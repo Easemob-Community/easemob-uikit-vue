@@ -1,0 +1,53 @@
+{
+  "name": "@easemob/uikit",
+  "version": "1.0.0",
+  "description": "Easemob UIKit Vue3 Components",
+  "type": "module",
+  "main": "./dist/easemob-uikit.umd.cjs",
+  "module": "./dist/easemob-uikit.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/easemob-uikit.js",
+      "require": "./dist/easemob-uikit.umd.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./resolver": {
+      "import": "./dist/resolver.js",
+      "types": "./dist/resolver.d.ts"
+    },
+    "./auto-imports": {
+      "import": "./dist/auto-imports.js",
+      "types": "./dist/auto-imports.d.ts"
+    },
+    "./theme": "./dist/theme/index.css"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "vite build && vue-tsc --emitDeclarationOnly",
+    "dev": "vite build --watch",
+    "story:dev": "histoire dev",
+    "story:build": "histoire build"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.0",
+    "pinia": "^2.1.0"
+  },
+  "dependencies": {
+    "easemob-websdk": "^4.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "vite-plugin-dts": "^3.6.0",
+    "unocss": "^0.58.0",
+    "@unocss/preset-wind": "^0.58.0",
+    "@unocss/preset-attributify": "^0.58.0",
+    "@unocss/preset-rem-to-px": "^0.58.0",
+    "histoire": "^0.17.0",
+    "@histoire/plugin-vue": "^0.17.0",
+    "typescript": "^5.3.0",
+    "vue": "^3.3.0",
+    "vue-tsc": "^1.8.0"
+  }
+}

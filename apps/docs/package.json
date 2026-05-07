@@ -1,0 +1,15 @@
+{
+  "name": "@easemob/docs",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0-rc.4",
+    "vue": "^3.3.0"
+  }
+}

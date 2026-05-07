@@ -1,0 +1,122 @@
+<script setup lang="ts">
+export interface ButtonProps {
+  type?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
+  size?: 'small' | 'medium' | 'large'
+  disabled?: boolean
+  loading?: boolean
+  block?: boolean
+}
+
+export interface ButtonEmits {
+  (e: 'click', event: MouseEvent): void
+}
+
+const props = withDefaults(defineProps<ButtonProps>(), {
+  type: 'default',
+  size: 'medium',
+  disabled: false,
+  loading: false,
+  block: false,
+})
+
+const emit = defineEmits<ButtonEmits>()
+
+function handleClick(event: MouseEvent) {
+  if (props.disabled || props.loading) return
+  emit('click', event)
+}
+</script>
+
+<template>
+  <button
+    class="uikit-button"
+    :class="[
+      `uikit-button--${props.type}`,
+      `uikit-button--${props.size}`,
+      { 'uikit-button--block': props.block, 'uikit-button--loading': props.loading },
+    ]"
+    :disabled="props.disabled || props.loading"
+    @click="handleClick"
+  >
+    <span v-if="props.loading" class="uikit-button__loading" />
+    <slot />
+  </button>
+</template>
+
+<style scoped>
+.uikit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-size: 14px;
+}
+
+.uikit-button--small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.uikit-button--medium {
+  padding: 8px 16px;
+}
+
+.uikit-button--large {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.uikit-button--primary {
+  background-color: var(--uikit-primary-color);
+  color: #fff;
+}
+
+.uikit-button--success {
+  background-color: var(--uikit-success-color);
+  color: #fff;
+}
+
+.uikit-button--warning {
+  background-color: var(--uikit-warning-color);
+  color: #fff;
+}
+
+.uikit-button--danger {
+  background-color: var(--uikit-danger-color);
+  color: #fff;
+}
+
+.uikit-button--default {
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-primary);
+}
+
+.uikit-button--block {
+  display: flex;
+  width: 100%;
+}
+
+.uikit-button--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.uikit-button__loading {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: uikit-spin 0.8s linear infinite;
+}
+
+@keyframes uikit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
