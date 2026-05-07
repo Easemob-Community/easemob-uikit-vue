@@ -9,14 +9,17 @@ import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
 import Icon from '../../components/icon/icon.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
+import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type { ConversationAction } from './types'
 
 const props = withDefaults(defineProps<{
   showSearch?: boolean
   customActions?: ConversationAction[]
+  showScrollToTop?: boolean
 }>(), {
   showSearch: true,
   customActions: () => [],
+  showScrollToTop: true,
 })
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations } = useConversation()
@@ -153,6 +156,15 @@ function confirmDelete() {
       </div>
     </div>
 
+    <!-- 滚动置顶按钮：放在滚动容器外部，由 conversation-list 定位 -->
+    <ScrollToTop
+      v-if="props.showScrollToTop"
+      :target="itemsRef ?? undefined"
+      :visibility-height="200"
+      :bottom="12"
+      :right="12"
+    />
+
     <!-- 删除会话二次确认 -->
     <Modal
       v-model:show="showDeleteModal"
@@ -179,6 +191,7 @@ function confirmDelete() {
   flex-direction: column;
   height: 100%;
   border-right: 1px solid #e5e7eb;
+  position: relative;
 }
 
 .conversation-list__header {

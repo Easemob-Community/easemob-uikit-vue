@@ -11,6 +11,8 @@ export interface ConversationContainerProps {
   includeEmptyConversations?: boolean
   /** 是否展示搜索框，默认 true */
   showSearch?: boolean
+  /** 是否展示滚动置顶按钮，默认 true */
+  showScrollToTop?: boolean
   /** 自定义 popup/action sheet 条目 */
   customActions?: ConversationAction[]
 }
@@ -19,6 +21,7 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   pageSize: 20,
   includeEmptyConversations: false,
   showSearch: true,
+  showScrollToTop: true,
   customActions: () => [],
 })
 
@@ -36,6 +39,7 @@ onMounted(() => {
   <div class="conversation-container">
     <ConversationList
       :show-search="props.showSearch"
+      :show-scroll-to-top="props.showScrollToTop"
       :custom-actions="props.customActions"
     >
       <template v-if="$slots.header" #header>

@@ -55,5 +55,13 @@ const customActions = [
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="Hide ScrollToTop">
+      <div style="height: 500px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationContainer :show-scroll-to-top="false" />
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>
