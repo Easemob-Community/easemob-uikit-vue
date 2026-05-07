@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ConversationList from '../modules/conversation/conversation-list.vue'
+import ConversationList from '../../modules/conversation/conversation-list.vue'
 </script>
 
 <template>

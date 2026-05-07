@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.3.0",
-    "easemob-websdk": "^4.2.0"
+    "easemob-websdk": "^4.21.0"
   },
   "devDependencies": {
     "@histoire/plugin-vue": "^0.17.0",

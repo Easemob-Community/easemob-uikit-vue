@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { ChatClient } from '../sdk/types'
+import { shallowRef, computed } from 'vue'
+import type { UIKitClient } from '../sdk/client'
 
 export const useClientStore = defineStore('client', () => {
-  const client = ref<ChatClient | null>(null)
-  const connected = ref(false)
-  const connecting = ref(false)
-  const currentUser = ref<string>('')
+  const client = shallowRef<UIKitClient | null>(null)
+  const connected = shallowRef(false)
+  const connecting = shallowRef(false)
+  const currentUser = shallowRef<string>('')
 
   const isLoggedIn = computed(() => connected.value && !!currentUser.value)
 
-  function setClient(instance: ChatClient) {
+  function setClient(instance: UIKitClient) {
     client.value = instance
   }
 

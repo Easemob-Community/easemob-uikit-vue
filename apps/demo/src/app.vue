@@ -4,7 +4,7 @@ import DemoPage from './demo-page.vue'
 </script>
 
 <template>
-  <UIKitProvider app-key="your-app-key">
+  <UIKitProvider :auto-init="false">
     <DemoPage />
   </UIKitProvider>
 </template>

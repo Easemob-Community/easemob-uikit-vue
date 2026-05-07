@@ -1,9 +1,9 @@
-import { inject, type InjectionKey } from 'vue'
-import type { ChatClient } from '../sdk/types'
+import { inject, type InjectionKey, type Ref } from 'vue'
+import type { UIKitClient } from '../sdk/client'
 import type { RootStores } from '../sdk/event-handler'
 
 export interface UIKitContext {
-  client: ChatClient | null
+  client: Ref<UIKitClient | null>
   stores: RootStores
   theme: ReturnType<typeof import('../store/theme').useThemeStore>
   locale: ReturnType<typeof import('../locale').useLocale>
