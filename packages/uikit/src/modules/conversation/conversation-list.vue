@@ -3,8 +3,14 @@ import { useConversation } from '../../composables/use-conversation'
 import { useLocale } from '../../locale'
 import ConversationItem from './conversation-item.vue'
 
-const { conversationList, selectConversation } = useConversation()
+const { conversationList, currentConversation, selectConversation, pinConversation, sendChannelAck, deleteConversation } = useConversation()
 const { t } = useLocale()
+
+function handleSelect(id: string) {
+  selectConversation(id)
+  // 进入会话后发送已读回执
+  sendChannelAck(id)
+}
 </script>
 
 <template>
@@ -17,7 +23,11 @@ const { t } = useLocale()
         v-for="item in conversationList"
         :key="item.id"
         :conversation="item"
-        @click="selectConversation(item.id)"
+        :class="{ 'is-active': currentConversation?.id === item.id }"
+        @click="handleSelect(item.id)"
+        @pin="pinConversation"
+        @delete="deleteConversation"
+        @read="sendChannelAck"
       />
     </div>
   </div>

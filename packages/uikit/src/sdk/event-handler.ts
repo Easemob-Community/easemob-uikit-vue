@@ -3,6 +3,7 @@ import type { EasemobChat } from 'easemob-websdk'
 import { useMessageStore } from '../store/message'
 import { useClientStore } from '../store/client'
 import { useConversationStore } from '../store/conversation'
+import { MESSAGE_TYPE, MESSAGE_STATUS, CONVERSATION_TYPE } from '../constants'
 
 export interface RootStores {
   message: ReturnType<typeof useMessageStore>
@@ -18,10 +19,10 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
         conversationId: msg.to,
         from: msg.from || '',
         to: msg.to,
-        type: 'text',
+        type: MESSAGE_TYPE.TXT,
         body: { msg: msg.msg },
         timestamp: msg.time || Date.now(),
-        status: 'sent',
+        status: MESSAGE_STATUS.SENT,
         isSelf: false,
       })
       stores.conversation.addConversation({
@@ -29,7 +30,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
         name: msg.from || '',
         lastMessage: msg.msg || '',
         lastMessageTime: msg.time || Date.now(),
-        type: 'single',
+        type: CONVERSATION_TYPE.SINGLECHAT,
       })
     },
     onImageMessage: (msg: EasemobChat.ImgMsgBody) => {
@@ -38,12 +39,30 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
         conversationId: msg.to,
         from: msg.from || '',
         to: msg.to,
-        type: 'image',
+        type: MESSAGE_TYPE.IMG,
         body: { url: msg.url, thumb: msg.thumb },
         timestamp: msg.time || Date.now(),
-        status: 'sent',
+        status: MESSAGE_STATUS.SENT,
         isSelf: false,
       })
+    },
+    /** 会话已读回执：对方已读，将本地对应会话未读数置为 0 */
+    onChannelMessage: (msg: any) => {
+      const conversationId = msg.from
+      if (conversationId) {
+        stores.conversation.updateUnreadCount(conversationId, 0)
+      }
+    },
+    /** 多设备事件同步：置顶/取消置顶/删除会话 */
+    onMultiDeviceEvent: (event: any) => {
+      const { operation, conversationId, conversationType } = event
+      if (operation === 'pinnedConversation') {
+        stores.conversation.togglePin(conversationId, true, event.timestamp)
+      } else if (operation === 'unpinnedConversation') {
+        stores.conversation.togglePin(conversationId, false)
+      } else if (operation === 'deleteConversation') {
+        stores.conversation.deleteConversation(conversationId)
+      }
     },
     onConnected: () => {
       stores.client.setConnected(true)

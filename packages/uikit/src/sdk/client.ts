@@ -1,13 +1,13 @@
 import WebIM, { type EasemobChat } from 'easemob-websdk'
 import type { ClientConfig } from './types'
+import { MESSAGE_STATUS, ACK_TYPE, CONVERSATION_TYPE } from '../constants'
+import type { MessageStatusValue, ConversationTypeValue } from '../constants'
 
 let clientInstance: UIKitClient | null = null
 
-export type MessageStatus = 'sending' | 'sent' | 'failed'
-
 export type MessageStatusCallback = (
   localMsgId: string,
-  status: MessageStatus
+  status: MessageStatusValue
 ) => void
 
 /**
@@ -47,12 +47,13 @@ export class UIKitClient {
     this._onMessageStatus = cb
   }
 
-  /** 登录 */
-  async login(params: { user: string; accessToken?: string }) {
+  /** 登录（支持 accessToken 或密码） */
+  async login(params: { user: string; accessToken?: string; password?: string }) {
     return this._connection.open({
       user: params.user,
-      accessToken: params.accessToken,
-    })
+      ...(params.accessToken ? { accessToken: params.accessToken } : {}),
+      ...(params.password ? { pwd: params.password } : {}),
+    } as any)
   }
 
   /** 登出 */
@@ -64,13 +65,13 @@ export class UIKitClient {
   async sendText(options: EasemobChat.CreateTextMsgParameters) {
     const msg = WebIM.message.create(options)
     const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, 'sending')
+    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
     try {
       const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, 'sent')
+      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
       return result
     } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, 'failed')
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
       throw error
     }
   }
@@ -79,13 +80,13 @@ export class UIKitClient {
   async sendImage(options: EasemobChat.CreateImgMsgParameters) {
     const msg = WebIM.message.create(options)
     const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, 'sending')
+    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
     try {
       const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, 'sent')
+      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
       return result
     } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, 'failed')
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
       throw error
     }
   }
@@ -94,13 +95,13 @@ export class UIKitClient {
   async sendFile(options: EasemobChat.CreateFileMsgParameters) {
     const msg = WebIM.message.create(options)
     const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, 'sending')
+    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
     try {
       const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, 'sent')
+      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
       return result
     } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, 'failed')
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
       throw error
     }
   }
@@ -109,15 +110,62 @@ export class UIKitClient {
   async sendCustom(options: EasemobChat.CreateCustomMsgParameters) {
     const msg = WebIM.message.create(options)
     const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, 'sending')
+    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
     try {
       const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, 'sent')
+      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
       return result
     } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, 'failed')
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
       throw error
     }
+  }
+
+  /** 从服务端分页获取会话列表 */
+  async getServerConversations(options?: {
+    pageSize?: number
+    cursor?: string
+    includeEmptyConversations?: boolean
+  }) {
+    const conn = this._connection as any
+    return conn.getServerConversations({
+      pageSize: options?.pageSize ?? 50,
+      cursor: options?.cursor ?? '',
+      includeEmptyConversations: options?.includeEmptyConversations ?? false,
+    })
+  }
+
+  /** 置顶/取消置顶会话 */
+  async pinConversation(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    isPinned: boolean
+  }) {
+    const conn = this._connection as any
+    return conn.pinConversation(options)
+  }
+
+  /** 发送会话已读回执 */
+  async sendChannelAck(options: {
+    chatType: ConversationTypeValue
+    to: string
+  }) {
+    const msg = WebIM.message.create({
+      type: ACK_TYPE.CHANNEL,
+      chatType: options.chatType,
+      to: options.to,
+    })
+    return this._connection.send(msg)
+  }
+
+  /** 删除会话 */
+  async deleteConversation(options: {
+    channel: string
+    chatType: ConversationTypeValue
+    deleteRoam?: boolean
+  }) {
+    const conn = this._connection as any
+    return conn.deleteConversation(options)
   }
 
   /** 添加事件处理器 */

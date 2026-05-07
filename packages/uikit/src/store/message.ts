@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { MessageTypeValue, MessageStatusValue } from '../constants'
 
 export interface Message {
   id: string
   conversationId: string
   from: string
   to: string
-  type: 'text' | 'image' | 'voice' | 'video' | 'file'
+  type: MessageTypeValue
   body: Record<string, any>
   timestamp: number
-  status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed'
+  status: MessageStatusValue
   isSelf: boolean
 }
 

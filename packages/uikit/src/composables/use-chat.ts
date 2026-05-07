@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useUIKit } from './use-uikit'
 import type { Message } from '../store/message'
+import { MESSAGE_STATUS, MESSAGE_TYPE } from '../constants'
 
 export function useChat() {
   const { stores } = useUIKit()
@@ -14,7 +15,7 @@ export function useChat() {
 
   const currentConversation = computed(() => conversationStore.currentConversation)
 
-  function sendMessage(body: Record<string, any>, type: Message['type'] = 'text') {
+  function sendMessage(body: Record<string, any>, type: Message['type'] = MESSAGE_TYPE.TXT) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
 
@@ -26,7 +27,7 @@ export function useChat() {
       type,
       body,
       timestamp: Date.now(),
-      status: 'sending',
+      status: MESSAGE_STATUS.SENDING,
       isSelf: true,
     }
 

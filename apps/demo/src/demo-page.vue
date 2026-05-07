@@ -22,7 +22,9 @@ const sdkAppKey = ref('')
 const sdkApiUrl = ref('')
 const sdkDebug = ref(false)
 const loginUser = ref('')
+const loginPassword = ref('')
 const loginToken = ref('')
+const loginMode = ref<'password' | 'token'>('password')
 
 function handleInit() {
   init({
@@ -35,7 +37,15 @@ function handleInit() {
 async function handleLogin() {
   if (!loginUser.value) return
   try {
-    await login({ user: loginUser.value, accessToken: loginToken.value || undefined })
+    const params: { user: string; accessToken?: string; password?: string } = {
+      user: loginUser.value,
+    }
+    if (loginMode.value === 'token' && loginToken.value) {
+      params.accessToken = loginToken.value
+    } else if (loginMode.value === 'password' && loginPassword.value) {
+      params.password = loginPassword.value
+    }
+    await login(params)
   } catch (err) {
     alert('登录失败: ' + (err as Error).message)
   }
@@ -253,16 +263,41 @@ function updatePrimaryColor(e: Event) {
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
               <input
                 v-model="loginUser"
-                placeholder="user"
+                placeholder="用户名"
                 class="demo-input"
-                style="width: 100px;"
+                style="width: 120px;"
               />
-              <input
-                v-model="loginToken"
-                placeholder="accessToken (可选)"
-                class="demo-input"
-                style="width: 140px;"
-              />
+              <template v-if="loginMode === 'password'">
+                <input
+                  v-model="loginPassword"
+                  placeholder="密码"
+                  type="password"
+                  class="demo-input"
+                  style="width: 120px;"
+                />
+              </template>
+              <template v-else>
+                <input
+                  v-model="loginToken"
+                  placeholder="accessToken"
+                  class="demo-input"
+                  style="width: 140px;"
+                />
+              </template>
+              <button
+                class="demo-btn"
+                :class="{ 'demo-btn--active': loginMode === 'password' }"
+                @click="loginMode = 'password'"
+              >
+                密码
+              </button>
+              <button
+                class="demo-btn"
+                :class="{ 'demo-btn--active': loginMode === 'token' }"
+                @click="loginMode = 'token'"
+              >
+                Token
+              </button>
               <button
                 class="demo-btn"
                 :disabled="!loginUser || isLoggedIn"

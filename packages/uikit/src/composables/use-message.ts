@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useUIKit } from './use-uikit'
+import { MESSAGE_STATUS } from '../constants'
 
 export function useMessage() {
   const { stores } = useUIKit()
@@ -14,7 +15,7 @@ export function useMessage() {
   }
 
   function recallMessage(msgId: string) {
-    messageStore.updateMessageStatus(msgId, 'failed')
+    messageStore.updateMessageStatus(msgId, MESSAGE_STATUS.FAILED)
     // TODO: call SDK recall
   }
 
