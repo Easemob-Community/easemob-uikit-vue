@@ -324,7 +324,15 @@ function updatePrimaryColor(e: Event) {
     <!-- 主体内容 -->
     <div class="demo-layout__body">
       <div class="demo-layout__sidebar">
-        <ConversationContainer />
+        <ConversationContainer>
+        <!-- 自定义头部的用法 -->
+          <!-- <template #header>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 600;">哈哈哈</span>
+              <span style="font-size: 12px; color: #6b7280;">v1.0</span>
+            </div>
+          </template> -->
+        </ConversationContainer>
       </div>
       <div class="demo-layout__main">
         <ChatContainer />

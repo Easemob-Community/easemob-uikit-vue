@@ -19,6 +19,7 @@ export interface Conversation {
 export const useConversationStore = defineStore('conversation', () => {
   const conversationList = ref<Conversation[]>([])
   const currentConversation = ref<Conversation | null>(null)
+  const conversationCursor = ref<string | null>(null)
 
   /** 按置顶状态和时间排序的会话列表 */
   const sortedConversationList = computed(() => {
@@ -31,6 +32,10 @@ export const useConversationStore = defineStore('conversation', () => {
       const bTime = b.pinnedTime || b.lastMessageTime || 0
       return bTime - aTime
     })
+  })
+
+  const hasMoreConversations = computed(() => {
+    return conversationCursor.value !== null && conversationCursor.value !== ''
   })
 
   function addConversation(cvs: Conversation) {
@@ -79,15 +84,22 @@ export const useConversationStore = defineStore('conversation', () => {
     }
   }
 
+  function setConversationCursor(cursor: string | null) {
+    conversationCursor.value = cursor
+  }
+
   function clearConversationList() {
     conversationList.value = []
     currentConversation.value = null
+    conversationCursor.value = null
   }
 
   return {
     conversationList,
     sortedConversationList,
     currentConversation,
+    conversationCursor,
+    hasMoreConversations,
     addConversation,
     setConversationList,
     deleteConversation,
@@ -95,6 +107,7 @@ export const useConversationStore = defineStore('conversation', () => {
     updateConversation,
     updateUnreadCount,
     togglePin,
+    setConversationCursor,
     clearConversationList,
   }
 })

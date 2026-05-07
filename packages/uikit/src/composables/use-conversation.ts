@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import type { Conversation } from '../store/conversation'
 
@@ -23,6 +23,8 @@ export function useConversation() {
 
   const conversationList = computed(() => conversationStore.sortedConversationList)
   const currentConversation = computed(() => conversationStore.currentConversation)
+  const hasMore = computed(() => conversationStore.hasMoreConversations)
+  const loadingMore = ref(false)
 
   function selectConversation(id: string) {
     const cvs = conversationStore.conversationList.find((c: { id: string }) => c.id === id)
@@ -36,12 +38,35 @@ export function useConversation() {
     pageSize?: number
     cursor?: string
     includeEmptyConversations?: boolean
+    append?: boolean
   }) {
     const res = await client.value?.getServerConversations(options)
     const list: any[] = res?.data?.conversations || []
     const mapped = list.map(mapServerConversation)
-    conversationStore.setConversationList(mapped)
+
+    if (options?.append) {
+      mapped.forEach((cvs) => conversationStore.addConversation(cvs))
+    } else {
+      conversationStore.setConversationList(mapped)
+    }
+
+    conversationStore.setConversationCursor(res?.data?.cursor || null)
     return res
+  }
+
+  /** 加载更多会话 */
+  async function loadMoreConversations(pageSize?: number) {
+    if (loadingMore.value || !hasMore.value) return
+    loadingMore.value = true
+    try {
+      await fetchServerConversations({
+        pageSize,
+        cursor: conversationStore.conversationCursor || undefined,
+        append: true,
+      })
+    } finally {
+      loadingMore.value = false
+    }
   }
 
   /** 置顶/取消置顶会话 */
@@ -84,14 +109,35 @@ export function useConversation() {
     conversationStore.deleteConversation(id)
   }
 
+  /** 本地添加/更新单个会话 */
+  function addLocalConversation(cvs: Conversation) {
+    conversationStore.addConversation(cvs)
+  }
+
+  /** 本地批量设置会话列表 */
+  function setLocalConversationList(list: Conversation[]) {
+    conversationStore.setConversationList(list)
+  }
+
+  /** 本地更新会话字段 */
+  function updateLocalConversation(id: string, patch: Partial<Conversation>) {
+    conversationStore.updateConversation(id, patch)
+  }
+
   return {
     conversationList,
     currentConversation,
+    hasMore,
+    loadingMore,
     selectConversation,
     fetchServerConversations,
+    loadMoreConversations,
     pinConversation,
     sendChannelAck,
     deleteConversation,
     removeConversation,
+    addLocalConversation,
+    setLocalConversationList,
+    updateLocalConversation,
   }
 }

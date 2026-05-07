@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import Popup from '../popup/popup.vue'
+import Icon from '../icon/icon.vue'
 
 export interface ActionSheetItem {
   name: string
   color?: string
   disabled?: boolean
+  icon?: string
 }
 
 export interface ActionSheetProps {
@@ -58,7 +60,8 @@ function onCancel() {
           :style="item.color ? { color: item.color } : undefined"
           @click="onSelect(item, index)"
         >
-          {{ item.name }}
+          <Icon v-if="item.icon" :name="item.icon" :size="16" />
+          <span>{{ item.name }}</span>
         </div>
       </div>
       <div class="uikit-action-sheet__cancel" @click="onCancel">
@@ -94,6 +97,10 @@ function onCancel() {
   cursor: pointer;
   transition: background-color 0.15s;
   border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .uikit-action-sheet__item:active {
