@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useInfiniteScroll } from '@vueuse/core'
+import { useInfiniteScroll, onClickOutside } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
+import { useViewport } from '../../composables/use-viewport'
 import { useLocale } from '../../locale'
 import ConversationItem from './conversation-item.vue'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
+import Icon from '../../components/icon/icon.vue'
+import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import type { ConversationAction } from './types'
 
 const props = withDefaults(defineProps<{
@@ -18,9 +21,47 @@ const props = withDefaults(defineProps<{
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations } = useConversation()
 const { t } = useLocale()
+const { isMobile } = useViewport()
 
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
+const showHeaderMenu = ref(false)
+const headerMenuRef = ref<HTMLElement>()
+const showHeaderActionSheet = ref(false)
+
+onClickOutside(headerMenuRef, () => {
+  showHeaderMenu.value = false
+})
+
+/** Header 菜单项定义 */
+const headerMenuItems = computed(() => [
+  { key: 'newChat', label: t('conversation.newChat'), icon: 'chat/bubble_fill' },
+  { key: 'addContact', label: t('conversation.addContact'), icon: 'people/person_add' },
+  { key: 'createGroup', label: t('conversation.createGroup'), icon: 'people/person_double_fill' },
+])
+
+const headerActionSheetActions = computed(() =>
+  headerMenuItems.value.map((item) => ({ name: item.label, icon: item.icon }))
+)
+
+function onHeaderMenuClick() {
+  if (isMobile.value) {
+    showHeaderActionSheet.value = true
+  } else {
+    showHeaderMenu.value = !showHeaderMenu.value
+  }
+}
+
+function onHeaderActionSheetSelect(_item: { name: string; icon?: string }, index: number) {
+  // TODO: 根据 key 执行对应操作
+  headerMenuItems.value[index]
+}
+
+function onHeaderMenuItemClick(key: string) {
+  showHeaderMenu.value = false
+  // TODO: 根据 key 执行对应操作
+  void key
+}
 
 const filteredConversationList = computed(() => {
   if (!searchKeyword.value.trim()) return conversationList.value
@@ -71,6 +112,22 @@ function confirmDelete() {
       <slot name="header">
         <span class="conversation-list__title">{{ t('conversation.title') }}</span>
       </slot>
+      <div ref="headerMenuRef" class="conversation-list__menu-wrapper">
+        <div class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
+          <Icon name="actions/plus_in_circle" :size="22" />
+        </div>
+        <div v-if="showHeaderMenu && !isMobile" class="conversation-list__menu">
+          <div
+            v-for="item in headerMenuItems"
+            :key="item.key"
+            class="conversation-list__menu-item"
+            @click="onHeaderMenuItemClick(item.key)"
+          >
+            <Icon :name="item.icon" :size="18" />
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div v-if="props.showSearch" class="conversation-list__search">
       <Input
@@ -106,6 +163,13 @@ function confirmDelete() {
     >
       <div>{{ t('conversation.deleteConfirm') }}</div>
     </Modal>
+
+    <!-- H5 Header 菜单 ActionSheet -->
+    <ActionSheet
+      v-model:show="showHeaderActionSheet"
+      :actions="headerActionSheetActions"
+      @select="onHeaderActionSheetSelect"
+    />
   </div>
 </template>
 
@@ -120,6 +184,56 @@ function confirmDelete() {
 .conversation-list__header {
   padding: 16px;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.conversation-list__menu-wrapper {
+  position: relative;
+}
+
+.conversation-list__menu-trigger {
+  cursor: pointer;
+  color: var(--uikit-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: background-color 0.15s;
+}
+
+.conversation-list__menu-trigger:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.conversation-list__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--uikit-bg-base);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
+  padding: 6px 0;
+  z-index: 100;
+}
+
+.conversation-list__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--uikit-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s;
+  white-space: nowrap;
+}
+
+.conversation-list__menu-item:hover {
+  background-color: var(--uikit-bg-secondary);
 }
 
 .conversation-list__search {
