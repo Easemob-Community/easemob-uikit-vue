@@ -12,6 +12,22 @@ export function useTheme() {
     themeStore.setMode(value)
   }
 
+  function setPrimaryColor(hue: number) {
+    themeStore.setPrimaryColor(hue)
+  }
+
+  function setAvatarShape(shape: 'circle' | 'square') {
+    themeStore.setAvatarShape(shape)
+  }
+
+  function setBubbleShape(shape: 'ground' | 'square') {
+    themeStore.setBubbleShape(shape)
+  }
+
+  function setComponentsShape(shape: 'ground' | 'square') {
+    themeStore.setComponentsShape(shape)
+  }
+
   function toggleMode() {
     themeStore.setMode(themeStore.mode === 'light' ? 'dark' : 'light')
   }
@@ -20,7 +36,14 @@ export function useTheme() {
     mode,
     primaryColor,
     isDark,
+    avatarShape: computed(() => themeStore.avatarShape),
+    bubbleShape: computed(() => themeStore.bubbleShape),
+    componentsShape: computed(() => themeStore.componentsShape),
     setMode,
+    setPrimaryColor,
+    setAvatarShape,
+    setBubbleShape,
+    setComponentsShape,
     toggleMode,
   }
 }

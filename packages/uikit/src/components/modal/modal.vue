@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Popup from './popup.vue'
-import Button from './button.vue'
+import Popup from '../popup/popup.vue'
+import Button from '../button/button.vue'
 
 export interface ModalProps {
   show: boolean

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { useConversation } from '../../composables/use-conversation'
+import { useLocale } from '../../locale'
 import ConversationItem from './conversation-item.vue'
 
 const { conversationList, selectConversation } = useConversation()
+const { t } = useLocale()
 </script>
 
 <template>
   <div class="conversation-list">
     <div class="conversation-list__header">
-      <span class="conversation-list__title">会话列表</span>
+      <span class="conversation-list__title">{{ t('conversation.title') }}</span>
     </div>
     <div class="conversation-list__items">
       <ConversationItem

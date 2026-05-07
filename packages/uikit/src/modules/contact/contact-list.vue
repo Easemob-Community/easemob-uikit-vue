@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { useContact } from '../../composables/use-contact'
-import Avatar from '../../components/avatar.vue'
+import { useLocale } from '../../locale'
+import Avatar from '../../components/avatar/avatar.vue'
 
 const { contactList } = useContact()
+const { t } = useLocale()
 </script>
 
 <template>
   <div class="contact-list">
     <div class="contact-list__header">
-      <span class="contact-list__title">联系人</span>
+      <span class="contact-list__title">{{ t('contact.title') }}</span>
     </div>
     <div class="contact-list__items">
       <div

@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { useChat } from '../../composables/use-chat'
+import { useLocale } from '../../locale'
 import MessageList from './message-list.vue'
 import MessageInput from './message-input.vue'
 
 const { currentConversation } = useChat()
+const { t } = useLocale()
 </script>
 
 <template>
   <div class="chat">
     <div class="chat__header">
-      <span class="chat__title">{{ currentConversation?.name || '聊天' }}</span>
+      <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
     </div>
     <MessageList class="chat__messages" />
     <MessageInput class="chat__input" />

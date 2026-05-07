@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
 export interface PopupProps {
   show: boolean
@@ -36,11 +37,18 @@ const transitionName = computed(() => {
   return map[props.position] || 'uikit-fade'
 })
 
-function onOverlayClick() {
-  if (props.closeOnClickOverlay) {
+const contentRef = ref<HTMLElement>()
+
+onClickOutside(contentRef, () => {
+  if (props.closeOnClickOverlay && props.show) {
     emit('update:show', false)
     emit('close')
   }
+})
+
+function onCloseClick() {
+  emit('update:show', false)
+  emit('close')
 }
 </script>
 
@@ -48,14 +56,15 @@ function onOverlayClick() {
   <Teleport to="body">
     <Transition name="uikit-fade">
       <div v-if="props.show" class="uikit-popup" :style="{ zIndex: props.zIndex }">
-        <div v-if="props.overlay" class="uikit-popup__overlay" @click="onOverlayClick" />
+        <div v-if="props.overlay" class="uikit-popup__overlay" />
         <Transition :name="transitionName">
           <div
             v-if="props.show"
+            ref="contentRef"
             class="uikit-popup__content"
             :class="`uikit-popup__content--${props.position}`"
           >
-            <div v-if="props.showClose" class="uikit-popup__close" @click="onOverlayClick">
+            <div v-if="props.showClose" class="uikit-popup__close" @click="onCloseClick">
               &times;
             </div>
             <slot />

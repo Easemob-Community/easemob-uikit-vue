@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Popup from './popup.vue'
+import Popup from '../popup/popup.vue'
 
 export interface ActionSheetItem {
   name: string

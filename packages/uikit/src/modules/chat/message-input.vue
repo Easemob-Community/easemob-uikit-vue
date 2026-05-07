@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useChat } from '../../composables/use-chat'
-import Input from '../../components/input.vue'
-import Button from '../../components/button.vue'
+import { useLocale } from '../../locale'
+import Input from '../../components/input/input.vue'
+import Button from '../../components/button/button.vue'
 
 const { sendMessage } = useChat()
+const { t } = useLocale()
 const text = ref('')
 
 function handleSubmit() {
@@ -18,11 +20,11 @@ function handleSubmit() {
   <div class="message-input">
     <Input
       v-model="text"
-      placeholder="请输入消息..."
+      :placeholder="t('chat.placeholder')"
       class="message-input__field"
       @submit="handleSubmit"
     />
-    <Button type="primary" size="small" @click="handleSubmit">发送</Button>
+    <Button type="primary" size="small" @click="handleSubmit">{{ t('chat.send') }}</Button>
   </div>
 </template>
 

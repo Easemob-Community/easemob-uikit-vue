@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useThemeStore } from '../../store/theme'
 
 export interface AvatarProps {
   src?: string
@@ -10,8 +11,12 @@ export interface AvatarProps {
 
 const props = withDefaults(defineProps<AvatarProps>(), {
   size: 40,
-  shape: 'circle',
+  shape: undefined,
 })
+
+const themeStore = useThemeStore()
+
+const avatarShape = computed(() => props.shape ?? themeStore.avatarShape)
 
 const displayName = computed(() => {
   if (!props.name) return ''
@@ -28,7 +33,7 @@ const bgColor = computed(() => {
 <template>
   <div
     class="uikit-avatar"
-    :class="`uikit-avatar--${props.shape}`"
+    :class="`uikit-avatar--${avatarShape}`"
     :style="{ width: `${props.size}px`, height: `${props.size}px`, fontSize: `${props.size * 0.4}px` }"
   >
     <img v-if="props.src" :src="props.src" class="uikit-avatar__img" />

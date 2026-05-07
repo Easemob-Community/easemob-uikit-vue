@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useThemeStore } from '../../store/theme'
+
 export interface ButtonProps {
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
   size?: 'small' | 'medium' | 'large'
@@ -21,6 +24,11 @@ const props = withDefaults(defineProps<ButtonProps>(), {
 
 const emit = defineEmits<ButtonEmits>()
 
+const themeStore = useThemeStore()
+const shapeClass = computed(() =>
+  themeStore.componentsShape === 'square' ? 'uikit-button--square' : ''
+)
+
 function handleClick(event: MouseEvent) {
   if (props.disabled || props.loading) return
   emit('click', event)
@@ -33,6 +41,7 @@ function handleClick(event: MouseEvent) {
     :class="[
       `uikit-button--${props.type}`,
       `uikit-button--${props.size}`,
+      shapeClass,
       { 'uikit-button--block': props.block, 'uikit-button--loading': props.loading },
     ]"
     :disabled="props.disabled || props.loading"
@@ -54,6 +63,10 @@ function handleClick(event: MouseEvent) {
   cursor: pointer;
   transition: opacity 0.2s;
   font-size: 14px;
+}
+
+.uikit-button--square {
+  border-radius: 4px;
 }
 
 .uikit-button--small {

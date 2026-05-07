@@ -3,6 +3,7 @@ import type { LocaleMessages } from './type'
 const messages: LocaleMessages = {
   'button.confirm': 'Confirm',
   'button.cancel': 'Cancel',
+  'chat.title': 'Chat',
   'chat.placeholder': 'Type a message...',
   'chat.send': 'Send',
   'conversation.title': 'Conversations',

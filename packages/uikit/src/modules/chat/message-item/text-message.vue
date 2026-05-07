@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useThemeStore } from '../../../store/theme'
 import type { Message } from '../../../store/message'
 
 export interface TextMessageProps {
@@ -6,11 +8,16 @@ export interface TextMessageProps {
 }
 
 const props = defineProps<TextMessageProps>()
+
+const themeStore = useThemeStore()
+const bubbleClass = computed(() =>
+  themeStore.bubbleShape === 'square' ? 'text-message__bubble--square' : ''
+)
 </script>
 
 <template>
   <div class="text-message" :class="{ 'text-message--self': props.message.isSelf }">
-    <div class="text-message__bubble">
+    <div class="text-message__bubble" :class="bubbleClass">
       {{ props.message.body.msg }}
     </div>
   </div>
@@ -33,6 +40,10 @@ const props = defineProps<TextMessageProps>()
   color: var(--uikit-text-primary);
   font-size: 14px;
   word-break: break-word;
+}
+
+.text-message__bubble--square {
+  border-radius: 4px;
 }
 
 .text-message--self .text-message__bubble {

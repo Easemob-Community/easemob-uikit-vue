@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useThemeStore } from '../../../store/theme'
 import type { Message } from '../../../store/message'
 
 export interface ImageMessageProps {
@@ -6,6 +8,14 @@ export interface ImageMessageProps {
 }
 
 const props = defineProps<ImageMessageProps>()
+
+const themeStore = useThemeStore()
+const imgClass = computed(() =>
+  themeStore.bubbleShape === 'square' ? 'image-message__img--square' : ''
+)
+const placeholderClass = computed(() =>
+  themeStore.bubbleShape === 'square' ? 'image-message__placeholder--square' : ''
+)
 </script>
 
 <template>
@@ -14,9 +24,10 @@ const props = defineProps<ImageMessageProps>()
       v-if="props.message.body.url"
       :src="props.message.body.url"
       class="image-message__img"
+      :class="imgClass"
       alt="image"
     />
-    <div v-else class="image-message__placeholder">[图片]</div>
+    <div v-else class="image-message__placeholder" :class="placeholderClass">[图片]</div>
   </div>
 </template>
 
@@ -36,11 +47,19 @@ const props = defineProps<ImageMessageProps>()
   object-fit: cover;
 }
 
+.image-message__img--square {
+  border-radius: 4px;
+}
+
 .image-message__placeholder {
   padding: 10px 14px;
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
   font-size: 14px;
   color: var(--uikit-text-secondary);
+}
+
+.image-message__placeholder--square {
+  border-radius: 4px;
 }
 </style>

@@ -1,4 +1,5 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
+import { useEventListener } from '@vueuse/core'
 
 export function useKeyboard() {
   const keyboardHeight = ref(0)
@@ -15,15 +16,10 @@ export function useKeyboard() {
     setTimeout(handleResize, 300)
   }
 
-  onMounted(() => {
-    window.visualViewport?.addEventListener('resize', handleResize)
-    document.addEventListener('focusin', handleFocusIn)
-  })
-
-  onUnmounted(() => {
-    window.visualViewport?.removeEventListener('resize', handleResize)
-    document.removeEventListener('focusin', handleFocusIn)
-  })
+  if (window.visualViewport) {
+    useEventListener(window.visualViewport, 'resize', handleResize)
+  }
+  useEventListener(document, 'focusin', handleFocusIn)
 
   return {
     keyboardHeight,

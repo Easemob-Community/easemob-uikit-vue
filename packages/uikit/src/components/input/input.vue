@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useThemeStore } from '../../store/theme'
 
 export interface InputProps {
   modelValue?: string
@@ -26,6 +27,11 @@ const props = withDefaults(defineProps<InputProps>(), {
 const emit = defineEmits<InputEmits>()
 const inputRef = ref<HTMLInputElement | null>(null)
 
+const themeStore = useThemeStore()
+const shapeClass = computed(() =>
+  themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : ''
+)
+
 function onInput(e: Event) {
   const target = e.target as HTMLInputElement
   emit('update:modelValue', target.value)
@@ -44,6 +50,7 @@ function onKeydown(e: KeyboardEvent) {
     <input
       ref="inputRef"
       class="uikit-input__field"
+      :class="shapeClass"
       :value="props.modelValue"
       :type="props.type"
       :placeholder="props.placeholder"
@@ -73,6 +80,10 @@ function onKeydown(e: KeyboardEvent) {
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
   transition: border-color 0.2s;
+}
+
+.uikit-input__field--square {
+  border-radius: 4px;
 }
 
 .uikit-input__field:focus {

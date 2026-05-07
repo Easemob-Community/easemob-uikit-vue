@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Avatar from '../../components/avatar.vue'
-import Badge from '../../components/badge.vue'
+import Avatar from '../../components/avatar/avatar.vue'
+import Badge from '../../components/badge/badge.vue'
 import type { Conversation } from '../../store/conversation'
 
 export interface ConversationItemProps {
