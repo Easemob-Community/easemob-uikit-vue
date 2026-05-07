@@ -76,6 +76,7 @@ function confirmDelete() {
       <Input
         v-model="searchKeyword"
         :placeholder="t('conversation.searchPlaceholder')"
+        prefix-icon="misc/magnifier2"
       />
     </div>
     <div ref="itemsRef" class="conversation-list__items">

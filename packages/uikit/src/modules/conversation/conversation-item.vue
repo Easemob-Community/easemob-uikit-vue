@@ -90,6 +90,7 @@ const mergedActions = computed<MergedAction[]>(() => {
     actions.push({
       key: 'read',
       label: t('conversation.read'),
+      icon: 'chat/doneAll',
       handler: () => emit('read', props.conversation.id),
       position: 'both',
     })
@@ -98,6 +99,7 @@ const mergedActions = computed<MergedAction[]>(() => {
   actions.push({
     key: 'pin',
     label: props.conversation.isPinned ? t('conversation.unpin') : t('conversation.pin'),
+    icon: props.conversation.isPinned ? 'arrows/arrow_n_line' : 'arrows/line_n_arrow',
     handler: () => emit('pin', props.conversation.id, !props.conversation.isPinned),
     position: 'both',
   })
@@ -105,6 +107,7 @@ const mergedActions = computed<MergedAction[]>(() => {
   actions.push({
     key: 'delete',
     label: t('conversation.delete'),
+    icon: 'actions/trash',
     color: '#ef4444',
     danger: true,
     handler: () => emit('delete', props.conversation.id),
@@ -172,7 +175,7 @@ function onContextMenuItemClick(actionKey: string) {
         <div class="conversation-item__name-wrap">
           <span class="conversation-item__name">{{ props.conversation.name }}</span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
-            <Icon name="pin" :size="12" />
+            <Icon name="chat/pinned" :size="12" />
           </span>
         </div>
         <span v-if="props.conversation.lastMessageTime" class="conversation-item__time">

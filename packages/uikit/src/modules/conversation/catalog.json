@@ -1,0 +1,131 @@
+{
+  "module": "conversation",
+  "description": "会话列表模块所需图标映射，关联 src/assets/icons 下的实际资源文件",
+  "iconUsage": [
+    {
+      "feature": "搜索会话",
+      "scene": "会话列表顶部搜索输入框前缀图标",
+      "mapping": { "category": "misc", "file": "magnifier2.svg" }
+    },
+    {
+      "feature": "新建会话",
+      "scene": "会话列表标题栏右侧添加按钮",
+      "mapping": { "category": "actions", "file": "plus_in_circle.svg" },
+      "alternatives": [{ "category": "actions", "file": "plus_in_circle_fill.svg" }]
+    },
+    {
+      "feature": "置顶会话",
+      "scene": "右键/长按菜单中的「置顶」操作图标（横线+向上箭头，原项目映射 LINE_ARROW）",
+      "mapping": { "category": "arrows", "file": "line_n_arrow.svg" },
+      "note": "会话置顶使用 arrows/line_n_arrow，非 chat/pin（chat/pin 是消息置顶图标）"
+    },
+    {
+      "feature": "取消置顶",
+      "scene": "右键/长按菜单中的「取消置顶」操作图标（向下箭头+横线，原项目映射 ARROW_LINE）",
+      "mapping": { "category": "arrows", "file": "arrow_n_line.svg" },
+      "note": "取消置顶使用 arrows/arrow_n_line，非 chat/unpin"
+    },
+    {
+      "feature": "已置顶标识",
+      "scene": "会话项名称旁的置顶小图标",
+      "mapping": { "category": "chat", "file": "pinned.svg" },
+      "alternatives": [{ "category": "arrows", "file": "line_n_arrow.svg" }],
+      "note": "会话列表置顶标识"
+    },
+    {
+      "feature": "删除会话",
+      "scene": "右键/长按菜单中的「删除」操作图标",
+      "mapping": { "category": "actions", "file": "trash.svg" },
+      "alternatives": [{ "category": "actions", "file": "trashdelete.svg" }]
+    },
+    {
+      "feature": "免打扰",
+      "scene": "右键/长按菜单中的「免打扰」操作图标",
+      "mapping": { "category": "misc", "file": "bell_slash.svg" }
+    },
+    {
+      "feature": "免打扰标识(气泡)",
+      "scene": "会话项上显示免打扰状态的气泡图标",
+      "mapping": { "category": "chat", "file": "bubble_slash_fill.svg" }
+    },
+    {
+      "feature": "标记已读",
+      "scene": "右键/长按菜单中的「标记已读」操作图标",
+      "mapping": { "category": "chat", "file": "doneAll.svg" }
+    },
+    {
+      "feature": "通知提醒",
+      "scene": "会话项免打扰关闭时的铃铛图标",
+      "mapping": { "category": "misc", "file": "bell.svg" }
+    },
+    {
+      "feature": "消息已读",
+      "scene": "消息气泡上的已读回执状态图标",
+      "mapping": { "category": "status", "file": "read@3x.png" }
+    },
+    {
+      "feature": "消息已送达",
+      "scene": "消息气泡上的已送达回执状态图标",
+      "mapping": { "category": "status", "file": "received@3x.png" }
+    },
+    {
+      "feature": "消息发送中",
+      "scene": "消息气泡上的发送中状态图标",
+      "mapping": { "category": "status", "file": "sending@3x.png" }
+    },
+    {
+      "feature": "消息已发送",
+      "scene": "消息气泡上的已发送状态图标",
+      "mapping": { "category": "status", "file": "sent@3x.png" }
+    },
+    {
+      "feature": "消息发送失败",
+      "scene": "消息气泡上的发送失败状态图标",
+      "mapping": { "category": "status", "file": "failed@3x.png" }
+    },
+    {
+      "feature": "在线状态-在线",
+      "scene": "会话项头像右下角的在线状态指示",
+      "mapping": { "category": "status", "file": "Online.png" },
+      "alternatives": [{ "category": "status", "file": "Online2.png" }]
+    },
+    {
+      "feature": "在线状态-忙碌",
+      "scene": "会话项头像右下角的忙碌状态指示",
+      "mapping": { "category": "status", "file": "Busy.png" },
+      "alternatives": [{ "category": "status", "file": "Busy2.png" }]
+    },
+    {
+      "feature": "在线状态-勿扰",
+      "scene": "会话项头像右下角的勿扰状态指示",
+      "mapping": { "category": "status", "file": "Do_not_Disturb.png" },
+      "alternatives": [{ "category": "status", "file": "Do_not_Disturb2.png" }]
+    },
+    {
+      "feature": "在线状态-离线",
+      "scene": "会话项头像右下角的离线状态指示",
+      "mapping": { "category": "status", "file": "Offline.png" },
+      "alternatives": [{ "category": "status", "file": "Offline2.png" }]
+    },
+    {
+      "feature": "在线状态-离开",
+      "scene": "会话项头像右下角的离开状态指示",
+      "mapping": { "category": "status", "file": "leave.png" },
+      "alternatives": [{ "category": "status", "file": "leave2.png" }]
+    },
+    {
+      "feature": "加载中",
+      "scene": "会话列表底部加载更多的旋转指示",
+      "mapping": { "category": "actions", "file": "spinner.svg" },
+      "alternatives": [
+        { "category": "actions", "file": "loading.svg" },
+        { "category": "actions", "file": "loading_circle.svg" }
+      ]
+    },
+    {
+      "feature": "空状态",
+      "scene": "会话列表为空时的占位图标",
+      "mapping": { "category": "misc", "file": "empty.svg" }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "name": "easemob-uikit-react 图标资源库",
+  "source": "从 easemob-uikit-react 项目抽离的图标与图片资源",
+  "totalCount": 246,
+  "format": "SVG(矢量图标) + PNG(位图素材)",
+  "svgSize": "20x20 或 24x24 (viewBox)",
+  "categories": [
+    {
+      "dir": "arrows",
+      "count": 16,
+      "label": "箭头方向",
+      "desc": "用于导航、指向、排序、上传下载等场景"
+    },
+    {
+      "dir": "audio-video",
+      "count": 35,
+      "label": "音视频通话",
+      "desc": "用于音视频通话、直播、语音消息、摄像头等场景"
+    },
+    {
+      "dir": "people",
+      "count": 13,
+      "label": "人员用户",
+      "desc": "用于联系人、群组、好友管理、用户头像占位等场景"
+    },
+    {
+      "dir": "chat",
+      "count": 17,
+      "label": "聊天消息",
+      "desc": "用于会话、消息操作、话题、置顶、转发等场景"
+    },
+    {
+      "dir": "actions",
+      "count": 32,
+      "label": "操作交互",
+      "desc": "用于确认、删除、加载、选择、关闭等交互场景"
+    },
+    {
+      "dir": "navigation",
+      "count": 13,
+      "label": "导航菜单",
+      "desc": "用于页面导航、布局切换、侧边栏等场景"
+    },
+    {
+      "dir": "files-media",
+      "count": 14,
+      "label": "文件媒体",
+      "desc": "用于文件管理、图片查看、位置分享、链接等场景"
+    },
+    {
+      "dir": "status",
+      "count": 23,
+      "label": "状态指示",
+      "desc": "用于在线状态、消息发送状态、警告提示等场景"
+    },
+    {
+      "dir": "emojis-reactions",
+      "count": 54,
+      "label": "表情回应",
+      "desc": "包含表情输入SVG和52个emoji回应PNG图片"
+    },
+    {
+      "dir": "gifts",
+      "count": 4,
+      "label": "礼物",
+      "desc": "用于礼物打赏、礼物消息等场景"
+    },
+    {
+      "dir": "misc",
+      "count": 25,
+      "label": "其他杂项",
+      "desc": "通知、设置、安全、可见性、主题切换、搜索等功能图标"
+    }
+  ],
+  "namingConventions": {
+    "fill": "实心/填充样式",
+    "slash": "带斜线(表示关闭/禁止)",
+    "n": "and 的缩写(如 circle_n_dot = 圆圈和圆点)",
+    "thick": "粗线条样式",
+    "thin": "细线条样式",
+    "_in_": "包含于(如 triangle_in_circle = 圆圈中的三角)",
+    "_on_": "叠加/开启(如 mic_on = 麦克风开启)",
+    "U+": "Unicode编码(emoji反应PNG命名)"
+  },
+  "usage": "每个子目录下的 catalog.json 包含该分类所有图标的语义描述和用途说明，AI可直接读取catalog.json查找所需图标"
+}

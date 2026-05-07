@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useThemeStore } from '../../store/theme'
+import Icon from '../icon/icon.vue'
 
 export interface InputProps {
   modelValue?: string
@@ -9,6 +10,8 @@ export interface InputProps {
   disabled?: boolean
   maxlength?: number
   rows?: number
+  /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
+  prefixIcon?: string
 }
 
 export interface InputEmits {
@@ -46,7 +49,13 @@ function onKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="uikit-input">
+  <div class="uikit-input" :class="{ 'uikit-input--with-prefix': props.prefixIcon }">
+    <Icon
+      v-if="props.prefixIcon"
+      :name="props.prefixIcon"
+      :size="16"
+      class="uikit-input__prefix-icon"
+    />
     <input
       ref="inputRef"
       class="uikit-input__field"
@@ -68,6 +77,20 @@ function onKeydown(e: KeyboardEvent) {
 .uikit-input {
   display: flex;
   width: 100%;
+  position: relative;
+}
+
+.uikit-input--with-prefix .uikit-input__field {
+  padding-left: 36px;
+}
+
+.uikit-input__prefix-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--uikit-text-secondary, #9ca3af);
+  pointer-events: none;
 }
 
 .uikit-input__field {

@@ -1,0 +1,20 @@
+{
+  "category": "files-media",
+  "description": "文件/媒体类图标，用于文件管理、图片查看、位置分享等场景",
+  "icons": [
+    { "file": "archives.svg", "name": "归档(线框)", "usage": "归档消息、文件归档" },
+    { "file": "archives_plus.svg", "name": "归档添加", "usage": "添加归档、新建归档" },
+    { "file": "archives_xmark.svg", "name": "归档移除", "usage": "移除归档、取消归档" },
+    { "file": "box_up_arrow.svg", "name": "上传到盒子", "usage": "上传文件、文件提交" },
+    { "file": "doc.svg", "name": "文档(线框)", "usage": "文档文件、消息中的文件" },
+    { "file": "doc_lock.svg", "name": "加密文档", "usage": "加密文件、受保护文档" },
+    { "file": "doc_on_doc.svg", "name": "文档叠加", "usage": "合并文档、文件引用" },
+    { "file": "file.svg", "name": "文件(基础)", "usage": "通用文件图标" },
+    { "file": "folder.svg", "name": "文件夹", "usage": "文件夹、文件目录" },
+    { "file": "gif.svg", "name": "GIF动图", "usage": "GIF图片、动图消息" },
+    { "file": "img.svg", "name": "图片(线框)", "usage": "图片、图片消息" },
+    { "file": "img_xmark.svg", "name": "图片移除", "usage": "删除图片、取消图片" },
+    { "file": "link.svg", "name": "链接", "usage": "超链接、URL分享" },
+    { "file": "location.svg", "name": "位置", "usage": "位置分享、地图定位" }
+  ]
+}

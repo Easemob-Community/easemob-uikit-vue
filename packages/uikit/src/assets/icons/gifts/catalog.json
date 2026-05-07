@@ -1,0 +1,11 @@
+{
+  "category": "gifts",
+  "description": "礼物类资源，用于礼物打赏、礼物消息等场景",
+  "icons": [
+    { "file": "gift.svg", "name": "礼物盒子(SVG)", "usage": "礼物入口、礼物图标" },
+    { "file": "dollagora.png", "name": "多拉戈拉(礼物素材)", "usage": "礼物打赏素材-多拉戈拉" },
+    { "file": "gift.svg", "name": "礼物(SVG副本)", "usage": "礼物打赏素材-礼物SVG" },
+    { "file": "heart.png", "name": "爱心(礼物素材)", "usage": "礼物打赏素材-爱心" },
+    { "file": "star.png", "name": "星星(礼物素材)", "usage": "礼物打赏素材-星星" }
+  ]
+}

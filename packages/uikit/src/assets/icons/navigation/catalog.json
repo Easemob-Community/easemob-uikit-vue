@@ -1,0 +1,19 @@
+{
+  "category": "navigation",
+  "description": "导航/菜单类图标，用于页面导航、布局切换、侧边栏等场景",
+  "icons": [
+    { "file": "3chart.svg", "name": "三栏图表", "usage": "数据面板、统计视图" },
+    { "file": "bar_square_fill.svg", "name": "侧边栏(实心)", "usage": "侧边栏切换、导航菜单" },
+    { "file": "board.svg", "name": "看板", "usage": "看板视图、面板布局" },
+    { "file": "boxes.svg", "name": "多格视图", "usage": "多窗口布局、网格视图" },
+    { "file": "chevron_4_all_around.svg", "name": "四向箭头(全向)", "usage": "全方向移动、自由拖拽" },
+    { "file": "chevron_4_cluster.svg", "name": "四向箭头(聚簇)", "usage": "多方向调整、布局调整" },
+    { "file": "chevron_down.svg", "name": "向下折叠", "usage": "下拉展开、折叠面板" },
+    { "file": "chevron_left.svg", "name": "向左折叠", "usage": "左折叠、返回上级" },
+    { "file": "chevron_right.svg", "name": "向右展开", "usage": "右展开、进入下级" },
+    { "file": "chevron_up.svg", "name": "向上收起", "usage": "上拉收起、折叠面板" },
+    { "file": "hamburger.svg", "name": "汉堡菜单", "usage": "导航菜单入口、侧边栏切换" },
+    { "file": "instance_outlined.svg", "name": "实例(线框)", "usage": "实例切换、多账户" },
+    { "file": "rectangle_separate.svg", "name": "分屏矩形", "usage": "分屏布局、窗口分离" }
+  ]
+}

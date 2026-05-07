@@ -1,0 +1,19 @@
+{
+  "category": "people",
+  "description": "人员/用户类图标，用于联系人、群组、好友管理等场景",
+  "icons": [
+    { "file": "person_3lines_fill.svg", "name": "联系人列表(实心)", "usage": "通讯录、联系人列表" },
+    { "file": "person_add.svg", "name": "添加联系人(线框)", "usage": "添加好友、邀请用户" },
+    { "file": "person_add_fill.svg", "name": "添加联系人(实心)", "usage": "添加好友按钮、邀请成员" },
+    { "file": "person_double_3lines_fill.svg", "name": "群组成员列表(实心)", "usage": "群成员列表、多人管理" },
+    { "file": "person_double_fill.svg", "name": "双人(实心)", "usage": "双人会话、好友关系、群聊" },
+    { "file": "person_minus.svg", "name": "移除联系人(线框)", "usage": "移除好友、踢出群组" },
+    { "file": "person_minus_fill.svg", "name": "移除联系人(实心)", "usage": "移除成员按钮" },
+    { "file": "person_single_fill.svg", "name": "单人(实心)", "usage": "用户头像占位、单人标识" },
+    { "file": "person_single_line_fill.svg", "name": "单人带线条(实心)", "usage": "用户详情、个人资料" },
+    { "file": "person_single_outline.svg", "name": "单人(线框)", "usage": "用户占位、未登录头像" },
+    { "file": "person_slash_fill.svg", "name": "禁言用户(实心)", "usage": "禁言、黑名单用户" },
+    { "file": "person_xmark_fill.svg", "name": "删除用户(实心)", "usage": "删除联系人、拉黑用户" },
+    { "file": "user.svg", "name": "用户(基础)", "usage": "通用用户图标、头像占位" }
+  ]
+}

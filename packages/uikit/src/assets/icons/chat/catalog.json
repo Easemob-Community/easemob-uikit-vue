@@ -1,0 +1,23 @@
+{
+  "category": "chat",
+  "description": "聊天/消息类图标，用于会话、消息操作、话题、置顶等场景",
+  "icons": [
+    { "file": "3lines_n_arrow.svg", "name": "转发列表", "usage": "消息转发、列表跳转" },
+    { "file": "airplane.svg", "name": "发送消息", "usage": "发送按钮、消息发送" },
+    { "file": "bubble_fill.svg", "name": "聊天气泡(实心)", "usage": "会话列表、消息入口" },
+    { "file": "bubble_n_hashtag.svg", "name": "话题气泡", "usage": "话题/频道消息" },
+    { "file": "bubble_slash_fill.svg", "name": "消息免打扰(实心)", "usage": "会话免打扰、消息屏蔽" },
+    { "file": "doneAll.svg", "name": "全部已读", "usage": "消息已读回执、全部已读" },
+    { "file": "envelope.svg", "name": "信封", "usage": "私信、邮件消息" },
+    { "file": "gotoMessage.svg", "name": "跳转到消息", "usage": "定位到指定消息、消息跳转" },
+    { "file": "hashtag_gap.svg", "name": "话题#号(间隔)", "usage": "话题标记、频道标识" },
+    { "file": "hashtag_in_bubble.svg", "name": "话题气泡(线框)", "usage": "话题/子区入口" },
+    { "file": "hashtag_in_bubble_fill.svg", "name": "话题气泡(实心)", "usage": "话题/子区活跃状态" },
+    { "file": "hashtag_n_lock.svg", "name": "私密话题", "usage": "私密频道、加密话题" },
+    { "file": "modifyMsg.svg", "name": "编辑消息", "usage": "修改已发送的消息" },
+    { "file": "pin-1.svg", "name": "图钉(样式1)", "usage": "置顶/固定消息(备选样式，非会话置顶用的图标)" },
+    { "file": "pin.svg", "name": "图钉", "usage": "消息置顶图标，注意：会话列表置顶/取消置顶实际用的是 arrows/line_n_arrow.svg 和 arrows/arrow_n_line.svg" },
+    { "file": "pinned.svg", "name": "已置顶", "usage": "消息已置顶状态、置顶标识" },
+    { "file": "unpin.svg", "name": "取消置顶", "usage": "取消置顶、取消固定" }
+  ]
+}
