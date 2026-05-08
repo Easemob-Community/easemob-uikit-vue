@@ -26,7 +26,6 @@ const bubbleClass = computed(() =>
 <style scoped>
 .text-message {
   display: flex;
-  max-width: 70%;
 }
 
 .text-message--self {
@@ -39,7 +38,8 @@ const bubbleClass = computed(() =>
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
   font-size: 14px;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .text-message__bubble--square {

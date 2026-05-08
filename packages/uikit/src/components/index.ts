@@ -9,6 +9,7 @@ export { default as Modal } from './modal/modal.vue'
 export { default as Toast } from './toast/toast.vue'
 export { default as ActionSheet } from './action-sheet/action-sheet.vue'
 export { default as ScrollToTop } from './scroll-to-top/scroll-to-top.vue'
+export { default as EmojiPicker } from './emoji-picker/emoji-picker.vue'
 
 export const componentList = [
   'button',
@@ -21,4 +22,5 @@ export const componentList = [
   'toast',
   'action-sheet',
   'scroll-to-top',
+  'emoji-picker',
 ] as const

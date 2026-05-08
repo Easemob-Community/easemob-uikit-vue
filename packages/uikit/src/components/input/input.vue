@@ -16,6 +16,7 @@ export interface InputProps {
 
 export interface InputEmits {
   (e: 'update:modelValue', value: string): void
+  (e: 'input', event: Event): void
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
   (e: 'submit', value: string): void
@@ -38,6 +39,7 @@ const shapeClass = computed(() =>
 function onInput(e: Event) {
   const target = e.target as HTMLInputElement
   emit('update:modelValue', target.value)
+  emit('input', e)
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -46,6 +48,10 @@ function onKeydown(e: KeyboardEvent) {
     emit('submit', props.modelValue)
   }
 }
+
+defineExpose({
+  inputRef,
+})
 </script>
 
 <template>

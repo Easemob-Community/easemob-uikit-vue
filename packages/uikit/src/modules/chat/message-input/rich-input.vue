@@ -62,6 +62,8 @@ const editor = useEditor({
     }),
   ],
   content: '',
+  onCreate: ({ editor: e }) => updateHasContent(e),
+  onUpdate: ({ editor: e }) => updateHasContent(e),
   editorProps: {
     attributes: {
       class: 'rich-input__editor-content',
@@ -102,12 +104,13 @@ const editor = useEditor({
 })
 
 /** 是否有内容（包含文本或图片） */
-const hasContent = computed(() => {
-  if (!editor.value) return false
-  const text = editor.value.getText().trim()
-  const html = editor.value.getHTML()
-  return text.length > 0 || html.includes('<img')
-})
+const hasContent = ref(false)
+
+function updateHasContent(e: any) {
+  const text = e.getText().trim()
+  const html = e.getHTML()
+  hasContent.value = text.length > 0 || html.includes('<img')
+}
 
 /** 发送消息 */
 function handleSend() {

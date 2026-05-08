@@ -1,0 +1,220 @@
+{
+  "module": "chat",
+  "description": "聊天模块所需图标映射，关联 src/assets/icons 下的实际资源文件",
+  "iconUsage": [
+    {
+      "feature": "返回箭头",
+      "scene": "聊天信息抽屉的返回按钮",
+      "mapping": { "category": "arrows", "file": "arrow_left_thick.svg" }
+    },
+    {
+      "feature": "编辑备注",
+      "scene": "聊天信息抽屉中编辑备注的图标",
+      "mapping": { "category": "misc", "file": "edit.svg" }
+    },
+    {
+      "feature": "Emoji表情",
+      "scene": "输入框工具栏的Emoji按钮",
+      "mapping": { "category": "emojis-reactions", "file": "face.svg" }
+    },
+    {
+      "feature": "图片上传",
+      "scene": "输入框工具栏的图片上传按钮",
+      "mapping": { "category": "files-media", "file": "img.svg" }
+    },
+    {
+      "feature": "视频上传",
+      "scene": "输入框工具栏的视频上传按钮",
+      "mapping": { "category": "audio-video", "file": "video_camera.svg" }
+    },
+    {
+      "feature": "文件上传",
+      "scene": "输入框工具栏的文件上传按钮",
+      "mapping": { "category": "files-media", "file": "file.svg" }
+    },
+    {
+      "feature": "语音输入",
+      "scene": "输入框工具栏的语音录制按钮（默认状态）",
+      "mapping": { "category": "audio-video", "file": "mic.svg" }
+    },
+    {
+      "feature": "语音输入(激活)",
+      "scene": "输入框工具栏的语音录制按钮（录制中状态）",
+      "mapping": { "category": "audio-video", "file": "mic_on.svg" }
+    },
+    {
+      "feature": "富文本粗体",
+      "scene": "富文本输入框工具栏的粗体按钮",
+      "mapping": { "category": "misc", "file": "bold.svg" }
+    },
+    {
+      "feature": "富文本斜体",
+      "scene": "富文本输入框工具栏的斜体按钮",
+      "mapping": { "category": "misc", "file": "italic.svg" }
+    },
+    {
+      "feature": "富文本删除线",
+      "scene": "富文本输入框工具栏的删除线按钮",
+      "mapping": { "category": "misc", "file": "strikethrough.svg" }
+    },
+    {
+      "feature": "富文本代码",
+      "scene": "富文本输入框工具栏的代码按钮",
+      "mapping": { "category": "misc", "file": "code.svg" }
+    },
+    {
+      "feature": "文件类型-图片",
+      "scene": "文件消息气泡中图片类型的文件图标",
+      "mapping": { "category": "files-media", "file": "image.svg" }
+    },
+    {
+      "feature": "文件类型-视频",
+      "scene": "文件消息气泡中视频类型的文件图标",
+      "mapping": { "category": "files-media", "file": "video.svg" }
+    },
+    {
+      "feature": "文件类型-音频",
+      "scene": "文件消息气泡中音频类型的文件图标",
+      "mapping": { "category": "files-media", "file": "audio.svg" }
+    },
+    {
+      "feature": "文件类型-PDF",
+      "scene": "文件消息气泡中PDF类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file_pdf.svg" }
+    },
+    {
+      "feature": "文件类型-Word",
+      "scene": "文件消息气泡中Word类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file_doc.svg" }
+    },
+    {
+      "feature": "文件类型-Excel",
+      "scene": "文件消息气泡中Excel类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file_xls.svg" }
+    },
+    {
+      "feature": "文件类型-PPT",
+      "scene": "文件消息气泡中PPT类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file_ppt.svg" }
+    },
+    {
+      "feature": "文件类型-压缩包",
+      "scene": "文件消息气泡中压缩包类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file_zip.svg" }
+    },
+    {
+      "feature": "文件类型-通用",
+      "scene": "文件消息气泡中未知类型的文件图标",
+      "mapping": { "category": "files-media", "file": "file.svg" }
+    },
+    {
+      "feature": "消息已读",
+      "scene": "消息气泡上的已读回执状态图标",
+      "mapping": { "category": "status", "file": "read@3x.png" }
+    },
+    {
+      "feature": "消息已送达",
+      "scene": "消息气泡上的已送达回执状态图标",
+      "mapping": { "category": "status", "file": "received@3x.png" }
+    },
+    {
+      "feature": "消息发送中",
+      "scene": "消息气泡上的发送中状态图标",
+      "mapping": { "category": "status", "file": "sending@3x.png" }
+    },
+    {
+      "feature": "消息已发送",
+      "scene": "消息气泡上的已发送状态图标",
+      "mapping": { "category": "status", "file": "sent@3x.png" }
+    },
+    {
+      "feature": "消息发送失败",
+      "scene": "消息气泡上的发送失败状态图标",
+      "mapping": { "category": "status", "file": "failed@3x.png" }
+    },
+    {
+      "feature": "新消息提示",
+      "scene": "消息列表底部新消息提示的向下箭头图标",
+      "mapping": { "category": "arrows", "file": "arrow_down_thick.svg" },
+      "alternatives": [{ "category": "arrows", "file": "arrow_down_thin.svg" }]
+    },
+    {
+      "feature": "@提及",
+      "scene": "输入框@提及功能的人物/提及图标",
+      "mapping": { "category": "people", "file": "mention.svg" },
+      "alternatives": [{ "category": "people", "file": "people_tag.svg" }],
+      "note": "如 people 分类下无 mention 图标，可用 people_tag 或 at 相关图标替代"
+    },
+    {
+      "feature": "引用消息",
+      "scene": "右键/长按菜单中的「引用」操作图标",
+      "mapping": { "category": "chat", "file": "quote.svg" },
+      "alternatives": [{ "category": "arrows", "file": "arrow_Uturn_anti_clockwise.svg" }]
+    },
+    {
+      "feature": "复制消息",
+      "scene": "右键/长按菜单中的「复制」操作图标",
+      "mapping": { "category": "actions", "file": "copy.svg" },
+      "note": "如 actions 分类下无 copy 图标，可用 misc/copy 或文档类图标替代"
+    },
+    {
+      "feature": "删除消息",
+      "scene": "右键/长按菜单中的「删除」操作图标",
+      "mapping": { "category": "actions", "file": "trash.svg" },
+      "alternatives": [{ "category": "actions", "file": "trashdelete.svg" }]
+    },
+    {
+      "feature": "撤回消息",
+      "scene": "右键/长按菜单中的「撤回」操作图标",
+      "mapping": { "category": "arrows", "file": "arrow_Uturn_anti_clockwise.svg" },
+      "alternatives": [{ "category": "arrows", "file": "arrow_Uturn_clockwise.svg" }]
+    },
+    {
+      "feature": "转发消息",
+      "scene": "右键/长按菜单中的「转发」操作图标",
+      "mapping": { "category": "arrows", "file": "arrow_n_line.svg" },
+      "note": "转发可使用箭头相关图标"
+    },
+    {
+      "feature": "多选消息",
+      "scene": "右键/长按菜单中的「多选」操作图标",
+      "mapping": { "category": "actions", "file": "checked_ellipse.svg" },
+      "alternatives": [{ "category": "actions", "file": "check.svg" }]
+    },
+    {
+      "feature": "翻译消息",
+      "scene": "右键/长按菜单中的「翻译」操作图标",
+      "mapping": { "category": "misc", "file": "language.svg" },
+      "note": "如 misc 分类下无 language 图标，可用地球/文本相关图标替代"
+    },
+    {
+      "feature": "置顶消息",
+      "scene": "右键/长按菜单中的「置顶」操作图标",
+      "mapping": { "category": "chat", "file": "pin.svg" },
+      "alternatives": [{ "category": "arrows", "file": "line_n_arrow.svg" }]
+    },
+    {
+      "feature": "多选转发",
+      "scene": "多选模式底部操作栏的转发按钮图标",
+      "mapping": { "category": "chat", "file": "forward.svg" },
+      "alternatives": [{ "category": "arrows", "file": "arrow_n_line.svg" }]
+    },
+    {
+      "feature": "多选删除",
+      "scene": "多选模式底部操作栏的删除按钮图标",
+      "mapping": { "category": "actions", "file": "trash.svg" }
+    },
+    {
+      "feature": "视频播放",
+      "scene": "视频消息气泡中的播放按钮图标",
+      "mapping": { "category": "audio-video", "file": "play.svg" },
+      "alternatives": [{ "category": "audio-video", "file": "play_fill.svg" }]
+    },
+    {
+      "feature": "关闭预览",
+      "scene": "视频全屏预览的关闭按钮图标",
+      "mapping": { "category": "actions", "file": "close.svg" },
+      "alternatives": [{ "category": "actions", "file": "xmark_thick.svg" }]
+    }
+  ]
+}

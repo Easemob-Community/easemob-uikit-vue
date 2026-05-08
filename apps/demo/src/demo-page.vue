@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   ConversationContainer,
   ChatContainer,
@@ -20,12 +20,33 @@ const { setLocalConversationList } = useConversation()
 
 const showSettings = ref(false)
 
+// 输入框配置状态
+const chatInputMode = ref<'simple' | 'rich'>('simple')
+const chatInputStyle = ref<'wechat' | 'feishu'>('wechat')
+const chatInputFeatures = ref({
+  emoji: true,
+  image: true,
+  file: true,
+  voice: true,
+  video: false,
+  mention: true,
+})
+
+/** ChatContainer 配置 */
+const chatConfig = computed(() => ({
+  input: {
+    mode: chatInputMode.value,
+    style: chatInputStyle.value,
+    features: { ...chatInputFeatures.value },
+  },
+}))
+
 // SDK 初始化相关状态
-const sdkAppKey = ref('')
+const sdkAppKey = ref('easemob-demo#support')
 const sdkApiUrl = ref('')
 const sdkDebug = ref(false)
-const loginUser = ref('')
-const loginPassword = ref('')
+const loginUser = ref('hfp')
+const loginPassword = ref('1')
 const loginToken = ref('')
 const loginMode = ref<'password' | 'token'>('password')
 
@@ -301,6 +322,76 @@ function injectMockConversations() {
           </div>
 
           <div class="demo-settings__group">
+            <label class="demo-settings__label">输入框模式</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatInputMode === 'simple' }"
+                @click="chatInputMode = 'simple'"
+              >
+                简洁
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatInputMode === 'rich' }"
+                @click="chatInputMode = 'rich'"
+              >
+                富文本
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">输入框风格</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatInputStyle === 'wechat' }"
+                @click="chatInputStyle = 'wechat'"
+              >
+                微信
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatInputStyle === 'feishu' }"
+                @click="chatInputStyle = 'feishu'"
+              >
+                飞书
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">输入框功能</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.emoji" type="checkbox" />
+                <span>Emoji</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.image" type="checkbox" />
+                <span>图片</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.file" type="checkbox" />
+                <span>文件</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.voice" type="checkbox" />
+                <span>语音</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.video" type="checkbox" />
+                <span>视频</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="chatInputFeatures.mention" type="checkbox" />
+                <span>@提及</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
             <label class="demo-settings__label">语言</label>
             <div class="demo-settings__options">
               <button
@@ -449,7 +540,7 @@ function injectMockConversations() {
         </ConversationContainer>
       </div>
       <div class="demo-layout__main">
-        <ChatContainer />
+        <ChatContainer :config="chatConfig" />
       </div>
     </div>
   </div>
