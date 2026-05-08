@@ -8,6 +8,12 @@ const showBottom = ref(false)
 const showTop = ref(false)
 const showLeft = ref(false)
 const showRight = ref(false)
+
+const anchorRef = ref<HTMLElement>()
+const showAnchorBottom = ref(false)
+const showAnchorTop = ref(false)
+const showAnchorLeft = ref(false)
+const showAnchorRight = ref(false)
 </script>
 
 <template>
@@ -49,6 +55,50 @@ const showRight = ref(false)
       <Popup v-model:show="showRight" position="right">
         <div style="padding: 40px; text-align: center;">
           右侧内容
+        </div>
+      </Popup>
+    </Variant>
+
+    <Variant title="Anchor Bottom">
+      <div style="display: flex; justify-content: center; padding: 40px;">
+        <Button ref="anchorRef" @click="showAnchorBottom = true">锚点下方</Button>
+      </div>
+      <Popup v-model:show="showAnchorBottom" :anchor="anchorRef" placement="bottom" :overlay="false">
+        <div style="padding: 16px; min-width: 160px;">
+          锚点下方内容
+        </div>
+      </Popup>
+    </Variant>
+
+    <Variant title="Anchor Top">
+      <div style="display: flex; justify-content: center; padding: 40px;">
+        <Button ref="anchorRef" @click="showAnchorTop = true">锚点上方</Button>
+      </div>
+      <Popup v-model:show="showAnchorTop" :anchor="anchorRef" placement="top" :overlay="false">
+        <div style="padding: 16px; min-width: 160px;">
+          锚点上方内容
+        </div>
+      </Popup>
+    </Variant>
+
+    <Variant title="Anchor Left">
+      <div style="display: flex; justify-content: center; padding: 40px;">
+        <Button ref="anchorRef" @click="showAnchorLeft = true">锚点左侧</Button>
+      </div>
+      <Popup v-model:show="showAnchorLeft" :anchor="anchorRef" placement="left" :overlay="false">
+        <div style="padding: 16px; min-width: 160px;">
+          锚点左侧内容
+        </div>
+      </Popup>
+    </Variant>
+
+    <Variant title="Anchor Right">
+      <div style="display: flex; justify-content: center; padding: 40px;">
+        <Button ref="anchorRef" @click="showAnchorRight = true">锚点右侧</Button>
+      </div>
+      <Popup v-model:show="showAnchorRight" :anchor="anchorRef" placement="right" :overlay="false">
+        <div style="padding: 16px; min-width: 160px;">
+          锚点右侧内容
         </div>
       </Popup>
     </Variant>

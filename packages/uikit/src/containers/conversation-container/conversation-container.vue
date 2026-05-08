@@ -28,8 +28,12 @@ export interface ConversationContainerProps {
   emptyText?: string
   /** 未读数显示模式：'count' 显示数字，'dot' 只显示红点，默认 'count' */
   unreadMode?: 'count' | 'dot'
+  /** 是否展示头部区域，默认 true */
+  showHeader?: boolean
   /** Header 标题文本 */
   title?: string
+  /** Header 内容对齐方式：left | center | right，默认 left */
+  headerAlign?: 'left' | 'center' | 'right'
   /** 自定义搜索过滤函数 */
   filterFn?: (keyword: string, item: Conversation) => boolean
   /** #body slot 是否固定不随列表滚动 */
@@ -55,6 +59,8 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   customActions: () => [],
   showSenderName: true,
   unreadMode: 'count',
+  showHeader: true,
+  headerAlign: 'left',
   bodySticky: false,
   footerSticky: false,
   pullRefresh: false,
@@ -96,7 +102,9 @@ function handleConversationSelect(id: string, conversation: Conversation) {
       :show-sender-name="props.showSenderName"
       :empty-text="props.emptyText"
       :unread-mode="props.unreadMode"
+      :show-header="props.showHeader"
       :title="props.title"
+      :header-align="props.headerAlign"
       :filter-fn="props.filterFn"
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"

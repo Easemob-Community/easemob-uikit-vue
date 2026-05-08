@@ -56,6 +56,14 @@ function customFilterFn(keyword: string, item: any): boolean {
       </div>
     </Variant>
 
+    <Variant title="Hide Header">
+      <div style="height: 500px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationContainer :show-header="false" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
     <Variant title="Custom Header">
       <div style="height: 500px;">
         <UIKitProvider :auto-init="false">
@@ -67,6 +75,14 @@ function customFilterFn(keyword: string, item: any): boolean {
               </div>
             </template>
           </ConversationContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Center Title">
+      <div style="height: 500px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationContainer title="消息" header-align="center" />
         </UIKitProvider>
       </div>
     </Variant>

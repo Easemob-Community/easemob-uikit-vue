@@ -23,8 +23,12 @@ const props = withDefaults(defineProps<{
   showSenderName?: boolean
   emptyText?: string
   unreadMode?: 'count' | 'dot'
+  /** 是否展示头部区域，默认 true */
+  showHeader?: boolean
   /** Header 标题文本，不传则使用 i18n 默认值 */
   title?: string
+  /** Header 内容对齐方式：left | center | right，默认 left */
+  headerAlign?: 'left' | 'center' | 'right'
   /** 自定义搜索过滤函数 */
   filterFn?: (keyword: string, item: Conversation) => boolean
   /** #body slot 是否固定不随列表滚动，默认 false */
@@ -39,6 +43,8 @@ const props = withDefaults(defineProps<{
   showScrollToTop: true,
   showSenderName: true,
   unreadMode: 'count',
+  showHeader: true,
+  headerAlign: 'left',
   bodySticky: false,
   footerSticky: false,
   pullRefresh: false,
@@ -161,7 +167,7 @@ function confirmDelete() {
 
 <template>
   <div class="conversation-list">
-    <div class="conversation-list__header">
+    <div v-if="props.showHeader" class="conversation-list__header" :class="`conversation-list__header--${props.headerAlign}`">
       <slot name="header">
         <span class="conversation-list__title">{{ props.title || t('conversation.title') }}</span>
       </slot>
@@ -280,6 +286,25 @@ function confirmDelete() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.conversation-list__header--center {
+  justify-content: center;
+  position: relative;
+}
+
+.conversation-list__header--center .conversation-list__menu-wrapper {
+  position: absolute;
+  right: 16px;
+}
+
+.conversation-list__header--right {
+  flex-direction: row-reverse;
+}
+
+.conversation-list__header--right .conversation-list__menu {
+  left: 0;
+  right: auto;
 }
 
 .conversation-list__menu-wrapper {

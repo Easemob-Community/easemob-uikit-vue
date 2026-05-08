@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { computed, nextTick, ref, watch } from 'vue'
+import { onClickOutside, useEventListener } from '@vueuse/core'
 
 export interface PopupProps {
   show: boolean
@@ -9,6 +9,12 @@ export interface PopupProps {
   overlay?: boolean
   closeOnClickOverlay?: boolean
   showClose?: boolean
+  /** 相对定位的锚点元素，传入后 popup 将相对于该元素定位 */
+  anchor?: HTMLElement
+  /** 相对锚点的位置，默认 'bottom' */
+  placement?: 'bottom' | 'top' | 'left' | 'right'
+  /** 与锚点的间距（px），默认 8 */
+  offset?: number
 }
 
 export interface PopupEmits {
@@ -22,11 +28,18 @@ const props = withDefaults(defineProps<PopupProps>(), {
   overlay: true,
   closeOnClickOverlay: true,
   showClose: false,
+  placement: 'bottom',
+  offset: 8,
 })
 
 const emit = defineEmits<PopupEmits>()
 
+const isAnchored = computed(() => !!props.anchor)
+
 const transitionName = computed(() => {
+  if (isAnchored.value) {
+    return 'uikit-fade'
+  }
   const map: Record<string, string> = {
     center: 'uikit-fade-scale',
     bottom: 'uikit-slide-up',
@@ -38,8 +51,93 @@ const transitionName = computed(() => {
 })
 
 const contentRef = ref<HTMLElement>()
+const contentStyle = ref<Record<string, string>>({})
+const ignoreClickOutside = ref(false)
 
-onClickOutside(contentRef, () => {
+function updateAnchorPosition() {
+  if (!isAnchored.value || !props.anchor || !contentRef.value) return
+
+  const anchorRect = props.anchor.getBoundingClientRect()
+  const contentRect = contentRef.value.getBoundingClientRect()
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const offset = props.offset
+
+  let x = 0
+  let y = 0
+
+  // 计算初始位置
+  switch (props.placement) {
+    case 'bottom':
+      x = anchorRect.left + (anchorRect.width - contentRect.width) / 2
+      y = anchorRect.bottom + offset
+      break
+    case 'top':
+      x = anchorRect.left + (anchorRect.width - contentRect.width) / 2
+      y = anchorRect.top - contentRect.height - offset
+      break
+    case 'left':
+      x = anchorRect.left - contentRect.width - offset
+      y = anchorRect.top + (anchorRect.height - contentRect.height) / 2
+      break
+    case 'right':
+      x = anchorRect.right + offset
+      y = anchorRect.top + (anchorRect.height - contentRect.height) / 2
+      break
+  }
+
+  // 边界检测与翻转
+  if (props.placement === 'bottom' && y + contentRect.height > vh) {
+    y = anchorRect.top - contentRect.height - offset
+  } else if (props.placement === 'top' && y < 0) {
+    y = anchorRect.bottom + offset
+  } else if (props.placement === 'right' && x + contentRect.width > vw) {
+    x = anchorRect.left - contentRect.width - offset
+  } else if (props.placement === 'left' && x < 0) {
+    x = anchorRect.right + offset
+  }
+
+  // 水平边界约束
+  if (contentRect.width <= vw) {
+    x = Math.max(offset, Math.min(x, vw - contentRect.width - offset))
+  }
+
+  // 垂直边界约束
+  if (contentRect.height <= vh) {
+    y = Math.max(offset, Math.min(y, vh - contentRect.height - offset))
+  }
+
+  contentStyle.value = {
+    position: 'fixed',
+    left: `${x}px`,
+    top: `${y}px`,
+  }
+}
+
+watch(() => [props.show, props.anchor], ([show]) => {
+  if (show && isAnchored.value) {
+    ignoreClickOutside.value = true
+    nextTick(() => {
+      updateAnchorPosition()
+      requestAnimationFrame(() => {
+        ignoreClickOutside.value = false
+      })
+    })
+  }
+})
+
+useEventListener(window, 'resize', () => {
+  if (props.show && isAnchored.value) updateAnchorPosition()
+})
+
+useEventListener(window, 'scroll', () => {
+  if (props.show && isAnchored.value) updateAnchorPosition()
+}, { capture: true })
+
+onClickOutside(contentRef, (event) => {
+  if (ignoreClickOutside.value) return
+  // 锚定模式下点击 anchor 本身不关闭 popup
+  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) return
   if (props.closeOnClickOverlay && props.show) {
     emit('update:show', false)
     emit('close')
@@ -62,7 +160,8 @@ function onCloseClick() {
             v-if="props.show"
             ref="contentRef"
             class="uikit-popup__content"
-            :class="`uikit-popup__content--${props.position}`"
+            :class="isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`"
+            :style="isAnchored ? contentStyle : undefined"
           >
             <div v-if="props.showClose" class="uikit-popup__close" @click="onCloseClick">
               &times;
@@ -145,6 +244,11 @@ function onCloseClick() {
   height: 100%;
   border-radius: 12px 0 0 12px;
   max-height: 100%;
+}
+
+.uikit-popup__content--anchored {
+  position: fixed;
+  margin: 0;
 }
 
 .uikit-popup__close {
