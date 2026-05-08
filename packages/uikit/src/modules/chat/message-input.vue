@@ -1,43 +1,281 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useChat } from '../../composables/use-chat'
-import { useLocale } from '../../locale'
-import Input from '../../components/input/input.vue'
-import Button from '../../components/button/button.vue'
+import { useViewport } from '../../composables/use-viewport'
+import { MESSAGE_TYPE } from '../../constants'
+import SimpleInput from './message-input/simple-input.vue'
+import RichInput from './message-input/rich-input.vue'
+import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
+import MentionPicker from './mention-picker.vue'
+import Popup from '../../components/popup/popup.vue'
+import type { ChatConfig, MentionContact } from './types'
+
+export interface MessageInputProps {
+  config?: ChatConfig
+  /** 当前是否为群聊 */
+  isGroup?: boolean
+}
+
+const props = defineProps<MessageInputProps>()
 
 const { sendMessage } = useChat()
-const { t } = useLocale()
-const text = ref('')
+const { isMobile } = useViewport()
 
-function handleSubmit() {
-  if (!text.value.trim()) return
-  sendMessage({ msg: text.value }, 'text')
-  text.value = ''
+/** 输入框配置 */
+const inputConfig = computed(() => props.config?.input)
+
+/** 输入框模式 */
+const inputMode = computed(() => {
+  // H5 端强制降级为 simple 模式
+  if (isMobile.value) return 'simple'
+  return inputConfig.value?.mode ?? 'simple'
+})
+
+/** Emoji 选择器显示状态 */
+const showEmojiPicker = ref(false)
+
+/** Emoji 锚点元素 */
+const emojiAnchorRef = ref<HTMLElement>()
+
+/** MentionPicker 显示状态 */
+const showMentionPicker = ref(false)
+
+/** MentionPicker 锚点元素 */
+const mentionAnchorRef = ref<HTMLElement>()
+
+/** Mention 过滤关键词 */
+const mentionKeyword = ref('')
+
+/** 是否启用 @提及 */
+const enableMention = computed(() => {
+  const cfg = inputConfig.value
+  if (cfg?.features?.mention === false) return false
+  const onlyInGroup = cfg?.mention?.onlyInGroup ?? true
+  if (onlyInGroup && !props.isGroup) return false
+  return true
+})
+
+/** @提及联系人列表 */
+const mentionContacts = computed(() => inputConfig.value?.mention?.contacts ?? [])
+
+/** SimpleInput 引用 */
+const simpleInputRef = ref<InstanceType<typeof SimpleInput>>()
+
+/** RichInput 引用 */
+const richInputRef = ref<InstanceType<typeof RichInput>>()
+
+/** 发送文本消息 */
+function handleSendText(text: string) {
+  sendMessage({ msg: text }, MESSAGE_TYPE.TXT)
 }
+
+/** 发送富文本消息 */
+function handleSendRich(_html: string, text: string) {
+  sendMessage({ msg: text }, MESSAGE_TYPE.TXT)
+}
+
+/** 待回收的 Blob URL 列表 */
+const pendingBlobUrls = new Set<string>()
+
+/** 发送文件消息 */
+function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
+  const file = files[0]
+  if (!file) return
+
+  const url = URL.createObjectURL(file)
+  // 记录 blob URL 以便后续回收
+  pendingBlobUrls.add(url)
+  const msgType = type === 'image'
+    ? MESSAGE_TYPE.IMG
+    : type === 'video'
+      ? MESSAGE_TYPE.VIDEO
+      : MESSAGE_TYPE.FILE
+
+  sendMessage(
+    {
+      url,
+      name: file.name,
+      size: file.size,
+    },
+    msgType
+  )
+}
+
+/** 打开 Emoji 选择器 */
+function onEmojiClick(anchorEl?: HTMLElement) {
+  if (anchorEl) {
+    emojiAnchorRef.value = anchorEl
+  }
+  showEmojiPicker.value = true
+}
+
+/** 选择 Emoji */
+function onEmojiSelect(emoji: string) {
+  showEmojiPicker.value = false
+  // TODO: 将 emoji 插入到当前输入框光标位置
+}
+
+/** 清理 @提及锚点 DOM */
+function cleanupMentionAnchor() {
+  if (mentionAnchorRef.value && mentionAnchorRef.value.parentNode) {
+    mentionAnchorRef.value.parentNode.removeChild(mentionAnchorRef.value)
+  }
+  mentionAnchorRef.value = undefined
+}
+
+/** 触发 @提及 */
+function onMentionTrigger(anchor: HTMLElement, keyword: string) {
+  // 先清理旧锚点
+  cleanupMentionAnchor()
+  mentionAnchorRef.value = anchor
+  mentionKeyword.value = keyword
+  showMentionPicker.value = true
+}
+
+/** 关闭 @提及 */
+function onMentionClose() {
+  showMentionPicker.value = false
+  cleanupMentionAnchor()
+}
+
+/** 选择 @提及联系人 */
+function onMentionSelect(contact: MentionContact) {
+  showMentionPicker.value = false
+  const name = contact.remark || contact.name
+  if (inputMode.value === 'simple') {
+    simpleInputRef.value?.insertMention?.(name)
+  } else {
+    richInputRef.value?.insertMention?.(name)
+  }
+  // 选择后清理锚点
+  cleanupMentionAnchor()
+}
+
+/** mention 关闭时清理锚点 */
+watch(showMentionPicker, (val) => {
+  if (!val) {
+    cleanupMentionAnchor()
+  }
+})
+
+/** 组件卸载时清理锚点与 Blob URL */
+onBeforeUnmount(() => {
+  cleanupMentionAnchor()
+  // 回收所有未释放的 Blob URL
+  pendingBlobUrls.forEach((url) => {
+    URL.revokeObjectURL(url)
+  })
+  pendingBlobUrls.clear()
+})
 </script>
 
 <template>
   <div class="message-input">
-    <Input
-      v-model="text"
-      :placeholder="t('chat.placeholder')"
-      class="message-input__field"
-      @submit="handleSubmit"
+    <!-- 简单输入框 -->
+    <SimpleInput
+      v-if="inputMode === 'simple'"
+      ref="simpleInputRef"
+      :config="inputConfig"
+      :enable-mention="enableMention"
+      @send="handleSendText"
+      @send-file="handleSendFile"
+      @emoji-click="onEmojiClick"
+      @mention-trigger="onMentionTrigger"
+      @mention-close="onMentionClose"
     />
-    <Button type="primary" size="small" @click="handleSubmit">{{ t('chat.send') }}</Button>
+
+    <!-- 富文本输入框 -->
+    <RichInput
+      v-else
+      ref="richInputRef"
+      :config="inputConfig"
+      :enable-mention="enableMention"
+      @send="handleSendRich"
+      @send-file="handleSendFile"
+      @emoji-click="onEmojiClick"
+      @mention-trigger="onMentionTrigger"
+      @mention-close="onMentionClose"
+    />
+
+    <!-- PC 端 Emoji Popup -->
+    <Popup
+      v-if="!isMobile"
+      :show="showEmojiPicker"
+      :anchor="emojiAnchorRef"
+      placement="top"
+      :overlay="false"
+      @update:show="showEmojiPicker = $event"
+    >
+      <EmojiPicker
+        :show="true"
+        @select="onEmojiSelect"
+        @update:show="showEmojiPicker = $event"
+      />
+    </Popup>
+
+    <!-- H5 端 Emoji ActionSheet（简化：底部弹层） -->
+    <div
+      v-if="isMobile && showEmojiPicker"
+      class="message-input__emoji-sheet"
+    >
+      <div class="message-input__emoji-sheet-mask" @click="showEmojiPicker = false" />
+      <div class="message-input__emoji-sheet-content">
+        <EmojiPicker
+          :show="true"
+          @select="onEmojiSelect"
+          @update:show="showEmojiPicker = $event"
+        />
+      </div>
+    </div>
+
+    <!-- @提及选择器 -->
+    <MentionPicker
+      v-if="enableMention"
+      :show="showMentionPicker"
+      :contacts="mentionContacts"
+      :keyword="mentionKeyword"
+      :anchor="mentionAnchorRef"
+      @update:show="showMentionPicker = $event"
+      @select="onMentionSelect"
+    />
   </div>
 </template>
 
 <style scoped>
 .message-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background-color: var(--uikit-bg-secondary);
+  position: relative;
 }
 
-.message-input__field {
-  flex: 1;
+/* H5 Emoji 底部弹层 */
+.message-input__emoji-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.message-input__emoji-sheet-mask {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.message-input__emoji-sheet-content {
+  position: relative;
+  background-color: var(--uikit-bg-base);
+  border-radius: 16px 16px 0 0;
+  padding: 12px;
+  animation: slide-up 0.2s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 </style>
