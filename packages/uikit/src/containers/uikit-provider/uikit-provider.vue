@@ -11,6 +11,7 @@ import { createEventHandler } from '../../sdk/event-handler'
 import { UIKIT_CONTEXT_KEY } from '../../composables/use-uikit'
 import type { ClientConfig } from '../../sdk/types'
 import type { UIKitClient } from '../../sdk/client'
+import type { AnimationConfig } from '../../store/theme'
 
 export interface ProviderProps {
   appKey?: string
@@ -21,6 +22,7 @@ export interface ProviderProps {
     primaryColor?: number
   }
   locale?: 'zh-CN' | 'en'
+  animation?: AnimationConfig
 }
 
 const props = withDefaults(defineProps<ProviderProps>(), {
@@ -86,6 +88,9 @@ onMounted(() => {
   }
   if (props.theme?.primaryColor) {
     themeStore.setPrimaryColor(props.theme.primaryColor)
+  }
+  if (props.animation) {
+    themeStore.applyAnimationConfig(props.animation)
   }
   setLocale(props.locale)
 })

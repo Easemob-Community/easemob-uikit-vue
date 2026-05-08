@@ -12,7 +12,7 @@ import {
 } from '@easemob/uikit'
 import type { Conversation } from '@easemob/uikit'
 
-const { mode, primaryColor, isDark, setMode, setPrimaryColor } = useTheme()
+const { mode, primaryColor, isDark, setMode, setPrimaryColor, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
@@ -229,6 +229,73 @@ function injectMockConversations() {
                 @click="themeStore.setComponentsShape('square')"
               >
                 直角
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">动画开关</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': animationEnabled }"
+                @click="setAnimationEnabled(true)"
+              >
+                开启
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': !animationEnabled }"
+                @click="setAnimationEnabled(false)"
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">动画强度</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': animationLevel === 'subtle' }"
+                @click="setAnimationLevel('subtle')"
+              >
+                轻柔
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': animationLevel === 'normal' }"
+                @click="setAnimationLevel('normal')"
+              >
+                标准
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': animationLevel === 'expressive' }"
+                @click="setAnimationLevel('expressive')"
+              >
+                生动
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">波纹效果</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': animationRipple }"
+                @click="setAnimationRipple(true)"
+              >
+                开启
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': !animationRipple }"
+                @click="setAnimationRipple(false)"
+              >
+                关闭
               </button>
             </div>
           </div>

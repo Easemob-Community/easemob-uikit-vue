@@ -30,5 +30,12 @@ export default defineConfig({
     'u-between': 'flex items-center justify-between',
     'u-ellipsis': 'overflow-hidden text-ellipsis whitespace-nowrap',
     'u-safe-bottom': 'pb-[env(safe-area-inset-bottom)]',
+    // ===== 动画相关 shortcuts =====
+    /** 按压缩放反馈，受 CSS 变量控制 */
+    'u-press': 'active:scale-[var(--uikit-anim-scale-press)] transition-transform duration-150',
+    /** Ripple 波纹容器，确保 position + overflow */
+    'u-ripple-container': 'relative overflow-hidden',
+    /** 使用动画标准缓动曲线的通用过渡 */
+    'u-transition': 'transition-all duration-[var(--uikit-anim-duration)] ease-[var(--uikit-anim-easing)]',
   },
 })

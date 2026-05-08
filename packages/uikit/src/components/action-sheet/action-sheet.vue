@@ -57,7 +57,7 @@ function onCancel() {
           :key="index"
           class="uikit-action-sheet__item"
           :class="{ 'uikit-action-sheet__item--disabled': item.disabled }"
-          :style="item.color ? { color: item.color } : undefined"
+          :style="{ ...item.color ? { color: item.color } : {}, animationDelay: `calc(var(--uikit-anim-stagger-delay) * ${index})` }"
           @click="onSelect(item, index)"
         >
           <Icon v-if="item.icon" :name="item.icon" :size="16" />
@@ -95,12 +95,14 @@ function onCancel() {
   font-size: 16px;
   color: var(--uikit-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 150ms var(--uikit-anim-easing);
   border-bottom: 1px solid #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  /* 交错出场动画 */
+  animation: uikit-action-item-in var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel) both;
 }
 
 .uikit-action-sheet__item:active {
@@ -125,5 +127,17 @@ function onCancel() {
 
 .uikit-action-sheet__cancel:active {
   opacity: 0.8;
+}
+
+/* 交错出场关键帧 */
+@keyframes uikit-action-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

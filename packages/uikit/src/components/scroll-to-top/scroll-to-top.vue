@@ -160,7 +160,8 @@ onUnmounted(() => {
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
   z-index: 10;
 }
 
@@ -173,14 +174,19 @@ onUnmounted(() => {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.uikit-scroll-top-fade-enter-active,
+.uikit-scroll-top-fade-enter-active {
+  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
+}
+
 .uikit-scroll-top-fade-leave-active {
-  transition: opacity 0.25s, transform 0.25s;
+  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-scroll-top-fade-enter-from,
 .uikit-scroll-top-fade-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(8px) scale(0.9);
 }
 </style>

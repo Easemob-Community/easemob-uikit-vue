@@ -14,6 +14,40 @@
   --uikit-scrollbar-thumb: #c1c1c1;
   --uikit-scrollbar-thumb-hover: #a0a0a0;
   --uikit-scrollbar-thumb-radius: 3px;
+
+  /* ===== 动画系统 CSS 变量 ===== */
+
+  /* 全局开关：1 = 开启动画，0 = 关闭动画 */
+  --uikit-anim-enabled: 1;
+
+  /* 动画强度等级: subtle / normal / expressive — 通过 ThemeStore 动态切换变量值 */
+  /* 基础时长 */
+  --uikit-anim-duration: 300ms;
+  /* 入场时长（比基础略长，产生减速感） */
+  --uikit-anim-duration-enter: 350ms;
+  /* 出场时长（比基础略短，产生加速感） */
+  --uikit-anim-duration-leave: 250ms;
+
+  /* 缓动曲线 */
+  --uikit-anim-easing: cubic-bezier(0.4, 0, 0.2, 1);         /* Material 标准 */
+  --uikit-anim-easing-decel: cubic-bezier(0, 0, 0.2, 1);      /* 入场减速 */
+  --uikit-anim-easing-accel: cubic-bezier(0.4, 0, 1, 1);      /* 出场加速 */
+  --uikit-anim-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性过冲 */
+
+  /* 按压缩放比 */
+  --uikit-anim-scale-press: 0.97;
+  /* Modal/弹窗入场缩放起点 */
+  --uikit-anim-scale-enter: 0.92;
+
+  /* Ripple 波纹 */
+  --uikit-anim-ripple-opacity: 0.15;
+  --uikit-anim-ripple-duration: 600ms;
+
+  /* Overlay 遮罩 */
+  --uikit-anim-overlay-duration: 300ms;
+
+  /* 交错动画间隔（Action-Sheet 项列） */
+  --uikit-anim-stagger-delay: 30ms;
 }
 
 [data-uikit-theme="dark"] {
@@ -52,4 +86,83 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--uikit-scrollbar-thumb) var(--uikit-scrollbar-track);
+}
+
+/* ===== 动画等级变量覆盖 ===== */
+/* subtle: 更短时长、更轻缩放 */
+[data-uikit-anim-level="subtle"] {
+  --uikit-anim-duration: 150ms;
+  --uikit-anim-duration-enter: 200ms;
+  --uikit-anim-duration-leave: 120ms;
+  --uikit-anim-scale-press: 0.99;
+  --uikit-anim-scale-enter: 0.97;
+  --uikit-anim-ripple-opacity: 0.08;
+  --uikit-anim-ripple-duration: 400ms;
+  --uikit-anim-stagger-delay: 15ms;
+}
+
+/* normal: 默认值已在 :root 定义，此处无需覆盖 */
+
+/* expressive: 更长时长、更明显缩放、弹性曲线 */
+[data-uikit-anim-level="expressive"] {
+  --uikit-anim-duration: 400ms;
+  --uikit-anim-duration-enter: 450ms;
+  --uikit-anim-duration-leave: 300ms;
+  --uikit-anim-scale-press: 0.94;
+  --uikit-anim-scale-enter: 0.85;
+  --uikit-anim-ripple-opacity: 0.22;
+  --uikit-anim-ripple-duration: 800ms;
+  --uikit-anim-easing-decel: cubic-bezier(0, 0, 0.2, 1);
+  --uikit-anim-stagger-delay: 50ms;
+}
+
+/* ===== 动画关闭：全局归零 ===== */
+[data-uikit-anim-enabled="false"] {
+  --uikit-anim-enabled: 0;
+  --uikit-anim-duration: 0ms;
+  --uikit-anim-duration-enter: 0ms;
+  --uikit-anim-duration-leave: 0ms;
+  --uikit-anim-scale-press: 1;
+  --uikit-anim-scale-enter: 1;
+  --uikit-anim-ripple-opacity: 0;
+  --uikit-anim-ripple-duration: 0ms;
+  --uikit-anim-overlay-duration: 0ms;
+  --uikit-anim-stagger-delay: 0ms;
+}
+
+/* ===== prefers-reduced-motion 无障碍兜底 ===== */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-uikit-theme="dark"] {
+    --uikit-anim-enabled: 0;
+    --uikit-anim-duration: 0ms;
+    --uikit-anim-duration-enter: 0ms;
+    --uikit-anim-duration-leave: 0ms;
+    --uikit-anim-scale-press: 1;
+    --uikit-anim-scale-enter: 1;
+    --uikit-anim-ripple-opacity: 0;
+    --uikit-anim-ripple-duration: 0ms;
+    --uikit-anim-overlay-duration: 0ms;
+    --uikit-anim-stagger-delay: 0ms;
+  }
+}
+
+/* ===== Ripple 波纹关键帧 ===== */
+@keyframes uikit-ripple {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Ripple 波纹元素样式（全局，非 scoped） */
+.uikit-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: var(--uikit-anim-ripple-opacity);
+  pointer-events: none;
+  animation: uikit-ripple var(--uikit-anim-ripple-duration) var(--uikit-anim-easing) forwards;
+  /* 强制 GPU 合成层 */
+  will-change: transform, opacity;
 }

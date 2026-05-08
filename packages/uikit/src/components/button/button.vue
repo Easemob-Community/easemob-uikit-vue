@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useThemeStore } from '../../store/theme'
+import { useRipple } from '../../composables/use-ripple'
 
 export interface ButtonProps {
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
@@ -29,6 +30,10 @@ const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'uikit-button--square' : ''
 )
 
+// Ripple 波纹
+const buttonRef = ref<HTMLElement>()
+useRipple(buttonRef)
+
 function handleClick(event: MouseEvent) {
   if (props.disabled || props.loading) return
   emit('click', event)
@@ -37,6 +42,7 @@ function handleClick(event: MouseEvent) {
 
 <template>
   <button
+    ref="buttonRef"
     class="uikit-button"
     :class="[
       `uikit-button--${props.type}`,
@@ -61,8 +67,17 @@ function handleClick(event: MouseEvent) {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+              transform 150ms var(--uikit-anim-easing),
+              background-color 150ms var(--uikit-anim-easing);
   font-size: 14px;
+  /* 为 Ripple 波纹提供定位上下文 */
+  position: relative;
+  overflow: hidden;
+}
+
+.uikit-button:active:not(:disabled):not(.uikit-button--loading) {
+  transform: scale(var(--uikit-anim-scale-press));
 }
 
 .uikit-button--square {

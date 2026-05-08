@@ -28,7 +28,7 @@ const emit = defineEmits<PopupEmits>()
 
 const transitionName = computed(() => {
   const map: Record<string, string> = {
-    center: 'uikit-fade',
+    center: 'uikit-fade-scale',
     bottom: 'uikit-slide-up',
     top: 'uikit-slide-down',
     left: 'uikit-slide-right',
@@ -94,6 +94,7 @@ function onCloseClick() {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity var(--uikit-anim-overlay-duration) var(--uikit-anim-easing);
 }
 
 .uikit-popup__content {
@@ -158,7 +159,7 @@ function onCloseClick() {
 
 .uikit-fade-enter-active,
 .uikit-fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .uikit-fade-enter-from,
@@ -166,43 +167,88 @@ function onCloseClick() {
   opacity: 0;
 }
 
-.uikit-slide-up-enter-active,
+.uikit-slide-up-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
 .uikit-slide-up-leave-active {
-  transition: transform 0.3s;
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-slide-up-enter-from,
 .uikit-slide-up-leave-to {
   transform: translateY(100%);
+  opacity: 0;
 }
 
-.uikit-slide-down-enter-active,
+.uikit-slide-down-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
 .uikit-slide-down-leave-active {
-  transition: transform 0.3s;
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-slide-down-enter-from,
 .uikit-slide-down-leave-to {
   transform: translateY(-100%);
+  opacity: 0;
 }
 
-.uikit-slide-left-enter-active,
+.uikit-slide-left-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
 .uikit-slide-left-leave-active {
-  transition: transform 0.3s;
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-slide-left-enter-from,
 .uikit-slide-left-leave-to {
   transform: translateX(100%);
+  opacity: 0;
 }
 
-.uikit-slide-right-enter-active,
+.uikit-slide-right-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
 .uikit-slide-right-leave-active {
-  transition: transform 0.3s;
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-slide-right-enter-from,
 .uikit-slide-right-leave-to {
   transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* ===== Center 弹窗：fade + scale 缩放 ===== */
+.uikit-fade-scale-enter-active {
+  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
+}
+
+.uikit-fade-scale-leave-active {
+  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-fade-scale-enter-from {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-scale-enter));
+}
+
+.uikit-fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-scale-enter));
 }
 </style>

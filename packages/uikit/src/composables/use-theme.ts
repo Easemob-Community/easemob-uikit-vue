@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useUIKit } from './use-uikit'
+import type { AnimationLevel, AnimationConfig } from '../store/theme'
 
 export function useTheme() {
   const { theme: themeStore } = useUIKit()
@@ -32,6 +33,27 @@ export function useTheme() {
     themeStore.setMode(themeStore.mode === 'light' ? 'dark' : 'light')
   }
 
+  // ===== 动画配置 =====
+  const animationEnabled = computed(() => themeStore.animationEnabled)
+  const animationLevel = computed(() => themeStore.animationLevel)
+  const animationRipple = computed(() => themeStore.animationRipple)
+
+  function setAnimationEnabled(value: boolean) {
+    themeStore.setAnimationEnabled(value)
+  }
+
+  function setAnimationLevel(level: AnimationLevel) {
+    themeStore.setAnimationLevel(level)
+  }
+
+  function setAnimationRipple(value: boolean) {
+    themeStore.setAnimationRipple(value)
+  }
+
+  function applyAnimationConfig(config: AnimationConfig) {
+    themeStore.applyAnimationConfig(config)
+  }
+
   return {
     mode,
     primaryColor,
@@ -45,5 +67,12 @@ export function useTheme() {
     setBubbleShape,
     setComponentsShape,
     toggleMode,
+    animationEnabled,
+    animationLevel,
+    animationRipple,
+    setAnimationEnabled,
+    setAnimationLevel,
+    setAnimationRipple,
+    applyAnimationConfig,
   }
 }

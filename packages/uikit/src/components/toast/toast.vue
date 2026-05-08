@@ -69,14 +69,23 @@ const icon = computed(() => iconMap[props.type])
   word-break: break-word;
 }
 
-.uikit-toast-enter-active,
-.uikit-toast-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+.uikit-toast-enter-active {
+  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
 }
 
-.uikit-toast-enter-from,
+.uikit-toast-leave-active {
+  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-toast-enter-from {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+}
+
 .uikit-toast-leave-to {
   opacity: 0;
-  transform: scale(0.9);
+  transform: translate(-50%, -50%) scale(0.95);
 }
 </style>
