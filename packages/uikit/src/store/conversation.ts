@@ -7,6 +7,10 @@ export interface Conversation {
   name: string
   avatar?: string
   lastMessage?: string
+  /** 最后一条消息类型（对齐 SDK MessageType: txt/img/audio/video/file/cmd/custom/loc） */
+  lastMessageType?: string
+  /** 最后一条消息发送者名称（群聊场景） */
+  lastMessageSender?: string
   lastMessageTime?: number
   unreadCount?: number
   type: ConversationTypeValue
@@ -14,6 +18,12 @@ export interface Conversation {
   isPinned?: boolean
   /** 置顶时间戳 */
   pinnedTime?: number
+  /** 是否静音/免打扰 */
+  isMuted?: boolean
+  /** 草稿内容 */
+  draft?: string
+  /** 草稿保存时间戳 */
+  draftTime?: number
 }
 
 export const useConversationStore = defineStore('conversation', () => {

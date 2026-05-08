@@ -7,6 +7,7 @@ export const useClientStore = defineStore('client', () => {
   const connected = shallowRef(false)
   const connecting = shallowRef(false)
   const currentUser = shallowRef<string>('')
+  const appKey = shallowRef<string>('')
 
   const isLoggedIn = computed(() => connected.value && !!currentUser.value)
 
@@ -26,10 +27,15 @@ export const useClientStore = defineStore('client', () => {
     currentUser.value = userId
   }
 
+  function setAppKey(key: string) {
+    appKey.value = key
+  }
+
   function clearClient() {
     client.value = null
     connected.value = false
     currentUser.value = ''
+    appKey.value = ''
   }
 
   return {
@@ -37,11 +43,13 @@ export const useClientStore = defineStore('client', () => {
     connected,
     connecting,
     currentUser,
+    appKey,
     isLoggedIn,
     setClient,
     setConnected,
     setConnecting,
     setCurrentUser,
+    setAppKey,
     clearClient,
   }
 })

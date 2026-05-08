@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useInfiniteScroll, onClickOutside } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
 import { useViewport } from '../../composables/use-viewport'
+import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
 import ConversationItem from './conversation-item.vue'
 import Modal from '../../components/modal/modal.vue'
@@ -11,26 +12,63 @@ import Icon from '../../components/icon/icon.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type { ConversationAction } from './types'
+import type { Conversation } from '../../store/conversation'
 
 const props = withDefaults(defineProps<{
   showSearch?: boolean
   customActions?: ConversationAction[]
   showScrollToTop?: boolean
+  timeFormatter?: (timestamp: number) => string
+  messageFormatter?: (msg: string, type?: string) => string
+  showSenderName?: boolean
+  emptyText?: string
+  unreadMode?: 'count' | 'dot'
+  /** Header 标题文本，不传则使用 i18n 默认值 */
+  title?: string
+  /** 自定义搜索过滤函数 */
+  filterFn?: (keyword: string, item: Conversation) => boolean
+  /** #body slot 是否固定不随列表滚动，默认 false */
+  bodySticky?: boolean
+  /** #footer slot 是否固定不随列表滚动，默认 false */
+  footerSticky?: boolean
+  /** 是否启用下拉刷新（H5），默认 false */
+  pullRefresh?: boolean
 }>(), {
   showSearch: true,
   customActions: () => [],
   showScrollToTop: true,
+  showSenderName: true,
+  unreadMode: 'count',
+  bodySticky: false,
+  footerSticky: false,
+  pullRefresh: false,
 })
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations } = useConversation()
+const emit = defineEmits<{
+  (e: 'select', id: string, conversation: Conversation): void
+}>()
+
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, fetchServerConversations, saveDraft, loadDraft, clearDraft } = useConversation()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
+/** 规范化后的搜索关键字（去空格），用于过滤和空状态判断 */
+const normalizedSearchKeyword = computed(() => searchKeyword.value.trim())
 const showHeaderMenu = ref(false)
 const headerMenuRef = ref<HTMLElement>()
 const showHeaderActionSheet = ref(false)
+
+/** 下拉刷新 */
+const { isRefreshing: isPullRefreshing } = usePullRefresh(
+  itemsRef,
+  {
+    onRefresh: async () => {
+      await fetchServerConversations({ pageSize: 20 })
+    },
+  }
+)
 
 onClickOutside(headerMenuRef, () => {
   showHeaderMenu.value = false
@@ -67,8 +105,11 @@ function onHeaderMenuItemClick(key: string) {
 }
 
 const filteredConversationList = computed(() => {
-  if (!searchKeyword.value.trim()) return conversationList.value
-  const kw = searchKeyword.value.trim().toLowerCase()
+  if (!normalizedSearchKeyword.value) return conversationList.value
+  const kw = normalizedSearchKeyword.value.toLowerCase()
+  if (props.filterFn) {
+    return conversationList.value.filter((item) => props.filterFn!(kw, item))
+  }
   return conversationList.value.filter((item) => {
     const matchId = item.id.toLowerCase().includes(kw)
     const matchMsg = item.lastMessage?.toLowerCase().includes(kw)
@@ -87,9 +128,17 @@ useInfiniteScroll(
 )
 
 function handleSelect(id: string) {
+  // 切换会话前，为当前会话保存草稿（如果有输入内容，由 chat-container 侧触发）
   selectConversation(id)
   // 进入会话后发送已读回执
   sendChannelAck(id)
+  // 加载目标会话的草稿
+  loadDraft(id)
+  // 通知上层
+  const cvs = conversationList.value.find((c: Conversation) => c.id === id)
+  if (cvs) {
+    emit('select', id, cvs)
+  }
 }
 
 /** 删除确认 */
@@ -103,6 +152,7 @@ function handleDelete(id: string) {
 
 function confirmDelete() {
   if (pendingDeleteId.value) {
+    clearDraft(pendingDeleteId.value)
     deleteConversation(pendingDeleteId.value)
     pendingDeleteId.value = ''
   }
@@ -113,7 +163,7 @@ function confirmDelete() {
   <div class="conversation-list">
     <div class="conversation-list__header">
       <slot name="header">
-        <span class="conversation-list__title">{{ t('conversation.title') }}</span>
+        <span class="conversation-list__title">{{ props.title || t('conversation.title') }}</span>
       </slot>
       <div ref="headerMenuRef" class="conversation-list__menu-wrapper">
         <div class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
@@ -139,13 +189,29 @@ function confirmDelete() {
         prefix-icon="misc/magnifier2"
       />
     </div>
+    <!-- body slot - sticky 模式放在滚动容器外部 -->
+    <div v-if="$slots.body && props.bodySticky" class="conversation-list__body conversation-list__body--sticky">
+      <slot name="body" />
+    </div>
     <div ref="itemsRef" class="conversation-list__items">
+      <!-- 下拉刷新指示器（H5） -->
+      <div v-if="props.pullRefresh && isPullRefreshing" class="conversation-list__pull-refresh">
+        {{ t('conversation.pullRefresh') }}
+      </div>
+      <!-- body slot - 非 sticky 模式放在滚动容器内部 -->
+      <div v-if="$slots.body && !props.bodySticky" class="conversation-list__body">
+        <slot name="body" />
+      </div>
       <ConversationItem
         v-for="item in filteredConversationList"
         :key="item.id"
         :conversation="item"
         :class="{ 'is-active': currentConversation?.id === item.id }"
         :custom-actions="props.customActions"
+        :time-formatter="props.timeFormatter"
+        :message-formatter="props.messageFormatter"
+        :show-sender-name="props.showSenderName"
+        :unread-mode="props.unreadMode"
         @select="handleSelect"
         @pin="pinConversation"
         @delete="handleDelete"
@@ -154,6 +220,20 @@ function confirmDelete() {
       <div v-if="loadingMore" class="conversation-list__loading">
         {{ t('conversation.loadingMore') }}
       </div>
+      <div v-if="!filteredConversationList.length && !loadingMore" class="conversation-list__empty">
+        <slot name="empty" :search-keyword="normalizedSearchKeyword">
+          <span>{{ props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty')) }}</span>
+        </slot>
+      </div>
+      <!-- footer slot - 非 sticky 模式放在滚动容器内部 -->
+      <div v-if="$slots.footer && !props.footerSticky" class="conversation-list__footer">
+        <slot name="footer" />
+      </div>
+    </div>
+
+    <!-- footer slot - sticky 模式放在滚动容器外部 -->
+    <div v-if="$slots.footer && props.footerSticky" class="conversation-list__footer conversation-list__footer--sticky">
+      <slot name="footer" />
     </div>
 
     <!-- 滚动置顶按钮：放在滚动容器外部，由 conversation-list 定位 -->
@@ -266,6 +346,38 @@ function confirmDelete() {
 }
 
 .conversation-list__loading {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
+}
+
+.conversation-list__empty {
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+}
+
+.conversation-list__body {
+  padding: 0 16px;
+}
+
+.conversation-list__body--sticky {
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.conversation-list__footer {
+  padding: 8px 16px;
+}
+
+.conversation-list__footer--sticky {
+  flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.conversation-list__pull-refresh {
   padding: 12px 16px;
   text-align: center;
   font-size: 13px;

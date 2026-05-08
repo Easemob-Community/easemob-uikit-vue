@@ -8,12 +8,15 @@ import {
   useLocale,
   useUIKit,
   useClient,
+  useConversation,
 } from '@easemob/uikit'
+import type { Conversation } from '@easemob/uikit'
 
 const { mode, primaryColor, isDark, setMode, setPrimaryColor } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
+const { setLocalConversationList } = useConversation()
 
 const showSettings = ref(false)
 
@@ -62,6 +65,38 @@ async function handleLogout() {
 function updatePrimaryColor(e: Event) {
   const val = Number((e.target as HTMLInputElement).value)
   setPrimaryColor(val)
+}
+
+/** 生成 1000 条模拟会话数据用于测试滚动效果 */
+function generateMockConversations(count = 1000): Conversation[] {
+  const messages = [
+    '你好，最近怎么样？',
+    '明天一起吃饭吧',
+    '项目进展如何？',
+    '收到，我看看',
+    '周末有空吗？',
+    '这个方案不错',
+    '下午开会讨论一下',
+    '文件已发送，请查收',
+    '好的，没问题',
+    '稍等我一下',
+  ]
+  const now = Date.now()
+  return Array.from({ length: count }, (_, i) => ({
+    id: `mock_conv_${i}`,
+    name: `用户${String(i + 1).padStart(4, '0')}`,
+    lastMessage: messages[i % messages.length],
+    lastMessageTime: now - i * 60000,
+    unreadCount: i % 5 === 0 ? Math.floor(Math.random() * 10) + 1 : 0,
+    type: (i % 3 === 0 ? 'groupChat' : 'singleChat') as Conversation['type'],
+    isPinned: i < 5,
+    pinnedTime: i < 5 ? now - i * 1000 : undefined,
+  }))
+}
+
+function injectMockConversations() {
+  const list = generateMockConversations(1000)
+  setLocalConversationList(list)
 }
 </script>
 
@@ -214,6 +249,18 @@ function updatePrimaryColor(e: Event) {
                 @click="setLocale('en')"
               >
                 English
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">会话数据</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <button
+                class="demo-btn"
+                @click="injectMockConversations"
+              >
+                注入1000条会话
               </button>
             </div>
           </div>

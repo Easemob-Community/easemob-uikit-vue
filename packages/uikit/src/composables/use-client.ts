@@ -4,6 +4,7 @@ import { useUIKit } from './use-uikit'
 import { createClient } from '../sdk/client'
 import type { ClientConfig } from '../sdk/types'
 import { CONVERSATION_TYPE } from '../constants'
+import { clearAllDrafts } from './use-conversation'
 
 export function useClient() {
   const { stores } = useUIKit()
@@ -68,6 +69,7 @@ export function useClient() {
       clientStore.setConnected(false)
       clientStore.setCurrentUser('')
       conversationStore.clearConversationList()
+      clearAllDrafts()
     },
   }
 }

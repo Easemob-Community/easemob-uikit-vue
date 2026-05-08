@@ -7,6 +7,13 @@
   --uikit-bg-secondary: #f3f4f6;
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
+
+  /* 滚动条 */
+  --uikit-scrollbar-width: 6px;
+  --uikit-scrollbar-track: transparent;
+  --uikit-scrollbar-thumb: #c1c1c1;
+  --uikit-scrollbar-thumb-hover: #a0a0a0;
+  --uikit-scrollbar-thumb-radius: 3px;
 }
 
 [data-uikit-theme="dark"] {
@@ -14,4 +21,35 @@
   --uikit-bg-secondary: #1f2937;
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
+
+  /* 滚动条 - 暗色 */
+  --uikit-scrollbar-thumb: #4b5563;
+  --uikit-scrollbar-thumb-hover: #6b7280;
+}
+
+/* ===== 全局滚动条美化 ===== */
+
+/* WebKit (Chrome / Safari / Edge) */
+::-webkit-scrollbar {
+  width: var(--uikit-scrollbar-width);
+  height: var(--uikit-scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--uikit-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--uikit-scrollbar-thumb);
+  border-radius: var(--uikit-scrollbar-thumb-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--uikit-scrollbar-thumb-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--uikit-scrollbar-thumb) var(--uikit-scrollbar-track);
 }

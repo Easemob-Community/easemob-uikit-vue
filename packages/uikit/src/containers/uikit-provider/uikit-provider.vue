@@ -43,6 +43,7 @@ if (props.appKey && props.autoInit) {
     ...props.sdkConfig,
   })
   clientStore.setClient(client)
+  clientStore.setAppKey(props.appKey)
 }
 
 const stores = {

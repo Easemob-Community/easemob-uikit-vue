@@ -7,6 +7,7 @@ import Icon from '../../components/icon/icon.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
+import { CONVERSATION_TYPE } from '../../constants'
 import type { Conversation } from '../../store/conversation'
 import type { ConversationAction } from './types'
 
@@ -14,10 +15,20 @@ export interface ConversationItemProps {
   conversation: Conversation
   class?: string | Record<string, boolean> | Array<string | Record<string, boolean>>
   customActions?: ConversationAction[]
+  /** 时间格式化函数 */
+  timeFormatter?: (timestamp: number) => string
+  /** 消息摘要格式化函数 */
+  messageFormatter?: (msg: string, type?: string) => string
+  /** 群聊是否显示发送者名称 */
+  showSenderName?: boolean
+  /** 未读数显示模式 */
+  unreadMode?: 'count' | 'dot'
 }
 
 const props = withDefaults(defineProps<ConversationItemProps>(), {
   customActions: () => [],
+  showSenderName: true,
+  unreadMode: 'count',
 })
 
 const emit = defineEmits<{
@@ -159,17 +170,50 @@ function onContextMenuItemClick(actionKey: string) {
   const action = mergedActions.value.find((a) => a.key === actionKey)
   action?.handler()
 }
+
+/** ===== 显示内容计算 ===== */
+
+/** 显示时间：优先取草稿时间，其次取最后消息时间 */
+const displayTime = computed(() => {
+  const timestamp = props.conversation.draftTime || props.conversation.lastMessageTime
+  if (!timestamp) return ''
+  if (props.timeFormatter) {
+    return props.timeFormatter(timestamp)
+  }
+  // 无 formatter 时 fallback 到简单格式
+  return new Date(timestamp).toLocaleTimeString()
+})
+
+/** 是否显示草稿 */
+const displayDraft = computed(() => {
+  return !!props.conversation.draft
+})
+
+/** 显示消息内容：草稿优先，否则用 messageFormatter 格式化 */
+const displayMessage = computed(() => {
+  if (props.conversation.draft) {
+    return props.conversation.draft
+  }
+  if (props.messageFormatter) {
+    return props.messageFormatter(
+      props.conversation.lastMessage || '',
+      props.conversation.lastMessageType
+    )
+  }
+  return props.conversation.lastMessage || ''
+})
 </script>
 
 <template>
   <div
     ref="itemRef"
     class="conversation-item"
-    :class="[props.class, { 'is-pinned': conversation.isPinned }]"
+    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted }]"
     @click="onClick"
     @contextmenu.prevent="onContextMenu"
   >
-    <Avatar :name="props.conversation.name" :size="48" />
+    <Avatar :name="props.conversation.name" :src="props.conversation.avatar" :size="48" />
+    <slot name="item-prefix" />
     <div class="conversation-item__info">
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
@@ -177,15 +221,26 @@ function onContextMenuItemClick(actionKey: string) {
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />
           </span>
+          <span v-if="props.conversation.isMuted" class="conversation-item__mute-badge">
+            <Icon name="audio-video/speaker_xmark" :size="12" />
+          </span>
         </div>
-        <span v-if="props.conversation.lastMessageTime" class="conversation-item__time">
-          {{ new Date(props.conversation.lastMessageTime).toLocaleTimeString() }}
+        <span v-if="displayTime" class="conversation-item__time">
+          {{ displayTime }}
         </span>
       </div>
       <div class="conversation-item__bottom">
-        <span class="conversation-item__message">{{ props.conversation.lastMessage }}</span>
-        <Badge v-if="props.conversation.unreadCount" :count="props.conversation.unreadCount" />
+        <span class="conversation-item__message">
+          <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
+        </span>
+        <Badge
+          v-if="props.conversation.unreadCount"
+          :count="props.conversation.unreadCount"
+          :dot="props.unreadMode === 'dot' || props.conversation.isMuted"
+          :color="props.conversation.isMuted ? 'var(--uikit-text-secondary)' : undefined"
+        />
       </div>
+      <slot name="item-suffix" />
     </div>
   </div>
 
@@ -278,6 +333,13 @@ function onContextMenuItemClick(actionKey: string) {
   flex-shrink: 0;
 }
 
+.conversation-item__mute-badge {
+  display: inline-flex;
+  align-items: center;
+  color: var(--uikit-text-secondary);
+  flex-shrink: 0;
+}
+
 .conversation-item__time {
   font-size: 11px;
   color: var(--uikit-text-secondary);
@@ -292,6 +354,11 @@ function onContextMenuItemClick(actionKey: string) {
   white-space: nowrap;
   flex: 1;
   margin-right: 8px;
+}
+
+.conversation-item__draft {
+  color: var(--uikit-danger-color, #ef4444);
+  margin-right: 2px;
 }
 
 /* PC 右键菜单 */
