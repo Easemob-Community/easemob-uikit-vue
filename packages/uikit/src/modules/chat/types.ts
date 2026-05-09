@@ -31,6 +31,8 @@ export interface ChatConfig {
     align?: HeaderAlign
     /** 是否启用自定义插槽，默认 false */
     customSlot?: boolean
+    /** 是否显示头像，默认 false */
+    showAvatar?: boolean
   }
   /** 消息列表配置 */
   messageList?: {

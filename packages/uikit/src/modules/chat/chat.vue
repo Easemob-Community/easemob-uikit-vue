@@ -7,6 +7,7 @@ import MessageList from './message-list.vue'
 import MessageInput from './message-input.vue'
 import ChatInfoDrawer from './chat-info-drawer.vue'
 import Icon from '../../components/icon/icon.vue'
+import Avatar from '../../components/avatar/avatar.vue'
 import type { ChatConfig } from './types'
 
 export interface ChatProps {
@@ -29,6 +30,9 @@ const headerAlign = computed(() => headerConfig.value?.align ?? 'center')
 
 /** 是否使用自定义 header 插槽 */
 const customHeaderSlot = computed(() => headerConfig.value?.customSlot ?? false)
+
+/** 是否显示 header 头像 */
+const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 
 /** 是否显示 drawer */
 const showDrawer = ref(false)
@@ -90,6 +94,16 @@ function onMultiSelectDelete() {
       }"
     >
       <slot name="header" :conversation="currentConversation">
+        <!-- 头像区域 -->
+        <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
+          <slot name="header-avatar" :conversation="currentConversation">
+            <Avatar
+              :src="currentConversation.avatar"
+              :name="currentConversation.name"
+              :size="36"
+            />
+          </slot>
+        </div>
         <div class="chat__header-main">
           <template v-if="customHeaderSlot">
             <slot name="header-title" :conversation="currentConversation">
@@ -173,6 +187,12 @@ function onMultiSelectDelete() {
 
 .chat__header--align-right .chat__header-main {
   justify-content: flex-end;
+}
+
+.chat__header-avatar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .chat__header-main {

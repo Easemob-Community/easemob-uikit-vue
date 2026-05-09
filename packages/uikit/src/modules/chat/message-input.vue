@@ -3,6 +3,7 @@ import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useViewport } from '../../composables/use-viewport'
 import { MESSAGE_TYPE } from '../../constants'
+import { useToast } from '../../composables/use-toast'
 import SimpleInput from './message-input/simple-input.vue'
 import RichInput from './message-input/rich-input.vue'
 import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
@@ -20,6 +21,7 @@ const props = defineProps<MessageInputProps>()
 
 const { sendMessage } = useChat()
 const { isMobile } = useViewport()
+const { show: showToast } = useToast()
 
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
@@ -163,6 +165,118 @@ watch(showMentionPicker, (val) => {
   }
 })
 
+// ===== 语音录制相关 =====
+
+/** MediaRecorder 实例 */
+let mediaRecorder: MediaRecorder | null = null
+
+/** 音频数据块 */
+let audioChunks: Blob[] = []
+
+/** 录音开始时间戳 */
+let recordingStartTime = 0
+
+/** 录音麦克风流 */
+let voiceStream: MediaStream | null = null
+
+/** 是否已取消录音 */
+let isVoiceCancelled = false
+
+/** 录音启动期间被要求停止的标志 */
+let shouldCancelVoice = false
+
+/** 开始录音 */
+async function handleVoiceStart() {
+  isVoiceCancelled = false
+  shouldCancelVoice = false
+  try {
+    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder = new MediaRecorder(voiceStream)
+    audioChunks = []
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data)
+    }
+
+    mediaRecorder.start()
+    recordingStartTime = Date.now()
+
+    // 如果启动期间被要求停止，立即取消
+    if (shouldCancelVoice) {
+      handleVoiceCancel()
+    }
+  } catch (err) {
+    console.error('录音启动失败:', err)
+    showToast('录音启动失败，请检查麦克风权限')
+    // 清理
+    voiceStream?.getTracks().forEach((track) => track.stop())
+    voiceStream = null
+    mediaRecorder = null
+  }
+}
+
+/** 停止录音并发送 */
+function handleVoiceEnd(durationFromInput?: number) {
+  if (!mediaRecorder) {
+    // 还没启动完成，标记需要取消
+    shouldCancelVoice = true
+    return
+  }
+
+  const actualDuration =
+    durationFromInput ?? Math.floor((Date.now() - recordingStartTime) / 1000)
+
+  const mr = mediaRecorder
+
+  // 如果还没开始录音（state 为 inactive），直接清理资源
+  if (mr.state === 'inactive') {
+    voiceStream?.getTracks().forEach((track) => track.stop())
+    audioChunks = []
+    voiceStream = null
+    mediaRecorder = null
+    return
+  }
+
+  mediaRecorder.onstop = () => {
+    voiceStream?.getTracks().forEach((track) => track.stop())
+
+    if (!isVoiceCancelled && audioChunks.length > 0) {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' })
+      const url = URL.createObjectURL(blob)
+      pendingBlobUrls.add(url)
+
+      sendMessage(
+        {
+          url,
+          duration: actualDuration,
+          filename: `voice-${Date.now()}.webm`,
+          filetype: 'audio/webm',
+          size: blob.size,
+        },
+        MESSAGE_TYPE.AUDIO
+      )
+    }
+
+    audioChunks = []
+    voiceStream = null
+    if (mr === mediaRecorder) mediaRecorder = null
+  }
+
+  mr.stop()
+}
+
+/** 取消录音 */
+function handleVoiceCancel() {
+  isVoiceCancelled = true
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop()
+  }
+  voiceStream?.getTracks().forEach((track) => track.stop())
+  mediaRecorder = null
+  voiceStream = null
+  audioChunks = []
+}
+
 /** 组件卸载时清理锚点与 Blob URL */
 onBeforeUnmount(() => {
   cleanupMentionAnchor()
@@ -171,6 +285,8 @@ onBeforeUnmount(() => {
     URL.revokeObjectURL(url)
   })
   pendingBlobUrls.clear()
+  // 清理录音资源
+  handleVoiceCancel()
 })
 </script>
 
@@ -185,6 +301,9 @@ onBeforeUnmount(() => {
       @send="handleSendText"
       @send-file="handleSendFile"
       @emoji-click="onEmojiClick"
+      @voice-start="handleVoiceStart"
+      @voice-end="handleVoiceEnd"
+      @voice-cancel="handleVoiceCancel"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
     />

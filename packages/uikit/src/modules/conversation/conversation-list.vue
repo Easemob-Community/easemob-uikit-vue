@@ -281,11 +281,12 @@ function confirmDelete() {
 }
 
 .conversation-list__header {
-  padding: 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 48px;
 }
 
 .conversation-list__header--center {

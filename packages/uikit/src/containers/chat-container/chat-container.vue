@@ -17,6 +17,9 @@ const props = defineProps<ChatContainerProps>()
       <template #header="slotProps">
         <slot name="header" v-bind="slotProps" />
       </template>
+      <template #header-avatar="slotProps">
+        <slot name="header-avatar" v-bind="slotProps" />
+      </template>
       <template #header-title="slotProps">
         <slot name="header-title" v-bind="slotProps" />
       </template>

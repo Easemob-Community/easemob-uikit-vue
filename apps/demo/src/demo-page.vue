@@ -41,6 +41,7 @@ const chatInputMaxLength = ref(0)
 
 /** ChatContainer 配置 */
 const chatConfig = computed(() => ({
+  header: { showAvatar: true } ,
   input: {
     mode: chatInputMode.value,
     style: chatInputStyle.value,

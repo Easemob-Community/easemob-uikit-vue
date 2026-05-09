@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import Input from '../../../components/input/input.vue'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
+import VoicePanel from './components/voice-panel.vue'
 import type { ChatConfig } from '../types'
 
 export interface SimpleInputProps {
@@ -20,7 +21,8 @@ const emit = defineEmits<{
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
   (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
-  (e: 'voice-end'): void
+  (e: 'voice-end', duration: number): void
+  (e: 'voice-cancel'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
 }>()
@@ -61,8 +63,11 @@ const maxLengthValue = computed(() => {
   return len && len > 0 ? len : undefined
 })
 
-/** 是否正在录音 */
-const isRecording = ref(false)
+/** 移动端是否正在录音（保持原有行为） */
+const isMobileRecording = ref(false)
+
+/** 是否处于录音模式（PC 端点击麦克风后进入） */
+const isVoiceMode = ref(false)
 
 /** 发送消息 */
 function handleSend() {
@@ -98,16 +103,31 @@ function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
   }
 }
 
-/** 语音录制 */
-function toggleVoice() {
-  if (isRecording.value) {
-    isRecording.value = false
-    emit('voice-end')
+/** 移动端语音录制（保持原有点击切换行为） */
+function toggleMobileVoice() {
+  if (isMobileRecording.value) {
+    isMobileRecording.value = false
+    emit('voice-end', 0)
   } else {
-    isRecording.value = true
+    isMobileRecording.value = true
     emit('voice-start')
   }
 }
+
+/** 统一的麦克风按钮点击处理 */
+function onMicClick() {
+  if (isMobile.value) {
+    toggleMobileVoice()
+  } else {
+    isVoiceMode.value = true
+  }
+}
+
+/** 麦克风图标高亮状态 */
+const showMicOn = computed(() => {
+  if (isMobile.value) return isMobileRecording.value
+  return isVoiceMode.value
+})
 
 /** 表情按钮 ref */
 const emojiBtnRef = ref<HTMLElement>()
@@ -251,6 +271,11 @@ onMounted(() => {
   }
 })
 
+/** 组件卸载时退出录音模式 */
+onBeforeUnmount(() => {
+  isVoiceMode.value = false
+})
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
@@ -280,15 +305,15 @@ defineExpose({
       <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
         <Icon name="files-media/file" :size="22" />
       </div>
-      <div v-if="features.voice" class="simple-input__tool-btn" @click="toggleVoice">
-        <Icon :name="isRecording ? 'audio-video/mic_on' : 'audio-video/mic'" :size="22" />
+      <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
+        <Icon :name="showMicOn ? 'audio-video/mic_on' : 'audio-video/mic'" :size="22" />
       </div>
     </div>
 
     <!-- 输入区域 -->
     <div class="simple-input__field-area">
-      <!-- 单行/多行输入 -->
-      <template v-if="!isRecording">
+      <!-- 正常输入（PC 端非录音模式，或移动端非录音模式） -->
+      <template v-if="!isVoiceMode && !isMobileRecording">
         <Input
           v-if="!isMultiline"
           ref="inputComponentRef"
@@ -312,9 +337,20 @@ defineExpose({
         />
       </template>
 
-      <!-- 语音录制按钮 -->
-      <div v-else class="simple-input__voice-btn">
-        {{ isRecording ? '松开结束录音' : '按住说话' }}
+      <!-- PC 端录音面板 -->
+      <template v-else-if="isVoiceMode && !isMobile">
+        <VoicePanel
+          :active="isVoiceMode"
+          @update:active="isVoiceMode = $event"
+          @start="emit('voice-start')"
+          @end="(d) => emit('voice-end', d)"
+          @cancel="emit('voice-cancel')"
+        />
+      </template>
+
+      <!-- 移动端语音录制按钮 -->
+      <div v-else-if="isMobileRecording" class="simple-input__voice-btn-mobile">
+        {{ t('chat.voice.releaseEnd') }}
       </div>
     </div>
 
@@ -452,7 +488,7 @@ defineExpose({
   background-color: v-bind(selectionColorVar);
 }
 
-.simple-input__voice-btn {
+.simple-input__voice-btn-mobile {
   flex: 1;
   padding: 10px 16px;
   border-radius: 8px;
@@ -465,7 +501,7 @@ defineExpose({
   user-select: none;
 }
 
-.simple-input__voice-btn:active {
+.simple-input__voice-btn-mobile:active {
   background-color: var(--uikit-bg-hover, #e5e7eb);
 }
 
