@@ -1,7 +1,8 @@
 import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import type { Message } from '../store/message'
-import { MESSAGE_STATUS } from '../constants'
+import type { Conversation } from '../store/conversation'
+import { MESSAGE_STATUS, MESSAGE_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
 import { getClient } from '../sdk/client'
 import type { UIKitClient } from '../sdk/client'
@@ -71,6 +72,32 @@ export function useChat() {
   }
 
   /**
+   * 根据消息类型格式化会话列表最后一条消息摘要文本
+   */
+  function _formatLastMessageText(sdkMsg: EasemobChat.MessageBody): string {
+    switch (sdkMsg.type) {
+      case MESSAGE_TYPE.TXT:
+        return (sdkMsg as EasemobChat.TextMsgBody).msg || ''
+      case MESSAGE_TYPE.IMG:
+        return '[图片]'
+      case MESSAGE_TYPE.AUDIO:
+        return '[语音]'
+      case MESSAGE_TYPE.VIDEO:
+        return '[视频]'
+      case MESSAGE_TYPE.FILE:
+        return '[文件]'
+      case MESSAGE_TYPE.CMD:
+        return '[命令消息]'
+      case MESSAGE_TYPE.CUSTOM:
+        return '[自定义消息]'
+      case MESSAGE_TYPE.LOC:
+        return '[位置]'
+      default:
+        return '[消息]'
+    }
+  }
+
+  /**
    * 本地插入一条发送中的消息，直接展开 SDK 消息的所有原生字段 + 追加 UI 扩展字段
    */
   function _insertSendingMessage(
@@ -86,6 +113,18 @@ export function useChat() {
       timestamp: Date.now(),
     } as Message
     messageStore.addMessage(msg)
+
+    // 同步更新会话列表最新消息
+    const lastMessageText = _formatLastMessageText(sdkMsg)
+    const currentUser = stores.client.currentUser
+    const isGroup = chatType === 'groupChat'
+    const patch: Partial<Conversation> = {
+      lastMessage: lastMessageText,
+      lastMessageTime: msg.timestamp,
+      lastMessageType: sdkMsg.type as string,
+      lastMessageSender: isGroup ? currentUser : '',
+    }
+    conversationStore.updateConversation(to, patch)
   }
 
   /**
