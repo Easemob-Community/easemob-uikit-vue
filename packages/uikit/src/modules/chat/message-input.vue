@@ -68,14 +68,17 @@ const messageInputRef = ref<HTMLElement>()
 /** RichInput 引用 */
 const richInputRef = ref<InstanceType<typeof RichInput>>()
 
+/** 群已读回执配置 */
+const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
+
 /** 发送文本消息 */
 function handleSendText(text: string) {
-  sendTextMessage(text)
+  sendTextMessage(text, undefined, groupReadReceiptConfig.value)
 }
 
 /** 发送富文本消息 */
 function handleSendRich(_html: string, text: string) {
-  sendTextMessage(text)
+  sendTextMessage(text, undefined, groupReadReceiptConfig.value)
 }
 
 /** 待回收的 Blob URL 列表 */
@@ -87,11 +90,11 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   if (!file) return
 
   if (type === 'image') {
-    sendImageMessage(file)
+    sendImageMessage(file, groupReadReceiptConfig.value)
   } else if (type === 'video') {
-    sendVideoMessage(file)
+    sendVideoMessage(file, groupReadReceiptConfig.value)
   } else {
-    sendFileMessage(file)
+    sendFileMessage(file, groupReadReceiptConfig.value)
   }
 }
 
@@ -231,7 +234,7 @@ function handleVoiceEnd(durationFromInput?: number) {
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
-      sendAudioMessage(blob, actualDuration)
+      sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value)
     }
 
     audioChunks = []

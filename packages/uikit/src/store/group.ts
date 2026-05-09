@@ -29,6 +29,27 @@ export const useGroupStore = defineStore('group', () => {
     groupList.value = groupList.value.filter((g: Group) => g.groupId !== groupId)
   }
 
+  /** 根据群ID获取群信息 */
+  function getGroupById(groupId: string): Group | undefined {
+    return groupList.value.find((g: Group) => g.groupId === groupId)
+  }
+
+  /** 更新群成员数（群信息可能来自群详情接口或消息上下文） */
+  function updateGroupMemberCount(groupId: string, count: number) {
+    const g = groupList.value.find((item: Group) => item.groupId === groupId)
+    if (g) {
+      g.memberCount = count
+    } else {
+      // 缓存未知群的成员数（仅 memberCount，其他字段用占位值）
+      groupList.value.push({
+        groupId,
+        groupName: groupId,
+        owner: '',
+        memberCount: count,
+      })
+    }
+  }
+
   function setCurrentGroup(group: Group | null) {
     currentGroup.value = group
   }
@@ -45,6 +66,8 @@ export const useGroupStore = defineStore('group', () => {
     addGroup,
     removeGroup,
     setCurrentGroup,
+    getGroupById,
+    updateGroupMemberCount,
     clearGroups,
   }
 })

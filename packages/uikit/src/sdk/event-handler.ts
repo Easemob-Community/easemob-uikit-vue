@@ -1,8 +1,10 @@
 import type { UIKitClient } from './client'
+import { getClient } from './client'
 import type { EasemobChat } from 'easemob-websdk'
 import { useMessageStore } from '../store/message'
 import { useClientStore } from '../store/client'
 import { useConversationStore } from '../store/conversation'
+import { useGroupStore } from '../store/group'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../constants'
 import type { Message } from '../store/message'
 import type { ConversationTypeValue } from '../constants'
@@ -11,6 +13,7 @@ export interface RootStores {
   message: ReturnType<typeof useMessageStore>
   client: ReturnType<typeof useClientStore>
   conversation: ReturnType<typeof useConversationStore>
+  group: ReturnType<typeof useGroupStore>
 }
 
 /**
@@ -50,6 +53,15 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
     const chatType: ConversationTypeValue = isGroup ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT
     const conversationId = resolveConversationId(msg, currentUser)
 
+    // 解析 allowGroupAck：优先取 msgConfig，其次取 ext.msgConfig
+    const msgConfigAllowGroupAck = (msg as EasemobChat.ExcludeAckMessageBody & { msgConfig?: { allowGroupAck?: boolean } }).msgConfig?.allowGroupAck
+    const extMsgConfigAllowGroupAck = msg.ext
+      && typeof msg.ext === 'object'
+      && msg.ext.msgConfig
+      && typeof msg.ext.msgConfig === 'object'
+      && (msg.ext.msgConfig as Record<string, unknown>).allowGroupAck
+    const requireGroupAck = !!(msgConfigAllowGroupAck || extMsgConfigAllowGroupAck)
+
     // 直接展开 SDK 原生字段，追加 UI 扩展字段
     const uiMsg: Message = {
       ...msg,
@@ -57,6 +69,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       isSelf: false,
       status: MESSAGE_STATUS.SENT,
       timestamp: msg.time || Date.now(),
+      requireGroupAck: requireGroupAck || undefined,
     } as Message
 
     stores.message.addMessage(uiMsg)
@@ -78,6 +91,23 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       const cvs = stores.conversation.conversationList.find((c) => c.id === conversationId)
       if (cvs) {
         stores.conversation.updateUnreadCount(conversationId, (cvs.unreadCount || 0) + 1)
+      }
+    } else {
+      // 当前会话的消息：自动发送已读回执
+      const client = getClient()
+      if (client) {
+        // 单聊：自动发消息已读回执
+        if (!isGroup) {
+          client.sendReadAck({ chatType, to: conversationId, msgId: msg.id })
+            .catch((e: unknown) => console.warn('[EventHandler] sendReadAck failed:', e))
+        }
+        // 群已读回执：若消息携带 allowGroupAck，自动回复
+        if (requireGroupAck && isGroup) {
+          client.sendGroupReadAck({
+            to: msg.to || conversationId,
+            msgId: msg.id,
+          }).catch((e: unknown) => console.warn('[EventHandler] sendGroupReadAck failed:', e))
+        }
       }
     }
   }
@@ -116,6 +146,43 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       const conversationId = msg.from || msg.to
       if (conversationId) {
         stores.conversation.updateUnreadCount(conversationId, 0)
+      }
+    },
+
+    /** 消息已读回执：单聊更新消息状态为 READ，群聊更新 groupReadCount */
+    onReadMessage: (msg: EasemobChat.ReadMsgBody) => {
+      const msgId = msg.mid || msg.ackId || msg.id
+      if (!msgId) return
+
+      // 群已读回执：更新 groupReadCount
+      if (msg.groupReadCount && msg.mid) {
+        const readCount = msg.groupReadCount[msg.mid]
+        if (readCount !== undefined) {
+          stores.message.updateMessageById(msgId, { groupReadCount: readCount })
+        }
+        return
+      }
+
+      // 单聊已读回执：更新消息状态为 READ
+      stores.message.updateMessageStatus(msgId, MESSAGE_STATUS.READ)
+    },
+
+    /** 离线群已读回执：登录后批量接收 */
+    onStatisticMessage: (msg: EasemobChat.CmdMsgBody) => {
+      try {
+        const location = (msg as EasemobChat.CmdMsgBody & { location?: string }).location
+        if (!location) return
+        const statisticMsg = JSON.parse(location)
+        const groupAck: Array<{ msgId: string; readCount: number }> = statisticMsg?.group_ack || []
+        for (const ack of groupAck) {
+          if (ack.msgId) {
+            stores.message.updateMessageById(ack.msgId, {
+              groupReadCount: ack.readCount,
+            })
+          }
+        }
+      } catch (e) {
+        console.warn('[EventHandler] onStatisticMessage parse failed:', e)
       }
     },
 

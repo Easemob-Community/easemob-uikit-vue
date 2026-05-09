@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import type { Message } from '../store/message'
 import type { Conversation } from '../store/conversation'
-import { MESSAGE_STATUS, MESSAGE_TYPE } from '../constants'
+import { MESSAGE_STATUS, MESSAGE_TYPE, CONVERSATION_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
 import { getClient } from '../sdk/client'
 import type { UIKitClient } from '../sdk/client'
@@ -49,6 +49,25 @@ export function useChat() {
   const selectedMessages = computed(() =>
     messages.value.filter((msg) => selectedMessageIds.value.has(msg.id))
   )
+
+  /**
+   * 判断是否应启用群已读回执
+   * - 总开关未开启 → false
+   * - 非群聊 → false
+   * - 群成员数未知（<=0）→ false（保守策略，避免超发）
+   * - 群成员数超过上限 → false
+   */
+  function _shouldEnableGroupAck(
+    chatType: ConversationTypeValue,
+    groupId: string,
+    enabled?: boolean,
+    maxGroupSize?: number,
+  ): boolean {
+    if (!enabled || chatType !== CONVERSATION_TYPE.GROUPCHAT) return false
+    const memberCount = stores.group.getGroupById(groupId)?.memberCount || 0
+    const limit = maxGroupSize && maxGroupSize > 0 ? maxGroupSize : 200
+    return memberCount > 0 && memberCount <= limit
+  }
 
   /**
    * 获取 UIKitClient 实例，若未初始化则抛出错误
@@ -99,25 +118,29 @@ export function useChat() {
 
   /**
    * 本地插入一条发送中的消息，直接展开 SDK 消息的所有原生字段 + 追加 UI 扩展字段
+   * @param groupReadReceiptEnabled 是否启用群已读回执
    */
   function _insertSendingMessage(
     sdkMsg: EasemobChat.MessageBody,
     to: string,
     chatType: ConversationTypeValue,
+    groupReadReceiptEnabled?: boolean,
   ): void {
+    const isGroup = chatType === CONVERSATION_TYPE.GROUPCHAT
+    const requireGroupAck = !!(groupReadReceiptEnabled && isGroup)
     const msg: Message = {
       ...sdkMsg,
       conversationId: to,
       isSelf: true,
       status: MESSAGE_STATUS.SENDING,
       timestamp: Date.now(),
+      requireGroupAck: requireGroupAck || undefined,
     } as Message
     messageStore.addMessage(msg)
 
     // 同步更新会话列表最新消息
     const lastMessageText = _formatLastMessageText(sdkMsg)
     const currentUser = stores.client.currentUser
-    const isGroup = chatType === 'groupChat'
     const patch: Partial<Conversation> = {
       lastMessage: lastMessageText,
       lastMessageTime: msg.timestamp,
@@ -139,18 +162,21 @@ export function useChat() {
   }
 
   /** 发送文本消息 */
-  async function sendTextMessage(text: string, ext?: Record<string, any>) {
+  async function sendTextMessage(text: string, ext?: Record<string, any>, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
+    const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+    const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
     const sdkMsg = client.createMessage({
       type: 'txt',
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       msg: text,
       ext,
+      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id)
@@ -160,17 +186,20 @@ export function useChat() {
   }
 
   /** 发送图片消息 */
-  async function sendImageMessage(file: File) {
+  async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
+    const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+    const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
     const sdkMsg = client.createMessage({
       type: 'img',
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file),
+      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id)
@@ -180,17 +209,20 @@ export function useChat() {
   }
 
   /** 发送文件消息 */
-  async function sendFileMessage(file: File) {
+  async function sendFileMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
+    const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+    const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
     const sdkMsg = client.createMessage({
       type: 'file',
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file),
+      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id)
@@ -200,10 +232,12 @@ export function useChat() {
   }
 
   /** 发送语音消息 */
-  async function sendAudioMessage(file: File | Blob, duration: number) {
+  async function sendAudioMessage(file: File | Blob, duration: number, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
+    const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+    const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
     const sdkMsg = client.createMessage({
       type: 'audio',
       to: cvs.id,
@@ -211,8 +245,9 @@ export function useChat() {
       file: _toFileObj(file, file instanceof File ? file.name : 'audio.amr'),
       filename: file instanceof File ? file.name : 'audio.amr',
       length: duration,
+      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id)
@@ -222,18 +257,21 @@ export function useChat() {
   }
 
   /** 发送视频消息 */
-  async function sendVideoMessage(file: File) {
+  async function sendVideoMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
+    const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+    const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
     const sdkMsg = client.createMessage({
       type: 'video',
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file, file.name),
       filename: file.name,
+      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id)
@@ -252,6 +290,11 @@ export function useChat() {
 
   /**
    * 获取历史消息
+   *
+   * ⚠️ 注意：此方法仅从服务端拉取历史消息并写入本地 store，
+   * 不会触发任何已读回执（read ack / channel ack / group ack），
+   * 也不会触发 event-handler 中的 handleIncomingMessage。
+   * 后续维护时请勿在此处遍历发送 read ack，历史消息无需回执。
    */
   async function fetchHistoryMessages(cursor?: string) {
     const cvs = conversationStore.currentConversation
@@ -270,12 +313,21 @@ export function useChat() {
       const historyMsgs: Message[] = rawMsgs.map((m) => {
         const isGroup = m.chatType === 'groupChat'
         const conversationId = isGroup ? m.to : (m.from === currentUser ? m.to : m.from)
+        // 解析 allowGroupAck
+        const msgConfigAllowGroupAck = (m as EasemobChat.ExcludeAckMessageBody & { msgConfig?: { allowGroupAck?: boolean } }).msgConfig?.allowGroupAck
+        const extMsgConfigAllowGroupAck = m.ext
+          && typeof m.ext === 'object'
+          && m.ext.msgConfig
+          && typeof m.ext.msgConfig === 'object'
+          && (m.ext.msgConfig as Record<string, unknown>).allowGroupAck
+        const requireGroupAck = !!(msgConfigAllowGroupAck || extMsgConfigAllowGroupAck)
         return {
           ...m,
           conversationId: conversationId || cvs.id,
           isSelf: m.from === currentUser,
           status: MESSAGE_STATUS.SENT,
           timestamp: m.time || Date.now(),
+          requireGroupAck: requireGroupAck || undefined,
         } as Message
       })
       messageStore.prependMessages(cvs.id, historyMsgs)
@@ -290,6 +342,26 @@ export function useChat() {
     }
   }
 
+  /** 对指定消息发送已读回执（单聊） */
+  async function sendReadAckForMessage(msgId: string) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
+    try {
+      await _getClient().sendReadAck({
+        chatType: cvs.type,
+        to: cvs.id,
+        msgId,
+      })
+    } catch (e) {
+      console.warn('[useChat] sendReadAck failed:', e)
+    }
+  }
+
+  /** 获取群消息已读用户详情 */
+  async function fetchGroupReadDetail(msgId: string, groupId: string) {
+    return _getClient().getGroupMsgReadUser({ msgId, groupId })
+  }
+
   return {
     messages,
     currentConversation,
@@ -300,6 +372,8 @@ export function useChat() {
     sendAudioMessage,
     sendVideoMessage,
     fetchHistoryMessages,
+    sendReadAckForMessage,
+    fetchGroupReadDetail,
     // 多选相关
     isMultiSelectMode,
     selectedMessages,

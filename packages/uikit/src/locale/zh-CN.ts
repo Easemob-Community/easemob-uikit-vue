@@ -57,6 +57,10 @@ const messages: LocaleMessages = {
   'toast.success': '操作成功',
   'toast.error': '操作失败',
   'modal.title': '提示',
+  'groupReadReceipt.title': '已读详情',
+  'groupReadReceipt.read': '已读',
+  'groupReadReceipt.unread': '未读',
+  'groupReadReceipt.empty': '暂无',
 }
 
 export default messages

@@ -30,6 +30,8 @@ export const useConversationStore = defineStore('conversation', () => {
   const conversationList = ref<Conversation[]>([])
   const currentConversation = ref<Conversation | null>(null)
   const conversationCursor = ref<string | null>(null)
+  /** 群成员数缓存（groupId -> count），用于群已读回执的已读/未读人数计算 */
+  const groupMemberCountMap = ref<Record<string, number>>({})
 
   /** 按置顶状态和时间排序的会话列表 */
   const sortedConversationList = computed(() => {
@@ -98,10 +100,19 @@ export const useConversationStore = defineStore('conversation', () => {
     conversationCursor.value = cursor
   }
 
+  function setGroupMemberCount(groupId: string, count: number) {
+    groupMemberCountMap.value[groupId] = count
+  }
+
+  function getGroupMemberCount(groupId: string): number {
+    return groupMemberCountMap.value[groupId] || 0
+  }
+
   function clearConversationList() {
     conversationList.value = []
     currentConversation.value = null
     conversationCursor.value = null
+    groupMemberCountMap.value = {}
   }
 
   return {
@@ -118,6 +129,9 @@ export const useConversationStore = defineStore('conversation', () => {
     updateUnreadCount,
     togglePin,
     setConversationCursor,
+    groupMemberCountMap,
+    setGroupMemberCount,
+    getGroupMemberCount,
     clearConversationList,
   }
 })

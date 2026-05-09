@@ -159,17 +159,58 @@ export class UIKitClient {
     return (this._connection as any).pinConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
   }
 
-  /** 发送会话已读回执 */
+  /** 发送会话已读回执（群聊不会产生 channel ack，自动跳过） */
   async sendChannelAck(options: {
     chatType: ConversationTypeValue
     to: string
-  }): Promise<EasemobChat.SendMsgResult> {
+  }): Promise<EasemobChat.SendMsgResult | void> {
+    // 群聊不发 channel ack，群聊不会产生会话已读回执
+    if (options.chatType === CONVERSATION_TYPE.GROUPCHAT) return
     const msg = WebIM.message.create({
       type: ACK_TYPE.CHANNEL as EasemobChat.MessageType,
       chatType: options.chatType as EasemobChat.ChatType,
       to: options.to,
     } as EasemobChat.CreateChannelMsgParameters)
     return this._connection.send(msg)
+  }
+
+  /** 发送消息已读回执（单聊） */
+  async sendReadAck(options: {
+    chatType: ConversationTypeValue
+    to: string
+    msgId: string
+  }): Promise<EasemobChat.SendMsgResult> {
+    const msg = WebIM.message.create({
+      type: ACK_TYPE.READ as EasemobChat.MessageType,
+      chatType: options.chatType as EasemobChat.ChatType,
+      to: options.to,
+      id: options.msgId,
+    } as EasemobChat.CreateReadMsgParameters)
+    return this._connection.send(msg)
+  }
+
+  /** 发送群消息已读回执 */
+  async sendGroupReadAck(options: {
+    to: string
+    msgId: string
+    ackContent?: string
+  }): Promise<EasemobChat.SendMsgResult> {
+    const msg = WebIM.message.create({
+      type: ACK_TYPE.GROUP_READ as EasemobChat.MessageType,
+      chatType: 'groupChat' as EasemobChat.ChatType,
+      to: options.to,
+      id: options.msgId,
+      ackContent: options.ackContent || JSON.stringify({}),
+    } as EasemobChat.CreateReadMsgParameters)
+    return this._connection.send(msg)
+  }
+
+  /** 获取群消息已读用户列表 */
+  async getGroupMsgReadUser(options: {
+    msgId: string
+    groupId: string
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.GetGroupMsgReadUserResult>> {
+    return this._connection.getGroupMsgReadUser(options)
   }
 
   /** 删除会话 */

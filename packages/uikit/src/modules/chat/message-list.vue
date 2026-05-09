@@ -7,6 +7,7 @@ import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
 import MessageBubbleWrapper from './message-item/message-bubble-wrapper.vue'
 import MessageVirtualList from './message-virtual-list.vue'
+import GroupReadReceiptModal from './group-read-receipt-modal.vue'
 import type { ChatConfig, MessageActionEvent } from './types'
 import type { Message } from '../../store/message'
 
@@ -16,7 +17,7 @@ export interface MessageListProps {
 
 const props = defineProps<MessageListProps>()
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages } = useChat()
+const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail } = useChat()
 const { isMobile } = useViewport()
 const { t } = useLocale()
 
@@ -175,6 +176,29 @@ function onMessageAction(event: MessageActionEvent) {
   // TODO: 处理其他操作（引用、复制、删除、撤回、转发、翻译、置顶）
 }
 
+/** 处理群已读点击 */
+async function onGroupReadClick(msgId: string, groupId: string) {
+  try {
+    const result = await fetchGroupReadDetail(msgId, groupId)
+    const data = result.data
+    // SDK 返回 userlist 为已读用户列表，未读用户需用群成员总数减去已读列表推算
+    const readUsers = (data?.userlist as string[]) || []
+    const totalRead = data?.total || readUsers.length
+    // 未读用户列表：当前无法直接从 SDK 获取，需业务层维护群成员列表后做差集
+    // 此处先展示已读列表，未读列表留空（或后续接入群成员全量列表后补充）
+    modalReadList.value = readUsers
+    modalUnreadList.value = []
+    showGroupReadModal.value = true
+  } catch (e) {
+    console.warn('[MessageList] fetchGroupReadDetail failed:', e)
+  }
+}
+
+/** 群已读弹窗状态 */
+const showGroupReadModal = ref(false)
+const modalReadList = ref<string[]>([])
+const modalUnreadList = ref<string[]>([])
+
 /** 处理多选切换 */
 function onToggleSelect(msgId: string) {
   if (isMultiSelectMode.value) {
@@ -260,6 +284,7 @@ const messagesWithDividers = computed(() => {
           :is-selected="isMessageSelected((item.data as Message).id)"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
+          @group-read-click="onGroupReadClick"
         />
       </template>
     </MessageVirtualList>
@@ -285,6 +310,7 @@ const messagesWithDividers = computed(() => {
           :is-selected="isMessageSelected((item.data as Message).id)"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
+          @group-read-click="onGroupReadClick"
         />
       </div>
     </div>
@@ -298,6 +324,13 @@ const messagesWithDividers = computed(() => {
       <span>{{ unreadNewCount }} 条新消息</span>
       <span class="message-list__new-tip-arrow">&#8595;</span>
     </div>
+
+    <!-- 群已读详情弹窗 -->
+    <GroupReadReceiptModal
+      v-model:show="showGroupReadModal"
+      :read-list="modalReadList"
+      :unread-list="modalUnreadList"
+    />
   </div>
 </template>
 

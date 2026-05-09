@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useClientStore } from '../../store/client'
 import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
+import { useGroupStore } from '../../store/group'
 import { useThemeStore } from '../../store/theme'
 import { useLocale } from '../../locale'
 import { createClient } from '../../sdk/client'
@@ -33,6 +34,7 @@ const props = withDefaults(defineProps<ProviderProps>(), {
 const clientStore = useClientStore()
 const conversationStore = useConversationStore()
 const messageStore = useMessageStore()
+const groupStore = useGroupStore()
 const themeStore = useThemeStore()
 const { setLocale } = useLocale()
 
@@ -52,6 +54,7 @@ const stores = {
   message: messageStore,
   client: clientStore,
   conversation: conversationStore,
+  group: groupStore,
 }
 
 /** 当 client 实例变化时，自动挂载/卸载事件处理器 */

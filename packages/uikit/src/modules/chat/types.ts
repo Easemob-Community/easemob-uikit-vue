@@ -75,6 +75,13 @@ export interface ChatConfig {
     /** 启用置顶，默认 false */
     enablePin?: boolean
   }
+  /** 群已读回执配置 */
+  groupReadReceipt?: {
+    /** 是否启用群已读回执，默认 false */
+    enabled?: boolean
+    /** 群人数上限，默认 200（超过此人数不发已读回执） */
+    maxGroupSize?: number
+  }
   /** 输入框配置 */
   input?: {
     /** 输入框模式，默认 'simple' */

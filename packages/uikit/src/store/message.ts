@@ -13,6 +13,12 @@ export interface MessageUiExtension {
   status: MessageStatusValue
   /** 时间戳，对齐 SDK time 字段 */
   timestamp: number
+  /** 群已读人数（仅群聊 allowGroupAck 消息，发送方可查看） */
+  groupReadCount?: number
+  /** 群成员总数（用于计算未读人数，仅群聊 allowGroupAck 消息） */
+  groupMemberCount?: number
+  /** 是否需要群已读回执（来自 msgConfig.allowGroupAck） */
+  requireGroupAck?: boolean
 }
 
 /**

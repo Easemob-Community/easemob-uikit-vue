@@ -37,6 +37,8 @@ export type MessageStatusValue =
 /** 回执消息类型常量 */
 export const ACK_TYPE = {
   CHANNEL: 'channel',
+  READ: 'read',
+  GROUP_READ: 'read', // 群已读与单聊 read 共用 type，区别在 chatType
 } as const
 
 export type AckTypeValue = (typeof ACK_TYPE)[keyof typeof ACK_TYPE]

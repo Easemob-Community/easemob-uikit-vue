@@ -5,7 +5,8 @@ import MessageRenderer from './message-renderer.vue'
 import MessageInteractive from './message-interactive.vue'
 import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
-import { MESSAGE_STATUS } from '../../../constants'
+import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../../../constants'
+import { useGroupStore } from '../../../store/group'
 
 
 export interface MessageBubbleWrapperProps {
@@ -23,10 +24,13 @@ export interface MessageBubbleWrapperProps {
 export interface MessageBubbleWrapperEmits {
   (e: 'toggle-select', messageId: string): void
   (e: 'action', event: MessageActionEvent): void
+  (e: 'group-read-click', msgId: string, groupId: string): void
 }
 
 const props = defineProps<MessageBubbleWrapperProps>()
 const emit = defineEmits<MessageBubbleWrapperEmits>()
+
+const groupStore = useGroupStore()
 
 /** 布局模式 */
 const layout = computed<MessageLayout>(() => props.config?.layout ?? 'conversation')
@@ -62,6 +66,35 @@ const showStatus = computed(() => props.message.isSelf)
 
 /** 消息状态 */
 const messageStatus = computed(() => props.message.status)
+
+/** 是否显示群已读人数标注 */
+const showGroupReadCount = computed(() =>
+  props.message.isSelf
+  && props.message.requireGroupAck
+  && props.message.chatType === CONVERSATION_TYPE.GROUPCHAT
+)
+
+/** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
+const groupMemberCount = computed(() => {
+  return props.message.groupMemberCount
+    || groupStore.getGroupById(props.message.to || props.message.conversationId)?.memberCount
+    || 0
+})
+
+/** 群已读人数 */
+const groupReadCount = computed(() => props.message.groupReadCount || 0)
+
+/** 群未读人数 */
+const groupUnreadCount = computed(() =>
+  groupMemberCount.value > 0 ? groupMemberCount.value - groupReadCount.value : 0
+)
+
+/** 群已读标注点击 */
+function onGroupReadClick() {
+  if (props.message.chatType === CONVERSATION_TYPE.GROUPCHAT) {
+    emit('group-read-click', props.message.id, props.message.to || props.message.conversationId)
+  }
+}
 </script>
 
 <template>
@@ -134,6 +167,15 @@ const messageStatus = computed(() => props.message.status)
         <!-- 发送失败 -->
         <span v-else-if="messageStatus === MESSAGE_STATUS.FAILED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed" title="发送失败">&#33;</span>
       </div>
+
+      <!-- 群已读人数标注 -->
+      <span
+        v-if="showGroupReadCount"
+        class="message-bubble-wrapper__group-read"
+        @click.stop="onGroupReadClick"
+      >
+        {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
+      </span>
 
       <!-- 时间戳 -->
       <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
@@ -278,6 +320,20 @@ const messageStatus = computed(() => props.message.status)
   color: #e74c3c;
   font-weight: bold;
   cursor: pointer;
+}
+
+/* 群已读人数标注 */
+.message-bubble-wrapper__group-read {
+  font-size: 11px;
+  color: var(--uikit-text-secondary);
+  margin-top: 2px;
+  padding-left: 2px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.message-bubble-wrapper__group-read:hover {
+  color: var(--uikit-primary-color);
 }
 
 @keyframes message-status-loading {

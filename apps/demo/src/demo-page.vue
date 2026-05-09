@@ -39,9 +39,17 @@ const chatInputCaretColor = ref('')
 const chatInputSelectionColor = ref('')
 const chatInputMaxLength = ref(0)
 
+// 群已读回执配置
+const groupReadReceiptEnabled = ref(false)
+const groupReadReceiptMaxSize = ref(200)
+
 /** ChatContainer 配置 */
 const chatConfig = computed(() => ({
   header: { showAvatar: true } ,
+  groupReadReceipt: {
+    enabled: groupReadReceiptEnabled.value,
+    maxGroupSize: groupReadReceiptMaxSize.value,
+  },
   input: {
     mode: chatInputMode.value,
     style: chatInputStyle.value,
@@ -459,6 +467,26 @@ function injectMockConversations() {
                   v-model.number="chatInputMaxLength"
                   type="number"
                   placeholder="0=无限制"
+                  class="demo-input"
+                  style="flex: 1;"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">群已读回执</label>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label class="demo-check">
+                <input v-model="groupReadReceiptEnabled" type="checkbox" />
+                <span>启用群已读回执</span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); min-width: 80px;">人数上限</span>
+                <input
+                  v-model.number="groupReadReceiptMaxSize"
+                  type="number"
+                  placeholder="200"
                   class="demo-input"
                   style="flex: 1;"
                 />
