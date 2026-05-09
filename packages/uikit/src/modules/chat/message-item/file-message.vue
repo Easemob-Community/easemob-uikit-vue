@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
-import type { Message } from '../../../store/message'
+import type { FileMessageType } from '../../../store/message'
 
 export interface FileMessageProps {
-  message: Message
+  message: FileMessageType
 }
 
 const props = defineProps<FileMessageProps>()
 
 /** 文件名 */
-const fileName = computed(() => props.message.body.name || '未知文件')
+const fileName = computed(() => props.message.filename || '未知文件')
 
 /** 文件大小格式化 */
 const fileSize = computed(() => {
-  const size = props.message.body.size || 0
+  const size = props.message.file_length || 0
   if (size === 0) return ''
   if (size < 1024) return `${size} B`
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
@@ -37,7 +37,7 @@ const fileIcon = computed(() => {
 
 function handleDownload() {
   // TODO: 接入真实下载逻辑
-  const url = props.message.body.url
+  const url = props.message.url
   if (url) {
     const a = document.createElement('a')
     a.href = url

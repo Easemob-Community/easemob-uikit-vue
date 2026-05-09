@@ -5,6 +5,7 @@ import MessageRenderer from './message-renderer.vue'
 import MessageInteractive from './message-interactive.vue'
 import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
+import { MESSAGE_STATUS } from '../../../constants'
 
 
 export interface MessageBubbleWrapperProps {
@@ -55,6 +56,12 @@ const shouldShowTime = computed(() => {
   if (showTime.value === false) return false
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
+
+/** 是否显示发送状态（仅自己的消息） */
+const showStatus = computed(() => props.message.isSelf)
+
+/** 消息状态 */
+const messageStatus = computed(() => props.message.status)
 </script>
 
 <template>
@@ -112,6 +119,20 @@ const shouldShowTime = computed(() => {
             </template>
           </MessageRenderer>
         </MessageInteractive>
+      </div>
+
+      <!-- 消息状态指示器（仅己方消息） -->
+      <div v-if="showStatus" class="message-bubble-wrapper__status">
+        <!-- 发送中 -->
+        <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
+        <!-- 已发送 -->
+        <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
+        <!-- 已送达 -->
+        <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
+        <!-- 已读 -->
+        <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
+        <!-- 发送失败 -->
+        <span v-else-if="messageStatus === MESSAGE_STATUS.FAILED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed" title="发送失败">&#33;</span>
       </div>
 
       <!-- 时间戳 -->
@@ -220,5 +241,47 @@ const shouldShowTime = computed(() => {
 
 .message-bubble-wrapper--selected {
   opacity: 0.85;
+}
+
+/* 消息状态指示器 */
+.message-bubble-wrapper__status {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  padding-left: 2px;
+  flex-shrink: 0;
+}
+
+.message-bubble-wrapper__status-icon {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  line-height: 1;
+}
+
+.message-bubble-wrapper__status-icon--loading {
+  animation: message-status-loading 1s infinite;
+  color: var(--uikit-text-secondary);
+}
+
+.message-bubble-wrapper__status-icon--delivered {
+  letter-spacing: -2px;
+  font-size: 11px;
+}
+
+.message-bubble-wrapper__status-icon--read {
+  color: var(--uikit-primary-color);
+  letter-spacing: -2px;
+  font-size: 11px;
+}
+
+.message-bubble-wrapper__status-icon--failed {
+  color: #e74c3c;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@keyframes message-status-loading {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 </style>

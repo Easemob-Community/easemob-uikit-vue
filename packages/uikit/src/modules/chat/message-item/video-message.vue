@@ -2,10 +2,10 @@
 import { computed, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
-import type { Message } from '../../../store/message'
+import type { VideoMessageType } from '../../../store/message'
 
 export interface VideoMessageProps {
-  message: Message
+  message: VideoMessageType
 }
 
 const props = defineProps<VideoMessageProps>()
@@ -32,8 +32,8 @@ function closePreview() {
   <div class="video-message" :class="{ 'video-message--self': props.message.isSelf }">
     <div class="video-message__container" @click="openPreview">
       <video
-        v-if="props.message.body.url"
-        :src="props.message.body.url"
+        v-if="props.message.url"
+        :src="props.message.url"
         class="video-message__video"
         :class="videoClass"
         preload="metadata"
@@ -46,19 +46,19 @@ function closePreview() {
         <div class="video-message__play-btn">&#9658;</div>
       </div>
       <!-- 时长标签 -->
-      <div v-if="props.message.body.duration" class="video-message__duration">
-        {{ Math.floor(props.message.body.duration / 60) }}:{{ String(props.message.body.duration % 60).padStart(2, '0') }}
+      <div v-if="props.message.length" class="video-message__duration">
+        {{ Math.floor(props.message.length / 60) }}:{{ String(props.message.length % 60).padStart(2, '0') }}
       </div>
     </div>
 
     <!-- 全屏预览 -->
     <div
-      v-if="isPreviewing && props.message.body.url"
+      v-if="isPreviewing && props.message.url"
       class="video-message__preview"
       @click="closePreview"
     >
       <video
-        :src="props.message.body.url"
+        :src="props.message.url"
         class="video-message__preview-video"
         controls
         autoplay

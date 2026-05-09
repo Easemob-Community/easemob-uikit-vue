@@ -43,7 +43,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
   <div class="message-renderer">
     <!-- 通知类型消息：居中灰色小字 -->
     <div v-if="isNotice" class="message-renderer__notice">
-      {{ message.body.msg }}
+      {{ 'msg' in message ? message.msg : '' }}
     </div>
 
     <!-- 类型级插槽覆盖：用户可通过 #message-txt 等完全替换某一类型的渲染 -->

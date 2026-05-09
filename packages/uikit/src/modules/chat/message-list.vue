@@ -16,7 +16,7 @@ export interface MessageListProps {
 
 const props = defineProps<MessageListProps>()
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode } = useChat()
+const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages } = useChat()
 const { isMobile } = useViewport()
 const { t } = useLocale()
 
@@ -49,6 +49,9 @@ const historyMode = computed(() => {
   if (mode === 'auto') return isMobile.value ? 'pull-down' : 'scroll-top'
   return mode
 })
+
+/** 历史消息分页游标 */
+const historyCursor = ref('')
 
 /** 加载历史消息中 */
 const loadingHistory = ref(false)
@@ -115,14 +118,32 @@ function onNewMessageTipClick() {
 async function loadMoreHistory() {
   if (loadingHistory.value || !hasMoreHistory.value) return
   loadingHistory.value = true
-  const beforeCount = messages.value.length
-  // TODO: 接入真实的历史消息加载逻辑
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  const afterCount = messages.value.length
-  if (afterCount <= beforeCount) {
+  // 记录加载前的滚动位置，用于加载后恢复
+  const container = listRef.value
+  const prevScrollHeight = container?.scrollHeight ?? 0
+  const prevScrollTop = container?.scrollTop ?? 0
+  try {
+    const result = await fetchHistoryMessages(historyCursor.value || undefined)
+    if (result) {
+      historyCursor.value = result.cursor
+      // SDK 返回 isLast 表示是否为最后一页
+      if (result.isLast || result.messages.length === 0) {
+        hasMoreHistory.value = false
+      }
+    } else {
+      hasMoreHistory.value = false
+    }
+  } catch (e) {
+    console.error('[MessageList] loadMoreHistory failed:', e)
     hasMoreHistory.value = false
   }
   loadingHistory.value = false
+  // 恢复滚动位置：加载后 scrollHeight 变化了，需要补偿 scrollTop
+  if (container && prevScrollHeight > 0) {
+    await nextTick()
+    const newScrollHeight = container.scrollHeight
+    container.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight)
+  }
 }
 
 /** PC 端：滚动到顶部加载 */

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import type { Message } from '../../../store/message'
+import type { AudioMessageType } from '../../../store/message'
 
 export interface VoiceMessageProps {
-  message: Message
+  message: AudioMessageType
 }
 
 const props = defineProps<VoiceMessageProps>()
@@ -19,7 +19,7 @@ const bubbleClass = computed(() =>
   <div class="voice-message" :class="{ 'voice-message--self': props.message.isSelf }">
     <div class="voice-message__bubble" :class="bubbleClass">
       <span class="voice-message__icon">&#9658;</span>
-      <span class="voice-message__duration">{{ props.message.body.duration || 0 }}"</span>
+      <span class="voice-message__duration">{{ props.message.length || 0 }}"</span>
     </div>
   </div>
 </template>

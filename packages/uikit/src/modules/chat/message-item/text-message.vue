@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import type { Message } from '../../../store/message'
+import type { TextMessageType } from '../../../store/message'
 
 export interface TextMessageProps {
-  message: Message
+  message: TextMessageType
 }
 
 const props = defineProps<TextMessageProps>()
@@ -18,7 +18,7 @@ const bubbleClass = computed(() =>
 <template>
   <div class="text-message" :class="{ 'text-message--self': props.message.isSelf }">
     <div class="text-message__bubble" :class="bubbleClass">
-      {{ props.message.body.msg }}
+      {{ props.message.msg }}
     </div>
   </div>
 </template>

@@ -31,25 +31,29 @@ function injectMockData() {
   cvsStore.setConversationList([mockConversation])
   cvsStore.setCurrentConversation(mockConversation)
 
-  const mockMessages = Array.from({ length: 8 }, (_, i) => ({
-    id: `msg_${i}`,
-    conversationId: mockConversation.id,
-    to: mockConversation.id,
-    type: i % 3 === 0 ? MESSAGE_TYPE.TXT : i % 3 === 1 ? MESSAGE_TYPE.IMG : MESSAGE_TYPE.AUDIO,
-    body: {
-      content: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。`,
-      url: i % 3 === 1 ? 'https://picsum.photos/200/150' : undefined,
-      duration: i % 3 === 2 ? 15 : undefined,
-      name: i % 3 === 2 ? 'voice.amr' : undefined,
-      size: i % 3 === 2 ? 10240 : undefined,
-    },
-    timestamp: Date.now() - (8 - i) * 60000,
-    isSelf: i % 2 === 0,
-    from: i % 2 === 0 ? 'user_self' : 'user_002',
-    status: MESSAGE_STATUS.READ,
-  }))
+  const mockMessages = Array.from({ length: 8 }, (_, i) => {
+    const type = i % 3 === 0 ? 'txt' as const : i % 3 === 1 ? 'img' as const : 'audio' as const
+    return {
+      id: `msg_${i}`,
+      conversationId: mockConversation.id,
+      chatType: 'groupChat' as const,
+      to: mockConversation.id,
+      from: i % 2 === 0 ? 'user_self' : 'user_002',
+      type,
+      // 文本消息字段
+      ...(type === 'txt' ? { msg: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。` } : {}),
+      // 图片消息字段
+      ...(type === 'img' ? { url: 'https://picsum.photos/200/150', file_length: 10240 } : {}),
+      // 语音消息字段
+      ...(type === 'audio' ? { url: '', length: 15, filename: 'voice.amr', file_length: 10240 } : {}),
+      time: Date.now() - (8 - i) * 60000,
+      timestamp: Date.now() - (8 - i) * 60000,
+      isSelf: i % 2 === 0,
+      status: MESSAGE_STATUS.READ,
+    }
+  })
 
-  msgStore.messageMap[mockConversation.id] = mockMessages
+  msgStore.messageMap[mockConversation.id] = mockMessages as any
 }
 
 /** 基础配置 */
@@ -172,7 +176,7 @@ injectMockData()
           <ChatContainer :config="baseConfig">
             <template #message-txt="{ message }">
               <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: 14px;">
-                [自定义文本] {{ message.body.content }}
+                [自定义文本] {{ 'msg' in message ? message.msg : '' }}
               </div>
             </template>
           </ChatContainer>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import type { Message } from '../../../store/message'
+import type { ImgMessageType } from '../../../store/message'
 
 export interface ImageMessageProps {
-  message: Message
+  message: ImgMessageType
 }
 
 const props = defineProps<ImageMessageProps>()
@@ -21,8 +21,8 @@ const placeholderClass = computed(() =>
 <template>
   <div class="image-message" :class="{ 'image-message--self': props.message.isSelf }">
     <img
-      v-if="props.message.body.url"
-      :src="props.message.body.url"
+      v-if="props.message.url"
+      :src="props.message.url"
       class="image-message__img"
       :class="imgClass"
       alt="image"

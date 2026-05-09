@@ -2,7 +2,6 @@
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useViewport } from '../../composables/use-viewport'
-import { MESSAGE_TYPE } from '../../constants'
 import { useToast } from '../../composables/use-toast'
 import SimpleInput from './message-input/simple-input.vue'
 import RichInput from './message-input/rich-input.vue'
@@ -19,7 +18,7 @@ export interface MessageInputProps {
 
 const props = defineProps<MessageInputProps>()
 
-const { sendMessage } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage } = useChat()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
 
@@ -71,12 +70,12 @@ const richInputRef = ref<InstanceType<typeof RichInput>>()
 
 /** 发送文本消息 */
 function handleSendText(text: string) {
-  sendMessage({ msg: text }, MESSAGE_TYPE.TXT)
+  sendTextMessage(text)
 }
 
 /** 发送富文本消息 */
 function handleSendRich(_html: string, text: string) {
-  sendMessage({ msg: text }, MESSAGE_TYPE.TXT)
+  sendTextMessage(text)
 }
 
 /** 待回收的 Blob URL 列表 */
@@ -87,23 +86,13 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   const file = files[0]
   if (!file) return
 
-  const url = URL.createObjectURL(file)
-  // 记录 blob URL 以便后续回收
-  pendingBlobUrls.add(url)
-  const msgType = type === 'image'
-    ? MESSAGE_TYPE.IMG
-    : type === 'video'
-      ? MESSAGE_TYPE.VIDEO
-      : MESSAGE_TYPE.FILE
-
-  sendMessage(
-    {
-      url,
-      name: file.name,
-      size: file.size,
-    },
-    msgType
-  )
+  if (type === 'image') {
+    sendImageMessage(file)
+  } else if (type === 'video') {
+    sendVideoMessage(file)
+  } else {
+    sendFileMessage(file)
+  }
 }
 
 /** 打开 Emoji 选择器 */
@@ -242,19 +231,7 @@ function handleVoiceEnd(durationFromInput?: number) {
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
-      const url = URL.createObjectURL(blob)
-      pendingBlobUrls.add(url)
-
-      sendMessage(
-        {
-          url,
-          duration: actualDuration,
-          filename: `voice-${Date.now()}.webm`,
-          filetype: 'audio/webm',
-          size: blob.size,
-        },
-        MESSAGE_TYPE.AUDIO
-      )
+      sendAudioMessage(blob, actualDuration)
     }
 
     audioChunks = []

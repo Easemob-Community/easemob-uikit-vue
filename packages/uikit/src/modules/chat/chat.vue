@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useChat } from '../../composables/use-chat'
+import { useUIKit } from '../../composables/use-uikit'
 import { useLocale } from '../../locale'
 import { CONVERSATION_TYPE } from '../../constants'
+import { getClient } from '../../sdk/client'
 import MessageList from './message-list.vue'
 import MessageInput from './message-input.vue'
 import ChatInfoDrawer from './chat-info-drawer.vue'
@@ -16,7 +18,8 @@ export interface ChatProps {
 
 const props = defineProps<ChatProps>()
 
-const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode } = useChat()
+const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages } = useChat()
+const { stores } = useUIKit()
 const { t } = useLocale()
 
 /** Header 配置 */
@@ -67,6 +70,35 @@ const conversationType = computed(() => currentConversation.value?.type)
 
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
+
+/**
+ * 会话切换时：
+ * 1. 发送已读回执
+ * 2. 清零未读数
+ * 3. 首次拉取历史消息
+ */
+watch(currentConversation, async (cvs, oldCvs) => {
+  if (!cvs || cvs.id === oldCvs?.id) return
+
+  // 发送已读回执
+  try {
+    const client = getClient()
+    if (client && cvs.id) {
+      await client.sendChannelAck({ chatType: cvs.type, to: cvs.id })
+    }
+  } catch (e) {
+    console.warn('[Chat] sendChannelAck failed:', e)
+  }
+
+  // 清零未读数
+  stores.conversation.updateUnreadCount(cvs.id, 0)
+
+  // 首次拉取历史消息
+  const existingMsgs = stores.message.getMessages(cvs.id)
+  if (existingMsgs.length === 0) {
+    await fetchHistoryMessages()
+  }
+}, { immediate: true })
 
 /** 多选模式底部操作 */
 function onMultiSelectForward() {

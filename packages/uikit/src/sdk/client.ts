@@ -61,10 +61,15 @@ export class UIKitClient {
     this._connection.close()
   }
 
-  /** 发送文本消息 */
-  async sendText(options: EasemobChat.CreateTextMsgParameters) {
+  /**
+   * 通用发送方法：创建消息 → 发送 → 状态回调
+   * 所有 sendXxx 方法统一委托此方法，消除重复代码
+   *
+   * @returns SendMsgResult，包含 localMsgId 和 serverMsgId
+   */
+  private async _sendWithStatus(options: EasemobChat.CreateMsgType): Promise<EasemobChat.SendMsgResult> {
     const msg = WebIM.message.create(options)
-    const localMsgId = (msg as any).id as string
+    const localMsgId = msg.id
     if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
     try {
       const result = await this._connection.send(msg)
@@ -74,51 +79,62 @@ export class UIKitClient {
       if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
       throw error
     }
+  }
+
+  /**
+   * 仅创建消息对象，不发送。用于需要先拿到 SDK 生成的 msg.id 再插入本地 store 的场景。
+   *
+   * @returns 创建好的 MessageBody（含 id 字段）
+   */
+  createMessage(options: EasemobChat.CreateMsgType): EasemobChat.MessageBody {
+    return WebIM.message.create(options)
+  }
+
+  /**
+   * 发送已创建的消息对象（配合 createMessage 使用）
+   *
+   * @returns SendMsgResult
+   */
+  async sendCreatedMessage(msg: EasemobChat.MessageBody): Promise<EasemobChat.SendMsgResult> {
+    const localMsgId = msg.id
+    try {
+      const result = await this._connection.send(msg)
+      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
+      return result
+    } catch (error) {
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
+      throw error
+    }
+  }
+
+  /** 发送文本消息 */
+  async sendText(options: EasemobChat.CreateTextMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
   }
 
   /** 发送图片消息 */
-  async sendImage(options: EasemobChat.CreateImgMsgParameters) {
-    const msg = WebIM.message.create(options)
-    const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
-    try {
-      const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
-      return result
-    } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
-      throw error
-    }
+  async sendImage(options: EasemobChat.CreateImgMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
   }
 
   /** 发送文件消息 */
-  async sendFile(options: EasemobChat.CreateFileMsgParameters) {
-    const msg = WebIM.message.create(options)
-    const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
-    try {
-      const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
-      return result
-    } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
-      throw error
-    }
+  async sendFile(options: EasemobChat.CreateFileMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
   }
 
   /** 发送自定义消息 */
-  async sendCustom(options: EasemobChat.CreateCustomMsgParameters) {
-    const msg = WebIM.message.create(options)
-    const localMsgId = (msg as any).id as string
-    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
-    try {
-      const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
-      return result
-    } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
-      throw error
-    }
+  async sendCustom(options: EasemobChat.CreateCustomMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
+  }
+
+  /** 发送语音消息 */
+  async sendAudio(options: EasemobChat.CreateAudioMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
+  }
+
+  /** 发送视频消息 */
+  async sendVideo(options: EasemobChat.CreateVideoMsgParameters): Promise<EasemobChat.SendMsgResult> {
+    return this._sendWithStatus(options)
   }
 
   /** 从服务端分页获取会话列表 */
@@ -126,13 +142,12 @@ export class UIKitClient {
     pageSize?: number
     cursor?: string
     includeEmptyConversations?: boolean
-  }) {
-    const conn = this._connection as any
-    return conn.getServerConversations({
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.ServerConversations>> {
+    return this._connection.getServerConversations({
       pageSize: options?.pageSize ?? 50,
       cursor: options?.cursor ?? '',
       includeEmptyConversations: options?.includeEmptyConversations ?? false,
-    })
+    } as any) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
   }
 
   /** 置顶/取消置顶会话 */
@@ -140,21 +155,20 @@ export class UIKitClient {
     conversationId: string
     conversationType: ConversationTypeValue
     isPinned: boolean
-  }) {
-    const conn = this._connection as any
-    return conn.pinConversation(options)
+  }): Promise<void> {
+    return (this._connection as any).pinConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
   }
 
   /** 发送会话已读回执 */
   async sendChannelAck(options: {
     chatType: ConversationTypeValue
     to: string
-  }) {
+  }): Promise<EasemobChat.SendMsgResult> {
     const msg = WebIM.message.create({
-      type: ACK_TYPE.CHANNEL,
-      chatType: options.chatType,
+      type: ACK_TYPE.CHANNEL as EasemobChat.MessageType,
+      chatType: options.chatType as EasemobChat.ChatType,
       to: options.to,
-    })
+    } as EasemobChat.CreateChannelMsgParameters)
     return this._connection.send(msg)
   }
 
@@ -163,9 +177,23 @@ export class UIKitClient {
     channel: string
     chatType: ConversationTypeValue
     deleteRoam?: boolean
-  }) {
-    const conn = this._connection as any
-    return conn.deleteConversation(options)
+  }): Promise<void> {
+    return (this._connection as any).deleteConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
+  }
+
+  /** 获取历史消息（分页） */
+  async getHistoryMessages(options: {
+    targetId: string
+    chatType: ConversationTypeValue
+    pageSize?: number
+    cursor?: string
+  }): Promise<EasemobChat.HistoryMessages> {
+    return this._connection.getHistoryMessages({
+      targetId: options.targetId,
+      chatType: options.chatType as EasemobChat.ChatType,
+      pageSize: options.pageSize ?? 20,
+      cursor: options.cursor ?? '',
+    })
   }
 
   /** 添加事件处理器 */
