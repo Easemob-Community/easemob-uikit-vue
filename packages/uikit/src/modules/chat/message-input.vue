@@ -61,6 +61,9 @@ const mentionContacts = computed(() => inputConfig.value?.mention?.contacts ?? [
 /** SimpleInput 引用 */
 const simpleInputRef = ref<InstanceType<typeof SimpleInput>>()
 
+/** message-input 根元素引用 */
+const messageInputRef = ref<HTMLElement>()
+
 /** RichInput 引用 */
 const richInputRef = ref<InstanceType<typeof RichInput>>()
 
@@ -102,17 +105,19 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
 }
 
 /** 打开 Emoji 选择器 */
-function onEmojiClick(anchorEl?: HTMLElement) {
-  if (anchorEl) {
-    emojiAnchorRef.value = anchorEl
-  }
+function onEmojiClick(anchorEl: HTMLElement) {
+  emojiAnchorRef.value = anchorEl
   showEmojiPicker.value = true
 }
 
 /** 选择 Emoji */
 function onEmojiSelect(emoji: string) {
   showEmojiPicker.value = false
-  // TODO: 将 emoji 插入到当前输入框光标位置
+  if (inputMode.value === 'simple') {
+    simpleInputRef.value?.insertEmoji?.(emoji)
+  } else {
+    richInputRef.value?.insertEmoji?.(emoji)
+  }
 }
 
 /** 清理 @提及锚点 DOM */
@@ -170,7 +175,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="message-input">
+  <div ref="messageInputRef" class="message-input">
     <!-- 简单输入框 -->
     <SimpleInput
       v-if="inputMode === 'simple'"
@@ -202,15 +207,18 @@ onBeforeUnmount(() => {
       v-if="!isMobile"
       :show="showEmojiPicker"
       :anchor="emojiAnchorRef"
+      :boundary="messageInputRef"
       placement="top"
       :overlay="false"
       @update:show="showEmojiPicker = $event"
     >
-      <EmojiPicker
-        :show="true"
-        @select="onEmojiSelect"
-        @update:show="showEmojiPicker = $event"
-      />
+      <div class="emoji-picker-wrapper">
+        <EmojiPicker
+          :show="true"
+          @select="onEmojiSelect"
+          @update:show="showEmojiPicker = $event"
+        />
+      </div>
     </Popup>
 
     <!-- H5 端 Emoji ActionSheet（简化：底部弹层） -->
@@ -220,11 +228,13 @@ onBeforeUnmount(() => {
     >
       <div class="message-input__emoji-sheet-mask" @click="showEmojiPicker = false" />
       <div class="message-input__emoji-sheet-content">
-        <EmojiPicker
-          :show="true"
-          @select="onEmojiSelect"
-          @update:show="showEmojiPicker = $event"
-        />
+        <div class="emoji-picker-wrapper">
+          <EmojiPicker
+            :show="true"
+            @select="onEmojiSelect"
+            @update:show="showEmojiPicker = $event"
+          />
+        </div>
       </div>
     </div>
 
@@ -240,6 +250,20 @@ onBeforeUnmount(() => {
     />
   </div>
 </template>
+
+<style>
+/* 表情选择器包裹层：hover 阴影效果（非 scoped，因 Popup 使用 Teleport） */
+.emoji-picker-wrapper {
+  width: 320px;
+  border-radius: 12px;
+  background: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border, rgba(0, 0, 0, 0.08));
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 12px 40px rgba(0, 0, 0, 0.14);
+}
+</style>
 
 <style scoped>
 .message-input {

@@ -20,7 +20,7 @@ const props = defineProps<RichInputProps>()
 const emit = defineEmits<{
   (e: 'send', html: string, text: string): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
-  (e: 'emoji-click'): void
+  (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
   (e: 'voice-end'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
@@ -32,6 +32,18 @@ const { isMobile } = useViewport()
 
 /** 输入框风格 */
 const style = computed(() => props.config?.style ?? 'wechat')
+
+/** 聚焦时边框颜色 */
+const focusBorderColorVar = computed(() => props.config?.focusBorderColor || 'var(--uikit-primary-color)')
+
+/** CSS 变量（用于全局样式中的 caret/selection） */
+const cssVars = computed(() => ({
+  '--rich-input-caret-color': props.config?.caretColor || 'auto',
+  '--rich-input-selection-color': props.config?.selectionColor || 'revert',
+}))
+
+/** 最大输入长度 */
+const maxLength = computed(() => props.config?.maxLength ?? 0)
 
 /** 功能开关 */
 const features = computed(() => ({
@@ -62,13 +74,37 @@ const editor = useEditor({
     }),
   ],
   content: '',
-  onCreate: ({ editor: e }) => updateHasContent(e),
+  onCreate: ({ editor: e }) => {
+    updateHasContent(e)
+    if (props.config?.autoFocus) {
+      e.commands.focus()
+    }
+  },
   onUpdate: ({ editor: e }) => updateHasContent(e),
   editorProps: {
     attributes: {
       class: 'rich-input__editor-content',
     },
+    handlePaste: (_view, event) => {
+      if (maxLength.value > 0) {
+        const text = _view.state.doc.textContent
+        const pastedText = event.clipboardData?.getData('text/plain') || ''
+        if (text.length + pastedText.length > maxLength.value) {
+          event.preventDefault()
+          return true
+        }
+      }
+      return false
+    },
     handleKeyDown: (_view, event) => {
+      // 最大长度限制：阻止普通字符输入
+      if (maxLength.value > 0 && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        const text = _view.state.doc.textContent
+        if (text.length >= maxLength.value) {
+          event.preventDefault()
+          return true
+        }
+      }
       if (event.key === '@' && props.enableMention) {
         mentionAnchorPos.value = _view.state.selection.from
         requestAnimationFrame(() => {
@@ -124,6 +160,9 @@ function handleSend() {
   inlineImageBlobUrls.clear()
 }
 
+/** 表情按钮 ref */
+const emojiBtnRef = ref<HTMLElement>()
+
 /** 触发文件选择 */
 const imageInputRef = ref<HTMLInputElement>()
 const fileInputRef = ref<HTMLInputElement>()
@@ -164,6 +203,18 @@ function toggleVoice() {
   }
 }
 
+/** 点击表情按钮 */
+function onEmojiClick() {
+  if (emojiBtnRef.value) {
+    emit('emoji-click', emojiBtnRef.value)
+  }
+}
+
+/** 插入 Emoji */
+function insertEmoji(emoji: string) {
+  editor.value?.chain().focus().insertContent(emoji).run()
+}
+
 /** 插入 @提及 */
 function insertMention(name: string) {
   if (!editor.value || mentionAnchorPos.value < 0) return
@@ -180,6 +231,7 @@ function insertMention(name: string) {
 /** 暴露方法 */
 defineExpose({
   insertMention,
+  insertEmoji,
 })
 
 /** 组件卸载时销毁编辑器并回收 Blob URL */
@@ -197,10 +249,11 @@ onBeforeUnmount(() => {
       'rich-input--feishu': style === 'feishu',
       'rich-input--wechat': style === 'wechat',
     }"
+    :style="cssVars"
   >
     <!-- 工具栏 -->
     <div class="rich-input__toolbar">
-      <div v-if="features.emoji" class="rich-input__tool-btn" @click="emit('emoji-click')">
+      <div v-if="features.emoji" ref="emojiBtnRef" class="rich-input__tool-btn" @click="onEmojiClick">
         <Icon name="emojis-reactions/face" :size="22" />
       </div>
       <div v-if="features.image" class="rich-input__tool-btn" @click="triggerFileInput('image')">
@@ -277,6 +330,11 @@ onBeforeUnmount(() => {
   line-height: 1.5;
   color: var(--uikit-text-primary);
   overflow-y: auto;
+  caret-color: var(--rich-input-caret-color, auto);
+}
+
+.rich-input__editor-content ::selection {
+  background-color: var(--rich-input-selection-color, revert);
 }
 
 .rich-input__editor-content p {
@@ -358,7 +416,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-input__editor-wrapper:focus-within {
-  border-color: var(--uikit-primary-color);
+  border-color: v-bind(focusBorderColorVar);
 }
 
 .rich-input__placeholder {

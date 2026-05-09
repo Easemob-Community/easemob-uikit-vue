@@ -32,12 +32,24 @@ const chatInputFeatures = ref({
   mention: true,
 })
 
+// 输入框扩展配置
+const chatInputAutoFocus = ref(false)
+const chatInputFocusBorderColor = ref('')
+const chatInputCaretColor = ref('')
+const chatInputSelectionColor = ref('')
+const chatInputMaxLength = ref(0)
+
 /** ChatContainer 配置 */
 const chatConfig = computed(() => ({
   input: {
     mode: chatInputMode.value,
     style: chatInputStyle.value,
     features: { ...chatInputFeatures.value },
+    autoFocus: chatInputAutoFocus.value,
+    ...(chatInputFocusBorderColor.value ? { focusBorderColor: chatInputFocusBorderColor.value } : {}),
+    ...(chatInputCaretColor.value ? { caretColor: chatInputCaretColor.value } : {}),
+    ...(chatInputSelectionColor.value ? { selectionColor: chatInputSelectionColor.value } : {}),
+    ...(chatInputMaxLength.value > 0 ? { maxLength: chatInputMaxLength.value } : {}),
   },
 }))
 
@@ -388,6 +400,68 @@ function injectMockConversations() {
                 <input v-model="chatInputFeatures.mention" type="checkbox" />
                 <span>@提及</span>
               </label>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">输入框扩展配置</label>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label class="demo-check">
+                <input v-model="chatInputAutoFocus" type="checkbox" />
+                <span>自动聚焦</span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); min-width: 80px;">聚焦边框色</span>
+                <input
+                  v-model="chatInputFocusBorderColor"
+                  placeholder="默认主题色"
+                  class="demo-input"
+                  style="flex: 1;"
+                />
+                <div
+                  v-if="chatInputFocusBorderColor"
+                  style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #e5e7eb;"
+                  :style="{ backgroundColor: chatInputFocusBorderColor }"
+                />
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); min-width: 80px;">光标颜色</span>
+                <input
+                  v-model="chatInputCaretColor"
+                  placeholder="默认"
+                  class="demo-input"
+                  style="flex: 1;"
+                />
+                <div
+                  v-if="chatInputCaretColor"
+                  style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #e5e7eb;"
+                  :style="{ backgroundColor: chatInputCaretColor }"
+                />
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); min-width: 80px;">选中背景色</span>
+                <input
+                  v-model="chatInputSelectionColor"
+                  placeholder="默认"
+                  class="demo-input"
+                  style="flex: 1;"
+                />
+                <div
+                  v-if="chatInputSelectionColor"
+                  style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #e5e7eb;"
+                  :style="{ backgroundColor: chatInputSelectionColor }"
+                />
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); min-width: 80px;">最大长度</span>
+                <input
+                  v-model.number="chatInputMaxLength"
+                  type="number"
+                  placeholder="0=无限制"
+                  class="demo-input"
+                  style="flex: 1;"
+                />
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import Input from '../../../components/input/input.vue'
@@ -18,7 +18,7 @@ const props = defineProps<SimpleInputProps>()
 const emit = defineEmits<{
   (e: 'send', text: string): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
-  (e: 'emoji-click'): void
+  (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
   (e: 'voice-end'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
@@ -45,6 +45,21 @@ const features = computed(() => ({
 
 /** 是否使用多行文本 */
 const isMultiline = computed(() => !isMobile.value)
+
+/** 聚焦时边框颜色 */
+const focusBorderColorVar = computed(() => props.config?.focusBorderColor || 'var(--uikit-primary-color)')
+
+/** 光标颜色 */
+const caretColorVar = computed(() => props.config?.caretColor || 'auto')
+
+/** 文本选中背景色 */
+const selectionColorVar = computed(() => props.config?.selectionColor || 'revert')
+
+/** 最大输入长度 */
+const maxLengthValue = computed(() => {
+  const len = props.config?.maxLength
+  return len && len > 0 ? len : undefined
+})
 
 /** 是否正在录音 */
 const isRecording = ref(false)
@@ -93,6 +108,9 @@ function toggleVoice() {
     emit('voice-start')
   }
 }
+
+/** 表情按钮 ref */
+const emojiBtnRef = ref<HTMLElement>()
 
 /** 输入框元素引用（textarea 或 Input 组件实例） */
 const textareaRef = ref<HTMLTextAreaElement>()
@@ -157,13 +175,6 @@ function detectMention() {
     return
   }
 
-  // 检查 @ 前面是否是边界（开头、空格、换行）
-  const isBoundary = atPos === 0 || value[atPos - 1] === ' ' || value[atPos - 1] === '\n'
-  if (!isBoundary) {
-    emit('mention-close')
-    return
-  }
-
   const keyword = value.substring(atPos + 1, pos)
 
   // 计算光标坐标并创建锚点
@@ -207,9 +218,43 @@ function insertMention(name: string) {
   })
 }
 
+/** 点击表情按钮 */
+function onEmojiClick() {
+  if (emojiBtnRef.value) {
+    emit('emoji-click', emojiBtnRef.value)
+  }
+}
+
+/** 在光标位置插入 Emoji */
+function insertEmoji(emoji: string) {
+  const el = getInputEl()
+  if (!el) return
+
+  const start = el.selectionStart || 0
+  const end = el.selectionEnd || 0
+  const value = el.value
+
+  text.value = value.substring(0, start) + emoji + value.substring(end)
+
+  nextTick(() => {
+    const newPos = start + emoji.length
+    el.setSelectionRange(newPos, newPos)
+    el.focus()
+  })
+}
+
+/** 自动聚焦 */
+onMounted(() => {
+  if (props.config?.autoFocus) {
+    const el = getInputEl()
+    el?.focus()
+  }
+})
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
+  insertEmoji,
 })
 </script>
 
@@ -223,7 +268,7 @@ defineExpose({
   >
     <!-- 工具栏 -->
     <div class="simple-input__toolbar">
-      <div v-if="features.emoji" class="simple-input__tool-btn" @click="emit('emoji-click')">
+      <div v-if="features.emoji" ref="emojiBtnRef" class="simple-input__tool-btn" @click="onEmojiClick">
         <Icon name="emojis-reactions/face" :size="22" />
       </div>
       <div v-if="features.image" class="simple-input__tool-btn" @click="triggerFileInput('image')">
@@ -249,6 +294,7 @@ defineExpose({
           ref="inputComponentRef"
           v-model="text"
           :placeholder="t('chat.placeholder')"
+          :maxlength="maxLengthValue"
           class="simple-input__field"
           @submit="handleSend"
           @input="detectMention"
@@ -259,6 +305,7 @@ defineExpose({
           v-model="text"
           class="simple-input__textarea"
           :placeholder="t('chat.placeholder')"
+          :maxlength="maxLengthValue"
           rows="3"
           @keydown="onKeydown"
           @input="detectMention"
@@ -377,11 +424,32 @@ defineExpose({
 }
 
 .simple-input__textarea:focus {
-  border-color: var(--uikit-primary-color);
+  border-color: v-bind(focusBorderColorVar);
 }
 
 .simple-input__textarea::placeholder {
   color: var(--uikit-text-secondary);
+}
+
+.simple-input__textarea {
+  caret-color: v-bind(caretColorVar);
+}
+
+.simple-input__textarea::selection {
+  background-color: v-bind(selectionColorVar);
+}
+
+/* 覆盖 Input 组件的样式 */
+:deep(.uikit-input__field) {
+  caret-color: v-bind(caretColorVar);
+}
+
+:deep(.uikit-input__field:focus) {
+  border-color: v-bind(focusBorderColorVar);
+}
+
+:deep(.uikit-input__field::selection) {
+  background-color: v-bind(selectionColorVar);
 }
 
 .simple-input__voice-btn {

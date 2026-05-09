@@ -15,6 +15,8 @@ export interface PopupProps {
   placement?: 'bottom' | 'top' | 'left' | 'right'
   /** 与锚点的间距（px），默认 8 */
   offset?: number
+  /** 边界约束元素，传入后 popup 将被限制在该元素范围内 */
+  boundary?: HTMLElement
 }
 
 export interface PopupEmits {
@@ -97,14 +99,25 @@ function updateAnchorPosition() {
     x = anchorRect.right + offset
   }
 
+  // 边界约束（优先使用 boundary，否则回退到视口）
+  const boundaryRect = props.boundary?.getBoundingClientRect()
+  const minX = boundaryRect ? boundaryRect.left + offset : offset
+  const maxX = boundaryRect
+    ? boundaryRect.right - contentRect.width - offset
+    : vw - contentRect.width - offset
+  const minY = boundaryRect ? boundaryRect.top + offset : offset
+  const maxY = boundaryRect
+    ? boundaryRect.bottom - contentRect.height - offset
+    : vh - contentRect.height - offset
+
   // 水平边界约束
-  if (contentRect.width <= vw) {
-    x = Math.max(offset, Math.min(x, vw - contentRect.width - offset))
+  if (contentRect.width <= (boundaryRect ? boundaryRect.width : vw)) {
+    x = Math.max(minX, Math.min(x, maxX))
   }
 
   // 垂直边界约束
-  if (contentRect.height <= vh) {
-    y = Math.max(offset, Math.min(y, vh - contentRect.height - offset))
+  if (contentRect.height <= (boundaryRect ? boundaryRect.height : vh)) {
+    y = Math.max(minY, Math.min(y, maxY))
   }
 
   contentStyle.value = {

@@ -94,6 +94,16 @@ export interface ChatConfig {
       /** @提及，默认 true */
       mention?: boolean
     }
+    /** 是否自动聚焦输入框，默认 false */
+    autoFocus?: boolean
+    /** 聚焦时边框颜色，不设置则使用默认主题色 */
+    focusBorderColor?: string
+    /** 光标颜色，不设置则使用默认 */
+    caretColor?: string
+    /** 文本选中背景色，不设置则使用浏览器默认 */
+    selectionColor?: string
+    /** 最大输入长度，0 或不设置表示无限制 */
+    maxLength?: number
     /** @提及配置 */
     mention?: {
       /** 联系人列表（也可从外部通过 chat-container 灌入） */
