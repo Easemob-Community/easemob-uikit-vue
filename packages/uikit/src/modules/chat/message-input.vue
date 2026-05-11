@@ -268,6 +268,19 @@ onBeforeUnmount(() => {
   // 清理录音资源
   handleVoiceCancel()
 })
+
+/** 设置输入文本（用于重新编辑等场景） */
+function setText(value: string) {
+  if (inputMode.value === 'simple') {
+    simpleInputRef.value?.setText?.(value)
+  } else {
+    richInputRef.value?.setText?.(value)
+  }
+}
+
+defineExpose({
+  setText,
+})
 </script>
 
 <template>

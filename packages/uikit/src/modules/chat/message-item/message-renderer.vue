@@ -12,7 +12,12 @@ export interface MessageRendererProps {
   message: Message
 }
 
+export interface MessageRendererEmits {
+  (e: 'reedit', message: Message): void
+}
+
 const props = defineProps<MessageRendererProps>()
+const emit = defineEmits<MessageRendererEmits>()
 
 /** 消息类型到组件的映射 */
 const messageComponentMap: Record<string, unknown> = {
@@ -56,6 +61,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       :is="renderComponent"
       v-else-if="renderComponent"
       :message="message"
+      @reedit="emit('reedit', $event)"
     />
 
     <!-- 未识别的消息类型 -->

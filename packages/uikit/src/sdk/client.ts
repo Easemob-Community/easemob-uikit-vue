@@ -205,6 +205,21 @@ export class UIKitClient {
     return this._connection.send(msg)
   }
 
+  /** 撤回消息 */
+  async recallMessage(options: {
+    mid: string
+    to: string
+    chatType: ConversationTypeValue
+    ext?: string
+  }): Promise<EasemobChat.SendMsgResult> {
+    return this._connection.recallMessage({
+      mid: options.mid,
+      to: options.to,
+      chatType: options.chatType as 'singleChat' | 'groupChat' | 'chatRoom',
+      ext: options.ext,
+    })
+  }
+
   /** 获取群消息已读用户列表 */
   async getGroupMsgReadUser(options: {
     msgId: string

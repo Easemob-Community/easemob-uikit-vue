@@ -61,6 +61,8 @@ const messages: LocaleMessages = {
   'groupReadReceipt.read': '已读',
   'groupReadReceipt.unread': '未读',
   'groupReadReceipt.empty': '暂无',
+  'message.recalled': '撤回了一条消息',
+  'message.reedit': '重新编辑',
 }
 
 export default messages

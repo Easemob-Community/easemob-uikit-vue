@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { EasemobChat } from 'easemob-websdk'
 import type { MessageStatusValue } from '../constants'
+import { MESSAGE_STATUS } from '../constants'
 
 /** UI 层对 SDK 消息的扩展字段 */
 export interface MessageUiExtension {
@@ -19,6 +20,14 @@ export interface MessageUiExtension {
   groupMemberCount?: number
   /** 是否需要群已读回执（来自 msgConfig.allowGroupAck） */
   requireGroupAck?: boolean
+  /** 消息是否已被撤回 */
+  recalled?: boolean
+  /** 撤回操作者 ID（自己撤回或对方/管理员撤回） */
+  recalledBy?: string
+  /** 文本消息撤回后保留的原始内容，用于重新编辑 */
+  originalMsg?: string
+  /** 环信服务器消息 ID（撤回等操作需要） */
+  mid?: string
 }
 
 /**
@@ -77,8 +86,58 @@ export const useMessageStore = defineStore('message', () => {
     }
   }
 
+  /**
+   * 用服务器返回的完整消息体替换本地消息
+   * - 保留 UI 扩展字段（conversationId, isSelf, status, timestamp 等）
+   * - 继承服务器补全的字段（mid, thumb, url 等）
+   */
+  function replaceMessageById(msgId: string, serverMsg: EasemobChat.ExcludeAckMessageBody) {
+    for (const key in messageMap.value) {
+      const msg = messageMap.value[key].find((m: Message) => m.id === msgId)
+      if (msg) {
+        const preserved: MessageUiExtension = {
+          conversationId: msg.conversationId,
+          isSelf: msg.isSelf,
+          status: MESSAGE_STATUS.SENT,
+          timestamp: msg.timestamp,
+          groupReadCount: msg.groupReadCount,
+          groupMemberCount: msg.groupMemberCount,
+          requireGroupAck: msg.requireGroupAck,
+        }
+        const replaced: Message = {
+          ...serverMsg,
+          ...preserved,
+          mid: serverMsg.id,
+        } as Message
+        const index = messageMap.value[key].findIndex((m: Message) => m.id === msgId)
+        if (index !== -1) {
+          messageMap.value[key][index] = replaced
+        }
+        break
+      }
+    }
+  }
+
   function updateMessageStatus(msgId: string, status: Message['status']) {
     updateMessageById(msgId, { status })
+  }
+
+  /** 撤回消息：标记 recalled 并保留 originalMsg（文本类型） */
+  function recallMessage(msgId: string, recalledBy: string) {
+    for (const key in messageMap.value) {
+      const msg = messageMap.value[key].find((m: Message) => m.id === msgId || m.mid === msgId)
+      if (msg) {
+        const patch: Partial<Message> = {
+          recalled: true,
+          recalledBy,
+        }
+        if (msg.type === 'txt' && 'msg' in msg) {
+          patch.originalMsg = (msg as EasemobChat.TextMsgBody).msg
+        }
+        Object.assign(msg, patch)
+        break
+      }
+    }
   }
 
   function deleteMessage(msgId: string) {
@@ -98,7 +157,9 @@ export const useMessageStore = defineStore('message', () => {
     addMessage,
     prependMessages,
     updateMessageById,
+    replaceMessageById,
     updateMessageStatus,
+    recallMessage,
     deleteMessage,
     clearMessages,
   }

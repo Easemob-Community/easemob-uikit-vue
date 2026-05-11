@@ -10,16 +10,24 @@ import MessageVirtualList from './message-virtual-list.vue'
 import GroupReadReceiptModal from './group-read-receipt-modal.vue'
 import type { ChatConfig, MessageActionEvent } from './types'
 import type { Message } from '../../store/message'
+import { useToast } from '../../composables/use-toast'
 
 export interface MessageListProps {
   config?: ChatConfig
 }
 
-const props = defineProps<MessageListProps>()
+export interface MessageListEmits {
+  (e: 'reedit', message: Message): void
+  (e: 'recall-failed', error: any, message: Message): void
+}
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail } = useChat()
+const props = defineProps<MessageListProps>()
+const emit = defineEmits<MessageListEmits>()
+
+const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage } = useChat()
 const { isMobile } = useViewport()
 const { t } = useLocale()
+const { show: showToast } = useToast()
 
 /** 消息列表容器引用 */
 const listRef = ref<HTMLElement>()
@@ -168,12 +176,32 @@ const { isPulling, isRefreshing, pullDistance } = usePullRefresh(listRef, {
 })
 
 /** 处理消息操作 */
-function onMessageAction(event: MessageActionEvent) {
+async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'multiSelect') {
     enterMultiSelectMode()
     toggleMessageSelection(event.message.id)
+    return
   }
-  // TODO: 处理其他操作（引用、复制、删除、撤回、转发、翻译、置顶）
+  if (event.action === 'recall') {
+    try {
+      await recallMessage(event.message.mid || event.message.id)
+    } catch (e) {
+      emit('recall-failed', e, event.message)
+    }
+    return
+  }
+  if (event.action === 'delete') {
+    // TODO: 删除消息
+    return
+  }
+  // TODO: 处理其他操作（引用、复制、转发、翻译、置顶）
+}
+
+/** 处理重新编辑 */
+function onReedit(message: Message) {
+  // 透传给 chat.vue
+  // eslint-disable-next-line no-console
+  console.log('[MessageList] reedit', message.id)
 }
 
 /** 处理群已读点击 */
@@ -285,6 +313,7 @@ const messagesWithDividers = computed(() => {
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
+          @reedit="onReedit"
         />
       </template>
     </MessageVirtualList>
@@ -311,6 +340,7 @@ const messagesWithDividers = computed(() => {
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
+          @reedit="onReedit"
         />
       </div>
     </div>

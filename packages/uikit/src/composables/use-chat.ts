@@ -152,12 +152,17 @@ export function useChat() {
 
   /**
    * 发送成功/失败后更新本地消息状态
+   * 若提供了 serverMsg，则用服务器返回的完整消息体替换本地消息
    */
-  function _onSendResult(msgId: string, error?: unknown) {
+  function _onSendResult(msgId: string, error?: unknown, serverMsg?: EasemobChat.ExcludeAckMessageBody) {
     if (error) {
       messageStore.updateMessageStatus(msgId, MESSAGE_STATUS.FAILED)
     } else {
-      messageStore.updateMessageStatus(msgId, MESSAGE_STATUS.SENT)
+      if (serverMsg) {
+        messageStore.replaceMessageById(msgId, serverMsg)
+      } else {
+        messageStore.updateMessageStatus(msgId, MESSAGE_STATUS.SENT)
+      }
     }
   }
 
@@ -178,8 +183,8 @@ export function useChat() {
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id)
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
     }
@@ -201,8 +206,8 @@ export function useChat() {
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id)
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
     }
@@ -224,8 +229,8 @@ export function useChat() {
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id)
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
     }
@@ -249,8 +254,8 @@ export function useChat() {
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id)
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
     }
@@ -273,8 +278,8 @@ export function useChat() {
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id)
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
     }
@@ -362,6 +367,25 @@ export function useChat() {
     return _getClient().getGroupMsgReadUser({ msgId, groupId })
   }
 
+  /** 撤回消息 */
+  async function recallMessage(msgId: string) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs) return
+    const client = _getClient()
+    try {
+      await client.recallMessage({
+        mid: msgId,
+        to: cvs.id,
+        chatType: cvs.type,
+      })
+      // 发起方：SDK 调用成功后立即本地标记撤回（不需要等 onRecallMessage，那是给被撤回方用的）
+      messageStore.recallMessage(msgId, stores.client.currentUser || '')
+    } catch (e) {
+      console.warn('[useChat] recallMessage failed:', e)
+      throw e
+    }
+  }
+
   return {
     messages,
     currentConversation,
@@ -374,6 +398,7 @@ export function useChat() {
     fetchHistoryMessages,
     sendReadAckForMessage,
     fetchGroupReadDetail,
+    recallMessage,
     // 多选相关
     isMultiSelectMode,
     selectedMessages,

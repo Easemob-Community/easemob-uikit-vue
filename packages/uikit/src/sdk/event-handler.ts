@@ -133,6 +133,14 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       handleIncomingMessage(msg, '[文件]')
     },
 
+    /** 消息撤回：更新本地消息为撤回状态 */
+    onRecallMessage: (msg: EasemobChat.RecallMsgBody) => {
+      const msgId = msg.mid || msg.id
+      if (msgId) {
+        stores.message.recallMessage(msgId, msg.from || '')
+      }
+    },
+
     /** 送达回执：对方已收到消息，更新本地消息状态为 delivered */
     onDeliveredMessage: (msg: EasemobChat.DeliveryMsgBody) => {
       const msgId = msg.ackId || msg.mid || msg.id

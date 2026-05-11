@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
@@ -11,17 +11,35 @@ import ChatInfoDrawer from './chat-info-drawer.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import type { ChatConfig } from './types'
+import type { Message } from '../../store/message'
 
 export interface ChatProps {
   config?: ChatConfig
 }
 
+export interface ChatEmits {
+  (e: 'recall-failed', error: any, message: Message): void
+}
+
 const props = defineProps<ChatProps>()
+const emit = defineEmits<ChatEmits>()
 
 const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { t } = useLocale()
+
+/** 输入框组件引用 */
+const messageInputRef = ref<InstanceType<typeof MessageInput>>()
+
+/** 重新编辑：将撤回消息的原文回显到输入框 */
+function onReedit(message: Message) {
+  const originalText = message.originalMsg
+  // eslint-disable-next-line no-console
+  console.log('[chat] onReedit', { originalText, ref: messageInputRef.value, hasSetText: !!messageInputRef.value?.setText })
+  if (!originalText) return
+  messageInputRef.value?.setText?.(originalText)
+}
 
 /** Header 配置 */
 const headerConfig = computed(() => props.config?.header)
@@ -148,7 +166,7 @@ function onMultiSelectDelete() {
     </div>
 
     <!-- 消息列表 -->
-    <MessageList :config="props.config" />
+    <MessageList :config="props.config" @reedit="onReedit" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
 
     <!-- 多选模式底部操作栏 -->
     <div v-if="isMultiSelectMode" class="chat__multi-select-bar">
@@ -167,7 +185,7 @@ function onMultiSelectDelete() {
     </div>
 
     <!-- 输入框 -->
-    <MessageInput v-if="!isMultiSelectMode" :config="props.config" :is-group="isGroupChat" />
+    <MessageInput v-if="!isMultiSelectMode" ref="messageInputRef" :config="props.config" :is-group="isGroupChat" />
 
     <!-- 聊天信息抽屉 -->
     <ChatInfoDrawer

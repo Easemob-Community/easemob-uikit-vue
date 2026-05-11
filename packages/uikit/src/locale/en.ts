@@ -61,6 +61,8 @@ const messages: LocaleMessages = {
   'groupReadReceipt.read': 'Read',
   'groupReadReceipt.unread': 'Unread',
   'groupReadReceipt.empty': 'No users',
+  'message.recalled': 'recalled a message',
+  'message.reedit': 'Re-edit',
 }
 
 export default messages

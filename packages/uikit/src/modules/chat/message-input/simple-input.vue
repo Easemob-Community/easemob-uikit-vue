@@ -276,10 +276,20 @@ onBeforeUnmount(() => {
   isVoiceMode.value = false
 })
 
+/** 设置输入文本 */
+function setText(value: string) {
+  text.value = value
+  nextTick(() => {
+    const el = getInputEl()
+    el?.focus()
+  })
+}
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
   insertEmoji,
+  setText,
 })
 </script>
 

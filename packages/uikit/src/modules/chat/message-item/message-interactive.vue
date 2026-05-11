@@ -50,7 +50,7 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableMultiSelect !== false) add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
   if (cfg?.enableTranslate) add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
   if (cfg?.enablePin) add('pin', t('message.action.pin') ?? '置顶', 'actions/star')
-  if (cfg?.enableRecall !== false) add('recall', t('message.action.recall') ?? '撤回', 'arrows/arrow_Uturn_anti_clockwise')
+  if (cfg?.enableRecall !== false && !props.message.recalled) add('recall', t('message.action.recall') ?? '撤回', 'arrows/arrow_Uturn_anti_clockwise')
   if (cfg?.enableDelete !== false) add('delete', t('message.action.delete') ?? '删除', 'actions/trash', true)
 
   return items

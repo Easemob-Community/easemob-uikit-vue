@@ -7,6 +7,7 @@ import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
+import { useLocale } from '../../../locale'
 
 
 export interface MessageBubbleWrapperProps {
@@ -25,10 +26,22 @@ export interface MessageBubbleWrapperEmits {
   (e: 'toggle-select', messageId: string): void
   (e: 'action', event: MessageActionEvent): void
   (e: 'group-read-click', msgId: string, groupId: string): void
+  (e: 'reedit', message: Message): void
 }
 
 const props = defineProps<MessageBubbleWrapperProps>()
 const emit = defineEmits<MessageBubbleWrapperEmits>()
+
+const { t } = useLocale()
+
+/** 是否为已撤回消息 */
+const isRecalled = computed(() => props.message.recalled)
+
+/** 撤回提示文案 */
+const recalledText = computed(() => {
+  const from = props.message.from || ''
+  return `${from} ${t('message.recalled') ?? '撤回了一条消息'}`
+})
 
 const groupStore = useGroupStore()
 
@@ -105,85 +118,104 @@ function onGroupReadClick() {
       'message-bubble-wrapper--left': layout === 'left',
       'message-bubble-wrapper--hover-time': showTime === 'hover',
       'message-bubble-wrapper--selected': props.isSelected,
+      'message-bubble-wrapper--recalled': isRecalled,
     }"
     @click="props.isMultiSelectMode && emit('toggle-select', props.message.id)"
   >
-    <!-- 多选 Checkbox -->
-    <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
-      <div
-        class="message-bubble-wrapper__check-icon"
-        :class="{ 'message-bubble-wrapper__check-icon--checked': props.isSelected }"
-      >
-        <span v-if="props.isSelected">&#10003;</span>
-      </div>
-    </div>
-
-    <!-- 头像区域 -->
-    <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
-      <slot name="avatar" :message="message">
-        <Avatar :name="message.from" :size="avatarSize" />
-      </slot>
-    </div>
-
-    <!-- 内容区域 -->
-    <div class="message-bubble-wrapper__content">
-      <!-- 昵称 -->
-      <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
-        <slot name="nickname" :message="message">
-          {{ message.from }}
-        </slot>
-      </div>
-
-      <!-- 消息渲染器 -->
-      <div class="message-bubble-wrapper__body">
-        <MessageInteractive
+    <!-- 已撤回消息：居中灰色提示，不显示头像/昵称/气泡 -->
+    <template v-if="isRecalled">
+      <div class="message-bubble-wrapper__recalled">
+        <span class="message-bubble-wrapper__recalled-text">{{ recalledText }}</span>
+        <!-- 文本消息重新编辑按钮 -->
+        <MessageRenderer
+          v-if="message.type === 'txt' && message.isSelf && message.originalMsg"
           :message="message"
-          :config="actionConfig"
-          @action="emit('action', $event)"
+          @reedit="emit('reedit', $event)"
+        />
+      </div>
+    </template>
+
+    <template v-else>
+      <!-- 多选 Checkbox -->
+      <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
+        <div
+          class="message-bubble-wrapper__check-icon"
+          :class="{ 'message-bubble-wrapper__check-icon--checked': props.isSelected }"
         >
-          <MessageRenderer :message="message">
-            <!-- 透传所有类型级插槽 -->
-            <template
-              v-for="(_, name) in $slots"
-              :key="name"
-              #[name]="slotProps"
-            >
-              <slot :name="name" v-bind="slotProps" />
-            </template>
-          </MessageRenderer>
-        </MessageInteractive>
+          <span v-if="props.isSelected">&#10003;</span>
+        </div>
       </div>
 
-      <!-- 消息状态指示器（仅己方消息） -->
-      <div v-if="showStatus" class="message-bubble-wrapper__status">
-        <!-- 发送中 -->
-        <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
-        <!-- 已发送 -->
-        <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
-        <!-- 已送达 -->
-        <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
-        <!-- 已读 -->
-        <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
-        <!-- 发送失败 -->
-        <span v-else-if="messageStatus === MESSAGE_STATUS.FAILED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed" title="发送失败">&#33;</span>
-      </div>
-
-      <!-- 群已读人数标注 -->
-      <span
-        v-if="showGroupReadCount"
-        class="message-bubble-wrapper__group-read"
-        @click.stop="onGroupReadClick"
-      >
-        {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
-      </span>
-
-      <!-- 时间戳 -->
-      <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
-        <slot name="time" :message="message">
-          {{ formattedTime }}
+      <!-- 头像区域 -->
+      <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
+        <slot name="avatar" :message="message">
+          <Avatar :name="message.from" :size="avatarSize" />
         </slot>
       </div>
-    </div>
+
+      <!-- 内容区域 -->
+      <div class="message-bubble-wrapper__content">
+        <!-- 昵称 -->
+        <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
+          <slot name="nickname" :message="message">
+            {{ message.from }}
+          </slot>
+        </div>
+
+        <!-- 消息渲染器 -->
+        <div class="message-bubble-wrapper__body">
+          <MessageInteractive
+            :message="message"
+            :config="actionConfig"
+            @action="emit('action', $event)"
+          >
+            <MessageRenderer
+              :message="message"
+              @reedit="emit('reedit', $event)"
+            >
+              <!-- 透传所有类型级插槽 -->
+              <template
+                v-for="(_, name) in $slots"
+                :key="name"
+                #[name]="slotProps"
+              >
+                <slot :name="name" v-bind="slotProps" />
+              </template>
+            </MessageRenderer>
+          </MessageInteractive>
+        </div>
+
+        <!-- 消息状态指示器（仅己方消息） -->
+        <div v-if="showStatus" class="message-bubble-wrapper__status">
+          <!-- 发送中 -->
+          <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
+          <!-- 已发送 -->
+          <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
+          <!-- 已送达 -->
+          <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
+          <!-- 已读 -->
+          <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
+          <!-- 发送失败 -->
+          <span v-else-if="messageStatus === MESSAGE_STATUS.FAILED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed" title="发送失败">&#33;</span>
+        </div>
+
+        <!-- 群已读人数标注 -->
+        <span
+          v-if="showGroupReadCount"
+          class="message-bubble-wrapper__group-read"
+          @click.stop="onGroupReadClick"
+        >
+          {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
+        </span>
+
+        <!-- 时间戳 -->
+        <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
+          <slot name="time" :message="message">
+            {{ formattedTime }}
+          </slot>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -339,5 +371,23 @@ function onGroupReadClick() {
 @keyframes message-status-loading {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
+}
+
+/* 已撤回消息：居中灰色提示 */
+.message-bubble-wrapper--recalled {
+  justify-content: center;
+}
+
+.message-bubble-wrapper__recalled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.message-bubble-wrapper__recalled-text {
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
 }
 </style>
