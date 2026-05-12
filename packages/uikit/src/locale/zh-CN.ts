@@ -64,6 +64,8 @@ const messages: LocaleMessages = {
   'message.recalled': '撤回了一条消息',
   'message.reedit': '重新编辑',
   'message.recallExpired': '超过{duration}分钟，无法撤回',
+  'message.copySuccess': '已复制',
+  'message.copyFailed': '复制失败',
 }
 
 export default messages

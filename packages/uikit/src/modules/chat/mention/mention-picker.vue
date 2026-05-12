@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useViewport } from '../../composables/use-viewport'
-import { useLocale } from '../../locale'
-import Popup from '../../components/popup/popup.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
-import type { MentionContact } from './types'
+import { useViewport } from '../../../composables/use-viewport'
+import { useLocale } from '../../../locale'
+import Popup from '../../../components/popup/popup.vue'
+import Avatar from '../../../components/avatar/avatar.vue'
+import Icon from '../../../components/icon/icon.vue'
+import type { MentionContact } from '../types'
 
 export interface MentionPickerProps {
   /** 是否显示 */

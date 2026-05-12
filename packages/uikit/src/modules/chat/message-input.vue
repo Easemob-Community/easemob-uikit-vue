@@ -6,7 +6,7 @@ import { useToast } from '../../composables/use-toast'
 import SimpleInput from './message-input/simple-input.vue'
 import RichInput from './message-input/rich-input.vue'
 import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
-import MentionPicker from './mention-picker.vue'
+import MentionPicker from './mention/mention-picker.vue'
 import Popup from '../../components/popup/popup.vue'
 import type { ChatConfig, MentionContact } from './types'
 

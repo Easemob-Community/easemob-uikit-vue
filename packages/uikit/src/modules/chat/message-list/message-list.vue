@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch, nextTick } from 'vue'
-import { useInfiniteScroll, useScroll } from '@vueuse/core'
-import { useChat } from '../../composables/use-chat'
-import { useViewport } from '../../composables/use-viewport'
-import { usePullRefresh } from '../../composables/use-pull-refresh'
-import { useLocale } from '../../locale'
-import MessageBubbleWrapper from './message-item/message-bubble-wrapper.vue'
+import { useInfiniteScroll, useScroll, useClipboard } from '@vueuse/core'
+import { useChat } from '../../../composables/use-chat'
+import { useViewport } from '../../../composables/use-viewport'
+import { usePullRefresh } from '../../../composables/use-pull-refresh'
+import { useLocale } from '../../../locale'
+import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import MessageVirtualList from './message-virtual-list.vue'
-import GroupReadReceiptModal from './group-read-receipt-modal.vue'
-import type { ChatConfig, MessageActionEvent } from './types'
-import type { Message } from '../../store/message'
-import { useToast } from '../../composables/use-toast'
+import GroupReadReceiptModal from '../group-read-receipt-modal.vue'
+import type { ChatConfig, MessageActionEvent } from '../types'
+import type { Message } from '../../../store/message'
+import { useToast } from '../../../composables/use-toast'
 
 export interface MessageListProps {
   config?: ChatConfig
@@ -28,6 +28,9 @@ const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, 
 const { isMobile } = useViewport()
 const { t } = useLocale()
 const { show: showToast } = useToast()
+
+/** 剪贴板能力：优先使用 navigator.clipboard，不可用时自动降级 execCommand */
+const { copy: copyToClipboard, isSupported: isClipboardSupported } = useClipboard({ legacy: true })
 
 /** 消息列表容器引用 */
 const listRef = ref<HTMLElement>()
@@ -190,11 +193,34 @@ async function onMessageAction(event: MessageActionEvent) {
     }
     return
   }
+  if (event.action === 'copy') {
+    await handleCopyMessage(event.message)
+    return
+  }
   if (event.action === 'delete') {
     // TODO: 删除消息
     return
   }
-  // TODO: 处理其他操作（引用、复制、转发、翻译、置顶）
+  // TODO: 处理其他操作（引用、转发、翻译、置顶）
+}
+
+/** 通过 VueUse useClipboard 复制消息文本 */
+async function handleCopyMessage(message: Message) {
+  const text = message.type === 'txt' && 'msg' in message ? String((message as unknown as { msg: string }).msg ?? '') : ''
+  if (!text) {
+    showToast(t('message.copyFailed') ?? '复制失败')
+    return
+  }
+  if (!isClipboardSupported.value) {
+    showToast(t('message.copyFailed') ?? '复制失败')
+    return
+  }
+  try {
+    await copyToClipboard(text)
+    showToast(t('message.copySuccess') ?? '已复制')
+  } catch {
+    showToast(t('message.copyFailed') ?? '复制失败')
+  }
 }
 
 /** 处理重新编辑 */

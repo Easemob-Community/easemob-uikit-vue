@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import ChatDrawer from './chat-drawer.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
-import { useThemeStore } from '../../store/theme'
-import type { Conversation } from '../../store/conversation'
+import Avatar from '../../../components/avatar/avatar.vue'
+import Icon from '../../../components/icon/icon.vue'
+import { useThemeStore } from '../../../store/theme'
+import type { Conversation } from '../../../store/conversation'
 
 export interface ChatInfoDrawerProps {
   show: boolean
