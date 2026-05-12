@@ -166,7 +166,12 @@ function onCloseClick() {
 <template>
   <Teleport to="body">
     <Transition name="uikit-fade">
-      <div v-if="props.show" class="uikit-popup" :style="{ zIndex: props.zIndex }">
+      <div
+        v-if="props.show"
+        class="uikit-popup"
+        :class="{ 'uikit-popup--pass-through': isAnchored && !props.overlay }"
+        :style="{ zIndex: props.zIndex }"
+      >
         <div v-if="props.overlay" class="uikit-popup__overlay" />
         <Transition :name="transitionName">
           <div
@@ -197,6 +202,15 @@ function onCloseClick() {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 锚定模式且无遮罩时，容器不拦截点击事件，让它穿透到下层元素 */
+.uikit-popup--pass-through {
+  pointer-events: none;
+}
+
+.uikit-popup--pass-through .uikit-popup__content {
+  pointer-events: auto;
 }
 
 .uikit-popup__overlay {
