@@ -14,6 +14,14 @@ const showAnchorBottom = ref(false)
 const showAnchorTop = ref(false)
 const showAnchorLeft = ref(false)
 const showAnchorRight = ref(false)
+
+// Group 互斥分组 Demo
+const groupAnchorA = ref<HTMLElement>()
+const groupAnchorB = ref<HTMLElement>()
+const groupAnchorC = ref<HTMLElement>()
+const showGroupA = ref(false)
+const showGroupB = ref(false)
+const showGroupC = ref(false)
 </script>
 
 <template>
@@ -102,5 +110,45 @@ const showAnchorRight = ref(false)
         </div>
       </Popup>
     </Variant>
+
+    <Variant title="Group (互斥分组)">
+      <div style="padding: 16px; color: #666; font-size: 13px;">
+        同一 group 的 popup 同时只能开一个，打开新的会自动关闭其他。<br>
+        依次点击 A → B → C，观察前一个是否自动关闭。
+      </div>
+      <div style="display: flex; gap: 16px; padding: 24px; justify-content: center;">
+        <Button ref="groupAnchorA" @click="showGroupA = true">打开 A</Button>
+        <Button ref="groupAnchorB" @click="showGroupB = true">打开 B</Button>
+        <Button ref="groupAnchorC" @click="showGroupC = true">打开 C</Button>
+      </div>
+      <Popup
+        v-model:show="showGroupA"
+        :anchor="groupAnchorA"
+        placement="bottom"
+        :overlay="false"
+        group="story-demo"
+      >
+        <div style="padding: 16px; min-width: 120px;">弹窗 A</div>
+      </Popup>
+      <Popup
+        v-model:show="showGroupB"
+        :anchor="groupAnchorB"
+        placement="bottom"
+        :overlay="false"
+        group="story-demo"
+      >
+        <div style="padding: 16px; min-width: 120px;">弹窗 B</div>
+      </Popup>
+      <Popup
+        v-model:show="showGroupC"
+        :anchor="groupAnchorC"
+        placement="bottom"
+        :overlay="false"
+        group="story-demo"
+      >
+        <div style="padding: 16px; min-width: 120px;">弹窗 C</div>
+      </Popup>
+    </Variant>
   </Story>
 </template>
+
