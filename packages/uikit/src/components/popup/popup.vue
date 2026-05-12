@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 
 export interface PopupProps {
@@ -17,6 +17,8 @@ export interface PopupProps {
   offset?: number
   /** 边界约束元素，传入后 popup 将被限制在该元素范围内 */
   boundary?: HTMLElement
+  /** 互斥分组：同一 group 内同时只能有一个 popup 打开，打开新的会自动关闭其他的 */
+  group?: string
 }
 
 export interface PopupEmits {
@@ -161,6 +163,46 @@ function onCloseClick() {
   emit('update:show', false)
   emit('close')
 }
+
+// ===== 互斥分组：同一 group 内只能有一个 popup 打开 =====
+const POPUP_GROUP_EVENT = 'uikit:popup-group-open'
+const instanceId = Symbol('popup-instance')
+
+interface PopupGroupEventDetail {
+  group: string
+  id: symbol
+}
+
+function onGroupOpen(event: Event) {
+  const { detail } = event as CustomEvent<PopupGroupEventDetail>
+  if (
+    props.group
+    && detail.group === props.group
+    && detail.id !== instanceId
+    && props.show
+  ) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+watch(() => props.show, (show) => {
+  if (show && props.group) {
+    document.dispatchEvent(
+      new CustomEvent<PopupGroupEventDetail>(POPUP_GROUP_EVENT, {
+        detail: { group: props.group, id: instanceId },
+      }),
+    )
+  }
+})
+
+onMounted(() => {
+  document.addEventListener(POPUP_GROUP_EVENT, onGroupOpen)
+})
+
+onUnmounted(() => {
+  document.removeEventListener(POPUP_GROUP_EVENT, onGroupOpen)
+})
 </script>
 
 <template>

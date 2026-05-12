@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import { useLongPress } from '../../../composables/use-long-press'
@@ -9,9 +9,6 @@ import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
 import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageActionItem, MessageActionEvent, MessageActionType } from '../types'
-
-/** 全局事件名：用于互斥关闭其他菜单 */
-const MENU_CLOSE_EVENT = 'uikit:message-action-menu-close'
 
 export interface MessageInteractiveProps {
   message: Message
@@ -28,9 +25,6 @@ const emit = defineEmits<MessageInteractiveEmits>()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
-
-/** 当前实例标识，用于全局互斥 */
-const instanceId = Symbol('message-interactive')
 
 /** 触发元素引用 */
 const triggerRef = ref<HTMLElement>()
@@ -105,9 +99,6 @@ function onContextMenu(event: MouseEvent) {
   if (isMobile.value) return
   event.preventDefault()
 
-  // 全局互斥：通知其他实例关闭菜单
-  document.dispatchEvent(new CustomEvent(MENU_CLOSE_EVENT, { detail: instanceId }))
-
   isActive.value = true
   // 创建一个临时元素作为锚点
   const el = document.createElement('div')
@@ -137,22 +128,6 @@ function closePopup() {
     }
   }
 }
-
-/** 监听全局关闭事件：其他实例打开菜单时，关闭自己的菜单 */
-function onGlobalClose(event: Event) {
-  const customEvent = event as CustomEvent<symbol>
-  if (customEvent.detail !== instanceId && showPopup.value) {
-    closePopup()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener(MENU_CLOSE_EVENT, onGlobalClose)
-})
-
-onUnmounted(() => {
-  document.removeEventListener(MENU_CLOSE_EVENT, onGlobalClose)
-})
 
 /** H5 端长按触发 */
 const longPress = useLongPress(() => {
@@ -205,13 +180,14 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
     <slot />
   </div>
 
-  <!-- PC 端：Popup 锚定菜单 -->
+  <!-- PC 端：Popup 锚定菜单（group 保证同一分组内只有一个打开） -->
   <Popup
     :show="showPopup"
     :anchor="anchorRef"
     placement="bottom"
     :overlay="false"
     :close-on-click-overlay="true"
+    group="message-action"
     @update:show="onPopupClose"
     @close="onPopupClose"
   >
