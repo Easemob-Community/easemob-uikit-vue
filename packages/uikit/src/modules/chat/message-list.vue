@@ -199,9 +199,7 @@ async function onMessageAction(event: MessageActionEvent) {
 
 /** 处理重新编辑 */
 function onReedit(message: Message) {
-  // 透传给 chat.vue
-  // eslint-disable-next-line no-console
-  console.log('[MessageList] reedit', message.id)
+  emit('reedit', message)
 }
 
 /** 处理群已读点击 */

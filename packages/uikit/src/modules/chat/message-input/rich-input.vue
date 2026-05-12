@@ -228,10 +228,16 @@ function insertMention(name: string) {
   mentionAnchorPos.value = -1
 }
 
+/** 设置编辑器内容（用于重新编辑等场景） */
+function setText(value: string) {
+  editor.value?.commands.setContent(value)
+}
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
   insertEmoji,
+  setText,
 })
 
 /** 组件卸载时销毁编辑器并回收 Blob URL */

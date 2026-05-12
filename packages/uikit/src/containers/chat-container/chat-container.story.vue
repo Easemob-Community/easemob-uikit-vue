@@ -99,6 +99,15 @@ const disabledActionsConfig: ChatConfig = {
   },
 }
 
+/** 撤回时效：30 秒（用于 Story 演示过期效果） */
+const recallExpiredConfig: ChatConfig = {
+  ...baseConfig,
+  messageAction: {
+    ...baseConfig.messageAction,
+    recallDisableDuration: 30 * 1000,
+  },
+}
+
 const customSlotTitle = ref('✨ 自定义标题插槽')
 
 // 注入 mock 数据供 Story 展示
@@ -151,6 +160,14 @@ injectMockData()
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="disabledActionsConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Recall Expired (30s)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="recallExpiredConfig" />
         </UIKitProvider>
       </div>
     </Variant>

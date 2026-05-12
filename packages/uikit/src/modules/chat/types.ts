@@ -74,6 +74,8 @@ export interface ChatConfig {
     enableTranslate?: boolean
     /** 启用置顶，默认 false */
     enablePin?: boolean
+    /** 撤回禁用时长（毫秒），超过该时长后无法撤回，默认 2 分钟（120000） */
+    recallDisableDuration?: number
   }
   /** 群已读回执配置 */
   groupReadReceipt?: {
@@ -144,6 +146,10 @@ export interface MessageActionItem {
   icon?: string
   /** 是否危险操作（红色高亮） */
   danger?: boolean
+  /** 是否禁用 */
+  disabled?: boolean
+  /** 禁用时的提示文本 */
+  disabledTip?: string
 }
 
 /** 消息操作事件 */

@@ -15,6 +15,9 @@ const props = defineProps<MessageActionMenuProps>()
 const emit = defineEmits<MessageActionMenuEmits>()
 
 function onItemClick(action: MessageActionItem) {
+  if (action.disabled) {
+    return
+  }
   emit('select', action)
 }
 </script>
@@ -25,7 +28,10 @@ function onItemClick(action: MessageActionItem) {
       v-for="action in props.actions"
       :key="action.type"
       class="message-action-menu__item"
-      :class="{ 'message-action-menu__item--danger': action.danger }"
+      :class="{
+        'message-action-menu__item--danger': action.danger,
+        'message-action-menu__item--disabled': action.disabled,
+      }"
       @click="onItemClick(action)"
     >
       <Icon v-if="action.icon" :name="action.icon" :size="16" />
@@ -69,5 +75,15 @@ function onItemClick(action: MessageActionItem) {
 
 .message-action-menu__item--danger:hover {
   background-color: #fef2f2;
+}
+
+.message-action-menu__item--disabled {
+  color: var(--uikit-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.message-action-menu__item--disabled:hover {
+  background-color: transparent;
 }
 </style>
