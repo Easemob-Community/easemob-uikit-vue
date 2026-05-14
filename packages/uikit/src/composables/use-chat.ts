@@ -128,8 +128,11 @@ export function useChat() {
   ): void {
     const isGroup = chatType === CONVERSATION_TYPE.GROUPCHAT
     const requireGroupAck = !!(groupReadReceiptEnabled && isGroup)
+    const currentUser = stores.client.currentUser
     const msg: Message = {
       ...sdkMsg,
+      // SDK createMessage 不会自动填充 from，显式以当前用户补齐，避免头像/名称出现空状态闪烁
+      from: sdkMsg.from || currentUser || '',
       conversationId: to,
       isSelf: true,
       status: MESSAGE_STATUS.SENDING,
@@ -140,7 +143,6 @@ export function useChat() {
 
     // 同步更新会话列表最新消息
     const lastMessageText = _formatLastMessageText(sdkMsg)
-    const currentUser = stores.client.currentUser
     const patch: Partial<Conversation> = {
       lastMessage: lastMessageText,
       lastMessageTime: msg.timestamp,
@@ -191,7 +193,7 @@ export function useChat() {
   }
 
   /** 发送图片消息 */
-  async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
+  async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
@@ -202,6 +204,7 @@ export function useChat() {
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file),
+      ...(ext ? { ext } : {}),
       ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
@@ -214,7 +217,7 @@ export function useChat() {
   }
 
   /** 发送文件消息 */
-  async function sendFileMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
+  async function sendFileMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
@@ -225,6 +228,7 @@ export function useChat() {
       to: cvs.id,
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file),
+      ...(ext ? { ext } : {}),
       ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
@@ -237,7 +241,7 @@ export function useChat() {
   }
 
   /** 发送语音消息 */
-  async function sendAudioMessage(file: File | Blob, duration: number, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
+  async function sendAudioMessage(file: File | Blob, duration: number, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
@@ -250,6 +254,7 @@ export function useChat() {
       file: _toFileObj(file, file instanceof File ? file.name : 'audio.amr'),
       filename: file instanceof File ? file.name : 'audio.amr',
       length: duration,
+      ...(ext ? { ext } : {}),
       ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
@@ -262,7 +267,7 @@ export function useChat() {
   }
 
   /** 发送视频消息 */
-  async function sendVideoMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
+  async function sendVideoMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
@@ -274,6 +279,7 @@ export function useChat() {
       chatType: cvs.type as EasemobChat.ChatType,
       file: _toFileObj(file, file.name),
       filename: file.name,
+      ...(ext ? { ext } : {}),
       ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)

@@ -109,7 +109,7 @@ export function useConversation() {
     conversationStore.togglePin(id, isPinned)
   }
 
-  /** 发送会话已读回执（仅单聊且存在未读消息时发送，群聊和不带未读的会话自动跳过） */
+  /** 发送会话已读回执（单聊/群聊均支持，未读数为 0 时跳过以避免无效请求） */
   async function sendChannelAck(id: string) {
     const cvs = conversationStore.conversationList.find((c: { id: string }) => c.id === id)
     if (!cvs) return

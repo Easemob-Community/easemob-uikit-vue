@@ -3,11 +3,13 @@ import { computed } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import MessageRenderer from './message-renderer.vue'
 import MessageInteractive from './message-interactive.vue'
+import QuoteCard from '../quote/quote-card.vue'
 import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
+import { useQuote } from '../../../composables/use-quote'
 
 
 export interface MessageBubbleWrapperProps {
@@ -44,6 +46,7 @@ const recalledText = computed(() => {
 })
 
 const groupStore = useGroupStore()
+const { highlightedMessageId, requestLocate } = useQuote()
 
 /** 布局模式 */
 const layout = computed<MessageLayout>(() => props.config?.layout ?? 'conversation')
@@ -108,17 +111,46 @@ function onGroupReadClick() {
     emit('group-read-click', props.message.id, props.message.to || props.message.conversationId)
   }
 }
+
+/** 提取引用数据：仅在 ext.msgQuote 存在且具有 msgPreview 时返回 */
+const quoteData = computed(() => {
+  const ext = (props.message as unknown as { ext?: Record<string, any> }).ext
+  const q = ext?.msgQuote
+  if (!q || typeof q !== 'object') return null
+  if (!q.msgPreview) return null
+  return {
+    msgID: String(q.msgID || ''),
+    msgPreview: String(q.msgPreview || ''),
+    msgSender: String(q.msgSender || ''),
+    msgType: String(q.msgType || 'txt'),
+  } as { msgID: string; msgPreview: string; msgSender: string; msgType: 'txt' | 'img' | 'video' | 'file' | 'audio' | 'custom' | 'loc' | 'cmd' }
+})
+
+/** 点击引用卡片：触发定位/闪烁，列表端 watch locateRequest 处理 */
+function onQuoteClick() {
+  if (!quoteData.value?.msgID) return
+  requestLocate(quoteData.value.msgID)
+}
+
+/** 当前气泡是否需要闪烁高亮（被其他引用卡片定位到） */
+const isHighlighted = computed(() => {
+  const target = highlightedMessageId.value
+  if (!target) return false
+  return target === props.message.mid || target === props.message.id
+})
 </script>
 
 <template>
   <div
     class="message-bubble-wrapper"
+    :data-msg-id="props.message.mid || props.message.id"
     :class="{
       'message-bubble-wrapper--self': isSelfConversation,
       'message-bubble-wrapper--left': layout === 'left',
       'message-bubble-wrapper--hover-time': showTime === 'hover',
       'message-bubble-wrapper--selected': props.isSelected,
       'message-bubble-wrapper--recalled': isRecalled,
+      'message-bubble-wrapper--highlight': isHighlighted,
     }"
     @click="props.isMultiSelectMode && emit('toggle-select', props.message.id)"
   >
@@ -183,6 +215,13 @@ function onGroupReadClick() {
               </template>
             </MessageRenderer>
           </MessageInteractive>
+          <!-- 引用卡片（气泡下方） -->
+          <QuoteCard
+            v-if="quoteData"
+            :quote="quoteData"
+            :align-right="isSelfConversation"
+            @click="onQuoteClick"
+          />
         </div>
 
         <!-- 消息状态指示器（仅己方消息） -->
@@ -389,5 +428,19 @@ function onGroupReadClick() {
 .message-bubble-wrapper__recalled-text {
   font-size: 13px;
   color: var(--uikit-text-secondary);
+}
+
+/* 被引用定位后的闪烁高亮：作用于气泡主体，避免影响头像/名称/状态 */
+.message-bubble-wrapper--highlight .message-bubble-wrapper__body {
+  animation: message-bubble-flash 1.2s ease-in-out;
+  border-radius: 8px;
+}
+
+@keyframes message-bubble-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(64, 158, 255, 0); background-color: transparent; }
+  20%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.35); background-color: rgba(64, 158, 255, 0.12); }
+  50%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0); background-color: rgba(64, 158, 255, 0.06); }
+  80%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.2); background-color: rgba(64, 158, 255, 0.10); }
+  100% { box-shadow: 0 0 0 0 rgba(64, 158, 255, 0); background-color: transparent; }
 }
 </style>

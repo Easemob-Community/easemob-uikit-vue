@@ -2,6 +2,7 @@
 import { computed, ref, watch, nextTick } from 'vue'
 import { useInfiniteScroll, useScroll, useClipboard } from '@vueuse/core'
 import { useChat } from '../../../composables/use-chat'
+import { useQuote } from '../../../composables/use-quote'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
 import { useLocale } from '../../../locale'
@@ -25,6 +26,7 @@ const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
 const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage } = useChat()
+const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -197,6 +199,10 @@ async function onMessageAction(event: MessageActionEvent) {
     await handleCopyMessage(event.message)
     return
   }
+  if (event.action === 'quote') {
+    setQuote(event.message)
+    return
+  }
   if (event.action === 'delete') {
     // TODO: 删除消息
     return
@@ -289,6 +295,50 @@ const messagesWithDividers = computed(() => {
     lastMsg = msg
   })
   return result
+})
+
+/** 闪烁高亮计时器，避免连续点击多个计时器堆积 */
+let highlightTimer: ReturnType<typeof setTimeout> | null = null
+
+/** 定位并闪烁原消息；id 优先匹配 mid，其次 id；未找到返回 false */
+function locateAndFlash(targetMsgID: string): boolean {
+  if (!targetMsgID) return false
+  const targetIndex = messages.value.findIndex(m => m.mid === targetMsgID || m.id === targetMsgID)
+  if (targetIndex === -1) return false
+  // 虚拟列表：先通过索引滚动使原消息被渲染，再在下一帧查找 DOM 进行平滑居中
+  const useVirtual = enableVirtual.value
+  if (useVirtual) {
+    // 虚拟列表中消息项位于 messagesWithDividers，需定位到包含该消息的项索引
+    const itemIndex = messagesWithDividers.value.findIndex(it => it.type === 'message' && (it.data as Message).id === messages.value[targetIndex].id)
+    if (itemIndex !== -1) virtualListRef.value?.scrollToIndex(itemIndex)
+  }
+  nextTick(() => {
+    const root = useVirtual
+      ? (virtualListRef.value as unknown as { listRef?: HTMLElement } | undefined)?.listRef
+      : listRef.value
+    if (root) {
+      const el = root.querySelector<HTMLElement>(`[data-msg-id="${targetMsgID}"]`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
+    setHighlight(targetMsgID)
+    if (highlightTimer) clearTimeout(highlightTimer)
+    highlightTimer = setTimeout(() => {
+      setHighlight('')
+      highlightTimer = null
+    }, 1300)
+  })
+  return true
+}
+
+/** watch 引用点击发起的定位请求 */
+watch(locateRequest, (req) => {
+  if (!req) return
+  const ok = locateAndFlash(req.msgID)
+  if (!ok) {
+    showToast(t('message.quote.notFound') ?? '原消息已删除或未加载')
+  }
 })
 </script>
 

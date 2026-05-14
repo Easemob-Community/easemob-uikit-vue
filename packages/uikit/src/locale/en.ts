@@ -66,6 +66,8 @@ const messages: LocaleMessages = {
   'message.recallExpired': 'Cannot recall after {duration} minutes',
   'message.copySuccess': 'Copied',
   'message.copyFailed': 'Copy failed',
+  'message.quote.prefix': 'Reply to',
+  'message.quote.notFound': 'Original message deleted or not loaded',
 }
 
 export default messages

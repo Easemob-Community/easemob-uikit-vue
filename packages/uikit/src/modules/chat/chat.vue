@@ -3,6 +3,7 @@ import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
+import { useQuote } from '../../composables/use-quote'
 import { useLocale } from '../../locale'
 import { CONVERSATION_TYPE } from '../../constants'
 import MessageList from './message-list/message-list.vue'
@@ -27,6 +28,7 @@ const emit = defineEmits<ChatEmits>()
 const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
+const { clearQuote } = useQuote()
 const { t } = useLocale()
 
 /** 输入框组件引用 */
@@ -92,13 +94,16 @@ const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.
 
 /**
  * 会话切换时：
- * 1. 发送已读回执（useConversation.sendChannelAck 内部已有未读数守卫和群聊跳过逻辑）
+ * 1. 发送会话已读回执（useConversation.sendChannelAck 内部已有未读数守卫，单聊/群聊均支持）
  * 2. 首次拉取历史消息
  */
 watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id) return
 
-  // 发送会话已读回执（内部已做：群聊跳过 + 未读为 0 跳过）
+  // 会话切换：清空引用状态，避免跨会话残留
+  clearQuote()
+
+  // 发送会话已读回执（内部已做未读数为 0 跳过；单聊/群聊均适用）
   sendChannelAck(cvs.id)
 
   // 首次拉取历史消息

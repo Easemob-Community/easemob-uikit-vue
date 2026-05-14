@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useChat } from '../../composables/use-chat'
+import { useQuote } from '../../composables/use-quote'
 import { useViewport } from '../../composables/use-viewport'
 import { useToast } from '../../composables/use-toast'
 import SimpleInput from './message-input/simple-input.vue'
@@ -8,6 +9,7 @@ import RichInput from './message-input/rich-input.vue'
 import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
 import MentionPicker from './mention/mention-picker.vue'
 import Popup from '../../components/popup/popup.vue'
+import QuoteBar from './quote/quote-bar.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 export interface MessageInputProps {
@@ -19,6 +21,7 @@ export interface MessageInputProps {
 const props = defineProps<MessageInputProps>()
 
 const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage } = useChat()
+const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
 
@@ -71,14 +74,24 @@ const richInputRef = ref<InstanceType<typeof RichInput>>()
 /** 群已读回执配置 */
 const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
 
+/** 构造包含引用 ext 的合并对象；无引用时返回 undefined */
+function buildExtWithQuote(): Record<string, any> | undefined {
+  if (!quotedMessage.value) return undefined
+  return { ...buildQuoteExt(quotedMessage.value) }
+}
+
 /** 发送文本消息 */
 function handleSendText(text: string) {
-  sendTextMessage(text, undefined, groupReadReceiptConfig.value)
+  const ext = buildExtWithQuote()
+  sendTextMessage(text, ext, groupReadReceiptConfig.value)
+  clearQuote()
 }
 
 /** 发送富文本消息 */
 function handleSendRich(_html: string, text: string) {
-  sendTextMessage(text, undefined, groupReadReceiptConfig.value)
+  const ext = buildExtWithQuote()
+  sendTextMessage(text, ext, groupReadReceiptConfig.value)
+  clearQuote()
 }
 
 /** 待回收的 Blob URL 列表 */
@@ -89,13 +102,16 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   const file = files[0]
   if (!file) return
 
+  const ext = buildExtWithQuote()
+
   if (type === 'image') {
-    sendImageMessage(file, groupReadReceiptConfig.value)
+    sendImageMessage(file, groupReadReceiptConfig.value, ext)
   } else if (type === 'video') {
-    sendVideoMessage(file, groupReadReceiptConfig.value)
+    sendVideoMessage(file, groupReadReceiptConfig.value, ext)
   } else {
-    sendFileMessage(file, groupReadReceiptConfig.value)
+    sendFileMessage(file, groupReadReceiptConfig.value, ext)
   }
+  clearQuote()
 }
 
 /** 打开 Emoji 选择器 */
@@ -234,7 +250,9 @@ function handleVoiceEnd(durationFromInput?: number) {
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
-      sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value)
+      const ext = buildExtWithQuote()
+      sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value, ext)
+      clearQuote()
     }
 
     audioChunks = []
@@ -285,6 +303,13 @@ defineExpose({
 
 <template>
   <div ref="messageInputRef" class="message-input">
+    <!-- 引用条 -->
+    <QuoteBar
+      v-if="quotedMessage"
+      :message="quotedMessage"
+      @close="clearQuote"
+    />
+
     <!-- 简单输入框 -->
     <SimpleInput
       v-if="inputMode === 'simple'"

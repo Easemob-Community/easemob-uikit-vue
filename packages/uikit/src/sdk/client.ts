@@ -1,6 +1,6 @@
 import WebIM, { type EasemobChat } from 'easemob-websdk'
 import type { ClientConfig } from './types'
-import { MESSAGE_STATUS, ACK_TYPE, CONVERSATION_TYPE } from '../constants'
+import { MESSAGE_STATUS, ACK_TYPE } from '../constants'
 import type { MessageStatusValue, ConversationTypeValue } from '../constants'
 
 let clientInstance: UIKitClient | null = null
@@ -159,13 +159,11 @@ export class UIKitClient {
     return (this._connection as any).pinConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
   }
 
-  /** 发送会话已读回执（群聊不会产生 channel ack，自动跳过） */
+  /** 发送会话已读回执（单聊/群聊均支持，用于清空整个会话的未读数） */
   async sendChannelAck(options: {
     chatType: ConversationTypeValue
     to: string
   }): Promise<EasemobChat.SendMsgResult | void> {
-    // 群聊不发 channel ack，群聊不会产生会话已读回执
-    if (options.chatType === CONVERSATION_TYPE.GROUPCHAT) return
     const msg = WebIM.message.create({
       type: ACK_TYPE.CHANNEL as EasemobChat.MessageType,
       chatType: options.chatType as EasemobChat.ChatType,

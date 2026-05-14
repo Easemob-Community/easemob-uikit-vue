@@ -69,7 +69,7 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableMultiSelect !== false) add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
   if (cfg?.enableTranslate) add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
   if (cfg?.enablePin) add('pin', t('message.action.pin') ?? '置顶', 'actions/star')
-  if (cfg?.enableRecall !== false && !props.message.recalled) {
+  if (cfg?.enableRecall !== false && props.message.isSelf && !props.message.recalled) {
     const expired = isRecallExpired.value
     const minutes = recallDurationMinutes.value
     add(
