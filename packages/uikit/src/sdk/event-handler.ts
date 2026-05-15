@@ -134,7 +134,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
     },
 
     onCombineMessage: (msg: EasemobChat.CombineMsgBody) => {
-      handleIncomingMessage(msg, '[聊天记录]')
+      handleIncomingMessage(msg, msg.summary || '[聊天记录]')
     },
 
     /** 消息撤回：更新本地消息为撤回状态 */

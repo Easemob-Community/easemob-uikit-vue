@@ -194,6 +194,10 @@ const displayMessage = computed(() => {
   if (props.conversation.draft) {
     return props.conversation.draft
   }
+  // 合并消息类型统一回显为 [聊天记录]
+  if (props.conversation.lastMessageType === 'combine') {
+    return t('message.combine') || '[聊天记录]'
+  }
   if (props.messageFormatter) {
     return props.messageFormatter(
       props.conversation.lastMessage || '',

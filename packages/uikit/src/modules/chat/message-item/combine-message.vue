@@ -5,13 +5,17 @@ import type { Message } from '../../../store/message'
 
 export interface CombineMessageProps {
   message: Message
+  /** 是否为己方发送的消息，用于区分主题色 */
+  isSelf?: boolean
 }
 
 export interface CombineMessageEmits {
   (e: 'view', message: Message): void
 }
 
-const props = defineProps<CombineMessageProps>()
+const props = withDefaults(defineProps<CombineMessageProps>(), {
+  isSelf: false,
+})
 const emit = defineEmits<CombineMessageEmits>()
 const { t } = useLocale()
 
@@ -32,7 +36,7 @@ function handleClick() {
 </script>
 
 <template>
-  <div class="combine-message" @click="handleClick">
+  <div class="combine-message" :class="{ 'combine-message--self': props.isSelf }" @click="handleClick">
     <!-- 标题 -->
     <div class="combine-message__header">
       <Icon name="files-media/folder" :size="16" class="combine-message__icon" />
@@ -67,6 +71,23 @@ function handleClick() {
 
 .combine-message:hover {
   background-color: var(--uikit-bg-tertiary, #f0f0f0);
+}
+
+/* 己方合并消息：使用主题色背景 */
+.combine-message--self {
+  background-color: var(--uikit-primary-color, #5f6df3);
+}
+
+.combine-message--self .combine-message__header,
+.combine-message--self .combine-message__title,
+.combine-message--self .combine-message__summary,
+.combine-message--self .combine-message__compatible,
+.combine-message--self .combine-message__icon {
+  color: #fff;
+}
+
+.combine-message--self:hover {
+  background-color: var(--uikit-primary-hover, #4b57c7);
 }
 
 .combine-message__header {

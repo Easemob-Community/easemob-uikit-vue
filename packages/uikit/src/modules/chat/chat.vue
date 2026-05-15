@@ -11,6 +11,7 @@ import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal.vue'
+import MultiSelectBar from './multi-select-bar.vue'
 import Modal from '../../components/modal/modal.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
@@ -29,7 +30,7 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
-const { currentConversation, isMultiSelectMode, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages } = useChat()
+const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
@@ -152,9 +153,6 @@ watch(currentConversation, async (cvs, oldCvs) => {
 /** 转发弹窗显示状态 */
 const showForwardModal = ref(false)
 
-/** 批量删除确认弹窗 */
-const showBatchDeleteConfirm = ref(false)
-
 /** 待转发的消息（单条或多选） */
 const pendingForwardMessages = ref<Message[]>([])
 
@@ -165,43 +163,57 @@ function openForwardModal(messages: Message[]) {
   showForwardModal.value = true
 }
 
+/** 当前转发模式：'oneByOne' 逐条转发 | 'combine' 合并转发 */
+const forwardMode = ref<'oneByOne' | 'combine'>('combine')
+
 /** 执行转发 */
 async function onForwardConfirm(targetConversation: Conversation) {
   const messages = pendingForwardMessages.value
   if (messages.length === 0) return
   try {
-    if (messages.length === 1) {
-      // 单条转发：使用原有逻辑
-      await forwardMessage(messages[0], targetConversation)
+    if (forwardMode.value === 'oneByOne') {
+      // 逐条转发：每条消息单独转发
+      for (const msg of messages) {
+        await forwardMessage(msg, targetConversation)
+      }
     } else {
-      // 多选转发：使用合并消息 API
+      // 合并转发：使用合并消息 API
       await forwardCombineMessages(messages, targetConversation)
     }
   } catch (e) {
     console.warn('[Chat] forward messages failed:', e)
   }
   pendingForwardMessages.value = []
+  exitMultiSelectMode()
 }
 
-function onMultiSelectForward() {
+/** 多选：逐条转发（每条消息单独转发） */
+function onMultiSelectForwardOneByOne() {
   if (selectedMessages.value.length === 0) {
     exitMultiSelectMode()
     return
   }
+  forwardMode.value = 'oneByOne'
   openForwardModal(selectedMessages.value)
 }
 
-function onMultiSelectDelete() {
+/** 多选：合并转发 */
+function onMultiSelectForwardCombine() {
   if (selectedMessages.value.length === 0) {
     exitMultiSelectMode()
     return
   }
-  showBatchDeleteConfirm.value = true
+  forwardMode.value = 'combine'
+  openForwardModal(selectedMessages.value)
 }
 
-function onConfirmBatchDelete() {
-  deleteMessages(Array.from(selectedMessageIds.value))
-  showBatchDeleteConfirm.value = false
+/** 多选：删除 */
+function onMultiSelectDelete(messages: Message[]) {
+  if (messages.length === 0) {
+    exitMultiSelectMode()
+    return
+  }
+  deleteMessages(messages.map(m => m.id))
   exitMultiSelectMode()
 }
 </script>
@@ -262,20 +274,17 @@ function onConfirmBatchDelete() {
     <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
 
     <!-- 多选模式底部操作栏 -->
-    <div v-if="isMultiSelectMode" class="chat__multi-select-bar">
-      <span class="chat__multi-select-count">已选 {{ selectedMessages.length }} 条</span>
-      <div class="chat__multi-select-actions">
-        <button class="chat__multi-select-btn" @click="onMultiSelectForward">
-          转发
-        </button>
-        <button class="chat__multi-select-btn chat__multi-select-btn--danger" @click="onMultiSelectDelete">
-          删除
-        </button>
-        <button class="chat__multi-select-btn" @click="exitMultiSelectMode">
-          取消
-        </button>
-      </div>
-    </div>
+    <MultiSelectBar
+      v-if="isMultiSelectMode"
+      :selected-messages="selectedMessages"
+      :total-messages="messages.length"
+      @forward-one-by-one="onMultiSelectForwardOneByOne"
+      @forward-combine="onMultiSelectForwardCombine"
+      @delete="onMultiSelectDelete"
+      @select-all="selectAllMessages(messages)"
+      @deselect-all="deselectAllMessages()"
+      @close="exitMultiSelectMode"
+    />
 
     <!-- 输入框 -->
     <MessageInput v-if="!isMultiSelectMode" ref="messageInputRef" :config="props.config" :is-group="isGroupChat" />
@@ -293,17 +302,6 @@ function onConfirmBatchDelete() {
       v-model:show="showForwardModal"
       @forward="onForwardConfirm"
     />
-
-    <!-- 批量删除确认弹窗 -->
-    <Modal
-      v-model:show="showBatchDeleteConfirm"
-      :title="t('message.action.delete')"
-      :confirm-text="t('button.confirm')"
-      :cancel-text="t('button.cancel')"
-      @confirm="onConfirmBatchDelete"
-    >
-      {{ t('message.delete.batchConfirm').replace('{count}', String(selectedMessages.length)) }}
-    </Modal>
   </div>
 </template>
 
@@ -375,44 +373,5 @@ function onConfirmBatchDelete() {
 
 .chat__header-more:hover {
   background-color: var(--uikit-bg-secondary);
-}
-
-/* 多选模式底部栏 */
-.chat__multi-select-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  background-color: var(--uikit-bg-secondary);
-  border-top: 1px solid #e5e7eb;
-}
-
-.chat__multi-select-count {
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-}
-
-.chat__multi-select-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.chat__multi-select-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: none;
-  background-color: var(--uikit-primary-color);
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.chat__multi-select-btn:hover {
-  opacity: 0.9;
-}
-
-.chat__multi-select-btn--danger {
-  background-color: #ef4444;
 }
 </style>

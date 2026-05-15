@@ -207,7 +207,7 @@ const isHighlighted = computed(() => {
     </template>
 
     <template v-else>
-      <!-- 多选 Checkbox -->
+      <!-- 多选 Checkbox：微信风格，所有消息统一放在最左侧（独立于内层 row-reverse 之外） -->
       <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
         <div
           class="message-bubble-wrapper__check-icon"
@@ -217,6 +217,14 @@ const isHighlighted = computed(() => {
         </div>
       </div>
 
+      <!-- 主体区域：处理己方/对方头像+内容布局 -->
+      <div
+        class="message-bubble-wrapper__main"
+        :class="{
+          'message-bubble-wrapper__main--self': isSelfConversation,
+          'message-bubble-wrapper__main--left': layout === 'left',
+        }"
+      >
       <!-- 头像区域 -->
       <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
         <slot name="avatar" :message="message">
@@ -309,6 +317,7 @@ const isHighlighted = computed(() => {
           </slot>
         </div>
       </div>
+      </div>
     </template>
 
     <!-- 合并消息弹窗栈：支持嵌套合并消息逐层点击 -->
@@ -328,6 +337,7 @@ const isHighlighted = computed(() => {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  width: 100%;
   max-width: 100%;
 }
 
@@ -336,12 +346,32 @@ const isHighlighted = computed(() => {
   justify-content: flex-start;
 }
 
-/* 对话模式：己方消息反向排列 */
+/* 对话模式：己方消息外层反向（使主体靠右） */
 .message-bubble-wrapper--self {
-  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
-.message-bubble-wrapper--self .message-bubble-wrapper__content {
+/* 内层主体容器：处理头像+内容布局，擑满剩余空间以使 content max-width: 70% 生效 */
+.message-bubble-wrapper__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  max-width: 100%;
+}
+
+.message-bubble-wrapper__main--left {
+  justify-content: flex-start;
+}
+
+/* 己方消息：内层反向排列（头像在右，气泡靠右） */
+.message-bubble-wrapper--self .message-bubble-wrapper__main {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.message-bubble-wrapper__main--self .message-bubble-wrapper__content {
   align-items: flex-end;
 }
 

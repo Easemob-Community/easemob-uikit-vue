@@ -65,6 +65,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       :is="renderComponent"
       v-else-if="renderComponent"
       :message="message"
+      :is-self="message.isSelf"
       @reedit="emit('reedit', $event)"
       @toggle-translation="emit('toggle-translation', $event)"
       @view="emit('view-combine', $event)"

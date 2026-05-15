@@ -48,6 +48,19 @@ function isMessageSelected(msgId: string): boolean {
   return selectedMessageIds.value.has(msgId)
 }
 
+/** 全选当前会话所有可转发的消息（过滤掉已撤回、发送中的消息） */
+function selectAllMessages(messages: Message[]) {
+  const validIds = messages
+    .filter(m => m.status === MESSAGE_STATUS.SENT && !m.recalled)
+    .map(m => m.id)
+  selectedMessageIds.value = new Set(validIds)
+}
+
+/** 取消全选 */
+function deselectAllMessages() {
+  selectedMessageIds.value.clear()
+}
+
 function enterEditMode(message: Message) {
   editingMessage.value = message
 }
@@ -650,21 +663,39 @@ export function useChat() {
   /**
    * 更新目标会话的最后一条消息（用于转发后同步会话列表）
    */
-  function _updateTargetConversation(targetId: string, targetType: ConversationTypeValue, lastMessageText: string, timestamp: number) {
+  function _updateTargetConversation(targetId: string, targetType: ConversationTypeValue, lastMessageText: string, timestamp: number, lastMessageType?: string) {
     const isGroup = targetType === CONVERSATION_TYPE.GROUPCHAT
     const patch: Partial<Conversation> = {
       lastMessage: lastMessageText,
       lastMessageTime: timestamp,
-      lastMessageType: 'combine',
+      lastMessageType: lastMessageType || 'combine',
       lastMessageSender: isGroup ? (stores.client.currentUser || '') : '',
     }
     conversationStore.updateConversation(targetId, patch)
   }
 
   /**
+   * 将 SDK 消息体转换为 UI Message 并插入目标会话的消息列表
+   * 用于转发后让目标会话立即显示新消息，无需刷新页面
+   */
+  function _insertForwardedMessage(sdkMsg: EasemobChat.MessageBody, targetId: string, targetType: ConversationTypeValue) {
+    const currentUser = stores.client.currentUser
+    const isGroup = targetType === CONVERSATION_TYPE.GROUPCHAT
+    const uiMsg: Message = {
+      ...sdkMsg,
+      from: sdkMsg.from || currentUser || '',
+      conversationId: targetId,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENT,
+      timestamp: Date.now(),
+    } as Message
+    messageStore.addMessage(uiMsg)
+  }
+
+  /**
    * 单条转发消息到指定会话
    * - 文本消息：直接创建新文本消息发送
-   * - 其他类型：通过 ext 携带原始消息信息，创建文本消息发送（带 [转发] 前缀）
+   * - 其他类型：提取原消息文件信息，创建同类型消息发送（真正转发原文件）
    */
   async function forwardMessage(message: Message, targetConversation: Conversation) {
     const client = _getClient()
@@ -681,44 +712,113 @@ export function useChat() {
       try {
         const result = await client.sendCreatedMessage(sdkMsg)
         _onSendResult(sdkMsg.id, undefined, result.message)
-        _updateTargetConversation(targetConversation.id, targetConversation.type, text, Date.now())
+        _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
+        _updateTargetConversation(targetConversation.id, targetConversation.type, text, Date.now(), 'txt')
       } catch (e) {
         _onSendResult(sdkMsg.id, e)
         throw e
       }
-    } else {
-      // 非文本消息：发送带描述的文本消息，ext 中标记为转发
-      const typeMap: Record<string, string> = {
-        img: '[图片]',
-        audio: '[语音]',
-        video: '[视频]',
-        file: '[文件]',
-        custom: '[自定义消息]',
-        loc: '[位置]',
+      return
+    }
+
+    // 非文本消息：提取原消息文件信息，创建同类型消息真正转发
+    const baseOptions = {
+      type: message.type,
+      to: targetConversation.id,
+      chatType: targetConversation.type as EasemobChat.ChatType,
+      ext: message.ext,
+    } as Record<string, any>
+
+    switch (message.type) {
+      case 'img': {
+        const imgMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; width?: number; height?: number; thumb?: string; thumb_secret?: string }
+        baseOptions.url = imgMsg.url
+        baseOptions.secret = imgMsg.secret
+        baseOptions.filename = imgMsg.filename || 'image.jpg'
+        baseOptions.file_length = imgMsg.file_length || 0
+        if (imgMsg.width) baseOptions.width = imgMsg.width
+        if (imgMsg.height) baseOptions.height = imgMsg.height
+        if (imgMsg.thumb) baseOptions.thumb = imgMsg.thumb
+        if (imgMsg.thumb_secret) baseOptions.thumb_secret = imgMsg.thumb_secret
+        break
       }
-      const desc = typeMap[message.type] || '[消息]'
-      const sdkMsg = client.createMessage({
-        type: 'txt',
-        to: targetConversation.id,
-        chatType: targetConversation.type as EasemobChat.ChatType,
-        msg: desc,
-        ext: {
-          ...(message.ext || {}),
-          uikitForward: {
-            originalType: message.type,
-            originalFrom: message.from,
-            originalTime: message.timestamp,
-          },
-        },
-      })
-      try {
-        const result = await client.sendCreatedMessage(sdkMsg)
-        _onSendResult(sdkMsg.id, undefined, result.message)
-        _updateTargetConversation(targetConversation.id, targetConversation.type, desc, Date.now())
-      } catch (e) {
-        _onSendResult(sdkMsg.id, e)
-        throw e
+      case 'audio': {
+        const audioMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; length?: number }
+        baseOptions.url = audioMsg.url
+        baseOptions.secret = audioMsg.secret
+        baseOptions.filename = audioMsg.filename || 'audio.amr'
+        baseOptions.file_length = audioMsg.file_length || 0
+        baseOptions.length = audioMsg.length || 0
+        break
       }
+      case 'video': {
+        const videoMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; length?: number; thumb?: string; thumb_secret?: string }
+        baseOptions.url = videoMsg.url
+        baseOptions.secret = videoMsg.secret
+        baseOptions.filename = videoMsg.filename || 'video.mp4'
+        baseOptions.file_length = videoMsg.file_length || 0
+        baseOptions.length = videoMsg.length || 0
+        if (videoMsg.thumb) baseOptions.thumb = videoMsg.thumb
+        if (videoMsg.thumb_secret) baseOptions.thumb_secret = videoMsg.thumb_secret
+        break
+      }
+      case 'file': {
+        const fileMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number }
+        baseOptions.url = fileMsg.url
+        baseOptions.secret = fileMsg.secret
+        baseOptions.filename = fileMsg.filename || 'file'
+        baseOptions.file_length = fileMsg.file_length || 0
+        break
+      }
+      case 'loc': {
+        const locMsg = message as unknown as { lat?: number; lng?: number; addr?: string }
+        baseOptions.lat = locMsg.lat || 0
+        baseOptions.lng = locMsg.lng || 0
+        baseOptions.addr = locMsg.addr || ''
+        break
+      }
+      case 'custom': {
+        const customMsg = message as unknown as { customEvent?: string; customExts?: Record<string, any> }
+        baseOptions.customEvent = customMsg.customEvent || ''
+        baseOptions.customExts = customMsg.customExts || {}
+        break
+      }
+      default: {
+        // 不支持的类型降级为文本描述
+        const typeMap: Record<string, string> = {
+          img: '[图片]', audio: '[语音]', video: '[视频]',
+          file: '[文件]', custom: '[自定义消息]', loc: '[位置]',
+        }
+        const desc = typeMap[message.type] || '[消息]'
+        const sdkMsg = client.createMessage({
+          type: 'txt',
+          to: targetConversation.id,
+          chatType: targetConversation.type as EasemobChat.ChatType,
+          msg: desc,
+          ext: { ...(message.ext || {}), uikitForward: { originalType: message.type, originalFrom: message.from, originalTime: message.timestamp } },
+        })
+        try {
+          const result = await client.sendCreatedMessage(sdkMsg)
+          _onSendResult(sdkMsg.id, undefined, result.message)
+          _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
+          _updateTargetConversation(targetConversation.id, targetConversation.type, desc, Date.now(), 'txt')
+        } catch (e) {
+          _onSendResult(sdkMsg.id, e)
+          throw e
+        }
+        return
+      }
+    }
+
+    const sdkMsg = client.createMessage(baseOptions as any)
+    try {
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
+      _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
+      _updateTargetConversation(targetConversation.id, targetConversation.type, `[${message.type}]`, Date.now(), message.type)
+    } catch (e) {
+      _onSendResult(sdkMsg.id, e)
+      throw e
     }
   }
 
@@ -802,7 +902,8 @@ export function useChat() {
     try {
       const result = await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id, undefined, result.message)
-      _updateTargetConversation(targetConversation.id, targetConversation.type, '[聊天记录]', Date.now())
+      _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
+      _updateTargetConversation(targetConversation.id, targetConversation.type, '[聊天记录]', Date.now(), 'combine')
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
       throw e
@@ -900,6 +1001,8 @@ export function useChat() {
     exitMultiSelectMode,
     toggleMessageSelection,
     isMessageSelected,
+    selectAllMessages,
+    deselectAllMessages,
     // 编辑/置顶/翻译
     editingMessage,
     enterEditMode,
