@@ -28,7 +28,7 @@ const chatInputFeatures = ref({
   image: true,
   file: true,
   voice: true,
-  video: false,
+  video: true,
   mention: true,
 })
 

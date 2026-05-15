@@ -111,7 +111,7 @@ export interface ChatConfig {
       file?: boolean
       /** 语音，默认 true */
       voice?: boolean
-      /** 视频，默认 false */
+      /** 视频，默认 true */
       video?: boolean
       /** @提及，默认 true */
       mention?: boolean

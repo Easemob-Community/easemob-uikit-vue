@@ -51,7 +51,7 @@ const features = computed(() => ({
   image: props.config?.features?.image !== false,
   file: props.config?.features?.file !== false,
   voice: props.config?.features?.voice !== false,
-  video: props.config?.features?.video ?? false,
+  video: props.config?.features?.video !== false,
 }))
 
 /** 是否正在录音 */
