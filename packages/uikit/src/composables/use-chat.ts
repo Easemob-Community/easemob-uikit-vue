@@ -209,6 +209,25 @@ export function useChat() {
     }
   }
 
+  /**
+   * 读取图片文件的原始宽高
+   */
+  function _readImageDimensions(file: File): Promise<{ width: number; height: number }> {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file)
+      const img = new Image()
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight })
+        URL.revokeObjectURL(url)
+      }
+      img.onerror = () => {
+        resolve({ width: 0, height: 0 })
+        URL.revokeObjectURL(url)
+      }
+      img.src = url
+    })
+  }
+
   /** 发送图片消息 */
   async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
     const cvs = conversationStore.currentConversation
@@ -216,6 +235,11 @@ export function useChat() {
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
+
+    // 读取图片宽高并生成本地预览 URL
+    const { width, height } = await _readImageDimensions(file)
+    const localPreviewUrl = URL.createObjectURL(file)
+
     const sdkMsg = client.createMessage({
       type: 'img',
       to: cvs.id,
@@ -224,12 +248,23 @@ export function useChat() {
       ...(ext ? { ext } : {}),
       ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
+
+    // Patch 本地预览 URL 和宽高到消息对象，使己方消息可立即展示
+    ;(sdkMsg as any).url = localPreviewUrl
+    if (width > 0 && height > 0) {
+      ;(sdkMsg as any).width = width
+      ;(sdkMsg as any).height = height
+    }
+
     _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
     try {
       const result = await client.sendCreatedMessage(sdkMsg)
       _onSendResult(sdkMsg.id, undefined, result.message)
     } catch (e) {
       _onSendResult(sdkMsg.id, e)
+    } finally {
+      // 服务器响应后释放本地 objectURL
+      URL.revokeObjectURL(localPreviewUrl)
     }
   }
 
