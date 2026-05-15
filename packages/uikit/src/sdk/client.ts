@@ -218,6 +218,74 @@ export class UIKitClient {
     })
   }
 
+  /** 修改已发送的消息（当前 SDK 仅文本消息支持完整内容修改，其它类型仅支持 ext 修改） */
+  async modifyMessage(options: {
+    messageId: string
+    modifiedMessage: EasemobChat.ExcludeAckMessageBody
+  }): Promise<EasemobChat.ModifyMsgResult> {
+    return this._connection.modifyMessage({
+      messageId: options.messageId,
+      modifiedMessage: options.modifiedMessage,
+    })
+  }
+
+  /** 置顶消息 */
+  async pinMessage(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    messageId: string
+  }): Promise<void> {
+    return this._connection.pinMessage({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType as EasemobChat.ChatType,
+      messageId: options.messageId,
+    })
+  }
+
+  /** 取消置顶消息 */
+  async unpinMessage(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    messageId: string
+  }): Promise<void> {
+    return this._connection.unpinMessage({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType as EasemobChat.ChatType,
+      messageId: options.messageId,
+    })
+  }
+
+  /** 分页拉取会话置顶消息列表 */
+  async getServerPinnedMessages(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    pageSize?: number
+    cursor?: string
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.CursorPinnedMessagesResult>> {
+    return this._connection.getServerPinnedMessages({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType as EasemobChat.ChatType,
+      pageSize: options.pageSize ?? 20,
+      cursor: options.cursor ?? '',
+    })
+  }
+
+  /** 翻译文本（支持多目标语言；UIKIT 当前仅使用单目标） */
+  async translateMessage(options: {
+    text: string
+    languages: string[]
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.TranslationResult>> {
+    return this._connection.translateMessage({
+      text: options.text,
+      languages: options.languages,
+    })
+  }
+
+  /** 获取翻译服务支持的语言列表 */
+  async getSupportedLanguages(): Promise<EasemobChat.AsyncResult<EasemobChat.SupportLanguage[]>> {
+    return this._connection.getSupportedLanguages()
+  }
+
   /** 获取群消息已读用户列表 */
   async getGroupMsgReadUser(options: {
     msgId: string

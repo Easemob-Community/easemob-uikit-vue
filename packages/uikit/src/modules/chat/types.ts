@@ -55,6 +55,13 @@ export interface ChatConfig {
       /** 加载模式，默认 'auto'（自动适配端型） */
       mode?: LoadHistoryMode
     }
+    /** 置顶横幅配置 */
+    pinnedBar?: {
+      /** 是否显示顶部置顶条，默认 true */
+      visible?: boolean
+      /** 预览文本最大长度，默认 30 */
+      maxPreviewLength?: number
+    }
   }
   /** 消息操作配置 */
   messageAction?: {
@@ -66,16 +73,20 @@ export interface ChatConfig {
     enableDelete?: boolean
     /** 启用撤回，默认 true */
     enableRecall?: boolean
+    /** 启用编辑，默认 true（仅 isSelf 且文本消息生效） */
+    enableEdit?: boolean
     /** 启用转发，默认 true */
     enableForward?: boolean
     /** 启用多选，默认 true */
     enableMultiSelect?: boolean
-    /** 启用翻译，默认 false */
+    /** 启用翻译，默认 true（仅文本消息生效） */
     enableTranslate?: boolean
-    /** 启用置顶，默认 false */
+    /** 启用置顶/取消置顶，默认 true */
     enablePin?: boolean
     /** 撤回禁用时长（毫秒），超过该时长后无法撤回，默认 2 分钟（120000） */
     recallDisableDuration?: number
+    /** 翻译目标语言，例如 'zh-Hans'、'en'。不设置时根据 UIKIT 当前 locale 自动选择（zh-CN→zh-Hans，en→en，其他默认 en） */
+    translateTargetLang?: string
   }
   /** 群已读回执配置 */
   groupReadReceipt?: {
@@ -131,10 +142,12 @@ export type MessageActionType =
   | 'copy'
   | 'delete'
   | 'recall'
+  | 'edit'
   | 'forward'
   | 'multiSelect'
   | 'translate'
   | 'pin'
+  | 'unpin'
 
 /** 消息操作菜单项 */
 export interface MessageActionItem {

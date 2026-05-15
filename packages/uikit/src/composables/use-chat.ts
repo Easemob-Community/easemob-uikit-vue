@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
+import { useLocale } from '../locale'
 import type { Message } from '../store/message'
 import type { Conversation } from '../store/conversation'
 import { MESSAGE_STATUS, MESSAGE_TYPE, CONVERSATION_TYPE } from '../constants'
@@ -11,6 +12,11 @@ import type { EasemobChat } from 'easemob-websdk'
 // ===== 多选模式状态（模块级单例，确保同一页面内多处调用共享同一份状态） =====
 const isMultiSelectMode = ref(false)
 const selectedMessageIds = ref<Set<string>>(new Set())
+
+// ===== 编辑模式状态（模块级单例） =====
+const editingMessage = ref<Message | null>(null)
+/** SDK 限制：单条消息最多可被修改 5 次 */
+const MODIFY_LIMIT = 5
 
 function enterMultiSelectMode() {
   isMultiSelectMode.value = true
@@ -34,8 +40,17 @@ function isMessageSelected(msgId: string): boolean {
   return selectedMessageIds.value.has(msgId)
 }
 
+function enterEditMode(message: Message) {
+  editingMessage.value = message
+}
+
+function exitEditMode() {
+  editingMessage.value = null
+}
+
 export function useChat() {
   const { stores } = useUIKit()
+  const { locale } = useLocale()
   const messageStore = stores.message
   const conversationStore = stores.conversation
 
@@ -373,6 +388,186 @@ export function useChat() {
     return _getClient().getGroupMsgReadUser({ msgId, groupId })
   }
 
+  /** 获取翻译目标语言：优先 ChatConfig 传入，其次跟随 UIKIT 当前 locale */
+  function _resolveTranslateLang(targetLang?: string): string {
+    if (targetLang && targetLang.trim()) return targetLang.trim()
+    const cur = locale.value
+    if (cur === 'zh-CN' || cur === 'zh' || cur === 'zh-Hans') return 'zh-Hans'
+    if (cur === 'en' || cur?.startsWith('en-')) return 'en'
+    return 'en'
+  }
+
+  /**
+   * 修改文本消息：调用 SDK modifyMessage，返回后应用到本地。
+   * - 仅针对 type === 'txt' 的消息生效
+   * - 对比 newText 与原文本，内容未变化时不发送请求
+   * - 服务端返回超过 5 次会拋出 error，调用方需 catch
+   */
+  async function modifyTextMessage(message: Message, newText: string) {
+    if (!message || message.type !== 'txt') return
+    const cvs = conversationStore.currentConversation
+    if (!cvs) return
+    const trimmed = (newText ?? '').trim()
+    if (!trimmed) return
+    const originalText = (message as EasemobChat.TextMsgBody).msg || ''
+    if (trimmed === originalText) {
+      exitEditMode()
+      return
+    }
+    const client = _getClient()
+    const messageId = message.mid || message.id
+    const modifiedMsg = client.createMessage({
+      type: 'txt',
+      to: cvs.id,
+      chatType: cvs.type as EasemobChat.ChatType,
+      msg: trimmed,
+    }) as EasemobChat.ExcludeAckMessageBody
+    try {
+      const result = await client.modifyMessage({
+        messageId,
+        modifiedMessage: modifiedMsg,
+      })
+      const serverMsg = (result as unknown as { message?: EasemobChat.ExcludeAckMessageBody }).message
+      const info = result?.modifiedInfo
+      if (serverMsg) {
+        messageStore.applyModifiedMessage(serverMsg, info && {
+          operatorId: info.operatorId,
+          operationCount: info.operationCount,
+          operationTime: info.operationTime,
+        })
+      } else {
+        // 部分 SDK 返回仅含 modifiedInfo：本地补全 msg 内容
+        const fallback: EasemobChat.ExcludeAckMessageBody = {
+          ...(message as unknown as EasemobChat.ExcludeAckMessageBody),
+          msg: trimmed,
+        } as EasemobChat.ExcludeAckMessageBody
+        messageStore.applyModifiedMessage(fallback, info && {
+          operatorId: info.operatorId,
+          operationCount: info.operationCount,
+          operationTime: info.operationTime,
+        })
+      }
+      exitEditMode()
+    } catch (e) {
+      console.warn('[useChat] modifyMessage failed:', e)
+      throw e
+    }
+  }
+
+  /** 置顶消息 */
+  async function pinMessage(message: Message) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs || !message) return
+    const client = _getClient()
+    const messageId = message.mid || message.id
+    try {
+      await client.pinMessage({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
+        messageId,
+      })
+      // 主动置顶后本地立即标记（多端以 onMessagePinEvent 同步）
+      messageStore.setMessagePinned(messageId, {
+        operatorId: stores.client.currentUser || '',
+        pinTime: Date.now(),
+      })
+    } catch (e) {
+      console.warn('[useChat] pinMessage failed:', e)
+      throw e
+    }
+  }
+
+  /** 取消置顶消息 */
+  async function unpinMessage(message: Message) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs || !message) return
+    const client = _getClient()
+    const messageId = message.mid || message.id
+    try {
+      await client.unpinMessage({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
+        messageId,
+      })
+      messageStore.setMessageUnpinned(messageId)
+    } catch (e) {
+      console.warn('[useChat] unpinMessage failed:', e)
+      throw e
+    }
+  }
+
+  /**
+   * 拉取当前会话的服务端置顶消息列表（仅拉首页，快递场景足够）
+   */
+  async function fetchPinnedMessages() {
+    const cvs = conversationStore.currentConversation
+    if (!cvs) return
+    try {
+      const result = await _getClient().getServerPinnedMessages({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
+        pageSize: 20,
+        cursor: '',
+      })
+      const list = result?.data?.list || []
+      const currentUser = stores.client.currentUser
+      const mapped: Message[] = list.map((info) => {
+        const m = info.message as EasemobChat.ExcludeAckMessageBody
+        return {
+          ...m,
+          conversationId: cvs.id,
+          isSelf: m.from === currentUser,
+          status: MESSAGE_STATUS.SENT,
+          timestamp: m.time || info.pinTime || Date.now(),
+          mid: m.id,
+          pinned: true,
+          pinTime: info.pinTime,
+          pinOperatorId: info.operatorId,
+        } as Message
+      })
+      messageStore.setPinnedMessages(cvs.id, mapped)
+    } catch (e) {
+      console.warn('[useChat] fetchPinnedMessages failed:', e)
+    }
+  }
+
+  /**
+   * 翻译文本消息：仅 type === 'txt'
+   * - 已有译文与目标语一致 → 仅切换 showTranslation
+   * - 否则调用 SDK translateMessage 拉取译文
+   */
+  async function translateTextMessage(message: Message, targetLang?: string) {
+    if (!message || message.type !== 'txt') return
+    const text = (message as EasemobChat.TextMsgBody).msg || ''
+    if (!text) return
+    const lang = _resolveTranslateLang(targetLang)
+    const msgId = message.id
+    // 复用已有译文
+    if (message.translation && message.translation.to === lang) {
+      messageStore.toggleTranslation(msgId)
+      return
+    }
+    messageStore.setTranslating(msgId, true)
+    try {
+      const result = await _getClient().translateMessage({ text, languages: [lang] })
+      const translation = result?.data?.translations?.[0]
+      if (translation) {
+        messageStore.setTranslation(msgId, { text: translation.text, to: translation.to })
+      } else {
+        messageStore.setTranslating(msgId, false)
+      }
+    } catch (e) {
+      messageStore.setTranslating(msgId, false)
+      console.warn('[useChat] translateMessage failed:', e)
+      throw e
+    }
+  }
+
+  /** 切换译文/原文展示 */
+  function toggleTranslation(msgId: string) {
+    messageStore.toggleTranslation(msgId)
+  }
+
   /** 撤回消息 */
   async function recallMessage(msgId: string) {
     const cvs = conversationStore.currentConversation
@@ -413,5 +608,16 @@ export function useChat() {
     exitMultiSelectMode,
     toggleMessageSelection,
     isMessageSelected,
+    // 编辑/置顶/翻译
+    editingMessage,
+    enterEditMode,
+    exitEditMode,
+    modifyTextMessage,
+    pinMessage,
+    unpinMessage,
+    fetchPinnedMessages,
+    translateTextMessage,
+    toggleTranslation,
+    MODIFY_LIMIT,
   }
 }

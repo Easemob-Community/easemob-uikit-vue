@@ -14,6 +14,7 @@ export interface MessageRendererProps {
 
 export interface MessageRendererEmits {
   (e: 'reedit', message: Message): void
+  (e: 'toggle-translation', message: Message): void
 }
 
 const props = defineProps<MessageRendererProps>()
@@ -62,6 +63,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       v-else-if="renderComponent"
       :message="message"
       @reedit="emit('reedit', $event)"
+      @toggle-translation="emit('toggle-translation', $event)"
     />
 
     <!-- 未识别的消息类型 -->

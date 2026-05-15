@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
+import Icon from '../../../components/icon/icon.vue'
 import MessageRenderer from './message-renderer.vue'
 import MessageInteractive from './message-interactive.vue'
 import QuoteCard from '../quote/quote-card.vue'
@@ -29,6 +30,7 @@ export interface MessageBubbleWrapperEmits {
   (e: 'action', event: MessageActionEvent): void
   (e: 'group-read-click', msgId: string, groupId: string): void
   (e: 'reedit', message: Message): void
+  (e: 'toggle-translation', message: Message): void
 }
 
 const props = defineProps<MessageBubbleWrapperProps>()
@@ -196,6 +198,15 @@ const isHighlighted = computed(() => {
 
         <!-- 消息渲染器 -->
         <div class="message-bubble-wrapper__body">
+          <!-- 置顶角标 -->
+          <div
+            v-if="message.pinned"
+            class="message-bubble-wrapper__pin-badge"
+            :title="t('message.action.pin')"
+          >
+            <Icon name="chat/pin" :size="12" />
+            <span>{{ t('message.action.pin') }}</span>
+          </div>
           <MessageInteractive
             :message="message"
             :config="actionConfig"
@@ -204,6 +215,7 @@ const isHighlighted = computed(() => {
             <MessageRenderer
               :message="message"
               @reedit="emit('reedit', $event)"
+              @toggle-translation="emit('toggle-translation', $event)"
             >
               <!-- 透传所有类型级插槽 -->
               <template
@@ -434,6 +446,25 @@ const isHighlighted = computed(() => {
 .message-bubble-wrapper--highlight .message-bubble-wrapper__body {
   animation: message-bubble-flash 1.2s ease-in-out;
   border-radius: 8px;
+}
+
+/* 置顶角标 */
+.message-bubble-wrapper__pin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  align-self: flex-start;
+  margin-bottom: 2px;
+  padding: 1px 6px;
+  font-size: 11px;
+  color: var(--uikit-primary-color, #5f6df3);
+  background-color: rgba(95, 109, 243, 0.1);
+  border-radius: 8px;
+  user-select: none;
+}
+
+.message-bubble-wrapper--self .message-bubble-wrapper__pin-badge {
+  align-self: flex-end;
 }
 
 @keyframes message-bubble-flash {

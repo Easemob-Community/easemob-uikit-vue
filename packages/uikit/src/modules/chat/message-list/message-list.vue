@@ -20,12 +20,13 @@ export interface MessageListProps {
 export interface MessageListEmits {
   (e: 'reedit', message: Message): void
   (e: 'recall-failed', error: any, message: Message): void
+  (e: 'edit', message: Message): void
 }
 
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage } = useChat()
+const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { t } = useLocale()
@@ -207,7 +208,47 @@ async function onMessageAction(event: MessageActionEvent) {
     // TODO: 删除消息
     return
   }
-  // TODO: 处理其他操作（引用、转发、翻译、置顶）
+  if (event.action === 'edit') {
+    // 编辑：向上层 emit 'edit'，chat.vue 负责进入编辑模式并回填输入框
+    if (event.message.type === 'txt' && !event.message.recalled) {
+      emit('edit', event.message)
+    }
+    return
+  }
+  if (event.action === 'pin') {
+    try {
+      await pinMessage(event.message)
+    } catch (e: any) {
+      console.warn('[MessageList] pinMessage failed:', e)
+      showToast(e?.message || t('message.action.pin') || '置顶失败')
+    }
+    return
+  }
+  if (event.action === 'unpin') {
+    try {
+      await unpinMessage(event.message)
+    } catch (e: any) {
+      console.warn('[MessageList] unpinMessage failed:', e)
+      showToast(e?.message || t('message.action.unpin') || '取消置顶失败')
+    }
+    return
+  }
+  if (event.action === 'translate') {
+    if (event.message.type !== 'txt') return
+    try {
+      await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
+    } catch (e: any) {
+      console.warn('[MessageList] translateTextMessage failed:', e)
+      showToast(e?.message || t('message.action.translate') || '翻译失败')
+    }
+    return
+  }
+  // TODO: 处理其他操作（转发）
+}
+
+/** 文本消息翻译切换（显示译文/原文） */
+function onToggleTranslation(message: Message) {
+  toggleTranslation(message.id)
 }
 
 /** 通过 VueUse useClipboard 复制消息文本 */
@@ -388,6 +429,7 @@ watch(locateRequest, (req) => {
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
+          @toggle-translation="onToggleTranslation"
         />
       </template>
     </MessageVirtualList>
@@ -415,6 +457,7 @@ watch(locateRequest, (req) => {
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
+          @toggle-translation="onToggleTranslation"
         />
       </div>
     </div>

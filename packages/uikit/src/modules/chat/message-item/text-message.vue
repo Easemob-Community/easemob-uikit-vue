@@ -10,6 +10,7 @@ export interface TextMessageProps {
 
 export interface TextMessageEmits {
   (e: 'reedit', message: TextMessageType): void
+  (e: 'toggle-translation', message: TextMessageType): void
 }
 
 const props = defineProps<TextMessageProps>()
@@ -25,8 +26,24 @@ const { t } = useLocale()
 /** 是否显示重新编辑 */
 const showReedit = computed(() => props.message.recalled && props.message.isSelf && props.message.originalMsg)
 
+/** 是否已被编辑：以消息体 modifiedInfo 字段为准（历史消息拉取也会带），兼容本地 modified 标记 */
+const isModified = computed(() => (!!props.message.modifiedInfo || !!props.message.modified) && !props.message.recalled)
+
+/** 是否存在译文 */
+const hasTranslation = computed(() => !!props.message.translation?.text)
+
+/** 是否优先显示译文 */
+const showTranslated = computed(() => hasTranslation.value && props.message.showTranslation !== false)
+
+/** 是否正在翻译中 */
+const translating = computed(() => !!props.message.translating)
+
 function onReedit() {
   emit('reedit', props.message)
+}
+
+function onToggleTranslation() {
+  emit('toggle-translation', props.message)
 }
 </script>
 
@@ -44,7 +61,44 @@ function onReedit() {
     </template>
     <!-- 正常文本 -->
     <div v-else class="text-message__bubble" :class="bubbleClass">
-      {{ props.message.msg }}
+      <div class="text-message__content">
+        {{ props.message.msg }}
+        <span
+          v-if="isModified"
+          class="text-message__edited"
+          :title="props.message.modifiedInfo ? `${t('message.edited')} ×${props.message.modifiedInfo.operationCount}` : ''"
+        >
+          {{ t('message.edited') }}
+        </span>
+      </div>
+      <!-- 译文区 -->
+      <template v-if="translating">
+        <div class="text-message__divider" />
+        <div class="text-message__translation text-message__translation--loading">
+          {{ t('message.translate.loading') }}
+        </div>
+      </template>
+      <template v-else-if="hasTranslation && showTranslated">
+        <div class="text-message__divider" />
+        <div class="text-message__translation">
+          {{ props.message.translation?.text }}
+        </div>
+        <button
+          class="text-message__translate-toggle"
+          @click.stop="onToggleTranslation"
+        >
+          {{ t('message.translate.showOriginal') }}
+        </button>
+      </template>
+      <template v-else-if="hasTranslation && !showTranslated">
+        <div class="text-message__divider" />
+        <button
+          class="text-message__translate-toggle"
+          @click.stop="onToggleTranslation"
+        >
+          {{ t('message.translate.showTranslated') }}
+        </button>
+      </template>
     </div>
   </div>
 </template>
@@ -75,6 +129,61 @@ function onReedit() {
 .text-message--self .text-message__bubble {
   background-color: var(--uikit-primary-color);
   color: #fff;
+}
+
+.text-message__content {
+  display: inline;
+}
+
+.text-message__edited {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--uikit-text-secondary);
+  opacity: 0.75;
+  user-select: none;
+  vertical-align: baseline;
+}
+
+.text-message--self .text-message__edited {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.text-message__divider {
+  height: 1px;
+  margin: 8px -4px 6px;
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.text-message--self .text-message__divider {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.text-message__translation {
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.text-message__translation--loading {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.text-message__translate-toggle {
+  margin-top: 4px;
+  padding: 0;
+  font-size: 12px;
+  color: inherit;
+  opacity: 0.8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.text-message__translate-toggle:hover {
+  opacity: 1;
 }
 
 .text-message__reedit-btn {

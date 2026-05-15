@@ -194,6 +194,29 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       }
     },
 
+    /** 消息被编辑：用 SDK 返回的最新消息体覆盖本地，标记 modified */
+    onModifiedMessage: (msg: EasemobChat.ModifiedEventMessage) => {
+      const info = (msg as EasemobChat.ExcludeAckMessageBody & { modifiedInfo?: EasemobChat.ModifiedMsgInfo }).modifiedInfo
+      stores.message.applyModifiedMessage(msg, info && {
+        operatorId: info.operatorId,
+        operationCount: info.operationCount,
+        operationTime: info.operationTime,
+      })
+    },
+
+    /** 消息置顶/取消置顶事件：多端同步 */
+    onMessagePinEvent: (event: EasemobChat.MessagePinEvent) => {
+      if (!event || !event.messageId) return
+      if (event.operation === 'pin') {
+        stores.message.setMessagePinned(event.messageId, {
+          operatorId: event.operatorId || '',
+          pinTime: event.time || Date.now(),
+        })
+      } else if (event.operation === 'unpin') {
+        stores.message.setMessageUnpinned(event.messageId)
+      }
+    },
+
     /** 多设备事件同步：置顶/取消置顶/删除会话 */
     onMultiDeviceEvent: (event: EasemobChat.MultiDeviceEvent) => {
       if ('operation' in event && 'conversationId' in event) {

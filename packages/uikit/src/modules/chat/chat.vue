@@ -8,6 +8,7 @@ import { useLocale } from '../../locale'
 import { CONVERSATION_TYPE } from '../../constants'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
+import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
@@ -25,10 +26,10 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
-const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail } = useChat()
+const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
-const { clearQuote } = useQuote()
+const { clearQuote, requestLocate } = useQuote()
 const { t } = useLocale()
 
 /** 输入框组件引用 */
@@ -37,10 +38,34 @@ const messageInputRef = ref<InstanceType<typeof MessageInput>>()
 /** 重新编辑：将撤回消息的原文回显到输入框 */
 function onReedit(message: Message) {
   const originalText = message.originalMsg
-  // eslint-disable-next-line no-console
-  console.log('[chat] onReedit', { originalText, ref: messageInputRef.value, hasSetText: !!messageInputRef.value?.setText })
   if (!originalText) return
-  messageInputRef.value?.setText?.(originalText)
+  // 重新编辑是“发送一条新消息”，不进入编辑态
+  exitEditMode()
+  nextTick(() => messageInputRef.value?.setText?.(originalText))
+}
+
+/** 进入编辑态：仅文本消息 */
+function onEdit(message: Message) {
+  if (!message || message.type !== 'txt') return
+  enterEditMode(message)
+  const originalText = (message as unknown as { msg?: string }).msg || ''
+  nextTick(() => messageInputRef.value?.setText?.(originalText))
+}
+
+/** 切换译文/原文 */
+function onToggleTranslation(message: Message) {
+  toggleTranslation(message.id)
+}
+
+/** 置顶横幅配置 */
+const pinnedBarConfig = computed(() => props.config?.messageList?.pinnedBar)
+const showPinnedBar = computed(() => pinnedBarConfig.value?.visible !== false)
+const pinnedBarMaxLength = computed(() => pinnedBarConfig.value?.maxPreviewLength ?? 30)
+
+/** 在消息列表中定位置顶消息 */
+function onPinnedLocate(message: Message) {
+  const target = message.mid || message.id
+  if (target) requestLocate(target)
 }
 
 /** Header 配置 */
@@ -100,8 +125,9 @@ const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.
 watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id) return
 
-  // 会话切换：清空引用状态，避免跨会话残留
+  // 会话切换：清空引用状态与编辑态，避免跨会话残留
   clearQuote()
+  exitEditMode()
 
   // 发送会话已读回执（内部已做未读数为 0 跳过；单聊/群聊均适用）
   sendChannelAck(cvs.id)
@@ -111,6 +137,9 @@ watch(currentConversation, async (cvs, oldCvs) => {
   if (existingMsgs.length === 0) {
     await fetchHistoryMessages()
   }
+
+  // 拉取服务端置顶消息列表
+  fetchPinnedMessages()
 }, { immediate: true })
 
 /** 多选模式底部操作 */
@@ -170,8 +199,15 @@ function onMultiSelectDelete() {
       </slot>
     </div>
 
+    <!-- 置顶横幅 -->
+    <PinnedBar
+      v-if="showPinnedBar && currentConversation"
+      :max-preview-length="pinnedBarMaxLength"
+      @locate="onPinnedLocate"
+    />
+
     <!-- 消息列表 -->
-    <MessageList :config="props.config" @reedit="onReedit" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
+    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
 
     <!-- 多选模式底部操作栏 -->
     <div v-if="isMultiSelectMode" class="chat__multi-select-bar">

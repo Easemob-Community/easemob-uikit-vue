@@ -6,10 +6,12 @@ import { useViewport } from '../../composables/use-viewport'
 import { useToast } from '../../composables/use-toast'
 import SimpleInput from './message-input/simple-input.vue'
 import RichInput from './message-input/rich-input.vue'
+import EditingBar from './message-input/editing-bar.vue'
 import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
 import MentionPicker from './mention/mention-picker.vue'
 import Popup from '../../components/popup/popup.vue'
 import QuoteBar from './quote/quote-bar.vue'
+import { useLocale } from '../../locale'
 import type { ChatConfig, MentionContact } from './types'
 
 export interface MessageInputProps {
@@ -20,10 +22,11 @@ export interface MessageInputProps {
 
 const props = defineProps<MessageInputProps>()
 
-const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage } = useChat()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
+const { t } = useLocale()
 
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
@@ -80,15 +83,48 @@ function buildExtWithQuote(): Record<string, any> | undefined {
   return { ...buildQuoteExt(quotedMessage.value) }
 }
 
-/** 发送文本消息 */
+/** 取消编辑：退出编辑态并清空输入 */
+function handleCancelEdit() {
+  exitEditMode()
+  setText('')
+}
+
+/** 发送文本消息（或提交编辑） */
 function handleSendText(text: string) {
+  // 编辑模式：改为调用 modifyMessage
+  if (editingMessage.value) {
+    const target = editingMessage.value
+    modifyTextMessage(target, text)
+      .then(() => setText(''))
+      .catch((e: any) => {
+        const code = e?.type ?? e?.code
+        const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
+          ? t('message.edit.limitReached')
+          : t('message.edit.failed')
+        showToast(msg)
+      })
+    return
+  }
   const ext = buildExtWithQuote()
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
   clearQuote()
 }
 
-/** 发送富文本消息 */
+/** 发送富文本消息（或提交编辑） */
 function handleSendRich(_html: string, text: string) {
+  if (editingMessage.value) {
+    const target = editingMessage.value
+    modifyTextMessage(target, text)
+      .then(() => setText(''))
+      .catch((e: any) => {
+        const code = e?.type ?? e?.code
+        const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
+          ? t('message.edit.limitReached')
+          : t('message.edit.failed')
+        showToast(msg)
+      })
+    return
+  }
   const ext = buildExtWithQuote()
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
   clearQuote()
@@ -303,9 +339,16 @@ defineExpose({
 
 <template>
   <div ref="messageInputRef" class="message-input">
+    <!-- 编辑条：优先于引用条 -->
+    <EditingBar
+      v-if="editingMessage"
+      :message="editingMessage"
+      @close="handleCancelEdit"
+    />
+
     <!-- 引用条 -->
     <QuoteBar
-      v-if="quotedMessage"
+      v-if="!editingMessage && quotedMessage"
       :message="quotedMessage"
       @close="clearQuote"
     />

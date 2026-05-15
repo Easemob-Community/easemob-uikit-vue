@@ -63,12 +63,21 @@ const actions = computed<MessageActionItem[]>(() => {
     items.push({ type, label, icon, danger, disabled, disabledTip })
   }
 
-  if (cfg?.enableQuote !== false) add('quote', t('message.action.quote') ?? '引用', 'chat/3lines_n_arrow')
-  if (cfg?.enableCopy !== false) add('copy', t('message.action.copy') ?? '复制', 'actions/check_2')
-  if (cfg?.enableForward !== false) add('forward', t('message.action.forward') ?? '转发', 'chat/airplane')
+  if (cfg?.enableQuote !== false) add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
+  if (cfg?.enableCopy !== false) add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
+  if (cfg?.enableForward !== false) add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false) add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
-  if (cfg?.enableTranslate) add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
-  if (cfg?.enablePin) add('pin', t('message.action.pin') ?? '置顶', 'actions/star')
+  // 翻译：仅文本消息可翻译，其他类型不展示
+  if (cfg?.enableTranslate !== false && props.message.type === 'txt') {
+    add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
+  }
+  if (cfg?.enablePin !== false && !props.message.recalled) {
+    if (props.message.pinned) {
+      add('unpin', t('message.action.unpin') ?? '取消置顶', 'chat/unpin')
+    } else {
+      add('pin', t('message.action.pin') ?? '置顶', 'chat/pin')
+    }
+  }
   if (cfg?.enableRecall !== false && props.message.isSelf && !props.message.recalled) {
     const expired = isRecallExpired.value
     const minutes = recallDurationMinutes.value
@@ -79,6 +88,25 @@ const actions = computed<MessageActionItem[]>(() => {
       false,
       expired,
       t('message.recallExpired').replace('{duration}', String(minutes)) ?? `超过${minutes}分钟，无法撤回`,
+    )
+  }
+  // 编辑：仅自己发送的文本消息（环信 SDK modifyMessage 仅文本类支持），且未被撤回
+  if (
+    cfg?.enableEdit !== false
+    && props.message.isSelf
+    && !props.message.recalled
+    && props.message.type === 'txt'
+  ) {
+    // SDK modifyMessage 单条消息编辑次数上限为 5 次
+    const count = props.message.modifiedInfo?.operationCount ?? 0
+    const limitReached = count >= 5
+    add(
+      'edit',
+      t('message.action.edit') ?? '编辑',
+      'chat/modifyMsg',
+      false,
+      limitReached,
+      t('message.edit.limitReached') ?? '此消息编辑次数已达上限',
     )
   }
   if (cfg?.enableDelete !== false) add('delete', t('message.action.delete') ?? '删除', 'actions/trash', true)
