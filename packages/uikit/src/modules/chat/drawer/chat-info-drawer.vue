@@ -4,6 +4,7 @@ import ChatDrawer from './chat-drawer.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useThemeStore } from '../../../store/theme'
+import { useLocale } from '../../../locale'
 import type { Conversation } from '../../../store/conversation'
 
 export interface ChatInfoDrawerProps {
@@ -19,6 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const themeStore = useThemeStore()
+const { t } = useLocale()
 const closeBtnClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : ''
 )
@@ -42,7 +44,7 @@ const groupMembers = ref([
 ])
 
 /** 当前名称/备注 */
-const displayName = computed(() => props.conversation?.name || '未命名')
+const displayName = computed(() => props.conversation?.name || t('chat.info.unnamed'))
 
 /** 关闭抽屉 */
 function onClose() {
@@ -78,7 +80,7 @@ function onLeaveOrDelete() {
           <Icon name="arrows/arrow_left_thick" :size="16" />
         </button>
         <span class="chat-info-drawer__title">
-          {{ isGroup ? '群聊信息' : '好友信息' }}
+          {{ isGroup ? t('chat.info.titleGroup') : t('chat.info.titleFriend') }}
         </span>
         <button class="chat-info-drawer__close" :class="closeBtnClass" @click="onClose">
           <Icon name="actions/xmark_thick" :size="16" />
@@ -95,26 +97,26 @@ function onLeaveOrDelete() {
 
     <!-- 单聊：备注编辑 -->
     <div v-if="!isGroup" class="chat-info-drawer__section">
-      <div class="chat-info-drawer__section-title">备注</div>
+      <div class="chat-info-drawer__section-title">{{ t('chat.info.remark') }}</div>
       <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
-        <span>{{ remarkInput || '点击设置备注' }}</span>
+        <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
         <Icon name="misc/edit" :size="16" />
       </div>
       <div v-else class="chat-info-drawer__remark-edit">
         <input
           v-model="remarkInput"
           class="chat-info-drawer__remark-input"
-          placeholder="输入备注名"
+          :placeholder="t('chat.info.remarkInputPlaceholder')"
           @keydown.enter="saveRemark"
         />
-        <button class="chat-info-drawer__remark-save" @click="saveRemark">保存</button>
+        <button class="chat-info-drawer__remark-save" @click="saveRemark">{{ t('chat.info.save') }}</button>
       </div>
     </div>
 
     <!-- 群聊：成员列表（纵向滚动） -->
     <div v-if="isGroup" class="chat-info-drawer__section">
       <div class="chat-info-drawer__section-title">
-        群成员 <span class="chat-info-drawer__count">({{ groupMembers.length }})</span>
+        {{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ groupMembers.length }})</span>
       </div>
       <div class="chat-info-drawer__member-list">
         <div v-for="member in groupMembers" :key="member.id" class="chat-info-drawer__member-row">
@@ -131,7 +133,7 @@ function onLeaveOrDelete() {
           class="chat-info-drawer__action-btn chat-info-drawer__action-btn--danger"
           @click="onLeaveOrDelete"
         >
-          {{ isGroup ? '退出群聊' : '删除好友' }}
+          {{ isGroup ? t('chat.info.leaveGroup') : t('chat.info.deleteFriend') }}
         </button>
       </div>
     </template>

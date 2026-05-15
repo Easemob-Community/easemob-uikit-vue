@@ -85,6 +85,16 @@ const messages: LocaleMessages = {
   'message.translate.showTranslated': 'Show translation',
   'message.translate.provider': 'Translated by provider',
   'chat.pinnedBar.count': '{count} pinned messages',
+  'chat.info.titleGroup': 'Group Info',
+  'chat.info.titleFriend': 'Friend Info',
+  'chat.info.unnamed': 'Unnamed',
+  'chat.info.remark': 'Remark',
+  'chat.info.remarkPlaceholder': 'Click to set remark',
+  'chat.info.remarkInputPlaceholder': 'Enter remark',
+  'chat.info.save': 'Save',
+  'chat.info.groupMembers': 'Group Members',
+  'chat.info.leaveGroup': 'Leave Group',
+  'chat.info.deleteFriend': 'Delete Friend',
 }
 
 export default messages

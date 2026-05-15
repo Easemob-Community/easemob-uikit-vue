@@ -41,18 +41,18 @@ const cursor = ref(0)
 
 const currentItem = computed(() => pinnedList.value[cursor.value] || pinnedList.value[0])
 
-/** 单条预览文本 */
+/** 单条预览文本（直接复用 locale 中已带方括号的预览文案，避免再拼接） */
 function previewOf(msg: Message): string {
   const max = props.maxPreviewLength
   if (msg.type === 'txt') {
     const text = (msg as EasemobChat.TextMsgBody).msg || ''
     return text.length > max ? text.slice(0, max) + '\u2026' : text
   }
-  if (msg.type === 'img') return `[${t('message.preview.image') || '图片'}]`
-  if (msg.type === 'audio') return `[${t('message.preview.voice') || '语音'}]`
-  if (msg.type === 'video') return `[${t('message.preview.video') || '视频'}]`
-  if (msg.type === 'file') return `[${t('message.preview.file') || '文件'}]`
-  return `[${t('message.preview.message') || '消息'}]`
+  if (msg.type === 'img') return t('message.image') || '[图片]'
+  if (msg.type === 'audio') return t('message.audio') || '[语音]'
+  if (msg.type === 'video') return t('message.video') || '[视频]'
+  if (msg.type === 'file') return t('message.file') || '[文件]'
+  return t('message.custom') || '[消息]'
 }
 
 function onLocate(msg: Message) {

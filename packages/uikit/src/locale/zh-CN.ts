@@ -85,6 +85,16 @@ const messages: LocaleMessages = {
   'message.translate.showTranslated': '查看译文',
   'message.translate.provider': '由翻译服务提供',
   'chat.pinnedBar.count': '{count} 条置顶消息',
+  'chat.info.titleGroup': '群聊信息',
+  'chat.info.titleFriend': '好友信息',
+  'chat.info.unnamed': '未命名',
+  'chat.info.remark': '备注',
+  'chat.info.remarkPlaceholder': '点击设置备注',
+  'chat.info.remarkInputPlaceholder': '输入备注名',
+  'chat.info.save': '保存',
+  'chat.info.groupMembers': '群成员',
+  'chat.info.leaveGroup': '退出群聊',
+  'chat.info.deleteFriend': '删除好友',
 }
 
 export default messages
