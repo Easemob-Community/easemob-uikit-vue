@@ -173,7 +173,9 @@ export function useChat() {
    */
   function _onSendResult(msgId: string, error?: unknown, serverMsg?: EasemobChat.ExcludeAckMessageBody) {
     if (error) {
-      messageStore.updateMessageStatus(msgId, MESSAGE_STATUS.FAILED)
+      const reason = error instanceof Error ? error.message : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error))
+      console.error(`[useChat] sendMessage failed (msgId=${msgId}):`, error)
+      messageStore.updateMessageById(msgId, { status: MESSAGE_STATUS.FAILED, failReason: reason })
     } else {
       if (serverMsg) {
         messageStore.replaceMessageById(msgId, serverMsg)
@@ -550,11 +552,16 @@ export function useChat() {
     messageStore.setTranslating(msgId, true)
     try {
       const result = await _getClient().translateMessage({ text, languages: [lang] })
-      const translation = result?.data?.translations?.[0]
+      console.log('[useChat] translateMessage raw result:', JSON.stringify(result))
+      // SDK AsyncResult<TranslationResult> — data 可能为对象或数组，兼容处理
+      const data = result?.data
+      const translationResult = Array.isArray(data) ? data[0] : data
+      const translation = translationResult?.translations?.[0]
       if (translation) {
         messageStore.setTranslation(msgId, { text: translation.text, to: translation.to })
       } else {
         messageStore.setTranslating(msgId, false)
+        console.warn('[useChat] translateMessage: no translation in response, data:', data)
       }
     } catch (e) {
       messageStore.setTranslating(msgId, false)

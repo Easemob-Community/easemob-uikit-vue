@@ -83,6 +83,7 @@ const messages: LocaleMessages = {
   'message.translate.loading': '翻译中…',
   'message.translate.showOriginal': '显示原文',
   'message.translate.showTranslated': '查看译文',
+  'message.translate.provider': '由翻译服务提供',
   'chat.pinnedBar.count': '{count} 条置顶消息',
 }
 

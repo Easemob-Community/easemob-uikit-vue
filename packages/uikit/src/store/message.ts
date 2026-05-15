@@ -48,6 +48,8 @@ export interface MessageUiExtension {
   showTranslation?: boolean
   /** 翻译请求中 */
   translating?: boolean
+  /** 消息发送失败原因 */
+  failReason?: string
 }
 
 /**

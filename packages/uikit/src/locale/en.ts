@@ -83,6 +83,7 @@ const messages: LocaleMessages = {
   'message.translate.loading': 'Translating...',
   'message.translate.showOriginal': 'Show original',
   'message.translate.showTranslated': 'Show translation',
+  'message.translate.provider': 'Translated by provider',
   'chat.pinnedBar.count': '{count} pinned messages',
 }
 
