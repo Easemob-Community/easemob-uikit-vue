@@ -28,7 +28,7 @@ export interface MessageListEmits {
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage } = useChat()
+const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor, clearHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { t } = useLocale()
@@ -63,8 +63,11 @@ const enableLoadHistory = computed(() => loadHistoryConfig.value?.enable !== fal
 /** 历史加载模式 */
 const historyMode = computed(() => {
   const mode = loadHistoryConfig.value?.mode ?? 'auto'
-  if (mode === 'auto') return isMobile.value ? 'pull-down' : 'scroll-top'
-  return mode
+  if (mode !== 'auto') return mode
+  // PC 端（非触摸设备）强制使用 scroll-top，移动端使用 pull-down
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  if (!isTouchDevice) return 'scroll-top'
+  return isMobile.value ? 'pull-down' : 'scroll-top'
 })
 
 /** 历史消息分页游标 */
@@ -82,18 +85,51 @@ const isAtBottom = ref(true)
 /** 未读新消息数 */
 const unreadNewCount = ref(0)
 
-/** 滚动状态 */
+/** 滚动状态 —— 仅普通滚动模式使用 */
 const { arrivedState } = useScroll(listRef, { throttle: 100 })
 
-/** 监听滚动到底部状态 */
+/** 监听滚动到底部状态（普通滚动模式） */
 watch(() => arrivedState.bottom, (bottom) => {
-  isAtBottom.value = bottom
-  if (bottom && unreadNewCount.value > 0) {
-    unreadNewCount.value = 0
+  if (!enableVirtual.value) {
+    isAtBottom.value = bottom
+    if (bottom && unreadNewCount.value > 0) {
+      unreadNewCount.value = 0
+    }
   }
 })
 
-/** 监听消息变化，处理智能滚动 */
+/** 虚拟列表滚动事件处理 */
+function onVirtualScroll(event: Event) {
+  const el = event.target as HTMLElement
+  if (!el) return
+  const threshold = 2
+  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
+  isAtBottom.value = atBottom
+  if (atBottom && unreadNewCount.value > 0) {
+    unreadNewCount.value = 0
+  }
+}
+
+/** 监听当前会话切换，重置状态并滚动到底部
+ *  ⚠️ 切勿改回监听 messages.value 引用：prependMessages 加载历史时也会替换数组引用，
+ *     会被误判为切换会话从而把列表强制滚到底部，导致触顶加载只能触发一次。 */
+watch(
+  () => currentConversation.value?.id,
+  (cvsId) => {
+    if (!cvsId) return
+    unreadNewCount.value = 0
+    isAtBottom.value = true
+    // 同步 cursor 状态：如果 useChat 已经加载过历史，使用缓存
+    const cached = getHistoryCursor(cvsId)
+    historyCursor.value = cached.cursor
+    hasMoreHistory.value = !cached.isLast
+    loadingHistory.value = false
+    scrollToBottom()
+  },
+  { flush: 'post', immediate: true }
+)
+
+/** 监听消息数量变化，处理新消息到达时的智能滚动 */
 watch(
   () => messages.value.length,
   (newLen, oldLen) => {
@@ -135,12 +171,19 @@ function onNewMessageTipClick() {
 async function loadMoreHistory() {
   if (loadingHistory.value || !hasMoreHistory.value) return
   loadingHistory.value = true
-  // 记录加载前的滚动位置，用于加载后恢复
-  const container = listRef.value
+
+  // 根据当前模式选择正确的容器和恢复方式
+  const isVirtual = enableVirtual.value
+  const container = isVirtual
+    ? (virtualListRef.value as unknown as { listRef?: HTMLElement } | undefined)?.listRef
+    : listRef.value
+
   const prevScrollHeight = container?.scrollHeight ?? 0
   const prevScrollTop = container?.scrollTop ?? 0
+
   try {
-    const result = await fetchHistoryMessages(historyCursor.value || undefined)
+    // fetchHistoryMessages 内部会自动管理 cursor，无需传入
+    const result = await fetchHistoryMessages()
     if (result) {
       historyCursor.value = result.cursor
       // SDK 返回 isLast 表示是否为最后一页
@@ -155,24 +198,33 @@ async function loadMoreHistory() {
     hasMoreHistory.value = false
   }
   loadingHistory.value = false
+
   // 恢复滚动位置：加载后 scrollHeight 变化了，需要补偿 scrollTop
-  if (container && prevScrollHeight > 0) {
+  if (isVirtual && virtualListRef.value) {
+    // 虚拟列表模式：通过组件方法恢复
+    (virtualListRef.value as unknown as { preserveScrollPosition?: (t: number, h: number) => void })?.preserveScrollPosition?.(prevScrollTop, prevScrollHeight)
+  } else if (container && prevScrollHeight > 0) {
+    // 普通滚动模式：直接操作 DOM，确保恢复后 scrollTop > threshold 避免立即再次触发
     await nextTick()
     const newScrollHeight = container.scrollHeight
-    container.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight)
+    const targetScrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight)
+    container.scrollTop = Math.max(targetScrollTop, 60)
   }
 }
 
-/** PC 端：滚动到顶部加载 */
-useInfiniteScroll(
-  listRef,
-  () => {
-    if (historyMode.value === 'scroll-top' && enableLoadHistory.value) {
-      loadMoreHistory()
-    }
-  },
-  { distance: 50 }
-)
+/** PC 端：滚动到顶部加载（自定义实现，避免 useInfiniteScroll 空容器疯狂触发） */
+function onNativeScroll(event: Event) {
+  const el = event.target as HTMLElement
+  if (!el) return
+  if (historyMode.value !== 'scroll-top' || !enableLoadHistory.value) return
+  if (loadingHistory.value || !hasMoreHistory.value) return
+  if (messages.value.length === 0) return
+
+  const threshold = 50
+  if (el.scrollTop <= threshold) {
+    loadMoreHistory()
+  }
+}
 
 /** H5 端：下拉加载 */
 const { isPulling, isRefreshing, pullDistance } = usePullRefresh(listRef, {
@@ -432,6 +484,7 @@ watch(locateRequest, (req) => {
       key-field="key"
       :estimate-height="80"
       @reach-top="loadMoreHistory"
+      @scroll="onVirtualScroll"
     >
       <template #default="{ item }">
         <!-- 时间分割线 -->
@@ -457,7 +510,7 @@ watch(locateRequest, (req) => {
     </MessageVirtualList>
 
     <!-- 普通滚动模式 -->
-    <div v-else ref="listRef" class="message-list__scroll">
+    <div v-else ref="listRef" class="message-list__scroll" @scroll="onNativeScroll">
       <div
         v-for="item in messagesWithDividers"
         :key="item.key"

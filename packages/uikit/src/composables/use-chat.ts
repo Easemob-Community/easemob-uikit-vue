@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import { useLocale } from '../locale'
-import type { Message } from '../store/message'
+import type { Message, MessageStoreOptions } from '../store/message'
 import type { Conversation } from '../store/conversation'
 import { MESSAGE_STATUS, MESSAGE_TYPE, CONVERSATION_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
@@ -25,6 +25,21 @@ const selectedMessageIds = ref<Set<string>>(new Set())
 const editingMessage = ref<Message | null>(null)
 /** SDK 限制：单条消息最多可被修改 5 次 */
 const MODIFY_LIMIT = 5
+
+// ===== 历史消息加载游标（会话维度，模块级单例） =====
+const historyCursorMap = ref<Record<string, { cursor: string; isLast: boolean }>>({})
+
+function getHistoryCursor(conversationId: string) {
+  return historyCursorMap.value[conversationId] || { cursor: '', isLast: false }
+}
+
+function setHistoryCursor(conversationId: string, cursor: string, isLast: boolean) {
+  historyCursorMap.value[conversationId] = { cursor, isLast }
+}
+
+function clearHistoryCursor(conversationId: string) {
+  delete historyCursorMap.value[conversationId]
+}
 
 function enterMultiSelectMode() {
   isMultiSelectMode.value = true
@@ -69,11 +84,22 @@ function exitEditMode() {
   editingMessage.value = null
 }
 
-export function useChat() {
+/** useChat 配置选项 */
+export interface UseChatOptions {
+  /** 消息 store 配置 */
+  messageStoreOptions?: MessageStoreOptions
+}
+
+export function useChat(options?: UseChatOptions) {
   const { stores } = useUIKit()
   const { locale, t } = useLocale()
   const messageStore = stores.message
   const conversationStore = stores.conversation
+
+  // 初始化消息 store 配置（只执行一次）
+  if (options?.messageStoreOptions) {
+    messageStore.setOptions(options.messageStoreOptions)
+  }
 
   const messages = computed(() => {
     const cvsId = conversationStore.currentConversation?.id
@@ -383,12 +409,17 @@ export function useChat() {
   async function fetchHistoryMessages(cursor?: string) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return { messages: [] as Message[], cursor: '', isLast: true }
+
+    // 如果没有传入 cursor，尝试从缓存获取
+    const cached = getHistoryCursor(cvs.id)
+    const actualCursor = cursor ?? cached.cursor
+
     try {
       const result = await _getClient().getHistoryMessages({
         targetId: cvs.id,
         chatType: cvs.type,
         pageSize: 20,
-        cursor: cursor ?? '',
+        cursor: actualCursor,
       })
       const rawMsgs = (result.messages || []).filter(
         (m): m is EasemobChat.ExcludeAckMessageBody => m.type !== 'read' && m.type !== 'delivery' && m.type !== 'channel',
@@ -415,10 +446,18 @@ export function useChat() {
         } as Message
       })
       messageStore.prependMessages(cvs.id, historyMsgs)
+
+      // 更新 cursor 缓存
+      // SDK 在最后一页可能返回字符串字面量 'undefined'/'null'，需清洗为空串
+      const rawCursor = result.cursor
+      const newCursor = (rawCursor && rawCursor !== 'undefined' && rawCursor !== 'null') ? rawCursor : ''
+      const isLast = result.isLast || historyMsgs.length === 0 || !newCursor
+      setHistoryCursor(cvs.id, newCursor, isLast)
+
       return {
         messages: historyMsgs,
-        cursor: result.cursor || '',
-        isLast: result.isLast,
+        cursor: newCursor,
+        isLast,
       }
     } catch (e) {
       console.error('[useChat] fetchHistoryMessages failed:', e)
@@ -1014,5 +1053,8 @@ export function useChat() {
     translateTextMessage,
     toggleTranslation,
     MODIFY_LIMIT,
+    // 历史消息游标
+    getHistoryCursor,
+    clearHistoryCursor,
   }
 }

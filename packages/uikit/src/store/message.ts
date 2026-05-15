@@ -68,6 +68,12 @@ export type AudioMessageType = Extract<Message, { type: 'audio' }>
 export type VideoMessageType = Extract<Message, { type: 'video' }>
 export type FileMessageType = Extract<Message, { type: 'file' }>
 
+/** MessageStore 配置选项 */
+export interface MessageStoreOptions {
+  /** 单个会话最大消息存储数，默认 300 */
+  maxMessageCount?: number
+}
+
 export const useMessageStore = defineStore('message', () => {
   const messageMap = ref<Record<string, Message[]>>({})
   const sendingMessages = ref<Set<string>>(new Set())
@@ -78,6 +84,22 @@ export const useMessageStore = defineStore('message', () => {
    * 避免重复调用 downloadAndParseCombineMessage。
    */
   const parsedCombineMessageMap = ref<Record<string, EasemobChat.ExcludeAckMessageBody[]>>({})
+
+  /** 单个会话消息存储上限，默认 300 */
+  let maxMessageCount = 300
+
+  /** 设置 store 配置 */
+  function setOptions(options?: MessageStoreOptions) {
+    if (options?.maxMessageCount !== undefined && options.maxMessageCount > 0) {
+      maxMessageCount = options.maxMessageCount
+    }
+  }
+
+  /** 裁剪消息列表，保留最新的 maxMessageCount 条 */
+  function trimMessages(list: Message[]): Message[] {
+    if (list.length <= maxMessageCount) return list
+    return list.slice(-maxMessageCount)
+  }
 
   function getMessages(conversationId: string): Message[] {
     return messageMap.value[conversationId] || []
@@ -103,7 +125,7 @@ export const useMessageStore = defineStore('message', () => {
       list.push(msg)
       // 按 timestamp 升序排列，确保消息顺序正确
       list.sort((a, b) => a.timestamp - b.timestamp)
-      messageMap.value[msg.conversationId] = list
+      messageMap.value[msg.conversationId] = trimMessages(list)
     }
   }
 
@@ -114,7 +136,7 @@ export const useMessageStore = defineStore('message', () => {
     const newMsgs = messages.filter((m: Message) => !existingIds.has(m.id))
     const merged = [...newMsgs, ...existing]
     merged.sort((a, b) => a.timestamp - b.timestamp)
-    messageMap.value[conversationId] = merged
+    messageMap.value[conversationId] = trimMessages(merged)
   }
 
   /** 按 id 查找并局部更新消息 */
@@ -362,6 +384,7 @@ export const useMessageStore = defineStore('message', () => {
     sendingMessages,
     pinnedMessageMap,
     parsedCombineMessageMap,
+    setOptions,
     getMessages,
     getPinnedMessages,
     addMessage,

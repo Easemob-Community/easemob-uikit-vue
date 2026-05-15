@@ -30,7 +30,11 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
-const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
+const messageStoreOptions = computed(() => ({
+  maxMessageCount: props.config?.messageList?.maxMessageCount,
+}))
+
+const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat({ messageStoreOptions: messageStoreOptions.value })
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { clearQuote, requestLocate } = useQuote()

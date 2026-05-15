@@ -55,6 +55,8 @@ export interface ChatConfig {
       /** 加载模式，默认 'auto'（自动适配端型） */
       mode?: LoadHistoryMode
     }
+    /** 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300 */
+    maxMessageCount?: number
     /** 置顶横幅配置 */
     pinnedBar?: {
       /** 是否显示顶部置顶条，默认 true */
