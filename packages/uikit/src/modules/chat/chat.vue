@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick, provide } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
@@ -31,6 +31,9 @@ const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
 const { t } = useLocale()
+
+/** 向后代组件提供 textMessage 配置（链接识别 & 拦截器） */
+provide('textMessageConfig', computed(() => props.config?.textMessage))
 
 /** 输入框组件引用 */
 const messageInputRef = ref<InstanceType<typeof MessageInput>>()

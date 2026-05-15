@@ -134,6 +134,18 @@ export interface ChatConfig {
       onlyInGroup?: boolean
     }
   }
+  /** 文本消息配置 */
+  textMessage?: {
+    /** 是否启用 URL 识别为可点击链接，默认 true */
+    enableLinkify?: boolean
+    /**
+     * 链接点击拦截器
+     * - 返回 false：阻止跳转
+     * - 返回 string：跳转到返回值指定的地址
+     * - 返回 void / undefined / true：默认行为（跳转原始 URL）
+     */
+    onLinkClick?: (url: string) => boolean | string | void
+  }
 }
 
 /** 消息操作类型 */

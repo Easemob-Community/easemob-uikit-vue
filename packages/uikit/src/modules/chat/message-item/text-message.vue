@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
+import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
+import { linkify } from '../../../utils/linkify'
 import Icon from '../../../components/icon/icon.vue'
 import type { TextMessageType } from '../../../store/message'
+import type { ChatConfig } from '../types'
 
 export interface TextMessageProps {
   message: TextMessageType
@@ -23,6 +26,33 @@ const bubbleClass = computed(() =>
 )
 
 const { t } = useLocale()
+
+/** 注入 textMessage 配置（由 chat.vue provide） */
+const textMessageConfig = inject<ComputedRef<ChatConfig['textMessage'] | undefined>>('textMessageConfig', computed(() => undefined))
+
+/** 是否启用链接识别，默认 true */
+const enableLinkify = computed(() => textMessageConfig.value?.enableLinkify !== false)
+
+/** 链接点击拦截器 */
+const linkClickHandler = computed(() => textMessageConfig.value?.onLinkClick)
+
+/** 消息文本 linkify 分片 */
+const msgSegments = computed(() => {
+  if (!enableLinkify.value) return null
+  return linkify(props.message.msg || '')
+})
+
+/** 译文文本 linkify 分片 */
+const translationSegments = computed(() => {
+  if (!enableLinkify.value) return null
+  const text = props.message.translation?.text
+  if (!text) return null
+  return linkify(text)
+})
+
+/** 是否含有链接（用于决定是否用分片渲染） */
+const hasLinks = computed(() => !!msgSegments.value?.some(s => s.type === 'link'))
+const translationHasLinks = computed(() => !!translationSegments.value?.some(s => s.type === 'link'))
 
 /** 是否显示重新编辑 */
 const showReedit = computed(() => props.message.recalled && props.message.isSelf && props.message.originalMsg)
@@ -49,6 +79,24 @@ function onReedit() {
 function onToggleTranslation() {
   emit('toggle-translation', props.message)
 }
+
+/** 链接点击处理：支持拦截器 */
+function onLinkClick(url: string, event: MouseEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const handler = linkClickHandler.value
+  if (handler) {
+    const result = handler(url)
+    if (result === false) return
+    if (typeof result === 'string') {
+      window.open(result, '_blank', 'noopener,noreferrer')
+      return
+    }
+  }
+  // 默认行为：新窗口打开
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <template>
@@ -67,7 +115,24 @@ function onToggleTranslation() {
     <template v-else>
       <div class="text-message__bubble" :class="bubbleClass">
         <div class="text-message__content">
-          {{ props.message.msg }}
+          <!-- 启用 linkify 且包含链接时用分片渲染 -->
+          <template v-if="hasLinks && msgSegments">
+            <template v-for="(seg, idx) in msgSegments" :key="idx">
+              <a
+                v-if="seg.type === 'link'"
+                class="text-message__link"
+                :href="seg.href"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="onLinkClick(seg.href!, $event)"
+              >{{ seg.value }}</a>
+              <span v-else>{{ seg.value }}</span>
+            </template>
+          </template>
+          <!-- 无链接时纤文本渲染 -->
+          <template v-else>
+            {{ props.message.msg }}
+          </template>
           <span
             v-if="isModified"
             class="text-message__edited"
@@ -86,7 +151,22 @@ function onToggleTranslation() {
         <!-- 已有译文：显示译文 -->
         <template v-else-if="showTranslated">
           <div class="text-message__translation-text">
-            {{ props.message.translation?.text }}
+            <template v-if="translationHasLinks && translationSegments">
+              <template v-for="(seg, idx) in translationSegments" :key="idx">
+                <a
+                  v-if="seg.type === 'link'"
+                  class="text-message__link text-message__link--translation"
+                  :href="seg.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  @click="onLinkClick(seg.href!, $event)"
+                >{{ seg.value }}</a>
+                <span v-else>{{ seg.value }}</span>
+              </template>
+            </template>
+            <template v-else>
+              {{ props.message.translation?.text }}
+            </template>
           </div>
           <div class="text-message__translation-footer">
             <span class="text-message__translation-provider">
@@ -239,5 +319,29 @@ function onToggleTranslation() {
 
 .text-message__reedit-btn:hover {
   opacity: 0.8;
+}
+
+/* 链接样式 */
+.text-message__link {
+  color: var(--uikit-primary-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  word-break: break-all;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.text-message__link:hover {
+  opacity: 0.8;
+}
+
+.text-message--self .text-message__link {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, 0.7);
+}
+
+.text-message__link--translation {
+  color: var(--uikit-primary-color);
 }
 </style>

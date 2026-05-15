@@ -1,6 +1,7 @@
 // Utility Functions
 export * from './format-time'
 export * from './format-message'
+export * from './linkify'
 
 export function isEmpty(val: unknown): boolean {
   return val === undefined || val === null || val === ''
