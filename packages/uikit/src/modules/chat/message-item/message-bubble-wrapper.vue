@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import MessageRenderer from './message-renderer.vue'
 import MessageInteractive from './message-interactive.vue'
 import QuoteCard from '../quote/quote-card.vue'
+import CombineMessageModal from './combine-message-modal.vue'
 import type { Message } from '../../../store/message'
 import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../../../constants'
@@ -31,6 +32,42 @@ export interface MessageBubbleWrapperEmits {
   (e: 'group-read-click', msgId: string, groupId: string): void
   (e: 'reedit', message: Message): void
   (e: 'toggle-translation', message: Message): void
+  (e: 'resend', message: Message): void
+}
+
+/** 弹窗中嵌套合并消息的层级栈 */
+interface ModalState {
+  show: boolean
+  message: Message | null
+}
+
+const modalStack = ref<ModalState[]>([])
+
+/** 当前最上层弹窗 */
+const topModal = computed(() => {
+  const len = modalStack.value.length
+  return len > 0 ? modalStack.value[len - 1] : null
+})
+
+/** 打开合并消息弹窗 */
+function openCombineModal(message: Message) {
+  modalStack.value.push({ show: true, message })
+}
+
+/** 关闭指定层弹窗 */
+function closeModalAt(index: number) {
+  if (index >= 0 && index < modalStack.value.length) {
+    modalStack.value[index].show = false
+    // 延迟移除，让关闭动画完成
+    setTimeout(() => {
+      modalStack.value.splice(index, 1)
+    }, 300)
+  }
+}
+
+/** 处理嵌套合并消息点击 */
+function onViewCombine(message: Message) {
+  openCombineModal(message)
 }
 
 const props = defineProps<MessageBubbleWrapperProps>()
@@ -216,6 +253,7 @@ const isHighlighted = computed(() => {
               :message="message"
               @reedit="emit('reedit', $event)"
               @toggle-translation="emit('toggle-translation', $event)"
+              @view-combine="onViewCombine"
             >
               <!-- 透传所有类型级插槽 -->
               <template
@@ -247,7 +285,12 @@ const isHighlighted = computed(() => {
           <!-- 已读 -->
           <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
           <!-- 发送失败 -->
-          <span v-else-if="messageStatus === MESSAGE_STATUS.FAILED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed" title="发送失败">&#33;</span>
+          <span
+            v-else-if="messageStatus === MESSAGE_STATUS.FAILED"
+            class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed"
+            title="点击重发"
+            @click.stop="emit('resend', message)"
+          >&#33;</span>
         </div>
 
         <!-- 群已读人数标注 -->
@@ -267,6 +310,16 @@ const isHighlighted = computed(() => {
         </div>
       </div>
     </template>
+
+    <!-- 合并消息弹窗栈：支持嵌套合并消息逐层点击 -->
+    <CombineMessageModal
+      v-for="(modal, idx) in modalStack"
+      :key="modal.message?.id || idx"
+      :show="modal.show"
+      :message="modal.message!"
+      @update:show="(v: boolean) => { if (!v) closeModalAt(idx) }"
+      @view-combine="onViewCombine"
+    />
   </div>
 </template>
 

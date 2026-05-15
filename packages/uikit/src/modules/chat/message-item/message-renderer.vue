@@ -7,6 +7,7 @@ import ImageMessage from './image-message.vue'
 import VoiceMessage from './voice-message.vue'
 import VideoMessage from './video-message.vue'
 import FileMessage from './file-message.vue'
+import CombineMessage from './combine-message.vue'
 
 export interface MessageRendererProps {
   message: Message
@@ -15,6 +16,7 @@ export interface MessageRendererProps {
 export interface MessageRendererEmits {
   (e: 'reedit', message: Message): void
   (e: 'toggle-translation', message: Message): void
+  (e: 'view-combine', message: Message): void
 }
 
 const props = defineProps<MessageRendererProps>()
@@ -27,6 +29,7 @@ const messageComponentMap: Record<string, unknown> = {
   [MESSAGE_TYPE.AUDIO]: VoiceMessage,
   [MESSAGE_TYPE.VIDEO]: VideoMessage,
   [MESSAGE_TYPE.FILE]: FileMessage,
+  combine: CombineMessage,
 }
 
 /** 当前消息对应的渲染组件 */
@@ -64,6 +67,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       :message="message"
       @reedit="emit('reedit', $event)"
       @toggle-translation="emit('toggle-translation', $event)"
+      @view="emit('view-combine', $event)"
     />
 
     <!-- 未识别的消息类型 -->

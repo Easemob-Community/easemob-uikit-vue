@@ -9,6 +9,7 @@ import { useLocale } from '../../../locale'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import MessageVirtualList from './message-virtual-list.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal.vue'
+import Modal from '../../../components/modal/modal.vue'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import type { Message } from '../../../store/message'
 import { useToast } from '../../../composables/use-toast'
@@ -21,12 +22,13 @@ export interface MessageListEmits {
   (e: 'reedit', message: Message): void
   (e: 'recall-failed', error: any, message: Message): void
   (e: 'edit', message: Message): void
+  (e: 'forward', messages: Message[]): void
 }
 
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation } = useChat()
+const { messages, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { t } = useLocale()
@@ -205,7 +207,12 @@ async function onMessageAction(event: MessageActionEvent) {
     return
   }
   if (event.action === 'delete') {
-    // TODO: 删除消息
+    pendingDeleteMessage.value = event.message
+    showDeleteConfirm.value = true
+    return
+  }
+  if (event.action === 'forward') {
+    emit('forward', [event.message])
     return
   }
   if (event.action === 'edit') {
@@ -275,6 +282,16 @@ function onReedit(message: Message) {
   emit('reedit', message)
 }
 
+/** 处理重发失败消息 */
+async function onResend(message: Message) {
+  try {
+    await resendMessage(message)
+  } catch (e: any) {
+    console.warn('[MessageList] resend failed:', e)
+    showToast(e?.message || t('message.resend.failed') || '重发失败')
+  }
+}
+
 /** 处理群已读点击 */
 async function onGroupReadClick(msgId: string, groupId: string) {
   try {
@@ -297,6 +314,10 @@ async function onGroupReadClick(msgId: string, groupId: string) {
 const showGroupReadModal = ref(false)
 const modalReadList = ref<string[]>([])
 const modalUnreadList = ref<string[]>([])
+
+/** 删除确认弹窗状态 */
+const showDeleteConfirm = ref(false)
+const pendingDeleteMessage = ref<Message | null>(null)
 
 /** 处理多选切换 */
 function onToggleSelect(msgId: string) {
@@ -429,6 +450,7 @@ watch(locateRequest, (req) => {
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
+          @resend="onResend"
           @toggle-translation="onToggleTranslation"
         />
       </template>
@@ -457,6 +479,7 @@ watch(locateRequest, (req) => {
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
+          @resend="onResend"
           @toggle-translation="onToggleTranslation"
         />
       </div>
@@ -478,6 +501,18 @@ watch(locateRequest, (req) => {
       :read-list="modalReadList"
       :unread-list="modalUnreadList"
     />
+
+    <!-- 删除确认弹窗 -->
+    <Modal
+      v-model:show="showDeleteConfirm"
+      :title="t('message.action.delete')"
+      :confirm-text="t('button.confirm')"
+      :cancel-text="t('button.cancel')"
+      @confirm="pendingDeleteMessage && deleteMessage(pendingDeleteMessage.id); pendingDeleteMessage = null"
+      @cancel="pendingDeleteMessage = null"
+    >
+      {{ t('message.delete.confirm') }}
+    </Modal>
   </div>
 </template>
 

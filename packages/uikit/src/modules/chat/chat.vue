@@ -10,10 +10,13 @@ import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
+import ForwardModal from './forward-modal.vue'
+import Modal from '../../components/modal/modal.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import type { ChatConfig } from './types'
 import type { Message } from '../../store/message'
+import type { Conversation } from '../../store/conversation'
 
 export interface ChatProps {
   config?: ChatConfig
@@ -26,7 +29,7 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
-const { currentConversation, isMultiSelectMode, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation } = useChat()
+const { currentConversation, isMultiSelectMode, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
@@ -146,13 +149,59 @@ watch(currentConversation, async (cvs, oldCvs) => {
 }, { immediate: true })
 
 /** 多选模式底部操作 */
+/** 转发弹窗显示状态 */
+const showForwardModal = ref(false)
+
+/** 批量删除确认弹窗 */
+const showBatchDeleteConfirm = ref(false)
+
+/** 待转发的消息（单条或多选） */
+const pendingForwardMessages = ref<Message[]>([])
+
+/** 打开转发弹窗 */
+function openForwardModal(messages: Message[]) {
+  if (messages.length === 0) return
+  pendingForwardMessages.value = messages
+  showForwardModal.value = true
+}
+
+/** 执行转发 */
+async function onForwardConfirm(targetConversation: Conversation) {
+  const messages = pendingForwardMessages.value
+  if (messages.length === 0) return
+  try {
+    if (messages.length === 1) {
+      // 单条转发：使用原有逻辑
+      await forwardMessage(messages[0], targetConversation)
+    } else {
+      // 多选转发：使用合并消息 API
+      await forwardCombineMessages(messages, targetConversation)
+    }
+  } catch (e) {
+    console.warn('[Chat] forward messages failed:', e)
+  }
+  pendingForwardMessages.value = []
+}
+
 function onMultiSelectForward() {
-  // TODO: 转发选中的消息
-  exitMultiSelectMode()
+  if (selectedMessages.value.length === 0) {
+    exitMultiSelectMode()
+    return
+  }
+  openForwardModal(selectedMessages.value)
 }
 
 function onMultiSelectDelete() {
-  // TODO: 删除选中的消息
+  if (selectedMessages.value.length === 0) {
+    exitMultiSelectMode()
+    return
+  }
+  showBatchDeleteConfirm.value = true
+}
+
+function onConfirmBatchDelete() {
+  deleteMessages(Array.from(selectedMessageIds.value))
+  showBatchDeleteConfirm.value = false
   exitMultiSelectMode()
 }
 </script>
@@ -210,7 +259,7 @@ function onMultiSelectDelete() {
     />
 
     <!-- 消息列表 -->
-    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
+    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
 
     <!-- 多选模式底部操作栏 -->
     <div v-if="isMultiSelectMode" class="chat__multi-select-bar">
@@ -238,6 +287,23 @@ function onMultiSelectDelete() {
       :is-group="isGroupChat"
       :offset-top="headerHeight"
     />
+
+    <!-- 转发弹窗 -->
+    <ForwardModal
+      v-model:show="showForwardModal"
+      @forward="onForwardConfirm"
+    />
+
+    <!-- 批量删除确认弹窗 -->
+    <Modal
+      v-model:show="showBatchDeleteConfirm"
+      :title="t('message.action.delete')"
+      :confirm-text="t('button.confirm')"
+      :cancel-text="t('button.cancel')"
+      @confirm="onConfirmBatchDelete"
+    >
+      {{ t('message.delete.batchConfirm').replace('{count}', String(selectedMessages.length)) }}
+    </Modal>
   </div>
 </template>
 

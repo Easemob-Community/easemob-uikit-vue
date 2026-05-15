@@ -9,6 +9,14 @@ import { getClient } from '../sdk/client'
 import type { UIKitClient } from '../sdk/client'
 import type { EasemobChat } from 'easemob-websdk'
 
+/** 消息类型到创建参数的映射（用于重发） */
+interface CreateMsgOptions {
+  type: string
+  to: string
+  chatType: EasemobChat.ChatType
+  [key: string]: any
+}
+
 // ===== 多选模式状态（模块级单例，确保同一页面内多处调用共享同一份状态） =====
 const isMultiSelectMode = ref(false)
 const selectedMessageIds = ref<Set<string>>(new Set())
@@ -50,7 +58,7 @@ function exitEditMode() {
 
 export function useChat() {
   const { stores } = useUIKit()
-  const { locale } = useLocale()
+  const { locale, t } = useLocale()
   const messageStore = stores.message
   const conversationStore = stores.conversation
 
@@ -629,6 +637,243 @@ export function useChat() {
     }
   }
 
+  /** 删除单条消息（仅从本地 store 移除） */
+  function deleteMessage(msgId: string) {
+    messageStore.deleteMessage(msgId)
+  }
+
+  /** 批量删除消息（多选模式） */
+  function deleteMessages(msgIds: string[]) {
+    messageStore.deleteMessages(msgIds)
+  }
+
+  /**
+   * 更新目标会话的最后一条消息（用于转发后同步会话列表）
+   */
+  function _updateTargetConversation(targetId: string, targetType: ConversationTypeValue, lastMessageText: string, timestamp: number) {
+    const isGroup = targetType === CONVERSATION_TYPE.GROUPCHAT
+    const patch: Partial<Conversation> = {
+      lastMessage: lastMessageText,
+      lastMessageTime: timestamp,
+      lastMessageType: 'combine',
+      lastMessageSender: isGroup ? (stores.client.currentUser || '') : '',
+    }
+    conversationStore.updateConversation(targetId, patch)
+  }
+
+  /**
+   * 单条转发消息到指定会话
+   * - 文本消息：直接创建新文本消息发送
+   * - 其他类型：通过 ext 携带原始消息信息，创建文本消息发送（带 [转发] 前缀）
+   */
+  async function forwardMessage(message: Message, targetConversation: Conversation) {
+    const client = _getClient()
+
+    if (message.type === 'txt') {
+      const text = (message as unknown as { msg?: string }).msg || ''
+      const sdkMsg = client.createMessage({
+        type: 'txt',
+        to: targetConversation.id,
+        chatType: targetConversation.type as EasemobChat.ChatType,
+        msg: text,
+        ext: message.ext,
+      })
+      try {
+        const result = await client.sendCreatedMessage(sdkMsg)
+        _onSendResult(sdkMsg.id, undefined, result.message)
+        _updateTargetConversation(targetConversation.id, targetConversation.type, text, Date.now())
+      } catch (e) {
+        _onSendResult(sdkMsg.id, e)
+        throw e
+      }
+    } else {
+      // 非文本消息：发送带描述的文本消息，ext 中标记为转发
+      const typeMap: Record<string, string> = {
+        img: '[图片]',
+        audio: '[语音]',
+        video: '[视频]',
+        file: '[文件]',
+        custom: '[自定义消息]',
+        loc: '[位置]',
+      }
+      const desc = typeMap[message.type] || '[消息]'
+      const sdkMsg = client.createMessage({
+        type: 'txt',
+        to: targetConversation.id,
+        chatType: targetConversation.type as EasemobChat.ChatType,
+        msg: desc,
+        ext: {
+          ...(message.ext || {}),
+          uikitForward: {
+            originalType: message.type,
+            originalFrom: message.from,
+            originalTime: message.timestamp,
+          },
+        },
+      })
+      try {
+        const result = await client.sendCreatedMessage(sdkMsg)
+        _onSendResult(sdkMsg.id, undefined, result.message)
+        _updateTargetConversation(targetConversation.id, targetConversation.type, desc, Date.now())
+      } catch (e) {
+        _onSendResult(sdkMsg.id, e)
+        throw e
+      }
+    }
+  }
+
+  /** 合并消息最大条数 */
+  const COMBINE_MAX_COUNT = 300
+
+  /**
+   * 多选转发：使用环信合并消息 API（Combine.create）
+   * - 仅允许转发成功发送/接收的消息（status === SENT）
+   * - 最多 300 条消息
+   * - 支持嵌套，最多 10 层（由 SDK 控制）
+   */
+  async function forwardCombineMessages(messages: Message[], targetConversation: Conversation) {
+    const client = _getClient()
+
+    // 过滤：只有成功发送或接收的消息才能合并转发
+    const validMessages = messages.filter(m => m.status === MESSAGE_STATUS.SENT && !m.recalled)
+    if (validMessages.length === 0) {
+      throw new Error(t('message.forward.noValidMessages') || '没有可转发的消息')
+    }
+    if (validMessages.length > COMBINE_MAX_COUNT) {
+      throw new Error(t('message.forward.tooMany').replace('{max}', String(COMBINE_MAX_COUNT)) || `最多支持 ${COMBINE_MAX_COUNT} 条消息`)
+    }
+
+    // 构建合并消息的 messageList（需要 SDK 原始消息格式）
+    const messageList: EasemobChat.CombineMsgList = validMessages.map(m => {
+      // 将 UI Message 转换回 SDK 消息格式（排除 UI 扩展字段）
+      const sdkMsg: Record<string, any> = {}
+      const uiKeys = new Set([
+        'conversationId', 'isSelf', 'status', 'timestamp', 'groupReadCount',
+        'groupMemberCount', 'requireGroupAck', 'recalled', 'recalledBy',
+        'originalMsg', 'mid', 'modified', 'modifiedInfo', 'pinned',
+        'pinTime', 'pinOperatorId', 'translation', 'showTranslation',
+        'translating', 'failReason',
+      ])
+      for (const key in m) {
+        if (!uiKeys.has(key)) {
+          sdkMsg[key] = (m as Record<string, any>)[key]
+        }
+      }
+      return sdkMsg as EasemobChat.CombineMsgList[number]
+    })
+
+    // 构建摘要
+    const summary = validMessages.slice(0, 3).map(m => {
+      const sender = m.from || ''
+      let content = ''
+      switch (m.type) {
+        case 'txt': content = (m as unknown as { msg?: string }).msg || ''; break
+        case 'img': content = '[图片]'; break
+        case 'audio': content = '[语音]'; break
+        case 'video': content = '[视频]'; break
+        case 'file': content = '[文件]'; break
+        case 'custom': content = '[自定义消息]'; break
+        case 'loc': content = '[位置]'; break
+        default: content = '[消息]'
+      }
+      return `${sender}: ${content}`
+    }).join('\n')
+
+    const title = t('message.forward.combineTitle') || '聊天记录'
+    const compatibleText = t('message.forward.combineCompatible') || '[该版本不支持合并消息，请升级]'
+
+    const sdkMsg = client.createMessage({
+      type: 'combine',
+      to: targetConversation.id,
+      chatType: targetConversation.type as EasemobChat.ChatType,
+      title,
+      summary,
+      compatibleText,
+      messageList,
+      onFileUploadComplete: (data: { url: string; secret: string }) => {
+        // 文件上传完成后补全 url 和 secret，否则无法下载解析
+        messageStore.updateMessageById(sdkMsg.id, {
+          url: data.url,
+          secret: data.secret,
+        } as Partial<Message>)
+      },
+    } as EasemobChat.CreateCombineMsgParameters)
+
+    try {
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
+      _updateTargetConversation(targetConversation.id, targetConversation.type, '[聊天记录]', Date.now())
+    } catch (e) {
+      _onSendResult(sdkMsg.id, e)
+      throw e
+    }
+  }
+
+  /**
+   * 重发失败的消息
+   * - 先删除旧消息，再重新创建并发送
+   * - 返回新消息的 id
+   */
+  async function resendMessage(message: Message) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs) return
+    const client = _getClient()
+
+    // 删除旧失败消息
+    messageStore.deleteMessage(message.id)
+
+    const options: CreateMsgOptions = {
+      type: message.type,
+      to: cvs.id,
+      chatType: cvs.type as EasemobChat.ChatType,
+    }
+
+    // 根据消息类型重建参数
+    switch (message.type) {
+      case 'txt':
+        options.msg = (message as unknown as { msg?: string }).msg || ''
+        break
+      case 'img':
+      case 'audio':
+      case 'video':
+      case 'file': {
+        const fileMsg = message as unknown as { file?: EasemobChat.FileObj; filename?: string; length?: number; width?: number; height?: number }
+        if (fileMsg.file) {
+          options.file = fileMsg.file
+        }
+        if (fileMsg.filename) options.filename = fileMsg.filename
+        if (fileMsg.length) options.length = fileMsg.length
+        if (fileMsg.width) options.width = fileMsg.width
+        if (fileMsg.height) options.height = fileMsg.height
+        break
+      }
+      case 'custom': {
+        const customMsg = message as unknown as { customEvent?: string; customExts?: Record<string, any> }
+        if (customMsg.customEvent) options.customEvent = customMsg.customEvent
+        if (customMsg.customExts) options.customExts = customMsg.customExts
+        break
+      }
+      default:
+        console.warn('[useChat] resendMessage: unsupported message type', message.type)
+        return
+    }
+
+    if (message.ext) {
+      options.ext = message.ext
+    }
+
+    const sdkMsg = client.createMessage(options as EasemobChat.CreateMsgType)
+    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, message.requireGroupAck)
+    try {
+      const result = await client.sendCreatedMessage(sdkMsg)
+      _onSendResult(sdkMsg.id, undefined, result.message)
+      return sdkMsg.id
+    } catch (e) {
+      _onSendResult(sdkMsg.id, e)
+      throw e
+    }
+  }
+
   return {
     messages,
     currentConversation,
@@ -642,6 +887,11 @@ export function useChat() {
     sendReadAckForMessage,
     fetchGroupReadDetail,
     recallMessage,
+    deleteMessage,
+    deleteMessages,
+    forwardMessage,
+    forwardCombineMessages,
+    resendMessage,
     // 多选相关
     isMultiSelectMode,
     selectedMessages,

@@ -1,0 +1,110 @@
+<script setup lang="ts">
+import { useLocale } from '../../../locale'
+import Icon from '../../../components/icon/icon.vue'
+import type { Message } from '../../../store/message'
+
+export interface CombineMessageProps {
+  message: Message
+}
+
+export interface CombineMessageEmits {
+  (e: 'view', message: Message): void
+}
+
+const props = defineProps<CombineMessageProps>()
+const emit = defineEmits<CombineMessageEmits>()
+const { t } = useLocale()
+
+/** 合并消息特有的字段 */
+const combineMsg = props.message as unknown as {
+  title?: string
+  summary?: string
+  compatibleText?: string
+}
+
+const title = combineMsg.title || t('message.forward.combineTitle') || '聊天记录'
+const summary = combineMsg.summary || ''
+const compatibleText = combineMsg.compatibleText || ''
+
+function handleClick() {
+  emit('view', props.message)
+}
+</script>
+
+<template>
+  <div class="combine-message" @click="handleClick">
+    <!-- 标题 -->
+    <div class="combine-message__header">
+      <Icon name="files-media/folder" :size="16" class="combine-message__icon" />
+      <span class="combine-message__title">{{ title }}</span>
+    </div>
+
+    <!-- 摘要 -->
+    <div v-if="summary" class="combine-message__summary">
+      <p v-for="(line, idx) in summary.split('\n')" :key="idx">{{ line }}</p>
+    </div>
+
+    <!-- 兼容文本（不支持合并消息的 SDK 版本显示） -->
+    <div v-else-if="compatibleText" class="combine-message__compatible">
+      {{ compatibleText }}
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.combine-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: var(--uikit-bg-secondary);
+  cursor: pointer;
+  min-width: 200px;
+  max-width: 300px;
+  transition: background-color 0.15s;
+}
+
+.combine-message:hover {
+  background-color: var(--uikit-bg-tertiary, #f0f0f0);
+}
+
+.combine-message__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--uikit-text-primary);
+}
+
+.combine-message__icon {
+  color: var(--uikit-text-secondary);
+  flex-shrink: 0;
+}
+
+.combine-message__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combine-message__summary {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  line-height: 1.5;
+}
+
+.combine-message__summary p {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combine-message__compatible {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  font-style: italic;
+}
+</style>

@@ -73,6 +73,11 @@ export const useMessageStore = defineStore('message', () => {
   const sendingMessages = ref<Set<string>>(new Set())
   /** 会话维度的置顶消息列表（按 pinTime 降序） */
   const pinnedMessageMap = ref<Record<string, Message[]>>({})
+  /**
+   * 合并消息解析缓存：key = 合并消息 id，value = 解析后的子消息列表。
+   * 避免重复调用 downloadAndParseCombineMessage。
+   */
+  const parsedCombineMessageMap = ref<Record<string, EasemobChat.ExcludeAckMessageBody[]>>({})
 
   function getMessages(conversationId: string): Message[] {
     return messageMap.value[conversationId] || []
@@ -319,7 +324,17 @@ export const useMessageStore = defineStore('message', () => {
 
   function deleteMessage(msgId: string) {
     for (const key in messageMap.value) {
-      messageMap.value[key] = messageMap.value[key].filter((m: Message) => m.id !== msgId)
+      messageMap.value[key] = messageMap.value[key].filter((m: Message) => m.id !== msgId && m.mid !== msgId)
+    }
+  }
+
+  /** 批量删除消息（支持多选删除） */
+  function deleteMessages(msgIds: string[]) {
+    const idSet = new Set(msgIds)
+    for (const key in messageMap.value) {
+      messageMap.value[key] = messageMap.value[key].filter(
+        (m: Message) => !idSet.has(m.id) && !idSet.has(m.mid || '')
+      )
     }
   }
 
@@ -327,10 +342,26 @@ export const useMessageStore = defineStore('message', () => {
     delete messageMap.value[conversationId]
   }
 
+  /** 读取合并消息解析缓存（未命中返回 undefined） */
+  function getParsedCombineMessages(msgId: string): EasemobChat.ExcludeAckMessageBody[] | undefined {
+    return parsedCombineMessageMap.value[msgId]
+  }
+
+  /** 写入合并消息解析缓存 */
+  function setParsedCombineMessages(msgId: string, messages: EasemobChat.ExcludeAckMessageBody[]) {
+    parsedCombineMessageMap.value[msgId] = messages
+  }
+
+  /** 清除某条合并消息的解析缓存 */
+  function clearParsedCombineMessages(msgId: string) {
+    delete parsedCombineMessageMap.value[msgId]
+  }
+
   return {
     messageMap,
     sendingMessages,
     pinnedMessageMap,
+    parsedCombineMessageMap,
     getMessages,
     getPinnedMessages,
     addMessage,
@@ -340,6 +371,7 @@ export const useMessageStore = defineStore('message', () => {
     updateMessageStatus,
     recallMessage,
     deleteMessage,
+    deleteMessages,
     clearMessages,
     applyModifiedMessage,
     setMessagePinned,
@@ -348,5 +380,8 @@ export const useMessageStore = defineStore('message', () => {
     setTranslation,
     toggleTranslation,
     setTranslating,
+    getParsedCombineMessages,
+    setParsedCombineMessages,
+    clearParsedCombineMessages,
   }
 })

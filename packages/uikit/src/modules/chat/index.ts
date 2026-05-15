@@ -18,6 +18,7 @@ export { default as RichInput } from './message-input/rich-input.vue'
 export { default as MentionPicker } from './mention/mention-picker.vue'
 
 export { default as GroupReadReceiptModal } from './group-read-receipt-modal.vue'
+export { default as ForwardModal } from './forward-modal.vue'
 
 // Types
 export type { ChatConfig, MessageActionItem, MessageActionEvent, MessageActionType, MentionContact } from './types'

@@ -112,7 +112,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
     }
   }
 
-  const handler: EasemobChat.EventHandlerType = {
+  const handler: EasemobChat.EventHandlerType & { onCombineMessage?: (msg: EasemobChat.CombineMsgBody) => void } = {
     onTextMessage: (msg: EasemobChat.TextMsgBody) => {
       handleIncomingMessage(msg, msg.msg || '')
     },
@@ -131,6 +131,10 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
 
     onFileMessage: (msg: EasemobChat.FileMsgBody) => {
       handleIncomingMessage(msg, '[文件]')
+    },
+
+    onCombineMessage: (msg: EasemobChat.CombineMsgBody) => {
+      handleIncomingMessage(msg, '[聊天记录]')
     },
 
     /** 消息撤回：更新本地消息为撤回状态 */
