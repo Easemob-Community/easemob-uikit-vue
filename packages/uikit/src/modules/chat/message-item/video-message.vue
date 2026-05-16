@@ -2,6 +2,9 @@
 import { computed, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
+import { useToast } from '../../../composables/use-toast'
+import Icon from '../../../components/icon/icon.vue'
+import { downloadFile, detectEnvironment } from '../../../utils/download'
 import type { VideoMessageType } from '../../../store/message'
 
 export interface VideoMessageProps {
@@ -12,6 +15,7 @@ const props = defineProps<VideoMessageProps>()
 
 const themeStore = useThemeStore()
 const { t } = useLocale()
+const { show: showToast } = useToast()
 const videoClass = computed(() =>
   themeStore.bubbleShape === 'square' ? 'video-message__video--square' : ''
 )
@@ -25,6 +29,39 @@ function openPreview() {
 
 function closePreview() {
   isPreviewing.value = false
+}
+
+/** 下载视频 */
+async function handleDownload(event: MouseEvent) {
+  event.stopPropagation()
+  const url = props.message.url
+  if (!url) {
+    showToast(t('message.download.failed') || '下载失败')
+    return
+  }
+
+  const env = detectEnvironment()
+  const filename = (props.message as any).filename || 'video.mp4'
+
+  try {
+    await downloadFile({
+      url,
+      filename,
+      env,
+      onSuccess: () => {
+        showToast(t('message.download.success') || '下载成功')
+      },
+      onError: (err) => {
+        if (err.name === 'WechatNotSupported') {
+          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
+        } else {
+          showToast(t('message.download.failed') || '下载失败')
+        }
+      },
+    })
+  } catch {
+    // 错误已在 onError 回调中处理
+  }
 }
 </script>
 
@@ -64,6 +101,14 @@ function closePreview() {
         autoplay
         @click.stop
       />
+      <!-- 下载按钮 -->
+      <button
+        class="video-message__download-btn"
+        :title="t('message.download.success') || '下载'"
+        @click.stop="handleDownload"
+      >
+        <Icon name="arrows/arrow_down_n_box" :size="20" />
+      </button>
     </div>
   </div>
 </template>
@@ -158,5 +203,28 @@ function closePreview() {
   max-width: 90vw;
   max-height: 90vh;
   border-radius: 8px;
+}
+
+/* 预览层下载按钮 */
+.video-message__download-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  z-index: 3001;
+}
+
+.video-message__download-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
 }
 </style>

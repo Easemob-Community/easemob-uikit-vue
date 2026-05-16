@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import { useLocale } from '../../../locale'
+import { useToast } from '../../../composables/use-toast'
+import { downloadFile, detectEnvironment } from '../../../utils/download'
 import type { FileMessageType } from '../../../store/message'
 
 export interface FileMessageProps {
@@ -8,9 +11,11 @@ export interface FileMessageProps {
 }
 
 const props = defineProps<FileMessageProps>()
+const { t } = useLocale()
+const { show: showToast } = useToast()
 
 /** 文件名 */
-const fileName = computed(() => props.message.filename || '未知文件')
+const fileName = computed(() => props.message.filename || t('message.file') || '未知文件')
 
 /** 文件大小格式化 */
 const fileSize = computed(() => {
@@ -32,14 +37,36 @@ const fileIcon = computed(() => {
   return 'files-media/file'
 })
 
-function handleDownload() {
-  // TODO: 接入真实下载逻辑
+/** 是否正在下载 */
+const isDownloading = computed(() => false)
+
+async function handleDownload() {
   const url = props.message.url
-  if (url) {
-    const a = document.createElement('a')
-    a.href = url
-    a.download = fileName.value
-    a.click()
+  if (!url) {
+    showToast(t('message.download.failed') || '下载失败')
+    return
+  }
+
+  const env = detectEnvironment()
+
+  try {
+    await downloadFile({
+      url,
+      filename: fileName.value,
+      env,
+      onSuccess: () => {
+        showToast(t('message.download.success') || '下载成功')
+      },
+      onError: (err) => {
+        if (err.name === 'WechatNotSupported') {
+          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
+        } else {
+          showToast(t('message.download.failed') || '下载失败')
+        }
+      },
+    })
+  } catch {
+    // 错误已在 onError 回调中处理，此处静默捕获避免未处理的 Promise  rejection
   }
 }
 </script>

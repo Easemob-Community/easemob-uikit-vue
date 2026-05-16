@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
+import { useLocale } from '../../../locale'
+import { useToast } from '../../../composables/use-toast'
+import Icon from '../../../components/icon/icon.vue'
+import { downloadFile, detectEnvironment } from '../../../utils/download'
 import type { ImgMessageType } from '../../../store/message'
 
 export interface ImageMessageProps {
@@ -10,6 +14,8 @@ export interface ImageMessageProps {
 const props = defineProps<ImageMessageProps>()
 
 const themeStore = useThemeStore()
+const { t } = useLocale()
+const { show: showToast } = useToast()
 
 /** 图片展示最大约束 */
 const MAX_WIDTH = 240
@@ -70,6 +76,39 @@ function openPreview() {
 function closePreview() {
   isPreviewing.value = false
 }
+
+/** 下载原图 */
+async function handleDownload(event: MouseEvent) {
+  event.stopPropagation()
+  const url = originalUrl.value
+  if (!url) {
+    showToast(t('message.download.failed') || '下载失败')
+    return
+  }
+
+  const env = detectEnvironment()
+  const filename = (props.message as any).filename || 'image.jpg'
+
+  try {
+    await downloadFile({
+      url,
+      filename,
+      env,
+      onSuccess: () => {
+        showToast(t('message.download.success') || '下载成功')
+      },
+      onError: (err) => {
+        if (err.name === 'WechatNotSupported') {
+          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
+        } else {
+          showToast(t('message.download.failed') || '下载失败')
+        }
+      },
+    })
+  } catch {
+    // 错误已在 onError 回调中处理
+  }
+}
 </script>
 
 <template>
@@ -112,6 +151,14 @@ function closePreview() {
         alt="preview"
         @click.stop
       />
+      <!-- 下载按钮 -->
+      <button
+        class="image-message__download-btn"
+        :title="t('message.download.success') || '下载'"
+        @click.stop="handleDownload"
+      >
+        <Icon name="arrows/arrow_down_n_box" :size="20" />
+      </button>
     </div>
   </div>
 </template>
@@ -187,6 +234,29 @@ function closePreview() {
   max-height: 90vh;
   object-fit: contain;
   border-radius: 4px;
+}
+
+/* 预览层下载按钮 */
+.image-message__download-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  z-index: 3001;
+}
+
+.image-message__download-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 @keyframes image-loading-pulse {
