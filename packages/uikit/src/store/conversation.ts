@@ -33,6 +33,9 @@ export const useConversationStore = defineStore('conversation', () => {
   /** 群成员数缓存（groupId -> count），用于群已读回执的已读/未读人数计算 */
   const groupMemberCountMap = ref<Record<string, number>>({})
 
+  /** 会话维度的对方输入状态：key = conversationId，value = 是否正在输入 */
+  const typingMap = ref<Record<string, boolean>>({})
+
   /** 按置顶状态和时间排序的会话列表 */
   const sortedConversationList = computed(() => {
     return [...conversationList.value].sort((a, b) => {
@@ -108,11 +111,16 @@ export const useConversationStore = defineStore('conversation', () => {
     return groupMemberCountMap.value[groupId] || 0
   }
 
+  function setTyping(conversationId: string, isTyping: boolean) {
+    typingMap.value[conversationId] = isTyping
+  }
+
   function clearConversationList() {
     conversationList.value = []
     currentConversation.value = null
     conversationCursor.value = null
     groupMemberCountMap.value = {}
+    typingMap.value = {}
   }
 
   return {
@@ -132,6 +140,8 @@ export const useConversationStore = defineStore('conversation', () => {
     groupMemberCountMap,
     setGroupMemberCount,
     getGroupMemberCount,
+    typingMap,
+    setTyping,
     clearConversationList,
   }
 })

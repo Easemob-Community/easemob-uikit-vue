@@ -135,6 +135,8 @@ export interface ChatConfig {
       /** 是否仅在群聊中启用，默认 true */
       onlyInGroup?: boolean
     }
+    /** 是否启用输入状态提示（对方正在输入...），默认 true */
+    enableTyping?: boolean
   }
   /** 文本消息配置 */
   textMessage?: {

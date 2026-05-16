@@ -22,7 +22,7 @@ export interface MessageInputProps {
 
 const props = defineProps<MessageInputProps>()
 
-const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage, sendTypingCmd } = useChat()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
@@ -367,6 +367,7 @@ defineExpose({
       @voice-cancel="handleVoiceCancel"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @typing="sendTypingCmd"
     />
 
     <!-- 富文本输入框 -->

@@ -221,6 +221,17 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       }
     },
 
+    /** 命令消息：处理输入状态提示 */
+    onCmdMessage: (msg: EasemobChat.CmdMsgBody) => {
+      const action = msg.action
+      if (action === 'TypingBegin') {
+        const conversationId = msg.from || ''
+        if (conversationId) {
+          stores.conversation.setTyping(conversationId, true)
+        }
+      }
+    },
+
     /** 多设备事件同步：置顶/取消置顶/删除会话 */
     onMultiDeviceEvent: (event: EasemobChat.MultiDeviceEvent) => {
       if ('operation' in event && 'conversationId' in event) {

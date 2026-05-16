@@ -25,6 +25,7 @@ const emit = defineEmits<{
   (e: 'voice-cancel'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
+  (e: 'typing'): void
 }>()
 
 const { t } = useLocale()
@@ -75,6 +76,27 @@ function handleSend() {
   if (!trimmed) return
   emit('send', trimmed)
   text.value = ''
+}
+
+/** 输入状态提示节流 */
+let typingThrottleTimer: ReturnType<typeof setTimeout> | null = null
+let isTypingThrottled = false
+
+/** 触发输入状态 */
+function triggerTyping() {
+  if (isTypingThrottled) return
+  isTypingThrottled = true
+  emit('typing')
+  typingThrottleTimer = setTimeout(() => {
+    isTypingThrottled = false
+    typingThrottleTimer = null
+  }, 5000)
+}
+
+/** 输入事件处理 */
+function onInput() {
+  detectMention()
+  triggerTyping()
 }
 
 /** 键盘事件 */
@@ -332,7 +354,7 @@ defineExpose({
           :maxlength="maxLengthValue"
           class="simple-input__field"
           @submit="handleSend"
-          @input="detectMention"
+          @input="onInput"
         />
         <textarea
           v-else
@@ -343,7 +365,7 @@ defineExpose({
           :maxlength="maxLengthValue"
           rows="3"
           @keydown="onKeydown"
-          @input="detectMention"
+          @input="onInput"
         />
       </template>
 

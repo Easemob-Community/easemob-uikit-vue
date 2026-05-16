@@ -9,6 +9,14 @@ import { getClient } from '../sdk/client'
 import type { UIKitClient } from '../sdk/client'
 import type { EasemobChat } from 'easemob-websdk'
 
+/** Typing 命令消息 action 常量 */
+const TYPING_ACTION = {
+  BEGIN: 'TypingBegin',
+} as const
+
+/** Typing 状态持续时间（毫秒） */
+const TYPING_DURATION = 5000
+
 /** 消息类型到创建参数的映射（用于重发） */
 interface CreateMsgOptions {
   type: string
@@ -1014,6 +1022,35 @@ export function useChat(options?: UseChatOptions) {
     }
   }
 
+  /**
+   * 发送输入状态命令消息（TypingBegin）
+   * - 仅单聊有效
+   * - 通过 CMD 消息发送，对端收到后显示"对方正在输入..."
+   */
+  async function sendTypingCmd() {
+    const cvs = conversationStore.currentConversation
+    if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
+    const client = _getClient()
+    try {
+      const sdkMsg = client.createMessage({
+        type: 'cmd',
+        to: cvs.id,
+        chatType: cvs.type as EasemobChat.ChatType,
+        action: TYPING_ACTION.BEGIN,
+      } as EasemobChat.CreateCmdMsgParameters)
+      await client.sendCreatedMessage(sdkMsg)
+    } catch (e) {
+      console.warn('[useChat] sendTypingCmd failed:', e)
+    }
+  }
+
+  /**
+   * 设置指定会话的输入状态
+   */
+  function setTyping(conversationId: string, isTyping: boolean) {
+    conversationStore.setTyping(conversationId, isTyping)
+  }
+
   return {
     messages,
     currentConversation,
@@ -1056,5 +1093,9 @@ export function useChat(options?: UseChatOptions) {
     // 历史消息游标
     getHistoryCursor,
     clearHistoryCursor,
+    // 输入状态
+    sendTypingCmd,
+    setTyping,
+    TYPING_DURATION,
   }
 }

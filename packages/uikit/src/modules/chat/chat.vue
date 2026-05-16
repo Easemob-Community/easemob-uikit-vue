@@ -12,6 +12,7 @@ import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal.vue'
 import MultiSelectBar from './multi-select-bar.vue'
+import TypingIndicator from './typing-indicator.vue'
 import Modal from '../../components/modal/modal.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
@@ -34,7 +35,7 @@ const messageStoreOptions = computed(() => ({
   maxMessageCount: props.config?.messageList?.maxMessageCount,
 }))
 
-const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat({ messageStoreOptions: messageStoreOptions.value })
+const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat({ messageStoreOptions: messageStoreOptions.value })
 const { stores } = useUIKit()
 const { sendChannelAck } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
@@ -127,6 +128,59 @@ const conversationType = computed(() => currentConversation.value?.type)
 
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
+
+/** 是否启用输入状态提示 */
+const enableTyping = computed(() => props.config?.input?.enableTyping !== false)
+
+/** 当前会话对方是否正在输入 */
+const isTyping = computed(() => {
+  if (!enableTyping.value || !currentConversation.value) return false
+  return stores.conversation.typingMap[currentConversation.value.id] || false
+})
+
+/** Typing 状态 5s 隐藏定时器 */
+let typingHideTimer: ReturnType<typeof setTimeout> | null = null
+
+/** 清除 typing 隐藏定时器 */
+function clearTypingTimer() {
+  if (typingHideTimer) {
+    clearTimeout(typingHideTimer)
+    typingHideTimer = null
+  }
+}
+
+/** 收到 typing 后启动/重置 5s 隐藏定时器 */
+function startTypingHideTimer() {
+  clearTypingTimer()
+  typingHideTimer = setTimeout(() => {
+    if (currentConversation.value) {
+      setTyping(currentConversation.value.id, false)
+    }
+    typingHideTimer = null
+  }, TYPING_DURATION)
+}
+
+/** 监听 typing 状态变化：显示时启动定时器 */
+watch(isTyping, (typing) => {
+  if (typing) {
+    startTypingHideTimer()
+  } else {
+    clearTypingTimer()
+  }
+})
+
+/** 会话切换时清理 typing 状态 */
+watch(currentConversation, (cvs, oldCvs) => {
+  if (oldCvs && oldCvs.id !== cvs?.id) {
+    clearTypingTimer()
+    setTyping(oldCvs.id, false)
+  }
+})
+
+/** 组件卸载时清理 */
+onUnmounted(() => {
+  clearTypingTimer()
+})
 
 /**
  * 会话切换时：
@@ -276,6 +330,9 @@ function onMultiSelectDelete(messages: Message[]) {
 
     <!-- 消息列表 -->
     <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
+
+    <!-- 输入状态提示 -->
+    <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
 
     <!-- 多选模式底部操作栏 -->
     <MultiSelectBar
