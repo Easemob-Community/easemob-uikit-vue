@@ -110,6 +110,7 @@ const messages: LocaleMessages = {
   'chat.info.leaveGroup': 'Leave Group',
   'chat.info.deleteFriend': 'Delete Friend',
   'chat.typing': 'Typing...',
+  'conversation.atMe': '@',
 }
 
 export default messages

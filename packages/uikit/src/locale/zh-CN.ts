@@ -110,6 +110,7 @@ const messages: LocaleMessages = {
   'chat.info.leaveGroup': '退出群聊',
   'chat.info.deleteFriend': '删除好友',
   'chat.typing': '对方正在输入...',
+  'conversation.atMe': '@',
 }
 
 export default messages

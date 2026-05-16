@@ -26,6 +26,7 @@ export interface ChatProps {
 
 export interface ChatEmits {
   (e: 'recall-failed', error: any, message: Message): void
+  (e: 'at-me-click', userId: string): void
 }
 
 const props = defineProps<ChatProps>()
@@ -189,9 +190,36 @@ onUnmounted(() => {
 })
 
 /**
+ * 尝试定位到首条@我的消息
+ * - 如果消息已存在于列表中，直接定位并清除该会话的@我记录
+ * - 如果消息不在列表中（可能在更旧的历史中），给出提示
+ */
+function locateAtMeMessage(cvsId: string) {
+  const atMeMsgIds = stores.message.getAtMeMessages(cvsId)
+  if (atMeMsgIds.length === 0) return
+
+  const firstAtMeMsgId = atMeMsgIds[0]
+  const existingMsgs = stores.message.getMessages(cvsId)
+  const found = existingMsgs.some(m => m.id === firstAtMeMsgId || m.mid === firstAtMeMsgId)
+
+  if (found) {
+    // 消息已加载，直接定位，定位完成后清除记录避免重复定位
+    nextTick(() => {
+      requestLocate(firstAtMeMsgId)
+      stores.message.clearAtMeMessages(cvsId)
+    })
+  } else {
+    // 消息不在当前已加载列表中，提示用户向上加载更多历史
+    // 可选：自动触发历史消息加载直到找到该消息（此处仅做提示）
+    console.warn('[Chat] @me message not in loaded history, scroll up to load more:', firstAtMeMsgId)
+  }
+}
+
+/**
  * 会话切换时：
  * 1. 发送会话已读回执（useConversation.sendChannelAck 内部已有未读数守卫，单聊/群聊均支持）
  * 2. 首次拉取历史消息
+ * 3. 若有@我的消息，自动定位到首条@消息
  */
 watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id) return
@@ -205,12 +233,26 @@ watch(currentConversation, async (cvs, oldCvs) => {
 
   // 首次拉取历史消息
   const existingMsgs = stores.message.getMessages(cvs.id)
+  let historyLoaded = false
   if (existingMsgs.length === 0) {
     await fetchHistoryMessages()
+    historyLoaded = true
   }
 
   // 拉取服务端置顶消息列表
   fetchPinnedMessages()
+
+  // 自动定位到首条@我的消息（如果启用）
+  if (props.config?.messageList?.autoLocateAtMe !== false) {
+    // 如果刚刚加载了历史消息，等待渲染完成后再定位
+    if (historyLoaded) {
+      nextTick(() => {
+        locateAtMeMessage(cvs.id)
+      })
+    } else {
+      locateAtMeMessage(cvs.id)
+    }
+  }
 }, { immediate: true })
 
 /** 多选模式底部操作 */

@@ -36,6 +36,9 @@ export const useConversationStore = defineStore('conversation', () => {
   /** 会话维度的对方输入状态：key = conversationId，value = 是否正在输入 */
   const typingMap = ref<Record<string, boolean>>({})
 
+  /** 会话维度的是否有人@我：key = conversationId，value = 是否被@ */
+  const atMeMap = ref<Record<string, boolean>>({})
+
   /** 按置顶状态和时间排序的会话列表 */
   const sortedConversationList = computed(() => {
     return [...conversationList.value].sort((a, b) => {
@@ -115,12 +118,18 @@ export const useConversationStore = defineStore('conversation', () => {
     typingMap.value[conversationId] = isTyping
   }
 
+  /** 设置会话的@我状态 */
+  function setAtMe(conversationId: string, hasAtMe: boolean) {
+    atMeMap.value[conversationId] = hasAtMe
+  }
+
   function clearConversationList() {
     conversationList.value = []
     currentConversation.value = null
     conversationCursor.value = null
     groupMemberCountMap.value = {}
     typingMap.value = {}
+    atMeMap.value = {}
   }
 
   return {
@@ -142,6 +151,8 @@ export const useConversationStore = defineStore('conversation', () => {
     getGroupMemberCount,
     typingMap,
     setTyping,
+    atMeMap,
+    setAtMe,
     clearConversationList,
   }
 })

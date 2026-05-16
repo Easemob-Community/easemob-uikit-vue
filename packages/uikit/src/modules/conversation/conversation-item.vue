@@ -23,12 +23,15 @@ export interface ConversationItemProps {
   showSenderName?: boolean
   /** 未读数显示模式 */
   unreadMode?: 'count' | 'dot'
+  /** 是否有人@我 */
+  hasAtMe?: boolean
 }
 
 const props = withDefaults(defineProps<ConversationItemProps>(), {
   customActions: () => [],
   showSenderName: true,
   unreadMode: 'count',
+  hasAtMe: false,
 })
 
 const emit = defineEmits<{
@@ -212,7 +215,7 @@ const displayMessage = computed(() => {
   <div
     ref="itemRef"
     class="conversation-item"
-    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted }]"
+    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': props.hasAtMe }]"
     @click="onClick"
     @contextmenu.prevent="onContextMenu"
   >
@@ -221,7 +224,9 @@ const displayMessage = computed(() => {
     <div class="conversation-item__info">
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
-          <span class="conversation-item__name">{{ props.conversation.name }}</span>
+          <span class="conversation-item__name" :class="{ 'is-at-me': props.hasAtMe }">
+            {{ props.hasAtMe ? `[${t('conversation.atMe') || '@'}] ` : '' }}{{ props.conversation.name }}
+          </span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />
           </span>
@@ -328,6 +333,15 @@ const displayMessage = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.conversation-item__name.is-at-me {
+  color: var(--uikit-primary, #3b82f6);
+  font-weight: 600;
+}
+
+.conversation-item.has-at-me {
+  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.06);
 }
 
 .conversation-item__pin-badge {

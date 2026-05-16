@@ -41,6 +41,18 @@ function resolveConversationId(msg: SdkMsgBase, currentUser: string): string {
 
 export function createEventHandler(client: UIKitClient, stores: RootStores) {
   /**
+   * 检测消息是否@了当前用户
+   * - 检查 ext.em_at_list 是否包含当前用户ID
+   */
+  function isAtMe(msg: SdkMsgBase, currentUser: string): boolean {
+    const atList = msg.ext?.em_at_list
+    if (Array.isArray(atList)) {
+      return atList.includes(currentUser)
+    }
+    return false
+  }
+
+  /**
    * 公共处理逻辑：将 SDK 消息写入 messageStore 并更新会话列表
    * 直接展开 SDK 消息的所有原生字段 + 追加 UI 扩展字段，不做 body 映射
    */
@@ -84,6 +96,12 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
       lastMessageSender: msg.from || '',
       type: chatType,
     })
+
+    // 检测是否@我（仅群聊场景，且非自己发送的消息）
+    if (isGroup && msg.from !== currentUser && isAtMe(msg, currentUser)) {
+      stores.conversation.setAtMe(conversationId, true)
+      stores.message.addAtMeMessage(conversationId, msg.id)
+    }
 
     // 非当前会话的消息增加未读数
     const currentCvsId = stores.conversation.currentConversation?.id

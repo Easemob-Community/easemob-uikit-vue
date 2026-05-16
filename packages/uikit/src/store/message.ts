@@ -85,6 +85,9 @@ export const useMessageStore = defineStore('message', () => {
    */
   const parsedCombineMessageMap = ref<Record<string, EasemobChat.ExcludeAckMessageBody[]>>({})
 
+  /** 会话维度的@我的消息ID列表：key = conversationId，value = 消息ID数组 */
+  const atMeMessageMap = ref<Record<string, string[]>>({})
+
   /** 单个会话消息存储上限，默认 300 */
   let maxMessageCount = 300
 
@@ -379,6 +382,24 @@ export const useMessageStore = defineStore('message', () => {
     delete parsedCombineMessageMap.value[msgId]
   }
 
+  /** 向会话的@我列表中添加消息ID（去重） */
+  function addAtMeMessage(conversationId: string, msgId: string) {
+    const list = atMeMessageMap.value[conversationId] || []
+    if (!list.includes(msgId)) {
+      atMeMessageMap.value[conversationId] = [...list, msgId]
+    }
+  }
+
+  /** 获取会话的@我消息ID列表 */
+  function getAtMeMessages(conversationId: string): string[] {
+    return atMeMessageMap.value[conversationId] || []
+  }
+
+  /** 清除会话的@我状态 */
+  function clearAtMeMessages(conversationId: string) {
+    delete atMeMessageMap.value[conversationId]
+  }
+
   return {
     messageMap,
     sendingMessages,
@@ -406,5 +427,9 @@ export const useMessageStore = defineStore('message', () => {
     getParsedCombineMessages,
     setParsedCombineMessages,
     clearParsedCombineMessages,
+    atMeMessageMap,
+    addAtMeMessage,
+    getAtMeMessages,
+    clearAtMeMessages,
   }
 })

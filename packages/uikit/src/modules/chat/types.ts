@@ -64,6 +64,8 @@ export interface ChatConfig {
       /** 预览文本最大长度，默认 30 */
       maxPreviewLength?: number
     }
+    /** 切换会话时是否自动定位到首条@我的消息，默认 true */
+    autoLocateAtMe?: boolean
   }
   /** 消息操作配置 */
   messageAction?: {

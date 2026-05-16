@@ -5,6 +5,7 @@ import { useConversation } from '../../composables/use-conversation'
 import { useViewport } from '../../composables/use-viewport'
 import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
+import { useUIKit } from '../../composables/use-uikit'
 import ConversationItem from './conversation-item.vue'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
@@ -52,9 +53,11 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'select', id: string, conversation: Conversation): void
+  (e: 'at-me-click', id: string, conversation: Conversation): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, fetchServerConversations, saveDraft, loadDraft, clearDraft } = useConversation()
+const { stores } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 
@@ -134,16 +137,28 @@ useInfiniteScroll(
 )
 
 function handleSelect(id: string) {
+  const cvs = conversationList.value.find((c: Conversation) => c.id === id)
+  const hadAtMe = !!stores.conversation.atMeMap[id]
+
   // 切换会话前，为当前会话保存草稿（如果有输入内容，由 chat-container 侧触发）
   selectConversation(id)
   // 进入会话后发送已读回执
   sendChannelAck(id)
   // 加载目标会话的草稿
   loadDraft(id)
+
+  // 清除该会话的@我高亮状态（UI 层面）
+  // 注意：atMeMessageMap 保留用于 chat.vue 定位，定位完成后由 chat.vue 自行清除
+  if (hadAtMe) {
+    stores.conversation.setAtMe(id, false)
+  }
+
   // 通知上层
-  const cvs = conversationList.value.find((c: Conversation) => c.id === id)
   if (cvs) {
     emit('select', id, cvs)
+    if (hadAtMe) {
+      emit('at-me-click', id, cvs)
+    }
   }
 }
 
@@ -218,6 +233,7 @@ function confirmDelete() {
         :message-formatter="props.messageFormatter"
         :show-sender-name="props.showSenderName"
         :unread-mode="props.unreadMode"
+        :has-at-me="!!stores.conversation.atMeMap[item.id]"
         @select="handleSelect"
         @pin="pinConversation"
         @delete="handleDelete"
