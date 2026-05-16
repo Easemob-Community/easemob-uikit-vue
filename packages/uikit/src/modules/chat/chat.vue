@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted, nextTick, provide } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, onErrorCaptured, nextTick, provide } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
 import { useQuote } from '../../composables/use-quote'
 import { useLocale } from '../../locale'
+import { useToast } from '../../composables/use-toast'
 import { CONVERSATION_TYPE } from '../../constants'
+import type { ChatSendHooks } from './types'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
-import ForwardModal from './forward-modal.vue'
-import MultiSelectBar from './multi-select-bar.vue'
-import TypingIndicator from './typing-indicator.vue'
+import ForwardModal from './forward-modal/forward-modal.vue'
+import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
+import TypingIndicator from './typing-indicator/typing-indicator.vue'
 import Modal from '../../components/modal/modal.vue'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
@@ -20,8 +22,20 @@ import type { ChatConfig } from './types'
 import type { Message } from '../../store/message'
 import type { Conversation } from '../../store/conversation'
 
+/** 渲染错误信息 */
+interface RenderError {
+  message: string
+  component?: string
+}
+
 export interface ChatProps {
   config?: ChatConfig
+  /** 是否处于全局加载状态 */
+  loading?: boolean
+  /** 自定义根元素 class */
+  class?: string
+  /** 自定义根元素 style */
+  style?: Record<string, string>
 }
 
 export interface ChatEmits {
@@ -32,6 +46,12 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
+/** 暴露输入框操作方法 */
+defineExpose({
+  setText: (text: string) => messageInputRef.value?.setText?.(text),
+  getText: () => messageInputRef.value?.getText?.() || '',
+})
+
 const messageStoreOptions = computed(() => ({
   maxMessageCount: props.config?.messageList?.maxMessageCount,
 }))
@@ -40,7 +60,37 @@ const { currentConversation, isMultiSelectMode, messages, selectedMessages, sele
 const { stores } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
+
+/** 发送钩子 */
+const sendHooks = computed<ChatSendHooks | undefined>(() => props.config?.hooks)
+
+/** 组件卸载时清理残留状态 */
+onUnmounted(() => {
+  exitMultiSelectMode()
+  exitEditMode()
+  clearQuote()
+})
 const { t } = useLocale()
+const { show: showToast } = useToast()
+
+/** 错误边界状态 */
+const renderError = ref<RenderError | null>(null)
+
+/** 捕获子组件渲染错误 */
+onErrorCaptured((err, instance, info) => {
+  const errMsg = err instanceof Error ? err.message : String(err)
+  renderError.value = {
+    message: errMsg,
+    component: instance?.$options?.name || info,
+  }
+  console.error('[Chat] render error captured:', err, info)
+  return false
+})
+
+/** 清除错误状态 */
+function clearRenderError() {
+  renderError.value = null
+}
 
 /** 向后代组件提供 textMessage 配置（链接识别 & 拦截器） */
 provide('textMessageConfig', computed(() => props.config?.textMessage))
@@ -103,11 +153,7 @@ function onToggleTranslation(message: Message) {
   toggleTranslation(message.id)
 }
 
-/** @提及点击 */
-function onMentionClick(userId: string) {
-  // 默认行为：可扩展为跳转个人资料等
-  console.log('[Chat] mention clicked:', userId)
-}
+
 
 /** 置顶横幅配置 */
 const pinnedBarConfig = computed(() => props.config?.messageList?.pinnedBar)
@@ -327,11 +373,13 @@ async function onForwardConfirm(targetConversation: Conversation) {
       // 合并转发：使用合并消息 API
       await forwardCombineMessages(messages, targetConversation)
     }
+    // 仅成功后才清空状态
+    pendingForwardMessages.value = []
+    exitMultiSelectMode()
   } catch (e) {
     console.warn('[Chat] forward messages failed:', e)
+    showToast(t('message.forward.failed') || '转发失败')
   }
-  pendingForwardMessages.value = []
-  exitMultiSelectMode()
 }
 
 /** 多选：逐条转发（每条消息单独转发） */
@@ -366,7 +414,35 @@ function onMultiSelectDelete(messages: Message[]) {
 </script>
 
 <template>
-  <div class="chat">
+  <div class="chat" :class="props.class" :style="props.style">
+    <!-- 全局加载状态 -->
+    <div v-if="props.loading" class="chat__loading">
+      <slot name="loading">
+        <span class="chat__loading-text">{{ t('conversation.loadingMore') || '加载中...' }}</span>
+      </slot>
+    </div>
+
+    <!-- 错误边界：子组件渲染错误时显示降级 UI -->
+    <div v-else-if="renderError" class="chat__error">
+      <slot name="error" :error="renderError">
+        <div class="chat__error-content">
+          <span class="chat__error-icon">&#9888;</span>
+          <span class="chat__error-text">{{ renderError.message }}</span>
+          <button class="chat__error-retry" @click="clearRenderError">
+            {{ t('button.confirm') || '重试' }}
+          </button>
+        </div>
+      </slot>
+    </div>
+
+    <!-- 空状态：无当前会话 -->
+    <div v-else-if="!currentConversation" class="chat__empty">
+      <slot name="empty">
+        <span class="chat__empty-text">{{ t('chat.empty') || '请选择会话' }}</span>
+      </slot>
+    </div>
+
+    <template v-else>
     <!-- Header -->
     <div
       v-if="showHeader"
@@ -418,7 +494,7 @@ function onMultiSelectDelete(messages: Message[]) {
     />
 
     <!-- 消息列表 -->
-    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="onMentionClick" />
+    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
 
     <!-- 输入状态提示 -->
     <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
@@ -458,6 +534,7 @@ function onMultiSelectDelete(messages: Message[]) {
       v-model:show="showForwardModal"
       @forward="onForwardConfirm"
     />
+    </template>
   </div>
 </template>
 
@@ -468,6 +545,75 @@ function onMultiSelectDelete(messages: Message[]) {
   flex-direction: column;
   height: 100%;
   background-color: var(--uikit-bg-base);
+}
+
+/* 空状态：上下左右居中 */
+.chat__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat__empty-text {
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+}
+
+/* 全局加载状态 */
+.chat__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat__loading-text {
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+}
+
+/* 错误边界 */
+.chat__error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat__error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+}
+
+.chat__error-icon {
+  font-size: 32px;
+  color: #e74c3c;
+}
+
+.chat__error-text {
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+  text-align: center;
+  word-break: break-word;
+}
+
+.chat__error-retry {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  background-color: var(--uikit-primary-color);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.chat__error-retry:hover {
+  opacity: 0.9;
 }
 
 .chat__header {

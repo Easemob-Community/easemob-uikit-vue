@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useLocale } from '../../locale'
+import { useLocale } from '../../../locale'
 
 export interface TypingIndicatorProps {
   /** 是否显示 */

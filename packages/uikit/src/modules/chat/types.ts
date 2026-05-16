@@ -21,10 +21,24 @@ export type LoadHistoryMode = 'pull-down' | 'scroll-top' | 'auto'
 /** 时间显示策略 */
 export type TimeDisplayStrategy = boolean | 'always' | 'hover'
 
+/**
+ * 消息发送拦截钩子
+ * - beforeSend: 返回 false 阻止发送，返回 Promise<false> 异步阻止
+ * - afterSend: 发送成功后的回调
+ */
+export interface ChatSendHooks {
+  /** 发送前拦截，返回 false 则阻止发送 */
+  beforeSend?: (message: Partial<Message>) => boolean | Promise<boolean>
+  /** 发送成功后的回调 */
+  afterSend?: (message: Message) => void
+}
+
 /** 聊天页面全局配置 */
 export interface ChatConfig {
   /** 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true */
   enableDraft?: boolean
+  /** 消息发送拦截钩子 */
+  hooks?: ChatSendHooks
   /** Header 配置 */
   header?: {
     /** 是否显示 header，默认 true */

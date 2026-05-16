@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Component } from 'vue'
 import type { Message } from '../../../store/message'
 import { MESSAGE_TYPE } from '../../../constants'
 import TextMessage from './text-message.vue'
@@ -8,6 +9,7 @@ import VoiceMessage from './voice-message.vue'
 import VideoMessage from './video-message.vue'
 import FileMessage from './file-message.vue'
 import CombineMessage from './combine-message.vue'
+import CustomMessage from './custom-message.vue'
 
 export interface MessageRendererProps {
   message: Message
@@ -24,13 +26,14 @@ const props = defineProps<MessageRendererProps>()
 const emit = defineEmits<MessageRendererEmits>()
 
 /** 消息类型到组件的映射 */
-const messageComponentMap: Record<string, unknown> = {
+const messageComponentMap: Record<string, Component> = {
   [MESSAGE_TYPE.TXT]: TextMessage,
   [MESSAGE_TYPE.IMG]: ImageMessage,
   [MESSAGE_TYPE.AUDIO]: VoiceMessage,
   [MESSAGE_TYPE.VIDEO]: VideoMessage,
   [MESSAGE_TYPE.FILE]: FileMessage,
   combine: CombineMessage,
+  [MESSAGE_TYPE.CUSTOM]: CustomMessage,
 }
 
 /** 当前消息对应的渲染组件 */

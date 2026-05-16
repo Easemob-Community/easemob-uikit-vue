@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import Icon from '../../components/icon/icon.vue'
-import type { Message } from '../../store/message'
-import type { Conversation } from '../../store/conversation'
+import Icon from '../../../components/icon/icon.vue'
+import type { Message } from '../../../store/message'
+import type { Conversation } from '../../../store/conversation'
 
 export interface MultiSelectBarEmits {
   (e: 'forward-one-by-one', messages: Message[]): void

@@ -110,6 +110,40 @@ const recallExpiredConfig: ChatConfig = {
 
 const customSlotTitle = ref('✨ 自定义标题插槽')
 
+/** 空状态配置：无当前会话 */
+const emptyStateConfig: ChatConfig = {
+  ...baseConfig,
+}
+
+/** 加载状态配置 */
+const loadingConfig: ChatConfig = {
+  ...baseConfig,
+}
+
+/** 发送拦截钩子配置 */
+const hooksConfig: ChatConfig = {
+  ...baseConfig,
+  hooks: {
+    beforeSend: (msg) => {
+      console.log('[Story] beforeSend:', msg)
+      // 演示：阻止包含 "敏感词" 的消息发送
+      if ('msg' in msg && typeof msg.msg === 'string' && msg.msg.includes('敏感词')) {
+        alert('消息包含敏感词，已被拦截')
+        return false
+      }
+      return true
+    },
+    afterSend: (msg) => {
+      console.log('[Story] afterSend:', msg)
+    },
+  },
+}
+
+/** 自定义样式配置 */
+const customStyleConfig: ChatConfig = {
+  ...baseConfig,
+}
+
 // 注入 mock 数据供 Story 展示
 injectMockData()
 </script>
@@ -200,5 +234,78 @@ injectMockData()
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="Empty State (No Conversation)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="emptyStateConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Empty Slot">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="emptyStateConfig">
+            <template #empty>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <span style="font-size: 48px;">&#128172;</span>
+                <span style="font-size: 16px; color: var(--uikit-text-secondary);">选择一个会话开始聊天吧</span>
+              </div>
+            </template>
+          </ChatContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Loading State">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="loadingConfig" loading />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Loading Slot">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="loadingConfig" loading>
+            <template #loading>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <span style="font-size: 32px; animation: spin 1s linear infinite;">&#128260;</span>
+                <span style="font-size: 14px; color: var(--uikit-text-secondary);">正在加载会话...</span>
+              </div>
+            </template>
+          </ChatContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Class & Style">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="customStyleConfig"
+            class="story-custom-chat"
+            :style="{ backgroundColor: '#f0f9ff', borderRadius: '12px' }"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Send Hooks (beforeSend / afterSend)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="hooksConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
+
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </template>

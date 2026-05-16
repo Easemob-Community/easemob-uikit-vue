@@ -4,6 +4,7 @@ const messages: LocaleMessages = {
   'button.confirm': 'Confirm',
   'button.cancel': 'Cancel',
   'chat.title': 'Chat',
+  'chat.empty': 'Please select a conversation',
   'chat.placeholder': 'Type a message...',
   'chat.send': 'Send',
   'conversation.title': 'Conversations',

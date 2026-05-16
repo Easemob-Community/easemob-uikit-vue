@@ -4,6 +4,7 @@ const messages: LocaleMessages = {
   'button.confirm': '确认',
   'button.cancel': '取消',
   'chat.title': '聊天',
+  'chat.empty': '请选择会话',
   'chat.placeholder': '请输入消息...',
   'chat.send': '发送',
   'conversation.title': '会话列表',

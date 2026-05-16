@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useUIKit } from '../../composables/use-uikit'
-import { useLocale } from '../../locale'
-import { useViewport } from '../../composables/use-viewport'
-import Popup from '../../components/popup/popup.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
-import Input from '../../components/input/input.vue'
-import type { Conversation } from '../../store/conversation'
+import { useUIKit } from '../../../composables/use-uikit'
+import { useLocale } from '../../../locale'
+import { useViewport } from '../../../composables/use-viewport'
+import Popup from '../../../components/popup/popup.vue'
+import Avatar from '../../../components/avatar/avatar.vue'
+import Icon from '../../../components/icon/icon.vue'
+import Input from '../../../components/input/input.vue'
+import type { Conversation } from '../../../store/conversation'
 
 export interface ForwardModalProps {
   show: boolean

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import Popup from '../../components/popup/popup.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import { useLocale } from '../../locale'
+import Popup from '../../../components/popup/popup.vue'
+import Avatar from '../../../components/avatar/avatar.vue'
+import { useLocale } from '../../../locale'
 
 export interface GroupReadReceiptModalProps {
   show: boolean

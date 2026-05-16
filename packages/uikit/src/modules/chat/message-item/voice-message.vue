@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onUnmounted } from 'vue'
+import { computed, ref, onUnmounted, inject, type InjectionKey } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import type { AudioMessageType } from '../../../store/message'
 
@@ -14,40 +14,66 @@ const bubbleClass = computed(() =>
   themeStore.bubbleShape === 'square' ? 'voice-message__bubble--square' : ''
 )
 
-/** 全局音频实例，用于互斥播放 */
-let globalAudio: HTMLAudioElement | null = null
-let globalPlayingId = ''
+/** 音频播放控制器接口 */
+interface AudioController {
+  play: (audio: HTMLAudioElement, id: string) => void
+  stop: (id: string) => void
+  isPlaying: (id: string) => boolean
+}
+
+/** 全局音频控制器 InjectionKey */
+const AudioControllerKey: InjectionKey<AudioController> = Symbol('voice-audio-controller')
+
+/** 创建默认音频控制器（模块级单例，比全局变量更安全） */
+function createAudioController(): AudioController {
+  let currentAudio: HTMLAudioElement | null = null
+  let currentId = ''
+  return {
+    play(audio, id) {
+      // 互斥：停止其他正在播放的语音
+      if (currentAudio && currentAudio !== audio) {
+        currentAudio.pause()
+        currentAudio.currentTime = 0
+      }
+      currentAudio = audio
+      currentId = id
+    },
+    stop(id) {
+      if (currentId === id) {
+        currentAudio = null
+        currentId = ''
+      }
+    },
+    isPlaying(id) {
+      return currentId === id && currentAudio !== null && !currentAudio.paused
+    },
+  }
+}
+
+/** 注入或创建音频控制器 */
+const audioController = inject(AudioControllerKey, createAudioController(), true)
 
 const isPlaying = ref(false)
 const currentAudio = ref<HTMLAudioElement | null>(null)
 
-function stopCurrentAudio() {
+function cleanupAudio() {
   if (currentAudio.value) {
     currentAudio.value.pause()
     currentAudio.value.currentTime = 0
+    audioController.stop(props.message.id)
     currentAudio.value = null
   }
   isPlaying.value = false
-  if (globalPlayingId === props.message.id) {
-    globalPlayingId = ''
-    globalAudio = null
-  }
 }
 
 function onPlayClick() {
   // 如果正在播放，则停止
   if (isPlaying.value && currentAudio.value) {
-    stopCurrentAudio()
+    cleanupAudio()
     return
   }
 
-  // 互斥：停止其他正在播放的语音
-  if (globalAudio && globalAudio !== currentAudio.value) {
-    globalAudio.pause()
-    globalAudio.currentTime = 0
-  }
-
-  const url = (props.message as any).url || ''
+  const url = (props.message as unknown as { url?: string }).url || ''
   if (!url) {
     console.warn('[VoiceMessage] no audio url:', props.message.id)
     return
@@ -55,38 +81,26 @@ function onPlayClick() {
 
   const audio = new Audio(url)
   currentAudio.value = audio
-  globalAudio = audio
-  globalPlayingId = props.message.id
 
   audio.addEventListener('ended', () => {
-    isPlaying.value = false
-    currentAudio.value = null
-    if (globalPlayingId === props.message.id) {
-      globalPlayingId = ''
-      globalAudio = null
-    }
+    cleanupAudio()
   })
 
   audio.addEventListener('error', () => {
-    isPlaying.value = false
-    currentAudio.value = null
-    if (globalPlayingId === props.message.id) {
-      globalPlayingId = ''
-      globalAudio = null
-    }
+    cleanupAudio()
   })
 
   audio.play().then(() => {
     isPlaying.value = true
+    audioController.play(audio, props.message.id)
   }).catch((err) => {
     console.warn('[VoiceMessage] play failed:', err)
-    isPlaying.value = false
-    currentAudio.value = null
+    cleanupAudio()
   })
 }
 
 onUnmounted(() => {
-  stopCurrentAudio()
+  cleanupAudio()
 })
 </script>
 

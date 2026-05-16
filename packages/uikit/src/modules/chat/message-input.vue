@@ -12,7 +12,8 @@ import MentionPicker from './mention/mention-picker.vue'
 import Popup from '../../components/popup/popup.vue'
 import QuoteBar from './quote/quote-bar.vue'
 import { useLocale } from '../../locale'
-import type { ChatConfig, MentionContact } from './types'
+import type { ChatConfig, MentionContact, ChatSendHooks } from './types'
+import type { Message } from '../../store/message'
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -35,6 +36,39 @@ const { t } = useLocale()
 
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
+
+/** 发送钩子 */
+const sendHooks = computed<ChatSendHooks | undefined>(() => props.config?.hooks)
+
+/**
+ * 执行 beforeSend 钩子
+ * @returns true 表示允许发送，false 表示阻止
+ */
+async function runBeforeSend(message: Partial<Message>): Promise<boolean> {
+  const hook = sendHooks.value?.beforeSend
+  if (!hook) return true
+  try {
+    const result = await hook(message)
+    return result !== false
+  } catch (e) {
+    console.error('[MessageInput] beforeSend hook error:', e)
+    return true
+  }
+}
+
+/**
+ * 执行 afterSend 钩子
+ */
+function runAfterSend(message: any) {
+  const hook = sendHooks.value?.afterSend
+  if (hook) {
+    try {
+      hook(message)
+    } catch (e) {
+      console.error('[MessageInput] afterSend hook error:', e)
+    }
+  }
+}
 
 /** 输入框模式 */
 const inputMode = computed(() => {
@@ -95,7 +129,7 @@ function handleCancelEdit() {
 }
 
 /** 发送文本消息（或提交编辑） */
-function handleSendText(text: string, mentionList?: MentionContact[]) {
+async function handleSendText(text: string, mentionList?: MentionContact[]) {
   // 编辑模式：改为调用 modifyMessage
   if (editingMessage.value) {
     const target = editingMessage.value
@@ -113,19 +147,29 @@ function handleSendText(text: string, mentionList?: MentionContact[]) {
       })
     return
   }
-  const ext = buildExtWithQuote()
+  let ext = buildExtWithQuote()
   // 如果有 mention，写入 ext.em_at_list
   if (mentionList && mentionList.length > 0) {
-    ext!.em_at_list = mentionList.map(m => m.userId)
+    ext = ext || {}
+    ext.em_at_list = mentionList.map(m => m.userId)
   }
+  // beforeSend 拦截
+  const canSend = await runBeforeSend({ type: 'txt', msg: text })
+  if (!canSend) return
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
-    .then(() => emit('send-success'))
-    .catch(() => {})
+    .then((msg) => {
+      emit('send-success')
+      runAfterSend(msg)
+    })
+    .catch((e: any) => {
+      console.error('[MessageInput] sendTextMessage failed:', e)
+      showToast(e?.message || t('message.send.failed') || '发送失败')
+    })
   clearQuote()
 }
 
 /** 发送富文本消息（或提交编辑） */
-function handleSendRich(_html: string, text: string, mentionList?: MentionContact[]) {
+async function handleSendRich(_html: string, text: string, mentionList?: MentionContact[]) {
   if (editingMessage.value) {
     const target = editingMessage.value
     modifyTextMessage(target, text)
@@ -142,14 +186,24 @@ function handleSendRich(_html: string, text: string, mentionList?: MentionContac
       })
     return
   }
-  const ext = buildExtWithQuote()
+  let ext = buildExtWithQuote()
   // 如果有 mention，写入 ext.em_at_list
   if (mentionList && mentionList.length > 0) {
-    ext!.em_at_list = mentionList.map(m => m.userId)
+    ext = ext || {}
+    ext.em_at_list = mentionList.map(m => m.userId)
   }
+  // beforeSend 拦截
+  const canSend = await runBeforeSend({ type: 'txt', msg: text })
+  if (!canSend) return
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
-    .then(() => emit('send-success'))
-    .catch(() => {})
+    .then((msg) => {
+      emit('send-success')
+      runAfterSend(msg)
+    })
+    .catch((e: any) => {
+      console.error('[MessageInput] sendTextMessage failed:', e)
+      showToast(e?.message || t('message.send.failed') || '发送失败')
+    })
   clearQuote()
 }
 
@@ -157,11 +211,15 @@ function handleSendRich(_html: string, text: string, mentionList?: MentionContac
 const pendingBlobUrls = new Set<string>()
 
 /** 发送文件消息 */
-function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
+async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   const file = files[0]
   if (!file) return
 
   const ext = buildExtWithQuote()
+
+  // beforeSend 拦截
+  const canSend = await runBeforeSend({ type: type === 'image' ? 'img' : type })
+  if (!canSend) return
 
   let promise: Promise<any> | undefined
   if (type === 'image') {
@@ -171,7 +229,13 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   } else {
     promise = sendFileMessage(file, groupReadReceiptConfig.value, ext)
   }
-  promise?.then(() => emit('send-success')).catch(() => {})
+  promise?.then((msg) => {
+    emit('send-success')
+    runAfterSend(msg)
+  }).catch((e: any) => {
+    console.error('[MessageInput] sendFile failed:', e)
+    showToast(e?.message || t('message.send.failed') || '发送失败')
+  })
   clearQuote()
 }
 
@@ -306,15 +370,27 @@ function handleVoiceEnd(durationFromInput?: number) {
     return
   }
 
-  mediaRecorder.onstop = () => {
+  mediaRecorder.onstop = async () => {
     voiceStream?.getTracks().forEach((track) => track.stop())
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
       const ext = buildExtWithQuote()
+      // beforeSend 拦截
+      const canSend = await runBeforeSend({ type: 'audio' })
+      if (!canSend) {
+        clearQuote()
+        return
+      }
       sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value, ext)
-        .then(() => emit('send-success'))
-        .catch(() => {})
+        .then((msg) => {
+          emit('send-success')
+          runAfterSend(msg)
+        })
+        .catch((e: any) => {
+          console.error('[MessageInput] sendAudioMessage failed:', e)
+          showToast(e?.message || t('message.send.failed') || '发送失败')
+        })
       clearQuote()
     }
 
