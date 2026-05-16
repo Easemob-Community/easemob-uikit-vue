@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
   (e: 'typing'): void
+  (e: 'draft-change', text: string): void
 }>()
 
 const { t } = useLocale()
@@ -103,6 +104,7 @@ function triggerTyping() {
 function onInput() {
   detectMention()
   triggerTyping()
+  emit('draft-change', text.value)
 }
 
 /** 键盘事件 */

@@ -20,7 +20,13 @@ export interface MessageInputProps {
   isGroup?: boolean
 }
 
+export interface MessageInputEmits {
+  (e: 'draft-change', text: string): void
+  (e: 'send-success'): void
+}
+
 const props = defineProps<MessageInputProps>()
+const emit = defineEmits<MessageInputEmits>()
 
 const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage, sendTypingCmd } = useChat()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
@@ -95,7 +101,10 @@ function handleSendText(text: string, mentionList?: MentionContact[]) {
   if (editingMessage.value) {
     const target = editingMessage.value
     modifyTextMessage(target, text)
-      .then(() => setText(''))
+      .then(() => {
+        setText('')
+        emit('send-success')
+      })
       .catch((e: any) => {
         const code = e?.type ?? e?.code
         const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
@@ -111,6 +120,8 @@ function handleSendText(text: string, mentionList?: MentionContact[]) {
     ext!.em_at_list = mentionList.map(m => m.userId)
   }
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
+    .then(() => emit('send-success'))
+    .catch(() => {})
   clearQuote()
 }
 
@@ -119,7 +130,10 @@ function handleSendRich(_html: string, text: string, mentionList?: MentionContac
   if (editingMessage.value) {
     const target = editingMessage.value
     modifyTextMessage(target, text)
-      .then(() => setText(''))
+      .then(() => {
+        setText('')
+        emit('send-success')
+      })
       .catch((e: any) => {
         const code = e?.type ?? e?.code
         const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
@@ -135,6 +149,8 @@ function handleSendRich(_html: string, text: string, mentionList?: MentionContac
     ext!.em_at_list = mentionList.map(m => m.userId)
   }
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
+    .then(() => emit('send-success'))
+    .catch(() => {})
   clearQuote()
 }
 
@@ -148,13 +164,15 @@ function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
 
   const ext = buildExtWithQuote()
 
+  let promise: Promise<any> | undefined
   if (type === 'image') {
-    sendImageMessage(file, groupReadReceiptConfig.value, ext)
+    promise = sendImageMessage(file, groupReadReceiptConfig.value, ext)
   } else if (type === 'video') {
-    sendVideoMessage(file, groupReadReceiptConfig.value, ext)
+    promise = sendVideoMessage(file, groupReadReceiptConfig.value, ext)
   } else {
-    sendFileMessage(file, groupReadReceiptConfig.value, ext)
+    promise = sendFileMessage(file, groupReadReceiptConfig.value, ext)
   }
+  promise?.then(() => emit('send-success')).catch(() => {})
   clearQuote()
 }
 
@@ -296,6 +314,8 @@ function handleVoiceEnd(durationFromInput?: number) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
       const ext = buildExtWithQuote()
       sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value, ext)
+        .then(() => emit('send-success'))
+        .catch(() => {})
       clearQuote()
     }
 
@@ -376,6 +396,7 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @typing="sendTypingCmd"
+      @draft-change="emit('draft-change', $event)"
     />
 
     <!-- 富文本输入框 -->
@@ -389,6 +410,7 @@ defineExpose({
       @emoji-click="onEmojiClick"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @draft-change="emit('draft-change', $event)"
     />
 
     <!-- PC 端 Emoji Popup -->

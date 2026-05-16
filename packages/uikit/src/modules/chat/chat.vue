@@ -38,7 +38,7 @@ const messageStoreOptions = computed(() => ({
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat({ messageStoreOptions: messageStoreOptions.value })
 const { stores } = useUIKit()
-const { sendChannelAck } = useConversation()
+const { sendChannelAck, saveDraft, loadDraft, clearDraft } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
 const { t } = useLocale()
 
@@ -52,7 +52,7 @@ const messageInputRef = ref<InstanceType<typeof MessageInput>>()
 function onReedit(message: Message) {
   const originalText = message.originalMsg
   if (!originalText) return
-  // 重新编辑是“发送一条新消息”，不进入编辑态
+  // 重新编辑是"发送一条新消息"，不进入编辑态
   exitEditMode()
   nextTick(() => messageInputRef.value?.setText?.(originalText))
 }
@@ -63,6 +63,28 @@ function onEdit(message: Message) {
   enterEditMode(message)
   const originalText = (message as unknown as { msg?: string }).msg || ''
   nextTick(() => messageInputRef.value?.setText?.(originalText))
+}
+
+/** 恢复草稿到输入框 */
+function restoreDraft(cvsId: string) {
+  const draft = loadDraft(cvsId)
+  if (draft) {
+    nextTick(() => messageInputRef.value?.setText?.(draft))
+  }
+}
+
+/** 保存当前输入框草稿 */
+function handleSaveDraft(text: string) {
+  const cvsId = currentConversation.value?.id
+  if (!cvsId) return
+  saveDraft(cvsId, text)
+}
+
+/** 发送成功后清除草稿 */
+function handleSendSuccess() {
+  const cvsId = currentConversation.value?.id
+  if (!cvsId) return
+  clearDraft(cvsId)
 }
 
 /** 切换译文/原文 */
@@ -253,6 +275,9 @@ watch(currentConversation, async (cvs, oldCvs) => {
       locateAtMeMessage(cvs.id)
     }
   }
+
+  // 恢复草稿到输入框
+  restoreDraft(cvs.id)
 }, { immediate: true })
 
 /** 多选模式底部操作 */
@@ -396,7 +421,14 @@ function onMultiSelectDelete(messages: Message[]) {
     />
 
     <!-- 输入框 -->
-    <MessageInput v-if="!isMultiSelectMode" ref="messageInputRef" :config="props.config" :is-group="isGroupChat" />
+    <MessageInput
+      v-if="!isMultiSelectMode"
+      ref="messageInputRef"
+      :config="props.config"
+      :is-group="isGroupChat"
+      @draft-change="handleSaveDraft"
+      @send-success="handleSendSuccess"
+    />
 
     <!-- 聊天信息抽屉 -->
     <ChatInfoDrawer

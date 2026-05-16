@@ -25,6 +25,7 @@ const emit = defineEmits<{
   (e: 'voice-end'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
+  (e: 'draft-change', text: string): void
 }>()
 
 const { t } = useLocale()
@@ -149,6 +150,7 @@ function updateHasContent(e: any) {
   const text = e.getText().trim()
   const html = e.getHTML()
   hasContent.value = text.length > 0 || html.includes('<img')
+  emit('draft-change', e.getText())
 }
 
 /** 发送消息 */
