@@ -7,7 +7,7 @@ import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
-import type { ChatConfig } from '../types'
+import type { ChatConfig, MentionContact } from '../types'
 
 export interface RichInputProps {
   config?: ChatConfig['input']
@@ -18,7 +18,7 @@ export interface RichInputProps {
 const props = defineProps<RichInputProps>()
 
 const emit = defineEmits<{
-  (e: 'send', html: string, text: string): void
+  (e: 'send', html: string, text: string, mentionList?: MentionContact[]): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
   (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
@@ -59,6 +59,9 @@ const isRecording = ref(false)
 
 /** @提及锚点位置 */
 const mentionAnchorPos = ref(-1)
+
+/** 已插入的 @提及列表 */
+const mentionList = ref<MentionContact[]>([])
 
 /** Tiptap 编辑器实例 */
 const editor = useEditor({
@@ -153,11 +156,12 @@ function handleSend() {
   if (!editor.value || !hasContent.value) return
   const html = editor.value.getHTML()
   const text = editor.value.getText()
-  emit('send', html, text)
+  emit('send', html, text, mentionList.value.length > 0 ? mentionList.value : undefined)
   editor.value.commands.clearContent()
   // 发送后回收内联图片 blob URL
   inlineImageBlobUrls.forEach((url) => URL.revokeObjectURL(url))
   inlineImageBlobUrls.clear()
+  mentionList.value = []
 }
 
 /** 表情按钮 ref */
@@ -216,7 +220,7 @@ function insertEmoji(emoji: string) {
 }
 
 /** 插入 @提及 */
-function insertMention(name: string) {
+function insertMention(name: string, contact?: MentionContact) {
   if (!editor.value || mentionAnchorPos.value < 0) return
   const currentPos = editor.value.state.selection.from
   editor.value
@@ -226,11 +230,15 @@ function insertMention(name: string) {
     .insertContent(`@${name} `)
     .run()
   mentionAnchorPos.value = -1
+  if (contact && !mentionList.value.find(m => m.userId === contact.userId)) {
+    mentionList.value.push(contact)
+  }
 }
 
 /** 设置编辑器内容（用于重新编辑等场景） */
 function setText(value: string) {
   editor.value?.commands.setContent(value)
+  mentionList.value = []
 }
 
 /** 暴露方法 */

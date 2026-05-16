@@ -69,6 +69,12 @@ function onToggleTranslation(message: Message) {
   toggleTranslation(message.id)
 }
 
+/** @提及点击 */
+function onMentionClick(userId: string) {
+  // 默认行为：可扩展为跳转个人资料等
+  console.log('[Chat] mention clicked:', userId)
+}
+
 /** 置顶横幅配置 */
 const pinnedBarConfig = computed(() => props.config?.messageList?.pinnedBar)
 const showPinnedBar = computed(() => pinnedBarConfig.value?.visible !== false)
@@ -329,7 +335,7 @@ function onMultiSelectDelete(messages: Message[]) {
     />
 
     <!-- 消息列表 -->
-    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" />
+    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="onMentionClick" />
 
     <!-- 输入状态提示 -->
     <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />

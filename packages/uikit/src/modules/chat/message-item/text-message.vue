@@ -4,6 +4,7 @@ import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { linkify } from '../../../utils/linkify'
+import type { LinkSegment } from '../../../utils/linkify'
 import Icon from '../../../components/icon/icon.vue'
 import type { TextMessageType } from '../../../store/message'
 import type { ChatConfig } from '../types'
@@ -15,6 +16,7 @@ export interface TextMessageProps {
 export interface TextMessageEmits {
   (e: 'reedit', message: TextMessageType): void
   (e: 'toggle-translation', message: TextMessageType): void
+  (e: 'mention-click', userId: string): void
 }
 
 const props = defineProps<TextMessageProps>()
@@ -36,13 +38,71 @@ const enableLinkify = computed(() => textMessageConfig.value?.enableLinkify !== 
 /** 链接点击拦截器 */
 const linkClickHandler = computed(() => textMessageConfig.value?.onLinkClick)
 
-/** 消息文本 linkify 分片 */
-const msgSegments = computed(() => {
-  if (!enableLinkify.value) return null
-  return linkify(props.message.msg || '')
+/** 是否启用 @提及高亮识别，默认 true */
+const enableMentionHighlight = computed(() => textMessageConfig.value?.enableMentionHighlight !== false)
+
+/** @提及点击拦截器（优先使用配置回调，其次 emit） */
+const mentionClickHandler = computed(() => textMessageConfig.value?.onMentionClick)
+
+/** 提取消息中的 @提及列表（来自 ext.em_at_list） */
+const mentionList = computed(() => {
+  if (!enableMentionHighlight.value) return []
+  const ext = (props.message as unknown as { ext?: Record<string, any> }).ext
+  const list = ext?.em_at_list
+  if (Array.isArray(list)) return list as string[]
+  return []
 })
 
-/** 译文文本 linkify 分片 */
+/** 将消息文本按 @mention 和 linkify 分片 */
+const msgSegments = computed(() => {
+  const text = props.message.msg || ''
+  if (!text) return []
+
+  const mentions = mentionList.value
+  if (mentions.length === 0) {
+    // 无 mention，仅做 linkify
+    if (!enableLinkify.value) return [{ type: 'text' as const, value: text }]
+    return linkify(text)
+  }
+
+  // 有 mention：先按 @name 拆分，再对每段做 linkify
+  const result: Array<LinkSegment | { type: 'mention'; value: string; userId: string }> = []
+
+  let lastIndex = 0
+  const atRegex = /@([^\s\n]+)/g
+  let match: RegExpExecArray | null
+
+  while ((match = atRegex.exec(text)) !== null) {
+    const index = match.index
+    const name = match[1]
+    const full = match[0]
+
+    if (index > lastIndex) {
+      const beforeText = text.substring(lastIndex, index)
+      if (enableLinkify.value) {
+        result.push(...linkify(beforeText))
+      } else {
+        result.push({ type: 'text', value: beforeText })
+      }
+    }
+
+    result.push({ type: 'mention', value: full, userId: name })
+    lastIndex = index + full.length
+  }
+
+  if (lastIndex < text.length) {
+    const afterText = text.substring(lastIndex)
+    if (enableLinkify.value) {
+      result.push(...linkify(afterText))
+    } else {
+      result.push({ type: 'text', value: afterText })
+    }
+  }
+
+  return result
+})
+
+/** 译文文本分片 */
 const translationSegments = computed(() => {
   if (!enableLinkify.value) return null
   const text = props.message.translation?.text
@@ -97,6 +157,18 @@ function onLinkClick(url: string, event: MouseEvent) {
   // 默认行为：新窗口打开
   window.open(url, '_blank', 'noopener,noreferrer')
 }
+
+/** @提及点击 */
+function onMentionClick(userId: string, event: MouseEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+  const handler = mentionClickHandler.value
+  if (handler) {
+    handler(userId)
+    return
+  }
+  emit('mention-click', userId)
+}
 </script>
 
 <template>
@@ -115,8 +187,8 @@ function onLinkClick(url: string, event: MouseEvent) {
     <template v-else>
       <div class="text-message__bubble" :class="bubbleClass">
         <div class="text-message__content">
-          <!-- 启用 linkify 且包含链接时用分片渲染 -->
-          <template v-if="hasLinks && msgSegments">
+          <!-- 启用 linkify 或包含 mention 时用分片渲染 -->
+          <template v-if="msgSegments.length > 0">
             <template v-for="(seg, idx) in msgSegments" :key="idx">
               <a
                 v-if="seg.type === 'link'"
@@ -126,10 +198,15 @@ function onLinkClick(url: string, event: MouseEvent) {
                 rel="noopener noreferrer"
                 @click="onLinkClick(seg.href!, $event)"
               >{{ seg.value }}</a>
+              <span
+                v-else-if="seg.type === 'mention'"
+                class="text-message__mention"
+                @click="onMentionClick(seg.userId, $event)"
+              >{{ seg.value }}</span>
               <span v-else>{{ seg.value }}</span>
             </template>
           </template>
-          <!-- 无链接时纤文本渲染 -->
+          <!-- 无链接/mention 时纯文本渲染 -->
           <template v-else>
             {{ props.message.msg }}
           </template>
@@ -321,7 +398,24 @@ function onLinkClick(url: string, event: MouseEvent) {
   opacity: 0.8;
 }
 
-/* 链接样式 */
+/* @提及高亮样式 */
+.text-message__mention {
+  color: var(--uikit-primary-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.text-message__mention:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.text-message--self .text-message__mention {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, 0.7);
+}
 .text-message__link {
   color: var(--uikit-primary-color);
   text-decoration: underline;

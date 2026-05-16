@@ -90,7 +90,7 @@ function handleCancelEdit() {
 }
 
 /** 发送文本消息（或提交编辑） */
-function handleSendText(text: string) {
+function handleSendText(text: string, mentionList?: MentionContact[]) {
   // 编辑模式：改为调用 modifyMessage
   if (editingMessage.value) {
     const target = editingMessage.value
@@ -106,12 +106,16 @@ function handleSendText(text: string) {
     return
   }
   const ext = buildExtWithQuote()
+  // 如果有 mention，写入 ext.em_at_list
+  if (mentionList && mentionList.length > 0) {
+    ext!.em_at_list = mentionList.map(m => m.userId)
+  }
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
   clearQuote()
 }
 
 /** 发送富文本消息（或提交编辑） */
-function handleSendRich(_html: string, text: string) {
+function handleSendRich(_html: string, text: string, mentionList?: MentionContact[]) {
   if (editingMessage.value) {
     const target = editingMessage.value
     modifyTextMessage(target, text)
@@ -126,6 +130,10 @@ function handleSendRich(_html: string, text: string) {
     return
   }
   const ext = buildExtWithQuote()
+  // 如果有 mention，写入 ext.em_at_list
+  if (mentionList && mentionList.length > 0) {
+    ext!.em_at_list = mentionList.map(m => m.userId)
+  }
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
   clearQuote()
 }
@@ -194,9 +202,9 @@ function onMentionSelect(contact: MentionContact) {
   showMentionPicker.value = false
   const name = contact.remark || contact.name
   if (inputMode.value === 'simple') {
-    simpleInputRef.value?.insertMention?.(name)
+    simpleInputRef.value?.insertMention?.(contact)
   } else {
-    richInputRef.value?.insertMention?.(name)
+    richInputRef.value?.insertMention?.(name, contact)
   }
   // 选择后清理锚点
   cleanupMentionAnchor()

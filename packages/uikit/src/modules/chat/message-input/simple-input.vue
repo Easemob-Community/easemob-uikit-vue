@@ -6,7 +6,7 @@ import Input from '../../../components/input/input.vue'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
 import VoicePanel from './components/voice-panel.vue'
-import type { ChatConfig } from '../types'
+import type { ChatConfig, MentionContact } from '../types'
 
 export interface SimpleInputProps {
   config?: ChatConfig['input']
@@ -17,7 +17,7 @@ export interface SimpleInputProps {
 const props = defineProps<SimpleInputProps>()
 
 const emit = defineEmits<{
-  (e: 'send', text: string): void
+  (e: 'send', text: string, mentionList?: MentionContact[]): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
   (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
@@ -70,12 +70,18 @@ const isMobileRecording = ref(false)
 /** 是否处于录音模式（PC 端点击麦克风后进入） */
 const isVoiceMode = ref(false)
 
+/** 已插入的 @提及列表 */
+const mentionList = ref<MentionContact[]>([])
+
 /** 发送消息 */
 function handleSend() {
   const trimmed = text.value.trim()
   if (!trimmed) return
-  emit('send', trimmed)
+  // 过滤出实际出现在文本中的 mention
+  const activeMentions = mentionList.value.filter(m => trimmed.includes(`@${m.name}`))
+  emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
   text.value = ''
+  mentionList.value = []
 }
 
 /** 输入状态提示节流 */
@@ -234,7 +240,7 @@ function detectMention() {
 }
 
 /** 在光标位置插入 @提及文本（替换已有的 @keyword） */
-function insertMention(name: string) {
+function insertMention(contact: MentionContact) {
   const el = getInputEl()
   if (!el) return
 
@@ -250,11 +256,16 @@ function insertMention(name: string) {
 
   const before = value.substring(0, atPos)
   const after = value.substring(pos)
-  text.value = `${before}@${name} ${after}`
+  text.value = `${before}@${contact.name} ${after}`
+
+  // 记录 mention
+  if (!mentionList.value.find(m => m.userId === contact.userId)) {
+    mentionList.value.push(contact)
+  }
 
   // 恢复光标位置
   nextTick(() => {
-    const newPos = before.length + name.length + 2 // @name + 空格
+    const newPos = before.length + contact.name.length + 2 // @name + 空格
     el.setSelectionRange(newPos, newPos)
     el.focus()
   })
@@ -301,6 +312,7 @@ onBeforeUnmount(() => {
 /** 设置输入文本 */
 function setText(value: string) {
   text.value = value
+  mentionList.value = []
   nextTick(() => {
     const el = getInputEl()
     el?.focus()

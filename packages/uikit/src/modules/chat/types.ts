@@ -149,6 +149,10 @@ export interface ChatConfig {
      * - 返回 void / undefined / true：默认行为（跳转原始 URL）
      */
     onLinkClick?: (url: string) => boolean | string | void
+    /** 是否启用 @提及高亮识别，默认 true */
+    enableMentionHighlight?: boolean
+    /** @提及点击回调 */
+    onMentionClick?: (userId: string) => void
   }
 }
 

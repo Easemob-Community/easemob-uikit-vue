@@ -23,6 +23,7 @@ export interface MessageListEmits {
   (e: 'recall-failed', error: any, message: Message): void
   (e: 'edit', message: Message): void
   (e: 'forward', messages: Message[]): void
+  (e: 'mention-click', userId: string): void
 }
 
 const props = defineProps<MessageListProps>()
@@ -505,6 +506,7 @@ watch(locateRequest, (req) => {
           @reedit="onReedit"
           @resend="onResend"
           @toggle-translation="onToggleTranslation"
+          @mention-click="emit('mention-click', $event)"
         />
       </template>
     </MessageVirtualList>
@@ -534,6 +536,7 @@ watch(locateRequest, (req) => {
           @reedit="onReedit"
           @resend="onResend"
           @toggle-translation="onToggleTranslation"
+          @mention-click="emit('mention-click', $event)"
         />
       </div>
     </div>

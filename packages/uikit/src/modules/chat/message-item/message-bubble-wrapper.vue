@@ -33,6 +33,7 @@ export interface MessageBubbleWrapperEmits {
   (e: 'reedit', message: Message): void
   (e: 'toggle-translation', message: Message): void
   (e: 'resend', message: Message): void
+  (e: 'mention-click', userId: string): void
 }
 
 /** 弹窗中嵌套合并消息的层级栈 */
@@ -262,6 +263,7 @@ const isHighlighted = computed(() => {
               @reedit="emit('reedit', $event)"
               @toggle-translation="emit('toggle-translation', $event)"
               @view-combine="onViewCombine"
+              @mention-click="emit('mention-click', $event)"
             >
               <!-- 透传所有类型级插槽 -->
               <template

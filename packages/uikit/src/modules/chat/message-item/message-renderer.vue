@@ -17,6 +17,7 @@ export interface MessageRendererEmits {
   (e: 'reedit', message: Message): void
   (e: 'toggle-translation', message: Message): void
   (e: 'view-combine', message: Message): void
+  (e: 'mention-click', userId: string): void
 }
 
 const props = defineProps<MessageRendererProps>()
@@ -69,6 +70,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       @reedit="emit('reedit', $event)"
       @toggle-translation="emit('toggle-translation', $event)"
       @view="emit('view-combine', $event)"
+      @mention-click="emit('mention-click', $event)"
     />
 
     <!-- 未识别的消息类型 -->
