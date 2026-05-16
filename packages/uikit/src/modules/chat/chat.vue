@@ -65,23 +65,34 @@ function onEdit(message: Message) {
   nextTick(() => messageInputRef.value?.setText?.(originalText))
 }
 
-/** 恢复草稿到输入框 */
+/** 草稿功能开关 */
+const enableDraft = computed(() => props.config?.enableDraft !== false)
+
+/** 恢复草稿到输入框（无草稿时清空输入） */
 function restoreDraft(cvsId: string) {
+  if (!enableDraft.value) return
   const draft = loadDraft(cvsId)
-  if (draft) {
-    nextTick(() => messageInputRef.value?.setText?.(draft))
-  }
+  nextTick(() => {
+    // 防止异步竞态：仅当会话仍为目标会话时才操作输入框
+    if (currentConversation.value?.id !== cvsId) return
+    messageInputRef.value?.setText?.(draft || '')
+  })
 }
 
 /** 保存当前输入框草稿 */
-function handleSaveDraft(text: string) {
-  const cvsId = currentConversation.value?.id
-  if (!cvsId) return
-  saveDraft(cvsId, text)
+function saveCurrentDraft(cvsId: string) {
+  if (!enableDraft.value) return
+  const text = messageInputRef.value?.getText?.() || ''
+  if (text.trim()) {
+    saveDraft(cvsId, text)
+  } else {
+    clearDraft(cvsId)
+  }
 }
 
 /** 发送成功后清除草稿 */
 function handleSendSuccess() {
+  if (!enableDraft.value) return
   const cvsId = currentConversation.value?.id
   if (!cvsId) return
   clearDraft(cvsId)
@@ -246,6 +257,11 @@ function locateAtMeMessage(cvsId: string) {
 watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id) return
 
+  // 切换会话前：保存旧会话的未发送内容作为草稿
+  if (oldCvs) {
+    saveCurrentDraft(oldCvs.id)
+  }
+
   // 会话切换：清空引用状态与编辑态，避免跨会话残留
   clearQuote()
   exitEditMode()
@@ -276,7 +292,7 @@ watch(currentConversation, async (cvs, oldCvs) => {
     }
   }
 
-  // 恢复草稿到输入框
+  // 恢复新会话的草稿到输入框
   restoreDraft(cvs.id)
 }, { immediate: true })
 
@@ -426,7 +442,6 @@ function onMultiSelectDelete(messages: Message[]) {
       ref="messageInputRef"
       :config="props.config"
       :is-group="isGroupChat"
-      @draft-change="handleSaveDraft"
       @send-success="handleSendSuccess"
     />
 

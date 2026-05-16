@@ -25,7 +25,6 @@ const emit = defineEmits<{
   (e: 'voice-end'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
-  (e: 'draft-change', text: string): void
 }>()
 
 const { t } = useLocale()
@@ -150,7 +149,6 @@ function updateHasContent(e: any) {
   const text = e.getText().trim()
   const html = e.getHTML()
   hasContent.value = text.length > 0 || html.includes('<img')
-  emit('draft-change', e.getText())
 }
 
 /** 发送消息 */
@@ -243,11 +241,17 @@ function setText(value: string) {
   mentionList.value = []
 }
 
+/** 获取当前编辑器纯文本内容 */
+function getText(): string {
+  return editor.value?.getText() || ''
+}
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
   insertEmoji,
   setText,
+  getText,
 })
 
 /** 组件卸载时销毁编辑器并回收 Blob URL */

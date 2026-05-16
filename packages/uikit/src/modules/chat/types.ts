@@ -23,6 +23,8 @@ export type TimeDisplayStrategy = boolean | 'always' | 'hover'
 
 /** 聊天页面全局配置 */
 export interface ChatConfig {
+  /** 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true */
+  enableDraft?: boolean
   /** Header 配置 */
   header?: {
     /** 是否显示 header，默认 true */

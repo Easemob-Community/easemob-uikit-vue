@@ -21,7 +21,6 @@ export interface MessageInputProps {
 }
 
 export interface MessageInputEmits {
-  (e: 'draft-change', text: string): void
   (e: 'send-success'): void
 }
 
@@ -360,8 +359,18 @@ function setText(value: string) {
   }
 }
 
+/** 获取当前输入文本 */
+function getText(): string {
+  if (inputMode.value === 'simple') {
+    return simpleInputRef.value?.getText?.() || ''
+  } else {
+    return richInputRef.value?.getText?.() || ''
+  }
+}
+
 defineExpose({
   setText,
+  getText,
 })
 </script>
 
@@ -396,7 +405,6 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @typing="sendTypingCmd"
-      @draft-change="emit('draft-change', $event)"
     />
 
     <!-- 富文本输入框 -->
@@ -410,7 +418,6 @@ defineExpose({
       @emoji-click="onEmojiClick"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
-      @draft-change="emit('draft-change', $event)"
     />
 
     <!-- PC 端 Emoji Popup -->
