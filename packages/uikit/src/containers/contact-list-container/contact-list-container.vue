@@ -18,6 +18,9 @@ import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { Contact } from '../../store/contact'
 import type { Component } from 'vue'
 
+/** 联系人列表项点击行为模式 */
+export type ContactListClickBehavior = 'default' | 'event-only'
+
 export interface ContactListContainerProps {
   // ---------- 外观 ----------
   /** 是否展示头部，默认 true */
@@ -87,6 +90,14 @@ export interface ContactListContainerProps {
   /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
   searchComponent?: Component
 
+  // ---------- 点击行为 ----------
+  /**
+   * 列表项点击行为模式，默认 'default'。
+   * - 'default': 触发 click 事件，同时执行内部默认行为（设置 activeId）
+   * - 'event-only': 仅触发 click 事件，不执行内部默认行为，由外部完全接管
+   */
+  clickBehavior?: ContactListClickBehavior
+
   // ---------- 自治拉取 ----------
   /**
    * mount 时自动拉取联系人列表，默认 true。
@@ -115,6 +126,7 @@ const props = withDefaults(defineProps<ContactListContainerProps>(), {
   loadMoreThreshold: 60,
   bodySticky: false,
   footerSticky: false,
+  clickBehavior: 'default',
   autoFetch: true,
 })
 
@@ -199,6 +211,7 @@ defineExpose({
       :footer-sticky="props.footerSticky"
       :search-component="props.searchComponent"
       @select="(c: Contact) => emit('select', c)"
+      :click-behavior="props.clickBehavior"
       @click="(c: Contact) => emit('click', c)"
       @contextmenu="(e: MouseEvent, c: Contact) => emit('contextmenu', e, c)"
       @load-more="handleContactLoadMore"

@@ -6,6 +6,9 @@ export type { AvatarShape }
 /** 选择模式 */
 export type GroupSelectMode = 'none' | 'single' | 'multiple'
 
+/** 群组列表项点击行为模式 */
+export type GroupListClickBehavior = 'default' | 'event-only'
+
 /** Item 尺寸 */
 export type GroupItemSize = 'compact' | 'normal' | 'large'
 

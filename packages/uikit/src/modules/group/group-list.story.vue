@@ -324,5 +324,37 @@ function onLoadMore() {
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="ClickBehavior: event-only (外部接管)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList
+            click-behavior="event-only"
+            @click="(g) => console.log('[event-only] click:', g.groupName, g.groupId)"
+            @select="(g) => console.log('[event-only] select:', g.groupName, g.groupId)"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        点击列表项：仅触发 click 事件，不设置 activeId（无高亮）。打开控制台查看日志。
+      </div>
+    </Variant>
+
+    <Variant title="ClickBehavior: default (默认行为)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList
+            click-behavior="default"
+            @click="(g) => console.log('[default] click:', g.groupName, g.groupId)"
+            @select="(g) => console.log('[default] select:', g.groupName, g.groupId)"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        点击列表项：触发 click + select 事件，同时设置 activeId（有高亮）。打开控制台查看日志。
+      </div>
+    </Variant>
   </Story>
 </template>

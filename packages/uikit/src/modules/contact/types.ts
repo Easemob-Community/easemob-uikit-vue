@@ -12,6 +12,9 @@ export type AvatarShape = 'circle' | 'rounded' | 'square'
 /** 在线状态 */
 export type OnlineStatus = 'online' | 'offline' | 'away' | 'busy'
 
+/** 联系人列表项点击行为模式 */
+export type ContactListClickBehavior = 'default' | 'event-only'
+
 /** disabled 判定函数 */
 export type ContactDisabledFn = (contact: Contact) => boolean
 

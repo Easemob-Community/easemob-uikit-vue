@@ -19,6 +19,7 @@ import type {
   GroupDisabledFn,
   GroupSubtitleFn,
   AvatarShape,
+  GroupListClickBehavior,
 } from './types'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { Group } from '../../store/group'
@@ -85,6 +86,8 @@ const props = withDefaults(defineProps<{
   footerSticky?: boolean
   /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
   searchComponent?: Component
+  /** 列表项点击行为模式，默认 'default' */
+  clickBehavior?: GroupListClickBehavior
 }>(), {
   showHeader: true,
   headerAlign: 'left',
@@ -106,6 +109,7 @@ const props = withDefaults(defineProps<{
   enableLoadMore: true,
   bodySticky: false,
   footerSticky: false,
+  clickBehavior: 'default',
 })
 
 const emit = defineEmits<{
@@ -269,6 +273,10 @@ const alphabetKeys = computed(() => groupedGroups.value.map((g) => g.key))
 
 function onItemClick(group: Group) {
   emit('click', group)
+  if (props.clickBehavior === 'event-only') {
+    // 外部完全接管，不执行内部默认行为
+    return
+  }
   emit('select', group)
 }
 

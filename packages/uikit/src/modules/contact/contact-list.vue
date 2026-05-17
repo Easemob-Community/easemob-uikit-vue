@@ -23,6 +23,7 @@ import type {
   ContactSubtitleFn,
   ContactOnlineStatusFn,
   OnlineStatus,
+  ContactListClickBehavior,
 } from './types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
@@ -90,6 +91,8 @@ const props = withDefaults(defineProps<{
   footerSticky?: boolean
   /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
   searchComponent?: Component
+  /** 列表项点击行为模式，默认 'default' */
+  clickBehavior?: ContactListClickBehavior
 }>(), {
   showHeader: true,
   headerAlign: 'left',
@@ -110,6 +113,7 @@ const props = withDefaults(defineProps<{
   enableLoadMore: false,
   bodySticky: false,
   footerSticky: false,
+  clickBehavior: 'default',
 })
 
 const emit = defineEmits<{
@@ -297,6 +301,10 @@ async function scrollToGroup(key: string) {
 
 function onItemClick(contact: Contact) {
   emit('click', contact)
+  if (props.clickBehavior === 'event-only') {
+    // 外部完全接管，不执行内部默认行为
+    return
+  }
   emit('select', contact)
 }
 

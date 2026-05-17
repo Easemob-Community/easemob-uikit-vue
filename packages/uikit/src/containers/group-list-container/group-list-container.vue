@@ -17,6 +17,9 @@ import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { Group } from '../../store/group'
 import type { Component } from 'vue'
 
+/** 群组列表项点击行为模式 */
+export type GroupListClickBehavior = 'default' | 'event-only'
+
 export interface GroupListContainerProps {
   // ---------- 外观 ----------
   /** 是否展示头部，默认 true */
@@ -82,6 +85,14 @@ export interface GroupListContainerProps {
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
 
+  // ---------- 点击行为 ----------
+  /**
+   * 列表项点击行为模式，默认 'default'。
+   * - 'default': 触发 click 事件，同时执行内部默认行为（设置 activeId）
+   * - 'event-only': 仅触发 click 事件，不执行内部默认行为，由外部完全接管
+   */
+  clickBehavior?: GroupListClickBehavior
+
   // ---------- 自定义搜索 ----------
   /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
   searchComponent?: Component
@@ -114,6 +125,7 @@ const props = withDefaults(defineProps<GroupListContainerProps>(), {
   loadMoreThreshold: 60,
   bodySticky: false,
   footerSticky: false,
+  clickBehavior: 'default',
   autoFetch: true,
 })
 
@@ -198,6 +210,7 @@ defineExpose({
       :footer-sticky="props.footerSticky"
       :search-component="props.searchComponent"
       @select="(g: Group) => emit('select', g)"
+      :click-behavior="props.clickBehavior"
       @click="(g: Group) => emit('click', g)"
       @contextmenu="(e: MouseEvent, g: Group) => emit('contextmenu', e, g)"
       @load-more="handleGroupLoadMore"
