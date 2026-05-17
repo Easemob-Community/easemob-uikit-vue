@@ -15,6 +15,12 @@ export const useContactStore = defineStore('contact', () => {
   const loaded = ref(false)
   /** 黑名单是否已拉取过（幂等标记） */
   const blockListLoaded = ref(false)
+  /** 是否还有下一页 */
+  const hasMore = ref(false)
+  /** 分页游标 */
+  const cursor = ref<string>('')
+  /** 好友总数（由 getAllContacts 轻量接口提供） */
+  const contactCount = ref<number>(0)
 
   /** 黑名单 ID 集合（高频查询优化） */
   const blackIdSet = computed(() => new Set(blackList.value.map((c) => c.userId)))
@@ -22,6 +28,16 @@ export const useContactStore = defineStore('contact', () => {
   function setContactList(list: Contact[]) {
     contactList.value = list
     loaded.value = true
+  }
+
+  function appendContactList(list: Contact[]) {
+    const ids = new Set(contactList.value.map((c) => c.userId))
+    for (const c of list) {
+      if (!ids.has(c.userId)) {
+        contactList.value.push(c)
+        ids.add(c.userId)
+      }
+    }
   }
 
   function addContact(contact: Contact) {
@@ -64,11 +80,26 @@ export const useContactStore = defineStore('contact', () => {
     return blackIdSet.value.has(userId)
   }
 
+  function setHasMore(value: boolean) {
+    hasMore.value = value
+  }
+
+  function setCursor(value: string) {
+    cursor.value = value
+  }
+
+  function setContactCount(count: number) {
+    contactCount.value = count
+  }
+
   function clearContacts() {
     contactList.value = []
     blackList.value = []
     loaded.value = false
     blockListLoaded.value = false
+    hasMore.value = false
+    cursor.value = ''
+    contactCount.value = 0
   }
 
   return {
@@ -76,8 +107,12 @@ export const useContactStore = defineStore('contact', () => {
     blackList,
     loaded,
     blockListLoaded,
+    hasMore,
+    cursor,
+    contactCount,
     blackIdSet,
     setContactList,
+    appendContactList,
     addContact,
     removeContact,
     updateContactRemark,
@@ -85,6 +120,9 @@ export const useContactStore = defineStore('contact', () => {
     addToBlackList,
     removeFromBlackList,
     isBlocked,
+    setHasMore,
+    setCursor,
+    setContactCount,
     clearContacts,
   }
 })

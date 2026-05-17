@@ -11,7 +11,7 @@ import type { PresenceInfo } from '../store/presence'
  * - 传入 -> 业务接管该接口的数据获取/订阅
  */
 export interface UIKitDataSource {
-  fetchContacts?: () => Promise<Contact[]>
+  fetchContacts?: (params?: { cursor?: string; pageSize?: number }) => Promise<{ list: Contact[]; cursor?: string; hasMore?: boolean }>
   fetchBlocklist?: () => Promise<Contact[]>
   fetchGroups?: (params: { cursor?: string; pageSize?: number }) => Promise<{ list: Group[]; cursor?: string; hasMore?: boolean }>
   fetchPresence?: (userIds: string[]) => Promise<PresenceInfo[]>
@@ -19,11 +19,22 @@ export interface UIKitDataSource {
   unsubscribePresence?: (userIds: string[]) => Promise<void> | void
 }
 
+/**
+ * 联系人拉取模式
+ * - 'page': 分页拉取（默认，推荐）
+ * - 'all':  一次性全量拉取（getAllContacts）
+ */
+export type ContactFetchMode = 'page' | 'all'
+
 /** Provider 下发的全局能力开关 */
 export interface UIKitFeatures {
   enableContact: boolean
   enableBlocklist: boolean
   enablePresence: boolean
+  /** 联系人拉取模式，默认 'page' */
+  contactFetchMode: ContactFetchMode
+  /** 是否启用群组体系，默认 true */
+  enableGroup: boolean
 }
 
 export interface UIKitContext {

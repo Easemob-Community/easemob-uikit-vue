@@ -28,6 +28,8 @@ export interface EventHandlerOptions {
   enableBlocklist?: boolean
   /** 是否启用在线状态事件 */
   enablePresence?: boolean
+  /** 是否启用群组体系 */
+  enableGroup?: boolean
 }
 
 /**

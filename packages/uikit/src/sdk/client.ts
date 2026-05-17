@@ -319,6 +319,11 @@ export class UIKitClient {
   }
 
   // ========== 好友 ==========
+  /** 获取全部好友列表（轻量，仅 userId） */
+  async getAllContacts(): Promise<EasemobChat.AsyncResult<EasemobChat.ContactItem[]>> {
+    return this._connection.getAllContacts()
+  }
+
   /** 分页获取好友列表（含备注） */
   async getContactsWithCursor(options?: {
     pageSize?: number
