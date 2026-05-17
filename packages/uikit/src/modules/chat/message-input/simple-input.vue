@@ -447,7 +447,6 @@ defineExpose({
   gap: 8px;
   padding: 8px 12px;
   background-color: var(--uikit-bg-secondary);
-  border-top: 1px solid #e5e7eb;
 }
 
 /* 飞书风格：输入框在上，工具栏在下 */

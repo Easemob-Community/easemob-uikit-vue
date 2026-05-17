@@ -4,6 +4,9 @@ import { ref, watchEffect } from 'vue'
 /** 动画强度等级 */
 export type AnimationLevel = 'subtle' | 'normal' | 'expressive'
 
+/** 列表项 hover 风格 */
+export type HoverStyle = 'default' | 'rounded'
+
 /** 动画配置 */
 export interface AnimationConfig {
   /** 全局动画开关，默认 true */
@@ -21,6 +24,9 @@ export const useThemeStore = defineStore('theme', () => {
   const bubbleShape = ref<'ground' | 'square'>('ground')
   const componentsShape = ref<'ground' | 'square'>('ground')
 
+  // ===== Hover 风格配置 =====
+  const hoverStyle = ref<HoverStyle>('default')
+
   // ===== 动画配置 =====
   const animationEnabled = ref(true)
   const animationLevel = ref<AnimationLevel>('normal')
@@ -37,6 +43,27 @@ export const useThemeStore = defineStore('theme', () => {
       `hsla(${hue}, 100%, 60%, 0.25)`
     )
     document.documentElement.setAttribute('data-uikit-theme', mode.value)
+  })
+
+  // Hover 风格 DOM 属性联动
+  watchEffect(() => {
+    const isRounded = hoverStyle.value === 'rounded'
+    document.documentElement.style.setProperty(
+      '--uikit-item-hover-radius',
+      isRounded ? '8px' : '0px'
+    )
+    document.documentElement.style.setProperty(
+      '--uikit-item-hover-margin-x',
+      isRounded ? '8px' : '0px'
+    )
+    document.documentElement.style.setProperty(
+      '--uikit-item-hover-padding-x',
+      isRounded ? '8px' : '16px'
+    )
+    document.documentElement.style.setProperty(
+      '--uikit-item-active-radius',
+      isRounded ? '8px' : '0px'
+    )
   })
 
   // 动画相关 DOM 属性联动
@@ -74,6 +101,11 @@ export const useThemeStore = defineStore('theme', () => {
     componentsShape.value = shape
   }
 
+  // ===== Hover setters =====
+  function setHoverStyle(style: HoverStyle) {
+    hoverStyle.value = style
+  }
+
   // ===== 动画 setters =====
   function setAnimationEnabled(value: boolean) {
     animationEnabled.value = value
@@ -102,6 +134,7 @@ export const useThemeStore = defineStore('theme', () => {
     avatarShape,
     bubbleShape,
     componentsShape,
+    hoverStyle,
     animationEnabled,
     animationLevel,
     animationRipple,
@@ -110,6 +143,7 @@ export const useThemeStore = defineStore('theme', () => {
     setAvatarShape,
     setBubbleShape,
     setComponentsShape,
+    setHoverStyle,
     setAnimationEnabled,
     setAnimationLevel,
     setAnimationRipple,

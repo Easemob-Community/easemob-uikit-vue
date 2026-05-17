@@ -319,6 +319,7 @@ defineExpose({
         <Input
           v-else
           v-model="searchKeyword"
+          variant="search"
           :placeholder="t('group.searchPlaceholder')"
           prefix-icon="misc/magnifier2"
         />
@@ -456,14 +457,12 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid #e5e7eb;
   position: relative;
   background-color: var(--uikit-bg-base);
 }
 
 .group-list__header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -492,8 +491,7 @@ defineExpose({
 }
 
 .group-list__search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 2px 18px 8px;
 }
 
 .group-list__items {
@@ -519,7 +517,6 @@ defineExpose({
 
 .group-list__body--sticky {
   flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 .group-list__footer {
@@ -528,7 +525,6 @@ defineExpose({
 
 .group-list__footer--sticky {
   flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
 }
 
 .group-list__empty-wrap,

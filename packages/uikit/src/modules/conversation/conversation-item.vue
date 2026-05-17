@@ -288,20 +288,24 @@ const displayMessage = computed(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px var(--uikit-item-hover-padding-x, 16px);
+  margin: 0 var(--uikit-item-hover-margin-x, 0px);
   cursor: pointer;
   transition: background-color 0.15s;
   position: relative;
   -webkit-touch-callout: none;
   user-select: none;
+  border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
 .conversation-item.is-pinned {
   background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.04);
+  border-radius: var(--uikit-item-active-radius, 0px);
 }
 
 .conversation-item:hover {
   background-color: var(--uikit-bg-secondary);
+  border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
 .conversation-item__info {

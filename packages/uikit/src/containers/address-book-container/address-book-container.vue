@@ -319,6 +319,7 @@ const subviewTitle = computed(() => {
           <div v-if="props.showSearch" class="address-book-container__search">
             <Input
               v-model="homeSearchKeyword"
+              variant="search"
               :placeholder="t('contact.searchPlaceholder')"
               prefix-icon="misc/magnifier2"
             />
@@ -417,7 +418,6 @@ const subviewTitle = computed(() => {
 
 .address-book-container__header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -439,8 +439,7 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 2px 18px 8px;
 }
 
 .address-book-container__nav-wrap {
@@ -454,7 +453,6 @@ const subviewTitle = computed(() => {
 
 .address-book-container__home-footer {
   padding: 12px 16px;
-  border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
 }
 
@@ -466,7 +464,6 @@ const subviewTitle = computed(() => {
 .address-book-container__subheader {
   position: relative;
   padding: 12px 48px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;

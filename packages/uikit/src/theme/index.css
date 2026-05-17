@@ -9,6 +9,11 @@
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
 
+  /* 边框与分隔线 */
+  --uikit-border-color: #e5e7eb;
+  --uikit-border-light: #f3f4f6;
+  --uikit-divider-color: rgba(0, 0, 0, 0.06);
+
   /* 滚动条 */
   --uikit-scrollbar-width: 6px;
   --uikit-scrollbar-track: transparent;
@@ -56,6 +61,11 @@
   --uikit-bg-secondary: #1f2937;
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
+
+  /* 边框与分隔线 - 暗色 */
+  --uikit-border-color: #374151;
+  --uikit-border-light: #1f2937;
+  --uikit-divider-color: rgba(255, 255, 255, 0.06);
 
   /* 滚动条 - 暗色 */
   --uikit-scrollbar-thumb: #4b5563;

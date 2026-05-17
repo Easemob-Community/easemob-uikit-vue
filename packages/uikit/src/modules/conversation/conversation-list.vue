@@ -207,6 +207,7 @@ function confirmDelete() {
     <div v-if="props.showSearch" class="conversation-list__search">
       <Input
         v-model="searchKeyword"
+        variant="search"
         :placeholder="t('conversation.searchPlaceholder')"
         prefix-icon="misc/magnifier2"
       />
@@ -293,13 +294,11 @@ function confirmDelete() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid #e5e7eb;
   position: relative;
 }
 
 .conversation-list__header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -373,8 +372,7 @@ function confirmDelete() {
 }
 
 .conversation-list__search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 2px 18px 8px;
 }
 
 .conversation-list__title {
@@ -408,7 +406,6 @@ function confirmDelete() {
 
 .conversation-list__body--sticky {
   flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 .conversation-list__footer {
@@ -417,7 +414,6 @@ function confirmDelete() {
 
 .conversation-list__footer--sticky {
   flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
 }
 
 .conversation-list__pull-refresh {

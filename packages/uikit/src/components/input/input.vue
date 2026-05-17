@@ -14,10 +14,13 @@ export interface InputProps {
   prefixIcon?: string
   /**
    * 输入框风格变体
-   * - 'default': 白色背景 + 边框，适用于表单输入
-   * - 'search': 灰色背景 + 无边框，适用于搜索框（默认）
+   * - 'default': 白色背景 + 边框 + 圆角，适用于表单输入（默认）
+   * - 'search': 白底 + 底部细线，适用于搜索框
+   * - 'filled': 灰色背景 + 无边框 + 圆角，旧搜索风格
+   * - 'ghost': 完全透明 + 聚焦时底部细线，极简风格
+   * - 'underline': 无背景 + 仅底部一条线，最极简
    */
-  variant?: 'default' | 'search'
+  variant?: 'default' | 'search' | 'filled' | 'ghost' | 'underline'
 }
 
 export interface InputEmits {
@@ -32,7 +35,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   modelValue: '',
   type: 'text',
   disabled: false,
-  variant: 'search',
+  variant: 'default',
 })
 
 const emit = defineEmits<InputEmits>()
@@ -43,9 +46,13 @@ const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : ''
 )
 
-const variantClass = computed(() =>
-  props.variant === 'search' ? 'uikit-input__field--search' : ''
-)
+const variantClass = computed(() => {
+  if (props.variant === 'search') return 'uikit-input__field--search'
+  if (props.variant === 'filled') return 'uikit-input__field--filled'
+  if (props.variant === 'ghost') return 'uikit-input__field--ghost'
+  if (props.variant === 'underline') return 'uikit-input__field--underline'
+  return ''
+})
 
 function onInput(e: Event) {
   const target = e.target as HTMLInputElement
@@ -71,6 +78,9 @@ defineExpose({
     :class="{
       'uikit-input--with-prefix': props.prefixIcon,
       'uikit-input--search': props.variant === 'search',
+      'uikit-input--filled': props.variant === 'filled',
+      'uikit-input--ghost': props.variant === 'ghost',
+      'uikit-input--underline': props.variant === 'underline',
     }"
   >
     <Icon
@@ -119,7 +129,7 @@ defineExpose({
 .uikit-input__field {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
   border-radius: 8px;
   font-size: 14px;
   outline: none;
@@ -136,11 +146,11 @@ defineExpose({
   border-color: var(--uikit-primary-color);
 }
 
-/* Search 风格：灰色背景 + 无边框 */
+/* Search 风格：灰色背景 + 无边框 + 圆角 + 聚焦光环（飞书风格） */
 .uikit-input__field--search {
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   border-color: transparent;
-  border-radius: 10px;
+  padding-left: 28px;
 }
 
 .uikit-input__field--search:focus {
@@ -151,6 +161,66 @@ defineExpose({
 
 .uikit-input--search .uikit-input__prefix-icon {
   color: var(--uikit-text-secondary, #9ca3af);
+  left: 4px;
+}
+
+/* Filled 风格：灰色背景 + 无边框 + 圆角 */
+.uikit-input__field--filled {
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  border-color: transparent;
+  padding-left: 28px;
+}
+
+.uikit-input__field--filled:focus {
+  border-color: transparent;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  box-shadow: none;
+}
+
+.uikit-input--filled .uikit-input__prefix-icon {
+  color: var(--uikit-text-secondary, #9ca3af);
+  left: 4px;
+}
+
+/* Ghost 风格：完全透明 + 聚焦时底部细线 */
+.uikit-input__field--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  padding-left: 28px;
+}
+
+.uikit-input__field--ghost:focus {
+  border-color: transparent;
+  border-bottom: 1px solid var(--uikit-primary-color);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.uikit-input--ghost .uikit-input__prefix-icon {
+  color: var(--uikit-text-secondary, #9ca3af);
+  left: 4px;
+}
+
+/* Underline 风格：无背景 + 仅底部一条线 */
+.uikit-input__field--underline {
+  background-color: transparent;
+  border-color: transparent;
+  border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  border-radius: 0;
+  padding-left: 28px;
+}
+
+.uikit-input__field--underline:focus {
+  border-color: transparent;
+  border-bottom-color: var(--uikit-primary-color);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.uikit-input--underline .uikit-input__prefix-icon {
+  color: var(--uikit-text-secondary, #9ca3af);
+  left: 4px;
 }
 
 .uikit-input__field::placeholder {

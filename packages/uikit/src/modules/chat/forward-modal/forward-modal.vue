@@ -64,6 +64,7 @@ function onSelect(conversation: Conversation) {
       <div class="forward-modal__search">
         <Input
           v-model="searchKeyword"
+          variant="search"
           :placeholder="t('conversation.searchPlaceholder')"
           prefix-icon="misc/magnifier2"
         />

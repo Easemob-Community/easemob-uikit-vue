@@ -5,6 +5,7 @@ import {
   EmContactContainer,
   EmChatContainer,
   EmPopup,
+  EmInput,
   useTheme,
   useLocale,
   useUIKit,
@@ -36,13 +37,17 @@ function toggleEnableBlocklist(v: boolean) { emit('update:enableBlocklist', v) }
 function toggleEnablePresence(v: boolean) { emit('update:enablePresence', v) }
 function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource', v) }
 
-const { mode, primaryColor, setMode, setPrimaryColor, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
+const { mode, primaryColor, hoverStyle, setMode, setPrimaryColor, setHoverStyle, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
 const { setLocalConversationList } = useConversation()
 
 const showSettings = ref(false)
+
+// Input 组件风格演示
+const inputVariant = ref<'default' | 'search' | 'filled' | 'ghost' | 'underline'>('search')
+const inputDemoValue = ref('')
 
 // 输入框配置状态
 const chatInputMode = ref<'simple' | 'rich'>('simple')
@@ -295,6 +300,26 @@ function injectMockContacts() {
           </div>
 
           <div class="demo-settings__group">
+            <label class="demo-settings__label">Hover 风格</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': hoverStyle === 'default' }"
+                @click="setHoverStyle('default')"
+              >
+                默认
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': hoverStyle === 'rounded' }"
+                @click="setHoverStyle('rounded')"
+              >
+                圆角卡片
+              </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
             <label class="demo-settings__label">头像形状</label>
             <div class="demo-settings__options">
               <button
@@ -418,6 +443,55 @@ function injectMockContacts() {
               >
                 关闭
               </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">Input 组件风格</label>
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': inputVariant === 'default' }"
+                @click="inputVariant = 'default'"
+              >
+                default
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': inputVariant === 'search' }"
+                @click="inputVariant = 'search'"
+              >
+                search
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': inputVariant === 'filled' }"
+                @click="inputVariant = 'filled'"
+              >
+                filled
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': inputVariant === 'ghost' }"
+                @click="inputVariant = 'ghost'"
+              >
+                ghost
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': inputVariant === 'underline' }"
+                @click="inputVariant = 'underline'"
+              >
+                underline
+              </button>
+            </div>
+            <div style="margin-top: 8px;">
+              <EmInput
+                v-model="inputDemoValue"
+                :variant="inputVariant"
+                prefix-icon="misc/magnifier2"
+                placeholder="预览 Input 风格..."
+              />
             </div>
           </div>
 

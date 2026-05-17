@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useUIKit } from './use-uikit'
-import type { AnimationLevel, AnimationConfig } from '../store/theme'
+import type { AnimationLevel, AnimationConfig, HoverStyle } from '../store/theme'
 
 export function useTheme() {
   const { theme: themeStore } = useUIKit()
@@ -27,6 +27,10 @@ export function useTheme() {
 
   function setComponentsShape(shape: 'ground' | 'square') {
     themeStore.setComponentsShape(shape)
+  }
+
+  function setHoverStyle(style: HoverStyle) {
+    themeStore.setHoverStyle(style)
   }
 
   function toggleMode() {
@@ -61,11 +65,13 @@ export function useTheme() {
     avatarShape: computed(() => themeStore.avatarShape),
     bubbleShape: computed(() => themeStore.bubbleShape),
     componentsShape: computed(() => themeStore.componentsShape),
+    hoverStyle: computed(() => themeStore.hoverStyle),
     setMode,
     setPrimaryColor,
     setAvatarShape,
     setBubbleShape,
     setComponentsShape,
+    setHoverStyle,
     toggleMode,
     animationEnabled,
     animationLevel,

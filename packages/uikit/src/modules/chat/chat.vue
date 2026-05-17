@@ -620,7 +620,6 @@ function onMultiSelectDelete(messages: Message[]) {
   position: relative;
   z-index: 101;
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   min-height: 48px;

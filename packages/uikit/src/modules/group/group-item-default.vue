@@ -96,15 +96,17 @@ const rootClass = computed(() => ({
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0 var(--uikit-item-hover-padding-x, 16px);
+  margin: 0 var(--uikit-item-hover-margin-x, 0px);
   height: var(--group-item-height, 56px);
   cursor: pointer;
   transition: background-color 0.15s, opacity 0.15s;
+  border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
 .group-item-default.size-compact {
   height: var(--group-item-height-compact, 48px);
-  padding: 0 12px;
+  padding: 0 calc(var(--uikit-item-hover-padding-x, 16px) - 4px);
   gap: 10px;
 }
 
@@ -115,10 +117,12 @@ const rootClass = computed(() => ({
 
 .group-item-default:hover {
   background-color: var(--uikit-bg-secondary);
+  border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
 .group-item-default.is-active {
   background-color: var(--group-active-bg, var(--uikit-bg-secondary));
+  border-radius: var(--uikit-item-active-radius, 0px);
 }
 
 .group-item-default.is-disabled {

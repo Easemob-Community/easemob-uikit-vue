@@ -347,6 +347,7 @@ defineExpose({
         <Input
           v-else
           v-model="searchKeyword"
+          variant="search"
           :placeholder="t('contact.searchPlaceholder')"
           prefix-icon="misc/magnifier2"
         />
@@ -485,14 +486,12 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid #e5e7eb;
   position: relative;
   background-color: var(--uikit-bg-base);
 }
 
 .contact-list__header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -521,8 +520,7 @@ defineExpose({
 }
 
 .contact-list__search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 2px 18px 8px;
 }
 
 .contact-list__items {
@@ -548,7 +546,6 @@ defineExpose({
 
 .contact-list__body--sticky {
   flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 .contact-list__footer {
@@ -557,7 +554,6 @@ defineExpose({
 
 .contact-list__footer--sticky {
   flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
 }
 
 .contact-list__empty-wrap,
