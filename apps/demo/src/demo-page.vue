@@ -17,6 +17,24 @@ import type { Conversation, Contact } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
 
+/** Provider 面 三开关 + 自定义 dataSource（v-model 双向绑定到 app.vue） */
+const props = defineProps<{
+  enableContact: boolean
+  enableBlocklist: boolean
+  enablePresence: boolean
+  useCustomDataSource: boolean
+}>()
+const emit = defineEmits<{
+  (e: 'update:enableContact', v: boolean): void
+  (e: 'update:enableBlocklist', v: boolean): void
+  (e: 'update:enablePresence', v: boolean): void
+  (e: 'update:useCustomDataSource', v: boolean): void
+}>()
+function toggleEnableContact(v: boolean) { emit('update:enableContact', v) }
+function toggleEnableBlocklist(v: boolean) { emit('update:enableBlocklist', v) }
+function toggleEnablePresence(v: boolean) { emit('update:enablePresence', v) }
+function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource', v) }
+
 const { mode, primaryColor, setMode, setPrimaryColor, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
@@ -587,6 +605,48 @@ function injectMockContacts() {
             <div class="demo-info">
               关闭时：中文全部归入 # 分组，只能原文搜索。<br />
               开启后：按拼音首字母分组（张三 → Z），支持输入 zhang / zs 搜索。
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">Provider 能力开关</label>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <label class="demo-check">
+                <input
+                  type="checkbox"
+                  :checked="props.enableContact"
+                  @change="toggleEnableContact(($event.target as HTMLInputElement).checked)"
+                />
+                <span>enableContact 拉取好友列表 / 事件</span>
+              </label>
+              <label class="demo-check">
+                <input
+                  type="checkbox"
+                  :checked="props.enableBlocklist"
+                  @change="toggleEnableBlocklist(($event.target as HTMLInputElement).checked)"
+                />
+                <span>enableBlocklist 拉取黑名单 / 事件</span>
+              </label>
+              <label class="demo-check">
+                <input
+                  type="checkbox"
+                  :checked="props.enablePresence"
+                  @change="toggleEnablePresence(($event.target as HTMLInputElement).checked)"
+                />
+                <span>enablePresence 按需订阅在线状态</span>
+              </label>
+              <label class="demo-check">
+                <input
+                  type="checkbox"
+                  :checked="props.useCustomDataSource"
+                  @change="toggleCustomDataSource(($event.target as HTMLInputElement).checked)"
+                />
+                <span>使用自定义 dataSource（业务接管 fetchContacts）</span>
+              </label>
+            </div>
+            <div class="demo-info">
+              默认全关。开启对应开关后，登录后 Provider 会拉黑名单；ContactContainer 会拉好友 / 群。<br />
+              启用自定义 dataSource 后，拉好友将走示例接口（返回 Alice/Bob）而非 SDK。
             </div>
           </div>
 
