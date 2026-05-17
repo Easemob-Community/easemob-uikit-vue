@@ -7,3 +7,19 @@ export { default as EmContactContainer } from './contact-container/contact-conta
 export { default as EmAddressBookContainer } from './address-book-container/address-book-container.vue'
 export { default as EmContactListContainer } from './contact-list-container/contact-list-container.vue'
 export { default as EmGroupListContainer } from './group-list-container/group-list-container.vue'
+
+export type {
+  ContactContainerProps,
+  ContactContainerView,
+  ContactContainerEntryKey,
+  ContactContainerTransition,
+} from './contact-container/contact-container.vue'
+export type {
+  AddressBookContainerProps,
+  AddressBookContainerView,
+  AddressBookContainerEntry,
+  AddressBookContainerEntryKey,
+  AddressBookContainerTransition,
+} from './address-book-container/address-book-container.vue'
+export type { ContactListContainerProps } from './contact-list-container/contact-list-container.vue'
+export type { GroupListContainerProps } from './group-list-container/group-list-container.vue'

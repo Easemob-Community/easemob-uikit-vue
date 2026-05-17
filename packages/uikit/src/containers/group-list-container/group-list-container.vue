@@ -15,6 +15,7 @@ import type {
 } from '../../modules/group/types'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { Group } from '../../store/group'
+import type { Component } from 'vue'
 
 export interface GroupListContainerProps {
   // ---------- 外观 ----------
@@ -80,6 +81,10 @@ export interface GroupListContainerProps {
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
+
+  // ---------- 自定义搜索 ----------
+  /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
+  searchComponent?: Component
 
   // ---------- 自治拉取 ----------
   /**
@@ -191,6 +196,7 @@ defineExpose({
       :no-more-text="props.noMoreText"
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
+      :search-component="props.searchComponent"
       @select="(g: Group) => emit('select', g)"
       @click="(g: Group) => emit('click', g)"
       @contextmenu="(e: MouseEvent, g: Group) => emit('contextmenu', e, g)"
@@ -224,6 +230,9 @@ defineExpose({
       </template>
       <template v-if="$slots.item" #item="slotProps">
         <slot name="item" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.search" #search="slotProps">
+        <slot name="search" v-bind="slotProps" />
       </template>
     </GroupList>
   </div>

@@ -67,6 +67,11 @@ const chatInputMaxLength = ref(0)
 const groupReadReceiptEnabled = ref(false)
 const groupReadReceiptMaxSize = ref(200)
 
+// 联系人容器搜索控制
+const showHomeSearch = ref(true)
+const showContactSearch = ref(true)
+const showGroupSearch = ref(true)
+
 /** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
   header: { showAvatar: true } ,
@@ -621,6 +626,27 @@ function injectMockContacts() {
           </div>
 
           <div class="demo-settings__group">
+            <label class="demo-settings__label">联系人搜索控制</label>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <label class="demo-check">
+                <input v-model="showHomeSearch" type="checkbox" />
+                <span>展示 home 视图搜索</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="showContactSearch" type="checkbox" />
+                <span>展示联系人子视图搜索</span>
+              </label>
+              <label class="demo-check">
+                <input v-model="showGroupSearch" type="checkbox" />
+                <span>展示群组子视图搜索</span>
+              </label>
+            </div>
+            <div class="demo-info">
+              独立控制各视图搜索框显隐。全关则使用 :show-search="false" 统一关闭。
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
             <label class="demo-settings__label">Provider 能力开关</label>
             <div style="display: flex; flex-direction: column; gap: 6px;">
               <label class="demo-check">
@@ -776,7 +802,12 @@ function injectMockContacts() {
           </div>
         </template> -->
       </EmConversationContainer>
-      <EmContactContainer v-else />
+      <EmContactContainer
+        v-else
+        :show-home-search="showHomeSearch"
+        :show-contact-search="showContactSearch"
+        :show-group-search="showGroupSearch"
+      />
     </div>
 
     <!-- 右侧主体：聊天容器 -->

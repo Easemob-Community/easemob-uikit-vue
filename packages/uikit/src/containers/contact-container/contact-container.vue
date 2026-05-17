@@ -29,9 +29,10 @@ import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { Contact } from '../../store/contact'
 import type { Group } from '../../store/group'
+import type { Component } from 'vue'
 
 /** 容器视图状态（兼容旧命名） */
-export type ContactContainerView = 'home' | 'group' | 'contact'
+export type ContactContainerView = 'home' | 'group' | 'contact' | 'notice'
 
 /** 入口标识（兼容旧命名） */
 export type ContactContainerEntryKey = 'notice' | 'group' | 'contact'
@@ -44,7 +45,14 @@ export interface ContactContainerProps {
   showHeader?: boolean
   title?: string
   headerAlign?: 'left' | 'center' | 'right'
+  /** 是否展示搜索框（向后兼容的统一开关，默认 true） */
   showSearch?: boolean
+  /** 是否展示 home 视图搜索框，默认 true */
+  showHomeSearch?: boolean
+  /** 是否展示联系人子视图搜索框，默认 undefined（回退到 showSearch） */
+  showContactSearch?: boolean
+  /** 是否展示群组子视图搜索框，默认 undefined（回退到 showSearch） */
+  showGroupSearch?: boolean
   showScrollToTop?: boolean
   class?: string
   style?: Record<string, string>
@@ -53,18 +61,26 @@ export interface ContactContainerProps {
   // ---------- 聚合入口 ----------
   /** 是否展示「通知」入口，默认 true */
   showNotice?: boolean
+  /** @deprecated 请使用 showNotice */
+  showNewRequest?: boolean
   showGroup?: boolean
   showContact?: boolean
   /** 「通知」徽标数量，默认 0（外部注入） */
   noticeCount?: number
+  /** @deprecated 请使用 noticeCount */
+  newRequestCount?: number
   groupCount?: number
   contactCount?: number
   autoEntryCount?: boolean
   entryOrder?: ContactContainerEntryKey[]
   noticeLabel?: string
+  /** @deprecated 请使用 noticeLabel */
+  newRequestLabel?: string
   groupLabel?: string
   contactLabel?: string
   noticeIcon?: string
+  /** @deprecated 请使用 noticeIcon */
+  newRequestIcon?: string
   groupIcon?: string
   contactIcon?: string
   initialView?: ContactContainerView
@@ -118,6 +134,12 @@ export interface ContactContainerProps {
   groupEmptyText?: string
   groupNoMoreText?: string
 
+  // ---------- 自定义搜索 ----------
+  /** 联系人子视图自定义搜索组件 */
+  contactSearchComponent?: Component
+  /** 群组子视图自定义搜索组件 */
+  groupSearchComponent?: Component
+
   // ---------- 自治拉取 ----------
   autoFetch?: boolean
   autoFetchGroups?: boolean
@@ -127,6 +149,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showHeader: true,
   headerAlign: 'left',
   showSearch: true,
+  showHomeSearch: true,
   showScrollToTop: true,
   transition: 'slide',
   showNotice: true,
@@ -166,7 +189,10 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
 
 const emit = defineEmits<{
   (e: 'view-change', view: ContactContainerView): void
+  (e: 'entry-click', key: string): void
   (e: 'notice-click'): void
+  /** @deprecated 请使用 notice-click */
+  (e: 'new-request-click'): void
   (e: 'home-search', keyword: string): void
   (e: 'contact-select', contact: Contact): void
   (e: 'contact-click', contact: Contact): void
@@ -186,10 +212,12 @@ const addressBookRef = ref<InstanceType<typeof AddressBookContainer>>()
 const contactListContainerRef = ref<InstanceType<typeof ContactListContainer>>()
 const groupListContainerRef = ref<InstanceType<typeof GroupListContainer>>()
 
-const currentView = computed(() => addressBookRef.value?.view ?? 'home')
+const currentView = computed(() => addressBookRef.value?.view)
 
 watch(currentView, (v) => {
-  emit('view-change', v as ContactContainerView)
+  if (v !== undefined) {
+    emit('view-change', v as ContactContainerView)
+  }
 })
 
 function goHome() {
@@ -200,6 +228,9 @@ function goContact() {
 }
 function goGroup() {
   addressBookRef.value?.goGroup()
+}
+function goNotice() {
+  addressBookRef.value?.goNotice()
 }
 function goTo(key: string) {
   addressBookRef.value?.goTo(key)
@@ -215,7 +246,9 @@ defineExpose({
   goHome,
   goContact,
   goGroup,
+  goNotice,
   goTo,
+  setView: goTo,
   scrollToGroup,
 })
 </script>
@@ -228,26 +261,27 @@ defineExpose({
     :show-header="props.showHeader"
     :title="props.title"
     :header-align="props.headerAlign"
-    :show-search="props.showSearch"
+    :show-search="props.showHomeSearch"
     :transition="props.transition"
-    :show-notice="props.showNotice"
+    :show-notice="props.showNotice ?? props.showNewRequest"
     :show-group="props.showGroup"
     :show-contact="props.showContact"
-    :notice-count="props.noticeCount"
+    :notice-count="props.noticeCount ?? props.newRequestCount"
     :group-count="props.groupCount"
     :contact-count="props.contactCount"
     :auto-entry-count="props.autoEntryCount"
     :entry-order="props.entryOrder"
-    :notice-label="props.noticeLabel"
+    :notice-label="props.noticeLabel ?? props.newRequestLabel"
     :group-label="props.groupLabel"
     :contact-label="props.contactLabel"
-    :notice-icon="props.noticeIcon"
+    :notice-icon="props.noticeIcon ?? props.newRequestIcon"
     :group-icon="props.groupIcon"
     :contact-icon="props.contactIcon"
     :entries="props.entries"
     :initial-view="props.initialView as AddressBookContainerView"
     @view-change="(v) => emit('view-change', v as ContactContainerView)"
-    @notice-click="emit('notice-click')"
+    @entry-click="(k) => emit('entry-click', k)"
+    @notice-click="() => { emit('notice-click'); emit('new-request-click') }"
     @home-search="(k) => emit('home-search', k)"
   >
     <template #header>
@@ -284,8 +318,9 @@ defineExpose({
         v-if="view === 'contact'"
         ref="contactListContainerRef"
         :show-header="false"
-        :show-search="props.showSearch"
+        :show-search="props.showContactSearch ?? props.showSearch"
         :show-scroll-to-top="props.showScrollToTop"
+        :search-component="props.contactSearchComponent"
         :show-count="props.showCount"
         :empty-text="props.emptyText"
         :filter-fn="props.filterFn"
@@ -341,6 +376,9 @@ defineExpose({
         <template v-if="$slots.item" #item="slotProps">
           <slot name="item" v-bind="slotProps" />
         </template>
+        <template v-if="$slots['contact-search']" #search="slotProps">
+          <slot name="contact-search" v-bind="slotProps" />
+        </template>
       </ContactListContainer>
 
       <!-- Group 子视图 -->
@@ -348,8 +386,9 @@ defineExpose({
         v-else-if="view === 'group'"
         ref="groupListContainerRef"
         :show-header="false"
-        :show-search="props.showSearch"
+        :show-search="props.showGroupSearch ?? props.showSearch"
         :show-scroll-to-top="props.showScrollToTop"
+        :search-component="props.groupSearchComponent"
         :show-count="props.groupShowCount"
         :empty-text="props.groupEmptyText"
         :filter-fn="props.groupFilterFn"
@@ -404,6 +443,9 @@ defineExpose({
         </template>
         <template v-if="$slots['group-item']" #item="slotProps">
           <slot name="group-item" v-bind="slotProps" />
+        </template>
+        <template v-if="$slots['group-search']" #search="slotProps">
+          <slot name="group-search" v-bind="slotProps" />
         </template>
       </GroupListContainer>
 

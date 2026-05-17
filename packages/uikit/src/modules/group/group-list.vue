@@ -22,6 +22,7 @@ import type {
 } from './types'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { Group } from '../../store/group'
+import type { Component } from 'vue'
 
 const props = withDefaults(defineProps<{
   /** 是否展示头部区域，默认 true */
@@ -82,6 +83,8 @@ const props = withDefaults(defineProps<{
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
+  /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
+  searchComponent?: Component
 }>(), {
   showHeader: true,
   headerAlign: 'left',
@@ -182,8 +185,8 @@ const isAlphabet = computed(() => props.groupBy === 'alphabet')
 const isFlatNoGroup = computed(() => props.groupBy === 'none')
 
 // ================== selectedIds 受控同步 ==================
-let isInternalUpdate = false
-let lastValidIds: string[] = []
+const isInternalUpdate = ref(false)
+const lastValidIds = ref<string[]>([])
 
 watch(
   () => props.selectedIds,
@@ -192,11 +195,11 @@ watch(
     const cur = Array.from(storeSelectedIds.value).slice().sort().join(',')
     const next = [...ids].slice().sort().join(',')
     if (cur !== next) {
-      isInternalUpdate = true
+      isInternalUpdate.value = true
       setSelectedIds(ids)
-      lastValidIds = [...ids]
+      lastValidIds.value = [...ids]
       nextTick(() => {
-        isInternalUpdate = false
+        isInternalUpdate.value = false
       })
     }
   },
@@ -206,17 +209,17 @@ watch(
 watch(
   () => Array.from(storeSelectedIds.value),
   (next) => {
-    if (isInternalUpdate) return
+    if (isInternalUpdate.value) return
     if (props.maxSelected && next.length > props.maxSelected) {
-      isInternalUpdate = true
-      setSelectedIds(lastValidIds)
+      isInternalUpdate.value = true
+      setSelectedIds(lastValidIds.value)
       nextTick(() => {
-        isInternalUpdate = false
+        isInternalUpdate.value = false
       })
       emit('max-exceed', props.maxSelected)
       return
     }
-    lastValidIds = [...next]
+    lastValidIds.value = [...next]
     emit('update:selectedIds', next)
   },
 )
@@ -238,11 +241,16 @@ function releaseLoadMoreLock() {
   isLoadingMore.value = false
 }
 
+const scrollEl = ref<HTMLElement | null>(null)
+
 onMounted(() => {
-  itemsRef.value?.addEventListener('scroll', onScroll, { passive: true })
+  scrollEl.value = itemsRef.value ?? null
+  scrollEl.value?.addEventListener('scroll', onScroll, { passive: true })
 })
 onBeforeUnmount(() => {
-  itemsRef.value?.removeEventListener('scroll', onScroll)
+  if (scrollEl.value) {
+    scrollEl.value.removeEventListener('scroll', onScroll)
+  }
 })
 
 /** 跳转到指定分组 */
@@ -290,12 +298,23 @@ defineExpose({
       </slot>
     </div>
 
-    <div v-if="props.showSearch" class="group-list__search">
-      <Input
-        v-model="searchKeyword"
-        :placeholder="t('group.searchPlaceholder')"
-        prefix-icon="misc/magnifier2"
-      />
+    <div
+      v-if="$slots.search || props.searchComponent || props.showSearch"
+      class="group-list__search"
+    >
+      <slot name="search" :keyword="searchKeyword" :set-keyword="setFilterText">
+        <component
+          :is="props.searchComponent"
+          v-if="props.searchComponent"
+          v-model="searchKeyword"
+        />
+        <Input
+          v-else
+          v-model="searchKeyword"
+          :placeholder="t('group.searchPlaceholder')"
+          prefix-icon="misc/magnifier2"
+        />
+      </slot>
     </div>
 
     <!-- body slot - sticky 模式 -->

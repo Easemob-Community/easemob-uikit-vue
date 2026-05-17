@@ -117,6 +117,8 @@ const groupStore = useGroupStore()
 /** 群组能力是否启用（Provider 层冻结） */
 const groupEnabled = computed(() => features.enableGroup !== false)
 
+const view = ref<AddressBookContainerView>(resolveInitialView())
+
 /** home 视图下轻量获取好友总数（不拉取完整列表） */
 function maybeFetchContactCount() {
   fetchContactCount()
@@ -160,8 +162,6 @@ function resolveInitialView(): AddressBookContainerView {
   return 'home'
 }
 
-const view = ref<AddressBookContainerView>(resolveInitialView())
-
 watch(
   () => [props.showContact, props.showGroup, props.showNotice, props.initialView] as const,
   () => {
@@ -194,6 +194,8 @@ const resolvedContactCount = computed(() => {
   return contactList.value.length
 })
 
+type NavEntryWithSort = ContactNavEntry & { sort?: number }
+
 const navEntries = computed<ContactNavEntry[]>(() => {
   const order = props.entryOrder ?? (['notice', 'group', 'contact'] as const)
   const map: Record<string, ContactNavEntry> = {
@@ -220,7 +222,7 @@ const navEntries = computed<ContactNavEntry[]>(() => {
     },
   }
   const builtInEntries = order.map((k) => map[k]).filter((e): e is ContactNavEntry => Boolean(e))
-  const customEntries = (props.entries ?? []).map((e) => ({
+  const customEntries: NavEntryWithSort[] = (props.entries ?? []).map((e) => ({
     key: e.key,
     label: e.label,
     count: e.count,
@@ -228,16 +230,16 @@ const navEntries = computed<ContactNavEntry[]>(() => {
     visible: e.visible !== false,
     sort: e.sort,
   }))
-  const all = [...builtInEntries, ...customEntries]
-  const hasSort = all.some((e) => typeof (e as any).sort === 'number')
+  const all: NavEntryWithSort[] = [...builtInEntries, ...customEntries]
+  const hasSort = all.some((e) => typeof e.sort === 'number')
   if (hasSort) {
-    return all.sort((a, b) => {
-      const sa = typeof (a as any).sort === 'number' ? (a as any).sort : Infinity
-      const sb = typeof (b as any).sort === 'number' ? (b as any).sort : Infinity
+    return [...all].sort((a, b) => {
+      const sa = typeof a.sort === 'number' ? a.sort : Infinity
+      const sb = typeof b.sort === 'number' ? b.sort : Infinity
       return sa - sb
-    }) as ContactNavEntry[]
+    })
   }
-  return all as ContactNavEntry[]
+  return all
 })
 
 function onEntryClick(key: string) {
@@ -294,7 +296,6 @@ const subviewTitle = computed(() => {
   <div class="address-book-container" :class="props.class" :style="props.style">
     <Transition
       :name="`address-book-container-${props.transition}`"
-      :duration="props.transition === 'none' ? 0 : 220"
       mode="out-in"
     >
       <div :key="view" class="address-book-container__view">

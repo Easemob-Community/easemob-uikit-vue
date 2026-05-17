@@ -711,5 +711,99 @@ function groupSubtitleFn(g: Group): string | undefined {
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="Search: Hide Home Search">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :notice-count="3"
+            :show-home-search="false"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Search: Hide Contact Search">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-notice="false"
+            :show-group="false"
+            :show-contact-search="false"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Search: Hide Group Search">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-notice="false"
+            :show-contact="false"
+            :show-group-search="false"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Search: Hide All Search">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :notice-count="3"
+            :show-home-search="false"
+            :show-contact-search="false"
+            :show-group-search="false"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Search: Custom Contact Search Slot">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-notice="false"
+            :show-group="false"
+            @vue:mounted="injectMockContacts"
+          >
+            <template #contact-search="{ keyword, setKeyword }">
+              <input
+                :value="keyword"
+                placeholder="🔍 自定义联系人搜索..."
+                style="width: 100%; padding: 8px 12px; border: 2px solid #3b82f6; border-radius: 8px; outline: none; font-size: 14px;"
+                @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
+              />
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Search: Custom Group Search Slot">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-notice="false"
+            :show-contact="false"
+            @vue:mounted="injectMockGroups"
+          >
+            <template #group-search="{ keyword, setKeyword }">
+              <input
+                :value="keyword"
+                placeholder="🔍 自定义群组搜索..."
+                style="width: 100%; padding: 8px 12px; border: 2px solid #10b981; border-radius: 8px; outline: none; font-size: 14px;"
+                @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
+              />
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>

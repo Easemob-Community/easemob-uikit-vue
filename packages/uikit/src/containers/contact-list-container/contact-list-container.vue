@@ -16,6 +16,7 @@ import type {
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { Contact } from '../../store/contact'
+import type { Component } from 'vue'
 
 export interface ContactListContainerProps {
   // ---------- 外观 ----------
@@ -82,6 +83,10 @@ export interface ContactListContainerProps {
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
 
+  // ---------- 自定义搜索 ----------
+  /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
+  searchComponent?: Component
+
   // ---------- 自治拉取 ----------
   /**
    * mount 时自动拉取联系人列表，默认 true。
@@ -106,7 +111,7 @@ const props = withDefaults(defineProps<ContactListContainerProps>(), {
   avatarShape: 'circle',
   itemSize: 'normal',
   loading: false,
-  enableLoadMore: true,
+  enableLoadMore: false,
   loadMoreThreshold: 60,
   bodySticky: false,
   footerSticky: false,
@@ -192,6 +197,7 @@ defineExpose({
       :no-more-text="props.noMoreText"
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
+      :search-component="props.searchComponent"
       @select="(c: Contact) => emit('select', c)"
       @click="(c: Contact) => emit('click', c)"
       @contextmenu="(e: MouseEvent, c: Contact) => emit('contextmenu', e, c)"
@@ -225,6 +231,9 @@ defineExpose({
       </template>
       <template v-if="$slots.item" #item="slotProps">
         <slot name="item" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.search" #search="slotProps">
+        <slot name="search" v-bind="slotProps" />
       </template>
     </ContactList>
   </div>
