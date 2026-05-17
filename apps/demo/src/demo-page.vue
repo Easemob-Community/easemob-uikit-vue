@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {
   EmConversationContainer,
   EmContactContainer,
@@ -171,6 +171,15 @@ function injectMockConversations() {
 
 /** 左侧边栏 tab：会话 / 联系人 */
 const sidebarTab = ref<'conversation' | 'contact'>('conversation')
+
+const { stores } = useUIKit()
+
+/** 切到联系人页时清空当前会话，避免右侧 Chat 仍显示旧会话 */
+watch(sidebarTab, (tab) => {
+  if (tab === 'contact') {
+    stores.conversation.setCurrentConversation(null)
+  }
+})
 
 /** 拼音 adapter 开关（对比体验未注入 vs 已注入的区别） */
 const pinyinAdapterEnabled = ref(false)

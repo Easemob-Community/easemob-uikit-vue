@@ -103,9 +103,9 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="3"
+            :notice-count="3"
             @vue:mounted="injectMock"
-            @new-request-click="() => console.log('new-request-click')"
+            @notice-click="() => console.log('notice-click')"
             @view-change="(v) => console.log('view-change:', v)"
           />
         </UIKitProvider>
@@ -115,7 +115,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     <Variant title="Hide NewRequest">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :show-new-request="false" @vue:mounted="injectMock" />
+          <ContactContainer :show-notice="false" @vue:mounted="injectMock" />
         </UIKitProvider>
       </div>
     </Variant>
@@ -124,7 +124,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             @vue:mounted="injectMockContacts"
           />
@@ -136,7 +136,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             @vue:mounted="injectMockGroups"
           />
@@ -148,7 +148,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-sort-by="pinyin"
             @vue:mounted="injectMockGroups"
@@ -161,7 +161,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-sort-by="memberCount"
             @vue:mounted="injectMockGroups"
@@ -174,7 +174,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             :group-sort-by="customGroupComparator"
             @vue:mounted="injectMockGroups"
@@ -187,7 +187,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-sort-by="pinyin"
             group-group-by="alphabet"
@@ -200,7 +200,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     <Variant title="Custom Nav Entry Slot">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :new-request-count="5" @vue:mounted="injectMock">
+          <ContactContainer :notice-count="5" @vue:mounted="injectMock">
             <template #nav-entry="{ entry }">
               <div
                 style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
@@ -266,7 +266,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             group-by="none"
             @vue:mounted="injectMockContacts"
@@ -279,7 +279,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             :group-by="vowelGrouper"
             :show-alphabet-nav="false"
@@ -293,7 +293,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             select-mode="single"
             @contact-select="(c) => console.log('selected:', c.userId)"
@@ -307,7 +307,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             select-mode="multiple"
             @vue:mounted="injectMockContacts"
@@ -320,7 +320,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             :filter-fn="customFilterFn"
             @vue:mounted="injectMockContacts"
@@ -332,7 +332,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     <Variant title="Contact: Custom Empty Slot">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :show-new-request="false" :show-group="false">
+          <ContactContainer :show-notice="false" :show-group="false">
             <template #empty="{ searchKeyword }">
               <div style="text-align: center; padding: 60px 16px;">
                 <div style="font-size: 32px; margin-bottom: 8px;">📒</div>
@@ -353,7 +353,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             @vue:mounted="injectMockContacts"
           >
@@ -392,7 +392,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="3"
+            :notice-count="3"
             transition="fade"
             @vue:mounted="injectMock"
           />
@@ -404,7 +404,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="3"
+            :notice-count="3"
             transition="none"
             @vue:mounted="injectMock"
           />
@@ -416,7 +416,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="5"
+            :notice-count="5"
             auto-entry-count
             show-count
             group-show-count
@@ -430,7 +430,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="5"
+            :notice-count="5"
             :group-count="99"
             :contact-count="888"
             @vue:mounted="injectMock"
@@ -442,7 +442,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     <Variant title="#home-footer Slot (首页底部插槽)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :new-request-count="2" @vue:mounted="injectMock">
+          <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #home-footer>
               <div
                 style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #6b7280;"
@@ -464,7 +464,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     <Variant title="#header-extra Slot (右上角操作区)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :new-request-count="2" @vue:mounted="injectMock">
+          <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #header-extra>
               <span
                 style="font-size: 13px; color: #3b82f6; cursor: pointer;"
@@ -480,7 +480,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             item-size="compact"
             @vue:mounted="injectMockContacts"
@@ -493,7 +493,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             item-size="large"
             :subtitle-fn="contactSubtitleFn"
@@ -507,7 +507,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-item-size="large"
             :group-subtitle-fn="groupSubtitleFn"
@@ -521,7 +521,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="2"
+            :notice-count="2"
             avatar-shape="square"
             group-avatar-shape="rounded"
             @vue:mounted="injectMock"
@@ -534,7 +534,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :new-request-count="2"
+            :notice-count="2"
             :show-avatar="false"
             :group-show-avatar="false"
             @vue:mounted="injectMock"
@@ -547,7 +547,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             select-mode="multiple"
             :selected-ids="contactSelectedIds"
@@ -567,7 +567,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-select-mode="multiple"
             :group-selected-ids="groupSelectedIds"
@@ -587,7 +587,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             loading
             @vue:mounted="injectMockContacts"
@@ -600,7 +600,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-loading
             @vue:mounted="injectMockGroups"
@@ -613,7 +613,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             :group-sort-by="customGroupComparator"
             group-group-by="alphabet"
@@ -628,7 +628,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             :enable-load-more="false"
             @vue:mounted="injectMockContacts"
@@ -641,7 +641,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             no-more-text="—— 已经到底了 ——"
             @vue:mounted="injectMockContacts"
@@ -654,7 +654,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-group="false"
             body-sticky
             footer-sticky
@@ -679,7 +679,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             :group-enable-load-more="false"
             @vue:mounted="injectMockGroups"
@@ -692,7 +692,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
-            :show-new-request="false"
+            :show-notice="false"
             :show-contact="false"
             group-no-more-text="—— 群组已加载完毕 ——"
             @vue:mounted="injectMockGroups"
@@ -705,7 +705,7 @@ function groupSubtitleFn(g: Group): string | undefined {
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false" :enable-group="false">
           <ContactContainer
-            :new-request-count="3"
+            :notice-count="3"
             @vue:mounted="injectMockContacts"
           />
         </UIKitProvider>

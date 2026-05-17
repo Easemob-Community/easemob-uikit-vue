@@ -51,7 +51,7 @@ const messages: LocaleMessages = {
   'contact.empty': 'No contacts',
   'contact.noSearchResult': 'No matching contacts',
   'contact.searchPlaceholder': 'Search contacts...',
-  'contact.entryNewRequest': 'New Requests',
+  'contact.entryNotice': 'New Requests',
   'contact.entryGroup': 'Groups',
   'contact.entryContact': 'Contacts',
   'group.title': 'Groups',
