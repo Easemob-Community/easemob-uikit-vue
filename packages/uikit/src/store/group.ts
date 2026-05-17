@@ -13,9 +13,34 @@ export interface Group {
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<Group[]>([])
   const currentGroup = ref<Group | null>(null)
+  /** 是否已拉取过群组列表（幂等标记） */
+  const loaded = ref(false)
+  /** 是否还有下一页 */
+  const hasMore = ref(false)
+  /** 分页游标（SDK 使用 pageNum，此处统一抽象为 cursor） */
+  const cursor = ref<string>('')
 
   function setGroupList(list: Group[]) {
     groupList.value = list
+    loaded.value = true
+  }
+
+  function appendGroupList(list: Group[]) {
+    const ids = new Set(groupList.value.map((g) => g.groupId))
+    for (const g of list) {
+      if (!ids.has(g.groupId)) {
+        groupList.value.push(g)
+        ids.add(g.groupId)
+      }
+    }
+  }
+
+  function setHasMore(value: boolean) {
+    hasMore.value = value
+  }
+
+  function setCursor(value: string) {
+    cursor.value = value
   }
 
   function addGroup(group: Group) {
@@ -57,12 +82,21 @@ export const useGroupStore = defineStore('group', () => {
   function clearGroups() {
     groupList.value = []
     currentGroup.value = null
+    loaded.value = false
+    hasMore.value = false
+    cursor.value = ''
   }
 
   return {
     groupList,
     currentGroup,
+    loaded,
+    hasMore,
+    cursor,
     setGroupList,
+    appendGroupList,
+    setHasMore,
+    setCursor,
     addGroup,
     removeGroup,
     setCurrentGroup,
