@@ -318,6 +318,98 @@ export class UIKitClient {
     })
   }
 
+  // ========== 好友 ==========
+  /** 获取好友 userId 列表（轻量） */
+  async getContacts(): Promise<string[]> {
+    const res = await (this._connection as any).getContacts()
+    return (res?.data || []) as string[]
+  }
+
+  /** 获取所有好友（含备注） */
+  async getAllContacts(): Promise<Array<{ userId: string; remark?: string }>> {
+    const res = await (this._connection as any).getAllContacts()
+    return (res?.data || []) as Array<{ userId: string; remark?: string }>
+  }
+
+  /** 添加好友 */
+  async addContact(userId: string, reason?: string): Promise<void> {
+    return (this._connection as any).addContact(userId, reason ?? '')
+  }
+
+  /** 删除好友 */
+  async deleteContact(userId: string): Promise<void> {
+    return (this._connection as any).deleteContact(userId)
+  }
+
+  /** 设置好友备注 */
+  async setContactRemark(userId: string, remark: string): Promise<void> {
+    return (this._connection as any).setContactRemark({ userId, remark })
+  }
+
+  // ========== 黑名单 ==========
+  /** 获取黑名单 */
+  async getBlocklist(): Promise<string[]> {
+    const res = await (this._connection as any).getBlocklist()
+    if (Array.isArray(res?.data)) return res.data as string[]
+    if (Array.isArray(res)) return res as string[]
+    return []
+  }
+
+  /** 加入黑名单 */
+  async addUsersToBlocklist(userIds: string[]): Promise<void> {
+    return (this._connection as any).addUsersToBlocklist({ name: userIds })
+  }
+
+  /** 移出黑名单 */
+  async removeUserFromBlocklist(userId: string): Promise<void> {
+    return (this._connection as any).removeUserFromBlocklist({ name: userId })
+  }
+
+  // ========== 群组 ==========
+  /** 拉取已加入的群组（分页） */
+  async getJoinedGroups(options?: {
+    pageSize?: number
+    pageNum?: number
+    needAffiliations?: boolean
+    needRole?: boolean
+  }): Promise<Array<{ groupId: string; groupName?: string; disabled?: boolean; public?: boolean; role?: string }>> {
+    const res = await (this._connection as any).getJoinedGroups({
+      pageSize: options?.pageSize ?? 50,
+      pageNum: options?.pageNum ?? 0,
+      needAffiliations: options?.needAffiliations ?? false,
+      needRole: options?.needRole ?? false,
+    })
+    if (Array.isArray(res?.data)) return res.data
+    if (Array.isArray(res)) return res
+    return []
+  }
+
+  /** 获取单个群详情 */
+  async getGroupInfo(groupId: string): Promise<any> {
+    return (this._connection as any).getGroupInfo({ groupId })
+  }
+
+  // ========== Presence ==========
+  /** 订阅在线状态变更 */
+  async subscribePresence(userIds: string[], expiry = 7 * 24 * 60 * 60): Promise<any> {
+    return (this._connection as any).subscribePresence({ usernames: userIds, expiry })
+  }
+
+  /** 取消订阅在线状态 */
+  async unsubscribePresence(userIds: string[]): Promise<any> {
+    return (this._connection as any).unsubscribePresence({ usernames: userIds })
+  }
+
+  /** 主动获取在线状态 */
+  async getPresenceStatus(userIds: string[]): Promise<any> {
+    return (this._connection as any).getPresenceStatus({ usernames: userIds })
+  }
+
+  /** 发布自定义在线状态 */
+  async publishPresence(description: string): Promise<any> {
+    return (this._connection as any).publishPresence({ description })
+  }
+
   /** 添加事件处理器 */
   addEventHandler(id: string, handler: EasemobChat.EventHandlerType) {
     this._handlers.set(id, handler)

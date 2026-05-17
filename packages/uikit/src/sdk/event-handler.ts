@@ -5,6 +5,8 @@ import { useMessageStore } from '../store/message'
 import { useClientStore } from '../store/client'
 import { useConversationStore } from '../store/conversation'
 import { useGroupStore } from '../store/group'
+import { useContactStore } from '../store/contact'
+import { usePresenceStore, type PresenceStatus } from '../store/presence'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../constants'
 import type { Message } from '../store/message'
 import type { ConversationTypeValue } from '../constants'
@@ -14,6 +16,18 @@ export interface RootStores {
   client: ReturnType<typeof useClientStore>
   conversation: ReturnType<typeof useConversationStore>
   group: ReturnType<typeof useGroupStore>
+  contact: ReturnType<typeof useContactStore>
+  presence: ReturnType<typeof usePresenceStore>
+}
+
+/** 事件处理器可选业务开关，按需挂载对应类别事件 */
+export interface EventHandlerOptions {
+  /** 是否启用好友事件（邀请/同意/拒绝/删除等） */
+  enableContact?: boolean
+  /** 是否启用黑名单事件 */
+  enableBlocklist?: boolean
+  /** 是否启用在线状态事件 */
+  enablePresence?: boolean
 }
 
 /**
@@ -39,7 +53,7 @@ function resolveConversationId(msg: SdkMsgBase, currentUser: string): string {
   return (isGroup ? msg.to : (msg.from === currentUser ? msg.to : msg.from)) || ''
 }
 
-export function createEventHandler(client: UIKitClient, stores: RootStores) {
+export function createEventHandler(client: UIKitClient, stores: RootStores, options: EventHandlerOptions = {}) {
   /**
    * 检测消息是否@了当前用户
    * - 检查 ext.em_at_list 是否包含当前用户ID
@@ -274,6 +288,90 @@ export function createEventHandler(client: UIKitClient, stores: RootStores) {
     onError: (error) => {
       console.error('[UIKit SDK Error]', error)
     },
+  }
+
+  // ========== 好友事件（可选） ==========
+  if (options.enableContact) {
+    const contactHandler: Pick<
+      EasemobChat.EventHandlerType,
+      'onContactInvited' | 'onContactAgreed' | 'onContactRefuse' | 'onContactDeleted' | 'onContactAdded'
+    > = {
+      onContactInvited: (msg: EasemobChat.ContactMsgBody) => {
+        // 接收到好友邀请——业务层可通过自定义 hook 接管，默认不介入 store
+        console.info('[UIKit] onContactInvited:', msg)
+      },
+      onContactAgreed: (msg: EasemobChat.ContactMsgBody) => {
+        const userId = msg.from
+        if (!userId) return
+        stores.contact.addContact({ userId, name: userId })
+      },
+      onContactRefuse: (msg: EasemobChat.ContactMsgBody) => {
+        console.info('[UIKit] onContactRefuse:', msg)
+      },
+      onContactDeleted: (msg: EasemobChat.ContactMsgBody) => {
+        const userId = msg.from
+        if (userId) stores.contact.removeContact(userId)
+      },
+      onContactAdded: (msg: EasemobChat.ContactMsgBody) => {
+        const userId = msg.from
+        if (!userId) return
+        stores.contact.addContact({ userId, name: userId })
+      },
+    }
+    Object.assign(handler, contactHandler)
+  }
+
+  // ========== 黑名单事件（可选） ==========
+  // 注：SDK 4.21.0 的 EventHandlerType 未公开 onBlockMsg，但运行时确实会回调，
+  // 这里基于 SDK 实际下发结构定义最小局部类型，避免使用 any。
+  if (options.enableBlocklist) {
+    interface BlockMsgBody {
+      action: 'addUserToBlackList' | 'removeUserFromBlackList'
+      from?: string
+      to?: string
+      type?: string
+    }
+    const blockHandler: { onBlockMsg: (msg: BlockMsgBody) => void } = {
+      onBlockMsg: (msg: BlockMsgBody) => {
+        // SDK 黑名单事件路由在 onBlockMsg 中，action 区分 add/remove
+        const userId = msg.from
+        if (!userId) return
+        if (msg.action === 'addUserToBlackList') {
+          stores.contact.addToBlackList({ userId, name: userId })
+        } else if (msg.action === 'removeUserFromBlackList') {
+          stores.contact.removeFromBlackList(userId)
+        }
+      },
+    }
+    Object.assign(handler, blockHandler)
+  }
+
+  // ========== 在线状态事件（可选） ==========
+  if (options.enablePresence) {
+    const presenceHandler: Pick<EasemobChat.EventHandlerType, 'onPresenceStatusChange'> = {
+      onPresenceStatusChange: (list: EasemobChat.PresenceType[]) => {
+        if (!Array.isArray(list)) return
+        const mapped = list.map((item) => {
+          // SDK 返回结构：PresenceType { userId, ext, statusDetails: StatusDetailsType[{ device, status }] }
+          // statusDetails 中任一设备 status === 1 即视为在线（SDK 类型为 number，运行时也可能为字符串 '1'）
+          const userId = item.userId || ''
+          const details: EasemobChat.StatusDetailsType[] = Array.isArray(item.statusDetails) ? item.statusDetails : []
+          const isOnline = details.some((d) => Number(d?.status) === 1)
+          const ext = item.ext || ''
+          let status: PresenceStatus = isOnline ? 'online' : 'offline'
+          if (ext) {
+            // 存在自定义描述时，优先识别为常见状态字面量
+            const lower = ext.toLowerCase()
+            if (lower.includes('away')) status = 'away'
+            else if (lower.includes('busy')) status = 'busy'
+            else if (isOnline) status = 'custom'
+          }
+          return { userId, status, ext, lastTime: Date.now() }
+        }).filter((p) => !!p.userId)
+        stores.presence.updateBatch(mapped)
+      },
+    }
+    Object.assign(handler, presenceHandler)
   }
 
   client.addEventHandler('uikit', handler)
