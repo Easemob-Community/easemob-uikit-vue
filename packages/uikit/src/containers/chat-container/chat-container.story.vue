@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useUIKit } from '../../composables/use-uikit'
-import { useChat } from '../../composables/use-chat'
+import { ref } from 'vue'
+import { useConversationStore } from '../../store/conversation'
+import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
 import { CONVERSATION_TYPE, MESSAGE_TYPE, MESSAGE_STATUS } from '../../constants'
 import ChatContainer from './chat-container.vue'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 
 /** 构造 mock 会话与消息，便于 Story 中展示不同配置效果 */
+/**
+ * 直接使用 Pinia store（已在 histoire-setup 全局注册），避免依赖 UIKitProvider 的 inject 上下文。
+ * 因为 script setup 顶层执行时尚未进入 <UIKitProvider> 子树，调用 useUIKit() 会抛错。
+ */
 function injectMockData() {
-  const { stores } = useUIKit()
-  const cvsStore = stores.conversation
-  const msgStore = stores.message
+  const cvsStore = useConversationStore()
+  const msgStore = useMessageStore()
 
   const mockConversation = {
     id: 'cvs_001',

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { UIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit'
 import DemoPage from './demo-page.vue'
 </script>
 
 <template>
-  <UIKitProvider :auto-init="false">
+  <EmUIKitProvider :auto-init="false">
     <DemoPage />
-  </UIKitProvider>
+  </EmUIKitProvider>
 </template>
 
 <style>

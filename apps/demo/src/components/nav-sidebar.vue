@@ -8,7 +8,7 @@
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
 import { computed } from 'vue'
-import { Icon, Avatar, Badge, useTheme, useClient, useConversationStore } from '@easemob/uikit'
+import { EmIcon, EmAvatar, EmBadge, useTheme, useClient, useConversationStore } from '@easemob/uikit'
 
 interface Props {
   /** 当前激活 tab key */
@@ -51,7 +51,7 @@ function toggleMode() {
   <aside class="nav-sidebar">
     <!-- 顶部：当前用户头像 -->
     <div class="nav-sidebar__top">
-      <Avatar :name="currentUser || 'Guest'" :size="40" />
+      <EmAvatar :name="currentUser || 'Guest'" :size="40" />
     </div>
 
     <!-- 主体：业务 tab -->
@@ -65,14 +65,14 @@ function toggleMode() {
         :title="tab.label"
         @click="selectTab(tab.key)"
       >
-        <Badge
+        <EmBadge
           v-if="tab.key === 'conversation' && totalUnread > 0"
           :count="totalUnread"
           class="nav-item__badge"
         >
-          <Icon :name="tab.icon" :size="22" />
-        </Badge>
-        <Icon v-else :name="tab.icon" :size="22" />
+          <EmIcon :name="tab.icon" :size="22" />
+        </EmBadge>
+        <EmIcon v-else :name="tab.icon" :size="22" />
       </button>
     </nav>
 
@@ -92,7 +92,7 @@ function toggleMode() {
         title="设置"
         @click="emit('open-settings')"
       >
-        <Icon name="misc/gear" :size="22" />
+        <EmIcon name="misc/gear" :size="22" />
       </button>
     </div>
   </aside>

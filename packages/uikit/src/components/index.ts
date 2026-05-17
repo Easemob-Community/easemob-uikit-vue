@@ -1,26 +1,27 @@
 // Base UI Components
-export { default as Button } from './button/button.vue'
-export { default as Avatar } from './avatar/avatar.vue'
-export { default as Badge } from './badge/badge.vue'
-export { default as Icon } from './icon/icon.vue'
-export { default as Input } from './input/input.vue'
-export { default as Popup } from './popup/popup.vue'
-export { default as Modal } from './modal/modal.vue'
-export { default as Toast } from './toast/toast.vue'
-export { default as ActionSheet } from './action-sheet/action-sheet.vue'
-export { default as ScrollToTop } from './scroll-to-top/scroll-to-top.vue'
-export { default as EmojiPicker } from './emoji-picker/emoji-picker.vue'
+// 对外统一使用 Em 前缀，避免与业务方组件命名冲突
+export { default as EmButton } from './button/button.vue'
+export { default as EmAvatar } from './avatar/avatar.vue'
+export { default as EmBadge } from './badge/badge.vue'
+export { default as EmIcon } from './icon/icon.vue'
+export { default as EmInput } from './input/input.vue'
+export { default as EmPopup } from './popup/popup.vue'
+export { default as EmModal } from './modal/modal.vue'
+export { default as EmToast } from './toast/toast.vue'
+export { default as EmActionSheet } from './action-sheet/action-sheet.vue'
+export { default as EmScrollToTop } from './scroll-to-top/scroll-to-top.vue'
+export { default as EmEmojiPicker } from './emoji-picker/emoji-picker.vue'
 
 export const componentList = [
-  'button',
-  'avatar',
-  'badge',
-  'icon',
-  'input',
-  'popup',
-  'modal',
-  'toast',
-  'action-sheet',
-  'scroll-to-top',
-  'emoji-picker',
+  'em-button',
+  'em-avatar',
+  'em-badge',
+  'em-icon',
+  'em-input',
+  'em-popup',
+  'em-modal',
+  'em-toast',
+  'em-action-sheet',
+  'em-scroll-to-top',
+  'em-emoji-picker',
 ] as const

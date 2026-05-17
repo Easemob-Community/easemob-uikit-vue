@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import {
-  ConversationContainer,
-  ContactContainer,
-  ChatContainer,
-  Popup,
+  EmConversationContainer,
+  EmContactContainer,
+  EmChatContainer,
+  EmPopup,
   useTheme,
   useLocale,
   useUIKit,
@@ -48,7 +48,7 @@ const chatInputMaxLength = ref(0)
 const groupReadReceiptEnabled = ref(false)
 const groupReadReceiptMaxSize = ref(200)
 
-/** ChatContainer 配置 */
+/** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
   header: { showAvatar: true } ,
   groupReadReceipt: {
@@ -214,7 +214,7 @@ function injectMockContacts() {
     />
 
     <!-- 设置抽屉 -->
-    <Popup v-model:show="showSettings" position="right">
+    <EmPopup v-model:show="showSettings" position="right">
       <div class="demo-drawer">
         <div class="demo-drawer__header">
           <span class="demo-drawer__title">设置</span>
@@ -691,11 +691,11 @@ function injectMockContacts() {
           </div>
         </div>
       </div>
-    </Popup>
+    </EmPopup>
 
     <!-- 中间侧边栏：会话列表 / 联系人列表 -->
     <div class="demo-layout__sidebar">
-      <ConversationContainer v-if="sidebarTab === 'conversation'">
+      <EmConversationContainer v-if="sidebarTab === 'conversation'">
       <!-- 自定义头部的用法 -->
         <!-- <template #header>
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -703,13 +703,13 @@ function injectMockContacts() {
             <span style="font-size: 12px; color: #6b7280;">v1.0</span>
           </div>
         </template> -->
-      </ConversationContainer>
-      <ContactContainer v-else />
+      </EmConversationContainer>
+      <EmContactContainer v-else />
     </div>
 
     <!-- 右侧主体：聊天容器 -->
     <div class="demo-layout__main">
-      <ChatContainer :config="chatConfig" />
+      <EmChatContainer :config="chatConfig" />
     </div>
   </div>
 </template>

@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    DemoSettingGroup: typeof import('./src/components/demo-setting-group.vue')['default']
     NavSidebar: typeof import('./src/components/nav-sidebar.vue')['default']
   }
 }
