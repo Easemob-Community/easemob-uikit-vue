@@ -60,6 +60,7 @@ const messages: LocaleMessages = {
   'group.searchPlaceholder': 'Search groups...',
   'common.back': 'Back',
   'common.loading': 'Loading...',
+  'common.noMore': 'No more',
   'mention.title': 'Select Contact',
   'mention.searchPlaceholder': 'Search contacts...',
   'mention.noResult': 'No contacts found',

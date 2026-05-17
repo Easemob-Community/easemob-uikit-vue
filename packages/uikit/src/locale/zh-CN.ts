@@ -60,6 +60,7 @@ const messages: LocaleMessages = {
   'group.searchPlaceholder': '搜索群组...',
   'common.back': '返回',
   'common.loading': '加载中...',
+  'common.noMore': '没有更多了',
   'mention.title': '选择联系人',
   'mention.searchPlaceholder': '搜索联系人...',
   'mention.noResult': '未找到联系人',

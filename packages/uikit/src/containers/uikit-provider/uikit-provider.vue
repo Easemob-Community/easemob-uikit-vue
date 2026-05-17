@@ -170,8 +170,9 @@ watch(
         if (ds.fetchContacts) {
           list = await ds.fetchContacts()
         } else if (client) {
-          const all = await client.getAllContacts()
-          list = all.map((item) => ({
+          const res = await client.getContactsWithCursor()
+          const contacts = res.data?.contacts || []
+          list = contacts.map((item) => ({
             userId: item.userId,
             name: item.remark || item.userId,
             remark: item.remark,

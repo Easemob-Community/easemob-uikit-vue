@@ -75,10 +75,14 @@ const props = withDefaults(defineProps<{
   itemSize?: ContactItemSize
   /** 是否处于加载态，展示骨架/loading 提示 */
   loading?: boolean
+  /** 是否还有更多数据可加载，默认 true */
+  hasMore?: boolean
   /** 触底距离阈值（px），<= 该距离触发 load-more，默认 60 */
   loadMoreThreshold?: number
   /** 启用触底加载（loading 期间不触发） */
   enableLoadMore?: boolean
+  /** 自定义"没有更多"提示文案 */
+  noMoreText?: string
   /** #body slot 是否固定不随列表滚动 */
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动 */
@@ -98,6 +102,7 @@ const props = withDefaults(defineProps<{
   avatarShape: 'circle',
   itemSize: 'normal',
   loading: false,
+  hasMore: true,
   loadMoreThreshold: 60,
   enableLoadMore: false,
   bodySticky: false,
@@ -135,6 +140,8 @@ const presenceEnabled = computed(
 const presence = usePresence()
 
 const itemsRef = ref<HTMLElement>()
+/** 触底加载本地锁，防止异步请求期间重复触发 */
+const isLoadingMore = ref(false)
 const searchKeyword = computed({
   get: () => filterText.value,
   set: (v: string) => setFilterText(v),
@@ -223,13 +230,19 @@ watch(
 
 // ================== 触底加载 ==================
 function onScroll() {
-  if (!props.enableLoadMore || props.loading) return
+  if (!props.enableLoadMore || props.loading || isLoadingMore.value || !props.hasMore) return
   const el = itemsRef.value
   if (!el) return
   const distance = el.scrollHeight - el.scrollTop - el.clientHeight
   if (distance <= props.loadMoreThreshold) {
+    isLoadingMore.value = true
     emit('load-more')
   }
+}
+
+/** 释放触底加载锁（由外部在 load-more 完成后调用） */
+function releaseLoadMoreLock() {
+  isLoadingMore.value = false
 }
 
 onMounted(() => {
@@ -263,6 +276,7 @@ function onItemContextmenu(e: MouseEvent, contact: Contact) {
 defineExpose({
   scrollToGroup,
   groupedContacts,
+  releaseLoadMoreLock,
 })
 </script>
 
@@ -367,8 +381,18 @@ defineExpose({
           v-if="props.loading && groupedContacts.length > 0"
           class="contact-list__load-more"
         >
-          <slot name="loading">
+          <slot name="loading-more">
             <span class="contact-list__loading-text">{{ t('common.loading') }}</span>
+          </slot>
+        </div>
+
+        <!-- 没有更多提示 -->
+        <div
+          v-if="!props.loading && !props.hasMore && groupedContacts.length > 0"
+          class="contact-list__no-more"
+        >
+          <slot name="no-more">
+            <span class="contact-list__no-more-text">{{ props.noMoreText || t('common.noMore') }}</span>
           </slot>
         </div>
       </template>
@@ -503,5 +527,17 @@ defineExpose({
   align-items: center;
   justify-content: center;
   padding: 12px 16px;
+}
+
+.contact-list__no-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+}
+
+.contact-list__no-more-text {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
 }
 </style>

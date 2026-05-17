@@ -132,6 +132,8 @@ export interface ContactContainerProps {
   enableLoadMore?: boolean
   /** 触底阈值 */
   loadMoreThreshold?: number
+  /** 联系人"没有更多"提示文案 */
+  noMoreText?: string
   /** #body slot 是否固定不随列表滚动 */
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动 */
@@ -176,6 +178,8 @@ export interface ContactContainerProps {
   groupFilterFn?: GroupFilterFn
   /** 群组空列表提示 */
   groupEmptyText?: string
+  /** 群组"没有更多"提示文案 */
+  groupNoMoreText?: string
 
   // ---------- 自治拉取（容器自管） ----------
   /**
@@ -229,7 +233,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   groupAvatarShape: 'rounded',
   groupItemSize: 'normal',
   groupLoading: false,
-  groupEnableLoadMore: false,
+  groupEnableLoadMore: true,
   autoFetch: true,
   autoFetchGroups: true,
 })
@@ -255,7 +259,7 @@ const emit = defineEmits<{
 const { t } = useLocale()
 
 const { contactList, refresh: refreshContacts } = useContact()
-const { groupList, refresh: refreshGroups } = useGroup()
+const { groupList, refresh: refreshGroups, loadMore: loadMoreGroups, joinedGroupCount, fetchJoinedGroupCount } = useGroup()
 const { features } = useUIKit()
 const contactStore = useContactStore()
 const groupStore = useGroupStore()
@@ -273,11 +277,20 @@ function maybeFetchGroups() {
   refreshGroups()
 }
 
+/** home 视图下轻量获取群组总数（不拉取完整列表） */
+function maybeFetchGroupCount() {
+  if (!props.autoFetchGroups) return
+  fetchJoinedGroupCount()
+}
+
 onMounted(() => {
   // home 视图通常需要 contact / group 数量；group/contact 子视图按需
   if (view.value === 'home') {
     if (props.showContact) maybeFetchContacts()
-    if (props.showGroup) maybeFetchGroups()
+    if (props.showGroup) {
+      maybeFetchGroupCount()
+      maybeFetchGroups()
+    }
   } else if (view.value === 'group') {
     maybeFetchGroups()
   } else if (view.value === 'contact') {
@@ -323,7 +336,12 @@ watch(homeSearchKeyword, (v) => emit('home-search', v))
 // ---------- 入口列表 ----------
 const resolvedGroupCount = computed(() => {
   if (props.groupCount !== undefined) return props.groupCount
-  return props.autoEntryCount ? groupList.value.length : 0
+  if (!props.autoEntryCount) return 0
+  // home 视图优先使用轻量接口返回的总数，子视图或 fallback 用列表长度
+  if (view.value === 'home') {
+    return joinedGroupCount.value || groupList.value.length
+  }
+  return groupList.value.length
 })
 const resolvedContactCount = computed(() => {
   if (props.contactCount !== undefined) return props.contactCount
@@ -369,6 +387,15 @@ function onEntryClick(key: string) {
   }
   if (key === 'contact') {
     view.value = 'contact'
+  }
+}
+
+/** 处理群组触底加载更多 */
+async function handleGroupLoadMore() {
+  try {
+    await loadMoreGroups()
+  } finally {
+    groupListRef.value?.releaseLoadMoreLock?.()
   }
 }
 
@@ -505,14 +532,16 @@ const subviewTitle = computed(() => {
             :avatar-shape="props.groupAvatarShape"
             :item-size="props.groupItemSize"
             :loading="props.groupLoading"
+            :has-more="groupStore.hasMore"
             :enable-load-more="props.groupEnableLoadMore"
             :load-more-threshold="props.loadMoreThreshold"
+            :no-more-text="props.groupNoMoreText"
             :body-sticky="props.bodySticky"
             :footer-sticky="props.footerSticky"
             @select="(g: Group) => emit('group-select', g)"
             @click="(g: Group) => emit('group-click', g)"
             @contextmenu="(e: MouseEvent, g: Group) => emit('group-contextmenu', e, g)"
-            @load-more="() => emit('group-load-more')"
+            @load-more="handleGroupLoadMore"
             @max-exceed="(m: number) => emit('group-max-exceed', m)"
             @update:selected-ids="(ids: string[]) => emit('update:groupSelectedIds', ids)"
           >
@@ -524,6 +553,12 @@ const subviewTitle = computed(() => {
             </template>
             <template v-if="$slots['group-loading']" #loading>
               <slot name="group-loading" />
+            </template>
+            <template v-if="$slots['group-loading-more']" #loading-more>
+              <slot name="group-loading-more" />
+            </template>
+            <template v-if="$slots['group-no-more']" #no-more>
+              <slot name="group-no-more" />
             </template>
             <template v-if="$slots['group-empty']" #empty="slotProps">
               <slot name="group-empty" v-bind="slotProps" />
@@ -580,8 +615,10 @@ const subviewTitle = computed(() => {
             :avatar-shape="props.avatarShape"
             :item-size="props.itemSize"
             :loading="props.loading"
+            :has-more="true"
             :enable-load-more="props.enableLoadMore"
             :load-more-threshold="props.loadMoreThreshold"
+            :no-more-text="props.noMoreText"
             :body-sticky="props.bodySticky"
             :footer-sticky="props.footerSticky"
             @select="(c: Contact) => emit('contact-select', c)"
@@ -602,6 +639,12 @@ const subviewTitle = computed(() => {
             </template>
             <template v-if="$slots.loading" #loading>
               <slot name="loading" />
+            </template>
+            <template v-if="$slots['loading-more']" #loading-more>
+              <slot name="loading-more" />
+            </template>
+            <template v-if="$slots['no-more']" #no-more>
+              <slot name="no-more" />
             </template>
             <template v-if="$slots.empty" #empty="slotProps">
               <slot name="empty" v-bind="slotProps" />

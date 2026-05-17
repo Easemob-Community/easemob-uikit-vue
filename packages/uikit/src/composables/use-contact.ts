@@ -27,8 +27,9 @@ export function useContact() {
       if (dataSource.fetchContacts) {
         list = await dataSource.fetchContacts()
       } else if (client.value) {
-        const all = await client.value.getAllContacts()
-        list = all.map((item) => ({
+        const res = await client.value.getContactsWithCursor()
+        const contacts = res.data?.contacts || []
+        list = contacts.map((item) => ({
           userId: item.userId,
           name: item.remark || item.userId,
           remark: item.remark,

@@ -9,6 +9,25 @@ export type ClientConfig = EasemobChat.ConnectionParameters & {
   debug?: boolean
 }
 
+/** getJoinedGroups 返回的群组项（BaseGroupInfo / GroupInfo 的并集） */
+export interface JoinedGroupItem {
+  groupId: string
+  groupName?: string
+  disabled?: boolean
+  public?: boolean
+  role?: string
+  memberCount?: number
+  affiliationsCount?: number
+  description?: string
+  avatar?: string
+  maxUsers?: number
+  allowInvites?: boolean
+  approval?: boolean
+  mute?: boolean
+  shieldgroup?: boolean
+  created?: number
+}
+
 /** 直接复用 SDK 的 Connection 类型 */
 export type ChatClient = EasemobChat.Connection
 

@@ -1,5 +1,5 @@
 import WebIM, { type EasemobChat } from 'easemob-websdk'
-import type { ClientConfig } from './types'
+import type { ClientConfig, JoinedGroupItem } from './types'
 import { MESSAGE_STATUS, ACK_TYPE } from '../constants'
 import type { MessageStatusValue, ConversationTypeValue } from '../constants'
 
@@ -53,7 +53,7 @@ export class UIKitClient {
       user: params.user,
       ...(params.accessToken ? { accessToken: params.accessToken } : {}),
       ...(params.password ? { pwd: params.password } : {}),
-    } as any)
+    })
   }
 
   /** 登出 */
@@ -147,7 +147,7 @@ export class UIKitClient {
       pageSize: options?.pageSize ?? 50,
       cursor: options?.cursor ?? '',
       includeEmptyConversations: options?.includeEmptyConversations ?? false,
-    } as any) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
+    })
   }
 
   /** 置顶/取消置顶会话 */
@@ -155,8 +155,8 @@ export class UIKitClient {
     conversationId: string
     conversationType: ConversationTypeValue
     isPinned: boolean
-  }): Promise<void> {
-    return (this._connection as any).pinConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.PinConversation>> {
+    return this._connection.pinConversation(options)
   }
 
   /** 发送会话已读回执（单聊/群聊均支持，用于清空整个会话的未读数） */
@@ -298,9 +298,9 @@ export class UIKitClient {
   async deleteConversation(options: {
     channel: string
     chatType: ConversationTypeValue
-    deleteRoam?: boolean
-  }): Promise<void> {
-    return (this._connection as any).deleteConversation(options) // SDK 未在 Connection 接口暴露此方法签名，运行时存在
+    deleteRoam: boolean
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.DeleteSessionResult>> {
+    return this._connection.deleteConversation(options)
   }
 
   /** 获取历史消息（分页） */
@@ -319,95 +319,128 @@ export class UIKitClient {
   }
 
   // ========== 好友 ==========
-  /** 获取好友 userId 列表（轻量） */
-  async getContacts(): Promise<string[]> {
-    const res = await (this._connection as any).getContacts()
-    return (res?.data || []) as string[]
-  }
-
-  /** 获取所有好友（含备注） */
-  async getAllContacts(): Promise<Array<{ userId: string; remark?: string }>> {
-    const res = await (this._connection as any).getAllContacts()
-    return (res?.data || []) as Array<{ userId: string; remark?: string }>
+  /** 分页获取好友列表（含备注） */
+  async getContactsWithCursor(options?: {
+    pageSize?: number
+    cursor?: string
+  }): Promise<EasemobChat.AsyncResult<EasemobChat.CursorContactsResult>> {
+    return this._connection.getContactsWithCursor({
+      pageSize: options?.pageSize ?? 50,
+      cursor: options?.cursor ?? '',
+    })
   }
 
   /** 添加好友 */
   async addContact(userId: string, reason?: string): Promise<void> {
-    return (this._connection as any).addContact(userId, reason ?? '')
+    return this._connection.addContact(userId, reason ?? '')
   }
 
   /** 删除好友 */
   async deleteContact(userId: string): Promise<void> {
-    return (this._connection as any).deleteContact(userId)
+    return this._connection.deleteContact(userId)
   }
 
   /** 设置好友备注 */
   async setContactRemark(userId: string, remark: string): Promise<void> {
-    return (this._connection as any).setContactRemark({ userId, remark })
+    return this._connection.setContactRemark({ userId, remark })
   }
 
   // ========== 黑名单 ==========
   /** 获取黑名单 */
   async getBlocklist(): Promise<string[]> {
-    const res = await (this._connection as any).getBlocklist()
+    const res = await this._connection.getBlocklist()
     if (Array.isArray(res?.data)) return res.data as string[]
     if (Array.isArray(res)) return res as string[]
     return []
   }
 
   /** 加入黑名单 */
-  async addUsersToBlocklist(userIds: string[]): Promise<void> {
-    return (this._connection as any).addUsersToBlocklist({ name: userIds })
+  async addUsersToBlocklist(userIds: string[]): Promise<EasemobChat.AsyncResult<EasemobChat.OperateResult>> {
+    return this._connection.addUsersToBlocklist({ name: userIds })
   }
 
   /** 移出黑名单 */
   async removeUserFromBlocklist(userId: string): Promise<void> {
-    return (this._connection as any).removeUserFromBlocklist({ name: userId })
+    return this._connection.removeUserFromBlocklist({ name: userId })
   }
 
   // ========== 群组 ==========
-  /** 拉取已加入的群组（分页） */
+  /** 拉取已加入的群组（分页）
+   *
+   * 当 needAffiliations=true 时，SDK 返回 GroupInfo[]（含 memberCount/role 等字段）；
+   * 否则返回 BaseGroupInfo[]（仅 groupId/groupName）。
+   */
   async getJoinedGroups(options?: {
     pageSize?: number
     pageNum?: number
     needAffiliations?: boolean
     needRole?: boolean
-  }): Promise<Array<{ groupId: string; groupName?: string; disabled?: boolean; public?: boolean; role?: string }>> {
-    const res = await (this._connection as any).getJoinedGroups({
+  }): Promise<JoinedGroupItem[]> {
+    const res: unknown = await this._connection.getJoinedGroups({
       pageSize: options?.pageSize ?? 50,
       pageNum: options?.pageNum ?? 0,
       needAffiliations: options?.needAffiliations ?? false,
       needRole: options?.needRole ?? false,
     })
-    if (Array.isArray(res?.data)) return res.data
-    if (Array.isArray(res)) return res
+    console.log('[UIKitClient] getJoinedGroups raw res:', res)
+
+    type RawResult = { data?: unknown[]; entities?: unknown[] }
+
+    const parsed = res as RawResult | unknown[]
+
+    if (Array.isArray(parsed)) return parsed as JoinedGroupItem[]
+
+    const record = parsed as RawResult
+    if (Array.isArray(record?.data)) return record.data as JoinedGroupItem[]
+    if (Array.isArray(record?.entities)) return record.entities as JoinedGroupItem[]
+
     return []
   }
 
-  /** 获取单个群详情 */
-  async getGroupInfo(groupId: string): Promise<any> {
-    return (this._connection as any).getGroupInfo({ groupId })
+  /** 获取当前用户加入的群组总数（轻量接口，无需拉取完整列表） */
+  async getJoinedGroupsCount(): Promise<number> {
+    try {
+      const res: unknown = await this._connection.getJoinedGroupsCount()
+      console.log('[UIKitClient] getJoinedGroupsCount raw res:', res)
+      // SDK 返回结构：{ data: number } 或 AsyncResult<{ data: number }>
+      if (typeof res === 'number') return res
+      const record = res as Record<string, unknown>
+      if (typeof record?.data === 'number') return record.data
+      // 某些版本可能直接返回 { count: number }
+      if (typeof record?.count === 'number') return record.count
+      return 0
+    } catch (e) {
+      console.warn('[UIKitClient] getJoinedGroupsCount failed:', e)
+      return 0
+    }
+  }
+
+  /** 获取单个/多个群详情（支持批量） */
+  async getGroupInfo(groupId: string | string[]): Promise<any> {
+    const res = await this._connection.getGroupInfo({ groupId })
+    console.log('[UIKitClient] getGroupInfo raw res:', res)
+    return res
   }
 
   // ========== Presence ==========
   /** 订阅在线状态变更 */
   async subscribePresence(userIds: string[], expiry = 7 * 24 * 60 * 60): Promise<any> {
-    return (this._connection as any).subscribePresence({ usernames: userIds, expiry })
+    return this._connection.subscribePresence({ usernames: userIds, expiry })
   }
 
   /** 取消订阅在线状态 */
   async unsubscribePresence(userIds: string[]): Promise<any> {
-    return (this._connection as any).unsubscribePresence({ usernames: userIds })
+    return this._connection.unsubscribePresence({ usernames: userIds })
   }
 
   /** 主动获取在线状态 */
   async getPresenceStatus(userIds: string[]): Promise<any> {
-    return (this._connection as any).getPresenceStatus({ usernames: userIds })
+    return this._connection.getPresenceStatus({ usernames: userIds })
   }
 
   /** 发布自定义在线状态 */
   async publishPresence(description: string): Promise<any> {
-    return (this._connection as any).publishPresence({ description })
+    return this._connection.publishPresence({ description })
   }
 
   /** 添加事件处理器 */

@@ -17,8 +17,8 @@ import LoginPage from './login-page.vue'
  * - dataSource：业务可提供自定义接口接管 SDK 默认实现。
  *   下面展示一个只覆盖 fetchContacts 的最小例子。
  */
-const enableContact = ref(false)
-const enableBlocklist = ref(false)
+const enableContact = ref(true)
+const enableBlocklist = ref(true)
 const enablePresence = ref(false)
 
 /** 是否启用 demo 提供的自定义 dataSource（演示业务接管拉好友逻辑） */

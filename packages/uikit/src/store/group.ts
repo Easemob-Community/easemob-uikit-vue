@@ -1,13 +1,41 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+/**
+ * UIKIT 内部群组模型
+ * 基于 SDK getGroupInfo (GroupDetailInfo) 与 getJoinedGroups (GroupInfo) 的并集
+ */
 export interface Group {
+  /** 群组 ID */
   groupId: string
+  /** 群组名称 */
   groupName: string
+  /** 群组头像 */
   avatar?: string
+  /** 群主 */
   owner: string
+  /** 成员数量 */
   memberCount: number
+  /** 群组描述 */
   description?: string
+  /** 是否公开群 */
+  public?: boolean
+  /** 当前用户角色 */
+  role?: 'owner' | 'admin' | 'member'
+  /** 是否允许成员邀请 */
+  allowInvites?: boolean
+  /** 是否需要审批入群 */
+  approval?: boolean
+  /** 最大成员数 */
+  maxUsers?: number
+  /** 是否全员禁言 */
+  mute?: boolean
+  /** 是否已屏蔽该群消息 */
+  shieldgroup?: boolean
+  /** 群组扩展信息 */
+  ext?: string
+  /** 创建时间戳 */
+  created?: number
 }
 
 export const useGroupStore = defineStore('group', () => {
@@ -19,6 +47,8 @@ export const useGroupStore = defineStore('group', () => {
   const hasMore = ref(false)
   /** 分页游标（SDK 使用 pageNum，此处统一抽象为 cursor） */
   const cursor = ref<string>('')
+  /** 当前用户加入的群组总数（由 getJoinedGroupsCount 轻量接口提供） */
+  const joinedGroupCount = ref<number>(0)
 
   function setGroupList(list: Group[]) {
     groupList.value = list
@@ -79,12 +109,17 @@ export const useGroupStore = defineStore('group', () => {
     currentGroup.value = group
   }
 
+  function setJoinedGroupCount(count: number) {
+    joinedGroupCount.value = count
+  }
+
   function clearGroups() {
     groupList.value = []
     currentGroup.value = null
     loaded.value = false
     hasMore.value = false
     cursor.value = ''
+    joinedGroupCount.value = 0
   }
 
   return {
@@ -93,6 +128,7 @@ export const useGroupStore = defineStore('group', () => {
     loaded,
     hasMore,
     cursor,
+    joinedGroupCount,
     setGroupList,
     appendGroupList,
     setHasMore,
@@ -102,6 +138,7 @@ export const useGroupStore = defineStore('group', () => {
     setCurrentGroup,
     getGroupById,
     updateGroupMemberCount,
+    setJoinedGroupCount,
     clearGroups,
   }
 })
