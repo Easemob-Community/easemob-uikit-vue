@@ -54,5 +54,97 @@ import UIKitProvider from './uikit-provider.vue'
         </div>
       </UIKitProvider>
     </Variant>
+
+    <Variant title="Enable Contact + Blocklist + Presence + Group">
+      <UIKitProvider
+        :auto-init="false"
+        enable-contact
+        enable-blocklist
+        enable-presence
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          好友 / 黑名单 / 在线状态 / 群组 已启用
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Disable Group">
+      <UIKitProvider
+        :auto-init="false"
+        :enable-group="false"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          群组能力已关闭
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Contact FetchMode: all (全量拉取)">
+      <UIKitProvider
+        :auto-init="false"
+        enable-contact
+        contact-fetch-mode="all"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          全量拉取模式（getAllContacts）
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Custom DataSource">
+      <UIKitProvider
+        :auto-init="false"
+        enable-contact
+        :data-source="{
+          fetchContacts: async () => ({
+            list: [
+              { userId: 'u_ds1', name: '数据源用户1' },
+              { userId: 'u_ds2', name: '数据源用户2' },
+            ],
+            hasMore: false,
+          }),
+        }"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          自定义数据源模式
+        </div>
+      </UIKitProvider>
+    </Variant>
   </Story>
 </template>

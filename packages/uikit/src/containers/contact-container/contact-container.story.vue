@@ -623,5 +623,93 @@ function groupSubtitleFn(g: Group): string | undefined {
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="Contact: Disable LoadMore">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            :enable-load-more="false"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact: Custom noMoreText">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            no-more-text="—— 已经到底了 ——"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact: Body Sticky + Footer Sticky">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            body-sticky
+            footer-sticky
+            @vue:mounted="injectMockContacts"
+          >
+            <template #body>
+              <div style="padding: 8px 0; font-size: 12px; color: #3b82f6;">
+                置顶提示：这是 sticky body 区域
+              </div>
+            </template>
+            <template #footer>
+              <div style="padding: 8px 0; font-size: 12px; color: #ef4444;">
+                底部操作：sticky footer 区域
+              </div>
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group: Disable LoadMore">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            :group-enable-load-more="false"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group: Custom noMoreText">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-no-more-text="—— 群组已加载完毕 ——"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Disable Group (Provider 关闭群组能力)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false" :enable-group="false">
+          <ContactContainer
+            :new-request-count="3"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>

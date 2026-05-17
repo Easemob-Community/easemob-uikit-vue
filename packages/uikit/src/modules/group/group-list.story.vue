@@ -261,5 +261,68 @@ function onLoadMore() {
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="HasMore=false (无更多数据)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList :has-more="false" @vue:mounted="injectMockGroups" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom noMoreText">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList
+            :has-more="false"
+            no-more-text="—— 群组已加载完毕 ——"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Body Sticky + Footer Sticky">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList
+            body-sticky
+            footer-sticky
+            @vue:mounted="injectMockGroups"
+          >
+            <template #body>
+              <div style="padding: 8px 0; font-size: 12px; color: #3b82f6;">
+                置顶提示：sticky body 插槽
+              </div>
+            </template>
+            <template #footer>
+              <div style="padding: 8px 0; font-size: 12px; color: #ef4444;">
+                底部操作：sticky footer 插槽
+              </div>
+            </template>
+          </GroupList>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom #group-header Slot">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupList
+            sort-by="pinyin"
+            group-by="alphabet"
+            @vue:mounted="injectMockGroups"
+          >
+            <template #group-header="{ group }">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #34d399;" />
+                <span style="font-weight: 600;">{{ group.title }}</span>
+                <span style="font-size: 11px; color: #9ca3af;">({{ group.items.length }})</span>
+              </div>
+            </template>
+          </GroupList>
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>
