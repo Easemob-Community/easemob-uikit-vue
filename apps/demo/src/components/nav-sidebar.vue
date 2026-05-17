@@ -21,7 +21,7 @@ const emit = defineEmits<{
   (e: 'open-settings'): void
 }>()
 
-const { isDark, setMode } = useTheme()
+const { mode, isDark, setMode } = useTheme()
 const { currentUser } = useClient()
 const conversationStore = useConversationStore()
 
@@ -43,7 +43,8 @@ function selectTab(key: Props['modelValue']) {
 }
 
 function toggleMode() {
-  setMode(isDark.value ? 'light' : 'dark')
+  const next = mode.value === 'light' ? 'dark' : mode.value === 'dark' ? 'auto' : 'light'
+  setMode(next)
 }
 </script>
 
@@ -81,10 +82,10 @@ function toggleMode() {
       <button
         type="button"
         class="nav-item"
-        :title="isDark ? '切换亮色' : '切换暗色'"
+        :title="mode === 'auto' ? '跟随系统' : isDark ? '切换亮色' : '切换暗色'"
         @click="toggleMode"
       >
-        <span class="nav-item__emoji">{{ isDark ? '☀️' : '🌙' }}</span>
+        <span class="nav-item__emoji">{{ mode === 'auto' ? '🖥️' : isDark ? '☀️' : '🌙' }}</span>
       </button>
       <button
         type="button"

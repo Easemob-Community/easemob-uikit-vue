@@ -278,6 +278,13 @@ function injectMockContacts() {
               >
                 暗色
               </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': mode === 'auto' }"
+                @click="setMode('auto')"
+              >
+                跟随系统
+              </button>
             </div>
           </div>
 

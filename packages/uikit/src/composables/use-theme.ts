@@ -1,15 +1,16 @@
 import { computed } from 'vue'
 import { useUIKit } from './use-uikit'
-import type { AnimationLevel, AnimationConfig, HoverStyle } from '../store/theme'
+import type { AnimationLevel, AnimationConfig, HoverStyle, ThemeMode } from '../store/theme'
 
 export function useTheme() {
   const { theme: themeStore } = useUIKit()
 
   const mode = computed(() => themeStore.mode)
+  const effectiveMode = computed(() => themeStore.effectiveMode)
   const primaryColor = computed(() => themeStore.primaryColor)
-  const isDark = computed(() => themeStore.mode === 'dark')
+  const isDark = computed(() => themeStore.effectiveMode === 'dark')
 
-  function setMode(value: 'light' | 'dark') {
+  function setMode(value: ThemeMode) {
     themeStore.setMode(value)
   }
 
@@ -38,7 +39,8 @@ export function useTheme() {
   }
 
   function toggleMode() {
-    themeStore.setMode(themeStore.mode === 'light' ? 'dark' : 'light')
+    const next = themeStore.mode === 'light' ? 'dark' : themeStore.mode === 'dark' ? 'auto' : 'light'
+    themeStore.setMode(next)
   }
 
   // ===== 动画配置 =====
@@ -64,6 +66,7 @@ export function useTheme() {
 
   return {
     mode,
+    effectiveMode,
     primaryColor,
     isDark,
     avatarShape: computed(() => themeStore.avatarShape),

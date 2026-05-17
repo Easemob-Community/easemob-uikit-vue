@@ -1,11 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref, watchEffect } from 'vue'
+import { computed, watchEffect } from 'vue'
+import { useStorage, usePreferredColorScheme } from '@vueuse/core'
 
 /** 动画强度等级 */
 export type AnimationLevel = 'subtle' | 'normal' | 'expressive'
 
 /** 列表项 hover 风格 */
 export type HoverStyle = 'default' | 'rounded'
+
+/** 主题模式：light / dark / auto(跟随系统) */
+export type ThemeMode = 'light' | 'dark' | 'auto'
 
 /** 动画配置 */
 export interface AnimationConfig {
@@ -17,35 +21,103 @@ export interface AnimationConfig {
   ripple?: boolean
 }
 
+/** localStorage key */
+const THEME_STORAGE_KEY = 'easemob_uikit_theme'
+
+/** 持久化的主题状态 */
+interface ThemeStorageState {
+  primaryColor: number
+  mode: ThemeMode
+  avatarShape: 'circle' | 'square'
+  bubbleShape: 'ground' | 'square'
+  componentsShape: 'ground' | 'square'
+  containerGap: number
+  hoverStyle: HoverStyle
+  animationEnabled: boolean
+  animationLevel: AnimationLevel
+  animationRipple: boolean
+}
+
+const defaultState: ThemeStorageState = {
+  primaryColor: 203,
+  mode: 'auto',
+  avatarShape: 'circle',
+  bubbleShape: 'ground',
+  componentsShape: 'ground',
+  containerGap: 8,
+  hoverStyle: 'default',
+  animationEnabled: true,
+  animationLevel: 'normal',
+  animationRipple: true,
+}
+
 export const useThemeStore = defineStore('theme', () => {
-  const primaryColor = ref<number>(203)
-  const mode = ref<'light' | 'dark'>('light')
-  const avatarShape = ref<'circle' | 'square'>('circle')
-  const bubbleShape = ref<'ground' | 'square'>('ground')
-  const componentsShape = ref<'ground' | 'square'>('ground')
+  const storage = useStorage<ThemeStorageState>(THEME_STORAGE_KEY, defaultState)
 
-  // ===== 容器间距配置 =====
-  const containerGap = ref<number>(8)
+  // 使用 computed 保持响应性，同时支持读写
+  const primaryColor = computed({
+    get: () => storage.value.primaryColor,
+    set: (v: number) => { storage.value.primaryColor = v },
+  })
+  const mode = computed({
+    get: () => storage.value.mode,
+    set: (v: ThemeMode) => { storage.value.mode = v },
+  })
 
-  // ===== Hover 风格配置 =====
-  const hoverStyle = ref<HoverStyle>('default')
+  // 系统偏好颜色方案（light / dark）
+  const systemMode = usePreferredColorScheme()
 
-  // ===== 动画配置 =====
-  const animationEnabled = ref(true)
-  const animationLevel = ref<AnimationLevel>('normal')
-  const animationRipple = ref(true)
+  // 实际生效的模式：auto 时跟随系统
+  const effectiveMode = computed<'light' | 'dark'>(() => {
+    if (mode.value === 'auto') {
+      return systemMode.value === 'dark' ? 'dark' : 'light'
+    }
+    return mode.value
+  })
+  const avatarShape = computed({
+    get: () => storage.value.avatarShape,
+    set: (v: 'circle' | 'square') => { storage.value.avatarShape = v },
+  })
+  const bubbleShape = computed({
+    get: () => storage.value.bubbleShape,
+    set: (v: 'ground' | 'square') => { storage.value.bubbleShape = v },
+  })
+  const componentsShape = computed({
+    get: () => storage.value.componentsShape,
+    set: (v: 'ground' | 'square') => { storage.value.componentsShape = v },
+  })
+  const containerGap = computed({
+    get: () => storage.value.containerGap,
+    set: (v: number) => { storage.value.containerGap = v },
+  })
+  const hoverStyle = computed({
+    get: () => storage.value.hoverStyle,
+    set: (v: HoverStyle) => { storage.value.hoverStyle = v },
+  })
+  const animationEnabled = computed({
+    get: () => storage.value.animationEnabled,
+    set: (v: boolean) => { storage.value.animationEnabled = v },
+  })
+  const animationLevel = computed({
+    get: () => storage.value.animationLevel,
+    set: (v: AnimationLevel) => { storage.value.animationLevel = v },
+  })
+  const animationRipple = computed({
+    get: () => storage.value.animationRipple,
+    set: (v: boolean) => { storage.value.animationRipple = v },
+  })
 
-  // 初始化：立即将默认值写入 CSS 变量，确保懒加载 store 时也有初始样式
+  // 初始化：立即将当前值写入 CSS 变量，确保懒加载 store 时也有样式
   document.documentElement.style.setProperty('--uikit-primary-color', `hsl(${primaryColor.value}, 100%, 60%)`)
   document.documentElement.style.setProperty('--uikit-primary-color-opacity', `hsla(${primaryColor.value}, 100%, 60%, 0.25)`)
-  document.documentElement.setAttribute('data-uikit-theme', mode.value)
-  document.documentElement.style.setProperty('--uikit-item-hover-radius', '0px')
-  document.documentElement.style.setProperty('--uikit-item-hover-margin-x', '0px')
-  document.documentElement.style.setProperty('--uikit-item-hover-padding-x', '16px')
-  document.documentElement.style.setProperty('--uikit-item-active-radius', '0px')
-  document.documentElement.style.setProperty('--uikit-components-radius', '8px')
-  document.documentElement.style.setProperty('--uikit-container-gap', '8px')
-  document.documentElement.setAttribute('data-uikit-anim-enabled', 'true')
+  document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
+  document.documentElement.style.setProperty('--uikit-item-hover-radius', hoverStyle.value === 'rounded' ? '8px' : '0px')
+  document.documentElement.style.setProperty('--uikit-item-hover-margin-x', hoverStyle.value === 'rounded' ? '8px' : '0px')
+  document.documentElement.style.setProperty('--uikit-item-hover-padding-x', hoverStyle.value === 'rounded' ? '8px' : '16px')
+  document.documentElement.style.setProperty('--uikit-item-active-radius', hoverStyle.value === 'rounded' ? '8px' : '0px')
+  document.documentElement.style.setProperty('--uikit-components-radius', componentsShape.value === 'ground' ? '8px' : '4px')
+  document.documentElement.style.setProperty('--uikit-container-gap', `${Math.max(0, containerGap.value)}px`)
+  document.documentElement.setAttribute('data-uikit-anim-enabled', String(animationEnabled.value))
   document.documentElement.setAttribute('data-uikit-anim-level', animationLevel.value)
 
   watchEffect(() => {
@@ -58,7 +130,7 @@ export const useThemeStore = defineStore('theme', () => {
       '--uikit-primary-color-opacity',
       `hsla(${hue}, 100%, 60%, 0.25)`
     )
-    document.documentElement.setAttribute('data-uikit-theme', mode.value)
+    document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
   })
 
   // Hover 风格 DOM 属性联动
@@ -118,7 +190,7 @@ export const useThemeStore = defineStore('theme', () => {
     primaryColor.value = hue
   }
 
-  function setMode(value: 'light' | 'dark') {
+  function setMode(value: ThemeMode) {
     mode.value = value
   }
 
@@ -169,6 +241,7 @@ export const useThemeStore = defineStore('theme', () => {
   return {
     primaryColor,
     mode,
+    effectiveMode,
     avatarShape,
     bubbleShape,
     componentsShape,
