@@ -70,7 +70,7 @@ function onClick() {
 }
 
 .quote-card:hover {
-  background-color: var(--uikit-bg-hover, #ececee);
+  background-color: var(--uikit-bg-hover);
 }
 
 .quote-card:active {

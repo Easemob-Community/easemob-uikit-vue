@@ -213,7 +213,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   min-height: 120px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base);
   border: 1px solid #e5e7eb;
   cursor: pointer;
@@ -222,7 +222,7 @@ onBeforeUnmount(() => {
 }
 
 .voice-panel:active {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
+  background-color: var(--uikit-bg-hover);
 }
 
 .voice-panel__ready,

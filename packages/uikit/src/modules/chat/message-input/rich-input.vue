@@ -367,7 +367,7 @@ onBeforeUnmount(() => {
 
 .rich-input__editor-content img {
   max-width: 100%;
-  border-radius: 4px;
+  border-radius: var(--uikit-components-radius, 4px);
   display: inline-block;
 }
 
@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
   transition: background-color 0.15s, color 0.15s;
@@ -415,7 +415,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-input__tool-btn:hover {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
+  background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
 }
 
@@ -429,7 +429,7 @@ onBeforeUnmount(() => {
   flex: 1;
   position: relative;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base);
   transition: border-color 0.2s;
 }
@@ -451,7 +451,7 @@ onBeforeUnmount(() => {
 .rich-input__voice-btn {
   flex: 1;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base);
   border: 1px solid #e5e7eb;
   text-align: center;
@@ -462,7 +462,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-input__voice-btn:active {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
+  background-color: var(--uikit-bg-hover);
 }
 
 .rich-input__actions {

@@ -471,7 +471,7 @@ defineExpose({
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
   transition: background-color 0.15s, color 0.15s;
@@ -479,7 +479,7 @@ defineExpose({
 }
 
 .simple-input__tool-btn:hover {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
+  background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
 }
 
@@ -497,7 +497,7 @@ defineExpose({
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   font-size: 14px;
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -540,7 +540,7 @@ defineExpose({
 .simple-input__voice-btn-mobile {
   flex: 1;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base);
   border: 1px solid #e5e7eb;
   text-align: center;
@@ -551,7 +551,7 @@ defineExpose({
 }
 
 .simple-input__voice-btn-mobile:active {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
+  background-color: var(--uikit-bg-hover);
 }
 
 .simple-input__actions {

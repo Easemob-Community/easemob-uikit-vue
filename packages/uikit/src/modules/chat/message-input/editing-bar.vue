@@ -54,7 +54,7 @@ function onClose() {
   gap: 6px;
   padding: 6px 12px;
   margin: 0 12px 4px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   background-color: var(--uikit-bg-base);
   border: 1px solid var(--uikit-primary-color, #5f6df3);
   color: var(--uikit-text-secondary);

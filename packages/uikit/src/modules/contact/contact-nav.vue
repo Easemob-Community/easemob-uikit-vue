@@ -86,7 +86,7 @@ function onEntryClick(entry: ContactNavEntry) {
 }
 
 .contact-nav__item:hover {
-  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary, #f3f4f6));
+  background-color: var(--uikit-bg-hover);
 }
 
 .contact-nav__item:active {

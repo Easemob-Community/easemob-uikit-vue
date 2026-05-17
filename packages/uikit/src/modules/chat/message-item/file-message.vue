@@ -115,7 +115,7 @@ async function handleDownload() {
 }
 
 .file-message__bubble:hover {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
+  background-color: var(--uikit-bg-hover);
 }
 
 .file-message__icon {

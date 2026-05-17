@@ -225,7 +225,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .mention-picker__item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
+  background-color: var(--uikit-bg-hover);
 }
 
 .mention-picker__item:active {

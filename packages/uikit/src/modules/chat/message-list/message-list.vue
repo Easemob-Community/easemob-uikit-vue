@@ -606,7 +606,7 @@ watch(locateRequest, (req) => {
 
 .message-list__divider span {
   padding: 2px 10px;
-  border-radius: 4px;
+  border-radius: var(--uikit-components-radius, 4px);
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
   font-size: 12px;

@@ -6,6 +6,7 @@
   --uikit-danger-color: hsl(350, 100%, 60%);
   --uikit-bg-base: #ffffff;
   --uikit-bg-secondary: #f3f4f6;
+  --uikit-bg-hover: #e5e7eb;
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
 
@@ -63,6 +64,7 @@
 [data-uikit-theme="dark"] {
   --uikit-bg-base: #111827;
   --uikit-bg-secondary: #1f2937;
+  --uikit-bg-hover: #374151;
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
 
