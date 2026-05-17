@@ -12,6 +12,12 @@ export interface InputProps {
   rows?: number
   /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
   prefixIcon?: string
+  /**
+   * 输入框风格变体
+   * - 'default': 白色背景 + 边框，适用于表单输入
+   * - 'search': 灰色背景 + 无边框，适用于搜索框（默认）
+   */
+  variant?: 'default' | 'search'
 }
 
 export interface InputEmits {
@@ -26,6 +32,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   modelValue: '',
   type: 'text',
   disabled: false,
+  variant: 'search',
 })
 
 const emit = defineEmits<InputEmits>()
@@ -34,6 +41,10 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const themeStore = useThemeStore()
 const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : ''
+)
+
+const variantClass = computed(() =>
+  props.variant === 'search' ? 'uikit-input__field--search' : ''
 )
 
 function onInput(e: Event) {
@@ -55,7 +66,13 @@ defineExpose({
 </script>
 
 <template>
-  <div class="uikit-input" :class="{ 'uikit-input--with-prefix': props.prefixIcon }">
+  <div
+    class="uikit-input"
+    :class="{
+      'uikit-input--with-prefix': props.prefixIcon,
+      'uikit-input--search': props.variant === 'search',
+    }"
+  >
     <Icon
       v-if="props.prefixIcon"
       :name="props.prefixIcon"
@@ -65,7 +82,7 @@ defineExpose({
     <input
       ref="inputRef"
       class="uikit-input__field"
-      :class="shapeClass"
+      :class="[shapeClass, variantClass]"
       :value="props.modelValue"
       :type="props.type"
       :placeholder="props.placeholder"
@@ -108,7 +125,7 @@ defineExpose({
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .uikit-input__field--square {
@@ -117,6 +134,23 @@ defineExpose({
 
 .uikit-input__field:focus {
   border-color: var(--uikit-primary-color);
+}
+
+/* Search 风格：灰色背景 + 无边框 */
+.uikit-input__field--search {
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  border-color: transparent;
+  border-radius: 10px;
+}
+
+.uikit-input__field--search:focus {
+  border-color: transparent;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  box-shadow: 0 0 0 2px var(--uikit-primary-color-opacity, hsla(203, 100%, 60%, 0.25));
+}
+
+.uikit-input--search .uikit-input__prefix-icon {
+  color: var(--uikit-text-secondary, #9ca3af);
 }
 
 .uikit-input__field::placeholder {

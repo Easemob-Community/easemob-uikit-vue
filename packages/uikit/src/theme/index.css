@@ -1,5 +1,6 @@
 :root {
   --uikit-primary-color: hsl(203, 100%, 60%);
+  --uikit-primary-color-opacity: hsla(203, 100%, 60%, 0.25);
   --uikit-success-color: hsl(155, 100%, 60%);
   --uikit-warning-color: hsl(38, 100%, 60%);
   --uikit-danger-color: hsl(350, 100%, 60%);

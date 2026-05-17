@@ -27,9 +27,14 @@ export const useThemeStore = defineStore('theme', () => {
   const animationRipple = ref(true)
 
   watchEffect(() => {
+    const hue = primaryColor.value
     document.documentElement.style.setProperty(
       '--uikit-primary-color',
-      `hsl(${primaryColor.value}, 100%, 60%)`
+      `hsl(${hue}, 100%, 60%)`
+    )
+    document.documentElement.style.setProperty(
+      '--uikit-primary-color-opacity',
+      `hsla(${hue}, 100%, 60%, 0.25)`
     )
     document.documentElement.setAttribute('data-uikit-theme', mode.value)
   })
