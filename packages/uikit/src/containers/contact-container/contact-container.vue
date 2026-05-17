@@ -66,7 +66,7 @@ export interface ContactContainerProps {
   // ---------- 聚合入口 ----------
   /** 是否展示「新请求」入口，默认 true */
   showNewRequest?: boolean
-  /** 是否展示「群组」入口，默认 true */
+  /** 是否展示「群组」入口，默认 true（Provider.enableGroup=false 时强制隐藏） */
   showGroup?: boolean
   /** 是否展示「联系人」入口，默认 true */
   showContact?: boolean
@@ -217,7 +217,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   avatarShape: 'circle',
   itemSize: 'normal',
   loading: false,
-  enableLoadMore: false,
+  enableLoadMore: true,
   loadMoreThreshold: 60,
   bodySticky: false,
   footerSticky: false,
@@ -258,11 +258,14 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-const { contactList, refresh: refreshContacts } = useContact()
+const { contactList, refresh: refreshContacts, loadMore: loadMoreContacts, contactCount, fetchContactCount } = useContact()
 const { groupList, refresh: refreshGroups, loadMore: loadMoreGroups, joinedGroupCount, fetchJoinedGroupCount } = useGroup()
 const { features } = useUIKit()
 const contactStore = useContactStore()
 const groupStore = useGroupStore()
+
+/** 群组能力是否启用（Provider 层冻结） */
+const groupEnabled = computed(() => features.enableGroup !== false)
 
 /** 自治拉取：根据当前视图按需触发 */
 function maybeFetchContacts() {
@@ -277,6 +280,12 @@ function maybeFetchGroups() {
   refreshGroups()
 }
 
+/** home 视图下轻量获取好友总数（不拉取完整列表） */
+function maybeFetchContactCount() {
+  if (!props.autoFetch) return
+  fetchContactCount()
+}
+
 /** home 视图下轻量获取群组总数（不拉取完整列表） */
 function maybeFetchGroupCount() {
   if (!props.autoFetchGroups) return
@@ -286,7 +295,10 @@ function maybeFetchGroupCount() {
 onMounted(() => {
   // home 视图通常需要 contact / group 数量；group/contact 子视图按需
   if (view.value === 'home') {
-    if (props.showContact) maybeFetchContacts()
+    if (props.showContact) {
+      maybeFetchContactCount()
+      maybeFetchContacts()
+    }
     if (props.showGroup) {
       maybeFetchGroupCount()
       maybeFetchGroups()
@@ -345,7 +357,12 @@ const resolvedGroupCount = computed(() => {
 })
 const resolvedContactCount = computed(() => {
   if (props.contactCount !== undefined) return props.contactCount
-  return props.autoEntryCount ? contactList.value.length : 0
+  if (!props.autoEntryCount) return 0
+  // home 视图优先使用轻量接口返回的总数，子视图或 fallback 用列表长度
+  if (view.value === 'home') {
+    return contactCount.value || contactList.value.length
+  }
+  return contactList.value.length
 })
 
 const navEntries = computed<ContactNavEntry[]>(() => {
@@ -363,7 +380,7 @@ const navEntries = computed<ContactNavEntry[]>(() => {
       label: props.groupLabel || t('contact.entryGroup'),
       count: resolvedGroupCount.value,
       icon: props.groupIcon,
-      visible: props.showGroup,
+      visible: props.showGroup && groupEnabled.value,
     },
     contact: {
       key: 'contact',
@@ -387,6 +404,15 @@ function onEntryClick(key: string) {
   }
   if (key === 'contact') {
     view.value = 'contact'
+  }
+}
+
+/** 处理联系人触底加载更多 */
+async function handleContactLoadMore() {
+  try {
+    await loadMoreContacts()
+  } finally {
+    contactListRef.value?.releaseLoadMoreLock?.()
   }
 }
 
@@ -615,7 +641,7 @@ const subviewTitle = computed(() => {
             :avatar-shape="props.avatarShape"
             :item-size="props.itemSize"
             :loading="props.loading"
-            :has-more="true"
+            :has-more="contactStore.hasMore"
             :enable-load-more="props.enableLoadMore"
             :load-more-threshold="props.loadMoreThreshold"
             :no-more-text="props.noMoreText"
@@ -624,7 +650,7 @@ const subviewTitle = computed(() => {
             @select="(c: Contact) => emit('contact-select', c)"
             @click="(c: Contact) => emit('contact-click', c)"
             @contextmenu="(e: MouseEvent, c: Contact) => emit('contact-contextmenu', e, c)"
-            @load-more="() => emit('contact-load-more')"
+            @load-more="handleContactLoadMore"
             @max-exceed="(m: number) => emit('contact-max-exceed', m)"
             @update:selected-ids="(ids: string[]) => emit('update:selectedIds', ids)"
           >

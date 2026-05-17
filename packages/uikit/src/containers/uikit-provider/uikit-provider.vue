@@ -11,7 +11,7 @@ import { useThemeStore } from '../../store/theme'
 import { useLocale } from '../../locale'
 import { createClient } from '../../sdk/client'
 import { createEventHandler } from '../../sdk/event-handler'
-import { UIKIT_CONTEXT_KEY, type UIKitDataSource, type UIKitFeatures } from '../../composables/use-uikit'
+import { UIKIT_CONTEXT_KEY, type UIKitDataSource, type UIKitFeatures, type ContactFetchMode } from '../../composables/use-uikit'
 import type { ClientConfig } from '../../sdk/types'
 import type { UIKitClient } from '../../sdk/client'
 import type { AnimationConfig } from '../../store/theme'
@@ -34,6 +34,12 @@ export interface ProviderProps {
    */
   enableContact?: boolean
   /**
+   * 联系人拉取模式（默认 'page'）
+   * - 'page': 分页拉取（getContactsWithCursor），支持触底加载更多
+   * - 'all':  一次性全量拉取（getAllContacts），无分页能力
+   */
+  contactFetchMode?: ContactFetchMode
+  /**
    * 是否启用黑名单（默认 false）
    * 启用后：
    * - event-handler 挂载黑名单事件
@@ -47,6 +53,13 @@ export interface ProviderProps {
    * - 组件层 useUIKit().features.enablePresence===true 时，可通过 usePresence() 按需订阅
    */
   enablePresence?: boolean
+  /**
+   * 是否启用群组体系（默认 true）
+   * 关闭后：
+   * - ContactContainer 中群组入口/列表不展示
+   * - useGroup().refresh() 等操作直接返回
+   */
+  enableGroup?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
 }
@@ -57,6 +70,8 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableContact: false,
   enableBlocklist: false,
   enablePresence: false,
+  enableGroup: true,
+  contactFetchMode: 'page',
 })
 
 const clientStore = useClientStore()
@@ -94,6 +109,8 @@ const features: UIKitFeatures = {
   enableContact: props.enableContact,
   enableBlocklist: props.enableBlocklist,
   enablePresence: props.enablePresence,
+  enableGroup: props.enableGroup,
+  contactFetchMode: props.contactFetchMode,
 }
 
 /** 当 client 实例变化时，自动挂载/卸载事件处理器 */
@@ -114,6 +131,7 @@ watch(
           enableContact: props.enableContact,
           enableBlocklist: props.enableBlocklist,
           enablePresence: props.enablePresence,
+          enableGroup: props.enableGroup,
         },
       )
       // 连接消息发送状态回写到 store
@@ -166,17 +184,34 @@ watch(
     // 好友列表（可选预拉）
     if (props.enableContact && !contactStore.loaded) {
       try {
+        const isAllMode = props.contactFetchMode === 'all'
         let list: Array<{ userId: string; name: string; remark?: string }> = []
-        if (ds.fetchContacts) {
-          list = await ds.fetchContacts()
+        if (isAllMode && client) {
+          // 全量拉取模式
+          const res = await client.getAllContacts()
+          const data = res.data || []
+          list = data.map((item) => ({
+            userId: item.userId,
+            name: item.remark || item.userId,
+            remark: item.remark,
+          }))
+          contactStore.setHasMore(false)
+          contactStore.setCursor('')
+        } else if (ds.fetchContacts) {
+          const res = await ds.fetchContacts({ pageSize: 50 })
+          list = res.list || []
+          contactStore.setHasMore(!!res.hasMore)
+          contactStore.setCursor(res.cursor || '')
         } else if (client) {
-          const res = await client.getContactsWithCursor()
+          const res = await client.getContactsWithCursor({ pageSize: 50 })
           const contacts = res.data?.contacts || []
           list = contacts.map((item) => ({
             userId: item.userId,
             name: item.remark || item.userId,
             remark: item.remark,
           }))
+          contactStore.setHasMore(contacts.length >= 50)
+          contactStore.setCursor(res.data?.cursor || '')
         }
         contactStore.setContactList(list)
       } catch (e) {
