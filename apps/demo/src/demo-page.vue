@@ -29,6 +29,7 @@ const emit = defineEmits<{
   (e: 'update:enableBlocklist', v: boolean): void
   (e: 'update:enablePresence', v: boolean): void
   (e: 'update:useCustomDataSource', v: boolean): void
+  (e: 'logout'): void
 }>()
 function toggleEnableContact(v: boolean) { emit('update:enableContact', v) }
 function toggleEnableBlocklist(v: boolean) { emit('update:enableBlocklist', v) }
@@ -124,6 +125,8 @@ async function handleLogout() {
     await logout?.()
   } catch (err) {
     alert('登出失败: ' + (err as Error).message)
+  } finally {
+    emit('logout')
   }
 }
 
