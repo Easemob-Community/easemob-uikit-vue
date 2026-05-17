@@ -444,8 +444,8 @@ defineExpose({
 .simple-input {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--uikit-container-gap, 8px);
+  padding: var(--uikit-container-gap, 8px) 12px;
   background-color: var(--uikit-bg-secondary);
 }
 
@@ -462,7 +462,7 @@ defineExpose({
 .simple-input__toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: calc(var(--uikit-container-gap, 8px) * 1.5);
 }
 
 .simple-input__tool-btn {
@@ -486,7 +486,7 @@ defineExpose({
 .simple-input__field-area {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: var(--uikit-container-gap, 8px);
 }
 
 .simple-input__field {

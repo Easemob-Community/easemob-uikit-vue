@@ -51,8 +51,8 @@ function onClose() {
 .editing-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: calc(var(--uikit-container-gap, 8px) * 0.75);
+  padding: calc(var(--uikit-container-gap, 8px) * 0.75) 12px;
   margin: 0 12px 4px;
   border-radius: var(--uikit-components-radius, 6px);
   background-color: var(--uikit-bg-base);
@@ -73,7 +73,7 @@ function onClose() {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: calc(var(--uikit-container-gap, 8px) * 0.75);
   overflow: hidden;
 }
 

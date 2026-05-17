@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: calc(var(--uikit-container-gap, 8px) * 1.5);
 }
 
 .voice-panel__mic-wrapper {
