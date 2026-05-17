@@ -268,7 +268,7 @@ onUnmounted(() => {
 .uikit-popup__content {
   position: relative;
   background-color: var(--uikit-bg-base);
-  border-radius: 12px;
+  border-radius: var(--uikit-components-radius, 12px);
   max-width: 90vw;
   max-height: 90vh;
   overflow: auto;
@@ -283,7 +283,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   width: 100%;
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
   max-width: 100%;
   max-height: 80vh;
 }
@@ -293,7 +293,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
   max-width: 100%;
 }
 
@@ -302,7 +302,7 @@ onUnmounted(() => {
   left: 0;
   top: 0;
   height: 100%;
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0;
   max-height: 100%;
 }
 
@@ -311,7 +311,7 @@ onUnmounted(() => {
   right: 0;
   top: 0;
   height: 100%;
-  border-radius: 12px 0 0 12px;
+  border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
   max-height: 100%;
 }
 

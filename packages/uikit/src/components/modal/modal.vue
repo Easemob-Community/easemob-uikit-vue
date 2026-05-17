@@ -67,6 +67,7 @@ function onCancel() {
 .uikit-modal {
   width: 300px;
   padding: 20px;
+  border-radius: var(--uikit-components-radius, 12px);
 }
 
 .uikit-modal__title {

@@ -23,6 +23,10 @@ export interface ProviderProps {
   theme?: {
     mode?: 'light' | 'dark'
     primaryColor?: number
+    /** 容器间距（px），默认 8，最小 0 */
+    gap?: number
+    /** 组件圆角模式：'ground' 圆角（默认）| 'square' 直角 */
+    shape?: 'ground' | 'square'
   }
   locale?: 'zh-CN' | 'en'
   animation?: AnimationConfig
@@ -228,6 +232,12 @@ onMounted(() => {
   }
   if (props.theme?.primaryColor) {
     themeStore.setPrimaryColor(props.theme.primaryColor)
+  }
+  if (props.theme?.gap !== undefined) {
+    themeStore.setContainerGap(props.theme.gap)
+  }
+  if (props.theme?.shape) {
+    themeStore.setComponentsShape(props.theme.shape)
   }
   if (props.animation) {
     themeStore.applyAnimationConfig(props.animation)

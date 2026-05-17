@@ -125,7 +125,7 @@ onClickOutside(panelRef, () => {
   flex-direction: column;
   pointer-events: auto;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  border-radius: 12px 0 0 12px;
+  border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
 }
 
 .chat-drawer__panel--square {

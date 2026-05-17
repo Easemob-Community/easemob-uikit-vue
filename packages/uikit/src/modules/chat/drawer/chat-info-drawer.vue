@@ -159,7 +159,7 @@ function onLeaveOrDelete() {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   padding: 0;
   transition: background-color 0.15s;
 }
@@ -227,7 +227,7 @@ function onLeaveOrDelete() {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
   font-size: 14px;
@@ -243,7 +243,7 @@ function onLeaveOrDelete() {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   font-size: 14px;
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -256,7 +256,7 @@ function onLeaveOrDelete() {
 
 .chat-info-drawer__remark-save {
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   border: none;
   background-color: var(--uikit-primary-color);
   color: #fff;
@@ -276,7 +276,7 @@ function onLeaveOrDelete() {
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   cursor: pointer;
   transition: background-color 0.15s;
 }
@@ -301,7 +301,7 @@ function onLeaveOrDelete() {
 .chat-info-drawer__action-btn {
   width: 100%;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   border: none;
   font-size: 15px;
   font-weight: 500;

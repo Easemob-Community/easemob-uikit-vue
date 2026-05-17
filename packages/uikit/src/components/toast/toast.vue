@@ -52,7 +52,7 @@ const icon = computed(() => iconMap[props.type])
   align-items: center;
   gap: 8px;
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: var(--uikit-components-radius, 12px);
   background-color: rgba(0, 0, 0, 0.75);
   color: #fff;
   font-size: 14px;

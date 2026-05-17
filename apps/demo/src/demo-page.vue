@@ -37,7 +37,7 @@ function toggleEnableBlocklist(v: boolean) { emit('update:enableBlocklist', v) }
 function toggleEnablePresence(v: boolean) { emit('update:enablePresence', v) }
 function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource', v) }
 
-const { mode, primaryColor, hoverStyle, setMode, setPrimaryColor, setHoverStyle, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
+const { mode, primaryColor, hoverStyle, containerGap, setMode, setPrimaryColor, setHoverStyle, setContainerGap, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
@@ -376,6 +376,22 @@ function injectMockContacts() {
               >
                 直角
               </button>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">容器间距</label>
+            <div class="demo-settings__color">
+              <input
+                type="range"
+                min="0"
+                max="24"
+                :value="containerGap"
+                class="demo-slider"
+                style="background: linear-gradient(to right, #e5e7eb, var(--uikit-primary-color, hsl(203, 100%, 60%)));"
+                @input="(e: Event) => setContainerGap(Number((e.target as HTMLInputElement).value))"
+              />
+              <span style="font-size: 13px; color: var(--uikit-text-secondary, #6b7280); min-width: 28px; text-align: right;">{{ containerGap }}px</span>
             </div>
           </div>
 
@@ -897,9 +913,12 @@ function injectMockContacts() {
   flex-direction: row;
   height: 100vh;
   width: 100vw;
-  background-color: var(--uikit-bg-base, #ffffff);
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
   color: var(--uikit-text-primary, #111827);
   overflow: hidden;
+  gap: var(--uikit-container-gap, 8px);
+  padding: var(--uikit-container-gap, 8px);
+  box-sizing: border-box;
 }
 
 .demo-btn {
@@ -1054,9 +1073,11 @@ function injectMockContacts() {
 .demo-layout__sidebar {
   width: 300px;
   flex-shrink: 0;
-  border-right: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 8px);
   overflow: auto;
   height: 100%;
+  background-color: var(--uikit-bg-base, #ffffff);
 }
 
 .demo-layout__main {
@@ -1064,6 +1085,9 @@ function injectMockContacts() {
   min-width: 0;
   overflow: auto;
   height: 100%;
+  border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-bg-base, #ffffff);
 }
 
 .demo-input {

@@ -21,6 +21,10 @@
   --uikit-scrollbar-thumb-hover: #a0a0a0;
   --uikit-scrollbar-thumb-radius: 3px;
 
+  /* 容器间距与组件圆角 */
+  --uikit-container-gap: 8px;
+  --uikit-components-radius: 8px;
+
   /* ===== 动画系统 CSS 变量 ===== */
 
   /* 全局开关：1 = 开启动画，0 = 关闭动画 */

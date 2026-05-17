@@ -29,6 +29,10 @@ export function useTheme() {
     themeStore.setComponentsShape(shape)
   }
 
+  function setContainerGap(gap: number) {
+    themeStore.setContainerGap(gap)
+  }
+
   function setHoverStyle(style: HoverStyle) {
     themeStore.setHoverStyle(style)
   }
@@ -65,12 +69,14 @@ export function useTheme() {
     avatarShape: computed(() => themeStore.avatarShape),
     bubbleShape: computed(() => themeStore.bubbleShape),
     componentsShape: computed(() => themeStore.componentsShape),
+    containerGap: computed(() => themeStore.containerGap),
     hoverStyle: computed(() => themeStore.hoverStyle),
     setMode,
     setPrimaryColor,
     setAvatarShape,
     setBubbleShape,
     setComponentsShape,
+    setContainerGap,
     setHoverStyle,
     toggleMode,
     animationEnabled,

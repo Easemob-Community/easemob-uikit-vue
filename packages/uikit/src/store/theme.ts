@@ -24,6 +24,9 @@ export const useThemeStore = defineStore('theme', () => {
   const bubbleShape = ref<'ground' | 'square'>('ground')
   const componentsShape = ref<'ground' | 'square'>('ground')
 
+  // ===== 容器间距配置 =====
+  const containerGap = ref<number>(8)
+
   // ===== Hover 风格配置 =====
   const hoverStyle = ref<HoverStyle>('default')
 
@@ -31,6 +34,19 @@ export const useThemeStore = defineStore('theme', () => {
   const animationEnabled = ref(true)
   const animationLevel = ref<AnimationLevel>('normal')
   const animationRipple = ref(true)
+
+  // 初始化：立即将默认值写入 CSS 变量，确保懒加载 store 时也有初始样式
+  document.documentElement.style.setProperty('--uikit-primary-color', `hsl(${primaryColor.value}, 100%, 60%)`)
+  document.documentElement.style.setProperty('--uikit-primary-color-opacity', `hsla(${primaryColor.value}, 100%, 60%, 0.25)`)
+  document.documentElement.setAttribute('data-uikit-theme', mode.value)
+  document.documentElement.style.setProperty('--uikit-item-hover-radius', '0px')
+  document.documentElement.style.setProperty('--uikit-item-hover-margin-x', '0px')
+  document.documentElement.style.setProperty('--uikit-item-hover-padding-x', '16px')
+  document.documentElement.style.setProperty('--uikit-item-active-radius', '0px')
+  document.documentElement.style.setProperty('--uikit-components-radius', '8px')
+  document.documentElement.style.setProperty('--uikit-container-gap', '8px')
+  document.documentElement.setAttribute('data-uikit-anim-enabled', 'true')
+  document.documentElement.setAttribute('data-uikit-anim-level', animationLevel.value)
 
   watchEffect(() => {
     const hue = primaryColor.value
@@ -63,6 +79,23 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.setProperty(
       '--uikit-item-active-radius',
       isRounded ? '8px' : '0px'
+    )
+  })
+
+  // 组件形状 / 圆角 DOM 属性联动
+  watchEffect(() => {
+    const isRounded = componentsShape.value === 'ground'
+    document.documentElement.style.setProperty(
+      '--uikit-components-radius',
+      isRounded ? '8px' : '4px'
+    )
+  })
+
+  // 容器间距 DOM 属性联动
+  watchEffect(() => {
+    document.documentElement.style.setProperty(
+      '--uikit-container-gap',
+      `${Math.max(0, containerGap.value)}px`
     )
   })
 
@@ -101,6 +134,11 @@ export const useThemeStore = defineStore('theme', () => {
     componentsShape.value = shape
   }
 
+  // ===== Container gap setter =====
+  function setContainerGap(gap: number) {
+    containerGap.value = Math.max(0, gap)
+  }
+
   // ===== Hover setters =====
   function setHoverStyle(style: HoverStyle) {
     hoverStyle.value = style
@@ -134,6 +172,7 @@ export const useThemeStore = defineStore('theme', () => {
     avatarShape,
     bubbleShape,
     componentsShape,
+    containerGap,
     hoverStyle,
     animationEnabled,
     animationLevel,
@@ -143,6 +182,7 @@ export const useThemeStore = defineStore('theme', () => {
     setAvatarShape,
     setBubbleShape,
     setComponentsShape,
+    setContainerGap,
     setHoverStyle,
     setAnimationEnabled,
     setAnimationLevel,

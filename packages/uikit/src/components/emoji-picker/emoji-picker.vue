@@ -64,7 +64,7 @@ function onClose() {
 <style scoped>
 .emoji-picker {
   background-color: var(--uikit-bg-base);
-  border-radius: 12px;
+  border-radius: var(--uikit-components-radius, 12px);
   overflow: hidden;
   width: 320px;
 }

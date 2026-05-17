@@ -549,7 +549,7 @@ defineExpose({
 /* 表情选择器包裹层：hover 阴影效果（非 scoped，因 Popup 使用 Teleport） */
 .emoji-picker-wrapper {
   width: 320px;
-  border-radius: 12px;
+  border-radius: var(--uikit-components-radius, 12px);
   background: var(--uikit-bg-base);
   border: 1px solid var(--uikit-border, rgba(0, 0, 0, 0.08));
   box-shadow:
@@ -583,7 +583,7 @@ defineExpose({
 .message-input__emoji-sheet-content {
   position: relative;
   background-color: var(--uikit-bg-base);
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--uikit-components-radius, 16px) var(--uikit-components-radius, 16px) 0 0;
   padding: 12px;
   animation: slide-up 0.2s ease-out;
 }

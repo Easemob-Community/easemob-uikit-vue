@@ -65,7 +65,7 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: 4px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
               transform 150ms var(--uikit-anim-easing),
@@ -82,6 +82,11 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--square {
   border-radius: 4px;
+}
+
+/* 当全局为 square 时，保持按钮的 square 样式 */
+[data-uikit-components-radius="4px"] .uikit-button:not(.uikit-button--square) {
+  border-radius: var(--uikit-components-radius, 8px);
 }
 
 .uikit-button--small {
