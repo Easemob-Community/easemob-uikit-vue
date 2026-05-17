@@ -82,8 +82,8 @@ function onTap(key: string) {
 }
 
 .contact-alphabet-nav__item.is-active {
-  color: var(--uikit-bg-base);
-  background-color: var(--uikit-text-primary);
+  color: #ffffff;
+  background-color: var(--uikit-primary-color);
 }
 
 .contact-alphabet-nav__item.is-empty {

@@ -145,6 +145,8 @@ const presence = usePresence()
 const itemsRef = ref<HTMLElement>()
 /** 触底加载本地锁，防止异步请求期间重复触发 */
 const isLoadingMore = ref(false)
+/** 当前可视区域的分组 key，用于字母导航高亮 */
+const activeGroupKey = ref('')
 const searchKeyword = computed({
   get: () => filterText.value,
   set: (v: string) => setFilterText(v),
@@ -231,15 +233,36 @@ watch(
   },
 )
 
-// ================== 触底加载 ==================
+// ================== 触底加载 & 分组高亮 ==================
 function onScroll() {
-  if (!props.enableLoadMore || props.loading || isLoadingMore.value || !props.hasMore) return
   const el = itemsRef.value
   if (!el) return
-  const distance = el.scrollHeight - el.scrollTop - el.clientHeight
-  if (distance <= props.loadMoreThreshold) {
-    isLoadingMore.value = true
-    emit('load-more')
+
+  // 触底加载
+  if (props.enableLoadMore && !props.loading && !isLoadingMore.value && props.hasMore) {
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight
+    if (distance <= props.loadMoreThreshold) {
+      isLoadingMore.value = true
+      emit('load-more')
+    }
+  }
+
+  // 更新当前可视分组高亮
+  if (isAlphabet.value && props.showAlphabetNav && groupedContacts.value.length > 0) {
+    const headers = el.querySelectorAll<HTMLElement>('[data-group-key]')
+    let current = ''
+    for (let i = headers.length - 1; i >= 0; i--) {
+      const header = headers[i]
+      if (header.offsetTop <= el.scrollTop + 4) {
+        current = header.getAttribute('data-group-key') || ''
+        break
+      }
+    }
+    // 如果还没滚动到任何 header，默认第一个分组
+    if (!current && headers.length > 0) {
+      current = headers[0].getAttribute('data-group-key') || ''
+    }
+    activeGroupKey.value = current
   }
 }
 
@@ -434,6 +457,7 @@ defineExpose({
     <ContactAlphabetNav
       v-if="isAlphabet && props.showAlphabetNav && groupedContacts.length > 0"
       :groups="(groupedContacts as ContactGroupItem[])"
+      :active-key="activeGroupKey"
       @jump="scrollToGroup"
     />
 
