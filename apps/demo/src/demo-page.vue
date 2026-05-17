@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import {
   ConversationContainer,
+  ContactContainer,
   ChatContainer,
   Popup,
   useTheme,
@@ -9,10 +10,14 @@ import {
   useUIKit,
   useClient,
   useConversation,
+  useContactStore,
+  setPinyinAdapter,
 } from '@easemob/uikit'
-import type { Conversation } from '@easemob/uikit'
+import type { Conversation, Contact } from '@easemob/uikit'
+import { pinyin } from 'pinyin-pro'
+import NavSidebar from './components/nav-sidebar.vue'
 
-const { mode, primaryColor, isDark, setMode, setPrimaryColor, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
+const { mode, primaryColor, setMode, setPrimaryColor, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
@@ -140,34 +145,73 @@ function injectMockConversations() {
   const list = generateMockConversations(1000)
   setLocalConversationList(list)
 }
+
+/* ============== 联系人演示（拼音能力） ============== */
+
+/** 左侧边栏 tab：会话 / 联系人 */
+const sidebarTab = ref<'conversation' | 'contact'>('conversation')
+
+/** 拼音 adapter 开关（对比体验未注入 vs 已注入的区别） */
+const pinyinAdapterEnabled = ref(false)
+
+/** pinyin-pro 适配器实现（业务方例程） */
+function createPinyinAdapter() {
+  return (text: string) => {
+    const full = pinyin(text, { toneType: 'none', type: 'string', nonZh: 'consecutive' })
+      .replace(/\s+/g, '')
+      .toLowerCase()
+    const initialsRaw = pinyin(text, { pattern: 'first', toneType: 'none', type: 'string' })
+      .replace(/\s+/g, '')
+      .toLowerCase()
+    const firstChar = initialsRaw.charAt(0).toUpperCase()
+    return {
+      pinyin: full,
+      initials: initialsRaw,
+      firstLetter: /^[A-Z]$/.test(firstChar) ? firstChar : '#',
+    }
+  }
+}
+
+function togglePinyinAdapter(enabled: boolean) {
+  pinyinAdapterEnabled.value = enabled
+  setPinyinAdapter(enabled ? createPinyinAdapter() : null)
+}
+
+/** 生成中英文混杂的联系人 mock 数据 */
+function generateMockContacts(): Contact[] {
+  const cn = [
+    '张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十',
+    '陈小明', '林志玲', '诸葛亮', '欧阳智勇', '马云', '黄德华',
+    '宝宝', '高雅萝', '叶子', '月亮', '安心', '市场',
+  ]
+  const en = [
+    'Alice', 'Bob', 'Charlie', 'David', 'Emma', 'Frank',
+    'Grace', 'Henry', 'Ivy', 'Jack', 'Kate', 'Leo',
+    'Mike', 'Nina', 'Oscar', 'Peter', 'Queen', 'Rose',
+    'Sam', 'Tom', 'Uma', 'Vincent', 'Will', 'Xander', 'Yara', 'Zoe',
+  ]
+  const numId = ['001号客服', '002号客服', '＃特殊字符']
+  const list: Contact[] = []
+  cn.forEach((name, i) => list.push({ userId: `cn_${i}`, name }))
+  en.forEach((name, i) => list.push({ userId: `en_${i}`, name }))
+  numId.forEach((name, i) => list.push({ userId: `num_${i}`, name }))
+  return list
+}
+
+function injectMockContacts() {
+  const contactStore = useContactStore()
+  contactStore.setContactList(generateMockContacts())
+  sidebarTab.value = 'contact'
+}
 </script>
 
 <template>
   <div class="demo-layout">
-    <!-- 顶部工具栏 -->
-    <header class="demo-toolbar">
-      <div class="demo-toolbar__brand">
-        <span class="demo-toolbar__logo">UIKit</span>
-        <span class="demo-toolbar__tag">Demo</span>
-      </div>
-      <div class="demo-toolbar__actions">
-        <button
-          class="demo-btn demo-btn--icon"
-          :title="isDark ? '切换亮色' : '切换暗色'"
-          @click="setMode(isDark ? 'light' : 'dark')"
-        >
-          <span v-if="isDark">☀️</span>
-          <span v-else>🌙</span>
-        </button>
-        <button
-          class="demo-btn"
-          :class="{ 'demo-btn--active': showSettings }"
-          @click="showSettings = !showSettings"
-        >
-          设置
-        </button>
-      </div>
-    </header>
+    <!-- 左侧导航栏（仿微信） -->
+    <NavSidebar
+      v-model="sidebarTab"
+      @open-settings="showSettings = true"
+    />
 
     <!-- 设置抽屉 -->
     <Popup v-model:show="showSettings" position="right">
@@ -527,6 +571,26 @@ function injectMockConversations() {
           </div>
 
           <div class="demo-settings__group">
+            <label class="demo-settings__label">联系人演示（拼音能力）</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <button class="demo-btn" @click="injectMockContacts">
+                注入 mock 联系人
+              </button>
+              <button
+                class="demo-btn"
+                :class="{ 'demo-btn--active': pinyinAdapterEnabled }"
+                @click="togglePinyinAdapter(!pinyinAdapterEnabled)"
+              >
+                {{ pinyinAdapterEnabled ? '已启用拼音 adapter' : '启用拼音 adapter' }}
+              </button>
+            </div>
+            <div class="demo-info">
+              关闭时：中文全部归入 # 分组，只能原文搜索。<br />
+              开启后：按拼音首字母分组（张三 → Z），支持输入 zhang / zs 搜索。
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
             <label class="demo-settings__label">SDK 初始化（延迟初始化验证）</label>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
               <input
@@ -629,22 +693,23 @@ function injectMockConversations() {
       </div>
     </Popup>
 
-    <!-- 主体内容 -->
-    <div class="demo-layout__body">
-      <div class="demo-layout__sidebar">
-        <ConversationContainer>
-        <!-- 自定义头部的用法 -->
-          <!-- <template #header>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-weight: 600;">哈哈哈</span>
-              <span style="font-size: 12px; color: #6b7280;">v1.0</span>
-            </div>
-          </template> -->
-        </ConversationContainer>
-      </div>
-      <div class="demo-layout__main">
-        <ChatContainer :config="chatConfig" />
-      </div>
+    <!-- 中间侧边栏：会话列表 / 联系人列表 -->
+    <div class="demo-layout__sidebar">
+      <ConversationContainer v-if="sidebarTab === 'conversation'">
+      <!-- 自定义头部的用法 -->
+        <!-- <template #header>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-weight: 600;">哈哈哈</span>
+            <span style="font-size: 12px; color: #6b7280;">v1.0</span>
+          </div>
+        </template> -->
+      </ConversationContainer>
+      <ContactContainer v-else />
+    </div>
+
+    <!-- 右侧主体：聊天容器 -->
+    <div class="demo-layout__main">
+      <ChatContainer :config="chatConfig" />
     </div>
   </div>
 </template>
@@ -652,48 +717,12 @@ function injectMockConversations() {
 <style scoped>
 .demo-layout {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100vh;
   width: 100vw;
   background-color: var(--uikit-bg-base, #ffffff);
   color: var(--uikit-text-primary, #111827);
-}
-
-.demo-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--uikit-bg-secondary, #e5e7eb);
-  background-color: var(--uikit-bg-base, #ffffff);
-  flex-shrink: 0;
-}
-
-.demo-toolbar__brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.demo-toolbar__logo {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
-}
-
-.demo-toolbar__tag {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
-  color: var(--uikit-text-secondary, #6b7280);
-}
-
-.demo-toolbar__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  overflow: hidden;
 }
 
 .demo-btn {
@@ -845,24 +874,19 @@ function injectMockConversations() {
   flex-shrink: 0;
 }
 
-.demo-layout__body {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
 .demo-layout__sidebar {
   width: 300px;
   flex-shrink: 0;
   border-right: 1px solid var(--uikit-bg-secondary, #e5e7eb);
   overflow: auto;
+  height: 100%;
 }
 
 .demo-layout__main {
   flex: 1;
   min-width: 0;
   overflow: auto;
+  height: 100%;
 }
 
 .demo-input {
