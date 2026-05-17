@@ -22,6 +22,10 @@ export default defineConfig({
     rollupOptions: {
       external: ['vue', 'pinia', 'easemob-websdk'],
       output: {
+        // 同时存在命名导出与 default 导出时，显式声明使用命名导出策略，
+        // 避免 Rollup 警告 "Consumers will have to use `EasemobUIKit.default`"。
+        // 由于 install 也是命名导出，UMD 用户可直接 `app.use(EasemobUIKit)`。
+        exports: 'named',
         globals: {
           vue: 'Vue',
           pinia: 'Pinia',

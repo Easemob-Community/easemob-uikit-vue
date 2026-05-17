@@ -1,4 +1,4 @@
-import type { App } from 'vue'
+import type { App, Component, Plugin } from 'vue'
 
 // Components
 export * from './components'
@@ -24,11 +24,65 @@ export * from './locale'
 // Theme
 import './theme/index.css'
 
-// Install function for app.use(UIKit)
-export function install(_app: App) {
-  // Pinia 应由使用方自行创建，避免重复注册
+// 用于全量扫描的命名空间导入
+import * as components from './components'
+import * as containers from './containers'
+import * as modules from './modules'
+
+/**
+ * `app.use(UIKit, options)` 的可选参数。
+ */
+export interface UIKitInstallOptions {
+  /**
+   * 全局注册组件时使用的前缀，默认 `'Em'`，与 `EasemobUIKitResolver` 保持一致。
+   *
+   * - 默认情况下，组件以 `Em*` 形式注册（如 `EmButton`、`EmChatContainer`）。
+   * - 传入自定义前缀时，会将原 `Em` 前缀替换为该前缀。
+   *   例如 `prefix: 'My'` → `EmButton` 注册为 `MyButton`。
+   */
+  prefix?: string
 }
 
-export default {
-  install,
+function isVueComponent(value: unknown): boolean {
+  if (!value) return false
+  const t = typeof value
+  if (t === 'function') return true
+  if (t !== 'object') return false
+  const obj = value as Record<string, unknown>
+  return (
+    'render' in obj ||
+    'setup' in obj ||
+    'template' in obj ||
+    '__file' in obj ||
+    '__name' in obj
+  )
 }
+
+/**
+ * Vue 插件安装函数。
+ *
+ * 支持两种使用方式：
+ * 1. `app.use(UIKit)` —— 一把梭全局注册，组件名带默认 `Em` 前缀。
+ * 2. `app.use(UIKit, { prefix: 'My' })` —— 自定义前缀全局注册。
+ *
+ * 注：若追求更优的 tree-shaking，请改用 `EasemobUIKitResolver` 实现按需导入，
+ * 此时无需调用 `app.use(UIKit)`。Pinia 仍需使用方自行创建并注册。
+ */
+export function install(app: App, options: UIKitInstallOptions = {}) {
+  const prefix = options.prefix ?? 'Em'
+  const allExports: Record<string, unknown> = {
+    ...components,
+    ...containers,
+    ...modules,
+  }
+  for (const [name, value] of Object.entries(allExports)) {
+    // 仅注册以 Em 开头的具名导出（其余为类型 / 常量 / 工具函数）
+    if (!name.startsWith('Em')) continue
+    if (!isVueComponent(value)) continue
+    const finalName = prefix === 'Em' ? name : `${prefix}${name.slice(2)}`
+    app.component(finalName, value as Component)
+  }
+}
+
+const UIKit: Plugin = { install }
+export default UIKit
