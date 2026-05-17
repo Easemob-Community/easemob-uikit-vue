@@ -3,13 +3,16 @@ import { computed } from 'vue'
 import { DEFAULT_ALPHABET_KEYS, type ContactGroupItem } from './types'
 
 const props = withDefaults(defineProps<{
-  /** 当前已渲染的分组数据，用于禁用空字母 */
-  groups: ContactGroupItem[]
+  /** 当前已渲染的分组数据，用于禁用空字母（与 keys 二选一） */
+  groups?: ContactGroupItem[]
+  /** 已有的分组 key 列表（通用现，与 groups 二选一；优先级高于 groups） */
+  keys?: string[]
   /** 当前激活的字母（高亮） */
   activeKey?: string
   /** 是否禁用未存在的字母（变浅色） */
   dimEmpty?: boolean
 }>(), {
+  groups: () => [],
   activeKey: '',
   dimEmpty: true,
 })
@@ -18,7 +21,10 @@ const emit = defineEmits<{
   (e: 'jump', key: string): void
 }>()
 
-const existKeys = computed(() => new Set(props.groups.map((g) => g.key)))
+const existKeys = computed(() => {
+  if (props.keys && props.keys.length) return new Set(props.keys)
+  return new Set(props.groups.map((g) => g.key))
+})
 
 function onTap(key: string) {
   if (props.dimEmpty && !existKeys.value.has(key)) return

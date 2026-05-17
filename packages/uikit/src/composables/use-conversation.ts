@@ -60,25 +60,53 @@ export function useConversation() {
     }
   }
 
-  /** 从服务端获取会话列表 */
+  /**
+   * 从服务端获取会话列表
+   *
+   * 默认仅在未拉取过会话时才向远端发起请求（首屏 / 刷新页面）：
+   * - 如果 store 中 `conversationsLoaded === true`，会直接跳过远端调用，
+   *   仅依赖本地 store 渲染，避免容器多次 mount/unmount 造成重复拉取。
+   * - 传入 `force: true` 可强制拉取（下拉刷新 / 业务主动刷新场景）。
+   * - `append: true` 在加载更多场景使用，不受该短路逻辑影响。
+   */
   async function fetchServerConversations(options?: {
     pageSize?: number
     cursor?: string
     includeEmptyConversations?: boolean
     append?: boolean
+    /** 强制拉取，忽略本地已加载标志。仅对非 append 场景生效 */
+    force?: boolean
   }) {
+    const isLoadMore = !!options?.append
+    // 非加载更多且未强制时，若已加载过则直接复用 store 数据
+    if (!isLoadMore && !options?.force && conversationStore.conversationsLoaded) {
+      return null
+    }
+
     const res = await client.value?.getServerConversations(options)
     const list: any[] = res?.data?.conversations || []
     const mapped = list.map(mapServerConversation)
 
-    if (options?.append) {
+    if (isLoadMore) {
       mapped.forEach((cvs) => conversationStore.addConversation(cvs))
     } else {
       conversationStore.setConversationList(mapped)
+      conversationStore.setConversationsLoaded(true)
     }
 
     conversationStore.setConversationCursor(res?.data?.cursor || null)
     return res
+  }
+
+  /**
+   * 强制从服务端重新拉取会话列表（跳过本地缓存短路）。
+   * 适用于业务侧"下拉刷新 / 手动刷新"等需要明确拿最新数据的场景。
+   */
+  async function refreshConversations(options?: {
+    pageSize?: number
+    includeEmptyConversations?: boolean
+  }) {
+    return fetchServerConversations({ ...options, force: true })
   }
 
   /** 加载更多会话 */
@@ -257,6 +285,7 @@ export function useConversation() {
     loadingMore,
     selectConversation,
     fetchServerConversations,
+    refreshConversations,
     loadMoreConversations,
     pinConversation,
     sendChannelAck,

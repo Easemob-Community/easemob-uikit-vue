@@ -1,29 +1,27 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
-import { useContact } from '../../composables/use-contact'
-import { useContactFilter } from '../../composables/use-contact-filter'
-import { useContactGroup } from '../../composables/use-contact-group'
-import { useContactSort } from '../../composables/use-contact-sort'
-import { useViewport } from '../../composables/use-viewport'
+import { useGroup } from '../../composables/use-group'
+import { useGroupFilter } from '../../composables/use-group-filter'
+import { useGroupSort } from '../../composables/use-group-sort'
 import { useLocale } from '../../locale'
-import ContactItem from './contact-item.vue'
-import ContactEmpty from './contact-empty.vue'
-import ContactAlphabetNav from './contact-alphabet-nav.vue'
+import { resolvePinyin } from '../../composables/use-pinyin'
+import GroupItem from './group-item.vue'
+import GroupEmpty from './group-empty.vue'
+import ContactAlphabetNav from '../contact/contact-alphabet-nav.vue'
 import Input from '../../components/input/input.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type {
-  ContactGroupBy,
-  ContactGroupItem,
-  ContactSelectMode,
-  ContactItemSize,
+  GroupGroupBy,
+  GroupGroupItem,
+  GroupSelectMode,
+  GroupSortBy,
+  GroupItemSize,
+  GroupDisabledFn,
+  GroupSubtitleFn,
   AvatarShape,
-  ContactDisabledFn,
-  ContactSubtitleFn,
-  ContactOnlineStatusFn,
 } from './types'
-import type { ContactFilterFn } from '../../composables/use-contact-filter'
-import type { ContactSortBy } from '../../composables/use-contact-sort'
-import type { Contact } from '../../store/contact'
+import type { GroupFilterFn } from '../../composables/use-group-filter'
+import type { Group } from '../../store/group'
 
 const props = withDefaults(defineProps<{
   /** 是否展示头部区域，默认 true */
@@ -41,40 +39,40 @@ const props = withDefaults(defineProps<{
   /** 空列表提示文字 */
   emptyText?: string
   /** 自定义搜索过滤函数 */
-  filterFn?: ContactFilterFn
-  /** 排序方式，默认 'none' */
-  sortBy?: ContactSortBy
-  /** 分组方式，默认 'alphabet' */
-  groupBy?: ContactGroupBy
+  filterFn?: GroupFilterFn
+  /** 排序方式，默认 'none'（保持 store 顺序） */
+  sortBy?: GroupSortBy
+  /** 分组方式，默认 'none'（平铺） */
+  groupBy?: GroupGroupBy
   /** 是否展示分组标题，默认 true（仅 groupBy !== 'none' 时） */
   showGroupHeader?: boolean
   /** 是否展示字母导航，默认 true（仅 groupBy === 'alphabet' 时） */
   showAlphabetNav?: boolean
   /** 选择模式 */
-  selectMode?: ContactSelectMode
+  selectMode?: GroupSelectMode
   /** 已选中 id 列表（受控，配合 update:selectedIds 实现 v-model） */
   selectedIds?: string[]
-  /** 最大可选数量（multiple 模式生效），超过会被回滚并 emit max-exceed */
+  /** 最大可选数量（multiple 模式生效） */
   maxSelected?: number
-  /** disabled 判定（如：排除自己 / 已加群成员） */
-  disabledFn?: ContactDisabledFn
-  /** 副标题提取函数（双行排版） */
-  subtitleFn?: ContactSubtitleFn
-  /** 在线状态提取函数 */
-  onlineStatusFn?: ContactOnlineStatusFn
-  /** 是否展示头像，默认 true */
+  /** disabled 判定 */
+  disabledFn?: GroupDisabledFn
+  /** 副标题提取函数 */
+  subtitleFn?: GroupSubtitleFn
+  /** 是否展示群头像，默认 true */
   showAvatar?: boolean
+  /** 是否展示成员数，默认 true */
+  showMemberCount?: boolean
   /** 头像尺寸（px），覆盖 itemSize 推断 */
   avatarSize?: number
-  /** 头像形状，默认 circle */
+  /** 头像形状，默认 rounded */
   avatarShape?: AvatarShape
   /** Item 紧凑度，默认 'normal' */
-  itemSize?: ContactItemSize
-  /** 是否处于加载态，展示骨架/loading 提示 */
+  itemSize?: GroupItemSize
+  /** 是否处于加载态 */
   loading?: boolean
-  /** 触底距离阈值（px），<= 该距离触发 load-more，默认 60 */
+  /** 触底距离阈值（px），默认 60 */
   loadMoreThreshold?: number
-  /** 启用触底加载（loading 期间不触发） */
+  /** 启用触底加载 */
   enableLoadMore?: boolean
   /** #body slot 是否固定不随列表滚动 */
   bodySticky?: boolean
@@ -87,12 +85,13 @@ const props = withDefaults(defineProps<{
   showSearch: true,
   showScrollToTop: true,
   sortBy: 'none',
-  groupBy: 'alphabet',
+  groupBy: 'none',
   showGroupHeader: true,
   showAlphabetNav: true,
   selectMode: 'none',
   showAvatar: true,
-  avatarShape: 'circle',
+  showMemberCount: true,
+  avatarShape: 'rounded',
   itemSize: 'normal',
   loading: false,
   loadMoreThreshold: 60,
@@ -102,9 +101,9 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  (e: 'select', contact: Contact): void
-  (e: 'click', contact: Contact): void
-  (e: 'contextmenu', event: MouseEvent, contact: Contact): void
+  (e: 'select', group: Group): void
+  (e: 'click', group: Group): void
+  (e: 'contextmenu', event: MouseEvent, group: Group): void
   (e: 'group-jump', key: string): void
   (e: 'update:selectedIds', ids: string[]): void
   (e: 'max-exceed', max: number): void
@@ -112,15 +111,13 @@ const emit = defineEmits<{
 }>()
 
 const {
-  contactList,
+  groupList,
   filterText,
   setFilterText,
   selectedIds: storeSelectedIds,
   setSelectedIds,
-} = useContact()
+} = useGroup()
 const { t } = useLocale()
-const { isMobile } = useViewport()
-void isMobile
 
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = computed({
@@ -129,28 +126,58 @@ const searchKeyword = computed({
 })
 const normalizedKeyword = computed(() => searchKeyword.value.trim())
 
-/** 排序 + 过滤 + 分组 流水线 */
 const sortByRef = computed(() => props.sortBy)
 const groupByRef = computed(() => props.groupBy)
 
-const sortedContacts = useContactSort(contactList, sortByRef)
-const filteredContacts = useContactFilter(sortedContacts, searchKeyword, {
+const filteredGroups = useGroupFilter(groupList, searchKeyword, {
   filterFn: props.filterFn,
 })
-const groupedContacts = useContactGroup(filteredContacts, groupByRef)
+const sortedGroups = useGroupSort(filteredGroups, sortByRef)
+
+/** 总群组数（过滤后） */
+const totalCount = computed(() => filteredGroups.value.length)
+
+/** 群组分组逻辑（与 contact 对齐，但简化：默认 none，平铺为单组） */
+function resolveGroupKey(g: Group, mode: GroupGroupBy): string {
+  if (mode === 'none') return 'all'
+  if (typeof mode === 'function') return mode(g)
+  // alphabet 模式
+  const raw = (g.groupName || '').trim()
+  if (!raw) return '#'
+  const first = raw.charAt(0).toUpperCase()
+  if (/^[A-Z]$/.test(first)) return first
+  const py = resolvePinyin(raw)
+  if (py && /^[A-Z]$/.test(py.firstLetter)) return py.firstLetter
+  return '#'
+}
+
+const groupedGroups = computed<GroupGroupItem[]>(() => {
+  const list = sortedGroups.value
+  const mode = groupByRef.value
+  const map = new Map<string, Group[]>()
+  const orderedKeys: string[] = []
+  for (const item of list) {
+    const key = resolveGroupKey(item, mode)
+    if (!map.has(key)) {
+      map.set(key, [])
+      orderedKeys.push(key)
+    }
+    map.get(key)!.push(item)
+  }
+  return orderedKeys.map<GroupGroupItem>((key) => ({
+    key,
+    title: key,
+    items: map.get(key)!,
+  }))
+})
 
 const isAlphabet = computed(() => props.groupBy === 'alphabet')
 const isFlatNoGroup = computed(() => props.groupBy === 'none')
 
-/** 总联系人数（过滤后） */
-const totalCount = computed(() => filteredContacts.value.length)
-
 // ================== selectedIds 受控同步 ==================
-
 let isInternalUpdate = false
 let lastValidIds: string[] = []
 
-// props -> store
 watch(
   () => props.selectedIds,
   (ids) => {
@@ -169,13 +196,11 @@ watch(
   { immediate: true },
 )
 
-// store -> props (含 maxSelected 拦截)
 watch(
   () => Array.from(storeSelectedIds.value),
   (next) => {
     if (isInternalUpdate) return
     if (props.maxSelected && next.length > props.maxSelected) {
-      // 回滚到上一次合法集合
       isInternalUpdate = true
       setSelectedIds(lastValidIds)
       nextTick(() => {
@@ -219,40 +244,42 @@ async function scrollToGroup(key: string) {
   emit('group-jump', key)
 }
 
-function onItemClick(contact: Contact) {
-  emit('click', contact)
-  emit('select', contact)
+const alphabetKeys = computed(() => groupedGroups.value.map((g) => g.key))
+
+function onItemClick(group: Group) {
+  emit('click', group)
+  emit('select', group)
 }
 
-function onItemContextmenu(e: MouseEvent, contact: Contact) {
-  emit('contextmenu', e, contact)
+function onItemContextmenu(e: MouseEvent, group: Group) {
+  emit('contextmenu', e, group)
 }
 
 defineExpose({
   scrollToGroup,
-  groupedContacts,
+  groupedGroups,
 })
 </script>
 
 <template>
-  <div class="contact-list">
+  <div class="group-list">
     <div
       v-if="props.showHeader"
-      class="contact-list__header"
-      :class="`contact-list__header--${props.headerAlign}`"
+      class="group-list__header"
+      :class="`group-list__header--${props.headerAlign}`"
     >
       <slot name="header">
-        <span class="contact-list__title">
-          {{ props.title || t('contact.title') }}
-          <span v-if="props.showCount" class="contact-list__count">({{ totalCount }})</span>
+        <span class="group-list__title">
+          {{ props.title || t('group.title') }}
+          <span v-if="props.showCount" class="group-list__count">({{ totalCount }})</span>
         </span>
       </slot>
     </div>
 
-    <div v-if="props.showSearch" class="contact-list__search">
+    <div v-if="props.showSearch" class="group-list__search">
       <Input
         v-model="searchKeyword"
-        :placeholder="t('contact.searchPlaceholder')"
+        :placeholder="t('group.searchPlaceholder')"
         prefix-icon="misc/magnifier2"
       />
     </div>
@@ -260,35 +287,35 @@ defineExpose({
     <!-- body slot - sticky 模式 -->
     <div
       v-if="$slots.body && props.bodySticky"
-      class="contact-list__body contact-list__body--sticky"
+      class="group-list__body group-list__body--sticky"
     >
       <slot name="body" />
     </div>
 
-    <div ref="itemsRef" class="contact-list__items">
+    <div ref="itemsRef" class="group-list__items">
       <!-- body slot - 非 sticky 模式 -->
-      <div v-if="$slots.body && !props.bodySticky" class="contact-list__body">
+      <div v-if="$slots.body && !props.bodySticky" class="group-list__body">
         <slot name="body" />
       </div>
 
-      <!-- loading（有数据时也展示在顶部覆盖；无数据时占位） -->
+      <!-- loading -->
       <div
-        v-if="props.loading && groupedContacts.length === 0"
-        class="contact-list__loading-wrap"
+        v-if="props.loading && (groupedGroups.length === 0 || groupedGroups.every((g) => g.items.length === 0))"
+        class="group-list__loading-wrap"
       >
         <slot name="loading">
-          <span class="contact-list__loading-text">{{ t('common.loading') }}</span>
+          <span class="group-list__loading-text">{{ t('common.loading') }}</span>
         </slot>
       </div>
 
       <!-- 空状态 -->
       <div
-        v-else-if="groupedContacts.length === 0"
-        class="contact-list__empty-wrap"
+        v-else-if="groupedGroups.length === 0 || groupedGroups.every((g) => g.items.length === 0)"
+        class="group-list__empty-wrap"
       >
         <slot name="empty" :search-keyword="normalizedKeyword">
-          <ContactEmpty
-            :text="props.emptyText || (normalizedKeyword ? t('contact.noSearchResult') : t('contact.empty'))"
+          <GroupEmpty
+            :text="props.emptyText || (normalizedKeyword ? t('group.noSearchResult') : t('group.empty'))"
           />
         </slot>
       </div>
@@ -296,30 +323,30 @@ defineExpose({
       <!-- 分组列表 -->
       <template v-else>
         <div
-          v-for="group in (groupedContacts as ContactGroupItem[])"
+          v-for="group in (groupedGroups as GroupGroupItem[])"
           :key="group.key"
-          class="contact-list__group"
+          class="group-list__group"
           :data-group-key="group.key"
         >
           <div
             v-if="props.showGroupHeader && !isFlatNoGroup"
-            class="contact-list__group-header"
+            class="group-list__group-header"
           >
             <slot name="group-header" :group="group">
               <span>{{ group.title }}</span>
             </slot>
           </div>
-          <ContactItem
-            v-for="contact in group.items"
-            :key="contact.userId"
-            :contact="contact"
+          <GroupItem
+            v-for="g in group.items"
+            :key="g.groupId"
+            :group="g"
             :select-mode="props.selectMode"
-            :disabled="props.disabledFn ? props.disabledFn(contact) : false"
+            :disabled="props.disabledFn ? props.disabledFn(g) : false"
             :show-avatar="props.showAvatar"
+            :show-member-count="props.showMemberCount"
             :avatar-size="props.avatarSize"
             :avatar-shape="props.avatarShape"
-            :subtitle="props.subtitleFn ? props.subtitleFn(contact) : undefined"
-            :online-status="props.onlineStatusFn ? props.onlineStatusFn(contact) : undefined"
+            :subtitle="props.subtitleFn ? props.subtitleFn(g) : undefined"
             :size="props.itemSize"
             @click="onItemClick"
             @contextmenu="onItemContextmenu"
@@ -327,22 +354,22 @@ defineExpose({
             <template v-if="$slots.item" #default="slotProps">
               <slot name="item" v-bind="slotProps" />
             </template>
-          </ContactItem>
+          </GroupItem>
         </div>
 
         <!-- 触底加载提示 -->
         <div
-          v-if="props.loading && groupedContacts.length > 0"
-          class="contact-list__load-more"
+          v-if="props.loading && groupedGroups.length > 0"
+          class="group-list__load-more"
         >
           <slot name="loading">
-            <span class="contact-list__loading-text">{{ t('common.loading') }}</span>
+            <span class="group-list__loading-text">{{ t('common.loading') }}</span>
           </slot>
         </div>
       </template>
 
       <!-- footer slot - 非 sticky 模式 -->
-      <div v-if="$slots.footer && !props.footerSticky" class="contact-list__footer">
+      <div v-if="$slots.footer && !props.footerSticky" class="group-list__footer">
         <slot name="footer" />
       </div>
     </div>
@@ -350,15 +377,15 @@ defineExpose({
     <!-- footer slot - sticky 模式 -->
     <div
       v-if="$slots.footer && props.footerSticky"
-      class="contact-list__footer contact-list__footer--sticky"
+      class="group-list__footer group-list__footer--sticky"
     >
       <slot name="footer" />
     </div>
 
-    <!-- 字母导航 -->
+    <!-- 字母导航（与 contact 对齐） -->
     <ContactAlphabetNav
-      v-if="isAlphabet && props.showAlphabetNav && groupedContacts.length > 0"
-      :groups="(groupedContacts as ContactGroupItem[])"
+      v-if="isAlphabet && props.showAlphabetNav && alphabetKeys.length > 0"
+      :keys="alphabetKeys"
       @jump="scrollToGroup"
     />
 
@@ -374,7 +401,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.contact-list {
+.group-list {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -383,7 +410,7 @@ defineExpose({
   background-color: var(--uikit-bg-base);
 }
 
-.contact-list__header {
+.group-list__header {
   padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
@@ -392,39 +419,39 @@ defineExpose({
   min-height: 48px;
 }
 
-.contact-list__header--center {
+.group-list__header--center {
   justify-content: center;
 }
 
-.contact-list__header--right {
+.group-list__header--right {
   flex-direction: row-reverse;
 }
 
-.contact-list__title {
+.group-list__title {
   font-size: 16px;
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
-.contact-list__count {
+.group-list__count {
   margin-left: 6px;
   font-size: 12px;
   font-weight: 400;
   color: var(--uikit-text-secondary);
 }
 
-.contact-list__search {
+.group-list__search {
   padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.contact-list__items {
+.group-list__items {
   flex: 1;
   overflow-y: auto;
   position: relative;
 }
 
-.contact-list__group-header {
+.group-list__group-header {
   padding: 6px 16px;
   font-size: 12px;
   font-weight: 600;
@@ -435,38 +462,38 @@ defineExpose({
   z-index: 1;
 }
 
-.contact-list__body {
+.group-list__body {
   padding: 0 16px;
 }
 
-.contact-list__body--sticky {
+.group-list__body--sticky {
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.contact-list__footer {
+.group-list__footer {
   padding: 8px 16px;
 }
 
-.contact-list__footer--sticky {
+.group-list__footer--sticky {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
 }
 
-.contact-list__empty-wrap,
-.contact-list__loading-wrap {
+.group-list__empty-wrap,
+.group-list__loading-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 16px;
 }
 
-.contact-list__loading-text {
+.group-list__loading-text {
   font-size: 14px;
   color: var(--uikit-text-secondary);
 }
 
-.contact-list__load-more {
+.group-list__load-more {
   display: flex;
   align-items: center;
   justify-content: center;

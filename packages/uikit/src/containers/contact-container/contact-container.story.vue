@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import ContactContainer from './contact-container.vue'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
+import { ref } from 'vue'
 import { useContactStore } from '../../store/contact'
+import { useGroupStore } from '../../store/group'
 import type { Contact } from '../../store/contact'
+import type { Group } from '../../store/group'
 
 /** 构造 mock 联系人数据，覆盖多字母分组与 # 兜底 */
 function injectMockContacts() {
@@ -39,6 +42,30 @@ function injectMockContacts() {
   contactStore.setContactList(list)
 }
 
+/** 构造 mock 群组数据 */
+function injectMockGroups() {
+  const groupStore = useGroupStore()
+  const list: Group[] = [
+    { groupId: 'g_001', groupName: 'Vue 技术交流', owner: 'me', memberCount: 128 },
+    { groupId: 'g_002', groupName: 'React 开发者', owner: 'me', memberCount: 64 },
+    { groupId: 'g_003', groupName: '周末桌游局', owner: 'me', memberCount: 12 },
+    { groupId: 'g_004', groupName: 'Animation Lovers', owner: 'me', memberCount: 8 },
+    { groupId: 'g_005', groupName: '产品设计研讨', owner: 'me', memberCount: 36 },
+    { groupId: 'g_006', groupName: 'Bug Hunters', owner: 'me', memberCount: 20 },
+    { groupId: 'g_007', groupName: '环信内部', owner: 'me', memberCount: 256 },
+    { groupId: 'g_008', groupName: '警警闲聊', owner: 'me', memberCount: 5 },
+    { groupId: 'g_009', groupName: 'Indie Game Dev', owner: 'me', memberCount: 17 },
+    { groupId: 'g_010', groupName: '广告交流', owner: 'me', memberCount: 3 },
+    { groupId: 'g_011', groupName: 'AI 前沿', owner: 'me', memberCount: 44 },
+  ]
+  groupStore.setGroupList(list)
+}
+
+function injectMock() {
+  injectMockContacts()
+  injectMockGroups()
+}
+
 /** 自定义筛选：只匹配 userId 不匹配 name */
 function customFilterFn(keyword: string, c: Contact): boolean {
   return c.userId.toLowerCase().includes(keyword)
@@ -49,50 +76,142 @@ function vowelGrouper(c: Contact): string {
   const first = (c.remark || c.name || '').charAt(0).toUpperCase()
   return /^[AEIOU]$/.test(first) ? '元音' : '辅音及其他'
 }
+
+/** 自定义群组排序：按群 ID 升序 */
+function customGroupComparator(a: Group, b: Group): number {
+  return a.groupId.localeCompare(b.groupId)
+}
+
+/** 受控 selectedIds 演示 */
+const contactSelectedIds = ref<string[]>(['u_alice'])
+const groupSelectedIds = ref<string[]>(['g_001'])
+
+/** Contact subtitle 函数 */
+function contactSubtitleFn(c: Contact): string | undefined {
+  return `ID: ${c.userId}`
+}
+
+/** Group subtitle 函数 */
+function groupSubtitleFn(g: Group): string | undefined {
+  return `${g.memberCount ?? 0} 人`
+}
 </script>
 
 <template>
   <Story title="ContactContainer">
-    <Variant title="Default">
+    <Variant title="Default Aggregate Home">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer @vue:mounted="injectMockContacts" />
+          <ContactContainer
+            :new-request-count="3"
+            @vue:mounted="injectMock"
+            @new-request-click="() => console.log('new-request-click')"
+            @view-change="(v) => console.log('view-change:', v)"
+          />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Hide Search">
+    <Variant title="Hide NewRequest">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :show-search="false" @vue:mounted="injectMockContacts" />
+          <ContactContainer :show-new-request="false" @vue:mounted="injectMock" />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Hide Header">
+    <Variant title="Hide Group (Flat Contact)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :show-header="false" @vue:mounted="injectMockContacts" />
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            @vue:mounted="injectMockContacts"
+          />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Custom Title">
+    <Variant title="Hide Contact (Flat Group)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer title="通讯录" header-align="center" @vue:mounted="injectMockContacts" />
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            @vue:mounted="injectMockGroups"
+          />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Custom Header">
+    <Variant title="Group SortBy: Pinyin">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer @vue:mounted="injectMockContacts">
-            <template #header>
-              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="font-weight: 600;">我的好友</span>
-                <span style="font-size: 12px; color: #6b7280;">26 人</span>
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-sort-by="pinyin"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group SortBy: MemberCount">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-sort-by="memberCount"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group SortBy: Custom">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            :group-sort-by="customGroupComparator"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group GroupBy: Alphabet">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-sort-by="pinyin"
+            group-group-by="alphabet"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Nav Entry Slot">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer :new-request-count="5" @vue:mounted="injectMock">
+            <template #nav-entry="{ entry }">
+              <div
+                style="display: flex; align-items: center; justify-content: space-between; width: 100%;"
+              >
+                <span style="display: inline-flex; gap: 8px; align-items: center;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #3b82f6;" />
+                  <span style="font-weight: 600;">{{ entry.label }}</span>
+                </span>
+                <span v-if="entry.count" style="color: #ef4444; font-weight: 700;">
+                  {{ entry.count }}
+                </span>
               </div>
             </template>
           </ContactContainer>
@@ -100,18 +219,68 @@ function vowelGrouper(c: Contact): string {
       </div>
     </Variant>
 
-    <Variant title="No Group (Flat List)">
+    <Variant title="Custom Back Icon">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer group-by="none" @vue:mounted="injectMockContacts" />
+          <ContactContainer initial-view="group" @vue:mounted="injectMock">
+            <template #back-icon>
+              <span style="font-size: 18px; color: #3b82f6;">←</span>
+            </template>
+          </ContactContainer>
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Custom GroupBy (Vowel)">
+    <Variant title="Hide Header">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer :show-header="false" @vue:mounted="injectMock" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Title">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer title="通讯录" header-align="center" @vue:mounted="injectMock" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Custom Header">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer @vue:mounted="injectMock">
+            <template #header>
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <span style="font-weight: 600;">我的联系人</span>
+                <span style="font-size: 12px; color: #6b7280;">点击右上角添加</span>
+              </div>
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact: No Group (Flat List)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            group-by="none"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact: Custom GroupBy (Vowel)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
             :group-by="vowelGrouper"
             :show-alphabet-nav="false"
             @vue:mounted="injectMockContacts"
@@ -120,26 +289,12 @@ function vowelGrouper(c: Contact): string {
       </div>
     </Variant>
 
-    <Variant title="Hide Group Header">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer :show-group-header="false" @vue:mounted="injectMockContacts" />
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Hide Alphabet Nav">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer :show-alphabet-nav="false" @vue:mounted="injectMockContacts" />
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Single Select Mode">
+    <Variant title="Contact: Single Select Mode">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
             select-mode="single"
             @contact-select="(c) => console.log('selected:', c.userId)"
             @vue:mounted="injectMockContacts"
@@ -148,34 +303,36 @@ function vowelGrouper(c: Contact): string {
       </div>
     </Variant>
 
-    <Variant title="Multiple Select Mode">
+    <Variant title="Contact: Multiple Select Mode">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer select-mode="multiple" @vue:mounted="injectMockContacts" />
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            select-mode="multiple"
+            @vue:mounted="injectMockContacts"
+          />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Custom Filter (userId only)">
+    <Variant title="Contact: Custom Filter (userId only)">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer :filter-fn="customFilterFn" @vue:mounted="injectMockContacts" />
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            :filter-fn="customFilterFn"
+            @vue:mounted="injectMockContacts"
+          />
         </UIKitProvider>
       </div>
     </Variant>
 
-    <Variant title="Custom Empty Text">
+    <Variant title="Contact: Custom Empty Slot">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer empty-text="还没有添加联系人哦~" />
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Custom Empty Slot">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer>
+          <ContactContainer :show-new-request="false" :show-group="false">
             <template #empty="{ searchKeyword }">
               <div style="text-align: center; padding: 60px 16px;">
                 <div style="font-size: 32px; margin-bottom: 8px;">📒</div>
@@ -192,10 +349,14 @@ function vowelGrouper(c: Contact): string {
       </div>
     </Variant>
 
-    <Variant title="Custom Item Slot">
+    <Variant title="Contact: Custom Item Slot">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
-          <ContactContainer @vue:mounted="injectMockContacts">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            @vue:mounted="injectMockContacts"
+          >
             <template #item="{ contact, active }">
               <div
                 style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer;"
@@ -219,72 +380,246 @@ function vowelGrouper(c: Contact): string {
       </div>
     </Variant>
 
-    <Variant title="Custom Group Header Slot">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer @vue:mounted="injectMockContacts">
-            <template #group-header="{ group }">
-              <div
-                style="padding: 6px 16px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 600;"
-              >
-                ▸ {{ group.title }}（{{ group.items.length }}）
-              </div>
-            </template>
-          </ContactContainer>
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Body & Footer Slots">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer @vue:mounted="injectMockContacts">
-            <template #body>
-              <div style="padding: 8px 16px; background: #f0f9ff; font-size: 12px; color: #3b82f6;">
-                新的朋友 · 群聊 · 标签
-              </div>
-            </template>
-            <template #footer>
-              <div style="padding: 8px 16px; text-align: center; font-size: 12px; color: #9ca3af;">
-                共 26 位联系人
-              </div>
-            </template>
-          </ContactContainer>
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Sticky Body & Footer">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer body-sticky footer-sticky @vue:mounted="injectMockContacts">
-            <template #body>
-              <div style="padding: 8px 16px; background: #f0f9ff; font-size: 12px; color: #3b82f6;">
-                固定快捷入口
-              </div>
-            </template>
-            <template #footer>
-              <div style="padding: 8px 16px; text-align: center; font-size: 12px; color: #9ca3af;">
-                固定底部统计
-              </div>
-            </template>
-          </ContactContainer>
-        </UIKitProvider>
-      </div>
-    </Variant>
-
-    <Variant title="Hide ScrollToTop">
-      <div style="height: 600px; width: 320px;">
-        <UIKitProvider :auto-init="false">
-          <ContactContainer :show-scroll-to-top="false" @vue:mounted="injectMockContacts" />
-        </UIKitProvider>
-      </div>
-    </Variant>
-
     <Variant title="Empty State">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Transition: fade">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="3"
+            transition="fade"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Transition: none (无动画)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="3"
+            transition="none"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Auto Entry Count (从 store 推断数量)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="5"
+            auto-entry-count
+            show-count
+            group-show-count
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Manual Entry Count">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="5"
+            :group-count="99"
+            :contact-count="888"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="#home-footer Slot (首页底部插槽)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer :new-request-count="2" @vue:mounted="injectMock">
+            <template #home-footer>
+              <div
+                style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #6b7280;"
+              >
+                <span>已同步 · 刚刚</span>
+                <button
+                  style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                  @click="() => console.log('add new contact')"
+                >
+                  + 添加
+                </button>
+              </div>
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="#header-extra Slot (右上角操作区)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer :new-request-count="2" @vue:mounted="injectMock">
+            <template #header-extra>
+              <span
+                style="font-size: 13px; color: #3b82f6; cursor: pointer;"
+                @click="() => console.log('more')"
+              >+</span>
+            </template>
+          </ContactContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact ItemSize: Compact">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            item-size="compact"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact ItemSize: Large + Subtitle">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            item-size="large"
+            :subtitle-fn="contactSubtitleFn"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group ItemSize + Subtitle">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-item-size="large"
+            :group-subtitle-fn="groupSubtitleFn"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Avatar Shape: Square / Rounded">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="2"
+            avatar-shape="square"
+            group-avatar-shape="rounded"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Hide Avatars (Contact + Group)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :new-request-count="2"
+            :show-avatar="false"
+            :group-show-avatar="false"
+            @vue:mounted="injectMock"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Contact: Controlled selectedIds (multiple)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            select-mode="multiple"
+            :selected-ids="contactSelectedIds"
+            :max-selected="3"
+            @update:selected-ids="(ids) => (contactSelectedIds = ids)"
+            @contact-max-exceed="(m) => console.warn('contact max:', m)"
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+          已选: {{ contactSelectedIds.join(', ') || '空' }}
+        </div>
+      </div>
+    </Variant>
+
+    <Variant title="Group: Controlled groupSelectedIds (multiple)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-select-mode="multiple"
+            :group-selected-ids="groupSelectedIds"
+            :group-max-selected="2"
+            @update:group-selected-ids="(ids) => (groupSelectedIds = ids)"
+            @group-max-exceed="(m) => console.warn('group max:', m)"
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+          已选: {{ groupSelectedIds.join(', ') || '空' }}
+        </div>
+      </div>
+    </Variant>
+
+    <Variant title="Contact Loading State">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-group="false"
+            loading
+            @vue:mounted="injectMockContacts"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group Loading State">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            group-loading
+            @vue:mounted="injectMockGroups"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Group GroupBy: Custom Sort + Alphabet">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ContactContainer
+            :show-new-request="false"
+            :show-contact="false"
+            :group-sort-by="customGroupComparator"
+            group-group-by="alphabet"
+            group-show-count
+            @vue:mounted="injectMockGroups"
+          />
         </UIKitProvider>
       </div>
     </Variant>

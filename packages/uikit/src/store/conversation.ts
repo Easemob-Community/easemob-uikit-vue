@@ -30,6 +30,12 @@ export const useConversationStore = defineStore('conversation', () => {
   const conversationList = ref<Conversation[]>([])
   const currentConversation = ref<Conversation | null>(null)
   const conversationCursor = ref<string | null>(null)
+  /**
+   * 是否已从服务端成功拉取过会话列表（仅记录首次首屏请求）。
+   * 用于避免 ConversationContainer 在 tab 切换（mount/unmount）时反复触发远端拉取。
+   * 登出时由 clearConversationList 自动重置。
+   */
+  const conversationsLoaded = ref(false)
   /** 群成员数缓存（groupId -> count），用于群已读回执的已读/未读人数计算 */
   const groupMemberCountMap = ref<Record<string, number>>({})
 
@@ -106,6 +112,10 @@ export const useConversationStore = defineStore('conversation', () => {
     conversationCursor.value = cursor
   }
 
+  function setConversationsLoaded(v: boolean) {
+    conversationsLoaded.value = v
+  }
+
   function setGroupMemberCount(groupId: string, count: number) {
     groupMemberCountMap.value[groupId] = count
   }
@@ -130,6 +140,7 @@ export const useConversationStore = defineStore('conversation', () => {
     groupMemberCountMap.value = {}
     typingMap.value = {}
     atMeMap.value = {}
+    conversationsLoaded.value = false
   }
 
   return {
@@ -137,6 +148,8 @@ export const useConversationStore = defineStore('conversation', () => {
     sortedConversationList,
     currentConversation,
     conversationCursor,
+    conversationsLoaded,
+    setConversationsLoaded,
     hasMoreConversations,
     addConversation,
     setConversationList,

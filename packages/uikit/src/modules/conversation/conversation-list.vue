@@ -56,7 +56,7 @@ const emit = defineEmits<{
   (e: 'at-me-click', id: string, conversation: Conversation): void
 }>()
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, fetchServerConversations, saveDraft, loadDraft, clearDraft } = useConversation()
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, saveDraft, loadDraft, clearDraft } = useConversation()
 const { stores } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -74,7 +74,8 @@ const { isRefreshing: isPullRefreshing } = usePullRefresh(
   itemsRef,
   {
     onRefresh: async () => {
-      await fetchServerConversations({ pageSize: 20 })
+      // 下拉刷新需要明确拿最新数据，走强制刷新接口以跳过本地已加载短路
+      await refreshConversations({ pageSize: 20 })
     },
   }
 )

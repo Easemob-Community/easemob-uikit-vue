@@ -49,6 +49,15 @@ export interface ConversationContainerProps {
    * - 'local' localStorage 持久化，关闭浏览器后仍保留
    */
   draftStorage?: 'none' | 'session' | 'local'
+  /**
+   * 是否在容器首次 mount 时自动拉取远端会话列表，默认 true。
+   * 内部已依赖 store 的已加载标记进行幂等：
+   * - 首屏 / 刷新页面会拉取一次
+   * - tab 切换导致容器重新 mount 时不会重复拉取
+   * 若业务侧期望完全接管拉取时机，可将该项设为 false，
+   * 然后通过 useConversation().refreshConversations() 主动触发。
+   */
+  autoFetch?: boolean
 }
 
 const props = withDefaults(defineProps<ConversationContainerProps>(), {
@@ -65,6 +74,7 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   footerSticky: false,
   pullRefresh: false,
   draftStorage: 'none',
+  autoFetch: true,
 })
 
 const emit = defineEmits<{
@@ -80,6 +90,9 @@ const defaultMessageFormatter = createMessageFormatter(t)
 onMounted(() => {
   // 初始化草稿存储模式
   initDraftStorage(props.draftStorage ?? 'none')
+  if (!props.autoFetch) return
+  // 仅首次（未加载过）会发起远端请求，
+  // tab 切换导致的重复 mount 会被内部短路跳过。
   fetchServerConversations({
     pageSize: props.pageSize,
     includeEmptyConversations: props.includeEmptyConversations,

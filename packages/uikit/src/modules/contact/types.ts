@@ -3,6 +3,24 @@ import type { Contact } from '../../store/contact'
 /** 选择模式 */
 export type ContactSelectMode = 'none' | 'single' | 'multiple'
 
+/** Item 尺寸 */
+export type ContactItemSize = 'compact' | 'normal' | 'large'
+
+/** 头像形状 */
+export type AvatarShape = 'circle' | 'rounded' | 'square'
+
+/** 在线状态 */
+export type OnlineStatus = 'online' | 'offline' | 'away' | 'busy'
+
+/** disabled 判定函数 */
+export type ContactDisabledFn = (contact: Contact) => boolean
+
+/** 副标题提取函数 */
+export type ContactSubtitleFn = (contact: Contact) => string | undefined
+
+/** 在线状态提取函数 */
+export type ContactOnlineStatusFn = (contact: Contact) => OnlineStatus | undefined
+
 /** 分组方式 */
 export type ContactGroupBy =
   | 'none'
@@ -39,3 +57,17 @@ export const DEFAULT_ALPHABET_KEYS = [
 ] as const
 
 export type AlphabetKey = typeof DEFAULT_ALPHABET_KEYS[number]
+
+/** ContactNav 入口项配置 */
+export interface ContactNavEntry {
+  /** 入口唯一标识 */
+  key: string
+  /** 入口标签文本 */
+  label: string
+  /** 右侧数量徽标，0 时不展示 */
+  count?: number
+  /** 入口图标名（icon-map 中的 name） */
+  icon?: string
+  /** 是否可见，false 时不渲染该卡片，默认 true */
+  visible?: boolean
+}
