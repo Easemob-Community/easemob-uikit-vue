@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { useGroupStore } from '../store/group'
 import type { Group } from '../store/group'
+import { useUIKit } from './use-uikit'
 
 /**
  * 群组列表 UI 状态：当前激活项 / 多选集合 / 搜索词
@@ -14,7 +15,61 @@ const filterText = ref<string>('')
 
 export function useGroup() {
   const groupStore = useGroupStore()
+  const { client, dataSource } = useUIKit()
   const groupList = computed(() => groupStore.groupList || [])
+
+  /** 首页拉取群组，默认幂等（仅首次），传 force=true 强刷 */
+  async function refresh(force = false, pageSize = 50) {
+    if (!force && groupStore.loaded) return
+    try {
+      if (dataSource.fetchGroups) {
+        const res = await dataSource.fetchGroups({ pageSize })
+        groupStore.setGroupList(res.list || [])
+        groupStore.setHasMore(!!res.hasMore)
+        groupStore.setCursor(res.cursor || '')
+      } else if (client.value) {
+        const list = await client.value.getJoinedGroups({ pageSize, pageNum: 0 })
+        const mapped: Group[] = list.map((item: any) => ({
+          groupId: item.groupId,
+          groupName: item.groupName || item.groupId,
+          owner: item.owner || '',
+          memberCount: item.memberCount || 0,
+        }))
+        groupStore.setGroupList(mapped)
+        groupStore.setHasMore(mapped.length >= pageSize)
+        groupStore.setCursor(String(1))
+      }
+    } catch (e) {
+      console.warn('[UIKit] fetch groups failed:', e)
+    }
+  }
+
+  /** 加载下一页 */
+  async function loadMore(pageSize = 50) {
+    if (!groupStore.hasMore) return
+    try {
+      if (dataSource.fetchGroups) {
+        const res = await dataSource.fetchGroups({ pageSize, cursor: groupStore.cursor })
+        groupStore.appendGroupList(res.list || [])
+        groupStore.setHasMore(!!res.hasMore)
+        groupStore.setCursor(res.cursor || '')
+      } else if (client.value) {
+        const nextPage = (parseInt(groupStore.cursor || '0') || 0) + 1
+        const list = await client.value.getJoinedGroups({ pageSize, pageNum: nextPage })
+        const mapped: Group[] = list.map((item: any) => ({
+          groupId: item.groupId,
+          groupName: item.groupName || item.groupId,
+          owner: item.owner || '',
+          memberCount: item.memberCount || 0,
+        }))
+        groupStore.appendGroupList(mapped)
+        groupStore.setHasMore(mapped.length >= pageSize)
+        groupStore.setCursor(String(nextPage))
+      }
+    } catch (e) {
+      console.warn('[UIKit] load more groups failed:', e)
+    }
+  }
 
   /** 设置当前激活群组（单选定位） */
   function setActiveId(id: string) {
@@ -77,5 +132,9 @@ export function useGroup() {
     isSelected,
     setFilterText,
     getGroupById,
+
+    // actions
+    refresh,
+    loadMore,
   }
 }

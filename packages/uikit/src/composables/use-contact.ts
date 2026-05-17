@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { useContactStore } from '../store/contact'
 import type { Contact } from '../store/contact'
+import { useUIKit } from './use-uikit'
 
 /**
  * 列表 UI 状态：当前激活项 / 多选集合 / 搜索词
@@ -14,7 +15,50 @@ const filterText = ref<string>('')
 
 export function useContact() {
   const contactStore = useContactStore()
+  const { client, dataSource, features } = useUIKit()
   const contactList = computed(() => contactStore.contactList || [])
+
+  /** 拉取好友列表。默认幂等（仅首次拉取），传 force=true 强制刷新。 */
+  async function refresh(force = false) {
+    if (!features.enableContact) return
+    if (!force && contactStore.loaded) return
+    try {
+      let list: Contact[] = []
+      if (dataSource.fetchContacts) {
+        list = await dataSource.fetchContacts()
+      } else if (client.value) {
+        const all = await client.value.getAllContacts()
+        list = all.map((item) => ({
+          userId: item.userId,
+          name: item.remark || item.userId,
+          remark: item.remark,
+        }))
+      }
+      contactStore.setContactList(list)
+    } catch (e) {
+      console.warn('[UIKit] fetch contacts failed:', e)
+    }
+  }
+
+  /** 添加好友邀请 */
+  async function addContactRequest(userId: string, reason?: string) {
+    if (!client.value) return
+    await client.value.addContact(userId, reason)
+  }
+
+  /** 删除好友 */
+  async function deleteContact(userId: string) {
+    if (!client.value) return
+    await client.value.deleteContact(userId)
+    contactStore.removeContact(userId)
+  }
+
+  /** 设置备注 */
+  async function setRemark(userId: string, remark: string) {
+    if (!client.value) return
+    await client.value.setContactRemark(userId, remark)
+    contactStore.updateContactRemark(userId, remark)
+  }
 
   /** 设置当前激活联系人（单选定位） */
   function setActiveId(id: string) {
@@ -77,5 +121,11 @@ export function useContact() {
     isSelected,
     setFilterText,
     getContactById,
+
+    // actions
+    refresh,
+    addContactRequest,
+    deleteContact,
+    setRemark,
   }
 }
