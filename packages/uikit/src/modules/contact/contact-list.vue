@@ -5,6 +5,8 @@ import { useContactFilter } from '../../composables/use-contact-filter'
 import { useContactGroup } from '../../composables/use-contact-group'
 import { useContactSort } from '../../composables/use-contact-sort'
 import { useViewport } from '../../composables/use-viewport'
+import { useUIKit } from '../../composables/use-uikit'
+import { usePresence } from '../../composables/use-presence'
 import { useLocale } from '../../locale'
 import ContactItem from './contact-item.vue'
 import ContactEmpty from './contact-empty.vue'
@@ -20,6 +22,7 @@ import type {
   ContactDisabledFn,
   ContactSubtitleFn,
   ContactOnlineStatusFn,
+  OnlineStatus,
 } from './types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
@@ -122,6 +125,15 @@ const { t } = useLocale()
 const { isMobile } = useViewport()
 void isMobile
 
+// ================== Presence 默认兑底 ==================
+// 当外部未传 onlineStatusFn 且 Provider.enablePresence===true 时，
+// 内部使用 usePresence 提供在线状态，并按过滤后的可见联系人 ID 自动订阅。
+const { features } = useUIKit()
+const presenceEnabled = computed(
+  () => features.enablePresence && !props.onlineStatusFn,
+)
+const presence = usePresence()
+
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = computed({
   get: () => filterText.value,
@@ -144,6 +156,26 @@ const isFlatNoGroup = computed(() => props.groupBy === 'none')
 
 /** 总联系人数（过滤后） */
 const totalCount = computed(() => filteredContacts.value.length)
+
+// 过滤后的联系人 ID 集合，作为 Presence 订阅范围
+const visibleUserIds = computed(() =>
+  presenceEnabled.value ? filteredContacts.value.map((c) => c.userId) : [],
+)
+// 启用时：自动 retain/release，卸载时释放
+if (presenceEnabled.value) {
+  presence.watch(visibleUserIds)
+}
+
+/** 默认在线状态提取：优先用外部 onlineStatusFn，其次走 usePresence 兑底 */
+function resolveOnlineStatus(c: Contact): OnlineStatus | undefined {
+  if (props.onlineStatusFn) return props.onlineStatusFn(c)
+  if (!features.enablePresence) return undefined
+  const info = presence.get(c.userId).value
+  if (!info) return undefined
+  // PresenceStatus 可能为 'custom'，映射为 'online'（非默认状态表示用户在线）
+  if (info.status === 'custom') return 'online'
+  return info.status
+}
 
 // ================== selectedIds 受控同步 ==================
 
@@ -319,7 +351,7 @@ defineExpose({
             :avatar-size="props.avatarSize"
             :avatar-shape="props.avatarShape"
             :subtitle="props.subtitleFn ? props.subtitleFn(contact) : undefined"
-            :online-status="props.onlineStatusFn ? props.onlineStatusFn(contact) : undefined"
+            :online-status="resolveOnlineStatus(contact)"
             :size="props.itemSize"
             @click="onItemClick"
             @contextmenu="onItemContextmenu"

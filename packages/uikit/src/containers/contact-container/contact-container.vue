@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import ContactList from '../../modules/contact/contact-list.vue'
 import ContactNav from '../../modules/contact/contact-nav.vue'
 import GroupList from '../../modules/group/group-list.vue'
@@ -8,6 +8,9 @@ import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
+import { useUIKit } from '../../composables/use-uikit'
+import { useContactStore } from '../../store/contact'
+import { useGroupStore } from '../../store/group'
 import type {
   ContactGroupBy,
   ContactSelectMode,
@@ -173,6 +176,19 @@ export interface ContactContainerProps {
   groupFilterFn?: GroupFilterFn
   /** 群组空列表提示 */
   groupEmptyText?: string
+
+  // ---------- 自治拉取（容器自管） ----------
+  /**
+   * mount 时自动拉取联系人列表，默认 true。
+   * 需 Provider.enableContact=true 才会生效；
+   * 已加载则跳过（幂等），如需强制刷新请手动调用 useContact().refresh(true)。
+   */
+  autoFetch?: boolean
+  /**
+   * mount 时（home / group 视图）自动拉取群组列表，默认 true。
+   * 已加载则跳过（幂等），如需强制刷新请手动调用 useGroup().refresh(true)。
+   */
+  autoFetchGroups?: boolean
 }
 
 const props = withDefaults(defineProps<ContactContainerProps>(), {
@@ -214,6 +230,8 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   groupItemSize: 'normal',
   groupLoading: false,
   groupEnableLoadMore: false,
+  autoFetch: true,
+  autoFetchGroups: true,
 })
 
 const emit = defineEmits<{
@@ -236,8 +254,36 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-const { contactList } = useContact()
-const { groupList } = useGroup()
+const { contactList, refresh: refreshContacts } = useContact()
+const { groupList, refresh: refreshGroups } = useGroup()
+const { features } = useUIKit()
+const contactStore = useContactStore()
+const groupStore = useGroupStore()
+
+/** 自治拉取：根据当前视图按需触发 */
+function maybeFetchContacts() {
+  if (!props.autoFetch) return
+  if (!features.enableContact) return
+  if (contactStore.loaded) return
+  refreshContacts()
+}
+function maybeFetchGroups() {
+  if (!props.autoFetchGroups) return
+  if (groupStore.loaded) return
+  refreshGroups()
+}
+
+onMounted(() => {
+  // home 视图通常需要 contact / group 数量；group/contact 子视图按需
+  if (view.value === 'home') {
+    if (props.showContact) maybeFetchContacts()
+    if (props.showGroup) maybeFetchGroups()
+  } else if (view.value === 'group') {
+    maybeFetchGroups()
+  } else if (view.value === 'contact') {
+    maybeFetchContacts()
+  }
+})
 
 const enabledCount = computed(() => {
   return [props.showNewRequest, props.showGroup, props.showContact].filter(Boolean).length
@@ -266,6 +312,9 @@ watch(
 
 watch(view, (v) => {
   emit('view-change', v)
+  // 切换到子视图时按需拉取（幂等，已加载则跳过）
+  if (v === 'group') maybeFetchGroups()
+  else if (v === 'contact') maybeFetchContacts()
 })
 
 const homeSearchKeyword = ref('')
