@@ -46,7 +46,7 @@ const filterText = ref<string>('')
 
 export function useGroup() {
   const groupStore = useGroupStore()
-  const { client, dataSource } = useUIKit()
+  const { client, dataSource, features } = useUIKit()
   const groupList = computed(() => groupStore.groupList || [])
   const joinedGroupCount = computed(() => groupStore.joinedGroupCount || 0)
 
@@ -58,6 +58,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
 
   /** 轻量获取加入的群组总数（不拉取完整列表） */
   async function fetchJoinedGroupCount() {
+    if (!features.enableGroup) return
     try {
       if (client.value) {
         const count = await client.value.getJoinedGroupsCount()
@@ -70,6 +71,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
 
   /** 首页拉取群组，默认幂等（仅首次），传 force=true 强刷 */
   async function refresh(force = false, pageSize = JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL) {
+    if (!features.enableGroup) return
     if (!force && groupStore.loaded) return
     try {
       if (dataSource.fetchGroups) {
@@ -112,6 +114,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
 
   /** 加载下一页 */
   async function loadMore(pageSize = JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL) {
+    if (!features.enableGroup) return
     if (!groupStore.hasMore) return
     try {
       if (dataSource.fetchGroups) {

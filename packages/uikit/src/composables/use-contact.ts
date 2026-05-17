@@ -13,31 +13,112 @@ const activeId = ref<string>('')
 const selectedIds = ref<Set<string>>(new Set())
 const filterText = ref<string>('')
 
+/** 分页默认页大小 */
+const CONTACT_PAGE_SIZE = 50
+
 export function useContact() {
   const contactStore = useContactStore()
   const { client, dataSource, features } = useUIKit()
   const contactList = computed(() => contactStore.contactList || [])
+  const contactCount = computed(() => contactStore.contactCount || 0)
+
+  /** 是否为全量拉取模式 */
+  const isAllMode = computed(() => features.contactFetchMode === 'all')
+
+  /** 轻量获取好友总数（不拉取完整列表） */
+  async function fetchContactCount() {
+    try {
+      if (client.value) {
+        const res = await client.value.getAllContacts()
+        const count = res.data?.length || 0
+        contactStore.setContactCount(count)
+      }
+    } catch (e) {
+      console.warn('[UIKit] fetch contact count failed:', e)
+    }
+  }
+
+  /** 全量拉取好友列表（getAllContacts） */
+  async function fetchAllContacts() {
+    if (!client.value) return
+    const res = await client.value.getAllContacts()
+    const data = res.data || []
+    const list: Contact[] = data.map((item) => ({
+      userId: item.userId,
+      name: item.remark || item.userId,
+      remark: item.remark,
+    }))
+    contactStore.setContactList(list)
+    // 全量模式无分页能力
+    contactStore.setHasMore(false)
+    contactStore.setCursor('')
+  }
+
+  /** 分页拉取好友列表（getContactsWithCursor） */
+  async function fetchContactsByPage() {
+    let list: Contact[] = []
+    if (dataSource.fetchContacts) {
+      const res = await dataSource.fetchContacts({ pageSize: CONTACT_PAGE_SIZE })
+      list = res.list || []
+      contactStore.setHasMore(!!res.hasMore)
+      contactStore.setCursor(res.cursor || '')
+    } else if (client.value) {
+      const res = await client.value.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
+      const contacts = res.data?.contacts || []
+      list = contacts.map((item) => ({
+        userId: item.userId,
+        name: item.remark || item.userId,
+        remark: item.remark,
+      }))
+      contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
+      contactStore.setCursor(res.data?.cursor || '')
+    }
+    contactStore.setContactList(list)
+  }
 
   /** 拉取好友列表。默认幂等（仅首次拉取），传 force=true 强制刷新。 */
   async function refresh(force = false) {
     if (!features.enableContact) return
     if (!force && contactStore.loaded) return
     try {
-      let list: Contact[] = []
+      if (isAllMode.value) {
+        await fetchAllContacts()
+      } else {
+        await fetchContactsByPage()
+      }
+    } catch (e) {
+      console.warn('[UIKit] fetch contacts failed:', e)
+    }
+  }
+
+  /** 加载下一页（仅分页模式有效） */
+  async function loadMore() {
+    if (isAllMode.value) return
+    if (!contactStore.hasMore) return
+    try {
       if (dataSource.fetchContacts) {
-        list = await dataSource.fetchContacts()
+        const res = await dataSource.fetchContacts({ pageSize: CONTACT_PAGE_SIZE, cursor: contactStore.cursor })
+        const list = res.list || []
+        contactStore.appendContactList(list)
+        contactStore.setHasMore(!!res.hasMore)
+        contactStore.setCursor(res.cursor || '')
       } else if (client.value) {
-        const res = await client.value.getContactsWithCursor()
+        const res = await client.value.getContactsWithCursor({
+          pageSize: CONTACT_PAGE_SIZE,
+          cursor: contactStore.cursor,
+        })
         const contacts = res.data?.contacts || []
-        list = contacts.map((item) => ({
+        const list = contacts.map((item) => ({
           userId: item.userId,
           name: item.remark || item.userId,
           remark: item.remark,
         }))
+        contactStore.appendContactList(list)
+        contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
+        contactStore.setCursor(res.data?.cursor || '')
       }
-      contactStore.setContactList(list)
     } catch (e) {
-      console.warn('[UIKit] fetch contacts failed:', e)
+      console.warn('[UIKit] load more contacts failed:', e)
     }
   }
 
@@ -107,6 +188,7 @@ export function useContact() {
   return {
     // store data
     contactList,
+    contactCount,
 
     // ui state
     activeId,
@@ -125,6 +207,8 @@ export function useContact() {
 
     // actions
     refresh,
+    loadMore,
+    fetchContactCount,
     addContactRequest,
     deleteContact,
     setRemark,
