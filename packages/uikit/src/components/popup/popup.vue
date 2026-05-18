@@ -40,9 +40,14 @@ const emit = defineEmits<PopupEmits>()
 
 const isAnchored = computed(() => !!props.anchor)
 
+// DEBUG: 监听 show 和 anchor 变化
+watch(() => [props.show, props.anchor], ([show, anchor]) => {
+  console.log('[Popup] show/anchor changed', { show, hasAnchor: !!anchor, isAnchored: isAnchored.value })
+}, { flush: 'sync' })
+
 const transitionName = computed(() => {
   if (isAnchored.value) {
-    return 'uikit-fade'
+    return 'uikit-anchor-scale'
   }
   const map: Record<string, string> = {
     center: 'uikit-fade-scale',
@@ -59,7 +64,11 @@ const contentStyle = ref<Record<string, string>>({})
 const ignoreClickOutside = ref(false)
 
 function updateAnchorPosition() {
-  if (!isAnchored.value || !props.anchor || !contentRef.value) return
+  console.log('[Popup] updateAnchorPosition called', { isAnchored: isAnchored.value, hasAnchor: !!props.anchor, hasContent: !!contentRef.value })
+  if (!isAnchored.value || !props.anchor || !contentRef.value) {
+    console.log('[Popup] updateAnchorPosition early return')
+    return
+  }
 
   const anchorRect = props.anchor.getBoundingClientRect()
   const contentRect = contentRef.value.getBoundingClientRect()
@@ -129,17 +138,20 @@ function updateAnchorPosition() {
   }
 }
 
+// 使用 sync flush，确保 ignoreClickOutside 在同步代码中立即生效，
+// 避免被右键后随之而来的合成 click 事件（Mac 触控板双指点击会同时派发 contextmenu 和 click）抢先触发外部点击关闭。
 watch(() => [props.show, props.anchor], ([show]) => {
   if (show && isAnchored.value) {
     ignoreClickOutside.value = true
     nextTick(() => {
       updateAnchorPosition()
-      requestAnimationFrame(() => {
-        ignoreClickOutside.value = false
-      })
     })
+    // 250ms 后解除忽略，足以覆盖右键打开后浏览器可能补发的 click 事件
+    window.setTimeout(() => {
+      ignoreClickOutside.value = false
+    }, 250)
   }
-})
+}, { flush: 'sync' })
 
 useEventListener(window, 'resize', () => {
   if (props.show && isAnchored.value) updateAnchorPosition()
@@ -150,10 +162,18 @@ useEventListener(window, 'scroll', () => {
 }, { capture: true })
 
 onClickOutside(contentRef, (event) => {
-  if (ignoreClickOutside.value) return
+  console.log('[Popup] onClickOutside triggered', { ignoreClickOutside: ignoreClickOutside.value, isAnchored: isAnchored.value, show: props.show, target: event.target })
+  if (ignoreClickOutside.value) {
+    console.log('[Popup] onClickOutside ignored')
+    return
+  }
   // 锚定模式下点击 anchor 本身不关闭 popup
-  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) return
+  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) {
+    console.log('[Popup] onClickOutside: clicked anchor, skip')
+    return
+  }
   if (props.closeOnClickOverlay && props.show) {
+    console.log('[Popup] onClickOutside: closing popup')
     emit('update:show', false)
     emit('close')
   }
@@ -175,19 +195,25 @@ interface PopupGroupEventDetail {
 
 function onGroupOpen(event: Event) {
   const { detail } = event as CustomEvent<PopupGroupEventDetail>
+  // 严格排除自身实例：同一 Symbol 引用必须完全相等
+  const isSelf = detail.id === instanceId
+  console.log('[Popup] onGroupOpen', { myGroup: props.group, eventGroup: detail.group, sameGroup: detail.group === props.group, isSelf, myId: instanceId, eventId: detail.id, show: props.show })
   if (
     props.group
     && detail.group === props.group
-    && detail.id !== instanceId
+    && !isSelf
     && props.show
   ) {
+    console.log('[Popup] onGroupOpen: closing due to group conflict')
     emit('update:show', false)
     emit('close')
   }
 }
 
 watch(() => props.show, (show) => {
+  console.log('[Popup] watch show changed', { show, group: props.group, instanceId })
   if (show && props.group) {
+    console.log('[Popup] dispatching group event', { group: props.group, id: instanceId })
     document.dispatchEvent(
       new CustomEvent<PopupGroupEventDetail>(POPUP_GROUP_EVENT, {
         detail: { group: props.group, id: instanceId },
@@ -315,11 +341,6 @@ onUnmounted(() => {
   max-height: 100%;
 }
 
-.uikit-popup__content--anchored {
-  position: fixed;
-  margin: 0;
-}
-
 .uikit-popup__close {
   position: absolute;
   top: 12px;
@@ -330,98 +351,10 @@ onUnmounted(() => {
   z-index: 1;
 }
 
-.uikit-fade-enter-active,
-.uikit-fade-leave-active {
-  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.uikit-fade-enter-from,
-.uikit-fade-leave-to {
-  opacity: 0;
-}
-
-.uikit-slide-up-enter-active {
-  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
-}
-
-.uikit-slide-up-leave-active {
-  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
-}
-
-.uikit-slide-up-enter-from,
-.uikit-slide-up-leave-to {
-  transform: translateY(100%);
-  opacity: 0;
-}
-
-.uikit-slide-down-enter-active {
-  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
-}
-
-.uikit-slide-down-leave-active {
-  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
-}
-
-.uikit-slide-down-enter-from,
-.uikit-slide-down-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-.uikit-slide-left-enter-active {
-  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
-}
-
-.uikit-slide-left-leave-active {
-  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
-}
-
-.uikit-slide-left-enter-from,
-.uikit-slide-left-leave-to {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
-.uikit-slide-right-enter-active {
-  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
-}
-
-.uikit-slide-right-leave-active {
-  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
-}
-
-.uikit-slide-right-enter-from,
-.uikit-slide-right-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-
-/* ===== Center 弹窗：fade + scale 缩放 ===== */
-.uikit-fade-scale-enter-active {
-  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
-}
-
-.uikit-fade-scale-leave-active {
-  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
-}
-
-.uikit-fade-scale-enter-from {
-  opacity: 0;
-  transform: scale(var(--uikit-anim-scale-enter));
-}
-
-.uikit-fade-scale-leave-to {
-  opacity: 0;
-  transform: scale(var(--uikit-anim-scale-enter));
+/* 锚定内容默认以左上角为 transform-origin，通过 CSS 变量支持动态调整 */
+.uikit-popup__content--anchored {
+  position: fixed;
+  margin: 0;
+  transform-origin: var(--uikit-anim-anchor-origin-x) var(--uikit-anim-anchor-origin-y);
 }
 </style>

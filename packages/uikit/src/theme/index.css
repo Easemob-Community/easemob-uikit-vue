@@ -49,6 +49,11 @@
   --uikit-anim-scale-press: 0.97;
   /* Modal/弹窗入场缩放起点 */
   --uikit-anim-scale-enter: 0.92;
+  /* 锚点 Popup 原点缩放起点 */
+  --uikit-anim-anchor-scale-enter: 0.85;
+  /* 锚点 Popup 原点偏移（展开起始点相对内容中心的偏移比例） */
+  --uikit-anim-anchor-origin-x: 0%;
+  --uikit-anim-anchor-origin-y: 0%;
 
   /* Ripple 波纹 */
   --uikit-anim-ripple-opacity: 0.15;
@@ -113,6 +118,7 @@
   --uikit-anim-duration-leave: 120ms;
   --uikit-anim-scale-press: 0.99;
   --uikit-anim-scale-enter: 0.97;
+  --uikit-anim-anchor-scale-enter: 0.92;
   --uikit-anim-ripple-opacity: 0.08;
   --uikit-anim-ripple-duration: 400ms;
   --uikit-anim-stagger-delay: 15ms;
@@ -127,6 +133,7 @@
   --uikit-anim-duration-leave: 300ms;
   --uikit-anim-scale-press: 0.94;
   --uikit-anim-scale-enter: 0.85;
+  --uikit-anim-anchor-scale-enter: 0.75;
   --uikit-anim-ripple-opacity: 0.22;
   --uikit-anim-ripple-duration: 800ms;
   --uikit-anim-easing-decel: cubic-bezier(0, 0, 0.2, 1);
@@ -141,6 +148,7 @@
   --uikit-anim-duration-leave: 0ms;
   --uikit-anim-scale-press: 1;
   --uikit-anim-scale-enter: 1;
+  --uikit-anim-anchor-scale-enter: 1;
   --uikit-anim-ripple-opacity: 0;
   --uikit-anim-ripple-duration: 0ms;
   --uikit-anim-overlay-duration: 0ms;
@@ -157,6 +165,7 @@
     --uikit-anim-duration-leave: 0ms;
     --uikit-anim-scale-press: 1;
     --uikit-anim-scale-enter: 1;
+    --uikit-anim-anchor-scale-enter: 1;
     --uikit-anim-ripple-opacity: 0;
     --uikit-anim-ripple-duration: 0ms;
     --uikit-anim-overlay-duration: 0ms;
@@ -182,4 +191,127 @@
   animation: uikit-ripple var(--uikit-anim-ripple-duration) var(--uikit-anim-easing) forwards;
   /* 强制 GPU 合成层 */
   will-change: transform, opacity;
+}
+
+/* ===== Popup / Modal 过渡动画（全局，非 scoped） ===== */
+
+/* fade */
+.uikit-fade-enter-active,
+.uikit-fade-leave-active {
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.uikit-fade-enter-from,
+.uikit-fade-leave-to {
+  opacity: 0;
+}
+
+/* slide-up */
+.uikit-slide-up-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
+.uikit-slide-up-leave-active {
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-slide-up-enter-from,
+.uikit-slide-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+/* slide-down */
+.uikit-slide-down-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
+.uikit-slide-down-leave-active {
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-slide-down-enter-from,
+.uikit-slide-down-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* slide-left */
+.uikit-slide-left-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
+.uikit-slide-left-leave-active {
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-slide-left-enter-from,
+.uikit-slide-left-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* slide-right */
+.uikit-slide-right-enter-active {
+  transition: transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
+.uikit-slide-right-leave-active {
+  transition: transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-slide-right-enter-from,
+.uikit-slide-right-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* fade-scale */
+.uikit-fade-scale-enter-active {
+  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
+}
+
+.uikit-fade-scale-leave-active {
+  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-fade-scale-enter-from {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-scale-enter));
+}
+
+.uikit-fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-scale-enter));
+}
+
+/* anchor-scale */
+.uikit-anchor-scale-enter-active {
+  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
+}
+
+.uikit-anchor-scale-leave-active {
+  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.uikit-anchor-scale-enter-from {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-anchor-scale-enter));
+}
+
+.uikit-anchor-scale-leave-to {
+  opacity: 0;
+  transform: scale(var(--uikit-anim-anchor-scale-enter));
 }

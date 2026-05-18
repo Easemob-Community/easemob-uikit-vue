@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onLongPress, onClickOutside } from '@vueuse/core'
+import { onLongPress } from '@vueuse/core'
 import Avatar from '../../components/avatar/avatar.vue'
 import Badge from '../../components/badge/badge.vue'
 import Icon from '../../components/icon/icon.vue'
+import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
@@ -46,7 +47,6 @@ const { t } = useLocale()
 const { isMobile } = useViewport()
 
 const itemRef = ref<HTMLElement>()
-const contextMenuRef = ref<HTMLElement>()
 
 /** H5 长按 ActionSheet - VueUse onLongPress */
 const showActionSheet = ref(false)
@@ -62,19 +62,45 @@ onLongPress(
   { delay: 600 }
 )
 
-/** PC 右键菜单 - VueUse onClickOutside 自动关闭 */
+/** PC 右键菜单 - 使用 Popup 锚定模式 */
 const showContextMenu = ref(false)
-const contextMenuPos = ref({ x: 0, y: 0 })
-
-onClickOutside(contextMenuRef, () => {
-  showContextMenu.value = false
-})
+const contextMenuAnchor = ref<HTMLElement>()
 
 function onContextMenu(e: MouseEvent) {
-  if (isMobile.value) return
+  console.log('[conversation-item] onContextMenu triggered', { isMobile: isMobile.value, clientX: e.clientX, clientY: e.clientY })
+  if (isMobile.value) {
+    console.log('[conversation-item] isMobile, skip')
+    return
+  }
   e.preventDefault()
-  contextMenuPos.value = { x: e.clientX, y: e.clientY }
+
+  // 如果已有菜单打开，先清理
+  if (contextMenuAnchor.value) {
+    console.log('[conversation-item] remove old anchor')
+    document.body.removeChild(contextMenuAnchor.value)
+    contextMenuAnchor.value = undefined
+  }
+
+  // 创建临时锚点元素在右键点击位置
+  const el = document.createElement('div')
+  el.style.position = 'fixed'
+  el.style.left = `${e.clientX}px`
+  el.style.top = `${e.clientY}px`
+  el.style.width = '1px'
+  el.style.height = '1px'
+  document.body.appendChild(el)
+  contextMenuAnchor.value = el
   showContextMenu.value = true
+  console.log('[conversation-item] showContextMenu set to true, anchor:', el)
+}
+
+function onContextMenuClose() {
+  console.log('[conversation-item] onContextMenuClose called, current showContextMenu:', showContextMenu.value)
+  showContextMenu.value = false
+  if (contextMenuAnchor.value) {
+    document.body.removeChild(contextMenuAnchor.value)
+    contextMenuAnchor.value = undefined
+  }
 }
 
 /** 点击选择 */
@@ -169,7 +195,7 @@ function onActionSheetSelect(_item: { name: string; color?: string; icon?: strin
 }
 
 function onContextMenuItemClick(actionKey: string) {
-  showContextMenu.value = false
+  onContextMenuClose()
   const action = mergedActions.value.find((a) => a.key === actionKey)
   action?.handler()
 }
@@ -217,7 +243,7 @@ const displayMessage = computed(() => {
     class="conversation-item"
     :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': props.hasAtMe }]"
     @click="onClick"
-    @contextmenu.prevent="onContextMenu"
+    @contextmenu="onContextMenu"
   >
     <Avatar :name="props.conversation.name" :src="props.conversation.avatar" :size="48" />
     <slot name="item-prefix" />
@@ -254,26 +280,29 @@ const displayMessage = computed(() => {
   </div>
 
   <!-- PC 右键菜单 -->
-  <Teleport v-if="showContextMenu" to="body">
-    <div class="context-menu-overlay" @contextmenu.prevent>
+  <Popup
+    :show="showContextMenu"
+    :anchor="contextMenuAnchor"
+    placement="bottom"
+    :overlay="false"
+    :close-on-click-overlay="true"
+    group="conversation-context-menu"
+    @update:show="onContextMenuClose"
+    @close="onContextMenuClose"
+  >
+    <div class="context-menu">
       <div
-        ref="contextMenuRef"
-        class="context-menu"
-        :style="{ left: `${contextMenuPos.x}px`, top: `${contextMenuPos.y}px` }"
+        v-for="item in contextMenuItems"
+        :key="item.action"
+        class="context-menu__item"
+        :class="{ 'is-danger': item.danger }"
+        @click.stop="onContextMenuItemClick(item.action)"
       >
-        <div
-          v-for="item in contextMenuItems"
-          :key="item.action"
-          class="context-menu__item"
-          :class="{ 'is-danger': item.danger }"
-          @click.stop="onContextMenuItemClick(item.action)"
-        >
-          <Icon v-if="item.icon" :name="item.icon" :size="14" />
-          <span>{{ item.label }}</span>
-        </div>
+        <Icon v-if="item.icon" :name="item.icon" :size="14" />
+        <span>{{ item.label }}</span>
       </div>
     </div>
-  </Teleport>
+  </Popup>
 
   <!-- H5 长按 ActionSheet -->
   <ActionSheet
@@ -384,20 +413,12 @@ const displayMessage = computed(() => {
 }
 
 /* PC 右键菜单 */
-.context-menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2000;
-}
-
 .context-menu {
-  position: absolute;
-  background: var(--uikit-bg-primary, #fff);
-  border: 1px solid var(--uikit-border, #e5e7eb);
-  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  background: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border-color);
+  border-radius: var(--uikit-components-radius, 8px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 120px;
   overflow: hidden;
@@ -424,6 +445,6 @@ const displayMessage = computed(() => {
 }
 
 .context-menu__item.is-danger:hover {
-  background-color: #fef2f2;
+  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
 }
 </style>
