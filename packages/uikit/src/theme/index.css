@@ -25,6 +25,15 @@
   /* 容器间距与组件圆角 */
   --uikit-container-gap: 8px;
   --uikit-components-radius: 8px;
+  --uikit-components-radius-hover: 14px;
+
+  /* Popup 内边距 */
+  --uikit-popup-padding: 4px;
+  --uikit-popup-padding-hover: 8px;
+
+  /* 阴影系统 */
+  --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.10);
+  --uikit-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.12), 0 18px 48px rgba(0, 0, 0, 0.14);
 
   /* ===== 动画系统 CSS 变量 ===== */
 
@@ -81,6 +90,10 @@
   /* 滚动条 - 暗色 */
   --uikit-scrollbar-thumb: #4b5563;
   --uikit-scrollbar-thumb-hover: #6b7280;
+
+  /* 阴影系统 - 暗色（提高不透明度避免深色背景看不出阴影） */
+  --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.40), 0 12px 32px rgba(0, 0, 0, 0.45);
+  --uikit-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.50), 0 18px 48px rgba(0, 0, 0, 0.55);
 }
 
 /* ===== 全局滚动条美化 ===== */

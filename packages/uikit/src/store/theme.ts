@@ -116,6 +116,7 @@ export const useThemeStore = defineStore('theme', () => {
   document.documentElement.style.setProperty('--uikit-item-hover-padding-x', hoverStyle.value === 'rounded' ? '8px' : '16px')
   document.documentElement.style.setProperty('--uikit-item-active-radius', hoverStyle.value === 'rounded' ? '8px' : '0px')
   document.documentElement.style.setProperty('--uikit-components-radius', componentsShape.value === 'ground' ? '8px' : '4px')
+  document.documentElement.style.setProperty('--uikit-components-radius-hover', componentsShape.value === 'ground' ? '14px' : '10px')
   document.documentElement.style.setProperty('--uikit-container-gap', `${Math.max(0, containerGap.value)}px`)
   document.documentElement.setAttribute('data-uikit-anim-enabled', String(animationEnabled.value))
   document.documentElement.setAttribute('data-uikit-anim-level', animationLevel.value)
@@ -160,6 +161,10 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.setProperty(
       '--uikit-components-radius',
       isRounded ? '8px' : '4px'
+    )
+    document.documentElement.style.setProperty(
+      '--uikit-components-radius-hover',
+      isRounded ? '14px' : '10px'
     )
   })
 

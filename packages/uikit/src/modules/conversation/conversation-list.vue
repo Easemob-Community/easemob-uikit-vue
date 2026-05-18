@@ -10,6 +10,7 @@ import ConversationItem from './conversation-item.vue'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
 import Icon from '../../components/icon/icon.vue'
+import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type { ConversationAction } from './types'
@@ -66,7 +67,7 @@ const searchKeyword = ref('')
 /** 规范化后的搜索关键字（去空格），用于过滤和空状态判断 */
 const normalizedSearchKeyword = computed(() => searchKeyword.value.trim())
 const showHeaderMenu = ref(false)
-const headerMenuRef = ref<HTMLElement>()
+const headerMenuTriggerRef = ref<HTMLElement>()
 const showHeaderActionSheet = ref(false)
 
 /** 下拉刷新 */
@@ -80,9 +81,9 @@ const { isRefreshing: isPullRefreshing } = usePullRefresh(
   }
 )
 
-onClickOutside(headerMenuRef, () => {
+function onHeaderMenuClose() {
   showHeaderMenu.value = false
-})
+}
 
 /** Header 菜单项定义 */
 const headerMenuItems = computed(() => [
@@ -99,7 +100,7 @@ function onHeaderMenuClick() {
   if (isMobile.value) {
     showHeaderActionSheet.value = true
   } else {
-    showHeaderMenu.value = !showHeaderMenu.value
+    showHeaderMenu.value = true
   }
 }
 
@@ -187,21 +188,32 @@ function confirmDelete() {
       <slot name="header">
         <span class="conversation-list__title">{{ props.title || t('conversation.title') }}</span>
       </slot>
-      <div ref="headerMenuRef" class="conversation-list__menu-wrapper">
-        <div class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
+      <div class="conversation-list__menu-wrapper">
+        <div ref="headerMenuTriggerRef" class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
           <Icon name="actions/plus_in_circle" :size="22" />
         </div>
-        <div v-if="showHeaderMenu && !isMobile" class="conversation-list__menu">
-          <div
-            v-for="item in headerMenuItems"
-            :key="item.key"
-            class="conversation-list__menu-item"
-            @click="onHeaderMenuItemClick(item.key)"
-          >
-            <Icon :name="item.icon" :size="18" />
-            <span>{{ item.label }}</span>
+        <Popup
+          :show="showHeaderMenu && !isMobile"
+          :anchor="headerMenuTriggerRef ?? undefined"
+          placement="bottom"
+          :overlay="false"
+          :close-on-click-overlay="true"
+          group="conversation-header-menu"
+          @update:show="onHeaderMenuClose"
+          @close="onHeaderMenuClose"
+        >
+          <div class="context-menu">
+            <div
+              v-for="item in headerMenuItems"
+              :key="item.key"
+              class="context-menu__item"
+              @click.stop="onHeaderMenuItemClick(item.key)"
+            >
+              <Icon :name="item.icon" :size="18" />
+              <span>{{ item.label }}</span>
+            </div>
           </div>
-        </div>
+        </Popup>
       </div>
     </div>
     <div v-if="props.showSearch" class="conversation-list__search">
@@ -335,7 +347,7 @@ function confirmDelete() {
   align-items: center;
   justify-content: center;
   padding: 2px;
-  border-radius: 50%;
+  border-radius: var(--uikit-components-radius, 8px);
   transition: background-color 0.15s;
 }
 
@@ -343,32 +355,33 @@ function confirmDelete() {
   background-color: var(--uikit-bg-secondary);
 }
 
-.conversation-list__menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background-color: var(--uikit-bg-base);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+/* PC Header 菜单 —— 与 conversation-item 右键菜单风格统一 */
+.context-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
   min-width: 160px;
-  padding: 6px 0;
-  z-index: 100;
+  padding: 6px;
 }
 
-.conversation-list__menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+.context-menu__item {
+  padding: 10px 12px;
   font-size: 14px;
   color: var(--uikit-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
   white-space: nowrap;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.conversation-list__menu-item:hover {
-  background-color: var(--uikit-bg-secondary);
+.context-menu__item:hover {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
 }
 
 .conversation-list__search {

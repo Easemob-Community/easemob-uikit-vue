@@ -412,36 +412,38 @@ const displayMessage = computed(() => {
   margin-right: 2px;
 }
 
-/* PC 右键菜单 */
+/* PC 右键菜单 —— 卡片：白底圆角 + 细边 + 柔和阴影 + 内 padding */
 .context-menu {
   display: flex;
   flex-direction: column;
   background: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color);
-  border-radius: var(--uikit-components-radius, 8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 120px;
-  overflow: hidden;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
+  min-width: 160px;
+  padding: 6px;
 }
 
+/* 菜单项 —— 自身带圆角，hover 时是独立的圆角色块（不贴卡片边） */
 .context-menu__item {
-  padding: 10px 16px;
+  padding: 10px 12px;
   font-size: 14px;
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.1s;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .context-menu__item:hover {
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bg-hover, #f3f4f6);
 }
 
 .context-menu__item.is-danger {
-  color: #ef4444;
+  color: var(--uikit-danger-color, #ef4444);
 }
 
 .context-menu__item.is-danger:hover {

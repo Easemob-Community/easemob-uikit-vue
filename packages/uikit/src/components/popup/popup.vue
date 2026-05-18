@@ -40,11 +40,6 @@ const emit = defineEmits<PopupEmits>()
 
 const isAnchored = computed(() => !!props.anchor)
 
-// DEBUG: 监听 show 和 anchor 变化
-watch(() => [props.show, props.anchor], ([show, anchor]) => {
-  console.log('[Popup] show/anchor changed', { show, hasAnchor: !!anchor, isAnchored: isAnchored.value })
-}, { flush: 'sync' })
-
 const transitionName = computed(() => {
   if (isAnchored.value) {
     return 'uikit-anchor-scale'
@@ -64,11 +59,7 @@ const contentStyle = ref<Record<string, string>>({})
 const ignoreClickOutside = ref(false)
 
 function updateAnchorPosition() {
-  console.log('[Popup] updateAnchorPosition called', { isAnchored: isAnchored.value, hasAnchor: !!props.anchor, hasContent: !!contentRef.value })
-  if (!isAnchored.value || !props.anchor || !contentRef.value) {
-    console.log('[Popup] updateAnchorPosition early return')
-    return
-  }
+  if (!isAnchored.value || !props.anchor || !contentRef.value) return
 
   const anchorRect = props.anchor.getBoundingClientRect()
   const contentRect = contentRef.value.getBoundingClientRect()
@@ -162,18 +153,10 @@ useEventListener(window, 'scroll', () => {
 }, { capture: true })
 
 onClickOutside(contentRef, (event) => {
-  console.log('[Popup] onClickOutside triggered', { ignoreClickOutside: ignoreClickOutside.value, isAnchored: isAnchored.value, show: props.show, target: event.target })
-  if (ignoreClickOutside.value) {
-    console.log('[Popup] onClickOutside ignored')
-    return
-  }
+  if (ignoreClickOutside.value) return
   // 锚定模式下点击 anchor 本身不关闭 popup
-  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) {
-    console.log('[Popup] onClickOutside: clicked anchor, skip')
-    return
-  }
+  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) return
   if (props.closeOnClickOverlay && props.show) {
-    console.log('[Popup] onClickOutside: closing popup')
     emit('update:show', false)
     emit('close')
   }
@@ -195,25 +178,20 @@ interface PopupGroupEventDetail {
 
 function onGroupOpen(event: Event) {
   const { detail } = event as CustomEvent<PopupGroupEventDetail>
-  // 严格排除自身实例：同一 Symbol 引用必须完全相等
   const isSelf = detail.id === instanceId
-  console.log('[Popup] onGroupOpen', { myGroup: props.group, eventGroup: detail.group, sameGroup: detail.group === props.group, isSelf, myId: instanceId, eventId: detail.id, show: props.show })
   if (
     props.group
     && detail.group === props.group
     && !isSelf
     && props.show
   ) {
-    console.log('[Popup] onGroupOpen: closing due to group conflict')
     emit('update:show', false)
     emit('close')
   }
 }
 
 watch(() => props.show, (show) => {
-  console.log('[Popup] watch show changed', { show, group: props.group, instanceId })
   if (show && props.group) {
-    console.log('[Popup] dispatching group event', { group: props.group, id: instanceId })
     document.dispatchEvent(
       new CustomEvent<PopupGroupEventDetail>(POPUP_GROUP_EVENT, {
         detail: { group: props.group, id: instanceId },
@@ -293,8 +271,6 @@ onUnmounted(() => {
 
 .uikit-popup__content {
   position: relative;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
   max-width: 90vw;
   max-height: 90vh;
   overflow: auto;
@@ -302,6 +278,9 @@ onUnmounted(() => {
 
 .uikit-popup__content--center {
   margin: auto;
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 8px);
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
 }
 
 .uikit-popup__content--bottom {
@@ -309,7 +288,9 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   width: 100%;
+  background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
   max-height: 80vh;
 }
@@ -319,7 +300,9 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
+  background-color: var(--uikit-bg-base);
   border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
 }
 
@@ -328,7 +311,9 @@ onUnmounted(() => {
   left: 0;
   top: 0;
   height: 100%;
+  background-color: var(--uikit-bg-base);
   border-radius: 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0;
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
 }
 
@@ -337,7 +322,9 @@ onUnmounted(() => {
   right: 0;
   top: 0;
   height: 100%;
+  background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
 }
 

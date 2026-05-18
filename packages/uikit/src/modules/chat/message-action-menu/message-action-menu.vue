@@ -44,37 +44,37 @@ function onItemClick(action: MessageActionItem) {
 .message-action-menu {
   display: flex;
   flex-direction: column;
-  min-width: 140px;
-  padding: 4px 0;
+  min-width: 160px;
+  padding: 6px;
   background-color: var(--uikit-bg-base);
   border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 48px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
 }
 
 .message-action-menu__item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 10px 12px;
   font-size: 14px;
   color: var(--uikit-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
   white-space: nowrap;
 }
 
 .message-action-menu__item:hover {
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bg-hover, #f3f4f6);
 }
 
 .message-action-menu__item--danger {
-  color: #ef4444;
+  color: var(--uikit-danger-color, #ef4444);
 }
 
 .message-action-menu__item--danger:hover {
-  background-color: #fef2f2;
+  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
 }
 
 .message-action-menu__item--disabled {
