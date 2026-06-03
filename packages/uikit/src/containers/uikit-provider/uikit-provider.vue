@@ -181,7 +181,7 @@ watch(
       try {
         const list: UIKitContact[] = ds.fetchBlocklist
           ? await ds.fetchBlocklist()
-          : (await client?.getBlocklist() || []).map((userInfo: UserInfo) => ({
+          : (await client?.contact.getBlocklist() || []).map((userInfo: UserInfo) => ({
               userId: userInfo.userId || '',
               name: userInfo.nickname || userInfo.userId || '',
             }))
@@ -197,7 +197,7 @@ watch(
         let list: Array<{ userId: string; name: string; remark?: string }> = []
         if (isAllMode && client) {
           // 全量拉取模式
-          const res = client.getContacts()
+          const res = client.contact.getContacts()
           const data = Array.isArray(res) ? res : []
           list = data.map((item) => ({
             userId: item.userId,
@@ -217,7 +217,7 @@ watch(
            * ContactManager 不暴露此方法，由 UIKitClient 桥接。
            */
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const res = await client.getContactsWithCursor({ pageSize: 50 })
+          const res = await client.contact.getContactsWithCursor({ pageSize: 50 })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const contacts = (res as any)?.data?.contacts || (res as any)?.contacts || []
           list = contacts.map((item: any) => ({

@@ -465,7 +465,7 @@ export function useChat(options?: UseChatOptions) {
     const actualCursor = cursor ?? cached.cursor
 
     try {
-      const result = await _getClient().getHistoryMessages({
+      const result = await _getClient().conversation.getHistoryMessages({
         targetId: cvs.id,
         conversationType: cvs.type,
         pageSize: 20,
@@ -533,7 +533,7 @@ export function useChat(options?: UseChatOptions) {
     const cvs = conversationStore.currentConversation
     if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
     try {
-      await _getClient().sendMessageReadAck({
+      await _getClient().conversation.sendMessageReadAck({
         conversationId: cvs.id,
         conversationType: cvs.type,
         messageId: msgId,
@@ -545,7 +545,7 @@ export function useChat(options?: UseChatOptions) {
 
   /** 获取群消息已读用户详情 */
   async function fetchGroupReadDetail(msgId: string, groupId: string) {
-    return _getClient().getGroupMessageReadUsers({ messageId: msgId, groupId })
+    return _getClient().message.getGroupMessageReadUsers({ messageId: msgId, groupId })
   }
 
   /** 获取翻译目标语言 */
@@ -579,7 +579,7 @@ export function useChat(options?: UseChatOptions) {
        * 无法在编译期获取已修改次数等信息。
        */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await client.modifyMessage({
+      const result = await client.message.modifyMessage({
         conversationId: cvs.id,
         conversationType: cvs.type,
         messageId,
@@ -611,7 +611,7 @@ export function useChat(options?: UseChatOptions) {
     const client = _getClient()
     const messageId = message.serverId || message.id
     try {
-      await client.pinMessage({
+      await client.message.pinMessage({
         conversationId: cvs.id,
         conversationType: cvs.type,
         messageId,
@@ -633,7 +633,7 @@ export function useChat(options?: UseChatOptions) {
     const client = _getClient()
     const messageId = message.serverId || message.id
     try {
-      await client.unpinMessage({
+      await client.message.unpinMessage({
         conversationId: cvs.id,
         conversationType: cvs.type,
         messageId,
@@ -652,7 +652,7 @@ export function useChat(options?: UseChatOptions) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     try {
-      const result = await _getClient().getPinnedMessageList({
+      const result = await _getClient().message.getPinnedMessageList({
         conversationId: cvs.id,
         conversationType: cvs.type,
         pageSize: 20,
@@ -704,7 +704,7 @@ export function useChat(options?: UseChatOptions) {
     }
     messageStore.setTranslating(msgId, true)
     try {
-      const result = await _getClient().translateMessage({ text, languages: [lang] }) as MessageTranslationResult
+      const result = await _getClient().message.translateMessage({ text, languages: [lang] }) as MessageTranslationResult
       console.log('[useChat] translateMessage raw result:', JSON.stringify(result))
       const translation = result?.translations?.[0]
       if (translation) {
@@ -731,7 +731,7 @@ export function useChat(options?: UseChatOptions) {
     if (!cvs) return
     const client = _getClient()
     try {
-      await client.recallMessage({
+      await client.message.recallMessage({
         messageId: msgId,
         conversationId: cvs.id,
         conversationType: cvs.type,

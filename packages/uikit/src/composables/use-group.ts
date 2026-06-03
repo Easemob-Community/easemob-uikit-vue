@@ -62,7 +62,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
     if (!features.enableGroup) return
     try {
       if (client.value) {
-        const count = await client.value.getJoinedGroupsCount()
+        const count = await client.value.group.getJoinedGroupsCount()
         groupStore.setJoinedGroupCount(count)
       }
     } catch (e) {
@@ -83,7 +83,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
       } else if (client.value) {
         // 开启 needAffiliations 以获取 memberCount / role / description 等字段
         // 注意：SDK 在 needAffiliations=true 或 needRole=true 时，pageSize 上限强制为 20
-        const res = await client.value.getJoinedGroupList({
+        const res = await client.value.group.getJoinedGroupList({
           pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
           needMemberCount: true,
           needRole: true,
@@ -126,7 +126,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
         groupStore.setCursor(res.cursor || '')
       } else if (client.value) {
         const nextPage = (parseInt(groupStore.cursor || '0') || 0) + 1
-        const res = await client.value.getJoinedGroupList({
+        const res = await client.value.group.getJoinedGroupList({
           pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
           needMemberCount: true,
           needRole: true,
@@ -163,7 +163,7 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
     for (let i = 0; i < groupIds.length; i += BATCH_SIZE) {
       const batch = groupIds.slice(i, i + BATCH_SIZE)
       try {
-        const res = await client.value.getGroupInfo(batch)
+        const res = await client.value.group.getGroupInfo(batch)
         /**
          * @see SDK_DEFICIENCY: UIKit client.getGroupInfo 仅支持单个 groupId，
          * 未提供 getGroupInfoList 的批量调用封装。

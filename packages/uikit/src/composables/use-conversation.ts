@@ -151,7 +151,7 @@ export function useConversation() {
     // ===== 加载更多：走 REST 分页 =====
     if (isLoadMore) {
       console.log('[useConversation] loadMore mode -> REST getConversationList')
-      const res = await client.value?.getServerConversations(options)
+      const res = await client.value?.conversation.getServerConversations(options)
       const page = res as SdkConversationPage
       const list = page?.items || []
       const mapped: Conversation[] = list.map(mapConversationItem)
@@ -163,7 +163,7 @@ export function useConversation() {
     // ===== 强制刷新：触发 WebSocket 重新同步 =====
     if (isForceRefresh) {
       console.log('[useConversation] force refresh -> calling refreshSessionList')
-      await client.value?.refreshSessionList({
+      await client.value?.conversation.refreshSessionList({
         needEmptySession: options?.includeEmptyConversations ?? false,
       })
       // refreshSessionList 会触发 onConversationListSyncDidStart/Finish，
@@ -178,7 +178,7 @@ export function useConversation() {
     }
 
     console.log('[useConversation] first load -> try getSessionList')
-    const sessionList = client.value?.getSessionList()
+    const sessionList = client.value?.conversation.getSessionList()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sessions = sessionList as any[]
     if (sessions && sessions.length > 0) {
@@ -193,7 +193,7 @@ export function useConversation() {
 
     // ===== Fallback：本地无数据，走 REST =====
     console.log('[useConversation] getSessionList empty -> fallback to REST')
-    const res = await client.value?.getServerConversations(options)
+    const res = await client.value?.conversation.getServerConversations(options)
     const page = res as SdkConversationPage
     const list = page?.items || []
     const mapped: Conversation[] = list.map(mapConversationItem)
@@ -234,7 +234,7 @@ export function useConversation() {
     const cvs = conversationStore.conversationList.find((c: { id: string }) => c.id === id)
     if (!cvs) return
 
-    await client.value?.setConversationPinned({
+    await client.value?.conversation.setConversationPinned({
       conversationId: id,
       conversationType: cvs.type,
       pinned: isPinned,
@@ -251,7 +251,7 @@ export function useConversation() {
       conversationStore.updateUnreadCount(id, 0)
       return
     }
-    await client.value?.markConversationRead({ conversationId: id, conversationType: cvs.type })
+    await client.value?.conversation.markConversationRead({ conversationId: id, conversationType: cvs.type })
     conversationStore.updateUnreadCount(id, 0)
   }
 
@@ -260,7 +260,7 @@ export function useConversation() {
     const cvs = conversationStore.conversationList.find((c: { id: string }) => c.id === id)
     if (!cvs) return
 
-    await client.value?.deleteConversation({
+    await client.value?.conversation.deleteConversation({
       conversationId: id,
       conversationType: cvs.type,
       deleteRoamingMessages: true,

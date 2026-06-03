@@ -30,7 +30,7 @@ export function useContact() {
   function fetchContactCount() {
     try {
       if (client.value) {
-        const res: ReadonlyArray<SdkContact> = client.value.getContacts()
+        const res: ReadonlyArray<SdkContact> = client.value.contact.getContacts()
         contactStore.setContactCount(res.length)
       }
     } catch (e) {
@@ -41,7 +41,7 @@ export function useContact() {
   /** 全量拉取好友列表（getContacts，同步返回内存中的联系人快照） */
   function fetchAllContacts() {
     if (!client.value) return
-    const res: ReadonlyArray<SdkContact> = client.value.getContacts()
+    const res: ReadonlyArray<SdkContact> = client.value.contact.getContacts()
     const list: Contact[] = res.map((item) => ({
       userId: item.userId,
       name: item.remark || item.userId,
@@ -67,7 +67,7 @@ export function useContact() {
        * SDK 仅提供 getContacts() 返回完整内存快照，无分页能力。
        */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res: any = await client.value.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
+      const res: any = await client.value.contact.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
       const contacts: Array<SdkContact> = res?.contacts || res?.items || []
       list = contacts.map((item) => ({
         userId: item.userId,
@@ -111,7 +111,7 @@ export function useContact() {
          * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法。
          */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const res: any = await client.value.getContactsWithCursor({
+        const res: any = await client.value.contact.getContactsWithCursor({
           pageSize: CONTACT_PAGE_SIZE,
           cursor: contactStore.cursor,
         })
@@ -133,20 +133,20 @@ export function useContact() {
   /** 添加好友邀请 */
   async function addContactRequest(userId: string, reason?: string) {
     if (!client.value) return
-    await client.value.addContact(userId, reason)
+    await client.value.contact.addContact(userId, reason)
   }
 
   /** 删除好友 */
   async function deleteContact(userId: string) {
     if (!client.value) return
-    await client.value.deleteContact(userId)
+    await client.value.contact.deleteContact(userId)
     contactStore.removeContact(userId)
   }
 
   /** 设置备注 */
   async function setRemark(userId: string, remark: string) {
     if (!client.value) return
-    await client.value.setContactRemark(userId, remark)
+    await client.value.contact.setContactRemark(userId, remark)
     contactStore.updateContactRemark(userId, remark)
   }
 

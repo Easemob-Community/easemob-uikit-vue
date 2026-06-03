@@ -27,7 +27,7 @@ export function useBlocklist() {
       return
     }
     if (!client.value) return
-    const userInfos: ReadonlyArray<UserInfo> = await client.value.getBlocklist()
+    const userInfos: ReadonlyArray<UserInfo> = await client.value.contact.getBlocklist()
     contactStore.setBlackList(userInfos.map((info: UserInfo) => ({
       userId: info.userId,
       name: info.nickname || info.userId,
@@ -38,14 +38,14 @@ export function useBlocklist() {
   /** \u5c06\u67d0\u4eba\u52a0\u9ed1 */
   async function addBlock(contact: Contact) {
     if (!client.value) return
-    await client.value.addUsersToBlocklist([contact.userId])
+    await client.value.contact.addUsersToBlocklist([contact.userId])
     contactStore.addToBlackList(contact)
   }
 
   /** \u53d6\u6d88\u62c9\u9ed1 */
   async function removeBlock(userId: string) {
     if (!client.value) return
-    await client.value.removeUserFromBlocklist(userId)
+    await client.value.contact.removeUserFromBlocklist(userId)
     contactStore.removeFromBlackList(userId)
   }
 

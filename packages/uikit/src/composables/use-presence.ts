@@ -50,14 +50,14 @@ export function usePresence() {
           if (dataSource.subscribePresence) {
             await dataSource.subscribePresence(subList)
           } else if (client.value) {
-            await client.value.subscribePresence(subList)
+            await client.value.presence.subscribePresence(subList)
           }
           // \u9996\u6b21\u8ba2\u9605\u540e\u62c9\u4e00\u6b21\u521d\u59cb\u72b6\u6001
           if (dataSource.fetchPresence) {
             const list = await dataSource.fetchPresence(subList)
             presenceStore.updateBatch(list)
           } else if (client.value) {
-            const res = await client.value.getPresenceStatus(subList)
+            const res = await client.value.presence.getPresenceStatus(subList)
             /**
              * SDK getPresenceStatus 直接返回 ReadonlyArray<SdkPresenceInfo>，
              * 无 .result/.data 包装。
@@ -85,7 +85,7 @@ export function usePresence() {
           if (dataSource.unsubscribePresence) {
             await dataSource.unsubscribePresence(unsubList)
           } else if (client.value) {
-            await client.value.unsubscribePresence(unsubList)
+            await client.value.presence.unsubscribePresence(unsubList)
           }
         } catch (e) {
           console.warn('[UIKit] presence unsubscribe failed:', e)
