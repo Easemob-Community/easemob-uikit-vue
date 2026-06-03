@@ -32,6 +32,8 @@ export interface Conversation {
   remindType?: string
   /** 会话标记 */
   marks?: number[]
+  /** 已读位置时间戳（毫秒），来自 SessionItem.readReceipt */
+  readReceipt?: number
 }
 
 export const useConversationStore = defineStore('conversation', () => {
@@ -52,6 +54,9 @@ export const useConversationStore = defineStore('conversation', () => {
 
   /** 会话维度的是否有人@我：key = conversationId，value = 是否被@ */
   const atMeMap = ref<Record<string, boolean>>({})
+
+  /** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
+  const isSyncingConversations = ref(false)
 
   /** 按置顶状态和时间排序的会话列表 */
   const sortedConversationList = computed(() => {
@@ -141,6 +146,10 @@ export const useConversationStore = defineStore('conversation', () => {
     atMeMap.value[conversationId] = hasAtMe
   }
 
+  function setSyncingConversations(v: boolean) {
+    isSyncingConversations.value = v
+  }
+
   function clearConversationList() {
     conversationList.value = []
     currentConversation.value = null
@@ -149,6 +158,7 @@ export const useConversationStore = defineStore('conversation', () => {
     typingMap.value = {}
     atMeMap.value = {}
     conversationsLoaded.value = false
+    isSyncingConversations.value = false
   }
 
   return {
@@ -174,6 +184,8 @@ export const useConversationStore = defineStore('conversation', () => {
     setTyping,
     atMeMap,
     setAtMe,
+    isSyncingConversations,
+    setSyncingConversations,
     clearConversationList,
   }
 })

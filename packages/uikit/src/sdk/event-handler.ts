@@ -9,12 +9,14 @@ import { usePresenceStore, type PresenceStatus } from '../store/presence'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../constants'
 import type { Message } from '../store/message'
 import type { ConversationTypeValue } from '../constants'
+import { mapSessionItem } from '../composables/use-conversation'
 import type {
   ConnectionEventHandlerMap,
   ChatEventHandlerMap,
   ContactEventHandlerMap,
   GroupEventHandlerMap,
   PresenceEventHandlerMap,
+  EventPayloadMap,
 } from 'im-sdk-web'
 
 export interface RootStores {
@@ -245,56 +247,82 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
   }
 
   // ========== 连接事件处理器 ==========
-  const connHandler = {
-    onConnected: () => {
-      stores.client.setConnected(true)
+  const connHandler: ConnectionEventHandlerMap = {
+    onConnecting: (_payload: EventPayloadMap['onConnecting']) => {
+      stores.client.setConnecting(true)
     },
-    onDisconnected: () => {
+    onConnected: (_payload: EventPayloadMap['onConnected']) => {
+      stores.client.setConnected(true)
+      stores.client.setConnecting(false)
+    },
+    onDisconnected: (_payload: EventPayloadMap['onDisconnected']) => {
       stores.client.setConnected(false)
+      stores.client.setConnecting(false)
       stores.client.setCurrentUser('')
     },
-    onTokenWillExpire: () => {
+    onReconnectFailed: (_payload: EventPayloadMap['onReconnectFailed']) => {
+      stores.client.setConnecting(false)
+      console.error('[UIKit] Auto-reconnect failed after max retries')
+    },
+    onOfflineMessageSyncStart: () => {
+      console.log('[UIKit] Offline message sync started')
+    },
+    onOfflineMessageSyncFinish: () => {
+      console.log('[UIKit] Offline message sync finished')
+    },
+    onTokenWillExpire: (_payload: EventPayloadMap['onTokenWillExpire']) => {
       console.warn('[UIKit] Token will expire')
     },
-    onTokenExpired: () => {
+    onTokenExpired: (_payload: EventPayloadMap['onTokenExpired']) => {
       console.error('[UIKit] Token expired')
     },
   }
 
   // ========== Chat 事件处理器 ==========
-  const chatHandler = {
+  const chatHandler: ChatEventHandlerMap = {
     /** 统一消息接收 */
-    onMessage: (messages: SdkMsgBase[]) => {
+    onMessage: (messages: EventPayloadMap['onMessage']) => {
       if (!Array.isArray(messages)) {
-        handleIncomingMessage(messages)
+        handleIncomingMessage(messages as unknown as SdkMsgBase)
         return
       }
       for (const msg of messages) {
-        handleIncomingMessage(msg)
+        handleIncomingMessage(msg as unknown as SdkMsgBase)
       }
     },
 
     /** 消息撤回 */
-    onMessageRecalled: (payload: { messageId: string; from?: string }) => {
+    onMessageRecalled: (payload: EventPayloadMap['onMessageRecalled']) => {
       if (payload.messageId) {
-        stores.message.recallMessage(payload.messageId, payload.from || '')
+        stores.message.recallMessage(payload.messageId, '')
       }
     },
 
     /** 送达回执 */
-    onMessageDelivered: (payload: { messageId: string }) => {
+    onMessageDelivered: (payload: EventPayloadMap['onMessageDelivered']) => {
       if (payload.messageId) {
         stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.DELIVERED)
       }
     },
 
     /** 消息已读回执 */
-    onMessageRead: (payload: { messageId: string; groupReadCount?: number }) => {
+    onMessageRead: (payload: EventPayloadMap['onMessageRead']) => {
       if (!payload.messageId) return
 
       // 群已读回执
-      if (payload.groupReadCount !== undefined) {
-        stores.message.updateMessageById(payload.messageId, { groupReadCount: payload.groupReadCount })
+      if (payload.isGroupAck) {
+        const ackContent = payload.ackContent
+        if (ackContent) {
+          try {
+            const parsed = JSON.parse(ackContent)
+            const groupReadCount = parsed?.count
+            if (typeof groupReadCount === 'number') {
+              stores.message.updateMessageById(payload.messageId, { groupReadCount })
+            }
+          } catch {
+            // ackContent 不是 JSON，忽略
+          }
+        }
         return
       }
 
@@ -303,26 +331,26 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
     },
 
     /** 会话已读回执 */
-    onConversationRead: (payload: { conversationId: string }) => {
+    onConversationRead: (payload: EventPayloadMap['onConversationRead']) => {
       if (payload.conversationId) {
         stores.conversation.updateUnreadCount(payload.conversationId, 0)
       }
     },
 
     /** 消息被编辑 */
-    onMessageUpdated: (payload: { messageId: string; message: SdkMsgBase }) => {
+    onMessageUpdated: (payload: EventPayloadMap['onMessageUpdated']) => {
       const currentUser = stores.client.currentUser
-      const uiMsg = convertSdkMessageToUiMessage(payload.message, currentUser)
+      const uiMsg = convertSdkMessageToUiMessage(payload.message as unknown as SdkMsgBase, currentUser)
       stores.message.applyModifiedMessage(uiMsg)
     },
 
     /** 消息置顶/取消置顶事件 */
-    onPinnedMessageChanged: (payload: { messageId: string; operation: 'pin' | 'unpin'; operatorId?: string; time?: number }) => {
+    onPinnedMessageChanged: (payload: EventPayloadMap['onPinnedMessageChanged']) => {
       if (!payload || !payload.messageId) return
       if (payload.operation === 'pin') {
         stores.message.setMessagePinned(payload.messageId, {
           operatorId: payload.operatorId || '',
-          pinTime: payload.time || Date.now(),
+          pinTime: payload.pinTime || Date.now(),
         })
       } else if (payload.operation === 'unpin') {
         stores.message.setMessageUnpinned(payload.messageId)
@@ -331,82 +359,96 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
 
     /** 会话列表同步开始 */
     onConversationListSyncDidStart: () => {
-      // 可选：设置同步状态
+      console.log('[EventHandler] onConversationListSyncDidStart')
+      stores.conversation.setSyncingConversations(true)
     },
 
     /** 会话列表同步完成 */
-    onConversationListSyncDidFinish: () => {
-      // 可选：清除同步状态
+    onConversationListSyncDidFinish: (_payload?: EventPayloadMap['onConversationListSyncDidFinish']) => {
+      console.log('[EventHandler] onConversationListSyncDidFinish')
+      stores.conversation.setSyncingConversations(false)
+      // 同步完成后从本地 SessionList 读取会话数据（WebSocket 同步的内存数据）
+      try {
+        const sessionList = client.getSessionList()
+        console.log('[EventHandler] getSessionList returned', {
+          count: sessionList.length,
+          sessions: sessionList.map((s) => ({
+            sessionId: (s as unknown as Record<string, unknown>).sessionId,
+            type: (s as unknown as Record<string, unknown>).type,
+            unreadCount: (s as unknown as Record<string, unknown>).unreadCount,
+          })),
+        })
+        const mapped = sessionList.map((item) => mapSessionItem(item))
+        stores.conversation.setConversationList(mapped)
+      } catch (e) {
+        console.warn('[EventHandler] getSessionList failed:', e)
+      }
+      // 同步完成后标记已加载，避免 container 重复调用 REST 接口
+      stores.conversation.setConversationsLoaded(true)
     },
 
     /** 会话实时更新 */
-    onConversationUpdate: (payload: SdkMsgBase & { conversationId?: string; unreadCount?: number }) => {
-      if (payload.conversationId) {
-        const currentUser = stores.client.currentUser
-        const lastMessageText = getLastMessageText(payload)
-        stores.conversation.addConversation({
-          id: payload.conversationId,
-          name: payload.from || '',
-          lastMessage: lastMessageText,
-          lastMessageTime: payload.timestamp || Date.now(),
-          lastMessageType: (payload.type || 'text') as ConversationTypeValue,
-          lastMessageSender: payload.from || '',
-          type: (payload.conversationType || 'singleChat') as ConversationTypeValue,
-          unreadCount: payload.unreadCount,
-        })
+    onConversationUpdate: () => {
+      // 从 SessionListCache 重新读取完整数据，确保 isPinned、isMuted、displayName、
+      // remindType、marks 等 SessionItem 特有字段正确更新。
+      // 直接映射 payload 会丢失这些字段。
+      try {
+        const sessionList = client.getSessionList()
+        const mapped = sessionList.map((item) => mapSessionItem(item))
+        mapped.forEach((cvs) => stores.conversation.addConversation(cvs))
+      } catch (e) {
+        console.warn('[EventHandler] onConversationUpdate getSessionList failed:', e)
       }
     },
   }
 
   // ========== 好友事件（可选） ==========
   if (options.enableContact) {
-    const contactHandler = {
-      onContactInvited: (msg: { from?: string; to?: string; status?: string }) => {
+    const contactHandler: ContactEventHandlerMap = {
+      onContactInvited: (msg: EventPayloadMap['onContactInvited']) => {
         console.info('[UIKit] onContactInvited:', msg)
       },
-      onContactAgreed: (msg: { from?: string }) => {
+      onContactAgreed: (msg: EventPayloadMap['onContactAgreed']) => {
         const userId = msg.from
         if (!userId) return
         stores.contact.addContact({ userId, name: userId })
       },
-      onContactRefuse: (msg: { from?: string }) => {
+      onContactRefuse: (msg: EventPayloadMap['onContactRefuse']) => {
         console.info('[UIKit] onContactRefuse:', msg)
       },
-      onContactDeleted: (msg: { from?: string }) => {
+      onContactDeleted: (msg: EventPayloadMap['onContactDeleted']) => {
         const userId = msg.from
         if (userId) stores.contact.removeContact(userId)
       },
-      onContactAdded: (msg: { from?: string }) => {
+      onContactAdded: (msg: EventPayloadMap['onContactAdded']) => {
         const userId = msg.from
         if (!userId) return
         stores.contact.addContact({ userId, name: userId })
       },
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.addContactEventHandler('uikit-contact', contactHandler as any)
+    client.addContactEventHandler('uikit-contact', contactHandler)
   }
 
   // ========== 黑名单事件（可选） ==========
   if (options.enableBlocklist) {
     // 新 SDK 黑名单事件通过 contactManager 事件处理
-    const blockHandler = {
-      onContactInfoUpdated: (msg: { userId?: string; remark?: string }) => {
+    const blockHandler: ContactEventHandlerMap = {
+      onContactInfoUpdated: (msg: EventPayloadMap['onContactInfoUpdated']) => {
         console.info('[UIKit] onContactInfoUpdated:', msg)
       },
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.addContactEventHandler('uikit-blocklist', blockHandler as any)
+    client.addContactEventHandler('uikit-blocklist', blockHandler)
   }
 
   // ========== 在线状态事件（可选） ==========
   if (options.enablePresence) {
-    const presenceHandler = {
-      onPresenceStatusChange: (list: { userId?: string; ext?: string; statusDetails?: { status?: number | string }[] }[]) => {
+    const presenceHandler: PresenceEventHandlerMap = {
+      onPresenceStatusChange: (list: EventPayloadMap['onPresenceStatusChange']) => {
         if (!Array.isArray(list)) return
         const mapped = list.map((item) => {
           const userId = item.userId || ''
           const details = Array.isArray(item.statusDetails) ? item.statusDetails : []
-          const isOnline = details.some((d) => Number(d?.status) === 1)
+          const isOnline = details.some((d: unknown) => Number((d as Record<string, unknown>)?.status) === 1)
           const ext = item.ext || ''
           let status: PresenceStatus = isOnline ? 'online' : 'offline'
           if (ext) {
@@ -420,8 +462,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
         stores.presence.updateBatch(mapped)
       },
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.addEventHandler('uikit-presence', presenceHandler as any)
+    client.addEventHandler('uikit-presence', presenceHandler)
   }
 
   // ========== 群组事件（可选） ==========
@@ -480,10 +521,8 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
   }
 
   // 注册事件处理器
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  client.addEventHandler('uikit-conn', connHandler as any)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  client.addChatEventHandler('uikit-chat', chatHandler as any)
+  client.addEventHandler('uikit-conn', connHandler)
+  client.addChatEventHandler('uikit-chat', chatHandler)
 
   return {
     dispose: () => {

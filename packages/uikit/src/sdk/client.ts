@@ -241,11 +241,21 @@ export class UIKitClient {
     cursor?: string
     includeEmptyConversations?: boolean
   }) {
-    return this._client.chatManager.getConversationList({
+    const params = {
       pageSize: options?.pageSize ?? 50,
       cursor: options?.cursor ?? '',
       includeEmptyConversations: options?.includeEmptyConversations ?? false,
+    }
+    console.log('[UIKitClient] getServerConversations -> chatManager.getConversationList', params)
+    const result = await this._client.chatManager.getConversationList(params)
+    console.log('[UIKitClient] getServerConversations <- result', {
+      hasItems: !!result && 'items' in result,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      itemCount: (result as any)?.items?.length ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cursor: (result as any)?.cursor,
     })
+    return result
   }
 
   /** 获取本地会话列表（WebSocket 同步的内存数据） */

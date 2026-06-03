@@ -8,35 +8,56 @@ import type { ChatManager } from 'im-sdk-web'
  * SDK ConversationPage 类型提取（未从 im-sdk-web 主入口导出）。
  */
 type SdkConversationPage = Awaited<ReturnType<ChatManager['getConversationList']>>
-/** SDK ConversationItem 类型提取 */
-type SdkConversationItem = SdkConversationPage['items'][number]
 
 /**
- * 将服务端会话数据（ConversationItem）转换为 UIKIT Conversation 格式。
+ * 将本地 SessionItem（WebSocket 同步数据）转换为 UIKIT Conversation 格式。
+ * SDK 5.x 优先使用 getSessionList() 获取会话数据，字段更丰富。
+ */
+export function mapSessionItem(item: unknown): Conversation {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const s = item as any
+  const lastMsg = s.lastMessage
+  const lastMsgBody = lastMsg?.body || {}
+  return {
+    id: s.sessionId,
+    name: s.display?.displayName || s.sessionId,
+    avatar: s.display?.avatarUrl,
+    lastMessage: lastMsgBody.content || lastMsgBody.msg || lastMsg?.type || '',
+    lastMessageType: lastMsg?.type || '',
+    lastMessageSender: lastMsg?.from || '',
+    lastMessageTime: s.lastMessageAt || lastMsg?.timestamp || 0,
+    unreadCount: s.unreadCount || 0,
+    type: s.type as Conversation['type'],
+    isPinned: s.isPinned || false,
+    pinnedTime: s.pinnedTime || 0,
+    isMuted: s.remindType === 'none',
+    displayName: s.display?.displayName,
+    avatarUrl: s.display?.avatarUrl,
+    remindType: s.remindType,
+    marks: [...(s.marks || [])] as number[],
+    readReceipt: s.readReceipt || 0,
+  }
+}
+
+/**
+ * 将 REST 分页会话数据（ConversationItem）转换为 UIKIT Conversation 格式。
+ * 仅用于 loadMore 等分页场景。
  *
  * @see SDK_DEFICIENCY: ConversationItem 未暴露 isMuted、remindType、display（displayName/avatarUrl）字段，
  * 这些字段仅在 SessionItem 中可用（通过 getSessionList）。
  */
-function mapServerConversation(item: SdkConversationItem): Conversation {
+function mapConversationItem(item: SdkConversationPage['items'][number]): Conversation {
   const lastMsg = item.lastMessage
-  /**
-   * SDK ConversationItem.lastMessage.body 为 Record<string, unknown>，
-   * 实际运行时包含 content/msg 等字段。
-   * @see SDK_DEFICIENCY: lastMessage.body 未提供具体的消息体联合类型。
-   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const body = (lastMsg?.body || {}) as Record<string, any>
-  /**
-   * @see SDK_DEFICIENCY: ConversationItem 未暴露 display、isMuted、remindType 字段。
-   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const itemAny = item as any
   return {
     id: item.conversationId,
     name: item.conversationId || itemAny.display?.displayName || '',
+    avatar: itemAny.display?.avatarUrl,
     lastMessage: body.content || body.msg || lastMsg?.type || '',
     lastMessageType: lastMsg?.type || '',
-    /** @see SDK_DEFICIENCY: ConversationItem.lastMessage 未暴露 from 字段 */
     lastMessageSender: (lastMsg as any)?.from || '',
     lastMessageTime: lastMsg?.timestamp || 0,
     unreadCount: item.unreadCount || 0,
@@ -48,6 +69,7 @@ function mapServerConversation(item: SdkConversationItem): Conversation {
     avatarUrl: itemAny.display?.avatarUrl,
     remindType: itemAny.remindType,
     marks: [...item.marks] as number[],
+    readReceipt: itemAny.readReceipt || 0,
   }
 }
 
@@ -99,6 +121,16 @@ export function useConversation() {
    * - 传入 `force: true` 可强制拉取（下拉刷新 / 业务主动刷新场景）。
    * - `append: true` 在加载更多场景使用，不受该短路逻辑影响。
    */
+  /**
+   * 获取会话列表（SDK 5.x WebSocket 驱动）。
+   *
+   * 策略：
+   * - 首次加载：优先调用 getSessionList() 读取 WebSocket 同步的本地内存数据。
+   *   如果本地无数据（同步尚未完成），fallback 到 REST getConversationList。
+   * - 加载更多（append）：走 REST getConversationList 分页。
+   * - force 刷新：触发 refreshSessionList() 强制服务端重新同步，
+   *   同步完成后由 onConversationListSyncDidFinish 事件自动填充 store。
+   */
   async function fetchServerConversations(options?: {
     pageSize?: number
     cursor?: string
@@ -108,30 +140,72 @@ export function useConversation() {
     force?: boolean
   }) {
     const isLoadMore = !!options?.append
-    // 非加载更多且未强制时，若已加载过则直接复用 store 数据
-    if (!isLoadMore && !options?.force && conversationStore.conversationsLoaded) {
+    const isForceRefresh = !!options?.force
+    console.log('[useConversation] fetchServerConversations called', {
+      isLoadMore,
+      isForceRefresh,
+      conversationsLoaded: conversationStore.conversationsLoaded,
+      clientExists: !!client.value,
+    })
+
+    // ===== 加载更多：走 REST 分页 =====
+    if (isLoadMore) {
+      console.log('[useConversation] loadMore mode -> REST getConversationList')
+      const res = await client.value?.getServerConversations(options)
+      const page = res as SdkConversationPage
+      const list = page?.items || []
+      const mapped: Conversation[] = list.map(mapConversationItem)
+      mapped.forEach((cvs) => conversationStore.addConversation(cvs))
+      conversationStore.setConversationCursor(page?.cursor || null)
+      return page
+    }
+
+    // ===== 强制刷新：触发 WebSocket 重新同步 =====
+    if (isForceRefresh) {
+      console.log('[useConversation] force refresh -> calling refreshSessionList')
+      await client.value?.refreshSessionList({
+        needEmptySession: options?.includeEmptyConversations ?? false,
+      })
+      // refreshSessionList 会触发 onConversationListSyncDidStart/Finish，
+      // 在 Finish 回调中会调用 getSessionList 填充 store，此处无需额外处理。
       return null
     }
 
+    // ===== 首次加载：优先读本地 SessionList =====
+    if (!isLoadMore && !isForceRefresh && conversationStore.conversationsLoaded) {
+      console.log('[useConversation] skipped: conversationsLoaded is true')
+      return null
+    }
+
+    console.log('[useConversation] first load -> try getSessionList')
+    const sessionList = client.value?.getSessionList()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessions = sessionList as any[]
+    if (sessions && sessions.length > 0) {
+      console.log('[useConversation] getSessionList hit', { count: sessions.length })
+      const mapped = sessions.map(mapSessionItem)
+      conversationStore.setConversationList(mapped)
+      conversationStore.setConversationsLoaded(true)
+      // SessionList 不支持分页游标，标记为无更多
+      conversationStore.setConversationCursor(null)
+      return { items: sessions, cursor: '', hasMore: false }
+    }
+
+    // ===== Fallback：本地无数据，走 REST =====
+    console.log('[useConversation] getSessionList empty -> fallback to REST')
     const res = await client.value?.getServerConversations(options)
     const page = res as SdkConversationPage
     const list = page?.items || []
-    const mapped = list.map(mapServerConversation)
-
-    if (isLoadMore) {
-      mapped.forEach((cvs) => conversationStore.addConversation(cvs))
-    } else {
-      conversationStore.setConversationList(mapped)
-      conversationStore.setConversationsLoaded(true)
-    }
-
+    const mapped: Conversation[] = list.map(mapConversationItem)
+    conversationStore.setConversationList(mapped)
+    conversationStore.setConversationsLoaded(true)
     conversationStore.setConversationCursor(page?.cursor || null)
     return page
   }
 
   /**
-   * 强制从服务端重新拉取会话列表（跳过本地缓存短路）。
-   * 适用于业务侧"下拉刷新 / 手动刷新"等需要明确拿最新数据的场景。
+   * 强制刷新会话列表。
+   * 触发 WebSocket 重新同步，同步完成后由事件回调自动更新 store。
    */
   async function refreshConversations(options?: {
     pageSize?: number
@@ -140,7 +214,7 @@ export function useConversation() {
     return fetchServerConversations({ ...options, force: true })
   }
 
-  /** 加载更多会话 */
+  /** 加载更多会话（REST 分页） */
   async function loadMoreConversations(pageSize?: number) {
     if (loadingMore.value || !hasMore.value) return
     loadingMore.value = true

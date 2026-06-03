@@ -3,12 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useUIKit } from './use-uikit'
 import { createClient } from '../sdk/client'
 import type { ClientConfig } from '../sdk/types'
-import { CONVERSATION_TYPE } from '../constants'
 import { clearAllDrafts } from './use-conversation'
-import type { ChatManager } from 'im-sdk-web'
-
-/** SDK ConversationPage 类型提取 */
-type SdkConversationPage = Awaited<ReturnType<ChatManager['getConversationList']>>
 
 export function useClient() {
   const { stores } = useUIKit()
@@ -27,31 +22,6 @@ export function useClient() {
     return instance
   }
 
-  /** 登录成功后获取会话列表 */
-  async function fetchConversationsAfterLogin() {
-    try {
-      const res = await client.value?.getServerConversations({ pageSize: 50 })
-      const page = res as SdkConversationPage
-      const list = page?.items || []
-      const mapped = list.map((item) => {
-        const lastMsg = item.lastMessage
-        return {
-          id: item.conversationId,
-          name: item.conversationId,
-          lastMessage: (lastMsg?.body && typeof lastMsg.body === 'object' ? String((lastMsg.body as Record<string, unknown>).content || '') : ''),
-          lastMessageTime: lastMsg?.timestamp || 0,
-          unreadCount: item.unreadCount || 0,
-          type: (item.conversationType === CONVERSATION_TYPE.GROUPCHAT ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT) as typeof CONVERSATION_TYPE.SINGLECHAT | typeof CONVERSATION_TYPE.GROUPCHAT,
-          isPinned: item.isPinned || false,
-          pinnedTime: item.pinnedTime || 0,
-        }
-      })
-      conversationStore.setConversationList(mapped)
-    } catch (error) {
-      console.error('[UIKit] fetch conversations failed:', error)
-    }
-  }
-
   return {
     client,
     connected,
@@ -64,8 +34,9 @@ export function useClient() {
     login: async (params: { user: string; accessToken?: string; password?: string }) => {
       const result = await client.value?.login(params)
       clientStore.setCurrentUser(params.user)
-      // 登录成功后自动拉取服务端会话列表
-      await fetchConversationsAfterLogin()
+      // SDK 5.x: 登录后会自动触发 WebSocket 会话同步，
+      // 通过 onConversationListSyncDidStart/Finish 事件驱动，
+      // 不再手动调用 REST 接口拉取。
       return result
     },
     /** 登出 */

@@ -62,6 +62,9 @@ const { stores } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 
+/** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
+const isSyncing = computed(() => stores.conversation.isSyncingConversations)
+
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
 /** 规范化后的搜索关键字（去空格），用于过滤和空状态判断 */
@@ -253,10 +256,15 @@ function confirmDelete() {
         @delete="handleDelete"
         @read="sendChannelAck"
       />
+      <!-- 会话列表同步中（WebSocket 首次同步） -->
+      <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__syncing">
+        <Icon name="actions/loading_circle" :size="20" class="conversation-list__syncing-icon" />
+        <span>{{ t('conversation.syncing') }}</span>
+      </div>
       <div v-if="loadingMore" class="conversation-list__loading">
         {{ t('conversation.loadingMore') }}
       </div>
-      <div v-if="!filteredConversationList.length && !loadingMore" class="conversation-list__empty">
+      <div v-if="!filteredConversationList.length && !loadingMore && !isSyncing" class="conversation-list__empty">
         <slot name="empty" :search-keyword="normalizedSearchKeyword">
           <span>{{ props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty')) }}</span>
         </slot>
@@ -404,6 +412,30 @@ function confirmDelete() {
   text-align: center;
   font-size: 13px;
   color: var(--uikit-text-secondary);
+}
+
+.conversation-list__syncing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+}
+
+.conversation-list__syncing-icon {
+  animation: conversation-list-spin 1s linear infinite;
+}
+
+@keyframes conversation-list-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .conversation-list__empty {
