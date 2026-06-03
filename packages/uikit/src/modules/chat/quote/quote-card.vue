@@ -18,11 +18,11 @@ const emit = defineEmits<QuoteCardEmits>()
 /** 非文本类型的预览前缀图标，用于直观区分引用消息类型 */
 const typeIcon = computed(() => {
   switch (props.quote.msgType) {
-    case 'img': return '🖼'
+    case 'image': return '🖼'
     case 'video': return '🎬'
-    case 'audio': return '🎙'
+    case 'voice': return '🎙'
     case 'file': return '📎'
-    case 'loc': return '📍'
+    case 'location': return '📍'
     case 'custom': return '📦'
     case 'cmd': return '⚡'
     default: return ''

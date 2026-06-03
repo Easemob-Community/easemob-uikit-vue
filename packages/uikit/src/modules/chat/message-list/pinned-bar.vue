@@ -5,7 +5,7 @@ import { useChat } from '../../../composables/use-chat'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useLocale } from '../../../locale'
 import type { Message } from '../../../store/message'
-import type { EasemobChat } from 'easemob-websdk'
+
 
 export interface PinnedBarProps {
   /** 预览文本最大长度 */
@@ -44,12 +44,12 @@ const currentItem = computed(() => pinnedList.value[cursor.value] || pinnedList.
 /** 单条预览文本（直接复用 locale 中已带方括号的预览文案，避免再拼接） */
 function previewOf(msg: Message): string {
   const max = props.maxPreviewLength
-  if (msg.type === 'txt') {
-    const text = (msg as EasemobChat.TextMsgBody).msg || ''
-    return text.length > max ? text.slice(0, max) + '\u2026' : text
+  if (msg.type === 'text') {
+    const text = msg.content || ''
+    return text.length > max ? text.slice(0, max) + '…' : text
   }
-  if (msg.type === 'img') return t('message.image') || '[图片]'
-  if (msg.type === 'audio') return t('message.audio') || '[语音]'
+  if (msg.type === 'image') return t('message.image') || '[图片]'
+  if (msg.type === 'voice') return t('message.audio') || '[语音]'
   if (msg.type === 'video') return t('message.video') || '[视频]'
   if (msg.type === 'file') return t('message.file') || '[文件]'
   return t('message.custom') || '[消息]'

@@ -5,6 +5,10 @@ import { createClient } from '../sdk/client'
 import type { ClientConfig } from '../sdk/types'
 import { CONVERSATION_TYPE } from '../constants'
 import { clearAllDrafts } from './use-conversation'
+import type { ChatManager } from 'im-sdk-web'
+
+/** SDK ConversationPage 类型提取 */
+type SdkConversationPage = Awaited<ReturnType<ChatManager['getConversationList']>>
 
 export function useClient() {
   const { stores } = useUIKit()
@@ -27,15 +31,16 @@ export function useClient() {
   async function fetchConversationsAfterLogin() {
     try {
       const res = await client.value?.getServerConversations({ pageSize: 50 })
-      const list: any[] = res?.data?.conversations || []
-      const mapped = list.map((item: any) => {
-        const lastMsg = item.lastMessage || {}
+      const page = res as SdkConversationPage
+      const list = page?.items || []
+      const mapped = list.map((item) => {
+        const lastMsg = item.lastMessage
         return {
           id: item.conversationId,
           name: item.conversationId,
-          lastMessage: lastMsg.msg || lastMsg.type || '',
-          lastMessageTime: lastMsg.time || 0,
-          unreadCount: item.unReadCount || 0,
+          lastMessage: (lastMsg?.body && typeof lastMsg.body === 'object' ? String((lastMsg.body as Record<string, unknown>).content || '') : ''),
+          lastMessageTime: lastMsg?.timestamp || 0,
+          unreadCount: item.unreadCount || 0,
           type: (item.conversationType === CONVERSATION_TYPE.GROUPCHAT ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT) as typeof CONVERSATION_TYPE.SINGLECHAT | typeof CONVERSATION_TYPE.GROUPCHAT,
           isPinned: item.isPinned || false,
           pinnedTime: item.pinnedTime || 0,
@@ -53,8 +58,8 @@ export function useClient() {
     isLoggedIn,
     currentUser,
     init,
-    /** 原始 SDK Connection 实例 */
-    connection: computed(() => client.value?.connection ?? null),
+    /** 原始 SDK ChatClient 实例 */
+    sdkClient: computed(() => client.value?.client ?? null),
     /** 登录（支持 accessToken 或密码） */
     login: async (params: { user: string; accessToken?: string; password?: string }) => {
       const result = await client.value?.login(params)

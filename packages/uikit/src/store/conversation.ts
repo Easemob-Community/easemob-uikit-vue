@@ -7,7 +7,7 @@ export interface Conversation {
   name: string
   avatar?: string
   lastMessage?: string
-  /** 最后一条消息类型（对齐 SDK MessageType: txt/img/audio/video/file/cmd/custom/loc） */
+  /** 最后一条消息类型（对齐 SDK MessageType: text/image/voice/video/file/cmd/custom/location） */
   lastMessageType?: string
   /** 最后一条消息发送者名称（群聊场景） */
   lastMessageSender?: string
@@ -24,6 +24,14 @@ export interface Conversation {
   draft?: string
   /** 草稿保存时间戳 */
   draftTime?: number
+  /** 显示名称（来自服务端 display） */
+  displayName?: string
+  /** 头像 URL（来自服务端 display） */
+  avatarUrl?: string
+  /** 提醒类型 */
+  remindType?: string
+  /** 会话标记 */
+  marks?: number[]
 }
 
 export const useConversationStore = defineStore('conversation', () => {

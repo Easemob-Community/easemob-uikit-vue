@@ -12,6 +12,7 @@ import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receip
 import Modal from '../../../components/modal/modal.vue'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import type { Message } from '../../../store/message'
+import type { GroupMessageReadUsersResult } from 'im-sdk-web'
 import { useToast } from '../../../composables/use-toast'
 
 export interface MessageListProps {
@@ -245,7 +246,7 @@ async function onMessageAction(event: MessageActionEvent) {
   }
   if (event.action === 'recall') {
     try {
-      await recallMessage(event.message.mid || event.message.id)
+      await recallMessage(event.message.serverId || event.message.id)
     } catch (e) {
       emit('recall-failed', e, event.message)
     }
@@ -270,7 +271,7 @@ async function onMessageAction(event: MessageActionEvent) {
   }
   if (event.action === 'edit') {
     // 编辑：向上层 emit 'edit'，chat.vue 负责进入编辑模式并回填输入框
-    if (event.message.type === 'txt' && !event.message.recalled) {
+    if (event.message.type === 'text' && !event.message.recalled) {
       emit('edit', event.message)
     }
     return
@@ -278,28 +279,28 @@ async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'pin') {
     try {
       await pinMessage(event.message)
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.warn('[MessageList] pinMessage failed:', e)
-      showToast(e?.message || t('message.action.pin') || '置顶失败')
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败')
     }
     return
   }
   if (event.action === 'unpin') {
     try {
       await unpinMessage(event.message)
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.warn('[MessageList] unpinMessage failed:', e)
-      showToast(e?.message || t('message.action.unpin') || '取消置顶失败')
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败')
     }
     return
   }
   if (event.action === 'translate') {
-    if (event.message.type !== 'txt') return
+    if (event.message.type !== 'text') return
     try {
       await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.warn('[MessageList] translateTextMessage failed:', e)
-      showToast(e?.message || t('message.action.translate') || '翻译失败')
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.translate') || '翻译失败')
     }
     return
   }
@@ -313,7 +314,7 @@ function onToggleTranslation(message: Message) {
 
 /** 通过 VueUse useClipboard 复制消息文本 */
 async function handleCopyMessage(message: Message) {
-  const text = message.type === 'txt' && 'msg' in message ? String((message as unknown as { msg: string }).msg ?? '') : ''
+  const text = message.type === 'text' && 'content' in message ? String((message as unknown as { content: string }).content ?? '') : ''
   if (!text) {
     showToast(t('message.copyFailed') ?? '复制失败')
     return
@@ -339,20 +340,19 @@ function onReedit(message: Message) {
 async function onResend(message: Message) {
   try {
     await resendMessage(message)
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.warn('[MessageList] resend failed:', e)
-    showToast(e?.message || t('message.resend.failed') || '重发失败')
+    showToast(e instanceof Error ? e.message : String(e) || t('message.resend.failed') || '重发失败')
   }
 }
 
 /** 处理群已读点击 */
 async function onGroupReadClick(msgId: string, groupId: string) {
   try {
-    const result = await fetchGroupReadDetail(msgId, groupId)
-    const data = result.data
-    // SDK 返回 userlist 为已读用户列表，未读用户需用群成员总数减去已读列表推算
-    const readUsers = (data?.userlist as string[]) || []
-    const totalRead = data?.total || readUsers.length
+    const result: GroupMessageReadUsersResult = await fetchGroupReadDetail(msgId, groupId)
+    // SDK 返回 users 为已读用户列表，每个 GroupMessageReadUser 包含 userId
+    const readUsers = result?.users?.map((u) => u.userId) || []
+    const totalRead = result?.count || readUsers.length
     // 未读用户列表：当前无法直接从 SDK 获取，需业务层维护群成员列表后做差集
     // 此处先展示已读列表，未读列表留空（或后续接入群成员全量列表后补充）
     modalReadList.value = readUsers
@@ -418,7 +418,7 @@ let highlightTimer: ReturnType<typeof setTimeout> | null = null
 /** 定位并闪烁原消息；id 优先匹配 mid，其次 id；未找到返回 false */
 function locateAndFlash(targetMsgID: string): boolean {
   if (!targetMsgID) return false
-  const targetIndex = messages.value.findIndex(m => m.mid === targetMsgID || m.id === targetMsgID)
+  const targetIndex = messages.value.findIndex(m => m.serverId === targetMsgID || m.id === targetMsgID)
   if (targetIndex === -1) return false
   // 虚拟列表：先通过索引滚动使原消息被渲染，再在下一帧查找 DOM 进行平滑居中
   const useVirtual = enableVirtual.value

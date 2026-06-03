@@ -154,7 +154,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'txt', msg: text })
+  const canSend = await runBeforeSend({ type: 'text', content: text })
   if (!canSend) return
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
     .then((msg) => {
@@ -193,7 +193,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'txt', msg: text })
+  const canSend = await runBeforeSend({ type: 'text', content: text })
   if (!canSend) return
   sendTextMessage(text, ext, groupReadReceiptConfig.value)
     .then((msg) => {
@@ -218,7 +218,7 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
   const ext = buildExtWithQuote()
 
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: type === 'image' ? 'img' : type })
+  const canSend = await runBeforeSend({ type: type === 'image' ? 'image' : type })
   if (!canSend) return
 
   let promise: Promise<any> | undefined
@@ -377,7 +377,7 @@ function handleVoiceEnd(durationFromInput?: number) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
       const ext = buildExtWithQuote()
       // beforeSend 拦截
-      const canSend = await runBeforeSend({ type: 'audio' })
+      const canSend = await runBeforeSend({ type: 'voice' })
       if (!canSend) {
         clearQuote()
         return

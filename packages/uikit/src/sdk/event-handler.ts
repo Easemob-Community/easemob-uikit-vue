@@ -1,6 +1,5 @@
 import type { UIKitClient } from './client'
 import { getClient } from './client'
-import type { EasemobChat } from 'easemob-websdk'
 import { useMessageStore } from '../store/message'
 import { useClientStore } from '../store/client'
 import { useConversationStore } from '../store/conversation'
@@ -10,6 +9,13 @@ import { usePresenceStore, type PresenceStatus } from '../store/presence'
 import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../constants'
 import type { Message } from '../store/message'
 import type { ConversationTypeValue } from '../constants'
+import type {
+  ConnectionEventHandlerMap,
+  ChatEventHandlerMap,
+  ContactEventHandlerMap,
+  GroupEventHandlerMap,
+  PresenceEventHandlerMap,
+} from 'im-sdk-web'
 
 export interface RootStores {
   message: ReturnType<typeof useMessageStore>
@@ -33,16 +39,25 @@ export interface EventHandlerOptions {
 }
 
 /**
- * SDK 内容消息共有的基础字段（用于 resolveConversationId）
- * 等价于 ExcludeAckMessageBody 各变体的公共字段
+ * 新 SDK Message 基础字段（WebSocket 层原始消息结构）
  */
 interface SdkMsgBase {
-  id: string
+  msgServerId?: string
+  id?: string
   from?: string
   to?: string
+  timestamp?: number
   time?: number
-  chatType?: EasemobChat.ChatType
-  ext?: { [key: string]: any }
+  conversationType?: 'singleChat' | 'groupChat'
+  chatType?: string
+  ext?: { [key: string]: unknown }
+  /**
+   * @see SDK_DEFICIENCY: MessageBody 联合类型未从 im-sdk-web 主入口导出，
+   * 无法在编译期约束 body 的精确类型。
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any
+  type?: string
 }
 
 /**
@@ -51,8 +66,109 @@ interface SdkMsgBase {
  * - 单聊：取对方 ID（msg.from === 当前用户 ? msg.to : msg.from）
  */
 function resolveConversationId(msg: SdkMsgBase, currentUser: string): string {
-  const isGroup = msg.chatType === 'groupChat'
+  const isGroup = msg.conversationType === 'groupChat' || msg.chatType === 'groupChat'
   return (isGroup ? msg.to : (msg.from === currentUser ? msg.to : msg.from)) || ''
+}
+
+/**
+ * 从 SDK Message body 中提取 lastMessageText
+ */
+function getLastMessageText(sdkMsg: SdkMsgBase): string {
+  switch (sdkMsg.type) {
+    case 'text':
+      return sdkMsg.body?.content || ''
+    case 'image':
+      return '[图片]'
+    case 'voice':
+      return '[语音]'
+    case 'video':
+      return '[视频]'
+    case 'file':
+      return '[文件]'
+    case 'location':
+      return '[位置]'
+    case 'combine':
+      return sdkMsg.body?.summary || '[聊天记录]'
+    case 'cmd':
+      return '[命令]'
+    case 'custom':
+      return '[自定义]'
+    default:
+      return ''
+  }
+}
+
+/**
+ * 将新 SDK Message 转换为 UI Message
+ */
+function convertSdkMessageToUiMessage(sdkMsg: SdkMsgBase, currentUser: string): Message {
+  const isGroup = sdkMsg.conversationType === 'groupChat' || sdkMsg.chatType === 'groupChat'
+  const chatType: ConversationTypeValue = isGroup ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT
+  const conversationId = resolveConversationId(sdkMsg, currentUser)
+
+  // 解析 allowGroupAck
+  /**
+   * @see SDK_DEFICIENCY: SDK Message 类型未暴露 msgConfig 字段，
+   * 但 WebSocket 层实际下发该字段用于群已读回执标记。
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const msgConfigAllowGroupAck = (sdkMsg as any).msgConfig?.allowGroupAck
+  const extMsgConfigAllowGroupAck = sdkMsg.ext
+    && typeof sdkMsg.ext === 'object'
+    && sdkMsg.ext.msgConfig
+    && typeof sdkMsg.ext.msgConfig === 'object'
+    && (sdkMsg.ext.msgConfig as Record<string, unknown>).allowGroupAck
+  const requireGroupAck = !!(msgConfigAllowGroupAck || extMsgConfigAllowGroupAck)
+
+  const body = sdkMsg.body || {}
+
+  const uiMsg: Message = {
+    // 身份
+    id: sdkMsg.id || sdkMsg.msgServerId || '',
+    serverId: sdkMsg.msgServerId || sdkMsg.id || '',
+    // 会话
+    from: sdkMsg.from || '',
+    to: sdkMsg.to || '',
+    conversationType: chatType,
+    // 时间
+    timestamp: sdkMsg.timestamp || sdkMsg.time || Date.now(),
+    // 类型
+    type: (sdkMsg.type || 'text') as Message['type'],
+    // 扩展
+    ext: sdkMsg.ext,
+    // 文本消息
+    content: body.content,
+    // 媒体消息
+    url: body.url || body.originalImageUrl,
+    thumbnailUrl: body.thumbnailUrl,
+    secret: body.secret,
+    filename: body.filename,
+    fileSize: body.fileSize,
+    duration: body.duration,
+    width: body.width,
+    height: body.height,
+    // 位置消息
+    latitude: body.latitude,
+    longitude: body.longitude,
+    address: body.address,
+    // 自定义消息
+    customEvent: body.customEvent,
+    customExts: body.customExts,
+    // 合并消息
+    title: body.title,
+    summary: body.summary,
+    compatibleText: body.compatibleText,
+    messageList: body.messageList,
+    // 命令消息
+    action: body.action,
+    // UI 扩展
+    conversationId,
+    isSelf: false,
+    status: MESSAGE_STATUS.SENT,
+    requireGroupAck: requireGroupAck || undefined,
+  }
+
+  return uiMsg
 }
 
 export function createEventHandler(client: UIKitClient, stores: RootStores, options: EventHandlerOptions = {}) {
@@ -70,53 +186,32 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
 
   /**
    * 公共处理逻辑：将 SDK 消息写入 messageStore 并更新会话列表
-   * 直接展开 SDK 消息的所有原生字段 + 追加 UI 扩展字段，不做 body 映射
    */
-  function handleIncomingMessage(
-    msg: EasemobChat.ExcludeAckMessageBody,
-    lastMessageText: string,
-  ) {
+  function handleIncomingMessage(sdkMsg: SdkMsgBase) {
     const currentUser = stores.client.currentUser
-    const isGroup = msg.chatType === 'groupChat'
-    const chatType: ConversationTypeValue = isGroup ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT
-    const conversationId = resolveConversationId(msg, currentUser)
+    const isGroup = sdkMsg.conversationType === 'groupChat' || sdkMsg.chatType === 'groupChat'
+    const conversationId = resolveConversationId(sdkMsg, currentUser)
+    const lastMessageText = getLastMessageText(sdkMsg)
 
-    // 解析 allowGroupAck：优先取 msgConfig，其次取 ext.msgConfig
-    const msgConfigAllowGroupAck = (msg as EasemobChat.ExcludeAckMessageBody & { msgConfig?: { allowGroupAck?: boolean } }).msgConfig?.allowGroupAck
-    const extMsgConfigAllowGroupAck = msg.ext
-      && typeof msg.ext === 'object'
-      && msg.ext.msgConfig
-      && typeof msg.ext.msgConfig === 'object'
-      && (msg.ext.msgConfig as Record<string, unknown>).allowGroupAck
-    const requireGroupAck = !!(msgConfigAllowGroupAck || extMsgConfigAllowGroupAck)
-
-    // 直接展开 SDK 原生字段，追加 UI 扩展字段
-    const uiMsg: Message = {
-      ...msg,
-      conversationId,
-      isSelf: false,
-      status: MESSAGE_STATUS.SENT,
-      timestamp: msg.time || Date.now(),
-      requireGroupAck: requireGroupAck || undefined,
-    } as Message
+    const uiMsg = convertSdkMessageToUiMessage(sdkMsg, currentUser)
 
     stores.message.addMessage(uiMsg)
 
     // 更新会话列表
     stores.conversation.addConversation({
       id: conversationId,
-      name: isGroup ? (msg.to || '') : (msg.from || ''),
+      name: isGroup ? (sdkMsg.to || '') : (sdkMsg.from || ''),
       lastMessage: lastMessageText,
-      lastMessageTime: msg.time || Date.now(),
-      lastMessageType: msg.type as ConversationTypeValue,
-      lastMessageSender: msg.from || '',
-      type: chatType,
+      lastMessageTime: sdkMsg.timestamp || sdkMsg.time || Date.now(),
+      lastMessageType: (sdkMsg.type || 'text') as ConversationTypeValue,
+      lastMessageSender: sdkMsg.from || '',
+      type: uiMsg.conversationType,
     })
 
     // 检测是否@我（仅群聊场景，且非自己发送的消息）
-    if (isGroup && msg.from !== currentUser && isAtMe(msg, currentUser)) {
+    if (isGroup && sdkMsg.from !== currentUser && isAtMe(sdkMsg, currentUser)) {
       stores.conversation.setAtMe(conversationId, true)
-      stores.message.addAtMeMessage(conversationId, msg.id)
+      stores.message.addAtMeMessage(conversationId, uiMsg.id)
     }
 
     // 非当前会话的消息增加未读数
@@ -128,158 +223,29 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
       }
     } else {
       // 当前会话的消息：自动发送已读回执
-      const client = getClient()
-      if (client) {
+      const clientInstance = getClient()
+      if (clientInstance) {
         // 单聊：自动发消息已读回执
-        if (!isGroup) {
-          client.sendReadAck({ chatType, to: conversationId, msgId: msg.id })
-            .catch((e: unknown) => console.warn('[EventHandler] sendReadAck failed:', e))
+        if (!isGroup && uiMsg.serverId) {
+          clientInstance.sendMessageReadAck({
+            conversationId,
+            conversationType: uiMsg.conversationType,
+            messageId: uiMsg.serverId,
+          }).catch((e: unknown) => console.warn('[EventHandler] sendMessageReadAck failed:', e))
         }
         // 群已读回执：若消息携带 allowGroupAck，自动回复
-        if (requireGroupAck && isGroup) {
-          client.sendGroupReadAck({
-            to: msg.to || conversationId,
-            msgId: msg.id,
-          }).catch((e: unknown) => console.warn('[EventHandler] sendGroupReadAck failed:', e))
+        if (uiMsg.requireGroupAck && isGroup) {
+          clientInstance.sendGroupMessageReadAck({
+            groupId: sdkMsg.to || conversationId,
+            messageId: uiMsg.serverId,
+          }).catch((e: unknown) => console.warn('[EventHandler] sendGroupMessageReadAck failed:', e))
         }
       }
     }
   }
 
-  const handler: EasemobChat.EventHandlerType & { onCombineMessage?: (msg: EasemobChat.CombineMsgBody) => void } = {
-    onTextMessage: (msg: EasemobChat.TextMsgBody) => {
-      handleIncomingMessage(msg, msg.msg || '')
-    },
-
-    onImageMessage: (msg: EasemobChat.ImgMsgBody) => {
-      handleIncomingMessage(msg, '[图片]')
-    },
-
-    onAudioMessage: (msg: EasemobChat.AudioMsgBody) => {
-      handleIncomingMessage(msg, '[语音]')
-    },
-
-    onVideoMessage: (msg: EasemobChat.VideoMsgBody) => {
-      handleIncomingMessage(msg, '[视频]')
-    },
-
-    onFileMessage: (msg: EasemobChat.FileMsgBody) => {
-      handleIncomingMessage(msg, '[文件]')
-    },
-
-    onCombineMessage: (msg: EasemobChat.CombineMsgBody) => {
-      handleIncomingMessage(msg, msg.summary || '[聊天记录]')
-    },
-
-    /** 消息撤回：更新本地消息为撤回状态 */
-    onRecallMessage: (msg: EasemobChat.RecallMsgBody) => {
-      const msgId = msg.mid || msg.id
-      if (msgId) {
-        stores.message.recallMessage(msgId, msg.from || '')
-      }
-    },
-
-    /** 送达回执：对方已收到消息，更新本地消息状态为 delivered */
-    onDeliveredMessage: (msg: EasemobChat.DeliveryMsgBody) => {
-      const msgId = msg.ackId || msg.mid || msg.id
-      if (msgId) {
-        stores.message.updateMessageStatus(msgId, MESSAGE_STATUS.DELIVERED)
-      }
-    },
-
-    /** 会话已读回执：对方已读，将本地对应会话未读数置为 0 */
-    onChannelMessage: (msg: EasemobChat.ChannelMsgBody) => {
-      const conversationId = msg.from || msg.to
-      if (conversationId) {
-        stores.conversation.updateUnreadCount(conversationId, 0)
-      }
-    },
-
-    /** 消息已读回执：单聊更新消息状态为 READ，群聊更新 groupReadCount */
-    onReadMessage: (msg: EasemobChat.ReadMsgBody) => {
-      const msgId = msg.mid || msg.ackId || msg.id
-      if (!msgId) return
-
-      // 群已读回执：更新 groupReadCount
-      if (msg.groupReadCount && msg.mid) {
-        const readCount = msg.groupReadCount[msg.mid]
-        if (readCount !== undefined) {
-          stores.message.updateMessageById(msgId, { groupReadCount: readCount })
-        }
-        return
-      }
-
-      // 单聊已读回执：更新消息状态为 READ
-      stores.message.updateMessageStatus(msgId, MESSAGE_STATUS.READ)
-    },
-
-    /** 离线群已读回执：登录后批量接收 */
-    onStatisticMessage: (msg: EasemobChat.CmdMsgBody) => {
-      try {
-        const location = (msg as EasemobChat.CmdMsgBody & { location?: string }).location
-        if (!location) return
-        const statisticMsg = JSON.parse(location)
-        const groupAck: Array<{ msgId: string; readCount: number }> = statisticMsg?.group_ack || []
-        for (const ack of groupAck) {
-          if (ack.msgId) {
-            stores.message.updateMessageById(ack.msgId, {
-              groupReadCount: ack.readCount,
-            })
-          }
-        }
-      } catch (e) {
-        console.warn('[EventHandler] onStatisticMessage parse failed:', e)
-      }
-    },
-
-    /** 消息被编辑：用 SDK 返回的最新消息体覆盖本地，标记 modified */
-    onModifiedMessage: (msg: EasemobChat.ModifiedEventMessage) => {
-      const info = (msg as EasemobChat.ExcludeAckMessageBody & { modifiedInfo?: EasemobChat.ModifiedMsgInfo }).modifiedInfo
-      stores.message.applyModifiedMessage(msg, info && {
-        operatorId: info.operatorId,
-        operationCount: info.operationCount,
-        operationTime: info.operationTime,
-      })
-    },
-
-    /** 消息置顶/取消置顶事件：多端同步 */
-    onMessagePinEvent: (event: EasemobChat.MessagePinEvent) => {
-      if (!event || !event.messageId) return
-      if (event.operation === 'pin') {
-        stores.message.setMessagePinned(event.messageId, {
-          operatorId: event.operatorId || '',
-          pinTime: event.time || Date.now(),
-        })
-      } else if (event.operation === 'unpin') {
-        stores.message.setMessageUnpinned(event.messageId)
-      }
-    },
-
-    /** 命令消息：处理输入状态提示 */
-    onCmdMessage: (msg: EasemobChat.CmdMsgBody) => {
-      const action = msg.action
-      if (action === 'TypingBegin') {
-        const conversationId = msg.from || ''
-        if (conversationId) {
-          stores.conversation.setTyping(conversationId, true)
-        }
-      }
-    },
-
-    /** 多设备事件同步：置顶/取消置顶/删除会话 */
-    onMultiDeviceEvent: (event: EasemobChat.MultiDeviceEvent) => {
-      if ('operation' in event && 'conversationId' in event) {
-        const info = event as EasemobChat.ConversationChangedInfo
-        if (info.operation === 'pinnedConversation') {
-          stores.conversation.togglePin(info.conversationId, true, info.timestamp)
-        } else if (info.operation === 'unpinnedConversation') {
-          stores.conversation.togglePin(info.conversationId, false)
-        } else if (info.operation === 'deleteConversation') {
-          stores.conversation.deleteConversation(info.conversationId)
-        }
-      }
-    },
-
+  // ========== 连接事件处理器 ==========
+  const connHandler = {
     onConnected: () => {
       stores.client.setConnected(true)
     },
@@ -287,82 +253,163 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
       stores.client.setConnected(false)
       stores.client.setCurrentUser('')
     },
-    onError: (error) => {
-      console.error('[UIKit SDK Error]', error)
+    onTokenWillExpire: () => {
+      console.warn('[UIKit] Token will expire')
+    },
+    onTokenExpired: () => {
+      console.error('[UIKit] Token expired')
+    },
+  }
+
+  // ========== Chat 事件处理器 ==========
+  const chatHandler = {
+    /** 统一消息接收 */
+    onMessage: (messages: SdkMsgBase[]) => {
+      if (!Array.isArray(messages)) {
+        handleIncomingMessage(messages)
+        return
+      }
+      for (const msg of messages) {
+        handleIncomingMessage(msg)
+      }
+    },
+
+    /** 消息撤回 */
+    onMessageRecalled: (payload: { messageId: string; from?: string }) => {
+      if (payload.messageId) {
+        stores.message.recallMessage(payload.messageId, payload.from || '')
+      }
+    },
+
+    /** 送达回执 */
+    onMessageDelivered: (payload: { messageId: string }) => {
+      if (payload.messageId) {
+        stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.DELIVERED)
+      }
+    },
+
+    /** 消息已读回执 */
+    onMessageRead: (payload: { messageId: string; groupReadCount?: number }) => {
+      if (!payload.messageId) return
+
+      // 群已读回执
+      if (payload.groupReadCount !== undefined) {
+        stores.message.updateMessageById(payload.messageId, { groupReadCount: payload.groupReadCount })
+        return
+      }
+
+      // 单聊已读回执
+      stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.READ)
+    },
+
+    /** 会话已读回执 */
+    onConversationRead: (payload: { conversationId: string }) => {
+      if (payload.conversationId) {
+        stores.conversation.updateUnreadCount(payload.conversationId, 0)
+      }
+    },
+
+    /** 消息被编辑 */
+    onMessageUpdated: (payload: { messageId: string; message: SdkMsgBase }) => {
+      const currentUser = stores.client.currentUser
+      const uiMsg = convertSdkMessageToUiMessage(payload.message, currentUser)
+      stores.message.applyModifiedMessage(uiMsg)
+    },
+
+    /** 消息置顶/取消置顶事件 */
+    onPinnedMessageChanged: (payload: { messageId: string; operation: 'pin' | 'unpin'; operatorId?: string; time?: number }) => {
+      if (!payload || !payload.messageId) return
+      if (payload.operation === 'pin') {
+        stores.message.setMessagePinned(payload.messageId, {
+          operatorId: payload.operatorId || '',
+          pinTime: payload.time || Date.now(),
+        })
+      } else if (payload.operation === 'unpin') {
+        stores.message.setMessageUnpinned(payload.messageId)
+      }
+    },
+
+    /** 会话列表同步开始 */
+    onConversationListSyncDidStart: () => {
+      // 可选：设置同步状态
+    },
+
+    /** 会话列表同步完成 */
+    onConversationListSyncDidFinish: () => {
+      // 可选：清除同步状态
+    },
+
+    /** 会话实时更新 */
+    onConversationUpdate: (payload: SdkMsgBase & { conversationId?: string; unreadCount?: number }) => {
+      if (payload.conversationId) {
+        const currentUser = stores.client.currentUser
+        const lastMessageText = getLastMessageText(payload)
+        stores.conversation.addConversation({
+          id: payload.conversationId,
+          name: payload.from || '',
+          lastMessage: lastMessageText,
+          lastMessageTime: payload.timestamp || Date.now(),
+          lastMessageType: (payload.type || 'text') as ConversationTypeValue,
+          lastMessageSender: payload.from || '',
+          type: (payload.conversationType || 'singleChat') as ConversationTypeValue,
+          unreadCount: payload.unreadCount,
+        })
+      }
     },
   }
 
   // ========== 好友事件（可选） ==========
   if (options.enableContact) {
-    const contactHandler: Pick<
-      EasemobChat.EventHandlerType,
-      'onContactInvited' | 'onContactAgreed' | 'onContactRefuse' | 'onContactDeleted' | 'onContactAdded'
-    > = {
-      onContactInvited: (msg: EasemobChat.ContactMsgBody) => {
-        // 接收到好友邀请——业务层可通过自定义 hook 接管，默认不介入 store
+    const contactHandler = {
+      onContactInvited: (msg: { from?: string; to?: string; status?: string }) => {
         console.info('[UIKit] onContactInvited:', msg)
       },
-      onContactAgreed: (msg: EasemobChat.ContactMsgBody) => {
+      onContactAgreed: (msg: { from?: string }) => {
         const userId = msg.from
         if (!userId) return
         stores.contact.addContact({ userId, name: userId })
       },
-      onContactRefuse: (msg: EasemobChat.ContactMsgBody) => {
+      onContactRefuse: (msg: { from?: string }) => {
         console.info('[UIKit] onContactRefuse:', msg)
       },
-      onContactDeleted: (msg: EasemobChat.ContactMsgBody) => {
+      onContactDeleted: (msg: { from?: string }) => {
         const userId = msg.from
         if (userId) stores.contact.removeContact(userId)
       },
-      onContactAdded: (msg: EasemobChat.ContactMsgBody) => {
+      onContactAdded: (msg: { from?: string }) => {
         const userId = msg.from
         if (!userId) return
         stores.contact.addContact({ userId, name: userId })
       },
     }
-    Object.assign(handler, contactHandler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client.addContactEventHandler('uikit-contact', contactHandler as any)
   }
 
   // ========== 黑名单事件（可选） ==========
-  // 注：SDK 4.21.0 的 EventHandlerType 未公开 onBlockMsg，但运行时确实会回调，
-  // 这里基于 SDK 实际下发结构定义最小局部类型，避免使用 any。
   if (options.enableBlocklist) {
-    interface BlockMsgBody {
-      action: 'addUserToBlackList' | 'removeUserFromBlackList'
-      from?: string
-      to?: string
-      type?: string
-    }
-    const blockHandler: { onBlockMsg: (msg: BlockMsgBody) => void } = {
-      onBlockMsg: (msg: BlockMsgBody) => {
-        // SDK 黑名单事件路由在 onBlockMsg 中，action 区分 add/remove
-        const userId = msg.from
-        if (!userId) return
-        if (msg.action === 'addUserToBlackList') {
-          stores.contact.addToBlackList({ userId, name: userId })
-        } else if (msg.action === 'removeUserFromBlackList') {
-          stores.contact.removeFromBlackList(userId)
-        }
+    // 新 SDK 黑名单事件通过 contactManager 事件处理
+    const blockHandler = {
+      onContactInfoUpdated: (msg: { userId?: string; remark?: string }) => {
+        console.info('[UIKit] onContactInfoUpdated:', msg)
       },
     }
-    Object.assign(handler, blockHandler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client.addContactEventHandler('uikit-blocklist', blockHandler as any)
   }
 
   // ========== 在线状态事件（可选） ==========
   if (options.enablePresence) {
-    const presenceHandler: Pick<EasemobChat.EventHandlerType, 'onPresenceStatusChange'> = {
-      onPresenceStatusChange: (list: EasemobChat.PresenceType[]) => {
+    const presenceHandler = {
+      onPresenceStatusChange: (list: { userId?: string; ext?: string; statusDetails?: { status?: number | string }[] }[]) => {
         if (!Array.isArray(list)) return
         const mapped = list.map((item) => {
-          // SDK 返回结构：PresenceType { userId, ext, statusDetails: StatusDetailsType[{ device, status }] }
-          // statusDetails 中任一设备 status === 1 即视为在线（SDK 类型为 number，运行时也可能为字符串 '1'）
           const userId = item.userId || ''
-          const details: EasemobChat.StatusDetailsType[] = Array.isArray(item.statusDetails) ? item.statusDetails : []
+          const details = Array.isArray(item.statusDetails) ? item.statusDetails : []
           const isOnline = details.some((d) => Number(d?.status) === 1)
           const ext = item.ext || ''
           let status: PresenceStatus = isOnline ? 'online' : 'offline'
           if (ext) {
-            // 存在自定义描述时，优先识别为常见状态字面量
             const lower = ext.toLowerCase()
             if (lower.includes('away')) status = 'away'
             else if (lower.includes('busy')) status = 'busy'
@@ -373,12 +420,88 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
         stores.presence.updateBatch(mapped)
       },
     }
-    Object.assign(handler, presenceHandler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client.addEventHandler('uikit-presence', presenceHandler as any)
   }
 
-  client.addEventHandler('uikit', handler)
+  // ========== 群组事件（可选） ==========
+  if (options.enableGroup) {
+    /**
+     * @see SDK_DEFICIENCY: 群组事件 payload 中多数字段类型为 UserInfo，
+     * UIKit 当前仅处理 userId 字符串，存在类型不完全匹配。
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupHandler: GroupEventHandlerMap = {
+      onGroupInfoChanged: (payload: any) => {
+        stores.group.updateGroup(payload.groupId, {
+          groupName: payload.groupName,
+          description: payload.description,
+          avatar: payload.avatar,
+        })
+      },
+      onMembersJoined: (payload: any) => {
+        stores.group.incrementMemberCount(payload.groupId, payload.members.length)
+      },
+      onMembersExited: (payload: any) => {
+        stores.group.decrementMemberCount(payload.groupId, payload.members.length)
+      },
+      onOwnerChanged: (payload: any) => {
+        stores.group.updateGroup(payload.groupId, { owner: payload.newOwner })
+      },
+      onAdminAdded: (payload: any) => {
+        stores.group.markAdmin(payload.groupId, payload.admin)
+      },
+      onAdminRemoved: (payload: any) => {
+        stores.group.unmarkAdmin(payload.groupId, payload.admin)
+      },
+      onUserRemoved: (payload: any) => {
+        const currentUser = stores.client.currentUser
+        if (payload.userId === currentUser) {
+          stores.group.removeGroup(payload.groupId)
+        }
+      },
+      onGroupDestroyed: (payload: any) => {
+        stores.group.removeGroup(payload.groupId)
+      },
+      onAnnouncementChanged: (payload: any) => {
+        stores.group.updateGroup(payload.groupId, { announcement: payload.announcement })
+      },
+      onMuteListAdded: (payload: any) => {
+        stores.group.setMuted(payload.groupId, payload.members, true)
+      },
+      onMuteListRemoved: (payload: any) => {
+        stores.group.setMuted(payload.groupId, payload.members, false)
+      },
+      onAllMemberMuteStateChanged: (payload: any) => {
+        stores.group.updateGroup(payload.groupId, { mute: payload.allMuted })
+      },
+    }
+    client.addGroupEventHandler('uikit-group', groupHandler)
+  }
+
+  // 注册事件处理器
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client.addEventHandler('uikit-conn', connHandler as any)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client.addChatEventHandler('uikit-chat', chatHandler as any)
 
   return {
-    dispose: () => client.removeEventHandler('uikit'),
+    dispose: () => {
+      client.removeEventHandler('uikit-conn')
+      client.removeChatEventHandler('uikit-chat')
+      if (options.enableContact) {
+        client.removeContactEventHandler('uikit-contact')
+      }
+      if (options.enableBlocklist) {
+        client.removeContactEventHandler('uikit-blocklist')
+      }
+      if (options.enablePresence) {
+        client.removeEventHandler('uikit-presence')
+      }
+      if (options.enableGroup) {
+        client.removeGroupEventHandler('uikit-group')
+      }
+    },
   }
 }
+

@@ -127,7 +127,7 @@ const messageStatus = computed(() => props.message.status)
 const showGroupReadCount = computed(() =>
   props.message.isSelf
   && props.message.requireGroupAck
-  && props.message.chatType === CONVERSATION_TYPE.GROUPCHAT
+  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
 )
 
 /** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
@@ -147,7 +147,7 @@ const groupUnreadCount = computed(() =>
 
 /** 群已读标注点击 */
 function onGroupReadClick() {
-  if (props.message.chatType === CONVERSATION_TYPE.GROUPCHAT) {
+  if (props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
     emit('group-read-click', props.message.id, props.message.to || props.message.conversationId)
   }
 }
@@ -162,8 +162,8 @@ const quoteData = computed(() => {
     msgID: String(q.msgID || ''),
     msgPreview: String(q.msgPreview || ''),
     msgSender: String(q.msgSender || ''),
-    msgType: String(q.msgType || 'txt'),
-  } as { msgID: string; msgPreview: string; msgSender: string; msgType: 'txt' | 'img' | 'video' | 'file' | 'audio' | 'custom' | 'loc' | 'cmd' }
+    msgType: String(q.msgType || 'text'),
+  } as { msgID: string; msgPreview: string; msgSender: string; msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd' }
 })
 
 /** 点击引用卡片：触发定位/闪烁，列表端 watch locateRequest 处理 */
@@ -176,14 +176,14 @@ function onQuoteClick() {
 const isHighlighted = computed(() => {
   const target = highlightedMessageId.value
   if (!target) return false
-  return target === props.message.mid || target === props.message.id
+  return target === props.message.serverId || target === props.message.id
 })
 </script>
 
 <template>
   <div
     class="message-bubble-wrapper"
-    :data-msg-id="props.message.mid || props.message.id"
+    :data-msg-id="props.message.serverId || props.message.id"
     :class="{
       'message-bubble-wrapper--self': isSelfConversation,
       'message-bubble-wrapper--left': layout === 'left',
@@ -200,7 +200,7 @@ const isHighlighted = computed(() => {
         <span class="message-bubble-wrapper__recalled-text">{{ recalledText }}</span>
         <!-- 文本消息重新编辑按钮 -->
         <MessageRenderer
-          v-if="message.type === 'txt' && message.isSelf && message.originalMsg"
+          v-if="message.type === 'text' && message.isSelf && message.originalMsg"
           :message="message"
           @reedit="emit('reedit', $event)"
         />

@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { useContactStore } from '../store/contact'
 import type { Contact } from '../store/contact'
 import { useUIKit } from './use-uikit'
+import type { Contact as SdkContact } from 'im-sdk-web'
 
 /**
  * 列表 UI 状态：当前激活项 / 多选集合 / 搜索词
@@ -26,24 +27,22 @@ export function useContact() {
   const isAllMode = computed(() => features.contactFetchMode === 'all')
 
   /** 轻量获取好友总数（不拉取完整列表） */
-  async function fetchContactCount() {
+  function fetchContactCount() {
     try {
       if (client.value) {
-        const res = await client.value.getAllContacts()
-        const count = res.data?.length || 0
-        contactStore.setContactCount(count)
+        const res: ReadonlyArray<SdkContact> = client.value.getContacts()
+        contactStore.setContactCount(res.length)
       }
     } catch (e) {
       console.warn('[UIKit] fetch contact count failed:', e)
     }
   }
 
-  /** 全量拉取好友列表（getAllContacts） */
-  async function fetchAllContacts() {
+  /** 全量拉取好友列表（getContacts，同步返回内存中的联系人快照） */
+  function fetchAllContacts() {
     if (!client.value) return
-    const res = await client.value.getAllContacts()
-    const data = res.data || []
-    const list: Contact[] = data.map((item) => ({
+    const res: ReadonlyArray<SdkContact> = client.value.getContacts()
+    const list: Contact[] = res.map((item) => ({
       userId: item.userId,
       name: item.remark || item.userId,
       remark: item.remark,
@@ -63,15 +62,20 @@ export function useContact() {
       contactStore.setHasMore(!!res.hasMore)
       contactStore.setCursor(res.cursor || '')
     } else if (client.value) {
-      const res = await client.value.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
-      const contacts = res.data?.contacts || []
+      /**
+       * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法。
+       * SDK 仅提供 getContacts() 返回完整内存快照，无分页能力。
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res: any = await client.value.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
+      const contacts: Array<SdkContact> = res?.contacts || res?.items || []
       list = contacts.map((item) => ({
         userId: item.userId,
         name: item.remark || item.userId,
         remark: item.remark,
       }))
       contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
-      contactStore.setCursor(res.data?.cursor || '')
+      contactStore.setCursor(res?.cursor || '')
     }
     contactStore.setContactList(list)
   }
@@ -103,11 +107,15 @@ export function useContact() {
         contactStore.setHasMore(!!res.hasMore)
         contactStore.setCursor(res.cursor || '')
       } else if (client.value) {
-        const res = await client.value.getContactsWithCursor({
+        /**
+         * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法。
+         */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const res: any = await client.value.getContactsWithCursor({
           pageSize: CONTACT_PAGE_SIZE,
           cursor: contactStore.cursor,
         })
-        const contacts = res.data?.contacts || []
+        const contacts: Array<SdkContact> = res?.contacts || res?.items || []
         const list = contacts.map((item) => ({
           userId: item.userId,
           name: item.remark || item.userId,
@@ -115,7 +123,7 @@ export function useContact() {
         }))
         contactStore.appendContactList(list)
         contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
-        contactStore.setCursor(res.data?.cursor || '')
+        contactStore.setCursor(res?.cursor || '')
       }
     } catch (e) {
       console.warn('[UIKit] load more contacts failed:', e)

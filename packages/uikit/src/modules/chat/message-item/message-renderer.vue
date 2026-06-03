@@ -27,12 +27,12 @@ const emit = defineEmits<MessageRendererEmits>()
 
 /** 消息类型到组件的映射 */
 const messageComponentMap: Record<string, Component> = {
-  [MESSAGE_TYPE.TXT]: TextMessage,
-  [MESSAGE_TYPE.IMG]: ImageMessage,
-  [MESSAGE_TYPE.AUDIO]: VoiceMessage,
+  [MESSAGE_TYPE.TEXT]: TextMessage,
+  [MESSAGE_TYPE.IMAGE]: ImageMessage,
+  [MESSAGE_TYPE.VOICE]: VoiceMessage,
   [MESSAGE_TYPE.VIDEO]: VideoMessage,
   [MESSAGE_TYPE.FILE]: FileMessage,
-  combine: CombineMessage,
+  [MESSAGE_TYPE.COMBINE]: CombineMessage,
   [MESSAGE_TYPE.CUSTOM]: CustomMessage,
 }
 
@@ -56,7 +56,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
   <div class="message-renderer">
     <!-- 通知类型消息：居中灰色小字 -->
     <div v-if="isNotice" class="message-renderer__notice">
-      {{ 'msg' in message ? message.msg : '' }}
+      {{ 'content' in message ? message.content : '' }}
     </div>
 
     <!-- 类型级插槽覆盖：用户可通过 #message-txt 等完全替换某一类型的渲染 -->

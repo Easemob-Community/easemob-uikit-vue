@@ -2,22 +2,52 @@ import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from './use-uikit-storage'
 import type { Conversation } from '../store/conversation'
+import type { ChatManager } from 'im-sdk-web'
 
-/** 将服务端会话数据转换为 UIKIT Conversation 格式 */
-function mapServerConversation(item: any): Conversation {
-  const lastMsg = item.lastMessage || {}
+/**
+ * SDK ConversationPage 类型提取（未从 im-sdk-web 主入口导出）。
+ */
+type SdkConversationPage = Awaited<ReturnType<ChatManager['getConversationList']>>
+/** SDK ConversationItem 类型提取 */
+type SdkConversationItem = SdkConversationPage['items'][number]
+
+/**
+ * 将服务端会话数据（ConversationItem）转换为 UIKIT Conversation 格式。
+ *
+ * @see SDK_DEFICIENCY: ConversationItem 未暴露 isMuted、remindType、display（displayName/avatarUrl）字段，
+ * 这些字段仅在 SessionItem 中可用（通过 getSessionList）。
+ */
+function mapServerConversation(item: SdkConversationItem): Conversation {
+  const lastMsg = item.lastMessage
+  /**
+   * SDK ConversationItem.lastMessage.body 为 Record<string, unknown>，
+   * 实际运行时包含 content/msg 等字段。
+   * @see SDK_DEFICIENCY: lastMessage.body 未提供具体的消息体联合类型。
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const body = (lastMsg?.body || {}) as Record<string, any>
+  /**
+   * @see SDK_DEFICIENCY: ConversationItem 未暴露 display、isMuted、remindType 字段。
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const itemAny = item as any
   return {
     id: item.conversationId,
-    name: item.conversationId,
-    lastMessage: lastMsg.msg || lastMsg.type || '',
-    lastMessageType: lastMsg.type || '',
-    lastMessageSender: lastMsg.from || '',
-    lastMessageTime: lastMsg.time || item.lastMessage?.time || 0,
-    unreadCount: item.unReadCount || 0,
-    type: item.conversationType,
+    name: item.conversationId || itemAny.display?.displayName || '',
+    lastMessage: body.content || body.msg || lastMsg?.type || '',
+    lastMessageType: lastMsg?.type || '',
+    /** @see SDK_DEFICIENCY: ConversationItem.lastMessage 未暴露 from 字段 */
+    lastMessageSender: (lastMsg as any)?.from || '',
+    lastMessageTime: lastMsg?.timestamp || 0,
+    unreadCount: item.unreadCount || 0,
+    type: item.conversationType as Conversation['type'],
     isPinned: item.isPinned || false,
     pinnedTime: item.pinnedTime || 0,
-    isMuted: item.isMuted || false,
+    isMuted: itemAny.isMuted || false,
+    displayName: itemAny.display?.displayName,
+    avatarUrl: itemAny.display?.avatarUrl,
+    remindType: itemAny.remindType,
+    marks: [...item.marks] as number[],
   }
 }
 
@@ -84,7 +114,8 @@ export function useConversation() {
     }
 
     const res = await client.value?.getServerConversations(options)
-    const list: any[] = res?.data?.conversations || []
+    const page = res as SdkConversationPage
+    const list = page?.items || []
     const mapped = list.map(mapServerConversation)
 
     if (isLoadMore) {
@@ -94,8 +125,8 @@ export function useConversation() {
       conversationStore.setConversationsLoaded(true)
     }
 
-    conversationStore.setConversationCursor(res?.data?.cursor || null)
-    return res
+    conversationStore.setConversationCursor(page?.cursor || null)
+    return page
   }
 
   /**
@@ -129,10 +160,10 @@ export function useConversation() {
     const cvs = conversationStore.conversationList.find((c: { id: string }) => c.id === id)
     if (!cvs) return
 
-    await client.value?.pinConversation({
+    await client.value?.setConversationPinned({
       conversationId: id,
       conversationType: cvs.type,
-      isPinned,
+      pinned: isPinned,
     })
     conversationStore.togglePin(id, isPinned)
   }
@@ -146,7 +177,7 @@ export function useConversation() {
       conversationStore.updateUnreadCount(id, 0)
       return
     }
-    await client.value?.sendChannelAck({ chatType: cvs.type, to: id })
+    await client.value?.markConversationRead({ conversationId: id, conversationType: cvs.type })
     conversationStore.updateUnreadCount(id, 0)
   }
 
@@ -156,9 +187,9 @@ export function useConversation() {
     if (!cvs) return
 
     await client.value?.deleteConversation({
-      channel: id,
-      chatType: cvs.type,
-      deleteRoam: true,
+      conversationId: id,
+      conversationType: cvs.type,
+      deleteRoamingMessages: true,
     })
     conversationStore.deleteConversation(id)
   }

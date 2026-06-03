@@ -22,12 +22,12 @@ const sender = computed(() => props.message.from || '')
 const preview = computed(() => getQuotePreview(props.message))
 
 /** 是否为图片（展示缩略图） */
-const isImage = computed(() => props.message.type === 'img')
+const isImage = computed(() => props.message.type === 'image')
 
 /** 图片缩略图 URL */
 const thumbUrl = computed(() => {
-  const m = props.message as unknown as { thumb?: string; url?: string }
-  return m.thumb || m.url || ''
+  const m = props.message as unknown as { thumbnailUrl?: string; url?: string }
+  return m.thumbnailUrl || m.url || ''
 })
 
 function onClose() {

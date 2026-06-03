@@ -83,8 +83,8 @@ async function handleDownload(event: MouseEvent) {
         <div class="video-message__play-btn">&#9658;</div>
       </div>
       <!-- 时长标签 -->
-      <div v-if="props.message.length" class="video-message__duration">
-        {{ Math.floor(props.message.length / 60) }}:{{ String(props.message.length % 60).padStart(2, '0') }}
+      <div v-if="props.message.duration" class="video-message__duration">
+        {{ Math.floor(props.message.duration / 60) }}:{{ String(props.message.duration % 60).padStart(2, '0') }}
       </div>
     </div>
 

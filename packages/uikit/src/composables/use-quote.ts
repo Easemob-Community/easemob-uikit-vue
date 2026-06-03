@@ -10,7 +10,7 @@ export interface MsgQuotePayload {
   /** 发送人显示名 / ID */
   msgSender: string
   /** 原消息类型 */
-  msgType: 'txt' | 'img' | 'video' | 'file' | 'audio' | 'custom' | 'loc' | 'cmd'
+  msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd'
 }
 
 /** 模块级单例：当前输入框中正在引用的消息 */
@@ -25,11 +25,11 @@ const locateRequest = ref<{ msgID: string; token: number } | null>(null)
 /** 生成引用预览文本 */
 export function getQuotePreview(message: Message): string {
   switch (message.type) {
-    case 'txt':
-      return 'msg' in message ? String((message as unknown as { msg: string }).msg ?? '') : ''
-    case 'img':
+    case 'text':
+      return 'content' in message ? String(message.content ?? '') : ''
+    case 'image':
       return '[图片]'
-    case 'audio':
+    case 'voice':
       return '[语音]'
     case 'video':
       return '[视频]'
@@ -37,7 +37,7 @@ export function getQuotePreview(message: Message): string {
       const filename = 'filename' in message ? (message as unknown as { filename?: string }).filename : ''
       return filename ? filename : '[文件]'
     }
-    case 'loc':
+    case 'location':
       return '[位置]'
     case 'custom':
       return '[自定义消息]'
@@ -50,7 +50,7 @@ export function getQuotePreview(message: Message): string {
 
 /** 构造 ext.msgQuote（仅返回 { msgQuote } 片段，调用方可与其他 ext 合并） */
 export function buildQuoteExt(message: Message): { msgQuote: MsgQuotePayload } {
-  const msgID = message.mid || message.id
+  const msgID = message.serverId || message.id
   return {
     msgQuote: {
       msgID,

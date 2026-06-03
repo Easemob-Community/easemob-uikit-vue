@@ -20,8 +20,8 @@ function customTimeFormatter(timestamp: number): string {
 }
 
 function customMessageFormatter(msg: string, type?: string): string {
-  if (type === 'img') return '[图片消息]'
-  if (type === 'audio') return '[语音消息]'
+  if (type === 'image') return '[图片消息]'
+  if (type === 'voice') return '[语音消息]'
   return msg
 }
 

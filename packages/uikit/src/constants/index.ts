@@ -9,14 +9,15 @@ export type ConversationTypeValue =
 
 /** 消息类型常量（与环信 SDK MessageType 对齐） */
 export const MESSAGE_TYPE = {
-  TXT: 'txt',
-  IMG: 'img',
-  AUDIO: 'audio',
+  TEXT: 'text',
+  IMAGE: 'image',
+  VOICE: 'voice',
   VIDEO: 'video',
   FILE: 'file',
   CMD: 'cmd',
   CUSTOM: 'custom',
-  LOC: 'loc',
+  LOCATION: 'location',
+  COMBINE: 'combine',
 } as const
 
 export type MessageTypeValue =

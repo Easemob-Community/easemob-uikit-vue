@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useLocale } from '../../../locale'
 import type { Message } from '../../../store/message'
-import type { EasemobChat } from 'easemob-websdk'
+
 
 export interface EditingBarProps {
   message: Message
@@ -19,8 +19,8 @@ const { t } = useLocale()
 
 /** 编辑中预览文本（取原文本） */
 const preview = computed(() => {
-  if (props.message.type === 'txt') {
-    return (props.message as EasemobChat.TextMsgBody).msg || ''
+  if (props.message.type === 'text') {
+    return props.message.content || ''
   }
   return ''
 })

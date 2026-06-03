@@ -15,6 +15,8 @@ import { UIKIT_CONTEXT_KEY, type UIKitDataSource, type UIKitFeatures, type Conta
 import type { ClientConfig } from '../../sdk/types'
 import type { UIKitClient } from '../../sdk/client'
 import type { AnimationConfig } from '../../store/theme'
+import type { Contact as UIKitContact } from '../../store/contact'
+import type { UserInfo } from 'im-sdk-web'
 
 export interface ProviderProps {
   appKey?: string
@@ -177,9 +179,12 @@ watch(
     // 黑名单
     if (props.enableBlocklist && !contactStore.blockListLoaded) {
       try {
-        const list = ds.fetchBlocklist
+        const list: UIKitContact[] = ds.fetchBlocklist
           ? await ds.fetchBlocklist()
-          : (await client?.getBlocklist() || []).map((id) => ({ userId: id, name: id }))
+          : (await client?.getBlocklist() || []).map((userInfo: UserInfo) => ({
+              userId: userInfo.userId || '',
+              name: userInfo.nickname || userInfo.userId || '',
+            }))
         contactStore.setBlackList(list)
       } catch (e) {
         console.warn('[UIKit] fetch blocklist failed:', e)
@@ -192,8 +197,8 @@ watch(
         let list: Array<{ userId: string; name: string; remark?: string }> = []
         if (isAllMode && client) {
           // 全量拉取模式
-          const res = await client.getAllContacts()
-          const data = res.data || []
+          const res = client.getContacts()
+          const data = Array.isArray(res) ? res : []
           list = data.map((item) => ({
             userId: item.userId,
             name: item.remark || item.userId,
@@ -207,15 +212,22 @@ watch(
           contactStore.setHasMore(!!res.hasMore)
           contactStore.setCursor(res.cursor || '')
         } else if (client) {
+          /**
+           * @see SDK_DEFICIENCY: getContactsWithCursor 返回值类型不确定，
+           * ContactManager 不暴露此方法，由 UIKitClient 桥接。
+           */
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const res = await client.getContactsWithCursor({ pageSize: 50 })
-          const contacts = res.data?.contacts || []
-          list = contacts.map((item) => ({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const contacts = (res as any)?.data?.contacts || (res as any)?.contacts || []
+          list = contacts.map((item: any) => ({
             userId: item.userId,
             name: item.remark || item.userId,
             remark: item.remark,
           }))
           contactStore.setHasMore(contacts.length >= 50)
-          contactStore.setCursor(res.data?.cursor || '')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          contactStore.setCursor((res as any)?.data?.cursor || (res as any)?.cursor || '')
         }
         contactStore.setContactList(list)
       } catch (e) {

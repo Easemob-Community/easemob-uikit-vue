@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, onUnmounted, inject, type InjectionKey } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import type { AudioMessageType } from '../../../store/message'
+import type { VoiceMessageType } from '../../../store/message'
 
 export interface VoiceMessageProps {
-  message: AudioMessageType
+  message: VoiceMessageType
 }
 
 const props = defineProps<VoiceMessageProps>()
@@ -115,7 +115,7 @@ onUnmounted(() => {
         </span>
         <span v-else>&#9658;</span>
       </span>
-      <span class="voice-message__duration">{{ props.message.length || 0 }}"</span>
+      <span class="voice-message__duration">{{ props.message.duration || 0 }}"</span>
     </div>
   </div>
 </template>

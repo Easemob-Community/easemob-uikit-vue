@@ -32,6 +32,10 @@ export interface Group {
   mute?: boolean
   /** 是否已屏蔽该群消息 */
   shieldgroup?: boolean
+  /** 群公告 */
+  announcement?: string
+  /** 是否全员禁言 */
+  allMuted?: boolean
   /** 群组扩展信息 */
   ext?: string
   /** 创建时间戳 */
@@ -113,6 +117,48 @@ export const useGroupStore = defineStore('group', () => {
     joinedGroupCount.value = count
   }
 
+  /** 按 groupId 局部更新群信息 */
+  function updateGroup(groupId: string, patch: Partial<Group>) {
+    const g = groupList.value.find((item) => item.groupId === groupId)
+    if (g) Object.assign(g, patch)
+  }
+
+  /** 增量更新成员数 */
+  function incrementMemberCount(groupId: string, delta: number) {
+    const g = groupList.value.find((item) => item.groupId === groupId)
+    if (g) g.memberCount = Math.max(0, (g.memberCount || 0) + delta)
+  }
+
+  /** 减量更新成员数 */
+  function decrementMemberCount(groupId: string, delta: number) {
+    const g = groupList.value.find((item) => item.groupId === groupId)
+    if (g) g.memberCount = Math.max(0, (g.memberCount || 0) - delta)
+  }
+
+  /**
+   * 标记管理员（当前 Group 类型不含管理员列表，仅做占位）
+   * @see SDK_DEFICIENCY: 群管理员变更事件 payload 中的 administrator 为 UserInfo 而非 string
+   */
+  function markAdmin(_groupId: string, _userId: string) {
+    // Admin tracking requires adding admins field to Group type
+  }
+
+  /**
+   * 取消管理员标记（当前 Group 类型不含管理员列表，仅做占位）
+   * @see SDK_DEFICIENCY: 群管理员变更事件 payload 中的 administrator 为 UserInfo 而非 string
+   */
+  function unmarkAdmin(_groupId: string, _userId: string) {
+    // Admin tracking requires adding admins field to Group type
+  }
+
+  /**
+   * 设置用户禁言状态（当前 Group 类型不含禁言列表，仅做占位）
+   * @see SDK_DEFICIENCY: 群禁言事件 payload 中的 mutes 为 UserInfo[] 而非 string[]
+   */
+  function setMuted(_groupId: string, _userIds: string[], _muted: boolean) {
+    // Mute tracking requires adding muteList field to Group type
+  }
+
   function clearGroups() {
     groupList.value = []
     currentGroup.value = null
@@ -139,6 +185,12 @@ export const useGroupStore = defineStore('group', () => {
     getGroupById,
     updateGroupMemberCount,
     setJoinedGroupCount,
+    updateGroup,
+    incrementMemberCount,
+    decrementMemberCount,
+    markAdmin,
+    unmarkAdmin,
+    setMuted,
     clearGroups,
   }
 })

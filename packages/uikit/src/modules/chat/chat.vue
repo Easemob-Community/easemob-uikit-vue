@@ -109,9 +109,9 @@ function onReedit(message: Message) {
 
 /** 进入编辑态：仅文本消息 */
 function onEdit(message: Message) {
-  if (!message || message.type !== 'txt') return
+  if (!message || message.type !== 'text') return
   enterEditMode(message)
-  const originalText = (message as unknown as { msg?: string }).msg || ''
+  const originalText = (message as unknown as { content?: string }).content || ''
   nextTick(() => messageInputRef.value?.setText?.(originalText))
 }
 
@@ -162,7 +162,7 @@ const pinnedBarMaxLength = computed(() => pinnedBarConfig.value?.maxPreviewLengt
 
 /** 在消息列表中定位置顶消息 */
 function onPinnedLocate(message: Message) {
-  const target = message.mid || message.id
+  const target = message.serverId || message.id
   if (target) requestLocate(target)
 }
 
@@ -279,7 +279,7 @@ function locateAtMeMessage(cvsId: string) {
 
   const firstAtMeMsgId = atMeMsgIds[0]
   const existingMsgs = stores.message.getMessages(cvsId)
-  const found = existingMsgs.some(m => m.id === firstAtMeMsgId || m.mid === firstAtMeMsgId)
+  const found = existingMsgs.some(m => m.id === firstAtMeMsgId || m.serverId === firstAtMeMsgId)
 
   if (found) {
     // 消息已加载，直接定位，定位完成后清除记录避免重复定位

@@ -5,6 +5,7 @@ import Icon from '../../../components/icon/icon.vue'
 import MessageRenderer from './message-renderer.vue'
 import { useLocale } from '../../../locale'
 import { getClient } from '../../../sdk/client'
+import type { SdkMessage } from '../../../sdk/client'
 import { useClientStore } from '../../../store/client'
 import { useMessageStore } from '../../../store/message'
 import { MESSAGE_STATUS } from '../../../constants'
@@ -27,7 +28,8 @@ const { t } = useLocale()
 
 /** 是否正在加载 */
 const isLoading = ref(false)
-/** 解析后的消息列表 */
+/** 解析后的消息列表（桥接 SDK Message 与 UIKit Message 两种类型） */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parsedMessages = ref<any[]>([])
 /** 加载错误 */
 const loadError = ref('')
@@ -60,16 +62,28 @@ const messageStore = useMessageStore()
  * 将解析出的原始消息体适配为 Message 类型，补全 UI 计算字段。
  * 这样可以直接交给 MessageRenderer 复用（图片/视频/文件/语音/嵌套合并等都能渲染）。
  */
-function adaptMessage(msg: any): Message {
+function adaptMessage(msg: SdkMessage): Message {
   const currentUser = clientStore.currentUser || ''
   const from = msg.from || ''
-  const time = msg.time || msg.timestamp || Date.now()
+  const time = msg.timestamp || Date.now()
+  const body = msg.body || {} as Record<string, any>
   return {
-    ...msg,
-    conversationId: msg.to || from,
+    id: msg.msgServerId || msg.msgLocalId || '',
+    serverId: msg.msgServerId || '',
+    from: from,
+    to: msg.to || '',
+    conversationId: msg.conversationId || msg.to || from,
+    conversationType: (msg.conversationType as any) || 'groupChat',
     isSelf: !!from && from === currentUser,
     status: MESSAGE_STATUS.SENT,
     timestamp: time,
+    type: (msg.type || 'text') as Message['type'],
+    ext: msg.ext as Record<string, unknown> | undefined,
+    content: (body as any).content,
+    url: (body as any).url,
+    filename: (body as any).filename,
+    fileSize: (body as any).fileSize,
+    duration: (body as any).duration,
   } as Message
 }
 
@@ -77,8 +91,8 @@ function adaptMessage(msg: any): Message {
 const renderableMessages = computed(() => parsedMessages.value.map(adaptMessage))
 
 /** 格式化发送者名称：优先 ext 里的 nickname */
-function formatSender(msg: any): string {
-  const ext = msg.ext?.ease_chat_uikit_user_info
+function formatSender(msg: Message): string {
+  const ext = msg.ext?.ease_chat_uikit_user_info as Record<string, string> | undefined
   return ext?.nickname || ext?.remark || msg.from || 'Unknown'
 }
 
@@ -115,9 +129,14 @@ async function loadMessages() {
       loadError.value = t('message.forward.parseFailed') || '解析失败'
       return
     }
-    const result = await client.connection.downloadAndParseCombineMessage({ url, secret })
+    /**
+     * @see SDK_DEFICIENCY: downloadAndParseCombineMessage 要求传入 { message: Message }，
+     * 但业务层保存的是 { url, secret } 格式的参数。此处使用 as any 桥接两种调用方式。
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (client.chatManager as any).downloadAndParseCombineMessage({ url, secret } as any)
     console.log('[CombineMessageModal] downloadAndParseCombineMessage result:', result)
-    // SDK 可能返回数组或 { data: [...] } 对象
+    // SDK 返回 ReadonlyArray<Message>
     const list = Array.isArray(result) ? result : (result as any)?.data
     const finalList = Array.isArray(list) ? list : []
     parsedMessages.value = finalList

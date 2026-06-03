@@ -55,7 +55,7 @@ const mentionList = computed(() => {
 
 /** 将消息文本按 @mention 和 linkify 分片 */
 const msgSegments = computed(() => {
-  const text = props.message.msg || ''
+  const text = props.message.content || ''
   if (!text) return []
 
   const mentions = mentionList.value
@@ -208,7 +208,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
           </template>
           <!-- 无链接/mention 时纯文本渲染 -->
           <template v-else>
-            {{ props.message.msg }}
+            {{ props.message.content }}
           </template>
           <span
             v-if="isModified"

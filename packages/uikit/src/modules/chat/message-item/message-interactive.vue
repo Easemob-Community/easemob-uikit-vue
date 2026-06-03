@@ -68,7 +68,7 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableForward !== false) add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false) add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
   // 翻译：仅文本消息可翻译，其他类型不展示
-  if (cfg?.enableTranslate !== false && props.message.type === 'txt') {
+  if (cfg?.enableTranslate !== false && props.message.type === 'text') {
     add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
   }
   if (cfg?.enablePin !== false && !props.message.recalled) {
@@ -95,7 +95,7 @@ const actions = computed<MessageActionItem[]>(() => {
     cfg?.enableEdit !== false
     && props.message.isSelf
     && !props.message.recalled
-    && props.message.type === 'txt'
+    && props.message.type === 'text'
   ) {
     // SDK modifyMessage 单条消息编辑次数上限为 5 次
     const count = props.message.modifiedInfo?.operationCount ?? 0

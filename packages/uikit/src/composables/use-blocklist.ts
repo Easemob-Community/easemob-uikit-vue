@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useContactStore, type Contact } from '../store/contact'
 import { useUIKit } from './use-uikit'
+import type { UserInfo } from 'im-sdk-web'
 
 /**
  * 黑名单能力集成
@@ -26,8 +27,12 @@ export function useBlocklist() {
       return
     }
     if (!client.value) return
-    const ids = await client.value.getBlocklist()
-    contactStore.setBlackList(ids.map((id) => ({ userId: id, name: id })))
+    const userInfos: ReadonlyArray<UserInfo> = await client.value.getBlocklist()
+    contactStore.setBlackList(userInfos.map((info: UserInfo) => ({
+      userId: info.userId,
+      name: info.nickname || info.userId,
+      avatar: info.avatarUrl,
+    })))
   }
 
   /** \u5c06\u67d0\u4eba\u52a0\u9ed1 */

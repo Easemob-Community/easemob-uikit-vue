@@ -23,7 +23,7 @@ function injectMockData() {
     avatar: '',
     unreadCount: 3,
     lastMessage: '大家看下这个设计方案',
-    lastMessageType: MESSAGE_TYPE.TXT,
+    lastMessageType: MESSAGE_TYPE.TEXT,
     lastMessageSender: 'user_002',
     lastMessageTime: Date.now(),
     timestamp: Date.now(),
@@ -35,21 +35,20 @@ function injectMockData() {
   cvsStore.setCurrentConversation(mockConversation)
 
   const mockMessages = Array.from({ length: 8 }, (_, i) => {
-    const type = i % 3 === 0 ? 'txt' as const : i % 3 === 1 ? 'img' as const : 'audio' as const
+    const type = i % 3 === 0 ? 'text' as const : i % 3 === 1 ? 'image' as const : 'voice' as const
     return {
       id: `msg_${i}`,
       conversationId: mockConversation.id,
-      chatType: 'groupChat' as const,
+      conversationType: 'groupChat' as const,
       to: mockConversation.id,
       from: i % 2 === 0 ? 'user_self' : 'user_002',
       type,
       // 文本消息字段
-      ...(type === 'txt' ? { msg: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。` } : {}),
+      ...(type === 'text' ? { content: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。` } : {}),
       // 图片消息字段
-      ...(type === 'img' ? { url: 'https://picsum.photos/200/150', file_length: 10240 } : {}),
+      ...(type === 'image' ? { url: 'https://picsum.photos/200/150', fileSize: 10240 } : {}),
       // 语音消息字段
-      ...(type === 'audio' ? { url: '', length: 15, filename: 'voice.amr', file_length: 10240 } : {}),
-      time: Date.now() - (8 - i) * 60000,
+      ...(type === 'voice' ? { url: '', duration: 15, filename: 'voice.amr', fileSize: 10240 } : {}),
       timestamp: Date.now() - (8 - i) * 60000,
       isSelf: i % 2 === 0,
       status: MESSAGE_STATUS.READ,
@@ -130,7 +129,7 @@ const hooksConfig: ChatConfig = {
     beforeSend: (msg) => {
       console.log('[Story] beforeSend:', msg)
       // 演示：阻止包含 "敏感词" 的消息发送
-      if ('msg' in msg && typeof msg.msg === 'string' && msg.msg.includes('敏感词')) {
+      if ('content' in msg && typeof msg.content === 'string' && msg.content.includes('敏感词')) {
         alert('消息包含敏感词，已被拦截')
         return false
       }
@@ -230,7 +229,7 @@ injectMockData()
           <ChatContainer :config="baseConfig">
             <template #message-txt="{ message }">
               <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: 14px;">
-                [自定义文本] {{ 'msg' in message ? message.msg : '' }}
+                [自定义文本] {{ 'content' in message ? message.content : '' }}
               </div>
             </template>
           </ChatContainer>

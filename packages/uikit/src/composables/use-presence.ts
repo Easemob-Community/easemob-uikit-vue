@@ -1,6 +1,10 @@
 import { computed, onScopeDispose, toValue, watch, type ComputedRef, type MaybeRefOrGetter } from 'vue'
 import { usePresenceStore, type PresenceInfo } from '../store/presence'
 import { useUIKit } from './use-uikit'
+import type { PresenceManager } from 'im-sdk-web'
+
+/** SDK getPresenceStatus 返回的在线状态类型 */
+type SdkPresenceInfo = Awaited<ReturnType<PresenceManager['getPresenceStatus']>>[number]
 
 /**
  * Presence \u6309\u9700\u8ba2\u9605\u7ba1\u7406\u5668
@@ -53,14 +57,19 @@ export function usePresence() {
             const list = await dataSource.fetchPresence(subList)
             presenceStore.updateBatch(list)
           } else if (client.value) {
-            const res: any = await client.value.getPresenceStatus(subList)
-            const items = Array.isArray(res?.result) ? res.result : Array.isArray(res?.data) ? res.data : []
-            const mapped: PresenceInfo[] = items.map((item: any) => {
-              const uid = item?.userId || ''
-              const details: Array<{ status?: string }> = Array.isArray(item?.statusDetails) ? item.statusDetails : []
-              const isOnline = details.some((d) => String(d?.status) === '1')
-              return { userId: uid, status: isOnline ? 'online' : 'offline', ext: item?.ext }
-            }).filter((p: PresenceInfo) => !!p.userId)
+            const res = await client.value.getPresenceStatus(subList)
+            /**
+             * SDK getPresenceStatus 直接返回 ReadonlyArray<SdkPresenceInfo>，
+             * 无 .result/.data 包装。
+             * SdkPresenceInfo 使用 publisher/statusList 字段（非 userId/statusDetails）。
+             */
+            const items: ReadonlyArray<SdkPresenceInfo> = res
+            const mapped: PresenceInfo[] = items.map((item) => {
+              const uid = item.publisher || ''
+              const statusList = item.statusList || {}
+              const isOnline = Object.values(statusList).some((v) => Number(v) === 1)
+              return { userId: uid, status: (isOnline ? 'online' : 'offline') as PresenceInfo['status'], ext: item.ext }
+            }).filter((p) => !!p.userId) as PresenceInfo[]
             presenceStore.updateBatch(mapped)
           }
         } catch (e) {

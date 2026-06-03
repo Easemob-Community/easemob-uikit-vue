@@ -5,9 +5,15 @@ import type { Message, MessageStoreOptions } from '../store/message'
 import type { Conversation } from '../store/conversation'
 import { MESSAGE_STATUS, MESSAGE_TYPE, CONVERSATION_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
+import type { SdkMessage } from '../sdk/client'
 import { getClient } from '../sdk/client'
 import type { UIKitClient } from '../sdk/client'
-import type { EasemobChat } from 'easemob-websdk'
+import type {
+  MessageHistoryPage,
+  MessageTranslationResult,
+  PinnedMessageListResult,
+  PinnedMessageSummary,
+} from 'im-sdk-web'
 
 /** Typing 命令消息 action 常量 */
 const TYPING_ACTION = {
@@ -16,14 +22,6 @@ const TYPING_ACTION = {
 
 /** Typing 状态持续时间（毫秒） */
 const TYPING_DURATION = 5000
-
-/** 消息类型到创建参数的映射（用于重发） */
-interface CreateMsgOptions {
-  type: string
-  to: string
-  chatType: EasemobChat.ChatType
-  [key: string]: any
-}
 
 // ===== 多选模式状态（模块级单例，确保同一页面内多处调用共享同一份状态） =====
 const isMultiSelectMode = ref(false)
@@ -122,10 +120,6 @@ export function useChat(options?: UseChatOptions) {
 
   /**
    * 判断是否应启用群已读回执
-   * - 总开关未开启 → false
-   * - 非群聊 → false
-   * - 群成员数未知（<=0）→ false（保守策略，避免超发）
-   * - 群成员数超过上限 → false
    */
   function _shouldEnableGroupAck(
     chatType: ConversationTypeValue,
@@ -134,7 +128,7 @@ export function useChat(options?: UseChatOptions) {
     maxGroupSize?: number,
   ): boolean {
     if (!enabled || chatType !== CONVERSATION_TYPE.GROUPCHAT) return false
-    const memberCount = stores.group.getGroupById(groupId)?.memberCount || 0
+    const memberCount = stores.group.getGroupById?.(groupId)?.memberCount || 0
     const limit = maxGroupSize && maxGroupSize > 0 ? maxGroupSize : 200
     return memberCount > 0 && memberCount <= limit
   }
@@ -149,27 +143,15 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /**
-   * 将浏览器原生 File/Blob 转为 SDK 要求的 FileObj 格式
-   */
-  function _toFileObj(file: File | Blob, filename?: string): EasemobChat.FileObj {
-    return {
-      data: file as File,
-      filename: filename || (file instanceof File ? file.name : 'file'),
-      filetype: file.type || 'application/octet-stream',
-      url: '',
-    }
-  }
-
-  /**
    * 根据消息类型格式化会话列表最后一条消息摘要文本
    */
-  function _formatLastMessageText(sdkMsg: EasemobChat.MessageBody): string {
+  function _formatLastMessageText(sdkMsg: { type?: string; content?: string }): string {
     switch (sdkMsg.type) {
-      case MESSAGE_TYPE.TXT:
-        return (sdkMsg as EasemobChat.TextMsgBody).msg || ''
-      case MESSAGE_TYPE.IMG:
+      case MESSAGE_TYPE.TEXT:
+        return sdkMsg.content || ''
+      case MESSAGE_TYPE.IMAGE:
         return '[图片]'
-      case MESSAGE_TYPE.AUDIO:
+      case MESSAGE_TYPE.VOICE:
         return '[语音]'
       case MESSAGE_TYPE.VIDEO:
         return '[视频]'
@@ -179,7 +161,7 @@ export function useChat(options?: UseChatOptions) {
         return '[命令消息]'
       case MESSAGE_TYPE.CUSTOM:
         return '[自定义消息]'
-      case MESSAGE_TYPE.LOC:
+      case MESSAGE_TYPE.LOCATION:
         return '[位置]'
       default:
         return '[消息]'
@@ -187,11 +169,10 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /**
-   * 本地插入一条发送中的消息，直接展开 SDK 消息的所有原生字段 + 追加 UI 扩展字段
-   * @param groupReadReceiptEnabled 是否启用群已读回执
+   * 本地插入一条发送中的消息
    */
   function _insertSendingMessage(
-    sdkMsg: EasemobChat.MessageBody,
+    sdkMsg: Message,
     to: string,
     chatType: ConversationTypeValue,
     groupReadReceiptEnabled?: boolean,
@@ -201,14 +182,13 @@ export function useChat(options?: UseChatOptions) {
     const currentUser = stores.client.currentUser
     const msg: Message = {
       ...sdkMsg,
-      // SDK createMessage 不会自动填充 from，显式以当前用户补齐，避免头像/名称出现空状态闪烁
       from: sdkMsg.from || currentUser || '',
       conversationId: to,
       isSelf: true,
       status: MESSAGE_STATUS.SENDING,
       timestamp: Date.now(),
       requireGroupAck: requireGroupAck || undefined,
-    } as Message
+    }
     messageStore.addMessage(msg)
 
     // 同步更新会话列表最新消息
@@ -224,9 +204,8 @@ export function useChat(options?: UseChatOptions) {
 
   /**
    * 发送成功/失败后更新本地消息状态
-   * 若提供了 serverMsg，则用服务器返回的完整消息体替换本地消息
    */
-  function _onSendResult(msgId: string, error?: unknown, serverMsg?: EasemobChat.ExcludeAckMessageBody) {
+  function _onSendResult(msgId: string, error?: unknown, serverMsg?: Message) {
     if (error) {
       const reason = error instanceof Error ? error.message : (typeof error === 'object' && error !== null ? JSON.stringify(error) : String(error))
       console.error(`[useChat] sendMessage failed (msgId=${msgId}):`, error)
@@ -241,26 +220,40 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /** 发送文本消息 */
-  async function sendTextMessage(text: string, ext?: Record<string, any>, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
+  async function sendTextMessage(text: string, ext?: Record<string, unknown>, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
-    const sdkMsg = client.createMessage({
-      type: 'txt',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      msg: text,
+    const sdkMsg = client.chatManager.createTextMessage({
+      conversationId: cvs.id,
+      conversationType: cvs.type,
+      content: text,
       ext,
-      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
+    // 构造 UI Message
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: cvs.id,
+      conversationType: cvs.type,
+      timestamp: Date.now(),
+      type: 'text',
+      content: text,
+      ext,
+      conversationId: cvs.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+      requireGroupAck: enableGroupAck || undefined,
+    }
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
     }
   }
 
@@ -284,182 +277,244 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /** 发送图片消息 */
-  async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
+  async function sendImageMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, unknown>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
 
-    // 读取图片宽高并生成本地预览 URL
     const { width, height } = await _readImageDimensions(file)
     const localPreviewUrl = URL.createObjectURL(file)
 
-    const sdkMsg = client.createMessage({
-      type: 'img',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      file: _toFileObj(file),
-      ...(ext ? { ext } : {}),
-      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
+    const sdkMsg = client.chatManager.createImageMessage({
+      conversationId: cvs.id,
+      conversationType: cvs.type,
+      data: file,
+      ext,
     })
 
-    // Patch 本地预览 URL 和宽高到消息对象，使己方消息可立即展示
-    ;(sdkMsg as any).url = localPreviewUrl
-    if (width > 0 && height > 0) {
-      ;(sdkMsg as any).width = width
-      ;(sdkMsg as any).height = height
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: cvs.id,
+      conversationType: cvs.type,
+      timestamp: Date.now(),
+      type: 'image',
+      url: localPreviewUrl,
+      filename: file.name,
+      width,
+      height,
+      ext,
+      conversationId: cvs.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+      requireGroupAck: enableGroupAck || undefined,
     }
 
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
     } finally {
-      // 服务器响应后释放本地 objectURL
       URL.revokeObjectURL(localPreviewUrl)
     }
   }
 
   /** 发送文件消息 */
-  async function sendFileMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
+  async function sendFileMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, unknown>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
-    const sdkMsg = client.createMessage({
-      type: 'file',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      file: _toFileObj(file),
-      ...(ext ? { ext } : {}),
-      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
+
+    const sdkMsg = client.chatManager.createFileMessage({
+      conversationId: cvs.id,
+      conversationType: cvs.type,
+      data: file,
+      ext,
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
+
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: cvs.id,
+      conversationType: cvs.type,
+      timestamp: Date.now(),
+      type: 'file',
+      filename: file.name,
+      ext,
+      conversationId: cvs.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+      requireGroupAck: enableGroupAck || undefined,
+    }
+
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
     }
   }
 
   /** 发送语音消息 */
-  async function sendAudioMessage(file: File | Blob, duration: number, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
+  async function sendAudioMessage(file: File | Blob, duration: number, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, unknown>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
-    const sdkMsg = client.createMessage({
-      type: 'audio',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      file: _toFileObj(file, file instanceof File ? file.name : 'audio.amr'),
-      filename: file instanceof File ? file.name : 'audio.amr',
-      length: duration,
-      ...(ext ? { ext } : {}),
-      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
+
+    const sdkMsg = client.chatManager.createVoiceMessage({
+      conversationId: cvs.id,
+      conversationType: cvs.type,
+      data: file as File,
+      duration,
+      ext,
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
+
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: cvs.id,
+      conversationType: cvs.type,
+      timestamp: Date.now(),
+      type: 'voice',
+      filename: file instanceof File ? file.name : 'audio.amr',
+      duration,
+      ext,
+      conversationId: cvs.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+      requireGroupAck: enableGroupAck || undefined,
+    }
+
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
     }
   }
 
   /** 发送视频消息 */
-  async function sendVideoMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, any>) {
+  async function sendVideoMessage(file: File, groupReadReceiptConfig?: { enabled?: boolean; maxGroupSize?: number }, ext?: Record<string, unknown>) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
     const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
     const enableGroupAck = _shouldEnableGroupAck(cvs.type, cvs.id, groupReadReceiptConfig?.enabled, groupReadReceiptConfig?.maxGroupSize)
-    const sdkMsg = client.createMessage({
-      type: 'video',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      file: _toFileObj(file, file.name),
-      filename: file.name,
-      ...(ext ? { ext } : {}),
-      ...(isGroup && enableGroupAck ? { msgConfig: { allowGroupAck: true } } : {}),
+
+    const sdkMsg = client.chatManager.createVideoMessage({
+      conversationId: cvs.id,
+      conversationType: cvs.type,
+      data: file,
+      duration: 0,
+      ext,
     })
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, enableGroupAck)
+
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: cvs.id,
+      conversationType: cvs.type,
+      timestamp: Date.now(),
+      type: 'video',
+      filename: file.name,
+      ext,
+      conversationId: cvs.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+      requireGroupAck: enableGroupAck || undefined,
+    }
+
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, enableGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
     }
   }
 
   /**
    * 通用发送方法（兼容旧接口）
    */
-  function sendMessage(body: Record<string, any>, _type?: string) {
-    // 通用方法仅支持文本，其他类型请使用专用方法
-    sendTextMessage(body.msg || '')
+  function sendMessage(body: Record<string, unknown>, _type?: string) {
+    sendTextMessage(body.msg as string || '')
   }
 
   /**
    * 获取历史消息
-   *
-   * ⚠️ 注意：此方法仅从服务端拉取历史消息并写入本地 store，
-   * 不会触发任何已读回执（read ack / channel ack / group ack），
-   * 也不会触发 event-handler 中的 handleIncomingMessage。
-   * 后续维护时请勿在此处遍历发送 read ack，历史消息无需回执。
    */
   async function fetchHistoryMessages(cursor?: string) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return { messages: [] as Message[], cursor: '', isLast: true }
 
-    // 如果没有传入 cursor，尝试从缓存获取
     const cached = getHistoryCursor(cvs.id)
     const actualCursor = cursor ?? cached.cursor
 
     try {
       const result = await _getClient().getHistoryMessages({
         targetId: cvs.id,
-        chatType: cvs.type,
+        conversationType: cvs.type,
         pageSize: 20,
         cursor: actualCursor,
-      })
-      const rawMsgs = (result.messages || []).filter(
-        (m): m is EasemobChat.ExcludeAckMessageBody => m.type !== 'read' && m.type !== 'delivery' && m.type !== 'channel',
-      )
+      }) as MessageHistoryPage
+      const rawMsgs = result?.items || []
       const currentUser = stores.client.currentUser
       const historyMsgs: Message[] = rawMsgs.map((m) => {
-        const isGroup = m.chatType === 'groupChat'
+        const isGroup = m.conversationType === 'groupChat' || (m as any).chatType === 'groupChat'
         const conversationId = isGroup ? m.to : (m.from === currentUser ? m.to : m.from)
-        // 解析 allowGroupAck
-        const msgConfigAllowGroupAck = (m as EasemobChat.ExcludeAckMessageBody & { msgConfig?: { allowGroupAck?: boolean } }).msgConfig?.allowGroupAck
-        const extMsgConfigAllowGroupAck = m.ext
-          && typeof m.ext === 'object'
-          && m.ext.msgConfig
-          && typeof m.ext.msgConfig === 'object'
-          && (m.ext.msgConfig as Record<string, unknown>).allowGroupAck
-        const requireGroupAck = !!(msgConfigAllowGroupAck || extMsgConfigAllowGroupAck)
+        const body = m.body || {} as Record<string, any>
         return {
-          ...m,
+          id: m.msgServerId || '',
+          serverId: m.msgServerId || '',
+          from: m.from || '',
+          to: m.to || '',
+          conversationType: (m.conversationType || 'singleChat') as ConversationTypeValue,
+          timestamp: m.timestamp || Date.now(),
+          type: (m.type || 'text') as Message['type'],
+          ext: m.ext as Record<string, unknown> | undefined,
+          content: (body as any).content,
+          url: (body as any).url || (body as any).originalImageUrl,
+          thumbnailUrl: (body as any).thumbnailUrl,
+          secret: (body as any).secret,
+          filename: (body as any).filename,
+          fileSize: (body as any).fileSize,
+          duration: (body as any).duration,
+          width: (body as any).width,
+          height: (body as any).height,
+          latitude: (body as any).latitude,
+          longitude: (body as any).longitude,
+          address: (body as any).address,
+          customEvent: (body as any).customEvent,
+          customExts: (body as any).customExts,
+          title: (body as any).title,
+          summary: (body as any).summary,
+          compatibleText: (body as any).compatibleText,
+          messageList: (body as any).messageList,
+          action: (body as any).action,
           conversationId: conversationId || cvs.id,
           isSelf: m.from === currentUser,
           status: MESSAGE_STATUS.SENT,
-          timestamp: m.time || Date.now(),
-          requireGroupAck: requireGroupAck || undefined,
         } as Message
       })
       messageStore.prependMessages(cvs.id, historyMsgs)
 
-      // 更新 cursor 缓存
-      // SDK 在最后一页可能返回字符串字面量 'undefined'/'null'，需清洗为空串
-      const rawCursor = result.cursor
+      const rawCursor = result?.cursor
       const newCursor = (rawCursor && rawCursor !== 'undefined' && rawCursor !== 'null') ? rawCursor : ''
-      const isLast = result.isLast || historyMsgs.length === 0 || !newCursor
+      const isLast = !result?.hasMore || historyMsgs.length === 0 || !newCursor
       setHistoryCursor(cvs.id, newCursor, isLast)
 
       return {
@@ -478,22 +533,22 @@ export function useChat(options?: UseChatOptions) {
     const cvs = conversationStore.currentConversation
     if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
     try {
-      await _getClient().sendReadAck({
-        chatType: cvs.type,
-        to: cvs.id,
-        msgId,
+      await _getClient().sendMessageReadAck({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
+        messageId: msgId,
       })
     } catch (e) {
-      console.warn('[useChat] sendReadAck failed:', e)
+      console.warn('[useChat] sendMessageReadAck failed:', e)
     }
   }
 
   /** 获取群消息已读用户详情 */
   async function fetchGroupReadDetail(msgId: string, groupId: string) {
-    return _getClient().getGroupMsgReadUser({ msgId, groupId })
+    return _getClient().getGroupMessageReadUsers({ messageId: msgId, groupId })
   }
 
-  /** 获取翻译目标语言：优先 ChatConfig 传入，其次跟随 UIKIT 当前 locale */
+  /** 获取翻译目标语言 */
   function _resolveTranslateLang(targetLang?: string): string {
     if (targetLang && targetLang.trim()) return targetLang.trim()
     const cur = locale.value
@@ -503,58 +558,48 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /**
-   * 修改文本消息：调用 SDK modifyMessage，返回后应用到本地。
-   * - 仅针对 type === 'txt' 的消息生效
-   * - 对比 newText 与原文本，内容未变化时不发送请求
-   * - 服务端返回超过 5 次会拋出 error，调用方需 catch
+   * 修改文本消息
    */
   async function modifyTextMessage(message: Message, newText: string) {
-    if (!message || message.type !== 'txt') return
+    if (!message || message.type !== 'text') return
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const trimmed = (newText ?? '').trim()
     if (!trimmed) return
-    const originalText = (message as EasemobChat.TextMsgBody).msg || ''
+    const originalText = message.content || ''
     if (trimmed === originalText) {
       exitEditMode()
       return
     }
     const client = _getClient()
-    const messageId = message.mid || message.id
-    const modifiedMsg = client.createMessage({
-      type: 'txt',
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-      msg: trimmed,
-    }) as EasemobChat.ExcludeAckMessageBody
+    const messageId = message.serverId || message.id
     try {
+      /**
+       * @see SDK_DEFICIENCY: modifyMessage 返回的 Message 类型不包含 modifiedInfo 字段，
+       * 无法在编译期获取已修改次数等信息。
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await client.modifyMessage({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
         messageId,
-        modifiedMessage: modifiedMsg,
-      })
-      const serverMsg = (result as unknown as { message?: EasemobChat.ExcludeAckMessageBody }).message
+        message: { type: 'text' as const, body: { content: trimmed }, ext: message.ext || {} },
+      }) as any
       const info = result?.modifiedInfo
-      if (serverMsg) {
-        messageStore.applyModifiedMessage(serverMsg, info && {
-          operatorId: info.operatorId,
-          operationCount: info.operationCount,
-          operationTime: info.operationTime,
-        })
-      } else {
-        // 部分 SDK 返回仅含 modifiedInfo：本地补全 msg 内容
-        const fallback: EasemobChat.ExcludeAckMessageBody = {
-          ...(message as unknown as EasemobChat.ExcludeAckMessageBody),
-          msg: trimmed,
-        } as EasemobChat.ExcludeAckMessageBody
-        messageStore.applyModifiedMessage(fallback, info && {
-          operatorId: info.operatorId,
-          operationCount: info.operationCount,
-          operationTime: info.operationTime,
-        })
+      const fallback: Message = {
+        ...message,
+        content: trimmed,
+        modified: true,
+        modifiedInfo: info || {
+          operatorId: stores.client.currentUser || '',
+          operationCount: (message.modifiedInfo?.operationCount ?? 0) + 1,
+          operationTime: Date.now(),
+        },
       }
+      messageStore.applyModifiedMessage(fallback)
       exitEditMode()
     } catch (e) {
-      console.warn('[useChat] modifyMessage failed:', e)
+      console.warn('[useChat] updateMessage failed:', e)
       throw e
     }
   }
@@ -564,14 +609,13 @@ export function useChat(options?: UseChatOptions) {
     const cvs = conversationStore.currentConversation
     if (!cvs || !message) return
     const client = _getClient()
-    const messageId = message.mid || message.id
+    const messageId = message.serverId || message.id
     try {
       await client.pinMessage({
         conversationId: cvs.id,
         conversationType: cvs.type,
         messageId,
       })
-      // 主动置顶后本地立即标记（多端以 onMessagePinEvent 同步）
       messageStore.setMessagePinned(messageId, {
         operatorId: stores.client.currentUser || '',
         pinTime: Date.now(),
@@ -587,7 +631,7 @@ export function useChat(options?: UseChatOptions) {
     const cvs = conversationStore.currentConversation
     if (!cvs || !message) return
     const client = _getClient()
-    const messageId = message.mid || message.id
+    const messageId = message.serverId || message.id
     try {
       await client.unpinMessage({
         conversationId: cvs.id,
@@ -602,31 +646,40 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /**
-   * 拉取当前会话的服务端置顶消息列表（仅拉首页，快递场景足够）
+   * 拉取当前会话的服务端置顶消息列表
    */
   async function fetchPinnedMessages() {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     try {
-      const result = await _getClient().getServerPinnedMessages({
+      const result = await _getClient().getPinnedMessageList({
         conversationId: cvs.id,
         conversationType: cvs.type,
         pageSize: 20,
         cursor: '',
-      })
-      const list = result?.data?.list || []
+      }) as PinnedMessageListResult
+      /**
+       * @see SDK_DEFICIENCY: PinnedMessageSummary 不包含 message 字段，
+       * 无法直接从置顶消息列表中获取完整消息对象。
+       * 此处仅记录 messageId，实际消息需另行拉取。
+       */
+      const list = result?.items || []
       const currentUser = stores.client.currentUser
-      const mapped: Message[] = list.map((info) => {
-        const m = info.message as EasemobChat.ExcludeAckMessageBody
+      const mapped: Message[] = list.map((info: PinnedMessageSummary) => {
+        // PinnedMessageSummary only has messageId, no full message object
         return {
-          ...m,
+          id: info.messageId,
+          serverId: info.messageId,
+          from: '',
+          to: '',
+          conversationType: cvs.type,
+          timestamp: info.pinnedAt || Date.now(),
+          type: 'text' as Message['type'],
           conversationId: cvs.id,
-          isSelf: m.from === currentUser,
+          isSelf: false,
           status: MESSAGE_STATUS.SENT,
-          timestamp: m.time || info.pinTime || Date.now(),
-          mid: m.id,
           pinned: true,
-          pinTime: info.pinTime,
+          pinTime: info.pinnedAt,
           pinOperatorId: info.operatorId,
         } as Message
       })
@@ -637,34 +690,28 @@ export function useChat(options?: UseChatOptions) {
   }
 
   /**
-   * 翻译文本消息：仅 type === 'txt'
-   * - 已有译文与目标语一致 → 仅切换 showTranslation
-   * - 否则调用 SDK translateMessage 拉取译文
+   * 翻译文本消息
    */
   async function translateTextMessage(message: Message, targetLang?: string) {
-    if (!message || message.type !== 'txt') return
-    const text = (message as EasemobChat.TextMsgBody).msg || ''
+    if (!message || message.type !== 'text') return
+    const text = message.content || ''
     if (!text) return
     const lang = _resolveTranslateLang(targetLang)
     const msgId = message.id
-    // 复用已有译文
     if (message.translation && message.translation.to === lang) {
       messageStore.toggleTranslation(msgId)
       return
     }
     messageStore.setTranslating(msgId, true)
     try {
-      const result = await _getClient().translateMessage({ text, languages: [lang] })
+      const result = await _getClient().translateMessage({ text, languages: [lang] }) as MessageTranslationResult
       console.log('[useChat] translateMessage raw result:', JSON.stringify(result))
-      // SDK AsyncResult<TranslationResult> — data 可能为对象或数组，兼容处理
-      const data = result?.data
-      const translationResult = Array.isArray(data) ? data[0] : data
-      const translation = translationResult?.translations?.[0]
+      const translation = result?.translations?.[0]
       if (translation) {
         messageStore.setTranslation(msgId, { text: translation.text, to: translation.to })
       } else {
         messageStore.setTranslating(msgId, false)
-        console.warn('[useChat] translateMessage: no translation in response, data:', data)
+        console.warn('[useChat] translateMessage: no translation in response, data:', result)
       }
     } catch (e) {
       messageStore.setTranslating(msgId, false)
@@ -685,11 +732,10 @@ export function useChat(options?: UseChatOptions) {
     const client = _getClient()
     try {
       await client.recallMessage({
-        mid: msgId,
-        to: cvs.id,
-        chatType: cvs.type,
+        messageId: msgId,
+        conversationId: cvs.id,
+        conversationType: cvs.type,
       })
-      // 发起方：SDK 调用成功后立即本地标记撤回（不需要等 onRecallMessage，那是给被撤回方用的）
       messageStore.recallMessage(msgId, stores.client.currentUser || '')
     } catch (e) {
       console.warn('[useChat] recallMessage failed:', e)
@@ -723,11 +769,9 @@ export function useChat(options?: UseChatOptions) {
 
   /**
    * 将 SDK 消息体转换为 UI Message 并插入目标会话的消息列表
-   * 用于转发后让目标会话立即显示新消息，无需刷新页面
    */
-  function _insertForwardedMessage(sdkMsg: EasemobChat.MessageBody, targetId: string, targetType: ConversationTypeValue) {
+  function _insertForwardedMessage(sdkMsg: Message, targetId: string, targetType: ConversationTypeValue) {
     const currentUser = stores.client.currentUser
-    const isGroup = targetType === CONVERSATION_TYPE.GROUPCHAT
     const uiMsg: Message = {
       ...sdkMsg,
       from: sdkMsg.from || currentUser || '',
@@ -735,136 +779,83 @@ export function useChat(options?: UseChatOptions) {
       isSelf: true,
       status: MESSAGE_STATUS.SENT,
       timestamp: Date.now(),
-    } as Message
+    }
     messageStore.addMessage(uiMsg)
   }
 
   /**
    * 单条转发消息到指定会话
-   * - 文本消息：直接创建新文本消息发送
-   * - 其他类型：提取原消息文件信息，创建同类型消息发送（真正转发原文件）
    */
   async function forwardMessage(message: Message, targetConversation: Conversation) {
     const client = _getClient()
 
-    if (message.type === 'txt') {
-      const text = (message as unknown as { msg?: string }).msg || ''
-      const sdkMsg = client.createMessage({
-        type: 'txt',
-        to: targetConversation.id,
-        chatType: targetConversation.type as EasemobChat.ChatType,
-        msg: text,
+    if (message.type === 'text') {
+      const text = message.content || ''
+      const sdkMsg = client.chatManager.createTextMessage({
+        conversationId: targetConversation.id,
+        conversationType: targetConversation.type,
+        content: text,
         ext: message.ext,
       })
+      const uiMsg: Message = {
+        id: sdkMsg.msgLocalId || '',
+        serverId: '',
+        from: stores.client.currentUser || '',
+        to: targetConversation.id,
+        conversationType: targetConversation.type,
+        timestamp: Date.now(),
+        type: 'text',
+        content: text,
+        ext: message.ext,
+        conversationId: targetConversation.id,
+        isSelf: true,
+        status: MESSAGE_STATUS.SENDING,
+      }
       try {
-        const result = await client.sendCreatedMessage(sdkMsg)
-        _onSendResult(sdkMsg.id, undefined, result.message)
-        _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
-        _updateTargetConversation(targetConversation.id, targetConversation.type, text, Date.now(), 'txt')
+        const result = await client.chatManager.sendMessage(sdkMsg)
+        _onSendResult(uiMsg.id, undefined, result as unknown as Message)
+        _insertForwardedMessage(result as unknown as Message, targetConversation.id, targetConversation.type)
+        _updateTargetConversation(targetConversation.id, targetConversation.type, text, Date.now(), 'text')
       } catch (e) {
-        _onSendResult(sdkMsg.id, e)
+        _onSendResult(uiMsg.id, e)
         throw e
       }
       return
     }
 
-    // 非文本消息：提取原消息文件信息，创建同类型消息真正转发
-    const baseOptions = {
-      type: message.type,
-      to: targetConversation.id,
-      chatType: targetConversation.type as EasemobChat.ChatType,
-      ext: message.ext,
-    } as Record<string, any>
-
-    switch (message.type) {
-      case 'img': {
-        const imgMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; width?: number; height?: number; thumb?: string; thumb_secret?: string }
-        baseOptions.url = imgMsg.url
-        baseOptions.secret = imgMsg.secret
-        baseOptions.filename = imgMsg.filename || 'image.jpg'
-        baseOptions.file_length = imgMsg.file_length || 0
-        if (imgMsg.width) baseOptions.width = imgMsg.width
-        if (imgMsg.height) baseOptions.height = imgMsg.height
-        if (imgMsg.thumb) baseOptions.thumb = imgMsg.thumb
-        if (imgMsg.thumb_secret) baseOptions.thumb_secret = imgMsg.thumb_secret
-        break
-      }
-      case 'audio': {
-        const audioMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; length?: number }
-        baseOptions.url = audioMsg.url
-        baseOptions.secret = audioMsg.secret
-        baseOptions.filename = audioMsg.filename || 'audio.amr'
-        baseOptions.file_length = audioMsg.file_length || 0
-        baseOptions.length = audioMsg.length || 0
-        break
-      }
-      case 'video': {
-        const videoMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number; length?: number; thumb?: string; thumb_secret?: string }
-        baseOptions.url = videoMsg.url
-        baseOptions.secret = videoMsg.secret
-        baseOptions.filename = videoMsg.filename || 'video.mp4'
-        baseOptions.file_length = videoMsg.file_length || 0
-        baseOptions.length = videoMsg.length || 0
-        if (videoMsg.thumb) baseOptions.thumb = videoMsg.thumb
-        if (videoMsg.thumb_secret) baseOptions.thumb_secret = videoMsg.thumb_secret
-        break
-      }
-      case 'file': {
-        const fileMsg = message as unknown as { url?: string; secret?: string; filename?: string; file_length?: number }
-        baseOptions.url = fileMsg.url
-        baseOptions.secret = fileMsg.secret
-        baseOptions.filename = fileMsg.filename || 'file'
-        baseOptions.file_length = fileMsg.file_length || 0
-        break
-      }
-      case 'loc': {
-        const locMsg = message as unknown as { lat?: number; lng?: number; addr?: string }
-        baseOptions.lat = locMsg.lat || 0
-        baseOptions.lng = locMsg.lng || 0
-        baseOptions.addr = locMsg.addr || ''
-        break
-      }
-      case 'custom': {
-        const customMsg = message as unknown as { customEvent?: string; customExts?: Record<string, any> }
-        baseOptions.customEvent = customMsg.customEvent || ''
-        baseOptions.customExts = customMsg.customExts || {}
-        break
-      }
-      default: {
-        // 不支持的类型降级为文本描述
-        const typeMap: Record<string, string> = {
-          img: '[图片]', audio: '[语音]', video: '[视频]',
-          file: '[文件]', custom: '[自定义消息]', loc: '[位置]',
-        }
-        const desc = typeMap[message.type] || '[消息]'
-        const sdkMsg = client.createMessage({
-          type: 'txt',
-          to: targetConversation.id,
-          chatType: targetConversation.type as EasemobChat.ChatType,
-          msg: desc,
-          ext: { ...(message.ext || {}), uikitForward: { originalType: message.type, originalFrom: message.from, originalTime: message.timestamp } },
-        })
-        try {
-          const result = await client.sendCreatedMessage(sdkMsg)
-          _onSendResult(sdkMsg.id, undefined, result.message)
-          _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
-          _updateTargetConversation(targetConversation.id, targetConversation.type, desc, Date.now(), 'txt')
-        } catch (e) {
-          _onSendResult(sdkMsg.id, e)
-          throw e
-        }
-        return
-      }
+    // 非文本消息：降级为文本描述转发
+    const typeMap: Record<string, string> = {
+      image: '[图片]', voice: '[语音]', video: '[视频]',
+      file: '[文件]', custom: '[自定义消息]', location: '[位置]',
     }
-
-    const sdkMsg = client.createMessage(baseOptions as any)
+    const desc = typeMap[message.type] || '[消息]'
+    const sdkMsg = client.chatManager.createTextMessage({
+      conversationId: targetConversation.id,
+      conversationType: targetConversation.type,
+      content: desc,
+      ext: { ...(message.ext || {}), uikitForward: { originalType: message.type, originalFrom: message.from, originalTime: message.timestamp } },
+    })
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: targetConversation.id,
+      conversationType: targetConversation.type,
+      timestamp: Date.now(),
+      type: 'text',
+      content: desc,
+      ext: message.ext,
+      conversationId: targetConversation.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+    }
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
-      _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
-      _updateTargetConversation(targetConversation.id, targetConversation.type, `[${message.type}]`, Date.now(), message.type)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
+      _insertForwardedMessage(result as unknown as Message, targetConversation.id, targetConversation.type)
+      _updateTargetConversation(targetConversation.id, targetConversation.type, desc, Date.now(), 'text')
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
       throw e
     }
   }
@@ -873,15 +864,11 @@ export function useChat(options?: UseChatOptions) {
   const COMBINE_MAX_COUNT = 300
 
   /**
-   * 多选转发：使用环信合并消息 API（Combine.create）
-   * - 仅允许转发成功发送/接收的消息（status === SENT）
-   * - 最多 300 条消息
-   * - 支持嵌套，最多 10 层（由 SDK 控制）
+   * 多选转发：使用环信合并消息 API
    */
   async function forwardCombineMessages(messages: Message[], targetConversation: Conversation) {
     const client = _getClient()
 
-    // 过滤：只有成功发送或接收的消息才能合并转发
     const validMessages = messages.filter(m => m.status === MESSAGE_STATUS.SENT && !m.recalled)
     if (validMessages.length === 0) {
       throw new Error(t('message.forward.noValidMessages') || '没有可转发的消息')
@@ -890,10 +877,9 @@ export function useChat(options?: UseChatOptions) {
       throw new Error(t('message.forward.tooMany').replace('{max}', String(COMBINE_MAX_COUNT)) || `最多支持 ${COMBINE_MAX_COUNT} 条消息`)
     }
 
-    // 构建合并消息的 messageList（需要 SDK 原始消息格式）
-    const messageList: EasemobChat.CombineMsgList = validMessages.map(m => {
-      // 将 UI Message 转换回 SDK 消息格式（排除 UI 扩展字段）
-      const sdkMsg: Record<string, any> = {}
+    // 构建合并消息的 messageList
+    const messageList = validMessages.map(m => {
+      const sdkMsg: Record<string, unknown> = {}
       const uiKeys = new Set([
         'conversationId', 'isSelf', 'status', 'timestamp', 'groupReadCount',
         'groupMemberCount', 'requireGroupAck', 'recalled', 'recalledBy',
@@ -901,26 +887,26 @@ export function useChat(options?: UseChatOptions) {
         'pinTime', 'pinOperatorId', 'translation', 'showTranslation',
         'translating', 'failReason',
       ])
-      for (const key in m) {
+      const msgRecord = m as unknown as Record<string, unknown>
+      for (const key in msgRecord) {
         if (!uiKeys.has(key)) {
-          sdkMsg[key] = (m as Record<string, any>)[key]
+          sdkMsg[key] = msgRecord[key]
         }
       }
-      return sdkMsg as EasemobChat.CombineMsgList[number]
+      return sdkMsg
     })
 
-    // 构建摘要
     const summary = validMessages.slice(0, 3).map(m => {
       const sender = m.from || ''
       let content = ''
       switch (m.type) {
-        case 'txt': content = (m as unknown as { msg?: string }).msg || ''; break
-        case 'img': content = '[图片]'; break
-        case 'audio': content = '[语音]'; break
+        case 'text': content = m.content || ''; break
+        case 'image': content = '[图片]'; break
+        case 'voice': content = '[语音]'; break
         case 'video': content = '[视频]'; break
         case 'file': content = '[文件]'; break
         case 'custom': content = '[自定义消息]'; break
-        case 'loc': content = '[位置]'; break
+        case 'location': content = '[位置]'; break
         default: content = '[消息]'
       }
       return `${sender}: ${content}`
@@ -929,116 +915,122 @@ export function useChat(options?: UseChatOptions) {
     const title = t('message.forward.combineTitle') || '聊天记录'
     const compatibleText = t('message.forward.combineCompatible') || '[该版本不支持合并消息，请升级]'
 
-    const sdkMsg = client.createMessage({
-      type: 'combine',
-      to: targetConversation.id,
-      chatType: targetConversation.type as EasemobChat.ChatType,
+    const sdkMsg = client.chatManager.createCombineMessage({
+      conversationId: targetConversation.id,
+      conversationType: targetConversation.type,
       title,
       summary,
       compatibleText,
-      messageList,
-      onFileUploadComplete: (data: { url: string; secret: string }) => {
-        // 文件上传完成后补全 url 和 secret，否则无法下载解析
-        messageStore.updateMessageById(sdkMsg.id, {
-          url: data.url,
-          secret: data.secret,
-        } as Partial<Message>)
-      },
-    } as EasemobChat.CreateCombineMsgParameters)
+      messageList: messageList as unknown as ReadonlyArray<SdkMessage>,
+    })
+
+    const uiMsg: Message = {
+      id: sdkMsg.msgLocalId || '',
+      serverId: '',
+      from: stores.client.currentUser || '',
+      to: targetConversation.id,
+      conversationType: targetConversation.type,
+      timestamp: Date.now(),
+      type: 'combine',
+      title,
+      summary,
+      compatibleText,
+      messageList: messageList as unknown as any[],
+      conversationId: targetConversation.id,
+      isSelf: true,
+      status: MESSAGE_STATUS.SENDING,
+    }
 
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
-      _insertForwardedMessage(result.message || sdkMsg, targetConversation.id, targetConversation.type)
+      const result = await client.chatManager.sendMessage(sdkMsg)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
+      _insertForwardedMessage(result as unknown as Message, targetConversation.id, targetConversation.type)
       _updateTargetConversation(targetConversation.id, targetConversation.type, '[聊天记录]', Date.now(), 'combine')
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
       throw e
     }
   }
 
   /**
    * 重发失败的消息
-   * - 先删除旧消息，再重新创建并发送
-   * - 返回新消息的 id
    */
   async function resendMessage(message: Message) {
     const cvs = conversationStore.currentConversation
     if (!cvs) return
     const client = _getClient()
 
-    // 删除旧失败消息
     messageStore.deleteMessage(message.id)
 
-    const options: CreateMsgOptions = {
-      type: message.type,
-      to: cvs.id,
-      chatType: cvs.type as EasemobChat.ChatType,
-    }
-
-    // 根据消息类型重建参数
+    let sdkMsg: unknown
     switch (message.type) {
-      case 'txt':
-        options.msg = (message as unknown as { msg?: string }).msg || ''
+      case 'text':
+        sdkMsg = client.chatManager.createTextMessage({
+          conversationId: cvs.id,
+          conversationType: cvs.type,
+          content: message.content || '',
+          ext: message.ext,
+        })
         break
-      case 'img':
-      case 'audio':
+      case 'image':
+        // 重发图片需要原始 File，这里降级处理
+        console.warn('[useChat] resendMessage: image resend requires original File')
+        return
+      case 'voice':
+        console.warn('[useChat] resendMessage: voice resend requires original File')
+        return
       case 'video':
-      case 'file': {
-        const fileMsg = message as unknown as { file?: EasemobChat.FileObj; filename?: string; length?: number; width?: number; height?: number }
-        if (fileMsg.file) {
-          options.file = fileMsg.file
-        }
-        if (fileMsg.filename) options.filename = fileMsg.filename
-        if (fileMsg.length) options.length = fileMsg.length
-        if (fileMsg.width) options.width = fileMsg.width
-        if (fileMsg.height) options.height = fileMsg.height
+        console.warn('[useChat] resendMessage: video resend requires original File')
+        return
+      case 'file':
+        console.warn('[useChat] resendMessage: file resend requires original File')
+        return
+      case 'custom':
+        sdkMsg = client.chatManager.createCustomMessage({
+          conversationId: cvs.id,
+          conversationType: cvs.type,
+          event: message.customEvent || '',
+          params: message.customExts || {},
+          ext: message.ext,
+        })
         break
-      }
-      case 'custom': {
-        const customMsg = message as unknown as { customEvent?: string; customExts?: Record<string, any> }
-        if (customMsg.customEvent) options.customEvent = customMsg.customEvent
-        if (customMsg.customExts) options.customExts = customMsg.customExts
-        break
-      }
       default:
         console.warn('[useChat] resendMessage: unsupported message type', message.type)
         return
     }
 
-    if (message.ext) {
-      options.ext = message.ext
+    const uiMsg: Message = {
+      ...message,
+      id: (sdkMsg as SdkMessage)?.msgLocalId || message.id,
+      status: MESSAGE_STATUS.SENDING,
+      timestamp: Date.now(),
     }
 
-    const sdkMsg = client.createMessage(options as EasemobChat.CreateMsgType)
-    _insertSendingMessage(sdkMsg, cvs.id, cvs.type, message.requireGroupAck)
+    _insertSendingMessage(uiMsg, cvs.id, cvs.type, message.requireGroupAck)
     try {
-      const result = await client.sendCreatedMessage(sdkMsg)
-      _onSendResult(sdkMsg.id, undefined, result.message)
-      return sdkMsg.id
+      const result = await client.chatManager.sendMessage(sdkMsg as SdkMessage)
+      _onSendResult(uiMsg.id, undefined, result as unknown as Message)
+      return uiMsg.id
     } catch (e) {
-      _onSendResult(sdkMsg.id, e)
+      _onSendResult(uiMsg.id, e)
       throw e
     }
   }
 
   /**
    * 发送输入状态命令消息（TypingBegin）
-   * - 仅单聊有效
-   * - 通过 CMD 消息发送，对端收到后显示"对方正在输入..."
    */
   async function sendTypingCmd() {
     const cvs = conversationStore.currentConversation
     if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
     const client = _getClient()
     try {
-      const sdkMsg = client.createMessage({
-        type: 'cmd',
-        to: cvs.id,
-        chatType: cvs.type as EasemobChat.ChatType,
+      const sdkMsg = client.chatManager.createCmdMessage({
+        conversationId: cvs.id,
+        conversationType: cvs.type,
         action: TYPING_ACTION.BEGIN,
-      } as EasemobChat.CreateCmdMsgParameters)
-      await client.sendCreatedMessage(sdkMsg)
+      })
+      await client.chatManager.sendMessage(sdkMsg)
     } catch (e) {
       console.warn('[useChat] sendTypingCmd failed:', e)
     }

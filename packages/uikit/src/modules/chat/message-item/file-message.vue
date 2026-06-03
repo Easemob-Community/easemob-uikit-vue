@@ -19,7 +19,7 @@ const fileName = computed(() => props.message.filename || t('message.file') || '
 
 /** 文件大小格式化 */
 const fileSize = computed(() => {
-  const size = props.message.file_length || 0
+  const size = props.message.fileSize || 0
   if (size === 0) return ''
   if (size < 1024) return `${size} B`
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`

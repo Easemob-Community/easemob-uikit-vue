@@ -3,6 +3,7 @@ import { useGroupStore } from '../store/group'
 import type { Group } from '../store/group'
 import type { JoinedGroupItem } from '../sdk/types'
 import { useUIKit } from './use-uikit'
+import type { GroupListResult, GroupSummary, GroupDetail } from 'im-sdk-web'
 
 /**
  * 将 SDK 原始群组项映射为 UIKIT Group 模型
@@ -82,12 +83,13 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
       } else if (client.value) {
         // 开启 needAffiliations 以获取 memberCount / role / description 等字段
         // 注意：SDK 在 needAffiliations=true 或 needRole=true 时，pageSize 上限强制为 20
-        const list = await client.value.getJoinedGroups({
+        const res = await client.value.getJoinedGroupList({
           pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
-          pageNum: 0,
-          needAffiliations: true,
+          needMemberCount: true,
           needRole: true,
         })
+        const result = res as GroupListResult
+        const list: ReadonlyArray<GroupSummary> = result?.items || []
         console.log('[UIKit] getJoinedGroups raw list:', list)
         const mapped: Group[] = list.map(mapSdkGroupItem)
         console.log('[UIKit] getJoinedGroups mapped:', mapped)
@@ -124,12 +126,13 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
         groupStore.setCursor(res.cursor || '')
       } else if (client.value) {
         const nextPage = (parseInt(groupStore.cursor || '0') || 0) + 1
-        const list = await client.value.getJoinedGroups({
+        const res = await client.value.getJoinedGroupList({
           pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
-          pageNum: nextPage,
-          needAffiliations: true,
+          needMemberCount: true,
           needRole: true,
         })
+        const result = res as GroupListResult
+        const list: ReadonlyArray<GroupSummary> = result?.items || []
         const mapped: Group[] = list.map(mapSdkGroupItem)
 
         const groupIdsNeedDetail = mapped
@@ -161,7 +164,14 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
       const batch = groupIds.slice(i, i + BATCH_SIZE)
       try {
         const res = await client.value.getGroupInfo(batch)
-        const details: unknown[] = res?.data ?? []
+        /**
+         * @see SDK_DEFICIENCY: UIKit client.getGroupInfo 仅支持单个 groupId，
+         * 未提供 getGroupInfoList 的批量调用封装。
+         * GroupDetail 无 .data 字段，此处保留兼容旧代码。
+         */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = res as any
+        const details: unknown[] = result?.data ?? (result ? [result] : [])
         for (const d of details) {
           const detail = mapSdkGroupItem(d as Record<string, unknown>)
           const idx = groupStore.groupList.findIndex(

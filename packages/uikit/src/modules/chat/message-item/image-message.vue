@@ -5,10 +5,10 @@ import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
 import Icon from '../../../components/icon/icon.vue'
 import { downloadFile, detectEnvironment } from '../../../utils/download'
-import type { ImgMessageType } from '../../../store/message'
+import type { ImageMessageType } from '../../../store/message'
 
 export interface ImageMessageProps {
-  message: ImgMessageType
+  message: ImageMessageType
 }
 
 const props = defineProps<ImageMessageProps>()
@@ -39,9 +39,9 @@ const displaySize = computed(() => {
 const displayUrl = computed(() => {
   const msg = props.message as any
   if (msg.isSelf) {
-    return msg.url || msg.thumb || ''
+    return msg.url || msg.thumbnailUrl || ''
   }
-  return msg.thumb || msg.url || ''
+  return msg.thumbnailUrl || msg.url || ''
 })
 
 /** 原图 URL（用于预览） */

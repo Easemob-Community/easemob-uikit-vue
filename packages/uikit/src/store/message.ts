@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { EasemobChat } from 'easemob-websdk'
 import type { MessageStatusValue } from '../constants'
 import { MESSAGE_STATUS } from '../constants'
 
@@ -27,7 +26,7 @@ export interface MessageUiExtension {
   /** 文本消息撤回后保留的原始内容，用于重新编辑 */
   originalMsg?: string
   /** 环信服务器消息 ID（撤回等操作需要） */
-  mid?: string
+  serverId?: string
   /** 是否被编辑过 */
   modified?: boolean
   /** 编辑信息：最后一次编辑者、编辑次数（SDK 最多 5 次）、编辑时间 */
@@ -53,20 +52,58 @@ export interface MessageUiExtension {
 }
 
 /**
- * UI 层消息类型：在 SDK 原生消息体基础上扩展 UI 状态字段
+ * UI 层消息类型：完全独立定义，不再依赖 SDK 类型
  *
- * - 直接继承 SDK ExcludeAckMessageBody（排除 read/delivery/channel 回执类型）
- * - 各消息类型的专有字段保留在顶层（msg, url, thumb, length, filename 等），保持 SDK 原生类型安全
+ * - 各消息类型的专有字段保留在顶层（content, url, thumbnailUrl, duration, filename 等）
  * - 新增 conversationId / isSelf / status / timestamp 为 UI 计算/状态字段
  */
-export type Message = EasemobChat.ExcludeAckMessageBody & MessageUiExtension
+export interface Message extends MessageUiExtension {
+  // 身份
+  id: string
+  serverId: string
+  // 会话
+  from: string
+  to: string
+  conversationType: 'singleChat' | 'groupChat'
+  // 时间
+  timestamp: number
+  // 类型
+  type: 'text' | 'image' | 'voice' | 'video' | 'file' | 'location' | 'custom' | 'cmd' | 'combine'
+  // 扩展
+  ext?: Record<string, any>
+  // 文本消息
+  content?: string
+  // 媒体消息
+  url?: string
+  thumbnailUrl?: string
+  secret?: string
+  filename?: string
+  fileSize?: number
+  duration?: number
+  width?: number
+  height?: number
+  // 位置消息
+  latitude?: number
+  longitude?: number
+  address?: string
+  // 自定义消息
+  customEvent?: string
+  customExts?: Record<string, any>
+  // 合并消息
+  title?: string
+  summary?: string
+  compatibleText?: string
+  messageList?: any[]
+  // 命令消息
+  action?: string
+}
 
 /** 按消息类型提取具体的 Message 子类型（用于组件 props 精确类型） */
-export type TextMessageType = Extract<Message, { type: 'txt' }>
-export type ImgMessageType = Extract<Message, { type: 'img' }>
-export type AudioMessageType = Extract<Message, { type: 'audio' }>
-export type VideoMessageType = Extract<Message, { type: 'video' }>
-export type FileMessageType = Extract<Message, { type: 'file' }>
+export type TextMessageType = Message & { type: 'text' }
+export type ImageMessageType = Message & { type: 'image' }
+export type VoiceMessageType = Message & { type: 'voice' }
+export type VideoMessageType = Message & { type: 'video' }
+export type FileMessageType = Message & { type: 'file' }
 
 /** MessageStore 配置选项 */
 export interface MessageStoreOptions {
@@ -83,7 +120,7 @@ export const useMessageStore = defineStore('message', () => {
    * 合并消息解析缓存：key = 合并消息 id，value = 解析后的子消息列表。
    * 避免重复调用 downloadAndParseCombineMessage。
    */
-  const parsedCombineMessageMap = ref<Record<string, EasemobChat.ExcludeAckMessageBody[]>>({})
+  const parsedCombineMessageMap = ref<Record<string, Message[]>>({})
 
   /** 会话维度的@我的消息ID列表：key = conversationId，value = 消息ID数组 */
   const atMeMessageMap = ref<Record<string, string[]>>({})
@@ -115,7 +152,7 @@ export const useMessageStore = defineStore('message', () => {
   /** 在所有会话中按 id/mid 定位消息 */
   function _findMessageById(msgId: string): Message | undefined {
     for (const key in messageMap.value) {
-      const msg = messageMap.value[key].find((m: Message) => m.id === msgId || m.mid === msgId)
+      const msg = messageMap.value[key].find((m: Message) => m.id === msgId || m.serverId === msgId)
       if (msg) return msg
     }
     return undefined
@@ -158,7 +195,7 @@ export const useMessageStore = defineStore('message', () => {
    * - 保留 UI 扩展字段（conversationId, isSelf, status, timestamp 等）
    * - 继承服务器补全的字段（mid, thumb, url 等）
    */
-  function replaceMessageById(msgId: string, serverMsg: EasemobChat.ExcludeAckMessageBody) {
+  function replaceMessageById(msgId: string, serverMsg: Message) {
     for (const key in messageMap.value) {
       const msg = messageMap.value[key].find((m: Message) => m.id === msgId)
       if (msg) {
@@ -195,13 +232,13 @@ export const useMessageStore = defineStore('message', () => {
    * 并标记 modified=true、记录 modifiedInfo。
    */
   function applyModifiedMessage(
-    serverMsg: EasemobChat.ExcludeAckMessageBody,
+    serverMsg: Message,
     info?: { operatorId?: string, operationCount?: number, operationTime?: number },
   ) {
     const msgId = serverMsg.id
     for (const key in messageMap.value) {
       const list = messageMap.value[key]
-      const index = list.findIndex((m: Message) => m.id === msgId || m.mid === msgId)
+      const index = list.findIndex((m: Message) => m.id === msgId || m.serverId === msgId)
       if (index === -1) continue
       const local = list[index]
       const preserved: MessageUiExtension = {
@@ -215,7 +252,7 @@ export const useMessageStore = defineStore('message', () => {
         recalled: local.recalled,
         recalledBy: local.recalledBy,
         originalMsg: local.originalMsg,
-        mid: local.mid || serverMsg.id,
+        serverId: local.serverId || serverMsg.id,
         pinned: local.pinned,
         pinTime: local.pinTime,
         pinOperatorId: local.pinOperatorId,
@@ -244,7 +281,7 @@ export const useMessageStore = defineStore('message', () => {
       const cvsId = local.conversationId
       const pinList = pinnedMessageMap.value[cvsId]
       if (pinList) {
-        const pinIdx = pinList.findIndex((m: Message) => m.id === msgId || m.mid === msgId)
+        const pinIdx = pinList.findIndex((m: Message) => m.id === msgId || m.serverId === msgId)
         if (pinIdx !== -1) pinList[pinIdx] = replaced
       }
       break
@@ -263,7 +300,7 @@ export const useMessageStore = defineStore('message', () => {
     target.pinOperatorId = pinInfo.operatorId
     const cvsId = target.conversationId
     const list = pinnedMessageMap.value[cvsId] || []
-    const exists = list.find((m: Message) => m.id === target.id || m.mid === target.mid)
+    const exists = list.find((m: Message) => m.id === target.id || m.serverId === target.serverId)
     if (!exists) {
       list.unshift(target)
       list.sort((a, b) => (b.pinTime || 0) - (a.pinTime || 0))
@@ -281,14 +318,14 @@ export const useMessageStore = defineStore('message', () => {
       const cvsId = target.conversationId
       const list = pinnedMessageMap.value[cvsId]
       if (list) {
-        pinnedMessageMap.value[cvsId] = list.filter((m: Message) => m.id !== target.id && m.mid !== target.mid)
+        pinnedMessageMap.value[cvsId] = list.filter((m: Message) => m.id !== target.id && m.serverId !== target.serverId)
       }
       return
     }
     // 未在主列表命中：仅从 pinnedMessageMap 移除
     for (const key in pinnedMessageMap.value) {
       pinnedMessageMap.value[key] = pinnedMessageMap.value[key].filter(
-        (m: Message) => m.id !== msgId && m.mid !== msgId,
+        (m: Message) => m.id !== msgId && m.serverId !== msgId,
       )
     }
   }
@@ -302,9 +339,9 @@ export const useMessageStore = defineStore('message', () => {
     const list = messageMap.value[conversationId] || []
     const pinIds = new Set(messages.map((m: Message) => m.id))
     list.forEach((m: Message) => {
-      const isPinned = pinIds.has(m.id) || (m.mid ? pinIds.has(m.mid) : false)
+      const isPinned = pinIds.has(m.id) || (m.serverId ? pinIds.has(m.serverId) : false)
       if (isPinned) {
-        const matched = messages.find(p => p.id === m.id || p.id === m.mid)
+        const matched = messages.find(p => p.id === m.id || p.id === m.serverId)
         m.pinned = true
         m.pinTime = matched?.pinTime
         m.pinOperatorId = matched?.pinOperatorId
@@ -332,14 +369,14 @@ export const useMessageStore = defineStore('message', () => {
   /** 撤回消息：标记 recalled 并保留 originalMsg（文本类型） */
   function recallMessage(msgId: string, recalledBy: string) {
     for (const key in messageMap.value) {
-      const msg = messageMap.value[key].find((m: Message) => m.id === msgId || m.mid === msgId)
+      const msg = messageMap.value[key].find((m: Message) => m.id === msgId || m.serverId === msgId)
       if (msg) {
         const patch: Partial<Message> = {
           recalled: true,
           recalledBy,
         }
-        if (msg.type === 'txt' && 'msg' in msg) {
-          patch.originalMsg = (msg as EasemobChat.TextMsgBody).msg
+        if (msg.type === 'text' && 'content' in msg) {
+          patch.originalMsg = msg.content
         }
         Object.assign(msg, patch)
         break
@@ -349,7 +386,7 @@ export const useMessageStore = defineStore('message', () => {
 
   function deleteMessage(msgId: string) {
     for (const key in messageMap.value) {
-      messageMap.value[key] = messageMap.value[key].filter((m: Message) => m.id !== msgId && m.mid !== msgId)
+      messageMap.value[key] = messageMap.value[key].filter((m: Message) => m.id !== msgId && m.serverId !== msgId)
     }
   }
 
@@ -358,7 +395,7 @@ export const useMessageStore = defineStore('message', () => {
     const idSet = new Set(msgIds)
     for (const key in messageMap.value) {
       messageMap.value[key] = messageMap.value[key].filter(
-        (m: Message) => !idSet.has(m.id) && !idSet.has(m.mid || '')
+        (m: Message) => !idSet.has(m.id) && !idSet.has(m.serverId || '')
       )
     }
   }
@@ -368,12 +405,12 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   /** 读取合并消息解析缓存（未命中返回 undefined） */
-  function getParsedCombineMessages(msgId: string): EasemobChat.ExcludeAckMessageBody[] | undefined {
+  function getParsedCombineMessages(msgId: string): Message[] | undefined {
     return parsedCombineMessageMap.value[msgId]
   }
 
   /** 写入合并消息解析缓存 */
-  function setParsedCombineMessages(msgId: string, messages: EasemobChat.ExcludeAckMessageBody[]) {
+  function setParsedCombineMessages(msgId: string, messages: Message[]) {
     parsedCombineMessageMap.value[msgId] = messages
   }
 

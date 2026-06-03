@@ -1,9 +1,34 @@
-import WebIM, { type EasemobChat } from 'easemob-websdk'
-import type { ClientConfig, JoinedGroupItem } from './types'
-import { MESSAGE_STATUS, ACK_TYPE } from '../constants'
+import {
+  ChatClient as SdkChatClient,
+  ChatManager,
+  ContactManager,
+  GroupManager,
+  PresenceManager,
+} from 'im-sdk-web'
+import type {
+  ChatEventHandlerMap,
+  ConnectionEventHandlerMap,
+  ContactEventHandlerMap,
+  GroupEventHandlerMap,
+  PresenceEventHandlerMap,
+  UpdateMessageParams,
+  MessageTranslationResult,
+  PinnedMessageListResult,
+  GroupListResult,
+  Contact,
+} from 'im-sdk-web'
+import type { ClientConfig, JoinedGroupItem, ChatClient } from './types'
+import { MESSAGE_STATUS } from '../constants'
 import type { MessageStatusValue, ConversationTypeValue } from '../constants'
 
 let clientInstance: UIKitClient | null = null
+
+/**
+ * 从 SDK ChatManager 返回值推断 Message 类型。
+ * SDK 未将 Message 作为命名类型导出，此处通过 ReturnType 提取。
+ * @see SDK_DEFICIENCY: im-sdk-web 未在公共入口导出 Message 命名类型
+ */
+export type SdkMessage = Awaited<ReturnType<ChatManager['sendMessage']>>
 
 export type MessageStatusCallback = (
   localMsgId: string,
@@ -13,33 +38,67 @@ export type MessageStatusCallback = (
 /**
  * UIKIT 客户端封装类
  *
- * 对 easemob-websdk 的 Connection 进行二次封装：
+ * 对 im-sdk-web 的 ChatClient 进行二次封装：
  * - 提供 login / logout / sendText 等便捷方法
  * - 统一事件处理器管理
  * - 支持消息发送状态回调（sending / sent / failed）
- * - 通过 `connection` getter 暴露原始 SDK 实例，保留全部原生能力
+ * - 通过 manager getters 暴露原始 SDK 实例，保留全部原生能力
  */
 export class UIKitClient {
-  private _connection: EasemobChat.Connection
-  private _handlers = new Map<string, EasemobChat.EventHandlerType>()
+  private _client: ChatClient
+  private _connHandlers = new Map<string, ConnectionEventHandlerMap | PresenceEventHandlerMap>()
+  private _chatHandlers = new Map<string, ChatEventHandlerMap>()
+  private _contactHandlers = new Map<string, ContactEventHandlerMap>()
+  private _groupHandlers = new Map<string, GroupEventHandlerMap>()
   private _onMessageStatus?: MessageStatusCallback
 
   constructor(config: ClientConfig) {
     const { debug, ...sdkConfig } = config
-    this._connection = new WebIM.connection(sdkConfig)
+    this._client = SdkChatClient.init({
+      ...sdkConfig,
+      managers: [ChatManager, ContactManager, GroupManager, PresenceManager],
+    })
     if (debug) {
-      this._connection.isDebug = true
+      /**
+       * @see SDK_DEFICIENCY: im-sdk-web ChatClient 未在公开 API 中暴露 logger 属性，
+       * 无法通过类型安全的方式设置日志级别。
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const logger = (this._client as any).logger
+      if (logger && typeof logger.setLevel === 'function') {
+        logger.setLevel('debug')
+      }
     }
   }
 
-  /** 原始 SDK Connection 实例，可直接调用所有原生 API */
-  get connection() {
-    return this._connection
+  /** 原始 SDK ChatClient 实例 */
+  get client() {
+    return this._client
+  }
+
+  /** ChatManager 实例 */
+  get chatManager() {
+    return this._client.chatManager
+  }
+
+  /** ContactManager 实例 */
+  get contactManager() {
+    return this._client.contactManager
+  }
+
+  /** GroupManager 实例 */
+  get groupManager() {
+    return this._client.groupManager
+  }
+
+  /** PresenceManager 实例 */
+  get presenceManager() {
+    return this._client.presenceManager
   }
 
   /** 当前连接是否已打开 */
   get isConnected() {
-    return this._connection.isOpened()
+    return this._client.getConnectionState() === 'connected'
   }
 
   /** 设置消息发送状态回调 */
@@ -49,92 +108,131 @@ export class UIKitClient {
 
   /** 登录（支持 accessToken 或密码） */
   async login(params: { user: string; accessToken?: string; password?: string }) {
-    return this._connection.open({
-      user: params.user,
-      ...(params.accessToken ? { accessToken: params.accessToken } : {}),
-      ...(params.password ? { pwd: params.password } : {}),
+    return this._client.login({
+      userId: params.user,
+      token: params.accessToken ?? params.password ?? '',
     })
   }
 
   /** 登出 */
-  logout() {
-    this._connection.close()
+  async logout() {
+    return this._client.logout()
   }
 
   /**
-   * 通用发送方法：创建消息 → 发送 → 状态回调
-   * 所有 sendXxx 方法统一委托此方法，消除重复代码
-   *
-   * @returns SendMsgResult，包含 localMsgId 和 serverMsgId
+   * 发送文本消息
    */
-  private async _sendWithStatus(options: EasemobChat.CreateMsgType): Promise<EasemobChat.SendMsgResult> {
-    const msg = WebIM.message.create(options)
-    const localMsgId = msg.id
-    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
-    try {
-      const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
-      return result
-    } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
-      throw error
-    }
-  }
-
-  /**
-   * 仅创建消息对象，不发送。用于需要先拿到 SDK 生成的 msg.id 再插入本地 store 的场景。
-   *
-   * @returns 创建好的 MessageBody（含 id 字段）
-   */
-  createMessage(options: EasemobChat.CreateMsgType): EasemobChat.MessageBody {
-    return WebIM.message.create(options)
-  }
-
-  /**
-   * 发送已创建的消息对象（配合 createMessage 使用）
-   *
-   * @returns SendMsgResult
-   */
-  async sendCreatedMessage(msg: EasemobChat.MessageBody): Promise<EasemobChat.SendMsgResult> {
-    const localMsgId = msg.id
-    try {
-      const result = await this._connection.send(msg)
-      this._onMessageStatus?.(result.localMsgId, MESSAGE_STATUS.SENT)
-      return result
-    } catch (error) {
-      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
-      throw error
-    }
-  }
-
-  /** 发送文本消息 */
-  async sendText(options: EasemobChat.CreateTextMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendText(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    content: string
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createTextMessage(options)
+    return this._sendWithStatus(msg)
   }
 
   /** 发送图片消息 */
-  async sendImage(options: EasemobChat.CreateImgMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendImage(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    file: File
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createImageMessage(options)
+    return this._sendWithStatus(msg)
   }
 
   /** 发送文件消息 */
-  async sendFile(options: EasemobChat.CreateFileMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendFile(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    file: File
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createFileMessage(options)
+    return this._sendWithStatus(msg)
   }
 
   /** 发送自定义消息 */
-  async sendCustom(options: EasemobChat.CreateCustomMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendCustom(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    customEvent: string
+    customExts?: Record<string, unknown>
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createCustomMessage({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
+      event: options.customEvent,
+      ext: options.ext,
+    })
+    return this._sendWithStatus(msg)
   }
 
   /** 发送语音消息 */
-  async sendAudio(options: EasemobChat.CreateAudioMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendAudio(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    file: File
+    duration: number
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createVoiceMessage(options)
+    return this._sendWithStatus(msg)
   }
 
   /** 发送视频消息 */
-  async sendVideo(options: EasemobChat.CreateVideoMsgParameters): Promise<EasemobChat.SendMsgResult> {
-    return this._sendWithStatus(options)
+  async sendVideo(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    file: File
+    duration: number
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createVideoMessage(options)
+    return this._sendWithStatus(msg)
+  }
+
+  /** 发送位置消息 */
+  async sendLocation(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    latitude: number
+    longitude: number
+    address?: string
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createLocationMessage(options)
+    return this._sendWithStatus(msg)
+  }
+
+  /** 发送命令消息 */
+  async sendCmd(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    action: string
+    ext?: Record<string, unknown>
+  }) {
+    const msg = this._client.chatManager.createCmdMessage(options)
+    return this._sendWithStatus(msg)
+  }
+
+  /**
+   * 通用发送方法：发送 → 状态回调
+   */
+  private async _sendWithStatus(msg: SdkMessage): Promise<SdkMessage> {
+    const localMsgId = msg.msgLocalId || ''
+    if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.SENDING)
+    try {
+      const result = await this._client.chatManager.sendMessage(msg)
+      this._onMessageStatus?.(result.msgLocalId || localMsgId, MESSAGE_STATUS.SENT)
+      return result
+    } catch (error) {
+      if (localMsgId) this._onMessageStatus?.(localMsgId, MESSAGE_STATUS.FAILED)
+      throw error
+    }
   }
 
   /** 从服务端分页获取会话列表 */
@@ -142,91 +240,92 @@ export class UIKitClient {
     pageSize?: number
     cursor?: string
     includeEmptyConversations?: boolean
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.ServerConversations>> {
-    return this._connection.getServerConversations({
+  }) {
+    return this._client.chatManager.getConversationList({
       pageSize: options?.pageSize ?? 50,
       cursor: options?.cursor ?? '',
       includeEmptyConversations: options?.includeEmptyConversations ?? false,
     })
   }
 
-  /** 置顶/取消置顶会话 */
-  async pinConversation(options: {
-    conversationId: string
-    conversationType: ConversationTypeValue
-    isPinned: boolean
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.PinConversation>> {
-    return this._connection.pinConversation(options)
+  /** 获取本地会话列表（WebSocket 同步的内存数据） */
+  getSessionList() {
+    return this._client.chatManager.getSessionList()
   }
 
-  /** 发送会话已读回执（单聊/群聊均支持，用于清空整个会话的未读数） */
-  async sendChannelAck(options: {
-    chatType: ConversationTypeValue
-    to: string
-  }): Promise<EasemobChat.SendMsgResult | void> {
-    const msg = WebIM.message.create({
-      type: ACK_TYPE.CHANNEL as EasemobChat.MessageType,
-      chatType: options.chatType as EasemobChat.ChatType,
-      to: options.to,
-    } as EasemobChat.CreateChannelMsgParameters)
-    return this._connection.send(msg)
+  /** 强制刷新会话列表 */
+  async refreshSessionList(options?: { needEmptySession?: boolean; needSessionMark?: boolean }) {
+    return this._client.chatManager.refreshSessionList({
+      needEmptySession: options?.needEmptySession ?? false,
+      needSessionMark: options?.needSessionMark ?? false,
+    })
+  }
+
+  /** 置顶/取消置顶会话 */
+  async setConversationPinned(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    pinned: boolean
+  }) {
+    return this._client.chatManager.setConversationPinned({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
+      pinned: options.pinned,
+    })
+  }
+
+  /** 标记会话已读（替代 sendChannelAck） */
+  async markConversationRead(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+  }) {
+    return this._client.chatManager.markConversationRead({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
+    })
   }
 
   /** 发送消息已读回执（单聊） */
-  async sendReadAck(options: {
-    chatType: ConversationTypeValue
-    to: string
-    msgId: string
-  }): Promise<EasemobChat.SendMsgResult> {
-    const msg = WebIM.message.create({
-      type: ACK_TYPE.READ as EasemobChat.MessageType,
-      chatType: options.chatType as EasemobChat.ChatType,
-      to: options.to,
-      id: options.msgId,
-    } as EasemobChat.CreateReadMsgParameters)
-    return this._connection.send(msg)
+  async sendMessageReadAck(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+    messageId: string
+  }) {
+    return this._client.chatManager.sendMessageReadAck({
+      conversationId: options.conversationId,
+      messageId: options.messageId,
+    })
   }
 
   /** 发送群消息已读回执 */
-  async sendGroupReadAck(options: {
-    to: string
-    msgId: string
+  async sendGroupMessageReadAck(options: {
+    groupId: string
+    messageId: string
     ackContent?: string
-  }): Promise<EasemobChat.SendMsgResult> {
-    const msg = WebIM.message.create({
-      type: ACK_TYPE.GROUP_READ as EasemobChat.MessageType,
-      chatType: 'groupChat' as EasemobChat.ChatType,
-      to: options.to,
-      id: options.msgId,
+  }) {
+    return this._client.chatManager.sendGroupMessageReadAck({
+      groupId: options.groupId,
+      messageId: options.messageId,
       ackContent: options.ackContent || JSON.stringify({}),
-    } as EasemobChat.CreateReadMsgParameters)
-    return this._connection.send(msg)
+    })
   }
 
   /** 撤回消息 */
   async recallMessage(options: {
-    mid: string
-    to: string
-    chatType: ConversationTypeValue
-    ext?: string
-  }): Promise<EasemobChat.SendMsgResult> {
-    return this._connection.recallMessage({
-      mid: options.mid,
-      to: options.to,
-      chatType: options.chatType as 'singleChat' | 'groupChat' | 'chatRoom',
-      ext: options.ext,
+    messageId: string
+    conversationId: string
+    conversationType: ConversationTypeValue
+  }) {
+    return this._client.chatManager.recallMessage({
+      messageId: options.messageId,
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
     })
   }
 
-  /** 修改已发送的消息（当前 SDK 仅文本消息支持完整内容修改，其它类型仅支持 ext 修改） */
-  async modifyMessage(options: {
-    messageId: string
-    modifiedMessage: EasemobChat.ExcludeAckMessageBody
-  }): Promise<EasemobChat.ModifyMsgResult> {
-    return this._connection.modifyMessage({
-      messageId: options.messageId,
-      modifiedMessage: options.modifiedMessage,
-    })
+  /** 修改已发送的消息 */
+  async modifyMessage(options: UpdateMessageParams) {
+    return this._client.chatManager.modifyMessage(options)
   }
 
   /** 置顶消息 */
@@ -234,10 +333,10 @@ export class UIKitClient {
     conversationId: string
     conversationType: ConversationTypeValue
     messageId: string
-  }): Promise<void> {
-    return this._connection.pinMessage({
+  }) {
+    return this._client.chatManager.pinMessage({
       conversationId: options.conversationId,
-      conversationType: options.conversationType as EasemobChat.ChatType,
+      conversationType: options.conversationType,
       messageId: options.messageId,
     })
   }
@@ -247,72 +346,78 @@ export class UIKitClient {
     conversationId: string
     conversationType: ConversationTypeValue
     messageId: string
-  }): Promise<void> {
-    return this._connection.unpinMessage({
+  }) {
+    return this._client.chatManager.unpinMessage({
       conversationId: options.conversationId,
-      conversationType: options.conversationType as EasemobChat.ChatType,
+      conversationType: options.conversationType,
       messageId: options.messageId,
     })
   }
 
   /** 分页拉取会话置顶消息列表 */
-  async getServerPinnedMessages(options: {
+  async getPinnedMessageList(options: {
     conversationId: string
     conversationType: ConversationTypeValue
     pageSize?: number
     cursor?: string
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.CursorPinnedMessagesResult>> {
-    return this._connection.getServerPinnedMessages({
-      conversationId: options.conversationId,
-      conversationType: options.conversationType as EasemobChat.ChatType,
-      pageSize: options.pageSize ?? 20,
-      cursor: options.cursor ?? '',
-    })
+  }): Promise<PinnedMessageListResult> {
+    /**
+     * @see SDK_DEFICIENCY: getPinnedMessageList 参数类型仅包含 ConversationIdentifier，
+     * 不支持 pageSize/cursor 分页参数，但我们仍透传以确保向后兼容。
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._client.chatManager.getPinnedMessageList(options as any)
   }
 
   /** 翻译文本（支持多目标语言；UIKIT 当前仅使用单目标） */
-  async translateMessage(options: {
-    text: string
-    languages: string[]
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.TranslationResult>> {
-    return this._connection.translateMessage({
-      text: options.text,
-      languages: options.languages,
+  async translateMessage(options: { text: string; languages: string[] }): Promise<MessageTranslationResult> {
+    const fakeMsg = this._client.chatManager.createTextMessage({
+      conversationId: '',
+      conversationType: 'singleChat' as const,
+      content: options.text,
+    })
+    return this._client.chatManager.translateMessage({
+      message: fakeMsg,
+      targetLanguages: options.languages,
     })
   }
 
   /** 获取翻译服务支持的语言列表 */
-  async getSupportedLanguages(): Promise<EasemobChat.AsyncResult<EasemobChat.SupportLanguage[]>> {
-    return this._connection.getSupportedLanguages()
+  async getSupportedTranslationLanguages() {
+    return this._client.chatManager.getSupportedTranslationLanguages()
   }
 
   /** 获取群消息已读用户列表 */
-  async getGroupMsgReadUser(options: {
-    msgId: string
+  async getGroupMessageReadUsers(options: {
+    messageId: string
     groupId: string
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.GetGroupMsgReadUserResult>> {
-    return this._connection.getGroupMsgReadUser(options)
+  }) {
+    return this._client.chatManager.getGroupMessageReadUsers(options)
   }
 
   /** 删除会话 */
   async deleteConversation(options: {
-    channel: string
-    chatType: ConversationTypeValue
-    deleteRoam: boolean
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.DeleteSessionResult>> {
-    return this._connection.deleteConversation(options)
+    conversationId: string
+    conversationType: ConversationTypeValue
+    deleteRoamingMessages?: boolean
+  }) {
+    return this._client.chatManager.deleteConversation({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
+      deleteRoamingMessages: options.deleteRoamingMessages ?? false,
+    })
   }
 
   /** 获取历史消息（分页） */
   async getHistoryMessages(options: {
     targetId: string
-    chatType: ConversationTypeValue
+    conversationType: ConversationTypeValue
     pageSize?: number
     cursor?: string
-  }): Promise<EasemobChat.HistoryMessages> {
-    return this._connection.getHistoryMessages({
-      targetId: options.targetId,
-      chatType: options.chatType as EasemobChat.ChatType,
+  }) {
+    return this._client.chatManager.getHistoryMessages({
+      conversationId: options.targetId,
+      conversationType: options.conversationType,
       pageSize: options.pageSize ?? 20,
       cursor: options.cursor ?? '',
     })
@@ -320,100 +425,85 @@ export class UIKitClient {
 
   // ========== 好友 ==========
   /** 获取全部好友列表（轻量，仅 userId） */
-  async getAllContacts(): Promise<EasemobChat.AsyncResult<EasemobChat.ContactItem[]>> {
-    return this._connection.getAllContacts()
+  getContacts() {
+    return this._client.contactManager.getContacts()
   }
 
   /** 分页获取好友列表（含备注） */
   async getContactsWithCursor(options?: {
     pageSize?: number
     cursor?: string
-  }): Promise<EasemobChat.AsyncResult<EasemobChat.CursorContactsResult>> {
-    return this._connection.getContactsWithCursor({
+  }) {
+    /**
+     * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法，
+     * 仅提供 getContacts() 返回内存中的完整联系人列表。
+     * 此处保留占位实现以维持 UIKit 分页接口兼容性。
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (this._client.contactManager as any).getContactsWithCursor?.({
       pageSize: options?.pageSize ?? 50,
       cursor: options?.cursor ?? '',
     })
   }
 
   /** 添加好友 */
-  async addContact(userId: string, reason?: string): Promise<void> {
-    return this._connection.addContact(userId, reason ?? '')
+  async addContact(userId: string, reason?: string) {
+    return this._client.contactManager.addContact({
+      userId,
+      message: reason ?? '',
+    })
   }
 
   /** 删除好友 */
-  async deleteContact(userId: string): Promise<void> {
-    return this._connection.deleteContact(userId)
+  async deleteContact(userId: string) {
+    return this._client.contactManager.deleteContact({ userId })
   }
 
   /** 设置好友备注 */
-  async setContactRemark(userId: string, remark: string): Promise<void> {
-    return this._connection.setContactRemark({ userId, remark })
+  async setContactRemark(userId: string, remark: string) {
+    return this._client.contactManager.setContactRemark({ userId, remark })
   }
 
   // ========== 黑名单 ==========
   /** 获取黑名单 */
-  async getBlocklist(): Promise<string[]> {
-    const res = await this._connection.getBlocklist()
-    if (Array.isArray(res?.data)) return res.data as string[]
-    if (Array.isArray(res)) return res as string[]
-    return []
+  getBlocklist() {
+    return this._client.contactManager.getBlocklist()
   }
 
   /** 加入黑名单 */
-  async addUsersToBlocklist(userIds: string[]): Promise<EasemobChat.AsyncResult<EasemobChat.OperateResult>> {
-    return this._connection.addUsersToBlocklist({ name: userIds })
+  async addUsersToBlocklist(userIds: string[]) {
+    return this._client.contactManager.addUsersToBlocklist({ userIds })
   }
 
   /** 移出黑名单 */
-  async removeUserFromBlocklist(userId: string): Promise<void> {
-    return this._connection.removeUserFromBlocklist({ name: userId })
+  async removeUserFromBlocklist(userId: string) {
+    return this._client.contactManager.removeUserFromBlocklist({ userIds: [userId] })
   }
 
   // ========== 群组 ==========
-  /** 拉取已加入的群组（分页）
-   *
-   * 当 needAffiliations=true 时，SDK 返回 GroupInfo[]（含 memberCount/role 等字段）；
-   * 否则返回 BaseGroupInfo[]（仅 groupId/groupName）。
-   */
-  async getJoinedGroups(options?: {
+  /** 拉取已加入的群组（分页） */
+  async getJoinedGroupList(options?: {
     pageSize?: number
-    pageNum?: number
-    needAffiliations?: boolean
+    needMemberCount?: boolean
     needRole?: boolean
-  }): Promise<JoinedGroupItem[]> {
-    const res: unknown = await this._connection.getJoinedGroups({
+  }) {
+    return this._client.groupManager.getJoinedGroupList({
       pageSize: options?.pageSize ?? 50,
-      pageNum: options?.pageNum ?? 0,
-      needAffiliations: options?.needAffiliations ?? false,
+      needMemberCount: options?.needMemberCount ?? false,
       needRole: options?.needRole ?? false,
     })
-    console.log('[UIKitClient] getJoinedGroups raw res:', res)
-
-    type RawResult = { data?: unknown[]; entities?: unknown[] }
-
-    const parsed = res as RawResult | unknown[]
-
-    if (Array.isArray(parsed)) return parsed as JoinedGroupItem[]
-
-    const record = parsed as RawResult
-    if (Array.isArray(record?.data)) return record.data as JoinedGroupItem[]
-    if (Array.isArray(record?.entities)) return record.entities as JoinedGroupItem[]
-
-    return []
   }
 
   /** 获取当前用户加入的群组总数（轻量接口，无需拉取完整列表） */
-  async getJoinedGroupsCount(): Promise<number> {
+  async getJoinedGroupsCount() {
     try {
-      const res: unknown = await this._connection.getJoinedGroupsCount()
-      console.log('[UIKitClient] getJoinedGroupsCount raw res:', res)
-      // SDK 返回结构：{ data: number } 或 AsyncResult<{ data: number }>
-      if (typeof res === 'number') return res
-      const record = res as Record<string, unknown>
-      if (typeof record?.data === 'number') return record.data
-      // 某些版本可能直接返回 { count: number }
-      if (typeof record?.count === 'number') return record.count
-      return 0
+      const res = await this._client.groupManager.getJoinedGroupList({ pageSize: 1 })
+      /**
+       * @see SDK_DEFICIENCY: GroupListResult 类型未声明 total 字段，
+       * 但服务端实际返回中包含该字段。
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return typeof (res as any)?.total === 'number' ? (res as any).total : 0
     } catch (e) {
       console.warn('[UIKitClient] getJoinedGroupsCount failed:', e)
       return 0
@@ -421,43 +511,90 @@ export class UIKitClient {
   }
 
   /** 获取单个/多个群详情（支持批量） */
-  async getGroupInfo(groupId: string | string[]): Promise<any> {
-    const res = await this._connection.getGroupInfo({ groupId })
-    console.log('[UIKitClient] getGroupInfo raw res:', res)
-    return res
+  async getGroupInfo(groupId: string | string[]) {
+    const id = Array.isArray(groupId) ? groupId[0] : groupId
+    return this._client.groupManager.getGroupInfo({ groupId: id })
   }
 
   // ========== Presence ==========
   /** 订阅在线状态变更 */
-  async subscribePresence(userIds: string[], expiry = 7 * 24 * 60 * 60): Promise<any> {
-    return this._connection.subscribePresence({ usernames: userIds, expiry })
+  async subscribePresence(userIds: string[], expiry = 7 * 24 * 60 * 60) {
+    return this._client.presenceManager.subscribePresence({
+      userIds,
+      expiry,
+    })
   }
 
   /** 取消订阅在线状态 */
-  async unsubscribePresence(userIds: string[]): Promise<any> {
-    return this._connection.unsubscribePresence({ usernames: userIds })
+  async unsubscribePresence(userIds: string[]) {
+    return this._client.presenceManager.unsubscribePresence({ userIds })
   }
 
   /** 主动获取在线状态 */
-  async getPresenceStatus(userIds: string[]): Promise<any> {
-    return this._connection.getPresenceStatus({ usernames: userIds })
+  async getPresenceStatus(userIds: string[]) {
+    return this._client.presenceManager.getPresenceStatus({ userIds })
   }
 
   /** 发布自定义在线状态 */
-  async publishPresence(description: string): Promise<any> {
-    return this._connection.publishPresence({ description })
+  async publishPresence(description: string) {
+    /**
+     * @see SDK_DEFICIENCY: PublishPresenceParams 类型未从 im-sdk-web 主入口导出，
+     * 此处使用内联对象字面量。
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this._client.presenceManager.publishPresence({ customStatus: description } as any)
   }
 
-  /** 添加事件处理器 */
-  addEventHandler(id: string, handler: EasemobChat.EventHandlerType) {
-    this._handlers.set(id, handler)
-    this._connection.addEventHandler(id, handler)
+  /** 添加连接事件处理器 */
+  addEventHandler(id: string, handler: ConnectionEventHandlerMap | PresenceEventHandlerMap) {
+    this._connHandlers.set(id, handler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._client.addEventHandler(id, handler as any)
   }
 
-  /** 移除事件处理器 */
+  /** 移除连接事件处理器 */
   removeEventHandler(id: string) {
-    this._handlers.delete(id)
-    this._connection.removeEventHandler(id)
+    this._connHandlers.delete(id)
+    this._client.removeEventHandler(id)
+  }
+
+  /** 添加 ChatManager 事件处理器 */
+  addChatEventHandler(id: string, handler: ChatEventHandlerMap) {
+    this._chatHandlers.set(id, handler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._client.chatManager.addEventHandler(id, handler as any)
+  }
+
+  /** 移除 ChatManager 事件处理器 */
+  removeChatEventHandler(id: string) {
+    this._chatHandlers.delete(id)
+    this._client.chatManager.removeEventHandler(id)
+  }
+
+  /** 添加 ContactManager 事件处理器 */
+  addContactEventHandler(id: string, handler: ContactEventHandlerMap) {
+    this._contactHandlers.set(id, handler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._client.contactManager.addEventHandler(id, handler as any)
+  }
+
+  /** 移除 ContactManager 事件处理器 */
+  removeContactEventHandler(id: string) {
+    this._contactHandlers.delete(id)
+    this._client.contactManager.removeEventHandler(id)
+  }
+
+  /** 添加 GroupManager 事件处理器 */
+  addGroupEventHandler(id: string, handler: GroupEventHandlerMap) {
+    this._groupHandlers.set(id, handler)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._client.groupManager.addEventHandler(id, handler as any)
+  }
+
+  /** 移除 GroupManager 事件处理器 */
+  removeGroupEventHandler(id: string) {
+    this._groupHandlers.delete(id)
+    this._client.groupManager.removeEventHandler(id)
   }
 }
 
@@ -472,5 +609,3 @@ export function createClient(config: ClientConfig): UIKitClient {
 export function getClient(): UIKitClient | null {
   return clientInstance
 }
-
-

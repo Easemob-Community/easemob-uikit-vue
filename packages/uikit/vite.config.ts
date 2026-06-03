@@ -20,7 +20,7 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pinia', 'easemob-websdk'],
+      external: ['vue', 'pinia', 'im-sdk-web'],
       output: {
         // 同时存在命名导出与 default 导出时，显式声明使用命名导出策略，
         // 避免 Rollup 警告 "Consumers will have to use `EasemobUIKit.default`"。
@@ -29,7 +29,7 @@ export default defineConfig({
         globals: {
           vue: 'Vue',
           pinia: 'Pinia',
-          'easemob-websdk': 'Easemob',
+          'im-sdk-web': 'Easemob',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css') return 'theme/index.css'
