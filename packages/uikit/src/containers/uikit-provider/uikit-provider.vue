@@ -86,6 +86,7 @@ const dataSource = computed(() => props.dataSource ?? {})
  * 当 appKey 为空时仍创建上下文，但 client 实例可能无法完成登录。
  */
 const ctx = useUIKitProvider(config.value, {
+  autoInit: props.autoInit,
   features,
   dataSource: dataSource.value,
 })

@@ -196,6 +196,10 @@ export function useConversation() {
     sendChannelAck,
     deleteConversation,
     removeConversation,
+    /** 直接设置本地会话列表（业务自定义数据源 / demo 注入 mock 用） */
+    setLocalConversationList(list: UiConversation[]) {
+      conversationStore.setConversationList(list)
+    },
     saveDraft,
     loadDraft,
     clearDraft,

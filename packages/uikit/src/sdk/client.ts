@@ -5,7 +5,7 @@ import {
   PresenceManager,
   ChatClient as SdkChatClient,
 } from 'easemob-websdk'
-import type { InitConfig } from 'easemob-websdk'
+import type { ConnectionEventHandlerMap, EventHandlerMap, InitConfig } from 'easemob-websdk'
 
 /**
  * UIKit 需要使用的 SDK 管理器集合。
@@ -22,6 +22,10 @@ export interface ManagerHost {
   readonly presenceManager: PresenceManager
   /** 当前登录用户 ID（未登录时为 null） */
   readonly currentUserId: string | null
+  /** 注册连接级事件处理器（委托到底层 ChatClient） */
+  addEventHandler: (id: string, handlers: ConnectionEventHandlerMap) => void
+  /** 注销连接级事件处理器 */
+  removeEventHandler: (id: string) => void
 }
 
 /**
@@ -96,6 +100,16 @@ export class UIKitClient {
   /** 当前登录用户 ID */
   get currentUserId() {
     return this._client.getCurrentUserId()
+  }
+
+  /** 注册连接级事件处理器（委托到底层 ChatClient） */
+  addEventHandler(id: string, handlers: ConnectionEventHandlerMap) {
+    this._client.addEventHandler(id, handlers as EventHandlerMap)
+  }
+
+  /** 注销连接级事件处理器 */
+  removeEventHandler(id: string) {
+    this._client.removeEventHandler(id)
   }
 
   /** 登录 SDK */

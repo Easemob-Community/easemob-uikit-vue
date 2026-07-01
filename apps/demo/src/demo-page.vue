@@ -14,7 +14,7 @@ import {
   useContactStore,
   setPinyinAdapter,
 } from '@easemob/uikit'
-import type { Conversation, Contact } from '@easemob/uikit'
+import type { UiContact, UiConversation } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
 
@@ -146,7 +146,7 @@ function updatePrimaryColor(e: Event) {
 }
 
 /** 生成 1000 条模拟会话数据用于测试滚动效果 */
-function generateMockConversations(count = 1000): Conversation[] {
+function generateMockConversations(count = 1000): UiConversation[] {
   const messages = [
     '你好，最近怎么样？',
     '明天一起吃饭吧',
@@ -163,12 +163,14 @@ function generateMockConversations(count = 1000): Conversation[] {
   return Array.from({ length: count }, (_, i) => ({
     id: `mock_conv_${i}`,
     name: `用户${String(i + 1).padStart(4, '0')}`,
-    lastMessage: messages[i % messages.length],
+    lastMessageText: messages[i % messages.length],
     lastMessageTime: now - i * 60000,
     unreadCount: i % 5 === 0 ? Math.floor(Math.random() * 10) + 1 : 0,
-    type: (i % 3 === 0 ? 'groupChat' : 'singleChat') as Conversation['type'],
+    type: (i % 3 === 0 ? 'groupChat' : 'singleChat') as UiConversation['type'],
     isPinned: i < 5,
     pinnedTime: i < 5 ? now - i * 1000 : undefined,
+    isMuted: false,
+    marks: [],
   }))
 }
 
@@ -187,7 +189,7 @@ const { stores } = useUIKit()
 /** 切到联系人页时清空当前会话，避免右侧 Chat 仍显示旧会话 */
 watch(sidebarTab, (tab) => {
   if (tab === 'contact') {
-    stores.conversation.setCurrentConversation(null)
+    stores.conversation.setCurrentConversationId(null)
   }
 })
 
@@ -218,7 +220,7 @@ function togglePinyinAdapter(enabled: boolean) {
 }
 
 /** 生成中英文混杂的联系人 mock 数据 */
-function generateMockContacts(): Contact[] {
+function generateMockContacts(): UiContact[] {
   const cn = [
     '张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十',
     '陈小明', '林志玲', '诸葛亮', '欧阳智勇', '马云', '黄德华',
@@ -231,7 +233,7 @@ function generateMockContacts(): Contact[] {
     'Sam', 'Tom', 'Uma', 'Vincent', 'Will', 'Xander', 'Yara', 'Zoe',
   ]
   const numId = ['001号客服', '002号客服', '＃特殊字符']
-  const list: Contact[] = []
+  const list: UiContact[] = []
   cn.forEach((name, i) => list.push({ userId: `cn_${i}`, name }))
   en.forEach((name, i) => list.push({ userId: `en_${i}`, name }))
   numId.forEach((name, i) => list.push({ userId: `num_${i}`, name }))

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from 'vue'
 import { EmUIKitProvider, useClient } from '@easemob/uikit'
-import type { Contact } from '@easemob/uikit'
+import type { UiContact } from '@easemob/uikit'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
 
@@ -26,7 +26,7 @@ const useCustomDataSource = ref(false)
 
 const customDataSource = {
   /** 示例：业务从自己后端拉取联系人。 */
-  async fetchContacts(): Promise<{ list: Contact[]; cursor?: string; hasMore?: boolean }> {
+  async fetchContacts(): Promise<{ list: UiContact[]; cursor?: string; hasMore?: boolean }> {
     // 实际使用时请替换为业务 API
     return {
       list: [

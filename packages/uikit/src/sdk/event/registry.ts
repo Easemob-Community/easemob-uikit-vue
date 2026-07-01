@@ -18,7 +18,7 @@ export function registerEventHandlers(client: ManagerHost, stores: RootStores) {
   const presenceHandlers = createPresenceHandlers(stores)
 
   // 连接事件注册到 ChatClient
-  ;(client as any).addEventHandler('uikit-conn', connHandlers)
+  client.addEventHandler('uikit-conn', connHandlers)
 
   // 各 manager 事件注册到对应 manager
   client.chatManager.addEventHandler('uikit-chat', chatHandlers)
@@ -27,7 +27,7 @@ export function registerEventHandlers(client: ManagerHost, stores: RootStores) {
   client.presenceManager.addEventHandler('uikit-presence', presenceHandlers)
 
   return () => {
-    ;(client as any).removeEventHandler('uikit-conn')
+    client.removeEventHandler('uikit-conn')
     client.chatManager.removeEventHandler('uikit-chat')
     client.contactManager.removeEventHandler('uikit-contact')
     client.groupManager.removeEventHandler('uikit-group')
