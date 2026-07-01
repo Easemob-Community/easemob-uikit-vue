@@ -17,8 +17,11 @@ export const useContactStore = defineStore('contact', () => {
   const selectedIds = ref<Set<string>>(new Set())
   /** 是否还有更多可加载（分页数据源场景） */
   const hasMore = ref(false)
-  /** 好友总数（可与列表长度不一致，如仅拉取了计数） */
-  const contactCount = ref(0)
+  /** 未加载完整列表时的轻量总数（仅在 loaded 为 false 时生效）；加载后总数恒等于列表长度 */
+  const explicitContactCount = ref(0)
+  const contactCount = computed(() =>
+    loaded.value ? contactList.value.length : explicitContactCount.value,
+  )
 
   const blackIdSet = computed(() => new Set(blackList.value.map(c => c.userId)))
 
@@ -105,7 +108,7 @@ export const useContactStore = defineStore('contact', () => {
   }
 
   function setContactCount(count: number) {
-    contactCount.value = count
+    explicitContactCount.value = count
   }
 
   function clearContacts() {
@@ -117,7 +120,7 @@ export const useContactStore = defineStore('contact', () => {
     activeId.value = ''
     selectedIds.value = new Set()
     hasMore.value = false
-    contactCount.value = 0
+    explicitContactCount.value = 0
   }
 
   // 别名方法：兼容 Domain 层 ContactStoreLike 接口

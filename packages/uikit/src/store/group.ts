@@ -1,12 +1,16 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { UiGroup } from '../sdk/types'
 
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<UiGroup[]>([])
   const currentGroup = ref<UiGroup | null>(null)
   const loaded = ref(false)
-  const joinedGroupCount = ref(0)
+  /** 未加载完整列表时的轻量群数量（仅在 loaded 为 false 时生效）；加载后恒等于列表长度 */
+  const explicitJoinedGroupCount = ref(0)
+  const joinedGroupCount = computed(() =>
+    loaded.value ? groupList.value.length : explicitJoinedGroupCount.value,
+  )
 
   // ===== UI 交互状态 =====
   const filterText = ref('')
@@ -63,7 +67,7 @@ export const useGroupStore = defineStore('group', () => {
   }
 
   function setJoinedGroupCount(count: number) {
-    joinedGroupCount.value = count
+    explicitJoinedGroupCount.value = count
   }
 
   function updateGroup(groupId: string, patch: Partial<UiGroup>) {
@@ -121,7 +125,7 @@ export const useGroupStore = defineStore('group', () => {
     groupList.value = []
     currentGroup.value = null
     loaded.value = false
-    joinedGroupCount.value = 0
+    explicitJoinedGroupCount.value = 0
     filterText.value = ''
     activeId.value = ''
     selectedIds.value = new Set()
