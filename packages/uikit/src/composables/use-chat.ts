@@ -13,7 +13,7 @@ import type {
   MessageTranslationResult,
   PinnedMessageListResult,
   PinnedMessageSummary,
-} from 'im-sdk-web'
+} from 'easemob-websdk'
 
 /** Typing 命令消息 action 常量 */
 const TYPING_ACTION = {
@@ -528,19 +528,12 @@ export function useChat(options?: UseChatOptions) {
     }
   }
 
-  /** 对指定消息发送已读回执（单聊） */
-  async function sendReadAckForMessage(msgId: string) {
-    const cvs = conversationStore.currentConversation
-    if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT) return
-    try {
-      await _getClient().conversation.sendMessageReadAck({
-        conversationId: cvs.id,
-        conversationType: cvs.type,
-        messageId: msgId,
-      })
-    } catch (e) {
-      console.warn('[useChat] sendMessageReadAck failed:', e)
-    }
+  /** 对指定消息发送已读回执（单聊）
+   * @deprecated SDK5 使用 markMessageRead，需要原始 SDK Message 对象。
+   * UIKit 不保留 SDK Message，业务层如需消息级已读回执请自行调用 client.chatManager.markMessageRead。
+   */
+  async function sendReadAckForMessage(_msgId: string) {
+    console.warn('[useChat] sendReadAckForMessage is deprecated in SDK5; use markMessageRead with SDK Message.')
   }
 
   /** 获取群消息已读用户详情 */

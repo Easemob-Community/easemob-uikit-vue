@@ -1,4 +1,4 @@
-import type { EventPayloadMap } from 'im-sdk-web'
+import type { ConversationItem, EventPayloadMap } from 'easemob-websdk'
 import type { UIKitClient } from '../client'
 import type { RootStores } from './index'
 import { mapSessionItem } from '../../composables/use-conversation'
@@ -8,29 +8,53 @@ import { mapSessionItem } from '../../composables/use-conversation'
  */
 export function createConversationHandler(client: UIKitClient, stores: RootStores) {
   const handler = {
-    /** 会话列表同步开始 */
-    onConversationListSyncDidStart: () => {
-      console.log('[EventHandler] onConversationListSyncDidStart')
+    /** 数据同步开始 */
+    onSyncDataStart: () => {
+      console.log('[EventHandler] onSyncDataStart')
       stores.conversation.setSyncingConversations(true)
     },
 
-    /** 会话列表同步完成 */
-    onConversationListSyncDidFinish: (_payload?: EventPayloadMap['onConversationListSyncDidFinish']) => {
-      console.log('[EventHandler] onConversationListSyncDidFinish')
+    /** 数据同步完成 */
+    onSyncDataFinished: () => {
+      console.log('[EventHandler] onSyncDataFinished')
       stores.conversation.setSyncingConversations(false)
-      // 同步完成后从本地 SessionList 读取会话数据（WebSocket 同步的内存数据）
+      // 同步完成后从本地 ConversationList 读取会话数据
       try {
         const sessionList = client.conversation.getSessionList()
         console.log('[EventHandler] getSessionList returned', {
           count: sessionList.length,
-          sessions: sessionList.map((s: unknown) => ({
-            sessionId: (s as Record<string, unknown>).sessionId,
-            type: (s as Record<string, unknown>).type,
-            unreadCount: (s as Record<string, unknown>).unreadCount,
+          sessions: sessionList.map((s) => ({
+            sessionId: s.conversationId,
+            type: s.conversationType,
+            unreadCount: s.unreadCount,
           })),
         })
-        const mapped = sessionList.map((item: unknown) => mapSessionItem(item))
+        const mapped = sessionList.map((item: ConversationItem) => mapSessionItem(item))
+        console.log('[EventHandler] mapped conversations unread counts:',
+          mapped.map((c: import('../../store/conversation').Conversation) => ({ id: c.id, unreadCount: c.unreadCount }))
+        )
         stores.conversation.setConversationList(mapped)
+
+        // 补偿：如果当前正在聊天的会话在同步后仍有未读数，自动标记已读
+        const currentCvs = stores.conversation.currentConversation
+        if (currentCvs) {
+          const syncedCvs = mapped.find((c: import('../../store/conversation').Conversation) => c.id === currentCvs.id)
+          if (syncedCvs && syncedCvs.unreadCount && syncedCvs.unreadCount > 0) {
+            console.log('[EventHandler] auto mark current conversation as read after sync:', {
+              conversationId: currentCvs.id,
+              unreadCount: syncedCvs.unreadCount,
+            })
+            client.conversation.markConversationRead({
+              conversationId: currentCvs.id,
+              conversationType: currentCvs.type,
+            }).then(() => {
+              stores.conversation.updateUnreadCount(currentCvs.id, 0)
+              console.log('[EventHandler] auto mark success:', { conversationId: currentCvs.id })
+            }).catch((e: unknown) => {
+              console.warn('[EventHandler] auto mark failed:', { conversationId: currentCvs.id, error: e })
+            })
+          }
+        }
       } catch (e) {
         console.warn('[EventHandler] getSessionList failed:', e)
       }
@@ -38,18 +62,14 @@ export function createConversationHandler(client: UIKitClient, stores: RootStore
       stores.conversation.setConversationsLoaded(true)
     },
 
-    /** 会话实时更新 */
-    onConversationUpdate: () => {
-      // 从 SessionListCache 重新读取完整数据，确保 isPinned、isMuted、displayName、
-      // remindType、marks 等 SessionItem 特有字段正确更新。
-      // 直接映射 payload 会丢失这些字段。
-      try {
-        const sessionList = client.conversation.getSessionList()
-        const mapped = sessionList.map((item: unknown) => mapSessionItem(item))
-        mapped.forEach((cvs: unknown) => stores.conversation.addConversation(cvs as import('../../store/conversation').Conversation))
-      } catch (e) {
-        console.warn('[EventHandler] onConversationUpdate getSessionList failed:', e)
-      }
+    /** 会话列表实时更新 */
+    onConversationListUpdate: (payload: EventPayloadMap['onConversationListUpdate']) => {
+      console.log('[EventHandler] onConversationListUpdate', {
+        reason: payload.reason,
+        count: payload.items.length,
+      })
+      const mapped = payload.items.map((item: ConversationItem) => mapSessionItem(item))
+      stores.conversation.setConversationList(mapped)
     },
 
     /** 多设备会话同步（删除/置顶/标记/免打扰等） */
@@ -74,7 +94,7 @@ export function createConversationHandler(client: UIKitClient, stores: RootStore
         case 'CONVERSATION_MUTE_INFO_CHANGED':
           if (event.remindType) {
             stores.conversation.updateConversation(conversationId, {
-              isMuted: event.remindType === 'none',
+              isMuted: event.remindType === 'NONE',
               remindType: event.remindType,
             })
           }

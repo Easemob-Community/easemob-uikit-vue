@@ -2,7 +2,7 @@ import type {
   UpdateMessageParams,
   MessageTranslationResult,
   PinnedMessageListResult,
-} from 'im-sdk-web'
+} from 'easemob-websdk'
 import type { ConversationTypeValue } from '../../constants'
 import type { ClientCore } from './index'
 

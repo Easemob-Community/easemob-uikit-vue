@@ -67,7 +67,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
   // ========== 在线状态事件（可选） ==========
   if (options.enablePresence) {
     const presenceHandler = createPresenceHandler(stores)
-    client.addEventHandler('uikit-presence', presenceHandler)
+    client.presenceManager.addEventHandler('uikit-presence', presenceHandler)
   }
 
   // ========== 群组事件（可选） ==========
@@ -91,7 +91,7 @@ export function createEventHandler(client: UIKitClient, stores: RootStores, opti
         client.removeContactEventHandler('uikit-blocklist')
       }
       if (options.enablePresence) {
-        client.removeEventHandler('uikit-presence')
+        client.presenceManager.removeEventHandler('uikit-presence')
       }
       if (options.enableGroup) {
         client.removeGroupEventHandler('uikit-group')

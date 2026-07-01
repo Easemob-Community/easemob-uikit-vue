@@ -5,7 +5,7 @@ import type {
   GroupManager,
   PresenceManager,
   InitConfig,
-} from 'im-sdk-web'
+} from 'easemob-websdk'
 
 /**
  * UIKIT 的客户端配置
@@ -57,17 +57,6 @@ export interface ChatEventHandler {
   onOfflineMessageSyncStart?: () => void
   onOfflineMessageSyncFinish?: () => void
 }
-
-/**
- * SDK 消息桥接类型。
- *
- * SDK 未将 Message 类型作为命名导出暴露，此处使用宽松的结构类型作为桥接层。
- * SDK 方法（sendMessage / createTextMessage 等）的返回值由 TypeScript 自动推断为正确的 Message 类型。
- *
- * @see SDK_DEFICIENCY: im-sdk-web 未在公共入口导出 Message 命名类型
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ChatMessage = Record<string, any>
 
 /** 错误事件类型 */
 export interface ChatError {

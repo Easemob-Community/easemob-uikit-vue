@@ -1,4 +1,4 @@
-import type { EventPayloadMap } from 'im-sdk-web'
+import type { EventPayloadMap } from 'easemob-websdk'
 import type { RootStores } from './index'
 
 /**
@@ -33,11 +33,11 @@ export function createContactHandler(stores: RootStores) {
       }
       console.info('[UIKit] onContactInfoUpdated:', msg)
     },
-    onContactSyncStart: () => {
+    onSyncDataStart: () => {
       console.log('[UIKit] Contact sync started')
     },
-    onContactSyncFinish: (payload: EventPayloadMap['onContactSyncFinish']) => {
-      console.log('[UIKit] Contact sync finished', payload)
+    onSyncDataFinished: () => {
+      console.log('[UIKit] Contact sync finished')
     },
   }
 

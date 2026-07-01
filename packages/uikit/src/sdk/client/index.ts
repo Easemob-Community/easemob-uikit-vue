@@ -4,16 +4,10 @@ import {
   ContactManager,
   GroupManager,
   PresenceManager,
-} from 'im-sdk-web'
-import type {
-  ChatEventHandlerMap,
-  ConnectionEventHandlerMap,
-  ContactEventHandlerMap,
-  GroupEventHandlerMap,
-  PresenceEventHandlerMap,
-} from 'im-sdk-web'
+} from 'easemob-websdk'
+import type { Message, ChatEventHandlerMap, ConnectionEventHandlerMap, ContactEventHandlerMap, EventHandlerMap, GroupEventHandlerMap, PresenceEventHandlerMap } from 'easemob-websdk'
 import type { ClientConfig, ChatClient } from '../types'
-import type { MessageStatusValue } from '../../constants'
+import type { MessageStatusValue, ConversationTypeValue } from '../../constants'
 import { MESSAGE_STATUS } from '../../constants'
 import { MessageService } from './message'
 import { ConversationService } from './conversation'
@@ -30,12 +24,7 @@ export { PresenceService } from './presence'
 
 let clientInstance: UIKitClient | null = null
 
-/**
- * 从 SDK ChatManager 返回值推断 Message 类型。
- * SDK 未将 Message 作为命名类型导出，此处通过 ReturnType 提取。
- * @see SDK_DEFICIENCY: im-sdk-web 未在公共入口导出 Message 命名类型
- */
-export type SdkMessage = Awaited<ReturnType<ChatClient['chatManager']['sendMessage']>>
+export type SdkMessage = Message
 
 export type MessageStatusCallback = (
   localMsgId: string,
@@ -57,7 +46,7 @@ export interface ClientCore {
 /**
  * UIKIT 客户端封装类
  *
- * 对 im-sdk-web 的 ChatClient 进行二次封装：
+ * 对 easemob-websdk 的 ChatClient 进行二次封装：
  * - 提供 login / logout / sendText 等便捷方法
  * - 统一事件处理器管理
  * - 支持消息发送状态回调（sending / sent / failed）
@@ -66,10 +55,10 @@ export interface ClientCore {
  */
 export class UIKitClient implements ClientCore {
   private _client: ChatClient
-  private _connHandlers = new Map<string, import('im-sdk-web').ConnectionEventHandlerMap | import('im-sdk-web').PresenceEventHandlerMap>()
-  private _chatHandlers = new Map<string, import('im-sdk-web').ChatEventHandlerMap>()
-  private _contactHandlers = new Map<string, import('im-sdk-web').ContactEventHandlerMap>()
-  private _groupHandlers = new Map<string, import('im-sdk-web').GroupEventHandlerMap>()
+  private _connHandlers = new Map<string, ConnectionEventHandlerMap>()
+  private _chatHandlers = new Map<string, ChatEventHandlerMap>()
+  private _contactHandlers = new Map<string, ContactEventHandlerMap>()
+  private _groupHandlers = new Map<string, GroupEventHandlerMap>()
   private _onMessageStatus?: MessageStatusCallback
 
   /** 消息服务 */
@@ -85,15 +74,13 @@ export class UIKitClient implements ClientCore {
 
   constructor(config: ClientConfig) {
     const { debug, ...sdkConfig } = config
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._client = (SdkChatClient as any).init({
+    this._client = SdkChatClient.init({
       ...sdkConfig,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      managers: [ChatManager, ContactManager, GroupManager, PresenceManager] as any,
+      managers: [ChatManager, ContactManager, GroupManager, PresenceManager],
     }) as ChatClient
     if (debug) {
       /**
-       * @see SDK_DEFICIENCY: im-sdk-web ChatClient 未在公开 API 中暴露 logger 属性，
+       * @see SDK_DEFICIENCY: easemob-websdk ChatClient 未在公开 API 中暴露 logger 属性，
        * 无法通过类型安全的方式设置日志级别。
        */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -179,13 +166,22 @@ export class UIKitClient implements ClientCore {
     return this._client.getConnectionState() === 'connected'
   }
 
+  // ========== 会话便捷方法 ==========
+
+  /** 标记会话已读（清空未读数） */
+  async markConversationRead(options: {
+    conversationId: string
+    conversationType: ConversationTypeValue
+  }) {
+    return this.conversation.markConversationRead(options)
+  }
+
   // ========== 事件处理器管理 ==========
 
   /** 添加连接事件处理器 */
-  addEventHandler(id: string, handler: import('im-sdk-web').ConnectionEventHandlerMap | import('im-sdk-web').PresenceEventHandlerMap) {
+  addEventHandler(id: string, handler: ConnectionEventHandlerMap) {
     this._connHandlers.set(id, handler)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._client.addEventHandler(id, handler as any)
+    this._client.addEventHandler(id, handler as EventHandlerMap)
   }
 
   /** 移除连接事件处理器 */
@@ -195,10 +191,9 @@ export class UIKitClient implements ClientCore {
   }
 
   /** 添加 ChatManager 事件处理器 */
-  addChatEventHandler(id: string, handler: import('im-sdk-web').ChatEventHandlerMap) {
+  addChatEventHandler(id: string, handler: ChatEventHandlerMap) {
     this._chatHandlers.set(id, handler)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._client.chatManager.addEventHandler(id, handler as any)
+    this._client.chatManager.addEventHandler(id, handler)
   }
 
   /** 移除 ChatManager 事件处理器 */
@@ -208,10 +203,9 @@ export class UIKitClient implements ClientCore {
   }
 
   /** 添加 ContactManager 事件处理器 */
-  addContactEventHandler(id: string, handler: import('im-sdk-web').ContactEventHandlerMap) {
+  addContactEventHandler(id: string, handler: ContactEventHandlerMap) {
     this._contactHandlers.set(id, handler)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._client.contactManager.addEventHandler(id, handler as any)
+    this._client.contactManager.addEventHandler(id, handler)
   }
 
   /** 移除 ContactManager 事件处理器 */
@@ -221,10 +215,9 @@ export class UIKitClient implements ClientCore {
   }
 
   /** 添加 GroupManager 事件处理器 */
-  addGroupEventHandler(id: string, handler: import('im-sdk-web').GroupEventHandlerMap) {
+  addGroupEventHandler(id: string, handler: GroupEventHandlerMap) {
     this._groupHandlers.set(id, handler)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._client.groupManager.addEventHandler(id, handler as any)
+    this._client.groupManager.addEventHandler(id, handler)
   }
 
   /** 移除 GroupManager 事件处理器 */

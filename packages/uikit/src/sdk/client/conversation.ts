@@ -1,4 +1,5 @@
 import type { ConversationTypeValue } from '../../constants'
+import type { ConversationFilter as SdkConversationFilter, Message } from 'easemob-websdk'
 import type { ClientCore } from './index'
 
 /**
@@ -15,35 +16,36 @@ export class ConversationService {
       includeEmptyConversations?: boolean
     },
   ) {
-    const params = {
-      pageSize: options?.pageSize ?? 50,
-      cursor: options?.cursor ?? '',
-      includeEmptyConversations: options?.includeEmptyConversations ?? false,
-    }
-    console.log('[UIKitClient] getServerConversations -> chatManager.getConversationList', params)
-    const result = await this.core.chatManager.getConversationList(params)
+    const filter: SdkConversationFilter = {}
+    console.log('[UIKitClient] getServerConversations -> chatManager.getConversationList', options)
+    const result = await this.core.chatManager.getConversationList(filter)
     console.log('[UIKitClient] getServerConversations <- result', {
-      hasItems: !!result && 'items' in result,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      itemCount: (result as any)?.items?.length ?? 0,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      cursor: (result as any)?.cursor,
+      count: result.length,
     })
     return result
   }
 
-  /** 获取本地会话列表（WebSocket 同步的内存数据） */
+  /** 获取本地会话列表（来自 SDK 同步后的内存数据） */
   getSessionList() {
-    return this.core.chatManager.getSessionList()
+    const list = this.core.chatManager.getConversationList()
+    console.log('[ConversationService] getSessionList:', {
+      count: list.length,
+      items: list.map((item) => ({
+        sessionId: item.conversationId,
+        type: item.conversationType,
+        unreadCount: item.unreadCount,
+        lastMessageAt: item.lastMessageAt,
+      })),
+    })
+    return list
   }
 
   /** 强制刷新会话列表 */
   async refreshSessionList(
-    options?: { needEmptySession?: boolean; needSessionMark?: boolean },
+    options?: { includeEmpty?: boolean },
   ) {
     return this.core.chatManager.refreshSessionList({
-      needEmptySession: options?.needEmptySession ?? false,
-      needSessionMark: options?.needSessionMark ?? false,
+      includeEmpty: options?.includeEmpty ?? false,
     })
   }
 
@@ -69,38 +71,40 @@ export class ConversationService {
       conversationType: ConversationTypeValue
     },
   ) {
-    return this.core.chatManager.markConversationRead({
+    console.log('[ConversationService] markConversationRead ->', {
       conversationId: options.conversationId,
       conversationType: options.conversationType,
     })
+    const result = await this.core.chatManager.markConversationRead({
+      conversationId: options.conversationId,
+      conversationType: options.conversationType,
+    })
+    // mark 后立即查询该会话在列表中的状态
+    const sessionList = this.core.chatManager.getConversationList()
+    const session = sessionList.find(
+      (s) => s.conversationId === options.conversationId,
+    )
+    console.log('[ConversationService] markConversationRead <- result:', result, 'session after mark:', session ? {
+      sessionId: session.conversationId,
+      unreadCount: session.unreadCount,
+    } : 'not found')
+    return result
   }
 
-  /** 发送消息已读回执（单聊） */
+  /** 发送消息已读回执（单聊/群聊统一入口） */
   async sendMessageReadAck(
     options: {
-      conversationId: string
-      conversationType: ConversationTypeValue
-      messageId: string
-    },
-  ) {
-    return this.core.chatManager.sendMessageReadAck({
-      conversationId: options.conversationId,
-      messageId: options.messageId,
-    })
-  }
-
-  /** 发送群消息已读回执 */
-  async sendGroupMessageReadAck(
-    options: {
-      groupId: string
-      messageId: string
+      message: Message
       ackContent?: string
     },
   ) {
-    return this.core.chatManager.sendGroupMessageReadAck({
-      groupId: options.groupId,
-      messageId: options.messageId,
-      ackContent: options.ackContent || JSON.stringify({}),
+    return this.core.chatManager.markMessageRead({
+      messages: [
+        {
+          message: options.message,
+          ackContent: options.ackContent,
+        },
+      ],
     })
   }
 
@@ -110,12 +114,14 @@ export class ConversationService {
       conversationId: string
       conversationType: ConversationTypeValue
       deleteRoamingMessages?: boolean
+      deleteLocal?: boolean
     },
   ) {
     return this.core.chatManager.deleteConversation({
       conversationId: options.conversationId,
       conversationType: options.conversationType,
       deleteRoamingMessages: options.deleteRoamingMessages ?? false,
+      deleteLocal: options.deleteLocal ?? true,
     })
   }
 

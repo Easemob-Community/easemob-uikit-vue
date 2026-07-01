@@ -2,75 +2,41 @@ import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from './use-uikit-storage'
 import type { Conversation } from '../store/conversation'
-import type { ChatManager } from 'im-sdk-web'
+import type { ConversationItem } from 'easemob-websdk'
 
 /**
- * SDK ConversationPage 类型提取（未从 im-sdk-web 主入口导出）。
+ * 将本地 ConversationItem（SDK 同步数据）转换为 UIKIT Conversation 格式。
  */
-type SdkConversationPage = Awaited<ReturnType<ChatManager['getConversationList']>>
-
-/**
- * 将本地 SessionItem（WebSocket 同步数据）转换为 UIKIT Conversation 格式。
- * SDK 5.x 优先使用 getSessionList() 获取会话数据，字段更丰富。
- */
-export function mapSessionItem(item: unknown): Conversation {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const s = item as any
-  const lastMsg = s.lastMessage
+export function mapSessionItem(item: ConversationItem): Conversation {
+  const lastMsg = item.lastMessage
   const lastMsgBody = lastMsg?.body || {}
   return {
-    id: s.sessionId,
-    name: s.display?.displayName || s.sessionId,
-    avatar: s.display?.avatarUrl,
-    lastMessage: lastMsgBody.content || lastMsgBody.msg || lastMsg?.type || '',
+    id: item.conversationId,
+    name: item.conversationName || item.conversationId,
+    avatar: item.conversationAvatar,
+    lastMessage: (lastMsgBody.content as string) || (lastMsgBody.msg as string) || lastMsg?.type || '',
     lastMessageType: lastMsg?.type || '',
     lastMessageSender: lastMsg?.from || '',
-    lastMessageTime: s.lastMessageAt || lastMsg?.timestamp || 0,
-    unreadCount: s.unreadCount || 0,
-    type: s.type as Conversation['type'],
-    isPinned: s.isPinned || false,
-    pinnedTime: s.pinnedTime || 0,
-    isMuted: s.remindType === 'none',
-    displayName: s.display?.displayName,
-    avatarUrl: s.display?.avatarUrl,
-    remindType: s.remindType,
-    marks: [...(s.marks || [])] as number[],
-    readReceipt: s.readReceipt || 0,
+    lastMessageTime: item.lastMessageAt || lastMsg?.timestamp || 0,
+    unreadCount: item.unreadCount || 0,
+    type: item.conversationType as Conversation['type'],
+    isPinned: item.isPinned || false,
+    pinnedTime: item.pinnedTimestamp || 0,
+    isMuted: item.remindType === 'NONE',
+    displayName: item.conversationName,
+    avatarUrl: item.conversationAvatar,
+    remindType: item.remindType,
+    marks: [...(item.marks || [])] as number[],
+    readReceipt: item.readAt || 0,
   }
 }
 
 /**
  * 将 REST 分页会话数据（ConversationItem）转换为 UIKIT Conversation 格式。
  * 仅用于 loadMore 等分页场景。
- *
- * @see SDK_DEFICIENCY: ConversationItem 未暴露 isMuted、remindType、display（displayName/avatarUrl）字段，
- * 这些字段仅在 SessionItem 中可用（通过 getSessionList）。
  */
-function mapConversationItem(item: SdkConversationPage['items'][number]): Conversation {
-  const lastMsg = item.lastMessage
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const body = (lastMsg?.body || {}) as Record<string, any>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const itemAny = item as any
-  return {
-    id: item.conversationId,
-    name: item.conversationId || itemAny.display?.displayName || '',
-    avatar: itemAny.display?.avatarUrl,
-    lastMessage: body.content || body.msg || lastMsg?.type || '',
-    lastMessageType: lastMsg?.type || '',
-    lastMessageSender: (lastMsg as any)?.from || '',
-    lastMessageTime: lastMsg?.timestamp || 0,
-    unreadCount: item.unreadCount || 0,
-    type: item.conversationType as Conversation['type'],
-    isPinned: item.isPinned || false,
-    pinnedTime: item.pinnedTime || 0,
-    isMuted: itemAny.isMuted || false,
-    displayName: itemAny.display?.displayName,
-    avatarUrl: itemAny.display?.avatarUrl,
-    remindType: itemAny.remindType,
-    marks: [...item.marks] as number[],
-    readReceipt: itemAny.readReceipt || 0,
-  }
+function mapConversationItem(item: ConversationItem): Conversation {
+  return mapSessionItem(item)
 }
 
 /** 草稿存储配置 */
@@ -121,16 +87,6 @@ export function useConversation() {
    * - 传入 `force: true` 可强制拉取（下拉刷新 / 业务主动刷新场景）。
    * - `append: true` 在加载更多场景使用，不受该短路逻辑影响。
    */
-  /**
-   * 获取会话列表（SDK 5.x WebSocket 驱动）。
-   *
-   * 策略：
-   * - 首次加载：优先调用 getSessionList() 读取 WebSocket 同步的本地内存数据。
-   *   如果本地无数据（同步尚未完成），fallback 到 REST getConversationList。
-   * - 加载更多（append）：走 REST getConversationList 分页。
-   * - force 刷新：触发 refreshSessionList() 强制服务端重新同步，
-   *   同步完成后由 onConversationListSyncDidFinish 事件自动填充 store。
-   */
   async function fetchServerConversations(options?: {
     pageSize?: number
     cursor?: string
@@ -151,23 +107,22 @@ export function useConversation() {
     // ===== 加载更多：走 REST 分页 =====
     if (isLoadMore) {
       console.log('[useConversation] loadMore mode -> REST getConversationList')
-      const res = await client.value?.conversation.getServerConversations(options)
-      const page = res as SdkConversationPage
-      const list = page?.items || []
-      const mapped: Conversation[] = list.map(mapConversationItem)
+      const list = await client.value?.conversation.getServerConversations(options)
+      const mapped: Conversation[] = (list || []).map(mapConversationItem)
       mapped.forEach((cvs) => conversationStore.addConversation(cvs))
-      conversationStore.setConversationCursor(page?.cursor || null)
-      return page
+      // SDK5 getConversationList 当前返回完整数组，无 cursor 分页；需要时再接入
+      conversationStore.setConversationCursor(null)
+      return list
     }
 
     // ===== 强制刷新：触发 WebSocket 重新同步 =====
     if (isForceRefresh) {
       console.log('[useConversation] force refresh -> calling refreshSessionList')
       await client.value?.conversation.refreshSessionList({
-        needEmptySession: options?.includeEmptyConversations ?? false,
+        includeEmpty: options?.includeEmptyConversations ?? false,
       })
-      // refreshSessionList 会触发 onConversationListSyncDidStart/Finish，
-      // 在 Finish 回调中会调用 getSessionList 填充 store，此处无需额外处理。
+      // refreshSessionList 会触发 onConversationListUpdate，
+      // 在事件回调中会调用 getConversationList 填充 store，此处无需额外处理。
       return null
     }
 
@@ -179,28 +134,25 @@ export function useConversation() {
 
     console.log('[useConversation] first load -> try getSessionList')
     const sessionList = client.value?.conversation.getSessionList()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sessions = sessionList as any[]
-    if (sessions && sessions.length > 0) {
+    const sessions = sessionList || []
+    if (sessions.length > 0) {
       console.log('[useConversation] getSessionList hit', { count: sessions.length })
       const mapped = sessions.map(mapSessionItem)
       conversationStore.setConversationList(mapped)
       conversationStore.setConversationsLoaded(true)
       // SessionList 不支持分页游标，标记为无更多
       conversationStore.setConversationCursor(null)
-      return { items: sessions, cursor: '', hasMore: false }
+      return sessions
     }
 
     // ===== Fallback：本地无数据，走 REST =====
     console.log('[useConversation] getSessionList empty -> fallback to REST')
-    const res = await client.value?.conversation.getServerConversations(options)
-    const page = res as SdkConversationPage
-    const list = page?.items || []
-    const mapped: Conversation[] = list.map(mapConversationItem)
+    const list = await client.value?.conversation.getServerConversations(options)
+    const mapped: Conversation[] = (list || []).map(mapConversationItem)
     conversationStore.setConversationList(mapped)
     conversationStore.setConversationsLoaded(true)
-    conversationStore.setConversationCursor(page?.cursor || null)
-    return page
+    conversationStore.setConversationCursor(null)
+    return list
   }
 
   /**
@@ -251,8 +203,14 @@ export function useConversation() {
       conversationStore.updateUnreadCount(id, 0)
       return
     }
-    await client.value?.conversation.markConversationRead({ conversationId: id, conversationType: cvs.type })
-    conversationStore.updateUnreadCount(id, 0)
+    try {
+      await client.value?.conversation.markConversationRead({ conversationId: id, conversationType: cvs.type })
+      conversationStore.updateUnreadCount(id, 0)
+      console.log('[sendChannelAck] markConversationRead success:', { conversationId: id, unreadCount: 0 })
+    } catch (error) {
+      console.warn('[sendChannelAck] markConversationRead failed:', { conversationId: id, error })
+      // 调用失败时不更新本地未读数，避免"假已读"
+    }
   }
 
   /** 删除会话（服务端+本地） */

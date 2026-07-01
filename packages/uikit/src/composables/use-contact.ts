@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { useContactStore } from '../store/contact'
 import type { Contact } from '../store/contact'
 import { useUIKit } from './use-uikit'
-import type { Contact as SdkContact } from 'im-sdk-web'
+import type { Contact as SdkContact } from 'easemob-websdk'
 
 /**
  * 列表 UI 状态：当前激活项 / 多选集合 / 搜索词

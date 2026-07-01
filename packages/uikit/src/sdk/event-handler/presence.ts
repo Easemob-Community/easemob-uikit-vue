@@ -1,4 +1,4 @@
-import type { EventPayloadMap } from 'im-sdk-web'
+import type { EventPayloadMap } from 'easemob-websdk'
 import type { RootStores } from './index'
 import type { PresenceStatus } from '../../store/presence'
 

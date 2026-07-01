@@ -40,7 +40,7 @@ function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource',
 const { mode, primaryColor, hoverStyle, containerGap, setMode, setPrimaryColor, setHoverStyle, setContainerGap, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
 const { theme: themeStore } = useUIKit()
-const { client, connected, isLoggedIn, currentUser, connection, init, login, logout } = useClient()
+const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
 const { setLocalConversationList } = useConversation()
 
 const showSettings = ref(false)
@@ -880,8 +880,8 @@ function injectMockContacts() {
                 登出
               </button>
             </div>
-            <div v-if="connection" class="demo-info">
-              connection 实例: {{ connection.constructor.name }}
+            <div v-if="sdkClient" class="demo-info">
+              sdkClient 实例: {{ sdkClient.constructor.name }}
             </div>
           </div>
         </div>

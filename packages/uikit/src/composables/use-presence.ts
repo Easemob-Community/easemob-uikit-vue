@@ -1,7 +1,7 @@
 import { computed, onScopeDispose, toValue, watch, type ComputedRef, type MaybeRefOrGetter } from 'vue'
 import { usePresenceStore, type PresenceInfo } from '../store/presence'
 import { useUIKit } from './use-uikit'
-import type { PresenceManager } from 'im-sdk-web'
+import type { PresenceManager } from 'easemob-websdk'
 
 /** SDK getPresenceStatus 返回的在线状态类型 */
 type SdkPresenceInfo = Awaited<ReturnType<PresenceManager['getPresenceStatus']>>[number]

@@ -1,4 +1,4 @@
-import type { EventPayloadMap } from 'im-sdk-web'
+import type { EventPayloadMap } from 'easemob-websdk'
 import type { RootStores } from './index'
 import { MESSAGE_STATUS } from '../../constants'
 import type { Message } from '../../store/message'
@@ -56,21 +56,10 @@ export function createMessageHandler(stores: RootStores) {
       // 当前会话的消息：自动发送已读回执
       const clientInstance = getClient()
       if (clientInstance) {
-        // 单聊：自动发消息已读回执
-        if (!isGroup && uiMsg.serverId) {
-          clientInstance.conversation.sendMessageReadAck({
-            conversationId,
-            conversationType: uiMsg.conversationType,
-            messageId: uiMsg.serverId,
-          }).catch((e: unknown) => console.warn('[EventHandler] sendMessageReadAck failed:', e))
-        }
-        // 群已读回执：若消息携带 allowGroupAck，自动回复
-        if (uiMsg.requireGroupAck && isGroup) {
-          clientInstance.conversation.sendGroupMessageReadAck({
-            groupId: sdkMsg.to || conversationId,
-            messageId: uiMsg.serverId,
-          }).catch((e: unknown) => console.warn('[EventHandler] sendGroupMessageReadAck failed:', e))
-        }
+        // SDK5 使用 markMessageRead 统一处理单聊/群聊已读回执，
+        // 需要传入完整 Message 对象。事件处理层只有 UI 消息，不直接调用，
+        // 由业务层在消息可见时通过 message store 里的 SDK message 触发。
+        void clientInstance
       }
     }
   }
@@ -103,27 +92,26 @@ export function createMessageHandler(stores: RootStores) {
 
     /** 消息已读回执 */
     onMessageRead: (payload: EventPayloadMap['onMessageRead']) => {
-      if (!payload.messageId) return
+      for (const item of payload) {
+        if (!item.messageId) continue
 
-      // 群已读回执
-      if (payload.isGroupAck) {
-        const ackContent = payload.ackContent
-        if (ackContent) {
+        // 群已读回执
+        if (item.conversationType === 'groupChat' && item.ackContent) {
           try {
-            const parsed = JSON.parse(ackContent)
+            const parsed = JSON.parse(item.ackContent)
             const groupReadCount = parsed?.count
             if (typeof groupReadCount === 'number') {
-              stores.message.updateMessageById(payload.messageId, { groupReadCount })
+              stores.message.updateMessageById(item.messageId, { groupReadCount })
             }
           } catch {
             // ackContent 不是 JSON，忽略
           }
+          continue
         }
-        return
-      }
 
-      // 单聊已读回执
-      stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.READ)
+        // 单聊已读回执
+        stores.message.updateMessageStatus(item.messageId, MESSAGE_STATUS.READ)
+      }
     },
 
     /** 会话已读回执 */

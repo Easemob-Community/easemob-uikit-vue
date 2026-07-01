@@ -16,7 +16,7 @@ import type { ClientConfig } from '../../sdk/types'
 import type { UIKitClient } from '../../sdk/client'
 import type { AnimationConfig } from '../../store/theme'
 import type { Contact as UIKitContact } from '../../store/contact'
-import type { UserInfo } from 'im-sdk-web'
+import type { UserInfo } from 'easemob-websdk'
 
 export interface ProviderProps {
   appKey?: string

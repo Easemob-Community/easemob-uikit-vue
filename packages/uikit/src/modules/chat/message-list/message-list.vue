@@ -12,7 +12,7 @@ import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receip
 import Modal from '../../../components/modal/modal.vue'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import type { Message } from '../../../store/message'
-import type { GroupMessageReadUsersResult } from 'im-sdk-web'
+import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { useToast } from '../../../composables/use-toast'
 
 export interface MessageListProps {

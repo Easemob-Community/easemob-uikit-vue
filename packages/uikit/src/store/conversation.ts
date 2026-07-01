@@ -107,9 +107,12 @@ export const useConversationStore = defineStore('conversation', () => {
   }
 
   function updateUnreadCount(id: string, count: number) {
-    const cvs = conversationList.value.find((item: Conversation) => item.id === id)
-    if (cvs) {
-      cvs.unreadCount = count
+    const index = conversationList.value.findIndex((item: Conversation) => item.id === id)
+    if (index > -1) {
+      conversationList.value[index] = {
+        ...conversationList.value[index],
+        unreadCount: count,
+      }
     }
   }
 

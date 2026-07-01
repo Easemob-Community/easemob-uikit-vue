@@ -27,7 +27,7 @@ export class PresenceService {
   /** 发布自定义在线状态 */
   async publishPresence(description: string) {
     /**
-     * @see SDK_DEFICIENCY: PublishPresenceParams 类型未从 im-sdk-web 主入口导出，
+     * @see SDK_DEFICIENCY: PublishPresenceParams 类型未从 easemob-websdk 主入口导出，
      * 此处使用内联对象字面量。
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

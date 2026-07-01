@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useContactStore, type Contact } from '../store/contact'
 import { useUIKit } from './use-uikit'
-import type { UserInfo } from 'im-sdk-web'
+import type { UserInfo } from 'easemob-websdk'
 
 /**
  * 黑名单能力集成

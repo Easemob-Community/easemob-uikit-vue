@@ -26,12 +26,15 @@ const useCustomDataSource = ref(false)
 
 const customDataSource = {
   /** 示例：业务从自己后端拉取联系人。 */
-  async fetchContacts(): Promise<Contact[]> {
+  async fetchContacts(): Promise<{ list: Contact[]; cursor?: string; hasMore?: boolean }> {
     // 实际使用时请替换为业务 API
-    return [
-      { userId: 'biz_alice', name: 'Alice (业务接口)' },
-      { userId: 'biz_bob', name: 'Bob (业务接口)' },
-    ]
+    return {
+      list: [
+        { userId: 'biz_alice', name: 'Alice (业务接口)' },
+        { userId: 'biz_bob', name: 'Bob (业务接口)' },
+      ],
+      hasMore: false,
+    }
   },
 }
 

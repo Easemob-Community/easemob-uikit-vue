@@ -16,7 +16,7 @@ export interface SdkMsgBase {
   chatType?: string
   ext?: { [key: string]: unknown }
   /**
-   * @see SDK_DEFICIENCY: MessageBody 联合类型未从 im-sdk-web 主入口导出，
+   * @see SDK_DEFICIENCY: MessageBody 联合类型未从 easemob-websdk 主入口导出，
    * 无法在编译期约束 body 的精确类型。
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

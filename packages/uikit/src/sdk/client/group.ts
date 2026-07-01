@@ -6,31 +6,16 @@ import type { ClientCore } from './index'
 export class GroupService {
   constructor(private core: ClientCore) {}
 
-  /** 拉取已加入的群组（分页） */
-  async getJoinedGroupList(
-    options?: {
-      pageSize?: number
-      needMemberCount?: boolean
-      needRole?: boolean
-    },
-  ) {
-    return this.core.groupManager.getJoinedGroupList({
-      pageSize: options?.pageSize ?? 50,
-      needMemberCount: options?.needMemberCount ?? false,
-      needRole: options?.needRole ?? false,
-    })
+  /** 拉取已加入的群组（轻量摘要列表，无分页） */
+  async getJoinedGroupList() {
+    return this.core.groupManager.getJoinedGroupList()
   }
 
   /** 获取当前用户加入的群组总数（轻量接口，无需拉取完整列表） */
   async getJoinedGroupsCount() {
     try {
-      const res = await this.core.groupManager.getJoinedGroupList({ pageSize: 1 })
-      /**
-       * @see SDK_DEFICIENCY: GroupListResult 类型未声明 total 字段，
-       * 但服务端实际返回中包含该字段。
-       */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return typeof (res as any)?.total === 'number' ? (res as any).total : 0
+      const res = await this.core.groupManager.getJoinedGroupList()
+      return res.length
     } catch (e) {
       console.warn('[UIKitClient] getJoinedGroupsCount failed:', e)
       return 0

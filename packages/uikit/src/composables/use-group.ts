@@ -3,7 +3,7 @@ import { useGroupStore } from '../store/group'
 import type { Group } from '../store/group'
 import type { JoinedGroupItem } from '../sdk/types'
 import { useUIKit } from './use-uikit'
-import type { GroupListResult, GroupSummary, GroupDetail } from 'im-sdk-web'
+import type { JoinedGroupSummary } from 'easemob-websdk'
 
 /**
  * 将 SDK 原始群组项映射为 UIKIT Group 模型
@@ -71,28 +71,21 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
   }
 
   /** 首页拉取群组，默认幂等（仅首次），传 force=true 强刷 */
-  async function refresh(force = false, pageSize = JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL) {
+  async function refresh(force = false) {
     if (!features.enableGroup) return
     if (!force && groupStore.loaded) return
     try {
       if (dataSource.fetchGroups) {
-        const res = await dataSource.fetchGroups({ pageSize })
+        const res = await dataSource.fetchGroups({ pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL })
         groupStore.setGroupList(res.list || [])
         groupStore.setHasMore(!!res.hasMore)
         groupStore.setCursor(res.cursor || '')
       } else if (client.value) {
-        // 开启 needAffiliations 以获取 memberCount / role / description 等字段
-        // 注意：SDK 在 needAffiliations=true 或 needRole=true 时，pageSize 上限强制为 20
-        const res = await client.value.group.getJoinedGroupList({
-          pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
-          needMemberCount: true,
-          needRole: true,
-        })
-        const result = res as GroupListResult
-        const list: ReadonlyArray<GroupSummary> = result?.items || []
-        console.log('[UIKit] getJoinedGroups raw list:', list)
+        const res = await client.value.group.getJoinedGroupList()
+        const list: ReadonlyArray<JoinedGroupSummary> = res
+        console.log('[UIKit] getJoinedGroupList raw list:', list)
         const mapped: Group[] = list.map(mapSdkGroupItem)
-        console.log('[UIKit] getJoinedGroups mapped:', mapped)
+        console.log('[UIKit] getJoinedGroupList mapped:', mapped)
 
         // 异步批量补全群详情（avatar 等字段），不阻塞列表首屏渲染
         const groupIdsNeedDetail = mapped
@@ -106,51 +99,19 @@ const JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL = 20
 
         groupStore.setGroupList(mapped)
         console.log('[UIKit] groupStore.groupList after set:', groupStore.groupList)
-        groupStore.setHasMore(mapped.length >= JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL)
-        groupStore.setCursor(String(0))
+        // getJoinedGroupList 返回全部已加入群组，无分页
+        groupStore.setHasMore(false)
+        groupStore.setCursor('')
       }
     } catch (e) {
       console.warn('[UIKit] fetch groups failed:', e)
     }
   }
 
-  /** 加载下一页 */
-  async function loadMore(pageSize = JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL) {
+  /** 加载下一页（SDK5 getJoinedGroupList 返回全部，loadMore 不再生效） */
+  async function loadMore() {
     if (!features.enableGroup) return
-    if (!groupStore.hasMore) return
-    try {
-      if (dataSource.fetchGroups) {
-        const res = await dataSource.fetchGroups({ pageSize, cursor: groupStore.cursor })
-        groupStore.appendGroupList(res.list || [])
-        groupStore.setHasMore(!!res.hasMore)
-        groupStore.setCursor(res.cursor || '')
-      } else if (client.value) {
-        const nextPage = (parseInt(groupStore.cursor || '0') || 0) + 1
-        const res = await client.value.group.getJoinedGroupList({
-          pageSize: JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL,
-          needMemberCount: true,
-          needRole: true,
-        })
-        const result = res as GroupListResult
-        const list: ReadonlyArray<GroupSummary> = result?.items || []
-        const mapped: Group[] = list.map(mapSdkGroupItem)
-
-        const groupIdsNeedDetail = mapped
-          .filter((g) => !g.avatar)
-          .map((g) => g.groupId)
-        if (groupIdsNeedDetail.length > 0) {
-          fetchGroupDetails(groupIdsNeedDetail).catch(() => {
-            // 静默失败
-          })
-        }
-
-        groupStore.appendGroupList(mapped)
-        groupStore.setHasMore(mapped.length >= JOINED_GROUPS_PAGE_SIZE_WITH_DETAIL)
-        groupStore.setCursor(String(nextPage))
-      }
-    } catch (e) {
-      console.warn('[UIKit] load more groups failed:', e)
-    }
+    console.log('[UIKit] SDK5 getJoinedGroupList returns full list; loadMore is no-op.')
   }
 
   /**
