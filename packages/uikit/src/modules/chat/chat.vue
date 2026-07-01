@@ -43,6 +43,9 @@ export interface ChatEmits {
 const props = defineProps<ChatProps>()
 const emit = defineEmits<ChatEmits>()
 
+/** 输入框组件引用 */
+const messageInputRef = ref<InstanceType<typeof MessageInput>>()
+
 /** 暴露输入框操作方法 */
 defineExpose({
   setText: (text: string) => messageInputRef.value?.setText?.(text),
@@ -84,9 +87,6 @@ function clearRenderError() {
 
 /** 向后代组件提供 textMessage 配置（链接识别 & 拦截器） */
 provide('textMessageConfig', computed(() => props.config?.textMessage))
-
-/** 输入框组件引用 */
-const messageInputRef = ref<InstanceType<typeof MessageInput>>()
 
 /** 重新编辑：将撤回消息的原文回显到输入框 */
 function onReedit(message: UiMessage) {

@@ -1,4 +1,3 @@
-import type { ConversationItem } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import type { UiConversation } from '../types'
 import { toUiConversations } from '../adapter/conversation-adapter'
@@ -7,11 +6,11 @@ import { toUiConversations } from '../adapter/conversation-adapter'
  * ConversationStore 需要暴露给 Domain 的最小接口。
  */
 export interface ConversationStoreLike {
-  setList(list: UiConversation[]): void
-  setCurrentConversationId(id: string | null): void
-  setSyncing(syncing: boolean): void
-  delete(id: string): void
-  update(id: string, patch: Partial<UiConversation>): void
+  setList: (list: UiConversation[]) => void
+  setCurrentConversationId: (id: string | null) => void
+  setSyncing: (syncing: boolean) => void
+  delete: (id: string) => void
+  update: (id: string, patch: Partial<UiConversation>) => void
 }
 
 /**
@@ -93,7 +92,7 @@ export class ConversationDomain {
   }
 
   /** 添加会话标记 */
-  async addMark(conversations: { conversationId: string; conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
+  async addMark(conversations: { conversationId: string, conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
     await this.client.chatManager.addConversationMark({
       conversations,
       mark: mark as any,
@@ -101,7 +100,7 @@ export class ConversationDomain {
   }
 
   /** 移除会话标记 */
-  async removeMark(conversations: { conversationId: string; conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
+  async removeMark(conversations: { conversationId: string, conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
     await this.client.chatManager.removeConversationMark({
       conversations,
       mark: mark as any,

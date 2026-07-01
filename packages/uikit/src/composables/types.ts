@@ -6,9 +6,9 @@ import type { UiContact, UiGroup, UiPresence } from '../sdk/types'
  * 传入 -> 业务接管该接口的数据获取/订阅。
  */
 export interface UIKitDataSource {
-  fetchContacts?: (params?: { cursor?: string; pageSize?: number }) => Promise<{ list: UiContact[]; cursor?: string; hasMore?: boolean }>
+  fetchContacts?: (params?: { cursor?: string, pageSize?: number }) => Promise<{ list: UiContact[], cursor?: string, hasMore?: boolean }>
   fetchBlocklist?: () => Promise<UiContact[]>
-  fetchGroups?: (params: { cursor?: string; pageSize?: number }) => Promise<{ list: UiGroup[]; cursor?: string; hasMore?: boolean }>
+  fetchGroups?: (params: { cursor?: string, pageSize?: number }) => Promise<{ list: UiGroup[], cursor?: string, hasMore?: boolean }>
   fetchPresence?: (userIds: string[]) => Promise<UiPresence[]>
   subscribePresence?: (userIds: string[]) => Promise<void> | void
   unsubscribePresence?: (userIds: string[]) => Promise<void> | void

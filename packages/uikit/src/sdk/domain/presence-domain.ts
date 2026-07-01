@@ -5,8 +5,8 @@ import type { UiPresence } from '../types'
  * PresenceStore 需要暴露给 Domain 的最小接口。
  */
 export interface PresenceStoreLike {
-  updateBatch(list: UiPresence[]): void
-  setSubscribed(userIds: string[]): void
+  updateBatch: (list: UiPresence[]) => void
+  setSubscribed: (userIds: string[]) => void
 }
 
 /**

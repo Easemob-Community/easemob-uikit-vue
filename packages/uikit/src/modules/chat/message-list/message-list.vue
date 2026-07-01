@@ -254,6 +254,15 @@ const { isPulling, isRefreshing, pullDistance } = usePullRefresh(listRef, {
   },
 })
 
+/** 群已读弹窗状态 */
+const showGroupReadModal = ref(false)
+const modalReadList = ref<string[]>([])
+const modalUnreadList = ref<string[]>([])
+
+/** 删除确认弹窗状态 */
+const showDeleteConfirm = ref(false)
+const pendingDeleteMessage = ref<UiMessage | null>(null)
+
 /** 处理消息操作 */
 async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'multiSelect') {
@@ -385,15 +394,6 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     console.warn('[MessageList] fetchGroupReadDetail failed:', e)
   }
 }
-
-/** 群已读弹窗状态 */
-const showGroupReadModal = ref(false)
-const modalReadList = ref<string[]>([])
-const modalUnreadList = ref<string[]>([])
-
-/** 删除确认弹窗状态 */
-const showDeleteConfirm = ref(false)
-const pendingDeleteMessage = ref<UiMessage | null>(null)
 
 /** 处理多选切换 */
 function onToggleSelect(msgId: string) {

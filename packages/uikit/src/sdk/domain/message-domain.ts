@@ -1,19 +1,9 @@
 import type {
-  Message as SdkMessage,
-  CreateTextMessageParams,
-  CreateImageMessageParams,
-  CreateFileMessageParams,
-  CreateVoiceMessageParams,
-  CreateVideoMessageParams,
-  CreateLocationMessageParams,
-  CreateCustomMessageParams,
-  CreateCmdMessageParams,
-  CreateCombineMessageParams,
   MarkMessageReadItem,
+  Message as SdkMessage,
 } from 'easemob-websdk'
-import type { MessageStatus } from '../types'
+import type { MessageStatus, UiMessage } from '../types'
 import type { ManagerHost } from '../client'
-import type { UiMessage } from '../types'
 import { toUiMessage } from '../adapter/message-adapter'
 
 /**
@@ -21,18 +11,18 @@ import { toUiMessage } from '../adapter/message-adapter'
  * 具体实现由 store/message.ts 提供。
  */
 export interface MessageStoreLike {
-  addMessage(msg: UiMessage): void
-  addSendingMessage(localId: string, sdkMsg: SdkMessage): void
-  replaceWithSent(localId: string, msg: UiMessage): void
-  updateUploadProgress(localId: string, percent: number): void
-  markFailed(localId: string, reason: string): void
-  prependMessages(conversationId: string, msgs: UiMessage[]): void
-  updateStatusByServerId(serverId: string, status: MessageStatus): void
-  recallMessage(serverId: string, operatorId?: string): void
-  updateMessage(serverId: string, msg: UiMessage): void
-  setPinnedMessages(conversationId: string, msgs: UiMessage[]): void
-  setTranslation(msgId: string, translation: { text: string; to: string }): void
-  setTranslating(msgId: string, translating: boolean): void
+  addMessage: (msg: UiMessage) => void
+  addSendingMessage: (localId: string, sdkMsg: SdkMessage) => void
+  replaceWithSent: (localId: string, msg: UiMessage) => void
+  updateUploadProgress: (localId: string, percent: number) => void
+  markFailed: (localId: string, reason: string) => void
+  prependMessages: (conversationId: string, msgs: UiMessage[]) => void
+  updateStatusByServerId: (serverId: string, status: MessageStatus) => void
+  recallMessage: (serverId: string, operatorId?: string) => void
+  updateMessage: (serverId: string, msg: UiMessage) => void
+  setPinnedMessages: (conversationId: string, msgs: UiMessage[]) => void
+  setTranslation: (msgId: string, translation: { text: string, to: string }) => void
+  setTranslating: (msgId: string, translating: boolean) => void
 }
 
 /**
@@ -212,7 +202,8 @@ export class MessageDomain {
       const uiMsg = toUiMessage(sent, this.currentUserId)
       this.store.replaceWithSent(localId, uiMsg)
       return sent
-    } catch (error) {
+    }
+    catch (error) {
       const reason = error instanceof Error ? error.message : String(error)
       this.store.markFailed(localId, reason)
       throw error
@@ -261,7 +252,8 @@ export class MessageDomain {
 
   /** 批量标记消息已读（需要传入收到的 SDK Message 对象） */
   async markMessagesRead(items: MarkMessageReadItem[]) {
-    if (items.length === 0) return
+    if (items.length === 0)
+      return
     await this.client.chatManager.markMessageRead({ messages: items })
   }
 

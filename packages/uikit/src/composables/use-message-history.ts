@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 
 export function useMessageHistory() {
@@ -7,7 +7,7 @@ export function useMessageHistory() {
   const messageStore = stores.message
 
   const loading = ref(false)
-  const historyCursorMap = ref<Record<string, { cursor: string; isLast: boolean }>>({})
+  const historyCursorMap = ref<Record<string, { cursor: string, isLast: boolean }>>({})
 
   const messages = computed(() => {
     const cvsId = conversationStore.currentConversationId
@@ -29,7 +29,8 @@ export function useMessageHistory() {
   /** 拉取历史消息 */
   async function fetchHistoryMessages(cursor?: string) {
     const cvs = conversationStore.currentConversation
-    if (!cvs) return { messages: [], cursor: '', isLast: true }
+    if (!cvs)
+      return { messages: [], cursor: '', isLast: true }
 
     const cached = getHistoryCursor(cvs.id)
     const actualCursor = cursor ?? cached.cursor
@@ -45,7 +46,8 @@ export function useMessageHistory() {
         cursor: newCursor,
         isLast,
       }
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   }

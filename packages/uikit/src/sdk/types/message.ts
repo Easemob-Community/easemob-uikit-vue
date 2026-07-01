@@ -1,4 +1,4 @@
-import type { Message as SdkMessage, MessageBody } from 'easemob-websdk'
+import type { MessageBody, Message as SdkMessage } from 'easemob-websdk'
 
 /**
  * 本地复刻 SDK 各消息体结构，便于 UIKit 组件按类型精确访问 body 字段。

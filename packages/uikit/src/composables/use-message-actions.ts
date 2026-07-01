@@ -1,7 +1,7 @@
-import { ref, computed } from 'vue'
-import { useUIKit } from './use-uikit'
+import { computed, ref } from 'vue'
 import { MESSAGE_STATUS } from '../constants'
-import type { UiMessage, TextMessageBody } from '../sdk/types'
+import type { TextMessageBody, UiMessage } from '../sdk/types'
+import { useUIKit } from './use-uikit'
 
 export function useMessageActions() {
   const { domains, stores } = useUIKit()
@@ -14,7 +14,8 @@ export function useMessageActions() {
 
   const selectedMessages = computed(() => {
     const cvsId = conversationStore.currentConversationId
-    if (!cvsId) return []
+    if (!cvsId)
+      return []
     const msgs = messageStore.getMessages(cvsId)
     return msgs.filter(msg => selectedMessageIds.value.has(msg.msgServerId || msg.msgLocalId))
   })
@@ -32,7 +33,8 @@ export function useMessageActions() {
   function toggleMessageSelection(msgId: string) {
     if (selectedMessageIds.value.has(msgId)) {
       selectedMessageIds.value.delete(msgId)
-    } else {
+    }
+    else {
       selectedMessageIds.value.add(msgId)
     }
   }
@@ -55,7 +57,8 @@ export function useMessageActions() {
   /** 撤回消息 */
   async function recallMessage(msgId: string) {
     const cvs = conversationStore.currentConversation
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.recall(cvs.id, cvs.type, msgId)
   }
 
@@ -71,9 +74,11 @@ export function useMessageActions() {
 
   /** 翻译文本消息 */
   async function translateTextMessage(message: UiMessage, targetLang?: string) {
-    if (message.type !== 'text') return
+    if (message.type !== 'text')
+      return
     const text = (message.body as TextMessageBody).content
-    if (!text) return
+    if (!text)
+      return
 
     const lang = resolveTranslateLang(targetLang)
     const msgId = message.msgServerId || message.msgLocalId
@@ -89,10 +94,12 @@ export function useMessageActions() {
       const translation = result.translations[0]
       if (translation) {
         messageStore.setTranslation(msgId, translation)
-      } else {
+      }
+      else {
         messageStore.setTranslating(msgId, false)
       }
-    } catch (e) {
+    }
+    catch (e) {
       messageStore.setTranslating(msgId, false)
       throw e
     }
@@ -105,7 +112,8 @@ export function useMessageActions() {
   /** 置顶消息 */
   async function pinMessage(message: UiMessage) {
     const cvs = conversationStore.currentConversation
-    if (!cvs || !message) return
+    if (!cvs || !message)
+      return
     const msgId = message.msgServerId || message.msgLocalId
     await domains.message.pinMessage(cvs.id, cvs.type, msgId)
     messageStore.setMessagePinned(msgId, {
@@ -117,7 +125,8 @@ export function useMessageActions() {
   /** 取消置顶 */
   async function unpinMessage(message: UiMessage) {
     const cvs = conversationStore.currentConversation
-    if (!cvs || !message) return
+    if (!cvs || !message)
+      return
     const msgId = message.msgServerId || message.msgLocalId
     await domains.message.unpinMessage(cvs.id, cvs.type, msgId)
     messageStore.setMessageUnpinned(msgId)
@@ -126,7 +135,8 @@ export function useMessageActions() {
   /** 获取置顶消息列表 */
   async function fetchPinnedMessages() {
     const cvs = conversationStore.currentConversation
-    if (!cvs) return
+    if (!cvs)
+      return
     return domains.message.getPinnedMessages(cvs.id, cvs.type)
   }
 
@@ -152,6 +162,7 @@ export function useMessageActions() {
 }
 
 function resolveTranslateLang(targetLang?: string): string {
-  if (targetLang?.trim()) return targetLang.trim()
+  if (targetLang?.trim())
+    return targetLang.trim()
   return 'en'
 }

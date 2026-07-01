@@ -34,15 +34,15 @@ const fileSize = computed(() => {
 /** 根据文件名推断文件类型图标 */
 const fileIcon = computed(() => {
   const name = fileName.value.toLowerCase()
-  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(name))
+  if (/\.(?:jpg|jpeg|png|gif|webp|svg)$/.test(name))
     return 'files-media/img'
-  if (/\.(mp4|mov|avi|mkv)$/.test(name))
+  if (/\.(?:mp4|mov|avi|mkv)$/.test(name))
     return 'audio-video/video_camera'
-  if (/\.(mp3|wav|aac|flac|ogg|m4a)$/.test(name))
+  if (/\.(?:mp3|wav|aac|flac|ogg|m4a)$/.test(name))
     return 'audio-video/speaker_wave_2'
-  if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name))
+  if (/\.(?:pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name))
     return 'files-media/doc'
-  if (/\.(zip|rar|7z|tar|gz)$/.test(name))
+  if (/\.(?:zip|rar|7z|tar|gz)$/.test(name))
     return 'files-media/archives'
   return 'files-media/file'
 })

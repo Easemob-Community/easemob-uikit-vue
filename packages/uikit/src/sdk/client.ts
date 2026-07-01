@@ -1,11 +1,11 @@
 import {
-  ChatClient as SdkChatClient,
   ChatManager,
   ContactManager,
   GroupManager,
   PresenceManager,
+  ChatClient as SdkChatClient,
 } from 'easemob-websdk'
-import type { InitConfig, AuthContext } from 'easemob-websdk'
+import type { InitConfig } from 'easemob-websdk'
 
 /**
  * UIKit 需要使用的 SDK 管理器集合。
@@ -34,7 +34,7 @@ export interface ClientConfig extends InitConfig {
 }
 
 /** SDK 已注册管理器映射 */
-type ManagerRegistry = {
+interface ManagerRegistry {
   chatManager: ChatManager
   contactManager: ContactManager
   groupManager: GroupManager

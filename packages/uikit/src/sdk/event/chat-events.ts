@@ -1,8 +1,8 @@
 import type { ChatEventHandlerMap } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
-import type { RootStores } from './types'
-import { toUiMessage, toUiMessages } from '../adapter/message-adapter'
+import { toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
+import type { RootStores } from './types'
 
 /**
  * 创建 ChatManager 事件处理器。
@@ -50,7 +50,8 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onMessageRead: (payload) => {
       for (const item of payload) {
-        if (!item.messageId) continue
+        if (!item.messageId)
+          continue
         if (item.conversationType === 'groupChat' && item.ackContent) {
           try {
             const parsed = JSON.parse(item.ackContent)
@@ -58,7 +59,8 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
             if (typeof count === 'number') {
               stores.message.updateMessageById(item.messageId, { groupReadCount: count })
             }
-          } catch {
+          }
+          catch {
             // ignore
           }
           continue
@@ -79,20 +81,23 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onPinnedMessageChanged: (payload) => {
-      if (!payload.messageId) return
+      if (!payload.messageId)
+        return
       if (payload.operation === 'pin') {
         stores.message.setMessagePinned(payload.messageId, {
           operatorId: payload.operatorId || '',
           pinTime: payload.pinTime || Date.now(),
         })
-      } else if (payload.operation === 'unpin') {
+      }
+      else if (payload.operation === 'unpin') {
         stores.message.setMessageUnpinned(payload.messageId)
       }
     },
 
     onMultiDeviceConversation: (event) => {
       const { operation, conversationId } = event
-      if (!conversationId) return
+      if (!conversationId)
+        return
       switch (operation) {
         case 'CONVERSATION_DELETED':
           stores.conversation.deleteConversation(conversationId)
@@ -117,21 +122,23 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           }
           break
         default:
-          console.log('[UIKit] onMultiDeviceConversation unhandled:', event)
+          console.warn('[UIKit] onMultiDeviceConversation unhandled:', event)
       }
     },
 
     onMultiDeviceMessageRemoved: (event) => {
       const { operation, conversationId, messageIds, beforeTimestamp } = event
-      if (!conversationId || operation !== 'MESSAGE_REMOVED') return
+      if (!conversationId || operation !== 'MESSAGE_REMOVED')
+        return
 
       if (messageIds && messageIds.length > 0) {
         stores.message.deleteMessages([...messageIds])
-      } else if (beforeTimestamp) {
+      }
+      else if (beforeTimestamp) {
         const msgs = stores.message.getMessages(conversationId)
         const idsToDelete = msgs
-          .filter((m) => m.timestamp && m.timestamp < beforeTimestamp)
-          .map((m) => m.msgServerId || m.msgLocalId)
+          .filter(m => m.timestamp && m.timestamp < beforeTimestamp)
+          .map(m => m.msgServerId || m.msgLocalId)
           .filter((id: string | undefined): id is string => !!id)
         if (idsToDelete.length > 0) {
           stores.message.deleteMessages(idsToDelete)

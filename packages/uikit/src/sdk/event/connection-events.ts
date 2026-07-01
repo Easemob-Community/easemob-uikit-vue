@@ -30,10 +30,10 @@ export function createConnectionHandlers(stores: RootStores): ConnectionEventHan
       console.error('[UIKit] Token expired')
     },
     onOfflineMessageSyncStart: () => {
-      console.log('[UIKit] Offline message sync started')
+      // 离线消息同步开始：当前无需 UI 处理
     },
     onOfflineMessageSyncFinish: () => {
-      console.log('[UIKit] Offline message sync finished')
+      // 离线消息同步结束：当前无需 UI 处理
     },
   }
 }

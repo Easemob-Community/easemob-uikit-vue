@@ -28,14 +28,11 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         owner: typeof p.newOwner === 'string' ? p.newOwner : p.newOwner?.userId || '',
       })
     },
-    onAdminAdded: (payload) => {
-      const p = payload as any
-      // UIKit store 当前没有管理员列表，仅记录日志
-      console.info('[UIKit] onAdminAdded:', p)
+    onAdminAdded: () => {
+      // UIKit store 当前没有管理员列表，暂不处理该事件
     },
-    onAdminRemoved: (payload) => {
-      const p = payload as any
-      console.info('[UIKit] onAdminRemoved:', p)
+    onAdminRemoved: () => {
+      // UIKit store 当前没有管理员列表，暂不处理该事件
     },
     onUserRemoved: (payload) => {
       const p = payload as any

@@ -108,9 +108,8 @@ function onHeaderMenuClick() {
   }
 }
 
-function onHeaderActionSheetSelect(_item: { name: string, icon?: string }, index: number) {
+function onHeaderActionSheetSelect(_item: { name: string, icon?: string }, _index: number) {
   // TODO: 根据 key 执行对应操作
-  headerMenuItems.value[index]
 }
 
 function onHeaderMenuItemClick(key: string) {

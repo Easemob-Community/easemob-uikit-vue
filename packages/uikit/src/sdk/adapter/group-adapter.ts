@@ -1,5 +1,4 @@
-import type { JoinedGroupSummary, GroupDetail } from 'easemob-websdk'
-import type { UiGroup, SdkGroupSource } from '../types'
+import type { SdkGroupSource, UiGroup } from '../types'
 
 /**
  * 将 SDK 群组摘要/详情转换为 UIKit 群组展示类型。

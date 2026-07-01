@@ -1,16 +1,16 @@
 import type { ManagerHost } from '../client'
 import type { UiContact } from '../types'
-import { toUiContacts, toUiContact } from '../adapter/contact-adapter'
+import { toUiContacts } from '../adapter/contact-adapter'
 
 /**
  * ContactStore 需要暴露给 Domain 的最小接口。
  */
 export interface ContactStoreLike {
-  setList(list: UiContact[]): void
-  addContact(contact: UiContact): void
-  removeContact(userId: string): void
-  updateRemark(userId: string, remark: string): void
-  setBlocklist(list: UiContact[]): void
+  setList: (list: UiContact[]) => void
+  addContact: (contact: UiContact) => void
+  removeContact: (userId: string) => void
+  updateRemark: (userId: string, remark: string) => void
+  setBlocklist: (list: UiContact[]) => void
 }
 
 /**

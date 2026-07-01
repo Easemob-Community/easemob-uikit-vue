@@ -31,11 +31,13 @@ export function toUiContact(source: SdkContact | SdkUserInfo): UiContact {
 
 /** 解析 SDK UserInfo 的 ext（JSON 字符串）为对象，失败时返回 undefined */
 function parseUserInfoExt(ext: string | undefined): Record<string, unknown> | undefined {
-  if (!ext) return undefined
+  if (!ext)
+    return undefined
   try {
     const parsed = JSON.parse(ext)
     return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : undefined
-  } catch {
+  }
+  catch {
     return undefined
   }
 }

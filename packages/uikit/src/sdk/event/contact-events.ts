@@ -6,24 +6,27 @@ import type { RootStores } from './types'
  */
 export function createContactHandlers(stores: RootStores): ContactEventHandlerMap {
   return {
-    onContactInvited: (msg) => {
-      console.info('[UIKit] onContactInvited:', msg)
+    onContactInvited: () => {
+      // 好友申请通知：UIKit 暂不维护申请列表，交由业务层监听处理
     },
     onContactAgreed: (msg) => {
       const userId = msg.from
-      if (!userId) return
+      if (!userId)
+        return
       stores.contact.addContact({ userId, name: userId })
     },
-    onContactRefuse: (msg) => {
-      console.info('[UIKit] onContactRefuse:', msg)
+    onContactRefuse: () => {
+      // 好友申请被拒：UIKit 暂不维护申请列表，交由业务层监听处理
     },
     onContactDeleted: (msg) => {
       const userId = msg.from
-      if (userId) stores.contact.removeContact(userId)
+      if (userId)
+        stores.contact.removeContact(userId)
     },
     onContactAdded: (msg) => {
       const userId = msg.from
-      if (!userId) return
+      if (!userId)
+        return
       stores.contact.addContact({ userId, name: userId })
     },
     onContactInfoUpdated: (msg) => {
@@ -31,7 +34,6 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       if (contact?.userId && contact.remark !== undefined) {
         stores.contact.updateContactRemark(contact.userId, contact.remark)
       }
-      console.info('[UIKit] onContactInfoUpdated:', msg)
     },
   }
 }

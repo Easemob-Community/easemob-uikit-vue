@@ -74,9 +74,9 @@ const msgSegments = computed(() => {
 
   let lastIndex = 0
   const atRegex = /@(\S+)/g
-  let match: RegExpExecArray | null
+  let match = atRegex.exec(text)
 
-  while ((match = atRegex.exec(text)) !== null) {
+  while (match !== null) {
     const index = match.index
     const name = match[1]
     const full = match[0]
@@ -93,6 +93,7 @@ const msgSegments = computed(() => {
 
     result.push({ type: 'mention', value: full, userId: name })
     lastIndex = index + full.length
+    match = atRegex.exec(text)
   }
 
   if (lastIndex < text.length) {

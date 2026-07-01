@@ -1,15 +1,15 @@
 import type { ManagerHost } from '../client'
 import type { UiGroup } from '../types'
-import { toUiGroups, toUiGroup } from '../adapter/group-adapter'
+import { toUiGroup, toUiGroups } from '../adapter/group-adapter'
 
 /**
  * GroupStore 需要暴露给 Domain 的最小接口。
  */
 export interface GroupStoreLike {
-  setList(list: UiGroup[]): void
-  addGroup(group: UiGroup): void
-  removeGroup(groupId: string): void
-  updateGroup(groupId: string, patch: Partial<UiGroup>): void
+  setList: (list: UiGroup[]) => void
+  addGroup: (group: UiGroup) => void
+  removeGroup: (groupId: string) => void
+  updateGroup: (groupId: string, patch: Partial<UiGroup>) => void
 }
 
 /**

@@ -1,7 +1,5 @@
-import { computed } from 'vue'
+import type { CustomMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
 import { useUIKit } from './use-uikit'
-import { MESSAGE_STATUS } from '../constants'
-import type { UiMessage, TextMessageBody, CustomMessageBody } from '../sdk/types'
 
 export interface SendMessageOptions {
   /** 是否启用群已读回执 */
@@ -17,7 +15,8 @@ function shouldEnableGroupAck(
   maxGroupSize?: number,
   stores?: any,
 ): boolean {
-  if (!enabled || chatType !== 'groupChat') return false
+  if (!enabled || chatType !== 'groupChat')
+    return false
   const memberCount = stores?.group?.getGroupById?.(groupId)?.memberCount || 0
   const limit = maxGroupSize && maxGroupSize > 0 ? maxGroupSize : 200
   return memberCount > 0 && memberCount <= limit
@@ -27,7 +26,6 @@ export function useMessageSend() {
   const { domains, stores } = useUIKit()
   const conversationStore = stores.conversation
   const messageStore = stores.message
-  const currentUser = computed(() => stores.client.currentUser)
 
   function currentCvs() {
     return conversationStore.currentConversation
@@ -36,8 +34,10 @@ export function useMessageSend() {
   /** 发送文本消息 */
   async function sendTextMessage(text: string, ext?: Record<string, unknown>, options?: SendMessageOptions) {
     const cvs = currentCvs()
-    if (!cvs) return
-    const enableGroupAck = shouldEnableGroupAck(
+    if (!cvs)
+      return
+    // 群已读回执开关：已按会话类型与群规模算好，待 domain.sendText 支持透传后接通（当前 SDK 封装未暴露该参数）
+    const _enableGroupAck = shouldEnableGroupAck(
       cvs.type,
       cvs.id,
       options?.groupReadReceiptEnabled,
@@ -50,14 +50,16 @@ export function useMessageSend() {
   /** 发送图片消息 */
   async function sendImageMessage(file: File, options?: SendMessageOptions, ext?: Record<string, unknown>) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendImage(cvs.id, cvs.type, file, ext)
   }
 
   /** 发送文件消息 */
   async function sendFileMessage(file: File, options?: SendMessageOptions, ext?: Record<string, unknown>) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendFile(cvs.id, cvs.type, file, ext)
   }
 
@@ -69,7 +71,8 @@ export function useMessageSend() {
     ext?: Record<string, unknown>,
   ) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendVoice(cvs.id, cvs.type, file, duration, ext)
   }
 
@@ -81,7 +84,8 @@ export function useMessageSend() {
     ext?: Record<string, unknown>,
   ) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendVideo(cvs.id, cvs.type, file, duration, ext)
   }
 
@@ -93,7 +97,8 @@ export function useMessageSend() {
     ext?: Record<string, unknown>,
   ) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendLocation(cvs.id, cvs.type, latitude, longitude, address, ext)
   }
 
@@ -104,21 +109,24 @@ export function useMessageSend() {
     ext?: Record<string, unknown>,
   ) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendCustom(cvs.id, cvs.type, event, params, ext)
   }
 
   /** 发送命令消息 */
   async function sendCmdMessage(action: string, ext?: Record<string, unknown>) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
     await domains.message.sendCmd(cvs.id, cvs.type, action, ext)
   }
 
   /** 重发失败的消息 */
   async function resendMessage(message: UiMessage) {
     const cvs = currentCvs()
-    if (!cvs) return
+    if (!cvs)
+      return
 
     messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
 

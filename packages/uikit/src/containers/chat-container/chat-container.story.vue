@@ -212,7 +212,7 @@ injectMockData()
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="baseConfig">
-            <template #header-title="{ conversation }">
+            <template #header-title>
               <span style="font-weight: 700; color: #3b82f6;">{{ customSlotTitle }}</span>
             </template>
             <template #header-extra>

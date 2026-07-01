@@ -1,15 +1,15 @@
+import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websdk'
 import {
-  isTextBody as isTextMessageBody,
-  isImageBody as isImageMessageBody,
-  isFileBody as isFileMessageBody,
-  isVoiceBody as isVoiceMessageBody,
-  isVideoBody as isVideoMessageBody,
-  isLocationBody as isLocationMessageBody,
-  isCustomBody as isCustomMessageBody,
   isCmdBody as isCmdMessageBody,
   isCombineBody as isCombineMessageBody,
+  isCustomBody as isCustomMessageBody,
+  isFileBody as isFileMessageBody,
+  isImageBody as isImageMessageBody,
+  isLocationBody as isLocationMessageBody,
+  isTextBody as isTextMessageBody,
+  isVideoBody as isVideoMessageBody,
+  isVoiceBody as isVoiceMessageBody,
 } from '../types/message'
-import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websdk'
 import type { UiMessage } from '../types'
 
 /**
@@ -32,24 +32,35 @@ export function toUiMessages(sdkMsgs: readonly SdkMessage[], currentUserId: stri
 
 /** 从 SDK Message 提取消息摘要文本 */
 export function extractLastMessageText(sdkMsg: SdkMessage | null | undefined): string {
-  if (!sdkMsg) return ''
+  if (!sdkMsg)
+    return ''
 
   const { body } = sdkMsg
-  if (isTextMessageBody(body)) return body.content || ''
-  if (isImageMessageBody(body)) return '[图片]'
-  if (isVoiceMessageBody(body)) return '[语音]'
-  if (isVideoMessageBody(body)) return '[视频]'
-  if (isFileMessageBody(body)) return body.filename || '[文件]'
-  if (isLocationMessageBody(body)) return '[位置]'
-  if (isCustomMessageBody(body)) return '[自定义]'
-  if (isCmdMessageBody(body)) return '[命令]'
-  if (isCombineMessageBody(body)) return body.summary || '[聊天记录]'
+  if (isTextMessageBody(body))
+    return body.content || ''
+  if (isImageMessageBody(body))
+    return '[图片]'
+  if (isVoiceMessageBody(body))
+    return '[语音]'
+  if (isVideoMessageBody(body))
+    return '[视频]'
+  if (isFileMessageBody(body))
+    return body.filename || '[文件]'
+  if (isLocationMessageBody(body))
+    return '[位置]'
+  if (isCustomMessageBody(body))
+    return '[自定义]'
+  if (isCmdMessageBody(body))
+    return '[命令]'
+  if (isCombineMessageBody(body))
+    return body.summary || '[聊天记录]'
   return ''
 }
 
 /** 从会话最后一条消息摘要（SessionMessageSnippet）提取文本 */
 export function extractSnippetText(snippet: SessionMessageSnippet | null | undefined): string {
-  if (!snippet) return ''
+  if (!snippet)
+    return ''
 
   const body = snippet.body || {}
   switch (snippet.type) {
@@ -87,6 +98,7 @@ export function isMessageInConversation(
 
 /** 从 SDK Message 计算单聊场景下的对方用户 ID */
 export function resolvePeerUserId(sdkMsg: SdkMessage, currentUserId: string): string {
-  if (sdkMsg.conversationType === 'groupChat') return sdkMsg.to
+  if (sdkMsg.conversationType === 'groupChat')
+    return sdkMsg.to
   return sdkMsg.from === currentUserId ? sdkMsg.to : sdkMsg.from
 }
