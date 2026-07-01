@@ -4,6 +4,7 @@ import {
   GroupManager,
   PresenceManager,
   ChatClient as SdkChatClient,
+  UserInfoManager,
 } from 'easemob-websdk'
 import type { ConnectionEventHandlerMap, EventHandlerMap, InitConfig } from 'easemob-websdk'
 
@@ -62,7 +63,10 @@ export class UIKitClient {
     const { debug, ...sdkConfig } = config
     this._client = SdkChatClient.init({
       ...sdkConfig,
-      managers: [ChatManager, ContactManager, GroupManager, PresenceManager],
+      // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
+      // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
+      enableSyncData: sdkConfig.enableSyncData ?? ['conversation', 'contact', 'group'],
+      managers: [ChatManager, ContactManager, GroupManager, PresenceManager, UserInfoManager],
     }) as SdkChatClient & ManagerRegistry
 
     if (debug) {

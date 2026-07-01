@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
-import type { Contact, UserInfo } from 'easemob-websdk'
+import type { UserInfo } from 'easemob-websdk'
 import {
   type ContactFetchMode,
   type UIKitDataSource,
@@ -127,17 +127,13 @@ watch(
       }
     }
 
-    // 好友列表（可选预拉）
-    if (features.enableContact && !ctx.stores.contact.loaded) {
+    // 好友列表：仅当业务提供了自定义数据源时在登录后立即拉取；
+    // 默认走 SDK 的场景由 onSyncDataFinished 在数据同步完成后回填，
+    // 避免在 roster 同步完成前抢跑 getContacts() 拿到空列表并锁定 loaded。
+    if (features.enableContact && ds.fetchContacts && !ctx.stores.contact.loaded) {
       try {
-        const res = client.contactManager.getContacts()
-        const data = Array.isArray(res) ? res : []
-        const list = data.map((item: Contact) => ({
-          userId: item.userId,
-          name: item.remark || item.userId,
-          remark: item.remark,
-        }))
-        ctx.stores.contact.setContactList(list)
+        const result = await ds.fetchContacts()
+        ctx.stores.contact.setContactList(result.list)
       }
       catch (e) {
         console.warn('[UIKit] fetch contacts failed:', e)

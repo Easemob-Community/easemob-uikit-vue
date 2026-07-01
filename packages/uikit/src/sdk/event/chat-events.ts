@@ -2,6 +2,8 @@ import type { ChatEventHandlerMap } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
+import { toUiContacts } from '../adapter/contact-adapter'
+import { toUiGroups } from '../adapter/group-adapter'
 import type { RootStores } from './types'
 
 /**
@@ -10,15 +12,32 @@ import type { RootStores } from './types'
  */
 export function createChatHandlers(client: ManagerHost, stores: RootStores): ChatEventHandlerMap {
   return {
-    onSyncDataStart: () => {
-      stores.conversation.setSyncingConversations(true)
+    onSyncDataStart: (payload) => {
+      if (payload.dataType === 'conversation') {
+        stores.conversation.setSyncingConversations(true)
+      }
     },
 
-    onSyncDataFinished: () => {
-      stores.conversation.setSyncingConversations(false)
-      const items = client.chatManager.getConversationList()
-      stores.conversation.setConversationList(toUiConversations(items))
-      stores.conversation.setConversationsLoaded(true)
+    onSyncDataFinished: (payload) => {
+      // SDK 按数据类型分别触发同步完成（conversation / contact / group），逐类回填。
+      switch (payload.dataType) {
+        case 'conversation':
+          stores.conversation.setSyncingConversations(false)
+          stores.conversation.setConversationList(toUiConversations(client.chatManager.getConversationList()))
+          stores.conversation.setConversationsLoaded(true)
+          break
+        case 'contact':
+          // 已由自定义数据源填充（loaded 为真）则跳过，避免覆盖业务数据
+          if (!stores.contact.loaded) {
+            stores.contact.setContactList(toUiContacts(client.contactManager.getContacts()))
+          }
+          break
+        case 'group':
+          if (!stores.group.loaded) {
+            stores.group.setGroupList(toUiGroups(client.groupManager.getJoinedGroupList()))
+          }
+          break
+      }
     },
 
     onConversationListUpdate: (payload) => {
