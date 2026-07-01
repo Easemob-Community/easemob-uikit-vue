@@ -7,11 +7,11 @@ import { useToast } from '../../../composables/use-toast'
 import Popup from '../../../components/popup/popup.vue'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
-import type { Message } from '../../../store/message'
-import type { ChatConfig, MessageActionItem, MessageActionEvent, MessageActionType } from '../types'
+import type { UiMessage } from '../../../sdk/types'
+import type { ChatConfig, MessageActionEvent, MessageActionItem, MessageActionType } from '../types'
 
 export interface MessageInteractiveProps {
-  message: Message
+  message: UiMessage
   config?: ChatConfig['messageAction']
 }
 
@@ -63,10 +63,14 @@ const actions = computed<MessageActionItem[]>(() => {
     items.push({ type, label, icon, danger, disabled, disabledTip })
   }
 
-  if (cfg?.enableQuote !== false) add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
-  if (cfg?.enableCopy !== false) add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
-  if (cfg?.enableForward !== false) add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
-  if (cfg?.enableMultiSelect !== false) add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
+  if (cfg?.enableQuote !== false)
+    add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
+  if (cfg?.enableCopy !== false)
+    add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
+  if (cfg?.enableForward !== false)
+    add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
+  if (cfg?.enableMultiSelect !== false)
+    add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
   // 翻译：仅文本消息可翻译，其他类型不展示
   if (cfg?.enableTranslate !== false && props.message.type === 'text') {
     add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
@@ -74,7 +78,8 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {
       add('unpin', t('message.action.unpin') ?? '取消置顶', 'chat/unpin')
-    } else {
+    }
+    else {
       add('pin', t('message.action.pin') ?? '置顶', 'chat/pin')
     }
   }
@@ -109,22 +114,24 @@ const actions = computed<MessageActionItem[]>(() => {
       t('message.edit.limitReached') ?? '此消息编辑次数已达上限',
     )
   }
-  if (cfg?.enableDelete !== false) add('delete', t('message.action.delete') ?? '删除', 'actions/trash', true)
+  if (cfg?.enableDelete !== false)
+    add('delete', t('message.action.delete') ?? '删除', 'actions/trash', true)
 
   return items
 })
 
 /** ActionSheet 格式化的 actions */
 const actionSheetActions = computed(() =>
-  actions.value.map((item) => ({
+  actions.value.map(item => ({
     name: item.label,
     color: item.danger ? '#ef4444' : undefined,
-  }))
+  })),
 )
 
 /** PC 端右键菜单 */
 function onContextMenu(event: MouseEvent) {
-  if (isMobile.value) return
+  if (isMobile.value)
+    return
   event.preventDefault()
 
   isActive.value = true
@@ -159,7 +166,8 @@ function closePopup() {
 
 /** H5 端长按触发 */
 const longPress = useLongPress(() => {
-  if (!isMobile.value) return
+  if (!isMobile.value)
+    return
   showActionSheet.value = true
 })
 

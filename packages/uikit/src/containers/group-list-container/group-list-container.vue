@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import type { Component } from 'vue'
 import GroupList from '../../modules/group/group-list.vue'
 import { useGroup } from '../../composables/use-group'
 import { useGroupStore } from '../../store/group'
 import { useUIKit } from '../../composables/use-uikit'
 import type {
+  AvatarShape,
+  GroupDisabledFn,
   GroupGroupBy,
+  GroupItemSize,
   GroupSelectMode,
   GroupSortBy,
-  GroupItemSize,
-  GroupDisabledFn,
   GroupSubtitleFn,
-  AvatarShape,
 } from '../../modules/group/types'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
-import type { Group } from '../../store/group'
-import type { Component } from 'vue'
+import type { UiGroup as Group } from '../../sdk/types'
 
 /** 群组列表项点击行为模式 */
 export type GroupListClickBehavior = 'default' | 'event-only'
@@ -146,9 +146,12 @@ const groupListRef = ref<InstanceType<typeof GroupList>>()
 
 /** 自治拉取 */
 function maybeFetchGroups() {
-  if (!props.autoFetch) return
-  if (!features.enableGroup) return
-  if (groupStore.loaded) return
+  if (!props.autoFetch)
+    return
+  if (!features.enableGroup)
+    return
+  if (groupStore.loaded)
+    return
   refreshGroups()
 }
 
@@ -160,7 +163,8 @@ onMounted(() => {
 async function handleGroupLoadMore() {
   try {
     await loadMoreGroups()
-  } finally {
+  }
+  finally {
     groupListRef.value?.releaseLoadMoreLock?.()
   }
 }
@@ -209,8 +213,8 @@ defineExpose({
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
       :search-component="props.searchComponent"
-      @select="(g: Group) => emit('select', g)"
       :click-behavior="props.clickBehavior"
+      @select="(g: Group) => emit('select', g)"
       @click="(g: Group) => emit('click', g)"
       @contextmenu="(e: MouseEvent, g: Group) => emit('contextmenu', e, g)"
       @load-more="handleGroupLoadMore"

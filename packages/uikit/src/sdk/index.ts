@@ -1,4 +1,7 @@
 // SDK
-export { UIKitClient, createClient, getClient } from './client/index'
-export * from './event-handler/index'
+export { UIKitClient, createClient } from './client'
 export * from './types'
+export * from './adapter'
+export * from './domain'
+export { registerEventHandlers } from './event/registry'
+export type { UIKitContext } from '../composables/use-uikit'

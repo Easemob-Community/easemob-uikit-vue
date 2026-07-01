@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { getQuotePreview } from '../../../composables/use-quote'
-import type { Message } from '../../../store/message'
+import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface QuoteBarProps {
-  message: Message
+  message: UiMessage
 }
 
 export interface QuoteBarEmits {
@@ -26,8 +26,8 @@ const isImage = computed(() => props.message.type === 'image')
 
 /** 图片缩略图 URL */
 const thumbUrl = computed(() => {
-  const m = props.message as unknown as { thumbnailUrl?: string; url?: string }
-  return m.thumbnailUrl || m.url || ''
+  const body = props.message.body as ImageMessageBody
+  return body.thumbnailUrl || body.localUrl || body.originalImageUrl || ''
 })
 
 function onClose() {
@@ -43,7 +43,7 @@ function onClose() {
       class="quote-bar__thumb"
       :src="thumbUrl"
       alt="quote-thumb"
-    />
+    >
     <div class="quote-bar__text">
       <span class="quote-bar__sender">{{ sender }}：</span>
       <span class="quote-bar__preview">{{ preview }}</span>

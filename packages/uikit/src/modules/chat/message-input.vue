@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useQuote } from '../../composables/use-quote'
 import { useViewport } from '../../composables/use-viewport'
 import { useToast } from '../../composables/use-toast'
+import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
+import Popup from '../../components/popup/popup.vue'
+import { useLocale } from '../../locale'
+import type { UiMessage } from '../../sdk/types'
 import SimpleInput from './message-input/simple-input.vue'
 import RichInput from './message-input/rich-input.vue'
 import EditingBar from './message-input/editing-bar.vue'
-import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
 import MentionPicker from './mention/mention-picker.vue'
-import Popup from '../../components/popup/popup.vue'
 import QuoteBar from './quote/quote-bar.vue'
-import { useLocale } from '../../locale'
-import type { ChatConfig, MentionContact, ChatSendHooks } from './types'
-import type { Message } from '../../store/message'
+import type { ChatConfig, ChatSendHooks, MentionContact } from './types'
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -44,13 +44,15 @@ const sendHooks = computed<ChatSendHooks | undefined>(() => props.config?.hooks)
  * 执行 beforeSend 钩子
  * @returns true 表示允许发送，false 表示阻止
  */
-async function runBeforeSend(message: Partial<Message>): Promise<boolean> {
+async function runBeforeSend(message: Partial<UiMessage>): Promise<boolean> {
   const hook = sendHooks.value?.beforeSend
-  if (!hook) return true
+  if (!hook)
+    return true
   try {
     const result = await hook(message)
     return result !== false
-  } catch (e) {
+  }
+  catch (e) {
     console.error('[MessageInput] beforeSend hook error:', e)
     return true
   }
@@ -64,7 +66,8 @@ function runAfterSend(message: any) {
   if (hook) {
     try {
       hook(message)
-    } catch (e) {
+    }
+    catch (e) {
       console.error('[MessageInput] afterSend hook error:', e)
     }
   }
@@ -73,7 +76,8 @@ function runAfterSend(message: any) {
 /** 输入框模式 */
 const inputMode = computed(() => {
   // H5 端强制降级为 simple 模式
-  if (isMobile.value) return 'simple'
+  if (isMobile.value)
+    return 'simple'
   return inputConfig.value?.mode ?? 'simple'
 })
 
@@ -95,9 +99,11 @@ const mentionKeyword = ref('')
 /** 是否启用 @提及 */
 const enableMention = computed(() => {
   const cfg = inputConfig.value
-  if (cfg?.features?.mention === false) return false
+  if (cfg?.features?.mention === false)
+    return false
   const onlyInGroup = cfg?.mention?.onlyInGroup ?? true
-  if (onlyInGroup && !props.isGroup) return false
+  if (onlyInGroup && !props.isGroup)
+    return false
   return true
 })
 
@@ -118,7 +124,8 @@ const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
 
 /** 构造包含引用 ext 的合并对象；无引用时返回 undefined */
 function buildExtWithQuote(): Record<string, any> | undefined {
-  if (!quotedMessage.value) return undefined
+  if (!quotedMessage.value)
+    return undefined
   return { ...buildQuoteExt(quotedMessage.value) }
 }
 
@@ -154,9 +161,10 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'text', content: text })
-  if (!canSend) return
-  sendTextMessage(text, ext, groupReadReceiptConfig.value)
+  const canSend = await runBeforeSend({ type: 'text', body: { content: text } })
+  if (!canSend)
+    return
+  sendTextMessage(text, ext)
     .then((msg) => {
       emit('send-success')
       runAfterSend(msg)
@@ -193,9 +201,10 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'text', content: text })
-  if (!canSend) return
-  sendTextMessage(text, ext, groupReadReceiptConfig.value)
+  const canSend = await runBeforeSend({ type: 'text', body: { content: text } })
+  if (!canSend)
+    return
+  sendTextMessage(text, ext)
     .then((msg) => {
       emit('send-success')
       runAfterSend(msg)
@@ -213,20 +222,24 @@ const pendingBlobUrls = new Set<string>()
 /** 发送文件消息 */
 async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
   const file = files[0]
-  if (!file) return
+  if (!file)
+    return
 
   const ext = buildExtWithQuote()
 
   // beforeSend 拦截
   const canSend = await runBeforeSend({ type: type === 'image' ? 'image' : type })
-  if (!canSend) return
+  if (!canSend)
+    return
 
   let promise: Promise<any> | undefined
   if (type === 'image') {
     promise = sendImageMessage(file, groupReadReceiptConfig.value, ext)
-  } else if (type === 'video') {
-    promise = sendVideoMessage(file, groupReadReceiptConfig.value, ext)
-  } else {
+  }
+  else if (type === 'video') {
+    promise = sendVideoMessage(file, 0, undefined, ext)
+  }
+  else {
     promise = sendFileMessage(file, groupReadReceiptConfig.value, ext)
   }
   promise?.then((msg) => {
@@ -250,7 +263,8 @@ function onEmojiSelect(emoji: string) {
   showEmojiPicker.value = false
   if (inputMode.value === 'simple') {
     simpleInputRef.value?.insertEmoji?.(emoji)
-  } else {
+  }
+  else {
     richInputRef.value?.insertEmoji?.(emoji)
   }
 }
@@ -284,7 +298,8 @@ function onMentionSelect(contact: MentionContact) {
   const name = contact.remark || contact.name
   if (inputMode.value === 'simple') {
     simpleInputRef.value?.insertMention?.(contact)
-  } else {
+  }
+  else {
     richInputRef.value?.insertMention?.(name, contact)
   }
   // 选择后清理锚点
@@ -328,7 +343,8 @@ async function handleVoiceStart() {
     audioChunks = []
 
     mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) audioChunks.push(e.data)
+      if (e.data.size > 0)
+        audioChunks.push(e.data)
     }
 
     mediaRecorder.start()
@@ -338,11 +354,12 @@ async function handleVoiceStart() {
     if (shouldCancelVoice) {
       handleVoiceCancel()
     }
-  } catch (err) {
+  }
+  catch (err) {
     console.error('录音启动失败:', err)
     showToast('录音启动失败，请检查麦克风权限')
     // 清理
-    voiceStream?.getTracks().forEach((track) => track.stop())
+    voiceStream?.getTracks().forEach(track => track.stop())
     voiceStream = null
     mediaRecorder = null
   }
@@ -356,14 +373,14 @@ function handleVoiceEnd(durationFromInput?: number) {
     return
   }
 
-  const actualDuration =
-    durationFromInput ?? Math.floor((Date.now() - recordingStartTime) / 1000)
+  const actualDuration
+    = durationFromInput ?? Math.floor((Date.now() - recordingStartTime) / 1000)
 
   const mr = mediaRecorder
 
   // 如果还没开始录音（state 为 inactive），直接清理资源
   if (mr.state === 'inactive') {
-    voiceStream?.getTracks().forEach((track) => track.stop())
+    voiceStream?.getTracks().forEach(track => track.stop())
     audioChunks = []
     voiceStream = null
     mediaRecorder = null
@@ -371,7 +388,7 @@ function handleVoiceEnd(durationFromInput?: number) {
   }
 
   mediaRecorder.onstop = async () => {
-    voiceStream?.getTracks().forEach((track) => track.stop())
+    voiceStream?.getTracks().forEach(track => track.stop())
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
       const blob = new Blob(audioChunks, { type: 'audio/webm' })
@@ -382,7 +399,7 @@ function handleVoiceEnd(durationFromInput?: number) {
         clearQuote()
         return
       }
-      sendAudioMessage(blob, actualDuration, groupReadReceiptConfig.value, ext)
+      sendAudioMessage(new File([blob], 'voice.webm', { type: blob.type }), actualDuration, undefined, ext)
         .then((msg) => {
           emit('send-success')
           runAfterSend(msg)
@@ -396,7 +413,8 @@ function handleVoiceEnd(durationFromInput?: number) {
 
     audioChunks = []
     voiceStream = null
-    if (mr === mediaRecorder) mediaRecorder = null
+    if (mr === mediaRecorder)
+      mediaRecorder = null
   }
 
   mr.stop()
@@ -408,7 +426,7 @@ function handleVoiceCancel() {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') {
     mediaRecorder.stop()
   }
-  voiceStream?.getTracks().forEach((track) => track.stop())
+  voiceStream?.getTracks().forEach(track => track.stop())
   mediaRecorder = null
   voiceStream = null
   audioChunks = []
@@ -430,7 +448,8 @@ onBeforeUnmount(() => {
 function setText(value: string) {
   if (inputMode.value === 'simple') {
     simpleInputRef.value?.setText?.(value)
-  } else {
+  }
+  else {
     richInputRef.value?.setText?.(value)
   }
 }
@@ -439,7 +458,8 @@ function setText(value: string) {
 function getText(): string {
   if (inputMode.value === 'simple') {
     return simpleInputRef.value?.getText?.() || ''
-  } else {
+  }
+  else {
     return richInputRef.value?.getText?.() || ''
   }
 }

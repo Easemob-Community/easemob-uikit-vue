@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
-import type { Group } from '../../store/group'
-import type { GroupItemSize, AvatarShape } from './types'
+import type { UiGroup as Group } from '../../sdk/types'
+import type { AvatarShape, GroupItemSize } from './types'
 
 const props = withDefaults(defineProps<{
   group: Group
@@ -39,9 +39,12 @@ const props = withDefaults(defineProps<{
 const displayName = computed(() => props.group.groupName || props.group.groupId)
 
 const resolvedAvatarSize = computed(() => {
-  if (props.avatarSize) return props.avatarSize
-  if (props.size === 'compact') return 32
-  if (props.size === 'large') return 48
+  if (props.avatarSize)
+    return props.avatarSize
+  if (props.size === 'compact')
+    return 32
+  if (props.size === 'large')
+    return 48
   return 40
 })
 
@@ -100,7 +103,9 @@ const rootClass = computed(() => ({
   margin: 0 var(--uikit-item-hover-margin-x, 0px);
   height: var(--group-item-height, 56px);
   cursor: pointer;
-  transition: background-color 0.15s, opacity 0.15s;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s;
   border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
@@ -142,7 +147,7 @@ const rootClass = computed(() => ({
 }
 
 .group-item-default.is-selected .group-item-default__check {
-  color: var(--uikit-primary, #155EEF);
+  color: var(--uikit-primary, #155eef);
 }
 
 .group-item-default__avatar-wrap {

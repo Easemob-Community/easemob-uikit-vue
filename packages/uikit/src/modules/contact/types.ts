@@ -1,4 +1,4 @@
-import type { Contact } from '../../store/contact'
+import type { UiContact as Contact } from '../../sdk/types'
 
 /** 选择模式 */
 export type ContactSelectMode = 'none' | 'single' | 'multiple'
@@ -54,8 +54,32 @@ export interface ContactAction {
 
 /** 字母导航默认序列 */
 export const DEFAULT_ALPHABET_KEYS = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
   '#',
 ] as const
 

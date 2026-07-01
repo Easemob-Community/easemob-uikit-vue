@@ -1,37 +1,34 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-
-export interface Contact {
-  userId: string
-  name: string
-  avatar?: string
-  remark?: string
-}
+import { computed, ref } from 'vue'
+import type { UiContact } from '../sdk/types'
 
 export const useContactStore = defineStore('contact', () => {
-  const contactList = ref<Contact[]>([])
-  const blackList = ref<Contact[]>([])
-  /** 好友列表是否已拉取过（幂等标记） */
+  const contactList = ref<UiContact[]>([])
+  const blackList = ref<UiContact[]>([])
   const loaded = ref(false)
-  /** 黑名单是否已拉取过（幂等标记） */
   const blockListLoaded = ref(false)
-  /** 是否还有下一页 */
+
+  // ===== UI 交互状态 =====
+  /** 搜索过滤文本 */
+  const filterText = ref('')
+  /** 当前激活（单选高亮）的联系人 ID */
+  const activeId = ref('')
+  /** 多选场景选中的联系人 ID 集合 */
+  const selectedIds = ref<Set<string>>(new Set())
+  /** 是否还有更多可加载（分页数据源场景） */
   const hasMore = ref(false)
-  /** 分页游标 */
-  const cursor = ref<string>('')
-  /** 好友总数（由 getAllContacts 轻量接口提供） */
-  const contactCount = ref<number>(0)
+  /** 好友总数（可与列表长度不一致，如仅拉取了计数） */
+  const contactCount = ref(0)
 
-  /** 黑名单 ID 集合（高频查询优化） */
-  const blackIdSet = computed(() => new Set(blackList.value.map((c) => c.userId)))
+  const blackIdSet = computed(() => new Set(blackList.value.map(c => c.userId)))
 
-  function setContactList(list: Contact[]) {
+  function setContactList(list: UiContact[]) {
     contactList.value = list
     loaded.value = true
   }
 
-  function appendContactList(list: Contact[]) {
-    const ids = new Set(contactList.value.map((c) => c.userId))
+  function appendContactList(list: UiContact[]) {
+    const ids = new Set(contactList.value.map(c => c.userId))
     for (const c of list) {
       if (!ids.has(c.userId)) {
         contactList.value.push(c)
@@ -40,52 +37,71 @@ export const useContactStore = defineStore('contact', () => {
     }
   }
 
-  function addContact(contact: Contact) {
-    const exists = contactList.value.find((c: Contact) => c.userId === contact.userId)
+  function addContact(contact: UiContact) {
+    const exists = contactList.value.find(c => c.userId === contact.userId)
     if (!exists) {
       contactList.value.push(contact)
     }
   }
 
   function removeContact(userId: string) {
-    contactList.value = contactList.value.filter((c: Contact) => c.userId !== userId)
+    contactList.value = contactList.value.filter(c => c.userId !== userId)
   }
 
   function updateContactRemark(userId: string, remark: string) {
-    const contact = contactList.value.find((c: Contact) => c.userId === userId)
+    const contact = contactList.value.find(c => c.userId === userId)
     if (contact) {
       contact.remark = remark
+      contact.name = remark || contact.name
     }
   }
 
-  /** 设置黑名单 */
-  function setBlackList(list: Contact[]) {
+  function setBlackList(list: UiContact[]) {
     blackList.value = list
     blockListLoaded.value = true
   }
 
-  /** 加入黑名单 */
-  function addToBlackList(contact: Contact) {
-    const exists = blackList.value.find((c) => c.userId === contact.userId)
-    if (!exists) blackList.value.push(contact)
+  function addToBlackList(contact: UiContact) {
+    const exists = blackList.value.find(c => c.userId === contact.userId)
+    if (!exists)
+      blackList.value.push(contact)
   }
 
-  /** 移出黑名单 */
   function removeFromBlackList(userId: string) {
-    blackList.value = blackList.value.filter((c) => c.userId !== userId)
+    blackList.value = blackList.value.filter(c => c.userId !== userId)
   }
 
-  /** 是否被拉黑 */
   function isBlocked(userId: string): boolean {
     return blackIdSet.value.has(userId)
   }
 
-  function setHasMore(value: boolean) {
-    hasMore.value = value
+  // ===== UI 交互状态操作 =====
+  function setFilterText(text: string) {
+    filterText.value = text
   }
 
-  function setCursor(value: string) {
-    cursor.value = value
+  function setActiveId(id: string) {
+    activeId.value = id
+  }
+
+  function isSelected(id: string): boolean {
+    return selectedIds.value.has(id)
+  }
+
+  function toggleSelect(id: string) {
+    const next = new Set(selectedIds.value)
+    if (next.has(id))
+      next.delete(id)
+    else next.add(id)
+    selectedIds.value = next
+  }
+
+  function setSelectedIds(ids: string[]) {
+    selectedIds.value = new Set(ids)
+  }
+
+  function setHasMore(value: boolean) {
+    hasMore.value = value
   }
 
   function setContactCount(count: number) {
@@ -97,31 +113,47 @@ export const useContactStore = defineStore('contact', () => {
     blackList.value = []
     loaded.value = false
     blockListLoaded.value = false
+    filterText.value = ''
+    activeId.value = ''
+    selectedIds.value = new Set()
     hasMore.value = false
-    cursor.value = ''
     contactCount.value = 0
   }
+
+  // 别名方法：兼容 Domain 层 ContactStoreLike 接口
+  const setList = setContactList
+  const updateRemark = updateContactRemark
+  const setBlocklist = setBlackList
 
   return {
     contactList,
     blackList,
     loaded,
     blockListLoaded,
-    hasMore,
-    cursor,
-    contactCount,
     blackIdSet,
+    filterText,
+    activeId,
+    selectedIds,
+    hasMore,
+    contactCount,
     setContactList,
+    setList,
     appendContactList,
     addContact,
     removeContact,
     updateContactRemark,
+    updateRemark,
     setBlackList,
+    setBlocklist,
     addToBlackList,
     removeFromBlackList,
     isBlocked,
+    setFilterText,
+    setActiveId,
+    isSelected,
+    toggleSelect,
+    setSelectedIds,
     setHasMore,
-    setCursor,
     setContactCount,
     clearContacts,
   }

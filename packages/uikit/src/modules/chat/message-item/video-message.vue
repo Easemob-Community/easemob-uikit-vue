@@ -4,11 +4,11 @@ import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
 import Icon from '../../../components/icon/icon.vue'
-import { downloadFile, detectEnvironment } from '../../../utils/download'
-import type { VideoMessageType } from '../../../store/message'
+import { detectEnvironment, downloadFile } from '../../../utils/download'
+import type { UiMessage, VideoMessageBody } from '../../../sdk/types'
 
 export interface VideoMessageProps {
-  message: VideoMessageType
+  message: UiMessage
 }
 
 const props = defineProps<VideoMessageProps>()
@@ -17,8 +17,10 @@ const themeStore = useThemeStore()
 const { t } = useLocale()
 const { show: showToast } = useToast()
 const videoClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'video-message__video--square' : ''
+  themeStore.bubbleShape === 'square' ? 'video-message__video--square' : '',
 )
+
+const body = computed(() => props.message.body as VideoMessageBody)
 
 /** 是否正在预览 */
 const isPreviewing = ref(false)
@@ -34,14 +36,14 @@ function closePreview() {
 /** 下载视频 */
 async function handleDownload(event: MouseEvent) {
   event.stopPropagation()
-  const url = props.message.url
+  const url = body.value.url
   if (!url) {
     showToast(t('message.download.failed') || '下载失败')
     return
   }
 
   const env = detectEnvironment()
-  const filename = (props.message as any).filename || 'video.mp4'
+  const filename = body.value.filename || 'video.mp4'
 
   try {
     await downloadFile({
@@ -54,12 +56,14 @@ async function handleDownload(event: MouseEvent) {
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
           showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
-        } else {
+        }
+        else {
           showToast(t('message.download.failed') || '下载失败')
         }
       },
     })
-  } catch {
+  }
+  catch {
     // 错误已在 onError 回调中处理
   }
 }
@@ -69,8 +73,8 @@ async function handleDownload(event: MouseEvent) {
   <div class="video-message" :class="{ 'video-message--self': props.message.isSelf }">
     <div class="video-message__container" @click="openPreview">
       <video
-        v-if="props.message.url"
-        :src="props.message.url"
+        v-if="body.url"
+        :src="body.url"
         class="video-message__video"
         :class="videoClass"
         preload="metadata"
@@ -80,22 +84,24 @@ async function handleDownload(event: MouseEvent) {
       </div>
       <!-- 播放按钮覆盖层 -->
       <div class="video-message__overlay">
-        <div class="video-message__play-btn">&#9658;</div>
+        <div class="video-message__play-btn">
+          &#9658;
+        </div>
       </div>
       <!-- 时长标签 -->
-      <div v-if="props.message.duration" class="video-message__duration">
-        {{ Math.floor(props.message.duration / 60) }}:{{ String(props.message.duration % 60).padStart(2, '0') }}
+      <div v-if="body.duration" class="video-message__duration">
+        {{ Math.floor(body.duration / 60) }}:{{ String(body.duration % 60).padStart(2, '0') }}
       </div>
     </div>
 
     <!-- 全屏预览 -->
     <div
-      v-if="isPreviewing && props.message.url"
+      v-if="isPreviewing && body.url"
       class="video-message__preview"
       @click="closePreview"
     >
       <video
-        :src="props.message.url"
+        :src="body.url"
         class="video-message__preview-video"
         controls
         autoplay

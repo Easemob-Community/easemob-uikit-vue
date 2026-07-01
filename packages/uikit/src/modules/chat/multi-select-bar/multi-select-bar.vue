@@ -1,20 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
-import type { Message } from '../../../store/message'
-import type { Conversation } from '../../../store/conversation'
+import type { UiMessage } from '../../../sdk/types'
 
 export interface MultiSelectBarEmits {
-  (e: 'forward-one-by-one', messages: Message[]): void
-  (e: 'forward-combine', messages: Message[]): void
-  (e: 'delete', messages: Message[]): void
+  (e: 'forward-one-by-one', messages: UiMessage[]): void
+  (e: 'forward-combine', messages: UiMessage[]): void
+  (e: 'delete', messages: UiMessage[]): void
   (e: 'select-all'): void
   (e: 'deselect-all'): void
   (e: 'close'): void
 }
 
 const props = defineProps<{
-  selectedMessages: Message[]
+  selectedMessages: UiMessage[]
   totalMessages: number
 }>()
 
@@ -26,7 +25,8 @@ const isAllSelected = computed(() => props.selectedMessages.length > 0 && props.
 function onToggleSelectAll() {
   if (isAllSelected.value) {
     emit('deselect-all')
-  } else {
+  }
+  else {
     emit('select-all')
   }
 }
@@ -34,18 +34,20 @@ function onToggleSelectAll() {
 const forwardMode = ref<'oneByOne' | 'combine'>('combine')
 
 /** 待转发的消息 */
-const pendingForwardMessages = ref<Message[]>([])
+const pendingForwardMessages = ref<UiMessage[]>([])
 
 /** 批量删除确认弹窗 */
 const showBatchDeleteConfirm = ref(false)
 
 /** 打开转发弹窗 */
-function openForwardModal(messages: Message[]) {
-  if (messages.length === 0) return
+function openForwardModal(messages: UiMessage[]) {
+  if (messages.length === 0)
+    return
   pendingForwardMessages.value = messages
   if (forwardMode.value === 'oneByOne') {
     emit('forward-one-by-one', messages)
-  } else {
+  }
+  else {
     emit('forward-combine', messages)
   }
 }
@@ -130,11 +132,19 @@ function onConfirmDelete() {
   <Teleport to="body">
     <div v-if="showBatchDeleteConfirm" class="multi-select-bar__modal-overlay" @click="showBatchDeleteConfirm = false">
       <div class="multi-select-bar__modal" @click.stop>
-        <div class="multi-select-bar__modal-title">确认删除</div>
-        <div class="multi-select-bar__modal-desc">确定要删除选中的 {{ selectedMessages.length }} 条消息吗？</div>
+        <div class="multi-select-bar__modal-title">
+          确认删除
+        </div>
+        <div class="multi-select-bar__modal-desc">
+          确定要删除选中的 {{ selectedMessages.length }} 条消息吗？
+        </div>
         <div class="multi-select-bar__modal-actions">
-          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel" @click="showBatchDeleteConfirm = false">取消</button>
-          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--confirm" @click="onConfirmDelete">删除</button>
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel" @click="showBatchDeleteConfirm = false">
+            取消
+          </button>
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--confirm" @click="onConfirmDelete">
+            删除
+          </button>
         </div>
       </div>
     </div>

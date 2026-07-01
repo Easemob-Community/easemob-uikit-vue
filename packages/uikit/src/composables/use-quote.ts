@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { Message } from '../store/message'
+import type { FileMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
 
 /** 引用消息协议类型（ext.msgQuote） */
 export interface MsgQuotePayload {
@@ -14,19 +14,19 @@ export interface MsgQuotePayload {
 }
 
 /** 模块级单例：当前输入框中正在引用的消息 */
-const quotedMessage = ref<Message | null>(null)
+const quotedMessage = ref<UiMessage | null>(null)
 
 /** 模块级单例：当前需要闪烁高亮的消息 ID（mid 或 id 任一即可） */
 const highlightedMessageId = ref<string>('')
 
 /** 模块级单例：定位请求 token —— 列表端 watch 该值进行滚动定位与未找到提示 */
-const locateRequest = ref<{ msgID: string; token: number } | null>(null)
+const locateRequest = ref<{ msgID: string, token: number } | null>(null)
 
 /** 生成引用预览文本 */
-export function getQuotePreview(message: Message): string {
+export function getQuotePreview(message: UiMessage): string {
   switch (message.type) {
     case 'text':
-      return 'content' in message ? String(message.content ?? '') : ''
+      return (message.body as TextMessageBody).content || ''
     case 'image':
       return '[图片]'
     case 'voice':
@@ -34,8 +34,8 @@ export function getQuotePreview(message: Message): string {
     case 'video':
       return '[视频]'
     case 'file': {
-      const filename = 'filename' in message ? (message as unknown as { filename?: string }).filename : ''
-      return filename ? filename : '[文件]'
+      const filename = (message.body as FileMessageBody).filename
+      return filename || '[文件]'
     }
     case 'location':
       return '[位置]'
@@ -49,8 +49,8 @@ export function getQuotePreview(message: Message): string {
 }
 
 /** 构造 ext.msgQuote（仅返回 { msgQuote } 片段，调用方可与其他 ext 合并） */
-export function buildQuoteExt(message: Message): { msgQuote: MsgQuotePayload } {
-  const msgID = message.serverId || message.id
+export function buildQuoteExt(message: UiMessage): { msgQuote: MsgQuotePayload } {
+  const msgID = message.msgServerId || message.msgLocalId
   return {
     msgQuote: {
       msgID,
@@ -69,7 +69,7 @@ export function buildQuoteExt(message: Message): { msgQuote: MsgQuotePayload } {
  * - 气泡内引用卡片点击通过 requestLocate 触发定位/闪烁，列表端 watch locateRequest 处理
  */
 export function useQuote() {
-  function setQuote(message: Message) {
+  function setQuote(message: UiMessage) {
     quotedMessage.value = message
   }
 
@@ -79,7 +79,8 @@ export function useQuote() {
 
   /** 触发一次定位请求：携带递增 token 让列表端 watch 即使相同 msgID 也能触发 */
   function requestLocate(msgID: string) {
-    if (!msgID) return
+    if (!msgID)
+      return
     locateRequest.value = { msgID, token: Date.now() }
   }
 

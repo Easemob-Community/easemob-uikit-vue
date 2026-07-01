@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ContactList from './contact-list.vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
-import type { Contact } from '../../store/contact'
+import type { UiContact as Contact } from '../../sdk/types'
+import ContactList from './contact-list.vue'
 
 /** 注入 mock 联系人数据，覆盖多字母分组 + # 兜底 */
 function injectMockContacts() {
@@ -79,7 +79,8 @@ function onMaxExceed(max: number) {
 // ========== loadMore 演示 ==========
 const loadingMore = ref(false)
 function onLoadMore() {
-  if (loadingMore.value) return
+  if (loadingMore.value)
+    return
   loadingMore.value = true
   console.log('[contact-list] load-more triggered')
   setTimeout(() => {
@@ -233,13 +234,15 @@ function onLoadMore() {
                 <div
                   style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; background: linear-gradient(135deg, #f97316, #ec4899);"
                 >
-                  {{ (contact.remark || contact.name).slice(0, 1) }}
+                  {{ (contact.remark || contact.name || '').slice(0, 1) }}
                 </div>
                 <div style="flex: 1; min-width: 0;">
                   <div style="font-size: 14px; color: #111827;">
                     {{ contact.remark || contact.name }}
                   </div>
-                  <div style="font-size: 12px; color: #9ca3af;">{{ contact.userId }}</div>
+                  <div style="font-size: 12px; color: #9ca3af;">
+                    {{ contact.userId }}
+                  </div>
                 </div>
                 <button
                   style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"

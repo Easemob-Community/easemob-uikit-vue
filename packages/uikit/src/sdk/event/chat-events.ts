@@ -1,0 +1,142 @@
+import type { ChatEventHandlerMap } from 'easemob-websdk'
+import type { ManagerHost } from '../client'
+import type { RootStores } from './types'
+import { toUiMessage, toUiMessages } from '../adapter/message-adapter'
+import { toUiConversations } from '../adapter/conversation-adapter'
+
+/**
+ * 创建 ChatManager 事件处理器。
+ * 注册到 client.chatManager.addEventHandler。
+ */
+export function createChatHandlers(client: ManagerHost, stores: RootStores): ChatEventHandlerMap {
+  return {
+    onSyncDataStart: () => {
+      stores.conversation.setSyncingConversations(true)
+    },
+
+    onSyncDataFinished: () => {
+      stores.conversation.setSyncingConversations(false)
+      const items = client.chatManager.getConversationList()
+      stores.conversation.setConversationList(toUiConversations(items))
+      stores.conversation.setConversationsLoaded(true)
+    },
+
+    onConversationListUpdate: (payload) => {
+      // SDK5 payload 包含完整快照和 patch；简单场景直接全量替换
+      stores.conversation.setConversationList(toUiConversations(payload.items))
+    },
+
+    onMessage: (sdkMsg) => {
+      const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
+      stores.message.addMessage(uiMsg)
+
+      // 更新@我状态
+      if (sdkMsg.conversationType === 'groupChat' && sdkMsg.from !== stores.client.currentUser) {
+        const atList = sdkMsg.ext?.em_at_list
+        if (Array.isArray(atList) && atList.includes(stores.client.currentUser)) {
+          stores.conversation.setAtMe(sdkMsg.conversationId, true)
+          stores.message.addAtMeMessage(sdkMsg.conversationId, uiMsg.msgServerId || uiMsg.msgLocalId)
+        }
+      }
+    },
+
+    onMessageRecalled: (payload) => {
+      stores.message.recallMessage(payload.messageId, stores.client.currentUser)
+    },
+
+    onMessageDelivered: (payload) => {
+      stores.message.updateMessageStatus(payload.messageId, 'delivered')
+    },
+
+    onMessageRead: (payload) => {
+      for (const item of payload) {
+        if (!item.messageId) continue
+        if (item.conversationType === 'groupChat' && item.ackContent) {
+          try {
+            const parsed = JSON.parse(item.ackContent)
+            const count = parsed?.count
+            if (typeof count === 'number') {
+              stores.message.updateMessageById(item.messageId, { groupReadCount: count })
+            }
+          } catch {
+            // ignore
+          }
+          continue
+        }
+        stores.message.updateMessageStatus(item.messageId, 'read')
+      }
+    },
+
+    onConversationRead: (payload) => {
+      if (payload.conversationId) {
+        stores.conversation.updateUnreadCount(payload.conversationId, 0)
+      }
+    },
+
+    onMessageUpdated: (payload) => {
+      const uiMsg = toUiMessage(payload.message as any, stores.client.currentUser)
+      stores.message.applyModifiedMessage(uiMsg)
+    },
+
+    onPinnedMessageChanged: (payload) => {
+      if (!payload.messageId) return
+      if (payload.operation === 'pin') {
+        stores.message.setMessagePinned(payload.messageId, {
+          operatorId: payload.operatorId || '',
+          pinTime: payload.pinTime || Date.now(),
+        })
+      } else if (payload.operation === 'unpin') {
+        stores.message.setMessageUnpinned(payload.messageId)
+      }
+    },
+
+    onMultiDeviceConversation: (event) => {
+      const { operation, conversationId } = event
+      if (!conversationId) return
+      switch (operation) {
+        case 'CONVERSATION_DELETED':
+          stores.conversation.deleteConversation(conversationId)
+          break
+        case 'CONVERSATION_PINNED':
+          stores.conversation.updateConversation(conversationId, { isPinned: true })
+          break
+        case 'CONVERSATION_UNPINNED':
+          stores.conversation.updateConversation(conversationId, { isPinned: false })
+          break
+        case 'CONVERSATION_MARK':
+          if (event.mark !== undefined) {
+            stores.conversation.updateConversation(conversationId, { marks: [event.mark] })
+          }
+          break
+        case 'CONVERSATION_MUTE_INFO_CHANGED':
+          if (event.remindType) {
+            stores.conversation.updateConversation(conversationId, {
+              isMuted: event.remindType === 'NONE',
+              remindType: event.remindType,
+            })
+          }
+          break
+        default:
+          console.log('[UIKit] onMultiDeviceConversation unhandled:', event)
+      }
+    },
+
+    onMultiDeviceMessageRemoved: (event) => {
+      const { operation, conversationId, messageIds, beforeTimestamp } = event
+      if (!conversationId || operation !== 'MESSAGE_REMOVED') return
+
+      if (messageIds && messageIds.length > 0) {
+        stores.message.deleteMessages([...messageIds])
+      } else if (beforeTimestamp) {
+        const msgs = stores.message.getMessages(conversationId)
+        const idsToDelete = msgs
+          .filter((m) => m.timestamp && m.timestamp < beforeTimestamp)
+          .map((m) => m.msgServerId || m.msgLocalId)
+          .filter((id: string | undefined): id is string => !!id)
+        if (idsToDelete.length > 0) {
+          stores.message.deleteMessages(idsToDelete)
+        }
+      }
+    },
+  }
+}

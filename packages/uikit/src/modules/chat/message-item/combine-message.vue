@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useLocale } from '../../../locale'
 import Icon from '../../../components/icon/icon.vue'
-import type { Message } from '../../../store/message'
+import type { CombineMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface CombineMessageProps {
-  message: Message
+  message: UiMessage
   /** 是否为己方发送的消息，用于区分主题色 */
   isSelf?: boolean
 }
 
 export interface CombineMessageEmits {
-  (e: 'view', message: Message): void
+  (e: 'view', message: UiMessage): void
 }
 
 const props = withDefaults(defineProps<CombineMessageProps>(), {
@@ -19,16 +20,11 @@ const props = withDefaults(defineProps<CombineMessageProps>(), {
 const emit = defineEmits<CombineMessageEmits>()
 const { t } = useLocale()
 
-/** 合并消息特有的字段 */
-const combineMsg = props.message as unknown as {
-  title?: string
-  summary?: string
-  compatibleText?: string
-}
+const body = computed(() => props.message.body as CombineMessageBody)
 
-const title = combineMsg.title || t('message.forward.combineTitle') || '聊天记录'
-const summary = combineMsg.summary || ''
-const compatibleText = combineMsg.compatibleText || ''
+const title = computed(() => body.value.title || t('message.forward.combineTitle') || '聊天记录')
+const summary = computed(() => body.value.summary || '')
+const compatibleText = computed(() => body.value.compatibleText || '')
 
 function handleClick() {
   emit('view', props.message)
@@ -45,7 +41,9 @@ function handleClick() {
 
     <!-- 摘要 -->
     <div v-if="summary" class="combine-message__summary">
-      <p v-for="(line, idx) in summary.split('\n')" :key="idx">{{ line }}</p>
+      <p v-for="(line, idx) in summary.split('\n')" :key="idx">
+        {{ line }}
+      </p>
     </div>
 
     <!-- 兼容文本（不支持合并消息的 SDK 版本显示） -->

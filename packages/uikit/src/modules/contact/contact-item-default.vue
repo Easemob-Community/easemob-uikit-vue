@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
-import type { Contact } from '../../store/contact'
-import type { ContactItemSize, OnlineStatus, AvatarShape } from './types'
+import type { UiContact as Contact } from '../../sdk/types'
+import type { AvatarShape, ContactItemSize, OnlineStatus } from './types'
 
 const props = withDefaults(defineProps<{
   contact: Contact
@@ -38,9 +38,12 @@ const props = withDefaults(defineProps<{
 const displayName = computed(() => props.contact.remark || props.contact.name || props.contact.userId)
 
 const resolvedAvatarSize = computed(() => {
-  if (props.avatarSize) return props.avatarSize
-  if (props.size === 'compact') return 32
-  if (props.size === 'large') return 48
+  if (props.avatarSize)
+    return props.avatarSize
+  if (props.size === 'compact')
+    return 32
+  if (props.size === 'large')
+    return 48
   return 40
 })
 
@@ -96,7 +99,9 @@ const rootClass = computed(() => ({
   margin: 0 var(--uikit-item-hover-margin-x, 0px);
   height: var(--contact-item-height, 56px);
   cursor: pointer;
-  transition: background-color 0.15s, opacity 0.15s;
+  transition:
+    background-color 0.15s,
+    opacity 0.15s;
   border-radius: var(--uikit-item-hover-radius, 0px);
 }
 
@@ -138,7 +143,7 @@ const rootClass = computed(() => ({
 }
 
 .contact-item-default.is-selected .contact-item-default__check {
-  color: var(--uikit-primary, #155EEF);
+  color: var(--uikit-primary, #155eef);
 }
 
 .contact-item-default__avatar-wrap {
@@ -166,10 +171,18 @@ const rootClass = computed(() => ({
   background-color: var(--uikit-text-tertiary, #c0c4cc);
 }
 
-.contact-item-default__status.status-online { background-color: #22c55e; }
-.contact-item-default__status.status-away { background-color: #f59e0b; }
-.contact-item-default__status.status-busy { background-color: #ef4444; }
-.contact-item-default__status.status-offline { background-color: #94a3b8; }
+.contact-item-default__status.status-online {
+  background-color: #22c55e;
+}
+.contact-item-default__status.status-away {
+  background-color: #f59e0b;
+}
+.contact-item-default__status.status-busy {
+  background-color: #ef4444;
+}
+.contact-item-default__status.status-offline {
+  background-color: #94a3b8;
+}
 
 .contact-item-default__main {
   flex: 1;

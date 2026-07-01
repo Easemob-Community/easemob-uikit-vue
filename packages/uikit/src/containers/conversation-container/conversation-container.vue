@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import ConversationList from '../../modules/conversation/conversation-list.vue'
-import { useConversation, initDraftStorage } from '../../composables/use-conversation'
+import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
 import { useLocale } from '../../locale'
 import type { ConversationAction } from '../../modules/conversation/types'
-import type { Conversation } from '../../store/conversation'
+import type { UiConversation as Conversation } from '../../sdk/types'
 
 export interface ConversationContainerProps {
   /** 默认从服务端获取的会话数量，max 50，默认 20 */
@@ -71,7 +71,7 @@ const emit = defineEmits<{
   (e: 'conversation-select', conversation: Conversation): void
 }>()
 
-const { fetchServerConversations } = useConversation()
+const { refreshConversations } = useConversation()
 const { t } = useLocale()
 
 const defaultTimeFormatter = createConversationTimeFormatter(t)
@@ -83,8 +83,7 @@ onMounted(() => {
   // SDK 5.x: 会话列表由 WebSocket 自动同步驱动。
   // onConversationListSyncDidFinish 事件会自动调用 getSessionList 填充 store。
   // 容器 mount 时尝试读取本地 SessionList（同步可能已完成或正在进行）。
-  console.log('[ConversationContainer] onMounted -> try fetch from local SessionList')
-  fetchServerConversations()
+  refreshConversations()
 })
 
 function handleConversationSelect(id: string, conversation: Conversation) {

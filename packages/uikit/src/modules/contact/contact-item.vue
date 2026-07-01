@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import ContactItemDefault from './contact-item-default.vue'
 import { useContact } from '../../composables/use-contact'
-import type { ContactSelectMode, ContactItemSize, OnlineStatus, AvatarShape } from './types'
-import type { Contact } from '../../store/contact'
+import type { UiContact as Contact } from '../../sdk/types'
+import ContactItemDefault from './contact-item-default.vue'
+import type { AvatarShape, ContactItemSize, ContactSelectMode, OnlineStatus } from './types'
 
 const props = withDefaults(defineProps<{
   contact: Contact
@@ -42,19 +42,23 @@ const selected = computed(() => isSelected(props.contact.userId))
 const showCheckbox = computed(() => props.selectMode === 'multiple')
 
 function onClick() {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   if (props.selectMode === 'multiple') {
     toggleSelect(props.contact.userId)
-  } else if (props.selectMode === 'single') {
+  }
+  else if (props.selectMode === 'single') {
     setActiveId(props.contact.userId)
-  } else {
+  }
+  else {
     setActiveId(props.contact.userId)
   }
   emit('click', props.contact)
 }
 
 function onContextmenu(e: MouseEvent) {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   emit('contextmenu', e, props.contact)
 }
 </script>

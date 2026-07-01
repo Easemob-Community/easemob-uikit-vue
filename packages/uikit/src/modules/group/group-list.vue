@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import type { Component } from 'vue'
 import { useGroup } from '../../composables/use-group'
 import { useGroupFilter } from '../../composables/use-group-filter'
 import { useGroupSort } from '../../composables/use-group-sort'
 import { useLocale } from '../../locale'
 import { resolvePinyin } from '../../composables/use-pinyin'
-import GroupItem from './group-item.vue'
-import GroupEmpty from './group-empty.vue'
 import ContactAlphabetNav from '../contact/contact-alphabet-nav.vue'
 import Input from '../../components/input/input.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
+import type { GroupFilterFn } from '../../composables/use-group-filter'
+import type { UiGroup as Group } from '../../sdk/types'
 import type {
+  AvatarShape,
+  GroupDisabledFn,
   GroupGroupBy,
   GroupGroupItem,
+  GroupItemSize,
+  GroupListClickBehavior,
   GroupSelectMode,
   GroupSortBy,
-  GroupItemSize,
-  GroupDisabledFn,
   GroupSubtitleFn,
-  AvatarShape,
-  GroupListClickBehavior,
 } from './types'
-import type { GroupFilterFn } from '../../composables/use-group-filter'
-import type { Group } from '../../store/group'
-import type { Component } from 'vue'
+import GroupEmpty from './group-empty.vue'
+import GroupItem from './group-item.vue'
 
 const props = withDefaults(defineProps<{
   /** 是否展示头部区域，默认 true */
@@ -153,15 +153,20 @@ const totalCount = computed(() => filteredGroups.value.length)
 
 /** 群组分组逻辑（与 contact 对齐，但简化：默认 none，平铺为单组） */
 function resolveGroupKey(g: Group, mode: GroupGroupBy): string {
-  if (mode === 'none') return 'all'
-  if (typeof mode === 'function') return mode(g)
+  if (mode === 'none')
+    return 'all'
+  if (typeof mode === 'function')
+    return mode(g)
   // alphabet 模式
   const raw = (g.groupName || '').trim()
-  if (!raw) return '#'
+  if (!raw)
+    return '#'
   const first = raw.charAt(0).toUpperCase()
-  if (/^[A-Z]$/.test(first)) return first
+  if (/^[A-Z]$/.test(first))
+    return first
   const py = resolvePinyin(raw)
-  if (py && /^[A-Z]$/.test(py.firstLetter)) return py.firstLetter
+  if (py && /^[A-Z]$/.test(py.firstLetter))
+    return py.firstLetter
   return '#'
 }
 
@@ -178,7 +183,7 @@ const groupedGroups = computed<GroupGroupItem[]>(() => {
     }
     map.get(key)!.push(item)
   }
-  return orderedKeys.map<GroupGroupItem>((key) => ({
+  return orderedKeys.map<GroupGroupItem>(key => ({
     key,
     title: key,
     items: map.get(key)!,
@@ -195,7 +200,8 @@ const lastValidIds = ref<string[]>([])
 watch(
   () => props.selectedIds,
   (ids) => {
-    if (!ids) return
+    if (!ids)
+      return
     const cur = Array.from(storeSelectedIds.value).slice().sort().join(',')
     const next = [...ids].slice().sort().join(',')
     if (cur !== next) {
@@ -213,7 +219,8 @@ watch(
 watch(
   () => Array.from(storeSelectedIds.value),
   (next) => {
-    if (isInternalUpdate.value) return
+    if (isInternalUpdate.value)
+      return
     if (props.maxSelected && next.length > props.maxSelected) {
       isInternalUpdate.value = true
       setSelectedIds(lastValidIds.value)
@@ -230,9 +237,11 @@ watch(
 
 // ================== 触底加载 ==================
 function onScroll() {
-  if (!props.enableLoadMore || props.loading || isLoadingMore.value || !props.hasMore) return
+  if (!props.enableLoadMore || props.loading || isLoadingMore.value || !props.hasMore)
+    return
   const el = itemsRef.value
-  if (!el) return
+  if (!el)
+    return
   const distance = el.scrollHeight - el.scrollTop - el.clientHeight
   if (distance <= props.loadMoreThreshold) {
     isLoadingMore.value = true
@@ -261,7 +270,8 @@ onBeforeUnmount(() => {
 async function scrollToGroup(key: string) {
   await nextTick()
   const root = itemsRef.value
-  if (!root) return
+  if (!root)
+    return
   const target = root.querySelector<HTMLElement>(`[data-group-key="${key}"]`)
   if (target) {
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -269,7 +279,7 @@ async function scrollToGroup(key: string) {
   emit('group-jump', key)
 }
 
-const alphabetKeys = computed(() => groupedGroups.value.map((g) => g.key))
+const alphabetKeys = computed(() => groupedGroups.value.map(g => g.key))
 
 function onItemClick(group: Group) {
   emit('click', group)

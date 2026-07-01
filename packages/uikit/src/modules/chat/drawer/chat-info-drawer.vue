@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import ChatDrawer from './chat-drawer.vue'
+import { computed, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
-import type { Conversation } from '../../../store/conversation'
+import type { UiConversation as Conversation } from '../../../sdk/types'
+import ChatDrawer from './chat-drawer.vue'
 
 export interface ChatInfoDrawerProps {
   show: boolean
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 const themeStore = useThemeStore()
 const { t } = useLocale()
 const closeBtnClass = computed(() =>
-  themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : ''
+  themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : '',
 )
 
 /** 备注编辑状态 */
@@ -91,13 +91,19 @@ function onLeaveOrDelete() {
     <!-- Body 默认插槽 -->
     <div class="chat-info-drawer__profile">
       <Avatar :name="displayName" :size="64" />
-      <div class="chat-info-drawer__name">{{ displayName }}</div>
-      <div v-if="!isGroup" class="chat-info-drawer__id">ID: {{ conversation?.id }}</div>
+      <div class="chat-info-drawer__name">
+        {{ displayName }}
+      </div>
+      <div v-if="!isGroup" class="chat-info-drawer__id">
+        ID: {{ conversation?.id }}
+      </div>
     </div>
 
     <!-- 单聊：备注编辑 -->
     <div v-if="!isGroup" class="chat-info-drawer__section">
-      <div class="chat-info-drawer__section-title">{{ t('chat.info.remark') }}</div>
+      <div class="chat-info-drawer__section-title">
+        {{ t('chat.info.remark') }}
+      </div>
       <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
         <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
         <Icon name="misc/edit" :size="16" />
@@ -108,8 +114,10 @@ function onLeaveOrDelete() {
           class="chat-info-drawer__remark-input"
           :placeholder="t('chat.info.remarkInputPlaceholder')"
           @keydown.enter="saveRemark"
-        />
-        <button class="chat-info-drawer__remark-save" @click="saveRemark">{{ t('chat.info.save') }}</button>
+        >
+        <button class="chat-info-drawer__remark-save" @click="saveRemark">
+          {{ t('chat.info.save') }}
+        </button>
       </div>
     </div>
 

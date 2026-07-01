@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useInfiniteScroll, onClickOutside } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { useInfiniteScroll } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
 import { useViewport } from '../../composables/use-viewport'
 import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
-import ConversationItem from './conversation-item.vue'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
 import Icon from '../../components/icon/icon.vue'
 import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
+import type { UiConversation as Conversation } from '../../sdk/types'
 import type { ConversationAction } from './types'
-import type { Conversation } from '../../store/conversation'
+import ConversationItem from './conversation-item.vue'
 
 const props = withDefaults(defineProps<{
   showSearch?: boolean
@@ -57,7 +57,7 @@ const emit = defineEmits<{
   (e: 'at-me-click', id: string, conversation: Conversation): void
 }>()
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, saveDraft, loadDraft, clearDraft } = useConversation()
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
 const { stores } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -79,9 +79,9 @@ const { isRefreshing: isPullRefreshing } = usePullRefresh(
   {
     onRefresh: async () => {
       // 下拉刷新需要明确拿最新数据，走强制刷新接口以跳过本地已加载短路
-      await refreshConversations({ pageSize: 20 })
+      await refreshConversations()
     },
-  }
+  },
 )
 
 function onHeaderMenuClose() {
@@ -96,18 +96,19 @@ const headerMenuItems = computed(() => [
 ])
 
 const headerActionSheetActions = computed(() =>
-  headerMenuItems.value.map((item) => ({ name: item.label, icon: item.icon }))
+  headerMenuItems.value.map(item => ({ name: item.label, icon: item.icon })),
 )
 
 function onHeaderMenuClick() {
   if (isMobile.value) {
     showHeaderActionSheet.value = true
-  } else {
+  }
+  else {
     showHeaderMenu.value = true
   }
 }
 
-function onHeaderActionSheetSelect(_item: { name: string; icon?: string }, index: number) {
+function onHeaderActionSheetSelect(_item: { name: string, icon?: string }, index: number) {
   // TODO: 根据 key 执行对应操作
   headerMenuItems.value[index]
 }
@@ -119,14 +120,15 @@ function onHeaderMenuItemClick(key: string) {
 }
 
 const filteredConversationList = computed(() => {
-  if (!normalizedSearchKeyword.value) return conversationList.value
+  if (!normalizedSearchKeyword.value)
+    return conversationList.value
   const kw = normalizedSearchKeyword.value.toLowerCase()
   if (props.filterFn) {
-    return conversationList.value.filter((item) => props.filterFn!(kw, item))
+    return conversationList.value.filter(item => props.filterFn!(kw, item))
   }
   return conversationList.value.filter((item) => {
     const matchId = item.id.toLowerCase().includes(kw)
-    const matchMsg = item.lastMessage?.toLowerCase().includes(kw)
+    const matchMsg = item.lastMessageText?.toLowerCase().includes(kw)
     return matchId || matchMsg
   })
 })
@@ -138,7 +140,7 @@ useInfiniteScroll(
       loadMoreConversations()
     }
   },
-  { distance: 50 }
+  { distance: 50 },
 )
 
 function handleSelect(id: string) {

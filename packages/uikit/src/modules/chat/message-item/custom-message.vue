@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Message } from '../../../store/message'
+import type { CustomMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface CustomMessageProps {
-  message: Message
+  message: UiMessage
 }
 
 const props = defineProps<CustomMessageProps>()
 
+const body = computed(() => props.message.body as CustomMessageBody)
+
 /** 提取自定义消息展示内容 */
 const displayContent = computed(() => {
-  const customMsg = props.message as unknown as {
-    customEvent?: string
-    customExts?: Record<string, any>
-  }
-  const event = customMsg.customEvent || ''
-  const exts = customMsg.customExts
-  if (exts && Object.keys(exts).length > 0) {
-    return `${event}: ${JSON.stringify(exts)}`
+  const event = body.value.event || ''
+  const params = body.value.params
+  if (params && Object.keys(params).length > 0) {
+    return `${event}: ${JSON.stringify(params)}`
   }
   return event || '[自定义消息]'
 })

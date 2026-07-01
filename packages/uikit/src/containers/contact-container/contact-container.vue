@@ -1,35 +1,34 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import type { Component } from 'vue'
 import AddressBookContainer from '../address-book-container/address-book-container.vue'
 import ContactListContainer from '../contact-list-container/contact-list-container.vue'
 import GroupListContainer from '../group-list-container/group-list-container.vue'
 import type {
-  AddressBookContainerView,
   AddressBookContainerEntry,
+  AddressBookContainerView,
 } from '../address-book-container/address-book-container.vue'
 import type {
-  ContactGroupBy,
-  ContactSelectMode,
-  ContactItemSize,
   AvatarShape,
   ContactDisabledFn,
-  ContactSubtitleFn,
+  ContactGroupBy,
+  ContactItemSize,
   ContactOnlineStatusFn,
+  ContactSelectMode,
+  ContactSubtitleFn,
 } from '../../modules/contact/types'
 import type {
+  GroupDisabledFn,
   GroupGroupBy,
+  GroupItemSize,
   GroupSelectMode,
   GroupSortBy,
-  GroupItemSize,
-  GroupDisabledFn,
   GroupSubtitleFn,
 } from '../../modules/group/types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
-import type { Contact } from '../../store/contact'
-import type { Group } from '../../store/group'
-import type { Component } from 'vue'
+import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
 
 /** 容器视图状态（兼容旧命名） */
 export type ContactContainerView = 'home' | 'group' | 'contact' | 'notice'

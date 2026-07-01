@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import type { Component } from 'vue'
 import ContactList from '../../modules/contact/contact-list.vue'
 import { useContact } from '../../composables/use-contact'
 import { useContactStore } from '../../store/contact'
 import { useUIKit } from '../../composables/use-uikit'
 import type {
-  ContactGroupBy,
-  ContactSelectMode,
-  ContactItemSize,
   AvatarShape,
   ContactDisabledFn,
-  ContactSubtitleFn,
+  ContactGroupBy,
+  ContactItemSize,
   ContactOnlineStatusFn,
+  ContactSelectMode,
+  ContactSubtitleFn,
 } from '../../modules/contact/types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
-import type { Contact } from '../../store/contact'
-import type { Component } from 'vue'
+import type { UiContact as Contact } from '../../sdk/types'
 
 /** 联系人列表项点击行为模式 */
 export type ContactListClickBehavior = 'default' | 'event-only'
@@ -147,9 +147,12 @@ const contactListRef = ref<InstanceType<typeof ContactList>>()
 
 /** 自治拉取 */
 function maybeFetchContacts() {
-  if (!props.autoFetch) return
-  if (!features.enableContact) return
-  if (contactStore.loaded) return
+  if (!props.autoFetch)
+    return
+  if (!features.enableContact)
+    return
+  if (contactStore.loaded)
+    return
   refreshContacts()
 }
 
@@ -161,7 +164,8 @@ onMounted(() => {
 async function handleContactLoadMore() {
   try {
     await loadMoreContacts()
-  } finally {
+  }
+  finally {
     contactListRef.value?.releaseLoadMoreLock?.()
   }
 }
@@ -210,8 +214,8 @@ defineExpose({
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
       :search-component="props.searchComponent"
-      @select="(c: Contact) => emit('select', c)"
       :click-behavior="props.clickBehavior"
+      @select="(c: Contact) => emit('select', c)"
       @click="(c: Contact) => emit('click', c)"
       @contextmenu="(e: MouseEvent, c: Contact) => emit('contextmenu', e, c)"
       @load-more="handleContactLoadMore"

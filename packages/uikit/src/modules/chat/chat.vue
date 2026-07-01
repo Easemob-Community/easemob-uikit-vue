@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted, onErrorCaptured, nextTick, provide } from 'vue'
+import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
@@ -7,7 +7,10 @@ import { useQuote } from '../../composables/use-quote'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { CONVERSATION_TYPE } from '../../constants'
-import type { ChatSendHooks } from './types'
+import type { UiConversation as Conversation, TextMessageBody, UiMessage } from '../../sdk/types'
+import Icon from '../../components/icon/icon.vue'
+import Avatar from '../../components/avatar/avatar.vue'
+import type { ChatConfig } from './types'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
@@ -15,12 +18,6 @@ import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import TypingIndicator from './typing-indicator/typing-indicator.vue'
-import Modal from '../../components/modal/modal.vue'
-import Icon from '../../components/icon/icon.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import type { ChatConfig } from './types'
-import type { Message } from '../../store/message'
-import type { Conversation } from '../../store/conversation'
 
 /** 渲染错误信息 */
 interface RenderError {
@@ -39,7 +36,7 @@ export interface ChatProps {
 }
 
 export interface ChatEmits {
-  (e: 'recall-failed', error: any, message: Message): void
+  (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
 }
 
@@ -52,17 +49,10 @@ defineExpose({
   getText: () => messageInputRef.value?.getText?.() || '',
 })
 
-const messageStoreOptions = computed(() => ({
-  maxMessageCount: props.config?.messageList?.maxMessageCount,
-}))
-
-const { currentConversation, isMultiSelectMode, messages, selectedMessages, selectedMessageIds, exitMultiSelectMode, fetchHistoryMessages, sendReadAckForMessage, fetchGroupReadDetail, editingMessage, enterEditMode, exitEditMode, fetchPinnedMessages, toggleTranslation, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat({ messageStoreOptions: messageStoreOptions.value })
+const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
 const { stores } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
-
-/** 发送钩子 */
-const sendHooks = computed<ChatSendHooks | undefined>(() => props.config?.hooks)
 
 /** 组件卸载时清理残留状态 */
 onUnmounted(() => {
@@ -99,19 +89,21 @@ provide('textMessageConfig', computed(() => props.config?.textMessage))
 const messageInputRef = ref<InstanceType<typeof MessageInput>>()
 
 /** 重新编辑：将撤回消息的原文回显到输入框 */
-function onReedit(message: Message) {
+function onReedit(message: UiMessage) {
   const originalText = message.originalMsg
-  if (!originalText) return
+  if (!originalText)
+    return
   // 重新编辑是"发送一条新消息"，不进入编辑态
   exitEditMode()
   nextTick(() => messageInputRef.value?.setText?.(originalText))
 }
 
 /** 进入编辑态：仅文本消息 */
-function onEdit(message: Message) {
-  if (!message || message.type !== 'text') return
+function onEdit(message: UiMessage) {
+  if (!message || message.type !== 'text')
+    return
   enterEditMode(message)
-  const originalText = (message as unknown as { content?: string }).content || ''
+  const originalText = (message.body as TextMessageBody).content || ''
   nextTick(() => messageInputRef.value?.setText?.(originalText))
 }
 
@@ -120,40 +112,39 @@ const enableDraft = computed(() => props.config?.enableDraft !== false)
 
 /** 恢复草稿到输入框（无草稿时清空输入） */
 function restoreDraft(cvsId: string) {
-  if (!enableDraft.value) return
+  if (!enableDraft.value)
+    return
   const draft = loadDraft(cvsId)
   nextTick(() => {
     // 防止异步竞态：仅当会话仍为目标会话时才操作输入框
-    if (currentConversation.value?.id !== cvsId) return
+    if (currentConversation.value?.id !== cvsId)
+      return
     messageInputRef.value?.setText?.(draft || '')
   })
 }
 
 /** 保存当前输入框草稿 */
 function saveCurrentDraft(cvsId: string) {
-  if (!enableDraft.value) return
+  if (!enableDraft.value)
+    return
   const text = messageInputRef.value?.getText?.() || ''
   if (text.trim()) {
     saveDraft(cvsId, text)
-  } else {
+  }
+  else {
     clearDraft(cvsId)
   }
 }
 
 /** 发送成功后清除草稿 */
 function handleSendSuccess() {
-  if (!enableDraft.value) return
+  if (!enableDraft.value)
+    return
   const cvsId = currentConversation.value?.id
-  if (!cvsId) return
+  if (!cvsId)
+    return
   clearDraft(cvsId)
 }
-
-/** 切换译文/原文 */
-function onToggleTranslation(message: Message) {
-  toggleTranslation(message.id)
-}
-
-
 
 /** 置顶横幅配置 */
 const pinnedBarConfig = computed(() => props.config?.messageList?.pinnedBar)
@@ -161,9 +152,10 @@ const showPinnedBar = computed(() => pinnedBarConfig.value?.visible !== false)
 const pinnedBarMaxLength = computed(() => pinnedBarConfig.value?.maxPreviewLength ?? 30)
 
 /** 在消息列表中定位置顶消息 */
-function onPinnedLocate(message: Message) {
-  const target = message.serverId || message.id
-  if (target) requestLocate(target)
+function onPinnedLocate(message: UiMessage) {
+  const target = message.msgServerId || message.msgLocalId
+  if (target)
+    requestLocate(target)
 }
 
 /** Header 配置 */
@@ -220,7 +212,8 @@ const enableTyping = computed(() => props.config?.input?.enableTyping !== false)
 
 /** 当前会话对方是否正在输入 */
 const isTyping = computed(() => {
-  if (!enableTyping.value || !currentConversation.value) return false
+  if (!enableTyping.value || !currentConversation.value)
+    return false
   return stores.conversation.typingMap[currentConversation.value.id] || false
 })
 
@@ -240,7 +233,7 @@ function startTypingHideTimer() {
   clearTypingTimer()
   typingHideTimer = setTimeout(() => {
     if (currentConversation.value) {
-      setTyping(currentConversation.value.id, false)
+      setTyping()
     }
     typingHideTimer = null
   }, TYPING_DURATION)
@@ -250,7 +243,8 @@ function startTypingHideTimer() {
 watch(isTyping, (typing) => {
   if (typing) {
     startTypingHideTimer()
-  } else {
+  }
+  else {
     clearTypingTimer()
   }
 })
@@ -259,7 +253,7 @@ watch(isTyping, (typing) => {
 watch(currentConversation, (cvs, oldCvs) => {
   if (oldCvs && oldCvs.id !== cvs?.id) {
     clearTypingTimer()
-    setTyping(oldCvs.id, false)
+    setTyping()
   }
 })
 
@@ -275,19 +269,21 @@ onUnmounted(() => {
  */
 function locateAtMeMessage(cvsId: string) {
   const atMeMsgIds = stores.message.getAtMeMessages(cvsId)
-  if (atMeMsgIds.length === 0) return
+  if (atMeMsgIds.length === 0)
+    return
 
   const firstAtMeMsgId = atMeMsgIds[0]
   const existingMsgs = stores.message.getMessages(cvsId)
-  const found = existingMsgs.some(m => m.id === firstAtMeMsgId || m.serverId === firstAtMeMsgId)
+  const found = existingMsgs.some(m => m.msgServerId === firstAtMeMsgId || m.msgLocalId === firstAtMeMsgId)
 
   if (found) {
     // 消息已加载，直接定位，定位完成后清除记录避免重复定位
     nextTick(() => {
       requestLocate(firstAtMeMsgId)
-      stores.message.clearAtMeMessages(cvsId)
+      stores.message.clearAtMe(cvsId)
     })
-  } else {
+  }
+  else {
     // 消息不在当前已加载列表中，提示用户向上加载更多历史
     // 可选：自动触发历史消息加载直到找到该消息（此处仅做提示）
     console.warn('[Chat] @me message not in loaded history, scroll up to load more:', firstAtMeMsgId)
@@ -301,7 +297,8 @@ function locateAtMeMessage(cvsId: string) {
  * 3. 若有@我的消息，自动定位到首条@消息
  */
 watch(currentConversation, async (cvs, oldCvs) => {
-  if (!cvs || cvs.id === oldCvs?.id) return
+  if (!cvs || cvs.id === oldCvs?.id)
+    return
 
   // 切换会话前：保存旧会话的未发送内容作为草稿
   if (oldCvs) {
@@ -333,7 +330,8 @@ watch(currentConversation, async (cvs, oldCvs) => {
       nextTick(() => {
         locateAtMeMessage(cvs.id)
       })
-    } else {
+    }
+    else {
       locateAtMeMessage(cvs.id)
     }
   }
@@ -347,11 +345,12 @@ watch(currentConversation, async (cvs, oldCvs) => {
 const showForwardModal = ref(false)
 
 /** 待转发的消息（单条或多选） */
-const pendingForwardMessages = ref<Message[]>([])
+const pendingForwardMessages = ref<UiMessage[]>([])
 
 /** 打开转发弹窗 */
-function openForwardModal(messages: Message[]) {
-  if (messages.length === 0) return
+function openForwardModal(messages: UiMessage[]) {
+  if (messages.length === 0)
+    return
   pendingForwardMessages.value = messages
   showForwardModal.value = true
 }
@@ -362,21 +361,24 @@ const forwardMode = ref<'oneByOne' | 'combine'>('combine')
 /** 执行转发 */
 async function onForwardConfirm(targetConversation: Conversation) {
   const messages = pendingForwardMessages.value
-  if (messages.length === 0) return
+  if (messages.length === 0)
+    return
   try {
     if (forwardMode.value === 'oneByOne') {
       // 逐条转发：每条消息单独转发
       for (const msg of messages) {
         await forwardMessage(msg, targetConversation)
       }
-    } else {
+    }
+    else {
       // 合并转发：使用合并消息 API
       await forwardCombineMessages(messages, targetConversation)
     }
     // 仅成功后才清空状态
     pendingForwardMessages.value = []
     exitMultiSelectMode()
-  } catch (e) {
+  }
+  catch (e) {
     console.warn('[Chat] forward messages failed:', e)
     showToast(t('message.forward.failed') || '转发失败')
   }
@@ -403,12 +405,12 @@ function onMultiSelectForwardCombine() {
 }
 
 /** 多选：删除 */
-function onMultiSelectDelete(messages: Message[]) {
+function onMultiSelectDelete(messages: UiMessage[]) {
   if (messages.length === 0) {
     exitMultiSelectMode()
     return
   }
-  deleteMessages(messages.map(m => m.id))
+  deleteMessages(messages.map(m => m.msgServerId || m.msgLocalId))
   exitMultiSelectMode()
 }
 </script>
@@ -443,97 +445,97 @@ function onMultiSelectDelete(messages: Message[]) {
     </div>
 
     <template v-else>
-    <!-- Header -->
-    <div
-      v-if="showHeader"
-      ref="headerRef"
-      class="chat__header"
-      :class="{
-        'chat__header--align-left': headerAlign === 'left',
-        'chat__header--align-center': headerAlign === 'center',
-        'chat__header--align-right': headerAlign === 'right',
-      }"
-    >
-      <slot name="header" :conversation="currentConversation">
-        <!-- 头像区域 -->
-        <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
-          <slot name="header-avatar" :conversation="currentConversation">
-            <Avatar
-              :src="currentConversation.avatar"
-              :name="currentConversation.name"
-              :size="36"
-            />
-          </slot>
-        </div>
-        <div class="chat__header-main">
-          <template v-if="customHeaderSlot">
-            <slot name="header-title" :conversation="currentConversation">
-              <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
+      <!-- Header -->
+      <div
+        v-if="showHeader"
+        ref="headerRef"
+        class="chat__header"
+        :class="{
+          'chat__header--align-left': headerAlign === 'left',
+          'chat__header--align-center': headerAlign === 'center',
+          'chat__header--align-right': headerAlign === 'right',
+        }"
+      >
+        <slot name="header" :conversation="currentConversation">
+          <!-- 头像区域 -->
+          <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
+            <slot name="header-avatar" :conversation="currentConversation">
+              <Avatar
+                :src="currentConversation.avatar"
+                :name="currentConversation.name"
+                :size="36"
+              />
             </slot>
-            <slot name="header-extra" :conversation="currentConversation" />
-          </template>
-          <template v-else>
-            <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
-          </template>
-        </div>
-        <button
-          v-if="currentConversation"
-          class="chat__header-more"
-          @click.stop="showDrawer = true"
-        >
-          <Icon name="actions/ellipsis_vertical" :size="20" />
-        </button>
-      </slot>
-    </div>
+          </div>
+          <div class="chat__header-main">
+            <template v-if="customHeaderSlot">
+              <slot name="header-title" :conversation="currentConversation">
+                <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
+              </slot>
+              <slot name="header-extra" :conversation="currentConversation" />
+            </template>
+            <template v-else>
+              <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
+            </template>
+          </div>
+          <button
+            v-if="currentConversation"
+            class="chat__header-more"
+            @click.stop="showDrawer = true"
+          >
+            <Icon name="actions/ellipsis_vertical" :size="20" />
+          </button>
+        </slot>
+      </div>
 
-    <!-- 置顶横幅 -->
-    <PinnedBar
-      v-if="showPinnedBar && currentConversation"
-      :max-preview-length="pinnedBarMaxLength"
-      @locate="onPinnedLocate"
-    />
+      <!-- 置顶横幅 -->
+      <PinnedBar
+        v-if="showPinnedBar && currentConversation"
+        :max-preview-length="pinnedBarMaxLength"
+        @locate="onPinnedLocate"
+      />
 
-    <!-- 消息列表 -->
-    <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
+      <!-- 消息列表 -->
+      <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
 
-    <!-- 输入状态提示 -->
-    <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
+      <!-- 输入状态提示 -->
+      <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
 
-    <!-- 多选模式底部操作栏 -->
-    <MultiSelectBar
-      v-if="isMultiSelectMode"
-      :selected-messages="selectedMessages"
-      :total-messages="messages.length"
-      @forward-one-by-one="onMultiSelectForwardOneByOne"
-      @forward-combine="onMultiSelectForwardCombine"
-      @delete="onMultiSelectDelete"
-      @select-all="selectAllMessages(messages)"
-      @deselect-all="deselectAllMessages()"
-      @close="exitMultiSelectMode"
-    />
+      <!-- 多选模式底部操作栏 -->
+      <MultiSelectBar
+        v-if="isMultiSelectMode"
+        :selected-messages="selectedMessages"
+        :total-messages="messages.length"
+        @forward-one-by-one="onMultiSelectForwardOneByOne"
+        @forward-combine="onMultiSelectForwardCombine"
+        @delete="onMultiSelectDelete"
+        @select-all="selectAllMessages(messages)"
+        @deselect-all="deselectAllMessages()"
+        @close="exitMultiSelectMode"
+      />
 
-    <!-- 输入框 -->
-    <MessageInput
-      v-if="!isMultiSelectMode"
-      ref="messageInputRef"
-      :config="props.config"
-      :is-group="isGroupChat"
-      @send-success="handleSendSuccess"
-    />
+      <!-- 输入框 -->
+      <MessageInput
+        v-if="!isMultiSelectMode"
+        ref="messageInputRef"
+        :config="props.config"
+        :is-group="isGroupChat"
+        @send-success="handleSendSuccess"
+      />
 
-    <!-- 聊天信息抽屉 -->
-    <ChatInfoDrawer
-      v-model:show="showDrawer"
-      :conversation="currentConversation"
-      :is-group="isGroupChat"
-      :offset-top="headerHeight"
-    />
+      <!-- 聊天信息抽屉 -->
+      <ChatInfoDrawer
+        v-model:show="showDrawer"
+        :conversation="currentConversation"
+        :is-group="isGroupChat"
+        :offset-top="headerHeight"
+      />
 
-    <!-- 转发弹窗 -->
-    <ForwardModal
-      v-model:show="showForwardModal"
-      @forward="onForwardConfirm"
-    />
+      <!-- 转发弹窗 -->
+      <ForwardModal
+        v-model:show="showForwardModal"
+        @forward="onForwardConfirm"
+      />
     </template>
   </div>
 </template>

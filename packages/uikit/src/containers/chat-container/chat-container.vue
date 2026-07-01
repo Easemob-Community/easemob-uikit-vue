@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import type { ChatConfig } from '../../modules/chat/types'
-import type { Message } from '../../store/message'
+import type { UiMessage } from '../../sdk/types'
 
 export interface ChatContainerProps {
   /** 聊天页面配置 */
@@ -16,7 +16,7 @@ export interface ChatContainerProps {
 }
 
 export interface ChatContainerEmits {
-  (e: 'recall-failed', error: any, message: Message): void
+  (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
 }
 
@@ -39,7 +39,7 @@ defineExpose({
       :loading="props.loading"
       :class="props.class"
       :style="props.style"
-      @recall-failed="(err: any, msg: Message) => emit('recall-failed', err, msg)"
+      @recall-failed="(err: any, msg: UiMessage) => emit('recall-failed', err, msg)"
       @at-me-click="(userId: string) => emit('at-me-click', userId)"
     >
       <!-- 透传空状态插槽 -->

@@ -1,9 +1,9 @@
-import { computed, type ComputedRef, type Ref } from 'vue'
-import type { Contact } from '../store/contact'
+import { type ComputedRef, type Ref, computed } from 'vue'
+import type { UiContact as Contact } from '../sdk/types'
 import {
-  DEFAULT_ALPHABET_KEYS,
   type ContactGroupBy,
   type ContactGroupItem,
+  DEFAULT_ALPHABET_KEYS,
 } from '../modules/contact/types'
 import { resolvePinyin } from './use-pinyin'
 
@@ -18,18 +18,23 @@ import { resolvePinyin } from './use-pinyin'
  * - groupBy 为函数：调用并使用其返回值
  */
 function resolveGroupKey(contact: Contact, groupBy: ContactGroupBy): string {
-  if (groupBy === 'none') return 'all'
-  if (typeof groupBy === 'function') return groupBy(contact)
+  if (groupBy === 'none')
+    return 'all'
+  if (typeof groupBy === 'function')
+    return groupBy(contact)
 
   // alphabet 模式
   const raw = (contact.remark || contact.name || '').trim()
-  if (!raw) return '#'
+  if (!raw)
+    return '#'
   const first = raw.charAt(0).toUpperCase()
-  if (/^[A-Z]$/.test(first)) return first
+  if (/^[A-Z]$/.test(first))
+    return first
 
   // 中文等非 A-Z 字符尝试通过拼音 adapter 解析
   const py = resolvePinyin(raw)
-  if (py && /^[A-Z]$/.test(py.firstLetter)) return py.firstLetter
+  if (py && /^[A-Z]$/.test(py.firstLetter))
+    return py.firstLetter
 
   return '#'
 }
@@ -50,7 +55,7 @@ export interface UseContactGroupOptions {
 export function useContactGroup(
   contacts: Ref<Contact[]> | ComputedRef<Contact[]>,
   groupBy: Ref<ContactGroupBy>,
-  options: UseContactGroupOptions = {}
+  options: UseContactGroupOptions = {},
 ): ComputedRef<ContactGroupItem[]> {
   const defaultSort = (a: Contact, b: Contact) => {
     const aRaw = a.remark || a.name || ''
@@ -80,12 +85,13 @@ export function useContactGroup(
 
     let keys: string[]
     if (mode === 'alphabet') {
-      keys = DEFAULT_ALPHABET_KEYS.filter((k) => map.has(k))
-    } else {
+      keys = DEFAULT_ALPHABET_KEYS.filter(k => map.has(k))
+    }
+    else {
       keys = orderedKeys
     }
 
-    return keys.map<ContactGroupItem>((key) => ({
+    return keys.map<ContactGroupItem>(key => ({
       key,
       title: key,
       items: [...map.get(key)!].sort(sort),

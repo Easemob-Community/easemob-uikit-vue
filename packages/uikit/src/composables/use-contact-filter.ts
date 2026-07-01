@@ -1,5 +1,5 @@
-import { computed, type ComputedRef, type Ref } from 'vue'
-import type { Contact } from '../store/contact'
+import { type ComputedRef, type Ref, computed } from 'vue'
+import type { UiContact as Contact } from '../sdk/types'
 import { resolvePinyin } from './use-pinyin'
 
 export type ContactFilterFn = (keyword: string, contact: Contact) => boolean
@@ -23,24 +23,28 @@ export interface UseContactFilterOptions {
 export function useContactFilter(
   contacts: Ref<Contact[]> | ComputedRef<Contact[]>,
   keyword: Ref<string>,
-  options: UseContactFilterOptions = {}
+  options: UseContactFilterOptions = {},
 ): ComputedRef<Contact[]> {
   return computed(() => {
     const kw = keyword.value.trim().toLowerCase()
-    if (!kw) return contacts.value
+    if (!kw)
+      return contacts.value
     if (options.filterFn) {
-      return contacts.value.filter((c) => options.filterFn!(kw, c))
+      return contacts.value.filter(c => options.filterFn!(kw, c))
     }
     return contacts.value.filter((c) => {
       const display = (c.remark || c.name || '').toLowerCase()
       const userId = (c.userId || '').toLowerCase()
-      if (display.includes(kw) || userId.includes(kw)) return true
+      if (display.includes(kw) || userId.includes(kw))
+        return true
 
       // 拼音匹配（adapter 存在时才生效，零依赖降级）
       const py = resolvePinyin(c.remark || c.name || '')
       if (py) {
-        if (py.pinyin.includes(kw)) return true
-        if (py.initials.includes(kw)) return true
+        if (py.pinyin.includes(kw))
+          return true
+        if (py.initials.includes(kw))
+          return true
       }
       return false
     })

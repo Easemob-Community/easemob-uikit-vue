@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
-import type { Message } from '../../../store/message'
+import type { UiMessage } from '../../../sdk/types'
 import { MESSAGE_TYPE } from '../../../constants'
 import TextMessage from './text-message.vue'
 import ImageMessage from './image-message.vue'
@@ -12,13 +12,13 @@ import CombineMessage from './combine-message.vue'
 import CustomMessage from './custom-message.vue'
 
 export interface MessageRendererProps {
-  message: Message
+  message: UiMessage
 }
 
 export interface MessageRendererEmits {
-  (e: 'reedit', message: Message): void
-  (e: 'toggle-translation', message: Message): void
-  (e: 'view-combine', message: Message): void
+  (e: 'reedit', message: UiMessage): void
+  (e: 'toggle-translation', message: UiMessage): void
+  (e: 'view-combine', message: UiMessage): void
   (e: 'mention-click', userId: string): void
 }
 
@@ -56,7 +56,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
   <div class="message-renderer">
     <!-- 通知类型消息：居中灰色小字 -->
     <div v-if="isNotice" class="message-renderer__notice">
-      {{ 'content' in message ? message.content : '' }}
+      {{ (message.body as any).content || (message as any).content || '' }}
     </div>
 
     <!-- 类型级插槽覆盖：用户可通过 #message-txt 等完全替换某一类型的渲染 -->

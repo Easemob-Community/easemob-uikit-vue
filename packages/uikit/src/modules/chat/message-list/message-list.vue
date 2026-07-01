@@ -1,36 +1,36 @@
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue'
-import { useInfiniteScroll, useScroll, useClipboard } from '@vueuse/core'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useClipboard, useScroll } from '@vueuse/core'
+import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
 import { useLocale } from '../../../locale'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
-import MessageVirtualList from './message-virtual-list.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import Modal from '../../../components/modal/modal.vue'
+import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
-import type { Message } from '../../../store/message'
-import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { useToast } from '../../../composables/use-toast'
+import MessageVirtualList from './message-virtual-list.vue'
 
 export interface MessageListProps {
   config?: ChatConfig
 }
 
 export interface MessageListEmits {
-  (e: 'reedit', message: Message): void
-  (e: 'recall-failed', error: any, message: Message): void
-  (e: 'edit', message: Message): void
-  (e: 'forward', messages: Message[]): void
+  (e: 'reedit', message: UiMessage): void
+  (e: 'recall-failed', error: any, message: UiMessage): void
+  (e: 'edit', message: UiMessage): void
+  (e: 'forward', messages: UiMessage[]): void
   (e: 'mention-click', userId: string): void
 }
 
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor, clearHistoryCursor } = useChat()
+const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { t } = useLocale()
@@ -65,10 +65,12 @@ const enableLoadHistory = computed(() => loadHistoryConfig.value?.enable !== fal
 /** 历史加载模式 */
 const historyMode = computed(() => {
   const mode = loadHistoryConfig.value?.mode ?? 'auto'
-  if (mode !== 'auto') return mode
+  if (mode !== 'auto')
+    return mode
   // PC 端（非触摸设备）强制使用 scroll-top，移动端使用 pull-down
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-  if (!isTouchDevice) return 'scroll-top'
+  if (!isTouchDevice)
+    return 'scroll-top'
   return isMobile.value ? 'pull-down' : 'scroll-top'
 })
 
@@ -103,7 +105,8 @@ watch(() => arrivedState.bottom, (bottom) => {
 /** 虚拟列表滚动事件处理 */
 function onVirtualScroll(event: Event) {
   const el = event.target as HTMLElement
-  if (!el) return
+  if (!el)
+    return
   const threshold = 2
   const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
   isAtBottom.value = atBottom
@@ -112,13 +115,16 @@ function onVirtualScroll(event: Event) {
   }
 }
 
-/** 监听当前会话切换，重置状态并滚动到底部
+/**
+ * 监听当前会话切换，重置状态并滚动到底部
  *  ⚠️ 切勿改回监听 messages.value 引用：prependMessages 加载历史时也会替换数组引用，
- *     会被误判为切换会话从而把列表强制滚到底部，导致触顶加载只能触发一次。 */
+ *     会被误判为切换会话从而把列表强制滚到底部，导致触顶加载只能触发一次。
+ */
 watch(
   () => currentConversation.value?.id,
   (cvsId) => {
-    if (!cvsId) return
+    if (!cvsId)
+      return
     unreadNewCount.value = 0
     isAtBottom.value = true
     // 同步 cursor 状态：如果 useChat 已经加载过历史，使用缓存
@@ -128,7 +134,7 @@ watch(
     loadingHistory.value = false
     scrollToBottom()
   },
-  { flush: 'post', immediate: true }
+  { flush: 'post', immediate: true },
 )
 
 /** 监听消息数量变化，处理新消息到达时的智能滚动 */
@@ -141,15 +147,17 @@ watch(
       if (lastMsg?.isSelf) {
         // 自己发送的消息，始终滚动到底部
         scrollToBottom()
-      } else if (isAtBottom.value) {
+      }
+      else if (isAtBottom.value) {
         // 在底部，自动滚动
         scrollToBottom()
-      } else {
+      }
+      else {
         // 不在底部，累积未读
         unreadNewCount.value++
       }
     }
-  }
+  },
 )
 
 /** 滚动到底部 */
@@ -157,7 +165,8 @@ function scrollToBottom() {
   nextTick(() => {
     if (enableVirtual.value) {
       virtualListRef.value?.scrollToBottom()
-    } else if (listRef.value) {
+    }
+    else if (listRef.value) {
       listRef.value.scrollTop = listRef.value.scrollHeight
     }
   })
@@ -171,7 +180,8 @@ function onNewMessageTipClick() {
 
 /** 加载历史消息 */
 async function loadMoreHistory() {
-  if (loadingHistory.value || !hasMoreHistory.value) return
+  if (loadingHistory.value || !hasMoreHistory.value)
+    return
   loadingHistory.value = true
 
   // 根据当前模式选择正确的容器和恢复方式
@@ -192,10 +202,12 @@ async function loadMoreHistory() {
       if (result.isLast || result.messages.length === 0) {
         hasMoreHistory.value = false
       }
-    } else {
+    }
+    else {
       hasMoreHistory.value = false
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error('[MessageList] loadMoreHistory failed:', e)
     hasMoreHistory.value = false
   }
@@ -205,7 +217,8 @@ async function loadMoreHistory() {
   if (isVirtual && virtualListRef.value) {
     // 虚拟列表模式：通过组件方法恢复
     (virtualListRef.value as unknown as { preserveScrollPosition?: (t: number, h: number) => void })?.preserveScrollPosition?.(prevScrollTop, prevScrollHeight)
-  } else if (container && prevScrollHeight > 0) {
+  }
+  else if (container && prevScrollHeight > 0) {
     // 普通滚动模式：直接操作 DOM，确保恢复后 scrollTop > threshold 避免立即再次触发
     await nextTick()
     const newScrollHeight = container.scrollHeight
@@ -217,10 +230,14 @@ async function loadMoreHistory() {
 /** PC 端：滚动到顶部加载（自定义实现，避免 useInfiniteScroll 空容器疯狂触发） */
 function onNativeScroll(event: Event) {
   const el = event.target as HTMLElement
-  if (!el) return
-  if (historyMode.value !== 'scroll-top' || !enableLoadHistory.value) return
-  if (loadingHistory.value || !hasMoreHistory.value) return
-  if (messages.value.length === 0) return
+  if (!el)
+    return
+  if (historyMode.value !== 'scroll-top' || !enableLoadHistory.value)
+    return
+  if (loadingHistory.value || !hasMoreHistory.value)
+    return
+  if (messages.value.length === 0)
+    return
 
   const threshold = 50
   if (el.scrollTop <= threshold) {
@@ -241,13 +258,14 @@ const { isPulling, isRefreshing, pullDistance } = usePullRefresh(listRef, {
 async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'multiSelect') {
     enterMultiSelectMode()
-    toggleMessageSelection(event.message.id)
+    toggleMessageSelection(event.message.msgServerId || event.message.msgLocalId)
     return
   }
   if (event.action === 'recall') {
     try {
-      await recallMessage(event.message.serverId || event.message.id)
-    } catch (e) {
+      await recallMessage(event.message.msgServerId || event.message.msgLocalId)
+    }
+    catch (e) {
       emit('recall-failed', e, event.message)
     }
     return
@@ -279,7 +297,8 @@ async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'pin') {
     try {
       await pinMessage(event.message)
-    } catch (e: unknown) {
+    }
+    catch (e: unknown) {
       console.warn('[MessageList] pinMessage failed:', e)
       showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败')
     }
@@ -288,33 +307,35 @@ async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'unpin') {
     try {
       await unpinMessage(event.message)
-    } catch (e: unknown) {
+    }
+    catch (e: unknown) {
       console.warn('[MessageList] unpinMessage failed:', e)
       showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败')
     }
     return
   }
   if (event.action === 'translate') {
-    if (event.message.type !== 'text') return
+    if (event.message.type !== 'text')
+      return
     try {
       await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
-    } catch (e: unknown) {
+    }
+    catch (e: unknown) {
       console.warn('[MessageList] translateTextMessage failed:', e)
       showToast(e instanceof Error ? e.message : String(e) || t('message.action.translate') || '翻译失败')
     }
-    return
   }
   // TODO: 处理其他操作（转发）
 }
 
 /** 文本消息翻译切换（显示译文/原文） */
-function onToggleTranslation(message: Message) {
-  toggleTranslation(message.id)
+function onToggleTranslation(message: UiMessage) {
+  toggleTranslation(message.msgServerId || message.msgLocalId)
 }
 
 /** 通过 VueUse useClipboard 复制消息文本 */
-async function handleCopyMessage(message: Message) {
-  const text = message.type === 'text' && 'content' in message ? String((message as unknown as { content: string }).content ?? '') : ''
+async function handleCopyMessage(message: UiMessage) {
+  const text = message.type === 'text' ? (message.body as TextMessageBody).content || '' : ''
   if (!text) {
     showToast(t('message.copyFailed') ?? '复制失败')
     return
@@ -326,21 +347,23 @@ async function handleCopyMessage(message: Message) {
   try {
     await copyToClipboard(text)
     showToast(t('message.copySuccess') ?? '已复制')
-  } catch {
+  }
+  catch {
     showToast(t('message.copyFailed') ?? '复制失败')
   }
 }
 
 /** 处理重新编辑 */
-function onReedit(message: Message) {
+function onReedit(message: UiMessage) {
   emit('reedit', message)
 }
 
 /** 处理重发失败消息 */
-async function onResend(message: Message) {
+async function onResend(message: UiMessage) {
   try {
     await resendMessage(message)
-  } catch (e: unknown) {
+  }
+  catch (e: unknown) {
     console.warn('[MessageList] resend failed:', e)
     showToast(e instanceof Error ? e.message : String(e) || t('message.resend.failed') || '重发失败')
   }
@@ -351,14 +374,14 @@ async function onGroupReadClick(msgId: string, groupId: string) {
   try {
     const result: GroupMessageReadUsersResult = await fetchGroupReadDetail(msgId, groupId)
     // SDK 返回 users 为已读用户列表，每个 GroupMessageReadUser 包含 userId
-    const readUsers = result?.users?.map((u) => u.userId) || []
-    const totalRead = result?.count || readUsers.length
+    const readUsers = result?.users?.map(u => u.userId) || []
     // 未读用户列表：当前无法直接从 SDK 获取，需业务层维护群成员列表后做差集
     // 此处先展示已读列表，未读列表留空（或后续接入群成员全量列表后补充）
     modalReadList.value = readUsers
     modalUnreadList.value = []
     showGroupReadModal.value = true
-  } catch (e) {
+  }
+  catch (e) {
     console.warn('[MessageList] fetchGroupReadDetail failed:', e)
   }
 }
@@ -370,7 +393,7 @@ const modalUnreadList = ref<string[]>([])
 
 /** 删除确认弹窗状态 */
 const showDeleteConfirm = ref(false)
-const pendingDeleteMessage = ref<Message | null>(null)
+const pendingDeleteMessage = ref<UiMessage | null>(null)
 
 /** 处理多选切换 */
 function onToggleSelect(msgId: string) {
@@ -380,8 +403,9 @@ function onToggleSelect(msgId: string) {
 }
 
 /** 是否需要显示时间分割线 */
-function shouldShowTimeDivider(current: Message, previous: Message | null): boolean {
-  if (!previous) return true
+function shouldShowTimeDivider(current: UiMessage, previous: UiMessage | null): boolean {
+  if (!previous)
+    return true
   return current.timestamp - previous.timestamp > groupInterval.value
 }
 
@@ -392,7 +416,8 @@ function formatDividerTime(timestamp: number): string {
   const isToday = date.toDateString() === now.toDateString()
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
-  if (isToday) return `${hours}:${minutes}`
+  if (isToday)
+    return `${hours}:${minutes}`
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${month}-${day} ${hours}:${minutes}`
@@ -400,13 +425,13 @@ function formatDividerTime(timestamp: number): string {
 
 /** 带时间分割线的消息列表 */
 const messagesWithDividers = computed(() => {
-  const result: Array<{ key: string; type: 'message' | 'divider'; data: Message | string; index: number }> = []
-  let lastMsg: Message | null = null
+  const result: Array<{ key: string, type: 'message' | 'divider', data: UiMessage | string, index: number }> = []
+  let lastMsg: UiMessage | null = null
   messages.value.forEach((msg, index) => {
     if (shouldShowTimeDivider(msg, lastMsg)) {
       result.push({ key: `divider-${msg.timestamp}`, type: 'divider', data: formatDividerTime(msg.timestamp), index: -1 })
     }
-    result.push({ key: msg.id, type: 'message', data: msg, index })
+    result.push({ key: msg.msgServerId || msg.msgLocalId, type: 'message', data: msg, index })
     lastMsg = msg
   })
   return result
@@ -415,17 +440,25 @@ const messagesWithDividers = computed(() => {
 /** 闪烁高亮计时器，避免连续点击多个计时器堆积 */
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
-/** 定位并闪烁原消息；id 优先匹配 mid，其次 id；未找到返回 false */
+/** 定位并闪烁原消息；优先匹配 msgServerId，其次 msgLocalId；未找到返回 false */
 function locateAndFlash(targetMsgID: string): boolean {
-  if (!targetMsgID) return false
-  const targetIndex = messages.value.findIndex(m => m.serverId === targetMsgID || m.id === targetMsgID)
-  if (targetIndex === -1) return false
+  if (!targetMsgID)
+    return false
+  const targetIndex = messages.value.findIndex(m => m.msgServerId === targetMsgID || m.msgLocalId === targetMsgID)
+  if (targetIndex === -1)
+    return false
   // 虚拟列表：先通过索引滚动使原消息被渲染，再在下一帧查找 DOM 进行平滑居中
   const useVirtual = enableVirtual.value
   if (useVirtual) {
     // 虚拟列表中消息项位于 messagesWithDividers，需定位到包含该消息的项索引
-    const itemIndex = messagesWithDividers.value.findIndex(it => it.type === 'message' && (it.data as Message).id === messages.value[targetIndex].id)
-    if (itemIndex !== -1) virtualListRef.value?.scrollToIndex(itemIndex)
+    const targetMsg = messages.value[targetIndex]
+    const itemIndex = messagesWithDividers.value.findIndex(
+      it => it.type === 'message'
+        && ((it.data as UiMessage).msgServerId === targetMsg.msgServerId
+          || (it.data as UiMessage).msgLocalId === targetMsg.msgLocalId),
+    )
+    if (itemIndex !== -1)
+      virtualListRef.value?.scrollToIndex(itemIndex)
   }
   nextTick(() => {
     const root = useVirtual
@@ -438,7 +471,8 @@ function locateAndFlash(targetMsgID: string): boolean {
       }
     }
     setHighlight(targetMsgID)
-    if (highlightTimer) clearTimeout(highlightTimer)
+    if (highlightTimer)
+      clearTimeout(highlightTimer)
     highlightTimer = setTimeout(() => {
       setHighlight('')
       highlightTimer = null
@@ -449,7 +483,8 @@ function locateAndFlash(targetMsgID: string): boolean {
 
 /** watch 引用点击发起的定位请求 */
 watch(locateRequest, (req) => {
-  if (!req) return
+  if (!req)
+    return
   const ok = locateAndFlash(req.msgID)
   if (!ok) {
     showToast(t('message.quote.notFound') ?? '原消息已删除或未加载')
@@ -495,11 +530,11 @@ watch(locateRequest, (req) => {
         <!-- 消息气泡 -->
         <MessageBubbleWrapper
           v-else
-          :message="item.data as Message"
+          :message="item.data as UiMessage"
           :config="messageListConfig"
           :action-config="config?.messageAction"
           :is-multi-select-mode="isMultiSelectMode"
-          :is-selected="isMessageSelected((item.data as Message).id)"
+          :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
@@ -525,11 +560,11 @@ watch(locateRequest, (req) => {
         <!-- 消息气泡 -->
         <MessageBubbleWrapper
           v-else
-          :message="item.data as Message"
+          :message="item.data as UiMessage"
           :config="messageListConfig"
           :action-config="config?.messageAction"
           :is-multi-select-mode="isMultiSelectMode"
-          :is-selected="isMessageSelected((item.data as Message).id)"
+          :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
@@ -564,7 +599,7 @@ watch(locateRequest, (req) => {
       :title="t('message.action.delete')"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
-      @confirm="pendingDeleteMessage && deleteMessage(pendingDeleteMessage.id); pendingDeleteMessage = null"
+      @confirm="pendingDeleteMessage && deleteMessage(pendingDeleteMessage.msgServerId || pendingDeleteMessage.msgLocalId); pendingDeleteMessage = null"
       @cancel="pendingDeleteMessage = null"
     >
       {{ t('message.delete.confirm') }}
@@ -649,7 +684,9 @@ watch(locateRequest, (req) => {
   align-items: center;
   gap: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
   z-index: 10;
 }
 

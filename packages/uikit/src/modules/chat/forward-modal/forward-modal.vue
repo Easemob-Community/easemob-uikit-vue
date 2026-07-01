@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
@@ -7,7 +7,7 @@ import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Input from '../../../components/input/input.vue'
-import type { Conversation } from '../../../store/conversation'
+import type { UiConversation as Conversation } from '../../../sdk/types'
 
 export interface ForwardModalProps {
   show: boolean
@@ -31,10 +31,11 @@ const conversationStore = stores.conversation
 
 const filteredConversations = computed(() => {
   const list = conversationStore.sortedConversationList
-  if (!searchKeyword.value.trim()) return list
+  if (!searchKeyword.value.trim())
+    return list
   const kw = searchKeyword.value.trim().toLowerCase()
   return list.filter((c: Conversation) =>
-    c.name.toLowerCase().includes(kw) || c.id.toLowerCase().includes(kw)
+    c.name.toLowerCase().includes(kw) || c.id.toLowerCase().includes(kw),
   )
 })
 
@@ -79,7 +80,7 @@ function onSelect(conversation: Conversation) {
           <Avatar :src="item.avatar" :name="item.name" :size="40" />
           <div class="forward-modal__info">
             <span class="forward-modal__name">{{ item.name || item.id }}</span>
-            <span v-if="item.lastMessage" class="forward-modal__last-msg">{{ item.lastMessage }}</span>
+            <span v-if="item.lastMessageText" class="forward-modal__last-msg">{{ item.lastMessageText }}</span>
           </div>
           <Icon name="arrows/arrow_right" :size="16" class="forward-modal__arrow" />
         </div>

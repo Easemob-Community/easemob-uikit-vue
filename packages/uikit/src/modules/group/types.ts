@@ -1,4 +1,4 @@
-import type { Group } from '../../store/group'
+import type { UiGroup as Group } from '../../sdk/types'
 import type { AvatarShape } from '../contact/types'
 
 export type { AvatarShape }

@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_TYPE, MESSAGE_STATUS } from '../../constants'
-import ChatContainer from './chat-container.vue'
+import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../constants'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
+import ChatContainer from './chat-container.vue'
 
 /** 构造 mock 会话与消息，便于 Story 中展示不同配置效果 */
 /**
@@ -22,9 +22,9 @@ function injectMockData() {
     type: CONVERSATION_TYPE.GROUPCHAT,
     avatar: '',
     unreadCount: 3,
-    lastMessage: '大家看下这个设计方案',
-    lastMessageType: MESSAGE_TYPE.TEXT,
-    lastMessageSender: 'user_002',
+    lastMessageText: '大家看下这个设计方案',
+    marks: [],
+
     lastMessageTime: Date.now(),
     timestamp: Date.now(),
     isPinned: false,
@@ -32,7 +32,7 @@ function injectMockData() {
   }
 
   cvsStore.setConversationList([mockConversation])
-  cvsStore.setCurrentConversation(mockConversation)
+  cvsStore.setCurrentConversationId(mockConversation.id)
 
   const mockMessages = Array.from({ length: 8 }, (_, i) => {
     const type = i % 3 === 0 ? 'text' as const : i % 3 === 1 ? 'image' as const : 'voice' as const
@@ -307,7 +307,11 @@ injectMockData()
 
 <style>
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

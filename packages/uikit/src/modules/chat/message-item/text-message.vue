@@ -24,7 +24,7 @@ const emit = defineEmits<TextMessageEmits>()
 
 const themeStore = useThemeStore()
 const bubbleClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'text-message__bubble--square' : ''
+  themeStore.bubbleShape === 'square' ? 'text-message__bubble--square' : '',
 )
 
 const { t } = useLocale()
@@ -46,30 +46,34 @@ const mentionClickHandler = computed(() => textMessageConfig.value?.onMentionCli
 
 /** 提取消息中的 @提及列表（来自 ext.em_at_list） */
 const mentionList = computed(() => {
-  if (!enableMentionHighlight.value) return []
+  if (!enableMentionHighlight.value)
+    return []
   const ext = (props.message as unknown as { ext?: Record<string, any> }).ext
   const list = ext?.em_at_list
-  if (Array.isArray(list)) return list as string[]
+  if (Array.isArray(list))
+    return list as string[]
   return []
 })
 
 /** 将消息文本按 @mention 和 linkify 分片 */
 const msgSegments = computed(() => {
-  const text = props.message.content || ''
-  if (!text) return []
+  const text = props.message.body.content || ''
+  if (!text)
+    return []
 
   const mentions = mentionList.value
   if (mentions.length === 0) {
     // 无 mention，仅做 linkify
-    if (!enableLinkify.value) return [{ type: 'text' as const, value: text }]
+    if (!enableLinkify.value)
+      return [{ type: 'text' as const, value: text }]
     return linkify(text)
   }
 
   // 有 mention：先按 @name 拆分，再对每段做 linkify
-  const result: Array<LinkSegment | { type: 'mention'; value: string; userId: string }> = []
+  const result: Array<LinkSegment | { type: 'mention', value: string, userId: string }> = []
 
   let lastIndex = 0
-  const atRegex = /@([^\s\n]+)/g
+  const atRegex = /@(\S+)/g
   let match: RegExpExecArray | null
 
   while ((match = atRegex.exec(text)) !== null) {
@@ -81,7 +85,8 @@ const msgSegments = computed(() => {
       const beforeText = text.substring(lastIndex, index)
       if (enableLinkify.value) {
         result.push(...linkify(beforeText))
-      } else {
+      }
+      else {
         result.push({ type: 'text', value: beforeText })
       }
     }
@@ -94,7 +99,8 @@ const msgSegments = computed(() => {
     const afterText = text.substring(lastIndex)
     if (enableLinkify.value) {
       result.push(...linkify(afterText))
-    } else {
+    }
+    else {
       result.push({ type: 'text', value: afterText })
     }
   }
@@ -104,21 +110,22 @@ const msgSegments = computed(() => {
 
 /** 译文文本分片 */
 const translationSegments = computed(() => {
-  if (!enableLinkify.value) return null
+  if (!enableLinkify.value)
+    return null
   const text = props.message.translation?.text
-  if (!text) return null
+  if (!text)
+    return null
   return linkify(text)
 })
 
 /** 是否含有链接（用于决定是否用分片渲染） */
-const hasLinks = computed(() => !!msgSegments.value?.some(s => s.type === 'link'))
 const translationHasLinks = computed(() => !!translationSegments.value?.some(s => s.type === 'link'))
 
 /** 是否显示重新编辑 */
 const showReedit = computed(() => props.message.recalled && props.message.isSelf && props.message.originalMsg)
 
 /** 是否已被编辑：以消息体 modifiedInfo 字段为准（历史消息拉取也会带），兼容本地 modified 标记 */
-const isModified = computed(() => (!!props.message.modifiedInfo || !!props.message.modified) && !props.message.recalled)
+const isModified = computed(() => (!!props.message.modifiedInfo) && !props.message.recalled)
 
 /** 是否存在译文 */
 const hasTranslation = computed(() => !!props.message.translation?.text)
@@ -148,7 +155,8 @@ function onLinkClick(url: string, event: MouseEvent) {
   const handler = linkClickHandler.value
   if (handler) {
     const result = handler(url)
-    if (result === false) return
+    if (result === false)
+      return
     if (typeof result === 'string') {
       window.open(result, '_blank', 'noopener,noreferrer')
       return
@@ -208,7 +216,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
           </template>
           <!-- 无链接/mention 时纯文本渲染 -->
           <template v-else>
-            {{ props.message.content }}
+            {{ props.message.body.content }}
           </template>
           <span
             v-if="isModified"

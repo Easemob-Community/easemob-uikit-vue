@@ -1,5 +1,5 @@
-import { computed, type ComputedRef, type Ref } from 'vue'
-import type { Group } from '../store/group'
+import { type ComputedRef, type Ref, computed } from 'vue'
+import type { UiGroup as Group } from '../sdk/types'
 import type { GroupSortBy } from '../modules/group/types'
 import { resolvePinyin } from './use-pinyin'
 
@@ -18,7 +18,8 @@ export function useGroupSort(
   return computed(() => {
     const list = groups.value
     const mode = sortBy.value
-    if (mode === 'none') return list
+    if (mode === 'none')
+      return list
     const arr = [...list]
     if (typeof mode === 'function') {
       return arr.sort(mode)

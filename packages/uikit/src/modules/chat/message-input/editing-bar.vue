@@ -2,11 +2,10 @@
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useLocale } from '../../../locale'
-import type { Message } from '../../../store/message'
-
+import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface EditingBarProps {
-  message: Message
+  message: UiMessage
 }
 
 export interface EditingBarEmits {
@@ -20,7 +19,7 @@ const { t } = useLocale()
 /** 编辑中预览文本（取原文本） */
 const preview = computed(() => {
   if (props.message.type === 'text') {
-    return props.message.content || ''
+    return (props.message.body as TextMessageBody).content || ''
   }
   return ''
 })

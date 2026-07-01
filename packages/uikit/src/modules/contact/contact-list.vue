@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import type { Component } from 'vue'
 import { useContact } from '../../composables/use-contact'
 import { useContactFilter } from '../../composables/use-contact-filter'
 import { useContactGroup } from '../../composables/use-contact-group'
@@ -8,27 +9,26 @@ import { useViewport } from '../../composables/use-viewport'
 import { useUIKit } from '../../composables/use-uikit'
 import { usePresence } from '../../composables/use-presence'
 import { useLocale } from '../../locale'
-import ContactItem from './contact-item.vue'
-import ContactEmpty from './contact-empty.vue'
-import ContactAlphabetNav from './contact-alphabet-nav.vue'
 import Input from '../../components/input/input.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
-import type {
-  ContactGroupBy,
-  ContactGroupItem,
-  ContactSelectMode,
-  ContactItemSize,
-  AvatarShape,
-  ContactDisabledFn,
-  ContactSubtitleFn,
-  ContactOnlineStatusFn,
-  OnlineStatus,
-  ContactListClickBehavior,
-} from './types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
-import type { Contact } from '../../store/contact'
-import type { Component } from 'vue'
+import type { UiContact as Contact } from '../../sdk/types'
+import type {
+  AvatarShape,
+  ContactDisabledFn,
+  ContactGroupBy,
+  ContactGroupItem,
+  ContactItemSize,
+  ContactListClickBehavior,
+  ContactOnlineStatusFn,
+  ContactSelectMode,
+  ContactSubtitleFn,
+  OnlineStatus,
+} from './types'
+import ContactAlphabetNav from './contact-alphabet-nav.vue'
+import ContactEmpty from './contact-empty.vue'
+import ContactItem from './contact-item.vue'
 
 const props = withDefaults(defineProps<{
   /** 是否展示头部区域，默认 true */
@@ -175,7 +175,7 @@ const totalCount = computed(() => filteredContacts.value.length)
 
 // 过滤后的联系人 ID 集合，作为 Presence 订阅范围
 const visibleUserIds = computed(() =>
-  presenceEnabled.value ? filteredContacts.value.map((c) => c.userId) : [],
+  presenceEnabled.value ? filteredContacts.value.map(c => c.userId) : [],
 )
 // 启用时：自动 retain/release，卸载时释放
 if (presenceEnabled.value) {
@@ -184,12 +184,16 @@ if (presenceEnabled.value) {
 
 /** 默认在线状态提取：优先用外部 onlineStatusFn，其次走 usePresence 兑底 */
 function resolveOnlineStatus(c: Contact): OnlineStatus | undefined {
-  if (props.onlineStatusFn) return props.onlineStatusFn(c)
-  if (!features.enablePresence) return undefined
+  if (props.onlineStatusFn)
+    return props.onlineStatusFn(c)
+  if (!features.enablePresence)
+    return undefined
   const info = presence.get(c.userId).value
-  if (!info) return undefined
+  if (!info)
+    return undefined
   // PresenceStatus 可能为 'custom'，映射为 'online'（非默认状态表示用户在线）
-  if (info.status === 'custom') return 'online'
+  if (info.status === 'custom')
+    return 'online'
   return info.status
 }
 
@@ -202,7 +206,8 @@ const lastValidIds = ref<string[]>([])
 watch(
   () => props.selectedIds,
   (ids) => {
-    if (!ids) return
+    if (!ids)
+      return
     const cur = Array.from(storeSelectedIds.value).slice().sort().join(',')
     const next = [...ids].slice().sort().join(',')
     if (cur !== next) {
@@ -221,7 +226,8 @@ watch(
 watch(
   () => Array.from(storeSelectedIds.value),
   (next) => {
-    if (isInternalUpdate.value) return
+    if (isInternalUpdate.value)
+      return
     if (props.maxSelected && next.length > props.maxSelected) {
       // 回滚到上一次合法集合
       isInternalUpdate.value = true
@@ -240,7 +246,8 @@ watch(
 // ================== 触底加载 & 分组高亮 ==================
 function onScroll() {
   const el = itemsRef.value
-  if (!el) return
+  if (!el)
+    return
 
   // 触底加载
   if (props.enableLoadMore && !props.loading && !isLoadingMore.value && props.hasMore) {
@@ -291,7 +298,8 @@ onBeforeUnmount(() => {
 async function scrollToGroup(key: string) {
   await nextTick()
   const root = itemsRef.value
-  if (!root) return
+  if (!root)
+    return
   const target = root.querySelector<HTMLElement>(`[data-group-key="${key}"]`)
   if (target) {
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })

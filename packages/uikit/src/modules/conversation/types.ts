@@ -1,4 +1,4 @@
-import type { Conversation } from '../../store/conversation'
+import type { UiConversation as Conversation } from '../../sdk/types'
 
 export interface ConversationAction {
   key: string

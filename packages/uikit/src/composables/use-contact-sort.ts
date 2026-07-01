@@ -1,5 +1,5 @@
-import { computed, type ComputedRef, type Ref } from 'vue'
-import type { Contact } from '../store/contact'
+import { type ComputedRef, type Ref, computed } from 'vue'
+import type { UiContact as Contact } from '../sdk/types'
 import { resolvePinyin } from './use-pinyin'
 
 /** 联系人排序方式 */
@@ -22,7 +22,8 @@ export function useContactSort(
   return computed(() => {
     const list = contacts.value
     const mode = sortBy.value
-    if (mode === 'none') return list
+    if (mode === 'none')
+      return list
     const arr = [...list]
     if (typeof mode === 'function') {
       return arr.sort(mode)

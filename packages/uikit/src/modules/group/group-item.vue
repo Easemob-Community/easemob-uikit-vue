@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import GroupItemDefault from './group-item-default.vue'
 import { useGroup } from '../../composables/use-group'
-import type { GroupSelectMode, GroupItemSize, AvatarShape } from './types'
-import type { Group } from '../../store/group'
+import type { UiGroup as Group } from '../../sdk/types'
+import GroupItemDefault from './group-item-default.vue'
+import type { AvatarShape, GroupItemSize, GroupSelectMode } from './types'
 
 const props = withDefaults(defineProps<{
   group: Group
@@ -43,17 +43,20 @@ const selected = computed(() => isSelected(props.group.groupId))
 const showCheckbox = computed(() => props.selectMode === 'multiple')
 
 function onClick() {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   if (props.selectMode === 'multiple') {
     toggleSelect(props.group.groupId)
-  } else {
+  }
+  else {
     setActiveId(props.group.groupId)
   }
   emit('click', props.group)
 }
 
 function onContextmenu(e: MouseEvent) {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   emit('contextmenu', e, props.group)
 }
 </script>

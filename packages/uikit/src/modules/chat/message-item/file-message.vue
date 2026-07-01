@@ -3,45 +3,52 @@ import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
-import { downloadFile, detectEnvironment } from '../../../utils/download'
-import type { FileMessageType } from '../../../store/message'
+import { detectEnvironment, downloadFile } from '../../../utils/download'
+import type { FileMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface FileMessageProps {
-  message: FileMessageType
+  message: UiMessage
 }
 
 const props = defineProps<FileMessageProps>()
 const { t } = useLocale()
 const { show: showToast } = useToast()
 
+const body = computed(() => props.message.body as FileMessageBody)
+
 /** 文件名 */
-const fileName = computed(() => props.message.filename || t('message.file') || '未知文件')
+const fileName = computed(() => body.value.filename || t('message.file') || '未知文件')
 
 /** 文件大小格式化 */
 const fileSize = computed(() => {
-  const size = props.message.fileSize || 0
-  if (size === 0) return ''
-  if (size < 1024) return `${size} B`
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
+  const size = body.value.fileSize || body.value.fileLength || 0
+  if (size === 0)
+    return ''
+  if (size < 1024)
+    return `${size} B`
+  if (size < 1024 * 1024)
+    return `${(size / 1024).toFixed(1)} KB`
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 })
 
 /** 根据文件名推断文件类型图标 */
 const fileIcon = computed(() => {
   const name = fileName.value.toLowerCase()
-  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return 'files-media/img'
-  if (/\.(mp4|mov|avi|mkv)$/.test(name)) return 'audio-video/video_camera'
-  if (/\.(mp3|wav|aac|flac|ogg|m4a)$/.test(name)) return 'audio-video/speaker_wave_2'
-  if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name)) return 'files-media/doc'
-  if (/\.(zip|rar|7z|tar|gz)$/.test(name)) return 'files-media/archives'
+  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(name))
+    return 'files-media/img'
+  if (/\.(mp4|mov|avi|mkv)$/.test(name))
+    return 'audio-video/video_camera'
+  if (/\.(mp3|wav|aac|flac|ogg|m4a)$/.test(name))
+    return 'audio-video/speaker_wave_2'
+  if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name))
+    return 'files-media/doc'
+  if (/\.(zip|rar|7z|tar|gz)$/.test(name))
+    return 'files-media/archives'
   return 'files-media/file'
 })
 
-/** 是否正在下载 */
-const isDownloading = computed(() => false)
-
 async function handleDownload() {
-  const url = props.message.url
+  const url = body.value.url
   if (!url) {
     showToast(t('message.download.failed') || '下载失败')
     return
@@ -60,12 +67,14 @@ async function handleDownload() {
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
           showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
-        } else {
+        }
+        else {
           showToast(t('message.download.failed') || '下载失败')
         }
       },
     })
-  } catch {
+  }
+  catch {
     // 错误已在 onError 回调中处理，此处静默捕获避免未处理的 Promise  rejection
   }
 }
@@ -79,8 +88,12 @@ async function handleDownload() {
   >
     <div class="file-message__bubble">
       <div class="file-message__info">
-        <div class="file-message__name" :title="fileName">{{ fileName }}</div>
-        <div v-if="fileSize" class="file-message__size">{{ fileSize }}</div>
+        <div class="file-message__name" :title="fileName">
+          {{ fileName }}
+        </div>
+        <div v-if="fileSize" class="file-message__size">
+          {{ fileSize }}
+        </div>
       </div>
       <div class="file-message__icon">
         <Icon :name="fileIcon" :size="36" />

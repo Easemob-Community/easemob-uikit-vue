@@ -1,4 +1,4 @@
-import type { Message } from '../../store/message'
+import type { UiMessage } from '../../sdk/types'
 
 /** 消息气泡布局模式 */
 export type MessageLayout = 'left' | 'conversation'
@@ -28,9 +28,9 @@ export type TimeDisplayStrategy = boolean | 'always' | 'hover'
  */
 export interface ChatSendHooks {
   /** 发送前拦截，返回 false 则阻止发送 */
-  beforeSend?: (message: Partial<Message>) => boolean | Promise<boolean>
+  beforeSend?: (message: Partial<UiMessage>) => boolean | Promise<boolean>
   /** 发送成功后的回调 */
-  afterSend?: (message: Message) => void
+  afterSend?: (message: UiMessage) => void
 }
 
 /** 聊天页面全局配置 */
@@ -208,7 +208,7 @@ export interface MessageActionEvent {
   /** 操作类型 */
   action: MessageActionType
   /** 目标消息 */
-  message: Message
+  message: UiMessage
 }
 
 /** 联系人（用于 @提及） */
@@ -220,7 +220,7 @@ export interface MentionContact {
 }
 
 /** 消息渲染器插槽名称映射 */
-export type MessageSlotName = `message-${Message['type']}`
+export type MessageSlotName = `message-${UiMessage['type']}`
 
 /** 消息底部扩展插槽名称映射 */
-export type MessageFooterSlotName = `message-footer-${Message['type']}`
+export type MessageFooterSlotName = `message-footer-${UiMessage['type']}`

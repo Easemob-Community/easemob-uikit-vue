@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import AddressBookContainer from './address-book-container.vue'
 import ContactListContainer from '../contact-list-container/contact-list-container.vue'
 import GroupListContainer from '../group-list-container/group-list-container.vue'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
-import { ref } from 'vue'
 import { useContactStore } from '../../store/contact'
 import { useGroupStore } from '../../store/group'
-import type { Contact } from '../../store/contact'
-import type { Group } from '../../store/group'
+import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
+import AddressBookContainer from './address-book-container.vue'
 
 function injectMockContacts() {
   const contactStore = useContactStore()
@@ -64,9 +62,6 @@ function injectMock() {
   injectMockContacts()
   injectMockGroups()
 }
-
-const contactSelectedIds = ref<string[]>(['u_alice'])
-const groupSelectedIds = ref<string[]>(['g_001'])
 </script>
 
 <template>

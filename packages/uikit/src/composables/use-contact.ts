@@ -1,224 +1,165 @@
 import { computed, ref } from 'vue'
-import { useContactStore } from '../store/contact'
-import type { Contact } from '../store/contact'
 import { useUIKit } from './use-uikit'
-import type { Contact as SdkContact } from 'easemob-websdk'
-
-/**
- * 列表 UI 状态：当前激活项 / 多选集合 / 搜索词
- *
- * 数据本身仍然由 Pinia store 管理，这里只承载视图层的临时状态，
- * 在 contact-list / contact-item 子组件之间共享。
- */
-const activeId = ref<string>('')
-const selectedIds = ref<Set<string>>(new Set())
-const filterText = ref<string>('')
-
-/** 分页默认页大小 */
-const CONTACT_PAGE_SIZE = 50
 
 export function useContact() {
-  const contactStore = useContactStore()
-  const { client, dataSource, features } = useUIKit()
-  const contactList = computed(() => contactStore.contactList || [])
-  const contactCount = computed(() => contactStore.contactCount || 0)
+  const { domains, stores, dataSource } = useUIKit()
+  const contactStore = stores.contact
 
-  /** 是否为全量拉取模式 */
-  const isAllMode = computed(() => features.contactFetchMode === 'all')
+  const contactList = computed(() => contactStore.contactList)
+  const blackList = computed(() => contactStore.blackList)
+  const loaded = computed(() => contactStore.loaded)
 
-  /** 轻量获取好友总数（不拉取完整列表） */
-  function fetchContactCount() {
-    try {
-      if (client.value) {
-        const res: ReadonlyArray<SdkContact> = client.value.contact.getContacts()
-        contactStore.setContactCount(res.length)
-      }
-    } catch (e) {
-      console.warn('[UIKit] fetch contact count failed:', e)
-    }
+  // ===== UI 交互状态 =====
+  const filterText = computed(() => contactStore.filterText)
+  const activeId = computed(() => contactStore.activeId)
+  const selectedIds = computed(() => contactStore.selectedIds)
+  const hasMore = computed(() => contactStore.hasMore)
+  const contactCount = computed(() => contactStore.contactCount)
+
+  const loading = ref(false)
+
+  function setFilterText(text: string) {
+    contactStore.setFilterText(text)
   }
 
-  /** 全量拉取好友列表（getContacts，同步返回内存中的联系人快照） */
-  function fetchAllContacts() {
-    if (!client.value) return
-    const res: ReadonlyArray<SdkContact> = client.value.contact.getContacts()
-    const list: Contact[] = res.map((item) => ({
-      userId: item.userId,
-      name: item.remark || item.userId,
-      remark: item.remark,
-    }))
-    contactStore.setContactList(list)
-    // 全量模式无分页能力
-    contactStore.setHasMore(false)
-    contactStore.setCursor('')
+  function setActiveId(id: string) {
+    contactStore.setActiveId(id)
   }
 
-  /** 分页拉取好友列表（getContactsWithCursor） */
-  async function fetchContactsByPage() {
-    let list: Contact[] = []
+  function isSelected(userId: string): boolean {
+    return contactStore.isSelected(userId)
+  }
+
+  function toggleSelect(userId: string) {
+    contactStore.toggleSelect(userId)
+  }
+
+  function setSelectedIds(ids: string[]) {
+    contactStore.setSelectedIds(ids)
+  }
+
+  /** 同步本地联系人列表 */
+  function syncLocalContacts() {
+    return domains.contact.syncLocal()
+  }
+
+  /** 拉取联系人列表（优先数据源适配器） */
+  async function fetchContacts(params?: { cursor?: string, pageSize?: number }) {
     if (dataSource.fetchContacts) {
-      const res = await dataSource.fetchContacts({ pageSize: CONTACT_PAGE_SIZE })
-      list = res.list || []
-      contactStore.setHasMore(!!res.hasMore)
-      contactStore.setCursor(res.cursor || '')
-    } else if (client.value) {
-      /**
-       * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法。
-       * SDK 仅提供 getContacts() 返回完整内存快照，无分页能力。
-       */
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res: any = await client.value.contact.getContactsWithCursor({ pageSize: CONTACT_PAGE_SIZE })
-      const contacts: Array<SdkContact> = res?.contacts || res?.items || []
-      list = contacts.map((item) => ({
-        userId: item.userId,
-        name: item.remark || item.userId,
-        remark: item.remark,
-      }))
-      contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
-      contactStore.setCursor(res?.cursor || '')
-    }
-    contactStore.setContactList(list)
-  }
-
-  /** 拉取好友列表。默认幂等（仅首次拉取），传 force=true 强制刷新。 */
-  async function refresh(force = false) {
-    if (!features.enableContact) return
-    if (!force && contactStore.loaded) return
-    try {
-      if (isAllMode.value) {
-        await fetchAllContacts()
-      } else {
-        await fetchContactsByPage()
+      loading.value = true
+      try {
+        const result = await dataSource.fetchContacts(params)
+        contactStore.setContactList(result.list)
+        return result
       }
-    } catch (e) {
-      console.warn('[UIKit] fetch contacts failed:', e)
-    }
-  }
-
-  /** 加载下一页（仅分页模式有效） */
-  async function loadMore() {
-    if (isAllMode.value) return
-    if (!contactStore.hasMore) return
-    try {
-      if (dataSource.fetchContacts) {
-        const res = await dataSource.fetchContacts({ pageSize: CONTACT_PAGE_SIZE, cursor: contactStore.cursor })
-        const list = res.list || []
-        contactStore.appendContactList(list)
-        contactStore.setHasMore(!!res.hasMore)
-        contactStore.setCursor(res.cursor || '')
-      } else if (client.value) {
-        /**
-         * @see SDK_DEFICIENCY: ContactManager 未暴露 getContactsWithCursor 方法。
-         */
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const res: any = await client.value.contact.getContactsWithCursor({
-          pageSize: CONTACT_PAGE_SIZE,
-          cursor: contactStore.cursor,
-        })
-        const contacts: Array<SdkContact> = res?.contacts || res?.items || []
-        const list = contacts.map((item) => ({
-          userId: item.userId,
-          name: item.remark || item.userId,
-          remark: item.remark,
-        }))
-        contactStore.appendContactList(list)
-        contactStore.setHasMore(contacts.length >= CONTACT_PAGE_SIZE)
-        contactStore.setCursor(res?.cursor || '')
+      finally {
+        loading.value = false
       }
-    } catch (e) {
-      console.warn('[UIKit] load more contacts failed:', e)
     }
+    // 默认走 SDK 本地内存
+    const list = domains.contact.syncLocal()
+    return { list, cursor: undefined, hasMore: false }
   }
 
-  /** 添加好友邀请 */
-  async function addContactRequest(userId: string, reason?: string) {
-    if (!client.value) return
-    await client.value.contact.addContact(userId, reason)
+  /** 拉取黑名单 */
+  async function fetchBlocklist() {
+    if (dataSource.fetchBlocklist) {
+      const list = await dataSource.fetchBlocklist()
+      contactStore.setBlackList(list)
+      return list
+    }
+    return domains.contact.syncBlocklist()
+  }
+
+  /** 添加好友 */
+  async function addContact(userId: string, message?: string) {
+    await domains.contact.addContact(userId, message)
   }
 
   /** 删除好友 */
   async function deleteContact(userId: string) {
-    if (!client.value) return
-    await client.value.contact.deleteContact(userId)
-    contactStore.removeContact(userId)
+    await domains.contact.deleteContact(userId)
   }
 
   /** 设置备注 */
-  async function setRemark(userId: string, remark: string) {
-    if (!client.value) return
-    await client.value.contact.setContactRemark(userId, remark)
-    contactStore.updateContactRemark(userId, remark)
+  async function setContactRemark(userId: string, remark: string) {
+    await domains.contact.setRemark(userId, remark)
   }
 
-  /** 设置当前激活联系人（单选定位） */
-  function setActiveId(id: string) {
-    activeId.value = id
+  /** 接受好友申请 */
+  async function acceptContactInvite(userId: string) {
+    await domains.contact.acceptInvite(userId)
   }
 
-  /** 重置当前激活联系人 */
-  function clearActiveId() {
-    activeId.value = ''
+  /** 拒绝好友申请 */
+  async function declineContactInvite(userId: string) {
+    await domains.contact.declineInvite(userId)
   }
 
-  /** 多选切换 */
-  function toggleSelect(id: string) {
-    const next = new Set(selectedIds.value)
-    if (next.has(id)) next.delete(id)
-    else next.add(id)
-    selectedIds.value = next
+  /** 加入黑名单 */
+  async function addToBlocklist(userIds: string[]) {
+    await domains.contact.addToBlocklist(userIds)
   }
 
-  /** 设置多选集合 */
-  function setSelectedIds(ids: string[]) {
-    selectedIds.value = new Set(ids)
+  /** 移出黑名单 */
+  async function removeFromBlocklist(userIds: string[]) {
+    await domains.contact.removeFromBlocklist(userIds)
   }
 
-  /** 清空多选 */
-  function clearSelected() {
-    selectedIds.value = new Set()
+  /** 刷新联系人列表（重新拉取） */
+  async function refresh() {
+    await fetchContacts()
+    contactStore.setContactCount(contactStore.contactList.length)
   }
 
-  /** 是否被选中 */
-  function isSelected(id: string): boolean {
-    return selectedIds.value.has(id)
+  /**
+   * 加载更多联系人（分页数据源场景）。
+   * SDK 本地联系人为全量内存态，无分页；仅在配置了分页数据源时才有更多数据。
+   */
+  async function loadMore() {
+    if (!contactStore.hasMore)
+      return
+    if (dataSource.fetchContacts) {
+      await fetchContacts()
+    }
   }
 
-  /** 设置搜索关键字 */
-  function setFilterText(text: string) {
-    filterText.value = text
-  }
-
-  /** 根据 id 获取联系人（便于上层 emit 时填充） */
-  function getContactById(id: string): Contact | undefined {
-    return contactList.value.find((c) => c.userId === id)
+  /** 轻量获取好友总数（不强制拉取完整列表） */
+  async function fetchContactCount(): Promise<number> {
+    const count = contactStore.loaded
+      ? contactStore.contactList.length
+      : domains.contact.syncLocal().length
+    contactStore.setContactCount(count)
+    return count
   }
 
   return {
-    // store data
     contactList,
-    contactCount,
-
-    // ui state
+    blackList,
+    loaded,
+    loading,
+    filterText,
     activeId,
     selectedIds,
-    filterText,
-
-    // setters
+    hasMore,
+    contactCount,
+    setFilterText,
     setActiveId,
-    clearActiveId,
+    isSelected,
     toggleSelect,
     setSelectedIds,
-    clearSelected,
-    isSelected,
-    setFilterText,
-    getContactById,
-
-    // actions
+    syncLocalContacts,
+    fetchContacts,
+    fetchBlocklist,
+    fetchContactCount,
     refresh,
     loadMore,
-    fetchContactCount,
-    addContactRequest,
+    addContact,
     deleteContact,
-    setRemark,
+    setContactRemark,
+    acceptContactInvite,
+    declineContactInvite,
+    addToBlocklist,
+    removeFromBlocklist,
   }
 }

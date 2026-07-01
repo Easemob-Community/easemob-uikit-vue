@@ -1,9 +1,9 @@
 import { computed } from 'vue'
-import { useUIKit } from './use-uikit'
-import type { AnimationLevel, AnimationConfig, HoverStyle, ThemeMode } from '../store/theme'
+import { useThemeStore } from '../store/theme'
+import type { AnimationConfig, AnimationLevel, HoverStyle, ThemeMode } from '../store/theme'
 
 export function useTheme() {
-  const { theme: themeStore } = useUIKit()
+  const themeStore = useThemeStore()
 
   const mode = computed(() => themeStore.mode)
   const effectiveMode = computed(() => themeStore.effectiveMode)

@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, onUnmounted, inject, type InjectionKey } from 'vue'
+import { type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import type { VoiceMessageType } from '../../../store/message'
+import type { UiMessage, VoiceMessageBody } from '../../../sdk/types'
 
 export interface VoiceMessageProps {
-  message: VoiceMessageType
+  message: UiMessage
 }
 
 const props = defineProps<VoiceMessageProps>()
 
 const themeStore = useThemeStore()
 const bubbleClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'voice-message__bubble--square' : ''
+  themeStore.bubbleShape === 'square' ? 'voice-message__bubble--square' : '',
 )
+
+const body = computed(() => props.message.body as VoiceMessageBody)
 
 /** 音频播放控制器接口 */
 interface AudioController {
@@ -60,7 +62,7 @@ function cleanupAudio() {
   if (currentAudio.value) {
     currentAudio.value.pause()
     currentAudio.value.currentTime = 0
-    audioController.stop(props.message.id)
+    audioController.stop(props.message.msgServerId || props.message.msgLocalId)
     currentAudio.value = null
   }
   isPlaying.value = false
@@ -73,9 +75,9 @@ function onPlayClick() {
     return
   }
 
-  const url = (props.message as unknown as { url?: string }).url || ''
+  const url = body.value.url || ''
   if (!url) {
-    console.warn('[VoiceMessage] no audio url:', props.message.id)
+    console.warn('[VoiceMessage] no audio url:', props.message.msgServerId || props.message.msgLocalId)
     return
   }
 
@@ -92,7 +94,7 @@ function onPlayClick() {
 
   audio.play().then(() => {
     isPlaying.value = true
-    audioController.play(audio, props.message.id)
+    audioController.play(audio, props.message.msgServerId || props.message.msgLocalId)
   }).catch((err) => {
     console.warn('[VoiceMessage] play failed:', err)
     cleanupAudio()
@@ -115,7 +117,7 @@ onUnmounted(() => {
         </span>
         <span v-else>&#9658;</span>
       </span>
-      <span class="voice-message__duration">{{ props.message.duration || 0 }}"</span>
+      <span class="voice-message__duration">{{ body.duration || 0 }}"</span>
     </div>
   </div>
 </template>
@@ -190,8 +192,12 @@ onUnmounted(() => {
 }
 
 @keyframes voice-wave {
-  0% { transform: scaleY(0.4); }
-  100% { transform: scaleY(1); }
+  0% {
+    transform: scaleY(0.4);
+  }
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 /* 播放中状态 */

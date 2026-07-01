@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import ContactContainer from './contact-container.vue'
-import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { ref } from 'vue'
+import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
 import { useGroupStore } from '../../store/group'
-import type { Contact } from '../../store/contact'
-import type { Group } from '../../store/group'
+import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
+import ContactContainer from './contact-container.vue'
 
 /** 构造 mock 联系人数据，覆盖多字母分组与 # 兜底 */
 function injectMockContacts() {
@@ -335,7 +334,9 @@ function groupSubtitleFn(g: Group): string | undefined {
           <ContactContainer :show-notice="false" :show-group="false">
             <template #empty="{ searchKeyword }">
               <div style="text-align: center; padding: 60px 16px;">
-                <div style="font-size: 32px; margin-bottom: 8px;">📒</div>
+                <div style="font-size: 32px; margin-bottom: 8px;">
+                  📒
+                </div>
                 <div v-if="searchKeyword" style="color: #6b7280; font-size: 14px;">
                   未搜到 "{{ searchKeyword }}"
                 </div>
@@ -365,13 +366,15 @@ function groupSubtitleFn(g: Group): string | undefined {
                 <div
                   style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #60a5fa, #a78bfa); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;"
                 >
-                  {{ (contact.remark || contact.name).slice(0, 1) }}
+                  {{ (contact.remark || contact.name || '').slice(0, 1) }}
                 </div>
                 <div style="flex: 1; min-width: 0;">
                   <div style="font-size: 14px; color: #111827;">
                     {{ contact.remark || contact.name }}
                   </div>
-                  <div style="font-size: 12px; color: #9ca3af;">{{ contact.userId }}</div>
+                  <div style="font-size: 12px; color: #9ca3af;">
+                    {{ contact.userId }}
+                  </div>
                 </div>
               </div>
             </template>
@@ -778,7 +781,7 @@ function groupSubtitleFn(g: Group): string | undefined {
                 placeholder="🔍 自定义联系人搜索..."
                 style="width: 100%; padding: 8px 12px; border: 2px solid #3b82f6; border-radius: 8px; outline: none; font-size: 14px;"
                 @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
-              />
+              >
             </template>
           </ContactContainer>
         </UIKitProvider>
@@ -799,7 +802,7 @@ function groupSubtitleFn(g: Group): string | undefined {
                 placeholder="🔍 自定义群组搜索..."
                 style="width: 100%; padding: 8px 12px; border: 2px solid #10b981; border-radius: 8px; outline: none; font-size: 14px;"
                 @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
-              />
+              >
             </template>
           </ContactContainer>
         </UIKitProvider>

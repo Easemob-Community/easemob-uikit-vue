@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import GroupList from './group-list.vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
-import type { Group } from '../../store/group'
+import type { UiGroup as Group } from '../../sdk/types'
+import GroupList from './group-list.vue'
 
 function injectMockGroups() {
   const groupStore = useGroupStore()
@@ -33,7 +33,7 @@ function subtitleFn(g: Group): string | undefined {
 
 function disabledFn(g: Group): boolean {
   // 禁用成员超过 100 的群
-return (g.memberCount ?? 0) > 100
+  return (g.memberCount ?? 0) > 100
 }
 
 // 受控 selectedIds + maxSelected 演示
@@ -45,7 +45,8 @@ function onMaxExceed(max: number) {
 // loadMore 演示
 const loadingMore = ref(false)
 function onLoadMore() {
-  if (loadingMore.value) return
+  if (loadingMore.value)
+    return
   loadingMore.value = true
   console.log('[group-list] load-more triggered')
   setTimeout(() => {
@@ -136,7 +137,7 @@ function onLoadMore() {
                 <div
                   style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #34d399, #60a5fa); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;"
                 >
-                  {{ group.groupName.slice(0, 1) }}
+                  {{ (group.groupName || '').slice(0, 1) }}
                 </div>
                 <div style="flex: 1; min-width: 0;">
                   <div style="font-size: 14px; color: #111827;">

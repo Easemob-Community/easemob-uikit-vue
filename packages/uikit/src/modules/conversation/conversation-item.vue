@@ -8,8 +8,7 @@ import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
-import { CONVERSATION_TYPE } from '../../constants'
-import type { Conversation } from '../../store/conversation'
+import type { UiConversation as Conversation } from '../../sdk/types'
 import type { ConversationAction } from './types'
 
 export interface ConversationItemProps {
@@ -40,7 +39,7 @@ const emit = defineEmits<{
   (e: 'pin', id: string, isPinned: boolean): void
   (e: 'delete', id: string): void
   (e: 'read', id: string): void
-  (e: 'customAction', key: string, conversation: Conversation): void
+  (e: 'custom-action', key: string, conversation: Conversation): void
 }>()
 
 const { t } = useLocale()
@@ -55,11 +54,12 @@ const preventClick = ref(false)
 onLongPress(
   itemRef,
   () => {
-    if (!isMobile.value) return
+    if (!isMobile.value)
+      return
     preventClick.value = true
     showActionSheet.value = true
   },
-  { delay: 600 }
+  { delay: 600 },
 )
 
 /** PC 右键菜单 - 使用 Popup 锚定模式 */
@@ -67,16 +67,13 @@ const showContextMenu = ref(false)
 const contextMenuAnchor = ref<HTMLElement>()
 
 function onContextMenu(e: MouseEvent) {
-  console.log('[conversation-item] onContextMenu triggered', { isMobile: isMobile.value, clientX: e.clientX, clientY: e.clientY })
   if (isMobile.value) {
-    console.log('[conversation-item] isMobile, skip')
     return
   }
   e.preventDefault()
 
   // 如果已有菜单打开，先清理
   if (contextMenuAnchor.value) {
-    console.log('[conversation-item] remove old anchor')
     document.body.removeChild(contextMenuAnchor.value)
     contextMenuAnchor.value = undefined
   }
@@ -91,11 +88,9 @@ function onContextMenu(e: MouseEvent) {
   document.body.appendChild(el)
   contextMenuAnchor.value = el
   showContextMenu.value = true
-  console.log('[conversation-item] showContextMenu set to true, anchor:', el)
 }
 
 function onContextMenuClose() {
-  console.log('[conversation-item] onContextMenuClose called, current showContextMenu:', showContextMenu.value)
   showContextMenu.value = false
   if (contextMenuAnchor.value) {
     document.body.removeChild(contextMenuAnchor.value)
@@ -165,8 +160,9 @@ const mergedActions = computed<MergedAction[]>(() => {
       handler: () => {
         if (custom.handler) {
           custom.handler(props.conversation)
-        } else {
-          emit('customAction', custom.key, props.conversation)
+        }
+        else {
+          emit('custom-action', custom.key, props.conversation)
         }
       },
     })
@@ -177,26 +173,26 @@ const mergedActions = computed<MergedAction[]>(() => {
 
 const actionSheetActions = computed(() => {
   return mergedActions.value
-    .filter((a) => a.position === 'mobile' || a.position === 'both')
-    .map((a) => ({ name: a.label, color: a.color, icon: a.icon }))
+    .filter(a => a.position === 'mobile' || a.position === 'both')
+    .map(a => ({ name: a.label, color: a.color, icon: a.icon }))
 })
 
 const contextMenuItems = computed(() => {
   return mergedActions.value
-    .filter((a) => a.position === 'pc' || a.position === 'both')
-    .map((a) => ({ label: a.label, action: a.key, danger: a.danger, icon: a.icon }))
+    .filter(a => a.position === 'pc' || a.position === 'both')
+    .map(a => ({ label: a.label, action: a.key, danger: a.danger, icon: a.icon }))
 })
 
-function onActionSheetSelect(_item: { name: string; color?: string; icon?: string }, index: number) {
+function onActionSheetSelect(_item: { name: string, color?: string, icon?: string }, index: number) {
   const mobileActions = mergedActions.value.filter(
-    (a) => a.position === 'mobile' || a.position === 'both'
+    a => a.position === 'mobile' || a.position === 'both',
   )
   mobileActions[index]?.handler()
 }
 
 function onContextMenuItemClick(actionKey: string) {
   onContextMenuClose()
-  const action = mergedActions.value.find((a) => a.key === actionKey)
+  const action = mergedActions.value.find(a => a.key === actionKey)
   action?.handler()
 }
 
@@ -205,7 +201,8 @@ function onContextMenuItemClick(actionKey: string) {
 /** 显示时间：优先取草稿时间，其次取最后消息时间 */
 const displayTime = computed(() => {
   const timestamp = props.conversation.draftTime || props.conversation.lastMessageTime
-  if (!timestamp) return ''
+  if (!timestamp)
+    return ''
   if (props.timeFormatter) {
     return props.timeFormatter(timestamp)
   }
@@ -224,16 +221,16 @@ const displayMessage = computed(() => {
     return props.conversation.draft
   }
   // 合并消息类型统一回显为 [聊天记录]
-  if (props.conversation.lastMessageType === 'combine') {
+  if (false) {
     return t('message.combine') || '[聊天记录]'
   }
   if (props.messageFormatter) {
     return props.messageFormatter(
-      props.conversation.lastMessage || '',
-      props.conversation.lastMessageType
+      props.conversation.lastMessageText || '',
+      'text',
     )
   }
-  return props.conversation.lastMessage || ''
+  return props.conversation.lastMessageText || ''
 })
 </script>
 

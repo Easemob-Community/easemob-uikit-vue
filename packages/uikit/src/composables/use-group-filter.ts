@@ -1,5 +1,5 @@
-import { computed, type ComputedRef, type Ref } from 'vue'
-import type { Group } from '../store/group'
+import { type ComputedRef, type Ref, computed } from 'vue'
+import type { UiGroup as Group } from '../sdk/types'
 import { resolvePinyin } from './use-pinyin'
 
 export type GroupFilterFn = (keyword: string, group: Group) => boolean
@@ -23,24 +23,28 @@ export interface UseGroupFilterOptions {
 export function useGroupFilter(
   groups: Ref<Group[]> | ComputedRef<Group[]>,
   keyword: Ref<string>,
-  options: UseGroupFilterOptions = {}
+  options: UseGroupFilterOptions = {},
 ): ComputedRef<Group[]> {
   return computed(() => {
     const kw = keyword.value.trim().toLowerCase()
-    if (!kw) return groups.value
+    if (!kw)
+      return groups.value
     if (options.filterFn) {
-      return groups.value.filter((g) => options.filterFn!(kw, g))
+      return groups.value.filter(g => options.filterFn!(kw, g))
     }
     return groups.value.filter((g) => {
       const name = (g.groupName || '').toLowerCase()
       const id = (g.groupId || '').toLowerCase()
-      if (name.includes(kw) || id.includes(kw)) return true
+      if (name.includes(kw) || id.includes(kw))
+        return true
 
       // 拼音匹配（adapter 存在时才生效，零依赖降级）
       const py = resolvePinyin(g.groupName || '')
       if (py) {
-        if (py.pinyin.includes(kw)) return true
-        if (py.initials.includes(kw)) return true
+        if (py.pinyin.includes(kw))
+          return true
+        if (py.initials.includes(kw))
+          return true
       }
       return false
     })

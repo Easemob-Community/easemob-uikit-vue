@@ -4,8 +4,7 @@ import Icon from '../../../components/icon/icon.vue'
 import { useChat } from '../../../composables/use-chat'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useLocale } from '../../../locale'
-import type { Message } from '../../../store/message'
-
+import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface PinnedBarProps {
   /** 预览文本最大长度 */
@@ -13,8 +12,8 @@ export interface PinnedBarProps {
 }
 
 export interface PinnedBarEmits {
-  (e: 'locate', message: Message): void
-  (e: 'unpin', message: Message): void
+  (e: 'locate', message: UiMessage): void
+  (e: 'unpin', message: UiMessage): void
 }
 
 const props = withDefaults(defineProps<PinnedBarProps>(), {
@@ -27,9 +26,10 @@ const { currentConversation, unpinMessage } = useChat()
 const { t } = useLocale()
 
 /** 当前会话的置顶消息列表（按 pinTime 降序） */
-const pinnedList = computed<Message[]>(() => {
+const pinnedList = computed<UiMessage[]>(() => {
   const cvsId = currentConversation.value?.id
-  if (!cvsId) return []
+  if (!cvsId)
+    return []
   return stores.message.getPinnedMessages(cvsId) || []
 })
 
@@ -42,36 +42,43 @@ const cursor = ref(0)
 const currentItem = computed(() => pinnedList.value[cursor.value] || pinnedList.value[0])
 
 /** 单条预览文本（直接复用 locale 中已带方括号的预览文案，避免再拼接） */
-function previewOf(msg: Message): string {
+function previewOf(msg: UiMessage): string {
   const max = props.maxPreviewLength
   if (msg.type === 'text') {
-    const text = msg.content || ''
-    return text.length > max ? text.slice(0, max) + '…' : text
+    const text = (msg.body as TextMessageBody).content || ''
+    return text.length > max ? `${text.slice(0, max)}…` : text
   }
-  if (msg.type === 'image') return t('message.image') || '[图片]'
-  if (msg.type === 'voice') return t('message.audio') || '[语音]'
-  if (msg.type === 'video') return t('message.video') || '[视频]'
-  if (msg.type === 'file') return t('message.file') || '[文件]'
+  if (msg.type === 'image')
+    return t('message.image') || '[图片]'
+  if (msg.type === 'voice')
+    return t('message.audio') || '[语音]'
+  if (msg.type === 'video')
+    return t('message.video') || '[视频]'
+  if (msg.type === 'file')
+    return t('message.file') || '[文件]'
   return t('message.custom') || '[消息]'
 }
 
-function onLocate(msg: Message) {
+function onLocate(msg: UiMessage) {
   emit('locate', msg)
 }
 
-async function onUnpin(msg: Message, evt?: Event) {
+async function onUnpin(msg: UiMessage, evt?: Event) {
   evt?.stopPropagation()
   try {
     await unpinMessage(msg)
     emit('unpin', msg)
-    if (cursor.value >= pinnedList.value.length) cursor.value = 0
-  } catch {
+    if (cursor.value >= pinnedList.value.length)
+      cursor.value = 0
+  }
+  catch {
     // 错误已在 useChat 内 console.warn
   }
 }
 
 function toggle() {
-  if (pinnedList.value.length <= 1) return
+  if (pinnedList.value.length <= 1)
+    return
   expanded.value = !expanded.value
 }
 </script>
@@ -115,7 +122,7 @@ function toggle() {
       </div>
       <div
         v-for="msg in pinnedList"
-        :key="msg.id"
+        :key="msg.msgServerId || msg.msgLocalId"
         class="pinned-bar__item"
         @click="onLocate(msg)"
       >
@@ -211,7 +218,9 @@ function toggle() {
   border: none;
   color: var(--uikit-text-secondary);
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
 }
 
 .pinned-bar__action:hover {

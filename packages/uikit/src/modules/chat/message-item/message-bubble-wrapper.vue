@@ -2,20 +2,19 @@
 import { computed, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
-import MessageRenderer from './message-renderer.vue'
-import MessageInteractive from './message-interactive.vue'
 import QuoteCard from '../quote/quote-card.vue'
-import CombineMessageModal from './combine-message-modal.vue'
-import type { Message } from '../../../store/message'
-import type { ChatConfig, MessageLayout, TimeDisplayStrategy, MessageActionEvent } from '../types'
-import { MESSAGE_STATUS, CONVERSATION_TYPE } from '../../../constants'
+import type { UiMessage } from '../../../sdk/types'
+import type { ChatConfig, MessageActionEvent, MessageLayout, TimeDisplayStrategy } from '../types'
+import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
 import { useQuote } from '../../../composables/use-quote'
-
+import CombineMessageModal from './combine-message-modal.vue'
+import MessageInteractive from './message-interactive.vue'
+import MessageRenderer from './message-renderer.vue'
 
 export interface MessageBubbleWrapperProps {
-  message: Message
+  message: UiMessage
   /** 消息列表配置 */
   config?: ChatConfig['messageList']
   /** 消息操作菜单配置 */
@@ -30,28 +29,26 @@ export interface MessageBubbleWrapperEmits {
   (e: 'toggle-select', messageId: string): void
   (e: 'action', event: MessageActionEvent): void
   (e: 'group-read-click', msgId: string, groupId: string): void
-  (e: 'reedit', message: Message): void
-  (e: 'toggle-translation', message: Message): void
-  (e: 'resend', message: Message): void
+  (e: 'reedit', message: UiMessage): void
+  (e: 'toggle-translation', message: UiMessage): void
+  (e: 'resend', message: UiMessage): void
   (e: 'mention-click', userId: string): void
 }
 
 /** 弹窗中嵌套合并消息的层级栈 */
 interface ModalState {
   show: boolean
-  message: Message | null
+  message: UiMessage | null
 }
+
+const props = defineProps<MessageBubbleWrapperProps>()
+
+const emit = defineEmits<MessageBubbleWrapperEmits>()
 
 const modalStack = ref<ModalState[]>([])
 
-/** 当前最上层弹窗 */
-const topModal = computed(() => {
-  const len = modalStack.value.length
-  return len > 0 ? modalStack.value[len - 1] : null
-})
-
 /** 打开合并消息弹窗 */
-function openCombineModal(message: Message) {
+function openCombineModal(message: UiMessage) {
   modalStack.value.push({ show: true, message })
 }
 
@@ -67,12 +64,9 @@ function closeModalAt(index: number) {
 }
 
 /** 处理嵌套合并消息点击 */
-function onViewCombine(message: Message) {
+function onViewCombine(message: UiMessage) {
   openCombineModal(message)
 }
-
-const props = defineProps<MessageBubbleWrapperProps>()
-const emit = defineEmits<MessageBubbleWrapperEmits>()
 
 const { t } = useLocale()
 
@@ -113,7 +107,8 @@ const formattedTime = computed(() => {
 
 /** 是否显示时间标签 */
 const shouldShowTime = computed(() => {
-  if (showTime.value === false) return false
+  if (showTime.value === false)
+    return false
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
 
@@ -127,7 +122,7 @@ const messageStatus = computed(() => props.message.status)
 const showGroupReadCount = computed(() =>
   props.message.isSelf
   && props.message.requireGroupAck
-  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
+  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT,
 )
 
 /** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
@@ -142,13 +137,13 @@ const groupReadCount = computed(() => props.message.groupReadCount || 0)
 
 /** 群未读人数 */
 const groupUnreadCount = computed(() =>
-  groupMemberCount.value > 0 ? groupMemberCount.value - groupReadCount.value : 0
+  groupMemberCount.value > 0 ? groupMemberCount.value - groupReadCount.value : 0,
 )
 
 /** 群已读标注点击 */
 function onGroupReadClick() {
   if (props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
-    emit('group-read-click', props.message.id, props.message.to || props.message.conversationId)
+    emit('group-read-click', props.message.msgServerId, props.message.to || props.message.conversationId)
   }
 }
 
@@ -156,34 +151,38 @@ function onGroupReadClick() {
 const quoteData = computed(() => {
   const ext = (props.message as unknown as { ext?: Record<string, any> }).ext
   const q = ext?.msgQuote
-  if (!q || typeof q !== 'object') return null
-  if (!q.msgPreview) return null
+  if (!q || typeof q !== 'object')
+    return null
+  if (!q.msgPreview)
+    return null
   return {
     msgID: String(q.msgID || ''),
     msgPreview: String(q.msgPreview || ''),
     msgSender: String(q.msgSender || ''),
     msgType: String(q.msgType || 'text'),
-  } as { msgID: string; msgPreview: string; msgSender: string; msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd' }
+  } as { msgID: string, msgPreview: string, msgSender: string, msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd' }
 })
 
 /** 点击引用卡片：触发定位/闪烁，列表端 watch locateRequest 处理 */
 function onQuoteClick() {
-  if (!quoteData.value?.msgID) return
+  if (!quoteData.value?.msgID)
+    return
   requestLocate(quoteData.value.msgID)
 }
 
 /** 当前气泡是否需要闪烁高亮（被其他引用卡片定位到） */
 const isHighlighted = computed(() => {
   const target = highlightedMessageId.value
-  if (!target) return false
-  return target === props.message.serverId || target === props.message.id
+  if (!target)
+    return false
+  return target === props.message.msgServerId || target === props.message.msgLocalId
 })
 </script>
 
 <template>
   <div
     class="message-bubble-wrapper"
-    :data-msg-id="props.message.serverId || props.message.id"
+    :data-msg-id="props.message.msgServerId || props.message.msgLocalId"
     :class="{
       'message-bubble-wrapper--self': isSelfConversation,
       'message-bubble-wrapper--left': layout === 'left',
@@ -192,7 +191,7 @@ const isHighlighted = computed(() => {
       'message-bubble-wrapper--recalled': isRecalled,
       'message-bubble-wrapper--highlight': isHighlighted,
     }"
-    @click="props.isMultiSelectMode && emit('toggle-select', props.message.id)"
+    @click="props.isMultiSelectMode && emit('toggle-select', props.message.msgServerId || props.message.msgLocalId)"
   >
     <!-- 已撤回消息：居中灰色提示，不显示头像/昵称/气泡 -->
     <template v-if="isRecalled">
@@ -226,106 +225,106 @@ const isHighlighted = computed(() => {
           'message-bubble-wrapper__main--left': layout === 'left',
         }"
       >
-      <!-- 头像区域 -->
-      <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
-        <slot name="avatar" :message="message">
-          <Avatar :name="message.from" :size="avatarSize" />
-        </slot>
-      </div>
-
-      <!-- 内容区域 -->
-      <div class="message-bubble-wrapper__content">
-        <!-- 昵称 -->
-        <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
-          <slot name="nickname" :message="message">
-            {{ message.from }}
+        <!-- 头像区域 -->
+        <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
+          <slot name="avatar" :message="message">
+            <Avatar :name="message.from" :size="avatarSize" />
           </slot>
         </div>
 
-        <!-- 消息渲染器 -->
-        <div class="message-bubble-wrapper__body">
-          <!-- 置顶角标 -->
-          <div
-            v-if="message.pinned"
-            class="message-bubble-wrapper__pin-badge"
-            :title="t('message.action.pin')"
-          >
-            <Icon name="chat/pin" :size="12" />
-            <span>{{ t('message.action.pin') }}</span>
+        <!-- 内容区域 -->
+        <div class="message-bubble-wrapper__content">
+          <!-- 昵称 -->
+          <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
+            <slot name="nickname" :message="message">
+              {{ message.from }}
+            </slot>
           </div>
-          <MessageInteractive
-            :message="message"
-            :config="actionConfig"
-            @action="emit('action', $event)"
-          >
-            <MessageRenderer
-              :message="message"
-              @reedit="emit('reedit', $event)"
-              @toggle-translation="emit('toggle-translation', $event)"
-              @view-combine="onViewCombine"
-              @mention-click="emit('mention-click', $event)"
+
+          <!-- 消息渲染器 -->
+          <div class="message-bubble-wrapper__body">
+            <!-- 置顶角标 -->
+            <div
+              v-if="message.pinned"
+              class="message-bubble-wrapper__pin-badge"
+              :title="t('message.action.pin')"
             >
-              <!-- 透传所有类型级插槽 -->
-              <template
-                v-for="(_, name) in $slots"
-                :key="name"
-                #[name]="slotProps"
+              <Icon name="chat/pin" :size="12" />
+              <span>{{ t('message.action.pin') }}</span>
+            </div>
+            <MessageInteractive
+              :message="message"
+              :config="actionConfig"
+              @action="emit('action', $event)"
+            >
+              <MessageRenderer
+                :message="message"
+                @reedit="emit('reedit', $event)"
+                @toggle-translation="emit('toggle-translation', $event)"
+                @view-combine="onViewCombine"
+                @mention-click="emit('mention-click', $event)"
               >
-                <slot :name="name" v-bind="slotProps" />
-              </template>
-            </MessageRenderer>
-          </MessageInteractive>
-          <!-- 引用卡片（气泡下方） -->
-          <QuoteCard
-            v-if="quoteData"
-            :quote="quoteData"
-            :align-right="isSelfConversation"
-            @click="onQuoteClick"
-          />
-        </div>
+                <!-- 透传所有类型级插槽 -->
+                <template
+                  v-for="(_, name) in $slots"
+                  :key="name"
+                  #[name]="slotProps"
+                >
+                  <slot :name="name" v-bind="slotProps" />
+                </template>
+              </MessageRenderer>
+            </MessageInteractive>
+            <!-- 引用卡片（气泡下方） -->
+            <QuoteCard
+              v-if="quoteData"
+              :quote="quoteData"
+              :align-right="isSelfConversation"
+              @click="onQuoteClick"
+            />
+          </div>
 
-        <!-- 消息状态指示器（仅己方消息） -->
-        <div v-if="showStatus" class="message-bubble-wrapper__status">
-          <!-- 发送中 -->
-          <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
-          <!-- 已发送 -->
-          <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
-          <!-- 已送达 -->
-          <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
-          <!-- 已读 -->
-          <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
-          <!-- 发送失败 -->
+          <!-- 消息状态指示器（仅己方消息） -->
+          <div v-if="showStatus" class="message-bubble-wrapper__status">
+            <!-- 发送中 -->
+            <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
+            <!-- 已发送 -->
+            <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
+            <!-- 已送达 -->
+            <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
+            <!-- 已读 -->
+            <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
+            <!-- 发送失败 -->
+            <span
+              v-else-if="messageStatus === MESSAGE_STATUS.FAILED"
+              class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed"
+              title="点击重发"
+              @click.stop="emit('resend', message)"
+            >&#33;</span>
+          </div>
+
+          <!-- 群已读人数标注 -->
           <span
-            v-else-if="messageStatus === MESSAGE_STATUS.FAILED"
-            class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed"
-            title="点击重发"
-            @click.stop="emit('resend', message)"
-          >&#33;</span>
-        </div>
+            v-if="showGroupReadCount"
+            class="message-bubble-wrapper__group-read"
+            @click.stop="onGroupReadClick"
+          >
+            {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
+          </span>
 
-        <!-- 群已读人数标注 -->
-        <span
-          v-if="showGroupReadCount"
-          class="message-bubble-wrapper__group-read"
-          @click.stop="onGroupReadClick"
-        >
-          {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
-        </span>
-
-        <!-- 时间戳 -->
-        <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
-          <slot name="time" :message="message">
-            {{ formattedTime }}
-          </slot>
+          <!-- 时间戳 -->
+          <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
+            <slot name="time" :message="message">
+              {{ formattedTime }}
+            </slot>
+          </div>
         </div>
-      </div>
       </div>
     </template>
 
     <!-- 合并消息弹窗栈：支持嵌套合并消息逐层点击 -->
     <CombineMessageModal
       v-for="(modal, idx) in modalStack"
-      :key="modal.message?.id || idx"
+      :key="modal.message?.msgServerId || modal.message?.msgLocalId || idx"
       :show="modal.show"
       :message="modal.message!"
       @update:show="(v: boolean) => { if (!v) closeModalAt(idx) }"
@@ -505,8 +504,13 @@ const isHighlighted = computed(() => {
 }
 
 @keyframes message-status-loading {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 /* 已撤回消息：居中灰色提示 */
@@ -553,10 +557,25 @@ const isHighlighted = computed(() => {
 }
 
 @keyframes message-bubble-flash {
-  0%   { box-shadow: 0 0 0 0 rgba(64, 158, 255, 0); background-color: transparent; }
-  20%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.35); background-color: rgba(64, 158, 255, 0.12); }
-  50%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0); background-color: rgba(64, 158, 255, 0.06); }
-  80%  { box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.2); background-color: rgba(64, 158, 255, 0.10); }
-  100% { box-shadow: 0 0 0 0 rgba(64, 158, 255, 0); background-color: transparent; }
+  0% {
+    box-shadow: 0 0 0 0 rgba(64, 158, 255, 0);
+    background-color: transparent;
+  }
+  20% {
+    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.35);
+    background-color: rgba(64, 158, 255, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0);
+    background-color: rgba(64, 158, 255, 0.06);
+  }
+  80% {
+    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.2);
+    background-color: rgba(64, 158, 255, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(64, 158, 255, 0);
+    background-color: transparent;
+  }
 }
 </style>

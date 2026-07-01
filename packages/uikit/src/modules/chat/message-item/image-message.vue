@@ -4,11 +4,11 @@ import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
 import Icon from '../../../components/icon/icon.vue'
-import { downloadFile, detectEnvironment } from '../../../utils/download'
-import type { ImageMessageType } from '../../../store/message'
+import { detectEnvironment, downloadFile } from '../../../utils/download'
+import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface ImageMessageProps {
-  message: ImageMessageType
+  message: UiMessage
 }
 
 const props = defineProps<ImageMessageProps>()
@@ -23,10 +23,10 @@ const MAX_HEIGHT = 240
 
 /** 根据消息体 width/height 等比计算展示尺寸 */
 const displaySize = computed(() => {
-  const w = (props.message as any).width as number | undefined
-  const h = (props.message as any).height as number | undefined
+  const w = (props.message.body as ImageMessageBody).width
+  const h = (props.message.body as ImageMessageBody).height
   if (!w || !h || w <= 0 || h <= 0) {
-    return { width: 160, height: 120 } // 无宽高信息时的默认占位
+    return { width: 160, height: 120 }
   }
   const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h, 1)
   return {
@@ -37,19 +37,19 @@ const displaySize = computed(() => {
 
 /** 展示用图片 URL：己方展示原图（本地 objectURL），对方优先缩略图 */
 const displayUrl = computed(() => {
-  const msg = props.message as any
-  if (msg.isSelf) {
-    return msg.url || msg.thumbnailUrl || ''
+  const body = props.message.body as ImageMessageBody
+  if (props.message.isSelf) {
+    return body.localUrl || body.originalImageUrl || body.thumbnailUrl || ''
   }
-  return msg.thumbnailUrl || msg.url || ''
+  return body.thumbnailUrl || body.originalImageUrl || body.localUrl || ''
 })
 
 /** 原图 URL（用于预览） */
-const originalUrl = computed(() => (props.message as any).url || '')
+const originalUrl = computed(() => (props.message.body as ImageMessageBody).localUrl || (props.message.body as ImageMessageBody).originalImageUrl || '')
 
 /** 圆角 class */
 const radiusClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'image-message__img--square' : ''
+  themeStore.bubbleShape === 'square' ? 'image-message__img--square' : '',
 )
 
 /** 图片加载状态 */
@@ -87,7 +87,7 @@ async function handleDownload(event: MouseEvent) {
   }
 
   const env = detectEnvironment()
-  const filename = (props.message as any).filename || 'image.jpg'
+  const filename = (props.message.body as ImageMessageBody).filename || 'image.jpg'
 
   try {
     await downloadFile({
@@ -100,12 +100,14 @@ async function handleDownload(event: MouseEvent) {
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
           showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
-        } else {
+        }
+        else {
           showToast(t('message.download.failed') || '下载失败')
         }
       },
     })
-  } catch {
+  }
+  catch {
     // 错误已在 onError 回调中处理
   }
 }
@@ -118,7 +120,7 @@ async function handleDownload(event: MouseEvent) {
       v-if="displayUrl"
       class="image-message__container"
       :class="radiusClass"
-      :style="{ width: displaySize.width + 'px', height: displaySize.height + 'px' }"
+      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }"
       @click="openPreview"
     >
       <!-- 加载中占位 -->
@@ -131,13 +133,17 @@ async function handleDownload(event: MouseEvent) {
         alt="image"
         @load="onLoad"
         @error="onError"
-      />
+      >
       <!-- 加载失败 -->
-      <div v-if="isError" class="image-message__error" :class="radiusClass">[图片加载失败]</div>
+      <div v-if="isError" class="image-message__error" :class="radiusClass">
+        [图片加载失败]
+      </div>
     </div>
 
     <!-- 无图片 URL -->
-    <div v-else class="image-message__placeholder" :class="radiusClass">[图片]</div>
+    <div v-else class="image-message__placeholder" :class="radiusClass">
+      [图片]
+    </div>
 
     <!-- 全屏预览浮层 -->
     <div
@@ -150,7 +156,7 @@ async function handleDownload(event: MouseEvent) {
         class="image-message__preview-img"
         alt="preview"
         @click.stop
-      />
+      >
       <!-- 下载按钮 -->
       <button
         class="image-message__download-btn"
@@ -260,7 +266,12 @@ async function handleDownload(event: MouseEvent) {
 }
 
 @keyframes image-loading-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 </style>
