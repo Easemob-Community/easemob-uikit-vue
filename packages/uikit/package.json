@@ -1,6 +1,6 @@
 {
   "name": "@easemob/uikit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Easemob UIKit Vue3 Components",
   "type": "module",
   "main": "./dist/easemob-uikit.umd.cjs",

@@ -4,10 +4,10 @@
 
 ## 特性
 
-- Vue 3.3+ Composition API
+- [Vue 3.3+ Composition API](https://vuejs.org/)
 - Pinia 状态管理
 - UnoCSS 原子样式
-- H5 适配
+- [H5 适配](./guide/h5-adaptation)
 - 主题定制
 - TypeScript 支持
 
