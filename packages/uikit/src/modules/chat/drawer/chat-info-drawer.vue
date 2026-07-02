@@ -5,8 +5,8 @@ import Icon from '../../../components/icon/icon.vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
-import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
+import { useUserInfo } from '../../../composables/use-user-info'
 import type { UiConversation as Conversation } from '../../../sdk/types'
 import ChatDrawer from './chat-drawer.vue'
 
@@ -24,7 +24,6 @@ const emit = defineEmits<{
 
 const themeStore = useThemeStore()
 const { t } = useLocale()
-const { stores } = useUIKit()
 const { setContactRemark } = useContact()
 const { show: showToast } = useToast()
 const closeBtnClass = computed(() =>
@@ -36,10 +35,10 @@ const isEditingRemark = ref(false)
 const remarkInput = ref('')
 const savingRemark = ref(false)
 
-const peerUserId = computed(() => props.conversation?.id)
-const contact = computed(() =>
-  peerUserId.value ? stores.contact.getContact(peerUserId.value) : undefined,
+const peerUserId = computed(() =>
+  props.conversation?.type === 'singleChat' ? props.conversation.id : undefined,
 )
+const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 
 watch(
   () => contact.value?.remark,
@@ -64,11 +63,23 @@ const groupMembers = ref([
   { id: '10', name: '成员J' },
 ])
 
-/** 当前名称/备注 */
+/** 当前名称/备注：单聊按 备注 > 资料昵称 > 会话名 > unnamed */
 const displayName = computed(() => {
-  if (contact.value?.remark)
-    return contact.value.remark
-  return props.conversation?.name || t('chat.info.unnamed')
+  if (props.conversation?.type === 'groupChat')
+    return props.conversation.name || t('chat.info.unnamed')
+  return (
+    contact.value?.remark
+    || userInfo.value?.nickname
+    || props.conversation?.name
+    || t('chat.info.unnamed')
+  )
+})
+
+/** 当前头像：单聊优先取用户资料头像 */
+const displayAvatar = computed(() => {
+  if (props.conversation?.type === 'groupChat')
+    return props.conversation.avatar
+  return avatarUrl.value || props.conversation?.avatar
 })
 
 /** 关闭抽屉 */
@@ -128,7 +139,7 @@ function onLeaveOrDelete() {
 
     <!-- Body 默认插槽 -->
     <div class="chat-info-drawer__profile">
-      <Avatar :name="displayName" :size="64" />
+      <Avatar :name="displayName" :src="displayAvatar" :size="64" />
       <div class="chat-info-drawer__name">
         {{ displayName }}
       </div>

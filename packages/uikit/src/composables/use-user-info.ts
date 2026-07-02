@@ -4,6 +4,7 @@ import { useUIKit } from './use-uikit'
 
 /**
  * 根据用户 ID 获取用户资料（昵称/头像等）。
+ * 展示优先级：联系人备注 > 用户资料昵称/头像 > 用户 ID。
  * 首次使用时会触发批量拉取与订阅；已缓存则直接返回。
  */
 export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
@@ -15,6 +16,11 @@ export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
   const userInfo = computed(() => {
     const userIdValue = id.value
     return userIdValue ? stores.userInfo.getUserInfo(userIdValue) : undefined
+  })
+
+  const contact = computed(() => {
+    const userIdValue = id.value
+    return userIdValue ? stores.contact.getContact(userIdValue) : undefined
   })
 
   watchEffect(() => {
@@ -33,11 +39,12 @@ export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
     }
   })
 
-  const displayName = computed(() => userInfo.value?.nickname || id.value || '')
-  const avatarUrl = computed(() => userInfo.value?.avatarUrl)
+  const displayName = computed(() => contact.value?.remark || userInfo.value?.nickname || id.value || '')
+  const avatarUrl = computed(() => userInfo.value?.avatarUrl || contact.value?.avatar)
 
   return {
     userInfo,
+    contact,
     displayName,
     avatarUrl,
   }

@@ -6,6 +6,7 @@ import { useConversation } from '../../composables/use-conversation'
 import { useQuote } from '../../composables/use-quote'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
+import { useUserInfo } from '../../composables/use-user-info'
 import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, TextMessageBody, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
@@ -184,6 +185,34 @@ const headerRef = ref<HTMLElement>()
 
 /** Header 实际高度 */
 const headerHeight = ref(0)
+
+/** 当前会话对方用户 ID（仅单聊） */
+const peerUserId = computed(() =>
+  currentConversation.value?.type === 'singleChat' ? currentConversation.value.id : undefined,
+)
+const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
+
+/** 顶部标题：群聊用会话名；单聊按 备注 > 资料昵称 > 会话名 > ID */
+const headerTitle = computed(() => {
+  if (!currentConversation.value)
+    return t('chat.title')
+  if (currentConversation.value.type === 'groupChat')
+    return currentConversation.value.name || t('chat.title')
+  return (
+    contact.value?.remark
+    || userInfo.value?.nickname
+    || currentConversation.value.name
+    || currentConversation.value.id
+    || t('chat.title')
+  )
+})
+
+/** 顶部头像：单聊优先取用户资料头像 */
+const headerAvatar = computed(() => {
+  if (currentConversation.value?.type === 'groupChat')
+    return currentConversation.value.avatar
+  return avatarUrl.value || currentConversation.value?.avatar
+})
 
 let resizeObserver: ResizeObserver | null = null
 
@@ -464,8 +493,8 @@ function onMultiSelectDelete(messages: UiMessage[]) {
           <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
             <slot name="header-avatar" :conversation="currentConversation">
               <Avatar
-                :src="currentConversation.avatar"
-                :name="currentConversation.name"
+                :src="headerAvatar"
+                :name="headerTitle"
                 :size="36"
               />
             </slot>
@@ -473,12 +502,12 @@ function onMultiSelectDelete(messages: UiMessage[]) {
           <div class="chat__header-main">
             <template v-if="customHeaderSlot">
               <slot name="header-title" :conversation="currentConversation">
-                <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
+                <span class="chat__title">{{ headerTitle }}</span>
               </slot>
               <slot name="header-extra" :conversation="currentConversation" />
             </template>
             <template v-else>
-              <span class="chat__title">{{ currentConversation?.name || t('chat.title') }}</span>
+              <span class="chat__title">{{ headerTitle }}</span>
             </template>
           </div>
           <button

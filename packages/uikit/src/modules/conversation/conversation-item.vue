@@ -48,9 +48,11 @@ const { isMobile } = useViewport()
 
 const isSingleChat = computed(() => props.conversation.type === 'singleChat')
 const peerUserId = computed(() => isSingleChat.value ? props.conversation.id : undefined)
-const { displayName, avatarUrl } = useUserInfo(peerUserId)
+const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 
-const conversationName = computed(() => displayName.value || props.conversation.name)
+const conversationName = computed(() =>
+  contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
+)
 const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
 
 const itemRef = ref<HTMLElement>()

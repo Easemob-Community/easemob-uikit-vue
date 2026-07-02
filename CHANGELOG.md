@@ -20,6 +20,11 @@
   - 备注保存成功后抽屉内名称、联系人列表等使用 `remark` 的位置会自动刷新。
   - 保存过程中按钮禁用并显示“保存中...”。
   - 新增 `chat.info.remarkSaveFailed` / `chat.info.saving` 国际化文案。
+- 统一 UIKit 内用户昵称/头像展示优先级：
+  - 单聊场景下统一按 **联系人备注（remark）> 用户资料昵称/头像（UserInfo）> 业务兜底名称/头像（会话/消息自带）> 用户 ID** 的顺序展示。
+  - `useUserInfo()` 与 `useOwnUserInfo()` 的 `displayName` / `avatarUrl` 已纳入 `contact.remark` / `contact.avatar`。
+  - 已覆盖位置：会话列表（`conversation-item`）、聊天窗口顶部 header（`chat`）、消息气泡发送者（`message-bubble-wrapper`）、聊天信息抽屉（`chat-info-drawer`）。
+  - 群聊仍使用会话自身名称/头像，不受单聊资料优先级影响。
 
 ## 1.1.0 (2026-07-01)
 

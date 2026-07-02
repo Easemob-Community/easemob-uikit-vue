@@ -11,6 +11,11 @@ export function useOwnUserInfo() {
 
   const currentUserId = computed(() => client.value.currentUserId)
 
+  const contact = computed(() => {
+    const userId = currentUserId.value
+    return userId ? stores.contact.getContact(userId) : undefined
+  })
+
   watchEffect(() => {
     if (!enabled)
       return
@@ -28,8 +33,8 @@ export function useOwnUserInfo() {
     return userId ? stores.userInfo.getUserInfo(userId) : undefined
   })
 
-  const displayName = computed(() => userInfo.value?.nickname || currentUserId.value || '')
-  const avatarUrl = computed(() => userInfo.value?.avatarUrl)
+  const displayName = computed(() => contact.value?.remark || userInfo.value?.nickname || currentUserId.value || '')
+  const avatarUrl = computed(() => userInfo.value?.avatarUrl || contact.value?.avatar)
 
   return {
     userInfo,
