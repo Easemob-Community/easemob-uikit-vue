@@ -1,5 +1,7 @@
 import { computed, ref } from 'vue'
-import type { TextMessageBody, UiConversation, UiMessage } from '../sdk/types'
+import type { Message as SdkMessage } from 'easemob-websdk'
+import type { CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
+import { extractLastMessageText } from '../sdk/adapter/message-adapter'
 import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
 import { useMessageActions } from './use-message-actions'
@@ -58,11 +60,66 @@ export function useChat() {
 
   /** 逐条转发 */
   async function forwardMessage(message: UiMessage, target: UiConversation) {
+    const { id, type } = target
     switch (message.type) {
       case 'text':
-        return domains.message.sendText(target.id, target.type, (message.body as TextMessageBody).content || '', message.ext)
+        return domains.message.sendText(id, type, (message.body as TextMessageBody).content || '', message.ext)
+      case 'image': {
+        const url = (message.body as ImageMessageBody).originalImageUrl
+          || (message.body as ImageMessageBody).bigImageUrl
+          || (message.body as ImageMessageBody).thumbnailUrl
+          || (message.body as ImageMessageBody).localUrl
+        if (!url) {
+          console.warn('[useChat] forwardMessage: image url not found')
+          return
+        }
+        return domains.message.sendImage(id, type, url, message.ext)
+      }
+      case 'file': {
+        const url = (message.body as FileMessageBody).url
+        if (!url) {
+          console.warn('[useChat] forwardMessage: file url not found')
+          return
+        }
+        return domains.message.sendFile(id, type, url, message.ext)
+      }
+      case 'voice': {
+        const url = (message.body as VoiceMessageBody).url
+        if (!url) {
+          console.warn('[useChat] forwardMessage: voice url not found')
+          return
+        }
+        return domains.message.sendVoice(id, type, url, (message.body as VoiceMessageBody).duration || 0, message.ext)
+      }
+      case 'video': {
+        const url = (message.body as VideoMessageBody).url
+          || (message.body as VideoMessageBody).thumbnailUrl
+        if (!url) {
+          console.warn('[useChat] forwardMessage: video url not found')
+          return
+        }
+        return domains.message.sendVideo(id, type, url, (message.body as VideoMessageBody).duration || 0, message.ext)
+      }
+      case 'location':
+        return domains.message.sendLocation(
+          id,
+          type,
+          (message.body as LocationMessageBody).latitude,
+          (message.body as LocationMessageBody).longitude,
+          (message.body as LocationMessageBody).address,
+          message.ext,
+        )
       case 'custom':
-        return // TODO
+        return domains.message.sendCustom(
+          id,
+          type,
+          (message.body as CustomMessageBody).event || '',
+          (message.body as CustomMessageBody).params,
+          message.ext,
+        )
+      case 'combine':
+        // 合并消息逐条转发：作为单个合并消息重新发送
+        return forwardCombineMessages([message], target)
       default:
         console.warn('[useChat] forwardMessage: unsupported type', message.type)
     }
@@ -70,8 +127,20 @@ export function useChat() {
 
   /** 合并转发 */
   async function forwardCombineMessages(messages: UiMessage[], target: UiConversation) {
-    // TODO: 接入 createCombineMessage
-    console.warn('[useChat] forwardCombineMessages not implemented', messages.length, target.id)
+    if (messages.length === 0)
+      return
+    const { id, type } = target
+    const title = type === 'groupChat' ? (target.name || id) : '聊天记录'
+    const summary = messages.map(m => `${m.from}: ${extractLastMessageText(m)}`).join('\n')
+    const compatibleText = '[聊天记录]'
+    return domains.message.sendCombine(
+      id,
+      type,
+      title,
+      summary,
+      compatibleText,
+      messages as unknown as SdkMessage[],
+    )
   }
 
   function setTyping() {

@@ -54,7 +54,7 @@ export class MessageDomain {
   async sendImage(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
-    data: File,
+    data: File | string,
     ext?: Record<string, unknown>,
   ) {
     const sdkMsg = this.client.chatManager.createImageMessage({
@@ -62,14 +62,14 @@ export class MessageDomain {
       conversationType,
       data,
       ext,
-    })
+    } as any)
     return this._send(sdkMsg)
   }
 
   async sendFile(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
-    data: File,
+    data: File | string,
     ext?: Record<string, unknown>,
   ) {
     const sdkMsg = this.client.chatManager.createFileMessage({
@@ -77,14 +77,14 @@ export class MessageDomain {
       conversationType,
       data,
       ext,
-    })
+    } as any)
     return this._send(sdkMsg)
   }
 
   async sendVoice(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
-    data: File,
+    data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
   ) {
@@ -94,14 +94,14 @@ export class MessageDomain {
       data,
       duration,
       ext,
-    })
+    } as any)
     return this._send(sdkMsg)
   }
 
   async sendVideo(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
-    data: File,
+    data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
   ) {
@@ -111,7 +111,7 @@ export class MessageDomain {
       data,
       duration,
       ext,
-    })
+    } as any)
     return this._send(sdkMsg)
   }
 

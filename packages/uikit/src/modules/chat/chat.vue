@@ -355,11 +355,13 @@ function openForwardModal(messages: UiMessage[]) {
   if (messages.length === 0)
     return
   pendingForwardMessages.value = messages
+  // 单条消息默认逐条转发；多条消息默认合并转发
+  forwardMode.value = messages.length === 1 ? 'oneByOne' : 'combine'
   showForwardModal.value = true
 }
 
 /** 当前转发模式：'oneByOne' 逐条转发 | 'combine' 合并转发 */
-const forwardMode = ref<'oneByOne' | 'combine'>('combine')
+const forwardMode = ref<'oneByOne' | 'combine'>('oneByOne')
 
 /** 执行转发 */
 async function onForwardConfirm(targetConversation: Conversation) {
