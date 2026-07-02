@@ -51,6 +51,10 @@ export const useContactStore = defineStore('contact', () => {
     contactList.value = contactList.value.filter(c => c.userId !== userId)
   }
 
+  function getContact(userId: string): UiContact | undefined {
+    return contactList.value.find(c => c.userId === userId)
+  }
+
   function updateContactRemark(userId: string, remark: string) {
     const contact = contactList.value.find(c => c.userId === userId)
     if (contact) {
@@ -143,6 +147,7 @@ export const useContactStore = defineStore('contact', () => {
     setList,
     appendContactList,
     addContact,
+    getContact,
     removeContact,
     updateContactRemark,
     updateRemark,

@@ -15,6 +15,11 @@
   - 检测到 `code === 210` / `httpStatus === 403` / `reason === 'service_forbidden'` 时自动熔断，后续不再发起订阅请求。
   - 失败用户 ID 会被缓存，避免反复重试；权限类错误仅 warn 一次，避免刷屏。
   - 新增 `UIKitFeatures.enableUserInfoSubscription` 开关，业务可主动关闭订阅。
+- 修复聊天信息抽屉中备注编辑未接入 SDK 的问题。
+  - 点击保存后调用 `contactManager.setContactRemark` 同步到服务端。
+  - 备注保存成功后抽屉内名称、联系人列表等使用 `remark` 的位置会自动刷新。
+  - 保存过程中按钮禁用并显示“保存中...”。
+  - 新增 `chat.info.remarkSaveFailed` / `chat.info.saving` 国际化文案。
 
 ## 1.1.0 (2026-07-01)
 

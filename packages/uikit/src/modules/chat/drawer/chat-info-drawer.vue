@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
+import { useContact } from '../../../composables/use-contact'
+import { useUIKit } from '../../../composables/use-uikit'
+import { useToast } from '../../../composables/use-toast'
 import type { UiConversation as Conversation } from '../../../sdk/types'
 import ChatDrawer from './chat-drawer.vue'
 
@@ -21,6 +24,9 @@ const emit = defineEmits<{
 
 const themeStore = useThemeStore()
 const { t } = useLocale()
+const { stores } = useUIKit()
+const { setContactRemark } = useContact()
+const { show: showToast } = useToast()
 const closeBtnClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : '',
 )
@@ -28,6 +34,21 @@ const closeBtnClass = computed(() =>
 /** 备注编辑状态 */
 const isEditingRemark = ref(false)
 const remarkInput = ref('')
+const savingRemark = ref(false)
+
+const peerUserId = computed(() => props.conversation?.id)
+const contact = computed(() =>
+  peerUserId.value ? stores.contact.getContact(peerUserId.value) : undefined,
+)
+
+watch(
+  () => contact.value?.remark,
+  (remark) => {
+    if (!isEditingRemark.value)
+      remarkInput.value = remark || ''
+  },
+  { immediate: true },
+)
 
 /** 群成员（mock） */
 const groupMembers = ref([
@@ -44,7 +65,11 @@ const groupMembers = ref([
 ])
 
 /** 当前名称/备注 */
-const displayName = computed(() => props.conversation?.name || t('chat.info.unnamed'))
+const displayName = computed(() => {
+  if (contact.value?.remark)
+    return contact.value.remark
+  return props.conversation?.name || t('chat.info.unnamed')
+})
 
 /** 关闭抽屉 */
 function onClose() {
@@ -53,9 +78,22 @@ function onClose() {
 }
 
 /** 保存备注 */
-function saveRemark() {
-  // TODO: 接入 SDK 修改备注
-  isEditingRemark.value = false
+async function saveRemark() {
+  const userId = peerUserId.value
+  if (!userId)
+    return
+
+  savingRemark.value = true
+  try {
+    await setContactRemark(userId, remarkInput.value)
+    isEditingRemark.value = false
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed') || '备注设置失败')
+  }
+  finally {
+    savingRemark.value = false
+  }
 }
 
 /** 删除好友 / 退出群聊 */
@@ -115,8 +153,12 @@ function onLeaveOrDelete() {
           :placeholder="t('chat.info.remarkInputPlaceholder')"
           @keydown.enter="saveRemark"
         >
-        <button class="chat-info-drawer__remark-save" @click="saveRemark">
-          {{ t('chat.info.save') }}
+        <button
+          class="chat-info-drawer__remark-save"
+          :disabled="savingRemark"
+          @click="saveRemark"
+        >
+          {{ savingRemark ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
         </button>
       </div>
     </div>
@@ -270,6 +312,11 @@ function onLeaveOrDelete() {
   color: #fff;
   font-size: 14px;
   cursor: pointer;
+}
+
+.chat-info-drawer__remark-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* 纵向成员列表 */
