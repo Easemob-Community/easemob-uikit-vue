@@ -61,28 +61,43 @@ export const useMessageStore = defineStore('message', () => {
     return list.slice(-maxMessageCount)
   }
 
-  function _findMessageById(msgId: string): { list: UiMessage[], index: number } | null {
+  function _findMessageById(msgId: string): { conversationId: string, index: number } | null {
     for (const conversationId in messageMap.value) {
       const index = messageMap.value[conversationId].findIndex(
         m => m.msgServerId === msgId || m.msgLocalId === msgId || m.localId === msgId,
       )
       if (index > -1) {
-        return { list: messageMap.value[conversationId], index }
+        return { conversationId, index }
       }
     }
     return null
+  }
+
+  function _updateMessageById(msgId: string, updater: (msg: UiMessage) => UiMessage): boolean {
+    const found = _findMessageById(msgId)
+    if (!found)
+      return false
+    const { conversationId, index } = found
+    const list = messageMap.value[conversationId]
+    messageMap.value[conversationId] = [
+      ...list.slice(0, index),
+      updater(list[index]),
+      ...list.slice(index + 1),
+    ]
+    return true
   }
 
   /** 添加一条消息（通常来自 SDK 事件） */
   function addMessage(msg: UiMessage) {
     const list = messageMap.value[msg.conversationId] || []
     const exists = list.find(
-      m => m.msgServerId === msg.msgServerId || m.msgLocalId === msg.msgLocalId,
+      m =>
+        (msg.msgServerId && m.msgServerId === msg.msgServerId)
+        || (msg.msgLocalId && m.msgLocalId === msg.msgLocalId),
     )
     if (!exists) {
-      list.push(msg)
-      list.sort((a, b) => a.timestamp - b.timestamp)
-      messageMap.value[msg.conversationId] = trim(list)
+      const newList = [...list, msg].sort((a, b) => a.timestamp - b.timestamp)
+      messageMap.value[msg.conversationId] = trim(newList)
     }
   }
 
@@ -98,11 +113,14 @@ export const useMessageStore = defineStore('message', () => {
     }
 
     const list = messageMap.value[uiMsg.conversationId] || []
-    const exists = list.find(m => m.msgLocalId === localId)
+    const exists = list.find(
+      m =>
+        (uiMsg.msgServerId && m.msgServerId === uiMsg.msgServerId)
+        || (uiMsg.msgLocalId && m.msgLocalId === uiMsg.msgLocalId),
+    )
     if (!exists) {
-      list.push(uiMsg)
-      list.sort((a, b) => a.timestamp - b.timestamp)
-      messageMap.value[uiMsg.conversationId] = trim(list)
+      const newList = [...list, uiMsg].sort((a, b) => a.timestamp - b.timestamp)
+      messageMap.value[uiMsg.conversationId] = trim(newList)
     }
   }
 
@@ -117,37 +135,36 @@ export const useMessageStore = defineStore('message', () => {
       return
     }
 
-    const { list, index } = found
+    const { conversationId, index } = found
+    const list = messageMap.value[conversationId]
     const old = list[index]
-    list[index] = {
-      ...msg,
-      isSelf: true,
-      localId,
-      translation: old.translation,
-      showTranslation: old.showTranslation,
-      requireGroupAck: old.requireGroupAck,
-    }
+    messageMap.value[conversationId] = [
+      ...list.slice(0, index),
+      {
+        ...msg,
+        isSelf: true,
+        localId,
+        translation: old.translation,
+        showTranslation: old.showTranslation,
+        requireGroupAck: old.requireGroupAck,
+      },
+      ...list.slice(index + 1),
+    ]
   }
 
   /** 更新附件上传进度 */
   function updateUploadProgress(localId: string, _percent: number) {
-    const found = _findMessageById(localId)
-    if (found) {
-      found.list[found.index] = { ...found.list[found.index] } as UiMessage
-    }
+    _updateMessageById(localId, msg => ({ ...msg }))
   }
 
   /** 标记发送失败 */
   function markFailed(localId: string, reason: string) {
     delete sendingMetaMap.value[localId]
-    const found = _findMessageById(localId)
-    if (found) {
-      found.list[found.index] = {
-        ...found.list[found.index],
-        status: 'failed',
-        failReason: reason,
-      }
-    }
+    _updateMessageById(localId, msg => ({
+      ...msg,
+      status: 'failed',
+      failReason: reason,
+    }))
   }
 
   /** 批量插入历史消息到头部 */
@@ -166,18 +183,12 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 按消息 ID 局部更新 */
   function updateMessageById(msgId: string, patch: Partial<UiMessage>) {
-    const found = _findMessageById(msgId)
-    if (found) {
-      found.list[found.index] = { ...found.list[found.index], ...patch }
-    }
+    _updateMessageById(msgId, msg => ({ ...msg, ...patch }))
   }
 
   /** 按消息 ID 完整替换 */
   function replaceMessageById(msgId: string, msg: UiMessage) {
-    const found = _findMessageById(msgId)
-    if (found) {
-      found.list[found.index] = msg
-    }
+    _updateMessageById(msgId, () => msg)
   }
 
   /** 更新消息状态（用于送达/已读回执） */
@@ -188,7 +199,9 @@ export const useMessageStore = defineStore('message', () => {
   /** 撤回消息 */
   function recallMessage(serverId: string, operatorId?: string) {
     const found = _findMessageById(serverId)
-    const originalBody = found?.list[found.index].body as TextMessageBody | undefined
+    const originalBody = found
+      ? (messageMap.value[found.conversationId][found.index].body as TextMessageBody | undefined)
+      : undefined
     updateMessageById(serverId, {
       recalled: true,
       recalledBy: operatorId,
@@ -198,10 +211,7 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 应用编辑后的消息 */
   function applyModifiedMessage(msg: UiMessage) {
-    const found = _findMessageById(msg.msgServerId)
-    if (found) {
-      found.list[found.index] = { ...msg }
-    }
+    _updateMessageById(msg.msgServerId, () => ({ ...msg }))
   }
 
   /** 按服务端消息 ID 完整更新消息 */
@@ -217,7 +227,10 @@ export const useMessageStore = defineStore('message', () => {
         m => m.msgServerId === msgId || m.msgLocalId === msgId || m.localId === msgId,
       )
       if (index > -1) {
-        list.splice(index, 1)
+        messageMap.value[conversationId] = [
+          ...list.slice(0, index),
+          ...list.slice(index + 1),
+        ]
         break
       }
     }
@@ -260,8 +273,7 @@ export const useMessageStore = defineStore('message', () => {
   function addAtMeMessage(conversationId: string, msgId: string) {
     const list = atMeMessageMap.value[conversationId] || []
     if (!list.includes(msgId)) {
-      list.push(msgId)
-      atMeMessageMap.value[conversationId] = list
+      atMeMessageMap.value[conversationId] = [...list, msgId]
     }
   }
 
@@ -286,13 +298,10 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 切换译文/原文展示 */
   function toggleTranslation(msgId: string) {
-    const found = _findMessageById(msgId)
-    if (found) {
-      found.list[found.index] = {
-        ...found.list[found.index],
-        showTranslation: !found.list[found.index].showTranslation,
-      }
-    }
+    _updateMessageById(msgId, msg => ({
+      ...msg,
+      showTranslation: !msg.showTranslation,
+    }))
   }
 
   /** 清空所有消息数据 */
