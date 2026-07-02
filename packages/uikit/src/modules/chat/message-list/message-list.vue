@@ -335,10 +335,22 @@ async function onMessageAction(event: MessageActionEvent) {
     }
     catch (e: unknown) {
       console.warn('[MessageList] translateTextMessage failed:', e)
-      showToast(e instanceof Error ? e.message : String(e) || t('message.action.translate') || '翻译失败')
+      showToast(resolveTranslateErrorMessage(e))
     }
   }
   // TODO: 处理其他操作（转发）
+}
+
+/** 根据 SDK 翻译错误提取友好的提示文案 */
+function resolveTranslateErrorMessage(e: unknown): string {
+  const httpStatus = (e as { details?: { httpStatus?: number } })?.details?.httpStatus
+  if (httpStatus === 403) {
+    return t('message.translate.noPermission') || '暂无翻译权限'
+  }
+  if (typeof httpStatus === 'number' && (httpStatus === 404 || httpStatus === 503 || httpStatus >= 500)) {
+    return t('message.translate.serviceUnavailable') || '翻译服务未开通，请联系管理员开通'
+  }
+  return t('message.translate.failed') || '翻译失败，请稍后重试'
 }
 
 /** 文本消息翻译切换（显示译文/原文） */
