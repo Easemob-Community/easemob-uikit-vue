@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 (2026-07-02)
+
+### 修复
+
+- 修复用户资料订阅在服务端未开通/无权限时产生大量 403 控制台警告的问题。
+  - `UserInfoDomain.subscribeUserInfos` 现在会合并同一事件循环内的订阅请求，减少并发。
+  - 检测到 `code === 210` / `httpStatus === 403` / `reason === 'service_forbidden'` 时自动熔断，后续不再发起订阅请求。
+  - 失败用户 ID 会被缓存，避免反复重试；权限类错误仅 warn 一次，避免刷屏。
+  - 新增 `UIKitFeatures.enableUserInfoSubscription` 开关，业务可主动关闭订阅。
+
 ## 1.1.0 (2026-07-01)
 
 ### 新增

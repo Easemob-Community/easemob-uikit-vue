@@ -9,6 +9,7 @@ import { useUIKit } from './use-uikit'
 export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
   const { stores, domains, features } = useUIKit()
   const enabled = features.enableUserInfo !== false
+  const subscriptionEnabled = features.enableUserInfoSubscription !== false
 
   const id = computed(() => toValue(userId))
   const userInfo = computed(() => {
@@ -26,7 +27,10 @@ export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
       return
 
     void domains.userInfo.fetchUserInfos([userIdValue])
-    void domains.userInfo.subscribeUserInfos([userIdValue])
+
+    if (subscriptionEnabled && !stores.userInfo.isSubscriptionDisabled()) {
+      void domains.userInfo.subscribeUserInfos([userIdValue])
+    }
   })
 
   const displayName = computed(() => userInfo.value?.nickname || id.value || '')

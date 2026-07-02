@@ -29,4 +29,6 @@ export interface UIKitFeatures {
   enableGroup: boolean
   /** 是否启用自动拉取/展示用户资料（昵称/头像），默认 true */
   enableUserInfo?: boolean
+  /** 是否启用用户资料变更订阅；默认 true，服务端返回无权限时自动熔断 */
+  enableUserInfoSubscription?: boolean
 }

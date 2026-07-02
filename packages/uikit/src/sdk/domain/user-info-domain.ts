@@ -10,6 +10,9 @@ import type { UIKitDataSource } from '../../composables/types'
  */
 export class UserInfoDomain {
   private handlerId = 'uikit-user-info'
+  private subscribeQueue: string[] = []
+  private subscribeFlushPromise: Promise<void> | null = null
+  private hasLoggedPermissionError = false
 
   constructor(
     private client: ManagerHost,
@@ -89,21 +92,73 @@ export class UserInfoDomain {
 
   /**
    * 批量订阅陌生人资料变更通知。
+   * 同一事件循环内的多次调用会合并为一次 SDK 请求；
+   * 若服务端返回无权限，则自动熔断后续订阅并缓存失败用户，避免重复请求与控制台警告刷屏。
    */
   async subscribeUserInfos(userIds: string[]): Promise<void> {
-    const unsubscribedIds = Array.from(new Set(userIds.filter(Boolean))).filter(
-      id => !this.store.isSubscribed(id),
-    )
-    if (unsubscribedIds.length === 0)
+    if (this.store.isSubscriptionDisabled())
       return
 
+    const targetIds = Array.from(new Set(userIds.filter(Boolean))).filter(
+      id => !this.store.isSubscribed(id) && !this.store.isSubscribeFailed(id),
+    )
+    if (targetIds.length === 0)
+      return
+
+    this.subscribeQueue.push(...targetIds)
+
+    if (this.subscribeFlushPromise)
+      return this.subscribeFlushPromise
+
+    this.subscribeFlushPromise = Promise.resolve().then(() => this.flushSubscribeQueue())
+    return this.subscribeFlushPromise
+  }
+
+  private async flushSubscribeQueue(): Promise<void> {
+    const userIds = Array.from(new Set(this.subscribeQueue))
+    this.subscribeQueue = []
+
     try {
-      await this.client.userInfoManager.subscribeUsersInfo({ userIds: unsubscribedIds })
-      this.store.markSubscribed(unsubscribedIds)
+      await this.client.userInfoManager.subscribeUsersInfo({ userIds })
+      this.store.markSubscribed(userIds)
     }
     catch (err) {
-      console.warn('[UserInfoDomain] subscribeUserInfos failed:', err)
+      this.handleSubscribeError(err, userIds)
     }
+    finally {
+      this.subscribeFlushPromise = null
+    }
+  }
+
+  private handleSubscribeError(err: unknown, userIds: string[]): void {
+    if (this.isPermissionError(err)) {
+      this.store.markSubscribeFailed(userIds)
+      this.store.disableSubscription()
+      if (!this.hasLoggedPermissionError) {
+        this.hasLoggedPermissionError = true
+        console.warn(
+          '[UserInfoDomain] 用户资料订阅无权限或服务未开通，已自动关闭订阅。' +
+          '后续陌生人资料变更将不会实时推送，拉取到的资料仍可正常展示。',
+          err,
+        )
+      }
+      return
+    }
+
+    this.store.markSubscribeFailed(userIds)
+    console.warn('[UserInfoDomain] subscribeUserInfos failed:', err)
+  }
+
+  private isPermissionError(err: unknown): boolean {
+    if (!err || typeof err !== 'object')
+      return false
+    const e = err as {
+      code?: number | string
+      details?: { httpStatus?: number; reason?: string }
+    }
+    return e.code === 210
+      || e.details?.httpStatus === 403
+      || e.details?.reason === 'service_forbidden'
   }
 
   /**
@@ -133,10 +188,13 @@ export class UserInfoDomain {
   }
 
   /**
-   * 清理事件监听。
+   * 清理事件监听与内部状态。
    */
   dispose() {
     this.client.userInfoManager.removeEventHandler(this.handlerId)
+    this.subscribeQueue = []
+    this.subscribeFlushPromise = null
+    this.hasLoggedPermissionError = false
   }
 
   private listenUserInfoChanges() {

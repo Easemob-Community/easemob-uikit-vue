@@ -66,6 +66,7 @@ const defaultFeatures: UIKitFeatures = {
   contactFetchMode: 'page',
   enableGroup: true,
   enableUserInfo: true,
+  enableUserInfoSubscription: true,
 }
 
 /**
