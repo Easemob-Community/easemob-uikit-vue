@@ -49,6 +49,21 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
       stores.message.addMessage(uiMsg)
 
+      // 当前会话收到新消息时自动标记已读，避免刷新/重新同步后服务端未读数再次浮现
+      const currentCvsId = stores.conversation.currentConversationId
+      if (
+        currentCvsId
+        && sdkMsg.conversationId === currentCvsId
+        && sdkMsg.from !== stores.client.currentUser
+      ) {
+        void client.chatManager.markConversationRead({
+          conversationId: sdkMsg.conversationId,
+          conversationType: sdkMsg.conversationType as 'singleChat' | 'groupChat',
+        }).catch((err: unknown) => {
+          console.warn('[UIKit] auto markConversationRead failed:', err)
+        })
+      }
+
       // 更新@我状态
       if (sdkMsg.conversationType === 'groupChat' && sdkMsg.from !== stores.client.currentUser) {
         const atList = sdkMsg.ext?.em_at_list
