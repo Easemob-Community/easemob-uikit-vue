@@ -7,6 +7,7 @@ export function useContact() {
 
   const contactList = computed(() => contactStore.contactList)
   const blackList = computed(() => contactStore.blackList)
+  const inviteList = computed(() => contactStore.inviteList)
   const loaded = computed(() => contactStore.loaded)
 
   // ===== UI 交互状态 =====
@@ -136,6 +137,7 @@ export function useContact() {
   return {
     contactList,
     blackList,
+    inviteList,
     loaded,
     loading,
     filterText,

@@ -9,7 +9,7 @@ import { useToast } from '../../composables/use-toast'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { CONVERSATION_TYPE } from '../../constants'
-import type { UiConversation as Conversation, TextMessageBody, UiMessage } from '../../sdk/types'
+import type { UiConversation as Conversation, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import type { ChatConfig } from './types'
@@ -17,6 +17,8 @@ import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
+import ChatDrawer from './drawer/chat-drawer.vue'
+import GroupMemberList from '../group/group-member-list.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import TypingIndicator from './typing-indicator/typing-indicator.vue'
@@ -58,9 +60,9 @@ defineExpose({
 })
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
-const { stores, h5 } = useUIKit()
+const { stores, h5, client, domains } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory } = useConversation()
-const { leaveGroup, destroyGroup } = useGroup()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -182,7 +184,14 @@ const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 /** 是否显示 drawer */
 const showDrawer = ref(false)
 
-/** Header 元素引用 */
+/** 是否显示群成员列表 drawer */
+const showMemberList = ref(false)
+
+/** 当前成员列表对应的群 ID */
+const memberListGroupId = ref('')
+
+/** 当前登录用户 ID */
+const currentUserId = computed(() => client.value.currentUserId ?? '')
 const headerRef = ref<HTMLElement>()
 
 /** Header 实际高度 */
@@ -497,14 +506,63 @@ async function onClearHistory(payload: { id: string, type: 'singleChat' | 'group
 
 /** 查看全部成员 */
 function onViewAllMembers(groupId: string) {
-  console.log('[Chat] view all members:', groupId)
-  // TODO: 接入 GroupMemberList 组件
+  memberListGroupId.value = groupId
+  showMemberList.value = true
 }
 
 /** 添加成员 */
 function onAddMember(groupId: string) {
   console.log('[Chat] add member:', groupId)
   // TODO: 接入联系人选择器
+}
+
+/** 与成员发起单聊 */
+function onChatMember(member: UiGroupMember) {
+  showMemberList.value = false
+  stores.conversation.setCurrentConversationId(member.userId)
+  domains?.conversation?.enter(member.userId, 'singleChat')
+}
+
+/** 移除成员 */
+async function onRemoveMember(member: UiGroupMember) {
+  if (!memberListGroupId.value)
+    return
+  try {
+    await removeGroupMembers(memberListGroupId.value, [member.userId])
+    showToast(t('chat.info.removeMemberSuccess') || '成员已移除')
+  }
+  catch (err) {
+    console.warn('[Chat] remove member failed:', err)
+    showToast(t('chat.info.removeMemberFailed') || '移除成员失败')
+  }
+}
+
+/** 设为管理员 */
+async function onSetAdmin(member: UiGroupMember) {
+  if (!memberListGroupId.value)
+    return
+  try {
+    await addGroupAdmin(memberListGroupId.value, member.userId)
+    showToast(t('chat.info.setAdminSuccess') || '已设为管理员')
+  }
+  catch (err) {
+    console.warn('[Chat] set admin failed:', err)
+    showToast(t('chat.info.setAdminFailed') || '设置管理员失败')
+  }
+}
+
+/** 取消管理员 */
+async function onRemoveAdmin(member: UiGroupMember) {
+  if (!memberListGroupId.value)
+    return
+  try {
+    await removeGroupAdmin(memberListGroupId.value, member.userId)
+    showToast(t('chat.info.removeAdminSuccess') || '已取消管理员')
+  }
+  catch (err) {
+    console.warn('[Chat] remove admin failed:', err)
+    showToast(t('chat.info.removeAdminFailed') || '取消管理员失败')
+  }
 }
 </script>
 
@@ -630,6 +688,23 @@ function onAddMember(groupId: string) {
         @view-all-members="onViewAllMembers"
         @add-member="onAddMember"
       />
+
+      <!-- 群成员列表抽屉 -->
+      <ChatDrawer
+        v-model:show="showMemberList"
+        :offset-top="headerHeight"
+        width="320"
+      >
+        <GroupMemberList
+          v-if="memberListGroupId"
+          :group-id="memberListGroupId"
+          :current-user-id="currentUserId"
+          @chat-member="onChatMember"
+          @remove-member="onRemoveMember"
+          @set-admin="onSetAdmin"
+          @remove-admin="onRemoveAdmin"
+        />
+      </ChatDrawer>
 
       <!-- 转发弹窗 -->
       <ForwardModal

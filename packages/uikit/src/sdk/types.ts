@@ -155,6 +155,22 @@ export interface UiGroupMember {
   joinedAt?: number
 }
 
+/** UIKit 好友申请展示类型 */
+export interface UiContactInvite {
+  /** 申请人用户 ID */
+  userId: string
+  /** 申请人昵称 */
+  nickname?: string
+  /** 申请人头像 */
+  avatarUrl?: string
+  /** 申请附言 */
+  reason?: string
+  /** 申请状态 */
+  status: 'pending' | 'accepted' | 'declined'
+  /** 申请时间戳 */
+  timestamp?: number
+}
+
 /** UIKit 在线状态展示类型 */
 export interface UiPresence {
   userId: string

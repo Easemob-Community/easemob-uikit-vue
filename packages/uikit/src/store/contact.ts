@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UiContact } from '../sdk/types'
+import type { UiContact, UiContactInvite } from '../sdk/types'
 
 export const useContactStore = defineStore('contact', () => {
   const contactList = ref<UiContact[]>([])
   const blackList = ref<UiContact[]>([])
+  const inviteList = ref<UiContactInvite[]>([])
   const loaded = ref(false)
   const blockListLoaded = ref(false)
 
@@ -86,6 +87,36 @@ export const useContactStore = defineStore('contact', () => {
     return blackIdSet.value.has(userId)
   }
 
+  // ===== 好友申请列表 =====
+  function addInvite(invite: UiContactInvite) {
+    const index = inviteList.value.findIndex(i => i.userId === invite.userId)
+    if (index >= 0) {
+      inviteList.value[index] = { ...inviteList.value[index], ...invite }
+    }
+    else {
+      inviteList.value.unshift(invite)
+    }
+  }
+
+  function removeInvite(userId: string) {
+    inviteList.value = inviteList.value.filter(i => i.userId !== userId)
+  }
+
+  function updateInviteStatus(userId: string, status: UiContactInvite['status']) {
+    const index = inviteList.value.findIndex(i => i.userId === userId)
+    if (index >= 0) {
+      inviteList.value[index] = { ...inviteList.value[index], status }
+    }
+  }
+
+  function getInvite(userId: string): UiContactInvite | undefined {
+    return inviteList.value.find(i => i.userId === userId)
+  }
+
+  function clearInvites() {
+    inviteList.value = []
+  }
+
   // ===== UI 交互状态操作 =====
   function setFilterText(text: string) {
     filterText.value = text
@@ -122,6 +153,7 @@ export const useContactStore = defineStore('contact', () => {
   function clearContacts() {
     contactList.value = []
     blackList.value = []
+    inviteList.value = []
     loaded.value = false
     blockListLoaded.value = false
     filterText.value = ''
@@ -139,6 +171,7 @@ export const useContactStore = defineStore('contact', () => {
   return {
     contactList,
     blackList,
+    inviteList,
     loaded,
     blockListLoaded,
     blackIdSet,
@@ -160,6 +193,11 @@ export const useContactStore = defineStore('contact', () => {
     addToBlackList,
     removeFromBlackList,
     isBlocked,
+    addInvite,
+    removeInvite,
+    updateInviteStatus,
+    getInvite,
+    clearInvites,
     setFilterText,
     setActiveId,
     isSelected,

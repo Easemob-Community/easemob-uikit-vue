@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import ContactNav from '../../modules/contact/contact-nav.vue'
+import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
@@ -108,7 +109,7 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-const { contactList, contactCount: contactStoreCount, fetchContactCount } = useContact()
+const { contactList, contactCount: contactStoreCount, fetchContactCount, inviteList } = useContact()
 const { groupList, joinedGroupCount: groupStoreCount, fetchJoinedGroupCount } = useGroup()
 const { features } = useUIKit()
 const contactStore = useContactStore()
@@ -194,6 +195,12 @@ const resolvedContactCount = computed(() => {
   return contactList.value.length
 })
 
+const resolvedNoticeCount = computed(() => {
+  if (props.noticeCount !== undefined) return props.noticeCount
+  if (!props.autoEntryCount) return 0
+  return inviteList.value.length
+})
+
 type NavEntryWithSort = ContactNavEntry & { sort?: number }
 
 const navEntries = computed<ContactNavEntry[]>(() => {
@@ -202,7 +209,7 @@ const navEntries = computed<ContactNavEntry[]>(() => {
     notice: {
       key: 'notice',
       label: props.noticeLabel || t('contact.entryNotice'),
-      count: props.noticeCount,
+      count: resolvedNoticeCount.value,
       icon: props.noticeIcon,
       visible: props.showNotice,
     },
@@ -363,9 +370,13 @@ const subviewTitle = computed(() => {
             </span>
           </div>
 
-          <!-- 子视图内容通过默认插槽由外部注入 -->
+          <!-- 子视图内容：notice 视图优先使用 #notice 插槽，否则默认渲染 ContactNoticeList；其他视图使用默认插槽 -->
           <div class="address-book-container__subview">
-            <slot :view="view" />
+            <template v-if="view === 'notice'">
+              <slot name="notice" />
+              <ContactNoticeList v-if="!$slots.notice" />
+            </template>
+            <slot v-else :view="view" />
           </div>
         </template>
       </div>

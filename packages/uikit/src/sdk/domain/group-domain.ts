@@ -13,6 +13,7 @@ export interface GroupStoreLike {
   setGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   appendGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   removeGroupMembers: (groupId: string, userIds: string[]) => void
+  updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void
 }
 
@@ -132,5 +133,17 @@ export class GroupDomain {
   /** 邀请用户入群 */
   async inviteUsersToGroup(groupId: string, userIds: string[]) {
     await this.client.groupManager.inviteUsersToGroup({ groupId, userIds })
+  }
+
+  /** 设置群管理员 */
+  async addGroupAdmin(groupId: string, userId: string) {
+    await this.client.groupManager.addGroupAdmin({ groupId, userId })
+    this.store.updateGroupMemberRole(groupId, userId, 'admin')
+  }
+
+  /** 取消群管理员 */
+  async removeGroupAdmin(groupId: string, userId: string) {
+    await this.client.groupManager.removeGroupAdmin({ groupId, userId })
+    this.store.updateGroupMemberRole(groupId, userId, 'member')
   }
 }

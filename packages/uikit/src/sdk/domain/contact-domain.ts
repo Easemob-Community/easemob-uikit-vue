@@ -1,5 +1,5 @@
 import type { ManagerHost } from '../client'
-import type { UiContact } from '../types'
+import type { UiContact, UiContactInvite } from '../types'
 import { toUiContacts } from '../adapter/contact-adapter'
 
 /**
@@ -11,6 +11,9 @@ export interface ContactStoreLike {
   removeContact: (userId: string) => void
   updateRemark: (userId: string, remark: string) => void
   setBlocklist: (list: UiContact[]) => void
+  addInvite: (invite: UiContactInvite) => void
+  removeInvite: (userId: string) => void
+  updateInviteStatus: (userId: string, status: UiContactInvite['status']) => void
 }
 
 /**
@@ -52,11 +55,13 @@ export class ContactDomain {
   /** 接受好友申请 */
   async acceptInvite(userId: string) {
     await this.client.contactManager.acceptContactInvite({ userId })
+    this.store.removeInvite(userId)
   }
 
   /** 拒绝好友申请 */
   async declineInvite(userId: string) {
     await this.client.contactManager.declineContactInvite({ userId })
+    this.store.removeInvite(userId)
   }
 
   /** 获取黑名单 */

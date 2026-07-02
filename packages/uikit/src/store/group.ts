@@ -121,6 +121,14 @@ export const useGroupStore = defineStore('group', () => {
       .filter(m => !idSet.has(m.userId))
   }
 
+  function updateGroupMemberRole(groupId: string, userId: string, role: UiGroupMember['role']) {
+    const list = groupMembersMap.value[groupId] || []
+    const member = list.find(m => m.userId === userId)
+    if (member) {
+      member.role = role
+    }
+  }
+
   function getGroupMembers(groupId: string): UiGroupMember[] {
     return groupMembersMap.value[groupId] || []
   }
@@ -214,6 +222,7 @@ export const useGroupStore = defineStore('group', () => {
     setGroupMembers,
     appendGroupMembers,
     removeGroupMembers,
+    updateGroupMemberRole,
     getGroupMembers,
     clearGroupMembers,
     setGroupAnnouncement,

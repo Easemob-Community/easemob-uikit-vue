@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.2.0 (2026-07-04)
+
+### 新增
+
+- 新增群成员列表组件 `GroupMemberList`（公开名 `EmGroupMemberList`）：
+  - 支持搜索、分页加载、角色标签（群主/管理员/成员）。
+  - 支持对成员发起单聊、移除成员、设置/取消管理员（按当前用户角色自动判断权限）。
+  - 通过 `Chat.vue` 的「查看全部成员」入口承接群信息抽屉，打开右侧抽屉展示成员列表。
+- `Chat.vue` 新增 `showMemberList` 状态与成员列表抽屉，点击群信息抽屉的「查看全部成员」后可直接打开 `GroupMemberList`。
+- `GroupDomain` / `useGroup` 新增群管理员能力：
+  - `addGroupAdmin(groupId, userId)` / `removeGroupAdmin(groupId, userId)`
+  - 操作成功后同步更新 `GroupStore` 中对应成员角色。
+- `GroupStore` 新增 `updateGroupMemberRole(groupId, userId, role)`，用于本地即时更新成员角色。
+- 新增好友申请通知列表组件 `ContactNoticeList`（公开名 `EmContactNoticeList`）：
+  - 展示待处理、已接受、已拒绝的好友申请。
+  - 支持接受/拒绝操作，并自动同步联系人列表与申请状态。
+- `ContactStore` 新增 `inviteList` 缓存与 `addInvite / removeInvite / updateInviteStatus / clearInvites` 方法。
+- `ContactDomain` 与 `contact-events.ts` 扩展好友申请事件处理：
+  - `onContactInvited` 将申请存入 `inviteList`。
+  - `onContactAgreed` / `onContactRefuse` / `onContactAdded` / `onContactDeleted` 同步联系人及申请状态。
+- `AddressBookContainer` 默认通知视图：
+  - 通知徽标数未传入时自动取 `inviteList.length`。
+  - `notice` 视图默认渲染 `ContactNoticeList`，业务仍可通过 `#notice` 插槽覆盖。
+- 新增 `UiContactInvite` 类型，描述好友申请数据结构。
+- 新增 `contact.*` 与 `group.memberList.*` 系列国际化文案（好友申请、群成员列表、管理员操作等）。
+- 新增 `ContactNoticeList` 与 `GroupMemberList` 的 Storybook 示例。
+
 ## 1.1.3 (2026-07-03)
 
 ### 新增
