@@ -15,7 +15,12 @@ export class UserInfoDomain {
     private client: ManagerHost,
     private store: UserInfoStore,
     private dataSource: UIKitDataSource = {},
-  ) {
+  ) {}
+
+  /**
+   * 启动用户资料变更事件监听。应在 SDK 初始化完成后调用。
+   */
+  listen() {
     this.listenUserInfoChanges()
   }
 

@@ -161,6 +161,7 @@ export function useUIKitProvider(
     currentAppKey = cfg.appKey
     stores.client.setAppKey(cfg.appKey)
     disposeEvents = registerEventHandlers(uikitClient, stores)
+    domains.userInfo.listen()
     disposeUserInfoDomain = () => domains.userInfo.dispose()
     return uikitClient
   }
