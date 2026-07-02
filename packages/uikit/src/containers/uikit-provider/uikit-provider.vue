@@ -10,6 +10,8 @@ import {
 } from '../../composables/use-uikit'
 import { useLocale } from '../../locale'
 import { useThemeStore } from '../../store/theme'
+import { useToast } from '../../composables/use-toast'
+import { EmToast } from '../../components'
 import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
@@ -71,6 +73,13 @@ const props = withDefaults(defineProps<ProviderProps>(), {
 
 const { setLocale } = useLocale()
 const themeStore = useThemeStore()
+const { state: toastState } = useToast()
+
+const toastProps = computed(() => ({
+  show: toastState.value.visible,
+  message: toastState.value.message,
+  type: toastState.value.type,
+}))
 
 const config = computed<ClientConfig>(() => ({
   appKey: props.appKey ?? '',
@@ -181,6 +190,7 @@ onMounted(() => {
 <template>
   <div class="uikit-provider">
     <slot />
+    <EmToast v-bind="toastProps" />
   </div>
 </template>
 
