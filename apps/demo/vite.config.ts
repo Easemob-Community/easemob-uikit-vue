@@ -3,13 +3,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
-import UnoCSS from 'unocss/vite'
 import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [
     vue(),
-    UnoCSS(),
     Components({
       dts: true,
     }),
