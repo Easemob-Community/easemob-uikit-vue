@@ -56,10 +56,14 @@ export const useContactStore = defineStore('contact', () => {
   }
 
   function updateContactRemark(userId: string, remark: string) {
-    const contact = contactList.value.find(c => c.userId === userId)
-    if (contact) {
-      contact.remark = remark
-      contact.name = remark || contact.name
+    const index = contactList.value.findIndex(c => c.userId === userId)
+    if (index >= 0) {
+      const contact = contactList.value[index]
+      contactList.value[index] = {
+        ...contact,
+        remark,
+        name: remark || contact.name,
+      }
     }
   }
 

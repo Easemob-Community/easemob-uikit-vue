@@ -46,6 +46,7 @@ export class ContactDomain {
   /** 设置好友备注 */
   async setRemark(userId: string, remark: string) {
     await this.client.contactManager.setContactRemark({ userId, remark })
+    this.store.updateRemark(userId, remark)
   }
 
   /** 接受好友申请 */

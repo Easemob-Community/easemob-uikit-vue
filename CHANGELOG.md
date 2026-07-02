@@ -17,7 +17,8 @@
   - 新增 `UIKitFeatures.enableUserInfoSubscription` 开关，业务可主动关闭订阅。
 - 修复聊天信息抽屉中备注编辑未接入 SDK 的问题。
   - 点击保存后调用 `contactManager.setContactRemark` 同步到服务端。
-  - 备注保存成功后抽屉内名称、联系人列表等使用 `remark` 的位置会自动刷新。
+  - 备注保存成功后抽屉内名称、联系人列表、聊天 header、会话列表、消息气泡等使用 `remark` 的位置会自动刷新。
+  - 修复联系人 store 备注更新未触发响应式的问题（`updateContactRemark` 改为生成新对象并替换数组项）。
   - 保存过程中按钮禁用并显示“保存中...”。
   - 新增 `chat.info.remarkSaveFailed` / `chat.info.saving` 国际化文案。
 - 统一 UIKit 内用户昵称/头像展示优先级：
