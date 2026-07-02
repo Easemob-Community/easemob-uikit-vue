@@ -59,6 +59,11 @@ export interface ProviderProps {
   enableGroup?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
+  /**
+   * 是否启用内置 Toast 提示（默认 true）。
+   * 关闭后仍可通过 `useToast()` 获取状态并自行渲染提示组件。
+   */
+  enableToast?: boolean
 }
 
 const props = withDefaults(defineProps<ProviderProps>(), {
@@ -69,6 +74,7 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enablePresence: false,
   enableGroup: true,
   contactFetchMode: 'page',
+  enableToast: true,
 })
 
 const { setLocale } = useLocale()
@@ -190,7 +196,7 @@ onMounted(() => {
 <template>
   <div class="uikit-provider">
     <slot />
-    <EmToast v-bind="toastProps" />
+    <EmToast v-if="props.enableToast" v-bind="toastProps" />
   </div>
 </template>
 
