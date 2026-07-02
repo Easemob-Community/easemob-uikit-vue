@@ -100,7 +100,7 @@
   - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过；产物 `dist/easemob-uikit.js` 不再包含 UnoCSS。
 
 - [x] **D2. 修正库构建 external，把 `im-sdk-web` 改为 `easemob-websdk`**
-  - 已于 <待填 commit> 修复。
+  - 已于此前提交修复。
   - 改动：`packages/uikit/vite.config.ts` 的 `rollupOptions.external` 与 `output.globals` 中 `im-sdk-web` → `easemob-websdk`。
   - 验证：构建产物 `dist/easemob-uikit.js` 以 `import { ChatClient as H2, ... } from "easemob-websdk"` 引入 SDK；UMD 产物以 `require("easemob-websdk")` 引入；SDK 不再内联到 UIKit 包中。
 
@@ -110,7 +110,7 @@
   - 验证：类型检查 + 构建 + demo 类型检查通过。
 
 - [x] **H5 适配核心能力落地（2026-07 专项）**
-  - 已于 <待填 commit> 修复。
+  - 已于 `04e07ca` 修复。
   - 改动：
     - 新增 `packages/uikit/src/composables/use-h5-adaptation.ts`，集中管理 viewport/安全区/键盘高度/下拉刷新/字号缩放预留；
     - `theme/index.css` 新增 `--uikit-safe-*` 与 `--uikit-font-scale`；
