@@ -1,5 +1,31 @@
 <script setup lang="ts">
 import UIKitProvider from './uikit-provider.vue'
+import { useToast } from '../../composables/use-toast'
+
+const toast = useToast()
+
+const CustomToastDemo = {
+  setup() {
+    const { state, show } = useToast()
+    return { state, show }
+  },
+  template: `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <button
+        style="padding: 8px 16px; border-radius: 8px; background: var(--uikit-primary); color: #fff; border: none; cursor: pointer;"
+        @click="show('自定义提示内容', 'success')"
+      >
+        触发自定义 Toast
+      </button>
+      <div
+        v-if="state.visible"
+        style="padding: 12px 24px; background: #4caf50; color: #fff; border-radius: 8px;"
+      >
+        {{ state.message }}
+      </div>
+    </div>
+  `,
+}
 </script>
 
 <template>
@@ -143,6 +169,47 @@ import UIKitProvider from './uikit-provider.vue'
           "
         >
           自定义数据源模式
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Built-in Toast">
+      <UIKitProvider :auto-init="false">
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          <button
+            style="padding: 8px 16px; border-radius: 8px; background: var(--uikit-primary); color: #fff; border: none; cursor: pointer;"
+            @click="toast.show('内置 Toast 提示', 'success')"
+          >
+            触发内置 Toast
+          </button>
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Custom Toast via useToast (enableToast=false)">
+      <UIKitProvider :auto-init="false" :enable-toast="false">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          <CustomToastDemo />
         </div>
       </UIKitProvider>
     </Variant>
