@@ -3,6 +3,12 @@ import type { UiGroup, UiGroupMember } from '../types'
 import { toUiGroup, toUiGroups, toUiGroupMember, toUiGroupMembers } from '../adapter/group-adapter'
 
 /**
+ * FIXME: 临时 mock 群 ID，用于在 websdk2 第二通道群组列表同步异常时手动注入一个真实群，便于功能验证。
+ * 等 SDK 同步修复后应移除该常量与注入逻辑。
+ */
+const MOCK_GROUP_ID = '316136506851329'
+
+/**
  * GroupStore 需要暴露给 Domain 的最小接口。
  */
 export interface GroupStoreLike {
@@ -29,6 +35,16 @@ export class GroupDomain {
   syncLocal(): UiGroup[] {
     const items = this.client.groupManager.getJoinedGroupList()
     const list = toUiGroups(items)
+
+    // FIXME: 临时 mock：手动注入真实群 ID，用于第二通道同步异常期间的功能验证
+    const hasMock = list.some(g => g.groupId === MOCK_GROUP_ID)
+    if (!hasMock) {
+      list.unshift({
+        groupId: MOCK_GROUP_ID,
+        groupName: '测试群',
+      })
+    }
+
     this.store.setList(list)
     return list
   }
