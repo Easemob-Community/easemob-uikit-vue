@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import { useToast } from '../../../composables/use-toast'
+import { MESSAGE_STATUS } from '../../../constants'
 import type { UiMessage } from '../../../sdk/types'
 
 export interface MultiSelectBarEmits {
@@ -18,6 +20,18 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<MultiSelectBarEmits>()
+const { show: showToast } = useToast()
+
+/** 可转发的消息类型集合 */
+const FORWARDABLE_TYPES = new Set(['text', 'image', 'file', 'voice', 'video', 'location', 'custom', 'combine'])
+
+/** 判断单条消息是否可转发：仅已发送、未撤回、且类型在可转发集合内 */
+function canForwardMessage(msg: UiMessage): boolean {
+  return msg.status === MESSAGE_STATUS.SENT && !msg.recalled && FORWARDABLE_TYPES.has(msg.type)
+}
+
+/** 当前选中消息是否全部可转发 */
+const canForward = computed(() => props.selectedMessages.length > 0 && props.selectedMessages.every(canForwardMessage))
 
 /** 多选：全选 / 取消全选 */
 const isAllSelected = computed(() => props.selectedMessages.length > 0 && props.selectedMessages.length >= props.totalMessages)
@@ -30,46 +44,44 @@ function onToggleSelectAll() {
     emit('select-all')
   }
 }
+
 /** 当前转发模式 */
 const forwardMode = ref<'oneByOne' | 'combine'>('combine')
-
-/** 待转发的消息 */
-const pendingForwardMessages = ref<UiMessage[]>([])
 
 /** 批量删除确认弹窗 */
 const showBatchDeleteConfirm = ref(false)
 
-/** 打开转发弹窗 */
-function openForwardModal(messages: UiMessage[]) {
-  if (messages.length === 0)
+/** 转发方式选择弹窗（多条消息时显示） */
+const showForwardTypeSelect = ref(false)
+
+/** 点击统一转发入口 */
+function onForward() {
+  if (props.selectedMessages.length === 0) {
+    emit('close')
     return
-  pendingForwardMessages.value = messages
-  if (forwardMode.value === 'oneByOne') {
-    emit('forward-one-by-one', messages)
+  }
+  if (!canForward.value) {
+    showToast('选中的消息包含不可转发的消息')
+    return
+  }
+  // 单条消息直接逐条转发；多条消息弹出方式选择
+  if (props.selectedMessages.length === 1) {
+    emit('forward-one-by-one', props.selectedMessages)
   }
   else {
-    emit('forward-combine', messages)
+    showForwardTypeSelect.value = true
   }
 }
 
-/** 多选：逐条转发 */
-function onForwardOneByOne() {
-  if (props.selectedMessages.length === 0) {
-    emit('close')
-    return
+/** 选择转发方式 */
+function onSelectForwardType(mode: 'oneByOne' | 'combine') {
+  showForwardTypeSelect.value = false
+  if (mode === 'oneByOne') {
+    emit('forward-one-by-one', props.selectedMessages)
   }
-  forwardMode.value = 'oneByOne'
-  openForwardModal(props.selectedMessages)
-}
-
-/** 多选：合并转发 */
-function onForwardCombine() {
-  if (props.selectedMessages.length === 0) {
-    emit('close')
-    return
+  else {
+    emit('forward-combine', props.selectedMessages)
   }
-  forwardMode.value = 'combine'
-  openForwardModal(props.selectedMessages)
 }
 
 /** 多选：删除 */
@@ -84,6 +96,11 @@ function onDelete() {
 function onConfirmDelete() {
   emit('delete', props.selectedMessages)
   showBatchDeleteConfirm.value = false
+}
+
+/** 取消多选 */
+function onCancel() {
+  emit('close')
 }
 </script>
 
@@ -102,17 +119,15 @@ function onConfirmDelete() {
     </div>
 
     <div class="multi-select-bar__actions">
-      <div class="multi-select-bar__action" @click="onForwardOneByOne">
+      <div
+        class="multi-select-bar__action"
+        :class="{ 'multi-select-bar__action--disabled': !canForward }"
+        @click="onForward"
+      >
         <div class="multi-select-bar__icon">
           <Icon name="arrows/arrow_turn_right" :size="22" />
         </div>
-        <span class="multi-select-bar__label">逐条转发</span>
-      </div>
-      <div class="multi-select-bar__action" @click="onForwardCombine">
-        <div class="multi-select-bar__icon">
-          <Icon name="chat/3lines_n_arrow" :size="22" />
-        </div>
-        <span class="multi-select-bar__label">合并转发</span>
+        <span class="multi-select-bar__label">转发</span>
       </div>
       <div class="multi-select-bar__action" @click="onDelete">
         <div class="multi-select-bar__icon multi-select-bar__icon--danger">
@@ -121,12 +136,32 @@ function onConfirmDelete() {
         <span class="multi-select-bar__label multi-select-bar__label--danger">删除</span>
       </div>
     </div>
-    <div class="multi-select-bar__action multi-select-bar__action--close" @click="emit('close')">
-      <div class="multi-select-bar__icon multi-select-bar__icon--close">
-        <Icon name="actions/xmark_thick" :size="20" />
+    <button class="multi-select-bar__cancel" @click="onCancel">
+      取消
+    </button>
+  </div>
+
+  <!-- 转发方式选择弹窗 -->
+  <Teleport to="body">
+    <div v-if="showForwardTypeSelect" class="multi-select-bar__modal-overlay" @click="showForwardTypeSelect = false">
+      <div class="multi-select-bar__modal" @click.stop>
+        <div class="multi-select-bar__modal-title">
+          转发给
+        </div>
+        <div class="multi-select-bar__modal-actions multi-select-bar__modal-actions--column">
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType('oneByOne')">
+            逐条转发
+          </button>
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType('combine')">
+            合并转发
+          </button>
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel" @click="showForwardTypeSelect = false">
+            取消
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 
   <!-- 批量删除确认弹窗 -->
   <Teleport to="body">
@@ -252,6 +287,34 @@ function onConfirmDelete() {
   color: #ff4d4f;
 }
 
+.multi-select-bar__action--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.multi-select-bar__action--disabled:hover .multi-select-bar__icon {
+  background-color: var(--uikit-bg-secondary, #f5f5f5);
+}
+
+/* 取消按钮：绝对定位靠右，文字按钮 */
+.multi-select-bar__cancel {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 12px;
+  border: none;
+  background-color: transparent;
+  color: var(--uikit-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.multi-select-bar__cancel:hover {
+  color: var(--uikit-text-primary);
+}
+
 /* 关闭按钮：绝对定位靠右，不干扰中间动作组布局 */
 .multi-select-bar__action--close {
   position: absolute;
@@ -310,6 +373,11 @@ function onConfirmDelete() {
   justify-content: center;
 }
 
+.multi-select-bar__modal-actions--column {
+  flex-direction: column;
+  gap: 8px;
+}
+
 .multi-select-bar__modal-btn {
   padding: 8px 20px;
   border-radius: 6px;
@@ -317,6 +385,15 @@ function onConfirmDelete() {
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.15s;
+}
+
+.multi-select-bar__modal-btn--option {
+  background-color: var(--uikit-bg-secondary, #f5f5f5);
+  color: var(--uikit-text-primary);
+}
+
+.multi-select-bar__modal-btn--option:hover {
+  background-color: var(--uikit-bg-tertiary, #e8e8e8);
 }
 
 .multi-select-bar__modal-btn--cancel {

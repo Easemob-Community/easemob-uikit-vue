@@ -351,12 +351,12 @@ const showForwardModal = ref(false)
 const pendingForwardMessages = ref<UiMessage[]>([])
 
 /** 打开转发弹窗 */
-function openForwardModal(messages: UiMessage[]) {
+function openForwardModal(messages: UiMessage[], mode?: 'oneByOne' | 'combine') {
   if (messages.length === 0)
     return
   pendingForwardMessages.value = messages
-  // 单条消息默认逐条转发；多条消息默认合并转发
-  forwardMode.value = messages.length === 1 ? 'oneByOne' : 'combine'
+  // 显式指定模式优先；未指定时单条默认逐条转发，多条默认合并转发
+  forwardMode.value = mode ?? (messages.length === 1 ? 'oneByOne' : 'combine')
   showForwardModal.value = true
 }
 
@@ -395,8 +395,7 @@ function onMultiSelectForwardOneByOne() {
     exitMultiSelectMode()
     return
   }
-  forwardMode.value = 'oneByOne'
-  openForwardModal(selectedMessages.value)
+  openForwardModal(selectedMessages.value, 'oneByOne')
 }
 
 /** 多选：合并转发 */
@@ -405,8 +404,7 @@ function onMultiSelectForwardCombine() {
     exitMultiSelectMode()
     return
   }
-  forwardMode.value = 'combine'
-  openForwardModal(selectedMessages.value)
+  openForwardModal(selectedMessages.value, 'combine')
 }
 
 /** 多选：删除 */
