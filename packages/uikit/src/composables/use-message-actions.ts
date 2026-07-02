@@ -3,14 +3,14 @@ import { MESSAGE_STATUS } from '../constants'
 import type { TextMessageBody, UiMessage } from '../sdk/types'
 import { useUIKit } from './use-uikit'
 
+/** 多选状态（模块级单例，保证跨组件共享） */
+const isMultiSelectMode = ref(false)
+const selectedMessageIds = ref<Set<string>>(new Set())
+
 export function useMessageActions() {
   const { domains, stores } = useUIKit()
   const conversationStore = stores.conversation
   const messageStore = stores.message
-
-  // 多选状态（模块级单例）
-  const isMultiSelectMode = ref(false)
-  const selectedMessageIds = ref<Set<string>>(new Set())
 
   const selectedMessages = computed(() => {
     const cvsId = conversationStore.currentConversationId
