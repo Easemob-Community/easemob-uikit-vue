@@ -21,6 +21,8 @@ export interface ManagerHost {
   readonly groupManager: GroupManager
   /** SDK PresenceManager */
   readonly presenceManager: PresenceManager
+  /** SDK UserInfoManager */
+  readonly userInfoManager: UserInfoManager
   /** 当前登录用户 ID（未登录时为 null） */
   readonly currentUserId: string | null
   /** 注册连接级事件处理器（委托到底层 ChatClient） */
@@ -44,6 +46,7 @@ interface ManagerRegistry {
   contactManager: ContactManager
   groupManager: GroupManager
   presenceManager: PresenceManager
+  userInfoManager: UserInfoManager
 }
 
 /**
@@ -94,6 +97,11 @@ export class UIKitClient {
   /** SDK PresenceManager */
   get presenceManager() {
     return this._client.presenceManager
+  }
+
+  /** SDK UserInfoManager */
+  get userInfoManager() {
+    return this._client.userInfoManager
   }
 
   /** 当前连接状态 */

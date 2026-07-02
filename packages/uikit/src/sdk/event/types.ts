@@ -4,6 +4,7 @@ import type { useContactStore } from '../../store/contact'
 import type { useGroupStore } from '../../store/group'
 import type { usePresenceStore } from '../../store/presence'
 import type { useClientStore } from '../../store/client'
+import type { useUserInfoStore } from '../../store/user-info'
 
 /**
  * 事件处理器可访问的 Pinia Store 集合。
@@ -16,4 +17,5 @@ export interface RootStores {
   group: ReturnType<typeof useGroupStore>
   presence: ReturnType<typeof usePresenceStore>
   client: ReturnType<typeof useClientStore>
+  userInfo: ReturnType<typeof useUserInfoStore>
 }

@@ -7,6 +7,7 @@ import {
   GroupDomain,
   MessageDomain,
   PresenceDomain,
+  UserInfoDomain,
 } from '../sdk/domain'
 import { registerEventHandlers } from '../sdk/event/registry'
 import { useMessageStore } from '../store/message'
@@ -16,6 +17,7 @@ import { useGroupStore } from '../store/group'
 import { usePresenceStore } from '../store/presence'
 import { useClientStore } from '../store/client'
 import { useThemeStore } from '../store/theme'
+import { useUserInfoStore } from '../store/user-info'
 import type { RootStores } from '../sdk/event/types'
 import type { UIKitDataSource, UIKitFeatures } from './types'
 import { useH5Adaptation, type H5AdaptationConfig } from './use-h5-adaptation'
@@ -38,6 +40,7 @@ export interface UIKitContext {
     contact: ContactDomain
     group: GroupDomain
     presence: PresenceDomain
+    userInfo: UserInfoDomain
   }
   stores: RootStores
   features: UIKitFeatures
@@ -62,6 +65,7 @@ const defaultFeatures: UIKitFeatures = {
   enablePresence: false,
   contactFetchMode: 'page',
   enableGroup: true,
+  enableUserInfo: true,
 }
 
 /**
@@ -88,6 +92,7 @@ export function useUIKitProvider(
     group: useGroupStore(),
     presence: usePresenceStore(),
     client: useClientStore(),
+    userInfo: useUserInfoStore(),
   }
 
   // H5 适配状态：单一实例注入 context，避免各组件重复监听
@@ -96,6 +101,7 @@ export function useUIKitProvider(
   // 真实 SDK 客户端懒加载：auto-init=false 时在 init() 调用后才创建
   let uikitClient: UIKitClient | null = null
   let disposeEvents: (() => void) | null = null
+  let disposeUserInfoDomain: (() => void) | null = null
   let currentAppKey = config.appKey || ''
 
   function requireClient(): UIKitClient {
@@ -121,6 +127,9 @@ export function useUIKitProvider(
     get presenceManager() {
       return requireClient().presenceManager
     },
+    get userInfoManager() {
+      return requireClient().userInfoManager
+    },
     get currentUserId() {
       return uikitClient?.currentUserId ?? null
     },
@@ -141,15 +150,18 @@ export function useUIKitProvider(
     contact: new ContactDomain(host, stores.contact),
     group: new GroupDomain(host, stores.group),
     presence: new PresenceDomain(host, stores.presence),
+    userInfo: new UserInfoDomain(host, stores.userInfo, options.dataSource || {}),
   }
 
   /** 创建 SDK 客户端并注册事件（首次或重新初始化） */
   function setupClient(cfg: ClientConfig): UIKitClient {
     disposeEvents?.()
+    disposeUserInfoDomain?.()
     uikitClient = createClient(cfg)
     currentAppKey = cfg.appKey
     stores.client.setAppKey(cfg.appKey)
     disposeEvents = registerEventHandlers(uikitClient, stores)
+    disposeUserInfoDomain = () => domains.userInfo.dispose()
     return uikitClient
   }
 
@@ -173,12 +185,15 @@ export function useUIKitProvider(
     if (uikitClient) {
       await uikitClient.logout()
     }
+    disposeUserInfoDomain?.()
+    disposeUserInfoDomain = null
     stores.client.clearClient()
     stores.conversation.clearConversationList()
     stores.message.clearMessages()
     stores.contact.clearContacts()
     stores.group.clearGroups()
     stores.presence.clear()
+    stores.userInfo.clearUserInfos()
   }
 
   const ctx: UIKitContext = {

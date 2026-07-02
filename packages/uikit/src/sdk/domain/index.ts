@@ -12,3 +12,6 @@ export type { GroupStoreLike } from './group-domain'
 
 export { PresenceDomain } from './presence-domain'
 export type { PresenceStoreLike } from './presence-domain'
+
+export { UserInfoDomain } from './user-info-domain'
+export type { UserInfoStore } from './user-info-domain'
