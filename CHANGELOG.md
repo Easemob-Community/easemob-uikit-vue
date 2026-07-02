@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.2 (2026-07-02)
+
+### 新增
+
+- `UIKitProvider` 新增 `enableUserInfo` 与 `enableUserInfoSubscription` props，业务可显式控制用户资料展示与陌生人资料变更订阅。
+  - `enableUserInfo`：是否启用自动拉取/展示用户资料（昵称/头像），默认 `true`。
+  - `enableUserInfoSubscription`：是否启用陌生人资料变更订阅，默认 `true`；服务端未开通时自动熔断并提示。
+- 用户资料订阅无权限或服务未开通时，UIKIT 现在会通过内置 Toast 提示用户：
+  - 中文："用户资料实时订阅未开通，陌生人资料变更不会自动更新，请联系管理员开通"。
+  - 英文："User profile real-time subscription is not enabled. Stranger profile changes will not update automatically. Please contact the admin."。
+  - 提示仅触发一次，避免刷屏。
+- 撤回消息失败时增加分类 Toast 提示：
+  - `message recall disabled` / 服务未开通：提示"消息撤回功能未开通，请联系管理员开通"。
+  - 超过可撤回时间：提示"已超过可撤回时间，无法撤回"。
+  - 其他失败：提示"撤回失败，请稍后重试"。
+  - 失败仍会通过 `recall-failed` 事件透传，业务层可继续自定义处理。
+
+### 文档
+
+- 为 `UIKitProvider` Storybook 补充用户资料订阅配置示例（开启 / 关闭订阅两种 Variant）。
+
 ## 1.1.1 (2026-07-02)
 
 ### 新增

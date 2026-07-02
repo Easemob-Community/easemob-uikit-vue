@@ -18,6 +18,7 @@ export class UserInfoDomain {
     private client: ManagerHost,
     private store: UserInfoStore,
     private dataSource: UIKitDataSource = {},
+    private onSubscriptionPermissionError?: () => void,
   ) {}
 
   /**
@@ -141,6 +142,7 @@ export class UserInfoDomain {
           '后续陌生人资料变更将不会实时推送，拉取到的资料仍可正常展示。',
           err,
         )
+        this.onSubscriptionPermissionError?.()
       }
       return
     }

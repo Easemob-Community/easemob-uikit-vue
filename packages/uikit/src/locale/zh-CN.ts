@@ -81,6 +81,9 @@ const messages: LocaleMessages = {
   'message.recalled': '撤回了一条消息',
   'message.reedit': '重新编辑',
   'message.recallExpired': '超过{duration}分钟，无法撤回',
+  'message.recall.failed': '撤回失败，请稍后重试',
+  'message.recall.disabled': '消息撤回功能未开通，请联系管理员开通',
+  'message.recall.timeLimit': '已超过可撤回时间，无法撤回',
   'message.copySuccess': '已复制',
   'message.copyFailed': '复制失败',
   'message.quote.prefix': '引用',
@@ -134,6 +137,7 @@ const messages: LocaleMessages = {
   'chat.info.deleteFriend': '删除好友',
   'chat.typing': '对方正在输入...',
   'conversation.atMe': '@',
+  'userInfo.subscriptionDisabled': '用户资料实时订阅未开通，陌生人资料变更不会自动更新，请联系管理员开通',
 }
 
 export default messages

@@ -173,6 +173,48 @@ const CustomToastDemo = {
       </UIKitProvider>
     </Variant>
 
+    <Variant title="User Info: enabled + subscription enabled">
+      <UIKitProvider
+        :auto-init="false"
+        enable-user-info
+        enable-user-info-subscription
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          用户资料与实时订阅已启用
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="User Info: subscription disabled">
+      <UIKitProvider
+        :auto-init="false"
+        enable-user-info
+        :enable-user-info-subscription="false"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: var(--uikit-bg-base);
+            color: var(--uikit-text-primary);
+          "
+        >
+          用户资料展示已启用，但陌生人资料变更订阅已关闭
+        </div>
+      </UIKitProvider>
+    </Variant>
+
     <Variant title="Built-in Toast">
       <UIKitProvider :auto-init="false">
         <div

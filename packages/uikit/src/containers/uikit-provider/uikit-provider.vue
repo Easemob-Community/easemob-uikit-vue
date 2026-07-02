@@ -57,6 +57,15 @@ export interface ProviderProps {
    * 是否启用群组体系（默认 true）
    */
   enableGroup?: boolean
+  /**
+   * 是否启用用户资料（昵称/头像等）展示与拉取（默认 true）
+   */
+  enableUserInfo?: boolean
+  /**
+   * 是否启用陌生人用户资料变更订阅（默认 true）。
+   * 若服务端未开通该能力，会提示用户开通并自动熔断后续订阅。
+   */
+  enableUserInfoSubscription?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
   /**
@@ -73,13 +82,16 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableBlocklist: false,
   enablePresence: false,
   enableGroup: true,
+  enableUserInfo: true,
+  enableUserInfoSubscription: true,
   contactFetchMode: 'page',
   enableToast: true,
 })
 
 const { setLocale } = useLocale()
 const themeStore = useThemeStore()
-const { state: toastState } = useToast()
+const { state: toastState, warning: showToastWarning } = useToast()
+const { t } = useLocale()
 
 const toastProps = computed(() => ({
   show: toastState.value.visible,
@@ -97,6 +109,8 @@ const features: UIKitFeatures = {
   enableBlocklist: props.enableBlocklist,
   enablePresence: props.enablePresence,
   enableGroup: props.enableGroup,
+  enableUserInfo: props.enableUserInfo,
+  enableUserInfoSubscription: props.enableUserInfoSubscription,
   contactFetchMode: props.contactFetchMode,
 }
 
@@ -111,6 +125,9 @@ const ctx = useUIKitProvider(config.value, {
   features,
   dataSource: dataSource.value,
   h5: props.h5,
+  onUserInfoSubscriptionPermissionError: props.enableToast
+    ? () => showToastWarning(t('userInfo.subscriptionDisabled'))
+    : undefined,
 })
 
 /**

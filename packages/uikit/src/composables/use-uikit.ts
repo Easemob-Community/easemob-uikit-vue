@@ -84,6 +84,10 @@ export function useUIKitProvider(
     features?: Partial<UIKitFeatures>
     dataSource?: Partial<UIKitDataSource>
     h5?: H5AdaptationConfig
+    /**
+     * 用户资料订阅无权限/服务未开通时的回调；UIKit 默认将其绑定到内置 Toast。
+     */
+    onUserInfoSubscriptionPermissionError?: () => void
   } = {},
 ) {
   const stores: RootStores = {
@@ -151,7 +155,12 @@ export function useUIKitProvider(
     contact: new ContactDomain(host, stores.contact),
     group: new GroupDomain(host, stores.group),
     presence: new PresenceDomain(host, stores.presence),
-    userInfo: new UserInfoDomain(host, stores.userInfo, options.dataSource || {}),
+    userInfo: new UserInfoDomain(
+      host,
+      stores.userInfo,
+      options.dataSource || {},
+      options.onUserInfoSubscriptionPermissionError,
+    ),
   }
 
   /** 创建 SDK 客户端并注册事件（首次或重新初始化） */

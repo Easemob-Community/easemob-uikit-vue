@@ -81,6 +81,9 @@ const messages: LocaleMessages = {
   'message.recalled': 'recalled a message',
   'message.reedit': 'Re-edit',
   'message.recallExpired': 'Cannot recall after {duration} minutes',
+  'message.recall.failed': 'Recall failed, please try again later',
+  'message.recall.disabled': 'Message recall is not enabled, please contact the admin',
+  'message.recall.timeLimit': 'Recall time limit exceeded',
   'message.copySuccess': 'Copied',
   'message.copyFailed': 'Copy failed',
   'message.quote.prefix': 'Reply to',
@@ -134,6 +137,7 @@ const messages: LocaleMessages = {
   'chat.info.deleteFriend': 'Delete Friend',
   'chat.typing': 'Typing...',
   'conversation.atMe': '@',
+  'userInfo.subscriptionDisabled': 'User profile real-time subscription is not enabled. Stranger profile changes will not update automatically. Please contact the admin.',
 }
 
 export default messages

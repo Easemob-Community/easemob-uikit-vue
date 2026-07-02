@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
 import { MESSAGE_STATUS } from '../constants'
 import type { TextMessageBody, UiMessage } from '../sdk/types'
+import { useLocale } from '../locale'
+import { useToast } from './use-toast'
 import { useUIKit } from './use-uikit'
 
 /** 多选状态（模块级单例，保证跨组件共享） */
@@ -9,6 +11,8 @@ const selectedMessageIds = ref<Set<string>>(new Set())
 
 export function useMessageActions() {
   const { domains, stores } = useUIKit()
+  const { t } = useLocale()
+  const toast = useToast()
   const conversationStore = stores.conversation
   const messageStore = stores.message
 
@@ -59,7 +63,14 @@ export function useMessageActions() {
     const cvs = conversationStore.currentConversation
     if (!cvs)
       return
-    await domains.message.recall(cvs.id, cvs.type, msgId)
+    try {
+      await domains.message.recall(cvs.id, cvs.type, msgId)
+    }
+    catch (error) {
+      const reason = extractErrorReason(error)
+      showRecallErrorToast(reason, t, toast)
+      throw error
+    }
   }
 
   /** 删除本地消息 */
@@ -165,4 +176,31 @@ function resolveTranslateLang(targetLang?: string): string {
   if (targetLang?.trim())
     return targetLang.trim()
   return 'en'
+}
+
+function extractErrorReason(error: unknown): string {
+  if (error instanceof Error)
+    return error.message
+  if (typeof error === 'string')
+    return error
+  if (error && typeof error === 'object' && 'reason' in error && typeof error.reason === 'string')
+    return error.reason
+  return String(error)
+}
+
+function showRecallErrorToast(
+  reason: string,
+  t: (key: string) => string,
+  toast: ReturnType<typeof useToast>,
+): void {
+  const lower = reason.toLowerCase()
+  if (lower.includes('recall disabled') || lower.includes('disabled')) {
+    toast.warning(t('message.recall.disabled'))
+    return
+  }
+  if (lower.includes('time limit') || lower.includes('expired') || lower.includes('timeout')) {
+    toast.warning(t('message.recall.timeLimit'))
+    return
+  }
+  toast.error(t('message.recall.failed'))
 }
