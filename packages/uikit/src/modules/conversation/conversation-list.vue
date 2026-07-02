@@ -58,12 +58,15 @@ const emit = defineEmits<{
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
-const { stores } = useUIKit()
+const { stores, h5 } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 
 /** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
 const isSyncing = computed(() => stores.conversation.isSyncingConversations)
+
+/** 实际是否启用下拉刷新：prop 优先，未显式开启时走 Provider H5 配置 */
+const effectivePullRefresh = computed(() => props.pullRefresh || h5.enablePullRefresh.value)
 
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
@@ -234,7 +237,7 @@ function confirmDelete() {
     </div>
     <div ref="itemsRef" class="conversation-list__items">
       <!-- 下拉刷新指示器（H5） -->
-      <div v-if="props.pullRefresh && isPullRefreshing" class="conversation-list__pull-refresh">
+      <div v-if="effectivePullRefresh && isPullRefreshing" class="conversation-list__pull-refresh">
         {{ t('conversation.pullRefresh') }}
       </div>
       <!-- body slot - 非 sticky 模式放在滚动容器内部 -->
@@ -319,7 +322,7 @@ function confirmDelete() {
 }
 
 .conversation-list__header {
-  padding: 12px 16px;
+  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -357,7 +360,7 @@ function confirmDelete() {
   justify-content: center;
   padding: 2px;
   border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .conversation-list__menu-trigger:hover {
@@ -455,7 +458,7 @@ function confirmDelete() {
 }
 
 .conversation-list__footer {
-  padding: 8px 16px;
+  padding: 8px 16px calc(8px + var(--uikit-safe-bottom, 0px));
 }
 
 .conversation-list__footer--sticky {

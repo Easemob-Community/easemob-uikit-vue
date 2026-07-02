@@ -172,6 +172,10 @@ function scrollToBottom() {
   })
 }
 
+defineExpose({
+  scrollToBottom,
+})
+
 /** 点击新消息提示 */
 function onNewMessageTipClick() {
   unreadNewCount.value = 0
@@ -671,7 +675,7 @@ watch(locateRequest, (req) => {
 /* 新消息提示 */
 .message-list__new-tip {
   position: absolute;
-  bottom: 16px;
+  bottom: calc(16px + var(--uikit-safe-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 16px;
@@ -685,8 +689,8 @@ watch(locateRequest, (req) => {
   gap: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition:
-    transform 0.2s,
-    opacity 0.2s;
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing),
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
   z-index: 10;
 }
 

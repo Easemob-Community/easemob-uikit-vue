@@ -139,7 +139,7 @@ onUnmounted(() => {
       class="uikit-scroll-to-top"
       :style="{
         right: `${props.right}px`,
-        bottom: `${props.bottom}px`,
+        bottom: `calc(${props.bottom}px + var(--uikit-safe-bottom, 0px))`,
         width: `${props.size}px`,
         height: `${props.size}px`,
       }"

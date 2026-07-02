@@ -3,6 +3,7 @@ import { computed, onMounted, watch } from 'vue'
 import type { UserInfo } from 'easemob-websdk'
 import {
   type ContactFetchMode,
+  type H5AdaptationConfig,
   type UIKitDataSource,
   type UIKitFeatures,
   useUIKitProvider,
@@ -27,6 +28,11 @@ export interface ProviderProps {
   }
   locale?: 'zh-CN' | 'en'
   animation?: AnimationConfig
+  /**
+   * H5 适配配置：安全区、键盘适配、下拉刷新等。
+   * 默认 safeArea=true, keyboardAdapt=true, pullRefresh='auto'。
+   */
+  h5?: H5AdaptationConfig
   /**
    * 是否启用好友体系（默认 false）
    */
@@ -89,6 +95,7 @@ const ctx = useUIKitProvider(config.value, {
   autoInit: props.autoInit,
   features,
   dataSource: dataSource.value,
+  h5: props.h5,
 })
 
 /**
@@ -158,6 +165,14 @@ onMounted(() => {
   }
   if (props.animation) {
     themeStore.applyAnimationConfig(props.animation)
+  }
+  // H5 安全区开关：关闭时把 env() 变量覆写为 0，避免组件仍读取到刘海高度
+  if (props.h5?.safeArea === false) {
+    const root = document.documentElement
+    root.style.setProperty('--uikit-safe-top', '0px')
+    root.style.setProperty('--uikit-safe-right', '0px')
+    root.style.setProperty('--uikit-safe-bottom', '0px')
+    root.style.setProperty('--uikit-safe-left', '0px')
   }
   setLocale(props.locale)
 })

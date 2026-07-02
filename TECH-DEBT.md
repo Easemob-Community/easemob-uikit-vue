@@ -20,7 +20,7 @@
 
 - **现象**：库的样式契约是「只用 `var(--uikit-*)` token」，但组件 `<style>` 里散落 **140 处 hex + 51 处 rgba** 字面量，还有 ~50 处硬编码 `transition` 时长绕过动画开关。
 - **证据（worst offenders）**：`modules/chat/multi-select-bar/multi-select-bar.vue`(16 hex)、`modules/chat/message-item/message-bubble-wrapper.vue`(10)、`components/input/input.vue`(10)、`modules/conversation/conversation-item.vue`(7)、`modules/chat/drawer/chat-info-drawer.vue`(7)、`components/avatar/avatar.vue`(6)、`components/button/button.vue`(5)。多处手抄 theme 值（`#e5e7eb`≈border ×20、`#f3f4f6`≈bg-secondary ×16、`#fff` ×28），还引入了不在色板里的 `#5f6df3/#3b82f6/#007aff/#155eef/#ef4444/#ff4d4f`。
-- **建议修法**：批量把颜色/圆角/时长替换为已存在的 `--uikit-*` token（缺 token 先加进 `src/theme/index.css`）；动效改用 `var(--uikit-anim-duration/easing)`。可分模块逐个清。
+- **建议修法**：批量把颜色/圆角/时长替换为已存在的 `--uikit-*` token（缺 token 先加进 `src/theme/index.css`）；动效改用 `var(--uikit-anim-duration/easing)`。可分模块逐个清。**2026-07 H5 适配专项已顺手修复 message-input emoji sheet 等 H5 高频路径的硬编码时长，全局 140+ hex 仍需继续清理。**
 - **关联 skill**：`uikit-styling-theming`
 
 ### [ ] D4. 组件引用了「未定义」的 `--uikit-*` 变量，永远走 fallback 且 fallback 互相不一致
@@ -58,11 +58,12 @@
 
 ## P2 · 局部 / 低风险
 
-### [ ] D8. 两套长按实现并存（自写 vs vueuse）
+### [x] D8. 两套长按实现并存（自写 vs vueuse）
 
 - **现象**：`composables/use-long-press.ts` 是自写 `setTimeout` 实现，`modules/conversation/conversation-item.vue` 又直接用 vueuse 的 `onLongPress`，功能重复。
-- **建议修法**：统一到一处（建议保留封装的 `useLongPress`，内部改用 vueuse `onLongPress`，或反之删掉自写版全用 vueuse）。
-- **关联 skill**：`uikit-store-composable`（vueuse 使用约束一节）
+- **修复**：2026-07 H5 适配专项中统一为 `useLongPress`，内部改用 vueuse `onLongPress`，并增加 touchmove 阈值（超过阈值取消长按）与长按时临时禁止 body 滚动，解决 H5 长按与页面滚动冲突。
+- **关联 skill**：`uikit-store-composable` / `uikit-h5-adaptation`
+- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 通过。
 
 ### [ ] D9. i18n：一处硬编码中文漏翻 + `t()` 无插值
 
@@ -86,7 +87,7 @@
 ### [ ] D12. 动效未接入变量的比例偏高
 
 - **现象**：主题里有完整 `--uikit-anim-*` 体系（含 subtle/expressive/关闭/reduced-motion 开关），但组件里约 50 处 `transition` 用字面时长/缓动，绕过开关（只有 ~8 处 duration + ~12 处 easing 真正用了变量）。
-- **建议修法**：过渡统一改用 `var(--uikit-anim-duration/easing)`，让全局动画开关真正生效。可与 D3 一起清。
+- **建议修法**：过渡统一改用 `var(--uikit-anim-duration/easing)`，让全局动画开关真正生效。可与 D3 一起清。**2026-07 H5 适配专项已修复 message-input 等 H5 路径的硬编码 transition，剩余 ~50 处仍需继续清理。**
 - **关联 skill**：`uikit-styling-theming`
 
 ---
@@ -102,3 +103,21 @@
   - 已于 <待填 commit> 修复。
   - 改动：`packages/uikit/vite.config.ts` 的 `rollupOptions.external` 与 `output.globals` 中 `im-sdk-web` → `easemob-websdk`。
   - 验证：构建产物 `dist/easemob-uikit.js` 以 `import { ChatClient as H2, ... } from "easemob-websdk"` 引入 SDK；UMD 产物以 `require("easemob-websdk")` 引入；SDK 不再内联到 UIKit 包中。
+
+- [x] **D8. 统一长按实现并修复 H5 长按与滚动冲突**
+  - 已于 2026-07 H5 适配专项修复。
+  - 改动：`composables/use-long-press.ts` 改用 vueuse `onLongPress`，增加 touchmove 阈值与长按时 `document.body.style.overflow='hidden'` 滚动抑制；`modules/conversation/conversation-item.vue`、`modules/chat/message-item/message-interactive.vue` 统一改用 `useLongPress`。
+  - 验证：类型检查 + 构建 + demo 类型检查通过。
+
+- [x] **H5 适配核心能力落地（2026-07 专项）**
+  - 已于 <待填 commit> 修复。
+  - 改动：
+    - 新增 `packages/uikit/src/composables/use-h5-adaptation.ts`，集中管理 viewport/安全区/键盘高度/下拉刷新/字号缩放预留；
+    - `theme/index.css` 新增 `--uikit-safe-*` 与 `--uikit-font-scale`；
+    - `use-uikit.ts` 的 `UIKitContext` 注入 `h5` 单一实例；`use-viewport.ts` 优先从 context 读取；
+    - `uikit-provider.vue` 新增 `h5?: H5AdaptationConfig` prop，`safeArea=false` 时覆写 CSS 变量为 `0px`；
+    - 安全区接入：`chat-container`、`chat` header、`address-book-container` header/footer、`popup` bottom、`scroll-to-top`、`message-input` emoji sheet、`conversation-list` header/footer；
+    - 键盘适配：`chat.vue` 读取 `h5.keyboardHeight` 传给 `MessageInput`，输入框 focus 触发 `message-list.scrollToBottom()`；
+    - 动画修复：`message-input` emoji sheet 改用 `uikit-slide-up` Vue Transition，多处硬编码 `0.15s/0.2s` transition 改接 `--uikit-anim-*`；
+    - 导出更新：`composables/index.ts`、`auto-imports.ts` 加入 `useH5Adaptation`。
+  - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。

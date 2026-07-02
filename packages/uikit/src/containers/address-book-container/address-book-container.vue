@@ -417,7 +417,7 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__header {
-  padding: 12px 16px;
+  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -452,7 +452,7 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__home-footer {
-  padding: 12px 16px;
+  padding: 12px 16px calc(12px + var(--uikit-safe-bottom, 0px));
   flex-shrink: 0;
 }
 
@@ -463,7 +463,7 @@ const subviewTitle = computed(() => {
 
 .address-book-container__subheader {
   position: relative;
-  padding: 12px 48px;
+  padding: calc(12px + var(--uikit-safe-top, 0px)) 48px 12px;
   display: flex;
   align-items: center;
   justify-content: center;

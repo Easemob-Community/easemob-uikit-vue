@@ -165,9 +165,10 @@ Actions`（`use-message.ts` 里 `const history = useMessageHistory()` 再转发�
   统一命名空间与清理（如 `useUIKitStorage` 的 `easemob_uikit_{hash}_{suffix}` key）。
 - **高阶 API**（`onClickOutside` / `useInfiniteScroll` / `useClipboard` / `useScroll` 等）→
   **可组件内直用**，无需为其再包一层。
-- **禁止重造 vueuse 已有能力**。当前反例：`composables/use-long-press.ts` 自写 `setTimeout`，
-  而 `modules/conversation/conversation-item.vue` 直用 vueuse `onLongPress`，两套并存 → `TECH-DEBT.md` **D8**。
-  新代码一律用 vueuse，勿再自写。
+- **禁止重造 vueuse 已有能力**。`use-long-press.ts` 已统一封装并在内部使用 vueuse `onLongPress`，
+  同时增加了 touchmove 阈值与长按时滚动抑制；组件内统一调用 `useLongPress`，不要再自写或混用 vueuse `onLongPress`。
+- H5/移动端状态（viewport / 键盘 / 安全区 / 下拉刷新）统一走 `useUIKit().h5`，
+  由 `useH5Adaptation()` 集中管理；禁止组件自行监听 `resize/visualViewport/keyboard`。
 
 ## 硬规则 vs 软约定
 
@@ -175,6 +176,7 @@ Actions`（`use-message.ts` 里 `const history = useMessageHistory()` 再转发�
 - setup-store 形态 + 单个扁平 return；数据 store 必带全量 `clearXxx()` reset。
 - Domain 只依赖 `*StoreLike` + 构造注入，域内**绝不** `useXxxStore()`。
 - feature composable 只经 `useUIKit().stores` 取 store（**theme 例外**）；暴露状态用 `computed` 包裹。
+- H5/移动端相关状态只经 `useUIKit().h5` 获取，禁止组件自行监听窗口/键盘/触摸事件。
 - 不重造 vueuse 已有能力；底层原语封装、高阶 API 直用。
 
 **软约定（建议对齐，历史不一致可暂留并记债）：**
@@ -194,6 +196,7 @@ Actions`（`use-message.ts` 里 `const history = useMessageHistory()` 再转发�
 - ❌ feature composable 直接 `return` 裸 store ref（丢响应式/只读约束，必须 `computed` 包裹）。
 - ❌ 绕过 `useUIKit()` 直接 `useXxxStore()` 取状态（**theme 除外**）。
 - ❌ 自己实现 vueuse 已有的能力（如再写一版长按 / 事件监听 / storage）。
+- ❌ 在组件里自行监听 `resize` / `visualViewport` / `keyboard` 算 H5 状态——统一走 `useUIKit().h5`。
 - ❌ 把 `loaded + explicitCount` 当成所有 store 的铁律去硬套（只有 contact/group 需要）。
 - ❌ 数据 store 漏掉全量 `clearXxx()` reset，导致登出后状态残留。
 - ❌ store return 拆成多个对象或裸导出 ref，破坏「单个扁平 return」形态。

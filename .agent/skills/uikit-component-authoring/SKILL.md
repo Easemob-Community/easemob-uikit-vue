@@ -164,6 +164,8 @@ app.component(finalName, value as Component)
   （`.conversation-item`）。这是 tier 习惯，非强制。
 - **三层职责**：components 纯展示原子；modules 持交互逻辑；containers 薄——包一个 module，
   把通用事件翻成域事件（如 `@select` → `emit('conversation-select', …)`），并从 composable 取状态。
+- **H5 适配**：需要安全区/键盘/移动态的组件，优先从 `useUIKit().h5` 读取，不要新增独立 props；
+  安全区通过 `var(--uikit-safe-*, 0px)` 变量处理，禁止组件内直接写 `env(safe-area-inset-*)`。
 - **结构歧义**：`modules/chat/message-input.vue` 与 `modules/chat/message-input/` 目录并存，命名易混，
   新增别踩这坑，见 `TECH-DEBT.md` **D11**。
 - **打包契约提醒**：`packages/uikit/vite.config.ts` 的 external 里 `im-sdk-web` 是**过时名**
@@ -179,3 +181,4 @@ app.component(finalName, value as Component)
 - ❌ 组件名不以 `Em` 开头 —— 不会被解析也不会被全局注册。
 - ❌ 调用方/内部从深层文件直接 `import` 组件 `.vue`，绕开 `Em*` 命名导出 / resolver。
 - ❌ 漏 `<style scoped>`，或样式里写死颜色/时长而非 `var(--uikit-*)`（详见 `uikit-styling-theming`）。
+- ❌ 组件里直接 `env(safe-area-inset-*)` 或自行监听 `resize/visualViewport` 处理 H5 适配。

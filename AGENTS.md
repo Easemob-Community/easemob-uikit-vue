@@ -32,13 +32,14 @@
 | `uikit-store-composable` | 加/改 Pinia store、composable、状态管理、vueuse 用法 | `加 store`、`写 composable`、`加 hook`、`状态管理`、`用 vueuse` | [.agent/skills/uikit-store-composable/SKILL.md](.agent/skills/uikit-store-composable/SKILL.md) |
 | `uikit-i18n-locale` | 加/改文案、多语言、翻译 key | `加文案`、`多语言`、`i18n`、`翻译`、`locale` | [.agent/skills/uikit-i18n-locale/SKILL.md](.agent/skills/uikit-i18n-locale/SKILL.md) |
 | `uikit-tiptap-editor` | 改消息输入框、富文本、@提及、编辑器行为 | `改输入框`、`富文本`、`@提及`、`tiptap`、`编辑器` | [.agent/skills/uikit-tiptap-editor/SKILL.md](.agent/skills/uikit-tiptap-editor/SKILL.md) |
+| `uikit-h5-adaptation` | H5/移动端适配：安全区、键盘、下拉刷新、长按、viewport | `H5 适配`、`安全区`、`键盘`、`下拉刷新`、`长按`、`viewport` | [.agent/skills/uikit-h5-adaptation/SKILL.md](.agent/skills/uikit-h5-adaptation/SKILL.md) |
 | `websdk2-uikit-migration` | SDK 层（sdk/domain/adapter/event）架构与迁移 | `迁移 SDK`、`重写 uikit sdk`、`domain 层`、`websdk2 最佳实践` | [.agent/skills/websdk2-uikit-migration/SKILL.md](.agent/skills/websdk2-uikit-migration/SKILL.md) |
 | `uikit-lint-governance` | 处理 eslint、lint 治理、非代码改动层决策、收尾提交 | `跑 lint`、`清 lint`、`改 eslint 配置`、`提交前检查` | [.agent/skills/uikit-lint-governance/SKILL.md](.agent/skills/uikit-lint-governance/SKILL.md) |
 
 路由规则：
 
 - 先按触发词匹配对应 skill；命中任意 `.agent/skills/*` 后，先用一句短话显式提示命中的 skill 名，例如：`本次命中 skill: uikit-styling-theming`。
-- 多个命中时按「先理解层（component/store/styling/i18n/tiptap 对应域）→ SDK 层（migration）→ 收尾（lint-governance）」组合。
+- 多个命中时按「先理解层（component/store/styling/i18n/tiptap/h5 对应域）→ SDK 层（migration）→ 收尾（lint-governance）」组合。
 - 涉及具体待修问题时，先查根 `TECH-DEBT.md` 是否已登记，避免重复排查。
 
 ## 上下文入口

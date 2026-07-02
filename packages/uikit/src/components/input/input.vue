@@ -135,7 +135,8 @@ defineExpose({
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .uikit-input__field--square {

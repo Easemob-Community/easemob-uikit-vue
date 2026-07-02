@@ -18,8 +18,10 @@ import { useClientStore } from '../store/client'
 import { useThemeStore } from '../store/theme'
 import type { RootStores } from '../sdk/event/types'
 import type { UIKitDataSource, UIKitFeatures } from './types'
+import { useH5Adaptation, type H5AdaptationConfig } from './use-h5-adaptation'
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from './types'
+export type { H5AdaptationConfig } from './use-h5-adaptation'
 
 /** UIKit 登录参数：支持 accessToken 或密码登录 */
 export interface UIKitLoginParams {
@@ -40,6 +42,8 @@ export interface UIKitContext {
   stores: RootStores
   features: UIKitFeatures
   dataSource: UIKitDataSource
+  /** H5 适配状态（viewport / 安全区 / 键盘高度 / 下拉刷新开关） */
+  h5: ReturnType<typeof useH5Adaptation>
   /** 主题 store（provider 与消费方共享同一实例） */
   theme: ReturnType<typeof useThemeStore>
   /** 手动初始化 SDK 客户端（延迟初始化场景，auto-init=false 时使用） */
@@ -74,6 +78,7 @@ export function useUIKitProvider(
     autoInit?: boolean
     features?: Partial<UIKitFeatures>
     dataSource?: Partial<UIKitDataSource>
+    h5?: H5AdaptationConfig
   } = {},
 ) {
   const stores: RootStores = {
@@ -84,6 +89,9 @@ export function useUIKitProvider(
     presence: usePresenceStore(),
     client: useClientStore(),
   }
+
+  // H5 适配状态：单一实例注入 context，避免各组件重复监听
+  const h5 = useH5Adaptation(options.h5 ?? {})
 
   // 真实 SDK 客户端懒加载：auto-init=false 时在 init() 调用后才创建
   let uikitClient: UIKitClient | null = null
@@ -179,6 +187,7 @@ export function useUIKitProvider(
     stores,
     features: { ...defaultFeatures, ...options.features },
     dataSource: options.dataSource || {},
+    h5,
     theme: useThemeStore(),
     init,
     login,

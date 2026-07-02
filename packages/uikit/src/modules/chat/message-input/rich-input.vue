@@ -25,6 +25,7 @@ const emit = defineEmits<{
   (e: 'voice-end'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
+  (e: 'focus'): void
 }>()
 
 const { t } = useLocale()
@@ -84,6 +85,7 @@ const editor = useEditor({
     }
   },
   onUpdate: ({ editor: e }) => updateHasContent(e),
+  onFocus: () => emit('focus'),
   editorProps: {
     attributes: {
       class: 'rich-input__editor-content',
@@ -410,7 +412,8 @@ onBeforeUnmount(() => {
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
@@ -431,7 +434,7 @@ onBeforeUnmount(() => {
   border: 1px solid #e5e7eb;
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base);
-  transition: border-color 0.2s;
+  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .rich-input__editor-wrapper:focus-within {

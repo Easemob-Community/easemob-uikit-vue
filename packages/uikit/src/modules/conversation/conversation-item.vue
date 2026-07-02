@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { onLongPress } from '@vueuse/core'
+import { useLongPress } from '../../composables/use-long-press'
 import Avatar from '../../components/avatar/avatar.vue'
 import Badge from '../../components/badge/badge.vue'
 import Icon from '../../components/icon/icon.vue'
@@ -47,20 +47,16 @@ const { isMobile } = useViewport()
 
 const itemRef = ref<HTMLElement>()
 
-/** H5 长按 ActionSheet - VueUse onLongPress */
+/** H5 长按 ActionSheet */
 const showActionSheet = ref(false)
 const preventClick = ref(false)
 
-onLongPress(
-  itemRef,
-  () => {
-    if (!isMobile.value)
-      return
-    preventClick.value = true
-    showActionSheet.value = true
-  },
-  { delay: 600 },
-)
+const longPress = useLongPress(() => {
+  if (!isMobile.value)
+    return
+  preventClick.value = true
+  showActionSheet.value = true
+})
 
 /** PC 右键菜单 - 使用 Popup 锚定模式 */
 const showContextMenu = ref(false)
@@ -241,6 +237,10 @@ const displayMessage = computed(() => {
     :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': props.hasAtMe }]"
     @click="onClick"
     @contextmenu="onContextMenu"
+    @touchstart="longPress.start"
+    @touchmove="longPress.move"
+    @touchend="longPress.end"
+    @touchcancel="longPress.cancel"
   >
     <Avatar :name="props.conversation.name" :src="props.conversation.avatar" :size="48" />
     <slot name="item-prefix" />

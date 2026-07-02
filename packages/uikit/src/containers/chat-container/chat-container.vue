@@ -85,5 +85,6 @@ defineExpose({
   flex-direction: column;
   height: 100%;
   background-color: var(--uikit-bg-base);
+  padding-bottom: var(--uikit-safe-bottom, 0px);
 }
 </style>

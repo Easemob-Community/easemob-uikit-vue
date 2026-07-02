@@ -8,6 +8,7 @@ export const EasemobUIKitImports = {
     'useGroup',
     'useClient',
     'useTheme',
+    'useH5Adaptation',
     'useKeyboard',
     'useLongPress',
     'useViewport',

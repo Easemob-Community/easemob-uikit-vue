@@ -84,6 +84,8 @@
 - **动画**：`--uikit-anim-enabled` / `-duration`(`/-enter/-leave`) / `-easing`(`/-decel/-accel/-spring`) /
   `-scale-press` / `-scale-enter` / `-anchor-scale-enter` / `-anchor-origin-x` / `-y` /
   `-ripple-opacity` / `-ripple-duration` / `-overlay-duration` / `-stagger-delay`
+- **H5 安全区（2026-07 新增）**：`--uikit-safe-top` / `--uikit-safe-right` / `--uikit-safe-bottom` / `--uikit-safe-left`；由 `UIKitProvider :h5` 控制开关，`safeArea=false` 时运行时被覆写为 `0px`。
+- **H5 字号缩放（P2 预留）**：`--uikit-font-scale`（当前默认 `1`，供后续全局字号缩放使用）。
 
 暗色与动画分级都是**属性选择器覆盖，不是纯 media query**：
 
@@ -107,6 +109,7 @@
 
 - 组件 `<style>` 里**禁止硬编码颜色 / 圆角 / 动效时长**；一切可视值引用已存在的 `--uikit-*` token。
 - token 缺了**先加进 `src/theme/index.css`**，且**必须同时补 `[data-uikit-theme="dark"]` 的暗色值**（只改 `:root` = 暗色下必出错）。
+- H5 安全区**禁止直接写 `env(safe-area-inset-*)`**，统一通过 `--uikit-safe-*` 变量传递；需要开关时由 `UIKitProvider :h5` 覆写变量，组件不感知开关逻辑。
 - 过渡 / 动画统一用 `var(--uikit-anim-duration / -easing)`（及 `-enter/-leave/-decel/-accel`），让全局动画开关和 reduced-motion 真正生效。
 - 只在 `var(--uikit-x, fallback)` 的 fallback 位置允许出现字面量 hex / 时长，且 fallback 要和 `:root` 默认值一致。
 - 可作为 lint 守卫方向：禁止 `packages/uikit/src/**/*.vue` 的 `<style>` 出现裸 hex / 裸 `rgba()` / 裸 `Ns|Nms` 时长（fallback 参数除外）。
@@ -129,4 +132,5 @@
 - ❌ 现编 `--uikit-xxx` 变量名却不加进 `src/theme/index.css`——永远只渲染 fallback，等于没换肤。
 - ❌ 只改 `:root` 忘了 `[data-uikit-theme="dark"]`——暗色下颜色 / 对比度必出问题。
 - ❌ 直接 `document.documentElement.style.setProperty(...)` 改主题，绕开 `use-theme` / store。
+- ❌ 组件里直接 `env(safe-area-inset-top)` 或自己监听 `resize/visualViewport`——H5 适配走 `UIKitProvider :h5`。
 - ❌ 用普通 `<style>` 写组件样式泄漏全局（全局 / 穿透样式才用非 scoped 块，且要克制）。

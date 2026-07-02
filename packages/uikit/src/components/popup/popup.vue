@@ -293,6 +293,7 @@ onUnmounted(() => {
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
   max-height: 80vh;
+  padding-bottom: var(--uikit-safe-bottom, 0px);
 }
 
 .uikit-popup__content--top {

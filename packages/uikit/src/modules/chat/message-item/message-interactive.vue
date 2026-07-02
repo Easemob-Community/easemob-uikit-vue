@@ -210,6 +210,7 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
     :class="{ 'message-interactive--active': isActive }"
     @contextmenu="onContextMenu"
     @touchstart="longPress.start"
+    @touchmove="longPress.move"
     @touchend="longPress.end"
     @touchcancel="longPress.cancel"
   >

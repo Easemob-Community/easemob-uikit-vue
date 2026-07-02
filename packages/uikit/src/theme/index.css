@@ -10,6 +10,12 @@
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
 
+  /* 安全区（H5 适配）：env() 在非刘海设备上返回 0px，不影响 PC */
+  --uikit-safe-top: env(safe-area-inset-top);
+  --uikit-safe-right: env(safe-area-inset-right);
+  --uikit-safe-bottom: env(safe-area-inset-bottom);
+  --uikit-safe-left: env(safe-area-inset-left);
+
   /* 边框与分隔线 */
   --uikit-border-color: #e5e7eb;
   --uikit-border-light: #f3f4f6;
@@ -73,6 +79,9 @@
 
   /* 交错动画间隔（Action-Sheet 项列） */
   --uikit-anim-stagger-delay: 30ms;
+
+  /* 字体缩放预留：当前不生效，为 P2 H5 字号适配预留接口 */
+  --uikit-font-scale: 1;
 }
 
 [data-uikit-theme="dark"] {

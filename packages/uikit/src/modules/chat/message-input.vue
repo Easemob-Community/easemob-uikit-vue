@@ -19,10 +19,14 @@ export interface MessageInputProps {
   config?: ChatConfig
   /** 当前是否为群聊 */
   isGroup?: boolean
+  /** 键盘高度（H5 适配用） */
+  keyboardHeight?: number
 }
 
 export interface MessageInputEmits {
   (e: 'send-success'): void
+  /** 输入框聚焦时触发（H5 键盘弹起后需滚动消息列表） */
+  (e: 'focus'): void
 }
 
 const props = defineProps<MessageInputProps>()
@@ -471,7 +475,11 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="messageInputRef" class="message-input">
+  <div
+    ref="messageInputRef"
+    class="message-input"
+    :style="{ paddingBottom: `${props.keyboardHeight || 0}px` }"
+  >
     <!-- 编辑条：优先于引用条 -->
     <EditingBar
       v-if="editingMessage"
@@ -501,6 +509,7 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @typing="sendTypingCmd"
+      @focus="emit('focus')"
     />
 
     <!-- 富文本输入框 -->
@@ -514,6 +523,7 @@ defineExpose({
       @emoji-click="onEmojiClick"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @focus="emit('focus')"
     />
 
     <!-- PC 端 Emoji Popup -->
@@ -541,15 +551,17 @@ defineExpose({
       class="message-input__emoji-sheet"
     >
       <div class="message-input__emoji-sheet-mask" @click="showEmojiPicker = false" />
-      <div class="message-input__emoji-sheet-content">
-        <div class="emoji-picker-wrapper">
-          <EmojiPicker
-            :show="true"
-            @select="onEmojiSelect"
-            @update:show="showEmojiPicker = $event"
-          />
+      <Transition name="uikit-slide-up">
+        <div v-show="showEmojiPicker" class="message-input__emoji-sheet-content">
+          <div class="emoji-picker-wrapper">
+            <EmojiPicker
+              :show="true"
+              @select="onEmojiSelect"
+              @update:show="showEmojiPicker = $event"
+            />
+          </div>
         </div>
-      </div>
+      </Transition>
     </div>
 
     <!-- @提及选择器 -->
@@ -604,16 +616,6 @@ defineExpose({
   position: relative;
   background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 16px) var(--uikit-components-radius, 16px) 0 0;
-  padding: 12px;
-  animation: slide-up 0.2s ease-out;
-}
-
-@keyframes slide-up {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+  padding: 12px 12px calc(12px + var(--uikit-safe-bottom, 0px)) 12px;
 }
 </style>

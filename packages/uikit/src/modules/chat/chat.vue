@@ -46,6 +46,9 @@ const emit = defineEmits<ChatEmits>()
 /** 输入框组件引用 */
 const messageInputRef = ref<InstanceType<typeof MessageInput>>()
 
+/** 消息列表组件引用 */
+const messageListRef = ref<InstanceType<typeof MessageList>>()
+
 /** 暴露输入框操作方法 */
 defineExpose({
   setText: (text: string) => messageInputRef.value?.setText?.(text),
@@ -53,7 +56,7 @@ defineExpose({
 })
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
-const { stores } = useUIKit()
+const { stores, h5 } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft } = useConversation()
 const { clearQuote, requestLocate } = useQuote()
 
@@ -496,7 +499,7 @@ function onMultiSelectDelete(messages: UiMessage[]) {
       />
 
       <!-- 消息列表 -->
-      <MessageList :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
+      <MessageList ref="messageListRef" :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
 
       <!-- 输入状态提示 -->
       <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
@@ -520,7 +523,9 @@ function onMultiSelectDelete(messages: UiMessage[]) {
         ref="messageInputRef"
         :config="props.config"
         :is-group="isGroupChat"
+        :keyboard-height="h5.keyboardHeight.value"
         @send-success="handleSendSuccess"
+        @focus="messageListRef?.scrollToBottom()"
       />
 
       <!-- 聊天信息抽屉 -->
@@ -621,7 +626,7 @@ function onMultiSelectDelete(messages: UiMessage[]) {
 .chat__header {
   position: relative;
   z-index: 101;
-  padding: 12px 16px;
+  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
   display: flex;
   align-items: center;
   min-height: 48px;

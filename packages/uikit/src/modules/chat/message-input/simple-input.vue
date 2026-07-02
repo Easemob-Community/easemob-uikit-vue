@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
   (e: 'typing'): void
+  (e: 'focus'): void
 }>()
 
 const { t } = useLocale()
@@ -373,6 +374,7 @@ defineExpose({
           class="simple-input__field"
           @submit="handleSend"
           @input="onInput"
+          @focus="emit('focus')"
         />
         <textarea
           v-else
@@ -384,6 +386,7 @@ defineExpose({
           rows="3"
           @keydown="onKeydown"
           @input="onInput"
+          @focus="emit('focus')"
         />
       </template>
 
@@ -474,7 +477,8 @@ defineExpose({
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
@@ -505,7 +509,7 @@ defineExpose({
   resize: none;
   font-family: inherit;
   line-height: 1.5;
-  transition: border-color 0.2s;
+  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .simple-input__textarea:focus {
