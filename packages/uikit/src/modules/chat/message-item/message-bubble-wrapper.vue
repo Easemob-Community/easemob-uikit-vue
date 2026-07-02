@@ -9,6 +9,7 @@ import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
 import { useQuote } from '../../../composables/use-quote'
+import { useUserInfo } from '../../../composables/use-user-info'
 import CombineMessageModal from './combine-message-modal.vue'
 import MessageInteractive from './message-interactive.vue'
 import MessageRenderer from './message-renderer.vue'
@@ -70,12 +71,14 @@ function onViewCombine(message: UiMessage) {
 
 const { t } = useLocale()
 
+const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
+
 /** 是否为已撤回消息 */
 const isRecalled = computed(() => props.message.recalled)
 
 /** 撤回提示文案 */
 const recalledText = computed(() => {
-  const from = props.message.from || ''
+  const from = displayName.value || props.message.from || ''
   return `${from} ${t('message.recalled') ?? '撤回了一条消息'}`
 })
 
@@ -228,7 +231,7 @@ const isHighlighted = computed(() => {
         <!-- 头像区域 -->
         <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
           <slot name="avatar" :message="message">
-            <Avatar :name="message.from" :size="avatarSize" />
+            <Avatar :name="displayName" :src="avatarUrl" :size="avatarSize" />
           </slot>
         </div>
 
@@ -237,7 +240,7 @@ const isHighlighted = computed(() => {
           <!-- 昵称 -->
           <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
             <slot name="nickname" :message="message">
-              {{ message.from }}
+              {{ displayName }}
             </slot>
           </div>
 

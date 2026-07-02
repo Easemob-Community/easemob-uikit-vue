@@ -8,6 +8,7 @@ import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
+import { useUserInfo } from '../../composables/use-user-info'
 import type { UiConversation as Conversation } from '../../sdk/types'
 import type { ConversationAction } from './types'
 
@@ -44,6 +45,13 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 const { isMobile } = useViewport()
+
+const isSingleChat = computed(() => props.conversation.type === 'singleChat')
+const peerUserId = computed(() => isSingleChat.value ? props.conversation.id : undefined)
+const { displayName, avatarUrl } = useUserInfo(peerUserId)
+
+const conversationName = computed(() => displayName.value || props.conversation.name)
+const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
 
 const itemRef = ref<HTMLElement>()
 
@@ -242,13 +250,13 @@ const displayMessage = computed(() => {
     @touchend="longPress.end"
     @touchcancel="longPress.cancel"
   >
-    <Avatar :name="props.conversation.name" :src="props.conversation.avatar" :size="48" />
+    <Avatar :name="conversationName" :src="conversationAvatar" :size="48" />
     <slot name="item-prefix" />
     <div class="conversation-item__info">
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
           <span class="conversation-item__name" :class="{ 'is-at-me': props.hasAtMe }">
-            {{ props.hasAtMe ? `[${t('conversation.atMe') || '@'}] ` : '' }}{{ props.conversation.name }}
+            {{ props.hasAtMe ? `[${t('conversation.atMe') || '@'}] ` : '' }}{{ conversationName }}
           </span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />

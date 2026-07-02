@@ -1,4 +1,5 @@
 import type { UiContact, UiGroup, UiPresence } from '../sdk/types'
+import type { UserInfo } from 'easemob-websdk'
 
 /**
  * 业务可插拔的数据源适配器。
@@ -12,6 +13,8 @@ export interface UIKitDataSource {
   fetchPresence?: (userIds: string[]) => Promise<UiPresence[]>
   subscribePresence?: (userIds: string[]) => Promise<void> | void
   unsubscribePresence?: (userIds: string[]) => Promise<void> | void
+  /** 业务自定义用户资料源；返回数组至少包含 userId，可选 nickname/avatarUrl 等 */
+  fetchUserInfos?: (userIds: string[]) => Promise<Array<Pick<UserInfo, 'userId' | 'nickname' | 'avatarUrl' | 'sign' | 'ext'>>>
 }
 
 /** 联系人拉取模式 */
@@ -24,4 +27,6 @@ export interface UIKitFeatures {
   enablePresence: boolean
   contactFetchMode: ContactFetchMode
   enableGroup: boolean
+  /** 是否启用自动拉取/展示用户资料（昵称/头像），默认 true */
+  enableUserInfo?: boolean
 }
