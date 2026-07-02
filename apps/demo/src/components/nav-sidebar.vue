@@ -8,7 +8,7 @@
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
 import { computed } from 'vue'
-import { EmIcon, EmAvatar, EmBadge, useTheme, useClient, useConversationStore } from '@easemob/uikit'
+import { EmIcon, EmAvatar, EmBadge, useTheme, useClient, useConversationStore, useOwnUserInfo } from '@easemob/uikit'
 
 interface Props {
   /** 当前激活 tab key */
@@ -23,6 +23,7 @@ const emit = defineEmits<{
 
 const { mode, isDark, setMode } = useTheme()
 const { currentUser } = useClient()
+const { avatarUrl, displayName } = useOwnUserInfo()
 const conversationStore = useConversationStore()
 
 /** 全部未读数聚合（忽略静音会话） */
@@ -52,7 +53,7 @@ function toggleMode() {
   <aside class="nav-sidebar">
     <!-- 顶部：当前用户头像 -->
     <div class="nav-sidebar__top">
-      <EmAvatar :name="currentUser || 'Guest'" :size="40" />
+      <EmAvatar :src="avatarUrl" :name="displayName || currentUser || 'Guest'" :size="40" />
     </div>
 
     <!-- 主体：业务 tab -->
