@@ -1,4 +1,4 @@
-import type { SdkGroupSource, UiGroup } from '../types'
+import type { GroupMemberEntry, SdkGroupSource, UiGroup, UiGroupMember } from '../types'
 
 /**
  * 将 SDK 群组摘要/详情转换为 UIKit 群组展示类型。
@@ -46,4 +46,21 @@ export function toUiGroup(source: SdkGroupSource): UiGroup {
 /** 批量转换 SDK 群组 */
 export function toUiGroups(sources: readonly SdkGroupSource[]): UiGroup[] {
   return sources.map(source => toUiGroup(source))
+}
+
+/** 将 SDK 群成员条目转换为 UIKit 群成员展示类型 */
+export function toUiGroupMember(source: GroupMemberEntry): UiGroupMember {
+  const user = source.user
+  return {
+    userId: user.userId,
+    nickname: user.nickname,
+    avatarUrl: user.avatarUrl,
+    role: source.role,
+    joinedAt: source.joinedAt,
+  }
+}
+
+/** 批量转换 SDK 群成员 */
+export function toUiGroupMembers(sources: readonly GroupMemberEntry[]): UiGroupMember[] {
+  return sources.map(source => toUiGroupMember(source))
 }

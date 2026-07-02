@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.3 (2026-07-03)
+
+### 新增
+
+- 群信息抽屉（`ChatInfoDrawer`）从 mock 数据升级为真实群信息入口：
+  - 展示群名称、头像、描述、公告、成员数。
+  - 拉取并展示群成员列表（首页），区分群主/管理员/普通成员角色。
+  - 提供「清空聊天记录」「退出群聊」「解散群聊（仅群主）」操作，并带二次确认弹窗。
+  - 预留「查看全部成员」「添加成员」事件入口，下一期可接入群成员管理。
+- `GroupDomain` / `useGroup` 新增群成员、群公告、转让群主、移除成员、邀请入群能力：
+  - `fetchGroupMembers` / `fetchGroupAnnouncement` / `updateGroupAnnouncement`
+  - `changeGroupOwner` / `removeGroupMembers` / `inviteUsersToGroup`
+- `GroupStore` 新增群成员与群公告缓存，`group-events.ts` 事件已可自动同步更新。
+- `ConversationDomain` / `useConversation` 新增 `clearChatHistory`，支持清空本地聊天记录并可选删除服务端漫游消息。
+- `MessageStore` 新增 `clearConversationMessages` 用于清理指定会话本地消息缓存。
+- 新增 `UiGroupMember` 类型与 `toUiGroupMember` 适配器。
+- 新增 `chat.info.*` 系列国际化文案（群公告、群介绍、群主、管理员、成员、查看全部成员、添加成员、清空/退出/解散群聊等）。
+- 新增 `ChatInfoDrawer` Storybook 示例（Group / SingleChat 两种 Variant）。
+
 ## 1.1.2 (2026-07-02)
 
 ### 新增

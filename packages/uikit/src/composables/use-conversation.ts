@@ -164,6 +164,15 @@ export function useConversation() {
     await domains.conversation.sendChannelAck(id, cvs.type)
   }
 
+  /** 清空聊天记录 */
+  async function clearChatHistory(id: string, deleteRoamingMessages = false) {
+    const cvs = conversationStore.conversationList.find(c => c.id === id)
+    if (!cvs)
+      return
+    await domains.conversation.clearChatHistory(id, cvs.type, deleteRoamingMessages)
+    stores.message.clearConversationMessages(id)
+  }
+
   /** 删除会话 */
   async function deleteConversation(id: string) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
@@ -194,6 +203,7 @@ export function useConversation() {
     pinConversation,
     markConversationRead,
     sendChannelAck,
+    clearChatHistory,
     deleteConversation,
     removeConversation,
     /** 直接设置本地会话列表（业务自定义数据源 / demo 注入 mock 用） */

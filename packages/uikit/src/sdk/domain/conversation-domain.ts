@@ -91,6 +91,22 @@ export class ConversationDomain {
     })
   }
 
+  /** 清空聊天记录 */
+  async clearChatHistory(
+    conversationId: string,
+    conversationType: 'singleChat' | 'groupChat',
+    deleteRoamingMessages = false,
+  ) {
+    if (deleteRoamingMessages) {
+      await this.client.chatManager.deleteConversation({
+        conversationId,
+        conversationType,
+        deleteRoamingMessages: true,
+        deleteLocal: false,
+      })
+    }
+  }
+
   /** 添加会话标记 */
   async addMark(conversations: { conversationId: string, conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
     await this.client.chatManager.addConversationMark({

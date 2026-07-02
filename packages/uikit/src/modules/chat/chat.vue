@@ -7,6 +7,7 @@ import { useQuote } from '../../composables/use-quote'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useUserInfo } from '../../composables/use-user-info'
+import { useGroup } from '../../composables/use-group'
 import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, TextMessageBody, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
@@ -58,7 +59,8 @@ defineExpose({
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
 const { stores, h5 } = useUIKit()
-const { sendChannelAck, saveDraft, loadDraft, clearDraft } = useConversation()
+const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory } = useConversation()
+const { leaveGroup, destroyGroup } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -445,6 +447,65 @@ function onMultiSelectDelete(messages: UiMessage[]) {
   deleteMessages(messages.map(m => m.msgServerId || m.msgLocalId))
   exitMultiSelectMode()
 }
+
+/** 退出群聊 */
+async function onLeaveGroup(groupId: string) {
+  try {
+    await leaveGroup(groupId)
+    const cvs = currentConversation.value
+    if (cvs) {
+      stores.conversation.deleteConversation(cvs.id)
+      stores.message.clearConversationMessages(cvs.id)
+    }
+    showToast(t('chat.info.leaveGroupSuccess') || '已退出群聊')
+  }
+  catch (err) {
+    console.warn('[Chat] leave group failed:', err)
+    showToast(t('chat.info.leaveGroupFailed') || '退出群聊失败')
+  }
+}
+
+/** 解散群聊 */
+async function onDestroyGroup(groupId: string) {
+  try {
+    await destroyGroup(groupId)
+    const cvs = currentConversation.value
+    if (cvs) {
+      stores.conversation.deleteConversation(cvs.id)
+      stores.message.clearConversationMessages(cvs.id)
+    }
+    showToast(t('chat.info.destroyGroupSuccess') || '群聊已解散')
+  }
+  catch (err) {
+    console.warn('[Chat] destroy group failed:', err)
+    showToast(t('chat.info.destroyGroupFailed') || '解散群聊失败')
+  }
+}
+
+/** 清空聊天记录 */
+async function onClearHistory(payload: { id: string, type: 'singleChat' | 'groupChat' }) {
+  try {
+    await clearChatHistory(payload.id, true)
+    stores.message.clearConversationMessages(payload.id)
+    showToast(t('chat.info.clearHistorySuccess') || '聊天记录已清空')
+  }
+  catch (err) {
+    console.warn('[Chat] clear history failed:', err)
+    showToast(t('chat.info.clearHistoryFailed') || '清空聊天记录失败')
+  }
+}
+
+/** 查看全部成员 */
+function onViewAllMembers(groupId: string) {
+  console.log('[Chat] view all members:', groupId)
+  // TODO: 接入 GroupMemberList 组件
+}
+
+/** 添加成员 */
+function onAddMember(groupId: string) {
+  console.log('[Chat] add member:', groupId)
+  // TODO: 接入联系人选择器
+}
 </script>
 
 <template>
@@ -563,6 +624,11 @@ function onMultiSelectDelete(messages: UiMessage[]) {
         :conversation="currentConversation"
         :is-group="isGroupChat"
         :offset-top="headerHeight"
+        @leave-group="onLeaveGroup"
+        @destroy-group="onDestroyGroup"
+        @clear-history="onClearHistory"
+        @view-all-members="onViewAllMembers"
+        @add-member="onAddMember"
       />
 
       <!-- 转发弹窗 -->

@@ -23,6 +23,7 @@ export interface MessageStoreLike {
   setPinnedMessages: (conversationId: string, msgs: UiMessage[]) => void
   setTranslation: (msgId: string, translation: { text: string, to: string }) => void
   setTranslating: (msgId: string, translating: boolean) => void
+  clearConversationMessages: (conversationId: string) => void
 }
 
 /**

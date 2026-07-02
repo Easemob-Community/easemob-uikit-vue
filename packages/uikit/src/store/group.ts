@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UiGroup } from '../sdk/types'
+import type { UiGroup, UiGroupMember } from '../sdk/types'
 
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<UiGroup[]>([])
@@ -11,6 +11,11 @@ export const useGroupStore = defineStore('group', () => {
   const joinedGroupCount = computed(() =>
     loaded.value ? groupList.value.length : explicitJoinedGroupCount.value,
   )
+
+  /** 群成员缓存：groupId -> members */
+  const groupMembersMap = ref<Record<string, UiGroupMember[]>>({})
+  /** 群公告缓存：groupId -> announcement */
+  const groupAnnouncementMap = ref<Record<string, string>>({})
 
   // ===== UI 交互状态 =====
   const filterText = ref('')
@@ -92,6 +97,51 @@ export const useGroupStore = defineStore('group', () => {
     // UIKit Group 类型不含禁言列表，当前仅占位
   }
 
+  // ===== 群成员/公告缓存 =====
+  function setGroupMembers(groupId: string, members: UiGroupMember[]) {
+    groupMembersMap.value[groupId] = members
+  }
+
+  function appendGroupMembers(groupId: string, members: UiGroupMember[]) {
+    const existing = groupMembersMap.value[groupId] || []
+    const existingIds = new Set(existing.map(m => m.userId))
+    const appended = [...existing]
+    for (const member of members) {
+      if (!existingIds.has(member.userId)) {
+        appended.push(member)
+        existingIds.add(member.userId)
+      }
+    }
+    groupMembersMap.value[groupId] = appended
+  }
+
+  function removeGroupMembers(groupId: string, userIds: string[]) {
+    const idSet = new Set(userIds)
+    groupMembersMap.value[groupId] = (groupMembersMap.value[groupId] || [])
+      .filter(m => !idSet.has(m.userId))
+  }
+
+  function getGroupMembers(groupId: string): UiGroupMember[] {
+    return groupMembersMap.value[groupId] || []
+  }
+
+  function clearGroupMembers(groupId?: string) {
+    if (groupId) {
+      delete groupMembersMap.value[groupId]
+    }
+    else {
+      groupMembersMap.value = {}
+    }
+  }
+
+  function setGroupAnnouncement(groupId: string, announcement: string) {
+    groupAnnouncementMap.value[groupId] = announcement
+  }
+
+  function getGroupAnnouncement(groupId: string): string {
+    return groupAnnouncementMap.value[groupId] || ''
+  }
+
   // ===== UI 交互状态操作 =====
   function setFilterText(text: string) {
     filterText.value = text
@@ -130,6 +180,8 @@ export const useGroupStore = defineStore('group', () => {
     activeId.value = ''
     selectedIds.value = new Set()
     hasMore.value = false
+    groupMembersMap.value = {}
+    groupAnnouncementMap.value = {}
   }
 
   // 别名方法：兼容 Domain 层 GroupStoreLike 接口
@@ -140,6 +192,8 @@ export const useGroupStore = defineStore('group', () => {
     currentGroup,
     loaded,
     joinedGroupCount,
+    groupMembersMap: computed(() => groupMembersMap.value),
+    groupAnnouncementMap: computed(() => groupAnnouncementMap.value),
     filterText,
     activeId,
     selectedIds,
@@ -157,6 +211,13 @@ export const useGroupStore = defineStore('group', () => {
     incrementMemberCount,
     decrementMemberCount,
     setMuted,
+    setGroupMembers,
+    appendGroupMembers,
+    removeGroupMembers,
+    getGroupMembers,
+    clearGroupMembers,
+    setGroupAnnouncement,
+    getGroupAnnouncement,
     setFilterText,
     setActiveId,
     isSelected,

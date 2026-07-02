@@ -1,6 +1,6 @@
 import type { ManagerHost } from '../client'
-import type { UiGroup } from '../types'
-import { toUiGroup, toUiGroups } from '../adapter/group-adapter'
+import type { UiGroup, UiGroupMember } from '../types'
+import { toUiGroup, toUiGroups, toUiGroupMember, toUiGroupMembers } from '../adapter/group-adapter'
 
 /**
  * GroupStore 需要暴露给 Domain 的最小接口。
@@ -10,6 +10,10 @@ export interface GroupStoreLike {
   addGroup: (group: UiGroup) => void
   removeGroup: (groupId: string) => void
   updateGroup: (groupId: string, patch: Partial<UiGroup>) => void
+  setGroupMembers: (groupId: string, members: UiGroupMember[]) => void
+  appendGroupMembers: (groupId: string, members: UiGroupMember[]) => void
+  removeGroupMembers: (groupId: string, userIds: string[]) => void
+  setGroupAnnouncement: (groupId: string, announcement: string) => void
 }
 
 /**
@@ -81,5 +85,52 @@ export class GroupDomain {
   /** 解散群组 */
   async destroyGroup(groupId: string) {
     await this.client.groupManager.destroyGroup({ groupId })
+  }
+
+  /** 拉取群成员列表 */
+  async fetchGroupMembers(
+    groupId: string,
+    cursor?: string,
+    pageSize = 20,
+  ): Promise<{ members: UiGroupMember[], cursor?: string, hasMore?: boolean }> {
+    const result = await this.client.groupManager.getGroupMemberList({ groupId, cursor, pageSize })
+    const members = toUiGroupMembers(result.items)
+    if (cursor) {
+      this.store.appendGroupMembers(groupId, members)
+    }
+    else {
+      this.store.setGroupMembers(groupId, members)
+    }
+    return { members, cursor: result.cursor, hasMore: result.hasMore }
+  }
+
+  /** 拉取群公告 */
+  async fetchGroupAnnouncement(groupId: string): Promise<string> {
+    const result = await this.client.groupManager.getGroupAnnouncement({ groupId })
+    const announcement = result.announcement ?? ''
+    this.store.setGroupAnnouncement(groupId, announcement)
+    return announcement
+  }
+
+  /** 更新群公告 */
+  async updateGroupAnnouncement(groupId: string, announcement: string) {
+    await this.client.groupManager.updateGroupAnnouncement({ groupId, announcement })
+    this.store.setGroupAnnouncement(groupId, announcement)
+  }
+
+  /** 转让群主 */
+  async changeGroupOwner(groupId: string, newOwnerId: string) {
+    await this.client.groupManager.changeGroupOwner({ groupId, newOwner: newOwnerId })
+  }
+
+  /** 移除群成员 */
+  async removeGroupMembers(groupId: string, userIds: string[]) {
+    await this.client.groupManager.removeGroupMembers({ groupId, userIds })
+    this.store.removeGroupMembers(groupId, userIds)
+  }
+
+  /** 邀请用户入群 */
+  async inviteUsersToGroup(groupId: string, userIds: string[]) {
+    await this.client.groupManager.inviteUsersToGroup({ groupId, userIds })
   }
 }

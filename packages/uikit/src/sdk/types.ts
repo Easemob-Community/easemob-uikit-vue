@@ -6,6 +6,8 @@ import type {
   UserInfo as SdkUserInfo,
 } from 'easemob-websdk'
 
+export type { GroupMemberEntry } from 'easemob-websdk'
+
 /**
  * UIKit 对 SDK Message 的扩展字段。
  * SDK Message 本身已包含：msgServerId / msgLocalId / status / timestamp /
@@ -137,6 +139,20 @@ export interface UiGroup {
   announcement?: string
   /** 创建时间 */
   created?: number
+}
+
+/** UIKit 群成员展示类型 */
+export interface UiGroupMember {
+  /** 成员用户 ID */
+  userId: string
+  /** 成员昵称 */
+  nickname?: string
+  /** 成员头像 */
+  avatarUrl?: string
+  /** 成员角色 */
+  role?: 'owner' | 'admin' | 'member'
+  /** 入群时间戳 */
+  joinedAt?: number
 }
 
 /** UIKit 在线状态展示类型 */

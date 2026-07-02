@@ -282,6 +282,20 @@ export const useMessageStore = defineStore('message', () => {
     delete atMeMessageMap.value[conversationId]
   }
 
+  /** 清空指定会话的所有消息（本地） */
+  function clearConversationMessages(conversationId: string) {
+    delete messageMap.value[conversationId]
+    delete pinnedMessageMap.value[conversationId]
+    delete parsedCombineMessageMap.value[conversationId]
+    delete atMeMessageMap.value[conversationId]
+    const relatedSending = Object.entries(sendingMetaMap.value)
+      .filter(([, meta]) => meta.sdkMsg.conversationId === conversationId)
+      .map(([localId]) => localId)
+    for (const localId of relatedSending) {
+      delete sendingMetaMap.value[localId]
+    }
+  }
+
   /** 设置翻译中状态 */
   function setTranslating(msgId: string, translating: boolean) {
     updateMessageById(msgId, { translating })
@@ -350,5 +364,6 @@ export const useMessageStore = defineStore('message', () => {
     setTranslation,
     toggleTranslation,
     clearMessages,
+    clearConversationMessages,
   }
 })

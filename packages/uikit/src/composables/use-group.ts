@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import type { UiGroup } from '../sdk/types'
+import type { UiGroup, UiGroupMember } from '../sdk/types'
 import { useUIKit } from './use-uikit'
 
 export function useGroup() {
@@ -68,6 +68,25 @@ export function useGroup() {
     return domains.group.fetchGroupInfo(groupId)
   }
 
+  /** 拉取群成员列表 */
+  async function fetchGroupMembers(
+    groupId: string,
+    cursor?: string,
+    pageSize = 20,
+  ): Promise<{ members: UiGroupMember[], cursor?: string, hasMore?: boolean }> {
+    return domains.group.fetchGroupMembers(groupId, cursor, pageSize)
+  }
+
+  /** 拉取群公告 */
+  async function fetchGroupAnnouncement(groupId: string): Promise<string> {
+    return domains.group.fetchGroupAnnouncement(groupId)
+  }
+
+  /** 更新群公告 */
+  async function updateGroupAnnouncement(groupId: string, announcement: string) {
+    await domains.group.updateGroupAnnouncement(groupId, announcement)
+  }
+
   /** 创建群组 */
   async function createGroup(params: {
     name: string
@@ -90,6 +109,36 @@ export function useGroup() {
   /** 离开群组 */
   async function leaveGroup(groupId: string) {
     await domains.group.leaveGroup(groupId)
+  }
+
+  /** 解散群组 */
+  async function destroyGroup(groupId: string) {
+    await domains.group.destroyGroup(groupId)
+  }
+
+  /** 转让群主 */
+  async function changeGroupOwner(groupId: string, newOwnerId: string) {
+    await domains.group.changeGroupOwner(groupId, newOwnerId)
+  }
+
+  /** 移除群成员 */
+  async function removeGroupMembers(groupId: string, userIds: string[]) {
+    await domains.group.removeGroupMembers(groupId, userIds)
+  }
+
+  /** 邀请用户入群 */
+  async function inviteUsersToGroup(groupId: string, userIds: string[]) {
+    await domains.group.inviteUsersToGroup(groupId, userIds)
+  }
+
+  /** 获取已缓存的群成员 */
+  function getGroupMembers(groupId: string): UiGroupMember[] {
+    return groupStore.getGroupMembers(groupId)
+  }
+
+  /** 获取已缓存的群公告 */
+  function getGroupAnnouncement(groupId: string): string {
+    return groupStore.getGroupAnnouncement(groupId)
   }
 
   /** 刷新群组列表（重新拉取） */
@@ -137,9 +186,18 @@ export function useGroup() {
     syncLocalGroups,
     fetchGroups,
     fetchGroupInfo,
+    fetchGroupMembers,
+    fetchGroupAnnouncement,
+    updateGroupAnnouncement,
     createGroup,
     joinGroup,
     leaveGroup,
+    destroyGroup,
+    changeGroupOwner,
+    removeGroupMembers,
+    inviteUsersToGroup,
+    getGroupMembers,
+    getGroupAnnouncement,
     refresh,
     loadMore,
     fetchJoinedGroupCount,
