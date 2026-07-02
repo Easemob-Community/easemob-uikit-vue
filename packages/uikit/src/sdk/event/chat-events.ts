@@ -114,7 +114,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       stores.message.applyModifiedMessage(uiMsg)
     },
 
-    onPinnedMessageChanged: (payload) => {
+    onPinnedMessageChanged: async (payload) => {
       if (!payload.messageId)
         return
       if (payload.operation === 'pin') {
@@ -125,6 +125,21 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       }
       else if (payload.operation === 'unpin') {
         stores.message.setMessageUnpinned(payload.messageId)
+      }
+
+      // 同步置顶消息列表，保证顶部 PinnedBar 与消息气泡状态一致
+      if (payload.conversationId && payload.conversationType) {
+        try {
+          const result = await client.chatManager.getPinnedMessageList({
+            conversationId: payload.conversationId,
+            conversationType: payload.conversationType,
+          })
+          const uiMsgs = result.items.map(item => toUiMessage(item.message, stores.client.currentUser))
+          stores.message.setPinnedMessages(payload.conversationId, uiMsgs)
+        }
+        catch (err) {
+          console.warn('[UIKit] refresh pinned messages failed:', err)
+        }
       }
     },
 
