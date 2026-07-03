@@ -6,13 +6,18 @@ import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
 import type { RootStores } from './types'
 
+/** 正在主动拉取群名称的 ID 集合，避免并发重复请求 */
+const fetchingGroupNames = new Set<string>()
+
 /**
  * 用联系人 / 用户资料 / 群组信息补全会话名称。
  * websdk2 本地会话缓存中的 conversationName 在部分场景（如群聊）可能为空，
  * 导致会话列表只显示 ID，因此需要二次补全。
+ * 若本地群组列表没有对应群，还会通过 getGroupInfoList 主动拉取一次群详情。
  */
-function patchConversationNames(stores: RootStores) {
+async function patchConversationNames(stores: RootStores, client: ManagerHost) {
   const groupMap = new Map(stores.group.groupList.map(g => [g.groupId, g.groupName]))
+  const missingGroupIds: string[] = []
   for (const cvs of stores.conversation.conversationList) {
     const needsPatch = !cvs.name || cvs.name === cvs.id
     if (!needsPatch) continue
@@ -20,6 +25,9 @@ function patchConversationNames(stores: RootStores) {
       const groupName = groupMap.get(cvs.id)
       if (groupName) {
         stores.conversation.updateConversation(cvs.id, { name: groupName })
+      }
+      else if (!fetchingGroupNames.has(cvs.id)) {
+        missingGroupIds.push(cvs.id)
       }
     }
     else if (cvs.type === 'singleChat') {
@@ -30,6 +38,24 @@ function patchConversationNames(stores: RootStores) {
         stores.conversation.updateConversation(cvs.id, { name })
       }
     }
+  }
+
+  if (missingGroupIds.length === 0) return
+
+  for (const id of missingGroupIds) fetchingGroupNames.add(id)
+  try {
+    const details = await client.groupManager.getGroupInfoList({ groupIds: missingGroupIds })
+    const groups = toUiGroups(details)
+    for (const group of groups) {
+      stores.group.updateGroup(group.groupId, group)
+      stores.conversation.updateConversation(group.groupId, { name: group.groupName || group.groupId })
+    }
+  }
+  catch (err) {
+    console.warn('[UIKit] fetch missing group names failed:', err)
+  }
+  finally {
+    for (const id of missingGroupIds) fetchingGroupNames.delete(id)
   }
 }
 
@@ -52,20 +78,20 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           stores.conversation.setSyncingConversations(false)
           stores.conversation.setConversationList(toUiConversations(client.chatManager.getConversationList()))
           stores.conversation.setConversationsLoaded(true)
-          patchConversationNames(stores)
+          void patchConversationNames(stores, client)
           break
         case 'contact':
           // 已由自定义数据源填充（loaded 为真）则跳过，避免覆盖业务数据
           if (!stores.contact.loaded) {
             stores.contact.setContactList(toUiContacts(client.contactManager.getContacts()))
           }
-          patchConversationNames(stores)
+          void patchConversationNames(stores, client)
           break
         case 'group':
           if (!stores.group.loaded) {
             stores.group.setGroupList(toUiGroups(client.groupManager.getJoinedGroupList()))
           }
-          patchConversationNames(stores)
+          void patchConversationNames(stores, client)
           break
       }
     },
@@ -73,7 +99,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     onConversationListUpdate: (payload) => {
       // SDK5 payload 包含完整快照和 patch；简单场景直接全量替换
       stores.conversation.setConversationList(toUiConversations(payload.items))
-      patchConversationNames(stores)
+      void patchConversationNames(stores, client)
     },
 
     onMessage: (sdkMsg) => {

@@ -44,6 +44,7 @@
 
 - 修复会话列表中群聊只显示群组 ID 的问题：
   - 在 `onSyncDataFinished`（conversation / contact / group）和 `onConversationListUpdate` 之后，使用群组列表、联系人备注/名称、用户资料昵称补全会话名称。
+  - 若本地没有对应群组信息，会主动调用 `groupManager.getGroupInfoList` 拉取群详情，进一步兜底补全群名称。
 - 修复会话列表搜索不支持中文备注 / 群名 / 昵称的问题：
   - 默认搜索现在会同时匹配会话 ID、会话名、最后一条消息、单聊联系人备注/名称/用户资料昵称、群聊群名称。
   - 仍可通过 `filterFn` 自定义搜索逻辑。
