@@ -210,6 +210,7 @@ const navEntries = computed<ContactNavEntry[]>(() => {
       key: 'notice',
       label: props.noticeLabel || t('contact.entryNotice'),
       count: resolvedNoticeCount.value,
+      hot: resolvedNoticeCount.value > 0,
       icon: props.noticeIcon,
       visible: props.showNotice,
     },

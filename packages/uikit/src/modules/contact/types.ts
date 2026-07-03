@@ -93,6 +93,8 @@ export interface ContactNavEntry {
   label: string
   /** 右侧数量徽标，0 时不展示 */
   count?: number
+  /** 是否为 hot/未读红点样式（仅 count > 0 时生效） */
+  hot?: boolean
   /** 入口图标名（icon-map 中的 name） */
   icon?: string
   /** 是否可见，false 时不渲染该卡片，默认 true */

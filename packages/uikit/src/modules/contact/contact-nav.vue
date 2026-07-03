@@ -47,6 +47,7 @@ function onEntryClick(entry: ContactNavEntry) {
               <span
                 v-if="entry.count !== undefined && entry.count !== null && entry.count > 0"
                 class="contact-nav__item-count"
+                :class="{ 'contact-nav__item-count--hot': entry.hot }"
               >
                 {{ entry.count > 99 ? '99+' : entry.count }}
               </span>
@@ -119,6 +120,11 @@ function onEntryClick(entry: ContactNavEntry) {
 }
 
 .contact-nav__item-count {
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
+}
+
+.contact-nav__item-count--hot {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
