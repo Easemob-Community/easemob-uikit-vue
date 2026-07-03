@@ -7,6 +7,33 @@ import { toUiGroups } from '../adapter/group-adapter'
 import type { RootStores } from './types'
 
 /**
+ * 用联系人 / 用户资料 / 群组信息补全会话名称。
+ * websdk2 本地会话缓存中的 conversationName 在部分场景（如群聊）可能为空，
+ * 导致会话列表只显示 ID，因此需要二次补全。
+ */
+function patchConversationNames(stores: RootStores) {
+  const groupMap = new Map(stores.group.groupList.map(g => [g.groupId, g.groupName]))
+  for (const cvs of stores.conversation.conversationList) {
+    const needsPatch = !cvs.name || cvs.name === cvs.id
+    if (!needsPatch) continue
+    if (cvs.type === 'groupChat') {
+      const groupName = groupMap.get(cvs.id)
+      if (groupName) {
+        stores.conversation.updateConversation(cvs.id, { name: groupName })
+      }
+    }
+    else if (cvs.type === 'singleChat') {
+      const contact = stores.contact.getContact(cvs.id)
+      const userInfo = stores.userInfo.getUserInfo(cvs.id)
+      const name = contact?.remark || contact?.name || userInfo?.nickname
+      if (name) {
+        stores.conversation.updateConversation(cvs.id, { name })
+      }
+    }
+  }
+}
+
+/**
  * 创建 ChatManager 事件处理器。
  * 注册到 client.chatManager.addEventHandler。
  */
@@ -25,17 +52,20 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           stores.conversation.setSyncingConversations(false)
           stores.conversation.setConversationList(toUiConversations(client.chatManager.getConversationList()))
           stores.conversation.setConversationsLoaded(true)
+          patchConversationNames(stores)
           break
         case 'contact':
           // 已由自定义数据源填充（loaded 为真）则跳过，避免覆盖业务数据
           if (!stores.contact.loaded) {
             stores.contact.setContactList(toUiContacts(client.contactManager.getContacts()))
           }
+          patchConversationNames(stores)
           break
         case 'group':
           if (!stores.group.loaded) {
             stores.group.setGroupList(toUiGroups(client.groupManager.getJoinedGroupList()))
           }
+          patchConversationNames(stores)
           break
       }
     },
@@ -43,6 +73,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     onConversationListUpdate: (payload) => {
       // SDK5 payload 包含完整快照和 patch；简单场景直接全量替换
       stores.conversation.setConversationList(toUiConversations(payload.items))
+      patchConversationNames(stores)
     },
 
     onMessage: (sdkMsg) => {
