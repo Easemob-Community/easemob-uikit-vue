@@ -60,6 +60,25 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
 }
 
 /**
+ * 与会话列表中已有的 UI 数据合并，优先保留已补全的名称/头像，
+ * 避免 SDK 把 conversationName 回退成 conversationId 导致闪烁。
+ */
+function mergeWithExistingConversations(stores: RootStores, incoming: ReturnType<typeof toUiConversations>) {
+  return incoming.map((item) => {
+    const existing = stores.conversation.conversationList.find(c => c.id === item.id)
+    if (!existing)
+      return item
+    const keepName = (!item.name || item.name === item.id) && existing.name && existing.name !== existing.id
+    const keepAvatar = !item.avatar && existing.avatar
+    return {
+      ...item,
+      name: keepName ? existing.name : item.name,
+      avatar: keepAvatar ? existing.avatar : item.avatar,
+    }
+  })
+}
+
+/**
  * 创建 ChatManager 事件处理器。
  * 注册到 client.chatManager.addEventHandler。
  */
@@ -76,7 +95,11 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       switch (payload.dataType) {
         case 'conversation':
           stores.conversation.setSyncingConversations(false)
-          stores.conversation.setConversationList(toUiConversations(client.chatManager.getConversationList()))
+          {
+            const incoming = toUiConversations(client.chatManager.getConversationList())
+            const merged = mergeWithExistingConversations(stores, incoming)
+            stores.conversation.setConversationList(merged)
+          }
           stores.conversation.setConversationsLoaded(true)
           void patchConversationNames(stores, client)
           break
@@ -97,8 +120,23 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onConversationListUpdate: (payload) => {
-      // SDK5 payload 包含完整快照和 patch；简单场景直接全量替换
-      stores.conversation.setConversationList(toUiConversations(payload.items))
+      // SDK5 payload 包含完整快照和 patch；合并更新，避免 SDK 把 name/avatar 回退成 id 导致闪烁
+      const updates = toUiConversations(payload.items)
+      for (const item of updates) {
+        const existing = stores.conversation.conversationList.find(c => c.id === item.id)
+        if (existing) {
+          const keepName = (!item.name || item.name === item.id) && existing.name && existing.name !== existing.id
+          const keepAvatar = !item.avatar && existing.avatar
+          stores.conversation.updateConversation(item.id, {
+            ...item,
+            name: keepName ? existing.name : item.name,
+            avatar: keepAvatar ? existing.avatar : item.avatar,
+          })
+        }
+        else {
+          stores.conversation.addConversation(item)
+        }
+      }
       void patchConversationNames(stores, client)
     },
 

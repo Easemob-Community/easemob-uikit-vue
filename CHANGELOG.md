@@ -73,6 +73,9 @@
 
 ### 修复
 
+- 修复会话列表切换/更新时名称先显示 ID 再显示名称的闪烁问题：
+  - `onConversationListUpdate` 改为合并更新，优先保留本地已补全的名称/头像，避免 SDK 把 `conversationName` 回退成 `conversationId`。
+  - `onSyncDataFinished` 的 conversation 分支也使用合并策略保留已补全名称。
 - 修复会话列表中群聊只显示群组 ID 的问题：
   - 在 `onSyncDataFinished`（conversation / contact / group）和 `onConversationListUpdate` 之后，使用群组列表、联系人备注/名称、用户资料昵称补全会话名称。
   - 若本地没有对应群组信息，会主动调用 `groupManager.getGroupInfoList` 拉取群详情，进一步兜底补全群名称。
