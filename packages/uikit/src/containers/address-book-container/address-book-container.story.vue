@@ -114,6 +114,27 @@ function injectMock() {
       </div>
     </Variant>
 
+    <Variant title="Persisted Notice Badge">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <AddressBookContainer
+            notice-persist-invites
+            @vue:mounted="() => { injectMock(); injectMockInvites() }"
+            @notice-click="() => console.log('notice-click')"
+            @view-change="(v) => console.log('view-change:', v)"
+          >
+            <template #default="{ view }">
+              <ContactListContainer v-if="view === 'contact'" />
+              <GroupListContainer v-else-if="view === 'group'" />
+            </template>
+          </AddressBookContainer>
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        开启 notice-persist-invites 后，pending 通知会持久化；刷新页面后首页徽标仍可立即显示红点。
+      </div>
+    </Variant>
+
     <Variant title="Hide Notice">
       <div style="height: 600px; width: 320px;">
         <UIKitProvider :auto-init="false">

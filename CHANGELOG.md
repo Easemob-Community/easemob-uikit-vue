@@ -27,6 +27,11 @@
   - `acceptGroupInvitation(groupId)` / `declineGroupInvitation(groupId)`
 - `group-events.ts` 新增群邀请事件处理：
   - `onInvitationReceived` / `onInvitationAccepted` / `onInvitationDeclined` / `onAutoAcceptInvitationFromGroup` / `onMembersJoined` 自动维护 `inviteList` 状态。
+- `ContactNoticeList` 新增 `persist` 配置：
+  - `persist` 支持 `true` / 'local' / 'session'，开启后未处理通知自动持久化，刷新页面后仍可恢复。
+- `AddressBookContainer` 新增 `noticePersistInvites` 配置：
+  - 在容器层统一开启通知持久化，确保首页「通知」hot 红点在刷新后也能立即显示，无需先打开通知列表。
+- 新增 `useInvitePersistence` 组合式函数，基于 `appKey + userId` 生成隔离存储 key，恢复时自动过滤已接受 / 已加入的邀请。
 - `AddressBookContainer` 默认通知视图：
   - 通知徽标数未传入时自动取 **pending 数量**（`pendingCount`），仅统计未处理的好友申请与群邀请。
   - 「通知」入口徽标使用 **hot 红点徽章**（红底白字圆点），联系人 / 群组入口保持原有默认数字样式。

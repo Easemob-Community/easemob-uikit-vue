@@ -7,22 +7,28 @@ import { useToast } from '../../composables/use-toast'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
+import { useInvitePersistence, type InvitePersistType } from '../../composables/use-invite-persistence'
 import type { UiContactInvite } from '../../sdk/types'
 
 export interface ContactNoticeListProps {
   invites?: UiContactInvite[]
   loading?: boolean
+  /** 是否持久化未处理通知（true = localStorage，或指定 'local' / 'session'） */
+  persist?: InvitePersistType
 }
 
 const props = withDefaults(defineProps<ContactNoticeListProps>(), {
   invites: undefined,
   loading: false,
+  persist: false,
 })
 
 const emit = defineEmits<{
   (e: 'accept', invite: UiContactInvite): void
   (e: 'decline', invite: UiContactInvite): void
 }>()
+
+useInvitePersistence(computed(() => props.persist))
 
 const { t } = useLocale()
 const { show: showToast } = useToast()

@@ -8,6 +8,7 @@ import { useLocale } from '../../locale'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
+import { useInvitePersistence } from '../../composables/use-invite-persistence'
 import { useContactStore } from '../../store/contact'
 import { useGroupStore } from '../../store/group'
 import type { ContactNavEntry } from '../../modules/contact/contact-nav.vue'
@@ -83,6 +84,8 @@ export interface AddressBookContainerProps {
   noticeIcon?: string
   groupIcon?: string
   contactIcon?: string
+  /** 是否持久化未处理通知（好友申请 + 群邀请），开启后首页徽标在刷新后也能立即显示红点 */
+  noticePersistInvites?: boolean | 'local' | 'session'
   /** 初始视图（默认 home） */
   initialView?: AddressBookContainerView
 }
@@ -98,6 +101,7 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   noticeCount: 0,
   autoEntryCount: true,
   entryOrder: () => ['notice', 'group', 'contact'] as const,
+  noticePersistInvites: false,
 })
 
 const emit = defineEmits<{
@@ -108,6 +112,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+
+useInvitePersistence(computed(() => props.noticePersistInvites))
 
 const { contactList, contactCount: contactStoreCount, fetchContactCount } = useContact()
 const { groupList, joinedGroupCount: groupStoreCount, fetchJoinedGroupCount } = useGroup()
