@@ -89,6 +89,7 @@ const messages: LocaleMessages = {
   'group.inviteMember.invite': '邀请',
   'group.inviteMember.success': '邀请已发送',
   'group.inviteMember.failed': '邀请失败',
+  'group.inviteMember.forbidden': '当前群组不允许邀请成员，请联系群主或管理员',
   'common.back': '返回',
   'common.loading': '加载中...',
   'common.noMore': '没有更多了',

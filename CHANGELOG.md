@@ -37,6 +37,11 @@
   - 「通知」入口徽标使用 **hot 红点徽章**（红底白字圆点），联系人 / 群组入口保持原有默认数字样式。
   - 徽标数字超过 99 显示 `99+`。
   - `notice` 视图默认渲染 `ContactNoticeList`，业务仍可通过 `#notice` 插槽覆盖。
+- 群信息抽屉「添加成员」按钮按群组邀请权限动态显示：
+  - 群主/管理员始终显示。
+  - 普通成员仅在 `group.allowInvites === true` 时显示。
+  - 无权限时不展示按钮，避免触发 403。
+- 邀请失败时增加 `group.inviteMember.forbidden` 文案：遇到 `forbidden` / `access forbidden` 错误提示「当前群组不允许邀请成员，请联系群主或管理员」。
 - 群信息抽屉「添加成员」按钮样式修复：增加 `justify-content: center`、`line-height: 1` 与水平 padding，解决文案/图标不居中的问题。
 - 新增 `InviteMemberModal` 组件，实现从联系人列表选择并邀请成员入群：
   - 邀请弹窗内联系人列表关闭字母导航与分组标题，改为平铺列表，避免右侧字母条溢出/挤压弹窗。

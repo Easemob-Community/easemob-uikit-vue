@@ -89,6 +89,7 @@ const messages: LocaleMessages = {
   'group.inviteMember.invite': 'Invite',
   'group.inviteMember.success': 'Invitation sent',
   'group.inviteMember.failed': 'Invitation failed',
+  'group.inviteMember.forbidden': 'This group does not allow member invitations. Please contact the group owner or admin.',
   'common.back': 'Back',
   'common.loading': 'Loading...',
   'common.noMore': 'No more',

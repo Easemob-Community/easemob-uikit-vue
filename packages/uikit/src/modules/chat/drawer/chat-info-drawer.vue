@@ -124,9 +124,24 @@ const members = computed<UiGroupMember[]>(() =>
 const announcement = computed(() =>
   groupId.value ? getGroupAnnouncement(groupId.value) : '',
 )
-const isOwner = computed(() =>
-  !!currentUserId.value && currentUserId.value === group.value?.owner,
-)
+const currentUserRole = computed(() => {
+  if (!currentUserId.value)
+    return undefined
+  return members.value.find(m => m.userId === currentUserId.value)?.role
+})
+
+const isOwner = computed(() => currentUserRole.value === 'owner')
+const isAdmin = computed(() => currentUserRole.value === 'admin')
+
+/** 是否展示「添加成员」按钮：群主/管理员始终可邀请；普通成员需 group.allowInvites 为 true */
+const canAddMember = computed(() => {
+  if (!currentUserId.value)
+    return false
+  if (isOwner.value || isAdmin.value)
+    return true
+  return group.value?.allowInvites === true
+})
+
 const memberCount = computed(() =>
   group.value?.memberCount ?? members.value.length,
 )
@@ -344,7 +359,7 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
       <div v-if="isGroup" class="chat-info-drawer__section">
         <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
           <span>{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
-          <button class="chat-info-drawer__text-btn" @click="onAddMember">
+          <button v-if="canAddMember" class="chat-info-drawer__text-btn" @click="onAddMember">
             <Icon name="actions/plus" :size="14" />
             {{ t('chat.info.addMember') }}
           </button>

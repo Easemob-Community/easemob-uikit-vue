@@ -542,7 +542,13 @@ async function onInviteMembers(userIds: string[]) {
   }
   catch (err) {
     console.warn('[Chat] invite members failed:', err)
-    showToast(t('group.inviteMember.failed') || '邀请失败')
+    const message = String(err instanceof Error ? err.message : err)
+    const isForbidden = message.toLowerCase().includes('forbidden') || message.toLowerCase().includes('access forbidden')
+    showToast(
+      isForbidden
+        ? (t('group.inviteMember.forbidden') || '当前群组不允许邀请成员')
+        : (t('group.inviteMember.failed') || '邀请失败'),
+    )
   }
 }
 
