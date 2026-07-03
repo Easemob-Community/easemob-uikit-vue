@@ -90,6 +90,8 @@ watch(
         <ContactList
           :show-header="false"
           :show-scroll-to-top="false"
+          :show-alphabet-nav="false"
+          group-by="none"
           select-mode="multiple"
           :disabled-fn="disabledFn"
         />
