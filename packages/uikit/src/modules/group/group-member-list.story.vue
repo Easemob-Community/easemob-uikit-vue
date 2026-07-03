@@ -153,7 +153,51 @@ function onRemoveAdmin(member: UiGroupMember) {
       </div>
     </Variant>
 
-    <Variant title="Events Log">
+    <Variant title="仅联系人可发消息">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupMemberList
+            group-id="g_demo"
+            :group="group"
+            :members="members"
+            :current-user-id="currentUserId"
+            :has-more="false"
+            allow-chat="contact"
+            @chat-member="onChatMember"
+            @remove-member="onRemoveMember"
+            @set-admin="onSetAdmin"
+            @remove-admin="onRemoveAdmin"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        allow-chat="contact"：只有联系人列表里的成员才显示「发消息」按钮。
+      </div>
+    </Variant>
+
+    <Variant title="禁止发消息">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <GroupMemberList
+            group-id="g_demo"
+            :group="group"
+            :members="members"
+            :current-user-id="currentUserId"
+            :has-more="false"
+            allow-chat="none"
+            @chat-member="onChatMember"
+            @remove-member="onRemoveMember"
+            @set-admin="onSetAdmin"
+            @remove-admin="onRemoveAdmin"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        allow-chat="none"：对任何成员都不显示「发消息」按钮。
+      </div>
+    </Variant>
+
+        <Variant title="Events Log">
       <div style="display: flex; gap: 16px;">
         <div style="height: 600px; width: 320px;">
           <UIKitProvider :auto-init="false">

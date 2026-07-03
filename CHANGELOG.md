@@ -37,6 +37,12 @@
   - 「通知」入口徽标使用 **hot 红点徽章**（红底白字圆点），联系人 / 群组入口保持原有默认数字样式。
   - 徽标数字超过 99 显示 `99+`。
   - `notice` 视图默认渲染 `ContactNoticeList`，业务仍可通过 `#notice` 插槽覆盖。
+- `GroupMemberList` 新增 `allow-chat` 配置（`'all' | 'contact' | 'none'`）：
+  - `'all'`：对所有成员（除自己外）显示「发消息」按钮。
+  - `'contact'`：仅对联系人列表中的成员显示「发消息」按钮。
+  - `'none'`：不显示「发消息」按钮。
+  - `ChatConfig` 新增 `groupMember.allowChat`，`Chat.vue` 会自动透传给成员列表弹窗。
+- 新增 `GroupMemberList` Storybook 示例：「仅联系人可发消息」与「禁止发消息」。
 - 新增 `contact.*` 与 `group.memberList.*` 系列国际化文案（好友申请、群邀请、群成员列表、管理员操作等）。
 - 新增 `ContactNoticeList`、`GroupMemberList` 与 `AddressBookContainer` 的 Storybook 示例。
 

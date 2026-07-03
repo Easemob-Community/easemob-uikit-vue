@@ -700,6 +700,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
             v-if="memberListGroupId"
             :group-id="memberListGroupId"
             :current-user-id="currentUserId"
+            :allow-chat="props.config?.groupMember?.allowChat"
             closable
             @close="showMemberList = false"
             @chat-member="onChatMember"

@@ -19,6 +19,8 @@ export interface GroupMemberListProps {
   showSearch?: boolean
   /** 是否在标题栏显示关闭按钮 */
   closable?: boolean
+  /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
+  allowChat?: 'all' | 'contact' | 'none'
 }
 
 const props = withDefaults(defineProps<GroupMemberListProps>(), {
@@ -29,6 +31,7 @@ const props = withDefaults(defineProps<GroupMemberListProps>(), {
   currentUserId: '',
   showSearch: true,
   closable: false,
+  allowChat: 'all',
 })
 
 const emit = defineEmits<{
@@ -136,6 +139,16 @@ function canSetAdmin(member: UiGroupMember): boolean {
 
 function canRemoveAdmin(member: UiGroupMember): boolean {
   return isOwner.value && member.userId !== props.currentUserId && member.role === 'admin'
+}
+
+function canChat(member: UiGroupMember): boolean {
+  if (member.userId === props.currentUserId)
+    return false
+  if (props.allowChat === 'none')
+    return false
+  if (props.allowChat === 'contact')
+    return !!stores.contact.getContact(member.userId)
+  return true
 }
 
 function roleClass(role?: string): string {
@@ -256,7 +269,7 @@ function clearSearch() {
           <div class="group-member-list__actions" @click.stop
           >
             <button
-              v-if="member.userId !== props.currentUserId"
+              v-if="canChat(member)"
               class="group-member-list__action-btn"
               @click="onChat(member)"
             >

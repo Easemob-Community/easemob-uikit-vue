@@ -115,6 +115,11 @@ export interface ChatConfig {
     /** 群人数上限，默认 200（超过此人数不发已读回执） */
     maxGroupSize?: number
   }
+  /** 群成员列表配置 */
+  groupMember?: {
+    /** 是否允许对成员发起单聊，默认 'all' */
+    allowChat?: 'all' | 'contact' | 'none'
+  }
   /** 输入框配置 */
   input?: {
     /** 输入框模式，默认 'simple' */
