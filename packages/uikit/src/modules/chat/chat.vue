@@ -19,6 +19,7 @@ import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import Popup from '../../components/popup/popup.vue'
 import GroupMemberList from '../group/group-member-list.vue'
+import InviteMemberModal from '../group/invite-member-modal.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import TypingIndicator from './typing-indicator/typing-indicator.vue'
@@ -62,7 +63,7 @@ defineExpose({
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
 const { stores, h5, client, domains } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory } = useConversation()
-const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers } = useGroup()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -189,6 +190,16 @@ const showMemberList = ref(false)
 
 /** 当前成员列表对应的群 ID */
 const memberListGroupId = ref('')
+
+/** 是否显示添加成员弹窗 */
+const showInviteModal = ref(false)
+
+/** 当前添加成员对应的群 ID */
+const inviteGroupId = ref('')
+
+/** 群成员列表组件引用 */
+const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
+
 
 /** 当前登录用户 ID */
 const currentUserId = computed(() => client.value.currentUserId ?? '')
@@ -512,8 +523,27 @@ function onViewAllMembers(groupId: string) {
 
 /** 添加成员 */
 function onAddMember(groupId: string) {
-  console.log('[Chat] add member:', groupId)
-  // TODO: 接入联系人选择器
+  inviteGroupId.value = groupId
+  showInviteModal.value = true
+}
+
+/** 邀请成员入群 */
+async function onInviteMembers(userIds: string[]) {
+  const groupId = inviteGroupId.value
+  if (!groupId || userIds.length === 0)
+    return
+  try {
+    await inviteUsersToGroup(groupId, userIds)
+    showToast(t('group.inviteMember.success') || '邀请已发送')
+    // 如果成员列表弹窗正在打开，刷新列表
+    if (showMemberList.value && memberListGroupId.value === groupId) {
+      await memberListRef.value?.refresh()
+    }
+  }
+  catch (err) {
+    console.warn('[Chat] invite members failed:', err)
+    showToast(t('group.inviteMember.failed') || '邀请失败')
+  }
 }
 
 /** 与成员发起单聊 */
@@ -698,6 +728,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
         <div class="chat__member-modal">
           <GroupMemberList
             v-if="memberListGroupId"
+            ref="memberListRef"
             :group-id="memberListGroupId"
             :current-user-id="currentUserId"
             :allow-chat="props.config?.groupMember?.allowChat"
@@ -710,6 +741,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
           />
         </div>
       </Popup>
+
+      <!-- 添加成员弹窗 -->
+      <InviteMemberModal
+        v-model:show="showInviteModal"
+        :group-id="inviteGroupId"
+        :existing-member-ids="stores.group.getGroupMembers(inviteGroupId).map(m => m.userId)"
+        @invited="onInviteMembers"
+      />
 
       <!-- 转发弹窗 -->
       <ForwardModal

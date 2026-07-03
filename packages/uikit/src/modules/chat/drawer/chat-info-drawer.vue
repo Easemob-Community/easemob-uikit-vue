@@ -611,13 +611,15 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
 .chat-info-drawer__text-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   border: none;
   background: none;
   color: var(--uikit-primary-color);
   font-size: 13px;
+  line-height: 1;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 6px;
   border-radius: 4px;
 }
 

@@ -194,6 +194,13 @@ function onRemoveAdmin(member: UiGroupMember) {
 function clearSearch() {
   searchKeyword.value = ''
 }
+
+async function refresh() {
+  cursor.value = undefined
+  await initialLoad()
+}
+
+defineExpose({ refresh })
 </script>
 
 <template>
