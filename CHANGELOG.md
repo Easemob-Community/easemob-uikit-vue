@@ -42,6 +42,9 @@
 
 ### 修复
 
+- 修复会话列表搜索不支持中文备注 / 群名 / 昵称的问题：
+  - 默认搜索现在会同时匹配会话 ID、会话名、最后一条消息、单聊联系人备注/名称/用户资料昵称、群聊群名称。
+  - 仍可通过 `filterFn` 自定义搜索逻辑。
 - 修复发送视频消息失败的问题：
   - 原实现调用 `sendVideoMessage(file, 0, ...)` 时 duration 为 0，触发 websdk2 `ValidationError: duration must be positive`。
   - 现在通过 `<video>` 元素读取本地视频真实时长，读取失败时兜底为 1 秒，确保 duration 始终为正整数。

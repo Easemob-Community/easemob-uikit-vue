@@ -121,6 +121,21 @@ function onHeaderMenuItemClick(key: string) {
   void key
 }
 
+/** 获取会话可用于搜索的文本字段（ID、会话名、备注、昵称、群名、最后消息等） */
+function getConversationSearchFields(item: Conversation): string[] {
+  const fields: (string | undefined)[] = [item.id, item.name, item.lastMessageText]
+  if (item.type === 'singleChat') {
+    const contact = stores.contact.getContact(item.id)
+    const userInfo = stores.userInfo.getUserInfo(item.id)
+    fields.push(contact?.remark, contact?.name, userInfo?.nickname)
+  }
+  else if (item.type === 'groupChat') {
+    const group = stores.group.getGroupById(item.id)
+    fields.push(group?.groupName)
+  }
+  return fields.filter((text): text is string => !!text)
+}
+
 const filteredConversationList = computed(() => {
   if (!normalizedSearchKeyword.value)
     return conversationList.value
@@ -129,9 +144,7 @@ const filteredConversationList = computed(() => {
     return conversationList.value.filter(item => props.filterFn!(kw, item))
   }
   return conversationList.value.filter((item) => {
-    const matchId = item.id.toLowerCase().includes(kw)
-    const matchMsg = item.lastMessageText?.toLowerCase().includes(kw)
-    return matchId || matchMsg
+    return getConversationSearchFields(item).some(text => text.toLowerCase().includes(kw))
   })
 })
 
