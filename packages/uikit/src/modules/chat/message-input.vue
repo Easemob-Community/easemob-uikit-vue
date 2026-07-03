@@ -241,7 +241,8 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     promise = sendImageMessage(file, groupReadReceiptConfig.value, ext)
   }
   else if (type === 'video') {
-    promise = sendVideoMessage(file, 0, undefined, ext)
+    const duration = await getVideoDuration(file)
+    promise = sendVideoMessage(file, duration, groupReadReceiptConfig.value, ext)
   }
   else {
     promise = sendFileMessage(file, groupReadReceiptConfig.value, ext)
@@ -254,6 +255,36 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     showToast(e?.message || t('message.send.failed') || '发送失败')
   })
   clearQuote()
+}
+
+/** 读取本地视频时长（秒），失败或无法读取时兜底返回 1 */
+function getVideoDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    if (typeof document === 'undefined') {
+      resolve(1)
+      return
+    }
+    const video = document.createElement('video')
+    const url = URL.createObjectURL(file)
+    video.preload = 'metadata'
+    video.muted = true
+    video.playsInline = true
+    video.src = url
+
+    let settled = false
+    const finish = (duration: number) => {
+      if (settled) return
+      settled = true
+      URL.revokeObjectURL(url)
+      resolve(Math.max(1, Math.floor(duration || 0)))
+    }
+
+    video.addEventListener('loadedmetadata', () => finish(video.duration))
+    video.addEventListener('error', () => finish(1))
+
+    // 5s 超时兜底
+    setTimeout(() => finish(1), 5000)
+  })
 }
 
 /** 打开 Emoji 选择器 */
