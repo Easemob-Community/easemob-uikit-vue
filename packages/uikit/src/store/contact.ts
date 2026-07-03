@@ -87,9 +87,11 @@ export const useContactStore = defineStore('contact', () => {
     return blackIdSet.value.has(userId)
   }
 
-  // ===== 好友申请列表 =====
+  // ===== 好友申请/群组邀请列表 =====
+  const pendingCount = computed(() => inviteList.value.filter(i => i.status === 'pending').length)
+
   function addInvite(invite: UiContactInvite) {
-    const index = inviteList.value.findIndex(i => i.userId === invite.userId)
+    const index = inviteList.value.findIndex(i => i.id === invite.id)
     if (index >= 0) {
       inviteList.value[index] = { ...inviteList.value[index], ...invite }
     }
@@ -98,19 +100,19 @@ export const useContactStore = defineStore('contact', () => {
     }
   }
 
-  function removeInvite(userId: string) {
-    inviteList.value = inviteList.value.filter(i => i.userId !== userId)
+  function removeInvite(id: string) {
+    inviteList.value = inviteList.value.filter(i => i.id !== id)
   }
 
-  function updateInviteStatus(userId: string, status: UiContactInvite['status']) {
-    const index = inviteList.value.findIndex(i => i.userId === userId)
+  function updateInviteStatus(id: string, status: UiContactInvite['status']) {
+    const index = inviteList.value.findIndex(i => i.id === id)
     if (index >= 0) {
       inviteList.value[index] = { ...inviteList.value[index], status }
     }
   }
 
-  function getInvite(userId: string): UiContactInvite | undefined {
-    return inviteList.value.find(i => i.userId === userId)
+  function getInvite(id: string): UiContactInvite | undefined {
+    return inviteList.value.find(i => i.id === id)
   }
 
   function clearInvites() {
@@ -172,6 +174,7 @@ export const useContactStore = defineStore('contact', () => {
     contactList,
     blackList,
     inviteList,
+    pendingCount,
     loaded,
     blockListLoaded,
     blackIdSet,

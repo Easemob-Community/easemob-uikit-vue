@@ -4,8 +4,11 @@ import type { RootStores } from './types'
 
 function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite['status'] = 'pending'): UiContactInvite {
   const userInfo = payload.userInfo
+  const userId = payload.from
   return {
-    userId: payload.from,
+    id: userId,
+    type: 'contact',
+    userId,
     nickname: userInfo?.nickname,
     avatarUrl: userInfo?.avatarUrl,
     reason: payload.status,
@@ -20,14 +23,16 @@ function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite[
 export function createContactHandlers(stores: RootStores): ContactEventHandlerMap {
   return {
     onContactInvited: (payload) => {
-      stores.contact.addInvite(toUiInvite(payload, 'pending'))
+      const userId = payload.from
+      const alreadyContact = userId ? stores.contact.getContact(userId) : undefined
+      stores.contact.addInvite(toUiInvite(payload, alreadyContact ? 'accepted' : 'pending'))
     },
     onContactAgreed: (payload) => {
       const userId = payload.from
       if (!userId)
         return
-      // 若申请列表中存在，更新为已接受；无论是否存在都加入联系人
-      if (stores.contact.getInvite(userId)) {
+      const invite = stores.contact.getInvite(userId)
+      if (invite) {
         stores.contact.updateInviteStatus(userId, 'accepted')
       }
       stores.contact.addContact({ userId, name: userId })

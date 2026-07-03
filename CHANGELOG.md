@@ -14,18 +14,25 @@
   - 操作成功后同步更新 `GroupStore` 中对应成员角色。
 - `GroupStore` 新增 `updateGroupMemberRole(groupId, userId, role)`，用于本地即时更新成员角色。
 - 新增好友申请通知列表组件 `ContactNoticeList`（公开名 `EmContactNoticeList`）：
-  - 展示待处理、已接受、已拒绝的好友申请。
-  - 支持接受/拒绝操作，并自动同步联系人列表与申请状态。
-- `ContactStore` 新增 `inviteList` 缓存与 `addInvite / removeInvite / updateInviteStatus / clearInvites` 方法。
+  - 同时支持**好友申请**与**群组邀请**两种通知类型。
+  - 针对已加入的群组或已成为好友的待处理邀请，会按「已接受」展示，避免无效操作。
+  - 支持接受 / 拒绝操作，好友申请调用 `ContactManager`，群邀请调用 `GroupManager`。
+  - 优化 item hover 与按钮边界：拒绝按钮使用白底描边，hover 时保持可见边界。
+- `UiContactInvite` 类型扩展：新增 `id`、`type`、`groupId`、`groupName`、`inviterId`、`inviterName` 字段，统一描述好友申请与群组邀请。
+- `ContactStore` 新增 `inviteList` 缓存与 `addInvite / removeInvite / updateInviteStatus / clearInvites` 方法，并新增 `pendingCount` 计算属性。
 - `ContactDomain` 与 `contact-events.ts` 扩展好友申请事件处理：
-  - `onContactInvited` 将申请存入 `inviteList`。
+  - `onContactInvited` 将申请存入 `inviteList`；若对方已是好友，则直接标记为 `accepted`。
   - `onContactAgreed` / `onContactRefuse` / `onContactAdded` / `onContactDeleted` 同步联系人及申请状态。
+- `GroupDomain` / `useGroup` 新增群邀请处理能力：
+  - `acceptGroupInvitation(groupId)` / `declineGroupInvitation(groupId)`
+- `group-events.ts` 新增群邀请事件处理：
+  - `onInvitationReceived` / `onInvitationAccepted` / `onInvitationDeclined` / `onAutoAcceptInvitationFromGroup` / `onMembersJoined` 自动维护 `inviteList` 状态。
 - `AddressBookContainer` 默认通知视图：
-  - 通知徽标数未传入时自动取 `inviteList.length`。
+  - 通知徽标数未传入时自动取 **pending 数量**（`pendingCount`），仅统计未处理的好友申请与群邀请。
+  - 徽标样式改为红色背景 + 白色文字圆点徽章，超过 99 显示 `99+`。
   - `notice` 视图默认渲染 `ContactNoticeList`，业务仍可通过 `#notice` 插槽覆盖。
-- 新增 `UiContactInvite` 类型，描述好友申请数据结构。
-- 新增 `contact.*` 与 `group.memberList.*` 系列国际化文案（好友申请、群成员列表、管理员操作等）。
-- 新增 `ContactNoticeList` 与 `GroupMemberList` 的 Storybook 示例。
+- 新增 `contact.*` 与 `group.memberList.*` 系列国际化文案（好友申请、群邀请、群成员列表、管理员操作等）。
+- 新增 `ContactNoticeList`、`GroupMemberList` 与 `AddressBookContainer` 的 Storybook 示例。
 
 ## 1.1.3 (2026-07-03)
 

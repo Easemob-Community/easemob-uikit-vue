@@ -48,7 +48,7 @@ function onEntryClick(entry: ContactNavEntry) {
                 v-if="entry.count !== undefined && entry.count !== null && entry.count > 0"
                 class="contact-nav__item-count"
               >
-                {{ entry.count }}
+                {{ entry.count > 99 ? '99+' : entry.count }}
               </span>
             </slot>
             <Icon
@@ -119,8 +119,17 @@ function onEntryClick(entry: ContactNavEntry) {
 }
 
 .contact-nav__item-count {
-  font-size: 13px;
-  color: var(--uikit-text-secondary);
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #ef4444;
+  border-radius: 9px;
 }
 
 .contact-nav__item-arrow {

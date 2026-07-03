@@ -58,6 +58,13 @@ function injectMockGroups() {
   groupStore.setGroupList(list)
 }
 
+function injectMockInvites() {
+  const contactStore = useContactStore()
+  contactStore.addInvite({ id: 'u_alice', type: 'contact', userId: 'u_alice', nickname: 'Alice', status: 'pending', timestamp: Date.now() })
+  contactStore.addInvite({ id: 'g_team', type: 'group', groupId: 'g_team', groupName: '产品设计组', inviterId: 'u_bob', status: 'pending', timestamp: Date.now() })
+  contactStore.addInvite({ id: 'u_old', type: 'contact', userId: 'u_old', nickname: 'Old Friend', status: 'accepted', timestamp: Date.now() - 86400_000 })
+}
+
 function injectMock() {
   injectMockContacts()
   injectMockGroups()
@@ -84,6 +91,26 @@ function injectMock() {
             </template>
           </AddressBookContainer>
         </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Auto Notice Badge">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <AddressBookContainer
+            @vue:mounted="() => { injectMock(); injectMockInvites() }"
+            @notice-click="() => console.log('notice-click')"
+            @view-change="(v) => console.log('view-change:', v)"
+          >
+            <template #default="{ view }">
+              <ContactListContainer v-if="view === 'contact'" />
+              <GroupListContainer v-else-if="view === 'group'" />
+            </template>
+          </AddressBookContainer>
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        未传入 noticeCount 时，徽标自动显示 pending 好友申请 + 群邀请数量。
       </div>
     </Variant>
 

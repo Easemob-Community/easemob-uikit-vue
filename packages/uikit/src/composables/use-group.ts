@@ -141,6 +141,16 @@ export function useGroup() {
     await domains.group.removeGroupAdmin(groupId, userId)
   }
 
+  /** 接受群邀请 */
+  async function acceptGroupInvitation(groupId: string) {
+    await domains.group.acceptGroupInvitation(groupId)
+  }
+
+  /** 拒绝群邀请 */
+  async function declineGroupInvitation(groupId: string) {
+    await domains.group.declineGroupInvitation(groupId)
+  }
+
   /** 获取已缓存的群成员 */
   function getGroupMembers(groupId: string): UiGroupMember[] {
     return groupStore.getGroupMembers(groupId)
@@ -208,6 +218,8 @@ export function useGroup() {
     inviteUsersToGroup,
     addGroupAdmin,
     removeGroupAdmin,
+    acceptGroupInvitation,
+    declineGroupInvitation,
     getGroupMembers,
     getGroupAnnouncement,
     refresh,

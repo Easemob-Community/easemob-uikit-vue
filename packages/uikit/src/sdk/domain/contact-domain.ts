@@ -12,8 +12,8 @@ export interface ContactStoreLike {
   updateRemark: (userId: string, remark: string) => void
   setBlocklist: (list: UiContact[]) => void
   addInvite: (invite: UiContactInvite) => void
-  removeInvite: (userId: string) => void
-  updateInviteStatus: (userId: string, status: UiContactInvite['status']) => void
+  removeInvite: (id: string) => void
+  updateInviteStatus: (id: string, status: UiContactInvite['status']) => void
 }
 
 /**

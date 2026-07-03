@@ -109,9 +109,9 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-const { contactList, contactCount: contactStoreCount, fetchContactCount, inviteList } = useContact()
+const { contactList, contactCount: contactStoreCount, fetchContactCount } = useContact()
 const { groupList, joinedGroupCount: groupStoreCount, fetchJoinedGroupCount } = useGroup()
-const { features } = useUIKit()
+const { features, stores } = useUIKit()
 const contactStore = useContactStore()
 const groupStore = useGroupStore()
 
@@ -198,7 +198,7 @@ const resolvedContactCount = computed(() => {
 const resolvedNoticeCount = computed(() => {
   if (props.noticeCount !== undefined) return props.noticeCount
   if (!props.autoEntryCount) return 0
-  return inviteList.value.length
+  return stores.contact.pendingCount
 })
 
 type NavEntryWithSort = ContactNavEntry & { sort?: number }

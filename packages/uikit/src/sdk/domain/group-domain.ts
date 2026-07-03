@@ -146,4 +146,14 @@ export class GroupDomain {
     await this.client.groupManager.removeGroupAdmin({ groupId, userId })
     this.store.updateGroupMemberRole(groupId, userId, 'member')
   }
+
+  /** 接受群邀请 */
+  async acceptGroupInvitation(groupId: string) {
+    await this.client.groupManager.acceptInvitation({ groupId })
+  }
+
+  /** 拒绝群邀请 */
+  async declineGroupInvitation(groupId: string) {
+    await this.client.groupManager.rejectInvitation({ groupId })
+  }
 }

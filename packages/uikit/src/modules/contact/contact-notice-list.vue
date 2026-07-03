@@ -5,6 +5,8 @@ import Icon from '../../components/icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useContact } from '../../composables/use-contact'
+import { useGroup } from '../../composables/use-group'
+import { useUIKit } from '../../composables/use-uikit'
 import type { UiContactInvite } from '../../sdk/types'
 
 export interface ContactNoticeListProps {
@@ -18,53 +20,83 @@ const props = withDefaults(defineProps<ContactNoticeListProps>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'accept', userId: string): void
-  (e: 'decline', userId: string): void
+  (e: 'accept', invite: UiContactInvite): void
+  (e: 'decline', invite: UiContactInvite): void
 }>()
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
+const { stores } = useUIKit()
 const { inviteList, acceptContactInvite, declineContactInvite } = useContact()
+const { acceptGroupInvitation, declineGroupInvitation } = useGroup()
 
 const displayInvites = computed(() => props.invites ?? inviteList.value)
 
 const processingIds = ref<Set<string>>(new Set())
 
-function isProcessing(userId: string): boolean {
-  return processingIds.value.has(userId)
+function isProcessing(invite: UiContactInvite): boolean {
+  return processingIds.value.has(invite.id)
+}
+
+function isAlreadyAccepted(invite: UiContactInvite): boolean {
+  if (invite.status !== 'pending')
+    return false
+  if (invite.type === 'contact') {
+    return invite.userId ? stores.contact.getContact(invite.userId) !== undefined : false
+  }
+  if (invite.type === 'group') {
+    return invite.groupId ? stores.group.getGroupById(invite.groupId) !== undefined : false
+  }
+  return false
+}
+
+function effectiveStatus(invite: UiContactInvite): UiContactInvite['status'] {
+  if (isAlreadyAccepted(invite))
+    return 'accepted'
+  return invite.status
 }
 
 async function onAccept(invite: UiContactInvite) {
-  if (processingIds.value.has(invite.userId))
+  if (processingIds.value.has(invite.id))
     return
-  processingIds.value.add(invite.userId)
+  processingIds.value.add(invite.id)
   try {
-    await acceptContactInvite(invite.userId)
-    emit('accept', invite.userId)
+    if (invite.type === 'group' && invite.groupId) {
+      await acceptGroupInvitation(invite.groupId)
+    }
+    else if (invite.userId) {
+      await acceptContactInvite(invite.userId)
+    }
+    emit('accept', invite)
   }
   catch (err) {
     console.warn('[ContactNoticeList] accept invite failed:', err)
-    showToast(t('contact.inviteAcceptFailed') || '接受好友申请失败')
+    showToast(t('contact.inviteAcceptFailed') || '接受失败')
   }
   finally {
-    processingIds.value.delete(invite.userId)
+    processingIds.value.delete(invite.id)
   }
 }
 
 async function onDecline(invite: UiContactInvite) {
-  if (processingIds.value.has(invite.userId))
+  if (processingIds.value.has(invite.id))
     return
-  processingIds.value.add(invite.userId)
+  processingIds.value.add(invite.id)
   try {
-    await declineContactInvite(invite.userId)
-    emit('decline', invite.userId)
+    if (invite.type === 'group' && invite.groupId) {
+      await declineGroupInvitation(invite.groupId)
+    }
+    else if (invite.userId) {
+      await declineContactInvite(invite.userId)
+    }
+    emit('decline', invite)
   }
   catch (err) {
     console.warn('[ContactNoticeList] decline invite failed:', err)
-    showToast(t('contact.inviteDeclineFailed') || '拒绝好友申请失败')
+    showToast(t('contact.inviteDeclineFailed') || '拒绝失败')
   }
   finally {
-    processingIds.value.delete(invite.userId)
+    processingIds.value.delete(invite.id)
   }
 }
 
@@ -83,8 +115,26 @@ function statusLabel(status: UiContactInvite['status']): string {
   return ''
 }
 
-function displayName(invite: UiContactInvite): string {
-  return invite.nickname || invite.userId
+function displayTitle(invite: UiContactInvite): string {
+  if (invite.type === 'group')
+    return invite.groupName || invite.groupId || ''
+  return invite.nickname || invite.userId || ''
+}
+
+function displaySubtitle(invite: UiContactInvite): string {
+  if (invite.type === 'group') {
+    const inviter = invite.inviterName || invite.inviterId
+    if (inviter)
+      return `${t('contact.inviteInviter') || '邀请人'}: ${inviter}`
+    return `ID: ${invite.groupId || ''}`
+  }
+  return `ID: ${invite.userId || ''}`
+}
+
+function avatarName(invite: UiContactInvite): string {
+  if (invite.type === 'group')
+    return invite.groupName || invite.groupId || ''
+  return invite.nickname || invite.userId || ''
 }
 </script>
 
@@ -111,27 +161,27 @@ function displayName(invite: UiContactInvite): string {
     <div v-else class="contact-notice-list__items">
       <div
         v-for="invite in displayInvites"
-        :key="invite.userId"
+        :key="invite.id"
         class="contact-notice-list__item"
         :class="{
-          'contact-notice-list__item--accepted': invite.status === 'accepted',
-          'contact-notice-list__item--declined': invite.status === 'declined',
+          'contact-notice-list__item--accepted': effectiveStatus(invite) === 'accepted',
+          'contact-notice-list__item--declined': effectiveStatus(invite) === 'declined',
         }"
       >
         <Avatar
           class="contact-notice-list__avatar"
-          :name="displayName(invite)"
+          :name="avatarName(invite)"
           :src="invite.avatarUrl"
           :size="44"
         />
 
         <div class="contact-notice-list__info">
           <div class="contact-notice-list__name-row">
-            <span class="contact-notice-list__name">{{ displayName(invite) }}</span>
-            <span v-if="statusLabel(invite.status)" class="contact-notice-list__status">{{ statusLabel(invite.status) }}</span>
+            <span class="contact-notice-list__name">{{ displayTitle(invite) }}</span>
+            <span v-if="statusLabel(effectiveStatus(invite))" class="contact-notice-list__status">{{ statusLabel(effectiveStatus(invite)) }}</span>
           </div>
           <div class="contact-notice-list__meta">
-            <span class="contact-notice-list__id">ID: {{ invite.userId }}</span>
+            <span class="contact-notice-list__subtitle">{{ displaySubtitle(invite) }}</span>
             <span v-if="invite.reason" class="contact-notice-list__reason">{{ t('contact.inviteReason') || '附言' }}: {{ invite.reason }}</span>
           </div>
           <div v-if="invite.timestamp" class="contact-notice-list__time">
@@ -140,17 +190,17 @@ function displayName(invite: UiContactInvite): string {
         </div>
 
         <div class="contact-notice-list__actions">
-          <template v-if="invite.status === 'pending'">
+          <template v-if="effectiveStatus(invite) === 'pending'">
             <button
               class="contact-notice-list__btn contact-notice-list__btn--primary"
-              :disabled="isProcessing(invite.userId)"
+              :disabled="isProcessing(invite)"
               @click="onAccept(invite)"
             >
               {{ t('contact.inviteAccept') || '接受' }}
             </button>
             <button
               class="contact-notice-list__btn contact-notice-list__btn--default"
-              :disabled="isProcessing(invite.userId)"
+              :disabled="isProcessing(invite)"
               @click="onDecline(invite)"
             >
               {{ t('contact.inviteDecline') || '拒绝' }}
@@ -256,7 +306,7 @@ function displayName(invite: UiContactInvite): string {
   gap: 2px;
 }
 
-.contact-notice-list__id,
+.contact-notice-list__subtitle,
 .contact-notice-list__reason,
 .contact-notice-list__time {
   font-size: 12px;
@@ -275,10 +325,10 @@ function displayName(invite: UiContactInvite): string {
 .contact-notice-list__btn {
   padding: 6px 14px;
   border-radius: var(--uikit-components-radius, 6px);
-  border: none;
+  border: 1px solid transparent;
   font-size: 13px;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, border-color 0.15s, background-color 0.15s;
 }
 
 .contact-notice-list__btn:disabled {
@@ -289,11 +339,26 @@ function displayName(invite: UiContactInvite): string {
 .contact-notice-list__btn--primary {
   background-color: var(--uikit-primary-color);
   color: #fff;
+  border-color: var(--uikit-primary-color);
+}
+
+.contact-notice-list__btn--primary:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
 .contact-notice-list__btn--default {
-  background-color: var(--uikit-bg-secondary);
+  background-color: #fff;
   color: var(--uikit-text-primary);
+  border-color: var(--uikit-border-color, #e5e7eb);
+}
+
+.contact-notice-list__item:hover .contact-notice-list__btn--default {
+  background-color: #fff;
+  border-color: var(--uikit-border-color, #d1d5db);
+}
+
+.contact-notice-list__btn--default:hover:not(:disabled) {
+  background-color: var(--uikit-bg-secondary);
 }
 
 .contact-notice-list__empty {
