@@ -21,6 +21,8 @@ export interface MessageInputProps {
   isGroup?: boolean
   /** 键盘高度（H5 适配用） */
   keyboardHeight?: number
+  /** @提及联系人列表，传入后优先于 config.input.mention.contacts */
+  mentionContacts?: MentionContact[]
 }
 
 export interface MessageInputEmits {
@@ -111,8 +113,8 @@ const enableMention = computed(() => {
   return true
 })
 
-/** @提及联系人列表 */
-const mentionContacts = computed(() => inputConfig.value?.mention?.contacts ?? [])
+/** @提及联系人列表：传入的 props 优先，否则取 config */
+const mentionContacts = computed(() => props.mentionContacts ?? inputConfig.value?.mention?.contacts ?? [])
 
 /** SimpleInput 引用 */
 const simpleInputRef = ref<InstanceType<typeof SimpleInput>>()

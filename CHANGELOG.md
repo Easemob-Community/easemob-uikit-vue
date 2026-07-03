@@ -37,6 +37,11 @@
   - 「通知」入口徽标使用 **hot 红点徽章**（红底白字圆点），联系人 / 群组入口保持原有默认数字样式。
   - 徽标数字超过 99 显示 `99+`。
   - `notice` 视图默认渲染 `ContactNoticeList`，业务仍可通过 `#notice` 插槽覆盖。
+- 群聊输入框 @提及自动调起群内成员列表：
+  - `Chat.vue` 在群聊会话下自动预加载群成员（本地为空时拉取第一页）。
+  - 将当前群成员（排除自己）映射为 `MentionContact[]` 透传给 `MessageInput`。
+  - `MessageInput` 新增 `mentionContacts` prop，传入后优先于 `config.input.mention.contacts` 使用。
+  - 用户输入 `@` 时，`MentionPicker` 现在能展示群内成员并支持搜索、选中。
 - 群信息抽屉「添加成员」按钮按群组邀请权限动态显示：
   - 群主/管理员始终显示。
   - 普通成员仅在 `group.allowInvites === true` 时显示。

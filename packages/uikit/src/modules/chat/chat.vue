@@ -12,7 +12,7 @@ import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
-import type { ChatConfig } from './types'
+import type { ChatConfig, MentionContact } from './types'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
@@ -63,7 +63,7 @@ defineExpose({
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
 const { stores, h5, client, domains } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory } = useConversation()
-const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -260,6 +260,39 @@ const conversationType = computed(() => currentConversation.value?.type)
 
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
+
+/** 群聊 @提及成员列表 */
+const mentionContacts = computed<MentionContact[]>(() => {
+  if (!isGroupChat.value || !currentConversation.value)
+    return []
+  return stores.group
+    .getGroupMembers(currentConversation.value.id)
+    .filter(m => m.userId !== currentUserId.value)
+    .map(m => ({
+      userId: m.userId,
+      name: m.nickname || m.userId,
+      avatar: m.avatarUrl,
+    }))
+})
+
+/** 切换到群聊会话时，若本地没有成员则拉取第一页成员（用于 @提及） */
+watch(
+  () => currentConversation.value,
+  async (cvs) => {
+    if (cvs?.type !== 'groupChat' || !cvs.id)
+      return
+    const members = stores.group.getGroupMembers(cvs.id)
+    if (members.length > 0)
+      return
+    try {
+      await fetchGroupMembers(cvs.id)
+    }
+    catch (err) {
+      console.warn('[Chat] preload group members for mention failed:', err)
+    }
+  },
+  { immediate: true },
+)
 
 /** 是否启用输入状态提示 */
 const enableTyping = computed(() => props.config?.input?.enableTyping !== false)
@@ -708,6 +741,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
         :config="props.config"
         :is-group="isGroupChat"
         :keyboard-height="h5.keyboardHeight.value"
+        :mention-contacts="mentionContacts"
         @send-success="handleSendSuccess"
         @focus="messageListRef?.scrollToBottom()"
       />
