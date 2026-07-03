@@ -294,7 +294,7 @@ function onNativeScroll(event: Event) {
   if (messages.value.length === 0)
     return
 
-  const threshold = 50
+  const threshold = 0
   if (el.scrollTop <= threshold) {
     loadMoreHistory()
   }

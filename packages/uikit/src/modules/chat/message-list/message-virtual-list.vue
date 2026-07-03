@@ -225,7 +225,7 @@ function preserveScrollPosition(prevScrollTop: number, prevScrollHeight: number)
     // 更新到达状态
     const el = listRef.value
     const threshold = 2
-    arrivedState.value.top = el.scrollTop <= threshold
+    arrivedState.value.top = el.scrollTop <= 0
     arrivedState.value.bottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold
   })
 }
@@ -258,6 +258,7 @@ defineExpose({
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 16px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -268,5 +269,9 @@ defineExpose({
 
 .message-virtual-list__item {
   flex-shrink: 0;
+}
+
+.message-virtual-list__item:not(:last-child) {
+  padding-bottom: 12px;
 }
 </style>
