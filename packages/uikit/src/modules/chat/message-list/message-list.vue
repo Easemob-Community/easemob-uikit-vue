@@ -89,6 +89,10 @@ const isAtBottom = ref(true)
 /** 未读新消息数 */
 const unreadNewCount = ref(0)
 
+/** 用于区分新消息追加与历史消息前置 */
+const previousConversationId = ref('')
+const previousLastMsgId = ref('')
+
 /** 滚动状态 —— 仅普通滚动模式使用 */
 const { arrivedState } = useScroll(listRef, { throttle: 100 })
 
@@ -127,12 +131,16 @@ watch(
       return
     unreadNewCount.value = 0
     isAtBottom.value = true
+    previousConversationId.value = cvsId
+    previousLastMsgId.value = messages.value[messages.value.length - 1]?.msgServerId || messages.value[messages.value.length - 1]?.msgLocalId || ''
     // 同步 cursor 状态：如果 useChat 已经加载过历史，使用缓存
     const cached = getHistoryCursor(cvsId)
     historyCursor.value = cached.cursor
     hasMoreHistory.value = !cached.isLast
     loadingHistory.value = false
     scrollToBottom()
+    // 如果消息不足以撑满视口，自动加载历史，直到可滚动或没有更多
+    void ensureHistoryFill()
   },
   { flush: 'post', immediate: true },
 )
@@ -140,10 +148,22 @@ watch(
 /** 监听消息数量变化，处理新消息到达时的智能滚动 */
 watch(
   () => messages.value.length,
-  (newLen, oldLen) => {
-    if (newLen > (oldLen || 0)) {
-      // 有新消息加入
-      const lastMsg = messages.value[messages.value.length - 1]
+  async (newLen, oldLen) => {
+    const cvsId = currentConversation.value?.id || ''
+    // 切换会话时重置基准，避免把旧会话的 lastMsgId 带过来
+    if (cvsId !== previousConversationId.value) {
+      previousConversationId.value = cvsId
+      previousLastMsgId.value = messages.value[newLen - 1]?.msgServerId || messages.value[newLen - 1]?.msgLocalId || ''
+      return
+    }
+    if (newLen <= (oldLen || 0))
+      return
+    const lastMsg = messages.value[newLen - 1]
+    const lastId = lastMsg?.msgServerId || lastMsg?.msgLocalId || ''
+    // lastId 没变说明是前置历史消息，不应该计入新消息
+    const isAppend = lastId !== '' && lastId !== previousLastMsgId.value
+    previousLastMsgId.value = lastId
+    if (isAppend) {
       if (lastMsg?.isSelf) {
         // 自己发送的消息，始终滚动到底部
         scrollToBottom()
@@ -157,6 +177,8 @@ watch(
         unreadNewCount.value++
       }
     }
+    // 如果消息列表仍未撑满视口，继续自动加载历史
+    await ensureHistoryFill()
   },
 )
 
@@ -228,6 +250,35 @@ async function loadMoreHistory() {
     const newScrollHeight = container.scrollHeight
     const targetScrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight)
     container.scrollTop = Math.max(targetScrollTop, 60)
+  }
+}
+
+/**
+ * 自动填充历史消息：当消息列表不足以撑满视口且还有历史消息时，
+ * 自动继续加载，避免登录后只有几条新消息时无法触发滚动加载。
+ */
+async function ensureHistoryFill() {
+  if (!enableLoadHistory.value || !hasMoreHistory.value || loadingHistory.value)
+    return
+  if (enableVirtual.value)
+    return
+
+  await nextTick()
+  const container = listRef.value
+  if (!container)
+    return
+
+  let attempts = 0
+  const maxAttempts = 5
+  while (
+    container.scrollHeight <= container.clientHeight + 1
+    && hasMoreHistory.value
+    && !loadingHistory.value
+    && attempts < maxAttempts
+  ) {
+    attempts++
+    await loadMoreHistory()
+    await nextTick()
   }
 }
 
@@ -520,12 +571,13 @@ watch(locateRequest, (req) => {
       <span v-else-if="isPulling">{{ t('conversation.pullRefresh') }}</span>
     </div>
 
-    <!-- PC 顶部加载指示器 -->
+    <!-- PC 顶部加载/无更多指示器 -->
     <div
-      v-if="historyMode === 'scroll-top' && loadingHistory"
+      v-if="historyMode === 'scroll-top' && messages.length > 0 && (loadingHistory || !hasMoreHistory)"
       class="message-list__top-loading"
     >
-      <span>{{ t('conversation.loadingMore') }}</span>
+      <span v-if="loadingHistory">{{ t('conversation.loadingMore') }}</span>
+      <span v-else>{{ t('conversation.noMoreHistory') || '没有更多历史消息' }}</span>
     </div>
 
     <!-- 虚拟滚动模式 -->

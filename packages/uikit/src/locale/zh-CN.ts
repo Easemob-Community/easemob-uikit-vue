@@ -18,6 +18,7 @@ const messages: LocaleMessages = {
   'conversation.pullRefresh': '刷新中...',
   'conversation.searchPlaceholder': '搜索会话...',
   'conversation.loadingMore': '加载中...',
+  'conversation.noMoreHistory': '没有更多历史消息',
   'conversation.syncing': '正在同步会话...',
   'conversation.newChat': '新会话',
   'conversation.addContact': '添加联系人',

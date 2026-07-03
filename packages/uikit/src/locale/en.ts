@@ -18,6 +18,7 @@ const messages: LocaleMessages = {
   'conversation.pullRefresh': 'Refreshing...',
   'conversation.searchPlaceholder': 'Search conversations...',
   'conversation.loadingMore': 'Loading more...',
+  'conversation.noMoreHistory': 'No more history messages',
   'conversation.syncing': 'Syncing conversations...',
   'conversation.newChat': 'New Chat',
   'conversation.addContact': 'Add Contact',
