@@ -349,7 +349,7 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
             {{ t('chat.info.addMember') }}
           </button>
         </div>
-        <div class="chat-info-drawer__member-grid">
+        <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
           <div
             v-for="member in displayedMembers"
             :key="member.userId"
@@ -361,7 +361,7 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
             <span v-else-if="member.role === 'admin'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">{{ t('chat.info.groupAdmin') }}</span>
           </div>
         </div>
-        <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click="onViewAllMembers">
+        <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
           {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
         </button>
       </div>

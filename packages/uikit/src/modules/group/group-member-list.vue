@@ -17,6 +17,8 @@ export interface GroupMemberListProps {
   hasMore?: boolean
   currentUserId?: string
   showSearch?: boolean
+  /** 是否在标题栏显示关闭按钮 */
+  closable?: boolean
 }
 
 const props = withDefaults(defineProps<GroupMemberListProps>(), {
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<GroupMemberListProps>(), {
   hasMore: false,
   currentUserId: '',
   showSearch: true,
+  closable: false,
 })
 
 const emit = defineEmits<{
@@ -35,6 +38,7 @@ const emit = defineEmits<{
   (e: 'set-admin', member: UiGroupMember): void
   (e: 'remove-admin', member: UiGroupMember): void
   (e: 'load-more'): void
+  (e: 'close'): void
 }>()
 
 const { t } = useLocale()
@@ -183,8 +187,17 @@ function clearSearch() {
   <div class="group-member-list">
     <!-- 头部标题 -->
     <div class="group-member-list__header">
-      <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
-      <span class="group-member-list__count">{{ groupInfo?.memberCount ?? localMembers.length }}</span>
+      <div class="group-member-list__header-left">
+        <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
+        <span class="group-member-list__count">{{ groupInfo?.memberCount ?? localMembers.length }}</span>
+      </div>
+      <button
+        v-if="props.closable"
+        class="group-member-list__close"
+        @click="emit('close')"
+      >
+        <Icon name="actions/xmark_thick" :size="16" />
+      </button>
     </div>
 
     <!-- 搜索 -->
@@ -307,10 +320,28 @@ function clearSearch() {
 .group-member-list__header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
   flex-shrink: 0;
+}
+
+.group-member-list__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-member-list__close {
+  background: none;
+  border: none;
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin: -4px -8px -4px 0;
 }
 
 .group-member-list__title {

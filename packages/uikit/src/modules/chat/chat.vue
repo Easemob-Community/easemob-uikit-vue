@@ -17,7 +17,7 @@ import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
-import ChatDrawer from './drawer/chat-drawer.vue'
+import Popup from '../../components/popup/popup.vue'
 import GroupMemberList from '../group/group-member-list.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
@@ -689,22 +689,26 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @add-member="onAddMember"
       />
 
-      <!-- 群成员列表抽屉 -->
-      <ChatDrawer
+      <!-- 群成员列表弹窗 -->
+      <Popup
         v-model:show="showMemberList"
-        :offset-top="headerHeight"
-        width="320"
+        position="center"
+        :close-on-click-overlay="true"
       >
-        <GroupMemberList
-          v-if="memberListGroupId"
-          :group-id="memberListGroupId"
-          :current-user-id="currentUserId"
-          @chat-member="onChatMember"
-          @remove-member="onRemoveMember"
-          @set-admin="onSetAdmin"
-          @remove-admin="onRemoveAdmin"
-        />
-      </ChatDrawer>
+        <div class="chat__member-modal">
+          <GroupMemberList
+            v-if="memberListGroupId"
+            :group-id="memberListGroupId"
+            :current-user-id="currentUserId"
+            closable
+            @close="showMemberList = false"
+            @chat-member="onChatMember"
+            @remove-member="onRemoveMember"
+            @set-admin="onSetAdmin"
+            @remove-admin="onRemoveAdmin"
+          />
+        </div>
+      </Popup>
 
       <!-- 转发弹窗 -->
       <ForwardModal
@@ -851,5 +855,25 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
 .chat__header-more:hover {
   background-color: var(--uikit-bg-secondary);
+}
+
+.chat__member-modal {
+  width: 480px;
+  max-width: 90vw;
+  height: 70vh;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--uikit-components-radius, 12px);
+  overflow: hidden;
+  background-color: var(--uikit-bg-base);
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .chat__member-modal {
+    width: 90vw;
+    height: 80vh;
+  }
 }
 </style>
