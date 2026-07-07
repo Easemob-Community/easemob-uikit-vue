@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
-  EmConversationContainer,
-  EmContactContainer,
   EmChatContainer,
-  EmPopup,
+  EmContactContainer,
+  EmContactDetail,
+  EmConversationContainer,
   EmInput,
-  useTheme,
-  useLocale,
-  useUIKit,
+  EmPopup,
+  setPinyinAdapter,
   useClient,
   useConversation,
   useContactStore,
-  setPinyinAdapter,
+  useLocale,
+  useTheme,
+  useUIKit,
 } from '@easemob/uikit'
 import type { UiContact, UiConversation } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
@@ -39,11 +40,14 @@ function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource',
 
 const { mode, primaryColor, hoverStyle, containerGap, setMode, setPrimaryColor, setHoverStyle, setContainerGap, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { locale, setLocale } = useLocale()
-const { theme: themeStore } = useUIKit()
+const { stores, theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
-const { setLocalConversationList } = useConversation()
+const { setLocalConversationList, selectConversation } = useConversation()
 
 const showSettings = ref(false)
+
+/** 当前右侧主区域展示的联系人详情用户 ID */
+const detailUserId = ref<string | null>(null)
 
 // Input 组件风格演示
 const inputVariant = ref<'default' | 'search' | 'filled' | 'ghost' | 'underline'>('search')
@@ -95,6 +99,28 @@ const chatConfig = computed(() => ({
     ...(chatInputMaxLength.value > 0 ? { maxLength: chatInputMaxLength.value } : {}),
   },
 }))
+
+/** 从联系人详情页进入单聊 */
+function enterChatWithUser(userId: string) {
+  const contactStore = useContactStore()
+  const contact = contactStore.getContact(userId)
+  const existing = stores.conversation.conversationList.find(c => c.id === userId)
+  if (!existing) {
+    stores.conversation.addConversation({
+      id: userId,
+      name: contact?.name || contact?.remark || userId,
+      avatar: contact?.avatar,
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '',
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    })
+  }
+  selectConversation(userId)
+  detailUserId.value = null
+}
 
 // SDK 初始化相关状态
 const sdkAppKey = ref('easemob-demo#support')
@@ -184,13 +210,20 @@ function injectMockConversations() {
 /** 左侧边栏 tab：会话 / 联系人 */
 const sidebarTab = ref<'conversation' | 'contact'>('conversation')
 
-const { stores } = useUIKit()
-
 /** 切到联系人页时清空当前会话，避免右侧 Chat 仍显示旧会话 */
 watch(sidebarTab, (tab) => {
   if (tab === 'contact') {
     stores.conversation.setCurrentConversationId(null)
   }
+  else if (tab === 'conversation') {
+    detailUserId.value = null
+  }
+})
+
+/** 选中会话后清空联系人详情页 */
+watch(() => stores.conversation.currentConversationId, (id) => {
+  if (id)
+    detailUserId.value = null
 })
 
 /** 拼音 adapter 开关（对比体验未注入 vs 已注入的区别） */
@@ -906,12 +939,19 @@ function injectMockContacts() {
         :show-home-search="showHomeSearch"
         :show-contact-search="showContactSearch"
         :show-group-search="showGroupSearch"
+        @contact-click="(c: UiContact) => detailUserId = c.userId"
       />
     </div>
 
-    <!-- 右侧主体：聊天容器 -->
+    <!-- 右侧主体：聊天容器 / 联系人详情 -->
     <div class="demo-layout__main">
-      <EmChatContainer :config="chatConfig" />
+      <EmContactDetail
+        v-if="detailUserId"
+        :user-id="detailUserId"
+        @send-message="enterChatWithUser"
+        @deleted="detailUserId = null"
+      />
+      <EmChatContainer v-else :config="chatConfig" />
     </div>
   </div>
 </template>

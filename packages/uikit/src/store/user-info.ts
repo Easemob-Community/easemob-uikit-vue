@@ -13,6 +13,7 @@ export interface UserInfoState {
 export const useUserInfoStore = defineStore('userInfo', () => {
   const userInfoMap = ref<Record<string, UserInfo>>({})
   const loadingSet = ref<Set<string>>(new Set())
+  const fetchFailedSet = ref<Set<string>>(new Set())
   const subscribedSet = ref<Set<string>>(new Set())
   const subscribeFailedSet = ref<Set<string>>(new Set())
   const subscriptionDisabled = ref(false)
@@ -23,11 +24,13 @@ export const useUserInfoStore = defineStore('userInfo', () => {
 
   function setUserInfo(userInfo: UserInfo) {
     userInfoMap.value[userInfo.userId] = { ...userInfo }
+    fetchFailedSet.value.delete(userInfo.userId)
   }
 
   function setUserInfos(infos: UserInfo[]) {
     for (const info of infos) {
       userInfoMap.value[info.userId] = { ...info }
+      fetchFailedSet.value.delete(info.userId)
     }
   }
 
@@ -41,6 +44,16 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     for (const id of userIds) {
       loadingSet.value.delete(id)
     }
+  }
+
+  function markFetchFailed(userIds: string[]) {
+    for (const id of userIds) {
+      fetchFailedSet.value.add(id)
+    }
+  }
+
+  function isFetchFailed(userId: string): boolean {
+    return fetchFailedSet.value.has(userId)
   }
 
   function markSubscribed(userIds: string[]) {
@@ -79,6 +92,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
   function clearUserInfos() {
     userInfoMap.value = {}
     loadingSet.value.clear()
+    fetchFailedSet.value.clear()
     subscribedSet.value.clear()
     subscribeFailedSet.value.clear()
     subscriptionDisabled.value = false
@@ -87,6 +101,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
   return {
     userInfoMap: computed(() => userInfoMap.value),
     loadingSet: computed(() => loadingSet.value),
+    fetchFailedSet: computed(() => fetchFailedSet.value),
     subscribedSet: computed(() => subscribedSet.value),
     subscribeFailedSet: computed(() => subscribeFailedSet.value),
     subscriptionDisabled: computed(() => subscriptionDisabled.value),
@@ -95,6 +110,8 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     setUserInfos,
     markLoading,
     markLoaded,
+    markFetchFailed,
+    isFetchFailed,
     markSubscribed,
     markSubscribeFailed,
     isSubscribeFailed,

@@ -15,6 +15,9 @@ import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type { UiConversation as Conversation } from '../../sdk/types'
 import type { ConversationAction } from './types'
 import ConversationItem from './conversation-item.vue'
+import NewChatModal from './new-chat-modal.vue'
+import AddContactModal from './add-contact-modal.vue'
+import CreateGroupModal from './create-group-modal.vue'
 
 const props = withDefaults(defineProps<{
   showSearch?: boolean
@@ -76,6 +79,10 @@ const showHeaderMenu = ref(false)
 const headerMenuTriggerRef = ref<HTMLElement>()
 const showHeaderActionSheet = ref(false)
 
+const showNewChatModal = ref(false)
+const showAddContactModal = ref(false)
+const showCreateGroupModal = ref(false)
+
 /** 下拉刷新 */
 const { isRefreshing: isPullRefreshing } = usePullRefresh(
   itemsRef,
@@ -111,14 +118,24 @@ function onHeaderMenuClick() {
   }
 }
 
-function onHeaderActionSheetSelect(_item: { name: string, icon?: string }, _index: number) {
-  // TODO: 根据 key 执行对应操作
+function onHeaderActionSheetSelect(item: { name: string, icon?: string }, index: number) {
+  const key = headerMenuItems.value[index]?.key
+  if (key)
+    handleHeaderAction(key)
 }
 
 function onHeaderMenuItemClick(key: string) {
   showHeaderMenu.value = false
-  // TODO: 根据 key 执行对应操作
-  void key
+  handleHeaderAction(key)
+}
+
+function handleHeaderAction(key: string) {
+  if (key === 'newChat')
+    showNewChatModal.value = true
+  else if (key === 'addContact')
+    showAddContactModal.value = true
+  else if (key === 'createGroup')
+    showCreateGroupModal.value = true
 }
 
 /** 获取会话可用于搜索的文本字段（ID、会话名、备注、昵称、群名、最后消息等） */
@@ -187,16 +204,18 @@ function handleSelect(id: string) {
 /** 删除确认 */
 const showDeleteModal = ref(false)
 const pendingDeleteId = ref('')
+const deleteWithHistory = ref(true)
 
 function handleDelete(id: string) {
   pendingDeleteId.value = id
+  deleteWithHistory.value = true
   showDeleteModal.value = true
 }
 
 function confirmDelete() {
   if (pendingDeleteId.value) {
     clearDraft(pendingDeleteId.value)
-    deleteConversation(pendingDeleteId.value)
+    deleteConversation(pendingDeleteId.value, deleteWithHistory.value)
     pendingDeleteId.value = ''
   }
 }
@@ -314,7 +333,13 @@ function confirmDelete() {
       :cancel-text="t('button.cancel')"
       @confirm="confirmDelete"
     >
-      <div>{{ t('conversation.deleteConfirm') }}</div>
+      <div class="conversation-list__delete-body">
+        <div>{{ t('conversation.deleteConfirm') }}</div>
+        <label class="conversation-list__delete-option">
+          <input v-model="deleteWithHistory" type="checkbox">
+          <span>{{ t('conversation.deleteWithHistory') || '同时删除聊天记录' }}</span>
+        </label>
+      </div>
     </Modal>
 
     <!-- H5 Header 菜单 ActionSheet -->
@@ -323,6 +348,15 @@ function confirmDelete() {
       :actions="headerActionSheetActions"
       @select="onHeaderActionSheetSelect"
     />
+
+    <!-- 新会话 -->
+    <NewChatModal v-model:show="showNewChatModal" />
+
+    <!-- 添加联系人 -->
+    <AddContactModal v-model:show="showAddContactModal" />
+
+    <!-- 创建群组 -->
+    <CreateGroupModal v-model:show="showCreateGroupModal" />
   </div>
 </template>
 
@@ -483,5 +517,29 @@ function confirmDelete() {
   text-align: center;
   font-size: 13px;
   color: var(--uikit-text-secondary);
+}
+
+.conversation-list__delete-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.conversation-list__delete-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+}
+
+.conversation-list__delete-option input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--uikit-primary-color);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 </style>

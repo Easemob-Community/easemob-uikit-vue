@@ -1,5 +1,6 @@
 import { computed, toValue, watchEffect } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
+import type { UserInfoAttribute } from 'easemob-websdk'
 import { useUIKit } from './use-uikit'
 
 /**
@@ -7,7 +8,10 @@ import { useUIKit } from './use-uikit'
  * 展示优先级：联系人备注 > 用户资料昵称/头像 > 用户 ID。
  * 首次使用时会触发批量拉取与订阅；已缓存则直接返回。
  */
-export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
+export function useUserInfo(
+  userId: MaybeRefOrGetter<string | undefined>,
+  attributes: UserInfoAttribute[] = ['nickname', 'avatarUrl'],
+) {
   const { stores, domains, features } = useUIKit()
   const enabled = features.enableUserInfo !== false
   const subscriptionEnabled = features.enableUserInfoSubscription !== false
@@ -29,10 +33,15 @@ export function useUserInfo(userId: MaybeRefOrGetter<string | undefined>) {
     const userIdValue = id.value
     if (!userIdValue)
       return
-    if (stores.userInfo.getUserInfo(userIdValue) || stores.userInfo.isLoading(userIdValue))
+    if (
+      stores.userInfo.getUserInfo(userIdValue)
+      || stores.userInfo.isLoading(userIdValue)
+      || stores.userInfo.isFetchFailed(userIdValue)
+    ) {
       return
+    }
 
-    void domains.userInfo.fetchUserInfos([userIdValue])
+    void domains.userInfo.fetchUserInfos([userIdValue], attributes)
 
     if (subscriptionEnabled && !stores.userInfo.isSubscriptionDisabled()) {
       void domains.userInfo.subscribeUserInfos([userIdValue])

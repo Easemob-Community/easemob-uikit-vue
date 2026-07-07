@@ -173,12 +173,12 @@ export function useConversation() {
     stores.message.clearConversationMessages(id)
   }
 
-  /** 删除会话 */
-  async function deleteConversation(id: string) {
+  /** 删除会话（默认同时删除漫游消息和本地缓存） */
+  async function deleteConversation(id: string, deleteRoamingMessages = true) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
     if (!cvs)
       return
-    await domains.conversation.remove(id, cvs.type)
+    await domains.conversation.remove(id, cvs.type, deleteRoamingMessages)
   }
 
   /** 本地删除会话 */

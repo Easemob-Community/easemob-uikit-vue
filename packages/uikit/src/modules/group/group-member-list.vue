@@ -47,7 +47,7 @@ const emit = defineEmits<{
 const { t } = useLocale()
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
-const { fetchGroupMembers, getGroupMembers } = useGroup()
+const { fetchGroupMembers } = useGroup()
 
 const searchKeyword = ref('')
 const loadingMore = ref(false)
@@ -64,7 +64,6 @@ watch(() => props.hasMore, (val) => {
 }, { immediate: true })
 
 const groupInfo = computed(() => props.group || stores.group.getGroupById(props.groupId))
-const ownerId = computed(() => groupInfo.value?.owner)
 const currentUserRole = computed(() => {
   const member = localMembers.value.find(m => m.userId === props.currentUserId)
   return member?.role || 'member'
@@ -200,7 +199,17 @@ async function refresh() {
   await initialLoad()
 }
 
-defineExpose({ refresh })
+function removeMember(userId: string) {
+  localMembers.value = localMembers.value.filter(m => m.userId !== userId)
+}
+
+function setMemberRole(userId: string, role: UiGroupMember['role']) {
+  const member = localMembers.value.find(m => m.userId === userId)
+  if (member)
+    member.role = role
+}
+
+defineExpose({ refresh, removeMember, setMemberRole })
 </script>
 
 <template>
@@ -270,11 +279,12 @@ defineExpose({ refresh })
                 {{ roleLabel(member.role) }}
               </span>
             </div>
-            <div class="group-member-list__id">ID: {{ member.userId }}</div>
+            <div class="group-member-list__id">
+              ID: {{ member.userId }}
+            </div>
           </div>
 
-          <div class="group-member-list__actions" @click.stop
-          >
+          <div class="group-member-list__actions" @click.stop>
             <button
               v-if="canChat(member)"
               class="group-member-list__action-btn"

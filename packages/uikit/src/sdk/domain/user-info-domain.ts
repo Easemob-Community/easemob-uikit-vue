@@ -1,8 +1,6 @@
-import type {
-  ManagerHost,
-} from '../client'
-import type { UserInfoStore } from '../../store/user-info'
 import type { UserInfo, UserInfoAttribute } from 'easemob-websdk'
+import type { ManagerHost } from '../client'
+import type { UserInfoStore } from '../../store/user-info'
 import type { UIKitDataSource } from '../../composables/types'
 
 /**
@@ -39,7 +37,7 @@ export class UserInfoDomain {
   ): Promise<UserInfo[]> {
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     const missingIds = uniqueIds.filter(
-      id => !this.store.getUserInfo(id) && !this.store.isLoading(id),
+      id => !this.store.getUserInfo(id) && !this.store.isLoading(id) && !this.store.isFetchFailed(id),
     )
 
     if (missingIds.length === 0) {
@@ -51,6 +49,13 @@ export class UserInfoDomain {
       const infos = this.dataSource.fetchUserInfos
         ? await this.fetchFromDataSource(missingIds)
         : await this.fetchFromSdk(missingIds, attributes)
+
+      // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
+      const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+      const failedIds = missingIds.filter(id => !fetchedIds.has(id))
+      if (failedIds.length > 0)
+        this.store.markFetchFailed(failedIds)
+
       this.store.setUserInfos(infos)
       return uniqueIds
         .map(id => this.store.getUserInfo(id))
@@ -58,6 +63,7 @@ export class UserInfoDomain {
     }
     catch (err) {
       console.warn('[UserInfoDomain] fetchUserInfos failed:', err)
+      this.store.markFetchFailed(missingIds)
       return uniqueIds
         .map(id => this.store.getUserInfo(id))
         .filter((info): info is UserInfo => Boolean(info))
@@ -138,8 +144,8 @@ export class UserInfoDomain {
       if (!this.hasLoggedPermissionError) {
         this.hasLoggedPermissionError = true
         console.warn(
-          '[UserInfoDomain] 用户资料订阅无权限或服务未开通，已自动关闭订阅。' +
-          '后续陌生人资料变更将不会实时推送，拉取到的资料仍可正常展示。',
+          '[UserInfoDomain] 用户资料订阅无权限或服务未开通，已自动关闭订阅。'
+          + '后续陌生人资料变更将不会实时推送，拉取到的资料仍可正常展示。',
           err,
         )
         this.onSubscriptionPermissionError?.()
@@ -156,7 +162,7 @@ export class UserInfoDomain {
       return false
     const e = err as {
       code?: number | string
-      details?: { httpStatus?: number; reason?: string }
+      details?: { httpStatus?: number, reason?: string }
     }
     return e.code === 210
       || e.details?.httpStatus === 403

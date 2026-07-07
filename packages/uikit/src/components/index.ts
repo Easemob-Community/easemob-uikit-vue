@@ -11,6 +11,8 @@ export { default as EmToast } from './toast/toast.vue'
 export { default as EmActionSheet } from './action-sheet/action-sheet.vue'
 export { default as EmScrollToTop } from './scroll-to-top/scroll-to-top.vue'
 export { default as EmEmojiPicker } from './emoji-picker/emoji-picker.vue'
+export { default as EmUserCard } from './user-card/user-card.vue'
+export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
 
 export const componentList = [
   'em-button',
@@ -24,4 +26,6 @@ export const componentList = [
   'em-action-sheet',
   'em-scroll-to-top',
   'em-emoji-picker',
+  'em-user-card',
+  'em-user-card-modal',
 ] as const

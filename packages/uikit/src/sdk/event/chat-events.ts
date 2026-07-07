@@ -20,7 +20,8 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
   const missingGroupIds: string[] = []
   for (const cvs of stores.conversation.conversationList) {
     const needsPatch = !cvs.name || cvs.name === cvs.id
-    if (!needsPatch) continue
+    if (!needsPatch)
+      continue
     if (cvs.type === 'groupChat') {
       const groupName = groupMap.get(cvs.id)
       if (groupName) {
@@ -40,7 +41,8 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
     }
   }
 
-  if (missingGroupIds.length === 0) return
+  if (missingGroupIds.length === 0)
+    return
 
   for (const id of missingGroupIds) fetchingGroupNames.add(id)
   try {
@@ -120,21 +122,23 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onConversationListUpdate: (payload) => {
-      // SDK5 payload 包含完整快照和 patch；合并更新，避免 SDK 把 name/avatar 回退成 id 导致闪烁
-      const updates = toUiConversations(payload.items)
-      for (const item of updates) {
-        const existing = stores.conversation.conversationList.find(c => c.id === item.id)
-        if (existing) {
-          const keepName = (!item.name || item.name === item.id) && existing.name && existing.name !== existing.id
-          const keepAvatar = !item.avatar && existing.avatar
-          stores.conversation.updateConversation(item.id, {
-            ...item,
-            name: keepName ? existing.name : item.name,
-            avatar: keepAvatar ? existing.avatar : item.avatar,
-          })
-        }
-        else {
-          stores.conversation.addConversation(item)
+      // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
+      // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
+      const incoming = toUiConversations(payload.items)
+      const merged = mergeWithExistingConversations(stores, incoming)
+
+      if (payload.patch.reset || payload.patch.removed.length > 0) {
+        stores.conversation.setConversationList(merged)
+      }
+      else {
+        for (const item of merged) {
+          const existing = stores.conversation.conversationList.find(c => c.id === item.id)
+          if (existing) {
+            stores.conversation.updateConversation(item.id, item)
+          }
+          else {
+            stores.conversation.addConversation(item)
+          }
         }
       }
       void patchConversationNames(stores, client)

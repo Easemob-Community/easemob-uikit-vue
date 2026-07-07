@@ -99,7 +99,16 @@ export const useGroupStore = defineStore('group', () => {
 
   // ===== 群成员/公告缓存 =====
   function setGroupMembers(groupId: string, members: UiGroupMember[]) {
-    groupMembersMap.value[groupId] = members
+    const existing = groupMembersMap.value[groupId] || []
+    const existingRoles = new Map(existing.map(m => [m.userId, m.role]))
+    groupMembersMap.value[groupId] = members.map((m) => {
+      const existingRole = existingRoles.get(m.userId)
+      // 保留已缓存的 admin/owner 角色，避免服务端延迟同步导致角色闪回
+      if (existingRole && (existingRole === 'admin' || existingRole === 'owner') && m.role === 'member') {
+        return { ...m, role: existingRole }
+      }
+      return m
+    })
   }
 
   function appendGroupMembers(groupId: string, members: UiGroupMember[]) {

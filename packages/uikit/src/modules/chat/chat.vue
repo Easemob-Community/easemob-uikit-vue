@@ -12,17 +12,19 @@ import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
-import type { ChatConfig, MentionContact } from './types'
+import Popup from '../../components/popup/popup.vue'
+import GroupMemberList from '../group/group-member-list.vue'
+import InviteMemberModal from '../group/invite-member-modal.vue'
+import Modal from '../../components/modal/modal.vue'
+import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
-import Popup from '../../components/popup/popup.vue'
-import GroupMemberList from '../group/group-member-list.vue'
-import InviteMemberModal from '../group/invite-member-modal.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import TypingIndicator from './typing-indicator/typing-indicator.vue'
+import type { ChatConfig, MentionContact } from './types'
 
 /** 渲染错误信息 */
 interface RenderError {
@@ -61,9 +63,9 @@ defineExpose({
 })
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
-const { stores, h5, client, domains } = useUIKit()
-const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory } = useConversation()
-const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo } = useGroup()
+const { stores, h5, client } = useUIKit()
+const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, selectConversation } = useConversation()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -197,9 +199,20 @@ const showInviteModal = ref(false)
 /** 当前添加成员对应的群 ID */
 const inviteGroupId = ref('')
 
+/** 是否显示移除成员二次确认 */
+const showRemoveConfirmModal = ref(false)
+
+/** 待移除成员 */
+const pendingRemoveMember = ref<UiGroupMember | null>(null)
+
+/** 是否显示用户名片弹窗 */
+const showUserCardModal = ref(false)
+
+/** 用户名片弹窗展示的用户 ID */
+const userCardUserId = ref('')
+
 /** 群成员列表组件引用 */
 const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
-
 
 /** 当前登录用户 ID */
 const currentUserId = computed(() => client.value.currentUserId ?? '')
@@ -434,6 +447,9 @@ const showForwardModal = ref(false)
 /** 待转发的消息（单条或多选） */
 const pendingForwardMessages = ref<UiMessage[]>([])
 
+/** 当前转发模式：'oneByOne' 逐条转发 | 'combine' 合并转发 */
+const forwardMode = ref<'oneByOne' | 'combine'>('oneByOne')
+
 /** 打开转发弹窗 */
 function openForwardModal(messages: UiMessage[], mode?: 'oneByOne' | 'combine') {
   if (messages.length === 0)
@@ -443,9 +459,6 @@ function openForwardModal(messages: UiMessage[], mode?: 'oneByOne' | 'combine') 
   forwardMode.value = mode ?? (messages.length === 1 ? 'oneByOne' : 'combine')
   showForwardModal.value = true
 }
-
-/** 当前转发模式：'oneByOne' 逐条转发 | 'combine' 合并转发 */
-const forwardMode = ref<'oneByOne' | 'combine'>('oneByOne')
 
 /** 执行转发 */
 async function onForwardConfirm(targetConversation: Conversation) {
@@ -567,6 +580,7 @@ async function onInviteMembers(userIds: string[]) {
     return
   try {
     await inviteUsersToGroup(groupId, userIds)
+    showInviteModal.value = false
     showToast(t('group.inviteMember.success') || '邀请已发送')
     // 如果成员列表弹窗正在打开，刷新列表
     if (showMemberList.value && memberListGroupId.value === groupId) {
@@ -585,25 +599,81 @@ async function onInviteMembers(userIds: string[]) {
   }
 }
 
+/** 点击聊天 header 头像打开用户名片 */
+function onHeaderAvatarClick() {
+  if (currentConversation.value?.type === 'singleChat' && currentConversation.value?.id) {
+    userCardUserId.value = currentConversation.value.id
+    showUserCardModal.value = true
+  }
+}
+
+/** 从用户名片进入单聊 */
+function onUserCardSendMessage(userId: string) {
+  const existing = stores.conversation.conversationList.find(c => c.id === userId)
+  if (!existing) {
+    stores.conversation.addConversation({
+      id: userId,
+      name: userId,
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '',
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    })
+  }
+  selectConversation(userId)
+}
+
 /** 与成员发起单聊 */
 function onChatMember(member: UiGroupMember) {
   showMemberList.value = false
-  stores.conversation.setCurrentConversationId(member.userId)
-  domains?.conversation?.enter(member.userId, 'singleChat')
+  const existing = stores.conversation.conversationList.find(c => c.id === member.userId)
+  if (!existing) {
+    stores.conversation.addConversation({
+      id: member.userId,
+      name: member.nickname || member.userId,
+      avatar: member.avatarUrl,
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '',
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    })
+  }
+  selectConversation(member.userId)
 }
 
 /** 移除成员 */
-async function onRemoveMember(member: UiGroupMember) {
-  if (!memberListGroupId.value)
+function onRemoveMember(member: UiGroupMember) {
+  pendingRemoveMember.value = member
+  showRemoveConfirmModal.value = true
+}
+
+/** 确认移除成员 */
+async function confirmRemoveMember() {
+  const member = pendingRemoveMember.value
+  if (!member || !memberListGroupId.value) {
+    showRemoveConfirmModal.value = false
     return
+  }
+  pendingRemoveMember.value = null
+  showRemoveConfirmModal.value = false
   try {
     await removeGroupMembers(memberListGroupId.value, [member.userId])
     showToast(t('chat.info.removeMemberSuccess') || '成员已移除')
+    memberListRef.value?.removeMember(member.userId)
   }
   catch (err) {
     console.warn('[Chat] remove member failed:', err)
     showToast(t('chat.info.removeMemberFailed') || '移除成员失败')
   }
+}
+
+function cancelRemoveMember() {
+  pendingRemoveMember.value = null
+  showRemoveConfirmModal.value = false
 }
 
 /** 设为管理员 */
@@ -613,6 +683,7 @@ async function onSetAdmin(member: UiGroupMember) {
   try {
     await addGroupAdmin(memberListGroupId.value, member.userId)
     showToast(t('chat.info.setAdminSuccess') || '已设为管理员')
+    memberListRef.value?.setMemberRole(member.userId, 'admin')
   }
   catch (err) {
     console.warn('[Chat] set admin failed:', err)
@@ -627,6 +698,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   try {
     await removeGroupAdmin(memberListGroupId.value, member.userId)
     showToast(t('chat.info.removeAdminSuccess') || '已取消管理员')
+    memberListRef.value?.setMemberRole(member.userId, 'member')
   }
   catch (err) {
     console.warn('[Chat] remove admin failed:', err)
@@ -684,6 +756,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
                 :src="headerAvatar"
                 :name="headerTitle"
                 :size="36"
+                @click="onHeaderAvatarClick"
               />
             </slot>
           </div>
@@ -782,6 +855,20 @@ async function onRemoveAdmin(member: UiGroupMember) {
         </div>
       </Popup>
 
+      <!-- 移除成员二次确认 -->
+      <Modal
+        v-model:show="showRemoveConfirmModal"
+        :title="t('group.memberList.removeConfirmTitle')"
+        :confirm-text="t('button.confirm')"
+        :cancel-text="t('button.cancel')"
+        @confirm="confirmRemoveMember"
+        @cancel="cancelRemoveMember"
+      >
+        <template v-if="pendingRemoveMember">
+          {{ t('group.memberList.removeConfirmPrefix') }} {{ pendingRemoveMember.nickname || pendingRemoveMember.userId }} {{ t('group.memberList.removeConfirmSuffix') }}
+        </template>
+      </Modal>
+
       <!-- 添加成员弹窗 -->
       <InviteMemberModal
         v-model:show="showInviteModal"
@@ -794,6 +881,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
       <ForwardModal
         v-model:show="showForwardModal"
         @forward="onForwardConfirm"
+      />
+
+      <!-- 用户名片弹窗 -->
+      <UserCardModal
+        v-model:show="showUserCardModal"
+        :user-id="userCardUserId"
+        @send-message="onUserCardSendMessage"
       />
     </template>
   </div>
