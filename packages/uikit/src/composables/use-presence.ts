@@ -9,8 +9,13 @@ export function usePresence() {
 
   const presenceMap = computed(() => presenceStore.presenceMap)
   const onlineUserIds = computed(() => presenceStore.onlineUserIds)
+  const currentUserId = computed(() => stores.client.currentUser)
 
   const loading = ref(false)
+
+  function isSelf(userId: string): boolean {
+    return !!currentUserId.value && userId === currentUserId.value
+  }
 
   /** 订阅在线状态 */
   async function subscribePresence(userIds: string[], expiry?: number) {
@@ -32,13 +37,16 @@ export function usePresence() {
 
   /** 查询在线状态 */
   async function fetchPresence(userIds: string[]): Promise<UiPresence[]> {
+    const ids = userIds.filter(id => !isSelf(id))
+    if (ids.length === 0)
+      return []
     if (dataSource.fetchPresence) {
-      const list = await dataSource.fetchPresence(userIds)
+      const list = await dataSource.fetchPresence(ids)
       presenceStore.updateBatch(list)
       return list
     }
-    await domains.presence.fetchStatus(userIds)
-    return userIds
+    await domains.presence.fetchStatus(ids)
+    return ids
       .map(userId => presenceStore.get(userId))
       .filter((p): p is UiPresence => !!p)
   }
@@ -61,13 +69,15 @@ export function usePresence() {
   /**
    * 跟随传入的用户 ID 列表自动订阅/取消订阅在线状态。
    * 列表变化时增量订阅新增用户、取消已移出用户；作用域销毁时释放全部订阅。
+   * Presence 服务不支持订阅自己，因此当前登录用户 ID 会被自动排除，
+   * 自身在线状态依赖 SDK 派发事件写入 store。
    */
   function watch(source: MaybeRefOrGetter<string[]>): void {
     let current: string[] = []
     const stop = vueWatch(
-      () => toValue(source),
-      (ids) => {
-        const next = ids || []
+      () => ({ ids: toValue(source), self: currentUserId.value }),
+      ({ ids, self }) => {
+        const next = (ids || []).filter(id => id !== self)
         const toAdd = next.filter(id => !current.includes(id))
         const toRemove = current.filter(id => !next.includes(id))
         current = [...next]
