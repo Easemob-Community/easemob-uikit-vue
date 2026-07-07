@@ -17,6 +17,7 @@ import GroupMemberList from '../group/group-member-list.vue'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
+import GroupCardModal from '../../components/group-card/group-card-modal.vue'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
@@ -210,6 +211,11 @@ const showUserCardModal = ref(false)
 
 /** 用户名片弹窗展示的用户 ID */
 const userCardUserId = ref('')
+
+/** 是否显示群名片弹窗 */
+const showGroupCardModal = ref(false)
+/** 群名片弹窗展示的群 ID */
+const groupCardGroupId = ref('')
 
 /** 群成员列表组件引用 */
 const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
@@ -599,11 +605,18 @@ async function onInviteMembers(userIds: string[]) {
   }
 }
 
-/** 点击聊天 header 头像打开用户名片 */
+/** 点击聊天 header 头像打开名片 */
 function onHeaderAvatarClick() {
-  if (currentConversation.value?.type === 'singleChat' && currentConversation.value?.id) {
-    userCardUserId.value = currentConversation.value.id
+  const conversation = currentConversation.value
+  if (!conversation?.id)
+    return
+  if (conversation.type === 'singleChat') {
+    userCardUserId.value = conversation.id
     showUserCardModal.value = true
+  }
+  else if (conversation.type === 'groupChat') {
+    groupCardGroupId.value = conversation.id
+    showGroupCardModal.value = true
   }
 }
 
@@ -623,6 +636,24 @@ function onUserCardSendMessage(userId: string) {
     })
   }
   selectConversation(userId)
+}
+
+/** 从群名片进入/刷新群聊 */
+function onGroupCardSendMessage(groupId: string) {
+  const existing = stores.conversation.conversationList.find(c => c.id === groupId)
+  if (!existing) {
+    stores.conversation.addConversation({
+      id: groupId,
+      name: groupId,
+      type: 'groupChat',
+      unreadCount: 0,
+      lastMessageText: '',
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    })
+  }
+  selectConversation(groupId)
 }
 
 /** 与成员发起单聊 */
@@ -888,6 +919,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
         v-model:show="showUserCardModal"
         :user-id="userCardUserId"
         @send-message="onUserCardSendMessage"
+      />
+
+      <!-- 群名片弹窗 -->
+      <GroupCardModal
+        v-model:show="showGroupCardModal"
+        :group-id="groupCardGroupId"
+        @send-message="onGroupCardSendMessage"
       />
     </template>
   </div>

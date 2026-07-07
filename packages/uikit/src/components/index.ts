@@ -13,6 +13,8 @@ export { default as EmScrollToTop } from './scroll-to-top/scroll-to-top.vue'
 export { default as EmEmojiPicker } from './emoji-picker/emoji-picker.vue'
 export { default as EmUserCard } from './user-card/user-card.vue'
 export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
+export { default as EmGroupCard } from './group-card/group-card.vue'
+export { default as EmGroupCardModal } from './group-card/group-card-modal.vue'
 
 export const componentList = [
   'em-button',
@@ -28,4 +30,6 @@ export const componentList = [
   'em-emoji-picker',
   'em-user-card',
   'em-user-card-modal',
+  'em-group-card',
+  'em-group-card-modal',
 ] as const

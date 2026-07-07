@@ -5,6 +5,7 @@ import {
   EmContactContainer,
   EmContactDetail,
   EmConversationContainer,
+  EmGroupDetail,
   EmInput,
   EmPopup,
   setPinyinAdapter,
@@ -15,7 +16,7 @@ import {
   useTheme,
   useUIKit,
 } from '@easemob/uikit'
-import type { UiContact, UiConversation } from '@easemob/uikit'
+import type { UiContact, UiConversation, UiGroup } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
 
@@ -48,6 +49,8 @@ const showSettings = ref(false)
 
 /** 当前右侧主区域展示的联系人详情用户 ID */
 const detailUserId = ref<string | null>(null)
+/** 当前右侧主区域展示的群组详情群 ID */
+const detailGroupId = ref<string | null>(null)
 
 // Input 组件风格演示
 const inputVariant = ref<'default' | 'search' | 'filled' | 'ghost' | 'underline'>('search')
@@ -119,7 +122,30 @@ function enterChatWithUser(userId: string) {
     })
   }
   selectConversation(userId)
+  sidebarTab.value = 'conversation'
   detailUserId.value = null
+}
+
+/** 从群组详情页进入群聊 */
+function enterChatWithGroup(groupId: string) {
+  const existing = stores.conversation.conversationList.find(c => c.id === groupId)
+  if (!existing) {
+    const group = stores.group.getGroupById(groupId)
+    stores.conversation.addConversation({
+      id: groupId,
+      name: group?.groupName || groupId,
+      avatar: group?.avatar,
+      type: 'groupChat',
+      unreadCount: 0,
+      lastMessageText: '',
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    })
+  }
+  selectConversation(groupId)
+  sidebarTab.value = 'conversation'
+  detailGroupId.value = null
 }
 
 // SDK 初始化相关状态
@@ -217,13 +243,16 @@ watch(sidebarTab, (tab) => {
   }
   else if (tab === 'conversation') {
     detailUserId.value = null
+    detailGroupId.value = null
   }
 })
 
 /** 选中会话后清空联系人详情页 */
 watch(() => stores.conversation.currentConversationId, (id) => {
-  if (id)
+  if (id) {
     detailUserId.value = null
+    detailGroupId.value = null
+  }
 })
 
 /** 拼音 adapter 开关（对比体验未注入 vs 已注入的区别） */
@@ -939,17 +968,24 @@ function injectMockContacts() {
         :show-home-search="showHomeSearch"
         :show-contact-search="showContactSearch"
         :show-group-search="showGroupSearch"
-        @contact-click="(c: UiContact) => detailUserId = c.userId"
+        @view-change="() => { detailUserId = null; detailGroupId = null }"
+        @contact-click="(c: UiContact) => { detailUserId = c.userId; detailGroupId = null }"
+        @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"
       />
     </div>
 
-    <!-- 右侧主体：聊天容器 / 联系人详情 -->
+    <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
     <div class="demo-layout__main">
       <EmContactDetail
         v-if="detailUserId"
         :user-id="detailUserId"
         @send-message="enterChatWithUser"
         @deleted="detailUserId = null"
+      />
+      <EmGroupDetail
+        v-else-if="detailGroupId"
+        :group-id="detailGroupId"
+        @send-message="enterChatWithGroup"
       />
       <EmChatContainer v-else :config="chatConfig" />
     </div>
