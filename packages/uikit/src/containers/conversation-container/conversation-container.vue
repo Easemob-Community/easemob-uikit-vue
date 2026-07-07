@@ -42,6 +42,8 @@ export interface ConversationContainerProps {
   footerSticky?: boolean
   /** 是否启用下拉刷新（H5），默认 false */
   pullRefresh?: boolean
+  /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  enablePresence?: boolean
   /**
    * 草稿存储模式：
    * - 'none' 仅内存缓存，页面关闭即丢失（默认）
@@ -64,6 +66,7 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   bodySticky: false,
   footerSticky: false,
   pullRefresh: false,
+  enablePresence: undefined,
   draftStorage: 'none',
 })
 
@@ -109,6 +112,7 @@ function handleConversationSelect(id: string, conversation: Conversation) {
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
       :pull-refresh="props.pullRefresh"
+      :enable-presence="props.enablePresence"
       @select="handleConversationSelect"
     >
       <template v-if="$slots.header" #header>

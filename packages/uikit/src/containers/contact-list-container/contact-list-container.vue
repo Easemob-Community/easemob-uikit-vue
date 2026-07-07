@@ -86,6 +86,10 @@ export interface ContactListContainerProps {
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
 
+  // ---------- 在线状态 ----------
+  /** 是否展示联系人头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  enablePresence?: boolean
+
   // ---------- 自定义搜索 ----------
   /** 自定义搜索组件（完全接管搜索逻辑与UI），传入后 showSearch 失效 */
   searchComponent?: Component
@@ -127,6 +131,7 @@ const props = withDefaults(defineProps<ContactListContainerProps>(), {
   bodySticky: false,
   footerSticky: false,
   clickBehavior: 'default',
+  enablePresence: undefined,
   autoFetch: true,
 })
 
@@ -215,6 +220,7 @@ defineExpose({
       :footer-sticky="props.footerSticky"
       :search-component="props.searchComponent"
       :click-behavior="props.clickBehavior"
+      :enable-presence="props.enablePresence"
       @select="(c: Contact) => emit('select', c)"
       @click="(c: Contact) => emit('click', c)"
       @contextmenu="(e: MouseEvent, c: Contact) => emit('contextmenu', e, c)"

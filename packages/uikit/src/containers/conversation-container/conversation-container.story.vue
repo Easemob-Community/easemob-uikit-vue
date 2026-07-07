@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ConversationContainer from './conversation-container.vue'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
+import { useConversationStore } from '../../store/conversation'
+import { usePresenceStore } from '../../store/presence'
+import type { UiConversation, UiPresence } from '../../sdk/types'
 
 const customActions = [
   {
@@ -27,6 +30,76 @@ function customMessageFormatter(msg: string, type?: string): string {
 
 function customFilterFn(keyword: string, item: any): boolean {
   return item.name?.toLowerCase().includes(keyword) || item.id?.toLowerCase().includes(keyword)
+}
+
+/** 注入 mock 会话数据 */
+function injectMockConversations() {
+  const store = useConversationStore()
+  const now = Date.now()
+  const list: UiConversation[] = [
+    {
+      id: 'u_alice',
+      name: 'Alice',
+      type: 'singleChat',
+      unreadCount: 2,
+      lastMessageText: '晚上一起吃饭吗？',
+      lastMessageTime: now - 5 * 60 * 1000,
+      isPinned: true,
+      isMuted: false,
+      marks: [],
+    },
+    {
+      id: 'u_bob',
+      name: 'Bob',
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '文件已发送',
+      lastMessageTime: now - 30 * 60 * 1000,
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    },
+    {
+      id: 'u_carol',
+      name: 'Carol',
+      type: 'singleChat',
+      unreadCount: 1,
+      lastMessageText: '收到，谢谢！',
+      lastMessageTime: now - 2 * 60 * 60 * 1000,
+      isPinned: false,
+      isMuted: true,
+      marks: [],
+    },
+    {
+      id: 'g_team',
+      name: '产品技术群',
+      type: 'groupChat',
+      unreadCount: 5,
+      lastMessageText: 'Tom: 版本已发',
+      lastMessageTime: now - 10 * 60 * 1000,
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    },
+  ]
+  store.setConversationList(list)
+}
+
+/** 注入 mock 在线状态 */
+function injectMockConversationPresence() {
+  const store = usePresenceStore()
+  const list: UiPresence[] = [
+    { userId: 'u_alice', status: 'online', ext: '', lastTime: Date.now() },
+    { userId: 'u_bob', status: 'busy', ext: 'busy', lastTime: Date.now() },
+    { userId: 'u_carol', status: 'away', ext: 'away', lastTime: Date.now() },
+  ]
+  store.updateBatch(list)
+}
+
+const mockDataSource = {
+  subscribePresence: async () => {
+    // Storybook 未连接 SDK，用空实现避免报错
+  },
 }
 </script>
 
@@ -222,6 +295,34 @@ function customFilterFn(keyword: string, item: any): boolean {
             </template>
           </ConversationContainer>
         </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Presence Enabled (mocked SDK)">
+      <div style="height: 500px;">
+        <UIKitProvider :auto-init="false" :data-source="mockDataSource">
+          <ConversationContainer
+            enable-presence
+            @vue:mounted="() => { injectMockConversations(); injectMockConversationPresence() }"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        单聊头像右下角展示在线状态；通过容器 enable-presence prop 控制，可覆盖 Provider 全局配置。
+      </div>
+    </Variant>
+
+    <Variant title="Presence Disabled (enablePresence=false)">
+      <div style="height: 500px;">
+        <UIKitProvider :auto-init="false" :enable-presence="true" :data-source="mockDataSource">
+          <ConversationContainer
+            :enable-presence="false"
+            @vue:mounted="() => { injectMockConversations(); injectMockConversationPresence() }"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        Provider 全局开启 Presence，但当前容器通过 :enable-presence="false" 独立关闭。
       </div>
     </Variant>
   </Story>

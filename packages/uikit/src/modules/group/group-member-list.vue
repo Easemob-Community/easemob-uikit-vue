@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
+import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
+import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 
 export interface GroupMemberListProps {
   groupId: string
@@ -46,14 +48,69 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
-const { stores } = useUIKit()
+const { stores, features } = useUIKit()
 const { fetchGroupMembers } = useGroup()
+const { fetchPresence, getPresence } = usePresence()
 
 const searchKeyword = ref('')
 const loadingMore = ref(false)
 const cursor = ref<string | undefined>(undefined)
 const localHasMore = ref(props.hasMore)
 const localMembers = ref<UiGroupMember[]>(props.members)
+
+// Presence 可视区域懒加载
+const itemsRef = ref<HTMLElement>()
+const visibleUserIds = ref<Set<string>>(new Set())
+const observedUserIds = ref<Set<string>>(new Set())
+let presenceObserver: IntersectionObserver | null = null
+let presenceFetchTimer: ReturnType<typeof setTimeout> | null = null
+
+function ensurePresenceObserver() {
+  if (presenceObserver || !itemsRef.value || !features.fetchGroupMemberPresenceOnVisible)
+    return
+  presenceObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const id = entry.target.getAttribute('data-member-id')
+      if (!id)
+        return
+      if (entry.isIntersecting)
+        visibleUserIds.value.add(id)
+      else
+        visibleUserIds.value.delete(id)
+    })
+    scheduleFetchPresence()
+  }, { root: itemsRef.value, threshold: 0 })
+}
+
+function observeMembers() {
+  nextTick(() => {
+    ensurePresenceObserver()
+    const items = itemsRef.value?.querySelectorAll<HTMLElement>('[data-member-id]') ?? []
+    items.forEach((item) => {
+      const id = item.getAttribute('data-member-id')
+      if (id && !observedUserIds.value.has(id)) {
+        presenceObserver?.observe(item)
+        observedUserIds.value.add(id)
+      }
+    })
+  })
+}
+
+function scheduleFetchPresence() {
+  if (presenceFetchTimer)
+    clearTimeout(presenceFetchTimer)
+  presenceFetchTimer = setTimeout(() => {
+    if (!features.enablePresence)
+      return
+    const ids = Array.from(visibleUserIds.value).filter(id => !getPresence(id))
+    if (ids.length > 0)
+      void fetchPresence(ids)
+  }, 200)
+}
+
+function getMemberPresence(userId: string): PresenceDisplayStatus | undefined {
+  return getPresence(userId)?.status as PresenceDisplayStatus | undefined
+}
 
 watch(() => props.members, (val) => {
   localMembers.value = val
@@ -80,6 +137,14 @@ const filteredMembers = computed(() => {
     return name.includes(keyword)
   })
 })
+
+watch(
+  () => filteredMembers.value.map(m => m.userId).join(','),
+  () => {
+    observeMembers()
+  },
+  { immediate: true },
+)
 
 async function initialLoad() {
   try {
@@ -243,7 +308,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
     </div>
 
     <!-- 成员列表 -->
-    <div class="group-member-list__items">
+    <div ref="itemsRef" class="group-member-list__items">
       <div v-if="props.loading && filteredMembers.length === 0" class="group-member-list__empty">
         <span class="group-member-list__empty-text">{{ t('common.loading') }}</span>
       </div>
@@ -259,6 +324,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           v-for="member in filteredMembers"
           :key="member.userId"
           class="group-member-list__item"
+          :data-member-id="member.userId"
           @click="onMemberClick(member)"
         >
           <Avatar
@@ -266,6 +332,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
             :name="displayName(member)"
             :src="member.avatarUrl"
             :size="40"
+            :presence="getMemberPresence(member.userId)"
           />
 
           <div class="group-member-list__info">

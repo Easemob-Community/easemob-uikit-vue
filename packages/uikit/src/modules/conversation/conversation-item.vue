@@ -9,7 +9,9 @@ import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
 import { useUserInfo } from '../../composables/use-user-info'
+import { usePresence } from '../../composables/use-presence'
 import type { UiConversation as Conversation } from '../../sdk/types'
+import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import type { ConversationAction } from './types'
 
 export interface ConversationItemProps {
@@ -49,6 +51,13 @@ const { isMobile } = useViewport()
 const isSingleChat = computed(() => props.conversation.type === 'singleChat')
 const peerUserId = computed(() => isSingleChat.value ? props.conversation.id : undefined)
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
+const { get: getPresence } = usePresence()
+
+const peerPresence = computed<PresenceDisplayStatus | undefined>(() => {
+  if (!isSingleChat.value || !peerUserId.value)
+    return undefined
+  return getPresence(peerUserId.value).value?.status as PresenceDisplayStatus | undefined
+})
 
 const conversationName = computed(() =>
   contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
@@ -252,7 +261,7 @@ const displayMessage = computed(() => {
     @touchend="longPress.end"
     @touchcancel="longPress.cancel"
   >
-    <Avatar :name="conversationName" :src="conversationAvatar" :size="48" />
+    <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
     <slot name="item-prefix" />
     <div class="conversation-item__info">
       <div class="conversation-item__top">

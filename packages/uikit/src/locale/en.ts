@@ -265,6 +265,13 @@ const messages: LocaleMessages = {
   'chat.typing': 'Typing...',
   'conversation.atMe': '@',
   'userInfo.subscriptionDisabled': 'User profile real-time subscription is not enabled. Stranger profile changes will not update automatically. Please contact the admin.',
+  'presence.setStatus': 'Set Status',
+  'presence.online': 'Online',
+  'presence.away': 'Away',
+  'presence.busy': 'Busy',
+  'presence.custom': 'Custom',
+  'presence.customPlaceholder': 'Enter custom status',
+  'presence.publishFailed': 'Failed to set status',
 }
 
 export default messages

@@ -10,6 +10,8 @@ import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
 import { useQuote } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
+import { usePresence } from '../../../composables/use-presence'
+import type { PresenceDisplayStatus } from '../../../components/avatar/avatar.vue'
 import CombineMessageModal from './combine-message-modal.vue'
 import MessageInteractive from './message-interactive.vue'
 import MessageRenderer from './message-renderer.vue'
@@ -72,6 +74,11 @@ function onViewCombine(message: UiMessage) {
 const { t } = useLocale()
 
 const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
+const { get: getPresence } = usePresence()
+
+const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
+  return getPresence(props.message.from).value?.status as PresenceDisplayStatus | undefined
+})
 
 /** 是否为已撤回消息 */
 const isRecalled = computed(() => props.message.recalled)
@@ -231,7 +238,7 @@ const isHighlighted = computed(() => {
         <!-- 头像区域 -->
         <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
           <slot name="avatar" :message="message">
-            <Avatar :name="displayName" :src="avatarUrl" :size="avatarSize" />
+            <Avatar :name="displayName" :src="avatarUrl" :size="avatarSize" :presence="senderPresence" />
           </slot>
         </div>
 

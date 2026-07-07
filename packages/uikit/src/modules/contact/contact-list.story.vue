@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
-import type { UiContact as Contact } from '../../sdk/types'
+import { usePresenceStore } from '../../store/presence'
+import type { UiContact as Contact, UiPresence } from '../../sdk/types'
 import ContactList from './contact-list.vue'
 
 /** 注入 mock 联系人数据，覆盖多字母分组 + # 兜底 */
@@ -68,6 +69,25 @@ function onlineStatusFn(c: Contact): 'online' | 'offline' | 'away' | 'busy' {
   let h = 0
   for (let i = 0; i < c.userId.length; i++) h = (h + c.userId.charCodeAt(i)) % 4
   return map[h]!
+}
+
+/** 注入 mock 在线状态到 store，配合 enablePresence 使用 */
+function injectMockPresence() {
+  const store = usePresenceStore()
+  const list: UiPresence[] = [
+    { userId: 'u_alice', status: 'online', ext: '', lastTime: Date.now() },
+    { userId: 'u_amy', status: 'away', ext: 'away', lastTime: Date.now() },
+    { userId: 'u_bob', status: 'busy', ext: 'busy', lastTime: Date.now() },
+    { userId: 'u_carol', status: 'offline', ext: '', lastTime: Date.now() },
+    { userId: 'u_david', status: 'online', ext: '', lastTime: Date.now() },
+  ]
+  store.updateBatch(list)
+}
+
+const mockDataSource = {
+  subscribePresence: async () => {
+    // Storybook 未连接 SDK，用空实现避免报错
+  },
 }
 
 // ========== 受控选中 + maxSelected 演示 ==========
@@ -168,6 +188,34 @@ function onLoadMore() {
         <UIKitProvider :auto-init="false">
           <ContactList :online-status-fn="onlineStatusFn" @vue:mounted="injectMockContacts" />
         </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Presence via enablePresence (mocked SDK)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false" :data-source="mockDataSource">
+          <ContactList
+            enable-presence
+            @vue:mounted="() => { injectMockContacts(); injectMockPresence() }"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        通过 :enable-presence="true" 开启组件级 Presence；Provider 全局可关闭，仅当前组件生效。
+      </div>
+    </Variant>
+
+    <Variant title="Presence Disabled (enablePresence=false)">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false" :enable-presence="true" :data-source="mockDataSource">
+          <ContactList
+            :enable-presence="false"
+            @vue:mounted="() => { injectMockContacts(); injectMockPresence() }"
+          />
+        </UIKitProvider>
+      </div>
+      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        Provider 全局开启，但当前组件通过 :enable-presence="false" 独立关闭。
       </div>
     </Variant>
 

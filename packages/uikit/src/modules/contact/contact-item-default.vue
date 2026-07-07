@@ -72,13 +72,9 @@ const rootClass = computed(() => ({
           :src="props.contact.avatar"
           :name="displayName"
           :size="resolvedAvatarSize"
+          :presence="props.onlineStatus"
         />
       </slot>
-      <span
-        v-if="props.onlineStatus"
-        class="contact-item-default__status"
-        :class="`status-${props.onlineStatus}`"
-      />
     </span>
     <span class="contact-item-default__main">
       <span class="contact-item-default__name">{{ displayName }}</span>
@@ -158,30 +154,6 @@ const rootClass = computed(() => ({
 
 .contact-item-default__avatar.shape-square :deep(.avatar) {
   border-radius: 4px;
-}
-
-.contact-item-default__status {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-bg-base, #fff);
-  background-color: var(--uikit-text-tertiary, #c0c4cc);
-}
-
-.contact-item-default__status.status-online {
-  background-color: #22c55e;
-}
-.contact-item-default__status.status-away {
-  background-color: #f59e0b;
-}
-.contact-item-default__status.status-busy {
-  background-color: #ef4444;
-}
-.contact-item-default__status.status-offline {
-  background-color: #94a3b8;
 }
 
 .contact-item-default__main {

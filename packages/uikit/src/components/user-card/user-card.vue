@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
 import { useLocale } from '../../locale'
+import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 
 export interface UserCardAction {
   key: string
@@ -27,7 +29,9 @@ export interface UserCardProps {
   /** 顶部背景图 URL，不传时使用默认渐变 */
   banner?: string
   /** 在线状态 */
-  status?: 'online' | 'offline'
+  status?: PresenceDisplayStatus
+  /** 头像是否可编辑（用于当前用户变更在线状态），默认 false */
+  editable?: boolean
   /** 底部操作按钮 */
   actions?: UserCardAction[]
   /** 信息行 */
@@ -37,15 +41,28 @@ export interface UserCardProps {
 const props = withDefaults(defineProps<UserCardProps>(), {
   actions: () => [],
   infoRows: () => [],
+  editable: false,
 })
 
 const emit = defineEmits<{
   (e: 'action-click', key: string): void
   (e: 'info-click', key: string): void
   (e: 'avatar-click'): void
+  (e: 'presence-click'): void
 }>()
 
 const { t } = useLocale()
+
+const statusText = computed(() => {
+  const map: Record<PresenceDisplayStatus, string> = {
+    online: t('userCard.online') || '在线',
+    offline: t('userCard.offline') || '离线',
+    away: t('presence.away') || '离开',
+    busy: t('presence.busy') || '忙碌',
+    custom: t('presence.custom') || '自定义',
+  }
+  return props.status ? map[props.status] : ''
+})
 
 function onActionClick(key: string) {
   emit('action-click', key)
@@ -57,12 +74,9 @@ function onInfoClick(row: UserCardInfoRow) {
 }
 
 function onAvatarClick() {
+  if (props.editable)
+    emit('presence-click')
   emit('avatar-click')
-}
-
-const statusText = {
-  online: t('userCard.online') || '在线',
-  offline: t('userCard.offline') || '离线',
 }
 </script>
 
@@ -80,10 +94,14 @@ const statusText = {
       <div class="user-card__profile">
         <Avatar
           class="user-card__avatar"
+          :class="{ 'is-editable': props.editable }"
           :src="props.avatar"
           :name="props.name"
           :size="90"
           shape="circle"
+          :presence="props.status"
+          :editable="props.editable"
+          @presence-click="emit('presence-click')"
           @click="onAvatarClick"
         />
         <div class="user-card__meta">
@@ -95,7 +113,7 @@ const statusText = {
               :class="`user-card__status--${props.status}`"
             >
               <span class="user-card__status-dot" />
-              {{ statusText[props.status] }}
+              {{ statusText }}
             </span>
           </div>
           <div class="user-card__user-id">
@@ -178,6 +196,9 @@ const statusText = {
   margin-bottom: 12px;
   border: 5px solid var(--uikit-bg-base);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-card__avatar.is-editable {
   cursor: pointer;
 }
 
@@ -222,7 +243,16 @@ const statusText = {
   background-color: var(--uikit-success-color, #10b981);
 }
 
-.user-card__status--offline .user-card__status-dot {
+.user-card__status--away .user-card__status-dot {
+  background-color: var(--uikit-warning-color, #f59e0b);
+}
+
+.user-card__status--busy .user-card__status-dot {
+  background-color: var(--uikit-danger-color, #ef4444);
+}
+
+.user-card__status--offline .user-card__status-dot,
+.user-card__status--custom .user-card__status-dot {
   background-color: var(--uikit-text-tertiary);
 }
 

@@ -20,7 +20,7 @@ import { useThemeStore } from '../store/theme'
 import { useUserInfoStore } from '../store/user-info'
 import type { RootStores } from '../sdk/event/types'
 import type { UIKitDataSource, UIKitFeatures } from './types'
-import { useH5Adaptation, type H5AdaptationConfig } from './use-h5-adaptation'
+import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from './types'
 export type { H5AdaptationConfig } from './use-h5-adaptation'
@@ -63,6 +63,8 @@ const defaultFeatures: UIKitFeatures = {
   enableContact: true,
   enableBlocklist: true,
   enablePresence: false,
+  presenceStrangerMode: 'none',
+  fetchGroupMemberPresenceOnVisible: true,
   contactFetchMode: 'page',
   enableGroup: true,
   enableUserInfo: true,

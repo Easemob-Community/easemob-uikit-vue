@@ -10,7 +10,7 @@ export type ContactItemSize = 'compact' | 'normal' | 'large'
 export type AvatarShape = 'circle' | 'rounded' | 'square'
 
 /** 在线状态 */
-export type OnlineStatus = 'online' | 'offline' | 'away' | 'busy'
+export type OnlineStatus = 'online' | 'offline' | 'away' | 'busy' | 'custom'
 
 /** 联系人列表项点击行为模式 */
 export type ContactListClickBehavior = 'default' | 'event-only'

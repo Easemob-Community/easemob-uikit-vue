@@ -93,6 +93,8 @@ const props = withDefaults(defineProps<{
   searchComponent?: Component
   /** 列表项点击行为模式，默认 'default' */
   clickBehavior?: ContactListClickBehavior
+  /** 是否展示联系人头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  enablePresence?: boolean
 }>(), {
   showHeader: true,
   headerAlign: 'left',
@@ -138,11 +140,11 @@ const { isMobile } = useViewport()
 void isMobile
 
 // ================== Presence 默认兑底 ==================
-// 当外部未传 onlineStatusFn 且 Provider.enablePresence===true 时，
+// 当外部未传 onlineStatusFn 且（组件 prop 或 Provider 全局）enablePresence===true 时，
 // 内部使用 usePresence 提供在线状态，并按过滤后的可见联系人 ID 自动订阅。
 const { features } = useUIKit()
 const presenceEnabled = computed(
-  () => features.enablePresence && !props.onlineStatusFn,
+  () => (props.enablePresence ?? features.enablePresence) && !props.onlineStatusFn,
 )
 const presence = usePresence()
 
@@ -186,14 +188,11 @@ if (presenceEnabled.value) {
 function resolveOnlineStatus(c: Contact): OnlineStatus | undefined {
   if (props.onlineStatusFn)
     return props.onlineStatusFn(c)
-  if (!features.enablePresence)
+  if (!(props.enablePresence ?? features.enablePresence))
     return undefined
   const info = presence.get(c.userId).value
   if (!info)
     return undefined
-  // PresenceStatus 可能为 'custom'，映射为 'online'（非默认状态表示用户在线）
-  if (info.status === 'custom')
-    return 'online'
   return info.status
 }
 

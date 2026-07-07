@@ -7,8 +7,8 @@
  * - tab 列表硬编码 + 底部工具区，结构稳定且简单；如需扩展，复制本组件即可
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
-import { computed } from 'vue'
-import { EmIcon, EmAvatar, EmBadge, useTheme, useClient, useConversationStore, useOwnUserInfo } from '@easemob/uikit'
+import { computed, ref } from 'vue'
+import { EmIcon, EmBadge, EmPresenceAvatar, EmPresenceSelectorModal, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence } from '@easemob/uikit'
 
 interface Props {
   /** 当前激活 tab key */
@@ -25,6 +25,16 @@ const { mode, isDark, setMode } = useTheme()
 const { currentUser } = useClient()
 const { avatarUrl, displayName } = useOwnUserInfo()
 const conversationStore = useConversationStore()
+const { fetchPresence } = usePresence()
+
+const showPresenceModal = ref(false)
+
+/** 发布状态后主动拉取一次，确保头像立即刷新 */
+function refreshOwnPresence() {
+  if (!currentUser.value)
+    return
+  void fetchPresence([currentUser.value])
+}
 
 /** 全部未读数聚合（忽略静音会话） */
 const totalUnread = computed(() => {
@@ -53,7 +63,14 @@ function toggleMode() {
   <aside class="nav-sidebar">
     <!-- 顶部：当前用户头像 -->
     <div class="nav-sidebar__top">
-      <EmAvatar :src="avatarUrl" :name="displayName || currentUser || 'Guest'" :size="40" />
+      <EmPresenceAvatar
+        :user-id="currentUser || 'Guest'"
+        :src="avatarUrl"
+        :name="displayName || currentUser || 'Guest'"
+        :size="40"
+        editable
+        @presence-click="showPresenceModal = true"
+      />
     </div>
 
     <!-- 主体：业务 tab -->
@@ -97,6 +114,12 @@ function toggleMode() {
         <EmIcon name="misc/gear" :size="22" />
       </button>
     </div>
+
+    <!-- 在线状态设置弹窗 -->
+    <EmPresenceSelectorModal
+      v-model:show="showPresenceModal"
+      @close="refreshOwnPresence"
+    />
   </aside>
 </template>
 

@@ -1,3 +1,4 @@
+import type { PresenceInfo } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import type { UiPresence } from '../types'
 
@@ -7,6 +8,34 @@ import type { UiPresence } from '../types'
 export interface PresenceStoreLike {
   updateBatch: (list: UiPresence[]) => void
   setSubscribed: (userIds: string[]) => void
+}
+
+/**
+ * 将 SDK PresenceInfo 映射为 UIKit 展示对象。
+ */
+function toUiPresence(item: PresenceInfo): UiPresence | null {
+  const userId = item.publisher || ''
+  if (!userId)
+    return null
+  const statusList = item.statusList || {}
+  const isOnline = Object.values(statusList).some(status => Number(status) === 1)
+  const ext = item.ext || ''
+  let status: UiPresence['status'] = isOnline ? 'online' : 'offline'
+  if (ext) {
+    const lower = ext.toLowerCase()
+    if (lower.includes('away'))
+      status = 'away'
+    else if (lower.includes('busy'))
+      status = 'busy'
+    else if (isOnline)
+      status = 'custom'
+  }
+  return {
+    userId,
+    status,
+    ext,
+    lastTime: item.latestTime || Date.now(),
+  }
 }
 
 /**
@@ -25,6 +54,10 @@ export class PresenceDomain {
       expiry,
     })
     this.store.setSubscribed(userIds)
+    const mapped = result
+      .map(toUiPresence)
+      .filter((p): p is UiPresence => p !== null)
+    this.store.updateBatch(mapped)
     return result
   }
 
@@ -35,7 +68,12 @@ export class PresenceDomain {
 
   /** 主动查询在线状态 */
   async fetchStatus(userIds: string[]) {
-    return this.client.presenceManager.getPresenceStatus({ userIds })
+    const result = await this.client.presenceManager.getPresenceStatus({ userIds })
+    const mapped = result
+      .map(toUiPresence)
+      .filter((p): p is UiPresence => p !== null)
+    this.store.updateBatch(mapped)
+    return result
   }
 
   /** 发布自定义在线状态 */

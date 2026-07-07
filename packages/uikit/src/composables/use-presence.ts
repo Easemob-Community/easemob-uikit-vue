@@ -33,20 +33,14 @@ export function usePresence() {
   /** 查询在线状态 */
   async function fetchPresence(userIds: string[]): Promise<UiPresence[]> {
     if (dataSource.fetchPresence) {
-      return dataSource.fetchPresence(userIds)
+      const list = await dataSource.fetchPresence(userIds)
+      presenceStore.updateBatch(list)
+      return list
     }
-    const result = await domains.presence.fetchStatus(userIds)
-    return result.map((item: any) => {
-      const userId = item.userId || ''
-      const details = Array.isArray(item.statusDetails) ? item.statusDetails : []
-      const isOnline = details.some((d: any) => Number(d?.status) === 1)
-      return {
-        userId,
-        status: isOnline ? 'online' : 'offline',
-        ext: item.ext || '',
-        lastTime: Date.now(),
-      }
-    })
+    await domains.presence.fetchStatus(userIds)
+    return userIds
+      .map(userId => presenceStore.get(userId))
+      .filter((p): p is UiPresence => !!p)
   }
 
   /** 发布自定义在线状态 */

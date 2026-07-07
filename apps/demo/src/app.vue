@@ -9,17 +9,17 @@ import LoginPage from './login-page.vue'
  * Provider 三开关 × dataSource 演示
  *
  * - enableContact / enableBlocklist / enablePresence
- *   默认 false。开启后：
- *     1) 登录后 Provider 会拉取对应列表（黑名单同步，好友需 ContactContainer 触发）
- *     2) 事件接收器会挂载对应 SDK 事件
- *   3) Presence 开启后，依赖 ContactItem 等可见包裹会被按需订阅
+ *   默认 true。关闭后：
+ *     1) 登录后 Provider 不会拉取对应列表（黑名单同步，好友需 ContactContainer 触发）
+ *     2) 事件接收器不会挂载对应 SDK 事件
+ *   3) Presence 关闭后，ContactItem 等位置不再展示在线状态指示器
  *
  * - dataSource：业务可提供自定义接口接管 SDK 默认实现。
  *   下面展示一个只覆盖 fetchContacts 的最小例子。
  */
 const enableContact = ref(true)
 const enableBlocklist = ref(true)
-const enablePresence = ref(false)
+const enablePresence = ref(true)
 
 /** 是否启用 demo 提供的自定义 dataSource（演示业务接管拉好友逻辑） */
 const useCustomDataSource = ref(false)

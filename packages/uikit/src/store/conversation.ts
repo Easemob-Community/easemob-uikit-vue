@@ -41,7 +41,16 @@ export const useConversationStore = defineStore('conversation', () => {
   }
 
   function setConversationList(list: UiConversation[]) {
+    const currentId = currentConversationId.value
+    const currentCvs = currentId
+      ? conversationList.value.find(item => item.id === currentId)
+      : undefined
     conversationList.value = list
+    // 保留当前会话：刷新/同步后的列表若不含当前会话，把本地快照补回去，
+    // 避免从联系人/群组详情新建空会话后被刷新覆盖导致右侧聊天消失。
+    if (currentId && currentCvs && !list.some(item => item.id === currentId)) {
+      conversationList.value = [currentCvs, ...list]
+    }
   }
 
   function deleteConversation(id: string) {

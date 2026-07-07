@@ -1,5 +1,5 @@
-import type { UiContact, UiGroup, UiPresence } from '../sdk/types'
 import type { UserInfo } from 'easemob-websdk'
+import type { UiContact, UiGroup, UiPresence } from '../sdk/types'
 
 /**
  * 业务可插拔的数据源适配器。
@@ -25,6 +25,10 @@ export interface UIKitFeatures {
   enableContact: boolean
   enableBlocklist: boolean
   enablePresence: boolean
+  /** 陌生人 Presence 策略：'none' 不获取；'query-on-visible' 可见时查询 */
+  presenceStrangerMode?: 'none' | 'query-on-visible'
+  /** 是否在群成员列表可见时主动查询 Presence，默认 true */
+  fetchGroupMemberPresenceOnVisible?: boolean
   contactFetchMode: ContactFetchMode
   enableGroup: boolean
   /** 是否启用自动拉取/展示用户资料（昵称/头像），默认 true */

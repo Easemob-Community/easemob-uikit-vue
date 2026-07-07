@@ -111,6 +111,10 @@ export interface ContactContainerProps {
   bodySticky?: boolean
   footerSticky?: boolean
 
+  // ---------- 在线状态 ----------
+  /** 是否展示联系人头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  enablePresence?: boolean
+
   // ---------- Group 子列表配置 ----------
   groupSortBy?: GroupSortBy
   groupGroupBy?: GroupGroupBy
@@ -184,6 +188,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   groupEnableLoadMore: true,
   autoFetch: true,
   autoFetchGroups: true,
+  enablePresence: undefined,
 })
 
 const emit = defineEmits<{
@@ -344,6 +349,7 @@ defineExpose({
         :body-sticky="props.bodySticky"
         :footer-sticky="props.footerSticky"
         :auto-fetch="props.autoFetch"
+        :enable-presence="props.enablePresence"
         @select="(c: Contact) => emit('contact-select', c)"
         @click="(c: Contact) => emit('contact-click', c)"
         @contextmenu="(e: MouseEvent, c: Contact) => emit('contact-contextmenu', e, c)"

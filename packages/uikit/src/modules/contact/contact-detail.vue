@@ -5,6 +5,7 @@ import { onClickOutside } from '@vueuse/core'
 import Button from '../../components/button/button.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCard from '../../components/user-card/user-card.vue'
+import PresenceSelectorModal from '../../components/presence-selector/presence-selector-modal.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -13,6 +14,7 @@ import { useBlocklist } from '../../composables/use-blocklist'
 import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import type { UiContact } from '../../sdk/types'
+import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 
 export interface ContactDetailProps {
   /** 联系人用户 ID */
@@ -52,13 +54,15 @@ const attributes: UserInfoAttribute[] = [
 
 const { userInfo, contact: contactFromStore, avatarUrl, displayName } = useUserInfo(() => props.userId, attributes)
 
-const presenceStatus = ref<'online' | 'offline' | undefined>(undefined)
+const presenceStatus = ref<PresenceDisplayStatus | undefined>(undefined)
 const presenceLoading = ref(false)
+const showPresenceSelector = ref(false)
 const loading = computed(() => {
   if (!props.userId)
     return false
   return stores.userInfo.isLoading(props.userId) || presenceLoading.value
 })
+const isSelf = computed(() => stores.client.currentUser === props.userId)
 const isEditingRemark = ref(false)
 const remarkInput = ref('')
 const remarkEditRef = ref<HTMLElement>()
@@ -182,7 +186,7 @@ async function loadData() {
     if (features.enablePresence) {
       try {
         const presences = await fetchPresence([props.userId])
-        presenceStatus.value = presences[0]?.status as 'online' | 'offline' | undefined
+        presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
         console.warn('[ContactDetail] fetch presence failed:', err)
@@ -277,6 +281,17 @@ function onCardAction(key: string) {
 function onCardInfoClick(_key: string) {
   // 信息行暂无跳转
 }
+
+function onPresenceClick() {
+  if (isSelf.value)
+    showPresenceSelector.value = true
+}
+
+function onPresenceSelectorClose() {
+  showPresenceSelector.value = false
+  if (features.enablePresence && isSelf.value)
+    void loadData()
+}
 </script>
 
 <template>
@@ -291,10 +306,12 @@ function onCardInfoClick(_key: string) {
         :name="displayNameValue"
         :avatar="displayAvatar"
         :status="presenceStatus"
+        :editable="isSelf"
         :actions="cardActions"
         :info-rows="cardInfoRows"
         @action-click="onCardAction"
         @info-click="onCardInfoClick"
+        @presence-click="onPresenceClick"
       >
         <div class="contact-detail__extra">
           <div class="contact-detail__row">
@@ -356,6 +373,11 @@ function onCardInfoClick(_key: string) {
     >
       {{ confirmModal.content }}
     </Modal>
+
+    <PresenceSelectorModal
+      v-model:show="showPresenceSelector"
+      @close="onPresenceSelectorClose"
+    />
   </div>
 </template>
 

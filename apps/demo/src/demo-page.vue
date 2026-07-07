@@ -844,7 +844,7 @@ function injectMockContacts() {
               </label>
             </div>
             <div class="demo-info">
-              默认全关。开启对应开关后，登录后 Provider 会拉黑名单；ContactContainer 会拉好友 / 群。<br />
+              默认 enableContact / enableBlocklist / enablePresence 开启。关闭对应开关后，登录后 Provider 不再拉取对应列表/事件。<br />
               启用自定义 dataSource 后，拉好友将走示例接口（返回 Alice/Bob）而非 SDK。
             </div>
           </div>

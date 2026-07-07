@@ -265,6 +265,13 @@ const messages: LocaleMessages = {
   'chat.typing': '对方正在输入...',
   'conversation.atMe': '@',
   'userInfo.subscriptionDisabled': '用户资料实时订阅未开通，陌生人资料变更不会自动更新，请联系管理员开通',
+  'presence.setStatus': '设置在线状态',
+  'presence.online': '在线',
+  'presence.away': '离开',
+  'presence.busy': '忙碌',
+  'presence.custom': '自定义',
+  'presence.customPlaceholder': '请输入自定义状态',
+  'presence.publishFailed': '状态设置失败',
 }
 
 export default messages

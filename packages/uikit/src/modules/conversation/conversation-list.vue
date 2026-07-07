@@ -6,6 +6,7 @@ import { useViewport } from '../../composables/use-viewport'
 import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
+import { usePresence } from '../../composables/use-presence'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
 import Icon from '../../components/icon/icon.vue'
@@ -42,6 +43,8 @@ const props = withDefaults(defineProps<{
   footerSticky?: boolean
   /** 是否启用下拉刷新（H5），默认 false */
   pullRefresh?: boolean
+  /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  enablePresence?: boolean
 }>(), {
   showSearch: true,
   customActions: () => [],
@@ -61,15 +64,19 @@ const emit = defineEmits<{
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
-const { stores, h5 } = useUIKit()
+const { stores, h5, features } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
+const presence = usePresence()
 
 /** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
 const isSyncing = computed(() => stores.conversation.isSyncingConversations)
 
 /** 实际是否启用下拉刷新：prop 优先，未显式开启时走 Provider H5 配置 */
 const effectivePullRefresh = computed(() => props.pullRefresh || h5.enablePullRefresh.value)
+
+/** 实际是否启用 Presence：组件 prop 优先，未传时走 Provider 全局配置 */
+const effectiveEnablePresence = computed(() => props.enablePresence ?? features.enablePresence)
 
 const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
@@ -164,6 +171,20 @@ const filteredConversationList = computed(() => {
     return getConversationSearchFields(item).some(text => text.toLowerCase().includes(kw))
   })
 })
+
+/** 当前会话列表中可见的单聊对方用户 ID，用于 Presence 兜底拉取 */
+const visibleUserIds = computed(() =>
+  effectiveEnablePresence.value
+    ? filteredConversationList.value
+      .filter(item => item.type === 'singleChat')
+      .map(item => item.id)
+    : [],
+)
+
+/** 启用 Presence 时，按可见联系人自动订阅/取消订阅在线状态 */
+if (effectiveEnablePresence.value) {
+  presence.watch(visibleUserIds)
+}
 
 useInfiniteScroll(
   itemsRef,

@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.3.0 (2026-07-07)
+
+### 新增
+
+- 接入 Presence 在线状态能力：
+  - 新增 `PresenceDomain` 封装 SDK `PresenceManager` 的订阅、查询、发布能力。
+  - 新增 `usePresence` 组合式函数，提供 `subscribePresence`、`fetchPresence`、`publishPresence`、`watch` 等 API。
+  - 新增 `PresenceStore` 用于缓存在线状态，支持 `update` / `updateBatch` / `get`。
+- 新增 Presence 相关组件：
+  - `EmPresenceSelector`：在线状态选择器（在线 / 忙碌 / 离开 / 自定义）。
+  - `EmPresenceSelectorModal`：弹窗形态的在线状态选择器，内部调用 `publishPresence`。
+  - `EmPresenceAvatar`：传入 `userId` 即可自动订阅/拉取并展示在线状态，支持 `editable` 触发发布弹窗。
+- `EmAvatar` 扩展：
+  - 新增 `presence` prop，支持展示 `online` / `away` / `busy` / `offline` / `custom` 指示器。
+  - 新增 `presenceSize` prop 自定义指示器尺寸。
+  - 新增 `editable` prop 与 `presence-click` 事件，支持点击指示器触发状态编辑。
+- 联系人/会话/群成员等列表组件接入在线状态展示：
+  - `ContactList` / `ContactItem` / `ContactDetail` 支持在线状态点。
+  - `ConversationList` / `ConversationItem` 单聊头像支持在线状态点。
+  - `GroupMemberList` 支持懒加载可见成员的在线状态。
+  - `UserCard` / `UserCardModal` 支持展示当前用户在线状态。
+  - `MessageBubbleWrapper` 支持消息气泡头像展示发送者在线状态。
+- 组件级 Presence 开关：
+  - `ConversationContainer` / `ConversationList` 新增 `enablePresence` prop。
+  - `ContactContainer` / `ContactListContainer` / `ContactList` 新增 `enablePresence` prop。
+  - 优先级：组件 prop > Provider 全局 `features.enablePresence`。
+- Provider 全局开关：
+  - `UIKitProvider` 新增 `enablePresence` prop，默认 `false`。
+  - `UIKitFeatures` 新增 `enablePresence`、`presenceStrangerMode`、`fetchGroupMemberPresenceOnVisible`。
+- Demo 集成：
+  - 默认开启 `enablePresence: true`。
+  - 左侧导航栏顶部头像使用 `EmPresenceAvatar`，点击可发布在线状态。
+- 新增 Histoire stories：
+  - `Avatar` 新增 `Presence Sizes` variant。
+  - 新增 `PresenceSelector`、`PresenceSelectorModal`、`PresenceAvatar` stories。
+  - `ContactList` / `ConversationContainer` 新增 Presence 开启/关闭示例。
+
+### 修复
+
+- 修复 `Avatar` 方形模式下内部图片/文字缺少圆角的问题。
+- 修复 `PresenceDomain.subscribe` / `fetchStatus` 成功后未写入 `PresenceStore` 的问题。
+- 修复 `use-presence.ts` 中 `fetchPresence` 对 SDK `PresenceInfo.statusList` 的错误映射。
+- 修复会话列表默认不主动获取在线状态的问题：进入会话列表时自动按可见单聊用户订阅 Presence。
+
 ## 1.2.0 (2026-07-04)
 
 ### 新增

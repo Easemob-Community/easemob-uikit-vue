@@ -2,12 +2,14 @@
 import { computed, ref, watch } from 'vue'
 import type { UserInfoAttribute } from 'easemob-websdk'
 import Popup from '../popup/popup.vue'
+import PresenceSelectorModal from '../presence-selector/presence-selector-modal.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import { usePresence } from '../../composables/use-presence'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useToast } from '../../composables/use-toast'
+import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 import UserCard from './user-card.vue'
 
 export interface UserCardModalProps {
@@ -47,7 +49,10 @@ const loading = computed(() => {
     return false
   return stores.userInfo.isLoading(props.userId) || presenceLoading.value
 })
-const presenceStatus = ref<'online' | 'offline' | undefined>(undefined)
+const presenceStatus = ref<PresenceDisplayStatus | undefined>(undefined)
+const showPresenceSelector = ref(false)
+
+const isSelf = computed(() => stores.client.currentUser === props.userId)
 
 watch(
   () => props.show,
@@ -66,7 +71,7 @@ async function loadData() {
     if (features.enablePresence) {
       try {
         const presences = await fetchPresence([props.userId])
-        presenceStatus.value = presences[0]?.status as 'online' | 'offline' | undefined
+        presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
         console.warn('[UserCardModal] fetch presence failed:', err)
@@ -156,6 +161,18 @@ function onInfoClick(key: string) {
   else if (key === 'department')
     showToast(t('userCard.department') || '部门')
 }
+
+function onPresenceClick() {
+  if (isSelf.value)
+    showPresenceSelector.value = true
+}
+
+function onPresenceSelectorClose() {
+  showPresenceSelector.value = false
+  // 变更后重新拉取自己的状态
+  if (features.enablePresence && isSelf.value)
+    void loadData()
+}
 </script>
 
 <template>
@@ -172,10 +189,17 @@ function onInfoClick(key: string) {
         :name="displayNameValue"
         :avatar="displayAvatar"
         :status="presenceStatus"
+        :editable="isSelf"
         :actions="cardActions"
         :info-rows="cardInfoRows"
         @action-click="onActionClick"
         @info-click="onInfoClick"
+        @presence-click="onPresenceClick"
+      />
+
+      <PresenceSelectorModal
+        v-model:show="showPresenceSelector"
+        @close="onPresenceSelectorClose"
       />
 
       <div v-if="loading" class="user-card-modal__loading">

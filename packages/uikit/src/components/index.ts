@@ -15,6 +15,10 @@ export { default as EmUserCard } from './user-card/user-card.vue'
 export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
 export { default as EmGroupCard } from './group-card/group-card.vue'
 export { default as EmGroupCardModal } from './group-card/group-card-modal.vue'
+export { default as EmPresenceSelector } from './presence-selector/presence-selector.vue'
+export { default as EmPresenceSelectorModal } from './presence-selector/presence-selector-modal.vue'
+export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
+export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
   'em-button',
@@ -32,4 +36,7 @@ export const componentList = [
   'em-user-card-modal',
   'em-group-card',
   'em-group-card-modal',
+  'em-presence-selector',
+  'em-presence-selector-modal',
+  'em-presence-avatar',
 ] as const
