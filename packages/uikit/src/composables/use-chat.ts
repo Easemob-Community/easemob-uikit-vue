@@ -125,13 +125,37 @@ export function useChat() {
     }
   }
 
+  /**
+   * 解析消息发送者的显示名称。
+   * 优先级：联系人备注 > 用户资料昵称 > ext 快照昵称 > userId。
+   */
+  function resolveSenderName(m: UiMessage): string {
+    const from = m.from || ''
+    // 1. 联系人备注
+    const contact = stores.contact.getContact(from)
+    if (contact?.remark)
+      return contact.remark
+    // 2. 用户资料昵称
+    const userInfo = stores.userInfo.getUserInfo(from)
+    if (userInfo?.nickname)
+      return userInfo.nickname
+    // 3. 消息 ext 中携带的 UIKit 用户信息快照
+    const extInfo = m.ext?.ease_chat_uikit_user_info as Record<string, string> | undefined
+    if (extInfo?.nickname)
+      return extInfo.nickname
+    if (extInfo?.remark)
+      return extInfo.remark
+    // 4. userId 兜底
+    return from
+  }
+
   /** 合并转发 */
   async function forwardCombineMessages(messages: UiMessage[], target: UiConversation) {
     if (messages.length === 0)
       return
     const { id, type } = target
     const title = type === 'groupChat' ? (target.name || id) : '聊天记录'
-    const summary = messages.map(m => `${m.from}: ${extractLastMessageText(m)}`).join('\n')
+    const summary = messages.map(m => `${resolveSenderName(m)}: ${extractLastMessageText(m)}`).join('\n')
     const compatibleText = '[聊天记录]'
     return domains.message.sendCombine(
       id,

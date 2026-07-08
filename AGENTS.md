@@ -34,6 +34,7 @@
 | `uikit-tiptap-editor` | 改消息输入框、富文本、@提及、编辑器行为 | `改输入框`、`富文本`、`@提及`、`tiptap`、`编辑器` | [.agent/skills/uikit-tiptap-editor/SKILL.md](.agent/skills/uikit-tiptap-editor/SKILL.md) |
 | `uikit-h5-adaptation` | H5/移动端适配：安全区、键盘、下拉刷新、长按、viewport | `H5 适配`、`安全区`、`键盘`、`下拉刷新`、`长按`、`viewport` | [.agent/skills/uikit-h5-adaptation/SKILL.md](.agent/skills/uikit-h5-adaptation/SKILL.md) |
 | `uikit-contact-group-capabilities` | 单人与群组功能实现：联系人/好友/黑名单、群信息/成员/管理/公告/文件/名片 | `单人功能`、`联系人功能`、`群组功能`、`群管理`、`通讯录功能`、`address book` | [.agent/skills/uikit-contact-group-capabilities/SKILL.md](.agent/skills/uikit-contact-group-capabilities/SKILL.md) |
+| `uikit-user-attribute-extraction` | 用户属性（昵称/头像/在线状态）提取：useUserInfo/useOwnUserInfo/usePresence、Avatar 复用、列表拆子组件 | `昵称`、`头像`、`用户属性`、`显示名`、`useUserInfo`、`头像不显示`、`sender name` | [.agent/skills/uikit-user-attribute-extraction/SKILL.md](.agent/skills/uikit-user-attribute-extraction/SKILL.md) |
 | `websdk2-uikit-migration` | SDK 层（sdk/domain/adapter/event）架构与迁移 | `迁移 SDK`、`重写 uikit sdk`、`domain 层`、`websdk2 最佳实践` | [.agent/skills/websdk2-uikit-migration/SKILL.md](.agent/skills/websdk2-uikit-migration/SKILL.md) |
 | `uikit-lint-governance` | 处理 eslint、lint 治理、非代码改动层决策、收尾提交 | `跑 lint`、`清 lint`、`改 eslint 配置`、`提交前检查` | [.agent/skills/uikit-lint-governance/SKILL.md](.agent/skills/uikit-lint-governance/SKILL.md) |
 

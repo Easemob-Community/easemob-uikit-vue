@@ -8,7 +8,7 @@ import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
 import type { CombineMessageBody, UiMessage } from '../../../sdk/types'
 import { useMessageStore } from '../../../store/message'
-import MessageRenderer from './message-renderer.vue'
+import CombineMessageModalItem from './combine-message-modal-item.vue'
 
 export interface CombineMessageModalProps {
   show: boolean
@@ -39,14 +39,6 @@ const body = computed(() => props.message.body as CombineMessageBody)
 
 const title = computed(() => body.value.title || t('message.forward.combineTitle') || '聊天记录')
 
-/** 格式化时间 */
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
 /**
  * 将 SDK 解析出的子消息转换为 UiMessage，直接交给 MessageRenderer 复用。
  */
@@ -55,16 +47,10 @@ function adaptMessage(sdkMsg: SdkMessage): UiMessage {
   return toUiMessage(sdkMsg, currentUser)
 }
 
-/** 适配后的消息列表（交给 MessageRenderer 渲染） */
+/** 适配后的消息列表（交给子组件渲染） */
 const renderableMessages = computed(() => parsedMessages.value)
 
-/** 格式化发送者名称：优先 ext 里的 nickname */
-function formatSender(msg: UiMessage): string {
-  const ext = msg.ext?.ease_chat_uikit_user_info as Record<string, string> | undefined
-  return ext?.nickname || ext?.remark || msg.from || 'Unknown'
-}
-
-/** 点击嵌套合并消息（由 MessageRenderer 的 view-combine 事件触发） */
+/** 点击嵌套合并消息（由子组件的 view-combine 事件触发） */
 function onViewCombine(msg: UiMessage) {
   emit('view-combine', msg)
 }
@@ -156,26 +142,12 @@ watch(() => props.show, (show) => {
 
         <!-- 消息列表：复用 MessageRenderer，自动获得图片/视频/文件/语音/嵌套合并等完整渲染能力 -->
         <div v-else-if="renderableMessages.length > 0" class="combine-message-modal__list">
-          <div
+          <CombineMessageModalItem
             v-for="(msg, idx) in renderableMessages"
             :key="msg.msgServerId || msg.msgLocalId || idx"
-            class="combine-message-modal__item"
-          >
-            <!-- 头像占位 -->
-            <div class="combine-message-modal__item-avatar">
-              {{ formatSender(msg).charAt(0).toUpperCase() }}
-            </div>
-            <!-- 内容 -->
-            <div class="combine-message-modal__item-content">
-              <div class="combine-message-modal__item-meta">
-                <span class="combine-message-modal__item-sender">{{ formatSender(msg) }}</span>
-                <span class="combine-message-modal__item-time">{{ formatTime(msg.timestamp) }}</span>
-              </div>
-              <div class="combine-message-modal__item-bubble">
-                <MessageRenderer :message="msg" @view-combine="onViewCombine" />
-              </div>
-            </div>
-          </div>
+            :message="msg"
+            @view-combine="onViewCombine"
+          />
         </div>
 
         <!-- 空状态 -->
@@ -271,78 +243,5 @@ watch(() => props.show, (show) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.combine-message-modal__item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.15s;
-}
-
-.combine-message-modal__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.combine-message-modal__item--combine {
-  cursor: pointer;
-}
-
-.combine-message-modal__item-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--uikit-primary-color, #5f6df3);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.combine-message-modal__item-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.combine-message-modal__item-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.combine-message-modal__item-sender {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-}
-
-.combine-message-modal__item-time {
-  font-size: 11px;
-  color: var(--uikit-text-secondary);
-}
-
-.combine-message-modal__item-bubble {
-  margin-top: 2px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  word-break: break-word;
-  /* 限制嵌套渲染的媒体宽度，避免超出弹窗 */
-  max-width: 100%;
-}
-
-.combine-message-modal__item-bubble :deep(img),
-.combine-message-modal__item-bubble :deep(video) {
-  max-width: 240px;
-  max-height: 240px;
-  border-radius: 6px;
 }
 </style>
