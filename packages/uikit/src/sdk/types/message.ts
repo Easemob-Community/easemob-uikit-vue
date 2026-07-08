@@ -76,7 +76,7 @@ export interface CustomMessageBody {
 export interface CombineMessageBody {
   title: string
   summary: string
-  compatibleText: string
+  // compatibleText 仅作为创建参数，SDK 0.14.181 起不再在 body 中暴露
   messageList?: ReadonlyArray<SdkMessage>
   url?: string
   filename: string

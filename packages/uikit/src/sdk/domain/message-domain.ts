@@ -1,7 +1,4 @@
-import type {
-  MarkMessageReadItem,
-  Message as SdkMessage,
-} from 'easemob-websdk'
+import type { Message as SdkMessage } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '../types'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
@@ -251,11 +248,19 @@ export class MessageDomain {
     })
   }
 
-  /** 批量标记消息已读（需要传入收到的 SDK Message 对象） */
-  async markMessagesRead(items: MarkMessageReadItem[]) {
-    if (items.length === 0)
+  /** 批量发送消息已读回执（统一 API，支持单聊/群聊） */
+  async markMessagesRead(
+    conversationId: string,
+    conversationType: 'singleChat' | 'groupChat',
+    messageIds: string[],
+  ) {
+    if (messageIds.length === 0)
       return
-    await this.client.chatManager.markMessageRead({ messages: items })
+    await this.client.chatManager.sendMessageReadReceipts({
+      conversationId,
+      conversationType,
+      messageIds,
+    })
   }
 
   /** 置顶消息 */
@@ -320,20 +325,16 @@ export class MessageDomain {
     return this.client.currentUserId || ''
   }
 
-  /** 标记某条消息已读 */
+  /** 发送单条消息已读回执 */
   async markRead(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
     messageId: string,
   ) {
-    await this.client.chatManager.markMessageRead({
-      messages: [{
-        message: {
-          msgServerId: messageId,
-          conversationId,
-          conversationType,
-        } as any,
-      }],
+    await this.client.chatManager.sendMessageReadReceipts({
+      conversationId,
+      conversationType,
+      messageIds: [messageId],
     })
   }
 

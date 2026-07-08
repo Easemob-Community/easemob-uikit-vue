@@ -1,4 +1,4 @@
-# websdk2 0.14.161 SDK 在 Vue3 UIKit 中的最佳实践迁移
+# websdk2 0.14.181 SDK 在 Vue3 UIKit 中的最佳实践迁移
 
 ## 触发词
 
@@ -23,7 +23,7 @@
 
 ## 迁移前必读
 
-- SDK 版本：`easemob-websdk@0.14.161`
+- SDK 版本：`easemob-websdk@0.14.181`
 - 关键 SDK 事实：
   - `onMessage` payload 是**单个 `Message`**，不是数组
   - `ChatClient.init()` 返回带 managers 类型的实例
@@ -31,6 +31,18 @@
   - `chatManager.refreshSessionList({ includeEmpty? })` 触发服务端同步
   - `createCustomMessage` 需要 `params`（不是 `customExts`）
   - `getPinnedMessageList` 只接受 `ConversationIdentifier`，不分页
+  - 已读回执 API 统一（0.14.181 破坏性变更）：
+    - `message.needGroupReadReceipt` → `message.needReadReceipt`（单聊/群聊统一字段）
+    - `chatManager.markMessageRead(...)` → `chatManager.sendMessageReadReceipts({ conversationId, conversationType, messageIds })`
+    - `chatManager.sendGroupMessageReadAck(...)` → 同上 `sendMessageReadReceipts`
+    - `chatManager.onMessageRead` → `chatManager.onMessageReceipts`（payload 为 `ReadonlyArray<MessageReceiptEventPayload>`，每项含 `{ conversationId, conversationType, messageIds, timestamp }`，不再携带 `ackContent`）
+  - 会话未读清零 API 改造（0.14.181 破坏性变更）：
+    - `chatManager.markConversationRead(...)` → `chatManager.clearConversationUnreadMessageCount({ conversationId, conversationType })`
+    - 协议仅同步自己多设备，不再发送给对方
+    - 多设备事件：`onConversationUnreadMessageCountCleared` / `onAllConversationsUnreadMessageCountCleared`
+  - 合并消息字段精简（0.14.181 破坏性变更）：
+    - `compatibleText` 仅作为创建参数，不再在 `body` 中暴露
+    - `combineLevel` 仅在 `body.combineLevel` 暴露
 
 ## 目录结构目标
 
@@ -229,8 +241,10 @@ packages/uikit/src/
 | 登出 | `client.logout()` | 清理状态和缓存 |
 | 发送文本 | `chatManager.createTextMessage({...})` + `chatManager.sendMessage(msg, options?)` | 所有消息统一 sendMessage |
 | 拉历史 | `chatManager.getHistoryMessages({ conversationId, conversationType, pageSize, cursor, searchDirection: 'up' })` | 返回 `{ items, cursor, hasMore }` |
-| 标记会话已读 | `chatManager.markConversationRead({ conversationId, conversationType })` | 单聊对方收到 `onConversationRead` |
-| 标记消息已读 | `chatManager.markMessageRead({ messages: [{ message, ackContent? }] })` | 需要原始 SdkMessage |
+| 清空会话未读数 | `chatManager.clearConversationUnreadMessageCount({ conversationId, conversationType })` | 0.14.181 起替换 `markConversationRead`；仅同步自己多设备，不再发送给对方 |
+| 发送消息已读回执 | `chatManager.sendMessageReadReceipts({ conversationId, conversationType, messageIds })` | 0.14.181 起替换 `markMessageRead` / `sendGroupMessageReadAck`；统一单聊/群聊 |
+| 清空所有会话未读 | `chatManager.clearAllConversationUnreadMessageCount()` | 0.14.181 新增 |
+| 获取群消息已读回执 | `chatManager.getMessageReadReceipts(params)` | 0.14.181 新增，按群会话批量获取 |
 | 撤回 | `chatManager.recallMessage({ conversationId, conversationType, messageId })` | 默认 2 分钟 |
 | 置顶消息 | `chatManager.pinMessage({ conversationId, conversationType, messageId })` | 触发 `onPinnedMessageChanged` |
 | 获取置顶 | `chatManager.getPinnedMessageList({ conversationId, conversationType })` | 最多 20 条，不分页 |

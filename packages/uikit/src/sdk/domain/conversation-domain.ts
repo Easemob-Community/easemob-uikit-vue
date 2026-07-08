@@ -83,9 +83,9 @@ export class ConversationDomain {
     })
   }
 
-  /** 标记会话已读 */
+  /** 清空会话未读数（协议仅同步自己多设备，不再发送给对方） */
   async markRead(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
-    await this.client.chatManager.markConversationRead({
+    await this.client.chatManager.clearConversationUnreadMessageCount({
       conversationId,
       conversationType,
     })
@@ -125,7 +125,7 @@ export class ConversationDomain {
 
   /** 发送 channel ack */
   async sendChannelAck(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
-    // SDK5 无 sendChannelAck；使用 markConversationRead 达到已读效果
+    // SDK5 无 sendChannelAck；使用 clearConversationUnreadMessageCount 达到已读效果
     await this.markRead(conversationId, conversationType)
   }
 

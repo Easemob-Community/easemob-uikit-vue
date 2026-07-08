@@ -24,7 +24,6 @@ const body = computed(() => props.message.body as CombineMessageBody)
 
 const title = computed(() => body.value.title || t('message.forward.combineTitle') || '聊天记录')
 const summary = computed(() => body.value.summary || '')
-const compatibleText = computed(() => body.value.compatibleText || '')
 
 function handleClick() {
   emit('view', props.message)
@@ -44,11 +43,6 @@ function handleClick() {
       <p v-for="(line, idx) in summary.split('\n')" :key="idx">
         {{ line }}
       </p>
-    </div>
-
-    <!-- 兼容文本（不支持合并消息的 SDK 版本显示） -->
-    <div v-else-if="compatibleText" class="combine-message__compatible">
-      {{ compatibleText }}
     </div>
   </div>
 </template>
@@ -79,7 +73,6 @@ function handleClick() {
 .combine-message--self .combine-message__header,
 .combine-message--self .combine-message__title,
 .combine-message--self .combine-message__summary,
-.combine-message--self .combine-message__compatible,
 .combine-message--self .combine-message__icon {
   color: #fff;
 }
@@ -119,11 +112,5 @@ function handleClick() {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.combine-message__compatible {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-  font-style: italic;
 }
 </style>

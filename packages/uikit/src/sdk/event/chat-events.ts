@@ -155,11 +155,11 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         && sdkMsg.conversationId === currentCvsId
         && sdkMsg.from !== stores.client.currentUser
       ) {
-        void client.chatManager.markConversationRead({
+        void client.chatManager.clearConversationUnreadMessageCount({
           conversationId: sdkMsg.conversationId,
           conversationType: sdkMsg.conversationType as 'singleChat' | 'groupChat',
         }).catch((err: unknown) => {
-          console.warn('[UIKit] auto markConversationRead failed:', err)
+          console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', err)
         })
       }
 
@@ -181,30 +181,30 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       stores.message.updateMessageStatus(payload.messageId, 'delivered')
     },
 
-    onMessageRead: (payload) => {
-      for (const item of payload) {
-        if (!item.messageId)
-          continue
-        if (item.conversationType === 'groupChat' && item.ackContent) {
-          try {
-            const parsed = JSON.parse(item.ackContent)
-            const count = parsed?.count
-            if (typeof count === 'number') {
-              stores.message.updateMessageById(item.messageId, { groupReadCount: count })
-            }
+    onMessageReceipts: (payload) => {
+      // 新 API（0.14.181）：payload 是 ReadonlyArray<MessageReceiptEventPayload>
+      // 每项包含 { conversationId, conversationType, messageIds, timestamp }
+      // 群聊已读回执不再携带 ackContent/count，群已读人数需通过 getMessageReadReceipts 按需获取
+      for (const receipt of payload) {
+        for (const messageId of receipt.messageIds) {
+          if (receipt.conversationType !== 'groupChat') {
+            stores.message.updateMessageStatus(messageId, 'read')
           }
-          catch {
-            // ignore
-          }
-          continue
         }
-        stores.message.updateMessageStatus(item.messageId, 'read')
       }
     },
 
-    onConversationRead: (payload) => {
+    onConversationUnreadMessageCountCleared: (payload) => {
+      // 多设备清空会话未读数时派发
       if (payload.conversationId) {
         stores.conversation.updateUnreadCount(payload.conversationId, 0)
+      }
+    },
+
+    onAllConversationsUnreadMessageCountCleared: () => {
+      // 多设备清空所有会话未读数时派发
+      for (const cvs of stores.conversation.conversationList) {
+        stores.conversation.updateUnreadCount(cvs.id, 0)
       }
     },
 
