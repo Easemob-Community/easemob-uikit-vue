@@ -44,9 +44,9 @@ const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
   showMuteAll: true,
   showMuteList: true,
   showBlocklist: true,
-  showAllowlist: true,
+  showAllowlist: false,
   showSharedFiles: true,
-  showJoinRequests: true,
+  showJoinRequests: false,
 })
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
@@ -692,7 +692,7 @@ defineExpose({
 
 .chat-info-drawer__member-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px 8px;
 }
 
@@ -701,7 +701,14 @@ defineExpose({
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 6px 2px;
   cursor: pointer;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.chat-info-drawer__member-cell:hover {
+  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary));
 }
 
 .chat-info-drawer__member-name {

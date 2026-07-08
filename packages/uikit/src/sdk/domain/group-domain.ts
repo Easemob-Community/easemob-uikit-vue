@@ -1,6 +1,6 @@
 import type { ManagerHost } from '../client'
 import type { UiGroup, UiGroupMember } from '../types'
-import { toUiGroup, toUiGroupMember, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
+import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
 
 /**
  * GroupStore 需要暴露给 Domain 的最小接口。
@@ -267,7 +267,25 @@ export class GroupDomain {
   /** 获取群共享文件列表 */
   async getGroupSharedFileList(groupId: string, pageNum?: number, pageSize?: number) {
     const result = await this.client.groupManager.getGroup(groupId).getSharedFileList({ pageNum, pageSize })
+    console.warn('[GroupDomain] getGroupSharedFileList result:', result)
     return result
+  }
+
+  /** 上传群共享文件 */
+  async uploadGroupSharedFile(groupId: string, file: File) {
+    let response: unknown
+    await this.client.groupManager.getGroup(groupId).uploadSharedFile({
+      file,
+      onFileUploadComplete: (res: unknown) => {
+        response = res
+      },
+    })
+    return response
+  }
+
+  /** 删除群共享文件 */
+  async deleteGroupSharedFile(groupId: string, fileId: string) {
+    await this.client.groupManager.getGroup(groupId).deleteSharedFile({ fileId })
   }
 
   /** 同意入群申请 */

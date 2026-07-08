@@ -45,9 +45,9 @@ const props = withDefaults(defineProps<GroupManagementSectionProps>(), {
   showMuteAll: true,
   showMuteList: true,
   showBlocklist: true,
-  showAllowlist: true,
+  showAllowlist: false,
   showSharedFiles: true,
-  showJoinRequests: true,
+  showJoinRequests: false,
 })
 
 const emit = defineEmits<{
@@ -140,6 +140,8 @@ const hasManagementEntries = computed(() => {
 })
 
 const activeDrawerKey = ref<ManagementKey | null>(null)
+const sharedFileListRef = ref<InstanceType<typeof EmGroupSharedFileList> | null>(null)
+const blockListRef = ref<InstanceType<typeof EmGroupBlocklist> | null>(null)
 const showDrawer = computed({
   get: () => activeDrawerKey.value !== null,
   set: (value: boolean) => {
@@ -236,7 +238,21 @@ function closeDrawer() {
             <Icon name="arrows/arrowto" :size="16" />
           </button>
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
-          <span class="group-management-section__drawer-placeholder" />
+          <button
+            v-if="activeDrawerKey === 'files'"
+            class="group-management-section__action-text"
+            @click="sharedFileListRef?.triggerUpload()"
+          >
+            {{ t('group.sharedFile.uploadText') || '上传' }}
+          </button>
+          <button
+            v-else-if="activeDrawerKey === 'block'"
+            class="group-management-section__action-text"
+            @click="blockListRef?.openAddMember()"
+          >
+            {{ t('group.blocklist.add') || '添加' }}
+          </button>
+          <span v-else class="group-management-section__drawer-placeholder" />
         </div>
       </template>
 
@@ -248,8 +264,10 @@ function closeDrawer() {
         />
         <EmGroupBlocklist
           v-if="activeDrawerKey === 'block'"
+          ref="blockListRef"
           :group-id="props.groupId"
           @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
+          @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
         />
         <EmGroupAllowlist
           v-if="activeDrawerKey === 'allow'"
@@ -258,6 +276,7 @@ function closeDrawer() {
         />
         <EmGroupSharedFileList
           v-if="activeDrawerKey === 'files'"
+          ref="sharedFileListRef"
           :group-id="props.groupId"
         />
         <EmGroupJoinRequestList
@@ -283,7 +302,21 @@ function closeDrawer() {
             <Icon name="arrows/arrowto" :size="16" />
           </button>
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
-          <span class="group-management-section__drawer-placeholder" />
+          <button
+            v-if="activeDrawerKey === 'files'"
+            class="group-management-section__action-text"
+            @click="sharedFileListRef?.triggerUpload()"
+          >
+            {{ t('group.sharedFile.uploadText') || '上传' }}
+          </button>
+          <button
+            v-else-if="activeDrawerKey === 'block'"
+            class="group-management-section__action-text"
+            @click="blockListRef?.openAddMember()"
+          >
+            {{ t('group.blocklist.add') || '添加' }}
+          </button>
+          <span v-else class="group-management-section__drawer-placeholder" />
         </div>
         <div class="group-management-section__drawer-body">
           <EmGroupMuteList
@@ -293,8 +326,10 @@ function closeDrawer() {
           />
           <EmGroupBlocklist
             v-if="activeDrawerKey === 'block'"
+            ref="blockListRef"
             :group-id="props.groupId"
             @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
+            @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
           />
           <EmGroupAllowlist
             v-if="activeDrawerKey === 'allow'"
@@ -303,6 +338,7 @@ function closeDrawer() {
           />
           <EmGroupSharedFileList
             v-if="activeDrawerKey === 'files'"
+            ref="sharedFileListRef"
             :group-id="props.groupId"
           />
           <EmGroupJoinRequestList
@@ -335,7 +371,7 @@ function closeDrawer() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 10px 12px;
   cursor: pointer;
   border-radius: var(--uikit-components-radius, 8px);
   transition: background-color 0.15s;
@@ -465,6 +501,22 @@ function closeDrawer() {
 
 .group-management-section__drawer-placeholder {
   width: 32px;
+}
+
+.group-management-section__action-text {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--uikit-primary-color);
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 32px;
+  text-align: right;
+}
+
+.group-management-section__action-text:hover {
+  opacity: 0.8;
 }
 
 .group-management-section__drawer-body {

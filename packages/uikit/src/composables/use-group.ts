@@ -253,6 +253,16 @@ export function useGroup() {
     return domains.group.getGroupSharedFileList(groupId, pageNum, pageSize)
   }
 
+  /** 上传群共享文件 */
+  async function uploadGroupSharedFile(groupId: string, file: File) {
+    return domains.group.uploadGroupSharedFile(groupId, file)
+  }
+
+  /** 删除群共享文件 */
+  async function deleteGroupSharedFile(groupId: string, fileId: string) {
+    await domains.group.deleteGroupSharedFile(groupId, fileId)
+  }
+
   /** 同意入群申请 */
   async function acceptGroupJoinRequest(groupId: string, userId: string) {
     await domains.group.acceptGroupJoinRequest(groupId, userId)
@@ -345,6 +355,8 @@ export function useGroup() {
     checkIfInGroupAllowList,
     checkIfInGroupMuteList,
     getGroupSharedFileList,
+    uploadGroupSharedFile,
+    deleteGroupSharedFile,
     acceptGroupJoinRequest,
     rejectGroupJoinRequest,
     getPublicGroupList,
