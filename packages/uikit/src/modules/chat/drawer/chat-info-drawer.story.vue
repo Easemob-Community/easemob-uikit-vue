@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import ChatInfoDrawer from './chat-info-drawer.vue'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
 import Button from '../../../components/button/button.vue'
+import { useGroupStore } from '../../../store/group'
 import type { UiConversation, UiGroupMember } from '../../../sdk/types'
 
 const groupConversation: UiConversation = {
@@ -40,6 +41,18 @@ const mockMembers: UiGroupMember[] = [
 
 const showGroup = ref(false)
 const showSingle = ref(false)
+
+// 为群管理区块提供群主角色与计数
+const groupStore = useGroupStore()
+groupStore.addGroup({
+  groupId: 'g_story_001',
+  groupName: 'Vue 技术交流群',
+  role: 'owner',
+  memberCount: mockMembers.length,
+})
+groupStore.groupJoinRequestsMap.g_story_001 = [
+  { applicant: { userId: 'req_001', nickname: '申请加入的人' }, status: 'pending', reason: '想学习 Vue' },
+]
 
 function onEvent(name: string, payload?: unknown) {
   console.log(`[ChatInfoDrawer Story] ${name}`, payload)

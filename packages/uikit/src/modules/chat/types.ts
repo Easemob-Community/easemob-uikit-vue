@@ -120,6 +120,21 @@ export interface ChatConfig {
     /** 是否允许对成员发起单聊，默认 'all' */
     allowChat?: 'all' | 'contact' | 'none'
   }
+  /** 群管理功能配置 */
+  groupManagement?: {
+    /** 是否展示全员禁言开关，默认 true */
+    showMuteAll?: boolean
+    /** 是否展示禁言列表入口，默认 true */
+    showMuteList?: boolean
+    /** 是否展示黑名单入口，默认 true */
+    showBlocklist?: boolean
+    /** 是否展示白名单入口，默认 true */
+    showAllowlist?: boolean
+    /** 是否展示共享文件入口，默认 true */
+    showSharedFiles?: boolean
+    /** 是否展示入群申请入口，默认 true */
+    showJoinRequests?: boolean
+  }
   /** 输入框配置 */
   input?: {
     /** 输入框模式，默认 'simple' */

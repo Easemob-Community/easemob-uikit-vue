@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import type { UiGroup } from '../../sdk/types'
 import GroupCard from '../../components/group-card/group-card.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
-import type { UiGroup } from '../../sdk/types'
 
 export interface GroupDetailProps {
   /** 群 ID */
@@ -42,7 +42,8 @@ watch(
 async function loadData() {
   if (!props.groupId)
     return
-  if (groupFromStore.value?.groupName || loading.value || fetchFailedIds.value.has(props.groupId))
+  // 列表数据不一定含 role，必须 fetchGroupInfo 补齐后才能跳过
+  if ((groupFromStore.value?.groupName && groupFromStore.value?.role) || loading.value || fetchFailedIds.value.has(props.groupId))
     return
 
   loading.value = true
@@ -123,7 +124,7 @@ function onCardAction(key: string) {
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 24px;
   background-color: var(--uikit-bg-secondary, #f3f4f6);
@@ -134,6 +135,9 @@ function onCardAction(key: string) {
   position: relative;
   width: 100%;
   max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .group-detail__loading {

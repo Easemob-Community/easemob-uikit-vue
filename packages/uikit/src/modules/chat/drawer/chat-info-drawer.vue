@@ -11,6 +11,7 @@ import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
+import GroupManagementSection from '../../group/group-management-section.vue'
 import ChatDrawer from './chat-drawer.vue'
 
 export interface ChatInfoDrawerProps {
@@ -18,9 +19,28 @@ export interface ChatInfoDrawerProps {
   conversation?: Conversation | null
   isGroup?: boolean
   offsetTop?: string | number
+  /** 是否展示全员禁言开关 */
+  showMuteAll?: boolean
+  /** 是否展示禁言列表入口 */
+  showMuteList?: boolean
+  /** 是否展示黑名单入口 */
+  showBlocklist?: boolean
+  /** 是否展示白名单入口 */
+  showAllowlist?: boolean
+  /** 是否展示共享文件入口 */
+  showSharedFiles?: boolean
+  /** 是否展示入群申请入口 */
+  showJoinRequests?: boolean
 }
 
-const props = defineProps<ChatInfoDrawerProps>()
+const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
+  showMuteAll: true,
+  showMuteList: true,
+  showBlocklist: true,
+  showAllowlist: true,
+  showSharedFiles: true,
+  showJoinRequests: true,
+})
 const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'leave-group', groupId: string): void
@@ -36,12 +56,12 @@ const { setContactRemark } = useContact()
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
 const {
-    fetchGroupInfo,
-    fetchGroupMembers,
-    fetchGroupAnnouncement,
-    getGroupMembers,
-    getGroupAnnouncement,
-  } = useGroup()
+  fetchGroupInfo,
+  fetchGroupMembers,
+  fetchGroupAnnouncement,
+  getGroupMembers,
+  getGroupAnnouncement,
+} = useGroup()
 
 const closeBtnClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : '',
@@ -380,6 +400,18 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
           {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
         </button>
       </div>
+
+      <!-- 群聊：群管理 -->
+      <GroupManagementSection
+        v-if="isGroup"
+        :group-id="groupId"
+        :show-mute-all="props.showMuteAll"
+        :show-mute-list="props.showMuteList"
+        :show-blocklist="props.showBlocklist"
+        :show-allowlist="props.showAllowlist"
+        :show-shared-files="props.showSharedFiles"
+        :show-join-requests="props.showJoinRequests"
+      />
 
       <!-- 通用操作 -->
       <div class="chat-info-drawer__section">

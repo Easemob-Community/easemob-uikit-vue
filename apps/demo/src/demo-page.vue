@@ -84,12 +84,35 @@ const showHomeSearch = ref(true)
 const showContactSearch = ref(true)
 const showGroupSearch = ref(true)
 
+// 群管理 Demo 配置开关
+const groupManagementConfig = ref({
+  showMuteAll: true,
+  showMuteList: true,
+  showBlocklist: true,
+  showAllowlist: true,
+  showSharedFiles: true,
+  showJoinRequests: true,
+  showMuteAction: true,
+  showBlockAction: true,
+  showAdminAction: true,
+  showRemoveAction: true,
+  showChatAction: true,
+})
+
 /** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
   header: { showAvatar: true } ,
   groupReadReceipt: {
     enabled: groupReadReceiptEnabled.value,
     maxGroupSize: groupReadReceiptMaxSize.value,
+  },
+  groupManagement: {
+    showMuteAll: groupManagementConfig.value.showMuteAll,
+    showMuteList: groupManagementConfig.value.showMuteList,
+    showBlocklist: groupManagementConfig.value.showBlocklist,
+    showAllowlist: groupManagementConfig.value.showAllowlist,
+    showSharedFiles: groupManagementConfig.value.showSharedFiles,
+    showJoinRequests: groupManagementConfig.value.showJoinRequests,
   },
   input: {
     mode: chatInputMode.value,

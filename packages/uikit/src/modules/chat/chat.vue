@@ -19,7 +19,7 @@ import Modal from '../../components/modal/modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
 import MessageList from './message-list/message-list.vue'
-import MessageInput from './message-input.vue'
+import MessageInput from './message-input/index.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
@@ -856,6 +856,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
         :conversation="currentConversation"
         :is-group="isGroupChat"
         :offset-top="headerHeight"
+        :show-mute-all="props.config?.groupManagement?.showMuteAll"
+        :show-mute-list="props.config?.groupManagement?.showMuteList"
+        :show-blocklist="props.config?.groupManagement?.showBlocklist"
+        :show-allowlist="props.config?.groupManagement?.showAllowlist"
+        :show-shared-files="props.config?.groupManagement?.showSharedFiles"
+        :show-join-requests="props.config?.groupManagement?.showJoinRequests"
         @leave-group="onLeaveGroup"
         @destroy-group="onDestroyGroup"
         @clear-history="onClearHistory"
