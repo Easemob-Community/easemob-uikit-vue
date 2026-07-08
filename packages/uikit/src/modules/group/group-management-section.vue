@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import Icon from '../../components/icon/icon.vue'
+import Popup from '../../components/popup/popup.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -14,6 +15,8 @@ import EmGroupJoinRequestList from './group-management/join-request-list.vue'
 export interface GroupManagementSectionProps {
   /** 群 ID */
   groupId: string
+  /** 二级页面展示方式：drawer（抽屉）或 modal（居中弹窗） */
+  displayMode?: 'drawer' | 'modal'
   /** 是否展示全员禁言开关 */
   showMuteAll?: boolean
   /** 是否展示禁言列表入口 */
@@ -38,6 +41,7 @@ interface ManagementEntry {
 }
 
 const props = withDefaults(defineProps<GroupManagementSectionProps>(), {
+  displayMode: 'drawer',
   showMuteAll: true,
   showMuteList: true,
   showBlocklist: true,
@@ -45,6 +49,10 @@ const props = withDefaults(defineProps<GroupManagementSectionProps>(), {
   showSharedFiles: true,
   showJoinRequests: true,
 })
+
+const emit = defineEmits<{
+  (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
+}>()
 
 const { t } = useLocale()
 const { stores } = useUIKit()
@@ -63,9 +71,11 @@ async function toggleMuteAll() {
   try {
     if (isMuteAll.value) {
       await unmuteAllGroupMembers(props.groupId)
+      emit('group-operation', { type: 'unmute-all', groupId: props.groupId })
     }
     else {
       await muteAllGroupMembers(props.groupId)
+      emit('group-operation', { type: 'mute-all', groupId: props.groupId })
     }
   }
   catch (err) {
@@ -173,7 +183,6 @@ function closeDrawer() {
       class="group-management-section__item group-management-section__item--switch"
     >
       <div class="group-management-section__item-left">
-        <Icon name="audio-video/mute" :size="18" class="group-management-section__icon" />
         <span class="group-management-section__label">
           {{ t('group.management.muteAll') || '全员禁言' }}
         </span>
@@ -215,6 +224,7 @@ function closeDrawer() {
 
     <!-- 二级抽屉 -->
     <ChatDrawer
+      v-if="props.displayMode === 'drawer'"
       v-model:show="showDrawer"
       :overlay="true"
       :close-on-click-overlay="true"
@@ -223,7 +233,7 @@ function closeDrawer() {
       <template #header>
         <div class="group-management-section__drawer-header">
           <button class="group-management-section__drawer-close" @click="closeDrawer">
-            <Icon name="arrows/arrow_left_thick" :size="16" />
+            <Icon name="arrows/arrowto" :size="16" />
           </button>
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <span class="group-management-section__drawer-placeholder" />
@@ -234,14 +244,17 @@ function closeDrawer() {
         <EmGroupMuteList
           v-if="activeDrawerKey === 'mute'"
           :group-id="props.groupId"
+          @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
         />
         <EmGroupBlocklist
           v-if="activeDrawerKey === 'block'"
           :group-id="props.groupId"
+          @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
         />
         <EmGroupAllowlist
           v-if="activeDrawerKey === 'allow'"
           :group-id="props.groupId"
+          @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
         />
         <EmGroupSharedFileList
           v-if="activeDrawerKey === 'files'"
@@ -250,9 +263,57 @@ function closeDrawer() {
         <EmGroupJoinRequestList
           v-if="activeDrawerKey === 'requests'"
           :group-id="props.groupId"
+          @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
+          @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
         />
       </div>
     </ChatDrawer>
+
+    <!-- 二级弹窗 -->
+    <Popup
+      v-else
+      v-model:show="showDrawer"
+      position="center"
+      :close-on-click-overlay="true"
+      @close="closeDrawer"
+    >
+      <div class="group-management-section__modal">
+        <div class="group-management-section__drawer-header">
+          <button class="group-management-section__drawer-close" @click="closeDrawer">
+            <Icon name="arrows/arrowto" :size="16" />
+          </button>
+          <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
+          <span class="group-management-section__drawer-placeholder" />
+        </div>
+        <div class="group-management-section__drawer-body">
+          <EmGroupMuteList
+            v-if="activeDrawerKey === 'mute'"
+            :group-id="props.groupId"
+            @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
+          />
+          <EmGroupBlocklist
+            v-if="activeDrawerKey === 'block'"
+            :group-id="props.groupId"
+            @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
+          />
+          <EmGroupAllowlist
+            v-if="activeDrawerKey === 'allow'"
+            :group-id="props.groupId"
+            @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
+          />
+          <EmGroupSharedFileList
+            v-if="activeDrawerKey === 'files'"
+            :group-id="props.groupId"
+          />
+          <EmGroupJoinRequestList
+            v-if="activeDrawerKey === 'requests'"
+            :group-id="props.groupId"
+            @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
+            @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
+          />
+        </div>
+      </div>
+    </Popup>
   </div>
 </template>
 
@@ -276,6 +337,7 @@ function closeDrawer() {
   justify-content: space-between;
   padding: 10px 0;
   cursor: pointer;
+  border-radius: var(--uikit-components-radius, 8px);
   transition: background-color 0.15s;
 }
 
@@ -317,7 +379,7 @@ function closeDrawer() {
 }
 
 .group-management-section__entry {
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
+  margin-top: 2px;
 }
 
 /* 全员禁言开关 */
@@ -409,5 +471,16 @@ function closeDrawer() {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+}
+
+.group-management-section__modal {
+  width: 420px;
+  max-width: 90vw;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 8px);
+  overflow: hidden;
 }
 </style>

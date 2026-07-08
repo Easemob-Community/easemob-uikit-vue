@@ -12,8 +12,6 @@ import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
-import Popup from '../../components/popup/popup.vue'
-import GroupMemberList from '../group/group-member-list.vue'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
@@ -46,6 +44,7 @@ export interface ChatProps {
 export interface ChatEmits {
   (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
+  (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
 }
 
 const props = defineProps<ChatProps>()
@@ -188,11 +187,8 @@ const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 /** 是否显示 drawer */
 const showDrawer = ref(false)
 
-/** 是否显示群成员列表 drawer */
-const showMemberList = ref(false)
-
-/** 当前成员列表对应的群 ID */
-const memberListGroupId = ref('')
+/** 群信息抽屉组件引用 */
+const chatInfoDrawerRef = ref<InstanceType<typeof ChatInfoDrawer>>()
 
 /** 是否显示添加成员弹窗 */
 const showInviteModal = ref(false)
@@ -216,9 +212,6 @@ const userCardUserId = ref('')
 const showGroupCardModal = ref(false)
 /** 群名片弹窗展示的群 ID */
 const groupCardGroupId = ref('')
-
-/** 群成员列表组件引用 */
-const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
 
 /** 当前登录用户 ID */
 const currentUserId = computed(() => client.value.currentUserId ?? '')
@@ -567,12 +560,6 @@ async function onClearHistory(payload: { id: string, type: 'singleChat' | 'group
   }
 }
 
-/** 查看全部成员 */
-function onViewAllMembers(groupId: string) {
-  memberListGroupId.value = groupId
-  showMemberList.value = true
-}
-
 /** 添加成员 */
 function onAddMember(groupId: string) {
   inviteGroupId.value = groupId
@@ -588,10 +575,8 @@ async function onInviteMembers(userIds: string[]) {
     await inviteUsersToGroup(groupId, userIds)
     showInviteModal.value = false
     showToast(t('group.inviteMember.success') || '邀请已发送')
-    // 如果成员列表弹窗正在打开，刷新列表
-    if (showMemberList.value && memberListGroupId.value === groupId) {
-      await memberListRef.value?.refresh()
-    }
+    // 刷新成员列表
+    chatInfoDrawerRef.value?.refreshMemberList()
   }
   catch (err) {
     console.warn('[Chat] invite members failed:', err)
@@ -658,7 +643,6 @@ function onGroupCardSendMessage(groupId: string) {
 
 /** 与成员发起单聊 */
 function onChatMember(member: UiGroupMember) {
-  showMemberList.value = false
   const existing = stores.conversation.conversationList.find(c => c.id === member.userId)
   if (!existing) {
     stores.conversation.addConversation({
@@ -685,16 +669,17 @@ function onRemoveMember(member: UiGroupMember) {
 /** 确认移除成员 */
 async function confirmRemoveMember() {
   const member = pendingRemoveMember.value
-  if (!member || !memberListGroupId.value) {
+  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  if (!member || !groupId) {
     showRemoveConfirmModal.value = false
     return
   }
   pendingRemoveMember.value = null
   showRemoveConfirmModal.value = false
   try {
-    await removeGroupMembers(memberListGroupId.value, [member.userId])
+    await removeGroupMembers(groupId, [member.userId])
     showToast(t('chat.info.removeMemberSuccess') || '成员已移除')
-    memberListRef.value?.removeMember(member.userId)
+    chatInfoDrawerRef.value?.removeMember(member.userId)
   }
   catch (err) {
     console.warn('[Chat] remove member failed:', err)
@@ -709,12 +694,13 @@ function cancelRemoveMember() {
 
 /** 设为管理员 */
 async function onSetAdmin(member: UiGroupMember) {
-  if (!memberListGroupId.value)
+  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  if (!groupId)
     return
   try {
-    await addGroupAdmin(memberListGroupId.value, member.userId)
+    await addGroupAdmin(groupId, member.userId)
     showToast(t('chat.info.setAdminSuccess') || '已设为管理员')
-    memberListRef.value?.setMemberRole(member.userId, 'admin')
+    chatInfoDrawerRef.value?.setMemberRole(member.userId, 'admin')
   }
   catch (err) {
     console.warn('[Chat] set admin failed:', err)
@@ -724,12 +710,13 @@ async function onSetAdmin(member: UiGroupMember) {
 
 /** 取消管理员 */
 async function onRemoveAdmin(member: UiGroupMember) {
-  if (!memberListGroupId.value)
+  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  if (!groupId)
     return
   try {
-    await removeGroupAdmin(memberListGroupId.value, member.userId)
+    await removeGroupAdmin(groupId, member.userId)
     showToast(t('chat.info.removeAdminSuccess') || '已取消管理员')
-    memberListRef.value?.setMemberRole(member.userId, 'member')
+    chatInfoDrawerRef.value?.setMemberRole(member.userId, 'member')
   }
   catch (err) {
     console.warn('[Chat] remove admin failed:', err)
@@ -852,10 +839,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
       <!-- 聊天信息抽屉 -->
       <ChatInfoDrawer
+        ref="chatInfoDrawerRef"
         v-model:show="showDrawer"
         :conversation="currentConversation"
         :is-group="isGroupChat"
         :offset-top="headerHeight"
+        :group-management-display-mode="props.config?.groupManagement?.displayMode"
+        :allow-chat="props.config?.groupMember?.allowChat"
         :show-mute-all="props.config?.groupManagement?.showMuteAll"
         :show-mute-list="props.config?.groupManagement?.showMuteList"
         :show-blocklist="props.config?.groupManagement?.showBlocklist"
@@ -865,32 +855,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @leave-group="onLeaveGroup"
         @destroy-group="onDestroyGroup"
         @clear-history="onClearHistory"
-        @view-all-members="onViewAllMembers"
         @add-member="onAddMember"
+        @group-operation="emit('group-operation', $event)"
+        @chat-member="onChatMember"
+        @remove-member="onRemoveMember"
+        @set-admin="onSetAdmin"
+        @remove-admin="onRemoveAdmin"
       />
-
-      <!-- 群成员列表弹窗 -->
-      <Popup
-        v-model:show="showMemberList"
-        position="center"
-        :close-on-click-overlay="true"
-      >
-        <div class="chat__member-modal">
-          <GroupMemberList
-            v-if="memberListGroupId"
-            ref="memberListRef"
-            :group-id="memberListGroupId"
-            :current-user-id="currentUserId"
-            :allow-chat="props.config?.groupMember?.allowChat"
-            closable
-            @close="showMemberList = false"
-            @chat-member="onChatMember"
-            @remove-member="onRemoveMember"
-            @set-admin="onSetAdmin"
-            @remove-admin="onRemoveAdmin"
-          />
-        </div>
-      </Popup>
 
       <!-- 移除成员二次确认 -->
       <Modal
@@ -1073,25 +1044,5 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
 .chat__header-more:hover {
   background-color: var(--uikit-bg-secondary);
-}
-
-.chat__member-modal {
-  width: 480px;
-  max-width: 90vw;
-  height: 70vh;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--uikit-components-radius, 12px);
-  overflow: hidden;
-  background-color: var(--uikit-bg-base);
-  box-sizing: border-box;
-}
-
-@media (max-width: 640px) {
-  .chat__member-modal {
-    width: 90vw;
-    height: 80vh;
-  }
 }
 </style>

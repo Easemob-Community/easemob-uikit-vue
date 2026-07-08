@@ -122,6 +122,8 @@ export interface ChatConfig {
   }
   /** 群管理功能配置 */
   groupManagement?: {
+    /** 二级页面展示方式：drawer（抽屉）或 modal（居中弹窗），默认 drawer */
+    displayMode?: 'drawer' | 'modal'
     /** 是否展示全员禁言开关，默认 true */
     showMuteAll?: boolean
     /** 是否展示禁言列表入口，默认 true */

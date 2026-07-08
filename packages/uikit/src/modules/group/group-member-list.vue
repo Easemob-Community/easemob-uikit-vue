@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
+import Popup from '../../components/popup/popup.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -21,6 +22,8 @@ export interface GroupMemberListProps {
   showSearch?: boolean
   /** 是否在标题栏显示关闭按钮 */
   closable?: boolean
+  /** 是否展示头部标题栏 */
+  showHeader?: boolean
   /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
   allowChat?: 'all' | 'contact' | 'none'
   /** 是否展示禁言/取消禁言操作 */
@@ -43,6 +46,7 @@ const props = withDefaults(defineProps<GroupMemberListProps>(), {
   currentUserId: '',
   showSearch: true,
   closable: false,
+  showHeader: true,
   allowChat: 'all',
   showMuteAction: true,
   showBlockAction: true,
@@ -76,6 +80,10 @@ const loadingMore = ref(false)
 const cursor = ref<string | undefined>(undefined)
 const localHasMore = ref(props.hasMore)
 const localMembers = ref<UiGroupMember[]>(props.members)
+
+// 更多操作菜单状态
+const activeMoreMenuMemberId = ref<string | null>(null)
+const moreMenuTriggerRefs = ref<Record<string, HTMLElement>>({})
 
 // Presence 可视区域懒加载
 const itemsRef = ref<HTMLElement>()
@@ -357,6 +365,71 @@ function onUnblock(member: UiGroupMember) {
   emit('unblock-member', member)
 }
 
+function setMoreTriggerRef(userId: string, el: HTMLElement | null) {
+  if (el)
+    moreMenuTriggerRefs.value[userId] = el
+}
+
+function openMoreMenu(member: UiGroupMember) {
+  activeMoreMenuMemberId.value = member.userId
+}
+
+function closeMoreMenu() {
+  activeMoreMenuMemberId.value = null
+}
+
+interface MoreAction {
+  key: string
+  label: string
+  danger?: boolean
+}
+
+function getMoreActions(member: UiGroupMember): MoreAction[] {
+  const actions: MoreAction[] = []
+  if (canMute(member))
+    actions.push({ key: 'mute', label: t('group.memberList.mute') || '禁言' })
+  if (canUnmute(member))
+    actions.push({ key: 'unmute', label: t('group.memberList.unmute') || '取消禁言' })
+  if (canBlock(member))
+    actions.push({ key: 'block', label: t('group.memberList.block') || '拉黑' })
+  if (canUnblock(member))
+    actions.push({ key: 'unblock', label: t('group.memberList.unblock') || '取消拉黑' })
+  if (props.showAdminAction && canSetAdmin(member))
+    actions.push({ key: 'setAdmin', label: t('group.memberList.setAdmin') || '设管理员' })
+  if (props.showAdminAction && canRemoveAdmin(member))
+    actions.push({ key: 'removeAdmin', label: t('group.memberList.removeAdmin') || '取消管理员' })
+  if (props.showRemoveAction && canRemove(member))
+    actions.push({ key: 'remove', label: t('group.memberList.remove') || '移除', danger: true })
+  return actions
+}
+
+function onMoreActionClick(member: UiGroupMember, actionKey: string) {
+  closeMoreMenu()
+  switch (actionKey) {
+    case 'mute':
+      onMute(member)
+      break
+    case 'unmute':
+      onUnmute(member)
+      break
+    case 'block':
+      onBlock(member)
+      break
+    case 'unblock':
+      onUnblock(member)
+      break
+    case 'setAdmin':
+      onSetAdmin(member)
+      break
+    case 'removeAdmin':
+      onRemoveAdmin(member)
+      break
+    case 'remove':
+      onRemove(member)
+      break
+  }
+}
+
 function clearSearch() {
   searchKeyword.value = ''
 }
@@ -382,7 +455,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 <template>
   <div class="group-member-list">
     <!-- 头部标题 -->
-    <div class="group-member-list__header">
+    <div v-if="props.showHeader" class="group-member-list__header">
       <div class="group-member-list__header-left">
         <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
         <span class="group-member-list__count">{{ groupInfo?.memberCount ?? localMembers.length }}</span>
@@ -480,61 +553,40 @@ defineExpose({ refresh, removeMember, setMemberRole })
               {{ t('group.memberList.chat') || '发消息' }}
             </button>
 
-            <button
-              v-if="canMute(member)"
-              class="group-member-list__action-btn"
-              @click="onMute(member)"
+            <div
+              v-if="getMoreActions(member).length > 0"
+              :ref="(el) => setMoreTriggerRef(member.userId, el as HTMLElement)"
+              class="group-member-list__more"
             >
-              {{ t('group.memberList.mute') || '禁言' }}
-            </button>
-
-            <button
-              v-if="canUnmute(member)"
-              class="group-member-list__action-btn"
-              @click="onUnmute(member)"
-            >
-              {{ t('group.memberList.unmute') || '取消禁言' }}
-            </button>
-
-            <button
-              v-if="canBlock(member)"
-              class="group-member-list__action-btn group-member-list__action-btn--danger"
-              @click="onBlock(member)"
-            >
-              {{ t('group.memberList.block') || '拉黑' }}
-            </button>
-
-            <button
-              v-if="canUnblock(member)"
-              class="group-member-list__action-btn"
-              @click="onUnblock(member)"
-            >
-              {{ t('group.memberList.unblock') || '取消拉黑' }}
-            </button>
-
-            <button
-              v-if="props.showAdminAction && canSetAdmin(member)"
-              class="group-member-list__action-btn"
-              @click="onSetAdmin(member)"
-            >
-              {{ t('group.memberList.setAdmin') || '设管理员' }}
-            </button>
-
-            <button
-              v-if="props.showAdminAction && canRemoveAdmin(member)"
-              class="group-member-list__action-btn"
-              @click="onRemoveAdmin(member)"
-            >
-              {{ t('group.memberList.removeAdmin') || '取消管理员' }}
-            </button>
-
-            <button
-              v-if="props.showRemoveAction && canRemove(member)"
-              class="group-member-list__action-btn group-member-list__action-btn--danger"
-              @click="onRemove(member)"
-            >
-              {{ t('group.memberList.remove') || '移除' }}
-            </button>
+              <button
+                class="group-member-list__action-btn group-member-list__action-btn--icon"
+                @click.stop="openMoreMenu(member)"
+              >
+                <Icon name="actions/ellipsis_vertical" :size="16" />
+              </button>
+              <Popup
+                :show="activeMoreMenuMemberId === member.userId"
+                :anchor="moreMenuTriggerRefs[member.userId]"
+                placement="bottom"
+                :overlay="false"
+                :close-on-click-overlay="true"
+                group="group-member-more-menu"
+                @update:show="closeMoreMenu"
+                @close="closeMoreMenu"
+              >
+                <div class="group-member-list__context-menu">
+                  <div
+                    v-for="action in getMoreActions(member)"
+                    :key="action.key"
+                    class="group-member-list__context-menu-item"
+                    :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
+                    @click.stop="onMoreActionClick(member, action.key)"
+                  >
+                    {{ action.label }}
+                  </div>
+                </div>
+              </Popup>
+            </div>
           </div>
         </div>
 
@@ -757,6 +809,20 @@ defineExpose({ refresh, removeMember, setMemberRole })
   background-color: #fef2f2;
 }
 
+.group-member-list__action-btn--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+
+.group-member-list__more {
+  position: relative;
+  display: inline-flex;
+}
+
 .group-member-list__load-more,
 .group-member-list__no-more,
 .group-member-list__empty {
@@ -796,5 +862,35 @@ defineExpose({ refresh, removeMember, setMemberRole })
   .group-member-list__actions {
     opacity: 1;
   }
+}
+
+/* 更多操作菜单 */
+.group-member-list__context-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
+  min-width: 120px;
+  padding: 6px;
+}
+
+.group-member-list__context-menu-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--uikit-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.group-member-list__context-menu-item:hover {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
+}
+
+.group-member-list__context-menu-item--danger {
+  color: #ef4444;
 }
 </style>

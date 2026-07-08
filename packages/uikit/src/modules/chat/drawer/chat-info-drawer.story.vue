@@ -72,8 +72,11 @@ function onEvent(name: string, payload?: unknown) {
             @leave-group="(id) => onEvent('leave-group', id)"
             @destroy-group="(id) => onEvent('destroy-group', id)"
             @clear-history="(p) => onEvent('clear-history', p)"
-            @view-all-members="(id) => onEvent('view-all-members', id)"
             @add-member="(id) => onEvent('add-member', id)"
+            @chat-member="(m) => onEvent('chat-member', m)"
+            @remove-member="(m) => onEvent('remove-member', m)"
+            @set-admin="(m) => onEvent('set-admin', m)"
+            @remove-admin="(m) => onEvent('remove-admin', m)"
           />
         </div>
       </UIKitProvider>

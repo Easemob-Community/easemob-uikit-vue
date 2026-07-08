@@ -12,6 +12,7 @@ import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
+import GroupMemberList from '../../group/group-member-list.vue'
 import ChatDrawer from './chat-drawer.vue'
 
 export interface ChatInfoDrawerProps {
@@ -19,6 +20,10 @@ export interface ChatInfoDrawerProps {
   conversation?: Conversation | null
   isGroup?: boolean
   offsetTop?: string | number
+  /** 群管理二级页面展示方式：drawer（抽屉）或 modal（居中弹窗） */
+  groupManagementDisplayMode?: 'drawer' | 'modal'
+  /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
+  allowChat?: 'all' | 'contact' | 'none'
   /** 是否展示全员禁言开关 */
   showMuteAll?: boolean
   /** 是否展示禁言列表入口 */
@@ -34,6 +39,8 @@ export interface ChatInfoDrawerProps {
 }
 
 const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
+  groupManagementDisplayMode: 'drawer',
+  allowChat: 'all',
   showMuteAll: true,
   showMuteList: true,
   showBlocklist: true,
@@ -46,8 +53,13 @@ const emit = defineEmits<{
   (e: 'leave-group', groupId: string): void
   (e: 'destroy-group', groupId: string): void
   (e: 'clear-history', payload: { id: string, type: 'singleChat' | 'groupChat' }): void
-  (e: 'view-all-members', groupId: string): void
   (e: 'add-member', groupId: string): void
+  (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
+  // 群成员列表事件
+  (e: 'chat-member', member: UiGroupMember): void
+  (e: 'remove-member', member: UiGroupMember): void
+  (e: 'set-admin', member: UiGroupMember): void
+  (e: 'remove-admin', member: UiGroupMember): void
 }>()
 
 const themeStore = useThemeStore()
@@ -153,6 +165,10 @@ const currentUserRole = computed(() => {
 const isOwner = computed(() => currentUserRole.value === 'owner')
 const isAdmin = computed(() => currentUserRole.value === 'admin')
 
+/** 群成员列表二级页面状态 */
+const showMemberList = ref(false)
+const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
+
 /** 是否展示「添加成员」按钮：群主/管理员始终可邀请；普通成员需 group.allowInvites 为 true */
 const canAddMember = computed(() => {
   if (!currentUserId.value)
@@ -194,6 +210,9 @@ watch(
   ([show, isGroup, id]) => {
     if (show && isGroup && id) {
       loadGroupData()
+    }
+    if (!show) {
+      showMemberList.value = false
     }
   },
   { immediate: true },
@@ -277,10 +296,19 @@ function onClearHistory() {
 }
 
 function onViewAllMembers() {
-  const id = groupId.value
-  if (id)
-    emit('view-all-members', id)
+  showMemberList.value = true
 }
+
+function closeMemberList() {
+  showMemberList.value = false
+}
+
+function onChatMember(member: UiGroupMember) {
+  emit('update:show', false)
+  emit('chat-member', member)
+}
+
+const memberListTitle = computed(() => t('chat.info.groupMembers') || '群成员')
 
 function onAddMember() {
   const id = groupId.value
@@ -290,6 +318,16 @@ function onAddMember() {
 
 const displayedMembers = computed(() => members.value.slice(0, 6))
 const hasMoreMembers = computed(() => members.value.length > displayedMembers.value.length)
+
+/** 暴露成员列表操作方法供父组件调用 */
+defineExpose({
+  /** 移除成员（更新本地列表） */
+  removeMember: (userId: string) => memberListRef.value?.removeMember(userId),
+  /** 设置成员角色（更新本地列表） */
+  setMemberRole: (userId: string, role: UiGroupMember['role']) => memberListRef.value?.setMemberRole(userId, role),
+  /** 刷新成员列表 */
+  refreshMemberList: () => memberListRef.value?.refresh(),
+})
 </script>
 
 <template>
@@ -302,10 +340,8 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
   >
     <!-- Header 插槽 -->
     <template #header>
-      <div class="chat-info-drawer__header">
-        <button class="chat-info-drawer__close" :class="closeBtnClass" @click="onClose">
-          <Icon name="arrows/arrow_left_thick" :size="16" />
-        </button>
+      <div v-if="!showMemberList" class="chat-info-drawer__header">
+        <span class="chat-info-drawer__header-placeholder" />
         <span class="chat-info-drawer__title">
           {{ isGroup ? t('chat.info.titleGroup') : t('chat.info.titleFriend') }}
         </span>
@@ -313,117 +349,146 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
           <Icon name="actions/xmark_thick" :size="16" />
         </button>
       </div>
+      <div v-else class="chat-info-drawer__header">
+        <button class="chat-info-drawer__back" @click="closeMemberList">
+          <Icon name="arrows/arrowto" :size="16" />
+        </button>
+        <span class="chat-info-drawer__title">{{ memberListTitle }}</span>
+        <span class="chat-info-drawer__header-placeholder" />
+      </div>
     </template>
 
     <!-- Body 默认插槽 -->
     <div class="chat-info-drawer__body">
-      <div class="chat-info-drawer__profile">
-        <Avatar :name="displayName" :src="displayAvatar" :size="64" />
-        <div class="chat-info-drawer__name">
-          {{ displayName }}
-        </div>
-        <div v-if="!isGroup" class="chat-info-drawer__id">
-          ID: {{ conversation?.id }}
-        </div>
-      </div>
-
-      <!-- 单聊：备注编辑 -->
-      <div v-if="!isGroup" class="chat-info-drawer__section">
-        <div class="chat-info-drawer__section-title">
-          {{ t('chat.info.remark') }}
-        </div>
-        <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
-          <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
-          <Icon name="misc/edit" :size="16" />
-        </div>
-        <div v-else class="chat-info-drawer__remark-edit">
-          <input
-            v-model="remarkInput"
-            class="chat-info-drawer__remark-input"
-            :placeholder="t('chat.info.remarkInputPlaceholder')"
-            @keydown.enter="saveRemark"
-          >
-          <button
-            class="chat-info-drawer__remark-save"
-            :disabled="savingRemark"
-            @click="saveRemark"
-          >
-            {{ savingRemark ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-          </button>
-        </div>
-      </div>
-
-      <!-- 群聊：群公告 -->
-      <div v-if="isGroup" class="chat-info-drawer__section">
-        <div class="chat-info-drawer__section-title">
-          {{ t('chat.info.groupAnnouncement') }}
-        </div>
-        <div class="chat-info-drawer__announcement">
-          <span v-if="loadingGroup" class="chat-info-drawer__placeholder">{{ t('common.loading') }}</span>
-          <span v-else-if="announcement">{{ announcement }}</span>
-          <span v-else class="chat-info-drawer__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
-        </div>
-      </div>
-
-      <!-- 群聊：群描述 -->
-      <div v-if="isGroup && group?.description" class="chat-info-drawer__section">
-        <div class="chat-info-drawer__section-title">
-          {{ t('chat.info.groupDescription') }}
-        </div>
-        <div class="chat-info-drawer__description">
-          {{ group.description }}
-        </div>
-      </div>
-
-      <!-- 群聊：成员列表 -->
-      <div v-if="isGroup" class="chat-info-drawer__section">
-        <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
-          <span>{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
-          <button v-if="canAddMember" class="chat-info-drawer__text-btn" @click="onAddMember">
-            <Icon name="actions/plus" :size="14" />
-            {{ t('chat.info.addMember') }}
-          </button>
-        </div>
-        <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
-          <div
-            v-for="member in displayedMembers"
-            :key="member.userId"
-            class="chat-info-drawer__member-cell"
-          >
-            <Avatar :name="member.nickname || member.userId" :src="member.avatarUrl" :size="48" />
-            <span class="chat-info-drawer__member-name">{{ member.nickname || member.userId }}</span>
-            <span v-if="member.role === 'owner'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--owner">{{ t('chat.info.groupOwner') }}</span>
-            <span v-else-if="member.role === 'admin'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">{{ t('chat.info.groupAdmin') }}</span>
+      <template v-if="!showMemberList">
+        <div class="chat-info-drawer__profile">
+          <Avatar :name="displayName" :src="displayAvatar" :size="64" />
+          <div class="chat-info-drawer__name">
+            {{ displayName }}
+          </div>
+          <div v-if="!isGroup" class="chat-info-drawer__id">
+            ID: {{ conversation?.id }}
           </div>
         </div>
-        <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
-          {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
-        </button>
-      </div>
 
-      <!-- 群聊：群管理 -->
-      <GroupManagementSection
-        v-if="isGroup"
-        :group-id="groupId"
-        :show-mute-all="props.showMuteAll"
-        :show-mute-list="props.showMuteList"
-        :show-blocklist="props.showBlocklist"
-        :show-allowlist="props.showAllowlist"
-        :show-shared-files="props.showSharedFiles"
-        :show-join-requests="props.showJoinRequests"
-      />
+        <!-- 单聊：备注编辑 -->
+        <div v-if="!isGroup" class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section-title">
+            {{ t('chat.info.remark') }}
+          </div>
+          <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
+            <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
+            <Icon name="misc/edit" :size="16" />
+          </div>
+          <div v-else class="chat-info-drawer__remark-edit">
+            <input
+              v-model="remarkInput"
+              class="chat-info-drawer__remark-input"
+              :placeholder="t('chat.info.remarkInputPlaceholder')"
+              @keydown.enter="saveRemark"
+            >
+            <button
+              class="chat-info-drawer__remark-save"
+              :disabled="savingRemark"
+              @click="saveRemark"
+            >
+              {{ savingRemark ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
+            </button>
+          </div>
+        </div>
 
-      <!-- 通用操作 -->
-      <div class="chat-info-drawer__section">
-        <button class="chat-info-drawer__action-row" @click="onClearHistory">
-          <Icon name="actions/trash" :size="18" />
-          <span>{{ t('chat.info.clearHistory') }}</span>
-        </button>
+        <!-- 群聊：群公告 -->
+        <div v-if="isGroup" class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section-title">
+            {{ t('chat.info.groupAnnouncement') }}
+          </div>
+          <div class="chat-info-drawer__announcement">
+            <span v-if="loadingGroup" class="chat-info-drawer__placeholder">{{ t('common.loading') }}</span>
+            <span v-else-if="announcement">{{ announcement }}</span>
+            <span v-else class="chat-info-drawer__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
+          </div>
+        </div>
+
+        <!-- 群聊：群描述 -->
+        <div v-if="isGroup && group?.description" class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section-title">
+            {{ t('chat.info.groupDescription') }}
+          </div>
+          <div class="chat-info-drawer__description">
+            {{ group.description }}
+          </div>
+        </div>
+
+        <!-- 群聊：成员列表 -->
+        <div v-if="isGroup" class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
+            <span>{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
+            <button v-if="canAddMember" class="chat-info-drawer__text-btn" @click="onAddMember">
+              <Icon name="actions/plus" :size="14" />
+              {{ t('chat.info.addMember') }}
+            </button>
+          </div>
+          <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
+            <div
+              v-for="member in displayedMembers"
+              :key="member.userId"
+              class="chat-info-drawer__member-cell"
+            >
+              <Avatar :name="member.nickname || member.userId" :src="member.avatarUrl" :size="48" />
+              <span class="chat-info-drawer__member-name">{{ member.nickname || member.userId }}</span>
+              <span v-if="member.role === 'owner'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--owner">{{ t('chat.info.groupOwner') }}</span>
+              <span v-else-if="member.role === 'admin'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">{{ t('chat.info.groupAdmin') }}</span>
+            </div>
+          </div>
+          <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
+            {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
+          </button>
+        </div>
+
+        <!-- 群聊：群管理 -->
+        <GroupManagementSection
+          v-if="isGroup"
+          :group-id="groupId"
+          :display-mode="props.groupManagementDisplayMode"
+          :show-mute-all="props.showMuteAll"
+          :show-mute-list="props.showMuteList"
+          :show-blocklist="props.showBlocklist"
+          :show-allowlist="props.showAllowlist"
+          :show-shared-files="props.showSharedFiles"
+          :show-join-requests="props.showJoinRequests"
+          @group-operation="emit('group-operation', $event)"
+        />
+
+        <!-- 通用操作 -->
+        <div class="chat-info-drawer__section">
+          <button class="chat-info-drawer__action-row" @click="onClearHistory">
+            <Icon name="actions/trash" :size="18" />
+            <span>{{ t('chat.info.clearHistory') }}</span>
+          </button>
+        </div>
+      </template>
+
+      <!-- 群成员列表：二级页面 -->
+      <div v-else class="chat-info-drawer__member-detail">
+        <GroupMemberList
+          v-if="groupId"
+          ref="memberListRef"
+          :group-id="groupId"
+          :current-user-id="currentUserId"
+          :allow-chat="props.allowChat"
+          :show-header="false"
+          closable
+          @close="closeMemberList"
+          @chat-member="onChatMember"
+          @remove-member="emit('remove-member', $event)"
+          @set-admin="emit('set-admin', $event)"
+          @remove-admin="emit('remove-admin', $event)"
+        />
       </div>
     </div>
 
     <!-- Footer 插槽 -->
-    <template #footer>
+    <template v-if="!showMemberList" #footer>
       <div class="chat-info-drawer__actions">
         <button
           class="chat-info-drawer__action-btn chat-info-drawer__action-btn--danger"
@@ -478,6 +543,30 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
   border-radius: 2px;
 }
 
+.chat-info-drawer__back {
+  background: none;
+  border: none;
+  color: var(--uikit-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--uikit-components-radius, 6px);
+  padding: 0;
+  transition: background-color 0.15s;
+}
+
+.chat-info-drawer__back:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.chat-info-drawer__header-placeholder {
+  width: 32px;
+  height: 32px;
+}
+
 .chat-info-drawer__title {
   font-size: 16px;
   font-weight: 600;
@@ -488,6 +577,8 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
 
 .chat-info-drawer__body {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   min-height: 0;
 }
@@ -716,5 +807,12 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
 .chat-info-drawer__action-btn--danger {
   background-color: #fef2f2;
   color: #ef4444;
+}
+
+.chat-info-drawer__member-detail {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-color: var(--uikit-bg-base);
 }
 </style>
