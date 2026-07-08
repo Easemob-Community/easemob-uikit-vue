@@ -14,10 +14,12 @@ export interface MultiSelectBarEmits {
   (e: 'close'): void
 }
 
-const props = defineProps<{
+interface MultiSelectBarProps {
   selectedMessages: UiMessage[]
   totalMessages: number
-}>()
+}
+
+const props = defineProps<MultiSelectBarProps>()
 
 const emit = defineEmits<MultiSelectBarEmits>()
 const { show: showToast } = useToast()

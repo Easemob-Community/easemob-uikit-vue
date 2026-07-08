@@ -23,6 +23,16 @@ export interface GroupMemberListProps {
   closable?: boolean
   /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
   allowChat?: 'all' | 'contact' | 'none'
+  /** 是否展示禁言/取消禁言操作 */
+  showMuteAction?: boolean
+  /** 是否展示拉黑/取消拉黑操作 */
+  showBlockAction?: boolean
+  /** 是否展示设/取消管理员操作 */
+  showAdminAction?: boolean
+  /** 是否展示移除成员操作 */
+  showRemoveAction?: boolean
+  /** 是否展示发消息操作 */
+  showChatAction?: boolean
 }
 
 const props = withDefaults(defineProps<GroupMemberListProps>(), {
@@ -34,6 +44,11 @@ const props = withDefaults(defineProps<GroupMemberListProps>(), {
   showSearch: true,
   closable: false,
   allowChat: 'all',
+  showMuteAction: true,
+  showBlockAction: true,
+  showAdminAction: true,
+  showRemoveAction: true,
+  showChatAction: true,
 })
 
 const emit = defineEmits<{
@@ -42,6 +57,10 @@ const emit = defineEmits<{
   (e: 'remove-member', member: UiGroupMember): void
   (e: 'set-admin', member: UiGroupMember): void
   (e: 'remove-admin', member: UiGroupMember): void
+  (e: 'mute-member', member: UiGroupMember): void
+  (e: 'unmute-member', member: UiGroupMember): void
+  (e: 'block-member', member: UiGroupMember): void
+  (e: 'unblock-member', member: UiGroupMember): void
   (e: 'load-more'): void
   (e: 'close'): void
 }>()
@@ -206,6 +225,8 @@ function canRemoveAdmin(member: UiGroupMember): boolean {
 }
 
 function canChat(member: UiGroupMember): boolean {
+  if (!props.showChatAction)
+    return false
   if (member.userId === props.currentUserId)
     return false
   if (props.allowChat === 'none')
@@ -213,6 +234,71 @@ function canChat(member: UiGroupMember): boolean {
   if (props.allowChat === 'contact')
     return !!stores.contact.getContact(member.userId)
   return true
+}
+
+// ===== 禁言/拉黑/白名单状态检查 =====
+function isMemberMuted(groupId: string, userId: string): boolean {
+  const muteList = stores.group.groupMuteListMap[groupId] || []
+  return muteList.some(m => m.userId === userId)
+}
+
+function isMemberBlocked(groupId: string, userId: string): boolean {
+  const blocklist = stores.group.groupBlocklistMap[groupId] || []
+  return blocklist.some(m => m.userId === userId)
+}
+
+function isMemberInAllowlist(groupId: string, userId: string): boolean {
+  const allowlist = stores.group.groupAllowlistMap[groupId] || []
+  return allowlist.some(m => m.userId === userId)
+}
+
+// ===== 禁言/拉黑权限检查 =====
+function canMute(member: UiGroupMember): boolean {
+  if (!props.showMuteAction)
+    return false
+  if (member.userId === props.currentUserId)
+    return false
+  if (isMemberMuted(props.groupId, member.userId))
+    return false
+  if (isOwner.value)
+    return true
+  if (isAdmin.value && member.role === 'member')
+    return true
+  return false
+}
+
+function canUnmute(member: UiGroupMember): boolean {
+  if (!props.showMuteAction)
+    return false
+  if (!isMemberMuted(props.groupId, member.userId))
+    return false
+  if (isOwner.value)
+    return true
+  if (isAdmin.value && member.role === 'member')
+    return true
+  return false
+}
+
+function canBlock(member: UiGroupMember): boolean {
+  if (!props.showBlockAction)
+    return false
+  if (member.userId === props.currentUserId)
+    return false
+  if (isMemberBlocked(props.groupId, member.userId))
+    return false
+  if (isOwner.value || isAdmin.value)
+    return true
+  return false
+}
+
+function canUnblock(member: UiGroupMember): boolean {
+  if (!props.showBlockAction)
+    return false
+  if (!isMemberBlocked(props.groupId, member.userId))
+    return false
+  if (isOwner.value || isAdmin.value)
+    return true
+  return false
 }
 
 function roleClass(role?: string): string {
@@ -253,6 +339,22 @@ function onSetAdmin(member: UiGroupMember) {
 
 function onRemoveAdmin(member: UiGroupMember) {
   emit('remove-admin', member)
+}
+
+function onMute(member: UiGroupMember) {
+  emit('mute-member', member)
+}
+
+function onUnmute(member: UiGroupMember) {
+  emit('unmute-member', member)
+}
+
+function onBlock(member: UiGroupMember) {
+  emit('block-member', member)
+}
+
+function onUnblock(member: UiGroupMember) {
+  emit('unblock-member', member)
 }
 
 function clearSearch() {
@@ -345,6 +447,24 @@ defineExpose({ refresh, removeMember, setMemberRole })
               >
                 {{ roleLabel(member.role) }}
               </span>
+              <span
+                v-if="isMemberMuted(props.groupId, member.userId)"
+                class="group-member-list__status-tag group-member-list__status-tag--muted"
+              >
+                {{ t('group.memberList.muted') || '禁言中' }}
+              </span>
+              <span
+                v-if="isMemberBlocked(props.groupId, member.userId)"
+                class="group-member-list__status-tag group-member-list__status-tag--blocked"
+              >
+                {{ t('group.memberList.blocked') || '已拉黑' }}
+              </span>
+              <span
+                v-if="isMemberInAllowlist(props.groupId, member.userId)"
+                class="group-member-list__status-tag group-member-list__status-tag--allowlist"
+              >
+                {{ t('group.memberList.inAllowlist') || '白名单' }}
+              </span>
             </div>
             <div class="group-member-list__id">
               ID: {{ member.userId }}
@@ -361,7 +481,39 @@ defineExpose({ refresh, removeMember, setMemberRole })
             </button>
 
             <button
-              v-if="canSetAdmin(member)"
+              v-if="canMute(member)"
+              class="group-member-list__action-btn"
+              @click="onMute(member)"
+            >
+              {{ t('group.memberList.mute') || '禁言' }}
+            </button>
+
+            <button
+              v-if="canUnmute(member)"
+              class="group-member-list__action-btn"
+              @click="onUnmute(member)"
+            >
+              {{ t('group.memberList.unmute') || '取消禁言' }}
+            </button>
+
+            <button
+              v-if="canBlock(member)"
+              class="group-member-list__action-btn group-member-list__action-btn--danger"
+              @click="onBlock(member)"
+            >
+              {{ t('group.memberList.block') || '拉黑' }}
+            </button>
+
+            <button
+              v-if="canUnblock(member)"
+              class="group-member-list__action-btn"
+              @click="onUnblock(member)"
+            >
+              {{ t('group.memberList.unblock') || '取消拉黑' }}
+            </button>
+
+            <button
+              v-if="props.showAdminAction && canSetAdmin(member)"
               class="group-member-list__action-btn"
               @click="onSetAdmin(member)"
             >
@@ -369,7 +521,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
             </button>
 
             <button
-              v-if="canRemoveAdmin(member)"
+              v-if="props.showAdminAction && canRemoveAdmin(member)"
               class="group-member-list__action-btn"
               @click="onRemoveAdmin(member)"
             >
@@ -377,7 +529,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
             </button>
 
             <button
-              v-if="canRemove(member)"
+              v-if="props.showRemoveAction && canRemove(member)"
               class="group-member-list__action-btn group-member-list__action-btn--danger"
               @click="onRemove(member)"
             >
@@ -539,6 +691,29 @@ defineExpose({ refresh, removeMember, setMemberRole })
 .group-member-list__role--admin {
   background-color: #dbeafe;
   color: #2563eb;
+}
+
+.group-member-list__status-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.group-member-list__status-tag--muted {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.group-member-list__status-tag--blocked {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.group-member-list__status-tag--allowlist {
+  background-color: #d1fae5;
+  color: #059669;
 }
 
 .group-member-list__id {

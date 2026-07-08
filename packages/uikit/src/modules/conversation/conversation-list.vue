@@ -20,7 +20,7 @@ import NewChatModal from './new-chat-modal.vue'
 import AddContactModal from './add-contact-modal.vue'
 import CreateGroupModal from './create-group-modal.vue'
 
-const props = withDefaults(defineProps<{
+interface ConversationListProps {
   showSearch?: boolean
   customActions?: ConversationAction[]
   showScrollToTop?: boolean
@@ -45,7 +45,9 @@ const props = withDefaults(defineProps<{
   pullRefresh?: boolean
   /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean
-}>(), {
+}
+
+const props = withDefaults(defineProps<ConversationListProps>(), {
   showSearch: true,
   customActions: () => [],
   showScrollToTop: true,

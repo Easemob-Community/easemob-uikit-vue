@@ -201,11 +201,11 @@ export function useUIKitProvider(
     disposeUserInfoDomain?.()
     disposeUserInfoDomain = null
     stores.client.clearClient()
-    stores.conversation.clearConversationList()
+    stores.conversation.clearConversations()
     stores.message.clearMessages()
     stores.contact.clearContacts()
     stores.group.clearGroups()
-    stores.presence.clear()
+    stores.presence.clearPresence()
     stores.userInfo.clearUserInfos()
   }
 

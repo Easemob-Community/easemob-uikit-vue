@@ -1,4 +1,5 @@
 import { computed, watchEffect } from 'vue'
+import type { UserInfoAttribute } from 'easemob-websdk'
 import { useUIKit } from './use-uikit'
 
 /**
@@ -36,9 +37,21 @@ export function useOwnUserInfo() {
   const displayName = computed(() => contact.value?.remark || userInfo.value?.nickname || currentUserId.value || '')
   const avatarUrl = computed(() => userInfo.value?.avatarUrl || contact.value?.avatar)
 
+  /** 更新当前用户资料（批量字段） */
+  async function updateOwnInfo(params: Parameters<typeof domains.userInfo.updateOwnInfo>[0]) {
+    return domains.userInfo.updateOwnInfo(params)
+  }
+
+  /** 更新当前用户单个资料属性 */
+  async function updateOwnInfoByAttribute(attribute: UserInfoAttribute, value: string | number | boolean) {
+    return domains.userInfo.updateOwnInfoByAttribute(attribute, value)
+  }
+
   return {
     userInfo,
     displayName,
     avatarUrl,
+    updateOwnInfo,
+    updateOwnInfoByAttribute,
   }
 }

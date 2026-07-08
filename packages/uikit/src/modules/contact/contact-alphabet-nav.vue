@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { DEFAULT_ALPHABET_KEYS, type ContactGroupItem } from './types'
 
-const props = withDefaults(defineProps<{
+interface ContactAlphabetNavProps {
   /** 当前已渲染的分组数据，用于禁用空字母（与 keys 二选一） */
   groups?: ContactGroupItem[]
   /** 已有的分组 key 列表（通用现，与 groups 二选一；优先级高于 groups） */
@@ -11,7 +11,9 @@ const props = withDefaults(defineProps<{
   activeKey?: string
   /** 是否禁用未存在的字母（变浅色） */
   dimEmpty?: boolean
-}>(), {
+}
+
+const props = withDefaults(defineProps<ContactAlphabetNavProps>(), {
   groups: () => [],
   activeKey: '',
   dimEmpty: true,

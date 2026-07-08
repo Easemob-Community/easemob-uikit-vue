@@ -63,6 +63,12 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     }
   }
 
+  function markUnsubscribed(userIds: string[]) {
+    for (const id of userIds) {
+      subscribedSet.value.delete(id)
+    }
+  }
+
   function markSubscribeFailed(userIds: string[]) {
     for (const id of userIds) {
       subscribeFailedSet.value.add(id)
@@ -113,6 +119,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     markFetchFailed,
     isFetchFailed,
     markSubscribed,
+    markUnsubscribed,
     markSubscribeFailed,
     isSubscribeFailed,
     disableSubscription,

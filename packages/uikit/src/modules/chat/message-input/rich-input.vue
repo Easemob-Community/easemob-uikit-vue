@@ -301,7 +301,7 @@ onBeforeUnmount(() => {
         </div>
       </template>
       <div v-else class="rich-input__voice-btn">
-        {{ isRecording ? '松开结束录音' : '按住说话' }}
+        {{ isRecording ? t('chat.voice.releaseEnd') : t('chat.voice.holdTalk') }}
       </div>
     </div>
 

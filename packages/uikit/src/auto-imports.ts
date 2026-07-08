@@ -14,5 +14,10 @@ export const EasemobUIKitImports = {
     'useViewport',
     'useToast',
     'useLocale',
+    'usePresence',
+    'useBlocklist',
+    'useUserInfo',
+    'useOwnUserInfo',
+    'useBottomSheet',
   ],
 }

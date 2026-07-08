@@ -30,7 +30,7 @@ import ContactAlphabetNav from './contact-alphabet-nav.vue'
 import ContactEmpty from './contact-empty.vue'
 import ContactItem from './contact-item.vue'
 
-const props = withDefaults(defineProps<{
+export interface ContactListProps {
   /** 是否展示头部区域，默认 true */
   showHeader?: boolean
   /** Header 标题文本，不传则使用 i18n 默认值 */
@@ -95,7 +95,9 @@ const props = withDefaults(defineProps<{
   clickBehavior?: ContactListClickBehavior
   /** 是否展示联系人头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean
-}>(), {
+}
+
+const props = withDefaults(defineProps<ContactListProps>(), {
   showHeader: true,
   headerAlign: 'left',
   showCount: false,

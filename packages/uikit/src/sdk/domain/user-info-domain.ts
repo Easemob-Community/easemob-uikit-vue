@@ -196,6 +196,50 @@ export class UserInfoDomain {
   }
 
   /**
+   * 更新当前登录用户的单个资料属性。
+   */
+  async updateOwnInfoByAttribute(attribute: UserInfoAttribute, value: string | number | boolean): Promise<UserInfo | undefined> {
+    try {
+      const info = await this.client.userInfoManager.updateOwnInfoByAttribute(attribute, value)
+      this.store.setUserInfo(info)
+      return info
+    }
+    catch (err) {
+      console.warn('[UserInfoDomain] updateOwnInfoByAttribute failed:', err)
+      return undefined
+    }
+  }
+
+  /**
+   * 取消订阅指定用户的资料变更通知。
+   */
+  async unsubscribeUsersInfo(userIds: string[]): Promise<void> {
+    const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
+    if (uniqueIds.length === 0)
+      return
+    try {
+      await this.client.userInfoManager.unsubscribeUsersInfo({ userIds: uniqueIds })
+      this.store.markUnsubscribed(uniqueIds)
+    }
+    catch (err) {
+      console.warn('[UserInfoDomain] unsubscribeUsersInfo failed:', err)
+    }
+  }
+
+  /**
+   * 获取当前用户已订阅资料变更的用户列表。
+   */
+  async getSubscribedUsers() {
+    try {
+      return await this.client.userInfoManager.getSubscribedUsers()
+    }
+    catch (err) {
+      console.warn('[UserInfoDomain] getSubscribedUsers failed:', err)
+      return []
+    }
+  }
+
+  /**
    * 清理事件监听与内部状态。
    */
   dispose() {

@@ -1,4 +1,4 @@
-import { computed, ref, toValue, watch, type MaybeRef } from 'vue'
+import { type MaybeRef, computed, ref, toValue, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { useKeyboard } from './use-keyboard'
 
@@ -83,6 +83,16 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
 
   const { keyboardHeight, isKeyboardOpen } = useKeyboard()
 
+  /** 预留：字体缩放，后续 P2 接入 rem 体系时消费 */
+  const fontScale = computed(() => resolved.value.fontScale ?? 1)
+
+  // 将 fontScale 同步到 CSS 变量 --uikit-font-scale，驱动全局字号缩放
+  watch(fontScale, (scale) => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.setProperty('--uikit-font-scale', String(scale))
+    }
+  }, { immediate: true })
+
   return {
     config: resolved,
     viewport: { width, height },
@@ -103,7 +113,6 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
       return typeof window !== 'undefined'
         && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
     }),
-    /** 预留：字体缩放，后续 P2 接入 rem 体系时消费 */
-    fontScale: computed(() => resolved.value.fontScale ?? 1),
+    fontScale,
   }
 }

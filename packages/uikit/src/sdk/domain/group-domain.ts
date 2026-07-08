@@ -1,6 +1,6 @@
 import type { ManagerHost } from '../client'
 import type { UiGroup, UiGroupMember } from '../types'
-import { toUiGroup, toUiGroups, toUiGroupMember, toUiGroupMembers } from '../adapter/group-adapter'
+import { toUiGroup, toUiGroupMember, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
 
 /**
  * GroupStore 需要暴露给 Domain 的最小接口。
@@ -150,6 +150,140 @@ export class GroupDomain {
   /** 接受群邀请 */
   async acceptGroupInvitation(groupId: string) {
     await this.client.groupManager.acceptInvitation({ groupId })
+  }
+
+  /** 更新群基础资料（名称/描述/头像/扩展字段） */
+  async updateGroupInfo(
+    groupId: string,
+    input: { name?: string, description?: string, avatar?: string, ext?: string },
+  ) {
+    await this.client.groupManager.getGroup(groupId).updateInfo(input)
+    // SDK 字段名映射到 UiGroup 字段名
+    const patch: Partial<UiGroup> = {}
+    if (input.name !== undefined)
+      patch.groupName = input.name
+    if (input.description !== undefined)
+      patch.description = input.description
+    if (input.avatar !== undefined)
+      patch.avatar = input.avatar
+    this.store.updateGroup(groupId, patch)
+  }
+
+  /** 更新群配置（公开/审批/邀请/最大人数等） */
+  async updateGroupConfigs(
+    groupId: string,
+    input: {
+      public?: boolean
+      joinApprovalRequired?: boolean
+      allowInvites?: boolean
+      inviteNeedConfirm?: boolean
+      maxMembers?: number
+    },
+  ) {
+    await this.client.groupManager.getGroup(groupId).updateConfigs(input)
+    // SDK 字段名映射到 UiGroup 字段名
+    const patch: Partial<UiGroup> = {}
+    if (input.public !== undefined)
+      patch.public = input.public
+    if (input.joinApprovalRequired !== undefined)
+      patch.approval = input.joinApprovalRequired
+    if (input.allowInvites !== undefined)
+      patch.allowInvites = input.allowInvites
+    if (input.maxMembers !== undefined)
+      patch.maxUsers = input.maxMembers
+    this.store.updateGroup(groupId, patch)
+  }
+
+  /** 开启全员禁言 */
+  async muteAllGroupMembers(groupId: string) {
+    await this.client.groupManager.getGroup(groupId).muteAllMembers()
+    this.store.updateGroup(groupId, { mute: true })
+  }
+
+  /** 关闭全员禁言 */
+  async unmuteAllGroupMembers(groupId: string) {
+    await this.client.groupManager.getGroup(groupId).unmuteAllMembers()
+    this.store.updateGroup(groupId, { mute: false })
+  }
+
+  /** 禁言指定成员 */
+  async muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
+    await this.client.groupManager.getGroup(groupId).muteMembers({ userIds, muteDuration })
+  }
+
+  /** 解除指定成员禁言 */
+  async unmuteGroupMembers(groupId: string, userIds: string[]) {
+    await this.client.groupManager.getGroup(groupId).unmuteMembers({ userIds })
+  }
+
+  /** 获取群禁言列表 */
+  async getGroupMuteList(groupId: string, pageNum?: number, pageSize?: number) {
+    const result = await this.client.groupManager.getGroup(groupId).getMuteList({ pageNum, pageSize })
+    return result
+  }
+
+  /** 获取群黑名单 */
+  async getGroupBlocklist(groupId: string, pageNum?: number, pageSize?: number) {
+    const result = await this.client.groupManager.getGroup(groupId).getBlocklist({ pageNum, pageSize })
+    return result
+  }
+
+  /** 将成员加入群黑名单 */
+  async blockGroupMembers(groupId: string, userIds: string[]) {
+    await this.client.groupManager.getGroup(groupId).blockMembers({ userIds })
+  }
+
+  /** 将成员移出群黑名单 */
+  async unblockGroupMembers(groupId: string, userIds: string[]) {
+    await this.client.groupManager.getGroup(groupId).unblockMembers({ userIds })
+  }
+
+  /** 获取群白名单 */
+  async getGroupAllowlist(groupId: string) {
+    const result = await this.client.groupManager.getGroup(groupId).getAllowlist()
+    return result
+  }
+
+  /** 将成员加入群白名单 */
+  async addUsersToGroupAllowlist(groupId: string, userIds: string[]) {
+    await this.client.groupManager.getGroup(groupId).addUsersToAllowlist({ userIds })
+  }
+
+  /** 将成员移出群白名单 */
+  async removeUsersFromGroupAllowlist(groupId: string, userIds: string[]) {
+    await this.client.groupManager.getGroup(groupId).removeUsersFromAllowlist({ userIds })
+  }
+
+  /** 检查当前用户是否在群白名单中 */
+  async checkIfInGroupAllowList(groupId: string) {
+    return this.client.groupManager.getGroup(groupId).checkIfInAllowList()
+  }
+
+  /** 检查当前用户是否在群禁言列表中 */
+  async checkIfInGroupMuteList(groupId: string) {
+    return this.client.groupManager.getGroup(groupId).checkIfInMuteList()
+  }
+
+  /** 获取群共享文件列表 */
+  async getGroupSharedFileList(groupId: string, pageNum?: number, pageSize?: number) {
+    const result = await this.client.groupManager.getGroup(groupId).getSharedFileList({ pageNum, pageSize })
+    return result
+  }
+
+  /** 同意入群申请 */
+  async acceptGroupJoinRequest(groupId: string, userId: string) {
+    await this.client.groupManager.acceptGroupJoinRequest({ groupId, userId })
+  }
+
+  /** 拒绝入群申请 */
+  async rejectGroupJoinRequest(groupId: string, userId: string, reason: string) {
+    await this.client.groupManager.rejectGroupJoinRequest({ groupId, userId, reason })
+  }
+
+  /** 获取公开群列表 */
+  async getPublicGroupList(params?: { cursor?: string, pageSize?: number }) {
+    const result = await this.client.groupManager.getPublicGroupList(params)
+    return result
   }
 
   /** 拒绝群邀请 */

@@ -5,7 +5,7 @@ import type { UiContact as Contact } from '../../sdk/types'
 import ContactItemDefault from './contact-item-default.vue'
 import type { AvatarShape, ContactItemSize, ContactSelectMode, OnlineStatus } from './types'
 
-const props = withDefaults(defineProps<{
+interface ContactItemProps {
   contact: Contact
   selectMode?: ContactSelectMode
   /** 是否禁用 */
@@ -22,7 +22,9 @@ const props = withDefaults(defineProps<{
   onlineStatus?: OnlineStatus
   /** Item 尺寸 */
   size?: ContactItemSize
-}>(), {
+}
+
+const props = withDefaults(defineProps<ContactItemProps>(), {
   selectMode: 'none',
   disabled: false,
   showAvatar: true,

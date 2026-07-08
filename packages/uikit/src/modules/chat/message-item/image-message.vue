@@ -67,14 +67,121 @@ function onError() {
 /** 全屏预览 */
 const isPreviewing = ref(false)
 
+/** 缩放比例 */
+const scale = ref(1)
+/** 平移 X */
+const translateX = ref(0)
+/** 平移 Y */
+const translateY = ref(0)
+
+/** 双指初始距离 */
+let initialPinchDistance = 0
+/** 双指缩放起始值 */
+let pinchStartScale = 1
+/** 单指拖拽起始位 */
+let dragStartX = 0
+let dragStartY = 0
+let dragStartTranslateX = 0
+let dragStartTranslateY = 0
+/** 判断是拖拽还是双指缩放 */
+let isPinching = false
+
 function openPreview() {
   if (originalUrl.value) {
     isPreviewing.value = true
+    resetZoom()
   }
 }
 
 function closePreview() {
   isPreviewing.value = false
+  resetZoom()
+}
+
+function resetZoom() {
+  scale.value = 1
+  translateX.value = 0
+  translateY.value = 0
+}
+
+/** 获取两指间距 */
+function getTouchDistance(e: TouchEvent): number {
+  const dx = e.touches[0].clientX - e.touches[1].clientX
+  const dy = e.touches[0].clientY - e.touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function onPreviewTouchStart(e: TouchEvent) {
+  if (e.touches.length === 2) {
+    // 双指缩放开始
+    isPinching = true
+    initialPinchDistance = getTouchDistance(e)
+    pinchStartScale = scale.value
+  }
+  else if (e.touches.length === 1) {
+    // 单指拖拽
+    isPinching = false
+    dragStartX = e.touches[0].clientX
+    dragStartY = e.touches[0].clientY
+    dragStartTranslateX = translateX.value
+    dragStartTranslateY = translateY.value
+  }
+}
+
+function onPreviewTouchMove(e: TouchEvent) {
+  e.preventDefault()
+  if (e.touches.length === 2) {
+    // 双指缩放
+    isPinching = true
+    const currentDistance = getTouchDistance(e)
+    if (initialPinchDistance > 0) {
+      const ratio = currentDistance / initialPinchDistance
+      const newScale = Math.max(1, Math.min(5, pinchStartScale * ratio))
+      scale.value = newScale
+    }
+  }
+  else if (e.touches.length === 1 && !isPinching && scale.value > 1) {
+    // 单指拖拽（仅放大后可拖拽）
+    const dx = e.touches[0].clientX - dragStartX
+    const dy = e.touches[0].clientY - dragStartY
+    translateX.value = dragStartTranslateX + dx
+    translateY.value = dragStartTranslateY + dy
+  }
+}
+
+function onPreviewTouchEnd(e: TouchEvent) {
+  // 从双指缩放切换到单指拖拽时，重新捕获拖拽起点，避免位置跳变
+  if (isPinching && e.touches.length === 1) {
+    isPinching = false
+    dragStartX = e.touches[0].clientX
+    dragStartY = e.touches[0].clientY
+    dragStartTranslateX = translateX.value
+    dragStartTranslateY = translateY.value
+    return
+  }
+  isPinching = false
+}
+
+/** 双击切换缩放 */
+let lastTapTime = 0
+function onPreviewImageClick(e: MouseEvent) {
+  e.stopPropagation()
+  const now = Date.now()
+  if (now - lastTapTime < 300) {
+    // 双击：在 1x 和 2x 间切换
+    if (scale.value > 1.5) {
+      resetZoom()
+    }
+    else {
+      scale.value = 2
+      translateX.value = 0
+      translateY.value = 0
+    }
+    lastTapTime = 0
+  }
+  else {
+    lastTapTime = now
+  }
 }
 
 /** 下载原图 */
@@ -155,7 +262,14 @@ async function handleDownload(event: MouseEvent) {
         :src="originalUrl"
         class="image-message__preview-img"
         alt="preview"
-        @click.stop
+        :style="{
+          transform: `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`,
+          cursor: scale > 1 ? 'grab' : 'default',
+        }"
+        @touchstart="onPreviewTouchStart"
+        @touchmove.prevent="onPreviewTouchMove"
+        @touchend="onPreviewTouchEnd"
+        @click="onPreviewImageClick"
       >
       <!-- 下载按钮 -->
       <button

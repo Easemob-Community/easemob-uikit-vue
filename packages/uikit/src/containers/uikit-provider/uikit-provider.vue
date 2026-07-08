@@ -142,7 +142,7 @@ watch(
     if (!loggedIn) {
       ctx.stores.contact.clearContacts()
       ctx.stores.group.clearGroups()
-      ctx.stores.presence.clear()
+      ctx.stores.presence.clearPresence()
       return
     }
     const ds = dataSource.value

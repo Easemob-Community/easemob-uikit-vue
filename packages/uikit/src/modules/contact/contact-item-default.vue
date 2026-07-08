@@ -5,7 +5,7 @@ import Icon from '../../components/icon/icon.vue'
 import type { UiContact as Contact } from '../../sdk/types'
 import type { AvatarShape, ContactItemSize, OnlineStatus } from './types'
 
-const props = withDefaults(defineProps<{
+interface ContactItemDefaultProps {
   contact: Contact
   active?: boolean
   selected?: boolean
@@ -25,7 +25,9 @@ const props = withDefaults(defineProps<{
   onlineStatus?: OnlineStatus
   /** 紧凑/正常/大尺寸，默认 normal */
   size?: ContactItemSize
-}>(), {
+}
+
+const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   active: false,
   selected: false,
   showCheckbox: false,

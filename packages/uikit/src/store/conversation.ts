@@ -27,8 +27,8 @@ export const useConversationStore = defineStore('conversation', () => {
     })
   })
 
-  /** SDK5 当前 getConversationList 无分页游标 */
-  const hasMoreConversations = computed(() => false)
+  /** 是否还有更多会话可加载（分页数据源场景，SDK 全量加载时为 false） */
+  const hasMoreConversations = ref(false)
 
   function addConversation(cvs: UiConversation) {
     const index = conversationList.value.findIndex(item => item.id === cvs.id)
@@ -106,11 +106,16 @@ export const useConversationStore = defineStore('conversation', () => {
     atMeMap.value[conversationId] = hasAtMe
   }
 
-  function clearConversationList() {
+  function setHasMoreConversations(value: boolean) {
+    hasMoreConversations.value = value
+  }
+
+  function clearConversations() {
     conversationList.value = []
     currentConversationId.value = null
     conversationsLoaded.value = false
     isSyncingConversations.value = false
+    hasMoreConversations.value = false
     groupMemberCountMap.value = {}
     typingMap.value = {}
     atMeMap.value = {}
@@ -154,6 +159,7 @@ export const useConversationStore = defineStore('conversation', () => {
     getGroupMemberCount,
     setTyping,
     setAtMe,
-    clearConversationList,
+    setHasMoreConversations,
+    clearConversations,
   }
 })

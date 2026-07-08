@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useLocale } from '../../locale'
 
-const props = defineProps<{
+interface ContactEmptyProps {
   text?: string
-}>()
+}
+
+const props = defineProps<ContactEmptyProps>()
 
 const { t } = useLocale()
 </script>

@@ -161,6 +161,113 @@ export function useGroup() {
     return groupStore.getGroupAnnouncement(groupId)
   }
 
+  /** 更新群基础资料 */
+  async function updateGroupInfo(
+    groupId: string,
+    input: { name?: string, description?: string, avatar?: string, ext?: string },
+  ) {
+    await domains.group.updateGroupInfo(groupId, input)
+  }
+
+  /** 更新群配置 */
+  async function updateGroupConfigs(
+    groupId: string,
+    input: {
+      public?: boolean
+      joinApprovalRequired?: boolean
+      allowInvites?: boolean
+      inviteNeedConfirm?: boolean
+      maxMembers?: number
+    },
+  ) {
+    await domains.group.updateGroupConfigs(groupId, input)
+  }
+
+  /** 开启全员禁言 */
+  async function muteAllGroupMembers(groupId: string) {
+    await domains.group.muteAllGroupMembers(groupId)
+  }
+
+  /** 关闭全员禁言 */
+  async function unmuteAllGroupMembers(groupId: string) {
+    await domains.group.unmuteAllGroupMembers(groupId)
+  }
+
+  /** 禁言指定成员 */
+  async function muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
+    await domains.group.muteGroupMembers(groupId, userIds, muteDuration)
+  }
+
+  /** 解除指定成员禁言 */
+  async function unmuteGroupMembers(groupId: string, userIds: string[]) {
+    await domains.group.unmuteGroupMembers(groupId, userIds)
+  }
+
+  /** 获取群禁言列表 */
+  async function getGroupMuteList(groupId: string, pageNum?: number, pageSize?: number) {
+    return domains.group.getGroupMuteList(groupId, pageNum, pageSize)
+  }
+
+  /** 获取群黑名单 */
+  async function getGroupBlocklist(groupId: string, pageNum?: number, pageSize?: number) {
+    return domains.group.getGroupBlocklist(groupId, pageNum, pageSize)
+  }
+
+  /** 将成员加入群黑名单 */
+  async function blockGroupMembers(groupId: string, userIds: string[]) {
+    await domains.group.blockGroupMembers(groupId, userIds)
+  }
+
+  /** 将成员移出群黑名单 */
+  async function unblockGroupMembers(groupId: string, userIds: string[]) {
+    await domains.group.unblockGroupMembers(groupId, userIds)
+  }
+
+  /** 获取群白名单 */
+  async function getGroupAllowlist(groupId: string) {
+    return domains.group.getGroupAllowlist(groupId)
+  }
+
+  /** 将成员加入群白名单 */
+  async function addUsersToGroupAllowlist(groupId: string, userIds: string[]) {
+    await domains.group.addUsersToGroupAllowlist(groupId, userIds)
+  }
+
+  /** 将成员移出群白名单 */
+  async function removeUsersFromGroupAllowlist(groupId: string, userIds: string[]) {
+    await domains.group.removeUsersFromGroupAllowlist(groupId, userIds)
+  }
+
+  /** 检查当前用户是否在群白名单中 */
+  async function checkIfInGroupAllowList(groupId: string) {
+    return domains.group.checkIfInGroupAllowList(groupId)
+  }
+
+  /** 检查当前用户是否在群禁言列表中 */
+  async function checkIfInGroupMuteList(groupId: string) {
+    return domains.group.checkIfInGroupMuteList(groupId)
+  }
+
+  /** 获取群共享文件列表 */
+  async function getGroupSharedFileList(groupId: string, pageNum?: number, pageSize?: number) {
+    return domains.group.getGroupSharedFileList(groupId, pageNum, pageSize)
+  }
+
+  /** 同意入群申请 */
+  async function acceptGroupJoinRequest(groupId: string, userId: string) {
+    await domains.group.acceptGroupJoinRequest(groupId, userId)
+  }
+
+  /** 拒绝入群申请 */
+  async function rejectGroupJoinRequest(groupId: string, userId: string, reason: string) {
+    await domains.group.rejectGroupJoinRequest(groupId, userId, reason)
+  }
+
+  /** 获取公开群列表 */
+  async function getPublicGroupList(params?: { cursor?: string, pageSize?: number }) {
+    return domains.group.getPublicGroupList(params)
+  }
+
   /** 刷新群组列表（重新拉取） */
   async function refresh() {
     await fetchGroups()
@@ -222,6 +329,25 @@ export function useGroup() {
     declineGroupInvitation,
     getGroupMembers,
     getGroupAnnouncement,
+    updateGroupInfo,
+    updateGroupConfigs,
+    muteAllGroupMembers,
+    unmuteAllGroupMembers,
+    muteGroupMembers,
+    unmuteGroupMembers,
+    getGroupMuteList,
+    getGroupBlocklist,
+    blockGroupMembers,
+    unblockGroupMembers,
+    getGroupAllowlist,
+    addUsersToGroupAllowlist,
+    removeUsersFromGroupAllowlist,
+    checkIfInGroupAllowList,
+    checkIfInGroupMuteList,
+    getGroupSharedFileList,
+    acceptGroupJoinRequest,
+    rejectGroupJoinRequest,
+    getPublicGroupList,
     refresh,
     loadMore,
     fetchJoinedGroupCount,

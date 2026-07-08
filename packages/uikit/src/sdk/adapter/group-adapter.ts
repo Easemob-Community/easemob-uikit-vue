@@ -14,6 +14,7 @@ export function toUiGroup(source: SdkGroupSource): UiGroup {
     approval: source.joinApprovalRequired,
     disabled: source.disabled,
     maxUsers: source.maxMembers,
+    role: source.role,
   }
 
   if ('avatarUrl' in source) {

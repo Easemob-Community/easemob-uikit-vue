@@ -1,17 +1,16 @@
 import { computed } from 'vue'
 import type { UserInfo } from 'easemob-websdk'
-import { useContactStore } from '../store/contact'
 import type { UiContact as Contact } from '../sdk/types'
 import { useUIKit } from './use-uikit'
 
 /**
  * 黑名单能力集成
- * - 读走 contactStore.blackList
+ * - 读走 context.stores.contact.blackList
  * - 写走 client + dataSource（需 Provider.enableBlocklist=true）
  */
 export function useBlocklist() {
-  const contactStore = useContactStore()
-  const { client, dataSource, features } = useUIKit()
+  const { client, dataSource, features, stores } = useUIKit()
+  const contactStore = stores.contact
 
   const blockList = computed(() => contactStore.blackList)
 

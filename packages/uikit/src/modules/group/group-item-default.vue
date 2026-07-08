@@ -5,7 +5,7 @@ import Icon from '../../components/icon/icon.vue'
 import type { UiGroup as Group } from '../../sdk/types'
 import type { AvatarShape, GroupItemSize } from './types'
 
-const props = withDefaults(defineProps<{
+interface GroupItemDefaultProps {
   group: Group
   active?: boolean
   selected?: boolean
@@ -25,7 +25,9 @@ const props = withDefaults(defineProps<{
   subtitle?: string
   /** Item 尺寸 */
   size?: GroupItemSize
-}>(), {
+}
+
+const props = withDefaults(defineProps<GroupItemDefaultProps>(), {
   active: false,
   selected: false,
   showCheckbox: false,

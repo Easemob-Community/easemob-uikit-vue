@@ -17,6 +17,17 @@ export const useGroupStore = defineStore('group', () => {
   /** 群公告缓存：groupId -> announcement */
   const groupAnnouncementMap = ref<Record<string, string>>({})
 
+  /** 群成员禁言列表缓存：groupId -> members */
+  const groupMuteListMap = ref<Record<string, UiGroupMember[]>>({})
+  /** 群黑名单缓存：groupId -> members */
+  const groupBlocklistMap = ref<Record<string, UiGroupMember[]>>({})
+  /** 群白名单缓存：groupId -> members */
+  const groupAllowlistMap = ref<Record<string, UiGroupMember[]>>({})
+  /** 群共享文件缓存：groupId -> files */
+  const groupSharedFilesMap = ref<Record<string, any[]>>({})
+  /** 入群申请列表缓存：groupId -> requests */
+  const groupJoinRequestsMap = ref<Record<string, any[]>>({})
+
   // ===== UI 交互状态 =====
   const filterText = ref('')
   const activeId = ref('')
@@ -93,8 +104,138 @@ export const useGroupStore = defineStore('group', () => {
       g.memberCount = Math.max(0, (g.memberCount || 0) - delta)
   }
 
-  function setMuted(_groupId: string, _userIds: string[], _muted: boolean) {
-    // UIKit Group 类型不含禁言列表，当前仅占位
+  /** 成员级禁言状态更新：同步更新 groupMuteListMap */
+  function setMuted(groupId: string, userIds: string[], muted: boolean) {
+    const list = groupMuteListMap.value[groupId] || []
+    if (muted) {
+      // 添加禁言成员（去重）
+      const existingIds = new Set(list.map(m => m.userId))
+      const newMembers = userIds
+        .filter(id => !existingIds.has(id))
+        .map(id => ({ userId: id, role: 'member' as const }))
+      if (newMembers.length > 0) {
+        groupMuteListMap.value[groupId] = [...list, ...newMembers]
+      }
+    }
+    else {
+      // 移除禁言成员
+      const idSet = new Set(userIds)
+      groupMuteListMap.value[groupId] = list.filter(m => !idSet.has(m.userId))
+    }
+  }
+
+  // ===== 禁言列表缓存 =====
+  function setGroupMuteList(groupId: string, members: UiGroupMember[]) {
+    groupMuteListMap.value[groupId] = members
+  }
+
+  function addGroupMuteMembers(groupId: string, userIds: string[]) {
+    const list = groupMuteListMap.value[groupId] || []
+    const existingIds = new Set(list.map(m => m.userId))
+    const newMembers = userIds
+      .filter(id => !existingIds.has(id))
+      .map(id => ({ userId: id, role: 'member' as const }))
+    if (newMembers.length > 0) {
+      groupMuteListMap.value[groupId] = [...list, ...newMembers]
+    }
+  }
+
+  function removeGroupMuteMembers(groupId: string, userIds: string[]) {
+    const idSet = new Set(userIds)
+    groupMuteListMap.value[groupId] = (groupMuteListMap.value[groupId] || [])
+      .filter(m => !idSet.has(m.userId))
+  }
+
+  function getGroupMuteList(groupId: string): UiGroupMember[] {
+    return groupMuteListMap.value[groupId] || []
+  }
+
+  // ===== 黑名单缓存 =====
+  function setGroupBlocklist(groupId: string, members: UiGroupMember[]) {
+    groupBlocklistMap.value[groupId] = members
+  }
+
+  function addGroupBlocklistMembers(groupId: string, userIds: string[]) {
+    const list = groupBlocklistMap.value[groupId] || []
+    const existingIds = new Set(list.map(m => m.userId))
+    const newMembers = userIds
+      .filter(id => !existingIds.has(id))
+      .map(id => ({ userId: id, role: 'member' as const }))
+    if (newMembers.length > 0) {
+      groupBlocklistMap.value[groupId] = [...list, ...newMembers]
+    }
+  }
+
+  function removeGroupBlocklistMembers(groupId: string, userIds: string[]) {
+    const idSet = new Set(userIds)
+    groupBlocklistMap.value[groupId] = (groupBlocklistMap.value[groupId] || [])
+      .filter(m => !idSet.has(m.userId))
+  }
+
+  function getGroupBlocklist(groupId: string): UiGroupMember[] {
+    return groupBlocklistMap.value[groupId] || []
+  }
+
+  // ===== 白名单缓存 =====
+  function setGroupAllowlist(groupId: string, members: UiGroupMember[]) {
+    groupAllowlistMap.value[groupId] = members
+  }
+
+  function addGroupAllowlistMembers(groupId: string, userIds: string[]) {
+    const list = groupAllowlistMap.value[groupId] || []
+    const existingIds = new Set(list.map(m => m.userId))
+    const newMembers = userIds
+      .filter(id => !existingIds.has(id))
+      .map(id => ({ userId: id, role: 'member' as const }))
+    if (newMembers.length > 0) {
+      groupAllowlistMap.value[groupId] = [...list, ...newMembers]
+    }
+  }
+
+  function removeGroupAllowlistMembers(groupId: string, userIds: string[]) {
+    const idSet = new Set(userIds)
+    groupAllowlistMap.value[groupId] = (groupAllowlistMap.value[groupId] || [])
+      .filter(m => !idSet.has(m.userId))
+  }
+
+  function getGroupAllowlist(groupId: string): UiGroupMember[] {
+    return groupAllowlistMap.value[groupId] || []
+  }
+
+  // ===== 共享文件缓存 =====
+  function setGroupSharedFiles(groupId: string, files: any[]) {
+    groupSharedFilesMap.value[groupId] = files
+  }
+
+  function addGroupSharedFile(groupId: string, file: any) {
+    const list = groupSharedFilesMap.value[groupId] || []
+    groupSharedFilesMap.value[groupId] = [...list, file]
+  }
+
+  function removeGroupSharedFile(groupId: string, fileId: string) {
+    groupSharedFilesMap.value[groupId] = (groupSharedFilesMap.value[groupId] || [])
+      .filter(f => f.fileId !== fileId && f.id !== fileId)
+  }
+
+  function getGroupSharedFiles(groupId: string): any[] {
+    return groupSharedFilesMap.value[groupId] || []
+  }
+
+  // ===== 入群申请缓存 =====
+  function setGroupJoinRequests(groupId: string, requests: any[]) {
+    groupJoinRequestsMap.value[groupId] = requests
+  }
+
+  function updateGroupJoinRequest(groupId: string, userId: string, status: string) {
+    const list = groupJoinRequestsMap.value[groupId] || []
+    const item = list.find(r => r.userId === userId || r.applicantId === userId)
+    if (item) {
+      item.status = status
+    }
+  }
+
+  function getGroupJoinRequests(groupId: string): any[] {
+    return groupJoinRequestsMap.value[groupId] || []
   }
 
   // ===== 群成员/公告缓存 =====
@@ -199,6 +340,11 @@ export const useGroupStore = defineStore('group', () => {
     hasMore.value = false
     groupMembersMap.value = {}
     groupAnnouncementMap.value = {}
+    groupMuteListMap.value = {}
+    groupBlocklistMap.value = {}
+    groupAllowlistMap.value = {}
+    groupSharedFilesMap.value = {}
+    groupJoinRequestsMap.value = {}
   }
 
   // 别名方法：兼容 Domain 层 GroupStoreLike 接口
@@ -211,6 +357,11 @@ export const useGroupStore = defineStore('group', () => {
     joinedGroupCount,
     groupMembersMap: computed(() => groupMembersMap.value),
     groupAnnouncementMap: computed(() => groupAnnouncementMap.value),
+    groupMuteListMap: computed(() => groupMuteListMap.value),
+    groupBlocklistMap: computed(() => groupBlocklistMap.value),
+    groupAllowlistMap: computed(() => groupAllowlistMap.value),
+    groupSharedFilesMap: computed(() => groupSharedFilesMap.value),
+    groupJoinRequestsMap: computed(() => groupJoinRequestsMap.value),
     filterText,
     activeId,
     selectedIds,
@@ -236,6 +387,25 @@ export const useGroupStore = defineStore('group', () => {
     clearGroupMembers,
     setGroupAnnouncement,
     getGroupAnnouncement,
+    setGroupMuteList,
+    addGroupMuteMembers,
+    removeGroupMuteMembers,
+    getGroupMuteList,
+    setGroupBlocklist,
+    addGroupBlocklistMembers,
+    removeGroupBlocklistMembers,
+    getGroupBlocklist,
+    setGroupAllowlist,
+    addGroupAllowlistMembers,
+    removeGroupAllowlistMembers,
+    getGroupAllowlist,
+    setGroupSharedFiles,
+    addGroupSharedFile,
+    removeGroupSharedFile,
+    getGroupSharedFiles,
+    setGroupJoinRequests,
+    updateGroupJoinRequest,
+    getGroupJoinRequests,
     setFilterText,
     setActiveId,
     isSelected,

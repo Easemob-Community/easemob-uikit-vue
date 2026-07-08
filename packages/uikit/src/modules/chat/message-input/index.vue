@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useChat } from '../../composables/use-chat'
-import { useQuote } from '../../composables/use-quote'
-import { useViewport } from '../../composables/use-viewport'
-import { useToast } from '../../composables/use-toast'
-import EmojiPicker from '../../components/emoji-picker/emoji-picker.vue'
-import Popup from '../../components/popup/popup.vue'
-import { useLocale } from '../../locale'
-import type { UiMessage } from '../../sdk/types'
-import SimpleInput from './message-input/simple-input.vue'
-import RichInput from './message-input/rich-input.vue'
-import EditingBar from './message-input/editing-bar.vue'
-import MentionPicker from './mention/mention-picker.vue'
-import QuoteBar from './quote/quote-bar.vue'
-import type { ChatConfig, ChatSendHooks, MentionContact } from './types'
+import { useChat } from '../../../composables/use-chat'
+import { useQuote } from '../../../composables/use-quote'
+import { useViewport } from '../../../composables/use-viewport'
+import { useToast } from '../../../composables/use-toast'
+import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
+import Popup from '../../../components/popup/popup.vue'
+import { useLocale } from '../../../locale'
+import type { UiMessage } from '../../../sdk/types'
+import MentionPicker from '../mention/mention-picker.vue'
+import QuoteBar from '../quote/quote-bar.vue'
+import type { ChatConfig, ChatSendHooks, MentionContact } from '../types'
+import SimpleInput from './simple-input.vue'
+import RichInput from './rich-input.vue'
+import EditingBar from './editing-bar.vue'
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -275,7 +275,8 @@ function getVideoDuration(file: File): Promise<number> {
 
     let settled = false
     const finish = (duration: number) => {
-      if (settled) return
+      if (settled)
+        return
       settled = true
       URL.revokeObjectURL(url)
       resolve(Math.max(1, Math.floor(duration || 0)))

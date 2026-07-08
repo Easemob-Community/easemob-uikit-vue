@@ -119,6 +119,8 @@ export interface UiGroup {
   description?: string
   /** 群主 */
   owner?: string
+  /** 当前用户在群内的角色 */
+  role?: 'owner' | 'admin' | 'member'
   /** 成员数 */
   memberCount?: number
   /** 最大成员数 */

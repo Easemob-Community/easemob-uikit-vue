@@ -2,7 +2,7 @@
 // 对外统一使用 Em 前缀，避免与业务方组件命名冲突
 export { default as EmChat } from './chat.vue'
 export { default as EmMessageList } from './message-list/message-list.vue'
-export { default as EmMessageInput } from './message-input.vue'
+export { default as EmMessageInput } from './message-input/index.vue'
 export { default as EmChatInfoDrawer } from './drawer/chat-info-drawer.vue'
 export { default as EmMessageVirtualList } from './message-list/message-virtual-list.vue'
 export { default as EmMessageRenderer } from './message-item/message-renderer.vue'

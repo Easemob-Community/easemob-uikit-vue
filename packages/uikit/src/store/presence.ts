@@ -42,7 +42,7 @@ export const usePresenceStore = defineStore('presence', () => {
     }
   }
 
-  function clear() {
+  function clearPresence() {
     presenceMap.value = new Map()
     subscribedUserIds.value = new Set()
   }
@@ -55,6 +55,6 @@ export const usePresenceStore = defineStore('presence', () => {
     updateBatch,
     get,
     setSubscribed,
-    clear,
+    clearPresence,
   }
 })

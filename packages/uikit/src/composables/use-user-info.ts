@@ -56,5 +56,9 @@ export function useUserInfo(
     contact,
     displayName,
     avatarUrl,
+    /** 取消订阅指定用户的资料变更 */
+    unsubscribeUsersInfo: (userIds: string[]) => domains.userInfo.unsubscribeUsersInfo(userIds),
+    /** 获取已订阅用户列表 */
+    getSubscribedUsers: () => domains.userInfo.getSubscribedUsers(),
   }
 }

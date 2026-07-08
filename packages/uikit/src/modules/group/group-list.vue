@@ -25,7 +25,7 @@ import type {
 import GroupEmpty from './group-empty.vue'
 import GroupItem from './group-item.vue'
 
-const props = withDefaults(defineProps<{
+export interface GroupListProps {
   /** 是否展示头部区域，默认 true */
   showHeader?: boolean
   /** Header 标题文本，不传则使用 i18n 默认值 */
@@ -88,7 +88,9 @@ const props = withDefaults(defineProps<{
   searchComponent?: Component
   /** 列表项点击行为模式，默认 'default' */
   clickBehavior?: GroupListClickBehavior
-}>(), {
+}
+
+const props = withDefaults(defineProps<GroupListProps>(), {
   showHeader: true,
   headerAlign: 'left',
   showCount: false,

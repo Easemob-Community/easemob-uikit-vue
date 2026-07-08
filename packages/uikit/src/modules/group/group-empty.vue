@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useLocale } from '../../locale'
 
-const props = defineProps<{
+interface GroupEmptyProps {
   text?: string
-}>()
+}
+
+const props = defineProps<GroupEmptyProps>()
 
 const { t } = useLocale()
 </script>

@@ -1,4 +1,4 @@
-import type { GroupEventHandlerMap, GroupInvitationReceivedEventPayload, GroupInvitationAcceptedEventPayload, GroupInvitationDeclinedEventPayload, GroupAutoAcceptInvitationEventPayload, GroupMembersJoinedEventPayload } from 'easemob-websdk'
+import type { GroupAllowListAddedEventPayload, GroupAllowListRemovedEventPayload, GroupAutoAcceptInvitationEventPayload, GroupEventHandlerMap, GroupInvitationAcceptedEventPayload, GroupInvitationDeclinedEventPayload, GroupInvitationReceivedEventPayload, GroupMembersJoinedEventPayload, GroupMuteListAddedEventPayload, GroupMuteListRemovedEventPayload, GroupRequestToJoinAcceptedEventPayload, GroupRequestToJoinDeclinedEventPayload, GroupRequestToJoinReceivedEventPayload, GroupSharedFileAddedEventPayload, GroupSharedFileDeletedEventPayload } from 'easemob-websdk'
 import type { UiContactInvite } from '../types'
 import type { RootStores } from './types'
 
@@ -91,17 +91,60 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       const p = payload as any
       stores.group.updateGroup(p.groupId, { announcement: p.announcement })
     },
-    onMuteListAdded: (payload) => {
-      const p = payload as any
-      stores.group.setMuted(p.groupId, p.members, true)
+    onMuteListAdded: (payload: GroupMuteListAddedEventPayload) => {
+      const userIds = (payload.mutes || []).map((u: any) => u.userId)
+      stores.group.addGroupMuteMembers(payload.groupId, userIds)
     },
-    onMuteListRemoved: (payload) => {
-      const p = payload as any
-      stores.group.setMuted(p.groupId, p.members, false)
+    onMuteListRemoved: (payload: GroupMuteListRemovedEventPayload) => {
+      const userIds = (payload.mutes || []).map((u: any) => u.userId)
+      stores.group.removeGroupMuteMembers(payload.groupId, userIds)
     },
     onAllMemberMuteStateChanged: (payload) => {
       const p = payload as any
-      stores.group.updateGroup(p.groupId, { mute: p.allMuted })
+      stores.group.updateGroup(p.groupId, { mute: p.isMuted })
+    },
+    onAllowListAdded: (payload: GroupAllowListAddedEventPayload) => {
+      const userIds = (payload.allowlist || []).map((u: any) => u.userId)
+      stores.group.addGroupAllowlistMembers(payload.groupId, userIds)
+    },
+    onAllowListRemoved: (payload: GroupAllowListRemovedEventPayload) => {
+      const userIds = (payload.allowlist || []).map((u: any) => u.userId)
+      stores.group.removeGroupAllowlistMembers(payload.groupId, userIds)
+    },
+    onSharedFileAdded: (payload: GroupSharedFileAddedEventPayload) => {
+      if (payload.sharedFile) {
+        stores.group.addGroupSharedFile(payload.groupId, payload.sharedFile)
+      }
+    },
+    onSharedFileDeleted: (payload: GroupSharedFileDeletedEventPayload) => {
+      stores.group.removeGroupSharedFile(payload.groupId, payload.fileId)
+    },
+    onRequestToJoinReceived: (payload: GroupRequestToJoinReceivedEventPayload) => {
+      const list = stores.group.getGroupJoinRequests(payload.groupId)
+      stores.group.setGroupJoinRequests(payload.groupId, [
+        ...list,
+        {
+          groupId: payload.groupId,
+          groupName: payload.groupName,
+          applicant: payload.applicant,
+          reason: payload.reason,
+          status: 'pending',
+          timestamp: Date.now(),
+        },
+      ])
+    },
+    onRequestToJoinAccepted: (payload: GroupRequestToJoinAcceptedEventPayload) => {
+      // 入群申请被同意后，移除对应申请记录
+      const list = stores.group.getGroupJoinRequests(payload.groupId)
+        .filter((r: any) => r.applicant?.userId !== payload.accepter?.userId)
+      stores.group.setGroupJoinRequests(payload.groupId, list)
+    },
+    onRequestToJoinDeclined: (payload: GroupRequestToJoinDeclinedEventPayload) => {
+      stores.group.updateGroupJoinRequest(
+        payload.groupId,
+        payload.applicant?.userId || '',
+        'declined',
+      )
     },
   }
 }

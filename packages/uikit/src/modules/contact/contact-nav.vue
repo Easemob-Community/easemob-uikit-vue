@@ -4,14 +4,16 @@ import type { ContactNavEntry } from './types'
 
 export type { ContactNavEntry }
 
-const props = withDefaults(defineProps<{
+interface ContactNavProps {
   /** 入口配置列表，按数组顺序展示 */
   entries: ContactNavEntry[]
   /** 单卡附加 class */
   cardClass?: string
   /** 单卡附加 style */
   cardStyle?: Record<string, string>
-}>(), {})
+}
+
+const props = withDefaults(defineProps<ContactNavProps>(), {})
 
 const emit = defineEmits<{
   (e: 'entry-click', key: string): void

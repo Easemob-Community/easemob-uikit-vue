@@ -4,11 +4,29 @@
   --uikit-success-color: hsl(155, 100%, 60%);
   --uikit-warning-color: hsl(38, 100%, 60%);
   --uikit-danger-color: hsl(350, 100%, 60%);
-  --uikit-bg-base: #ffffff;
-  --uikit-bg-secondary: #f3f4f6;
-  --uikit-bg-hover: #e5e7eb;
+
+  /* 文字层级 */
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
+  --uikit-text-tertiary: #9ca3af;
+
+  /* 背景层级 */
+  --uikit-bg-base: #ffffff;
+  --uikit-bg-secondary: #f3f4f6;
+  --uikit-bg-tertiary: #f0f0f0;
+  --uikit-bg-hover: #e5e7eb;
+  --uikit-bg-active: rgba(51, 170, 255, 0.08);
+
+  /* 主色别名 */
+  --uikit-primary: var(--uikit-primary-color);
+  --uikit-primary-hover: hsl(203, 100%, 50%);
+  --uikit-primary-rgb: 59, 130, 246;
+
+  /* 危险色 RGB */
+  --uikit-danger-rgb: 255, 51, 68;
+
+  /* 边框别名 */
+  --uikit-border: var(--uikit-border-color);
 
   /* 安全区（H5 适配）：env() 在非刘海设备上返回 0px，不影响 PC */
   --uikit-safe-top: env(safe-area-inset-top);
@@ -87,9 +105,23 @@
 [data-uikit-theme="dark"] {
   --uikit-bg-base: #111827;
   --uikit-bg-secondary: #1f2937;
+  --uikit-bg-tertiary: #0a101f;
   --uikit-bg-hover: #374151;
+  --uikit-bg-active: rgba(51, 170, 255, 0.12);
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
+  --uikit-text-tertiary: #6b7280;
+
+  /* 主色别名 */
+  --uikit-primary: var(--uikit-primary-color);
+  --uikit-primary-hover: hsl(203, 100%, 45%);
+  --uikit-primary-rgb: 59, 130, 246;
+
+  /* 危险色 RGB */
+  --uikit-danger-rgb: 255, 51, 68;
+
+  /* 边框别名 */
+  --uikit-border: var(--uikit-border-color);
 
   /* 边框与分隔线 - 暗色 */
   --uikit-border-color: #374151;

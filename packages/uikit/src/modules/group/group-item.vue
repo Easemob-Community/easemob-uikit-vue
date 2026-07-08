@@ -5,7 +5,7 @@ import type { UiGroup as Group } from '../../sdk/types'
 import GroupItemDefault from './group-item-default.vue'
 import type { AvatarShape, GroupItemSize, GroupSelectMode } from './types'
 
-const props = withDefaults(defineProps<{
+interface GroupItemProps {
   group: Group
   selectMode?: GroupSelectMode
   /** 是否禁用 */
@@ -22,7 +22,9 @@ const props = withDefaults(defineProps<{
   subtitle?: string
   /** Item 尺寸 */
   size?: GroupItemSize
-}>(), {
+}
+
+const props = withDefaults(defineProps<GroupItemProps>(), {
   selectMode: 'none',
   disabled: false,
   showAvatar: true,
