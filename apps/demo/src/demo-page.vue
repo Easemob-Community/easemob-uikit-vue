@@ -6,15 +6,17 @@ import {
   EmContactDetail,
   EmConversationContainer,
   EmGroupDetail,
+  EmIcon,
   EmInput,
   EmPopup,
   setPinyinAdapter,
   useClient,
-  useConversation,
   useContactStore,
+  useConversation,
   useLocale,
   useTheme,
   useUIKit,
+  useViewport,
 } from '@easemob/uikit'
 import type { UiContact, UiConversation, UiGroup } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
@@ -44,6 +46,13 @@ const { locale, setLocale } = useLocale()
 const { stores, theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
 const { setLocalConversationList, selectConversation } = useConversation()
+const { isMobile } = useViewport()
+
+/** 左侧边栏 tab：会话 / 联系人 */
+const sidebarTab = ref<'conversation' | 'contact'>('conversation')
+
+/** H5 页面栈：'list' 会话/联系人列表 | 'chat' 聊天详情 | 'detail' 联系人/群组详情 */
+const h5Page = ref<'list' | 'chat' | 'detail'>('list')
 
 const showSettings = ref(false)
 
@@ -101,7 +110,7 @@ const groupManagementConfig = ref({
 
 /** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
-  header: { showAvatar: true } ,
+  header: { showAvatar: true },
   groupReadReceipt: {
     enabled: groupReadReceiptEnabled.value,
     maxGroupSize: groupReadReceiptMaxSize.value,
@@ -148,6 +157,9 @@ function enterChatWithUser(userId: string) {
   selectConversation(userId)
   sidebarTab.value = 'conversation'
   detailUserId.value = null
+  if (isMobile.value) {
+    h5Page.value = 'chat'
+  }
 }
 
 /** 从群组详情页进入群聊 */
@@ -170,6 +182,28 @@ function enterChatWithGroup(groupId: string) {
   selectConversation(groupId)
   sidebarTab.value = 'conversation'
   detailGroupId.value = null
+  if (isMobile.value) {
+    h5Page.value = 'chat'
+  }
+}
+
+/** H5：从聊天返回列表 */
+function h5BackToList() {
+  h5Page.value = 'list'
+  stores.conversation.setCurrentConversationId(null)
+}
+
+/** H5：进入联系人/群组详情 */
+function h5EnterDetail(type: 'user' | 'group', id: string) {
+  if (type === 'user') {
+    detailUserId.value = id
+    detailGroupId.value = null
+  }
+  else {
+    detailGroupId.value = id
+    detailUserId.value = null
+  }
+  h5Page.value = 'detail'
 }
 
 // SDK 初始化相关状态
@@ -190,28 +224,34 @@ function handleInit() {
 }
 
 async function handleLogin() {
-  if (!loginUser.value) return
+  if (!loginUser.value) {
+    return
+  }
   try {
     const params: { user: string; accessToken?: string; password?: string } = {
       user: loginUser.value,
     }
     if (loginMode.value === 'token' && loginToken.value) {
       params.accessToken = loginToken.value
-    } else if (loginMode.value === 'password' && loginPassword.value) {
+    }
+    else if (loginMode.value === 'password' && loginPassword.value) {
       params.password = loginPassword.value
     }
     await login(params)
-  } catch (err) {
-    alert('登录失败: ' + (err as Error).message)
+  }
+  catch (err) {
+    console.warn('登录失败:', (err as Error).message)
   }
 }
 
 async function handleLogout() {
   try {
     await logout?.()
-  } catch (err) {
-    alert('登出失败: ' + (err as Error).message)
-  } finally {
+  }
+  catch (err) {
+    console.warn('登出失败:', (err as Error).message)
+  }
+  finally {
     emit('logout')
   }
 }
@@ -257,9 +297,6 @@ function injectMockConversations() {
 
 /* ============== 联系人演示（拼音能力） ============== */
 
-/** 左侧边栏 tab：会话 / 联系人 */
-const sidebarTab = ref<'conversation' | 'contact'>('conversation')
-
 /** 切到联系人页时清空当前会话，避免右侧 Chat 仍显示旧会话 */
 watch(sidebarTab, (tab) => {
   if (tab === 'contact') {
@@ -271,11 +308,14 @@ watch(sidebarTab, (tab) => {
   }
 })
 
-/** 选中会话后清空联系人详情页 */
+/** 选中会话后清空联系人详情页；H5 时自动跳聊天页 */
 watch(() => stores.conversation.currentConversationId, (id) => {
   if (id) {
     detailUserId.value = null
     detailGroupId.value = null
+    if (isMobile.value) {
+      h5Page.value = 'chat'
+    }
   }
 })
 
@@ -335,14 +375,130 @@ function injectMockContacts() {
 
 <template>
   <div class="demo-layout">
-    <!-- 左侧导航栏（仿微信） -->
-    <NavSidebar
-      v-model="sidebarTab"
-      @open-settings="showSettings = true"
-    />
+    <!-- ==================== PC 三栏布局 ==================== -->
+    <template v-if="!isMobile">
+      <!-- 左侧导航栏（仿微信） -->
+      <NavSidebar
+        v-model="sidebarTab"
+        @open-settings="showSettings = true"
+      />
 
-    <!-- 设置抽屉 -->
-    <EmPopup v-model:show="showSettings" position="right">
+      <!-- 中间侧边栏：会话列表 / 联系人列表 -->
+      <div class="demo-layout__sidebar">
+        <EmConversationContainer v-if="sidebarTab === 'conversation'">
+        </EmConversationContainer>
+        <EmContactContainer
+          v-else
+          :show-home-search="showHomeSearch"
+          :show-contact-search="showContactSearch"
+          :show-group-search="showGroupSearch"
+          @view-change="() => { detailUserId = null; detailGroupId = null }"
+          @contact-click="(c: UiContact) => { detailUserId = c.userId; detailGroupId = null }"
+          @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"
+        />
+      </div>
+
+      <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
+      <div class="demo-layout__main">
+        <EmContactDetail
+          v-if="detailUserId"
+          :user-id="detailUserId"
+          @send-message="enterChatWithUser"
+          @deleted="detailUserId = null"
+        />
+        <EmGroupDetail
+          v-else-if="detailGroupId"
+          :group-id="detailGroupId"
+          @send-message="enterChatWithGroup"
+        />
+        <EmChatContainer v-else :config="chatConfig" />
+      </div>
+    </template>
+
+    <!-- ==================== H5 单栏栈式布局 ==================== -->
+    <template v-else>
+      <!-- 列表页（会话 / 联系人） -->
+      <div v-show="h5Page === 'list'" class="h5-page">
+        <div class="h5-page__header">
+          <span class="h5-page__title">{{ sidebarTab === 'conversation' ? '消息' : '联系人' }}</span>
+          <button class="h5-page__header-btn" @click="showSettings = true">
+            <EmIcon name="misc/gear" :size="20" />
+          </button>
+        </div>
+        <div class="h5-page__body">
+          <EmConversationContainer v-if="sidebarTab === 'conversation'" :pull-refresh="true" />
+          <EmContactContainer
+            v-else
+            :show-home-search="showHomeSearch"
+            :show-contact-search="showContactSearch"
+            :show-group-search="showGroupSearch"
+            @view-change="() => { detailUserId = null; detailGroupId = null }"
+            @contact-click="(c: UiContact) => h5EnterDetail('user', c.userId)"
+            @group-click="(g: UiGroup) => h5EnterDetail('group', g.groupId)"
+          />
+        </div>
+        <!-- H5 底部 TabBar -->
+        <nav class="h5-tabbar">
+          <button
+            class="h5-tabbar__item"
+            :class="{ 'h5-tabbar__item--active': sidebarTab === 'conversation' }"
+            @click="sidebarTab = 'conversation'"
+          >
+            <EmIcon name="chat/bubble_fill" :size="22" />
+            <span class="h5-tabbar__label">消息</span>
+          </button>
+          <button
+            class="h5-tabbar__item"
+            :class="{ 'h5-tabbar__item--active': sidebarTab === 'contact' }"
+            @click="sidebarTab = 'contact'"
+          >
+            <EmIcon name="people/person_3lines_fill" :size="22" />
+            <span class="h5-tabbar__label">联系人</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- 聊天页 -->
+      <div v-show="h5Page === 'chat'" class="h5-page">
+        <div class="h5-page__header">
+          <button class="h5-page__header-btn" @click="h5BackToList">
+            <EmIcon name="arrow/arrow_left" :size="20" />
+          </button>
+          <span class="h5-page__title">聊天</span>
+          <span class="h5-page__header-spacer" />
+        </div>
+        <div class="h5-page__body">
+          <EmChatContainer :config="chatConfig" />
+        </div>
+      </div>
+
+      <!-- 联系人/群组详情页 -->
+      <div v-show="h5Page === 'detail'" class="h5-page">
+        <div class="h5-page__header">
+          <button class="h5-page__header-btn" @click="h5Page = 'list'">
+            <EmIcon name="arrow/arrow_left" :size="20" />
+          </button>
+          <span class="h5-page__title">详情</span>
+          <span class="h5-page__header-spacer" />
+        </div>
+        <div class="h5-page__body">
+          <EmContactDetail
+            v-if="detailUserId"
+            :user-id="detailUserId"
+            @send-message="enterChatWithUser"
+            @deleted="detailUserId = null; h5Page = 'list'"
+          />
+          <EmGroupDetail
+            v-else-if="detailGroupId"
+            :group-id="detailGroupId"
+            @send-message="enterChatWithGroup"
+          />
+        </div>
+      </div>
+    </template>
+
+    <!-- 设置抽屉（PC 右侧 / H5 底部） -->
+    <EmPopup v-model:show="showSettings" :position="isMobile ? 'bottom' : 'right'">
       <div class="demo-drawer">
         <div class="demo-drawer__header">
           <span class="demo-drawer__title">设置</span>
@@ -975,44 +1131,6 @@ function injectMockContacts() {
         </div>
       </div>
     </EmPopup>
-
-    <!-- 中间侧边栏：会话列表 / 联系人列表 -->
-    <div class="demo-layout__sidebar">
-      <EmConversationContainer v-if="sidebarTab === 'conversation'">
-      <!-- 自定义头部的用法 -->
-        <!-- <template #header>
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-weight: 600;">哈哈哈</span>
-            <span style="font-size: 12px; color: #6b7280;">v1.0</span>
-          </div>
-        </template> -->
-      </EmConversationContainer>
-      <EmContactContainer
-        v-else
-        :show-home-search="showHomeSearch"
-        :show-contact-search="showContactSearch"
-        :show-group-search="showGroupSearch"
-        @view-change="() => { detailUserId = null; detailGroupId = null }"
-        @contact-click="(c: UiContact) => { detailUserId = c.userId; detailGroupId = null }"
-        @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"
-      />
-    </div>
-
-    <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
-    <div class="demo-layout__main">
-      <EmContactDetail
-        v-if="detailUserId"
-        :user-id="detailUserId"
-        @send-message="enterChatWithUser"
-        @deleted="detailUserId = null"
-      />
-      <EmGroupDetail
-        v-else-if="detailGroupId"
-        :group-id="detailGroupId"
-        @send-message="enterChatWithGroup"
-      />
-      <EmChatContainer v-else :config="chatConfig" />
-    </div>
   </div>
 </template>
 
@@ -1246,5 +1364,105 @@ function injectMockContacts() {
   margin-top: 6px;
   font-size: 12px;
   color: var(--uikit-text-secondary, #6b7280);
+}
+
+/* ===== H5 单栏布局 ===== */
+
+.h5-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--uikit-bg-base, #ffffff);
+  overflow: hidden;
+}
+
+.h5-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  padding-top: calc(var(--uikit-safe-top, 0px) + 8px);
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+.h5-page__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.h5-page__header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--uikit-text-primary, #111827);
+  cursor: pointer;
+  padding: 0;
+}
+
+.h5-page__header-btn:active {
+  background-color: var(--uikit-bg-hover, #e5e7eb);
+}
+
+.h5-page__header-spacer {
+  width: 36px;
+}
+
+.h5-page__body {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* H5 底部 TabBar */
+.h5-tabbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 50px;
+  padding-bottom: var(--uikit-safe-bottom, 0px);
+  border-top: 1px solid var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-bg-base, #ffffff);
+  flex-shrink: 0;
+}
+
+.h5-tabbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-tertiary, #9ca3af);
+  cursor: pointer;
+  padding: 4px 16px;
+  transition: color var(--uikit-anim-duration, 300ms) var(--uikit-anim-easing, ease);
+}
+
+.h5-tabbar__item--active {
+  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+.h5-tabbar__label {
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* H5 设置抽屉宽度适配 */
+@media (max-width: 767px) {
+  .demo-drawer {
+    width: 100vw;
+    max-height: 80vh;
+    border-radius: 12px 12px 0 0;
+  }
 }
 </style>

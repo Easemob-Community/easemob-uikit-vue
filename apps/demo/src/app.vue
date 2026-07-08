@@ -141,6 +141,7 @@ const AppContent = {
     :enable-blocklist="enableBlocklist"
     :enable-presence="enablePresence"
     :data-source="useCustomDataSource ? customDataSource : undefined"
+    :h5="{ safeArea: true, keyboardAdapt: true, pullRefresh: 'auto' }"
   >
     <AppContent />
   </EmUIKitProvider>

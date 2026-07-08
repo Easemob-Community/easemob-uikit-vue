@@ -204,6 +204,7 @@ async function handleLogin() {
 
 .login-card {
   width: 380px;
+  max-width: calc(100vw - 32px);
   padding: 32px;
   border-radius: 12px;
   background-color: var(--uikit-bg-base, #ffffff);

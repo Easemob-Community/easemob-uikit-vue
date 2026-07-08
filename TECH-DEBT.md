@@ -242,6 +242,20 @@
 - **建议修法**：清理该 TODO 注释。
 - **关联 skill**：`uikit-lint-governance`
 
+### [ ] D35. H5 集成体验改进（demo 集成时反向发现）
+
+- **现象 1**：`EmConversationContainer` 未暴露「用户点击某会话」事件供 H5 页面栈导航。内部 `conversation-list` emit 了 `@select`，容器层只 emit `conversation-select`，且选中后直接调 `selectConversation()` 设置 currentConversationId。H5 场景只能 watch `stores.conversation.currentConversationId` 间接实现推页面栈，不够直观。
+- **现象 2**：`EmContactContainer` 的 `@contact-click` / `@group-click` 事件只告知「谁被点了」，不管导航。H5 业务需自己管页面跳转，缺少标准做法示例。
+- **现象 3**：`EmPopup` `position="bottom"` 时无 `max-height` 约束，H5 弹出会占满全屏，需业务侧自行加 `max-height` + 圆角。
+- **现象 4**：`h5.fontScale` 目前纯占位，设值后无组件消费 `--uikit-font-scale` 做字号缩放，文档应标注「暂未生效」避免误解。
+- **现象 5**：缺乏官方 H5 集成示例 / guide 页面，业务方从零摸索成本高。
+- **建议修法**：
+  1. `EmConversationContainer` 增加 `@conversation-click` 事件或文档说明 H5 导航标准模式；
+  2. `EmPopup` bottom 模式自动限制 `max-height: 85vh` + 顶部圆角；
+  3. `h5.fontScale` 文档标注 P2 预留暂未生效；
+  4. 补充 H5 集成 guide 或 demo 页面。
+- **关联 skill**：`uikit-h5-adaptation` / `uikit-component-authoring`
+
 ---
 
 ## 已修复（归档）
