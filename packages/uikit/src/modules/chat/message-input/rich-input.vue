@@ -34,9 +34,6 @@ const { isMobile } = useViewport()
 /** 输入框风格 */
 const style = computed(() => props.config?.style ?? 'wechat')
 
-/** 聚焦时边框颜色 */
-const focusBorderColorVar = computed(() => props.config?.focusBorderColor || 'var(--uikit-primary-color)')
-
 /** CSS 变量（用于全局样式中的 caret/selection） */
 const cssVars = computed(() => ({
   '--rich-input-caret-color': props.config?.caretColor || 'auto',
@@ -54,6 +51,9 @@ const features = computed(() => ({
   voice: props.config?.features?.voice !== false,
   video: props.config?.features?.video !== false,
 }))
+
+/** 是否显示发送按钮 */
+const showSendButton = computed(() => props.config?.showSendButton !== false)
 
 /** 是否正在录音 */
 const isRecording = ref(false)
@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- 发送按钮 -->
-    <div class="rich-input__actions">
+    <div v-if="showSendButton" class="rich-input__actions">
       <Button
         type="primary"
         size="small"
@@ -383,8 +383,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: var(--uikit-container-gap, 8px);
-  padding: var(--uikit-container-gap, 8px) 12px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: transparent;
 }
 
 /* 飞书风格：输入框在上，工具栏在下 */
@@ -431,14 +430,9 @@ onBeforeUnmount(() => {
 .rich-input__editor-wrapper {
   flex: 1;
   position: relative;
-  border: 1px solid #e5e7eb;
+  border: none;
   border-radius: var(--uikit-components-radius, 8px);
-  background-color: var(--uikit-bg-base);
-  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.rich-input__editor-wrapper:focus-within {
-  border-color: v-bind(focusBorderColorVar);
+  background-color: transparent;
 }
 
 .rich-input__placeholder {
@@ -472,5 +466,6 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding: 8px 4px 4px 0;
 }
 </style>

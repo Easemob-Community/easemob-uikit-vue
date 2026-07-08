@@ -177,6 +177,8 @@ export interface ChatConfig {
     }
     /** 是否启用输入状态提示（对方正在输入...），默认 true */
     enableTyping?: boolean
+    /** 是否显示发送按钮，默认 true */
+    showSendButton?: boolean
   }
   /** 文本消息配置 */
   textMessage?: {

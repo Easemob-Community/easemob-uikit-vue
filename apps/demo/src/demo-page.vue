@@ -119,6 +119,7 @@ const chatConfig = computed(() => ({
     style: chatInputStyle.value,
     features: { ...chatInputFeatures.value },
     autoFocus: chatInputAutoFocus.value,
+    showSendButton: false,
     ...(chatInputFocusBorderColor.value ? { focusBorderColor: chatInputFocusBorderColor.value } : {}),
     ...(chatInputCaretColor.value ? { caretColor: chatInputCaretColor.value } : {}),
     ...(chatInputSelectionColor.value ? { selectionColor: chatInputSelectionColor.value } : {}),

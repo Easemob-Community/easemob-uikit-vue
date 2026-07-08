@@ -628,6 +628,17 @@ defineExpose({
 <style scoped>
 .message-input {
   position: relative;
+  background-color: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin: 12px;
+  padding: 12px;
+  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.message-input:focus-within {
+  border-color: var(--uikit-primary-color);
 }
 
 /* H5 Emoji 底部弹层 */

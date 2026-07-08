@@ -47,11 +47,11 @@ const features = computed(() => ({
   video: props.config?.features?.video !== false,
 }))
 
+/** 是否显示发送按钮 */
+const showSendButton = computed(() => props.config?.showSendButton !== false)
+
 /** 是否使用多行文本 */
 const isMultiline = computed(() => !isMobile.value)
-
-/** 聚焦时边框颜色 */
-const focusBorderColorVar = computed(() => props.config?.focusBorderColor || 'var(--uikit-primary-color)')
 
 /** 光标颜色 */
 const caretColorVar = computed(() => props.config?.caretColor || 'auto')
@@ -77,7 +77,9 @@ const mentionList = ref<MentionContact[]>([])
 /** 发送消息 */
 function handleSend() {
   const trimmed = text.value.trim()
-  if (!trimmed) return
+  if (!trimmed) {
+    return
+  }
   // 过滤出实际出现在文本中的 mention
   const activeMentions = mentionList.value.filter(m => trimmed.includes(`@${m.name}`))
   emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
@@ -91,7 +93,9 @@ let isTypingThrottled = false
 
 /** 触发输入状态 */
 function triggerTyping() {
-  if (isTypingThrottled) return
+  if (isTypingThrottled) {
+    return
+  }
   isTypingThrottled = true
   emit('typing')
   typingThrottleTimer = setTimeout(() => {
@@ -199,9 +203,13 @@ function getCaretCoordinates(el: HTMLInputElement | HTMLTextAreaElement, positio
 
 /** 检测是否触发了 @提及 */
 function detectMention() {
-  if (!props.enableMention) return
+  if (!props.enableMention) {
+    return
+  }
   const el = getInputEl()
-  if (!el) return
+  if (!el) {
+    return
+  }
   const pos = el.selectionStart || 0
   const value = el.value
 
@@ -243,7 +251,9 @@ function detectMention() {
 /** 在光标位置插入 @提及文本（替换已有的 @keyword） */
 function insertMention(contact: MentionContact) {
   const el = getInputEl()
-  if (!el) return
+  if (!el) {
+    return
+  }
 
   const pos = el.selectionStart || 0
   const value = el.value
@@ -253,7 +263,9 @@ function insertMention(contact: MentionContact) {
   while (atPos >= 0 && value[atPos] !== '@') {
     atPos--
   }
-  if (atPos < 0) return
+  if (atPos < 0) {
+    return
+  }
 
   const before = value.substring(0, atPos)
   const after = value.substring(pos)
@@ -282,7 +294,9 @@ function onEmojiClick() {
 /** 在光标位置插入 Emoji */
 function insertEmoji(emoji: string) {
   const el = getInputEl()
-  if (!el) return
+  if (!el) {
+    return
+  }
 
   const start = el.selectionStart || 0
   const end = el.selectionEnd || 0
@@ -408,7 +422,7 @@ defineExpose({
     </div>
 
     <!-- 发送按钮 -->
-    <div class="simple-input__actions">
+    <div v-if="showSendButton" class="simple-input__actions">
       <Button
         type="primary"
         size="small"
@@ -448,8 +462,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   gap: var(--uikit-container-gap, 8px);
-  padding: var(--uikit-container-gap, 8px) 12px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: transparent;
 }
 
 /* 飞书风格：输入框在上，工具栏在下 */
@@ -477,8 +490,9 @@ defineExpose({
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-              color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
@@ -500,20 +514,15 @@ defineExpose({
 .simple-input__textarea {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  border: none;
   border-radius: var(--uikit-components-radius, 8px);
   font-size: 14px;
   outline: none;
-  background-color: var(--uikit-bg-base);
+  background-color: transparent;
   color: var(--uikit-text-primary);
   resize: none;
   font-family: inherit;
   line-height: 1.5;
-  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.simple-input__textarea:focus {
-  border-color: v-bind(focusBorderColorVar);
 }
 
 .simple-input__textarea::placeholder {
@@ -528,13 +537,15 @@ defineExpose({
   background-color: v-bind(selectionColorVar);
 }
 
-/* 覆盖 Input 组件的样式 */
+/* 覆盖 Input 组件的样式：融入 card 容器，去掉内边框 */
 :deep(.uikit-input__field) {
   caret-color: v-bind(caretColorVar);
+  border: none;
+  background-color: transparent;
 }
 
 :deep(.uikit-input__field:focus) {
-  border-color: v-bind(focusBorderColorVar);
+  border-color: transparent;
 }
 
 :deep(.uikit-input__field::selection) {
@@ -562,5 +573,6 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding: 8px 4px 4px 0;
 }
 </style>
