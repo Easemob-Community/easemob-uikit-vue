@@ -6,6 +6,7 @@ import Badge from '../../components/badge/badge.vue'
 import Icon from '../../components/icon/icon.vue'
 import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
+import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -63,8 +64,6 @@ const conversationName = computed(() =>
   contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
 )
 const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
-
-const itemRef = ref<HTMLElement>()
 
 /** H5 长按 ActionSheet */
 const showActionSheet = ref(false)
@@ -250,9 +249,8 @@ const displayMessage = computed(() => {
 </script>
 
 <template>
-  <div
-    ref="itemRef"
-    class="conversation-item"
+  <Cell
+    auto-height
     :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': props.hasAtMe }]"
     @click="onClick"
     @contextmenu="onContextMenu"
@@ -261,8 +259,10 @@ const displayMessage = computed(() => {
     @touchend="longPress.end"
     @touchcancel="longPress.cancel"
   >
-    <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
-    <slot name="item-prefix" />
+    <template #leading>
+      <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
+      <slot name="item-prefix" />
+    </template>
     <div class="conversation-item__info">
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
@@ -293,7 +293,7 @@ const displayMessage = computed(() => {
       </div>
       <slot name="item-suffix" />
     </div>
-  </div>
+  </Cell>
 
   <!-- PC 右键菜单 -->
   <Popup
@@ -329,28 +329,19 @@ const displayMessage = computed(() => {
 </template>
 
 <style scoped>
-.conversation-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px var(--uikit-item-hover-padding-x, 16px);
-  margin: 0 var(--uikit-item-hover-margin-x, 0px);
-  cursor: pointer;
-  transition: background-color 0.15s;
-  position: relative;
-  -webkit-touch-callout: none;
-  user-select: none;
-  border-radius: var(--uikit-item-hover-radius, 0px);
-}
-
-.conversation-item.is-pinned {
+/* 会话项状态覆盖 EmCell 根样式 */
+.uikit-cell.is-pinned {
   background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.04);
   border-radius: var(--uikit-item-active-radius, 0px);
 }
 
-.conversation-item:hover {
-  background-color: var(--uikit-bg-secondary);
-  border-radius: var(--uikit-item-hover-radius, 0px);
+.uikit-cell.has-at-me {
+  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.06);
+}
+
+/* leading slot 内 Avatar 与 prefix slot 间距 */
+:deep(.uikit-cell__leading) {
+  gap: 12px;
 }
 
 .conversation-item__info {
@@ -387,10 +378,6 @@ const displayMessage = computed(() => {
 .conversation-item__name.is-at-me {
   color: var(--uikit-primary, #3b82f6);
   font-weight: 600;
-}
-
-.conversation-item.has-at-me {
-  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.06);
 }
 
 .conversation-item__pin-badge {

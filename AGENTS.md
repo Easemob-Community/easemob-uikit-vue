@@ -37,6 +37,7 @@
 | `uikit-user-attribute-extraction` | 用户属性（昵称/头像/在线状态）提取：useUserInfo/useOwnUserInfo/usePresence、Avatar 复用、列表拆子组件 | `昵称`、`头像`、`用户属性`、`显示名`、`useUserInfo`、`头像不显示`、`sender name` | [.agent/skills/uikit-user-attribute-extraction/SKILL.md](.agent/skills/uikit-user-attribute-extraction/SKILL.md) |
 | `websdk2-uikit-migration` | SDK 层（sdk/domain/adapter/event）架构与迁移 | `迁移 SDK`、`重写 uikit sdk`、`domain 层`、`websdk2 最佳实践` | [.agent/skills/websdk2-uikit-migration/SKILL.md](.agent/skills/websdk2-uikit-migration/SKILL.md) |
 | `uikit-lint-governance` | 处理 eslint、lint 治理、非代码改动层决策、收尾提交 | `跑 lint`、`清 lint`、`改 eslint 配置`、`提交前检查` | [.agent/skills/uikit-lint-governance/SKILL.md](.agent/skills/uikit-lint-governance/SKILL.md) |
+| `uikit-cell-contract` | Cell 类组件统一约束：列表项/导航项/操作行/信息行的视觉一致性 + EmCell 基础组件 | `cell`、`cell 组件`、`cell 规范`、`列表项`、`list item`、`视觉统一`、`导航项`、`操作行`、`信息行` | [.agent/skills/uikit-cell-contract/SKILL.md](.agent/skills/uikit-cell-contract/SKILL.md) |
 
 路由规则：
 
