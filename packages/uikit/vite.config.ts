@@ -1,10 +1,32 @@
 /// <reference types="node" />
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-import { resolve } from 'path'
+
+function getSdkVersion(): string {
+  const _require = createRequire(import.meta.url)
+  const sdkMainPath = _require.resolve('easemob-websdk')
+  const sdkPackagePath = resolve(dirname(sdkMainPath), '../package.json')
+  const sdkPackage = JSON.parse(readFileSync(sdkPackagePath, 'utf-8')) as { version?: string }
+  return sdkPackage.version ?? 'unknown'
+}
+
+function getUIKitVersion(): string {
+  const uikitPackage = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as { version?: string }
+  return uikitPackage.version ?? 'unknown'
+}
+
+const sdkVersion = getSdkVersion()
+const uikitVersion = getUIKitVersion()
 
 export default defineConfig({
+  define: {
+    __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
+    __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
+  },
   plugins: [
     vue(),
     dts({
@@ -27,12 +49,13 @@ export default defineConfig({
         // 由于 install 也是命名导出，UMD 用户可直接 `app.use(EasemobUIKit)`。
         exports: 'named',
         globals: {
-          vue: 'Vue',
-          pinia: 'Pinia',
+          'vue': 'Vue',
+          'pinia': 'Pinia',
           'easemob-websdk': 'Easemob',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
-          if (assetInfo.name === 'style.css') return 'theme/index.css'
+          if (assetInfo.name === 'style.css')
+            return 'theme/index.css'
           return assetInfo.name || 'assets/[name][extname]'
         },
       },

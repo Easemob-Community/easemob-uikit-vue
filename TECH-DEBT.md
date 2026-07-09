@@ -259,6 +259,19 @@
 
 ---
 
+### [ ] D37. 统一 UIKit 日志体系，替换直接 console 输出
+
+- **现象**：UIKit 已新建 `utils/logger.ts` 但能力较薄（仅提供原始 `log`）；代码中仍存在多处直接 `console.warn` 等原生输出，且各模块没有统一命名空间、级别控制和运行开关，不利于问题排查和生产环境管控。
+- **证据**：`packages/uikit/src/utils/logger.ts` 目前只有 `log`；`sdk/domain/group-domain.ts` L270 等仍有 `console.warn`；多个模块错误处理仅 `console.warn` 或无日志。
+- **建议修法**：
+  1. 扩展 `utils/logger.ts`：增加 `debug/info/warn/error` 级别、`createLogger(namespace)` 命名空间、`setLogLevel/getLogLevel` 全局开关、基于级别的过滤；
+  2. 在 `UIKitClient` / `UIKitProvider` 初始化时根据 `debug` 配置自动设置日志级别；
+  3. 按模块为 `client.ts` 和各 `domain`/`composable` 创建 `createLogger('UIKit:xxx')`，替换所有 `console.warn`；
+  4. 版本输出等需要自定义样式的地方仍保留 `log` 作为底层输出能力。
+- **关联 skill**：`uikit-lint-governance` / `uikit-store-composable`
+
+---
+
 ### [ ] D35. H5 集成体验改进（demo 集成时反向发现）
 
 - **现象 1**：`EmConversationContainer` 未暴露「用户点击某会话」事件供 H5 页面栈导航。内部 `conversation-list` emit 了 `@select`，容器层只 emit `conversation-select`，且选中后直接调 `selectConversation()` 设置 currentConversationId。H5 场景只能 watch `stores.conversation.currentConversationId` 间接实现推页面栈，不够直观。

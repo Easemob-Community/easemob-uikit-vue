@@ -7,6 +7,10 @@ import {
   UserInfoManager,
 } from 'easemob-websdk'
 import type { ConnectionEventHandlerMap, EventHandlerMap, InitConfig } from 'easemob-websdk'
+import { log } from '../utils/logger'
+
+declare const __EASEMOB_SDK_VERSION__: string
+declare const __EASEMOB_UIKIT_VERSION__: string
 
 /**
  * UIKit 需要使用的 SDK 管理器集合。
@@ -77,6 +81,13 @@ export class UIKitClient {
         setLogLevel('DEBUG')
       })
     }
+
+    log(
+      '%c[Easemob] SDK version: %s, UIKit version: %s',
+      'color: green; font-weight: bold;',
+      __EASEMOB_SDK_VERSION__,
+      __EASEMOB_UIKIT_VERSION__,
+    )
   }
 
   /** SDK ChatManager */
