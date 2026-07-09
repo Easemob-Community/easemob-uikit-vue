@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Popup from '../../../components/popup/popup.vue'
+import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
@@ -150,23 +151,23 @@ defineExpose({
     <div v-else-if="members.length === 0" class="block-list__empty">
       {{ t('group.memberList.empty') || '暂无黑名单成员' }}
     </div>
-    <div
+    <Cell
       v-for="item in members"
       :key="userId(item)"
       class="block-list__item"
+      size="compact"
+      :title="displayName(item)"
+      :clickable="false"
     >
-      <Avatar
-        class="block-list__avatar"
-        :name="displayName(item)"
-        :size="36"
-      />
-      <div class="block-list__info">
-        <span class="block-list__name">{{ displayName(item) }}</span>
-      </div>
-      <button class="block-list__action-btn" @click="onUnblock(item)">
-        {{ t('group.memberList.unblock') || '移出黑名单' }}
-      </button>
-    </div>
+      <template #leading>
+        <Avatar :name="displayName(item)" :size="36" />
+      </template>
+      <template #trailing>
+        <button class="block-list__action-btn" @click.stop="onUnblock(item)">
+          {{ t('group.memberList.unblock') || '移出黑名单' }}
+        </button>
+      </template>
+    </Cell>
 
     <Popup
       v-model:show="showAddPopup"
@@ -185,23 +186,25 @@ defineExpose({
           <div v-else-if="selectableMembers.length === 0" class="block-list__popup-status">
             {{ t('group.blocklist.emptySelectable') || '暂无可添加的成员' }}
           </div>
-          <div
+          <Cell
             v-for="member in selectableMembers"
             :key="member.userId"
             class="block-list__popup-item"
+            size="compact"
+            :title="memberDisplayName(member)"
+            :selected="selectedUserIds.has(member.userId)"
             @click="toggleSelect(member)"
           >
-            <Avatar
-              class="block-list__popup-avatar"
-              :name="memberDisplayName(member)"
-              :size="36"
-            />
-            <span class="block-list__popup-name">{{ memberDisplayName(member) }}</span>
-            <span
-              class="block-list__popup-checkbox"
-              :class="{ 'block-list__popup-checkbox--checked': selectedUserIds.has(member.userId) }"
-            />
-          </div>
+            <template #leading>
+              <Avatar :name="memberDisplayName(member)" :size="36" />
+            </template>
+            <template #trailing>
+              <span
+                class="block-list__popup-checkbox"
+                :class="{ 'block-list__popup-checkbox--checked': selectedUserIds.has(member.userId) }"
+              />
+            </template>
+          </Cell>
         </div>
         <div class="block-list__popup-footer">
           <button class="block-list__popup-btn block-list__popup-btn--cancel" @click="closeAddPopup">
@@ -232,22 +235,7 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 .block-list__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-}
-.block-list__avatar {
-  flex-shrink: 0;
-}
-.block-list__info {
-  flex: 1;
-  min-width: 0;
-}
-.block-list__name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
+  --uikit-item-hover-padding-x: 16px;
 }
 .block-list__action-btn {
   padding: 4px 10px;
@@ -298,26 +286,7 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 .block-list__popup-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  cursor: pointer;
-}
-.block-list__popup-item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-.block-list__popup-avatar {
-  flex-shrink: 0;
-}
-.block-list__popup-name {
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  --uikit-item-hover-padding-x: 16px;
 }
 .block-list__popup-checkbox {
   width: 18px;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import Cell from '../../../components/cell/cell.vue'
 import { useChat } from '../../../composables/use-chat'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useLocale } from '../../../locale'
@@ -122,24 +123,30 @@ function toggle() {
         <span>{{ t('chat.pinnedBar.count').replace('{count}', String(pinnedList.length)) }}</span>
         <Icon name="arrows/arrow_up_thick" :size="12" />
       </div>
-      <div
+      <Cell
         v-for="msg in pinnedList"
         :key="msg.msgServerId || msg.msgLocalId"
         class="pinned-bar__item"
+        auto-height
+        border="bottom"
         @click="onLocate(msg)"
       >
-        <div class="pinned-bar__content">
-          <span class="pinned-bar__sender">{{ msg.from }}：</span>
-          <span class="pinned-bar__preview">{{ previewOf(msg) }}</span>
-        </div>
-        <button
-          class="pinned-bar__action"
-          :title="t('message.action.unpin')"
-          @click="onUnpin(msg, $event)"
-        >
-          <Icon name="actions/xmark_thin" :size="14" />
-        </button>
-      </div>
+        <template #default>
+          <div class="pinned-bar__content">
+            <span class="pinned-bar__sender">{{ msg.from }}：</span>
+            <span class="pinned-bar__preview">{{ previewOf(msg) }}</span>
+          </div>
+        </template>
+        <template #trailing>
+          <button
+            class="pinned-bar__action"
+            :title="t('message.action.unpin')"
+            @click="onUnpin(msg, $event)"
+          >
+            <Icon name="actions/xmark_thin" :size="14" />
+          </button>
+        </template>
+      </Cell>
     </div>
   </div>
 </template>
@@ -251,20 +258,6 @@ function toggle() {
 }
 
 .pinned-bar__item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-  border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.04));
-}
-
-.pinned-bar__item:last-child {
-  border-bottom: none;
-}
-
-.pinned-bar__item:hover {
-  background-color: var(--uikit-bg-secondary);
+  --uikit-item-hover-padding-x: 12px;
 }
 </style>

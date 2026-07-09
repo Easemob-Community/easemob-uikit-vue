@@ -57,8 +57,8 @@ border-radius: var(--uikit-item-active-radius, 0px);
 | size | 高度 | gap | 适用场景 |
 |---|---|---|---|
 | `compact` | 48px | 10px | 紧凑列表、选择器 |
-| `normal` | 56px | 12px | 默认列表项（会话/联系人/群组） |
-| `large` | 64px | 12px | 带副标题、详情页信息行 |
+| `normal` | 64px | 12px | 默认列表项（会话/联系人/群组） |
+| `large` | 72px | 12px | 带副标题、详情页信息行 |
 
 高度通过组件级 CSS 变量控制，允许覆盖：
 

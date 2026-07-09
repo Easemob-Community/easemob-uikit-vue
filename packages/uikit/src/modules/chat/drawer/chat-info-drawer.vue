@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Modal from '../../../components/modal/modal.vue'
+import Cell from '../../../components/cell/cell.vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
@@ -461,10 +462,12 @@ defineExpose({
 
         <!-- 通用操作 -->
         <div class="chat-info-drawer__section">
-          <button class="chat-info-drawer__action-row" @click="onClearHistory">
-            <Icon name="actions/trash" :size="18" />
-            <span>{{ t('chat.info.clearHistory') }}</span>
-          </button>
+          <Cell auto-height @click="onClearHistory">
+            <template #leading>
+              <Icon name="actions/trash" :size="18" />
+            </template>
+            <template #default>{{ t('chat.info.clearHistory') }}</template>
+          </Cell>
         </div>
       </template>
 
@@ -770,25 +773,6 @@ defineExpose({
 
 .chat-info-drawer__text-btn:hover {
   background-color: var(--uikit-bg-secondary);
-}
-
-.chat-info-drawer__action-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--uikit-components-radius, 8px);
-  border: none;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.chat-info-drawer__action-row:hover {
-  background-color: var(--uikit-border-color, #f3f4f6);
 }
 
 .chat-info-drawer__actions {

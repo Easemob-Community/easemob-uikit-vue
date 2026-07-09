@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import Icon from '../../components/icon/icon.vue'
 import Popup from '../../components/popup/popup.vue'
+import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -180,48 +181,36 @@ function closeDrawer() {
     </div>
 
     <!-- 全员禁言开关 -->
-    <div
+    <Cell
       v-if="props.showMuteAll && isAdminOrOwner"
-      class="group-management-section__item group-management-section__item--switch"
+      :clickable="false"
+      class="group-management-section__switch-cell"
     >
-      <div class="group-management-section__item-left">
-        <span class="group-management-section__label">
-          {{ t('group.management.muteAll') || '全员禁言' }}
-        </span>
-      </div>
-      <label class="group-management-section__toggle">
-        <input
-          type="checkbox"
-          :checked="isMuteAll"
-          class="group-management-section__toggle-input"
-          @change="toggleMuteAll"
-        >
-        <span class="group-management-section__toggle-slider" />
-      </label>
-    </div>
+      <template #default>{{ t('group.management.muteAll') || '全员禁言' }}</template>
+      <template #trailing>
+        <label class="group-management-section__toggle">
+          <input
+            type="checkbox"
+            :checked="isMuteAll"
+            class="group-management-section__toggle-input"
+            @change="toggleMuteAll"
+          >
+          <span class="group-management-section__toggle-slider" />
+        </label>
+      </template>
+    </Cell>
 
     <!-- 管理入口列表 -->
-    <div
-      v-for="entry in managementEntries"
-      :key="entry.key"
-      class="group-management-section__entry"
-    >
-      <div
-        class="group-management-section__item"
+    <div class="group-management-section__entries">
+      <Cell
+        v-for="entry in managementEntries"
+        :key="entry.key"
+        :title="entry.label"
+        :meta="entry.count ? String(entry.count) : undefined"
+        show-arrow
+        size="compact"
         @click="openDrawer(entry.key)"
-      >
-        <div class="group-management-section__item-left">
-          <span class="group-management-section__label">{{ entry.label }}</span>
-          <span v-if="entry.count" class="group-management-section__badge">
-            {{ entry.count }}
-          </span>
-        </div>
-        <Icon
-          name="arrows/chevron_right"
-          :size="16"
-          class="group-management-section__arrow"
-        />
-      </div>
+      />
     </div>
 
     <!-- 二级抽屉 -->
@@ -367,55 +356,10 @@ function closeDrawer() {
   margin-bottom: 12px;
 }
 
-.group-management-section__item {
+.group-management-section__entries {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  cursor: pointer;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color 0.15s;
-}
-
-.group-management-section__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.group-management-section__item--switch {
-  cursor: default;
-}
-
-.group-management-section__item-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.group-management-section__icon {
-  color: var(--uikit-text-secondary);
-}
-
-.group-management-section__label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-}
-
-.group-management-section__badge {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--uikit-text-secondary);
-  background-color: var(--uikit-bg-secondary);
-  padding: 1px 7px;
-  border-radius: 10px;
-}
-
-.group-management-section__arrow {
-  color: var(--uikit-text-secondary);
-}
-
-.group-management-section__entry {
-  margin-top: 2px;
+  flex-direction: column;
+  gap: 2px;
 }
 
 /* 全员禁言开关 */

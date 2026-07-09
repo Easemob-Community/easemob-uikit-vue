@@ -11,6 +11,7 @@ import Input from '../../components/input/input.vue'
 import Button from '../../components/button/button.vue'
 import ContactList from '../contact/contact-list.vue'
 import Avatar from '../../components/avatar/avatar.vue'
+import Cell from '../../components/cell/cell.vue'
 import type { UiContact } from '../../sdk/types'
 
 export interface CreateGroupModalConfig {
@@ -220,17 +221,27 @@ watch(
           </div>
 
           <div class="create-group-modal__selected-list">
-            <div
+            <Cell
               v-for="contact in selectedContacts"
               :key="contact.userId"
               class="create-group-modal__selected-item"
+              size="compact"
+              auto-height
+              :clickable="false"
             >
-              <Avatar :src="contact.avatar" :name="contact.name || contact.userId" :size="36" />
-              <span class="create-group-modal__selected-name">{{ contact.name || contact.userId }}</span>
-              <button class="create-group-modal__selected-remove" @click="removeSelected(contact.userId)">
-                <span>×</span>
-              </button>
-            </div>
+              <template #leading>
+                <Avatar :src="contact.avatar" :name="contact.name || contact.userId" :size="36" />
+              </template>
+              <template #default>{{ contact.name || contact.userId }}</template>
+              <template #trailing>
+                <button
+                  class="create-group-modal__selected-remove"
+                  @click="removeSelected(contact.userId)"
+                >
+                  <span>×</span>
+                </button>
+              </template>
+            </Cell>
             <div v-if="selectedCount === 0" class="create-group-modal__selected-empty">
               {{ t('group.createSelectedEmpty') || '请选择联系人' }}
             </div>
@@ -365,25 +376,7 @@ watch(
 }
 
 .create-group-modal__selected-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.create-group-modal__selected-item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
-
-.create-group-modal__selected-name {
-  flex: 1;
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  --uikit-item-hover-padding-x: 8px;
 }
 
 .create-group-modal__selected-remove {

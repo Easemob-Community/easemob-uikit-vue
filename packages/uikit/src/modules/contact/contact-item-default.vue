@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
+import Cell from '../../components/cell/cell.vue'
 import type { UiContact as Contact } from '../../sdk/types'
 import type { AvatarShape, ContactItemSize, OnlineStatus } from './types'
 
@@ -49,88 +50,58 @@ const resolvedAvatarSize = computed(() => {
   return 40
 })
 
-const rootClass = computed(() => ({
-  'is-active': props.active,
-  'is-selected': props.selected,
-  'is-disabled': props.disabled,
-  [`size-${props.size}`]: true,
-  'has-subtitle': !!props.subtitle,
-}))
+/** Avatar 组件仅支持 circle / square；rounded 与 square 视觉一致（8px 圆角） */
+const resolvedAvatarShape = computed(() => {
+  if (props.avatarShape === 'circle')
+    return 'circle'
+  return 'square'
+})
 </script>
 
 <template>
-  <div class="contact-item-default" :class="rootClass">
-    <span v-if="props.showCheckbox" class="contact-item-default__check">
-      <Icon
-        :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
-        :size="20"
-      />
-    </span>
-    <span v-if="props.showAvatar" class="contact-item-default__avatar-wrap">
-      <slot name="avatar" :contact="props.contact" :size="resolvedAvatarSize">
-        <Avatar
-          class="contact-item-default__avatar"
-          :class="`shape-${props.avatarShape}`"
-          :src="props.contact.avatar"
-          :name="displayName"
-          :size="resolvedAvatarSize"
-          :presence="props.onlineStatus"
-        />
-      </slot>
-    </span>
-    <span class="contact-item-default__main">
-      <span class="contact-item-default__name">{{ displayName }}</span>
-      <span v-if="props.subtitle" class="contact-item-default__subtitle">{{ props.subtitle }}</span>
-    </span>
-    <span v-if="$slots.extra" class="contact-item-default__extra" @click.stop>
-      <slot name="extra" :contact="props.contact" :disabled="props.disabled" />
-    </span>
-  </div>
+  <Cell
+    class="contact-item-default"
+    :title="displayName"
+    :subtitle="props.subtitle"
+    :size="props.size"
+    :active="props.active"
+    :selected="props.selected"
+    :disabled="props.disabled"
+  >
+    <template #leading>
+      <span class="contact-item-default__leading">
+        <span v-if="props.showCheckbox" class="contact-item-default__check">
+          <Icon
+            :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+            :size="20"
+          />
+        </span>
+        <slot name="avatar" :contact="props.contact" :size="resolvedAvatarSize">
+          <Avatar
+            v-if="props.showAvatar"
+            :src="props.contact.avatar"
+            :name="displayName"
+            :size="resolvedAvatarSize"
+            :shape="resolvedAvatarShape"
+            :presence="props.onlineStatus"
+          />
+        </slot>
+      </span>
+    </template>
+
+    <template #trailing>
+      <span v-if="$slots.extra" class="contact-item-default__extra" @click.stop>
+        <slot name="extra" :contact="props.contact" :disabled="props.disabled" />
+      </span>
+    </template>
+  </Cell>
 </template>
 
 <style scoped>
-.contact-item-default {
-  display: flex;
+.contact-item-default__leading {
+  display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 0 var(--uikit-item-hover-padding-x, 16px);
-  margin: 0 var(--uikit-item-hover-margin-x, 0px);
-  height: var(--contact-item-height, 56px);
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    opacity 0.15s;
-  border-radius: var(--uikit-item-hover-radius, 0px);
-}
-
-.contact-item-default.size-compact {
-  height: var(--contact-item-height-compact, 48px);
-  padding: 0 calc(var(--uikit-item-hover-padding-x, 16px) - 4px);
-  gap: 10px;
-}
-
-.contact-item-default.size-large,
-.contact-item-default.has-subtitle {
-  height: var(--contact-item-height-large, 64px);
-}
-
-.contact-item-default:hover {
-  background-color: var(--uikit-bg-secondary);
-  border-radius: var(--uikit-item-hover-radius, 0px);
-}
-
-.contact-item-default.is-active {
-  background-color: var(--contact-active-bg, var(--uikit-bg-secondary));
-  border-radius: var(--uikit-item-active-radius, 0px);
-}
-
-.contact-item-default.is-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.contact-item-default.is-disabled:hover {
-  background-color: transparent;
 }
 
 .contact-item-default__check {
@@ -144,47 +115,7 @@ const rootClass = computed(() => ({
   color: var(--uikit-primary, #155eef);
 }
 
-.contact-item-default__avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-  display: inline-flex;
-}
-
-.contact-item-default__avatar.shape-rounded :deep(.avatar) {
-  border-radius: 8px;
-}
-
-.contact-item-default__avatar.shape-square :deep(.avatar) {
-  border-radius: 4px;
-}
-
-.contact-item-default__main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  gap: 2px;
-}
-
-.contact-item-default__name {
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.contact-item-default__subtitle {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .contact-item-default__extra {
-  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
 }

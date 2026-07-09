@@ -62,12 +62,12 @@ import Cell from './cell.vue'
             <Avatar name="C" :size="32" />
           </template>
         </Cell>
-        <Cell title="Normal" subtitle="56px" size="normal" border>
+        <Cell title="Normal" subtitle="64px" size="normal" border>
           <template #leading>
             <Avatar name="N" :size="40" />
           </template>
         </Cell>
-        <Cell title="Large" subtitle="64px" size="large">
+        <Cell title="Large" subtitle="72px" size="large">
           <template #leading>
             <Avatar name="L" :size="48" />
           </template>

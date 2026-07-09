@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
 import Icon from '../icon/icon.vue'
 import Input from '../input/input.vue'
+import Cell from '../cell/cell.vue'
 
 export type PresenceSelectorValue = 'online' | 'busy' | 'away' | 'custom'
 
@@ -95,22 +96,27 @@ function onCancel() {
     </div>
 
     <div class="presence-selector__options">
-      <div
+      <Cell
         v-for="option in options"
         :key="option.key"
         class="presence-selector__option"
-        :class="{ 'is-active': isActive(option) }"
+        size="compact"
+        :active="isActive(option)"
         @click="onSelect(option)"
       >
-        <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
-        <span class="presence-selector__label">{{ option.label }}</span>
-        <Icon
-          v-if="isActive(option)"
-          name="actions/checkmark_thick"
-          :size="16"
-          class="presence-selector__check"
-        />
-      </div>
+        <template #leading>
+          <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
+        </template>
+        <template #default>{{ option.label }}</template>
+        <template #trailing>
+          <Icon
+            v-if="isActive(option)"
+            name="actions/checkmark_thick"
+            :size="16"
+            class="presence-selector__check"
+          />
+        </template>
+      </Cell>
     </div>
 
     <div v-if="selectedKey === 'custom'" class="presence-selector__custom">
@@ -168,21 +174,7 @@ function onCancel() {
 }
 
 .presence-selector__option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--uikit-components-radius, 8px);
-  cursor: pointer;
-  transition: background-color 150ms ease;
-}
-
-.presence-selector__option:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.presence-selector__option.is-active {
-  background-color: var(--uikit-bg-secondary);
+  --uikit-item-hover-padding-x: 12px;
 }
 
 .presence-selector__dot {

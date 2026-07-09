@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useUserInfo } from '../../../composables/use-user-info'
 import Avatar from '../../../components/avatar/avatar.vue'
+import Cell from '../../../components/cell/cell.vue'
 import type { UiMessage } from '../../../sdk/types'
 import MessageRenderer from './message-renderer.vue'
 
@@ -45,34 +46,33 @@ function onViewCombine(msg: UiMessage) {
 </script>
 
 <template>
-  <div class="combine-message-modal-item">
+  <Cell class="combine-message-modal-item" auto-height :clickable="false">
     <!-- 头像：复用 Avatar 组件，展示真实头像 -->
-    <Avatar :name="senderName" :src="avatarUrl" :size="32" />
+    <template #leading>
+      <Avatar :name="senderName" :src="avatarUrl" :size="32" />
+    </template>
     <!-- 内容 -->
-    <div class="combine-message-modal-item__content">
-      <div class="combine-message-modal-item__meta">
-        <span class="combine-message-modal-item__sender">{{ senderName }}</span>
-        <span class="combine-message-modal-item__time">{{ formatTime(props.message.timestamp) }}</span>
+    <template #default>
+      <div class="combine-message-modal-item__content">
+        <div class="combine-message-modal-item__meta">
+          <span class="combine-message-modal-item__sender">{{ senderName }}</span>
+          <span class="combine-message-modal-item__time">{{ formatTime(props.message.timestamp) }}</span>
+        </div>
+        <div class="combine-message-modal-item__bubble">
+          <MessageRenderer :message="props.message" @view-combine="onViewCombine" />
+        </div>
       </div>
-      <div class="combine-message-modal-item__bubble">
-        <MessageRenderer :message="props.message" @view-combine="onViewCombine" />
-      </div>
-    </div>
-  </div>
+    </template>
+  </Cell>
 </template>
 
 <style scoped>
 .combine-message-modal-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.15s;
+  --uikit-item-hover-padding-x: 8px;
 }
 
-.combine-message-modal-item:hover {
-  background-color: var(--uikit-bg-secondary);
+.combine-message-modal-item :deep(.uikit-cell) {
+  align-items: flex-start;
 }
 
 .combine-message-modal-item__content {

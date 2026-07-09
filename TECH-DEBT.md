@@ -242,7 +242,7 @@
 - **建议修法**：清理该 TODO 注释。
 - **关联 skill**：`uikit-lint-governance`
 
-### [ ] D36. Cell 类组件视觉不一致 + 重复代码（EmCell 已建，存量待收敛）
+### [x] D36. Cell 类组件视觉不一致 + 重复代码（EmCell 已建，存量已收敛）
 
 - **现象**：会话列表项、联系人项、群组项、群管理导航项、操作行等 cell 类组件的 padding/margin/圆角/transition 各写一套，视觉不统一。`contact-item-default.vue` 与 `group-item-default.vue` 代码 ~90% 重复。`group-management-section` 和 `chat-info-drawer` 的操作行未走 `--uikit-item-hover-*` 体系。
 - **证据**：
@@ -250,10 +250,11 @@
   - `contact-item-default.vue` / `group-item-default.vue`：几乎相同的 props/CSS/模板，仅数据源不同
   - `group-management-section.vue` L370-L378：`padding: 10px 12px`，未走 `--uikit-item-hover-*`
   - `chat-info-drawer.vue` L775-L788：`action-row` 同样 `padding: 10px 12px`
-- **建议修法**：
-  1. 已新增 `components/cell/cell.vue`（EmCell）+ `uikit-cell-contract` skill 约束；
-  2. 存量收敛分两步：先修 CSS 变量不一致（`group-management-section` / `chat-info-drawer` 改用 `--uikit-item-hover-*` + `var(--uikit-anim-duration)`），再基于 EmCell 重构 `contact-item-default` / `group-item-default`；
-  3. `conversation-item` 因复杂度高（右键菜单/长按/草稿）可暂不基于 EmCell，但 CSS 变量/transition 必须对齐。
+- **修复**：
+  - `contact-item-default.vue`、`group-item-default.vue` 已基于 `EmCell` 重构；
+  - `group-management-section.vue`、`chat-info-drawer.vue` 操作行、`group-member-list.vue` 成员项、`create-group-modal.vue` 已选联系人、`presence-selector.vue` 选项、`block-list.vue` 成员项、`pinned-bar.vue` 展开项、`combine-message-modal-item.vue` 消息摘要项均已改用 `EmCell`；
+  - `conversation-item.vue` 的 transition 已改用 `var(--uikit-anim-duration/easing)`，其 `padding` 因 `auto-height` 模式需要保持 `12px var(...)`；
+  - 所有 cell 类组件统一使用 `--uikit-item-hover-*` / `--uikit-anim-*` 变量。
 - **关联 skill**：`uikit-cell-contract` / `uikit-component-authoring` / `uikit-styling-theming`
 
 ---

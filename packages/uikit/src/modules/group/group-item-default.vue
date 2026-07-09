@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
+import Cell from '../../components/cell/cell.vue'
 import type { UiGroup as Group } from '../../sdk/types'
 import type { AvatarShape, GroupItemSize } from './types'
 
@@ -50,95 +51,66 @@ const resolvedAvatarSize = computed(() => {
   return 40
 })
 
-const rootClass = computed(() => ({
-  'is-active': props.active,
-  'is-selected': props.selected,
-  'is-disabled': props.disabled,
-  [`size-${props.size}`]: true,
-  'has-subtitle': !!props.subtitle,
-}))
+/** Avatar 组件仅支持 circle / square；rounded 与 square 视觉一致（8px 圆角） */
+const resolvedAvatarShape = computed(() => {
+  if (props.avatarShape === 'circle')
+    return 'circle'
+  return 'square'
+})
+
+const memberCountMeta = computed(() => {
+  if (!props.showMemberCount)
+    return undefined
+  if ((props.group.memberCount ?? 0) <= 0)
+    return undefined
+  return String(props.group.memberCount)
+})
 </script>
 
 <template>
-  <div class="group-item-default" :class="rootClass">
-    <span v-if="props.showCheckbox" class="group-item-default__check">
-      <Icon
-        :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
-        :size="20"
-      />
-    </span>
-    <span v-if="props.showAvatar" class="group-item-default__avatar-wrap">
-      <slot name="avatar" :group="props.group" :size="resolvedAvatarSize">
-        <Avatar
-          class="group-item-default__avatar"
-          :class="`shape-${props.avatarShape}`"
-          :src="props.group.avatar"
-          :name="displayName"
-          :size="resolvedAvatarSize"
-        />
-      </slot>
-    </span>
-    <span class="group-item-default__main">
-      <span class="group-item-default__row">
-        <span class="group-item-default__name">{{ displayName }}</span>
-        <span
-          v-if="props.showMemberCount && (props.group.memberCount ?? 0) > 0"
-          class="group-item-default__meta"
-        >
-          {{ props.group.memberCount }}
+  <Cell
+    class="group-item-default"
+    :title="displayName"
+    :subtitle="props.subtitle"
+    :meta="memberCountMeta"
+    :size="props.size"
+    :active="props.active"
+    :selected="props.selected"
+    :disabled="props.disabled"
+  >
+    <template #leading>
+      <span class="group-item-default__leading">
+        <span v-if="props.showCheckbox" class="group-item-default__check">
+          <Icon
+            :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+            :size="20"
+          />
         </span>
+        <slot name="avatar" :group="props.group" :size="resolvedAvatarSize">
+          <Avatar
+            v-if="props.showAvatar"
+            :src="props.group.avatar"
+            :name="displayName"
+            :size="resolvedAvatarSize"
+            :shape="resolvedAvatarShape"
+          />
+        </slot>
       </span>
-      <span v-if="props.subtitle" class="group-item-default__subtitle">{{ props.subtitle }}</span>
-    </span>
-    <span v-if="$slots.extra" class="group-item-default__extra" @click.stop>
-      <slot name="extra" :group="props.group" :disabled="props.disabled" />
-    </span>
-  </div>
+    </template>
+
+    <template #trailing>
+      <span v-if="$slots.extra" class="group-item-default__extra" @click.stop>
+        <slot name="extra" :group="props.group" :disabled="props.disabled" />
+      </span>
+    </template>
+  </Cell>
 </template>
 
 <style scoped>
-.group-item-default {
-  display: flex;
+.group-item-default__leading {
+  display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 0 var(--uikit-item-hover-padding-x, 16px);
-  margin: 0 var(--uikit-item-hover-margin-x, 0px);
-  height: var(--group-item-height, 56px);
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    opacity 0.15s;
-  border-radius: var(--uikit-item-hover-radius, 0px);
-}
-
-.group-item-default.size-compact {
-  height: var(--group-item-height-compact, 48px);
-  padding: 0 calc(var(--uikit-item-hover-padding-x, 16px) - 4px);
-  gap: 10px;
-}
-
-.group-item-default.size-large,
-.group-item-default.has-subtitle {
-  height: var(--group-item-height-large, 64px);
-}
-
-.group-item-default:hover {
-  background-color: var(--uikit-bg-secondary);
-  border-radius: var(--uikit-item-hover-radius, 0px);
-}
-
-.group-item-default.is-active {
-  background-color: var(--group-active-bg, var(--uikit-bg-secondary));
-  border-radius: var(--uikit-item-active-radius, 0px);
-}
-
-.group-item-default.is-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.group-item-default.is-disabled:hover {
-  background-color: transparent;
 }
 
 .group-item-default__check {
@@ -152,66 +124,7 @@ const rootClass = computed(() => ({
   color: var(--uikit-primary, #155eef);
 }
 
-.group-item-default__avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-  display: inline-flex;
-}
-
-.group-item-default__avatar.shape-circle :deep(.avatar) {
-  border-radius: 50%;
-}
-
-.group-item-default__avatar.shape-rounded :deep(.avatar) {
-  border-radius: 8px;
-}
-
-.group-item-default__avatar.shape-square :deep(.avatar) {
-  border-radius: 4px;
-}
-
-.group-item-default__main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  gap: 2px;
-}
-
-.group-item-default__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-
-.group-item-default__name {
-  flex: 1;
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.group-item-default__meta {
-  flex-shrink: 0;
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-}
-
-.group-item-default__subtitle {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .group-item-default__extra {
-  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
 }

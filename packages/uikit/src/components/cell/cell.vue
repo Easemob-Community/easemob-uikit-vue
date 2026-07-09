@@ -117,7 +117,7 @@ function onContextmenu(e: MouseEvent) {
   gap: 12px;
   padding: 0 var(--uikit-item-hover-padding-x, 16px);
   margin: 0 var(--uikit-item-hover-margin-x, 0px);
-  height: var(--uikit-cell-height, 56px);
+  height: var(--uikit-cell-height, 64px);
   border-radius: var(--uikit-item-hover-radius, 0px);
   transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   -webkit-touch-callout: none;
@@ -134,12 +134,11 @@ function onContextmenu(e: MouseEvent) {
 .uikit-cell.size-compact {
   height: var(--uikit-cell-height-compact, 48px);
   gap: 10px;
-  padding: 0 calc(var(--uikit-item-hover-padding-x, 16px) - 4px);
 }
 
 .uikit-cell.size-large,
 .uikit-cell.has-subtitle {
-  height: var(--uikit-cell-height-large, 64px);
+  height: var(--uikit-cell-height-large, 72px);
 }
 
 /* 分隔线 */

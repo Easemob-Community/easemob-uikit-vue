@@ -4,6 +4,7 @@ import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
 import Popup from '../../components/popup/popup.vue'
+import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -495,100 +496,106 @@ defineExpose({ refresh, removeMember, setMemberRole })
       </div>
 
       <template v-else>
-        <div
+        <Cell
           v-for="member in filteredMembers"
           :key="member.userId"
           class="group-member-list__item"
+          auto-height
           :data-member-id="member.userId"
           @click="onMemberClick(member)"
         >
-          <Avatar
-            class="group-member-list__avatar"
-            :name="displayName(member)"
-            :src="member.avatarUrl"
-            :size="40"
-            :presence="getMemberPresence(member.userId)"
-          />
+          <template #leading>
+            <Avatar
+              :name="displayName(member)"
+              :src="member.avatarUrl"
+              :size="40"
+              :presence="getMemberPresence(member.userId)"
+            />
+          </template>
 
-          <div class="group-member-list__info">
-            <div class="group-member-list__name-row">
-              <span class="group-member-list__name">{{ displayName(member) }}</span>
-              <span
-                v-if="member.role !== 'member'"
-                class="group-member-list__role"
-                :class="roleClass(member.role)"
-              >
-                {{ roleLabel(member.role) }}
-              </span>
-              <span
-                v-if="isMemberMuted(props.groupId, member.userId)"
-                class="group-member-list__status-tag group-member-list__status-tag--muted"
-              >
-                {{ t('group.memberList.muted') || '禁言中' }}
-              </span>
-              <span
-                v-if="isMemberBlocked(props.groupId, member.userId)"
-                class="group-member-list__status-tag group-member-list__status-tag--blocked"
-              >
-                {{ t('group.memberList.blocked') || '已拉黑' }}
-              </span>
-              <span
-                v-if="isMemberInAllowlist(props.groupId, member.userId)"
-                class="group-member-list__status-tag group-member-list__status-tag--allowlist"
-              >
-                {{ t('group.memberList.inAllowlist') || '白名单' }}
-              </span>
+          <template #default>
+            <div class="group-member-list__info">
+              <div class="group-member-list__name-row">
+                <span class="group-member-list__name">{{ displayName(member) }}</span>
+                <span
+                  v-if="member.role !== 'member'"
+                  class="group-member-list__role"
+                  :class="roleClass(member.role)"
+                >
+                  {{ roleLabel(member.role) }}
+                </span>
+                <span
+                  v-if="isMemberMuted(props.groupId, member.userId)"
+                  class="group-member-list__status-tag group-member-list__status-tag--muted"
+                >
+                  {{ t('group.memberList.muted') || '禁言中' }}
+                </span>
+                <span
+                  v-if="isMemberBlocked(props.groupId, member.userId)"
+                  class="group-member-list__status-tag group-member-list__status-tag--blocked"
+                >
+                  {{ t('group.memberList.blocked') || '已拉黑' }}
+                </span>
+                <span
+                  v-if="isMemberInAllowlist(props.groupId, member.userId)"
+                  class="group-member-list__status-tag group-member-list__status-tag--allowlist"
+                >
+                  {{ t('group.memberList.inAllowlist') || '白名单' }}
+                </span>
+              </div>
+              <div class="group-member-list__id">
+                ID: {{ member.userId }}
+              </div>
             </div>
-            <div class="group-member-list__id">
-              ID: {{ member.userId }}
-            </div>
-          </div>
+          </template>
 
-          <div class="group-member-list__actions" @click.stop>
-            <button
-              v-if="canChat(member)"
-              class="group-member-list__action-btn"
-              @click="onChat(member)"
-            >
-              {{ t('group.memberList.chat') || '发消息' }}
-            </button>
-
-            <div
-              v-if="getMoreActions(member).length > 0"
-              :ref="(el) => setMoreTriggerRef(member.userId, el as HTMLElement)"
-              class="group-member-list__more"
-            >
+          <template #trailing>
+            <div class="group-member-list__actions" @click.stop>
               <button
-                class="group-member-list__action-btn group-member-list__action-btn--icon"
-                @click.stop="openMoreMenu(member)"
+                v-if="canChat(member)"
+                class="group-member-list__action-btn"
+                @click="onChat(member)"
               >
-                <Icon name="actions/ellipsis_vertical" :size="16" />
+                {{ t('group.memberList.chat') || '发消息' }}
               </button>
-              <Popup
-                :show="activeMoreMenuMemberId === member.userId"
-                :anchor="moreMenuTriggerRefs[member.userId]"
-                placement="bottom"
-                :overlay="false"
-                :close-on-click-overlay="true"
-                group="group-member-more-menu"
-                @update:show="closeMoreMenu"
-                @close="closeMoreMenu"
+
+              <div
+                v-if="getMoreActions(member).length > 0"
+                :ref="(el) => setMoreTriggerRef(member.userId, el as HTMLElement)"
+                class="group-member-list__more"
               >
-                <div class="group-member-list__context-menu">
-                  <div
-                    v-for="action in getMoreActions(member)"
-                    :key="action.key"
-                    class="group-member-list__context-menu-item"
-                    :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
-                    @click.stop="onMoreActionClick(member, action.key)"
-                  >
-                    {{ action.label }}
+                <button
+                  class="group-member-list__action-btn group-member-list__action-btn--icon"
+                  @click.stop="openMoreMenu(member)"
+                >
+                  <Icon name="actions/ellipsis_vertical" :size="16" />
+                </button>
+                <Popup
+                  :show="activeMoreMenuMemberId === member.userId"
+                  :anchor="moreMenuTriggerRefs[member.userId]"
+                  placement="bottom"
+                  :overlay="false"
+                  :close-on-click-overlay="true"
+                  group="group-member-more-menu"
+                  @update:show="closeMoreMenu"
+                  @close="closeMoreMenu"
+                >
+                  <div class="group-member-list__context-menu">
+                    <div
+                      v-for="action in getMoreActions(member)"
+                      :key="action.key"
+                      class="group-member-list__context-menu-item"
+                      :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
+                      @click.stop="onMoreActionClick(member, action.key)"
+                    >
+                      {{ action.label }}
+                    </div>
                   </div>
-                </div>
-              </Popup>
+                </Popup>
+              </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </Cell>
 
         <!-- 加载更多 -->
         <div v-if="localHasMore || loadingMore" class="group-member-list__load-more">
@@ -687,21 +694,8 @@ defineExpose({ refresh, removeMember, setMemberRole })
   min-height: 0;
 }
 
-.group-member-list__item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.group-member-list__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.group-member-list__avatar {
-  flex-shrink: 0;
+.group-member-list__item:hover .group-member-list__actions {
+  opacity: 1;
 }
 
 .group-member-list__info {
