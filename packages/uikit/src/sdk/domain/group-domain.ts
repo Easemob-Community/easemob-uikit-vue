@@ -288,6 +288,17 @@ export class GroupDomain {
     await this.client.groupManager.getGroup(groupId).deleteSharedFile({ fileId })
   }
 
+  /** 下载群共享文件 */
+  async downloadGroupSharedFile(groupId: string, fileId: string): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      this.client.groupManager.getGroup(groupId).downloadSharedFile({
+        fileId,
+        onFileDownloadComplete: (blob: Blob) => resolve(blob),
+        onFileDownloadError: (error: unknown) => reject(error),
+      })
+    })
+  }
+
   /** 同意入群申请 */
   async acceptGroupJoinRequest(groupId: string, userId: string) {
     await this.client.groupManager.acceptGroupJoinRequest({ groupId, userId })

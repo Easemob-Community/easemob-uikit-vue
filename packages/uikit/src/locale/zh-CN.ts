@@ -160,6 +160,8 @@ const messages: LocaleMessages = {
   'group.joinRequest.reject': '拒绝',
   'group.sharedFile.download': '下载',
   'group.sharedFile.delete': '删除',
+  'group.sharedFile.downloadSuccess': '下载成功',
+  'group.sharedFile.downloadFailed': '下载失败',
   'group.sharedFile.upload': '上传文件',
   'group.sharedFile.uploadText': '上传',
   'group.sharedFile.uploading': '上传中...',

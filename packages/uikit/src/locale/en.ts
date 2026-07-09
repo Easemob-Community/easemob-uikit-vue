@@ -160,6 +160,8 @@ const messages: LocaleMessages = {
   'group.joinRequest.reject': 'Reject',
   'group.sharedFile.download': 'Download',
   'group.sharedFile.delete': 'Delete',
+  'group.sharedFile.downloadSuccess': 'Download successful',
+  'group.sharedFile.downloadFailed': 'Download failed',
   'group.sharedFile.upload': 'Upload File',
   'group.sharedFile.uploadText': 'Upload',
   'group.sharedFile.uploading': 'Uploading...',

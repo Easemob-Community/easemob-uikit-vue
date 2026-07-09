@@ -5,6 +5,8 @@ import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
+import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
+import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 
 export interface SharedFileListProps {
   groupId: string
@@ -19,12 +21,31 @@ const {
   getGroupSharedFileList: fetchSharedFiles,
   uploadGroupSharedFile,
   deleteGroupSharedFile,
+  downloadGroupSharedFile,
 } = useGroup()
 
 const loading = ref(false)
 const uploading = ref(false)
 const files = ref<any[]>([])
 const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const showActionSheet = ref(false)
+const activeFile = ref<any>(null)
+
+const actionSheetActions = computed<ActionSheetItem[]>(() => {
+  if (!activeFile.value)
+    return []
+  const actions: ActionSheetItem[] = [
+    { name: t('group.sharedFile.download') || '下载' },
+  ]
+  if (canDelete(activeFile.value)) {
+    actions.push({
+      name: t('group.sharedFile.delete') || '删除',
+      color: '#ef4444',
+    })
+  }
+  return actions
+})
 
 const currentUserId = computed(() => stores.client.currentUser)
 const group = computed(() => stores.group.getGroupById(props.groupId))
@@ -212,6 +233,64 @@ function formatSize(bytes?: number): string {
     return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
+
+const MAX_FILE_NAME_LENGTH = 24
+
+function formatFileName(fileName: string): string {
+  if (fileName.length <= MAX_FILE_NAME_LENGTH)
+    return fileName
+  const dotIndex = fileName.lastIndexOf('.')
+  let name = fileName
+  let ext = ''
+  if (dotIndex > 0 && dotIndex < fileName.length - 1) {
+    ext = fileName.slice(dotIndex)
+    name = fileName.slice(0, dotIndex)
+  }
+  if (name.length + ext.length <= MAX_FILE_NAME_LENGTH)
+    return fileName
+  const ellipsis = '...'
+  const available = MAX_FILE_NAME_LENGTH - ext.length - ellipsis.length
+  if (available <= 0)
+    return `${fileName.slice(0, MAX_FILE_NAME_LENGTH - ellipsis.length)}${ellipsis}`
+  const side = Math.max(1, Math.floor(available / 2))
+  return `${name.slice(0, side)}${ellipsis}${name.slice(-side)}${ext}`
+}
+
+function openActionSheet(file: any) {
+  activeFile.value = file
+  showActionSheet.value = true
+}
+
+async function onActionSheetSelect(_item: ActionSheetItem, index: number) {
+  const file = activeFile.value
+  if (!file)
+    return
+  if (index === 0)
+    await onDownload(file)
+  else
+    await onDelete(file)
+}
+
+async function onDownload(file: any) {
+  if (!props.groupId || !file.fileId)
+    return
+  try {
+    const blob = await downloadGroupSharedFile(props.groupId, file.fileId)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file.fileName || 'download'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast(t('group.sharedFile.downloadSuccess') || '下载成功')
+  }
+  catch (err) {
+    console.warn('[SharedFileList] download failed:', err)
+    showToast(t('group.sharedFile.downloadFailed') || '下载失败')
+  }
+}
 </script>
 
 <template>
@@ -236,7 +315,7 @@ function formatSize(bytes?: number): string {
     >
       <Icon name="files-media/file" :size="20" class="shared-file-list__icon" />
       <div class="shared-file-list__info">
-        <span class="shared-file-list__name">{{ file.fileName }}</span>
+        <span class="shared-file-list__name" :title="file.fileName">{{ formatFileName(file.fileName) }}</span>
         <span class="shared-file-list__meta">
           <template v-if="file.fileSize">{{ formatSize(file.fileSize) }}</template>
           <template v-if="file.fileOwner">
@@ -245,13 +324,18 @@ function formatSize(bytes?: number): string {
         </span>
       </div>
       <button
-        v-if="canDelete(file)"
-        class="shared-file-list__delete-btn"
-        @click="onDelete(file)"
+        class="shared-file-list__more-btn"
+        @click.stop="openActionSheet(file)"
       >
-        {{ t('group.sharedFile.delete') || '删除' }}
+        <Icon name="actions/ellipsis_vertical" :size="20" />
       </button>
     </div>
+
+    <ActionSheet
+      v-model:show="showActionSheet"
+      :actions="actionSheetActions"
+      @select="onActionSheetSelect"
+    />
   </div>
 </template>
 
@@ -302,19 +386,26 @@ function formatSize(bytes?: number): string {
   font-size: 12px;
   color: var(--uikit-text-secondary);
 }
-.shared-file-list__delete-btn {
-  padding: 4px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: #ef4444;
-  font-size: 12px;
+.shared-file-list__item:hover .shared-file-list__name {
+  color: var(--uikit-primary-color);
+}
+.shared-file-list__more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--uikit-text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   flex-shrink: 0;
 }
-.shared-file-list__delete-btn:hover {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+.shared-file-list__more-btn:hover {
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-primary-color);
 }
 </style>
