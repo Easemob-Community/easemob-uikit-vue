@@ -56,6 +56,8 @@ function previewOf(msg: UiMessage): string {
     return t('message.video') || '[视频]'
   if (msg.type === 'file')
     return t('message.file') || '[文件]'
+  if (msg.type === 'combine')
+    return t('message.combine') || '[聊天记录]'
   return t('message.custom') || '[消息]'
 }
 

@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, toRaw } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
 import type { CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
 import { extractLastMessageText } from '../sdk/adapter/message-adapter'
@@ -6,6 +6,42 @@ import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
 import { useMessageActions } from './use-message-actions'
 import { useUIKit } from './use-uikit'
+
+/**
+ * 将 UiMessage 转换为干净的 SDK Message 对象。
+ * 剥离 UiMessage 扩展字段（isSelf / localId / recalled / pinned /
+ * translation / progress 等），仅保留 SDK Message 接口定义的字段。
+ * 同时通过 JSON 序列化去除 Vue reactive proxy，确保 SDK 的
+ * createCombineMessage 能正确编码合并载荷。
+ * 不剥离扩展字段会导致合并文件载荷异常偏大，
+ * 服务端可能无法正确存储/检索该消息。
+ */
+function toCleanSdkMessage(msg: UiMessage): SdkMessage {
+  // toRaw 解包 Vue reactive proxy
+  const raw = toRaw(msg)
+  // 解构剥离所有 UiMessage 扩展字段
+  const {
+    isSelf: _isSelf,
+    localId: _localId,
+    requireGroupAck: _requireGroupAck,
+    groupMemberCount: _groupMemberCount,
+    recalled: _recalled,
+    recalledBy: _recalledBy,
+    originalMsg: _originalMsg,
+    pinned: _pinned,
+    pinTime: _pinTime,
+    pinOperatorId: _pinOperatorId,
+    translation: _translation,
+    showTranslation: _showTranslation,
+    translating: _translating,
+    failReason: _failReason,
+    progress: _progress,
+    modified: _modified,
+    ...sdkMsg
+  } = raw
+  // JSON 序列化深拷贝：去除残余 proxy，确保纯数据对象
+  return JSON.parse(JSON.stringify(sdkMsg))
+}
 
 const TYPING_DURATION = 5000
 
@@ -61,9 +97,11 @@ export function useChat() {
   /** 逐条转发 */
   async function forwardMessage(message: UiMessage, target: UiConversation) {
     const { id, type } = target
+    // 解包 ext 的 reactive proxy，避免 Vue 内部属性干扰 SDK 序列化
+    const ext = message.ext ? JSON.parse(JSON.stringify(toRaw(message.ext))) : undefined
     switch (message.type) {
       case 'text':
-        return domains.message.sendText(id, type, (message.body as TextMessageBody).content || '', message.ext)
+        return domains.message.sendText(id, type, (message.body as TextMessageBody).content || '', ext)
       case 'image': {
         const url = (message.body as ImageMessageBody).originalImageUrl
           || (message.body as ImageMessageBody).bigImageUrl
@@ -73,7 +111,7 @@ export function useChat() {
           console.warn('[useChat] forwardMessage: image url not found')
           return
         }
-        return domains.message.sendImage(id, type, url, message.ext)
+        return domains.message.sendImage(id, type, url, ext)
       }
       case 'file': {
         const url = (message.body as FileMessageBody).url
@@ -81,7 +119,7 @@ export function useChat() {
           console.warn('[useChat] forwardMessage: file url not found')
           return
         }
-        return domains.message.sendFile(id, type, url, message.ext)
+        return domains.message.sendFile(id, type, url, ext)
       }
       case 'voice': {
         const url = (message.body as VoiceMessageBody).url
@@ -89,7 +127,7 @@ export function useChat() {
           console.warn('[useChat] forwardMessage: voice url not found')
           return
         }
-        return domains.message.sendVoice(id, type, url, (message.body as VoiceMessageBody).duration || 0, message.ext)
+        return domains.message.sendVoice(id, type, url, (message.body as VoiceMessageBody).duration || 0, ext)
       }
       case 'video': {
         const url = (message.body as VideoMessageBody).url
@@ -98,7 +136,7 @@ export function useChat() {
           console.warn('[useChat] forwardMessage: video url not found')
           return
         }
-        return domains.message.sendVideo(id, type, url, (message.body as VideoMessageBody).duration || 0, message.ext)
+        return domains.message.sendVideo(id, type, url, (message.body as VideoMessageBody).duration || 0, ext)
       }
       case 'location':
         return domains.message.sendLocation(
@@ -107,15 +145,15 @@ export function useChat() {
           (message.body as LocationMessageBody).latitude,
           (message.body as LocationMessageBody).longitude,
           (message.body as LocationMessageBody).address,
-          message.ext,
+          ext,
         )
       case 'custom':
         return domains.message.sendCustom(
           id,
           type,
           (message.body as CustomMessageBody).event || '',
-          (message.body as CustomMessageBody).params,
-          message.ext,
+          (message.body as CustomMessageBody).params ? JSON.parse(JSON.stringify(toRaw((message.body as CustomMessageBody).params))) : undefined,
+          ext,
         )
       case 'combine':
         // 合并消息逐条转发：作为单个合并消息重新发送
@@ -157,13 +195,18 @@ export function useChat() {
     const title = type === 'groupChat' ? (target.name || id) : '聊天记录'
     const summary = messages.map(m => `${resolveSenderName(m)}: ${extractLastMessageText(m)}`).join('\n')
     const compatibleText = '[聊天记录]'
+    // 剥离 UiMessage 扩展字段并去 reactive proxy：
+    // SDK createCombineMessage 期望纯净的 SDK Message 对象，
+    // 包含 isSelf / localId / recalled 等扩展字段会导致合并载荷
+    // 异常偏大，服务端可能无法正确存储/检索该消息
+    const cleanMessages = messages.map(toCleanSdkMessage)
     return domains.message.sendCombine(
       id,
       type,
       title,
       summary,
       compatibleText,
-      messages as unknown as SdkMessage[],
+      cleanMessages,
     )
   }
 
