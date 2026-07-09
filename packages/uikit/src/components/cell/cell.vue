@@ -110,6 +110,8 @@ function onContextmenu(e: MouseEvent) {
 
 <style scoped>
 .uikit-cell {
+  position: relative;
+  z-index: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -117,9 +119,7 @@ function onContextmenu(e: MouseEvent) {
   margin: 0 var(--uikit-item-hover-margin-x, 0px);
   height: var(--uikit-cell-height, 56px);
   border-radius: var(--uikit-item-hover-radius, 0px);
-  transition:
-    background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
-    opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   -webkit-touch-callout: none;
   user-select: none;
 }
@@ -151,19 +151,31 @@ function onContextmenu(e: MouseEvent) {
   border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
 }
 
+/* hover / active 背景层 */
+.uikit-cell::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--uikit-item-hover-padding-x, 16px) / 2);
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-bg-secondary);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  pointer-events: none;
+}
+
 /* 交互状态 */
 .uikit-cell.is-clickable {
   cursor: pointer;
 }
 
-.uikit-cell.is-clickable:hover {
-  background-color: var(--uikit-bg-secondary);
-  border-radius: var(--uikit-item-hover-radius, 0px);
+.uikit-cell.is-clickable:hover::before {
+  opacity: 1;
 }
 
-.uikit-cell.is-active {
-  background-color: var(--uikit-bg-secondary);
-  border-radius: var(--uikit-item-active-radius, 0px);
+.uikit-cell.is-active::before {
+  opacity: 1;
+  border-radius: var(--uikit-components-radius, 8px);
 }
 
 .uikit-cell.is-disabled {
@@ -171,8 +183,8 @@ function onContextmenu(e: MouseEvent) {
   cursor: not-allowed;
 }
 
-.uikit-cell.is-disabled:hover {
-  background-color: transparent;
+.uikit-cell.is-disabled:hover::before {
+  opacity: 0;
 }
 
 /* leading */
