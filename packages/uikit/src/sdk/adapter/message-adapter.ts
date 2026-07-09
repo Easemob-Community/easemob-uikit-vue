@@ -1,4 +1,5 @@
 import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websdk'
+import { markRaw } from 'vue'
 import {
   isCmdBody as isCmdMessageBody,
   isCombineBody as isCombineMessageBody,
@@ -11,18 +12,28 @@ import {
   isVoiceBody as isVoiceMessageBody,
 } from '../types/message'
 import type { UiMessage } from '../types'
+import type { CombineMessageBody } from '../types/message'
 
 /**
  * 将 SDK Message 转换为 UIKit Message。
  * - 保留 SDK Message 全部字段作为真相源
  * - 仅添加 UI 层需要的计算/状态字段
+ * - 合并消息的 messageList 仅用于创建/转发，UI 渲染不需要，
+ *   标记为 raw 避免进入 Vue 响应式系统产生性能问题。
  */
 export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessage {
-  return {
+  const uiMsg: UiMessage = {
     ...sdkMsg,
     isSelf: sdkMsg.from === currentUserId,
     localId: sdkMsg.msgLocalId,
   }
+  if (isCombineMessageBody(uiMsg.body) && uiMsg.body.messageList) {
+    uiMsg.body = {
+      ...uiMsg.body,
+      messageList: markRaw([...uiMsg.body.messageList]),
+    } as CombineMessageBody
+  }
+  return uiMsg
 }
 
 /** 批量转换 SDK Messages */

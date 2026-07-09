@@ -200,3 +200,36 @@ Actions`（`use-message.ts` 里 `const history = useMessageHistory()` 再转发�
 - ❌ 把 `loaded + explicitCount` 当成所有 store 的铁律去硬套（只有 contact/group 需要）。
 - ❌ 数据 store 漏掉全量 `clearXxx()` reset，导致登出后状态残留。
 - ❌ store return 拆成多个对象或裸导出 ref，破坏「单个扁平 return」形态。
+
+## 7. SDK 大数组/嵌套数据入 store 的响应式处理
+
+合并消息等 SDK Message 的 body 中可能包含 `messageList` 这种**大数组/嵌套结构**。`toUiMessage` 如果直接 spread 进 UiMessage 并存入 Pinia store，整个数组会被 Vue 递归代理。渲染时哪怕不读 `messageList`，响应式系统也可能在深访问、devtools 检查或 diff 时触发递归遍历，导致页面卡顿甚至无响应。
+
+**处理原则：**
+
+- **识别 payload**：SDK 返回的 `messageList`、`ext` 中的大数组等，都是潜在风险点。
+- **在 adapter 层隔离**：把这类数据标记为 `markRaw`，或干脆剔除 UI 不需要的字段，避免进入响应式系统。
+
+**真实片段（`packages/uikit/src/sdk/adapter/message-adapter.ts`）：**
+
+```ts
+import { markRaw } from 'vue'
+
+export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessage {
+  const uiMsg: UiMessage = {
+    ...sdkMsg,
+    isSelf: sdkMsg.from === currentUserId,
+    localId: sdkMsg.msgLocalId,
+  }
+  // 合并消息的 messageList 仅用于创建/转发，UI 渲染不需要响应式代理
+  if (isCombineMessageBody(uiMsg.body) && uiMsg.body.messageList) {
+    uiMsg.body = {
+      ...uiMsg.body,
+      messageList: markRaw([...uiMsg.body.messageList]),
+    } as CombineMessageBody
+  }
+  return uiMsg
+}
+```
+
+**注意**：不要依赖 `JSON.parse(JSON.stringify())` 深拷贝去「脱敏」。它会把整个嵌套结构序列化一次，大 payload 会阻塞主线程；遇到循环引用还会抛错。`toRaw` + 解构剥离 + `markRaw` 隔离才是正确做法。

@@ -52,13 +52,19 @@ export function toUiGroups(sources: readonly SdkGroupSource[]): UiGroup[] {
 /** 将 SDK 群成员条目转换为 UIKit 群成员展示类型 */
 export function toUiGroupMember(source: GroupMemberEntry): UiGroupMember {
   const user = source.user
-  return {
+  const member: UiGroupMember = {
     userId: user.userId,
     nickname: user.nickname,
     avatarUrl: user.avatarUrl,
     role: source.role,
-    joinedAt: source.joinedAt,
   }
+
+  // 0.14.192+ 服务端未返回加入时间时 SDK 不再输出该字段
+  if ('joinedAt' in source) {
+    member.joinedAt = source.joinedAt
+  }
+
+  return member
 }
 
 /** 批量转换 SDK 群成员 */

@@ -11,8 +11,8 @@ import { useUIKit } from './use-uikit'
  * 将 UiMessage 转换为干净的 SDK Message 对象。
  * 剥离 UiMessage 扩展字段（isSelf / localId / recalled / pinned /
  * translation / progress 等），仅保留 SDK Message 接口定义的字段。
- * 同时通过 JSON 序列化去除 Vue reactive proxy，确保 SDK 的
- * createCombineMessage 能正确编码合并载荷。
+ * 通过 toRaw 解包 Vue reactive proxy，避免 SDK createCombineMessage
+ * 编码合并载荷时把 Vue 内部属性也序列化进去。
  * 不剥离扩展字段会导致合并文件载荷异常偏大，
  * 服务端可能无法正确存储/检索该消息。
  */
@@ -39,8 +39,7 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
     modified: _modified,
     ...sdkMsg
   } = raw
-  // JSON 序列化深拷贝：去除残余 proxy，确保纯数据对象
-  return JSON.parse(JSON.stringify(sdkMsg))
+  return sdkMsg as unknown as SdkMessage
 }
 
 const TYPING_DURATION = 5000
