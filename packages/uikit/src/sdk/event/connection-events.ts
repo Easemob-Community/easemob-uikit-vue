@@ -1,5 +1,8 @@
 import type { ConnectionEventHandlerMap } from 'easemob-websdk'
+import { createLogger } from '../../utils/logger'
 import type { RootStores } from './types'
+
+const connLog = createLogger('UIKit:ConnEvents')
 
 /**
  * 创建连接事件处理器。
@@ -8,32 +11,38 @@ import type { RootStores } from './types'
 export function createConnectionHandlers(stores: RootStores): ConnectionEventHandlerMap {
   return {
     onConnecting: () => {
+      connLog.info('onConnecting')
       stores.client.setConnecting(true)
     },
     onConnected: () => {
+      connLog.info('onConnected')
       stores.client.setConnected(true)
       stores.client.setConnecting(false)
     },
     onDisconnected: () => {
+      connLog.info('onDisconnected')
       stores.client.setConnected(false)
       stores.client.setConnecting(false)
       stores.client.setCurrentUser('')
     },
     onReconnectFailed: () => {
+      connLog.info('onReconnectFailed')
       stores.client.setConnecting(false)
-      console.error('[UIKit] Auto-reconnect failed after max retries')
+      connLog.error('Auto-reconnect failed after max retries')
     },
     onTokenWillExpire: () => {
-      console.warn('[UIKit] Token will expire')
+      connLog.info('onTokenWillExpire')
+      connLog.warn('Token will expire')
     },
     onTokenExpired: () => {
-      console.error('[UIKit] Token expired')
+      connLog.info('onTokenExpired')
+      connLog.error('Token expired')
     },
     onOfflineMessageSyncStart: () => {
-      // 离线消息同步开始：当前无需 UI 处理
+      connLog.info('onOfflineMessageSyncStart')
     },
     onOfflineMessageSyncFinish: () => {
-      // 离线消息同步结束：当前无需 UI 处理
+      connLog.info('onOfflineMessageSyncFinish')
     },
   }
 }

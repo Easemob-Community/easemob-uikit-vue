@@ -25,6 +25,7 @@ const useInlineSvg = computed(() => iconSvg.value && !slots.default)
 
 <template>
   <svg
+    v-if="useInlineSvg || slots.default"
     class="uikit-icon"
     :width="props.size"
     :height="props.size"

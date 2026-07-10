@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import type { UiGroup } from '../../sdk/types'
 import GroupCard from '../../components/group-card/group-card.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
+import { useToast } from '../../composables/use-toast'
 
 export interface GroupDetailProps {
   /** 群 ID */
@@ -22,14 +23,23 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { show: showToast } = useToast()
 const { stores } = useUIKit()
-const { fetchGroupInfo } = useGroup()
+const { fetchGroupInfo, updateGroupInfo } = useGroup()
 
 const loading = ref(false)
 /** 当前会话内已拉取失败的群 ID，避免空结果导致死循环 */
 const fetchFailedIds = ref<Set<string>>(new Set())
 
+// 群名称编辑状态
+const isEditingName = ref(false)
+const nameInputRef = ref<HTMLInputElement>()
+const nameInput = ref('')
+const savingName = ref(false)
+
 const groupFromStore = computed(() => stores.group.getGroupById(props.groupId))
+
+const isOwner = computed(() => groupFromStore.value?.role === 'owner')
 
 watch(
   () => props.groupId,
@@ -67,6 +77,42 @@ const displayGroup = computed<UiGroup | undefined>(() => {
 
 const displayAvatar = computed(() => displayGroup.value?.avatar)
 const displayName = computed(() => displayGroup.value?.groupName || props.groupId)
+
+// 同步编辑输入
+watch(displayName, (val) => {
+  if (!isEditingName.value)
+    nameInput.value = val
+}, { immediate: true })
+
+function startEditName() {
+  nameInput.value = displayName.value
+  isEditingName.value = true
+}
+
+// 自动聚焦编辑输入框
+watch(isEditingName, async (editing) => {
+  if (editing) {
+    await nextTick()
+    nameInputRef.value?.focus()
+  }
+})
+
+async function saveName() {
+  if (!props.groupId)
+    return
+  savingName.value = true
+  try {
+    await updateGroupInfo(props.groupId, { name: nameInput.value })
+    isEditingName.value = false
+    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+  }
+  finally {
+    savingName.value = false
+  }
+}
 
 const cardActions = computed(() => {
   return [
@@ -114,7 +160,34 @@ function onCardAction(key: string) {
         :actions="cardActions"
         :info-rows="cardInfoRows"
         @action-click="onCardAction"
-      />
+      >
+        <template v-if="isOwner" #name>
+          <template v-if="!isEditingName">
+            <span>{{ displayName }}</span>
+            <button
+              class="group-detail__edit-btn"
+              @click="startEditName"
+            >
+              <span class="group-detail__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
+            </button>
+          </template>
+          <div v-else class="group-detail__edit-row">
+            <input
+              ref="nameInputRef"
+              v-model="nameInput"
+              class="group-detail__edit-input"
+              @keydown.enter="saveName"
+            >
+            <button
+              class="group-detail__edit-save"
+              :disabled="savingName"
+              @click="saveName"
+            >
+              {{ savingName ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
+            </button>
+          </div>
+        </template>
+      </GroupCard>
     </div>
   </div>
 </template>
@@ -151,5 +224,61 @@ function onCardAction(key: string) {
   font-size: 14px;
   border-radius: var(--uikit-components-radius, 12px);
   z-index: 1;
+}
+
+/* 群名称编辑 */
+.group-detail__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  margin-left: 6px;
+  border: none;
+  border-radius: var(--uikit-components-radius, 6px);
+  background: none;
+  color: var(--uikit-primary-color);
+  font-size: 12px;
+  cursor: pointer;
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+}
+
+.group-detail__edit-btn:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.group-detail__edit-row {
+  display: flex;
+  gap: 8px;
+}
+
+.group-detail__edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--uikit-primary-color);
+  border-radius: var(--uikit-components-radius, 6px);
+  font-size: 20px;
+  font-weight: 600;
+  outline: none;
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+}
+
+.group-detail__edit-save {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: none;
+  background-color: var(--uikit-primary-color);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.group-detail__edit-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

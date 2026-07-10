@@ -143,12 +143,32 @@
 - **建议修法**：在 `getMoreActions()` 中为群主添加「转让群主」操作项（仅当前用户是群主且目标成员非自己时显示），并在 `chat.vue` 添加对应处理函数。
 - **关联 skill**：`uikit-contact-group-capabilities`
 
-### [ ] D26. 群公告编辑 UI 缺失
+### [x] D26. 群信息编辑 UI 缺失（群名称/公告/描述）
 
-- **现象**：`updateGroupAnnouncement` 方法已定义但全代码库中无任何组件调用。群公告仅展示不可编辑，群主/管理员无法通过 UI 编辑。
-- **证据**：`composables/use-group.ts` L86-L88 定义 `updateGroupAnnouncement`；`modules/chat/drawer/chat-info-drawer.vue` L400-L410 仅展示群公告内容。
-- **建议修法**：在 `chat-info-drawer.vue` 群公告区域为群主/管理员增加编辑按钮和输入框，调用 `updateGroupAnnouncement`。
+- **现象**：`updateGroupInfo`（名称/描述/头像）和 `updateGroupAnnouncement` 方法已在 domain/composable 层完整实现，但 `chat-info-drawer.vue` 群信息面板中群名称仅展示不可编辑、群公告仅展示不可编辑、群描述仅当有值时才显示且不可编辑。群主/管理员无法通过 UI 修改群信息。
+- **证据**：`composables/use-group.ts` L86-L88 定义 `updateGroupAnnouncement`，L165-L169 定义 `updateGroupInfo`；`modules/chat/drawer/chat-info-drawer.vue` L400-L410 仅展示群公告内容，L413-L421 群描述仅在有值时显示。
+- **修复**：
+  - 群名称：群主在 profile 区域可点击编辑按钮进行内联编辑，调用 `updateGroupInfo({ name })`；
+  - 群公告：群主/管理员可点击编辑按钮进行内联编辑（textarea），调用 `updateGroupAnnouncement`；
+  - 群描述：群主始终可见该区域（即使描述为空），可点击编辑按钮进行内联编辑（textarea），调用 `updateGroupInfo({ description })`；
+  - 新增 i18n key：`chat.info.edit`、`chat.info.groupInfoUpdated`、`chat.info.groupInfoUpdateFailed`、`chat.info.noGroupDescription`。
 - **关联 skill**：`uikit-contact-group-capabilities`
+
+### [x] D38. `GroupDomain` 禁言/黑名单/白名单查询方法未同步 store 缓存
+
+- **现象**：`getGroupMuteList()`、`getGroupBlocklist()`、`getGroupAllowlist()` 三个方法仅调用 SDK 并返回原始结果，未同步 `store.setGroupMuteList/setGroupBlocklist/setGroupAllowlist`。`group-management-section.vue` 使用 `stores.group.groupMuteListMap[id].length` 显示管理入口的计数 badge，永远为空（始终为 0）。同样，`blockGroupMembers()`、`unblockGroupMembers()`、`muteGroupMembers()`、`unmuteGroupMembers()` 写操作也未同步 store 缓存。
+- **证据**：`sdk/domain/group-domain.ts` L220-L222 `getGroupMuteList` 仅 `return result`；L226-L228 `getGroupBlocklist` 仅 `return result`；L242-L244 `getGroupAllowlist` 仅 `return result`；`modules/group/group-management-section.vue` L96 使用 `stores.group.groupMuteListMap[id].length`。
+- **修复**：
+  - 扩展 `GroupStoreLike` 接口添加 `setGroupMuteList/addGroupMuteMembers/removeGroupMuteMembers/setGroupBlocklist/addGroupBlocklistMembers/removeGroupBlocklistMembers/setGroupAllowlist/addGroupAllowlistMembers/removeGroupAllowlistMembers` 方法；
+  - 所有查询/写操作方法追加对应的 store 缓存同步调用。
+- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+
+### [x] D39. `group-management-section` 全员禁言 Cell 与其他管理项字体不一致
+
+- **现象**：群管理面板中「全员禁言」开关 Cell 使用 `#default` 插槽渲染标题文本，不经过 `.uikit-cell__title` 样式约束，继承外层更大的字号；而下方「禁言列表」「黑名单」等管理入口 Cell 通过 `:title` prop 渲染，正确应用了 `font-size: 14px; font-weight: 500;`。视觉上字体明显偏大。
+- **证据**：`modules/group/group-management-section.vue` L190 `#default` 插槽输出文本 vs L209 `:title="entry.label"`；`components/cell/cell.vue` L85-L88 `#default` 插槽内的内容不经过 `.uikit-cell__title`（14px/500）。
+- **修复**：将全员禁言 Cell 的 `#default` 插槽改为 `:title` prop，使其与下方入口 Cell 享用相同的 `.uikit-cell__title` 字体样式。
+- **关联 skill**：`uikit-cell-contract`
 
 ---
 

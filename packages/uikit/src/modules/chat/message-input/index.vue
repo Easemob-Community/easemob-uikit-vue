@@ -23,6 +23,8 @@ export interface MessageInputProps {
   keyboardHeight?: number
   /** @提及联系人列表，传入后优先于 config.input.mention.contacts */
   mentionContacts?: MentionContact[]
+  /** 当前群是否全员禁言 */
+  muted?: boolean
 }
 
 export interface MessageInputEmits {
@@ -514,6 +516,11 @@ defineExpose({
     class="message-input"
     :style="{ paddingBottom: `${props.keyboardHeight || 0}px` }"
   >
+    <!-- 全员禁言遮罩 -->
+    <div v-if="props.muted" class="message-input__muted-overlay">
+      <span class="message-input__muted-text">{{ t('chat.input.mutedAll') || '全员禁言中' }}</span>
+    </div>
+
     <!-- 编辑条：优先于引用条 -->
     <EditingBar
       v-if="editingMessage"
@@ -662,5 +669,23 @@ defineExpose({
   background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 16px) var(--uikit-components-radius, 16px) 0 0;
   padding: 12px 12px calc(12px + var(--uikit-safe-bottom, 0px)) 12px;
+}
+
+/* 全员禁言遮罩 */
+.message-input__muted-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 12px);
+  opacity: 0.95;
+}
+
+.message-input__muted-text {
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
 }
 </style>

@@ -265,7 +265,12 @@ export function useGroupMembers(groupId: MaybeRefOrGetter<string>) {
 }
 ```
 
-### 5.4 事件刷新
+### 5.4 编辑态自动聚焦
+
+所有内联编辑入口（群名称、备注、公告、描述等）切换编辑态后**必须**自动聚焦输入框，
+具体规范见 `uikit-component-authoring` SKILL.md「软约定-编辑态自动聚焦」。
+
+### 5.5 事件刷新
 
 新增能力后，记得在 `sdk/event/group-events.ts` / `contact-events.ts` 的事件处理中更新对应 store，确保 UI 实时刷新。
 

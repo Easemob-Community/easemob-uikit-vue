@@ -1,6 +1,9 @@
 import type { PresenceEventHandlerMap } from 'easemob-websdk'
+import { createLogger } from '../../utils/logger'
 import type { UiPresence } from '../types'
 import type { RootStores } from './types'
+
+const presenceLog = createLogger('UIKit:PresenceEvents')
 
 /**
  * 创建 PresenceManager 事件处理器。
@@ -8,6 +11,7 @@ import type { RootStores } from './types'
 export function createPresenceHandlers(stores: RootStores): PresenceEventHandlerMap {
   return {
     onPresenceStatusChange: (list) => {
+      presenceLog.info('onPresenceStatusChange', { count: Array.isArray(list) ? list.length : 0 })
       if (!Array.isArray(list))
         return
       const mapped: UiPresence[] = list.map((item) => {

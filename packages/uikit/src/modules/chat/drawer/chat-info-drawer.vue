@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Modal from '../../../components/modal/modal.vue'
@@ -74,6 +74,8 @@ const {
   fetchGroupAnnouncement,
   getGroupMembers,
   getGroupAnnouncement,
+  updateGroupInfo,
+  updateGroupAnnouncement,
 } = useGroup()
 
 const closeBtnClass = computed(() =>
@@ -82,8 +84,26 @@ const closeBtnClass = computed(() =>
 
 /** 备注编辑状态 */
 const isEditingRemark = ref(false)
+const remarkInputRef = ref<HTMLInputElement>()
 const remarkInput = ref('')
 const savingRemark = ref(false)
+
+// ===== 群信息编辑状态 =====
+/** 群名称编辑 */
+const isEditingGroupName = ref(false)
+const groupNameInputRef = ref<HTMLInputElement>()
+const groupNameInput = ref('')
+const savingGroupName = ref(false)
+/** 群公告编辑 */
+const isEditingAnnouncement = ref(false)
+const announcementInputRef = ref<HTMLTextAreaElement>()
+const announcementInput = ref('')
+const savingAnnouncement = ref(false)
+/** 群描述编辑 */
+const isEditingDescription = ref(false)
+const descriptionInputRef = ref<HTMLTextAreaElement>()
+const descriptionInput = ref('')
+const savingDescription = ref(false)
 
 const peerUserId = computed(() =>
   props.conversation?.type === 'singleChat' ? props.conversation.id : undefined,
@@ -122,6 +142,9 @@ const displayAvatar = computed(() => {
 function onClose() {
   emit('update:show', false)
   isEditingRemark.value = false
+  isEditingGroupName.value = false
+  isEditingAnnouncement.value = false
+  isEditingDescription.value = false
 }
 
 /** 保存备注 */
@@ -165,6 +188,116 @@ const currentUserRole = computed(() => {
 
 const isOwner = computed(() => currentUserRole.value === 'owner')
 const isAdmin = computed(() => currentUserRole.value === 'admin')
+const isAdminOrOwner = computed(() => isOwner.value || isAdmin.value)
+
+// 群信息编辑：数据同步
+watch(
+  () => props.conversation?.name,
+  (name) => {
+    if (!isEditingGroupName.value)
+      groupNameInput.value = name || ''
+  },
+  { immediate: true },
+)
+watch(
+  () => announcement.value,
+  (val) => {
+    if (!isEditingAnnouncement.value)
+      announcementInput.value = val || ''
+  },
+  { immediate: true },
+)
+watch(
+  () => group.value?.description,
+  (val) => {
+    if (!isEditingDescription.value)
+      descriptionInput.value = val || ''
+  },
+  { immediate: true },
+)
+
+// 自动聚焦编辑输入框
+watch(isEditingRemark, async (editing) => {
+  if (editing) {
+    await nextTick()
+    remarkInputRef.value?.focus()
+  }
+})
+watch(isEditingGroupName, async (editing) => {
+  if (editing) {
+    await nextTick()
+    groupNameInputRef.value?.focus()
+  }
+})
+watch(isEditingAnnouncement, async (editing) => {
+  if (editing) {
+    await nextTick()
+    announcementInputRef.value?.focus()
+  }
+})
+watch(isEditingDescription, async (editing) => {
+  if (editing) {
+    await nextTick()
+    descriptionInputRef.value?.focus()
+  }
+})
+
+/** 保存群名称 */
+async function saveGroupName() {
+  const id = groupId.value
+  if (!id)
+    return
+  savingGroupName.value = true
+  try {
+    await updateGroupInfo(id, { name: groupNameInput.value })
+    isEditingGroupName.value = false
+    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+  }
+  finally {
+    savingGroupName.value = false
+  }
+}
+
+/** 保存群公告 */
+async function saveAnnouncement() {
+  const id = groupId.value
+  if (!id)
+    return
+  savingAnnouncement.value = true
+  try {
+    await updateGroupAnnouncement(id, announcementInput.value)
+    isEditingAnnouncement.value = false
+    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+  }
+  finally {
+    savingAnnouncement.value = false
+  }
+}
+
+/** 保存群描述 */
+async function saveDescription() {
+  const id = groupId.value
+  if (!id)
+    return
+  savingDescription.value = true
+  try {
+    await updateGroupInfo(id, { description: descriptionInput.value })
+    isEditingDescription.value = false
+    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+  }
+  finally {
+    savingDescription.value = false
+  }
+}
 
 /** 群成员列表二级页面状态 */
 const showMemberList = ref(false)
@@ -364,7 +497,37 @@ defineExpose({
       <template v-if="!showMemberList">
         <div class="chat-info-drawer__profile">
           <Avatar :name="displayName" :src="displayAvatar" :size="64" />
-          <div class="chat-info-drawer__name">
+          <!-- 群聊：群名称可编辑 -->
+          <div v-if="isGroup" class="chat-info-drawer__name-row">
+            <template v-if="!isEditingGroupName">
+              <span class="chat-info-drawer__name">{{ displayName }}</span>
+              <button
+                v-if="isOwner"
+                class="chat-info-drawer__inline-edit-btn"
+                @click="isEditingGroupName = true"
+              >
+                <span class="chat-info-drawer__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
+              </button>
+            </template>
+            <div v-else class="chat-info-drawer__inline-edit">
+              <input
+                ref="groupNameInputRef"
+                v-model="groupNameInput"
+                class="chat-info-drawer__inline-input"
+                :placeholder="displayName"
+                @keydown.enter="saveGroupName"
+              >
+              <button
+                class="chat-info-drawer__inline-save"
+                :disabled="savingGroupName"
+                @click="saveGroupName"
+              >
+                {{ savingGroupName ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
+              </button>
+            </div>
+          </div>
+          <!-- 单聊：仅展示名称 -->
+          <div v-else class="chat-info-drawer__name">
             {{ displayName }}
           </div>
           <div v-if="!isGroup" class="chat-info-drawer__id">
@@ -379,10 +542,11 @@ defineExpose({
           </div>
           <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
             <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
-            <Icon name="misc/edit" :size="16" />
+            <span class="chat-info-drawer__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
           </div>
           <div v-else class="chat-info-drawer__remark-edit">
             <input
+              ref="remarkInputRef"
               v-model="remarkInput"
               class="chat-info-drawer__remark-input"
               :placeholder="t('chat.info.remarkInputPlaceholder')"
@@ -400,23 +564,92 @@ defineExpose({
 
         <!-- 群聊：群公告 -->
         <div v-if="isGroup" class="chat-info-drawer__section">
-          <div class="chat-info-drawer__section-title">
-            {{ t('chat.info.groupAnnouncement') }}
+          <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
+            <span>{{ t('chat.info.groupAnnouncement') }}</span>
+            <button
+              v-if="isAdminOrOwner && !isEditingAnnouncement"
+              class="chat-info-drawer__text-btn"
+              @click="isEditingAnnouncement = true"
+            >
+              {{ t('chat.info.edit') || '编辑' }}
+            </button>
           </div>
-          <div class="chat-info-drawer__announcement">
-            <span v-if="loadingGroup" class="chat-info-drawer__placeholder">{{ t('common.loading') }}</span>
-            <span v-else-if="announcement">{{ announcement }}</span>
-            <span v-else class="chat-info-drawer__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
+          <template v-if="!isEditingAnnouncement">
+            <div class="chat-info-drawer__announcement">
+              <span v-if="loadingGroup" class="chat-info-drawer__placeholder">{{ t('common.loading') }}</span>
+              <span v-else-if="announcement">{{ announcement }}</span>
+              <span v-else class="chat-info-drawer__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
+            </div>
+          </template>
+          <div v-else class="chat-info-drawer__inline-edit">
+            <textarea
+              ref="announcementInputRef"
+              v-model="announcementInput"
+              class="chat-info-drawer__inline-textarea"
+              :placeholder="t('chat.info.groupAnnouncementPlaceholder')"
+              rows="3"
+            />
+            <div class="chat-info-drawer__inline-edit-actions">
+              <button
+                class="chat-info-drawer__inline-cancel"
+                @click="isEditingAnnouncement = false"
+              >
+                {{ t('button.cancel') || '取消' }}
+              </button>
+              <button
+                class="chat-info-drawer__inline-save"
+                :disabled="savingAnnouncement"
+                @click="saveAnnouncement"
+              >
+                {{ savingAnnouncement ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- 群聊：群描述 -->
-        <div v-if="isGroup && group?.description" class="chat-info-drawer__section">
-          <div class="chat-info-drawer__section-title">
-            {{ t('chat.info.groupDescription') }}
+        <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
+            <span>{{ t('chat.info.groupDescription') }}</span>
+            <button
+              v-if="isOwner && !isEditingDescription"
+              class="chat-info-drawer__text-btn"
+              @click="isEditingDescription = true"
+            >
+              {{ t('chat.info.edit') || '编辑' }}
+            </button>
           </div>
-          <div class="chat-info-drawer__description">
-            {{ group.description }}
+          <template v-if="!isEditingDescription">
+            <div v-if="group?.description" class="chat-info-drawer__description">
+              {{ group.description }}
+            </div>
+            <div v-else class="chat-info-drawer__description">
+              <span class="chat-info-drawer__placeholder">{{ t('chat.info.noGroupDescription') || '暂无群介绍' }}</span>
+            </div>
+          </template>
+          <div v-else class="chat-info-drawer__inline-edit">
+            <textarea
+              ref="descriptionInputRef"
+              v-model="descriptionInput"
+              class="chat-info-drawer__inline-textarea"
+              :placeholder="t('chat.info.noGroupDescription') || '暂无群介绍'"
+              rows="3"
+            />
+            <div class="chat-info-drawer__inline-edit-actions">
+              <button
+                class="chat-info-drawer__inline-cancel"
+                @click="isEditingDescription = false"
+              >
+                {{ t('button.cancel') || '取消' }}
+              </button>
+              <button
+                class="chat-info-drawer__inline-save"
+                :disabled="savingDescription"
+                @click="saveDescription"
+              >
+                {{ savingDescription ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -643,6 +876,12 @@ defineExpose({
   cursor: pointer;
 }
 
+.chat-info-drawer__edit-label {
+  font-size: 12px;
+  color: var(--uikit-primary-color);
+  white-space: nowrap;
+}
+
 .chat-info-drawer__remark-edit {
   display: flex;
   gap: 8px;
@@ -676,6 +915,107 @@ defineExpose({
 .chat-info-drawer__remark-save:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* 群信息内联编辑 */
+.chat-info-drawer__name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.chat-info-drawer__inline-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border: none;
+  border-radius: var(--uikit-components-radius, 4px);
+  background: none;
+  color: var(--uikit-primary-color);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.chat-info-drawer__inline-edit-btn:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.chat-info-drawer__inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-info-drawer__inline-input {
+  padding: 8px 12px;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 6px);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+}
+
+.chat-info-drawer__inline-input:focus {
+  border-color: var(--uikit-primary-color);
+}
+
+.chat-info-drawer__inline-textarea {
+  padding: 8px 12px;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 6px);
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.chat-info-drawer__inline-textarea:focus {
+  border-color: var(--uikit-primary-color);
+}
+
+.chat-info-drawer__inline-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chat-info-drawer__inline-save {
+  padding: 6px 14px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: none;
+  background-color: var(--uikit-primary-color);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chat-info-drawer__inline-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chat-info-drawer__inline-cancel {
+  padding: 6px 14px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chat-info-drawer__inline-cancel:hover {
+  background-color: var(--uikit-bg-secondary);
 }
 
 .chat-info-drawer__announcement,

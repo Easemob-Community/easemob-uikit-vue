@@ -80,6 +80,9 @@ const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
   return getPresence(props.message.from).value?.status as PresenceDisplayStatus | undefined
 })
 
+/** 是否为通知类型消息 */
+const isNotice = computed(() => (props.message.type as string) === 'notice')
+
 /** 是否为已撤回消息 */
 const isRecalled = computed(() => props.message.recalled)
 
@@ -203,8 +206,15 @@ const isHighlighted = computed(() => {
     }"
     @click="props.isMultiSelectMode && emit('toggle-select', props.message.msgServerId || props.message.msgLocalId)"
   >
+    <!-- 通知类型消息：居中灰色提示，不显示头像/昵称/气泡 -->
+    <template v-if="isNotice">
+      <div class="message-bubble-wrapper__notice">
+        {{ (message.body as any).content || (message as any).content || '' }}
+      </div>
+    </template>
+
     <!-- 已撤回消息：居中灰色提示，不显示头像/昵称/气泡 -->
-    <template v-if="isRecalled">
+    <template v-else-if="isRecalled">
       <div class="message-bubble-wrapper__recalled">
         <span class="message-bubble-wrapper__recalled-text">{{ recalledText }}</span>
         <!-- 文本消息重新编辑按钮 -->
@@ -521,6 +531,18 @@ const isHighlighted = computed(() => {
   50% {
     opacity: 0.3;
   }
+}
+
+/* 通知类型消息：居中灰色小字，无背景 */
+.message-bubble-wrapper__notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  color: var(--uikit-text-secondary);
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
 }
 
 /* 已撤回消息：居中灰色提示 */

@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
-import Icon from '../../../components/icon/icon.vue'
+import Popup from '../../../components/popup/popup.vue'
+import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
+import { useToast } from '../../../composables/use-toast'
+import { useUIKit } from '../../../composables/use-uikit'
+import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
 
 export interface MuteListProps {
@@ -14,13 +18,30 @@ const props = defineProps<MuteListProps>()
 
 const emit = defineEmits<{
   (e: 'unmute', member: UiGroupMember): void
+  (e: 'mute', members: UiGroupMember[]): void
 }>()
 
+const logger = createLogger('MuteList')
 const { t } = useLocale()
-const { getGroupMuteList: fetchMuteList, unmuteGroupMembers } = useGroup()
+const { show: showToast } = useToast()
+const { stores } = useUIKit()
+const {
+  getGroupMuteList: fetchMuteList,
+  unmuteGroupMembers,
+  muteGroupMembers,
+  fetchGroupMembers,
+} = useGroup()
 
 const loading = ref(false)
 const members = ref<any[]>([])
+
+// 添加禁言成员 Popup 状态
+const showAddPopup = ref(false)
+const loadingMembers = ref(false)
+const groupMembers = ref<UiGroupMember[]>([])
+const selectedUserIds = ref<Set<string>>(new Set())
+
+const mutedUserIds = computed(() => new Set(members.value.map(m => userId(m)).filter(Boolean)))
 
 async function loadData() {
   if (!props.groupId)
@@ -28,10 +49,11 @@ async function loadData() {
   loading.value = true
   try {
     const result = await fetchMuteList(props.groupId)
+    logger.info('loadData succeeded', { result })
     members.value = Array.isArray(result) ? result : []
   }
   catch (err) {
-    console.warn('[MuteList] load failed:', err)
+    logger.warn('load failed:', err)
   }
   finally {
     loading.value = false
@@ -50,44 +72,212 @@ function userId(item: any): string {
   return user?.userId || ''
 }
 
+function memberDisplayName(member: UiGroupMember): string {
+  return member.nickname || member.userId || ''
+}
+
 async function onUnmute(item: any) {
   const uid = userId(item)
+  const name = displayName(item)
   try {
     await unmuteGroupMembers(props.groupId, [uid])
     members.value = members.value.filter((m: any) => userId(m) !== uid)
     emit('unmute', { userId: uid })
+    addNoticeToChat((t('group.mutelist.unmuteNotice') || '{name} 被解除禁言').replace('{name}', name))
   }
   catch (err) {
-    console.warn('[MuteList] unmute failed:', err)
+    logger.warn('unmute failed:', err)
   }
 }
+
+// 通知消息：插入聊天中的灰色系统通知
+function addNoticeToChat(content: string) {
+  if (!props.groupId)
+    return
+  const id = `notice-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  stores.message.addMessage({
+    msgLocalId: id,
+    msgServerId: '',
+    type: 'notice' as any,
+    body: { content } as any,
+    from: stores.client.currentUser ?? '',
+    to: props.groupId,
+    conversationId: props.groupId,
+    conversationType: 'groupChat' as const,
+    timestamp: Date.now(),
+    status: 'sent' as const,
+    isSelf: true,
+    localId: id,
+  } as any)
+}
+
+function openAddMember() {
+  showAddPopup.value = true
+  selectedUserIds.value.clear()
+  loadGroupMembers()
+}
+
+async function loadGroupMembers() {
+  if (!props.groupId)
+    return
+  loadingMembers.value = true
+  try {
+    const { members: list } = await fetchGroupMembers(props.groupId, undefined, 200)
+    groupMembers.value = list || []
+  }
+  catch (err) {
+    logger.warn('load group members failed:', err)
+  }
+  finally {
+    loadingMembers.value = false
+  }
+}
+
+const selectableMembers = computed(() => {
+  return groupMembers.value.filter(m => !mutedUserIds.value.has(m.userId))
+})
+
+function toggleSelect(member: UiGroupMember) {
+  const next = new Set(selectedUserIds.value)
+  if (next.has(member.userId))
+    next.delete(member.userId)
+  else
+    next.add(member.userId)
+  selectedUserIds.value = next
+}
+
+async function onConfirmAdd() {
+  const ids = Array.from(selectedUserIds.value)
+  logger.info('onConfirmAdd clicked', { groupId: props.groupId, count: ids.length, userIds: ids })
+  if (ids.length === 0 || !props.groupId) {
+    logger.info('onConfirmAdd early return: empty selection or no groupId')
+    return
+  }
+  try {
+    logger.info('calling muteGroupMembers', { groupId: props.groupId, userIds: ids, muteDuration: -1 })
+    await muteGroupMembers(props.groupId, ids, -1)
+    logger.info('muteGroupMembers succeeded')
+    logger.info('calling loadData to refresh mute list')
+    await loadData()
+    logger.info('loadData finished, members count:', members.value.length)
+    showAddPopup.value = false
+    selectedUserIds.value.clear()
+    showToast(t('group.mutelist.addSuccess') || '添加成功')
+    logger.info('emitting mute event', { userIds: ids })
+    emit('mute', ids.map(id => ({ userId: id })))
+    // 插入系统通知
+    const names = ids.map((uid) => {
+      const member = groupMembers.value.find(m => m.userId === uid)
+      return memberDisplayName(member || {} as UiGroupMember) || uid
+    }).join('、')
+    logger.info('adding notice to chat', { names })
+    addNoticeToChat((t('group.mutelist.muteNotice') || '{name} 被禁言').replace('{name}', names))
+    logger.info('onConfirmAdd completed successfully')
+  }
+  catch (err) {
+    logger.warn('add to mutelist failed:', err)
+    showToast(t('group.mutelist.addFailed') || '添加失败')
+  }
+}
+
+function closeAddPopup() {
+  showAddPopup.value = false
+  selectedUserIds.value.clear()
+}
+
+defineExpose({
+  openAddMember,
+})
 </script>
 
 <template>
   <div class="mute-list">
+    <!-- 顶部操作栏 -->
+    <div class="mute-list__header">
+      <span class="mute-list__header-count">
+        {{ members.length }} {{ t('group.mutelist.memberCount') || '名禁言成员' }}
+      </span>
+      <button class="mute-list__add-btn" @click="openAddMember">
+        {{ t('group.mutelist.add') || '添加禁言' }}
+      </button>
+    </div>
+
     <div v-if="loading" class="mute-list__loading">
       {{ t('common.loading') }}
     </div>
     <div v-else-if="members.length === 0" class="mute-list__empty">
       {{ t('group.memberList.empty') || '暂无禁言成员' }}
     </div>
-    <div
+    <Cell
       v-for="item in members"
       :key="userId(item)"
       class="mute-list__item"
+      size="compact"
+      :title="displayName(item)"
+      :clickable="false"
     >
-      <Avatar
-        class="mute-list__avatar"
-        :name="displayName(item)"
-        :size="36"
-      />
-      <div class="mute-list__info">
-        <span class="mute-list__name">{{ displayName(item) }}</span>
+      <template #leading>
+        <Avatar :name="displayName(item)" :size="36" />
+      </template>
+      <template #trailing>
+        <button class="mute-list__action-btn" @click.stop="onUnmute(item)">
+          {{ t('group.memberList.unmute') || '取消禁言' }}
+        </button>
+      </template>
+    </Cell>
+
+    <!-- 添加禁言成员 Popup -->
+    <Popup
+      v-model:show="showAddPopup"
+      position="center"
+      :close-on-click-overlay="true"
+      @close="closeAddPopup"
+    >
+      <div class="mute-list__popup" @pointerdown.stop>
+        <div class="mute-list__popup-header">
+          <span class="mute-list__popup-title">{{ t('group.mutelist.addTitle') || '添加禁言成员' }}</span>
+        </div>
+        <div class="mute-list__popup-body">
+          <div v-if="loadingMembers" class="mute-list__popup-status">
+            {{ t('common.loading') }}
+          </div>
+          <div v-else-if="selectableMembers.length === 0" class="mute-list__popup-status">
+            {{ t('group.mutelist.emptySelectable') || '暂无可添加的成员' }}
+          </div>
+          <Cell
+            v-for="member in selectableMembers"
+            :key="member.userId"
+            class="mute-list__popup-item"
+            size="compact"
+            :title="memberDisplayName(member)"
+            :selected="selectedUserIds.has(member.userId)"
+            @click="toggleSelect(member)"
+          >
+            <template #leading>
+              <Avatar :name="memberDisplayName(member)" :size="36" />
+            </template>
+            <template #trailing>
+              <span
+                class="mute-list__popup-checkbox"
+                :class="{ 'mute-list__popup-checkbox--checked': selectedUserIds.has(member.userId) }"
+              />
+            </template>
+          </Cell>
+        </div>
+        <div class="mute-list__popup-footer">
+          <button class="mute-list__popup-btn mute-list__popup-btn--cancel" @click="closeAddPopup">
+            {{ t('group.blocklist.cancel') || '取消' }}
+          </button>
+          <button
+            class="mute-list__popup-btn mute-list__popup-btn--confirm"
+            :disabled="selectedUserIds.size === 0"
+            @click="onConfirmAdd"
+          >
+            {{ t('group.blocklist.confirm') || '确定' }}
+          </button>
+        </div>
       </div>
-      <button class="mute-list__action-btn" @click="onUnmute(item)">
-        {{ t('group.memberList.unmute') || '取消禁言' }}
-      </button>
-    </div>
+    </Popup>
   </div>
 </template>
 
@@ -95,6 +285,38 @@ async function onUnmute(item: any) {
 .mute-list {
   padding: 8px 0;
 }
+
+/* 顶部操作栏 */
+.mute-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
+}
+
+.mute-list__header-count {
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
+}
+
+.mute-list__add-btn {
+  padding: 4px 12px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-primary-color);
+  background: none;
+  color: var(--uikit-primary-color);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.mute-list__add-btn:hover {
+  background-color: var(--uikit-primary-color);
+  color: #ffffff;
+}
+
 .mute-list__loading,
 .mute-list__empty {
   text-align: center;
@@ -102,24 +324,11 @@ async function onUnmute(item: any) {
   font-size: 14px;
   color: var(--uikit-text-secondary);
 }
+
 .mute-list__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
+  --uikit-item-hover-padding-x: 16px;
 }
-.mute-list__avatar {
-  flex-shrink: 0;
-}
-.mute-list__info {
-  flex: 1;
-  min-width: 0;
-}
-.mute-list__name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-}
+
 .mute-list__action-btn {
   padding: 4px 10px;
   border-radius: var(--uikit-components-radius, 5px);
@@ -130,7 +339,105 @@ async function onUnmute(item: any) {
   cursor: pointer;
   transition: all 0.15s;
 }
+
 .mute-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
+
+/* Popup 样式 */
+.mute-list__popup {
+  width: 360px;
+  max-width: 90vw;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 8px);
+  overflow: hidden;
+}
+
+.mute-list__popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
+}
+
+.mute-list__popup-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--uikit-text-primary);
+}
+
+.mute-list__popup-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.mute-list__popup-status {
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 14px;
+  color: var(--uikit-text-secondary);
+}
+
+.mute-list__popup-item {
+  --uikit-item-hover-padding-x: 16px;
+}
+
+.mute-list__popup-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--uikit-border-color, #d1d5db);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.mute-list__popup-checkbox--checked {
+  border-color: var(--uikit-primary-color);
+  background-color: var(--uikit-primary-color);
+}
+
+.mute-list__popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
+}
+
+.mute-list__popup-btn {
+  padding: 6px 16px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mute-list__popup-btn:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.mute-list__popup-btn--confirm {
+  border-color: var(--uikit-primary-color);
+  background-color: var(--uikit-primary-color);
+  color: #ffffff;
+}
+
+.mute-list__popup-btn--confirm:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.mute-list__popup-btn--confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

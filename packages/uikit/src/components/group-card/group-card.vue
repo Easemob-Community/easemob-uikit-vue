@@ -65,7 +65,7 @@ function onActionClick(key: string) {
         />
         <div class="group-card__meta">
           <div class="group-card__name">
-            {{ props.name }}
+            <slot name="name">{{ props.name }}</slot>
           </div>
           <div class="group-card__group-id">
             {{ props.groupId }}

@@ -501,6 +501,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           :key="member.userId"
           class="group-member-list__item"
           auto-height
+          :clickable="false"
           :data-member-id="member.userId"
           @click="onMemberClick(member)"
         >

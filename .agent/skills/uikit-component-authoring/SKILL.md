@@ -166,6 +166,9 @@ app.component(finalName, value as Component)
   把通用事件翻成域事件（如 `@select` → `emit('conversation-select', …)`），并从 composable 取状态。
 - **H5 适配**：需要安全区/键盘/移动态的组件，优先从 `useUIKit().h5` 读取，不要新增独立 props；
   安全区通过 `var(--uikit-safe-*, 0px)` 变量处理，禁止组件内直接写 `env(safe-area-inset-*)`。
+- **编辑态自动聚焦**：所有内联编辑入口（群名称、备注、公告、描述等）在切换编辑态后，
+  **必须**通过 `watch(isEditing, async () => { await nextTick(); inputRef.value?.focus() })` 实现输入框自动聚焦。
+  模板 ref 命名统一为 `{field}InputRef`（如 `groupNameInputRef`、`remarkInputRef`）。
 - **结构歧义**：`modules/chat/message-input.vue` 与 `modules/chat/message-input/` 目录并存，命名易混，
   新增别踩这坑，见 `TECH-DEBT.md` **D11**。
 - **打包契约提醒**：`packages/uikit/vite.config.ts` 的 external 里 `im-sdk-web` 是**过时名**

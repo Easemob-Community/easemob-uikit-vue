@@ -1,6 +1,9 @@
 import type { ContactEventHandlerMap, ContactRosterEventPayload } from 'easemob-websdk'
+import { createLogger } from '../../utils/logger'
 import type { UiContactInvite } from '../types'
 import type { RootStores } from './types'
+
+const contactLog = createLogger('UIKit:ContactEvents')
 
 function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite['status'] = 'pending'): UiContactInvite {
   const userInfo = payload.userInfo
@@ -23,11 +26,13 @@ function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite[
 export function createContactHandlers(stores: RootStores): ContactEventHandlerMap {
   return {
     onContactInvited: (payload) => {
+      contactLog.info('onContactInvited', { from: payload.from })
       const userId = payload.from
       const alreadyContact = userId ? stores.contact.getContact(userId) : undefined
       stores.contact.addInvite(toUiInvite(payload, alreadyContact ? 'accepted' : 'pending'))
     },
     onContactAgreed: (payload) => {
+      contactLog.info('onContactAgreed', { from: payload.from })
       const userId = payload.from
       if (!userId)
         return
@@ -38,12 +43,14 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       stores.contact.addContact({ userId, name: userId })
     },
     onContactRefuse: (payload) => {
+      contactLog.info('onContactRefuse', { from: payload.from })
       const userId = payload.from
       if (userId && stores.contact.getInvite(userId)) {
         stores.contact.updateInviteStatus(userId, 'declined')
       }
     },
     onContactDeleted: (payload) => {
+      contactLog.info('onContactDeleted', { from: payload.from })
       const userId = payload.from
       if (userId) {
         stores.contact.removeContact(userId)
@@ -51,6 +58,7 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       }
     },
     onContactAdded: (payload) => {
+      contactLog.info('onContactAdded', { from: payload.from })
       const userId = payload.from
       if (!userId)
         return
@@ -58,6 +66,7 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       stores.contact.removeInvite(userId)
     },
     onContactInfoUpdated: (msg) => {
+      contactLog.info('onContactInfoUpdated', { userId: msg.contact?.userId })
       const contact = msg.contact
       if (contact?.userId && contact.remark !== undefined) {
         stores.contact.updateContactRemark(contact.userId, contact.remark)

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
+import { useViewport } from '../../../composables/use-viewport'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 
@@ -17,6 +19,7 @@ const props = defineProps<SharedFileListProps>()
 const { t } = useLocale()
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
+const { isMobile } = useViewport()
 const {
   getGroupSharedFileList: fetchSharedFiles,
   uploadGroupSharedFile,
@@ -30,6 +33,8 @@ const files = ref<any[]>([])
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
 const showActionSheet = ref(false)
+const showContextMenu = ref(false)
+const contextMenuAnchor = ref<HTMLElement>()
 const activeFile = ref<any>(null)
 
 const actionSheetActions = computed<ActionSheetItem[]>(() => {
@@ -256,9 +261,31 @@ function formatFileName(fileName: string): string {
   return `${name.slice(0, side)}${ellipsis}${name.slice(-side)}${ext}`
 }
 
-function openActionSheet(file: any) {
+function openActionSheet(file: any, event?: MouseEvent) {
   activeFile.value = file
-  showActionSheet.value = true
+  if (isMobile.value) {
+    showActionSheet.value = true
+  }
+  else {
+    contextMenuAnchor.value = event?.currentTarget as HTMLElement
+    showContextMenu.value = true
+  }
+}
+
+function onContextMenuClose() {
+  showContextMenu.value = false
+  contextMenuAnchor.value = undefined
+}
+
+function onContextMenuItemClick(actionKey: 'download' | 'delete') {
+  onContextMenuClose()
+  const file = activeFile.value
+  if (!file)
+    return
+  if (actionKey === 'download')
+    onDownload(file)
+  else if (actionKey === 'delete')
+    onDelete(file)
 }
 
 async function onActionSheetSelect(_item: ActionSheetItem, index: number) {
@@ -325,7 +352,7 @@ async function onDownload(file: any) {
       </div>
       <button
         class="shared-file-list__more-btn"
-        @click.stop="openActionSheet(file)"
+        @click.stop="(event) => openActionSheet(file, event as MouseEvent)"
       >
         <Icon name="actions/ellipsis_vertical" :size="20" />
       </button>
@@ -336,6 +363,34 @@ async function onDownload(file: any) {
       :actions="actionSheetActions"
       @select="onActionSheetSelect"
     />
+
+    <!-- PC 端使用 Popup 锚定菜单 -->
+    <Popup
+      :show="showContextMenu"
+      :anchor="contextMenuAnchor"
+      placement="bottom"
+      :overlay="false"
+      :close-on-click-overlay="true"
+      group="shared-file-context-menu"
+      @update:show="onContextMenuClose"
+      @close="onContextMenuClose"
+    >
+      <div class="shared-file-list__context-menu">
+        <div
+          class="shared-file-list__context-menu-item"
+          @click.stop="onContextMenuItemClick('download')"
+        >
+          {{ t('group.sharedFile.download') || '下载' }}
+        </div>
+        <div
+          v-if="activeFile && canDelete(activeFile)"
+          class="shared-file-list__context-menu-item is-danger"
+          @click.stop="onContextMenuItemClick('delete')"
+        >
+          {{ t('group.sharedFile.delete') || '删除' }}
+        </div>
+      </div>
+    </Popup>
   </div>
 </template>
 
@@ -407,5 +462,38 @@ async function onDownload(file: any) {
 .shared-file-list__more-btn:hover {
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-primary-color);
+}
+
+.shared-file-list__context-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--uikit-bg-base);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
+  min-width: 140px;
+  padding: 6px;
+}
+
+.shared-file-list__context-menu-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--uikit-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+}
+
+.shared-file-list__context-menu-item:hover {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
+}
+
+.shared-file-list__context-menu-item.is-danger {
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+.shared-file-list__context-menu-item.is-danger:hover {
+  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
 }
 </style>

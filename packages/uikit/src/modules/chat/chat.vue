@@ -273,6 +273,13 @@ const conversationType = computed(() => currentConversation.value?.type)
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
 
+/** 当前群是否全员禁言 */
+const isMutedAll = computed(() => {
+  if (!isGroupChat.value || !currentConversation.value)
+    return false
+  return stores.group.getGroupById(currentConversation.value.id)?.mute === true
+})
+
 /** 群聊 @提及成员列表 */
 const mentionContacts = computed<MentionContact[]>(() => {
   if (!isGroupChat.value || !currentConversation.value)
@@ -831,6 +838,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
         ref="messageInputRef"
         :config="props.config"
         :is-group="isGroupChat"
+        :muted="isMutedAll"
         :keyboard-height="h5.keyboardHeight.value"
         :mention-contacts="mentionContacts"
         @send-success="handleSendSuccess"

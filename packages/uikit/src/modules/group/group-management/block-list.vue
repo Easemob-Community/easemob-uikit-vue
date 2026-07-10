@@ -109,10 +109,12 @@ const selectableMembers = computed(() => {
 })
 
 function toggleSelect(member: UiGroupMember) {
-  if (selectedUserIds.value.has(member.userId))
-    selectedUserIds.value.delete(member.userId)
+  const next = new Set(selectedUserIds.value)
+  if (next.has(member.userId))
+    next.delete(member.userId)
   else
-    selectedUserIds.value.add(member.userId)
+    next.add(member.userId)
+  selectedUserIds.value = next
 }
 
 async function onConfirmAdd() {
@@ -175,7 +177,7 @@ defineExpose({
       :close-on-click-overlay="true"
       @close="closeAddPopup"
     >
-      <div class="block-list__popup">
+      <div class="block-list__popup" @pointerdown.stop>
         <div class="block-list__popup-header">
           <span class="block-list__popup-title">{{ t('group.blocklist.addTitle') || '添加黑名单成员' }}</span>
         </div>

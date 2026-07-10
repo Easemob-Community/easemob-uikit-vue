@@ -4,7 +4,10 @@ import { toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
+import { createLogger } from '../../utils/logger'
 import type { RootStores } from './types'
+
+const chatLog = createLogger('UIKit:ChatEvents')
 
 /** 正在主动拉取群名称的 ID 集合，避免并发重复请求 */
 const fetchingGroupNames = new Set<string>()
@@ -54,7 +57,7 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
     }
   }
   catch (err) {
-    console.warn('[UIKit] fetch missing group names failed:', err)
+    chatLog.warn('fetch missing group names failed:', err)
   }
   finally {
     for (const id of missingGroupIds) fetchingGroupNames.delete(id)
@@ -87,12 +90,14 @@ function mergeWithExistingConversations(stores: RootStores, incoming: ReturnType
 export function createChatHandlers(client: ManagerHost, stores: RootStores): ChatEventHandlerMap {
   return {
     onSyncDataStart: (payload) => {
+      chatLog.info('onSyncDataStart', { dataType: payload.dataType })
       if (payload.dataType === 'conversation') {
         stores.conversation.setSyncingConversations(true)
       }
     },
 
     onSyncDataFinished: (payload) => {
+      chatLog.info('onSyncDataFinished', { dataType: payload.dataType })
       // SDK 按数据类型分别触发同步完成（conversation / contact / group），逐类回填。
       switch (payload.dataType) {
         case 'conversation':
@@ -122,6 +127,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onConversationListUpdate: (payload) => {
+      chatLog.info('onConversationListUpdate', { count: payload.items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
       // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
       const incoming = toUiConversations(payload.items)
@@ -145,6 +151,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onMessage: (sdkMsg) => {
+      chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
       stores.message.addMessage(uiMsg)
 
@@ -174,14 +181,17 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onMessageRecalled: (payload) => {
+      chatLog.info('onMessageRecalled', { messageId: payload.messageId })
       stores.message.recallMessage(payload.messageId, stores.client.currentUser)
     },
 
     onMessageDelivered: (payload) => {
+      chatLog.info('onMessageDelivered', { messageId: payload.messageId })
       stores.message.updateMessageStatus(payload.messageId, 'delivered')
     },
 
     onMessageReceipts: (payload) => {
+      chatLog.info('onMessageReceipts', { count: payload.length })
       // 新 API（0.14.181）：payload 是 ReadonlyArray<MessageReceiptEventPayload>
       // 每项包含 { conversationId, conversationType, messageIds, timestamp }
       // 群聊已读回执不再携带 ackContent/count，群已读人数需通过 getMessageReadReceipts 按需获取
@@ -195,6 +205,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onConversationUnreadMessageCountCleared: (payload) => {
+      chatLog.info('onConversationUnreadMessageCountCleared', { conversationId: payload.conversationId })
       // 多设备清空会话未读数时派发
       if (payload.conversationId) {
         stores.conversation.updateUnreadCount(payload.conversationId, 0)
@@ -202,6 +213,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onAllConversationsUnreadMessageCountCleared: () => {
+      chatLog.info('onAllConversationsUnreadMessageCountCleared')
       // 多设备清空所有会话未读数时派发
       for (const cvs of stores.conversation.conversationList) {
         stores.conversation.updateUnreadCount(cvs.id, 0)
@@ -209,11 +221,13 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onMessageUpdated: (payload) => {
+      chatLog.info('onMessageUpdated')
       const uiMsg = toUiMessage(payload.message as any, stores.client.currentUser)
       stores.message.applyModifiedMessage(uiMsg)
     },
 
     onPinnedMessageChanged: async (payload) => {
+      chatLog.info('onPinnedMessageChanged', { conversationId: payload.conversationId, operation: payload.operation })
       if (!payload.messageId)
         return
       if (payload.operation === 'pin') {
@@ -237,12 +251,13 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           stores.message.setPinnedMessages(payload.conversationId, uiMsgs)
         }
         catch (err) {
-          console.warn('[UIKit] refresh pinned messages failed:', err)
+          chatLog.warn('refresh pinned messages failed:', err)
         }
       }
     },
 
     onMultiDeviceConversation: (event) => {
+      chatLog.info('onMultiDeviceConversation', { operation: event.operation, conversationId: event.conversationId })
       const { operation, conversationId } = event
       if (!conversationId)
         return
@@ -270,11 +285,12 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           }
           break
         default:
-          console.warn('[UIKit] onMultiDeviceConversation unhandled:', event)
+          chatLog.warn('onMultiDeviceConversation unhandled:', event)
       }
     },
 
     onMultiDeviceMessageRemoved: (event) => {
+      chatLog.info('onMultiDeviceMessageRemoved', { conversationId: event.conversationId, operation: event.operation, messageIds: event.messageIds })
       const { operation, conversationId, messageIds, beforeTimestamp } = event
       if (!conversationId || operation !== 'MESSAGE_REMOVED')
         return

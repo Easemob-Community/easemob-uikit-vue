@@ -15,6 +15,15 @@ export interface GroupStoreLike {
   removeGroupMembers: (groupId: string, userIds: string[]) => void
   updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void
+  setGroupMuteList: (groupId: string, members: UiGroupMember[]) => void
+  addGroupMuteMembers: (groupId: string, userIds: string[]) => void
+  removeGroupMuteMembers: (groupId: string, userIds: string[]) => void
+  setGroupBlocklist: (groupId: string, members: UiGroupMember[]) => void
+  addGroupBlocklistMembers: (groupId: string, userIds: string[]) => void
+  removeGroupBlocklistMembers: (groupId: string, userIds: string[]) => void
+  setGroupAllowlist: (groupId: string, members: UiGroupMember[]) => void
+  addGroupAllowlistMembers: (groupId: string, userIds: string[]) => void
+  removeGroupAllowlistMembers: (groupId: string, userIds: string[]) => void
 }
 
 /**
@@ -209,38 +218,51 @@ export class GroupDomain {
   /** 禁言指定成员 */
   async muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
     await this.client.groupManager.getGroup(groupId).muteMembers({ userIds, muteDuration })
+    this.store.addGroupMuteMembers(groupId, userIds)
   }
 
   /** 解除指定成员禁言 */
   async unmuteGroupMembers(groupId: string, userIds: string[]) {
     await this.client.groupManager.getGroup(groupId).unmuteMembers({ userIds })
+    this.store.removeGroupMuteMembers(groupId, userIds)
   }
 
   /** 获取群禁言列表 */
   async getGroupMuteList(groupId: string, pageNum?: number, pageSize?: number) {
     const result = await this.client.groupManager.getGroup(groupId).getMuteList({ pageNum, pageSize })
+    // 同步 store 缓存，确保管理入口的计数 badge 正确显示
+    const members = Array.isArray(result) ? result : (result as any)?.data ?? []
+    this.store.setGroupMuteList(groupId, toUiGroupMembers(members))
     return result
   }
 
   /** 获取群黑名单 */
   async getGroupBlocklist(groupId: string, pageNum?: number, pageSize?: number) {
     const result = await this.client.groupManager.getGroup(groupId).getBlocklist({ pageNum, pageSize })
+    // 同步 store 缓存，确保管理入口的计数 badge 正确显示
+    const members = Array.isArray(result) ? result : (result as any)?.data ?? []
+    this.store.setGroupBlocklist(groupId, toUiGroupMembers(members))
     return result
   }
 
   /** 将成员加入群黑名单 */
   async blockGroupMembers(groupId: string, userIds: string[]) {
     await this.client.groupManager.getGroup(groupId).blockMembers({ userIds })
+    this.store.addGroupBlocklistMembers(groupId, userIds)
   }
 
   /** 将成员移出群黑名单 */
   async unblockGroupMembers(groupId: string, userIds: string[]) {
     await this.client.groupManager.getGroup(groupId).unblockMembers({ userIds })
+    this.store.removeGroupBlocklistMembers(groupId, userIds)
   }
 
   /** 获取群白名单 */
   async getGroupAllowlist(groupId: string) {
     const result = await this.client.groupManager.getGroup(groupId).getAllowlist()
+    // 同步 store 缓存，确保管理入口的计数 badge 正确显示
+    const members = Array.isArray(result) ? result : (result as any)?.data ?? []
+    this.store.setGroupAllowlist(groupId, toUiGroupMembers(members))
     return result
   }
 

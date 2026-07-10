@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
+import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
 
 export interface AllowListProps {
@@ -15,6 +16,7 @@ const emit = defineEmits<{
   (e: 'remove', member: UiGroupMember): void
 }>()
 
+const logger = createLogger('AllowList')
 const { t } = useLocale()
 const { getGroupAllowlist: fetchAllowlist, removeUsersFromGroupAllowlist } = useGroup()
 
@@ -30,7 +32,7 @@ async function loadData() {
     members.value = Array.isArray(result) ? result : []
   }
   catch (err) {
-    console.warn('[AllowList] load failed:', err)
+    logger.warn('load failed:', err)
   }
   finally {
     loading.value = false
@@ -57,7 +59,7 @@ async function onRemove(item: any) {
     emit('remove', { userId: uid })
   }
   catch (err) {
-    console.warn('[AllowList] remove failed:', err)
+    logger.warn('remove failed:', err)
   }
 }
 </script>

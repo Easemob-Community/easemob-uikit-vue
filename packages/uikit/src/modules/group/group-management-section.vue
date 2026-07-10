@@ -184,9 +184,10 @@ function closeDrawer() {
     <Cell
       v-if="props.showMuteAll && isAdminOrOwner"
       :clickable="false"
+      size="compact"
+      :title="t('group.management.muteAll') || '全员禁言'"
       class="group-management-section__switch-cell"
     >
-      <template #default>{{ t('group.management.muteAll') || '全员禁言' }}</template>
       <template #trailing>
         <label class="group-management-section__toggle">
           <input
@@ -250,6 +251,7 @@ function closeDrawer() {
           v-if="activeDrawerKey === 'mute'"
           :group-id="props.groupId"
           @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
+          @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
         />
         <EmGroupBlocklist
           v-if="activeDrawerKey === 'block'"
@@ -312,6 +314,7 @@ function closeDrawer() {
             v-if="activeDrawerKey === 'mute'"
             :group-id="props.groupId"
             @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
+          @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
           />
           <EmGroupBlocklist
             v-if="activeDrawerKey === 'block'"
