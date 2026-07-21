@@ -47,7 +47,7 @@ export class ConversationDomain {
     await this.client.chatManager.refreshSessionList({ includeEmpty })
   }
 
-  /** 删除会话（默认同时删除漫游消息和本地缓存） */
+  /** 删除会话（默认同时删除漫游消息；SDK 0.14.227 成功后总会清理本地会话缓存） */
   async remove(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
@@ -57,15 +57,15 @@ export class ConversationDomain {
       conversationId,
       conversationType,
       deleteRoamingMessages,
-      deleteLocal: true,
     })
   }
 
-  /** 仅删除本地缓存 */
-  removeLocal(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
-    this.client.chatManager.deleteConversationLocally({
+  /** 删除会话但保留漫游消息（SDK 已无仅本地删除 API，用 deleteRoamingMessages=false 代替） */
+  async removeLocal(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+    await this.client.chatManager.deleteConversation({
       conversationId,
       conversationType,
+      deleteRoamingMessages: false,
     })
     this.store.delete(conversationId)
   }
@@ -102,7 +102,6 @@ export class ConversationDomain {
         conversationId,
         conversationType,
         deleteRoamingMessages: true,
-        deleteLocal: false,
       })
     }
   }

@@ -72,6 +72,17 @@ export function useChat() {
       return
     const msgId = message.msgServerId || message.msgLocalId
     await domains.message.modifyText(cvs.id, cvs.type, msgId, text)
+    // 0.14.224 起 SDK 不再在当前操作设备伪造 onMessageUpdated，本地直接更新
+    stores.message.applyModifiedMessage({
+      ...message,
+      body: { ...(message.body as TextMessageBody), content: text },
+      modified: true,
+      modifiedInfo: {
+        operatorId: stores.client.currentUser || '',
+        operationCount: (message.modifiedInfo?.operationCount ?? 0) + 1,
+        operationTime: Date.now(),
+      },
+    })
     exitEditMode()
   }
 

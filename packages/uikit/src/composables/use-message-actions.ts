@@ -65,6 +65,8 @@ export function useMessageActions() {
       return
     try {
       await domains.message.recall(cvs.id, cvs.type, msgId)
+      // 0.14.224 起 SDK 不再在当前操作设备伪造 onMessageRecalled，本地直接更新
+      messageStore.recallMessage(msgId, stores.client.currentUser)
     }
     catch (error) {
       const reason = extractErrorReason(error)
@@ -131,6 +133,8 @@ export function useMessageActions() {
       operatorId: stores.client.currentUser || '',
       pinTime: Date.now(),
     })
+    // 0.14.223 起 SDK 不再在当前操作设备伪造 onPinnedMessageChanged，本地刷新置顶列表
+    await refreshPinnedMessages(cvs.id, cvs.type)
   }
 
   /** 取消置顶 */
@@ -141,6 +145,18 @@ export function useMessageActions() {
     const msgId = message.msgServerId || message.msgLocalId
     await domains.message.unpinMessage(cvs.id, cvs.type, msgId)
     messageStore.setMessageUnpinned(msgId)
+    // 0.14.223 起 SDK 不再在当前操作设备伪造 onPinnedMessageChanged，本地刷新置顶列表
+    await refreshPinnedMessages(cvs.id, cvs.type)
+  }
+
+  /** 刷新置顶列表；失败仅告警，不影响已完成的置顶操作 */
+  async function refreshPinnedMessages(cvsId: string, cvsType: 'singleChat' | 'groupChat') {
+    try {
+      await domains.message.getPinnedMessages(cvsId, cvsType)
+    }
+    catch (err) {
+      console.warn('[UIKit] refresh pinned messages failed:', err)
+    }
   }
 
   /** 获取置顶消息列表 */

@@ -310,12 +310,14 @@ export class GroupDomain {
     await this.client.groupManager.getGroup(groupId).deleteSharedFile({ fileId })
   }
 
-  /** 下载群共享文件 */
+  /** 下载群共享文件（SDK 0.14.203+ 无 Blob 环境会返回 ArrayBuffer，统一转为 Blob） */
   async downloadGroupSharedFile(groupId: string, fileId: string): Promise<Blob> {
     return new Promise((resolve, reject) => {
       this.client.groupManager.getGroup(groupId).downloadSharedFile({
         fileId,
-        onFileDownloadComplete: (blob: Blob) => resolve(blob),
+        onFileDownloadComplete: (data: Blob | ArrayBuffer) => {
+          resolve(data instanceof Blob ? data : new Blob([data]))
+        },
         onFileDownloadError: (error: unknown) => reject(error),
       })
     })

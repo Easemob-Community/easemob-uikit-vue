@@ -181,12 +181,12 @@ export function useConversation() {
     await domains.conversation.remove(id, cvs.type, deleteRoamingMessages)
   }
 
-  /** 本地删除会话 */
-  function removeConversation(id: string) {
+  /** 删除会话但保留漫游消息（异步，SDK 会同步服务端会话列表与本地缓存） */
+  async function removeConversation(id: string) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
     if (!cvs)
       return
-    domains.conversation.removeLocal(id, cvs.type)
+    await domains.conversation.removeLocal(id, cvs.type)
   }
 
   return {
