@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import Avatar from '../../../components/avatar/avatar.vue'
 import Popup from '../../../components/popup/popup.vue'
-import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import { useUIKit } from '../../../composables/use-uikit'
 import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
+import MuteListItem from './mute-list-item.vue'
+import MuteListSelectItem from './mute-list-select-item.vue'
 
 export interface MuteListProps {
   groupId: string
@@ -41,7 +41,10 @@ const loadingMembers = ref(false)
 const groupMembers = ref<UiGroupMember[]>([])
 const selectedUserIds = ref<Set<string>>(new Set())
 
-const mutedUserIds = computed(() => new Set(members.value.map(m => userId(m)).filter(Boolean)))
+const mutedUserIds = computed(() => new Set(members.value.map((m) => {
+  const user = m.user || m
+  return user?.userId || ''
+}).filter(Boolean)))
 
 async function loadData() {
   if (!props.groupId)
@@ -62,26 +65,16 @@ async function loadData() {
 
 watch(() => props.groupId, loadData, { immediate: true })
 
-function displayName(item: any): string {
-  const user = item.user || item
-  return user?.nickname || user?.userId || ''
-}
-
-function userId(item: any): string {
-  const user = item.user || item
-  return user?.userId || ''
-}
-
-function memberDisplayName(member: UiGroupMember): string {
-  return member.nickname || member.userId || ''
-}
-
 async function onUnmute(item: any) {
-  const uid = userId(item)
-  const name = displayName(item)
+  const user = item.user || item
+  const uid = user?.userId || ''
+  const name = user?.nickname || uid
   try {
     await unmuteGroupMembers(props.groupId, [uid])
-    members.value = members.value.filter((m: any) => userId(m) !== uid)
+    members.value = members.value.filter((m: any) => {
+      const u = m.user || m
+      return (u?.userId || '') !== uid
+    })
     emit('unmute', { userId: uid })
     addNoticeToChat((t('group.mutelist.unmuteNotice') || '{name} 被解除禁言').replace('{name}', name))
   }
@@ -134,7 +127,7 @@ async function loadGroupMembers() {
 }
 
 const selectableMembers = computed(() => {
-  return groupMembers.value.filter(m => !mutedUserIds.value.has(m.userId))
+  return groupMembers.value.filter(m => !mutedUserIds.value.has(m.userId) && m.role !== 'owner')
 })
 
 function toggleSelect(member: UiGroupMember) {
@@ -168,7 +161,7 @@ async function onConfirmAdd() {
     // 插入系统通知
     const names = ids.map((uid) => {
       const member = groupMembers.value.find(m => m.userId === uid)
-      return memberDisplayName(member || {} as UiGroupMember) || uid
+      return member?.nickname || uid
     }).join('、')
     logger.info('adding notice to chat', { names })
     addNoticeToChat((t('group.mutelist.muteNotice') || '{name} 被禁言').replace('{name}', names))
@@ -208,23 +201,12 @@ defineExpose({
     <div v-else-if="members.length === 0" class="mute-list__empty">
       {{ t('group.memberList.empty') || '暂无禁言成员' }}
     </div>
-    <Cell
+    <MuteListItem
       v-for="item in members"
-      :key="userId(item)"
-      class="mute-list__item"
-      size="compact"
-      :title="displayName(item)"
-      :clickable="false"
-    >
-      <template #leading>
-        <Avatar :name="displayName(item)" :size="36" />
-      </template>
-      <template #trailing>
-        <button class="mute-list__action-btn" @click.stop="onUnmute(item)">
-          {{ t('group.memberList.unmute') || '取消禁言' }}
-        </button>
-      </template>
-    </Cell>
+      :key="(item.user || item)?.userId || ''"
+      :item="item"
+      @unmute="onUnmute(item)"
+    />
 
     <!-- 添加禁言成员 Popup -->
     <Popup
@@ -233,7 +215,7 @@ defineExpose({
       :close-on-click-overlay="true"
       @close="closeAddPopup"
     >
-      <div class="mute-list__popup" @pointerdown.stop>
+      <div class="mute-list__popup" @pointerdown.stop @click.stop>
         <div class="mute-list__popup-header">
           <span class="mute-list__popup-title">{{ t('group.mutelist.addTitle') || '添加禁言成员' }}</span>
         </div>
@@ -244,25 +226,13 @@ defineExpose({
           <div v-else-if="selectableMembers.length === 0" class="mute-list__popup-status">
             {{ t('group.mutelist.emptySelectable') || '暂无可添加的成员' }}
           </div>
-          <Cell
+          <MuteListSelectItem
             v-for="member in selectableMembers"
             :key="member.userId"
-            class="mute-list__popup-item"
-            size="compact"
-            :title="memberDisplayName(member)"
+            :member="member"
             :selected="selectedUserIds.has(member.userId)"
-            @click="toggleSelect(member)"
-          >
-            <template #leading>
-              <Avatar :name="memberDisplayName(member)" :size="36" />
-            </template>
-            <template #trailing>
-              <span
-                class="mute-list__popup-checkbox"
-                :class="{ 'mute-list__popup-checkbox--checked': selectedUserIds.has(member.userId) }"
-              />
-            </template>
-          </Cell>
+            @toggle="toggleSelect(member)"
+          />
         </div>
         <div class="mute-list__popup-footer">
           <button class="mute-list__popup-btn mute-list__popup-btn--cancel" @click="closeAddPopup">
@@ -325,25 +295,6 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 
-.mute-list__item {
-  --uikit-item-hover-padding-x: 16px;
-}
-
-.mute-list__action-btn {
-  padding: 4px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.mute-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
 /* Popup 样式 */
 .mute-list__popup {
   width: 360px;
@@ -382,24 +333,6 @@ defineExpose({
   padding: 24px 16px;
   font-size: 14px;
   color: var(--uikit-text-secondary);
-}
-
-.mute-list__popup-item {
-  --uikit-item-hover-padding-x: 16px;
-}
-
-.mute-list__popup-checkbox {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-border-color, #d1d5db);
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-
-.mute-list__popup-checkbox--checked {
-  border-color: var(--uikit-primary-color);
-  background-color: var(--uikit-primary-color);
 }
 
 .mute-list__popup-footer {

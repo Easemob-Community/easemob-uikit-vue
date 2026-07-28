@@ -25,13 +25,14 @@ const emit = defineEmits<{
 
 const themeStore = useThemeStore()
 const shapeClass = computed(() =>
-  themeStore.componentsShape === 'square' ? 'chat-drawer__panel--square' : ''
+  themeStore.componentsShape === 'square' ? 'chat-drawer__panel--square' : '',
 )
 
 const panelRef = ref<HTMLElement>()
 
 const offsetTopStyle = computed(() => {
-  if (typeof props.offsetTop === 'number') return `${props.offsetTop}px`
+  if (typeof props.offsetTop === 'number')
+    return `${props.offsetTop}px`
   return props.offsetTop
 })
 
@@ -47,11 +48,16 @@ function onOverlayClick() {
 }
 
 /** 点击 panel 外部关闭（无论是否有 overlay） */
+/**
+ * 使用 capture: false 确保 bubble 阶段的 event.stopPropagation()（如内层
+ * Teleport Popup 上的 @click.stop/@pointerdown.stop）能够阻止此监听器触发，
+ * 避免内层弹窗内的点击误关闭外层 Drawer。
+ */
 onClickOutside(panelRef, () => {
   if (props.show && props.closeOnClickOverlay) {
     close()
   }
-})
+}, { capture: false })
 </script>
 
 <template>

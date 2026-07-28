@@ -14,6 +14,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
+import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatDrawer from './chat-drawer.vue'
 
 export interface ChatInfoDrawerProps {
@@ -663,16 +664,11 @@ defineExpose({
             </button>
           </div>
           <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
-            <div
+            <ChatInfoDrawerMemberCell
               v-for="member in displayedMembers"
               :key="member.userId"
-              class="chat-info-drawer__member-cell"
-            >
-              <Avatar :name="member.nickname || member.userId" :src="member.avatarUrl" :size="48" />
-              <span class="chat-info-drawer__member-name">{{ member.nickname || member.userId }}</span>
-              <span v-if="member.role === 'owner'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--owner">{{ t('chat.info.groupOwner') }}</span>
-              <span v-else-if="member.role === 'admin'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">{{ t('chat.info.groupAdmin') }}</span>
-            </div>
+              :member="member"
+            />
           </div>
           <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
             {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
@@ -699,7 +695,9 @@ defineExpose({
             <template #leading>
               <Icon name="actions/trash" :size="18" />
             </template>
-            <template #default>{{ t('chat.info.clearHistory') }}</template>
+            <template #default>
+              {{ t('chat.info.clearHistory') }}
+            </template>
           </Cell>
         </div>
       </template>
@@ -1037,47 +1035,6 @@ defineExpose({
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px 8px;
-}
-
-.chat-info-drawer__member-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 2px;
-  cursor: pointer;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.chat-info-drawer__member-cell:hover {
-  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary));
-}
-
-.chat-info-drawer__member-name {
-  font-size: 12px;
-  color: var(--uikit-text-primary);
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.chat-info-drawer__member-tag {
-  font-size: 10px;
-  padding: 1px 4px;
-  border-radius: 4px;
-  line-height: 1.2;
-}
-
-.chat-info-drawer__member-tag--owner {
-  background-color: #fef3c7;
-  color: #d97706;
-}
-
-.chat-info-drawer__member-tag--admin {
-  background-color: #dbeafe;
-  color: #2563eb;
 }
 
 .chat-info-drawer__view-all {

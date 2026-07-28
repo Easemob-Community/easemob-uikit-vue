@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
@@ -9,6 +8,7 @@ import { useToast } from '../../../composables/use-toast'
 import { useViewport } from '../../../composables/use-viewport'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
+import SharedFileListItem from './shared-file-list-item.vue'
 
 export interface SharedFileListProps {
   groupId: string
@@ -229,38 +229,6 @@ async function onDelete(file: any) {
   }
 }
 
-function formatSize(bytes?: number): string {
-  if (!bytes || bytes <= 0)
-    return ''
-  if (bytes < 1024)
-    return `${bytes} B`
-  if (bytes < 1024 * 1024)
-    return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-const MAX_FILE_NAME_LENGTH = 24
-
-function formatFileName(fileName: string): string {
-  if (fileName.length <= MAX_FILE_NAME_LENGTH)
-    return fileName
-  const dotIndex = fileName.lastIndexOf('.')
-  let name = fileName
-  let ext = ''
-  if (dotIndex > 0 && dotIndex < fileName.length - 1) {
-    ext = fileName.slice(dotIndex)
-    name = fileName.slice(0, dotIndex)
-  }
-  if (name.length + ext.length <= MAX_FILE_NAME_LENGTH)
-    return fileName
-  const ellipsis = '...'
-  const available = MAX_FILE_NAME_LENGTH - ext.length - ellipsis.length
-  if (available <= 0)
-    return `${fileName.slice(0, MAX_FILE_NAME_LENGTH - ellipsis.length)}${ellipsis}`
-  const side = Math.max(1, Math.floor(available / 2))
-  return `${name.slice(0, side)}${ellipsis}${name.slice(-side)}${ext}`
-}
-
 function openActionSheet(file: any, event?: MouseEvent) {
   activeFile.value = file
   if (isMobile.value) {
@@ -335,28 +303,12 @@ async function onDownload(file: any) {
     <div v-else-if="files.length === 0" class="shared-file-list__empty">
       {{ t('group.sharedFile.empty') || '暂无群文件' }}
     </div>
-    <div
+    <SharedFileListItem
       v-for="file in files"
       :key="file.fileId"
-      class="shared-file-list__item"
-    >
-      <Icon name="files-media/file" :size="20" class="shared-file-list__icon" />
-      <div class="shared-file-list__info">
-        <span class="shared-file-list__name" :title="file.fileName">{{ formatFileName(file.fileName) }}</span>
-        <span class="shared-file-list__meta">
-          <template v-if="file.fileSize">{{ formatSize(file.fileSize) }}</template>
-          <template v-if="file.fileOwner">
-            {{ file.fileOwner?.nickname || file.fileOwner?.userId }}
-          </template>
-        </span>
-      </div>
-      <button
-        class="shared-file-list__more-btn"
-        @click.stop="(event) => openActionSheet(file, event as MouseEvent)"
-      >
-        <Icon name="actions/ellipsis_vertical" :size="20" />
-      </button>
-    </div>
+      :file="file"
+      @more="(file, event) => openActionSheet(file, event as MouseEvent)"
+    />
 
     <ActionSheet
       v-model:show="showActionSheet"
@@ -411,57 +363,6 @@ async function onDownload(file: any) {
   padding: 16px;
   font-size: 14px;
   color: var(--uikit-text-secondary);
-}
-.shared-file-list__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-}
-.shared-file-list__icon {
-  flex-shrink: 0;
-  color: var(--uikit-text-secondary);
-}
-.shared-file-list__info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.shared-file-list__name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.shared-file-list__meta {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-}
-.shared-file-list__item:hover .shared-file-list__name {
-  color: var(--uikit-primary-color);
-}
-.shared-file-list__more-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background-color: transparent;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
-  flex-shrink: 0;
-}
-.shared-file-list__more-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-primary-color);
 }
 
 .shared-file-list__context-menu {

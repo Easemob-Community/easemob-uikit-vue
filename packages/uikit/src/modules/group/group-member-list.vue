@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
-import Popup from '../../components/popup/popup.vue'
-import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -12,6 +9,7 @@ import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
+import GroupMemberListItem from './group-member-list-item.vue'
 
 export interface GroupMemberListProps {
   groupId: string
@@ -82,10 +80,6 @@ const cursor = ref<string | undefined>(undefined)
 const localHasMore = ref(props.hasMore)
 const localMembers = ref<UiGroupMember[]>(props.members)
 
-// 更多操作菜单状态
-const activeMoreMenuMemberId = ref<string | null>(null)
-const moreMenuTriggerRefs = ref<Record<string, HTMLElement>>({})
-
 // Presence 可视区域懒加载
 const itemsRef = ref<HTMLElement>()
 const visibleUserIds = ref<Set<string>>(new Set())
@@ -149,12 +143,10 @@ watch(() => props.hasMore, (val) => {
 }, { immediate: true })
 
 const groupInfo = computed(() => props.group || stores.group.getGroupById(props.groupId))
-const currentUserRole = computed(() => {
+const currentUserRole = computed<'owner' | 'admin' | 'member'>(() => {
   const member = localMembers.value.find(m => m.userId === props.currentUserId)
-  return member?.role || 'member'
+  return (member?.role as 'owner' | 'admin' | 'member' | undefined) || 'member'
 })
-const isOwner = computed(() => currentUserRole.value === 'owner')
-const isAdmin = computed(() => currentUserRole.value === 'admin')
 
 const filteredMembers = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
@@ -214,222 +206,6 @@ watch(() => props.groupId, (id) => {
     initialLoad()
   }
 }, { immediate: true })
-
-function canRemove(member: UiGroupMember): boolean {
-  if (member.userId === props.currentUserId)
-    return false
-  if (isOwner.value)
-    return true
-  if (isAdmin.value && member.role === 'member')
-    return true
-  return false
-}
-
-function canSetAdmin(member: UiGroupMember): boolean {
-  return isOwner.value && member.userId !== props.currentUserId && member.role !== 'admin'
-}
-
-function canRemoveAdmin(member: UiGroupMember): boolean {
-  return isOwner.value && member.userId !== props.currentUserId && member.role === 'admin'
-}
-
-function canChat(member: UiGroupMember): boolean {
-  if (!props.showChatAction)
-    return false
-  if (member.userId === props.currentUserId)
-    return false
-  if (props.allowChat === 'none')
-    return false
-  if (props.allowChat === 'contact')
-    return !!stores.contact.getContact(member.userId)
-  return true
-}
-
-// ===== 禁言/拉黑/白名单状态检查 =====
-function isMemberMuted(groupId: string, userId: string): boolean {
-  const muteList = stores.group.groupMuteListMap[groupId] || []
-  return muteList.some(m => m.userId === userId)
-}
-
-function isMemberBlocked(groupId: string, userId: string): boolean {
-  const blocklist = stores.group.groupBlocklistMap[groupId] || []
-  return blocklist.some(m => m.userId === userId)
-}
-
-function isMemberInAllowlist(groupId: string, userId: string): boolean {
-  const allowlist = stores.group.groupAllowlistMap[groupId] || []
-  return allowlist.some(m => m.userId === userId)
-}
-
-// ===== 禁言/拉黑权限检查 =====
-function canMute(member: UiGroupMember): boolean {
-  if (!props.showMuteAction)
-    return false
-  if (member.userId === props.currentUserId)
-    return false
-  if (isMemberMuted(props.groupId, member.userId))
-    return false
-  if (isOwner.value)
-    return true
-  if (isAdmin.value && member.role === 'member')
-    return true
-  return false
-}
-
-function canUnmute(member: UiGroupMember): boolean {
-  if (!props.showMuteAction)
-    return false
-  if (!isMemberMuted(props.groupId, member.userId))
-    return false
-  if (isOwner.value)
-    return true
-  if (isAdmin.value && member.role === 'member')
-    return true
-  return false
-}
-
-function canBlock(member: UiGroupMember): boolean {
-  if (!props.showBlockAction)
-    return false
-  if (member.userId === props.currentUserId)
-    return false
-  if (isMemberBlocked(props.groupId, member.userId))
-    return false
-  if (isOwner.value || isAdmin.value)
-    return true
-  return false
-}
-
-function canUnblock(member: UiGroupMember): boolean {
-  if (!props.showBlockAction)
-    return false
-  if (!isMemberBlocked(props.groupId, member.userId))
-    return false
-  if (isOwner.value || isAdmin.value)
-    return true
-  return false
-}
-
-function roleClass(role?: string): string {
-  if (role === 'owner')
-    return 'group-member-list__role--owner'
-  if (role === 'admin')
-    return 'group-member-list__role--admin'
-  return ''
-}
-
-function roleLabel(role?: string): string {
-  if (role === 'owner')
-    return t('group.memberList.owner') || '群主'
-  if (role === 'admin')
-    return t('group.memberList.admin') || '管理员'
-  return t('group.memberList.member') || '成员'
-}
-
-function displayName(member: UiGroupMember): string {
-  return member.nickname || member.userId
-}
-
-function onMemberClick(member: UiGroupMember) {
-  emit('click-member', member)
-}
-
-function onChat(member: UiGroupMember) {
-  emit('chat-member', member)
-}
-
-function onRemove(member: UiGroupMember) {
-  emit('remove-member', member)
-}
-
-function onSetAdmin(member: UiGroupMember) {
-  emit('set-admin', member)
-}
-
-function onRemoveAdmin(member: UiGroupMember) {
-  emit('remove-admin', member)
-}
-
-function onMute(member: UiGroupMember) {
-  emit('mute-member', member)
-}
-
-function onUnmute(member: UiGroupMember) {
-  emit('unmute-member', member)
-}
-
-function onBlock(member: UiGroupMember) {
-  emit('block-member', member)
-}
-
-function onUnblock(member: UiGroupMember) {
-  emit('unblock-member', member)
-}
-
-function setMoreTriggerRef(userId: string, el: HTMLElement | null) {
-  if (el)
-    moreMenuTriggerRefs.value[userId] = el
-}
-
-function openMoreMenu(member: UiGroupMember) {
-  activeMoreMenuMemberId.value = member.userId
-}
-
-function closeMoreMenu() {
-  activeMoreMenuMemberId.value = null
-}
-
-interface MoreAction {
-  key: string
-  label: string
-  danger?: boolean
-}
-
-function getMoreActions(member: UiGroupMember): MoreAction[] {
-  const actions: MoreAction[] = []
-  if (canMute(member))
-    actions.push({ key: 'mute', label: t('group.memberList.mute') || '禁言' })
-  if (canUnmute(member))
-    actions.push({ key: 'unmute', label: t('group.memberList.unmute') || '取消禁言' })
-  if (canBlock(member))
-    actions.push({ key: 'block', label: t('group.memberList.block') || '拉黑' })
-  if (canUnblock(member))
-    actions.push({ key: 'unblock', label: t('group.memberList.unblock') || '取消拉黑' })
-  if (props.showAdminAction && canSetAdmin(member))
-    actions.push({ key: 'setAdmin', label: t('group.memberList.setAdmin') || '设管理员' })
-  if (props.showAdminAction && canRemoveAdmin(member))
-    actions.push({ key: 'removeAdmin', label: t('group.memberList.removeAdmin') || '取消管理员' })
-  if (props.showRemoveAction && canRemove(member))
-    actions.push({ key: 'remove', label: t('group.memberList.remove') || '移除', danger: true })
-  return actions
-}
-
-function onMoreActionClick(member: UiGroupMember, actionKey: string) {
-  closeMoreMenu()
-  switch (actionKey) {
-    case 'mute':
-      onMute(member)
-      break
-    case 'unmute':
-      onUnmute(member)
-      break
-    case 'block':
-      onBlock(member)
-      break
-    case 'unblock':
-      onUnblock(member)
-      break
-    case 'setAdmin':
-      onSetAdmin(member)
-      break
-    case 'removeAdmin':
-      onRemoveAdmin(member)
-      break
-    case 'remove':
-      onRemove(member)
-      break
-  }
-}
 
 function clearSearch() {
   searchKeyword.value = ''
@@ -496,107 +272,30 @@ defineExpose({ refresh, removeMember, setMemberRole })
       </div>
 
       <template v-else>
-        <Cell
+        <GroupMemberListItem
           v-for="member in filteredMembers"
           :key="member.userId"
-          class="group-member-list__item"
-          auto-height
-          :clickable="false"
-          :data-member-id="member.userId"
-          @click="onMemberClick(member)"
-        >
-          <template #leading>
-            <Avatar
-              :name="displayName(member)"
-              :src="member.avatarUrl"
-              :size="40"
-              :presence="getMemberPresence(member.userId)"
-            />
-          </template>
-
-          <template #default>
-            <div class="group-member-list__info">
-              <div class="group-member-list__name-row">
-                <span class="group-member-list__name">{{ displayName(member) }}</span>
-                <span
-                  v-if="member.role !== 'member'"
-                  class="group-member-list__role"
-                  :class="roleClass(member.role)"
-                >
-                  {{ roleLabel(member.role) }}
-                </span>
-                <span
-                  v-if="isMemberMuted(props.groupId, member.userId)"
-                  class="group-member-list__status-tag group-member-list__status-tag--muted"
-                >
-                  {{ t('group.memberList.muted') || '禁言中' }}
-                </span>
-                <span
-                  v-if="isMemberBlocked(props.groupId, member.userId)"
-                  class="group-member-list__status-tag group-member-list__status-tag--blocked"
-                >
-                  {{ t('group.memberList.blocked') || '已拉黑' }}
-                </span>
-                <span
-                  v-if="isMemberInAllowlist(props.groupId, member.userId)"
-                  class="group-member-list__status-tag group-member-list__status-tag--allowlist"
-                >
-                  {{ t('group.memberList.inAllowlist') || '白名单' }}
-                </span>
-              </div>
-              <div class="group-member-list__id">
-                ID: {{ member.userId }}
-              </div>
-            </div>
-          </template>
-
-          <template #trailing>
-            <div class="group-member-list__actions" @click.stop>
-              <button
-                v-if="canChat(member)"
-                class="group-member-list__action-btn"
-                @click="onChat(member)"
-              >
-                {{ t('group.memberList.chat') || '发消息' }}
-              </button>
-
-              <div
-                v-if="getMoreActions(member).length > 0"
-                :ref="(el) => setMoreTriggerRef(member.userId, el as HTMLElement)"
-                class="group-member-list__more"
-              >
-                <button
-                  class="group-member-list__action-btn group-member-list__action-btn--icon"
-                  @click.stop="openMoreMenu(member)"
-                >
-                  <Icon name="actions/ellipsis_vertical" :size="16" />
-                </button>
-                <Popup
-                  :show="activeMoreMenuMemberId === member.userId"
-                  :anchor="moreMenuTriggerRefs[member.userId]"
-                  placement="bottom"
-                  :overlay="false"
-                  :close-on-click-overlay="true"
-                  group="group-member-more-menu"
-                  @update:show="closeMoreMenu"
-                  @close="closeMoreMenu"
-                >
-                  <div class="group-member-list__context-menu">
-                    <div
-                      v-for="action in getMoreActions(member)"
-                      :key="action.key"
-                      class="group-member-list__context-menu-item"
-                      :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
-                      @click.stop="onMoreActionClick(member, action.key)"
-                    >
-                      {{ action.label }}
-                    </div>
-                  </div>
-                </Popup>
-              </div>
-            </div>
-          </template>
-        </Cell>
+          :member="member"
+          :group-id="props.groupId"
+          :current-user-id="props.currentUserId"
+          :current-user-role="currentUserRole"
+          :show-mute-action="props.showMuteAction"
+          :show-block-action="props.showBlockAction"
+          :show-admin-action="props.showAdminAction"
+          :show-remove-action="props.showRemoveAction"
+          :show-chat-action="props.showChatAction"
+          :allow-chat="props.allowChat"
+          :presence="getMemberPresence(member.userId)"
+          @click-member="emit('click-member', $event)"
+          @chat-member="emit('chat-member', $event)"
+          @remove-member="emit('remove-member', $event)"
+          @set-admin="emit('set-admin', $event)"
+          @remove-admin="emit('remove-admin', $event)"
+          @mute-member="emit('mute-member', $event)"
+          @unmute-member="emit('unmute-member', $event)"
+          @block-member="emit('block-member', $event)"
+          @unblock-member="emit('unblock-member', $event)"
+        />
 
         <!-- 加载更多 -->
         <div v-if="localHasMore || loadingMore" class="group-member-list__load-more">
@@ -695,129 +394,6 @@ defineExpose({ refresh, removeMember, setMemberRole })
   min-height: 0;
 }
 
-.group-member-list__item:hover .group-member-list__actions {
-  opacity: 1;
-}
-
-.group-member-list__info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.group-member-list__name-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.group-member-list__name {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.group-member-list__role {
-  font-size: 10px;
-  padding: 1px 5px;
-  border-radius: 4px;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
-.group-member-list__role--owner {
-  background-color: #fef3c7;
-  color: #d97706;
-}
-
-.group-member-list__role--admin {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-.group-member-list__status-tag {
-  font-size: 10px;
-  padding: 1px 5px;
-  border-radius: 4px;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
-.group-member-list__status-tag--muted {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.group-member-list__status-tag--blocked {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.group-member-list__status-tag--allowlist {
-  background-color: #d1fae5;
-  color: #059669;
-}
-
-.group-member-list__id {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-}
-
-.group-member-list__actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.group-member-list__item:hover .group-member-list__actions {
-  opacity: 1;
-}
-
-.group-member-list__action-btn {
-  padding: 5px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.group-member-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.group-member-list__action-btn--danger {
-  border-color: #fecaca;
-  color: #ef4444;
-}
-
-.group-member-list__action-btn--danger:hover {
-  background-color: #fef2f2;
-}
-
-.group-member-list__action-btn--icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-}
-
-.group-member-list__more {
-  position: relative;
-  display: inline-flex;
-}
-
 .group-member-list__load-more,
 .group-member-list__no-more,
 .group-member-list__empty {
@@ -851,41 +427,5 @@ defineExpose({ refresh, removeMember, setMemberRole })
 
 .group-member-list__load-more-btn:hover {
   opacity: 0.8;
-}
-
-@media (max-width: 480px) {
-  .group-member-list__actions {
-    opacity: 1;
-  }
-}
-
-/* 更多操作菜单 */
-.group-member-list__context-menu {
-  display: flex;
-  flex-direction: column;
-  background: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
-  min-width: 120px;
-  padding: 6px;
-}
-
-.group-member-list__context-menu-item {
-  padding: 10px 12px;
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  white-space: nowrap;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.group-member-list__context-menu-item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
-
-.group-member-list__context-menu-item--danger {
-  color: #ef4444;
 }
 </style>

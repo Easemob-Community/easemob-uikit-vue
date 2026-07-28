@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import Avatar from '../../../components/avatar/avatar.vue'
 import Popup from '../../../components/popup/popup.vue'
-import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import type { UiGroupMember } from '../../../sdk/types'
+import BlockListItem from './block-list-item.vue'
+import BlockListSelectItem from './block-list-select-item.vue'
 
 export interface BlockListProps {
   groupId: string
@@ -36,7 +36,10 @@ const loadingMembers = ref(false)
 const groupMembers = ref<UiGroupMember[]>([])
 const selectedUserIds = ref<Set<string>>(new Set())
 
-const blockedUserIds = computed(() => new Set(members.value.map(m => userId(m)).filter(Boolean)))
+const blockedUserIds = computed(() => new Set(members.value.map((m) => {
+  const user = m.user || m
+  return user?.userId || ''
+}).filter(Boolean)))
 
 async function loadData() {
   if (!props.groupId)
@@ -56,25 +59,15 @@ async function loadData() {
 
 watch(() => props.groupId, loadData, { immediate: true })
 
-function displayName(item: any): string {
-  const user = item.user || item
-  return user?.nickname || user?.userId || ''
-}
-
-function userId(item: any): string {
-  const user = item.user || item
-  return user?.userId || ''
-}
-
-function memberDisplayName(member: UiGroupMember): string {
-  return member.nickname || member.userId || ''
-}
-
 async function onUnblock(item: any) {
-  const uid = userId(item)
+  const user = item.user || item
+  const uid = user?.userId || ''
   try {
     await unblockGroupMembers(props.groupId, [uid])
-    members.value = members.value.filter((m: any) => userId(m) !== uid)
+    members.value = members.value.filter((m: any) => {
+      const u = m.user || m
+      return (u?.userId || '') !== uid
+    })
     emit('unblock', { userId: uid })
   }
   catch (err) {
@@ -105,7 +98,7 @@ async function loadGroupMembers() {
 }
 
 const selectableMembers = computed(() => {
-  return groupMembers.value.filter(m => !blockedUserIds.value.has(m.userId))
+  return groupMembers.value.filter(m => !blockedUserIds.value.has(m.userId) && m.role !== 'owner')
 })
 
 function toggleSelect(member: UiGroupMember) {
@@ -153,23 +146,12 @@ defineExpose({
     <div v-else-if="members.length === 0" class="block-list__empty">
       {{ t('group.memberList.empty') || '暂无黑名单成员' }}
     </div>
-    <Cell
+    <BlockListItem
       v-for="item in members"
-      :key="userId(item)"
-      class="block-list__item"
-      size="compact"
-      :title="displayName(item)"
-      :clickable="false"
-    >
-      <template #leading>
-        <Avatar :name="displayName(item)" :size="36" />
-      </template>
-      <template #trailing>
-        <button class="block-list__action-btn" @click.stop="onUnblock(item)">
-          {{ t('group.memberList.unblock') || '移出黑名单' }}
-        </button>
-      </template>
-    </Cell>
+      :key="(item.user || item)?.userId || ''"
+      :item="item"
+      @unblock="onUnblock(item)"
+    />
 
     <Popup
       v-model:show="showAddPopup"
@@ -177,7 +159,7 @@ defineExpose({
       :close-on-click-overlay="true"
       @close="closeAddPopup"
     >
-      <div class="block-list__popup" @pointerdown.stop>
+      <div class="block-list__popup" @pointerdown.stop @click.stop>
         <div class="block-list__popup-header">
           <span class="block-list__popup-title">{{ t('group.blocklist.addTitle') || '添加黑名单成员' }}</span>
         </div>
@@ -188,25 +170,13 @@ defineExpose({
           <div v-else-if="selectableMembers.length === 0" class="block-list__popup-status">
             {{ t('group.blocklist.emptySelectable') || '暂无可添加的成员' }}
           </div>
-          <Cell
+          <BlockListSelectItem
             v-for="member in selectableMembers"
             :key="member.userId"
-            class="block-list__popup-item"
-            size="compact"
-            :title="memberDisplayName(member)"
+            :member="member"
             :selected="selectedUserIds.has(member.userId)"
-            @click="toggleSelect(member)"
-          >
-            <template #leading>
-              <Avatar :name="memberDisplayName(member)" :size="36" />
-            </template>
-            <template #trailing>
-              <span
-                class="block-list__popup-checkbox"
-                :class="{ 'block-list__popup-checkbox--checked': selectedUserIds.has(member.userId) }"
-              />
-            </template>
-          </Cell>
+            @toggle="toggleSelect(member)"
+          />
         </div>
         <div class="block-list__popup-footer">
           <button class="block-list__popup-btn block-list__popup-btn--cancel" @click="closeAddPopup">
@@ -235,22 +205,6 @@ defineExpose({
   padding: 16px;
   font-size: 14px;
   color: var(--uikit-text-secondary);
-}
-.block-list__item {
-  --uikit-item-hover-padding-x: 16px;
-}
-.block-list__action-btn {
-  padding: 4px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.block-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
 }
 
 .block-list__popup {
@@ -286,21 +240,6 @@ defineExpose({
   padding: 24px 16px;
   font-size: 14px;
   color: var(--uikit-text-secondary);
-}
-.block-list__popup-item {
-  --uikit-item-hover-padding-x: 16px;
-}
-.block-list__popup-checkbox {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-border-color, #d1d5db);
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-.block-list__popup-checkbox--checked {
-  border-color: var(--uikit-primary-color);
-  background-color: var(--uikit-primary-color);
 }
 .block-list__popup-footer {
   display: flex;
