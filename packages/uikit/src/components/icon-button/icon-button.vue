@@ -7,6 +7,8 @@ export interface IconButtonProps {
   iconSize?: number
   /** 按钮语义类型 */
   type?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
+  /** 视觉变体：solid 实心填充 / outline 描边 / ghost 透明 */
+  variant?: 'solid' | 'outline' | 'ghost'
   size?: 'small' | 'medium'
   disabled?: boolean
   /** hover/tooltip 提示 */
@@ -18,8 +20,9 @@ export interface IconButtonEmits {
 }
 
 const props = withDefaults(defineProps<IconButtonProps>(), {
-  iconSize: 18,
+  iconSize: undefined,
   type: 'default',
+  variant: 'solid',
   size: 'medium',
   disabled: false,
 })
@@ -37,13 +40,14 @@ function handleClick(event: MouseEvent) {
     class="uikit-icon-button"
     :class="[
       `uikit-icon-button--${props.type}`,
+      `uikit-icon-button--${props.variant}`,
       `uikit-icon-button--${props.size}`,
     ]"
     :disabled="props.disabled"
     :title="props.title"
     @click="handleClick"
   >
-    <EmIcon :name="props.icon" :size="props.iconSize" />
+    <EmIcon :name="props.icon" :size="props.iconSize ?? (props.size === 'small' ? 14 : 16)" />
   </button>
 </template>
 
@@ -52,20 +56,17 @@ function handleClick(event: MouseEvent) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--uikit-components-radius, 8px);
   background: transparent;
-  color: var(--uikit-text-secondary);
   cursor: pointer;
   transition: background-color 0.15s var(--uikit-anim-easing, ease),
               color 0.15s var(--uikit-anim-easing, ease),
+              border-color 0.15s var(--uikit-anim-easing, ease),
               opacity 0.15s var(--uikit-anim-easing, ease),
               transform 0.1s var(--uikit-anim-easing, ease);
   flex-shrink: 0;
-}
-
-.uikit-icon-button:hover:not(:disabled) {
-  background-color: var(--uikit-bg-secondary);
+  box-sizing: border-box;
 }
 
 .uikit-icon-button:active:not(:disabled) {
@@ -78,8 +79,8 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--small {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
 }
 
 .uikit-icon-button--medium {
@@ -87,19 +88,150 @@ function handleClick(event: MouseEvent) {
   height: 32px;
 }
 
-.uikit-icon-button--primary {
+/* ---------- solid ---------- */
+.uikit-icon-button--default.uikit-icon-button--solid {
+  background-color: var(--uikit-bg-base);
+  border-color: var(--uikit-border-color, #e5e7eb);
+  color: var(--uikit-text-secondary);
+}
+
+.uikit-icon-button--default.uikit-icon-button--solid:hover:not(:disabled) {
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-primary);
+}
+
+.uikit-icon-button--primary.uikit-icon-button--solid {
+  background-color: var(--uikit-primary-color);
+  color: #ffffff;
+}
+
+.uikit-icon-button--primary.uikit-icon-button--solid:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.uikit-icon-button--success.uikit-icon-button--solid {
+  background-color: var(--uikit-success-color);
+  color: #ffffff;
+}
+
+.uikit-icon-button--success.uikit-icon-button--solid:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.uikit-icon-button--warning.uikit-icon-button--solid {
+  background-color: var(--uikit-warning-color);
+  color: #ffffff;
+}
+
+.uikit-icon-button--warning.uikit-icon-button--solid:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.uikit-icon-button--danger.uikit-icon-button--solid {
+  background-color: var(--uikit-danger-color);
+  color: #ffffff;
+}
+
+.uikit-icon-button--danger.uikit-icon-button--solid:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* ---------- outline ---------- */
+.uikit-icon-button--default.uikit-icon-button--outline {
+  background-color: transparent;
+  border-color: var(--uikit-border-color, #e5e7eb);
+  color: var(--uikit-text-secondary);
+}
+
+.uikit-icon-button--default.uikit-icon-button--outline:hover:not(:disabled) {
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-primary);
+}
+
+.uikit-icon-button--primary.uikit-icon-button--outline {
+  background-color: transparent;
+  border-color: var(--uikit-primary-color);
   color: var(--uikit-primary-color);
 }
 
-.uikit-icon-button--success {
+.uikit-icon-button--primary.uikit-icon-button--outline:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-primary-rgb), 0.08);
+}
+
+.uikit-icon-button--success.uikit-icon-button--outline {
+  background-color: transparent;
+  border-color: var(--uikit-success-color);
   color: var(--uikit-success-color);
 }
 
-.uikit-icon-button--warning {
+.uikit-icon-button--success.uikit-icon-button--outline:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-success-rgb, 34 197 94), 0.08);
+}
+
+.uikit-icon-button--warning.uikit-icon-button--outline {
+  background-color: transparent;
+  border-color: var(--uikit-warning-color);
   color: var(--uikit-warning-color);
 }
 
-.uikit-icon-button--danger {
+.uikit-icon-button--warning.uikit-icon-button--outline:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-warning-rgb, 251 191 36), 0.08);
+}
+
+.uikit-icon-button--danger.uikit-icon-button--outline {
+  background-color: transparent;
+  border-color: var(--uikit-danger-color);
   color: var(--uikit-danger-color);
+}
+
+.uikit-icon-button--danger.uikit-icon-button--outline:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-danger-rgb, 239 68 68), 0.08);
+}
+
+/* ---------- ghost ---------- */
+.uikit-icon-button--ghost {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.uikit-icon-button--default.uikit-icon-button--ghost {
+  color: var(--uikit-text-secondary);
+}
+
+.uikit-icon-button--default.uikit-icon-button--ghost:hover:not(:disabled) {
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-primary);
+}
+
+.uikit-icon-button--primary.uikit-icon-button--ghost {
+  color: var(--uikit-primary-color);
+}
+
+.uikit-icon-button--primary.uikit-icon-button--ghost:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-primary-rgb), 0.08);
+}
+
+.uikit-icon-button--success.uikit-icon-button--ghost {
+  color: var(--uikit-success-color);
+}
+
+.uikit-icon-button--success.uikit-icon-button--ghost:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-success-rgb, 34 197 94), 0.08);
+}
+
+.uikit-icon-button--warning.uikit-icon-button--ghost {
+  color: var(--uikit-warning-color);
+}
+
+.uikit-icon-button--warning.uikit-icon-button--ghost:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-warning-rgb, 251 191 36), 0.08);
+}
+
+.uikit-icon-button--danger.uikit-icon-button--ghost {
+  color: var(--uikit-danger-color);
+}
+
+.uikit-icon-button--danger.uikit-icon-button--ghost:hover:not(:disabled) {
+  background-color: rgba(var(--uikit-danger-rgb, 239 68 68), 0.08);
 }
 </style>
