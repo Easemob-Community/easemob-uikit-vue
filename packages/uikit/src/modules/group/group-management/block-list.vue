@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
@@ -179,16 +180,20 @@ defineExpose({
           />
         </div>
         <div class="block-list__popup-footer">
-          <button class="block-list__popup-btn block-list__popup-btn--cancel" @click="closeAddPopup">
-            {{ t('group.blocklist.cancel') || '取消' }}
-          </button>
-          <button
-            class="block-list__popup-btn block-list__popup-btn--confirm"
+          <IconButton
+            icon="actions/xmark_thick"
+            size="small"
+            :title="t('group.blocklist.cancel') || '取消'"
+            @click="closeAddPopup"
+          />
+          <IconButton
+            icon="actions/check"
+            size="small"
+            type="success"
             :disabled="selectedUserIds.size === 0"
+            :title="t('group.blocklist.confirm') || '确定'"
             @click="onConfirmAdd"
-          >
-            {{ t('group.blocklist.confirm') || '确定' }}
-          </button>
+          />
         </div>
       </div>
     </Popup>
@@ -248,30 +253,5 @@ defineExpose({
   gap: 12px;
   padding: 12px 16px;
   border-top: 1px solid var(--uikit-border-color, #f3f4f6);
-}
-.block-list__popup-btn {
-  padding: 6px 16px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.block-list__popup-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-.block-list__popup-btn--confirm {
-  border-color: var(--uikit-primary-color);
-  background-color: var(--uikit-primary-color);
-  color: #ffffff;
-}
-.block-list__popup-btn--confirm:hover:not(:disabled) {
-  opacity: 0.9;
-}
-.block-list__popup-btn--confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

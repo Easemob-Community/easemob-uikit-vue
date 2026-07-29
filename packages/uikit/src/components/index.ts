@@ -1,6 +1,7 @@
 // Base UI Components
 // 对外统一使用 Em 前缀，避免与业务方组件命名冲突
 export { default as EmButton } from './button/button.vue'
+export { default as EmIconButton } from './icon-button/icon-button.vue'
 export { default as EmAvatar } from './avatar/avatar.vue'
 export { default as EmBadge } from './badge/badge.vue'
 export { default as EmIcon } from './icon/icon.vue'
@@ -24,6 +25,7 @@ export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
   'em-button',
+  'em-icon-button',
   'em-avatar',
   'em-badge',
   'em-icon',

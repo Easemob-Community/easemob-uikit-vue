@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import type { UiGroup } from '../../sdk/types'
 import GroupCard from '../../components/group-card/group-card.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -164,12 +165,13 @@ function onCardAction(key: string) {
         <template v-if="isOwner" #name>
           <template v-if="!isEditingName">
             <span>{{ displayName }}</span>
-            <button
-              class="group-detail__edit-btn"
+            <IconButton
+              icon="actions/edit"
+              size="small"
+              type="primary"
+              :title="t('chat.info.edit') || '编辑'"
               @click="startEditName"
-            >
-              <span class="group-detail__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
-            </button>
+            />
           </template>
           <div v-else class="group-detail__edit-row">
             <input
@@ -178,13 +180,15 @@ function onCardAction(key: string) {
               class="group-detail__edit-input"
               @keydown.enter="saveName"
             >
-            <button
+            <IconButton
               class="group-detail__edit-save"
+              icon="actions/check"
+              size="small"
+              type="success"
               :disabled="savingName"
+              :title="t('chat.info.save') || '保存'"
               @click="saveName"
-            >
-              {{ savingName ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-            </button>
+            />
           </div>
         </template>
       </GroupCard>
@@ -227,27 +231,6 @@ function onCardAction(key: string) {
 }
 
 /* 群名称编辑 */
-.group-detail__edit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px;
-  margin-left: 6px;
-  border: none;
-  border-radius: var(--uikit-components-radius, 6px);
-  background: none;
-  color: var(--uikit-primary-color);
-  font-size: 12px;
-  cursor: pointer;
-  vertical-align: middle;
-  white-space: nowrap;
-  transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
-}
-
-.group-detail__edit-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
 .group-detail__edit-row {
   display: flex;
   gap: 8px;
@@ -268,17 +251,5 @@ function onCardAction(key: string) {
 
 .group-detail__edit-save {
   flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: none;
-  background-color: var(--uikit-primary-color);
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.group-detail__edit-save:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 </style>

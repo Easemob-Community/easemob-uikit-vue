@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { UserInfo, UserInfoAttribute } from 'easemob-websdk'
 import { onClickOutside } from '@vueuse/core'
 import Button from '../../components/button/button.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCard from '../../components/user-card/user-card.vue'
 import PresenceSelectorModal from '../../components/presence-selector/presence-selector-modal.vue'
@@ -327,18 +328,29 @@ function onPresenceSelectorClose() {
                 @keyup.enter="saveRemark"
                 @keyup.esc="cancelEditRemark"
               >
-              <Button type="primary" size="small" @click="saveRemark">
-                {{ t('button.confirm') || '确认' }}
-              </Button>
-              <Button type="default" size="small" @click="cancelEditRemark">
-                {{ t('button.cancel') || '取消' }}
-              </Button>
+              <IconButton
+                icon="actions/check"
+                size="small"
+                type="success"
+                :title="t('button.confirm') || '确认'"
+                @click="saveRemark"
+              />
+              <IconButton
+                icon="actions/xmark_thick"
+                size="small"
+                :title="t('button.cancel') || '取消'"
+                @click="cancelEditRemark"
+              />
             </div>
             <template v-else>
               <span class="contact-detail__value">{{ remark || '-' }}</span>
-              <button class="contact-detail__edit-btn" @click="startEditRemark">
-                {{ t('contact.detail.edit') || '编辑' }}
-              </button>
+              <IconButton
+                icon="actions/edit"
+                size="small"
+                type="primary"
+                :title="t('contact.detail.edit') || '编辑'"
+                @click="startEditRemark"
+              />
             </template>
           </div>
 
@@ -459,8 +471,8 @@ function onPresenceSelectorClose() {
     flex: 1 1 100%;
   }
 
-  .contact-detail__remark-edit :deep(.uikit-button) {
-    flex: 1;
+  .contact-detail__remark-edit :deep(.uikit-icon-button) {
+    flex-shrink: 0;
   }
 }
 
@@ -479,15 +491,6 @@ function onPresenceSelectorClose() {
 
 .contact-detail__remark-input:focus {
   border-color: var(--uikit-primary-color, #3b82f6);
-}
-
-.contact-detail__edit-btn {
-  padding: 4px 8px;
-  font-size: 13px;
-  color: var(--uikit-primary-color, #3b82f6);
-  background: transparent;
-  border: none;
-  cursor: pointer;
 }
 
 @media (max-width: 640px) {

@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
 import Cell from '../../../components/cell/cell.vue'
 import { useThemeStore } from '../../../store/theme'
@@ -623,13 +624,14 @@ defineExpose({
           <div v-if="isGroup" class="chat-info-drawer__name-row">
             <template v-if="!isEditingGroupName">
               <span class="chat-info-drawer__name">{{ displayName }}</span>
-              <button
+              <IconButton
                 v-if="isOwner"
-                class="chat-info-drawer__inline-edit-btn"
+                icon="actions/edit"
+                size="small"
+                type="primary"
+                :title="t('chat.info.edit') || '编辑'"
                 @click="isEditingGroupName = true"
-              >
-                <span class="chat-info-drawer__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
-              </button>
+              />
             </template>
             <div v-else class="chat-info-drawer__inline-edit">
               <input
@@ -639,13 +641,15 @@ defineExpose({
                 :placeholder="displayName"
                 @keydown.enter="saveGroupName"
               >
-              <button
+              <IconButton
                 class="chat-info-drawer__inline-save"
+                icon="actions/check"
+                size="small"
+                type="success"
                 :disabled="savingGroupName"
+                :title="t('chat.info.save') || '保存'"
                 @click="saveGroupName"
-              >
-                {{ savingGroupName ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-              </button>
+              />
             </div>
           </div>
           <!-- 单聊：仅展示名称 -->
@@ -664,7 +668,13 @@ defineExpose({
           </div>
           <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
             <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
-            <span class="chat-info-drawer__edit-label">{{ t('chat.info.edit') || '编辑' }}</span>
+            <IconButton
+              icon="actions/edit"
+              size="small"
+              type="primary"
+              :title="t('chat.info.edit') || '编辑'"
+              @click.stop="isEditingRemark = true"
+            />
           </div>
           <div v-else class="chat-info-drawer__remark-edit">
             <input
@@ -674,13 +684,15 @@ defineExpose({
               :placeholder="t('chat.info.remarkInputPlaceholder')"
               @keydown.enter="saveRemark"
             >
-            <button
+            <IconButton
               class="chat-info-drawer__remark-save"
+              icon="actions/check"
+              size="small"
+              type="success"
               :disabled="savingRemark"
+              :title="t('chat.info.save') || '保存'"
               @click="saveRemark"
-            >
-              {{ savingRemark ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-            </button>
+            />
           </div>
         </div>
 
@@ -688,13 +700,14 @@ defineExpose({
         <div v-if="isGroup" class="chat-info-drawer__section">
           <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
             <span>{{ t('chat.info.groupAnnouncement') }}</span>
-            <button
+            <IconButton
               v-if="isAdminOrOwner && !isEditingAnnouncement"
-              class="chat-info-drawer__text-btn"
+              icon="actions/edit"
+              size="small"
+              type="primary"
+              :title="t('chat.info.edit') || '编辑'"
               @click="isEditingAnnouncement = true"
-            >
-              {{ t('chat.info.edit') || '编辑' }}
-            </button>
+            />
           </div>
           <template v-if="!isEditingAnnouncement">
             <div class="chat-info-drawer__announcement">
@@ -712,19 +725,21 @@ defineExpose({
               rows="3"
             />
             <div class="chat-info-drawer__inline-edit-actions">
-              <button
-                class="chat-info-drawer__inline-cancel"
+              <IconButton
+                icon="actions/xmark_thick"
+                size="small"
+                :title="t('button.cancel') || '取消'"
                 @click="isEditingAnnouncement = false"
-              >
-                {{ t('button.cancel') || '取消' }}
-              </button>
-              <button
+              />
+              <IconButton
                 class="chat-info-drawer__inline-save"
+                icon="actions/check"
+                size="small"
+                type="success"
                 :disabled="savingAnnouncement"
+                :title="t('chat.info.save') || '保存'"
                 @click="saveAnnouncement"
-              >
-                {{ savingAnnouncement ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -733,13 +748,14 @@ defineExpose({
         <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__section">
           <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
             <span>{{ t('chat.info.groupDescription') }}</span>
-            <button
+            <IconButton
               v-if="isOwner && !isEditingDescription"
-              class="chat-info-drawer__text-btn"
+              icon="actions/edit"
+              size="small"
+              type="primary"
+              :title="t('chat.info.edit') || '编辑'"
               @click="isEditingDescription = true"
-            >
-              {{ t('chat.info.edit') || '编辑' }}
-            </button>
+            />
           </div>
           <template v-if="!isEditingDescription">
             <div v-if="group?.description" class="chat-info-drawer__description">
@@ -758,19 +774,21 @@ defineExpose({
               rows="3"
             />
             <div class="chat-info-drawer__inline-edit-actions">
-              <button
-                class="chat-info-drawer__inline-cancel"
+              <IconButton
+                icon="actions/xmark_thick"
+                size="small"
+                :title="t('button.cancel') || '取消'"
                 @click="isEditingDescription = false"
-              >
-                {{ t('button.cancel') || '取消' }}
-              </button>
-              <button
+              />
+              <IconButton
                 class="chat-info-drawer__inline-save"
+                icon="actions/check"
+                size="small"
+                type="success"
                 :disabled="savingDescription"
+                :title="t('chat.info.save') || '保存'"
                 @click="saveDescription"
-              >
-                {{ savingDescription ? t('chat.info.saving') || '保存中...' : t('chat.info.save') }}
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -779,10 +797,14 @@ defineExpose({
         <div v-if="isGroup" class="chat-info-drawer__section">
           <div class="chat-info-drawer__section-title chat-info-drawer__section-title--row">
             <span>{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
-            <button v-if="canAddMember" class="chat-info-drawer__text-btn" @click="onAddMember">
-              <Icon name="actions/plus" :size="14" />
-              {{ t('chat.info.addMember') }}
-            </button>
+            <IconButton
+              v-if="canAddMember"
+              icon="actions/plus"
+              size="small"
+              type="primary"
+              :title="t('chat.info.addMember')"
+              @click="onAddMember"
+            />
           </div>
           <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
             <ChatInfoDrawerMemberCell
@@ -1000,12 +1022,6 @@ defineExpose({
   cursor: pointer;
 }
 
-.chat-info-drawer__edit-label {
-  font-size: 12px;
-  color: var(--uikit-primary-color);
-  white-space: nowrap;
-}
-
 .chat-info-drawer__remark-edit {
   display: flex;
   gap: 8px;
@@ -1026,46 +1042,12 @@ defineExpose({
   border-color: var(--uikit-primary-color);
 }
 
-.chat-info-drawer__remark-save {
-  padding: 8px 16px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: none;
-  background-color: var(--uikit-primary-color);
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.chat-info-drawer__remark-save:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 /* 群信息内联编辑 */
 .chat-info-drawer__name-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.chat-info-drawer__inline-edit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 6px;
-  border: none;
-  border-radius: var(--uikit-components-radius, 4px);
-  background: none;
-  color: var(--uikit-primary-color);
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.chat-info-drawer__inline-edit-btn:hover {
-  background-color: var(--uikit-bg-secondary);
 }
 
 .chat-info-drawer__inline-edit {
@@ -1113,35 +1095,6 @@ defineExpose({
   gap: 8px;
 }
 
-.chat-info-drawer__inline-save {
-  padding: 6px 14px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: none;
-  background-color: var(--uikit-primary-color);
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.chat-info-drawer__inline-save:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.chat-info-drawer__inline-cancel {
-  padding: 6px 14px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.chat-info-drawer__inline-cancel:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
 .chat-info-drawer__announcement,
 .chat-info-drawer__description {
   font-size: 14px;
@@ -1176,25 +1129,6 @@ defineExpose({
 }
 
 .chat-info-drawer__view-all:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.chat-info-drawer__text-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  color: var(--uikit-primary-color);
-  font-size: 13px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 4px;
-}
-
-.chat-info-drawer__text-btn:hover {
   background-color: var(--uikit-bg-secondary);
 }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import Icon from '../../components/icon/icon.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
@@ -228,20 +229,22 @@ function closeDrawer() {
             <Icon name="arrows/arrowto" :size="16" />
           </button>
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
-          <button
+          <IconButton
             v-if="activeDrawerKey === 'files'"
-            class="group-management-section__action-text"
+            icon="arrows/arrow_up_n_box"
+            size="small"
+            type="primary"
+            :title="t('group.sharedFile.uploadText') || '上传'"
             @click="sharedFileListRef?.triggerUpload()"
-          >
-            {{ t('group.sharedFile.uploadText') || '上传' }}
-          </button>
-          <button
+          />
+          <IconButton
             v-else-if="activeDrawerKey === 'block'"
-            class="group-management-section__action-text"
+            icon="actions/plus"
+            size="small"
+            type="primary"
+            :title="t('group.blocklist.add') || '添加'"
             @click="blockListRef?.openAddMember()"
-          >
-            {{ t('group.blocklist.add') || '添加' }}
-          </button>
+          />
           <span v-else class="group-management-section__drawer-placeholder" />
         </div>
       </template>
@@ -293,20 +296,22 @@ function closeDrawer() {
             <Icon name="arrows/arrowto" :size="16" />
           </button>
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
-          <button
+          <IconButton
             v-if="activeDrawerKey === 'files'"
-            class="group-management-section__action-text"
+            icon="arrows/arrow_up_n_box"
+            size="small"
+            type="primary"
+            :title="t('group.sharedFile.uploadText') || '上传'"
             @click="sharedFileListRef?.triggerUpload()"
-          >
-            {{ t('group.sharedFile.uploadText') || '上传' }}
-          </button>
-          <button
+          />
+          <IconButton
             v-else-if="activeDrawerKey === 'block'"
-            class="group-management-section__action-text"
+            icon="actions/plus"
+            size="small"
+            type="primary"
+            :title="t('group.blocklist.add') || '添加'"
             @click="blockListRef?.openAddMember()"
-          >
-            {{ t('group.blocklist.add') || '添加' }}
-          </button>
+          />
           <span v-else class="group-management-section__drawer-placeholder" />
         </div>
         <div class="group-management-section__drawer-body">
@@ -448,22 +453,6 @@ function closeDrawer() {
 
 .group-management-section__drawer-placeholder {
   width: 32px;
-}
-
-.group-management-section__action-text {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: var(--uikit-primary-color);
-  font-size: 14px;
-  cursor: pointer;
-  min-width: 32px;
-  text-align: right;
-}
-
-.group-management-section__action-text:hover {
-  opacity: 0.8;
 }
 
 .group-management-section__drawer-body {

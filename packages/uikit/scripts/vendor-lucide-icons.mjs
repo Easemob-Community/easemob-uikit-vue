@@ -115,6 +115,7 @@ const ICON_MAP = {
  */
 const ADD_ICONS = {
   'actions/plus': 'plus', // cell.story.vue / chat-info-drawer.vue 已引用
+  'actions/edit': 'pencil', // 通用编辑按钮（chat-info-drawer / contact-detail）
   'arrows/arrow_right': 'arrow-right', // forward-modal.vue 已引用
   'people/person_single': 'user', // address-book-container.story.vue 已引用
   'people/member_group': 'users', // address-book-container.story.vue 已引用
