@@ -161,10 +161,12 @@ function onContextmenu(e: MouseEvent) {
   /* 水平方向保留内缩，垂直方向顶满 cell 高度，避免 hover 背景上下露出空白 */
   inset: 0 calc(var(--uikit-item-hover-padding-x, 16px) / 2);
   border-radius: var(--uikit-item-hover-radius, 0px);
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bg-hover);
   z-index: -1;
   opacity: 0;
-  transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  transition:
+    opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
+    background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   pointer-events: none;
 }
 
@@ -175,11 +177,17 @@ function onContextmenu(e: MouseEvent) {
 
 .uikit-cell.is-clickable:hover::before {
   opacity: 1;
+  background-color: var(--uikit-bg-hover);
 }
 
 .uikit-cell.is-active::before {
   opacity: 1;
   border-radius: var(--uikit-item-active-radius, 0px);
+  background-color: var(--uikit-bg-active);
+}
+
+.uikit-cell.is-active.is-clickable:hover::before {
+  background-color: var(--uikit-bg-active);
 }
 
 .uikit-cell.is-disabled {
