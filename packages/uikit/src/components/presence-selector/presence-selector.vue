@@ -73,8 +73,9 @@ function isActive(option: PresenceOption): boolean {
 }
 
 function onSelect(option: PresenceOption) {
+  // 立即更新选中态，避免等待 presence 事件回传期间自定义项仍被勾选
+  selectedKey.value = option.key
   if (option.key === 'custom') {
-    selectedKey.value = 'custom'
     return
   }
   emit('select', option.key, option.ext)
