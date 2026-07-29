@@ -46,7 +46,7 @@ const showModel = computed({
 async function onSelect(_status: string, ext: string) {
   try {
     await publishPresence(ext)
-    showModel.value = false
+    // 选择后保持 modal 开启，让用户看到已切换的状态；点击遮罩或关闭按钮再关闭
   }
   catch (err) {
     console.warn('[PresenceSelectorModal] publish failed:', err)
