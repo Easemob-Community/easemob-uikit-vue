@@ -507,7 +507,7 @@ defineExpose({
 }
 
 .group-list__search {
-  padding: 2px 18px 8px;
+  padding: 2px 0 8px;
 }
 
 .group-list__items {

@@ -138,6 +138,22 @@ defineExpose({
               background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+/* search/filled 变体：与列表 Cell 的 16px 水平内边距对齐 */
+.uikit-input--search .uikit-input__field,
+.uikit-input--filled .uikit-input__field {
+  padding: 8px 16px;
+}
+
+.uikit-input--search.uikit-input--with-prefix .uikit-input__field,
+.uikit-input--filled.uikit-input--with-prefix .uikit-input__field {
+  padding-left: 40px;
+}
+
+.uikit-input--search .uikit-input__prefix-icon,
+.uikit-input--filled .uikit-input__prefix-icon {
+  left: 16px;
+}
+
 .uikit-input__field--square {
   border-radius: 4px;
 }

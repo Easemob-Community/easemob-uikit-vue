@@ -129,8 +129,8 @@ function onSelect(conversation: Conversation) {
 }
 
 .forward-modal__search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
   flex-shrink: 0;
 }
 
