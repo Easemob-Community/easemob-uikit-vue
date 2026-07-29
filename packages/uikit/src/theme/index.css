@@ -1,7 +1,7 @@
 :root {
   --uikit-primary-color: hsl(203, 100%, 60%);
   --uikit-primary-color-opacity: hsla(203, 100%, 60%, 0.25);
-  --uikit-success-color: hsl(155, 100%, 60%);
+  --uikit-success-color: hsl(142, 76%, 36%);
   --uikit-warning-color: hsl(38, 100%, 60%);
   --uikit-danger-color: hsl(350, 100%, 60%);
   --uikit-info-color: hsl(203, 100%, 60%);
@@ -24,7 +24,7 @@
   --uikit-primary-rgb: 51, 177, 255;
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
-  --uikit-success-rgb: 51, 255, 178;
+  --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
 
@@ -121,7 +121,7 @@
   --uikit-primary-rgb: 51, 177, 255;
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
-  --uikit-success-rgb: 51, 255, 178;
+  --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
 
