@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useLocale } from '../../locale'
+import { useClient } from '../../composables/use-client'
 import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import Popup from '../popup/popup.vue'
@@ -8,7 +9,7 @@ import PresenceSelector from './presence-selector.vue'
 
 export interface PresenceSelectorModalProps {
   show: boolean
-  /** 当前自定义状态文本 */
+  /** 当前在线状态描述（ext），未传时自动从当前登录用户的 presence 缓存读取 */
   value?: string
 }
 
@@ -21,7 +22,17 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
-const { publishPresence } = usePresence()
+const { currentUser } = useClient()
+const { publishPresence, get } = usePresence()
+
+const currentExt = computed(() => {
+  if (props.value !== undefined)
+    return props.value
+  const userId = currentUser.value
+  if (!userId)
+    return ''
+  return get(userId).value?.ext || ''
+})
 
 const showModel = computed({
   get: () => props.show,
@@ -57,7 +68,7 @@ function onCancel() {
     @close="onCancel"
   >
     <PresenceSelector
-      :value="props.value"
+      :value="currentExt"
       @select="onSelect"
       @cancel="onCancel"
     />
