@@ -110,9 +110,12 @@ function onCancel() {
   <div class="multi-select-bar">
     <!-- 全选按钮 -->
     <div class="multi-select-bar__select-all" @click="onToggleSelectAll">
-      <div class="multi-select-bar__check-icon" :class="{ 'multi-select-bar__check-icon--checked': isAllSelected }">
-        <span v-if="isAllSelected">&#10003;</span>
-      </div>
+      <Icon
+        :name="isAllSelected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+        :size="22"
+        class="multi-select-bar__check-icon"
+        :class="{ 'multi-select-bar__check-icon--checked': isAllSelected }"
+      />
       <span class="multi-select-bar__select-all-label">{{ isAllSelected ? '取消全选' : '全选' }}</span>
       <!-- 选中条数：放在全选按钮下方同一纵列 -->
       <div v-if="selectedMessages.length > 0" class="multi-select-bar__count">
@@ -215,21 +218,13 @@ function onCancel() {
 }
 
 .multi-select-bar__check-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-border-color, #c5c5c5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 12px;
-  transition: all 0.15s;
+  color: var(--uikit-text-tertiary, #94a3b8);
+  flex-shrink: 0;
+  transition: color 0.15s;
 }
 
 .multi-select-bar__check-icon--checked {
-  background-color: var(--uikit-primary-color, #007aff);
-  border-color: var(--uikit-primary-color, #007aff);
+  color: var(--uikit-primary-color, #007aff);
 }
 
 .multi-select-bar__select-all-label {

@@ -229,12 +229,12 @@ const isHighlighted = computed(() => {
     <template v-else>
       <!-- 多选 Checkbox：微信风格，所有消息统一放在最左侧（独立于内层 row-reverse 之外） -->
       <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
-        <div
+        <Icon
+          :name="props.isSelected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+          :size="18"
           class="message-bubble-wrapper__check-icon"
           :class="{ 'message-bubble-wrapper__check-icon--checked': props.isSelected }"
-        >
-          <span v-if="props.isSelected">&#10003;</span>
-        </div>
+        />
       </div>
 
       <!-- 主体区域：处理己方/对方头像+内容布局 -->
@@ -451,21 +451,13 @@ const isHighlighted = computed(() => {
 }
 
 .message-bubble-wrapper__check-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 12px;
-  transition: all 0.15s;
+  color: var(--uikit-text-tertiary, #94a3b8);
+  flex-shrink: 0;
+  transition: color 0.15s;
 }
 
 .message-bubble-wrapper__check-icon--checked {
-  background-color: var(--uikit-primary-color);
-  border-color: var(--uikit-primary-color);
+  color: var(--uikit-primary-color);
 }
 
 .message-bubble-wrapper--selected {
