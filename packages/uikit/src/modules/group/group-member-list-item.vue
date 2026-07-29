@@ -175,27 +175,28 @@ function setMoreTriggerRef(el: HTMLElement | null) {
 interface MoreAction {
   key: string
   label: string
+  icon: string
   danger?: boolean
 }
 
 function getMoreActions(member: UiGroupMember): MoreAction[] {
   const actions: MoreAction[] = []
   if (canMute(member))
-    actions.push({ key: 'mute', label: t('group.memberList.mute') || '禁言' })
+    actions.push({ key: 'mute', icon: 'actions/lock', label: t('group.memberList.mute') || '禁言' })
   if (canUnmute(member))
-    actions.push({ key: 'unmute', label: t('group.memberList.unmute') || '取消禁言' })
+    actions.push({ key: 'unmute', icon: 'actions/unlock', label: t('group.memberList.unmute') || '取消禁言' })
   if (canBlock(member))
-    actions.push({ key: 'block', label: t('group.memberList.block') || '拉黑' })
+    actions.push({ key: 'block', icon: 'actions/user-x', label: t('group.memberList.block') || '拉黑' })
   if (canUnblock(member))
-    actions.push({ key: 'unblock', label: t('group.memberList.unblock') || '取消拉黑' })
+    actions.push({ key: 'unblock', icon: 'actions/user-check', label: t('group.memberList.unblock') || '取消拉黑' })
   if (props.showAdminAction && canSetAdmin(member))
-    actions.push({ key: 'setAdmin', label: t('group.memberList.setAdmin') || '设管理员' })
+    actions.push({ key: 'setAdmin', icon: 'actions/shield', label: t('group.memberList.setAdmin') || '设管理员' })
   if (props.showAdminAction && canRemoveAdmin(member))
-    actions.push({ key: 'removeAdmin', label: t('group.memberList.removeAdmin') || '取消管理员' })
+    actions.push({ key: 'removeAdmin', icon: 'actions/shield-off', label: t('group.memberList.removeAdmin') || '取消管理员' })
   if (canTransferOwner(member))
-    actions.push({ key: 'transferOwner', label: t('group.memberList.transferOwner') || '转让群主', danger: true })
+    actions.push({ key: 'transferOwner', icon: 'actions/crown', label: t('group.memberList.transferOwner') || '转让群主', danger: true })
   if (props.showRemoveAction && canRemove(member))
-    actions.push({ key: 'remove', label: t('group.memberList.remove') || '移除', danger: true })
+    actions.push({ key: 'remove', icon: 'actions/user-minus', label: t('group.memberList.remove') || '移除', danger: true })
   return actions
 }
 
@@ -322,7 +323,8 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
                 :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
                 @click.stop="onMoreActionClick(props.member, action.key)"
               >
-                {{ action.label }}
+                <Icon :name="action.icon" :size="16" />
+                <span>{{ action.label }}</span>
               </div>
             </div>
           </Popup>
@@ -466,6 +468,9 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 12px;
   font-size: 14px;
   color: var(--uikit-text-primary);
