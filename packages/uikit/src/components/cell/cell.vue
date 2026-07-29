@@ -158,7 +158,8 @@ function onContextmenu(e: MouseEvent) {
 .uikit-cell::before {
   content: '';
   position: absolute;
-  inset: calc(var(--uikit-item-hover-padding-x, 16px) / 2);
+  /* 水平方向保留内缩，垂直方向顶满 cell 高度，避免 hover 背景上下露出空白 */
+  inset: 0 calc(var(--uikit-item-hover-padding-x, 16px) / 2);
   border-radius: var(--uikit-item-hover-radius, 0px);
   background-color: var(--uikit-bg-secondary);
   z-index: -1;
