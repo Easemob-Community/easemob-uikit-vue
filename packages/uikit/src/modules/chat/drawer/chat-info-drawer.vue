@@ -173,6 +173,12 @@ async function saveRemark() {
   }
 }
 
+/** 取消备注编辑 */
+function cancelEditRemark() {
+  remarkInput.value = contact.value?.remark || ''
+  isEditingRemark.value = false
+}
+
 // ===== 群聊相关 =====
 const currentUserId = computed(() => stores.client.currentUser)
 const groupId = computed(() =>
@@ -266,6 +272,12 @@ async function saveGroupName() {
   finally {
     savingGroupName.value = false
   }
+}
+
+/** 取消群名称编辑 */
+function cancelEditGroupName() {
+  groupNameInput.value = props.conversation?.name || ''
+  isEditingGroupName.value = false
 }
 
 /** 保存群公告 */
@@ -640,16 +652,26 @@ defineExpose({
                 class="chat-info-drawer__inline-input"
                 :placeholder="displayName"
                 @keydown.enter="saveGroupName"
+                @keydown.esc="cancelEditGroupName"
               >
-              <IconButton
-                class="chat-info-drawer__inline-save"
-                icon="actions/check"
-                size="small"
-                type="success"
-                :disabled="savingGroupName"
-                :title="t('chat.info.save') || '保存'"
-                @click="saveGroupName"
-              />
+              <div class="chat-info-drawer__inline-edit-actions">
+                <IconButton
+                  icon="actions/xmark_thick"
+                  size="small"
+                  type="danger"
+                  :title="t('button.cancel') || '取消'"
+                  @click="cancelEditGroupName"
+                />
+                <IconButton
+                  class="chat-info-drawer__inline-save"
+                  icon="actions/check"
+                  size="small"
+                  type="success"
+                  :disabled="savingGroupName"
+                  :title="t('chat.info.save') || '保存'"
+                  @click="saveGroupName"
+                />
+              </div>
             </div>
           </div>
           <!-- 单聊：仅展示名称 -->
@@ -683,7 +705,15 @@ defineExpose({
               class="chat-info-drawer__remark-input"
               :placeholder="t('chat.info.remarkInputPlaceholder')"
               @keydown.enter="saveRemark"
+              @keydown.esc="cancelEditRemark"
             >
+            <IconButton
+              icon="actions/xmark_thick"
+              size="small"
+              type="danger"
+              :title="t('button.cancel') || '取消'"
+              @click="cancelEditRemark"
+            />
             <IconButton
               class="chat-info-drawer__remark-save"
               icon="actions/check"

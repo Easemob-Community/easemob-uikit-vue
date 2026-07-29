@@ -90,6 +90,11 @@ function startEditName() {
   isEditingName.value = true
 }
 
+function cancelEditName() {
+  nameInput.value = displayName.value
+  isEditingName.value = false
+}
+
 // 自动聚焦编辑输入框
 watch(isEditingName, async (editing) => {
   if (editing) {
@@ -179,7 +184,15 @@ function onCardAction(key: string) {
               v-model="nameInput"
               class="group-detail__edit-input"
               @keydown.enter="saveName"
+              @keydown.esc="cancelEditName"
             >
+            <IconButton
+              icon="actions/xmark_thick"
+              size="small"
+              type="danger"
+              :title="t('button.cancel') || '取消'"
+              @click="cancelEditName"
+            />
             <IconButton
               class="group-detail__edit-save"
               icon="actions/check"
