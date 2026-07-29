@@ -135,8 +135,8 @@ function onCancel() {
         <span class="multi-select-bar__label">转发</span>
       </div>
       <div class="multi-select-bar__action" @click="onDelete">
-        <div class="multi-select-bar__icon multi-select-bar__icon--danger">
-          <Icon name="actions/trash" :size="22" />
+        <div class="multi-select-bar__icon">
+          <Icon name="actions/trash" :size="22" type="danger" />
         </div>
         <span class="multi-select-bar__label multi-select-bar__label--danger">删除</span>
       </div>
@@ -281,7 +281,7 @@ function onCancel() {
 }
 
 .multi-select-bar__label--danger {
-  color: #ff4d4f;
+  color: var(--uikit-danger-color, #ff4d4f);
 }
 
 .multi-select-bar__action--disabled {
@@ -325,11 +325,6 @@ function onCancel() {
   height: 36px;
   background-color: transparent;
   color: var(--uikit-text-secondary);
-}
-
-/* 删除图标红色 */
-.multi-select-bar__icon--danger {
-  color: #ff4d4f;
 }
 
 /* 确认弹窗 */
@@ -403,11 +398,11 @@ function onCancel() {
 }
 
 .multi-select-bar__modal-btn--confirm {
-  background-color: #ff4d4f;
+  background-color: var(--uikit-danger-color, #ff4d4f);
   color: #fff;
 }
 
 .multi-select-bar__modal-btn--confirm:hover {
-  background-color: #ff7875;
+  filter: brightness(1.1);
 }
 </style>

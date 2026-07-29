@@ -292,7 +292,7 @@ function onAvatarClick() {
 }
 
 .user-card__action--danger {
-  color: #ef4444;
+  color: var(--uikit-danger-color, #ef4444);
 }
 
 .user-card__action--default {

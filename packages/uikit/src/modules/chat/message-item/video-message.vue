@@ -85,7 +85,7 @@ async function handleDownload(event: MouseEvent) {
       <!-- 播放按钮覆盖层 -->
       <div class="video-message__overlay">
         <div class="video-message__play-btn">
-          &#9658;
+          <Icon name="audio-video/play" :size="20" color="#fff" />
         </div>
       </div>
       <!-- 时长标签 -->
@@ -179,8 +179,6 @@ async function handleDownload(event: MouseEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  padding-left: 4px;
 }
 
 .video-message__duration {

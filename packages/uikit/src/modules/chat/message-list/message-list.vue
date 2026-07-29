@@ -689,7 +689,7 @@ watch(locateRequest, (req) => {
       @click="onNewMessageTipClick"
     >
       <span>{{ unreadNewCount }} 条新消息</span>
-      <span class="message-list__new-tip-arrow">&#8595;</span>
+      <Icon name="arrows/arrow_down" :size="12" class="message-list__new-tip-arrow" />
     </div>
 
     <!-- 群已读详情弹窗 -->
@@ -809,6 +809,7 @@ watch(locateRequest, (req) => {
 }
 
 .message-list__new-tip-arrow {
-  font-size: 12px;
+  display: inline-flex;
+  flex-shrink: 0;
 }
 </style>

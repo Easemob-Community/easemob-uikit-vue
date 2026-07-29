@@ -707,7 +707,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <div v-else-if="renderError" class="chat__error">
       <slot name="error" :error="renderError">
         <div class="chat__error-content">
-          <span class="chat__error-icon">&#9888;</span>
+          <Icon name="status/warning" :size="48" type="warning" class="chat__error-icon" />
           <span class="chat__error-text">{{ renderError.message }}</span>
           <button class="chat__error-retry" @click="clearRenderError">
             {{ t('button.confirm') || '重试' }}
@@ -927,8 +927,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__error-icon {
-  font-size: 32px;
-  color: #e74c3c;
+  display: inline-flex;
 }
 
 .chat__error-text {

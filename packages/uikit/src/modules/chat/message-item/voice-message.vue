@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
+import Icon from '../../../components/icon/icon.vue'
 import type { UiMessage, VoiceMessageBody } from '../../../sdk/types'
 
 export interface VoiceMessageProps {
@@ -115,7 +116,7 @@ onUnmounted(() => {
           <span class="voice-message__wave-bar" />
           <span class="voice-message__wave-bar" />
         </span>
-        <span v-else>&#9658;</span>
+        <Icon v-else name="audio-video/play" :size="14" />
       </span>
       <span class="voice-message__duration">{{ body.duration || 0 }}"</span>
     </div>
@@ -153,7 +154,6 @@ onUnmounted(() => {
 }
 
 .voice-message__icon {
-  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;

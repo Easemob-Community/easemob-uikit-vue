@@ -511,7 +511,7 @@ const isHighlighted = computed(() => {
 }
 
 .message-bubble-wrapper__status-item--failed {
-  color: #e74c3c;
+  color: var(--uikit-danger-color, #e74c3c);
   cursor: pointer;
 }
 

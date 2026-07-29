@@ -4,6 +4,7 @@
   --uikit-success-color: hsl(155, 100%, 60%);
   --uikit-warning-color: hsl(38, 100%, 60%);
   --uikit-danger-color: hsl(350, 100%, 60%);
+  --uikit-info-color: hsl(203, 100%, 60%);
 
   /* 文字层级 */
   --uikit-text-primary: #111827;

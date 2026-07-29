@@ -7,6 +7,8 @@ export interface IconProps {
   name: string
   size?: number
   color?: string
+  /** 语义色类型；与 color 同时存在时 color 优先级更高 */
+  type?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
 }
 
 const props = withDefaults(defineProps<IconProps>(), {
@@ -55,12 +57,20 @@ const svgPaintAttrs = computed<Record<string, string | undefined>>(() => {
   }
   return { fill: data?.fill ?? props.color }
 })
+
+/** 语义色类名 */
+const typeClass = computed(() => {
+  if (!props.type || props.type === 'default')
+    return ''
+  return `uikit-icon--${props.type}`
+})
 </script>
 
 <template>
   <svg
     v-if="useInlineSvg || slots.default"
     class="uikit-icon"
+    :class="typeClass"
     :width="props.size"
     :height="props.size"
     v-bind="svgPaintAttrs"
@@ -75,5 +85,25 @@ const svgPaintAttrs = computed<Record<string, string | undefined>>(() => {
 .uikit-icon {
   display: inline-block;
   flex-shrink: 0;
+}
+
+.uikit-icon--primary {
+  color: var(--uikit-primary-color, #3b82f6);
+}
+
+.uikit-icon--success {
+  color: var(--uikit-success-color, #22c55e);
+}
+
+.uikit-icon--warning {
+  color: var(--uikit-warning-color, #f59e0b);
+}
+
+.uikit-icon--danger {
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+.uikit-icon--info {
+  color: var(--uikit-info-color, #3b82f6);
 }
 </style>
