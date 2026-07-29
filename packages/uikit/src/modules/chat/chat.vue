@@ -282,11 +282,16 @@ const conversationType = computed(() => currentConversation.value?.type)
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
 
-/** 当前群是否全员禁言 */
+/** 当前群是否全员禁言（仅对普通成员生效，群主/管理员不受影响） */
 const isMutedAll = computed(() => {
   if (!isGroupChat.value || !currentConversation.value)
     return false
-  return stores.group.getGroupById(currentConversation.value.id)?.mute === true
+  const group = stores.group.getGroupById(currentConversation.value.id)
+  if (group?.mute !== true)
+    return false
+  // 全员禁言不作用于群主和管理员
+  const role = group?.role
+  return role !== 'owner' && role !== 'admin'
 })
 
 /** 群聊 @提及成员列表 */
