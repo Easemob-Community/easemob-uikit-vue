@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, watch } from 'vue'
+import Icon from '../icon/icon.vue'
 
 export interface ToastProps {
   show: boolean
@@ -17,14 +18,14 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
 }>()
 
-const iconMap: Record<string, string> = {
-  info: 'i',
-  success: '✓',
-  error: '✕',
-  warning: '!',
+const iconMap: Record<NonNullable<ToastProps['type']>, string> = {
+  info: 'status/info',
+  success: 'status/success',
+  error: 'status/error',
+  warning: 'status/warning',
 }
 
-const icon = computed(() => iconMap[props.type])
+const iconName = computed(() => iconMap[props.type])
 
 let timer: ReturnType<typeof setTimeout> | null = null
 
@@ -54,7 +55,7 @@ onBeforeUnmount(clearTimer)
     <Transition name="uikit-toast">
       <div v-if="props.show" class="uikit-toast">
         <div class="uikit-toast__content" :class="`uikit-toast__content--${props.type}`">
-          <span class="uikit-toast__icon">{{ icon }}</span>
+          <Icon :name="iconName" :size="28" class="uikit-toast__icon" />
           <span class="uikit-toast__message">{{ props.message }}</span>
         </div>
       </div>
@@ -86,8 +87,23 @@ onBeforeUnmount(clearTimer)
 }
 
 .uikit-toast__icon {
-  font-size: 24px;
-  font-weight: 600;
+  color: #fff;
+}
+
+.uikit-toast__content--info .uikit-toast__icon {
+  color: #60a5fa;
+}
+
+.uikit-toast__content--success .uikit-toast__icon {
+  color: #4ade80;
+}
+
+.uikit-toast__content--error .uikit-toast__icon {
+  color: #f87171;
+}
+
+.uikit-toast__content--warning .uikit-toast__icon {
+  color: #facc15;
 }
 
 .uikit-toast__message {

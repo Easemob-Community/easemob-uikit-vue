@@ -118,6 +118,10 @@ const ADD_ICONS = {
   'arrows/arrow_right': 'arrow-right', // forward-modal.vue 已引用
   'people/person_single': 'user', // address-book-container.story.vue 已引用
   'people/member_group': 'users', // address-book-container.story.vue 已引用
+  'status/info': 'info', // toast.vue info 状态
+  'status/success': 'circle-check', // toast.vue success 状态
+  'status/error': 'circle-x', // toast.vue error 状态
+  'status/warning': 'alert-triangle', // toast.vue warning 状态
 }
 
 /** 递归收集 iconsDir 下所有 svg 的 name（相对路径去扩展名） */
