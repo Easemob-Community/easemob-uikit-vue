@@ -4,6 +4,7 @@ import { useClipboard, useScroll } from '@vueuse/core'
 import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
+import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
@@ -34,7 +35,8 @@ const emit = defineEmits<MessageListEmits>()
 const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
-const { h5 } = useUIKit()
+const { h5, stores } = useUIKit()
+const { fetchGroupMembers } = useGroup()
 const { t } = useLocale()
 const { show: showToast } = useToast()
 
@@ -470,10 +472,23 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     const result: GroupMessageReadUsersResult = await fetchGroupReadDetail(msgId, groupId)
     // SDK 返回 users 为已读用户列表，每个 GroupMessageReadUser 包含 userId
     const readUsers = result?.users?.map(u => u.userId) || []
-    // 未读用户列表：当前无法直接从 SDK 获取，需业务层维护群成员列表后做差集
-    // 此处先展示已读列表，未读列表留空（或后续接入群成员全量列表后补充）
     modalReadList.value = readUsers
-    modalUnreadList.value = []
+    // 未读列表 = 群成员 − 已读 − 消息发送者；成员优先取 store 缓存，缺失时拉取一页
+    let members = stores.group.getGroupMembers(groupId)
+    if (members.length === 0) {
+      try {
+        await fetchGroupMembers(groupId)
+        members = stores.group.getGroupMembers(groupId)
+      }
+      catch (e) {
+        console.warn('[MessageList] fetchGroupMembers for unread list failed:', e)
+      }
+    }
+    const readSet = new Set(readUsers)
+    const senderId = messages.value.find(m => (m.msgServerId || m.msgLocalId) === msgId)?.from
+    modalUnreadList.value = members
+      .map(m => m.userId)
+      .filter(id => !!id && !readSet.has(id) && id !== senderId)
     showGroupReadModal.value = true
   }
   catch (e) {

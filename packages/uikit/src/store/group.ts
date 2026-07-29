@@ -101,21 +101,26 @@ export const useGroupStore = defineStore('group', () => {
   }
 
   function updateGroup(groupId: string, patch: Partial<UiGroup>) {
-    const g = groupList.value.find(item => item.groupId === groupId)
-    if (g)
-      Object.assign(g, patch)
+    // 不可变更新：替换数组引用，保证依赖 ref 身份/浅比较的 computed 与 watch 正确触发
+    groupList.value = groupList.value.map(item =>
+      item.groupId === groupId ? { ...item, ...patch } : item,
+    )
   }
 
   function incrementMemberCount(groupId: string, delta: number) {
-    const g = groupList.value.find(item => item.groupId === groupId)
-    if (g)
-      g.memberCount = Math.max(0, (g.memberCount || 0) + delta)
+    groupList.value = groupList.value.map(item =>
+      item.groupId === groupId
+        ? { ...item, memberCount: Math.max(0, (item.memberCount || 0) + delta) }
+        : item,
+    )
   }
 
   function decrementMemberCount(groupId: string, delta: number) {
-    const g = groupList.value.find(item => item.groupId === groupId)
-    if (g)
-      g.memberCount = Math.max(0, (g.memberCount || 0) - delta)
+    groupList.value = groupList.value.map(item =>
+      item.groupId === groupId
+        ? { ...item, memberCount: Math.max(0, (item.memberCount || 0) - delta) }
+        : item,
+    )
   }
 
   /** 成员级禁言状态更新：同步更新 groupMuteListMap */
@@ -243,9 +248,12 @@ export const useGroupStore = defineStore('group', () => {
   function updateGroupJoinRequest(groupId: string, userId: string, status: UiGroupJoinRequest['status']) {
     const list = groupJoinRequestsMap.value[groupId] || []
     // 匹配键以扁平化的 applicantId 为准；applicant?.userId 兜底兼容旧记录
-    const item = list.find(r => r.applicantId === userId || r.applicant?.userId === userId)
-    if (item) {
-      item.status = status
+    // 不可变更新：替换 map 与数组引用，保证 computed/watch 正确触发
+    groupJoinRequestsMap.value = {
+      ...groupJoinRequestsMap.value,
+      [groupId]: list.map(r =>
+        (r.applicantId === userId || r.applicant?.userId === userId) ? { ...r, status } : r,
+      ),
     }
   }
 
@@ -288,9 +296,10 @@ export const useGroupStore = defineStore('group', () => {
 
   function updateGroupMemberRole(groupId: string, userId: string, role: UiGroupMember['role']) {
     const list = groupMembersMap.value[groupId] || []
-    const member = list.find(m => m.userId === userId)
-    if (member) {
-      member.role = role
+    // 不可变更新：替换 map 与数组引用，保证 computed/watch 正确触发
+    groupMembersMap.value = {
+      ...groupMembersMap.value,
+      [groupId]: list.map(m => (m.userId === userId ? { ...m, role } : m)),
     }
   }
 

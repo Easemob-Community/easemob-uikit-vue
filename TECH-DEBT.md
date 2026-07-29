@@ -134,11 +134,12 @@
 - **修复**：已于 2026-07-28 修复。`connection-events.ts` 的 `onDisconnected` 删除 `setCurrentUser('')`，保留 `setConnected(false)`/`setConnecting(false)`，并加注释说明 currentUser 仅 logout 时清除；`store/client.ts` 的 `clearClient` 补上漏清的 `connecting.value = false`。
 - **关联 skill**：`websdk2-uikit-migration`
 
-### [ ] D23. Group store 直接对象修改绕过 `computed` 响应式
+### [x] D23. Group store 直接对象修改绕过 `computed` 响应式
 
 - **现象**：`updateGroup`、`updateGroupJoinRequest`、`updateGroupMemberRole` 通过 `Object.assign(g, patch)` / `item.status = status` / `member.role = role` 原地修改对象，不替换数组引用。`computed(() => groupMembersMap.value)` 依赖 ref 值身份，内部属性变更不触发 computed 重算。组件通过 computed 读取时不收到更新。
 - **证据**：`store/group.ts` L89-L93 `Object.assign(g, patch)`；L229-L235 `item.status = status`；L274-L279 `member.role = role`。
 - **建议修法**：用新数组引用替换：`groupMembersMap.value = { ...groupMembersMap.value, [groupId]: list.map(m => m.userId === userId ? { ...m, role } : m) }`。对 `updateGroup` 和 `updateGroupJoinRequest` 同理。
+- **修复**：已于 2026-07-28 修复。`store/group.ts` 五处原地修改全部改不可变更新：`updateGroup`/`incrementMemberCount`/`decrementMemberCount` 用 `groupList.value = map(...)` 替换数组引用；`updateGroupJoinRequest`/`updateGroupMemberRole` 用 `{ ...map, [groupId]: list.map(...) }` 替换 map 与数组引用。
 - **关联 skill**：`uikit-store-composable`
 
 ### [x] D24. `useChat().setTyping()` / `sendTypingCmd()` 为空实现 — 打字指示器功能无效
@@ -497,12 +498,13 @@
 - **修复**：已于 2026-07-28 修复。`composables/use-presence.ts` 的 `subscribePresence` 调用补 catch，订阅失败时移除失败 id（不再乐观保留），后续触发可重新订阅，在线状态不再静默缺失。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D61. 群已读回执链路断链：`needReadReceipt` 未接通 + 已读弹窗未读列表恒空
+### [x] D61. 群已读回执链路断链：`needReadReceipt` 未接通 + 已读弹窗未读列表恒空
 
 - **现象 1**：`_enableGroupAck` 算完即弃，发送时从不设置 `needReadReceipt`（注释自承「未接通」），对端收不到回执请求 → `onMessageReadReceipts` 群聊分支的 `groupReadCount` 永远是初始值。
 - **现象 2**：群已读弹窗「未读列表」`modalUnreadList.value = []` 硬编码，未读 Tab 永远空（注释自承认未接群成员差集）。
 - **证据**：`composables/use-message-send.ts:35-48`；`sdk/event/chat-events.ts:198-202`；`modules/chat/message-list/message-list.vue:449-458`。
 - **建议修法**：发送时按开关设置 `needReadReceipt`，未读列表接群成员差集；或下掉 UI 上的已读人数/未读 Tab 展示。
+- **修复**：现象 1 已于 2026-07-28 早些时候修复（`use-message-send.ts` 发送群消息按开关接通 `needReadReceipt`）。现象 2 已于 2026-07-28 修复：`message-list.vue` 的 `onGroupReadClick` 未读列表改为「群成员 − 已读 − 消息发送者」差集——成员优先取 `stores.group.getGroupMembers` 缓存，缺失时 `fetchGroupMembers` 拉取一页后重取；成员拉取失败降级为未读列表为空（不影响已读 Tab）。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
 
 ### [x] D62. 删除会话默认连漫游消息一起删
