@@ -15,6 +15,8 @@
   --uikit-bg-base: #ffffff;
   --uikit-bg-secondary: #f3f4f6;
   --uikit-bg-tertiary: #f0f0f0;
+  /* 弹层/抽屉/卡片等浮层背景：浅色与 base 一致，深色适当提亮以形成层级 */
+  --uikit-bg-elevated: #ffffff;
   --uikit-bg-hover: #e5e7eb;
   --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.08);
 
@@ -109,6 +111,8 @@
   --uikit-bg-base: #111827;
   --uikit-bg-secondary: #1f2937;
   --uikit-bg-tertiary: #0a101f;
+  /* 弹层/抽屉/卡片等浮层背景：深色下比 base 提亮，与页面背景形成叠层 */
+  --uikit-bg-elevated: #1f2937;
   --uikit-bg-hover: #374151;
   --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
   --uikit-text-primary: #f9fafb;

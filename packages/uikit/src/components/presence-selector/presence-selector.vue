@@ -108,13 +108,13 @@ function onCancel() {
         :key="option.key"
         class="presence-selector__option"
         size="compact"
+        :title="option.label"
         :active="isActive(option)"
         @click="onSelect(option)"
       >
         <template #leading>
           <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
         </template>
-        <template #default>{{ option.label }}</template>
         <template #trailing>
           <Icon
             v-if="isActive(option)"

@@ -286,7 +286,8 @@ onUnmounted(() => {
 
 .uikit-popup__content--center {
   margin: auto;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 8px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   overflow: auto;
@@ -297,7 +298,8 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border-top: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
@@ -311,7 +313,8 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border-bottom: 1px solid var(--uikit-border-color);
   border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
@@ -323,7 +326,8 @@ onUnmounted(() => {
   left: 0;
   top: 0;
   height: 100%;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border-right: 1px solid var(--uikit-border-color);
   border-radius: 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0;
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
@@ -335,7 +339,8 @@ onUnmounted(() => {
   right: 0;
   top: 0;
   height: 100%;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border-left: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
@@ -360,7 +365,8 @@ onUnmounted(() => {
   /* 为锚定 Popup 提供统一外壳：背景、圆角、阴影、裁剪。
      避免子组件（菜单、表情面板等）的透明外层露出页面背景，
      从而解决“内层圆角、外层灰色直角”的问题。 */
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   overflow: hidden;

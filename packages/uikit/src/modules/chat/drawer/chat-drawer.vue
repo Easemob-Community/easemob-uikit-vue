@@ -132,11 +132,12 @@ onClickOutside(panelRef, (event) => {
   top: v-bind(offsetTopStyle);
   right: 0;
   height: calc(100% - v-bind(offsetTopStyle));
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
   display: flex;
   flex-direction: column;
   pointer-events: auto;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--uikit-shadow, -2px 0 8px rgba(0, 0, 0, 0.1));
+  border-left: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
   overflow: hidden;
 }
