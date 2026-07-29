@@ -62,6 +62,10 @@ const showPresenceSelector = ref(false)
 const loading = computed(() => {
   if (!props.userId)
     return false
+  // 若已有缓存资料，切换时不显示 loading，避免卡片闪动
+  const hasUserInfo = !!stores.userInfo.getUserInfo(props.userId)
+  if (hasUserInfo)
+    return presenceLoading.value
   return stores.userInfo.isLoading(props.userId) || presenceLoading.value
 })
 const isSelf = computed(() => stores.client.currentUser === props.userId)
@@ -409,15 +413,22 @@ function onPresenceSelectorClose() {
 }
 
 .contact-detail__wrapper {
+  position: relative;
   width: 100%;
   max-width: 320px;
 }
 
 .contact-detail__loading {
-  padding: 40px 0;
-  text-align: center;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--uikit-bg-base);
   color: var(--uikit-text-tertiary);
   font-size: 14px;
+  z-index: 1;
+  border-radius: var(--uikit-components-radius, 12px);
 }
 
 .contact-detail__extra {
