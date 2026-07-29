@@ -123,7 +123,7 @@ const props = withDefaults(defineProps<ContactListContainerProps>(), {
   showCount: false,
   selectMode: 'none',
   showAvatar: true,
-  avatarShape: 'circle',
+  avatarShape: undefined,
   itemSize: 'normal',
   loading: false,
   enableLoadMore: false,

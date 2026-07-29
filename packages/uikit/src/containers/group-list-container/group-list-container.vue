@@ -118,7 +118,7 @@ const props = withDefaults(defineProps<GroupListContainerProps>(), {
   selectMode: 'none',
   showAvatar: true,
   showMemberCount: true,
-  avatarShape: 'rounded',
+  avatarShape: undefined,
   itemSize: 'normal',
   loading: false,
   enableLoadMore: true,
