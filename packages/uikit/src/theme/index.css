@@ -16,7 +16,7 @@
   --uikit-bg-secondary: #f3f4f6;
   --uikit-bg-tertiary: #f0f0f0;
   --uikit-bg-hover: #e5e7eb;
-  --uikit-bg-active: rgba(51, 170, 255, 0.08);
+  --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.08);
 
   /* 主色别名 */
   --uikit-primary: var(--uikit-primary-color);
@@ -108,7 +108,7 @@
   --uikit-bg-secondary: #1f2937;
   --uikit-bg-tertiary: #0a101f;
   --uikit-bg-hover: #374151;
-  --uikit-bg-active: rgba(51, 170, 255, 0.12);
+  --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
   --uikit-text-tertiary: #6b7280;
