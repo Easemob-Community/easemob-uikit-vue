@@ -3,6 +3,7 @@ export * from './format-time'
 export * from './format-message'
 export * from './linkify'
 export * from './download'
+export * from './sdk-error'
 
 export function isEmpty(val: unknown): boolean {
   return val === undefined || val === null || val === ''

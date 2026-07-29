@@ -3,6 +3,10 @@ import type { LocaleMessages } from './type'
 const messages: LocaleMessages = {
   'button.confirm': '确认',
   'button.cancel': '取消',
+  'error.notConnected': '当前未连接，请检查网络后重试',
+  'error.network': '网络异常，请稍后重试',
+  'error.timeout': '请求超时，请稍后重试',
+  'error.unknown': '操作失败，请稍后重试',
   'emoji.recent': '常用',
   'chat.title': '聊天',
   'chat.empty': '请选择会话',
@@ -259,6 +263,7 @@ const messages: LocaleMessages = {
   'message.delete.failed': '删除失败',
   'message.delete.confirm': '确定删除该消息吗？',
   'message.delete.batchConfirm': '确定删除 {count} 条消息吗？',
+  'message.send.failed': '发送失败',
   'message.resend.failed': '重发失败',
   'message.translate.failed': '翻译失败，请稍后重试',
   'message.translate.serviceUnavailable': '翻译服务未开通，请联系管理员开通',

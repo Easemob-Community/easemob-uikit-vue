@@ -15,6 +15,7 @@ import Modal from '../../../components/modal/modal.vue'
 import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
+import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import MessageVirtualList from './message-virtual-list.vue'
 
 export interface MessageListProps {
@@ -462,7 +463,7 @@ async function onResend(message: UiMessage) {
   }
   catch (e: unknown) {
     console.warn('[MessageList] resend failed:', e)
-    showToast(e instanceof Error ? e.message : String(e) || t('message.resend.failed') || '重发失败')
+    showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t))
   }
 }
 

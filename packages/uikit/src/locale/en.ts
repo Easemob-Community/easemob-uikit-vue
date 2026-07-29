@@ -3,6 +3,10 @@ import type { LocaleMessages } from './type'
 const messages: LocaleMessages = {
   'button.confirm': 'Confirm',
   'button.cancel': 'Cancel',
+  'error.notConnected': 'Not connected, please check your network and try again',
+  'error.network': 'Network error, please try again later',
+  'error.timeout': 'Request timeout, please try again later',
+  'error.unknown': 'Operation failed, please try again later',
   'emoji.recent': 'Recent',
   'chat.title': 'Chat',
   'chat.empty': 'Please select a conversation',
@@ -259,6 +263,7 @@ const messages: LocaleMessages = {
   'message.delete.failed': 'Delete failed',
   'message.delete.confirm': 'Are you sure you want to delete this message?',
   'message.delete.batchConfirm': 'Are you sure you want to delete {count} messages?',
+  'message.send.failed': 'Send failed',
   'message.resend.failed': 'Resend failed',
   'message.translate.failed': 'Translation failed, please try again later',
   'message.translate.serviceUnavailable': 'Translation service is not enabled, please contact the admin',

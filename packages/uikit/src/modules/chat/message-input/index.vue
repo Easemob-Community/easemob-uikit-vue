@@ -4,6 +4,7 @@ import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
+import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
@@ -180,7 +181,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
     })
     .catch((e: any) => {
       console.error('[MessageInput] sendTextMessage failed:', e)
-      showToast(e?.message || t('message.send.failed') || '发送失败')
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
 }
@@ -220,7 +221,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
     })
     .catch((e: any) => {
       console.error('[MessageInput] sendTextMessage failed:', e)
-      showToast(e?.message || t('message.send.failed') || '发送失败')
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
 }
