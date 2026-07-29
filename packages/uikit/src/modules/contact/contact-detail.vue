@@ -113,6 +113,7 @@ const cardActions = computed(() => {
       label: blocked
         ? (t('contact.detail.unblock') || '取消拉黑')
         : (t('contact.detail.block') || '拉黑'),
+      icon: 'actions/ban',
       type: 'default' as const,
     },
     {
