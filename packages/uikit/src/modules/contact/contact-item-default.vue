@@ -72,6 +72,7 @@ const resolvedAvatarShape = computed(() => {
 
 <template>
   <Cell
+    auto-height
     class="contact-item-default"
     :title="displayName"
     :subtitle="props.subtitle"

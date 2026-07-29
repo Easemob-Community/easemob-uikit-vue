@@ -72,6 +72,7 @@ const memberCountMeta = computed(() => {
 
 <template>
   <Cell
+    auto-height
     class="group-item-default"
     :title="displayName"
     :subtitle="props.subtitle"
