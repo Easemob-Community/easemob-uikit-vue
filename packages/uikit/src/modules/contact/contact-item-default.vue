@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Icon from '../../components/icon/icon.vue'
 import Cell from '../../components/cell/cell.vue'
+import { useUserInfo } from '../../composables/use-user-info'
 import type { UiContact as Contact } from '../../sdk/types'
 import type { AvatarShape, ContactItemSize, OnlineStatus } from './types'
 
@@ -38,7 +39,15 @@ const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   size: 'normal',
 })
 
-const displayName = computed(() => props.contact.remark || props.contact.name || props.contact.userId)
+const { userInfo, avatarUrl, displayName: userInfoDisplayName } = useUserInfo(() => props.contact.userId)
+
+const displayName = computed(() =>
+  props.contact.remark || userInfoDisplayName.value || props.contact.name || props.contact.userId,
+)
+
+const displayAvatar = computed(() =>
+  props.contact.avatar || avatarUrl.value || userInfo.value?.avatarUrl,
+)
 
 const resolvedAvatarSize = computed(() => {
   if (props.avatarSize)
@@ -79,7 +88,7 @@ const resolvedAvatarShape = computed(() => {
         <slot name="avatar" :contact="props.contact" :size="resolvedAvatarSize">
           <Avatar
             v-if="props.showAvatar"
-            :src="props.contact.avatar"
+            :src="displayAvatar"
             :name="displayName"
             :size="resolvedAvatarSize"
             :shape="resolvedAvatarShape"
