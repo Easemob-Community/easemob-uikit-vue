@@ -24,3 +24,6 @@ coverage
 
 # Qoder cache
 .qoder
+
+# Local tarball artifacts
+*.tgz
