@@ -56,6 +56,8 @@ const selectedKey = ref<PresenceSelectorValue | null>(null)
 
 watch(() => props.value, (v) => {
   customText.value = v || ''
+  // 外部值变化时重置手动选择态，避免旧状态残留
+  selectedKey.value = null
 })
 
 function isActive(option: PresenceOption): boolean {
@@ -65,6 +67,8 @@ function isActive(option: PresenceOption): boolean {
   const current = (props.value || '').toLowerCase()
   if (option.key === 'online')
     return current === ''
+  if (option.key === 'custom')
+    return current !== '' && current !== 'busy' && current !== 'away'
   return current === option.ext.toLowerCase()
 }
 
@@ -78,10 +82,12 @@ function onSelect(option: PresenceOption) {
 
 function onConfirmCustom() {
   const text = customText.value.trim()
+  selectedKey.value = null
   emit('select', 'custom', text)
 }
 
 function onCancel() {
+  selectedKey.value = null
   emit('cancel')
 }
 </script>
