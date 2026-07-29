@@ -533,7 +533,7 @@ defineExpose({
 }
 
 .contact-list__search {
-  padding: 2px 0 8px;
+  padding: 2px 16px 8px;
 }
 
 .contact-list__items {

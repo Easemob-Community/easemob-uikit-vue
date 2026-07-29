@@ -457,7 +457,7 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__search {
-  padding: 2px 0 8px;
+  padding: 2px 16px 8px;
 }
 
 .address-book-container__nav-wrap {

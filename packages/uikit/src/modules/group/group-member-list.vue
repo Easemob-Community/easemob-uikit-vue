@@ -384,7 +384,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 
 .group-member-list__search {
   position: relative;
-  padding: 8px 0;
+  padding: 8px 16px;
   flex-shrink: 0;
 }
 
