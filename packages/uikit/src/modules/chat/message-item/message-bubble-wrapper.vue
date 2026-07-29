@@ -306,20 +306,50 @@ const isHighlighted = computed(() => {
           <!-- 消息状态指示器（仅己方消息） -->
           <div v-if="showStatus" class="message-bubble-wrapper__status">
             <!-- 发送中 -->
-            <span v-if="messageStatus === MESSAGE_STATUS.SENDING" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading">&#8226;</span>
+            <span
+              v-if="messageStatus === MESSAGE_STATUS.SENDING"
+              class="message-bubble-wrapper__status-item"
+              title="发送中"
+            >
+              <Icon
+                name="actions/loading_circle"
+                :size="14"
+                class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading"
+              />
+            </span>
             <!-- 已发送 -->
-            <span v-else-if="messageStatus === MESSAGE_STATUS.SENT" class="message-bubble-wrapper__status-icon" title="已发送">&#10003;</span>
+            <span
+              v-else-if="messageStatus === MESSAGE_STATUS.SENT"
+              class="message-bubble-wrapper__status-item"
+              title="已发送"
+            >
+              <Icon name="actions/check" :size="14" class="message-bubble-wrapper__status-icon" />
+            </span>
             <!-- 已送达 -->
-            <span v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" title="已送达">&#10003;&#10003;</span>
+            <span
+              v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED"
+              class="message-bubble-wrapper__status-item"
+              title="已送达"
+            >
+              <Icon name="chat/doneAll" :size="14" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" />
+            </span>
             <!-- 已读 -->
-            <span v-else-if="messageStatus === MESSAGE_STATUS.READ" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" title="已读">&#10003;&#10003;</span>
+            <span
+              v-else-if="messageStatus === MESSAGE_STATUS.READ"
+              class="message-bubble-wrapper__status-item"
+              title="已读"
+            >
+              <Icon name="chat/doneAll" :size="14" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" />
+            </span>
             <!-- 发送失败 -->
             <span
               v-else-if="messageStatus === MESSAGE_STATUS.FAILED"
-              class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed"
+              class="message-bubble-wrapper__status-item message-bubble-wrapper__status-item--failed"
               title="点击重发"
               @click.stop="emit('resend', message)"
-            >&#33;</span>
+            >
+              <Icon name="status/error" :size="14" class="message-bubble-wrapper__status-icon" />
+            </span>
           </div>
 
           <!-- 群已读人数标注 -->
@@ -473,32 +503,29 @@ const isHighlighted = computed(() => {
   flex-shrink: 0;
 }
 
-.message-bubble-wrapper__status-icon {
-  font-size: 12px;
+.message-bubble-wrapper__status-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--uikit-text-secondary);
-  line-height: 1;
+}
+
+.message-bubble-wrapper__status-item--failed {
+  color: #e74c3c;
+  cursor: pointer;
+}
+
+.message-bubble-wrapper__status-icon {
+  display: inline-flex;
+  color: inherit;
 }
 
 .message-bubble-wrapper__status-icon--loading {
   animation: message-status-loading 1s infinite;
-  color: var(--uikit-text-secondary);
-}
-
-.message-bubble-wrapper__status-icon--delivered {
-  letter-spacing: -2px;
-  font-size: 11px;
 }
 
 .message-bubble-wrapper__status-icon--read {
   color: var(--uikit-primary-color);
-  letter-spacing: -2px;
-  font-size: 11px;
-}
-
-.message-bubble-wrapper__status-icon--failed {
-  color: #e74c3c;
-  font-weight: bold;
-  cursor: pointer;
 }
 
 /* 群已读人数标注 */
