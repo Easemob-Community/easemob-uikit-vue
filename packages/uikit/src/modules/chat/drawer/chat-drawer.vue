@@ -52,11 +52,17 @@ function onOverlayClick() {
  * 使用 capture: false 确保 bubble 阶段的 event.stopPropagation()（如内层
  * Teleport Popup 上的 @click.stop/@pointerdown.stop）能够阻止此监听器触发，
  * 避免内层弹窗内的点击误关闭外层 Drawer。
+ *
+ * 另外，Popup/Modal 通常通过 Teleport 挂载到 body，其 DOM 不在 panelRef
+ * 内部，因此 onClickOutside 会将其判定为外部点击。这里通过
+ * target.closest('.uikit-popup') 忽略所有弹窗容器内的点击，保证从
+ * Drawer 中打开 Modal 时不会误关 Drawer。
  */
-onClickOutside(panelRef, () => {
-  if (props.show && props.closeOnClickOverlay) {
-    close()
-  }
+onClickOutside(panelRef, (event) => {
+  if (!props.show || !props.closeOnClickOverlay) return
+  const target = event.target as HTMLElement | null
+  if (target?.closest('.uikit-popup')) return
+  close()
 }, { capture: false })
 </script>
 
