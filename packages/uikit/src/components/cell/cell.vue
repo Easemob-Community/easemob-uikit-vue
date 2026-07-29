@@ -25,6 +25,8 @@ export interface CellProps {
   border?: boolean | 'top' | 'bottom'
   /** 内容驱动高度（而非固定高度） */
   autoHeight?: boolean
+  /** 危险操作样式（文字/图标显示为红色） */
+  danger?: boolean
 }
 
 const props = withDefaults(defineProps<CellProps>(), {
@@ -36,6 +38,7 @@ const props = withDefaults(defineProps<CellProps>(), {
   showArrow: false,
   border: false,
   autoHeight: false,
+  danger: false,
 })
 
 const emit = defineEmits<{
@@ -53,6 +56,7 @@ const rootClass = computed(() => ({
   'is-auto-height': props.autoHeight,
   [`size-${props.size}`]: true,
   'has-subtitle': !!props.subtitle,
+  'is-danger': props.danger,
 }))
 
 function onClick() {
@@ -184,6 +188,18 @@ function onContextmenu(e: MouseEvent) {
 
 .uikit-cell.is-disabled:hover::before {
   opacity: 0;
+}
+
+/* 危险操作 */
+.uikit-cell.is-danger,
+.uikit-cell.is-danger .uikit-cell__title,
+.uikit-cell.is-danger .uikit-cell__subtitle,
+.uikit-cell.is-danger .uikit-cell__meta {
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+.uikit-cell.is-danger.is-clickable:hover::before {
+  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
 }
 
 /* leading */

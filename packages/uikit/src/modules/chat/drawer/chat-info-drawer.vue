@@ -812,7 +812,7 @@ defineExpose({
 
         <!-- 通用操作 -->
         <div class="chat-info-drawer__section">
-          <Cell auto-height @click="onClearHistory">
+          <Cell auto-height danger @click="onClearHistory">
             <template #leading>
               <Icon name="actions/trash" :size="18" />
             </template>
