@@ -9,7 +9,6 @@ export interface InputProps {
   type?: 'text' | 'password' | 'number'
   disabled?: boolean
   maxlength?: number
-  rows?: number
   /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
   prefixIcon?: string
   /**
@@ -151,7 +150,6 @@ defineExpose({
 .uikit-input__field--search {
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   border-color: transparent;
-  padding-left: 28px;
 }
 
 .uikit-input__field--search:focus {
@@ -169,7 +167,6 @@ defineExpose({
 .uikit-input__field--filled {
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   border-color: transparent;
-  padding-left: 28px;
 }
 
 .uikit-input__field--filled:focus {
@@ -188,7 +185,6 @@ defineExpose({
   background-color: transparent;
   border-color: transparent;
   border-radius: 0;
-  padding-left: 28px;
 }
 
 .uikit-input__field--ghost:focus {
@@ -209,7 +205,6 @@ defineExpose({
   border-color: transparent;
   border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
   border-radius: 0;
-  padding-left: 28px;
 }
 
 .uikit-input__field--underline:focus {

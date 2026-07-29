@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, watch } from 'vue'
 
 export interface ToastProps {
   show: boolean
@@ -13,6 +13,10 @@ const props = withDefaults(defineProps<ToastProps>(), {
   duration: 2000,
 })
 
+const emit = defineEmits<{
+  (e: 'update:show', value: boolean): void
+}>()
+
 const iconMap: Record<string, string> = {
   info: 'i',
   success: '✓',
@@ -21,6 +25,28 @@ const iconMap: Record<string, string> = {
 }
 
 const icon = computed(() => iconMap[props.type])
+
+let timer: ReturnType<typeof setTimeout> | null = null
+
+function clearTimer() {
+  if (timer) {
+    clearTimeout(timer)
+    timer = null
+  }
+}
+
+// show 为 true 时启动 duration 定时器，到点自动关闭；与 use-toast 单例行为保持一致
+watch(() => props.show, (show) => {
+  clearTimer()
+  if (show) {
+    timer = setTimeout(() => {
+      timer = null
+      emit('update:show', false)
+    }, props.duration)
+  }
+}, { immediate: true })
+
+onBeforeUnmount(clearTimer)
 </script>
 
 <template>

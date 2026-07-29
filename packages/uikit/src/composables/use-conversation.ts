@@ -173,12 +173,13 @@ export function useConversation() {
     stores.message.clearConversationMessages(id)
   }
 
-  /** 删除会话（默认同时删除漫游消息和本地缓存） */
-  async function deleteConversation(id: string, deleteRoamingMessages = true) {
+  /** 删除会话（默认保留漫游消息，仅删除本地缓存；删除会话≠删历史） */
+  async function deleteConversation(id: string, deleteRoamingMessages = false) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
     if (!cvs)
       return
     await domains.conversation.remove(id, cvs.type, deleteRoamingMessages)
+    cleanupDeletedConversation(id)
   }
 
   /** 删除会话但保留漫游消息（异步，SDK 会同步服务端会话列表与本地缓存） */
@@ -187,6 +188,23 @@ export function useConversation() {
     if (!cvs)
       return
     await domains.conversation.removeLocal(id, cvs.type)
+    cleanupDeletedConversation(id)
+  }
+
+  /**
+   * 删除会话后的本地清理：
+   * 从列表移除并清空 currentConversationId（若删的是当前会话），
+   * 同时清掉该会话的本地消息缓存。
+   * 必须先清 currentConversationId：SDK 删除成功后会通过会话列表事件回填 store，
+   * store.setConversationList 的"保留当前会话"补回逻辑只在 currentConversationId
+   * 非空时触发，先置空可避免已删除会话被旧快照补回列表（复活）。
+   */
+  function cleanupDeletedConversation(id: string) {
+    if (conversationStore.currentConversationId === id) {
+      conversationStore.setCurrentConversationId(null)
+      stores.message.clearConversationMessages(id)
+    }
+    conversationStore.deleteConversation(id)
   }
 
   return {

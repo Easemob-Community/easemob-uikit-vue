@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useThemeStore } from '../../store/theme'
 
 /** 在线状态展示值 */
@@ -29,6 +29,14 @@ const emit = defineEmits<{
 }>()
 
 const themeStore = useThemeStore()
+
+/** 图片加载失败标记：失败后回退到文字头像 */
+const imgError = ref(false)
+
+// src 变化时重置失败状态，允许新地址重新尝试加载
+watch(() => props.src, () => {
+  imgError.value = false
+})
 
 const avatarShape = computed(() => props.shape ?? themeStore.avatarShape)
 
@@ -61,7 +69,7 @@ function onClick() {
     :style="{ width: `${props.size}px`, height: `${props.size}px`, fontSize: `${props.size * 0.4}px` }"
     @click="onClick"
   >
-    <img v-if="props.src" :src="props.src" class="uikit-avatar__img">
+    <img v-if="props.src && !imgError" :src="props.src" class="uikit-avatar__img" @error="imgError = true">
     <span v-else class="uikit-avatar__text" :style="{ backgroundColor: bgColor }">{{ displayName }}</span>
     <span
       v-if="props.presence"

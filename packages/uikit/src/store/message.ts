@@ -29,6 +29,15 @@ export const useMessageStore = defineStore('message', () => {
 
   let maxMessageCount = 300
 
+  /** 消息状态序号：状态只升不降（sending < sent < delivered < read），failed 与 sent 同级 */
+  const STATUS_ORDER: Record<MessageStatus, number> = {
+    sending: 0,
+    sent: 1,
+    failed: 1,
+    delivered: 2,
+    read: 3,
+  }
+
   function setOptions(options?: MessageStoreOptions) {
     if (options?.maxMessageCount !== undefined && options.maxMessageCount > 0) {
       maxMessageCount = options.maxMessageCount
@@ -110,6 +119,8 @@ export const useMessageStore = defineStore('message', () => {
       ...toUiMessage(sdkMsg, currentUserId),
       status: 'sending',
       isSelf: true,
+      // 请求了已读回执的群消息需要展示已读人数标注（replaceWithSent 会保留该字段）
+      requireGroupAck: sdkMsg.needReadReceipt === true ? true : undefined,
     }
 
     const list = messageMap.value[uiMsg.conversationId] || []
@@ -153,8 +164,8 @@ export const useMessageStore = defineStore('message', () => {
   }
 
   /** 更新附件上传进度 */
-  function updateUploadProgress(localId: string, _percent: number) {
-    _updateMessageById(localId, msg => ({ ...msg }))
+  function updateUploadProgress(localId: string, percent: number) {
+    _updateMessageById(localId, msg => ({ ...msg, progress: percent }))
   }
 
   /** 标记发送失败 */
@@ -193,7 +204,12 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 更新消息状态（用于送达/已读回执） */
   function updateMessageStatus(msgId: string, status: MessageStatus) {
-    updateMessageById(msgId, { status })
+    _updateMessageById(msgId, (msg) => {
+      // 状态只升不降：已读回执可能先于送达回执到达，避免 read 被回退成 delivered
+      if (STATUS_ORDER[msg.status] > STATUS_ORDER[status])
+        return msg
+      return { ...msg, status }
+    })
   }
 
   /** 撤回消息 */
@@ -284,9 +300,17 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 清空指定会话的所有消息（本地） */
   function clearConversationMessages(conversationId: string) {
+    // parsedCombineMessageMap 以“合并消息的消息 ID”为键而非 conversationId，
+    // 需在删除消息前按该会话内消息 ID 遍历清理对应的合并消息缓存条目
+    const msgs = messageMap.value[conversationId] || []
+    for (const m of msgs) {
+      for (const id of [m.msgServerId, m.msgLocalId, m.localId]) {
+        if (id)
+          delete parsedCombineMessageMap.value[id]
+      }
+    }
     delete messageMap.value[conversationId]
     delete pinnedMessageMap.value[conversationId]
-    delete parsedCombineMessageMap.value[conversationId]
     delete atMeMessageMap.value[conversationId]
     const relatedSending = Object.entries(sendingMetaMap.value)
       .filter(([, meta]) => meta.sdkMsg.conversationId === conversationId)

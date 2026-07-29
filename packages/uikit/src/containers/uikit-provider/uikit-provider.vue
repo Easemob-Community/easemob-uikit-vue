@@ -104,7 +104,9 @@ const config = computed<ClientConfig>(() => ({
   ...props.sdkConfig,
 }))
 
-const features: UIKitFeatures = {
+// features 保持响应式：useUIKitProvider 内部以 getter 读取，
+// 运行时切换 enableContact / enablePresence 等 prop 即可生效
+const features = computed<Partial<UIKitFeatures>>(() => ({
   enableContact: props.enableContact,
   enableBlocklist: props.enableBlocklist,
   enablePresence: props.enablePresence,
@@ -112,7 +114,7 @@ const features: UIKitFeatures = {
   enableUserInfo: props.enableUserInfo,
   enableUserInfoSubscription: props.enableUserInfoSubscription,
   contactFetchMode: props.contactFetchMode,
-}
+}))
 
 const dataSource = computed(() => props.dataSource ?? {})
 
@@ -123,7 +125,7 @@ const dataSource = computed(() => props.dataSource ?? {})
 const ctx = useUIKitProvider(config.value, {
   autoInit: props.autoInit,
   features,
-  dataSource: dataSource.value,
+  dataSource,
   h5: props.h5,
   onUserInfoSubscriptionPermissionError: props.enableToast
     ? () => showToastWarning(t('userInfo.subscriptionDisabled'))
@@ -151,7 +153,7 @@ watch(
       return
 
     // 黑名单
-    if (features.enableBlocklist && !ctx.stores.contact.blockListLoaded) {
+    if (features.value.enableBlocklist && !ctx.stores.contact.blockListLoaded) {
       try {
         const list: UiContact[] = ds.fetchBlocklist
           ? await ds.fetchBlocklist()
@@ -169,7 +171,7 @@ watch(
     // 好友列表：仅当业务提供了自定义数据源时在登录后立即拉取；
     // 默认走 SDK 的场景由 onSyncDataFinished 在数据同步完成后回填，
     // 避免在 roster 同步完成前抢跑 getContacts() 拿到空列表并锁定 loaded。
-    if (features.enableContact && ds.fetchContacts && !ctx.stores.contact.loaded) {
+    if (features.value.enableContact && ds.fetchContacts && !ctx.stores.contact.loaded) {
       try {
         const result = await ds.fetchContacts()
         ctx.stores.contact.setContactList(result.list)

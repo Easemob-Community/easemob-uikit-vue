@@ -8,7 +8,6 @@ export const useConversationStore = defineStore('conversation', () => {
   const conversationsLoaded = ref(false)
   const isSyncingConversations = ref(false)
   const groupMemberCountMap = ref<Record<string, number>>({})
-  const typingMap = ref<Record<string, boolean>>({})
   const atMeMap = ref<Record<string, boolean>>({})
 
   const currentConversation = computed(() =>
@@ -48,6 +47,9 @@ export const useConversationStore = defineStore('conversation', () => {
     conversationList.value = list
     // 保留当前会话：刷新/同步后的列表若不含当前会话，把本地快照补回去，
     // 避免从联系人/群组详情新建空会话后被刷新覆盖导致右侧聊天消失。
+    // 该补回只在 currentConversationId 非空时触发；删除会话的路径
+    // （useConversation.cleanupDeletedConversation）会先置空 currentConversationId，
+    // 因此被删除的当前会话不会被补回（不会在列表中复活）。
     if (currentId && currentCvs && !list.some(item => item.id === currentId)) {
       conversationList.value = [currentCvs, ...list]
     }
@@ -98,10 +100,6 @@ export const useConversationStore = defineStore('conversation', () => {
     return groupMemberCountMap.value[groupId] || 0
   }
 
-  function setTyping(conversationId: string, isTyping: boolean) {
-    typingMap.value[conversationId] = isTyping
-  }
-
   function setAtMe(conversationId: string, hasAtMe: boolean) {
     atMeMap.value[conversationId] = hasAtMe
   }
@@ -117,7 +115,6 @@ export const useConversationStore = defineStore('conversation', () => {
     isSyncingConversations.value = false
     hasMoreConversations.value = false
     groupMemberCountMap.value = {}
-    typingMap.value = {}
     atMeMap.value = {}
   }
 
@@ -138,7 +135,6 @@ export const useConversationStore = defineStore('conversation', () => {
     conversationsLoaded,
     isSyncingConversations,
     groupMemberCountMap,
-    typingMap,
     atMeMap,
     addConversation,
     setConversationList,
@@ -157,7 +153,6 @@ export const useConversationStore = defineStore('conversation', () => {
     setSyncing,
     setGroupMemberCount,
     getGroupMemberCount,
-    setTyping,
     setAtMe,
     setHasMoreConversations,
     clearConversations,

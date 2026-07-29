@@ -134,6 +134,10 @@ export class UserInfoDomain {
     }
     finally {
       this.subscribeFlushPromise = null
+      // flush 进行中新 push 进队列的 id 不会再触发后续 flush，这里补排一轮避免滞留
+      if (this.subscribeQueue.length > 0) {
+        this.subscribeFlushPromise = Promise.resolve().then(() => this.flushSubscribeQueue())
+      }
     }
   }
 

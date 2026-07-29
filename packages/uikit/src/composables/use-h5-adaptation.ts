@@ -31,6 +31,23 @@ function readCssVarAsPx(name: string): number {
   return Number.isNaN(parsed) ? 0 : parsed
 }
 
+let viewportFitWarned = false
+
+/**
+ * safeArea 开启时检测宿主 viewport meta 是否包含 viewport-fit=cover，
+ * 缺失时 iOS 上 env(safe-area-inset-*) 恒为 0，warn 一次提示宿主接入。
+ */
+function warnIfViewportFitMissing() {
+  if (viewportFitWarned || typeof document === 'undefined')
+    return
+  const meta = document.querySelector('meta[name="viewport"]')
+  const content = meta?.getAttribute('content') ?? ''
+  if (!content.includes('viewport-fit=cover')) {
+    viewportFitWarned = true
+    console.warn('[useH5Adaptation] safeArea 已开启，但宿主页面 viewport meta 缺少 viewport-fit=cover，env(safe-area-inset-*) 将恒为 0，请在宿主 HTML 的 viewport meta 中补充。')
+  }
+}
+
 /**
  * H5 适配核心状态。
  *
@@ -55,6 +72,9 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
   })
 
   function updateViewportAndSafeArea() {
+    // SSR 环境无 window，直接跳过
+    if (typeof window === 'undefined')
+      return
     width.value = window.innerWidth
     height.value = window.innerHeight
 
@@ -77,9 +97,15 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
   }
   // 初始化一次
   updateViewportAndSafeArea()
+  if (resolved.value.safeArea)
+    warnIfViewportFitMissing()
 
   // 安全区开关变化时重置
-  watch(() => resolved.value.safeArea, updateViewportAndSafeArea)
+  watch(() => resolved.value.safeArea, (enabled) => {
+    updateViewportAndSafeArea()
+    if (enabled)
+      warnIfViewportFitMissing()
+  })
 
   const { keyboardHeight, isKeyboardOpen } = useKeyboard()
 

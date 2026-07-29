@@ -89,8 +89,10 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     },
     onMembersExited: (payload) => {
       const p = payload as any
-      groupLog.info('onMembersExited', { groupId: p.groupId, count: (p.members as unknown[]).length })
-      stores.group.decrementMemberCount(p.groupId, (p.members as unknown[]).length)
+      // 与 onMembersJoined 对齐：members 可能为空，先兜底再取长度
+      const members = (p.members || []) as unknown[]
+      groupLog.info('onMembersExited', { groupId: p.groupId, count: members.length })
+      stores.group.decrementMemberCount(p.groupId, members.length)
     },
     onGroupInfoChanged: (payload) => {
       const p = payload as any
@@ -119,12 +121,19 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       groupLog.info('onUserRemoved', { groupId: p.groupId, userId: p.userId })
       if (p.userId === stores.client.currentUser) {
         stores.group.removeGroup(p.groupId)
+        // 自己被移出群：同时删除会话并清空本地消息，避免僵尸会话残留
+        // （deleteConversation 内部会在被删会话是当前会话时把 currentConversationId 置 null）
+        stores.conversation.deleteConversation(p.groupId)
+        stores.message.clearConversationMessages(p.groupId)
       }
     },
     onGroupDestroyed: (payload) => {
       const p = payload as any
       groupLog.info('onGroupDestroyed', { groupId: p.groupId })
       stores.group.removeGroup(p.groupId)
+      // 群被解散：同上删除会话并清空本地消息
+      stores.conversation.deleteConversation(p.groupId)
+      stores.message.clearConversationMessages(p.groupId)
     },
     onAnnouncementChanged: (payload) => {
       const p = payload as any
@@ -184,6 +193,8 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         {
           groupId: payload.groupId,
           groupName: payload.groupName,
+          // 扁平化申请人 ID，供 accepted/declined 状态匹配使用
+          applicantId: payload.applicant?.userId,
           applicant: payload.applicant,
           reason: payload.reason,
           status: 'pending',
@@ -193,9 +204,12 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     },
     onRequestToJoinAccepted: (payload: GroupRequestToJoinAcceptedEventPayload) => {
       groupLog.info('onRequestToJoinAccepted', { groupId: payload.groupId, accepter: payload.accepter?.userId })
-      // 入群申请被同意后，移除对应申请记录
+      // 该事件载荷只有 accepter（同意申请的管理员），没有申请人字段。
+      // 取舍：收到此事件意味着当前登录用户的申请被同意，因此清除本用户
+      // 在该群的 pending 申请；其他申请人的记录等待下次拉取刷新。
+      const currentUser = stores.client.currentUser
       const list = stores.group.getGroupJoinRequests(payload.groupId)
-        .filter((r: any) => r.applicant?.userId !== payload.accepter?.userId)
+        .filter(r => !(r.status === 'pending' && (r.applicantId === currentUser || r.applicant?.userId === currentUser)))
       stores.group.setGroupJoinRequests(payload.groupId, list)
     },
     onRequestToJoinDeclined: (payload: GroupRequestToJoinDeclinedEventPayload) => {

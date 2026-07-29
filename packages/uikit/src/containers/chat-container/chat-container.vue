@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
+import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
 import type { UiMessage } from '../../sdk/types'
 
@@ -25,6 +26,8 @@ const emit = defineEmits<ChatContainerEmits>()
 
 const chatRef = ref<InstanceType<typeof Chat>>()
 
+const { h5 } = useUIKit()
+
 defineExpose({
   setText: (text: string) => chatRef.value?.setText?.(text),
   getText: () => chatRef.value?.getText?.() || '',
@@ -32,7 +35,10 @@ defineExpose({
 </script>
 
 <template>
-  <div class="chat-container">
+  <div
+    class="chat-container"
+    :class="{ 'chat-container--keyboard-open': h5.isKeyboardOpen.value }"
+  >
     <Chat
       ref="chatRef"
       :config="props.config"
@@ -86,5 +92,10 @@ defineExpose({
   height: 100%;
   background-color: var(--uikit-bg-base);
   padding-bottom: var(--uikit-safe-bottom, 0px);
+}
+
+/* 键盘弹起时输入框已由 keyboardHeight padding 顶起，去掉容器这份 safe-bottom，避免双重叠加 */
+.chat-container--keyboard-open {
+  padding-bottom: 0;
 }
 </style>

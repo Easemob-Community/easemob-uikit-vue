@@ -182,13 +182,13 @@ function onActionClick(key: string) {
   min-width: 120px;
   padding: 10px 28px;
   border-radius: var(--uikit-components-radius, 12px);
-  background-color: #f3f4f6;
+  background-color: var(--uikit-bg-secondary);
   cursor: pointer;
   transition: background-color 150ms ease;
 }
 
 .group-card__action:hover {
-  background-color: #e5e7eb;
+  background-color: var(--uikit-bg-hover);
 }
 
 .group-card__action--primary {

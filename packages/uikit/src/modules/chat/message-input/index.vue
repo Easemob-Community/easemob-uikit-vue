@@ -14,6 +14,7 @@ import type { ChatConfig, ChatSendHooks, MentionContact } from '../types'
 import SimpleInput from './simple-input.vue'
 import RichInput from './rich-input.vue'
 import EditingBar from './editing-bar.vue'
+import H5Input from '../h5-input/h5-input.vue'
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -36,7 +37,7 @@ export interface MessageInputEmits {
 const props = defineProps<MessageInputProps>()
 const emit = defineEmits<MessageInputEmits>()
 
-const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage, sendTypingCmd } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage } = useChat()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
@@ -81,11 +82,8 @@ function runAfterSend(message: any) {
   }
 }
 
-/** 输入框模式 */
+/** 输入框模式（移动端固定渲染 H5Input，不走 simple/rich 分支） */
 const inputMode = computed(() => {
-  // H5 端强制降级为 simple 模式
-  if (isMobile.value)
-    return 'simple'
   return inputConfig.value?.mode ?? 'simple'
 })
 
@@ -120,6 +118,9 @@ const mentionContacts = computed(() => props.mentionContacts ?? inputConfig.valu
 
 /** SimpleInput 引用 */
 const simpleInputRef = ref<InstanceType<typeof SimpleInput>>()
+
+/** H5Input 引用（移动端） */
+const h5InputRef = ref<InstanceType<typeof H5Input>>()
 
 /** message-input 根元素引用 */
 const messageInputRef = ref<HTMLElement>()
@@ -298,10 +299,13 @@ function onEmojiClick(anchorEl: HTMLElement) {
   showEmojiPicker.value = true
 }
 
-/** 选择 Emoji */
+/** 选择 Emoji（移动端面板在 H5Input 内部，不会走到这里） */
 function onEmojiSelect(emoji: string) {
   showEmojiPicker.value = false
-  if (inputMode.value === 'simple') {
+  if (isMobile.value) {
+    h5InputRef.value?.insertEmoji?.(emoji)
+  }
+  else if (inputMode.value === 'simple') {
     simpleInputRef.value?.insertEmoji?.(emoji)
   }
   else {
@@ -336,7 +340,10 @@ function onMentionClose() {
 function onMentionSelect(contact: MentionContact) {
   showMentionPicker.value = false
   const name = contact.remark || contact.name
-  if (inputMode.value === 'simple') {
+  if (isMobile.value) {
+    h5InputRef.value?.insertMention?.(contact)
+  }
+  else if (inputMode.value === 'simple') {
     simpleInputRef.value?.insertMention?.(contact)
   }
   else {
@@ -486,7 +493,10 @@ onBeforeUnmount(() => {
 
 /** 设置输入文本（用于重新编辑等场景） */
 function setText(value: string) {
-  if (inputMode.value === 'simple') {
+  if (isMobile.value) {
+    h5InputRef.value?.setText?.(value)
+  }
+  else if (inputMode.value === 'simple') {
     simpleInputRef.value?.setText?.(value)
   }
   else {
@@ -496,6 +506,9 @@ function setText(value: string) {
 
 /** 获取当前输入文本 */
 function getText(): string {
+  if (isMobile.value) {
+    return h5InputRef.value?.getText?.() || ''
+  }
   if (inputMode.value === 'simple') {
     return simpleInputRef.value?.getText?.() || ''
   }
@@ -514,7 +527,8 @@ defineExpose({
   <div
     ref="messageInputRef"
     class="message-input"
-    :style="{ paddingBottom: `${props.keyboardHeight || 0}px` }"
+    :class="{ 'message-input--mobile': isMobile }"
+    :style="isMobile ? undefined : { paddingBottom: `${props.keyboardHeight || 0}px` }"
   >
     <!-- 全员禁言遮罩 -->
     <div v-if="props.muted" class="message-input__muted-overlay">
@@ -535,9 +549,26 @@ defineExpose({
       @close="clearQuote"
     />
 
+    <!-- 移动端：微信式 H5 输入区（表情/更多面板在其内部展开，键盘高度 padding 也在其内部处理） -->
+    <H5Input
+      v-if="isMobile"
+      ref="h5InputRef"
+      :config="inputConfig"
+      :enable-mention="enableMention"
+      :keyboard-height="props.keyboardHeight"
+      @send="handleSendText"
+      @send-file="handleSendFile"
+      @voice-start="handleVoiceStart"
+      @voice-end="handleVoiceEnd"
+      @voice-cancel="handleVoiceCancel"
+      @mention-trigger="onMentionTrigger"
+      @mention-close="onMentionClose"
+      @focus="emit('focus')"
+    />
+
     <!-- 简单输入框 -->
     <SimpleInput
-      v-if="inputMode === 'simple'"
+      v-else-if="inputMode === 'simple'"
       ref="simpleInputRef"
       :config="inputConfig"
       :enable-mention="enableMention"
@@ -549,7 +580,6 @@ defineExpose({
       @voice-cancel="handleVoiceCancel"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
-      @typing="sendTypingCmd"
       @focus="emit('focus')"
     />
 
@@ -585,25 +615,6 @@ defineExpose({
         />
       </div>
     </Popup>
-
-    <!-- H5 端 Emoji ActionSheet（简化：底部弹层） -->
-    <div
-      v-if="isMobile && showEmojiPicker"
-      class="message-input__emoji-sheet"
-    >
-      <div class="message-input__emoji-sheet-mask" @click="showEmojiPicker = false" />
-      <Transition name="uikit-slide-up">
-        <div v-show="showEmojiPicker" class="message-input__emoji-sheet-content">
-          <div class="emoji-picker-wrapper">
-            <EmojiPicker
-              :show="true"
-              @select="onEmojiSelect"
-              @update:show="showEmojiPicker = $event"
-            />
-          </div>
-        </div>
-      </Transition>
-    </div>
 
     <!-- @提及选择器 -->
     <MentionPicker
@@ -648,27 +659,21 @@ defineExpose({
   border-color: var(--uikit-primary-color);
 }
 
-/* H5 Emoji 底部弹层 */
-.message-input__emoji-sheet {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+/* 移动端：去掉桌面卡片样式（margin/border/radius/shadow），改为全宽工具条容器 */
+.message-input--mobile {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.message-input__emoji-sheet-mask {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+.message-input--mobile:focus-within {
+  border-color: transparent;
 }
 
-.message-input__emoji-sheet-content {
-  position: relative;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 16px) var(--uikit-components-radius, 16px) 0 0;
-  padding: 12px 12px calc(12px + var(--uikit-safe-bottom, 0px)) 12px;
+.message-input--mobile .message-input__muted-overlay {
+  border-radius: 0;
 }
 
 /* 全员禁言遮罩 */

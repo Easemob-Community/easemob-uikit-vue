@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Popup from '../popup/popup.vue'
 import Icon from '../icon/icon.vue'
+import { t } from '../../locale'
 
 export interface ActionSheetItem {
   name: string
@@ -24,7 +25,7 @@ export interface ActionSheetEmits {
 
 const props = withDefaults(defineProps<ActionSheetProps>(), {
   title: '',
-  cancelText: '取消',
+  cancelText: t('button.cancel', '取消'),
 })
 
 const emit = defineEmits<ActionSheetEmits>()
@@ -72,16 +73,13 @@ function onCancel() {
 </template>
 
 <style scoped>
-.uikit-action-sheet {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
+/* safe-bottom 由 Popup position="bottom" 统一处理，这里不再重复 env() */
 .uikit-action-sheet__title {
   text-align: center;
   padding: 16px;
   font-size: 14px;
   color: var(--uikit-text-secondary);
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--uikit-border-light);
 }
 
 .uikit-action-sheet__actions {
@@ -96,7 +94,7 @@ function onCancel() {
   color: var(--uikit-text-primary);
   cursor: pointer;
   transition: background-color 150ms var(--uikit-anim-easing);
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--uikit-border-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,7 +104,7 @@ function onCancel() {
 }
 
 .uikit-action-sheet__item:active {
-  background-color: #f3f4f6;
+  background-color: var(--uikit-bg-secondary);
 }
 
 .uikit-action-sheet__item--disabled {

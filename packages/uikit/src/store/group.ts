@@ -1,6 +1,18 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import type { UserInfo as SdkUserInfo } from 'easemob-websdk'
 import type { UiGroup, UiGroupMember } from '../sdk/types'
+
+/** 入群申请记录：申请人 ID 扁平化为 applicantId，作为状态更新的匹配键 */
+export interface UiGroupJoinRequest {
+  groupId?: string
+  groupName?: string
+  applicantId?: string
+  applicant?: SdkUserInfo
+  reason?: string
+  status?: 'pending' | 'accepted' | 'declined'
+  timestamp?: number
+}
 
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<UiGroup[]>([])
@@ -26,13 +38,15 @@ export const useGroupStore = defineStore('group', () => {
   /** 群共享文件缓存：groupId -> files */
   const groupSharedFilesMap = ref<Record<string, any[]>>({})
   /** 入群申请列表缓存：groupId -> requests */
-  const groupJoinRequestsMap = ref<Record<string, any[]>>({})
+  const groupJoinRequestsMap = ref<Record<string, UiGroupJoinRequest[]>>({})
 
   // ===== UI 交互状态 =====
   const filterText = ref('')
   const activeId = ref('')
   const selectedIds = ref<Set<string>>(new Set())
   const hasMore = ref(false)
+  /** 分页数据源的下一页游标（无分页能力时为 undefined） */
+  const cursor = ref<string | undefined>(undefined)
 
   function setGroupList(list: UiGroup[]) {
     groupList.value = list
@@ -222,19 +236,20 @@ export const useGroupStore = defineStore('group', () => {
   }
 
   // ===== 入群申请缓存 =====
-  function setGroupJoinRequests(groupId: string, requests: any[]) {
+  function setGroupJoinRequests(groupId: string, requests: UiGroupJoinRequest[]) {
     groupJoinRequestsMap.value[groupId] = requests
   }
 
-  function updateGroupJoinRequest(groupId: string, userId: string, status: string) {
+  function updateGroupJoinRequest(groupId: string, userId: string, status: UiGroupJoinRequest['status']) {
     const list = groupJoinRequestsMap.value[groupId] || []
-    const item = list.find(r => r.userId === userId || r.applicantId === userId)
+    // 匹配键以扁平化的 applicantId 为准；applicant?.userId 兜底兼容旧记录
+    const item = list.find(r => r.applicantId === userId || r.applicant?.userId === userId)
     if (item) {
       item.status = status
     }
   }
 
-  function getGroupJoinRequests(groupId: string): any[] {
+  function getGroupJoinRequests(groupId: string): UiGroupJoinRequest[] {
     return groupJoinRequestsMap.value[groupId] || []
   }
 
@@ -329,6 +344,10 @@ export const useGroupStore = defineStore('group', () => {
     hasMore.value = value
   }
 
+  function setCursor(value: string | undefined) {
+    cursor.value = value
+  }
+
   function clearGroups() {
     groupList.value = []
     currentGroup.value = null
@@ -338,6 +357,7 @@ export const useGroupStore = defineStore('group', () => {
     activeId.value = ''
     selectedIds.value = new Set()
     hasMore.value = false
+    cursor.value = undefined
     groupMembersMap.value = {}
     groupAnnouncementMap.value = {}
     groupMuteListMap.value = {}
@@ -366,6 +386,7 @@ export const useGroupStore = defineStore('group', () => {
     activeId,
     selectedIds,
     hasMore,
+    cursor,
     setGroupList,
     setList,
     appendGroupList,
@@ -412,6 +433,7 @@ export const useGroupStore = defineStore('group', () => {
     toggleSelect,
     setSelectedIds,
     setHasMore,
+    setCursor,
     clearGroups,
   }
 })

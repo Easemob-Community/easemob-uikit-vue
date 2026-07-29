@@ -1,13 +1,15 @@
 import { computed, ref } from 'vue'
 import { useUIKit } from './use-uikit'
 
+/** 历史消息游标（模块级单例，保证首屏拉取与上滑加载共享同一份游标） */
+const historyCursorMap = ref<Record<string, { cursor: string, isLast: boolean }>>({})
+
 export function useMessageHistory() {
   const { domains, stores } = useUIKit()
   const conversationStore = stores.conversation
   const messageStore = stores.message
 
   const loading = ref(false)
-  const historyCursorMap = ref<Record<string, { cursor: string, isLast: boolean }>>({})
 
   const messages = computed(() => {
     const cvsId = conversationStore.currentConversationId

@@ -14,7 +14,8 @@ function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite[
     userId,
     nickname: userInfo?.nickname,
     avatarUrl: userInfo?.avatarUrl,
-    reason: payload.status,
+    // 0.16.0 起 payload.status 重命名为 payload.message
+    reason: payload.message,
     status,
     timestamp: Date.now(),
   }

@@ -81,8 +81,13 @@ export function usePresence() {
         const toAdd = next.filter(id => !current.includes(id))
         const toRemove = current.filter(id => !next.includes(id))
         current = [...next]
-        if (toAdd.length)
-          void subscribePresence(toAdd)
+        if (toAdd.length) {
+          void subscribePresence(toAdd).catch((err: unknown) => {
+            console.warn('[usePresence] subscribePresence failed:', err)
+            // 订阅失败的 id 从“已订阅”集合移除，后续列表变化时可重新补订
+            current = current.filter(id => !toAdd.includes(id))
+          })
+        }
         if (toRemove.length)
           void unsubscribePresence(toRemove)
       },

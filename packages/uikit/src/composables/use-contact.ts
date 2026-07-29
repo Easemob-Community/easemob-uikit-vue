@@ -50,14 +50,23 @@ export function useContact() {
       loading.value = true
       try {
         const result = await dataSource.fetchContacts(params)
-        contactStore.setContactList(result.list)
+        // 带 cursor 视为分页追加，否则为首屏/刷新整体替换
+        if (params?.cursor) {
+          contactStore.appendContactList(result.list)
+        }
+        else {
+          contactStore.setContactList(result.list)
+        }
+        // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
+        contactStore.setHasMore(result.hasMore ?? false)
+        contactStore.setCursor(result.cursor)
         return result
       }
       finally {
         loading.value = false
       }
     }
-    // 默认走 SDK 本地内存
+    // 默认走 SDK 本地内存（全量内存态，无分页，hasMore 保持 false）
     const list = domains.contact.syncLocal()
     return { list, cursor: undefined, hasMore: false }
   }
@@ -121,7 +130,8 @@ export function useContact() {
     if (!contactStore.hasMore)
       return
     if (dataSource.fetchContacts) {
-      await fetchContacts()
+      // 携带 store 中的游标请求下一页，fetchContacts 内部走 append 合并
+      await fetchContacts({ cursor: contactStore.cursor })
     }
   }
 

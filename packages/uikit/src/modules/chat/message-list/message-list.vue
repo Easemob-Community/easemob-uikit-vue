@@ -4,6 +4,7 @@ import { useClipboard, useScroll } from '@vueuse/core'
 import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
+import { useUIKit } from '../../../composables/use-uikit'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
 import { useLocale } from '../../../locale'
@@ -33,6 +34,7 @@ const emit = defineEmits<MessageListEmits>()
 const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
+const { h5 } = useUIKit()
 const { t } = useLocale()
 const { show: showToast } = useToast()
 
@@ -82,6 +84,9 @@ const loadingHistory = ref(false)
 
 /** 是否还有更多历史消息 */
 const hasMoreHistory = ref(true)
+
+/** 历史消息加载失败（网络错误等）：保留 hasMoreHistory，顶部显示重试入口 */
+const historyLoadFailed = ref(false)
 
 /** 是否在底部 */
 const isAtBottom = ref(true)
@@ -173,8 +178,8 @@ watch(
         scrollToBottom()
       }
       else {
-        // 不在底部，累积未读
-        unreadNewCount.value++
+        // 不在底部，按新增条数累积未读
+        unreadNewCount.value += newLen - (oldLen || 0)
       }
     }
     // 如果消息列表仍未撑满视口，继续自动加载历史
@@ -222,6 +227,7 @@ async function loadMoreHistory() {
   try {
     // fetchHistoryMessages 内部会自动管理 cursor，无需传入
     const result = await fetchHistoryMessages()
+    historyLoadFailed.value = false
     if (result) {
       historyCursor.value = result.cursor
       // SDK 返回 isLast 表示是否为最后一页
@@ -235,7 +241,8 @@ async function loadMoreHistory() {
   }
   catch (e) {
     console.error('[MessageList] loadMoreHistory failed:', e)
-    hasMoreHistory.value = false
+    // 加载失败不视为"没有更多"：保留 hasMoreHistory，给出重试入口
+    historyLoadFailed.value = true
   }
   loadingHistory.value = false
 
@@ -300,14 +307,27 @@ function onNativeScroll(event: Event) {
   }
 }
 
-/** H5 端：下拉加载 */
+/** H5 端：下拉加载。手势开关统一走 Provider h5 配置；虚拟列表模式下禁用（由 reach-top 兜底） */
+const pullRefreshEnabled = computed(() =>
+  historyMode.value === 'pull-down'
+  && enableLoadHistory.value
+  && !enableVirtual.value
+  && h5.enablePullRefresh.value,
+)
 const { isPulling, isRefreshing, pullDistance } = usePullRefresh(listRef, {
+  enabled: pullRefreshEnabled,
   onRefresh: async () => {
     if (historyMode.value === 'pull-down' && enableLoadHistory.value) {
       await loadMoreHistory()
     }
   },
 })
+
+/** 历史加载失败后点击重试 */
+function retryLoadHistory() {
+  historyLoadFailed.value = false
+  loadMoreHistory()
+}
 
 /** 群已读弹窗状态 */
 const showGroupReadModal = ref(false)
@@ -389,7 +409,6 @@ async function onMessageAction(event: MessageActionEvent) {
       showToast(resolveTranslateErrorMessage(e))
     }
   }
-  // TODO: 处理其他操作（转发）
 }
 
 /** 根据 SDK 翻译错误提取友好的提示文案 */
@@ -571,12 +590,15 @@ watch(locateRequest, (req) => {
       <span v-else-if="isPulling">{{ t('conversation.pullRefresh') }}</span>
     </div>
 
-    <!-- PC 顶部加载/无更多指示器 -->
+    <!-- 顶部加载/失败重试/无更多指示器（scroll-top 模式常驻逻辑；失败态两种模式都显示） -->
     <div
-      v-if="historyMode === 'scroll-top' && messages.length > 0 && (loadingHistory || !hasMoreHistory)"
+      v-if="messages.length > 0 && (loadingHistory || historyLoadFailed || (historyMode === 'scroll-top' && !hasMoreHistory))"
       class="message-list__top-loading"
     >
       <span v-if="loadingHistory">{{ t('conversation.loadingMore') }}</span>
+      <span v-else-if="historyLoadFailed" class="message-list__top-retry" @click="retryLoadHistory">
+        {{ t('conversation.loadHistoryFailed') || '加载失败，点击重试' }}
+      </span>
       <span v-else>{{ t('conversation.noMoreHistory') || '没有更多历史消息' }}</span>
     </div>
 
@@ -688,6 +710,8 @@ watch(locateRequest, (req) => {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  /* 阻止触顶下拉冒泡成浏览器原生刷新/橡皮筋（与自定义下拉刷新共存） */
+  overscroll-behavior-y: contain;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -734,6 +758,12 @@ watch(locateRequest, (req) => {
   padding: 12px;
   color: var(--uikit-text-secondary);
   font-size: 13px;
+}
+
+/* 历史加载失败重试入口 */
+.message-list__top-retry {
+  color: var(--uikit-primary-color);
+  cursor: pointer;
 }
 
 /* 新消息提示 */

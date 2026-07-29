@@ -11,12 +11,21 @@ export interface ConversationStoreLike {
   setSyncing: (syncing: boolean) => void
   delete: (id: string) => void
   update: (id: string, patch: Partial<UiConversation>) => void
+  /** 会话列表快照（可选）：sendChannelAck 用它读取未读数做短路守卫 */
+  conversationList?: UiConversation[]
 }
 
 /**
  * 会话业务域：封装 SDK ChatManager 的会话相关能力。
  */
+
+/** channel ack 节流窗口：同一会话该时长内不重复发送 */
+const CHANNEL_ACK_THROTTLE_MS = 1000
+
 export class ConversationDomain {
+  /** 各会话最近一次发送 channel ack 的时间戳 */
+  private channelAckSentAt = new Map<string, number>()
+
   constructor(
     private client: ManagerHost,
     private store: ConversationStoreLike,
@@ -91,17 +100,23 @@ export class ConversationDomain {
     })
   }
 
-  /** 清空聊天记录 */
+  /**
+   * 清空聊天记录（只清消息，不删除会话）。
+   * - deleteRoamingMessages=true：同时删除服务端漫游历史消息
+   *   （SDK removeHistoryMessages 按 beforeTimestamp 清空当前时间之前的全部历史）；
+   * - deleteRoamingMessages=false：仅由调用方清理本地消息缓存。
+   * 注意：不要使用 deleteConversation 实现"清空聊天记录"，否则整个会话会从列表消失。
+   */
   async clearChatHistory(
     conversationId: string,
     conversationType: 'singleChat' | 'groupChat',
     deleteRoamingMessages = false,
   ) {
     if (deleteRoamingMessages) {
-      await this.client.chatManager.deleteConversation({
+      await this.client.chatManager.removeHistoryMessages({
         conversationId,
         conversationType,
-        deleteRoamingMessages: true,
+        beforeTimestamp: Date.now(),
       })
     }
   }
@@ -124,6 +139,16 @@ export class ConversationDomain {
 
   /** 发送 channel ack */
   async sendChannelAck(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+    // 未读数为 0 时无需发送（store 未暴露会话列表时退化为不守卫）
+    const unread = this.store.conversationList?.find(c => c.id === conversationId)?.unreadCount
+    if (unread !== undefined && unread <= 0)
+      return
+    // 简单节流：同一会话短时间内不重复发送
+    const now = Date.now()
+    const last = this.channelAckSentAt.get(conversationId) || 0
+    if (now - last < CHANNEL_ACK_THROTTLE_MS)
+      return
+    this.channelAckSentAt.set(conversationId, now)
     // SDK5 无 sendChannelAck；使用 clearConversationUnreadMessageCount 达到已读效果
     await this.markRead(conversationId, conversationType)
   }

@@ -1,4 +1,4 @@
-import { type InjectionKey, type Ref, inject, onScopeDispose, provide, shallowRef } from 'vue'
+import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
 import type { ClientConfig, ManagerHost, UIKitClient } from '../sdk/client'
 import { createClient } from '../sdk/client'
 import {
@@ -21,6 +21,8 @@ import { useUserInfoStore } from '../store/user-info'
 import type { RootStores } from '../sdk/event/types'
 import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
+import { clearAllDrafts } from './use-conversation'
+import { resetMultiSelectState } from './use-message-actions'
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from './types'
 export type { H5AdaptationConfig } from './use-h5-adaptation'
@@ -83,8 +85,10 @@ export function useUIKitProvider(
   config: ClientConfig,
   options: {
     autoInit?: boolean
-    features?: Partial<UIKitFeatures>
-    dataSource?: Partial<UIKitDataSource>
+    /** 支持传入 computed：ctx.features 以 getter 形式在每次读取时解析最新值 */
+    features?: Partial<UIKitFeatures> | ComputedRef<Partial<UIKitFeatures>>
+    /** 支持传入 computed：ctx.dataSource 以惰性代理形式在每次读取时解析最新值 */
+    dataSource?: Partial<UIKitDataSource> | ComputedRef<Partial<UIKitDataSource> | undefined>
     h5?: H5AdaptationConfig
     /**
      * 用户资料订阅无权限/服务未开通时的回调；UIKit 默认将其绑定到内置 Toast。
@@ -104,6 +108,32 @@ export function useUIKitProvider(
 
   // H5 适配状态：单一实例注入 context，避免各组件重复监听
   const h5 = useH5Adaptation(options.h5 ?? {})
+
+  // features / dataSource 支持传入响应式 computed：
+  // ctx 上的字段不再静态快照，每次读取时解析最新 props，
+  // 运行时切换 enableContact / enablePresence 等开关即刻生效（初始化行为不变）。
+  const resolveFeatures = (): UIKitFeatures => ({
+    ...defaultFeatures,
+    ...(isRef(options.features) ? options.features.value : options.features),
+  })
+  const features = {} as UIKitFeatures
+  for (const key of Object.keys(defaultFeatures) as (keyof UIKitFeatures)[]) {
+    Object.defineProperty(features, key, {
+      enumerable: true,
+      get: () => resolveFeatures()[key],
+    })
+  }
+
+  const resolveDataSource = (): UIKitDataSource => {
+    const ds = isRef(options.dataSource) ? options.dataSource.value : options.dataSource
+    return (ds || {}) as UIKitDataSource
+  }
+  const dataSource = new Proxy({} as UIKitDataSource, {
+    get: (_target, prop) => resolveDataSource()[prop as keyof UIKitDataSource],
+    has: (_target, prop) => prop in resolveDataSource(),
+    ownKeys: () => Reflect.ownKeys(resolveDataSource()),
+    getOwnPropertyDescriptor: (_target, prop) => Object.getOwnPropertyDescriptor(resolveDataSource(), prop),
+  })
 
   // 真实 SDK 客户端懒加载：auto-init=false 时在 init() 调用后才创建
   let uikitClient: UIKitClient | null = null
@@ -160,7 +190,8 @@ export function useUIKitProvider(
     userInfo: new UserInfoDomain(
       host,
       stores.userInfo,
-      options.dataSource || {},
+      // Domain 构造时解析一次快照（初始化行为不变）；ctx.dataSource 则为惰性代理
+      resolveDataSource(),
       options.onUserInfoSubscriptionPermissionError,
     ),
   }
@@ -198,6 +229,8 @@ export function useUIKitProvider(
     if (uikitClient) {
       await uikitClient.logout()
     }
+    disposeEvents?.()
+    disposeEvents = null
     disposeUserInfoDomain?.()
     disposeUserInfoDomain = null
     stores.client.clearClient()
@@ -207,14 +240,17 @@ export function useUIKitProvider(
     stores.group.clearGroups()
     stores.presence.clearPresence()
     stores.userInfo.clearUserInfos()
+    // 清理模块级单例：多选状态与草稿缓存（跨登录会话不应残留）
+    resetMultiSelectState()
+    clearAllDrafts()
   }
 
   const ctx: UIKitContext = {
     client,
     domains,
     stores,
-    features: { ...defaultFeatures, ...options.features },
-    dataSource: options.dataSource || {},
+    features,
+    dataSource,
     h5,
     theme: useThemeStore(),
     init,
@@ -226,6 +262,9 @@ export function useUIKitProvider(
 
   onScopeDispose(() => {
     disposeEvents?.()
+    disposeEvents = null
+    disposeUserInfoDomain?.()
+    disposeUserInfoDomain = null
   })
 
   return ctx

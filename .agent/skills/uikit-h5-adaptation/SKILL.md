@@ -57,6 +57,11 @@ h5.fontScale       // P2 预留字号缩放
 
 ## 3. CSS 变量契约：`theme/index.css`
 
+> **硬前置：宿主 HTML 的 viewport meta 必须包含 `viewport-fit=cover`**
+> （如 `<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />`），
+> 否则 iOS 上 `env(safe-area-inset-*)` 恒为 0，整套安全区适配失效。
+> `useH5Adaptation` 在 `safeArea` 开启且检测到缺失时会 `console.warn` 一次提示宿主接入。
+
 H5 安全区通过 CSS 变量透传，组件只引用变量、不直接 `env()`：
 
 ```css

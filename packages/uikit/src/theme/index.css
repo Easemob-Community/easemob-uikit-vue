@@ -20,7 +20,7 @@
   /* 主色别名 */
   --uikit-primary: var(--uikit-primary-color);
   --uikit-primary-hover: hsl(203, 100%, 50%);
-  --uikit-primary-rgb: 59, 130, 246;
+  --uikit-primary-rgb: 51, 177, 255;
 
   /* 危险色 RGB */
   --uikit-danger-rgb: 255, 51, 68;
@@ -115,7 +115,7 @@
   /* 主色别名 */
   --uikit-primary: var(--uikit-primary-color);
   --uikit-primary-hover: hsl(203, 100%, 45%);
-  --uikit-primary-rgb: 59, 130, 246;
+  --uikit-primary-rgb: 51, 177, 255;
 
   /* 危险色 RGB */
   --uikit-danger-rgb: 255, 51, 68;

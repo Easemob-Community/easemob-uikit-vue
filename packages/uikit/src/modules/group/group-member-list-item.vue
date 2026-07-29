@@ -36,6 +36,7 @@ const emit = defineEmits<{
   (e: 'unmute-member', member: UiGroupMember): void
   (e: 'block-member', member: UiGroupMember): void
   (e: 'unblock-member', member: UiGroupMember): void
+  (e: 'transfer-owner', member: UiGroupMember): void
 }>()
 
 const { t } = useLocale()
@@ -158,6 +159,11 @@ function canUnblock(member: UiGroupMember): boolean {
   return false
 }
 
+// 转让群主：仅当前用户是群主且目标成员不是自己时可见
+function canTransferOwner(member: UiGroupMember): boolean {
+  return isOwner.value && member.userId !== props.currentUserId
+}
+
 // ===== 更多操作菜单 =====
 const activeMoreMenu = ref(false)
 const moreMenuTriggerRef = ref<HTMLElement | undefined>()
@@ -186,6 +192,8 @@ function getMoreActions(member: UiGroupMember): MoreAction[] {
     actions.push({ key: 'setAdmin', label: t('group.memberList.setAdmin') || '设管理员' })
   if (props.showAdminAction && canRemoveAdmin(member))
     actions.push({ key: 'removeAdmin', label: t('group.memberList.removeAdmin') || '取消管理员' })
+  if (canTransferOwner(member))
+    actions.push({ key: 'transferOwner', label: t('group.memberList.transferOwner') || '转让群主', danger: true })
   if (props.showRemoveAction && canRemove(member))
     actions.push({ key: 'remove', label: t('group.memberList.remove') || '移除', danger: true })
   return actions
@@ -211,6 +219,9 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
       break
     case 'removeAdmin':
       emit('remove-admin', member)
+      break
+    case 'transferOwner':
+      emit('transfer-owner', member)
       break
     case 'remove':
       emit('remove-member', member)

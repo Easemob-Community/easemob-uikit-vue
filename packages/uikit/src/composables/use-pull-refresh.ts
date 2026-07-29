@@ -1,9 +1,14 @@
-import { ref, type Ref } from 'vue'
+import { ref, toValue, type MaybeRef, type Ref } from 'vue'
 import { useScroll, useSwipe } from '@vueuse/core'
 
 export interface UsePullRefreshOptions {
   /** 触发刷新的下拉距离阈值（px），默认 80 */
   threshold?: number
+  /**
+   * 是否启用下拉手势，默认 true。
+   * 为 false 时手势不触发刷新、不产生拉动状态（指示器也不应渲染）。
+   */
+  enabled?: MaybeRef<boolean>
   /** 刷新回调 */
   onRefresh: () => Promise<void>
 }
@@ -23,7 +28,7 @@ export function usePullRefresh(
     threshold: 5,
     onSwipeStart() {
       // 滚动到顶部时，开始下拉
-      if (arrivedState.top) {
+      if (toValue(options.enabled ?? true) && arrivedState.top) {
         isPulling.value = true
       }
     },

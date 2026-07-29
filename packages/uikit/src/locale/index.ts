@@ -16,9 +16,10 @@ const messages: Record<string, LocaleMessages> = {
 const currentLocale = ref<string>('zh-CN')
 
 export function useLocale() {
-  const t = (key: string): string => {
+  const t = (key: string, fallback?: string): string => {
     const msg = messages[currentLocale.value]
-    return msg?.[key] || key
+    // 缺 key 时返回 fallback（而非 truthy 的 key 名），让调用方兜底文案真正生效
+    return msg?.[key] || fallback || key
   }
 
   const setLocale = (locale: string) => {
@@ -31,9 +32,9 @@ export function useLocale() {
 }
 
 /** 独立的 t 函数，可在非 setup 上下文（如事件回调）中使用 */
-export function t(key: string): string {
+export function t(key: string, fallback?: string): string {
   const msg = messages[currentLocale.value]
-  return msg?.[key] || key
+  return msg?.[key] || fallback || key
 }
 
 export function createLocale(locale: string = 'zh-CN') {

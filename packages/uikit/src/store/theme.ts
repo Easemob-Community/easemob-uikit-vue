@@ -51,6 +51,26 @@ const defaultState: ThemeStorageState = {
   animationRipple: true,
 }
 
+/** hsl → "r, g, b" 字符串，用于 --uikit-primary-rgb（供 rgba(var(--uikit-primary-rgb), α) 场景） */
+function hslToRgbString(h: number, s: number, l: number): string {
+  const sat = s / 100
+  const lig = l / 100
+  const c = (1 - Math.abs(2 * lig - 1)) * sat
+  const hp = ((h % 360) + 360) % 360
+  const x = c * (1 - Math.abs(((hp / 60) % 2) - 1))
+  const m = lig - c / 2
+  let r = 0
+  let g = 0
+  let b = 0
+  if (hp < 60) { r = c; g = x }
+  else if (hp < 120) { r = x; g = c }
+  else if (hp < 180) { g = c; b = x }
+  else if (hp < 240) { g = x; b = c }
+  else if (hp < 300) { r = x; b = c }
+  else { r = c; b = x }
+  return `${Math.round((r + m) * 255)}, ${Math.round((g + m) * 255)}, ${Math.round((b + m) * 255)}`
+}
+
 export const useThemeStore = defineStore('theme', () => {
   const storage = useStorage<ThemeStorageState>(THEME_STORAGE_KEY, defaultState)
 
@@ -107,20 +127,7 @@ export const useThemeStore = defineStore('theme', () => {
     set: (v: boolean) => { storage.value.animationRipple = v },
   })
 
-  // 初始化：立即将当前值写入 CSS 变量，确保懒加载 store 时也有样式
-  document.documentElement.style.setProperty('--uikit-primary-color', `hsl(${primaryColor.value}, 100%, 60%)`)
-  document.documentElement.style.setProperty('--uikit-primary-color-opacity', `hsla(${primaryColor.value}, 100%, 60%, 0.25)`)
-  document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
-  document.documentElement.style.setProperty('--uikit-item-hover-radius', hoverStyle.value === 'rounded' ? '8px' : '0px')
-  document.documentElement.style.setProperty('--uikit-item-hover-margin-x', hoverStyle.value === 'rounded' ? '8px' : '0px')
-  document.documentElement.style.setProperty('--uikit-item-hover-padding-x', hoverStyle.value === 'rounded' ? '8px' : '16px')
-  document.documentElement.style.setProperty('--uikit-item-active-radius', hoverStyle.value === 'rounded' ? '8px' : '0px')
-  document.documentElement.style.setProperty('--uikit-components-radius', componentsShape.value === 'ground' ? '8px' : '4px')
-  document.documentElement.style.setProperty('--uikit-components-radius-hover', componentsShape.value === 'ground' ? '14px' : '10px')
-  document.documentElement.style.setProperty('--uikit-container-gap', `${Math.max(0, containerGap.value)}px`)
-  document.documentElement.setAttribute('data-uikit-anim-enabled', String(animationEnabled.value))
-  document.documentElement.setAttribute('data-uikit-anim-level', animationLevel.value)
-
+  // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
     const hue = primaryColor.value
     document.documentElement.style.setProperty(
@@ -130,6 +137,11 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.setProperty(
       '--uikit-primary-color-opacity',
       `hsla(${hue}, 100%, 60%, 0.25)`
+    )
+    // 同步重算 primary-rgb，保证 rgba(var(--uikit-primary-rgb), α) 跟随主题色
+    document.documentElement.style.setProperty(
+      '--uikit-primary-rgb',
+      hslToRgbString(hue, 100, 60)
     )
     document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
   })

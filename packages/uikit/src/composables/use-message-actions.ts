@@ -9,6 +9,12 @@ import { useUIKit } from './use-uikit'
 const isMultiSelectMode = ref(false)
 const selectedMessageIds = ref<Set<string>>(new Set())
 
+/** 重置多选状态（登出等全局清理场景使用） */
+export function resetMultiSelectState() {
+  isMultiSelectMode.value = false
+  selectedMessageIds.value.clear()
+}
+
 export function useMessageActions() {
   const { domains, stores } = useUIKit()
   const { t } = useLocale()
@@ -104,7 +110,7 @@ export function useMessageActions() {
     messageStore.setTranslating(msgId, true)
     try {
       const result = await domains.message.translateMessage(message, [lang])
-      const translation = result.translations[0]
+      const translation = result?.translations?.[0]
       if (translation) {
         messageStore.setTranslation(msgId, translation)
       }

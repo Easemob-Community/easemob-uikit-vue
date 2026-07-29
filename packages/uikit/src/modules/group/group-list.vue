@@ -126,8 +126,6 @@ const emit = defineEmits<{
 
 const {
   groupList,
-  filterText,
-  setFilterText,
   selectedIds: storeSelectedIds,
   setSelectedIds,
 } = useGroup()
@@ -136,10 +134,12 @@ const { t } = useLocale()
 const itemsRef = ref<HTMLElement>()
 /** 触底加载本地锁，防止异步请求期间重复触发 */
 const isLoadingMore = ref(false)
-const searchKeyword = computed({
-  get: () => filterText.value,
-  set: (v: string) => setFilterText(v),
-})
+// 搜索关键词为组件本地状态：group-list 被多个容器/弹窗复用，
+// 写 store 会让搜索词跨场景残留，故默认不共享
+const searchKeyword = ref('')
+function setSearchKeyword(v: string) {
+  searchKeyword.value = v
+}
 const normalizedKeyword = computed(() => searchKeyword.value.trim())
 
 const sortByRef = computed(() => props.sortBy)
@@ -266,6 +266,10 @@ onBeforeUnmount(() => {
   if (scrollEl.value) {
     scrollEl.value.removeEventListener('scroll', onScroll)
   }
+  // 选中态保留在 store 供弹窗提交读取；卸载时清理本组件产生的选中，
+  // 避免残留到下一个复用 group-list 的容器/弹窗（弹窗在提交时已读取选中，清理发生在其后）
+  if (storeSelectedIds.value.size > 0)
+    setSelectedIds([])
 })
 
 /** 跳转到指定分组 */
@@ -322,7 +326,7 @@ defineExpose({
       v-if="$slots.search || props.searchComponent || props.showSearch"
       class="group-list__search"
     >
-      <slot name="search" :keyword="searchKeyword" :set-keyword="setFilterText">
+      <slot name="search" :keyword="searchKeyword" :set-keyword="setSearchKeyword">
         <component
           :is="props.searchComponent"
           v-if="props.searchComponent"

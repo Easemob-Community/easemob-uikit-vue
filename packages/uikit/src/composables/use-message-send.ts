@@ -36,15 +36,15 @@ export function useMessageSend() {
     const cvs = currentCvs()
     if (!cvs)
       return
-    // 群已读回执开关：已按会话类型与群规模算好，待 domain.sendText 支持透传后接通（当前 SDK 封装未暴露该参数）
-    const _enableGroupAck = shouldEnableGroupAck(
+    // 群已读回执开关：按会话类型与群规模计算，接通 SDK needReadReceipt（单聊恒为 false）
+    const enableGroupAck = shouldEnableGroupAck(
       cvs.type,
       cvs.id,
       options?.groupReadReceiptEnabled,
       options?.maxGroupSize,
       stores,
     )
-    await domains.message.sendText(cvs.id, cvs.type, text, ext)
+    await domains.message.sendText(cvs.id, cvs.type, text, ext, enableGroupAck)
   }
 
   /** 发送图片消息 */
@@ -128,12 +128,13 @@ export function useMessageSend() {
     if (!cvs)
       return
 
-    messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
-
     switch (message.type) {
       case 'text':
+        // 文本/自定义消息：确认能重发后再删除本地失败消息，避免删完发不出去导致丢消息
+        messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
         return domains.message.sendText(cvs.id, cvs.type, (message.body as TextMessageBody).content || '', message.ext)
       case 'custom':
+        messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
         return domains.message.sendCustom(
           cvs.id,
           cvs.type,
@@ -145,6 +146,7 @@ export function useMessageSend() {
       case 'voice':
       case 'video':
       case 'file':
+        // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
         console.warn('[useMessageSend] resendMessage: media resend requires original File')
         return
       default:

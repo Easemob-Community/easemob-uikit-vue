@@ -155,10 +155,10 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showHomeSearch: true,
   showScrollToTop: true,
   transition: 'slide',
-  showNotice: true,
+  // showNotice/noticeCount 不给默认值：缺省行为放到 effectiveXxx computed，
+  // 让下方 ?? 链能正确回退到废弃 props（showNewRequest/newRequestCount）
   showGroup: true,
   showContact: true,
-  noticeCount: 0,
   autoEntryCount: true,
   sortBy: 'none',
   groupBy: 'alphabet',
@@ -190,6 +190,12 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   autoFetchGroups: true,
   enablePresence: undefined,
 })
+
+/** showNotice 缺省视为 true，兼容废弃 prop showNewRequest */
+const effectiveShowNotice = computed(() => props.showNotice ?? props.showNewRequest ?? true)
+
+/** noticeCount 缺省视为 0，兼容废弃 prop newRequestCount */
+const effectiveNoticeCount = computed(() => props.noticeCount ?? props.newRequestCount ?? 0)
 
 const emit = defineEmits<{
   (e: 'view-change', view: ContactContainerView): void
@@ -267,10 +273,10 @@ defineExpose({
     :header-align="props.headerAlign"
     :show-search="props.showHomeSearch"
     :transition="props.transition"
-    :show-notice="props.showNotice ?? props.showNewRequest"
+    :show-notice="effectiveShowNotice"
     :show-group="props.showGroup"
     :show-contact="props.showContact"
-    :notice-count="props.noticeCount ?? props.newRequestCount"
+    :notice-count="effectiveNoticeCount"
     :group-count="props.groupCount"
     :contact-count="props.contactCount"
     :auto-entry-count="props.autoEntryCount"

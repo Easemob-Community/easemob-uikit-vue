@@ -218,7 +218,8 @@ onUnmounted(() => {
         :class="{ 'uikit-popup--pass-through': isAnchored && !props.overlay }"
         :style="{ zIndex: props.zIndex }"
       >
-        <div v-if="props.overlay" class="uikit-popup__overlay" />
+        <!-- 遮罩层拦截 touchmove，防止弹层打开时背景滚动穿透（内容区不拦截，保证弹层内可滚动） -->
+        <div v-if="props.overlay" class="uikit-popup__overlay" @touchmove.prevent />
         <Transition :name="transitionName">
           <div
             v-if="props.show"
@@ -267,13 +268,19 @@ onUnmounted(() => {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   transition: opacity var(--uikit-anim-overlay-duration) var(--uikit-anim-easing);
+  /* 阻止滚动链穿透到背景页面 */
+  overscroll-behavior: contain;
 }
 
 .uikit-popup__content {
   position: relative;
   max-width: 90vw;
   max-height: 90vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 90vh */
+  max-height: 90dvh;
   overflow: auto;
+  /* 弹层内容滚动到边界时不把滚动链穿透给背景页面 */
+  overscroll-behavior: contain;
 }
 
 .uikit-popup__content--center {

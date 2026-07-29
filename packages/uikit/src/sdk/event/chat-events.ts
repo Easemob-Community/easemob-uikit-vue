@@ -12,6 +12,48 @@ const chatLog = createLogger('UIKit:ChatEvents')
 /** 正在主动拉取群名称的 ID 集合，避免并发重复请求 */
 const fetchingGroupNames = new Set<string>()
 
+/** 待发送已读回执的单聊消息 ID 队列（按会话分组，同一 microtask 内合并为一次请求） */
+const pendingReadReceipts = new Map<string, string[]>()
+let readReceiptFlushScheduled = false
+
+/**
+ * 单聊消息已读回执入队：同一 microtask 内到达的多条消息合并为一次
+ * sendMessageReadReceipts 请求（SDK 限制单次最多 50 条，超出自动分批），
+ * 避免逐条消息各发一次回执请求。
+ */
+function queueMessageReadReceipt(client: ManagerHost, conversationId: string, messageId: string) {
+  if (!messageId)
+    return
+  const list = pendingReadReceipts.get(conversationId) || []
+  list.push(messageId)
+  pendingReadReceipts.set(conversationId, list)
+  if (readReceiptFlushScheduled)
+    return
+  readReceiptFlushScheduled = true
+  void Promise.resolve().then(async () => {
+    readReceiptFlushScheduled = false
+    // flush 期间可能又有新消息入队，逐轮清空直至队列耗尽
+    while (pendingReadReceipts.size > 0) {
+      const entries = Array.from(pendingReadReceipts.entries())
+      pendingReadReceipts.clear()
+      for (const [cvsId, messageIds] of entries) {
+        for (let i = 0; i < messageIds.length; i += 50) {
+          try {
+            await client.chatManager.sendMessageReadReceipts({
+              conversationId: cvsId,
+              conversationType: 'singleChat',
+              messageIds: messageIds.slice(i, i + 50),
+            })
+          }
+          catch (err) {
+            chatLog.warn('sendMessageReadReceipts failed:', err)
+          }
+        }
+      }
+    }
+  })
+}
+
 /**
  * 用联系人 / 用户资料 / 群组信息补全会话名称。
  * websdk2 本地会话缓存中的 conversationName 在部分场景（如群聊）可能为空，
@@ -151,6 +193,10 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onMessage: (sdkMsg) => {
+      // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
+      // typing 等 cmd 的分发处理为后续 TODO。
+      if (sdkMsg.type === 'cmd')
+        return
       chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
       stores.message.addMessage(uiMsg)
@@ -168,6 +214,11 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         }).catch((err: unknown) => {
           console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', err)
         })
+        // 单聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
+        // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送
+        if (sdkMsg.conversationType === 'singleChat') {
+          queueMessageReadReceipt(client, sdkMsg.conversationId, sdkMsg.msgServerId)
+        }
       }
 
       // 更新@我状态
@@ -190,40 +241,34 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       stores.message.updateMessageStatus(payload.messageId, 'delivered')
     },
 
-    onMessageReceipts: (payload) => {
-      chatLog.info('onMessageReceipts', { count: payload.length })
-      // 新 API（0.14.181）：payload 是 ReadonlyArray<MessageReceiptEventPayload>
-      // 每项包含 { conversationId, conversationType, messageIds, timestamp }
-      // 群聊已读回执不再携带 ackContent/count，群已读人数需通过 getMessageReadReceipts 按需获取
+    onMessageReadReceipts: (payload) => {
+      chatLog.info('onMessageReadReceipts', { count: payload.length })
+      // 0.14.243 起事件更名为 onMessageReadReceipts；payload 按 conversationType 判别。
+      // 单聊：messageIds 逐条标记已读；群聊：receiptDetails 携带按消息 ID 的累计已读人数。
       for (const receipt of payload) {
-        for (const messageId of receipt.messageIds) {
-          if (receipt.conversationType !== 'groupChat') {
+        if (receipt.conversationType === 'groupChat') {
+          for (const detail of receipt.receiptDetails) {
+            stores.message.updateMessageById(detail.messageId, { groupReadCount: detail.count })
+          }
+        }
+        else {
+          for (const messageId of receipt.messageIds) {
             stores.message.updateMessageStatus(messageId, 'read')
           }
         }
       }
     },
 
-    onConversationUnreadMessageCountCleared: (payload) => {
-      chatLog.info('onConversationUnreadMessageCountCleared', { conversationId: payload.conversationId })
-      // 多设备清空会话未读数时派发
-      if (payload.conversationId) {
-        stores.conversation.updateUnreadCount(payload.conversationId, 0)
-      }
-    },
-
-    onAllConversationsUnreadMessageCountCleared: () => {
-      chatLog.info('onAllConversationsUnreadMessageCountCleared')
-      // 多设备清空所有会话未读数时派发
-      for (const cvs of stores.conversation.conversationList) {
-        stores.conversation.updateUnreadCount(cvs.id, 0)
-      }
-    },
-
     onMessageUpdated: (payload) => {
-      chatLog.info('onMessageUpdated')
-      const uiMsg = toUiMessage(payload.message as any, stores.client.currentUser)
-      stores.message.applyModifiedMessage(uiMsg)
+      chatLog.info('onMessageUpdated', { messageId: payload.messageId })
+      // payload.message 仅含 type/body/ext/modifiedInfo（无 msgServerId），
+      // 必须用 payload.messageId 定位，只 patch 编辑相关字段并标记已编辑。
+      stores.message.updateMessageById(payload.messageId, {
+        body: payload.message.body,
+        ext: payload.message.ext,
+        modifiedInfo: payload.message.modifiedInfo,
+        modified: true,
+      })
     },
 
     onPinnedMessageChanged: async (payload) => {
@@ -257,10 +302,17 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     },
 
     onMultiDeviceConversation: (event) => {
-      chatLog.info('onMultiDeviceConversation', { operation: event.operation, conversationId: event.conversationId })
-      const { operation, conversationId } = event
-      if (!conversationId)
+      chatLog.info('onMultiDeviceConversation', { operation: event.operation })
+      // 0.14.233 起未读清零事件统一通过 onMultiDeviceConversation 派发；
+      // ALL 变体不携带 conversationId，先单独处理并完成类型收窄。
+      if (event.operation === 'ALL_CONVERSATIONS_UNREAD_MESSAGE_COUNT_CLEARED') {
+        for (const cvs of stores.conversation.conversationList) {
+          stores.conversation.updateUnreadCount(cvs.id, 0)
+        }
         return
+      }
+
+      const { operation, conversationId } = event
       switch (operation) {
         case 'CONVERSATION_DELETED':
           stores.conversation.deleteConversation(conversationId)
@@ -270,6 +322,10 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           break
         case 'CONVERSATION_UNPINNED':
           stores.conversation.updateConversation(conversationId, { isPinned: false })
+          break
+        case 'CONVERSATION_UNREAD_MESSAGE_COUNT_CLEARED':
+          // 多设备清空单会话未读数
+          stores.conversation.updateUnreadCount(conversationId, 0)
           break
         case 'CONVERSATION_MARK':
           if (event.mark !== undefined) {

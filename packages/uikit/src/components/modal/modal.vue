@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Popup from '../popup/popup.vue'
 import Button from '../button/button.vue'
+import { t } from '../../locale'
 
 export interface ModalProps {
   show: boolean
@@ -20,8 +21,8 @@ export interface ModalEmits {
 const props = withDefaults(defineProps<ModalProps>(), {
   title: '',
   showCancel: true,
-  cancelText: '取消',
-  confirmText: '确认',
+  cancelText: t('button.cancel', '取消'),
+  confirmText: t('button.confirm', '确认'),
   closeOnClickOverlay: false,
 })
 

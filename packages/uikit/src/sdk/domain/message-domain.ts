@@ -39,12 +39,15 @@ export class MessageDomain {
     conversationType: 'singleChat' | 'groupChat',
     content: string,
     ext?: Record<string, unknown>,
+    /** 是否请求消息已读回执（单聊/群聊均可，SDK CreateMessageBaseParams.needReadReceipt） */
+    needReadReceipt?: boolean,
   ) {
     const sdkMsg = this.client.chatManager.createTextMessage({
       conversationId,
       conversationType,
       content,
       ext,
+      needReadReceipt,
     })
     return this._send(sdkMsg)
   }

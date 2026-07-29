@@ -18,6 +18,8 @@ export const useContactStore = defineStore('contact', () => {
   const selectedIds = ref<Set<string>>(new Set())
   /** 是否还有更多可加载（分页数据源场景） */
   const hasMore = ref(false)
+  /** 分页数据源的下一页游标（无分页能力时为 undefined） */
+  const cursor = ref<string | undefined>(undefined)
   /** 未加载完整列表时的轻量总数（仅在 loaded 为 false 时生效）；加载后总数恒等于列表长度 */
   const explicitContactCount = ref(0)
   const contactCount = computed(() =>
@@ -148,6 +150,10 @@ export const useContactStore = defineStore('contact', () => {
     hasMore.value = value
   }
 
+  function setCursor(value: string | undefined) {
+    cursor.value = value
+  }
+
   function setContactCount(count: number) {
     explicitContactCount.value = count
   }
@@ -162,6 +168,7 @@ export const useContactStore = defineStore('contact', () => {
     activeId.value = ''
     selectedIds.value = new Set()
     hasMore.value = false
+    cursor.value = undefined
     explicitContactCount.value = 0
   }
 
@@ -182,6 +189,7 @@ export const useContactStore = defineStore('contact', () => {
     activeId,
     selectedIds,
     hasMore,
+    cursor,
     contactCount,
     setContactList,
     setList,
@@ -207,6 +215,7 @@ export const useContactStore = defineStore('contact', () => {
     toggleSelect,
     setSelectedIds,
     setHasMore,
+    setCursor,
     setContactCount,
     clearContacts,
   }

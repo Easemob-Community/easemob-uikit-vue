@@ -22,6 +22,11 @@ export function useRipple(
   const themeStore = useThemeStore()
   const autoRemove = options.autoRemove ?? true
 
+  /** 进行中的波纹数量与元素原始样式：全部结束后恢复，避免永久改写元素样式 */
+  let activeRipples = 0
+  let originalPosition = ''
+  let originalOverflow = ''
+
   function createRipple(e: PointerEvent) {
     const target = el.value
     if (!target) return
@@ -53,7 +58,12 @@ export function useRipple(
       // 关键帧从 scale(0) → scale(1)，见 theme/index.css
     })
 
-    // 确保父元素可做定位基准
+    // 确保父元素可做定位基准；动画结束后恢复原始样式
+    if (activeRipples === 0) {
+      originalPosition = target.style.position
+      originalOverflow = target.style.overflow
+    }
+    activeRipples++
     const position = getComputedStyle(target).position
     if (position === 'static') {
       target.style.position = 'relative'
@@ -62,10 +72,16 @@ export function useRipple(
 
     target.appendChild(ripple)
 
-    if (autoRemove) {
-      const onEnd = () => {
-        ripple.remove()
+    const onEnd = () => {
+      ripple.remove()
+      activeRipples--
+      if (activeRipples === 0) {
+        target.style.position = originalPosition
+        target.style.overflow = originalOverflow
       }
+    }
+
+    if (autoRemove) {
       ripple.addEventListener('animationend', onEnd, { once: true })
       // 兜底：如果动画被 CSS 变量禁用（0ms），animationend 可能不触发
       // 注意：parseFloat('0ms') = 0，不应被 || 覆盖为默认值

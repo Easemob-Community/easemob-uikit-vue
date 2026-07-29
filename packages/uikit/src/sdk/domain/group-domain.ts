@@ -289,20 +289,24 @@ export class GroupDomain {
   /** 获取群共享文件列表 */
   async getGroupSharedFileList(groupId: string, pageNum?: number, pageSize?: number) {
     const result = await this.client.groupManager.getGroup(groupId).getSharedFileList({ pageNum, pageSize })
-    console.warn('[GroupDomain] getGroupSharedFileList result:', result)
     return result
   }
 
   /** 上传群共享文件 */
   async uploadGroupSharedFile(groupId: string, file: File) {
-    let response: unknown
-    await this.client.groupManager.getGroup(groupId).uploadSharedFile({
-      file,
-      onFileUploadComplete: (res: unknown) => {
-        response = res
-      },
+    // 用 Promise 包装回调：uploadSharedFile 的 Promise 可能先于 onFileUploadComplete 回调 resolve，
+    // 直接 await + 外赋变量会拿到 undefined
+    return new Promise((resolve, reject) => {
+      this.client.groupManager.getGroup(groupId).uploadSharedFile({
+        file,
+        onFileUploadComplete: (res: unknown) => {
+          resolve(res)
+        },
+        onFileUploadError: (err: unknown) => {
+          reject(err)
+        },
+      })
     })
-    return response
   }
 
   /** 删除群共享文件 */

@@ -132,8 +132,6 @@ const emit = defineEmits<{
 
 const {
   contactList,
-  filterText,
-  setFilterText,
   selectedIds: storeSelectedIds,
   setSelectedIds,
 } = useContact()
@@ -155,10 +153,12 @@ const itemsRef = ref<HTMLElement>()
 const isLoadingMore = ref(false)
 /** 当前可视区域的分组 key，用于字母导航高亮 */
 const activeGroupKey = ref('')
-const searchKeyword = computed({
-  get: () => filterText.value,
-  set: (v: string) => setFilterText(v),
-})
+// 搜索关键词为组件本地状态：contact-list 被通讯录容器与多个弹窗复用，
+// 写 store 会让 A 弹窗的搜索词残留到 B，故默认不共享
+const searchKeyword = ref('')
+function setSearchKeyword(v: string) {
+  searchKeyword.value = v
+}
 const normalizedKeyword = computed(() => searchKeyword.value.trim())
 
 /** 排序 + 过滤 + 分组 流水线 */
@@ -293,6 +293,10 @@ onBeforeUnmount(() => {
   if (scrollEl.value) {
     scrollEl.value.removeEventListener('scroll', onScroll)
   }
+  // 选中态保留在 store 供弹窗提交读取；卸载时清理本组件产生的选中，
+  // 避免残留到下一个复用 contact-list 的容器/弹窗（弹窗在提交时已读取选中，清理发生在其后）
+  if (storeSelectedIds.value.size > 0)
+    setSelectedIds([])
 })
 
 /** 跳转到指定分组 */
@@ -347,7 +351,7 @@ defineExpose({
       v-if="$slots.search || props.searchComponent || props.showSearch"
       class="contact-list__search"
     >
-      <slot name="search" :keyword="searchKeyword" :set-keyword="setFilterText">
+      <slot name="search" :keyword="searchKeyword" :set-keyword="setSearchKeyword">
         <component
           :is="props.searchComponent"
           v-if="props.searchComponent"

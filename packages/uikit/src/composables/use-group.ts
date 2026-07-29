@@ -52,13 +52,23 @@ export function useGroup() {
       loading.value = true
       try {
         const result = await dataSource.fetchGroups(params || {})
-        groupStore.setGroupList(result.list)
+        // 带 cursor 视为分页追加，否则为首屏/刷新整体替换
+        if (params?.cursor) {
+          groupStore.appendGroupList(result.list)
+        }
+        else {
+          groupStore.setGroupList(result.list)
+        }
+        // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
+        groupStore.setHasMore(result.hasMore ?? false)
+        groupStore.setCursor(result.cursor)
         return result
       }
       finally {
         loading.value = false
       }
     }
+    // 默认走 SDK 本地内存（全量内存态，无分页，hasMore 保持 false）
     const list = syncLocalGroups()
     return { list, cursor: undefined, hasMore: false }
   }
@@ -297,7 +307,8 @@ export function useGroup() {
     if (!groupStore.hasMore)
       return
     if (dataSource.fetchGroups) {
-      await fetchGroups()
+      // 携带 store 中的游标请求下一页，fetchGroups 内部走 append 合并
+      await fetchGroups({ cursor: groupStore.cursor })
     }
   }
 

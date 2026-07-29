@@ -66,7 +66,7 @@ const emit = defineEmits<{
 
 const themeStore = useThemeStore()
 const { t } = useLocale()
-const { setContactRemark } = useContact()
+const { setContactRemark, deleteContact } = useContact()
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
 const {
@@ -77,6 +77,11 @@ const {
   getGroupAnnouncement,
   updateGroupInfo,
   updateGroupAnnouncement,
+  changeGroupOwner,
+  muteGroupMembers,
+  unmuteGroupMembers,
+  blockGroupMembers,
+  unblockGroupMembers,
 } = useGroup()
 
 const closeBtnClass = computed(() =>
@@ -358,7 +363,9 @@ const confirmModal = ref<{
   show: boolean
   title: string
   content: string
-  action: 'leave' | 'destroy' | 'clear' | null
+  action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | null
+  /** transferOwner 专用：新群主用户 ID */
+  targetUserId?: string
 }>({
   show: false,
   title: '',
@@ -366,7 +373,7 @@ const confirmModal = ref<{
   action: null,
 })
 
-function openConfirm(action: 'leave' | 'destroy' | 'clear') {
+function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
   const id = props.conversation?.id
   if (!id)
     return
@@ -386,6 +393,14 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear') {
       action,
     }
   }
+  else if (action === 'deleteFriend') {
+    confirmModal.value = {
+      show: true,
+      title: t('chat.info.deleteFriend') || '删除好友',
+      content: t('chat.info.deleteFriendConfirm') || '确定删除该好友吗？',
+      action,
+    }
+  }
   else {
     confirmModal.value = {
       show: true,
@@ -393,6 +408,103 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear') {
       content: t('chat.info.clearHistoryConfirm') || '确定清空当前会话的聊天记录吗？',
       action,
     }
+  }
+}
+
+/** 单聊：删除好友 */
+async function doDeleteFriend(userId: string) {
+  try {
+    await deleteContact(userId)
+    showToast(t('chat.info.deleteFriendSuccess') || '好友已删除', 'success')
+    onClose()
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.deleteFriendFailed') || '删除好友失败', 'error')
+  }
+}
+
+// ===== 群成员管理：禁言/拉黑（domain 内部已同步 store 的禁言/黑名单缓存） =====
+async function onMuteMember(member: UiGroupMember) {
+  const id = groupId.value
+  if (!id)
+    return
+  try {
+    // muteDuration -1：永久禁言，与群管理-禁言列表添加操作保持一致
+    await muteGroupMembers(id, [member.userId], -1)
+    showToast(t('toast.success') || '操作成功', 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+  }
+}
+
+async function onUnmuteMember(member: UiGroupMember) {
+  const id = groupId.value
+  if (!id)
+    return
+  try {
+    await unmuteGroupMembers(id, [member.userId])
+    showToast(t('toast.success') || '操作成功', 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+  }
+}
+
+async function onBlockMember(member: UiGroupMember) {
+  const id = groupId.value
+  if (!id)
+    return
+  try {
+    await blockGroupMembers(id, [member.userId])
+    showToast(t('toast.success') || '操作成功', 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+  }
+}
+
+async function onUnblockMember(member: UiGroupMember) {
+  const id = groupId.value
+  if (!id)
+    return
+  try {
+    await unblockGroupMembers(id, [member.userId])
+    showToast(t('toast.success') || '操作成功', 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+  }
+}
+
+/** 转让群主：二次确认（参照删除好友的确认弹窗模式） */
+function onTransferOwner(member: UiGroupMember) {
+  if (!groupId.value)
+    return
+  confirmModal.value = {
+    show: true,
+    title: t('group.memberList.transferOwner') || '转让群主',
+    content: (t('chat.info.transferOwnerConfirm') || '确定将群主转让给 {name} 吗？转让后你将成为普通成员。')
+      .replace('{name}', member.nickname || member.userId),
+    action: 'transferOwner',
+    targetUserId: member.userId,
+  }
+}
+
+async function doTransferOwner(userId: string) {
+  const id = groupId.value
+  if (!id)
+    return
+  try {
+    await changeGroupOwner(id, userId)
+    // 同步本地成员角色缓存：新群主置为 owner，自己降级为 member，避免角色闪回
+    stores.group.updateGroupMemberRole(id, userId, 'owner')
+    if (currentUserId.value)
+      stores.group.updateGroupMemberRole(id, currentUserId.value, 'member')
+    showToast(t('chat.info.transferOwnerSuccess') || '群主已转让', 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.transferOwnerFailed') || '转让群主失败', 'error')
   }
 }
 
@@ -412,8 +524,17 @@ function onModalConfirm() {
   else if (action === 'clear') {
     emit('clear-history', { id, type })
   }
+  else if (action === 'deleteFriend') {
+    void doDeleteFriend(id)
+  }
+  else if (action === 'transferOwner') {
+    const targetUserId = confirmModal.value.targetUserId
+    if (targetUserId)
+      void doTransferOwner(targetUserId)
+  }
   confirmModal.value.show = false
   confirmModal.value.action = null
+  confirmModal.value.targetUserId = undefined
 }
 
 function onLeaveOrDelete() {
@@ -421,8 +542,8 @@ function onLeaveOrDelete() {
     openConfirm(isOwner.value ? 'destroy' : 'leave')
   }
   else {
-    // 单聊：删除好友（暂不实现）
-    onClose()
+    // 单聊：删除好友（二次确认后调用 deleteContact）
+    openConfirm('deleteFriend')
   }
 }
 
@@ -456,9 +577,9 @@ const hasMoreMembers = computed(() => members.value.length > displayedMembers.va
 
 /** 暴露成员列表操作方法供父组件调用 */
 defineExpose({
-  /** 移除成员（更新本地列表） */
+  /** 移除成员（更新 store 成员缓存） */
   removeMember: (userId: string) => memberListRef.value?.removeMember(userId),
-  /** 设置成员角色（更新本地列表） */
+  /** 设置成员角色（更新 store 成员缓存） */
   setMemberRole: (userId: string, role: UiGroupMember['role']) => memberListRef.value?.setMemberRole(userId, role),
   /** 刷新成员列表 */
   refreshMemberList: () => memberListRef.value?.refresh(),
@@ -717,6 +838,11 @@ defineExpose({
           @remove-member="emit('remove-member', $event)"
           @set-admin="emit('set-admin', $event)"
           @remove-admin="emit('remove-admin', $event)"
+          @mute-member="onMuteMember"
+          @unmute-member="onUnmuteMember"
+          @block-member="onBlockMember"
+          @unblock-member="onUnblockMember"
+          @transfer-owner="onTransferOwner"
         />
       </div>
     </div>

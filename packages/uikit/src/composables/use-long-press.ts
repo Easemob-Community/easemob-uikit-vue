@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { onScopeDispose, ref } from 'vue'
 
 export interface UseLongPressOptions {
   /** 触发长按所需的按住时长（ms），默认 600 */
@@ -102,6 +102,9 @@ export function useLongPress(callback: () => void, options: UseLongPressOptions 
     }
     startPos.value = null
   }
+
+  // 组件卸载时兜底清理：防止长按过程中卸载导致 body 永久禁止滚动
+  onScopeDispose(() => cleanup())
 
   return {
     start,

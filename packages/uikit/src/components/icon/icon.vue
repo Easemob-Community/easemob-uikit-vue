@@ -16,11 +16,25 @@ const props = withDefaults(defineProps<IconProps>(), {
 
 const slots = useSlots()
 
+/** 已告警过的缺失图标名，避免重复 warn */
+const warnedMissNames = new Set<string>()
+
 /** 当 name 在 icon-map 中能找到且没有默认 slot 时，使用内联 SVG */
-const iconSvg = computed(() => getIconSvg(props.name))
+const iconSvg = computed(() => {
+  const svg = getIconSvg(props.name)
+  // 图标 miss 且无 slot 兜底时整个 svg 静默不渲染，开发期 warn 一次提示排查
+  if (!svg && !slots.default && !warnedMissNames.has(props.name)) {
+    warnedMissNames.add(props.name)
+    console.warn(`[EmIcon] 图标 "${props.name}" 未在 icon-map 中注册，svg 将不渲染`)
+  }
+  return svg
+})
 
 /** 是否使用 name 解析的内联 SVG（有 slot 内容时优先 slot） */
 const useInlineSvg = computed(() => iconSvg.value && !slots.default)
+
+/** 使用图标原始 viewBox，避免非 24x24 画布的图标被裁切；缺失时回退 24x24 */
+const viewBox = computed(() => iconSvg.value?.viewBox ?? '0 0 24 24')
 </script>
 
 <template>
@@ -30,10 +44,10 @@ const useInlineSvg = computed(() => iconSvg.value && !slots.default)
     :width="props.size"
     :height="props.size"
     :fill="props.color"
-    viewBox="0 0 24 24"
+    :viewBox="viewBox"
   >
     <slot />
-    <g v-if="useInlineSvg && iconSvg" v-html="iconSvg" />
+    <g v-if="useInlineSvg && iconSvg" v-html="iconSvg.body" />
   </svg>
 </template>
 

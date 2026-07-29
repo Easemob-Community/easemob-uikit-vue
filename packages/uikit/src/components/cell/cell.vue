@@ -100,7 +100,7 @@ function onContextmenu(e: MouseEvent) {
       <slot name="trailing" />
       <Icon
         v-if="props.showArrow && !$slots.trailing"
-        name="arrows/chevron_right"
+        name="navigation/chevron_right"
         :size="16"
         class="uikit-cell__arrow"
       />
@@ -155,7 +155,7 @@ function onContextmenu(e: MouseEvent) {
   content: '';
   position: absolute;
   inset: calc(var(--uikit-item-hover-padding-x, 16px) / 2);
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-item-hover-radius, 0px);
   background-color: var(--uikit-bg-secondary);
   z-index: -1;
   opacity: 0;
@@ -174,7 +174,7 @@ function onContextmenu(e: MouseEvent) {
 
 .uikit-cell.is-active::before {
   opacity: 1;
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-item-active-radius, 0px);
 }
 
 .uikit-cell.is-disabled {

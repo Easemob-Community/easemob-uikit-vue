@@ -63,6 +63,7 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
 const emit = defineEmits<{
   (e: 'select', id: string, conversation: Conversation): void
   (e: 'at-me-click', id: string, conversation: Conversation): void
+  (e: 'custom-action', key: string, conversation: Conversation): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
@@ -96,6 +97,7 @@ const showCreateGroupModal = ref(false)
 const { isRefreshing: isPullRefreshing } = usePullRefresh(
   itemsRef,
   {
+    enabled: effectivePullRefresh,
     onRefresh: async () => {
       // 下拉刷新需要明确拿最新数据，走强制刷新接口以跳过本地已加载短路
       await refreshConversations()
@@ -227,11 +229,12 @@ function handleSelect(id: string) {
 /** 删除确认 */
 const showDeleteModal = ref(false)
 const pendingDeleteId = ref('')
-const deleteWithHistory = ref(true)
+/** 是否同时删除漫游历史消息，默认不勾选（删除会话≠删历史） */
+const deleteWithHistory = ref(false)
 
 function handleDelete(id: string) {
   pendingDeleteId.value = id
-  deleteWithHistory.value = true
+  deleteWithHistory.value = false
   showDeleteModal.value = true
 }
 
@@ -241,6 +244,11 @@ function confirmDelete() {
     deleteConversation(pendingDeleteId.value, deleteWithHistory.value)
     pendingDeleteId.value = ''
   }
+}
+
+/** 自定义操作项未传 handler 时，向上 re-emit 给外层处理 */
+function handleCustomAction(key: string, conversation: Conversation) {
+  emit('custom-action', key, conversation)
 }
 </script>
 
@@ -314,6 +322,7 @@ function confirmDelete() {
         @pin="pinConversation"
         @delete="handleDelete"
         @read="sendChannelAck"
+        @custom-action="handleCustomAction"
       />
       <!-- 会话列表同步中（WebSocket 首次同步） -->
       <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__syncing">
@@ -479,6 +488,8 @@ function confirmDelete() {
 .conversation-list__items {
   flex: 1;
   overflow-y: auto;
+  /* 滚动到边界时不把滚动链穿透给外层页面（H5 下拉刷新场景） */
+  overscroll-behavior-y: contain;
 }
 
 .conversation-list__loading {

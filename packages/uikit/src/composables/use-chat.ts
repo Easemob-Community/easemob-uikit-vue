@@ -42,7 +42,8 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
   return sdkMsg as unknown as SdkMessage
 }
 
-const TYPING_DURATION = 5000
+/** 编辑态消息（模块级单例，保证 chat.vue 与 message-input 跨组件共享同一份状态） */
+const editingMessage = ref<UiMessage | null>(null)
 
 /**
  * useChat 是消息相关能力的薄聚合层。
@@ -55,7 +56,6 @@ export function useChat() {
   const actions = useMessageActions()
 
   const currentConversation = computed(() => stores.conversation.currentConversation)
-  const editingMessage = ref<UiMessage | null>(null)
 
   function enterEditMode(message: UiMessage) {
     editingMessage.value = message
@@ -84,11 +84,6 @@ export function useChat() {
       },
     })
     exitEditMode()
-  }
-
-  /** 发送输入状态命令 */
-  async function sendTypingCmd() {
-    // 输入状态通过 CMD 消息实现，本期先占位
   }
 
   /** 标记某条消息已读 */
@@ -220,10 +215,6 @@ export function useChat() {
     )
   }
 
-  function setTyping() {
-    // 占位：实际通过 timer 控制
-  }
-
   return {
     // 当前会话
     currentConversation,
@@ -246,18 +237,15 @@ export function useChat() {
     sendCmdMessage: send.sendCmdMessage,
     resendMessage: send.resendMessage,
 
-    // 编辑/输入状态/转发
+    // 编辑/转发
     editingMessage,
     enterEditMode,
     exitEditMode,
     modifyTextMessage,
-    sendTypingCmd,
     sendReadAckForMessage,
     fetchGroupReadDetail,
     forwardMessage,
     forwardCombineMessages,
-    setTyping,
-    TYPING_DURATION,
 
     // 来自 useMessageActions
     isMultiSelectMode: actions.isMultiSelectMode,

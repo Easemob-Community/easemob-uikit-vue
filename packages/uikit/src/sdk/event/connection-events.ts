@@ -23,7 +23,8 @@ export function createConnectionHandlers(stores: RootStores): ConnectionEventHan
       connLog.info('onDisconnected')
       stores.client.setConnected(false)
       stores.client.setConnecting(false)
-      stores.client.setCurrentUser('')
+      // 断线不清 currentUser：自动重连只触发 onConnected，
+      // 若此处清空则重连后 currentUser 永不恢复；仅 logout 时才清除。
     },
     onReconnectFailed: () => {
       connLog.info('onReconnectFailed')

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '../../components/icon/icon.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
@@ -64,6 +64,7 @@ const emit = defineEmits<{
   (e: 'unmute-member', member: UiGroupMember): void
   (e: 'block-member', member: UiGroupMember): void
   (e: 'unblock-member', member: UiGroupMember): void
+  (e: 'transfer-owner', member: UiGroupMember): void
   (e: 'load-more'): void
   (e: 'close'): void
 }>()
@@ -78,7 +79,12 @@ const searchKeyword = ref('')
 const loadingMore = ref(false)
 const cursor = ref<string | undefined>(undefined)
 const localHasMore = ref(props.hasMore)
-const localMembers = ref<UiGroupMember[]>(props.members)
+/** 首次拉取成功后以 store 为唯一数据源；拉取前/失败时回退到 props.members（独立使用场景） */
+const hasFetched = ref(false)
+const storeMembers = computed(() => stores.group.getGroupMembers(props.groupId))
+const displayMembers = computed<UiGroupMember[]>(() =>
+  hasFetched.value || storeMembers.value.length > 0 ? storeMembers.value : props.members,
+)
 
 // Presence 可视区域懒加载
 const itemsRef = ref<HTMLElement>()
@@ -134,9 +140,17 @@ function getMemberPresence(userId: string): PresenceDisplayStatus | undefined {
   return getPresence(userId)?.status as PresenceDisplayStatus | undefined
 }
 
-watch(() => props.members, (val) => {
-  localMembers.value = val
-}, { immediate: true })
+// 卸载时清理 IntersectionObserver 与 presence 拉取定时器
+onBeforeUnmount(() => {
+  if (presenceObserver) {
+    presenceObserver.disconnect()
+    presenceObserver = null
+  }
+  if (presenceFetchTimer) {
+    clearTimeout(presenceFetchTimer)
+    presenceFetchTimer = null
+  }
+})
 
 watch(() => props.hasMore, (val) => {
   localHasMore.value = val
@@ -144,15 +158,15 @@ watch(() => props.hasMore, (val) => {
 
 const groupInfo = computed(() => props.group || stores.group.getGroupById(props.groupId))
 const currentUserRole = computed<'owner' | 'admin' | 'member'>(() => {
-  const member = localMembers.value.find(m => m.userId === props.currentUserId)
+  const member = displayMembers.value.find(m => m.userId === props.currentUserId)
   return (member?.role as 'owner' | 'admin' | 'member' | undefined) || 'member'
 })
 
 const filteredMembers = computed(() => {
   const keyword = searchKeyword.value.trim().toLowerCase()
   if (!keyword)
-    return localMembers.value
-  return localMembers.value.filter((m) => {
+    return displayMembers.value
+  return displayMembers.value.filter((m) => {
     const name = (m.nickname || m.userId).toLowerCase()
     return name.includes(keyword)
   })
@@ -168,8 +182,9 @@ watch(
 
 async function initialLoad() {
   try {
+    // domain 内部会把结果写入 store（setGroupMembers/appendGroupMembers），这里只维护分页游标
     const result = await fetchGroupMembers(props.groupId)
-    localMembers.value = result.members
+    hasFetched.value = true
     cursor.value = result.cursor
     localHasMore.value = result.hasMore ?? false
   }
@@ -185,7 +200,6 @@ async function onLoadMore() {
   loadingMore.value = true
   try {
     const result = await fetchGroupMembers(props.groupId, cursor.value)
-    localMembers.value = [...localMembers.value, ...result.members]
     cursor.value = result.cursor
     localHasMore.value = result.hasMore ?? false
     emit('load-more')
@@ -217,13 +231,11 @@ async function refresh() {
 }
 
 function removeMember(userId: string) {
-  localMembers.value = localMembers.value.filter(m => m.userId !== userId)
+  stores.group.removeGroupMembers(props.groupId, [userId])
 }
 
 function setMemberRole(userId: string, role: UiGroupMember['role']) {
-  const member = localMembers.value.find(m => m.userId === userId)
-  if (member)
-    member.role = role
+  stores.group.updateGroupMemberRole(props.groupId, userId, role)
 }
 
 defineExpose({ refresh, removeMember, setMemberRole })
@@ -235,7 +247,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
     <div v-if="props.showHeader" class="group-member-list__header">
       <div class="group-member-list__header-left">
         <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
-        <span class="group-member-list__count">{{ groupInfo?.memberCount ?? localMembers.length }}</span>
+        <span class="group-member-list__count">{{ groupInfo?.memberCount ?? displayMembers.length }}</span>
       </div>
       <button
         v-if="props.closable"
@@ -295,6 +307,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           @unmute-member="emit('unmute-member', $event)"
           @block-member="emit('block-member', $event)"
           @unblock-member="emit('unblock-member', $event)"
+          @transfer-owner="emit('transfer-owner', $event)"
         />
 
         <!-- 加载更多 -->

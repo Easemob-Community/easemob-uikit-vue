@@ -55,11 +55,11 @@ const { t } = useLocale()
 
 const statusText = computed(() => {
   const map: Record<PresenceDisplayStatus, string> = {
-    online: t('userCard.online') || '在线',
-    offline: t('userCard.offline') || '离线',
-    away: t('presence.away') || '离开',
-    busy: t('presence.busy') || '忙碌',
-    custom: t('presence.custom') || '自定义',
+    online: t('userCard.online', '在线'),
+    offline: t('userCard.offline', '离线'),
+    away: t('presence.away', '离开'),
+    busy: t('presence.busy', '忙碌'),
+    custom: t('presence.custom', '自定义'),
   }
   return props.status ? map[props.status] : ''
 })
@@ -74,8 +74,8 @@ function onInfoClick(row: UserCardInfoRow) {
 }
 
 function onAvatarClick() {
-  if (props.editable)
-    emit('presence-click')
+  // presence-click 由 Avatar 内部（editable 时点击）已 emit，经模板 @presence-click 转发，
+  // 这里只转发 avatar-click，避免一次点击重复触发 presence-click
   emit('avatar-click')
 }
 </script>
@@ -278,13 +278,13 @@ function onAvatarClick() {
   gap: 8px;
   padding: 14px 4px;
   border-radius: var(--uikit-components-radius, 12px);
-  background-color: #f3f4f6;
+  background-color: var(--uikit-bg-secondary);
   cursor: pointer;
   transition: background-color 150ms ease;
 }
 
 .user-card__action:hover {
-  background-color: #e5e7eb;
+  background-color: var(--uikit-bg-hover);
 }
 
 .user-card__action--primary {

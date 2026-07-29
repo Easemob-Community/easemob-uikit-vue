@@ -34,6 +34,7 @@ export const useClientStore = defineStore('client', () => {
   function clearClient() {
     client.value = null
     connected.value = false
+    connecting.value = false
     currentUser.value = ''
     appKey.value = ''
   }

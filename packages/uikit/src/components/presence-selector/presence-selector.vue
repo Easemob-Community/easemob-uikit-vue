@@ -111,7 +111,7 @@ function onCancel() {
         <template #trailing>
           <Icon
             v-if="isActive(option)"
-            name="actions/checkmark_thick"
+            name="actions/check"
             :size="16"
             class="presence-selector__check"
           />

@@ -22,7 +22,6 @@ import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
-import TypingIndicator from './typing-indicator/typing-indicator.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 /** 渲染错误信息 */
@@ -62,7 +61,7 @@ defineExpose({
   getText: () => messageInputRef.value?.getText?.() || '',
 })
 
-const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages, setTyping, TYPING_DURATION } = useChat()
+const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
 const { stores, h5, client } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
@@ -73,6 +72,16 @@ onUnmounted(() => {
   exitMultiSelectMode()
   exitEditMode()
   clearQuote()
+})
+
+/**
+ * 键盘高度变化后再滚动消息列表到底部：
+ * @focus 触发时键盘动画尚未完成，立即滚动仍会被键盘遮挡，
+ * 等 keyboardHeight 更新（动画推进/完成）后 nextTick 滚动才能保证最新消息可见。
+ */
+watch(h5.keyboardHeight, async () => {
+  await nextTick()
+  messageListRef.value?.scrollToBottom?.()
 })
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -313,61 +322,6 @@ watch(
   { immediate: true },
 )
 
-/** 是否启用输入状态提示 */
-const enableTyping = computed(() => props.config?.input?.enableTyping !== false)
-
-/** 当前会话对方是否正在输入 */
-const isTyping = computed(() => {
-  if (!enableTyping.value || !currentConversation.value)
-    return false
-  return stores.conversation.typingMap[currentConversation.value.id] || false
-})
-
-/** Typing 状态 5s 隐藏定时器 */
-let typingHideTimer: ReturnType<typeof setTimeout> | null = null
-
-/** 清除 typing 隐藏定时器 */
-function clearTypingTimer() {
-  if (typingHideTimer) {
-    clearTimeout(typingHideTimer)
-    typingHideTimer = null
-  }
-}
-
-/** 收到 typing 后启动/重置 5s 隐藏定时器 */
-function startTypingHideTimer() {
-  clearTypingTimer()
-  typingHideTimer = setTimeout(() => {
-    if (currentConversation.value) {
-      setTyping()
-    }
-    typingHideTimer = null
-  }, TYPING_DURATION)
-}
-
-/** 监听 typing 状态变化：显示时启动定时器 */
-watch(isTyping, (typing) => {
-  if (typing) {
-    startTypingHideTimer()
-  }
-  else {
-    clearTypingTimer()
-  }
-})
-
-/** 会话切换时清理 typing 状态 */
-watch(currentConversation, (cvs, oldCvs) => {
-  if (oldCvs && oldCvs.id !== cvs?.id) {
-    clearTypingTimer()
-    setTyping()
-  }
-})
-
-/** 组件卸载时清理 */
-onUnmounted(() => {
-  clearTypingTimer()
-})
-
 /**
  * 尝试定位到首条@我的消息
  * - 如果消息已存在于列表中，直接定位并清除该会话的@我记录
@@ -405,6 +359,9 @@ function locateAtMeMessage(cvsId: string) {
 watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id)
     return
+
+  // 会话切换：退出多选模式，避免多选栏跨会话残留
+  exitMultiSelectMode()
 
   // 切换会话前：保存旧会话的未发送内容作为草稿
   if (oldCvs) {
@@ -815,9 +772,6 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
       <!-- 消息列表 -->
       <MessageList ref="messageListRef" :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
-
-      <!-- 输入状态提示 -->
-      <TypingIndicator v-if="!isMultiSelectMode && isTyping" :show="isTyping" />
 
       <!-- 多选模式底部操作栏 -->
       <MultiSelectBar

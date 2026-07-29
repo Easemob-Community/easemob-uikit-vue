@@ -214,6 +214,8 @@ function onPresenceSelectorClose() {
   width: 320px;
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 64px);
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 100vh */
+  max-height: calc(100dvh - 64px);
   overflow-y: auto;
 }
 
