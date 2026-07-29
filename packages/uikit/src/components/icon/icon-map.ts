@@ -13,10 +13,26 @@ const svgModules = import.meta.glob<{ default: string }>(
 export interface IconSvgData {
   body: string
   viewBox: string
+  /**
+   * 源 <svg> 根节点的绘制属性。
+   * Lucide 等描边式图标的 path 不带 fill/stroke，依赖根节点继承，
+   * 剥离 <svg> 标签后必须由 Icon 组件透传这些属性，否则描边图标会渲染成实心色块。
+   */
+  fill?: string
+  stroke?: string
+  strokeWidth?: string
+  strokeLinecap?: string
+  strokeLinejoin?: string
 }
 
 /** 默认 viewBox，与原 Icon 组件硬编码值保持一致 */
 const DEFAULT_VIEW_BOX = '0 0 24 24'
+
+/** 从 <svg> 开标签中提取指定属性值 */
+function pickAttr(tag: string, attr: string): string | undefined {
+  const m = tag.match(new RegExp(`\\b${attr}="([^"]+)"`))
+  return m ? m[1] : undefined
+}
 
 /** 将文件路径解析为图标名，如 "../../assets/icons/actions/trash.svg" → "actions/trash" */
 const iconMap = new Map<string, IconSvgData>()
@@ -31,10 +47,18 @@ for (const path of Object.keys(svgModules)) {
       // 只提取 <svg> 内部的子元素内容（<path> 等），不含 <svg> 标签本身
       const innerMatch = raw.match(/<svg[^>]*>([\s\S]*)<\/svg>/)
       // 保留原 svg 的 viewBox（画布不一定是 24x24），缺失时回退默认值
-      const viewBoxMatch = raw.match(/<svg[^>]*\bviewBox="([^"]+)"/)
+      const openTagMatch = raw.match(/<svg[^>]*>/)
+      const openTag = openTagMatch ? openTagMatch[0] : ''
+      const viewBox = pickAttr(openTag, 'viewBox') ?? DEFAULT_VIEW_BOX
       iconMap.set(match[1], {
         body: innerMatch ? innerMatch[1].trim() : '',
-        viewBox: viewBoxMatch ? viewBoxMatch[1] : DEFAULT_VIEW_BOX,
+        viewBox,
+        // 透传根节点绘制属性（描边图标必需；填充图标通常无 stroke，不影响）
+        fill: pickAttr(openTag, 'fill'),
+        stroke: pickAttr(openTag, 'stroke'),
+        strokeWidth: pickAttr(openTag, 'stroke-width'),
+        strokeLinecap: pickAttr(openTag, 'stroke-linecap'),
+        strokeLinejoin: pickAttr(openTag, 'stroke-linejoin'),
       })
     }
   }
