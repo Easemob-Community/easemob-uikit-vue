@@ -22,7 +22,7 @@ export interface IconButtonEmits {
 const props = withDefaults(defineProps<IconButtonProps>(), {
   iconSize: undefined,
   type: 'default',
-  variant: 'solid',
+  variant: 'ghost',
   size: 'medium',
   disabled: false,
 })
@@ -64,13 +64,14 @@ function handleClick(event: MouseEvent) {
               color 0.15s var(--uikit-anim-easing, ease),
               border-color 0.15s var(--uikit-anim-easing, ease),
               opacity 0.15s var(--uikit-anim-easing, ease),
-              transform 0.1s var(--uikit-anim-easing, ease);
+              transform 0.15s var(--uikit-anim-easing, ease),
+              box-shadow 0.15s var(--uikit-anim-easing, ease);
   flex-shrink: 0;
   box-sizing: border-box;
 }
 
 .uikit-icon-button:active:not(:disabled) {
-  transform: scale(var(--uikit-anim-scale-press, 0.96));
+  transform: translateY(0) scale(var(--uikit-anim-scale-press, 0.96));
 }
 
 .uikit-icon-button:disabled {
@@ -192,6 +193,11 @@ function handleClick(event: MouseEvent) {
 .uikit-icon-button--ghost {
   background-color: transparent;
   border-color: transparent;
+}
+
+.uikit-icon-button--ghost:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .uikit-icon-button--default.uikit-icon-button--ghost {
