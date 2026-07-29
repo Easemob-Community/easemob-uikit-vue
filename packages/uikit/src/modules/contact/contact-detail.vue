@@ -338,6 +338,7 @@ function onPresenceSelectorClose() {
               <IconButton
                 icon="actions/xmark_thick"
                 size="small"
+                type="danger"
                 :title="t('button.cancel') || '取消'"
                 @click="cancelEditRemark"
               />

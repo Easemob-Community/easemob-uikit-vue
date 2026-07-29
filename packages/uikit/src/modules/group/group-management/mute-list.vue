@@ -239,6 +239,7 @@ defineExpose({
           <IconButton
             icon="actions/xmark_thick"
             size="small"
+            type="danger"
             :title="t('group.blocklist.cancel') || '取消'"
             @click="closeAddPopup"
           />
