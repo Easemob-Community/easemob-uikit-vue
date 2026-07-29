@@ -144,6 +144,7 @@ const hasManagementEntries = computed(() => {
 const activeDrawerKey = ref<ManagementKey | null>(null)
 const sharedFileListRef = ref<InstanceType<typeof EmGroupSharedFileList> | null>(null)
 const blockListRef = ref<InstanceType<typeof EmGroupBlocklist> | null>(null)
+const muteListRef = ref<InstanceType<typeof EmGroupMuteList> | null>(null)
 const showDrawer = computed({
   get: () => activeDrawerKey.value !== null,
   set: (value: boolean) => {
@@ -245,6 +246,14 @@ function closeDrawer() {
             :title="t('group.blocklist.add') || '添加'"
             @click="blockListRef?.openAddMember()"
           />
+          <IconButton
+            v-else-if="activeDrawerKey === 'mute'"
+            icon="actions/plus"
+            size="small"
+            type="primary"
+            :title="t('group.mutelist.add') || '添加禁言'"
+            @click="muteListRef?.openAddMember()"
+          />
           <span v-else class="group-management-section__drawer-placeholder" />
         </div>
       </template>
@@ -252,6 +261,7 @@ function closeDrawer() {
       <div class="group-management-section__drawer-body">
         <EmGroupMuteList
           v-if="activeDrawerKey === 'mute'"
+          ref="muteListRef"
           :group-id="props.groupId"
           @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
           @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
@@ -312,11 +322,20 @@ function closeDrawer() {
             :title="t('group.blocklist.add') || '添加'"
             @click="blockListRef?.openAddMember()"
           />
+          <IconButton
+            v-else-if="activeDrawerKey === 'mute'"
+            icon="actions/plus"
+            size="small"
+            type="primary"
+            :title="t('group.mutelist.add') || '添加禁言'"
+            @click="muteListRef?.openAddMember()"
+          />
           <span v-else class="group-management-section__drawer-placeholder" />
         </div>
         <div class="group-management-section__drawer-body">
           <EmGroupMuteList
             v-if="activeDrawerKey === 'mute'"
+            ref="muteListRef"
             :group-id="props.groupId"
             @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
           @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"

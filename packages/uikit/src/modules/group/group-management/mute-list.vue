@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
-import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
@@ -191,9 +190,6 @@ defineExpose({
       <span class="mute-list__header-count">
         {{ members.length }} {{ t('group.mutelist.memberCount') || '名禁言成员' }}
       </span>
-      <button class="mute-list__add-btn" @click="openAddMember">
-        {{ t('group.mutelist.add') || '添加禁言' }}
-      </button>
     </div>
 
     <div v-if="loading" class="mute-list__loading">
@@ -236,21 +232,16 @@ defineExpose({
           />
         </div>
         <div class="mute-list__popup-footer">
-          <IconButton
-            icon="actions/xmark_thick"
-            size="small"
-            type="danger"
-            :title="t('group.blocklist.cancel') || '取消'"
-            @click="closeAddPopup"
-          />
-          <IconButton
-            icon="actions/check"
-            size="small"
-            type="success"
+          <button class="mute-list__popup-btn mute-list__popup-btn--cancel" @click="closeAddPopup">
+            {{ t('group.blocklist.cancel') || '取消' }}
+          </button>
+          <button
+            class="mute-list__popup-btn mute-list__popup-btn--confirm"
             :disabled="selectedUserIds.size === 0"
-            :title="t('group.blocklist.confirm') || '确定'"
             @click="onConfirmAdd"
-          />
+          >
+            {{ t('group.blocklist.confirm') || '确定' }}
+          </button>
         </div>
       </div>
     </Popup>
@@ -274,23 +265,6 @@ defineExpose({
 .mute-list__header-count {
   font-size: 13px;
   color: var(--uikit-text-secondary);
-}
-
-.mute-list__add-btn {
-  padding: 4px 12px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: 1px solid var(--uikit-primary-color);
-  background: none;
-  color: var(--uikit-primary-color);
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-
-.mute-list__add-btn:hover {
-  background-color: var(--uikit-primary-color);
-  color: #ffffff;
 }
 
 .mute-list__loading,
@@ -348,5 +322,35 @@ defineExpose({
   gap: 12px;
   padding: 12px 16px;
   border-top: 1px solid var(--uikit-border-color, #f3f4f6);
+}
+
+.mute-list__popup-btn {
+  padding: 6px 16px;
+  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mute-list__popup-btn:hover {
+  background-color: var(--uikit-bg-secondary);
+}
+
+.mute-list__popup-btn--confirm {
+  border-color: var(--uikit-primary-color);
+  background-color: var(--uikit-primary-color);
+  color: #ffffff;
+}
+
+.mute-list__popup-btn--confirm:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.mute-list__popup-btn--confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
