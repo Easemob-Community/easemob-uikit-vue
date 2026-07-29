@@ -20,10 +20,16 @@ const userId = computed(() => {
   return user?.userId || ''
 })
 
-/** 禁言到期说明：muteExpire 缺失或非正数视为永久禁言（0.14.225+ SDK 返回该字段） */
+/** 禁言到期说明：
+ * - muteExpire 缺失、非正数，或超过 100 年后的时间戳视为永久禁言
+ * - 小于等于当前时间视为已到期
+ * - 否则显示到期时间
+ */
+const PERMANENT_THRESHOLD_MS = 100 * 365 * 24 * 60 * 60 * 1000
+
 const muteText = computed(() => {
   const expire = props.item?.muteExpire
-  if (expire === undefined || expire === null || expire <= 0)
+  if (expire === undefined || expire === null || expire <= 0 || expire - Date.now() > PERMANENT_THRESHOLD_MS)
     return t('group.mutelist.permanent', '永久禁言')
   if (expire <= Date.now())
     return t('group.mutelist.expired', '禁言已到期')
