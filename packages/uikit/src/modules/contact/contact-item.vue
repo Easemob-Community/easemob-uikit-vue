@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<ContactItemProps>(), {
   selectMode: 'none',
   disabled: false,
   showAvatar: true,
-  avatarShape: 'circle',
+  avatarShape: undefined,
   size: 'normal',
 })
 

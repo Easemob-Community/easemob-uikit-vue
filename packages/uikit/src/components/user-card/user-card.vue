@@ -98,7 +98,6 @@ function onAvatarClick() {
           :src="props.avatar"
           :name="props.name"
           :size="90"
-          shape="circle"
           :presence="props.status"
           :editable="props.editable"
           @presence-click="emit('presence-click')"

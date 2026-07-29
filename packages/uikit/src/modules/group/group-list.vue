@@ -103,7 +103,7 @@ const props = withDefaults(defineProps<GroupListProps>(), {
   selectMode: 'none',
   showAvatar: true,
   showMemberCount: true,
-  avatarShape: 'rounded',
+  avatarShape: undefined,
   itemSize: 'normal',
   loading: false,
   hasMore: true,

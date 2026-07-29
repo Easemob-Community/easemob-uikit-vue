@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<GroupItemProps>(), {
   disabled: false,
   showAvatar: true,
   showMemberCount: true,
-  avatarShape: 'rounded',
+  avatarShape: undefined,
   size: 'normal',
 })
 

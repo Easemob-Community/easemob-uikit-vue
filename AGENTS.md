@@ -13,6 +13,7 @@
 - 暂存后确认没混入产物/依赖：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'` 应为空（`dist/` 已 gitignore）。
 - 大改动先写计划、等确认再编码；涉及公开 API（组件名 / props / emits / 导出）改动先说明影响面。
 - 发现的技术债记进根 `TECH-DEBT.md`，逐条修复并勾选归档；不要为了「好看」大面积 `--fix` 未改动文件。
+- **Avatar 形状统一走主题**：`Avatar` 组件默认读取 `themeStore.avatarShape`（`props.shape` 为 `undefined` 时回落）。业务组件/列表项/卡片中复用 `Avatar` 时，默认不要硬编码 `shape`；只有明确需要覆盖主题时才传入。已修复历史硬编码点：`UserCard`、`GroupCard`、`ContactItem*`、`GroupItem*`、`ContactList`、`GroupList`。
 
 ## 工具链事实（省掉重复踩坑）
 

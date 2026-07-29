@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   showCheckbox: false,
   disabled: false,
   showAvatar: true,
-  avatarShape: 'circle',
+  avatarShape: undefined,
   size: 'normal',
 })
 
@@ -59,11 +59,14 @@ const resolvedAvatarSize = computed(() => {
   return 40
 })
 
-/** Avatar 组件仅支持 circle / square；rounded 与 square 视觉一致（8px 圆角） */
+/** Avatar 组件仅支持 circle / square；rounded 与 square 视觉一致（8px 圆角）。
+ *  未传入 shape 时返回 undefined，由 Avatar 组件读取主题配置。 */
 const resolvedAvatarShape = computed(() => {
   if (props.avatarShape === 'circle')
     return 'circle'
-  return 'square'
+  if (props.avatarShape === 'rounded' || props.avatarShape === 'square')
+    return 'square'
+  return undefined
 })
 </script>
 

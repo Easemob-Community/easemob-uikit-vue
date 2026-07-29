@@ -61,7 +61,6 @@ function onActionClick(key: string) {
           :src="props.avatar"
           :name="props.name"
           :size="90"
-          shape="square"
         />
         <div class="group-card__meta">
           <div class="group-card__name">

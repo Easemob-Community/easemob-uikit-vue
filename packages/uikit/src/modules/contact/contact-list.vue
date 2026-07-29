@@ -109,7 +109,7 @@ const props = withDefaults(defineProps<ContactListProps>(), {
   showAlphabetNav: true,
   selectMode: 'none',
   showAvatar: true,
-  avatarShape: 'circle',
+  avatarShape: undefined,
   itemSize: 'normal',
   loading: false,
   hasMore: true,

@@ -46,6 +46,14 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [x] D20. `Avatar` shape 在卡片与列表项中被硬编码，未遵循主题 `avatarShape`
+
+- **现象**：`UserCard` 硬编码 `shape="circle"`、`GroupCard` 硬编码 `shape="square"`，`ContactItem*` / `GroupItem*` / `ContactList` / `GroupList` 的 `avatarShape` 默认值也硬编码为 `'circle'` / `'rounded'`。当用户通过主题设置把头像改成方形/圆角时，名片和列表项不会跟随变化。
+- **证据**：`components/user-card/user-card.vue` L99 `shape="circle"`；`components/group-card/group-card.vue` L64 `shape="square"`；`modules/contact/contact-list.vue` L112 `avatarShape: 'circle'`；`modules/contact/contact-item.vue` L31 `avatarShape: 'circle'`；`modules/contact/contact-item-default.vue` L38 `avatarShape: 'circle'`；`modules/group/group-list.vue` L106 `avatarShape: 'rounded'`；`modules/group/group-item.vue` L32 `avatarShape: 'rounded'`；`modules/group/group-item-default.vue` L38 `avatarShape: 'rounded'`。
+- **建议修法**：移除上述硬编码，默认值改为 `undefined`；`Avatar` 组件在 `props.shape` 为 `undefined` 时会自动读取 `themeStore.avatarShape`。`contact-item-default` / `group-item-default` 内部把 `rounded` 映射为 `square` 的逻辑保留，但 `undefined` 时返回 `undefined` 交给 `Avatar` 处理。
+- **修复**：已于 2026-07-29 修复。涉及文件：`user-card.vue`、`group-card.vue`、`contact-list.vue`、`contact-item.vue`、`contact-item-default.vue`、`group-list.vue`、`group-item.vue`、`group-item-default.vue`。
+- **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
+
 ### [ ] D3. 主题 token 漂移：大量硬编码颜色 / 圆角 / 动效时长
 
 - **现象**：库的样式契约是「只用 `var(--uikit-*)` token」，但组件 `<style>` 里散落 **140 处 hex + 51 处 rgba** 字面量，还有 ~50 处硬编码 `transition` 时长绕过动画开关。
