@@ -388,7 +388,7 @@ async function onMessageAction(event: MessageActionEvent) {
     }
     catch (e: unknown) {
       console.warn('[MessageList] pinMessage failed:', e)
-      showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败')
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败', 'error')
     }
     return
   }
@@ -398,7 +398,7 @@ async function onMessageAction(event: MessageActionEvent) {
     }
     catch (e: unknown) {
       console.warn('[MessageList] unpinMessage failed:', e)
-      showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败')
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败', 'error')
     }
     return
   }
@@ -410,7 +410,7 @@ async function onMessageAction(event: MessageActionEvent) {
     }
     catch (e: unknown) {
       console.warn('[MessageList] translateTextMessage failed:', e)
-      showToast(resolveTranslateErrorMessage(e))
+      showToast(resolveTranslateErrorMessage(e), 'error')
     }
   }
 }
@@ -436,19 +436,19 @@ function onToggleTranslation(message: UiMessage) {
 async function handleCopyMessage(message: UiMessage) {
   const text = message.type === 'text' ? (message.body as TextMessageBody).content || '' : ''
   if (!text) {
-    showToast(t('message.copyFailed') ?? '复制失败')
+    showToast(t('message.copyFailed') ?? '复制失败', 'error')
     return
   }
   if (!isClipboardSupported.value) {
-    showToast(t('message.copyFailed') ?? '复制失败')
+    showToast(t('message.copyFailed') ?? '复制失败', 'error')
     return
   }
   try {
     await copyToClipboard(text)
-    showToast(t('message.copySuccess') ?? '已复制')
+    showToast(t('message.copySuccess') ?? '已复制', 'success')
   }
   catch {
-    showToast(t('message.copyFailed') ?? '复制失败')
+    showToast(t('message.copyFailed') ?? '复制失败', 'error')
   }
 }
 
@@ -464,7 +464,7 @@ async function onResend(message: UiMessage) {
   }
   catch (e: unknown) {
     console.warn('[MessageList] resend failed:', e)
-    showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t))
+    showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t), 'error')
   }
 }
 
@@ -590,7 +590,7 @@ watch(locateRequest, (req) => {
     return
   const ok = locateAndFlash(req.msgID)
   if (!ok) {
-    showToast(t('message.quote.notFound') ?? '原消息已删除或未加载')
+    showToast(t('message.quote.notFound') ?? '原消息已删除或未加载', 'warning')
   }
 })
 </script>
