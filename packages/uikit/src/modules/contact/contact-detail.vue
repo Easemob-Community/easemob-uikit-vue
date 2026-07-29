@@ -15,6 +15,7 @@ import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import type { UiContact } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
+import type { UserCardAction } from '../../components/user-card/user-card.vue'
 
 export interface ContactDetailProps {
   /** 联系人用户 ID */
@@ -99,14 +100,14 @@ const remark = computed(() =>
   contactFromStore.value?.remark || props.contact?.remark || '',
 )
 
-const cardActions = computed(() => {
+const cardActions = computed<UserCardAction[]>(() => {
   const blocked = isBlocked(props.userId)
   return [
     {
       key: 'message',
       label: t('contact.detail.sendMessage') || '发消息',
       icon: 'chat/bubble_fill',
-      type: 'primary' as const,
+      type: 'primary',
     },
     {
       key: blocked ? 'unblock' : 'block',
@@ -114,13 +115,13 @@ const cardActions = computed(() => {
         ? (t('contact.detail.unblock') || '取消拉黑')
         : (t('contact.detail.block') || '拉黑'),
       icon: 'actions/ban',
-      type: 'default' as const,
+      type: blocked ? 'danger' : 'primary',
     },
     {
       key: 'delete',
       label: t('contact.detail.deleteContact') || '删除好友',
       icon: 'actions/trash',
-      type: 'danger' as const,
+      type: 'danger',
     },
   ]
 })
