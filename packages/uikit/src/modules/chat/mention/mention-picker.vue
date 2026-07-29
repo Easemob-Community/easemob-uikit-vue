@@ -6,6 +6,7 @@ import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Empty from '../../../components/empty/empty.vue'
+import Cell from '../../../components/cell/cell.vue'
 import type { MentionContact } from '../types'
 
 export interface MentionPickerProps {
@@ -103,18 +104,21 @@ function onKeydown(e: KeyboardEvent) {
         </div>
         <!-- 联系人列表 -->
         <div class="mention-picker__list">
-          <div
+          <Cell
             v-for="contact in filteredContacts"
             :key="contact.userId"
-            class="mention-picker__item"
+            class="mention-picker__cell"
+            :title="contact.remark || contact.name"
+            :subtitle="contact.remark ? contact.name : undefined"
+            size="normal"
+            :border="'bottom'"
+            :auto-height="true"
             @click="onSelect(contact)"
           >
-            <Avatar :src="contact.avatar" :name="contact.name" :size="32" />
-            <div class="mention-picker__info">
-              <span class="mention-picker__name">{{ contact.remark || contact.name }}</span>
-              <span v-if="contact.remark" class="mention-picker__sub">{{ contact.name }}</span>
-            </div>
-          </div>
+            <template #leading>
+              <Avatar :src="contact.avatar" :name="contact.name" :size="36" />
+            </template>
+          </Cell>
           <Empty
             v-if="filteredContacts.length === 0"
             icon="empty/mentions"
@@ -156,18 +160,21 @@ function onKeydown(e: KeyboardEvent) {
         </div>
         <!-- 联系人列表 -->
         <div class="mention-picker__list mention-picker__list--scrollable">
-          <div
+          <Cell
             v-for="contact in filteredContacts"
             :key="contact.userId"
-            class="mention-picker__item"
+            class="mention-picker__cell"
+            :title="contact.remark || contact.name"
+            :subtitle="contact.remark ? contact.name : undefined"
+            size="large"
+            :border="'bottom'"
+            :auto-height="true"
             @click="onSelect(contact)"
           >
-            <Avatar :src="contact.avatar" :name="contact.name" :size="40" />
-            <div class="mention-picker__info">
-              <span class="mention-picker__name">{{ contact.remark || contact.name }}</span>
-              <span v-if="contact.remark" class="mention-picker__sub">{{ contact.name }}</span>
-            </div>
-          </div>
+            <template #leading>
+              <Avatar :src="contact.avatar" :name="contact.name" :size="40" />
+            </template>
+          </Cell>
           <Empty
             v-if="filteredContacts.length === 0"
             icon="empty/mentions"
@@ -222,48 +229,19 @@ function onKeydown(e: KeyboardEvent) {
   max-height: 50vh;
 }
 
-.mention-picker__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.mention-picker__item:hover {
-  background-color: var(--uikit-bg-hover);
-}
-
-.mention-picker__item:active {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.mention-picker__info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.mention-picker__name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mention-picker__sub {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
+.mention-picker__cell {
+  /* 在 Popup 内取消 Cell 默认的水平内缩，让 hover 背景顶满容器 */
+  --uikit-item-hover-padding-x: 0px;
+  --uikit-item-hover-margin-x: 0px;
+  --uikit-item-hover-radius: 0px;
 }
 
 /* ===== PC 端样式 ===== */
 .mention-picker--pc {
-  min-width: 200px;
-  max-width: 280px;
+  min-width: 220px;
+  max-width: 300px;
+  padding: 8px 0;
+  border-radius: 8px;
 }
 
 .mention-picker--pc .mention-picker__list {
@@ -273,6 +251,7 @@ function onKeydown(e: KeyboardEvent) {
 /* ===== H5 端样式 ===== */
 .mention-picker--h5 {
   width: 100%;
+  padding: 0 0 12px;
   border-radius: 12px 12px 0 0;
 }
 

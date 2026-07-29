@@ -295,18 +295,24 @@ const isMutedAll = computed(() => {
   return role !== 'owner' && role !== 'admin'
 })
 
-/** 群聊 @提及成员列表 */
+/** 群聊 @提及成员列表：走用户属性展示链（备注 > 用户资料昵称 > 群成员昵称 > ID） */
 const mentionContacts = computed<MentionContact[]>(() => {
   if (!isGroupChat.value || !currentConversation.value)
     return []
   return stores.group
     .getGroupMembers(currentConversation.value.id)
     .filter(m => m.userId !== currentUserId.value)
-    .map(m => ({
-      userId: m.userId,
-      name: m.nickname || m.userId,
-      avatar: m.avatarUrl,
-    }))
+    .map((m) => {
+      const contact = stores.contact.getContact(m.userId)
+      const userInfo = stores.userInfo.getUserInfo(m.userId)
+      const displayName = contact?.remark || userInfo?.nickname || m.nickname || m.userId
+      return {
+        userId: m.userId,
+        name: displayName,
+        avatar: userInfo?.avatarUrl || contact?.avatar || m.avatarUrl,
+        remark: contact?.remark,
+      }
+    })
 })
 
 /** 切换到群聊会话时，若本地没有成员则拉取第一页成员（用于 @提及） */
