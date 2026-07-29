@@ -46,10 +46,6 @@ function onItemClick(action: MessageActionItem) {
   flex-direction: column;
   min-width: 160px;
   padding: 6px;
-  background-color: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
 }
 
 .message-action-menu__item {

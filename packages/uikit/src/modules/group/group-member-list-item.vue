@@ -461,10 +461,6 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 .group-member-list__context-menu {
   display: flex;
   flex-direction: column;
-  background: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
   min-width: 120px;
   padding: 6px;
 }

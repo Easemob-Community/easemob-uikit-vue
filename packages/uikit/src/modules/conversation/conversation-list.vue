@@ -446,14 +446,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
   background-color: var(--uikit-bg-secondary);
 }
 
-/* PC Header 菜单 —— 与 conversation-item 右键菜单风格统一 */
+/* PC Header 菜单 —— 与 conversation-item 右键菜单风格统一。
+   外层外壳由 Popup 统一提供，此处只负责内容布局。 */
 .context-menu {
   display: flex;
   flex-direction: column;
-  background: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: var(--uikit-shadow, 0 10px 32px rgba(0, 0, 0, 0.14));
   min-width: 160px;
   padding: 6px;
 }

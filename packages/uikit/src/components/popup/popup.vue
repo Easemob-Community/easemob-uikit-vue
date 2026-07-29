@@ -278,7 +278,8 @@ onUnmounted(() => {
   max-height: 90vh;
   /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 90vh */
   max-height: 90dvh;
-  overflow: auto;
+  /* 统一裁剪子元素到圆角内，避免子组件直角背景/边框顶出圆角 */
+  overflow: hidden;
   /* 弹层内容滚动到边界时不把滚动链穿透给背景页面 */
   overscroll-behavior: contain;
 }
@@ -288,6 +289,7 @@ onUnmounted(() => {
   background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 8px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  overflow: auto;
 }
 
 .uikit-popup__content--bottom {
@@ -301,6 +303,7 @@ onUnmounted(() => {
   max-width: 100%;
   max-height: 80vh;
   padding-bottom: var(--uikit-safe-bottom, 0px);
+  overflow: auto;
 }
 
 .uikit-popup__content--top {
@@ -312,6 +315,7 @@ onUnmounted(() => {
   border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
+  overflow: auto;
 }
 
 .uikit-popup__content--left {
@@ -323,6 +327,7 @@ onUnmounted(() => {
   border-radius: 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0;
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
+  overflow: auto;
 }
 
 .uikit-popup__content--right {
@@ -334,6 +339,7 @@ onUnmounted(() => {
   border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
+  overflow: auto;
 }
 
 .uikit-popup__close {
@@ -351,5 +357,12 @@ onUnmounted(() => {
   position: fixed;
   margin: 0;
   transform-origin: var(--uikit-anim-anchor-origin-x) var(--uikit-anim-anchor-origin-y);
+  /* 为锚定 Popup 提供统一外壳：背景、圆角、阴影、裁剪。
+     避免子组件（菜单、表情面板等）的透明外层露出页面背景，
+     从而解决“内层圆角、外层灰色直角”的问题。 */
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  overflow: hidden;
 }
 </style>

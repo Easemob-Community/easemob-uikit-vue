@@ -143,10 +143,7 @@ function onCancel() {
 .presence-selector {
   width: 280px;
   max-width: calc(100vw - 32px);
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
   padding: 16px;
-  box-shadow: var(--uikit-shadow, 0 4px 24px rgba(0, 0, 0, 0.08));
 }
 
 .presence-selector__header {

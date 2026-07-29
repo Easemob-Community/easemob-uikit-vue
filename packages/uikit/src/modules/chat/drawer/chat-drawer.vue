@@ -138,6 +138,7 @@ onClickOutside(panelRef, (event) => {
   pointer-events: auto;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   border-radius: var(--uikit-components-radius, 12px) 0 0 var(--uikit-components-radius, 12px);
+  overflow: hidden;
 }
 
 .chat-drawer__panel--square {

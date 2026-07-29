@@ -634,13 +634,6 @@ defineExpose({
 /* 表情选择器包裹层：hover 阴影效果（非 scoped，因 Popup 使用 Teleport） */
 .emoji-picker-wrapper {
   width: 320px;
-  border-radius: var(--uikit-components-radius, 12px);
-  background: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border, rgba(0, 0, 0, 0.08));
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 12px 40px rgba(0, 0, 0, 0.14);
 }
 </style>
 
