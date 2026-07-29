@@ -16,6 +16,7 @@ import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
 import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
+import Icon from '../../../components/icon/icon.vue'
 import MessageVirtualList from './message-virtual-list.vue'
 
 export interface MessageListProps {
