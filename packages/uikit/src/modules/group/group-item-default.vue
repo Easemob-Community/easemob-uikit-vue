@@ -47,8 +47,8 @@ const resolvedAvatarSize = computed(() => {
   if (props.size === 'compact')
     return 32
   if (props.size === 'large')
-    return 48
-  return 40
+    return 56
+  return 48
 })
 
 /** Avatar 组件仅支持 circle / square；rounded 与 square 视觉一致（8px 圆角）。
