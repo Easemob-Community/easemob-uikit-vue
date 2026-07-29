@@ -24,10 +24,10 @@ const userId = computed(() => {
 const muteText = computed(() => {
   const expire = props.item?.muteExpire
   if (expire === undefined || expire === null || expire <= 0)
-    return t('group.mutelist.permanent') || '永久禁言'
+    return t('group.mutelist.permanent', '永久禁言')
   if (expire <= Date.now())
-    return t('group.mutelist.expired') || '禁言已到期'
-  return `${t('group.mutelist.expireAt') || '禁言至'} ${new Date(expire).toLocaleString()}`
+    return t('group.mutelist.expired', '禁言已到期')
+  return `${t('group.mutelist.expireAt', '禁言至')} ${new Date(expire).toLocaleString()}`
 })
 
 const { displayName, avatarUrl } = useUserInfo(userId)
