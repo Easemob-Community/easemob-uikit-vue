@@ -109,9 +109,9 @@ function onKeydown(e: KeyboardEvent) {
             :key="contact.userId"
             class="mention-picker__cell"
             :title="contact.remark || contact.name"
-            :subtitle="contact.remark ? contact.name : undefined"
+            :subtitle="contact.remark && contact.remark !== contact.name ? contact.name : undefined"
             size="normal"
-            :border="'bottom'"
+            :border="false"
             :auto-height="true"
             @click="onSelect(contact)"
           >
@@ -165,9 +165,9 @@ function onKeydown(e: KeyboardEvent) {
             :key="contact.userId"
             class="mention-picker__cell"
             :title="contact.remark || contact.name"
-            :subtitle="contact.remark ? contact.name : undefined"
+            :subtitle="contact.remark && contact.remark !== contact.name ? contact.name : undefined"
             size="large"
-            :border="'bottom'"
+            :border="false"
             :auto-height="true"
             @click="onSelect(contact)"
           >
@@ -230,18 +230,18 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .mention-picker__cell {
-  /* 在 Popup 内取消 Cell 默认的水平内缩，让 hover 背景顶满容器 */
-  --uikit-item-hover-padding-x: 0px;
+  /* 在 Popup 内给 Cell hover 背景留出圆角与舒适内边距 */
+  --uikit-item-hover-padding-x: 12px;
   --uikit-item-hover-margin-x: 0px;
-  --uikit-item-hover-radius: 0px;
+  --uikit-item-hover-radius: 8px;
 }
 
 /* ===== PC 端样式 ===== */
 .mention-picker--pc {
   min-width: 220px;
-  max-width: 300px;
-  padding: 8px 0;
-  border-radius: 8px;
+  max-width: 320px;
+  padding: 8px;
+  border-radius: 12px;
 }
 
 .mention-picker--pc .mention-picker__list {
@@ -251,8 +251,8 @@ function onKeydown(e: KeyboardEvent) {
 /* ===== H5 端样式 ===== */
 .mention-picker--h5 {
   width: 100%;
-  padding: 0 0 12px;
-  border-radius: 12px 12px 0 0;
+  padding: 0 16px 16px;
+  border-radius: 16px 16px 0 0;
 }
 
 .mention-picker__header {
