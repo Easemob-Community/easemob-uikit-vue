@@ -15,6 +15,7 @@ export default defineConfig({
           items: [
             { text: '快速开始', link: '/guide/quickstart' },
             { text: '主题定制', link: '/guide/theme' },
+            { text: '图标', link: '/guide/icons' },
             { text: 'H5 适配', link: '/guide/h5-adaptation' },
             { text: '进阶指南', link: '/guide/advanced' },
           ],
