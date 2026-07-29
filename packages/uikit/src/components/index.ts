@@ -21,6 +21,8 @@ export { default as EmPresenceSelectorModal } from './presence-selector/presence
 export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
 export { default as EmCell } from './cell/cell.vue'
 export type { CellProps } from './cell/cell.vue'
+export { default as EmEmpty } from './empty/empty.vue'
+export type { EmptyProps } from './empty/empty.vue'
 export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
@@ -44,4 +46,5 @@ export const componentList = [
   'em-presence-selector-modal',
   'em-presence-avatar',
   'em-cell',
+  'em-empty',
 ] as const

@@ -5,6 +5,7 @@ import { useGroup } from '../../../composables/use-group'
 import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
 import AllowListItem from './allow-list-item.vue'
+import Empty from '../../../components/empty/empty.vue'
 
 export interface AllowListProps {
   groupId: string
@@ -63,9 +64,12 @@ async function onRemove(item: any) {
     <div v-if="loading" class="allow-list__loading">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="members.length === 0" class="allow-list__empty">
-      {{ t('group.memberList.empty') || '暂无白名单成员' }}
-    </div>
+    <Empty
+      v-else-if="members.length === 0"
+      icon="empty/members"
+      :description="t('group.memberList.empty') || '暂无白名单成员'"
+      size="small"
+    />
     <AllowListItem
       v-for="item in members"
       :key="(item.user || item)?.userId || ''"
@@ -79,8 +83,7 @@ async function onRemove(item: any) {
 .allow-list {
   padding: 8px 0;
 }
-.allow-list__loading,
-.allow-list__empty {
+.allow-list__loading {
   text-align: center;
   padding: 16px;
   font-size: 14px;

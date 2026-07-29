@@ -9,6 +9,7 @@ import { useViewport } from '../../../composables/use-viewport'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import SharedFileListItem from './shared-file-list-item.vue'
+import Empty from '../../../components/empty/empty.vue'
 
 export interface SharedFileListProps {
   groupId: string
@@ -300,9 +301,12 @@ async function onDownload(file: any) {
     <div v-if="loading" class="shared-file-list__loading">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="files.length === 0" class="shared-file-list__empty">
-      {{ t('group.sharedFile.empty') || '暂无群文件' }}
-    </div>
+    <Empty
+      v-else-if="files.length === 0"
+      icon="empty/files"
+      :description="t('group.sharedFile.empty') || '暂无群文件'"
+      size="small"
+    />
     <SharedFileListItem
       v-for="file in files"
       :key="file.fileId"
@@ -357,8 +361,7 @@ async function onDownload(file: any) {
   height: 0;
   pointer-events: none;
 }
-.shared-file-list__loading,
-.shared-file-list__empty {
+.shared-file-list__loading {
   text-align: center;
   padding: 16px;
   font-size: 14px;

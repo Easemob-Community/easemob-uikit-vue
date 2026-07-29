@@ -16,9 +16,9 @@
  *   5. 打印替换 / 新增 / 保留清单。
  */
 
-import { copyFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, dirname as pathDirname } from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const pkgRoot = join(__dirname, '..')
@@ -131,6 +131,19 @@ const ADD_ICONS = {
   'status/success': 'circle-check', // toast.vue success 状态
   'status/error': 'circle-x', // toast.vue error 状态
   'status/warning': 'alert-triangle', // toast.vue warning 状态
+
+  // ---------- empty states ----------
+  'empty/contact': 'users', // 暂无联系人
+  'empty/group': 'users', // 暂无群组
+  'empty/members': 'users', // 暂无成员
+  'empty/conversation': 'message-circle', // 暂无会话
+  'empty/chat': 'message-square', // 请选择会话
+  'empty/search': 'search-x', // 搜索无结果
+  'empty/blocklist': 'shield-off', // 暂无黑名单成员
+  'empty/mutelist': 'volume-x', // 暂无禁言成员
+  'empty/files': 'folder-open', // 暂无群文件
+  'empty/mentions': 'at-sign', // @提及无结果
+  'empty/read-receipt': 'check-check', // 已读回执空
 }
 
 /** 递归收集 iconsDir 下所有 svg 的 name（相对路径去扩展名） */
@@ -165,6 +178,7 @@ function vendorOne(name, lucideName, bucket) {
     failed++
     return
   }
+  mkdirSync(pathDirname(dest), { recursive: true })
   copyFileSync(src, dest)
   bucket.push(`${name}  <=  ${lucideName}`)
 }

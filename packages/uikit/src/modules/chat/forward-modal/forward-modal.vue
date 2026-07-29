@@ -7,6 +7,7 @@ import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Input from '../../../components/input/input.vue'
+import Empty from '../../../components/empty/empty.vue'
 import type { UiConversation as Conversation } from '../../../sdk/types'
 
 export interface ForwardModalProps {
@@ -84,9 +85,12 @@ function onSelect(conversation: Conversation) {
           </div>
           <Icon name="arrows/arrow_right" :size="16" class="forward-modal__arrow" />
         </div>
-        <div v-if="!filteredConversations.length" class="forward-modal__empty">
-          {{ t('conversation.empty') }}
-        </div>
+        <Empty
+          v-if="!filteredConversations.length"
+          icon="empty/conversation"
+          :description="t('conversation.empty')"
+          size="small"
+        />
       </div>
     </div>
   </Popup>
@@ -179,10 +183,5 @@ function onSelect(conversation: Conversation) {
   flex-shrink: 0;
 }
 
-.forward-modal__empty {
-  padding: 40px 16px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--uikit-text-secondary);
-}
+
 </style>

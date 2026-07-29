@@ -6,6 +6,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { toUiMessage } from '../../../sdk/adapter/message-adapter'
 import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
+import Empty from '../../../components/empty/empty.vue'
 import type { CombineMessageBody, UiMessage } from '../../../sdk/types'
 import { useMessageStore } from '../../../store/message'
 import CombineMessageModalItem from './combine-message-modal-item.vue'
@@ -151,9 +152,12 @@ watch(() => props.show, (show) => {
         </div>
 
         <!-- 空状态 -->
-        <div v-else class="combine-message-modal__empty">
-          {{ t('message.forward.combineEmpty') || '暂无消息' }}
-        </div>
+        <Empty
+          v-else
+          icon="empty/chat"
+          :description="t('message.forward.combineEmpty') || '暂无消息'"
+          size="small"
+        />
       </div>
     </div>
   </Popup>
@@ -229,13 +233,6 @@ watch(() => props.show, (show) => {
   text-align: center;
   padding: 40px 0;
   color: #ef4444;
-  font-size: 14px;
-}
-
-.combine-message-modal__empty {
-  text-align: center;
-  padding: 40px 0;
-  color: var(--uikit-text-secondary);
   font-size: 14px;
 }
 

@@ -5,6 +5,7 @@ import { useLocale } from '../../../locale'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
+import Empty from '../../../components/empty/empty.vue'
 import type { MentionContact } from '../types'
 
 export interface MentionPickerProps {
@@ -114,9 +115,12 @@ function onKeydown(e: KeyboardEvent) {
               <span v-if="contact.remark" class="mention-picker__sub">{{ contact.name }}</span>
             </div>
           </div>
-          <div v-if="filteredContacts.length === 0" class="mention-picker__empty">
-            {{ t('mention.noResult') || '未找到联系人' }}
-          </div>
+          <Empty
+            v-if="filteredContacts.length === 0"
+            icon="empty/mentions"
+            :description="t('mention.noResult') || '未找到联系人'"
+            size="small"
+          />
         </div>
       </div>
     </Popup>
@@ -164,9 +168,12 @@ function onKeydown(e: KeyboardEvent) {
               <span v-if="contact.remark" class="mention-picker__sub">{{ contact.name }}</span>
             </div>
           </div>
-          <div v-if="filteredContacts.length === 0" class="mention-picker__empty">
-            {{ t('mention.noResult') || '未找到联系人' }}
-          </div>
+          <Empty
+            v-if="filteredContacts.length === 0"
+            icon="empty/mentions"
+            :description="t('mention.noResult') || '未找到联系人'"
+            size="small"
+          />
         </div>
       </div>
     </Popup>
@@ -250,13 +257,6 @@ function onKeydown(e: KeyboardEvent) {
 
 .mention-picker__sub {
   font-size: 12px;
-  color: var(--uikit-text-secondary);
-}
-
-.mention-picker__empty {
-  padding: 24px 16px;
-  text-align: center;
-  font-size: 14px;
   color: var(--uikit-text-secondary);
 }
 

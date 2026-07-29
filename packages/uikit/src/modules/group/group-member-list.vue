@@ -10,6 +10,7 @@ import { useToast } from '../../composables/use-toast'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import GroupMemberListItem from './group-member-list-item.vue'
+import Empty from '../../components/empty/empty.vue'
 
 export interface GroupMemberListProps {
   groupId: string
@@ -277,11 +278,12 @@ defineExpose({ refresh, removeMember, setMemberRole })
         <span class="group-member-list__empty-text">{{ t('common.loading') }}</span>
       </div>
 
-      <div v-else-if="filteredMembers.length === 0" class="group-member-list__empty">
-        <span class="group-member-list__empty-text">
-          {{ searchKeyword ? (t('group.memberList.noSearchResult') || '未找到相关成员') : (t('group.memberList.empty') || '暂无成员') }}
-        </span>
-      </div>
+      <Empty
+        v-else-if="filteredMembers.length === 0"
+        :icon="searchKeyword ? 'empty/search' : 'empty/members'"
+        :description="searchKeyword ? (t('group.memberList.noSearchResult') || '未找到相关成员') : (t('group.memberList.empty') || '暂无成员')"
+        size="small"
+      />
 
       <template v-else>
         <GroupMemberListItem

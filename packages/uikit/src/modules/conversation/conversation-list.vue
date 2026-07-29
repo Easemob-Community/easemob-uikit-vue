@@ -13,6 +13,7 @@ import Icon from '../../components/icon/icon.vue'
 import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
+import Empty from '../../components/empty/empty.vue'
 import type { UiConversation as Conversation } from '../../sdk/types'
 import type { ConversationAction } from './types'
 import ConversationItem from './conversation-item.vue'
@@ -332,11 +333,17 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <div v-if="loadingMore" class="conversation-list__loading">
         {{ t('conversation.loadingMore') }}
       </div>
-      <div v-if="!filteredConversationList.length && !loadingMore && !isSyncing" class="conversation-list__empty">
-        <slot name="empty" :search-keyword="normalizedSearchKeyword">
-          <span>{{ props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty')) }}</span>
-        </slot>
-      </div>
+      <Empty
+        v-if="!filteredConversationList.length && !loadingMore && !isSyncing"
+        :icon="normalizedSearchKeyword ? 'empty/search' : 'empty/conversation'"
+        :description="props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty'))"
+      >
+        <template #description>
+          <slot name="empty" :search-keyword="normalizedSearchKeyword">
+            {{ props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty')) }}
+          </slot>
+        </template>
+      </Empty>
       <!-- footer slot - 非 sticky 模式放在滚动容器内部 -->
       <div v-if="$slots.footer && !props.footerSticky" class="conversation-list__footer">
         <slot name="footer" />
@@ -518,13 +525,6 @@ function handleCustomAction(key: string, conversation: Conversation) {
   to {
     transform: rotate(360deg);
   }
-}
-
-.conversation-list__empty {
-  padding: 40px 16px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--uikit-text-secondary);
 }
 
 .conversation-list__body {

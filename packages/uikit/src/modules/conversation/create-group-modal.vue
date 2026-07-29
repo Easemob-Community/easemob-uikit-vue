@@ -12,6 +12,7 @@ import Button from '../../components/button/button.vue'
 import ContactList from '../contact/contact-list.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import Cell from '../../components/cell/cell.vue'
+import Empty from '../../components/empty/empty.vue'
 import type { UiContact } from '../../sdk/types'
 
 export interface CreateGroupModalConfig {
@@ -242,9 +243,12 @@ watch(
                 </button>
               </template>
             </Cell>
-            <div v-if="selectedCount === 0" class="create-group-modal__selected-empty">
-              {{ t('group.createSelectedEmpty') || '请选择联系人' }}
-            </div>
+            <Empty
+              v-if="selectedCount === 0"
+              icon="empty/contact"
+              :description="t('group.createSelectedEmpty') || '请选择联系人'"
+              size="small"
+            />
           </div>
         </div>
       </div>
@@ -399,13 +403,6 @@ watch(
 .create-group-modal__selected-remove:hover {
   background-color: var(--uikit-danger-color, #ef4444);
   color: #fff;
-}
-
-.create-group-modal__selected-empty {
-  padding: 40px 16px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--uikit-text-secondary);
 }
 
 .create-group-modal__error {

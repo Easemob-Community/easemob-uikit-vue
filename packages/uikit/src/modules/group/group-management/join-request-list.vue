@@ -4,6 +4,7 @@ import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import JoinRequestListItem from './join-request-list-item.vue'
+import Empty from '../../../components/empty/empty.vue'
 
 export interface JoinRequestListProps {
   groupId: string
@@ -67,9 +68,12 @@ async function onReject(item: any) {
     <div v-if="loading" class="join-request-list__loading">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="requests.length === 0" class="join-request-list__empty">
-      {{ t('group.memberList.empty') || '暂无入群申请' }}
-    </div>
+    <Empty
+      v-else-if="requests.length === 0"
+      icon="empty/members"
+      :description="t('group.memberList.empty') || '暂无入群申请'"
+      size="small"
+    />
     <JoinRequestListItem
       v-for="item in requests"
       :key="(item.applicant?.userId || '') || item.timestamp"
@@ -84,8 +88,7 @@ async function onReject(item: any) {
 .join-request-list {
   padding: 8px 0;
 }
-.join-request-list__loading,
-.join-request-list__empty {
+.join-request-list__loading {
   text-align: center;
   padding: 16px;
   font-size: 14px;

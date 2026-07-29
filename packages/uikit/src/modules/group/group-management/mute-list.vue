@@ -9,6 +9,7 @@ import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
 import MuteListItem from './mute-list-item.vue'
 import MuteListSelectItem from './mute-list-select-item.vue'
+import Empty from '../../../components/empty/empty.vue'
 
 export interface MuteListProps {
   groupId: string
@@ -195,9 +196,12 @@ defineExpose({
     <div v-if="loading" class="mute-list__loading">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="members.length === 0" class="mute-list__empty">
-      {{ t('group.memberList.empty') || '暂无禁言成员' }}
-    </div>
+    <Empty
+      v-else-if="members.length === 0"
+      icon="empty/mutelist"
+      :description="t('group.memberList.empty') || '暂无禁言成员'"
+      size="small"
+    />
     <MuteListItem
       v-for="item in members"
       :key="(item.user || item)?.userId || ''"
@@ -220,9 +224,12 @@ defineExpose({
           <div v-if="loadingMembers" class="mute-list__popup-status">
             {{ t('common.loading') }}
           </div>
-          <div v-else-if="selectableMembers.length === 0" class="mute-list__popup-status">
-            {{ t('group.mutelist.emptySelectable') || '暂无可添加的成员' }}
-          </div>
+          <Empty
+            v-else-if="selectableMembers.length === 0"
+            icon="empty/mutelist"
+            :description="t('group.mutelist.emptySelectable') || '暂无可添加的成员'"
+            size="small"
+          />
           <MuteListSelectItem
             v-for="member in selectableMembers"
             :key="member.userId"
@@ -267,8 +274,7 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 
-.mute-list__loading,
-.mute-list__empty {
+.mute-list__loading {
   text-align: center;
   padding: 16px;
   font-size: 14px;

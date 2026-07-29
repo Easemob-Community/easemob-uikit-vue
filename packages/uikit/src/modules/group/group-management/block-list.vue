@@ -6,6 +6,7 @@ import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import type { UiGroupMember } from '../../../sdk/types'
 import BlockListItem from './block-list-item.vue'
+import Empty from '../../../components/empty/empty.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
 
 export interface BlockListProps {
@@ -143,9 +144,12 @@ defineExpose({
     <div v-if="loading" class="block-list__loading">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="members.length === 0" class="block-list__empty">
-      {{ t('group.memberList.empty') || '暂无黑名单成员' }}
-    </div>
+    <Empty
+      v-else-if="members.length === 0"
+      icon="empty/blocklist"
+      :description="t('group.memberList.empty') || '暂无黑名单成员'"
+      size="small"
+    />
     <BlockListItem
       v-for="item in members"
       :key="(item.user || item)?.userId || ''"
@@ -167,9 +171,12 @@ defineExpose({
           <div v-if="loadingMembers" class="block-list__popup-status">
             {{ t('common.loading') }}
           </div>
-          <div v-else-if="selectableMembers.length === 0" class="block-list__popup-status">
-            {{ t('group.blocklist.emptySelectable') || '暂无可添加的成员' }}
-          </div>
+          <Empty
+            v-else-if="selectableMembers.length === 0"
+            icon="empty/blocklist"
+            :description="t('group.blocklist.emptySelectable') || '暂无可添加的成员'"
+            size="small"
+          />
           <BlockListSelectItem
             v-for="member in selectableMembers"
             :key="member.userId"
@@ -199,8 +206,7 @@ defineExpose({
 .block-list {
   padding: 8px 0;
 }
-.block-list__loading,
-.block-list__empty {
+.block-list__loading {
   text-align: center;
   padding: 16px;
   font-size: 14px;

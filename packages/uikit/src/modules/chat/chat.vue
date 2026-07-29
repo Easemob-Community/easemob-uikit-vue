@@ -22,6 +22,7 @@ import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
+import Empty from '../../components/empty/empty.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 /** 渲染错误信息 */
@@ -718,9 +719,17 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
     <!-- 空状态：无当前会话 -->
     <div v-else-if="!currentConversation" class="chat__empty">
-      <slot name="empty">
-        <span class="chat__empty-text">{{ t('chat.empty') || '请选择会话' }}</span>
-      </slot>
+      <Empty
+        icon="empty/chat"
+        :description="t('chat.empty') || '请选择会话'"
+        size="large"
+      >
+        <template #description>
+          <slot name="empty">
+            {{ t('chat.empty') || '请选择会话' }}
+          </slot>
+        </template>
+      </Empty>
     </div>
 
     <template v-else>
@@ -890,11 +899,6 @@ async function onRemoveAdmin(member: UiGroupMember) {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.chat__empty-text {
-  font-size: 14px;
-  color: var(--uikit-text-secondary);
 }
 
 /* 全局加载状态 */

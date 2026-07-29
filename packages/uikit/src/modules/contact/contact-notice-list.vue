@@ -8,6 +8,7 @@ import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
 import { useInvitePersistence, type InvitePersistType } from '../../composables/use-invite-persistence'
+import Empty from '../../components/empty/empty.vue'
 import type { UiContactInvite } from '../../sdk/types'
 
 export interface ContactNoticeListProps {
@@ -158,10 +159,11 @@ function avatarName(invite: UiContactInvite): string {
     </div>
 
     <!-- Empty -->
-    <div v-else-if="displayInvites.length === 0" class="contact-notice-list__empty">
-      <Icon name="misc/bell" :size="40" class="contact-notice-list__empty-icon" />
-      <span class="contact-notice-list__empty-text">{{ t('contact.inviteEmpty') || '暂无好友申请' }}</span>
-    </div>
+    <Empty
+      v-else-if="displayInvites.length === 0"
+      icon="empty/contact"
+      :description="t('contact.inviteEmpty') || '暂无好友申请'"
+    />
 
     <!-- List -->
     <div v-else class="contact-notice-list__items">
@@ -375,11 +377,6 @@ function avatarName(invite: UiContactInvite): string {
   justify-content: center;
   gap: 12px;
   padding: 40px 16px;
-}
-
-.contact-notice-list__empty-icon {
-  color: var(--uikit-text-secondary);
-  opacity: 0.5;
 }
 
 .contact-notice-list__empty-text {

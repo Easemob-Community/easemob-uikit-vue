@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
+import Empty from '../../../components/empty/empty.vue'
 import { useLocale } from '../../../locale'
 
 export interface GroupReadReceiptModalProps {
@@ -77,9 +78,12 @@ function onClose() {
           <Avatar :name="userId" :size="36" />
           <span class="group-read-modal__name">{{ userId }}</span>
         </div>
-        <div v-if="displayList.length === 0" class="group-read-modal__empty">
-          {{ t('groupReadReceipt.empty') }}
-        </div>
+        <Empty
+          v-if="displayList.length === 0"
+          icon="empty/read-receipt"
+          :description="t('groupReadReceipt.empty')"
+          size="small"
+        />
       </div>
     </div>
   </Popup>
@@ -209,12 +213,4 @@ function onClose() {
   white-space: nowrap;
 }
 
-.group-read-modal__empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 16px;
-  font-size: 13px;
-  color: var(--uikit-text-secondary);
-}
 </style>
