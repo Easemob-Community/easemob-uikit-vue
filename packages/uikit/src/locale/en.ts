@@ -16,6 +16,8 @@ const messages: LocaleMessages = {
   'conversation.title': 'Conversations',
   'conversation.pin': 'Pin',
   'conversation.unpin': 'Unpin',
+  'conversation.mute': 'Mute Notifications',
+  'conversation.unmute': 'Unmute Notifications',
   'conversation.read': 'Mark as Read',
   'conversation.delete': 'Delete Conversation',
   'conversation.deleteConfirm': 'Are you sure you want to delete this conversation?',

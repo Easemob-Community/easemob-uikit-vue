@@ -148,6 +148,14 @@ export function useConversation() {
     await domains.conversation.pin(id, cvs.type, isPinned)
   }
 
+  /** 设置/取消免打扰 */
+  async function muteConversation(id: string, muted: boolean) {
+    const cvs = conversationStore.conversationList.find(c => c.id === id)
+    if (!cvs)
+      return
+    await domains.conversation.setMuted(id, cvs.type, muted)
+  }
+
   /** 标记会话已读 */
   async function markConversationRead(id: string) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
@@ -219,6 +227,7 @@ export function useConversation() {
     refreshConversations,
     loadMoreConversations,
     pinConversation,
+    muteConversation,
     markConversationRead,
     sendChannelAck,
     clearChatHistory,

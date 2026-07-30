@@ -67,7 +67,7 @@ const emit = defineEmits<{
   (e: 'custom-action', key: string, conversation: Conversation): void
 }>()
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
 const { stores, h5, features } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -321,6 +321,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         :has-at-me="!!stores.conversation.atMeMap[item.id]"
         @select="handleSelect"
         @pin="pinConversation"
+        @mute="muteConversation"
         @delete="handleDelete"
         @read="sendChannelAck"
         @custom-action="handleCustomAction"

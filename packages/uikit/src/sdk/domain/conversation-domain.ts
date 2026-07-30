@@ -92,6 +92,37 @@ export class ConversationDomain {
     })
   }
 
+  /**
+   * 设置/取消会话免打扰。
+   * - 免打扰：PushManager.setConversationSilentMode，规则为 remindType=NONE（不提醒）；
+   * - 取消：clearConversationRemindType 恢复默认提醒。
+   * 成功后立即更新本地 store（多端同步事件不保证回推到本端），
+   * 若服务端随后下发 CONVERSATION_MUTE_INFO_CHANGED 事件，更新是幂等的。
+   */
+  async setMuted(
+    conversationId: string,
+    conversationType: 'singleChat' | 'groupChat',
+    muted: boolean,
+  ) {
+    if (muted) {
+      await this.client.pushManager.setConversationSilentMode({
+        conversationId,
+        conversationType,
+        rule: { mode: 'REMIND_TYPE', remindType: 'NONE' },
+      })
+    }
+    else {
+      await this.client.pushManager.clearConversationRemindType({
+        conversationId,
+        conversationType,
+      })
+    }
+    this.store.update(conversationId, {
+      isMuted: muted,
+      remindType: muted ? 'NONE' : 'DEFAULT',
+    })
+  }
+
   /** 清空会话未读数（协议仅同步自己多设备，不再发送给对方） */
   async markRead(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
     await this.client.chatManager.clearConversationUnreadMessageCount({

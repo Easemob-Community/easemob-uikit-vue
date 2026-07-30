@@ -164,6 +164,9 @@ export function useUIKitProvider(
     get presenceManager() {
       return requireClient().presenceManager
     },
+    get pushManager() {
+      return requireClient().pushManager
+    },
     get userInfoManager() {
       return requireClient().userInfoManager
     },

@@ -3,6 +3,7 @@ import {
   ContactManager,
   GroupManager,
   PresenceManager,
+  PushManager,
   ChatClient as SdkChatClient,
   UserInfoManager,
 } from 'easemob-websdk'
@@ -25,6 +26,8 @@ export interface ManagerHost {
   readonly groupManager: GroupManager
   /** SDK PresenceManager */
   readonly presenceManager: PresenceManager
+  /** SDK PushManager（免打扰等推送设置） */
+  readonly pushManager: PushManager
   /** SDK UserInfoManager */
   readonly userInfoManager: UserInfoManager
   /** 当前登录用户 ID（未登录时为 null） */
@@ -50,6 +53,7 @@ interface ManagerRegistry {
   contactManager: ContactManager
   groupManager: GroupManager
   presenceManager: PresenceManager
+  pushManager: PushManager
   userInfoManager: UserInfoManager
 }
 
@@ -73,7 +77,7 @@ export class UIKitClient {
       // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
       // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
       enableSyncData: sdkConfig.enableSyncData ?? ['conversation', 'contact', 'group'],
-      managers: [ChatManager, ContactManager, GroupManager, PresenceManager, UserInfoManager],
+      managers: [ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager],
     }) as SdkChatClient & ManagerRegistry
 
     if (debug) {
@@ -108,6 +112,11 @@ export class UIKitClient {
   /** SDK PresenceManager */
   get presenceManager() {
     return this._client.presenceManager
+  }
+
+  /** SDK PushManager */
+  get pushManager() {
+    return this._client.pushManager
   }
 
   /** SDK UserInfoManager */

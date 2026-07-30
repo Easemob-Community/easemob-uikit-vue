@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<ConversationItemProps>(), {
 const emit = defineEmits<{
   (e: 'select', id: string): void
   (e: 'pin', id: string, isPinned: boolean): void
+  (e: 'mute', id: string, muted: boolean): void
   (e: 'delete', id: string): void
   (e: 'read', id: string): void
   (e: 'custom-action', key: string, conversation: Conversation): void
@@ -150,6 +151,14 @@ const mergedActions = computed<MergedAction[]>(() => {
     label: props.conversation.isPinned ? t('conversation.unpin') : t('conversation.pin'),
     icon: props.conversation.isPinned ? 'arrows/arrow_n_line' : 'arrows/line_n_arrow',
     handler: () => emit('pin', props.conversation.id, !props.conversation.isPinned),
+    position: 'both',
+  })
+
+  actions.push({
+    key: 'mute',
+    label: props.conversation.isMuted ? t('conversation.unmute') : t('conversation.mute'),
+    icon: props.conversation.isMuted ? 'misc/bell' : 'misc/bell_slash',
+    handler: () => emit('mute', props.conversation.id, !props.conversation.isMuted),
     position: 'both',
   })
 

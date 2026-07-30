@@ -16,6 +16,8 @@ const messages: LocaleMessages = {
   'conversation.title': '会话列表',
   'conversation.pin': '置顶',
   'conversation.unpin': '取消置顶',
+  'conversation.mute': '免打扰',
+  'conversation.unmute': '取消免打扰',
   'conversation.read': '标记已读',
   'conversation.delete': '删除会话',
   'conversation.deleteConfirm': '确定删除该会话吗？',
