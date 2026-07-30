@@ -227,7 +227,7 @@ watch(
               :key="contact.userId"
               class="create-group-modal__selected-item"
               :contact="contact"
-              size="compact"
+              size="normal"
               :show-checkbox="false"
               :clickable="false"
             >
