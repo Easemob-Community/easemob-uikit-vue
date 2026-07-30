@@ -86,7 +86,12 @@ export interface CombineMessageBody {
   combineLevel: number
 }
 
-/** 与 SDK MessageStatus 对齐 */
+/**
+ * UIKit UI 展示层消息状态。
+ * 注意与 SDK 区分：SDK 0.20.0 起 `Message.status` 重命名为 `sendStatus`
+ * （仅 sending/sent/failed，sent 表示服务端已接受）；
+ * 本类型额外包含 delivered/read，由已读/送达回执事件驱动，仅用于 UI 展示。
+ */
 export type MessageStatus = 'sending' | 'sent' | 'failed' | 'delivered' | 'read'
 
 /** 将 MessageBody 联合类型窄化为具体 body 的便捷类型守卫 */

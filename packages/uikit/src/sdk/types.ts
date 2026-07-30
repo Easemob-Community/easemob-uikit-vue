@@ -7,15 +7,23 @@ import type {
 } from 'easemob-websdk'
 
 export type { GroupMemberEntry } from 'easemob-websdk'
+import type { MessageStatus } from './types/message'
 
 /**
  * UIKit 对 SDK Message 的扩展字段。
- * SDK Message 本身已包含：msgServerId / msgLocalId / status / timestamp /
- * groupReadCount / modifiedInfo / body / ext 等。
+ * SDK Message 本身已包含：msgServerId / msgLocalId / sendStatus / isPeerRead /
+ * timestamp / groupReadCount / modifiedInfo / body / ext 等。
+ *
+ * 注意：SDK 0.20.0 起 `Message.status` 重命名为 `Message.sendStatus`，
+ * 且 `sent` 仅表示服务端已接受消息。UIKit 的 `status` 是 UI 展示层状态
+ * （含 delivered/read 回执语义），由适配器从 sendStatus / isPeerRead 推导，
+ * 与 SDK 字段完全解耦。
  */
 export interface UiMessageExtension {
   /** 是否为自己发送的消息 */
   isSelf: boolean
+  /** UI 展示层消息状态（sending/sent/delivered/read/failed），非 SDK 字段 */
+  status: MessageStatus
   /** 本地消息 ID 别名，方便 UI 层引用 */
   localId?: string
   /** 该消息是否请求群已读回执 */

@@ -61,9 +61,9 @@ export class MessageDomain {
     const sdkMsg = this.client.chatManager.createImageMessage({
       conversationId,
       conversationType,
-      data,
       ext,
-    } as any)
+      ...(typeof data === 'string' ? { originalUrl: data } : { data }),
+    })
     return this._send(sdkMsg)
   }
 
@@ -76,9 +76,9 @@ export class MessageDomain {
     const sdkMsg = this.client.chatManager.createFileMessage({
       conversationId,
       conversationType,
-      data,
       ext,
-    } as any)
+      ...(typeof data === 'string' ? { originalUrl: data } : { data }),
+    })
     return this._send(sdkMsg)
   }
 
@@ -92,10 +92,10 @@ export class MessageDomain {
     const sdkMsg = this.client.chatManager.createVoiceMessage({
       conversationId,
       conversationType,
-      data,
       duration,
       ext,
-    } as any)
+      ...(typeof data === 'string' ? { originalUrl: data } : { data }),
+    })
     return this._send(sdkMsg)
   }
 
@@ -109,10 +109,10 @@ export class MessageDomain {
     const sdkMsg = this.client.chatManager.createVideoMessage({
       conversationId,
       conversationType,
-      data,
       duration,
       ext,
-    } as any)
+      ...(typeof data === 'string' ? { originalUrl: data } : { data }),
+    })
     return this._send(sdkMsg)
   }
 
@@ -364,7 +364,7 @@ export class MessageDomain {
         type: 'text',
         body: { content: text },
         ext: {},
-      } as any,
+      },
     })
   }
 }

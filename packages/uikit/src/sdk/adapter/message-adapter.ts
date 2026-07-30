@@ -18,14 +18,21 @@ import type { CombineMessageBody } from '../types/message'
  * 将 SDK Message 转换为 UIKit Message。
  * - 保留 SDK Message 全部字段作为真相源
  * - 仅添加 UI 层需要的计算/状态字段
+ * - UI 层 status 从 SDK 0.20.0 的 sendStatus / isPeerRead 推导：
+ *   单聊已发送消息若对端已读（isPeerRead），直接置为 read；
+ *   其余取 sendStatus，缺省（接收方向/旧缓存）视为 sent。
  * - 合并消息的 messageList 仅用于创建/转发，UI 渲染不需要，
  *   标记为 raw 避免进入 Vue 响应式系统产生性能问题。
  */
 export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessage {
+  const isSelf = sdkMsg.from === currentUserId
   const uiMsg: UiMessage = {
     ...sdkMsg,
-    isSelf: sdkMsg.from === currentUserId,
+    isSelf,
     localId: sdkMsg.msgLocalId,
+    status: isSelf && sdkMsg.isPeerRead === true
+      ? 'read'
+      : (sdkMsg.sendStatus ?? 'sent'),
   }
   if (isCombineMessageBody(uiMsg.body) && uiMsg.body.messageList) {
     uiMsg.body = {
