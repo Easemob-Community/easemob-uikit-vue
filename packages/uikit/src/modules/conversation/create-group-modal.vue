@@ -10,7 +10,7 @@ import Popup from '../../components/popup/popup.vue'
 import Input from '../../components/input/input.vue'
 import Button from '../../components/button/button.vue'
 import ContactList from '../contact/contact-list.vue'
-import Avatar from '../../components/avatar/avatar.vue'
+import ContactItemDefault from '../contact/contact-item-default.vue'
 import Cell from '../../components/cell/cell.vue'
 import Empty from '../../components/empty/empty.vue'
 import type { UiContact } from '../../sdk/types'
@@ -222,19 +222,16 @@ watch(
           </div>
 
           <div class="create-group-modal__selected-list">
-            <Cell
+            <ContactItemDefault
               v-for="contact in selectedContacts"
               :key="contact.userId"
               class="create-group-modal__selected-item"
+              :contact="contact"
               size="compact"
-              auto-height
+              :show-checkbox="false"
               :clickable="false"
             >
-              <template #leading>
-                <Avatar :src="contact.avatar" :name="contact.name || contact.userId" :size="36" />
-              </template>
-              <template #default>{{ contact.name || contact.userId }}</template>
-              <template #trailing>
+              <template #extra>
                 <button
                   class="create-group-modal__selected-remove"
                   @click="removeSelected(contact.userId)"
@@ -242,7 +239,7 @@ watch(
                   <span>×</span>
                 </button>
               </template>
-            </Cell>
+            </ContactItemDefault>
             <Empty
               v-if="selectedCount === 0"
               icon="empty/contact"

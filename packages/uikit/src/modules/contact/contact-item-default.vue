@@ -27,6 +27,8 @@ interface ContactItemDefaultProps {
   onlineStatus?: OnlineStatus
   /** 紧凑/正常/大尺寸，默认 normal */
   size?: ContactItemSize
+  /** 是否可点击（影响 hover 背景），默认 true */
+  clickable?: boolean
 }
 
 const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
@@ -37,6 +39,7 @@ const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   showAvatar: true,
   avatarShape: undefined,
   size: 'normal',
+  clickable: true,
 })
 
 const { userInfo, avatarUrl, displayName: userInfoDisplayName } = useUserInfo(() => props.contact.userId)
@@ -80,6 +83,7 @@ const resolvedAvatarShape = computed(() => {
     :active="props.active"
     :selected="props.selected"
     :disabled="props.disabled"
+    :clickable="props.clickable"
   >
     <template #leading>
       <span class="contact-item-default__leading">
