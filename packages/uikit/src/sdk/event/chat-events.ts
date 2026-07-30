@@ -55,6 +55,44 @@ function queueMessageReadReceipt(client: ManagerHost, conversationId: string, me
 }
 
 /**
+ * 批量回显会话免打扰状态。
+ * 会话列表同步协议不携带免打扰字段（SDK 侧恒为 DEFAULT，
+ * 群会话仅有 joined-group 同步可能带入），必须走 PushManager
+ * getConversationSilentModes 批量查询（单次最多 20 条，自动分批）。
+ * DURATION/INTERVAL 规则无 remindType，用 expireTimestamp 未过期判定免打扰中。
+ */
+async function patchConversationMuteStates(stores: RootStores, client: ManagerHost) {
+  const targets = stores.conversation.conversationList.map(c => ({
+    conversationId: c.id,
+    conversationType: c.type,
+  }))
+  if (targets.length === 0)
+    return
+
+  for (let i = 0; i < targets.length; i += 20) {
+    try {
+      const result = await client.pushManager.getConversationSilentModes({
+        conversationList: targets.slice(i, i + 20),
+      })
+      for (const item of result.conversations) {
+        const muted = item.rule.remindType === 'NONE'
+          || (item.rule.expireTimestamp !== undefined && item.rule.expireTimestamp > Date.now())
+        const existing = stores.conversation.conversationList.find(c => c.id === item.conversationId)
+        if (existing && existing.isMuted !== muted) {
+          stores.conversation.updateConversation(item.conversationId, {
+            isMuted: muted,
+            remindType: item.rule.remindType ?? (muted ? 'NONE' : 'DEFAULT'),
+          })
+        }
+      }
+    }
+    catch (err) {
+      chatLog.warn('patch conversation mute states failed:', err)
+    }
+  }
+}
+
+/**
  * 用联系人 / 用户资料 / 群组信息补全会话名称。
  * websdk2 本地会话缓存中的 conversationName 在部分场景（如群聊）可能为空，
  * 导致会话列表只显示 ID，因此需要二次补全。
@@ -151,6 +189,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           }
           stores.conversation.setConversationsLoaded(true)
           void patchConversationNames(stores, client)
+          void patchConversationMuteStates(stores, client)
           break
         case 'contact':
           // 已由自定义数据源填充（loaded 为真）则跳过，避免覆盖业务数据
