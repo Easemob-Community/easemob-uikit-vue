@@ -70,7 +70,7 @@ export class GroupDomain {
     inviteNeedConfirm?: boolean
     maxMembers?: number
   }) {
-    return this.client.groupManager.createGroup({
+    const result = await this.client.groupManager.createGroup({
       name: params.name,
       description: params.description ?? '',
       memberIds: params.memberIds,
@@ -80,6 +80,26 @@ export class GroupDomain {
       inviteNeedConfirm: params.inviteNeedConfirm ?? false,
       maxMembers: params.maxMembers,
     })
+    // 创建者即群主：立即写入本地群组缓存，保证抽屉/群管理/共享文件的权限判定不依赖后续同步
+    this.store.addGroup({
+      groupId: result.groupId,
+      groupName: params.name,
+      description: params.description,
+      role: 'owner',
+      memberCount: (params.memberIds?.length ?? 0) + 1,
+      maxUsers: params.maxMembers,
+      public: params.public ?? false,
+      allowInvites: params.allowInvites ?? false,
+      approval: params.joinApprovalRequired ?? false,
+    })
+    // 拉取权威详情（群主、角色、成员数等），失败不阻塞创建流程
+    try {
+      await this.fetchGroupInfo(result.groupId)
+    }
+    catch {
+      // 忽略：进入群聊后抽屉会按需重新拉取
+    }
+    return result
   }
 
   /** 加入群组 */

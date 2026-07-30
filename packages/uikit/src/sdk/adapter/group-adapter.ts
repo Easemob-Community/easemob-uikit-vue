@@ -14,7 +14,11 @@ export function toUiGroup(source: SdkGroupSource): UiGroup {
     approval: source.joinApprovalRequired,
     disabled: source.disabled,
     maxUsers: source.maxMembers,
-    role: source.role,
+  }
+
+  // 角色仅在有值时写入，避免详情接口未返回 role 时用 undefined 覆盖本地已缓存的角色
+  if (source.role) {
+    base.role = source.role
   }
 
   if ('avatarUrl' in source) {
