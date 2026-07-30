@@ -2,6 +2,12 @@ import type { Message as SdkMessage } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '../types'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
+import { createLogger } from '../../utils/logger'
+
+const combineLogger = createLogger('Combine')
+
+/** 上传进度回调写入 store 的最小间隔（ms），避免 XHR progress 事件高频触发整列表重渲染 */
+const PROGRESS_FLUSH_INTERVAL = 150
 
 /**
  * MessageStore 需要暴露给 Domain 的最小接口。
@@ -176,6 +182,8 @@ export class MessageDomain {
     messageList: readonly SdkMessage[],
     ext?: Record<string, unknown>,
   ) {
+    // 分段计时埋点：定位合并转发"卡发送中/页面无响应"的真实耗时段
+    const t0 = performance.now()
     const sdkMsg = this.client.chatManager.createCombineMessage({
       conversationId,
       conversationType,
@@ -185,26 +193,56 @@ export class MessageDomain {
       messageList,
       ext,
     })
+    combineLogger.info('createCombineMessage done', {
+      items: messageList.length,
+      elapsedMs: Math.round(performance.now() - t0),
+    })
     return this._send(sdkMsg)
   }
 
   /** 通用发送流程 */
   private async _send(sdkMsg: SdkMessage): Promise<SdkMessage> {
     const localId = sdkMsg.msgLocalId
+    const isCombine = sdkMsg.type === 'combine'
     this.store.addSendingMessage(localId, sdkMsg)
+
+    // 进度回调统计与节流：XHR progress 事件可能高频触发，
+    // 每次原样写 store 会替换整个消息数组引用并驱动整列表重渲染
+    let progressEvents = 0
+    let lastProgressFlush = 0
+    const sendStart = performance.now()
 
     try {
       const sent = await this.client.chatManager.sendMessage(sdkMsg, {
         onFileUploadProgress: (progress) => {
-          this.store.updateUploadProgress(localId, progress.percent ?? 0)
+          progressEvents += 1
+          const percent = progress.percent ?? 0
+          const now = performance.now()
+          if (percent < 100 && now - lastProgressFlush < PROGRESS_FLUSH_INTERVAL)
+            return
+          lastProgressFlush = now
+          this.store.updateUploadProgress(localId, percent)
         },
       })
 
+      if (isCombine) {
+        combineLogger.info('sendMessage done', {
+          elapsedMs: Math.round(performance.now() - sendStart),
+          progressEvents,
+        })
+      }
       const uiMsg = toUiMessage(sent, this.currentUserId)
       this.store.replaceWithSent(localId, uiMsg)
       return sent
     }
     catch (error) {
+      if (isCombine) {
+        combineLogger.warn('sendMessage failed', {
+          elapsedMs: Math.round(performance.now() - sendStart),
+          progressEvents,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
       const reason = error instanceof Error ? error.message : String(error)
       this.store.markFailed(localId, reason)
       throw error

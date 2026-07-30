@@ -2,10 +2,13 @@ import { computed, ref, toRaw } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
 import type { CombineMessageBody, CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
 import { extractLastMessageText } from '../sdk/adapter/message-adapter'
+import { createLogger } from '../utils/logger'
 import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
 import { useMessageActions } from './use-message-actions'
 import { useUIKit } from './use-uikit'
+
+const combineLogger = createLogger('Combine')
 
 /**
  * 将 UiMessage 转换为干净的 SDK Message 对象。
@@ -214,6 +217,19 @@ export function useChat() {
     // 包含 isSelf / localId / recalled 等扩展字段会导致合并载荷
     // 异常偏大，服务端可能无法正确存储/检索该消息
     const cleanMessages = messages.map(toCleanSdkMessage)
+    // 埋点：载荷字节数（约等于 SDK 编码后上传的 combine 文件大小），
+    // 用于判别"卡发送中"是载荷过大还是网络等待
+    let payloadKB = -1
+    try {
+      payloadKB = Math.round(JSON.stringify(cleanMessages).length / 1024)
+    }
+    catch {
+      payloadKB = -2 // 序列化失败（循环引用等）
+    }
+    combineLogger.info('forwardCombineMessages', {
+      items: cleanMessages.length,
+      payloadKB,
+    })
     return domains.message.sendCombine(
       id,
       type,
