@@ -83,7 +83,9 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
   const body = snippet.body || {}
   switch (snippet.type) {
     case 'text':
-      return (body.content as string) || ''
+      // combine 经 WS 会话同步会被 payload-decoder 降级为 text（title/summary 丢失），
+      // content 为空时尝试 summary，避免预览空白
+      return (body.content as string) || (body.summary as string) || ''
     case 'image':
       return '[图片]'
     case 'voice':
@@ -101,7 +103,11 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
     case 'combine':
       return (body.summary as string) || '[聊天记录]'
     default:
-      return ''
+      // SDK 链路异常时 snippet.type 可能落为 'unknown' 等未知值
+      //（如 toConversationSummary 从被 stripBodyType 清空的 body.type 读类型）。
+      // 此时仍应展示 body 中的可用文本，避免旧端合并消息
+      //（content 为“版本过低”）等场景预览空白
+      return (body.content as string) || (body.summary as string) || (body.msg as string) || ''
   }
 }
 
