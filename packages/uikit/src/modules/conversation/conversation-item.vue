@@ -282,7 +282,7 @@ const displayMessage = computed(() => {
             <Icon name="chat/pinned" :size="12" />
           </span>
           <span v-if="props.conversation.isMuted" class="conversation-item__mute-badge">
-            <Icon name="audio-video/speaker_xmark" :size="12" />
+            <Icon name="misc/bell_slash" :size="12" />
           </span>
         </div>
         <span v-if="displayTime" class="conversation-item__time">
