@@ -209,6 +209,21 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onConversationListUpdate: (payload) => {
       chatLog.info('onConversationListUpdate', { count: payload.items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
+      // 诊断：打印 combine/unknown snippet 的 SDK 原始形态（定位合并消息预览空白）
+      {
+        const typeCount: Record<string, number> = {}
+        const suspects: unknown[] = []
+        for (const item of payload.items) {
+          const type = String(item.lastMessage?.type ?? '(null)')
+          typeCount[type] = (typeCount[type] ?? 0) + 1
+          if (type === 'combine' || type === 'unknown') {
+            suspects.push({ conversationId: item.conversationId, lastMessage: item.lastMessage })
+          }
+        }
+        if (suspects.length > 0) {
+          chatLog.info('raw snippets (onConversationListUpdate)', { typeCount, suspects })
+        }
+      }
       // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
       const incoming = toUiConversations(payload.items)

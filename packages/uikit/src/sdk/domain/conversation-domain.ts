@@ -1,6 +1,33 @@
 import type { ManagerHost } from '../client'
 import type { UiConversation } from '../types'
 import { toUiConversations } from '../adapter/conversation-adapter'
+import { createLogger } from '../../utils/logger'
+
+const conversationLogger = createLogger('Conversation')
+
+/**
+ * 诊断：打印 SDK 原始会话项中 combine/unknown 类型的 lastMessage 形态。
+ * 用于定位合并消息在会话列表预览空白的问题（payload-decoder 降级 /
+ * toConversationSummary 产 'unknown' 两条 SDK 侧嫌疑路径）。
+ * 仅当列表中存在 combine/unknown snippet 时才输出，正常情况零噪音。
+ */
+function dumpRawSnippets(items: ReturnType<ManagerHost['chatManager']['getConversationList']>, source: string): void {
+  const typeCount: Record<string, number> = {}
+  const suspects: unknown[] = []
+  for (const item of items) {
+    const type = String(item.lastMessage?.type ?? '(null)')
+    typeCount[type] = (typeCount[type] ?? 0) + 1
+    if (type === 'combine' || type === 'unknown') {
+      suspects.push({
+        conversationId: item.conversationId,
+        lastMessage: item.lastMessage,
+      })
+    }
+  }
+  if (suspects.length > 0) {
+    conversationLogger.info(`raw snippets (${source})`, { typeCount, suspects })
+  }
+}
 
 /**
  * ConversationStore 需要暴露给 Domain 的最小接口。
@@ -46,6 +73,7 @@ export class ConversationDomain {
   /** 从本地缓存读取会话列表 */
   syncLocal(): UiConversation[] {
     const items = this.client.chatManager.getConversationList()
+    dumpRawSnippets(items, 'syncLocal')
     const list = toUiConversations(items)
     this.store.setList(list)
     return list
