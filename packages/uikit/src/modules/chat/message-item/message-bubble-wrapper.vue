@@ -76,7 +76,10 @@ const { t } = useLocale()
 const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
 const { get: getPresence } = usePresence()
 
+/** 发送者在线状态：己方消息不展示（自己的在线状态对自己没有信息量） */
 const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
+  if (props.message.isSelf)
+    return undefined
   return getPresence(props.message.from).value?.status as PresenceDisplayStatus | undefined
 })
 
