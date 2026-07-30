@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, markRaw, ref } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
 import type { MessageStatus, TextMessageBody, UiMessage } from '../sdk/types'
 import { toUiMessage } from '../sdk/adapter/message-adapter'
@@ -112,7 +112,9 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 发送前：将 SDK Message 以 sending 状态加入 store */
   function addSendingMessage(localId: string, sdkMsg: SdkMessage) {
-    sendingMetaMap.value[localId] = { sdkMsg, timestamp: Date.now() }
+    // markRaw：合并消息的 sdkMsg 携带完整 messageList 子消息图，
+    // 深响应式包装会产生大量无用 proxy，阻断潜在的重渲染/卡死链路
+    sendingMetaMap.value[localId] = { sdkMsg: markRaw(sdkMsg), timestamp: Date.now() }
 
     const currentUserId = sdkMsg.from
     const uiMsg: UiMessage = {

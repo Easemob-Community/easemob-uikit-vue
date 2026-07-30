@@ -1,6 +1,6 @@
 import { computed, ref, toRaw } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
-import type { CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
+import type { CombineMessageBody, CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
 import { extractLastMessageText } from '../sdk/adapter/message-adapter'
 import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
@@ -9,12 +9,15 @@ import { useUIKit } from './use-uikit'
 
 /**
  * 将 UiMessage 转换为干净的 SDK Message 对象。
- * 剥离 UiMessage 扩展字段（isSelf / localId / recalled / pinned /
- * translation / progress 等），仅保留 SDK Message 接口定义的字段。
+ * 剥离 UiMessage 扩展字段（isSelf / status / localId / recalled /
+ * pinned / translation / progress 等），仅保留 SDK Message 接口定义的字段。
  * 通过 toRaw 解包 Vue reactive proxy，避免 SDK createCombineMessage
  * 编码合并载荷时把 Vue 内部属性也序列化进去。
  * 不剥离扩展字段会导致合并文件载荷异常偏大，
  * 服务端可能无法正确存储/检索该消息。
+ * 嵌套的合并消息额外剥离 body.messageList：接收端通过 url/secret
+ * 按需下载子消息，保留会导致载荷随嵌套转发轮次指数膨胀，
+ * 同步编码与上传进度回调足以把页面主线程打满（表现为页面无响应）。
  */
 function toCleanSdkMessage(msg: UiMessage): SdkMessage {
   // toRaw 解包 Vue reactive proxy
@@ -22,6 +25,7 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
   // 解构剥离所有 UiMessage 扩展字段
   const {
     isSelf: _isSelf,
+    status: _status,
     localId: _localId,
     requireGroupAck: _requireGroupAck,
     groupMemberCount: _groupMemberCount,
@@ -39,6 +43,11 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
     modified: _modified,
     ...sdkMsg
   } = raw
+  // 嵌套合并消息：剥离 messageList，仅保留 title/summary/url/secret/combineLevel 等索引字段
+  if (sdkMsg.type === 'combine' && sdkMsg.body && 'messageList' in (sdkMsg.body as CombineMessageBody)) {
+    const { messageList: _messageList, ...restBody } = sdkMsg.body as CombineMessageBody
+    sdkMsg.body = restBody as typeof sdkMsg.body
+  }
   return sdkMsg as unknown as SdkMessage
 }
 
