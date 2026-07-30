@@ -189,7 +189,7 @@ async function handleDownload(event: MouseEvent) {
   event.stopPropagation()
   const url = originalUrl.value
   if (!url) {
-    showToast(t('message.download.failed') || '下载失败')
+    showToast(t('message.download.failed') || '下载失败', 'error')
     return
   }
 
@@ -202,14 +202,14 @@ async function handleDownload(event: MouseEvent) {
       filename,
       env,
       onSuccess: () => {
-        showToast(t('message.download.success') || '下载成功')
+        showToast(t('message.download.success') || '下载成功', 'success')
       },
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
-          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件')
+          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件', 'warning')
         }
         else {
-          showToast(t('message.download.failed') || '下载失败')
+          showToast(t('message.download.failed') || '下载失败', 'error')
         }
       },
     })

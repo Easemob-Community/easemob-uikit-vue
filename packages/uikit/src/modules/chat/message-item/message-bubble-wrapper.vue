@@ -524,7 +524,7 @@ const isHighlighted = computed(() => {
 }
 
 .message-bubble-wrapper__status-icon--loading {
-  animation: message-status-loading 1s infinite;
+  animation: message-status-loading 0.8s linear infinite;
 }
 
 .message-bubble-wrapper__status-icon--read {
@@ -546,12 +546,11 @@ const isHighlighted = computed(() => {
 }
 
 @keyframes message-status-loading {
-  0%,
-  100% {
-    opacity: 1;
+  from {
+    transform: rotate(0deg);
   }
-  50% {
-    opacity: 0.3;
+  to {
+    transform: rotate(360deg);
   }
 }
 

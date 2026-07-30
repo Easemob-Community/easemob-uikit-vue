@@ -129,11 +129,11 @@ async function onFileSelected(event: Event) {
           files.value = [...newFiles, ...files.value]
       }
     }
-    showToast(t('group.sharedFile.uploadSuccess') || '上传成功')
+    showToast(t('group.sharedFile.uploadSuccess') || '上传成功', 'success')
   }
   catch (err) {
     console.warn('[SharedFileList] upload failed:', err)
-    showToast(t('group.sharedFile.uploadFailed') || '上传失败')
+    showToast(t('group.sharedFile.uploadFailed') || '上传失败', 'error')
   }
   finally {
     uploading.value = false
@@ -222,11 +222,11 @@ async function onDelete(file: any) {
   try {
     await deleteGroupSharedFile(props.groupId, file.fileId)
     files.value = files.value.filter(f => f.fileId !== file.fileId)
-    showToast(t('group.sharedFile.deleteSuccess') || '删除成功')
+    showToast(t('group.sharedFile.deleteSuccess') || '删除成功', 'success')
   }
   catch (err) {
     console.warn('[SharedFileList] delete failed:', err)
-    showToast(t('group.sharedFile.deleteFailed') || '删除失败')
+    showToast(t('group.sharedFile.deleteFailed') || '删除失败', 'error')
   }
 }
 
@@ -280,11 +280,11 @@ async function onDownload(file: any) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    showToast(t('group.sharedFile.downloadSuccess') || '下载成功')
+    showToast(t('group.sharedFile.downloadSuccess') || '下载成功', 'success')
   }
   catch (err) {
     console.warn('[SharedFileList] download failed:', err)
-    showToast(t('group.sharedFile.downloadFailed') || '下载失败')
+    showToast(t('group.sharedFile.downloadFailed') || '下载失败', 'error')
   }
 }
 </script>
