@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useLongPress } from '../../composables/use-long-press'
 import Avatar from '../../components/avatar/avatar.vue'
 import Badge from '../../components/badge/badge.vue'
@@ -65,6 +65,21 @@ const conversationName = computed(() =>
   contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
 )
 const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
+
+/** 免打扰开启时铃铛摇摆动画（仅在状态由关闭变为开启时触发一次） */
+const muteShaking = ref(false)
+watch(() => props.conversation.isMuted, (muted, prev) => {
+  if (muted && !prev) {
+    muteShaking.value = false
+    requestAnimationFrame(() => {
+      muteShaking.value = true
+    })
+  }
+})
+
+function onMuteBadgeAnimEnd() {
+  muteShaking.value = false
+}
 
 /** H5 长按 ActionSheet */
 const showActionSheet = ref(false)
@@ -281,7 +296,12 @@ const displayMessage = computed(() => {
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />
           </span>
-          <span v-if="props.conversation.isMuted" class="conversation-item__mute-badge">
+          <span
+            v-if="props.conversation.isMuted"
+            class="conversation-item__mute-badge"
+            :class="{ 'is-shaking': muteShaking }"
+            @animationend="onMuteBadgeAnimEnd"
+          >
             <Icon name="misc/bell_slash" :size="12" />
           </span>
         </div>
@@ -401,6 +421,45 @@ const displayMessage = computed(() => {
   align-items: center;
   color: var(--uikit-text-secondary);
   flex-shrink: 0;
+  transform-origin: top center;
+}
+
+/* 摇铃动画：开启免打扰时铃铛左右摇摆后归位 */
+@keyframes uikit-bell-shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(18deg);
+  }
+  20% {
+    transform: rotate(-15deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  40% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+}
+
+.conversation-item__mute-badge.is-shaking {
+  animation: uikit-bell-shake 0.8s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conversation-item__mute-badge.is-shaking {
+    animation: none;
+  }
 }
 
 .conversation-item__time {
