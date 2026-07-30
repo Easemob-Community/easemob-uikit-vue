@@ -3,12 +3,21 @@ import type { Message as SdkMessage } from 'easemob-websdk'
 import type { CombineMessageBody, CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
 import { extractLastMessageText } from '../sdk/adapter/message-adapter'
 import { createLogger } from '../utils/logger'
+import { useLocale } from '../locale'
+import { useToast } from './use-toast'
 import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
 import { useMessageActions } from './use-message-actions'
 import { useUIKit } from './use-uikit'
 
 const combineLogger = createLogger('Combine')
+
+/**
+ * 合并消息上限，与 SDK combine-message-constraints.ts 对齐
+ *（MAX_COMBINE_MESSAGE_COUNT / MAX_COMBINE_LEVEL 未从 SDK 包公开导出，此处硬编码并注明来源）。
+ */
+const MAX_COMBINE_ITEMS = 300
+const MAX_COMBINE_LEVEL = 10
 
 /**
  * 将 UiMessage 转换为干净的 SDK Message 对象。
@@ -63,6 +72,8 @@ const editingMessage = ref<UiMessage | null>(null)
  */
 export function useChat() {
   const { stores, domains } = useUIKit()
+  const { t } = useLocale()
+  const { show: showToast } = useToast()
   const send = useMessageSend()
   const history = useMessageHistory()
   const actions = useMessageActions()
@@ -208,10 +219,28 @@ export function useChat() {
   async function forwardCombineMessages(messages: UiMessage[], target: UiConversation) {
     if (messages.length === 0)
       return
+    // 前置校验与 SDK 约束对齐（createCombineMessage 超限会直接抛 ValidationError），
+    // 在 UI 层先拦截并给出明确提示，而不是让用户看到笼统的"转发失败"
+    if (messages.length > MAX_COMBINE_ITEMS) {
+      showToast(t('message.forward.tooMany', `最多支持 ${MAX_COMBINE_ITEMS} 条消息`).replace('{max}', String(MAX_COMBINE_ITEMS)), 'warning')
+      return
+    }
+    // 嵌套合并层级：选中项中 combine 消息的最高 combineLevel + 1 超过 SDK 上限时拦截
+    const maxNestedLevel = messages.reduce((acc, m) => {
+      if (m.type !== 'combine')
+        return acc
+      const level = (m.body as CombineMessageBody).combineLevel ?? 0
+      return Math.max(acc, level)
+    }, 0)
+    if (maxNestedLevel + 1 > MAX_COMBINE_LEVEL) {
+      showToast(t('message.forward.combineLevelExceeded', '聊天记录嵌套层级过高，无法合并转发'), 'warning')
+      return
+    }
     const { id, type } = target
-    const title = type === 'groupChat' ? (target.name || id) : '聊天记录'
+    const title = type === 'groupChat' ? (target.name || id) : t('message.forward.combineTitle', '聊天记录')
     const summary = messages.map(m => `${resolveSenderName(m)}: ${extractLastMessageText(m)}`).join('\n')
-    const compatibleText = '[聊天记录]'
+    // 旧版本客户端展示的兼容文案（SDK compatibleText sidecar）
+    const compatibleText = t('message.forward.combineCompatible', '[聊天记录]')
     // 剥离 UiMessage 扩展字段并去 reactive proxy：
     // SDK createCombineMessage 期望纯净的 SDK Message 对象，
     // 包含 isSelf / localId / recalled 等扩展字段会导致合并载荷

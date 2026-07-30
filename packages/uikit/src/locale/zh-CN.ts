@@ -276,6 +276,7 @@ const messages: LocaleMessages = {
   'message.forward.combineEmpty': '暂无消息',
   'message.forward.noValidMessages': '没有可转发的消息',
   'message.forward.tooMany': '最多支持 {max} 条消息',
+  'message.forward.combineLevelExceeded': '聊天记录嵌套层级过高，无法合并转发',
   'message.forward.parsing': '解析中...',
   'message.forward.parseFailed': '解析失败',
   'message.download.success': '下载成功',

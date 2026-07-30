@@ -276,6 +276,7 @@ const messages: LocaleMessages = {
   'message.forward.combineEmpty': 'No messages',
   'message.forward.noValidMessages': 'No messages to forward',
   'message.forward.tooMany': 'Maximum {max} messages supported',
+  'message.forward.combineLevelExceeded': 'Chat history is nested too deeply to forward as combined message',
   'message.forward.parsing': 'Parsing...',
   'message.forward.parseFailed': 'Parse failed',
   'message.download.success': 'Download successful',
