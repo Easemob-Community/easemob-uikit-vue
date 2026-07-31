@@ -122,6 +122,7 @@ const emit = defineEmits<{
   (e: 'update:selectedIds', ids: string[]): void
   (e: 'max-exceed', max: number): void
   (e: 'load-more'): void
+  (e: 'search', keyword: string): void
 }>()
 
 const {
@@ -139,6 +140,7 @@ const isLoadingMore = ref(false)
 const searchKeyword = ref('')
 function setSearchKeyword(v: string) {
   searchKeyword.value = v
+  emit('search', v.trim())
 }
 const normalizedKeyword = computed(() => searchKeyword.value.trim())
 

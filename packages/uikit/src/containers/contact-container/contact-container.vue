@@ -85,6 +85,10 @@ export interface ContactContainerProps {
   initialView?: ContactContainerView
   /** 自定义入口列表，传入后按数组顺序展示，可与内置入口共存 */
   entries?: AddressBookContainerEntry[]
+  /** 是否在联系人子视图头部展示添加好友按钮，默认 true */
+  showContactAddButton?: boolean
+  /** 是否在群组子视图头部展示创建群组按钮，默认 true */
+  showGroupCreateButton?: boolean
 
   // ---------- Contact 子列表配置 ----------
   emptyText?: string
@@ -189,6 +193,8 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   autoFetch: true,
   autoFetchGroups: true,
   enablePresence: undefined,
+  showContactAddButton: true,
+  showGroupCreateButton: true,
 })
 
 /** showNotice 缺省视为 true，兼容废弃 prop showNewRequest */
@@ -204,6 +210,8 @@ const emit = defineEmits<{
   /** @deprecated 请使用 notice-click */
   (e: 'new-request-click'): void
   (e: 'home-search', keyword: string): void
+  (e: 'contact-search', keyword: string): void
+  (e: 'group-search', keyword: string): void
   (e: 'contact-select', contact: Contact): void
   (e: 'contact-click', contact: Contact): void
   (e: 'contact-contextmenu', event: MouseEvent, contact: Contact): void
@@ -216,6 +224,8 @@ const emit = defineEmits<{
   (e: 'group-load-more'): void
   (e: 'group-max-exceed', max: number): void
   (e: 'update:groupSelectedIds', ids: string[]): void
+  (e: 'add-contact'): void
+  (e: 'create-group'): void
 }>()
 
 const addressBookRef = ref<InstanceType<typeof AddressBookContainer>>()
@@ -289,10 +299,14 @@ defineExpose({
     :contact-icon="props.contactIcon"
     :entries="props.entries"
     :initial-view="props.initialView as AddressBookContainerView"
+    :show-contact-add-button="props.showContactAddButton"
+    :show-group-create-button="props.showGroupCreateButton"
     @view-change="(v) => emit('view-change', v as ContactContainerView)"
     @entry-click="(k) => emit('entry-click', k)"
     @notice-click="() => { emit('notice-click'); emit('new-request-click') }"
     @home-search="(k) => emit('home-search', k)"
+    @add-contact="emit('add-contact')"
+    @create-group="emit('create-group')"
   >
     <template #header>
       <slot name="header" />
@@ -318,7 +332,7 @@ defineExpose({
     <template #back-icon>
       <slot name="back-icon" />
     </template>
-    <template #subheader-extra="subProps">
+    <template v-if="$slots['subheader-extra']" #subheader-extra="subProps">
       <slot name="subheader-extra" v-bind="subProps" />
     </template>
 
@@ -362,6 +376,7 @@ defineExpose({
         @load-more="emit('contact-load-more')"
         @max-exceed="(m: number) => emit('contact-max-exceed', m)"
         @update:selected-ids="(ids: string[]) => emit('update:selectedIds', ids)"
+        @search="(k: string) => emit('contact-search', k)"
       >
         <template v-if="$slots.body" #body>
           <slot name="body" />
@@ -430,6 +445,7 @@ defineExpose({
         @load-more="emit('group-load-more')"
         @max-exceed="(m: number) => emit('group-max-exceed', m)"
         @update:selected-ids="(ids: string[]) => emit('update:groupSelectedIds', ids)"
+        @search="(k: string) => emit('group-search', k)"
       >
         <template v-if="$slots['group-body']" #body>
           <slot name="group-body" />

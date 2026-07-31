@@ -142,6 +142,7 @@ const emit = defineEmits<{
   (e: 'load-more'): void
   (e: 'max-exceed', max: number): void
   (e: 'update:selectedIds', ids: string[]): void
+  (e: 'search', keyword: string): void
 }>()
 
 const { refresh: refreshContacts, loadMore: loadMoreContacts } = useContact()
@@ -227,6 +228,7 @@ defineExpose({
       @load-more="handleContactLoadMore"
       @max-exceed="(m: number) => emit('max-exceed', m)"
       @update:selected-ids="(ids: string[]) => emit('update:selectedIds', ids)"
+      @search="(k: string) => emit('search', k)"
     >
       <template v-if="$slots.header" #header>
         <slot name="header" />

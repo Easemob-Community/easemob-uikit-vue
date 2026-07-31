@@ -88,6 +88,10 @@ export interface AddressBookContainerProps {
   noticePersistInvites?: boolean | 'local' | 'session'
   /** 初始视图（默认 home） */
   initialView?: AddressBookContainerView
+  /** 是否在联系人子视图头部展示添加好友按钮，默认 true */
+  showContactAddButton?: boolean
+  /** 是否在群组子视图头部展示创建群组按钮，默认 true */
+  showGroupCreateButton?: boolean
 }
 
 const props = withDefaults(defineProps<AddressBookContainerProps>(), {
@@ -102,6 +106,8 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   autoEntryCount: true,
   entryOrder: () => ['notice', 'group', 'contact'] as const,
   noticePersistInvites: false,
+  showContactAddButton: true,
+  showGroupCreateButton: true,
 })
 
 const emit = defineEmits<{
@@ -109,6 +115,8 @@ const emit = defineEmits<{
   (e: 'notice-click'): void
   (e: 'entry-click', key: string): void
   (e: 'home-search', keyword: string): void
+  (e: 'add-contact'): void
+  (e: 'create-group'): void
 }>()
 
 const { t } = useLocale()
@@ -374,6 +382,22 @@ const subviewTitle = computed(() => {
             <span class="address-book-container__subtitle">{{ subviewTitle }}</span>
             <span class="address-book-container__subheader-extra">
               <slot name="subheader-extra" :view="view" />
+              <span
+                v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
+                class="address-book-container__action-btn"
+                :title="t('contact.addContact')"
+                @click="emit('add-contact')"
+              >
+                <Icon name="actions/plus" :size="22" />
+              </span>
+              <span
+                v-if="!$slots['subheader-extra'] && view === 'group' && props.showGroupCreateButton"
+                class="address-book-container__action-btn"
+                :title="t('group.createGroup')"
+                @click="emit('create-group')"
+              >
+                <Icon name="actions/plus" :size="22" />
+              </span>
             </span>
           </div>
 
@@ -521,6 +545,23 @@ const subviewTitle = computed(() => {
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
+  gap: 4px;
+}
+
+.address-book-container__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--uikit-text-primary);
+  transition: background-color 0.15s;
+}
+
+.address-book-container__action-btn:hover {
+  background-color: var(--uikit-bg-secondary);
 }
 
 .address-book-container__subview {

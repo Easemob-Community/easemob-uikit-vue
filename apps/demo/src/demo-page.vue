@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import {
+  EmAddContactModal,
   EmChatContainer,
   EmContactContainer,
   EmContactDetail,
   EmConversationContainer,
+  EmCreateGroupModal,
   EmGroupDetail,
   EmIcon,
   EmInput,
@@ -97,6 +99,10 @@ const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
 const showHomeSearch = ref(true)
 const showContactSearch = ref(true)
 const showGroupSearch = ref(true)
+
+// 通讯录操作弹窗
+const showAddContactModal = ref(false)
+const showCreateGroupModal = ref(false)
 
 // 群管理 Demo 配置开关
 const groupManagementConfig = ref({
@@ -407,6 +413,8 @@ function injectMockContacts() {
           @view-change="() => { detailUserId = null; detailGroupId = null }"
           @contact-click="(c: UiContact) => { detailUserId = c.userId; detailGroupId = null }"
           @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"
+          @add-contact="showAddContactModal = true"
+          @create-group="showCreateGroupModal = true"
         />
       </div>
 
@@ -447,6 +455,8 @@ function injectMockContacts() {
             @view-change="() => { detailUserId = null; detailGroupId = null }"
             @contact-click="(c: UiContact) => h5EnterDetail('user', c.userId)"
             @group-click="(g: UiGroup) => h5EnterDetail('group', g.groupId)"
+            @add-contact="showAddContactModal = true"
+            @create-group="showCreateGroupModal = true"
           />
         </div>
         <!-- H5 底部 TabBar -->
@@ -1201,6 +1211,10 @@ function injectMockContacts() {
         </div>
       </div>
     </EmPopup>
+
+    <!-- 添加好友 / 创建群组 -->
+    <EmAddContactModal v-model:show="showAddContactModal" />
+    <EmCreateGroupModal v-model:show="showCreateGroupModal" />
   </div>
 </template>
 
