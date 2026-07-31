@@ -181,6 +181,7 @@ function onCancel() {
 
 .presence-selector--compact .presence-selector__options {
   gap: 2px;
+  padding: 0 6px;
 }
 
 .presence-selector--compact .presence-selector__options--no-header {
