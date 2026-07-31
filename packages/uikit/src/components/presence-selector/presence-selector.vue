@@ -194,7 +194,7 @@ function onCancel() {
 .presence-selector--compact .presence-selector__option :deep(.uikit-cell) {
   --uikit-cell-height: auto;
   height: auto;
-  padding: 8px 10px;
+  padding: 10px 12px;
   margin-bottom: 0;
 }
 
