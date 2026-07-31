@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import Icon from '../../components/icon/icon.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
@@ -250,13 +251,15 @@ defineExpose({ refresh, removeMember, setMemberRole })
         <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
         <span class="group-member-list__count">{{ groupInfo?.memberCount ?? displayMembers.length }}</span>
       </div>
-      <button
+      <IconButton
         v-if="props.closable"
         class="group-member-list__close"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
+        :title="t('button.close') || '关闭'"
         @click="emit('close')"
-      >
-        <Icon name="actions/xmark_thick" :size="16" />
-      </button>
+      />
     </div>
 
     <!-- 搜索 -->
@@ -356,14 +359,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 }
 
 .group-member-list__close {
-  background: none;
-  border: none;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
+  flex-shrink: 0;
   margin: -4px -8px -4px 0;
 }
 

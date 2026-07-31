@@ -5,6 +5,7 @@ import { useLocale } from '../../../locale'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import Empty from '../../../components/empty/empty.vue'
 import Cell from '../../../components/cell/cell.vue'
 import type { MentionContact } from '../types'
@@ -144,9 +145,14 @@ function onKeydown(e: KeyboardEvent) {
         <!-- 标题栏 -->
         <div class="mention-picker__header">
           <span class="mention-picker__header-title">{{ displayTitle }}</span>
-          <span class="mention-picker__header-close" @click="onClose">
-            <Icon name="actions/close" :size="20" />
-          </span>
+          <IconButton
+            class="mention-picker__header-close"
+            icon="actions/close"
+            size="small"
+            variant="ghost"
+            :title="t('button.close') || '关闭'"
+            @click="onClose"
+          />
         </div>
         <!-- 搜索栏 -->
         <div class="mention-picker__search">
@@ -274,10 +280,5 @@ function onKeydown(e: KeyboardEvent) {
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
 }
 </style>

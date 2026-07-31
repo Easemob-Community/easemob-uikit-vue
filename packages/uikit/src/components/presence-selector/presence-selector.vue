@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
 import Icon from '../icon/icon.vue'
+import IconButton from '../icon-button/icon-button.vue'
 import Input from '../input/input.vue'
 import Cell from '../cell/cell.vue'
 
@@ -110,9 +111,14 @@ function onCancel() {
   <div class="presence-selector" :class="{ 'presence-selector--compact': props.compact }">
     <div v-if="props.showHeader" class="presence-selector__header">
       <span class="presence-selector__title">{{ t('presence.setStatus') || '设置在线状态' }}</span>
-      <button class="presence-selector__close" @click="onCancel">
-        <Icon name="actions/xmark_thick" :size="16" />
-      </button>
+      <IconButton
+        class="presence-selector__close"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
+        :title="t('button.close') || '关闭'"
+        @click="onCancel"
+      />
     </div>
 
     <div class="presence-selector__options" :class="{ 'presence-selector__options--no-header': !props.showHeader }">
@@ -201,14 +207,7 @@ function onCancel() {
 }
 
 .presence-selector__close {
-  background: none;
-  border: none;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
+  flex-shrink: 0;
   margin: -4px -8px -4px 0;
 }
 

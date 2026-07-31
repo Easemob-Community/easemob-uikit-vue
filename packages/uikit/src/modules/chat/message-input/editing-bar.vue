@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
 import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 
@@ -36,13 +37,14 @@ function onClose() {
       <span class="editing-bar__title">{{ t('message.editing') }}</span>
       <span class="editing-bar__preview">{{ preview }}</span>
     </div>
-    <div
+    <IconButton
       class="editing-bar__close"
+      icon="actions/close"
+      size="small"
+      variant="ghost"
       :title="t('message.editing.cancel')"
       @click.stop="onClose"
-    >
-      <Icon name="actions/xmark_in_circle_fill" :size="16" />
-    </div>
+    />
   </div>
 </template>
 
@@ -90,18 +92,5 @@ function onClose() {
 
 .editing-bar__close {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--uikit-text-secondary);
-  transition: color 0.15s;
-}
-
-.editing-bar__close:hover {
-  color: var(--uikit-text-primary);
 }
 </style>

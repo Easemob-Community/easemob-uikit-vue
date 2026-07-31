@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
+import { useLocale } from '../../../locale'
 import { getQuotePreview } from '../../../composables/use-quote'
 import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
 
@@ -14,6 +16,7 @@ export interface QuoteBarEmits {
 
 const props = defineProps<QuoteBarProps>()
 const emit = defineEmits<QuoteBarEmits>()
+const { t } = useLocale()
 
 /** 发送人显示名（当前优先使用 from，后续可扩展映射） */
 const sender = computed(() => props.message.from || '')
@@ -48,9 +51,14 @@ function onClose() {
       <span class="quote-bar__sender">{{ sender }}：</span>
       <span class="quote-bar__preview">{{ preview }}</span>
     </div>
-    <div class="quote-bar__close" @click.stop="onClose">
-      <Icon name="actions/xmark_in_circle_fill" :size="16" />
-    </div>
+    <IconButton
+      class="quote-bar__close"
+      icon="actions/close"
+      size="small"
+      variant="ghost"
+      :title="t('quote.cancel') || '取消引用'"
+      @click.stop="onClose"
+    />
   </div>
 </template>
 
@@ -109,18 +117,5 @@ function onClose() {
 
 .quote-bar__close {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--uikit-text-secondary);
-  transition: color 0.15s;
-}
-
-.quote-bar__close:hover {
-  color: var(--uikit-text-primary);
 }
 </style>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { t } from '../../locale'
+import IconButton from '../icon-button/icon-button.vue'
 
 export interface EmojiPickerProps {
   show: boolean
@@ -47,7 +48,14 @@ function onClose() {
           {{ group.name }}
         </div>
       </div>
-      <button class="emoji-picker__close" @click="onClose">&times;</button>
+      <IconButton
+        class="emoji-picker__close"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
+        :title="t('button.close') || '关闭'"
+        @click="onClose"
+      />
     </div>
     <div class="emoji-picker__body">
       <button
@@ -100,13 +108,7 @@ function onClose() {
 }
 
 .emoji-picker__close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  line-height: 1;
-  padding: 0 4px;
+  flex-shrink: 0;
 }
 
 .emoji-picker__body {
