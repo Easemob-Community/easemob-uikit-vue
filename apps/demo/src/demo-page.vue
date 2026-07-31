@@ -88,6 +88,11 @@ const chatInputMaxLength = ref(0)
 const groupReadReceiptEnabled = ref(false)
 const groupReadReceiptMaxSize = ref(200)
 
+// 消息列表配置
+const chatShowTime = ref<false | true | 'always' | 'hover'>(false)
+const chatMessageStatusShowText = ref(false)
+const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
+
 // 联系人容器搜索控制
 const showHomeSearch = ref(true)
 const showContactSearch = ref(true)
@@ -133,6 +138,13 @@ const chatConfig = computed(() => ({
     ...(chatInputCaretColor.value ? { caretColor: chatInputCaretColor.value } : {}),
     ...(chatInputSelectionColor.value ? { selectionColor: chatInputSelectionColor.value } : {}),
     ...(chatInputMaxLength.value > 0 ? { maxLength: chatInputMaxLength.value } : {}),
+  },
+  messageList: {
+    showTime: chatShowTime.value,
+    messageStatus: {
+      showText: chatMessageStatusShowText.value,
+      direction: chatMessageStatusDirection.value,
+    },
   },
 }))
 
@@ -910,6 +922,64 @@ function injectMockContacts() {
                   class="demo-input"
                   style="flex: 1;"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-settings__group">
+            <label class="demo-settings__label">消息列表</label>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">时间戳显示</span>
+                <div class="demo-settings__options">
+                  <button
+                    class="demo-option"
+                    :class="{ 'demo-option--active': chatShowTime === false }"
+                    @click="chatShowTime = false"
+                  >
+                    关闭
+                  </button>
+                  <button
+                    class="demo-option"
+                    :class="{ 'demo-option--active': chatShowTime === true || chatShowTime === 'always' }"
+                    @click="chatShowTime = 'always'"
+                  >
+                    始终显示
+                  </button>
+                  <button
+                    class="demo-option"
+                    :class="{ 'demo-option--active': chatShowTime === 'hover' }"
+                    @click="chatShowTime = 'hover'"
+                  >
+                    悬停显示
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">发送状态</span>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label class="demo-check">
+                    <input v-model="chatMessageStatusShowText" type="checkbox" />
+                    <span>显示状态文本</span>
+                  </label>
+                  <div class="demo-settings__options">
+                    <button
+                      class="demo-option"
+                      :class="{ 'demo-option--active': chatMessageStatusDirection === 'horizontal' }"
+                      @click="chatMessageStatusDirection = 'horizontal'"
+                    >
+                      横向排列
+                    </button>
+                    <button
+                      class="demo-option"
+                      :class="{ 'demo-option--active': chatMessageStatusDirection === 'vertical' }"
+                      @click="chatMessageStatusDirection = 'vertical'"
+                    >
+                      纵向排列
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
