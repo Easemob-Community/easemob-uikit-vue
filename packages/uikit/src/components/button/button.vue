@@ -4,7 +4,7 @@ import { useThemeStore } from '../../store/theme'
 import { useRipple } from '../../composables/use-ripple'
 
 export interface ButtonProps {
-  type?: 'primary' | 'success' | 'warning' | 'danger' | 'default'
+  type?: 'primary' | 'success' | 'warning' | 'danger' | 'danger-outline' | 'default'
   size?: 'small' | 'medium' | 'large'
   disabled?: boolean
   loading?: boolean
@@ -30,9 +30,14 @@ const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'uikit-button--square' : ''
 )
 
-// Ripple 波纹
+// Ripple 波纹：危险系按钮使用红色波纹，其余使用主题主色
 const buttonRef = ref<HTMLElement>()
-useRipple(buttonRef)
+const rippleColor = computed(() =>
+  props.type === 'danger' || props.type === 'danger-outline'
+    ? 'rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.25)'
+    : 'var(--uikit-primary-color)',
+)
+useRipple(buttonRef, { color: rippleColor.value })
 
 function handleClick(event: MouseEvent) {
   if (props.disabled || props.loading) return
@@ -123,6 +128,15 @@ function handleClick(event: MouseEvent) {
   color: #fff;
 }
 
+.uikit-button--danger-outline {
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+.uikit-button--danger-outline:hover {
+  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+}
+
 .uikit-button--default {
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
@@ -145,6 +159,13 @@ function handleClick(event: MouseEvent) {
   border-top-color: #fff;
   border-radius: 50%;
   animation: uikit-spin 0.8s linear infinite;
+}
+
+/* 浅色背景按钮上的 loading 使用深色轨迹 */
+.uikit-button--default .uikit-button__loading,
+.uikit-button--danger-outline .uikit-button__loading {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-top-color: var(--uikit-text-primary);
 }
 
 @keyframes uikit-spin {

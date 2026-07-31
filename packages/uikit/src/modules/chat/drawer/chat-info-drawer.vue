@@ -4,6 +4,7 @@ import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
+import Button from '../../../components/button/button.vue'
 import Cell from '../../../components/cell/cell.vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
@@ -12,7 +13,6 @@ import { useToast } from '../../../composables/use-toast'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
-import { useRipple } from '../../../composables/use-ripple'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
@@ -322,10 +322,6 @@ async function saveDescription() {
 /** 群成员列表二级页面状态 */
 const showMemberList = ref(false)
 const memberListRef = ref<InstanceType<typeof GroupMemberList>>()
-
-/** 底部危险操作按钮 ref，用于绑定波纹效果 */
-const dangerActionRef = ref<HTMLElement>()
-useRipple(dangerActionRef, { color: 'rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.25)' })
 
 /** 是否展示「添加成员」按钮：群主/管理员始终可邀请；普通成员需 group.allowInvites 为 true */
 const canAddMember = computed(() => {
@@ -923,13 +919,9 @@ defineExpose({
     <!-- Footer 插槽 -->
     <template v-if="!showMemberList" #footer>
       <div class="chat-info-drawer__actions">
-        <button
-          ref="dangerActionRef"
-          class="chat-info-drawer__action-btn chat-info-drawer__action-btn--danger"
-          @click="onLeaveOrDelete"
-        >
+        <Button type="danger-outline" block @click="onLeaveOrDelete">
           {{ isGroup ? (isOwner ? t('chat.info.destroyGroup') : t('chat.info.leaveGroup')) : t('chat.info.deleteFriend') }}
-        </button>
+        </Button>
       </div>
     </template>
   </ChatDrawer>
@@ -1197,33 +1189,6 @@ defineExpose({
 .chat-info-drawer__actions {
   padding: 16px;
   background-color: var(--uikit-bg-secondary);
-}
-
-.chat-info-drawer__action-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--uikit-components-radius, 8px);
-  border: none;
-  font-size: 15px;
-  font-weight: 500;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.chat-info-drawer__action-btn--danger {
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-danger-color, #ef4444);
-  position: relative;
-  overflow: hidden;
-}
-
-.chat-info-drawer__action-btn--danger:hover {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
-}
-
-.chat-info-drawer__action-btn--danger:active {
-  transform: scale(var(--uikit-anim-scale-press, 0.97));
 }
 
 .chat-info-drawer__member-detail {
