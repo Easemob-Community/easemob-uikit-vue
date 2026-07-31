@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
+import Cell from '../../../components/cell/cell.vue'
 import Empty from '../../../components/empty/empty.vue'
 import { useLocale } from '../../../locale'
 
@@ -70,14 +71,17 @@ function onClose() {
 
       <!-- 用户列表 -->
       <div class="group-read-modal__list">
-        <div
+        <Cell
           v-for="userId in displayList"
           :key="userId"
-          class="group-read-modal__item"
+          :title="userId"
+          :clickable="false"
+          size="compact"
         >
-          <Avatar :name="userId" :size="36" />
-          <span class="group-read-modal__name">{{ userId }}</span>
-        </div>
+          <template #leading>
+            <Avatar :name="userId" :size="36" />
+          </template>
+        </Cell>
         <Empty
           v-if="displayList.length === 0"
           icon="empty/read-receipt"
@@ -190,27 +194,6 @@ function onClose() {
   overflow-y: auto;
   padding: 8px 0;
   min-height: 120px;
-}
-
-.group-read-modal__item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  cursor: default;
-  transition: background-color 0.1s;
-}
-
-.group-read-modal__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.group-read-modal__name {
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 </style>

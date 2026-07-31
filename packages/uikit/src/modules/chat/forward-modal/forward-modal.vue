@@ -5,7 +5,7 @@ import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
-import Icon from '../../../components/icon/icon.vue'
+import Cell from '../../../components/cell/cell.vue'
 import Input from '../../../components/input/input.vue'
 import Empty from '../../../components/empty/empty.vue'
 import type { UiConversation as Conversation } from '../../../sdk/types'
@@ -72,19 +72,18 @@ function onSelect(conversation: Conversation) {
         />
       </div>
       <div class="forward-modal__list">
-        <div
+        <Cell
           v-for="item in filteredConversations"
           :key="item.id"
-          class="forward-modal__item"
+          :title="item.name || item.id"
+          :subtitle="item.lastMessageText || undefined"
+          show-arrow
           @click="onSelect(item)"
         >
-          <Avatar :src="item.avatar" :name="item.name" :size="40" />
-          <div class="forward-modal__info">
-            <span class="forward-modal__name">{{ item.name || item.id }}</span>
-            <span v-if="item.lastMessageText" class="forward-modal__last-msg">{{ item.lastMessageText }}</span>
-          </div>
-          <Icon name="arrows/arrow_right" :size="16" class="forward-modal__arrow" />
-        </div>
+          <template #leading>
+            <Avatar :src="item.avatar" :name="item.name" :size="40" />
+          </template>
+        </Cell>
         <Empty
           v-if="!filteredConversations.length"
           icon="empty/conversation"
@@ -137,49 +136,6 @@ function onSelect(conversation: Conversation) {
   flex: 1;
   overflow-y: auto;
   padding: 8px 0;
-}
-
-.forward-modal__item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.forward-modal__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.forward-modal__info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.forward-modal__name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.forward-modal__last-msg {
-  font-size: 12px;
-  color: var(--uikit-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.forward-modal__arrow {
-  color: var(--uikit-text-secondary);
-  flex-shrink: 0;
 }
 
 
