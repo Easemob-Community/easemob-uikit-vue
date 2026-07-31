@@ -840,7 +840,7 @@ const isHighlighted = computed(() => {
 }
 
 .message-bubble-wrapper__group-read--zero {
-  opacity: 0.7;
+  border-color: var(--uikit-primary-color);
 }
 
 .message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {
