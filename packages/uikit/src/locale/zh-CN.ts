@@ -316,6 +316,7 @@ const messages: LocaleMessages = {
   'chat.info.addMember': '添加成员',
   'chat.info.clearHistory': '清空聊天记录',
   'chat.info.clearHistoryConfirm': '确定清空当前会话的聊天记录吗？',
+  'chat.info.clearHistoryDeleteConversation': '同时删除会话',
   'chat.info.clearHistorySuccess': '聊天记录已清空',
   'chat.info.clearHistoryFailed': '清空聊天记录失败',
   'chat.info.leaveGroupConfirm': '确定退出该群聊吗？',

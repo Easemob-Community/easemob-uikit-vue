@@ -316,6 +316,7 @@ const messages: LocaleMessages = {
   'chat.info.addMember': 'Add Member',
   'chat.info.clearHistory': 'Clear Chat History',
   'chat.info.clearHistoryConfirm': 'Are you sure you want to clear the chat history?',
+  'chat.info.clearHistoryDeleteConversation': 'Delete conversation as well',
   'chat.info.clearHistorySuccess': 'Chat history cleared',
   'chat.info.clearHistoryFailed': 'Failed to clear chat history',
   'chat.info.leaveGroupConfirm': 'Are you sure you want to leave this group?',

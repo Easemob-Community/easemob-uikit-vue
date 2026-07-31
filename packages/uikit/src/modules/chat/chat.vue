@@ -64,7 +64,7 @@ defineExpose({
 
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
 const { stores, h5, client } = useUIKit()
-const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, selectConversation } = useConversation()
+const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
@@ -524,15 +524,20 @@ async function onDestroyGroup(groupId: string) {
 }
 
 /** 清空聊天记录 */
-async function onClearHistory(payload: { id: string, type: 'singleChat' | 'groupChat' }) {
+async function onClearHistory(payload: { id: string, type: 'singleChat' | 'groupChat', deleteConversation?: boolean }) {
   try {
     await clearChatHistory(payload.id, true)
     stores.message.clearConversationMessages(payload.id)
-    showToast(t('chat.info.clearHistorySuccess') || '聊天记录已清空')
+    if (payload.deleteConversation) {
+      await deleteConversation(payload.id)
+      // 删除会话后清空当前选中，避免右侧继续展示已删除会话
+      selectConversation('')
+    }
+    showToast(t('chat.info.clearHistorySuccess') || '聊天记录已清空', 'success')
   }
   catch (err) {
     console.warn('[Chat] clear history failed:', err)
-    showToast(t('chat.info.clearHistoryFailed') || '清空聊天记录失败')
+    showToast(t('chat.info.clearHistoryFailed') || '清空聊天记录失败', 'error')
   }
 }
 

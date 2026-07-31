@@ -56,7 +56,7 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'leave-group', groupId: string): void
   (e: 'destroy-group', groupId: string): void
-  (e: 'clear-history', payload: { id: string, type: 'singleChat' | 'groupChat' }): void
+  (e: 'clear-history', payload: { id: string, type: 'singleChat' | 'groupChat', deleteConversation?: boolean }): void
   (e: 'add-member', groupId: string): void
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
   // 群成员列表事件
@@ -380,11 +380,14 @@ const confirmModal = ref<{
   action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | null
   /** transferOwner 专用：新群主用户 ID */
   targetUserId?: string
+  /** clear 专用：是否同时删除会话 */
+  deleteConversation?: boolean
 }>({
   show: false,
   title: '',
   content: '',
   action: null,
+  deleteConversation: false,
 })
 
 function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
@@ -421,6 +424,7 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
       title: t('chat.info.clearHistory') || '清空聊天记录',
       content: t('chat.info.clearHistoryConfirm') || '确定清空当前会话的聊天记录吗？',
       action,
+      deleteConversation: false,
     }
   }
 }
@@ -536,7 +540,7 @@ function onModalConfirm() {
     emit('destroy-group', id)
   }
   else if (action === 'clear') {
-    emit('clear-history', { id, type })
+    emit('clear-history', { id, type, deleteConversation: confirmModal.value.deleteConversation })
   }
   else if (action === 'deleteFriend') {
     void doDeleteFriend(id)
@@ -929,7 +933,19 @@ defineExpose({
     :cancel-text="t('button.cancel')"
     @confirm="onModalConfirm"
   >
-    {{ confirmModal.content }}
+    <div class="chat-info-drawer__confirm-body">
+      <p>{{ confirmModal.content }}</p>
+      <label
+        v-if="confirmModal.action === 'clear'"
+        class="chat-info-drawer__confirm-checkbox"
+      >
+        <input
+          v-model="confirmModal.deleteConversation"
+          type="checkbox"
+        />
+        <span>{{ t('chat.info.clearHistoryDeleteConversation') || '同时删除会话' }}</span>
+      </label>
+    </div>
   </Modal>
 </template>
 
@@ -1192,5 +1208,32 @@ defineExpose({
   min-height: 0;
   overflow: hidden;
   background-color: var(--uikit-bg-base);
+}
+
+.chat-info-drawer__confirm-body {
+  text-align: center;
+}
+
+.chat-info-drawer__confirm-body > p {
+  margin: 0 0 12px;
+  color: var(--uikit-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-info-drawer__confirm-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--uikit-text-primary);
+}
+
+.chat-info-drawer__confirm-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--uikit-primary-color);
+  cursor: pointer;
 }
 </style>
