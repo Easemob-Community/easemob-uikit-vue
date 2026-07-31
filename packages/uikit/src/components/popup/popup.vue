@@ -13,6 +13,8 @@ export interface PopupProps {
   anchor?: HTMLElement
   /** 相对锚点的位置，默认 'bottom' */
   placement?: 'bottom' | 'top' | 'left' | 'right'
+  /** 锚定轴上的对齐方式，默认 'center' */
+  align?: 'start' | 'center' | 'end'
   /** 与锚点的间距（px），默认 8 */
   offset?: number
   /** 边界约束元素，传入后 popup 将被限制在该元素范围内 */
@@ -33,6 +35,7 @@ const props = withDefaults(defineProps<PopupProps>(), {
   closeOnClickOverlay: true,
   showClose: false,
   placement: 'bottom',
+  align: 'center',
   offset: 8,
 })
 
@@ -70,23 +73,43 @@ function updateAnchorPosition() {
   let x = 0
   let y = 0
 
+  // 计算锚定轴上的对齐偏移
+  const alignStart = props.align === 'start'
+  const alignEnd = props.align === 'end'
+
   // 计算初始位置
   switch (props.placement) {
     case 'bottom':
-      x = anchorRect.left + (anchorRect.width - contentRect.width) / 2
+      x = alignStart
+        ? anchorRect.left
+        : alignEnd
+            ? anchorRect.right - contentRect.width
+            : anchorRect.left + (anchorRect.width - contentRect.width) / 2
       y = anchorRect.bottom + offset
       break
     case 'top':
-      x = anchorRect.left + (anchorRect.width - contentRect.width) / 2
+      x = alignStart
+        ? anchorRect.left
+        : alignEnd
+            ? anchorRect.right - contentRect.width
+            : anchorRect.left + (anchorRect.width - contentRect.width) / 2
       y = anchorRect.top - contentRect.height - offset
       break
     case 'left':
       x = anchorRect.left - contentRect.width - offset
-      y = anchorRect.top + (anchorRect.height - contentRect.height) / 2
+      y = alignStart
+        ? anchorRect.top
+        : alignEnd
+            ? anchorRect.bottom - contentRect.height
+            : anchorRect.top + (anchorRect.height - contentRect.height) / 2
       break
     case 'right':
       x = anchorRect.right + offset
-      y = anchorRect.top + (anchorRect.height - contentRect.height) / 2
+      y = alignStart
+        ? anchorRect.top
+        : alignEnd
+            ? anchorRect.bottom - contentRect.height
+            : anchorRect.top + (anchorRect.height - contentRect.height) / 2
       break
   }
 

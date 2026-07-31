@@ -16,11 +16,14 @@ export interface PresenceSelectorProps {
   customPlaceholder?: string
   /** 紧凑模式，popup 场景下更窄的宽度与更小的内边距 */
   compact?: boolean
+  /** 是否展示标题头部，默认 true */
+  showHeader?: boolean
 }
 
 const props = withDefaults(defineProps<PresenceSelectorProps>(), {
   showCustom: true,
   compact: false,
+  showHeader: true,
 })
 
 const emit = defineEmits<{
@@ -98,14 +101,14 @@ function onCancel() {
 
 <template>
   <div class="presence-selector" :class="{ 'presence-selector--compact': props.compact }">
-    <div class="presence-selector__header">
+    <div v-if="props.showHeader" class="presence-selector__header">
       <span class="presence-selector__title">{{ t('presence.setStatus') || '设置在线状态' }}</span>
       <button class="presence-selector__close" @click="onCancel">
         <Icon name="actions/xmark_thick" :size="16" />
       </button>
     </div>
 
-    <div class="presence-selector__options">
+    <div class="presence-selector__options" :class="{ 'presence-selector__options--no-header': !props.showHeader }">
       <Cell
         v-for="option in options"
         :key="option.key"
@@ -150,8 +153,8 @@ function onCancel() {
 }
 
 .presence-selector--compact {
-  width: 180px;
-  padding: 12px;
+  width: 160px;
+  padding: 8px;
 }
 
 .presence-selector--compact .presence-selector__title {
@@ -161,6 +164,20 @@ function onCancel() {
 .presence-selector--compact .presence-selector__dot {
   width: 8px;
   height: 8px;
+}
+
+.presence-selector--compact .presence-selector__options--no-header {
+  margin-top: 0;
+}
+
+.presence-selector--compact .presence-selector__custom {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.presence-selector--compact .presence-selector__confirm {
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 .presence-selector__header {
