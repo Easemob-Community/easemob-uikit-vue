@@ -106,7 +106,7 @@ const layout = computed<MessageLayout>(() => props.config?.layout ?? 'conversati
 const showAvatar = computed(() => props.config?.showAvatar ?? true)
 
 /** 是否显示时间 */
-const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? 'always')
+const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? false)
 
 /** 是否为对话模式且是己方消息 */
 const isSelfConversation = computed(() => layout.value === 'conversation' && props.message.isSelf)

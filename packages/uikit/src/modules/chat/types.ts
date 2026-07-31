@@ -69,7 +69,7 @@ export interface ChatConfig {
     layout?: MessageLayout
     /** 是否显示头像，默认 true */
     showAvatar?: boolean
-    /** 时间显示策略，默认 'always' */
+    /** 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' */
     showTime?: TimeDisplayStrategy
     /** 气泡形状，默认 'round' */
     bubbleShape?: BubbleShape
