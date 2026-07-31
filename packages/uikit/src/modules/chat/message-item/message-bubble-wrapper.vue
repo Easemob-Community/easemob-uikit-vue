@@ -447,12 +447,15 @@ const isHighlighted = computed(() => {
               v-if="showGroupReadCount"
               type="button"
               class="message-bubble-wrapper__group-read"
-              :class="{ 'message-bubble-wrapper__group-read--all': isGroupReadAll }"
+              :class="{
+                'message-bubble-wrapper__group-read--all': isGroupReadAll,
+                'message-bubble-wrapper__group-read--zero': groupReadCount === 0,
+              }"
               :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
               @click.stop="onGroupReadClick"
             >
-              <Icon v-if="isGroupReadAll" name="actions/check" :size="10" />
-              <template v-else>{{ groupReadCount }}</template>
+              <Icon v-if="isGroupReadAll" name="actions/check" :size="8" />
+              <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
             </button>
           </template>
 
@@ -564,12 +567,15 @@ const isHighlighted = computed(() => {
                 v-if="showGroupReadCount"
                 type="button"
                 class="message-bubble-wrapper__group-read"
-                :class="{ 'message-bubble-wrapper__group-read--all': isGroupReadAll }"
+                :class="{
+                  'message-bubble-wrapper__group-read--all': isGroupReadAll,
+                  'message-bubble-wrapper__group-read--zero': groupReadCount === 0,
+                }"
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="actions/check" :size="10" />
-                <template v-else>{{ groupReadCount }}</template>
+                <Icon v-if="isGroupReadAll" name="actions/check" :size="8" />
+                <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
               </button>
             </div>
           </div>
@@ -805,13 +811,13 @@ const isHighlighted = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 1.5px solid var(--uikit-text-secondary);
+  border: 1px solid var(--uikit-text-secondary);
   background: transparent;
   color: var(--uikit-text-secondary);
-  font-size: 10px;
+  font-size: 8px;
   line-height: 1;
   padding: 0;
   margin-top: 2px;
@@ -831,6 +837,10 @@ const isHighlighted = computed(() => {
 .message-bubble-wrapper__group-read--all {
   border-color: var(--uikit-primary-color);
   color: var(--uikit-primary-color);
+}
+
+.message-bubble-wrapper__group-read--zero {
+  opacity: 0.7;
 }
 
 .message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {

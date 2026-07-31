@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Cell from '../../../components/cell/cell.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import Empty from '../../../components/empty/empty.vue'
 import { useLocale } from '../../../locale'
+import { useUIKit } from '../../../composables/use-uikit'
 
 export interface GroupReadReceiptModalProps {
   show: boolean
@@ -19,9 +20,39 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { stores, domains, features } = useUIKit()
 
 /** 当前激活的 Tab：'read' | 'unread' */
 const activeTab = ref<'read' | 'unread'>('read')
+
+/** 批量拉取列表中用户的资料（备注/昵称/头像） */
+watchEffect(() => {
+  if (features.enableUserInfo === false)
+    return
+  const allIds = [...props.readList, ...props.unreadList]
+  const missing = allIds.filter(
+    id =>
+      id
+      && !stores.userInfo.getUserInfo(id)
+      && !stores.userInfo.isLoading(id)
+      && !stores.userInfo.isFetchFailed(id),
+  )
+  if (missing.length > 0) {
+    void domains.userInfo.fetchUserInfos(missing)
+  }
+})
+
+/** 获取用户展示名：备注 > 用户资料昵称 > userId */
+function getDisplayName(userId: string): string {
+  const contact = stores.contact.getContact(userId)
+  const userInfo = stores.userInfo.getUserInfo(userId)
+  return contact?.remark || userInfo?.nickname || userId
+}
+
+/** 获取用户头像 */
+function getAvatarUrl(userId: string): string | undefined {
+  return stores.userInfo.getUserInfo(userId)?.avatarUrl
+}
 
 const readCount = computed(() => props.readList.length)
 const unreadCount = computed(() => props.unreadList.length)
@@ -81,17 +112,17 @@ function onClose() {
         <Cell
           v-for="userId in displayList"
           :key="userId"
-          :title="userId"
+          :title="getDisplayName(userId)"
           :clickable="false"
           size="compact"
         >
           <template #leading>
-            <Avatar :name="userId" :size="36" />
+            <Avatar :name="getDisplayName(userId)" :src="getAvatarUrl(userId)" :size="36" />
           </template>
         </Cell>
         <Empty
           v-if="displayList.length === 0"
-          icon="empty/read-receipt"
+          icon="empty/members"
           :description="t('groupReadReceipt.empty')"
           size="small"
         />
