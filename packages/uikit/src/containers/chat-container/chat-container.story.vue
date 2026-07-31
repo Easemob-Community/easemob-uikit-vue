@@ -51,7 +51,7 @@ function injectMockData() {
       ...(type === 'voice' ? { url: '', duration: 15, filename: 'voice.amr', fileSize: 10240 } : {}),
       timestamp: Date.now() - (8 - i) * 60000,
       isSelf: i % 2 === 0,
-      status: MESSAGE_STATUS.READ,
+      status: [MESSAGE_STATUS.SENDING, MESSAGE_STATUS.FAILED, MESSAGE_STATUS.DELIVERED, MESSAGE_STATUS.READ][i % 4],
     }
   })
 
@@ -144,6 +144,65 @@ const hooksConfig: ChatConfig = {
 /** 自定义样式配置 */
 const customStyleConfig: ChatConfig = {
   ...baseConfig,
+}
+
+/** 时间戳：始终显示 */
+const timestampAlwaysConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: { ...baseConfig.messageList, showTime: 'always' },
+}
+
+/** 时间戳：悬停显示 */
+const timestampHoverConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: { ...baseConfig.messageList, showTime: 'hover' },
+}
+
+/** 时间戳：隐藏 */
+const timestampHiddenConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: { ...baseConfig.messageList, showTime: false },
+}
+
+/** 消息状态：仅图标 */
+const statusIconOnlyConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: { ...baseConfig.messageList, messageStatus: { showText: false } },
+}
+
+/** 消息状态：文本横向排列 */
+const statusTextHorizontalConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: {
+    ...baseConfig.messageList,
+    messageStatus: { showText: true, direction: 'horizontal' },
+  },
+}
+
+/** 消息状态：文本纵向排列 */
+const statusTextVerticalConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: {
+    ...baseConfig.messageList,
+    messageStatus: { showText: true, direction: 'vertical' },
+  },
+}
+
+/** 消息状态：自定义文案 */
+const customStatusTextConfig: ChatConfig = {
+  ...baseConfig,
+  messageList: {
+    ...baseConfig.messageList,
+    messageStatus: {
+      showText: true,
+      textMap: {
+        sending: '发送中…',
+        delivered: '已送达',
+        read: '已读',
+        failed: '发送失败',
+      },
+    },
+  },
 }
 
 // 注入 mock 数据供 Story 展示
@@ -299,6 +358,62 @@ injectMockData()
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="hooksConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Timestamp: Always">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="timestampAlwaysConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Timestamp: Hover">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="timestampHoverConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Timestamp: Hidden">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="timestampHiddenConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Message Status: Icon Only">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="statusIconOnlyConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Message Status: Text Horizontal">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="statusTextHorizontalConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Message Status: Text Vertical">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="statusTextVerticalConfig" />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Message Status: Custom Text">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer :config="customStatusTextConfig" />
         </UIKitProvider>
       </div>
     </Variant>
