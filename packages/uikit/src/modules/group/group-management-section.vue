@@ -371,8 +371,6 @@ function closeDrawer() {
 
 <style scoped>
 .group-management-section {
-  padding: 16px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
   flex-shrink: 0;
 }
 
@@ -386,7 +384,6 @@ function closeDrawer() {
 .group-management-section__entries {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 /* 全员禁言开关 */

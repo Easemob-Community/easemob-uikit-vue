@@ -630,56 +630,58 @@ defineExpose({
     <!-- Body 默认插槽 -->
     <div class="chat-info-drawer__body">
       <template v-if="!showMemberList">
-        <div class="chat-info-drawer__profile">
-          <Avatar :name="displayName" :src="displayAvatar" :size="64" />
-          <!-- 群聊：群名称可编辑 -->
-          <div v-if="isGroup" class="chat-info-drawer__name-row">
-            <template v-if="!isEditingGroupName">
-              <span class="chat-info-drawer__name">{{ displayName }}</span>
-              <IconButton
-                v-if="isOwner"
-                icon="actions/edit"
-                size="small"
-                type="primary"
-                :title="t('chat.info.edit') || '编辑'"
-                @click="isEditingGroupName = true"
-              />
-            </template>
-            <div v-else class="chat-info-drawer__inline-edit">
-              <input
-                ref="groupNameInputRef"
-                v-model="groupNameInput"
-                class="chat-info-drawer__inline-input"
-                :placeholder="displayName"
-                @keydown.enter="saveGroupName"
-                @keydown.esc="cancelEditGroupName"
-              >
-              <div class="chat-info-drawer__inline-edit-actions">
+        <div class="chat-info-drawer__section chat-info-drawer__section--profile">
+          <div class="chat-info-drawer__profile">
+            <Avatar :name="displayName" :src="displayAvatar" :size="64" />
+            <!-- 群聊：群名称可编辑 -->
+            <div v-if="isGroup" class="chat-info-drawer__name-row">
+              <template v-if="!isEditingGroupName">
+                <span class="chat-info-drawer__name">{{ displayName }}</span>
                 <IconButton
-                  icon="actions/xmark_thick"
+                  v-if="isOwner"
+                  icon="actions/edit"
                   size="small"
-                  type="danger"
-                  :title="t('button.cancel') || '取消'"
-                  @click="cancelEditGroupName"
+                  type="primary"
+                  :title="t('chat.info.edit') || '编辑'"
+                  @click="isEditingGroupName = true"
                 />
-                <IconButton
-                  class="chat-info-drawer__inline-save"
-                  icon="actions/check"
-                  size="small"
-                  type="success"
-                  :disabled="savingGroupName"
-                  :title="t('chat.info.save') || '保存'"
-                  @click="saveGroupName"
-                />
+              </template>
+              <div v-else class="chat-info-drawer__inline-edit">
+                <input
+                  ref="groupNameInputRef"
+                  v-model="groupNameInput"
+                  class="chat-info-drawer__inline-input"
+                  :placeholder="displayName"
+                  @keydown.enter="saveGroupName"
+                  @keydown.esc="cancelEditGroupName"
+                >
+                <div class="chat-info-drawer__inline-edit-actions">
+                  <IconButton
+                    icon="actions/xmark_thick"
+                    size="small"
+                    type="danger"
+                    :title="t('button.cancel') || '取消'"
+                    @click="cancelEditGroupName"
+                  />
+                  <IconButton
+                    class="chat-info-drawer__inline-save"
+                    icon="actions/check"
+                    size="small"
+                    type="success"
+                    :disabled="savingGroupName"
+                    :title="t('chat.info.save') || '保存'"
+                    @click="saveGroupName"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <!-- 单聊：仅展示名称 -->
-          <div v-else class="chat-info-drawer__name">
-            {{ displayName }}
-          </div>
-          <div v-if="!isGroup" class="chat-info-drawer__id">
-            ID: {{ conversation?.id }}
+            <!-- 单聊：仅展示名称 -->
+            <div v-else class="chat-info-drawer__name">
+              {{ displayName }}
+            </div>
+            <div v-if="!isGroup" class="chat-info-drawer__id">
+              ID: {{ conversation?.id }}
+            </div>
           </div>
         </div>
 
@@ -851,18 +853,19 @@ defineExpose({
         </div>
 
         <!-- 群聊：群管理 -->
-        <GroupManagementSection
-          v-if="isGroup"
-          :group-id="groupId"
-          :display-mode="props.groupManagementDisplayMode"
-          :show-mute-all="props.showMuteAll"
-          :show-mute-list="props.showMuteList"
-          :show-blocklist="props.showBlocklist"
-          :show-allowlist="props.showAllowlist"
-          :show-shared-files="props.showSharedFiles"
-          :show-join-requests="props.showJoinRequests"
-          @group-operation="emit('group-operation', $event)"
-        />
+        <div v-if="isGroup" class="chat-info-drawer__section chat-info-drawer__section--management">
+          <GroupManagementSection
+            :group-id="groupId"
+            :display-mode="props.groupManagementDisplayMode"
+            :show-mute-all="props.showMuteAll"
+            :show-mute-list="props.showMuteList"
+            :show-blocklist="props.showBlocklist"
+            :show-allowlist="props.showAllowlist"
+            :show-shared-files="props.showSharedFiles"
+            :show-join-requests="props.showJoinRequests"
+            @group-operation="emit('group-operation', $event)"
+          />
+        </div>
 
         <!-- 通用操作 -->
         <div class="chat-info-drawer__section">
@@ -930,7 +933,7 @@ defineExpose({
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
+  background-color: var(--uikit-bg-secondary);
   gap: 12px;
 }
 
@@ -995,13 +998,26 @@ defineExpose({
   flex-direction: column;
   overflow-y: auto;
   min-height: 0;
+  background-color: var(--uikit-bg-secondary);
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.chat-info-drawer__section {
+  background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 12px);
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+.chat-info-drawer__section--profile {
+  padding: 24px 16px;
 }
 
 .chat-info-drawer__profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 16px;
   gap: 12px;
   flex-shrink: 0;
 }
@@ -1015,12 +1031,6 @@ defineExpose({
 .chat-info-drawer__id {
   font-size: 13px;
   color: var(--uikit-text-secondary);
-}
-
-.chat-info-drawer__section {
-  padding: 16px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
-  flex-shrink: 0;
 }
 
 .chat-info-drawer__section-title {
@@ -1166,7 +1176,7 @@ defineExpose({
 
 .chat-info-drawer__actions {
   padding: 16px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
+  background-color: var(--uikit-bg-secondary);
 }
 
 .chat-info-drawer__action-btn {
