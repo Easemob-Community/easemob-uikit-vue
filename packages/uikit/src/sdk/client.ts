@@ -77,6 +77,10 @@ export class UIKitClient {
       // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
       // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
       enableSyncData: sdkConfig.enableSyncData ?? ['conversation', 'contact', 'group'],
+      // 启用用户资料同步增强：SDK 在消息链路中补齐发送者资料，
+      // 并结合联系人备注、用户资料和群名片更新 ConversationItem.conversationName /
+      // SessionMessageSnippet.sender，减少上层 patchConversationNames 的手动补全调用。
+      enableUserInfoSync: sdkConfig.enableUserInfoSync ?? true,
       managers: [ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager],
     }) as SdkChatClient & ManagerRegistry
 

@@ -51,7 +51,19 @@ const { t } = useLocale()
 const { isMobile } = useViewport()
 
 const isSingleChat = computed(() => props.conversation.type === 'singleChat')
-const peerUserId = computed(() => isSingleChat.value ? props.conversation.id : undefined)
+// SDK 的 conversationName 在 enableUserInfoSync 开启后已预填充用户资料。
+// 仅在 SDK 名称为空或等于 userId 时才回退到 useUserInfo 单独获取，
+// 头像缺失不影响——Avatar 组件会自动显示文字占位。
+const sdkNameSufficient = computed(() =>
+  !!props.conversation.name && props.conversation.name !== props.conversation.id,
+)
+const peerUserId = computed(() => {
+  if (!isSingleChat.value)
+    return undefined
+  if (sdkNameSufficient.value)
+    return undefined
+  return props.conversation.id
+})
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 const { get: getPresence } = usePresence()
 
@@ -426,7 +438,8 @@ const displayMessage = computed(() => {
 
 /* 摇铃动画：开启免打扰时铃铛左右摇摆后归位 */
 @keyframes uikit-bell-shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
   10% {
