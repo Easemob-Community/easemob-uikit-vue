@@ -122,27 +122,47 @@ function onCancel() {
     </div>
 
     <div class="presence-selector__options" :class="{ 'presence-selector__options--no-header': !props.showHeader }">
-      <Cell
-        v-for="option in options"
-        :key="option.key"
-        class="presence-selector__option"
-        size="compact"
-        :title="option.label"
-        :active="isActive(option)"
-        @click="onSelect(option)"
-      >
-        <template #leading>
+      <template v-if="props.compact">
+        <div
+          v-for="option in options"
+          :key="option.key"
+          class="presence-selector__option presence-selector__option--compact"
+          :class="{ 'is-active': isActive(option) }"
+          @click="onSelect(option)"
+        >
           <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
-        </template>
-        <template #trailing>
+          <span class="presence-selector__label">{{ option.label }}</span>
           <Icon
             v-if="isActive(option)"
             name="actions/check"
             :size="16"
             class="presence-selector__check"
           />
-        </template>
-      </Cell>
+        </div>
+      </template>
+      <template v-else>
+        <Cell
+          v-for="option in options"
+          :key="option.key"
+          class="presence-selector__option"
+          size="compact"
+          :title="option.label"
+          :active="isActive(option)"
+          @click="onSelect(option)"
+        >
+          <template #leading>
+            <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
+          </template>
+          <template #trailing>
+            <Icon
+              v-if="isActive(option)"
+              name="actions/check"
+              :size="16"
+              class="presence-selector__check"
+            />
+          </template>
+        </Cell>
+      </template>
     </div>
 
     <div v-if="selectedKey === 'custom' && !props.useCustomModal" class="presence-selector__custom">
@@ -180,6 +200,8 @@ function onCancel() {
 }
 
 .presence-selector--compact .presence-selector__options {
+  display: flex;
+  flex-direction: column;
   gap: 2px;
   padding: 0 6px;
 }
@@ -188,15 +210,23 @@ function onCancel() {
   margin-top: 0;
 }
 
-.presence-selector--compact .presence-selector__option {
-  --uikit-item-hover-padding-x: 0px;
+.presence-selector__option--compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: var(--uikit-item-hover-radius, 8px);
+  cursor: pointer;
+  color: var(--uikit-text-primary);
+  transition: background-color 150ms ease;
 }
 
-.presence-selector--compact .presence-selector__option :deep(.uikit-cell) {
-  --uikit-cell-height: auto;
-  height: auto;
-  padding: 10px 16px;
-  margin-bottom: 0;
+.presence-selector__option--compact:hover {
+  background-color: var(--uikit-bg-hover);
+}
+
+.presence-selector__option--compact.is-active {
+  background-color: var(--uikit-bg-active);
 }
 
 .presence-selector--compact .presence-selector__custom {
@@ -227,13 +257,13 @@ function onCancel() {
   margin: -4px -8px -4px 0;
 }
 
-.presence-selector__options {
+.presence-selector:not(.presence-selector--compact) .presence-selector__options {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.presence-selector__option {
+.presence-selector:not(.presence-selector--compact) .presence-selector__option {
   --uikit-item-hover-padding-x: 12px;
 }
 
