@@ -178,10 +178,6 @@ function closeDrawer() {
 
 <template>
   <div v-if="hasManagementEntries" class="group-management-section">
-    <div class="group-management-section__title">
-      {{ t('group.management.title') || '群管理' }}
-    </div>
-
     <!-- 全员禁言开关 -->
     <Cell
       v-if="props.showMuteAll && isAdminOrOwner"
@@ -374,13 +370,6 @@ function closeDrawer() {
   flex-shrink: 0;
 }
 
-.group-management-section__title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--uikit-text-primary);
-  margin-bottom: 12px;
-}
-
 .group-management-section__entries {
   display: flex;
   flex-direction: column;
@@ -436,7 +425,6 @@ function closeDrawer() {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
   gap: 12px;
 }
 

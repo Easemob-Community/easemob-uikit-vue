@@ -322,7 +322,6 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
-  border-top: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
@@ -337,7 +336,6 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
-  border-bottom: 1px solid var(--uikit-border-color);
   border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
@@ -350,7 +348,6 @@ onUnmounted(() => {
   top: 0;
   height: 100%;
   background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
-  border-right: 1px solid var(--uikit-border-color);
   border-radius: 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0;
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;

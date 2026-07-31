@@ -179,7 +179,6 @@ watch(() => props.show, (show) => {
   align-items: center;
   gap: 8px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
   flex-shrink: 0;
 }
 

@@ -243,7 +243,6 @@ function onCancel() {
 .presence-selector__custom {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
   display: flex;
   flex-direction: column;
   gap: 10px;

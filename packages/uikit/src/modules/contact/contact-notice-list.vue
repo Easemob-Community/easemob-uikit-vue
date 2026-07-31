@@ -233,7 +233,6 @@ function avatarName(invite: UiContactInvite): string {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
   flex-shrink: 0;
 }
 

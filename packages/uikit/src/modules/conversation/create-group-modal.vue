@@ -297,7 +297,6 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
   flex-shrink: 0;
 }
 
@@ -334,7 +333,6 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
   flex-shrink: 0;
 }
 
@@ -417,7 +415,6 @@ watch(
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-top: 1px solid var(--uikit-border-color, #e5e7eb);
   flex-shrink: 0;
   background-color: var(--uikit-bg-base);
 }

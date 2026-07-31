@@ -228,7 +228,6 @@ defineExpose({
   align-items: center;
   justify-content: center;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
 }
 .block-list__popup-title {
   font-size: 16px;
@@ -253,7 +252,6 @@ defineExpose({
   justify-content: flex-end;
   gap: 12px;
   padding: 12px 16px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
 }
 .block-list__popup-btn {
   padding: 6px 16px;

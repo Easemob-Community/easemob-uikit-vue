@@ -266,7 +266,6 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
 }
 
 .mute-list__header-count {
@@ -298,7 +297,6 @@ defineExpose({
   align-items: center;
   justify-content: center;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
 }
 
 .mute-list__popup-title {
@@ -327,7 +325,6 @@ defineExpose({
   justify-content: flex-end;
   gap: 12px;
   padding: 12px 16px;
-  border-top: 1px solid var(--uikit-border-color, #f3f4f6);
 }
 
 .mute-list__popup-btn {
