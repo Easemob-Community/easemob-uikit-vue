@@ -17,8 +17,6 @@ export interface PresenceSelectorPopupProps {
   placement?: 'bottom' | 'top' | 'left' | 'right'
   /** 锚定轴上的对齐方式，默认 'start' */
   align?: 'start' | 'center' | 'end'
-  /** 与锚点的间距（px），默认 8 */
-  offset?: number
   /** 当前在线状态描述（ext），未传时自动从当前登录用户的 presence 缓存读取 */
   value?: string
 }
@@ -103,7 +101,7 @@ async function onCustomConfirm() {
     :anchor="props.anchor"
     :placement="props.placement ?? 'bottom'"
     :align="props.align ?? 'start'"
-    :offset="props.offset ?? 8"
+    :offset="8"
     :overlay="false"
     :close-on-click-overlay="true"
     @update:show="(v: boolean) => showModel = v"
