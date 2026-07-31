@@ -881,14 +881,10 @@ defineExpose({
 
         <!-- 通用操作 -->
         <div class="chat-info-drawer__section">
-          <Cell auto-height danger @click="onClearHistory">
-            <template #leading>
-              <Icon name="actions/trash" :size="18" />
-            </template>
-            <template #default>
-              {{ t('chat.info.clearHistory') }}
-            </template>
-          </Cell>
+          <Button type="danger-outline" block @click="onClearHistory">
+            <Icon name="actions/trash" :size="18" />
+            {{ t('chat.info.clearHistory') }}
+          </Button>
         </div>
       </template>
 
