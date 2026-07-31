@@ -23,6 +23,8 @@ export interface MessageBubbleWrapperProps {
   config?: ChatConfig['messageList']
   /** 消息操作菜单配置 */
   actionConfig?: ChatConfig['messageAction']
+  /** 群已读回执配置 */
+  groupReadReceiptConfig?: ChatConfig['groupReadReceipt']
   /** 是否处于多选模式 */
   isMultiSelectMode?: boolean
   /** 当前消息是否被选中 */
@@ -211,11 +213,15 @@ function onStatusClick() {
 }
 
 /** 群聊已读回执是否激活（用圆圈替代普通状态） */
-const isGroupReadReceiptActive = computed(() =>
-  props.message.isSelf
-  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
-  && (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0),
-)
+const isGroupReadReceiptActive = computed(() => {
+  if (!props.message.isSelf || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
+    return false
+  // 消息本身已请求回执或已有回执数据，直接激活
+  if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
+    return true
+  // 配置开启时，群聊己方消息默认激活（兼容历史消息与未收到回执的新消息）
+  return props.groupReadReceiptConfig?.enabled === true
+})
 
 /** 是否显示群已读人数标注 */
 const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
