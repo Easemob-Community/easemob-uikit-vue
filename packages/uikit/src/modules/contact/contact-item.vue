@@ -107,7 +107,13 @@ function onContextmenu(e: MouseEvent) {
 <style scoped>
 .contact-item {
   display: block;
+  margin-bottom: var(--uikit-cell-gap, 3px);
 }
+
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+
 .contact-item.is-disabled {
   pointer-events: auto;
 }

@@ -105,7 +105,13 @@ function onContextmenu(e: MouseEvent) {
 <style scoped>
 .group-item {
   display: block;
+  margin-bottom: var(--uikit-cell-gap, 3px);
 }
+
+.group-item:last-child {
+  margin-bottom: 0;
+}
+
 .group-item.is-disabled {
   pointer-events: auto;
 }
