@@ -85,6 +85,7 @@ function onSelectorChanged() {
     v-model:show="showSelector"
     :anchor="avatarRef?.$el"
     :placement="props.selectorPlacement"
+    :offset="props.selectorPlacement === 'right' ? 0 : undefined"
     @changed="onSelectorChanged"
   />
 </template>
