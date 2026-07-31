@@ -1200,17 +1200,18 @@ defineExpose({
   border: none;
   font-size: 15px;
   font-weight: 500;
+  text-align: center;
   cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.chat-info-drawer__action-btn:hover {
-  opacity: 0.9;
+  transition: background-color 0.15s;
 }
 
 .chat-info-drawer__action-btn--danger {
-  background-color: #fef2f2;
-  color: #ef4444;
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+.chat-info-drawer__action-btn--danger:hover {
+  background-color: var(--uikit-bg-elevated, #f9fafb);
 }
 
 .chat-info-drawer__member-detail {
