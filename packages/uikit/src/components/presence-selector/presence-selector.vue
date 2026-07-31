@@ -167,7 +167,7 @@ function onCancel() {
 
 .presence-selector--compact {
   width: 140px;
-  padding: 6px;
+  padding: 4px;
 }
 
 .presence-selector--compact .presence-selector__title {
@@ -194,7 +194,7 @@ function onCancel() {
 .presence-selector--compact .presence-selector__option :deep(.uikit-cell) {
   --uikit-cell-height: auto;
   height: auto;
-  padding: 10px 12px;
+  padding: 8px 10px;
   margin-bottom: 0;
 }
 
