@@ -219,7 +219,6 @@ function onSelectorChanged() {
 .user-card__avatar {
   flex-shrink: 0;
   margin-bottom: 12px;
-  border: 5px solid var(--uikit-bg-base);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
