@@ -1,5 +1,6 @@
 import type { UiMessage } from '../../sdk/types'
 import type { MessageStatusValue } from '../../constants'
+import type { EmojiStickerPack } from '../../components/emoji-picker/types'
 
 /** 消息气泡布局模式 */
 export type MessageLayout = 'left' | 'conversation'
@@ -32,6 +33,8 @@ export interface MessageStatusConfig {
   iconMap?: Partial<Record<MessageStatusValue, string>>
   /** 文本与图标的排列方向，默认 'horizontal' */
   direction?: 'horizontal' | 'vertical'
+  /** 状态相对消息气泡的位置，默认 'below'（气泡下方）/ Position relative to the bubble */
+  position?: 'below' | 'inline'
 }
 
 /**
@@ -194,6 +197,8 @@ export interface ChatConfig {
     enableTyping?: boolean
     /** 是否显示发送按钮，默认 true */
     showSendButton?: boolean
+    /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker */
+    stickerPacks?: EmojiStickerPack[]
   }
   /** 文本消息配置 */
   textMessage?: {

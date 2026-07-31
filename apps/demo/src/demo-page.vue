@@ -88,13 +88,14 @@ const chatInputSelectionColor = ref('')
 const chatInputMaxLength = ref(0)
 
 // 群已读回执配置
-const groupReadReceiptEnabled = ref(false)
+const groupReadReceiptEnabled = ref(true)
 const groupReadReceiptMaxSize = ref(200)
 
 // 消息列表配置
 const chatShowTime = ref<false | true | 'always' | 'hover'>(false)
 const chatMessageStatusShowText = ref(false)
 const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
+const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
 
 // 联系人容器搜索控制
 const showHomeSearch = ref(true)
@@ -168,6 +169,7 @@ const chatConfig = computed(() => ({
     messageStatus: {
       showText: chatMessageStatusShowText.value,
       direction: chatMessageStatusDirection.value,
+      position: chatMessageStatusPosition.value,
     },
   },
 }))
@@ -1005,6 +1007,22 @@ function injectMockContacts() {
                       @click="chatMessageStatusDirection = 'vertical'"
                     >
                       纵向排列
+                    </button>
+                  </div>
+                  <div class="demo-settings__options">
+                    <button
+                      class="demo-option"
+                      :class="{ 'demo-option--active': chatMessageStatusPosition === 'below' }"
+                      @click="chatMessageStatusPosition = 'below'"
+                    >
+                      状态在下方
+                    </button>
+                    <button
+                      class="demo-option"
+                      :class="{ 'demo-option--active': chatMessageStatusPosition === 'inline' }"
+                      @click="chatMessageStatusPosition = 'inline'"
+                    >
+                      状态同行
                     </button>
                   </div>
                 </div>

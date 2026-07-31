@@ -63,11 +63,14 @@ export class MessageDomain {
     conversationType: 'singleChat' | 'groupChat',
     data: File | string,
     ext?: Record<string, unknown>,
+    /** 是否请求消息已读回执（仅群聊生效） */
+    needReadReceipt?: boolean,
   ) {
     const sdkMsg = this.client.chatManager.createImageMessage({
       conversationId,
       conversationType,
       ext,
+      needReadReceipt,
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
     })
     return this._send(sdkMsg)
@@ -78,11 +81,14 @@ export class MessageDomain {
     conversationType: 'singleChat' | 'groupChat',
     data: File | string,
     ext?: Record<string, unknown>,
+    /** 是否请求消息已读回执（仅群聊生效） */
+    needReadReceipt?: boolean,
   ) {
     const sdkMsg = this.client.chatManager.createFileMessage({
       conversationId,
       conversationType,
       ext,
+      needReadReceipt,
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
     })
     return this._send(sdkMsg)
@@ -94,12 +100,15 @@ export class MessageDomain {
     data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
+    /** 是否请求消息已读回执（仅群聊生效） */
+    needReadReceipt?: boolean,
   ) {
     const sdkMsg = this.client.chatManager.createVoiceMessage({
       conversationId,
       conversationType,
       duration,
       ext,
+      needReadReceipt,
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
     })
     return this._send(sdkMsg)
@@ -111,12 +120,15 @@ export class MessageDomain {
     data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
+    /** 是否请求消息已读回执（仅群聊生效） */
+    needReadReceipt?: boolean,
   ) {
     const sdkMsg = this.client.chatManager.createVideoMessage({
       conversationId,
       conversationType,
       duration,
       ext,
+      needReadReceipt,
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
     })
     return this._send(sdkMsg)

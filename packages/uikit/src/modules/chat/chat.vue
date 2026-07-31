@@ -65,7 +65,7 @@ defineExpose({
 const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
 const { stores, h5, client } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
-const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers } = useGroup()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 组件卸载时清理残留状态 */
@@ -315,12 +315,23 @@ const mentionContacts = computed<MentionContact[]>(() => {
     })
 })
 
-/** 切换到群聊会话时，若本地没有成员则拉取第一页成员（用于 @提及） */
+/** 切换到群聊会话时，预拉群详情与成员列表 */
 watch(
   () => currentConversation.value,
   async (cvs) => {
     if (cvs?.type !== 'groupChat' || !cvs.id)
       return
+    // 先拉群详情，确保 memberCount 可用于群已读回执开关判断
+    const group = stores.group.getGroupById(cvs.id)
+    if (!group?.memberCount) {
+      try {
+        await fetchGroupInfo(cvs.id)
+      }
+      catch (err) {
+        console.warn('[Chat] preload group info failed:', err)
+      }
+    }
+    // 再拉成员列表（用于 @提及 与群已读详情弹窗）
     const members = stores.group.getGroupMembers(cvs.id)
     if (members.length > 0)
       return

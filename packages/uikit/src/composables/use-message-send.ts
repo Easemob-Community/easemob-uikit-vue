@@ -47,12 +47,19 @@ export function useMessageSend() {
     await domains.message.sendText(cvs.id, cvs.type, text, ext, enableGroupAck)
   }
 
-  /** 发送图片消息 */
-  async function sendImageMessage(file: File, options?: SendMessageOptions, ext?: Record<string, unknown>) {
+  /** 发送图片消息，data 支持 File 或图片 URL（如 GIF 表情包） */
+  async function sendImageMessage(data: File | string, options?: SendMessageOptions, ext?: Record<string, unknown>) {
     const cvs = currentCvs()
     if (!cvs)
       return
-    await domains.message.sendImage(cvs.id, cvs.type, file, ext)
+    const enableGroupAck = shouldEnableGroupAck(
+      cvs.type,
+      cvs.id,
+      options?.groupReadReceiptEnabled,
+      options?.maxGroupSize,
+      stores,
+    )
+    await domains.message.sendImage(cvs.id, cvs.type, data, ext, enableGroupAck)
   }
 
   /** 发送文件消息 */
@@ -60,7 +67,14 @@ export function useMessageSend() {
     const cvs = currentCvs()
     if (!cvs)
       return
-    await domains.message.sendFile(cvs.id, cvs.type, file, ext)
+    const enableGroupAck = shouldEnableGroupAck(
+      cvs.type,
+      cvs.id,
+      options?.groupReadReceiptEnabled,
+      options?.maxGroupSize,
+      stores,
+    )
+    await domains.message.sendFile(cvs.id, cvs.type, file, ext, enableGroupAck)
   }
 
   /** 发送语音消息 */
@@ -73,7 +87,14 @@ export function useMessageSend() {
     const cvs = currentCvs()
     if (!cvs)
       return
-    await domains.message.sendVoice(cvs.id, cvs.type, file, duration, ext)
+    const enableGroupAck = shouldEnableGroupAck(
+      cvs.type,
+      cvs.id,
+      options?.groupReadReceiptEnabled,
+      options?.maxGroupSize,
+      stores,
+    )
+    await domains.message.sendVoice(cvs.id, cvs.type, file, duration, ext, enableGroupAck)
   }
 
   /** 发送视频消息 */
@@ -86,7 +107,14 @@ export function useMessageSend() {
     const cvs = currentCvs()
     if (!cvs)
       return
-    await domains.message.sendVideo(cvs.id, cvs.type, file, duration, ext)
+    const enableGroupAck = shouldEnableGroupAck(
+      cvs.type,
+      cvs.id,
+      options?.groupReadReceiptEnabled,
+      options?.maxGroupSize,
+      stores,
+    )
+    await domains.message.sendVideo(cvs.id, cvs.type, file, duration, ext, enableGroupAck)
   }
 
   /** 发送位置消息 */

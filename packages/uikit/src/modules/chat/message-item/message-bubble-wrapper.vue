@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import QuoteCard from '../quote/quote-card.vue'
@@ -167,6 +167,42 @@ const showStatusText = computed(() => statusConfig.value.showText ?? false)
 /** 状态区域排列方向 */
 const statusDirection = computed(() => statusConfig.value.direction ?? 'horizontal')
 
+/** 状态相对气泡位置 */
+const statusPosition = computed(() => statusConfig.value.position ?? 'below')
+
+/** 气泡主体 ref（用于判断单行/多行） */
+const bodyRef = ref<HTMLElement>()
+/** 状态列 ref */
+const statusColumnRef = ref<HTMLElement>()
+/** 是否多行气泡 */
+const isBodyMultiLine = ref(false)
+
+/** 根据 body 与状态列高度判断是否多行 */
+function checkMultiLine() {
+  const body = bodyRef.value
+  const statusColumn = statusColumnRef.value
+  if (!body || !statusColumn)
+    return
+  // 气泡明显高于状态列时视为多行，此时状态列沉底对齐
+  isBodyMultiLine.value = body.clientHeight > statusColumn.clientHeight + 8
+}
+
+let bodyResizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  if (statusPosition.value === 'inline') {
+    checkMultiLine()
+    if (bodyRef.value && typeof ResizeObserver !== 'undefined') {
+      bodyResizeObserver = new ResizeObserver(checkMultiLine)
+      bodyResizeObserver.observe(bodyRef.value)
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  bodyResizeObserver?.disconnect()
+})
+
 /** 点击状态：失败时触发重发 */
 function onStatusClick() {
   if (messageStatus.value === MESSAGE_STATUS.FAILED) {
@@ -177,8 +213,8 @@ function onStatusClick() {
 /** 是否显示群已读人数标注 */
 const showGroupReadCount = computed(() =>
   props.message.isSelf
-  && props.message.requireGroupAck
-  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT,
+  && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
+  && (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0),
 )
 
 /** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
@@ -304,100 +340,217 @@ const isHighlighted = computed(() => {
             </slot>
           </div>
 
-          <!-- 消息渲染器 -->
-          <div class="message-bubble-wrapper__body">
-            <!-- 置顶角标 -->
-            <div
-              v-if="message.pinned"
-              class="message-bubble-wrapper__pin-badge"
-              :title="t('message.action.pin')"
-            >
-              <Icon name="chat/pin" :size="12" />
-              <span>{{ t('message.action.pin') }}</span>
-            </div>
-            <MessageInteractive
-              :message="message"
-              :config="actionConfig"
-              @action="emit('action', $event)"
-            >
-              <MessageRenderer
-                :message="message"
-                @reedit="emit('reedit', $event)"
-                @toggle-translation="emit('toggle-translation', $event)"
-                @view-combine="onViewCombine"
-                @mention-click="emit('mention-click', $event)"
+          <!-- ===== 状态在气泡下方（默认/历史行为） ===== -->
+          <template v-if="statusPosition === 'below'">
+            <!-- 消息渲染器 -->
+            <div class="message-bubble-wrapper__body">
+              <!-- 置顶角标 -->
+              <div
+                v-if="message.pinned"
+                class="message-bubble-wrapper__pin-badge"
+                :title="t('message.action.pin')"
               >
-                <!-- 透传所有类型级插槽 -->
-                <template
-                  v-for="(_, name) in $slots"
-                  :key="name"
-                  #[name]="slotProps"
+                <Icon name="chat/pin" :size="12" />
+                <span>{{ t('message.action.pin') }}</span>
+              </div>
+              <MessageInteractive
+                :message="message"
+                :config="actionConfig"
+                @action="emit('action', $event)"
+              >
+                <MessageRenderer
+                  :message="message"
+                  @reedit="emit('reedit', $event)"
+                  @toggle-translation="emit('toggle-translation', $event)"
+                  @view-combine="onViewCombine"
+                  @mention-click="emit('mention-click', $event)"
                 >
-                  <slot :name="name" v-bind="slotProps" />
-                </template>
-              </MessageRenderer>
-            </MessageInteractive>
-            <!-- 引用卡片（气泡下方） -->
-            <QuoteCard
-              v-if="quoteData"
-              :quote="quoteData"
-              :align-right="isSelfConversation"
-              @click="onQuoteClick"
-            />
-          </div>
+                  <!-- 透传所有类型级插槽 -->
+                  <template
+                    v-for="(_, name) in $slots"
+                    :key="name"
+                    #[name]="slotProps"
+                  >
+                    <slot :name="name" v-bind="slotProps" />
+                  </template>
+                </MessageRenderer>
+              </MessageInteractive>
+              <!-- 引用卡片（气泡下方） -->
+              <QuoteCard
+                v-if="quoteData"
+                :quote="quoteData"
+                :align-right="isSelfConversation"
+                @click="onQuoteClick"
+              />
+            </div>
 
-          <!-- 消息状态指示器（仅己方消息） -->
+            <!-- 消息状态指示器（仅己方消息） -->
+            <div
+              v-if="showStatus"
+              class="message-bubble-wrapper__status"
+              :class="{
+                'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
+              }"
+            >
+              <slot
+                name="message-status"
+                :status="messageStatus"
+                :message="message"
+                :text="statusText"
+                :icon="statusIcon"
+              >
+                <span
+                  class="message-bubble-wrapper__status-item"
+                  :class="{
+                    'message-bubble-wrapper__status-item--failed': messageStatus === MESSAGE_STATUS.FAILED,
+                  }"
+                  :title="statusText"
+                  @click.stop="onStatusClick"
+                >
+                  <Icon
+                    v-if="statusIcon"
+                    :name="statusIcon"
+                    :size="14"
+                    class="message-bubble-wrapper__status-icon"
+                    :class="{
+                      'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
+                      'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
+                      'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                    }"
+                  />
+                  <span
+                    v-if="showStatusText"
+                    class="message-bubble-wrapper__status-text"
+                  >
+                    {{ statusText }}
+                  </span>
+                </span>
+              </slot>
+            </div>
+
+            <!-- 群已读人数标注 -->
+            <span
+              v-if="showGroupReadCount"
+              class="message-bubble-wrapper__group-read"
+              @click.stop="onGroupReadClick"
+            >
+              {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
+            </span>
+          </template>
+
+          <!-- ===== 状态与气泡同一行 ===== -->
           <div
-            v-if="showStatus"
-            class="message-bubble-wrapper__status"
+            v-else
+            class="message-bubble-wrapper__message-row"
             :class="{
-              'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
+              'message-bubble-wrapper__message-row--self': isSelfConversation,
+              'message-bubble-wrapper__message-row--multiline': isBodyMultiLine,
             }"
           >
-            <slot
-              name="message-status"
-              :status="messageStatus"
-              :message="message"
-              :text="statusText"
-              :icon="statusIcon"
-            >
-              <span
-                class="message-bubble-wrapper__status-item"
-                :class="{
-                  'message-bubble-wrapper__status-item--failed': messageStatus === MESSAGE_STATUS.FAILED,
-                }"
-                :title="statusText"
-                @click.stop="onStatusClick"
+            <!-- 消息渲染器 -->
+            <div ref="bodyRef" class="message-bubble-wrapper__body">
+              <!-- 置顶角标 -->
+              <div
+                v-if="message.pinned"
+                class="message-bubble-wrapper__pin-badge"
+                :title="t('message.action.pin')"
               >
-                <Icon
-                  v-if="statusIcon"
-                  :name="statusIcon"
-                  :size="14"
-                  class="message-bubble-wrapper__status-icon"
-                  :class="{
-                    'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
-                    'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
-                    'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
-                  }"
-                />
-                <span
-                  v-if="showStatusText"
-                  class="message-bubble-wrapper__status-text"
+                <Icon name="chat/pin" :size="12" />
+                <span>{{ t('message.action.pin') }}</span>
+              </div>
+              <MessageInteractive
+                :message="message"
+                :config="actionConfig"
+                @action="emit('action', $event)"
+              >
+                <MessageRenderer
+                  :message="message"
+                  @reedit="emit('reedit', $event)"
+                  @toggle-translation="emit('toggle-translation', $event)"
+                  @view-combine="onViewCombine"
+                  @mention-click="emit('mention-click', $event)"
                 >
-                  {{ statusText }}
-                </span>
-              </span>
-            </slot>
-          </div>
+                  <!-- 透传所有类型级插槽 -->
+                  <template
+                    v-for="(_, name) in $slots"
+                    :key="name"
+                    #[name]="slotProps"
+                  >
+                    <slot :name="name" v-bind="slotProps" />
+                  </template>
+                </MessageRenderer>
+              </MessageInteractive>
+              <!-- 引用卡片（气泡下方） -->
+              <QuoteCard
+                v-if="quoteData"
+                :quote="quoteData"
+                :align-right="isSelfConversation"
+                @click="onQuoteClick"
+              />
+            </div>
 
-          <!-- 群已读人数标注 -->
-          <span
-            v-if="showGroupReadCount"
-            class="message-bubble-wrapper__group-read"
-            @click.stop="onGroupReadClick"
-          >
-            {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
-          </span>
+            <!-- 状态列（状态 + 群已读） -->
+            <div
+              v-if="showStatus || showGroupReadCount"
+              ref="statusColumnRef"
+              class="message-bubble-wrapper__status-column"
+              :class="{
+                'message-bubble-wrapper__status-column--vertical': statusDirection === 'vertical',
+              }"
+            >
+              <div
+                v-if="showStatus"
+                class="message-bubble-wrapper__status"
+                :class="{
+                  'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
+                }"
+              >
+                <slot
+                  name="message-status"
+                  :status="messageStatus"
+                  :message="message"
+                  :text="statusText"
+                  :icon="statusIcon"
+                >
+                  <span
+                    class="message-bubble-wrapper__status-item"
+                    :class="{
+                      'message-bubble-wrapper__status-item--failed': messageStatus === MESSAGE_STATUS.FAILED,
+                    }"
+                    :title="statusText"
+                    @click.stop="onStatusClick"
+                  >
+                    <Icon
+                      v-if="statusIcon"
+                      :name="statusIcon"
+                      :size="14"
+                      class="message-bubble-wrapper__status-icon"
+                      :class="{
+                        'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
+                        'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
+                        'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                      }"
+                    />
+                    <span
+                      v-if="showStatusText"
+                      class="message-bubble-wrapper__status-text"
+                    >
+                      {{ statusText }}
+                    </span>
+                  </span>
+                </slot>
+              </div>
+
+              <!-- 群已读人数标注 -->
+              <span
+                v-if="showGroupReadCount"
+                class="message-bubble-wrapper__group-read"
+                @click.stop="onGroupReadClick"
+              >
+                {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
+              </span>
+            </div>
+          </div>
 
           <!-- 时间戳 -->
           <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
@@ -488,6 +641,53 @@ const isHighlighted = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+/* 状态与气泡同一行 */
+.message-bubble-wrapper__message-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+/* 己方消息：状态列在气泡左侧 */
+.message-bubble-wrapper__message-row--self {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+/* 多行气泡：状态列沉底 */
+.message-bubble-wrapper__message-row--multiline .message-bubble-wrapper__status-column {
+  align-self: flex-end;
+}
+
+.message-bubble-wrapper__status-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 0;
+}
+
+.message-bubble-wrapper__message-row--self .message-bubble-wrapper__status-column {
+  align-items: flex-end;
+}
+
+.message-bubble-wrapper__status-column--vertical {
+  align-items: center;
+}
+
+.message-bubble-wrapper__message-row .message-bubble-wrapper__status {
+  margin-top: 0;
+  padding-left: 0;
+}
+
+.message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {
+  margin-top: 2px;
+  padding-left: 0;
 }
 
 .message-bubble-wrapper__time {
