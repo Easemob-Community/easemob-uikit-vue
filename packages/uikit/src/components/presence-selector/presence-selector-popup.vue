@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useLocale } from '../../locale'
 import { useClient } from '../../composables/use-client'
 import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import Popup from '../popup/popup.vue'
+import Modal from '../modal/modal.vue'
+import Input from '../input/input.vue'
 import PresenceSelector from './presence-selector.vue'
 
 export interface PresenceSelectorPopupProps {
@@ -50,6 +52,9 @@ const showModel = computed({
   },
 })
 
+const showCustomModal = ref(false)
+const customInput = ref('')
+
 async function onSelect(_status: string, ext: string) {
   try {
     await publishPresence(ext)
@@ -63,6 +68,30 @@ async function onSelect(_status: string, ext: string) {
 
 function onCancel() {
   showModel.value = false
+}
+
+function onCustomClick() {
+  // 点击自定义选项时关闭 popup，打开独立输入 modal
+  showModel.value = false
+  customInput.value = currentExt.value
+  showCustomModal.value = true
+}
+
+function onCustomCancel() {
+  showCustomModal.value = false
+}
+
+async function onCustomConfirm() {
+  const text = customInput.value.trim()
+  showCustomModal.value = false
+  try {
+    await publishPresence(text)
+    emit('changed')
+  }
+  catch (err) {
+    console.warn('[PresenceSelectorPopup] publish custom failed:', err)
+    showToast(t('presence.publishFailed') || '状态设置失败')
+  }
 }
 </script>
 
@@ -82,8 +111,26 @@ function onCancel() {
       :value="currentExt"
       compact
       :show-header="false"
+      use-custom-modal
       @select="onSelect"
       @cancel="onCancel"
+      @custom-click="onCustomClick"
     />
   </Popup>
+
+  <Modal
+    v-model:show="showCustomModal"
+    :title="t('presence.setCustomStatus') || '设置自定义状态'"
+    :confirm-text="t('button.confirm') || '确认'"
+    :cancel-text="t('button.cancel') || '取消'"
+    @confirm="onCustomConfirm"
+    @cancel="onCustomCancel"
+  >
+    <Input
+      v-model="customInput"
+      :placeholder="t('presence.customPlaceholder') || '请输入自定义状态'"
+      :maxlength="32"
+      style="width: 100%; text-align: left;"
+    />
+  </Modal>
 </template>

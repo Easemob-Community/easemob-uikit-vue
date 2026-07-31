@@ -348,6 +348,7 @@ const messages: LocaleMessages = {
   'presence.custom': '自定义',
   'presence.customPlaceholder': '请输入自定义状态',
   'presence.publishFailed': '状态设置失败',
+  'presence.setCustomStatus': '设置自定义状态',
 }
 
 export default messages

@@ -18,17 +18,21 @@ export interface PresenceSelectorProps {
   compact?: boolean
   /** 是否展示标题头部，默认 true */
   showHeader?: boolean
+  /** 自定义状态是否使用独立 Modal 输入，默认 false（保持 inline 输入） */
+  useCustomModal?: boolean
 }
 
 const props = withDefaults(defineProps<PresenceSelectorProps>(), {
   showCustom: true,
   compact: false,
   showHeader: true,
+  useCustomModal: false,
 })
 
 const emit = defineEmits<{
   (e: 'select', status: PresenceSelectorValue, ext: string): void
   (e: 'cancel'): void
+  (e: 'custom-click'): void
 }>()
 
 const { t } = useLocale()
@@ -82,6 +86,9 @@ function onSelect(option: PresenceOption) {
   // 立即更新选中态，避免等待 presence 事件回传期间自定义项仍被勾选
   selectedKey.value = option.key
   if (option.key === 'custom') {
+    if (props.useCustomModal) {
+      emit('custom-click')
+    }
     return
   }
   emit('select', option.key, option.ext)
@@ -132,7 +139,7 @@ function onCancel() {
       </Cell>
     </div>
 
-    <div v-if="selectedKey === 'custom'" class="presence-selector__custom">
+    <div v-if="selectedKey === 'custom' && !props.useCustomModal" class="presence-selector__custom">
       <Input
         v-model="customText"
         :placeholder="props.customPlaceholder || (t('presence.customPlaceholder') || '请输入自定义状态')"

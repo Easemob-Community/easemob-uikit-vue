@@ -348,6 +348,7 @@ const messages: LocaleMessages = {
   'presence.custom': 'Custom',
   'presence.customPlaceholder': 'Enter custom status',
   'presence.publishFailed': 'Failed to set status',
+  'presence.setCustomStatus': 'Set Custom Status',
 }
 
 export default messages
