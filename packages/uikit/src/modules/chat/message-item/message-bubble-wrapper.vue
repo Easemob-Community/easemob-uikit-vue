@@ -4,8 +4,9 @@ import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { UiMessage } from '../../../sdk/types'
-import type { ChatConfig, MessageActionEvent, MessageLayout, TimeDisplayStrategy } from '../types'
+import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
 import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
+import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
 import { useQuote } from '../../../composables/use-quote'
@@ -133,6 +134,45 @@ const showStatus = computed(() => props.message.isSelf)
 
 /** 消息状态 */
 const messageStatus = computed(() => props.message.status)
+
+/** 消息状态展示配置 */
+const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageStatus || {})
+
+/** 默认状态图标映射 */
+const defaultStatusIconMap: Record<MessageStatusValue, string> = {
+  [MESSAGE_STATUS.SENDING]: 'actions/loading_circle',
+  [MESSAGE_STATUS.SENT]: 'actions/check',
+  [MESSAGE_STATUS.DELIVERED]: 'chat/doneAll',
+  [MESSAGE_STATUS.READ]: 'chat/doneAll',
+  [MESSAGE_STATUS.FAILED]: 'status/error',
+}
+
+/** 当前状态图标 */
+const statusIcon = computed(() => {
+  const cfg = statusConfig.value.iconMap
+  return cfg?.[messageStatus.value as MessageStatusValue] ?? defaultStatusIconMap[messageStatus.value as MessageStatusValue]
+})
+
+/** 当前状态文本 */
+const statusText = computed(() => {
+  const cfg = statusConfig.value.textMap
+  return cfg?.[messageStatus.value as MessageStatusValue]
+    ?? t(`message.status.${messageStatus.value}`)
+    ?? messageStatus.value
+})
+
+/** 是否显示状态文本 */
+const showStatusText = computed(() => statusConfig.value.showText ?? false)
+
+/** 状态区域排列方向 */
+const statusDirection = computed(() => statusConfig.value.direction ?? 'horizontal')
+
+/** 点击状态：失败时触发重发 */
+function onStatusClick() {
+  if (messageStatus.value === MESSAGE_STATUS.FAILED) {
+    emit('resend', props.message)
+  }
+}
 
 /** 是否显示群已读人数标注 */
 const showGroupReadCount = computed(() =>
@@ -307,52 +347,47 @@ const isHighlighted = computed(() => {
           </div>
 
           <!-- 消息状态指示器（仅己方消息） -->
-          <div v-if="showStatus" class="message-bubble-wrapper__status">
-            <!-- 发送中 -->
-            <span
-              v-if="messageStatus === MESSAGE_STATUS.SENDING"
-              class="message-bubble-wrapper__status-item"
-              title="发送中"
+          <div
+            v-if="showStatus"
+            class="message-bubble-wrapper__status"
+            :class="{
+              'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
+            }"
+          >
+            <slot
+              name="message-status"
+              :status="messageStatus"
+              :message="message"
+              :text="statusText"
+              :icon="statusIcon"
             >
-              <Icon
-                name="actions/loading_circle"
-                :size="14"
-                class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--loading"
-              />
-            </span>
-            <!-- 已发送 -->
-            <span
-              v-else-if="messageStatus === MESSAGE_STATUS.SENT"
-              class="message-bubble-wrapper__status-item"
-              title="已发送"
-            >
-              <Icon name="actions/check" :size="14" class="message-bubble-wrapper__status-icon" />
-            </span>
-            <!-- 已送达 -->
-            <span
-              v-else-if="messageStatus === MESSAGE_STATUS.DELIVERED"
-              class="message-bubble-wrapper__status-item"
-              title="已送达"
-            >
-              <Icon name="chat/doneAll" :size="14" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--delivered" />
-            </span>
-            <!-- 已读 -->
-            <span
-              v-else-if="messageStatus === MESSAGE_STATUS.READ"
-              class="message-bubble-wrapper__status-item"
-              title="已读"
-            >
-              <Icon name="chat/doneAll" :size="14" class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--read" />
-            </span>
-            <!-- 发送失败 -->
-            <span
-              v-else-if="messageStatus === MESSAGE_STATUS.FAILED"
-              class="message-bubble-wrapper__status-item message-bubble-wrapper__status-item--failed"
-              title="点击重发"
-              @click.stop="emit('resend', message)"
-            >
-              <Icon name="status/error" :size="14" class="message-bubble-wrapper__status-icon" />
-            </span>
+              <span
+                class="message-bubble-wrapper__status-item"
+                :class="{
+                  'message-bubble-wrapper__status-item--failed': messageStatus === MESSAGE_STATUS.FAILED,
+                }"
+                :title="statusText"
+                @click.stop="onStatusClick"
+              >
+                <Icon
+                  v-if="statusIcon"
+                  :name="statusIcon"
+                  :size="14"
+                  class="message-bubble-wrapper__status-icon"
+                  :class="{
+                    'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
+                    'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
+                    'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                  }"
+                />
+                <span
+                  v-if="showStatusText"
+                  class="message-bubble-wrapper__status-text"
+                >
+                  {{ statusText }}
+                </span>
+              </span>
+            </slot>
           </div>
 
           <!-- 群已读人数标注 -->
@@ -529,6 +564,23 @@ const isHighlighted = computed(() => {
 
 .message-bubble-wrapper__status-icon--read {
   color: var(--uikit-primary-color);
+}
+
+.message-bubble-wrapper__status--vertical .message-bubble-wrapper__status-item {
+  flex-direction: column;
+}
+
+.message-bubble-wrapper__status-text {
+  font-size: 11px;
+  color: var(--uikit-text-secondary);
+  line-height: 1;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.message-bubble-wrapper__status--vertical .message-bubble-wrapper__status-text {
+  margin-left: 0;
+  margin-top: 2px;
 }
 
 /* 群已读人数标注 */

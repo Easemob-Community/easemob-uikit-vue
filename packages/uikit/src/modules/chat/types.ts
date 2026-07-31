@@ -1,4 +1,5 @@
 import type { UiMessage } from '../../sdk/types'
+import type { MessageStatusValue } from '../../constants'
 
 /** 消息气泡布局模式 */
 export type MessageLayout = 'left' | 'conversation'
@@ -20,6 +21,18 @@ export type LoadHistoryMode = 'pull-down' | 'scroll-top' | 'auto'
 
 /** 时间显示策略 */
 export type TimeDisplayStrategy = boolean | 'always' | 'hover'
+
+/** 消息状态展示配置 */
+export interface MessageStatusConfig {
+  /** 是否显示状态文本，默认 false（仅展示 icon） */
+  showText?: boolean
+  /** 状态文本映射，未指定时从 locale 读取默认文案 */
+  textMap?: Partial<Record<MessageStatusValue, string>>
+  /** 状态图标映射，未指定时使用默认图标 */
+  iconMap?: Partial<Record<MessageStatusValue, string>>
+  /** 文本与图标的排列方向，默认 'horizontal' */
+  direction?: 'horizontal' | 'vertical'
+}
 
 /**
  * 消息发送拦截钩子
@@ -82,6 +95,8 @@ export interface ChatConfig {
     }
     /** 切换会话时是否自动定位到首条@我的消息，默认 true */
     autoLocateAtMe?: boolean
+    /** 消息发送状态展示配置 */
+    messageStatus?: MessageStatusConfig
   }
   /** 消息操作配置 */
   messageAction?: {
