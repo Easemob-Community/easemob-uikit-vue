@@ -254,14 +254,23 @@ const navEntries = computed<ContactNavEntry[]>(() => {
   }))
   const all: NavEntryWithSort[] = [...builtInEntries, ...customEntries]
   const hasSort = all.some((e) => typeof e.sort === 'number')
-  if (hasSort) {
-    return [...all].sort((a, b) => {
-      const sa = typeof a.sort === 'number' ? a.sort : Infinity
-      const sb = typeof b.sort === 'number' ? b.sort : Infinity
-      return sa - sb
-    })
-  }
-  return all
+  const sorted = hasSort
+    ? [...all].sort((a, b) => {
+        const sa = typeof a.sort === 'number' ? a.sort : Infinity
+        const sb = typeof b.sort === 'number' ? b.sort : Infinity
+        return sa - sb
+      })
+    : all
+
+  // home 视图搜索框：按 label / key 过滤入口
+  const kw = homeSearchKeyword.value.trim().toLowerCase()
+  if (!kw)
+    return sorted
+  return sorted.filter((e) => {
+    const label = (e.label || '').toLowerCase()
+    const key = (e.key || '').toLowerCase()
+    return label.includes(kw) || key.includes(kw)
+  })
 })
 
 function onEntryClick(key: string) {
