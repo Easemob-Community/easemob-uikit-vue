@@ -21,6 +21,7 @@ import {
   useViewport,
 } from '@easemob/uikit'
 import type { UiContact, UiConversation, UiGroup } from '@easemob/uikit'
+import type { EmojiStickerPack } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
 
@@ -119,6 +120,22 @@ const groupManagementConfig = ref({
   showChatAction: true,
 })
 
+/** 示例表情包（GIF），用于验证 emoji picker 的 sticker/GIF 发送链路
+ *  实际业务请替换为自有 CDN 资源
+ */
+const demoStickerPacks: EmojiStickerPack[] = [
+  {
+    id: 'demo-gifs',
+    name: '动图',
+    iconUrl: 'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif',
+    stickers: [
+      { key: 'celebrate', name: '庆祝', url: 'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif' },
+      { key: 'dance', name: '跳舞', url: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif' },
+      { key: 'thumbs-up', name: '点赞', url: 'https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif' },
+    ],
+  },
+]
+
 /** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
   header: { showAvatar: true },
@@ -140,6 +157,7 @@ const chatConfig = computed(() => ({
     features: { ...chatInputFeatures.value },
     autoFocus: chatInputAutoFocus.value,
     showSendButton: false,
+    stickerPacks: demoStickerPacks,
     ...(chatInputFocusBorderColor.value ? { focusBorderColor: chatInputFocusBorderColor.value } : {}),
     ...(chatInputCaretColor.value ? { caretColor: chatInputCaretColor.value } : {}),
     ...(chatInputSelectionColor.value ? { selectionColor: chatInputSelectionColor.value } : {}),
