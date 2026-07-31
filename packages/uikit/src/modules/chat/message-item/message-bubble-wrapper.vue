@@ -129,8 +129,8 @@ const shouldShowTime = computed(() => {
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
 
-/** 是否显示发送状态（仅自己的消息） */
-const showStatus = computed(() => props.message.isSelf)
+/** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
+const showStatus = computed(() => props.message.isSelf && !isGroupReadReceiptActive.value)
 
 /** 消息状态 */
 const messageStatus = computed(() => props.message.status)
@@ -210,12 +210,15 @@ function onStatusClick() {
   }
 }
 
-/** 是否显示群已读人数标注 */
-const showGroupReadCount = computed(() =>
+/** 群聊已读回执是否激活（用圆圈替代普通状态） */
+const isGroupReadReceiptActive = computed(() =>
   props.message.isSelf
   && props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
   && (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0),
 )
+
+/** 是否显示群已读人数标注 */
+const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
 
 /** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
 const groupMemberCount = computed(() => {
@@ -230,6 +233,11 @@ const groupReadCount = computed(() => props.message.groupReadCount || 0)
 /** 群未读人数 */
 const groupUnreadCount = computed(() =>
   groupMemberCount.value > 0 ? groupMemberCount.value - groupReadCount.value : 0,
+)
+
+/** 群已读是否全部已读 */
+const isGroupReadAll = computed(() =>
+  groupMemberCount.value > 0 && groupReadCount.value >= groupMemberCount.value,
 )
 
 /** 群已读标注点击 */
@@ -429,13 +437,17 @@ const isHighlighted = computed(() => {
             </div>
 
             <!-- 群已读人数标注 -->
-            <span
+            <button
               v-if="showGroupReadCount"
+              type="button"
               class="message-bubble-wrapper__group-read"
+              :class="{ 'message-bubble-wrapper__group-read--all': isGroupReadAll }"
+              :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
               @click.stop="onGroupReadClick"
             >
-              {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
-            </span>
+              <Icon v-if="isGroupReadAll" name="actions/check" :size="10" />
+              <template v-else>{{ groupReadCount }}</template>
+            </button>
           </template>
 
           <!-- ===== 状态与气泡同一行 ===== -->
@@ -542,13 +554,17 @@ const isHighlighted = computed(() => {
               </div>
 
               <!-- 群已读人数标注 -->
-              <span
+              <button
                 v-if="showGroupReadCount"
+                type="button"
                 class="message-bubble-wrapper__group-read"
+                :class="{ 'message-bubble-wrapper__group-read--all': isGroupReadAll }"
+                :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                {{ groupReadCount }}人已读<span v-if="groupUnreadCount > 0">/{{ groupMemberCount }}人</span>
-              </span>
+                <Icon v-if="isGroupReadAll" name="actions/check" :size="10" />
+                <template v-else>{{ groupReadCount }}</template>
+              </button>
             </div>
           </div>
 
@@ -685,11 +701,6 @@ const isHighlighted = computed(() => {
   padding-left: 0;
 }
 
-.message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {
-  margin-top: 2px;
-  padding-left: 0;
-}
-
 .message-bubble-wrapper__time {
   font-size: 11px;
   color: var(--uikit-text-secondary);
@@ -783,18 +794,42 @@ const isHighlighted = computed(() => {
   margin-top: 2px;
 }
 
-/* 群已读人数标注 */
+/* 群已读人数标注（企业微信风格圆圈） */
 .message-bubble-wrapper__group-read {
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--uikit-text-secondary);
+  background: transparent;
   color: var(--uikit-text-secondary);
+  font-size: 10px;
+  line-height: 1;
+  padding: 0;
   margin-top: 2px;
   padding-left: 2px;
   cursor: pointer;
-  transition: color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+  flex-shrink: 0;
 }
 
 .message-bubble-wrapper__group-read:hover {
   color: var(--uikit-primary-color);
+  border-color: var(--uikit-primary-color);
+}
+
+.message-bubble-wrapper__group-read--all {
+  border-color: var(--uikit-primary-color);
+  color: var(--uikit-primary-color);
+}
+
+.message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {
+  margin-top: 0;
+  padding-left: 0;
 }
 
 @keyframes message-status-loading {
