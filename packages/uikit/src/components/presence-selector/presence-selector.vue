@@ -167,7 +167,7 @@ function onCancel() {
 
 .presence-selector--compact {
   width: 160px;
-  padding: 8px;
+  padding: 6px;
 }
 
 .presence-selector--compact .presence-selector__title {
@@ -179,8 +179,23 @@ function onCancel() {
   height: 8px;
 }
 
+.presence-selector--compact .presence-selector__options {
+  gap: 2px;
+}
+
 .presence-selector--compact .presence-selector__options--no-header {
   margin-top: 0;
+}
+
+.presence-selector--compact .presence-selector__option {
+  --uikit-item-hover-padding-x: 12px;
+}
+
+.presence-selector--compact .presence-selector__option :deep(.uikit-cell) {
+  --uikit-cell-height: auto;
+  height: auto;
+  padding: 10px 12px;
+  margin-bottom: 0;
 }
 
 .presence-selector--compact .presence-selector__custom {
