@@ -66,6 +66,7 @@ const messages: LocaleMessages = {
   'contact.empty': '暂无联系人',
   'contact.noSearchResult': '未找到相关联系人',
   'contact.searchPlaceholder': '搜索联系人...',
+  'contact.homeSearchPlaceholder': '搜索通讯录入口...',
   'contact.inviteTitle': '好友申请与群邀请',
   'contact.inviteEmpty': '暂无新通知',
   'contact.inviteReason': '附言',

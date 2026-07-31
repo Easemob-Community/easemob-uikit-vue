@@ -66,6 +66,7 @@ const messages: LocaleMessages = {
   'contact.empty': 'No contacts',
   'contact.noSearchResult': 'No matching contacts',
   'contact.searchPlaceholder': 'Search contacts...',
+  'contact.homeSearchPlaceholder': 'Search address book entries...',
   'contact.inviteTitle': 'Friend Requests & Invites',
   'contact.inviteEmpty': 'No new notifications',
   'contact.inviteReason': 'Message',

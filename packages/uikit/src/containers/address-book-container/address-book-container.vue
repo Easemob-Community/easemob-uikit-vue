@@ -351,7 +351,7 @@ const subviewTitle = computed(() => {
             <Input
               v-model="homeSearchKeyword"
               variant="search"
-              :placeholder="t('contact.searchPlaceholder')"
+              :placeholder="t('contact.homeSearchPlaceholder')"
               prefix-icon="misc/magnifier2"
             />
           </div>
