@@ -188,7 +188,7 @@ function onCancel() {
 }
 
 .presence-selector--compact .presence-selector__option {
-  --uikit-item-hover-padding-x: 12px;
+  --uikit-item-hover-padding-x: 0px;
 }
 
 .presence-selector--compact .presence-selector__option :deep(.uikit-cell) {
