@@ -166,7 +166,7 @@ function onCancel() {
 }
 
 .presence-selector--compact {
-  width: 160px;
+  width: 140px;
   padding: 6px;
 }
 
