@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import ContactNav from '../../modules/contact/contact-nav.vue'
 import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
-import Icon from '../../components/icon/icon.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
 import { useContact } from '../../composables/use-contact'
@@ -383,30 +383,39 @@ const subviewTitle = computed(() => {
             v-if="isDrilldown && props.showHeader"
             class="address-book-container__subheader"
           >
-            <span class="address-book-container__back" @click="goHome">
+            <span class="address-book-container__back">
               <slot name="back-icon">
-                <Icon name="navigation/chevron_left" :size="20" />
+                <IconButton
+                  icon="navigation/chevron_left"
+                  size="small"
+                  variant="ghost"
+                  :icon-size="20"
+                  :title="t('button.back') || '返回'"
+                  @click="goHome"
+                />
               </slot>
             </span>
             <span class="address-book-container__subtitle">{{ subviewTitle }}</span>
             <span class="address-book-container__subheader-extra">
               <slot name="subheader-extra" :view="view" />
-              <span
+              <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
-                class="address-book-container__action-btn"
+                icon="actions/plus"
+                size="small"
+                variant="ghost"
+                :icon-size="20"
                 :title="t('contact.addContact')"
                 @click="emit('add-contact')"
-              >
-                <Icon name="actions/plus" :size="22" />
-              </span>
-              <span
+              />
+              <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'group' && props.showGroupCreateButton"
-                class="address-book-container__action-btn"
+                icon="actions/plus"
+                size="small"
+                variant="ghost"
+                :icon-size="20"
                 :title="t('group.createGroup')"
                 @click="emit('create-group')"
-              >
-                <Icon name="actions/plus" :size="22" />
-              </span>
+              />
             </span>
           </div>
 
@@ -529,16 +538,6 @@ const subviewTitle = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--uikit-text-primary);
-  transition: background-color 0.15s;
-}
-
-.address-book-container__back:hover {
-  background-color: var(--uikit-bg-secondary);
 }
 
 .address-book-container__subtitle {
@@ -555,22 +554,6 @@ const subviewTitle = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-}
-
-.address-book-container__action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--uikit-text-primary);
-  transition: background-color 0.15s;
-}
-
-.address-book-container__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
 }
 
 .address-book-container__subview {

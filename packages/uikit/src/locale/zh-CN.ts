@@ -3,6 +3,8 @@ import type { LocaleMessages } from './type'
 const messages: LocaleMessages = {
   'button.confirm': '确认',
   'button.cancel': '取消',
+  'button.close': '关闭',
+  'button.back': '返回',
   'error.notConnected': '当前未连接，请检查网络后重试',
   'error.network': '网络异常，请稍后重试',
   'error.timeout': '请求超时，请稍后重试',

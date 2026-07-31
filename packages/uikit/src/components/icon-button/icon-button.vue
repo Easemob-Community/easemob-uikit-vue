@@ -196,8 +196,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--ghost:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary));
 }
 
 .uikit-icon-button--default.uikit-icon-button--ghost {

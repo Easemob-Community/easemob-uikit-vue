@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onClickOutside, useEventListener } from '@vueuse/core'
+import IconButton from '../icon-button/icon-button.vue'
+import { useLocale } from '../../locale'
 
 export interface PopupProps {
   show: boolean
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<PopupProps>(), {
 })
 
 const emit = defineEmits<PopupEmits>()
+const { t } = useLocale()
 
 const isAnchored = computed(() => !!props.anchor)
 
@@ -251,9 +254,15 @@ onUnmounted(() => {
             :class="isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`"
             :style="isAnchored ? contentStyle : undefined"
           >
-            <div v-if="props.showClose" class="uikit-popup__close" @click="onCloseClick">
-              &times;
-            </div>
+            <IconButton
+              v-if="props.showClose"
+              class="uikit-popup__close"
+              icon="actions/close"
+              size="small"
+              variant="ghost"
+              :title="t('button.close') || '关闭'"
+              @click="onCloseClick"
+            />
             <slot />
           </div>
         </Transition>
@@ -371,9 +380,6 @@ onUnmounted(() => {
   position: absolute;
   top: 12px;
   right: 12px;
-  font-size: 20px;
-  cursor: pointer;
-  color: var(--uikit-text-secondary);
   z-index: 1;
 }
 

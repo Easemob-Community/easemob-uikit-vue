@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
@@ -222,9 +221,14 @@ function closeDrawer() {
     >
       <template #header>
         <div class="group-management-section__drawer-header">
-          <button class="group-management-section__drawer-close" @click="closeDrawer">
-            <Icon name="arrows/arrowto" :size="16" />
-          </button>
+          <IconButton
+            class="group-management-section__drawer-close"
+            icon="arrows/arrowto"
+            size="small"
+            variant="ghost"
+            :title="t('button.back') || '返回'"
+            @click="closeDrawer"
+          />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
@@ -298,9 +302,14 @@ function closeDrawer() {
     >
       <div class="group-management-section__modal">
         <div class="group-management-section__drawer-header">
-          <button class="group-management-section__drawer-close" @click="closeDrawer">
-            <Icon name="arrows/arrowto" :size="16" />
-          </button>
+          <IconButton
+            class="group-management-section__drawer-close"
+            icon="arrows/arrowto"
+            size="small"
+            variant="ghost"
+            :title="t('button.back') || '返回'"
+            @click="closeDrawer"
+          />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
@@ -429,22 +438,7 @@ function closeDrawer() {
 }
 
 .group-management-section__drawer-close {
-  background: none;
-  border: none;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--uikit-components-radius, 6px);
-  padding: 0;
-  transition: background-color 0.15s;
-}
-
-.group-management-section__drawer-close:hover {
-  background-color: var(--uikit-bg-secondary);
+  flex-shrink: 0;
 }
 
 .group-management-section__drawer-title {

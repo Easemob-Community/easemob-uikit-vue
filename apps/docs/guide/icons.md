@@ -20,6 +20,17 @@ UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。自当�
 
 图标分类包括：`actions`（操作交互）、`arrows`（箭头方向）、`audio-video`（音视频）、`chat`（聊天消息）、`emojis-reactions`（表情）、`files-media`（文件媒体）、`gifts`（礼物）、`misc`（杂项）、`navigation`（导航）、`people`（人员）、`status`（状态）。
 
+## 操作图标交互约束
+
+业务中所有“操作类图标按钮”（关闭、返回、`+`、设置、编辑、删除等）必须统一使用 `IconButton` 组件，禁止自行用 `<button>` + `<Icon>` 实现。详细约束见：[UIKIT UI 交互约束](../../packages/uikit/docs/UI_CONVENTIONS.md)。
+
+核心原则：
+
+- 关闭按钮统一使用 `actions/close`，由 `Popup` 的 `show-close` 或 `IconButton` 渲染。
+- 返回按钮统一使用 `arrows/arrowto` 或 `navigation/chevron_left`。
+- 添加按钮统一使用 `actions/plus`。
+- 默认 `variant="ghost"`、`size="small"`，统一圆角背景 hover，不手写 hover 样式。
+
 ## 覆盖与新增图标
 
 **替换已有图标**：直接用同名 SVG 文件覆盖 `src/assets/icons/<分类>/<图标名>.svg` 即可，所有 `name` 引用不变，无需改动任何业务代码。建议使用 24×24 viewBox、`currentColor` 着色的 SVG，以保证与主题体系一致。

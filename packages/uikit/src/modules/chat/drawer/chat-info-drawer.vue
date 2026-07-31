@@ -6,7 +6,6 @@ import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
 import Button from '../../../components/button/button.vue'
 import Cell from '../../../components/cell/cell.vue'
-import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
 import { useToast } from '../../../composables/use-toast'
@@ -66,7 +65,6 @@ const emit = defineEmits<{
   (e: 'remove-admin', member: UiGroupMember): void
 }>()
 
-const themeStore = useThemeStore()
 const { t } = useLocale()
 const { setContactRemark, deleteContact } = useContact()
 const { show: showToast } = useToast()
@@ -85,10 +83,6 @@ const {
   blockGroupMembers,
   unblockGroupMembers,
 } = useGroup()
-
-const closeBtnClass = computed(() =>
-  themeStore.componentsShape === 'square' ? 'chat-info-drawer__close--square' : '',
-)
 
 /** 备注编辑状态 */
 const isEditingRemark = ref(false)
@@ -619,14 +613,24 @@ defineExpose({
         <span class="chat-info-drawer__title">
           {{ isGroup ? t('chat.info.titleGroup') : t('chat.info.titleFriend') }}
         </span>
-        <button class="chat-info-drawer__close" :class="closeBtnClass" @click="onClose">
-          <Icon name="actions/xmark_thick" :size="16" />
-        </button>
+        <IconButton
+          class="chat-info-drawer__close"
+          icon="actions/close"
+          size="small"
+          variant="ghost"
+          :title="t('button.close') || '关闭'"
+          @click="onClose"
+        />
       </div>
       <div v-else class="chat-info-drawer__header">
-        <button class="chat-info-drawer__back" @click="closeMemberList">
-          <Icon name="arrows/arrowto" :size="16" />
-        </button>
+        <IconButton
+          class="chat-info-drawer__back"
+          icon="arrows/arrowto"
+          size="small"
+          variant="ghost"
+          :title="t('button.back') || '返回'"
+          @click="closeMemberList"
+        />
         <span class="chat-info-drawer__title">{{ memberListTitle }}</span>
         <span class="chat-info-drawer__header-placeholder" />
       </div>
@@ -958,46 +962,9 @@ defineExpose({
   gap: 12px;
 }
 
-.chat-info-drawer__close {
-  background: none;
-  border: none;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--uikit-components-radius, 6px);
-  padding: 0;
-  transition: background-color 0.15s;
-}
-
-.chat-info-drawer__close:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-
-.chat-info-drawer__close--square {
-  border-radius: 2px;
-}
-
+.chat-info-drawer__close,
 .chat-info-drawer__back {
-  background: none;
-  border: none;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--uikit-components-radius, 6px);
-  padding: 0;
-  transition: background-color 0.15s;
-}
-
-.chat-info-drawer__back:hover {
-  background-color: var(--uikit-bg-secondary);
+  flex-shrink: 0;
 }
 
 .chat-info-drawer__header-placeholder {

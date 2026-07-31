@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Cell from '../../../components/cell/cell.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import Empty from '../../../components/empty/empty.vue'
 import { useLocale } from '../../../locale'
 
@@ -46,7 +47,13 @@ function onClose() {
       <!-- 标题 -->
       <div class="group-read-modal__header">
         <span class="group-read-modal__title">{{ t('groupReadReceipt.title') }}</span>
-        <button class="group-read-modal__close" @click="onClose">&times;</button>
+        <IconButton
+          icon="actions/close"
+          size="small"
+          variant="ghost"
+          :title="t('button.close') || '关闭'"
+          @click="onClose"
+        />
       </div>
 
       <!-- Tab 切换 -->
@@ -118,26 +125,7 @@ function onClose() {
   color: var(--uikit-text-primary);
 }
 
-.group-read-modal__close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.15s;
-}
 
-.group-read-modal__close:hover {
-  background-color: var(--uikit-bg-secondary);
-}
 
 /* Tab */
 .group-read-modal__tabs {
