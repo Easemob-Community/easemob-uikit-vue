@@ -120,12 +120,17 @@ function onContextmenu(e: MouseEvent) {
   align-items: center;
   gap: 12px;
   padding: 0 var(--uikit-item-hover-padding-x, 16px);
-  margin: 0 var(--uikit-item-hover-margin-x, 0px);
+  margin: 0 var(--uikit-item-hover-margin-x, 0px) var(--uikit-cell-gap, 3px);
   height: var(--uikit-cell-height, 64px);
   border-radius: var(--uikit-item-hover-radius, 0px);
   transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   -webkit-touch-callout: none;
   user-select: none;
+}
+
+/* 列表末尾的 cell 不保留底部间距，避免容器底部多出空白 */
+.uikit-cell:last-child {
+  margin-bottom: 0;
 }
 
 /* autoHeight 模式：padding 驱动，不固定高度 */

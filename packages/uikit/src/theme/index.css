@@ -53,6 +53,7 @@
 
   /* 容器间距与组件圆角 */
   --uikit-container-gap: 8px;
+  --uikit-cell-gap: 3px;
   --uikit-components-radius: 8px;
   --uikit-components-radius-hover: 14px;
 
