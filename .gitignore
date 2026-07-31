@@ -27,3 +27,6 @@ coverage
 
 # Local tarball artifacts
 *.tgz
+
+# Temporary debug / regression scripts
+tmp/
