@@ -14,10 +14,13 @@ export interface PresenceSelectorProps {
   showCustom?: boolean
   /** 自定义状态输入框占位符 */
   customPlaceholder?: string
+  /** 紧凑模式，popup 场景下更窄的宽度与更小的内边距 */
+  compact?: boolean
 }
 
 const props = withDefaults(defineProps<PresenceSelectorProps>(), {
   showCustom: true,
+  compact: false,
 })
 
 const emit = defineEmits<{
@@ -94,7 +97,7 @@ function onCancel() {
 </script>
 
 <template>
-  <div class="presence-selector">
+  <div class="presence-selector" :class="{ 'presence-selector--compact': props.compact }">
     <div class="presence-selector__header">
       <span class="presence-selector__title">{{ t('presence.setStatus') || '设置在线状态' }}</span>
       <button class="presence-selector__close" @click="onCancel">
@@ -144,6 +147,20 @@ function onCancel() {
   width: 280px;
   max-width: calc(100vw - 32px);
   padding: 16px;
+}
+
+.presence-selector--compact {
+  width: 180px;
+  padding: 12px;
+}
+
+.presence-selector--compact .presence-selector__title {
+  font-size: 14px;
+}
+
+.presence-selector--compact .presence-selector__dot {
+  width: 8px;
+  height: 8px;
 }
 
 .presence-selector__header {

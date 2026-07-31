@@ -77,6 +77,7 @@ function onCancel() {
   >
     <PresenceSelector
       :value="currentExt"
+      compact
       @select="onSelect"
       @cancel="onCancel"
     />

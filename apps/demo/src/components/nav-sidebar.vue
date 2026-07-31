@@ -7,8 +7,8 @@
  * - tab 列表硬编码 + 底部工具区，结构稳定且简单；如需扩展，复制本组件即可
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
-import { computed, ref } from 'vue'
-import { EmIcon, EmBadge, EmPresenceAvatar, EmPresenceSelectorModal, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence } from '@easemob/uikit'
+import { computed } from 'vue'
+import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence } from '@easemob/uikit'
 
 interface Props {
   /** 当前激活 tab key */
@@ -26,8 +26,6 @@ const { currentUser } = useClient()
 const { avatarUrl, displayName } = useOwnUserInfo()
 const conversationStore = useConversationStore()
 const { fetchPresence } = usePresence()
-
-const showPresenceModal = ref(false)
 
 /** 发布状态后主动拉取一次，确保头像立即刷新 */
 function refreshOwnPresence() {
@@ -69,7 +67,8 @@ function toggleMode() {
         :name="displayName || currentUser || 'Guest'"
         :size="40"
         editable
-        @presence-click="showPresenceModal = true"
+        selector-placement="right"
+        @presence-changed="refreshOwnPresence"
       />
     </div>
 
@@ -115,11 +114,6 @@ function toggleMode() {
       </button>
     </div>
 
-    <!-- 在线状态设置弹窗 -->
-    <EmPresenceSelectorModal
-      v-model:show="showPresenceModal"
-      @close="refreshOwnPresence"
-    />
   </aside>
 </template>
 
