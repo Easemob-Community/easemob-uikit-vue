@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue'
 import type { UserInfoAttribute } from 'easemob-websdk'
 import Popup from '../popup/popup.vue'
-import PresenceSelectorModal from '../presence-selector/presence-selector-modal.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -50,7 +49,6 @@ const loading = computed(() => {
   return stores.userInfo.isLoading(props.userId) || presenceLoading.value
 })
 const presenceStatus = ref<PresenceDisplayStatus | undefined>(undefined)
-const showPresenceSelector = ref(false)
 
 const isSelf = computed(() => stores.client.currentUser === props.userId)
 
@@ -162,13 +160,7 @@ function onInfoClick(key: string) {
     showToast(t('userCard.department') || '部门')
 }
 
-function onPresenceClick() {
-  if (isSelf.value)
-    showPresenceSelector.value = true
-}
-
-function onPresenceSelectorClose() {
-  showPresenceSelector.value = false
+function onPresenceChanged() {
   // 变更后重新拉取自己的状态
   if (features.enablePresence && isSelf.value)
     void loadData()
@@ -194,12 +186,7 @@ function onPresenceSelectorClose() {
         :info-rows="cardInfoRows"
         @action-click="onActionClick"
         @info-click="onInfoClick"
-        @presence-click="onPresenceClick"
-      />
-
-      <PresenceSelectorModal
-        v-model:show="showPresenceSelector"
-        @close="onPresenceSelectorClose"
+        @presence-changed="onPresenceChanged"
       />
 
       <div v-if="loading" class="user-card-modal__loading">

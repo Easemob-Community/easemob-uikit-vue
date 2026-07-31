@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import PresenceAvatar from './presence-avatar.vue'
-import PresenceSelectorModal from '../presence-selector/presence-selector-modal.vue'
-
-const showModal = ref(false)
 
 const mockDataSource = {
   subscribePresence: async () => {
@@ -28,10 +24,6 @@ const mockDataSource = {
     })
   },
 }
-
-function onPresenceClick() {
-  showModal.value = true
-}
 </script>
 
 <template>
@@ -54,11 +46,9 @@ function onPresenceClick() {
           name="Me"
           :size="48"
           editable
-          @presence-click="onPresenceClick"
         />
-        <PresenceSelectorModal v-model:show="showModal" />
         <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
-          点击头像右下角指示器可打开在线状态选择器。
+          点击头像右下角指示器可在头像下方打开在线状态选择 popup。
         </div>
       </UIKitProvider>
     </Variant>

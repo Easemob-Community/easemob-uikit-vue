@@ -18,6 +18,7 @@ export { default as EmGroupCard } from './group-card/group-card.vue'
 export { default as EmGroupCardModal } from './group-card/group-card-modal.vue'
 export { default as EmPresenceSelector } from './presence-selector/presence-selector.vue'
 export { default as EmPresenceSelectorModal } from './presence-selector/presence-selector-modal.vue'
+export { default as EmPresenceSelectorPopup } from './presence-selector/presence-selector-popup.vue'
 export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
 export { default as EmCell } from './cell/cell.vue'
 export type { CellProps } from './cell/cell.vue'
@@ -44,6 +45,7 @@ export const componentList = [
   'em-group-card-modal',
   'em-presence-selector',
   'em-presence-selector-modal',
+  'em-presence-selector-popup',
   'em-presence-avatar',
   'em-cell',
   'em-empty',

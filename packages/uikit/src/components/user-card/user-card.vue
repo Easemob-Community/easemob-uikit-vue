@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
+import PresenceSelectorPopup from '../presence-selector/presence-selector-popup.vue'
 import { useLocale } from '../../locale'
 import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 
@@ -32,6 +33,8 @@ export interface UserCardProps {
   status?: PresenceDisplayStatus
   /** 头像是否可编辑（用于当前用户变更在线状态），默认 false */
   editable?: boolean
+  /** 弹层相对头像的位置，默认 'bottom' */
+  selectorPlacement?: 'bottom' | 'top' | 'left' | 'right'
   /** 底部操作按钮 */
   actions?: UserCardAction[]
   /** 信息行 */
@@ -49,9 +52,13 @@ const emit = defineEmits<{
   (e: 'info-click', key: string): void
   (e: 'avatar-click'): void
   (e: 'presence-click'): void
+  (e: 'presence-changed'): void
 }>()
 
 const { t } = useLocale()
+
+const avatarRef = ref<InstanceType<typeof Avatar>>()
+const showSelector = ref(false)
 
 const statusText = computed(() => {
   const map: Record<PresenceDisplayStatus, string> = {
@@ -78,6 +85,16 @@ function onAvatarClick() {
   // 这里只转发 avatar-click，避免一次点击重复触发 presence-click
   emit('avatar-click')
 }
+
+function onPresenceClick() {
+  emit('presence-click')
+  if (props.editable)
+    showSelector.value = true
+}
+
+function onSelectorChanged() {
+  emit('presence-changed')
+}
 </script>
 
 <template>
@@ -93,6 +110,7 @@ function onAvatarClick() {
     <div class="user-card__body">
       <div class="user-card__profile">
         <Avatar
+          ref="avatarRef"
           class="user-card__avatar"
           :class="{ 'is-editable': props.editable }"
           :src="props.avatar"
@@ -100,7 +118,7 @@ function onAvatarClick() {
           :size="90"
           :presence="props.status"
           :editable="props.editable"
-          @presence-click="emit('presence-click')"
+          @presence-click="onPresenceClick"
           @click="onAvatarClick"
         />
         <div class="user-card__meta">
@@ -154,6 +172,14 @@ function onAvatarClick() {
 
       <slot />
     </div>
+
+    <PresenceSelectorPopup
+      v-if="props.editable"
+      v-model:show="showSelector"
+      :anchor="avatarRef?.$el"
+      :placement="props.selectorPlacement"
+      @changed="onSelectorChanged"
+    />
   </div>
 </template>
 

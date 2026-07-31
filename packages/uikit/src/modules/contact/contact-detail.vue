@@ -6,7 +6,6 @@ import Button from '../../components/button/button.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCard from '../../components/user-card/user-card.vue'
-import PresenceSelectorModal from '../../components/presence-selector/presence-selector-modal.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -58,7 +57,6 @@ const { userInfo, contact: contactFromStore, avatarUrl, displayName } = useUserI
 
 const presenceStatus = ref<PresenceDisplayStatus | undefined>(undefined)
 const presenceLoading = ref(false)
-const showPresenceSelector = ref(false)
 const loading = computed(() => {
   if (!props.userId)
     return false
@@ -289,13 +287,7 @@ function onCardInfoClick(_key: string) {
   // 信息行暂无跳转
 }
 
-function onPresenceClick() {
-  if (isSelf.value)
-    showPresenceSelector.value = true
-}
-
-function onPresenceSelectorClose() {
-  showPresenceSelector.value = false
+function onPresenceChanged() {
   if (features.enablePresence && isSelf.value)
     void loadData()
 }
@@ -318,7 +310,7 @@ function onPresenceSelectorClose() {
         :info-rows="cardInfoRows"
         @action-click="onCardAction"
         @info-click="onCardInfoClick"
-        @presence-click="onPresenceClick"
+        @presence-changed="onPresenceChanged"
       >
         <div class="contact-detail__extra">
           <div class="contact-detail__row">
@@ -393,10 +385,6 @@ function onPresenceSelectorClose() {
       {{ confirmModal.content }}
     </Modal>
 
-    <PresenceSelectorModal
-      v-model:show="showPresenceSelector"
-      @close="onPresenceSelectorClose"
-    />
   </div>
 </template>
 
