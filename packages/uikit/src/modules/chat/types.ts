@@ -119,6 +119,8 @@ export interface ChatConfig {
     enableMultiSelect?: boolean
     /** 启用翻译，默认 true（仅文本消息生效） */
     enableTranslate?: boolean
+    /** 启用语音转文字，默认 true（仅带 url 的语音消息生效） */
+    enableVoiceToText?: boolean
     /** 启用置顶/取消置顶，默认 true */
     enablePin?: boolean
     /** 撤回禁用时长（毫秒），超过该时长后无法撤回，默认 2 分钟（120000） */
@@ -228,6 +230,7 @@ export type MessageActionType =
   | 'forward'
   | 'multiSelect'
   | 'translate'
+  | 'voiceToText'
   | 'pin'
   | 'unpin'
 

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { MESSAGE_STATUS } from '../constants'
-import type { TextMessageBody, UiMessage } from '../sdk/types'
+import type { TextMessageBody, UiMessage, VoiceMessageBody } from '../sdk/types'
 import { useLocale } from '../locale'
 import { useToast } from './use-toast'
 import { useUIKit } from './use-uikit'
@@ -128,6 +128,45 @@ export function useMessageActions() {
     messageStore.toggleTranslation(msgId)
   }
 
+  /** 语音消息转文字 */
+  async function transcribeVoiceMessage(message: UiMessage) {
+    if (message.type !== 'voice')
+      return
+    const body = message.body as VoiceMessageBody
+    if (!body.url)
+      return
+
+    const msgId = message.msgServerId || message.msgLocalId
+
+    // 已转写完成：切换显示/隐藏
+    if (message.voiceText?.text) {
+      messageStore.toggleVoiceText(msgId)
+      return
+    }
+
+    messageStore.setVoiceTranscribing(msgId, true)
+    try {
+      const result = await domains.message.transcribeVoiceMessage(message, {
+        format: resolveVoiceFormat(body),
+      })
+      const text = result?.text
+      if (typeof text === 'string' && text.length > 0) {
+        messageStore.setVoiceText(msgId, { text })
+      }
+      else {
+        messageStore.setVoiceTranscribing(msgId, false)
+      }
+    }
+    catch (e) {
+      messageStore.setVoiceTranscribing(msgId, false)
+      throw e
+    }
+  }
+
+  function toggleVoiceText(msgId: string) {
+    messageStore.toggleVoiceText(msgId)
+  }
+
   /** 置顶消息 */
   async function pinMessage(message: UiMessage) {
     const cvs = conversationStore.currentConversation
@@ -188,6 +227,8 @@ export function useMessageActions() {
     deleteMessages,
     translateTextMessage,
     toggleTranslation,
+    transcribeVoiceMessage,
+    toggleVoiceText,
     pinMessage,
     unpinMessage,
     fetchPinnedMessages,
@@ -198,6 +239,35 @@ function resolveTranslateLang(targetLang?: string): string {
   if (targetLang?.trim())
     return targetLang.trim()
   return 'en'
+}
+
+/** 根据语音 url 后缀推断转文字格式，兜底 amr */
+function resolveVoiceFormat(body: VoiceMessageBody): string {
+  const url = body.url || ''
+  const ext = url.split('.').pop()?.toLowerCase()
+  if (ext && ['amr', 'mp3', 'wav', 'm4a', 'aac'].includes(ext))
+    return ext
+  // SDK createVoiceMessage 默认使用 amr，无后缀时按 amr 兜底
+  return 'amr'
+}
+
+/** 根据 SDK 语音转文字错误提取友好提示文案 */
+export function resolveVoiceToTextErrorMessage(
+  e: unknown,
+  t: (key: string) => string,
+): string {
+  const code = (e as { code?: number | string })?.code
+  if (code === 505 || code === '505')
+    return t('message.voiceToText.noPermission') || '语音转文字服务未开通，请联系管理员开通'
+  if (code === 408 || code === '408')
+    return t('message.voiceToText.durationTooLong') || '语音时长超过限制'
+  if (code === 411 || code === '411')
+    return t('message.voiceToText.fileTooLarge') || '语音文件过大'
+  if (code === 407 || code === '407')
+    return t('message.voiceToText.fileInvalid') || '语音文件无效或已过期'
+  if (code === 410 || code === '410')
+    return t('message.voiceToText.uploadFailed') || '语音文件上传失败'
+  return t('message.voiceToText.failed') || '语音转文字失败，请稍后重试'
 }
 
 function extractErrorReason(error: unknown): string {

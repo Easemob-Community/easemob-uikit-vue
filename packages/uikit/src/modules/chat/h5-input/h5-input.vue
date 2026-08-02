@@ -4,6 +4,7 @@ import { useLocale } from '../../../locale'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
+import type { EmojiStickerItem } from '../../../components/emoji-picker/types'
 import type { ChatConfig, MentionContact } from '../types'
 
 export interface H5InputProps {
@@ -26,6 +27,7 @@ const emit = defineEmits<{
   (e: 'voice-cancel'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
+  (e: 'sticker-select', sticker: EmojiStickerItem): void
   (e: 'typing'): void
   (e: 'focus'): void
 }>()
@@ -34,6 +36,9 @@ const { t } = useLocale()
 
 /** 输入文本 */
 const text = ref('')
+
+/** 表情包（sticker）配置 */
+const stickerPacks = computed(() => props.config?.stickerPacks ?? [])
 
 /** 功能开关 */
 const features = computed(() => ({
@@ -431,6 +436,12 @@ function insertEmoji(emoji: string) {
   })
 }
 
+/** 选择表情包（sticker）：收起面板并上抛给外层发送 */
+function onSelectSticker(sticker: EmojiStickerItem) {
+  activePanel.value = 'none'
+  emit('sticker-select', sticker)
+}
+
 /** 设置输入文本 */
 function setText(value: string) {
   text.value = value
@@ -550,7 +561,9 @@ defineExpose({
       <EmojiPicker
         class="h5-input__emoji-picker"
         :show="true"
+        :sticker-packs="stickerPacks"
         @select="insertEmoji"
+        @select-sticker="onSelectSticker"
         @update:show="activePanel = 'none'"
       />
     </div>

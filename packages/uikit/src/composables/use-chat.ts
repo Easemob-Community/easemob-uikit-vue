@@ -316,6 +316,8 @@ export function useChat() {
     deleteMessages: actions.deleteMessages,
     translateTextMessage: actions.translateTextMessage,
     toggleTranslation: actions.toggleTranslation,
+    transcribeVoiceMessage: actions.transcribeVoiceMessage,
+    toggleVoiceText: actions.toggleVoiceText,
     pinMessage: actions.pinMessage,
     unpinMessage: actions.unpinMessage,
     fetchPinnedMessages: actions.fetchPinnedMessages,

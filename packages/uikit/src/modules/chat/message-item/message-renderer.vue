@@ -18,6 +18,7 @@ export interface MessageRendererProps {
 export interface MessageRendererEmits {
   (e: 'reedit', message: UiMessage): void
   (e: 'toggle-translation', message: UiMessage): void
+  (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'view-combine', message: UiMessage): void
   (e: 'mention-click', userId: string): void
 }
@@ -72,6 +73,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       :is-self="message.isSelf"
       @reedit="emit('reedit', $event)"
       @toggle-translation="emit('toggle-translation', $event)"
+      @toggle-voice-text="emit('toggle-voice-text', $event)"
       @view="emit('view-combine', $event)"
       @mention-click="emit('mention-click', $event)"
     />

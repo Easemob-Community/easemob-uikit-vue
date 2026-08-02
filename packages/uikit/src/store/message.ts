@@ -159,6 +159,8 @@ export const useMessageStore = defineStore('message', () => {
         localId,
         translation: old.translation,
         showTranslation: old.showTranslation,
+        voiceText: old.voiceText,
+        showVoiceText: old.showVoiceText,
         requireGroupAck: old.requireGroupAck,
       },
       ...list.slice(index + 1),
@@ -344,6 +346,28 @@ export const useMessageStore = defineStore('message', () => {
     }))
   }
 
+  /** 设置语音转文字中状态 */
+  function setVoiceTranscribing(msgId: string, voiceTranscribing: boolean) {
+    updateMessageById(msgId, { voiceTranscribing })
+  }
+
+  /** 设置语音转文字结果 */
+  function setVoiceText(msgId: string, voiceText: { text: string }) {
+    updateMessageById(msgId, {
+      voiceText,
+      showVoiceText: true,
+      voiceTranscribing: false,
+    })
+  }
+
+  /** 切换语音转文字结果/原文展示 */
+  function toggleVoiceText(msgId: string) {
+    _updateMessageById(msgId, msg => ({
+      ...msg,
+      showVoiceText: !msg.showVoiceText,
+    }))
+  }
+
   /** 清空所有消息数据 */
   function clearMessages() {
     messageMap.value = {}
@@ -389,6 +413,9 @@ export const useMessageStore = defineStore('message', () => {
     setTranslating,
     setTranslation,
     toggleTranslation,
+    setVoiceTranscribing,
+    setVoiceText,
+    toggleVoiceText,
     clearMessages,
     clearConversationMessages,
   }

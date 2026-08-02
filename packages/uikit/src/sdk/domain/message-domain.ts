@@ -26,6 +26,8 @@ export interface MessageStoreLike {
   setPinnedMessages: (conversationId: string, msgs: UiMessage[]) => void
   setTranslation: (msgId: string, translation: { text: string, to: string }) => void
   setTranslating: (msgId: string, translating: boolean) => void
+  setVoiceText: (msgId: string, voiceText: { text: string }) => void
+  setVoiceTranscribing: (msgId: string, transcribing: boolean) => void
   clearConversationMessages: (conversationId: string) => void
 }
 
@@ -351,6 +353,21 @@ export class MessageDomain {
       message,
       targetLanguages,
     })
+    return result
+  }
+
+  /** 语音消息转文字 */
+  async transcribeVoiceMessage(
+    message: SdkMessage,
+    voiceParams?: { format?: string, sampleRate?: number, bitsPerSample?: number, channels?: number },
+  ) {
+    // SDK 要求传入 VoiceMessageBody，且需要能从 url 解析出 fileId；
+    // 兼容部分历史消息 body 缺少 type 的情况，按 message.type 补齐。
+    const body = {
+      ...(message.body as Record<string, unknown>),
+      type: (message.body as Record<string, unknown>)?.type ?? message.type,
+    } as any
+    const result = await this.client.chatManager.voiceMessageToText(body, voiceParams)
     return result
   }
 

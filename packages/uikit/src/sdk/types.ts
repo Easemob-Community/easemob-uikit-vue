@@ -48,6 +48,12 @@ export interface UiMessageExtension {
   showTranslation?: boolean
   /** 是否正在翻译中 */
   translating?: boolean
+  /** 语音转文字结果 */
+  voiceText?: { text: string }
+  /** 是否优先展示语音转文字结果 */
+  showVoiceText?: boolean
+  /** 是否正在语音转文字中 */
+  voiceTranscribing?: boolean
   /** 发送失败原因 */
   failReason?: string
   /** 附件上传进度（0-100） */

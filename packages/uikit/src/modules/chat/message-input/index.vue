@@ -6,16 +6,17 @@ import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
 import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
+import type { EmojiStickerItem } from '../../../components/emoji-picker/types'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
 import type { UiMessage } from '../../../sdk/types'
 import MentionPicker from '../mention/mention-picker.vue'
 import QuoteBar from '../quote/quote-bar.vue'
 import type { ChatConfig, ChatSendHooks, MentionContact } from '../types'
+import H5Input from '../h5-input/h5-input.vue'
 import SimpleInput from './simple-input.vue'
 import RichInput from './rich-input.vue'
 import EditingBar from './editing-bar.vue'
-import H5Input from '../h5-input/h5-input.vue'
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -90,6 +91,9 @@ const inputMode = computed(() => {
 
 /** Emoji 选择器显示状态 */
 const showEmojiPicker = ref(false)
+
+/** 表情包（sticker）配置 */
+const stickerPacks = computed(() => inputConfig.value?.stickerPacks ?? [])
 
 /** Emoji 锚点元素 */
 const emojiAnchorRef = ref<HTMLElement>()
@@ -312,6 +316,23 @@ function onEmojiSelect(emoji: string) {
   else {
     richInputRef.value?.insertEmoji?.(emoji)
   }
+}
+
+/** 选择表情包（sticker）：SDK 图片消息支持 GIF，按 URL 以图片消息发送 */
+async function onStickerSelect(sticker: EmojiStickerItem) {
+  showEmojiPicker.value = false
+  const canSend = await runBeforeSend({ type: 'image' })
+  if (!canSend)
+    return
+  sendImageMessage(sticker.url, groupReadReceiptConfig.value)
+    .then((msg) => {
+      emit('send-success')
+      runAfterSend(msg)
+    })
+    .catch((e: any) => {
+      console.error('[MessageInput] sendSticker failed:', e)
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+    })
 }
 
 /** 清理 @提及锚点 DOM */
@@ -564,6 +585,7 @@ defineExpose({
       @voice-cancel="handleVoiceCancel"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @sticker-select="onStickerSelect"
       @focus="emit('focus')"
     />
 
@@ -611,7 +633,9 @@ defineExpose({
       <div class="emoji-picker-wrapper">
         <EmojiPicker
           :show="true"
+          :sticker-packs="stickerPacks"
           @select="onEmojiSelect"
+          @select-sticker="onStickerSelect"
           @update:show="showEmojiPicker = $event"
         />
       </div>

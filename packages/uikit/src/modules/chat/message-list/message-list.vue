@@ -16,6 +16,7 @@ import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
 import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
+import { resolveVoiceToTextErrorMessage } from '../../../composables/use-message-actions'
 import Icon from '../../../components/icon/icon.vue'
 import MessageVirtualList from './message-virtual-list.vue'
 
@@ -34,7 +35,7 @@ export interface MessageListEmits {
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, resendMessage, getHistoryCursor } = useChat()
+const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, transcribeVoiceMessage, toggleVoiceText, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { h5, stores } = useUIKit()
@@ -412,6 +413,18 @@ async function onMessageAction(event: MessageActionEvent) {
       console.warn('[MessageList] translateTextMessage failed:', e)
       showToast(resolveTranslateErrorMessage(e), 'error')
     }
+    return
+  }
+  if (event.action === 'voiceToText') {
+    if (event.message.type !== 'voice')
+      return
+    try {
+      await transcribeVoiceMessage(event.message)
+    }
+    catch (e: unknown) {
+      console.warn('[MessageList] transcribeVoiceMessage failed:', e)
+      showToast(resolveVoiceToTextErrorMessage(e, t), 'error')
+    }
   }
 }
 
@@ -430,6 +443,11 @@ function resolveTranslateErrorMessage(e: unknown): string {
 /** 文本消息翻译切换（显示译文/原文） */
 function onToggleTranslation(message: UiMessage) {
   toggleTranslation(message.msgServerId || message.msgLocalId)
+}
+
+/** 语音消息转文字结果切换（显示/隐藏） */
+function onToggleVoiceText(message: UiMessage) {
+  toggleVoiceText(message.msgServerId || message.msgLocalId)
 }
 
 /** 通过 VueUse useClipboard 复制消息文本 */
@@ -649,6 +667,7 @@ watch(locateRequest, (req) => {
           @reedit="onReedit"
           @resend="onResend"
           @toggle-translation="onToggleTranslation"
+          @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
         />
       </template>
@@ -680,6 +699,7 @@ watch(locateRequest, (req) => {
           @reedit="onReedit"
           @resend="onResend"
           @toggle-translation="onToggleTranslation"
+          @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
         />
       </div>

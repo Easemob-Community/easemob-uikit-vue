@@ -37,6 +37,7 @@ export interface MessageBubbleWrapperEmits {
   (e: 'group-read-click', msgId: string, groupId: string): void
   (e: 'reedit', message: UiMessage): void
   (e: 'toggle-translation', message: UiMessage): void
+  (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'resend', message: UiMessage): void
   (e: 'mention-click', userId: string): void
 }
@@ -376,6 +377,7 @@ const isHighlighted = computed(() => {
                   :message="message"
                   @reedit="emit('reedit', $event)"
                   @toggle-translation="emit('toggle-translation', $event)"
+                  @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                 >
@@ -488,6 +490,7 @@ const isHighlighted = computed(() => {
                   :message="message"
                   @reedit="emit('reedit', $event)"
                   @toggle-translation="emit('toggle-translation', $event)"
+                  @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                 >

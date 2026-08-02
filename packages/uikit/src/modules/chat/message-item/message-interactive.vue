@@ -75,6 +75,10 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableTranslate !== false && props.message.type === 'text') {
     add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
   }
+  // 语音转文字：仅带 url 的语音消息展示
+  if (cfg?.enableVoiceToText !== false && props.message.type === 'voice' && (props.message.body as any).url) {
+    add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'audio-video/mic')
+  }
   if (cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {
       add('unpin', t('message.action.unpin') ?? '取消置顶', 'chat/unpin')
