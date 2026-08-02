@@ -32,6 +32,7 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       outDir: 'dist',
+      exclude: ['*.config.ts', 'src/histoire-setup.ts'],
     }),
   ],
   build: {
