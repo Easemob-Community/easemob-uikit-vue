@@ -159,6 +159,12 @@ export function useMessageActions() {
     }
     catch (e) {
       messageStore.setVoiceTranscribing(msgId, false)
+      console.warn('[UIKit] voiceMessageToText raw error:', {
+        code: (e as { code?: number | string }).code,
+        message: e instanceof Error ? e.message : String(e),
+        details: (e as { details?: unknown }).details,
+        raw: e,
+      })
       throw e
     }
   }

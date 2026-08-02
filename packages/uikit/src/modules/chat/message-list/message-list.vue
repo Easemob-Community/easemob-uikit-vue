@@ -422,7 +422,12 @@ async function onMessageAction(event: MessageActionEvent) {
       await transcribeVoiceMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] transcribeVoiceMessage failed:', e)
+      console.warn('[MessageList] transcribeVoiceMessage failed:', {
+        code: (e as { code?: number | string }).code,
+        message: e instanceof Error ? e.message : String(e),
+        details: (e as { details?: unknown }).details,
+        raw: e,
+      })
       showToast(resolveVoiceToTextErrorMessage(e, t), 'error')
     }
   }
