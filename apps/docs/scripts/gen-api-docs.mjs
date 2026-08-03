@@ -188,17 +188,20 @@ function parseSlots(templateContent) {
   return slots
 }
 
-/** markdown 表格对齐：按列宽 padEnd，每行 `| a | b |` */
+/** markdown 表格对齐：按列宽 padEnd，每行 `| a | b |`；表头后插入 `| --- |` 分隔行（缺了它 markdown 不会解析为表格） */
 function alignTable(rows) {
   const colCount = rows[0].length
   const widths = Array.from({ length: colCount }, (_, i) =>
     Math.max(...rows.map((r) => escapeCell(r[i]).length)),
   )
-  return rows
-    .map((row) =>
-      `| ${row.map((cell, i) => escapeCell(cell).padEnd(widths[i])).join(' | ')} |`.trimEnd(),
-    )
-    .join('\n')
+  const formatRow = (row) =>
+    `| ${row.map((cell, i) => escapeCell(cell).padEnd(widths[i])).join(' | ')} |`.trimEnd()
+  const separator = `| ${Array.from({ length: colCount }, () => '---').join(' | ')} |`
+  return [
+    formatRow(rows[0]),
+    separator,
+    ...rows.slice(1).map(formatRow),
+  ].join('\n')
 }
 
 function buildMarkdown(componentName, pascal) {

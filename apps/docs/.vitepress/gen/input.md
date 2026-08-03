@@ -4,6 +4,7 @@
 ### Props
 
 | 属性          | 类型                                                            | 默认值         | 说明                                                 |
+| --- | --- | --- | --- |
 | modelValue  | `string`                                                      | `''`        | —                                                  |
 | placeholder | `string`                                                      | —           | —                                                  |
 | type        | `'text' \| 'password' \| 'number'`                            | `'text'`    | —                                                  |
@@ -15,6 +16,7 @@
 ### Events
 
 | 事件名                 | 参数                | 说明 |
+| --- | --- | --- |
 | `update:modelValue` | value: string     | —  |
 | `input`             | event: Event      | —  |
 | `focus`             | event: FocusEvent | —  |

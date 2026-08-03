@@ -4,6 +4,7 @@
 ### Props
 
 | 属性       | 类型                                                                                 | 默认值         | 说明 |
+| --- | --- | --- | --- |
 | type     | `'primary' \| 'success' \| 'warning' \| 'danger' \| 'danger-outline' \| 'default'` | `'default'` | —  |
 | size     | `'small' \| 'medium' \| 'large'`                                                   | `'medium'`  | —  |
 | disabled | `boolean`                                                                          | `false`     | —  |
@@ -13,4 +14,5 @@
 ### Events
 
 | 事件名     | 参数                | 说明 |
+| --- | --- | --- |
 | `click` | event: MouseEvent | —  |

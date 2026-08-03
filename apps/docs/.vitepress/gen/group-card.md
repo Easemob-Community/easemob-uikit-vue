@@ -4,6 +4,7 @@
 ### Props
 
 | 属性       | 类型                   | 默认值        | 说明                  |
+| --- | --- | --- | --- |
 | groupId  | `string`             | —          | 群 ID                |
 | name     | `string`             | —          | 群名称                 |
 | avatar   | `string`             | —          | 群头像 URL             |
@@ -14,9 +15,11 @@
 ### Events
 
 | 事件名            | 参数          | 说明 |
+| --- | --- | --- |
 | `action-click` | key: string | —  |
 
 ### Slots
 
 | 插槽名    | 说明 |
+| --- | --- |
 | `name` | —  |

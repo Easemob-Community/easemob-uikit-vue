@@ -4,6 +4,7 @@
 ### Props
 
 | 属性          | 类型                               | 默认值        | 说明                                            |
+| --- | --- | --- | --- |
 | icon        | `string`                         | —          | 图标名，格式 "category/icon-name"，如 "empty/contact" |
 | title       | `string`                         | —          | 标题文本                                          |
 | description | `string`                         | —          | 描述/副标题文本                                      |
@@ -12,5 +13,6 @@
 ### Slots
 
 | 插槽名           | 说明 |
+| --- | --- |
 | `title`       | —  |
 | `description` | —  |

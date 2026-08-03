@@ -4,6 +4,7 @@
 ### Props
 
 | 属性    | 类型        | 默认值                           | 说明 |
+| --- | --- | --- | --- |
 | count | `number`  | —                             | —  |
 | max   | `number`  | `99`                          | —  |
 | dot   | `boolean` | `false`                       | —  |

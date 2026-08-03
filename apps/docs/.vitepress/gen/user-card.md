@@ -4,6 +4,7 @@
 ### Props
 
 | 属性                | 类型                                       | 默认值        | 说明                             |
+| --- | --- | --- | --- |
 | userId            | `string`                                 | —          | 用户 ID                          |
 | name              | `string`                                 | —          | 展示名称                           |
 | avatar            | `string`                                 | —          | 头像 URL                         |
@@ -17,6 +18,7 @@
 ### Events
 
 | 事件名                | 参数          | 说明 |
+| --- | --- | --- |
 | `action-click`     | key: string | —  |
 | `info-click`       | key: string | —  |
 | `avatar-click`     | —           | —  |

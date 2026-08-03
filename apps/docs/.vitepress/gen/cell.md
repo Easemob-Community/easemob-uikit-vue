@@ -4,6 +4,7 @@
 ### Props
 
 | 属性         | 类型                                 | 默认值        | 说明                                              |
+| --- | --- | --- | --- |
 | clickable  | `boolean`                          | `true`     | 是否可点击（影响 cursor 和 hover），默认 true                |
 | active     | `boolean`                          | `false`    | 激活状态（当前选中项）                                     |
 | selected   | `boolean`                          | `false`    | 选中状态（多选模式）                                      |
@@ -20,12 +21,14 @@
 ### Events
 
 | 事件名           | 参数                | 说明 |
+| --- | --- | --- |
 | `click`       | —                 | —  |
 | `contextmenu` | event: MouseEvent | —  |
 
 ### Slots
 
 | 插槽名        | 说明 |
+| --- | --- |
 | `leading`  | —  |
 | `title`    | —  |
 | `subtitle` | —  |

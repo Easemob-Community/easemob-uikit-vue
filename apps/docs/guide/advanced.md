@@ -128,6 +128,92 @@ const info = await getUserInfo('user1')
 await updateOwnUserInfo({ nickname: '新昵称', avatarUrl: 'https://...' })
 ```
 
+## 国际化定制
+
+UIKit 内置中英文双语言包，组件文案自动跟随 `useLocale().setLocale()` 切换。同时提供了两个 API，方便业务方与插件开发者扩展自己的多语言文案或覆盖内置文案。
+
+### mergeLocaleMessages — 合并自定义文案
+
+增量注入自定义翻译 key。业务初始化或插件注册时调用，不会覆盖 UIKit 内置 key（同名 key 会被业务值覆盖）。
+
+```ts
+import { mergeLocaleMessages } from '@easemob/uikit'
+
+// 向中文包注入自定义文案
+mergeLocaleMessages('zh-CN', {
+  'plugin.quickReply.title': '快捷回复',
+  'plugin.quickReply.empty': '请先选择一个会话',
+})
+
+// 向英文包注入
+mergeLocaleMessages('en', {
+  'plugin.quickReply.title': 'Quick Reply',
+  'plugin.quickReply.empty': 'Please select a conversation first',
+})
+```
+
+此后在组件内通过 `useLocale().t('plugin.quickReply.title')` 即可拿到对应文案，无需额外配置。
+
+### findLocaleKey — 反查文案对应的 locale key
+
+当你看到界面上某个文案想要覆盖、却不知道对应哪个 key 时，用 `findLocaleKey` 直接将文案反查为 key 列表。支持单个 / 批量查询、模糊 / 精确匹配、指定语言包。
+
+```ts
+import { findLocaleKey } from '@easemob/uikit'
+
+// 单个查询（默认模糊匹配）
+findLocaleKey('暂无会话')
+// ['conversation.empty']
+
+// 批量查询
+findLocaleKey(['暂无会话', '发送名片', '名片'])
+// ['conversation.empty', 'message.sendCard', 'message.card', ...]
+
+// 精确匹配：只有完整文案一致才返回
+findLocaleKey('发送', { exact: true })
+
+// 指定语言包查询
+findLocaleKey('No conversation', { locale: 'en' })
+```
+
+`findLocaleKey` 返回的 key 数组可直接配合 `mergeLocaleMessages` 覆盖内置文案：
+
+```ts
+import { findLocaleKey, mergeLocaleMessages } from '@easemob/uikit'
+
+function overrideLocale(text: string, newText: string, locale = 'zh-CN') {
+  const keys = findLocaleKey(text, { locale })
+  const patch: Record<string, string> = {}
+  for (const k of keys) patch[k] = newText
+  mergeLocaleMessages(locale, patch)
+}
+
+overrideLocale('暂无会话', '没有会话哦~')
+overrideLocale('No conversation', 'No chats yet~', 'en')
+```
+
+API 签名：
+
+```ts
+export interface FindLocaleKeyOptions {
+  /** 是否精确匹配完整文案，默认 false（包含匹配） */
+  exact?: boolean
+  /** 指定查找的语言包，默认使用当前语言 */
+  locale?: string
+}
+
+export function findLocaleKey(
+  text: string | string[],
+  options?: FindLocaleKeyOptions,
+): string[]
+```
+
+### 运行原理
+
+- `mergeLocaleMessages` 将传入的 key-value 对象**浅合并**到指定语种的全局消息表中。同一 key 后调用的值覆盖先前的值。
+- `findLocaleKey` 遍历指定语言包的所有 value，对命中的 value 反查其 key。支持同一文案对应多个 key 的场景（如「名片」同时命中 `message.card` 和 `message.contactCard`）。
+- 两个 API 均可在初始化阶段或运行时任意时刻调用，响应式生效。
+
 ## H5 与多端适配
 
 移动端场景请阅读 [H5 适配](./h5-adaptation)，覆盖安全区、键盘避让、下拉刷新与手势优化。

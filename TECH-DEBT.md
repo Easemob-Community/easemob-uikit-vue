@@ -132,6 +132,7 @@
 - **证据**：`store/theme.ts` L111-L122 无 `typeof document` 守卫；`composables/use-h5-adaptation.ts` L57-L79 `updateViewportAndSafeArea()` 内无 `typeof window` 守卫（ref 初始值 L46-47 有守卫但函数内没有）。
 - **建议修法**：ThemeStore 移除 L111-122 直接调用（`watchEffect` 已覆盖）或加 `if (typeof document === 'undefined') return`；`useH5Adaptation` 函数开头加 `if (typeof window === 'undefined') return`。
 - **修复**：已于 2026-07-28 修复。两部分均已修：`store/theme.ts` 删除 setup 中重复直写 `document.documentElement` 的初始化代码（`watchEffect` 首次同步执行已覆盖，行为不变）；`composables/use-h5-adaptation.ts` 的 `updateViewportAndSafeArea()` 开头补 `if (typeof window === 'undefined') return` 守卫。
+- **残留（2026-08-03 文档站建设时发现）**：`composables/use-h5-adaptation.ts` 的 `useEventListener(window, 'resize', ...)` 与 `if (window.visualViewport)`（约 L94-L97）仍无 `typeof window` 守卫，SSR 环境（如 VitePress 预渲染）setup 阶段直接 `ReferenceError: window is not defined`。文档站目前以 `ClientOnly` 包裹 demo 规避（`apps/docs/.vitepress/theme/DemoBlock.vue`），库本体仍需补守卫。
 - **关联 skill**：`uikit-styling-theming` / `uikit-h5-adaptation`
 
 ### [x] D22. 自动重连后未恢复 `currentUser`，`isLoggedIn` 永远为 false

@@ -4,6 +4,7 @@
 ### Props
 
 | 属性                | 类型        | 默认值     | 说明                                          |
+| --- | --- | --- | --- |
 | value             | `string`  | —       | 当前自定义状态文本                                   |
 | showCustom        | `boolean` | `true`  | 是否允许自定义状态，默认 true                           |
 | customPlaceholder | `string`  | —       | 自定义状态输入框占位符                                 |
@@ -14,6 +15,7 @@
 ### Events
 
 | 事件名            | 参数                                         | 说明 |
+| --- | --- | --- |
 | `select`       | status: PresenceSelectorValue, ext: string | —  |
 | `cancel`       | —                                          | —  |
 | `custom-click` | —                                          | —  |

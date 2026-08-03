@@ -4,6 +4,7 @@
 ### Props
 
 | 属性    | 类型                                                                       | 默认值              | 说明                                                              |
+| --- | --- | --- | --- |
 | name  | `string`                                                                 | —                | 图标名称，格式 "category/icon-name"，如 "actions/trash"；传入 name 后无需 slot |
 | size  | `number`                                                                 | `20`             | —                                                               |
 | color | `string`                                                                 | `'currentColor'` | —                                                               |

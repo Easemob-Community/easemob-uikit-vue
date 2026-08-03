@@ -4,6 +4,7 @@
 ### Props
 
 | 属性                  | 类型        | 默认值                         | 说明 |
+| --- | --- | --- | --- |
 | show                | `boolean` | —                           | —  |
 | title               | `string`  | `''`                        | —  |
 | showCancel          | `boolean` | `true`                      | —  |
@@ -14,6 +15,7 @@
 ### Events
 
 | 事件名           | 参数             | 说明 |
+| --- | --- | --- |
 | `update:show` | value: boolean | —  |
 | `confirm`     | —              | —  |
 | `cancel`      | —              | —  |

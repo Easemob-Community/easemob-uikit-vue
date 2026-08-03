@@ -12,11 +12,11 @@ export default defineConfig({
   ignoreDeadLinks: [/packages\/uikit\//],
 
   head: [
-    ['link', { rel: 'icon', href: '/logo-light.svg' }],
+    ['link', { rel: 'icon', href: '/favicon.png', type: 'image/png' }],
   ],
 
   themeConfig: {
-    logo: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
+    logo: { light: '/logo-light.png', dark: '/logo-dark.png' },
     siteTitle: 'Easemob UIKit',
 
     nav: [

@@ -4,6 +4,7 @@
 ### Props
 
 | 属性       | 类型                                                             | 默认值         | 说明                                      |
+| --- | --- | --- | --- |
 | icon     | `string`                                                       | —           | 图标名称，格式 "category/icon-name"            |
 | iconSize | `number`                                                       | `undefined` | —                                       |
 | type     | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger'` | `'default'` | 按钮语义类型                                  |
@@ -15,4 +16,5 @@
 ### Events
 
 | 事件名     | 参数                | 说明 |
+| --- | --- | --- |
 | `click` | event: MouseEvent | —  |
