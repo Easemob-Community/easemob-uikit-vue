@@ -263,7 +263,7 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     runAfterSend(msg)
   }).catch((e: any) => {
     console.error('[MessageInput] sendFile failed:', formatSdkError(e))
-    showToast(e?.message || t('message.send.failed') || '发送失败')
+    showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
   })
   clearQuote()
 }
@@ -476,7 +476,7 @@ function handleVoiceEnd(durationFromInput?: number) {
         })
         .catch((e: any) => {
           console.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
-          showToast(e?.message || t('message.send.failed') || '发送失败')
+          showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
         })
       clearQuote()
     }
