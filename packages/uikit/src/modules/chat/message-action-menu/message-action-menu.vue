@@ -37,6 +37,7 @@ function onItemClick(action: MessageActionItem) {
       <Icon v-if="action.icon" :name="action.icon" :size="16" />
       <span>{{ action.label }}</span>
     </div>
+    <slot name="extra" />
   </div>
 </template>
 

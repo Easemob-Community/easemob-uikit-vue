@@ -30,6 +30,8 @@ import type { EmojiStickerPack } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
+import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
+import DemoQuickReplyPanel from './components/demo-quick-reply-panel.vue'
 
 /** Provider 面 三开关 + 自定义 dataSource（v-model 双向绑定到 app.vue） */
 const props = defineProps<{
@@ -117,17 +119,26 @@ const showCreateGroupModal = ref(false)
 // 名片消息演示：用户名片弹窗
 const showCardUserId = ref('')
 const showCardModal = ref(false)
+// 名片选择弹窗
+const showCardPickerModal = ref(false)
 
-/** 发送当前登录用户的名片到当前会话（扩展消息演示） */
-async function sendOwnCard() {
+// 快捷回复面板
+const showQuickReplyPanel = ref(false)
+const chatContainerRef = ref<{ setText?: (text: string) => void }>()
+
+/** 发送指定用户的名片到当前会话（扩展消息演示） */
+async function sendCard(userId: string) {
   const cvs = stores.conversation.currentConversation
-  if (!cvs || !currentUser.value)
+  if (!cvs || !userId)
     return
-  const params: Record<string, string> = { uid: currentUser.value }
-  if (ownDisplayName.value)
-    params.nickname = ownDisplayName.value
-  if (ownAvatarUrl.value)
-    params.avatar = ownAvatarUrl.value
+  const params: Record<string, string> = { uid: userId }
+  const contact = stores.contact.getContact(userId)
+  const userInfo = stores.userInfo.getUserInfo(userId)
+  const nickname = contact?.remark || userInfo?.nickname || (userId === currentUser.value ? ownDisplayName.value : undefined) || userId
+  params.nickname = nickname
+  const avatar = userInfo?.avatarUrl || contact?.avatar || (userId === currentUser.value ? ownAvatarUrl.value : undefined)
+  if (avatar)
+    params.avatar = avatar
   await sendCustomMessage('userCard', params)
 }
 
@@ -487,11 +498,32 @@ function injectMockContacts() {
           :group-id="detailGroupId"
           @send-message="enterChatWithGroup"
         />
-        <EmChatContainer v-else :config="chatConfig">
-          <template #header-extra>
-            <button class="demo-btn demo-btn--sm" @click="sendOwnCard">
-              发名片
+        <EmChatContainer
+          v-else
+          ref="chatContainerRef"
+          :config="chatConfig"
+        >
+          <template #toolbar-extra="{ togglePanel: toggleQuickReplyPanel }">
+            <button
+              class="demo-toolbar-btn"
+              title="快捷回复"
+              @click="toggleQuickReplyPanel"
+            >
+              <EmIcon name="chat/3lines_n_arrow" :size="22" />
             </button>
+            <button
+              class="demo-toolbar-btn"
+              title="发送名片"
+              @click="showCardPickerModal = true"
+            >
+              <EmIcon name="people/person_single" :size="22" />
+            </button>
+          </template>
+          <template #input-panel="{ showPanel }">
+            <DemoQuickReplyPanel
+              v-if="showPanel"
+              @select="(text) => chatContainerRef?.setText?.(text)"
+            />
           </template>
           <template #message-custom="{ message }">
             <DemoCardMessage
@@ -560,11 +592,31 @@ function injectMockContacts() {
           <span class="h5-page__header-spacer" />
         </div>
         <div class="h5-page__body">
-          <EmChatContainer :config="chatConfig">
-            <template #header-extra>
-              <button class="demo-btn demo-btn--sm" @click="sendOwnCard">
-                发名片
+          <EmChatContainer
+            ref="chatContainerRef"
+            :config="chatConfig"
+          >
+            <template #toolbar-extra="{ togglePanel: toggleQuickReplyPanel }">
+              <button
+                class="demo-toolbar-btn"
+                title="快捷回复"
+                @click="toggleQuickReplyPanel"
+              >
+                <EmIcon name="chat/3lines_n_arrow" :size="22" />
               </button>
+              <button
+                class="demo-toolbar-btn"
+                title="发送名片"
+                @click="showCardPickerModal = true"
+              >
+                <EmIcon name="people/person_single" :size="22" />
+              </button>
+            </template>
+            <template #input-panel="{ showPanel }">
+              <DemoQuickReplyPanel
+                v-if="showPanel"
+                @select="(text) => chatContainerRef?.setText?.(text)"
+              />
             </template>
             <template #message-custom="{ message }">
               <DemoCardMessage
@@ -1316,6 +1368,12 @@ function injectMockContacts() {
     <EmAddContactModal v-model:show="showAddContactModal" />
     <EmCreateGroupModal v-model:show="showCreateGroupModal" />
     <EmUserCardModal v-model:show="showCardModal" :user-id="showCardUserId" @send-message="enterChatWithUser" />
+    <DemoCardPickerModal
+      v-model:show="showCardPickerModal"
+      :own-user-id="currentUser || undefined"
+      :contacts="stores.contact.contactList"
+      @select="sendCard"
+    />
   </div>
 </template>
 
@@ -1360,6 +1418,29 @@ function injectMockContacts() {
 .demo-btn--icon {
   width: 32px;
   padding: 0;
+}
+
+.demo-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--uikit-components-radius, 6px);
+  background: none;
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  flex-shrink: 0;
+}
+
+.demo-toolbar-btn:hover {
+  background-color: var(--uikit-bg-hover);
+  color: var(--uikit-text-primary);
 }
 
 .demo-drawer {

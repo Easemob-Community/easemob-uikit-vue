@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
+import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
 import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
 import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
@@ -539,6 +540,27 @@ function getText(): string {
   }
 }
 
+/** 聚焦输入框 */
+function focus() {
+  if (isMobile.value) {
+    h5InputRef.value?.$el?.querySelector('textarea')?.focus()
+  }
+  else if (inputMode.value === 'simple') {
+    simpleInputRef.value?.$el?.querySelector('textarea')?.focus()
+    simpleInputRef.value?.$el?.querySelector('input')?.focus()
+  }
+  else {
+    richInputRef.value?.$el?.querySelector('[contenteditable]')?.focus()
+  }
+}
+
+/** 向 plugin 提供输入框操作能力 */
+provideMessageInputPluginContext({
+  setText,
+  getText,
+  focus,
+})
+
 defineExpose({
   setText,
   getText,
@@ -587,7 +609,14 @@ defineExpose({
       @mention-close="onMentionClose"
       @sticker-select="onStickerSelect"
       @focus="emit('focus')"
-    />
+    >
+      <template #toolbar-extra="slotProps">
+        <slot name="toolbar-extra" v-bind="slotProps" />
+      </template>
+      <template #input-panel="slotProps">
+        <slot name="input-panel" v-bind="slotProps" />
+      </template>
+    </H5Input>
 
     <!-- 简单输入框 -->
     <SimpleInput
@@ -604,7 +633,14 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @focus="emit('focus')"
-    />
+    >
+      <template #toolbar-extra="slotProps">
+        <slot name="toolbar-extra" v-bind="slotProps" />
+      </template>
+      <template #input-panel="slotProps">
+        <slot name="input-panel" v-bind="slotProps" />
+      </template>
+    </SimpleInput>
 
     <!-- 富文本输入框 -->
     <RichInput
@@ -618,7 +654,14 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @focus="emit('focus')"
-    />
+    >
+      <template #toolbar-extra="slotProps">
+        <slot name="toolbar-extra" v-bind="slotProps" />
+      </template>
+      <template #input-panel="slotProps">
+        <slot name="input-panel" v-bind="slotProps" />
+      </template>
+    </RichInput>
 
     <!-- PC 端 Emoji Popup -->
     <Popup

@@ -1,6 +1,7 @@
 import type { UiMessage } from '../../sdk/types'
 import type { MessageStatusValue } from '../../constants'
 import type { EmojiStickerPack } from '../../components/emoji-picker/types'
+import type { LastMessageTextResolver } from '../../utils/resolve-last-message-text'
 
 /** 消息气泡布局模式 */
 export type MessageLayout = 'left' | 'conversation'
@@ -202,6 +203,8 @@ export interface ChatConfig {
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
   }
+  /** 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 */
+  lastMessageTextResolver?: LastMessageTextResolver
   /** 文本消息配置 */
   textMessage?: {
     /** 是否启用 URL 识别为可点击链接，默认 true */

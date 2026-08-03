@@ -31,6 +31,7 @@ export interface MessageListEmits {
   (e: 'forward', messages: UiMessage[]): void
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
 const props = defineProps<MessageListProps>()
@@ -676,6 +677,7 @@ watch(locateRequest, (req) => {
           @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
+          @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
         >
           <!-- 透传消息类型级插槽到气泡包装器 -->
           <template
@@ -718,6 +720,7 @@ watch(locateRequest, (req) => {
           @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
+          @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
         >
           <!-- 透传消息类型级插槽到气泡包装器 -->
           <template

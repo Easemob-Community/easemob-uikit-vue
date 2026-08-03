@@ -8,6 +8,8 @@ import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
+import { provideChatPluginContext } from '../../composables/use-chat-plugin'
+import { resolveLastMessageText } from '../../utils/resolve-last-message-text'
 import { CONVERSATION_TYPE } from '../../constants'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
@@ -46,6 +48,7 @@ export interface ChatEmits {
   (e: 'at-me-click', userId: string): void
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
 const props = defineProps<ChatProps>()
@@ -63,11 +66,99 @@ defineExpose({
   getText: () => messageInputRef.value?.getText?.() || '',
 })
 
-const { currentConversation, isMultiSelectMode, messages, selectedMessages, exitMultiSelectMode, fetchHistoryMessages, enterEditMode, exitEditMode, fetchPinnedMessages, deleteMessages, forwardMessage, forwardCombineMessages, selectAllMessages, deselectAllMessages } = useChat()
+const {
+  currentConversation,
+  isMultiSelectMode,
+  messages,
+  selectedMessages,
+  exitMultiSelectMode,
+  fetchHistoryMessages,
+  enterEditMode,
+  exitEditMode,
+  fetchPinnedMessages,
+  deleteMessages,
+  forwardMessage,
+  forwardCombineMessages,
+  selectAllMessages,
+  deselectAllMessages,
+  sendTextMessage,
+  sendCustomMessage,
+  sendImageMessage,
+  sendFileMessage,
+  sendAudioMessage,
+  sendVideoMessage,
+  sendLocationMessage,
+} = useChat()
 const { stores, h5, client } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
+
+/** 群已读回执配置：透传给 plugin 的发送方法 */
+const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
+
+/** 获取用户显示名（备注 > 用户资料昵称 > ID） */
+function getUserDisplayName(userId: string): string {
+  const contact = stores.contact.getContact(userId)
+  const userInfo = stores.userInfo.getUserInfo(userId)
+  return contact?.remark || userInfo?.nickname || userId
+}
+
+/** 获取用户头像 */
+function getUserAvatar(userId: string): string | undefined {
+  const contact = stores.contact.getContact(userId)
+  const userInfo = stores.userInfo.getUserInfo(userId)
+  return userInfo?.avatarUrl || contact?.avatar
+}
+
+/** 向 plugin 提供聊天上下文与发送能力 */
+provideChatPluginContext({
+  currentConversation,
+  currentUserId: computed(() => client.value.currentUserId),
+  send: {
+    sendTextMessage: (text, ext) => sendTextMessage(text, ext, groupReadReceiptConfig.value),
+    sendCustomMessage,
+    sendImageMessage: (data, ext) => sendImageMessage(data, groupReadReceiptConfig.value, ext),
+    sendFileMessage: (file, ext) => sendFileMessage(file, groupReadReceiptConfig.value, ext),
+    sendAudioMessage: (file, duration, ext) => sendAudioMessage(file, duration, groupReadReceiptConfig.value, ext),
+    sendVideoMessage: (file, duration, ext) => sendVideoMessage(file, duration, groupReadReceiptConfig.value, ext),
+    sendLocationMessage: (body, ext) => sendLocationMessage(body.latitude, body.longitude, body.address, ext),
+  },
+  getUserDisplayName,
+  getUserAvatar,
+})
+
+/** 会话列表最新一条消息文案解析器 */
+const lastMessageTextResolver = computed(() => props.config?.lastMessageTextResolver)
+
+/** 已解析过的最新消息 ID，避免切换会话/加载历史时重复更新 */
+const lastResolvedMessageId = ref('')
+
+/** 切换会话时重置解析状态 */
+watch(
+  () => currentConversation.value?.id,
+  () => {
+    lastResolvedMessageId.value = ''
+  },
+)
+
+/** 当前会话最新消息变化时，自动更新会话列表的 lastMessageText */
+watch(
+  () => messages.value[messages.value.length - 1]?.msgServerId || messages.value[messages.value.length - 1]?.msgLocalId,
+  (newId) => {
+    if (!newId || newId === lastResolvedMessageId.value)
+      return
+    lastResolvedMessageId.value = newId
+    const lastMsg = messages.value[messages.value.length - 1]
+    const cvs = currentConversation.value
+    if (!lastMsg || !cvs || lastMsg.conversationId !== cvs.id)
+      return
+    stores.conversation.updateConversation(cvs.id, {
+      lastMessageText: resolveLastMessageText(lastMsg, lastMessageTextResolver.value),
+      lastMessageTime: lastMsg.timestamp,
+    })
+  },
+)
 
 /** 组件卸载时清理残留状态 */
 onUnmounted(() => {
@@ -780,15 +871,10 @@ async function onRemoveAdmin(member: UiGroupMember) {
             </slot>
           </div>
           <div class="chat__header-main">
-            <template v-if="customHeaderSlot">
-              <slot name="header-title" :conversation="currentConversation">
-                <span class="chat__title">{{ headerTitle }}</span>
-              </slot>
-              <slot name="header-extra" :conversation="currentConversation" />
-            </template>
-            <template v-else>
+            <slot name="header-title" :conversation="currentConversation">
               <span class="chat__title">{{ headerTitle }}</span>
-            </template>
+            </slot>
+            <slot name="header-extra" :conversation="currentConversation" />
           </div>
           <button
             v-if="currentConversation"
@@ -817,6 +903,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @recall-failed="(err, msg) => emit('recall-failed', err, msg)"
         @mention-click="(userId) => emit('at-me-click', userId)"
         @location-click="(body, msg) => emit('location-click', body, msg)"
+        @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
       >
         <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
         <template
@@ -852,7 +939,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
         :mention-contacts="mentionContacts"
         @send-success="handleSendSuccess"
         @focus="messageListRef?.scrollToBottom()"
-      />
+      >
+        <template #toolbar-extra="slotProps">
+          <slot name="toolbar-extra" v-bind="slotProps" />
+        </template>
+        <template #input-panel="slotProps">
+          <slot name="input-panel" v-bind="slotProps" />
+        </template>
+      </MessageInput>
 
       <!-- 聊天信息抽屉 -->
       <ChatInfoDrawer

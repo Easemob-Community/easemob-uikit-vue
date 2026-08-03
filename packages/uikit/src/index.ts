@@ -21,6 +21,9 @@ export * from './sdk'
 // Constants
 export * from './constants'
 
+// Utils
+export * from './utils/resolve-last-message-text'
+
 // Locale
 export * from './locale'
 

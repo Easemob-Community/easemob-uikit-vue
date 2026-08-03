@@ -23,6 +23,7 @@ export interface MessageRendererEmits {
   (e: 'view-combine', message: UiMessage): void
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
 const props = defineProps<MessageRendererProps>()
@@ -65,7 +66,11 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
 
     <!-- 类型级插槽覆盖：用户可通过 #message-txt 等完全替换某一类型的渲染 -->
     <div v-else-if="$slots[slotName]" class="message-renderer__slot">
-      <slot :name="slotName" :message="message" />
+      <slot
+        :name="slotName"
+        :message="message"
+        :emit-action="(action: string, payload?: any) => emit('custom-message-action', action, payload, message)"
+      />
     </div>
 
     <!-- 默认组件渲染 -->

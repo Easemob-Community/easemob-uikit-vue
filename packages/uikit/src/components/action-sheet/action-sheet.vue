@@ -65,6 +65,9 @@ function onCancel() {
           <span>{{ item.name }}</span>
         </div>
       </div>
+      <div class="uikit-action-sheet__extra">
+        <slot />
+      </div>
       <div class="uikit-action-sheet__cancel" @click="onCancel">
         {{ props.cancelText }}
       </div>
@@ -110,6 +113,11 @@ function onCancel() {
 .uikit-action-sheet__item--disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.uikit-action-sheet__extra {
+  display: flex;
+  flex-direction: column;
 }
 
 .uikit-action-sheet__cancel {

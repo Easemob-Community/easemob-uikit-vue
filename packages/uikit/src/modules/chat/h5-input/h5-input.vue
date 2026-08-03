@@ -63,10 +63,21 @@ const selectionColorVar = computed(() => props.config?.selectionColor || 'revert
 
 // ===== 面板（表情 / 更多）=====
 
-type PanelType = 'none' | 'emoji' | 'more'
+type PanelType = 'none' | 'emoji' | 'more' | 'custom'
 
 /** 当前展开的面板 */
 const activePanel = ref<PanelType>('none')
+
+/** 切换自定义面板（由 #input-panel 插槽使用） */
+function toggleCustomPanel() {
+  activePanel.value = activePanel.value === 'custom' ? 'none' : 'custom'
+}
+
+/** 关闭自定义面板 */
+function closeCustomPanel() {
+  if (activePanel.value === 'custom')
+    activePanel.value = 'none'
+}
 
 /** 键盘是否弹起（键盘高度由父级从 useUIKit().h5 透传） */
 const isKeyboardOpen = computed(() => (props.keyboardHeight ?? 0) > 0)
@@ -586,7 +597,17 @@ defineExpose({
           </div>
           <span class="h5-input__more-label">{{ item.label }}</span>
         </div>
+        <slot name="toolbar-extra" :toggle-panel="toggleCustomPanel" :show-panel="false" :close-panel="closeCustomPanel" />
       </div>
+    </div>
+
+    <!-- 自定义面板：由 #input-panel 插槽填充 -->
+    <div
+      v-else-if="activePanel === 'custom'"
+      class="h5-input__panel"
+      :style="{ height: panelHeightVar }"
+    >
+      <slot name="input-panel" :show-panel="true" :close-panel="closeCustomPanel" />
     </div>
 
     <!-- 录音浮层：时长 + 上滑取消提示 -->

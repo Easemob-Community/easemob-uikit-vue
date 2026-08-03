@@ -20,6 +20,7 @@ export interface ChatContainerEmits {
   (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
 const props = defineProps<ChatContainerProps>()
@@ -49,6 +50,7 @@ defineExpose({
       @recall-failed="(err: any, msg: UiMessage) => emit('recall-failed', err, msg)"
       @at-me-click="(userId: string) => emit('at-me-click', userId)"
       @location-click="(body: LocationMessageBody, msg: UiMessage) => emit('location-click', body, msg)"
+      @custom-message-action="(action: string, payload: any, msg: UiMessage) => emit('custom-message-action', action, payload, msg)"
     >
       <!-- 透传空状态插槽 -->
       <template #empty>

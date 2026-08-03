@@ -165,6 +165,19 @@ const showMicOn = computed(() => {
 /** 表情按钮 ref */
 const emojiBtnRef = ref<HTMLElement>()
 
+/** 是否展开自定义面板（由 #input-panel 插槽使用） */
+const showPanel = ref(false)
+
+/** 切换自定义面板 */
+function togglePanel() {
+  showPanel.value = !showPanel.value
+}
+
+/** 关闭自定义面板 */
+function closePanel() {
+  showPanel.value = false
+}
+
 /** 输入框元素引用（textarea 或 Input 组件实例） */
 const textareaRef = ref<HTMLTextAreaElement>()
 const inputComponentRef = ref<InstanceType<typeof Input>>()
@@ -373,6 +386,7 @@ defineExpose({
       <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
         <Icon :name="showMicOn ? 'audio-video/mic_on' : 'audio-video/mic'" :size="22" />
       </div>
+      <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
     </div>
 
     <!-- 输入区域 -->
@@ -419,6 +433,11 @@ defineExpose({
       <div v-else-if="isMobileRecording" class="simple-input__voice-btn-mobile">
         {{ t('chat.voice.releaseEnd') }}
       </div>
+    </div>
+
+    <!-- 自定义面板：由 #input-panel 插槽填充 -->
+    <div v-if="showPanel" class="simple-input__panel">
+      <slot name="input-panel" :show-panel="showPanel" :close-panel="closePanel" />
     </div>
 
     <!-- 发送按钮 -->
@@ -574,5 +593,10 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   padding: 8px 4px 4px 0;
+}
+
+.simple-input__panel {
+  border-top: 1px solid var(--uikit-border-color);
+  padding-top: 8px;
 }
 </style>

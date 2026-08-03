@@ -8,6 +8,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     DemoCardMessage: typeof import('./src/components/demo-card-message.vue')['default']
+    DemoCardPickerModal: typeof import('./src/components/demo-card-picker-modal.vue')['default']
+    DemoQuickReplyPanel: typeof import('./src/components/demo-quick-reply-panel.vue')['default']
     NavSidebar: typeof import('./src/components/nav-sidebar.vue')['default']
   }
 }

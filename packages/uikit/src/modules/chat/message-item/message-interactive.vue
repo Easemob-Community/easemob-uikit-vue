@@ -232,7 +232,11 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
     @update:show="onPopupClose"
     @close="onPopupClose"
   >
-    <MessageActionMenu :actions="actions" @select="onMenuSelect" />
+    <MessageActionMenu :actions="actions" @select="onMenuSelect">
+      <template #extra>
+        <slot name="message-action-extra" :message="props.message" />
+      </template>
+    </MessageActionMenu>
   </Popup>
 
   <!-- H5 端：ActionSheet 底部菜单 -->
@@ -241,7 +245,9 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
     :actions="actionSheetActions"
     @update:show="showActionSheet = $event"
     @select="onActionSheetSelect"
-  />
+  >
+    <slot name="message-action-extra" :message="props.message" />
+  </ActionSheet>
 </template>
 
 <style scoped>

@@ -41,6 +41,7 @@ export interface MessageBubbleWrapperEmits {
   (e: 'resend', message: UiMessage): void
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
 /** 弹窗中嵌套合并消息的层级栈 */
@@ -382,6 +383,7 @@ const isHighlighted = computed(() => {
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                   @location-click="emit('location-click', $event, message)"
+                  @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, message)"
                 >
                   <!-- 透传所有类型级插槽 -->
                   <template
@@ -392,6 +394,9 @@ const isHighlighted = computed(() => {
                     <slot :name="name" v-bind="slotProps" />
                   </template>
                 </MessageRenderer>
+                <template #message-action-extra="slotProps">
+                  <slot name="message-action-extra" v-bind="slotProps" />
+                </template>
               </MessageInteractive>
               <!-- 引用卡片（气泡下方） -->
               <QuoteCard
@@ -496,6 +501,7 @@ const isHighlighted = computed(() => {
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                   @location-click="emit('location-click', $event, message)"
+                  @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, message)"
                 >
                   <!-- 透传所有类型级插槽 -->
                   <template
@@ -506,6 +512,9 @@ const isHighlighted = computed(() => {
                     <slot :name="name" v-bind="slotProps" />
                   </template>
                 </MessageRenderer>
+                <template #message-action-extra="slotProps">
+                  <slot name="message-action-extra" v-bind="slotProps" />
+                </template>
               </MessageInteractive>
               <!-- 引用卡片（气泡下方） -->
               <QuoteCard

@@ -4,6 +4,7 @@ export * from './format-message'
 export * from './linkify'
 export * from './download'
 export * from './sdk-error'
+export * from './resolve-last-message-text'
 
 export function isEmpty(val: unknown): boolean {
   return val === undefined || val === null || val === ''
