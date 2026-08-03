@@ -54,6 +54,7 @@ const messages: LocaleMessages = {
   'message.cmd': '[指令]',
   'message.custom': '[自定义消息]',
   'message.location': '[位置]',
+  'message.card': '[名片]',
   'message.action.quote': '引用',
   'message.action.copy': '复制',
   'message.action.delete': '删除',

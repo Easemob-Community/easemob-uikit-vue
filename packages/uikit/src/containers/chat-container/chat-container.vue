@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
-import type { UiMessage } from '../../sdk/types'
+import type { LocationMessageBody, UiMessage } from '../../sdk/types'
 
 export interface ChatContainerProps {
   /** 聊天页面配置 */
@@ -19,6 +19,7 @@ export interface ChatContainerProps {
 export interface ChatContainerEmits {
   (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
+  (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
 }
 
 const props = defineProps<ChatContainerProps>()
@@ -47,6 +48,7 @@ defineExpose({
       :style="props.style"
       @recall-failed="(err: any, msg: UiMessage) => emit('recall-failed', err, msg)"
       @at-me-click="(userId: string) => emit('at-me-click', userId)"
+      @location-click="(body: LocationMessageBody, msg: UiMessage) => emit('location-click', body, msg)"
     >
       <!-- 透传空状态插槽 -->
       <template #empty>

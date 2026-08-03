@@ -12,7 +12,7 @@ import { useLocale } from '../../../locale'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import Modal from '../../../components/modal/modal.vue'
-import type { TextMessageBody, UiMessage } from '../../../sdk/types'
+import type { LocationMessageBody, TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
 import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
@@ -30,6 +30,7 @@ export interface MessageListEmits {
   (e: 'edit', message: UiMessage): void
   (e: 'forward', messages: UiMessage[]): void
   (e: 'mention-click', userId: string): void
+  (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
 }
 
 const props = defineProps<MessageListProps>()
@@ -674,7 +675,17 @@ watch(locateRequest, (req) => {
           @toggle-translation="onToggleTranslation"
           @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
-        />
+          @location-click="emit('location-click', $event, item.data as UiMessage)"
+        >
+          <!-- 透传消息类型级插槽到气泡包装器 -->
+          <template
+            v-for="(_, name) in $slots"
+            :key="name"
+            #[name]="slotProps"
+          >
+            <slot :name="name" v-bind="slotProps" />
+          </template>
+        </MessageBubbleWrapper>
       </template>
     </MessageVirtualList>
 
@@ -706,7 +717,17 @@ watch(locateRequest, (req) => {
           @toggle-translation="onToggleTranslation"
           @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
-        />
+          @location-click="emit('location-click', $event, item.data as UiMessage)"
+        >
+          <!-- 透传消息类型级插槽到气泡包装器 -->
+          <template
+            v-for="(_, name) in $slots"
+            :key="name"
+            #[name]="slotProps"
+          >
+            <slot :name="name" v-bind="slotProps" />
+          </template>
+        </MessageBubbleWrapper>
       </div>
     </div>
 

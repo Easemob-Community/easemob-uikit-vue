@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    DemoCardMessage: typeof import('./src/components/demo-card-message.vue')['default']
     NavSidebar: typeof import('./src/components/nav-sidebar.vue')['default']
   }
 }

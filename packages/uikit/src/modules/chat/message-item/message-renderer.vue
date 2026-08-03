@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
-import type { UiMessage } from '../../../sdk/types'
+import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
 import { MESSAGE_TYPE } from '../../../constants'
 import TextMessage from './text-message.vue'
 import ImageMessage from './image-message.vue'
@@ -10,6 +10,7 @@ import VideoMessage from './video-message.vue'
 import FileMessage from './file-message.vue'
 import CombineMessage from './combine-message.vue'
 import CustomMessage from './custom-message.vue'
+import LocationMessage from './location-message.vue'
 
 export interface MessageRendererProps {
   message: UiMessage
@@ -21,6 +22,7 @@ export interface MessageRendererEmits {
   (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'view-combine', message: UiMessage): void
   (e: 'mention-click', userId: string): void
+  (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
 }
 
 const props = defineProps<MessageRendererProps>()
@@ -35,6 +37,7 @@ const messageComponentMap: Record<string, Component> = {
   [MESSAGE_TYPE.FILE]: FileMessage,
   [MESSAGE_TYPE.COMBINE]: CombineMessage,
   [MESSAGE_TYPE.CUSTOM]: CustomMessage,
+  [MESSAGE_TYPE.LOCATION]: LocationMessage,
 }
 
 /** 当前消息对应的渲染组件 */
@@ -76,6 +79,7 @@ const isNotice = computed(() => (props.message.type as string) === 'notice')
       @toggle-voice-text="emit('toggle-voice-text', $event)"
       @view="emit('view-combine', $event)"
       @mention-click="emit('mention-click', $event)"
+      @location-click="emit('location-click', $event, message)"
     />
 
     <!-- 未识别的消息类型 -->

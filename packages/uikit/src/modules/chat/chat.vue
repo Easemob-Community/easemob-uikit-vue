@@ -9,7 +9,7 @@ import { useToast } from '../../composables/use-toast'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { CONVERSATION_TYPE } from '../../constants'
-import type { UiConversation as Conversation, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
+import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import InviteMemberModal from '../group/invite-member-modal.vue'
@@ -45,6 +45,7 @@ export interface ChatEmits {
   (e: 'recall-failed', error: any, message: UiMessage): void
   (e: 'at-me-click', userId: string): void
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
+  (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
 }
 
 const props = defineProps<ChatProps>()
@@ -807,7 +808,25 @@ async function onRemoveAdmin(member: UiGroupMember) {
       />
 
       <!-- 消息列表 -->
-      <MessageList ref="messageListRef" :config="props.config" @reedit="onReedit" @edit="onEdit" @forward="openForwardModal" @recall-failed="(err, msg) => emit('recall-failed', err, msg)" @mention-click="(userId) => emit('at-me-click', userId)" />
+      <MessageList
+        ref="messageListRef"
+        :config="props.config"
+        @reedit="onReedit"
+        @edit="onEdit"
+        @forward="openForwardModal"
+        @recall-failed="(err, msg) => emit('recall-failed', err, msg)"
+        @mention-click="(userId) => emit('at-me-click', userId)"
+        @location-click="(body, msg) => emit('location-click', body, msg)"
+      >
+        <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
+        <template
+          v-for="(_, name) in $slots"
+          :key="name"
+          #[name]="slotProps"
+        >
+          <slot :name="name" v-bind="slotProps" />
+        </template>
+      </MessageList>
 
       <!-- 多选模式底部操作栏 -->
       <MultiSelectBar

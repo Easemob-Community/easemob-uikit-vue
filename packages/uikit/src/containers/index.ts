@@ -23,3 +23,6 @@ export type {
 } from './address-book-container/address-book-container.vue'
 export type { ContactListContainerProps } from './contact-list-container/contact-list-container.vue'
 export type { GroupListContainerProps } from './group-list-container/group-list-container.vue'
+export type { ChatContainerProps, ChatContainerEmits } from './chat-container/chat-container.vue'
+export type { ConversationContainerProps } from './conversation-container/conversation-container.vue'
+export type { ProviderProps } from './uikit-provider/uikit-provider.vue'

@@ -7,23 +7,29 @@ import {
   EmContactDetail,
   EmConversationContainer,
   EmCreateGroupModal,
+  EmCustomMessage,
   EmGroupDetail,
   EmIcon,
   EmInput,
   EmPopup,
+  EmUserCardModal,
   setPinyinAdapter,
   useClient,
   useContactStore,
   useConversation,
   useLocale,
+  useMessageSend,
+  useOwnUserInfo,
   useTheme,
   useUIKit,
   useViewport,
 } from '@easemob/uikit'
-import type { UiContact, UiConversation, UiGroup } from '@easemob/uikit'
+import type { UiContact, UiConversation, UiGroup, UiMessage } from '@easemob/uikit'
+import type { CustomMessageBody } from '@easemob/uikit'
 import type { EmojiStickerPack } from '@easemob/uikit'
 import { pinyin } from 'pinyin-pro'
 import NavSidebar from './components/nav-sidebar.vue'
+import DemoCardMessage from './components/demo-card-message.vue'
 
 /** Provider 面 三开关 + 自定义 dataSource（v-model 双向绑定到 app.vue） */
 const props = defineProps<{
@@ -49,6 +55,8 @@ const { locale, setLocale } = useLocale()
 const { stores, theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
 const { setLocalConversationList, selectConversation } = useConversation()
+const { sendCustomMessage } = useMessageSend()
+const { displayName: ownDisplayName, avatarUrl: ownAvatarUrl } = useOwnUserInfo()
 const { isMobile } = useViewport()
 
 /** 左侧边栏 tab：会话 / 联系人 */
@@ -105,6 +113,34 @@ const showGroupSearch = ref(true)
 // 通讯录操作弹窗
 const showAddContactModal = ref(false)
 const showCreateGroupModal = ref(false)
+
+// 名片消息演示：用户名片弹窗
+const showCardUserId = ref('')
+const showCardModal = ref(false)
+
+/** 发送当前登录用户的名片到当前会话（扩展消息演示） */
+async function sendOwnCard() {
+  const cvs = stores.conversation.currentConversation
+  if (!cvs || !currentUser.value)
+    return
+  const params: Record<string, string> = { uid: currentUser.value }
+  if (ownDisplayName.value)
+    params.nickname = ownDisplayName.value
+  if (ownAvatarUrl.value)
+    params.avatar = ownAvatarUrl.value
+  await sendCustomMessage('userCard', params)
+}
+
+/** 判断 custom 消息是否为名片 */
+function isUserCardMessage(message: UiMessage): boolean {
+  return message.type === 'custom' && (message.body as CustomMessageBody).event === 'userCard'
+}
+
+/** 打开名片弹窗 */
+function openCardModal(userId: string) {
+  showCardUserId.value = userId
+  showCardModal.value = true
+}
 
 // 群管理 Demo 配置开关
 const groupManagementConfig = ref({
@@ -451,7 +487,21 @@ function injectMockContacts() {
           :group-id="detailGroupId"
           @send-message="enterChatWithGroup"
         />
-        <EmChatContainer v-else :config="chatConfig" />
+        <EmChatContainer v-else :config="chatConfig">
+          <template #header-extra>
+            <button class="demo-btn demo-btn--sm" @click="sendOwnCard">
+              发名片
+            </button>
+          </template>
+          <template #message-custom="{ message }">
+            <DemoCardMessage
+              v-if="isUserCardMessage(message as UiMessage)"
+              :message="message as UiMessage"
+              @card-click="openCardModal"
+            />
+            <EmCustomMessage v-else :message="message as UiMessage" />
+          </template>
+        </EmChatContainer>
       </div>
     </template>
 
@@ -510,7 +560,21 @@ function injectMockContacts() {
           <span class="h5-page__header-spacer" />
         </div>
         <div class="h5-page__body">
-          <EmChatContainer :config="chatConfig" />
+          <EmChatContainer :config="chatConfig">
+            <template #header-extra>
+              <button class="demo-btn demo-btn--sm" @click="sendOwnCard">
+                发名片
+              </button>
+            </template>
+            <template #message-custom="{ message }">
+              <DemoCardMessage
+                v-if="isUserCardMessage(message as UiMessage)"
+                :message="message as UiMessage"
+                @card-click="openCardModal"
+              />
+              <EmCustomMessage v-else :message="message as UiMessage" />
+            </template>
+          </EmChatContainer>
         </div>
       </div>
 
@@ -1248,9 +1312,10 @@ function injectMockContacts() {
       </div>
     </EmPopup>
 
-    <!-- 添加好友 / 创建群组 -->
+    <!-- 添加好友 / 创建群组 / 名片弹窗 -->
     <EmAddContactModal v-model:show="showAddContactModal" />
     <EmCreateGroupModal v-model:show="showCreateGroupModal" />
+    <EmUserCardModal v-model:show="showCardModal" :user-id="showCardUserId" @send-message="enterChatWithUser" />
   </div>
 </template>
 

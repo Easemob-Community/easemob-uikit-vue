@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import QuoteCard from '../quote/quote-card.vue'
-import type { UiMessage } from '../../../sdk/types'
+import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
 import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
@@ -40,6 +40,7 @@ export interface MessageBubbleWrapperEmits {
   (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'resend', message: UiMessage): void
   (e: 'mention-click', userId: string): void
+  (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
 }
 
 /** 弹窗中嵌套合并消息的层级栈 */
@@ -380,6 +381,7 @@ const isHighlighted = computed(() => {
                   @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
+                  @location-click="emit('location-click', $event, message)"
                 >
                   <!-- 透传所有类型级插槽 -->
                   <template
@@ -493,6 +495,7 @@ const isHighlighted = computed(() => {
                   @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
+                  @location-click="emit('location-click', $event, message)"
                 >
                   <!-- 透传所有类型级插槽 -->
                   <template

@@ -131,6 +131,7 @@ const ADD_ICONS = {
   'status/success': 'circle-check', // toast.vue success 状态
   'status/error': 'circle-x', // toast.vue error 状态
   'status/warning': 'alert-triangle', // toast.vue warning 状态
+  'misc/map_pin': 'map-pin', // 位置消息图标（location-message.vue）
 
   // ---------- empty states ----------
   'empty/contact': 'users', // 暂无联系人

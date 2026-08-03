@@ -54,6 +54,7 @@ const messages: LocaleMessages = {
   'message.cmd': '[Command]',
   'message.custom': '[Custom]',
   'message.location': '[Location]',
+  'message.card': '[Contact]',
   'message.action.quote': 'Quote',
   'message.action.copy': 'Copy',
   'message.action.delete': 'Delete',

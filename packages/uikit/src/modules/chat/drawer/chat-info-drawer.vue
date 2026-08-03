@@ -17,6 +17,7 @@ import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
 import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatDrawer from './chat-drawer.vue'
+import GroupAnnouncement from '../../group/group-announcement.vue'
 
 export interface ChatInfoDrawerProps {
   show: boolean
@@ -96,11 +97,6 @@ const isEditingGroupName = ref(false)
 const groupNameInputRef = ref<HTMLInputElement>()
 const groupNameInput = ref('')
 const savingGroupName = ref(false)
-/** 群公告编辑 */
-const isEditingAnnouncement = ref(false)
-const announcementInputRef = ref<HTMLTextAreaElement>()
-const announcementInput = ref('')
-const savingAnnouncement = ref(false)
 /** 群描述编辑 */
 const isEditingDescription = ref(false)
 const descriptionInputRef = ref<HTMLTextAreaElement>()
@@ -145,7 +141,6 @@ function onClose() {
   emit('update:show', false)
   isEditingRemark.value = false
   isEditingGroupName.value = false
-  isEditingAnnouncement.value = false
   isEditingDescription.value = false
 }
 
@@ -185,9 +180,6 @@ const group = computed(() =>
 const members = computed<UiGroupMember[]>(() =>
   groupId.value ? getGroupMembers(groupId.value) : [],
 )
-const announcement = computed(() =>
-  groupId.value ? getGroupAnnouncement(groupId.value) : '',
-)
 const currentUserRole = computed(() => {
   if (!currentUserId.value)
     return undefined
@@ -204,14 +196,6 @@ watch(
   (name) => {
     if (!isEditingGroupName.value)
       groupNameInput.value = name || ''
-  },
-  { immediate: true },
-)
-watch(
-  () => announcement.value,
-  (val) => {
-    if (!isEditingAnnouncement.value)
-      announcementInput.value = val || ''
   },
   { immediate: true },
 )
@@ -235,12 +219,6 @@ watch(isEditingGroupName, async (editing) => {
   if (editing) {
     await nextTick()
     groupNameInputRef.value?.focus()
-  }
-})
-watch(isEditingAnnouncement, async (editing) => {
-  if (editing) {
-    await nextTick()
-    announcementInputRef.value?.focus()
   }
 })
 watch(isEditingDescription, async (editing) => {
@@ -273,25 +251,6 @@ async function saveGroupName() {
 function cancelEditGroupName() {
   groupNameInput.value = props.conversation?.name || ''
   isEditingGroupName.value = false
-}
-
-/** 保存群公告 */
-async function saveAnnouncement() {
-  const id = groupId.value
-  if (!id)
-    return
-  savingAnnouncement.value = true
-  try {
-    await updateGroupAnnouncement(id, announcementInput.value)
-    isEditingAnnouncement.value = false
-    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
-  }
-  catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
-  }
-  finally {
-    savingAnnouncement.value = false
-  }
 }
 
 /** 保存群描述 */
@@ -741,53 +700,7 @@ defineExpose({
 
         <!-- 群聊：群公告 -->
         <div v-if="isGroup" class="chat-info-drawer__section-group">
-          <div class="chat-info-drawer__section-label-row">
-            <span class="chat-info-drawer__section-label">{{ t('chat.info.groupAnnouncement') }}</span>
-            <IconButton
-              v-if="isAdminOrOwner && !isEditingAnnouncement"
-              icon="actions/edit"
-              size="small"
-              type="primary"
-              :title="t('chat.info.edit') || '编辑'"
-              @click="isEditingAnnouncement = true"
-            />
-          </div>
-          <div class="chat-info-drawer__section">
-            <template v-if="!isEditingAnnouncement">
-              <div class="chat-info-drawer__announcement">
-                <span v-if="loadingGroup" class="chat-info-drawer__placeholder">{{ t('common.loading') }}</span>
-                <span v-else-if="announcement">{{ announcement }}</span>
-                <span v-else class="chat-info-drawer__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
-              </div>
-            </template>
-            <div v-else class="chat-info-drawer__inline-edit">
-              <textarea
-                ref="announcementInputRef"
-                v-model="announcementInput"
-                class="chat-info-drawer__inline-textarea"
-                :placeholder="t('chat.info.groupAnnouncementPlaceholder')"
-                rows="3"
-              />
-              <div class="chat-info-drawer__inline-edit-actions">
-                <IconButton
-                  icon="actions/xmark_thick"
-                  size="small"
-                  type="danger"
-                  :title="t('button.cancel') || '取消'"
-                  @click="isEditingAnnouncement = false"
-                />
-                <IconButton
-                  class="chat-info-drawer__inline-save"
-                  icon="actions/check"
-                  size="small"
-                  type="success"
-                  :disabled="savingAnnouncement"
-                  :title="t('chat.info.save') || '保存'"
-                  @click="saveAnnouncement"
-                />
-              </div>
-            </div>
-          </div>
+          <GroupAnnouncement :group-id="groupId" :loading="loadingGroup" />
         </div>
 
         <!-- 群聊：群描述 -->
@@ -1140,7 +1053,6 @@ defineExpose({
   gap: 8px;
 }
 
-.chat-info-drawer__announcement,
 .chat-info-drawer__description {
   font-size: 14px;
   color: var(--uikit-text-primary);
