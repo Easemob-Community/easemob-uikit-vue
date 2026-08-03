@@ -1,3 +1,15 @@
+import { isSDKError } from 'easemob-websdk'
+
+/**
+ * 安全格式化 SDK 错误，便于日志/调试输出。
+ * SDK 错误会调用其内置的 `toJSON()`，其他错误保持原样返回。
+ */
+export function formatSdkError(error: unknown): unknown {
+  if (isSDKError(error))
+    return error.toJSON()
+  return error
+}
+
 /**
  * 从 SDK 抛出的错误中提取可读 reason。
  * 兼容 Error 实例、字符串、以及带 reason 字段的对象。
@@ -23,15 +35,17 @@ export function resolveSdkErrorI18nKey(reason: string): string {
     || lower.includes('disconnected')
     || lower.includes('connection is closed')
     || lower.includes('chatclient is not connected')
-  )
+  ) {
     return 'error.notConnected'
+  }
   if (
     lower.includes('network')
     || lower.includes('net::err')
     || lower.includes('failed to fetch')
     || lower.includes('network request failed')
-  )
+  ) {
     return 'error.network'
+  }
   if (lower.includes('timeout') || lower.includes('timed out'))
     return 'error.timeout'
   return 'error.unknown'

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
 import type { UserInfo } from 'easemob-websdk'
+import { formatSdkError } from '../../utils/sdk-error'
 import {
   type ContactFetchMode,
   type H5AdaptationConfig,
@@ -164,7 +165,7 @@ watch(
         ctx.stores.contact.setBlackList(list)
       }
       catch (e) {
-        console.warn('[UIKit] fetch blocklist failed:', e)
+        console.warn('[UIKit] fetch blocklist failed:', formatSdkError(e))
       }
     }
 
@@ -177,7 +178,7 @@ watch(
         ctx.stores.contact.setContactList(result.list)
       }
       catch (e) {
-        console.warn('[UIKit] fetch contacts failed:', e)
+        console.warn('[UIKit] fetch contacts failed:', formatSdkError(e))
       }
     }
   },

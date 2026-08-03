@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
+import { formatSdkError } from '../../../utils/sdk-error'
 import { useLocale } from '../../../locale'
 import { useUIKit } from '../../../composables/use-uikit'
 import { toUiMessage } from '../../../sdk/adapter/message-adapter'
@@ -88,7 +89,7 @@ async function loadMessages() {
     }
   }
   catch (e) {
-    console.warn('[CombineMessageModal] downloadAndParseCombineMessage failed:', e)
+    console.warn('[CombineMessageModal] downloadAndParseCombineMessage failed:', formatSdkError(e))
     const errMsg = e instanceof Error ? e.message : String(e)
     loadError.value = (t('message.forward.parseFailed') || '解析失败') + (errMsg ? `: ${errMsg}` : '')
   }

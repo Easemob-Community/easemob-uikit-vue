@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { formatSdkError } from '../../../utils/sdk-error'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
@@ -8,8 +9,8 @@ import { useToast } from '../../../composables/use-toast'
 import { useViewport } from '../../../composables/use-viewport'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
-import SharedFileListItem from './shared-file-list-item.vue'
 import Empty from '../../../components/empty/empty.vue'
+import SharedFileListItem from './shared-file-list-item.vue'
 
 export interface SharedFileListProps {
   groupId: string
@@ -71,7 +72,7 @@ async function loadData() {
     files.value = list
   }
   catch (err) {
-    console.warn('[SharedFileList] load failed:', err)
+    console.warn('[SharedFileList] load failed:', formatSdkError(err))
   }
   finally {
     loading.value = false
@@ -132,7 +133,7 @@ async function onFileSelected(event: Event) {
     showToast(t('group.sharedFile.uploadSuccess') || '上传成功', 'success')
   }
   catch (err) {
-    console.warn('[SharedFileList] upload failed:', err)
+    console.warn('[SharedFileList] upload failed:', formatSdkError(err))
     showToast(t('group.sharedFile.uploadFailed') || '上传失败', 'error')
   }
   finally {
@@ -225,7 +226,7 @@ async function onDelete(file: any) {
     showToast(t('group.sharedFile.deleteSuccess') || '删除成功', 'success')
   }
   catch (err) {
-    console.warn('[SharedFileList] delete failed:', err)
+    console.warn('[SharedFileList] delete failed:', formatSdkError(err))
     showToast(t('group.sharedFile.deleteFailed') || '删除失败', 'error')
   }
 }
@@ -283,7 +284,7 @@ async function onDownload(file: any) {
     showToast(t('group.sharedFile.downloadSuccess') || '下载成功', 'success')
   }
   catch (err) {
-    console.warn('[SharedFileList] download failed:', err)
+    console.warn('[SharedFileList] download failed:', formatSdkError(err))
     showToast(t('group.sharedFile.downloadFailed') || '下载失败', 'error')
   }
 }

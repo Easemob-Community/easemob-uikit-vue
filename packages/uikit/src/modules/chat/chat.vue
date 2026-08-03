@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
@@ -18,13 +19,13 @@ import InviteMemberModal from '../group/invite-member-modal.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
+import Empty from '../../components/empty/empty.vue'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input/index.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
-import Empty from '../../components/empty/empty.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 /** 渲染错误信息 */
@@ -420,7 +421,7 @@ watch(
         await fetchGroupInfo(cvs.id)
       }
       catch (err) {
-        console.warn('[Chat] preload group info failed:', err)
+        console.warn('[Chat] preload group info failed:', formatSdkError(err))
       }
     }
     // 再拉成员列表（用于 @提及 与群已读详情弹窗）
@@ -431,7 +432,7 @@ watch(
       await fetchGroupMembers(cvs.id)
     }
     catch (err) {
-      console.warn('[Chat] preload group members for mention failed:', err)
+      console.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
     }
   },
   { immediate: true },
@@ -559,7 +560,7 @@ async function onForwardConfirm(targetConversation: Conversation) {
     exitMultiSelectMode()
   }
   catch (e) {
-    console.warn('[Chat] forward messages failed:', e)
+    console.warn('[Chat] forward messages failed:', formatSdkError(e))
     showToast(t('message.forward.failed') || '转发失败')
   }
 }
@@ -604,7 +605,7 @@ async function onLeaveGroup(groupId: string) {
     showToast(t('chat.info.leaveGroupSuccess') || '已退出群聊')
   }
   catch (err) {
-    console.warn('[Chat] leave group failed:', err)
+    console.warn('[Chat] leave group failed:', formatSdkError(err))
     showToast(t('chat.info.leaveGroupFailed') || '退出群聊失败')
   }
 }
@@ -621,7 +622,7 @@ async function onDestroyGroup(groupId: string) {
     showToast(t('chat.info.destroyGroupSuccess') || '群聊已解散')
   }
   catch (err) {
-    console.warn('[Chat] destroy group failed:', err)
+    console.warn('[Chat] destroy group failed:', formatSdkError(err))
     showToast(t('chat.info.destroyGroupFailed') || '解散群聊失败')
   }
 }
@@ -639,7 +640,7 @@ async function onClearHistory(payload: { id: string, type: 'singleChat' | 'group
     showToast(t('chat.info.clearHistorySuccess') || '聊天记录已清空', 'success')
   }
   catch (err) {
-    console.warn('[Chat] clear history failed:', err)
+    console.warn('[Chat] clear history failed:', formatSdkError(err))
     showToast(t('chat.info.clearHistoryFailed') || '清空聊天记录失败', 'error')
   }
 }
@@ -663,7 +664,7 @@ async function onInviteMembers(userIds: string[]) {
     chatInfoDrawerRef.value?.refreshMemberList()
   }
   catch (err) {
-    console.warn('[Chat] invite members failed:', err)
+    console.warn('[Chat] invite members failed:', formatSdkError(err))
     const message = String(err instanceof Error ? err.message : err)
     const isForbidden = message.toLowerCase().includes('forbidden') || message.toLowerCase().includes('access forbidden')
     showToast(
@@ -766,7 +767,7 @@ async function confirmRemoveMember() {
     chatInfoDrawerRef.value?.removeMember(member.userId)
   }
   catch (err) {
-    console.warn('[Chat] remove member failed:', err)
+    console.warn('[Chat] remove member failed:', formatSdkError(err))
     showToast(t('chat.info.removeMemberFailed') || '移除成员失败')
   }
 }
@@ -787,7 +788,7 @@ async function onSetAdmin(member: UiGroupMember) {
     chatInfoDrawerRef.value?.setMemberRole(member.userId, 'admin')
   }
   catch (err) {
-    console.warn('[Chat] set admin failed:', err)
+    console.warn('[Chat] set admin failed:', formatSdkError(err))
     showToast(t('chat.info.setAdminFailed') || '设置管理员失败')
   }
 }
@@ -803,7 +804,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
     chatInfoDrawerRef.value?.setMemberRole(member.userId, 'member')
   }
   catch (err) {
-    console.warn('[Chat] remove admin failed:', err)
+    console.warn('[Chat] remove admin failed:', formatSdkError(err))
     showToast(t('chat.info.removeAdminFailed') || '取消管理员失败')
   }
 }

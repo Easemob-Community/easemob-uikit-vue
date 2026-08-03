@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
@@ -80,7 +81,7 @@ async function toggleMuteAll() {
     }
   }
   catch (err) {
-    console.warn('[GroupManagementSection] toggleMuteAll failed:', err)
+    console.warn('[GroupManagementSection] toggleMuteAll failed:', formatSdkError(err))
   }
 }
 
@@ -343,7 +344,7 @@ function closeDrawer() {
             ref="muteListRef"
             :group-id="props.groupId"
             @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
-          @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
+            @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
           />
           <EmGroupBlocklist
             v-if="activeDrawerKey === 'block'"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import Popup from '../popup/popup.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
@@ -52,7 +53,7 @@ async function loadData() {
     }
   }
   catch (err) {
-    console.warn('[GroupCardModal] fetchGroupInfo failed:', err)
+    console.warn('[GroupCardModal] fetchGroupInfo failed:', formatSdkError(err))
     fetchFailedIds.value.add(props.groupId)
   }
   finally {

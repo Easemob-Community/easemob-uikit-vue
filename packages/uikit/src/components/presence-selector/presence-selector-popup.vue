@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import { useLocale } from '../../locale'
 import { useClient } from '../../composables/use-client'
 import { usePresence } from '../../composables/use-presence'
@@ -61,7 +62,7 @@ async function onSelect(_status: string, ext: string) {
     emit('changed')
   }
   catch (err) {
-    console.warn('[PresenceSelectorPopup] publish failed:', err)
+    console.warn('[PresenceSelectorPopup] publish failed:', formatSdkError(err))
     showToast(t('presence.publishFailed') || '状态设置失败')
   }
 }
@@ -89,7 +90,7 @@ async function onCustomConfirm() {
     emit('changed')
   }
   catch (err) {
-    console.warn('[PresenceSelectorPopup] publish custom failed:', err)
+    console.warn('[PresenceSelectorPopup] publish custom failed:', formatSdkError(err))
     showToast(t('presence.publishFailed') || '状态设置失败')
   }
 }

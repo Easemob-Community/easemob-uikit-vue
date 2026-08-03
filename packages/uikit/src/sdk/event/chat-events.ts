@@ -5,6 +5,7 @@ import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
 import { createLogger } from '../../utils/logger'
+import { formatSdkError } from '../../utils/sdk-error'
 import type { RootStores } from './types'
 
 const chatLog = createLogger('UIKit:ChatEvents')
@@ -266,7 +267,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           conversationId: sdkMsg.conversationId,
           conversationType: sdkMsg.conversationType as 'singleChat' | 'groupChat',
         }).catch((err: unknown) => {
-          console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', err)
+          console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
         })
         // 单聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
         // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送

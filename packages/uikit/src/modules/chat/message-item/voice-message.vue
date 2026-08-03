@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
+import { formatSdkError } from '../../../utils/sdk-error'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import Icon from '../../../components/icon/icon.vue'
@@ -105,7 +106,7 @@ function onPlayClick() {
     isPlaying.value = true
     audioController.play(audio, props.message.msgServerId || props.message.msgLocalId)
   }).catch((err) => {
-    console.warn('[VoiceMessage] play failed:', err)
+    console.warn('[VoiceMessage] play failed:', formatSdkError(err))
     cleanupAudio()
   })
 }

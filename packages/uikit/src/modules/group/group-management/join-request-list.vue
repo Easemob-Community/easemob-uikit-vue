@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { formatSdkError } from '../../../utils/sdk-error'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
-import JoinRequestListItem from './join-request-list-item.vue'
 import Empty from '../../../components/empty/empty.vue'
+import JoinRequestListItem from './join-request-list-item.vue'
 
 export interface JoinRequestListProps {
   groupId: string
@@ -46,7 +47,7 @@ async function onAccept(item: any) {
     emit('accepted', uid)
   }
   catch (err) {
-    console.warn('[JoinRequestList] accept failed:', err)
+    console.warn('[JoinRequestList] accept failed:', formatSdkError(err))
   }
 }
 
@@ -58,7 +59,7 @@ async function onReject(item: any) {
     emit('rejected', uid)
   }
   catch (err) {
-    console.warn('[JoinRequestList] reject failed:', err)
+    console.warn('[JoinRequestList] reject failed:', formatSdkError(err))
   }
 }
 </script>

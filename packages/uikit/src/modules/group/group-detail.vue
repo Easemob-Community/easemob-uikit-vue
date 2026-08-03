@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import type { UiGroup } from '../../sdk/types'
 import GroupCard from '../../components/group-card/group-card.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
@@ -64,7 +65,7 @@ async function loadData() {
       fetchFailedIds.value.add(props.groupId)
   }
   catch (err) {
-    console.warn('[GroupDetail] fetchGroupInfo failed:', err)
+    console.warn('[GroupDetail] fetchGroupInfo failed:', formatSdkError(err))
     fetchFailedIds.value.add(props.groupId)
   }
   finally {

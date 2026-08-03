@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
-import { useInvitePersistence, type InvitePersistType } from '../../composables/use-invite-persistence'
+import { type InvitePersistType, useInvitePersistence } from '../../composables/use-invite-persistence'
 import Empty from '../../components/empty/empty.vue'
 import type { UiContactInvite } from '../../sdk/types'
 
@@ -77,7 +77,7 @@ async function onAccept(invite: UiContactInvite) {
     emit('accept', invite)
   }
   catch (err) {
-    console.warn('[ContactNoticeList] accept invite failed:', err)
+    console.warn('[ContactNoticeList] accept invite failed:', formatSdkError(err))
     showToast(t('contact.inviteAcceptFailed') || '接受失败')
   }
   finally {
@@ -99,7 +99,7 @@ async function onDecline(invite: UiContactInvite) {
     emit('decline', invite)
   }
   catch (err) {
-    console.warn('[ContactNoticeList] decline invite failed:', err)
+    console.warn('[ContactNoticeList] decline invite failed:', formatSdkError(err))
     showToast(t('contact.inviteDeclineFailed') || '拒绝失败')
   }
   finally {
@@ -335,7 +335,10 @@ function avatarName(invite: UiContactInvite): string {
   border: 1px solid transparent;
   font-size: 13px;
   cursor: pointer;
-  transition: opacity 0.15s, border-color 0.15s, background-color 0.15s;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s,
+    background-color 0.15s;
 }
 
 .contact-notice-list__btn:disabled {

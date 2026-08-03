@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
+import { formatSdkError } from '../../../utils/sdk-error'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
 import Button from '../../../components/button/button.vue'
-import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
 import { useToast } from '../../../composables/use-toast'
@@ -15,9 +15,9 @@ import { useUIKit } from '../../../composables/use-uikit'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
+import GroupAnnouncement from '../../group/group-announcement.vue'
 import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatDrawer from './chat-drawer.vue'
-import GroupAnnouncement from '../../group/group-announcement.vue'
 
 export interface ChatInfoDrawerProps {
   show: boolean
@@ -304,7 +304,7 @@ async function loadGroupData() {
     ])
   }
   catch (err) {
-    console.warn('[ChatInfoDrawer] load group data failed:', err)
+    console.warn('[ChatInfoDrawer] load group data failed:', formatSdkError(err))
     showToast(t('chat.info.loadGroupInfoFailed') || '群信息加载失败')
   }
   finally {
@@ -784,7 +784,9 @@ defineExpose({
 
         <!-- 群聊：群管理 -->
         <div v-if="isGroup" class="chat-info-drawer__section-group">
-          <div class="chat-info-drawer__section-label">{{ t('group.management.title') || '群管理' }}</div>
+          <div class="chat-info-drawer__section-label">
+            {{ t('group.management.title') || '群管理' }}
+          </div>
           <div class="chat-info-drawer__section">
             <GroupManagementSection
               :group-id="groupId"
@@ -859,7 +861,7 @@ defineExpose({
         <input
           v-model="confirmModal.deleteConversation"
           type="checkbox"
-        />
+        >
         <span>{{ t('chat.info.clearHistoryDeleteConversation') || '同时删除会话' }}</span>
       </label>
     </div>
@@ -885,7 +887,7 @@ defineExpose({
   background-color: rgba(0, 0, 0, 0.12) !important;
 }
 
-[data-uikit-theme="dark"] .chat-info-drawer__close:hover:not(:disabled) {
+[data-uikit-theme='dark'] .chat-info-drawer__close:hover:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.18) !important;
 }
 
@@ -1118,7 +1120,7 @@ defineExpose({
   color: var(--uikit-text-primary);
 }
 
-.chat-info-drawer__confirm-checkbox input[type="checkbox"] {
+.chat-info-drawer__confirm-checkbox input[type='checkbox'] {
   width: 16px;
   height: 16px;
   accent-color: var(--uikit-primary-color);

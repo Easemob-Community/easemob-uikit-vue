@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { formatSdkError } from '../../../utils/sdk-error'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import type { UiGroupMember } from '../../../sdk/types'
-import BlockListItem from './block-list-item.vue'
 import Empty from '../../../components/empty/empty.vue'
+import BlockListItem from './block-list-item.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
 
 export interface BlockListProps {
@@ -51,7 +52,7 @@ async function loadData() {
     members.value = Array.isArray(result) ? result : []
   }
   catch (err) {
-    console.warn('[BlockList] load failed:', err)
+    console.warn('[BlockList] load failed:', formatSdkError(err))
   }
   finally {
     loading.value = false
@@ -72,7 +73,7 @@ async function onUnblock(item: any) {
     emit('unblock', { userId: uid })
   }
   catch (err) {
-    console.warn('[BlockList] unblock failed:', err)
+    console.warn('[BlockList] unblock failed:', formatSdkError(err))
   }
 }
 
@@ -91,7 +92,7 @@ async function loadGroupMembers() {
     groupMembers.value = list || []
   }
   catch (err) {
-    console.warn('[BlockList] load group members failed:', err)
+    console.warn('[BlockList] load group members failed:', formatSdkError(err))
   }
   finally {
     loadingMembers.value = false
@@ -124,7 +125,7 @@ async function onConfirmAdd() {
     emit('block', ids.map(id => ({ userId: id })))
   }
   catch (err) {
-    console.warn('[BlockList] add to blocklist failed:', err)
+    console.warn('[BlockList] add to blocklist failed:', formatSdkError(err))
     showToast(t('group.blocklist.addFailed') || '添加失败')
   }
 }

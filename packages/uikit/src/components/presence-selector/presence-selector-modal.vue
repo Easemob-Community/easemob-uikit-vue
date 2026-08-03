@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import { useLocale } from '../../locale'
 import { useClient } from '../../composables/use-client'
 import { usePresence } from '../../composables/use-presence'
@@ -49,7 +50,7 @@ async function onSelect(_status: string, ext: string) {
     // 选择后保持 modal 开启，让用户看到已切换的状态；点击遮罩或关闭按钮再关闭
   }
   catch (err) {
-    console.warn('[PresenceSelectorModal] publish failed:', err)
+    console.warn('[PresenceSelectorModal] publish failed:', formatSdkError(err))
     showToast(t('presence.publishFailed') || '状态设置失败')
   }
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { UserInfoAttribute } from 'easemob-websdk'
+import { formatSdkError } from '../../utils/sdk-error'
 import Popup from '../popup/popup.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
@@ -72,7 +73,7 @@ async function loadData() {
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
-        console.warn('[UserCardModal] fetch presence failed:', err)
+        console.warn('[UserCardModal] fetch presence failed:', formatSdkError(err))
       }
     }
 

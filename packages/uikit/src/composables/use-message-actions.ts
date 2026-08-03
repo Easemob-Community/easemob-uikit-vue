@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { MESSAGE_STATUS } from '../constants'
 import type { TextMessageBody, UiMessage, VoiceMessageBody } from '../sdk/types'
 import { useLocale } from '../locale'
+import { formatSdkError } from '../utils/sdk-error'
 import { useToast } from './use-toast'
 import { useUIKit } from './use-uikit'
 
@@ -163,7 +164,7 @@ export function useMessageActions() {
         code: (e as { code?: number | string }).code,
         message: e instanceof Error ? e.message : String(e),
         details: (e as { details?: unknown }).details,
-        raw: e,
+        raw: formatSdkError(e),
       })
       throw e
     }
@@ -206,7 +207,7 @@ export function useMessageActions() {
       await domains.message.getPinnedMessages(cvsId, cvsType)
     }
     catch (err) {
-      console.warn('[UIKit] refresh pinned messages failed:', err)
+      console.warn('[UIKit] refresh pinned messages failed:', formatSdkError(err))
     }
   }
 

@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useClipboard, useScroll } from '@vueuse/core'
 import type { GroupMessageReadUsersResult } from 'easemob-websdk'
+import { formatSdkError, resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { useGroup } from '../../../composables/use-group'
@@ -15,7 +16,6 @@ import Modal from '../../../components/modal/modal.vue'
 import type { LocationMessageBody, TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
-import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import { resolveVoiceToTextErrorMessage } from '../../../composables/use-message-actions'
 import Icon from '../../../components/icon/icon.vue'
 import MessageVirtualList from './message-virtual-list.vue'
@@ -247,7 +247,7 @@ async function loadMoreHistory() {
     }
   }
   catch (e) {
-    console.error('[MessageList] loadMoreHistory failed:', e)
+    console.error('[MessageList] loadMoreHistory failed:', formatSdkError(e))
     // 加载失败不视为"没有更多"：保留 hasMoreHistory，给出重试入口
     historyLoadFailed.value = true
   }
@@ -390,7 +390,7 @@ async function onMessageAction(event: MessageActionEvent) {
       await pinMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] pinMessage failed:', e)
+      console.warn('[MessageList] pinMessage failed:', formatSdkError(e))
       showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败', 'error')
     }
     return
@@ -400,7 +400,7 @@ async function onMessageAction(event: MessageActionEvent) {
       await unpinMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] unpinMessage failed:', e)
+      console.warn('[MessageList] unpinMessage failed:', formatSdkError(e))
       showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败', 'error')
     }
     return
@@ -412,7 +412,7 @@ async function onMessageAction(event: MessageActionEvent) {
       await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] translateTextMessage failed:', e)
+      console.warn('[MessageList] translateTextMessage failed:', formatSdkError(e))
       showToast(resolveTranslateErrorMessage(e), 'error')
     }
     return
@@ -428,7 +428,7 @@ async function onMessageAction(event: MessageActionEvent) {
         code: (e as { code?: number | string }).code,
         message: e instanceof Error ? e.message : String(e),
         details: (e as { details?: unknown }).details,
-        raw: e,
+        raw: formatSdkError(e),
       })
       showToast(resolveVoiceToTextErrorMessage(e, t), 'error')
     }
@@ -488,7 +488,7 @@ async function onResend(message: UiMessage) {
     await resendMessage(message)
   }
   catch (e: unknown) {
-    console.warn('[MessageList] resend failed:', e)
+    console.warn('[MessageList] resend failed:', formatSdkError(e))
     showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t), 'error')
   }
 }
@@ -508,7 +508,7 @@ async function onGroupReadClick(msgId: string, groupId: string) {
         members = stores.group.getGroupMembers(groupId)
       }
       catch (e) {
-        console.warn('[MessageList] fetchGroupMembers for unread list failed:', e)
+        console.warn('[MessageList] fetchGroupMembers for unread list failed:', formatSdkError(e))
       }
     }
     const readSet = new Set(readUsers)
@@ -519,7 +519,7 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     showGroupReadModal.value = true
   }
   catch (e) {
-    console.warn('[MessageList] fetchGroupReadDetail failed:', e)
+    console.warn('[MessageList] fetchGroupReadDetail failed:', formatSdkError(e))
   }
 }
 

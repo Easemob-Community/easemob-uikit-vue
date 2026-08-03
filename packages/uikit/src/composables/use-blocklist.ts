@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import type { UserInfo } from 'easemob-websdk'
 import type { UiContact as Contact } from '../sdk/types'
+import { formatSdkError } from '../utils/sdk-error'
 import { useUIKit } from './use-uikit'
 
 /**
@@ -36,7 +37,7 @@ export function useBlocklist() {
       })))
     }
     catch (error) {
-      console.warn('[useBlocklist] refresh failed:', error)
+      console.warn('[useBlocklist] refresh failed:', formatSdkError(error))
       throw error
     }
   }
@@ -48,7 +49,7 @@ export function useBlocklist() {
       contactStore.addToBlackList(contact)
     }
     catch (error) {
-      console.warn('[useBlocklist] addBlock failed:', error)
+      console.warn('[useBlocklist] addBlock failed:', formatSdkError(error))
       throw error
     }
   }
@@ -60,7 +61,7 @@ export function useBlocklist() {
       contactStore.removeFromBlackList(userId)
     }
     catch (error) {
-      console.warn('[useBlocklist] removeBlock failed:', error)
+      console.warn('[useBlocklist] removeBlock failed:', formatSdkError(error))
       throw error
     }
   }

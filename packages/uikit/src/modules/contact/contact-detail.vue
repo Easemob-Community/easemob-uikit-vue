@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { UserInfo, UserInfoAttribute } from 'easemob-websdk'
 import { onClickOutside } from '@vueuse/core'
-import Button from '../../components/button/button.vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Modal from '../../components/modal/modal.vue'
 import UserCard from '../../components/user-card/user-card.vue'
@@ -194,7 +194,7 @@ async function loadData() {
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
-        console.warn('[ContactDetail] fetch presence failed:', err)
+        console.warn('[ContactDetail] fetch presence failed:', formatSdkError(err))
       }
     }
   }
@@ -216,7 +216,7 @@ async function saveRemark() {
     showToast(t('contact.detail.remarkSaved') || '备注已保存')
   }
   catch (err) {
-    console.warn('[ContactDetail] save remark failed:', err)
+    console.warn('[ContactDetail] save remark failed:', formatSdkError(err))
     showToast(t('contact.detail.remarkSaveFailed') || '备注保存失败')
   }
 }
@@ -267,7 +267,7 @@ async function onConfirmAction() {
     }
   }
   catch (err) {
-    console.warn('[ContactDetail] action failed:', err)
+    console.warn('[ContactDetail] action failed:', formatSdkError(err))
     showToast(t('contact.detail.actionFailed') || '操作失败')
   }
 }
@@ -384,7 +384,6 @@ function onPresenceChanged() {
     >
       {{ confirmModal.content }}
     </Modal>
-
   </div>
 </template>
 

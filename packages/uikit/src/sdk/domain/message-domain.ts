@@ -3,6 +3,7 @@ import type { MessageStatus, UiMessage } from '../types'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
 import { createLogger } from '../../utils/logger'
+import { formatSdkError } from '../../utils/sdk-error'
 
 const combineLogger = createLogger('Combine')
 
@@ -349,11 +350,18 @@ export class MessageDomain {
 
   /** 翻译文本消息 */
   async translateMessage(message: SdkMessage, targetLanguages: string[]) {
-    const result = await this.client.chatManager.translateMessage({
-      message,
-      targetLanguages,
-    })
-    return result
+    try {
+      const result = await this.client.chatManager.translateMessage({
+        message,
+        targetLanguages,
+      })
+      return result
+    }
+    catch (error) {
+      // 打印原始报错，便于业务方定位未开通/参数/网络等问题
+      console.error('[MessageDomain.translateMessage] raw SDK error:', formatSdkError(error))
+      throw error
+    }
   }
 
   /** 语音消息转文字 */

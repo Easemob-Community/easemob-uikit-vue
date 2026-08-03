@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { formatSdkError } from '../../utils/sdk-error'
 import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Input from '../../components/input/input.vue'
@@ -10,8 +11,8 @@ import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
-import GroupMemberListItem from './group-member-list-item.vue'
 import Empty from '../../components/empty/empty.vue'
+import GroupMemberListItem from './group-member-list-item.vue'
 
 export interface GroupMemberListProps {
   groupId: string
@@ -191,7 +192,7 @@ async function initialLoad() {
     localHasMore.value = result.hasMore ?? false
   }
   catch (err) {
-    console.warn('[GroupMemberList] load members failed:', err)
+    console.warn('[GroupMemberList] load members failed:', formatSdkError(err))
     showToast(t('group.memberList.loadFailed') || '加载群成员失败')
   }
 }
@@ -207,7 +208,7 @@ async function onLoadMore() {
     emit('load-more')
   }
   catch (err) {
-    console.warn('[GroupMemberList] load more members failed:', err)
+    console.warn('[GroupMemberList] load more members failed:', formatSdkError(err))
     showToast(t('group.memberList.loadMoreFailed') || '加载更多失败')
   }
   finally {
@@ -368,7 +369,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
   background-color: rgba(0, 0, 0, 0.12) !important;
 }
 
-[data-uikit-theme="dark"] .group-member-list__close:hover:not(:disabled) {
+[data-uikit-theme='dark'] .group-member-list__close:hover:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.18) !important;
 }
 

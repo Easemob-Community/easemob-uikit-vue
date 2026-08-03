@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { formatSdkError, resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
 import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
-import { resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
 import type { EmojiStickerItem } from '../../../components/emoji-picker/types'
 import Popup from '../../../components/popup/popup.vue'
@@ -65,7 +65,7 @@ async function runBeforeSend(message: Partial<UiMessage>): Promise<boolean> {
     return result !== false
   }
   catch (e) {
-    console.error('[MessageInput] beforeSend hook error:', e)
+    console.error('[MessageInput] beforeSend hook error:', formatSdkError(e))
     return true
   }
 }
@@ -80,7 +80,7 @@ function runAfterSend(message: any) {
       hook(message)
     }
     catch (e) {
-      console.error('[MessageInput] afterSend hook error:', e)
+      console.error('[MessageInput] afterSend hook error:', formatSdkError(e))
     }
   }
 }
@@ -185,7 +185,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendTextMessage failed:', e)
+      console.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
@@ -225,7 +225,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendTextMessage failed:', e)
+      console.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
@@ -262,7 +262,7 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     emit('send-success')
     runAfterSend(msg)
   }).catch((e: any) => {
-    console.error('[MessageInput] sendFile failed:', e)
+    console.error('[MessageInput] sendFile failed:', formatSdkError(e))
     showToast(e?.message || t('message.send.failed') || '发送失败')
   })
   clearQuote()
@@ -331,7 +331,7 @@ async function onStickerSelect(sticker: EmojiStickerItem) {
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendSticker failed:', e)
+      console.error('[MessageInput] sendSticker failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
 }
@@ -426,7 +426,7 @@ async function handleVoiceStart() {
     }
   }
   catch (err) {
-    console.error('录音启动失败:', err)
+    console.error('录音启动失败:', formatSdkError(err))
     showToast('录音启动失败，请检查麦克风权限')
     // 清理
     voiceStream?.getTracks().forEach(track => track.stop())
@@ -475,7 +475,7 @@ function handleVoiceEnd(durationFromInput?: number) {
           runAfterSend(msg)
         })
         .catch((e: any) => {
-          console.error('[MessageInput] sendAudioMessage failed:', e)
+          console.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
           showToast(e?.message || t('message.send.failed') || '发送失败')
         })
       clearQuote()
