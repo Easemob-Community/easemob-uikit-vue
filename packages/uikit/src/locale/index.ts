@@ -50,3 +50,45 @@ export function createLocale(locale: string = 'zh-CN') {
 export function mergeLocaleMessages(locale: string, msgs: LocaleMessages) {
   messages[locale] = { ...(messages[locale] || {}), ...msgs }
 }
+
+export interface FindLocaleKeyOptions {
+  /** 是否精确匹配完整文案，默认 false（包含即可） */
+  exact?: boolean
+  /** 指定查找的语言包，默认使用当前语言 */
+  locale?: string
+}
+
+/**
+ * 根据文案反查 locale key，方便业务方定位需要覆盖的语言包项。
+ * 支持单个文案或批量文案查询。
+ *
+ * 示例：
+ *   findLocaleKey('暂无会话')                   // ['conversation.empty']
+ *   findLocaleKey(['暂无会话', '发送名片'])      // ['conversation.empty', 'demo.card.send']
+ *   findLocaleKey('发送', { exact: true })
+ *   findLocaleKey('No conversation', { locale: 'en' })
+ */
+export function findLocaleKey(
+  text: string | string[],
+  options: FindLocaleKeyOptions = {},
+): string[] {
+  const { exact = false, locale } = options
+  const target = locale || currentLocale.value
+  const msg = messages[target]
+  if (!msg) return []
+  const texts = Array.isArray(text) ? text : [text]
+  const matched = new Set<string>()
+  for (const [, value] of Object.entries(msg)) {
+    for (const t of texts) {
+      const hit = exact ? value === t : value.includes(t)
+      if (hit) {
+        matched.add(value)
+        break
+      }
+    }
+  }
+  // 根据命中文案反查其 key，支持同一文案对应多 key 的场景
+  return Object.entries(msg)
+    .filter(([, value]) => matched.has(value))
+    .map(([key]) => key)
+}
