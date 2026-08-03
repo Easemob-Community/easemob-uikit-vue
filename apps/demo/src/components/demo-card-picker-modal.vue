@@ -70,7 +70,7 @@ function onClose() {
   >
     <div class="demo-card-picker">
       <div class="demo-card-picker__header">
-        <span class="demo-card-picker__title">{{ t('message.sendCard') || '发送名片' }}</span>
+        <span class="demo-card-picker__title">{{ t('demo.card.send') }}</span>
       </div>
 
       <!-- 我的名片 -->
@@ -80,7 +80,7 @@ function onClose() {
         @click="onSelect(ownInfo.userId)"
       >
         <div class="demo-card-picker__section-title">
-          {{ t('message.myCard') || '我的名片' }}
+          {{ t('demo.card.myCard') }}
         </div>
         <div class="demo-card-picker__item">
           <EmAvatar :src="ownInfo.avatar" :name="ownInfo.name" :size="36" />
@@ -92,7 +92,7 @@ function onClose() {
       <!-- 联系人名片 -->
       <div v-if="friendList.length > 0" class="demo-card-picker__section">
         <div class="demo-card-picker__section-title">
-          {{ t('message.contactCard') || '联系人名片' }}
+          {{ t('demo.card.contactCard') }}
         </div>
         <div class="demo-card-picker__list">
           <div
@@ -110,7 +110,7 @@ function onClose() {
 
       <!-- 空状态 -->
       <div v-if="!ownInfo && friendList.length === 0" class="demo-card-picker__empty">
-        {{ t('message.noCardAvailable') || '暂无可发送的名片' }}
+        {{ t('demo.card.noAvailable') }}
       </div>
     </div>
   </EmPopup>

@@ -41,3 +41,12 @@ export function createLocale(locale: string = 'zh-CN') {
   currentLocale.value = locale
   return { t: useLocale().t, setLocale: useLocale().setLocale }
 }
+
+/**
+ * 向指定语言包增量合并自定义文案。
+ * 业务方 / plugin 可在初始化时调用，扩展自己的多语言 key，例如：
+ *   mergeLocaleMessages('en', { 'plugin.card.send': 'Send Card' })
+ */
+export function mergeLocaleMessages(locale: string, msgs: LocaleMessages) {
+  messages[locale] = { ...(messages[locale] || {}), ...msgs }
+}

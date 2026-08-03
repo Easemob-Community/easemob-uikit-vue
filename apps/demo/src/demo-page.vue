@@ -53,7 +53,7 @@ function toggleEnablePresence(v: boolean) { emit('update:enablePresence', v) }
 function toggleCustomDataSource(v: boolean) { emit('update:useCustomDataSource', v) }
 
 const { mode, primaryColor, hoverStyle, containerGap, setMode, setPrimaryColor, setHoverStyle, setContainerGap, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
-const { locale, setLocale } = useLocale()
+const { t, locale, setLocale } = useLocale()
 const { stores, theme: themeStore } = useUIKit()
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
 const { setLocalConversationList, selectConversation } = useConversation()
@@ -506,14 +506,14 @@ function injectMockContacts() {
           <template #toolbar-extra="{ togglePanel: toggleQuickReplyPanel }">
             <button
               class="demo-toolbar-btn"
-              title="快捷回复"
+              :title="t('demo.quickReply.title')"
               @click="toggleQuickReplyPanel"
             >
               <EmIcon name="chat/3lines_n_arrow" :size="22" />
             </button>
             <button
               class="demo-toolbar-btn"
-              title="发送名片"
+              :title="t('demo.card.send')"
               @click="showCardPickerModal = true"
             >
               <EmIcon name="people/person_single" :size="22" />
@@ -599,14 +599,14 @@ function injectMockContacts() {
             <template #toolbar-extra="{ togglePanel: toggleQuickReplyPanel }">
               <button
                 class="demo-toolbar-btn"
-                title="快捷回复"
+                :title="t('demo.quickReply.title')"
                 @click="toggleQuickReplyPanel"
               >
                 <EmIcon name="chat/3lines_n_arrow" :size="22" />
               </button>
               <button
                 class="demo-toolbar-btn"
-                title="发送名片"
+                :title="t('demo.card.send')"
                 @click="showCardPickerModal = true"
               >
                 <EmIcon name="people/person_single" :size="22" />
