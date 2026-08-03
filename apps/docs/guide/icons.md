@@ -20,6 +20,12 @@ UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。自当�
 
 图标分类包括：`actions`（操作交互）、`arrows`（箭头方向）、`audio-video`（音视频）、`chat`（聊天消息）、`emojis-reactions`（表情）、`files-media`（文件媒体）、`gifts`（礼物）、`misc`（杂项）、`navigation`（导航）、`people`（人员）、`status`（状态）。
 
+## 图标一览
+
+下方展示 UIKit 当前内置的全部 SVG 图标，按分类排列，设计师可直接对照使用。
+
+<IconGallery />
+
 ## 操作图标交互约束
 
 业务中所有“操作类图标按钮”（关闭、返回、`+`、设置、编辑、删除等）必须统一使用 `IconButton` 组件，禁止自行用 `<button>` + `<Icon>` 实现。详细约束见：[UIKIT UI 交互约束](../../packages/uikit/docs/UI_CONVENTIONS.md)。

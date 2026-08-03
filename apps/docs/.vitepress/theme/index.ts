@@ -2,8 +2,9 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { createPinia } from 'pinia'
 import UIKit from '@easemob/uikit'
-import { AntdTheme } from 'vite-plugin-vitepress-demo/theme'
+import DemoBlock from './DemoBlock.vue'
 import HomeLayout from './HomeLayout.vue'
+import IconGallery from '../components/IconGallery.vue'
 import './style.css'
 
 export default {
@@ -12,7 +13,10 @@ export default {
   enhanceApp({ app }) {
     app.use(createPinia())
     app.use(UIKit)
-    // 文档 demo 容器（对应 markdown 中的 <demo src="..." />）
-    app.component('demo', AntdTheme)
+    // 文档 demo 容器（对应 markdown 中的 <demo src="..." />），
+    // DemoBlock 内部用 ClientOnly 包裹，避免 SSR 预渲染时访问浏览器 API
+    app.component('demo', DemoBlock)
+    // 图标画廊，展示 UIKit 当前内置的全部 SVG 图标
+    app.component('IconGallery', IconGallery)
   },
 } satisfies Theme
