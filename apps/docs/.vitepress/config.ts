@@ -1,13 +1,33 @@
 import { defineConfig } from 'vitepress'
 
+// 版本号：由 vitepress build 时注入（见 vite.config.ts）
+const version = '__EASEMOB_UIKIT_VERSION__'
+
 export default defineConfig({
-  title: 'Easemob UIKit for Vue',
-  description: '环信 Vue3 UIKit 组件库文档',
+  lang: 'zh-CN',
+  title: 'Easemob UIKit',
+  description: '环信 Vue3 即时通讯 UI 组件库 - 官方文档',
+  cleanUrls: true,
+  // icons.md 引用了 packages/uikit/src 下的源码文件，属于仓库内文档链接，跳过校验
+  ignoreDeadLinks: [/packages\/uikit\//],
+
+  head: [
+    ['link', { rel: 'icon', href: '/logo-light.svg' }],
+  ],
+
   themeConfig: {
+    logo: { light: '/logo-light.svg', dark: '/logo-dark.svg' },
+    siteTitle: 'Easemob UIKit',
+
     nav: [
-      { text: '指南', link: '/guide/' },
-      { text: '组件', link: '/components/' },
+      { text: '首页', link: '/' },
+      { text: '指南', link: '/guide/quickstart' },
+      { text: '组件', link: '/components/button' },
+      { text: '主题定制', link: '/guide/theme' },
+      { text: 'H5 适配', link: '/guide/h5-adaptation' },
+      { text: 'GitHub', link: 'https://github.com/easemob/easemob-uikit-vue' },
     ],
+
     sidebar: {
       '/guide/': [
         {
@@ -23,14 +43,98 @@ export default defineConfig({
       ],
       '/components/': [
         {
-          text: '组件',
+          text: '基础组件',
           items: [
-            { text: 'Button', link: '/components/button' },
-            { text: 'Avatar', link: '/components/avatar' },
-            { text: 'Popup', link: '/components/popup' },
+            { text: 'Button 按钮', link: '/components/button' },
+            { text: 'Icon 图标', link: '/components/icon' },
+            { text: 'Avatar 头像', link: '/components/avatar' },
+            { text: 'Badge 徽标', link: '/components/badge' },
+            { text: 'Cell 单元格', link: '/components/cell' },
+            { text: 'Empty 空状态', link: '/components/empty' },
+            { text: 'Input 输入框', link: '/components/input' },
+            { text: 'IconButton 图标按钮', link: '/components/icon-button' },
+            { text: 'ScrollToTop 回到顶部', link: '/components/scroll-to-top' },
+          ],
+        },
+        {
+          text: '反馈组件',
+          items: [
+            { text: 'ActionSheet 操作菜单', link: '/components/action-sheet' },
+            { text: 'Modal 弹窗', link: '/components/modal' },
+            { text: 'Popup 弹出层', link: '/components/popup' },
+            { text: 'Toast 轻提示', link: '/components/toast' },
+            { text: 'EmojiPicker 表情选择', link: '/components/emoji-picker' },
+          ],
+        },
+        {
+          text: '数据展示',
+          items: [
+            { text: 'PresenceAvatar 在线头像', link: '/components/presence-avatar' },
+            { text: 'PresenceSelector 状态选择', link: '/components/presence-selector' },
+            { text: 'UserCard 用户卡片', link: '/components/user-card' },
+            { text: 'GroupCard 群组卡片', link: '/components/group-card' },
+          ],
+        },
+        {
+          text: '业务模块',
+          items: [
+            { text: '会话模块', link: '/components/conversation-container' },
+            { text: '聊天模块', link: '/components/chat-container' },
+            { text: '通讯录模块', link: '/components/contact-container' },
+            { text: '地址簿容器', link: '/components/address-book-container' },
+            { text: '群组模块', link: '/components/group-container' },
           ],
         },
       ],
+    },
+
+    outline: {
+      level: [2, 3],
+      label: '本页目录',
+    },
+
+    docFooter: {
+      prev: '上一篇',
+      next: '下一篇',
+    },
+
+    lastUpdated: {
+      text: '最近更新',
+      formatOptions: {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      },
+    },
+
+    darkModeSwitchLabel: '外观',
+    sidebarMenuLabel: '菜单',
+    returnToTopLabel: '回到顶部',
+    langMenuLabel: '语言',
+
+    search: {
+      provider: 'local',
+      options: {
+        translations: {
+          button: {
+            buttonText: '搜索文档',
+            buttonAriaLabel: '搜索文档',
+          },
+          modal: {
+            noResultsText: '未找到相关结果',
+            resetButtonTitle: '清除查询',
+            footer: {
+              selectText: '选择',
+              navigateText: '切换',
+              closeText: '关闭',
+            },
+          },
+        },
+      },
+    },
+
+    footer: {
+      message: '基于 VitePress 构建 · 环信 Easemob UIKit',
+      copyright: `Copyright © 2024 Easemob · UIKit v${version}`,
     },
   },
 })

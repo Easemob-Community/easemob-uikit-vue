@@ -28,5 +28,8 @@ coverage
 # Local tarball artifacts
 *.tgz
 
+# VitePress cache
+apps/docs/.vitepress/cache
+
 # Temporary debug / regression scripts
 tmp/
