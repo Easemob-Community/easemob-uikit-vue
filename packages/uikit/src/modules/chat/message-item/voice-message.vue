@@ -187,11 +187,11 @@ function onToggleVoiceText() {
 <style scoped>
 .voice-message {
   display: flex;
-  max-width: 60%;
+  flex-direction: column;
 }
 
 .voice-message--self {
-  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .voice-message__bubble {
@@ -203,6 +203,7 @@ function onToggleVoiceText() {
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
   font-size: 14px;
+  max-width: 60%;
 }
 
 .voice-message__bubble--square {
