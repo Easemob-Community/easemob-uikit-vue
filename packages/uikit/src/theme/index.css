@@ -104,6 +104,10 @@
   /* 交错动画间隔（Action-Sheet 项列） */
   --uikit-anim-stagger-delay: 30ms;
 
+  /* 字体族：标准跨平台系统字体栈，确保不同浏览器字体表现一致 */
+  --uikit-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--uikit-font-family);
+
   /* 字体缩放预留：当前不生效，为 P2 H5 字号适配预留接口 */
   --uikit-font-scale: 1;
 }
