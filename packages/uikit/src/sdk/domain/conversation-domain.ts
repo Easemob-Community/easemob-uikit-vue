@@ -56,12 +56,22 @@ export class ConversationDomain {
   constructor(
     private client: ManagerHost,
     private store: ConversationStoreLike,
+    private hooks: {
+      /**
+       * 进入会话后补发未发送过已读回执的接收消息（批量，fire-and-forget）：
+       * 登录时收到的离线消息在 onMessage 阶段可能尚未打开会话而无法即时回执，
+       * 点击会话进入后统一补发（群聊使发送方气泡及时显示已读数）。
+       */
+      sendPendingReadReceipts?: (conversationId: string, conversationType: 'singleChat' | 'groupChat') => void
+    } = {},
   ) {}
 
   /** 进入某个会话：通知 SDK 当前正在浏览该会话 */
   enter(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
     this.client.chatManager.setCurrentConversation({ conversationId, conversationType })
     this.store.setCurrentConversationId(conversationId)
+    // 补发该会话尚未回执的接收消息（不阻塞进入会话）
+    this.hooks.sendPendingReadReceipts?.(conversationId, conversationType)
   }
 
   /** 离开当前会话 */

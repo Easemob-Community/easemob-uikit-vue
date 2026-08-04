@@ -4,6 +4,7 @@ import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
 import { getQuotePreview } from '../../../composables/use-quote'
+import { useUserInfo } from '../../../composables/use-user-info'
 import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface QuoteBarProps {
@@ -18,8 +19,9 @@ const props = defineProps<QuoteBarProps>()
 const emit = defineEmits<QuoteBarEmits>()
 const { t } = useLocale()
 
-/** 发送人显示名（当前优先使用 from，后续可扩展映射） */
-const sender = computed(() => props.message.from || '')
+/** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
+const { displayName } = useUserInfo(() => props.message.from)
+const sender = computed(() => displayName.value || props.message.from || '')
 
 /** 预览文本 */
 const preview = computed(() => getQuotePreview(props.message))

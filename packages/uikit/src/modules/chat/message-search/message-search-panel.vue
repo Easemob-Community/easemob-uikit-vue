@@ -5,8 +5,10 @@ import { useMessageSearch } from '../../../composables/use-message-search'
 import { useLocale } from '../../../locale'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import Input from '../../../components/input/input.vue'
 import Empty from '../../../components/empty/empty.vue'
+
 export interface MessageSearchPanelProps {
   /** 面板显隐 */
   show?: boolean
@@ -95,9 +97,14 @@ nextTick(() => {
       <h4 class="message-search-panel__title">
         {{ t('message.search.title') || '搜索消息' }}
       </h4>
-      <button class="message-search-panel__close" @click="emit('close')">
-        <Icon name="actions/close" :size="18" />
-      </button>
+      <IconButton
+        class="message-search-panel__close"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
+        :title="t('button.close') || '关闭'"
+        @click="emit('close')"
+      />
     </div>
 
     <div class="message-search-panel__input">
@@ -171,21 +178,7 @@ nextTick(() => {
 }
 
 .message-search-panel__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  border-radius: var(--uikit-components-radius, 6px);
-  transition: background-color 0.15s;
-}
-
-.message-search-panel__close:hover {
-  background-color: var(--uikit-bg-hover);
+  flex-shrink: 0;
 }
 
 .message-search-panel__input {

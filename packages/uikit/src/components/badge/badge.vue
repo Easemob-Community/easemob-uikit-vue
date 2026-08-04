@@ -19,6 +19,8 @@ const displayCount = computed(() => {
   if (!props.count) return ''
   return props.count > props.max ? `${props.max}+` : String(props.count)
 })
+
+const isSingleDigit = computed(() => !props.dot && displayCount.value.length === 1)
 </script>
 
 <template>
@@ -27,7 +29,10 @@ const displayCount = computed(() => {
     <span
       v-if="props.count || props.dot"
       class="uikit-badge__content"
-      :class="{ 'uikit-badge__content--dot': props.dot }"
+      :class="{
+        'uikit-badge__content--dot': props.dot,
+        'uikit-badge__content--single': isSingleDigit,
+      }"
       :style="{ backgroundColor: props.color }"
     >
       {{ displayCount }}
@@ -46,22 +51,30 @@ const displayCount = computed(() => {
   top: 0;
   right: 0;
   transform: translate(50%, -50%);
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  font-size: 11px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font-size: 10px;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  box-sizing: border-box;
+}
+
+.uikit-badge__content--single {
+  width: 16px;
+  min-width: 16px;
+  padding: 0;
+  border-radius: 50%;
 }
 
 .uikit-badge__content--dot {
-  width: 8px;
-  height: 8px;
-  min-width: 8px;
+  width: 7px;
+  height: 7px;
+  min-width: 7px;
   padding: 0;
   border-radius: 50%;
 }

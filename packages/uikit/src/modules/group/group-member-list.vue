@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { formatSdkError } from '../../utils/sdk-error'
-import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
@@ -271,9 +270,15 @@ defineExpose({ refresh, removeMember, setMemberRole })
         :placeholder="t('group.memberList.searchPlaceholder') || '搜索群成员'"
         prefix-icon="misc/magnifier2"
       />
-      <button v-if="searchKeyword" class="group-member-list__clear" @click="clearSearch">
-        <Icon name="actions/xmark_thick" :size="14" />
-      </button>
+      <IconButton
+        v-if="searchKeyword"
+        class="group-member-list__clear"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
+        :title="t('button.clear') || '清除'"
+        @click="clearSearch"
+      />
     </div>
 
     <!-- 成员列表 -->
@@ -399,14 +404,6 @@ defineExpose({ refresh, removeMember, setMemberRole })
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
 }
 
 .group-member-list__items {

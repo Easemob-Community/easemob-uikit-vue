@@ -1,6 +1,6 @@
 import { type MaybeRef, computed, ref, toValue } from 'vue'
-import { useUIKit } from './use-uikit'
 import type { UiMessage } from '../sdk/types'
+import { useUIKit } from './use-uikit'
 
 /** 消息搜索结果 */
 export interface MessageSearchResult {
@@ -109,11 +109,12 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
 
   function buildResultFromUiMessage(msg: UiMessage): MessageSearchResult {
     const userInfo = stores.userInfo.getUserInfo(msg.from)
+    const contact = stores.contact.getContact(msg.from)
     return {
       msgId: msg.msgServerId || msg.msgLocalId || '',
       conversationId: msg.conversationId,
       senderId: msg.from,
-      senderName: userInfo?.nickname || msg.from,
+      senderName: contact?.remark || userInfo?.nickname || msg.from,
       avatar: userInfo?.avatarUrl,
       timestamp: msg.timestamp,
       summary: getMessageSummary(msg),
@@ -154,11 +155,12 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
     const serverMsgs = res?.messages || []
     return serverMsgs.map((msg: any) => {
       const userInfo = stores.userInfo.getUserInfo(msg.from)
+      const contact = stores.contact.getContact(msg.from)
       return {
         msgId: msg.id || msg.msgId || msg.msgServerId || msg.msgLocalId || '',
         conversationId: msg.conversationId || cvs.id,
         senderId: msg.from,
-        senderName: userInfo?.nickname || msg.from,
+        senderName: contact?.remark || userInfo?.nickname || msg.from,
         avatar: userInfo?.avatarUrl,
         timestamp: msg.time || msg.timestamp,
         summary: msg.text || msg.msg || getMessageSummary(msg as unknown as UiMessage),

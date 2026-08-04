@@ -188,7 +188,10 @@ export function useUIKitProvider(
 
   const domains = {
     message: new MessageDomain(host, stores.message),
-    conversation: new ConversationDomain(host, stores.conversation),
+    conversation: new ConversationDomain(host, stores.conversation, {
+      // 进入会话时批量补发未回执的接收消息（登录离线消息场景）
+      sendPendingReadReceipts: (id, type) => void domains.message.sendPendingReadReceipts(id, type),
+    }),
     contact: new ContactDomain(host, stores.contact),
     group: new GroupDomain(host, stores.group),
     presence: new PresenceDomain(host, stores.presence),
@@ -231,7 +234,6 @@ export function useUIKitProvider(
   }
 
   async function logout(): Promise<void> {
-    const userId = stores.client.currentUser
     if (uikitClient) {
       await uikitClient.logout()
     }

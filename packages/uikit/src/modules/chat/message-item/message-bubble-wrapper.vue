@@ -137,6 +137,20 @@ const shouldShowTime = computed(() => {
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
 
+/** 群聊已读回执是否激活（用圆圈替代普通状态） */
+const isGroupReadReceiptActive = computed(() => {
+  if (!props.message.isSelf || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
+    return false
+  // 消息本身已请求回执或已有回执数据，直接激活
+  if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
+    return true
+  // 配置开启时，群聊己方消息默认激活（兼容历史消息与未收到回执的新消息）
+  return props.groupReadReceiptConfig?.enabled === true
+})
+
+/** 是否显示群已读人数标注 */
+const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
+
 /** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
 const showStatus = computed(() => props.message.isSelf && !isGroupReadReceiptActive.value)
 
@@ -198,7 +212,9 @@ function checkMultiLine() {
 let bodyResizeObserver: ResizeObserver | null = null
 
 onMounted(() => {
-  if (statusPosition.value === 'inline') {
+  // 状态列与气泡同行的两种场景：配置 inline，或群已读回执激活（此时无论
+  // statusPosition 如何都走 message-row 分支）。二者都需要多行检测来沉底。
+  if (statusPosition.value === 'inline' || showGroupReadCount.value) {
     checkMultiLine()
     if (bodyRef.value && typeof ResizeObserver !== 'undefined') {
       bodyResizeObserver = new ResizeObserver(checkMultiLine)
@@ -213,20 +229,6 @@ function onStatusClick() {
     emit('resend', props.message)
   }
 }
-
-/** 群聊已读回执是否激活（用圆圈替代普通状态） */
-const isGroupReadReceiptActive = computed(() => {
-  if (!props.message.isSelf || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
-    return false
-  // 消息本身已请求回执或已有回执数据，直接激活
-  if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
-    return true
-  // 配置开启时，群聊己方消息默认激活（兼容历史消息与未收到回执的新消息）
-  return props.groupReadReceiptConfig?.enabled === true
-})
-
-/** 是否显示群已读人数标注 */
-const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
 
 /** 群成员总数（优先取消息缓存，其次从 groupStore 查） */
 const groupMemberCount = computed(() => {
@@ -416,7 +418,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- ===== 状态在气泡下方（默认/历史行为） ===== -->
-          <template v-if="statusPosition === 'below'">
+          <template v-if="statusPosition === 'below' && !showGroupReadCount">
             <!-- 消息渲染器 -->
             <div class="message-bubble-wrapper__body">
               <!-- 置顶角标 -->
@@ -509,24 +511,9 @@ onBeforeUnmount(() => {
               </slot>
             </div>
 
-            <!-- 群已读人数标注 -->
-            <button
-              v-if="showGroupReadCount"
-              type="button"
-              class="message-bubble-wrapper__group-read"
-              :class="{
-                'message-bubble-wrapper__group-read--all': isGroupReadAll,
-                'message-bubble-wrapper__group-read--zero': groupReadCount === 0,
-              }"
-              :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
-              @click.stop="onGroupReadClick"
-            >
-              <Icon v-if="isGroupReadAll" name="actions/check" :size="8" />
-              <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
-            </button>
           </template>
 
-          <!-- ===== 状态与气泡同一行 ===== -->
+          <!-- ===== 状态与气泡同一行（群已读回执默认与气泡同行） ===== -->
           <div
             v-else
             class="message-bubble-wrapper__message-row"
@@ -583,7 +570,7 @@ onBeforeUnmount(() => {
               />
             </div>
 
-            <!-- 状态列（状态 + 群已读） -->
+            <!-- 状态列（状态 + 群已读，默认位于己方气泡左侧） -->
             <div
               v-if="showStatus || showGroupReadCount"
               ref="statusColumnRef"

@@ -2,10 +2,12 @@
 import { computed, ref } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import Cell from '../../../components/cell/cell.vue'
+import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useChat } from '../../../composables/use-chat'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useLocale } from '../../../locale'
-import type { TextMessageBody, UiMessage } from '../../../sdk/types'
+import type { UiMessage } from '../../../sdk/types'
+import PinnedBarItem from './pinned-bar-item.vue'
 
 export interface PinnedBarProps {
   /** 预览文本最大长度 */
@@ -42,26 +44,6 @@ const cursor = ref(0)
 
 const currentItem = computed(() => pinnedList.value[cursor.value] || pinnedList.value[0])
 
-/** 单条预览文本（直接复用 locale 中已带方括号的预览文案，避免再拼接） */
-function previewOf(msg: UiMessage): string {
-  const max = props.maxPreviewLength
-  if (msg.type === 'text') {
-    const text = (msg.body as TextMessageBody).content || ''
-    return text.length > max ? `${text.slice(0, max)}…` : text
-  }
-  if (msg.type === 'image')
-    return t('message.image') || '[图片]'
-  if (msg.type === 'voice')
-    return t('message.audio') || '[语音]'
-  if (msg.type === 'video')
-    return t('message.video') || '[视频]'
-  if (msg.type === 'file')
-    return t('message.file') || '[文件]'
-  if (msg.type === 'combine')
-    return t('message.combine') || '[聊天记录]'
-  return t('message.custom') || '[消息]'
-}
-
 function onLocate(msg: UiMessage) {
   emit('locate', msg)
 }
@@ -96,8 +78,11 @@ function toggle() {
     >
       <Icon class="pinned-bar__icon" name="chat/pin" :size="14" />
       <div class="pinned-bar__content">
-        <span class="pinned-bar__sender">{{ currentItem?.from }}：</span>
-        <span class="pinned-bar__preview">{{ currentItem ? previewOf(currentItem) : '' }}</span>
+        <PinnedBarItem
+          v-if="currentItem"
+          :message="currentItem"
+          :max-preview-length="props.maxPreviewLength"
+        />
       </div>
       <span
         v-if="pinnedList.length > 1"
@@ -106,14 +91,15 @@ function toggle() {
       >
         {{ t('chat.pinnedBar.count').replace('{count}', String(pinnedList.length)) }}
       </span>
-      <button
+      <IconButton
         v-if="currentItem"
         class="pinned-bar__action"
+        icon="actions/close"
+        size="small"
+        variant="ghost"
         :title="t('message.action.unpin')"
         @click="onUnpin(currentItem, $event)"
-      >
-        <Icon name="actions/xmark_thin" :size="14" />
-      </button>
+      />
     </div>
 
     <!-- 展开态：滚动列表 -->
@@ -133,18 +119,18 @@ function toggle() {
       >
         <template #default>
           <div class="pinned-bar__content">
-            <span class="pinned-bar__sender">{{ msg.from }}：</span>
-            <span class="pinned-bar__preview">{{ previewOf(msg) }}</span>
+            <PinnedBarItem :message="msg" :max-preview-length="props.maxPreviewLength" />
           </div>
         </template>
         <template #trailing>
-          <button
+          <IconButton
             class="pinned-bar__action"
+            icon="actions/close"
+            size="small"
+            variant="ghost"
             :title="t('message.action.unpin')"
             @click="onUnpin(msg, $event)"
-          >
-            <Icon name="actions/xmark_thin" :size="14" />
-          </button>
+          />
         </template>
       </Cell>
     </div>
@@ -217,24 +203,6 @@ function toggle() {
 
 .pinned-bar__action {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  color: var(--uikit-text-secondary);
-  cursor: pointer;
-  transition:
-    color 0.15s,
-    background-color 0.15s;
-}
-
-.pinned-bar__action:hover {
-  color: var(--uikit-text-primary);
-  background-color: var(--uikit-bg-secondary);
 }
 
 .pinned-bar__list {

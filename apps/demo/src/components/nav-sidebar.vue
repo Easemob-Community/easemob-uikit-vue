@@ -48,7 +48,7 @@ const totalUnread = computed(() => {
 
 const tabs = [
   { key: 'conversation' as const, icon: 'chat/bubble_fill', label: '消息' },
-  { key: 'contact' as const, icon: 'people/person_3lines_fill', label: '联系人' },
+  { key: 'contact' as const, icon: 'people/person_3lines_fill', label: '通讯录' },
 ]
 
 function selectTab(key: Props['modelValue']) {

@@ -6,6 +6,7 @@ import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
+import { markReadReceiptSent } from '../domain/message-domain'
 import type { RootStores } from './types'
 
 const chatLog = createLogger('UIKit:ChatEvents')
@@ -18,16 +19,22 @@ const pendingReadReceipts = new Map<string, string[]>()
 let readReceiptFlushScheduled = false
 
 /**
- * 单聊消息已读回执入队：同一 microtask 内到达的多条消息合并为一次
+ * 单聊/群聊消息已读回执入队：同一 microtask 内到达的多条消息合并为一次
  * sendMessageReadReceipts 请求（SDK 限制单次最多 50 条，超出自动分批），
  * 避免逐条消息各发一次回执请求。
  */
-function queueMessageReadReceipt(client: ManagerHost, conversationId: string, messageId: string) {
+function queueMessageReadReceipt(
+  client: ManagerHost,
+  conversationType: 'singleChat' | 'groupChat',
+  conversationId: string,
+  messageId: string,
+) {
   if (!messageId)
     return
-  const list = pendingReadReceipts.get(conversationId) || []
+  const queueKey = `${conversationType}:${conversationId}`
+  const list = pendingReadReceipts.get(queueKey) || []
   list.push(messageId)
-  pendingReadReceipts.set(conversationId, list)
+  pendingReadReceipts.set(queueKey, list)
   if (readReceiptFlushScheduled)
     return
   readReceiptFlushScheduled = true
@@ -37,14 +44,18 @@ function queueMessageReadReceipt(client: ManagerHost, conversationId: string, me
     while (pendingReadReceipts.size > 0) {
       const entries = Array.from(pendingReadReceipts.entries())
       pendingReadReceipts.clear()
-      for (const [cvsId, messageIds] of entries) {
+      for (const [queueKey, messageIds] of entries) {
+        const [conversationType, conversationId] = queueKey.split(':') as ['singleChat' | 'groupChat', string]
         for (let i = 0; i < messageIds.length; i += 50) {
+          const batch = messageIds.slice(i, i + 50)
           try {
             await client.chatManager.sendMessageReadReceipts({
-              conversationId: cvsId,
-              conversationType: 'singleChat',
-              messageIds: messageIds.slice(i, i + 50),
+              conversationId,
+              conversationType,
+              messageIds: batch,
             })
+            // 发送成功记录去重，进入会话时不再重复补发该批消息
+            markReadReceiptSent(batch)
           }
           catch (err) {
             chatLog.warn('sendMessageReadReceipts failed:', err)
@@ -269,10 +280,10 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         }).catch((err: unknown) => {
           console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
         })
-        // 单聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
+        // 单聊/群聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
         // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送
-        if (sdkMsg.conversationType === 'singleChat') {
-          queueMessageReadReceipt(client, sdkMsg.conversationId, sdkMsg.msgServerId)
+        if (sdkMsg.conversationType === 'singleChat' || sdkMsg.conversationType === 'groupChat') {
+          queueMessageReadReceipt(client, sdkMsg.conversationType, sdkMsg.conversationId, sdkMsg.msgServerId)
         }
       }
 

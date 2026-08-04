@@ -6,15 +6,37 @@ import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
 
 const combineLogger = createLogger('Combine')
+const historyLogger = createLogger('History')
 
 /** 上传进度回调写入 store 的最小间隔（ms），避免 XHR progress 事件高频触发整列表重渲染 */
 const PROGRESS_FLUSH_INTERVAL = 150
+
+/**
+ * 已发送过已读回执的消息 ID 集合（模块级去重）。
+ * 实时回执路径（chat-events）与进入会话补发路径共享，避免重复发送。
+ */
+const sentReadReceiptIds = new Set<string>()
+/** 去重集合上限，超出后淘汰最早记录（Set 按插入序迭代） */
+const MAX_SENT_READ_RECEIPT_IDS = 5000
+
+/** 记录已发送过已读回执的消息 ID（供实时回执与补发路径共享去重） */
+export function markReadReceiptSent(messageIds: string[]) {
+  for (const id of messageIds) {
+    sentReadReceiptIds.add(id)
+    if (sentReadReceiptIds.size > MAX_SENT_READ_RECEIPT_IDS) {
+      const oldest = sentReadReceiptIds.values().next().value
+      if (oldest !== undefined)
+        sentReadReceiptIds.delete(oldest)
+    }
+  }
+}
 
 /**
  * MessageStore 需要暴露给 Domain 的最小接口。
  * 具体实现由 store/message.ts 提供。
  */
 export interface MessageStoreLike {
+  getMessages: (conversationId: string) => UiMessage[]
   addMessage: (msg: UiMessage) => void
   addSendingMessage: (localId: string, sdkMsg: SdkMessage) => void
   replaceWithSent: (localId: string, msg: UiMessage) => void
@@ -30,6 +52,7 @@ export interface MessageStoreLike {
   setVoiceText: (msgId: string, voiceText: { text: string }) => void
   setVoiceTranscribing: (msgId: string, transcribing: boolean) => void
   clearConversationMessages: (conversationId: string) => void
+  updateMessageById: (msgId: string, patch: Partial<UiMessage>) => void
 }
 
 /**
@@ -280,13 +303,72 @@ export class MessageDomain {
       searchDirection: 'up',
     })
 
+    // 调试：打印获取历史消息接口的原始返回数据
+    historyLogger.info('fetchHistory raw response', {
+      conversationId,
+      conversationType,
+      cursor,
+      pageSize,
+      raw: page,
+    })
+
     const uiMsgs = page.items.map(msg => toUiMessage(msg, this.currentUserId))
     this.store.prependMessages(conversationId, uiMsgs)
+
+    // 群聊历史消息（刷新首屏与上滑翻页共用此路径）：getHistoryMessages 返回的
+    // 离线消息不带群已读数（groupReadCount），需调用 getGroupMessageReadReceipts
+    // 批量补全，异步执行不阻塞历史消息返回与渲染。
+    if (conversationType === 'groupChat')
+      void this.fillGroupReadCounts(uiMsgs, conversationId)
 
     return {
       items: uiMsgs,
       cursor: page.cursor,
       hasMore: page.hasMore,
+    }
+  }
+
+  /**
+   * 补全群聊历史消息的已读数：对已读数缺失的己方消息，调用
+   * getGroupMessageReadReceipts 批量获取 count 并写入 store
+   * （服务端单次最多 20 条，超过自动分批）；失败仅告警，不影响整体。
+   *
+   * 注意：不做 needReadReceipt 筛选——该字段是发送时的创建参数，历史消息
+   * 返回时通常不携带；已读数只对发送者有意义，且 SDK 已带 groupReadCount
+   * 的消息会被过滤，不会重复请求。
+   */
+  private async fillGroupReadCounts(uiMsgs: UiMessage[], groupId: string) {
+    const candidates = uiMsgs.filter(m => m.isSelf && !(m.groupReadCount ?? 0))
+    const serverIds = candidates
+      .map(m => m.msgServerId)
+      .filter((id): id is string => !!id)
+    // 无论目标是否为空都打印，便于确认筛选结果
+    historyLogger.info('fillGroupReadCounts scan', {
+      groupId,
+      total: uiMsgs.length,
+      selfMissingCount: candidates.length,
+      targets: serverIds.length,
+    })
+    if (serverIds.length === 0)
+      return
+    // 服务端限制单次最多 20 条消息 ID，按 20 条分批请求
+    const BATCH_SIZE = 20
+    for (let i = 0; i < serverIds.length; i += BATCH_SIZE) {
+      const batch = serverIds.slice(i, i + BATCH_SIZE)
+      try {
+        const receipts = await this.client.chatManager.getGroupMessageReadReceipts({
+          groupId,
+          messageIds: batch,
+        })
+        historyLogger.info('fillGroupReadCounts result', { groupId, batch, receipts })
+        for (const receipt of receipts) {
+          if (receipt.count > 0)
+            this.store.updateMessageById(receipt.messageId, { groupReadCount: receipt.count })
+        }
+      }
+      catch (error) {
+        console.warn('[MessageDomain.fillGroupReadCounts] failed:', batch, formatSdkError(error))
+      }
     }
   }
 
@@ -317,6 +399,38 @@ export class MessageDomain {
       conversationType,
       messageIds,
     })
+  }
+
+  /**
+   * 补发当前会话中尚未发送过已读回执的接收消息（批量）。
+   *
+   * 场景：接收方登录时收到群内/单聊离线消息，onMessage 阶段当前会话可能
+   * 尚未打开而无法即时发送回执（群聊发送方气泡的已读数量因此不更新）；
+   * 点击会话进入后统一批量补发，使发送方能及时看到已读状态/人数。
+   * 已发送过的消息经 sentReadReceiptIds 去重，不会重复请求；
+   * 失败仅 warn 不阻塞进入会话（先标记后发送，失败回滚以便下次重试）。
+   */
+  async sendPendingReadReceipts(
+    conversationId: string,
+    conversationType: 'singleChat' | 'groupChat',
+  ) {
+    const messages = this.store.getMessages(conversationId)
+    const pendingIds = messages
+      .filter(m => !m.isSelf && !!m.msgServerId && !sentReadReceiptIds.has(m.msgServerId))
+      .map(m => m.msgServerId as string)
+    if (pendingIds.length === 0)
+      return
+    // 先标记再发送：并发进入会话不会重复请求
+    for (const id of pendingIds)
+      sentReadReceiptIds.add(id)
+    try {
+      await this.markMessagesRead(conversationId, conversationType, pendingIds)
+    }
+    catch (error) {
+      for (const id of pendingIds)
+        sentReadReceiptIds.delete(id)
+      console.warn('[MessageDomain.sendPendingReadReceipts] failed:', conversationId, formatSdkError(error))
+    }
   }
 
   /** 置顶消息 */

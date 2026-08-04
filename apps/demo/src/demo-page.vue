@@ -542,7 +542,7 @@ function injectMockContacts() {
       <!-- 列表页（会话 / 联系人） -->
       <div v-show="h5Page === 'list'" class="h5-page">
         <div class="h5-page__header">
-          <span class="h5-page__title">{{ sidebarTab === 'conversation' ? '消息' : '联系人' }}</span>
+          <span class="h5-page__title">{{ sidebarTab === 'conversation' ? '消息' : '通讯录' }}</span>
           <button class="h5-page__header-btn" @click="showSettings = true">
             <EmIcon name="misc/gear" :size="20" />
           </button>
@@ -577,7 +577,7 @@ function injectMockContacts() {
             @click="sidebarTab = 'contact'"
           >
             <EmIcon name="people/person_3lines_fill" :size="22" />
-            <span class="h5-tabbar__label">联系人</span>
+            <span class="h5-tabbar__label">通讯录</span>
           </button>
         </nav>
       </div>

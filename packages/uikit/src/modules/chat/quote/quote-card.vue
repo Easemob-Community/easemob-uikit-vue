@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
+import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface QuoteCardProps {
   quote: MsgQuotePayload
@@ -14,6 +15,10 @@ export interface QuoteCardEmits {
 
 const props = defineProps<QuoteCardProps>()
 const emit = defineEmits<QuoteCardEmits>()
+
+/** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
+const { displayName } = useUserInfo(() => props.quote.msgSender)
+const senderName = computed(() => displayName.value || props.quote.msgSender)
 
 /** 非文本类型的预览前缀图标，用于直观区分引用消息类型 */
 const typeIcon = computed(() => {
@@ -42,7 +47,7 @@ function onClick() {
   >
     <span class="quote-card__bar" aria-hidden="true" />
     <div class="quote-card__content">
-      <span class="quote-card__sender">{{ quote.msgSender }}</span>
+      <span class="quote-card__sender">{{ senderName }}</span>
       <span class="quote-card__divider">：</span>
       <span v-if="typeIcon" class="quote-card__type">{{ typeIcon }}</span>
       <span class="quote-card__preview">{{ quote.msgPreview }}</span>
