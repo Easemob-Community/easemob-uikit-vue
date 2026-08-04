@@ -32,6 +32,8 @@ export interface MessageListEmits {
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
+  (e: 'avatar-view-profile', userId: string): void
+  (e: 'avatar-mention', payload: { userId: string, name: string }): void
 }
 
 const props = defineProps<MessageListProps>()
@@ -61,6 +63,12 @@ const virtualThreshold = computed(() => messageListConfig.value?.virtualScrollTh
 
 /** 是否启用虚拟滚动 */
 const enableVirtual = computed(() => messages.value.length > virtualThreshold.value)
+
+/** 消息项间距 */
+const messageGap = computed(() => messageListConfig.value?.messageGap ?? 12)
+
+/** 消息列表内边距 */
+const messagePadding = computed(() => messageListConfig.value?.messagePadding ?? 16)
 
 /** 时间分组间隔 */
 const groupInterval = computed(() => messageListConfig.value?.groupInterval ?? 5 * 60 * 1000)
@@ -352,7 +360,7 @@ async function onMessageAction(event: MessageActionEvent) {
     toggleMessageSelection(event.message.msgServerId || event.message.msgLocalId)
     return
   }
-  if (event.action === 'recall') {
+  if (event.action === 'recall' || event.action === 'recallOther') {
     try {
       await recallMessage(event.message.msgServerId || event.message.msgLocalId)
     }
@@ -537,18 +545,31 @@ function shouldShowTimeDivider(current: UiMessage, previous: UiMessage | null): 
   return current.timestamp - previous.timestamp > groupInterval.value
 }
 
-/** 格式化时间分割线 */
+/** 格式化时间分割线：今天只显示时间，昨天/前天显示语义化文案，其余显示日期+时间 */
 function formatDividerTime(timestamp: number): string {
   const date = new Date(timestamp)
   const now = new Date()
-  const isToday = date.toDateString() === now.toDateString()
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
-  if (isToday)
-    return `${hours}:${minutes}`
+  const timeStr = `${hours}:${minutes}`
+
+  // 使用本地零点的 Date 对象计算自然日差，避免跨时区/夏令时误差
+  const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const diffDays = Math.round((nowDate.getTime() - targetDate.getTime()) / (24 * 60 * 60 * 1000))
+
+  if (diffDays === 0)
+    return timeStr
+  if (diffDays === 1)
+    return `${t('time.yesterday')} ${timeStr}`
+  if (diffDays === 2)
+    return `${t('time.beforeYesterday')} ${timeStr}`
+
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
-  return `${month}-${day} ${hours}:${minutes}`
+  const isSameYear = date.getFullYear() === now.getFullYear()
+  const dateStr = isSameYear ? `${month}-${day}` : `${date.getFullYear()}-${month}-${day}`
+  return `${dateStr} ${timeStr}`
 }
 
 /** 带时间分割线的消息列表 */
@@ -651,6 +672,8 @@ watch(locateRequest, (req) => {
       :items="messagesWithDividers"
       key-field="key"
       :estimate-height="80"
+      :gap="messageGap"
+      :padding="messagePadding"
       @reach-top="loadMoreHistory"
       @scroll="onVirtualScroll"
     >
@@ -678,6 +701,8 @@ watch(locateRequest, (req) => {
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
           @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
+          @avatar-view-profile="emit('avatar-view-profile', $event)"
+          @avatar-mention="emit('avatar-mention', $event)"
         >
           <!-- 透传消息类型级插槽到气泡包装器 -->
           <template
@@ -692,7 +717,13 @@ watch(locateRequest, (req) => {
     </MessageVirtualList>
 
     <!-- 普通滚动模式 -->
-    <div v-else ref="listRef" class="message-list__scroll" @scroll="onNativeScroll">
+    <div
+      v-else
+      ref="listRef"
+      class="message-list__scroll"
+      :style="{ gap: `${messageGap}px`, padding: `${messagePadding}px` }"
+      @scroll="onNativeScroll"
+    >
       <div
         v-for="item in messagesWithDividers"
         :key="item.key"
@@ -721,6 +752,8 @@ watch(locateRequest, (req) => {
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
           @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
+          @avatar-view-profile="emit('avatar-view-profile', $event)"
+          @avatar-mention="emit('avatar-mention', $event)"
         >
           <!-- 透传消息类型级插槽到气泡包装器 -->
           <template
@@ -782,8 +815,6 @@ watch(locateRequest, (req) => {
   overscroll-behavior-y: contain;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
   -webkit-overflow-scrolling: touch;
 }
 

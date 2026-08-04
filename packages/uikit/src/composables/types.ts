@@ -35,4 +35,6 @@ export interface UIKitFeatures {
   enableUserInfo?: boolean
   /** 是否启用用户资料变更订阅；默认 true，服务端返回无权限时自动熔断 */
   enableUserInfoSubscription?: boolean
+  /** 是否持久化好友申请/群邀请记录到 localStorage，默认 true */
+  enableInvitePersistence?: boolean
 }

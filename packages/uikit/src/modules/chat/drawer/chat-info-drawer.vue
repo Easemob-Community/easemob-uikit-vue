@@ -526,6 +526,14 @@ function onViewAllMembers() {
   showMemberList.value = true
 }
 
+function onViewMembersForTransfer() {
+  showMemberList.value = true
+}
+
+function onViewMembersForAdmin() {
+  showMemberList.value = true
+}
+
 function closeMemberList() {
   showMemberList.value = false
 }
@@ -778,6 +786,23 @@ defineExpose({
             </div>
             <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
               {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 群聊：群主/管理员专属入口 -->
+        <div v-if="isGroup && isOwner" class="chat-info-drawer__section-group">
+          <div class="chat-info-drawer__section-label">
+            {{ t('chat.info.groupAdminActions') || '群管理操作' }}
+          </div>
+          <div class="chat-info-drawer__section chat-info-drawer__section--admin-actions">
+            <button class="chat-info-drawer__admin-action" @click="onViewMembersForTransfer">
+              <Icon name="actions/crown" :size="18" />
+              <span>{{ t('chat.info.transferOwnerEntry') || '转让群主' }}</span>
+            </button>
+            <button class="chat-info-drawer__admin-action" @click="onViewMembersForAdmin">
+              <Icon name="actions/shield" :size="18" />
+              <span>{{ t('chat.info.setAdminEntry') || '设置管理员' }}</span>
             </button>
           </div>
         </div>
@@ -1098,6 +1123,31 @@ defineExpose({
   min-height: 0;
   overflow: hidden;
   background-color: var(--uikit-bg-base);
+}
+
+.chat-info-drawer__section--admin-actions {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.chat-info-drawer__admin-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color 0.15s;
+  text-align: left;
+}
+
+.chat-info-drawer__admin-action:hover {
+  background-color: var(--uikit-bg-hover);
 }
 
 .chat-info-drawer__confirm-body {

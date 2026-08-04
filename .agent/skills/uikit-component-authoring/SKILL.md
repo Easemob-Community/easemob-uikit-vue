@@ -63,6 +63,29 @@ const props = withDefaults(defineProps<ConversationItemProps>(), {
 })
 ```
 
+### 3.1 Boolean prop 默认值陷阱（必须给显式默认值）
+
+**Vue 3 对 `Boolean` 类型 prop 有特殊处理**：当父组件不传且 `withDefaults` 中未提供默认值时，Vue 会将 `undefined` 自动转为 `false`（而非保持 `undefined`）。
+
+这会导致依赖 `??` 运算符的回落链路失效：
+
+```ts
+// ❌ 错误示例：以为不传就是 undefined，实际是 false
+showNotice?: boolean  // 不传 → props.showNotice = false（Vue Boolean 自动转换）
+const effective = computed(() => props.showNotice ?? true)  // false ?? true = false ！
+
+// ✅ 正确：在 withDefaults 中给默认值
+const props = withDefaults(defineProps<MyProps>(), {
+  showNotice: true,  // 不传 → props.showNotice = true
+})
+```
+
+**规则**：所有 `Boolean` 类型 prop **必须在 `withDefaults` 中提供显式默认值**，即使默认值是 `false` 也要写出来——靠显式声明而非依赖 Vue 隐式行为。
+
+> `number`、`string` 等非 Boolean 类型不受此影响，不传时保持 `undefined`。
+
+---
+
 ## 4. emits：type-based，公开事件名一律 kebab-case（lint 强制）
 
 用 `defineEmits<...>()`。**对外事件名一律 kebab-case**：多词写连字符
@@ -154,6 +177,7 @@ app.component(finalName, value as Component)
 - 公开事件 kebab-case —— `vue/custom-event-name-casing` **报错级**（第 4 节）。
 - `Em*` 别名只在 `index.ts` 给；不写 `defineOptions`；名字不以 `Em` 开头就进不了 resolver/install（第 2、5、6 节）。
 - props 用 type-based `defineProps<XxxProps>()` + `withDefaults`，数组/对象默认值用工厂函数（第 3 节）。
+- **Boolean prop 必须在 `withDefaults` 中显式给默认值**——Vue 3 对未设默认值的 Boolean prop 自动转为 `false`，导致 `??` 回落链断裂（详见第 3.1 节）。
 
 **软约定（真实主流但有存量例外，靠 review 把关；新代码按严格版写）：**
 
@@ -185,3 +209,4 @@ app.component(finalName, value as Component)
 - ❌ 调用方/内部从深层文件直接 `import` 组件 `.vue`，绕开 `Em*` 命名导出 / resolver。
 - ❌ 漏 `<style scoped>`，或样式里写死颜色/时长而非 `var(--uikit-*)`（详见 `uikit-styling-theming`）。
 - ❌ 组件里直接 `env(safe-area-inset-*)` 或自行监听 `resize/visualViewport` 处理 H5 适配。
+- ❌ Boolean prop 不在 `withDefaults` 中给默认值，依赖 Vue 隐式 `false` 或 `?? true` 回落——Vue 3 会先把 `undefined` 转成 `false`，`false ?? true` = `false`，导致 "默认 true" 的逻辑永远不生效。

@@ -17,6 +17,7 @@ import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import Modal from '../../components/modal/modal.vue'
+import Popup from '../../components/popup/popup.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
 import Empty from '../../components/empty/empty.vue'
@@ -26,6 +27,7 @@ import PinnedBar from './message-list/pinned-bar.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
+import MessageSearchPanel from './message-search/message-search-panel.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 /** 渲染错误信息 */
@@ -287,8 +289,17 @@ const customHeaderSlot = computed(() => headerConfig.value?.customSlot ?? false)
 /** 是否显示 header 头像 */
 const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 
+/** 是否启用消息搜索入口 */
+const searchEnabled = computed(() => props.config?.messageList?.search?.enabled === true)
+
 /** 是否显示 drawer */
 const showDrawer = ref(false)
+
+/** 是否显示消息搜索面板 */
+const showSearchPanel = ref(false)
+
+/** 消息搜索触发按钮 ref */
+const searchBtnRef = ref<HTMLElement>()
 
 /** 群信息抽屉组件引用 */
 const chatInfoDrawerRef = ref<InstanceType<typeof ChatInfoDrawer>>()
@@ -690,6 +701,26 @@ function onHeaderAvatarClick() {
   }
 }
 
+/** 右键头像：查看资料 */
+function onAvatarViewProfile(userId: string) {
+  userCardUserId.value = userId
+  showUserCardModal.value = true
+}
+
+/** 右键头像：@ 提及 */
+function onAvatarMention(payload: { userId: string, name: string }) {
+  const contact: MentionContact = {
+    userId: payload.userId,
+    name: payload.name,
+  }
+  messageInputRef.value?.appendMention?.(contact)
+}
+
+/** 消息搜索定位 */
+function onSearchLocate(msgId: string) {
+  requestLocate(msgId)
+}
+
 /** 从用户名片进入单聊 */
 function onUserCardSendMessage(userId: string) {
   const existing = stores.conversation.conversationList.find(c => c.id === userId)
@@ -878,6 +909,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
             <slot name="header-extra" :conversation="currentConversation" />
           </div>
           <button
+            v-if="searchEnabled"
+            ref="searchBtnRef"
+            class="chat__header-search"
+            @click.stop="showSearchPanel = true"
+          >
+            <Icon name="misc/magnifier2" :size="20" />
+          </button>
+          <button
             v-if="currentConversation"
             class="chat__header-more"
             @click.stop="showDrawer = true"
@@ -905,6 +944,8 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @mention-click="(userId) => emit('at-me-click', userId)"
         @location-click="(body, msg) => emit('location-click', body, msg)"
         @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
+        @avatar-view-profile="onAvatarViewProfile"
+        @avatar-mention="onAvatarMention"
       >
         <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
         <template
@@ -974,6 +1015,25 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @set-admin="onSetAdmin"
         @remove-admin="onRemoveAdmin"
       />
+
+      <!-- 消息搜索面板 -->
+      <Popup
+        v-if="searchEnabled"
+        :show="showSearchPanel"
+        :anchor="searchBtnRef || undefined"
+        placement="bottom"
+        align="end"
+        :overlay="false"
+        :offset="8"
+        @update:show="showSearchPanel = $event"
+      >
+        <MessageSearchPanel
+          :show="showSearchPanel"
+          :config="props.config?.messageList?.search"
+          @locate="onSearchLocate"
+          @close="showSearchPanel = false"
+        />
+      </Popup>
 
       <!-- 移除成员二次确认 -->
       <Modal
@@ -1134,6 +1194,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   color: var(--uikit-text-primary);
 }
 
+.chat__header-search,
 .chat__header-more {
   background: none;
   border: none;
@@ -1148,6 +1209,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   flex-shrink: 0;
 }
 
+.chat__header-search:hover,
 .chat__header-more:hover {
   background-color: var(--uikit-bg-secondary);
 }

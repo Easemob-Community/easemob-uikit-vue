@@ -297,6 +297,23 @@ function insertMention(contact: MentionContact) {
   })
 }
 
+/** 在末尾追加 @提及 */
+function appendMention(contact: MentionContact) {
+  const el = getInputEl()
+  if (!el)
+    return
+  const prefix = text.value.length > 0 && !text.value.endsWith(' ') ? ' ' : ''
+  text.value = `${text.value}${prefix}@${contact.name} `
+  if (!mentionList.value.find(m => m.userId === contact.userId)) {
+    mentionList.value.push(contact)
+  }
+  nextTick(() => {
+    el.focus()
+    const newPos = text.value.length
+    el.setSelectionRange(newPos, newPos)
+  })
+}
+
 /** 点击表情按钮 */
 function onEmojiClick() {
   if (emojiBtnRef.value) {
@@ -355,6 +372,7 @@ function getText(): string {
 /** 暴露方法 */
 defineExpose({
   insertMention,
+  appendMention,
   insertEmoji,
   setText,
   getText,

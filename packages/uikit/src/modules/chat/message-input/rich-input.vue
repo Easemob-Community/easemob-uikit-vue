@@ -234,7 +234,7 @@ function insertEmoji(emoji: string) {
   editor.value?.chain().focus().insertContent(emoji).run()
 }
 
-/** 插入 @提及 */
+/** 插入 @提及（替换当前 @keyword） */
 function insertMention(name: string, contact?: MentionContact) {
   if (!editor.value || mentionAnchorPos.value < 0) return
   const currentPos = editor.value.state.selection.from
@@ -245,6 +245,19 @@ function insertMention(name: string, contact?: MentionContact) {
     .insertContent(`@${name} `)
     .run()
   mentionAnchorPos.value = -1
+  if (contact && !mentionList.value.find(m => m.userId === contact.userId)) {
+    mentionList.value.push(contact)
+  }
+}
+
+/** 在末尾追加 @提及 */
+function appendMention(name: string, contact?: MentionContact) {
+  if (!editor.value) return
+  editor.value
+    .chain()
+    .focus()
+    .insertContent(`@${name} `)
+    .run()
   if (contact && !mentionList.value.find(m => m.userId === contact.userId)) {
     mentionList.value.push(contact)
   }
@@ -264,6 +277,7 @@ function getText(): string {
 /** 暴露方法 */
 defineExpose({
   insertMention,
+  appendMention,
   insertEmoji,
   setText,
   getText,

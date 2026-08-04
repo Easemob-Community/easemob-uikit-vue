@@ -42,6 +42,8 @@ export interface MessageInputPluginContext {
   getText: () => string
   /** 聚焦输入框 */
   focus: () => void
+  /** 在光标/末尾插入 @提及 */
+  appendMention: (contact: MentionContact) => void
 }
 
 /** 合并后的 chat plugin 上下文 */
@@ -83,6 +85,7 @@ export function useChatPlugin(): ChatPluginMergedContext {
     setText: () => { console.warn('[useChatPlugin] setText not available') },
     getText: () => '',
     focus: () => { console.warn('[useChatPlugin] focus not available') },
+    appendMention: () => { console.warn('[useChatPlugin] appendMention not available') },
   }
 
   return {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useLocale } from '../../../locale'
 import { useViewport } from '../../../composables/use-viewport'
 import { useLongPress } from '../../../composables/use-long-press'
 import { useToast } from '../../../composables/use-toast'
+import { useUIKit } from '../../../composables/use-uikit'
+import { useGroupStore } from '../../../store/group'
+import { CONVERSATION_TYPE } from '../../../constants'
 import Popup from '../../../components/popup/popup.vue'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
@@ -25,6 +28,8 @@ const emit = defineEmits<MessageInteractiveEmits>()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
+const { domains } = useUIKit()
+const groupStore = useGroupStore()
 
 /** 触发元素引用 */
 const triggerRef = ref<HTMLElement>()
@@ -52,6 +57,43 @@ const isRecallExpired = computed(() => {
 const recallDurationMinutes = computed(() => {
   const duration = props.config?.recallDisableDuration ?? RECALL_DISABLE_DURATION_DEFAULT
   return Math.round(duration / 60 / 1000)
+})
+
+/** 当前用户是否为群聊的群主/管理员，可撤回他人消息 */
+const canRecallOther = computed(() => {
+  if (props.config?.enableRecallOther === false)
+    return false
+  if (props.message.isSelf)
+    return false
+  if (props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
+    return false
+  if (props.message.recalled)
+    return false
+  const groupId = props.message.conversationId
+  if (!groupId)
+    return false
+  const group = groupStore.getGroupById(groupId)
+  // 优先使用消息中可能携带的当前用户身份；否则从群信息读取当前登录用户的角色
+  const role = group?.role
+  return role === 'owner' || role === 'admin'
+})
+
+// 当群信息未预加载时（如从通知跳入），主动拉取一次群详情，
+// 拉取成功后 groupStore 更新，canRecallOther 会重新计算。
+const triedFetchRole = ref(false)
+onMounted(() => {
+  const groupId = props.message.conversationId
+  if (
+    props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT
+    && groupId
+    && !groupStore.getGroupById(groupId)
+    && !triedFetchRole.value
+  ) {
+    triedFetchRole.value = true
+    domains.group.fetchGroupInfo(groupId).catch(() => {
+      // 无权限或群不存在时静默失败，不阻断菜单展示
+    })
+  }
 })
 
 /** 根据配置生成菜单项 */
@@ -93,6 +135,19 @@ const actions = computed<MessageActionItem[]>(() => {
     add(
       'recall',
       t('message.action.recall') ?? '撤回',
+      'arrows/arrow_Uturn_anti_clockwise',
+      false,
+      expired,
+      t('message.recallExpired').replace('{duration}', String(minutes)) ?? `超过${minutes}分钟，无法撤回`,
+    )
+  }
+  // 群主/管理员撤回他人消息
+  if (canRecallOther.value) {
+    const expired = isRecallExpired.value
+    const minutes = recallDurationMinutes.value
+    add(
+      'recallOther',
+      t('message.action.recallOther') ?? '撤回',
       'arrows/arrow_Uturn_anti_clockwise',
       false,
       expired,

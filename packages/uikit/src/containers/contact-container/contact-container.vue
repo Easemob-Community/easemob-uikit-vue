@@ -4,6 +4,7 @@ import type { Component } from 'vue'
 import AddressBookContainer from '../address-book-container/address-book-container.vue'
 import ContactListContainer from '../contact-list-container/contact-list-container.vue'
 import GroupListContainer from '../group-list-container/group-list-container.vue'
+import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
 import type {
   AddressBookContainerEntry,
   AddressBookContainerView,
@@ -159,8 +160,11 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showHomeSearch: true,
   showScrollToTop: true,
   transition: 'slide',
-  // showNotice/noticeCount 不给默认值：缺省行为放到 effectiveXxx computed，
-  // 让下方 ?? 链能正确回退到废弃 props（showNewRequest/newRequestCount）
+  // showNotice/noticeCount 默认值说明：
+  // noticeCount 不给默认值（type number → 不传为 undefined）
+  // showNotice 必须给默认值 true，因为 Vue 3 对 Boolean prop 不传则自动转为 false，
+  // 导致 effectiveXxx computed 中 ?? true 永远收不到 nullish
+  showNotice: true,
   showGroup: true,
   showContact: true,
   autoEntryCount: true,
@@ -200,8 +204,8 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
 /** showNotice 缺省视为 true，兼容废弃 prop showNewRequest */
 const effectiveShowNotice = computed(() => props.showNotice ?? props.showNewRequest ?? true)
 
-/** noticeCount 缺省视为 0，兼容废弃 prop newRequestCount */
-const effectiveNoticeCount = computed(() => props.noticeCount ?? props.newRequestCount ?? 0)
+/** noticeCount 缺省视为 undefined，让 AddressBookContainer 回落读取 store，兼容废弃 prop newRequestCount */
+const effectiveNoticeCount = computed(() => props.noticeCount ?? props.newRequestCount)
 
 const emit = defineEmits<{
   (e: 'view-change', view: ContactContainerView): void
@@ -476,12 +480,13 @@ defineExpose({
         </template>
       </GroupListContainer>
 
-      <!-- Notice 子视图（外部自定义内容） -->
+      <!-- Notice 子视图：优先使用外部 #notice 插槽，否则默认渲染 ContactNoticeList -->
       <div
         v-else-if="view === 'notice'"
         class="contact-container__notice-view"
       >
         <slot name="notice" />
+        <ContactNoticeList v-if="!$slots.notice" />
       </div>
     </template>
   </AddressBookContainer>

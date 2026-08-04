@@ -102,7 +102,7 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   showNotice: true,
   showGroup: true,
   showContact: true,
-  noticeCount: 0,
+  noticeCount: undefined,
   autoEntryCount: true,
   entryOrder: () => ['notice', 'group', 'contact'] as const,
   noticePersistInvites: false,

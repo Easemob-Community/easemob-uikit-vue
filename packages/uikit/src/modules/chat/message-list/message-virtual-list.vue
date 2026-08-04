@@ -10,12 +10,18 @@ export interface MessageVirtualListProps<T> {
   buffer?: number
   /** 列表唯一标识字段 */
   keyField?: keyof T
+  /** 消息项之间的间距（px），默认 12 */
+  gap?: number
+  /** 列表内边距（px），默认 16 */
+  padding?: number
 }
 
 const props = withDefaults(defineProps<MessageVirtualListProps<any>>(), {
   estimateHeight: 60,
   buffer: 5,
   keyField: 'id' as any,
+  gap: 12,
+  padding: 16,
 })
 
 const emit = defineEmits<{
@@ -239,7 +245,12 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="listRef" class="message-virtual-list" @scroll="onScroll">
+  <div
+    ref="listRef"
+    class="message-virtual-list"
+    :style="{ '--vl-gap': `${props.gap}px`, '--vl-padding': `${props.padding}px` }"
+    @scroll="onScroll"
+  >
     <div class="message-virtual-list__spacer" :style="{ paddingTop: `${paddingTop}px`, paddingBottom: `${paddingBottom}px` }">
       <div
         v-for="{ item, index } in visibleItems"
@@ -258,7 +269,7 @@ defineExpose({
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px;
+  padding: var(--vl-padding, 16px);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -272,6 +283,6 @@ defineExpose({
 }
 
 .message-virtual-list__item:not(:last-child) {
-  padding-bottom: 12px;
+  padding-bottom: var(--vl-gap, 12px);
 }
 </style>

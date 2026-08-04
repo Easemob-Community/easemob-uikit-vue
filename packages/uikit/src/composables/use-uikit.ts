@@ -1,4 +1,4 @@
-import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
+import { type ComputedRef, type InjectionKey, type Ref, computed, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
 import type { ClientConfig, ManagerHost, UIKitClient } from '../sdk/client'
 import { createClient } from '../sdk/client'
 import {
@@ -23,6 +23,7 @@ import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
+import { useInvitePersistenceInternal } from './use-invite-persistence'
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from './types'
 export type { H5AdaptationConfig } from './use-h5-adaptation'
@@ -71,6 +72,7 @@ const defaultFeatures: UIKitFeatures = {
   enableGroup: true,
   enableUserInfo: true,
   enableUserInfoSubscription: true,
+  enableInvitePersistence: true,
 }
 
 /**
@@ -229,6 +231,7 @@ export function useUIKitProvider(
   }
 
   async function logout(): Promise<void> {
+    const userId = stores.client.currentUser
     if (uikitClient) {
       await uikitClient.logout()
     }
@@ -262,6 +265,12 @@ export function useUIKitProvider(
   }
 
   provide(UIKIT_CONTEXT_KEY, ctx)
+
+  // 好友申请/群邀请本地持久化：按登录用户 + appKey 隔离，仅保留 pending 状态
+  // 与 address-book-container / contact-notice-list 中显式调用的 useInvitePersistence 共用同一 storage key，
+  // 避免 provider 级与组件级两套独立机制导致数据不一致。
+  // 使用 Internal 版本直接传入 stores，避免在 Provider 自身内部调用 useUIKit()（inject 无法在当前组件命中）
+  useInvitePersistenceInternal(computed(() => features.enableInvitePersistence ?? true), stores)
 
   onScopeDispose(() => {
     disposeEvents?.()

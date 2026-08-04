@@ -426,6 +426,22 @@ function insertMention(contact: MentionContact) {
   })
 }
 
+/** 在末尾追加 @提及 */
+function appendMention(contact: MentionContact) {
+  const el = textareaRef.value
+  if (!el)
+    return
+  const prefix = text.value.length > 0 && !text.value.endsWith(' ') ? ' ' : ''
+  text.value = `${text.value}${prefix}@${contact.name} `
+  if (!mentionList.value.find(m => m.userId === contact.userId))
+    mentionList.value.push(contact)
+  nextTick(() => {
+    el.focus()
+    const newPos = text.value.length
+    el.setSelectionRange(newPos, newPos)
+  })
+}
+
 /** 在光标位置插入 Emoji */
 function insertEmoji(emoji: string) {
   const el = textareaRef.value
@@ -487,6 +503,7 @@ defineExpose({
   getText,
   insertEmoji,
   insertMention,
+  appendMention,
 })
 </script>
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
+import Popup from '../../../components/popup/popup.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
@@ -42,6 +43,8 @@ export interface MessageBubbleWrapperEmits {
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
+  (e: 'avatar-view-profile', userId: string): void
+  (e: 'avatar-mention', payload: { userId: string, name: string }): void
 }
 
 /** 弹窗中嵌套合并消息的层级栈 */
@@ -117,7 +120,7 @@ const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? f
 const isSelfConversation = computed(() => layout.value === 'conversation' && props.message.isSelf)
 
 /** 头像尺寸 */
-const avatarSize = 36
+const avatarSize = computed(() => props.config?.avatarSize ?? 36)
 
 /** 格式化后的时间（HH:mm） */
 const formattedTime = computed(() => {
@@ -204,10 +207,6 @@ onMounted(() => {
   }
 })
 
-onBeforeUnmount(() => {
-  bodyResizeObserver?.disconnect()
-})
-
 /** 点击状态：失败时触发重发 */
 function onStatusClick() {
   if (messageStatus.value === MESSAGE_STATUS.FAILED) {
@@ -286,6 +285,65 @@ const isHighlighted = computed(() => {
     return false
   return target === props.message.msgServerId || target === props.message.msgLocalId
 })
+
+/** 头像右键菜单显示状态 */
+const showAvatarMenu = ref(false)
+/** 头像右键菜单锚点元素 */
+const avatarMenuAnchor = ref<HTMLElement>()
+
+/** 是否在群聊中（@提及仅群聊展示） */
+const isGroupChat = computed(() => props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT)
+
+/** 右键点击头像：弹出资料/ @ 菜单 */
+function onAvatarContextMenu(event: MouseEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+  // 清理旧锚点
+  if (avatarMenuAnchor.value?.parentNode) {
+    avatarMenuAnchor.value.parentNode.removeChild(avatarMenuAnchor.value)
+  }
+  // 在鼠标位置创建 1px 锚点
+  const anchor = document.createElement('div')
+  anchor.style.position = 'fixed'
+  anchor.style.left = `${event.clientX}px`
+  anchor.style.top = `${event.clientY}px`
+  anchor.style.width = '1px'
+  anchor.style.height = '1px'
+  anchor.style.pointerEvents = 'none'
+  document.body.appendChild(anchor)
+  avatarMenuAnchor.value = anchor
+  showAvatarMenu.value = true
+}
+
+/** 关闭头像右键菜单并清理锚点 */
+function closeAvatarMenu() {
+  showAvatarMenu.value = false
+  nextTick(() => {
+    if (avatarMenuAnchor.value?.parentNode) {
+      avatarMenuAnchor.value.parentNode.removeChild(avatarMenuAnchor.value)
+    }
+    avatarMenuAnchor.value = undefined
+  })
+}
+
+/** 查看资料 */
+function onViewProfileFromAvatar() {
+  closeAvatarMenu()
+  emit('avatar-view-profile', props.message.from)
+}
+
+/** @ 该用户 */
+function onMentionFromAvatar() {
+  closeAvatarMenu()
+  emit('avatar-mention', { userId: props.message.from, name: displayName.value || props.message.from })
+}
+
+onBeforeUnmount(() => {
+  bodyResizeObserver?.disconnect()
+  if (avatarMenuAnchor.value?.parentNode) {
+    avatarMenuAnchor.value.parentNode.removeChild(avatarMenuAnchor.value)
+  }
+})
 </script>
 
 <template>
@@ -342,7 +400,7 @@ const isHighlighted = computed(() => {
         }"
       >
         <!-- 头像区域 -->
-        <div v-if="showAvatar" class="message-bubble-wrapper__avatar">
+        <div v-if="showAvatar" class="message-bubble-wrapper__avatar" @contextmenu.stop="onAvatarContextMenu">
           <slot name="avatar" :message="message">
             <Avatar :name="displayName" :src="avatarUrl" :size="avatarSize" :presence="senderPresence" />
           </slot>
@@ -614,6 +672,29 @@ const isHighlighted = computed(() => {
       @update:show="(v: boolean) => { if (!v) closeModalAt(idx) }"
       @view-combine="onViewCombine"
     />
+
+    <!-- 头像右键菜单：查看资料 / @ 提及 -->
+    <Popup
+      :show="showAvatarMenu"
+      :anchor="avatarMenuAnchor"
+      placement="right"
+      align="start"
+      :overlay="false"
+      :offset="4"
+      @update:show="(v: boolean) => { showAvatarMenu = v; if (!v) closeAvatarMenu() }"
+      @close="closeAvatarMenu"
+    >
+      <div class="avatar-context-menu" @click.stop>
+        <div class="avatar-context-menu__item" @click="onViewProfileFromAvatar">
+          <Icon name="people/person_single" :size="16" />
+          <span>{{ t('message.avatar.viewProfile') }}</span>
+        </div>
+        <div v-if="isGroupChat" class="avatar-context-menu__item" @click="onMentionFromAvatar">
+          <Icon name="empty/mentions" :size="16" />
+          <span>{{ t('message.avatar.mention') }}</span>
+        </div>
+      </div>
+    </Popup>
   </div>
 </template>
 
@@ -906,6 +987,31 @@ const isHighlighted = computed(() => {
 .message-bubble-wrapper--highlight .message-bubble-wrapper__body {
   animation: message-bubble-flash 1.2s ease-in-out;
   border-radius: 8px;
+}
+
+/* 头像右键菜单 */
+.avatar-context-menu {
+  min-width: 120px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.avatar-context-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--uikit-components-radius, 6px);
+  font-size: 13px;
+  color: var(--uikit-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.avatar-context-menu__item:hover {
+  background-color: var(--uikit-bg-hover);
 }
 
 /* 置顶角标 */

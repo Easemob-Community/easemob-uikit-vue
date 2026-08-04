@@ -3,6 +3,7 @@ import { useStorage } from '@vueuse/core'
 import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from './use-uikit-storage'
 import { useUIKit } from './use-uikit'
 import type { UiContactInvite } from '../sdk/types'
+import type { RootStores } from '../sdk/event/types'
 
 export type InvitePersistType = boolean | UIKitStorageType
 
@@ -13,18 +14,13 @@ function resolveStorageType(type: InvitePersistType | undefined): UIKitStorageTy
 }
 
 /**
- * 好友申请 / 群邀请通知持久化。
- *
- * 说明：websdk2 没有提供拉取「待处理通知列表」的 REST/本地接口，通知只能依赖事件流。
- * 开启持久化后，未处理（pending）的邀请会在 localStorage/sessionStorage 中落盘，
- * 刷新页面或重新登录同一账号后可恢复，避免事件丢失导致通知入口不显示红点。
- *
- * 注意：持久化 key 基于当前 appKey + userId，切换账号会自动隔离；登出不会删除，
- * 下次同一账号登录仍可见，服务端事件会二次校验状态。
+ * 好友申请 / 群邀请通知持久化内部实现。
+ * 直接传入 stores，可在 Provider 等无法调用 useUIKit() 的场景使用。
  */
-export function useInvitePersistence(enabled: InvitePersistType | Ref<InvitePersistType>) {
-  const { stores } = useUIKit()
-
+export function useInvitePersistenceInternal(
+  enabled: InvitePersistType | Ref<InvitePersistType>,
+  stores: RootStores,
+) {
   const persistType = computed(() =>
     resolveStorageType(isRef(enabled) ? enabled.value : enabled),
   )
@@ -98,4 +94,19 @@ export function useInvitePersistence(enabled: InvitePersistType | Ref<InvitePers
     persist,
     storageRef,
   }
+}
+
+/**
+ * 好友申请 / 群邀请通知持久化。
+ *
+ * 说明：websdk2 没有提供拉取「待处理通知列表」的 REST/本地接口，通知只能依赖事件流。
+ * 开启持久化后，未处理（pending）的邀请会在 localStorage/sessionStorage 中落盘，
+ * 刷新页面或重新登录同一账号后可恢复，避免事件丢失导致通知入口不显示红点。
+ *
+ * 注意：持久化 key 基于当前 appKey + userId，切换账号会自动隔离；登出不会删除，
+ * 下次同一账号登录仍可见，服务端事件会二次校验状态。
+ */
+export function useInvitePersistence(enabled: InvitePersistType | Ref<InvitePersistType>) {
+  const { stores } = useUIKit()
+  return useInvitePersistenceInternal(enabled, stores)
 }

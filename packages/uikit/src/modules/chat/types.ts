@@ -77,6 +77,12 @@ export interface ChatConfig {
     showTime?: TimeDisplayStrategy
     /** 气泡形状，默认 'round' */
     bubbleShape?: BubbleShape
+    /** 头像尺寸（px），默认 36 */
+    avatarSize?: number
+    /** 消息项之间的间距（px），默认 12 */
+    messageGap?: number
+    /** 消息列表内边距（px），默认 16 */
+    messagePadding?: number
     /** 时间分组间隔（毫秒），默认 5 分钟 */
     groupInterval?: number
     /** 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100 */
@@ -97,6 +103,15 @@ export interface ChatConfig {
       /** 预览文本最大长度，默认 30 */
       maxPreviewLength?: number
     }
+    /** 消息搜索配置 */
+    search?: {
+      /** 是否启用消息搜索入口，默认 false */
+      enabled?: boolean
+      /** 是否启用 SDK 服务端消息搜索，默认 false（仅搜索本地已加载消息） */
+      enableServerSearch?: boolean
+      /** 每页条数，默认 20 */
+      pageSize?: number
+    }
     /** 切换会话时是否自动定位到首条@我的消息，默认 true */
     autoLocateAtMe?: boolean
     /** 消息发送状态展示配置 */
@@ -112,6 +127,8 @@ export interface ChatConfig {
     enableDelete?: boolean
     /** 启用撤回，默认 true */
     enableRecall?: boolean
+    /** 启用撤回他人消息，默认 true（仅群主/管理员在群聊中生效） */
+    enableRecallOther?: boolean
     /** 启用编辑，默认 true（仅 isSelf 且文本消息生效） */
     enableEdit?: boolean
     /** 启用转发，默认 true */
@@ -229,6 +246,7 @@ export type MessageActionType =
   | 'copy'
   | 'delete'
   | 'recall'
+  | 'recallOther'
   | 'edit'
   | 'forward'
   | 'multiSelect'

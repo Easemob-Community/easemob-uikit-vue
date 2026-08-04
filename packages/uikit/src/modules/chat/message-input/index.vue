@@ -554,16 +554,31 @@ function focus() {
   }
 }
 
+/** 在光标/末尾插入 @提及 */
+function appendMention(contact: MentionContact) {
+  if (isMobile.value) {
+    h5InputRef.value?.appendMention?.(contact)
+  }
+  else if (inputMode.value === 'simple') {
+    simpleInputRef.value?.appendMention?.(contact)
+  }
+  else {
+    richInputRef.value?.appendMention?.(contact.name, contact)
+  }
+}
+
 /** 向 plugin 提供输入框操作能力 */
 provideMessageInputPluginContext({
   setText,
   getText,
   focus,
+  appendMention,
 })
 
 defineExpose({
   setText,
   getText,
+  appendMention,
 })
 </script>
 

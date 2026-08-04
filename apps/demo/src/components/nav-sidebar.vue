@@ -8,7 +8,7 @@
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
 import { computed } from 'vue'
-import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence } from '@easemob/uikit'
+import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence, useContact } from '@easemob/uikit'
 
 interface Props {
   /** 当前激活 tab key */
@@ -25,7 +25,11 @@ const { mode, isDark, setMode } = useTheme()
 const { currentUser } = useClient()
 const { avatarUrl, displayName } = useOwnUserInfo()
 const conversationStore = useConversationStore()
+const { inviteList } = useContact()
 const { fetchPresence } = usePresence()
+
+/** 好友申请 / 群邀请待处理数量 */
+const pendingNoticeCount = computed(() => inviteList.value.filter(i => i.status === 'pending').length)
 
 /** 发布状态后主动拉取一次，确保头像立即刷新 */
 function refreshOwnPresence() {
@@ -86,6 +90,13 @@ function toggleMode() {
         <EmBadge
           v-if="tab.key === 'conversation' && totalUnread > 0"
           :count="totalUnread"
+          class="nav-item__badge"
+        >
+          <EmIcon :name="tab.icon" :size="22" />
+        </EmBadge>
+        <EmBadge
+          v-else-if="tab.key === 'contact' && pendingNoticeCount > 0"
+          :count="pendingNoticeCount"
           class="nav-item__badge"
         >
           <EmIcon :name="tab.icon" :size="22" />
