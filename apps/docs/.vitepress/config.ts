@@ -38,6 +38,7 @@ export default defineConfig({
             { text: '图标', link: '/guide/icons' },
             { text: 'H5 适配', link: '/guide/h5-adaptation' },
             { text: '进阶指南', link: '/guide/advanced' },
+            { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
           ],
         },
       ],
