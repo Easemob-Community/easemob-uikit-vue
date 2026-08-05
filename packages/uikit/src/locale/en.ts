@@ -293,6 +293,7 @@ const messages: LocaleMessages = {
   'common.loading': 'Loading...',
   'common.noMore': 'No more',
   'common.next': 'Next',
+  'common.copy': 'Copy',
   'mention.title': 'Select Contact',
   'mention.searchPlaceholder': 'Search contacts...',
   'mention.noResult': 'No contacts found',

@@ -23,6 +23,8 @@ export { default as EmPresenceSelectorPopup } from './presence-selector/presence
 export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
 export { default as EmCell } from './cell/cell.vue'
 export type { CellProps } from './cell/cell.vue'
+export { default as EmCopyableText } from './copyable-text/copyable-text.vue'
+export type { CopyableTextProps } from './copyable-text/copyable-text.vue'
 export { default as EmEmpty } from './empty/empty.vue'
 export type { EmptyProps } from './empty/empty.vue'
 export type { PresenceDisplayStatus } from './avatar/avatar.vue'
@@ -49,5 +51,6 @@ export const componentList = [
   'em-presence-selector-popup',
   'em-presence-avatar',
   'em-cell',
+  'em-copyable-text',
   'em-empty',
 ] as const

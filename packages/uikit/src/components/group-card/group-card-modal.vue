@@ -5,7 +5,7 @@ import Popup from '../popup/popup.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
-import GroupCard from './group-card.vue'
+import GroupCard, { type GroupCardInfoRow } from './group-card.vue'
 
 export interface GroupCardModalProps {
   show: boolean
@@ -72,8 +72,8 @@ const cardActions = computed(() => {
   ]
 })
 
-const cardInfoRows = computed(() => {
-  const rows: { key: string, label: string, value: string }[] = []
+const cardInfoRows = computed<GroupCardInfoRow[]>(() => {
+  const rows: GroupCardInfoRow[] = []
   const g = group.value
 
   if (g?.description)
@@ -82,7 +82,7 @@ const cardInfoRows = computed(() => {
   if (g?.memberCount !== undefined)
     rows.push({ key: 'memberCount', label: t('groupCard.memberCount') || '成员数', value: String(g.memberCount) })
 
-  rows.push({ key: 'groupId', label: t('groupCard.groupId') || '群 ID', value: props.groupId })
+  rows.push({ key: 'groupId', label: t('groupCard.groupId') || '群 ID', value: props.groupId, copyable: true })
 
   return rows
 })

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
 import PresenceSelectorPopup from '../presence-selector/presence-selector-popup.vue'
+import CopyableText from '../copyable-text/copyable-text.vue'
 import { useLocale } from '../../locale'
 import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 
@@ -18,6 +19,8 @@ export interface UserCardInfoRow {
   label: string
   value: string
   clickable?: boolean
+  /** 是否展示复制图标并支持一键复制 value */
+  copyable?: boolean
 }
 
 export interface UserCardProps {
@@ -134,7 +137,7 @@ function onSelectorChanged() {
             </span>
           </div>
           <div class="user-card__user-id">
-            {{ props.userId }}
+            <CopyableText :text="props.userId" />
           </div>
         </div>
       </div>
@@ -166,7 +169,12 @@ function onSelectorChanged() {
           @click="onInfoClick(row)"
         >
           <span class="user-card__label">{{ row.label }}</span>
-          <span class="user-card__value">{{ row.value }}</span>
+          <CopyableText
+            v-if="row.copyable"
+            class="user-card__value"
+            :text="row.value"
+          />
+          <span v-else class="user-card__value">{{ row.value }}</span>
         </div>
       </div>
 

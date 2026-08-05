@@ -6,6 +6,7 @@ import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
 import Button from '../../../components/button/button.vue'
+import CopyableText from '../../../components/copyable-text/copyable-text.vue'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
 import { useToast } from '../../../composables/use-toast'
@@ -75,9 +76,7 @@ const {
   fetchGroupMembers,
   fetchGroupAnnouncement,
   getGroupMembers,
-  getGroupAnnouncement,
   updateGroupInfo,
-  updateGroupAnnouncement,
   changeGroupOwner,
   muteGroupMembers,
   unmuteGroupMembers,
@@ -188,7 +187,6 @@ const currentUserRole = computed(() => {
 
 const isOwner = computed(() => currentUserRole.value === 'owner')
 const isAdmin = computed(() => currentUserRole.value === 'admin')
-const isAdminOrOwner = computed(() => isOwner.value || isAdmin.value)
 
 // 群信息编辑：数据同步
 watch(
@@ -655,8 +653,8 @@ defineExpose({
             <div v-else class="chat-info-drawer__name">
               {{ displayName }}
             </div>
-            <div v-if="!isGroup" class="chat-info-drawer__id">
-              ID: {{ conversation?.id }}
+            <div class="chat-info-drawer__id">
+              <CopyableText :text="props.conversation?.id || ''" label="ID:" />
             </div>
           </div>
         </div>

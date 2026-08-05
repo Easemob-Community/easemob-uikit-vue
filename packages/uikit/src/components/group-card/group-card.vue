@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
+import CopyableText from '../copyable-text/copyable-text.vue'
 
 export interface GroupCardAction {
   key: string
@@ -13,6 +14,8 @@ export interface GroupCardInfoRow {
   key: string
   label: string
   value: string
+  /** 是否展示复制图标并支持一键复制 value */
+  copyable?: boolean
 }
 
 export interface GroupCardProps {
@@ -64,10 +67,12 @@ function onActionClick(key: string) {
         />
         <div class="group-card__meta">
           <div class="group-card__name">
-            <slot name="name">{{ props.name }}</slot>
+            <slot name="name">
+              {{ props.name }}
+            </slot>
           </div>
           <div class="group-card__group-id">
-            {{ props.groupId }}
+            <CopyableText :text="props.groupId" />
           </div>
         </div>
       </div>
@@ -97,7 +102,12 @@ function onActionClick(key: string) {
           class="group-card__row"
         >
           <span class="group-card__label">{{ row.label }}</span>
-          <span class="group-card__value">{{ row.value }}</span>
+          <CopyableText
+            v-if="row.copyable"
+            class="group-card__value"
+            :text="row.value"
+          />
+          <span v-else class="group-card__value">{{ row.value }}</span>
         </div>
       </div>
 

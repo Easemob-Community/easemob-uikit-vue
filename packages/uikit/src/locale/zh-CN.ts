@@ -293,6 +293,7 @@ const messages: LocaleMessages = {
   'common.loading': '加载中...',
   'common.noMore': '没有更多了',
   'common.next': '下一步',
+  'common.copy': '复制',
   'mention.title': '选择联系人',
   'mention.searchPlaceholder': '搜索联系人...',
   'mention.noResult': '未找到联系人',

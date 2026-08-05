@@ -10,7 +10,7 @@ import { usePresence } from '../../composables/use-presence'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useToast } from '../../composables/use-toast'
 import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
-import UserCard from './user-card.vue'
+import UserCard, { type UserCardInfoRow } from './user-card.vue'
 
 export interface UserCardModalProps {
   show: boolean
@@ -110,8 +110,8 @@ const cardActions = computed(() => {
   return actions
 })
 
-const cardInfoRows = computed(() => {
-  const rows: { key: string, label: string, value: string, clickable?: boolean }[] = []
+const cardInfoRows = computed<UserCardInfoRow[]>(() => {
+  const rows: UserCardInfoRow[] = []
   const info = userInfo.value
 
   if (info?.sign)
@@ -120,7 +120,7 @@ const cardInfoRows = computed(() => {
   if (info?.nickname)
     rows.push({ key: 'nickname', label: t('contact.detail.nickname') || '昵称', value: info.nickname })
 
-  rows.push({ key: 'userId', label: t('contact.detail.userId') || '用户 ID', value: props.userId })
+  rows.push({ key: 'userId', label: t('contact.detail.userId') || '用户 ID', value: props.userId, copyable: true })
 
   try {
     const ext = info?.ext ? (JSON.parse(info.ext) as Record<string, string>) : {}
