@@ -95,7 +95,7 @@ const {
 } = useChat()
 const { stores, h5, client } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
-const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo } = useGroup()
+const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo, fetchGroupAnnouncement } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
 /** 群已读回执配置：透传给 plugin 的发送方法 */
@@ -427,7 +427,7 @@ const mentionContacts = computed<MentionContact[]>(() => {
     })
 })
 
-/** 切换到群聊会话时，预拉群详情与成员列表 */
+/** 切换到群聊会话时，预拉群详情、成员列表与公告 */
 watch(
   () => currentConversation.value,
   async (cvs) => {
@@ -445,13 +445,23 @@ watch(
     }
     // 再拉成员列表（用于 @提及 与群已读详情弹窗）
     const members = stores.group.getGroupMembers(cvs.id)
-    if (members.length > 0)
-      return
-    try {
-      await fetchGroupMembers(cvs.id)
+    if (members.length === 0) {
+      try {
+        await fetchGroupMembers(cvs.id)
+      }
+      catch (err) {
+        console.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
+      }
     }
-    catch (err) {
-      console.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
+    // 预拉群公告，使聊天页面顶部横幅无需打开抽屉即可展示
+    const announcement = stores.group.getGroupAnnouncement(cvs.id)
+    if (!announcement) {
+      try {
+        await fetchGroupAnnouncement(cvs.id)
+      }
+      catch (err) {
+        console.warn('[Chat] preload group announcement failed:', formatSdkError(err))
+      }
     }
   },
   { immediate: true },
