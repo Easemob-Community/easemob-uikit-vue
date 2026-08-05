@@ -120,6 +120,7 @@ const messages: LocaleMessages = {
   'message.noCardAvailable': 'No contact cards available',
   'message.action.quote': 'Quote',
   'message.action.copy': 'Copy',
+  'message.action.download': 'Download',
   'message.action.delete': 'Delete',
   'message.action.recall': 'Recall',
   'message.action.recallOther': 'Recall',

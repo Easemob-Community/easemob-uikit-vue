@@ -120,6 +120,7 @@ const messages: LocaleMessages = {
   'message.noCardAvailable': '暂无可发送的名片',
   'message.action.quote': '引用',
   'message.action.copy': '复制',
+  'message.action.download': '下载',
   'message.action.delete': '删除',
   'message.action.recall': '撤回',
   'message.action.recallOther': '撤回',

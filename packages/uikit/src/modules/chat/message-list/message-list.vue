@@ -13,10 +13,11 @@ import { useLocale } from '../../../locale'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import Modal from '../../../components/modal/modal.vue'
-import type { LocationMessageBody, TextMessageBody, UiMessage } from '../../../sdk/types'
+import type { FileMessageBody, LocationMessageBody, TextMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent } from '../types'
 import { useToast } from '../../../composables/use-toast'
 import { resolveVoiceToTextErrorMessage } from '../../../composables/use-message-actions'
+import { detectEnvironment, downloadFile } from '../../../utils/download'
 import Icon from '../../../components/icon/icon.vue'
 import MessageVirtualList from './message-virtual-list.vue'
 
@@ -373,6 +374,10 @@ async function onMessageAction(event: MessageActionEvent) {
     await handleCopyMessage(event.message)
     return
   }
+  if (event.action === 'download') {
+    await handleDownloadMessage(event.message)
+    return
+  }
   if (event.action === 'quote') {
     setQuote(event.message)
     return
@@ -482,6 +487,42 @@ async function handleCopyMessage(message: UiMessage) {
   }
   catch {
     showToast(t('message.copyFailed') ?? '复制失败', 'error')
+  }
+}
+
+/** 下载文件消息附件 */
+async function handleDownloadMessage(message: UiMessage) {
+  if (message.type !== 'file')
+    return
+  const body = message.body as FileMessageBody
+  const url = body.url
+  const filename = body.filename || t('message.file') || 'file'
+  if (!url) {
+    showToast(t('message.download.failed') || '下载失败', 'error')
+    return
+  }
+
+  const env = detectEnvironment()
+  try {
+    await downloadFile({
+      url,
+      filename,
+      env,
+      onSuccess: () => {
+        showToast(t('message.download.success') || '下载成功', 'success')
+      },
+      onError: (err) => {
+        if (err.name === 'WechatNotSupported') {
+          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件', 'warning')
+        }
+        else {
+          showToast(t('message.download.failed') || '下载失败', 'error')
+        }
+      },
+    })
+  }
+  catch {
+    // 错误已在 onError 回调中处理，此处静默捕获避免未处理的 Promise rejection
   }
 }
 

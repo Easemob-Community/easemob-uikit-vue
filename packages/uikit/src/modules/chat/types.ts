@@ -123,8 +123,10 @@ export interface ChatConfig {
   messageAction?: {
     /** 启用引用，默认 true */
     enableQuote?: boolean
-    /** 启用复制，默认 true */
+    /** 启用复制，默认 true（仅文本消息生效） */
     enableCopy?: boolean
+    /** 启用下载，默认 true（仅文件消息生效） */
+    enableDownload?: boolean
     /** 启用删除，默认 true */
     enableDelete?: boolean
     /** 启用撤回，默认 true */
@@ -246,6 +248,7 @@ export interface ChatConfig {
 export type MessageActionType =
   | 'quote'
   | 'copy'
+  | 'download'
   | 'delete'
   | 'recall'
   | 'recallOther'

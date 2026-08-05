@@ -107,8 +107,12 @@ const actions = computed<MessageActionItem[]>(() => {
 
   if (cfg?.enableQuote !== false)
     add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
-  if (cfg?.enableCopy !== false)
+  // 复制：仅文本消息支持；图片/视频/文件等类型暂不提供复制
+  if (cfg?.enableCopy !== false && props.message.type === 'text')
     add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
+  // 下载：仅文件消息在右键/长按菜单中提供下载入口
+  if (cfg?.enableDownload !== false && props.message.type === 'file')
+    add('download', t('message.action.download') ?? '下载', 'arrows/arrow_down_n_box')
   if (cfg?.enableForward !== false)
     add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false)
