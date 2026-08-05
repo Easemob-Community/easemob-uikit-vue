@@ -10,7 +10,7 @@ import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
-import { useQuote } from '../../../composables/use-quote'
+import { useQuote, type MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { usePresence } from '../../../composables/use-presence'
 import type { PresenceDisplayStatus } from '../../../components/avatar/avatar.vue'
@@ -270,7 +270,8 @@ const quoteData = computed(() => {
     msgPreview: String(q.msgPreview || ''),
     msgSender: String(q.msgSender || ''),
     msgType: String(q.msgType || 'text'),
-  } as { msgID: string, msgPreview: string, msgSender: string, msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd' }
+    msgThumbUrl: String(q.msgThumbUrl || ''),
+  } as MsgQuotePayload
 })
 
 /** 点击引用卡片：触发定位/闪烁，列表端 watch locateRequest 处理 */

@@ -20,18 +20,17 @@ const emit = defineEmits<QuoteCardEmits>()
 const { displayName } = useUserInfo(() => props.quote.msgSender)
 const senderName = computed(() => displayName.value || props.quote.msgSender)
 
-/** 非文本类型的预览前缀图标，用于直观区分引用消息类型 */
-const typeIcon = computed(() => {
-  switch (props.quote.msgType) {
-    case 'image': return '🖼'
-    case 'video': return '🎬'
-    case 'voice': return '🎙'
-    case 'file': return '📎'
-    case 'location': return '📍'
-    case 'custom': return '📦'
-    case 'cmd': return '⚡'
-    default: return ''
-  }
+/** 是否展示图片/视频缩略图 */
+const isMedia = computed(() => props.quote.msgType === 'image' || props.quote.msgType === 'video')
+/** 缩略图地址 */
+const thumbUrl = computed(() => props.quote.msgThumbUrl || '')
+/** 非媒体类型或没有缩略图时展示的兜底文案 */
+const fallbackPreview = computed(() => {
+  if (props.quote.msgType === 'image')
+    return '【图片】'
+  if (props.quote.msgType === 'video')
+    return '【视频】'
+  return props.quote.msgPreview
 })
 
 function onClick() {
@@ -49,8 +48,12 @@ function onClick() {
     <div class="quote-card__content">
       <span class="quote-card__sender">{{ senderName }}</span>
       <span class="quote-card__divider">：</span>
-      <span v-if="typeIcon" class="quote-card__type">{{ typeIcon }}</span>
-      <span class="quote-card__preview">{{ quote.msgPreview }}</span>
+      <template v-if="isMedia && thumbUrl">
+        <img class="quote-card__thumb" :src="thumbUrl" alt="quote-thumb">
+      </template>
+      <template v-else>
+        <span class="quote-card__preview">{{ fallbackPreview }}</span>
+      </template>
     </div>
   </div>
 </template>
@@ -98,6 +101,9 @@ function onClick() {
 .quote-card__content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -106,18 +112,30 @@ function onClick() {
 .quote-card__sender {
   color: var(--uikit-text-primary, #303133);
   font-weight: 500;
+  flex-shrink: 0;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .quote-card__divider {
   color: var(--uikit-text-secondary, #909399);
-  margin: 0 2px;
+  flex-shrink: 0;
 }
 
-.quote-card__type {
-  margin-right: 2px;
+.quote-card__thumb {
+  flex-shrink: 0;
+  max-width: 80px;
+  max-height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  background-color: var(--uikit-bg-base);
 }
 
 .quote-card__preview {
   color: var(--uikit-text-secondary, #909399);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
