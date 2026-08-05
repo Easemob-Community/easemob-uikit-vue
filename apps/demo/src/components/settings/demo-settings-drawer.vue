@@ -11,6 +11,7 @@ import { EmIcon, EmPopup } from '@easemob/uikit'
 import DemoAppearancePanel from './demo-appearance-panel.vue'
 import DemoChatPanel from './demo-chat-panel.vue'
 import DemoContactPanel from './demo-contact-panel.vue'
+import DemoConversationPanel from './demo-conversation-panel.vue'
 import DemoDataPanel from './demo-data-panel.vue'
 import DemoProviderPanel from './demo-provider-panel.vue'
 import DemoSdkPanel from './demo-sdk-panel.vue'
@@ -40,6 +41,7 @@ const emit = defineEmits<{
 /** 分类定义：key 与面板组件一一对应 */
 const categories = [
   { key: 'appearance', label: '外观', icon: 'misc/gear' },
+  { key: 'conversation', label: '会话', icon: 'chat/pin' },
   { key: 'chat', label: '聊天', icon: 'chat/bubble_fill' },
   { key: 'contact', label: '通讯录', icon: 'people/person_3lines_fill' },
   { key: 'data', label: '演示数据', icon: 'files-media/archives' },
@@ -85,6 +87,7 @@ function close() {
         </nav>
         <div class="demo-drawer__content">
           <DemoAppearancePanel v-if="activeCategory === 'appearance'" />
+          <DemoConversationPanel v-else-if="activeCategory === 'conversation'" />
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
@@ -120,6 +123,7 @@ function close() {
         </nav>
         <div class="demo-drawer__content">
           <DemoAppearancePanel v-if="activeCategory === 'appearance'" />
+          <DemoConversationPanel v-else-if="activeCategory === 'conversation'" />
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />

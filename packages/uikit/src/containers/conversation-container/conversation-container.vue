@@ -4,7 +4,8 @@ import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
 import { useLocale } from '../../locale'
-import type { ConversationAction } from '../../modules/conversation/types'
+import type { ConversationAction, ConversationTabKey } from '../../modules/conversation/types'
+import { DEFAULT_CONVERSATION_TABS } from '../../modules/conversation/types'
 import type { UiConversation as Conversation } from '../../sdk/types'
 
 export interface ConversationContainerProps {
@@ -41,6 +42,13 @@ export interface ConversationContainerProps {
   /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean
   /**
+   * 会话分栏 tab 集合，默认全量 ['all', 'unread', 'atMe', 'single', 'group']；
+   * 顺序即渲染优先级；传空数组可隐藏 tab 栏。
+   */
+  tabs?: ConversationTabKey[]
+  /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
+  activeTab?: ConversationTabKey
+  /**
    * 草稿存储模式：
    * - 'none' 仅内存缓存，页面关闭即丢失（默认）
    * - 'session' sessionStorage 持久化，浏览器标签关闭后丢失
@@ -62,10 +70,13 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   pullRefresh: false,
   enablePresence: undefined,
   draftStorage: 'none',
+  tabs: () => [...DEFAULT_CONVERSATION_TABS],
+  activeTab: 'all',
 })
 
 const emit = defineEmits<{
   (e: 'conversation-select', conversation: Conversation): void
+  (e: 'update:active-tab', tab: ConversationTabKey): void
 }>()
 
 const { refreshConversations } = useConversation()
@@ -85,6 +96,10 @@ onMounted(() => {
 
 function handleConversationSelect(id: string, conversation: Conversation) {
   emit('conversation-select', conversation)
+}
+
+function handleActiveTabChange(tab: ConversationTabKey) {
+  emit('update:active-tab', tab)
 }
 </script>
 
@@ -107,8 +122,14 @@ function handleConversationSelect(id: string, conversation: Conversation) {
       :footer-sticky="props.footerSticky"
       :pull-refresh="props.pullRefresh"
       :enable-presence="props.enablePresence"
+      :tabs="props.tabs"
+      :active-tab="props.activeTab"
+      @update:active-tab="handleActiveTabChange"
       @select="handleConversationSelect"
     >
+      <template v-if="$slots.tabs" #tabs="slotProps">
+        <slot name="tabs" v-bind="slotProps" />
+      </template>
       <template v-if="$slots.header" #header>
         <slot name="header" />
       </template>
@@ -130,6 +151,8 @@ function handleConversationSelect(id: string, conversation: Conversation) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽 */
+  min-width: 0;
   background-color: var(--uikit-bg-base);
 }
 </style>

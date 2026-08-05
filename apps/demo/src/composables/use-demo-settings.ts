@@ -13,11 +13,12 @@
 import { ref } from 'vue'
 import { pinyin } from 'pinyin-pro'
 import {
+  DEFAULT_CONVERSATION_TABS,
   setPinyinAdapter,
   useContactStore,
   useConversation,
 } from '@easemob/uikit'
-import type { EmojiStickerPack, UiContact, UiConversation } from '@easemob/uikit'
+import type { ConversationTabKey, EmojiStickerPack, UiContact, UiConversation } from '@easemob/uikit'
 
 /** 示例表情包（GIF），用于验证 emoji picker 的 sticker/GIF 发送链路；实际业务请替换为自有 CDN 资源 */
 const demoStickerPacks: EmojiStickerPack[] = [
@@ -140,7 +141,7 @@ function createPinyinAdapter() {
   }
 }
 
-export function useDemoSettings() {
+function createDemoSettings() {
   /* ===== Input 组件风格演示 ===== */
   const inputVariant = ref<'default' | 'search' | 'filled' | 'ghost' | 'underline'>('search')
   const inputDemoValue = ref('')
@@ -176,6 +177,63 @@ export function useDemoSettings() {
   const showHomeSearch = ref(true)
   const showContactSearch = ref(true)
   const showGroupSearch = ref(true)
+
+  /* ===== 会话分栏配置 ===== */
+  /** 会话分栏 tab 集合（顺序即渲染优先级；置空数组隐藏 tab 栏） */
+  const conversationTabs = ref<ConversationTabKey[]>([...DEFAULT_CONVERSATION_TABS])
+  /** 分栏 tab 栏显隐开关 */
+  const conversationTabsVisible = ref(true)
+  /** 是否用 #tabs 插槽完全接管渲染（配合 useConversationTabs hook） */
+  const conversationTabsTakeover = ref(false)
+  /** 当前激活的分栏 tab */
+  const conversationActiveTab = ref<ConversationTabKey>('all')
+
+  /** 分栏 tab 中文标签（demo 面板展示用） */
+  const conversationTabLabels: Record<ConversationTabKey, string> = {
+    all: '全部',
+    unread: '未读',
+    atMe: '@我',
+    single: '单聊',
+    group: '群组',
+  }
+
+  /** 按 key 切换 tab 是否展示（保留原顺序） */
+  function toggleConversationTab(tab: ConversationTabKey, on: boolean) {
+    if (on) {
+      if (!conversationTabs.value.includes(tab))
+        conversationTabs.value.push(tab)
+    }
+    else {
+      conversationTabs.value = conversationTabs.value.filter(t => t !== tab)
+      // 激活的 tab 被移除时回落到 'all'（若仍展示）或第一个 tab
+      if (conversationActiveTab.value === tab) {
+        conversationActiveTab.value = conversationTabs.value[0] ?? 'all'
+      }
+    }
+  }
+
+  /** 调整 tab 渲染优先级（上移/下移） */
+  function moveConversationTab(index: number, dir: -1 | 1) {
+    const target = index + dir
+    if (index < 0 || target < 0 || target >= conversationTabs.value.length)
+      return
+    const next = [...conversationTabs.value]
+    ;[next[index], next[target]] = [next[target], next[index]]
+    conversationTabs.value = next
+  }
+
+  /** 快捷预设：仅单聊 / 仅群组 / 单聊 + 群组 / 恢复默认 */
+  function presetConversationTabs(preset: 'single' | 'group' | 'singleGroup' | 'default') {
+    if (preset === 'single')
+      conversationTabs.value = ['single']
+    else if (preset === 'group')
+      conversationTabs.value = ['group']
+    else if (preset === 'singleGroup')
+      conversationTabs.value = ['single', 'group']
+    else
+      conversationTabs.value = [...DEFAULT_CONVERSATION_TABS]
+    conversationActiveTab.value = conversationTabs.value[0] ?? 'all'
+  }
 
   /* ===== SDK 初始化 / 登录配置 ===== */
   const sdkAppKey = ref('easemob-demo#support')
@@ -234,6 +292,15 @@ export function useDemoSettings() {
     showHomeSearch,
     showContactSearch,
     showGroupSearch,
+    // 会话分栏
+    conversationTabs,
+    conversationTabsVisible,
+    conversationTabsTakeover,
+    conversationActiveTab,
+    conversationTabLabels,
+    toggleConversationTab,
+    moveConversationTab,
+    presetConversationTabs,
     // SDK 初始化 / 登录
     sdkAppKey,
     sdkApiUrl,
@@ -248,6 +315,18 @@ export function useDemoSettings() {
     injectMockConversations,
     injectMockContacts,
   }
+}
+
+/**
+ * 全局单例访问：demo 设置面板（components/settings/*）与 demo-page.vue 必须共享同一份状态，
+ * 否则面板修改无法作用到页面。首次调用创建实例，之后一律复用。
+ */
+let demoSettings: ReturnType<typeof createDemoSettings> | null = null
+
+export function useDemoSettings() {
+  if (!demoSettings)
+    demoSettings = createDemoSettings()
+  return demoSettings
 }
 
 export { demoStickerPacks }

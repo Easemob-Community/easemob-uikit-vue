@@ -124,6 +124,57 @@ function log(event: string, payload?: string) {
       </div>
     </Variant>
 
+    <Variant title="自定义 tabs（仅单聊 + 群组）">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationList
+            title="消息"
+            :tabs="['single', 'group']"
+            @vue:mounted="injectMockConversations"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="隐藏分栏 tab">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationList
+            title="消息"
+            :tabs="[]"
+            @vue:mounted="injectMockConversations"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="#tabs 插槽完全接管渲染">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationList
+            title="消息"
+            :tabs="['all', 'unread', 'single', 'group']"
+            @vue:mounted="injectMockConversations"
+          >
+            <template #tabs="{ tabs, activeTab, selectTab }">
+              <div style="display: flex; gap: 4px; padding: 2px 16px 6px;">
+                <button
+                  v-for="tab in tabs"
+                  :key="tab"
+                  type="button"
+                  style="flex: 1; padding: 6px 0; font-size: 13px; border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; color: #6b7280;"
+                  :style="{ borderBottomColor: activeTab === tab ? '#3b82f6' : 'transparent', color: activeTab === tab ? '#3b82f6' : '#6b7280', fontWeight: activeTab === tab ? 600 : 400 }"
+                  @click="selectTab(tab)"
+                >
+                  {{ tab }}
+                </button>
+              </div>
+            </template>
+          </ConversationList>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
     <Variant title="事件日志">
       <div style="display: flex; gap: 12px;">
         <div style="height: 600px; width: 320px;">

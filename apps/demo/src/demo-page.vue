@@ -14,13 +14,14 @@ import {
   useClient,
   useContactStore,
   useConversation,
+  useConversationTabs,
   useLocale,
   useMessageSend,
   useOwnUserInfo,
   useUIKit,
   useViewport,
 } from '@easemob/uikit'
-import type { CustomMessageBody, UiContact, UiGroup, UiMessage } from '@easemob/uikit'
+import type { ConversationTabKey, CustomMessageBody, UiContact, UiConversation, UiGroup, UiMessage } from '@easemob/uikit'
 import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
@@ -90,7 +91,42 @@ const {
   showHomeSearch,
   showContactSearch,
   showGroupSearch,
+  conversationTabs,
+  conversationTabsVisible,
+  conversationTabsTakeover,
+  conversationActiveTab,
 } = useDemoSettings()
+
+/** 会话分栏：面板配置的 tabs 与 hook 状态；接管模式下由 #tabs 插槽完全自绘 */
+const { tabs: takeoverTabs, activeTab: takeoverActiveTab, selectTab: takeoverSelectTab } = useConversationTabs({
+  tabs: ['all', 'unread', 'single', 'group'],
+  activeTab: 'all',
+})
+
+/** 实际传给会话容器的 tabs（显隐开关关闭时置空） */
+const effectiveConversationTabs = computed(() =>
+  conversationTabsTakeover.value ? takeoverTabs.value : (conversationTabsVisible.value ? conversationTabs.value : []),
+)
+
+/** 实际激活的 tab：接管模式用 hook 状态，普通模式用面板状态 */
+const effectiveConversationActiveTab = computed(() =>
+  conversationTabsTakeover.value ? takeoverActiveTab.value : conversationActiveTab.value,
+)
+
+function onConversationActiveTabChange(tab: ConversationTabKey) {
+  if (conversationTabsTakeover.value)
+    takeoverSelectTab(tab)
+  else
+    conversationActiveTab.value = tab
+}
+
+/** 接管模式下的 tab 标签（demo 自绘按钮用） */
+const takeoverTabLabels: Record<string, string> = {
+  all: '全部',
+  unread: '未读',
+  single: '单聊',
+  group: '群组',
+}
 
 /** 左侧边栏 tab：会话 / 联系人 */
 const sidebarTab = ref<'conversation' | 'contact'>('conversation')
@@ -99,6 +135,100 @@ const sidebarTab = ref<'conversation' | 'contact'>('conversation')
 const h5Page = ref<'list' | 'chat' | 'detail'>('list')
 
 const showSettings = ref(false)
+
+/* ============== 会话分栏 Mock 演示数据 ============== */
+
+/**
+ * 登录后若会话列表为空（账号无会话或 SDK 同步未完成），注入一组 mock 会话
+ * 用于演示「全部 / 未读 / @我 / 单聊 / 群组」分栏效果；
+ * 一旦见到真实列表（SDK 同步或业务创建）即停止兜底注入。
+ */
+const sawRealConversationList = ref(false)
+let mockConversationsInjected = false
+
+function injectMockConversations() {
+  const now = Date.now()
+  const list: UiConversation[] = [
+    {
+      id: 'mock_alice',
+      name: 'Alice',
+      type: 'singleChat',
+      unreadCount: 2,
+      lastMessageText: '晚上一起吃饭吗？',
+      lastMessageTime: now - 5 * 60 * 1000,
+      isPinned: true,
+      isMuted: false,
+      marks: [],
+    },
+    {
+      id: 'mock_dev_group',
+      name: '产品技术交流群',
+      type: 'groupChat',
+      unreadCount: 5,
+      lastMessageText: 'Tom: 新版本已经发布，大家看下',
+      lastMessageTime: now - 12 * 60 * 1000,
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    },
+    {
+      id: 'mock_bob',
+      name: 'Bob',
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '文件已发送',
+      lastMessageTime: now - 30 * 60 * 1000,
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    },
+    {
+      id: 'mock_qa_group',
+      name: 'QA 测试组',
+      type: 'groupChat',
+      unreadCount: 3,
+      lastMessageText: 'Lily: 回归用例已更新',
+      lastMessageTime: now - 2 * 60 * 60 * 1000,
+      isPinned: false,
+      isMuted: true,
+      marks: [],
+    },
+    {
+      id: 'mock_carol',
+      name: 'Carol',
+      type: 'singleChat',
+      unreadCount: 0,
+      lastMessageText: '收到，谢谢！',
+      lastMessageTime: now - 24 * 60 * 60 * 1000,
+      isPinned: false,
+      isMuted: false,
+      marks: [],
+    },
+  ]
+  stores.conversation.setConversationList(list)
+  // @我 标记：与 chat-events 的 em_at_list 命中机制同源（store 层 atMeMap）
+  stores.conversation.setAtMe('mock_alice', true)
+  stores.conversation.setAtMe('mock_dev_group', true)
+  mockConversationsInjected = true
+}
+
+/** 会话列表为空且不在同步中时兜底注入 mock；见到真实数据后不再注入 */
+watch(
+  [
+    () => stores.conversation.conversationList.length,
+    () => stores.conversation.isSyncingConversations,
+  ],
+  ([len, syncing]) => {
+    if (len > 0) {
+      sawRealConversationList.value = true
+      mockConversationsInjected = false
+      return
+    }
+    if (!syncing && !sawRealConversationList.value && !mockConversationsInjected)
+      injectMockConversations()
+  },
+  { immediate: true },
+)
 
 /** 当前右侧主区域展示的联系人详情用户 ID */
 const detailUserId = ref<string | null>(null)
@@ -292,7 +422,26 @@ watch(() => stores.conversation.currentConversationId, (id) => {
 
       <!-- 中间侧边栏：会话列表 / 联系人列表 -->
       <div class="demo-layout__sidebar">
-        <EmConversationContainer v-if="sidebarTab === 'conversation'">
+        <EmConversationContainer
+          v-if="sidebarTab === 'conversation'"
+          :tabs="effectiveConversationTabs"
+          :active-tab="effectiveConversationActiveTab"
+          @update:active-tab="onConversationActiveTabChange"
+        >
+          <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">
+            <div class="demo-takeover-tabs">
+              <button
+                v-for="tab in tabs"
+                :key="tab"
+                type="button"
+                class="demo-takeover-tab"
+                :class="{ 'is-active': activeTab === tab }"
+                @click="selectTab(tab)"
+              >
+                {{ takeoverTabLabels[tab] || tab }}
+              </button>
+            </div>
+          </template>
         </EmConversationContainer>
         <EmContactContainer
           v-else
@@ -370,7 +519,28 @@ watch(() => stores.conversation.currentConversationId, (id) => {
           </button>
         </div>
         <div class="h5-page__body">
-          <EmConversationContainer v-if="sidebarTab === 'conversation'" :pull-refresh="true" />
+          <EmConversationContainer
+            v-if="sidebarTab === 'conversation'"
+            :pull-refresh="true"
+            :tabs="effectiveConversationTabs"
+            :active-tab="effectiveConversationActiveTab"
+            @update:active-tab="onConversationActiveTabChange"
+          >
+            <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">
+              <div class="demo-takeover-tabs">
+                <button
+                  v-for="tab in tabs"
+                  :key="tab"
+                  type="button"
+                  class="demo-takeover-tab"
+                  :class="{ 'is-active': activeTab === tab }"
+                  @click="selectTab(tab)"
+                >
+                  {{ takeoverTabLabels[tab] || tab }}
+                </button>
+              </div>
+            </template>
+          </EmConversationContainer>
           <EmContactContainer
             v-else
             :show-home-search="showHomeSearch"
@@ -651,5 +821,43 @@ watch(() => stores.conversation.currentConversationId, (id) => {
 .h5-tabbar__label {
   font-size: 11px;
   line-height: 1;
+}
+
+/* ===== 会话分栏 #tabs 插槽完全接管（demo 下划线风格） ===== */
+
+.demo-takeover-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 2px 16px 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.demo-takeover-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.demo-takeover-tab {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--uikit-text-secondary, #6b7280);
+  cursor: pointer;
+  transition:
+    color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease),
+    border-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.demo-takeover-tab:hover {
+  color: var(--uikit-text-primary, #111827);
+}
+
+.demo-takeover-tab.is-active {
+  color: var(--uikit-primary-color, #3b82f6);
+  border-bottom-color: var(--uikit-primary-color, #3b82f6);
+  font-weight: 600;
 }
 </style>

@@ -16,8 +16,10 @@ import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import Empty from '../../components/empty/empty.vue'
 import type { UiConversation as Conversation } from '../../sdk/types'
-import type { ConversationAction } from './types'
+import { DEFAULT_CONVERSATION_TABS } from './types'
+import type { ConversationAction, ConversationTabKey } from './types'
 import ConversationItem from './conversation-item.vue'
+import ConversationTabs from './conversation-tabs.vue'
 import NewChatModal from './new-chat-modal.vue'
 import AddContactModal from './add-contact-modal.vue'
 import CreateGroupModal from './create-group-modal.vue'
@@ -47,6 +49,13 @@ interface ConversationListProps {
   pullRefresh?: boolean
   /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean
+  /**
+   * 会话分栏 tab 集合，默认全量 ['all', 'unread', 'atMe', 'single', 'group']；
+   * 顺序即渲染优先级；传空数组可隐藏 tab 栏。
+   */
+  tabs?: ConversationTabKey[]
+  /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
+  activeTab?: ConversationTabKey
 }
 
 const props = withDefaults(defineProps<ConversationListProps>(), {
@@ -60,12 +69,15 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
   bodySticky: false,
   footerSticky: false,
   pullRefresh: false,
+  tabs: () => [...DEFAULT_CONVERSATION_TABS],
+  activeTab: 'all',
 })
 
 const emit = defineEmits<{
   (e: 'select', id: string, conversation: Conversation): void
   (e: 'at-me-click', id: string, conversation: Conversation): void
   (e: 'custom-action', key: string, conversation: Conversation): void
+  (e: 'update:active-tab', tab: ConversationTabKey): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
@@ -166,16 +178,61 @@ function getConversationSearchFields(item: Conversation): string[] {
   return fields.filter((text): text is string => !!text)
 }
 
+/** 各 tab 空状态文案 */
+const tabEmptyTexts: Record<ConversationTabKey, string> = {
+  all: t('conversation.empty'),
+  unread: t('conversation.emptyUnread'),
+  atMe: t('conversation.emptyAtMe'),
+  single: t('conversation.emptySingle'),
+  group: t('conversation.emptyGroup'),
+}
+
+/** 切换分栏 tab */
+function selectTab(tab: ConversationTabKey) {
+  if (tab === props.activeTab)
+    return
+  emit('update:active-tab', tab)
+}
+
+/**
+ * 按分栏 tab 过滤（在搜索过滤之前执行）：
+ * - all：不过滤
+ * - unread：unreadCount > 0
+ * - atMe：本地 atMeMap 命中（@我 消息进入会话后清除）
+ * - single / group：按会话类型过滤
+ */
+const tabFilteredList = computed(() => {
+  const tab = props.activeTab
+  if (tab === 'all' || !tab)
+    return conversationList.value
+  if (tab === 'unread')
+    return conversationList.value.filter(item => (item.unreadCount ?? 0) > 0)
+  if (tab === 'atMe')
+    return conversationList.value.filter(item => !!stores.conversation.atMeMap[item.id])
+  if (tab === 'single')
+    return conversationList.value.filter(item => item.type === CONVERSATION_TYPE.SINGLECHAT)
+  if (tab === 'group')
+    return conversationList.value.filter(item => item.type === CONVERSATION_TYPE.GROUPCHAT)
+  return conversationList.value
+})
+
 const filteredConversationList = computed(() => {
   if (!normalizedSearchKeyword.value)
-    return conversationList.value
+    return tabFilteredList.value
   const kw = normalizedSearchKeyword.value.toLowerCase()
   if (props.filterFn) {
-    return conversationList.value.filter(item => props.filterFn!(kw, item))
+    return tabFilteredList.value.filter(item => props.filterFn!(kw, item))
   }
-  return conversationList.value.filter((item) => {
+  return tabFilteredList.value.filter((item) => {
     return getConversationSearchFields(item).some(text => text.toLowerCase().includes(kw))
   })
+})
+
+/** 空状态描述：搜索中优先显示无搜索结果，其次按当前 tab 区分文案 */
+const emptyDescription = computed(() => {
+  if (normalizedSearchKeyword.value)
+    return t('conversation.noSearchResult')
+  return props.emptyText || tabEmptyTexts[props.activeTab] || t('conversation.empty')
 })
 
 /** 当前会话列表中可见的单聊对方用户 ID，用于 Presence 兜底拉取 */
@@ -288,6 +345,17 @@ function handleCustomAction(key: string, conversation: Conversation) {
         </Popup>
       </div>
     </div>
+    <!-- 分栏 tab：header 之下、搜索框之上；tabs 为空数组时隐藏；
+         提供 #tabs 插槽（作用域 tabs/activeTab/selectTab）时完全接管渲染 -->
+    <ConversationTabs
+      :tabs="props.tabs"
+      :active-tab="props.activeTab"
+      @update:active-tab="selectTab"
+    >
+      <template v-if="$slots.tabs" #default="slotScope">
+        <slot name="tabs" v-bind="slotScope" />
+      </template>
+    </ConversationTabs>
     <div v-if="props.showSearch" class="conversation-list__search">
       <Input
         v-model="searchKeyword"
@@ -338,11 +406,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <Empty
         v-if="!filteredConversationList.length && !loadingMore && !isSyncing"
         :icon="normalizedSearchKeyword ? 'empty/search' : 'empty/conversation'"
-        :description="props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty'))"
+        :description="emptyDescription"
       >
         <template #description>
-          <slot name="empty" :search-keyword="normalizedSearchKeyword">
-            {{ props.emptyText || (normalizedSearchKeyword ? t('conversation.noSearchResult') : t('conversation.empty')) }}
+          <slot name="empty" :search-keyword="normalizedSearchKeyword" :active-tab="props.activeTab">
+            {{ emptyDescription }}
           </slot>
         </template>
       </Empty>
@@ -407,6 +475,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
   flex-direction: column;
   height: 100%;
   position: relative;
+  /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽，保证 tab 栏内部横向滚动成立 */
+  min-width: 0;
 }
 
 .conversation-list__header {

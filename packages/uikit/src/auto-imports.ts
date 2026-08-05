@@ -3,6 +3,7 @@ export const EasemobUIKitImports = {
     'useUIKit',
     'useChat',
     'useConversation',
+    'useConversationTabs',
     'useMessage',
     'useContact',
     'useGroup',
