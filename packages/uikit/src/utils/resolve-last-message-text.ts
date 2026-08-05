@@ -35,6 +35,9 @@ export function defaultLastMessageTextResolver(message: UiMessage): string {
     }
     case MESSAGE_TYPE.COMBINE:
       return '[聊天记录]'
+    case 'notice':
+      // 本地系统通知不进入会话列表摘要，避免本地-only 状态误导多设备预览
+      return ''
     default:
       return '[未知消息]'
   }

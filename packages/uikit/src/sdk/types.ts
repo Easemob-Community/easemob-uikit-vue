@@ -5,9 +5,9 @@ import type {
   Message as SdkMessage,
   UserInfo as SdkUserInfo,
 } from 'easemob-websdk'
+import type { MessageStatus } from './types/message'
 
 export type { GroupMemberEntry } from 'easemob-websdk'
-import type { MessageStatus } from './types/message'
 
 /**
  * UIKit 对 SDK Message 的扩展字段。
@@ -62,8 +62,24 @@ export interface UiMessageExtension {
   modified?: boolean
 }
 
-/** UIKit 层消息：SDK Message 加上 UI 扩展 */
-export type UiMessage = SdkMessage & UiMessageExtension
+/** 通知类型消息体（本地系统通知，非 SDK 消息类型） */
+export interface NoticeMessageBody {
+  /** 通知文案 */
+  content: string
+}
+
+/**
+ * UIKit 本地通知消息。
+ * 不来自 SDK 消息流，用于在聊天页面展示中性灰色系统提示
+ *（如好友关系变更、群成员变动、群主/管理员变更等）。
+ */
+export interface UiNoticeMessage extends Omit<SdkMessage, 'type' | 'body'>, UiMessageExtension {
+  type: 'notice'
+  body: NoticeMessageBody
+}
+
+/** UIKit 层消息：SDK Message 加上 UI 扩展，或本地通知消息 */
+export type UiMessage = (SdkMessage & UiMessageExtension) | UiNoticeMessage
 
 /** UIKit 会话展示类型 */
 export interface UiConversation {

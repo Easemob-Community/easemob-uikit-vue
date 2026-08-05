@@ -1,9 +1,12 @@
 import { computed, ref } from 'vue'
 import type { UiGroup, UiGroupMember } from '../sdk/types'
+import { useLocale } from '../locale'
+import { insertChatNotice } from '../sdk/event/notice-utils'
 import { useUIKit } from './use-uikit'
 
 export function useGroup() {
   const { domains, stores, dataSource } = useUIKit()
+  const { t } = useLocale()
   const groupStore = stores.group
 
   const groupList = computed(() => groupStore.groupList)
@@ -108,7 +111,10 @@ export function useGroup() {
     inviteNeedConfirm?: boolean
     maxMembers?: number
   }) {
-    return domains.group.createGroup(params)
+    const result = await domains.group.createGroup(params)
+    // 创建成功后在本设备群聊插入“群聊已创建”本地通知
+    insertChatNotice(stores, result.groupId, 'groupChat', t('chat.notice.groupCreated'))
+    return result
   }
 
   /** 加入群组 */

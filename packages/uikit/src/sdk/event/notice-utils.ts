@@ -1,0 +1,69 @@
+import type { UserInfo } from 'easemob-websdk'
+import type { UiMessage, UiNoticeMessage } from '../types'
+import type { RootStores } from './types'
+
+/** 从 SDK UserInfo 中提取展示名：昵称优先，其次用户 ID */
+export function resolveNoticeUserName(user?: UserInfo | null): string {
+  return user?.nickname || user?.userId || ''
+}
+
+/** 生成唯一本地通知消息 ID */
+function generateNoticeId(): string {
+  return `notice-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+/**
+ * 构建一条本地通知消息。
+ * 该消息不会发送到服务端，仅用于在当前设备的聊天页面展示中性灰色提示。
+ */
+export function createNoticeMessage(
+  content: string,
+  conversationId: string,
+  conversationType: 'singleChat' | 'groupChat',
+  currentUserId: string,
+): UiNoticeMessage {
+  const id = generateNoticeId()
+  return {
+    msgLocalId: id,
+    msgServerId: '',
+    localId: id,
+    from: currentUserId,
+    to: conversationId,
+    conversationId,
+    conversationType,
+    type: 'notice',
+    body: { content },
+    timestamp: Date.now(),
+    status: 'sent',
+    isSelf: false,
+    sender: { userId: currentUserId },
+    sendStatus: 'sent',
+    ext: {},
+  } as unknown as UiNoticeMessage
+}
+
+/** 类型守卫：判断消息是否为本地通知消息 */
+export function isNoticeMessage(message: UiMessage): message is UiNoticeMessage {
+  return message.type === 'notice'
+}
+
+/**
+ * 向指定会话插入一条本地通知消息。
+ * content 为空时不插入。
+ */
+export function insertChatNotice(
+  stores: RootStores,
+  conversationId: string,
+  conversationType: 'singleChat' | 'groupChat',
+  content: string,
+) {
+  if (!content)
+    return
+  const notice = createNoticeMessage(
+    content,
+    conversationId,
+    conversationType,
+    stores.client.currentUser || '',
+  )
+  stores.message.addMessage(notice)
+}

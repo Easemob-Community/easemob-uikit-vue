@@ -198,7 +198,8 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 按消息 ID 局部更新 */
   function updateMessageById(msgId: string, patch: Partial<UiMessage>) {
-    _updateMessageById(msgId, msg => ({ ...msg, ...patch }))
+    // UiMessage 是 SDK 消息与本地通知消息的联合，union spread 推断不出兼容类型，需显式断言
+    _updateMessageById(msgId, msg => ({ ...msg, ...patch }) as UiMessage)
   }
 
   /** 按消息 ID 完整替换 */

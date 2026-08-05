@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
+import type { Message as SdkMessage } from 'easemob-websdk'
 import { MESSAGE_STATUS } from '../constants'
-import type { TextMessageBody, UiMessage, VoiceMessageBody } from '../sdk/types'
+import type { UiMessage } from '../sdk/types'
+import { isTextBody, isVoiceBody } from '../sdk/types'
 import { useLocale } from '../locale'
 import { formatSdkError } from '../utils/sdk-error'
 import { useToast } from './use-toast'
@@ -94,9 +96,12 @@ export function useMessageActions() {
 
   /** 翻译文本消息 */
   async function translateTextMessage(message: UiMessage, targetLang?: string) {
+    // type 判别优先：排除 UiNoticeMessage（其 body 结构上兼容 TextMessageBody，仅守卫无法排除）
     if (message.type !== 'text')
       return
-    const text = (message.body as TextMessageBody).content
+    if (!isTextBody(message.body))
+      return
+    const text = message.body.content
     if (!text)
       return
 
@@ -110,7 +115,8 @@ export function useMessageActions() {
 
     messageStore.setTranslating(msgId, true)
     try {
-      const result = await domains.message.translateMessage(message, [lang])
+      // 已排除 UiNoticeMessage，窄化为 SDK 文本消息
+      const result = await domains.message.translateMessage(message as SdkMessage, [lang])
       const translation = result?.translations?.[0]
       if (translation) {
         messageStore.setTranslation(msgId, translation)
@@ -131,10 +137,12 @@ export function useMessageActions() {
 
   /** 语音消息转文字 */
   async function transcribeVoiceMessage(message: UiMessage) {
+    // type 判别优先：排除 UiNoticeMessage，再以守卫校验 body 结构
     if (message.type !== 'voice')
       return
-    const body = message.body as VoiceMessageBody
-    if (!body.url)
+    if (!isVoiceBody(message.body))
+      return
+    if (!message.body.url)
       return
 
     const msgId = message.msgServerId || message.msgLocalId
@@ -147,8 +155,8 @@ export function useMessageActions() {
 
     messageStore.setVoiceTranscribing(msgId, true)
     try {
-      // 不传 voiceParams：SDK 默认按自身逻辑处理语音格式，避免传入与采集格式不一致的 format 导致 400
-      const result = await domains.message.transcribeVoiceMessage(message)
+      // 已排除 UiNoticeMessage，窄化为 SDK 语音消息
+      const result = await domains.message.transcribeVoiceMessage(message as SdkMessage)
       const text = result?.text
       if (typeof text === 'string' && text.length > 0) {
         messageStore.setVoiceText(msgId, { text })

@@ -1,7 +1,8 @@
-import type { Message as SdkMessage } from 'easemob-websdk'
+import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '../types'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
+import { isVoiceBody } from '../types/message'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
 
@@ -417,8 +418,9 @@ export class MessageDomain {
   ) {
     const messages = this.store.getMessages(conversationId)
     const pendingIds = messages
-      .filter(m => !m.isSelf && !!m.msgServerId && !sentReadReceiptIds.has(m.msgServerId))
-      .map(m => m.msgServerId as string)
+      .filter(m => !m.isSelf && !sentReadReceiptIds.has(m.msgServerId))
+      .map(m => m.msgServerId)
+      .filter((id): id is string => !!id)
     if (pendingIds.length === 0)
       return
     // 先标记再发送：并发进入会话不会重复请求
@@ -482,14 +484,20 @@ export class MessageDomain {
   /** 语音消息转文字 */
   async transcribeVoiceMessage(
     message: SdkMessage,
-    voiceParams?: { format?: string, sampleRate?: number, bitsPerSample?: number, channels?: number },
+    voiceParams?: VoiceParams,
   ) {
-    // SDK 要求传入 VoiceMessageBody，且需要能从 url 解析出 fileId；
-    // 兼容部分历史消息 body 缺少 type 的情况，按 message.type 补齐。
-    const body = {
-      ...(message.body as Record<string, unknown>),
-      type: (message.body as Record<string, unknown>)?.type ?? message.type,
-    } as any
+    // SDK 要求传入语音消息体（VoiceMessageBody），且需要能从 url 解析出 fileId；
+    // 类型守卫收窄 body 后，用 SDK 的 VoiceMessageSource 补上 type 字段，
+    // 兼容部分历史消息 body 缺少 type 的情况（SDK 签名仅认 VoiceMessageBody，
+    // VoiceMessageSource 是其超集，可直接传入）。
+    if (!isVoiceBody(message.body)) {
+      console.warn('[MessageDomain.transcribeVoiceMessage] not a voice message:', message)
+      throw new Error('not a voice message')
+    }
+    const body: VoiceMessageSource = {
+      ...message.body,
+      type: 'voice',
+    }
     // 打印转入语音转文字的原始入参，便于定位 url/fileId/format 等参数问题
     messageLogger.info('voiceMessageToText raw input:', { message, body, voiceParams })
     const result = await this.client.chatManager.voiceMessageToText(body, voiceParams)

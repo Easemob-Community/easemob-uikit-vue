@@ -238,7 +238,11 @@ export function useChat() {
     }
     const { id, type } = target
     const title = type === 'groupChat' ? (target.name || id) : t('message.forward.combineTitle', '聊天记录')
-    const summary = messages.map(m => `${resolveSenderName(m)}: ${extractLastMessageText(m)}`).join('\n')
+    const summary = messages.map((m) => {
+      // 本地通知消息不经过 SDK 适配器，直接取通知文案；其余走 SDK 摘要提取
+      const text = m.type === 'notice' ? m.body.content : extractLastMessageText(m as SdkMessage)
+      return `${resolveSenderName(m)}: ${text}`
+    }).join('\n')
     // 旧版本客户端展示的兼容文案（SDK compatibleText sidecar）
     const compatibleText = t('message.forward.combineCompatible', '[聊天记录]')
     // 剥离 UiMessage 扩展字段并去 reactive proxy：

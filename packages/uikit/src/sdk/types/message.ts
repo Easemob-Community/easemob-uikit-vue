@@ -1,90 +1,31 @@
-import type { MessageBody, Message as SdkMessage } from 'easemob-websdk'
+import type {
+  CmdMessageBody,
+  CombineMessageBody,
+  CustomMessageBody,
+  FileMessageBody,
+  ImageMessageBody,
+  LocationMessageBody,
+  MessageBody,
+  TextMessageBody,
+  VideoMessageBody,
+  VoiceMessageBody,
+} from 'easemob-websdk'
 
 /**
- * 本地复刻 SDK 各消息体结构，便于 UIKit 组件按类型精确访问 body 字段。
- * SDK 主入口仅导出 MessageBody 联合类型，不单独导出各 body 接口。
+ * 各消息体类型直接复用 SDK 5.0.0 导出，不再本地复刻，避免双份定义漂移。
+ * SDK 主入口已单独导出全部 *MessageBody 接口。
  */
-export interface TextMessageBody {
-  content: string
-  targetLanguages?: string[]
-  translations?: Record<string, string>
-}
-
-export interface ImageMessageBody {
-  localUrl: string
-  filename?: string
-  filetype?: string
-  width?: number
-  height?: number
-  isGif: boolean
-  isOriginalImage: boolean
-  originalImageUrl?: string
-  bigImageUrl?: string
-  secret?: string
-  fileLength?: number
-  thumbnailUrl?: string
-}
-
-export interface FileMessageBody {
-  url?: string
-  filename?: string
-  filetype?: string
-  fileSize?: number
-  fileLength?: number
-  secret?: string
-}
-
-export interface VoiceMessageBody {
-  url?: string
-  filename?: string
-  filetype?: string
-  duration: number
-  fileLength?: number
-  secret?: string
-}
-
-export interface VideoMessageBody {
-  url?: string
-  filename?: string
-  filetype?: string
-  duration: number
-  width?: number
-  height?: number
-  fileLength?: number
-  secret?: string
-  thumbnailUrl?: string
-}
-
-export interface LocationMessageBody {
-  latitude: number
-  longitude: number
-  address?: string
-  buildingName?: string
-}
-
-export interface CmdMessageBody {
-  action: string
-  params?: Record<string, string>
-  deliverOnlineOnly?: boolean
-}
-
-export interface CustomMessageBody {
-  event: string
-  params?: Record<string, string>
-}
-
-export interface CombineMessageBody {
-  title: string
-  summary: string
-  // compatibleText 仅作为创建参数，SDK 0.14.181 起不再在 body 中暴露
-  messageList?: ReadonlyArray<SdkMessage>
-  url?: string
-  filename: string
-  filetype: string
-  fileLength?: number
-  secret?: string
-  combineLevel: number
-}
+export type {
+  TextMessageBody,
+  ImageMessageBody,
+  FileMessageBody,
+  VoiceMessageBody,
+  VideoMessageBody,
+  LocationMessageBody,
+  CmdMessageBody,
+  CustomMessageBody,
+  CombineMessageBody,
+} from 'easemob-websdk'
 
 /**
  * UIKit UI 展示层消息状态。
