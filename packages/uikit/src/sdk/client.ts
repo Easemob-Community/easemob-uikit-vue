@@ -69,9 +69,12 @@ interface ManagerRegistry {
  */
 export class UIKitClient {
   private _client: SdkChatClient & ManagerRegistry
+  private _deleteConversationOnGroupDestroyed: boolean
 
   constructor(config: ClientConfig) {
     const { debug, ...sdkConfig } = config
+    // 与 SDK 默认值保持一致：群组解散时自动删除本地群会话
+    this._deleteConversationOnGroupDestroyed = sdkConfig.deleteConversationOnGroupDestroyed ?? true
     this._client = SdkChatClient.init({
       ...sdkConfig,
       // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
@@ -131,6 +134,15 @@ export class UIKitClient {
   /** 当前连接状态 */
   get connectionState() {
     return this._client.getConnectionState()
+  }
+
+  /**
+   * 群组解散时是否自动删除对应的本地群会话。
+   * 与 SDK `InitConfig.deleteConversationOnGroupDestroyed` 保持一致，
+   * UIKit 事件层据此决定是否清理本地会话/消息，避免覆盖 SDK 行为。
+   */
+  get deleteConversationOnGroupDestroyed() {
+    return this._deleteConversationOnGroupDestroyed
   }
 
   /** 当前登录用户 ID */

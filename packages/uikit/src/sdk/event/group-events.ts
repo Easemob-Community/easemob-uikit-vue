@@ -184,9 +184,12 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     onGroupDestroyed: (payload: GroupDestroyedEventPayload) => {
       groupLog.info('onGroupDestroyed', { groupId: payload.groupId })
       stores.group.removeGroup(payload.groupId)
-      // 群被解散：同上删除会话并清空本地消息
-      stores.conversation.deleteConversation(payload.groupId)
-      stores.message.clearConversationMessages(payload.groupId)
+      // 群被解散：按 SDK 初始化配置 deleteConversationOnGroupDestroyed 决定是否删除会话并清空本地消息，
+      // 避免 UIKit 无条件覆盖 SDK 行为。
+      if (stores.client.client?.deleteConversationOnGroupDestroyed ?? true) {
+        stores.conversation.deleteConversation(payload.groupId)
+        stores.message.clearConversationMessages(payload.groupId)
+      }
       // 插入系统通知到群聊（在清空消息之前插入）
       insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.groupDestroyed'))
     },
