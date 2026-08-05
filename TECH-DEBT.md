@@ -693,6 +693,24 @@
 - **建议修法**：逐条小修（补 catch / logout 清理 / 入群校验 / focusout 重算），无架构改动。
 - **关联 skill**：`uikit-store-composable` / `uikit-lint-governance`
 
+### [ ] D85. 未来扩展：Electron + 本地数据库（SQLite）消息/会话持久化
+
+- **背景**：未来 UIKit 有较大可能在 Electron 环境使用，消息/会话数据需外接本地 DB——登录后从库加载回流 UIKit（冷启动不依赖网络）、收发写库、翻页先读本地再漫游。
+- **结论**：架构支持低侵入扩展（Domain 依赖注入 + store 已有 `setConversationList`/`prependMessages` 批量回流入口 + `toUiMessage` 形态对齐），缺持久化抽象接口、历史加载数据源分支、会话列表与 SDK 同步快照的覆盖竞争处理。**详细调研与落地建议见根 [ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（2026-08-05 预研）**。
+- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+
+### [ ] D86. 主题能力扩展：字号体系 / 适老版 / 密度 / 气泡色等语义 token
+
+- **背景**：主题机制（变量契约 + `data-uikit-*` 驱动）健康，但覆盖面不足：字号 token 空白（357 处硬编码 px、`--uikit-font-scale` 只写不读）、无全局密度、气泡颜色等高频定制点无独立 token、Provider `theme` prop 偏窄（无 auto、非响应式）。
+- **结论与推进顺序见根 [THEME-CAPABILITY-REVIEW.md](THEME-CAPABILITY-REVIEW.md)（2026-08-05 审查）**：先清 D3/D4/D12 硬编码债 → 建字号 token 体系并激活 font-scale（适老版）→ 补气泡/聊天背景语义 token → 扩 Provider prop → 密度档最后。
+- **关联 skill**：`uikit-styling-theming`
+
+### [ ] D87. Demo 开发者友好模式（Dev Hints）：悬停展示环信接口 + 实现思路
+
+- **背景**：demo 登录后默认开启教学覆盖层——悬停会话项/气泡等区域，浮出该功能用到的环信接口 + 文档链接 + UIKit 实现思路；气泡悬停延时出"点子"角标，点击展开详情抽屉。
+- **可行性：高，uikit 零侵入**（demo 层三件套：元数据注册表 + 事件委托悬停引擎 + 提示卡/EmPopup 详情抽屉）。DOM class 稳定可识别、API 素材集中在 `sdk/domain/*.ts`、开关机制挂 `useDemoSettings` 现成。**方案与映射表骨架见根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（2026-08-05 预研）**。
+- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+
 ---
 
 ## 已修复（归档）

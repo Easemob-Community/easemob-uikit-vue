@@ -51,6 +51,9 @@
 
 - 依赖/规范体系：本文件「Skill 路由表」+ `.agent/skills/*`
 - 技术债与待修：根 [TECH-DEBT.md](TECH-DEBT.md)
+- Electron + 本地 DB 持久化预研：根 [ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）
+- 主题配置能力审查（字号/适老/密度）：根 [THEME-CAPABILITY-REVIEW.md](THEME-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D86，关联 D3/D4/D12）
+- Demo 开发者友好模式预研：根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 核心包源码：`packages/uikit/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit/src/**/*.story.vue`（Histoire）
