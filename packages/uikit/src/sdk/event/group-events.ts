@@ -7,7 +7,9 @@ import type {
   GroupAnnouncementChangedEventPayload,
   GroupAutoAcceptInvitationEventPayload,
   GroupDestroyedEventPayload,
+  GroupDisabledChangedEventPayload,
   GroupEventHandlerMap,
+  GroupInfoChangedEventPayload,
   GroupInvitationReceivedEventPayload,
   GroupMembersExitedEventPayload,
   GroupMembersJoinedEventPayload,
@@ -26,7 +28,7 @@ import { t } from '../../locale'
 import { createLogger } from '../../utils/logger'
 import type { UiContactInvite } from '../types'
 import type { RootStores } from './types'
-import { insertChatNotice, resolveNoticeUserName } from './notice-utils'
+import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from './notice-utils'
 
 const groupLog = createLogger('UIKit:GroupEvents')
 
@@ -126,14 +128,24 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       )
       insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
     },
-    onGroupInfoChanged: (payload) => {
-      const p = payload as any
-      groupLog.info('onGroupInfoChanged', { groupId: p.groupId })
-      stores.group.updateGroup(p.groupId, {
-        groupName: p.groupName,
-        description: p.description,
-        avatar: p.avatar,
+    onGroupInfoChanged: (payload: GroupInfoChangedEventPayload) => {
+      groupLog.info('onGroupInfoChanged', { groupId: payload.groupId })
+      // 兼容两种载荷结构：SDK 5.0.0 为 { groupId, groupInfo: GroupDetail }，旧版本字段在顶层
+      const info: any = (payload as any).groupInfo ?? payload
+      const newName: string | undefined = info.name ?? info.groupName
+      const prevGroup = stores.group.getGroupById(payload.groupId)
+      stores.group.updateGroup(payload.groupId, {
+        groupName: newName,
+        description: info.description,
+        avatar: info.avatarUrl ?? info.avatar,
       })
+      // 仅群名称实际变更时插入系统通知（描述/头像变更不提示，避免刷屏）
+      if (newName && prevGroup?.groupName && newName !== prevGroup.groupName) {
+        insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', newName))
+        // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
+        // 否则需刷新（重新同步会话）才能看到新群名
+        stores.conversation.updateConversation(payload.groupId, { name: newName })
+      }
     },
     onOwnerChanged: (payload: GroupOwnerChangedEventPayload) => {
       groupLog.info('onOwnerChanged', { groupId: payload.groupId })
@@ -194,10 +206,15 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.groupDestroyed'))
     },
     onAnnouncementChanged: (payload: GroupAnnouncementChangedEventPayload) => {
-      groupLog.info('onAnnouncementChanged', { groupId: payload.groupId })
+      groupLog.info('onAnnouncementChanged', { groupId: payload.groupId, announcement: payload.announcement })
       stores.group.updateGroup(payload.groupId, { announcement: payload.announcement })
-      // 插入系统通知到群聊
-      insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.announcementChanged'))
+      // 记录公告历史（SDK 事件通常不带发布者，updater 为空）
+      stores.group.addGroupAnnouncementHistory(payload.groupId, {
+        content: payload.announcement || '',
+        updateTime: Date.now(),
+      })
+      // 插入系统通知到群聊（带上最新公告内容，SDK 事件不回推操作者本人）
+      insertChatNotice(stores, payload.groupId, 'groupChat', buildAnnouncementNoticeText(payload.announcement))
     },
     onMuteListAdded: (payload: GroupMuteListAddedEventPayload) => {
       groupLog.info('onMuteListAdded', { groupId: payload.groupId, count: (payload.mutes || []).length })
@@ -250,10 +267,25 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       )
       insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
     },
+    onGroupDisabledChanged: (payload: GroupDisabledChangedEventPayload) => {
+      groupLog.info('onGroupDisabledChanged', { groupId: payload.groupId, disabled: payload.disabled })
+      stores.group.updateGroup(payload.groupId, { disabled: payload.disabled })
+      // 插入系统通知到群聊
+      insertChatNotice(stores, payload.groupId, 'groupChat', t(payload.disabled ? 'chat.notice.groupDisabled' : 'chat.notice.groupEnabled'))
+    },
     onSharedFileAdded: (payload: GroupSharedFileAddedEventPayload) => {
       groupLog.info('onSharedFileAdded', { groupId: payload.groupId, fileId: payload.sharedFile?.fileId })
       if (payload.sharedFile) {
         stores.group.addGroupSharedFile(payload.groupId, payload.sharedFile)
+        // 插入系统通知到群聊（带上传者与文件名；操作者本人收不到该事件，由上传处本地插入）
+        const uploader = payload.sharedFile.fileOwner
+        const name = uploader?.userId === stores.client.currentUser
+          ? t('chat.notice.you')
+          : resolveNoticeUserName(uploader)
+        const noticeText = t('chat.notice.sharedFileAdded')
+          .replace('{name}', name || uploader?.userId || '')
+          .replace('{fileName}', payload.sharedFile.fileName)
+        insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
       }
     },
     onSharedFileDeleted: (payload: GroupSharedFileDeletedEventPayload) => {

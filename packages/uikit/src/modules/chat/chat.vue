@@ -24,6 +24,7 @@ import Empty from '../../components/empty/empty.vue'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input/index.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
+import GroupAnnouncementBanner from './group-announcement-banner.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
@@ -942,6 +943,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
         v-if="showPinnedBar && currentConversation"
         :max-preview-length="pinnedBarMaxLength"
         @locate="onPinnedLocate"
+      />
+
+      <!-- 群公告横幅 -->
+      <GroupAnnouncementBanner
+        v-if="isGroupChat && currentConversation"
+        :group-id="currentConversation.id"
       />
 
       <!-- 消息列表 -->

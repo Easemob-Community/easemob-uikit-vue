@@ -14,6 +14,13 @@ export interface UiGroupJoinRequest {
   timestamp?: number
 }
 
+/** 群公告历史记录 */
+export interface UiGroupAnnouncementRecord {
+  content: string
+  updater?: string
+  updateTime: number
+}
+
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<UiGroup[]>([])
   const currentGroup = ref<UiGroup | null>(null)
@@ -28,6 +35,8 @@ export const useGroupStore = defineStore('group', () => {
   const groupMembersMap = ref<Record<string, UiGroupMember[]>>({})
   /** 群公告缓存：groupId -> announcement */
   const groupAnnouncementMap = ref<Record<string, string>>({})
+  /** 群公告历史缓存：groupId -> records（按时间倒序，最新在前） */
+  const groupAnnouncementHistoryMap = ref<Record<string, UiGroupAnnouncementRecord[]>>({})
 
   /** 群成员禁言列表缓存：groupId -> members */
   const groupMuteListMap = ref<Record<string, UiGroupMember[]>>({})
@@ -324,6 +333,22 @@ export const useGroupStore = defineStore('group', () => {
     return groupAnnouncementMap.value[groupId] || ''
   }
 
+  function addGroupAnnouncementHistory(groupId: string, record: UiGroupAnnouncementRecord) {
+    const list = groupAnnouncementHistoryMap.value[groupId] || []
+    // 如果最新一条内容相同，只更新 meta，避免重复
+    if (list.length > 0 && list[0].content === record.content) {
+      list[0] = { ...list[0], updater: record.updater ?? list[0].updater, updateTime: record.updateTime }
+    }
+    else {
+      list.unshift(record)
+    }
+    groupAnnouncementHistoryMap.value[groupId] = [...list]
+  }
+
+  function getGroupAnnouncementHistory(groupId: string): UiGroupAnnouncementRecord[] {
+    return groupAnnouncementHistoryMap.value[groupId] || []
+  }
+
   // ===== UI 交互状态操作 =====
   function setFilterText(text: string) {
     filterText.value = text
@@ -369,6 +394,7 @@ export const useGroupStore = defineStore('group', () => {
     cursor.value = undefined
     groupMembersMap.value = {}
     groupAnnouncementMap.value = {}
+    groupAnnouncementHistoryMap.value = {}
     groupMuteListMap.value = {}
     groupBlocklistMap.value = {}
     groupAllowlistMap.value = {}
@@ -386,6 +412,7 @@ export const useGroupStore = defineStore('group', () => {
     joinedGroupCount,
     groupMembersMap: computed(() => groupMembersMap.value),
     groupAnnouncementMap: computed(() => groupAnnouncementMap.value),
+    groupAnnouncementHistoryMap: computed(() => groupAnnouncementHistoryMap.value),
     groupMuteListMap: computed(() => groupMuteListMap.value),
     groupBlocklistMap: computed(() => groupBlocklistMap.value),
     groupAllowlistMap: computed(() => groupAllowlistMap.value),
@@ -417,6 +444,8 @@ export const useGroupStore = defineStore('group', () => {
     clearGroupMembers,
     setGroupAnnouncement,
     getGroupAnnouncement,
+    addGroupAnnouncementHistory,
+    getGroupAnnouncementHistory,
     setGroupMuteList,
     addGroupMuteMembers,
     removeGroupMuteMembers,

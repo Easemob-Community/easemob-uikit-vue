@@ -1,4 +1,5 @@
 import type { UserInfo } from 'easemob-websdk'
+import { t } from '../../locale'
 import type { UiMessage, UiNoticeMessage } from '../types'
 import type { RootStores } from './types'
 
@@ -45,6 +46,16 @@ export function createNoticeMessage(
 /** 类型守卫：判断消息是否为本地通知消息 */
 export function isNoticeMessage(message: UiMessage): message is UiNoticeMessage {
   return message.type === 'notice'
+}
+
+/**
+ * 构建群公告更新的通知文案：内容非空时附上最新公告内容，为空时只显示固定文案。
+ * 发布方与接收方共用，保证文案一致。
+ */
+export function buildAnnouncementNoticeText(announcement: string): string {
+  if (!announcement)
+    return t('chat.notice.announcementChanged')
+  return t('chat.notice.announcementChangedWithContent').replace('{content}', announcement)
 }
 
 /**

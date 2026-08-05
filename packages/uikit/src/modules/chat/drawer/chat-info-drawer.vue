@@ -14,6 +14,7 @@ import { useToast } from '../../../composables/use-toast'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
+import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
@@ -234,8 +235,18 @@ async function saveGroupName() {
     return
   savingGroupName.value = true
   try {
+    // 记录旧群名（updateGroupInfo 会同步更新 store，必须先取）
+    const prevGroupName = stores.group.getGroupById(id)?.groupName
     await updateGroupInfo(id, { name: groupNameInput.value })
     isEditingGroupName.value = false
+    // 发布方本地插入灰色通知：SDK 的 onGroupInfoChanged 事件不回推操作者本人，
+    // 仅名称实际变更时插入，与接收方文案保持一致
+    if (prevGroupName && prevGroupName !== groupNameInput.value) {
+      insertChatNotice(stores, id, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', groupNameInput.value))
+    }
+    // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
+    // 否则需刷新（重新同步会话）才能看到新群名
+    stores.conversation.updateConversation(id, { name: groupNameInput.value })
     showToast(t('chat.info.groupInfoUpdated') || '更新成功')
   }
   catch (err) {
@@ -654,6 +665,50 @@ defineExpose({
             <div v-else class="chat-info-drawer__name">
               {{ displayName }}
             </div>
+            <!-- 群聊：群描述（弱化，合并为普通说明文字） -->
+            <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__description-row">
+              <template v-if="!isEditingDescription">
+                <span class="chat-info-drawer__description-text" :class="{ 'is-placeholder': !group?.description }">
+                  {{ group?.description || t('chat.info.noGroupDescription') || '暂无群介绍' }}
+                </span>
+                <IconButton
+                  v-if="isOwner"
+                  icon="actions/edit"
+                  size="small"
+                  type="primary"
+                  :title="t('chat.info.edit') || '编辑'"
+                  @click.stop="isEditingDescription = true"
+                />
+              </template>
+              <div v-else class="chat-info-drawer__inline-edit chat-info-drawer__inline-edit--description">
+                <textarea
+                  ref="descriptionInputRef"
+                  v-model="descriptionInput"
+                  class="chat-info-drawer__inline-textarea"
+                  :placeholder="t('chat.info.noGroupDescription') || '暂无群介绍'"
+                  rows="2"
+                  @keydown.esc="isEditingDescription = false"
+                />
+                <div class="chat-info-drawer__inline-edit-actions">
+                  <IconButton
+                    icon="actions/xmark_thick"
+                    size="small"
+                    type="danger"
+                    :title="t('button.cancel') || '取消'"
+                    @click="isEditingDescription = false"
+                  />
+                  <IconButton
+                    class="chat-info-drawer__inline-save"
+                    icon="actions/check"
+                    size="small"
+                    type="success"
+                    :disabled="savingDescription"
+                    :title="t('chat.info.save') || '保存'"
+                    @click="saveDescription"
+                  />
+                </div>
+              </div>
+            </div>
             <div class="chat-info-drawer__id">
               <CopyableText :text="props.conversation?.id || ''" label="ID:" />
             </div>
@@ -708,58 +763,6 @@ defineExpose({
         <!-- 群聊：群公告 -->
         <div v-if="isGroup" class="chat-info-drawer__section-group">
           <GroupAnnouncement :group-id="groupId" :loading="loadingGroup" />
-        </div>
-
-        <!-- 群聊：群描述 -->
-        <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__section-group">
-          <div class="chat-info-drawer__section-label-row">
-            <span class="chat-info-drawer__section-label">{{ t('chat.info.groupDescription') }}</span>
-            <IconButton
-              v-if="isOwner && !isEditingDescription"
-              icon="actions/edit"
-              size="small"
-              type="primary"
-              :title="t('chat.info.edit') || '编辑'"
-              @click="isEditingDescription = true"
-            />
-          </div>
-          <div class="chat-info-drawer__section">
-            <template v-if="!isEditingDescription">
-              <div v-if="group?.description" class="chat-info-drawer__description">
-                {{ group.description }}
-              </div>
-              <div v-else class="chat-info-drawer__description">
-                <span class="chat-info-drawer__placeholder">{{ t('chat.info.noGroupDescription') || '暂无群介绍' }}</span>
-              </div>
-            </template>
-            <div v-else class="chat-info-drawer__inline-edit">
-              <textarea
-                ref="descriptionInputRef"
-                v-model="descriptionInput"
-                class="chat-info-drawer__inline-textarea"
-                :placeholder="t('chat.info.noGroupDescription') || '暂无群介绍'"
-                rows="3"
-              />
-              <div class="chat-info-drawer__inline-edit-actions">
-                <IconButton
-                  icon="actions/xmark_thick"
-                  size="small"
-                  type="danger"
-                  :title="t('button.cancel') || '取消'"
-                  @click="isEditingDescription = false"
-                />
-                <IconButton
-                  class="chat-info-drawer__inline-save"
-                  icon="actions/check"
-                  size="small"
-                  type="success"
-                  :disabled="savingDescription"
-                  :title="t('chat.info.save') || '保存'"
-                  @click="saveDescription"
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- 群聊：成员列表 -->
@@ -1096,6 +1099,37 @@ defineExpose({
   color: var(--uikit-text-primary);
   line-height: 1.6;
   word-break: break-word;
+}
+
+.chat-info-drawer__description-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 260px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--uikit-text-secondary);
+  text-align: center;
+}
+
+.chat-info-drawer__description-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.chat-info-drawer__description-text.is-placeholder {
+  opacity: 0.7;
+}
+
+.chat-info-drawer__inline-edit--description {
+  width: 100%;
+  max-width: 320px;
 }
 
 .chat-info-drawer__placeholder {
