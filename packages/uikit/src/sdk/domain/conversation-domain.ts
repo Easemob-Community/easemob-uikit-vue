@@ -83,6 +83,7 @@ export class ConversationDomain {
   /** 从本地缓存读取会话列表 */
   syncLocal(): UiConversation[] {
     const items = this.client.chatManager.getConversationList()
+    conversationLogger.info('getConversationList raw (syncLocal)', items)
     dumpRawSnippets(items, 'syncLocal')
     const list = toUiConversations(items)
     this.store.setList(list)
@@ -225,6 +226,7 @@ export class ConversationDomain {
   /** 加载更多会话：SDK5 当前无分页游标，直接返回本地列表 */
   async loadMore(_pageSize?: number) {
     const items = this.client.chatManager.getConversationList()
+    conversationLogger.info('getConversationList raw (loadMore)', items)
     const list = toUiConversations(items)
     this.store.setList(list)
   }
