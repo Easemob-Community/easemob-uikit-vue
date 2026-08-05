@@ -409,7 +409,7 @@ const messages: LocaleMessages = {
   'chat.info.addMember': '添加成员',
   'chat.info.transferOwnerEntry': '转让群主',
   'chat.info.setAdminEntry': '设置管理员',
-  'chat.info.groupAdminActions': '群管理操作',
+  'chat.info.groupAdminActions': '群主操作',
   'chat.info.clearHistory': '清空聊天记录',
   'chat.info.clearHistoryConfirm': '确定清空当前会话的聊天记录吗？',
   'chat.info.clearHistoryDeleteConversation': '同时删除会话',

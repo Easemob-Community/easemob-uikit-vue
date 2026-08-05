@@ -791,7 +791,7 @@ defineExpose({
         <!-- 群聊：群主/管理员专属入口 -->
         <div v-if="isGroup && isOwner" class="chat-info-drawer__section-group">
           <div class="chat-info-drawer__section-label">
-            {{ t('chat.info.groupAdminActions') || '群管理操作' }}
+            {{ t('chat.info.groupAdminActions') || '群主操作' }}
           </div>
           <div class="chat-info-drawer__section chat-info-drawer__section--admin-actions">
             <button class="chat-info-drawer__admin-action" @click="onViewMembersForTransfer">

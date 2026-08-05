@@ -409,7 +409,7 @@ const messages: LocaleMessages = {
   'chat.info.addMember': 'Add Member',
   'chat.info.transferOwnerEntry': 'Transfer Ownership',
   'chat.info.setAdminEntry': 'Set Admins',
-  'chat.info.groupAdminActions': 'Admin Actions',
+  'chat.info.groupAdminActions': 'Owner Actions',
   'chat.info.clearHistory': 'Clear Chat History',
   'chat.info.clearHistoryConfirm': 'Are you sure you want to clear the chat history?',
   'chat.info.clearHistoryDeleteConversation': 'Delete conversation as well',
