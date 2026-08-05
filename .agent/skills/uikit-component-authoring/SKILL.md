@@ -167,6 +167,32 @@ app.component(finalName, value as Component)
 类名走 BEM（`.conversation-item__name.is-at-me`），主题只用 `var(--uikit-*)` 变量、不写死颜色/时长。
 样式与主题的完整规范属 skill **`uikit-styling-theming`**，此处不展开，写样式前请转过去。
 
+## 8. 枚举字符串常量：业务代码一律引用 `src/constants/index.ts`
+
+会话类型 / 消息类型 / 消息状态 / 群成员角色 / 转发模式等枚举字符串，**禁止在业务代码（composables / sdk / modules / containers / story）中硬编码字面量**，统一引用 `src/constants/index.ts` 导出：
+
+```ts
+// src/constants/index.ts（定义处保留字面量）
+export const CONVERSATION_TYPE = { SINGLECHAT: 'singleChat', GROUPCHAT: 'groupChat' } as const
+export const MESSAGE_TYPE = { TEXT: 'text', IMAGE: 'image', VOICE: 'voice', VIDEO: 'video', FILE: 'file', CMD: 'cmd', CUSTOM: 'custom', LOCATION: 'location', COMBINE: 'combine', NOTICE: 'notice' } as const
+export const MESSAGE_STATUS = { SENDING: 'sending', SENT: 'sent', DELIVERED: 'delivered', READ: 'read', FAILED: 'failed' } as const
+export const GROUP_MEMBER_ROLE = { OWNER: 'owner', ADMIN: 'admin', MEMBER: 'member' } as const
+export const FORWARD_MODE = { ONE_BY_ONE: 'oneByOne', COMBINE: 'combine' } as const
+export const ACK_TYPE = { READ: 'read', DELIVERED: 'delivered' } as const
+export const HEADER_ALIGN = { LEFT: 'left', CENTER: 'center', RIGHT: 'right' } as const
+export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONVERSATION_TYPE]
+// ... 其余类型别名同理
+```
+
+用法规则：
+
+- **运行时比较 / 传参**：`cvs.type === CONVERSATION_TYPE.GROUPCHAT`、`sendText(chatType, ...)`，不用裸 `'groupChat'`；switch case 同样写 `case MESSAGE_TYPE.TEXT:`。
+- **类型联合声明**：`type?: 'singleChat' | 'groupChat'` 一律替换为导出的类型别名 `ConversationTypeValue`（`GroupMemberRoleValue` / `MessageStatusValue` / `ForwardModeValue` 同理），避免类型与常量双源漂移。
+- `<script setup>` 中 import 的常量可直接在模板使用（如 `FORWARD_MODE.ONE_BY_ONE`、`GROUP_MEMBER_ROLE.MEMBER`），无需额外暴露。
+- **定义处保留字面量**：`src/constants/index.ts` 自身、`src/sdk/types.ts` 的 SDK 契约类型定义不套常量。
+- **SDK 协议内部字段保留**：SDK body 的 `type: 'img' / 'audio' / 'txt'` 等 wire 协议字段、SDK 降级值 `'unknown'` 不属于 MESSAGE_TYPE 语义，不套用。
+- **非枚举业务 key 保留**：视图页签、操作 key 等仅作本地标识的字符串（如 user-card-modal 的操作 key）不强制提取。
+
 ---
 
 ## 硬规则 vs 软约定
@@ -178,6 +204,7 @@ app.component(finalName, value as Component)
 - `Em*` 别名只在 `index.ts` 给；不写 `defineOptions`；名字不以 `Em` 开头就进不了 resolver/install（第 2、5、6 节）。
 - props 用 type-based `defineProps<XxxProps>()` + `withDefaults`，数组/对象默认值用工厂函数（第 3 节）。
 - **Boolean prop 必须在 `withDefaults` 中显式给默认值**——Vue 3 对未设默认值的 Boolean prop 自动转为 `false`，导致 `??` 回落链断裂（详见第 3.1 节）。
+- **枚举字符串（会话类型/消息类型/消息状态/群角色/转发模式等）一律引用 `src/constants/index.ts` 常量，禁止业务代码硬编码字面量**；类型联合用导出的类型别名（第 8 节）。
 
 **软约定（真实主流但有存量例外，靠 review 把关；新代码按严格版写）：**
 
@@ -208,5 +235,6 @@ app.component(finalName, value as Component)
 - ❌ 组件名不以 `Em` 开头 —— 不会被解析也不会被全局注册。
 - ❌ 调用方/内部从深层文件直接 `import` 组件 `.vue`，绕开 `Em*` 命名导出 / resolver。
 - ❌ 漏 `<style scoped>`，或样式里写死颜色/时长而非 `var(--uikit-*)`（详见 `uikit-styling-theming`）。
+- ❌ 业务代码里写死 `'groupChat'` / `'owner'` / `'text'` 等枚举字符串，或类型联合手写 `'singleChat' | 'groupChat'` —— 一律引用 `src/constants/index.ts`（第 8 节），改常量值一处生效。
 - ❌ 组件里直接 `env(safe-area-inset-*)` 或自行监听 `resize/visualViewport` 处理 H5 适配。
 - ❌ Boolean prop 不在 `withDefaults` 中给默认值，依赖 Vue 隐式 `false` 或 `?? true` 回落——Vue 3 会先把 `undefined` 转成 `false`，`false ?? true` = `false`，导致 "默认 true" 的逻辑永远不生效。

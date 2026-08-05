@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { UserInfo as SdkUserInfo } from 'easemob-websdk'
+import { GROUP_MEMBER_ROLE } from '../constants'
 import type { UiGroup, UiGroupMember } from '../sdk/types'
 
 /** 入群申请记录：申请人 ID 扁平化为 applicantId，作为状态更新的匹配键 */
@@ -13,7 +14,6 @@ export interface UiGroupJoinRequest {
   status?: 'pending' | 'accepted' | 'declined'
   timestamp?: number
 }
-
 
 export const useGroupStore = defineStore('group', () => {
   const groupList = ref<UiGroup[]>([])
@@ -132,7 +132,7 @@ export const useGroupStore = defineStore('group', () => {
       const existingIds = new Set(list.map(m => m.userId))
       const newMembers = userIds
         .filter(id => !existingIds.has(id))
-        .map(id => ({ userId: id, role: 'member' as const }))
+        .map(id => ({ userId: id, role: GROUP_MEMBER_ROLE.MEMBER }))
       if (newMembers.length > 0) {
         groupMuteListMap.value[groupId] = [...list, ...newMembers]
       }
@@ -154,7 +154,7 @@ export const useGroupStore = defineStore('group', () => {
     const existingIds = new Set(list.map(m => m.userId))
     const newMembers = userIds
       .filter(id => !existingIds.has(id))
-      .map(id => ({ userId: id, role: 'member' as const }))
+      .map(id => ({ userId: id, role: GROUP_MEMBER_ROLE.MEMBER }))
     if (newMembers.length > 0) {
       groupMuteListMap.value[groupId] = [...list, ...newMembers]
     }
@@ -180,7 +180,7 @@ export const useGroupStore = defineStore('group', () => {
     const existingIds = new Set(list.map(m => m.userId))
     const newMembers = userIds
       .filter(id => !existingIds.has(id))
-      .map(id => ({ userId: id, role: 'member' as const }))
+      .map(id => ({ userId: id, role: GROUP_MEMBER_ROLE.MEMBER }))
     if (newMembers.length > 0) {
       groupBlocklistMap.value[groupId] = [...list, ...newMembers]
     }
@@ -206,7 +206,7 @@ export const useGroupStore = defineStore('group', () => {
     const existingIds = new Set(list.map(m => m.userId))
     const newMembers = userIds
       .filter(id => !existingIds.has(id))
-      .map(id => ({ userId: id, role: 'member' as const }))
+      .map(id => ({ userId: id, role: GROUP_MEMBER_ROLE.MEMBER }))
     if (newMembers.length > 0) {
       groupAllowlistMap.value[groupId] = [...list, ...newMembers]
     }
@@ -269,7 +269,7 @@ export const useGroupStore = defineStore('group', () => {
     groupMembersMap.value[groupId] = members.map((m) => {
       const existingRole = existingRoles.get(m.userId)
       // 保留已缓存的 admin/owner 角色，避免服务端延迟同步导致角色闪回
-      if (existingRole && (existingRole === 'admin' || existingRole === 'owner') && m.role === 'member') {
+      if (existingRole && (existingRole === GROUP_MEMBER_ROLE.ADMIN || existingRole === GROUP_MEMBER_ROLE.OWNER) && m.role === GROUP_MEMBER_ROLE.MEMBER) {
         return { ...m, role: existingRole }
       }
       return m

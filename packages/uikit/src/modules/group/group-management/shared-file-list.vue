@@ -8,6 +8,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
 import { useViewport } from '../../../composables/use-viewport'
 import { insertChatNotice } from '../../../sdk/event/notice-utils'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import Empty from '../../../components/empty/empty.vue'
@@ -59,7 +60,7 @@ const currentUserId = computed(() => stores.client.currentUser)
 const group = computed(() => stores.group.getGroupById(props.groupId))
 const isOwnerOrAdmin = computed(() => {
   const role = group.value?.role
-  return role === 'owner' || role === 'admin'
+  return role === GROUP_MEMBER_ROLE.OWNER || role === GROUP_MEMBER_ROLE.ADMIN
 })
 
 async function loadData() {
@@ -137,7 +138,7 @@ async function onFileSelected(event: Event) {
     const noticeText = t('chat.notice.sharedFileAdded')
       .replace('{name}', t('chat.notice.you'))
       .replace('{fileName}', file.name)
-    insertChatNotice(stores, props.groupId, 'groupChat', noticeText)
+    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
   }
   catch (err) {
     console.warn('[SharedFileList] upload failed:', formatSdkError(err))

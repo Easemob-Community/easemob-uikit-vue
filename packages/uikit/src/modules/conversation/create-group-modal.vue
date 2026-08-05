@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
+import { CONVERSATION_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useViewport } from '../../composables/use-viewport'
 import { useGroup } from '../../composables/use-group'
@@ -135,7 +136,7 @@ async function onCreate() {
     stores.conversation.addConversation({
       id: groupId,
       name: finalName.value,
-      type: 'groupChat',
+      type: CONVERSATION_TYPE.GROUPCHAT,
       unreadCount: 0,
       lastMessageText: '',
       isPinned: false,

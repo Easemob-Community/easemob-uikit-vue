@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import type { UiGroup } from '../../sdk/types'
 import { useGroupStore } from '../../store/group'
@@ -13,12 +14,12 @@ const ownerGroup: UiGroup = {
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Design',
   description: '每周设计评审与走查',
   memberCount: 24,
-  role: 'owner',
+  role: GROUP_MEMBER_ROLE.OWNER,
 }
 
 const memberGroup: UiGroup = {
   ...ownerGroup,
-  role: 'member',
+  role: GROUP_MEMBER_ROLE.MEMBER,
 }
 
 function injectOwnerGroup() {

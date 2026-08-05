@@ -5,6 +5,7 @@ import type {
   Message as SdkMessage,
   UserInfo as SdkUserInfo,
 } from 'easemob-websdk'
+import type { ConversationTypeValue, GroupMemberRoleValue } from '../constants'
 import type { MessageStatus } from './types/message'
 
 export type { GroupMemberEntry } from 'easemob-websdk'
@@ -90,7 +91,7 @@ export interface UiConversation {
   /** 头像 */
   avatar?: string
   /** 会话类型 */
-  type: 'singleChat' | 'groupChat'
+  type: ConversationTypeValue
   /** 未读数 */
   unreadCount: number
   /** 最后一条消息摘要文本 */
@@ -150,7 +151,7 @@ export interface UiGroup {
   /** 群主 */
   owner?: string
   /** 当前用户在群内的角色 */
-  role?: 'owner' | 'admin' | 'member'
+  role?: GroupMemberRoleValue
   /** 成员数 */
   memberCount?: number
   /** 最大成员数 */
@@ -182,7 +183,7 @@ export interface UiGroupMember {
   /** 成员头像 */
   avatarUrl?: string
   /** 成员角色 */
-  role?: 'owner' | 'admin' | 'member'
+  role?: GroupMemberRoleValue
   /** 入群时间戳 */
   joinedAt?: number
 }

@@ -1,18 +1,20 @@
 import { defineStore } from 'pinia'
 import { computed, markRaw, ref } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
+import { MESSAGE_STATUS } from '../constants'
+import type { MESSAGE_TYPE } from '../constants'
 import type { MessageStatus, TextMessageBody, UiMessage } from '../sdk/types'
 import { toUiMessage } from '../sdk/adapter/message-adapter'
 
 /** 按消息类型提取具体的 UiMessage 子类型（用于组件 props 精确类型） */
-export type TextMessageType = UiMessage & { type: 'text', body: { content: string } }
-export type ImageMessageType = UiMessage & { type: 'image' }
-export type VoiceMessageType = UiMessage & { type: 'voice' }
-export type VideoMessageType = UiMessage & { type: 'video' }
-export type FileMessageType = UiMessage & { type: 'file' }
-export type CombineMessageType = UiMessage & { type: 'combine' }
-export type CustomMessageType = UiMessage & { type: 'custom' }
-export type LocationMessageType = UiMessage & { type: 'location' }
+export type TextMessageType = UiMessage & { type: typeof MESSAGE_TYPE.TEXT, body: { content: string } }
+export type ImageMessageType = UiMessage & { type: typeof MESSAGE_TYPE.IMAGE }
+export type VoiceMessageType = UiMessage & { type: typeof MESSAGE_TYPE.VOICE }
+export type VideoMessageType = UiMessage & { type: typeof MESSAGE_TYPE.VIDEO }
+export type FileMessageType = UiMessage & { type: typeof MESSAGE_TYPE.FILE }
+export type CombineMessageType = UiMessage & { type: typeof MESSAGE_TYPE.COMBINE }
+export type CustomMessageType = UiMessage & { type: typeof MESSAGE_TYPE.CUSTOM }
+export type LocationMessageType = UiMessage & { type: typeof MESSAGE_TYPE.LOCATION }
 
 /** MessageStore 配置选项 */
 export interface MessageStoreOptions {
@@ -119,7 +121,7 @@ export const useMessageStore = defineStore('message', () => {
     const currentUserId = sdkMsg.from
     const uiMsg: UiMessage = {
       ...toUiMessage(sdkMsg, currentUserId),
-      status: 'sending',
+      status: MESSAGE_STATUS.SENDING,
       isSelf: true,
       // 请求了已读回执的群消息需要展示已读人数标注（replaceWithSent 会保留该字段）
       requireGroupAck: sdkMsg.needReadReceipt === true ? true : undefined,
@@ -177,7 +179,7 @@ export const useMessageStore = defineStore('message', () => {
     delete sendingMetaMap.value[localId]
     _updateMessageById(localId, msg => ({
       ...msg,
-      status: 'failed',
+      status: MESSAGE_STATUS.FAILED,
       failReason: reason,
     }))
   }

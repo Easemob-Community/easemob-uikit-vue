@@ -1,6 +1,8 @@
 import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '../types'
+import type { ConversationTypeValue } from '../../constants'
 import type { ManagerHost } from '../client'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
 import { toUiMessage } from '../adapter/message-adapter'
 import { isVoiceBody } from '../types/message'
 import { createLogger } from '../../utils/logger'
@@ -70,7 +72,7 @@ export class MessageDomain {
 
   async sendText(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     content: string,
     ext?: Record<string, unknown>,
     /** 是否请求消息已读回执（单聊/群聊均可，SDK CreateMessageBaseParams.needReadReceipt） */
@@ -88,7 +90,7 @@ export class MessageDomain {
 
   async sendImage(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     data: File | string,
     ext?: Record<string, unknown>,
     /** 是否请求消息已读回执（仅群聊生效） */
@@ -106,7 +108,7 @@ export class MessageDomain {
 
   async sendFile(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     data: File | string,
     ext?: Record<string, unknown>,
     /** 是否请求消息已读回执（仅群聊生效） */
@@ -124,7 +126,7 @@ export class MessageDomain {
 
   async sendVoice(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
@@ -144,7 +146,7 @@ export class MessageDomain {
 
   async sendVideo(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     data: File | string,
     duration: number,
     ext?: Record<string, unknown>,
@@ -164,7 +166,7 @@ export class MessageDomain {
 
   async sendLocation(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     latitude: number,
     longitude: number,
     address?: string,
@@ -183,7 +185,7 @@ export class MessageDomain {
 
   async sendCustom(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     event: string,
     params?: Record<string, string>,
     ext?: Record<string, unknown>,
@@ -200,7 +202,7 @@ export class MessageDomain {
 
   async sendCmd(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     action: string,
     ext?: Record<string, unknown>,
   ) {
@@ -215,7 +217,7 @@ export class MessageDomain {
 
   async sendCombine(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     title: string,
     summary: string,
     compatibleText: string,
@@ -243,7 +245,7 @@ export class MessageDomain {
   /** 通用发送流程 */
   private async _send(sdkMsg: SdkMessage): Promise<SdkMessage> {
     const localId = sdkMsg.msgLocalId
-    const isCombine = sdkMsg.type === 'combine'
+    const isCombine = sdkMsg.type === MESSAGE_TYPE.COMBINE
     this.store.addSendingMessage(localId, sdkMsg)
 
     // 进度回调统计与节流：XHR progress 事件可能高频触发，
@@ -293,7 +295,7 @@ export class MessageDomain {
 
   async fetchHistory(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     cursor?: string,
     pageSize = 20,
   ) {
@@ -320,7 +322,7 @@ export class MessageDomain {
     // 群聊历史消息（刷新首屏与上滑翻页共用此路径）：getHistoryMessages 返回的
     // 离线消息不带群已读数（groupReadCount），需调用 getGroupMessageReadReceipts
     // 批量补全，异步执行不阻塞历史消息返回与渲染。
-    if (conversationType === 'groupChat')
+    if (conversationType === CONVERSATION_TYPE.GROUPCHAT)
       void this.fillGroupReadCounts(uiMsgs, conversationId)
 
     return {
@@ -378,7 +380,7 @@ export class MessageDomain {
 
   async recall(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageId: string,
   ) {
     await this.client.chatManager.recallMessage({
@@ -391,7 +393,7 @@ export class MessageDomain {
   /** 批量发送消息已读回执（统一 API，支持单聊/群聊） */
   async markMessagesRead(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageIds: string[],
   ) {
     if (messageIds.length === 0)
@@ -414,7 +416,7 @@ export class MessageDomain {
    */
   async sendPendingReadReceipts(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
   ) {
     const messages = this.store.getMessages(conversationId)
     const pendingIds = messages
@@ -439,7 +441,7 @@ export class MessageDomain {
   /** 置顶消息 */
   async pinMessage(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageId: string,
   ) {
     await this.client.chatManager.pinMessage({ conversationId, conversationType, messageId })
@@ -448,14 +450,14 @@ export class MessageDomain {
   /** 取消置顶 */
   async unpinMessage(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageId: string,
   ) {
     await this.client.chatManager.unpinMessage({ conversationId, conversationType, messageId })
   }
 
   /** 获取会话内置顶消息列表（最多 20 条） */
-  async getPinnedMessages(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+  async getPinnedMessages(conversationId: string, conversationType: ConversationTypeValue) {
     const result = await this.client.chatManager.getPinnedMessageList({
       conversationId,
       conversationType,
@@ -496,7 +498,7 @@ export class MessageDomain {
     }
     const body: VoiceMessageSource = {
       ...message.body,
-      type: 'voice',
+      type: MESSAGE_TYPE.VOICE,
     }
     // 打印转入语音转文字的原始入参，便于定位 url/fileId/format 等参数问题
     messageLogger.info('voiceMessageToText raw input:', { message, body, voiceParams })
@@ -531,7 +533,7 @@ export class MessageDomain {
   /** 发送单条消息已读回执 */
   async markRead(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageId: string,
   ) {
     await this.client.chatManager.sendMessageReadReceipts({
@@ -552,7 +554,7 @@ export class MessageDomain {
   /** 修改文本消息 */
   async modifyText(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     messageId: string,
     text: string,
   ) {
@@ -561,7 +563,7 @@ export class MessageDomain {
       conversationType,
       messageId,
       message: {
-        type: 'text',
+        type: MESSAGE_TYPE.TEXT,
         body: { content: text },
         ext: {},
       },

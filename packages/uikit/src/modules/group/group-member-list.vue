@@ -4,6 +4,8 @@ import { formatSdkError } from '../../utils/sdk-error'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Input from '../../components/input/input.vue'
 import { useLocale } from '../../locale'
+import { GROUP_MEMBER_ROLE } from '../../constants'
+import type { GroupMemberRoleValue } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { usePresence } from '../../composables/use-presence'
@@ -159,9 +161,9 @@ watch(() => props.hasMore, (val) => {
 }, { immediate: true })
 
 const groupInfo = computed(() => props.group || stores.group.getGroupById(props.groupId))
-const currentUserRole = computed<'owner' | 'admin' | 'member'>(() => {
+const currentUserRole = computed<GroupMemberRoleValue>(() => {
   const member = displayMembers.value.find(m => m.userId === props.currentUserId)
-  return (member?.role as 'owner' | 'admin' | 'member' | undefined) || 'member'
+  return (member?.role as GroupMemberRoleValue | undefined) || GROUP_MEMBER_ROLE.MEMBER
 })
 
 const filteredMembers = computed(() => {

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
-import GroupMemberList from './group-member-list.vue'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
+import GroupMemberList from './group-member-list.vue'
 
 const group: UiGroup = {
   groupId: 'g_demo',
@@ -12,26 +13,26 @@ const group: UiGroup = {
 }
 
 const members: UiGroupMember[] = [
-  { userId: 'u_owner', nickname: 'Owner', role: 'owner' },
-  { userId: 'u_admin', nickname: 'Admin', role: 'admin' },
-  { userId: 'u_alice', nickname: 'Alice', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice', role: 'member' },
-  { userId: 'u_bob', nickname: 'Bob', role: 'member' },
-  { userId: 'u_carol', nickname: 'Carol', role: 'member' },
-  { userId: 'u_dave', nickname: 'Dave', role: 'member' },
+  { userId: 'u_owner', nickname: 'Owner', role: GROUP_MEMBER_ROLE.OWNER },
+  { userId: 'u_admin', nickname: 'Admin', role: GROUP_MEMBER_ROLE.ADMIN },
+  { userId: 'u_alice', nickname: 'Alice', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice', role: GROUP_MEMBER_ROLE.MEMBER },
+  { userId: 'u_bob', nickname: 'Bob', role: GROUP_MEMBER_ROLE.MEMBER },
+  { userId: 'u_carol', nickname: 'Carol', role: GROUP_MEMBER_ROLE.MEMBER },
+  { userId: 'u_dave', nickname: 'Dave', role: GROUP_MEMBER_ROLE.MEMBER },
 ]
 
 const currentUserId = 'u_owner'
 
 const adminMembers: UiGroupMember[] = [
-  { userId: 'u_owner', nickname: 'Owner', role: 'owner' },
-  { userId: 'u_alice', nickname: 'Alice', role: 'admin' },
-  { userId: 'u_bob', nickname: 'Bob', role: 'member' },
+  { userId: 'u_owner', nickname: 'Owner', role: GROUP_MEMBER_ROLE.OWNER },
+  { userId: 'u_alice', nickname: 'Alice', role: GROUP_MEMBER_ROLE.ADMIN },
+  { userId: 'u_bob', nickname: 'Bob', role: GROUP_MEMBER_ROLE.MEMBER },
 ]
 
 const manyMembers: UiGroupMember[] = Array.from({ length: 30 }, (_, i) => ({
   userId: `u_${i + 1}`,
   nickname: `Member ${i + 1}`,
-  role: 'member',
+  role: GROUP_MEMBER_ROLE.MEMBER,
 }))
 
 const logs = ref<string[]>([])
@@ -197,7 +198,7 @@ function onRemoveAdmin(member: UiGroupMember) {
       </div>
     </Variant>
 
-        <Variant title="Events Log">
+    <Variant title="Events Log">
       <div style="display: flex; gap: 16px;">
         <div style="height: 600px; width: 320px;">
           <UIKitProvider :auto-init="false">

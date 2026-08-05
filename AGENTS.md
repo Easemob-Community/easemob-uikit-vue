@@ -14,6 +14,7 @@
 - 大改动先写计划、等确认再编码；涉及公开 API（组件名 / props / emits / 导出）改动先说明影响面。
 - 发现的技术债记进根 `TECH-DEBT.md`，逐条修复并勾选归档；不要为了「好看」大面积 `--fix` 未改动文件。
 - **Avatar 形状统一走主题**：`Avatar` 组件默认读取 `themeStore.avatarShape`（`props.shape` 为 `undefined` 时回落）。业务组件/列表项/卡片中复用 `Avatar` 时，默认不要硬编码 `shape`；只有明确需要覆盖主题时才传入。已修复历史硬编码点：`UserCard`、`GroupCard`、`ContactItem*`、`GroupItem*`、`ContactList`、`GroupList`。
+- **枚举字符串统一走 `src/constants/index.ts`**：会话类型/消息类型/消息状态/群成员角色/转发模式等枚举字符串（`CONVERSATION_TYPE`/`MESSAGE_TYPE`/`MESSAGE_STATUS`/`GROUP_MEMBER_ROLE`/`FORWARD_MODE`/`ACK_TYPE` 等）**禁止在业务代码（composables/sdk/modules/containers/story）硬编码字面量**，类型联合用导出的类型别名（`ConversationTypeValue` 等）；仅定义处（constants 自身、sdk 契约类型）与 SDK wire 协议字段（`'img'`/`'audio'`/`'txt'`）保留字面量。详见 skill `uikit-component-authoring` 第 8 节。
 
 ## 工具链事实（省掉重复踩坑）
 
@@ -28,7 +29,7 @@
 
 | Skill | 适用场景 | 触发词示例 | 文件 |
 | --- | --- | --- | --- |
-| `uikit-component-authoring` | 新增/修改组件、模块、容器；props/emits/导出/命名规范 | `写组件`、`加个组件`、`组件规范`、`emits 命名`、`Em 前缀`、`导出/resolver` | [.agent/skills/uikit-component-authoring/SKILL.md](.agent/skills/uikit-component-authoring/SKILL.md) |
+| `uikit-component-authoring` | 新增/修改组件、模块、容器；props/emits/导出/命名规范；枚举字符串常量规范 | `写组件`、`加个组件`、`组件规范`、`emits 命名`、`Em 前缀`、`导出/resolver`、`常量`、`硬编码字符串`、`groupChat` | [.agent/skills/uikit-component-authoring/SKILL.md](.agent/skills/uikit-component-authoring/SKILL.md) |
 | `uikit-styling-theming` | 改样式、主题、暗色、CSS 变量、颜色/圆角/动效 token | `改样式`、`主题`、`暗色`、`CSS 变量`、`颜色 token`、`unocss` | [.agent/skills/uikit-styling-theming/SKILL.md](.agent/skills/uikit-styling-theming/SKILL.md) |
 | `uikit-store-composable` | 加/改 Pinia store、composable、状态管理、vueuse 用法 | `加 store`、`写 composable`、`加 hook`、`状态管理`、`用 vueuse` | [.agent/skills/uikit-store-composable/SKILL.md](.agent/skills/uikit-store-composable/SKILL.md) |
 | `uikit-i18n-locale` | 加/改文案、多语言、翻译 key | `加文案`、`多语言`、`i18n`、`翻译`、`locale` | [.agent/skills/uikit-i18n-locale/SKILL.md](.agent/skills/uikit-i18n-locale/SKILL.md) |

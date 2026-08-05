@@ -10,6 +10,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
 import { useLocale } from '../../../locale'
+import { MESSAGE_TYPE } from '../../../constants'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import Modal from '../../../components/modal/modal.vue'
@@ -393,7 +394,7 @@ async function onMessageAction(event: MessageActionEvent) {
   }
   if (event.action === 'edit') {
     // 编辑：向上层 emit 'edit'，chat.vue 负责进入编辑模式并回填输入框
-    if (event.message.type === 'text' && !event.message.recalled) {
+    if (event.message.type === MESSAGE_TYPE.TEXT && !event.message.recalled) {
       emit('edit', event.message)
     }
     return
@@ -419,7 +420,7 @@ async function onMessageAction(event: MessageActionEvent) {
     return
   }
   if (event.action === 'translate') {
-    if (event.message.type !== 'text')
+    if (event.message.type !== MESSAGE_TYPE.TEXT)
       return
     try {
       await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
@@ -431,7 +432,7 @@ async function onMessageAction(event: MessageActionEvent) {
     return
   }
   if (event.action === 'voiceToText') {
-    if (event.message.type !== 'voice')
+    if (event.message.type !== MESSAGE_TYPE.VOICE)
       return
     try {
       await transcribeVoiceMessage(event.message)
@@ -472,7 +473,7 @@ function onToggleVoiceText(message: UiMessage) {
 
 /** 通过 VueUse useClipboard 复制消息文本 */
 async function handleCopyMessage(message: UiMessage) {
-  const text = message.type === 'text' ? (message.body as TextMessageBody).content || '' : ''
+  const text = message.type === MESSAGE_TYPE.TEXT ? (message.body as TextMessageBody).content || '' : ''
   if (!text) {
     showToast(t('message.copyFailed') ?? '复制失败', 'error')
     return
@@ -492,7 +493,7 @@ async function handleCopyMessage(message: UiMessage) {
 
 /** 下载文件消息附件 */
 async function handleDownloadMessage(message: UiMessage) {
-  if (message.type !== 'file')
+  if (message.type !== MESSAGE_TYPE.FILE)
     return
   const body = message.body as FileMessageBody
   const url = body.url

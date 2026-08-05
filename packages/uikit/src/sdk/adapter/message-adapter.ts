@@ -1,5 +1,7 @@
 import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websdk'
 import { markRaw } from 'vue'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
+import type { ConversationTypeValue } from '../../constants'
 import {
   isCmdBody as isCmdMessageBody,
   isCombineBody as isCombineMessageBody,
@@ -13,6 +15,7 @@ import {
 } from '../types/message'
 import type { UiMessage } from '../types'
 import type { CombineMessageBody } from '../types/message'
+import { customEventPreviewMap } from '../../utils/resolve-last-message-text'
 
 /**
  * 将 SDK Message 转换为 UIKit Message。
@@ -31,8 +34,8 @@ export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessag
     isSelf,
     localId: sdkMsg.msgLocalId,
     status: isSelf && sdkMsg.isPeerRead === true
-      ? 'read'
-      : (sdkMsg.sendStatus ?? 'sent'),
+      ? MESSAGE_STATUS.READ
+      : (sdkMsg.sendStatus ?? MESSAGE_STATUS.SENT),
   }
   if (isCombineMessageBody(uiMsg.body) && uiMsg.body.messageList) {
     uiMsg.body = {
@@ -67,7 +70,8 @@ export function extractLastMessageText(sdkMsg: SdkMessage | null | undefined): s
   if (isLocationMessageBody(body))
     return '[位置]'
   if (isCustomMessageBody(body))
-    return '[自定义]'
+    // 自定义消息按 event 查共享映射（与消息驱动摘要一致，如名片 userCard → [名片]）
+    return customEventPreviewMap[body.event || ''] || '[自定义]'
   if (isCmdMessageBody(body))
     return '[命令]'
   if (isCombineMessageBody(body))
@@ -82,31 +86,32 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
 
   const body = snippet.body || {}
   switch (snippet.type) {
-    case 'text':
+    case MESSAGE_TYPE.TEXT:
       // combine 经 WS 会话同步会被 payload-decoder 降级为 text（title/summary 丢失），
       // content 为空时尝试 summary，避免预览空白
       return (body.content as string) || (body.summary as string) || ''
-    case 'image':
+    case MESSAGE_TYPE.IMAGE:
       return '[图片]'
-    case 'voice':
+    case MESSAGE_TYPE.VOICE:
       return '[语音]'
-    case 'video':
+    case MESSAGE_TYPE.VIDEO:
       return '[视频]'
-    case 'file':
+    case MESSAGE_TYPE.FILE:
       return (body.filename as string) || '[文件]'
-    case 'location':
+    case MESSAGE_TYPE.LOCATION:
       return '[位置]'
-    case 'custom':
-      return '[自定义]'
-    case 'cmd':
+    case MESSAGE_TYPE.CUSTOM:
+      // 自定义消息按 event 查共享映射（与消息驱动摘要一致，如名片 userCard → [名片]）
+      return customEventPreviewMap[(body.event as string) || ''] || '[自定义]'
+    case MESSAGE_TYPE.CMD:
       return '[命令]'
-    case 'combine':
+    case MESSAGE_TYPE.COMBINE:
       return (body.summary as string) || '[聊天记录]'
     default:
       // SDK 链路异常时 snippet.type 可能落为 'unknown' 等未知值
-      //（如 toConversationSummary 从被 stripBodyType 清空的 body.type 读类型）。
+      // （如 toConversationSummary 从被 stripBodyType 清空的 body.type 读类型）。
       // 此时仍应展示 body 中的可用文本，避免旧端合并消息
-      //（content 为“版本过低”）等场景预览空白
+      // （content 为“版本过低”）等场景预览空白
       return (body.content as string) || (body.summary as string) || (body.msg as string) || ''
   }
 }
@@ -115,14 +120,14 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
 export function isMessageInConversation(
   sdkMsg: SdkMessage,
   conversationId: string,
-  conversationType: 'singleChat' | 'groupChat',
+  conversationType: ConversationTypeValue,
 ): boolean {
   return sdkMsg.conversationId === conversationId && sdkMsg.conversationType === conversationType
 }
 
 /** 从 SDK Message 计算单聊场景下的对方用户 ID */
 export function resolvePeerUserId(sdkMsg: SdkMessage, currentUserId: string): string {
-  if (sdkMsg.conversationType === 'groupChat')
+  if (sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT)
     return sdkMsg.to
   return sdkMsg.from === currentUserId ? sdkMsg.to : sdkMsg.from
 }

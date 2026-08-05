@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ChatInfoDrawer from './chat-info-drawer.vue'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
 import Button from '../../../components/button/button.vue'
 import { useGroupStore } from '../../../store/group'
 import type { UiConversation, UiGroupMember } from '../../../sdk/types'
+import ChatInfoDrawer from './chat-info-drawer.vue'
 
 const groupConversation: UiConversation = {
   id: 'g_story_001',
   name: 'Vue 技术交流群',
   avatar: '',
-  type: 'groupChat',
+  type: CONVERSATION_TYPE.GROUPCHAT,
   unreadCount: 0,
   lastMessageText: '',
   isPinned: false,
@@ -22,7 +23,7 @@ const singleConversation: UiConversation = {
   id: 'u_story_001',
   name: '张三',
   avatar: '',
-  type: 'singleChat',
+  type: CONVERSATION_TYPE.SINGLECHAT,
   unreadCount: 0,
   lastMessageText: '',
   isPinned: false,
@@ -31,8 +32,8 @@ const singleConversation: UiConversation = {
 }
 
 const mockMembers: UiGroupMember[] = [
-  { userId: 'owner_001', nickname: '群主大大', role: 'owner' },
-  { userId: 'admin_001', nickname: '管理员 A', role: 'admin' },
+  { userId: 'owner_001', nickname: '群主大大', role: GROUP_MEMBER_ROLE.OWNER },
+  { userId: 'admin_001', nickname: '管理员 A', role: GROUP_MEMBER_ROLE.ADMIN },
   { userId: 'member_001', nickname: '小李' },
   { userId: 'member_002', nickname: '阿强' },
   { userId: 'member_003', nickname: 'Bob' },
@@ -47,7 +48,7 @@ const groupStore = useGroupStore()
 groupStore.addGroup({
   groupId: 'g_story_001',
   groupName: 'Vue 技术交流群',
-  role: 'owner',
+  role: GROUP_MEMBER_ROLE.OWNER,
   memberCount: mockMembers.length,
 })
 groupStore.groupJoinRequestsMap.g_story_001 = [

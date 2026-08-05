@@ -1,4 +1,6 @@
 import type { UserInfo } from 'easemob-websdk'
+import { MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
+import type { ConversationTypeValue } from '../../constants'
 import { t } from '../../locale'
 import type { UiMessage, UiNoticeMessage } from '../types'
 import type { RootStores } from './types'
@@ -20,7 +22,7 @@ function generateNoticeId(): string {
 export function createNoticeMessage(
   content: string,
   conversationId: string,
-  conversationType: 'singleChat' | 'groupChat',
+  conversationType: ConversationTypeValue,
   currentUserId: string,
 ): UiNoticeMessage {
   const id = generateNoticeId()
@@ -32,20 +34,20 @@ export function createNoticeMessage(
     to: conversationId,
     conversationId,
     conversationType,
-    type: 'notice',
+    type: MESSAGE_TYPE.NOTICE,
     body: { content },
     timestamp: Date.now(),
-    status: 'sent',
+    status: MESSAGE_STATUS.SENT,
     isSelf: false,
     sender: { userId: currentUserId },
-    sendStatus: 'sent',
+    sendStatus: MESSAGE_STATUS.SENT,
     ext: {},
   } as unknown as UiNoticeMessage
 }
 
 /** 类型守卫：判断消息是否为本地通知消息 */
 export function isNoticeMessage(message: UiMessage): message is UiNoticeMessage {
-  return message.type === 'notice'
+  return message.type === MESSAGE_TYPE.NOTICE
 }
 
 /**
@@ -65,7 +67,7 @@ export function buildAnnouncementNoticeText(announcement: string): string {
 export function insertChatNotice(
   stores: RootStores,
   conversationId: string,
-  conversationType: 'singleChat' | 'groupChat',
+  conversationType: ConversationTypeValue,
   content: string,
 ) {
   if (!content)

@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
-import { MESSAGE_STATUS } from '../constants'
+import { MESSAGE_STATUS, MESSAGE_TYPE } from '../constants'
+import type { ConversationTypeValue } from '../constants'
 import type { UiMessage } from '../sdk/types'
 import { isTextBody, isVoiceBody } from '../sdk/types'
 import { useLocale } from '../locale'
@@ -97,7 +98,7 @@ export function useMessageActions() {
   /** 翻译文本消息 */
   async function translateTextMessage(message: UiMessage, targetLang?: string) {
     // type 判别优先：排除 UiNoticeMessage（其 body 结构上兼容 TextMessageBody，仅守卫无法排除）
-    if (message.type !== 'text')
+    if (message.type !== MESSAGE_TYPE.TEXT)
       return
     if (!isTextBody(message.body))
       return
@@ -138,7 +139,7 @@ export function useMessageActions() {
   /** 语音消息转文字 */
   async function transcribeVoiceMessage(message: UiMessage) {
     // type 判别优先：排除 UiNoticeMessage，再以守卫校验 body 结构
-    if (message.type !== 'voice')
+    if (message.type !== MESSAGE_TYPE.VOICE)
       return
     if (!isVoiceBody(message.body))
       return
@@ -209,7 +210,7 @@ export function useMessageActions() {
   }
 
   /** 刷新置顶列表；失败仅告警，不影响已完成的置顶操作 */
-  async function refreshPinnedMessages(cvsId: string, cvsType: 'singleChat' | 'groupChat') {
+  async function refreshPinnedMessages(cvsId: string, cvsType: ConversationTypeValue) {
     try {
       await domains.message.getPinnedMessages(cvsId, cvsType)
     }

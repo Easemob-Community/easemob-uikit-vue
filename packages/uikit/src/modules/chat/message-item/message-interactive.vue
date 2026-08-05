@@ -6,7 +6,7 @@ import { useLongPress } from '../../../composables/use-long-press'
 import { useToast } from '../../../composables/use-toast'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useGroupStore } from '../../../store/group'
-import { CONVERSATION_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE } from '../../../constants'
 import Popup from '../../../components/popup/popup.vue'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
@@ -75,7 +75,7 @@ const canRecallOther = computed(() => {
   const group = groupStore.getGroupById(groupId)
   // 优先使用消息中可能携带的当前用户身份；否则从群信息读取当前登录用户的角色
   const role = group?.role
-  return role === 'owner' || role === 'admin'
+  return role === GROUP_MEMBER_ROLE.OWNER || role === GROUP_MEMBER_ROLE.ADMIN
 })
 
 // 当群信息未预加载时（如从通知跳入），主动拉取一次群详情，
@@ -108,21 +108,21 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableQuote !== false)
     add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
   // 复制：仅文本消息支持；图片/视频/文件等类型暂不提供复制
-  if (cfg?.enableCopy !== false && props.message.type === 'text')
+  if (cfg?.enableCopy !== false && props.message.type === MESSAGE_TYPE.TEXT)
     add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
   // 下载：仅文件消息在右键/长按菜单中提供下载入口
-  if (cfg?.enableDownload !== false && props.message.type === 'file')
+  if (cfg?.enableDownload !== false && props.message.type === MESSAGE_TYPE.FILE)
     add('download', t('message.action.download') ?? '下载', 'arrows/arrow_down_n_box')
   if (cfg?.enableForward !== false)
     add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false)
     add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
   // 翻译：仅文本消息可翻译，其他类型不展示
-  if (cfg?.enableTranslate !== false && props.message.type === 'text') {
+  if (cfg?.enableTranslate !== false && props.message.type === MESSAGE_TYPE.TEXT) {
     add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
   }
   // 语音转文字：仅带 url 的语音消息展示
-  if (cfg?.enableVoiceToText !== false && props.message.type === 'voice' && (props.message.body as any).url) {
+  if (cfg?.enableVoiceToText !== false && props.message.type === MESSAGE_TYPE.VOICE && (props.message.body as any).url) {
     add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'audio-video/mic')
   }
   if (cfg?.enablePin !== false && !props.message.recalled) {
@@ -163,7 +163,7 @@ const actions = computed<MessageActionItem[]>(() => {
     cfg?.enableEdit !== false
     && props.message.isSelf
     && !props.message.recalled
-    && props.message.type === 'text'
+    && props.message.type === MESSAGE_TYPE.TEXT
   ) {
     // SDK modifyMessage 单条消息编辑次数上限为 5 次
     const count = props.message.modifiedInfo?.operationCount ?? 0

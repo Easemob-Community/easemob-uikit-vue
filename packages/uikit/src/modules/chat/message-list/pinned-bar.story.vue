@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
 import { useConversationStore } from '../../../store/conversation'
 import { useMessageStore } from '../../../store/message'
-import { CONVERSATION_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../../constants'
 import PinnedBar from './pinned-bar.vue'
 
 const logs = ref<string[]>([])
@@ -35,7 +35,7 @@ function injectMockData() {
 
   const base = {
     conversationId: mockConversation.id,
-    conversationType: 'groupChat' as const,
+    conversationType: CONVERSATION_TYPE.GROUPCHAT,
     to: mockConversation.id,
     timestamp: Date.now(),
     isSelf: false,
@@ -46,7 +46,7 @@ function injectMockData() {
       ...base,
       id: 'pin_1',
       from: 'user_002',
-      type: 'text',
+      type: MESSAGE_TYPE.TEXT,
       body: { type: 'txt', content: '这条是置顶消息，内容比较长，用于验证折叠态下的预览截断效果' },
       pinned: true,
       pinTime: Date.now() - 1000 * 60,
@@ -56,7 +56,7 @@ function injectMockData() {
       ...base,
       id: 'pin_2',
       from: 'user_002',
-      type: 'image',
+      type: MESSAGE_TYPE.IMAGE,
       body: { type: 'img', originalImageUrl: 'https://picsum.photos/300/200' },
       pinned: true,
       pinTime: Date.now() - 1000 * 60 * 30,
@@ -66,7 +66,7 @@ function injectMockData() {
       ...base,
       id: 'pin_3',
       from: 'user_self',
-      type: 'voice',
+      type: MESSAGE_TYPE.VOICE,
       body: { type: 'audio', url: '', filename: 'voice.amr', file_length: 10240, duration: 15 },
       pinned: true,
       pinTime: Date.now() - 1000 * 60 * 60,

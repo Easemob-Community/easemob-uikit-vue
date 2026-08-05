@@ -6,6 +6,7 @@ import GroupCard from '../../components/group-card/group-card.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
 import { useGroup } from '../../composables/use-group'
 import { useToast } from '../../composables/use-toast'
 import { insertChatNotice } from '../../sdk/event/notice-utils'
@@ -42,7 +43,7 @@ const savingName = ref(false)
 
 const groupFromStore = computed(() => stores.group.getGroupById(props.groupId))
 
-const isOwner = computed(() => groupFromStore.value?.role === 'owner')
+const isOwner = computed(() => groupFromStore.value?.role === GROUP_MEMBER_ROLE.OWNER)
 
 watch(
   () => props.groupId,
@@ -116,7 +117,7 @@ async function saveName() {
     isEditingName.value = false
     // 发布方本地插入灰色通知（SDK 事件不回推操作者本人），仅名称实际变更时插入
     if (prevGroupName && prevGroupName !== nameInput.value) {
-      insertChatNotice(stores, props.groupId, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', nameInput.value))
+      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupNameChanged').replace('{name}', nameInput.value))
     }
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名

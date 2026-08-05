@@ -5,6 +5,8 @@ import Icon from '../../components/icon/icon.vue'
 import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
+import { GROUP_MEMBER_ROLE } from '../../constants'
+import type { GroupMemberRoleValue } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import type { UiGroupMember } from '../../sdk/types'
@@ -14,7 +16,7 @@ interface Props {
   member: UiGroupMember
   groupId: string
   currentUserId: string
-  currentUserRole: 'owner' | 'admin' | 'member'
+  currentUserRole: GroupMemberRoleValue
   showMuteAction: boolean
   showBlockAction: boolean
   showAdminAction: boolean
@@ -45,21 +47,21 @@ const { stores } = useUIKit()
 // ✅ 使用 useUserInfo 解析显示名和头像（优先级：备注 > 昵称 > userId）
 const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 
-const isOwner = computed(() => props.currentUserRole === 'owner')
-const isAdmin = computed(() => props.currentUserRole === 'admin')
+const isOwner = computed(() => props.currentUserRole === GROUP_MEMBER_ROLE.OWNER)
+const isAdmin = computed(() => props.currentUserRole === GROUP_MEMBER_ROLE.ADMIN)
 
 function roleClass(role?: string): string {
-  if (role === 'owner')
+  if (role === GROUP_MEMBER_ROLE.OWNER)
     return 'group-member-list__role--owner'
-  if (role === 'admin')
+  if (role === GROUP_MEMBER_ROLE.ADMIN)
     return 'group-member-list__role--admin'
   return ''
 }
 
 function roleLabel(role?: string): string {
-  if (role === 'owner')
+  if (role === GROUP_MEMBER_ROLE.OWNER)
     return t('group.memberList.owner') || '群主'
-  if (role === 'admin')
+  if (role === GROUP_MEMBER_ROLE.ADMIN)
     return t('group.memberList.admin') || '管理员'
   return t('group.memberList.member') || '成员'
 }
@@ -86,17 +88,17 @@ function canRemove(member: UiGroupMember): boolean {
     return false
   if (isOwner.value)
     return true
-  if (isAdmin.value && member.role === 'member')
+  if (isAdmin.value && member.role === GROUP_MEMBER_ROLE.MEMBER)
     return true
   return false
 }
 
 function canSetAdmin(member: UiGroupMember): boolean {
-  return isOwner.value && member.userId !== props.currentUserId && member.role !== 'admin'
+  return isOwner.value && member.userId !== props.currentUserId && member.role !== GROUP_MEMBER_ROLE.ADMIN
 }
 
 function canRemoveAdmin(member: UiGroupMember): boolean {
-  return isOwner.value && member.userId !== props.currentUserId && member.role === 'admin'
+  return isOwner.value && member.userId !== props.currentUserId && member.role === GROUP_MEMBER_ROLE.ADMIN
 }
 
 function canChat(member: UiGroupMember): boolean {
@@ -120,7 +122,7 @@ function canMute(member: UiGroupMember): boolean {
     return false
   if (isOwner.value)
     return true
-  if (isAdmin.value && member.role === 'member')
+  if (isAdmin.value && member.role === GROUP_MEMBER_ROLE.MEMBER)
     return true
   return false
 }
@@ -132,7 +134,7 @@ function canUnmute(member: UiGroupMember): boolean {
     return false
   if (isOwner.value)
     return true
-  if (isAdmin.value && member.role === 'member')
+  if (isAdmin.value && member.role === GROUP_MEMBER_ROLE.MEMBER)
     return true
   return false
 }
@@ -253,7 +255,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
         <div class="group-member-list__name-row">
           <span class="group-member-list__name">{{ displayName }}</span>
           <span
-            v-if="props.member.role !== 'member'"
+            v-if="props.member.role !== GROUP_MEMBER_ROLE.MEMBER"
             class="group-member-list__role"
             :class="roleClass(props.member.role)"
           >

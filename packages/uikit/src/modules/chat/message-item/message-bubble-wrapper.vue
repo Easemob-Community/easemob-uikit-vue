@@ -6,11 +6,11 @@ import Popup from '../../../components/popup/popup.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useLocale } from '../../../locale'
-import { useQuote, type MsgQuotePayload } from '../../../composables/use-quote'
+import { type MsgQuotePayload, useQuote } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { usePresence } from '../../../composables/use-presence'
 import type { PresenceDisplayStatus } from '../../../components/avatar/avatar.vue'
@@ -93,7 +93,7 @@ const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
 })
 
 /** 是否为通知类型消息 */
-const isNotice = computed(() => (props.message.type as string) === 'notice')
+const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.NOTICE)
 
 /** 是否为已撤回消息 */
 const isRecalled = computed(() => props.message.recalled)
@@ -269,7 +269,7 @@ const quoteData = computed(() => {
     msgID: String(q.msgID || ''),
     msgPreview: String(q.msgPreview || ''),
     msgSender: String(q.msgSender || ''),
-    msgType: String(q.msgType || 'text'),
+    msgType: String(q.msgType || MESSAGE_TYPE.TEXT),
     msgThumbUrl: String(q.msgThumbUrl || ''),
   } as MsgQuotePayload
 })
@@ -376,7 +376,7 @@ onBeforeUnmount(() => {
         <span class="message-bubble-wrapper__recalled-text">{{ recalledText }}</span>
         <!-- 文本消息重新编辑按钮 -->
         <MessageRenderer
-          v-if="message.type === 'text' && message.isSelf && message.originalMsg"
+          v-if="message.type === MESSAGE_TYPE.TEXT && message.isSelf && message.originalMsg"
           :message="message"
           @reedit="emit('reedit', $event)"
         />

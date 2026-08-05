@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
+import { MESSAGE_TYPE } from '../../../constants'
 import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface EditingBarProps {
@@ -19,7 +20,7 @@ const { t } = useLocale()
 
 /** 编辑中预览文本（取原文本） */
 const preview = computed(() => {
-  if (props.message.type === 'text') {
+  if (props.message.type === MESSAGE_TYPE.TEXT) {
     return (props.message.body as TextMessageBody).content || ''
   }
   return ''

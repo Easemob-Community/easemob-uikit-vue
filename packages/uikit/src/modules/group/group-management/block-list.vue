@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { formatSdkError } from '../../../utils/sdk-error'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
+import { GROUP_MEMBER_ROLE } from '../../../constants'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import type { UiGroupMember } from '../../../sdk/types'
@@ -100,7 +101,7 @@ async function loadGroupMembers() {
 }
 
 const selectableMembers = computed(() => {
-  return groupMembers.value.filter(m => !blockedUserIds.value.has(m.userId) && m.role !== 'owner')
+  return groupMembers.value.filter(m => !blockedUserIds.value.has(m.userId) && m.role !== GROUP_MEMBER_ROLE.OWNER)
 })
 
 function toggleSelect(member: UiGroupMember) {

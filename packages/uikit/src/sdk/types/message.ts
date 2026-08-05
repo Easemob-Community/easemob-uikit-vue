@@ -10,6 +10,7 @@ import type {
   VideoMessageBody,
   VoiceMessageBody,
 } from 'easemob-websdk'
+import type { MessageStatusValue } from '../../constants'
 
 /**
  * 各消息体类型直接复用 SDK 5.0.0 导出，不再本地复刻，避免双份定义漂移。
@@ -33,7 +34,7 @@ export type {
  * （仅 sending/sent/failed，sent 表示服务端已接受）；
  * 本类型额外包含 delivered/read，由已读/送达回执事件驱动，仅用于 UI 展示。
  */
-export type MessageStatus = 'sending' | 'sent' | 'failed' | 'delivered' | 'read'
+export type MessageStatus = MessageStatusValue
 
 /** 将 MessageBody 联合类型窄化为具体 body 的便捷类型守卫 */
 export function isTextBody(body: MessageBody): body is TextMessageBody {

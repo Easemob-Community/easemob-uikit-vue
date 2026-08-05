@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useToast } from '../../../composables/use-toast'
-import { MESSAGE_STATUS } from '../../../constants'
+import { FORWARD_MODE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
+import type { ForwardModeValue } from '../../../constants'
 import type { UiMessage } from '../../../sdk/types'
 
 export interface MultiSelectBarEmits {
@@ -25,7 +26,16 @@ const emit = defineEmits<MultiSelectBarEmits>()
 const { show: showToast } = useToast()
 
 /** 可转发的消息类型集合 */
-const FORWARDABLE_TYPES = new Set(['text', 'image', 'file', 'voice', 'video', 'location', 'custom', 'combine'])
+const FORWARDABLE_TYPES = new Set<string>([
+  MESSAGE_TYPE.TEXT,
+  MESSAGE_TYPE.IMAGE,
+  MESSAGE_TYPE.FILE,
+  MESSAGE_TYPE.VOICE,
+  MESSAGE_TYPE.VIDEO,
+  MESSAGE_TYPE.LOCATION,
+  MESSAGE_TYPE.CUSTOM,
+  MESSAGE_TYPE.COMBINE,
+])
 
 /** 判断单条消息是否可转发：仅已发送、未撤回、且类型在可转发集合内 */
 function canForwardMessage(msg: UiMessage): boolean {
@@ -46,9 +56,6 @@ function onToggleSelectAll() {
     emit('select-all')
   }
 }
-
-/** 当前转发模式 */
-const forwardMode = ref<'oneByOne' | 'combine'>('combine')
 
 /** 批量删除确认弹窗 */
 const showBatchDeleteConfirm = ref(false)
@@ -76,9 +83,9 @@ function onForward() {
 }
 
 /** 选择转发方式 */
-function onSelectForwardType(mode: 'oneByOne' | 'combine') {
+function onSelectForwardType(mode: ForwardModeValue) {
   showForwardTypeSelect.value = false
-  if (mode === 'oneByOne') {
+  if (mode === FORWARD_MODE.ONE_BY_ONE) {
     emit('forward-one-by-one', props.selectedMessages)
   }
   else {
@@ -154,10 +161,10 @@ function onCancel() {
           转发给
         </div>
         <div class="multi-select-bar__modal-actions multi-select-bar__modal-actions--column">
-          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType('oneByOne')">
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType(FORWARD_MODE.ONE_BY_ONE)">
             逐条转发
           </button>
-          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType('combine')">
+          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType(FORWARD_MODE.COMBINE)">
             合并转发
           </button>
           <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel" @click="showForwardTypeSelect = false">

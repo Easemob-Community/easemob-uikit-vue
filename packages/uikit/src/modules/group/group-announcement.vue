@@ -4,6 +4,7 @@ import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useUIKit } from '../../composables/use-uikit'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
 import { useGroup } from '../../composables/use-group'
 import { buildAnnouncementNoticeText, insertChatNotice } from '../../sdk/event/notice-utils'
 
@@ -36,8 +37,8 @@ const currentUserRole = computed(() => {
     return undefined
   return members.value.find(m => m.userId === currentUserId.value)?.role
 })
-const isOwner = computed(() => currentUserRole.value === 'owner')
-const isAdmin = computed(() => currentUserRole.value === 'admin')
+const isOwner = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.OWNER)
+const isAdmin = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.ADMIN)
 const isAdminOrOwner = computed(() => isOwner.value || isAdmin.value)
 
 const announcement = computed(() => getGroupAnnouncement(props.groupId))
@@ -66,7 +67,7 @@ async function save() {
     emit('updated', announcementInput.value)
     // 发布方本地插入灰色通知：SDK 的 onAnnouncementChanged 事件不回推操作者本人，
     // 需自行插入，与接收方文案保持一致（带最新公告内容）
-    insertChatNotice(stores, props.groupId, 'groupChat', buildAnnouncementNoticeText(announcementInput.value))
+    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, buildAnnouncementNoticeText(announcementInput.value))
     showToast(t('chat.info.groupInfoUpdated') || '更新成功', 'success')
   }
   catch (err) {

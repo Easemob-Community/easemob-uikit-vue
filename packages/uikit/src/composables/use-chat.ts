@@ -1,8 +1,10 @@
 import { computed, ref, toRaw } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
 import type { CombineMessageBody, CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '../sdk/types'
 import { extractLastMessageText } from '../sdk/adapter/message-adapter'
 import { createLogger } from '../utils/logger'
+import { resolveSenderDisplayName } from '../utils/resolve-last-message-text'
 import { useLocale } from '../locale'
 import { useToast } from './use-toast'
 import { useMessageSend } from './use-message-send'
@@ -56,7 +58,7 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
     ...sdkMsg
   } = raw
   // 嵌套合并消息：剥离 messageList，仅保留 title/summary/url/secret/combineLevel 等索引字段
-  if (sdkMsg.type === 'combine' && sdkMsg.body && 'messageList' in (sdkMsg.body as CombineMessageBody)) {
+  if (sdkMsg.type === MESSAGE_TYPE.COMBINE && sdkMsg.body && 'messageList' in (sdkMsg.body as CombineMessageBody)) {
     const { messageList: _messageList, ...restBody } = sdkMsg.body as CombineMessageBody
     sdkMsg.body = restBody as typeof sdkMsg.body
   }
@@ -128,9 +130,9 @@ export function useChat() {
     // 解包 ext 的 reactive proxy，避免 Vue 内部属性干扰 SDK 序列化
     const ext = message.ext ? JSON.parse(JSON.stringify(toRaw(message.ext))) : undefined
     switch (message.type) {
-      case 'text':
+      case MESSAGE_TYPE.TEXT:
         return domains.message.sendText(id, type, (message.body as TextMessageBody).content || '', ext)
-      case 'image': {
+      case MESSAGE_TYPE.IMAGE: {
         const url = (message.body as ImageMessageBody).originalImageUrl
           || (message.body as ImageMessageBody).bigImageUrl
           || (message.body as ImageMessageBody).thumbnailUrl
@@ -141,7 +143,7 @@ export function useChat() {
         }
         return domains.message.sendImage(id, type, url, ext)
       }
-      case 'file': {
+      case MESSAGE_TYPE.FILE: {
         const url = (message.body as FileMessageBody).url
         if (!url) {
           console.warn('[useChat] forwardMessage: file url not found')
@@ -149,7 +151,7 @@ export function useChat() {
         }
         return domains.message.sendFile(id, type, url, ext)
       }
-      case 'voice': {
+      case MESSAGE_TYPE.VOICE: {
         const url = (message.body as VoiceMessageBody).url
         if (!url) {
           console.warn('[useChat] forwardMessage: voice url not found')
@@ -157,7 +159,7 @@ export function useChat() {
         }
         return domains.message.sendVoice(id, type, url, (message.body as VoiceMessageBody).duration || 0, ext)
       }
-      case 'video': {
+      case MESSAGE_TYPE.VIDEO: {
         const url = (message.body as VideoMessageBody).url
           || (message.body as VideoMessageBody).thumbnailUrl
         if (!url) {
@@ -166,7 +168,7 @@ export function useChat() {
         }
         return domains.message.sendVideo(id, type, url, (message.body as VideoMessageBody).duration || 0, ext)
       }
-      case 'location':
+      case MESSAGE_TYPE.LOCATION:
         return domains.message.sendLocation(
           id,
           type,
@@ -175,7 +177,7 @@ export function useChat() {
           (message.body as LocationMessageBody).address,
           ext,
         )
-      case 'custom':
+      case MESSAGE_TYPE.CUSTOM:
         return domains.message.sendCustom(
           id,
           type,
@@ -183,7 +185,7 @@ export function useChat() {
           (message.body as CustomMessageBody).params ? JSON.parse(JSON.stringify(toRaw((message.body as CustomMessageBody).params))) : undefined,
           ext,
         )
-      case 'combine':
+      case MESSAGE_TYPE.COMBINE:
         // 合并消息逐条转发：作为单个合并消息重新发送
         return forwardCombineMessages([message], target)
       default:
@@ -192,27 +194,10 @@ export function useChat() {
   }
 
   /**
-   * 解析消息发送者的显示名称。
-   * 优先级：联系人备注 > 用户资料昵称 > ext 快照昵称 > userId。
+   * 解析消息发送者的显示名称（复用共享链路：联系人备注 > 资料昵称 > ext 快照 > userId）。
    */
   function resolveSenderName(m: UiMessage): string {
-    const from = m.from || ''
-    // 1. 联系人备注
-    const contact = stores.contact.getContact(from)
-    if (contact?.remark)
-      return contact.remark
-    // 2. 用户资料昵称
-    const userInfo = stores.userInfo.getUserInfo(from)
-    if (userInfo?.nickname)
-      return userInfo.nickname
-    // 3. 消息 ext 中携带的 UIKit 用户信息快照
-    const extInfo = m.ext?.ease_chat_uikit_user_info as Record<string, string> | undefined
-    if (extInfo?.nickname)
-      return extInfo.nickname
-    if (extInfo?.remark)
-      return extInfo.remark
-    // 4. userId 兜底
-    return from
+    return resolveSenderDisplayName(stores, m)
   }
 
   /** 合并转发 */
@@ -227,7 +212,7 @@ export function useChat() {
     }
     // 嵌套合并层级：选中项中 combine 消息的最高 combineLevel + 1 超过 SDK 上限时拦截
     const maxNestedLevel = messages.reduce((acc, m) => {
-      if (m.type !== 'combine')
+      if (m.type !== MESSAGE_TYPE.COMBINE)
         return acc
       const level = (m.body as CombineMessageBody).combineLevel ?? 0
       return Math.max(acc, level)
@@ -237,10 +222,10 @@ export function useChat() {
       return
     }
     const { id, type } = target
-    const title = type === 'groupChat' ? (target.name || id) : t('message.forward.combineTitle', '聊天记录')
+    const title = type === CONVERSATION_TYPE.GROUPCHAT ? (target.name || id) : t('message.forward.combineTitle', '聊天记录')
     const summary = messages.map((m) => {
       // 本地通知消息不经过 SDK 适配器，直接取通知文案；其余走 SDK 摘要提取
-      const text = m.type === 'notice' ? m.body.content : extractLastMessageText(m as SdkMessage)
+      const text = m.type === MESSAGE_TYPE.NOTICE ? m.body.content : extractLastMessageText(m as SdkMessage)
       return `${resolveSenderName(m)}: ${text}`
     }).join('\n')
     // 旧版本客户端展示的兼容文案（SDK compatibleText sidecar）

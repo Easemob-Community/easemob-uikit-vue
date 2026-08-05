@@ -5,6 +5,7 @@ import { useConversation } from '../../composables/use-conversation'
 import { useViewport } from '../../composables/use-viewport'
 import { usePullRefresh } from '../../composables/use-pull-refresh'
 import { useLocale } from '../../locale'
+import { CONVERSATION_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { usePresence } from '../../composables/use-presence'
 import Modal from '../../components/modal/modal.vue'
@@ -153,12 +154,12 @@ function handleHeaderAction(key: string) {
 /** 获取会话可用于搜索的文本字段（ID、会话名、备注、昵称、群名、最后消息等） */
 function getConversationSearchFields(item: Conversation): string[] {
   const fields: (string | undefined)[] = [item.id, item.name, item.lastMessageText]
-  if (item.type === 'singleChat') {
+  if (item.type === CONVERSATION_TYPE.SINGLECHAT) {
     const contact = stores.contact.getContact(item.id)
     const userInfo = stores.userInfo.getUserInfo(item.id)
     fields.push(contact?.remark, contact?.name, userInfo?.nickname)
   }
-  else if (item.type === 'groupChat') {
+  else if (item.type === CONVERSATION_TYPE.GROUPCHAT) {
     const group = stores.group.getGroupById(item.id)
     fields.push(group?.groupName)
   }
@@ -181,7 +182,7 @@ const filteredConversationList = computed(() => {
 const visibleUserIds = computed(() =>
   effectiveEnablePresence.value
     ? filteredConversationList.value
-      .filter(item => item.type === 'singleChat')
+      .filter(item => item.type === CONVERSATION_TYPE.SINGLECHAT)
       .map(item => item.id)
     : [],
 )

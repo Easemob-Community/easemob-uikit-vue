@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useConversationStore } from '../../../store/conversation'
 import { useMessageStore } from '../../../store/message'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
-import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { ChatConfig } from '../types'
 import MessageList from './message-list.vue'
 
@@ -37,7 +37,7 @@ function injectMockData() {
 
   const base = {
     conversationId: mockConversation.id,
-    conversationType: 'groupChat' as const,
+    conversationType: CONVERSATION_TYPE.GROUPCHAT,
     to: mockConversation.id,
   }
 
@@ -46,7 +46,7 @@ function injectMockData() {
       ...base,
       id: 'msg_1',
       from: 'user_002',
-      type: 'text',
+      type: MESSAGE_TYPE.TEXT,
       content: '这是第一条文本消息，用于展示消息列表的渲染效果。',
       timestamp: Date.now() - 8 * 60000,
       isSelf: false,
@@ -56,7 +56,7 @@ function injectMockData() {
       ...base,
       id: 'msg_2',
       from: 'user_self',
-      type: 'image',
+      type: MESSAGE_TYPE.IMAGE,
       body: { type: 'img', url: 'https://picsum.photos/300/200', file_length: 10240 },
       timestamp: Date.now() - 7 * 60000,
       isSelf: true,
@@ -66,7 +66,7 @@ function injectMockData() {
       ...base,
       id: 'msg_3',
       from: 'user_002',
-      type: 'voice',
+      type: MESSAGE_TYPE.VOICE,
       body: { type: 'audio', url: '', filename: 'voice.amr', file_length: 10240, duration: 15 },
       timestamp: Date.now() - 6 * 60000,
       isSelf: false,
@@ -76,7 +76,7 @@ function injectMockData() {
       ...base,
       id: 'msg_4',
       from: 'user_self',
-      type: 'video',
+      type: MESSAGE_TYPE.VIDEO,
       body: {
         type: 'video',
         url: 'https://www.w3schools.com/html/mov_bbb.mp4',
@@ -93,7 +93,7 @@ function injectMockData() {
       ...base,
       id: 'msg_5',
       from: 'user_002',
-      type: 'file',
+      type: MESSAGE_TYPE.FILE,
       body: { type: 'file', filename: '设计方案-v3.pdf', file_length: 5242880, url: '' },
       timestamp: Date.now() - 4 * 60000,
       isSelf: false,
@@ -103,7 +103,7 @@ function injectMockData() {
       ...base,
       id: 'msg_6',
       from: 'user_self',
-      type: 'text',
+      type: MESSAGE_TYPE.TEXT,
       content: '我这边已经确认，可以按这个方案推进。',
       timestamp: Date.now() - 3 * 60000,
       isSelf: true,
@@ -113,7 +113,7 @@ function injectMockData() {
       ...base,
       id: 'msg_7',
       from: 'user_002',
-      type: 'combine',
+      type: MESSAGE_TYPE.COMBINE,
       body: {
         type: 'combine',
         title: '产品讨论群的历史消息',

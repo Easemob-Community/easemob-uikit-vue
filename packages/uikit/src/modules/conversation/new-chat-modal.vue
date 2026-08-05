@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useLocale } from '../../locale'
+import { CONVERSATION_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useViewport } from '../../composables/use-viewport'
 import { useConversation } from '../../composables/use-conversation'
@@ -57,7 +58,7 @@ async function onSelectContact(contact: UiContact) {
         id: targetId,
         name: contact.name || contact.remark || contact.userId,
         avatar: contact.avatar,
-        type: 'singleChat',
+        type: CONVERSATION_TYPE.SINGLECHAT,
         unreadCount: 0,
         lastMessageText: '',
         isPinned: false,

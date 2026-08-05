@@ -1,5 +1,7 @@
 import type { ManagerHost } from '../client'
 import type { UiConversation } from '../types'
+import { MESSAGE_TYPE } from '../../constants'
+import type { ConversationTypeValue } from '../../constants'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { createLogger } from '../../utils/logger'
 
@@ -17,7 +19,7 @@ function dumpRawSnippets(items: ReturnType<ManagerHost['chatManager']['getConver
   for (const item of items) {
     const type = String(item.lastMessage?.type ?? '(null)')
     typeCount[type] = (typeCount[type] ?? 0) + 1
-    if (type === 'combine' || type === 'unknown') {
+    if (type === MESSAGE_TYPE.COMBINE || type === 'unknown') {
       suspects.push({
         conversationId: item.conversationId,
         lastMessage: item.lastMessage,
@@ -62,12 +64,12 @@ export class ConversationDomain {
        * 登录时收到的离线消息在 onMessage 阶段可能尚未打开会话而无法即时回执，
        * 点击会话进入后统一补发（群聊使发送方气泡及时显示已读数）。
        */
-      sendPendingReadReceipts?: (conversationId: string, conversationType: 'singleChat' | 'groupChat') => void
+      sendPendingReadReceipts?: (conversationId: string, conversationType: ConversationTypeValue) => void
     } = {},
   ) {}
 
   /** 进入某个会话：通知 SDK 当前正在浏览该会话 */
-  enter(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+  enter(conversationId: string, conversationType: ConversationTypeValue) {
     this.client.chatManager.setCurrentConversation({ conversationId, conversationType })
     this.store.setCurrentConversationId(conversationId)
     // 补发该会话尚未回执的接收消息（不阻塞进入会话）
@@ -98,7 +100,7 @@ export class ConversationDomain {
   /** 删除会话（默认同时删除漫游消息；SDK 0.14.227 成功后总会清理本地会话缓存） */
   async remove(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     deleteRoamingMessages = true,
   ) {
     await this.client.chatManager.deleteConversation({
@@ -109,7 +111,7 @@ export class ConversationDomain {
   }
 
   /** 删除会话但保留漫游消息（SDK 已无仅本地删除 API，用 deleteRoamingMessages=false 代替） */
-  async removeLocal(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+  async removeLocal(conversationId: string, conversationType: ConversationTypeValue) {
     await this.client.chatManager.deleteConversation({
       conversationId,
       conversationType,
@@ -121,7 +123,7 @@ export class ConversationDomain {
   /** 置顶/取消置顶会话 */
   async pin(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     pinned: boolean,
   ) {
     await this.client.chatManager.setConversationPinned({
@@ -140,7 +142,7 @@ export class ConversationDomain {
    */
   async setMuted(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     muted: boolean,
   ) {
     if (muted) {
@@ -163,7 +165,7 @@ export class ConversationDomain {
   }
 
   /** 清空会话未读数（协议仅同步自己多设备，不再发送给对方） */
-  async markRead(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+  async markRead(conversationId: string, conversationType: ConversationTypeValue) {
     await this.client.chatManager.clearConversationUnreadMessageCount({
       conversationId,
       conversationType,
@@ -179,7 +181,7 @@ export class ConversationDomain {
    */
   async clearChatHistory(
     conversationId: string,
-    conversationType: 'singleChat' | 'groupChat',
+    conversationType: ConversationTypeValue,
     deleteRoamingMessages = false,
   ) {
     if (deleteRoamingMessages) {
@@ -192,7 +194,7 @@ export class ConversationDomain {
   }
 
   /** 添加会话标记 */
-  async addMark(conversations: { conversationId: string, conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
+  async addMark(conversations: { conversationId: string, conversationType: ConversationTypeValue }[], mark: number) {
     await this.client.chatManager.addConversationMark({
       conversations,
       mark: mark as any,
@@ -200,7 +202,7 @@ export class ConversationDomain {
   }
 
   /** 移除会话标记 */
-  async removeMark(conversations: { conversationId: string, conversationType: 'singleChat' | 'groupChat' }[], mark: number) {
+  async removeMark(conversations: { conversationId: string, conversationType: ConversationTypeValue }[], mark: number) {
     await this.client.chatManager.removeConversationMark({
       conversations,
       mark: mark as any,
@@ -208,7 +210,7 @@ export class ConversationDomain {
   }
 
   /** 发送 channel ack */
-  async sendChannelAck(conversationId: string, conversationType: 'singleChat' | 'groupChat') {
+  async sendChannelAck(conversationId: string, conversationType: ConversationTypeValue) {
     // 未读数为 0 时无需发送（store 未暴露会话列表时退化为不守卫）
     const unread = this.store.conversationList?.find(c => c.id === conversationId)?.unreadCount
     if (unread !== undefined && unread <= 0)

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import ConversationContainer from './conversation-container.vue'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useConversationStore } from '../../store/conversation'
 import { usePresenceStore } from '../../store/presence'
 import type { UiConversation, UiPresence } from '../../sdk/types'
+import ConversationContainer from './conversation-container.vue'
 
 const customActions = [
   {
@@ -23,8 +24,10 @@ function customTimeFormatter(timestamp: number): string {
 }
 
 function customMessageFormatter(msg: string, type?: string): string {
-  if (type === 'image') return '[图片消息]'
-  if (type === 'voice') return '[语音消息]'
+  if (type === MESSAGE_TYPE.IMAGE)
+    return '[图片消息]'
+  if (type === MESSAGE_TYPE.VOICE)
+    return '[语音消息]'
   return msg
 }
 
@@ -40,7 +43,7 @@ function injectMockConversations() {
     {
       id: 'u_alice',
       name: 'Alice',
-      type: 'singleChat',
+      type: CONVERSATION_TYPE.SINGLECHAT,
       unreadCount: 2,
       lastMessageText: '晚上一起吃饭吗？',
       lastMessageTime: now - 5 * 60 * 1000,
@@ -51,7 +54,7 @@ function injectMockConversations() {
     {
       id: 'u_bob',
       name: 'Bob',
-      type: 'singleChat',
+      type: CONVERSATION_TYPE.SINGLECHAT,
       unreadCount: 0,
       lastMessageText: '文件已发送',
       lastMessageTime: now - 30 * 60 * 1000,
@@ -62,7 +65,7 @@ function injectMockConversations() {
     {
       id: 'u_carol',
       name: 'Carol',
-      type: 'singleChat',
+      type: CONVERSATION_TYPE.SINGLECHAT,
       unreadCount: 1,
       lastMessageText: '收到，谢谢！',
       lastMessageTime: now - 2 * 60 * 60 * 1000,
@@ -73,7 +76,7 @@ function injectMockConversations() {
     {
       id: 'g_team',
       name: '产品技术群',
-      type: 'groupChat',
+      type: CONVERSATION_TYPE.GROUPCHAT,
       unreadCount: 5,
       lastMessageText: 'Tom: 版本已发',
       lastMessageTime: now - 10 * 60 * 1000,

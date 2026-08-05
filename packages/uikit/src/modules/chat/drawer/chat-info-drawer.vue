@@ -14,6 +14,8 @@ import { useToast } from '../../../composables/use-toast'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
+import type { ConversationTypeValue } from '../../../constants'
 import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
 import GroupManagementSection from '../../group/group-management-section.vue'
@@ -59,7 +61,7 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'leave-group', groupId: string): void
   (e: 'destroy-group', groupId: string): void
-  (e: 'clear-history', payload: { id: string, type: 'singleChat' | 'groupChat', deleteConversation?: boolean }): void
+  (e: 'clear-history', payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }): void
   (e: 'add-member', groupId: string): void
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
   // 群成员列表事件
@@ -105,7 +107,7 @@ const descriptionInput = ref('')
 const savingDescription = ref(false)
 
 const peerUserId = computed(() =>
-  props.conversation?.type === 'singleChat' ? props.conversation.id : undefined,
+  props.conversation?.type === CONVERSATION_TYPE.SINGLECHAT ? props.conversation.id : undefined,
 )
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 
@@ -120,7 +122,7 @@ watch(
 
 /** 当前名称/备注：单聊按 备注 > 资料昵称 > 会话名 > unnamed */
 const displayName = computed(() => {
-  if (props.conversation?.type === 'groupChat')
+  if (props.conversation?.type === CONVERSATION_TYPE.GROUPCHAT)
     return props.conversation.name || t('chat.info.unnamed')
   return (
     contact.value?.remark
@@ -132,7 +134,7 @@ const displayName = computed(() => {
 
 /** 当前头像：单聊优先取用户资料头像 */
 const displayAvatar = computed(() => {
-  if (props.conversation?.type === 'groupChat')
+  if (props.conversation?.type === CONVERSATION_TYPE.GROUPCHAT)
     return props.conversation.avatar
   return avatarUrl.value || props.conversation?.avatar
 })
@@ -187,8 +189,8 @@ const currentUserRole = computed(() => {
   return members.value.find(m => m.userId === currentUserId.value)?.role
 })
 
-const isOwner = computed(() => currentUserRole.value === 'owner')
-const isAdmin = computed(() => currentUserRole.value === 'admin')
+const isOwner = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.OWNER)
+const isAdmin = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.ADMIN)
 
 // 群信息编辑：数据同步
 watch(
@@ -242,7 +244,7 @@ async function saveGroupName() {
     // 发布方本地插入灰色通知：SDK 的 onGroupInfoChanged 事件不回推操作者本人，
     // 仅名称实际变更时插入，与接收方文案保持一致
     if (prevGroupName && prevGroupName !== groupNameInput.value) {
-      insertChatNotice(stores, id, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', groupNameInput.value))
+      insertChatNotice(stores, id, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupNameChanged').replace('{name}', groupNameInput.value))
     }
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
@@ -479,9 +481,9 @@ async function doTransferOwner(userId: string) {
   try {
     await changeGroupOwner(id, userId)
     // 同步本地成员角色缓存：新群主置为 owner，自己降级为 member，避免角色闪回
-    stores.group.updateGroupMemberRole(id, userId, 'owner')
+    stores.group.updateGroupMemberRole(id, userId, GROUP_MEMBER_ROLE.OWNER)
     if (currentUserId.value)
-      stores.group.updateGroupMemberRole(id, currentUserId.value, 'member')
+      stores.group.updateGroupMemberRole(id, currentUserId.value, GROUP_MEMBER_ROLE.MEMBER)
     showToast(t('chat.info.transferOwnerSuccess') || '群主已转让', 'success')
   }
   catch (err) {

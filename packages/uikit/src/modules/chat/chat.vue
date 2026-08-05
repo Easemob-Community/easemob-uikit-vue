@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, watch, watchEffect } from 'vue'
 import { formatSdkError } from '../../utils/sdk-error'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
@@ -10,8 +10,9 @@ import { useToast } from '../../composables/use-toast'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
-import { resolveLastMessageText } from '../../utils/resolve-last-message-text'
-import { CONVERSATION_TYPE } from '../../constants'
+import { resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
+import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE } from '../../constants'
+import type { ConversationTypeValue, ForwardModeValue } from '../../constants'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import Avatar from '../../components/avatar/avatar.vue'
@@ -93,7 +94,7 @@ const {
   sendVideoMessage,
   sendLocationMessage,
 } = useChat()
-const { stores, h5, client } = useUIKit()
+const { stores, domains, h5, client } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo, fetchGroupAnnouncement } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
@@ -135,34 +136,85 @@ provideChatPluginContext({
 /** 会话列表最新一条消息文案解析器 */
 const lastMessageTextResolver = computed(() => props.config?.lastMessageTextResolver)
 
-/** 已解析过的最新消息 ID，避免切换会话/加载历史时重复更新 */
-const lastResolvedMessageId = ref('')
+/**
+ * 当前会话最新一条消息的摘要快照（computed 驱动）。
+ *
+ * 依赖面 = 最新消息 + 发送者资料（联系人备注 / 用户资料昵称）+ 资料加载状态：
+ * 发送者资料异步加载完成（如点击会话后 fetchUserInfos 返回）时，
+ * computed 会自动重算，watch 随之重新写入会话 store；senderReady 为 false
+ * 时跳过写入，保证摘要不会闪动到 userId 中间态。
+ */
+const lastMessageSummary = computed(() => {
+  const lastMsg = messages.value[messages.value.length - 1]
+  const cvs = currentConversation.value
+  if (!lastMsg || !cvs || lastMsg.conversationId !== cvs.id)
+    return null
+  const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
+  const from = lastMsg.from || ''
+  // 群聊摘要统一拼接 "发送者: 消息" 前缀（与同步数据 conversation-adapter 的
+  // formatConversationPreview 规则一致），避免点击进入会话后摘要样式割裂。
+  // 发送者名用共享解析链路（备注 > 资料昵称 > 消息 ext 快照 > userId）：
+  // 历史消息场景资料可能未加载完成，ext 快照兜底避免前缀退化为 userId。
+  const senderName = isGroup ? resolveSenderDisplayName(stores, lastMsg) : undefined
+  // 发送者资料加载中且只能兜底 userId 时标记未就绪：推迟写入摘要
+  // （保持进入会话前的昵称展示），待资料就绪后直接刷新为最终态，
+  // 避免 "userId → 昵称" 的闪动过程。
+  const senderReady = !isGroup || senderName !== from || !stores.userInfo.isLoading(from)
+  return {
+    id: lastMsg.msgServerId || lastMsg.msgLocalId,
+    text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName),
+    timestamp: lastMsg.timestamp,
+    senderReady,
+  }
+})
 
-/** 切换会话时重置解析状态 */
-watch(
-  () => currentConversation.value?.id,
-  () => {
-    lastResolvedMessageId.value = ''
-  },
-)
+/**
+ * 摘要发送者资料预拉：群聊摘要解析不到昵称时主动拉取资料。
+ * 与 useUserInfo 相同的守卫（已缓存 / 加载中 / 失败均跳过），
+ * 资料就绪后 lastMessageSummary 重算，摘要直接以昵称落盘，无中间态。
+ */
+watchEffect(() => {
+  const lastMsg = messages.value[messages.value.length - 1]
+  const cvs = currentConversation.value
+  if (!lastMsg || !cvs || cvs.type !== CONVERSATION_TYPE.GROUPCHAT)
+    return
+  const from = lastMsg.from || ''
+  if (!from)
+    return
+  if (
+    stores.userInfo.getUserInfo(from)
+    || stores.userInfo.isLoading(from)
+    || stores.userInfo.isFetchFailed(from)
+  ) {
+    return
+  }
+  void domains.userInfo.fetchUserInfos([from])
+})
 
-/** 当前会话最新消息变化时，自动更新会话列表的 lastMessageText */
-watch(
-  () => messages.value[messages.value.length - 1]?.msgServerId || messages.value[messages.value.length - 1]?.msgLocalId,
-  (newId) => {
-    if (!newId || newId === lastResolvedMessageId.value)
-      return
-    lastResolvedMessageId.value = newId
-    const lastMsg = messages.value[messages.value.length - 1]
-    const cvs = currentConversation.value
-    if (!lastMsg || !cvs || lastMsg.conversationId !== cvs.id)
-      return
-    stores.conversation.updateConversation(cvs.id, {
-      lastMessageText: resolveLastMessageText(lastMsg, lastMessageTextResolver.value),
-      lastMessageTime: lastMsg.timestamp,
-    })
-  },
-)
+/** 上一次写入的摘要指纹（id|text|timestamp），内容未变时不重复写入 */
+const lastSummaryFingerprint = ref('')
+
+/** 摘要快照变化时，自动更新会话列表的 lastMessageText */
+watch(lastMessageSummary, (summary) => {
+  if (!summary?.id || !summary.senderReady)
+    return
+  const cvs = currentConversation.value
+  if (!cvs)
+    return
+  const fingerprint = `${summary.id}|${summary.text}|${summary.timestamp || ''}`
+  if (fingerprint === lastSummaryFingerprint.value)
+    return
+  lastSummaryFingerprint.value = fingerprint
+  const patch: Partial<Conversation> = {
+    lastMessageText: summary.text,
+  }
+  // lastMessageTime 仅单调递增更新：本地消息 timestamp 与服务端 lastMessageAt 存在
+  // 时钟偏差时，无条件覆盖会让进入会话瞬间列表按本地时间重排（会话项跳动）。
+  if (summary.timestamp && (!cvs.lastMessageTime || summary.timestamp > cvs.lastMessageTime)) {
+    patch.lastMessageTime = summary.timestamp
+  }
+  stores.conversation.updateConversation(cvs.id, patch)
+})
 
 /** 组件卸载时清理残留状态 */
 onUnmounted(() => {
@@ -203,7 +255,7 @@ function clearRenderError() {
 }
 
 /** 向后代组件提供 textMessage 配置（链接识别 & 拦截器） */
-provide('textMessageConfig', computed(() => props.config?.textMessage))
+provide(INJECTION_KEY.TEXT_MESSAGE_CONFIG, computed(() => props.config?.textMessage))
 
 /** 重新编辑：将撤回消息的原文回显到输入框 */
 function onReedit(message: UiMessage) {
@@ -217,7 +269,7 @@ function onReedit(message: UiMessage) {
 
 /** 进入编辑态：仅文本消息 */
 function onEdit(message: UiMessage) {
-  if (!message || message.type !== 'text')
+  if (!message || message.type !== MESSAGE_TYPE.TEXT)
     return
   enterEditMode(message)
   const originalText = (message.body as TextMessageBody).content || ''
@@ -282,7 +334,7 @@ const headerConfig = computed(() => props.config?.header)
 const showHeader = computed(() => headerConfig.value?.visible !== false)
 
 /** Header 对齐方式 */
-const headerAlign = computed(() => headerConfig.value?.align ?? 'center')
+const headerAlign = computed(() => headerConfig.value?.align ?? HEADER_ALIGN.CENTER)
 
 /** 是否显示 header 头像 */
 const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
@@ -334,7 +386,7 @@ const headerHeight = ref(0)
 
 /** 当前会话对方用户 ID（仅单聊） */
 const peerUserId = computed(() =>
-  currentConversation.value?.type === 'singleChat' ? currentConversation.value.id : undefined,
+  currentConversation.value?.type === CONVERSATION_TYPE.SINGLECHAT ? currentConversation.value.id : undefined,
 )
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 
@@ -342,7 +394,7 @@ const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 const headerTitle = computed(() => {
   if (!currentConversation.value)
     return t('chat.title')
-  if (currentConversation.value.type === 'groupChat')
+  if (currentConversation.value.type === CONVERSATION_TYPE.GROUPCHAT)
     return currentConversation.value.name || t('chat.title')
   return (
     contact.value?.remark
@@ -355,7 +407,7 @@ const headerTitle = computed(() => {
 
 /** 顶部头像：单聊优先取用户资料头像 */
 const headerAvatar = computed(() => {
-  if (currentConversation.value?.type === 'groupChat')
+  if (currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT)
     return currentConversation.value.avatar
   return avatarUrl.value || currentConversation.value?.avatar
 })
@@ -404,7 +456,7 @@ const isMutedAll = computed(() => {
     return false
   // 全员禁言不作用于群主和管理员
   const role = group?.role
-  return role !== 'owner' && role !== 'admin'
+  return role !== GROUP_MEMBER_ROLE.OWNER && role !== GROUP_MEMBER_ROLE.ADMIN
 })
 
 /** 群聊 @提及成员列表：走用户属性展示链（备注 > 用户资料昵称 > 群成员昵称 > ID） */
@@ -431,7 +483,7 @@ const mentionContacts = computed<MentionContact[]>(() => {
 watch(
   () => currentConversation.value,
   async (cvs) => {
-    if (cvs?.type !== 'groupChat' || !cvs.id)
+    if (cvs?.type !== CONVERSATION_TYPE.GROUPCHAT || !cvs.id)
       return
     // 先拉群详情，确保 memberCount 可用于群已读回执开关判断
     const group = stores.group.getGroupById(cvs.id)
@@ -555,16 +607,16 @@ const showForwardModal = ref(false)
 /** 待转发的消息（单条或多选） */
 const pendingForwardMessages = ref<UiMessage[]>([])
 
-/** 当前转发模式：'oneByOne' 逐条转发 | 'combine' 合并转发 */
-const forwardMode = ref<'oneByOne' | 'combine'>('oneByOne')
+/** 当前转发模式：逐条转发（FORWARD_MODE.ONE_BY_ONE）或合并转发（FORWARD_MODE.COMBINE） */
+const forwardMode = ref<ForwardModeValue>(FORWARD_MODE.ONE_BY_ONE)
 
 /** 打开转发弹窗 */
-function openForwardModal(messages: UiMessage[], mode?: 'oneByOne' | 'combine') {
+function openForwardModal(messages: UiMessage[], mode?: ForwardModeValue) {
   if (messages.length === 0)
     return
   pendingForwardMessages.value = messages
   // 显式指定模式优先；未指定时单条默认逐条转发，多条默认合并转发
-  forwardMode.value = mode ?? (messages.length === 1 ? 'oneByOne' : 'combine')
+  forwardMode.value = mode ?? (messages.length === 1 ? FORWARD_MODE.ONE_BY_ONE : FORWARD_MODE.COMBINE)
   showForwardModal.value = true
 }
 
@@ -574,7 +626,7 @@ async function onForwardConfirm(targetConversation: Conversation) {
   if (messages.length === 0)
     return
   try {
-    if (forwardMode.value === 'oneByOne') {
+    if (forwardMode.value === FORWARD_MODE.ONE_BY_ONE) {
       // 逐条转发：每条消息单独转发
       for (const msg of messages) {
         await forwardMessage(msg, targetConversation)
@@ -600,7 +652,7 @@ function onMultiSelectForwardOneByOne() {
     exitMultiSelectMode()
     return
   }
-  openForwardModal(selectedMessages.value, 'oneByOne')
+  openForwardModal(selectedMessages.value, FORWARD_MODE.ONE_BY_ONE)
 }
 
 /** 多选：合并转发 */
@@ -609,7 +661,7 @@ function onMultiSelectForwardCombine() {
     exitMultiSelectMode()
     return
   }
-  openForwardModal(selectedMessages.value, 'combine')
+  openForwardModal(selectedMessages.value, FORWARD_MODE.COMBINE)
 }
 
 /** 多选：删除 */
@@ -657,7 +709,7 @@ async function onDestroyGroup(groupId: string) {
 }
 
 /** 清空聊天记录 */
-async function onClearHistory(payload: { id: string, type: 'singleChat' | 'groupChat', deleteConversation?: boolean }) {
+async function onClearHistory(payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }) {
   try {
     await clearChatHistory(payload.id, true)
     stores.message.clearConversationMessages(payload.id)
@@ -709,11 +761,11 @@ function onHeaderAvatarClick() {
   const conversation = currentConversation.value
   if (!conversation?.id)
     return
-  if (conversation.type === 'singleChat') {
+  if (conversation.type === CONVERSATION_TYPE.SINGLECHAT) {
     userCardUserId.value = conversation.id
     showUserCardModal.value = true
   }
-  else if (conversation.type === 'groupChat') {
+  else if (conversation.type === CONVERSATION_TYPE.GROUPCHAT) {
     groupCardGroupId.value = conversation.id
     showGroupCardModal.value = true
   }
@@ -746,7 +798,7 @@ function onUserCardSendMessage(userId: string) {
     stores.conversation.addConversation({
       id: userId,
       name: userId,
-      type: 'singleChat',
+      type: CONVERSATION_TYPE.SINGLECHAT,
       unreadCount: 0,
       lastMessageText: '',
       isPinned: false,
@@ -764,7 +816,7 @@ function onGroupCardSendMessage(groupId: string) {
     stores.conversation.addConversation({
       id: groupId,
       name: groupId,
-      type: 'groupChat',
+      type: CONVERSATION_TYPE.GROUPCHAT,
       unreadCount: 0,
       lastMessageText: '',
       isPinned: false,
@@ -783,7 +835,7 @@ function onChatMember(member: UiGroupMember) {
       id: member.userId,
       name: member.nickname || member.userId,
       avatar: member.avatarUrl,
-      type: 'singleChat',
+      type: CONVERSATION_TYPE.SINGLECHAT,
       unreadCount: 0,
       lastMessageText: '',
       isPinned: false,
@@ -803,7 +855,7 @@ function onRemoveMember(member: UiGroupMember) {
 /** 确认移除成员 */
 async function confirmRemoveMember() {
   const member = pendingRemoveMember.value
-  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  const groupId = currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT ? currentConversation.value.id : ''
   if (!member || !groupId) {
     showRemoveConfirmModal.value = false
     return
@@ -828,13 +880,13 @@ function cancelRemoveMember() {
 
 /** 设为管理员 */
 async function onSetAdmin(member: UiGroupMember) {
-  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  const groupId = currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT ? currentConversation.value.id : ''
   if (!groupId)
     return
   try {
     await addGroupAdmin(groupId, member.userId)
     showToast(t('chat.info.setAdminSuccess') || '已设为管理员')
-    chatInfoDrawerRef.value?.setMemberRole(member.userId, 'admin')
+    chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.ADMIN)
   }
   catch (err) {
     console.warn('[Chat] set admin failed:', formatSdkError(err))
@@ -844,13 +896,13 @@ async function onSetAdmin(member: UiGroupMember) {
 
 /** 取消管理员 */
 async function onRemoveAdmin(member: UiGroupMember) {
-  const groupId = currentConversation.value?.type === 'groupChat' ? currentConversation.value.id : ''
+  const groupId = currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT ? currentConversation.value.id : ''
   if (!groupId)
     return
   try {
     await removeGroupAdmin(groupId, member.userId)
     showToast(t('chat.info.removeAdminSuccess') || '已取消管理员')
-    chatInfoDrawerRef.value?.setMemberRole(member.userId, 'member')
+    chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.MEMBER)
   }
   catch (err) {
     console.warn('[Chat] remove admin failed:', formatSdkError(err))
@@ -903,9 +955,9 @@ async function onRemoveAdmin(member: UiGroupMember) {
         ref="headerRef"
         class="chat__header"
         :class="{
-          'chat__header--align-left': headerAlign === 'left',
-          'chat__header--align-center': headerAlign === 'center',
-          'chat__header--align-right': headerAlign === 'right',
+          'chat__header--align-left': headerAlign === HEADER_ALIGN.LEFT,
+          'chat__header--align-center': headerAlign === HEADER_ALIGN.CENTER,
+          'chat__header--align-right': headerAlign === HEADER_ALIGN.RIGHT,
         }"
       >
         <slot name="header" :conversation="currentConversation">

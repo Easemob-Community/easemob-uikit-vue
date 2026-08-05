@@ -1,5 +1,7 @@
 import type { ChatEventHandlerMap } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
+import type { ConversationTypeValue } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
 import { toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
@@ -25,7 +27,7 @@ let readReceiptFlushScheduled = false
  */
 function queueMessageReadReceipt(
   client: ManagerHost,
-  conversationType: 'singleChat' | 'groupChat',
+  conversationType: ConversationTypeValue,
   conversationId: string,
   messageId: string,
 ) {
@@ -45,7 +47,7 @@ function queueMessageReadReceipt(
       const entries = Array.from(pendingReadReceipts.entries())
       pendingReadReceipts.clear()
       for (const [queueKey, messageIds] of entries) {
-        const [conversationType, conversationId] = queueKey.split(':') as ['singleChat' | 'groupChat', string]
+        const [conversationType, conversationId] = queueKey.split(':') as [ConversationTypeValue, string]
         for (let i = 0; i < messageIds.length; i += 50) {
           const batch = messageIds.slice(i, i + 50)
           try {
@@ -117,7 +119,7 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
     const needsPatch = !cvs.name || cvs.name === cvs.id
     if (!needsPatch)
       continue
-    if (cvs.type === 'groupChat') {
+    if (cvs.type === CONVERSATION_TYPE.GROUPCHAT) {
       const groupName = groupMap.get(cvs.id)
       if (groupName) {
         stores.conversation.updateConversation(cvs.id, { name: groupName })
@@ -126,7 +128,7 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
         missingGroupIds.push(cvs.id)
       }
     }
-    else if (cvs.type === 'singleChat') {
+    else if (cvs.type === CONVERSATION_TYPE.SINGLECHAT) {
       const contact = stores.contact.getContact(cvs.id)
       const userInfo = stores.userInfo.getUserInfo(cvs.id)
       const name = contact?.remark || contact?.name || userInfo?.nickname
@@ -231,7 +233,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         for (const item of payload.items) {
           const type = String(item.lastMessage?.type ?? '(null)')
           typeCount[type] = (typeCount[type] ?? 0) + 1
-          if (type === 'combine' || type === 'unknown') {
+          if (type === MESSAGE_TYPE.COMBINE || type === 'unknown') {
             suspects.push({ conversationId: item.conversationId, lastMessage: item.lastMessage })
           }
         }
@@ -264,7 +266,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     onMessage: (sdkMsg) => {
       // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
       // typing 等 cmd 的分发处理为后续 TODO。
-      if (sdkMsg.type === 'cmd')
+      if (sdkMsg.type === MESSAGE_TYPE.CMD)
         return
       chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
@@ -279,19 +281,19 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       ) {
         void client.chatManager.clearConversationUnreadMessageCount({
           conversationId: sdkMsg.conversationId,
-          conversationType: sdkMsg.conversationType as 'singleChat' | 'groupChat',
+          conversationType: sdkMsg.conversationType as ConversationTypeValue,
         }).catch((err: unknown) => {
           console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
         })
         // 单聊/群聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
         // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送
-        if (sdkMsg.conversationType === 'singleChat' || sdkMsg.conversationType === 'groupChat') {
+        if (sdkMsg.conversationType === CONVERSATION_TYPE.SINGLECHAT || sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
           queueMessageReadReceipt(client, sdkMsg.conversationType, sdkMsg.conversationId, sdkMsg.msgServerId)
         }
       }
 
       // 更新@我状态
-      if (sdkMsg.conversationType === 'groupChat' && sdkMsg.from !== stores.client.currentUser) {
+      if (sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT && sdkMsg.from !== stores.client.currentUser) {
         const atList = sdkMsg.ext?.em_at_list
         if (Array.isArray(atList) && atList.includes(stores.client.currentUser)) {
           stores.conversation.setAtMe(sdkMsg.conversationId, true)
@@ -307,7 +309,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onMessageDelivered: (payload) => {
       chatLog.info('onMessageDelivered', { messageId: payload.messageId })
-      stores.message.updateMessageStatus(payload.messageId, 'delivered')
+      stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.DELIVERED)
     },
 
     onMessageReadReceipts: (payload) => {
@@ -315,14 +317,14 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       // 0.14.243 起事件更名为 onMessageReadReceipts；payload 按 conversationType 判别。
       // 单聊：messageIds 逐条标记已读；群聊：receiptDetails 携带按消息 ID 的累计已读人数。
       for (const receipt of payload) {
-        if (receipt.conversationType === 'groupChat') {
+        if (receipt.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
           for (const detail of receipt.receiptDetails) {
             stores.message.updateMessageById(detail.messageId, { groupReadCount: detail.count })
           }
         }
         else {
           for (const messageId of receipt.messageIds) {
-            stores.message.updateMessageStatus(messageId, 'read')
+            stores.message.updateMessageStatus(messageId, MESSAGE_STATUS.READ)
           }
         }
       }

@@ -25,6 +25,7 @@ import type {
   UserInfo,
 } from 'easemob-websdk'
 import { t } from '../../locale'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
 import { createLogger } from '../../utils/logger'
 import type { UiContactInvite } from '../types'
 import type { RootStores } from './types'
@@ -113,7 +114,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         'chat.notice.memberJoined',
         'chat.notice.memberJoinedMultiple',
       )
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onMembersExited: (payload: GroupMembersExitedEventPayload) => {
       const members = payload.members || []
@@ -126,7 +127,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         'chat.notice.memberExited',
         'chat.notice.memberExitedMultiple',
       )
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onGroupInfoChanged: (payload: GroupInfoChangedEventPayload) => {
       groupLog.info('onGroupInfoChanged', { groupId: payload.groupId })
@@ -141,7 +142,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       })
       // 仅群名称实际变更时插入系统通知（描述/头像变更不提示，避免刷屏）
       if (newName && prevGroup?.groupName && newName !== prevGroup.groupName) {
-        insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', newName))
+        insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupNameChanged').replace('{name}', newName))
         // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
         // 否则需刷新（重新同步会话）才能看到新群名
         stores.conversation.updateConversation(payload.groupId, { name: newName })
@@ -155,29 +156,29 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       const currentUser = stores.client.currentUser || ''
       const name = newOwnerId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(payload.newOwner)
       const noticeText = t('chat.notice.ownerChanged').replace('{name}', name)
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onAdminAdded: (payload: GroupAdminAddedEventPayload) => {
       groupLog.info('onAdminAdded', { groupId: payload.groupId, userId: payload.administrator?.userId })
       const userId = payload.administrator?.userId
       if (userId)
-        stores.group.updateGroupMemberRole(payload.groupId, userId, 'admin')
+        stores.group.updateGroupMemberRole(payload.groupId, userId, GROUP_MEMBER_ROLE.ADMIN)
       // 插入系统通知到群聊
       const currentUser = stores.client.currentUser || ''
       const name = userId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(payload.administrator)
       const noticeText = t('chat.notice.adminAdded').replace('{name}', name)
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onAdminRemoved: (payload: GroupAdminRemovedEventPayload) => {
       groupLog.info('onAdminRemoved', { groupId: payload.groupId, userId: payload.administrator?.userId })
       const userId = payload.administrator?.userId
       if (userId)
-        stores.group.updateGroupMemberRole(payload.groupId, userId, 'member')
+        stores.group.updateGroupMemberRole(payload.groupId, userId, GROUP_MEMBER_ROLE.MEMBER)
       // 插入系统通知到群聊
       const currentUser = stores.client.currentUser || ''
       const name = userId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(payload.administrator)
       const noticeText = t('chat.notice.adminRemoved').replace('{name}', name)
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onUserRemoved: (payload: GroupUserRemovedEventPayload) => {
       groupLog.info('onUserRemoved', { groupId: payload.groupId })
@@ -191,7 +192,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       stores.message.clearConversationMessages(payload.groupId)
       // 插入系统通知到群聊（在清空消息之前插入，否则用户看不到提示）
       const noticeText = t('chat.notice.userRemoved').replace('{name}', name)
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onGroupDestroyed: (payload: GroupDestroyedEventPayload) => {
       groupLog.info('onGroupDestroyed', { groupId: payload.groupId })
@@ -203,13 +204,13 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         stores.message.clearConversationMessages(payload.groupId)
       }
       // 插入系统通知到群聊（在清空消息之前插入）
-      insertChatNotice(stores, payload.groupId, 'groupChat', t('chat.notice.groupDestroyed'))
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupDestroyed'))
     },
     onAnnouncementChanged: (payload: GroupAnnouncementChangedEventPayload) => {
       groupLog.info('onAnnouncementChanged', { groupId: payload.groupId, announcement: payload.announcement })
       stores.group.updateGroup(payload.groupId, { announcement: payload.announcement })
       // 插入系统通知到群聊（带上最新公告内容，SDK 事件不回推操作者本人）
-      insertChatNotice(stores, payload.groupId, 'groupChat', buildAnnouncementNoticeText(payload.announcement))
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, buildAnnouncementNoticeText(payload.announcement))
     },
     onMuteListAdded: (payload: GroupMuteListAddedEventPayload) => {
       groupLog.info('onMuteListAdded', { groupId: payload.groupId, count: (payload.mutes || []).length })
@@ -218,7 +219,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       // 插入系统通知到群聊
       const muteNames = (payload.mutes || []).map((u: any) => u.nickname || u.userId || '')
       const muteNoticeText = muteNames.map(name => t('group.mutelist.muteNotice').replace('{name}', name)).join('、')
-      insertChatNotice(stores, payload.groupId, 'groupChat', muteNoticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, muteNoticeText)
     },
     onMuteListRemoved: (payload: GroupMuteListRemovedEventPayload) => {
       groupLog.info('onMuteListRemoved', { groupId: payload.groupId, count: (payload.mutes || []).length })
@@ -227,14 +228,14 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       // 插入系统通知到群聊
       const unmuteNames = (payload.mutes || []).map((u: any) => u.nickname || u.userId || '')
       const unmuteNoticeText = unmuteNames.map(name => t('group.mutelist.unmuteNotice').replace('{name}', name)).join('、')
-      insertChatNotice(stores, payload.groupId, 'groupChat', unmuteNoticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, unmuteNoticeText)
     },
     onAllMemberMuteStateChanged: (payload: GroupAllMemberMuteStateChangedEventPayload) => {
       groupLog.info('onAllMemberMuteStateChanged', { groupId: payload.groupId, isMuted: payload.isMuted })
       stores.group.updateGroup(payload.groupId, { mute: payload.isMuted })
       // 插入系统通知到群聊
       const muteAllNotice = t(payload.isMuted ? 'group.mutelist.muteAllNotice' : 'group.mutelist.unmuteAllNotice')
-      insertChatNotice(stores, payload.groupId, 'groupChat', muteAllNotice)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, muteAllNotice)
     },
     onAllowListAdded: (payload: GroupAllowListAddedEventPayload) => {
       groupLog.info('onAllowListAdded', { groupId: payload.groupId, count: (payload.allowlist || []).length })
@@ -247,7 +248,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         'chat.notice.allowlistAdded',
         'chat.notice.allowlistAddedMultiple',
       )
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onAllowListRemoved: (payload: GroupAllowListRemovedEventPayload) => {
       groupLog.info('onAllowListRemoved', { groupId: payload.groupId, count: (payload.allowlist || []).length })
@@ -260,13 +261,13 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         'chat.notice.allowlistRemoved',
         'chat.notice.allowlistRemovedMultiple',
       )
-      insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
     },
     onGroupDisabledChanged: (payload: GroupDisabledChangedEventPayload) => {
       groupLog.info('onGroupDisabledChanged', { groupId: payload.groupId, disabled: payload.disabled })
       stores.group.updateGroup(payload.groupId, { disabled: payload.disabled })
       // 插入系统通知到群聊
-      insertChatNotice(stores, payload.groupId, 'groupChat', t(payload.disabled ? 'chat.notice.groupDisabled' : 'chat.notice.groupEnabled'))
+      insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, t(payload.disabled ? 'chat.notice.groupDisabled' : 'chat.notice.groupEnabled'))
     },
     onSharedFileAdded: (payload: GroupSharedFileAddedEventPayload) => {
       groupLog.info('onSharedFileAdded', { groupId: payload.groupId, fileId: payload.sharedFile?.fileId })
@@ -280,7 +281,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
         const noticeText = t('chat.notice.sharedFileAdded')
           .replace('{name}', name || uploader?.userId || '')
           .replace('{fileName}', payload.sharedFile.fileName)
-        insertChatNotice(stores, payload.groupId, 'groupChat', noticeText)
+        insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
       }
     },
     onSharedFileDeleted: (payload: GroupSharedFileDeletedEventPayload) => {

@@ -2,6 +2,7 @@
 import { computed, inject } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
+import { INJECTION_KEY } from '../../../constants'
 import { useLocale } from '../../../locale'
 import { linkify } from '../../../utils/linkify'
 import type { LinkSegment } from '../../../utils/linkify'
@@ -30,7 +31,7 @@ const bubbleClass = computed(() =>
 const { t } = useLocale()
 
 /** 注入 textMessage 配置（由 chat.vue provide） */
-const textMessageConfig = inject<ComputedRef<ChatConfig['textMessage'] | undefined>>('textMessageConfig', computed(() => undefined))
+const textMessageConfig = inject<ComputedRef<ChatConfig['textMessage'] | undefined>>(INJECTION_KEY.TEXT_MESSAGE_CONFIG, computed(() => undefined))
 
 /** 是否启用链接识别，默认 true */
 const enableLinkify = computed(() => textMessageConfig.value?.enableLinkify !== false)

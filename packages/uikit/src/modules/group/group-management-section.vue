@@ -7,6 +7,7 @@ import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
 
 import { useLocale } from '../../locale'
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import ChatDrawer from '../../modules/chat/drawer/chat-drawer.vue'
@@ -66,9 +67,9 @@ const { muteAllGroupMembers, unmuteAllGroupMembers } = useGroup()
 const group = computed(() => stores.group.getGroupById(props.groupId))
 const isMuteAll = computed(() => group.value?.mute === true)
 
-const currentUserRole = computed(() => group.value?.role || 'member')
-const isOwner = computed(() => currentUserRole.value === 'owner')
-const isAdminOrOwner = computed(() => currentUserRole.value === 'owner' || currentUserRole.value === 'admin')
+const currentUserRole = computed(() => group.value?.role || GROUP_MEMBER_ROLE.MEMBER)
+const isOwner = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.OWNER)
+const isAdminOrOwner = computed(() => currentUserRole.value === GROUP_MEMBER_ROLE.OWNER || currentUserRole.value === GROUP_MEMBER_ROLE.ADMIN)
 
 async function toggleMuteAll() {
   if (!props.groupId)

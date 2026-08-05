@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import type { UiGroupMember } from '../../sdk/types'
 import { useGroupStore } from '../../store/group'
@@ -11,10 +12,10 @@ const logs = ref<string[]>([])
 const groupId = 'g_design'
 
 const members: Record<string, UiGroupMember> = {
-  owner: { userId: 'u_owner', nickname: '群主大人', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Owner', role: 'owner', joinedAt: Date.now() - 86400000 * 30 },
-  admin: { userId: 'u_admin', nickname: '管理员小王', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', role: 'admin', joinedAt: Date.now() - 86400000 * 20 },
-  member: { userId: 'u_alice', nickname: 'Alice', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice', role: 'member', joinedAt: Date.now() - 86400000 * 3 },
-  muted: { userId: 'u_bob', nickname: 'Bob', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', role: 'member', joinedAt: Date.now() - 86400000 * 1 },
+  owner: { userId: 'u_owner', nickname: '群主大人', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Owner', role: GROUP_MEMBER_ROLE.OWNER, joinedAt: Date.now() - 86400000 * 30 },
+  admin: { userId: 'u_admin', nickname: '管理员小王', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', role: GROUP_MEMBER_ROLE.ADMIN, joinedAt: Date.now() - 86400000 * 20 },
+  member: { userId: 'u_alice', nickname: 'Alice', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice', role: GROUP_MEMBER_ROLE.MEMBER, joinedAt: Date.now() - 86400000 * 3 },
+  muted: { userId: 'u_bob', nickname: 'Bob', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', role: GROUP_MEMBER_ROLE.MEMBER, joinedAt: Date.now() - 86400000 * 1 },
 }
 
 const baseActions = {
@@ -33,12 +34,12 @@ function injectMockOwner() {
     { userId: 'u_alice', nickname: 'Alice', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice' },
     { userId: 'u_bob', nickname: 'Bob', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob' },
   ])
-  useGroupStore().setGroupList([{ groupId, groupName: '设计评审群', role: 'owner', memberCount: 24 }])
+  useGroupStore().setGroupList([{ groupId, groupName: '设计评审群', role: GROUP_MEMBER_ROLE.OWNER, memberCount: 24 }])
   useGroupStore().setGroupMuteList(groupId, [members.muted])
 }
 
 function injectMockMember() {
-  useGroupStore().setGroupList([{ groupId, groupName: '设计评审群', role: 'member', memberCount: 24 }])
+  useGroupStore().setGroupList([{ groupId, groupName: '设计评审群', role: GROUP_MEMBER_ROLE.MEMBER, memberCount: 24 }])
 }
 
 function log(event: string, payload?: string) {

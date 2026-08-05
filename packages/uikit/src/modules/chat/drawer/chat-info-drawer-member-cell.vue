@@ -2,6 +2,7 @@
 import Avatar from '../../../components/avatar/avatar.vue'
 import { useLocale } from '../../../locale'
 import { useUserInfo } from '../../../composables/use-user-info'
+import { GROUP_MEMBER_ROLE } from '../../../constants'
 import type { UiGroupMember } from '../../../sdk/types'
 
 const props = defineProps<{
@@ -18,10 +19,10 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
   <div class="chat-info-drawer__member-cell">
     <Avatar :name="displayName" :src="avatarUrl" :size="48" />
     <span class="chat-info-drawer__member-name">{{ displayName }}</span>
-    <span v-if="props.member.role === 'owner'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--owner">
+    <span v-if="props.member.role === GROUP_MEMBER_ROLE.OWNER" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--owner">
       {{ t('chat.info.groupOwner') }}
     </span>
-    <span v-else-if="props.member.role === 'admin'" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">
+    <span v-else-if="props.member.role === GROUP_MEMBER_ROLE.ADMIN" class="chat-info-drawer__member-tag chat-info-drawer__member-tag--admin">
       {{ t('chat.info.groupAdmin') }}
     </span>
   </div>

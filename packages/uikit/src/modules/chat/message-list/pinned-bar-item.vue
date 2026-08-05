@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useLocale } from '../../../locale'
+import { MESSAGE_TYPE } from '../../../constants'
 import { useUserInfo } from '../../../composables/use-user-info'
 import type { TextMessageBody, UiMessage } from '../../../sdk/types'
 
@@ -25,19 +26,19 @@ const sender = computed(() => displayName.value || props.message.from || '')
 const preview = computed(() => {
   const max = props.maxPreviewLength
   const msg = props.message
-  if (msg.type === 'text') {
+  if (msg.type === MESSAGE_TYPE.TEXT) {
     const text = (msg.body as TextMessageBody).content || ''
     return text.length > max ? `${text.slice(0, max)}…` : text
   }
-  if (msg.type === 'image')
+  if (msg.type === MESSAGE_TYPE.IMAGE)
     return t('message.image') || '[图片]'
-  if (msg.type === 'voice')
+  if (msg.type === MESSAGE_TYPE.VOICE)
     return t('message.audio') || '[语音]'
-  if (msg.type === 'video')
+  if (msg.type === MESSAGE_TYPE.VIDEO)
     return t('message.video') || '[视频]'
-  if (msg.type === 'file')
+  if (msg.type === MESSAGE_TYPE.FILE)
     return t('message.file') || '[文件]'
-  if (msg.type === 'combine')
+  if (msg.type === MESSAGE_TYPE.COMBINE)
     return t('message.combine') || '[聊天记录]'
   return t('message.custom') || '[消息]'
 })

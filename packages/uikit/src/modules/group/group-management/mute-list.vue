@@ -2,14 +2,15 @@
 import { computed, ref, watch } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import { useUIKit } from '../../../composables/use-uikit'
 import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
+import Empty from '../../../components/empty/empty.vue'
 import MuteListItem from './mute-list-item.vue'
 import MuteListSelectItem from './mute-list-select-item.vue'
-import Empty from '../../../components/empty/empty.vue'
 
 export interface MuteListProps {
   groupId: string
@@ -92,14 +93,14 @@ function addNoticeToChat(content: string) {
   stores.message.addMessage({
     msgLocalId: id,
     msgServerId: '',
-    type: 'notice' as any,
+    type: MESSAGE_TYPE.NOTICE as any,
     body: { content } as any,
     from: stores.client.currentUser ?? '',
     to: props.groupId,
     conversationId: props.groupId,
-    conversationType: 'groupChat' as const,
+    conversationType: CONVERSATION_TYPE.GROUPCHAT,
     timestamp: Date.now(),
-    status: 'sent' as const,
+    status: MESSAGE_STATUS.SENT,
     isSelf: true,
     localId: id,
   } as any)
@@ -128,7 +129,7 @@ async function loadGroupMembers() {
 }
 
 const selectableMembers = computed(() => {
-  return groupMembers.value.filter(m => !mutedUserIds.value.has(m.userId) && m.role !== 'owner')
+  return groupMembers.value.filter(m => !mutedUserIds.value.has(m.userId) && m.role !== GROUP_MEMBER_ROLE.OWNER)
 })
 
 function toggleSelect(member: UiGroupMember) {

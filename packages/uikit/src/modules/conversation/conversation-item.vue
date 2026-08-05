@@ -8,6 +8,7 @@ import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import Cell from '../../components/cell/cell.vue'
 import { useLocale } from '../../locale'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
 import { useViewport } from '../../composables/use-viewport'
 import { useUserInfo } from '../../composables/use-user-info'
 import { usePresence } from '../../composables/use-presence'
@@ -50,7 +51,7 @@ const emit = defineEmits<{
 const { t } = useLocale()
 const { isMobile } = useViewport()
 
-const isSingleChat = computed(() => props.conversation.type === 'singleChat')
+const isSingleChat = computed(() => props.conversation.type === CONVERSATION_TYPE.SINGLECHAT)
 // SDK 的 conversationName 在 enableUserInfoSync 开启后已预填充用户资料。
 // 仅在 SDK 名称为空或等于 userId 时才回退到 useUserInfo 单独获取，
 // 头像缺失不影响——Avatar 组件会自动显示文字占位。
@@ -277,7 +278,7 @@ const displayMessage = computed(() => {
   if (props.messageFormatter) {
     return props.messageFormatter(
       props.conversation.lastMessageText || '',
-      'text',
+      MESSAGE_TYPE.TEXT,
     )
   }
   return props.conversation.lastMessageText || ''

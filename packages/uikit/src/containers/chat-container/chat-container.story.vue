@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import ChatContainer from './chat-container.vue'
 
@@ -35,20 +35,20 @@ function injectMockData() {
   cvsStore.setCurrentConversationId(mockConversation.id)
 
   const mockMessages = Array.from({ length: 8 }, (_, i) => {
-    const type = i % 3 === 0 ? 'text' as const : i % 3 === 1 ? 'image' as const : 'voice' as const
+    const type = i % 3 === 0 ? MESSAGE_TYPE.TEXT : i % 3 === 1 ? MESSAGE_TYPE.IMAGE : MESSAGE_TYPE.VOICE
     return {
       id: `msg_${i}`,
       conversationId: mockConversation.id,
-      conversationType: 'groupChat' as const,
+      conversationType: CONVERSATION_TYPE.GROUPCHAT,
       to: mockConversation.id,
       from: i % 2 === 0 ? 'user_self' : 'user_002',
       type,
       // 文本消息字段
-      ...(type === 'text' ? { content: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。` } : {}),
+      ...(type === MESSAGE_TYPE.TEXT ? { content: `这是第 ${i + 1} 条测试消息内容，用于展示消息列表的渲染效果。` } : {}),
       // 图片消息字段
-      ...(type === 'image' ? { url: 'https://picsum.photos/200/150', fileSize: 10240 } : {}),
+      ...(type === MESSAGE_TYPE.IMAGE ? { url: 'https://picsum.photos/200/150', fileSize: 10240 } : {}),
       // 语音消息字段
-      ...(type === 'voice' ? { url: '', duration: 15, filename: 'voice.amr', fileSize: 10240 } : {}),
+      ...(type === MESSAGE_TYPE.VOICE ? { url: '', duration: 15, filename: 'voice.amr', fileSize: 10240 } : {}),
       timestamp: Date.now() - (8 - i) * 60000,
       isSelf: i % 2 === 0,
       status: [MESSAGE_STATUS.SENDING, MESSAGE_STATUS.FAILED, MESSAGE_STATUS.DELIVERED, MESSAGE_STATUS.READ][i % 4],

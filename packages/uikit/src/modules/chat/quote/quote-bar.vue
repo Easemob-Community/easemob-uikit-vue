@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import IconButton from '../../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../../locale'
+import { MESSAGE_TYPE } from '../../../constants'
 import { getQuotePreview } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
@@ -27,7 +28,7 @@ const sender = computed(() => displayName.value || props.message.from || '')
 const preview = computed(() => getQuotePreview(props.message))
 
 /** 是否为图片（展示缩略图） */
-const isImage = computed(() => props.message.type === 'image')
+const isImage = computed(() => props.message.type === MESSAGE_TYPE.IMAGE)
 
 /** 图片缩略图 URL */
 const thumbUrl = computed(() => {

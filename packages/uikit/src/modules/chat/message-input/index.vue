@@ -10,6 +10,7 @@ import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
 import type { EmojiStickerItem } from '../../../components/emoji-picker/types'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
+import { MESSAGE_TYPE } from '../../../constants'
 import type { UiMessage } from '../../../sdk/types'
 import MentionPicker from '../mention/mention-picker.vue'
 import QuoteBar from '../quote/quote-bar.vue'
@@ -176,7 +177,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'text', body: { content: text } })
+  const canSend = await runBeforeSend({ type: MESSAGE_TYPE.TEXT, body: { content: text } })
   if (!canSend)
     return
   sendTextMessage(text, ext)
@@ -216,7 +217,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
     ext.em_at_list = mentionList.map(m => m.userId)
   }
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: 'text', body: { content: text } })
+  const canSend = await runBeforeSend({ type: MESSAGE_TYPE.TEXT, body: { content: text } })
   if (!canSend)
     return
   sendTextMessage(text, ext)
@@ -243,15 +244,15 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
   const ext = buildExtWithQuote()
 
   // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: type === 'image' ? 'image' : type })
+  const canSend = await runBeforeSend({ type: type === MESSAGE_TYPE.IMAGE ? MESSAGE_TYPE.IMAGE : type })
   if (!canSend)
     return
 
   let promise: Promise<any> | undefined
-  if (type === 'image') {
+  if (type === MESSAGE_TYPE.IMAGE) {
     promise = sendImageMessage(file, groupReadReceiptConfig.value, ext)
   }
-  else if (type === 'video') {
+  else if (type === MESSAGE_TYPE.VIDEO) {
     const duration = await getVideoDuration(file)
     promise = sendVideoMessage(file, duration, groupReadReceiptConfig.value, ext)
   }
@@ -322,7 +323,7 @@ function onEmojiSelect(emoji: string) {
 /** 选择表情包（sticker）：SDK 图片消息支持 GIF，按 URL 以图片消息发送 */
 async function onStickerSelect(sticker: EmojiStickerItem) {
   showEmojiPicker.value = false
-  const canSend = await runBeforeSend({ type: 'image' })
+  const canSend = await runBeforeSend({ type: MESSAGE_TYPE.IMAGE })
   if (!canSend)
     return
   sendImageMessage(sticker.url, groupReadReceiptConfig.value)
@@ -534,7 +535,7 @@ function handleVoiceEnd(durationFromInput?: number) {
         const wavBlob = await convertToWav(recordedBlob)
         const ext = buildExtWithQuote()
         // beforeSend 拦截
-        const canSend = await runBeforeSend({ type: 'voice' })
+        const canSend = await runBeforeSend({ type: MESSAGE_TYPE.VOICE })
         if (!canSend) {
           clearQuote()
           return

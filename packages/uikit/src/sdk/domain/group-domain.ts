@@ -1,5 +1,6 @@
 import type { ManagerHost } from '../client'
 import type { UiGroup, UiGroupMember } from '../types'
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
 
 /**
@@ -85,7 +86,7 @@ export class GroupDomain {
       groupId: result.groupId,
       groupName: params.name,
       description: params.description,
-      role: 'owner',
+      role: GROUP_MEMBER_ROLE.OWNER,
       memberCount: (params.memberIds?.length ?? 0) + 1,
       maxUsers: params.maxMembers,
       public: params.public ?? false,
@@ -167,13 +168,13 @@ export class GroupDomain {
   /** 设置群管理员 */
   async addGroupAdmin(groupId: string, userId: string) {
     await this.client.groupManager.addGroupAdmin({ groupId, userId })
-    this.store.updateGroupMemberRole(groupId, userId, 'admin')
+    this.store.updateGroupMemberRole(groupId, userId, GROUP_MEMBER_ROLE.ADMIN)
   }
 
   /** 取消群管理员 */
   async removeGroupAdmin(groupId: string, userId: string) {
     await this.client.groupManager.removeGroupAdmin({ groupId, userId })
-    this.store.updateGroupMemberRole(groupId, userId, 'member')
+    this.store.updateGroupMemberRole(groupId, userId, GROUP_MEMBER_ROLE.MEMBER)
   }
 
   /** 接受群邀请 */

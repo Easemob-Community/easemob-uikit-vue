@@ -1,5 +1,7 @@
 import { ref } from 'vue'
-import type { FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
+import { MESSAGE_TYPE } from '../constants'
+import { customEventPreviewMap } from '../utils/resolve-last-message-text'
+import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
 
 /** 引用消息协议类型（ext.msgQuote） */
 export interface MsgQuotePayload {
@@ -27,23 +29,26 @@ const locateRequest = ref<{ msgID: string, token: number } | null>(null)
 /** 生成引用预览文本（使用 [] 兜底标签，去掉 emoji/icon 前缀） */
 export function getQuotePreview(message: UiMessage): string {
   switch (message.type) {
-    case 'text':
+    case MESSAGE_TYPE.TEXT:
       return (message.body as TextMessageBody).content || ''
-    case 'image':
+    case MESSAGE_TYPE.IMAGE:
       return '[图片]'
-    case 'voice':
+    case MESSAGE_TYPE.VOICE:
       return '[语音]'
-    case 'video':
+    case MESSAGE_TYPE.VIDEO:
       return '[视频]'
-    case 'file': {
+    case MESSAGE_TYPE.FILE: {
       const filename = (message.body as FileMessageBody).filename
       return filename || '[文件]'
     }
-    case 'location':
+    case MESSAGE_TYPE.LOCATION:
       return '[位置]'
-    case 'custom':
-      return '[自定义消息]'
-    case 'cmd':
+    case MESSAGE_TYPE.CUSTOM: {
+      // 按 event 查共享映射（与会话列表摘要一致，如名片 userCard → [名片]）
+      const event = (message.body as CustomMessageBody).event || ''
+      return customEventPreviewMap[event] || '[自定义]'
+    }
+    case MESSAGE_TYPE.CMD:
       return '[指令]'
     default:
       return '[消息]'
@@ -61,11 +66,11 @@ export function buildQuoteExt(message: UiMessage): { msgQuote: MsgQuotePayload }
   }
 
   // 图片/视频消息：把可展示的原图/缩略图 URL 带入引用卡片，接收方无需加载原消息也能看到缩略图
-  if (message.type === 'image') {
+  if (message.type === MESSAGE_TYPE.IMAGE) {
     const body = message.body as ImageMessageBody
     payload.msgThumbUrl = body.originalImageUrl || body.thumbnailUrl || body.localUrl || ''
   }
-  else if (message.type === 'video') {
+  else if (message.type === MESSAGE_TYPE.VIDEO) {
     const body = message.body as { thumbnailUrl?: string }
     payload.msgThumbUrl = body.thumbnailUrl || ''
   }

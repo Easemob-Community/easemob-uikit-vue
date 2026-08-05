@@ -54,7 +54,7 @@ const slotName = computed(() => `message-${props.message.type}` as const)
 const footerSlotName = computed(() => `message-footer-${props.message.type}` as const)
 
 /** 是否为通知类型消息 */
-const isNotice = computed(() => (props.message.type as string) === 'notice')
+const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.NOTICE)
 </script>
 
 <template>

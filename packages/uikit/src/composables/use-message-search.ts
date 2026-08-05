@@ -1,4 +1,5 @@
 import { type MaybeRef, computed, ref, toValue } from 'vue'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
 import type { UiMessage } from '../sdk/types'
 import { useUIKit } from './use-uikit'
 
@@ -33,24 +34,24 @@ export interface UseMessageSearchOptions {
 /** 判断消息内容是否命中关键词 */
 function matchMessageContent(msg: UiMessage, keyword: string): boolean {
   const k = keyword.toLowerCase()
-  if (msg.type === 'text') {
+  if (msg.type === MESSAGE_TYPE.TEXT) {
     const content = (msg.body as { content?: string }).content || ''
     return content.toLowerCase().includes(k)
   }
-  if (msg.type === 'file') {
+  if (msg.type === MESSAGE_TYPE.FILE) {
     const filename = (msg.body as { filename?: string }).filename || ''
     return filename.toLowerCase().includes(k)
   }
-  if (msg.type === 'combine') {
+  if (msg.type === MESSAGE_TYPE.COMBINE) {
     const title = (msg.body as { title?: string }).title || ''
     return title.toLowerCase().includes(k)
   }
-  if (msg.type === 'location') {
+  if (msg.type === MESSAGE_TYPE.LOCATION) {
     const address = (msg.body as { address?: string }).address || ''
     return address.toLowerCase().includes(k)
   }
   // 自定义消息支持搜索 ext 中的文本字段
-  if (msg.type === 'custom') {
+  if (msg.type === MESSAGE_TYPE.CUSTOM) {
     const event = (msg.body as { event?: string }).event || ''
     const params = JSON.stringify((msg.body as { params?: Record<string, string> }).params || {})
     return event.toLowerCase().includes(k) || params.toLowerCase().includes(k)
@@ -60,21 +61,21 @@ function matchMessageContent(msg: UiMessage, keyword: string): boolean {
 
 /** 从 UiMessage 提取摘要 */
 function getMessageSummary(msg: UiMessage): string {
-  if (msg.type === 'text')
+  if (msg.type === MESSAGE_TYPE.TEXT)
     return (msg.body as { content?: string }).content || ''
-  if (msg.type === 'image')
+  if (msg.type === MESSAGE_TYPE.IMAGE)
     return '[图片]'
-  if (msg.type === 'voice')
+  if (msg.type === MESSAGE_TYPE.VOICE)
     return '[语音]'
-  if (msg.type === 'video')
+  if (msg.type === MESSAGE_TYPE.VIDEO)
     return '[视频]'
-  if (msg.type === 'file')
+  if (msg.type === MESSAGE_TYPE.FILE)
     return `[文件] ${(msg.body as { filename?: string }).filename || ''}`
-  if (msg.type === 'location')
+  if (msg.type === MESSAGE_TYPE.LOCATION)
     return `[位置] ${(msg.body as { address?: string }).address || ''}`
-  if (msg.type === 'combine')
+  if (msg.type === MESSAGE_TYPE.COMBINE)
     return (msg.body as { title?: string }).title || '[聊天记录]'
-  if (msg.type === 'custom')
+  if (msg.type === MESSAGE_TYPE.CUSTOM)
     return (msg.body as { event?: string }).event || '[自定义消息]'
   return '[未知消息]'
 }
@@ -145,7 +146,7 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
       option: {
         keywordList: [keyword.value.trim()],
         conversationId: cvs.id,
-        conversationType: cvs.type === 'groupChat' ? 'groupChat' : 'singleChat',
+        conversationType: cvs.type === CONVERSATION_TYPE.GROUPCHAT ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT,
       },
       pageNum: pageNum.value,
       pageSize,

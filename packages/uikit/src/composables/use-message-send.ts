@@ -1,4 +1,6 @@
 import type { CustomMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
+import type { ConversationTypeValue } from '../constants'
 import { useUIKit } from './use-uikit'
 
 export interface SendMessageOptions {
@@ -9,13 +11,13 @@ export interface SendMessageOptions {
 }
 
 function shouldEnableGroupAck(
-  chatType: 'singleChat' | 'groupChat',
+  chatType: ConversationTypeValue,
   groupId: string,
   enabled?: boolean,
   maxGroupSize?: number,
   stores?: any,
 ): boolean {
-  if (!enabled || chatType !== 'groupChat')
+  if (!enabled || chatType !== CONVERSATION_TYPE.GROUPCHAT)
     return false
   const memberCount = stores?.group?.getGroupById?.(groupId)?.memberCount || 0
   const limit = maxGroupSize && maxGroupSize > 0 ? maxGroupSize : 200
@@ -157,11 +159,11 @@ export function useMessageSend() {
       return
 
     switch (message.type) {
-      case 'text':
+      case MESSAGE_TYPE.TEXT:
         // 文本/自定义消息：确认能重发后再删除本地失败消息，避免删完发不出去导致丢消息
         messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
         return domains.message.sendText(cvs.id, cvs.type, (message.body as TextMessageBody).content || '', message.ext)
-      case 'custom':
+      case MESSAGE_TYPE.CUSTOM:
         messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
         return domains.message.sendCustom(
           cvs.id,
@@ -170,10 +172,10 @@ export function useMessageSend() {
           (message.body as CustomMessageBody).params,
           message.ext,
         )
-      case 'image':
-      case 'voice':
-      case 'video':
-      case 'file':
+      case MESSAGE_TYPE.IMAGE:
+      case MESSAGE_TYPE.VOICE:
+      case MESSAGE_TYPE.VIDEO:
+      case MESSAGE_TYPE.FILE:
         // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
         console.warn('[useMessageSend] resendMessage: media resend requires original File')
         return

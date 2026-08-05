@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { GROUP_MEMBER_ROLE } from '../../constants'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
 import GroupManagementSection from './group-management-section.vue'
@@ -10,7 +11,7 @@ function injectOwnerGroup() {
     {
       groupId: 'g_design',
       groupName: '设计评审群',
-      role: 'owner',
+      role: GROUP_MEMBER_ROLE.OWNER,
       memberCount: 24,
     },
   ])
@@ -21,7 +22,7 @@ function injectMemberGroup() {
     {
       groupId: 'g_design',
       groupName: '设计评审群',
-      role: 'member',
+      role: GROUP_MEMBER_ROLE.MEMBER,
       memberCount: 24,
     },
   ])

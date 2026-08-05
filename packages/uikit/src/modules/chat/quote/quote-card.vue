@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { MESSAGE_TYPE } from '../../../constants'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 
@@ -21,14 +22,14 @@ const { displayName } = useUserInfo(() => props.quote.msgSender)
 const senderName = computed(() => displayName.value || props.quote.msgSender)
 
 /** 是否展示图片/视频缩略图 */
-const isMedia = computed(() => props.quote.msgType === 'image' || props.quote.msgType === 'video')
+const isMedia = computed(() => props.quote.msgType === MESSAGE_TYPE.IMAGE || props.quote.msgType === MESSAGE_TYPE.VIDEO)
 /** 缩略图地址 */
 const thumbUrl = computed(() => props.quote.msgThumbUrl || '')
 /** 非媒体类型或没有缩略图时展示的兜底文案 */
 const fallbackPreview = computed(() => {
-  if (props.quote.msgType === 'image')
+  if (props.quote.msgType === MESSAGE_TYPE.IMAGE)
     return '[图片]'
-  if (props.quote.msgType === 'video')
+  if (props.quote.msgType === MESSAGE_TYPE.VIDEO)
     return '[视频]'
   return props.quote.msgPreview
 })
