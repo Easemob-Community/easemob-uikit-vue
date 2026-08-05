@@ -810,7 +810,7 @@ defineExpose({
           <div class="chat-info-drawer__section-label">
             {{ t('group.management.title') || '群管理' }}
           </div>
-          <div class="chat-info-drawer__section">
+          <div class="chat-info-drawer__section chat-info-drawer__section--management">
             <GroupManagementSection
               :group-id="groupId"
               :display-mode="props.groupManagementDisplayMode"
@@ -1126,6 +1126,10 @@ defineExpose({
 .chat-info-drawer__section--admin-actions {
   display: flex;
   flex-direction: column;
+  padding: 4px;
+}
+
+.chat-info-drawer__section--management {
   padding: 4px;
 }
 

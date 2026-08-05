@@ -4,7 +4,7 @@ import { formatSdkError } from '../../utils/sdk-error'
 import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Popup from '../../components/popup/popup.vue'
-import Cell from '../../components/cell/cell.vue'
+
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -185,19 +185,17 @@ function closeDrawer() {
 
 <template>
   <div v-if="hasManagementEntries" class="group-management-section">
-    <!-- 全员禁言开关 -->
-    <Cell
-      v-if="props.showMuteAll && isAdminOrOwner"
-      :clickable="false"
-      size="compact"
-      :title="t('group.management.muteAll') || '全员禁言'"
-      class="group-management-section__cell"
-    >
-      <template #leading>
+    <div class="group-management-section__list">
+      <!-- 全员禁言开关 -->
+      <button
+        v-if="props.showMuteAll && isAdminOrOwner"
+        type="button"
+        class="group-management-section__action"
+      >
         <Icon name="actions/lock" :size="18" />
-      </template>
-      <template #trailing>
-        <label class="group-management-section__toggle">
+        <span class="group-management-section__action-text">{{ t('group.management.muteAll') || '全员禁言' }}</span>
+        <span class="group-management-section__action-spacer" />
+        <label class="group-management-section__toggle" @click.stop>
           <input
             type="checkbox"
             :checked="isMuteAll"
@@ -206,25 +204,21 @@ function closeDrawer() {
           >
           <span class="group-management-section__toggle-slider" />
         </label>
-      </template>
-    </Cell>
+      </button>
 
-    <!-- 管理入口列表 -->
-    <div class="group-management-section__entries">
-      <Cell
+      <!-- 管理入口列表 -->
+      <button
         v-for="entry in managementEntries"
         :key="entry.key"
-        :title="entry.label"
-        :meta="entry.count ? String(entry.count) : undefined"
-        show-arrow
-        size="compact"
-        class="group-management-section__cell"
+        type="button"
+        class="group-management-section__action"
         @click="openDrawer(entry.key)"
       >
-        <template #leading>
-          <Icon :name="entry.icon" :size="18" />
-        </template>
-      </Cell>
+        <Icon :name="entry.icon" :size="18" />
+        <span class="group-management-section__action-text">{{ entry.label }}</span>
+        <span v-if="entry.count" class="group-management-section__action-meta">{{ entry.count }}</span>
+        <Icon name="navigation/chevron_right" :size="16" class="group-management-section__action-arrow" />
+      </button>
     </div>
 
     <!-- 二级抽屉 -->
@@ -397,21 +391,53 @@ function closeDrawer() {
   flex-direction: column;
 }
 
-.group-management-section__entries {
+.group-management-section__list {
   display: flex;
   flex-direction: column;
 }
 
 /* 与 chat-info-drawer__admin-action 布局/样式完全对齐 */
-.group-management-section :deep(.uikit-cell) {
-  height: auto;
-  min-height: 40px;
-  padding: 10px 12px;
+.group-management-section__action {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-primary);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
   border-radius: var(--uikit-components-radius, 8px);
-  --uikit-cell-gap: 0px;
-  --uikit-item-hover-padding-x: 12px;
-  --uikit-item-hover-radius: 8px;
+  transition: background-color 0.15s;
+}
+
+.group-management-section__action:hover {
+  background-color: var(--uikit-bg-hover);
+}
+
+.group-management-section__action-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-management-section__action-spacer {
+  flex: 1;
+}
+
+.group-management-section__action-meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+}
+
+.group-management-section__action-arrow {
+  flex-shrink: 0;
+  color: var(--uikit-text-secondary);
 }
 
 /* 全员禁言开关 */
