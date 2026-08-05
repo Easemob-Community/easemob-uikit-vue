@@ -1,0 +1,197 @@
+/**
+ * Demo 设置面板共享样式
+ *
+ * 供 components/settings/*.vue 面板组件复用，包含：
+ * - 分段按钮（demo-option）
+ * - 复选/开关行（demo-check）
+ * - 基础按钮 / 输入框（demo-btn / demo-input）
+ * - 滑块与色板（demo-slider / demo-color-preview）
+ * - 分组、说明文字、连接状态点
+ *
+ * 非 scoped：面板组件各自 import 本文件即可获得统一表单控件外观。
+ */
+
+/* ===== 面板容器 ===== */
+.demo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== 分组 ===== */
+.demo-settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-settings__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--uikit-text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.demo-settings__options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.demo-settings__color {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ===== 分段按钮 ===== */
+.demo-option {
+  flex: 1;
+  height: 32px;
+  min-width: 64px;
+  padding: 0 12px;
+  border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--uikit-text-primary, #111827);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.demo-option:hover {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+.demo-option--active {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  background-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  color: #ffffff;
+}
+
+/* ===== 复选行 ===== */
+.demo-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--uikit-text-primary, #111827);
+  cursor: pointer;
+}
+
+/* ===== 基础按钮 ===== */
+.demo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  color: var(--uikit-text-primary, #111827);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.demo-btn:hover {
+  opacity: 0.85;
+}
+
+.demo-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.demo-btn--active {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+/* ===== 输入框 ===== */
+.demo-input {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: 6px;
+  background-color: var(--uikit-bg-base, #ffffff);
+  color: var(--uikit-text-primary, #111827);
+  font-size: 13px;
+  outline: none;
+}
+
+.demo-input:focus {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+/* ===== 滑块与色板 ===== */
+.demo-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+  outline: none;
+}
+
+.demo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.demo-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.demo-color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--uikit-bg-secondary, #e5e7eb);
+  flex-shrink: 0;
+}
+
+/* ===== 说明文字 ===== */
+.demo-info {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+/* ===== 连接状态点 ===== */
+.demo-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 8px;
+  background-color: #ef4444;
+}
+
+.demo-status-dot--on {
+  background-color: #22c55e;
+}
+
+.demo-status-text {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--uikit-text-secondary, #6b7280);
+}
