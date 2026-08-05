@@ -186,7 +186,7 @@ const demoStickerPacks: EmojiStickerPack[] = [
 
 /** EmChatContainer 配置 */
 const chatConfig = computed(() => ({
-  header: { showAvatar: true },
+  header: { showAvatar: false },
   groupReadReceipt: {
     enabled: groupReadReceiptEnabled.value,
     maxGroupSize: groupReadReceiptMaxSize.value,
