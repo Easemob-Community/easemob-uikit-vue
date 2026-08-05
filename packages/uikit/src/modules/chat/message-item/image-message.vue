@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
@@ -35,16 +35,23 @@ const displaySize = computed(() => {
   }
 })
 
-/** 展示用图片 URL：己方展示原图（本地 objectURL），对方优先缩略图 */
+/**
+ * 展示用图片 URL（三级策略：气泡最小图 → 点击中图 → 点击原图）。
+ * 气泡统一优先缩略图（thumbnailUrl 最小图），缺缩略图时回退本地图（己方发送中），
+ * 最后才回退中图/原图，避免气泡直接拉大图流量。
+ */
 const displayUrl = computed(() => {
   const body = props.message.body as ImageMessageBody
-  if (props.message.isSelf) {
-    return body.localUrl || body.originalImageUrl || body.thumbnailUrl || ''
-  }
-  return body.thumbnailUrl || body.originalImageUrl || body.localUrl || ''
+  return body.thumbnailUrl || body.localUrl || body.bigImageUrl || body.originalImageUrl || ''
 })
 
-/** 原图 URL（用于预览） */
+/** 中图 URL（点击气泡后首屏展示：优先 bigImageUrl 中图，己方发送中回退本地图，最后原图兜底） */
+const mediumUrl = computed(() => {
+  const body = props.message.body as ImageMessageBody
+  return body.bigImageUrl || body.localUrl || body.originalImageUrl || ''
+})
+
+/** 原图 URL（用于预览高清/下载） */
 const originalUrl = computed(() => (props.message.body as ImageMessageBody).localUrl || (props.message.body as ImageMessageBody).originalImageUrl || '')
 
 /** 圆角 class */
@@ -67,6 +74,22 @@ function onError() {
 /** 全屏预览 */
 const isPreviewing = ref(false)
 
+/** 预览当前展示的 URL：先中图秒开，中图加载完成后再切换原图 */
+const previewUrl = ref('')
+/** 预览图片加载阶段：medium=中图，original=原图 */
+const previewStage = ref<'medium' | 'original'>('medium')
+/** 中图已显示、原图正在加载中 */
+const isUpgradingOriginal = ref(false)
+/** 中图首次加载失败标记（避免中图/原图互跳死循环） */
+const mediumFailedOnce = ref(false)
+/** 预览图片最终加载失败（无可回退资源） */
+const previewFailed = ref(false)
+
+/** 是否已展示高清原图（预览右上角"高清"标识） */
+const isOriginalShown = computed(
+  () => previewStage.value === 'original' && !isUpgradingOriginal.value && !previewFailed.value,
+)
+
 /** 缩放比例 */
 const scale = ref(1)
 /** 平移 X */
@@ -87,15 +110,72 @@ let dragStartTranslateY = 0
 let isPinching = false
 
 function openPreview() {
-  if (originalUrl.value) {
-    isPreviewing.value = true
-    resetZoom()
-  }
+  if (!mediumUrl.value && !originalUrl.value)
+    return
+  isPreviewing.value = true
+  resetZoom()
+  previewStage.value = 'medium'
+  isUpgradingOriginal.value = false
+  mediumFailedOnce.value = false
+  previewFailed.value = false
+  // 首屏展示中图（大图压缩版）；原图需手动点击"查看原图"再加载
+  previewUrl.value = mediumUrl.value || originalUrl.value
 }
 
 function closePreview() {
   isPreviewing.value = false
   resetZoom()
+}
+
+/** 切换到原图展示；仅中图阶段且有原图时才生效 */
+function upgradeToOriginal(): boolean {
+  const orig = originalUrl.value
+  if (previewStage.value !== 'medium' || !orig || orig === previewUrl.value)
+    return false
+  previewStage.value = 'original'
+  isUpgradingOriginal.value = true
+  previewUrl.value = orig
+  return true
+}
+
+/** 切回中图展示（原图阶段点击"查看中图"按钮触发，与"查看原图"按钮形成 toggle） */
+function backToMedium() {
+  if (previewStage.value !== 'original' || isUpgradingOriginal.value)
+    return
+  const med = mediumUrl.value
+  if (!med || med === previewUrl.value)
+    return
+  previewStage.value = 'medium'
+  isUpgradingOriginal.value = false
+  previewUrl.value = med
+}
+
+/** 预览图片加载完成：中图或原图加载完成即结束加载态 */
+function onPreviewImgLoad() {
+  previewFailed.value = false
+  // 原图加载完成，或中图即最终图（无原图可切换）
+  isUpgradingOriginal.value = false
+}
+
+/** 预览图片加载失败：中图失败尝试原图；原图失败回退中图；都失败才置失败态 */
+function onPreviewImgError() {
+  if (previewStage.value === 'medium') {
+    if (!mediumFailedOnce.value) {
+      mediumFailedOnce.value = true
+      if (upgradeToOriginal())
+        return
+    }
+    previewFailed.value = true
+    return
+  }
+  // 原图加载失败：回退到中图继续展示
+  if (mediumUrl.value && mediumUrl.value !== previewUrl.value) {
+    previewStage.value = 'medium'
+    isUpgradingOriginal.value = false
+    previewUrl.value = mediumUrl.value
+    return
+  }
+  previewFailed.value = true
 }
 
 function resetZoom() {
@@ -130,6 +210,8 @@ function onPreviewTouchStart(e: TouchEvent) {
 
 function onPreviewTouchMove(e: TouchEvent) {
   e.preventDefault()
+  // 拖拽/缩放手势开始后取消未决的单击判定，避免误触"查看原图"
+  clearSingleTapTimer()
   if (e.touches.length === 2) {
     // 双指缩放
     isPinching = true
@@ -162,13 +244,24 @@ function onPreviewTouchEnd(e: TouchEvent) {
   isPinching = false
 }
 
-/** 双击切换缩放 */
+/** 双击缩放 + 单击查看原图 */
 let lastTapTime = 0
+/** 单击判定计时器（300ms 内无第二次点击则视为单击） */
+let singleTapTimer: ReturnType<typeof setTimeout> | undefined
+
+function clearSingleTapTimer() {
+  if (singleTapTimer) {
+    clearTimeout(singleTapTimer)
+    singleTapTimer = undefined
+  }
+}
+
 function onPreviewImageClick(e: MouseEvent) {
   e.stopPropagation()
   const now = Date.now()
   if (now - lastTapTime < 300) {
     // 双击：在 1x 和 2x 间切换
+    clearSingleTapTimer()
     if (scale.value > 1.5) {
       resetZoom()
     }
@@ -181,8 +274,19 @@ function onPreviewImageClick(e: MouseEvent) {
   }
   else {
     lastTapTime = now
+    clearSingleTapTimer()
+    // 单击（中图阶段）：300ms 后无第二次点击则切换查看原图
+    singleTapTimer = setTimeout(() => {
+      singleTapTimer = undefined
+      lastTapTime = 0
+      upgradeToOriginal()
+    }, 300)
   }
 }
+
+onBeforeUnmount(() => {
+  clearSingleTapTimer()
+})
 
 /** 下载原图 */
 async function handleDownload(event: MouseEvent) {
@@ -254,23 +358,49 @@ async function handleDownload(event: MouseEvent) {
 
     <!-- 全屏预览浮层 -->
     <div
-      v-if="isPreviewing && originalUrl"
+      v-if="isPreviewing && previewUrl"
       class="image-message__preview"
       @click="closePreview"
     >
       <img
-        :src="originalUrl"
+        :src="previewUrl"
         class="image-message__preview-img"
         alt="preview"
         :style="{
           transform: `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`,
           cursor: scale > 1 ? 'grab' : 'default',
         }"
+        @load="onPreviewImgLoad"
+        @error="onPreviewImgError"
         @touchstart="onPreviewTouchStart"
         @touchmove.prevent="onPreviewTouchMove"
         @touchend="onPreviewTouchEnd"
         @click="onPreviewImageClick"
       >
+      <!-- 底部统一切换入口：中图阶段 → 点击查看原图 -->
+      <button
+        v-if="previewStage === 'medium' && originalUrl && originalUrl !== previewUrl && !previewFailed"
+        class="image-message__preview-toggle"
+        @click.stop="upgradeToOriginal"
+      >
+        查看原图
+      </button>
+      <!-- 原图加载中提示 -->
+      <div v-else-if="isUpgradingOriginal" class="image-message__preview-tip">
+        加载原图中…
+      </div>
+      <!-- 原图已展示 → 点击切回中图 -->
+      <button
+        v-else-if="isOriginalShown && originalUrl && originalUrl !== mediumUrl"
+        class="image-message__preview-toggle"
+        @click.stop="backToMedium"
+      >
+        查看中图
+      </button>
+      <!-- 图片加载失败占位 -->
+      <div v-if="previewFailed" class="image-message__preview-failed">
+        图片加载失败
+      </div>
       <!-- 下载按钮 -->
       <button
         class="image-message__download-btn"
@@ -354,6 +484,57 @@ async function handleDownload(event: MouseEvent) {
   max-height: 90vh;
   object-fit: contain;
   border-radius: 4px;
+}
+
+/* 预览层加载高清提示 */
+.image-message__preview-tip {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: 16px;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  z-index: 3001;
+  pointer-events: none;
+}
+
+/* 预览层中图/原图切换按钮（底部统一入口，文案直接说明点击结果） */
+.image-message__preview-toggle {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: 16px;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  z-index: 3001;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.image-message__preview-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* 预览层加载失败占位 */
+.image-message__preview-failed {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 14px;
+  z-index: 3001;
+  pointer-events: none;
 }
 
 /* 预览层下载按钮 */
