@@ -316,16 +316,19 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
             @close="activeMoreMenu = false"
           >
             <div class="group-member-list__context-menu">
-              <div
+              <Cell
                 v-for="action in getMoreActions(props.member)"
                 :key="action.key"
-                class="group-member-list__context-menu-item"
-                :class="{ 'group-member-list__context-menu-item--danger': action.danger }"
+                size="compact"
+                :inset-hover="false"
+                :danger="action.danger"
+                :title="action.label"
                 @click.stop="onMoreActionClick(props.member, action.key)"
               >
-                <Icon :name="action.icon" :size="16" />
-                <span>{{ action.label }}</span>
-              </div>
+                <template #leading>
+                  <Icon :name="action.icon" :size="18" />
+                </template>
+              </Cell>
             </div>
           </Popup>
         </div>
@@ -463,28 +466,10 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 .group-member-list__context-menu {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
-  padding: 6px;
-}
-
-.group-member-list__context-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  font-size: 14px;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  white-space: nowrap;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.group-member-list__context-menu-item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
-
-.group-member-list__context-menu-item--danger {
-  color: #ef4444;
+  min-width: 140px;
+  padding: 4px;
+  /* 卡片内操作项：紧凑 padding + hover 背景顶满 */
+  --uikit-item-hover-padding-x: 12px;
+  --uikit-cell-height-compact: 40px;
 }
 </style>
