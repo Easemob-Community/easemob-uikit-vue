@@ -1168,6 +1168,9 @@ defineExpose({
   min-height: 0;
   overflow: hidden;
   background-color: var(--uikit-bg-base);
+  border-radius: var(--uikit-components-radius, 12px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--uikit-border-light, rgba(0, 0, 0, 0.04));
 }
 
 .chat-info-drawer__section--admin-actions {
