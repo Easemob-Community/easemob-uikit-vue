@@ -195,7 +195,9 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         case 'conversation':
           stores.conversation.setSyncingConversations(false)
           {
-            const incoming = toUiConversations(client.chatManager.getConversationList())
+            const rawItems = client.chatManager.getConversationList()
+            chatLog.info('getConversationList raw (onSyncDataFinished)', rawItems)
+            const incoming = toUiConversations(rawItems)
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
           }
@@ -221,6 +223,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onConversationListUpdate: (payload) => {
       chatLog.info('onConversationListUpdate', { count: payload.items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
+      chatLog.info('getConversationList raw (onConversationListUpdate)', payload.items)
       // 诊断：打印 combine/unknown snippet 的 SDK 原始形态（定位合并消息预览空白）
       {
         const typeCount: Record<string, number> = {}
