@@ -25,6 +25,7 @@ export default defineConfig({
       { text: '组件', link: '/components/button' },
       { text: '主题定制', link: '/guide/theme' },
       { text: 'H5 适配', link: '/guide/h5-adaptation' },
+      { text: '更新日志', link: '/guide/changelog' },
       { text: 'GitHub', link: 'https://github.com/easemob/easemob-uikit-vue' },
     ],
 
@@ -39,6 +40,7 @@ export default defineConfig({
             { text: 'H5 适配', link: '/guide/h5-adaptation' },
             { text: '进阶指南', link: '/guide/advanced' },
             { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
+            { text: '更新日志', link: '/guide/changelog' },
           ],
         },
       ],

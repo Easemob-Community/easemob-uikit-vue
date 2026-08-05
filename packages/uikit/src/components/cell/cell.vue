@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<CellProps>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'click'): void
+  (e: 'click', event: MouseEvent): void
   (e: 'contextmenu', event: MouseEvent): void
 }>()
 
@@ -63,10 +63,10 @@ const rootClass = computed(() => ({
   'is-inset-hover': props.insetHover,
 }))
 
-function onClick() {
+function onClick(e: MouseEvent) {
   if (props.disabled)
     return
-  emit('click')
+  emit('click', e)
 }
 
 function onContextmenu(e: MouseEvent) {

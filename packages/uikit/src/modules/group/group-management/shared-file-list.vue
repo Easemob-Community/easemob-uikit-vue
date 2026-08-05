@@ -7,6 +7,7 @@ import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
 import { useViewport } from '../../../composables/use-viewport'
+import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import Empty from '../../../components/empty/empty.vue'
@@ -131,6 +132,12 @@ async function onFileSelected(event: Event) {
       }
     }
     showToast(t('group.sharedFile.uploadSuccess') || '上传成功', 'success')
+    // 发布方本地插入灰色通知：SDK 的 onSharedFileAdded 事件不回推操作者本人，
+    // 与接收方文案保持一致（带上传者与文件名）
+    const noticeText = t('chat.notice.sharedFileAdded')
+      .replace('{name}', t('chat.notice.you'))
+      .replace('{fileName}', file.name)
+    insertChatNotice(stores, props.groupId, 'groupChat', noticeText)
   }
   catch (err) {
     console.warn('[SharedFileList] upload failed:', formatSdkError(err))

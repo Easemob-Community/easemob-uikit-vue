@@ -951,6 +951,9 @@ onBeforeUnmount(() => {
   font-size: 12px;
   text-align: center;
   width: 100%;
+  /* 公告等长内容通知：保留换行并允许长单词折行 */
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* 已撤回消息：居中灰色提示 */

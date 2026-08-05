@@ -8,6 +8,7 @@ import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { useToast } from '../../composables/use-toast'
+import { insertChatNotice } from '../../sdk/event/notice-utils'
 
 export interface GroupDetailProps {
   /** 群 ID */
@@ -109,8 +110,17 @@ async function saveName() {
     return
   savingName.value = true
   try {
+    // 记录旧群名（updateGroupInfo 会同步更新 store，必须先取）
+    const prevGroupName = stores.group.getGroupById(props.groupId)?.groupName
     await updateGroupInfo(props.groupId, { name: nameInput.value })
     isEditingName.value = false
+    // 发布方本地插入灰色通知（SDK 事件不回推操作者本人），仅名称实际变更时插入
+    if (prevGroupName && prevGroupName !== nameInput.value) {
+      insertChatNotice(stores, props.groupId, 'groupChat', t('chat.notice.groupNameChanged').replace('{name}', nameInput.value))
+    }
+    // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
+    // 否则需刷新（重新同步会话）才能看到新群名
+    stores.conversation.updateConversation(props.groupId, { name: nameInput.value })
     showToast(t('chat.info.groupInfoUpdated') || '更新成功')
   }
   catch (err) {

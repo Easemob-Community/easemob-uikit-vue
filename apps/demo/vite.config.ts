@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { defineConfig } from 'vite'
@@ -9,10 +9,18 @@ import AutoImport from 'unplugin-auto-import/vite'
 
 function getSdkVersion(): string {
   const _require = createRequire(import.meta.url)
-  const sdkMainPath = _require.resolve('easemob-websdk')
-  const sdkPackagePath = resolve(dirname(sdkMainPath), '../package.json')
-  const sdkPackage = JSON.parse(readFileSync(sdkPackagePath, 'utf-8')) as { version?: string }
-  return sdkPackage.version ?? 'unknown'
+  let dir = dirname(_require.resolve('easemob-websdk'))
+  // 向上查找 easemob-websdk 的 package.json（兼容旧版 dist 入口与新版根目录入口）
+  while (dir !== dirname(dir)) {
+    const sdkPackagePath = resolve(dir, 'package.json')
+    if (existsSync(sdkPackagePath)) {
+      const sdkPackage = JSON.parse(readFileSync(sdkPackagePath, 'utf-8')) as { name?: string, version?: string }
+      if (sdkPackage.name === 'easemob-websdk')
+        return sdkPackage.version ?? 'unknown'
+    }
+    dir = dirname(dir)
+  }
+  return 'unknown'
 }
 
 function getUIKitVersion(): string {
