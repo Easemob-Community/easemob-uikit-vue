@@ -27,6 +27,8 @@ export interface CellProps {
   autoHeight?: boolean
   /** 危险操作样式（文字/图标显示为红色） */
   danger?: boolean
+  /** hover 背景是否内缩（默认 true，卡片内操作项可设为 false 使 hover 背景顶满） */
+  insetHover?: boolean
 }
 
 const props = withDefaults(defineProps<CellProps>(), {
@@ -39,6 +41,7 @@ const props = withDefaults(defineProps<CellProps>(), {
   border: false,
   autoHeight: false,
   danger: false,
+  insetHover: true,
 })
 
 const emit = defineEmits<{
@@ -57,6 +60,7 @@ const rootClass = computed(() => ({
   [`size-${props.size}`]: true,
   'has-subtitle': !!props.subtitle,
   'is-danger': props.danger,
+  'is-inset-hover': props.insetHover,
 }))
 
 function onClick() {
@@ -163,8 +167,8 @@ function onContextmenu(e: MouseEvent) {
 .uikit-cell::before {
   content: '';
   position: absolute;
-  /* 水平方向保留内缩，垂直方向顶满 cell 高度，避免 hover 背景上下露出空白 */
-  inset: 0 calc(var(--uikit-item-hover-padding-x, 16px) / 2);
+  /* 默认顶满整个 cell；.is-inset-hover 下水平方向保留内缩，保持列表项 hover 不贴边 */
+  inset: 0;
   border-radius: var(--uikit-item-hover-radius, 0px);
   background-color: var(--uikit-bg-hover);
   z-index: -1;
@@ -173,6 +177,10 @@ function onContextmenu(e: MouseEvent) {
     opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
     background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   pointer-events: none;
+}
+
+.uikit-cell.is-inset-hover::before {
+  inset: 0 calc(var(--uikit-item-hover-padding-x, 16px) / 2);
 }
 
 /* 交互状态 */

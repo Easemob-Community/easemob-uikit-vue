@@ -429,11 +429,12 @@
 - **证据**：
   - `conversation-item.vue`：`padding: 12px var(...)` + `transition: background-color 0.15s`（硬编码）
   - `contact-item-default.vue` / `group-item-default.vue`：几乎相同的 props/CSS/模板，仅数据源不同
-  - `group-management-section.vue` L370-L378：`padding: 10px 12px`，未走 `--uikit-item-hover-*`
-  - `chat-info-drawer.vue` L775-L788：`action-row` 同样 `padding: 10px 12px`
+  - `group-management-section.vue` 操作行：`padding: 10px 12px` 硬编码，未走 `--uikit-item-hover-*`
+  - `chat-info-drawer.vue` 群主操作行：同上
 - **修复**：
   - `contact-item-default.vue`、`group-item-default.vue` 已基于 `EmCell` 重构；
-  - `group-management-section.vue`、`chat-info-drawer.vue` 操作行、`group-member-list.vue` 成员项、`create-group-modal.vue` 已选联系人、`presence-selector.vue` 选项、`block-list.vue` 成员项、`pinned-bar.vue` 展开项、`combine-message-modal-item.vue` 消息摘要项均已改用 `EmCell`；
+  - `group-member-list.vue` 成员项、`create-group-modal.vue` 已选联系人、`presence-selector.vue` 选项、`block-list.vue` 成员项、`pinned-bar.vue` 展开项、`combine-message-modal-item.vue` 消息摘要项均已改用 `EmCell`；
+  - `group-management-section.vue`、`chat-info-drawer.vue` 群主操作行已改用 `EmCell`，通过 `:inset-hover="false"` + 局部 `--uikit-item-hover-padding-x: 12px` + `--uikit-cell-height-compact: 40px` 实现卡片内操作项的顶满 hover 效果，并沉淀为 `uikit-cell-contract` 的「卡片内操作项模式」；
   - `conversation-item.vue` 的 transition 已改用 `var(--uikit-anim-duration/easing)`，其 `padding` 因 `auto-height` 模式需要保持 `12px var(...)`；
   - 所有 cell 类组件统一使用 `--uikit-item-hover-*` / `--uikit-anim-*` 变量。
 - **关联 skill**：`uikit-cell-contract` / `uikit-component-authoring` / `uikit-styling-theming`

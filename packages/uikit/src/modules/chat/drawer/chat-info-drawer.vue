@@ -7,6 +7,7 @@ import IconButton from '../../../components/icon-button/icon-button.vue'
 import Modal from '../../../components/modal/modal.vue'
 import Button from '../../../components/button/button.vue'
 import CopyableText from '../../../components/copyable-text/copyable-text.vue'
+import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useContact } from '../../../composables/use-contact'
 import { useToast } from '../../../composables/use-toast'
@@ -794,14 +795,26 @@ defineExpose({
             {{ t('chat.info.groupAdminActions') || '群主操作' }}
           </div>
           <div class="chat-info-drawer__section chat-info-drawer__section--admin-actions">
-            <button class="chat-info-drawer__admin-action" @click="onViewMembersForTransfer">
-              <Icon name="actions/crown" :size="18" />
-              <span>{{ t('chat.info.transferOwnerEntry') || '转让群主' }}</span>
-            </button>
-            <button class="chat-info-drawer__admin-action" @click="onViewMembersForAdmin">
-              <Icon name="actions/shield" :size="18" />
-              <span>{{ t('chat.info.setAdminEntry') || '设置管理员' }}</span>
-            </button>
+            <Cell
+              :title="t('chat.info.transferOwnerEntry') || '转让群主'"
+              size="compact"
+              :inset-hover="false"
+              @click="onViewMembersForTransfer"
+            >
+              <template #leading>
+                <Icon name="actions/crown" :size="18" />
+              </template>
+            </Cell>
+            <Cell
+              :title="t('chat.info.setAdminEntry') || '设置管理员'"
+              size="compact"
+              :inset-hover="false"
+              @click="onViewMembersForAdmin"
+            >
+              <template #leading>
+                <Icon name="actions/shield" :size="18" />
+              </template>
+            </Cell>
           </div>
         </div>
 
@@ -1127,29 +1140,13 @@ defineExpose({
   display: flex;
   flex-direction: column;
   padding: 4px;
+  /* 卡片内操作项：紧凑 padding + hover 背景顶满 */
+  --uikit-item-hover-padding-x: 12px;
+  --uikit-cell-height-compact: 40px;
 }
 
 .chat-info-drawer__section--management {
-  padding: 4px;
-}
-
-.chat-info-drawer__admin-action {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  color: var(--uikit-text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color 0.15s;
-  text-align: left;
-}
-
-.chat-info-drawer__admin-action:hover {
-  background-color: var(--uikit-bg-hover);
+  padding: 0;
 }
 
 .chat-info-drawer__confirm-body {

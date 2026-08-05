@@ -135,6 +135,8 @@ export interface CellProps {
   border?: boolean | 'top' | 'bottom'
   /** 内容驱动高度（而非固定高度） */
   autoHeight?: boolean
+  /** hover 背景是否内缩（默认 true）；卡片内操作项建议设为 false，使 hover 背景顶满整个 cell */
+  insetHover?: boolean
 }
 ```
 
@@ -178,7 +180,45 @@ export interface CellProps {
   </template>
   <template #default>清空聊天记录</template>
 </EmCell>
+
+<!-- 卡片内操作项（hover 背景顶满） -->
+<div class="action-card">
+  <EmCell size="compact" :inset-hover="false" title="禁言列表" :meta="'3'" showArrow>
+    <template #leading>
+      <Icon name="actions/ban" :size="18" />
+    </template>
+  </EmCell>
+  <EmCell size="compact" :inset-hover="false" title="黑名单" showArrow>
+    <template #leading>
+      <Icon name="actions/user-x" :size="18" />
+    </template>
+  </EmCell>
+</div>
 ```
+
+### 卡片内操作项模式
+
+在圆角卡片/section 内部使用操作项时，希望 hover 背景**顶满整个条目**、视觉上与卡片边缘保持统一内边距，而不是列表项那种"两侧留白"的内缩 hover。
+
+使用规范：
+
+1. `EmCell` 设置 `:inset-hover="false"` + `size="compact"`。
+2. 外层容器负责内边距与局部变量，使 cell 在该容器内呈现紧凑、顶满的 hover 效果：
+
+```css
+.action-card {
+  padding: 4px;
+  /* 让 cell 在该容器内使用更紧凑的横向 padding */
+  --uikit-item-hover-padding-x: 12px;
+  /* 需要时可将 compact 高度压到 40px */
+  --uikit-cell-height-compact: 40px;
+}
+```
+
+3. 图标使用 `:size="18"`，统一放在 `#leading` 插槽。
+4. 计数/箭头通过 `meta` / `showArrow` prop 渲染，保持 trailing 对齐。
+
+**禁止**：在卡片内为了"好看"而自行写 `<button>` 并硬编码 `padding/border-radius/transition`（见 TECH-DEBT D36）。应通过 `EmCell` + CSS 变量实现。
 
 ## 7. 何时用 EmCell vs 自行实现
 
@@ -199,8 +239,8 @@ export interface CellProps {
 | `conversation-item.vue` | padding 用 `12px var(...)` 而非 height 体系；transition 硬编码 | 改 `var(--uikit-anim-duration)` |
 | `contact-item-default.vue` | 与 `group-item-default.vue` ~90% 重复 | 基于 `EmCell` 重构 |
 | `group-item-default.vue` | 同上 | 基于 `EmCell` 重构 |
-| `group-management-section.vue` | item 用 `padding: 10px 12px`，未走 `--uikit-item-hover-*` | 改用 `EmCell` 或修正 CSS 变量 |
-| `chat-info-drawer.vue` action-row | 同上 | 改用 `EmCell` 或修正 CSS 变量 |
+| `group-management-section.vue` | ✅ 已改用 `EmCell` + `:inset-hover="false"` + 局部 `--uikit-item-hover-padding-x` | — |
+| `chat-info-drawer.vue` action-row | ✅ 已改用 `EmCell` + `:inset-hover="false"` + 局部 `--uikit-item-hover-padding-x` | — |
 | `contact-detail.vue` info-row | 用 `border-bottom` 而非统一分隔线 | 用 `EmCell border="bottom"` |
 
 迁移优先级：先修 CSS 变量不一致（视觉立竿见影），再逐步基于 EmCell 重构。
