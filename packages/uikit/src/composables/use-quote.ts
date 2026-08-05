@@ -24,29 +24,29 @@ const highlightedMessageId = ref<string>('')
 /** 模块级单例：定位请求 token —— 列表端 watch 该值进行滚动定位与未找到提示 */
 const locateRequest = ref<{ msgID: string, token: number } | null>(null)
 
-/** 生成引用预览文本（使用【】兜底标签，去掉 emoji/icon 前缀） */
+/** 生成引用预览文本（使用 [] 兜底标签，去掉 emoji/icon 前缀） */
 export function getQuotePreview(message: UiMessage): string {
   switch (message.type) {
     case 'text':
       return (message.body as TextMessageBody).content || ''
     case 'image':
-      return '【图片】'
+      return '[图片]'
     case 'voice':
-      return '【语音】'
+      return '[语音]'
     case 'video':
-      return '【视频】'
+      return '[视频]'
     case 'file': {
       const filename = (message.body as FileMessageBody).filename
-      return filename || '【文件】'
+      return filename || '[文件]'
     }
     case 'location':
-      return '【位置】'
+      return '[位置]'
     case 'custom':
-      return '【自定义消息】'
+      return '[自定义消息]'
     case 'cmd':
-      return '【指令】'
+      return '[指令]'
     default:
-      return '【消息】'
+      return '[消息]'
   }
 }
 

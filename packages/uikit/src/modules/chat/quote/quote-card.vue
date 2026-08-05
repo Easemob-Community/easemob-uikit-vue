@@ -27,9 +27,9 @@ const thumbUrl = computed(() => props.quote.msgThumbUrl || '')
 /** 非媒体类型或没有缩略图时展示的兜底文案 */
 const fallbackPreview = computed(() => {
   if (props.quote.msgType === 'image')
-    return '【图片】'
+    return '[图片]'
   if (props.quote.msgType === 'video')
-    return '【视频】'
+    return '[视频]'
   return props.quote.msgPreview
 })
 
