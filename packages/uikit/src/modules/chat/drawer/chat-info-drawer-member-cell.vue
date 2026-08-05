@@ -36,11 +36,6 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
   padding: 6px 2px;
   cursor: pointer;
   border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
-}
-
-.chat-info-drawer__member-cell:hover {
-  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary));
 }
 
 .chat-info-drawer__member-name {
