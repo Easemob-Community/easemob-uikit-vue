@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { formatSdkError } from '../../utils/sdk-error'
+import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
@@ -39,6 +40,7 @@ interface ManagementEntry {
   key: ManagementKey
   label: string
   show: boolean
+  icon: string
   count?: number
 }
 
@@ -94,6 +96,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'mute',
       label: t('group.management.muteList') || '禁言列表',
       show: true,
+      icon: 'actions/ban',
       count: (stores.group.groupMuteListMap[id] || []).length,
     })
   }
@@ -103,6 +106,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'block',
       label: t('group.management.blocklist') || '黑名单',
       show: true,
+      icon: 'actions/user-x',
       count: (stores.group.groupBlocklistMap[id] || []).length,
     })
   }
@@ -112,6 +116,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'allow',
       label: t('group.management.allowlist') || '白名单',
       show: true,
+      icon: 'actions/user-check',
       count: (stores.group.groupAllowlistMap[id] || []).length,
     })
   }
@@ -121,6 +126,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'files',
       label: t('group.management.sharedFiles') || '共享文件',
       show: true,
+      icon: 'files-media/folder',
       count: (stores.group.groupSharedFilesMap[id] || []).length,
     })
   }
@@ -130,6 +136,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'requests',
       label: t('group.management.joinRequests') || '入群申请',
       show: true,
+      icon: 'people/person_add',
       count: (stores.group.groupJoinRequestsMap[id] || []).length,
     })
   }
@@ -184,8 +191,11 @@ function closeDrawer() {
       :clickable="false"
       size="compact"
       :title="t('group.management.muteAll') || '全员禁言'"
-      class="group-management-section__switch-cell"
+      class="group-management-section__cell"
     >
+      <template #leading>
+        <Icon name="actions/lock" :size="18" />
+      </template>
       <template #trailing>
         <label class="group-management-section__toggle">
           <input
@@ -208,8 +218,13 @@ function closeDrawer() {
         :meta="entry.count ? String(entry.count) : undefined"
         show-arrow
         size="compact"
+        class="group-management-section__cell"
         @click="openDrawer(entry.key)"
-      />
+      >
+        <template #leading>
+          <Icon :name="entry.icon" :size="18" />
+        </template>
+      </Cell>
     </div>
 
     <!-- 二级抽屉 -->
@@ -378,11 +393,25 @@ function closeDrawer() {
 <style scoped>
 .group-management-section {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .group-management-section__entries {
   display: flex;
   flex-direction: column;
+}
+
+/* 与 chat-info-drawer__admin-action 布局/样式完全对齐 */
+.group-management-section :deep(.uikit-cell) {
+  height: auto;
+  min-height: 40px;
+  padding: 10px 12px;
+  gap: 10px;
+  border-radius: var(--uikit-components-radius, 8px);
+  --uikit-cell-gap: 0px;
+  --uikit-item-hover-padding-x: 12px;
+  --uikit-item-hover-radius: 8px;
 }
 
 /* 全员禁言开关 */
