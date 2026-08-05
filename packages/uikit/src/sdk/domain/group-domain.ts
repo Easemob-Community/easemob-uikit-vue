@@ -357,12 +357,6 @@ export class GroupDomain {
     await this.client.groupManager.rejectGroupJoinRequest({ groupId, userId, reason })
   }
 
-  /** 获取公开群列表 */
-  async getPublicGroupList(params?: { cursor?: string, pageSize?: number }) {
-    const result = await this.client.groupManager.getPublicGroupList(params)
-    return result
-  }
-
   /** 拒绝群邀请 */
   async declineGroupInvitation(groupId: string) {
     await this.client.groupManager.rejectInvitation({ groupId })

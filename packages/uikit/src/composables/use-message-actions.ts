@@ -147,9 +147,8 @@ export function useMessageActions() {
 
     messageStore.setVoiceTranscribing(msgId, true)
     try {
-      const result = await domains.message.transcribeVoiceMessage(message, {
-        format: resolveVoiceFormat(body),
-      })
+      // 不传 voiceParams：SDK 默认按自身逻辑处理语音格式，避免传入与采集格式不一致的 format 导致 400
+      const result = await domains.message.transcribeVoiceMessage(message)
       const text = result?.text
       if (typeof text === 'string' && text.length > 0) {
         messageStore.setVoiceText(msgId, { text })
@@ -246,16 +245,6 @@ function resolveTranslateLang(targetLang?: string): string {
   if (targetLang?.trim())
     return targetLang.trim()
   return 'en'
-}
-
-/** 根据语音 url 后缀推断转文字格式，兜底 amr */
-function resolveVoiceFormat(body: VoiceMessageBody): string {
-  const url = body.url || ''
-  const ext = url.split('.').pop()?.toLowerCase()
-  if (ext && ['amr', 'mp3', 'wav', 'm4a', 'aac'].includes(ext))
-    return ext
-  // SDK createVoiceMessage 默认使用 amr，无后缀时按 amr 兜底
-  return 'amr'
 }
 
 /** 根据 SDK 语音转文字错误提取友好提示文案 */

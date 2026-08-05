@@ -7,6 +7,7 @@ import { formatSdkError } from '../../utils/sdk-error'
 
 const combineLogger = createLogger('Combine')
 const historyLogger = createLogger('History')
+const messageLogger = createLogger('MessageDomain')
 
 /** 上传进度回调写入 store 的最小间隔（ms），避免 XHR progress 事件高频触发整列表重渲染 */
 const PROGRESS_FLUSH_INTERVAL = 150
@@ -489,6 +490,8 @@ export class MessageDomain {
       ...(message.body as Record<string, unknown>),
       type: (message.body as Record<string, unknown>)?.type ?? message.type,
     } as any
+    // 打印转入语音转文字的原始入参，便于定位 url/fileId/format 等参数问题
+    messageLogger.info('voiceMessageToText raw input:', { message, body, voiceParams })
     const result = await this.client.chatManager.voiceMessageToText(body, voiceParams)
     return result
   }

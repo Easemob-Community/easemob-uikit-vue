@@ -46,6 +46,7 @@ const SDK_ERROR_CODE_I18N_MAP: Record<number, string> = {
   219: 'error.userMutedByAdmin',
   220: 'error.deviceChanged',
   221: 'error.notOnRoster',
+  222: 'error.messageBlockedByRecipient',
 
   // 文件 / 附件 / 上传
   400: 'error.fileNotFound',

@@ -59,6 +59,7 @@ const messages: LocaleMessages = {
   'error.contactReachLimit': '好友数量已达上限',
   'error.contactReachLimitPeer': '对方好友数量已达上限',
   'error.contactBlocked': '对方已拒绝您的好友请求',
+  'error.messageBlockedByRecipient': '消息已被对方拒收',
   'error.translateUsageLimit': '翻译用量已达上限',
   'error.translateFailed': '翻译失败，请稍后重试',
   'error.moderationFailed': '内容审核未通过',

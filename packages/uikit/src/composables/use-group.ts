@@ -288,11 +288,6 @@ export function useGroup() {
     await domains.group.rejectGroupJoinRequest(groupId, userId, reason)
   }
 
-  /** 获取公开群列表 */
-  async function getPublicGroupList(params?: { cursor?: string, pageSize?: number }) {
-    return domains.group.getPublicGroupList(params)
-  }
-
   /** 刷新群组列表（重新拉取） */
   async function refresh() {
     await fetchGroups()
@@ -376,7 +371,6 @@ export function useGroup() {
     downloadGroupSharedFile,
     acceptGroupJoinRequest,
     rejectGroupJoinRequest,
-    getPublicGroupList,
     refresh,
     loadMore,
     fetchJoinedGroupCount,

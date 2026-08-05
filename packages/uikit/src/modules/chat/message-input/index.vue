@@ -403,6 +403,73 @@ let isVoiceCancelled = false
 /** 录音启动期间被要求停止的标志 */
 let shouldCancelVoice = false
 
+/**
+ * 将音频 Blob 转换为 WAV 格式
+ * 使用 Web Audio API 解码后重新编码为 WAV，确保语音转文字服务兼容
+ */
+async function convertToWav(audioBlob: Blob): Promise<Blob> {
+  const audioContext = new AudioContext()
+  try {
+    const arrayBuffer = await audioBlob.arrayBuffer()
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+
+    const numberOfChannels = audioBuffer.numberOfChannels
+    const sampleRate = audioBuffer.sampleRate
+    const format = 1 // PCM
+    const bitDepth = 16
+    const bytesPerSample = bitDepth / 8
+    const blockAlign = numberOfChannels * bytesPerSample
+
+    const length = audioBuffer.length
+    const dataSize = length * numberOfChannels * bytesPerSample
+    const buffer = new ArrayBuffer(44 + dataSize)
+    const view = new DataView(buffer)
+
+    // WAV 文件头
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i))
+      }
+    }
+
+    writeString(0, 'RIFF')
+    view.setUint32(4, 36 + dataSize, true)
+    writeString(8, 'WAVE')
+    writeString(12, 'fmt ')
+    view.setUint32(16, 16, true)
+    view.setUint16(20, format, true)
+    view.setUint16(22, numberOfChannels, true)
+    view.setUint32(24, sampleRate, true)
+    view.setUint32(28, sampleRate * blockAlign, true)
+    view.setUint16(32, blockAlign, true)
+    view.setUint16(34, bitDepth, true)
+    writeString(36, 'data')
+    view.setUint32(40, dataSize, true)
+
+    // 写入 PCM 数据
+    const offset = 44
+    const channels: Float32Array[] = []
+    for (let i = 0; i < numberOfChannels; i++) {
+      channels.push(audioBuffer.getChannelData(i))
+    }
+
+    let index = 0
+    for (let i = 0; i < length; i++) {
+      for (let channel = 0; channel < numberOfChannels; channel++) {
+        const sample = Math.max(-1, Math.min(1, channels[channel][i]))
+        const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF
+        view.setInt16(offset + index, intSample, true)
+        index += 2
+      }
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' })
+  }
+  finally {
+    audioContext.close()
+  }
+}
+
 /** 开始录音 */
 async function handleVoiceStart() {
   isVoiceCancelled = false
@@ -461,24 +528,32 @@ function handleVoiceEnd(durationFromInput?: number) {
     voiceStream?.getTracks().forEach(track => track.stop())
 
     if (!isVoiceCancelled && audioChunks.length > 0) {
-      const blob = new Blob(audioChunks, { type: 'audio/webm' })
-      const ext = buildExtWithQuote()
-      // beforeSend 拦截
-      const canSend = await runBeforeSend({ type: 'voice' })
-      if (!canSend) {
+      try {
+        const recordedBlob = new Blob(audioChunks, { type: 'audio/webm' })
+        // 转换为 WAV 格式以兼容语音转文字服务（支持 AMR/MP3/WAV/M4A/AAC）
+        const wavBlob = await convertToWav(recordedBlob)
+        const ext = buildExtWithQuote()
+        // beforeSend 拦截
+        const canSend = await runBeforeSend({ type: 'voice' })
+        if (!canSend) {
+          clearQuote()
+          return
+        }
+        sendAudioMessage(new File([wavBlob], 'voice.wav', { type: 'audio/wav' }), actualDuration, undefined, ext)
+          .then((msg) => {
+            emit('send-success')
+            runAfterSend(msg)
+          })
+          .catch((e: any) => {
+            console.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
+            showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+          })
         clearQuote()
-        return
       }
-      sendAudioMessage(new File([blob], 'voice.webm', { type: blob.type }), actualDuration, undefined, ext)
-        .then((msg) => {
-          emit('send-success')
-          runAfterSend(msg)
-        })
-        .catch((e: any) => {
-          console.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
-          showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
-        })
-      clearQuote()
+      catch (err) {
+        console.error('[MessageInput] 语音格式转换失败:', formatSdkError(err))
+        showToast('语音处理失败，请重试')
+      }
     }
 
     audioChunks = []

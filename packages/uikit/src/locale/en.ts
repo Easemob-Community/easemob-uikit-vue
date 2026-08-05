@@ -59,6 +59,7 @@ const messages: LocaleMessages = {
   'error.contactReachLimit': 'Contact limit reached',
   'error.contactReachLimitPeer': 'The user\'s contact limit reached',
   'error.contactBlocked': 'The user has declined your contact request',
+  'error.messageBlockedByRecipient': 'Message has been blocked by the recipient',
   'error.translateUsageLimit': 'Translation usage limit reached',
   'error.translateFailed': 'Translation failed, please try again later',
   'error.moderationFailed': 'Content moderation failed',
