@@ -208,11 +208,6 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     onAnnouncementChanged: (payload: GroupAnnouncementChangedEventPayload) => {
       groupLog.info('onAnnouncementChanged', { groupId: payload.groupId, announcement: payload.announcement })
       stores.group.updateGroup(payload.groupId, { announcement: payload.announcement })
-      // 记录公告历史（SDK 事件通常不带发布者，updater 为空）
-      stores.group.addGroupAnnouncementHistory(payload.groupId, {
-        content: payload.announcement || '',
-        updateTime: Date.now(),
-      })
       // 插入系统通知到群聊（带上最新公告内容，SDK 事件不回推操作者本人）
       insertChatNotice(stores, payload.groupId, 'groupChat', buildAnnouncementNoticeText(payload.announcement))
     },

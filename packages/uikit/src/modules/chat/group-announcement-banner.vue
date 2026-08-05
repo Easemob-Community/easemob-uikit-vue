@@ -3,7 +3,6 @@ import { computed, ref } from 'vue'
 import Icon from '../../components/icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
-import { useUserInfo } from '../../composables/use-user-info'
 
 export interface GroupAnnouncementBannerProps {
   groupId: string
@@ -15,26 +14,8 @@ const { t } = useLocale()
 const { stores } = useUIKit()
 
 const announcement = computed(() => stores.group.getGroupAnnouncement(props.groupId))
-const history = computed(() => stores.group.getGroupAnnouncementHistory(props.groupId))
-const latestMeta = computed(() => history.value[0])
-
 const collapsed = ref(false)
-
 const hasAnnouncement = computed(() => !!announcement.value)
-
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-}
-
-const updaterName = computed(() => {
-  const updater = latestMeta.value?.updater
-  if (!updater)
-    return ''
-  const contact = stores.contact.getContact(updater)
-  const userInfo = stores.userInfo.getUserInfo(updater)
-  return contact?.remark || userInfo?.nickname || updater
-})
 </script>
 
 <template>
@@ -48,9 +29,6 @@ const updaterName = computed(() => {
       <div class="group-announcement-banner__content">
         <div class="group-announcement-banner__title">
           {{ t('chat.announcementBanner.title') || '群公告' }}
-          <span v-if="updaterName || latestMeta?.updateTime" class="group-announcement-banner__meta">
-            {{ updaterName }}{{ updaterName && latestMeta?.updateTime ? ' · ' : '' }}{{ latestMeta?.updateTime ? formatTime(latestMeta.updateTime) : '' }}
-          </span>
         </div>
         <div class="group-announcement-banner__text" :class="{ 'is-collapsed': collapsed }">
           {{ announcement }}
@@ -104,15 +82,6 @@ const updaterName = computed(() => {
   font-size: 12px;
   font-weight: 500;
   color: var(--uikit-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.group-announcement-banner__meta {
-  font-weight: 400;
-  color: var(--uikit-text-secondary);
-  opacity: 0.8;
 }
 
 .group-announcement-banner__text {
