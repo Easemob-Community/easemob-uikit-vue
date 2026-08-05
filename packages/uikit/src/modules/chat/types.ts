@@ -60,12 +60,14 @@ export interface ChatConfig {
   header?: {
     /** 是否显示 header，默认 true */
     visible?: boolean
-    /** 标题对齐方式，默认 'center' */
+    /** 标题对齐方式，默认 'center'；对单聊/群聊同时生效 */
     align?: HeaderAlign
     /** 是否启用自定义插槽，默认 false */
     customSlot?: boolean
     /** 是否显示头像，默认 false */
     showAvatar?: boolean
+    /** 是否显示群成员数后缀，默认 true；仅群聊生效 */
+    showMemberCount?: boolean
   }
   /** 消息列表配置 */
   messageList?: {

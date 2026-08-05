@@ -283,9 +283,6 @@ const showHeader = computed(() => headerConfig.value?.visible !== false)
 /** Header 对齐方式 */
 const headerAlign = computed(() => headerConfig.value?.align ?? 'center')
 
-/** 是否使用自定义 header 插槽 */
-const customHeaderSlot = computed(() => headerConfig.value?.customSlot ?? false)
-
 /** 是否显示 header 头像 */
 const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 
@@ -386,6 +383,16 @@ const conversationType = computed(() => currentConversation.value?.type)
 
 /** 是否是群聊 */
 const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
+
+/** 是否显示群成员数后缀 */
+const showHeaderMemberCount = computed(() => headerConfig.value?.showMemberCount ?? true)
+
+/** 当前群成员数（从 group store 读取） */
+const groupMemberCount = computed(() => {
+  if (!isGroupChat.value || !currentConversation.value)
+    return undefined
+  return stores.group.getGroupById(currentConversation.value.id)?.memberCount
+})
 
 /** 当前群是否全员禁言（仅对普通成员生效，群主/管理员不受影响） */
 const isMutedAll = computed(() => {
@@ -905,6 +912,10 @@ async function onRemoveAdmin(member: UiGroupMember) {
           <div class="chat__header-main">
             <slot name="header-title" :conversation="currentConversation">
               <span class="chat__title">{{ headerTitle }}</span>
+              <span
+                v-if="isGroupChat && showHeaderMemberCount && groupMemberCount != null"
+                class="chat__header-member-count"
+              >({{ groupMemberCount }})</span>
             </slot>
             <slot name="header-extra" :conversation="currentConversation" />
           </div>
@@ -1192,6 +1203,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
   font-size: 16px;
   font-weight: 600;
   color: var(--uikit-text-primary);
+}
+
+.chat__header-member-count {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--uikit-text-secondary);
+  white-space: nowrap;
 }
 
 .chat__header-search,
