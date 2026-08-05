@@ -1164,13 +1164,18 @@ defineExpose({
 }
 
 .chat-info-drawer__member-detail {
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
   background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius, 12px);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--uikit-border-light, rgba(0, 0, 0, 0.04));
+}
+
+/* 内容少时卡片高度由成员列表决定，不强制撑满抽屉；成员多时由外层 body 滚动 */
+.chat-info-drawer__member-detail .group-member-list {
+  height: auto;
 }
 
 .chat-info-drawer__section--admin-actions {
