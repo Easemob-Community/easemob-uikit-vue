@@ -66,6 +66,8 @@ export default defineConfig({
             { text: 'Modal 弹窗', link: '/components/modal' },
             { text: 'Popup 弹出层', link: '/components/popup' },
             { text: 'Toast 轻提示', link: '/components/toast' },
+            { text: 'StatusBanner 状态横幅', link: '/components/status-banner' },
+            { text: 'Notification 消息通知', link: '/components/notification' },
             { text: 'EmojiPicker 表情选择', link: '/components/emoji-picker' },
           ],
         },

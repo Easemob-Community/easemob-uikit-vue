@@ -58,11 +58,16 @@ function onSelect() {
 - `footerSticky`：`#footer` 插槽是否固定不随列表滚动，默认 `false`
 - `pullRefresh`：是否启用下拉刷新（H5），默认 `false`
 - `enablePresence`：单聊头像是否展示在线状态；不传则使用 Provider 全局配置
+- `tabs`：会话分栏 tab 集合，默认 `['all', 'unread', 'atMe', 'single', 'group']`；顺序即渲染优先级，传空数组可隐藏 tab 栏
+- `activeTab`：当前激活的分栏 tab，默认 `'all'`，支持 `v-model:active-tab` 双向绑定
+- `showStatusBanner`：是否展示连接/同步状态横幅（断网、连接中、同步中），默认 `true`
 - `draftStorage`：草稿存储模式，`'none'` 内存 / `'session'` 会话 / `'local'` 本地持久化，默认 `'none'`
 
 ## 事件
 
 - `conversation-select`：点击某个会话，参数 `conversation: Conversation`
+- `update:active-tab`：切换分栏 tab，参数 `tab: ConversationTabKey`（配合 `v-model:active-tab` 使用）
+- `reconnect`：断网/连接失败横幅被点击时触发，由业务方决定重连策略
 
 ## 插槽
 
@@ -70,6 +75,76 @@ function onSelect() {
 - `empty`：空列表状态，接收 `keyword` 等插槽属性
 - `body`：列表顶部附加内容，可通过 `body-sticky` 固定
 - `footer`：列表底部附加内容，可通过 `footer-sticky` 固定
+- `tabs`：完全接管分栏 tab 栏渲染，作用域提供 `{ tabs, activeTab, selectTab }`（`ConversationTabsSlotScope`）
+- `status-banner`：自定义连接/同步状态横幅，作用域提供当前横幅状态（`{ visible, type, loading, title, description, clickable }`）
+
+## 会话分栏
+
+会话列表内置「全部 / 未读 / @我 / 单聊 / 群组」五种分栏 tab，按需展示会话。
+
+### 半接管：通过 props 控制
+
+把 `tabs` / `active-tab` 绑定到组件上，tab 栏渲染走内置样式：
+
+```vue
+<script setup lang="ts">
+import { useConversationTabs } from '@easemob/uikit'
+
+// 业务只有单聊/群聊，不区分更多类型
+const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })
+</script>
+
+<template>
+  <em-conversation-container v-model:active-tab="activeTab" :tabs="tabs" />
+</template>
+```
+
+- `tabs` 为空数组时隐藏 tab 栏
+- 顺序即渲染优先级，例如 `['group', 'single']` 会把群组排到前面
+- `activeTab` 支持 `v-model:active-tab` 双向绑定，可在业务侧同步切换状态
+
+### 完全接管：通过 #tabs 插槽自绘
+
+传入 `#tabs` 插槽后，tab 栏完全由业务方渲染，作用域提供 `tabs` / `activeTab` / `selectTab`：
+
+```vue
+<template>
+  <em-conversation-container
+    v-model:active-tab="activeTab"
+    :tabs="tabs"
+  >
+    <template #tabs="{ tabs: tabList, activeTab: current, selectTab }">
+      <div class="my-tabs">
+        <button
+          v-for="tab in tabList"
+          :key="tab"
+          :class="{ active: tab === current }"
+          @click="selectTab(tab)"
+        >
+          {{ tabLabel(tab) }}
+        </button>
+      </div>
+    </template>
+  </em-conversation-container>
+</template>
+```
+
+### 类型与常量
+
+- `ConversationTabKey`：`'all' | 'unread' | 'atMe' | 'single' | 'group'`
+- `DEFAULT_CONVERSATION_TABS`：默认 tab 集合常量（顺序即渲染优先级）
+- `ConversationTabsSlotScope`：`#tabs` 插槽作用域类型 `{ tabs, activeTab, selectTab }`
+- `useConversationTabs(options)`：分栏状态 hook，返回 `{ tabs, activeTab, selectTab, isActive }`
+
+## 状态横幅
+
+断网、连接中或同步中时，搜索栏下方会展示内置状态横幅（默认开启，`show-status-banner` 可关闭）：
+
+- 断网：error 样式，可点击，点击触发 `reconnect` 事件，由业务方决定重连策略
+- 连接中：warning 样式 + loading 图标
+- 会话/消息同步中：info 样式
+
+需要自定义横幅时使用 `#status-banner` 插槽，接收当前状态（`visible` / `type` / `loading` / `title` / `description` / `clickable`）自行渲染；内置横幅基于 [StatusBanner 组件](./status-banner) 实现。
 
 ## 进阶
 

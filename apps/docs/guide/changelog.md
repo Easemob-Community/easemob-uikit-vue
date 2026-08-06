@@ -10,6 +10,71 @@
 
 :::
 
+## 1.5.0 (2026-08-06)
+
+### 🚨 重大变更
+
+#### 同步 `easemob-websdk` 至 `0.20.32`（5.0.0 线）
+
+- 适配 `onMembersJoined` 事件 `groupName` 参数类型变更
+- 完整迁移说明见 1.4.0 版本的 SDK 5.0.0 升级记录
+
+### ✨ 新增功能
+
+#### 会话分栏 tabs 能力
+
+会话列表支持按「全部 / 未读 / @我 / 单聊 / 群组」分栏展示：
+
+- `ConversationContainer` / `ConversationList` 新增 `tabs`（自定义 tab 集合，顺序即渲染优先级，空数组隐藏）与 `activeTab`（支持 `v-model:active-tab`）props
+- 新增 `#tabs` 插槽：作用域提供 `tabs` / `activeTab` / `selectTab`，可完全接管 tab 栏渲染
+- 新增 `useConversationTabs` hook，半接管（绑定 props）与完全接管（插槽自绘）两种用法
+- 导出 `ConversationTabKey` / `DEFAULT_CONVERSATION_TABS` / `ConversationTabsSlotScope` 类型与常量
+
+#### 状态横幅 StatusBanner
+
+- 新增 `EmStatusBanner` 状态横幅组件：`info / warning / error / success` 四种类型、`loading` 旋转图标、可关闭（`v-model:show`）、自定义图标与插槽
+- 会话列表接入连接/同步状态横幅：断网（可点击，触发 `reconnect` 事件）、连接中、同步中自动展示，`show-status-banner` 可关闭，`#status-banner` 插槽可自定义
+
+#### 消息通知组件补齐
+
+- 新增 `EmNotification` / `EmNotificationContainer` 桌面端消息通知组件与 `useNotification` 状态单例
+- 同一会话短时间窗口内连续消息自动合并为一张卡片，`unreadCount` 累计展示
+- 容器支持 `position`（右上/左上/顶部居中）与 `maxVisible`（同时展示上限）配置
+
+#### 主题：字号 token 体系与适老版（Phase 2）
+
+- 新增 `--uikit-font-size-*` 字号 token 体系与 `--uikit-font-scale` 全局缩放
+- `setFontSize()` / `setFontSizeScale()` 支持标准 / 大 / 特大（适老版）切换
+- Phase 2.5 完成低频文件字号 token 化，Badge 适配字号缩放
+
+#### 主题：高频语义 token
+
+- 新增气泡色 / 聊天背景 / 输入区背景语义 token：`setBubbleBg` / `setChatBg` / `setInputBg`（Provider `bubbleColor` / `chatBg` / `inputBg` 声明式配置）
+- `setBubbleBg(null)` 支持重置为默认主题色
+
+#### 主题：密度（density）能力
+
+- 新增 `Density` 三档：`compact` 紧凑 / `normal` 标准 / `comfortable` 宽松
+- `useTheme` 新增 `density` 状态与 `setDensity()`；Provider 支持 `theme.density` 声明式配置
+- 密度变量覆盖 Cell 高度、内边距、列表间距、Header、输入区、气泡、抽屉与按钮
+
+### 🎨 优化
+
+- 时间分隔线与系统提示不再跟随气泡色，保持独立视觉层级
+- 旧版 localStorage 缺少 `fontSizeScale` 时默认标准字号，避免迁移后异常放大
+- 清理 D3 / D4 / D12 主题 token 漂移技术债
+- Demo 外观面板增加语义 token 调试控件与单项恢复按钮
+- 全仓库枚举字符串统一提取为 `constants` 常量，禁止业务代码硬编码
+
+### 📚 文档
+
+- 新增 StatusBanner、Notification 组件文档页，文档站导航同步更新
+- 会话容器文档增补分栏 tabs 能力、状态横幅与新增 props / 插槽说明
+- 主题定制指南增补密度能力与语义 token 重置说明
+- 沉淀三份预研文档（Electron 持久化、主题能力审查、Demo 开发者模式）
+
+---
+
 ## 1.4.0 (2026-08-05)
 
 ### 🚨 重大变更

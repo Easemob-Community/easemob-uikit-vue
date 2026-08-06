@@ -57,6 +57,14 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 - `--uikit-font-scale`：全局字号缩放倍数（默认 `1`）
 - `--uikit-font-size-10` ~ `--uikit-font-size-22`：按像素基准 × 缩放倍数计算
 
+### 密度
+
+密度档变量（默认 `normal`），覆盖 Cell 高度、内边距、列表间距、Header 内边距、输入区、气泡、抽屉与按钮等尺寸：
+
+- `[data-uikit-density="compact"]`：紧凑档
+- `[data-uikit-density="normal"]`：标准档（默认）
+- `[data-uikit-density="comfortable"]`：宽松档
+
 ### 动画
 
 - `--uikit-anim-enabled`：全局动画开关（1 / 0）
@@ -144,6 +152,7 @@ const {
   animationEnabled,
   animationLevel,
   fontSizeScale,
+  density,
   setPrimaryColor,
   setAvatarShape,
   setBubbleShape,
@@ -177,8 +186,12 @@ setFontSize('xlarge')
 // 或直接指定缩放倍数
 setFontSizeScale(1.25)
 
+// 密度：紧凑 / 标准 / 宽松（信息密度控制）
+setDensity('compact') // 'compact' | 'normal' | 'comfortable'
+
 // 气泡色、聊天背景、输入区背景
 setBubbleBg('#f3f4f6', '#7c3aed')
+setBubbleBg(null) // 传 null 重置为默认主题色
 setChatBg('url(/chat-bg.png)')
 setInputBg('#ffffff')
 
@@ -208,6 +221,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
       gap: 12,
       shape: 'square',
       fontSize: 'xlarge', // 'normal' | 'large' | 'xlarge' 或具体倍数
+      density: 'compact', // 'compact' | 'normal' | 'comfortable'
       bubbleColor: { other: '#f3f4f6', self: '#7c3aed' },
       chatBg: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       inputBg: '#ffffff',
