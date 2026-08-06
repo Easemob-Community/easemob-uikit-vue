@@ -109,15 +109,10 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
 
   const { keyboardHeight, isKeyboardOpen } = useKeyboard()
 
-  /** 预留：字体缩放，后续 P2 接入 rem 体系时消费 */
+  /** 预留：字体缩放，现由 themeStore 统一接管 --uikit-font-scale；
+   * 此处保留计算值供 H5 逻辑读取，但不再直接写 CSS 变量，避免与 themeStore 冲突。
+   */
   const fontScale = computed(() => resolved.value.fontScale ?? 1)
-
-  // 将 fontScale 同步到 CSS 变量 --uikit-font-scale，驱动全局字号缩放
-  watch(fontScale, (scale) => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.style.setProperty('--uikit-font-scale', String(scale))
-    }
-  }, { immediate: true })
 
   return {
     config: resolved,

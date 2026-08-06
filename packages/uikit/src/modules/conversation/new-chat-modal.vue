@@ -149,7 +149,7 @@ watch(
 }
 
 .new-chat-modal__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -167,7 +167,7 @@ watch(
   left: 16px;
   right: 16px;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-danger-color, #ef4444);
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   border-radius: var(--uikit-components-radius, 8px);

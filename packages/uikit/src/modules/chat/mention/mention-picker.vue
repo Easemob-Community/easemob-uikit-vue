@@ -217,7 +217,7 @@ function onKeydown(e: KeyboardEvent) {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   background: transparent;
   color: var(--uikit-text-primary);
 }
@@ -271,7 +271,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .mention-picker__header-title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
 }
 

@@ -456,7 +456,7 @@ async function handleDownload(event: MouseEvent) {
   align-items: center;
   justify-content: center;
   background-color: var(--uikit-bg-secondary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -464,7 +464,7 @@ async function handleDownload(event: MouseEvent) {
   padding: 10px 14px;
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -496,7 +496,7 @@ async function handleDownload(event: MouseEvent) {
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   z-index: 3001;
   pointer-events: none;
 }
@@ -511,7 +511,7 @@ async function handleDownload(event: MouseEvent) {
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   z-index: 3001;
   border: none;
   cursor: pointer;
@@ -532,7 +532,7 @@ async function handleDownload(event: MouseEvent) {
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.75);
   color: #fff;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   z-index: 3001;
   pointer-events: none;
 }

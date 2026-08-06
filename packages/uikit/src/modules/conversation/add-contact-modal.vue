@@ -150,7 +150,7 @@ watch(
 }
 
 .add-contact-modal__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -168,12 +168,12 @@ watch(
 }
 
 .add-contact-modal__label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
 .add-contact-modal__error {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-danger-color, #ef4444);
 }
 

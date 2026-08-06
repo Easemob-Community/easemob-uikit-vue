@@ -536,7 +536,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 .context-menu__item {
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
@@ -556,7 +556,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 }
 
 .conversation-list__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -571,7 +571,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 .conversation-list__loading {
   padding: 12px 16px;
   text-align: center;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -582,7 +582,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
   gap: 8px;
   padding: 40px 16px;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -618,7 +618,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 .conversation-list__pull-refresh {
   padding: 12px 16px;
   text-align: center;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -633,7 +633,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   cursor: pointer;
 }

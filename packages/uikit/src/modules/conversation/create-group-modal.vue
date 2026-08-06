@@ -302,7 +302,7 @@ watch(
 }
 
 .create-group-modal__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -338,13 +338,13 @@ watch(
 }
 
 .create-group-modal__right-title {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
 .create-group-modal__right-count {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -364,7 +364,7 @@ watch(
 }
 
 .create-group-modal__label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -390,7 +390,7 @@ watch(
   background-color: var(--uikit-bg-secondary, #e5e7eb);
   color: var(--uikit-text-secondary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1;
   padding: 0;
   flex-shrink: 0;
@@ -403,7 +403,7 @@ watch(
 
 .create-group-modal__error {
   padding: 8px 16px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-danger-color, #ef4444);
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   flex-shrink: 0;

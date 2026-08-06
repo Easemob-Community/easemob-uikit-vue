@@ -11,6 +11,9 @@ export type HoverStyle = 'default' | 'rounded'
 /** 主题模式：light / dark / auto(跟随系统) */
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
+/** 字号档位 */
+export type FontSizePreset = 'normal' | 'large' | 'xlarge'
+
 /** 动画配置 */
 export interface AnimationConfig {
   /** 全局动画开关，默认 true */
@@ -36,6 +39,7 @@ interface ThemeStorageState {
   animationEnabled: boolean
   animationLevel: AnimationLevel
   animationRipple: boolean
+  fontSizeScale: number
 }
 
 const defaultState: ThemeStorageState = {
@@ -49,6 +53,14 @@ const defaultState: ThemeStorageState = {
   animationEnabled: true,
   animationLevel: 'normal',
   animationRipple: true,
+  fontSizeScale: 1,
+}
+
+/** 字号档位 → scale 映射 */
+const FONT_SIZE_PRESET_MAP: Record<FontSizePreset, number> = {
+  normal: 1,
+  large: 1.125,
+  xlarge: 1.25,
 }
 
 /** hsl → "r, g, b" 字符串，用于 --uikit-primary-rgb（供 rgba(var(--uikit-primary-rgb), α) 场景） */
@@ -126,6 +138,10 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.animationRipple,
     set: (v: boolean) => { storage.value.animationRipple = v },
   })
+  const fontSizeScale = computed({
+    get: () => storage.value.fontSizeScale,
+    set: (v: number) => { storage.value.fontSizeScale = v },
+  })
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
@@ -148,6 +164,14 @@ export const useThemeStore = defineStore('theme', () => {
       `hsl(${hue}, 100%, 50%)`
     )
     document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
+  })
+
+  // 字号缩放：写入 --uikit-font-scale，驱动 --uikit-font-size-* token
+  watchEffect(() => {
+    document.documentElement.style.setProperty(
+      '--uikit-font-scale',
+      String(Math.max(0.5, fontSizeScale.value))
+    )
   })
 
   // Hover 风格 DOM 属性联动
@@ -250,6 +274,17 @@ export const useThemeStore = defineStore('theme', () => {
     animationRipple.value = value
   }
 
+  function setFontSizeScale(scale: number) {
+    fontSizeScale.value = Math.max(0.5, scale)
+  }
+
+  function setFontSize(preset: FontSizePreset) {
+    const scale = FONT_SIZE_PRESET_MAP[preset]
+    if (scale !== undefined) {
+      fontSizeScale.value = scale
+    }
+  }
+
   /**
    * 批量应用动画配置
    */
@@ -271,6 +306,7 @@ export const useThemeStore = defineStore('theme', () => {
     animationEnabled,
     animationLevel,
     animationRipple,
+    fontSizeScale,
     setPrimaryColor,
     setMode,
     setAvatarShape,
@@ -281,6 +317,8 @@ export const useThemeStore = defineStore('theme', () => {
     setAnimationEnabled,
     setAnimationLevel,
     setAnimationRipple,
+    setFontSizeScale,
+    setFontSize,
     applyAnimationConfig,
   }
 })

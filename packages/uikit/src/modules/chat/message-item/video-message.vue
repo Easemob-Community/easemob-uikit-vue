@@ -152,7 +152,7 @@ async function handleDownload(event: MouseEvent) {
   padding: 10px 14px;
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -189,7 +189,7 @@ async function handleDownload(event: MouseEvent) {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.6);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
 }
 
 /* 全屏预览 */

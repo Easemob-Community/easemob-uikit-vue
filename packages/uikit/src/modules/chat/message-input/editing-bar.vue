@@ -60,7 +60,7 @@ function onClose() {
   background-color: var(--uikit-bg-base);
   border: 1px solid var(--uikit-primary-color, #5f6df3);
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.4;
   min-height: 32px;
 }

@@ -14,20 +14,26 @@ import { useThemeStore } from '../../store/theme'
 import { useToast } from '../../composables/use-toast'
 import { EmToast } from '../../components'
 import type { ClientConfig } from '../../sdk/client'
-import type { AnimationConfig } from '../../store/theme'
+import type { AnimationConfig, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
+
+/** 字号配置：支持档位或具体 scale */
+export type ThemeFontSize = FontSizePreset | number
 
 export interface ProviderProps {
   appKey?: string
   sdkConfig?: Omit<ClientConfig, 'appKey'>
   autoInit?: boolean
   theme?: {
-    mode?: 'light' | 'dark'
+    /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
+    mode?: 'light' | 'dark' | 'auto'
     primaryColor?: number
     /** 容器间距（px），默认 8，最小 0 */
     gap?: number
     /** 组件圆角模式：'ground' 圆角（默认）| 'square' 直角 */
     shape?: 'ground' | 'square'
+    /** 字号：'normal' | 'large' | 'xlarge' 或具体缩放倍数 */
+    fontSize?: ThemeFontSize
   }
   locale?: 'zh-CN' | 'en'
   animation?: AnimationConfig
@@ -185,21 +191,63 @@ watch(
   { immediate: false },
 )
 
+/**
+ * 解析 theme.fontSize：支持档位或具体 scale
+ */
+function resolveFontSize(fontSize: ThemeFontSize | undefined): number | undefined {
+  if (fontSize === undefined)
+    return undefined
+  if (typeof fontSize === 'number')
+    return fontSize
+  const presetMap: Record<FontSizePreset, number> = {
+    normal: 1,
+    large: 1.125,
+    xlarge: 1.25,
+  }
+  return presetMap[fontSize]
+}
+
+/**
+ * 应用 theme 配置到 store，未传字段保持当前值不变
+ */
+function applyThemeConfig(theme?: ProviderProps['theme']) {
+  if (!theme)
+    return
+  if (theme.mode) {
+    themeStore.setMode(theme.mode)
+  }
+  if (theme.primaryColor !== undefined) {
+    themeStore.setPrimaryColor(theme.primaryColor)
+  }
+  if (theme.gap !== undefined) {
+    themeStore.setContainerGap(theme.gap)
+  }
+  if (theme.shape) {
+    themeStore.setComponentsShape(theme.shape)
+  }
+  const scale = resolveFontSize(theme.fontSize)
+  if (scale !== undefined) {
+    themeStore.setFontSizeScale(scale)
+  }
+}
+
+// theme 配置响应式应用
+watch(
+  () => props.theme,
+  (theme) => {
+    applyThemeConfig(theme)
+  },
+  { deep: true },
+)
+
 onMounted(() => {
-  if (props.theme?.mode) {
-    themeStore.setMode(props.theme.mode)
-  }
-  if (props.theme?.primaryColor) {
-    themeStore.setPrimaryColor(props.theme.primaryColor)
-  }
-  if (props.theme?.gap !== undefined) {
-    themeStore.setContainerGap(props.theme.gap)
-  }
-  if (props.theme?.shape) {
-    themeStore.setComponentsShape(props.theme.shape)
-  }
+  applyThemeConfig(props.theme)
   if (props.animation) {
     themeStore.applyAnimationConfig(props.animation)
+  }
+  // h5.fontScale 兼容：作为初始字号缩放值（若 theme.fontSize 未显式指定）
+  if (props.h5?.fontScale !== undefined && props.theme?.fontSize === undefined) {
+    themeStore.setFontSizeScale(props.h5.fontScale)
   }
   // H5 安全区开关：关闭时把 env() 变量覆写为 0，避免组件仍读取到刘海高度
   if (props.h5?.safeArea === false) {

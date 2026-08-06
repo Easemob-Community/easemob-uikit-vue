@@ -130,7 +130,7 @@ defineExpose({
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);

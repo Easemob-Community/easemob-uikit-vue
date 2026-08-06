@@ -202,7 +202,7 @@ function onToggleVoiceText() {
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   max-width: 60%;
 }
 
@@ -288,21 +288,21 @@ function onToggleVoiceText() {
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;
   box-sizing: border-box;
 }
 
 .voice-message__text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .voice-message__text--loading {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -312,7 +312,7 @@ function onToggleVoiceText() {
   justify-content: space-between;
   gap: 8px;
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -331,7 +331,7 @@ function onToggleVoiceText() {
 
 .voice-message__text-toggle {
   padding: 0;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-primary-color);
   background: none;
   border: none;

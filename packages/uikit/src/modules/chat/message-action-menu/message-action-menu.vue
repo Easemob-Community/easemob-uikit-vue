@@ -54,7 +54,7 @@ function onItemClick(action: MessageActionItem) {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   border-radius: var(--uikit-components-radius, 8px);

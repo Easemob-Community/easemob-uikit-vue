@@ -79,13 +79,13 @@ const hasAnnouncement = computed(() => !!announcement.value)
 }
 
 .group-announcement-banner__title {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   font-weight: 500;
   color: var(--uikit-text-secondary);
 }
 
 .group-announcement-banner__text {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   word-break: break-word;

@@ -12,7 +12,7 @@ import { EmInput, useLocale, useTheme, useUIKit } from '@easemob/uikit'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 
-const { mode, primaryColor, hoverStyle, containerGap, setMode, setPrimaryColor, setHoverStyle, setContainerGap, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
+const { mode, primaryColor, hoverStyle, containerGap, fontSizeScale, setMode, setPrimaryColor, setHoverStyle, setContainerGap, setFontSize, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
 const { theme: themeStore } = useUIKit()
 const { locale, setLocale } = useLocale()
 const { inputVariant, inputDemoValue } = useDemoSettings()
@@ -163,6 +163,33 @@ function updatePrimaryColor(e: Event) {
           @input="(e: Event) => setContainerGap(Number((e.target as HTMLInputElement).value))"
         />
         <span style="font-size: 13px; color: var(--uikit-text-secondary, #6b7280); min-width: 28px; text-align: right;">{{ containerGap }}px</span>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <label class="demo-settings__label">字号</label>
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': fontSizeScale === 1 }"
+          @click="setFontSize('normal')"
+        >
+          标准
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': fontSizeScale === 1.125 }"
+          @click="setFontSize('large')"
+        >
+          大
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': fontSizeScale === 1.25 }"
+          @click="setFontSize('xlarge')"
+        >
+          特大
+        </button>
       </div>
     </div>
 

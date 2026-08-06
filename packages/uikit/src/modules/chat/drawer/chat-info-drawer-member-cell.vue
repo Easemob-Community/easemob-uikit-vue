@@ -40,7 +40,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 }
 
 .chat-info-drawer__member-name {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
   max-width: 100%;
   overflow: hidden;
@@ -49,7 +49,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 }
 
 .chat-info-drawer__member-tag {
-  font-size: 10px;
+  font-size: var(--uikit-font-size-10);
   padding: 1px 4px;
   border-radius: 4px;
   line-height: 1.2;

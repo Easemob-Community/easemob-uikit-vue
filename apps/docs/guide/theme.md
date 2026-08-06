@@ -48,6 +48,14 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 
 - `--uikit-shadow`：常规阴影
 - `--uikit-shadow-hover`：hover / 浮起阴影
+- `--uikit-shadow-sm`：轻量小阴影（卡片/抽屉内）
+
+### 字号
+
+字号 token 与 `--uikit-font-scale` 联动，用于实现全局字号缩放（适老版）：
+
+- `--uikit-font-scale`：全局字号缩放倍数（默认 `1`）
+- `--uikit-font-size-10` ~ `--uikit-font-size-22`：按像素基准 × 缩放倍数计算
 
 ### 动画
 
@@ -126,6 +134,7 @@ const {
   hoverStyle,
   animationEnabled,
   animationLevel,
+  fontSizeScale,
   setPrimaryColor,
   setAvatarShape,
   setBubbleShape,
@@ -134,6 +143,8 @@ const {
   setHoverStyle,
   setAnimationEnabled,
   setAnimationLevel,
+  setFontSize,
+  setFontSizeScale,
   toggleMode,
 } = useTheme()
 
@@ -148,6 +159,11 @@ setComponentsShape('square')
 // 容器间距与 hover 风格
 setContainerGap(12)
 setHoverStyle('lift') // 'none' | 'light' | 'lift'
+
+// 字号：标准 / 大 / 特大（适老版）
+setFontSize('xlarge')
+// 或直接指定缩放倍数
+setFontSizeScale(1.25)
 
 // 动画：subtle / normal / expressive
 setAnimationLevel('expressive')
@@ -174,6 +190,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
       primaryColor: 262,
       gap: 12,
       shape: 'square',
+      fontSize: 'xlarge', // 'normal' | 'large' | 'xlarge' 或具体倍数
     }"
   >
     <em-conversation-container />

@@ -151,7 +151,7 @@ function onClose() {
 }
 
 .group-read-modal__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -173,7 +173,7 @@ function onClose() {
   gap: 4px;
   padding: 10px 0;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
   transition: color 0.15s;
   position: relative;
@@ -204,7 +204,7 @@ function onClose() {
 }
 
 .group-read-modal__tab-label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 /* 列表 */

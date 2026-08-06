@@ -716,7 +716,7 @@ defineExpose({
   border-radius: var(--uikit-components-radius, 8px);
   outline: none;
   /* font-size ≥ 16px，防止 iOS focus 自动缩放 */
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   line-height: 1.4;
   font-family: inherit;
   color: var(--uikit-text-primary);
@@ -743,7 +743,7 @@ defineExpose({
   padding: 8px 12px;
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-secondary);
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   line-height: 1.4;
   color: var(--uikit-text-primary);
   user-select: none;
@@ -811,7 +811,7 @@ defineExpose({
 }
 
 .h5-input__more-label {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -840,12 +840,12 @@ defineExpose({
 }
 
 .h5-input__record-duration {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-variant-numeric: tabular-nums;
 }
 
 .h5-input__record-hint {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 </style>

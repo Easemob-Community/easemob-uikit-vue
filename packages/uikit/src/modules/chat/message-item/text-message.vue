@@ -301,7 +301,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;
 }
@@ -321,7 +321,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__edited {
   margin-left: 6px;
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   opacity: 0.75;
   user-select: none;
@@ -339,21 +339,21 @@ function onMentionClick(userId: string, event: MouseEvent) {
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;
   box-sizing: border-box;
 }
 
 .text-message__translation-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .text-message__translation-text--loading {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -363,7 +363,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   justify-content: space-between;
   gap: 8px;
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -382,7 +382,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__translate-toggle {
   padding: 0;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-primary-color);
   background: none;
   border: none;
@@ -396,7 +396,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__reedit-btn {
   padding: 2px 8px;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-primary-color);
   background: none;
   border: none;

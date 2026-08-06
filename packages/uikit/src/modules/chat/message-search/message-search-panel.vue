@@ -172,7 +172,7 @@ nextTick(() => {
 
 .message-search-panel__title {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--uikit-font-size-15);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
@@ -223,19 +223,19 @@ nextTick(() => {
 }
 
 .message-search-panel__name {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   font-weight: 500;
 }
 
 .message-search-panel__time {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   flex-shrink: 0;
 }
 
 .message-search-panel__summary {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   line-height: 1.4;
   white-space: nowrap;
@@ -250,7 +250,7 @@ nextTick(() => {
   gap: 8px;
   padding: 24px;
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .message-search-panel__loading-icon {

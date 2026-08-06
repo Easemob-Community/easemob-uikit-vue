@@ -252,7 +252,7 @@ function onContextmenu(e: MouseEvent) {
 
 .uikit-cell__title {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
   white-space: nowrap;
@@ -262,12 +262,12 @@ function onContextmenu(e: MouseEvent) {
 
 .uikit-cell__meta {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
 .uikit-cell__subtitle {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   white-space: nowrap;
   overflow: hidden;

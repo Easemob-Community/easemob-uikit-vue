@@ -277,14 +277,14 @@ onBeforeUnmount(() => {
 }
 
 .voice-panel__timer {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 500;
   color: var(--uikit-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .voice-panel__hint {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   text-align: center;
   line-height: 1.5;

@@ -85,7 +85,7 @@ function handleClick() {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
@@ -102,7 +102,7 @@ function handleClick() {
 }
 
 .combine-message__summary {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   line-height: 1.5;
 }

@@ -189,7 +189,7 @@ watch(() => props.show, (show) => {
 }
 
 .combine-message-modal__header-title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
   white-space: nowrap;
@@ -212,7 +212,7 @@ watch(() => props.show, (show) => {
   gap: 8px;
   padding: 40px 0;
   color: var(--uikit-text-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
 }
 
 .combine-message-modal__loading-icon {
@@ -233,7 +233,7 @@ watch(() => props.show, (show) => {
   text-align: center;
   padding: 40px 0;
   color: #ef4444;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
 }
 
 .combine-message-modal__list {

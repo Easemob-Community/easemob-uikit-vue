@@ -70,7 +70,7 @@ function onClick() {
   border-radius: 6px;
   background-color: var(--uikit-bg-secondary, #f4f4f5);
   color: var(--uikit-text-secondary, #909399);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   line-height: 1.5;
   cursor: pointer;
   user-select: none;

@@ -381,7 +381,7 @@ onBeforeUnmount(() => {
   max-height: 150px;
   padding: 8px 12px;
   outline: none;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   overflow-y: auto;
@@ -474,7 +474,7 @@ onBeforeUnmount(() => {
   left: 12px;
   color: var(--uikit-text-secondary);
   pointer-events: none;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.5;
 }
 
@@ -485,7 +485,7 @@ onBeforeUnmount(() => {
   background-color: var(--uikit-bg-base);
   border: 1px solid #e5e7eb;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   user-select: none;

@@ -877,7 +877,7 @@ watch(locateRequest, (req) => {
   border-radius: var(--uikit-components-radius, 4px);
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
 }
 
 /* 下拉刷新指示器 */
@@ -888,7 +888,7 @@ watch(locateRequest, (req) => {
   overflow: hidden;
   transition: height 0.1s;
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 /* 顶部加载指示器 */
@@ -898,7 +898,7 @@ watch(locateRequest, (req) => {
   justify-content: center;
   padding: 12px;
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 /* 历史加载失败重试入口 */
@@ -917,7 +917,7 @@ watch(locateRequest, (req) => {
   border-radius: 20px;
   background-color: var(--uikit-primary-color);
   color: #fff;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
   display: flex;
   align-items: center;

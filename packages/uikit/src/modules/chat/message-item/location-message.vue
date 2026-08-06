@@ -105,7 +105,7 @@ function onClick() {
 }
 
 .location-message__address {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   line-height: 1.4;
   overflow: hidden;
@@ -117,7 +117,7 @@ function onClick() {
 }
 
 .location-message__coordinates {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 </style>

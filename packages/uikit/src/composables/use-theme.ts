@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useThemeStore } from '../store/theme'
-import type { AnimationConfig, AnimationLevel, HoverStyle, ThemeMode } from '../store/theme'
+import type { AnimationConfig, AnimationLevel, FontSizePreset, HoverStyle, ThemeMode } from '../store/theme'
 
 export function useTheme() {
   const themeStore = useThemeStore()
@@ -64,6 +64,17 @@ export function useTheme() {
     themeStore.applyAnimationConfig(config)
   }
 
+  // ===== 字号配置 =====
+  const fontSizeScale = computed(() => themeStore.fontSizeScale)
+
+  function setFontSizeScale(scale: number) {
+    themeStore.setFontSizeScale(scale)
+  }
+
+  function setFontSize(preset: FontSizePreset) {
+    themeStore.setFontSize(preset)
+  }
+
   return {
     mode,
     effectiveMode,
@@ -74,6 +85,7 @@ export function useTheme() {
     componentsShape: computed(() => themeStore.componentsShape),
     containerGap: computed(() => themeStore.containerGap),
     hoverStyle: computed(() => themeStore.hoverStyle),
+    fontSizeScale,
     setMode,
     setPrimaryColor,
     setAvatarShape,
@@ -81,6 +93,8 @@ export function useTheme() {
     setComponentsShape,
     setContainerGap,
     setHoverStyle,
+    setFontSizeScale,
+    setFontSize,
     toggleMode,
     animationEnabled,
     animationLevel,

@@ -235,13 +235,13 @@ function onCancel() {
 }
 
 .multi-select-bar__select-all-label {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
 }
 
 /* 选中条数：放在全选按钮下方 */
 .multi-select-bar__count {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-primary-color);
   font-weight: 500;
   margin-top: 2px;
@@ -283,7 +283,7 @@ function onCancel() {
 }
 
 .multi-select-bar__label {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
 }
 
@@ -310,7 +310,7 @@ function onCancel() {
   border: none;
   background-color: transparent;
   color: var(--uikit-text-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
@@ -354,14 +354,14 @@ function onCancel() {
 }
 
 .multi-select-bar__modal-title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
   margin-bottom: 8px;
 }
 
 .multi-select-bar__modal-desc {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
   margin-bottom: 20px;
 }
@@ -381,7 +381,7 @@ function onCancel() {
   padding: 8px 20px;
   border-radius: var(--uikit-components-radius, 6px);
   border: none;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

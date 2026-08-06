@@ -74,13 +74,13 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty__title {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
 
 .uikit-empty__description {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -91,10 +91,10 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty.size-small .uikit-empty__title {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .uikit-empty.size-small .uikit-empty__description {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
 }
 </style>

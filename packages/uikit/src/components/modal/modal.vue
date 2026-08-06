@@ -72,7 +72,7 @@ function onCancel() {
 }
 
 .uikit-modal__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   text-align: center;
   margin-bottom: 12px;
@@ -80,7 +80,7 @@ function onCancel() {
 }
 
 .uikit-modal__body {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
   text-align: center;
   margin-bottom: 20px;

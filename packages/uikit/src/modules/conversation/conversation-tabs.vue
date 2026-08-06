@@ -108,7 +108,7 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 .conversation-tabs__tab {
   flex-shrink: 0;
   padding: 5px 14px;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.4;
   color: var(--uikit-text-secondary);
   background-color: var(--uikit-bg-secondary);

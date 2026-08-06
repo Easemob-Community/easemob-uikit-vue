@@ -409,7 +409,7 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__name {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
   overflow: hidden;
@@ -477,13 +477,13 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__time {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   flex-shrink: 0;
 }
 
 .conversation-item__message {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -508,7 +508,7 @@ const displayMessage = computed(() => {
 /* 菜单项 —— 自身带圆角，hover 时是独立的圆角色块（不贴卡片边） */
 .context-menu__item {
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;

@@ -1186,7 +1186,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__loading-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -1211,7 +1211,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__error-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
   text-align: center;
   word-break: break-word;
@@ -1223,7 +1223,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   border: none;
   background-color: var(--uikit-primary-color);
   color: #fff;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: opacity 0.15s;
 }
@@ -1269,13 +1269,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
 .chat__header-member-count {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-secondary);
   white-space: nowrap;

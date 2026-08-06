@@ -111,7 +111,7 @@ const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.
   border-radius: 4px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   text-align: center;
 }
 
@@ -125,7 +125,7 @@ const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.
   border-radius: 8px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .message-renderer__footer {

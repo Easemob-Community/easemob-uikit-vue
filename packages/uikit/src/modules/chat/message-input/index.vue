@@ -842,7 +842,7 @@ defineExpose({
 }
 
 .message-input__muted-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 </style>

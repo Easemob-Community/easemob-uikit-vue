@@ -938,7 +938,7 @@ defineExpose({
 }
 
 .chat-info-drawer__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
   flex: 1;
@@ -964,7 +964,7 @@ defineExpose({
 }
 
 .chat-info-drawer__section-label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   font-weight: 500;
   color: var(--uikit-text-secondary);
   padding: 0 4px;
@@ -999,13 +999,13 @@ defineExpose({
 }
 
 .chat-info-drawer__name {
-  font-size: 18px;
+  font-size: var(--uikit-font-size-18);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
 .chat-info-drawer__id {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -1019,7 +1019,7 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
 }
 
@@ -1033,7 +1033,7 @@ defineExpose({
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
@@ -1061,7 +1061,7 @@ defineExpose({
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   text-align: center;
   outline: none;
@@ -1077,7 +1077,7 @@ defineExpose({
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.5;
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -1097,7 +1097,7 @@ defineExpose({
 }
 
 .chat-info-drawer__description {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   line-height: 1.6;
   word-break: break-word;
@@ -1110,7 +1110,7 @@ defineExpose({
   gap: 6px;
   width: 100%;
   max-width: 260px;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
   color: var(--uikit-text-secondary);
   text-align: center;
@@ -1151,7 +1151,7 @@ defineExpose({
   border: none;
   background: none;
   color: var(--uikit-primary-color);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   border-radius: var(--uikit-components-radius);
 }
@@ -1200,7 +1200,7 @@ defineExpose({
 .chat-info-drawer__confirm-body > p {
   margin: 0 0 12px;
   color: var(--uikit-text-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   line-height: 1.5;
 }
 
@@ -1209,7 +1209,7 @@ defineExpose({
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
 }
 
