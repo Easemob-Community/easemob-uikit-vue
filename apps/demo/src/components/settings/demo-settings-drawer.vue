@@ -13,6 +13,7 @@ import DemoChatPanel from './demo-chat-panel.vue'
 import DemoContactPanel from './demo-contact-panel.vue'
 import DemoConversationPanel from './demo-conversation-panel.vue'
 import DemoDataPanel from './demo-data-panel.vue'
+import DemoDeveloperPanel from './demo-developer-panel.vue'
 import DemoNotificationPanel from './demo-notification-panel.vue'
 import DemoProviderPanel from './demo-provider-panel.vue'
 import DemoSdkPanel from './demo-sdk-panel.vue'
@@ -47,6 +48,7 @@ const categories = [
   { key: 'contact', label: '通讯录', icon: 'people/person_3lines_fill' },
   { key: 'data', label: '演示数据', icon: 'files-media/archives' },
   { key: 'notification', label: '通知', icon: 'status/info' },
+  { key: 'developer', label: '开发者', icon: 'files-media/doc' },
   { key: 'provider', label: 'Provider', icon: 'actions/shield' },
   { key: 'sdk', label: 'SDK 登录', icon: 'actions/unlock' },
 ] as const
@@ -93,6 +95,7 @@ function close() {
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
+          <DemoDeveloperPanel v-else-if="activeCategory === 'developer'" />
           <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />
           <DemoProviderPanel
             v-else-if="activeCategory === 'provider'"
@@ -130,6 +133,7 @@ function close() {
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
+          <DemoDeveloperPanel v-else-if="activeCategory === 'developer'" />
           <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />
           <DemoProviderPanel
             v-else-if="activeCategory === 'provider'"

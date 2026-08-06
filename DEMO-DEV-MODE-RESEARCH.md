@@ -1,7 +1,7 @@
 # Demo 开发者友好模式（Dev Hints）方案预研
 
 > 调研日期：2026-08-05。文中行号为当日代码快照，可能随改动漂移，以文件+特征定位为准。
-> 状态：**预研结论，未实施**。定位：demo 层教学工具，不改 uikit 包本体（仅一处可选小改，见下）。
+> 状态：**已实施（2026-08-06，第一版）**。落地位置 `apps/demo/src/dev-hints/`（types.ts / registry.ts / use-dev-hints.ts / demo-dev-hint-card.vue），开关在设置抽屉「开发者」分类（默认开）。详见 TECH-DEBT.md D87。
 
 ## 背景与目标
 

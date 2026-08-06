@@ -81,6 +81,45 @@
   cursor: pointer;
 }
 
+/* 原生 checkbox 换肤：mask 引用线性图标集 actions/unchecked_rectangle 与 actions/checkbox_checked */
+.demo-check input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--uikit-text-tertiary, #9ca3af);
+  background-color: currentColor;
+  /* prettier-ignore */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23000'%20d='M20%206C20%204.89543%2019.1046%204%2018%204H6C4.89543%204%204%204.89543%204%206V18C4%2019.1046%204.89543%2020%206%2020H18C19.1046%2020%2020%2019.1046%2020%2018V6ZM22%2018C22%2020.2091%2020.2091%2022%2018%2022H6C3.79086%2022%202%2020.2091%202%2018V6C2%203.79086%203.79086%202%206%202H18C20.2091%202%2022%203.79086%2022%206V18Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  /* prettier-ignore */
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23000'%20d='M20%206C20%204.89543%2019.1046%204%2018%204H6C4.89543%204%204%204.89543%204%206V18C4%2019.1046%204.89543%2020%206%2020H18C19.1046%2020%2020%2019.1046%2020%2018V6ZM22%2018C22%2020.2091%2020.2091%2022%2018%2022H6C3.79086%2022%202%2020.2091%202%2018V6C2%203.79086%203.79086%202%206%202H18C20.2091%202%2022%203.79086%2022%206V18Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.demo-check input[type='checkbox']:checked {
+  color: var(--uikit-primary-color, #5f6df3);
+  /* prettier-ignore */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23000'%20d='M7%208C7%207.44772%207.44772%207%208%207H16C16.5523%207%2017%207.44772%2017%208V16C17%2016.5523%2016.5523%2017%2016%2017H8C7.44772%2017%207%2016.5523%207%2016V8Z'/%3E%3Cpath%20fill='%23000'%20d='M20%206C20%204.89543%2019.1046%204%2018%204H6C4.89543%204%204%204.89543%204%206V18C4%2019.1046%204.89543%2020%206%2020H18C19.1046%2020%2020%2019.1046%2020%2018V6ZM22%2018C22%2020.2091%2020.2091%2022%2018%2022H6C3.79086%2022%202%2020.2091%202%2018V6C2%203.79086%203.79086%202%206%202H18C20.2091%202%2022%203.79086%2022%206V18Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  /* prettier-ignore */
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23000'%20d='M7%208C7%207.44772%207.44772%207%208%207H16C16.5523%207%2017%207.44772%2017%208V16C17%2016.5523%2016.5523%2017%2016%2017H8C7.44772%2017%207%2016.5523%207%2016V8Z'/%3E%3Cpath%20fill='%23000'%20d='M20%206C20%204.89543%2019.1046%204%2018%204H6C4.89543%204%204%204.89543%204%206V18C4%2019.1046%204.89543%2020%206%2020H18C19.1046%2020%2020%2019.1046%2020%2018V6ZM22%2018C22%2020.2091%2020.2091%2022%2018%2022H6C3.79086%2022%202%2020.2091%202%2018V6C2%203.79086%203.79086%202%206%202H18C20.2091%202%2022%203.79086%2022%206V18Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.demo-check input[type='checkbox']:hover:not(:disabled) {
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+.demo-check input[type='checkbox']:checked:hover:not(:disabled) {
+  color: var(--uikit-primary-color, #5f6df3);
+}
+
+.demo-check input[type='checkbox']:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ===== 基础按钮 ===== */
 .demo-btn {
   display: inline-flex;

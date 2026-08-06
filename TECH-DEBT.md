@@ -708,10 +708,10 @@
 - **进展**：2026-08-06 Phase 2 完成核心链路：`theme/index.css` 新增 `--uikit-font-size-*` token 与 `--uikit-font-scale` 联动；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`、`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；`use-h5-adaptation.ts` 停止重复写 `--uikit-font-scale`；demo 外观面板加 标准/大/特大 三档切换；高频组件（chat/conversation/原子组件，45 个文件 144 处）字号已 token 化。2026-08-06 Phase 2.5 完成剩余低频文件字号 token 化：新增 `--uikit-font-size-8` token，57 个文件 207 处硬编码替换为字号 token，仅剩 4 处 story 内装饰性 emoji 尺寸保持 px。字号体系（除装饰性 emoji）已全覆盖，适老版切换可正常缩放。2026-08-06 Phase 3 完成高频语义 token：`theme/index.css` 新增 `--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self`、`--uikit-chat-bg`、`--uikit-input-bg`；store 与 Provider 新增对应配置入口；text/file/voice/video/image/location/combine/custom 消息组件、聊天容器、输入区、时间分隔线全部接入语义 token；`--uikit-chat-bg` 使用 `background` 简写，默认可支持颜色/渐变/`url(...)` 图片背景。2026-08-06 Phase 4 完成 Provider 密度扩展：新增 `Density = 'compact' | 'normal' | 'comfortable'`，`theme/index.css` 通过 `[data-uikit-density]` 覆盖 `--uikit-cell-height*` / `--uikit-cell-padding-y` / `--uikit-list-gap` / `--uikit-header-padding-y`；`Cell` 默认/紧凑/大尺寸高度与 `auto-height` 内边距、`chat.vue` 头部内边距已接入；demo 外观面板加 紧凑/标准/宽松 三档切换。**后续可选项**：把密度变量扩展到输入区、消息气泡间距、抽屉内边距等更多组件。
 - **关联 skill**：`uikit-styling-theming`
 
-### [ ] D87. Demo 开发者友好模式（Dev Hints）：悬停展示环信接口 + 实现思路
+### [x] D87. Demo 开发者友好模式（Dev Hints）：悬停展示环信接口 + 实现思路
 
 - **背景**：demo 登录后默认开启教学覆盖层——悬停会话项/气泡等区域，浮出该功能用到的环信接口 + 文档链接 + UIKit 实现思路；气泡悬停延时出"点子"角标，点击展开详情抽屉。
-- **可行性：高，uikit 零侵入**（demo 层三件套：元数据注册表 + 事件委托悬停引擎 + 提示卡/EmPopup 详情抽屉）。DOM class 稳定可识别、API 素材集中在 `sdk/domain/*.ts`、开关机制挂 `useDemoSettings` 现成。**方案与映射表骨架见根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（2026-08-05 预研）**。
+- **实施（2026-08-06，uikit 零侵入）**：`apps/demo/src/dev-hints/` 三件套已落地——`types.ts`（类型定义）+ `registry.ts`（13 条元数据：会话列表/7 种类型气泡/通用气泡/历史消息/输入框/聊天容器，每条含环信接口 + 实现思路 + 参考文件；两轮匹配：具体内容优先，`.chat` 等容器级兜底）+ `use-dev-hints.ts`（`.demo-layout` 事件委托引擎：L0 悬停 200ms 出提示卡、L1 气泡 2s 出 💡 角标、离开后 300ms 延迟隐藏 + 移入覆盖层取消隐藏、scroll/resize 隐藏）+ `demo-dev-hint-card.vue`（提示卡 + 💡 角标 + EmPopup 右侧详情抽屉）。开关挂 `useDemoSettings` 新增 `devHintsEnabled`（默认开 + localStorage 记忆），设置抽屉新增「开发者」分类面板，移动端自动禁用。**待办**：5.x 官方文档站上线后补录 `api.docUrl`；注册表条目随 uikit 迭代同步维护。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
 ### [x] D88. 群已读详情未按 userId 去重，多端登录记作不同人已读
@@ -723,7 +723,6 @@
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring`
 
 ### [ ] D89. 多处 `@media (hover: hover)` 块内选择器无缩进，触发 lint 报错与构建 CSS 警告
-
 - **现象**：`message-bubble-wrapper.vue`、`shared-file-list-item.vue`、`conversation-item.vue` 等多个文件存在 `@media (hover: hover) {` 块内选择器未缩进（与包裹语句同层级），lint 报 `Insert ··`，构建时 esbuild 报 `Unexpected "@media"` CSS 警告（不影响产物）。疑似历史 `wrap-hover` 脚本批量包裹 hover 样式时未补缩进。
 - **建议修法**：对 `@media (hover: hover)` 块内选择器统一补缩进；或按文件逐个修复后跑 `pnpm exec eslint --fix <file>` 校验。
 - **关联 skill**：`uikit-lint-governance` / `uikit-styling-theming`

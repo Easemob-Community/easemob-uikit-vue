@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useClient } from '@easemob/uikit'
+import { EmIcon, useClient } from '@easemob/uikit'
 import { demoPresetUsers } from './composables/use-demo-settings'
 import type { DemoPresetUser } from './composables/use-demo-settings'
 
@@ -28,6 +28,9 @@ const loginUser = ref(savedConfig?.user || '')
 const loginPassword = ref(savedConfig?.password || '')
 const loginToken = ref(savedConfig?.token || '')
 const loginMode = ref<'password' | 'token'>(savedConfig?.mode || 'password')
+
+/** 密码可见性（默认隐藏） */
+const showPassword = ref(false)
 
 const loading = ref(false)
 const errorMsg = ref('')
@@ -190,14 +193,23 @@ async function handleLogin() {
               </button>
             </div>
           </label>
-          <input
-            v-if="loginMode === 'password'"
-            v-model="loginPassword"
-            type="password"
-            placeholder="请输入密码"
-            class="demo-input"
-            @keydown.enter="handleLogin"
-          >
+          <div class="demo-input-wrap" v-if="loginMode === 'password'">
+            <input
+              v-model="loginPassword"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="请输入密码"
+              class="demo-input"
+              @keydown.enter="handleLogin"
+            >
+            <button
+              type="button"
+              class="demo-input__eye"
+              :title="showPassword ? '隐藏密码' : '显示密码'"
+              @click="showPassword = !showPassword"
+            >
+              <EmIcon :name="showPassword ? 'actions/eye_off' : 'actions/eye'" :size="18" />
+            </button>
+          </div>
           <input
             v-else
             v-model="loginToken"
@@ -318,6 +330,34 @@ async function handleLogin() {
 
 .demo-input:focus {
   border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+.demo-input-wrap {
+  position: relative;
+}
+
+.demo-input-wrap .demo-input {
+  padding-right: 40px;
+}
+
+.demo-input__eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-secondary, #6b7280);
+  cursor: pointer;
+}
+
+.demo-input__eye:hover {
+  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
 }
 
 .demo-btn {

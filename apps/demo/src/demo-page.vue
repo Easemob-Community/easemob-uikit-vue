@@ -28,6 +28,8 @@ import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
 import DemoQuickReplyPanel from './components/demo-quick-reply-panel.vue'
 import DemoSettingsDrawer from './components/settings/demo-settings-drawer.vue'
+import DemoDevHintCard from './dev-hints/demo-dev-hint-card.vue'
+import { useDevHints } from './dev-hints/use-dev-hints'
 import { demoStickerPacks, useDemoSettings } from './composables/use-demo-settings'
 
 /**
@@ -97,6 +99,7 @@ const {
   conversationTabsTakeover,
   conversationActiveTab,
   statusBannerEnabled,
+  devHintsEnabled,
   notificationEnable,
   notificationBrowser,
   notificationInApp,
@@ -125,6 +128,14 @@ watch(
   },
   { immediate: true },
 )
+
+/**
+ * Dev Hints 开发者友好模式（D87）：悬停会话项/气泡等区域浮出环信接口 + UIKit 实现思路。
+ * 事件委托挂在 .demo-layout 根上；开关由设置抽屉「开发者」分类控制（默认开），
+ * 移动端无 hover 能力，自动禁用。
+ */
+const devHintsActive = computed(() => devHintsEnabled.value && !isMobile.value)
+const { rootRef, badge, highlightEl, detail, openDetail, closeDetail } = useDevHints(devHintsActive)
 
 /** 会话分栏：面板配置的 tabs 与 hook 状态；接管模式下由 #tabs 插槽完全自绘 */
 const { tabs: takeoverTabs, activeTab: takeoverActiveTab, selectTab: takeoverSelectTab } = useConversationTabs({
@@ -440,7 +451,8 @@ watch(() => stores.conversation.currentConversationId, (id) => {
 </script>
 
 <template>
-  <div class="demo-layout">
+  <!-- 事件委托根：Dev Hints 引擎在此监听悬停（rootRef 绑定） -->
+  <div ref="rootRef" class="demo-layout">
     <!-- ==================== PC 三栏布局 ==================== -->
     <template v-if="!isMobile">
       <!-- 左侧导航栏（仿微信） -->
@@ -543,6 +555,9 @@ watch(() => stores.conversation.currentConversationId, (id) => {
       <!-- 列表页（会话 / 联系人） -->
       <div v-show="h5Page === 'list'" class="h5-page">
         <div class="h5-page__header">
+          <button class="h5-page__header-btn" @click="showSettings = true">
+            <EmIcon name="actions/menu" :size="20" />
+          </button>
           <span class="h5-page__title">{{ sidebarTab === 'conversation' ? '消息' : '通讯录' }}</span>
           <button class="h5-page__header-btn" @click="showSettings = true">
             <EmIcon name="misc/gear" :size="20" />
@@ -609,7 +624,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
       <div v-show="h5Page === 'chat'" class="h5-page">
         <div class="h5-page__header">
           <button class="h5-page__header-btn" @click="h5BackToList">
-            <EmIcon name="arrow/arrow_left" :size="20" />
+            <EmIcon name="arrows/arrow_left" :size="20" />
           </button>
           <span class="h5-page__title">聊天</span>
           <span class="h5-page__header-spacer" />
@@ -657,7 +672,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
       <div v-show="h5Page === 'detail'" class="h5-page">
         <div class="h5-page__header">
           <button class="h5-page__header-btn" @click="h5Page = 'list'">
-            <EmIcon name="arrow/arrow_left" :size="20" />
+            <EmIcon name="arrows/arrow_left" :size="20" />
           </button>
           <span class="h5-page__title">详情</span>
           <span class="h5-page__header-spacer" />
@@ -703,6 +718,17 @@ watch(() => stores.conversation.currentConversationId, (id) => {
       :contacts="stores.contact.contactList"
       @select="sendCard"
     />
+
+    <!-- Dev Hints 开发者友好模式覆盖层（仅 PC；移动端无 hover 不启用） -->
+    <div v-if="!isMobile" class="demo-dev-hints-layer">
+      <DemoDevHintCard
+        :badge="badge"
+        :highlight-el="highlightEl"
+        :detail="detail"
+        @open-detail="openDetail"
+        @close-detail="closeDetail"
+      />
+    </div>
   </div>
 </template>
 

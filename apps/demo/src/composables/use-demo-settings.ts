@@ -20,6 +20,9 @@ import {
 } from '@easemob/uikit'
 import type { ConversationTabKey, EmojiStickerPack, UiContact, UiConversation } from '@easemob/uikit'
 
+/** Dev Hints 开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
+const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'
+
 /** 预设测试账号（一键填入用户 + Token，免去每次手动复制） */
 export interface DemoPresetUser {
   /** 按钮显示名 */
@@ -267,6 +270,17 @@ function createDemoSettings() {
     conversationActiveTab.value = conversationTabs.value[0] ?? 'all'
   }
 
+  /* ===== 开发者友好模式（Dev Hints） ===== */
+  /**
+   * 悬停会话项/气泡等区域浮出环信接口 + UIKit 实现思路（D87）。
+   * 默认开启，localStorage 记忆用户关闭选择。
+   */
+  const devHintsEnabled = ref(localStorage.getItem(DEV_HINTS_STORAGE_KEY) === 'on')
+  function toggleDevHints(enabled: boolean) {
+    devHintsEnabled.value = enabled
+    localStorage.setItem(DEV_HINTS_STORAGE_KEY, enabled ? 'on' : 'off')
+  }
+
   /* ===== SDK 初始化 / 登录配置 ===== */
   const sdkAppKey = ref('easemob-demo#support-ngi')
   const sdkApiUrl = ref('')
@@ -362,6 +376,9 @@ function createDemoSettings() {
     togglePinyinAdapter,
     injectMockConversations,
     injectMockContacts,
+    // 开发者友好模式
+    devHintsEnabled,
+    toggleDevHints,
   }
 }
 
