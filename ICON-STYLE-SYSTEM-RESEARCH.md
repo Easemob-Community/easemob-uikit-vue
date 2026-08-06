@@ -38,7 +38,8 @@
 - 业界共识用法（iOS 底 tab、微信均为此模式）。现成落点：
   - 导航 / tab 类：选中 `chat/bubble_fill`、未选中 `chat/bubble`（demo 底 tab 是现成示范场景）；
   - 多选圈 `checked_ellipse`、已读 `doneAll`、置顶小标等小尺寸状态图标，面性辨识度更好；
-  - `pin` 面性版明显优于线性版。
+  - `pin` 面性版明显优于线性版；
+  - **消息状态与未读数徽章**：新交付的「数字胶囊」规范（见 `DIGITAL-CAPSULE-ICON-RESEARCH.md`）天然区分 `filled/stroked`——`filled` 用于实心圆点/实心徽章（更醒目），`stroked` 用于空心圆/描边徽章（更轻盈），二者应随 `iconStyle` 一键切换。
 - 优点：提升默认体验的精致度，不需要用户做任何配置。
 - 缺点：要逐组件梳理"选中态"语义点，改动点分散（但每处都很小）。
 

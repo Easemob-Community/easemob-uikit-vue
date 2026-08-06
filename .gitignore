@@ -34,6 +34,7 @@ apps/docs/.vitepress/cache
 # Temporary debug / regression scripts
 tmp/
 
-# Design source assets (icon sets, see 线性/icon/stroked, 面性/icon)
+# Design source assets (icon sets, see 线性/icon/stroked, 面性/icon, 消息状态以及未读状态)
 线性/icon/stroked/
 面性/
+消息状态以及未读状态/
