@@ -121,15 +121,15 @@ defineExpose({
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--uikit-text-secondary, #9ca3af);
+  color: var(--uikit-text-secondary);
   pointer-events: none;
 }
 
 .uikit-input__field {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 8px);
+  border: 1px solid var(--uikit-border-color);
+  border-radius: var(--uikit-components-radius);
   font-size: 14px;
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -164,35 +164,35 @@ defineExpose({
 
 /* Search 风格：灰色背景 + 无边框 + 圆角 + 聚焦光环（飞书风格） */
 .uikit-input__field--search {
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  background-color: var(--uikit-bg-secondary);
   border-color: transparent;
 }
 
 .uikit-input__field--search:focus {
   border-color: transparent;
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
-  box-shadow: 0 0 0 2px var(--uikit-primary-color-opacity, hsla(203, 100%, 60%, 0.25));
+  background-color: var(--uikit-bg-secondary);
+  box-shadow: 0 0 0 2px var(--uikit-primary-color-opacity);
 }
 
 .uikit-input--search .uikit-input__prefix-icon {
-  color: var(--uikit-text-secondary, #9ca3af);
+  color: var(--uikit-text-secondary);
   left: 4px;
 }
 
 /* Filled 风格：灰色背景 + 无边框 + 圆角 */
 .uikit-input__field--filled {
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  background-color: var(--uikit-bg-secondary);
   border-color: transparent;
 }
 
 .uikit-input__field--filled:focus {
   border-color: transparent;
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  background-color: var(--uikit-bg-secondary);
   box-shadow: none;
 }
 
 .uikit-input--filled .uikit-input__prefix-icon {
-  color: var(--uikit-text-secondary, #9ca3af);
+  color: var(--uikit-text-secondary);
   left: 4px;
 }
 
@@ -211,7 +211,7 @@ defineExpose({
 }
 
 .uikit-input--ghost .uikit-input__prefix-icon {
-  color: var(--uikit-text-secondary, #9ca3af);
+  color: var(--uikit-text-secondary);
   left: 4px;
 }
 
@@ -219,7 +219,7 @@ defineExpose({
 .uikit-input__field--underline {
   background-color: transparent;
   border-color: transparent;
-  border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  border-bottom: 1px solid var(--uikit-divider-color);
   border-radius: 0;
 }
 
@@ -231,7 +231,7 @@ defineExpose({
 }
 
 .uikit-input--underline .uikit-input__prefix-icon {
-  color: var(--uikit-text-secondary, #9ca3af);
+  color: var(--uikit-text-secondary);
   left: 4px;
 }
 

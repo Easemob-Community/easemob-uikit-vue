@@ -373,12 +373,12 @@ const displayMessage = computed(() => {
 <style scoped>
 /* 会话项状态覆盖 EmCell 根样式 */
 .uikit-cell.is-pinned {
-  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.04);
-  border-radius: var(--uikit-item-active-radius, 0px);
+  background-color: rgba(var(--uikit-primary-rgb), 0.04);
+  border-radius: var(--uikit-item-active-radius);
 }
 
 .uikit-cell.has-at-me {
-  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.06);
+  background-color: rgba(var(--uikit-primary-rgb), 0.06);
 }
 
 /* leading slot 内 Avatar 与 prefix slot 间距 */
@@ -418,14 +418,14 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__name.is-at-me {
-  color: var(--uikit-primary, #3b82f6);
+  color: var(--uikit-primary);
   font-weight: 600;
 }
 
 .conversation-item__pin-badge {
   display: inline-flex;
   align-items: center;
-  color: var(--uikit-primary, #3b82f6);
+  color: var(--uikit-primary);
   flex-shrink: 0;
 }
 
@@ -493,7 +493,7 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__draft {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
   margin-right: 2px;
 }
 
@@ -512,22 +512,22 @@ const displayMessage = computed(() => {
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+  border-radius: var(--uikit-components-radius);
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .context-menu__item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
+  background-color: var(--uikit-bg-hover);
 }
 
 .context-menu__item.is-danger {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .context-menu__item.is-danger:hover {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+  background-color: rgba(var(--uikit-danger-rgb), 0.08);
 }
 </style>

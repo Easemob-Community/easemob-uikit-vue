@@ -20,7 +20,7 @@
   --uikit-bg-hover: #e5e7eb;
   --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.08);
 
-  /* 主色别名 */
+  /* 主色别名：由 store/theme.ts 运行时同步重写，确保始终跟随主题色 */
   --uikit-primary: var(--uikit-primary-color);
   --uikit-primary-hover: hsl(203, 100%, 50%);
   --uikit-primary-rgb: 51, 177, 255;
@@ -29,6 +29,9 @@
   --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
+
+  /* 小阴影：用于卡片/抽屉内的轻量层级 */
+  --uikit-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
 
   /* 边框别名 */
   --uikit-border: var(--uikit-border-color);
@@ -124,7 +127,7 @@
   --uikit-text-secondary: #9ca3af;
   --uikit-text-tertiary: #6b7280;
 
-  /* 主色别名 */
+  /* 主色别名：由 store/theme.ts 运行时同步重写 */
   --uikit-primary: var(--uikit-primary-color);
   --uikit-primary-hover: hsl(203, 100%, 45%);
   --uikit-primary-rgb: 51, 177, 255;
@@ -133,6 +136,9 @@
   --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
+
+  /* 小阴影：深色下提高不透明度 */
+  --uikit-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
 
   /* 边框别名 */
   --uikit-border: var(--uikit-border-color);

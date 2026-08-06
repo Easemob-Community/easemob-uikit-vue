@@ -207,7 +207,7 @@ function onCancel() {
   justify-content: center;
   padding: 12px 60px 20px;
   background-color: var(--uikit-bg-base);
-  border-top: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-top: 1px solid var(--uikit-border-color);
 }
 
 /* 全选按钮 */
@@ -225,13 +225,13 @@ function onCancel() {
 }
 
 .multi-select-bar__check-icon {
-  color: var(--uikit-text-tertiary, #94a3b8);
+  color: var(--uikit-text-tertiary);
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .multi-select-bar__check-icon--checked {
-  color: var(--uikit-primary-color, #007aff);
+  color: var(--uikit-primary-color);
 }
 
 .multi-select-bar__select-all-label {
@@ -242,7 +242,7 @@ function onCancel() {
 /* 选中条数：放在全选按钮下方 */
 .multi-select-bar__count {
   font-size: 11px;
-  color: var(--uikit-primary-color, #007aff);
+  color: var(--uikit-primary-color);
   font-weight: 500;
   margin-top: 2px;
 }
@@ -270,16 +270,16 @@ function onCancel() {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: var(--uikit-bg-secondary, #f5f5f5);
+  background-color: var(--uikit-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--uikit-text-primary);
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .multi-select-bar__action:hover .multi-select-bar__icon {
-  background-color: var(--uikit-bg-tertiary, #e8e8e8);
+  background-color: var(--uikit-bg-tertiary);
 }
 
 .multi-select-bar__label {
@@ -288,7 +288,7 @@ function onCancel() {
 }
 
 .multi-select-bar__label--danger {
-  color: var(--uikit-danger-color, #ff4d4f);
+  color: var(--uikit-danger-color);
 }
 
 .multi-select-bar__action--disabled {
@@ -297,7 +297,7 @@ function onCancel() {
 }
 
 .multi-select-bar__action--disabled:hover .multi-select-bar__icon {
-  background-color: var(--uikit-bg-secondary, #f5f5f5);
+  background-color: var(--uikit-bg-secondary);
 }
 
 /* 取消按钮：绝对定位靠右，文字按钮 */
@@ -312,7 +312,7 @@ function onCancel() {
   color: var(--uikit-text-secondary);
   font-size: 14px;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .multi-select-bar__cancel:hover {
@@ -347,7 +347,7 @@ function onCancel() {
 
 .multi-select-bar__modal {
   background-color: var(--uikit-bg-base);
-  border-radius: 12px;
+  border-radius: var(--uikit-components-radius, 12px);
   padding: 20px 24px;
   min-width: 280px;
   text-align: center;
@@ -379,33 +379,33 @@ function onCancel() {
 
 .multi-select-bar__modal-btn {
   padding: 8px 20px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 6px);
   border: none;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .multi-select-bar__modal-btn--option {
-  background-color: var(--uikit-bg-secondary, #f5f5f5);
+  background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
 }
 
 .multi-select-bar__modal-btn--option:hover {
-  background-color: var(--uikit-bg-tertiary, #e8e8e8);
+  background-color: var(--uikit-bg-tertiary);
 }
 
 .multi-select-bar__modal-btn--cancel {
-  background-color: var(--uikit-bg-secondary, #f5f5f5);
+  background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
 }
 
 .multi-select-bar__modal-btn--cancel:hover {
-  background-color: var(--uikit-bg-tertiary, #e8e8e8);
+  background-color: var(--uikit-bg-tertiary);
 }
 
 .multi-select-bar__modal-btn--confirm {
-  background-color: var(--uikit-danger-color, #ff4d4f);
+  background-color: var(--uikit-danger-color);
   color: #fff;
 }
 

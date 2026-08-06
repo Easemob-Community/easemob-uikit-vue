@@ -215,10 +215,10 @@ function onCancel() {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  border-radius: var(--uikit-item-hover-radius, 8px);
+  border-radius: var(--uikit-item-hover-radius);
   cursor: pointer;
   color: var(--uikit-text-primary);
-  transition: background-color 150ms ease;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .presence-selector__option--compact:hover {
@@ -281,7 +281,7 @@ function onCancel() {
 }
 
 .presence-selector__check {
-  color: var(--uikit-primary-color, #3b82f6);
+  color: var(--uikit-primary-color);
   flex-shrink: 0;
 }
 
@@ -297,12 +297,12 @@ function onCancel() {
   align-self: flex-end;
   padding: 8px 16px;
   border: none;
-  border-radius: var(--uikit-components-radius, 8px);
-  background-color: var(--uikit-primary-color, #3b82f6);
+  border-radius: var(--uikit-components-radius);
+  background-color: var(--uikit-primary-color);
   color: #fff;
   font-size: 14px;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .presence-selector__confirm:hover {

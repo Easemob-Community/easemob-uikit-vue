@@ -807,7 +807,7 @@ onBeforeUnmount(() => {
 /* hover 显示时间 */
 .message-bubble-wrapper--hover-time .message-bubble-wrapper__time {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .message-bubble-wrapper--hover-time:hover .message-bubble-wrapper__time {
@@ -826,9 +826,9 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__check-icon {
-  color: var(--uikit-text-tertiary, #94a3b8);
+  color: var(--uikit-text-tertiary);
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .message-bubble-wrapper__check-icon--checked {
@@ -856,7 +856,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__status-item--failed {
-  color: var(--uikit-danger-color, #e74c3c);
+  color: var(--uikit-danger-color);
   cursor: pointer;
 }
 
@@ -908,8 +908,8 @@ onBeforeUnmount(() => {
   padding-left: 2px;
   cursor: pointer;
   transition:
-    color 0.15s,
-    border-color 0.15s;
+    color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
@@ -977,7 +977,7 @@ onBeforeUnmount(() => {
 /* 被引用定位后的闪烁高亮：作用于气泡主体，避免影响头像/名称/状态 */
 .message-bubble-wrapper--highlight .message-bubble-wrapper__body {
   animation: message-bubble-flash 1.2s ease-in-out;
-  border-radius: 8px;
+  border-radius: var(--uikit-components-radius, 8px);
 }
 
 /* 头像右键菜单 */
@@ -994,11 +994,11 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: var(--uikit-components-radius, 6px);
+  border-radius: var(--uikit-components-radius);
   font-size: 13px;
   color: var(--uikit-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .avatar-context-menu__item:hover {
@@ -1014,9 +1014,9 @@ onBeforeUnmount(() => {
   margin-bottom: 2px;
   padding: 1px 6px;
   font-size: 11px;
-  color: var(--uikit-primary-color, #5f6df3);
-  background-color: rgba(95, 109, 243, 0.1);
-  border-radius: 8px;
+  color: var(--uikit-primary-color);
+  background-color: rgba(var(--uikit-primary-rgb), 0.1);
+  border-radius: var(--uikit-components-radius, 8px);
   user-select: none;
 }
 
@@ -1026,23 +1026,23 @@ onBeforeUnmount(() => {
 
 @keyframes message-bubble-flash {
   0% {
-    box-shadow: 0 0 0 0 rgba(64, 158, 255, 0);
+    box-shadow: 0 0 0 0 rgba(var(--uikit-primary-rgb), 0);
     background-color: transparent;
   }
   20% {
-    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.35);
-    background-color: rgba(64, 158, 255, 0.12);
+    box-shadow: 0 0 0 4px rgba(var(--uikit-primary-rgb), 0.35);
+    background-color: rgba(var(--uikit-primary-rgb), 0.12);
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0);
-    background-color: rgba(64, 158, 255, 0.06);
+    box-shadow: 0 0 0 4px rgba(var(--uikit-primary-rgb), 0);
+    background-color: rgba(var(--uikit-primary-rgb), 0.06);
   }
   80% {
-    box-shadow: 0 0 0 4px rgba(64, 158, 255, 0.2);
-    background-color: rgba(64, 158, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(var(--uikit-primary-rgb), 0.2);
+    background-color: rgba(var(--uikit-primary-rgb), 0.1);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(64, 158, 255, 0);
+    box-shadow: 0 0 0 0 rgba(var(--uikit-primary-rgb), 0);
     background-color: transparent;
   }
 }

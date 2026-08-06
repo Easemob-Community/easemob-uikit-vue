@@ -190,10 +190,10 @@ function onActionClick(key: string) {
   gap: 6px;
   min-width: 120px;
   padding: 10px 28px;
-  border-radius: var(--uikit-components-radius, 12px);
+  border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-bg-secondary);
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .group-card__action:hover {
@@ -201,11 +201,11 @@ function onActionClick(key: string) {
 }
 
 .group-card__action--primary {
-  color: var(--uikit-primary-color, #3b82f6);
+  color: var(--uikit-primary-color);
 }
 
 .group-card__action--danger {
-  color: #ef4444;
+  color: var(--uikit-danger-color);
 }
 
 .group-card__action--default {

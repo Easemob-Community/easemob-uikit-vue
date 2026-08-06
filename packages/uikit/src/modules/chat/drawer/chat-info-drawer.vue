@@ -979,11 +979,11 @@ defineExpose({
 
 .chat-info-drawer__section {
   background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
+  border-radius: var(--uikit-components-radius);
   padding: 12px 16px;
   flex-shrink: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--uikit-border-light, rgba(0, 0, 0, 0.04));
+  box-shadow: var(--uikit-shadow-sm);
+  border: 1px solid var(--uikit-border-light);
 }
 
 .chat-info-drawer__section--profile {
@@ -1031,8 +1031,8 @@ defineExpose({
 .chat-info-drawer__remark-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color);
+  border-radius: var(--uikit-components-radius);
   font-size: 14px;
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -1059,8 +1059,8 @@ defineExpose({
 
 .chat-info-drawer__inline-input {
   padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color);
+  border-radius: var(--uikit-components-radius);
   font-size: 16px;
   font-weight: 600;
   text-align: center;
@@ -1075,8 +1075,8 @@ defineExpose({
 
 .chat-info-drawer__inline-textarea {
   padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
+  border: 1px solid var(--uikit-border-color);
+  border-radius: var(--uikit-components-radius);
   font-size: 14px;
   line-height: 1.5;
   outline: none;
@@ -1153,7 +1153,7 @@ defineExpose({
   color: var(--uikit-primary-color);
   font-size: 14px;
   cursor: pointer;
-  border-radius: var(--uikit-components-radius, 6px);
+  border-radius: var(--uikit-components-radius);
 }
 
 .chat-info-drawer__view-all:hover {
@@ -1170,9 +1170,9 @@ defineExpose({
   min-height: 0;
   overflow: hidden;
   background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--uikit-border-light, rgba(0, 0, 0, 0.04));
+  border-radius: var(--uikit-components-radius);
+  box-shadow: var(--uikit-shadow-sm);
+  border: 1px solid var(--uikit-border-light);
 }
 
 /* 内容少时卡片高度由成员列表决定，不强制撑满抽屉；成员多时由外层 body 滚动 */

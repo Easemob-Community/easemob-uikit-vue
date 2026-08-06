@@ -272,15 +272,15 @@ function onSelectorChanged() {
 }
 
 .user-card__status--online .user-card__status-dot {
-  background-color: var(--uikit-success-color, #10b981);
+  background-color: var(--uikit-success-color);
 }
 
 .user-card__status--away .user-card__status-dot {
-  background-color: var(--uikit-warning-color, #f59e0b);
+  background-color: var(--uikit-warning-color);
 }
 
 .user-card__status--busy .user-card__status-dot {
-  background-color: var(--uikit-danger-color, #ef4444);
+  background-color: var(--uikit-danger-color);
 }
 
 .user-card__status--offline .user-card__status-dot,
@@ -309,10 +309,10 @@ function onSelectorChanged() {
   justify-content: center;
   gap: 8px;
   padding: 14px 4px;
-  border-radius: var(--uikit-components-radius, 12px);
+  border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-bg-secondary);
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .user-card__action:hover {

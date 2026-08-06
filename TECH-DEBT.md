@@ -58,10 +58,11 @@
 
 - **现象**：库的样式契约是「只用 `var(--uikit-*)` token」，但组件 `<style>` 里散落 **140 处 hex + 51 处 rgba** 字面量，还有 ~50 处硬编码 `transition` 时长绕过动画开关。
 - **证据（worst offenders）**：`modules/chat/multi-select-bar/multi-select-bar.vue`(16 hex)、`modules/chat/message-item/message-bubble-wrapper.vue`(10)、`components/input/input.vue`(10)、`modules/conversation/conversation-item.vue`(7)、`modules/chat/drawer/chat-info-drawer.vue`(7)、`components/avatar/avatar.vue`(6)、`components/button/button.vue`(5)。多处手抄 theme 值（`#e5e7eb`≈border ×20、`#f3f4f6`≈bg-secondary ×16、`#fff` ×28），还引入了不在色板里的 `#5f6df3/#3b82f6/#007aff/#155eef/#ef4444/#ff4d4f`。2026-07-28 复核补充（暗色必现）：`components/user-card/user-card.vue:281,287` 与 `components/group-card/group-card.vue:185,191` action 按钮 `#f3f4f6`/hover `#e5e7eb`；`components/action-sheet/action-sheet.vue:84,99,109` 分隔线与按下态 `#f3f4f6`；`components/user-card/user-card-modal.vue:226`、`components/group-card/group-card-modal.vue:144` loading 遮罩 `rgba(255,255,255,0.7)`（暗色下盖白幕）；名片 banner 渐变 `#4f8cff/#2b6bf3/#7a5cff`（`user-card.vue:179`、`group-card.vue:128`）不跟随 primary token。
-- **建议修法**：批量把颜色/圆角/时长替换为已存在的 `--uikit-*` token（缺 token 先加进 `src/theme/index.css`）；动效改用 `var(--uikit-anim-duration/easing)`。可分模块逐个清。**2026-07 H5 适配专项已顺手修复 message-input emoji sheet 等 H5 高频路径的硬编码时长，全局 140+ hex 仍需继续清理。**
+- **建议修法**：批量把颜色/圆角/时长替换为已存在的 `--uikit-*` token（缺 token 先加进 `src/theme/index.css`）；动效改用 `var(--uikit-anim-duration/easing)`。可分模块逐个清。
+- **进展**：2026-08-05 主题 Phase 1 已清理 worst offenders（multi-select-bar / message-bubble-wrapper / input / conversation-item / chat-info-drawer / avatar / button / action-sheet / emoji-picker / user-card / group-card / presence-selector / icon-button）中的裸 hex、硬编码圆角与 transition，新增 `--uikit-shadow-sm` token。剩余非高频文件中的散落 hex 仍待继续清理。
 - **关联 skill**：`uikit-styling-theming`
 
-### [ ] D4. 组件引用了「未定义」的 `--uikit-*` 变量，永远走 fallback 且 fallback 互相不一致
+### [x] D4. 组件引用了「未定义」的 `--uikit-*` 变量，永远走 fallback 且 fallback 互相不一致
 
 - **现象**：组件里引用了 `theme/index.css` 与 `store/theme.ts` **都没有定义**的变量名，只能永远渲染 inline fallback；而不同文件对同一变量给的 fallback 还不一样。
 - **证据**：`--uikit-text-tertiary` / `--uikit-bg-tertiary` / `--uikit-bg-active` / `--uikit-primary` / `--uikit-primary-hover` / `--uikit-primary-rgb` / `--uikit-danger-rgb` / `--uikit-border` 均未定义。例：
@@ -70,6 +71,7 @@
   - `var(--uikit-text-tertiary, #c0c4cc)` vs `var(--uikit-text-tertiary, var(--uikit-text-secondary))` 两种 fallback 策略并存。
   - 2026-07-28 复核：`--uikit-text-tertiary` / `--uikit-bg-tertiary` 已在 `theme/index.css:11,16` 定义（本条部分描述已过时）；`--uikit-primary-rgb` 已在 `theme/index.css:23` 定义但固定 `59, 130, 246`（蓝），既不等于默认 primary `hsl(203,100%,60%)`，且 `store/theme.ts:111` 改主题色时不同步重算 → cell 契约 pinned 态 `rgba(var(--uikit-primary-rgb), 0.04)` 永远是错误的蓝。
 - **建议修法**：确定这些语义 token 是否该存在——该存在的补进 `theme/index.css`（含暗色），不该存在的替换为既有 token；统一 fallback。
+- **修复**：2026-08-05 主题 Phase 1 完成：`theme/index.css` 已统一定义上述变量（含暗色）；`store/theme.ts` 新增 `--uikit-primary-hover` 运行时同步，确保改主题色后别名与 `rgba(var(--uikit-primary-rgb), α)` 同步；worst offenders 中的不一致 fallback 已统一或移除。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [x] D5. `loaded + explicitCount` 计数模式只落地了一半
@@ -356,7 +358,8 @@
 ### [ ] D12. 动效未接入变量的比例偏高
 
 - **现象**：主题里有完整 `--uikit-anim-*` 体系（含 subtle/expressive/关闭/reduced-motion 开关），但组件里约 50 处 `transition` 用字面时长/缓动，绕过开关（只有 ~8 处 duration + ~12 处 easing 真正用了变量）。2026-07-28 复核补充：`components/button/button.vue:71-72`（150ms×2）、`components/action-sheet/action-sheet.vue:98`、`components/emoji-picker/emoji-picker.vue:91,134`、`components/user-card/user-card.vue:283`、`components/group-card/group-card.vue:187`、`components/presence-selector/presence-selector.vue:216`，`data-uikit-anim-enabled="false"` 和 reduced-motion 对这些无效。
-- **建议修法**：过渡统一改用 `var(--uikit-anim-duration/easing)`，让全局动画开关真正生效。可与 D3 一起清。**2026-07 H5 适配专项已修复 message-input 等 H5 路径的硬编码 transition，剩余 ~50 处仍需继续清理。**
+- **建议修法**：过渡统一改用 `var(--uikit-anim-duration/easing)`，让全局动画开关真正生效。可与 D3 一起清。
+- **进展**：2026-08-05 主题 Phase 1 已把 worst offenders 中的 `transition` 字面时长/缓动替换为 `var(--uikit-anim-duration)` / `var(--uikit-anim-easing)`，全局动画开关和 reduced-motion 现在对这些组件生效。剩余非高频文件中的 ~30 处仍待继续清理。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [x] D27. `invite-member-modal.vue` 和会话弹窗组件未从 barrel 文件导出

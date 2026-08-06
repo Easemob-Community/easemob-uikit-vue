@@ -57,21 +57,21 @@ function handleClick(event: MouseEvent) {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-components-radius);
   background: transparent;
   cursor: pointer;
-  transition: background-color 0.15s var(--uikit-anim-easing, ease),
-              color 0.15s var(--uikit-anim-easing, ease),
-              border-color 0.15s var(--uikit-anim-easing, ease),
-              opacity 0.15s var(--uikit-anim-easing, ease),
-              transform 0.15s var(--uikit-anim-easing, ease),
-              box-shadow 0.15s var(--uikit-anim-easing, ease);
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+              opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+              transform var(--uikit-anim-duration) var(--uikit-anim-easing),
+              box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
   box-sizing: border-box;
 }
 
 .uikit-icon-button:active:not(:disabled) {
-  transform: translateY(0) scale(var(--uikit-anim-scale-press, 0.96));
+  transform: translateY(0) scale(var(--uikit-anim-scale-press));
 }
 
 .uikit-icon-button:disabled {
@@ -92,7 +92,7 @@ function handleClick(event: MouseEvent) {
 /* ---------- solid ---------- */
 .uikit-icon-button--default.uikit-icon-button--solid {
   background-color: var(--uikit-bg-base);
-  border-color: var(--uikit-border-color, #e5e7eb);
+  border-color: var(--uikit-border-color);
   color: var(--uikit-text-secondary);
 }
 
@@ -140,7 +140,7 @@ function handleClick(event: MouseEvent) {
 /* ---------- outline ---------- */
 .uikit-icon-button--default.uikit-icon-button--outline {
   background-color: transparent;
-  border-color: var(--uikit-border-color, #e5e7eb);
+  border-color: var(--uikit-border-color);
   color: var(--uikit-text-secondary);
 }
 
@@ -166,7 +166,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--success.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-success-rgb, 34 197 94), 0.08);
+  background-color: rgba(var(--uikit-success-rgb), 0.08);
 }
 
 .uikit-icon-button--warning.uikit-icon-button--outline {
@@ -176,7 +176,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--warning.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-warning-rgb, 251 191 36), 0.08);
+  background-color: rgba(var(--uikit-warning-rgb), 0.08);
 }
 
 .uikit-icon-button--danger.uikit-icon-button--outline {
@@ -186,7 +186,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--danger.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-danger-rgb, 239 68 68), 0.08);
+  background-color: rgba(var(--uikit-danger-rgb), 0.08);
 }
 
 /* ---------- ghost ---------- */
@@ -196,7 +196,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: var(--uikit-bg-hover, var(--uikit-bg-secondary));
+  background-color: var(--uikit-bg-hover);
 }
 
 .uikit-icon-button--default.uikit-icon-button--ghost {
@@ -221,7 +221,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--success.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-success-rgb, 34 197 94), 0.08);
+  background-color: rgba(var(--uikit-success-rgb), 0.08);
 }
 
 .uikit-icon-button--warning.uikit-icon-button--ghost {
@@ -229,7 +229,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--warning.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-warning-rgb, 251 191 36), 0.08);
+  background-color: rgba(var(--uikit-warning-rgb), 0.08);
 }
 
 .uikit-icon-button--danger.uikit-icon-button--ghost {
@@ -237,6 +237,6 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-icon-button--danger.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-danger-rgb, 239 68 68), 0.08);
+  background-color: rgba(var(--uikit-danger-rgb), 0.08);
 }
 </style>

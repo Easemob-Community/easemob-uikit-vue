@@ -143,6 +143,10 @@ export const useThemeStore = defineStore('theme', () => {
       '--uikit-primary-rgb',
       hslToRgbString(hue, 100, 60)
     )
+    document.documentElement.style.setProperty(
+      '--uikit-primary-hover',
+      `hsl(${hue}, 100%, 50%)`
+    )
     document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
   })
 

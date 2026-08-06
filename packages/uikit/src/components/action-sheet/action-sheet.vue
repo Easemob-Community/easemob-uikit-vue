@@ -96,7 +96,7 @@ function onCancel() {
   font-size: 16px;
   color: var(--uikit-text-primary);
   cursor: pointer;
-  transition: background-color 150ms var(--uikit-anim-easing);
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   border-bottom: 1px solid var(--uikit-border-light);
   display: flex;
   align-items: center;

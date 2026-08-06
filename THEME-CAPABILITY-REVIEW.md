@@ -1,7 +1,7 @@
 # 主题配置能力审查（字号 / 适老版 / 密度 / 定制灵活性）
 
 > 审查日期：2026-08-05。文中行号为当日代码快照，可能随改动漂移，以文件+特征定位为准。
-> 状态：**审查结论，未实施**。关联 TECH-DEBT：D3 / D4 / D12（token 漂移债）。
+> 状态：**Phase 1（D3/D4/D12 token 漂移债）已实施，字号/语义 token/Provider 扩展待后续**。关联 TECH-DEBT：D3 / D4（已完成） / D12（部分完成）。
 
 ## 结论先行
 
@@ -53,7 +53,7 @@
 
 ## 建议推进顺序
 
-1. **先清 D3 / D4 / D12**——不清这些，任何新主题维度都会"改了不生效"；适老版尤其依赖变量全链路生效。
+1. ✅ **先清 D3 / D4 / D12（2026-08-05 已完成 worst offenders）**——`theme/index.css` 补 `--uikit-shadow-sm`、`store/theme.ts` 同步 `--uikit-primary-hover`；worst offenders 的裸 hex、不一致 fallback、硬编码 transition 已替换。
 2. **建字号 token 体系并激活 `--uikit-font-scale`**：字号分级 token + 全局缩放因子（`calc(var(--uikit-font-size-base) * var(--uikit-font-scale))`）；适老版 = 大号预设 + 大点击区域，Provider 可加 `fontSize?: 'normal' | 'large' | 'xlarge'` 或直接暴露 scale 数值。
 3. **补高频语义 token**：气泡色、聊天背景。
 4. **扩 Provider `theme` prop**：补 `mode: 'auto'`、fontSize、（未来）density，并改为 watch 响应式应用。

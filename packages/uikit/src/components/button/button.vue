@@ -34,7 +34,7 @@ const shapeClass = computed(() =>
 const buttonRef = ref<HTMLElement>()
 const rippleColor = computed(() =>
   props.type === 'danger' || props.type === 'danger-outline'
-    ? 'rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.25)'
+    ? 'rgba(var(--uikit-danger-rgb), 0.25)'
     : 'var(--uikit-primary-color)',
 )
 useRipple(buttonRef, { color: rippleColor.value })
@@ -70,11 +70,11 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: 4px;
   border: none;
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-components-radius);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
-              transform 150ms var(--uikit-anim-easing),
-              background-color 150ms var(--uikit-anim-easing);
+              transform var(--uikit-anim-duration) var(--uikit-anim-easing),
+              background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   font-size: 14px;
   /* 为 Ripple 波纹提供定位上下文 */
   position: relative;
@@ -130,11 +130,11 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--danger-outline {
   background-color: var(--uikit-bg-base);
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .uikit-button--danger-outline:hover {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+  background-color: rgba(var(--uikit-danger-rgb), 0.08);
 }
 
 .uikit-button--default {

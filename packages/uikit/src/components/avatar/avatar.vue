@@ -139,25 +139,25 @@ function onClick() {
   bottom: 0;
   border-radius: 50%;
   border-style: solid;
-  border-color: var(--uikit-bg-base, #fff);
-  background-color: var(--uikit-text-tertiary, #94a3b8);
+  border-color: var(--uikit-bg-base);
+  background-color: var(--uikit-text-tertiary);
   box-sizing: border-box;
 }
 
 .uikit-avatar__presence--online {
-  background-color: var(--uikit-success-color, #22c55e);
+  background-color: var(--uikit-success-color);
 }
 
 .uikit-avatar__presence--away {
-  background-color: var(--uikit-warning-color, #f59e0b);
+  background-color: var(--uikit-warning-color);
 }
 
 .uikit-avatar__presence--busy {
-  background-color: var(--uikit-danger-color, #ef4444);
+  background-color: var(--uikit-danger-color);
 }
 
 .uikit-avatar__presence--offline,
 .uikit-avatar__presence--custom {
-  background-color: var(--uikit-text-tertiary, #94a3b8);
+  background-color: var(--uikit-text-tertiary);
 }
 </style>
