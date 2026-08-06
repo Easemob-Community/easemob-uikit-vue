@@ -15,6 +15,7 @@ import Popup from '../../components/popup/popup.vue'
 import ActionSheet from '../../components/action-sheet/action-sheet.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import Empty from '../../components/empty/empty.vue'
+import StatusBanner from '../../components/status-banner/status-banner.vue'
 import type { UiConversation as Conversation } from '../../sdk/types'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationAction, ConversationTabKey } from './types'
@@ -56,6 +57,8 @@ interface ConversationListProps {
   tabs?: ConversationTabKey[]
   /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
   activeTab?: ConversationTabKey
+  /** 是否展示连接/同步状态横幅，默认 true */
+  showStatusBanner?: boolean
 }
 
 const props = withDefaults(defineProps<ConversationListProps>(), {
@@ -71,6 +74,7 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
   pullRefresh: false,
   tabs: () => [...DEFAULT_CONVERSATION_TABS],
   activeTab: 'all',
+  showStatusBanner: true,
 })
 
 const emit = defineEmits<{
@@ -78,6 +82,8 @@ const emit = defineEmits<{
   (e: 'at-me-click', id: string, conversation: Conversation): void
   (e: 'custom-action', key: string, conversation: Conversation): void
   (e: 'update:active-tab', tab: ConversationTabKey): void
+  /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
+  (e: 'reconnect'): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
@@ -88,6 +94,68 @@ const presence = usePresence()
 
 /** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
 const isSyncing = computed(() => stores.conversation.isSyncingConversations)
+
+/** 消息是否正在同步（离线消息同步阶段） */
+const isSyncingMessages = computed(() => stores.message.isSyncingMessages)
+
+/** 连接/同步状态横幅当前应展示的内容；按优先级：断网 > 连接中 > 会话同步 > 消息同步 */
+const bannerState = computed(() => {
+  const connected = stores.client.connected
+  const connecting = stores.client.connecting
+  if (!connected && !connecting) {
+    return {
+      visible: true,
+      type: 'error' as const,
+      loading: false,
+      title: t('status.networkError'),
+      description: '',
+      clickable: true,
+    }
+  }
+  if (connecting) {
+    return {
+      visible: true,
+      type: 'warning' as const,
+      loading: true,
+      title: t('status.connecting'),
+      description: '',
+      clickable: false,
+    }
+  }
+  if (isSyncing.value) {
+    return {
+      visible: true,
+      type: 'info' as const,
+      loading: true,
+      title: t('status.syncingConversations'),
+      description: '',
+      clickable: false,
+    }
+  }
+  if (isSyncingMessages.value) {
+    return {
+      visible: true,
+      type: 'info' as const,
+      loading: true,
+      title: t('status.syncingMessages'),
+      description: '',
+      clickable: false,
+    }
+  }
+  return {
+    visible: false,
+    type: 'info' as const,
+    loading: false,
+    title: '',
+    description: '',
+    clickable: false,
+  }
+})
+
+function handleReconnect() {
+  if (bannerState.value.clickable)
+    emit('reconnect')
+}
 
 /** 实际是否启用下拉刷新：prop 优先，未显式开启时走 Provider H5 配置 */
 const effectivePullRefresh = computed(() => props.pullRefresh || h5.enablePullRefresh.value)
@@ -364,6 +432,21 @@ function handleCustomAction(key: string, conversation: Conversation) {
         prefix-icon="misc/magnifier2"
       />
     </div>
+    <!-- 连接/同步状态横幅：搜索栏下方、列表上方 -->
+    <div v-if="props.showStatusBanner && bannerState.visible" class="conversation-list__status-banner">
+      <slot
+        name="status-banner"
+        v-bind="bannerState"
+      >
+        <StatusBanner
+          :type="bannerState.type"
+          :loading="bannerState.loading"
+          :title="bannerState.title"
+          :clickable="bannerState.clickable"
+          @click="handleReconnect"
+        />
+      </slot>
+    </div>
     <!-- body slot - sticky 模式放在滚动容器外部 -->
     <div v-if="$slots.body && props.bodySticky" class="conversation-list__body conversation-list__body--sticky">
       <slot name="body" />
@@ -553,6 +636,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 .conversation-list__search {
   padding: 2px 16px 8px;
+}
+
+.conversation-list__status-banner {
+  padding: 0 16px 8px;
+  flex-shrink: 0;
 }
 
 .conversation-list__title {

@@ -17,6 +17,7 @@ import {
   useConversationTabs,
   useLocale,
   useMessageSend,
+  useNotification,
   useOwnUserInfo,
   useUIKit,
   useViewport,
@@ -95,7 +96,35 @@ const {
   conversationTabsVisible,
   conversationTabsTakeover,
   conversationActiveTab,
+  statusBannerEnabled,
+  notificationEnable,
+  notificationBrowser,
+  notificationInApp,
+  notificationAutoRequest,
+  notificationTriggerMode,
 } = useDemoSettings()
+
+/** 消息通知配置：面板改动实时同步到 useNotification 单例（Provider 已按 prop 接线） */
+const { configureNotification } = useNotification()
+watch(
+  [
+    notificationEnable,
+    notificationBrowser,
+    notificationInApp,
+    notificationAutoRequest,
+    notificationTriggerMode,
+  ],
+  ([enabled, browserEnabled, inAppEnabled, autoRequestPermission, triggerMode]) => {
+    configureNotification({
+      enabled,
+      browserEnabled,
+      inAppEnabled,
+      autoRequestPermission,
+      triggerMode,
+    })
+  },
+  { immediate: true },
+)
 
 /** 会话分栏：面板配置的 tabs 与 hook 状态；接管模式下由 #tabs 插槽完全自绘 */
 const { tabs: takeoverTabs, activeTab: takeoverActiveTab, selectTab: takeoverSelectTab } = useConversationTabs({
@@ -426,6 +455,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
           v-if="sidebarTab === 'conversation'"
           :tabs="effectiveConversationTabs"
           :active-tab="effectiveConversationActiveTab"
+          :show-status-banner="statusBannerEnabled"
           @update:active-tab="onConversationActiveTabChange"
         >
           <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">
@@ -524,6 +554,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
             :pull-refresh="true"
             :tabs="effectiveConversationTabs"
             :active-tab="effectiveConversationActiveTab"
+            :show-status-banner="statusBannerEnabled"
             @update:active-tab="onConversationActiveTabChange"
           >
             <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">

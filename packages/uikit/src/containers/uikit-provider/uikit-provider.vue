@@ -12,7 +12,10 @@ import {
 import { useLocale } from '../../locale'
 import { useThemeStore } from '../../store/theme'
 import { useToast } from '../../composables/use-toast'
-import { EmToast } from '../../components'
+import { useNotification } from '../../composables/use-notification'
+import type { NotificationTriggerMode } from '../../composables/use-notification'
+import { EmNotificationContainer, EmToast } from '../../components'
+import type { NotificationItem } from '../../components/notification/types'
 import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
@@ -88,6 +91,24 @@ export interface ProviderProps {
    * 关闭后仍可通过 `useToast()` 获取状态并自行渲染提示组件。
    */
   enableToast?: boolean
+  /**
+   * 消息通知配置（默认全开，触发模式 background）。
+   * 关闭后仍可通过 `useNotification()` 获取状态并自行渲染通知组件。
+   */
+  notification?: {
+    /** 总开关（默认 true） */
+    enable?: boolean
+    /** 浏览器系统通知（默认 true） */
+    browser?: boolean
+    /** 页内右上角弹窗（默认 true） */
+    inApp?: boolean
+    /** 首次通知时自动请求浏览器通知权限（默认 true） */
+    autoRequestPermission?: boolean
+    /** 触发模式：'background' 仅页面隐藏时（默认）| 'always' 非当前会话即触发 */
+    triggerMode?: NotificationTriggerMode
+    /** 点击通知时跳转对应会话（默认 true） */
+    navigateOnClick?: boolean
+  }
 }
 
 const props = withDefaults(defineProps<ProviderProps>(), {
@@ -106,6 +127,12 @@ const props = withDefaults(defineProps<ProviderProps>(), {
 const { setLocale } = useLocale()
 const themeStore = useThemeStore()
 const { state: toastState, warning: showToastWarning } = useToast()
+const {
+  state: notificationState,
+  close: closeNotification,
+  configureNotification,
+  setNotificationClickHandler,
+} = useNotification()
 const { t } = useLocale()
 
 const toastProps = computed(() => ({
@@ -113,6 +140,9 @@ const toastProps = computed(() => ({
   message: toastState.value.message,
   type: toastState.value.type,
 }))
+
+/** 页内通知容器是否挂载（notification.enable 默认 true） */
+const enableNotification = computed(() => props.notification?.enable ?? true)
 
 const config = computed<ClientConfig>(() => ({
   appKey: props.appKey ?? '',
@@ -146,6 +176,38 @@ const ctx = useUIKitProvider(config.value, {
     ? () => showToastWarning(t('userInfo.subscriptionDisabled'))
     : undefined,
 })
+
+/** 通知点击默认行为：聚焦页面 + 跳转对应会话（navigateOnClick=false 时仅聚焦）。
+ * 进入流程与手动点击会话项保持一致（enter：SDK setCurrentConversation + store 当前会话
+ * + 补发已读回执；sendChannelAck：清除未读数）。若只 setCurrentConversationId，
+ * SDK 层仍认为该会话非当前会话，新消息到达时未读数先增后清，出现 1→0 闪烁。 */
+function onNotificationClick(item: Omit<NotificationItem, 'id' | 'unreadCount'>) {
+  window.focus()
+  if (props.notification?.navigateOnClick === false)
+    return
+  const cvs = ctx.stores.conversation.conversationList.find(c => c.id === item.conversationId)
+  if (!cvs)
+    return
+  ctx.domains.conversation.enter(cvs.id, cvs.type)
+  // 清除该会话未读数（未读数 > 0 时向服务端清未读，0 时短路）
+  void ctx.domains.conversation.sendChannelAck(cvs.id, cvs.type)
+}
+
+/** 通知配置响应式应用：开关/权限自动请求/触发模式/点击回调 */
+watch(
+  () => props.notification,
+  (config) => {
+    configureNotification({
+      enabled: config?.enable,
+      browserEnabled: config?.browser,
+      inAppEnabled: config?.inApp,
+      autoRequestPermission: config?.autoRequestPermission,
+      triggerMode: config?.triggerMode,
+    })
+    setNotificationClickHandler(config?.navigateOnClick === false ? null : onNotificationClick)
+  },
+  { deep: true, immediate: true },
+)
 
 /**
  * 登录后根据开关拉取全局副作用数据：
@@ -290,6 +352,12 @@ onMounted(() => {
   <div class="uikit-provider">
     <slot />
     <EmToast v-if="props.enableToast" v-bind="toastProps" />
+    <EmNotificationContainer
+      v-if="enableNotification"
+      :items="notificationState.list"
+      @close="closeNotification"
+      @click="onNotificationClick"
+    />
   </div>
 </template>
 

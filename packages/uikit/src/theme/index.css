@@ -29,6 +29,7 @@
   --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
+  --uikit-info-rgb: 51, 177, 255;
 
   /* 小阴影：用于卡片/抽屉内的轻量层级 */
   --uikit-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -72,6 +73,8 @@
   --uikit-message-padding: 16px;
   --uikit-drawer-padding: 16px;
   --uikit-button-padding-y: 8px;
+  --uikit-banner-padding-y: 8px;
+  --uikit-banner-padding-x: 12px;
   --uikit-components-radius: 8px;
   --uikit-components-radius-hover: 14px;
 
@@ -201,6 +204,7 @@
   --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
   --uikit-danger-rgb: 255, 51, 68;
+  --uikit-info-rgb: 51, 177, 255;
 
   /* 小阴影：深色下提高不透明度 */
   --uikit-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
@@ -239,6 +243,8 @@
   --uikit-message-padding: 12px;
   --uikit-drawer-padding: 12px;
   --uikit-button-padding-y: 6px;
+  --uikit-banner-padding-y: 6px;
+  --uikit-banner-padding-x: 10px;
 }
 
 [data-uikit-density="normal"] {
@@ -257,6 +263,8 @@
   --uikit-message-padding: 16px;
   --uikit-drawer-padding: 16px;
   --uikit-button-padding-y: 8px;
+  --uikit-banner-padding-y: 8px;
+  --uikit-banner-padding-x: 12px;
 }
 
 [data-uikit-density="comfortable"] {
@@ -275,6 +283,8 @@
   --uikit-message-padding: 20px;
   --uikit-drawer-padding: 20px;
   --uikit-button-padding-y: 12px;
+  --uikit-banner-padding-y: 10px;
+  --uikit-banner-padding-x: 14px;
 }
 
 /* ===== 全局滚动条美化 ===== */

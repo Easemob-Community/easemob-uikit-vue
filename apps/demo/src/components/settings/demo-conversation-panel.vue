@@ -10,10 +10,16 @@
  *
  * 状态来自 useDemoSettings，由 demo-page 绑定到 EmConversationContainer。
  */
+import { useClientStore, useConversationStore, useMessageStore } from '@easemob/uikit'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 
+const clientStore = useClientStore()
+const conversationStore = useConversationStore()
+const messageStore = useMessageStore()
+
 const {
+  statusBannerEnabled,
   conversationTabs,
   conversationTabsVisible,
   conversationTabsTakeover,
@@ -23,10 +29,67 @@ const {
   moveConversationTab,
   presetConversationTabs,
 } = useDemoSettings()
+
+/** 模拟状态：仅供 UI 验证，不触发真实 SDK 事件 */
+function simulateNetworkError() {
+  clientStore.setConnected(false)
+  clientStore.setConnecting(false)
+  conversationStore.setSyncingConversations(false)
+  messageStore.setSyncingMessages(false)
+}
+
+function simulateConnecting() {
+  clientStore.setConnected(false)
+  clientStore.setConnecting(true)
+  conversationStore.setSyncingConversations(false)
+  messageStore.setSyncingMessages(false)
+}
+
+function simulateSyncingConversations() {
+  clientStore.setConnected(true)
+  clientStore.setConnecting(false)
+  conversationStore.setSyncingConversations(true)
+  messageStore.setSyncingMessages(false)
+}
+
+function simulateSyncingMessages() {
+  clientStore.setConnected(true)
+  clientStore.setConnecting(false)
+  conversationStore.setSyncingConversations(false)
+  messageStore.setSyncingMessages(true)
+}
+
+function restoreStatus() {
+  clientStore.setConnected(true)
+  clientStore.setConnecting(false)
+  conversationStore.setSyncingConversations(false)
+  messageStore.setSyncingMessages(false)
+}
 </script>
 
 <template>
   <div class="demo-panel">
+    <div class="demo-settings__group">
+      <label class="demo-settings__label">状态横幅</label>
+      <label class="demo-check">
+        <input v-model="statusBannerEnabled" type="checkbox">
+        <span>展示连接/同步状态横幅</span>
+      </label>
+      <div class="demo-info">
+        横幅按优先级展示：断网 > 连接中 > 会话同步中 > 消息同步中。
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+        <button class="demo-btn demo-btn--sm" @click="simulateNetworkError">模拟断网</button>
+        <button class="demo-btn demo-btn--sm" @click="simulateConnecting">模拟连接中</button>
+        <button class="demo-btn demo-btn--sm" @click="simulateSyncingConversations">模拟会话同步</button>
+        <button class="demo-btn demo-btn--sm" @click="simulateSyncingMessages">模拟消息同步</button>
+        <button class="demo-btn demo-btn--sm" @click="restoreStatus">恢复</button>
+      </div>
+      <div class="demo-info" style="color: var(--uikit-warning-color, #f59e0b);">
+        注意：模拟按钮仅修改 UI 状态，不会真实断开 SDK 连接。
+      </div>
+    </div>
+
     <div class="demo-settings__group">
       <label class="demo-settings__label">分栏显隐</label>
       <div style="display: flex; flex-direction: column; gap: 6px;">

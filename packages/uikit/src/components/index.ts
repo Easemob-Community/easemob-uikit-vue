@@ -27,6 +27,14 @@ export { default as EmCopyableText } from './copyable-text/copyable-text.vue'
 export type { CopyableTextProps } from './copyable-text/copyable-text.vue'
 export { default as EmEmpty } from './empty/empty.vue'
 export type { EmptyProps } from './empty/empty.vue'
+export { default as EmNotification } from './notification/notification.vue'
+export type { NotificationProps } from './notification/notification.vue'
+export { default as EmNotificationContainer } from './notification/notification-container.vue'
+export type { NotificationContainerProps } from './notification/notification-container.vue'
+export type { NotificationItem } from './notification/types'
+export { default as EmStatusBanner } from './status-banner/status-banner.vue'
+export type { StatusBannerProps, StatusBannerEmits } from './status-banner/status-banner.vue'
+export type { StatusBannerType, StatusBannerItem } from './status-banner/types'
 export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
@@ -53,4 +61,7 @@ export const componentList = [
   'em-cell',
   'em-copyable-text',
   'em-empty',
+  'em-notification',
+  'em-notification-container',
+  'em-status-banner',
 ] as const

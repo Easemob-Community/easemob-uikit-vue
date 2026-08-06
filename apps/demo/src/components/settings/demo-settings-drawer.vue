@@ -3,7 +3,7 @@
  * Demo 设置抽屉（分类导航外壳）
  *
  * 交互：PC 为右侧抽屉「左侧分类导航 + 右侧面板内容」；H5 为底部抽屉「顶部横向分类 tab + 内容」。
- * 6 个分类对应 6 个独立面板组件，切换只换内容区，面板状态由 useDemoSettings 单例持有，不丢失。
+ * 8 个分类对应 8 个独立面板组件，切换只换内容区，面板状态由 useDemoSettings 单例持有，不丢失。
  * Provider 四开关由 app.vue 持有，经本组件 props/emits 双向转发到各面板。
  */
 import { ref } from 'vue'
@@ -13,6 +13,7 @@ import DemoChatPanel from './demo-chat-panel.vue'
 import DemoContactPanel from './demo-contact-panel.vue'
 import DemoConversationPanel from './demo-conversation-panel.vue'
 import DemoDataPanel from './demo-data-panel.vue'
+import DemoNotificationPanel from './demo-notification-panel.vue'
 import DemoProviderPanel from './demo-provider-panel.vue'
 import DemoSdkPanel from './demo-sdk-panel.vue'
 
@@ -45,6 +46,7 @@ const categories = [
   { key: 'chat', label: '聊天', icon: 'chat/bubble_fill' },
   { key: 'contact', label: '通讯录', icon: 'people/person_3lines_fill' },
   { key: 'data', label: '演示数据', icon: 'files-media/archives' },
+  { key: 'notification', label: '通知', icon: 'status/info' },
   { key: 'provider', label: 'Provider', icon: 'actions/shield' },
   { key: 'sdk', label: 'SDK 登录', icon: 'actions/unlock' },
 ] as const
@@ -91,6 +93,7 @@ function close() {
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
+          <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />
           <DemoProviderPanel
             v-else-if="activeCategory === 'provider'"
             :enable-contact="props.enableContact"
@@ -127,6 +130,7 @@ function close() {
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
+          <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />
           <DemoProviderPanel
             v-else-if="activeCategory === 'provider'"
             :enable-contact="props.enableContact"

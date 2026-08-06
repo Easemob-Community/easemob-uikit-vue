@@ -48,6 +48,8 @@ export interface ConversationContainerProps {
   tabs?: ConversationTabKey[]
   /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
   activeTab?: ConversationTabKey
+  /** 是否展示连接/同步状态横幅，默认 true */
+  showStatusBanner?: boolean
   /**
    * 草稿存储模式：
    * - 'none' 仅内存缓存，页面关闭即丢失（默认）
@@ -72,11 +74,14 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   draftStorage: 'none',
   tabs: () => [...DEFAULT_CONVERSATION_TABS],
   activeTab: 'all',
+  showStatusBanner: true,
 })
 
 const emit = defineEmits<{
   (e: 'conversation-select', conversation: Conversation): void
   (e: 'update:active-tab', tab: ConversationTabKey): void
+  /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
+  (e: 'reconnect'): void
 }>()
 
 const { refreshConversations } = useConversation()
@@ -101,6 +106,10 @@ function handleConversationSelect(id: string, conversation: Conversation) {
 function handleActiveTabChange(tab: ConversationTabKey) {
   emit('update:active-tab', tab)
 }
+
+function handleReconnect() {
+  emit('reconnect')
+}
 </script>
 
 <template>
@@ -124,8 +133,10 @@ function handleActiveTabChange(tab: ConversationTabKey) {
       :enable-presence="props.enablePresence"
       :tabs="props.tabs"
       :active-tab="props.activeTab"
+      :show-status-banner="props.showStatusBanner"
       @update:active-tab="handleActiveTabChange"
       @select="handleConversationSelect"
+      @reconnect="handleReconnect"
     >
       <template v-if="$slots.tabs" #tabs="slotProps">
         <slot name="tabs" v-bind="slotProps" />
@@ -135,6 +146,9 @@ function handleActiveTabChange(tab: ConversationTabKey) {
       </template>
       <template v-if="$slots.empty" #empty="slotProps">
         <slot name="empty" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.statusBanner" #status-banner="slotProps">
+        <slot name="status-banner" v-bind="slotProps" />
       </template>
       <template v-if="$slots.body" #body>
         <slot name="body" />

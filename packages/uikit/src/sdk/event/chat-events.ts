@@ -6,6 +6,7 @@ import { toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
+import { notifyOnNewMessage } from '../notification-engine'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
 import { markReadReceiptSent } from '../domain/message-domain'
@@ -300,6 +301,9 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           stores.message.addAtMeMessage(sdkMsg.conversationId, uiMsg.msgServerId || uiMsg.msgLocalId)
         }
       }
+
+      // 消息通知：非当前会话 + 页面隐藏（background 模式）时触发浏览器/页内通知
+      notifyOnNewMessage(stores, sdkMsg)
     },
 
     onMessageRecalled: (payload) => {

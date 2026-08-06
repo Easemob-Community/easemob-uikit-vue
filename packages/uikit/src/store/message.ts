@@ -28,6 +28,8 @@ export const useMessageStore = defineStore('message', () => {
   const pinnedMessageMap = ref<Record<string, UiMessage[]>>({})
   const parsedCombineMessageMap = ref<Record<string, UiMessage[]>>({})
   const atMeMessageMap = ref<Record<string, string[]>>({})
+  /** 离线消息同步中（登录后 SDK 拉取离线历史阶段） */
+  const isSyncingMessages = ref(false)
 
   let maxMessageCount = 300
 
@@ -60,6 +62,10 @@ export const useMessageStore = defineStore('message', () => {
 
   function setParsedCombineMessages(messageId: string, messages: UiMessage[]) {
     parsedCombineMessageMap.value[messageId] = messages
+  }
+
+  function setSyncingMessages(value: boolean) {
+    isSyncingMessages.value = value
   }
 
   function getAtMeMessages(conversationId: string): string[] {
@@ -378,6 +384,7 @@ export const useMessageStore = defineStore('message', () => {
     pinnedMessageMap.value = {}
     parsedCombineMessageMap.value = {}
     atMeMessageMap.value = {}
+    isSyncingMessages.value = false
   }
 
   return {
@@ -386,6 +393,8 @@ export const useMessageStore = defineStore('message', () => {
     pinnedMessageMap: computed(() => pinnedMessageMap.value),
     parsedCombineMessageMap: computed(() => parsedCombineMessageMap.value),
     atMeMessageMap: computed(() => atMeMessageMap.value),
+    isSyncingMessages: computed(() => isSyncingMessages.value),
+    setSyncingMessages,
     setOptions,
     getMessages,
     getPinnedMessages,

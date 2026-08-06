@@ -189,6 +189,22 @@ function createDemoSettings() {
   const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
   const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
 
+  /* ===== 状态横幅配置（EmStatusBanner） ===== */
+  /** 是否展示 ConversationList 中的状态横幅 */
+  const statusBannerEnabled = ref(true)
+
+  /* ===== 消息通知配置（EmNotification） ===== */
+  /** 总开关 */
+  const notificationEnable = ref(true)
+  /** 浏览器系统通知（页面在后台时） */
+  const notificationBrowser = ref(true)
+  /** 页内右上角弹窗 */
+  const notificationInApp = ref(true)
+  /** 首次通知时自动请求浏览器通知权限 */
+  const notificationAutoRequest = ref(true)
+  /** 触发模式：'background' 仅页面隐藏时（默认）| 'always' 非当前会话即触发 */
+  const notificationTriggerMode = ref<'background' | 'always'>('background')
+
   /* ===== 联系人容器搜索控制 ===== */
   const showHomeSearch = ref(true)
   const showContactSearch = ref(true)
@@ -311,6 +327,14 @@ function createDemoSettings() {
     chatMessageStatusShowText,
     chatMessageStatusDirection,
     chatMessageStatusPosition,
+    // 状态横幅
+    statusBannerEnabled,
+    // 消息通知
+    notificationEnable,
+    notificationBrowser,
+    notificationInApp,
+    notificationAutoRequest,
+    notificationTriggerMode,
     // 搜索控制
     showHomeSearch,
     showContactSearch,

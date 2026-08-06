@@ -41,9 +41,11 @@ export function createConnectionHandlers(stores: RootStores): ConnectionEventHan
     },
     onOfflineMessageSyncStart: () => {
       connLog.info('onOfflineMessageSyncStart')
+      stores.message.setSyncingMessages(true)
     },
     onOfflineMessageSyncFinish: () => {
       connLog.info('onOfflineMessageSyncFinish')
+      stores.message.setSyncingMessages(false)
     },
   }
 }
