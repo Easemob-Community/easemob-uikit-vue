@@ -326,6 +326,9 @@ function updatePrimaryColor(e: Event) {
           class="demo-color-input"
           @input="(e: Event) => setBubbleBg((e.target as HTMLInputElement).value, undefined)"
         >
+        <button class="demo-reset-btn" @click="setBubbleBg(undefined, undefined)">
+          恢复
+        </button>
       </div>
       <div class="demo-settings__row">
         <span class="demo-settings__row-label">自己气泡</span>
@@ -335,6 +338,9 @@ function updatePrimaryColor(e: Event) {
           class="demo-color-input"
           @input="(e: Event) => setBubbleBg(undefined, (e.target as HTMLInputElement).value)"
         >
+        <button class="demo-reset-btn" @click="setBubbleBg(undefined, undefined)">
+          恢复
+        </button>
       </div>
       <div class="demo-settings__row">
         <span class="demo-settings__row-label">输入区背景</span>
@@ -344,6 +350,9 @@ function updatePrimaryColor(e: Event) {
           class="demo-color-input"
           @input="(e: Event) => setInputBg((e.target as HTMLInputElement).value)"
         >
+        <button class="demo-reset-btn" @click="setInputBg(undefined)">
+          恢复
+        </button>
       </div>
       <div class="demo-settings__row demo-settings__row--column">
         <span class="demo-settings__row-label">聊天背景</span>
@@ -354,10 +363,15 @@ function updatePrimaryColor(e: Event) {
           class="demo-text-input"
           @input="(e: Event) => setChatBg((e.target as HTMLInputElement).value || undefined)"
         >
+        <div class="demo-settings__row-actions">
+          <button class="demo-reset-btn" @click="setChatBg(undefined)">
+            恢复
+          </button>
+        </div>
       </div>
       <div class="demo-settings__row">
         <button class="demo-option" @click="setBubbleBg(undefined, undefined); setChatBg(undefined); setInputBg(undefined)">
-          重置
+          全部重置
         </button>
       </div>
     </div>

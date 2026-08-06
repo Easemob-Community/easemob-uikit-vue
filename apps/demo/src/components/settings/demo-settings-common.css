@@ -225,6 +225,28 @@
   border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
 }
 
+.demo-settings__row-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.demo-reset-btn {
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--uikit-text-secondary, #6b7280);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-reset-btn:hover {
+  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+}
+
 /* ===== 说明文字 ===== */
 .demo-info {
   margin-top: 6px;
