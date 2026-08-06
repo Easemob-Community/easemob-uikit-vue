@@ -118,8 +118,8 @@ async function handleDownload() {
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   cursor: pointer;
   transition: background-color 0.15s;
   width: 240px;
@@ -166,20 +166,22 @@ async function handleDownload() {
 
 /* 己方气泡保持主色调 */
 .file-message--self .file-message__bubble {
-  background-color: var(--uikit-primary-color);
-  color: #fff;
+  background-color: var(--uikit-bubble-bg-self);
+  color: var(--uikit-bubble-text-self);
 }
 
 .file-message--self .file-message__bubble:hover {
-  background-color: var(--uikit-primary-color);
+  background-color: var(--uikit-bubble-bg-self);
   opacity: 0.9;
 }
 
 .file-message--self .file-message__icon {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.85;
 }
 
 .file-message--self .file-message__size {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.7;
 }
 </style>

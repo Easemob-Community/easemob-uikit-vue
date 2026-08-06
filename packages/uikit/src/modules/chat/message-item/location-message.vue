@@ -75,8 +75,8 @@ function onClick() {
   gap: 10px;
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   cursor: pointer;
   transition: background-color 0.15s;
   width: 240px;
@@ -84,8 +84,18 @@ function onClick() {
   box-sizing: border-box;
 }
 
+.location-message--self .location-message__bubble {
+  background-color: var(--uikit-bubble-bg-self);
+  color: var(--uikit-bubble-text-self);
+}
+
 .location-message__bubble:hover {
   background-color: var(--uikit-bg-hover);
+}
+
+.location-message--self .location-message__bubble:hover {
+  background-color: var(--uikit-bubble-bg-self);
+  opacity: 0.9;
 }
 
 .location-message__icon {
@@ -94,6 +104,11 @@ function onClick() {
   align-items: center;
   justify-content: center;
   color: var(--uikit-primary-color);
+}
+
+.location-message--self .location-message__icon {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.85;
 }
 
 .location-message__info {
@@ -119,5 +134,10 @@ function onClick() {
 .location-message__coordinates {
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
+}
+
+.location-message--self .location-message__coordinates {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.7;
 }
 </style>

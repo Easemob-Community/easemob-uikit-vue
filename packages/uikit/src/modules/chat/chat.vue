@@ -1166,7 +1166,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--uikit-bg-base);
+  background: var(--uikit-chat-bg);
 }
 
 /* 空状态：上下左右居中 */

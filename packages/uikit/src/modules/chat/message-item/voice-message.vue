@@ -200,8 +200,8 @@ function onToggleVoiceText() {
   gap: 6px;
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
   max-width: 60%;
 }
@@ -211,8 +211,8 @@ function onToggleVoiceText() {
 }
 
 .voice-message--self .voice-message__bubble {
-  background-color: var(--uikit-primary-color);
-  color: #fff;
+  background-color: var(--uikit-bubble-bg-self);
+  color: var(--uikit-bubble-text-self);
 }
 
 .voice-message__icon {
@@ -286,8 +286,8 @@ function onToggleVoiceText() {
   margin-top: 6px;
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;

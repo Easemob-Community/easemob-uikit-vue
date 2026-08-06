@@ -54,7 +54,7 @@ function handleClick() {
   gap: 6px;
   padding: 10px 14px;
   border-radius: 8px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bubble-bg-other);
   cursor: pointer;
   min-width: 200px;
   max-width: 300px;
@@ -67,14 +67,14 @@ function handleClick() {
 
 /* 己方合并消息：使用主题色背景 */
 .combine-message--self {
-  background-color: var(--uikit-primary-color, #5f6df3);
+  background-color: var(--uikit-bubble-bg-self);
 }
 
 .combine-message--self .combine-message__header,
 .combine-message--self .combine-message__title,
 .combine-message--self .combine-message__summary,
 .combine-message--self .combine-message__icon {
-  color: #fff;
+  color: var(--uikit-bubble-text-self);
 }
 
 .combine-message--self:hover {
@@ -87,7 +87,7 @@ function handleClick() {
   gap: 6px;
   font-size: var(--uikit-font-size-14);
   font-weight: 500;
-  color: var(--uikit-text-primary);
+  color: var(--uikit-bubble-text-other);
 }
 
 .combine-message__icon {
@@ -105,6 +105,11 @@ function handleClick() {
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   line-height: 1.5;
+}
+
+.combine-message--self .combine-message__summary {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.85;
 }
 
 .combine-message__summary p {

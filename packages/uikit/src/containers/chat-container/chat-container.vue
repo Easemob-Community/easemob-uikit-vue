@@ -94,7 +94,8 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--uikit-bg-base);
+  /* 使用 background 简写，支持颜色/渐变/图片 */
+  background: var(--uikit-chat-bg);
   padding-bottom: var(--uikit-safe-bottom, 0px);
 }
 

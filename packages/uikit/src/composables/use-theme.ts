@@ -75,6 +75,24 @@ export function useTheme() {
     themeStore.setFontSize(preset)
   }
 
+  // ===== 高频语义 token =====
+  const bubbleBgOther = computed(() => themeStore.bubbleBgOther)
+  const bubbleBgSelf = computed(() => themeStore.bubbleBgSelf)
+  const chatBg = computed(() => themeStore.chatBg)
+  const inputBg = computed(() => themeStore.inputBg)
+
+  function setBubbleBg(other?: string, self?: string) {
+    themeStore.setBubbleBg(other, self)
+  }
+
+  function setChatBg(value?: string) {
+    themeStore.setChatBg(value)
+  }
+
+  function setInputBg(value?: string) {
+    themeStore.setInputBg(value)
+  }
+
   return {
     mode,
     effectiveMode,
@@ -86,6 +104,10 @@ export function useTheme() {
     containerGap: computed(() => themeStore.containerGap),
     hoverStyle: computed(() => themeStore.hoverStyle),
     fontSizeScale,
+    bubbleBgOther,
+    bubbleBgSelf,
+    chatBg,
+    inputBg,
     setMode,
     setPrimaryColor,
     setAvatarShape,
@@ -95,6 +117,9 @@ export function useTheme() {
     setHoverStyle,
     setFontSizeScale,
     setFontSize,
+    setBubbleBg,
+    setChatBg,
+    setInputBg,
     toggleMode,
     animationEnabled,
     animationLevel,

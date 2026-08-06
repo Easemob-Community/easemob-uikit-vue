@@ -126,6 +126,18 @@
   --uikit-font-size-18: calc(18px * var(--uikit-font-scale));
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
+
+  /* 语义 token：气泡 */
+  --uikit-bubble-bg-other: var(--uikit-bg-secondary);
+  --uikit-bubble-bg-self: var(--uikit-primary-color);
+  --uikit-bubble-text-other: var(--uikit-text-primary);
+  --uikit-bubble-text-self: #fff;
+
+  /* 语义 token：聊天背景（使用 background 简写，支持颜色/渐变/图片） */
+  --uikit-chat-bg: var(--uikit-bg-base);
+
+  /* 语义 token：输入区背景 */
+  --uikit-input-bg: var(--uikit-bg-base);
 }
 
 [data-uikit-theme="dark"] {
@@ -157,6 +169,18 @@
   --uikit-font-size-18: calc(18px * var(--uikit-font-scale));
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
+
+  /* 语义 token：气泡 - 暗色默认与浅色逻辑一致 */
+  --uikit-bubble-bg-other: var(--uikit-bg-secondary);
+  --uikit-bubble-bg-self: var(--uikit-primary-color);
+  --uikit-bubble-text-other: var(--uikit-text-primary);
+  --uikit-bubble-text-self: #fff;
+
+  /* 语义 token：聊天背景 - 暗色（使用 background 简写，支持颜色/渐变/图片） */
+  --uikit-chat-bg: var(--uikit-bg-base);
+
+  /* 语义 token：输入区背景 - 暗色 */
+  --uikit-input-bg: var(--uikit-bg-base);
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
   --uikit-success-rgb: 22, 163, 74;

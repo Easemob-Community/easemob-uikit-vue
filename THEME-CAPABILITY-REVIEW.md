@@ -31,19 +31,19 @@
 - 只有局部 size prop：`Cell` 的 compact/normal/large（`components/cell/cell.vue:15`，且 `--uikit-cell-height-*` 未进 `theme/index.css`）、ContactItem/GroupItem 的 size。
 - padding 走 token 的全库仅 13 处，其余硬编码。做全局 compact/comfortable 档意味着间距也要 token 化。
 
-### 3. 高频业务定制点没有独立 token
+### 3. 高频业务定制点已有独立 token ✅
 
-- **气泡颜色**：搜 `--uikit-bubble` 零命中。对方气泡直接用 `--uikit-bg-secondary`、自己气泡用 `--uikit-primary-color`（`text-message.vue:302-315`）——改气泡色只能连带改通用变量，一改全站变色。`bubbleShape` 只切圆角不切颜色。
-- 消息列表背景、输入区背景同理，无专门配置点。
-- 建议补：`--uikit-bubble-bg-self/other`、`--uikit-bubble-text-self/other`、`--uikit-chat-bg` 等语义 token。
+- **气泡颜色**：`--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self` 已定义，消息组件已接入。
+- **聊天背景**：`--uikit-chat-bg` 已定义，聊天容器/聊天页使用 `background` 简写，支持颜色/渐变/图片。
+- **输入区背景**：`--uikit-input-bg` 已定义，PC/H5 输入区已接入。
+- 剩余未 token 化的高频定制点：消息内引用卡片（`quote-card`） nested 颜色、媒体消息遮罩层颜色。
 
-### 4. Provider `theme` prop 入口偏窄
+### 4. Provider `theme` prop 仍有扩展空间
 
-`uikit-provider.vue:24-31` 的 `theme` prop 只有 4 个字段（mode/primaryColor/gap/shape），且：
+`uikit-provider.vue` 的 `theme` prop 已扩展至 mode/primaryColor/gap/shape/fontSize/bubbleColor/chatBg/inputBg，且已响应式应用。仍缺少：
 
-- **mode 不含 `'auto'`**（store 支持三档，prop 只放两档，不一致）；
-- `onMounted` **一次性应用，非响应式**——业务后续改 prop 不生效，必须走 `useTheme()`；
-- 不含字号/密度/气泡色（底层尚不存在）。
+- **density**（compact/normal/comfortable）；
+- 引用卡片/媒体遮罩等 nested 语义色。
 
 ### 5. token 化不彻底的历史债（制约上面所有扩展）
 
@@ -55,6 +55,6 @@
 
 1. ✅ **先清 D3 / D4 / D12（2026-08-05 已完成 worst offenders）**——`theme/index.css` 补 `--uikit-shadow-sm`、`store/theme.ts` 同步 `--uikit-primary-hover`；worst offenders 的裸 hex、不一致 fallback、硬编码 transition 已替换。
 2. ✅ **建字号 token 体系并激活 `--uikit-font-scale`（2026-08-06 完成）**——`theme/index.css` 新增 `--uikit-font-size-8~22` token；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`/`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；demo 外观面板加档位切换；高频组件（45 文件 144 处）与低频文件（57 文件 207 处）字号均已 token 化，仅剩 4 处 story 装饰性 emoji 尺寸保持 px。
-3. **补高频语义 token**：气泡色、聊天背景。
+3. ✅ **补高频语义 token（2026-08-06 完成）**——`theme/index.css` 新增 `--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self`、`--uikit-chat-bg`、`--uikit-input-bg`；`store/theme.ts` / `use-theme.ts` 新增 `bubbleBgOther`/`bubbleBgSelf`/`chatBg`/`inputBg` 与 setter；`uikit-provider.vue` 支持 `theme.bubbleColor`（self/other）、`theme.chatBg`、`theme.inputBg`；消息组件（text/file/voice/video/image/location/combine/custom）与聊天容器、输入区、时间分隔线全部接入语义 token。`--uikit-chat-bg` 使用 `background` 简写，默认支持颜色/渐变/`url(...)` 图片背景。
 4. **扩 Provider `theme` prop**：density 等。
 5. **密度档最后做**（依赖间距 token 化，工程量最大、优先级相对低）。

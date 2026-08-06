@@ -40,6 +40,14 @@ interface ThemeStorageState {
   animationLevel: AnimationLevel
   animationRipple: boolean
   fontSizeScale: number
+  /** 对方气泡背景色 */
+  bubbleBgOther?: string
+  /** 自己气泡背景色 */
+  bubbleBgSelf?: string
+  /** 聊天背景（支持颜色/渐变/图片 url） */
+  chatBg?: string
+  /** 输入区背景 */
+  inputBg?: string
 }
 
 const defaultState: ThemeStorageState = {
@@ -54,6 +62,10 @@ const defaultState: ThemeStorageState = {
   animationLevel: 'normal',
   animationRipple: true,
   fontSizeScale: 1,
+  bubbleBgOther: undefined,
+  bubbleBgSelf: undefined,
+  chatBg: undefined,
+  inputBg: undefined,
 }
 
 /** 字号档位 → scale 映射 */
@@ -143,6 +155,22 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.fontSizeScale ?? 1,
     set: (v: number) => { storage.value.fontSizeScale = v },
   })
+  const bubbleBgOther = computed({
+    get: () => storage.value.bubbleBgOther,
+    set: (v: string | undefined) => { storage.value.bubbleBgOther = v },
+  })
+  const bubbleBgSelf = computed({
+    get: () => storage.value.bubbleBgSelf,
+    set: (v: string | undefined) => { storage.value.bubbleBgSelf = v },
+  })
+  const chatBg = computed({
+    get: () => storage.value.chatBg,
+    set: (v: string | undefined) => { storage.value.chatBg = v },
+  })
+  const inputBg = computed({
+    get: () => storage.value.inputBg,
+    set: (v: string | undefined) => { storage.value.inputBg = v },
+  })
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
@@ -174,6 +202,14 @@ export const useThemeStore = defineStore('theme', () => {
       '--uikit-font-scale',
       String(Math.max(0.5, scale))
     )
+  })
+
+  // 高频语义 token：气泡色、聊天背景、输入区背景
+  watchEffect(() => {
+    document.documentElement.style.setProperty('--uikit-bubble-bg-other', bubbleBgOther.value || '')
+    document.documentElement.style.setProperty('--uikit-bubble-bg-self', bubbleBgSelf.value || '')
+    document.documentElement.style.setProperty('--uikit-chat-bg', chatBg.value || '')
+    document.documentElement.style.setProperty('--uikit-input-bg', inputBg.value || '')
   })
 
   // Hover 风格 DOM 属性联动
@@ -288,6 +324,19 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
+  function setBubbleBg(other?: string, self?: string) {
+    if (other !== undefined) bubbleBgOther.value = other
+    if (self !== undefined) bubbleBgSelf.value = self
+  }
+
+  function setChatBg(value?: string) {
+    chatBg.value = value
+  }
+
+  function setInputBg(value?: string) {
+    inputBg.value = value
+  }
+
   /**
    * 批量应用动画配置
    */
@@ -310,6 +359,10 @@ export const useThemeStore = defineStore('theme', () => {
     animationLevel,
     animationRipple,
     fontSizeScale,
+    bubbleBgOther,
+    bubbleBgSelf,
+    chatBg,
+    inputBg,
     setPrimaryColor,
     setMode,
     setAvatarShape,
@@ -322,6 +375,9 @@ export const useThemeStore = defineStore('theme', () => {
     setAnimationRipple,
     setFontSizeScale,
     setFontSize,
+    setBubbleBg,
+    setChatBg,
+    setInputBg,
     applyAnimationConfig,
   }
 })

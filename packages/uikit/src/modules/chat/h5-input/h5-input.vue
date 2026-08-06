@@ -677,7 +677,7 @@ defineExpose({
 .h5-input {
   display: flex;
   flex-direction: column;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-bg);
   border-top: 1px solid var(--uikit-border-color);
 }
 
@@ -828,7 +828,7 @@ defineExpose({
   gap: 6px;
   padding: 16px 24px;
   border-radius: var(--uikit-components-radius, 8px);
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-bg);
   border: 1px solid var(--uikit-border-color);
   color: var(--uikit-text-primary);
   pointer-events: none;

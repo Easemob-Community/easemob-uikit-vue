@@ -34,6 +34,12 @@ export interface ProviderProps {
     shape?: 'ground' | 'square'
     /** 字号：'normal' | 'large' | 'xlarge' 或具体缩放倍数 */
     fontSize?: ThemeFontSize
+    /** 气泡颜色：传字符串时同时设置自己/对方；传对象可分别设置 */
+    bubbleColor?: string | { self?: string; other?: string }
+    /** 聊天背景：支持颜色 / 渐变 / url(...) 图片 */
+    chatBg?: string
+    /** 输入区背景 */
+    inputBg?: string
   }
   locale?: 'zh-CN' | 'en'
   animation?: AnimationConfig
@@ -228,6 +234,20 @@ function applyThemeConfig(theme?: ProviderProps['theme']) {
   const scale = resolveFontSize(theme.fontSize)
   if (scale !== undefined) {
     themeStore.setFontSizeScale(scale)
+  }
+  if (theme.bubbleColor !== undefined) {
+    if (typeof theme.bubbleColor === 'string') {
+      themeStore.setBubbleBg(theme.bubbleColor, theme.bubbleColor)
+    }
+    else {
+      themeStore.setBubbleBg(theme.bubbleColor.other, theme.bubbleColor.self)
+    }
+  }
+  if (theme.chatBg !== undefined) {
+    themeStore.setChatBg(theme.chatBg)
+  }
+  if (theme.inputBg !== undefined) {
+    themeStore.setInputBg(theme.inputBg)
   }
 }
 

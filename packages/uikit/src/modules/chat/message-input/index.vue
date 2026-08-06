@@ -798,7 +798,7 @@ defineExpose({
 <style scoped>
 .message-input {
   position: relative;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-bg);
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   border-radius: var(--uikit-components-radius, 12px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -836,7 +836,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-bg);
   border-radius: var(--uikit-components-radius, 12px);
   opacity: 0.95;
 }

@@ -299,8 +299,8 @@ function onMentionClick(userId: string, event: MouseEvent) {
 .text-message__bubble {
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;
@@ -311,8 +311,8 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message--self .text-message__bubble {
-  background-color: var(--uikit-primary-color);
-  color: #fff;
+  background-color: var(--uikit-bubble-bg-self);
+  color: var(--uikit-bubble-text-self);
 }
 
 .text-message__content {
@@ -329,7 +329,8 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message--self .text-message__edited {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.75;
 }
 
 /* 译文卡片：独立于气泡，吸顶气泡正下方 */
@@ -337,8 +338,8 @@ function onMentionClick(userId: string, event: MouseEvent) {
   max-width: 100%;
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+  background-color: var(--uikit-bubble-bg-other);
+  color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
   overflow-wrap: break-word;
   word-break: normal;
@@ -423,8 +424,9 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message--self .text-message__mention {
-  color: #fff;
-  text-decoration-color: rgba(255, 255, 255, 0.7);
+  color: var(--uikit-bubble-text-self);
+  text-decoration-color: var(--uikit-bubble-text-self);
+  opacity: 0.9;
 }
 .text-message__link {
   color: var(--uikit-primary-color);
@@ -441,8 +443,9 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message--self .text-message__link {
-  color: #fff;
-  text-decoration-color: rgba(255, 255, 255, 0.7);
+  color: var(--uikit-bubble-text-self);
+  text-decoration-color: var(--uikit-bubble-text-self);
+  opacity: 0.9;
 }
 
 .text-message__link--translation {

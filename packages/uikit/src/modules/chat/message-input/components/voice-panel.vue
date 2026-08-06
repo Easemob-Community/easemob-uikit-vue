@@ -214,7 +214,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   min-height: 120px;
   border-radius: var(--uikit-components-radius, 8px);
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-bg);
   border: 1px solid #e5e7eb;
   cursor: pointer;
   user-select: none;

@@ -151,9 +151,9 @@ async function handleDownload(event: MouseEvent) {
 .video-message__placeholder {
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-14);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-bubble-text-other);
 }
 
 .video-message__overlay {

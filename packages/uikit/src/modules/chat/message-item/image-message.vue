@@ -433,7 +433,7 @@ async function handleDownload(event: MouseEvent) {
 .image-message__loading {
   position: absolute;
   inset: 0;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bubble-bg-other);
   animation: image-loading-pulse 1.5s ease-in-out infinite;
 }
 
@@ -455,17 +455,17 @@ async function handleDownload(event: MouseEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-bubble-text-other);
 }
 
 .image-message__placeholder {
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-14);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-bubble-text-other);
 }
 
 /* 全屏预览 */

@@ -66,6 +66,15 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 - `--uikit-anim-ripple-*`：Ripple 波纹
 - `--uikit-anim-stagger-delay`：列表交错动画
 
+### 聊天语义 token
+
+- `--uikit-bubble-bg-other`：对方气泡背景（默认 `--uikit-bg-secondary`）
+- `--uikit-bubble-bg-self`：自己气泡背景（默认 `--uikit-primary-color`）
+- `--uikit-bubble-text-other`：对方气泡文字（默认 `--uikit-text-primary`）
+- `--uikit-bubble-text-self`：自己气泡文字（默认 `#fff`）
+- `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，使用 `background` 简写，支持颜色/渐变/图片）
+- `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`）
+
 ## 覆盖变量
 
 在项目样式表中覆盖 `:root` 即可全局生效：
@@ -145,6 +154,9 @@ const {
   setAnimationLevel,
   setFontSize,
   setFontSizeScale,
+  setBubbleBg,
+  setChatBg,
+  setInputBg,
   toggleMode,
 } = useTheme()
 
@@ -164,6 +176,11 @@ setHoverStyle('lift') // 'none' | 'light' | 'lift'
 setFontSize('xlarge')
 // 或直接指定缩放倍数
 setFontSizeScale(1.25)
+
+// 气泡色、聊天背景、输入区背景
+setBubbleBg('#f3f4f6', '#7c3aed')
+setChatBg('url(/chat-bg.png)')
+setInputBg('#ffffff')
 
 // 动画：subtle / normal / expressive
 setAnimationLevel('expressive')
@@ -191,12 +208,17 @@ import { EmUIKitProvider } from '@easemob/uikit'
       gap: 12,
       shape: 'square',
       fontSize: 'xlarge', // 'normal' | 'large' | 'xlarge' 或具体倍数
+      bubbleColor: { other: '#f3f4f6', self: '#7c3aed' },
+      chatBg: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      inputBg: '#ffffff',
     }"
   >
     <em-conversation-container />
   </EmUIKitProvider>
 </template>
 ```
+
+`bubbleColor` 也支持传字符串同时设置自己/对方：`bubbleColor: '#7c3aed'`。`chatBg` 支持颜色、渐变或 `url(...)` 图片背景。
 
 ## 业务层映射
 
