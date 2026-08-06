@@ -94,7 +94,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
       stores.contact.addInvite(toUiGroupInvite(payload, 'accepted'))
     },
     onMembersJoined: (payload: GroupMembersJoinedEventPayload) => {
-      groupLog.info('onMembersJoined', { groupId: payload.groupId, count: (payload.members || []).length })
+      groupLog.info('onMembersJoined', { groupId: payload.groupId, groupName: payload.groupName, count: (payload.members || []).length })
       const members = payload.members || []
       const currentUser = stores.client.currentUser
       const isSelfJoining = members.some(m => m.userId === currentUser)
@@ -103,7 +103,7 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
           stores.contact.updateInviteStatus(payload.groupId, 'accepted')
         }
         if (!stores.group.getGroupById(payload.groupId)) {
-          stores.group.addGroup({ groupId: payload.groupId, groupName: (payload as any).groupName })
+          stores.group.addGroup({ groupId: payload.groupId, groupName: payload.groupName })
         }
       }
       stores.group.incrementMemberCount(payload.groupId, members.length)
