@@ -12,7 +12,14 @@ import { EmInput, useLocale, useTheme, useUIKit } from '@easemob/uikit'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 
-const { mode, primaryColor, hoverStyle, containerGap, fontSizeScale, setMode, setPrimaryColor, setHoverStyle, setContainerGap, setFontSize, animationEnabled, animationLevel, animationRipple, setAnimationEnabled, setAnimationLevel, setAnimationRipple } = useTheme()
+const {
+  mode, primaryColor, hoverStyle, containerGap, fontSizeScale,
+  bubbleBgOther, bubbleBgSelf, chatBg, inputBg,
+  animationEnabled, animationLevel, animationRipple,
+  setMode, setPrimaryColor, setHoverStyle, setContainerGap, setFontSize,
+  setAnimationEnabled, setAnimationLevel, setAnimationRipple,
+  setBubbleBg, setChatBg, setInputBg,
+} = useTheme()
 const { theme: themeStore } = useUIKit()
 const { locale, setLocale } = useLocale()
 const { inputVariant, inputDemoValue } = useDemoSettings()
@@ -306,6 +313,52 @@ function updatePrimaryColor(e: Event) {
           prefix-icon="misc/magnifier2"
           placeholder="预览 Input 风格..."
         />
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <label class="demo-settings__label">语义 token 调试</label>
+      <div class="demo-settings__row">
+        <span class="demo-settings__row-label">对方气泡</span>
+        <input
+          type="color"
+          :value="bubbleBgOther || '#f3f4f6'"
+          class="demo-color-input"
+          @input="(e: Event) => setBubbleBg((e.target as HTMLInputElement).value, undefined)"
+        >
+      </div>
+      <div class="demo-settings__row">
+        <span class="demo-settings__row-label">自己气泡</span>
+        <input
+          type="color"
+          :value="bubbleBgSelf || '#3bb1ff'"
+          class="demo-color-input"
+          @input="(e: Event) => setBubbleBg(undefined, (e.target as HTMLInputElement).value)"
+        >
+      </div>
+      <div class="demo-settings__row">
+        <span class="demo-settings__row-label">输入区背景</span>
+        <input
+          type="color"
+          :value="inputBg || '#ffffff'"
+          class="demo-color-input"
+          @input="(e: Event) => setInputBg((e.target as HTMLInputElement).value)"
+        >
+      </div>
+      <div class="demo-settings__row demo-settings__row--column">
+        <span class="demo-settings__row-label">聊天背景</span>
+        <input
+          :value="chatBg || ''"
+          type="text"
+          placeholder="颜色、渐变或 url(...)"
+          class="demo-text-input"
+          @input="(e: Event) => setChatBg((e.target as HTMLInputElement).value || undefined)"
+        >
+      </div>
+      <div class="demo-settings__row">
+        <button class="demo-option" @click="setBubbleBg(undefined, undefined); setChatBg(undefined); setInputBg(undefined)">
+          重置
+        </button>
       </div>
     </div>
 

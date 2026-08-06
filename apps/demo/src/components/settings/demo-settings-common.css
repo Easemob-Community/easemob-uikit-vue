@@ -169,6 +169,62 @@
   flex-shrink: 0;
 }
 
+/* ===== 语义 token 调试行 ===== */
+.demo-settings__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.demo-settings__row--column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.demo-settings__row-label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.demo-color-input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.demo-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.demo-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.demo-text-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  border-radius: 6px;
+  background-color: var(--uikit-bg-base, #ffffff);
+  color: var(--uikit-text-primary, #111827);
+  font-size: 13px;
+  outline: none;
+}
+
+.demo-text-input:focus {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
 /* ===== 说明文字 ===== */
 .demo-info {
   margin-top: 6px;
