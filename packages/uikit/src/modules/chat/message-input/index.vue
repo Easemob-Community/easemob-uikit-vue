@@ -799,11 +799,11 @@ defineExpose({
 .message-input {
   position: relative;
   background-color: var(--uikit-input-bg);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 12px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin: 12px;
-  padding: 12px;
+  margin: var(--uikit-input-wrapper-spacing, 12px);
+  padding: var(--uikit-input-wrapper-spacing, 12px);
   transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 

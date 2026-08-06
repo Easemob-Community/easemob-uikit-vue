@@ -1219,13 +1219,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
 
 .chat__error-retry {
   padding: 8px 20px;
-  border-radius: 6px;
+  border-radius: var(--uikit-components-radius, 8px);
   border: none;
   background-color: var(--uikit-primary-color);
-  color: #fff;
+  color: #ffffff;
   font-size: var(--uikit-font-size-14);
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .chat__error-retry:hover {
@@ -1291,8 +1291,8 @@ async function onRemoveAdmin(member: UiGroupMember) {
   align-items: center;
   justify-content: center;
   padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.15s;
+  border-radius: var(--uikit-components-radius, 8px);
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 

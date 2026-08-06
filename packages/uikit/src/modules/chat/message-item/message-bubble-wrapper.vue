@@ -690,7 +690,7 @@ onBeforeUnmount(() => {
 .message-bubble-wrapper {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--uikit-bubble-gap, 8px);
   width: 100%;
   max-width: 100%;
 }
@@ -709,7 +709,7 @@ onBeforeUnmount(() => {
 .message-bubble-wrapper__main {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--uikit-bubble-gap, 8px);
   min-width: 0;
   flex: 1;
   max-width: 100%;

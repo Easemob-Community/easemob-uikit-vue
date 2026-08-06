@@ -95,37 +95,37 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-button--small {
-  padding: 6px 12px;
+  padding: calc(var(--uikit-button-padding-y, 8px) - 2px) 12px;
   font-size: var(--uikit-font-size-12);
 }
 
 .uikit-button--medium {
-  padding: 8px 16px;
+  padding: var(--uikit-button-padding-y, 8px) 16px;
 }
 
 .uikit-button--large {
-  padding: 12px 24px;
+  padding: calc(var(--uikit-button-padding-y, 8px) + 4px) 24px;
   font-size: var(--uikit-font-size-16);
 }
 
 .uikit-button--primary {
   background-color: var(--uikit-primary-color);
-  color: #fff;
+  color: #ffffff;
 }
 
 .uikit-button--success {
   background-color: var(--uikit-success-color);
-  color: #fff;
+  color: #ffffff;
 }
 
 .uikit-button--warning {
   background-color: var(--uikit-warning-color);
-  color: #fff;
+  color: #ffffff;
 }
 
 .uikit-button--danger {
   background-color: var(--uikit-danger-color);
-  color: #fff;
+  color: #ffffff;
 }
 
 .uikit-button--danger-outline {

@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
 .rich-input__editor-content {
   min-height: 60px;
   max-height: 150px;
-  padding: 8px 12px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   outline: none;
   font-size: var(--uikit-font-size-14);
   line-height: 1.5;
@@ -470,8 +470,8 @@ onBeforeUnmount(() => {
 
 .rich-input__placeholder {
   position: absolute;
-  top: 8px;
-  left: 12px;
+  top: var(--uikit-input-padding-y, 8px);
+  left: var(--uikit-input-padding-x, 12px);
   color: var(--uikit-text-secondary);
   pointer-events: none;
   font-size: var(--uikit-font-size-14);
@@ -480,10 +480,10 @@ onBeforeUnmount(() => {
 
 .rich-input__voice-btn {
   flex: 1;
-  padding: 10px 16px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-input-bg);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--uikit-border-color);
   text-align: center;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);

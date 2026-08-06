@@ -550,7 +550,7 @@ defineExpose({
 
 .simple-input__textarea {
   flex: 1;
-  padding: 8px 12px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
   font-size: var(--uikit-font-size-14);
@@ -594,7 +594,7 @@ defineExpose({
   padding: 10px 16px;
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-input-bg);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--uikit-border-color);
   text-align: center;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);

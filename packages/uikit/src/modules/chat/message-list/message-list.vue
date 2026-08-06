@@ -66,11 +66,25 @@ const virtualThreshold = computed(() => messageListConfig.value?.virtualScrollTh
 /** 是否启用虚拟滚动 */
 const enableVirtual = computed(() => messages.value.length > virtualThreshold.value)
 
-/** 消息项间距 */
-const messageGap = computed(() => messageListConfig.value?.messageGap ?? 12)
+/** 消息项间距（未配置时跟随全局密度变量） */
+const messageGap = computed(() => messageListConfig.value?.messageGap)
 
-/** 消息列表内边距 */
-const messagePadding = computed(() => messageListConfig.value?.messagePadding ?? 16)
+/** 消息列表内边距（未配置时跟随全局密度变量） */
+const messagePadding = computed(() => messageListConfig.value?.messagePadding)
+
+/** 普通滚动模式样式：显式配置优先，否则走 --uikit-message-gap / --uikit-message-padding */
+const nativeScrollStyle = computed(() => {
+  if (messageGap.value !== undefined || messagePadding.value !== undefined) {
+    return {
+      gap: `${messageGap.value ?? 12}px`,
+      padding: `${messagePadding.value ?? 16}px`,
+    }
+  }
+  return {
+    gap: 'var(--uikit-message-gap, 12px)',
+    padding: 'var(--uikit-message-padding, 16px)',
+  }
+})
 
 /** 时间分组间隔 */
 const groupInterval = computed(() => messageListConfig.value?.groupInterval ?? 5 * 60 * 1000)
@@ -714,8 +728,8 @@ watch(locateRequest, (req) => {
       :items="messagesWithDividers"
       key-field="key"
       :estimate-height="80"
-      :gap="messageGap"
-      :padding="messagePadding"
+      :gap="messageGap ?? 12"
+      :padding="messagePadding ?? 16"
       @reach-top="loadMoreHistory"
       @scroll="onVirtualScroll"
     >
@@ -763,7 +777,7 @@ watch(locateRequest, (req) => {
       v-else
       ref="listRef"
       class="message-list__scroll"
-      :style="{ gap: `${messageGap}px`, padding: `${messagePadding}px` }"
+      :style="nativeScrollStyle"
       @scroll="onNativeScroll"
     >
       <div
@@ -886,7 +900,7 @@ watch(locateRequest, (req) => {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: height 0.1s;
+  transition: height var(--uikit-anim-duration) var(--uikit-anim-easing);
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-13);
 }
@@ -916,7 +930,7 @@ watch(locateRequest, (req) => {
   padding: 8px 16px;
   border-radius: 20px;
   background-color: var(--uikit-primary-color);
-  color: #fff;
+  color: #ffffff;
   font-size: var(--uikit-font-size-13);
   cursor: pointer;
   display: flex;

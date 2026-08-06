@@ -913,7 +913,7 @@ defineExpose({
 .chat-info-drawer__header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   background-color: var(--uikit-bg-secondary);
   gap: 12px;
 }
@@ -952,7 +952,7 @@ defineExpose({
   overflow-y: auto;
   min-height: 0;
   background-color: var(--uikit-bg-secondary);
-  padding: 12px 16px;
+  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   gap: 12px;
 }
 
@@ -980,14 +980,14 @@ defineExpose({
 .chat-info-drawer__section {
   background-color: var(--uikit-bg-base);
   border-radius: var(--uikit-components-radius);
-  padding: 12px 16px;
+  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   flex-shrink: 0;
   box-shadow: var(--uikit-shadow-sm);
   border: 1px solid var(--uikit-border-light);
 }
 
 .chat-info-drawer__section--profile {
-  padding: 24px 16px;
+  padding: calc(var(--uikit-drawer-padding, 16px) * 1.5) var(--uikit-drawer-padding, 16px);
 }
 
 .chat-info-drawer__profile {
@@ -1161,7 +1161,7 @@ defineExpose({
 }
 
 .chat-info-drawer__actions {
-  padding: 16px;
+  padding: var(--uikit-drawer-padding, 16px);
   background-color: var(--uikit-bg-secondary);
 }
 

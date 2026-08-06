@@ -685,7 +685,7 @@ defineExpose({
   display: flex;
   align-items: flex-end;
   gap: var(--uikit-container-gap, 8px);
-  padding: 8px 12px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
 }
 
 .h5-input__icon-btn {
@@ -711,7 +711,7 @@ defineExpose({
 .h5-input__textarea {
   flex: 1;
   min-width: 0;
-  padding: 8px 12px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
   outline: none;
@@ -740,7 +740,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-secondary);
   font-size: var(--uikit-font-size-16);
