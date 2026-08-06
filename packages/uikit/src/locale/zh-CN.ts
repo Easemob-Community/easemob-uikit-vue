@@ -90,7 +90,7 @@ const messages: LocaleMessages = {
   'conversation.noMoreHistory': '没有更多历史消息',
   'conversation.loadHistoryFailed': '加载失败，点击重试',
   'conversation.syncing': '正在同步会话...',
-  'status.networkError': '网络异常，点击重试',
+  'status.networkError': '网络异常，请检查网络情况',
   'status.connecting': '正在连接...',
   'status.syncingConversations': '正在同步会话...',
   'status.syncingMessages': '正在同步消息...',

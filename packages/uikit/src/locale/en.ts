@@ -90,7 +90,7 @@ const messages: LocaleMessages = {
   'conversation.noMoreHistory': 'No more history messages',
   'conversation.loadHistoryFailed': 'Failed to load. Tap to retry',
   'conversation.syncing': 'Syncing conversations...',
-  'status.networkError': 'Network error, tap to retry',
+  'status.networkError': 'Network error, please check your network',
   'status.connecting': 'Connecting...',
   'status.syncingConversations': 'Syncing conversations...',
   'status.syncingMessages': 'Syncing messages...',
