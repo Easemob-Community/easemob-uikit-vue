@@ -162,14 +162,14 @@ function onActionClick(key: string) {
 }
 
 .group-card__name {
-  font-size: 22px;
+  font-size: var(--uikit-font-size-22);
   font-weight: 600;
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
 
 .group-card__group-id {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   margin-top: 4px;
   word-break: break-all;
@@ -217,7 +217,7 @@ function onActionClick(key: string) {
 }
 
 .group-card__action-label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .group-card__info {
@@ -235,13 +235,13 @@ function onActionClick(key: string) {
 
 .group-card__label {
   flex: 0 0 80px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
 .group-card__value {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }

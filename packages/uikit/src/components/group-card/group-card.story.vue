@@ -57,7 +57,7 @@ const infoRows: GroupCardInfoRow[] = [
           <template #name>
             <span style="color: var(--uikit-primary-color);">⭐ 置顶群</span>
           </template>
-          <div style="padding: 8px 0; font-size: 13px; color: var(--uikit-text-secondary);">
+          <div style="padding: 8px 0; font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
             默认插槽自定义内容
           </div>
         </GroupCard>
@@ -72,7 +72,7 @@ const infoRows: GroupCardInfoRow[] = [
           :actions="actions"
           @action-click="(key: string) => log('action-click', key)"
         />
-        <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">

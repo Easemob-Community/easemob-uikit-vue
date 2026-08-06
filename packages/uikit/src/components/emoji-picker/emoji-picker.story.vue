@@ -56,7 +56,7 @@ function onSelectSticker(sticker: EmojiStickerItem, packId: string) {
           <Button size="small" @click="show = !show">
             {{ show ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="selected" style="font-size: 13px; color: var(--uikit-text-secondary);">
+          <span v-if="selected" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
             已选择：{{ selected }}
           </span>
         </div>
@@ -70,7 +70,7 @@ function onSelectSticker(sticker: EmojiStickerItem, packId: string) {
           <Button size="small" @click="showSticker = !showSticker">
             {{ showSticker ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="selectedSticker" style="font-size: 13px; color: var(--uikit-text-secondary);">
+          <span v-if="selectedSticker" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
             已选择表情包：{{ selectedSticker }}
           </span>
         </div>

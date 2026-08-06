@@ -466,7 +466,7 @@ function closeDrawer() {
 }
 
 .group-management-section__drawer-title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
   flex: 1;

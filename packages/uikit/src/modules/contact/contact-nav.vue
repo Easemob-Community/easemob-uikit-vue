@@ -100,7 +100,7 @@ function onEntryClick(entry: ContactNavEntry) {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
+  font-size: var(--uikit-font-size-15);
   font-weight: 500;
   color: var(--uikit-text-primary);
   flex: 1;
@@ -117,12 +117,12 @@ function onEntryClick(entry: ContactNavEntry) {
   align-items: center;
   gap: 6px;
   color: var(--uikit-text-secondary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   flex-shrink: 0;
 }
 
 .contact-nav__item-count {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -133,7 +133,7 @@ function onEntryClick(entry: ContactNavEntry) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   font-weight: 600;
   color: #fff;
   background-color: #ef4444;

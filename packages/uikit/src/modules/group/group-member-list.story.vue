@@ -95,7 +95,7 @@ function onRemoveAdmin(member: UiGroupMember) {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         当前身份为管理员，仅可对普通成员执行“移除”操作，无法设置/取消管理员。
       </div>
     </Variant>
@@ -116,7 +116,7 @@ function onRemoveAdmin(member: UiGroupMember) {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         当前身份为普通成员，不展示管理操作按钮。
       </div>
     </Variant>
@@ -171,7 +171,7 @@ function onRemoveAdmin(member: UiGroupMember) {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         allow-chat="contact"：只有联系人列表里的成员才显示「发消息」按钮。
       </div>
     </Variant>
@@ -193,7 +193,7 @@ function onRemoveAdmin(member: UiGroupMember) {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         allow-chat="none"：对任何成员都不显示「发消息」按钮。
       </div>
     </Variant>
@@ -216,15 +216,15 @@ function onRemoveAdmin(member: UiGroupMember) {
           </UIKitProvider>
         </div>
         <div style="height: 600px; width: 240px;">
-          <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Event Logs</div>
+          <div style="font-size: var(--uikit-font-size-14); font-weight: 600; margin-bottom: 8px;">Event Logs</div>
           <div
             v-for="(item, index) in logs"
             :key="index"
-            style="font-size: 12px; color: #6b7280; padding: 2px 0; border-bottom: 1px solid #f3f4f6;"
+            style="font-size: var(--uikit-font-size-12); color: #6b7280; padding: 2px 0; border-bottom: 1px solid #f3f4f6;"
           >
             {{ item }}
           </div>
-          <div v-if="logs.length === 0" style="font-size: 12px; color: #9ca3af;">点击操作按钮查看事件日志</div>
+          <div v-if="logs.length === 0" style="font-size: var(--uikit-font-size-12); color: #9ca3af;">点击操作按钮查看事件日志</div>
         </div>
       </div>
     </Variant>

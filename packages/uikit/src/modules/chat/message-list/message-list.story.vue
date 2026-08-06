@@ -183,7 +183,7 @@ const baseConfig: ChatConfig = {
             />
           </UIKitProvider>
         </div>
-        <div style="width: 240px; font-size: 12px; color: #6b7280;">
+        <div style="width: 240px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           事件（消息操作触发）：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 8)" :key="i">

@@ -496,14 +496,14 @@ defineExpose({
 }
 
 .group-list__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
 .group-list__count {
   margin-left: 6px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   font-weight: 400;
   color: var(--uikit-text-secondary);
 }
@@ -520,7 +520,7 @@ defineExpose({
 
 .group-list__group-header {
   padding: 6px 16px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   font-weight: 600;
   color: var(--uikit-text-secondary);
   background-color: var(--uikit-bg-secondary);
@@ -554,7 +554,7 @@ defineExpose({
 }
 
 .group-list__loading-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -573,7 +573,7 @@ defineExpose({
 }
 
 .group-list__no-more-text {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 </style>

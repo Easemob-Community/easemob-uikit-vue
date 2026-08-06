@@ -47,7 +47,7 @@ const mockDataSource = {
           :size="48"
           editable
         />
-        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           点击头像右下角指示器可在头像下方打开在线状态选择 popup。
         </div>
       </UIKitProvider>
@@ -56,7 +56,7 @@ const mockDataSource = {
     <Variant title="Provider Presence Disabled">
       <UIKitProvider :auto-init="false" :enable-presence="false" :data-source="mockDataSource">
         <PresenceAvatar user-id="u_alice" name="Alice" :size="40" />
-        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           Provider enablePresence=false 时，不展示在线状态点，也不发起订阅。
         </div>
       </UIKitProvider>

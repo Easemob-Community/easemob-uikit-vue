@@ -211,7 +211,7 @@ defineExpose({
 .block-list__loading {
   text-align: center;
   padding: 16px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -232,7 +232,7 @@ defineExpose({
   padding: 14px 16px;
 }
 .block-list__popup-title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -245,7 +245,7 @@ defineExpose({
 .block-list__popup-status {
   text-align: center;
   padding: 24px 16px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 .block-list__popup-footer {
@@ -261,7 +261,7 @@ defineExpose({
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: all 0.15s;
 }

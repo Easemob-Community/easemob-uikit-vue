@@ -95,14 +95,14 @@ const game = { groupId: 'g_003', groupName: '周末桌游局', owner: 'me', memb
           <GroupItem :group="vue" subtitle="未读 3 条">
             <template #extra>
               <span
-                style="font-size: 11px; color: #fff; background: #ef4444; padding: 2px 6px; border-radius: 9px;"
+                style="font-size: var(--uikit-font-size-11); color: #fff; background: #ef4444; padding: 2px 6px; border-radius: 9px;"
               >3</span>
             </template>
           </GroupItem>
           <GroupItem :group="react" subtitle="点击进入">
             <template #extra>
               <button
-                style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                style="font-size: var(--uikit-font-size-12); padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
                 @click.stop="() => console.log('join')"
               >
                 加入

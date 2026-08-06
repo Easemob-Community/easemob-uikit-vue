@@ -116,7 +116,7 @@ const zhang = { userId: 'u_zhang', name: '张三' }
           <ContactItem :contact="alice" subtitle="尚未添加为好友">
             <template #extra>
               <button
-                style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                style="font-size: var(--uikit-font-size-12); padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
                 @click.stop="() => console.log('add')"
               >
                 添加
@@ -125,7 +125,7 @@ const zhang = { userId: 'u_zhang', name: '张三' }
           </ContactItem>
           <ContactItem :contact="bob" subtitle="待审批">
             <template #extra>
-              <span style="font-size: 12px; color: #f59e0b;">待审批</span>
+              <span style="font-size: var(--uikit-font-size-12); color: #f59e0b;">待审批</span>
             </template>
           </ContactItem>
         </div>

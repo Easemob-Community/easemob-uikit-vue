@@ -54,7 +54,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   min-width: 0;
 }
 .allow-list__name {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
@@ -64,7 +64,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   transition: all 0.15s;
 }

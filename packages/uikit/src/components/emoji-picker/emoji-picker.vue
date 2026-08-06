@@ -143,7 +143,7 @@ function onClose() {
 }
 
 .emoji-picker__tab {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   cursor: pointer;
   padding: 4px 8px;
@@ -190,7 +190,7 @@ function onClose() {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--uikit-font-size-20);
   background: none;
   border: none;
   border-radius: var(--uikit-components-radius);

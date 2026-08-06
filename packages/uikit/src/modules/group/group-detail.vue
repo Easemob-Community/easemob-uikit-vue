@@ -250,7 +250,7 @@ function onCardAction(key: string) {
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.7);
   color: var(--uikit-text-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   border-radius: var(--uikit-components-radius, 12px);
   z-index: 1;
 }
@@ -267,7 +267,7 @@ function onCardAction(key: string) {
   padding: 6px 10px;
   border: 1px solid var(--uikit-primary-color);
   border-radius: var(--uikit-components-radius, 6px);
-  font-size: 20px;
+  font-size: var(--uikit-font-size-20);
   font-weight: 600;
   outline: none;
   background-color: var(--uikit-bg-base);

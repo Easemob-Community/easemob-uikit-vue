@@ -61,7 +61,7 @@ function onClose() {
           @close="onClose"
           @changed="onChanged"
         />
-        <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(log, i) in logs.slice(0, 5)" :key="i">

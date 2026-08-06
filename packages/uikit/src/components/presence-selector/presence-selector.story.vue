@@ -20,7 +20,7 @@ function onCancel() {
   <Story title="Components/PresenceSelector">
     <Variant title="Default">
       <PresenceSelector @select="onSelect" @cancel="onCancel" />
-      <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         当前状态: {{ current || '(空/在线)' }}
       </div>
     </Variant>
@@ -35,7 +35,7 @@ function onCancel() {
 
     <Variant title="Events Log">
       <PresenceSelector @select="onSelect" @cancel="onCancel" />
-      <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         <div>当前状态: {{ current || '(空/在线)' }}</div>
         <div style="margin-top: 4px;">
           事件:

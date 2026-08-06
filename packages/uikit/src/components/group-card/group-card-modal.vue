@@ -146,7 +146,7 @@ function onActionClick(key: string) {
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.7);
   color: var(--uikit-text-secondary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   border-radius: var(--uikit-components-radius, 12px);
 }
 </style>

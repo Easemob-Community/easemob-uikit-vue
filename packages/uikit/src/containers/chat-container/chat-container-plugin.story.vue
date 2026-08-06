@@ -163,12 +163,12 @@ function onQuickReply(text: string) {
                   :key="group.label"
                   style="display: flex; flex-direction: column; gap: 8px;"
                 >
-                  <span style="font-size: 12px; color: var(--uikit-text-secondary);">{{ group.label }}</span>
+                  <span style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">{{ group.label }}</span>
                   <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     <button
                       v-for="(text, idx) in group.items"
                       :key="idx"
-                      style="padding: 6px 12px; border: 1px solid var(--uikit-border-color); border-radius: 6px; background: var(--uikit-bg-base); color: var(--uikit-text-primary); font-size: 13px; cursor: pointer;"
+                      style="padding: 6px 12px; border: 1px solid var(--uikit-border-color); border-radius: 6px; background: var(--uikit-bg-base); color: var(--uikit-text-primary); font-size: var(--uikit-font-size-13); cursor: pointer;"
                       @click="onQuickReply(text)"
                     >
                       {{ text }}
@@ -195,10 +195,10 @@ function onQuickReply(text: string) {
                 style="padding: 12px 14px; background: var(--uikit-bg-secondary); border-radius: 12px; cursor: pointer; max-width: 220px;"
                 @click="emitAction('view-card', { uid: message.body.params?.uid })"
               >
-                <div style="font-size: 14px; font-weight: 500;">
+                <div style="font-size: var(--uikit-font-size-14); font-weight: 500;">
                   {{ message.body.params?.nickname || message.body.params?.uid }}
                 </div>
-                <div style="font-size: 12px; color: var(--uikit-text-secondary); margin-top: 4px;">
+                <div style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary); margin-top: 4px;">
                   [名片] 点击查看详情
                 </div>
               </div>
@@ -207,10 +207,10 @@ function onQuickReply(text: string) {
                 style="padding: 12px 14px; background: var(--uikit-bg-secondary); border-radius: 12px; cursor: pointer; max-width: 260px;"
                 @click="emitAction('view-order', { orderId: message.body.params?.orderId })"
               >
-                <div style="font-size: 14px; font-weight: 500;">
+                <div style="font-size: var(--uikit-font-size-14); font-weight: 500;">
                   {{ message.body.params?.title }}
                 </div>
-                <div style="font-size: 12px; color: var(--uikit-text-secondary); margin-top: 4px;">
+                <div style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary); margin-top: 4px;">
                   订单：{{ message.body.params?.orderId }} · ¥{{ message.body.params?.price }}
                 </div>
               </div>
@@ -220,7 +220,7 @@ function onQuickReply(text: string) {
       </div>
       <pre
         v-if="actionLog"
-        style="margin-top: 12px; padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: 12px; white-space: pre-wrap;"
+        style="margin-top: 12px; padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: var(--uikit-font-size-12); white-space: pre-wrap;"
       >{{ actionLog }}</pre>
     </Variant>
 
@@ -230,7 +230,7 @@ function onQuickReply(text: string) {
           <ChatContainer :config="baseConfig">
             <template #message-action-extra="{ message }">
               <button
-                style="width: 100%; padding: 10px 12px; text-align: left; background: transparent; border: none; color: var(--uikit-text-primary); font-size: 14px; cursor: pointer;"
+                style="width: 100%; padding: 10px 12px; text-align: left; background: transparent; border: none; color: var(--uikit-text-primary); font-size: var(--uikit-font-size-14); cursor: pointer;"
                 @click="logAction('plugin-action', { source: 'message-action-extra' }, message)"
               >
                 Plugin 业务操作
@@ -241,7 +241,7 @@ function onQuickReply(text: string) {
       </div>
       <pre
         v-if="actionLog"
-        style="margin-top: 12px; padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: 12px; white-space: pre-wrap;"
+        style="margin-top: 12px; padding: 12px; background: #f3f4f6; border-radius: 6px; font-size: var(--uikit-font-size-12); white-space: pre-wrap;"
       >{{ actionLog }}</pre>
     </Variant>
 
@@ -251,7 +251,7 @@ function onQuickReply(text: string) {
           <ChatContainer :config="resolverConfig" />
         </UIKitProvider>
       </div>
-      <p style="margin-top: 8px; font-size: 12px; color: var(--uikit-text-secondary);">
+      <p style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
         左侧会话列表最后一条消息已按 resolver 渲染为「[名片] 产品经理小王 的名片」。
       </p>
     </Variant>

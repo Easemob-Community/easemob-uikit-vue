@@ -223,7 +223,7 @@ function groupSubtitleFn(g: Group): string | undefined {
         <UIKitProvider :auto-init="false">
           <ContactContainer initial-view="group" @vue:mounted="injectMock">
             <template #back-icon>
-              <span style="font-size: 18px; color: #3b82f6;">←</span>
+              <span style="font-size: var(--uikit-font-size-18); color: #3b82f6;">←</span>
             </template>
           </ContactContainer>
         </UIKitProvider>
@@ -253,7 +253,7 @@ function groupSubtitleFn(g: Group): string | undefined {
             <template #header>
               <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                 <span style="font-weight: 600;">我的联系人</span>
-                <span style="font-size: 12px; color: #6b7280;">点击右上角添加</span>
+                <span style="font-size: var(--uikit-font-size-12); color: #6b7280;">点击右上角添加</span>
               </div>
             </template>
           </ContactContainer>
@@ -337,10 +337,10 @@ function groupSubtitleFn(g: Group): string | undefined {
                 <div style="font-size: 32px; margin-bottom: 8px;">
                   📒
                 </div>
-                <div v-if="searchKeyword" style="color: #6b7280; font-size: 14px;">
+                <div v-if="searchKeyword" style="color: #6b7280; font-size: var(--uikit-font-size-14);">
                   未搜到 "{{ searchKeyword }}"
                 </div>
-                <div v-else style="color: #6b7280; font-size: 14px;">
+                <div v-else style="color: #6b7280; font-size: var(--uikit-font-size-14);">
                   通讯录还是空的，先去添加一个吧
                 </div>
               </div>
@@ -364,15 +364,15 @@ function groupSubtitleFn(g: Group): string | undefined {
                 :style="{ background: active ? '#e6f0ff' : 'transparent' }"
               >
                 <div
-                  style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #60a5fa, #a78bfa); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;"
+                  style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #60a5fa, #a78bfa); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--uikit-font-size-12); font-weight: 600;"
                 >
                   {{ (contact.remark || contact.name || '').slice(0, 1) }}
                 </div>
                 <div style="flex: 1; min-width: 0;">
-                  <div style="font-size: 14px; color: #111827;">
+                  <div style="font-size: var(--uikit-font-size-14); color: #111827;">
                     {{ contact.remark || contact.name }}
                   </div>
-                  <div style="font-size: 12px; color: #9ca3af;">
+                  <div style="font-size: var(--uikit-font-size-12); color: #9ca3af;">
                     {{ contact.userId }}
                   </div>
                 </div>
@@ -448,11 +448,11 @@ function groupSubtitleFn(g: Group): string | undefined {
           <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #home-footer>
               <div
-                style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #6b7280;"
+                style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: var(--uikit-font-size-12); color: #6b7280;"
               >
                 <span>已同步 · 刚刚</span>
                 <button
-                  style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                  style="font-size: var(--uikit-font-size-12); padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
                   @click="() => console.log('add new contact')"
                 >
                   + 添加
@@ -470,7 +470,7 @@ function groupSubtitleFn(g: Group): string | undefined {
           <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #header-extra>
               <span
-                style="font-size: 13px; color: #3b82f6; cursor: pointer;"
+                style="font-size: var(--uikit-font-size-13); color: #3b82f6; cursor: pointer;"
                 @click="() => console.log('more')"
               >+</span>
             </template>
@@ -560,7 +560,7 @@ function groupSubtitleFn(g: Group): string | undefined {
             @vue:mounted="injectMockContacts"
           />
         </UIKitProvider>
-        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           已选: {{ contactSelectedIds.join(', ') || '空' }}
         </div>
       </div>
@@ -580,7 +580,7 @@ function groupSubtitleFn(g: Group): string | undefined {
             @vue:mounted="injectMockGroups"
           />
         </UIKitProvider>
-        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           已选: {{ groupSelectedIds.join(', ') || '空' }}
         </div>
       </div>
@@ -664,12 +664,12 @@ function groupSubtitleFn(g: Group): string | undefined {
             @vue:mounted="injectMockContacts"
           >
             <template #body>
-              <div style="padding: 8px 0; font-size: 12px; color: #3b82f6;">
+              <div style="padding: 8px 0; font-size: var(--uikit-font-size-12); color: #3b82f6;">
                 置顶提示：这是 sticky body 区域
               </div>
             </template>
             <template #footer>
-              <div style="padding: 8px 0; font-size: 12px; color: #ef4444;">
+              <div style="padding: 8px 0; font-size: var(--uikit-font-size-12); color: #ef4444;">
                 底部操作：sticky footer 区域
               </div>
             </template>
@@ -779,7 +779,7 @@ function groupSubtitleFn(g: Group): string | undefined {
               <input
                 :value="keyword"
                 placeholder="🔍 自定义联系人搜索..."
-                style="width: 100%; padding: 8px 12px; border: 2px solid #3b82f6; border-radius: 8px; outline: none; font-size: 14px;"
+                style="width: 100%; padding: 8px 12px; border: 2px solid #3b82f6; border-radius: 8px; outline: none; font-size: var(--uikit-font-size-14);"
                 @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
               >
             </template>
@@ -800,7 +800,7 @@ function groupSubtitleFn(g: Group): string | undefined {
               <input
                 :value="keyword"
                 placeholder="🔍 自定义群组搜索..."
-                style="width: 100%; padding: 8px 12px; border: 2px solid #10b981; border-radius: 8px; outline: none; font-size: 14px;"
+                style="width: 100%; padding: 8px 12px; border: 2px solid #10b981; border-radius: 8px; outline: none; font-size: var(--uikit-font-size-14);"
                 @input="(e) => setKeyword((e.target as HTMLInputElement).value)"
               >
             </template>

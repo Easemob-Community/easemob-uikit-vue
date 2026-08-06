@@ -162,7 +162,7 @@ function log(event: string, payload?: string) {
                   v-for="tab in tabs"
                   :key="tab"
                   type="button"
-                  style="flex: 1; padding: 6px 0; font-size: 13px; border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; color: #6b7280;"
+                  style="flex: 1; padding: 6px 0; font-size: var(--uikit-font-size-13); border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; color: #6b7280;"
                   :style="{ borderBottomColor: activeTab === tab ? '#3b82f6' : 'transparent', color: activeTab === tab ? '#3b82f6' : '#6b7280', fontWeight: activeTab === tab ? 600 : 400 }"
                   @click="selectTab(tab)"
                 >
@@ -187,7 +187,7 @@ function log(event: string, payload?: string) {
             />
           </UIKitProvider>
         </div>
-        <div style="width: 240px; font-size: 12px; color: #6b7280;">
+        <div style="width: 240px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 8)" :key="i">

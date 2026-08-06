@@ -359,7 +359,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__name {
-  font-size: 15px;
+  font-size: var(--uikit-font-size-15);
   font-weight: 500;
   color: var(--uikit-text-primary);
   overflow: hidden;
@@ -368,7 +368,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__role {
-  font-size: 10px;
+  font-size: var(--uikit-font-size-10);
   padding: 1px 5px;
   border-radius: 4px;
   line-height: 1.2;
@@ -386,7 +386,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__status-tag {
-  font-size: 10px;
+  font-size: var(--uikit-font-size-10);
   padding: 1px 5px;
   border-radius: 4px;
   line-height: 1.2;
@@ -409,7 +409,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__id {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -427,7 +427,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   transition: all 0.15s;
 }

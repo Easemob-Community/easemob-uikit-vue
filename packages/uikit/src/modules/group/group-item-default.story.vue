@@ -50,7 +50,7 @@ function log(event: string) {
       <div style="max-width: 360px; padding: 16px;">
         <GroupItemDefault :group="group" @click="log('click')" />
       </div>
-      <div style="padding: 0 16px; font-size: 12px; color: #6b7280;">
+      <div style="padding: 0 16px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         事件：
         <ul style="margin: 4px 0; padding-left: 16px;">
           <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">

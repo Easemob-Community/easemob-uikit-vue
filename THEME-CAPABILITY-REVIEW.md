@@ -54,7 +54,7 @@
 ## 建议推进顺序
 
 1. ✅ **先清 D3 / D4 / D12（2026-08-05 已完成 worst offenders）**——`theme/index.css` 补 `--uikit-shadow-sm`、`store/theme.ts` 同步 `--uikit-primary-hover`；worst offenders 的裸 hex、不一致 fallback、硬编码 transition 已替换。
-2. ✅ **建字号 token 体系并激活 `--uikit-font-scale`（2026-08-06 完成核心链路）**——`theme/index.css` 新增 `--uikit-font-size-10~22` token；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`/`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；demo 外观面板加档位切换；高频组件（45 文件 144 处）字号已 token 化。**剩余约 211 处低频文件字号待 Phase 2.5。**
+2. ✅ **建字号 token 体系并激活 `--uikit-font-scale`（2026-08-06 完成）**——`theme/index.css` 新增 `--uikit-font-size-8~22` token；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`/`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；demo 外观面板加档位切换；高频组件（45 文件 144 处）与低频文件（57 文件 207 处）字号均已 token 化，仅剩 4 处 story 装饰性 emoji 尺寸保持 px。
 3. **补高频语义 token**：气泡色、聊天背景。
 4. **扩 Provider `theme` prop**：density 等。
 5. **密度档最后做**（依赖间距 token 化，工程量最大、优先级相对低）。

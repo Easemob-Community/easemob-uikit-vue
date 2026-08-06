@@ -109,7 +109,7 @@ function injectMock() {
           </AddressBookContainer>
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         未传入 noticeCount 时，徽标自动显示 pending 好友申请 + 群邀请数量。
       </div>
     </Variant>
@@ -130,7 +130,7 @@ function injectMock() {
           </AddressBookContainer>
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         开启 notice-persist-invites 后，pending 通知会持久化；刷新页面后首页徽标仍可立即显示红点。
       </div>
     </Variant>
@@ -214,7 +214,7 @@ function injectMock() {
         <UIKitProvider :auto-init="false">
           <AddressBookContainer initial-view="group" @vue:mounted="injectMock">
             <template #back-icon>
-              <span style="font-size: 18px; color: #3b82f6;">←</span>
+              <span style="font-size: var(--uikit-font-size-18); color: #3b82f6;">←</span>
             </template>
             <template #default="{ view }">
               <ContactListContainer v-if="view === 'contact'" />
@@ -339,11 +339,11 @@ function injectMock() {
           <AddressBookContainer :notice-count="2" @vue:mounted="injectMock">
             <template #home-footer>
               <div
-                style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #6b7280;"
+                style="padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: var(--uikit-font-size-12); color: #6b7280;"
               >
                 <span>已同步 · 刚刚</span>
                 <button
-                  style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                  style="font-size: var(--uikit-font-size-12); padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
                   @click="() => console.log('add new contact')"
                 >
                   + 添加
@@ -365,7 +365,7 @@ function injectMock() {
           <AddressBookContainer :notice-count="2" @vue:mounted="injectMock">
             <template #header-extra>
               <span
-                style="font-size: 13px; color: #3b82f6; cursor: pointer;"
+                style="font-size: var(--uikit-font-size-13); color: #3b82f6; cursor: pointer;"
                 @click="() => console.log('more')"
               >+</span>
             </template>

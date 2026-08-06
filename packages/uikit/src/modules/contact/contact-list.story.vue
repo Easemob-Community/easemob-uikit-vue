@@ -200,7 +200,7 @@ function onLoadMore() {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         通过 :enable-presence="true" 开启组件级 Presence；Provider 全局可关闭，仅当前组件生效。
       </div>
     </Variant>
@@ -214,7 +214,7 @@ function onLoadMore() {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         Provider 全局开启，但当前组件通过 :enable-presence="false" 独立关闭。
       </div>
     </Variant>
@@ -243,7 +243,7 @@ function onLoadMore() {
             @vue:mounted="injectMockContacts"
           />
         </UIKitProvider>
-        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+        <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
           已选: {{ controlledIds.join(', ') || '空' }}（最多 3 个）
         </div>
       </div>
@@ -285,15 +285,15 @@ function onLoadMore() {
                   {{ (contact.remark || contact.name || '').slice(0, 1) }}
                 </div>
                 <div style="flex: 1; min-width: 0;">
-                  <div style="font-size: 14px; color: #111827;">
+                  <div style="font-size: var(--uikit-font-size-14); color: #111827;">
                     {{ contact.remark || contact.name }}
                   </div>
-                  <div style="font-size: 12px; color: #9ca3af;">
+                  <div style="font-size: var(--uikit-font-size-12); color: #9ca3af;">
                     {{ contact.userId }}
                   </div>
                 </div>
                 <button
-                  style="font-size: 12px; padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
+                  style="font-size: var(--uikit-font-size-12); padding: 4px 10px; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 4px; background: transparent; cursor: pointer;"
                   @click.stop="() => console.log('add friend:', contact.userId)"
                 >
                   添加
@@ -334,12 +334,12 @@ function onLoadMore() {
             @vue:mounted="injectMockContacts"
           >
             <template #body>
-              <div style="padding: 8px 0; font-size: 12px; color: #3b82f6;">
+              <div style="padding: 8px 0; font-size: var(--uikit-font-size-12); color: #3b82f6;">
                 置顶提示：sticky body 插槽
               </div>
             </template>
             <template #footer>
-              <div style="padding: 8px 0; font-size: 12px; color: #ef4444;">
+              <div style="padding: 8px 0; font-size: var(--uikit-font-size-12); color: #ef4444;">
                 底部操作：sticky footer 插槽
               </div>
             </template>
@@ -356,7 +356,7 @@ function onLoadMore() {
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #3b82f6;" />
                 <span style="font-weight: 600;">{{ group.title }}</span>
-                <span style="font-size: 11px; color: #9ca3af;">({{ group.items.length }})</span>
+                <span style="font-size: var(--uikit-font-size-11); color: #9ca3af;">({{ group.items.length }})</span>
               </div>
             </template>
           </ContactList>
@@ -375,7 +375,7 @@ function onLoadMore() {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         点击列表项：仅触发 click 事件，不设置 activeId（无高亮）。打开控制台查看日志。
       </div>
     </Variant>
@@ -391,7 +391,7 @@ function onLoadMore() {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         点击列表项：触发 click + select 事件，同时设置 activeId（有高亮）。打开控制台查看日志。
       </div>
     </Variant>

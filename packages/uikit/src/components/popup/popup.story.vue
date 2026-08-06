@@ -112,7 +112,7 @@ const showGroupC = ref(false)
     </Variant>
 
     <Variant title="Group (互斥分组)">
-      <div style="padding: 16px; color: #666; font-size: 13px;">
+      <div style="padding: 16px; color: #666; font-size: var(--uikit-font-size-13);">
         同一 group 的 popup 同时只能开一个，打开新的会自动关闭其他。<br>
         依次点击 A → B → C，观察前一个是否自动关闭。
       </div>

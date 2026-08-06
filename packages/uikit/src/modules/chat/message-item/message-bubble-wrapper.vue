@@ -901,7 +901,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--uikit-text-secondary);
   background: transparent;
   color: var(--uikit-text-secondary);
-  font-size: 8px;
+  font-size: var(--uikit-font-size-8);
   line-height: 1;
   padding: 0;
   margin-top: 2px;

@@ -247,7 +247,7 @@ function onSelectorChanged() {
 }
 
 .user-card__name {
-  font-size: 22px;
+  font-size: var(--uikit-font-size-22);
   font-weight: 600;
   color: var(--uikit-text-primary);
   word-break: break-all;
@@ -257,7 +257,7 @@ function onSelectorChanged() {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   padding: 2px 8px;
   border-radius: 9999px;
@@ -289,7 +289,7 @@ function onSelectorChanged() {
 }
 
 .user-card__user-id {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   margin-top: 4px;
   word-break: break-all;
@@ -336,7 +336,7 @@ function onSelectorChanged() {
 }
 
 .user-card__action-label {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .user-card__info {
@@ -358,13 +358,13 @@ function onSelectorChanged() {
 
 .user-card__label {
   flex: 0 0 80px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
 .user-card__value {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-primary-color, #3b82f6);
   word-break: break-all;
 }

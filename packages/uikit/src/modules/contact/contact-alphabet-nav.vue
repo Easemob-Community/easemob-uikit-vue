@@ -69,7 +69,7 @@ function onTap(key: string) {
 }
 
 .contact-alphabet-nav__item {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   line-height: 1;
   padding: 2px 4px;
   color: var(--uikit-text-secondary);

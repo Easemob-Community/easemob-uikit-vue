@@ -25,13 +25,13 @@ function onClose() {
         打开在线状态选择器
       </button>
       <PresenceSelectorModal v-model:show="show" @close="onClose" />
-      <div style="margin-top: 12px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         事件:
         <ul style="margin: 4px 0; padding-left: 16px;">
           <li v-for="(log, i) in logs.slice(0, 5)" :key="i">{{ log }}</li>
         </ul>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #ef4444;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #ef4444;">
         注：该组件内部会调用 SDK 的 publishPresence，Storybook 未连接 SDK，点击状态项会触发失败提示。
       </div>
     </Variant>

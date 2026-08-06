@@ -413,7 +413,7 @@ function onPresenceChanged() {
   justify-content: center;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-tertiary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   z-index: 1;
   border-radius: var(--uikit-components-radius, 12px);
 }
@@ -441,13 +441,13 @@ function onPresenceChanged() {
 
 .contact-detail__label {
   flex: 0 0 80px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
 .contact-detail__value {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
@@ -484,7 +484,7 @@ function onPresenceChanged() {
   border-radius: var(--uikit-components-radius, 6px);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   outline: none;
 }
 

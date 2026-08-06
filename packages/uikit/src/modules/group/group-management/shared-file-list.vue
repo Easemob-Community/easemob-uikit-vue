@@ -373,7 +373,7 @@ async function onDownload(file: any) {
 .shared-file-list__loading {
   text-align: center;
   padding: 16px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -386,7 +386,7 @@ async function onDownload(file: any) {
 
 .shared-file-list__context-menu-item {
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;

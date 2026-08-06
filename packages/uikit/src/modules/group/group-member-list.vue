@@ -381,13 +381,13 @@ defineExpose({ refresh, removeMember, setMemberRole })
 }
 
 .group-member-list__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
 
 .group-member-list__count {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   font-weight: 500;
   color: #fff;
   background-color: var(--uikit-text-secondary);
@@ -432,7 +432,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 .group-member-list__empty-text,
 .group-member-list__no-more,
 .group-member-list__load-more-text {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
 }
 
@@ -440,7 +440,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
   border: none;
   background: none;
   color: var(--uikit-primary-color);
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   padding: 4px 8px;
 }

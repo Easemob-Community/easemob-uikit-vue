@@ -92,7 +92,7 @@ function onMoreClick(event: MouseEvent) {
   gap: 2px;
 }
 .shared-file-list__name {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
   overflow: hidden;
@@ -100,7 +100,7 @@ function onMoreClick(event: MouseEvent) {
   white-space: nowrap;
 }
 .shared-file-list__meta {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 .shared-file-list__item:hover .shared-file-list__name {

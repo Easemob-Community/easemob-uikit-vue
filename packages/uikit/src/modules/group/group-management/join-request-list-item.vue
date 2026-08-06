@@ -75,19 +75,19 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
   gap: 2px;
 }
 .join-request-list__name {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
 .join-request-list__reason {
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .join-request-list__status {
-  font-size: 11px;
+  font-size: var(--uikit-font-size-11);
   padding: 1px 5px;
   border-radius: 4px;
   width: fit-content;
@@ -111,7 +111,7 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 12px;
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   transition: all 0.15s;
 }

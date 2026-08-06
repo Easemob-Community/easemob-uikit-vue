@@ -275,7 +275,7 @@ injectMockData()
               <span style="font-weight: 700; color: #3b82f6;">{{ customSlotTitle }}</span>
             </template>
             <template #header-extra>
-              <span style="font-size: 12px; color: #6b7280;">v2.0</span>
+              <span style="font-size: var(--uikit-font-size-12); color: #6b7280;">v2.0</span>
             </template>
           </ChatContainer>
         </UIKitProvider>
@@ -287,7 +287,7 @@ injectMockData()
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="baseConfig">
             <template #message-txt="{ message }">
-              <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: 14px;">
+              <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: var(--uikit-font-size-14);">
                 [自定义文本] {{ 'content' in message ? message.content : '' }}
               </div>
             </template>
@@ -311,7 +311,7 @@ injectMockData()
             <template #empty>
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                 <span style="font-size: 48px;">&#128172;</span>
-                <span style="font-size: 16px; color: var(--uikit-text-secondary);">选择一个会话开始聊天吧</span>
+                <span style="font-size: var(--uikit-font-size-16); color: var(--uikit-text-secondary);">选择一个会话开始聊天吧</span>
               </div>
             </template>
           </ChatContainer>
@@ -334,7 +334,7 @@ injectMockData()
             <template #loading>
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                 <span style="font-size: 32px; animation: spin 1s linear infinite;">&#128260;</span>
-                <span style="font-size: 14px; color: var(--uikit-text-secondary);">正在加载会话...</span>
+                <span style="font-size: var(--uikit-font-size-14); color: var(--uikit-text-secondary);">正在加载会话...</span>
               </div>
             </template>
           </ChatContainer>

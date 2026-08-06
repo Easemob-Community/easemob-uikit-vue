@@ -51,11 +51,12 @@ const isSingleDigit = computed(() => !props.dot && displayCount.value.length ===
   top: 0;
   right: 0;
   transform: translate(50%, -50%);
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 8px;
-  font-size: 10px;
+  /* 使用 em 尺寸，使徽章容器随字号 token 联动缩放，避免适老版下数字溢出或过于拥挤 */
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.25em;
+  border-radius: 0.8em;
+  font-size: var(--uikit-font-size-10);
   color: #fff;
   display: flex;
   align-items: center;
@@ -65,8 +66,8 @@ const isSingleDigit = computed(() => !props.dot && displayCount.value.length ===
 }
 
 .uikit-badge__content--single {
-  width: 16px;
-  min-width: 16px;
+  width: 1.6em;
+  min-width: 1.6em;
   padding: 0;
   border-radius: 50%;
 }

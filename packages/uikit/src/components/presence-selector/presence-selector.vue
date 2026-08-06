@@ -191,7 +191,7 @@ function onCancel() {
 }
 
 .presence-selector--compact .presence-selector__title {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
 }
 
 .presence-selector--compact .presence-selector__dot {
@@ -236,7 +236,7 @@ function onCancel() {
 
 .presence-selector--compact .presence-selector__confirm {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
 }
 
 .presence-selector__header {
@@ -247,7 +247,7 @@ function onCancel() {
 }
 
 .presence-selector__title {
-  font-size: 16px;
+  font-size: var(--uikit-font-size-16);
   font-weight: 600;
   color: var(--uikit-text-primary);
 }
@@ -276,7 +276,7 @@ function onCancel() {
 
 .presence-selector__label {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
 }
 
@@ -300,7 +300,7 @@ function onCancel() {
   border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-primary-color);
   color: #fff;
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

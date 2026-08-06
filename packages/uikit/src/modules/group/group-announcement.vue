@@ -150,7 +150,7 @@ function cancel() {
 }
 
 .group-announcement__label {
-  font-size: 14px;
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }
@@ -162,7 +162,7 @@ function cancel() {
 }
 
 .group-announcement__content {
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   word-break: break-all;
@@ -186,7 +186,7 @@ function cancel() {
   border-radius: 6px;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: 13px;
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
   resize: vertical;
   outline: none;

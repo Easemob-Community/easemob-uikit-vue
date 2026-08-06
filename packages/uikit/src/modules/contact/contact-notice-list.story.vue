@@ -66,7 +66,7 @@ function onDecline(invite: UiContactInvite) {
           <ContactNoticeList :invites="[...baseInvites, ...groupInvites, ...acceptedInvites, ...declinedInvites]" />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         已接受 / 已拒绝 的条目会显示状态标签并禁用操作按钮；已加入的群组 / 已成好友的待处理邀请会按「已接受」展示。
       </div>
     </Variant>
@@ -81,7 +81,7 @@ function onDecline(invite: UiContactInvite) {
           />
         </UIKitProvider>
       </div>
-      <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+      <div style="margin-top: 8px; font-size: var(--uikit-font-size-12); color: #6b7280;">
         点击接受 / 拒绝会更新列表状态，同时支持好友申请与群邀请。
       </div>
     </Variant>
