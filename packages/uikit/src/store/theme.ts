@@ -139,7 +139,8 @@ export const useThemeStore = defineStore('theme', () => {
     set: (v: boolean) => { storage.value.animationRipple = v },
   })
   const fontSizeScale = computed({
-    get: () => storage.value.fontSizeScale,
+    // 兼容旧 localStorage：旧缓存中可能无 fontSizeScale 字段，回落到 1
+    get: () => storage.value.fontSizeScale ?? 1,
     set: (v: number) => { storage.value.fontSizeScale = v },
   })
 
@@ -168,9 +169,10 @@ export const useThemeStore = defineStore('theme', () => {
 
   // 字号缩放：写入 --uikit-font-scale，驱动 --uikit-font-size-* token
   watchEffect(() => {
+    const scale = Number.isFinite(fontSizeScale.value) ? fontSizeScale.value : 1
     document.documentElement.style.setProperty(
       '--uikit-font-scale',
-      String(Math.max(0.5, fontSizeScale.value))
+      String(Math.max(0.5, scale))
     )
   })
 
@@ -275,7 +277,8 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   function setFontSizeScale(scale: number) {
-    fontSizeScale.value = Math.max(0.5, scale)
+    const value = Number.isFinite(scale) ? scale : 1
+    fontSizeScale.value = Math.max(0.5, value)
   }
 
   function setFontSize(preset: FontSizePreset) {

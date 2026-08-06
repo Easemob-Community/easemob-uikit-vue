@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useClient } from '@easemob/uikit'
+import { demoPresetUsers } from './composables/use-demo-settings'
+import type { DemoPresetUser } from './composables/use-demo-settings'
 
 const emit = defineEmits<{
   (e: 'login-success'): void
@@ -13,12 +15,13 @@ const savedConfig = (() => {
   try {
     const raw = localStorage.getItem('uikit_demo_login_config')
     return raw ? JSON.parse(raw) : null
-  } catch {
+  }
+  catch {
     return null
   }
 })()
 
-const sdkAppKey = ref(savedConfig?.appKey || 'easemob-demo#support')
+const sdkAppKey = ref(savedConfig?.appKey || 'easemob-demo#support-ngi')
 const sdkApiUrl = ref(savedConfig?.apiUrl || '')
 const sdkDebug = ref(savedConfig?.debug || false)
 const loginUser = ref(savedConfig?.user || '')
@@ -28,6 +31,14 @@ const loginMode = ref<'password' | 'token'>(savedConfig?.mode || 'password')
 
 const loading = ref(false)
 const errorMsg = ref('')
+
+/** 应用预设账号：切到 Token 模式并填入用户 / Token */
+function applyPreset(preset: DemoPresetUser) {
+  loginUser.value = preset.user
+  loginToken.value = preset.token
+  loginMode.value = 'token'
+  errorMsg.value = ''
+}
 
 async function handleLogin() {
   errorMsg.value = ''
@@ -57,12 +68,13 @@ async function handleLogin() {
       debug: sdkDebug.value,
     })
 
-    const params: { user: string; accessToken?: string; password?: string } = {
+    const params: { user: string, accessToken?: string, password?: string } = {
       user: loginUser.value,
     }
     if (loginMode.value === 'token' && loginToken.value) {
       params.accessToken = loginToken.value
-    } else if (loginMode.value === 'password' && loginPassword.value) {
+    }
+    else if (loginMode.value === 'password' && loginPassword.value) {
       params.password = loginPassword.value
     }
 
@@ -83,9 +95,11 @@ async function handleLogin() {
     localStorage.setItem('uikit_demo_login_config', JSON.stringify(configToSave))
 
     emit('login-success')
-  } catch (err) {
-    errorMsg.value = '登录失败: ' + (err as Error).message
-  } finally {
+  }
+  catch (err) {
+    errorMsg.value = `登录失败: ${(err as Error).message}`
+  }
+  finally {
     loading.value = false
   }
 }
@@ -94,7 +108,9 @@ async function handleLogin() {
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h1 class="login-title">UIKit Demo 登录</h1>
+      <h1 class="login-title">
+        UIKit Demo 登录
+      </h1>
 
       <div class="login-form">
         <!-- AppKey -->
@@ -102,9 +118,9 @@ async function handleLogin() {
           <label class="login-label">AppKey</label>
           <input
             v-model="sdkAppKey"
-            placeholder="例如: easemob-demo#support"
+            placeholder="例如: easemob-demo#support-ngi"
             class="demo-input"
-          />
+          >
         </div>
 
         <!-- ApiUrl -->
@@ -114,15 +130,32 @@ async function handleLogin() {
             v-model="sdkApiUrl"
             placeholder="默认不填"
             class="demo-input"
-          />
+          >
         </div>
 
         <!-- Debug -->
         <div class="login-field login-field--inline">
           <label class="demo-check">
-            <input v-model="sdkDebug" type="checkbox" />
+            <input v-model="sdkDebug" type="checkbox">
             <span>开启 Debug</span>
           </label>
+        </div>
+
+        <!-- 预设账号 -->
+        <div class="login-field">
+          <label class="login-label">快捷账号</label>
+          <div class="login-preset-list">
+            <button
+              v-for="preset in demoPresetUsers"
+              :key="preset.user"
+              type="button"
+              class="demo-btn"
+              :class="{ 'demo-btn--active': loginUser === preset.user }"
+              @click="applyPreset(preset)"
+            >
+              {{ preset.label }}
+            </button>
+          </div>
         </div>
 
         <!-- 用户名 -->
@@ -133,7 +166,7 @@ async function handleLogin() {
             placeholder="请输入用户名"
             class="demo-input"
             @keydown.enter="handleLogin"
-          />
+          >
         </div>
 
         <!-- 密码 / Token -->
@@ -164,14 +197,14 @@ async function handleLogin() {
             placeholder="请输入密码"
             class="demo-input"
             @keydown.enter="handleLogin"
-          />
+          >
           <input
             v-else
             v-model="loginToken"
             placeholder="请输入 AccessToken"
             class="demo-input"
             @keydown.enter="handleLogin"
-          />
+          >
         </div>
 
         <!-- 错误提示 -->
@@ -249,6 +282,11 @@ async function handleLogin() {
 .login-mode-switch {
   display: flex;
   gap: 4px;
+}
+
+.login-preset-list {
+  display: flex;
+  gap: 8px;
 }
 
 .login-error {

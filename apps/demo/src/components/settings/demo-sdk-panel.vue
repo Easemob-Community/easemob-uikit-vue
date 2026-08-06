@@ -8,7 +8,7 @@
  * demo-page → app.vue 处理，清空本地登录缓存并回到登录页。
  */
 import { useClient } from '@easemob/uikit'
-import { useDemoSettings } from '../../composables/use-demo-settings'
+import { demoPresetUsers, useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 
 const emit = defineEmits<{
@@ -16,7 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
-const { sdkAppKey, sdkApiUrl, sdkDebug, loginUser, loginPassword, loginToken, loginMode } = useDemoSettings()
+const { sdkAppKey, sdkApiUrl, sdkDebug, loginUser, loginPassword, loginToken, loginMode, applyPresetUser } = useDemoSettings()
 
 function handleInit() {
   init({
@@ -70,15 +70,15 @@ async function handleLogout() {
           placeholder="appKey"
           class="demo-input"
           style="width: 160px;"
-        />
+        >
         <input
           v-model="sdkApiUrl"
           placeholder="apiUrl (可选)"
           class="demo-input"
           style="width: 160px;"
-        />
+        >
         <label class="demo-check">
-          <input v-model="sdkDebug" type="checkbox" />
+          <input v-model="sdkDebug" type="checkbox">
           <span>debug</span>
         </label>
         <button
@@ -105,12 +105,23 @@ async function handleLogout() {
         </span>
       </label>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <span class="demo-settings__label">快捷账号</span>
+        <button
+          v-for="preset in demoPresetUsers"
+          :key="preset.user"
+          class="demo-btn"
+          :class="{ 'demo-btn--active': loginUser === preset.user }"
+          @click="applyPresetUser(preset)"
+        >
+          {{ preset.label }}
+        </button>
+        <span class="demo-settings__label" style="margin-left: 4px;">|</span>
         <input
           v-model="loginUser"
           placeholder="用户名"
           class="demo-input"
           style="width: 120px;"
-        />
+        >
         <template v-if="loginMode === 'password'">
           <input
             v-model="loginPassword"
@@ -118,7 +129,7 @@ async function handleLogout() {
             type="password"
             class="demo-input"
             style="width: 120px;"
-          />
+          >
         </template>
         <template v-else>
           <input
@@ -126,7 +137,7 @@ async function handleLogout() {
             placeholder="accessToken"
             class="demo-input"
             style="width: 140px;"
-          />
+          >
         </template>
         <button
           class="demo-btn"
