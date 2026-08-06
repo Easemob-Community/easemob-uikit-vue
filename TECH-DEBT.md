@@ -705,7 +705,7 @@
 ### [ ] D86. 主题能力扩展：字号体系 / 适老版 / 密度 / 气泡色等语义 token
 
 - **背景**：主题机制（变量契约 + `data-uikit-*` 驱动）健康，但覆盖面不足：字号 token 空白（357 处硬编码 px、`--uikit-font-scale` 只写不读）、无全局密度、气泡颜色等高频定制点无独立 token、Provider `theme` prop 偏窄（无 auto、非响应式）。
-- **进展**：2026-08-06 Phase 2 完成核心链路：`theme/index.css` 新增 `--uikit-font-size-*` token 与 `--uikit-font-scale` 联动；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`、`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；`use-h5-adaptation.ts` 停止重复写 `--uikit-font-scale`；demo 外观面板加 标准/大/特大 三档切换；高频组件（chat/conversation/原子组件，45 个文件 144 处）字号已 token 化。**剩余 74 个低频文件（约 213 处）的字号硬编码仍待 Phase 2.5 继续替换。** 后续仍须补气泡/聊天背景语义 token、Provider 密度扩展。
+- **进展**：2026-08-06 Phase 2 完成核心链路：`theme/index.css` 新增 `--uikit-font-size-*` token 与 `--uikit-font-scale` 联动；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`、`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；`use-h5-adaptation.ts` 停止重复写 `--uikit-font-scale`；demo 外观面板加 标准/大/特大 三档切换；高频组件（chat/conversation/原子组件，45 个文件 144 处）字号已 token 化。**剩余 74 个低频文件（约 211 处）的字号硬编码仍待 Phase 2.5 继续替换。** 后续仍须补气泡/聊天背景语义 token、Provider 密度扩展。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [ ] D87. Demo 开发者友好模式（Dev Hints）：悬停展示环信接口 + 实现思路
