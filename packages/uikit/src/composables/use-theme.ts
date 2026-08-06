@@ -81,7 +81,7 @@ export function useTheme() {
   const chatBg = computed(() => themeStore.chatBg)
   const inputBg = computed(() => themeStore.inputBg)
 
-  function setBubbleBg(other?: string, self?: string) {
+  function setBubbleBg(other?: string | null, self?: string | null) {
     themeStore.setBubbleBg(other, self)
   }
 

@@ -324,9 +324,9 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
-  function setBubbleBg(other?: string, self?: string) {
-    if (other !== undefined) bubbleBgOther.value = other
-    if (self !== undefined) bubbleBgSelf.value = self
+  function setBubbleBg(other?: string | null, self?: string | null) {
+    if (other !== undefined) bubbleBgOther.value = other ?? undefined
+    if (self !== undefined) bubbleBgSelf.value = self ?? undefined
   }
 
   function setChatBg(value?: string) {

@@ -240,7 +240,7 @@ function applyThemeConfig(theme?: ProviderProps['theme']) {
       themeStore.setBubbleBg(theme.bubbleColor, theme.bubbleColor)
     }
     else {
-      themeStore.setBubbleBg(theme.bubbleColor.other, theme.bubbleColor.self)
+      themeStore.setBubbleBg(theme.bubbleColor.other ?? null, theme.bubbleColor.self ?? null)
     }
   }
   if (theme.chatBg !== undefined) {
