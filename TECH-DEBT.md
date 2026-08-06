@@ -714,6 +714,14 @@
 - **可行性：高，uikit 零侵入**（demo 层三件套：元数据注册表 + 事件委托悬停引擎 + 提示卡/EmPopup 详情抽屉）。DOM class 稳定可识别、API 素材集中在 `sdk/domain/*.ts`、开关机制挂 `useDemoSettings` 现成。**方案与映射表骨架见根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（2026-08-05 预研）**。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
+### [x] D88. 群已读详情未按 userId 去重，多端登录记作不同人已读
+
+- **现象**：`getGroupMessageReadUsers` 返回的已读用户列表直接展示，未按 userId 去重。同一账号多端登录时每个设备各上报一条已读记录，弹窗已读列表重复展示同一用户，已读 Tab 计数把设备数当人数（记作不同人已读）。
+- **证据**：`modules/chat/message-list/message-list.vue` 的 `onGroupReadClick`（`modalReadList.value = readUsers` 直接赋值）；SDK 类型 `GroupMessageReadUsersResult.users: ReadonlyArray<GroupMessageReadUser>`。
+- **建议修法**：展示前按 `userId` 去重；成员差集侧同步防御去重。
+- **修复**：已于 2026-08-06 修复。`message-list.vue` 的 `onGroupReadClick` 已读列表改为 `[...new Set(...)]` 按 userId 去重后赋值；未读列表的群成员 userId 同样去重后再做差集，避免异常数据重复展示。气泡上的 `groupReadCount` 为服务端统计 count（无用户列表），UIKit 侧无法去重，服务端需保证按人统计。
+- **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring`
+
 ---
 
 ## 已修复（归档）

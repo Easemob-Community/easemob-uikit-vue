@@ -561,8 +561,14 @@ async function onResend(message: UiMessage) {
 async function onGroupReadClick(msgId: string, groupId: string) {
   try {
     const result: GroupMessageReadUsersResult = await fetchGroupReadDetail(msgId, groupId)
-    // SDK 返回 users 为已读用户列表，每个 GroupMessageReadUser 包含 userId
-    const readUsers = result?.users?.map(u => u.userId) || []
+    // SDK 返回 users 为已读用户列表，每个 GroupMessageReadUser 包含 userId；
+    // 多端登录时同一账号会重复上报已读（每个设备一条记录），必须按 userId 去重后再展示，
+    // 否则已读列表与已读计数会把设备数当成人数（记作不同人已读）。
+    const readUsers = [...new Set(
+      (result?.users || [])
+        .map(u => u.userId)
+        .filter((id): id is string => !!id),
+    )]
     modalReadList.value = readUsers
     // 未读列表 = 群成员 − 已读 − 消息发送者；成员优先取 store 缓存，缺失时拉取一页
     let members = stores.group.getGroupMembers(groupId)
@@ -577,9 +583,13 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     }
     const readSet = new Set(readUsers)
     const senderId = messages.value.find(m => (m.msgServerId || m.msgLocalId) === msgId)?.from
-    modalUnreadList.value = members
-      .map(m => m.userId)
-      .filter(id => !!id && !readSet.has(id) && id !== senderId)
+    // 成员列表同样按 userId 去重，避免异常数据导致未读列表重复展示
+    const memberIds = [...new Set(
+      members
+        .map(m => m.userId)
+        .filter((id): id is string => !!id),
+    )]
+    modalUnreadList.value = memberIds.filter(id => !readSet.has(id) && id !== senderId)
     showGroupReadModal.value = true
   }
   catch (e) {
