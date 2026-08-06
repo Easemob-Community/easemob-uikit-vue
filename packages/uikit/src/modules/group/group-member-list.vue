@@ -14,6 +14,9 @@ import type { UiGroup, UiGroupMember } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import Empty from '../../components/empty/empty.vue'
 import GroupMemberListItem from './group-member-list-item.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:GroupMemberList')
 
 export interface GroupMemberListProps {
   groupId: string
@@ -193,8 +196,8 @@ async function initialLoad() {
     localHasMore.value = result.hasMore ?? false
   }
   catch (err) {
-    console.warn('[GroupMemberList] load members failed:', formatSdkError(err))
-    showToast(t('group.memberList.loadFailed') || '加载群成员失败')
+    logger.warn('[GroupMemberList] load members failed:', formatSdkError(err))
+    showToast(t('group.memberList.loadFailed', '加载群成员失败'))
   }
 }
 
@@ -209,8 +212,8 @@ async function onLoadMore() {
     emit('load-more')
   }
   catch (err) {
-    console.warn('[GroupMemberList] load more members failed:', formatSdkError(err))
-    showToast(t('group.memberList.loadMoreFailed') || '加载更多失败')
+    logger.warn('[GroupMemberList] load more members failed:', formatSdkError(err))
+    showToast(t('group.memberList.loadMoreFailed', '加载更多失败'))
   }
   finally {
     loadingMore.value = false
@@ -250,7 +253,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
     <!-- 头部标题 -->
     <div v-if="props.showHeader" class="group-member-list__header">
       <div class="group-member-list__header-left">
-        <span class="group-member-list__title">{{ t('group.memberList.title') || '群成员' }}</span>
+        <span class="group-member-list__title">{{ t('group.memberList.title', '群成员') }}</span>
         <span class="group-member-list__count">{{ groupInfo?.memberCount ?? displayMembers.length }}</span>
       </div>
       <IconButton
@@ -259,7 +262,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
         icon="actions/close"
         size="small"
         variant="ghost"
-        :title="t('button.close') || '关闭'"
+        :title="t('button.close', '关闭')"
         @click="emit('close')"
       />
     </div>
@@ -269,7 +272,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <Input
         v-model="searchKeyword"
         variant="search"
-        :placeholder="t('group.memberList.searchPlaceholder') || '搜索群成员'"
+        :placeholder="t('group.memberList.searchPlaceholder', '搜索群成员')"
         prefix-icon="misc/magnifier2"
       />
       <IconButton
@@ -278,7 +281,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
         icon="actions/close"
         size="small"
         variant="ghost"
-        :title="t('button.clear') || '清除'"
+        :title="t('button.clear', '清除')"
         @click="clearSearch"
       />
     </div>
@@ -292,7 +295,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <Empty
         v-else-if="filteredMembers.length === 0"
         :icon="searchKeyword ? 'empty/search' : 'empty/members'"
-        :description="searchKeyword ? (t('group.memberList.noSearchResult') || '未找到相关成员') : (t('group.memberList.empty') || '暂无成员')"
+        :description="searchKeyword ? (t('group.memberList.noSearchResult', '未找到相关成员')) : (t('group.memberList.empty', '暂无成员'))"
         size="small"
       />
 
@@ -330,13 +333,13 @@ defineExpose({ refresh, removeMember, setMemberRole })
             class="group-member-list__load-more-btn"
             @click="onLoadMore"
           >
-            {{ t('group.memberList.loadMore') || '加载更多' }}
+            {{ t('group.memberList.loadMore', '加载更多') }}
           </button>
           <span v-else class="group-member-list__load-more-text">{{ t('common.loading') }}</span>
         </div>
 
         <div v-else-if="!localHasMore && filteredMembers.length > 0" class="group-member-list__no-more">
-          <span>{{ t('group.memberList.noMore') || '没有更多了' }}</span>
+          <span>{{ t('group.memberList.noMore', '没有更多了') }}</span>
         </div>
       </template>
     </div>

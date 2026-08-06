@@ -2,6 +2,9 @@ import type { CustomMessageBody, TextMessageBody, UiMessage } from '../sdk/types
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
 import { useUIKit } from './use-uikit'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseMessageSend')
 
 export interface SendMessageOptions {
   /** 是否启用群已读回执 */
@@ -177,10 +180,10 @@ export function useMessageSend() {
       case MESSAGE_TYPE.VIDEO:
       case MESSAGE_TYPE.FILE:
         // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
-        console.warn('[useMessageSend] resendMessage: media resend requires original File')
+        logger.warn('[useMessageSend] resendMessage: media resend requires original File')
         return
       default:
-        console.warn('[useMessageSend] resendMessage: unsupported message type', message.type)
+        logger.warn('[useMessageSend] resendMessage: unsupported message type', message.type)
     }
   }
 

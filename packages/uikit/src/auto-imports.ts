@@ -14,6 +14,7 @@ export const EasemobUIKitImports = {
     'useLongPress',
     'useViewport',
     'useToast',
+    'useNotification',
     'useLocale',
     'usePresence',
     'useBlocklist',

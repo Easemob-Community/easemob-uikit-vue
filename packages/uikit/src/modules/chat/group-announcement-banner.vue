@@ -28,7 +28,7 @@ const hasAnnouncement = computed(() => !!announcement.value)
       <Icon class="group-announcement-banner__icon" name="chat/pin" :size="14" />
       <div class="group-announcement-banner__content">
         <div class="group-announcement-banner__title">
-          {{ t('chat.announcementBanner.title') || '群公告' }}
+          {{ t('chat.announcementBanner.title', '群公告') }}
         </div>
         <div class="group-announcement-banner__text" :class="{ 'is-collapsed': collapsed }">
           {{ announcement }}
@@ -37,7 +37,7 @@ const hasAnnouncement = computed(() => !!announcement.value)
     </div>
     <button
       class="group-announcement-banner__toggle"
-      :title="collapsed ? (t('chat.announcementBanner.expand') || '展开') : (t('chat.announcementBanner.collapse') || '收起')"
+      :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
       @click="collapsed = !collapsed"
     >
       <Icon :name="collapsed ? 'arrows/arrow_down' : 'arrows/arrow_up_thick'" :size="14" />

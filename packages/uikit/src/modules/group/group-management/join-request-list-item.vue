@@ -37,21 +37,21 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
         v-if="props.item.status === 'declined'"
         class="join-request-list__status join-request-list__status--declined"
       >
-        {{ t('contact.inviteDeclined') || '已拒绝' }}
+        {{ t('contact.inviteDeclined', '已拒绝') }}
       </span>
       <span
         v-else-if="props.item.status === 'accepted'"
         class="join-request-list__status join-request-list__status--accepted"
       >
-        {{ t('contact.inviteAccepted') || '已接受' }}
+        {{ t('contact.inviteAccepted', '已接受') }}
       </span>
     </div>
     <div v-if="props.item.status === 'pending'" class="join-request-list__actions">
       <button class="join-request-list__action-btn join-request-list__action-btn--accept" @click="emit('accept')">
-        {{ t('group.joinRequest.accept') || '同意' }}
+        {{ t('group.joinRequest.accept', '同意') }}
       </button>
       <button class="join-request-list__action-btn join-request-list__action-btn--reject" @click="emit('reject')">
-        {{ t('group.joinRequest.reject') || '拒绝' }}
+        {{ t('group.joinRequest.reject', '拒绝') }}
       </button>
     </div>
   </div>

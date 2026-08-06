@@ -21,6 +21,9 @@ import { resolveVoiceToTextErrorMessage } from '../../../composables/use-message
 import { detectEnvironment, downloadFile } from '../../../utils/download'
 import Icon from '../../../components/icon/icon.vue'
 import MessageVirtualList from './message-virtual-list.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:MessageList')
 
 export interface MessageListProps {
   config?: ChatConfig
@@ -271,7 +274,7 @@ async function loadMoreHistory() {
     }
   }
   catch (e) {
-    console.error('[MessageList] loadMoreHistory failed:', formatSdkError(e))
+    logger.error('[MessageList] loadMoreHistory failed:', formatSdkError(e))
     // 加载失败不视为"没有更多"：保留 hasMoreHistory，给出重试入口
     historyLoadFailed.value = true
   }
@@ -418,8 +421,8 @@ async function onMessageAction(event: MessageActionEvent) {
       await pinMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] pinMessage failed:', formatSdkError(e))
-      showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin') || '置顶失败', 'error')
+      logger.warn('[MessageList] pinMessage failed:', formatSdkError(e))
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.pin', '置顶失败'), 'error')
     }
     return
   }
@@ -428,8 +431,8 @@ async function onMessageAction(event: MessageActionEvent) {
       await unpinMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] unpinMessage failed:', formatSdkError(e))
-      showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin') || '取消置顶失败', 'error')
+      logger.warn('[MessageList] unpinMessage failed:', formatSdkError(e))
+      showToast(e instanceof Error ? e.message : String(e) || t('message.action.unpin', '取消置顶失败'), 'error')
     }
     return
   }
@@ -440,7 +443,7 @@ async function onMessageAction(event: MessageActionEvent) {
       await translateTextMessage(event.message, props.config?.messageAction?.translateTargetLang)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] translateTextMessage failed:', formatSdkError(e))
+      logger.warn('[MessageList] translateTextMessage failed:', formatSdkError(e))
       showToast(resolveTranslateErrorMessage(e), 'error')
     }
     return
@@ -452,7 +455,7 @@ async function onMessageAction(event: MessageActionEvent) {
       await transcribeVoiceMessage(event.message)
     }
     catch (e: unknown) {
-      console.warn('[MessageList] transcribeVoiceMessage failed:', {
+      logger.warn('[MessageList] transcribeVoiceMessage failed:', {
         code: (e as { code?: number | string }).code,
         message: e instanceof Error ? e.message : String(e),
         details: (e as { details?: unknown }).details,
@@ -467,12 +470,12 @@ async function onMessageAction(event: MessageActionEvent) {
 function resolveTranslateErrorMessage(e: unknown): string {
   const httpStatus = (e as { details?: { httpStatus?: number } })?.details?.httpStatus
   if (httpStatus === 403) {
-    return t('message.translate.noPermission') || '暂无翻译权限'
+    return t('message.translate.noPermission', '暂无翻译权限')
   }
   if (typeof httpStatus === 'number' && (httpStatus === 404 || httpStatus === 503 || httpStatus >= 500)) {
-    return t('message.translate.serviceUnavailable') || '翻译服务未开通，请联系管理员开通'
+    return t('message.translate.serviceUnavailable', '翻译服务未开通，请联系管理员开通')
   }
-  return t('message.translate.failed') || '翻译失败，请稍后重试'
+  return t('message.translate.failed', '翻译失败，请稍后重试')
 }
 
 /** 文本消息翻译切换（显示译文/原文） */
@@ -511,9 +514,9 @@ async function handleDownloadMessage(message: UiMessage) {
     return
   const body = message.body as FileMessageBody
   const url = body.url
-  const filename = body.filename || t('message.file') || 'file'
+  const filename = body.filename || t('message.file', 'file')
   if (!url) {
-    showToast(t('message.download.failed') || '下载失败', 'error')
+    showToast(t('message.download.failed', '下载失败'), 'error')
     return
   }
 
@@ -524,14 +527,14 @@ async function handleDownloadMessage(message: UiMessage) {
       filename,
       env,
       onSuccess: () => {
-        showToast(t('message.download.success') || '下载成功', 'success')
+        showToast(t('message.download.success', '下载成功'), 'success')
       },
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
-          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件', 'warning')
+          showToast(t('message.download.wechatHint', '请在浏览器中打开以下载文件'), 'warning')
         }
         else {
-          showToast(t('message.download.failed') || '下载失败', 'error')
+          showToast(t('message.download.failed', '下载失败'), 'error')
         }
       },
     })
@@ -552,7 +555,7 @@ async function onResend(message: UiMessage) {
     await resendMessage(message)
   }
   catch (e: unknown) {
-    console.warn('[MessageList] resend failed:', formatSdkError(e))
+    logger.warn('[MessageList] resend failed:', formatSdkError(e))
     showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t), 'error')
   }
 }
@@ -578,7 +581,7 @@ async function onGroupReadClick(msgId: string, groupId: string) {
         members = stores.group.getGroupMembers(groupId)
       }
       catch (e) {
-        console.warn('[MessageList] fetchGroupMembers for unread list failed:', formatSdkError(e))
+        logger.warn('[MessageList] fetchGroupMembers for unread list failed:', formatSdkError(e))
       }
     }
     const readSet = new Set(readUsers)
@@ -593,7 +596,7 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     showGroupReadModal.value = true
   }
   catch (e) {
-    console.warn('[MessageList] fetchGroupReadDetail failed:', formatSdkError(e))
+    logger.warn('[MessageList] fetchGroupReadDetail failed:', formatSdkError(e))
   }
 }
 
@@ -726,9 +729,9 @@ watch(locateRequest, (req) => {
     >
       <span v-if="loadingHistory">{{ t('conversation.loadingMore') }}</span>
       <span v-else-if="historyLoadFailed" class="message-list__top-retry" @click="retryLoadHistory">
-        {{ t('conversation.loadHistoryFailed') || '加载失败，点击重试' }}
+        {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
       </span>
-      <span v-else>{{ t('conversation.noMoreHistory') || '没有更多历史消息' }}</span>
+      <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
     </div>
 
     <!-- 虚拟滚动模式 -->

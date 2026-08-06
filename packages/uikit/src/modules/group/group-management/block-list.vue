@@ -10,6 +10,9 @@ import type { UiGroupMember } from '../../../sdk/types'
 import Empty from '../../../components/empty/empty.vue'
 import BlockListItem from './block-list-item.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:BlockList')
 
 export interface BlockListProps {
   groupId: string
@@ -53,7 +56,7 @@ async function loadData() {
     members.value = Array.isArray(result) ? result : []
   }
   catch (err) {
-    console.warn('[BlockList] load failed:', formatSdkError(err))
+    logger.warn('[BlockList] load failed:', formatSdkError(err))
   }
   finally {
     loading.value = false
@@ -74,7 +77,7 @@ async function onUnblock(item: any) {
     emit('unblock', { userId: uid })
   }
   catch (err) {
-    console.warn('[BlockList] unblock failed:', formatSdkError(err))
+    logger.warn('[BlockList] unblock failed:', formatSdkError(err))
   }
 }
 
@@ -93,7 +96,7 @@ async function loadGroupMembers() {
     groupMembers.value = list || []
   }
   catch (err) {
-    console.warn('[BlockList] load group members failed:', formatSdkError(err))
+    logger.warn('[BlockList] load group members failed:', formatSdkError(err))
   }
   finally {
     loadingMembers.value = false
@@ -122,12 +125,12 @@ async function onConfirmAdd() {
     await loadData()
     showAddPopup.value = false
     selectedUserIds.value.clear()
-    showToast(t('group.blocklist.addSuccess') || '添加成功')
+    showToast(t('group.blocklist.addSuccess', '添加成功'))
     emit('block', ids.map(id => ({ userId: id })))
   }
   catch (err) {
-    console.warn('[BlockList] add to blocklist failed:', formatSdkError(err))
-    showToast(t('group.blocklist.addFailed') || '添加失败')
+    logger.warn('[BlockList] add to blocklist failed:', formatSdkError(err))
+    showToast(t('group.blocklist.addFailed', '添加失败'))
   }
 }
 
@@ -149,7 +152,7 @@ defineExpose({
     <Empty
       v-else-if="members.length === 0"
       icon="empty/blocklist"
-      :description="t('group.memberList.empty') || '暂无黑名单成员'"
+      :description="t('group.memberList.empty', '暂无黑名单成员')"
       size="small"
     />
     <BlockListItem
@@ -167,7 +170,7 @@ defineExpose({
     >
       <div class="block-list__popup" @pointerdown.stop @click.stop>
         <div class="block-list__popup-header">
-          <span class="block-list__popup-title">{{ t('group.blocklist.addTitle') || '添加黑名单成员' }}</span>
+          <span class="block-list__popup-title">{{ t('group.blocklist.addTitle', '添加黑名单成员') }}</span>
         </div>
         <div class="block-list__popup-body">
           <div v-if="loadingMembers" class="block-list__popup-status">
@@ -176,7 +179,7 @@ defineExpose({
           <Empty
             v-else-if="selectableMembers.length === 0"
             icon="empty/blocklist"
-            :description="t('group.blocklist.emptySelectable') || '暂无可添加的成员'"
+            :description="t('group.blocklist.emptySelectable', '暂无可添加的成员')"
             size="small"
           />
           <BlockListSelectItem
@@ -189,14 +192,14 @@ defineExpose({
         </div>
         <div class="block-list__popup-footer">
           <button class="block-list__popup-btn block-list__popup-btn--cancel" @click="closeAddPopup">
-            {{ t('group.blocklist.cancel') || '取消' }}
+            {{ t('group.blocklist.cancel', '取消') }}
           </button>
           <button
             class="block-list__popup-btn block-list__popup-btn--confirm"
             :disabled="selectedUserIds.size === 0"
             @click="onConfirmAdd"
           >
-            {{ t('group.blocklist.confirm') || '确定' }}
+            {{ t('group.blocklist.confirm', '确定') }}
           </button>
         </div>
       </div>

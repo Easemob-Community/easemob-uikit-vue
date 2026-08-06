@@ -95,14 +95,14 @@ nextTick(() => {
   <div class="message-search-panel">
     <div class="message-search-panel__header">
       <h4 class="message-search-panel__title">
-        {{ t('message.search.title') || '搜索消息' }}
+        {{ t('message.search.title', '搜索消息') }}
       </h4>
       <IconButton
         class="message-search-panel__close"
         icon="actions/close"
         size="small"
         variant="ghost"
-        :title="t('button.close') || '关闭'"
+        :title="t('button.close', '关闭')"
         @click="emit('close')"
       />
     </div>
@@ -112,7 +112,7 @@ nextTick(() => {
         ref="inputRef"
         v-model="keyword"
         variant="search"
-        :placeholder="t('message.search.placeholder') || '搜索关键词...'"
+        :placeholder="t('message.search.placeholder', '搜索关键词...')"
       />
     </div>
 
@@ -139,13 +139,13 @@ nextTick(() => {
 
       <div v-else-if="loading" class="message-search-panel__loading">
         <Icon name="actions/loading_circle" :size="20" class="message-search-panel__loading-icon" />
-        <span>{{ t('message.search.loading') || '搜索中...' }}</span>
+        <span>{{ t('message.search.loading', '搜索中...') }}</span>
       </div>
 
       <Empty
         v-else-if="keyword.trim()"
         icon="empty/search"
-        :description="t('message.search.empty') || '无搜索结果'"
+        :description="t('message.search.empty', '无搜索结果')"
         size="small"
       />
     </div>

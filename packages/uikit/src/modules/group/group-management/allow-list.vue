@@ -67,7 +67,7 @@ async function onRemove(item: any) {
     <Empty
       v-else-if="members.length === 0"
       icon="empty/members"
-      :description="t('group.memberList.empty') || '暂无白名单成员'"
+      :description="t('group.memberList.empty', '暂无白名单成员')"
       size="small"
     />
     <AllowListItem

@@ -5,6 +5,9 @@ import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
 import Icon from '../../../components/icon/icon.vue'
 import type { UiMessage, VoiceMessageBody } from '../../../sdk/types'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:VoiceMessage')
 
 export interface VoiceMessageProps {
   message: UiMessage
@@ -87,7 +90,7 @@ function onPlayClick() {
 
   const url = body.value.url || ''
   if (!url) {
-    console.warn('[VoiceMessage] no audio url:', props.message.msgServerId || props.message.msgLocalId)
+    logger.warn('[VoiceMessage] no audio url:', props.message.msgServerId || props.message.msgLocalId)
     return
   }
 
@@ -106,7 +109,7 @@ function onPlayClick() {
     isPlaying.value = true
     audioController.play(audio, props.message.msgServerId || props.message.msgLocalId)
   }).catch((err) => {
-    console.warn('[VoiceMessage] play failed:', formatSdkError(err))
+    logger.warn('[VoiceMessage] play failed:', formatSdkError(err))
     cleanupAudio()
   })
 }

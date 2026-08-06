@@ -31,6 +31,9 @@ import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import MessageSearchPanel from './message-search/message-search-panel.vue'
 import type { ChatConfig, MentionContact } from './types'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:Chat')
 
 /** 渲染错误信息 */
 interface RenderError {
@@ -245,7 +248,7 @@ onErrorCaptured((err, instance, info) => {
     message: errMsg,
     component: instance?.$options?.name || info,
   }
-  console.error('[Chat] render error captured:', err, info)
+  logger.error('[Chat] render error captured:', err, info)
   return false
 })
 
@@ -492,7 +495,7 @@ watch(
         await fetchGroupInfo(cvs.id)
       }
       catch (err) {
-        console.warn('[Chat] preload group info failed:', formatSdkError(err))
+        logger.warn('[Chat] preload group info failed:', formatSdkError(err))
       }
     }
     // 再拉成员列表（用于 @提及 与群已读详情弹窗）
@@ -502,7 +505,7 @@ watch(
         await fetchGroupMembers(cvs.id)
       }
       catch (err) {
-        console.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
+        logger.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
       }
     }
     // 预拉群公告，使聊天页面顶部横幅无需打开抽屉即可展示
@@ -512,7 +515,7 @@ watch(
         await fetchGroupAnnouncement(cvs.id)
       }
       catch (err) {
-        console.warn('[Chat] preload group announcement failed:', formatSdkError(err))
+        logger.warn('[Chat] preload group announcement failed:', formatSdkError(err))
       }
     }
   },
@@ -543,7 +546,7 @@ function locateAtMeMessage(cvsId: string) {
   else {
     // 消息不在当前已加载列表中，提示用户向上加载更多历史
     // 可选：自动触发历史消息加载直到找到该消息（此处仅做提示）
-    console.warn('[Chat] @me message not in loaded history, scroll up to load more:', firstAtMeMsgId)
+    logger.warn('[Chat] @me message not in loaded history, scroll up to load more:', firstAtMeMsgId)
   }
 }
 
@@ -641,8 +644,8 @@ async function onForwardConfirm(targetConversation: Conversation) {
     exitMultiSelectMode()
   }
   catch (e) {
-    console.warn('[Chat] forward messages failed:', formatSdkError(e))
-    showToast(t('message.forward.failed') || '转发失败')
+    logger.warn('[Chat] forward messages failed:', formatSdkError(e))
+    showToast(t('message.forward.failed', '转发失败'))
   }
 }
 
@@ -683,11 +686,11 @@ async function onLeaveGroup(groupId: string) {
       stores.conversation.deleteConversation(cvs.id)
       stores.message.clearConversationMessages(cvs.id)
     }
-    showToast(t('chat.info.leaveGroupSuccess') || '已退出群聊')
+    showToast(t('chat.info.leaveGroupSuccess', '已退出群聊'))
   }
   catch (err) {
-    console.warn('[Chat] leave group failed:', formatSdkError(err))
-    showToast(t('chat.info.leaveGroupFailed') || '退出群聊失败')
+    logger.warn('[Chat] leave group failed:', formatSdkError(err))
+    showToast(t('chat.info.leaveGroupFailed', '退出群聊失败'))
   }
 }
 
@@ -700,11 +703,11 @@ async function onDestroyGroup(groupId: string) {
       stores.conversation.deleteConversation(cvs.id)
       stores.message.clearConversationMessages(cvs.id)
     }
-    showToast(t('chat.info.destroyGroupSuccess') || '群聊已解散')
+    showToast(t('chat.info.destroyGroupSuccess', '群聊已解散'))
   }
   catch (err) {
-    console.warn('[Chat] destroy group failed:', formatSdkError(err))
-    showToast(t('chat.info.destroyGroupFailed') || '解散群聊失败')
+    logger.warn('[Chat] destroy group failed:', formatSdkError(err))
+    showToast(t('chat.info.destroyGroupFailed', '解散群聊失败'))
   }
 }
 
@@ -718,11 +721,11 @@ async function onClearHistory(payload: { id: string, type: ConversationTypeValue
       // 删除会话后清空当前选中，避免右侧继续展示已删除会话
       selectConversation('')
     }
-    showToast(t('chat.info.clearHistorySuccess') || '聊天记录已清空', 'success')
+    showToast(t('chat.info.clearHistorySuccess', '聊天记录已清空'), 'success')
   }
   catch (err) {
-    console.warn('[Chat] clear history failed:', formatSdkError(err))
-    showToast(t('chat.info.clearHistoryFailed') || '清空聊天记录失败', 'error')
+    logger.warn('[Chat] clear history failed:', formatSdkError(err))
+    showToast(t('chat.info.clearHistoryFailed', '清空聊天记录失败'), 'error')
   }
 }
 
@@ -740,18 +743,18 @@ async function onInviteMembers(userIds: string[]) {
   try {
     await inviteUsersToGroup(groupId, userIds)
     showInviteModal.value = false
-    showToast(t('group.inviteMember.success') || '邀请已发送')
+    showToast(t('group.inviteMember.success', '邀请已发送'))
     // 刷新成员列表
     chatInfoDrawerRef.value?.refreshMemberList()
   }
   catch (err) {
-    console.warn('[Chat] invite members failed:', formatSdkError(err))
+    logger.warn('[Chat] invite members failed:', formatSdkError(err))
     const message = String(err instanceof Error ? err.message : err)
     const isForbidden = message.toLowerCase().includes('forbidden') || message.toLowerCase().includes('access forbidden')
     showToast(
       isForbidden
-        ? (t('group.inviteMember.forbidden') || '当前群组不允许邀请成员')
-        : (t('group.inviteMember.failed') || '邀请失败'),
+        ? (t('group.inviteMember.forbidden', '当前群组不允许邀请成员'))
+        : (t('group.inviteMember.failed', '邀请失败')),
     )
   }
 }
@@ -864,12 +867,12 @@ async function confirmRemoveMember() {
   showRemoveConfirmModal.value = false
   try {
     await removeGroupMembers(groupId, [member.userId])
-    showToast(t('chat.info.removeMemberSuccess') || '成员已移除')
+    showToast(t('chat.info.removeMemberSuccess', '成员已移除'))
     chatInfoDrawerRef.value?.removeMember(member.userId)
   }
   catch (err) {
-    console.warn('[Chat] remove member failed:', formatSdkError(err))
-    showToast(t('chat.info.removeMemberFailed') || '移除成员失败')
+    logger.warn('[Chat] remove member failed:', formatSdkError(err))
+    showToast(t('chat.info.removeMemberFailed', '移除成员失败'))
   }
 }
 
@@ -885,12 +888,12 @@ async function onSetAdmin(member: UiGroupMember) {
     return
   try {
     await addGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.setAdminSuccess') || '已设为管理员')
+    showToast(t('chat.info.setAdminSuccess', '已设为管理员'))
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.ADMIN)
   }
   catch (err) {
-    console.warn('[Chat] set admin failed:', formatSdkError(err))
-    showToast(t('chat.info.setAdminFailed') || '设置管理员失败')
+    logger.warn('[Chat] set admin failed:', formatSdkError(err))
+    showToast(t('chat.info.setAdminFailed', '设置管理员失败'))
   }
 }
 
@@ -901,12 +904,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
     return
   try {
     await removeGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.removeAdminSuccess') || '已取消管理员')
+    showToast(t('chat.info.removeAdminSuccess', '已取消管理员'))
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.MEMBER)
   }
   catch (err) {
-    console.warn('[Chat] remove admin failed:', formatSdkError(err))
-    showToast(t('chat.info.removeAdminFailed') || '取消管理员失败')
+    logger.warn('[Chat] remove admin failed:', formatSdkError(err))
+    showToast(t('chat.info.removeAdminFailed', '取消管理员失败'))
   }
 }
 </script>
@@ -916,7 +919,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <!-- 全局加载状态 -->
     <div v-if="props.loading" class="chat__loading">
       <slot name="loading">
-        <span class="chat__loading-text">{{ t('conversation.loadingMore') || '加载中...' }}</span>
+        <span class="chat__loading-text">{{ t('conversation.loadingMore', '加载中...') }}</span>
       </slot>
     </div>
 
@@ -927,7 +930,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
           <Icon name="status/warning" :size="48" type="warning" class="chat__error-icon" />
           <span class="chat__error-text">{{ renderError.message }}</span>
           <button class="chat__error-retry" @click="clearRenderError">
-            {{ t('button.confirm') || '重试' }}
+            {{ t('button.confirm', '重试') }}
           </button>
         </div>
       </slot>
@@ -937,12 +940,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <div v-else-if="!currentConversation" class="chat__empty">
       <Empty
         icon="empty/chat"
-        :description="t('chat.empty') || '请选择会话'"
+        :description="t('chat.empty', '请选择会话')"
         size="large"
       >
         <template #description>
           <slot name="empty">
-            {{ t('chat.empty') || '请选择会话' }}
+            {{ t('chat.empty', '请选择会话') }}
           </slot>
         </template>
       </Empty>

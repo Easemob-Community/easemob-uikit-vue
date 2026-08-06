@@ -16,6 +16,9 @@ import { useToast } from '../../composables/use-toast'
 import type { UiContact } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import type { UserCardAction } from '../../components/user-card/user-card.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:ContactDetail')
 
 export interface ContactDetailProps {
   /** 联系人用户 ID */
@@ -108,21 +111,21 @@ const cardActions = computed<UserCardAction[]>(() => {
   return [
     {
       key: 'message',
-      label: t('contact.detail.sendMessage') || '发消息',
+      label: t('contact.detail.sendMessage', '发消息'),
       icon: 'chat/bubble_fill',
       type: 'primary',
     },
     {
       key: blocked ? 'unblock' : 'block',
       label: blocked
-        ? (t('contact.detail.unblock') || '取消拉黑')
-        : (t('contact.detail.block') || '拉黑'),
+        ? (t('contact.detail.unblock', '取消拉黑'))
+        : (t('contact.detail.block', '拉黑')),
       icon: 'actions/ban',
       type: blocked ? 'danger' : 'primary',
     },
     {
       key: 'delete',
-      label: t('contact.detail.deleteContact') || '删除好友',
+      label: t('contact.detail.deleteContact', '删除好友'),
       icon: 'actions/trash',
       type: 'danger',
     },
@@ -132,10 +135,10 @@ const cardActions = computed<UserCardAction[]>(() => {
 const cardInfoRows = computed(() => {
   const rows: { key: string, label: string, value: string }[] = []
   if (signature.value)
-    rows.push({ key: 'signature', label: t('contact.detail.signature') || '个性签名', value: signature.value })
+    rows.push({ key: 'signature', label: t('contact.detail.signature', '个性签名'), value: signature.value })
   if (detailUserInfo.value?.nickname)
-    rows.push({ key: 'nickname', label: t('contact.detail.nickname') || '昵称', value: detailUserInfo.value.nickname })
-  rows.push({ key: 'userId', label: t('contact.detail.userId') || '用户 ID', value: props.userId })
+    rows.push({ key: 'nickname', label: t('contact.detail.nickname', '昵称'), value: detailUserInfo.value.nickname })
+  rows.push({ key: 'userId', label: t('contact.detail.userId', '用户 ID'), value: props.userId })
   return rows
 })
 
@@ -194,7 +197,7 @@ async function loadData() {
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
-        console.warn('[ContactDetail] fetch presence failed:', formatSdkError(err))
+        logger.warn('[ContactDetail] fetch presence failed:', formatSdkError(err))
       }
     }
   }
@@ -213,11 +216,11 @@ async function saveRemark() {
     await setContactRemark(props.userId, remarkInput.value)
     isEditingRemark.value = false
     emit('remark-changed', props.userId, remarkInput.value)
-    showToast(t('contact.detail.remarkSaved') || '备注已保存')
+    showToast(t('contact.detail.remarkSaved', '备注已保存'))
   }
   catch (err) {
-    console.warn('[ContactDetail] save remark failed:', formatSdkError(err))
-    showToast(t('contact.detail.remarkSaveFailed') || '备注保存失败')
+    logger.warn('[ContactDetail] save remark failed:', formatSdkError(err))
+    showToast(t('contact.detail.remarkSaveFailed', '备注保存失败'))
   }
 }
 
@@ -228,9 +231,9 @@ function cancelEditRemark() {
 
 function openConfirm(action: 'delete' | 'block' | 'unblock') {
   const contents: Record<string, string> = {
-    delete: t('contact.detail.deleteContactConfirm') || '确定删除该联系人？',
-    block: t('contact.detail.blockConfirm') || '确定拉黑该联系人？',
-    unblock: t('contact.detail.unblockConfirm') || '确定取消拉黑？',
+    delete: t('contact.detail.deleteContactConfirm', '确定删除该联系人？'),
+    block: t('contact.detail.blockConfirm', '确定拉黑该联系人？'),
+    unblock: t('contact.detail.unblockConfirm', '确定取消拉黑？'),
   }
   confirmModal.value = {
     show: true,
@@ -248,7 +251,7 @@ async function onConfirmAction() {
   try {
     if (action === 'delete') {
       await deleteContact(props.userId)
-      showToast(t('contact.detail.deleteContactSuccess') || '已删除联系人')
+      showToast(t('contact.detail.deleteContactSuccess', '已删除联系人'))
       emit('deleted', props.userId)
     }
     else if (action === 'block') {
@@ -257,18 +260,18 @@ async function onConfirmAction() {
         name: displayNameValue.value,
         avatar: displayAvatar.value || '',
       })
-      showToast(t('contact.detail.blockSuccess') || '已拉黑')
+      showToast(t('contact.detail.blockSuccess', '已拉黑'))
       emit('block-changed', props.userId, true)
     }
     else if (action === 'unblock') {
       await removeBlock(props.userId)
-      showToast(t('contact.detail.unblockSuccess') || '已取消拉黑')
+      showToast(t('contact.detail.unblockSuccess', '已取消拉黑'))
       emit('block-changed', props.userId, false)
     }
   }
   catch (err) {
-    console.warn('[ContactDetail] action failed:', formatSdkError(err))
-    showToast(t('contact.detail.actionFailed') || '操作失败')
+    logger.warn('[ContactDetail] action failed:', formatSdkError(err))
+    showToast(t('contact.detail.actionFailed', '操作失败'))
   }
 }
 
@@ -297,7 +300,7 @@ function onPresenceChanged() {
   <div class="contact-detail">
     <div class="contact-detail__wrapper">
       <div v-if="loading" class="contact-detail__loading">
-        {{ t('common.loading') || '加载中...' }}
+        {{ t('common.loading', '加载中...') }}
       </div>
 
       <UserCard
@@ -314,7 +317,7 @@ function onPresenceChanged() {
       >
         <div class="contact-detail__extra">
           <div class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.remark') || '备注' }}</span>
+            <span class="contact-detail__label">{{ t('contact.detail.remark', '备注') }}</span>
             <div v-if="isEditingRemark" ref="remarkEditRef" class="contact-detail__remark-edit">
               <input
                 ref="remarkInputRef"
@@ -328,14 +331,14 @@ function onPresenceChanged() {
                 icon="actions/check"
                 size="small"
                 type="success"
-                :title="t('button.confirm') || '确认'"
+                :title="t('button.confirm', '确认')"
                 @click="saveRemark"
               />
               <IconButton
                 icon="actions/xmark_thick"
                 size="small"
                 type="danger"
-                :title="t('button.cancel') || '取消'"
+                :title="t('button.cancel', '取消')"
                 @click="cancelEditRemark"
               />
             </div>
@@ -345,29 +348,29 @@ function onPresenceChanged() {
                 icon="actions/edit"
                 size="small"
                 type="primary"
-                :title="t('contact.detail.edit') || '编辑'"
+                :title="t('contact.detail.edit', '编辑')"
                 @click="startEditRemark"
               />
             </template>
           </div>
 
           <div v-if="detailUserInfo?.gender" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.gender') || '性别' }}</span>
+            <span class="contact-detail__label">{{ t('contact.detail.gender', '性别') }}</span>
             <span class="contact-detail__value">{{ detailUserInfo.gender }}</span>
           </div>
 
           <div v-if="detailUserInfo?.birth" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.birth') || '生日' }}</span>
+            <span class="contact-detail__label">{{ t('contact.detail.birth', '生日') }}</span>
             <span class="contact-detail__value">{{ detailUserInfo.birth }}</span>
           </div>
 
           <div v-if="detailUserInfo?.phone" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.phone') || '电话' }}</span>
+            <span class="contact-detail__label">{{ t('contact.detail.phone', '电话') }}</span>
             <span class="contact-detail__value">{{ detailUserInfo.phone }}</span>
           </div>
 
           <div v-if="detailUserInfo?.mail" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.mail') || '邮箱' }}</span>
+            <span class="contact-detail__label">{{ t('contact.detail.mail', '邮箱') }}</span>
             <span class="contact-detail__value">{{ detailUserInfo.mail }}</span>
           </div>
         </div>
@@ -377,8 +380,8 @@ function onPresenceChanged() {
     <Modal
       v-model:show="confirmModal.show"
       :title="confirmModal.title"
-      :confirm-text="t('button.confirm') || '确认'"
-      :cancel-text="t('button.cancel') || '取消'"
+      :confirm-text="t('button.confirm', '确认')"
+      :cancel-text="t('button.cancel', '取消')"
       @confirm="onConfirmAction"
       @cancel="confirmModal.show = false"
     >

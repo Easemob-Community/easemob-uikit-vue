@@ -11,6 +11,9 @@ import Empty from '../../../components/empty/empty.vue'
 import type { CombineMessageBody, UiMessage } from '../../../sdk/types'
 import { useMessageStore } from '../../../store/message'
 import CombineMessageModalItem from './combine-message-modal-item.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:CombineMessageModal')
 
 export interface CombineMessageModalProps {
   show: boolean
@@ -39,7 +42,7 @@ const loadError = ref('')
 /** 合并消息体（响应式，支持组件复用时更新） */
 const body = computed(() => props.message.body as CombineMessageBody)
 
-const title = computed(() => body.value.title || t('message.forward.combineTitle') || '聊天记录')
+const title = computed(() => body.value.title || t('message.forward.combineTitle', '聊天记录'))
 
 /**
  * 将 SDK 解析出的子消息转换为 UiMessage，直接交给 MessageRenderer 复用。
@@ -72,7 +75,7 @@ async function loadMessages() {
   const url = body.value.url
   const secret = body.value.secret
   if (!url || !secret) {
-    loadError.value = t('message.forward.parseFailed') || '解析失败'
+    loadError.value = t('message.forward.parseFailed', '解析失败')
     return
   }
 
@@ -89,9 +92,9 @@ async function loadMessages() {
     }
   }
   catch (e) {
-    console.warn('[CombineMessageModal] downloadAndParseCombineMessage failed:', formatSdkError(e))
+    logger.warn('[CombineMessageModal] downloadAndParseCombineMessage failed:', formatSdkError(e))
     const errMsg = e instanceof Error ? e.message : String(e)
-    loadError.value = (t('message.forward.parseFailed') || '解析失败') + (errMsg ? `: ${errMsg}` : '')
+    loadError.value = (t('message.forward.parseFailed', '解析失败')) + (errMsg ? `: ${errMsg}` : '')
   }
   finally {
     isLoading.value = false
@@ -134,7 +137,7 @@ watch(() => props.show, (show) => {
         <!-- 加载中 -->
         <div v-if="isLoading" class="combine-message-modal__loading">
           <Icon name="actions/loading_circle" :size="20" class="combine-message-modal__loading-icon" />
-          <span>{{ t('message.forward.parsing') || '解析中...' }}</span>
+          <span>{{ t('message.forward.parsing', '解析中...') }}</span>
         </div>
 
         <!-- 错误 -->
@@ -156,7 +159,7 @@ watch(() => props.show, (show) => {
         <Empty
           v-else
           icon="empty/chat"
-          :description="t('message.forward.combineEmpty') || '暂无消息'"
+          :description="t('message.forward.combineEmpty', '暂无消息')"
           size="small"
         />
       </div>

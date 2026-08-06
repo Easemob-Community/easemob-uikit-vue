@@ -6,6 +6,9 @@ import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import GroupCard, { type GroupCardInfoRow } from './group-card.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:GroupCardModal')
 
 export interface GroupCardModalProps {
   show: boolean
@@ -53,7 +56,7 @@ async function loadData() {
     }
   }
   catch (err) {
-    console.warn('[GroupCardModal] fetchGroupInfo failed:', formatSdkError(err))
+    logger.warn('[GroupCardModal] fetchGroupInfo failed:', formatSdkError(err))
     fetchFailedIds.value.add(props.groupId)
   }
   finally {
@@ -65,7 +68,7 @@ const cardActions = computed(() => {
   return [
     {
       key: 'message',
-      label: t('groupCard.message') || '消息',
+      label: t('groupCard.message', '消息'),
       icon: 'chat/bubble_fill',
       type: 'primary' as const,
     },
@@ -77,12 +80,12 @@ const cardInfoRows = computed<GroupCardInfoRow[]>(() => {
   const g = group.value
 
   if (g?.description)
-    rows.push({ key: 'description', label: t('groupCard.description') || '群介绍', value: g.description })
+    rows.push({ key: 'description', label: t('groupCard.description', '群介绍'), value: g.description })
 
   if (g?.memberCount !== undefined)
-    rows.push({ key: 'memberCount', label: t('groupCard.memberCount') || '成员数', value: String(g.memberCount) })
+    rows.push({ key: 'memberCount', label: t('groupCard.memberCount', '成员数'), value: String(g.memberCount) })
 
-  rows.push({ key: 'groupId', label: t('groupCard.groupId') || '群 ID', value: props.groupId, copyable: true })
+  rows.push({ key: 'groupId', label: t('groupCard.groupId', '群 ID'), value: props.groupId, copyable: true })
 
   return rows
 })
@@ -122,7 +125,7 @@ function onActionClick(key: string) {
       />
 
       <div v-if="loading" class="group-card-modal__loading">
-        {{ t('common.loading') || '加载中...' }}
+        {{ t('common.loading', '加载中...') }}
       </div>
     </div>
   </Popup>

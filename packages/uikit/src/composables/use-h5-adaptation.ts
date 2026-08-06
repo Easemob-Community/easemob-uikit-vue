@@ -1,6 +1,9 @@
 import { type MaybeRef, computed, ref, toValue, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { useKeyboard } from './use-keyboard'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseH5Adaptation')
 
 export interface H5AdaptationConfig {
   /** 是否启用 H5 安全区适配，默认 true */
@@ -44,7 +47,7 @@ function warnIfViewportFitMissing() {
   const content = meta?.getAttribute('content') ?? ''
   if (!content.includes('viewport-fit=cover')) {
     viewportFitWarned = true
-    console.warn('[useH5Adaptation] safeArea 已开启，但宿主页面 viewport meta 缺少 viewport-fit=cover，env(safe-area-inset-*) 将恒为 0，请在宿主 HTML 的 viewport meta 中补充。')
+    logger.warn('[useH5Adaptation] safeArea 已开启，但宿主页面 viewport meta 缺少 viewport-fit=cover，env(safe-area-inset-*) 将恒为 0，请在宿主 HTML 的 viewport meta 中补充。')
   }
 }
 

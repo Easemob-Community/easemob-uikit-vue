@@ -11,6 +11,9 @@ import { useBlocklist } from '../../composables/use-blocklist'
 import { useToast } from '../../composables/use-toast'
 import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 import UserCard, { type UserCardInfoRow } from './user-card.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:UserCardModal')
 
 export interface UserCardModalProps {
   show: boolean
@@ -73,7 +76,7 @@ async function loadData() {
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined
       }
       catch (err) {
-        console.warn('[UserCardModal] fetch presence failed:', formatSdkError(err))
+        logger.warn('[UserCardModal] fetch presence failed:', formatSdkError(err))
       }
     }
 
@@ -89,19 +92,19 @@ const cardActions = computed(() => {
   const actions = [
     {
       key: 'message',
-      label: t('userCard.message') || '消息',
+      label: t('userCard.message', '消息'),
       icon: 'chat/bubble_fill',
       type: 'primary' as const,
     },
     {
       key: 'voice',
-      label: t('userCard.voice') || '语音',
+      label: t('userCard.voice', '语音'),
       icon: 'audio-video/phone_pick',
       type: 'default' as const,
     },
     {
       key: 'video',
-      label: t('userCard.video') || '视频',
+      label: t('userCard.video', '视频'),
       icon: 'audio-video/video_camera',
       type: 'default' as const,
     },
@@ -115,19 +118,19 @@ const cardInfoRows = computed<UserCardInfoRow[]>(() => {
   const info = userInfo.value
 
   if (info?.sign)
-    rows.push({ key: 'signature', label: t('contact.detail.signature') || '个性签名', value: info.sign })
+    rows.push({ key: 'signature', label: t('contact.detail.signature', '个性签名'), value: info.sign })
 
   if (info?.nickname)
-    rows.push({ key: 'nickname', label: t('contact.detail.nickname') || '昵称', value: info.nickname })
+    rows.push({ key: 'nickname', label: t('contact.detail.nickname', '昵称'), value: info.nickname })
 
-  rows.push({ key: 'userId', label: t('contact.detail.userId') || '用户 ID', value: props.userId, copyable: true })
+  rows.push({ key: 'userId', label: t('contact.detail.userId', '用户 ID'), value: props.userId, copyable: true })
 
   try {
     const ext = info?.ext ? (JSON.parse(info.ext) as Record<string, string>) : {}
     if (ext.calendar)
-      rows.push({ key: 'calendar', label: t('userCard.calendar') || '日历', value: ext.calendar, clickable: true })
+      rows.push({ key: 'calendar', label: t('userCard.calendar', '日历'), value: ext.calendar, clickable: true })
     if (ext.department)
-      rows.push({ key: 'department', label: t('userCard.department') || '部门', value: ext.department, clickable: true })
+      rows.push({ key: 'department', label: t('userCard.department', '部门'), value: ext.department, clickable: true })
   }
   catch {
     // ext 不是 JSON 时忽略
@@ -150,15 +153,15 @@ function onActionClick(key: string) {
     onClose()
   }
   else if (key === 'voice' || key === 'video') {
-    showToast(t('userCard.notSupported') || '暂不支持')
+    showToast(t('userCard.notSupported', '暂不支持'))
   }
 }
 
 function onInfoClick(key: string) {
   if (key === 'calendar')
-    showToast(t('userCard.viewCalendar') || '查看日程')
+    showToast(t('userCard.viewCalendar', '查看日程'))
   else if (key === 'department')
-    showToast(t('userCard.department') || '部门')
+    showToast(t('userCard.department', '部门'))
 }
 
 function onPresenceChanged() {
@@ -191,7 +194,7 @@ function onPresenceChanged() {
       />
 
       <div v-if="loading" class="user-card-modal__loading">
-        {{ t('common.loading') || '加载中...' }}
+        {{ t('common.loading', '加载中...') }}
       </div>
     </div>
   </Popup>

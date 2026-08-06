@@ -371,7 +371,7 @@ export class MessageDomain {
         }
       }
       catch (error) {
-        console.warn('[MessageDomain.fillGroupReadCounts] failed:', batch, formatSdkError(error))
+        messageLogger.warn('[MessageDomain.fillGroupReadCounts] failed:', batch, formatSdkError(error))
       }
     }
   }
@@ -434,7 +434,7 @@ export class MessageDomain {
     catch (error) {
       for (const id of pendingIds)
         sentReadReceiptIds.delete(id)
-      console.warn('[MessageDomain.sendPendingReadReceipts] failed:', conversationId, formatSdkError(error))
+      messageLogger.warn('[MessageDomain.sendPendingReadReceipts] failed:', conversationId, formatSdkError(error))
     }
   }
 
@@ -478,7 +478,7 @@ export class MessageDomain {
     }
     catch (error) {
       // 打印原始报错，便于业务方定位未开通/参数/网络等问题
-      console.error('[MessageDomain.translateMessage] raw SDK error:', formatSdkError(error))
+      messageLogger.error('[MessageDomain.translateMessage] raw SDK error:', formatSdkError(error))
       throw error
     }
   }
@@ -493,7 +493,7 @@ export class MessageDomain {
     // 兼容部分历史消息 body 缺少 type 的情况（SDK 签名仅认 VoiceMessageBody，
     // VoiceMessageSource 是其超集，可直接传入）。
     if (!isVoiceBody(message.body)) {
-      console.warn('[MessageDomain.transcribeVoiceMessage] not a voice message:', message)
+      messageLogger.warn('[MessageDomain.transcribeVoiceMessage] not a voice message:', message)
       throw new Error('not a voice message')
     }
     const body: VoiceMessageSource = {

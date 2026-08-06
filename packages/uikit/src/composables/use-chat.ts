@@ -138,7 +138,7 @@ export function useChat() {
           || (message.body as ImageMessageBody).thumbnailUrl
           || (message.body as ImageMessageBody).localUrl
         if (!url) {
-          console.warn('[useChat] forwardMessage: image url not found')
+          combineLogger.warn('[useChat] forwardMessage: image url not found')
           return
         }
         return domains.message.sendImage(id, type, url, ext)
@@ -146,7 +146,7 @@ export function useChat() {
       case MESSAGE_TYPE.FILE: {
         const url = (message.body as FileMessageBody).url
         if (!url) {
-          console.warn('[useChat] forwardMessage: file url not found')
+          combineLogger.warn('[useChat] forwardMessage: file url not found')
           return
         }
         return domains.message.sendFile(id, type, url, ext)
@@ -154,7 +154,7 @@ export function useChat() {
       case MESSAGE_TYPE.VOICE: {
         const url = (message.body as VoiceMessageBody).url
         if (!url) {
-          console.warn('[useChat] forwardMessage: voice url not found')
+          combineLogger.warn('[useChat] forwardMessage: voice url not found')
           return
         }
         return domains.message.sendVoice(id, type, url, (message.body as VoiceMessageBody).duration || 0, ext)
@@ -163,7 +163,7 @@ export function useChat() {
         const url = (message.body as VideoMessageBody).url
           || (message.body as VideoMessageBody).thumbnailUrl
         if (!url) {
-          console.warn('[useChat] forwardMessage: video url not found')
+          combineLogger.warn('[useChat] forwardMessage: video url not found')
           return
         }
         return domains.message.sendVideo(id, type, url, (message.body as VideoMessageBody).duration || 0, ext)
@@ -189,7 +189,7 @@ export function useChat() {
         // 合并消息逐条转发：作为单个合并消息重新发送
         return forwardCombineMessages([message], target)
       default:
-        console.warn('[useChat] forwardMessage: unsupported type', message.type)
+        combineLogger.warn('[useChat] forwardMessage: unsupported type', message.type)
     }
   }
 

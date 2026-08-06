@@ -79,6 +79,7 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
 
 const emit = defineEmits<{
   (e: 'conversation-select', conversation: Conversation): void
+  (e: 'conversation-click', conversation: Conversation): void
   (e: 'update:active-tab', tab: ConversationTabKey): void
   /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
   (e: 'reconnect'): void
@@ -101,6 +102,10 @@ onMounted(() => {
 
 function handleConversationSelect(id: string, conversation: Conversation) {
   emit('conversation-select', conversation)
+}
+
+function handleConversationClick(id: string, conversation: Conversation) {
+  emit('conversation-click', conversation)
 }
 
 function handleActiveTabChange(tab: ConversationTabKey) {
@@ -136,6 +141,7 @@ function handleReconnect() {
       :show-status-banner="props.showStatusBanner"
       @update:active-tab="handleActiveTabChange"
       @select="handleConversationSelect"
+      @conversation-click="handleConversationClick"
       @reconnect="handleReconnect"
     >
       <template v-if="$slots.tabs" #tabs="slotProps">

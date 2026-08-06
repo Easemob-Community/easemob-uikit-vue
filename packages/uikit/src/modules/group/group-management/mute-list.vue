@@ -78,7 +78,7 @@ async function onUnmute(item: any) {
       return (u?.userId || '') !== uid
     })
     emit('unmute', { userId: uid })
-    addNoticeToChat((t('group.mutelist.unmuteNotice') || '{name} 被解除禁言').replace('{name}', name))
+    addNoticeToChat((t('group.mutelist.unmuteNotice', '{name} 被解除禁言')).replace('{name}', name))
   }
   catch (err) {
     logger.warn('unmute failed:', err)
@@ -157,7 +157,7 @@ async function onConfirmAdd() {
     logger.info('loadData finished, members count:', members.value.length)
     showAddPopup.value = false
     selectedUserIds.value.clear()
-    showToast(t('group.mutelist.addSuccess') || '添加成功')
+    showToast(t('group.mutelist.addSuccess', '添加成功'))
     logger.info('emitting mute event', { userIds: ids })
     emit('mute', ids.map(id => ({ userId: id })))
     // 插入系统通知
@@ -166,12 +166,12 @@ async function onConfirmAdd() {
       return member?.nickname || uid
     }).join('、')
     logger.info('adding notice to chat', { names })
-    addNoticeToChat((t('group.mutelist.muteNotice') || '{name} 被禁言').replace('{name}', names))
+    addNoticeToChat((t('group.mutelist.muteNotice', '{name} 被禁言')).replace('{name}', names))
     logger.info('onConfirmAdd completed successfully')
   }
   catch (err) {
     logger.warn('add to mutelist failed:', err)
-    showToast(t('group.mutelist.addFailed') || '添加失败')
+    showToast(t('group.mutelist.addFailed', '添加失败'))
   }
 }
 
@@ -190,7 +190,7 @@ defineExpose({
     <!-- 顶部操作栏 -->
     <div class="mute-list__header">
       <span class="mute-list__header-count">
-        {{ members.length }} {{ t('group.mutelist.memberCount') || '名禁言成员' }}
+        {{ members.length }} {{ t('group.mutelist.memberCount', '名禁言成员') }}
       </span>
     </div>
 
@@ -200,7 +200,7 @@ defineExpose({
     <Empty
       v-else-if="members.length === 0"
       icon="empty/mutelist"
-      :description="t('group.memberList.empty') || '暂无禁言成员'"
+      :description="t('group.memberList.empty', '暂无禁言成员')"
       size="small"
     />
     <MuteListItem
@@ -219,7 +219,7 @@ defineExpose({
     >
       <div class="mute-list__popup" @pointerdown.stop @click.stop>
         <div class="mute-list__popup-header">
-          <span class="mute-list__popup-title">{{ t('group.mutelist.addTitle') || '添加禁言成员' }}</span>
+          <span class="mute-list__popup-title">{{ t('group.mutelist.addTitle', '添加禁言成员') }}</span>
         </div>
         <div class="mute-list__popup-body">
           <div v-if="loadingMembers" class="mute-list__popup-status">
@@ -228,7 +228,7 @@ defineExpose({
           <Empty
             v-else-if="selectableMembers.length === 0"
             icon="empty/mutelist"
-            :description="t('group.mutelist.emptySelectable') || '暂无可添加的成员'"
+            :description="t('group.mutelist.emptySelectable', '暂无可添加的成员')"
             size="small"
           />
           <MuteListSelectItem
@@ -241,14 +241,14 @@ defineExpose({
         </div>
         <div class="mute-list__popup-footer">
           <button class="mute-list__popup-btn mute-list__popup-btn--cancel" @click="closeAddPopup">
-            {{ t('group.blocklist.cancel') || '取消' }}
+            {{ t('group.blocklist.cancel', '取消') }}
           </button>
           <button
             class="mute-list__popup-btn mute-list__popup-btn--confirm"
             :disabled="selectedUserIds.size === 0"
             @click="onConfirmAdd"
           >
-            {{ t('group.blocklist.confirm') || '确定' }}
+            {{ t('group.blocklist.confirm', '确定') }}
           </button>
         </div>
       </div>

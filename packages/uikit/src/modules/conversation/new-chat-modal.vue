@@ -45,7 +45,7 @@ async function onSelectContact(contact: UiContact) {
   if (!targetId)
     return
   if (targetId === stores.client.currentUser) {
-    errorMsg.value = t('conversation.newChatSelfError') || '不能和自己创建会话'
+    errorMsg.value = t('conversation.newChatSelfError', '不能和自己创建会话')
     return
   }
 
@@ -71,7 +71,7 @@ async function onSelectContact(contact: UiContact) {
     onClose()
   }
   catch (err) {
-    errorMsg.value = (err as Error).message || (t('conversation.newChatFailed') || '创建会话失败')
+    errorMsg.value = (err as Error).message || (t('conversation.newChatFailed', '创建会话失败'))
   }
   finally {
     loading.value = false
@@ -99,7 +99,7 @@ watch(
   >
     <div class="new-chat-modal" :class="{ 'new-chat-modal--mobile': isMobile }">
       <div class="new-chat-modal__header">
-        <span class="new-chat-modal__title">{{ t('conversation.newChat') || '新会话' }}</span>
+        <span class="new-chat-modal__title">{{ t('conversation.newChat', '新会话') }}</span>
       </div>
       <div class="new-chat-modal__body">
         <ContactList

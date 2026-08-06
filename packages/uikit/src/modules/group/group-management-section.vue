@@ -16,6 +16,9 @@ import EmGroupBlocklist from './group-management/block-list.vue'
 import EmGroupAllowlist from './group-management/allow-list.vue'
 import EmGroupSharedFileList from './group-management/shared-file-list.vue'
 import EmGroupJoinRequestList from './group-management/join-request-list.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:GroupManagementSection')
 
 export interface GroupManagementSectionProps {
   /** 群 ID */
@@ -85,7 +88,7 @@ async function toggleMuteAll() {
     }
   }
   catch (err) {
-    console.warn('[GroupManagementSection] toggleMuteAll failed:', formatSdkError(err))
+    logger.warn('[GroupManagementSection] toggleMuteAll failed:', formatSdkError(err))
   }
 }
 
@@ -96,7 +99,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
   if (props.showMuteList && isAdminOrOwner.value) {
     entries.push({
       key: 'mute',
-      label: t('group.management.muteList') || '禁言列表',
+      label: t('group.management.muteList', '禁言列表'),
       show: true,
       icon: 'actions/ban',
       count: (stores.group.groupMuteListMap[id] || []).length,
@@ -106,7 +109,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
   if (props.showBlocklist && isAdminOrOwner.value) {
     entries.push({
       key: 'block',
-      label: t('group.management.blocklist') || '黑名单',
+      label: t('group.management.blocklist', '黑名单'),
       show: true,
       icon: 'actions/user-x',
       count: (stores.group.groupBlocklistMap[id] || []).length,
@@ -116,7 +119,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
   if (props.showAllowlist && isOwner.value) {
     entries.push({
       key: 'allow',
-      label: t('group.management.allowlist') || '白名单',
+      label: t('group.management.allowlist', '白名单'),
       show: true,
       icon: 'actions/user-check',
       count: (stores.group.groupAllowlistMap[id] || []).length,
@@ -126,7 +129,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
   if (props.showSharedFiles) {
     entries.push({
       key: 'files',
-      label: t('group.management.sharedFiles') || '共享文件',
+      label: t('group.management.sharedFiles', '共享文件'),
       show: true,
       icon: 'files-media/folder',
       count: (stores.group.groupSharedFilesMap[id] || []).length,
@@ -136,7 +139,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
   if (props.showJoinRequests && isAdminOrOwner.value) {
     entries.push({
       key: 'requests',
-      label: t('group.management.joinRequests') || '入群申请',
+      label: t('group.management.joinRequests', '入群申请'),
       show: true,
       icon: 'people/person_add',
       count: (stores.group.groupJoinRequestsMap[id] || []).length,
@@ -167,11 +170,11 @@ const drawerTitle = computed(() => {
   if (!key)
     return ''
   const map: Record<ManagementKey, string> = {
-    mute: t('group.management.muteList') || '禁言列表',
-    block: t('group.management.blocklist') || '黑名单',
-    allow: t('group.management.allowlist') || '白名单',
-    files: t('group.management.sharedFiles') || '共享文件',
-    requests: t('group.management.joinRequests') || '入群申请',
+    mute: t('group.management.muteList', '禁言列表'),
+    block: t('group.management.blocklist', '黑名单'),
+    allow: t('group.management.allowlist', '白名单'),
+    files: t('group.management.sharedFiles', '共享文件'),
+    requests: t('group.management.joinRequests', '入群申请'),
   }
   return map[key]
 })
@@ -193,7 +196,7 @@ function closeDrawer() {
         v-if="props.showMuteAll && isAdminOrOwner"
         :clickable="false"
         size="compact"
-        :title="t('group.management.muteAll') || '全员禁言'"
+        :title="t('group.management.muteAll', '全员禁言')"
         :inset-hover="false"
       >
         <template #leading>
@@ -244,7 +247,7 @@ function closeDrawer() {
             icon="arrows/arrowto"
             size="small"
             variant="ghost"
-            :title="t('button.back') || '返回'"
+            :title="t('button.back', '返回')"
             @click="closeDrawer"
           />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
@@ -253,7 +256,7 @@ function closeDrawer() {
             icon="arrows/arrow_up_n_box"
             size="small"
             type="primary"
-            :title="t('group.sharedFile.uploadText') || '上传'"
+            :title="t('group.sharedFile.uploadText', '上传')"
             @click="sharedFileListRef?.triggerUpload()"
           />
           <IconButton
@@ -261,7 +264,7 @@ function closeDrawer() {
             icon="actions/plus"
             size="small"
             type="primary"
-            :title="t('group.blocklist.add') || '添加'"
+            :title="t('group.blocklist.add', '添加')"
             @click="blockListRef?.openAddMember()"
           />
           <IconButton
@@ -269,7 +272,7 @@ function closeDrawer() {
             icon="actions/plus"
             size="small"
             type="primary"
-            :title="t('group.mutelist.add') || '添加禁言'"
+            :title="t('group.mutelist.add', '添加禁言')"
             @click="muteListRef?.openAddMember()"
           />
           <span v-else class="group-management-section__drawer-placeholder" />
@@ -325,7 +328,7 @@ function closeDrawer() {
             icon="arrows/arrowto"
             size="small"
             variant="ghost"
-            :title="t('button.back') || '返回'"
+            :title="t('button.back', '返回')"
             @click="closeDrawer"
           />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
@@ -334,7 +337,7 @@ function closeDrawer() {
             icon="arrows/arrow_up_n_box"
             size="small"
             type="primary"
-            :title="t('group.sharedFile.uploadText') || '上传'"
+            :title="t('group.sharedFile.uploadText', '上传')"
             @click="sharedFileListRef?.triggerUpload()"
           />
           <IconButton
@@ -342,7 +345,7 @@ function closeDrawer() {
             icon="actions/plus"
             size="small"
             type="primary"
-            :title="t('group.blocklist.add') || '添加'"
+            :title="t('group.blocklist.add', '添加')"
             @click="blockListRef?.openAddMember()"
           />
           <IconButton
@@ -350,7 +353,7 @@ function closeDrawer() {
             icon="actions/plus"
             size="small"
             type="primary"
-            :title="t('group.mutelist.add') || '添加禁言'"
+            :title="t('group.mutelist.add', '添加禁言')"
             @click="muteListRef?.openAddMember()"
           />
           <span v-else class="group-management-section__drawer-placeholder" />

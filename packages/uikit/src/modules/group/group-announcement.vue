@@ -68,10 +68,10 @@ async function save() {
     // 发布方本地插入灰色通知：SDK 的 onAnnouncementChanged 事件不回推操作者本人，
     // 需自行插入，与接收方文案保持一致（带最新公告内容）
     insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, buildAnnouncementNoticeText(announcementInput.value))
-    showToast(t('chat.info.groupInfoUpdated') || '更新成功', 'success')
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'), 'error')
   }
   finally {
     saving.value = false
@@ -93,7 +93,7 @@ function cancel() {
         icon="actions/edit"
         size="small"
         type="primary"
-        :title="t('chat.info.edit') || '编辑'"
+        :title="t('chat.info.edit', '编辑')"
         @click="isEditing = true"
       />
     </div>
@@ -118,7 +118,7 @@ function cancel() {
             icon="actions/xmark_thick"
             size="small"
             type="danger"
-            :title="t('button.cancel') || '取消'"
+            :title="t('button.cancel', '取消')"
             @click="cancel"
           />
           <IconButton
@@ -127,7 +127,7 @@ function cancel() {
             size="small"
             type="success"
             :disabled="saving"
-            :title="t('chat.info.save') || '保存'"
+            :title="t('chat.info.save', '保存')"
             @click="save"
           />
         </div>

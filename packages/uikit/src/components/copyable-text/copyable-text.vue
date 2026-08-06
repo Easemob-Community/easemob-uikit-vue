@@ -40,10 +40,10 @@ async function copyText() {
       document.execCommand('copy')
       document.body.removeChild(textarea)
     }
-    showToast(t('message.copySuccess') || '已复制', 'success')
+    showToast(t('message.copySuccess', '已复制'), 'success')
   }
   catch {
-    showToast(t('message.copyFailed') || '复制失败', 'error')
+    showToast(t('message.copyFailed', '复制失败'), 'error')
   }
 }
 </script>
@@ -58,7 +58,7 @@ async function copyText() {
       icon="actions/copy"
       :icon-size="props.iconSize"
       variant="ghost"
-      :title="t('common.copy') || '复制'"
+      :title="t('common.copy', '复制')"
       @click.stop="copyText"
     />
   </div>

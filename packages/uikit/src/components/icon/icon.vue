@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 import { getIconSvg } from './icon-map'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:Icon')
 
 export interface IconProps {
   /** 图标名称，格式 "category/icon-name"，如 "actions/trash"；传入 name 后无需 slot */
@@ -27,7 +30,7 @@ const iconSvg = computed(() => {
   // 图标 miss 且无 slot 兜底时整个 svg 静默不渲染，开发期 warn 一次提示排查
   if (!svg && !slots.default && !warnedMissNames.has(props.name)) {
     warnedMissNames.add(props.name)
-    console.warn(`[EmIcon] 图标 "${props.name}" 未在 icon-map 中注册，svg 将不渲染`)
+    logger.warn(`[EmIcon] 图标 "${props.name}" 未在 icon-map 中注册，svg 将不渲染`)
   }
   return svg
 })

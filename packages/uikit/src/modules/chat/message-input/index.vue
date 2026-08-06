@@ -19,6 +19,9 @@ import H5Input from '../h5-input/h5-input.vue'
 import SimpleInput from './simple-input.vue'
 import RichInput from './rich-input.vue'
 import EditingBar from './editing-bar.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:Index')
 
 export interface MessageInputProps {
   config?: ChatConfig
@@ -66,7 +69,7 @@ async function runBeforeSend(message: Partial<UiMessage>): Promise<boolean> {
     return result !== false
   }
   catch (e) {
-    console.error('[MessageInput] beforeSend hook error:', formatSdkError(e))
+    logger.error('[MessageInput] beforeSend hook error:', formatSdkError(e))
     return true
   }
 }
@@ -81,7 +84,7 @@ function runAfterSend(message: any) {
       hook(message)
     }
     catch (e) {
-      console.error('[MessageInput] afterSend hook error:', formatSdkError(e))
+      logger.error('[MessageInput] afterSend hook error:', formatSdkError(e))
     }
   }
 }
@@ -186,7 +189,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
+      logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
@@ -226,7 +229,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
+      logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
   clearQuote()
@@ -263,7 +266,7 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     emit('send-success')
     runAfterSend(msg)
   }).catch((e: any) => {
-    console.error('[MessageInput] sendFile failed:', formatSdkError(e))
+    logger.error('[MessageInput] sendFile failed:', formatSdkError(e))
     showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
   })
   clearQuote()
@@ -332,7 +335,7 @@ async function onStickerSelect(sticker: EmojiStickerItem) {
       runAfterSend(msg)
     })
     .catch((e: any) => {
-      console.error('[MessageInput] sendSticker failed:', formatSdkError(e))
+      logger.error('[MessageInput] sendSticker failed:', formatSdkError(e))
       showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
     })
 }
@@ -494,7 +497,7 @@ async function handleVoiceStart() {
     }
   }
   catch (err) {
-    console.error('录音启动失败:', formatSdkError(err))
+    logger.error('录音启动失败:', formatSdkError(err))
     showToast('录音启动失败，请检查麦克风权限')
     // 清理
     voiceStream?.getTracks().forEach(track => track.stop())
@@ -546,13 +549,13 @@ function handleVoiceEnd(durationFromInput?: number) {
             runAfterSend(msg)
           })
           .catch((e: any) => {
-            console.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
+            logger.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
             showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
           })
         clearQuote()
       }
       catch (err) {
-        console.error('[MessageInput] 语音格式转换失败:', formatSdkError(err))
+        logger.error('[MessageInput] 语音格式转换失败:', formatSdkError(err))
         showToast('语音处理失败，请重试')
       }
     }
@@ -667,7 +670,7 @@ defineExpose({
   >
     <!-- 全员禁言遮罩 -->
     <div v-if="props.muted" class="message-input__muted-overlay">
-      <span class="message-input__muted-text">{{ t('chat.input.mutedAll') || '全员禁言中' }}</span>
+      <span class="message-input__muted-text">{{ t('chat.input.mutedAll', '全员禁言中') }}</span>
     </div>
 
     <!-- 编辑条：优先于引用条 -->

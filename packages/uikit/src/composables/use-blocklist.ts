@@ -3,6 +3,9 @@ import type { UserInfo } from 'easemob-websdk'
 import type { UiContact as Contact } from '../sdk/types'
 import { formatSdkError } from '../utils/sdk-error'
 import { useUIKit } from './use-uikit'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseBlocklist')
 
 /**
  * 黑名单能力集成
@@ -37,7 +40,7 @@ export function useBlocklist() {
       })))
     }
     catch (error) {
-      console.warn('[useBlocklist] refresh failed:', formatSdkError(error))
+      logger.warn('[useBlocklist] refresh failed:', formatSdkError(error))
       throw error
     }
   }
@@ -49,7 +52,7 @@ export function useBlocklist() {
       contactStore.addToBlackList(contact)
     }
     catch (error) {
-      console.warn('[useBlocklist] addBlock failed:', formatSdkError(error))
+      logger.warn('[useBlocklist] addBlock failed:', formatSdkError(error))
       throw error
     }
   }
@@ -61,7 +64,7 @@ export function useBlocklist() {
       contactStore.removeFromBlackList(userId)
     }
     catch (error) {
-      console.warn('[useBlocklist] removeBlock failed:', formatSdkError(error))
+      logger.warn('[useBlocklist] removeBlock failed:', formatSdkError(error))
       throw error
     }
   }

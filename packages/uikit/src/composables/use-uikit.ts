@@ -10,6 +10,7 @@ import {
   UserInfoDomain,
 } from '../sdk/domain'
 import { registerEventHandlers } from '../sdk/event/registry'
+import type { ConnectionEventCallbacks } from '../sdk/event/connection-events'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
@@ -96,6 +97,8 @@ export function useUIKitProvider(
      * 用户资料订阅无权限/服务未开通时的回调；UIKit 默认将其绑定到内置 Toast。
      */
     onUserInfoSubscriptionPermissionError?: () => void
+    /** 连接级事件回调（token 即将过期 / 已过期等） */
+    connectionCallbacks?: ConnectionEventCallbacks
   } = {},
 ) {
   const stores: RootStores = {
@@ -211,7 +214,7 @@ export function useUIKitProvider(
     uikitClient = createClient(cfg)
     currentAppKey = cfg.appKey
     stores.client.setAppKey(cfg.appKey)
-    disposeEvents = registerEventHandlers(uikitClient, stores)
+    disposeEvents = registerEventHandlers(uikitClient, stores, options.connectionCallbacks)
     domains.userInfo.listen()
     disposeUserInfoDomain = () => domains.userInfo.dispose()
     return uikitClient

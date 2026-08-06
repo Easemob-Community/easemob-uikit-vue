@@ -89,7 +89,7 @@ function onClose() {
         icon="actions/close"
         size="small"
         variant="ghost"
-        :title="t('button.close') || '关闭'"
+        :title="t('button.close', '关闭')"
         @click="onClose"
       />
     </div>

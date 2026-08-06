@@ -390,7 +390,7 @@ const subviewTitle = computed(() => {
                   size="small"
                   variant="ghost"
                   :icon-size="20"
-                  :title="t('button.back') || '返回'"
+                  :title="t('button.back', '返回')"
                   @click="goHome"
                 />
               </slot>

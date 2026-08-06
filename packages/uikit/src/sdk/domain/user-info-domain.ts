@@ -3,6 +3,9 @@ import type { ManagerHost } from '../client'
 import type { UserInfoStore } from '../../store/user-info'
 import type { UIKitDataSource } from '../../composables/types'
 import { formatSdkError } from '../../utils/sdk-error'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:UserInfoDomain')
 
 /**
  * 用户资料业务域：封装 SDK UserInfoManager 的查询、订阅与缓存能力。
@@ -63,7 +66,7 @@ export class UserInfoDomain {
         .filter((info): info is UserInfo => Boolean(info))
     }
     catch (err) {
-      console.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
+      logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
       this.store.markFetchFailed(missingIds)
       return uniqueIds
         .map(id => this.store.getUserInfo(id))
@@ -148,7 +151,7 @@ export class UserInfoDomain {
       this.store.disableSubscription()
       if (!this.hasLoggedPermissionError) {
         this.hasLoggedPermissionError = true
-        console.warn(
+        logger.warn(
           '[UserInfoDomain] 用户资料订阅无权限或服务未开通，已自动关闭订阅。'
           + '后续陌生人资料变更将不会实时推送，拉取到的资料仍可正常展示。',
           formatSdkError(err),
@@ -159,7 +162,7 @@ export class UserInfoDomain {
     }
 
     this.store.markSubscribeFailed(userIds)
-    console.warn('[UserInfoDomain] subscribeUserInfos failed:', formatSdkError(err))
+    logger.warn('[UserInfoDomain] subscribeUserInfos failed:', formatSdkError(err))
   }
 
   private isPermissionError(err: unknown): boolean {
@@ -195,7 +198,7 @@ export class UserInfoDomain {
       return info
     }
     catch (err) {
-      console.warn('[UserInfoDomain] updateOwnInfo failed:', formatSdkError(err))
+      logger.warn('[UserInfoDomain] updateOwnInfo failed:', formatSdkError(err))
       return undefined
     }
   }
@@ -210,7 +213,7 @@ export class UserInfoDomain {
       return info
     }
     catch (err) {
-      console.warn('[UserInfoDomain] updateOwnInfoByAttribute failed:', formatSdkError(err))
+      logger.warn('[UserInfoDomain] updateOwnInfoByAttribute failed:', formatSdkError(err))
       return undefined
     }
   }
@@ -227,7 +230,7 @@ export class UserInfoDomain {
       this.store.markUnsubscribed(uniqueIds)
     }
     catch (err) {
-      console.warn('[UserInfoDomain] unsubscribeUsersInfo failed:', formatSdkError(err))
+      logger.warn('[UserInfoDomain] unsubscribeUsersInfo failed:', formatSdkError(err))
     }
   }
 
@@ -239,7 +242,7 @@ export class UserInfoDomain {
       return await this.client.userInfoManager.getSubscribedUsers()
     }
     catch (err) {
-      console.warn('[UserInfoDomain] getSubscribedUsers failed:', formatSdkError(err))
+      logger.warn('[UserInfoDomain] getSubscribedUsers failed:', formatSdkError(err))
       return []
     }
   }

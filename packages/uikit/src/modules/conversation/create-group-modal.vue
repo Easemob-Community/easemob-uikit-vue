@@ -90,7 +90,7 @@ const generatedName = computed(() => {
   const names = selectedContacts.value.slice(0, 3).map(c => c.name || c.userId)
   if (selectedCount.value > 3)
     names.push('...')
-  return names.join('、') || (t('group.createDefaultName') || '群聊')
+  return names.join('、') || (t('group.createDefaultName', '群聊'))
 })
 
 const finalName = computed(() => groupNameInput.value.trim() || generatedName.value)
@@ -113,7 +113,7 @@ function removeSelected(userId: string) {
 
 async function onCreate() {
   if (selectedCount.value === 0) {
-    errorMsg.value = t('group.createNeedMember') || '请至少选择一位成员'
+    errorMsg.value = t('group.createNeedMember', '请至少选择一位成员')
     return
   }
 
@@ -148,7 +148,7 @@ async function onCreate() {
     onClose()
   }
   catch (err) {
-    errorMsg.value = (err as Error).message || (t('group.createFailed') || '创建群组失败')
+    errorMsg.value = (err as Error).message || (t('group.createFailed', '创建群组失败'))
   }
   finally {
     loading.value = false
@@ -176,7 +176,7 @@ watch(
   >
     <div class="create-group-modal" :class="{ 'create-group-modal--mobile': isMobile }">
       <div class="create-group-modal__header">
-        <span class="create-group-modal__title">{{ t('conversation.createGroup') || '创建群组' }}</span>
+        <span class="create-group-modal__title">{{ t('conversation.createGroup', '创建群组') }}</span>
       </div>
 
       <div class="create-group-modal__body">
@@ -196,28 +196,28 @@ watch(
         <div class="create-group-modal__right">
           <div class="create-group-modal__right-header">
             <span class="create-group-modal__right-title">
-              {{ t('group.createSelectedTitle') || '已选择的联系人' }}
+              {{ t('group.createSelectedTitle', '已选择的联系人') }}
             </span>
             <span class="create-group-modal__right-count">
-              {{ t('group.createSelectedPrefix') || '已选择' }} {{ selectedCount }} {{ t('group.createSelectedUnit') || '人' }}
+              {{ t('group.createSelectedPrefix', '已选择') }} {{ selectedCount }} {{ t('group.createSelectedUnit', '人') }}
             </span>
           </div>
 
           <div v-if="showNameInput || showDescriptionInput" class="create-group-modal__form">
             <div v-if="showNameInput" class="create-group-modal__field">
-              <label class="create-group-modal__label">{{ t('group.createName') || '群名称' }}</label>
+              <label class="create-group-modal__label">{{ t('group.createName', '群名称') }}</label>
               <Input
                 v-model="groupNameInput"
                 variant="default"
-                :placeholder="generatedName || (t('group.createNamePlaceholder') || '输入群名称')"
+                :placeholder="generatedName || (t('group.createNamePlaceholder', '输入群名称'))"
               />
             </div>
             <div v-if="showDescriptionInput" class="create-group-modal__field">
-              <label class="create-group-modal__label">{{ t('group.createDescription') || '群介绍' }}</label>
+              <label class="create-group-modal__label">{{ t('group.createDescription', '群介绍') }}</label>
               <Input
                 v-model="groupDescriptionInput"
                 variant="default"
-                :placeholder="t('group.createDescriptionPlaceholder') || '输入群介绍（可选）'"
+                :placeholder="t('group.createDescriptionPlaceholder', '输入群介绍（可选）')"
               />
             </div>
           </div>
@@ -244,7 +244,7 @@ watch(
             <Empty
               v-if="selectedCount === 0"
               icon="empty/contact"
-              :description="t('group.createSelectedEmpty') || '请选择联系人'"
+              :description="t('group.createSelectedEmpty', '请选择联系人')"
               size="small"
             />
           </div>
@@ -257,7 +257,7 @@ watch(
 
       <div class="create-group-modal__footer">
         <Button type="default" @click="onClose">
-          {{ t('button.cancel') || '取消' }}
+          {{ t('button.cancel', '取消') }}
         </Button>
         <Button
           type="primary"
@@ -265,7 +265,7 @@ watch(
           :loading="loading"
           @click="onCreate"
         >
-          {{ t('group.createSubmit') || '完成' }}
+          {{ t('group.createSubmit', '完成') }}
         </Button>
       </div>
     </div>

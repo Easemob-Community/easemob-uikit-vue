@@ -2,6 +2,9 @@ import { type MaybeRef, computed, ref, toValue } from 'vue'
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
 import type { UiMessage } from '../sdk/types'
 import { useUIKit } from './use-uikit'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseMessageSearch')
 
 /** 消息搜索结果 */
 export interface MessageSearchResult {
@@ -205,7 +208,7 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
             pageNum.value = Math.max(1, pageNum.value - 1)
           }
           // 服务未开通等错误不阻断本地搜索结果，仅记录日志
-          console.warn('[useMessageSearch] server search failed:', e)
+          logger.warn('[useMessageSearch] server search failed:', e)
         }
       }
 
@@ -224,7 +227,7 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
     }
     catch (e: any) {
       error.value = e?.message || String(e)
-      console.error('[useMessageSearch] search failed:', e)
+      logger.error('[useMessageSearch] search failed:', e)
       return false
     }
     finally {

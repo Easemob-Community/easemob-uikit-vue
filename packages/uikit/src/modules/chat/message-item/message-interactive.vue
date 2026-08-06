@@ -237,7 +237,7 @@ const longPress = useLongPress(() => {
 /** 处理菜单项选择 */
 function handleSelect(actionType: MessageActionType, actionItem?: MessageActionItem) {
   if (actionItem?.disabled) {
-    const tip = actionItem.disabledTip || t('message.recallExpired') || '无法撤回'
+    const tip = actionItem.disabledTip || t('message.recallExpired', '无法撤回')
     showToast(tip)
     return
   }

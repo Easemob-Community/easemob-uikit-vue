@@ -23,6 +23,9 @@ import GroupMemberList from '../../group/group-member-list.vue'
 import GroupAnnouncement from '../../group/group-announcement.vue'
 import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatDrawer from './chat-drawer.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:ChatInfoDrawer')
 
 export interface ChatInfoDrawerProps {
   show: boolean
@@ -159,7 +162,7 @@ async function saveRemark() {
     isEditingRemark.value = false
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed') || '备注设置失败')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed', '备注设置失败'))
   }
   finally {
     savingRemark.value = false
@@ -249,10 +252,10 @@ async function saveGroupName() {
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
     stores.conversation.updateConversation(id, { name: groupNameInput.value })
-    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
   }
   finally {
     savingGroupName.value = false
@@ -274,10 +277,10 @@ async function saveDescription() {
   try {
     await updateGroupInfo(id, { description: descriptionInput.value })
     isEditingDescription.value = false
-    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
   }
   finally {
     savingDescription.value = false
@@ -316,8 +319,8 @@ async function loadGroupData() {
     ])
   }
   catch (err) {
-    console.warn('[ChatInfoDrawer] load group data failed:', formatSdkError(err))
-    showToast(t('chat.info.loadGroupInfoFailed') || '群信息加载失败')
+    logger.warn('[ChatInfoDrawer] load group data failed:', formatSdkError(err))
+    showToast(t('chat.info.loadGroupInfoFailed', '群信息加载失败'))
   }
   finally {
     loadingGroup.value = false
@@ -362,32 +365,32 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
   if (action === 'leave') {
     confirmModal.value = {
       show: true,
-      title: t('chat.info.leaveGroup') || '退出群聊',
-      content: t('chat.info.leaveGroupConfirm') || '确定退出该群聊吗？',
+      title: t('chat.info.leaveGroup', '退出群聊'),
+      content: t('chat.info.leaveGroupConfirm', '确定退出该群聊吗？'),
       action,
     }
   }
   else if (action === 'destroy') {
     confirmModal.value = {
       show: true,
-      title: t('chat.info.destroyGroup') || '解散群聊',
-      content: t('chat.info.destroyGroupConfirm') || '确定解散该群聊吗？解散后无法恢复。',
+      title: t('chat.info.destroyGroup', '解散群聊'),
+      content: t('chat.info.destroyGroupConfirm', '确定解散该群聊吗？解散后无法恢复。'),
       action,
     }
   }
   else if (action === 'deleteFriend') {
     confirmModal.value = {
       show: true,
-      title: t('chat.info.deleteFriend') || '删除好友',
-      content: t('chat.info.deleteFriendConfirm') || '确定删除该好友吗？',
+      title: t('chat.info.deleteFriend', '删除好友'),
+      content: t('chat.info.deleteFriendConfirm', '确定删除该好友吗？'),
       action,
     }
   }
   else {
     confirmModal.value = {
       show: true,
-      title: t('chat.info.clearHistory') || '清空聊天记录',
-      content: t('chat.info.clearHistoryConfirm') || '确定清空当前会话的聊天记录吗？',
+      title: t('chat.info.clearHistory', '清空聊天记录'),
+      content: t('chat.info.clearHistoryConfirm', '确定清空当前会话的聊天记录吗？'),
       action,
       deleteConversation: false,
     }
@@ -398,11 +401,11 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
 async function doDeleteFriend(userId: string) {
   try {
     await deleteContact(userId)
-    showToast(t('chat.info.deleteFriendSuccess') || '好友已删除', 'success')
+    showToast(t('chat.info.deleteFriendSuccess', '好友已删除'), 'success')
     onClose()
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.deleteFriendFailed') || '删除好友失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.deleteFriendFailed', '删除好友失败'), 'error')
   }
 }
 
@@ -414,10 +417,10 @@ async function onMuteMember(member: UiGroupMember) {
   try {
     // muteDuration -1：永久禁言，与群管理-禁言列表添加操作保持一致
     await muteGroupMembers(id, [member.userId], -1)
-    showToast(t('toast.success') || '操作成功', 'success')
+    showToast(t('toast.success', '操作成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
   }
 }
 
@@ -427,10 +430,10 @@ async function onUnmuteMember(member: UiGroupMember) {
     return
   try {
     await unmuteGroupMembers(id, [member.userId])
-    showToast(t('toast.success') || '操作成功', 'success')
+    showToast(t('toast.success', '操作成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
   }
 }
 
@@ -440,10 +443,10 @@ async function onBlockMember(member: UiGroupMember) {
     return
   try {
     await blockGroupMembers(id, [member.userId])
-    showToast(t('toast.success') || '操作成功', 'success')
+    showToast(t('toast.success', '操作成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
   }
 }
 
@@ -453,10 +456,10 @@ async function onUnblockMember(member: UiGroupMember) {
     return
   try {
     await unblockGroupMembers(id, [member.userId])
-    showToast(t('toast.success') || '操作成功', 'success')
+    showToast(t('toast.success', '操作成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('toast.error') || '操作失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
   }
 }
 
@@ -466,8 +469,8 @@ function onTransferOwner(member: UiGroupMember) {
     return
   confirmModal.value = {
     show: true,
-    title: t('group.memberList.transferOwner') || '转让群主',
-    content: (t('chat.info.transferOwnerConfirm') || '确定将群主转让给 {name} 吗？转让后你将成为普通成员。')
+    title: t('group.memberList.transferOwner', '转让群主'),
+    content: (t('chat.info.transferOwnerConfirm', '确定将群主转让给 {name} 吗？转让后你将成为普通成员。'))
       .replace('{name}', member.nickname || member.userId),
     action: 'transferOwner',
     targetUserId: member.userId,
@@ -484,10 +487,10 @@ async function doTransferOwner(userId: string) {
     stores.group.updateGroupMemberRole(id, userId, GROUP_MEMBER_ROLE.OWNER)
     if (currentUserId.value)
       stores.group.updateGroupMemberRole(id, currentUserId.value, GROUP_MEMBER_ROLE.MEMBER)
-    showToast(t('chat.info.transferOwnerSuccess') || '群主已转让', 'success')
+    showToast(t('chat.info.transferOwnerSuccess', '群主已转让'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.transferOwnerFailed') || '转让群主失败', 'error')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.transferOwnerFailed', '转让群主失败'), 'error')
   }
 }
 
@@ -555,7 +558,7 @@ function onChatMember(member: UiGroupMember) {
   emit('chat-member', member)
 }
 
-const memberListTitle = computed(() => t('chat.info.groupMembers') || '群成员')
+const memberListTitle = computed(() => t('chat.info.groupMembers', '群成员'))
 
 function onAddMember() {
   const id = groupId.value
@@ -597,7 +600,7 @@ defineExpose({
           icon="actions/close"
           size="small"
           variant="ghost"
-          :title="t('button.close') || '关闭'"
+          :title="t('button.close', '关闭')"
           @click="onClose"
         />
       </div>
@@ -607,7 +610,7 @@ defineExpose({
           icon="arrows/arrowto"
           size="small"
           variant="ghost"
-          :title="t('button.back') || '返回'"
+          :title="t('button.back', '返回')"
           @click="closeMemberList"
         />
         <span class="chat-info-drawer__title">{{ memberListTitle }}</span>
@@ -630,7 +633,7 @@ defineExpose({
                   icon="actions/edit"
                   size="small"
                   type="primary"
-                  :title="t('chat.info.edit') || '编辑'"
+                  :title="t('chat.info.edit', '编辑')"
                   @click="isEditingGroupName = true"
                 />
               </template>
@@ -648,7 +651,7 @@ defineExpose({
                     icon="actions/xmark_thick"
                     size="small"
                     type="danger"
-                    :title="t('button.cancel') || '取消'"
+                    :title="t('button.cancel', '取消')"
                     @click="cancelEditGroupName"
                   />
                   <IconButton
@@ -657,7 +660,7 @@ defineExpose({
                     size="small"
                     type="success"
                     :disabled="savingGroupName"
-                    :title="t('chat.info.save') || '保存'"
+                    :title="t('chat.info.save', '保存')"
                     @click="saveGroupName"
                   />
                 </div>
@@ -671,14 +674,14 @@ defineExpose({
             <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__description-row">
               <template v-if="!isEditingDescription">
                 <span class="chat-info-drawer__description-text" :class="{ 'is-placeholder': !group?.description }">
-                  {{ group?.description || t('chat.info.noGroupDescription') || '暂无群介绍' }}
+                  {{ group?.description || t('chat.info.noGroupDescription', '暂无群介绍') }}
                 </span>
                 <IconButton
                   v-if="isOwner"
                   icon="actions/edit"
                   size="small"
                   type="primary"
-                  :title="t('chat.info.edit') || '编辑'"
+                  :title="t('chat.info.edit', '编辑')"
                   @click.stop="isEditingDescription = true"
                 />
               </template>
@@ -687,7 +690,7 @@ defineExpose({
                   ref="descriptionInputRef"
                   v-model="descriptionInput"
                   class="chat-info-drawer__inline-textarea"
-                  :placeholder="t('chat.info.noGroupDescription') || '暂无群介绍'"
+                  :placeholder="t('chat.info.noGroupDescription', '暂无群介绍')"
                   rows="2"
                   @keydown.esc="isEditingDescription = false"
                 />
@@ -696,7 +699,7 @@ defineExpose({
                     icon="actions/xmark_thick"
                     size="small"
                     type="danger"
-                    :title="t('button.cancel') || '取消'"
+                    :title="t('button.cancel', '取消')"
                     @click="isEditingDescription = false"
                   />
                   <IconButton
@@ -705,7 +708,7 @@ defineExpose({
                     size="small"
                     type="success"
                     :disabled="savingDescription"
-                    :title="t('chat.info.save') || '保存'"
+                    :title="t('chat.info.save', '保存')"
                     @click="saveDescription"
                   />
                 </div>
@@ -729,7 +732,7 @@ defineExpose({
                 icon="actions/edit"
                 size="small"
                 type="primary"
-                :title="t('chat.info.edit') || '编辑'"
+                :title="t('chat.info.edit', '编辑')"
                 @click.stop="isEditingRemark = true"
               />
             </div>
@@ -746,7 +749,7 @@ defineExpose({
                 icon="actions/xmark_thick"
                 size="small"
                 type="danger"
-                :title="t('button.cancel') || '取消'"
+                :title="t('button.cancel', '取消')"
                 @click="cancelEditRemark"
               />
               <IconButton
@@ -755,7 +758,7 @@ defineExpose({
                 size="small"
                 type="success"
                 :disabled="savingRemark"
-                :title="t('chat.info.save') || '保存'"
+                :title="t('chat.info.save', '保存')"
                 @click="saveRemark"
               />
             </div>
@@ -797,11 +800,11 @@ defineExpose({
         <!-- 群聊：群主/管理员专属入口 -->
         <div v-if="isGroup && isOwner" class="chat-info-drawer__section-group">
           <div class="chat-info-drawer__section-label">
-            {{ t('chat.info.groupAdminActions') || '群主操作' }}
+            {{ t('chat.info.groupAdminActions', '群主操作') }}
           </div>
           <div class="chat-info-drawer__section chat-info-drawer__section--admin-actions">
             <Cell
-              :title="t('chat.info.transferOwnerEntry') || '转让群主'"
+              :title="t('chat.info.transferOwnerEntry', '转让群主')"
               size="compact"
               :inset-hover="false"
               @click="onViewMembersForTransfer"
@@ -811,7 +814,7 @@ defineExpose({
               </template>
             </Cell>
             <Cell
-              :title="t('chat.info.setAdminEntry') || '设置管理员'"
+              :title="t('chat.info.setAdminEntry', '设置管理员')"
               size="compact"
               :inset-hover="false"
               @click="onViewMembersForAdmin"
@@ -826,7 +829,7 @@ defineExpose({
         <!-- 群聊：群管理 -->
         <div v-if="isGroup" class="chat-info-drawer__section-group">
           <div class="chat-info-drawer__section-label">
-            {{ t('group.management.title') || '群管理' }}
+            {{ t('group.management.title', '群管理') }}
           </div>
           <div class="chat-info-drawer__section chat-info-drawer__section--management">
             <GroupManagementSection
@@ -903,7 +906,7 @@ defineExpose({
           v-model="confirmModal.deleteConversation"
           type="checkbox"
         >
-        <span>{{ t('chat.info.clearHistoryDeleteConversation') || '同时删除会话' }}</span>
+        <span>{{ t('chat.info.clearHistoryDeleteConversation', '同时删除会话') }}</span>
       </label>
     </div>
   </Modal>

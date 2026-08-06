@@ -59,7 +59,7 @@ function onClose() {
       icon="actions/close"
       size="small"
       variant="ghost"
-      :title="t('quote.cancel') || '取消引用'"
+      :title="t('quote.cancel', '取消引用')"
       @click.stop="onClose"
     />
   </div>

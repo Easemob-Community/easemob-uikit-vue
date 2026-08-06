@@ -10,6 +10,9 @@ import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
 import { useGroup } from '../../composables/use-group'
 import { useToast } from '../../composables/use-toast'
 import { insertChatNotice } from '../../sdk/event/notice-utils'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:GroupDetail')
 
 export interface GroupDetailProps {
   /** 群 ID */
@@ -67,7 +70,7 @@ async function loadData() {
       fetchFailedIds.value.add(props.groupId)
   }
   catch (err) {
-    console.warn('[GroupDetail] fetchGroupInfo failed:', formatSdkError(err))
+    logger.warn('[GroupDetail] fetchGroupInfo failed:', formatSdkError(err))
     fetchFailedIds.value.add(props.groupId)
   }
   finally {
@@ -122,10 +125,10 @@ async function saveName() {
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
     stores.conversation.updateConversation(props.groupId, { name: nameInput.value })
-    showToast(t('chat.info.groupInfoUpdated') || '更新成功')
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed') || '更新失败')
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
   }
   finally {
     savingName.value = false
@@ -136,7 +139,7 @@ const cardActions = computed(() => {
   return [
     {
       key: 'message',
-      label: t('contact.detail.sendMessage') || '发消息',
+      label: t('contact.detail.sendMessage', '发消息'),
       icon: 'chat/bubble_fill',
       type: 'primary' as const,
     },
@@ -148,12 +151,12 @@ const cardInfoRows = computed(() => {
   const g = displayGroup.value
 
   if (g?.description)
-    rows.push({ key: 'description', label: t('groupCard.description') || '群介绍', value: g.description })
+    rows.push({ key: 'description', label: t('groupCard.description', '群介绍'), value: g.description })
 
   if (g?.memberCount !== undefined)
-    rows.push({ key: 'memberCount', label: t('groupCard.memberCount') || '成员数', value: String(g.memberCount) })
+    rows.push({ key: 'memberCount', label: t('groupCard.memberCount', '成员数'), value: String(g.memberCount) })
 
-  rows.push({ key: 'groupId', label: t('groupCard.groupId') || '群 ID', value: props.groupId })
+  rows.push({ key: 'groupId', label: t('groupCard.groupId', '群 ID'), value: props.groupId })
 
   return rows
 })
@@ -168,7 +171,7 @@ function onCardAction(key: string) {
   <div class="group-detail">
     <div class="group-detail__wrapper">
       <div v-if="loading" class="group-detail__loading">
-        {{ t('common.loading') || '加载中...' }}
+        {{ t('common.loading', '加载中...') }}
       </div>
 
       <GroupCard
@@ -186,7 +189,7 @@ function onCardAction(key: string) {
               icon="actions/edit"
               size="small"
               type="primary"
-              :title="t('chat.info.edit') || '编辑'"
+              :title="t('chat.info.edit', '编辑')"
               @click="startEditName"
             />
           </template>
@@ -202,7 +205,7 @@ function onCardAction(key: string) {
               icon="actions/xmark_thick"
               size="small"
               type="danger"
-              :title="t('button.cancel') || '取消'"
+              :title="t('button.cancel', '取消')"
               @click="cancelEditName"
             />
             <IconButton
@@ -211,7 +214,7 @@ function onCardAction(key: string) {
               size="small"
               type="success"
               :disabled="savingName"
-              :title="t('chat.info.save') || '保存'"
+              :title="t('chat.info.save', '保存')"
               @click="saveName"
             />
           </div>

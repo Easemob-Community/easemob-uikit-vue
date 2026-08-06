@@ -13,6 +13,9 @@ import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import Empty from '../../../components/empty/empty.vue'
 import SharedFileListItem from './shared-file-list-item.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:SharedFileList')
 
 export interface SharedFileListProps {
   groupId: string
@@ -45,11 +48,11 @@ const actionSheetActions = computed<ActionSheetItem[]>(() => {
   if (!activeFile.value)
     return []
   const actions: ActionSheetItem[] = [
-    { name: t('group.sharedFile.download') || '下载' },
+    { name: t('group.sharedFile.download', '下载') },
   ]
   if (canDelete(activeFile.value)) {
     actions.push({
-      name: t('group.sharedFile.delete') || '删除',
+      name: t('group.sharedFile.delete', '删除'),
       color: '#ef4444',
     })
   }
@@ -69,12 +72,12 @@ async function loadData() {
   loading.value = true
   try {
     const result = await fetchSharedFiles(props.groupId)
-    console.warn('[SharedFileList] load result:', result)
+    logger.warn('[SharedFileList] load result:', result)
     const list = extractSharedFileList(result)
     files.value = list
   }
   catch (err) {
-    console.warn('[SharedFileList] load failed:', formatSdkError(err))
+    logger.warn('[SharedFileList] load failed:', formatSdkError(err))
   }
   finally {
     loading.value = false
@@ -119,7 +122,7 @@ async function onFileSelected(event: Event) {
   uploading.value = true
   try {
     const res = await uploadGroupSharedFile(props.groupId, file)
-    console.warn('[SharedFileList] upload response:', res)
+    logger.warn('[SharedFileList] upload response:', res)
     const uploadedFiles = parseUploadResponse(res)
     if (uploadedFiles.length > 0) {
       if (isListResponse(res)) {
@@ -132,7 +135,7 @@ async function onFileSelected(event: Event) {
           files.value = [...newFiles, ...files.value]
       }
     }
-    showToast(t('group.sharedFile.uploadSuccess') || '上传成功', 'success')
+    showToast(t('group.sharedFile.uploadSuccess', '上传成功'), 'success')
     // 发布方本地插入灰色通知：SDK 的 onSharedFileAdded 事件不回推操作者本人，
     // 与接收方文案保持一致（带上传者与文件名）
     const noticeText = t('chat.notice.sharedFileAdded')
@@ -141,8 +144,8 @@ async function onFileSelected(event: Event) {
     insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
   }
   catch (err) {
-    console.warn('[SharedFileList] upload failed:', formatSdkError(err))
-    showToast(t('group.sharedFile.uploadFailed') || '上传失败', 'error')
+    logger.warn('[SharedFileList] upload failed:', formatSdkError(err))
+    showToast(t('group.sharedFile.uploadFailed', '上传失败'), 'error')
   }
   finally {
     uploading.value = false
@@ -231,11 +234,11 @@ async function onDelete(file: any) {
   try {
     await deleteGroupSharedFile(props.groupId, file.fileId)
     files.value = files.value.filter(f => f.fileId !== file.fileId)
-    showToast(t('group.sharedFile.deleteSuccess') || '删除成功', 'success')
+    showToast(t('group.sharedFile.deleteSuccess', '删除成功'), 'success')
   }
   catch (err) {
-    console.warn('[SharedFileList] delete failed:', formatSdkError(err))
-    showToast(t('group.sharedFile.deleteFailed') || '删除失败', 'error')
+    logger.warn('[SharedFileList] delete failed:', formatSdkError(err))
+    showToast(t('group.sharedFile.deleteFailed', '删除失败'), 'error')
   }
 }
 
@@ -289,11 +292,11 @@ async function onDownload(file: any) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    showToast(t('group.sharedFile.downloadSuccess') || '下载成功', 'success')
+    showToast(t('group.sharedFile.downloadSuccess', '下载成功'), 'success')
   }
   catch (err) {
-    console.warn('[SharedFileList] download failed:', formatSdkError(err))
-    showToast(t('group.sharedFile.downloadFailed') || '下载失败', 'error')
+    logger.warn('[SharedFileList] download failed:', formatSdkError(err))
+    showToast(t('group.sharedFile.downloadFailed', '下载失败'), 'error')
   }
 }
 </script>
@@ -313,7 +316,7 @@ async function onDownload(file: any) {
     <Empty
       v-else-if="files.length === 0"
       icon="empty/files"
-      :description="t('group.sharedFile.empty') || '暂无群文件'"
+      :description="t('group.sharedFile.empty', '暂无群文件')"
       size="small"
     />
     <SharedFileListItem
@@ -345,14 +348,14 @@ async function onDownload(file: any) {
           class="shared-file-list__context-menu-item"
           @click.stop="onContextMenuItemClick('download')"
         >
-          {{ t('group.sharedFile.download') || '下载' }}
+          {{ t('group.sharedFile.download', '下载') }}
         </div>
         <div
           v-if="activeFile && canDelete(activeFile)"
           class="shared-file-list__context-menu-item is-danger"
           @click.stop="onContextMenuItemClick('delete')"
         >
-          {{ t('group.sharedFile.delete') || '删除' }}
+          {{ t('group.sharedFile.delete', '删除') }}
         </div>
       </div>
     </Popup>

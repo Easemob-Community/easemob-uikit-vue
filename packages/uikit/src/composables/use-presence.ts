@@ -3,6 +3,9 @@ import type { ComputedRef, MaybeRefOrGetter } from 'vue'
 import type { UiPresence } from '../sdk/types'
 import { formatSdkError } from '../utils/sdk-error'
 import { useUIKit } from './use-uikit'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UsePresence')
 
 export function usePresence() {
   const { domains, stores, dataSource } = useUIKit()
@@ -84,7 +87,7 @@ export function usePresence() {
         current = [...next]
         if (toAdd.length) {
           void subscribePresence(toAdd).catch((err: unknown) => {
-            console.warn('[usePresence] subscribePresence failed:', formatSdkError(err))
+            logger.warn('[usePresence] subscribePresence failed:', formatSdkError(err))
             // 订阅失败的 id 从“已订阅”集合移除，后续列表变化时可重新补订
             current = current.filter(id => !toAdd.includes(id))
           })

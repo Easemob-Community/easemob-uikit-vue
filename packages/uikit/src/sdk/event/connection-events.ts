@@ -4,11 +4,22 @@ import type { RootStores } from './types'
 
 const connLog = createLogger('UIKit:ConnEvents')
 
+/** 连接级事件对外回调 */
+export interface ConnectionEventCallbacks {
+  /** Token 即将过期 */
+  onTokenWillExpire?: () => void
+  /** Token 已过期 */
+  onTokenExpired?: () => void
+}
+
 /**
  * 创建连接事件处理器。
  * 注册到 ChatClient.addEventHandler。
  */
-export function createConnectionHandlers(stores: RootStores): ConnectionEventHandlerMap {
+export function createConnectionHandlers(
+  stores: RootStores,
+  callbacks: ConnectionEventCallbacks = {},
+): ConnectionEventHandlerMap {
   return {
     onConnecting: () => {
       connLog.info('onConnecting')
@@ -34,10 +45,12 @@ export function createConnectionHandlers(stores: RootStores): ConnectionEventHan
     onTokenWillExpire: () => {
       connLog.info('onTokenWillExpire')
       connLog.warn('Token will expire')
+      callbacks.onTokenWillExpire?.()
     },
     onTokenExpired: () => {
       connLog.info('onTokenExpired')
       connLog.error('Token expired')
+      callbacks.onTokenExpired?.()
     },
     onOfflineMessageSyncStart: () => {
       connLog.info('onOfflineMessageSyncStart')

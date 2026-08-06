@@ -29,7 +29,7 @@ import { UIKitProvider } from '@easemob/uikit'
 | `safeArea` | `boolean` | `false` | 是否为刘海屏/灵动岛等设备启用安全区内边距。开启后顶部 header、底部 footer、popup 等会自动避开非安全区域。 |
 | `keyboardAdapt` | `boolean` | `false` | 是否在软键盘弹起时把键盘高度同步给输入组件，并自动滚动消息列表到底部。 |
 | `pullRefresh` | `boolean \| 'auto'` | `false` | 是否开启列表下拉刷新。`'auto'` 表示在触屏设备上自动开启。 |
-| `fontScale` | `number` | `1` | **P2 预留**：整体字号缩放系数，当前未生效。 |
+| `fontScale` | `number` | `1` | 整体字号缩放系数（已由主题字号体系接管，建议使用 `theme.fontSize` 或 `setFontSize`） |
 
 ## 安全区
 
@@ -68,6 +68,16 @@ H5 下的长按菜单（消息长按、会话长按）已经统一封装在 `use
 
 业务层无需额外处理。
 
+## H5 页面栈导航
+
+移动端单栏栈式布局下，会话列表点击后需要跳转到聊天页。`EmConversationContainer` 提供 `conversation-click` 事件，在内部选中逻辑之前触发，便于业务做页面栈导航：
+
+```vue
+<EmConversationContainer
+  @conversation-click="(cvs) => router.push(`/chat/${cvs.id}`)"
+/>
+```
+
 ## 注意事项
 
 - H5 相关状态统一来自 `useUIKit().h5`，**不要**在业务组件里自己监听 `resize` / `visualViewport` / `keyboard` 事件。
@@ -88,6 +98,5 @@ console.log(h5.safeAreaInsets.value) // { top, right, bottom, left }
 
 以下字段/变量已预留，当前版本未实现完整逻辑，但接口已稳定：
 
-- `fontScale` 与 CSS 变量 `--uikit-font-scale`：用于后续整体字号缩放。
 - 横屏响应式：`h5.viewport` 已包含 width/height，后续可扩展断点。
 - 大图手势缩放、bottom sheet 下滑关闭：未实现，但组件预留了接入点。

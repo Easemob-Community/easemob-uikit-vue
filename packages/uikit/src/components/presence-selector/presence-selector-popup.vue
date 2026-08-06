@@ -9,6 +9,9 @@ import Popup from '../popup/popup.vue'
 import Modal from '../modal/modal.vue'
 import Input from '../input/input.vue'
 import PresenceSelector from './presence-selector.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:PresenceSelectorPopup')
 
 export interface PresenceSelectorPopupProps {
   show: boolean
@@ -62,8 +65,8 @@ async function onSelect(_status: string, ext: string) {
     emit('changed')
   }
   catch (err) {
-    console.warn('[PresenceSelectorPopup] publish failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed') || '状态设置失败')
+    logger.warn('[PresenceSelectorPopup] publish failed:', formatSdkError(err))
+    showToast(t('presence.publishFailed', '状态设置失败'))
   }
 }
 
@@ -90,8 +93,8 @@ async function onCustomConfirm() {
     emit('changed')
   }
   catch (err) {
-    console.warn('[PresenceSelectorPopup] publish custom failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed') || '状态设置失败')
+    logger.warn('[PresenceSelectorPopup] publish custom failed:', formatSdkError(err))
+    showToast(t('presence.publishFailed', '状态设置失败'))
   }
 }
 </script>
@@ -121,15 +124,15 @@ async function onCustomConfirm() {
 
   <Modal
     v-model:show="showCustomModal"
-    :title="t('presence.setCustomStatus') || '设置自定义状态'"
-    :confirm-text="t('button.confirm') || '确认'"
-    :cancel-text="t('button.cancel') || '取消'"
+    :title="t('presence.setCustomStatus', '设置自定义状态')"
+    :confirm-text="t('button.confirm', '确认')"
+    :cancel-text="t('button.cancel', '取消')"
     @confirm="onCustomConfirm"
     @cancel="onCustomCancel"
   >
     <Input
       v-model="customInput"
-      :placeholder="t('presence.customPlaceholder') || '请输入自定义状态'"
+      :placeholder="t('presence.customPlaceholder', '请输入自定义状态')"
       :maxlength="32"
       style="width: 100%; text-align: left;"
     />

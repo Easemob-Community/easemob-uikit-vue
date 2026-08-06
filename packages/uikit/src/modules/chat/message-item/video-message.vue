@@ -38,7 +38,7 @@ async function handleDownload(event: MouseEvent) {
   event.stopPropagation()
   const url = body.value.url
   if (!url) {
-    showToast(t('message.download.failed') || '下载失败', 'error')
+    showToast(t('message.download.failed', '下载失败'), 'error')
     return
   }
 
@@ -51,14 +51,14 @@ async function handleDownload(event: MouseEvent) {
       filename,
       env,
       onSuccess: () => {
-        showToast(t('message.download.success') || '下载成功', 'success')
+        showToast(t('message.download.success', '下载成功'), 'success')
       },
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
-          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件', 'warning')
+          showToast(t('message.download.wechatHint', '请在浏览器中打开以下载文件'), 'warning')
         }
         else {
-          showToast(t('message.download.failed') || '下载失败', 'error')
+          showToast(t('message.download.failed', '下载失败'), 'error')
         }
       },
     })
@@ -80,7 +80,7 @@ async function handleDownload(event: MouseEvent) {
         preload="metadata"
       />
       <div v-else class="video-message__placeholder" :class="videoClass">
-        {{ t('message.video') || '[视频]' }}
+        {{ t('message.video', '[视频]') }}
       </div>
       <!-- 播放按钮覆盖层 -->
       <div class="video-message__overlay">
@@ -110,7 +110,7 @@ async function handleDownload(event: MouseEvent) {
       <!-- 下载按钮 -->
       <button
         class="video-message__download-btn"
-        :title="t('message.download.success') || '下载'"
+        :title="t('message.download.success', '下载')"
         @click.stop="handleDownload"
       >
         <Icon name="arrows/arrow_down_n_box" :size="20" />

@@ -273,7 +273,7 @@ const displayMessage = computed(() => {
   }
   // 合并消息类型统一回显为 [聊天记录]
   if (false) {
-    return t('message.combine') || '[聊天记录]'
+    return t('message.combine', '[聊天记录]')
   }
   if (props.messageFormatter) {
     return props.messageFormatter(
@@ -304,7 +304,7 @@ const displayMessage = computed(() => {
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
           <span class="conversation-item__name" :class="{ 'is-at-me': props.hasAtMe }">
-            {{ props.hasAtMe ? `[${t('conversation.atMe') || '@'}] ` : '' }}{{ conversationName }}
+            {{ props.hasAtMe ? `[${t('conversation.atMe', '@')}] ` : '' }}{{ conversationName }}
           </span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />

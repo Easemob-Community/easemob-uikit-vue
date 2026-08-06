@@ -6,6 +6,9 @@ import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import Empty from '../../../components/empty/empty.vue'
 import JoinRequestListItem from './join-request-list-item.vue'
+import { createLogger } from '../../../utils/logger'
+
+const logger = createLogger('UIKit:JoinRequestList')
 
 export interface JoinRequestListProps {
   groupId: string
@@ -47,7 +50,7 @@ async function onAccept(item: any) {
     emit('accepted', uid)
   }
   catch (err) {
-    console.warn('[JoinRequestList] accept failed:', formatSdkError(err))
+    logger.warn('[JoinRequestList] accept failed:', formatSdkError(err))
   }
 }
 
@@ -59,7 +62,7 @@ async function onReject(item: any) {
     emit('rejected', uid)
   }
   catch (err) {
-    console.warn('[JoinRequestList] reject failed:', formatSdkError(err))
+    logger.warn('[JoinRequestList] reject failed:', formatSdkError(err))
   }
 }
 </script>
@@ -72,7 +75,7 @@ async function onReject(item: any) {
     <Empty
       v-else-if="requests.length === 0"
       icon="empty/members"
-      :description="t('group.memberList.empty') || '暂无入群申请'"
+      :description="t('group.memberList.empty', '暂无入群申请')"
       size="small"
     />
     <JoinRequestListItem

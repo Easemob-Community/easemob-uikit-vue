@@ -82,7 +82,7 @@ watch(
   >
     <div class="invite-member-modal" :class="{ 'invite-member-modal--mobile': isMobile }">
       <div class="invite-member-modal__header">
-        <span class="invite-member-modal__title">{{ t('group.inviteMember.title') || '添加成员' }}</span>
+        <span class="invite-member-modal__title">{{ t('group.inviteMember.title', '添加成员') }}</span>
         <span v-if="selectedIds.size > 0" class="invite-member-modal__count">({{ selectedIds.size }})</span>
       </div>
 
@@ -99,10 +99,10 @@ watch(
 
       <div class="invite-member-modal__footer">
         <Button type="default" @click="onCancel">
-          {{ t('button.cancel') || '取消' }}
+          {{ t('button.cancel', '取消') }}
         </Button>
         <Button type="primary" :disabled="selectedIds.size === 0" :loading="loading" @click="onInvite">
-          {{ t('group.inviteMember.invite') || '邀请' }}
+          {{ t('group.inviteMember.invite', '邀请') }}
         </Button>
       </div>
     </div>

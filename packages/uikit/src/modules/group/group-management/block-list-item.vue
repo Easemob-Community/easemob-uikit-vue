@@ -35,7 +35,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
     </template>
     <template #trailing>
       <button class="block-list__action-btn" @click.stop="emit('unblock')">
-        {{ t('group.memberList.unblock') || '移出黑名单' }}
+        {{ t('group.memberList.unblock', '移出黑名单') }}
       </button>
     </template>
   </Cell>

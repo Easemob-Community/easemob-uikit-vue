@@ -8,6 +8,9 @@ import { useLocale } from '../locale'
 import { formatSdkError } from '../utils/sdk-error'
 import { useToast } from './use-toast'
 import { useUIKit } from './use-uikit'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseMessageActions')
 
 /** 多选状态（模块级单例，保证跨组件共享） */
 const isMultiSelectMode = ref(false)
@@ -168,7 +171,7 @@ export function useMessageActions() {
     }
     catch (e) {
       messageStore.setVoiceTranscribing(msgId, false)
-      console.warn('[UIKit] voiceMessageToText raw error:', {
+      logger.warn('[UIKit] voiceMessageToText raw error:', {
         code: (e as { code?: number | string }).code,
         message: e instanceof Error ? e.message : String(e),
         details: (e as { details?: unknown }).details,
@@ -215,7 +218,7 @@ export function useMessageActions() {
       await domains.message.getPinnedMessages(cvsId, cvsType)
     }
     catch (err) {
-      console.warn('[UIKit] refresh pinned messages failed:', formatSdkError(err))
+      logger.warn('[UIKit] refresh pinned messages failed:', formatSdkError(err))
     }
   }
 
@@ -259,20 +262,20 @@ function resolveTranslateLang(targetLang?: string): string {
 /** 根据 SDK 语音转文字错误提取友好提示文案 */
 export function resolveVoiceToTextErrorMessage(
   e: unknown,
-  t: (key: string) => string,
+  t: (key: string, fallback?: string, params?: Record<string, string | number>) => string,
 ): string {
   const code = (e as { code?: number | string })?.code
   if (code === 505 || code === '505')
-    return t('message.voiceToText.noPermission') || '语音转文字服务未开通，请联系管理员开通'
+    return t('message.voiceToText.noPermission', '语音转文字服务未开通，请联系管理员开通')
   if (code === 408 || code === '408')
-    return t('message.voiceToText.durationTooLong') || '语音时长超过限制'
+    return t('message.voiceToText.durationTooLong', '语音时长超过限制')
   if (code === 411 || code === '411')
-    return t('message.voiceToText.fileTooLarge') || '语音文件过大'
+    return t('message.voiceToText.fileTooLarge', '语音文件过大')
   if (code === 407 || code === '407')
-    return t('message.voiceToText.fileInvalid') || '语音文件无效或已过期'
+    return t('message.voiceToText.fileInvalid', '语音文件无效或已过期')
   if (code === 410 || code === '410')
-    return t('message.voiceToText.uploadFailed') || '语音文件上传失败'
-  return t('message.voiceToText.failed') || '语音转文字失败，请稍后重试'
+    return t('message.voiceToText.uploadFailed', '语音文件上传失败')
+  return t('message.voiceToText.failed', '语音转文字失败，请稍后重试')
 }
 
 function extractErrorReason(error: unknown): string {

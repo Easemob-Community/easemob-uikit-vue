@@ -49,7 +49,7 @@ async function onConfirm() {
   if (!targetId)
     return
   if (targetId === currentUserId.value) {
-    errorMsg.value = t('contact.addSelfError') || '不能添加自己为好友'
+    errorMsg.value = t('contact.addSelfError', '不能添加自己为好友')
     return
   }
 
@@ -61,7 +61,7 @@ async function onConfirm() {
     onClose()
   }
   catch (err) {
-    errorMsg.value = (err as Error).message || (t('contact.addFailed') || '添加失败')
+    errorMsg.value = (err as Error).message || (t('contact.addFailed', '添加失败'))
   }
   finally {
     loading.value = false
@@ -87,25 +87,25 @@ watch(
   >
     <div class="add-contact-modal" :class="{ 'add-contact-modal--mobile': isMobile }">
       <div class="add-contact-modal__header">
-        <span class="add-contact-modal__title">{{ t('conversation.addContact') || '添加联系人' }}</span>
+        <span class="add-contact-modal__title">{{ t('conversation.addContact', '添加联系人') }}</span>
       </div>
       <div class="add-contact-modal__body">
         <div class="add-contact-modal__field">
-          <label class="add-contact-modal__label">{{ t('contact.userId') || '用户 ID' }}</label>
+          <label class="add-contact-modal__label">{{ t('contact.userId', '用户 ID') }}</label>
           <Input
             v-model="userId"
             variant="default"
-            :placeholder="t('contact.addContactPlaceholder') || '输入用户 ID'
+            :placeholder="t('contact.addContactPlaceholder', '输入用户 ID')
             "
             @submit="onConfirm"
           />
         </div>
         <div class="add-contact-modal__field">
-          <label class="add-contact-modal__label">{{ t('contact.inviteReason') || '附言' }}</label>
+          <label class="add-contact-modal__label">{{ t('contact.inviteReason', '附言') }}</label>
           <Input
             v-model="reason"
             variant="default"
-            :placeholder="t('contact.addContactReasonPlaceholder') || '输入验证信息（可选）'
+            :placeholder="t('contact.addContactReasonPlaceholder', '输入验证信息（可选）')
             "
           />
         </div>
@@ -115,10 +115,10 @@ watch(
       </div>
       <div class="add-contact-modal__footer">
         <Button type="default" @click="onClose">
-          {{ t('button.cancel') || '取消' }}
+          {{ t('button.cancel', '取消') }}
         </Button>
         <Button type="primary" :disabled="!canSubmit" :loading="loading" @click="onConfirm">
-          {{ t('button.confirm') || '确认' }}
+          {{ t('button.confirm', '确认') }}
         </Button>
       </div>
     </div>

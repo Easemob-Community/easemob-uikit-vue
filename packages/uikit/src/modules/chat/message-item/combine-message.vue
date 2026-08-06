@@ -22,7 +22,7 @@ const { t } = useLocale()
 
 const body = computed(() => props.message.body as CombineMessageBody)
 
-const title = computed(() => body.value.title || t('message.forward.combineTitle') || '聊天记录')
+const title = computed(() => body.value.title || t('message.forward.combineTitle', '聊天记录'))
 const summary = computed(() => body.value.summary || '')
 
 function handleClick() {

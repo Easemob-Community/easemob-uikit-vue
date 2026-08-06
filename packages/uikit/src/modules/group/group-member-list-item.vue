@@ -60,10 +60,10 @@ function roleClass(role?: string): string {
 
 function roleLabel(role?: string): string {
   if (role === GROUP_MEMBER_ROLE.OWNER)
-    return t('group.memberList.owner') || '群主'
+    return t('group.memberList.owner', '群主')
   if (role === GROUP_MEMBER_ROLE.ADMIN)
-    return t('group.memberList.admin') || '管理员'
-  return t('group.memberList.member') || '成员'
+    return t('group.memberList.admin', '管理员')
+  return t('group.memberList.member', '成员')
 }
 
 // ===== 禁言/拉黑/白名单状态检查 =====
@@ -184,21 +184,21 @@ interface MoreAction {
 function getMoreActions(member: UiGroupMember): MoreAction[] {
   const actions: MoreAction[] = []
   if (canMute(member))
-    actions.push({ key: 'mute', icon: 'actions/lock', label: t('group.memberList.mute') || '禁言' })
+    actions.push({ key: 'mute', icon: 'actions/lock', label: t('group.memberList.mute', '禁言') })
   if (canUnmute(member))
-    actions.push({ key: 'unmute', icon: 'actions/unlock', label: t('group.memberList.unmute') || '取消禁言' })
+    actions.push({ key: 'unmute', icon: 'actions/unlock', label: t('group.memberList.unmute', '取消禁言') })
   if (canBlock(member))
-    actions.push({ key: 'block', icon: 'actions/user-x', label: t('group.memberList.block') || '拉黑' })
+    actions.push({ key: 'block', icon: 'actions/user-x', label: t('group.memberList.block', '拉黑') })
   if (canUnblock(member))
-    actions.push({ key: 'unblock', icon: 'actions/user-check', label: t('group.memberList.unblock') || '取消拉黑' })
+    actions.push({ key: 'unblock', icon: 'actions/user-check', label: t('group.memberList.unblock', '取消拉黑') })
   if (props.showAdminAction && canSetAdmin(member))
-    actions.push({ key: 'setAdmin', icon: 'actions/shield', label: t('group.memberList.setAdmin') || '设管理员' })
+    actions.push({ key: 'setAdmin', icon: 'actions/shield', label: t('group.memberList.setAdmin', '设管理员') })
   if (props.showAdminAction && canRemoveAdmin(member))
-    actions.push({ key: 'removeAdmin', icon: 'actions/shield-off', label: t('group.memberList.removeAdmin') || '取消管理员' })
+    actions.push({ key: 'removeAdmin', icon: 'actions/shield-off', label: t('group.memberList.removeAdmin', '取消管理员') })
   if (canTransferOwner(member))
-    actions.push({ key: 'transferOwner', icon: 'actions/crown', label: t('group.memberList.transferOwner') || '转让群主', danger: true })
+    actions.push({ key: 'transferOwner', icon: 'actions/crown', label: t('group.memberList.transferOwner', '转让群主'), danger: true })
   if (props.showRemoveAction && canRemove(member))
-    actions.push({ key: 'remove', icon: 'actions/user-minus', label: t('group.memberList.remove') || '移除', danger: true })
+    actions.push({ key: 'remove', icon: 'actions/user-minus', label: t('group.memberList.remove', '移除'), danger: true })
   return actions
 }
 
@@ -265,19 +265,19 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
             v-if="isMemberMuted(props.groupId, props.member.userId)"
             class="group-member-list__status-tag group-member-list__status-tag--muted"
           >
-            {{ t('group.memberList.muted') || '禁言中' }}
+            {{ t('group.memberList.muted', '禁言中') }}
           </span>
           <span
             v-if="isMemberBlocked(props.groupId, props.member.userId)"
             class="group-member-list__status-tag group-member-list__status-tag--blocked"
           >
-            {{ t('group.memberList.blocked') || '已拉黑' }}
+            {{ t('group.memberList.blocked', '已拉黑') }}
           </span>
           <span
             v-if="isMemberInAllowlist(props.groupId, props.member.userId)"
             class="group-member-list__status-tag group-member-list__status-tag--allowlist"
           >
-            {{ t('group.memberList.inAllowlist') || '白名单' }}
+            {{ t('group.memberList.inAllowlist', '白名单') }}
           </span>
         </div>
         <div class="group-member-list__id">
@@ -293,7 +293,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
           class="group-member-list__action-btn"
           @click="emit('chat-member', props.member)"
         >
-          {{ t('group.memberList.chat') || '发消息' }}
+          {{ t('group.memberList.chat', '发消息') }}
         </button>
 
         <div

@@ -34,7 +34,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
       <span class="allow-list__name">{{ displayName }}</span>
     </div>
     <button class="allow-list__action-btn allow-list__action-btn--danger" @click="emit('remove')">
-      {{ t('group.memberList.remove') || '移出白名单' }}
+      {{ t('group.memberList.remove', '移出白名单') }}
     </button>
   </div>
 </template>

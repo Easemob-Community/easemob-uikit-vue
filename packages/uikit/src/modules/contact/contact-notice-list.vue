@@ -10,6 +10,9 @@ import { useUIKit } from '../../composables/use-uikit'
 import { type InvitePersistType, useInvitePersistence } from '../../composables/use-invite-persistence'
 import Empty from '../../components/empty/empty.vue'
 import type { UiContactInvite } from '../../sdk/types'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:ContactNoticeList')
 
 export interface ContactNoticeListProps {
   invites?: UiContactInvite[]
@@ -77,8 +80,8 @@ async function onAccept(invite: UiContactInvite) {
     emit('accept', invite)
   }
   catch (err) {
-    console.warn('[ContactNoticeList] accept invite failed:', formatSdkError(err))
-    showToast(t('contact.inviteAcceptFailed') || '接受失败')
+    logger.warn('[ContactNoticeList] accept invite failed:', formatSdkError(err))
+    showToast(t('contact.inviteAcceptFailed', '接受失败'))
   }
   finally {
     processingIds.value.delete(invite.id)
@@ -99,8 +102,8 @@ async function onDecline(invite: UiContactInvite) {
     emit('decline', invite)
   }
   catch (err) {
-    console.warn('[ContactNoticeList] decline invite failed:', formatSdkError(err))
-    showToast(t('contact.inviteDeclineFailed') || '拒绝失败')
+    logger.warn('[ContactNoticeList] decline invite failed:', formatSdkError(err))
+    showToast(t('contact.inviteDeclineFailed', '拒绝失败'))
   }
   finally {
     processingIds.value.delete(invite.id)
@@ -116,9 +119,9 @@ function formatTime(timestamp?: number): string {
 
 function statusLabel(status: UiContactInvite['status']): string {
   if (status === 'accepted')
-    return t('contact.inviteAccepted') || '已接受'
+    return t('contact.inviteAccepted', '已接受')
   if (status === 'declined')
-    return t('contact.inviteDeclined') || '已拒绝'
+    return t('contact.inviteDeclined', '已拒绝')
   return ''
 }
 
@@ -132,7 +135,7 @@ function displaySubtitle(invite: UiContactInvite): string {
   if (invite.type === 'group') {
     const inviter = invite.inviterName || invite.inviterId
     if (inviter)
-      return `${t('contact.inviteInviter') || '邀请人'}: ${inviter}`
+      return `${t('contact.inviteInviter', '邀请人')}: ${inviter}`
     return `ID: ${invite.groupId || ''}`
   }
   return `ID: ${invite.userId || ''}`
@@ -149,7 +152,7 @@ function avatarName(invite: UiContactInvite): string {
   <div class="contact-notice-list">
     <!-- Header -->
     <div class="contact-notice-list__header">
-      <span class="contact-notice-list__title">{{ t('contact.inviteTitle') || '好友申请' }}</span>
+      <span class="contact-notice-list__title">{{ t('contact.inviteTitle', '好友申请') }}</span>
       <span v-if="displayInvites.length > 0" class="contact-notice-list__count">{{ displayInvites.length }}</span>
     </div>
 
@@ -162,7 +165,7 @@ function avatarName(invite: UiContactInvite): string {
     <Empty
       v-else-if="displayInvites.length === 0"
       icon="empty/contact"
-      :description="t('contact.inviteEmpty') || '暂无好友申请'"
+      :description="t('contact.inviteEmpty', '暂无好友申请')"
     />
 
     <!-- List -->
@@ -190,7 +193,7 @@ function avatarName(invite: UiContactInvite): string {
           </div>
           <div class="contact-notice-list__meta">
             <span class="contact-notice-list__subtitle">{{ displaySubtitle(invite) }}</span>
-            <span v-if="invite.reason" class="contact-notice-list__reason">{{ t('contact.inviteReason') || '附言' }}: {{ invite.reason }}</span>
+            <span v-if="invite.reason" class="contact-notice-list__reason">{{ t('contact.inviteReason', '附言') }}: {{ invite.reason }}</span>
           </div>
           <div v-if="invite.timestamp" class="contact-notice-list__time">
             {{ formatTime(invite.timestamp) }}
@@ -204,14 +207,14 @@ function avatarName(invite: UiContactInvite): string {
               :disabled="isProcessing(invite)"
               @click="onAccept(invite)"
             >
-              {{ t('contact.inviteAccept') || '接受' }}
+              {{ t('contact.inviteAccept', '接受') }}
             </button>
             <button
               class="contact-notice-list__btn contact-notice-list__btn--default"
               :disabled="isProcessing(invite)"
               @click="onDecline(invite)"
             >
-              {{ t('contact.inviteDecline') || '拒绝' }}
+              {{ t('contact.inviteDecline', '拒绝') }}
             </button>
           </template>
         </div>

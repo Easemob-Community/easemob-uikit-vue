@@ -1,6 +1,9 @@
 import { inject, provide, type InjectionKey, type ComputedRef } from 'vue'
 import type { LocationMessageBody, UiConversation, UiMessage } from '../sdk/types'
 import type { MentionContact } from '../modules/chat/types'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:UseChatPlugin')
 
 /** 聊天插件可使用的消息发送能力 */
 export interface ChatPluginSendUtils {
@@ -82,10 +85,10 @@ export function useChatPlugin(): ChatPluginMergedContext {
   }
 
   const noopInput: MessageInputPluginContext = {
-    setText: () => { console.warn('[useChatPlugin] setText not available') },
+    setText: () => { logger.warn('[useChatPlugin] setText not available') },
     getText: () => '',
-    focus: () => { console.warn('[useChatPlugin] focus not available') },
-    appendMention: () => { console.warn('[useChatPlugin] appendMention not available') },
+    focus: () => { logger.warn('[useChatPlugin] focus not available') },
+    appendMention: () => { logger.warn('[useChatPlugin] appendMention not available') },
   }
 
   return {

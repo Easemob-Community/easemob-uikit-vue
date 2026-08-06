@@ -47,14 +47,14 @@ interface PresenceOption {
 
 const options = computed<PresenceOption[]>(() => {
   const list: PresenceOption[] = [
-    { key: 'online', label: t('presence.online') || '在线', ext: '', color: 'var(--uikit-success-color, #22c55e)' },
-    { key: 'busy', label: t('presence.busy') || '忙碌', ext: 'busy', color: 'var(--uikit-danger-color, #ef4444)' },
-    { key: 'away', label: t('presence.away') || '离开', ext: 'away', color: 'var(--uikit-warning-color, #f59e0b)' },
+    { key: 'online', label: t('presence.online', '在线'), ext: '', color: 'var(--uikit-success-color, #22c55e)' },
+    { key: 'busy', label: t('presence.busy', '忙碌'), ext: 'busy', color: 'var(--uikit-danger-color, #ef4444)' },
+    { key: 'away', label: t('presence.away', '离开'), ext: 'away', color: 'var(--uikit-warning-color, #f59e0b)' },
   ]
   if (props.showCustom) {
     list.push({
       key: 'custom',
-      label: t('presence.custom') || '自定义',
+      label: t('presence.custom', '自定义'),
       ext: props.value || '',
       color: 'var(--uikit-text-tertiary, #94a3b8)',
     })
@@ -110,13 +110,13 @@ function onCancel() {
 <template>
   <div class="presence-selector" :class="{ 'presence-selector--compact': props.compact }">
     <div v-if="props.showHeader" class="presence-selector__header">
-      <span class="presence-selector__title">{{ t('presence.setStatus') || '设置在线状态' }}</span>
+      <span class="presence-selector__title">{{ t('presence.setStatus', '设置在线状态') }}</span>
       <IconButton
         class="presence-selector__close"
         icon="actions/close"
         size="small"
         variant="ghost"
-        :title="t('button.close') || '关闭'"
+        :title="t('button.close', '关闭')"
         @click="onCancel"
       />
     </div>
@@ -168,11 +168,11 @@ function onCancel() {
     <div v-if="selectedKey === 'custom' && !props.useCustomModal" class="presence-selector__custom">
       <Input
         v-model="customText"
-        :placeholder="props.customPlaceholder || (t('presence.customPlaceholder') || '请输入自定义状态')"
+        :placeholder="props.customPlaceholder || t('presence.customPlaceholder', '请输入自定义状态')"
         :maxlength="32"
       />
       <button class="presence-selector__confirm" @click="onConfirmCustom">
-        {{ t('button.confirm') || '确定' }}
+        {{ t('button.confirm', '确定') }}
       </button>
     </div>
   </div>

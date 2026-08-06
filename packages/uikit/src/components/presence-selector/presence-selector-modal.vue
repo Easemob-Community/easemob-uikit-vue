@@ -7,6 +7,9 @@ import { usePresence } from '../../composables/use-presence'
 import { useToast } from '../../composables/use-toast'
 import Popup from '../popup/popup.vue'
 import PresenceSelector from './presence-selector.vue'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:PresenceSelectorModal')
 
 export interface PresenceSelectorModalProps {
   show: boolean
@@ -50,8 +53,8 @@ async function onSelect(_status: string, ext: string) {
     // 选择后保持 modal 开启，让用户看到已切换的状态；点击遮罩或关闭按钮再关闭
   }
   catch (err) {
-    console.warn('[PresenceSelectorModal] publish failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed') || '状态设置失败')
+    logger.warn('[PresenceSelectorModal] publish failed:', formatSdkError(err))
+    showToast(t('presence.publishFailed', '状态设置失败'))
   }
 }
 

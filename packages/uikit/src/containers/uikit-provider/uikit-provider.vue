@@ -19,6 +19,9 @@ import type { NotificationItem } from '../../components/notification/types'
 import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('UIKit:UikitProvider')
 
 /** 字号配置：支持档位或具体 scale */
 export type ThemeFontSize = FontSizePreset | number
@@ -109,6 +112,10 @@ export interface ProviderProps {
     /** 点击通知时跳转对应会话（默认 true） */
     navigateOnClick?: boolean
   }
+  /** Token 即将过期回调，业务可在此刷新 token */
+  onTokenWillExpire?: () => void
+  /** Token 已过期回调，业务可在此重新登录或提示用户 */
+  onTokenExpired?: () => void
 }
 
 const props = withDefaults(defineProps<ProviderProps>(), {
@@ -175,6 +182,10 @@ const ctx = useUIKitProvider(config.value, {
   onUserInfoSubscriptionPermissionError: props.enableToast
     ? () => showToastWarning(t('userInfo.subscriptionDisabled'))
     : undefined,
+  connectionCallbacks: {
+    onTokenWillExpire: props.onTokenWillExpire,
+    onTokenExpired: props.onTokenExpired,
+  },
 })
 
 /** 通知点击默认行为：聚焦页面 + 跳转对应会话（navigateOnClick=false 时仅聚焦）。
@@ -241,7 +252,7 @@ watch(
         ctx.stores.contact.setBlackList(list)
       }
       catch (e) {
-        console.warn('[UIKit] fetch blocklist failed:', formatSdkError(e))
+        logger.warn('[UIKit] fetch blocklist failed:', formatSdkError(e))
       }
     }
 
@@ -254,7 +265,7 @@ watch(
         ctx.stores.contact.setContactList(result.list)
       }
       catch (e) {
-        console.warn('[UIKit] fetch contacts failed:', formatSdkError(e))
+        logger.warn('[UIKit] fetch contacts failed:', formatSdkError(e))
       }
     }
   },

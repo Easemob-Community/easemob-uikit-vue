@@ -58,7 +58,7 @@ const filteredContacts = computed(() => {
 })
 
 /** 显示标题 */
-const displayTitle = computed(() => props.title || t('mention.title') || '选择联系人')
+const displayTitle = computed(() => props.title || t('mention.title', '选择联系人'))
 
 /** 选择联系人 */
 function onSelect(contact: MentionContact) {
@@ -99,7 +99,7 @@ function onKeydown(e: KeyboardEvent) {
             v-model="searchText"
             type="text"
             class="mention-picker__search-input"
-            :placeholder="t('mention.searchPlaceholder') || '搜索联系人...'"
+            :placeholder="t('mention.searchPlaceholder', '搜索联系人...')"
             @keydown="onKeydown"
           />
         </div>
@@ -123,7 +123,7 @@ function onKeydown(e: KeyboardEvent) {
           <Empty
             v-if="filteredContacts.length === 0"
             icon="empty/mentions"
-            :description="t('mention.noResult') || '未找到联系人'"
+            :description="t('mention.noResult', '未找到联系人')"
             size="small"
           />
         </div>
@@ -150,7 +150,7 @@ function onKeydown(e: KeyboardEvent) {
             icon="actions/close"
             size="small"
             variant="ghost"
-            :title="t('button.close') || '关闭'"
+            :title="t('button.close', '关闭')"
             @click="onClose"
           />
         </div>
@@ -161,7 +161,7 @@ function onKeydown(e: KeyboardEvent) {
             v-model="searchText"
             type="text"
             class="mention-picker__search-input"
-            :placeholder="t('mention.searchPlaceholder') || '搜索联系人...'"
+            :placeholder="t('mention.searchPlaceholder', '搜索联系人...')"
           />
         </div>
         <!-- 联系人列表 -->
@@ -184,7 +184,7 @@ function onKeydown(e: KeyboardEvent) {
           <Empty
             v-if="filteredContacts.length === 0"
             icon="empty/mentions"
-            :description="t('mention.noResult') || '未找到联系人'"
+            :description="t('mention.noResult', '未找到联系人')"
             size="small"
           />
         </div>

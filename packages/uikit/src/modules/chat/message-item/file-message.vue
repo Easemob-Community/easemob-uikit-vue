@@ -17,7 +17,7 @@ const { show: showToast } = useToast()
 const body = computed(() => props.message.body as FileMessageBody)
 
 /** 文件名 */
-const fileName = computed(() => body.value.filename || t('message.file') || '未知文件')
+const fileName = computed(() => body.value.filename || t('message.file', '未知文件'))
 
 /** 文件大小格式化 */
 const fileSize = computed(() => {
@@ -50,7 +50,7 @@ const fileIcon = computed(() => {
 async function handleDownload() {
   const url = body.value.url
   if (!url) {
-    showToast(t('message.download.failed') || '下载失败', 'error')
+    showToast(t('message.download.failed', '下载失败'), 'error')
     return
   }
 
@@ -62,14 +62,14 @@ async function handleDownload() {
       filename: fileName.value,
       env,
       onSuccess: () => {
-        showToast(t('message.download.success') || '下载成功', 'success')
+        showToast(t('message.download.success', '下载成功'), 'success')
       },
       onError: (err) => {
         if (err.name === 'WechatNotSupported') {
-          showToast(t('message.download.wechatHint') || '请在浏览器中打开以下载文件', 'warning')
+          showToast(t('message.download.wechatHint', '请在浏览器中打开以下载文件'), 'warning')
         }
         else {
-          showToast(t('message.download.failed') || '下载失败', 'error')
+          showToast(t('message.download.failed', '下载失败'), 'error')
         }
       },
     })

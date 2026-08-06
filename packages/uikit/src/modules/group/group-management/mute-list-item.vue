@@ -52,7 +52,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
     </template>
     <template #trailing>
       <button class="mute-list__action-btn" @click.stop="emit('unmute')">
-        {{ t('group.memberList.unmute') || '取消禁言' }}
+        {{ t('group.memberList.unmute', '取消禁言') }}
       </button>
     </template>
   </Cell>

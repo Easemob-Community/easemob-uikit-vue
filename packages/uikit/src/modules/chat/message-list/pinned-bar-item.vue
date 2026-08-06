@@ -31,16 +31,16 @@ const preview = computed(() => {
     return text.length > max ? `${text.slice(0, max)}…` : text
   }
   if (msg.type === MESSAGE_TYPE.IMAGE)
-    return t('message.image') || '[图片]'
+    return t('message.image', '[图片]')
   if (msg.type === MESSAGE_TYPE.VOICE)
-    return t('message.audio') || '[语音]'
+    return t('message.audio', '[语音]')
   if (msg.type === MESSAGE_TYPE.VIDEO)
-    return t('message.video') || '[视频]'
+    return t('message.video', '[视频]')
   if (msg.type === MESSAGE_TYPE.FILE)
-    return t('message.file') || '[文件]'
+    return t('message.file', '[文件]')
   if (msg.type === MESSAGE_TYPE.COMBINE)
-    return t('message.combine') || '[聊天记录]'
-  return t('message.custom') || '[消息]'
+    return t('message.combine', '[聊天记录]')
+  return t('message.custom', '[消息]')
 })
 </script>
 

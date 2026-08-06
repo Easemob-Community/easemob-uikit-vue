@@ -79,6 +79,7 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
 
 const emit = defineEmits<{
   (e: 'select', id: string, conversation: Conversation): void
+  (e: 'conversation-click', id: string, conversation: Conversation): void
   (e: 'at-me-click', id: string, conversation: Conversation): void
   (e: 'custom-action', key: string, conversation: Conversation): void
   (e: 'update:active-tab', tab: ConversationTabKey): void
@@ -331,6 +332,11 @@ function handleSelect(id: string) {
   const cvs = conversationList.value.find((c: Conversation) => c.id === id)
   const hadAtMe = !!stores.conversation.atMeMap[id]
 
+  // 先向外抛点击事件，供 H5 等业务做页面栈导航（在 selection 逻辑之前）
+  if (cvs) {
+    emit('conversation-click', id, cvs)
+  }
+
   // 切换会话前，为当前会话保存草稿（如果有输入内容，由 chat-container 侧触发）
   selectConversation(id)
   // 进入会话后发送已读回执
@@ -529,7 +535,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         <div>{{ t('conversation.deleteConfirm') }}</div>
         <label class="conversation-list__delete-option">
           <input v-model="deleteWithHistory" type="checkbox">
-          <span>{{ t('conversation.deleteWithHistory') || '同时删除聊天记录' }}</span>
+          <span>{{ t('conversation.deleteWithHistory', '同时删除聊天记录') }}</span>
         </label>
       </div>
     </Modal>

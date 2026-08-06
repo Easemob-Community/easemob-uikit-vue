@@ -273,18 +273,21 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
       stores.message.addMessage(uiMsg)
 
-      // 当前会话收到新消息时自动标记已读，避免刷新/重新同步后服务端未读数再次浮现
+      // 当前会话收到新消息时自动标记已读，避免刷新/重新同步后服务端未读数再次浮现。
+      // 仅在页面可见时标记已读；页面隐藏时用户实际未看到，保持未读。
       const currentCvsId = stores.conversation.currentConversationId
+      const isPageVisible = typeof document === 'undefined' || document.visibilityState === 'visible'
       if (
         currentCvsId
         && sdkMsg.conversationId === currentCvsId
         && sdkMsg.from !== stores.client.currentUser
+        && isPageVisible
       ) {
         void client.chatManager.clearConversationUnreadMessageCount({
           conversationId: sdkMsg.conversationId,
           conversationType: sdkMsg.conversationType as ConversationTypeValue,
         }).catch((err: unknown) => {
-          console.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
+          chatLog.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
         })
         // 单聊/群聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
         // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送
