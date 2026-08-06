@@ -325,6 +325,7 @@ const messages: LocaleMessages = {
   'chat.input.camera': '拍摄',
   'chat.input.video': '视频',
   'chat.input.file': '文件',
+  'chat.input.mention': '@提及',
   'toast.success': '操作成功',
   'toast.error': '操作失败',
   'modal.title': '提示',

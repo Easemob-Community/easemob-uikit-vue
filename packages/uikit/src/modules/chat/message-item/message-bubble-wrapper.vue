@@ -162,11 +162,13 @@ const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageSt
 
 /** 默认状态图标映射 */
 const defaultStatusIconMap: Record<MessageStatusValue, string> = {
-  [MESSAGE_STATUS.SENDING]: 'actions/loading_circle',
+  // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
+  [MESSAGE_STATUS.SENDING]: 'actions/loading_arc',
   [MESSAGE_STATUS.SENT]: 'actions/check',
   [MESSAGE_STATUS.DELIVERED]: 'chat/doneAll',
   [MESSAGE_STATUS.READ]: 'chat/doneAll',
-  [MESSAGE_STATUS.FAILED]: 'status/error',
+  // 发送失败：回转箭头提示可点击重发
+  [MESSAGE_STATUS.FAILED]: 'arrows/arrow_Uturn_clockwise',
 }
 
 /** 当前状态图标 */

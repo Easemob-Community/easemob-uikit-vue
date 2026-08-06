@@ -33,7 +33,7 @@ function onClose() {
 
 <template>
   <div class="editing-bar">
-    <Icon class="editing-bar__icon" name="actions/check_2" :size="14" />
+    <Icon class="editing-bar__icon" name="chat/modifyMsg" :size="14" />
     <div class="editing-bar__text">
       <span class="editing-bar__title">{{ t('message.editing') }}</span>
       <span class="editing-bar__preview">{{ preview }}</span>

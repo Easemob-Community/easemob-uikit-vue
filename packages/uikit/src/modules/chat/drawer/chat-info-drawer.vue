@@ -607,7 +607,7 @@ defineExpose({
       <div v-else class="chat-info-drawer__header">
         <IconButton
           class="chat-info-drawer__back"
-          icon="arrows/arrowto"
+          icon="navigation/chevron_left"
           size="small"
           variant="ghost"
           :title="t('button.back', '返回')"

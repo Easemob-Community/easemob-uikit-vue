@@ -107,7 +107,7 @@ function toggle() {
       <div class="pinned-bar__list-header" @click="toggle">
         <Icon class="pinned-bar__icon" name="chat/pin" :size="14" />
         <span>{{ t('chat.pinnedBar.count').replace('{count}', String(pinnedList.length)) }}</span>
-        <Icon name="arrows/arrow_up_thick" :size="12" />
+        <Icon name="navigation/chevron_up" :size="12" />
       </div>
       <Cell
         v-for="msg in pinnedList"

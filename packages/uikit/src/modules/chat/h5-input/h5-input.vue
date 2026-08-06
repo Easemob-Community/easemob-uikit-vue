@@ -307,6 +307,17 @@ const moreItems = computed(() => {
       action: () => fileInputRef.value?.click(),
     })
   }
+  if (props.enableMention) {
+    items.push({
+      key: 'mention',
+      icon: 'misc/at',
+      label: t('chat.input.mention'),
+      action: () => {
+        activePanel.value = 'none'
+        onMentionBtnClick()
+      },
+    })
+  }
   return items
 })
 
@@ -347,6 +358,21 @@ function getCaretCoordinates(el: HTMLTextAreaElement, position: number) {
   const rect = span.getBoundingClientRect()
   document.body.removeChild(div)
   return { left: rect.left, top: rect.top + rect.height }
+}
+
+/** 点击 @按钮：末尾插入 '@' 并打开提及面板（选择联系人后 insertMention 可定位替换） */
+function onMentionBtnClick() {
+  if (!props.enableMention || isVoiceMode.value)
+    return
+  const el = textareaRef.value
+  text.value = `${text.value}@`
+  nextTick(() => {
+    el?.focus()
+    const pos = text.value.length
+    el?.setSelectionRange(pos, pos)
+  })
+  // H5 端提及面板为底部 Popup，anchor 仅作类型占位
+  emit('mention-trigger', el ?? document.body, '')
 }
 
 /** 检测是否触发了 @提及 */

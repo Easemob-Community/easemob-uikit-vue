@@ -116,14 +116,14 @@ const actions = computed<MessageActionItem[]>(() => {
   if (cfg?.enableForward !== false)
     add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false)
-    add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/checked_rectangle')
+    add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/items_check')
   // 翻译：仅文本消息可翻译，其他类型不展示
   if (cfg?.enableTranslate !== false && props.message.type === MESSAGE_TYPE.TEXT) {
-    add('translate', t('message.action.translate') ?? '翻译', 'misc/globe_asia-australia')
+    add('translate', t('message.action.translate') ?? '翻译', 'misc/hanzinalpha_in_rect')
   }
   // 语音转文字：仅带 url 的语音消息展示
   if (cfg?.enableVoiceToText !== false && props.message.type === MESSAGE_TYPE.VOICE && (props.message.body as any).url) {
-    add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'audio-video/mic')
+    add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'misc/hanzi_in_rect')
   }
   if (cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {

@@ -12,6 +12,13 @@ export interface InputProps {
   /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
   prefixIcon?: string
   /**
+   * 是否显示清除按钮（有输入内容时右侧出现）。
+   * 默认清除图标为 `actions/close`，搜索场景可传 `clear-icon="misc/search_clear"`。
+   */
+  clearable?: boolean
+  /** 清除按钮图标名称，默认 "actions/close" */
+  clearIcon?: string
+  /**
    * 输入框风格变体
    * - 'default': 白色背景 + 边框 + 圆角，适用于表单输入（默认）
    * - 'search': 白底 + 底部细线，适用于搜索框
@@ -35,6 +42,8 @@ const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
   disabled: false,
   variant: 'default',
+  clearable: false,
+  clearIcon: 'actions/close',
 })
 
 const emit = defineEmits<InputEmits>()
@@ -66,6 +75,13 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
+/** 清除输入内容并聚焦 */
+function onClear() {
+  emit('update:modelValue', '')
+  emit('input', new Event('input'))
+  inputRef.value?.focus()
+}
+
 defineExpose({
   inputRef,
 })
@@ -76,6 +92,7 @@ defineExpose({
     class="uikit-input"
     :class="{
       'uikit-input--with-prefix': props.prefixIcon,
+      'uikit-input--with-clear': props.clearable,
       'uikit-input--search': props.variant === 'search',
       'uikit-input--filled': props.variant === 'filled',
       'uikit-input--ghost': props.variant === 'ghost',
@@ -102,6 +119,15 @@ defineExpose({
       @blur="(e: FocusEvent) => emit('blur', e)"
       @keydown="onKeydown"
     />
+    <button
+      v-if="props.clearable && props.modelValue"
+      type="button"
+      class="uikit-input__clear"
+      title="clear"
+      @click="onClear"
+    >
+      <Icon :name="props.clearIcon" :size="14" />
+    </button>
   </div>
 </template>
 
@@ -114,6 +140,37 @@ defineExpose({
 
 .uikit-input--with-prefix .uikit-input__field {
   padding-left: 36px;
+}
+
+/* 可清除：右侧留出清除按钮空间 */
+.uikit-input--with-clear .uikit-input__field {
+  padding-right: 32px;
+}
+
+.uikit-input__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--uikit-bg-secondary);
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.uikit-input__clear:hover {
+  background-color: var(--uikit-bg-hover);
+  color: var(--uikit-text-primary);
 }
 
 .uikit-input__prefix-icon {

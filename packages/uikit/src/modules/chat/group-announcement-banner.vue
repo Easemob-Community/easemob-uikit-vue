@@ -40,7 +40,7 @@ const hasAnnouncement = computed(() => !!announcement.value)
       :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
       @click="collapsed = !collapsed"
     >
-      <Icon :name="collapsed ? 'arrows/arrow_down' : 'arrows/arrow_up_thick'" :size="14" />
+      <Icon :name="collapsed ? 'navigation/chevron_down' : 'navigation/chevron_up'" :size="14" />
     </button>
   </div>
 </template>

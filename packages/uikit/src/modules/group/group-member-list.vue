@@ -228,10 +228,6 @@ watch(() => props.groupId, (id) => {
   }
 }, { immediate: true })
 
-function clearSearch() {
-  searchKeyword.value = ''
-}
-
 async function refresh() {
   cursor.value = undefined
   await initialLoad()
@@ -272,17 +268,10 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <Input
         v-model="searchKeyword"
         variant="search"
+        clearable
+        clear-icon="misc/search_clear"
         :placeholder="t('group.memberList.searchPlaceholder', '搜索群成员')"
         prefix-icon="misc/magnifier2"
-      />
-      <IconButton
-        v-if="searchKeyword"
-        class="group-member-list__clear"
-        icon="actions/close"
-        size="small"
-        variant="ghost"
-        :title="t('button.clear', '清除')"
-        @click="clearSearch"
       />
     </div>
 

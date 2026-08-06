@@ -363,6 +363,8 @@ defineExpose({
           v-else
           v-model="searchKeyword"
           variant="search"
+          clearable
+          clear-icon="misc/search_clear"
           :placeholder="t('contact.searchPlaceholder')"
           prefix-icon="misc/magnifier2"
         />

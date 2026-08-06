@@ -165,6 +165,24 @@ const showMicOn = computed(() => {
 /** 表情按钮 ref */
 const emojiBtnRef = ref<HTMLElement>()
 
+/** @按钮 ref（作为提及面板锚点） */
+const mentionBtnRef = ref<HTMLElement>()
+
+/** 点击 @按钮：末尾插入 '@' 并打开提及面板（选择联系人后 insertMention 可定位替换） */
+function onMentionBtnClick() {
+  if (!props.enableMention)
+    return
+  const el = getInputEl()
+  text.value = `${text.value}@`
+  nextTick(() => {
+    el?.focus()
+    const pos = text.value.length
+    el?.setSelectionRange(pos, pos)
+  })
+  if (mentionBtnRef.value)
+    emit('mention-trigger', mentionBtnRef.value, '')
+}
+
 /** 是否展开自定义面板（由 #input-panel 插槽使用） */
 const showPanel = ref(false)
 
@@ -403,6 +421,9 @@ defineExpose({
       </div>
       <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
         <Icon :name="showMicOn ? 'audio-video/mic_on' : 'audio-video/mic'" :size="22" />
+      </div>
+      <div v-if="props.enableMention" ref="mentionBtnRef" class="simple-input__tool-btn" title="@" @click="onMentionBtnClick">
+        <Icon name="misc/at" :size="22" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
     </div>

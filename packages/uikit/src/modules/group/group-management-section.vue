@@ -244,7 +244,7 @@ function closeDrawer() {
         <div class="group-management-section__drawer-header">
           <IconButton
             class="group-management-section__drawer-close"
-            icon="arrows/arrowto"
+            icon="navigation/chevron_left"
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"
@@ -325,7 +325,7 @@ function closeDrawer() {
         <div class="group-management-section__drawer-header">
           <IconButton
             class="group-management-section__drawer-close"
-            icon="arrows/arrowto"
+            icon="navigation/chevron_left"
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"

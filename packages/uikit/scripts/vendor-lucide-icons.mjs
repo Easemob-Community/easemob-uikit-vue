@@ -1,6 +1,10 @@
 /**
  * vendor-lucide-icons.mjs
  *
+ * ⚠️ 警示：当前内置图标已切换为全新一版线性图标集（见 tmp/prepare-next-icons.mjs）。
+ * 本脚本仅保留用于历史对比 / Lucide 兜底恢复，请勿在未确认的情况下执行
+ * `pnpm -F @easemob/uikit run icons:vendor` —— 会把已切换的图标覆盖回 Lucide。
+ *
  * 用途：将 src/assets/icons/ 下手工收集的 SVG 图标批量替换为 Lucide 图标（ISC License）。
  * 替换策略是「保留文件路径、只替换内容」，因此 Icon 组件按 name（"分类/图标名"）解析
  * 的引用方式完全不变，零 breaking。

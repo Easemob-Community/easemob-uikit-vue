@@ -18,6 +18,39 @@ const ownerUserId = computed(() => props.file.fileOwner?.userId || '')
 
 const { displayName: ownerDisplayName } = useUserInfo(ownerUserId)
 
+/** 文件扩展名 → 类型图标（无匹配时回落通用文件图标） */
+const FILE_TYPE_ICONS: Record<string, string> = {
+  pdf: 'files-media/file_pdf',
+  xls: 'files-media/file_xls',
+  xlsx: 'files-media/file_xls',
+  ppt: 'files-media/file_ppt',
+  pptx: 'files-media/file_ppt',
+  jpg: 'files-media/file_img',
+  jpeg: 'files-media/file_img',
+  png: 'files-media/file_img',
+  gif: 'files-media/file_img',
+  webp: 'files-media/file_img',
+  bmp: 'files-media/file_img',
+  svg: 'files-media/file_img',
+  mp3: 'files-media/file_audio',
+  wav: 'files-media/file_audio',
+  m4a: 'files-media/file_audio',
+  aac: 'files-media/file_audio',
+  ogg: 'files-media/file_audio',
+  mp4: 'files-media/file_video',
+  mov: 'files-media/file_video',
+  avi: 'files-media/file_video',
+  mkv: 'files-media/file_video',
+  webm: 'files-media/file_video',
+}
+
+/** 当前文件类型图标 */
+const fileIcon = computed(() => {
+  const fileName = props.file.fileName || ''
+  const ext = fileName.includes('.') ? fileName.split('.').pop()?.toLowerCase() : ''
+  return (ext && FILE_TYPE_ICONS[ext]) || 'files-media/file'
+})
+
 function formatSize(bytes?: number): string {
   if (!bytes || bytes <= 0)
     return ''
@@ -56,7 +89,7 @@ function onMoreClick(event: MouseEvent) {
 
 <template>
   <div class="shared-file-list__item" @click="onMoreClick">
-    <Icon name="files-media/file" :size="20" class="shared-file-list__icon" />
+    <Icon :name="fileIcon" :size="20" class="shared-file-list__icon" />
     <div class="shared-file-list__info">
       <span class="shared-file-list__name" :title="props.file.fileName">{{ formatFileName(props.file.fileName) }}</span>
       <span class="shared-file-list__meta">

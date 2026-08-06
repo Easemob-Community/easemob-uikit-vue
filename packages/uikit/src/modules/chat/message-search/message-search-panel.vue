@@ -112,6 +112,8 @@ nextTick(() => {
         ref="inputRef"
         v-model="keyword"
         variant="search"
+        clearable
+        clear-icon="misc/search_clear"
         :placeholder="t('message.search.placeholder', '搜索关键词...')"
       />
     </div>

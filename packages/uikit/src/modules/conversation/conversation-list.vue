@@ -434,6 +434,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <Input
         v-model="searchKeyword"
         variant="search"
+        clearable
+        clear-icon="misc/search_clear"
         :placeholder="t('conversation.searchPlaceholder')"
         prefix-icon="misc/magnifier2"
       />

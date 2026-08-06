@@ -1,12 +1,12 @@
 # 图标
 
-UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。自当前版本起，内置图标来自 [Lucide](https://lucide.dev)（ISC License），风格统一为 24×24 画布、描边式线性图标。
+UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。当前内置图标以全新一版线性图标集（24×24 画布，填充式为主）为主，历史缺失图形（约 19 个，见下方说明）仍由 [Lucide](https://lucide.dev)（ISC License）描边式图标兜底。
 
 ## 图标体系说明
 
 - **渲染组件**：`EmIcon`（全局注册为 `<Icon />`）。图标以 inline SVG 方式渲染，不依赖图片请求。
 - **name 规则**：`name` 格式为 `分类/图标名`，与 `src/assets/icons/<分类>/<图标名>.svg` 文件路径一一对应，例如 `actions/trash` 对应 `src/assets/icons/actions/trash.svg`。构建时通过 `import.meta.glob` 自动注册，新增文件即生效，无需手工登记。
-- **着色**：图标使用 `currentColor` 描边/填充，颜色自动跟随 CSS `color`，天然适配主题体系；也可通过 `color` prop 显式指定。
+- **着色**：填充式图标使用 `currentColor` 填充，描边式图标使用 `currentColor` 描边，颜色均自动跟随 CSS `color`，天然适配主题体系；也可通过 `color` prop 显式指定。
 - **尺寸**：通过 `size` prop 指定（单位 px，默认 20），SVG 原始 `viewBox` 会被保留，不会被裁切。
 
 ```vue
@@ -52,15 +52,24 @@ UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。自当�
 pnpm -F @easemob/uikit run icons:check
 ```
 
-内置图标由 `lucide-static` 包 vendor 生成，如需升级或调整映射，编辑 `packages/uikit/scripts/vendor-lucide-icons.mjs` 中的映射表后执行：
+内置图标原由 `lucide-static` 包 vendor 生成。**当前已切换为全新一版线性图标集**（源自设计交付的线性 SVG，整理/校验脚本位于 `tmp/prepare-next-icons.mjs`），vendor 脚本仅保留用于历史对比或 Lucide 兜底恢复，**请勿在未确认的情况下执行 `icons:vendor`**（会把已切换的图标覆盖回 Lucide）：
 
 ```bash
+# 仅限历史对比 / Lucide 兜底恢复，切勿随意执行
 pnpm -F @easemob/uikit run icons:vendor
 ```
 
+## 图标来源与缺失说明
+
+全新图标集覆盖了绝大多数内置图标 name；**未覆盖的缺失图形**（约 19 个）仍保留 Lucide 图标兜底，包括：
+
+- **完全缺失（4 个）**：`actions/copy`、`audio-video/play`、`misc/map_pin`、`status/info`（待设计师补齐后替换）；
+- **空状态插画（11 个）**：`empty/*` 系列（非线性图标，需单独出插画稿）；
+- **有近似未直接覆盖（4 个）**：`actions/checked_ellipse`（≈circle/checked）、`audio-video/mic_on`（≈mic）、`chat/doneAll`（≈check/double）、`people/member_group`（≈person/double）。
+
 ## 许可与免责声明
 
-本 UIKit 内置图标来自 [Lucide](https://lucide.dev)，采用 [ISC License](https://opensource.org/licenses/ISC)，版权归 Lucide Contributors 所有。ISC 许可证允许自由使用、修改和再分发，且无需署名。仓库已在 `packages/uikit/src/assets/icons/LICENSE.lucide.txt` 附带许可证全文。
+本 UIKit 内置图标来源：全新一版线性图标集（设计交付）为主，历史缺失兜底部分来自 [Lucide](https://lucide.dev)，采用 [ISC License](https://opensource.org/licenses/ISC)，版权归 Lucide Contributors 所有。ISC 许可证允许自由使用、修改和再分发，且无需署名。仓库已在 `packages/uikit/src/assets/icons/LICENSE.lucide.txt` 附带许可证全文（仅适用于其中仍为 Lucide 来源的图标）。
 
 本项目按“原样”（as-is）提供这些图标，不就其适销性、特定用途适用性等另作任何明示或默示的担保。
 
