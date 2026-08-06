@@ -109,7 +109,7 @@ const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.
   align-self: center;
   padding: 4px 12px;
   border-radius: 4px;
-  background-color: var(--uikit-bubble-bg-other);
+  background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-12);
   text-align: center;
@@ -123,8 +123,8 @@ const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.
 .message-renderer__unknown {
   padding: 10px 14px;
   border-radius: 8px;
-  background-color: var(--uikit-bubble-bg-other);
-  color: var(--uikit-bubble-text-other);
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-13);
 }
 
