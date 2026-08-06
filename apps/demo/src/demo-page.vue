@@ -91,6 +91,7 @@ const {
   chatMessageStatusShowText,
   chatMessageStatusDirection,
   chatMessageStatusPosition,
+  chatMessageStatusStyle,
   showHomeSearch,
   showContactSearch,
   showGroupSearch,
@@ -319,6 +320,7 @@ const chatConfig = computed(() => ({
       showText: chatMessageStatusShowText.value,
       direction: chatMessageStatusDirection.value,
       position: chatMessageStatusPosition.value,
+      style: chatMessageStatusStyle.value,
     },
   },
 }))

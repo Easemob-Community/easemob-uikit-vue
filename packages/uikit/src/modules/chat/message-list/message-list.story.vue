@@ -21,7 +21,7 @@ function injectMockData() {
   const mockConversation = {
     id: 'cvs_001',
     name: '产品讨论群',
-    type: CONVERSATION_TYPE.GROUPCHAT,
+    type: CONVERSATION_TYPE.SINGLECHAT,
     avatar: '',
     unreadCount: 3,
     lastMessageText: '大家看下这个设计方案',
@@ -167,6 +167,22 @@ const baseConfig: ChatConfig = {
         <UIKitProvider :auto-init="false">
           <MessageList
             :config="{ ...baseConfig, messageList: { ...baseConfig.messageList, showTime: 'hover' } }"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="数字胶囊消息状态">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <MessageList
+            :config="{
+              ...baseConfig,
+              messageList: {
+                ...baseConfig.messageList,
+                messageStatus: { style: 'capsule', position: 'below' },
+              },
+            }"
           />
         </UIKitProvider>
       </div>

@@ -26,6 +26,7 @@ const {
   chatMessageStatusShowText,
   chatMessageStatusDirection,
   chatMessageStatusPosition,
+  chatMessageStatusStyle,
 } = useDemoSettings()
 </script>
 
@@ -216,6 +217,22 @@ const {
         <div>
           <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">发送状态</span>
           <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="demo-settings__options">
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatMessageStatusStyle === 'classic' }"
+                @click="chatMessageStatusStyle = 'classic'"
+              >
+                经典
+              </button>
+              <button
+                class="demo-option"
+                :class="{ 'demo-option--active': chatMessageStatusStyle === 'capsule' }"
+                @click="chatMessageStatusStyle = 'capsule'"
+              >
+                数字胶囊
+              </button>
+            </div>
             <label class="demo-check">
               <input v-model="chatMessageStatusShowText" type="checkbox" />
               <span>显示状态文本</span>

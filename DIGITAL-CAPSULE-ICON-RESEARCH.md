@@ -129,6 +129,15 @@
 2. **再补齐方案 B**：新增 `status/*` 图标与可选映射，为单聊已读回执提供新视觉。
 3. **最后方案 C**：等 D90（iconStyle 主题切换）实施后，把 Badge 与消息状态接入 `iconStyle`。
 
+## 落地进展
+
+- **2026-08-06**：
+  - `packages/uikit/src/assets/icons/status/` 新增 `circle`、`circle_check`、`dot`、`dot_check` 四个数字胶囊状态图标；`icon-map` 通过 `import.meta.glob` 自动注册。
+  - `Badge` 组件按数字胶囊规范重构：`size`（normal/small）、`variant`（filled/stroked）prop 落地；normal 尺寸按 units/tens/hundreds 位数区分为 24×24 / 32×24 / 42×24；small 按 0.75x 缩放为 18×18 / 24×18 / 32×18；红点模式同步提供大小两档。
+  - `message-bubble-wrapper.vue` 新增 `messageStatus.style: 'classic' | 'capsule'` 配置，`capsule` 风格下 `SENT/DELIVERED` 显示空心圆、`READ` 显示空心圆+对勾，默认保持 `classic` 不破坏既有行为。
+  - `badge.story.vue` 增加 Digital Capsule Sizes / Variants 两个展示变体；`message-list.story.vue` 增加 Digital Capsule 消息状态变体（mock 会话改为单聊以展示状态图标）。
+  - 下一步：D90 `iconStyle` 主题能力实施后，将 `Badge.variant` 与消息状态 `capsule` 映射默认绑定 `themeStore.iconStyle`，并补齐 `dot`/`dot_check` 在面性风格下的使用。
+
 ## 风险与注意
 
 - **源 SVG 不能直接引用**：目录中的数字是写死 path，不能作为组件图标；落地必须是 CSS 胶囊 + 文本。

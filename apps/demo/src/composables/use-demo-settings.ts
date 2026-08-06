@@ -191,6 +191,7 @@ function createDemoSettings() {
   const chatMessageStatusShowText = ref(false)
   const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
   const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
+  const chatMessageStatusStyle = ref<'classic' | 'capsule'>('classic')
 
   /* ===== 状态横幅配置（EmStatusBanner） ===== */
   /** 是否展示 ConversationList 中的状态横幅 */
@@ -341,6 +342,7 @@ function createDemoSettings() {
     chatMessageStatusShowText,
     chatMessageStatusDirection,
     chatMessageStatusPosition,
+    chatMessageStatusStyle,
     // 状态横幅
     statusBannerEnabled,
     // 消息通知

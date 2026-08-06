@@ -5,7 +5,7 @@ import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
-import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
+import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, MessageStatusStyle, TimeDisplayStrategy } from '../types'
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
@@ -160,8 +160,8 @@ const messageStatus = computed(() => props.message.status)
 /** 消息状态展示配置 */
 const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageStatus || {})
 
-/** 默认状态图标映射 */
-const defaultStatusIconMap: Record<MessageStatusValue, string> = {
+/** 经典状态图标映射（默认） */
+const classicStatusIconMap: Record<MessageStatusValue, string> = {
   // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
   [MESSAGE_STATUS.SENDING]: 'actions/loading_arc',
   [MESSAGE_STATUS.SENT]: 'actions/check',
@@ -171,10 +171,24 @@ const defaultStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.FAILED]: 'arrows/arrow_Uturn_clockwise',
 }
 
+/** 数字胶囊状态图标映射（线性/描边版）
+ * 语义：未读=空心圆，已读=空心圆+对勾；发送中/失败保持经典图标
+ */
+const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
+  [MESSAGE_STATUS.SENDING]: 'actions/loading_arc',
+  [MESSAGE_STATUS.SENT]: 'status/circle',
+  [MESSAGE_STATUS.DELIVERED]: 'status/circle',
+  [MESSAGE_STATUS.READ]: 'status/circle_check',
+  [MESSAGE_STATUS.FAILED]: 'arrows/arrow_Uturn_clockwise',
+}
+
 /** 当前状态图标 */
 const statusIcon = computed(() => {
   const cfg = statusConfig.value.iconMap
-  return cfg?.[messageStatus.value as MessageStatusValue] ?? defaultStatusIconMap[messageStatus.value as MessageStatusValue]
+  if (cfg?.[messageStatus.value as MessageStatusValue])
+    return cfg[messageStatus.value as MessageStatusValue]!
+  const map = statusConfig.value.style === 'capsule' ? capsuleStatusIconMap : classicStatusIconMap
+  return map[messageStatus.value as MessageStatusValue]
 })
 
 /** 当前状态文本 */

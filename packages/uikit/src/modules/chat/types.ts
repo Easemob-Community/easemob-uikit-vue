@@ -24,6 +24,9 @@ export type LoadHistoryMode = 'pull-down' | 'scroll-top' | 'auto'
 /** 时间显示策略 */
 export type TimeDisplayStrategy = boolean | 'always' | 'hover'
 
+/** 消息状态展示风格 */
+export type MessageStatusStyle = 'classic' | 'capsule'
+
 /** 消息状态展示配置 */
 export interface MessageStatusConfig {
   /** 是否显示状态文本，默认 false（仅展示 icon） */
@@ -36,6 +39,12 @@ export interface MessageStatusConfig {
   direction?: 'horizontal' | 'vertical'
   /** 状态相对消息气泡的位置，默认 'below'（气泡下方）/ Position relative to the bubble */
   position?: 'below' | 'inline'
+  /**
+   * 消息状态图标风格。
+   * - classic（默认）：沿用 check / doneAll 经典双勾映射；
+   * - capsule：数字胶囊风格，未读=空心圆/实心圆点，已读=圆+对勾。
+   */
+  style?: MessageStatusStyle
 }
 
 /**

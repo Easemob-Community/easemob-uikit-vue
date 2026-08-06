@@ -48,5 +48,46 @@ import Avatar from '../avatar/avatar.vue'
         </Badge>
       </div>
     </Variant>
+    <Variant title="Digital Capsule Sizes">
+      <div class="u-flex u-gap-4">
+        <Badge :count="8" size="normal">
+          <Avatar name="N1" />
+        </Badge>
+        <Badge :count="88" size="normal">
+          <Avatar name="N2" />
+        </Badge>
+        <Badge :count="888" size="normal">
+          <Avatar name="N3" />
+        </Badge>
+        <Badge :count="8" size="small">
+          <Avatar name="S1" />
+        </Badge>
+        <Badge :count="88" size="small">
+          <Avatar name="S2" />
+        </Badge>
+        <Badge :count="888" size="small">
+          <Avatar name="S3" />
+        </Badge>
+      </div>
+    </Variant>
+    <Variant title="Digital Capsule Variants">
+      <div class="u-flex u-gap-4">
+        <Badge :count="8" variant="filled">
+          <Avatar name="F1" />
+        </Badge>
+        <Badge :count="88" variant="filled">
+          <Avatar name="F2" />
+        </Badge>
+        <Badge :count="8" variant="stroked">
+          <Avatar name="S1" />
+        </Badge>
+        <Badge :count="88" variant="stroked">
+          <Avatar name="S2" />
+        </Badge>
+        <Badge dot variant="stroked">
+          <Avatar name="SD" />
+        </Badge>
+      </div>
+    </Variant>
   </Story>
 </template>
