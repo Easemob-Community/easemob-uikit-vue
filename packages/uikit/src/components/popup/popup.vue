@@ -3,13 +3,17 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import IconButton from '../icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
+import { nextZIndex } from '../../utils/z-index'
 
 export interface PopupProps {
   show: boolean
   position?: 'center' | 'bottom' | 'top' | 'left' | 'right'
+  /** 显式指定 z-index；不传时由全局分配器自动递增 */
   zIndex?: number
   overlay?: boolean
   closeOnClickOverlay?: boolean
+  /** 按 ESC 关闭，默认 true */
+  closeOnEsc?: boolean
   showClose?: boolean
   /** 相对定位的锚点元素，传入后 popup 将相对于该元素定位 */
   anchor?: HTMLElement
@@ -32,9 +36,9 @@ export interface PopupEmits {
 
 const props = withDefaults(defineProps<PopupProps>(), {
   position: 'center',
-  zIndex: 2000,
   overlay: true,
   closeOnClickOverlay: true,
+  closeOnEsc: true,
   showClose: false,
   placement: 'bottom',
   align: 'center',
@@ -43,6 +47,19 @@ const props = withDefaults(defineProps<PopupProps>(), {
 
 const emit = defineEmits<PopupEmits>()
 const { t } = useLocale()
+
+/** 实际 z-index：显式传入优先，否则打开时从全局分配器取一个递增值 */
+const allocatedZIndex = ref<number | null>(null)
+const effectiveZIndex = computed(() => props.zIndex ?? allocatedZIndex.value ?? 2000)
+
+watch(() => props.show, (show) => {
+  if (show && props.zIndex === undefined) {
+    allocatedZIndex.value = nextZIndex()
+  }
+  if (!show) {
+    allocatedZIndex.value = null
+  }
+})
 
 const isAnchored = computed(() => !!props.anchor)
 
@@ -178,6 +195,14 @@ useEventListener(window, 'scroll', () => {
   if (props.show && isAnchored.value) updateAnchorPosition()
 }, { capture: true })
 
+// ESC 关闭（可配置）
+useEventListener(window, 'keydown', (event) => {
+  if (event.key === 'Escape' && props.show && props.closeOnEsc) {
+    emit('update:show', false)
+    emit('close')
+  }
+})
+
 onClickOutside(contentRef, (event) => {
   if (ignoreClickOutside.value) return
   // 锚定模式下点击 anchor 本身不关闭 popup
@@ -242,7 +267,7 @@ onUnmounted(() => {
         v-if="props.show"
         class="uikit-popup"
         :class="{ 'uikit-popup--pass-through': isAnchored && !props.overlay }"
-        :style="{ zIndex: props.zIndex }"
+        :style="{ zIndex: effectiveZIndex }"
       >
         <!-- 遮罩层拦截 touchmove，防止弹层打开时背景滚动穿透（内容区不拦截，保证弹层内可滚动） -->
         <div v-if="props.overlay" class="uikit-popup__overlay" @touchmove.prevent />
@@ -253,6 +278,8 @@ onUnmounted(() => {
             class="uikit-popup__content"
             :class="isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`"
             :style="isAnchored ? contentStyle : undefined"
+            role="dialog"
+            :aria-modal="props.overlay"
           >
             <IconButton
               v-if="props.showClose"

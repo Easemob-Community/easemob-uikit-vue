@@ -279,8 +279,10 @@ function onToggleVoiceText() {
   transition: opacity 0.15s;
 }
 
+@media (hover: hover) {
 .voice-message__bubble:hover {
   opacity: 0.85;
+}
 }
 
 /* 转文字结果卡片 */
@@ -342,7 +344,9 @@ function onToggleVoiceText() {
   transition: opacity 0.15s;
 }
 
+@media (hover: hover) {
 .voice-message__text-toggle:hover {
   opacity: 0.8;
+}
 }
 </style>

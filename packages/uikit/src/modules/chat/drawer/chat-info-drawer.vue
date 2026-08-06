@@ -1159,8 +1159,10 @@ defineExpose({
   border-radius: var(--uikit-components-radius);
 }
 
+@media (hover: hover) {
 .chat-info-drawer__view-all:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 .chat-info-drawer__actions {

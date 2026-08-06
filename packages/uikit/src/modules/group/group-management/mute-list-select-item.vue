@@ -5,10 +5,12 @@ import Icon from '../../../components/icon/icon.vue'
 import { useUserInfo } from '../../../composables/use-user-info'
 import type { UiGroupMember } from '../../../sdk/types'
 
-const props = defineProps<{
+export interface MuteListSelectItemProps {
   member: UiGroupMember
   selected: boolean
-}>()
+}
+
+const props = defineProps<MuteListSelectItemProps>()
 
 const emit = defineEmits<{
   (e: 'toggle'): void

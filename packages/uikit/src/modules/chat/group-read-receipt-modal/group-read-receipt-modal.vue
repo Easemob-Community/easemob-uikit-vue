@@ -179,8 +179,10 @@ function onClose() {
   position: relative;
 }
 
+@media (hover: hover) {
 .group-read-modal__tab:hover {
   color: var(--uikit-text-primary);
+}
 }
 
 .group-read-modal__tab--active {

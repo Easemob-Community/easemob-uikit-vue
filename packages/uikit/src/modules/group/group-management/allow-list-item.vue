@@ -4,9 +4,11 @@ import Avatar from '../../../components/avatar/avatar.vue'
 import { useLocale } from '../../../locale'
 import { useUserInfo } from '../../../composables/use-user-info'
 
-const props = defineProps<{
+export interface AllowListItemProps {
   item: any
-}>()
+}
+
+const props = defineProps<AllowListItemProps>()
 
 const emit = defineEmits<{
   (e: 'remove'): void
@@ -68,14 +70,18 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   cursor: pointer;
   transition: all 0.15s;
 }
+@media (hover: hover) {
 .allow-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 .allow-list__action-btn--danger {
   border-color: #fecaca;
   color: #ef4444;
 }
+@media (hover: hover) {
 .allow-list__action-btn--danger:hover {
   background-color: #fef2f2;
+}
 }
 </style>

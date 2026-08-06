@@ -449,9 +449,11 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
+@media (hover: hover) {
 .rich-input__tool-btn:hover {
   background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
+}
 }
 
 .rich-input__field-area {

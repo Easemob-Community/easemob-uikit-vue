@@ -5,9 +5,11 @@ import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useUserInfo } from '../../../composables/use-user-info'
 
-const props = defineProps<{
+export interface MuteListItemProps {
   item: any
-}>()
+}
+
+const props = defineProps<MuteListItemProps>()
 
 const emit = defineEmits<{
   (e: 'unmute'): void
@@ -72,7 +74,9 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   cursor: pointer;
   transition: all 0.15s;
 }
+@media (hover: hover) {
 .mute-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 </style>

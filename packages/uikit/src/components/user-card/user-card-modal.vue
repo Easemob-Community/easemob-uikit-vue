@@ -143,7 +143,7 @@ const displayAvatar = computed(() => avatarUrl.value || userInfo.value?.avatarUr
 const displayNameValue = computed(() => displayName.value || userInfo.value?.nickname || props.userId)
 
 function onClose() {
-  emit('update:show', false)
+  // Popup 的 close 事件已经携带了 update:show(false)，此处不再重复 emit，避免消费者收到两次
   emit('close')
 }
 

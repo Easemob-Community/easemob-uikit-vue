@@ -913,9 +913,11 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
+@media (hover: hover) {
 .message-bubble-wrapper__group-read:hover {
   color: var(--uikit-primary-color);
   border-color: var(--uikit-primary-color);
+}
 }
 
 .message-bubble-wrapper__group-read--all {
@@ -1001,8 +1003,10 @@ onBeforeUnmount(() => {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .avatar-context-menu__item:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 /* 置顶角标 */

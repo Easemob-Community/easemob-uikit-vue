@@ -396,9 +396,11 @@ watch(
   flex-shrink: 0;
 }
 
+@media (hover: hover) {
 .create-group-modal__selected-remove:hover {
   background-color: var(--uikit-danger-color, #ef4444);
   color: #fff;
+}
 }
 
 .create-group-modal__error {

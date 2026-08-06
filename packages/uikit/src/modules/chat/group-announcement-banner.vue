@@ -116,7 +116,9 @@ const hasAnnouncement = computed(() => !!announcement.value)
   transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .group-announcement-banner__toggle:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 </style>

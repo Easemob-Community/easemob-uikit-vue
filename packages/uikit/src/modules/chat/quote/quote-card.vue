@@ -78,8 +78,10 @@ function onClick() {
   box-sizing: border-box;
 }
 
+@media (hover: hover) {
 .quote-card:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .quote-card:active {

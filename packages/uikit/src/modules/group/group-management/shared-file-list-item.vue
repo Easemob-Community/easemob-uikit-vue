@@ -3,10 +3,12 @@ import { computed } from 'vue'
 import Icon from '../../../components/icon/icon.vue'
 import { useUserInfo } from '../../../composables/use-user-info'
 
-const props = defineProps<{
+export interface SharedFileListItemProps {
   file: any
   maxFileNameLength?: number
-}>()
+}
+
+const props = defineProps<SharedFileListItemProps>()
 
 const emit = defineEmits<{
   (e: 'more', file: any, event: MouseEvent): void
@@ -121,8 +123,10 @@ function onMoreClick(event: MouseEvent) {
   transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   flex-shrink: 0;
 }
+@media (hover: hover) {
 .shared-file-list__more-btn:hover {
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-primary-color);
+}
 }
 </style>

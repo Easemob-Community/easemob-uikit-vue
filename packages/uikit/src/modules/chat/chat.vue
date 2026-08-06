@@ -583,8 +583,10 @@ watch(currentConversation, async (cvs, oldCvs) => {
     historyLoaded = true
   }
 
-  // 拉取服务端置顶消息列表
-  fetchPinnedMessages()
+  // 拉取服务端置顶消息列表（失败不阻断会话进入）
+  fetchPinnedMessages().catch((err: unknown) => {
+    logger.warn('[Chat] fetchPinnedMessages failed:', formatSdkError(err))
+  })
 
   // 自动定位到首条@我的消息（如果启用）
   if (props.config?.messageList?.autoLocateAtMe !== false) {
@@ -814,11 +816,17 @@ function onUserCardSendMessage(userId: string) {
 
 /** 从群名片进入/刷新群聊 */
 function onGroupCardSendMessage(groupId: string) {
+  const group = stores.group.getGroupById(groupId)
+  if (!group) {
+    showToast(t('chat.groupCardNotJoined'), 'warning')
+    return
+  }
   const existing = stores.conversation.conversationList.find(c => c.id === groupId)
   if (!existing) {
     stores.conversation.addConversation({
       id: groupId,
-      name: groupId,
+      name: group.groupName || groupId,
+      avatar: group.avatar,
       type: CONVERSATION_TYPE.GROUPCHAT,
       unreadCount: 0,
       lastMessageText: '',
@@ -1231,8 +1239,10 @@ async function onRemoveAdmin(member: UiGroupMember) {
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .chat__error-retry:hover {
   opacity: 0.9;
+}
 }
 
 .chat__header {
@@ -1300,7 +1310,9 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__header-search:hover,
+@media (hover: hover) {
 .chat__header-more:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 </style>

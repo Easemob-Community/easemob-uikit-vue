@@ -97,6 +97,8 @@ function onSelect(option: PresenceOption) {
 
 function onConfirmCustom() {
   const text = customText.value.trim()
+  if (!text)
+    return
   selectedKey.value = null
   emit('select', 'custom', text)
 }
@@ -221,8 +223,10 @@ function onCancel() {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .presence-selector__option--compact:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .presence-selector__option--compact.is-active {
@@ -305,7 +309,9 @@ function onCancel() {
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .presence-selector__confirm:hover {
   opacity: 0.9;
+}
 }
 </style>

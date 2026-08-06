@@ -391,8 +391,10 @@ function onMentionClick(userId: string, event: MouseEvent) {
   transition: opacity 0.15s;
 }
 
+@media (hover: hover) {
 .text-message__translate-toggle:hover {
   opacity: 0.8;
+}
 }
 
 .text-message__reedit-btn {
@@ -405,8 +407,10 @@ function onMentionClick(userId: string, event: MouseEvent) {
   transition: opacity 0.15s;
 }
 
+@media (hover: hover) {
 .text-message__reedit-btn:hover {
   opacity: 0.8;
+}
 }
 
 /* @提及高亮样式 */
@@ -417,10 +421,12 @@ function onMentionClick(userId: string, event: MouseEvent) {
   transition: opacity 0.15s;
 }
 
+@media (hover: hover) {
 .text-message__mention:hover {
   opacity: 0.8;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
 }
 
 .text-message--self .text-message__mention {
@@ -438,8 +444,10 @@ function onMentionClick(userId: string, event: MouseEvent) {
   -webkit-tap-highlight-color: transparent;
 }
 
+@media (hover: hover) {
 .text-message__link:hover {
   opacity: 0.8;
+}
 }
 
 .text-message--self .text-message__link {

@@ -89,8 +89,10 @@ function onClick() {
   color: var(--uikit-bubble-text-self);
 }
 
+@media (hover: hover) {
 .location-message__bubble:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .location-message--self .location-message__bubble:hover {

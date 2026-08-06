@@ -203,8 +203,10 @@ nextTick(() => {
   transition: background-color 0.15s;
 }
 
+@media (hover: hover) {
 .message-search-panel__item:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .message-search-panel__content {

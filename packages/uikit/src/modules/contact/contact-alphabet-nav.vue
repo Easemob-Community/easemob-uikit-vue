@@ -78,9 +78,11 @@ function onTap(key: string) {
   border-radius: 4px;
 }
 
+@media (hover: hover) {
 .contact-alphabet-nav__item:hover {
   color: var(--uikit-text-primary);
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 .contact-alphabet-nav__item.is-active {
@@ -93,8 +95,10 @@ function onTap(key: string) {
   cursor: default;
 }
 
+@media (hover: hover) {
 .contact-alphabet-nav__item.is-empty:hover {
   background-color: transparent;
   color: var(--uikit-text-tertiary, #c0c4cc);
+}
 }
 </style>

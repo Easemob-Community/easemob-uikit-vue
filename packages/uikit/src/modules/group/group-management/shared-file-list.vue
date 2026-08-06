@@ -397,15 +397,19 @@ async function onDownload(file: any) {
   transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .shared-file-list__context-menu-item:hover {
   background-color: var(--uikit-bg-hover, #f3f4f6);
+}
 }
 
 .shared-file-list__context-menu-item.is-danger {
   color: var(--uikit-danger-color, #ef4444);
 }
 
+@media (hover: hover) {
 .shared-file-list__context-menu-item.is-danger:hover {
   background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+}
 }
 </style>

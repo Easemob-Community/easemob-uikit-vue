@@ -5,7 +5,7 @@ export interface UseLongPressOptions {
   delay?: number
   /** touchmove 取消阈值（px），默认 10 */
   moveThreshold?: number
-  /** 长按时是否临时禁止 body 滚动，默认 true */
+  /** 长按时是否临时禁止 body 滚动，默认 true；仅锁 body，对内部滚动容器无效，防冲突主要依赖 moveThreshold */
   preventScroll?: boolean
   /** 长按时开始回调（可用于震动反馈） */
   onStart?: () => void

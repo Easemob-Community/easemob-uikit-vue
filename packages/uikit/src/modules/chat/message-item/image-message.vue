@@ -519,8 +519,10 @@ async function handleDownload(event: MouseEvent) {
   transition: background-color 0.2s;
 }
 
+@media (hover: hover) {
 .image-message__preview-toggle:hover {
   background-color: rgba(0, 0, 0, 0.75);
+}
 }
 
 /* 预览层加载失败占位 */
@@ -556,8 +558,10 @@ async function handleDownload(event: MouseEvent) {
   z-index: 3001;
 }
 
+@media (hover: hover) {
 .image-message__download-btn:hover {
   background-color: rgba(0, 0, 0, 0.7);
+}
 }
 
 @keyframes image-loading-pulse {

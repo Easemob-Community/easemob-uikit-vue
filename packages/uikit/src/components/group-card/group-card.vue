@@ -196,8 +196,10 @@ function onActionClick(key: string) {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .group-card__action:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .group-card__action--primary {

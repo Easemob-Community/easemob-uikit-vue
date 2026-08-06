@@ -81,8 +81,10 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 }
 
 /* hover 时滑块显色（Firefox） */
+@media (hover: hover) {
 .conversation-tabs:hover {
   scrollbar-color: var(--uikit-border-color, #e5e7eb) transparent;
+}
 }
 
 /* 滚动条始终占位 4px，轨道透明（WebKit） */
@@ -120,8 +122,10 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
     color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .conversation-tabs__tab:hover {
   background-color: var(--uikit-bg-hover, #f3f4f6);
+}
 }
 
 .conversation-tabs__tab.is-active {

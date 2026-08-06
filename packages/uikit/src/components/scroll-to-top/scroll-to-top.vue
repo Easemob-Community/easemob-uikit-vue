@@ -165,9 +165,11 @@ onUnmounted(() => {
   z-index: 10;
 }
 
+@media (hover: hover) {
 .uikit-scroll-to-top:hover {
   background-color: var(--uikit-bg-secondary);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 }
 
 .uikit-scroll-to-top:active {

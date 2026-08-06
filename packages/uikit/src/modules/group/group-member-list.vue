@@ -448,7 +448,9 @@ defineExpose({ refresh, removeMember, setMemberRole })
   padding: 4px 8px;
 }
 
+@media (hover: hover) {
 .group-member-list__load-more-btn:hover {
   opacity: 0.8;
+}
 }
 </style>

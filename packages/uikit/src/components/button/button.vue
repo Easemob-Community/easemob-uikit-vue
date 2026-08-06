@@ -133,8 +133,10 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-danger-color);
 }
 
+@media (hover: hover) {
 .uikit-button--danger-outline:hover {
   background-color: rgba(var(--uikit-danger-rgb), 0.08);
+}
 }
 
 .uikit-button--default {

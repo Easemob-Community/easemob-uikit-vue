@@ -533,9 +533,11 @@ defineExpose({
   flex-shrink: 0;
 }
 
+@media (hover: hover) {
 .simple-input__tool-btn:hover {
   background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
+}
 }
 
 .simple-input__field-area {

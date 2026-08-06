@@ -315,8 +315,10 @@ function onCancel() {
   transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .multi-select-bar__cancel:hover {
   color: var(--uikit-text-primary);
+}
 }
 
 /* 关闭按钮：绝对定位靠右，不干扰中间动作组布局 */
@@ -391,8 +393,10 @@ function onCancel() {
   color: var(--uikit-text-primary);
 }
 
+@media (hover: hover) {
 .multi-select-bar__modal-btn--option:hover {
   background-color: var(--uikit-bg-tertiary);
+}
 }
 
 .multi-select-bar__modal-btn--cancel {
@@ -400,8 +404,10 @@ function onCancel() {
   color: var(--uikit-text-primary);
 }
 
+@media (hover: hover) {
 .multi-select-bar__modal-btn--cancel:hover {
   background-color: var(--uikit-bg-tertiary);
+}
 }
 
 .multi-select-bar__modal-btn--confirm {
@@ -409,7 +415,9 @@ function onCancel() {
   color: #fff;
 }
 
+@media (hover: hover) {
 .multi-select-bar__modal-btn--confirm:hover {
   filter: brightness(1.1);
+}
 }
 </style>

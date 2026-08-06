@@ -91,7 +91,11 @@ function runAfterSend(message: any) {
 
 /** 输入框模式（移动端固定渲染 H5Input，不走 simple/rich 分支） */
 const inputMode = computed(() => {
-  return inputConfig.value?.mode ?? 'simple'
+  const mode = inputConfig.value?.mode ?? 'simple'
+  if (isMobile.value && mode === 'rich') {
+    logger.warn('[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略')
+  }
+  return mode
 })
 
 /** Emoji 选择器显示状态 */
@@ -795,6 +799,7 @@ defineExpose({
 /* 表情选择器包裹层：hover 阴影效果（非 scoped，因 Popup 使用 Teleport） */
 .emoji-picker-wrapper {
   width: 320px;
+  max-width: calc(100vw - 24px);
 }
 </style>
 

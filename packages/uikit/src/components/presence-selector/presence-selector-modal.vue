@@ -69,7 +69,6 @@ function onCancel() {
     position="center"
     :close-on-click-overlay="true"
     @update:show="(v: boolean) => showModel = v"
-    @close="onCancel"
   >
     <PresenceSelector
       :value="currentExt"

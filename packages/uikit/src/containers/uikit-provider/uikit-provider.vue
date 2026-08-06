@@ -347,16 +347,30 @@ onMounted(() => {
   if (props.h5?.fontScale !== undefined && props.theme?.fontSize === undefined) {
     themeStore.setFontSizeScale(props.h5.fontScale)
   }
-  // H5 安全区开关：关闭时把 env() 变量覆写为 0，避免组件仍读取到刘海高度
-  if (props.h5?.safeArea === false) {
-    const root = document.documentElement
-    root.style.setProperty('--uikit-safe-top', '0px')
-    root.style.setProperty('--uikit-safe-right', '0px')
-    root.style.setProperty('--uikit-safe-bottom', '0px')
-    root.style.setProperty('--uikit-safe-left', '0px')
-  }
   setLocale(props.locale)
 })
+
+/** H5 安全区开关响应式：运行期切换 :h5="{ safeArea }" 时同步覆写/恢复 CSS 变量 */
+watch(
+  () => props.h5?.safeArea,
+  (safeArea) => {
+    if (typeof document === 'undefined')
+      return
+    const root = document.documentElement
+    if (safeArea === false) {
+      root.style.setProperty('--uikit-safe-top', '0px')
+      root.style.setProperty('--uikit-safe-right', '0px')
+      root.style.setProperty('--uikit-safe-bottom', '0px')
+      root.style.setProperty('--uikit-safe-left', '0px')
+    }
+    else {
+      root.style.removeProperty('--uikit-safe-top')
+      root.style.removeProperty('--uikit-safe-right')
+      root.style.removeProperty('--uikit-safe-bottom')
+      root.style.removeProperty('--uikit-safe-left')
+    }
+  },
+)
 </script>
 
 <template>

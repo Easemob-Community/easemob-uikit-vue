@@ -269,8 +269,10 @@ function avatarName(invite: UiContactInvite): string {
   transition: background-color 0.15s;
 }
 
+@media (hover: hover) {
 .contact-notice-list__item:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 .contact-notice-list__item--accepted,

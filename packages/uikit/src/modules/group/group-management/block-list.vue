@@ -268,8 +268,10 @@ defineExpose({
   cursor: pointer;
   transition: all 0.15s;
 }
+@media (hover: hover) {
 .block-list__popup-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 .block-list__popup-btn--confirm {
   border-color: var(--uikit-primary-color);

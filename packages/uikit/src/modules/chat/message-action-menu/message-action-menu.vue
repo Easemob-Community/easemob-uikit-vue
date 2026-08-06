@@ -62,16 +62,20 @@ function onItemClick(action: MessageActionItem) {
   white-space: nowrap;
 }
 
+@media (hover: hover) {
 .message-action-menu__item:hover {
   background-color: var(--uikit-bg-hover, #f3f4f6);
+}
 }
 
 .message-action-menu__item--danger {
   color: var(--uikit-danger-color, #ef4444);
 }
 
+@media (hover: hover) {
 .message-action-menu__item--danger:hover {
   background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+}
 }
 
 .message-action-menu__item--disabled {
@@ -80,7 +84,9 @@ function onItemClick(action: MessageActionItem) {
   opacity: 0.6;
 }
 
+@media (hover: hover) {
 .message-action-menu__item--disabled:hover {
   background-color: transparent;
+}
 }
 </style>

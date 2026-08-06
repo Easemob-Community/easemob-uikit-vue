@@ -72,6 +72,7 @@ const messages: LocaleMessages = {
   'chat.empty': '请选择会话',
   'chat.placeholder': '请输入消息...',
   'chat.send': '发送',
+  'chat.groupCardNotJoined': '您尚未加入该群组，无法发送消息',
   'chat.input.mutedAll': '全员禁言中',
   'conversation.title': '会话列表',
   'conversation.pin': '置顶',

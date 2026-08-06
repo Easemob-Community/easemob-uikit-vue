@@ -95,7 +95,9 @@ async function copyText() {
 }
 
 .copyable-text:hover .copyable-text__btn,
+@media (hover: hover) {
 .copyable-text__btn:hover {
   opacity: 1;
+}
 }
 </style>

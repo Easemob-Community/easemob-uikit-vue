@@ -5,9 +5,11 @@ import Cell from '../../../components/cell/cell.vue'
 import { useLocale } from '../../../locale'
 import { useUserInfo } from '../../../composables/use-user-info'
 
-const props = defineProps<{
+export interface BlockListItemProps {
   item: any
-}>()
+}
+
+const props = defineProps<BlockListItemProps>()
 
 const emit = defineEmits<{
   (e: 'unblock'): void
@@ -55,7 +57,9 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   cursor: pointer;
   transition: all 0.15s;
 }
+@media (hover: hover) {
 .block-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 </style>

@@ -131,6 +131,10 @@ defineExpose({
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
   font-size: var(--uikit-font-size-14);
+  /* 移动端 iOS 对 <16px 输入框 focus 自动缩放，放大到 16px 规避 */
+  @media (hover: none), (max-width: 767px) {
+    font-size: var(--uikit-font-size-16);
+  }
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);

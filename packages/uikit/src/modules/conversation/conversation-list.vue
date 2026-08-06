@@ -610,8 +610,10 @@ function handleCustomAction(key: string, conversation: Conversation) {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .conversation-list__menu-trigger:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 /* PC Header 菜单 —— 与 conversation-item 右键菜单风格统一。
@@ -636,8 +638,10 @@ function handleCustomAction(key: string, conversation: Conversation) {
   gap: 8px;
 }
 
+@media (hover: hover) {
 .context-menu__item:hover {
   background-color: var(--uikit-bg-hover, #f3f4f6);
+}
 }
 
 .conversation-list__search {

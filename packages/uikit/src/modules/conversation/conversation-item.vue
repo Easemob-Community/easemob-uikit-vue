@@ -519,15 +519,19 @@ const displayMessage = computed(() => {
   gap: 8px;
 }
 
+@media (hover: hover) {
 .context-menu__item:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .context-menu__item.is-danger {
   color: var(--uikit-danger-color);
 }
 
+@media (hover: hover) {
 .context-menu__item.is-danger:hover {
   background-color: rgba(var(--uikit-danger-rgb), 0.08);
+}
 }
 </style>

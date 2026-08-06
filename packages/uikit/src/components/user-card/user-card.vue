@@ -315,8 +315,10 @@ function onSelectorChanged() {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .user-card__action:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .user-card__action--primary {

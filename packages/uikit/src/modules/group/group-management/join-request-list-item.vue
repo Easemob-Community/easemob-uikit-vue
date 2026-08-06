@@ -4,9 +4,11 @@ import Avatar from '../../../components/avatar/avatar.vue'
 import { useLocale } from '../../../locale'
 import { useUserInfo } from '../../../composables/use-user-info'
 
-const props = defineProps<{
+export interface JoinRequestListItemProps {
   item: any
-}>()
+}
+
+const props = defineProps<JoinRequestListItemProps>()
 
 const emit = defineEmits<{
   (e: 'accept'): void
@@ -115,21 +117,27 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
   cursor: pointer;
   transition: all 0.15s;
 }
+@media (hover: hover) {
 .join-request-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 .join-request-list__action-btn--accept {
   border-color: #bbf7d0;
   color: #16a34a;
 }
+@media (hover: hover) {
 .join-request-list__action-btn--accept:hover {
   background-color: #f0fdf4;
+}
 }
 .join-request-list__action-btn--reject {
   border-color: #fecaca;
   color: #ef4444;
 }
+@media (hover: hover) {
 .join-request-list__action-btn--reject:hover {
   background-color: #fef2f2;
+}
 }
 </style>

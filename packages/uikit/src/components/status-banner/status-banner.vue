@@ -138,8 +138,10 @@ function handleClick(event: MouseEvent) {
   cursor: pointer;
 }
 
+@media (hover: hover) {
 .uikit-status-banner--clickable:hover {
   filter: brightness(0.97);
+}
 }
 
 .uikit-status-banner__icon {
@@ -203,9 +205,11 @@ function handleClick(event: MouseEvent) {
               background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .uikit-status-banner__close:hover {
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.06);
+}
 }
 
 /* 入场/出场动画 */

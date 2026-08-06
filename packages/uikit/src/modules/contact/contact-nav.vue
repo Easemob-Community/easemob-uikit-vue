@@ -88,8 +88,10 @@ function onEntryClick(entry: ContactNavEntry) {
   user-select: none;
 }
 
+@media (hover: hover) {
 .contact-nav__item:hover {
   background-color: var(--uikit-bg-hover);
+}
 }
 
 .contact-nav__item:active {

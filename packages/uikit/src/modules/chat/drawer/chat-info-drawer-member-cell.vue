@@ -5,9 +5,11 @@ import { useUserInfo } from '../../../composables/use-user-info'
 import { GROUP_MEMBER_ROLE } from '../../../constants'
 import type { UiGroupMember } from '../../../sdk/types'
 
-const props = defineProps<{
+export interface ChatInfoDrawerMemberCellProps {
   member: UiGroupMember
-}>()
+}
+
+const props = defineProps<ChatInfoDrawerMemberCellProps>()
 
 const { t } = useLocale()
 

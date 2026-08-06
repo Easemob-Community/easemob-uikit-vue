@@ -82,8 +82,10 @@ const mergedCountText = computed(() => {
   transition: box-shadow var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .uikit-notification:hover {
   box-shadow: var(--uikit-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+}
 }
 
 .uikit-notification__avatar {
@@ -151,8 +153,10 @@ const mergedCountText = computed(() => {
   transition-timing-function: var(--uikit-anim-easing, ease);
 }
 
+@media (hover: hover) {
 .uikit-notification__close:hover {
   background-color: var(--uikit-bg-hover, #e5e7eb);
   color: var(--uikit-text-primary, #111827);
+}
 }
 </style>

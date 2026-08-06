@@ -8,10 +8,13 @@ export interface EmojiPickerProps {
   show: boolean
   /** 表情包（sticker pack）列表，默认 [] 不展示表情包 tab / Sticker packs to show as extra tabs */
   stickerPacks?: EmojiStickerPack[]
+  /** 选择 emoji / sticker 后自动关闭，默认 false */
+  closeOnSelect?: boolean
 }
 
 const props = withDefaults(defineProps<EmojiPickerProps>(), {
   stickerPacks: () => [],
+  closeOnSelect: false,
 })
 
 const emit = defineEmits<{
@@ -51,10 +54,14 @@ const activeStickerPack = computed(() =>
 
 function onSelect(emoji: string) {
   emit('select', emoji)
+  if (props.closeOnSelect)
+    onClose()
 }
 
 function onSelectSticker(sticker: EmojiStickerItem, packId: string) {
   emit('select-sticker', sticker, packId)
+  if (props.closeOnSelect)
+    onClose()
 }
 
 function onClose() {
@@ -127,6 +134,7 @@ function onClose() {
 <style scoped>
 .emoji-picker {
   width: 320px;
+  max-width: calc(100vw - 24px);
 }
 
 .emoji-picker__header {
@@ -154,8 +162,10 @@ function onClose() {
   align-items: center;
 }
 
+@media (hover: hover) {
 .emoji-picker__tab:hover {
   color: var(--uikit-text-primary);
+}
 }
 
 .emoji-picker__tab--active {
@@ -198,8 +208,10 @@ function onClose() {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+@media (hover: hover) {
 .emoji-picker__item:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 .emoji-picker__item--sticker {

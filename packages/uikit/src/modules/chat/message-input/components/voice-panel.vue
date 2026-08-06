@@ -296,7 +296,9 @@ onBeforeUnmount(() => {
   margin: 0 2px;
 }
 
+@media (hover: hover) {
 .voice-panel__link:hover {
   text-decoration: underline;
+}
 }
 </style>

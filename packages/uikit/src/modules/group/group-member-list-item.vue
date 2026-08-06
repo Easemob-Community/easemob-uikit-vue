@@ -432,8 +432,10 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
   transition: all 0.15s;
 }
 
+@media (hover: hover) {
 .group-member-list__action-btn:hover {
   background-color: var(--uikit-bg-secondary);
+}
 }
 
 .group-member-list__action-btn--danger {
@@ -441,8 +443,10 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
   color: #ef4444;
 }
 
+@media (hover: hover) {
 .group-member-list__action-btn--danger:hover {
   background-color: #fef2f2;
+}
 }
 
 .group-member-list__action-btn--icon {

@@ -956,8 +956,10 @@ watch(locateRequest, (req) => {
   z-index: 10;
 }
 
+@media (hover: hover) {
 .message-list__new-tip:hover {
   transform: translateX(-50%) translateY(-2px);
+}
 }
 
 .message-list__new-tip-arrow {
