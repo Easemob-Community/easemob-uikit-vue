@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useThemeStore } from '../store/theme'
-import type { AnimationConfig, AnimationLevel, FontSizePreset, HoverStyle, ThemeMode } from '../store/theme'
+import type { AnimationConfig, AnimationLevel, Density, FontSizePreset, HoverStyle, ThemeMode } from '../store/theme'
 
 export function useTheme() {
   const themeStore = useThemeStore()
@@ -75,6 +75,13 @@ export function useTheme() {
     themeStore.setFontSize(preset)
   }
 
+  // ===== 密度配置 =====
+  const density = computed(() => themeStore.density)
+
+  function setDensity(value: Density) {
+    themeStore.setDensity(value)
+  }
+
   // ===== 高频语义 token =====
   const bubbleBgOther = computed(() => themeStore.bubbleBgOther)
   const bubbleBgSelf = computed(() => themeStore.bubbleBgSelf)
@@ -104,6 +111,7 @@ export function useTheme() {
     containerGap: computed(() => themeStore.containerGap),
     hoverStyle: computed(() => themeStore.hoverStyle),
     fontSizeScale,
+    density,
     bubbleBgOther,
     bubbleBgSelf,
     chatBg,
@@ -117,6 +125,7 @@ export function useTheme() {
     setHoverStyle,
     setFontSizeScale,
     setFontSize,
+    setDensity,
     setBubbleBg,
     setChatBg,
     setInputBg,

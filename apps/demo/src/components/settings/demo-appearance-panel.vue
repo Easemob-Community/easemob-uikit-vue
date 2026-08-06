@@ -13,10 +13,10 @@ import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 
 const {
-  mode, primaryColor, hoverStyle, containerGap, fontSizeScale,
+  mode, primaryColor, hoverStyle, containerGap, fontSizeScale, density,
   bubbleBgOther, bubbleBgSelf, chatBg, inputBg,
   animationEnabled, animationLevel, animationRipple,
-  setMode, setPrimaryColor, setHoverStyle, setContainerGap, setFontSize,
+  setMode, setPrimaryColor, setHoverStyle, setContainerGap, setFontSize, setDensity,
   setAnimationEnabled, setAnimationLevel, setAnimationRipple,
   setBubbleBg, setChatBg, setInputBg,
 } = useTheme()
@@ -196,6 +196,33 @@ function updatePrimaryColor(e: Event) {
           @click="setFontSize('xlarge')"
         >
           特大
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <label class="demo-settings__label">密度</label>
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': density === 'compact' }"
+          @click="setDensity('compact')"
+        >
+          紧凑
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': density === 'normal' }"
+          @click="setDensity('normal')"
+        >
+          标准
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': density === 'comfortable' }"
+          @click="setDensity('comfortable')"
+        >
+          宽松
         </button>
       </div>
     </div>

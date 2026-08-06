@@ -57,6 +57,13 @@
   /* 容器间距与组件圆角 */
   --uikit-container-gap: 8px;
   --uikit-cell-gap: 3px;
+  /* 密度档变量（默认 normal）：Cell 高度、内边距、列表间距、Header 内边距 */
+  --uikit-cell-height: 64px;
+  --uikit-cell-height-compact: 48px;
+  --uikit-cell-height-large: 72px;
+  --uikit-cell-padding-y: 12px;
+  --uikit-list-gap: 8px;
+  --uikit-header-padding-y: 12px;
   --uikit-components-radius: 8px;
   --uikit-components-radius-hover: 14px;
 
@@ -205,6 +212,37 @@
   /* 阴影系统 - 暗色（提高不透明度避免深色背景看不出阴影） */
   --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.40), 0 12px 32px rgba(0, 0, 0, 0.45);
   --uikit-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.50), 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+/* ===== 密度档变量覆盖 ===== */
+[data-uikit-density="compact"] {
+  --uikit-cell-height: 52px;
+  --uikit-cell-height-compact: 40px;
+  --uikit-cell-height-large: 64px;
+  --uikit-cell-padding-y: 8px;
+  --uikit-cell-gap: 2px;
+  --uikit-list-gap: 4px;
+  --uikit-header-padding-y: 8px;
+}
+
+[data-uikit-density="normal"] {
+  --uikit-cell-height: 64px;
+  --uikit-cell-height-compact: 48px;
+  --uikit-cell-height-large: 72px;
+  --uikit-cell-padding-y: 12px;
+  --uikit-cell-gap: 3px;
+  --uikit-list-gap: 8px;
+  --uikit-header-padding-y: 12px;
+}
+
+[data-uikit-density="comfortable"] {
+  --uikit-cell-height: 76px;
+  --uikit-cell-height-compact: 60px;
+  --uikit-cell-height-large: 88px;
+  --uikit-cell-padding-y: 16px;
+  --uikit-cell-gap: 6px;
+  --uikit-list-gap: 12px;
+  --uikit-header-padding-y: 16px;
 }
 
 /* ===== 全局滚动条美化 ===== */

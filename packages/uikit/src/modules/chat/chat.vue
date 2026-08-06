@@ -1235,7 +1235,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
 .chat__header {
   position: relative;
   z-index: 101;
-  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
+  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px var(--uikit-header-padding-y, 12px);
   display: flex;
   align-items: center;
   min-height: 48px;

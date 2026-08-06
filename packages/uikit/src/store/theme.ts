@@ -14,6 +14,9 @@ export type ThemeMode = 'light' | 'dark' | 'auto'
 /** 字号档位 */
 export type FontSizePreset = 'normal' | 'large' | 'xlarge'
 
+/** 密度档位 */
+export type Density = 'compact' | 'normal' | 'comfortable'
+
 /** 动画配置 */
 export interface AnimationConfig {
   /** 全局动画开关，默认 true */
@@ -40,6 +43,8 @@ interface ThemeStorageState {
   animationLevel: AnimationLevel
   animationRipple: boolean
   fontSizeScale: number
+  /** 密度档位 */
+  density: Density
   /** 对方气泡背景色 */
   bubbleBgOther?: string
   /** 自己气泡背景色 */
@@ -62,6 +67,7 @@ const defaultState: ThemeStorageState = {
   animationLevel: 'normal',
   animationRipple: true,
   fontSizeScale: 1,
+  density: 'normal',
   bubbleBgOther: undefined,
   bubbleBgSelf: undefined,
   chatBg: undefined,
@@ -155,6 +161,11 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.fontSizeScale ?? 1,
     set: (v: number) => { storage.value.fontSizeScale = v },
   })
+  const density = computed({
+    // 兼容旧 localStorage：旧缓存中可能无 density 字段，回落到 normal
+    get: () => storage.value.density ?? 'normal',
+    set: (v: Density) => { storage.value.density = v },
+  })
   const bubbleBgOther = computed({
     get: () => storage.value.bubbleBgOther,
     set: (v: string | undefined) => { storage.value.bubbleBgOther = v },
@@ -202,6 +213,11 @@ export const useThemeStore = defineStore('theme', () => {
       '--uikit-font-scale',
       String(Math.max(0.5, scale))
     )
+  })
+
+  // 密度档：通过 data-uikit-density 驱动 CSS 变量覆盖
+  watchEffect(() => {
+    document.documentElement.setAttribute('data-uikit-density', density.value)
   })
 
   // 高频语义 token：气泡色、聊天背景、输入区背景
@@ -324,6 +340,10 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
+  function setDensity(value: Density) {
+    density.value = value
+  }
+
   function setBubbleBg(other?: string | null, self?: string | null) {
     if (other !== undefined) bubbleBgOther.value = other ?? undefined
     if (self !== undefined) bubbleBgSelf.value = self ?? undefined
@@ -359,6 +379,7 @@ export const useThemeStore = defineStore('theme', () => {
     animationLevel,
     animationRipple,
     fontSizeScale,
+    density,
     bubbleBgOther,
     bubbleBgSelf,
     chatBg,
@@ -375,6 +396,7 @@ export const useThemeStore = defineStore('theme', () => {
     setAnimationRipple,
     setFontSizeScale,
     setFontSize,
+    setDensity,
     setBubbleBg,
     setChatBg,
     setInputBg,

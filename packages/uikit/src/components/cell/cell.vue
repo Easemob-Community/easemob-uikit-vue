@@ -140,7 +140,7 @@ function onContextmenu(e: MouseEvent) {
 /* autoHeight 模式：padding 驱动，不固定高度 */
 .uikit-cell.is-auto-height {
   height: auto;
-  padding: 12px var(--uikit-item-hover-padding-x, 16px);
+  padding: var(--uikit-cell-padding-y, 12px) var(--uikit-item-hover-padding-x, 16px);
 }
 
 /* 尺寸变体 */

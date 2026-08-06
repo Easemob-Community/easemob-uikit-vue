@@ -1,7 +1,7 @@
 # 主题配置能力审查（字号 / 适老版 / 密度 / 定制灵活性）
 
-> 审查日期：2026-08-05。文中行号为当日代码快照，可能随改动漂移，以文件+特征定位为准。
-> 状态：**Phase 1（D3/D4/D12 token 漂移债）已实施，字号/语义 token/Provider 扩展待后续**。关联 TECH-DEBT：D3 / D4（已完成） / D12（部分完成）。
+> 审查日期：2026-08-05；2026-08-06 更新密度能力。文中行号为当日代码快照，可能随改动漂移，以文件+特征定位为准。
+> 状态：**Phase 1（D3/D4/D12 token 漂移债 worst offenders）已实施；Phase 2 字号体系、Phase 2.5 低频字号、Phase 3 高频语义 token 已完成；Phase 4 Provider 密度能力已完成**。关联 TECH-DEBT：D3（剩余非高频散落 hex） / D4（已完成） / D12（剩余非高频 transition） / D86（字号/密度/语义 token 已完成）。
 
 ## 结论先行
 
@@ -14,6 +14,7 @@
 | 模式 | light / dark / auto（auto 经 `usePreferredColorScheme` 跟随系统），localStorage 持久化 | `store/theme.ts:88-96`、`useTheme()` |
 | 主色 | hue 数字（0-360），运行时重算 `--uikit-primary-color` 系列 | `setPrimaryColor` |
 | 形状 | 头像 / 气泡 / 组件圆角切换、`hoverStyle`、`containerGap` | themeStore 各 setter |
+| 密度 | compact / normal / comfortable 三档；驱动 Cell 高度、列表项内边距、Header 内边距、列表间距 | `store/theme.ts` `setDensity` / `uikit-provider.vue` `theme.density` |
 | 动效 | 开关 + subtle/normal/expressive 分级 + ripple；`prefers-reduced-motion` 兜底 | `:animation` prop / store |
 | H5 | 安全区 / 键盘 / 下拉刷新 | `:h5` prop |
 | 底层 | `theme/index.css`（约 385 行）变量契约 + `[data-uikit-theme]`/`[data-uikit-anim-*]` 属性覆盖 | — |
@@ -26,10 +27,13 @@
 - `--uikit-font-scale` 是**纯预留**：`theme/index.css:112` 定义、`use-h5-adaptation.ts:113-120` 把 `h5.fontScale` 写进变量，但**没有任何组件消费它**（`use-h5-adaptation.ts:12` 注释自认"暂不生效，P2 预留"）。
 - 含义：做字号调节/适老版，需先建字号 token 体系（如 `--uikit-font-size-xs/sm/base/lg/xl` + 消息正文独立 token），再改造 357 处硬编码——工程量最大、也最基础。
 
-### 2. 无全局密度（density）概念
+### 2. 全局密度（density）已接入基础链路 ✅
 
-- 只有局部 size prop：`Cell` 的 compact/normal/large（`components/cell/cell.vue:15`，且 `--uikit-cell-height-*` 未进 `theme/index.css`）、ContactItem/GroupItem 的 size。
-- padding 走 token 的全库仅 13 处，其余硬编码。做全局 compact/comfortable 档意味着间距也要 token 化。
+- `theme/index.css` 新增 `--uikit-cell-height` / `--uikit-cell-height-compact` / `--uikit-cell-height-large` / `--uikit-cell-padding-y` / `--uikit-list-gap` / `--uikit-header-padding-y`，并通过 `[data-uikit-density="compact"|"normal"|"comfortable"]` 覆盖。
+- `store/theme.ts` / `use-theme.ts` 新增 `density` 与 `setDensity`；`uikit-provider.vue` `theme` prop 支持 `density` 并响应式应用。
+- `Cell` 默认高度 / 紧凑高度 / 大尺寸高度、`auto-height` 垂直内边距已改用上述变量；`chat.vue` 头部内边距也已接入 `--uikit-header-padding-y`。
+- 局部 `size` prop（`Cell` / `ContactItem` / `GroupItem`）仍优先于全局密度，保留业务显式覆盖能力。
+- 剩余可扩展：更多组件（如输入区、消息气泡间距、抽屉内边距）可继续跟随密度变量，但高频列表项已覆盖。
 
 ### 3. 高频业务定制点已有独立 token ✅
 
@@ -56,5 +60,5 @@
 1. ✅ **先清 D3 / D4 / D12（2026-08-05 已完成 worst offenders）**——`theme/index.css` 补 `--uikit-shadow-sm`、`store/theme.ts` 同步 `--uikit-primary-hover`；worst offenders 的裸 hex、不一致 fallback、硬编码 transition 已替换。
 2. ✅ **建字号 token 体系并激活 `--uikit-font-scale`（2026-08-06 完成）**——`theme/index.css` 新增 `--uikit-font-size-8~22` token；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`/`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；demo 外观面板加档位切换；高频组件（45 文件 144 处）与低频文件（57 文件 207 处）字号均已 token 化，仅剩 4 处 story 装饰性 emoji 尺寸保持 px。
 3. ✅ **补高频语义 token（2026-08-06 完成）**——`theme/index.css` 新增 `--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self`、`--uikit-chat-bg`、`--uikit-input-bg`；`store/theme.ts` / `use-theme.ts` 新增 `bubbleBgOther`/`bubbleBgSelf`/`chatBg`/`inputBg` 与 setter；`uikit-provider.vue` 支持 `theme.bubbleColor`（self/other）、`theme.chatBg`、`theme.inputBg`；消息组件（text/file/voice/video/image/location/combine/custom）与聊天容器、输入区、时间分隔线全部接入语义 token。`--uikit-chat-bg` 使用 `background` 简写，默认支持颜色/渐变/`url(...)` 图片背景。
-4. **扩 Provider `theme` prop**：density 等。
-5. **密度档最后做**（依赖间距 token 化，工程量最大、优先级相对低）。
+4. ✅ **扩 Provider `theme` prop：density（2026-08-06 完成）**——新增 `Density = 'compact' | 'normal' | 'comfortable'`；`theme/index.css` 通过 `[data-uikit-density]` 覆盖 Cell/Header/列表间距变量；`Cell` 与 `chat.vue` 头部已接入；demo 外观面板提供三档切换。
+5. **后续可选项**：把密度变量扩展到输入区、消息气泡间距、抽屉内边距、按钮高度等更多组件；继续清 D3/D12 剩余非高频硬编码。

@@ -14,7 +14,7 @@ import { useThemeStore } from '../../store/theme'
 import { useToast } from '../../composables/use-toast'
 import { EmToast } from '../../components'
 import type { ClientConfig } from '../../sdk/client'
-import type { AnimationConfig, FontSizePreset } from '../../store/theme'
+import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
 
 /** 字号配置：支持档位或具体 scale */
@@ -34,6 +34,8 @@ export interface ProviderProps {
     shape?: 'ground' | 'square'
     /** 字号：'normal' | 'large' | 'xlarge' 或具体缩放倍数 */
     fontSize?: ThemeFontSize
+    /** 密度：compact 紧凑 / normal 标准 / comfortable 宽松 */
+    density?: Density
     /** 气泡颜色：传字符串时同时设置自己/对方；传对象可分别设置 */
     bubbleColor?: string | { self?: string; other?: string }
     /** 聊天背景：支持颜色 / 渐变 / url(...) 图片 */
@@ -234,6 +236,9 @@ function applyThemeConfig(theme?: ProviderProps['theme']) {
   const scale = resolveFontSize(theme.fontSize)
   if (scale !== undefined) {
     themeStore.setFontSizeScale(scale)
+  }
+  if (theme.density) {
+    themeStore.setDensity(theme.density)
   }
   if (theme.bubbleColor !== undefined) {
     if (typeof theme.bubbleColor === 'string') {
