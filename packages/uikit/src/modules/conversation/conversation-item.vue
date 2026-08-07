@@ -66,6 +66,15 @@ const peerUserId = computed(() => {
   return props.conversation.id
 })
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
+
+/** 群聊最后一条消息发送者 userId，用于资料异步就绪后重新解析昵称 */
+const lastMessageSenderUserId = computed(() => {
+  if (!isSingleChat.value)
+    return props.conversation.lastMessageFrom
+  return undefined
+})
+const { displayName: lastMessageSenderDisplayName } = useUserInfo(lastMessageSenderUserId)
+
 const { get: getPresence } = usePresence()
 
 const peerPresence = computed<PresenceDisplayStatus | undefined>(() => {
@@ -275,13 +284,27 @@ const displayMessage = computed(() => {
   if (false) {
     return t('message.combine', '[聊天记录]')
   }
-  if (props.messageFormatter) {
-    return props.messageFormatter(
-      props.conversation.lastMessageText || '',
-      MESSAGE_TYPE.TEXT,
-    )
+
+  let text = props.conversation.lastMessageText || ''
+
+  // 群聊会话列表：若当前摘要前缀是 userId 且资料已异步就绪，
+  // 将前缀替换为备注/昵称，避免“点击会话后才显示昵称”的观感。
+  if (
+    !isSingleChat.value
+    && props.conversation.lastMessageFrom
+    && lastMessageSenderDisplayName.value
+    && lastMessageSenderDisplayName.value !== props.conversation.lastMessageFrom
+  ) {
+    const prefix = `${props.conversation.lastMessageFrom}: `
+    if (text.startsWith(prefix)) {
+      text = `${lastMessageSenderDisplayName.value}: ${text.slice(prefix.length)}`
+    }
   }
-  return props.conversation.lastMessageText || ''
+
+  if (props.messageFormatter) {
+    return props.messageFormatter(text, MESSAGE_TYPE.TEXT)
+  }
+  return text
 })
 </script>
 

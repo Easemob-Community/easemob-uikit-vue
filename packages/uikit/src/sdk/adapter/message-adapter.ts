@@ -33,6 +33,24 @@ export function normalizeUserId(id: string): string {
 }
 
 /**
+ * 从 custom 消息 body 中提取 event 字段。
+ * SDK 不同链路对 custom body 的序列化略有差异：
+ * - 正常消息体：body.event
+ * - 部分会话摘要/unknown 降级：body.params.event
+ */
+function extractCustomEvent(body: Record<string, unknown>): string {
+  if (body.event && typeof body.event === 'string')
+    return body.event
+  const params = body.params
+  if (params && typeof params === 'object') {
+    const event = (params as Record<string, unknown>).event
+    if (typeof event === 'string')
+      return event
+  }
+  return ''
+}
+
+/**
  * 将 SDK Message 转换为 UIKit Message。
  * - 保留 SDK Message 全部字段作为真相源
  * - 仅添加 UI 层需要的计算/状态字段
@@ -122,19 +140,26 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
       return (body.filename as string) || '[文件]'
     case MESSAGE_TYPE.LOCATION:
       return '[位置]'
-    case MESSAGE_TYPE.CUSTOM:
+    case MESSAGE_TYPE.CUSTOM: {
       // 自定义消息按 event 查共享映射（与消息驱动摘要一致，如名片 userCard → [名片]）
-      return customEventPreviewMap[(body.event as string) || ''] || '[自定义]'
+      const event = extractCustomEvent(body)
+      return customEventPreviewMap[event] || '[自定义]'
+    }
     case MESSAGE_TYPE.CMD:
       return '[命令]'
     case MESSAGE_TYPE.COMBINE:
       return (body.summary as string) || '[聊天记录]'
-    default:
+    default: {
       // SDK 链路异常时 snippet.type 可能落为 'unknown' 等未知值
       // （如 toConversationSummary 从被 stripBodyType 清空的 body.type 读类型）。
       // 此时仍应展示 body 中的可用文本，避免旧端合并消息
-      // （content 为“版本过低”）等场景预览空白
+      // （content 为“版本过低”）等场景预览空白。
+      // 优先识别自定义 event，避免 userCard 等自定义消息在会话列表空白。
+      const event = extractCustomEvent(body)
+      if (event)
+        return customEventPreviewMap[event] || '[自定义]'
       return (body.content as string) || (body.summary as string) || (body.msg as string) || ''
+    }
   }
 }
 

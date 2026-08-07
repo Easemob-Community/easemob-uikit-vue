@@ -756,6 +756,21 @@
 - **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
+### [x] D93. 会话列表自定义消息（userCard）刷新后空白，群聊摘要发送者名点击后才出现
+
+- **现象**：刷新页面后拉取会话列表，自定义消息（如名片 userCard）的最新一条消息在会话列表空白展示；点击会话加载历史消息后才会显示 `[名片]`。群聊场景下，最新一条消息的发送者名（前缀）也是点击会话后才出现/才变为昵称。
+- **根因**：
+  1. `sdk/adapter/message-adapter.ts` 的 `extractSnippetText` 仅在 `snippet.type === 'custom'` 时识别 `body.event`；SDK 在部分链路把自定义消息摘要归一为 `unknown` 类型，导致默认分支未命中 preview map，返回空串。
+  2. `sdk/adapter/conversation-adapter.ts` 构造群聊摘要时仅使用 SDK `lastMessage.sender.nickname || from`，未利用 UIKit 已缓存的联系人备注 / 用户资料昵称；且未归一化多设备后缀 `userId/deviceId`，导致 resolver 无法命中、前缀显示为原始 `from`。
+  3. 资料异步加载场景下，会话列表项不会随资料就绪自动刷新前缀，只有进入聊天页后 `chat.vue` 的 `lastMessageSummary` 才会重写摘要。
+- **修复（2026-08-07）**：
+  1. `extractSnippetText` 在 `custom` 分支与 `default/unknown` 分支均通过 `extractCustomEvent()` 识别 `body.event` / `body.params.event`，兜底 `[自定义]`，避免空白。
+  2. `conversation-adapter.ts` 新增 `ToUiConversationOptions.resolveSenderName`，构造时优先用 UIKit 资料解析发送者名；`from` / `sender.userId` 统一 `normalizeUserId` 去掉多设备后缀；`UiConversation` 新增可选 `lastMessageFrom` 字段。
+  3. `ConversationDomain` / `use-uikit.ts` / `chat-events.ts` 传入基于 `contact` / `userInfo` store 的 `resolveSenderName`。
+  4. `modules/conversation/conversation-item.vue` 群聊场景下用 `useUserInfo(props.conversation.lastMessageFrom)` 监听资料变化，实时把 `userId: ` 前缀替换为备注/昵称。
+- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
+- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+
 ---
 
 ## 已修复（归档）

@@ -10,6 +10,7 @@ import { notifyOnNewMessage } from '../notification-engine'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
 import { markReadReceiptSent } from '../domain/message-domain'
+import { resolveUserDisplayName } from '../../utils/resolve-last-message-text'
 import type { RootStores } from './types'
 
 const chatLog = createLogger('UIKit:ChatEvents')
@@ -183,6 +184,9 @@ function mergeWithExistingConversations(stores: RootStores, incoming: ReturnType
  * 注册到 client.chatManager.addEventHandler。
  */
 export function createChatHandlers(client: ManagerHost, stores: RootStores): ChatEventHandlerMap {
+  // 群聊会话摘要发送者显示名解析：优先联系人备注，其次用户资料昵称
+  const resolveSenderName = (userId: string) => resolveUserDisplayName(stores, userId)
+
   return {
     onSyncDataStart: (payload) => {
       chatLog.info('onSyncDataStart', { dataType: payload.dataType })
@@ -200,7 +204,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
           {
             const rawItems = client.chatManager.getConversationList()
             chatLog.info('getConversationList raw (onSyncDataFinished)', rawItems)
-            const incoming = toUiConversations(rawItems)
+            const incoming = toUiConversations(rawItems, { resolveSenderName })
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
           }
@@ -244,7 +248,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       }
       // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
-      const incoming = toUiConversations(payload.items)
+      const incoming = toUiConversations(payload.items, { resolveSenderName })
       const merged = mergeWithExistingConversations(stores, incoming)
 
       if (payload.patch.reset || payload.patch.removed.length > 0) {

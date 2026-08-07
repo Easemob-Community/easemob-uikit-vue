@@ -96,6 +96,8 @@ export interface UiConversation {
   unreadCount: number
   /** 最后一条消息摘要文本 */
   lastMessageText: string
+  /** 最后一条消息发送者 userId（群聊场景用于异步资料就绪后重新解析昵称） */
+  lastMessageFrom?: string
   /** 最后一条消息时间戳 */
   lastMessageTime?: number
   /** 是否置顶 */

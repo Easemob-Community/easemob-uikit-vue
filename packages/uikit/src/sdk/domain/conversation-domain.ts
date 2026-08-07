@@ -65,6 +65,11 @@ export class ConversationDomain {
        * 点击会话进入后统一补发（群聊使发送方气泡及时显示已读数）。
        */
       sendPendingReadReceipts?: (conversationId: string, conversationType: ConversationTypeValue) => void
+      /**
+       * 群聊会话摘要发送者显示名解析器。
+       * 优先于 SDK lastMessage.sender.nickname，用于资料已缓存时直接展示昵称。
+       */
+      resolveSenderName?: (userId: string) => string | undefined
     } = {},
   ) {}
 
@@ -87,7 +92,7 @@ export class ConversationDomain {
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (syncLocal)', items)
     dumpRawSnippets(items, 'syncLocal')
-    const list = toUiConversations(items)
+    const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })
     this.store.setList(list)
     return list
   }
@@ -229,7 +234,7 @@ export class ConversationDomain {
   async loadMore(_pageSize?: number) {
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (loadMore)', items)
-    const list = toUiConversations(items)
+    const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })
     this.store.setList(list)
   }
 }

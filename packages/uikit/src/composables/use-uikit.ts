@@ -21,6 +21,7 @@ import { useThemeStore } from '../store/theme'
 import { useUserInfoStore } from '../store/user-info'
 import type { RootStores } from '../sdk/event/types'
 import type { UIKitDataSource, UIKitFeatures } from './types'
+import { resolveUserDisplayName } from '../utils/resolve-last-message-text'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
@@ -194,6 +195,8 @@ export function useUIKitProvider(
     conversation: new ConversationDomain(host, stores.conversation, {
       // 进入会话时批量补发未回执的接收消息（登录离线消息场景）
       sendPendingReadReceipts: (id, type) => void domains.message.sendPendingReadReceipts(id, type),
+      // 会话列表群聊摘要优先使用 UIKit 已缓存的联系人备注 / 用户资料昵称
+      resolveSenderName: userId => resolveUserDisplayName(stores, userId),
     }),
     contact: new ContactDomain(host, stores.contact),
     group: new GroupDomain(host, stores.group),

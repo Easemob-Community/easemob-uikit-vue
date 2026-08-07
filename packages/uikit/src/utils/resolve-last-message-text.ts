@@ -50,6 +50,21 @@ export function defaultLastMessageTextResolver(message: UiMessage): string {
 }
 
 /**
+ * 根据用户 ID 从联系人 / 用户资料解析显示名。
+ * 优先级：联系人备注 > 用户资料昵称。
+ * 未命中时返回 undefined，由调用方决定回退策略。
+ */
+export function resolveUserDisplayName(stores: RootStores, userId: string): string | undefined {
+  const contact = stores.contact.getContact(userId)
+  if (contact?.remark)
+    return contact.remark
+  const userInfo = stores.userInfo.getUserInfo(userId)
+  if (userInfo?.nickname)
+    return userInfo.nickname
+  return undefined
+}
+
+/**
  * 解析消息发送者的显示名称。
  * 优先级：联系人备注 > 用户资料昵称 > 消息 ext 快照昵称 > ext 快照备注 > userId。
  * 会话列表消息驱动摘要（chat.vue watch）与合并转发摘要（use-chat.ts）共用，
