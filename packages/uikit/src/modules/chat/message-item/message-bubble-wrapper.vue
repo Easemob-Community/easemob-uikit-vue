@@ -137,9 +137,12 @@ const shouldShowTime = computed(() => {
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
 
-/** 群聊已读回执是否激活（用圆圈替代普通状态） */
+/** 群聊已读回执是否激活（用圆圈替代普通状态）。发送失败消息优先展示失败重发图标，不走已读回执。 */
 const isGroupReadReceiptActive = computed(() => {
   if (!props.message.isSelf || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
+    return false
+  // 发送失败时强制展示经典失败状态，避免已读圆圈为空导致用户看不到发送结果
+  if (messageStatus.value === MESSAGE_STATUS.FAILED)
     return false
   // 消息本身已请求回执或已有回执数据，直接激活
   if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
