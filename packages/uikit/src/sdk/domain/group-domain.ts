@@ -1,3 +1,4 @@
+import type { GroupUserInfo } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import type { UiGroup, UiGroupMember } from '../types'
 import { GROUP_MEMBER_ROLE } from '../../constants'
@@ -131,8 +132,28 @@ export class GroupDomain {
     }
     else {
       this.store.setGroupMembers(groupId, members)
+      // 成员列表不再返回 admin 角色，首屏必须单独拉取管理员列表并合并角色
+      try {
+        await this.syncGroupAdmins(groupId)
+      }
+      catch {
+        // 管理员列表失败不应阻塞成员列表展示
+      }
     }
     return { members, cursor: result.cursor, hasMore: result.hasMore }
+  }
+
+  /** 拉取并合并群管理员到成员缓存 */
+  private async syncGroupAdmins(groupId: string) {
+    const admins: readonly GroupUserInfo[] = await this.client.groupManager.getGroup(groupId).getAdmins()
+    const adminMembers = toUiGroupMembers(
+      (admins || []).map(admin => ({ user: admin, role: GROUP_MEMBER_ROLE.ADMIN })),
+    )
+    // 先追加缺失的管理员，再统一把角色置为 admin（已存在时仅更新角色）
+    this.store.appendGroupMembers(groupId, adminMembers)
+    for (const admin of adminMembers) {
+      this.store.updateGroupMemberRole(groupId, admin.userId, GROUP_MEMBER_ROLE.ADMIN)
+    }
   }
 
   /** 拉取群公告 */

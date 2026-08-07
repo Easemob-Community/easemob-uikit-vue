@@ -18,9 +18,20 @@ const chatLog = createLogger('UIKit:ChatEvents')
 /** 正在主动拉取群名称的 ID 集合，避免并发重复请求 */
 const fetchingGroupNames = new Set<string>()
 
+/** 已主动拉取过群名称的 ID 集合（本次事件注册周期内），避免 SDK 定时同步会话列表时重复请求 */
+const fetchedGroupNameIds = new Set<string>()
+
 /** 待发送已读回执的单聊消息 ID 队列（按会话分组，同一 microtask 内合并为一次请求） */
 const pendingReadReceipts = new Map<string, string[]>()
 let readReceiptFlushScheduled = false
+
+/** 清空 chat-events 模块级缓存状态，登出或重新注册事件时调用 */
+export function resetChatEventState() {
+  fetchingGroupNames.clear()
+  fetchedGroupNameIds.clear()
+  pendingReadReceipts.clear()
+  readReceiptFlushScheduled = false
+}
 
 /**
  * 单聊/群聊消息已读回执入队：同一 microtask 内到达的多条消息合并为一次
@@ -118,12 +129,15 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
   const groupMap = new Map(stores.group.groupList.map(g => [g.groupId, g.groupName]))
   const missingGroupIds: string[] = []
   for (const cvs of stores.conversation.conversationList) {
-    const needsPatch = !cvs.name || cvs.name === cvs.id
+    // 已经主动拉取过群名称的会话不再重复请求（无论之前成功或失败），
+    // 避免 SDK 定时同步会话列表时批量触发 getGroupInfoList。
+    const needsPatch = (!cvs.name || cvs.name === cvs.id) && !fetchedGroupNameIds.has(cvs.id)
     if (!needsPatch)
       continue
     if (cvs.type === CONVERSATION_TYPE.GROUPCHAT) {
       const groupName = groupMap.get(cvs.id)
-      if (groupName) {
+      // 本地群组列表中已有有效名称时直接补全，不再走网络请求。
+      if (groupName && groupName !== cvs.id) {
         stores.conversation.updateConversation(cvs.id, { name: groupName })
       }
       else if (!fetchingGroupNames.has(cvs.id)) {
@@ -143,13 +157,19 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
   if (missingGroupIds.length === 0)
     return
 
-  for (const id of missingGroupIds) fetchingGroupNames.add(id)
+  for (const id of missingGroupIds) {
+    fetchingGroupNames.add(id)
+    fetchedGroupNameIds.add(id)
+  }
   try {
     const details = await client.groupManager.getGroupInfoList({ groupIds: missingGroupIds })
     const groups = toUiGroups(details)
     for (const group of groups) {
       stores.group.updateGroup(group.groupId, group)
-      stores.conversation.updateConversation(group.groupId, { name: group.groupName || group.groupId })
+      // 群名有效时才更新会话名称；空名称回退到 groupId 会让 needsPatch 永远成立，导致无限循环请求。
+      if (group.groupName && group.groupName !== group.groupId) {
+        stores.conversation.updateConversation(group.groupId, { name: group.groupName })
+      }
     }
   }
   catch (err) {

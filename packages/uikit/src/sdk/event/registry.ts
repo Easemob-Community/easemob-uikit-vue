@@ -2,7 +2,7 @@ import type { ManagerHost } from '../client'
 import type { RootStores } from './types'
 import { createConnectionHandlers } from './connection-events'
 import type { ConnectionEventCallbacks } from './connection-events'
-import { createChatHandlers } from './chat-events'
+import { createChatHandlers, resetChatEventState } from './chat-events'
 import { createContactHandlers } from './contact-events'
 import { createGroupHandlers } from './group-events'
 import { createPresenceHandlers } from './presence-events'
@@ -37,5 +37,6 @@ export function registerEventHandlers(
     client.contactManager.removeEventHandler('uikit-contact')
     client.groupManager.removeEventHandler('uikit-group')
     client.presenceManager.removeEventHandler('uikit-presence')
+    resetChatEventState()
   }
 }
