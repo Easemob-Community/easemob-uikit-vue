@@ -1,8 +1,17 @@
 import type { GroupUserInfo } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
-import type { UiGroup, UiGroupMember } from '../types'
+import type { CreateGroupParams, UiGroup, UiGroupMember } from '../types'
 import { GROUP_MEMBER_ROLE } from '../../constants'
 import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
+
+/** 飞行中的 fetchGroupInfo Promise，避免多个消息气泡/组件并发请求同一群详情 */
+const pendingGroupInfoRequests = new Map<string, Promise<UiGroup>>()
+
+/** 飞行中的 syncGroupAdmins Promise，避免多个组件并发请求同一群管理员 */
+const pendingGroupAdminRequests = new Map<string, Promise<void>>()
+
+/** 飞行中的 fetchGroupAnnouncement Promise，避免多个组件并发请求同一群公告 */
+const pendingGroupAnnouncementRequests = new Map<string, Promise<string>>()
 
 /**
  * GroupStore 需要暴露给 Domain 的最小接口。
@@ -17,6 +26,8 @@ export interface GroupStoreLike {
   removeGroupMembers: (groupId: string, userIds: string[]) => void
   updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void
+  isGroupAdminSynced?: (groupId: string) => boolean
+  markGroupAdminSynced?: (groupId: string) => void
   setGroupMuteList: (groupId: string, members: UiGroupMember[]) => void
   addGroupMuteMembers: (groupId: string, userIds: string[]) => void
   removeGroupMuteMembers: (groupId: string, userIds: string[]) => void
@@ -47,10 +58,24 @@ export class GroupDomain {
 
   /** 获取单个群详情 */
   async fetchGroupInfo(groupId: string): Promise<UiGroup> {
-    const detail = await this.client.groupManager.getGroupInfo({ groupId })
-    const group = toUiGroup(detail)
-    this.store.updateGroup(groupId, group)
-    return group
+    const existing = pendingGroupInfoRequests.get(groupId)
+    if (existing)
+      return existing
+
+    const promise = (async () => {
+      const detail = await this.client.groupManager.getGroupInfo({ groupId })
+      const group = toUiGroup(detail)
+      this.store.updateGroup(groupId, group)
+      return group
+    })()
+
+    pendingGroupInfoRequests.set(groupId, promise)
+    try {
+      return await promise
+    }
+    finally {
+      pendingGroupInfoRequests.delete(groupId)
+    }
   }
 
   /** 批量获取群详情 */
@@ -62,16 +87,7 @@ export class GroupDomain {
   }
 
   /** 创建群组 */
-  async createGroup(params: {
-    name: string
-    description?: string
-    memberIds?: string[]
-    public?: boolean
-    joinApprovalRequired?: boolean
-    allowInvites?: boolean
-    inviteNeedConfirm?: boolean
-    maxMembers?: number
-  }) {
+  async createGroup(params: CreateGroupParams) {
     const result = await this.client.groupManager.createGroup({
       name: params.name,
       description: params.description ?? '',
@@ -145,23 +161,56 @@ export class GroupDomain {
 
   /** 拉取并合并群管理员到成员缓存 */
   private async syncGroupAdmins(groupId: string) {
-    const admins: readonly GroupUserInfo[] = await this.client.groupManager.getGroup(groupId).getAdmins()
-    const adminMembers = toUiGroupMembers(
-      (admins || []).map(admin => ({ user: admin, role: GROUP_MEMBER_ROLE.ADMIN })),
-    )
-    // 先追加缺失的管理员，再统一把角色置为 admin（已存在时仅更新角色）
-    this.store.appendGroupMembers(groupId, adminMembers)
-    for (const admin of adminMembers) {
-      this.store.updateGroupMemberRole(groupId, admin.userId, GROUP_MEMBER_ROLE.ADMIN)
+    const existing = pendingGroupAdminRequests.get(groupId)
+    if (existing)
+      return existing
+
+    // 已同步过管理员列表的群不再重复拉取；增删管理员事件会增量更新角色。
+    if (this.store.isGroupAdminSynced?.(groupId))
+      return
+
+    const promise = (async () => {
+      const admins: readonly GroupUserInfo[] = await this.client.groupManager.getGroup(groupId).getAdmins()
+      const adminMembers = toUiGroupMembers(
+        (admins || []).map(admin => ({ user: admin, role: GROUP_MEMBER_ROLE.ADMIN })),
+      )
+      // 先追加缺失的管理员，再统一把角色置为 admin（已存在时仅更新角色）
+      this.store.appendGroupMembers(groupId, adminMembers)
+      for (const admin of adminMembers) {
+        this.store.updateGroupMemberRole(groupId, admin.userId, GROUP_MEMBER_ROLE.ADMIN)
+      }
+      this.store.markGroupAdminSynced?.(groupId)
+    })()
+
+    pendingGroupAdminRequests.set(groupId, promise)
+    try {
+      return await promise
+    }
+    finally {
+      pendingGroupAdminRequests.delete(groupId)
     }
   }
 
   /** 拉取群公告 */
   async fetchGroupAnnouncement(groupId: string): Promise<string> {
-    const result = await this.client.groupManager.getGroupAnnouncement({ groupId })
-    const announcement = result.announcement ?? ''
-    this.store.setGroupAnnouncement(groupId, announcement)
-    return announcement
+    const existing = pendingGroupAnnouncementRequests.get(groupId)
+    if (existing)
+      return existing
+
+    const promise = (async () => {
+      const result = await this.client.groupManager.getGroupAnnouncement({ groupId })
+      const announcement = result.announcement ?? ''
+      this.store.setGroupAnnouncement(groupId, announcement)
+      return announcement
+    })()
+
+    pendingGroupAnnouncementRequests.set(groupId, promise)
+    try {
+      return await promise
+    }
+    finally {
+      pendingGroupAnnouncementRequests.delete(groupId)
+    }
   }
 
   /** 更新群公告 */

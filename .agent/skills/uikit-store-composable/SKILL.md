@@ -232,4 +232,69 @@ export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessag
 }
 ```
 
+## 8. Domain 层网络请求去重与结果缓存
+
+UIKit 里大量组件会在挂载/切换时触发同一类 SDK 请求（如进入群聊后每个消息气泡都想确认当前用户角色）。如果只在组件里用实例级 flag 去重，N 个实例就会并发 N 次请求；如果只在业务层判断"是否已加载"，又无法拦截 SDK 事件/定时同步导致的重复触发。**去重必须在 Domain 层或 store 层统一做**。
+
+**硬规则：**
+
+- **Promise 级去重（防并发）**：同一参数的请求在飞行中时，后续调用直接返回同一个 Promise。Domain 模块级 `Map<key, Promise<T>>` 是标准写法。
+- **结果缓存（防跨时间重复）**：对于"同一登录周期内不会变"或"事件可增量更新"的数据，用 store 标记"已同步"，避免每次进入/切换都重新拉取。
+- **区分 "未获取" 与 "已获取但为空"**：store getter 不要无脑 `|| ''` / `|| []` fallback，否则调用方无法判断是否需要发起首次请求。空值应保留其原始语义（`undefined` / 空数组）。
+- **登出 reset 必须清空缓存标记**：所有模块级/ store 级去重 Set/Map 都要在 `clearXxx()` 或 `resetXxxState()` 中清空，防止切账号后残留旧状态。
+
+**真实片段（`packages/uikit/src/sdk/domain/group-domain.ts`）：**
+
+```ts
+const pendingGroupInfoRequests = new Map<string, Promise<UiGroup>>()
+
+async fetchGroupInfo(groupId: string): Promise<UiGroup> {
+  const existing = pendingGroupInfoRequests.get(groupId)
+  if (existing)
+    return existing
+
+  const promise = (async () => {
+    const detail = await this.client.groupManager.getGroupInfo({ groupId })
+    const group = toUiGroup(detail)
+    this.store.updateGroup(groupId, group)
+    return group
+  })()
+
+  pendingGroupInfoRequests.set(groupId, promise)
+  try {
+    return await promise
+  }
+  finally {
+    pendingGroupInfoRequests.delete(groupId)
+  }
+}
+```
+
+**真实片段（store 层结果缓存，2026-08-07 修复群管理员重复同步）：**
+
+```ts
+// store/group.ts
+const groupAdminSyncedIds = ref<Set<string>>(new Set())
+
+function isGroupAdminSynced(groupId: string): boolean {
+  return groupAdminSyncedIds.value.has(groupId)
+}
+function markGroupAdminSynced(groupId: string) {
+  groupAdminSyncedIds.value = new Set([...groupAdminSyncedIds.value, groupId])
+}
+
+// sdk/domain/group-domain.ts 的 syncGroupAdmins
+if (this.store.isGroupAdminSynced?.(groupId))
+  return
+// ... 拉取并合并管理员 ...
+this.store.markGroupAdminSynced?.(groupId)
+```
+
+**反面清单：**
+
+- ❌ 在组件实例里用 `const tried = ref(false)` 做共享去重——每个实例各有一份，N 个实例并发 N 次请求。
+- ❌ store getter 无脑 `return map.value[id] || ''`，把"未获取"和"空值"混为一谈。
+- ❌ 只在调用方判断 `if (!data)` 就请求，不处理响应式引用变化导致的 watch 重复触发。
+- ❌ 模块级 Promise 去重 Map 在登出时不清理，切账号后返回旧数据或旧 Promise。
+
 **注意**：不要依赖 `JSON.parse(JSON.stringify())` 深拷贝去「脱敏」。它会把整个嵌套结构序列化一次，大 payload 会阻塞主线程；遇到循环引用还会抛错。`toRaw` + 解构剥离 + `markRaw` 隔离才是正确做法。

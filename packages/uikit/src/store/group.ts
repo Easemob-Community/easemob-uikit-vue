@@ -27,8 +27,10 @@ export const useGroupStore = defineStore('group', () => {
 
   /** 群成员缓存：groupId -> members */
   const groupMembersMap = ref<Record<string, UiGroupMember[]>>({})
-  /** 群公告缓存：groupId -> announcement */
-  const groupAnnouncementMap = ref<Record<string, string>>({})
+  /** 群公告缓存：groupId -> announcement；未获取时为 undefined，空字符串表示已获取但公告为空 */
+  const groupAnnouncementMap = ref<Record<string, string | undefined>>({})
+  /** 已同步过管理员列表的群 ID 集合，避免切换会话时重复拉取 */
+  const groupAdminSyncedIds = ref<Set<string>>(new Set())
 
   /** 群成员禁言列表缓存：groupId -> members */
   const groupMuteListMap = ref<Record<string, UiGroupMember[]>>({})
@@ -122,6 +124,25 @@ export const useGroupStore = defineStore('group', () => {
         ? { ...item, memberCount: Math.max(0, (item.memberCount || 0) - delta) }
         : item,
     )
+  }
+
+  function isGroupAdminSynced(groupId: string): boolean {
+    return groupAdminSyncedIds.value.has(groupId)
+  }
+
+  function markGroupAdminSynced(groupId: string) {
+    groupAdminSyncedIds.value = new Set([...groupAdminSyncedIds.value, groupId])
+  }
+
+  function clearGroupAdminSynced(groupId?: string) {
+    if (groupId) {
+      const next = new Set(groupAdminSyncedIds.value)
+      next.delete(groupId)
+      groupAdminSyncedIds.value = next
+    }
+    else {
+      groupAdminSyncedIds.value = new Set()
+    }
   }
 
   /** 成员级禁言状态更新：同步更新 groupMuteListMap */
@@ -321,8 +342,8 @@ export const useGroupStore = defineStore('group', () => {
     groupAnnouncementMap.value[groupId] = announcement
   }
 
-  function getGroupAnnouncement(groupId: string): string {
-    return groupAnnouncementMap.value[groupId] || ''
+  function getGroupAnnouncement(groupId: string): string | undefined {
+    return groupAnnouncementMap.value[groupId]
   }
 
   // ===== UI 交互状态操作 =====
@@ -370,6 +391,7 @@ export const useGroupStore = defineStore('group', () => {
     cursor.value = undefined
     groupMembersMap.value = {}
     groupAnnouncementMap.value = {}
+    groupAdminSyncedIds.value = new Set()
     groupMuteListMap.value = {}
     groupBlocklistMap.value = {}
     groupAllowlistMap.value = {}
@@ -418,6 +440,9 @@ export const useGroupStore = defineStore('group', () => {
     clearGroupMembers,
     setGroupAnnouncement,
     getGroupAnnouncement,
+    isGroupAdminSynced,
+    markGroupAdminSynced,
+    clearGroupAdminSynced,
     setGroupMuteList,
     addGroupMuteMembers,
     removeGroupMuteMembers,

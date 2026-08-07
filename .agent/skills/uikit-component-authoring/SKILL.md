@@ -237,4 +237,5 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
 - ❌ 漏 `<style scoped>`，或样式里写死颜色/时长而非 `var(--uikit-*)`（详见 `uikit-styling-theming`）。
 - ❌ 业务代码里写死 `'groupChat'` / `'owner'` / `'text'` 等枚举字符串，或类型联合手写 `'singleChat' | 'groupChat'` —— 一律引用 `src/constants/index.ts`（第 8 节），改常量值一处生效。
 - ❌ 组件里直接 `env(safe-area-inset-*)` 或自行监听 `resize/visualViewport` 处理 H5 适配。
+- ❌ 用组件实例级 `ref`/`reactive` 做需要跨实例共享的去重或缓存（如每个消息气泡各自 `const triedFetch = ref(false)`）—— 多实例挂载时会并发重复请求；应把去重/缓存上提到 Domain 层或 store 层，参见 `uikit-store-composable` 第 8 节。
 - ❌ Boolean prop 不在 `withDefaults` 中给默认值，依赖 Vue 隐式 `false` 或 `?? true` 回落——Vue 3 会先把 `undefined` 转成 `false`，`false ?? true` = `false`，导致 "默认 true" 的逻辑永远不生效。

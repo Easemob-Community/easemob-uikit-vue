@@ -812,3 +812,21 @@
     - `composables/use-keyboard.ts`：键盘高度公式补 `visualViewport.offsetTop`、无 `visualViewport` 时降级 `window.innerHeight` resize 差值、补 focusout 处理（对应 D48）；
     - `containers/chat-container/chat-container.vue` 键盘弹起态去掉 safe-bottom 叠加（对应 D49）；
     - `modules/chat/chat.vue` watch `keyboardHeight` 变化后二次 `scrollToBottom()`（对应 D50）。
+
+- [x] **D94. Domain/Store 层缺少网络请求去重与结果缓存，导致切换会话时重复拉取群详情/公告/管理员**
+  - 已于 2026-08-07 修复。
+  - 现象：
+    - `MessageDomain.markMessagesRead` 未分批，离线消息超过 50 条时触发 SDK `ValidationError`；
+    - `sdk/event/chat-events.ts` 的 `patchConversationNames` 无请求缓存，SDK 定时同步会话列表时反复批量拉取群详情；空群名 fallback 到 groupId 导致无限补全循环；
+    - `message-interactive.vue` 每个消息气泡独立维护 `triedFetchRole`，进入群聊时 N 个气泡并发请求同一群详情；
+    - `GroupDomain.fetchGroupInfo` / `syncGroupAdmins` / `fetchGroupAnnouncement` 只有业务层去重，缺少 Promise 级去重与结果缓存；
+    - `store/group.ts` 的 `getGroupAnnouncement` 用 `|| ''` 兜底，无法区分"未获取"与"已获取但为空"，空公告每次切换会话都重复请求；
+    - `syncGroupAdmins` 每次 `fetchGroupMembers` 首屏都重新请求管理员列表。
+  - 改动：
+    - `MessageDomain.markMessagesRead` 按 SDK 限制 50 条分批发送已读回执；
+    - `chat-events.ts` 增加 `fetchedGroupNameIds` 缓存与 `resetChatEventState()`，空群名不再写入 conversation.name；
+    - `GroupDomain` 增加 `pendingGroupInfoRequests` / `pendingGroupAdminRequests` / `pendingGroupAnnouncementRequests` 三套 Promise 去重；
+    - `store/group.ts` 增加 `groupAdminSyncedIds` 标记，已同步管理员的群不再重复拉取；`getGroupAnnouncement` 返回 `string | undefined`；
+    - `modules/chat/chat.vue` 预拉公告条件改为 `announcement === undefined`。
+  - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
+  - 关联 skill：`uikit-store-composable` / `uikit-component-authoring` / `websdk2-uikit-migration`。

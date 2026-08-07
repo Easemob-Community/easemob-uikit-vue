@@ -508,9 +508,10 @@ watch(
         logger.warn('[Chat] preload group members for mention failed:', formatSdkError(err))
       }
     }
-    // 预拉群公告，使聊天页面顶部横幅无需打开抽屉即可展示
+    // 预拉群公告，使聊天页面顶部横幅无需打开抽屉即可展示。
+    // 用 undefined 区分“未获取”与“已获取但为空”，避免空公告每次切换会话都重复请求。
     const announcement = stores.group.getGroupAnnouncement(cvs.id)
-    if (!announcement) {
+    if (announcement === undefined) {
       try {
         await fetchGroupAnnouncement(cvs.id)
       }
