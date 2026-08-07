@@ -3,7 +3,7 @@ import type { ConversationTypeValue } from '../constants'
 import { CONVERSATION_TYPE } from '../constants'
 import { useNotification } from '../composables/use-notification'
 import { resolveLastMessageText, resolveSenderDisplayName } from '../utils/resolve-last-message-text'
-import { toUiMessage } from './adapter/message-adapter'
+import { normalizeUserId, toUiMessage } from './adapter/message-adapter'
 import type { RootStores } from './event/types'
 
 /**
@@ -27,7 +27,7 @@ export function notifyOnNewMessage(stores: RootStores, sdkMsg: SdkMessage) {
   if (!state.value.enabled)
     return
 
-  if (sdkMsg.from === stores.client.currentUser)
+  if (normalizeUserId(sdkMsg.from) === normalizeUserId(stores.client.currentUser))
     return
 
   if (sdkMsg.conversationId === stores.conversation.currentConversationId)

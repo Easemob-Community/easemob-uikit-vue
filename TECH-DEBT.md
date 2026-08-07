@@ -745,6 +745,17 @@
 - **详细预研与落地记录见根 [DIGITAL-CAPSULE-ICON-RESEARCH.md](DIGITAL-CAPSULE-ICON-RESEARCH.md)**。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
 
+### [x] D92. 群聊中己方消息偶现出现在左侧（isSelf 误判）
+
+- **现象**：测试同事反馈群聊场景下，自己发送的消息偶尔显示在左侧（接收方气泡样式），刷新后可能又变回右侧；复现路径不稳定。
+- **根因**：`isSelf` 仅在 `toUiMessage` 适配阶段通过 `sdkMsg.from === currentUserId` 计算一次。Easemob SDK 文档说明：自己其他设备发给当前设备时，`from` 格式为 `当前用户ID/来源设备ID`（如 `user1/deviceA`），直接字符串相等会把多端同步回来的己方消息误判为对方消息；此外登录时序、缓存/历史消息加载等场景下 `currentUserId` 可能为空，也会导致误判。
+- **修复（2026-08-07）**：
+  1. `sdk/adapter/message-adapter.ts`：新增 `normalizeUserId()`，剥离 `/deviceId`、`@appKey`、`#appKey` 等后缀；`toUiMessage` 与 `resolvePeerUserId` 改用归一化比较；对空 `currentUserId` 增加 warning。
+  2. `modules/chat/message-item/message-bubble-wrapper.vue`：渲染层以 `clientStore.currentUser` 实时重新判定 `isSelf`，fallback 到消息对象存储的 `isSelf`，确保已入库的异常消息也能在渲染时纠正。
+  3. `sdk/event/chat-events.ts` / `sdk/notification-engine.ts`：新消息去重、自动清未读、@我判定、通知过滤等依赖 `from === currentUser` 的逻辑统一走 `normalizeUserId`。
+- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
+- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+
 ---
 
 ## 已修复（归档）

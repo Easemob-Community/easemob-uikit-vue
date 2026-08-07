@@ -9,10 +9,12 @@ import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
+import { useClientStore } from '../../../store/client'
 import { useLocale } from '../../../locale'
 import { type MsgQuotePayload, useQuote } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { usePresence } from '../../../composables/use-presence'
+import { normalizeUserId } from '../../../sdk/adapter/message-adapter'
 import type { PresenceDisplayStatus } from '../../../components/avatar/avatar.vue'
 import CombineMessageModal from './combine-message-modal.vue'
 import MessageInteractive from './message-interactive.vue'
@@ -82,12 +84,28 @@ function onViewCombine(message: UiMessage) {
 
 const { t } = useLocale()
 
+const clientStore = useClientStore()
+
 const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
 const { get: getPresence } = usePresence()
 
+/**
+ * 消息是否为己方发送。
+ * 渲染层以当前登录用户实时校准：解决登录时序/多端登录/资源后缀等场景下
+ * adapter 阶段计算出的 isSelf 与当前身份不一致的问题（偶现己方消息出现在左侧）。
+ */
+const isSelf = computed(() => {
+  const from = props.message.from
+  const currentUserId = clientStore.currentUser
+  if (from && currentUserId) {
+    return normalizeUserId(from) === normalizeUserId(currentUserId)
+  }
+  return props.message.isSelf
+})
+
 /** 发送者在线状态：己方消息不展示（自己的在线状态对自己没有信息量） */
 const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
-  if (props.message.isSelf)
+  if (isSelf.value)
     return undefined
   return getPresence(props.message.from).value?.status as PresenceDisplayStatus | undefined
 })
@@ -117,7 +135,7 @@ const showAvatar = computed(() => props.config?.showAvatar ?? true)
 const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? false)
 
 /** 是否为对话模式且是己方消息 */
-const isSelfConversation = computed(() => layout.value === 'conversation' && props.message.isSelf)
+const isSelfConversation = computed(() => layout.value === 'conversation' && isSelf.value)
 
 /** 头像尺寸 */
 const avatarSize = computed(() => props.config?.avatarSize ?? 36)
@@ -139,7 +157,7 @@ const shouldShowTime = computed(() => {
 
 /** 群聊已读回执是否激活（用圆圈替代普通状态）。发送失败消息优先展示失败重发图标，不走已读回执。 */
 const isGroupReadReceiptActive = computed(() => {
-  if (!props.message.isSelf || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
+  if (!isSelf.value || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
     return false
   // 发送失败时强制展示经典失败状态，避免已读圆圈为空导致用户看不到发送结果
   if (messageStatus.value === MESSAGE_STATUS.FAILED)
@@ -155,7 +173,7 @@ const isGroupReadReceiptActive = computed(() => {
 const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
 
 /** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
-const showStatus = computed(() => props.message.isSelf && !isGroupReadReceiptActive.value)
+const showStatus = computed(() => isSelf.value && !isGroupReadReceiptActive.value)
 
 /** 消息状态 */
 const messageStatus = computed(() => props.message.status)
@@ -395,7 +413,7 @@ onBeforeUnmount(() => {
         <span class="message-bubble-wrapper__recalled-text">{{ recalledText }}</span>
         <!-- 文本消息重新编辑按钮 -->
         <MessageRenderer
-          v-if="message.type === MESSAGE_TYPE.TEXT && message.isSelf && message.originalMsg"
+          v-if="message.type === MESSAGE_TYPE.TEXT && isSelf && message.originalMsg"
           :message="message"
           @reedit="emit('reedit', $event)"
         />
@@ -431,7 +449,7 @@ onBeforeUnmount(() => {
         <!-- 内容区域 -->
         <div class="message-bubble-wrapper__content">
           <!-- 昵称 -->
-          <div v-if="!message.isSelf" class="message-bubble-wrapper__nickname">
+          <div v-if="!isSelf" class="message-bubble-wrapper__nickname">
             <slot name="nickname" :message="message">
               {{ displayName }}
             </slot>

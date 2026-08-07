@@ -2,7 +2,7 @@ import type { ChatEventHandlerMap } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import type { ConversationTypeValue } from '../../constants'
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
-import { toUiMessage } from '../adapter/message-adapter'
+import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
@@ -280,7 +280,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       if (
         currentCvsId
         && sdkMsg.conversationId === currentCvsId
-        && sdkMsg.from !== stores.client.currentUser
+        && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)
         && isPageVisible
       ) {
         void client.chatManager.clearConversationUnreadMessageCount({
@@ -297,7 +297,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
       }
 
       // 更新@我状态
-      if (sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT && sdkMsg.from !== stores.client.currentUser) {
+      if (sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)) {
         const atList = sdkMsg.ext?.em_at_list
         if (Array.isArray(atList) && atList.includes(stores.client.currentUser)) {
           stores.conversation.setAtMe(sdkMsg.conversationId, true)
