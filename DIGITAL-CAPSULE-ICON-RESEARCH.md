@@ -133,9 +133,12 @@
 
 - **2026-08-06**：
   - `packages/uikit/src/assets/icons/status/` 新增 `circle`、`circle_check`、`dot`、`dot_check` 四个数字胶囊状态图标；`icon-map` 通过 `import.meta.glob` 自动注册。
-  - `Badge` 组件按数字胶囊规范重构：`size`（normal/small）、`variant`（filled/stroked）prop 落地；normal 尺寸按 units/tens/hundreds 位数区分为 24×24 / 32×24 / 42×24；small 按 0.75x 缩放为 18×18 / 24×18 / 32×18；红点模式同步提供大小两档。
+  - `Badge` 组件按数字胶囊规范重构：`size`（normal/small）、`variant`（filled/stroked）prop 落地；normal 尺寸按 units/tens/hundreds 位数区分为 24×24 / 32×24 / 42×24；红点模式同步提供大小两档。
   - `message-bubble-wrapper.vue` 新增 `messageStatus.style: 'classic' | 'capsule'` 配置，`capsule` 风格下 `SENT/DELIVERED` 显示空心圆、`READ` 显示空心圆+对勾，默认保持 `classic` 不破坏既有行为。
   - `badge.story.vue` 增加 Digital Capsule Sizes / Variants 两个展示变体；`message-list.story.vue` 增加 Digital Capsule 消息状态变体（mock 会话改为单聊以展示状态图标）。
+- **2026-08-07**：
+  - 修正 `Badge` small 尺寸：实际代码中 small 一位/两位/三位高度仅为 16px，与规范 18×18 / 24×18 / 32×18 不符，导致会话列表未读数显得拥挤厚重。已调整为 small 统一 18px 高，一位 18×18、两位 min-width 24px、三位 min-width 32px，small 字号从 9px 降至 8px，与胶囊比例更协调。
+  - 源目录 `消息状态以及未读状态/` 中的 `.svg` 是带固定数字 path 的视觉样例，不直接作为运行时图标；落地继续采用 CSS 胶囊 + 动态文本，符合本预研结论。
   - 下一步：D90 `iconStyle` 主题能力实施后，将 `Badge.variant` 与消息状态 `capsule` 映射默认绑定 `themeStore.iconStyle`，并补齐 `dot`/`dot_check` 在面性风格下的使用。
 
 ## 风险与注意
