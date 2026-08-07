@@ -69,6 +69,7 @@ export default defineConfig({
             { text: 'StatusBanner 状态横幅', link: '/components/status-banner' },
             { text: 'Notification 消息通知', link: '/components/notification' },
             { text: 'EmojiPicker 表情选择', link: '/components/emoji-picker' },
+            { text: 'ImageViewer 图片预览', link: '/components/image-viewer' },
           ],
         },
         {

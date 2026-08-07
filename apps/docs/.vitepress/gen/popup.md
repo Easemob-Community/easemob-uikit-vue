@@ -7,9 +7,10 @@
 | --- | --- | --- | --- |
 | show                | `boolean`                                            | —          | —                                            |
 | position            | `'center' \| 'bottom' \| 'top' \| 'left' \| 'right'` | `'center'` | —                                            |
-| zIndex              | `number`                                             | `2000`     | —                                            |
+| zIndex              | `number`                                             | —          | 显式指定 z-index；不传时由全局分配器自动递增                   |
 | overlay             | `boolean`                                            | `true`     | —                                            |
 | closeOnClickOverlay | `boolean`                                            | `true`     | —                                            |
+| closeOnEsc          | `boolean`                                            | `true`     | 按 ESC 关闭，默认 true                             |
 | showClose           | `boolean`                                            | `false`    | —                                            |
 | anchor              | `HTMLElement`                                        | —          | 相对定位的锚点元素，传入后 popup 将相对于该元素定位                |
 | placement           | `'bottom' \| 'top' \| 'left' \| 'right'`             | `'bottom'` | 相对锚点的位置，默认 'bottom'                          |

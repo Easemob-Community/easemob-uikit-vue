@@ -3,15 +3,17 @@
 
 ### Props
 
-| 属性          | 类型                                                            | 默认值         | 说明                                                 |
+| 属性          | 类型                                                            | 默认值               | 说明                                                 |
 | --- | --- | --- | --- |
-| modelValue  | `string`                                                      | `''`        | —                                                  |
-| placeholder | `string`                                                      | —           | —                                                  |
-| type        | `'text' \| 'password' \| 'number'`                            | `'text'`    | —                                                  |
-| disabled    | `boolean`                                                     | `false`     | —                                                  |
-| maxlength   | `number`                                                      | —           | —                                                  |
-| prefixIcon  | `string`                                                      | —           | 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" |
-| variant     | `'default' \| 'search' \| 'filled' \| 'ghost' \| 'underline'` | `'default'` | 输入框风格变体                                            |
+| modelValue  | `string`                                                      | `''`              | —                                                  |
+| placeholder | `string`                                                      | —                 | —                                                  |
+| type        | `'text' \| 'password' \| 'number'`                            | `'text'`          | —                                                  |
+| disabled    | `boolean`                                                     | `false`           | —                                                  |
+| maxlength   | `number`                                                      | —                 | —                                                  |
+| prefixIcon  | `string`                                                      | —                 | 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" |
+| clearable   | `boolean`                                                     | `false`           | 是否显示清除按钮（有输入内容时右侧出现）。                              |
+| clearIcon   | `string`                                                      | `'actions/close'` | 清除按钮图标名称，默认 "actions/close"                        |
+| variant     | `'default' \| 'search' \| 'filled' \| 'ghost' \| 'underline'` | `'default'`       | 输入框风格变体                                            |
 
 ### Events
 

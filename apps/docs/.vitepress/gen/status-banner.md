@@ -3,30 +3,30 @@
 
 ### Props
 
-| 属性        | 类型               | 默认值    | 说明                                        |
+| 属性          | 类型                 | 默认值      | 说明                                          |
 | --- | --- | --- | --- |
-| type        | `StatusBannerType` | `'info'` | 横幅类型，决定颜色与默认图标                |
-| loading     | `boolean`          | `false`  | 是否展示 loading 旋转图标                    |
-| closable    | `boolean`          | `false`  | 是否可关闭                                  |
-| show        | `boolean`          | `true`   | 是否可见，支持 v-model:show                  |
+| type        | `StatusBannerType` | `'info'` | 横幅类型，决定颜色与默认图标                              |
+| loading     | `boolean`          | `false`  | 是否展示 loading 旋转图标                           |
+| closable    | `boolean`          | `false`  | 是否可关闭                                       |
+| show        | `boolean`          | `true`   | 是否可见，支持 v-model:show                        |
 | icon        | `string`           | —        | 自定义图标名，格式 "category/icon-name"；不传时按 type 默认 |
-| title       | `string`           | —        | 标题文本                                    |
-| description | `string`           | —        | 描述/副标题文本                              |
-| clickable   | `boolean`          | `false`  | 是否可点击（仅影响光标与 hover 反馈，不控制事件） |
+| title       | `string`           | —        | 标题文本                                        |
+| description | `string`           | —        | 描述/副标题文本                                    |
+| clickable   | `boolean`          | `false`  | 是否可点击（仅影响光标与 hover 反馈，不控制事件）                |
 
 ### Events
 
-| 事件名         | 参数              | 说明 |
+| 事件名           | 参数                | 说明 |
 | --- | --- | --- |
-| `update:show` | value: boolean   | —  |
-| `close`       | —                | —  |
+| `update:show` | value: boolean    | —  |
+| `close`       | —                 | —  |
 | `click`       | event: MouseEvent | —  |
 
 ### Slots
 
-| 插槽名        | 说明 |
+| 插槽名           | 说明 |
 | --- | --- |
-| `icon`       | —  |
-| `title`      | —  |
+| `icon`        | —  |
+| `title`       | —  |
 | `description` | —  |
-| `action`     | —  |
+| `action`      | —  |

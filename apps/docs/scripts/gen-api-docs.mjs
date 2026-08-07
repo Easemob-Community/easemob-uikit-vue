@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const COMPONENTS_ROOT = join(__dirname, '../../../packages/uikit/src/components')
 const OUTPUT_DIR = join(__dirname, '../.vitepress/gen')
 
-/** 20 个原子组件：目录名 → 展示名 */
+/** 21 个原子组件：目录名 → 展示名 */
 const COMPONENTS = [
   'action-sheet',
   'avatar',
@@ -34,6 +34,7 @@ const COMPONENTS = [
   'group-card',
   'icon',
   'icon-button',
+  'image-viewer',
   'input',
   'modal',
   'notification',
