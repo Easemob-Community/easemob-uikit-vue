@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useThemeStore } from '../../../store/theme'
 import { useLocale } from '../../../locale'
-import { useToast } from '../../../composables/use-toast'
-import Icon from '../../../components/icon/icon.vue'
-import { detectEnvironment, downloadFile } from '../../../utils/download'
+import ImageViewer from '../../../components/image-viewer/image-viewer.vue'
 import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
 
 export interface ImageMessageProps {
@@ -15,7 +13,6 @@ const props = defineProps<ImageMessageProps>()
 
 const themeStore = useThemeStore()
 const { t } = useLocale()
-const { show: showToast } = useToast()
 
 /** 图片展示最大约束 */
 const MAX_WIDTH = 240
@@ -71,256 +68,54 @@ function onError() {
   isError.value = true
 }
 
-/** 全屏预览 */
+/** 全屏预览（EmImageViewer 受控） */
 const isPreviewing = ref(false)
+/** 预览索引：0=中图，1=原图 */
+const previewIndex = ref(0)
 
-/** 预览当前展示的 URL：先中图秒开，中图加载完成后再切换原图 */
-const previewUrl = ref('')
-/** 预览图片加载阶段：medium=中图，original=原图 */
-const previewStage = ref<'medium' | 'original'>('medium')
-/** 中图已显示、原图正在加载中 */
-const isUpgradingOriginal = ref(false)
-/** 中图首次加载失败标记（避免中图/原图互跳死循环） */
-const mediumFailedOnce = ref(false)
-/** 预览图片最终加载失败（无可回退资源） */
-const previewFailed = ref(false)
-
-/** 是否已展示高清原图（预览右上角"高清"标识） */
-const isOriginalShown = computed(
-  () => previewStage.value === 'original' && !isUpgradingOriginal.value && !previewFailed.value,
-)
-
-/** 缩放比例 */
-const scale = ref(1)
-/** 平移 X */
-const translateX = ref(0)
-/** 平移 Y */
-const translateY = ref(0)
-
-/** 双指初始距离 */
-let initialPinchDistance = 0
-/** 双指缩放起始值 */
-let pinchStartScale = 1
-/** 单指拖拽起始位 */
-let dragStartX = 0
-let dragStartY = 0
-let dragStartTranslateX = 0
-let dragStartTranslateY = 0
-/** 判断是拖拽还是双指缩放 */
-let isPinching = false
-
-function openPreview() {
-  if (!mediumUrl.value && !originalUrl.value)
-    return
-  isPreviewing.value = true
-  resetZoom()
-  previewStage.value = 'medium'
-  isUpgradingOriginal.value = false
-  mediumFailedOnce.value = false
-  previewFailed.value = false
-  // 首屏展示中图（大图压缩版）；原图需手动点击"查看原图"再加载
-  previewUrl.value = mediumUrl.value || originalUrl.value
-}
-
-function closePreview() {
-  isPreviewing.value = false
-  resetZoom()
-}
-
-/** 切换到原图展示；仅中图阶段且有原图时才生效 */
-function upgradeToOriginal(): boolean {
-  const orig = originalUrl.value
-  if (previewStage.value !== 'medium' || !orig || orig === previewUrl.value)
-    return false
-  previewStage.value = 'original'
-  isUpgradingOriginal.value = true
-  previewUrl.value = orig
-  return true
-}
-
-/** 切回中图展示（原图阶段点击"查看中图"按钮触发，与"查看原图"按钮形成 toggle） */
-function backToMedium() {
-  if (previewStage.value !== 'original' || isUpgradingOriginal.value)
-    return
-  const med = mediumUrl.value
-  if (!med || med === previewUrl.value)
-    return
-  previewStage.value = 'medium'
-  isUpgradingOriginal.value = false
-  previewUrl.value = med
-}
-
-/** 预览图片加载完成：中图或原图加载完成即结束加载态 */
-function onPreviewImgLoad() {
-  previewFailed.value = false
-  // 原图加载完成，或中图即最终图（无原图可切换）
-  isUpgradingOriginal.value = false
-}
-
-/** 预览图片加载失败：中图失败尝试原图；原图失败回退中图；都失败才置失败态 */
-function onPreviewImgError() {
-  if (previewStage.value === 'medium') {
-    if (!mediumFailedOnce.value) {
-      mediumFailedOnce.value = true
-      if (upgradeToOriginal())
-        return
-    }
-    previewFailed.value = true
-    return
-  }
-  // 原图加载失败：回退到中图继续展示
-  if (mediumUrl.value && mediumUrl.value !== previewUrl.value) {
-    previewStage.value = 'medium'
-    isUpgradingOriginal.value = false
-    previewUrl.value = mediumUrl.value
-    return
-  }
-  previewFailed.value = true
-}
-
-function resetZoom() {
-  scale.value = 1
-  translateX.value = 0
-  translateY.value = 0
-}
-
-/** 获取两指间距 */
-function getTouchDistance(e: TouchEvent): number {
-  const dx = e.touches[0].clientX - e.touches[1].clientX
-  const dy = e.touches[0].clientY - e.touches[1].clientY
-  return Math.sqrt(dx * dx + dy * dy)
-}
-
-function onPreviewTouchStart(e: TouchEvent) {
-  if (e.touches.length === 2) {
-    // 双指缩放开始
-    isPinching = true
-    initialPinchDistance = getTouchDistance(e)
-    pinchStartScale = scale.value
-  }
-  else if (e.touches.length === 1) {
-    // 单指拖拽
-    isPinching = false
-    dragStartX = e.touches[0].clientX
-    dragStartY = e.touches[0].clientY
-    dragStartTranslateX = translateX.value
-    dragStartTranslateY = translateY.value
-  }
-}
-
-function onPreviewTouchMove(e: TouchEvent) {
-  e.preventDefault()
-  // 拖拽/缩放手势开始后取消未决的单击判定，避免误触"查看原图"
-  clearSingleTapTimer()
-  if (e.touches.length === 2) {
-    // 双指缩放
-    isPinching = true
-    const currentDistance = getTouchDistance(e)
-    if (initialPinchDistance > 0) {
-      const ratio = currentDistance / initialPinchDistance
-      const newScale = Math.max(1, Math.min(5, pinchStartScale * ratio))
-      scale.value = newScale
-    }
-  }
-  else if (e.touches.length === 1 && !isPinching && scale.value > 1) {
-    // 单指拖拽（仅放大后可拖拽）
-    const dx = e.touches[0].clientX - dragStartX
-    const dy = e.touches[0].clientY - dragStartY
-    translateX.value = dragStartTranslateX + dx
-    translateY.value = dragStartTranslateY + dy
-  }
-}
-
-function onPreviewTouchEnd(e: TouchEvent) {
-  // 从双指缩放切换到单指拖拽时，重新捕获拖拽起点，避免位置跳变
-  if (isPinching && e.touches.length === 1) {
-    isPinching = false
-    dragStartX = e.touches[0].clientX
-    dragStartY = e.touches[0].clientY
-    dragStartTranslateX = translateX.value
-    dragStartTranslateY = translateY.value
-    return
-  }
-  isPinching = false
-}
-
-/** 双击缩放 + 单击查看原图 */
-let lastTapTime = 0
-/** 单击判定计时器（300ms 内无第二次点击则视为单击） */
-let singleTapTimer: ReturnType<typeof setTimeout> | undefined
-
-function clearSingleTapTimer() {
-  if (singleTapTimer) {
-    clearTimeout(singleTapTimer)
-    singleTapTimer = undefined
-  }
-}
-
-function onPreviewImageClick(e: MouseEvent) {
-  e.stopPropagation()
-  const now = Date.now()
-  if (now - lastTapTime < 300) {
-    // 双击：在 1x 和 2x 间切换
-    clearSingleTapTimer()
-    if (scale.value > 1.5) {
-      resetZoom()
-    }
-    else {
-      scale.value = 2
-      translateX.value = 0
-      translateY.value = 0
-    }
-    lastTapTime = 0
-  }
-  else {
-    lastTapTime = now
-    clearSingleTapTimer()
-    // 单击（中图阶段）：300ms 后无第二次点击则切换查看原图
-    singleTapTimer = setTimeout(() => {
-      singleTapTimer = undefined
-      lastTapTime = 0
-      upgradeToOriginal()
-    }, 300)
-  }
-}
-
-onBeforeUnmount(() => {
-  clearSingleTapTimer()
+/** 预览图片列表：中图 → 原图（同图双分辨率，供 EmImageViewer 展示与加载状态上报） */
+const previewSrcs = computed(() => {
+  const list = [mediumUrl.value, originalUrl.value].filter(Boolean) as string[]
+  return list.length > 1 && list[0] === list[1] ? [list[0]] : list
 })
 
-/** 下载原图 */
-async function handleDownload(event: MouseEvent) {
-  event.stopPropagation()
-  const url = originalUrl.value
-  if (!url) {
-    showToast(t('message.download.failed', '下载失败'), 'error')
+/** 已触发过失败降级的索引（防止中图/原图失败互跳死循环） */
+const degradedIndexes = ref<Set<number>>(new Set())
+
+function openPreview() {
+  if (previewSrcs.value.length === 0)
     return
-  }
+  previewIndex.value = 0
+  degradedIndexes.value.clear()
+  isPreviewing.value = true
+}
 
-  const env = detectEnvironment()
-  const filename = (props.message.body as ImageMessageBody).filename || 'image.jpg'
+/** 升级到原图（中图阶段底部按钮触发） */
+function upgradeToOriginal() {
+  if (previewIndex.value !== 0 || previewSrcs.value.length <= 1)
+    return
+  previewIndex.value = 1
+}
 
-  try {
-    await downloadFile({
-      url,
-      filename,
-      env,
-      onSuccess: () => {
-        showToast(t('message.download.success', '下载成功'), 'success')
-      },
-      onError: (err) => {
-        if (err.name === 'WechatNotSupported') {
-          showToast(t('message.download.wechatHint', '请在浏览器中打开以下载文件'), 'warning')
-        }
-        else {
-          showToast(t('message.download.failed', '下载失败'), 'error')
-        }
-      },
-    })
-  }
-  catch {
-    // 错误已在 onError 回调中处理
-  }
+/** 切回中图（原图阶段底部按钮触发，与"查看原图"形成 toggle） */
+function backToMedium() {
+  if (previewIndex.value !== 1)
+    return
+  previewIndex.value = 0
+}
+
+/**
+ * 预览图片加载失败：中图失败自动升原图；原图失败回退中图；
+ * 同一索引已降级过一次则停止互跳，避免死循环。
+ */
+function onPreviewError(index: number) {
+  if (degradedIndexes.value.has(index))
+    return
+  degradedIndexes.value.add(index)
+  if (index === 0 && previewSrcs.value.length > 1)
+    previewIndex.value = 1
+  else if (index === 1 && previewSrcs.value.length > 1)
+    previewIndex.value = 0
 }
 </script>
 
@@ -347,69 +142,46 @@ async function handleDownload(event: MouseEvent) {
       >
       <!-- 加载失败 -->
       <div v-if="isError" class="image-message__error" :class="radiusClass">
-        [图片加载失败]
+        {{ t('message.image.loadFailed', '[图片加载失败]') }}
       </div>
     </div>
 
     <!-- 无图片 URL -->
     <div v-else class="image-message__placeholder" :class="radiusClass">
-      [图片]
+      {{ t('message.image', '[图片]') }}
     </div>
 
-    <!-- 全屏预览浮层 -->
-    <div
-      v-if="isPreviewing && previewUrl"
-      class="image-message__preview"
-      @click="closePreview"
+    <!-- 全屏预览（缩放/旋转/loading/下载由 EmImageViewer 提供，中图/原图切换走底部按钮） -->
+    <ImageViewer
+      v-model:show="isPreviewing"
+      v-model:index="previewIndex"
+      :srcs="previewSrcs"
+      :show-navigator="false"
+      @load-error="onPreviewError"
     >
-      <img
-        :src="previewUrl"
-        class="image-message__preview-img"
-        alt="preview"
-        :style="{
-          transform: `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`,
-          cursor: scale > 1 ? 'grab' : 'default',
-        }"
-        @load="onPreviewImgLoad"
-        @error="onPreviewImgError"
-        @touchstart="onPreviewTouchStart"
-        @touchmove.prevent="onPreviewTouchMove"
-        @touchend="onPreviewTouchEnd"
-        @click="onPreviewImageClick"
-      >
-      <!-- 底部统一切换入口：中图阶段 → 点击查看原图 -->
-      <button
-        v-if="previewStage === 'medium' && originalUrl && originalUrl !== previewUrl && !previewFailed"
-        class="image-message__preview-toggle"
-        @click.stop="upgradeToOriginal"
-      >
-        查看原图
-      </button>
-      <!-- 原图加载中提示 -->
-      <div v-else-if="isUpgradingOriginal" class="image-message__preview-tip">
-        加载原图中…
-      </div>
-      <!-- 原图已展示 → 点击切回中图 -->
-      <button
-        v-else-if="isOriginalShown && originalUrl && originalUrl !== mediumUrl"
-        class="image-message__preview-toggle"
-        @click.stop="backToMedium"
-      >
-        查看中图
-      </button>
-      <!-- 图片加载失败占位 -->
-      <div v-if="previewFailed" class="image-message__preview-failed">
-        图片加载失败
-      </div>
-      <!-- 下载按钮 -->
-      <button
-        class="image-message__download-btn"
-        :title="t('message.download.success', '下载')"
-        @click.stop="handleDownload"
-      >
-        <Icon name="arrows/arrow_down_n_box" :size="20" />
-      </button>
-    </div>
+      <template #footer="{ index: viewIndex, loading }">
+        <!-- 中图阶段 → 点击查看原图 -->
+        <button
+          v-if="viewIndex === 0 && previewSrcs.length > 1 && !loading"
+          class="image-message__preview-toggle"
+          @click="upgradeToOriginal"
+        >
+          {{ t('message.image.viewOriginal', '查看原图') }}
+        </button>
+        <!-- 原图加载中提示 -->
+        <div v-else-if="viewIndex === 1 && loading" class="image-message__preview-tip">
+          {{ t('message.image.loadingOriginal', '加载原图中…') }}
+        </div>
+        <!-- 原图已展示 → 点击切回中图 -->
+        <button
+          v-else-if="viewIndex === 1 && !loading"
+          class="image-message__preview-toggle"
+          @click="backToMedium"
+        >
+          {{ t('message.image.viewMedium', '查看中图') }}
+        </button>
+      </template>
+    </ImageViewer>
   </div>
 </template>
 
@@ -468,51 +240,13 @@ async function handleDownload(event: MouseEvent) {
   color: var(--uikit-bubble-text-other);
 }
 
-/* 全屏预览 */
-.image-message__preview {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-message__preview-img {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  border-radius: 4px;
-}
-
-/* 预览层加载高清提示 */
-.image-message__preview-tip {
-  position: absolute;
-  bottom: 88px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 14px;
-  border-radius: 16px;
-  background-color: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: var(--uikit-font-size-12);
-  z-index: 3001;
-  pointer-events: none;
-}
-
-/* 预览层中图/原图切换按钮（底部统一入口，文案直接说明点击结果） */
+/* 预览层底部切换按钮/提示（位置由 EmImageViewer 的 footer 容器统一控制） */
 .image-message__preview-toggle {
-  position: absolute;
-  bottom: 88px;
-  left: 50%;
-  transform: translateX(-50%);
   padding: 6px 14px;
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: #fff;
   font-size: var(--uikit-font-size-12);
-  z-index: 3001;
   border: none;
   cursor: pointer;
   white-space: nowrap;
@@ -520,48 +254,18 @@ async function handleDownload(event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.image-message__preview-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.75);
-}
+  .image-message__preview-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+  }
 }
 
-/* 预览层加载失败占位 */
-.image-message__preview-failed {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.75);
+.image-message__preview-tip {
+  padding: 6px 14px;
+  border-radius: 16px;
+  background-color: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: var(--uikit-font-size-14);
-  z-index: 3001;
+  font-size: var(--uikit-font-size-12);
   pointer-events: none;
-}
-
-/* 预览层下载按钮 */
-.image-message__download-btn {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-  z-index: 3001;
-}
-
-@media (hover: hover) {
-.image-message__download-btn:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-}
 }
 
 @keyframes image-loading-pulse {
