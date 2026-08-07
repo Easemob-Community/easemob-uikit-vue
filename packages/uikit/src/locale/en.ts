@@ -157,6 +157,7 @@ const messages: LocaleMessages = {
   'imageViewer.zoomIn': 'Zoom in',
   'imageViewer.zoomOut': 'Zoom out',
   'imageViewer.reset': 'Fit to screen',
+  'imageViewer.fitted': 'Already fitted to screen',
   'imageViewer.rotateLeft': 'Rotate left',
   'imageViewer.rotateRight': 'Rotate right',
   'imageViewer.download': 'Download',

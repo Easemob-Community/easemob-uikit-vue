@@ -163,7 +163,16 @@ function onDblClick() {
 /** 滚轮缩放（桌面端，以图片中心为锚，0.5~5 倍） */
 function onWheel(e: WheelEvent) {
   const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1
-  scale.value = Math.max(1, Math.min(5, scale.value * factor))
+  applyScale(scale.value * factor)
+}
+
+/** 更新缩放并等比例修正平移，保证缩放锚点保持在图片中心 */
+function applyScale(nextScale: number) {
+  const clamped = Math.max(1, Math.min(5, nextScale))
+  const ratio = clamped / scale.value
+  scale.value = clamped
+  translateX.value *= ratio
+  translateY.value *= ratio
 }
 
 function getTouchDistance(e: TouchEvent): number {
@@ -197,8 +206,7 @@ function onTouchMove(e: TouchEvent) {
     isPinching = true
     const currentDistance = getTouchDistance(e)
     if (initialPinchDistance > 0) {
-      const ratio = currentDistance / initialPinchDistance
-      scale.value = Math.max(1, Math.min(5, pinchStartScale * ratio))
+      applyScale(pinchStartScale * currentDistance / initialPinchDistance)
     }
   }
   else if (e.touches.length === 1 && !isPinching && scale.value > 1) {
@@ -278,12 +286,24 @@ function goNext() {
 
 /** 工具栏操作 */
 function zoomIn() {
-  scale.value = Math.max(1, Math.min(5, scale.value + 0.5))
+  applyScale(scale.value + 0.5)
 }
 
 function zoomOut() {
-  scale.value = Math.max(1, Math.min(5, scale.value - 0.5))
+  applyScale(scale.value - 0.5)
 }
+
+/** 视图是否处于初始态（未缩放/未偏移/未旋转），决定「适应屏幕」是否可用 */
+const isViewReset = computed(() =>
+  scale.value <= 1 && translateX.value === 0 && translateY.value === 0 && rotation.value % 360 === 0,
+)
+
+/** 「适应屏幕」按钮提示：禁用时说明已是最佳视图，避免不可点但无解释 */
+const resetTooltip = computed(() =>
+  isViewReset.value
+    ? t('imageViewer.fitted', '已在适应屏幕状态')
+    : t('imageViewer.reset', '适应屏幕'),
+)
 
 /** 工具栏：适应屏幕（重置缩放/平移/旋转到初始态） */
 function resetView() {
@@ -421,8 +441,8 @@ async function handleDownload() {
       </button>
       <button
         class="image-viewer__tool-btn"
-        :title="t('imageViewer.reset', '适应屏幕')"
-        :disabled="scale === 1 && rotation % 360 === 0"
+        :title="resetTooltip"
+        :disabled="isViewReset"
         @click="resetView"
       >
         <Icon name="actions/reset" :size="18" />
