@@ -104,27 +104,28 @@ const digitCount = computed(() => {
 }
 
 .uikit-badge__content--small {
-  height: 18px;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 9px;
-  font-size: var(--uikit-font-size-8);
+  height: 16px;
+  min-width: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: var(--uikit-font-size-9);
+  font-weight: 600;
 }
 
 .uikit-badge__content--small.uikit-badge__content--single {
-  width: 18px;
-  min-width: 18px;
+  width: 16px;
+  min-width: 16px;
   padding: 0;
 }
 
 .uikit-badge__content--small.uikit-badge__content--double {
-  min-width: 24px;
+  min-width: 22px;
   padding: 0 5px;
 }
 
 .uikit-badge__content--small.uikit-badge__content--triple {
-  min-width: 32px;
-  padding: 0 6px;
+  min-width: 28px;
+  padding: 0 5px;
 }
 
 /* 红点模式 */

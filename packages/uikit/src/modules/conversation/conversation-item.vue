@@ -331,6 +331,7 @@ const displayMessage = computed(() => {
           :count="props.conversation.unreadCount"
           :dot="props.unreadMode === 'dot' || props.conversation.isMuted"
           :color="props.conversation.isMuted ? 'var(--uikit-text-secondary)' : undefined"
+          size="small"
         />
       </div>
       <slot name="item-suffix" />

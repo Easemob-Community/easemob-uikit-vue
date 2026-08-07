@@ -118,7 +118,8 @@ const bannerState = computed(() => {
       visible: true,
       type: 'warning' as const,
       loading: true,
-      title: t('status.connecting'),
+      // 首次连接与自动重连差异化文案：曾成功连接过即为重连中
+      title: stores.client.hasConnectedOnce ? t('status.reconnecting') : t('status.connecting'),
       description: '',
       clickable: false,
     }

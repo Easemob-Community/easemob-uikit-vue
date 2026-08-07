@@ -8,6 +8,8 @@ export function useClient() {
 
   const connected = computed(() => clientStore.connected)
   const connecting = computed(() => clientStore.connecting)
+  /** 是否已成功连接过：用于区分首次连接与自动重连 */
+  const hasConnectedOnce = computed(() => clientStore.hasConnectedOnce)
   const isLoggedIn = computed(() => clientStore.connected && !!clientStore.currentUser)
   const currentUser = computed(() => clientStore.currentUser)
   const sdkClient = computed(() => client.value)
@@ -17,6 +19,7 @@ export function useClient() {
     sdkClient,
     connected,
     connecting,
+    hasConnectedOnce,
     isLoggedIn,
     currentUser,
     /** 手动初始化 SDK 客户端（延迟初始化场景） */

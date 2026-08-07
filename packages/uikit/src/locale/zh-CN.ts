@@ -93,6 +93,7 @@ const messages: LocaleMessages = {
   'conversation.syncing': '正在同步会话...',
   'status.networkError': '网络异常，请检查网络情况',
   'status.connecting': '正在连接...',
+  'status.reconnecting': '正在重连...',
   'status.syncingConversations': '正在同步会话...',
   'status.syncingMessages': '正在同步消息...',
   'conversation.newChat': '新会话',

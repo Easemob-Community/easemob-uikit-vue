@@ -93,6 +93,7 @@ const messages: LocaleMessages = {
   'conversation.syncing': 'Syncing conversations...',
   'status.networkError': 'Network error, please check your network',
   'status.connecting': 'Connecting...',
+  'status.reconnecting': 'Reconnecting...',
   'status.syncingConversations': 'Syncing conversations...',
   'status.syncingMessages': 'Syncing messages...',
   'conversation.newChat': 'New Chat',

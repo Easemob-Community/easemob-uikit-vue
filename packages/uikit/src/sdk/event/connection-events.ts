@@ -29,6 +29,8 @@ export function createConnectionHandlers(
       connLog.info('onConnected')
       stores.client.setConnected(true)
       stores.client.setConnecting(false)
+      // 标记首次连接成功：此后再次 onConnecting 即为自动重连，横幅据此区分文案
+      stores.client.setHasConnectedOnce(true)
     },
     onDisconnected: () => {
       connLog.info('onDisconnected')
@@ -54,7 +56,12 @@ export function createConnectionHandlers(
     },
     onOfflineMessageSyncStart: () => {
       connLog.info('onOfflineMessageSyncStart')
-      stores.message.setSyncingMessages(true)
+      // SDK 会周期性触发离线消息同步：仅在首次连接（会话列表尚未加载完成）时
+      // 驱动「正在同步消息」横幅，后续定期同步不再驱动，避免横幅反复出现/消失
+      // 导致会话列表上下跳动（闪动）。
+      if (!stores.conversation.conversationsLoaded) {
+        stores.message.setSyncingMessages(true)
+      }
     },
     onOfflineMessageSyncFinish: () => {
       connLog.info('onOfflineMessageSyncFinish')
