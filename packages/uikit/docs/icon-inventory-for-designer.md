@@ -374,7 +374,7 @@
 | 建议名称 | 当前状态 | 用途 |
 |----------|----------|------|
 | `message/status_sending` | ⚠️ 静态 `actions/loading_circle` | 发送中（需动效规范） |
-| `message/status_failed` | ⚠️ 共用 `status/error`（lucide:circle-x） | 发送失败 |
+| `message/status_failed` | ✅ 已替换为 `misc/candle`（圆圈感叹号） | 发送失败 |
 | `message/status_sent` | ⚠️ 共用 `chat/doneAll` | 已发送 |
 | `message/status_delivered` | ⚠️ 共用 `chat/doneAll` | 已送达 |
 | `message/status_read` | ⚠️ 共用 `chat/doneAll` | 已读 |

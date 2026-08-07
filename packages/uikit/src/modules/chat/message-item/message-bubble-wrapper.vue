@@ -170,8 +170,8 @@ const classicStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.SENT]: 'actions/check',
   [MESSAGE_STATUS.DELIVERED]: 'chat/doneAll',
   [MESSAGE_STATUS.READ]: 'chat/doneAll',
-  // 发送失败：回转箭头提示可点击重发
-  [MESSAGE_STATUS.FAILED]: 'arrows/arrow_Uturn_clockwise',
+  // 发送失败：圆圈内感叹号（candle）提示可点击重发
+  [MESSAGE_STATUS.FAILED]: 'misc/candle',
 }
 
 /** 数字胶囊状态图标映射（线性/描边版）
@@ -182,7 +182,7 @@ const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.SENT]: 'status/circle',
   [MESSAGE_STATUS.DELIVERED]: 'status/circle',
   [MESSAGE_STATUS.READ]: 'status/circle_check',
-  [MESSAGE_STATUS.FAILED]: 'arrows/arrow_Uturn_clockwise',
+  [MESSAGE_STATUS.FAILED]: 'misc/candle',
 }
 
 /** 当前状态图标 */
