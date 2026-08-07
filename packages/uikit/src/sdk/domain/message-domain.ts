@@ -1,4 +1,4 @@
-import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
+import type { GroupMessageReadUser, GroupMessageReadUsersResult, Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '../types'
 import type { ConversationTypeValue } from '../../constants'
 import type { ManagerHost } from '../client'
@@ -398,11 +398,16 @@ export class MessageDomain {
   ) {
     if (messageIds.length === 0)
       return
-    await this.client.chatManager.sendMessageReadReceipts({
-      conversationId,
-      conversationType,
-      messageIds,
-    })
+    // SDK 单次最多允许 50 个 messageId，超过需分批发送。
+    const BATCH_SIZE = 50
+    for (let i = 0; i < messageIds.length; i += BATCH_SIZE) {
+      const batch = messageIds.slice(i, i + BATCH_SIZE)
+      await this.client.chatManager.sendMessageReadReceipts({
+        conversationId,
+        conversationType,
+        messageIds: batch,
+      })
+    }
   }
 
   /**
@@ -543,12 +548,34 @@ export class MessageDomain {
     })
   }
 
-  /** 获取群消息已读详情 */
-  async fetchGroupReadDetail(groupId: string, messageId: string) {
-    return this.client.chatManager.getGroupMessageReadUsers({
+  /** 获取群消息已读详情（自动翻页聚合全部已读成员） */
+  async fetchGroupReadDetail(
+    groupId: string,
+    messageId: string,
+    pageSize = 100,
+  ): Promise<GroupMessageReadUsersResult> {
+    let cursor: string | undefined
+    const users: GroupMessageReadUser[] = []
+    let count = 0
+    do {
+      const page = await this.client.chatManager.getGroupMessageReadUsers({
+        groupId,
+        messageId,
+        cursor,
+        pageSize,
+      })
+      users.push(...page.users)
+      count = page.count
+      cursor = page.cursor || undefined
+    } while (cursor)
+    return {
       groupId,
       messageId,
-    })
+      users,
+      count,
+      cursor: '',
+      hasMore: false,
+    }
   }
 
   /** 修改文本消息 */

@@ -27,6 +27,8 @@ export const useMessageStore = defineStore('message', () => {
   const sendingMetaMap = ref<Record<string, { sdkMsg: SdkMessage, timestamp: number }>>({})
   const pinnedMessageMap = ref<Record<string, UiMessage[]>>({})
   const parsedCombineMessageMap = ref<Record<string, UiMessage[]>>({})
+  /** 群消息已读成员缓存：key = `${groupId}:${messageId}` */
+  const groupMessageReadUsersMap = ref<Record<string, string[]>>({})
   const atMeMessageMap = ref<Record<string, string[]>>({})
   /** 离线消息同步中（登录后 SDK 拉取离线历史阶段） */
   const isSyncingMessages = ref(false)
@@ -62,6 +64,14 @@ export const useMessageStore = defineStore('message', () => {
 
   function setParsedCombineMessages(messageId: string, messages: UiMessage[]) {
     parsedCombineMessageMap.value[messageId] = messages
+  }
+
+  function getGroupMessageReadUsers(groupId: string, messageId: string): string[] {
+    return groupMessageReadUsersMap.value[`${groupId}:${messageId}`] || []
+  }
+
+  function setGroupMessageReadUsers(groupId: string, messageId: string, userIds: string[]) {
+    groupMessageReadUsersMap.value[`${groupId}:${messageId}`] = userIds
   }
 
   function setSyncingMessages(value: boolean) {
@@ -383,6 +393,7 @@ export const useMessageStore = defineStore('message', () => {
     sendingMetaMap.value = {}
     pinnedMessageMap.value = {}
     parsedCombineMessageMap.value = {}
+    groupMessageReadUsersMap.value = {}
     atMeMessageMap.value = {}
     isSyncingMessages.value = false
   }
@@ -392,6 +403,7 @@ export const useMessageStore = defineStore('message', () => {
     sendingMetaMap: computed(() => sendingMetaMap.value),
     pinnedMessageMap: computed(() => pinnedMessageMap.value),
     parsedCombineMessageMap: computed(() => parsedCombineMessageMap.value),
+    groupMessageReadUsersMap: computed(() => groupMessageReadUsersMap.value),
     atMeMessageMap: computed(() => atMeMessageMap.value),
     isSyncingMessages: computed(() => isSyncingMessages.value),
     setSyncingMessages,
@@ -400,6 +412,8 @@ export const useMessageStore = defineStore('message', () => {
     getPinnedMessages,
     getParsedCombineMessages,
     setParsedCombineMessages,
+    getGroupMessageReadUsers,
+    setGroupMessageReadUsers,
     getAtMeMessages,
     addMessage,
     addSendingMessage,
