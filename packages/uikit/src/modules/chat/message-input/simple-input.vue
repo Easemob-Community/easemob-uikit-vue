@@ -56,8 +56,8 @@ const isMultiline = computed(() => !isMobile.value)
 /** 光标颜色 */
 const caretColorVar = computed(() => props.config?.caretColor || 'auto')
 
-/** 文本选中背景色 */
-const selectionColorVar = computed(() => props.config?.selectionColor || 'revert')
+/** 文本选中背景色：未配置时使用主题选中色 token，跟随主题色 */
+const selectionColorVar = computed(() => props.config?.selectionColor || 'var(--uikit-selection-bg)')
 
 /** 最大输入长度 */
 const maxLengthValue = computed(() => {

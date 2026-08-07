@@ -215,7 +215,7 @@ export interface ChatConfig {
     focusBorderColor?: string
     /** 光标颜色，不设置则使用默认 */
     caretColor?: string
-    /** 文本选中背景色，不设置则使用浏览器默认 */
+    /** 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色） */
     selectionColor?: string
     /** 最大输入长度，0 或不设置表示无限制 */
     maxLength?: number

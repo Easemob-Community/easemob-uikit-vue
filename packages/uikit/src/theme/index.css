@@ -28,6 +28,9 @@
   --uikit-primary-hover: hsl(203, 100%, 50%);
   --uikit-primary-rgb: 51, 177, 255;
 
+  /* 文本选中背景色（输入框 ::selection），跟随主题色 */
+  --uikit-selection-bg: var(--uikit-primary-color-opacity);
+
   /* 语义色 RGB（用于 rgba() 半透明背景） */
   --uikit-success-rgb: 22, 163, 74;
   --uikit-warning-rgb: 255, 178, 51;
@@ -181,6 +184,9 @@
   --uikit-primary: var(--uikit-primary-color);
   --uikit-primary-hover: hsl(203, 100%, 45%);
   --uikit-primary-rgb: 51, 177, 255;
+
+  /* 文本选中背景色：暗底上提高透明度保证可见，跟随主题色 */
+  --uikit-selection-bg: rgba(var(--uikit-primary-rgb), 0.4);
 
   /* 字号 token：暗色下与浅色共用同一套缩放逻辑 */
   --uikit-font-size-8: calc(8px * var(--uikit-font-scale));

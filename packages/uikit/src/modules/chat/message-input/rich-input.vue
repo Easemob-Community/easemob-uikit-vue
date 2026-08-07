@@ -37,7 +37,7 @@ const style = computed(() => props.config?.style ?? 'wechat')
 /** CSS 变量（用于全局样式中的 caret/selection） */
 const cssVars = computed(() => ({
   '--rich-input-caret-color': props.config?.caretColor || 'auto',
-  '--rich-input-selection-color': props.config?.selectionColor || 'revert',
+  '--rich-input-selection-color': props.config?.selectionColor || 'var(--uikit-selection-bg)',
 }))
 
 /** 最大输入长度 */
