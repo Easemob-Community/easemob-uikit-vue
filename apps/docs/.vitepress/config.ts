@@ -89,6 +89,8 @@ export default defineConfig({
             { text: '通讯录模块', link: '/components/contact-container' },
             { text: '地址簿容器', link: '/components/address-book-container' },
             { text: '群组模块', link: '/components/group-container' },
+            { text: '添加联系人弹窗', link: '/components/add-contact-modal' },
+            { text: '创建群组弹窗', link: '/components/create-group-modal' },
           ],
         },
       ],

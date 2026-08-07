@@ -1,5 +1,5 @@
 import type { UserInfo } from 'easemob-websdk'
-import type { UiContact, UiGroup, UiPresence } from '../sdk/types'
+import type { CreateGroupParams, UiContact, UiGroup, UiPresence } from '../sdk/types'
 
 /**
  * 业务可插拔的数据源适配器。
@@ -15,6 +15,24 @@ export interface UIKitDataSource {
   unsubscribePresence?: (userIds: string[]) => Promise<void> | void
   /** 业务自定义用户资料源；返回数组至少包含 userId，可选 nickname/avatarUrl 等 */
   fetchUserInfos?: (userIds: string[]) => Promise<Array<Pick<UserInfo, 'userId' | 'nickname' | 'avatarUrl' | 'sign' | 'ext'>>>
+  /**
+   * 服务端搜索用户：按手机号/邮箱/昵称等业务字段查询环信 userId。
+   * 不传时添加联系人组件退化为直接输入 userId 添加。
+   * Business-side user search: map phone/email/etc. to Easemob userId.
+   */
+  searchUsers?: (keyword: string) => Promise<UiContact[]>
+  /**
+   * 业务接管添加好友动作（可先登记自有业务系统，再调用 SDK 添加）。
+   * 不传时走 SDK contactManager.addContact 默认实现。
+   * Business takeover of add-contact action; falls back to SDK by default.
+   */
+  addContact?: (userId: string, message?: string) => Promise<void>
+  /**
+   * 业务接管创建群组动作（可先登记自有业务系统，再调用 SDK 创建）。
+   * 不传时走 SDK groupManager.createGroup 默认实现。
+   * Business takeover of create-group action; falls back to SDK by default.
+   */
+  createGroup?: (params: CreateGroupParams) => Promise<{ groupId: string }>
 }
 
 /** 联系人拉取模式 */

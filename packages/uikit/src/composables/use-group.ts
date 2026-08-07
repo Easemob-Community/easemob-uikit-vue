@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { CONVERSATION_TYPE } from '../constants'
-import type { UiGroup, UiGroupMember } from '../sdk/types'
+import type { CreateGroupParams, UiGroup, UiGroupMember } from '../sdk/types'
 import { useLocale } from '../locale'
 import { insertChatNotice } from '../sdk/event/notice-utils'
 import { useUIKit } from './use-uikit'
@@ -101,18 +101,11 @@ export function useGroup() {
     await domains.group.updateGroupAnnouncement(groupId, announcement)
   }
 
-  /** 创建群组 */
-  async function createGroup(params: {
-    name: string
-    description?: string
-    memberIds?: string[]
-    public?: boolean
-    joinApprovalRequired?: boolean
-    allowInvites?: boolean
-    inviteNeedConfirm?: boolean
-    maxMembers?: number
-  }) {
-    const result = await domains.group.createGroup(params)
+  /** 创建群组（优先数据源适配器接管，回落 SDK 默认实现） */
+  async function createGroup(params: CreateGroupParams) {
+    const result = dataSource.createGroup
+      ? await dataSource.createGroup(params)
+      : await domains.group.createGroup(params)
     // 创建成功后在本设备群聊插入“群聊已创建”本地通知
     insertChatNotice(stores, result.groupId, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupCreated'))
     return result
@@ -173,8 +166,8 @@ export function useGroup() {
     return groupStore.getGroupMembers(groupId)
   }
 
-  /** 获取已缓存的群公告 */
-  function getGroupAnnouncement(groupId: string): string {
+  /** 获取已缓存的群公告；未获取过返回 undefined，已获取但为空返回 '' */
+  function getGroupAnnouncement(groupId: string): string | undefined {
     return groupStore.getGroupAnnouncement(groupId)
   }
 

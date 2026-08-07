@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import type { UiContact } from '../sdk/types'
 import { useUIKit } from './use-uikit'
 
 export function useContact() {
@@ -81,8 +82,22 @@ export function useContact() {
     return domains.contact.syncBlocklist()
   }
 
-  /** 添加好友 */
+  /**
+   * 搜索用户（手机号/邮箱/昵称等 → 环信 userId），优先数据源适配器。
+   * 未配置 searchUsers 适配器时返回空数组（SDK 无按关键字搜索能力）。
+   */
+  async function searchUsers(keyword: string): Promise<UiContact[]> {
+    if (dataSource.searchUsers)
+      return dataSource.searchUsers(keyword)
+    return []
+  }
+
+  /** 添加好友（优先数据源适配器接管，回落 SDK 默认实现） */
   async function addContact(userId: string, message?: string) {
+    if (dataSource.addContact) {
+      await dataSource.addContact(userId, message)
+      return
+    }
     await domains.contact.addContact(userId, message)
   }
 
@@ -166,6 +181,7 @@ export function useContact() {
     fetchContactCount,
     refresh,
     loadMore,
+    searchUsers,
     addContact,
     deleteContact,
     setContactRemark,

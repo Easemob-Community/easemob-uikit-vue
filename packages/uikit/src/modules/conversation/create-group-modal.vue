@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
 import { CONVERSATION_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
@@ -14,7 +14,7 @@ import ContactList from '../contact/contact-list.vue'
 import ContactItemDefault from '../contact/contact-item-default.vue'
 import Cell from '../../components/cell/cell.vue'
 import Empty from '../../components/empty/empty.vue'
-import type { UiContact } from '../../sdk/types'
+import type { CreateGroupParams, UiContact } from '../../sdk/types'
 
 export interface CreateGroupModalConfig {
   /** 群名称；不传时自动生成 */
@@ -40,11 +40,19 @@ export interface CreateGroupModalConfig {
    * 自动生成规则：取前 3 个成员昵称 + "..."（成员数 > 3 时）。
    */
   autoName?: boolean
+  /** 是否在弹窗内显示“群设置”区（公开/审批/邀请开关、最大成员数），默认 false */
+  showSettings?: boolean
 }
 
 export interface CreateGroupModalProps {
   show: boolean
   config?: CreateGroupModalConfig
+  /**
+   * 自定义创建群函数：完全接管创建动作（可先登记自有业务系统，再调用 SDK 创建）。
+   * 优先级高于 Provider 的 dataSource.createGroup；未配置时走 SDK 默认实现。
+   * Custom create: fully take over the create-group action.
+   */
+  createFn?: (params: CreateGroupParams) => Promise<{ groupId: string }>
 }
 
 export interface CreateGroupModalEmits {
@@ -73,6 +81,16 @@ const currentUserId = computed(() => stores.client.currentUser)
 const showNameInput = computed(() => props.config.showNameInput === true)
 const showDescriptionInput = computed(() => props.config.showDescriptionInput === true)
 const autoName = computed(() => props.config.autoName !== false)
+const showSettings = computed(() => props.config.showSettings === true)
+
+/** 群设置开关状态（初值取 config，弹窗内可调整） */
+const settings = reactive({
+  public: false,
+  joinApprovalRequired: false,
+  allowInvites: false,
+  inviteNeedConfirm: false,
+  maxMembers: '',
+})
 
 const selectedContacts = computed(() => {
   const ids = [...selectedIds.value]
@@ -104,6 +122,11 @@ function reset() {
   errorMsg.value = ''
   groupNameInput.value = ''
   groupDescriptionInput.value = ''
+  settings.public = props.config.public ?? false
+  settings.joinApprovalRequired = props.config.joinApprovalRequired ?? false
+  settings.allowInvites = props.config.allowInvites ?? false
+  settings.inviteNeedConfirm = props.config.inviteNeedConfirm ?? false
+  settings.maxMembers = props.config.maxMembers ? String(props.config.maxMembers) : ''
   setSelectedIds([])
 }
 
@@ -121,16 +144,20 @@ async function onCreate() {
   errorMsg.value = ''
   try {
     const memberIds = selectedContacts.value.map(c => c.userId)
-    const result = await createGroup({
+    const params: CreateGroupParams = {
       name: finalName.value,
       description: groupDescriptionInput.value.trim() || props.config.description || '',
       memberIds,
-      public: props.config.public ?? false,
-      joinApprovalRequired: props.config.joinApprovalRequired ?? false,
-      allowInvites: props.config.allowInvites ?? false,
-      inviteNeedConfirm: props.config.inviteNeedConfirm ?? false,
-      maxMembers: props.config.maxMembers,
-    })
+      public: settings.public,
+      joinApprovalRequired: settings.joinApprovalRequired,
+      allowInvites: settings.allowInvites,
+      inviteNeedConfirm: settings.inviteNeedConfirm,
+      maxMembers: settings.maxMembers ? Number(settings.maxMembers) : undefined,
+    }
+    // 提交链路：props.createFn → dataSource.createGroup → SDK 默认
+    const result = props.createFn
+      ? await props.createFn(params)
+      : await createGroup(params)
     const groupId = result.groupId
 
     stores.conversation.addConversation({
@@ -179,7 +206,10 @@ watch(
         <span class="create-group-modal__title">{{ t('conversation.createGroup', '创建群组') }}</span>
       </div>
 
-      <div class="create-group-modal__body">
+      <div v-if="$slots.body" class="create-group-modal__body">
+        <slot name="body" />
+      </div>
+      <div v-else class="create-group-modal__body">
         <!-- 左侧：联系人选择 -->
         <div class="create-group-modal__left">
           <ContactList
@@ -222,6 +252,54 @@ watch(
             </div>
           </div>
 
+          <!-- 群设置：公开/审批/邀请开关 + 最大成员数（config.showSettings 开启） -->
+          <div v-if="showSettings" class="create-group-modal__settings">
+            <div class="create-group-modal__settings-title">
+              {{ t('group.createSettings', '群设置') }}
+            </div>
+            <Cell size="compact" :border="false" @click="settings.public = !settings.public">
+              <template #default>
+                {{ t('group.createPublic', '公开群') }}
+              </template>
+              <template #trailing>
+                <span class="create-group-modal__switch" :class="{ 'is-on': settings.public }"><i /></span>
+              </template>
+            </Cell>
+            <Cell size="compact" :border="false" @click="settings.joinApprovalRequired = !settings.joinApprovalRequired">
+              <template #default>
+                {{ t('group.createApproval', '入群需审批') }}
+              </template>
+              <template #trailing>
+                <span class="create-group-modal__switch" :class="{ 'is-on': settings.joinApprovalRequired }"><i /></span>
+              </template>
+            </Cell>
+            <Cell size="compact" :border="false" @click="settings.allowInvites = !settings.allowInvites">
+              <template #default>
+                {{ t('group.createAllowInvites', '允许成员邀请') }}
+              </template>
+              <template #trailing>
+                <span class="create-group-modal__switch" :class="{ 'is-on': settings.allowInvites }"><i /></span>
+              </template>
+            </Cell>
+            <Cell size="compact" :border="false" @click="settings.inviteNeedConfirm = !settings.inviteNeedConfirm">
+              <template #default>
+                {{ t('group.createInviteNeedConfirm', '被邀请人需确认') }}
+              </template>
+              <template #trailing>
+                <span class="create-group-modal__switch" :class="{ 'is-on': settings.inviteNeedConfirm }"><i /></span>
+              </template>
+            </Cell>
+            <div class="create-group-modal__field create-group-modal__field--max-members">
+              <label class="create-group-modal__label">{{ t('group.createMaxMembers', '最大成员数') }}</label>
+              <Input
+                v-model="settings.maxMembers"
+                type="number"
+                variant="default"
+                :placeholder="t('group.createMaxMembersPlaceholder', '不填则使用默认上限')"
+              />
+            </div>
+          </div>
+
           <div class="create-group-modal__selected-list">
             <ContactItemDefault
               v-for="contact in selectedContacts"
@@ -255,7 +333,11 @@ watch(
         {{ errorMsg }}
       </div>
 
-      <div class="create-group-modal__footer">
+      <!-- #footer 插槽：接管操作区 -->
+      <div v-if="$slots.footer" class="create-group-modal__footer">
+        <slot name="footer" />
+      </div>
+      <div v-else class="create-group-modal__footer">
         <Button type="default" @click="onClose">
           {{ t('button.cancel', '取消') }}
         </Button>
@@ -397,10 +479,10 @@ watch(
 }
 
 @media (hover: hover) {
-.create-group-modal__selected-remove:hover {
-  background-color: var(--uikit-danger-color, #ef4444);
-  color: #fff;
-}
+  .create-group-modal__selected-remove:hover {
+    background-color: var(--uikit-danger-color, #ef4444);
+    color: #fff;
+  }
 }
 
 .create-group-modal__error {
@@ -410,6 +492,55 @@ watch(
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   flex-shrink: 0;
   text-align: center;
+}
+
+.create-group-modal__settings {
+  padding: 4px 16px 12px;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 240px;
+}
+
+.create-group-modal__settings-title {
+  padding: 8px 0 4px;
+  font-size: var(--uikit-font-size-13);
+  font-weight: 600;
+  color: var(--uikit-text-secondary);
+}
+
+.create-group-modal__field--max-members {
+  margin-top: 10px;
+}
+
+.create-group-modal__switch {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: var(--uikit-bg-strong, #e5e7eb);
+  position: relative;
+  transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.create-group-modal__switch i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: transform var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+}
+
+.create-group-modal__switch.is-on {
+  background-color: var(--uikit-primary-color);
+}
+
+.create-group-modal__switch.is-on i {
+  transform: translateX(16px);
 }
 
 .create-group-modal__footer {
