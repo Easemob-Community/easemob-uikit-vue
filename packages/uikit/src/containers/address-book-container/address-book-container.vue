@@ -402,19 +402,19 @@ const subviewTitle = computed(() => {
               <slot name="subheader-extra" :view="view" />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
-                icon="actions/plus"
+                icon="actions/plus_in_circle"
                 size="small"
                 variant="ghost"
-                :icon-size="20"
+                :icon-size="22"
                 :title="t('contact.addContact')"
                 @click="emit('add-contact')"
               />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'group' && props.showGroupCreateButton"
-                icon="actions/plus"
+                icon="actions/plus_in_circle"
                 size="small"
                 variant="ghost"
-                :icon-size="20"
+                :icon-size="22"
                 :title="t('group.createGroup')"
                 @click="emit('create-group')"
               />

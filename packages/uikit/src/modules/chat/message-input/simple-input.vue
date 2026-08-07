@@ -414,7 +414,7 @@ defineExpose({
         <Icon name="files-media/img" :size="22" />
       </div>
       <div v-if="features.video" class="simple-input__tool-btn" @click="triggerFileInput('video')">
-        <Icon name="audio-video/video_camera" :size="22" />
+        <Icon name="misc/triangle_in_rect" :size="22" />
       </div>
       <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
         <Icon name="files-media/file" :size="22" />

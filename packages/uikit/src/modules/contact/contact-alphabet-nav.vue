@@ -72,7 +72,7 @@ function onTap(key: string) {
   font-size: var(--uikit-font-size-11);
   line-height: 1;
   padding: 2px 4px;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-primary-color);
   cursor: pointer;
   transition: color 0.15s, background-color 0.15s;
   border-radius: 4px;
@@ -80,14 +80,19 @@ function onTap(key: string) {
 
 @media (hover: hover) {
 .contact-alphabet-nav__item:hover {
-  color: var(--uikit-text-primary);
+  color: var(--uikit-primary-hover);
   background-color: var(--uikit-bg-secondary);
 }
 }
 
 .contact-alphabet-nav__item.is-active {
-  color: #ffffff;
-  background-color: var(--uikit-primary-color);
+  color: var(--uikit-primary-hover);
+  background-color: var(--uikit-primary-color-opacity);
+  font-weight: 700;
+}
+
+.contact-alphabet-nav__item.is-active:active {
+  filter: brightness(0.85);
 }
 
 .contact-alphabet-nav__item.is-empty {

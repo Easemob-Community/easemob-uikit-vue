@@ -11,6 +11,9 @@
   --uikit-text-secondary: #6b7280;
   --uikit-text-tertiary: #9ca3af;
 
+  /* 弱化图标/占位图标色 */
+  --uikit-icon-muted: #B6B8BF;
+
   /* 背景层级 */
   --uikit-bg-base: #ffffff;
   --uikit-bg-secondary: #f3f4f6;
@@ -170,6 +173,9 @@
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
   --uikit-text-tertiary: #6b7280;
+
+  /* 弱化图标/占位图标色 */
+  --uikit-icon-muted: #6b7280;
 
   /* 主色别名：由 store/theme.ts 运行时同步重写 */
   --uikit-primary: var(--uikit-primary-color);

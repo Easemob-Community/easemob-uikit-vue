@@ -774,14 +774,6 @@ defineExpose({
         <div v-if="isGroup" class="chat-info-drawer__section-group">
           <div class="chat-info-drawer__section-label-row">
             <span class="chat-info-drawer__section-label">{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
-            <IconButton
-              v-if="canAddMember"
-              icon="actions/plus"
-              size="small"
-              type="primary"
-              :title="t('chat.info.addMember')"
-              @click="onAddMember"
-            />
           </div>
           <div class="chat-info-drawer__section">
             <div class="chat-info-drawer__member-grid" @click="onViewAllMembers">
@@ -790,6 +782,13 @@ defineExpose({
                 :key="member.userId"
                 :member="member"
               />
+              <div
+                v-if="canAddMember"
+                class="chat-info-drawer__member-cell chat-info-drawer__member-cell--add"
+                @click.stop="onAddMember"
+              >
+                <Icon name="rect/minus" :size="48" />
+              </div>
             </div>
             <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
               {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.viewAllMembers') }}
@@ -1145,6 +1144,22 @@ defineExpose({
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px 8px;
+}
+
+.chat-info-drawer__member-cell--add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 2px;
+  cursor: pointer;
+  border-radius: var(--uikit-components-radius, 8px);
+}
+
+.chat-info-drawer__member-cell--add :deep(.uikit-icon) {
+  width: 48px;
+  height: 48px;
+  color: var(--uikit-icon-muted);
 }
 
 .chat-info-drawer__view-all {
