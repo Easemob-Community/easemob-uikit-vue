@@ -36,7 +36,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 6px 2px;
+  padding: 6px;
   cursor: pointer;
   border-radius: var(--uikit-components-radius, 8px);
 }

@@ -1141,15 +1141,21 @@ defineExpose({
 }
 
 .chat-info-drawer__member-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 16px;
+}
+
+.chat-info-drawer__member-grid > * {
+  flex: 0 0 calc((100% - 4 * 16px) / 5);
+  max-width: calc((100% - 4 * 16px) / 5);
 }
 
 .chat-info-drawer__member-cell--add {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   padding: 6px 2px;
   cursor: pointer;
