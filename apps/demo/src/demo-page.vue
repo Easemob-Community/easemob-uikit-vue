@@ -82,7 +82,7 @@ function toggleCustomDataSource(v: boolean) {
   emit('update:useCustomDataSource', v)
 }
 
-const { t } = useLocale()
+const { t, locale } = useLocale()
 const { stores } = useUIKit()
 const { currentUser } = useClient()
 const { selectConversation } = useConversation()
@@ -178,12 +178,12 @@ function onConversationActiveTabChange(tab: ConversationTabKey) {
 }
 
 /** 接管模式下的 tab 标签（demo 自绘按钮用） */
-const takeoverTabLabels: Record<string, string> = {
-  all: '全部',
-  unread: '未读',
-  single: '单聊',
-  group: '群组',
-}
+const takeoverTabLabels = computed<Record<string, string>>(() => ({
+  all: t('conversation.tabAll'),
+  unread: t('conversation.tabUnread'),
+  single: t('conversation.tabSingle'),
+  group: t('conversation.tabGroup'),
+}))
 
 /** 左侧边栏 tab：会话 / 联系人 */
 const sidebarTab = ref<'conversation' | 'contact'>('conversation')

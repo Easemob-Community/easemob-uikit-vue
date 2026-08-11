@@ -4,6 +4,17 @@ import { useLocale } from '../../locale'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationTabKey, ConversationTabsSlotScope } from './types'
 
+const { t } = useLocale()
+
+/** 分栏 tab 文案映射（走 i18n，computed 保证语言切换后刷新） */
+const tabLabels = computed<Record<ConversationTabKey, string>>(() => ({
+  all: t('conversation.tabAll'),
+  unread: t('conversation.tabUnread'),
+  atMe: t('conversation.tabAtMe'),
+  single: t('conversation.tabSingle'),
+  group: t('conversation.tabGroup'),
+}))
+
 export interface ConversationTabsProps {
   /**
    * 会话分栏 tab 集合，默认全量 ['all', 'unread', 'atMe', 'single', 'group']；
@@ -22,17 +33,6 @@ const props = withDefaults(defineProps<ConversationTabsProps>(), {
 const emit = defineEmits<{
   (e: 'update:active-tab', tab: ConversationTabKey): void
 }>()
-
-const { t } = useLocale()
-
-/** 分栏 tab 文案映射（走 i18n） */
-const tabLabels: Record<ConversationTabKey, string> = {
-  all: t('conversation.tabAll'),
-  unread: t('conversation.tabUnread'),
-  atMe: t('conversation.tabAtMe'),
-  single: t('conversation.tabSingle'),
-  group: t('conversation.tabGroup'),
-}
 
 /** 切换分栏 tab */
 function selectTab(tab: ConversationTabKey) {

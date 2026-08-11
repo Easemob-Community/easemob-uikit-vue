@@ -94,6 +94,12 @@ onMounted(() => {
 1. 任何用户可见文案 **必须** 走 `useLocale().t('dotted.key')`，禁止硬编码中文/英文字面量。
 2. 新增 key **必须同时** 加进 `zh-CN.ts` 和 `en.ts`，两边 key 集合对齐。
 3. 含 `{x}` 的 key，在调用方 `.replace('{x}', ...)`（`t()` 不插值）。
+4. **`t()` 在 setup 中一次调用得到的是快照，不是响应式文本**。
+   - 若把 `t()` 结果存到普通对象/变量再交给模板，语言切换后不会刷新。
+   - 正确做法：
+     - 模板中直接调用 `{{ t('key') }}`；
+     - 或包一层 `computed(() => t('key'))`；
+     - 若通过 prop 函数（如 `timeFormatter`）间接使用 `t()`，computed 必须显式依赖 `useLocale().locale.value`，否则 Vue 不会知道它需要随语言重算。
 
 ## 软约定
 
@@ -111,3 +117,5 @@ onMounted(() => {
 - ❌ 只往 `zh-CN.ts` 加 key、忘了 `en.ts`（英文环境把 key 当文案渲染出来）。
 - ❌ 以为 `t('...{count}...')` 会自动替换 `{count}`（不会，得调用方 replace）。
 - ❌ 想靠改 provider `:locale` prop 在挂载后切语言（当前不生效，得用 `useLocale().setLocale`）。
+- ❌ setup 里一次性把 `t()` 结果塞进普通对象，例如 `const labels = { all: t('...') }`，语言切换不刷新。
+- ❌ computed 里间接调用 `t()`（如通过 `props.timeFormatter`）却不引入 `locale.value` 依赖，语言切换不刷新。
