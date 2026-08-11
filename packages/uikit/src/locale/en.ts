@@ -355,6 +355,7 @@ const messages: LocaleMessages = {
   'groupReadReceipt.unread': 'Unread',
   'groupReadReceipt.empty': 'No users',
   'message.recalled': 'recalled a message',
+  'message.recalledPreview': 'Message recalled',
   'message.reedit': 'Re-edit',
   'message.recallExpired': 'Cannot recall after {duration} minutes',
   'message.recall.failed': 'Recall failed, please try again later',

@@ -10,7 +10,8 @@ import { notifyOnNewMessage } from '../notification-engine'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
 import { markReadReceiptSent } from '../domain/message-domain'
-import { resolveUserDisplayName } from '../../utils/resolve-last-message-text'
+import { formatConversationPreview, resolveSenderDisplayName, resolveUserDisplayName } from '../../utils/resolve-last-message-text'
+import { t } from '../../locale'
 import type { RootStores } from './types'
 
 const chatLog = createLogger('UIKit:ChatEvents')
@@ -181,6 +182,46 @@ async function patchConversationNames(stores: RootStores, client: ManagerHost) {
 }
 
 /**
+ * 消息被撤回时，若被撤回的是会话最后一条消息，同步更新会话列表摘要。
+ * 当前会话由 chat.vue 的 lastMessageSummary watch 自动刷新；
+ * 非当前会话需依赖此方法主动 patch，避免列表仍显示原消息内容。
+ */
+function patchConversationLastMessageOnRecall(
+  stores: RootStores,
+  conversationId: string,
+  conversationType: ConversationTypeValue,
+  messageId: string,
+) {
+  const msgs = stores.message.getMessages(conversationId)
+  const index = msgs.findIndex(
+    m => m.msgServerId === messageId || m.msgLocalId === messageId,
+  )
+  if (index === -1)
+    return
+  // 仅当被撤回消息是会话已加载消息中的最后一条时才更新摘要
+  if (index !== msgs.length - 1)
+    return
+
+  const recalledMsg = msgs[index]
+  const cvs = stores.conversation.conversationList.find(c => c.id === conversationId)
+  if (!cvs)
+    return
+  // 若会话有更新的最后消息时间（存在未加载的新消息），则不覆盖
+  if (cvs.lastMessageTime && recalledMsg.timestamp < cvs.lastMessageTime - 1000)
+    return
+
+  const isGroup = conversationType === CONVERSATION_TYPE.GROUPCHAT
+  const senderName = isGroup ? resolveSenderDisplayName(stores, recalledMsg) : undefined
+  stores.conversation.updateConversation(conversationId, {
+    lastMessageText: formatConversationPreview(
+      conversationType,
+      senderName,
+      t('message.recalledPreview'),
+    ),
+  })
+}
+
+/**
  * 与会话列表中已有的 UI 数据合并，优先保留已补全的名称/头像，
  * 避免 SDK 把 conversationName 回退成 conversationId 导致闪烁。
  */
@@ -336,6 +377,14 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
     onMessageRecalled: (payload) => {
       chatLog.info('onMessageRecalled', { messageId: payload.messageId })
       stores.message.recallMessage(payload.messageId, stores.client.currentUser)
+      // 同步刷新会话列表最后一条消息摘要（当前会话由 chat.vue watch 处理，
+      // 非当前会话需在这里主动 patch，避免列表仍显示被撤回的原消息内容）。
+      patchConversationLastMessageOnRecall(
+        stores,
+        payload.conversationId,
+        payload.conversationType as ConversationTypeValue,
+        payload.messageId,
+      )
     },
 
     onMessageDelivered: (payload) => {

@@ -355,6 +355,7 @@ const messages: LocaleMessages = {
   'groupReadReceipt.unread': '未读',
   'groupReadReceipt.empty': '暂无',
   'message.recalled': '撤回了一条消息',
+  'message.recalledPreview': '消息已撤回',
   'message.reedit': '重新编辑',
   'message.recallExpired': '超过{duration}分钟，无法撤回',
   'message.recall.failed': '撤回失败，请稍后重试',

@@ -112,12 +112,18 @@ export function formatConversationPreview(
  * @param message 目标消息
  * @param resolver 业务自定义解析器，返回 undefined 时走默认解析
  * @param senderName 发送者显示名：群聊场景由调用方传入，用于拼接 "发送者: 消息" 前缀
+ * @param recalledText 已撤回消息的预览文案；传入时优先用于 recalled 消息
  */
 export function resolveLastMessageText(
   message: UiMessage,
   resolver?: LastMessageTextResolver,
   senderName?: string,
+  recalledText?: string,
 ): string {
+  // 已撤回消息统一展示召回状态，避免会话列表仍显示原消息摘要
+  if (message.recalled && recalledText) {
+    return formatConversationPreview(message.conversationType, senderName, recalledText)
+  }
   let text: string
   if (resolver) {
     const resolved = resolver(message)

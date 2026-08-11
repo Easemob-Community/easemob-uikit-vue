@@ -165,7 +165,7 @@ const lastMessageSummary = computed(() => {
   const senderReady = !isGroup || senderName !== from || !stores.userInfo.isLoading(from)
   return {
     id: lastMsg.msgServerId || lastMsg.msgLocalId,
-    text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName),
+    text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName, t('message.recalledPreview')),
     timestamp: lastMsg.timestamp,
     senderReady,
   }
