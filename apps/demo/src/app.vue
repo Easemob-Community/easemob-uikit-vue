@@ -20,6 +20,9 @@ import LoginPage from './login-page.vue'
 const enableContact = ref(true)
 const enableBlocklist = ref(true)
 const enablePresence = ref(true)
+const enableDraft = ref(true)
+const enableAtMe = ref(true)
+const enableTyping = ref(true)
 
 /** 是否启用 demo 提供的自定义 dataSource（演示业务接管拉好友逻辑） */
 const useCustomDataSource = ref(false)
@@ -125,6 +128,12 @@ const AppContent = {
         'onUpdate:enableBlocklist': (v: boolean) => { enableBlocklist.value = v },
         'enablePresence': enablePresence.value,
         'onUpdate:enablePresence': (v: boolean) => { enablePresence.value = v },
+        'enableDraft': enableDraft.value,
+        'onUpdate:enableDraft': (v: boolean) => { enableDraft.value = v },
+        'enableAtMe': enableAtMe.value,
+        'onUpdate:enableAtMe': (v: boolean) => { enableAtMe.value = v },
+        'enableTyping': enableTyping.value,
+        'onUpdate:enableTyping': (v: boolean) => { enableTyping.value = v },
         'useCustomDataSource': useCustomDataSource.value,
         'onUpdate:useCustomDataSource': (v: boolean) => { useCustomDataSource.value = v },
         onLogout,
@@ -140,6 +149,9 @@ const AppContent = {
     :enable-contact="enableContact"
     :enable-blocklist="enableBlocklist"
     :enable-presence="enablePresence"
+    :enable-draft="enableDraft"
+    :enable-at-me="enableAtMe"
+    :enable-typing="enableTyping"
     :data-source="useCustomDataSource ? customDataSource : undefined"
     :h5="{ safeArea: true, keyboardAdapt: true, pullRefresh: 'auto' }"
   >

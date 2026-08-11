@@ -11,6 +11,9 @@ interface Props {
   enableContact: boolean
   enableBlocklist: boolean
   enablePresence: boolean
+  enableDraft: boolean
+  enableAtMe: boolean
+  enableTyping: boolean
   useCustomDataSource: boolean
 }
 
@@ -20,6 +23,9 @@ const emit = defineEmits<{
   (e: 'update:enableContact', v: boolean): void
   (e: 'update:enableBlocklist', v: boolean): void
   (e: 'update:enablePresence', v: boolean): void
+  (e: 'update:enableDraft', v: boolean): void
+  (e: 'update:enableAtMe', v: boolean): void
+  (e: 'update:enableTyping', v: boolean): void
   (e: 'update:useCustomDataSource', v: boolean): void
 }>()
 
@@ -31,6 +37,15 @@ function onEnableBlocklist(e: Event) {
 }
 function onEnablePresence(e: Event) {
   emit('update:enablePresence', (e.target as HTMLInputElement).checked)
+}
+function onEnableDraft(e: Event) {
+  emit('update:enableDraft', (e.target as HTMLInputElement).checked)
+}
+function onEnableAtMe(e: Event) {
+  emit('update:enableAtMe', (e.target as HTMLInputElement).checked)
+}
+function onEnableTyping(e: Event) {
+  emit('update:enableTyping', (e.target as HTMLInputElement).checked)
 }
 function onUseCustomDataSource(e: Event) {
   emit('update:useCustomDataSource', (e.target as HTMLInputElement).checked)
@@ -69,6 +84,30 @@ function onUseCustomDataSource(e: Event) {
         <label class="demo-check">
           <input
             type="checkbox"
+            :checked="props.enableDraft"
+            @change="onEnableDraft"
+          />
+          <span>enableDraft 会话列表草稿显示</span>
+        </label>
+        <label class="demo-check">
+          <input
+            type="checkbox"
+            :checked="props.enableAtMe"
+            @change="onEnableAtMe"
+          />
+          <span>enableAtMe @我 提示</span>
+        </label>
+        <label class="demo-check">
+          <input
+            type="checkbox"
+            :checked="props.enableTyping"
+            @change="onEnableTyping"
+          />
+          <span>enableTyping 对方正在输入</span>
+        </label>
+        <label class="demo-check">
+          <input
+            type="checkbox"
             :checked="props.useCustomDataSource"
             @change="onUseCustomDataSource"
           />
@@ -76,7 +115,7 @@ function onUseCustomDataSource(e: Event) {
         </label>
       </div>
       <div class="demo-info">
-        默认 enableContact / enableBlocklist / enablePresence 开启。关闭对应开关后，登录后 Provider 不再拉取对应列表/事件。<br />
+        Provider 能力开关默认全部开启。关闭对应开关后，对应功能不再拉取/渲染/发送。<br />
         启用自定义 dataSource 后，拉好友将走示例接口（返回 Alice/Bob）而非 SDK。
       </div>
     </div>

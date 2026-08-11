@@ -45,12 +45,18 @@ const props = defineProps<{
   enableContact: boolean
   enableBlocklist: boolean
   enablePresence: boolean
+  enableDraft: boolean
+  enableAtMe: boolean
+  enableTyping: boolean
   useCustomDataSource: boolean
 }>()
 const emit = defineEmits<{
   (e: 'update:enableContact', v: boolean): void
   (e: 'update:enableBlocklist', v: boolean): void
   (e: 'update:enablePresence', v: boolean): void
+  (e: 'update:enableDraft', v: boolean): void
+  (e: 'update:enableAtMe', v: boolean): void
+  (e: 'update:enableTyping', v: boolean): void
   (e: 'update:useCustomDataSource', v: boolean): void
   (e: 'logout'): void
 }>()
@@ -62,6 +68,15 @@ function toggleEnableBlocklist(v: boolean) {
 }
 function toggleEnablePresence(v: boolean) {
   emit('update:enablePresence', v)
+}
+function toggleEnableDraft(v: boolean) {
+  emit('update:enableDraft', v)
+}
+function toggleEnableAtMe(v: boolean) {
+  emit('update:enableAtMe', v)
+}
+function toggleEnableTyping(v: boolean) {
+  emit('update:enableTyping', v)
 }
 function toggleCustomDataSource(v: boolean) {
   emit('update:useCustomDataSource', v)
@@ -704,10 +719,16 @@ watch(() => stores.conversation.currentConversationId, (id) => {
       :enable-contact="props.enableContact"
       :enable-blocklist="props.enableBlocklist"
       :enable-presence="props.enablePresence"
+      :enable-draft="props.enableDraft"
+      :enable-at-me="props.enableAtMe"
+      :enable-typing="props.enableTyping"
       :use-custom-data-source="props.useCustomDataSource"
       @update:enable-contact="toggleEnableContact"
       @update:enable-blocklist="toggleEnableBlocklist"
       @update:enable-presence="toggleEnablePresence"
+      @update:enable-draft="toggleEnableDraft"
+      @update:enable-at-me="toggleEnableAtMe"
+      @update:enable-typing="toggleEnableTyping"
       @update:use-custom-data-source="toggleCustomDataSource"
       @logout="handleLogout"
     />

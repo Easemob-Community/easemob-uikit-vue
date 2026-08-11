@@ -26,6 +26,9 @@ interface Props {
   enableContact: boolean
   enableBlocklist: boolean
   enablePresence: boolean
+  enableDraft: boolean
+  enableAtMe: boolean
+  enableTyping: boolean
   useCustomDataSource: boolean
 }
 
@@ -36,6 +39,9 @@ const emit = defineEmits<{
   (e: 'update:enableContact', v: boolean): void
   (e: 'update:enableBlocklist', v: boolean): void
   (e: 'update:enablePresence', v: boolean): void
+  (e: 'update:enableDraft', v: boolean): void
+  (e: 'update:enableAtMe', v: boolean): void
+  (e: 'update:enableTyping', v: boolean): void
   (e: 'update:useCustomDataSource', v: boolean): void
   (e: 'logout'): void
 }>()
@@ -102,10 +108,16 @@ function close() {
             :enable-contact="props.enableContact"
             :enable-blocklist="props.enableBlocklist"
             :enable-presence="props.enablePresence"
+            :enable-draft="props.enableDraft"
+            :enable-at-me="props.enableAtMe"
+            :enable-typing="props.enableTyping"
             :use-custom-data-source="props.useCustomDataSource"
             @update:enable-contact="(v: boolean) => emit('update:enableContact', v)"
             @update:enable-blocklist="(v: boolean) => emit('update:enableBlocklist', v)"
             @update:enable-presence="(v: boolean) => emit('update:enablePresence', v)"
+            @update:enable-draft="(v: boolean) => emit('update:enableDraft', v)"
+            @update:enable-at-me="(v: boolean) => emit('update:enableAtMe', v)"
+            @update:enable-typing="(v: boolean) => emit('update:enableTyping', v)"
             @update:use-custom-data-source="(v: boolean) => emit('update:useCustomDataSource', v)"
           />
           <DemoSdkPanel v-else @logout="emit('logout')" />
@@ -140,10 +152,16 @@ function close() {
             :enable-contact="props.enableContact"
             :enable-blocklist="props.enableBlocklist"
             :enable-presence="props.enablePresence"
+            :enable-draft="props.enableDraft"
+            :enable-at-me="props.enableAtMe"
+            :enable-typing="props.enableTyping"
             :use-custom-data-source="props.useCustomDataSource"
             @update:enable-contact="(v: boolean) => emit('update:enableContact', v)"
             @update:enable-blocklist="(v: boolean) => emit('update:enableBlocklist', v)"
             @update:enable-presence="(v: boolean) => emit('update:enablePresence', v)"
+            @update:enable-draft="(v: boolean) => emit('update:enableDraft', v)"
+            @update:enable-at-me="(v: boolean) => emit('update:enableAtMe', v)"
+            @update:enable-typing="(v: boolean) => emit('update:enableTyping', v)"
             @update:use-custom-data-source="(v: boolean) => emit('update:useCustomDataSource', v)"
           />
           <DemoSdkPanel v-else @logout="emit('logout')" />
