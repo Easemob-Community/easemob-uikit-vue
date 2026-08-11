@@ -16,12 +16,12 @@ const presenceIconMap: Record<PresenceDisplayStatus, string> = {
 }
 
 const presenceColorMap: Record<PresenceDisplayStatus, string> = {
-  online: '#6CE191',
-  offline: '#454545',
-  away: '#B9BBC5',
-  busy: '#ED7587',
-  doNotDisturb: '#EE798C',
-  custom: '#F3C850',
+  online: 'var(--uikit-presence-online-color, #6CE191)',
+  offline: 'var(--uikit-presence-offline-color, #454545)',
+  away: 'var(--uikit-presence-away-color, #B9BBC5)',
+  busy: 'var(--uikit-presence-busy-color, #ED7587)',
+  doNotDisturb: 'var(--uikit-presence-dnd-color, #EE798C)',
+  custom: 'var(--uikit-presence-custom-color, #F3C850)',
 }
 
 export interface AvatarProps {
@@ -114,12 +114,12 @@ function onClick() {
         width: `${resolvedPresenceSize}px`,
         height: `${resolvedPresenceSize}px`,
         borderWidth: `${presenceBorderWidth}px`,
+        color: presenceIconColor,
       }"
     >
       <Icon
         :name="presenceIconName"
         :size="presenceIconSize"
-        :color="presenceIconColor"
       />
     </span>
   </div>

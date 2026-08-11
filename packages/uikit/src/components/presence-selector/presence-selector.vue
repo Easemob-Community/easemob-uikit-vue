@@ -66,18 +66,18 @@ const fixedStatusValues = [
 
 const options = computed<PresenceOption[]>(() => {
   const list: PresenceOption[] = [
-    { key: 'online', label: t('presence.online', '在线'), ext: PRESENCE_STATUS.ONLINE, color: '#6CE191', icon: statusIconMap.online },
-    { key: 'away', label: t('presence.away', '离开'), ext: PRESENCE_STATUS.AWAY, color: '#B9BBC5', icon: statusIconMap.away },
-    { key: 'busy', label: t('presence.busy', '忙碌'), ext: PRESENCE_STATUS.BUSY, color: '#ED7587', icon: statusIconMap.busy },
-    { key: 'doNotDisturb', label: t('presence.doNotDisturb', '请勿打扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: '#EE798C', icon: statusIconMap.doNotDisturb },
-    { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: '#454545', icon: statusIconMap.offline },
+    { key: 'online', label: t('presence.online', '在线'), ext: PRESENCE_STATUS.ONLINE, color: 'var(--uikit-presence-online-color, #6CE191)', icon: statusIconMap.online },
+    { key: 'away', label: t('presence.away', '离开'), ext: PRESENCE_STATUS.AWAY, color: 'var(--uikit-presence-away-color, #B9BBC5)', icon: statusIconMap.away },
+    { key: 'busy', label: t('presence.busy', '忙碌'), ext: PRESENCE_STATUS.BUSY, color: 'var(--uikit-presence-busy-color, #ED7587)', icon: statusIconMap.busy },
+    { key: 'doNotDisturb', label: t('presence.doNotDisturb', '请勿打扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: 'var(--uikit-presence-dnd-color, #EE798C)', icon: statusIconMap.doNotDisturb },
+    { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: 'var(--uikit-presence-offline-color, #454545)', icon: statusIconMap.offline },
   ]
   if (props.showCustom) {
     list.push({
       key: 'custom',
       label: t('presence.custom', '自定义'),
       ext: props.value || '',
-      color: '#F3C850',
+      color: 'var(--uikit-presence-custom-color, #F3C850)',
       icon: statusIconMap.custom,
     })
   }
@@ -154,7 +154,7 @@ function onCancel() {
           :class="{ 'is-active': isActive(option) }"
           @click="onSelect(option)"
         >
-          <Icon :name="option.icon" :size="16" :color="option.color" />
+          <Icon :name="option.icon" :size="16" :style="{ color: option.color }" />
           <span class="presence-selector__label">{{ option.label }}</span>
           <Icon
             v-if="isActive(option)"
@@ -175,7 +175,7 @@ function onCancel() {
           @click="onSelect(option)"
         >
           <template #leading>
-            <Icon :name="option.icon" :size="20" :color="option.color" />
+            <Icon :name="option.icon" :size="20" :style="{ color: option.color }" />
           </template>
           <template #trailing>
             <Icon

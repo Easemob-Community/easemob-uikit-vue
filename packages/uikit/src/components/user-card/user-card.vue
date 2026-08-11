@@ -73,12 +73,12 @@ const statusIconMap: Record<PresenceDisplayStatus, string> = {
 }
 
 const statusColorMap: Record<PresenceDisplayStatus, string> = {
-  online: '#6CE191',
-  offline: '#454545',
-  away: '#B9BBC5',
-  busy: '#ED7587',
-  doNotDisturb: '#EE798C',
-  custom: '#F3C850',
+  online: 'var(--uikit-presence-online-color, #6CE191)',
+  offline: 'var(--uikit-presence-offline-color, #454545)',
+  away: 'var(--uikit-presence-away-color, #B9BBC5)',
+  busy: 'var(--uikit-presence-busy-color, #ED7587)',
+  doNotDisturb: 'var(--uikit-presence-dnd-color, #EE798C)',
+  custom: 'var(--uikit-presence-custom-color, #F3C850)',
 }
 
 const statusText = computed(() => {
@@ -158,7 +158,7 @@ function onSelectorChanged() {
                 v-if="statusIcon"
                 :name="statusIcon"
                 :size="10"
-                :color="statusIconColor"
+                :style="{ color: statusIconColor }"
               />
               {{ statusText }}
             </span>
