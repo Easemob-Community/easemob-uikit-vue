@@ -56,9 +56,9 @@ export function createConnectionHandlers(
     },
     onOfflineMessageSyncStart: () => {
       connLog.info('onOfflineMessageSyncStart')
-      // SDK 会周期性触发离线消息同步：仅在首次连接（会话列表尚未加载完成）时
-      // 驱动「正在同步消息」横幅，后续定期同步不再驱动，避免横幅反复出现/消失
-      // 导致会话列表上下跳动（闪动）。
+      // 0.20.34+ 已按连接周期去重：同一连接周期内的心跳不会重复触发。
+      // 这里仍保留「仅首次加载时展示横幅」的判断，避免重连成功后（新连接周期）
+      // 已加载完会话列表的场景再次抖动。
       if (!stores.conversation.conversationsLoaded) {
         stores.message.setSyncingMessages(true)
       }
