@@ -1926,7 +1926,7 @@ packages:
     engines: {node: '>= 0.4'}
 
   easemob-websdk@file:easemob-websdk-next-5.0.0.tgz:
-    resolution: {integrity: sha512-LvaH4gmWXhHWhgBSIiX1X+Ajfpkx9NxzdeiXRhoweekrF1iJLbw1oFACivKDQkABZ1ccBZ3+iwuHek+NC3+Srg==, tarball: file:easemob-websdk-next-5.0.0.tgz}
+    resolution: {integrity: sha512-CW+NYNFngFlIYh7WhIj7CDL0Q7tLlqaQnMzGKickRO/L1+hQc/xnwb9WHLDH5JtljB4s+CxUof3cygdlK8xBAg==, tarball: file:easemob-websdk-next-5.0.0.tgz}
     version: 5.0.0
 
   ee-first@1.1.1:
