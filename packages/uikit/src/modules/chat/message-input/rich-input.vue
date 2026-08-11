@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
   (e: 'focus'): void
+  (e: 'typing'): void
 }>()
 
 const { t } = useLocale()
@@ -64,6 +65,23 @@ const mentionAnchorPos = ref(-1)
 /** 已插入的 @提及列表 */
 const mentionList = ref<MentionContact[]>([])
 
+/** 输入状态提示节流 */
+let typingThrottleTimer: ReturnType<typeof setTimeout> | null = null
+let isTypingThrottled = false
+
+/** 触发输入状态 */
+function triggerTyping() {
+  if (isTypingThrottled) {
+    return
+  }
+  isTypingThrottled = true
+  emit('typing')
+  typingThrottleTimer = setTimeout(() => {
+    isTypingThrottled = false
+    typingThrottleTimer = null
+  }, 5000)
+}
+
 /** Tiptap 编辑器实例 */
 const editor = useEditor({
   extensions: [
@@ -84,7 +102,10 @@ const editor = useEditor({
       e.commands.focus()
     }
   },
-  onUpdate: ({ editor: e }) => updateHasContent(e),
+  onUpdate: ({ editor: e }) => {
+    updateHasContent(e)
+    triggerTyping()
+  },
   onFocus: () => emit('focus'),
   editorProps: {
     attributes: {
@@ -303,6 +324,10 @@ onBeforeUnmount(() => {
   editor.value?.destroy()
   inlineImageBlobUrls.forEach((url) => URL.revokeObjectURL(url))
   inlineImageBlobUrls.clear()
+  if (typingThrottleTimer) {
+    clearTimeout(typingThrottleTimer)
+    typingThrottleTimer = null
+  }
 })
 </script>
 

@@ -6,6 +6,7 @@ import { useQuote } from '../../../composables/use-quote'
 import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
 import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
+import { CONVERSATION_TYPE } from '../../../constants'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
 import type { EmojiStickerItem } from '../../../components/emoji-picker/types'
 import Popup from '../../../components/popup/popup.vue'
@@ -44,7 +45,7 @@ export interface MessageInputEmits {
 const props = defineProps<MessageInputProps>()
 const emit = defineEmits<MessageInputEmits>()
 
-const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, editingMessage, exitEditMode, modifyTextMessage } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
@@ -52,6 +53,19 @@ const { t } = useLocale()
 
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
+
+/** 是否启用输入状态提示 */
+const enableTyping = computed(() => inputConfig.value?.enableTyping ?? true)
+
+/** 发送 typing cmd（仅单聊，5s 节流由输入框子组件保证） */
+function handleTyping() {
+  if (!enableTyping.value)
+    return
+  const cvs = currentConversation.value
+  if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT)
+    return
+  void sendCmdMessage('TypingBegin')
+}
 
 /** 发送钩子 */
 const sendHooks = computed<ChatSendHooks | undefined>(() => props.config?.hooks)
@@ -707,6 +721,7 @@ defineExpose({
       @mention-close="onMentionClose"
       @sticker-select="onStickerSelect"
       @focus="emit('focus')"
+      @typing="handleTyping"
     >
       <template #toolbar-extra="slotProps">
         <slot name="toolbar-extra" v-bind="slotProps" />
@@ -731,6 +746,7 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @focus="emit('focus')"
+      @typing="handleTyping"
     >
       <template #toolbar-extra="slotProps">
         <slot name="toolbar-extra" v-bind="slotProps" />
@@ -752,6 +768,7 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @focus="emit('focus')"
+      @typing="handleTyping"
     >
       <template #toolbar-extra="slotProps">
         <slot name="toolbar-extra" v-bind="slotProps" />
