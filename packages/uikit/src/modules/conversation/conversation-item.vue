@@ -354,6 +354,12 @@ const displayMessage = computed(() => {
       <div class="conversation-item__bottom">
         <span class="conversation-item__message">
           <span v-if="props.hasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
+          <Icon
+            v-if="displayDraft"
+            name="conversation/stroked/rect_notched/pen"
+            :size="14"
+            class="conversation-item__draft-icon"
+          />
           <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
         </span>
         <Badge
@@ -533,6 +539,13 @@ const displayMessage = computed(() => {
 .conversation-item__draft {
   color: var(--uikit-danger-color);
   margin-right: 2px;
+}
+
+.conversation-item__draft-icon {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 2px;
+  color: var(--uikit-danger-color);
 }
 
 .conversation-item__at-me-prefix {
