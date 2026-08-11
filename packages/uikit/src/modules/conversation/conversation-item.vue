@@ -52,7 +52,7 @@ const emit = defineEmits<{
   (e: 'custom-action', key: string, conversation: Conversation): void
 }>()
 
-const { t } = useLocale()
+const { t, locale } = useLocale()
 const { features } = useUIKit()
 const { isMobile } = useViewport()
 
@@ -268,6 +268,8 @@ function onContextMenuItemClick(actionKey: string) {
 
 /** 显示时间：优先取草稿时间，其次取最后消息时间 */
 const displayTime = computed(() => {
+  // 引入 locale 依赖，确保语言切换后会话列表时间即时刷新
+  const currentLocale = locale.value
   const timestamp = props.conversation.draftTime || props.conversation.lastMessageTime
   if (!timestamp)
     return ''
@@ -275,7 +277,7 @@ const displayTime = computed(() => {
     return props.timeFormatter(timestamp)
   }
   // 无 formatter 时 fallback 到简单格式
-  return new Date(timestamp).toLocaleTimeString()
+  return new Date(timestamp).toLocaleTimeString(currentLocale)
 })
 
 /** 是否显示草稿（受全局 enableDraft 开关控制） */
