@@ -331,9 +331,17 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onMessage: (sdkMsg) => {
       // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
-      // typing 等 cmd 的分发处理为后续 TODO。
-      if (sdkMsg.type === MESSAGE_TYPE.CMD)
+      // 当前先打印日志验证 CMD 接收连通性，typing 等 cmd 的分发处理为后续 TODO。
+      if (sdkMsg.type === MESSAGE_TYPE.CMD) {
+        const action = (sdkMsg.body as { action?: string }).action
+        chatLog.info('[CMD received]', {
+          conversationId: sdkMsg.conversationId,
+          from: sdkMsg.from,
+          action,
+          ext: sdkMsg.ext,
+        })
         return
+      }
       chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
       stores.message.addMessage(uiMsg)
