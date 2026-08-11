@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
+import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
@@ -87,7 +88,10 @@ function cancel() {
 <template>
   <div class="group-announcement">
     <div class="group-announcement__label-row">
-      <span class="group-announcement__label">{{ t('chat.info.groupAnnouncement') }}</span>
+      <div class="group-announcement__label">
+        <Icon name="group-manager/icon/stroked/board" :size="16" />
+        <span>{{ t('chat.info.groupAnnouncement') }}</span>
+      </div>
       <IconButton
         v-if="isAdminOrOwner && !isEditing"
         icon="actions/edit"
@@ -150,6 +154,9 @@ function cancel() {
 }
 
 .group-announcement__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary);
