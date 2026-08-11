@@ -27,7 +27,7 @@ const userId = computed(() => {
  * - 小于等于当前时间视为已到期
  * - 否则显示到期时间
  */
-const PERMANENT_THRESHOLD_MS = 100 * 365 * 24 * 60 * 60 * 1000
+const PERMANENT_THRESHOLD_MS = 30 * 365 * 24 * 60 * 60 * 1000
 
 const muteText = computed(() => {
   const expire = props.item?.muteExpire
