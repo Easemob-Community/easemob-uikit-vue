@@ -316,7 +316,10 @@ export class MessageDomain {
       raw: page,
     })
 
-    const uiMsgs = page.items.map(msg => toUiMessage(msg, this.currentUserId))
+    // CMD 消息为透传命令，不应上屏渲染；历史消息入口也主动过滤。
+    const uiMsgs = page.items
+      .filter(msg => msg.type !== MESSAGE_TYPE.CMD)
+      .map(msg => toUiMessage(msg, this.currentUserId))
     this.store.prependMessages(conversationId, uiMsgs)
 
     // 群聊历史消息（刷新首屏与上滑翻页共用此路径）：getHistoryMessages 返回的
