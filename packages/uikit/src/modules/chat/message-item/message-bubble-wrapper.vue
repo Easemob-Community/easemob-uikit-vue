@@ -184,23 +184,23 @@ const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageSt
 /** 经典状态图标映射（默认） */
 const classicStatusIconMap: Record<MessageStatusValue, string> = {
   // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
-  [MESSAGE_STATUS.SENDING]: 'actions/loading_arc',
-  [MESSAGE_STATUS.SENT]: 'actions/check',
-  [MESSAGE_STATUS.DELIVERED]: 'chat/doneAll',
-  [MESSAGE_STATUS.READ]: 'chat/doneAll',
-  // 发送失败：圆圈内感叹号（candle）提示可点击重发
-  [MESSAGE_STATUS.FAILED]: 'misc/candle',
+  [MESSAGE_STATUS.SENDING]: 'message-status/stroked/loading/arc/normal',
+  [MESSAGE_STATUS.SENT]: 'message-status/stroked/circle/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'message-status/stroked/circle/empty',
+  [MESSAGE_STATUS.READ]: 'message-status/stroked/circle/checked',
+  // 发送失败：圆圈内感叹号提示可点击重发
+  [MESSAGE_STATUS.FAILED]: 'message-status/stroked/circle/bang',
 }
 
 /** 数字胶囊状态图标映射（线性/描边版）
  * 语义：未读=空心圆，已读=空心圆+对勾；发送中/失败保持经典图标
  */
 const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
-  [MESSAGE_STATUS.SENDING]: 'actions/loading_arc',
-  [MESSAGE_STATUS.SENT]: 'status/circle',
-  [MESSAGE_STATUS.DELIVERED]: 'status/circle',
-  [MESSAGE_STATUS.READ]: 'status/circle_check',
-  [MESSAGE_STATUS.FAILED]: 'misc/candle',
+  [MESSAGE_STATUS.SENDING]: 'message-status/stroked/loading/arc/normal',
+  [MESSAGE_STATUS.SENT]: 'message-status/stroked/circle/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'message-status/stroked/circle/empty',
+  [MESSAGE_STATUS.READ]: 'message-status/stroked/circle/checked',
+  [MESSAGE_STATUS.FAILED]: 'message-status/stroked/circle/bang',
 }
 
 /** 当前状态图标 */
@@ -211,6 +211,9 @@ const statusIcon = computed(() => {
   const map = statusConfig.value.style === 'capsule' ? capsuleStatusIconMap : classicStatusIconMap
   return map[messageStatus.value as MessageStatusValue]
 })
+
+/** PC 端发送失败图标 hover 时显示的替换图标（重发提示） */
+const failedHoverIcon = 'message-status/stroked/ringarrow/ccw'
 
 /** 当前状态文本 */
 const statusText = computed(() => {
@@ -539,6 +542,12 @@ onBeforeUnmount(() => {
                       'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
                     }"
                   />
+                  <Icon
+                    v-if="messageStatus === MESSAGE_STATUS.FAILED"
+                    :name="failedHoverIcon"
+                    :size="14"
+                    class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed-hover"
+                  />
                   <span
                     v-if="showStatusText"
                     class="message-bubble-wrapper__status-text"
@@ -650,6 +659,12 @@ onBeforeUnmount(() => {
                         'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
                       }"
                     />
+                    <Icon
+                      v-if="messageStatus === MESSAGE_STATUS.FAILED"
+                      :name="failedHoverIcon"
+                      :size="14"
+                      class="message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed-hover"
+                    />
                     <span
                       v-if="showStatusText"
                       class="message-bubble-wrapper__status-text"
@@ -672,7 +687,7 @@ onBeforeUnmount(() => {
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="actions/check" :size="8" />
+                <Icon v-if="isGroupReadAll" name="message-status/stroked/circle/checked" :size="10" />
                 <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
               </button>
             </div>
@@ -895,11 +910,18 @@ onBeforeUnmount(() => {
 .message-bubble-wrapper__status-item--failed {
   color: var(--uikit-danger-color);
   cursor: pointer;
+  position: relative;
 }
 
 .message-bubble-wrapper__status-icon {
   display: inline-flex;
   color: inherit;
+}
+
+.message-bubble-wrapper__status-item--failed .message-bubble-wrapper__status-icon {
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .message-bubble-wrapper__status-icon--loading {
@@ -908,6 +930,25 @@ onBeforeUnmount(() => {
 
 .message-bubble-wrapper__status-icon--read {
   color: var(--uikit-primary-color);
+}
+
+/* PC 端发送失败图标 hover 效果：放大并切换为重发箭头；H5 无 hover，保持默认 bang */
+.message-bubble-wrapper__status-icon--failed-hover {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  opacity: 0;
+  transform: translateY(-50%) scale(1);
+}
+
+@media (hover: hover) {
+  .message-bubble-wrapper__status-item--failed:hover .message-bubble-wrapper__status-icon:not(.message-bubble-wrapper__status-icon--failed-hover) {
+    opacity: 0;
+  }
+  .message-bubble-wrapper__status-item--failed:hover .message-bubble-wrapper__status-icon--failed-hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+  }
 }
 
 .message-bubble-wrapper__status--vertical .message-bubble-wrapper__status-item {

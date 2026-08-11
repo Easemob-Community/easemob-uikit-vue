@@ -10,7 +10,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { useViewport } from '../../../composables/use-viewport'
 import { usePullRefresh } from '../../../composables/use-pull-refresh'
 import { useLocale } from '../../../locale'
-import { MESSAGE_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../../constants'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import Modal from '../../../components/modal/modal.vue'
@@ -562,6 +562,9 @@ async function onResend(message: UiMessage) {
 
 /** 处理群已读点击 */
 async function onGroupReadClick(msgId: string, groupId: string) {
+  // 单聊不存在群已读回执，直接拦截避免误弹窗
+  if (currentConversation.value?.type !== CONVERSATION_TYPE.GROUPCHAT)
+    return
   try {
     // 优先使用 store 缓存，避免重复翻页拉取；缓存为空时一次性拉取全部已读成员
     let readUsers = stores.message.getGroupMessageReadUsers(groupId, msgId)
