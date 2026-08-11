@@ -57,16 +57,10 @@ const { features } = useUIKit()
 const { isMobile } = useViewport()
 
 const isSingleChat = computed(() => props.conversation.type === CONVERSATION_TYPE.SINGLECHAT)
-// SDK 的 conversationName 在 enableUserInfoSync 开启后已预填充用户资料。
-// 仅在 SDK 名称为空或等于 userId 时才回退到 useUserInfo 单独获取，
-// 头像缺失不影响——Avatar 组件会自动显示文字占位。
-const sdkNameSufficient = computed(() =>
-  !!props.conversation.name && props.conversation.name !== props.conversation.id,
-)
+// 单聊始终通过 useUserInfo 监听联系人/用户资料，确保备注、昵称、头像变更后能响应式更新。
+// useUserInfo 内部有缓存与加载状态判断，已加载的用户不会重复请求。
 const peerUserId = computed(() => {
   if (!isSingleChat.value)
-    return undefined
-  if (sdkNameSufficient.value)
     return undefined
   return props.conversation.id
 })
