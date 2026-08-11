@@ -327,7 +327,13 @@ const displayMessage = computed(() => {
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
           <span class="conversation-item__name" :class="{ 'is-at-me': props.hasAtMe }">
-            {{ props.hasAtMe ? `[${t('conversation.atMe', '@')}] ` : '' }}{{ conversationName }}
+            <Icon
+              v-if="props.hasAtMe"
+              name="conversation/stroked/at"
+              :size="14"
+              class="conversation-item__at-me-icon"
+            />
+            {{ conversationName }}
           </span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />
@@ -444,6 +450,13 @@ const displayMessage = computed(() => {
 .conversation-item__name.is-at-me {
   color: var(--uikit-primary);
   font-weight: 600;
+}
+
+.conversation-item__at-me-icon {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 2px;
+  color: var(--uikit-primary);
 }
 
 .conversation-item__pin-badge {
