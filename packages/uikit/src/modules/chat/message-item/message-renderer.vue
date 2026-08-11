@@ -55,10 +55,13 @@ const footerSlotName = computed(() => `message-footer-${props.message.type}` as 
 
 /** 是否为通知类型消息 */
 const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.NOTICE)
+
+/** CMD 透传消息不做任何 UI 渲染 */
+const isCmd = computed(() => (props.message.type as string) === MESSAGE_TYPE.CMD)
 </script>
 
 <template>
-  <div class="message-renderer">
+  <div v-if="!isCmd" class="message-renderer">
     <!-- 通知类型消息：居中灰色小字 -->
     <div v-if="isNotice" class="message-renderer__notice">
       {{ (message.body as any).content || (message as any).content || '' }}

@@ -248,6 +248,13 @@ export class MessageDomain {
   private async _send(sdkMsg: SdkMessage): Promise<SdkMessage> {
     const localId = sdkMsg.msgLocalId
     const isCombine = sdkMsg.type === MESSAGE_TYPE.COMBINE
+
+    // CMD 消息为透传命令，不应进入消息 store 上屏渲染（如 typing 指令）。
+    // 直接投递给 SDK，不跟踪发送状态/进度/失败原因。
+    if (sdkMsg.type === MESSAGE_TYPE.CMD) {
+      return this.client.chatManager.sendMessage(sdkMsg)
+    }
+
     this.store.addSendingMessage(localId, sdkMsg)
 
     // 进度回调统计与节流：XHR progress 事件可能高频触发，

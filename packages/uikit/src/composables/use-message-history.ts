@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { MESSAGE_TYPE } from '../constants'
 import { useUIKit } from './use-uikit'
 
 /** 历史消息游标（模块级单例，保证首屏拉取与上滑加载共享同一份游标） */
@@ -13,7 +14,9 @@ export function useMessageHistory() {
 
   const messages = computed(() => {
     const cvsId = conversationStore.currentConversationId
-    return cvsId ? messageStore.getMessages(cvsId) : []
+    const list = cvsId ? messageStore.getMessages(cvsId) : []
+    // CMD 透传消息不做 UI 渲染，即使因异常进入 store 也在展示层兜底过滤
+    return list.filter(msg => msg.type !== MESSAGE_TYPE.CMD)
   })
 
   function getHistoryCursor(conversationId: string) {
