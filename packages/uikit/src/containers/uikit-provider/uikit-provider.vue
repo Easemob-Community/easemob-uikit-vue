@@ -87,6 +87,12 @@ export interface ProviderProps {
    * 若服务端未开通该能力，会提示用户开通并自动熔断后续订阅。
    */
   enableUserInfoSubscription?: boolean
+  /** 是否启用会话列表草稿显示（默认 true） */
+  enableDraft?: boolean
+  /** 是否启用 @我 提示（默认 true） */
+  enableAtMe?: boolean
+  /** 是否启用对方正在输入提示（默认 true） */
+  enableTyping?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
   /**
@@ -128,6 +134,9 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableUserInfo: true,
   enableUserInfoSubscription: true,
   contactFetchMode: 'page',
+  enableDraft: true,
+  enableAtMe: true,
+  enableTyping: true,
   enableToast: true,
 })
 
@@ -166,6 +175,9 @@ const features = computed<Partial<UIKitFeatures>>(() => ({
   enableUserInfo: props.enableUserInfo,
   enableUserInfoSubscription: props.enableUserInfoSubscription,
   contactFetchMode: props.contactFetchMode,
+  enableDraft: props.enableDraft,
+  enableAtMe: props.enableAtMe,
+  enableTyping: props.enableTyping,
 }))
 
 const dataSource = computed(() => props.dataSource ?? {})

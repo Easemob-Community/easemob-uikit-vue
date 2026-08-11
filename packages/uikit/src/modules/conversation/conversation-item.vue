@@ -12,6 +12,7 @@ import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
 import { useViewport } from '../../composables/use-viewport'
 import { useUserInfo } from '../../composables/use-user-info'
 import { usePresence } from '../../composables/use-presence'
+import { useUIKit } from '../../composables/use-uikit'
 import type { UiConversation as Conversation } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import type { ConversationAction } from './types'
@@ -52,6 +53,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { features } = useUIKit()
 const { isMobile } = useViewport()
 
 const isSingleChat = computed(() => props.conversation.type === CONVERSATION_TYPE.SINGLECHAT)
@@ -90,6 +92,9 @@ const conversationName = computed(() =>
   contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
 )
 const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
+
+/** 实际是否展示 @我 提示（受全局 enableAtMe 开关控制） */
+const effectiveHasAtMe = computed(() => props.hasAtMe && features.enableAtMe !== false)
 
 /** 免打扰开启时铃铛摇摆动画（仅在状态由关闭变为开启时触发一次） */
 const muteShaking = ref(false)
@@ -273,9 +278,9 @@ const displayTime = computed(() => {
   return new Date(timestamp).toLocaleTimeString()
 })
 
-/** 是否显示草稿 */
+/** 是否显示草稿（受全局 enableDraft 开关控制） */
 const displayDraft = computed(() => {
-  return !!props.conversation.draft
+  return features.enableDraft !== false && !!props.conversation.draft
 })
 
 /** 显示消息内容：正在输入 > 草稿 > 最后消息，并用 messageFormatter 格式化 */
@@ -317,7 +322,7 @@ const displayMessage = computed(() => {
 <template>
   <Cell
     auto-height
-    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': props.hasAtMe }]"
+    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': effectiveHasAtMe }]"
     @click="onClick"
     @contextmenu="onContextMenu"
     @touchstart="longPress.start"
@@ -332,9 +337,9 @@ const displayMessage = computed(() => {
     <div class="conversation-item__info">
       <div class="conversation-item__top">
         <div class="conversation-item__name-wrap">
-          <span class="conversation-item__name" :class="{ 'is-at-me': props.hasAtMe }">
+          <span class="conversation-item__name" :class="{ 'is-at-me': effectiveHasAtMe }">
             <Icon
-              v-if="props.hasAtMe"
+              v-if="effectiveHasAtMe"
               name="conversation/stroked/at"
               :size="14"
               class="conversation-item__at-me-icon"
@@ -368,7 +373,7 @@ const displayMessage = computed(() => {
             <span class="conversation-item__typing-text">{{ displayMessage }}</span>
           </template>
           <template v-else>
-            <span v-if="props.hasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
+            <span v-if="effectiveHasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
             <Icon
               v-if="displayDraft"
               name="conversation/stroked/rect_notched/pen"

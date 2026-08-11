@@ -2,6 +2,7 @@ import type { ChatEventHandlerMap } from 'easemob-websdk'
 import type { ManagerHost } from '../client'
 import type { ConversationTypeValue } from '../../constants'
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
+import type { UIKitFeatures } from '../../composables/types'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
@@ -244,7 +245,11 @@ function mergeWithExistingConversations(stores: RootStores, incoming: ReturnType
  * 创建 ChatManager 事件处理器。
  * 注册到 client.chatManager.addEventHandler。
  */
-export function createChatHandlers(client: ManagerHost, stores: RootStores): ChatEventHandlerMap {
+export function createChatHandlers(
+  client: ManagerHost,
+  stores: RootStores,
+  features?: UIKitFeatures,
+): ChatEventHandlerMap {
   // 群聊会话摘要发送者显示名解析：优先联系人备注，其次用户资料昵称
   const resolveSenderName = (userId: string) => resolveUserDisplayName(stores, userId)
 
@@ -344,7 +349,7 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         // 仅单聊处理对方正在输入；群聊 typing 二期再做。
         if (
           action === 'TypingBegin'
-          && stores.conversation.typingEnabled
+          && features?.enableTyping !== false
           && sdkMsg.conversationType === CONVERSATION_TYPE.SINGLECHAT
           && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)
         ) {
@@ -379,8 +384,12 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
         }
       }
 
-      // 更新@我状态
-      if (sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)) {
+      // 更新@我状态（受全局 enableAtMe 开关控制）
+      if (
+        features?.enableAtMe !== false
+        && sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT
+        && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)
+      ) {
         const atList = sdkMsg.ext?.em_at_list
         if (Array.isArray(atList) && atList.includes(stores.client.currentUser)) {
           stores.conversation.setAtMe(sdkMsg.conversationId, true)

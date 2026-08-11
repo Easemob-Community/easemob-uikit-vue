@@ -18,7 +18,7 @@ export function clearAllDrafts() {
 }
 
 export function useConversation() {
-  const { domains, stores } = useUIKit()
+  const { domains, stores, features } = useUIKit()
   const conversationStore = stores.conversation
   const clientStore = stores.client
 
@@ -39,6 +39,10 @@ export function useConversation() {
 
   /** 保存草稿 */
   function saveDraft(conversationId: string, text: string) {
+    if (features.enableDraft === false) {
+      clearDraft(conversationId)
+      return
+    }
     if (!text) {
       clearDraft(conversationId)
       return
@@ -62,6 +66,10 @@ export function useConversation() {
 
   /** 加载草稿 */
   function loadDraft(conversationId: string): string {
+    if (features.enableDraft === false) {
+      clearDraft(conversationId)
+      return ''
+    }
     const key = getDraftKey(conversationId)
     const cached = draftCache.get(key)
     if (cached)

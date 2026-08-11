@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { formatSdkError, resolveSdkErrorMessage } from '../../../utils/sdk-error'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
+import { useUIKit } from '../../../composables/use-uikit'
 import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
 import { useViewport } from '../../../composables/use-viewport'
 import { useToast } from '../../../composables/use-toast'
@@ -46,6 +47,7 @@ const props = defineProps<MessageInputProps>()
 const emit = defineEmits<MessageInputEmits>()
 
 const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
+const { features } = useUIKit()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
@@ -54,12 +56,9 @@ const { t } = useLocale()
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
 
-/** 是否启用输入状态提示 */
-const enableTyping = computed(() => inputConfig.value?.enableTyping ?? true)
-
-/** 发送 typing cmd（仅单聊，5s 节流由输入框子组件保证） */
+/** 发送 typing cmd（仅单聊且全局 enableTyping 开启，5s 节流由输入框子组件保证） */
 function handleTyping() {
-  if (!enableTyping.value)
+  if (features.enableTyping === false)
     return
   const cvs = currentConversation.value
   if (!cvs || cvs.type !== CONVERSATION_TYPE.SINGLECHAT)

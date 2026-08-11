@@ -427,8 +427,6 @@ const headerAvatar = computed(() => {
 let resizeObserver: ResizeObserver | null = null
 
 onMounted(() => {
-  // 根据 ChatConfig 设置 typing 功能开关（全局生效）
-  stores.conversation.setTypingEnabled(props.config?.input?.enableTyping ?? true)
   if (headerRef.value) {
     headerHeight.value = headerRef.value.offsetHeight
     resizeObserver = new ResizeObserver((entries) => {

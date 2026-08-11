@@ -55,4 +55,10 @@ export interface UIKitFeatures {
   enableUserInfoSubscription?: boolean
   /** 是否持久化好友申请/群邀请记录到 localStorage，默认 true */
   enableInvitePersistence?: boolean
+  /** 是否启用会话列表草稿显示，默认 true */
+  enableDraft?: boolean
+  /** 是否启用 @我 提示，默认 true */
+  enableAtMe?: boolean
+  /** 是否启用对方正在输入提示（typing CMD），默认 true */
+  enableTyping?: boolean
 }

@@ -1,4 +1,5 @@
 import type { ManagerHost } from '../client'
+import type { UIKitFeatures } from '../../composables/types'
 import type { RootStores } from './types'
 import { createConnectionHandlers } from './connection-events'
 import type { ConnectionEventCallbacks } from './connection-events'
@@ -15,9 +16,10 @@ export function registerEventHandlers(
   client: ManagerHost,
   stores: RootStores,
   connectionCallbacks: ConnectionEventCallbacks = {},
+  features?: UIKitFeatures,
 ) {
   const connHandlers = createConnectionHandlers(stores, connectionCallbacks)
-  const chatHandlers = createChatHandlers(client, stores)
+  const chatHandlers = createChatHandlers(client, stores, features)
   const contactHandlers = createContactHandlers(stores)
   const groupHandlers = createGroupHandlers(stores)
   const presenceHandlers = createPresenceHandlers(stores)

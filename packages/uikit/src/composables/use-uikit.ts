@@ -75,6 +75,9 @@ const defaultFeatures: UIKitFeatures = {
   enableUserInfo: true,
   enableUserInfoSubscription: true,
   enableInvitePersistence: true,
+  enableDraft: true,
+  enableAtMe: true,
+  enableTyping: true,
 }
 
 /**
@@ -217,7 +220,7 @@ export function useUIKitProvider(
     uikitClient = createClient(cfg)
     currentAppKey = cfg.appKey
     stores.client.setAppKey(cfg.appKey)
-    disposeEvents = registerEventHandlers(uikitClient, stores, options.connectionCallbacks)
+    disposeEvents = registerEventHandlers(uikitClient, stores, options.connectionCallbacks, features)
     domains.userInfo.listen()
     disposeUserInfoDomain = () => domains.userInfo.dispose()
     return uikitClient
