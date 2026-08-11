@@ -809,7 +809,7 @@ defineExpose({
               @click="onViewMembersForTransfer"
             >
               <template #leading>
-                <Icon name="actions/crown" :size="18" />
+                <Icon name="group-manager/icon/stroked/crown" :size="18" />
               </template>
             </Cell>
             <Cell
@@ -819,7 +819,7 @@ defineExpose({
               @click="onViewMembersForAdmin"
             >
               <template #leading>
-                <Icon name="actions/shield" :size="18" />
+                <Icon name="group-manager/icon/stroked/shield/person" :size="18" />
               </template>
             </Cell>
           </div>

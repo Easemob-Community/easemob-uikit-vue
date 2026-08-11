@@ -101,7 +101,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'mute',
       label: t('group.management.muteList', '禁言列表'),
       show: true,
-      icon: 'actions/ban',
+      icon: 'group-manager/icon/stroked/bubble/slash',
       count: (stores.group.groupMuteListMap[id] || []).length,
     })
   }
@@ -111,7 +111,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'block',
       label: t('group.management.blocklist', '黑名单'),
       show: true,
-      icon: 'actions/user-x',
+      icon: 'group-manager/icon/stroked/shield/person',
       count: (stores.group.groupBlocklistMap[id] || []).length,
     })
   }
@@ -121,7 +121,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'allow',
       label: t('group.management.allowlist', '白名单'),
       show: true,
-      icon: 'actions/user-check',
+      icon: 'group-manager/icon/stroked/shield/person',
       count: (stores.group.groupAllowlistMap[id] || []).length,
     })
   }
@@ -131,7 +131,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'files',
       label: t('group.management.sharedFiles', '共享文件'),
       show: true,
-      icon: 'files-media/folder',
+      icon: 'group-manager/icon/stroked/doc',
       count: (stores.group.groupSharedFilesMap[id] || []).length,
     })
   }
@@ -141,7 +141,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'requests',
       label: t('group.management.joinRequests', '入群申请'),
       show: true,
-      icon: 'people/person_add',
+      icon: 'group-manager/icon/stroked/rect/personnclock',
       count: (stores.group.groupJoinRequestsMap[id] || []).length,
     })
   }
@@ -200,7 +200,7 @@ function closeDrawer() {
         :inset-hover="false"
       >
         <template #leading>
-          <Icon name="actions/lock" :size="18" />
+          <Icon name="group-manager/icon/stroked/bubble/slash" :size="18" />
         </template>
         <template #trailing>
           <label class="group-management-section__toggle" @click.stop>
