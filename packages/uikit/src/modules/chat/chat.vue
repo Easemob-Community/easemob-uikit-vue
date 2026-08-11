@@ -15,6 +15,7 @@ import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJEC
 import type { ConversationTypeValue, ForwardModeValue } from '../../constants'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
+import IconButton from '../../components/icon-button/icon-button.vue'
 import Avatar from '../../components/avatar/avatar.vue'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import Modal from '../../components/modal/modal.vue'
@@ -352,7 +353,8 @@ const showDrawer = ref(false)
 const showSearchPanel = ref(false)
 
 /** 消息搜索触发按钮 ref */
-const searchBtnRef = ref<HTMLElement>()
+const searchBtnRef = ref<InstanceType<typeof IconButton>>()
+const searchBtnEl = computed(() => searchBtnRef.value?.$el as HTMLElement | undefined)
 
 /** 群信息抽屉组件引用 */
 const chatInfoDrawerRef = ref<InstanceType<typeof ChatInfoDrawer>>()
@@ -994,21 +996,19 @@ async function onRemoveAdmin(member: UiGroupMember) {
             </slot>
             <slot name="header-extra" :conversation="currentConversation" />
           </div>
-          <button
+          <IconButton
             v-if="searchEnabled"
             ref="searchBtnRef"
-            class="chat__header-search"
+            icon="misc/magnifier2"
+            :icon-size="20"
             @click.stop="showSearchPanel = true"
-          >
-            <Icon name="misc/magnifier2" :size="20" />
-          </button>
-          <button
+          />
+          <IconButton
             v-if="currentConversation"
-            class="chat__header-more"
+            icon="actions/ellipsis_vertical"
+            :icon-size="20"
             @click.stop="showDrawer = true"
-          >
-            <Icon name="actions/ellipsis_vertical" :size="20" />
-          </button>
+          />
         </slot>
       </div>
 
@@ -1112,7 +1112,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
       <Popup
         v-if="searchEnabled"
         :show="showSearchPanel"
-        :anchor="searchBtnRef || undefined"
+        :anchor="searchBtnEl || undefined"
         placement="bottom"
         align="end"
         :overlay="false"
@@ -1295,25 +1295,5 @@ async function onRemoveAdmin(member: UiGroupMember) {
   white-space: nowrap;
 }
 
-.chat__header-search,
-.chat__header-more {
-  background: none;
-  border: none;
-  color: var(--uikit-text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: var(--uikit-components-radius, 8px);
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-  flex-shrink: 0;
-}
 
-.chat__header-search:hover,
-@media (hover: hover) {
-.chat__header-more:hover {
-  background-color: var(--uikit-bg-secondary);
-}
-}
 </style>

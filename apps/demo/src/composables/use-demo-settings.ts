@@ -188,6 +188,7 @@ function createDemoSettings() {
 
   /* ===== 消息列表配置 ===== */
   const chatShowTime = ref<false | true | 'always' | 'hover'>(false)
+  const chatMessageSearchEnabled = ref(false)
   const chatMessageStatusShowText = ref(false)
   const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
   const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
@@ -339,6 +340,7 @@ function createDemoSettings() {
     groupReadReceiptMaxSize,
     // 消息列表
     chatShowTime,
+    chatMessageSearchEnabled,
     chatMessageStatusShowText,
     chatMessageStatusDirection,
     chatMessageStatusPosition,

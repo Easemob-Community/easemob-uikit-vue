@@ -23,6 +23,7 @@ const {
   groupReadReceiptEnabled,
   groupReadReceiptMaxSize,
   chatShowTime,
+  chatMessageSearchEnabled,
   chatMessageStatusShowText,
   chatMessageStatusDirection,
   chatMessageStatusPosition,
@@ -187,6 +188,10 @@ const {
     <div class="demo-settings__group">
       <label class="demo-settings__label">消息列表</label>
       <div style="display: flex; flex-direction: column; gap: 12px;">
+        <label class="demo-check">
+          <input v-model="chatMessageSearchEnabled" type="checkbox" />
+          <span>启用消息搜索</span>
+        </label>
         <div>
           <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">时间戳显示</span>
           <div class="demo-settings__options">
