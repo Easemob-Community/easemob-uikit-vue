@@ -12,6 +12,35 @@ export interface PresenceStoreLike {
 }
 
 /**
+ * 根据是否在线与 ext 扩展字段解析 UIKit 展示状态。
+ * 当 isOnline 为 false 时，无论 ext 为何值均返回 offline；
+ * 在线时优先匹配多端统一常量，未命中则视为自定义状态。
+ */
+export function parsePresenceStatus(isOnline: boolean, ext: string): UiPresence['status'] {
+  if (!isOnline)
+    return 'offline'
+  if (!ext)
+    return 'online'
+  const lower = ext.toLowerCase()
+  const onlineValue = PRESENCE_STATUS.ONLINE.toLowerCase()
+  const awayValue = PRESENCE_STATUS.AWAY.toLowerCase()
+  const busyValue = PRESENCE_STATUS.BUSY.toLowerCase()
+  const dndValue = PRESENCE_STATUS.DO_NOT_DISTURB.toLowerCase()
+  const offlineValue = PRESENCE_STATUS.OFFLINE.toLowerCase()
+  if (lower === onlineValue)
+    return 'online'
+  if (lower === awayValue)
+    return 'away'
+  if (lower === busyValue)
+    return 'busy'
+  if (lower === dndValue)
+    return 'doNotDisturb'
+  if (lower === offlineValue)
+    return 'offline'
+  return 'custom'
+}
+
+/**
  * 将 SDK PresenceInfo 映射为 UIKit 展示对象。
  */
 function toUiPresence(item: PresenceInfo): UiPresence | null {
@@ -21,30 +50,9 @@ function toUiPresence(item: PresenceInfo): UiPresence | null {
   const statusList = item.statusList || {}
   const isOnline = Object.values(statusList).some(status => Number(status) === 1)
   const ext = item.ext || ''
-  let status: UiPresence['status'] = isOnline ? 'online' : 'offline'
-  if (ext) {
-    const lower = ext.toLowerCase()
-    const onlineValue = PRESENCE_STATUS.ONLINE.toLowerCase()
-    const awayValue = PRESENCE_STATUS.AWAY.toLowerCase()
-    const busyValue = PRESENCE_STATUS.BUSY.toLowerCase()
-    const dndValue = PRESENCE_STATUS.DO_NOT_DISTURB.toLowerCase()
-    const offlineValue = PRESENCE_STATUS.OFFLINE.toLowerCase()
-    if (lower === onlineValue)
-      status = 'online'
-    else if (lower === awayValue)
-      status = 'away'
-    else if (lower === busyValue)
-      status = 'busy'
-    else if (lower === dndValue)
-      status = 'doNotDisturb'
-    else if (lower === offlineValue)
-      status = 'offline'
-    else if (isOnline)
-      status = 'custom'
-  }
   return {
     userId,
-    status,
+    status: parsePresenceStatus(isOnline, ext),
     ext,
     lastTime: item.latestTime || Date.now(),
   }
