@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
@@ -86,9 +86,10 @@ const emit = defineEmits<{
 }>()
 
 const { refreshConversations } = useConversation()
-const { t } = useLocale()
+const { t, locale } = useLocale()
 
-const defaultTimeFormatter = createConversationTimeFormatter(t)
+/** 默认时间格式化函数：包一层 computed，locale 切换时函数引用变化，prop 透传链能感知更新 */
+const defaultTimeFormatter = computed<(timestamp: number) => string>(() => createConversationTimeFormatter(t))
 const defaultMessageFormatter = createMessageFormatter(t)
 
 onMounted(() => {
