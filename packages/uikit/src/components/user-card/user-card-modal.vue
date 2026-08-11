@@ -96,18 +96,19 @@ const cardActions = computed(() => {
       icon: 'chat/bubble_fill',
       type: 'primary' as const,
     },
-    {
-      key: 'voice',
-      label: t('userCard.voice', '语音'),
-      icon: 'audio-video/phone_pick',
-      type: 'default' as const,
-    },
-    {
-      key: 'video',
-      label: t('userCard.video', '视频'),
-      icon: 'audio-video/video_camera',
-      type: 'default' as const,
-    },
+    // 语音/视频通话当前未支持，先注释入口，避免用户误点
+    // {
+    //   key: 'voice',
+    //   label: t('userCard.voice', '语音'),
+    //   icon: 'audio-video/phone_pick',
+    //   type: 'default' as const,
+    // },
+    // {
+    //   key: 'video',
+    //   label: t('userCard.video', '视频'),
+    //   icon: 'audio-video/video_camera',
+    //   type: 'default' as const,
+    // },
   ]
 
   return actions
@@ -152,9 +153,10 @@ function onActionClick(key: string) {
     emit('send-message', props.userId)
     onClose()
   }
-  else if (key === 'voice' || key === 'video') {
-    showToast(t('userCard.notSupported', '暂不支持'))
-  }
+  // 语音/视频通话当前未支持，入口已注释，保留分支便于后续恢复
+  // else if (key === 'voice' || key === 'video') {
+  //   showToast(t('userCard.notSupported', '暂不支持'))
+  // }
 }
 
 function onInfoClick(key: string) {

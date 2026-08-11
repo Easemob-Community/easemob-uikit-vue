@@ -296,13 +296,16 @@ function onSelectorChanged() {
 }
 
 .user-card__actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 20px;
 }
 
 .user-card__action {
+  flex: 1 1 80px;
+  max-width: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
