@@ -1,4 +1,5 @@
 import type { PresenceInfo } from 'easemob-websdk'
+import { PRESENCE_STATUS } from '../../constants'
 import type { ManagerHost } from '../client'
 import type { UiPresence } from '../types'
 
@@ -23,10 +24,21 @@ function toUiPresence(item: PresenceInfo): UiPresence | null {
   let status: UiPresence['status'] = isOnline ? 'online' : 'offline'
   if (ext) {
     const lower = ext.toLowerCase()
-    if (lower.includes('away'))
+    const onlineValue = PRESENCE_STATUS.ONLINE.toLowerCase()
+    const awayValue = PRESENCE_STATUS.AWAY.toLowerCase()
+    const busyValue = PRESENCE_STATUS.BUSY.toLowerCase()
+    const dndValue = PRESENCE_STATUS.DO_NOT_DISTURB.toLowerCase()
+    const offlineValue = PRESENCE_STATUS.OFFLINE.toLowerCase()
+    if (lower === onlineValue)
+      status = 'online'
+    else if (lower === awayValue)
       status = 'away'
-    else if (lower.includes('busy'))
+    else if (lower === busyValue)
       status = 'busy'
+    else if (lower === dndValue)
+      status = 'doNotDisturb'
+    else if (lower === offlineValue)
+      status = 'offline'
     else if (isOnline)
       status = 'custom'
   }

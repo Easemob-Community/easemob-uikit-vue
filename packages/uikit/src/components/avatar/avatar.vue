@@ -1,9 +1,28 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useThemeStore } from '../../store/theme'
+import Icon from '../icon/icon.vue'
 
 /** 在线状态展示值 */
-export type PresenceDisplayStatus = 'online' | 'offline' | 'away' | 'busy' | 'custom'
+export type PresenceDisplayStatus = 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
+
+const presenceIconMap: Record<PresenceDisplayStatus, string> = {
+  online: 'status/icon/filled/circle/empty',
+  offline: 'status/icon/filled/circle/empty',
+  away: 'status/icon/filled/circle/clock',
+  busy: 'status/icon/filled/circle/equals',
+  doNotDisturb: 'status/icon/filled/circle/minus',
+  custom: 'status/icon/filled/circle/star',
+}
+
+const presenceColorMap: Record<PresenceDisplayStatus, string> = {
+  online: '#6CE191',
+  offline: 'var(--uikit-text-tertiary, #94a3b8)',
+  away: '#B9BBC5',
+  busy: '#ED7587',
+  doNotDisturb: '#EE798C',
+  custom: 'var(--uikit-text-tertiary, #94a3b8)',
+}
 
 export interface AvatarProps {
   src?: string
@@ -56,6 +75,22 @@ const resolvedPresenceSize = computed(() =>
   props.presenceSize ?? Math.max(8, Math.round(props.size * 0.22)),
 )
 
+const presenceBorderWidth = computed(() =>
+  Math.max(1, Math.round(resolvedPresenceSize.value * 0.15)),
+)
+
+const presenceIconSize = computed(() =>
+  Math.max(4, resolvedPresenceSize.value - presenceBorderWidth.value * 2),
+)
+
+const presenceIconName = computed(() =>
+  props.presence ? presenceIconMap[props.presence] : '',
+)
+
+const presenceIconColor = computed(() =>
+  props.presence ? presenceColorMap[props.presence] : '',
+)
+
 function onClick() {
   if (props.editable)
     emit('presence-click')
@@ -78,9 +113,15 @@ function onClick() {
       :style="{
         width: `${resolvedPresenceSize}px`,
         height: `${resolvedPresenceSize}px`,
-        borderWidth: `${Math.max(1, Math.round(resolvedPresenceSize * 0.15))}px`,
+        borderWidth: `${presenceBorderWidth}px`,
       }"
-    />
+    >
+      <Icon
+        :name="presenceIconName"
+        :size="presenceIconSize"
+        :color="presenceIconColor"
+      />
+    </span>
   </div>
 </template>
 
@@ -137,27 +178,14 @@ function onClick() {
   position: absolute;
   right: 0;
   bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   border-style: solid;
   border-color: var(--uikit-bg-base);
-  background-color: var(--uikit-text-tertiary);
+  background-color: var(--uikit-bg-base);
   box-sizing: border-box;
-}
-
-.uikit-avatar__presence--online {
-  background-color: var(--uikit-success-color);
-}
-
-.uikit-avatar__presence--away {
-  background-color: var(--uikit-warning-color);
-}
-
-.uikit-avatar__presence--busy {
-  background-color: var(--uikit-danger-color);
-}
-
-.uikit-avatar__presence--offline,
-.uikit-avatar__presence--custom {
-  background-color: var(--uikit-text-tertiary);
+  overflow: hidden;
 }
 </style>

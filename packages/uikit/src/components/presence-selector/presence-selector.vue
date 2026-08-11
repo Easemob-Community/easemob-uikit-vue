@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
+import { PRESENCE_STATUS } from '../../constants'
 import Icon from '../icon/icon.vue'
 import IconButton from '../icon-button/icon-button.vue'
 import Input from '../input/input.vue'
 import Cell from '../cell/cell.vue'
 
-export type PresenceSelectorValue = 'online' | 'busy' | 'away' | 'custom'
+export type PresenceSelectorValue = 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
 
 export interface PresenceSelectorProps {
   /** 当前自定义状态文本 */
@@ -43,13 +44,33 @@ interface PresenceOption {
   label: string
   ext: string
   color: string
+  icon: string
 }
+
+const statusIconMap: Record<PresenceSelectorValue, string> = {
+  online: 'status/icon/filled/circle/empty',
+  offline: 'status/icon/filled/circle/empty',
+  away: 'status/icon/filled/circle/clock',
+  busy: 'status/icon/filled/circle/equals',
+  doNotDisturb: 'status/icon/filled/circle/minus',
+  custom: 'status/icon/filled/circle/star',
+}
+
+const fixedStatusValues = [
+  PRESENCE_STATUS.ONLINE.toLowerCase(),
+  PRESENCE_STATUS.OFFLINE.toLowerCase(),
+  PRESENCE_STATUS.AWAY.toLowerCase(),
+  PRESENCE_STATUS.BUSY.toLowerCase(),
+  PRESENCE_STATUS.DO_NOT_DISTURB.toLowerCase(),
+]
 
 const options = computed<PresenceOption[]>(() => {
   const list: PresenceOption[] = [
-    { key: 'online', label: t('presence.online', '在线'), ext: '', color: 'var(--uikit-success-color, #22c55e)' },
-    { key: 'busy', label: t('presence.busy', '忙碌'), ext: 'busy', color: 'var(--uikit-danger-color, #ef4444)' },
-    { key: 'away', label: t('presence.away', '离开'), ext: 'away', color: 'var(--uikit-warning-color, #f59e0b)' },
+    { key: 'online', label: t('presence.online', '在线'), ext: PRESENCE_STATUS.ONLINE, color: '#6CE191', icon: statusIconMap.online },
+    { key: 'away', label: t('presence.away', '离开'), ext: PRESENCE_STATUS.AWAY, color: '#B9BBC5', icon: statusIconMap.away },
+    { key: 'busy', label: t('presence.busy', '忙碌'), ext: PRESENCE_STATUS.BUSY, color: '#ED7587', icon: statusIconMap.busy },
+    { key: 'doNotDisturb', label: t('presence.doNotDisturb', '请勿打扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: '#EE798C', icon: statusIconMap.doNotDisturb },
+    { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: 'var(--uikit-text-tertiary, #94a3b8)', icon: statusIconMap.offline },
   ]
   if (props.showCustom) {
     list.push({
@@ -57,6 +78,7 @@ const options = computed<PresenceOption[]>(() => {
       label: t('presence.custom', '自定义'),
       ext: props.value || '',
       color: 'var(--uikit-text-tertiary, #94a3b8)',
+      icon: statusIconMap.custom,
     })
   }
   return list
@@ -74,12 +96,12 @@ watch(() => props.value, (v) => {
 function isActive(option: PresenceOption): boolean {
   if (selectedKey.value)
     return selectedKey.value === option.key
-  // 未手动选择时，按当前 ext 匹配
+  // 未手动选择时，按当前 ext 匹配（统一按多端常量做大小写不敏感比较）
   const current = (props.value || '').toLowerCase()
   if (option.key === 'online')
-    return current === ''
+    return current === '' || current === PRESENCE_STATUS.ONLINE.toLowerCase()
   if (option.key === 'custom')
-    return current !== '' && current !== 'busy' && current !== 'away'
+    return current !== '' && !fixedStatusValues.includes(current)
   return current === option.ext.toLowerCase()
 }
 
@@ -132,7 +154,7 @@ function onCancel() {
           :class="{ 'is-active': isActive(option) }"
           @click="onSelect(option)"
         >
-          <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
+          <Icon :name="option.icon" :size="16" :color="option.color" />
           <span class="presence-selector__label">{{ option.label }}</span>
           <Icon
             v-if="isActive(option)"
@@ -153,7 +175,7 @@ function onCancel() {
           @click="onSelect(option)"
         >
           <template #leading>
-            <span class="presence-selector__dot" :style="{ backgroundColor: option.color }" />
+            <Icon :name="option.icon" :size="20" :color="option.color" />
           </template>
           <template #trailing>
             <Icon
@@ -194,11 +216,6 @@ function onCancel() {
 
 .presence-selector--compact .presence-selector__title {
   font-size: var(--uikit-font-size-14);
-}
-
-.presence-selector--compact .presence-selector__dot {
-  width: 8px;
-  height: 8px;
 }
 
 .presence-selector--compact .presence-selector__options {
@@ -269,13 +286,6 @@ function onCancel() {
 
 .presence-selector:not(.presence-selector--compact) .presence-selector__option {
   --uikit-item-hover-padding-x: 12px;
-}
-
-.presence-selector__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 .presence-selector__label {

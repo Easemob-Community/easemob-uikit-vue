@@ -79,3 +79,16 @@ export const INJECTION_KEY = {
   /** 文本消息配置（链接识别 & 拦截器），chat.vue provide / text-message.vue inject */
   TEXT_MESSAGE_CONFIG: 'textMessageConfig',
 } as const
+
+/** 在线状态常量（与多端保持一致，publish 时使用对应 ext） */
+export const PRESENCE_STATUS = {
+  ONLINE: 'Online',
+  OFFLINE: 'Offline',
+  AWAY: 'Away',
+  BUSY: 'Busy',
+  DO_NOT_DISTURB: 'Do Not Disturb',
+  CUSTOM: 'Custom',
+} as const
+
+export type PresenceStatusValue =
+  (typeof PRESENCE_STATUS)[keyof typeof PRESENCE_STATUS]

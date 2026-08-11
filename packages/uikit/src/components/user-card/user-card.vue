@@ -63,16 +63,38 @@ const { t } = useLocale()
 const avatarRef = ref<InstanceType<typeof Avatar>>()
 const showSelector = ref(false)
 
+const statusIconMap: Record<PresenceDisplayStatus, string> = {
+  online: 'status/icon/filled/circle/empty',
+  offline: 'status/icon/filled/circle/empty',
+  away: 'status/icon/filled/circle/clock',
+  busy: 'status/icon/filled/circle/equals',
+  doNotDisturb: 'status/icon/filled/circle/minus',
+  custom: 'status/icon/filled/circle/star',
+}
+
+const statusColorMap: Record<PresenceDisplayStatus, string> = {
+  online: '#6CE191',
+  offline: 'var(--uikit-text-tertiary, #94a3b8)',
+  away: '#B9BBC5',
+  busy: '#ED7587',
+  doNotDisturb: '#EE798C',
+  custom: 'var(--uikit-text-tertiary, #94a3b8)',
+}
+
 const statusText = computed(() => {
   const map: Record<PresenceDisplayStatus, string> = {
     online: t('userCard.online', '在线'),
     offline: t('userCard.offline', '离线'),
     away: t('presence.away', '离开'),
     busy: t('presence.busy', '忙碌'),
+    doNotDisturb: t('presence.doNotDisturb', '请勿打扰'),
     custom: t('presence.custom', '自定义'),
   }
   return props.status ? map[props.status] : ''
 })
+
+const statusIcon = computed(() => props.status ? statusIconMap[props.status] : '')
+const statusIconColor = computed(() => props.status ? statusColorMap[props.status] : '')
 
 function onActionClick(key: string) {
   emit('action-click', key)
@@ -132,7 +154,12 @@ function onSelectorChanged() {
               class="user-card__status"
               :class="`user-card__status--${props.status}`"
             >
-              <span class="user-card__status-dot" />
+              <Icon
+                v-if="statusIcon"
+                :name="statusIcon"
+                :size="10"
+                :color="statusIconColor"
+              />
               {{ statusText }}
             </span>
           </div>
@@ -262,30 +289,6 @@ function onSelectorChanged() {
   padding: 2px 8px;
   border-radius: 9999px;
   background-color: var(--uikit-bg-secondary);
-}
-
-.user-card__status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--uikit-text-tertiary);
-}
-
-.user-card__status--online .user-card__status-dot {
-  background-color: var(--uikit-success-color);
-}
-
-.user-card__status--away .user-card__status-dot {
-  background-color: var(--uikit-warning-color);
-}
-
-.user-card__status--busy .user-card__status-dot {
-  background-color: var(--uikit-danger-color);
-}
-
-.user-card__status--offline .user-card__status-dot,
-.user-card__status--custom .user-card__status-dot {
-  background-color: var(--uikit-text-tertiary);
 }
 
 .user-card__user-id {

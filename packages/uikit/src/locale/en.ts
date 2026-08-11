@@ -508,6 +508,8 @@ const messages: LocaleMessages = {
   'presence.online': 'Online',
   'presence.away': 'Away',
   'presence.busy': 'Busy',
+  'presence.doNotDisturb': 'Do Not Disturb',
+  'presence.offline': 'Offline',
   'presence.custom': 'Custom',
   'presence.customPlaceholder': 'Enter custom status',
   'presence.publishFailed': 'Failed to set status',

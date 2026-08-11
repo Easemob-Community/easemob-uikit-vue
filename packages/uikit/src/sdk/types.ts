@@ -241,7 +241,7 @@ export interface UiContactInvite {
 /** UIKit 在线状态展示类型 */
 export interface UiPresence {
   userId: string
-  status: 'online' | 'offline' | 'away' | 'busy' | 'custom'
+  status: 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
   ext?: string
   lastTime?: number
 }
