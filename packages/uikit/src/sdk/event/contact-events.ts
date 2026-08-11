@@ -78,6 +78,9 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       const contact = msg.contact
       if (contact?.userId && contact.remark !== undefined) {
         stores.contact.updateContactRemark(contact.userId, contact.remark)
+        // 跨端同步备注变更时，同步刷新会话列表显示名称
+        const name = contact.remark || msg.userInfo?.nickname || contact.userId
+        stores.conversation.updateConversation(contact.userId, { name })
       }
     },
   }
