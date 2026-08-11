@@ -93,6 +93,63 @@
 - 动画等级：`[data-uikit-anim-level="subtle"]` / `="expressive"` 覆盖时长与缩放；
   `[data-uikit-anim-enabled="false"]` 与 `@media (prefers-reduced-motion: reduce)` 把动画全部归零。
 
+## Icon / SVG 着色规范（防止图标改色不生效）
+
+新增或替换 `src/assets/icons/**/*.svg` 时，若图标需要跟随主题色 / 业务色变化，必须遵守以下规则：
+
+### 1. SVG 源文件要把写死颜色改成 `currentColor`
+
+`icon-map.ts` 会透传 SVG 根节点的 `fill` / `stroke` 给 `Icon.vue`。如果 SVG 内是 `fill="black"` / `stroke="black"`，`Icon` 的 `color` prop 无法覆盖：
+
+```svg
+<!-- ❌ 错误：fill 写死 -->
+<path fill="black" d="..." />
+
+<!-- ✅ 正确：fill 使用 currentColor -->
+<path fill="currentColor" d="..." />
+```
+
+> 内部细节（如时钟指针）需要固定对比色可保留 `fill="white"`，但承载主题色的主体路径必须改为 `currentColor`。
+
+### 2. 填充式图标不消费 `color` prop，改色要走 `style color`
+
+`Icon.vue` 对**描边式图标**（有 `stroke`）会把 `color` prop 转成 `stroke`；但对**填充式图标**（只有 `fill`），最终渲染属性是 `{ fill: data?.fill ?? props.color }`。
+
+因此给填充图标传 `:color="..."` 不会生效，必须直接给 `Icon` 元素透传 `color` 样式：
+
+```vue
+<!-- ❌ 错误：填充图标传 color prop 无效 -->
+<Icon name="status/icon/filled/circle/empty" :color="onlineColor" />
+
+<!-- ✅ 正确：通过 style 设置 color，currentColor 随之生效 -->
+<Icon name="status/icon/filled/circle/empty" :style="{ color: onlineColor }" />
+```
+
+### 3. 图标与伴生文本要分开着色
+
+如果父级容器里既有图标又有文本（如 `UserCard` 的状态 chip），不要把 `color` 样式设置在父级 span 上，否则文本也会被染色。应只给 `Icon` 本身设置 `color`：
+
+```vue
+<span class="user-card__status">
+  <Icon :name="statusIcon" :size="10" :style="{ color: statusIconColor }" />
+  {{ statusText }}
+</span>
+```
+
+### 4. 业务色值仍要走 `var(--uikit-*, #fallback)`
+
+即使颜色是业务指定的固定色，也建议写成 CSS 变量 + fallback 形式，保留后续主题覆盖能力：
+
+```ts
+const presenceColorMap = {
+  online: 'var(--uikit-presence-online-color, #6CE191)',
+  away: 'var(--uikit-presence-away-color, #B9BBC5)',
+  busy: 'var(--uikit-presence-busy-color, #ED7587)',
+}
+```
+
+---
+
 ## 运行时层：主题怎么被喂进来
 
 - **第二类变量在运行时写**：`src/store/theme.ts` 的 `useThemeStore` 用 `watchEffect` 往
@@ -132,5 +189,8 @@
 - ❌ 现编 `--uikit-xxx` 变量名却不加进 `src/theme/index.css`——永远只渲染 fallback，等于没换肤。
 - ❌ 只改 `:root` 忘了 `[data-uikit-theme="dark"]`——暗色下颜色 / 对比度必出问题。
 - ❌ 直接 `document.documentElement.style.setProperty(...)` 改主题，绕开 `use-theme` / store。
+- ❌ SVG 源文件里该随主题变色的路径用 `fill="black"` / `stroke="black"`——应改为 `currentColor`，否则 `Icon` 改色无效。
+- ❌ 给填充式 `Icon` 传 `:color` prop 期望改色——不会生效；应给 `Icon` 本身加 `:style="{ color: ... }"`。
+- ❌ 图标与文本共父时把 `color` 样式设在父级——会把文本一起染色，应只给 `Icon` 设置颜色。
 - ❌ 组件里直接 `env(safe-area-inset-top)` 或自己监听 `resize/visualViewport`——H5 适配走 `UIKitProvider :h5`。
 - ❌ 用普通 `<style>` 写组件样式泄漏全局（全局 / 穿透样式才用非 scoped 块，且要克制）。

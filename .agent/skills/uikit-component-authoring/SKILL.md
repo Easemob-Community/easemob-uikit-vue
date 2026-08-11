@@ -195,6 +195,28 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
 
 ---
 
+## 9. 使用 `Icon` 组件与 SVG 资源的陷阱
+
+### 9.1 SVG 源文件：主题色路径必须用 `currentColor`
+
+`src/assets/icons/**/*.svg` 中，凡是要跟随主题/业务色变化的 path，必须把 `fill="black"` / `stroke="black"` 改为 `currentColor`。`icon-map.ts` 会透传 SVG 根节点绘制属性，写死颜色会导致 `Icon` 无法改色。详见 `uikit-styling-theming` 的「Icon / SVG 着色规范」。
+
+### 9.2 填充式图标改色传 `style color`，不要传 `color` prop
+
+`Icon.vue` 对填充式图标（只有 `fill`、无 `stroke`）不会消费 `color` prop。正确写法：
+
+```vue
+<!-- ❌ 无效 -->
+<Icon name="status/icon/filled/circle/empty" :color="onlineColor" />
+
+<!-- ✅ 正确 -->
+<Icon name="status/icon/filled/circle/empty" :style="{ color: onlineColor }" />
+```
+
+如果父级同时包含图标和文本（如状态标签），只给 `Icon` 本身设 `color`，避免文本被连带染色。
+
+---
+
 ## 硬规则 vs 软约定
 
 **硬规则（lint / 构建 / resolver 会拦或直接影响可用性，100% 遵守）：**
@@ -236,6 +258,8 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
 - ❌ 调用方/内部从深层文件直接 `import` 组件 `.vue`，绕开 `Em*` 命名导出 / resolver。
 - ❌ 漏 `<style scoped>`，或样式里写死颜色/时长而非 `var(--uikit-*)`（详见 `uikit-styling-theming`）。
 - ❌ 业务代码里写死 `'groupChat'` / `'owner'` / `'text'` 等枚举字符串，或类型联合手写 `'singleChat' | 'groupChat'` —— 一律引用 `src/constants/index.ts`（第 8 节），改常量值一处生效。
+- ❌ 给填充式 `Icon` 传 `:color` prop 期望改色 —— 不会生效；应传 `:style="{ color: ... }"`（第 9 节）。
+- ❌ SVG 源文件里该随主题变色的路径用 `fill="black"` / `stroke="black"` —— 应改为 `currentColor`（第 9 节）。
 - ❌ 组件里直接 `env(safe-area-inset-*)` 或自行监听 `resize/visualViewport` 处理 H5 适配。
 - ❌ 用组件实例级 `ref`/`reactive` 做需要跨实例共享的去重或缓存（如每个消息气泡各自 `const triedFetch = ref(false)`）—— 多实例挂载时会并发重复请求；应把去重/缓存上提到 Domain 层或 store 层，参见 `uikit-store-composable` 第 8 节。
 - ❌ Boolean prop 不在 `withDefaults` 中给默认值，依赖 Vue 隐式 `false` 或 `?? true` 回落——Vue 3 会先把 `undefined` 转成 `false`，`false ?? true` = `false`，导致 "默认 true" 的逻辑永远不生效。
