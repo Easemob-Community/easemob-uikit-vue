@@ -15,7 +15,7 @@ export const useConversationStore = defineStore('conversation', () => {
   const typingEnabled = ref(true)
   /** typing 状态过期计时器（模块私有，避免频繁触发响应式更新） */
   const typingTimers = new Map<string, ReturnType<typeof setTimeout>>()
-  const TYPING_TIMEOUT = 8000
+  const TYPING_TIMEOUT = 5000
 
   const currentConversation = computed(() =>
     conversationList.value.find(c => c.id === currentConversationId.value) || null,
