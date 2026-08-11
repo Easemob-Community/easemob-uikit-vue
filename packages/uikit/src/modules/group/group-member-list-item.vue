@@ -130,6 +130,8 @@ function canMute(member: UiGroupMember): boolean {
 function canUnmute(member: UiGroupMember): boolean {
   if (!props.showMuteAction)
     return false
+  if (member.userId === props.currentUserId)
+    return false
   if (!isMemberMuted(props.groupId, member.userId))
     return false
   if (isOwner.value)
