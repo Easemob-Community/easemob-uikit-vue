@@ -111,7 +111,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'block',
       label: t('group.management.blocklist', '黑名单'),
       show: true,
-      icon: 'group-manager/icon/stroked/shield/person',
+      icon: 'actions/user-x',
       count: (stores.group.groupBlocklistMap[id] || []).length,
     })
   }
@@ -121,7 +121,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'allow',
       label: t('group.management.allowlist', '白名单'),
       show: true,
-      icon: 'group-manager/icon/stroked/shield/person',
+      icon: 'actions/user-check',
       count: (stores.group.groupAllowlistMap[id] || []).length,
     })
   }

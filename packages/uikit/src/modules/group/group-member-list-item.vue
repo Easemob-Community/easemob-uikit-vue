@@ -184,13 +184,13 @@ interface MoreAction {
 function getMoreActions(member: UiGroupMember): MoreAction[] {
   const actions: MoreAction[] = []
   if (canMute(member))
-    actions.push({ key: 'mute', icon: 'group-manager/icon/stroked/bubble/slash', label: t('group.memberList.mute', '禁言') })
+    actions.push({ key: 'mute', icon: 'group-manager/icon/stroked/rect/personnclock', label: t('group.memberList.mute', '禁言') })
   if (canUnmute(member))
-    actions.push({ key: 'unmute', icon: 'group-manager/icon/stroked/bubble/slash', label: t('group.memberList.unmute', '取消禁言') })
+    actions.push({ key: 'unmute', icon: 'group-manager/icon/stroked/rect/personnclock', label: t('group.memberList.unmute', '取消禁言') })
   if (canBlock(member))
-    actions.push({ key: 'block', icon: 'group-manager/icon/stroked/shield/person', label: t('group.memberList.block', '拉黑') })
+    actions.push({ key: 'block', icon: 'actions/user-x', label: t('group.memberList.block', '拉黑') })
   if (canUnblock(member))
-    actions.push({ key: 'unblock', icon: 'group-manager/icon/stroked/shield/person', label: t('group.memberList.unblock', '取消拉黑') })
+    actions.push({ key: 'unblock', icon: 'actions/user-check', label: t('group.memberList.unblock', '取消拉黑') })
   if (props.showAdminAction && canSetAdmin(member))
     actions.push({ key: 'setAdmin', icon: 'group-manager/icon/stroked/shield/person', label: t('group.memberList.setAdmin', '设管理员') })
   if (props.showAdminAction && canRemoveAdmin(member))
