@@ -25,7 +25,7 @@ const hasAnnouncement = computed(() => !!announcement.value)
     :class="{ 'is-collapsed': collapsed }"
   >
     <div class="group-announcement-banner__main">
-      <Icon class="group-announcement-banner__icon" name="group-manager/icon/stroked/board" :size="14" />
+      <Icon class="group-announcement-banner__icon" name="group/board" :size="14" />
       <div class="group-announcement-banner__content">
         <div class="group-announcement-banner__title">
           {{ t('chat.announcementBanner.title', '群公告') }}

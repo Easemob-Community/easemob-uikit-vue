@@ -787,7 +787,7 @@ defineExpose({
                 class="chat-info-drawer__member-cell chat-info-drawer__member-cell--add"
                 @click.stop="onAddMember"
               >
-                <Icon name="rect/minus" :size="48" />
+                <Icon name="actions/plus_in_rectangle" :size="48" />
               </div>
             </div>
             <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
@@ -809,7 +809,7 @@ defineExpose({
               @click="onViewMembersForTransfer"
             >
               <template #leading>
-                <Icon name="group-manager/icon/stroked/crown" :size="18" />
+                <Icon name="group/crown" :size="18" />
               </template>
             </Cell>
             <Cell
@@ -819,7 +819,7 @@ defineExpose({
               @click="onViewMembersForAdmin"
             >
               <template #leading>
-                <Icon name="group-manager/icon/stroked/shield/person" :size="18" />
+                <Icon name="group/shield-person" :size="18" />
               </template>
             </Cell>
           </div>

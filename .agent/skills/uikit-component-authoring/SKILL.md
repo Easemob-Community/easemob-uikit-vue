@@ -207,10 +207,10 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
 
 ```vue
 <!-- ❌ 无效 -->
-<Icon name="status/icon/filled/circle/empty" :color="onlineColor" />
+<Icon name="presence/empty" :color="onlineColor" />
 
 <!-- ✅ 正确 -->
-<Icon name="status/icon/filled/circle/empty" :style="{ color: onlineColor }" />
+<Icon name="presence/empty" :style="{ color: onlineColor }" />
 ```
 
 如果父级同时包含图标和文本（如状态标签），只给 `Icon` 本身设 `color`，避免文本被连带染色。

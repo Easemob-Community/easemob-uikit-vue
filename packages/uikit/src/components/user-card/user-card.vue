@@ -64,12 +64,12 @@ const avatarRef = ref<InstanceType<typeof Avatar>>()
 const showSelector = ref(false)
 
 const statusIconMap: Record<PresenceDisplayStatus, string> = {
-  online: 'status/icon/filled/circle/empty',
-  offline: 'status/icon/filled/circle/empty',
-  away: 'status/icon/filled/circle/clock',
-  busy: 'status/icon/filled/circle/equals',
-  doNotDisturb: 'status/icon/filled/circle/minus',
-  custom: 'status/icon/filled/circle/star',
+  online: 'presence/empty',
+  offline: 'presence/empty',
+  away: 'presence/clock',
+  busy: 'presence/equals',
+  doNotDisturb: 'presence/minus',
+  custom: 'presence/star',
 }
 
 const statusColorMap: Record<PresenceDisplayStatus, string> = {

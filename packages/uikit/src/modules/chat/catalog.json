@@ -110,27 +110,27 @@
     {
       "feature": "消息已读",
       "scene": "消息气泡上的已读回执状态图标",
-      "mapping": { "category": "status", "file": "read@3x.png" }
+      "mapping": { "category": "images/presence", "file": "read@3x.png" }
     },
     {
       "feature": "消息已送达",
       "scene": "消息气泡上的已送达回执状态图标",
-      "mapping": { "category": "status", "file": "received@3x.png" }
+      "mapping": { "category": "images/presence", "file": "received@3x.png" }
     },
     {
       "feature": "消息发送中",
       "scene": "消息气泡上的发送中状态图标",
-      "mapping": { "category": "status", "file": "sending@3x.png" }
+      "mapping": { "category": "images/presence", "file": "sending@3x.png" }
     },
     {
       "feature": "消息已发送",
       "scene": "消息气泡上的已发送状态图标",
-      "mapping": { "category": "status", "file": "sent@3x.png" }
+      "mapping": { "category": "images/presence", "file": "sent@3x.png" }
     },
     {
       "feature": "消息发送失败",
       "scene": "消息气泡上的发送失败状态图标",
-      "mapping": { "category": "status", "file": "failed@3x.png" }
+      "mapping": { "category": "images/presence", "file": "failed@3x.png" }
     },
     {
       "feature": "新消息提示",

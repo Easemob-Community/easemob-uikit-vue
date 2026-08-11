@@ -41,7 +41,7 @@
 以业务语义为维度，把 `icons-next` 与 `assets/icons` 按 `category/name` 对齐。例如：
 
 ```text
-icons-next/rect/minus.svg      → assets/icons/rect/minus.svg      （新增/替换）
+icons-next/rect/minus.svg      → assets/icons/actions/plus_in_rectangle.svg      （新增/替换，已并入 actions）
 icons-next/actions/plus.svg    → assets/icons/actions/plus.svg    （需对比差异）
 icons-next/status/done_all.svg → assets/icons/status/done_all.svg （需人工审查语义）
 ```
@@ -95,13 +95,13 @@ done
 
 ## 4. 命名与目录规范
 
-- 统一使用 `category/name.svg` 两级结构，不要出现 `icons-next/rect/minus.svg` 与 `assets/icons/rect/minus_2.svg` 这种无法对齐的命名。
+- 统一使用 `category/name.svg` 两级结构，不要出现 `icons-next/rect/minus.svg` 与 `assets/icons/actions/plus_in_rectangle_2.svg` 这种无法对齐的命名。
 - 新图标命名优先与设计师目录命名保持一致，若 `assets/icons` 中已有同名但语义不同，应协商改名而不是共存两套命名。
 - 状态类、胶囊类图标命名参考 `DIGITAL-CAPSULE-ICON-RESEARCH.md` 的规范，避免再次产生“未读数一大坨”的误用。
 
 ## 5. 建议的落地节奏
 
-1. **第一批（高优）**：补全当前业务已引用但 `assets/icons` 中效果不佳的图标，如群成员添加 `rect/minus`、视频发送 `misc/triangle_in_rect`、消息状态/未读数胶囊等。**这一批已完成的部分不再重复替换**。
+1. **第一批（高优）**：补全当前业务已引用但 `assets/icons` 中效果不佳的图标，如群成员添加 `actions/plus_in_rectangle`、视频发送 `misc/triangle_in_rect`、消息状态/未读数胶囊等。**这一批已完成的部分不再重复替换**。
 2. **第二批（中优）**：按分类批量 review `icons-next` 与 `assets/icons` 的同名片，造型一致则替换，造型不一致则记录。
 3. **第三批（低优）**：面性图标集 `iconStyle` 主题切换接入（详见 `ICON-STYLE-SYSTEM-RESEARCH.md`）。
 4. **长期**：设计师后续交付的新图标统一放入 `icons-next`，按本策略评估后再合并入 `assets/icons`。

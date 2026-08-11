@@ -89,7 +89,7 @@ function cancel() {
   <div class="group-announcement">
     <div class="group-announcement__label-row">
       <div class="group-announcement__label">
-        <Icon name="group-manager/icon/stroked/board" :size="16" />
+        <Icon name="group/board" :size="16" />
         <span>{{ t('chat.info.groupAnnouncement') }}</span>
       </div>
       <IconButton

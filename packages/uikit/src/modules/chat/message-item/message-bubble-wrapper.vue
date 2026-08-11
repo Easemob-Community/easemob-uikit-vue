@@ -184,23 +184,23 @@ const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageSt
 /** 经典状态图标映射（默认） */
 const classicStatusIconMap: Record<MessageStatusValue, string> = {
   // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
-  [MESSAGE_STATUS.SENDING]: 'message-status/stroked/loading/arc/normal',
-  [MESSAGE_STATUS.SENT]: 'message-status/stroked/circle/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'message-status/stroked/circle/empty',
-  [MESSAGE_STATUS.READ]: 'message-status/stroked/circle/checked',
+  [MESSAGE_STATUS.SENDING]: 'message-status/loading',
+  [MESSAGE_STATUS.SENT]: 'message-status/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'message-status/empty',
+  [MESSAGE_STATUS.READ]: 'message-status/checked',
   // 发送失败：圆圈内感叹号提示可点击重发
-  [MESSAGE_STATUS.FAILED]: 'message-status/stroked/circle/bang',
+  [MESSAGE_STATUS.FAILED]: 'message-status/bang',
 }
 
 /** 数字胶囊状态图标映射（线性/描边版）
  * 语义：未读=空心圆，已读=空心圆+对勾；发送中/失败保持经典图标
  */
 const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
-  [MESSAGE_STATUS.SENDING]: 'message-status/stroked/loading/arc/normal',
-  [MESSAGE_STATUS.SENT]: 'message-status/stroked/circle/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'message-status/stroked/circle/empty',
-  [MESSAGE_STATUS.READ]: 'message-status/stroked/circle/checked',
-  [MESSAGE_STATUS.FAILED]: 'message-status/stroked/circle/bang',
+  [MESSAGE_STATUS.SENDING]: 'message-status/loading',
+  [MESSAGE_STATUS.SENT]: 'message-status/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'message-status/empty',
+  [MESSAGE_STATUS.READ]: 'message-status/checked',
+  [MESSAGE_STATUS.FAILED]: 'message-status/bang',
 }
 
 /** 当前状态图标 */
@@ -213,7 +213,7 @@ const statusIcon = computed(() => {
 })
 
 /** PC 端发送失败图标 hover 时显示的替换图标（重发提示） */
-const failedHoverIcon = 'message-status/stroked/ringarrow/ccw'
+const failedHoverIcon = 'message-status/retry'
 
 /** 当前状态文本 */
 const statusText = computed(() => {
@@ -687,7 +687,7 @@ onBeforeUnmount(() => {
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="message-status/stroked/circle/checked" :size="10" />
+                <Icon v-if="isGroupReadAll" name="message-status/checked" :size="10" />
                 <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
               </button>
             </div>

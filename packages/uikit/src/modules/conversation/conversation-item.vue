@@ -340,7 +340,7 @@ const displayMessage = computed(() => {
           <span class="conversation-item__name" :class="{ 'is-at-me': effectiveHasAtMe }">
             <Icon
               v-if="effectiveHasAtMe"
-              name="conversation/stroked/at"
+              name="conversation/at"
               :size="14"
               class="conversation-item__at-me-icon"
             />
@@ -376,7 +376,7 @@ const displayMessage = computed(() => {
             <span v-if="effectiveHasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
             <Icon
               v-if="displayDraft"
-              name="conversation/stroked/rect_notched/pen"
+              name="conversation/draft"
               :size="14"
               class="conversation-item__draft-icon"
             />

@@ -119,10 +119,10 @@
 
 ```vue
 <!-- ❌ 错误：填充图标传 color prop 无效 -->
-<Icon name="status/icon/filled/circle/empty" :color="onlineColor" />
+<Icon name="presence/empty" :color="onlineColor" />
 
 <!-- ✅ 正确：通过 style 设置 color，currentColor 随之生效 -->
-<Icon name="status/icon/filled/circle/empty" :style="{ color: onlineColor }" />
+<Icon name="presence/empty" :style="{ color: onlineColor }" />
 ```
 
 ### 3. 图标与伴生文本要分开着色

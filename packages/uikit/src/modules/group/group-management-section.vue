@@ -101,7 +101,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'mute',
       label: t('group.management.muteList', '禁言列表'),
       show: true,
-      icon: 'group-manager/icon/stroked/bubble/slash',
+      icon: 'group/bubble-slash',
       count: (stores.group.groupMuteListMap[id] || []).length,
     })
   }
@@ -131,7 +131,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'files',
       label: t('group.management.sharedFiles', '共享文件'),
       show: true,
-      icon: 'group-manager/icon/stroked/doc',
+      icon: 'group/doc',
       count: (stores.group.groupSharedFilesMap[id] || []).length,
     })
   }
@@ -141,7 +141,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'requests',
       label: t('group.management.joinRequests', '入群申请'),
       show: true,
-      icon: 'group-manager/icon/stroked/rect/personnclock',
+      icon: 'group/person-clock',
       count: (stores.group.groupJoinRequestsMap[id] || []).length,
     })
   }
@@ -200,7 +200,7 @@ function closeDrawer() {
         :inset-hover="false"
       >
         <template #leading>
-          <Icon name="group-manager/icon/stroked/bubble/slash" :size="18" />
+          <Icon name="group/bubble-slash" :size="18" />
         </template>
         <template #trailing>
           <label class="group-management-section__toggle" @click.stop>

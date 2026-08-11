@@ -61,57 +61,57 @@
     {
       "feature": "消息已读",
       "scene": "消息气泡上的已读回执状态图标",
-      "mapping": { "category": "status", "file": "read@3x.png" }
+      "mapping": { "category": "images/presence", "file": "read@3x.png" }
     },
     {
       "feature": "消息已送达",
       "scene": "消息气泡上的已送达回执状态图标",
-      "mapping": { "category": "status", "file": "received@3x.png" }
+      "mapping": { "category": "images/presence", "file": "received@3x.png" }
     },
     {
       "feature": "消息发送中",
       "scene": "消息气泡上的发送中状态图标",
-      "mapping": { "category": "status", "file": "sending@3x.png" }
+      "mapping": { "category": "images/presence", "file": "sending@3x.png" }
     },
     {
       "feature": "消息已发送",
       "scene": "消息气泡上的已发送状态图标",
-      "mapping": { "category": "status", "file": "sent@3x.png" }
+      "mapping": { "category": "images/presence", "file": "sent@3x.png" }
     },
     {
       "feature": "消息发送失败",
       "scene": "消息气泡上的发送失败状态图标",
-      "mapping": { "category": "status", "file": "failed@3x.png" }
+      "mapping": { "category": "images/presence", "file": "failed@3x.png" }
     },
     {
       "feature": "在线状态-在线",
       "scene": "会话项头像右下角的在线状态指示",
-      "mapping": { "category": "status", "file": "Online.png" },
-      "alternatives": [{ "category": "status", "file": "Online2.png" }]
+      "mapping": { "category": "images/presence", "file": "Online.png" },
+      "alternatives": [{ "category": "images/presence", "file": "Online2.png" }]
     },
     {
       "feature": "在线状态-忙碌",
       "scene": "会话项头像右下角的忙碌状态指示",
-      "mapping": { "category": "status", "file": "Busy.png" },
-      "alternatives": [{ "category": "status", "file": "Busy2.png" }]
+      "mapping": { "category": "images/presence", "file": "Busy.png" },
+      "alternatives": [{ "category": "images/presence", "file": "Busy2.png" }]
     },
     {
       "feature": "在线状态-勿扰",
       "scene": "会话项头像右下角的勿扰状态指示",
-      "mapping": { "category": "status", "file": "Do_not_Disturb.png" },
-      "alternatives": [{ "category": "status", "file": "Do_not_Disturb2.png" }]
+      "mapping": { "category": "images/presence", "file": "Do_not_Disturb.png" },
+      "alternatives": [{ "category": "images/presence", "file": "Do_not_Disturb2.png" }]
     },
     {
       "feature": "在线状态-离线",
       "scene": "会话项头像右下角的离线状态指示",
-      "mapping": { "category": "status", "file": "Offline.png" },
-      "alternatives": [{ "category": "status", "file": "Offline2.png" }]
+      "mapping": { "category": "images/presence", "file": "Offline.png" },
+      "alternatives": [{ "category": "images/presence", "file": "Offline2.png" }]
     },
     {
       "feature": "在线状态-离开",
       "scene": "会话项头像右下角的离开状态指示",
-      "mapping": { "category": "status", "file": "leave.png" },
-      "alternatives": [{ "category": "status", "file": "leave2.png" }]
+      "mapping": { "category": "images/presence", "file": "leave.png" },
+      "alternatives": [{ "category": "images/presence", "file": "leave2.png" }]
     },
     {
       "feature": "加载中",
