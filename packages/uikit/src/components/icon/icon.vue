@@ -43,7 +43,7 @@ const viewBox = computed(() => iconSvg.value?.viewBox ?? '0 0 24 24')
 
 /**
  * 根节点绘制属性：
- * - 描边式图标（Lucide 等）：透传源 svg 的 fill="none"/stroke/stroke-width 等，
+ * - 描边式图标：透传源 svg 的 fill="none"/stroke/stroke-width 等，
  *   stroke 为 currentColor 时改绑 props.color，保证 color prop 对描边图标同样生效；
  * - 填充式图标（无 stroke）：维持原行为 fill = props.color。
  */

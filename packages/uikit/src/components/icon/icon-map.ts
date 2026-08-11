@@ -15,7 +15,7 @@ export interface IconSvgData {
   viewBox: string
   /**
    * 源 <svg> 根节点的绘制属性。
-   * Lucide 等描边式图标的 path 不带 fill/stroke，依赖根节点继承，
+   * 描边式图标的 path 不带 fill/stroke，依赖根节点继承，
    * 剥离 <svg> 标签后必须由 Icon 组件透传这些属性，否则描边图标会渲染成实心色块。
    */
   fill?: string
