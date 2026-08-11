@@ -1166,6 +1166,13 @@ defineExpose({
   width: 48px;
   height: 48px;
   color: var(--uikit-icon-muted);
+  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+@media (hover: hover) {
+  .chat-info-drawer__member-cell--add:hover :deep(.uikit-icon) {
+    transform: scale(1.2);
+  }
 }
 
 .chat-info-drawer__view-all {

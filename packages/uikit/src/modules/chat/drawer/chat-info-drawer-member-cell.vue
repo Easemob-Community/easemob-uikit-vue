@@ -51,10 +51,16 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 }
 
 .chat-info-drawer__member-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16px;
   font-size: var(--uikit-font-size-10);
   padding: 1px 4px;
   border-radius: 4px;
   line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .chat-info-drawer__member-tag--owner {
