@@ -687,7 +687,7 @@ onBeforeUnmount(() => {
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="message-status/checked" :size="10" />
+                <Icon v-if="isGroupReadAll" name="message-status/checked" :size="14" />
                 <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
               </button>
             </div>
@@ -999,7 +999,8 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__group-read--all {
-  border-color: var(--uikit-primary-color);
+  border: none;
+  background: transparent;
   color: var(--uikit-primary-color);
 }
 
