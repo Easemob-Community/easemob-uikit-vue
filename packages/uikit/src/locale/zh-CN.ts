@@ -508,7 +508,7 @@ const messages: LocaleMessages = {
   'presence.online': '在线',
   'presence.away': '离开',
   'presence.busy': '忙碌',
-  'presence.doNotDisturb': '请勿打扰',
+  'presence.doNotDisturb': '勿扰',
   'presence.offline': '离线',
   'presence.custom': '自定义',
   'presence.customPlaceholder': '请输入自定义状态',

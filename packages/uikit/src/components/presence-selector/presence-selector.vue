@@ -69,7 +69,7 @@ const options = computed<PresenceOption[]>(() => {
     { key: 'online', label: t('presence.online', '在线'), ext: PRESENCE_STATUS.ONLINE, color: 'var(--uikit-presence-online-color, #6CE191)', icon: statusIconMap.online },
     { key: 'away', label: t('presence.away', '离开'), ext: PRESENCE_STATUS.AWAY, color: 'var(--uikit-presence-away-color, #B9BBC5)', icon: statusIconMap.away },
     { key: 'busy', label: t('presence.busy', '忙碌'), ext: PRESENCE_STATUS.BUSY, color: 'var(--uikit-presence-busy-color, #ED7587)', icon: statusIconMap.busy },
-    { key: 'doNotDisturb', label: t('presence.doNotDisturb', '请勿打扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: 'var(--uikit-presence-dnd-color, #EE798C)', icon: statusIconMap.doNotDisturb },
+    { key: 'doNotDisturb', label: t('presence.doNotDisturb', '勿扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: 'var(--uikit-presence-dnd-color, #EE798C)', icon: statusIconMap.doNotDisturb },
     { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: 'var(--uikit-presence-offline-color, #454545)', icon: statusIconMap.offline },
   ]
   if (props.showCustom) {

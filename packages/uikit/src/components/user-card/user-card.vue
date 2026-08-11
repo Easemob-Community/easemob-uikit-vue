@@ -87,7 +87,7 @@ const statusText = computed(() => {
     offline: t('userCard.offline', '离线'),
     away: t('presence.away', '离开'),
     busy: t('presence.busy', '忙碌'),
-    doNotDisturb: t('presence.doNotDisturb', '请勿打扰'),
+    doNotDisturb: t('presence.doNotDisturb', '勿扰'),
     custom: t('presence.custom', '自定义'),
   }
   return props.status ? map[props.status] : ''
