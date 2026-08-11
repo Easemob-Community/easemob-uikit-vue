@@ -502,6 +502,7 @@ const messages: LocaleMessages = {
   'chat.notice.allowlistRemoved': '{name} was removed from allowlist',
   'chat.notice.allowlistRemovedMultiple': '{name} and {count} others were removed from allowlist',
   'conversation.atMe': '@',
+  'conversation.atMeInMessage': '@me',
   'userInfo.subscriptionDisabled': 'User profile real-time subscription is not enabled. Stranger profile changes will not update automatically. Please contact the admin.',
   'presence.setStatus': 'Set Status',
   'presence.online': 'Online',

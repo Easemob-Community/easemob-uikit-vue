@@ -502,6 +502,7 @@ const messages: LocaleMessages = {
   'chat.notice.allowlistRemoved': '{name} 被移出白名单',
   'chat.notice.allowlistRemovedMultiple': '{name} 等 {count} 人被移出白名单',
   'conversation.atMe': '@',
+  'conversation.atMeInMessage': '@我的',
   'userInfo.subscriptionDisabled': '用户资料实时订阅未开通，陌生人资料变更不会自动更新，请联系管理员开通',
   'presence.setStatus': '设置在线状态',
   'presence.online': '在线',

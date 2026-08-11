@@ -353,6 +353,7 @@ const displayMessage = computed(() => {
       </div>
       <div class="conversation-item__bottom">
         <span class="conversation-item__message">
+          <span v-if="props.hasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
           <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
         </span>
         <Badge
@@ -408,7 +409,7 @@ const displayMessage = computed(() => {
 }
 
 .uikit-cell.has-at-me {
-  background-color: rgba(var(--uikit-primary-rgb), 0.06);
+  background-color: rgba(var(--uikit-primary-rgb), 0.1);
 }
 
 /* leading slot 内 Avatar 与 prefix slot 间距 */
@@ -531,6 +532,12 @@ const displayMessage = computed(() => {
 
 .conversation-item__draft {
   color: var(--uikit-danger-color);
+  margin-right: 2px;
+}
+
+.conversation-item__at-me-prefix {
+  color: var(--uikit-primary);
+  font-weight: 500;
   margin-right: 2px;
 }
 
