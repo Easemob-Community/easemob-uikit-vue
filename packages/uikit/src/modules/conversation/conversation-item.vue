@@ -30,6 +30,8 @@ export interface ConversationItemProps {
   unreadMode?: 'count' | 'dot'
   /** 是否有人@我 */
   hasAtMe?: boolean
+  /** 对方是否正在输入（仅单聊） */
+  isTyping?: boolean
 }
 
 const props = withDefaults(defineProps<ConversationItemProps>(), {
@@ -37,6 +39,7 @@ const props = withDefaults(defineProps<ConversationItemProps>(), {
   showSenderName: true,
   unreadMode: 'count',
   hasAtMe: false,
+  isTyping: false,
 })
 
 const emit = defineEmits<{
@@ -275,8 +278,11 @@ const displayDraft = computed(() => {
   return !!props.conversation.draft
 })
 
-/** 显示消息内容：草稿优先，否则用 messageFormatter 格式化 */
+/** 显示消息内容：正在输入 > 草稿 > 最后消息，并用 messageFormatter 格式化 */
 const displayMessage = computed(() => {
+  if (props.isTyping) {
+    return t('chat.typing', '对方正在输入...')
+  }
   if (props.conversation.draft) {
     return props.conversation.draft
   }
@@ -353,14 +359,24 @@ const displayMessage = computed(() => {
       </div>
       <div class="conversation-item__bottom">
         <span class="conversation-item__message">
-          <span v-if="props.hasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
-          <Icon
-            v-if="displayDraft"
-            name="conversation/stroked/rect_notched/pen"
-            :size="14"
-            class="conversation-item__draft-icon"
-          />
-          <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
+          <template v-if="props.isTyping">
+            <span class="typing-dots" aria-hidden="true">
+              <span class="typing-dots__dot" />
+              <span class="typing-dots__dot" />
+              <span class="typing-dots__dot" />
+            </span>
+            <span class="conversation-item__typing-text">{{ displayMessage }}</span>
+          </template>
+          <template v-else>
+            <span v-if="props.hasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
+            <Icon
+              v-if="displayDraft"
+              name="conversation/stroked/rect_notched/pen"
+              :size="14"
+              class="conversation-item__draft-icon"
+            />
+            <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
+          </template>
         </span>
         <Badge
           v-if="props.conversation.unreadCount"
@@ -546,6 +562,59 @@ const displayMessage = computed(() => {
   vertical-align: middle;
   margin-right: 2px;
   color: var(--uikit-danger-color);
+}
+
+.conversation-item__typing-text {
+  color: var(--uikit-primary);
+  font-weight: 500;
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 4px;
+  color: var(--uikit-primary);
+}
+
+.typing-dots__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: typing-bounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dots__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dots__dot:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.typing-dots__dot:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots__dot {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .conversation-item__at-me-prefix {

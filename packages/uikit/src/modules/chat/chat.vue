@@ -410,6 +410,13 @@ const headerTitle = computed(() => {
   )
 })
 
+/** 当前单聊会话对方是否正在输入 */
+const isPeerTyping = computed(() => {
+  if (!currentConversation.value || isGroupChat.value)
+    return false
+  return !!stores.conversation.typingMap[currentConversation.value.id]
+})
+
 /** 顶部头像：单聊优先取用户资料头像 */
 const headerAvatar = computed(() => {
   if (currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT)
@@ -420,6 +427,8 @@ const headerAvatar = computed(() => {
 let resizeObserver: ResizeObserver | null = null
 
 onMounted(() => {
+  // 根据 ChatConfig 设置 typing 功能开关（全局生效）
+  stores.conversation.setTypingEnabled(props.config?.input?.enableTyping ?? true)
   if (headerRef.value) {
     headerHeight.value = headerRef.value.offsetHeight
     resizeObserver = new ResizeObserver((entries) => {
@@ -987,13 +996,23 @@ async function onRemoveAdmin(member: UiGroupMember) {
             </slot>
           </div>
           <div class="chat__header-main">
-            <slot name="header-title" :conversation="currentConversation">
-              <span class="chat__title">{{ headerTitle }}</span>
-              <span
-                v-if="isGroupChat && showHeaderMemberCount && groupMemberCount != null"
-                class="chat__header-member-count"
-              >({{ groupMemberCount }})</span>
-            </slot>
+            <div class="chat__header-title-row">
+              <slot name="header-title" :conversation="currentConversation">
+                <span class="chat__title">{{ headerTitle }}</span>
+                <span
+                  v-if="isGroupChat && showHeaderMemberCount && groupMemberCount != null"
+                  class="chat__header-member-count"
+                >({{ groupMemberCount }})</span>
+              </slot>
+            </div>
+            <div v-if="isPeerTyping" class="chat__typing">
+              <span class="typing-dots" aria-hidden="true">
+                <span class="typing-dots__dot" />
+                <span class="typing-dots__dot" />
+                <span class="typing-dots__dot" />
+              </span>
+              <span>{{ t('chat.typing', '对方正在输入...') }}</span>
+            </div>
             <slot name="header-extra" :conversation="currentConversation" />
           </div>
           <IconButton
@@ -1277,6 +1296,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
 .chat__header-main {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat__header-title-row {
+  display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -1293,6 +1320,60 @@ async function onRemoveAdmin(member: UiGroupMember) {
   font-weight: 600;
   color: var(--uikit-text-secondary);
   white-space: nowrap;
+}
+
+.chat__typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-primary);
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.typing-dots__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: typing-bounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dots__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dots__dot:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.typing-dots__dot:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots__dot {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 

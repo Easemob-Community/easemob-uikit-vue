@@ -9,6 +9,13 @@ export const useConversationStore = defineStore('conversation', () => {
   const isSyncingConversations = ref(false)
   const groupMemberCountMap = ref<Record<string, number>>({})
   const atMeMap = ref<Record<string, boolean>>({})
+  /** 正在输入状态：仅单聊，key 为 conversationId */
+  const typingMap = ref<Record<string, { userId: string }>>({})
+  /** typing 功能全局开关，默认开启 */
+  const typingEnabled = ref(true)
+  /** typing 状态过期计时器（模块私有，避免频繁触发响应式更新） */
+  const typingTimers = new Map<string, ReturnType<typeof setTimeout>>()
+  const TYPING_TIMEOUT = 8000
 
   const currentConversation = computed(() =>
     conversationList.value.find(c => c.id === currentConversationId.value) || null,
@@ -104,6 +111,47 @@ export const useConversationStore = defineStore('conversation', () => {
     atMeMap.value[conversationId] = hasAtMe
   }
 
+  /**
+   * 设置会话的正在输入状态。
+   * 同一会话高频触发时仅重置过期 timer，不重复更新响应式状态，避免 UI 抖动。
+   */
+  function setTypingEnabled(enabled: boolean) {
+    typingEnabled.value = enabled
+    if (!enabled) {
+      typingTimers.forEach(timer => clearTimeout(timer))
+      typingTimers.clear()
+      typingMap.value = {}
+    }
+  }
+
+  function setTyping(conversationId: string, userId: string) {
+    if (!typingEnabled.value)
+      return
+    const existingTimer = typingTimers.get(conversationId)
+    if (existingTimer) {
+      clearTimeout(existingTimer)
+    }
+    typingTimers.set(conversationId, setTimeout(() => {
+      clearTyping(conversationId)
+    }, TYPING_TIMEOUT))
+
+    const existed = typingMap.value[conversationId]
+    if (!existed || existed.userId !== userId) {
+      typingMap.value[conversationId] = { userId }
+    }
+  }
+
+  function clearTyping(conversationId: string) {
+    const timer = typingTimers.get(conversationId)
+    if (timer) {
+      clearTimeout(timer)
+      typingTimers.delete(conversationId)
+    }
+    if (typingMap.value[conversationId]) {
+      delete typingMap.value[conversationId]
+    }
+  }
+
   function setHasMoreConversations(value: boolean) {
     hasMoreConversations.value = value
   }
@@ -116,6 +164,9 @@ export const useConversationStore = defineStore('conversation', () => {
     hasMoreConversations.value = false
     groupMemberCountMap.value = {}
     atMeMap.value = {}
+    typingTimers.forEach(timer => clearTimeout(timer))
+    typingTimers.clear()
+    typingMap.value = {}
   }
 
   // 别名方法：兼容 Domain 层接口
@@ -136,6 +187,8 @@ export const useConversationStore = defineStore('conversation', () => {
     isSyncingConversations,
     groupMemberCountMap,
     atMeMap,
+    typingMap,
+    typingEnabled,
     addConversation,
     setConversationList,
     setList,
@@ -154,6 +207,9 @@ export const useConversationStore = defineStore('conversation', () => {
     setGroupMemberCount,
     getGroupMemberCount,
     setAtMe,
+    setTypingEnabled,
+    setTyping,
+    clearTyping,
     setHasMoreConversations,
     clearConversations,
   }

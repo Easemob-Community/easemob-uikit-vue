@@ -480,6 +480,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         :show-sender-name="props.showSenderName"
         :unread-mode="props.unreadMode"
         :has-at-me="!!stores.conversation.atMeMap[item.id]"
+        :is-typing="item.type === CONVERSATION_TYPE.SINGLECHAT && !!stores.conversation.typingMap[item.id]"
         @select="handleSelect"
         @pin="pinConversation"
         @mute="muteConversation"

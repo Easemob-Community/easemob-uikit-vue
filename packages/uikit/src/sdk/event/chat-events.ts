@@ -331,15 +331,25 @@ export function createChatHandlers(client: ManagerHost, stores: RootStores): Cha
 
     onMessage: (sdkMsg) => {
       // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
-      // 当前先打印日志验证 CMD 接收连通性，typing 等 cmd 的分发处理为后续 TODO。
+      // 仅处理 typing 相关 cmd，其余忽略。
       if (sdkMsg.type === MESSAGE_TYPE.CMD) {
         const action = (sdkMsg.body as { action?: string }).action
+        // 保留 CMD 接收日志，用于观察对端（如 iOS）频繁触发情况。
         chatLog.info('[CMD received]', {
           conversationId: sdkMsg.conversationId,
           from: sdkMsg.from,
           action,
           ext: sdkMsg.ext,
         })
+        // 仅单聊处理对方正在输入；群聊 typing 二期再做。
+        if (
+          action === 'TypingBegin'
+          && stores.conversation.typingEnabled
+          && sdkMsg.conversationType === CONVERSATION_TYPE.SINGLECHAT
+          && normalizeUserId(sdkMsg.from) !== normalizeUserId(stores.client.currentUser)
+        ) {
+          stores.conversation.setTyping(sdkMsg.conversationId, sdkMsg.from)
+        }
         return
       }
       chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
