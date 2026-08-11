@@ -211,6 +211,8 @@ export class MessageDomain {
       conversationType,
       action,
       ext,
+      // CMD 消息（如 typing）只投递给在线用户，不存离线队列。
+      deliverOnlineOnly: true,
     })
     return this._send(sdkMsg)
   }
