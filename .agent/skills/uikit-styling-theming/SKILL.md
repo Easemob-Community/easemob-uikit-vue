@@ -148,6 +148,13 @@ const presenceColorMap = {
 }
 ```
 
+### 5. 图标改色失败排查清单
+
+1. **先看 SVG 源文件**：grep `fill="black"` / `stroke="black"`，该随主题变色的路径必须改为 `currentColor`。
+2. **再看是填充还是描边图标**：填充图标（无 `stroke`）不要传 `:color` prop，改给 `<Icon>` 加 `:style="{ color: ... }"`。
+3. **最后看 color 作用域**：图标与伴生文本共父时，不要把 `color` 样式设在父级，否则文本会被连带染色。
+4. **业务文本颜色**：一律用 `var(--uikit-text-primary/secondary/tertiary, #fallback)`，禁止在 `<style>` 里写死 hex。
+
 ---
 
 ## 运行时层：主题怎么被喂进来
