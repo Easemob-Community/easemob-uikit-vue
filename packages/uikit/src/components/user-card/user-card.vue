@@ -74,11 +74,11 @@ const statusIconMap: Record<PresenceDisplayStatus, string> = {
 
 const statusColorMap: Record<PresenceDisplayStatus, string> = {
   online: '#6CE191',
-  offline: 'var(--uikit-text-tertiary, #94a3b8)',
+  offline: '#454545',
   away: '#B9BBC5',
   busy: '#ED7587',
   doNotDisturb: '#EE798C',
-  custom: 'var(--uikit-text-tertiary, #94a3b8)',
+  custom: '#F3C850',
 }
 
 const statusText = computed(() => {

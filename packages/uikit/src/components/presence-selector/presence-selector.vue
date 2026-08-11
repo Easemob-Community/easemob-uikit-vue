@@ -70,14 +70,14 @@ const options = computed<PresenceOption[]>(() => {
     { key: 'away', label: t('presence.away', '离开'), ext: PRESENCE_STATUS.AWAY, color: '#B9BBC5', icon: statusIconMap.away },
     { key: 'busy', label: t('presence.busy', '忙碌'), ext: PRESENCE_STATUS.BUSY, color: '#ED7587', icon: statusIconMap.busy },
     { key: 'doNotDisturb', label: t('presence.doNotDisturb', '请勿打扰'), ext: PRESENCE_STATUS.DO_NOT_DISTURB, color: '#EE798C', icon: statusIconMap.doNotDisturb },
-    { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: 'var(--uikit-text-tertiary, #94a3b8)', icon: statusIconMap.offline },
+    { key: 'offline', label: t('presence.offline', '离线'), ext: PRESENCE_STATUS.OFFLINE, color: '#454545', icon: statusIconMap.offline },
   ]
   if (props.showCustom) {
     list.push({
       key: 'custom',
       label: t('presence.custom', '自定义'),
       ext: props.value || '',
-      color: 'var(--uikit-text-tertiary, #94a3b8)',
+      color: '#F3C850',
       icon: statusIconMap.custom,
     })
   }
