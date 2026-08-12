@@ -107,7 +107,7 @@
   config.ts 配了 `ignoreDeadLinks` 跳过校验——新增仓库内链接无需再改配置；
 - `.vitepress/components/IconGallery.vue`：图标画廊（图标名/分类/预览），
   新增图标集时同步它的数据源；
-- `guide/changelog.md`：站点版更新日志，发布新版本时同步补录；
+- `guide/changelog.md`：**单一数据源**——整页只保留说明 + `<!-- @include: ../../../CHANGELOG.md -->`，内容自动引用根 `CHANGELOG.md`，禁止在站点页手写版本段（曾发生双写分叉：1.5.0/1.5.1 只进站点、根 CHANGELOG 停在 1.4.0、package.json 停在 1.3.1）；改根 CHANGELOG 后 `cd apps/docs && pnpm build` 验证渲染与死链；
 - 文档站无多语言（lang 固定 zh-CN），文案只写中文（组件 API 注释保持中英双语，
   那是组件侧的事）。
 

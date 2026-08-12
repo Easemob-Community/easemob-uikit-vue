@@ -9,6 +9,7 @@
   - 类型检查：`pnpm -F @easemob/uikit exec vue-tsc --noEmit`（0 错误）
   - 构建：`pnpm -F @easemob/uikit build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
   - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`
+- **版本号同步**：`packages/uikit/package.json` 的 `version` 必须与根 `CHANGELOG.md` 最新版本段一致；发版/改版本号后提交前跑 `pnpm changelog:check`（唯一版本数据源是根 CHANGELOG，文档站 changelog 页经 `@include` 引用，禁止手写版本段）。
 - 每次 `git commit` 的 message 用**中文**；**不主动 `git push`**，不做其它 git 变更（reset/rebase/force 等），除非用户明确要求，且每次都需再确认。
 - 暂存后确认没混入产物/依赖：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'` 应为空（`dist/` 已 gitignore）。
 - 大改动先写计划、等确认再编码；涉及公开 API（组件名 / props / emits / 导出）改动先说明影响面。

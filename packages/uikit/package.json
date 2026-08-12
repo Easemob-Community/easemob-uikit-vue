@@ -1,27 +1,27 @@
 {
   "name": "@easemob/uikit",
-  "version": "1.3.1",
-  "description": "Easemob UIKit Vue3 Components",
   "type": "module",
-  "main": "./dist/easemob-uikit.umd.cjs",
-  "module": "./dist/easemob-uikit.js",
-  "types": "./dist/index.d.ts",
+  "version": "1.6.0",
+  "description": "Easemob UIKit Vue3 Components",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/easemob-uikit.js",
-      "require": "./dist/easemob-uikit.umd.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/easemob-uikit.umd.cjs"
     },
     "./resolver": {
-      "import": "./dist/resolver.js",
-      "types": "./dist/resolver.d.ts"
+      "types": "./dist/resolver.d.ts",
+      "import": "./dist/resolver.js"
     },
     "./auto-imports": {
-      "import": "./dist/auto-imports.js",
-      "types": "./dist/auto-imports.d.ts"
+      "types": "./dist/auto-imports.d.ts",
+      "import": "./dist/auto-imports.js"
     },
     "./theme": "./dist/theme/index.css"
   },
+  "main": "./dist/easemob-uikit.umd.cjs",
+  "module": "./dist/easemob-uikit.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],

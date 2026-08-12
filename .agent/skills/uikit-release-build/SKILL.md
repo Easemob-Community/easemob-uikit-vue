@@ -30,6 +30,11 @@
 - **demo 运行时走 vite alias 直连 `packages/uikit/src` 源码**（改 src 刷新即生效），
   但 demo 的 `vue-tsc` 解析的是**已构建的 dist 类型**——改公开 API（props/emits/导出）后
   必须先重建 dist，否则 demo 类型检查与运行时不一致。
+- **版本号同步**：发版改版本号时，`packages/uikit/package.json` 的 `version` 必须与根
+  `CHANGELOG.md` 最新版本段（`## x.y.z (日期)`）一致；提交前跑 `pnpm changelog:check`
+  （`scripts/check-version-sync.mjs`：校验 package.json 与根 CHANGELOG 一致、版本段降序无重复、
+  文档站 `apps/docs/guide/changelog.md` 无手写版本段）。根 CHANGELOG 是唯一版本数据源，
+  文档站通过 `@include` 引用，禁止再单独维护文档站版本段。
 
 ## 2. 构建链路与产物结构（`packages/uikit`）
 
