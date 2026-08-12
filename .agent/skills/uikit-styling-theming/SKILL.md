@@ -145,8 +145,13 @@ const presenceColorMap = {
   online: 'var(--uikit-presence-online-color, #6CE191)',
   away: 'var(--uikit-presence-away-color, #B9BBC5)',
   busy: 'var(--uikit-presence-busy-color, #ED7587)',
+  doNotDisturb: 'var(--uikit-presence-dnd-color, #EE798C)',
+  offline: 'var(--uikit-presence-offline-color, #454545)',
+  custom: 'var(--uikit-presence-custom-color, #F3C850)',
 }
 ```
+
+在线状态图标多为**填充式图标**，改色时必须给 `<Icon>` 加 `:style="{ color: presenceColorMap[status] }"`，不要传 `:color` prop。且发布Presence 状态常量需与多端对齐：`Online`、`Offline`、`Away`、`Busy`、`Do Not Disturb`、`Custom`。
 
 ### 5. 图标改色失败排查清单
 

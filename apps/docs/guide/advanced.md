@@ -13,6 +13,9 @@
 - `enableUserInfo`：是否启用用户资料（昵称 / 头像）展示与拉取（默认 `true`）
 - `enableUserInfoSubscription`：是否启用陌生人用户资料变更订阅（默认 `true`）
 - `enableToast`：是否启用内置 Toast 提示（默认 `true`）
+- `enableDraft`：是否启用会话列表草稿提示（默认 `true`）
+- `enableAtMe`：是否启用会话列表 `@我` 提示（默认 `true`）
+- `enableTyping`：是否启用单聊「对方正在输入」提示（默认 `true`）
 - `contactFetchMode`：联系人拉取模式，`'page'` 或 `'all'`（默认 `'page'`）
 
 ```vue
@@ -32,6 +35,93 @@ import { EmUIKitProvider } from '@easemob/uikit'
   </EmUIKitProvider>
 </template>
 ```
+
+## 键盘导航
+
+UIKit 为列表类交互提供了一套声明式键盘导航 hooks，默认已接入**会话列表、联系人列表、群组列表、@ 提及弹层**。焦点在列表区域内时：
+
+- `↑` / `↓`：移动高亮项
+- `Enter`：确认选中（会话列表进入会话、联系人/群组进入详情、@ 弹层选中用户）
+- `Esc`：退出键盘导航高亮态
+
+焦点在输入框内时，方向键会让位给光标移动，不会误触发列表导航。
+
+### 组合式 API
+
+业务侧如需给自定义列表增加同样的键盘导航，可直接复用 `useArrowNavigation` 与 `useKeyBindings`：
+
+```ts
+import { useArrowNavigation, useKeyBindings } from '@easemob/uikit'
+
+const items = ref([...])
+const keyboardNavActive = ref(false)
+
+const { activeIndex } = useArrowNavigation({
+  count: computed(() => items.value.length),
+  active: keyboardNavActive,
+  wrap: true,
+  preventDefault: true,
+})
+
+useKeyBindings({
+  Enter: () => {
+    const item = items.value[activeIndex.value]
+    if (item) selectItem(item)
+  },
+}, { active: keyboardNavActive })
+```
+
+### 全局开关
+
+可通过 `setKeyboardShortcutsEnabled(false)` 一键禁用所有 `useKeyBindings` 绑定（包括 ESC 关闭、方向键导航等）：
+
+```ts
+import { setKeyboardShortcutsEnabled, isKeyboardShortcutsEnabled } from '@easemob/uikit'
+
+setKeyboardShortcutsEnabled(false)
+console.log(isKeyboardShortcutsEnabled()) // false
+```
+
+### 常用配置项
+
+`useKeyBindings` 选项：
+
+- `active`：是否启用，可传响应式值
+- `ignoreWhenTyping`：焦点在输入控件时是否不响应，默认 `true`
+- `repeat`：长按是否持续触发，默认 `true`
+- `preventDefault`：命中后是否阻止浏览器默认行为，方向键导航默认 `true`
+- `stopPropagation`：命中后是否阻止事件冒泡
+
+`useArrowNavigation` 选项：
+
+- `count`：列表项数量
+- `active`：是否启用导航
+- `wrap`：到边界是否回绕，默认 `true`
+- `initial`：初始高亮索引
+- `disabled(index)`：判断某项是否禁用，禁用项会被自动跳过
+- `onActiveChange`：高亮索引变化回调
+
+## 对方正在输入（Typing Indicator）
+
+UIKit 内置单聊「对方正在输入」提示，基于环信 CMD（透传）消息实现。启用 `enableTyping` 后：
+
+- 进入单聊会话且输入框有内容时，UIKit 会自动向对端发送 `TypingBegin` CMD 动作；
+- 收到对端 `TypingBegin` 后，会话列表的 `latestMessage` 区域与会话头部标题会显示「正在输入…」提示；
+- 为避免其他端（如 iOS）每个单词变化都触发刷新，UIKit 对同一发送者的 typing CMD 做了 5 秒去抖动；
+- CMD 消息本身**不会上屏渲染**，也不会进入历史消息列表。
+
+控制开关由 `EmUIKitProvider` 的 `enableTyping` prop 统一提供：
+
+```vue
+<template>
+  <EmUIKitProvider app-key="your-app-key" enable-typing>
+    <em-conversation-container />
+    <em-chat-container />
+  </EmUIKitProvider>
+</template>
+```
+
+关闭后，发送端不再发 typing CMD，接收端也不再展示 typing 提示，但原始 CMD 日志仍保留用于调试。
 
 ## 自定义数据源
 
@@ -213,6 +303,14 @@ export function findLocaleKey(
 - `mergeLocaleMessages` 将传入的 key-value 对象**浅合并**到指定语种的全局消息表中。同一 key 后调用的值覆盖先前的值。
 - `findLocaleKey` 遍历指定语言包的所有 value，对命中的 value 反查其 key。支持同一文案对应多个 key 的场景（如「名片」同时命中 `message.card` 和 `message.contactCard`）。
 - 两个 API 均可在初始化阶段或运行时任意时刻调用，响应式生效。
+
+### 开发约定
+
+UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组件模板或业务逻辑中硬编码中文 / 英文**。新增文案时：
+
+1. 先在中英文 locale 文件中补充 key（`packages/uikit/src/locale/lang/zh-CN.ts` / `en.ts`）；
+2. 组件内通过 `useLocale().t(key)` 读取；
+3. 时间、数字、状态等同样需要通过 locale 配置渲染，确保切换语言后实时刷新。
 
 ## H5 与多端适配
 
