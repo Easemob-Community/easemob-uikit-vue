@@ -140,7 +140,7 @@ nextTick(() => {
       </template>
 
       <div v-else-if="loading" class="message-search-panel__loading">
-        <Icon name="actions/loading_circle" :size="20" class="message-search-panel__loading-icon" />
+        <Icon name="actions/loading_circle" :size="20" anim="spin" />
         <span>{{ t('message.search.loading', '搜索中...') }}</span>
       </div>
 
@@ -255,18 +255,5 @@ nextTick(() => {
   padding: 24px;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-13);
-}
-
-.message-search-panel__loading-icon {
-  animation: message-search-loading 0.8s linear infinite;
-}
-
-@keyframes message-search-loading {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

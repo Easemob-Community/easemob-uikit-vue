@@ -12,6 +12,7 @@
  */
 import { useClientStore, useConversationStore, useMessageStore } from '@easemob/uikit'
 import { useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const clientStore = useClientStore()
@@ -70,7 +71,10 @@ function restoreStatus() {
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">状态横幅</label>
+      <DemoSettingLabel
+        title="状态横幅"
+        tip="会话列表顶部的连接 / 同步状态横幅，按 断网 > 连接中 > 会话同步 > 消息同步 的优先级展示"
+      />
       <label class="demo-check">
         <input v-model="statusBannerEnabled" type="checkbox">
         <span>展示连接/同步状态横幅</span>
@@ -91,7 +95,10 @@ function restoreStatus() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">分栏显隐</label>
+      <DemoSettingLabel
+        title="分栏显隐"
+        tip="会话分栏 tab 栏整体显隐：关闭后 tabs 数组置空、tab 栏整块隐藏，开启恢复原配置"
+      />
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <label class="demo-check">
           <input v-model="conversationTabsVisible" type="checkbox">
@@ -104,7 +111,10 @@ function restoreStatus() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">展示的 tab 按钮（可多选）</label>
+      <DemoSettingLabel
+        title="展示的 tab 按钮（可多选）"
+        tip="自定义会话分栏展示哪些 tab（全部 / 未读 / @我 / 单聊 / 群组）。如业务只有单聊和群聊，可只勾选这两项"
+      />
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <label
           v-for="tab in ['all', 'unread', 'atMe', 'single', 'group'] as const"
@@ -125,7 +135,10 @@ function restoreStatus() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">选项优先级（顺序即渲染顺序）</label>
+      <DemoSettingLabel
+        title="tab 顺序（↑↓ 调整渲染顺序）"
+        tip="调整 tab 的渲染顺序，顺序即 tab 栏的显示顺序"
+      />
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <div
           v-for="(tab, index) in conversationTabs"
@@ -174,7 +187,10 @@ function restoreStatus() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">完全接管渲染（#tabs 插槽）</label>
+      <DemoSettingLabel
+        title="完全接管渲染（#tabs 插槽）"
+        tip="用 useConversationTabs hook + #tabs 插槽完全自绘 tab 栏（演示下划线风格），业务可自由定制"
+      />
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <label class="demo-check">
           <input v-model="conversationTabsTakeover" type="checkbox">

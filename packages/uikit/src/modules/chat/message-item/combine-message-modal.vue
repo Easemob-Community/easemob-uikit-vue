@@ -136,7 +136,7 @@ watch(() => props.show, (show) => {
       <div class="combine-message-modal__body">
         <!-- 加载中 -->
         <div v-if="isLoading" class="combine-message-modal__loading">
-          <Icon name="actions/loading_circle" :size="20" class="combine-message-modal__loading-icon" />
+          <Icon name="actions/loading_circle" :size="20" anim="spin" />
           <span>{{ t('message.forward.parsing', '解析中...') }}</span>
         </div>
 
@@ -216,20 +216,6 @@ watch(() => props.show, (show) => {
   padding: 40px 0;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-14);
-}
-
-.combine-message-modal__loading-icon {
-  animation: combine-modal-spin 1s linear infinite;
-  color: var(--uikit-text-secondary);
-}
-
-@keyframes combine-modal-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .combine-message-modal__error {

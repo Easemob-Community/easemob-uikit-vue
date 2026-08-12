@@ -70,7 +70,7 @@ function handleClick(event: MouseEvent) {
     >
       <span class="uikit-status-banner__icon">
         <slot name="icon">
-          <Icon v-if="props.loading" name="actions/loading_circle" :size="18" class="uikit-status-banner__spinner" />
+          <Icon v-if="props.loading" name="actions/loading_circle" :size="18" anim="spin" />
           <Icon v-else :name="iconName" :size="18" />
         </slot>
       </span>
@@ -148,19 +148,6 @@ function handleClick(event: MouseEvent) {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-}
-
-.uikit-status-banner__spinner {
-  animation: uikit-status-banner-spin 1s linear infinite;
-}
-
-@keyframes uikit-status-banner-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .uikit-status-banner__content {

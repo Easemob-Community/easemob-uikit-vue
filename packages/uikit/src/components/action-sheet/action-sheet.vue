@@ -31,7 +31,8 @@ const props = withDefaults(defineProps<ActionSheetProps>(), {
 const emit = defineEmits<ActionSheetEmits>()
 
 function onSelect(item: ActionSheetItem, index: number) {
-  if (item.disabled) return
+  if (item.disabled)
+    return
   emit('select', item, index)
   emit('update:show', false)
 }
@@ -61,7 +62,9 @@ function onCancel() {
           :style="{ ...item.color ? { color: item.color } : {}, animationDelay: `calc(var(--uikit-anim-stagger-delay) * ${index})` }"
           @click="onSelect(item, index)"
         >
-          <Icon v-if="item.icon" :name="item.icon" :size="16" />
+          <Transition name="uikit-icon-swap" mode="out-in">
+            <Icon v-if="item.icon" :key="item.icon" :name="item.icon" :size="16" />
+          </Transition>
           <span>{{ item.name }}</span>
         </div>
       </div>
@@ -133,6 +136,24 @@ function onCancel() {
 
 .uikit-action-sheet__cancel:active {
   opacity: 0.8;
+}
+
+/* 操作项图标状态切换过渡（如免打扰 bell ↔ bell_slash） */
+.uikit-icon-swap-enter-active,
+.uikit-icon-swap-leave-active {
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.uikit-icon-swap-enter-from {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+
+.uikit-icon-swap-leave-to {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
 }
 
 /* 交错出场关键帧 */

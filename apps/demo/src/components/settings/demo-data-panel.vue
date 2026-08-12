@@ -7,6 +7,7 @@
  * 动作实现集中在 useDemoSettings，面板只负责触发与状态展示。
  */
 import { useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const { pinyinAdapterEnabled, togglePinyinAdapter, injectMockConversations, injectMockContacts } = useDemoSettings()
@@ -15,7 +16,10 @@ const { pinyinAdapterEnabled, togglePinyinAdapter, injectMockConversations, inje
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">会话数据</label>
+      <DemoSettingLabel
+        title="会话数据"
+        tip="注入 1000 条本地 mock 会话，用于测试会话列表长列表滚动性能"
+      />
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
         <button class="demo-btn" @click="injectMockConversations">
           注入 1000 条会话
@@ -27,7 +31,10 @@ const { pinyinAdapterEnabled, togglePinyinAdapter, injectMockConversations, inje
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">联系人演示（拼音能力）</label>
+      <DemoSettingLabel
+        title="联系人演示（拼音能力）"
+        tip="注入中英文 mock 联系人；拼音 adapter 开启后按拼音首字母分组（张三 → Z），支持输入 zhang / zs 搜索"
+      />
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
         <button class="demo-btn" @click="injectMockContacts">
           注入 mock 联系人

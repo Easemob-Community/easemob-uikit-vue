@@ -9,6 +9,7 @@
  */
 import { useClient } from '@easemob/uikit'
 import { demoPresetUsers, useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const emit = defineEmits<{
@@ -63,7 +64,10 @@ async function handleLogout() {
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">SDK 初始化（延迟初始化验证）</label>
+      <DemoSettingLabel
+        title="SDK 初始化（延迟初始化验证）"
+        tip="填写 appKey（可加 apiUrl）后手动初始化 SDK，验证延迟初始化场景"
+      />
       <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
         <input
           v-model="sdkAppKey"
@@ -93,7 +97,10 @@ async function handleLogout() {
 
     <div v-if="client" class="demo-settings__group">
       <label class="demo-settings__label">
-        SDK 登录
+        <DemoSettingLabel
+          title="SDK 登录"
+          tip="SDK 连接与登录状态；支持快捷账号一键填入、密码 / Token 两种登录方式"
+        />
         <span
           class="demo-status-dot"
           :class="connected ? 'demo-status-dot--on' : 'demo-status-dot--off'"

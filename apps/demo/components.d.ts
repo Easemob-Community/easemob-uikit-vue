@@ -19,6 +19,7 @@ declare module 'vue' {
     DemoProviderPanel: typeof import('./src/components/settings/demo-provider-panel.vue')['default']
     DemoQuickReplyPanel: typeof import('./src/components/demo-quick-reply-panel.vue')['default']
     DemoSdkPanel: typeof import('./src/components/settings/demo-sdk-panel.vue')['default']
+    DemoSettingLabel: typeof import('./src/components/settings/demo-setting-label.vue')['default']
     DemoSettingsDrawer: typeof import('./src/components/settings/demo-settings-drawer.vue')['default']
     NavSidebar: typeof import('./src/components/nav-sidebar.vue')['default']
   }

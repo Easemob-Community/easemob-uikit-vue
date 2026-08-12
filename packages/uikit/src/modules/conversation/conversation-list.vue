@@ -561,7 +561,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       />
       <!-- 会话列表同步中（WebSocket 首次同步） -->
       <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__syncing">
-        <Icon name="actions/loading_circle" :size="20" class="conversation-list__syncing-icon" />
+        <Icon name="actions/loading_circle" :size="20" anim="spin" />
         <span>{{ t('conversation.syncing') }}</span>
       </div>
       <div v-if="loadingMore" class="conversation-list__loading">
@@ -764,19 +764,6 @@ function handleCustomAction(key: string, conversation: Conversation) {
   text-align: center;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
-}
-
-.conversation-list__syncing-icon {
-  animation: conversation-list-spin 1s linear infinite;
-}
-
-@keyframes conversation-list-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .conversation-list__body {

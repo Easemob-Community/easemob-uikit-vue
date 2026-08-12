@@ -31,6 +31,8 @@ const emit = defineEmits<{
   (e: 'mention-close'): void
   (e: 'typing'): void
   (e: 'focus'): void
+  /** 展开/收起输入区（供上层关闭 emoji/mention 等锚点弹层） */
+  (e: 'expand-change', expanded: boolean): void
 }>()
 
 const { t } = useLocale()
@@ -54,8 +56,20 @@ const features = computed(() => ({
 /** 是否显示发送按钮 */
 const showSendButton = computed(() => props.config?.showSendButton !== false)
 
-/** 是否显示拖拽手柄（PC 且未通过 config 关闭） */
-const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
+/** 组件根元素 ref（展开态测量聊天容器高度用） */
+const rootRef = ref<HTMLElement>()
+
+/** 是否处于展开态（原地撑高输入区，仅 PC） */
+const expanded = ref(false)
+
+/** 展开前的输入区高度（含用户拖拽值），收起时恢复 */
+let preExpandHeight: number | null = null
+
+/** 是否显示展开/收起按钮（PC 且未通过 config 关闭） */
+const showExpandBtn = computed(() => !isMobile.value && props.config?.expandable !== false)
+
+/** 是否显示拖拽手柄（PC 且未通过 config 关闭；展开态下隐藏，避免拖拽 clamp 与展开高度冲突） */
+const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false && !expanded.value)
 
 /** 输入区高度（拖拽后设置，null 表示自适应） */
 const fieldAreaHeight = ref<number | null>(null)
@@ -81,6 +95,28 @@ const fieldAreaStyle = computed<Record<string, string> | null>(() => {
     return null
   return { height: `${fieldAreaHeight.value}px` }
 })
+
+/** 展开态目标高度：聊天容器高度的 50%，clamp 在 240~600px */
+function getExpandedHeight(): number {
+  const container = rootRef.value?.closest('.chat') as HTMLElement | null
+  const base = container?.clientHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 600)
+  return Math.min(Math.max(Math.round(base * 0.5), 240), 600)
+}
+
+/** 切换展开/收起：只改高度，不重建输入元素，内容与光标保留 */
+function toggleExpand() {
+  if (expanded.value) {
+    fieldAreaHeight.value = preExpandHeight
+    expanded.value = false
+  }
+  else {
+    preExpandHeight = fieldAreaHeight.value
+    fieldAreaHeight.value = getExpandedHeight()
+    expanded.value = true
+  }
+  emit('expand-change', expanded.value)
+  getInputEl()?.focus()
+}
 
 /** 是否使用多行文本 */
 const isMultiline = computed(() => !isMobile.value)
@@ -147,6 +183,12 @@ function onInput() {
 
 /** 键盘事件 */
 function onKeydown(e: KeyboardEvent) {
+  // 展开态下 Esc 收起输入区（mention 弹层打开时让弹层先处理 Esc）
+  if (e.key === 'Escape' && expanded.value && !props.mentionOpen) {
+    e.preventDefault()
+    toggleExpand()
+    return
+  }
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
     handleSend()
@@ -434,10 +476,12 @@ defineExpose({
 
 <template>
   <div
+    ref="rootRef"
     class="simple-input"
     :class="{
       'simple-input--feishu': style === 'feishu',
       'simple-input--wechat': style === 'wechat',
+      'simple-input--expanded': expanded,
     }"
   >
     <!-- 工具栏 -->
@@ -461,6 +505,15 @@ defineExpose({
         <Icon name="misc/at" :size="22" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
+      <!-- 展开/收起输入区（仅 PC，工具栏右端） -->
+      <div
+        v-if="showExpandBtn"
+        class="simple-input__tool-btn simple-input__expand-btn"
+        :title="expanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
+        @click="toggleExpand"
+      >
+        <Icon :name="expanded ? 'misc/collapse' : 'misc/expand'" :size="22" />
+      </div>
     </div>
 
     <!-- 输入区域 -->
@@ -579,6 +632,11 @@ defineExpose({
   display: flex;
   align-items: center;
   gap: calc(var(--uikit-container-gap, 8px) * 1.5);
+}
+
+/* 展开/收起按钮：固定在工具栏右端 */
+.simple-input__expand-btn {
+  margin-left: auto;
 }
 
 .simple-input__tool-btn {

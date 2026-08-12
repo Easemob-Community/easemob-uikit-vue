@@ -348,6 +348,8 @@ const messages: LocaleMessages = {
   'chat.input.video': '视频',
   'chat.input.file': '文件',
   'chat.input.mention': '@提及',
+  'chat.input.expand': '展开输入框',
+  'chat.input.collapse': '收起输入框',
   'toast.success': '操作成功',
   'toast.error': '操作失败',
   'modal.title': '提示',

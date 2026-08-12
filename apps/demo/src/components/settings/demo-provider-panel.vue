@@ -5,6 +5,7 @@
  * 四个开关由 app.vue 持有（Provider 配置必须在 EmUIKitProvider 挂载前确定），
  * 本面板通过 props/emits 与 demo-page → app.vue 双向绑定，避免状态重复。
  */
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 interface Props {
@@ -55,7 +56,10 @@ function onUseCustomDataSource(e: Event) {
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">Provider 能力开关</label>
+      <DemoSettingLabel
+        title="Provider 能力开关"
+        tip="Provider 各能力开关：好友列表、黑名单、在线状态、草稿、@我、正在输入。开关在 Provider 挂载时读取，登录后修改需重新登录（或刷新页面）才能完整生效"
+      />
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <label class="demo-check">
           <input
@@ -63,7 +67,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enableContact"
             @change="onEnableContact"
           />
-          <span>enableContact 拉取好友列表 / 事件</span>
+          <span>好友列表与好友事件（enableContact）</span>
         </label>
         <label class="demo-check">
           <input
@@ -71,7 +75,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enableBlocklist"
             @change="onEnableBlocklist"
           />
-          <span>enableBlocklist 拉取黑名单 / 事件</span>
+          <span>黑名单与拉黑事件（enableBlocklist）</span>
         </label>
         <label class="demo-check">
           <input
@@ -79,7 +83,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enablePresence"
             @change="onEnablePresence"
           />
-          <span>enablePresence 按需订阅在线状态</span>
+          <span>在线状态订阅（enablePresence）</span>
         </label>
         <label class="demo-check">
           <input
@@ -87,7 +91,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enableDraft"
             @change="onEnableDraft"
           />
-          <span>enableDraft 会话列表草稿显示</span>
+          <span>会话列表草稿显示（enableDraft）</span>
         </label>
         <label class="demo-check">
           <input
@@ -95,7 +99,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enableAtMe"
             @change="onEnableAtMe"
           />
-          <span>enableAtMe @我 提示</span>
+          <span>@我 消息提醒（enableAtMe）</span>
         </label>
         <label class="demo-check">
           <input
@@ -103,7 +107,7 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.enableTyping"
             @change="onEnableTyping"
           />
-          <span>enableTyping 对方正在输入</span>
+          <span>对方正在输入提示（enableTyping）</span>
         </label>
         <label class="demo-check">
           <input
@@ -111,12 +115,13 @@ function onUseCustomDataSource(e: Event) {
             :checked="props.useCustomDataSource"
             @change="onUseCustomDataSource"
           />
-          <span>使用自定义 dataSource（业务接管 fetchContacts）</span>
+          <span>自定义数据源：由业务接口接管拉取联系人（fetchContacts）</span>
         </label>
       </div>
       <div class="demo-info">
-        Provider 能力开关默认全部开启。关闭对应开关后，对应功能不再拉取/渲染/发送。<br />
-        启用自定义 dataSource 后，拉好友将走示例接口（返回 Alice/Bob）而非 SDK。
+        Provider 能力开关默认全部开启。关闭后对应功能不再拉取 / 渲染 / 发送。<br />
+        注意：开关在 Provider 挂载时读取，登录后修改需重新登录（或刷新页面）才能完整生效。<br />
+        启用自定义数据源后，拉取好友将走示例接口（返回 Alice / Bob）而非 SDK。
       </div>
     </div>
   </div>

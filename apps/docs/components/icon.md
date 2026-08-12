@@ -24,6 +24,10 @@
 
 <demo src="./demo/colors.vue" title="颜色" desc="通过 color 属性设置图标颜色，支持任意 CSS 颜色值。" />
 
+## 动画
+
+<demo src="./demo/animations.vue" title="动画" desc="通过 anim 属性启用内置动画：spin 旋转 / pulse 脉冲 / shake 摇摆 / flash 闪烁；时长与曲线跟随主题动画 token，全局动画开关与 prefers-reduced-motion 自动生效。" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/icon.md -->

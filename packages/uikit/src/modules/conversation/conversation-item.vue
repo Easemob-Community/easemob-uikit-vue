@@ -53,7 +53,7 @@ const emit = defineEmits<{
 }>()
 
 const { t, locale } = useLocale()
-const { features } = useUIKit()
+const { features, theme } = useUIKit()
 const { isMobile } = useViewport()
 
 const isSingleChat = computed(() => props.conversation.type === CONVERSATION_TYPE.SINGLECHAT)
@@ -96,10 +96,10 @@ const conversationAvatar = computed(() => avatarUrl.value || props.conversation.
 /** 实际是否展示 @我 提示（受全局 enableAtMe 开关控制） */
 const effectiveHasAtMe = computed(() => props.hasAtMe && features.enableAtMe !== false)
 
-/** 免打扰开启时铃铛摇摆动画（仅在状态由关闭变为开启时触发一次） */
+/** 免打扰开启时铃铛摇摆动画（仅在状态由关闭变为开启时触发一次；全局动画关闭时跳过） */
 const muteShaking = ref(false)
 watch(() => props.conversation.isMuted, (muted, prev) => {
-  if (muted && !prev) {
+  if (muted && !prev && theme.animationEnabled) {
     muteShaking.value = false
     requestAnimationFrame(() => {
       muteShaking.value = true
@@ -352,14 +352,15 @@ const displayMessage = computed(() => {
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
             <Icon name="chat/pinned" :size="12" />
           </span>
-          <span
-            v-if="props.conversation.isMuted"
-            class="conversation-item__mute-badge"
-            :class="{ 'is-shaking': muteShaking }"
-            @animationend="onMuteBadgeAnimEnd"
-          >
-            <Icon name="misc/bell_slash" :size="12" />
-          </span>
+          <Transition name="uikit-mute-badge">
+            <span
+              v-if="props.conversation.isMuted"
+              class="conversation-item__mute-badge"
+              @animationend="onMuteBadgeAnimEnd"
+            >
+              <Icon name="misc/bell_slash" :size="12" :anim="muteShaking ? 'shake' : undefined" />
+            </span>
+          </Transition>
         </div>
         <span v-if="displayTime" class="conversation-item__time">
           {{ displayTime }}
@@ -417,7 +418,9 @@ const displayMessage = computed(() => {
         :class="{ 'is-danger': item.danger }"
         @click.stop="onContextMenuItemClick(item.action)"
       >
-        <Icon v-if="item.icon" :name="item.icon" :size="14" />
+        <Transition name="uikit-icon-swap" mode="out-in">
+          <Icon v-if="item.icon" :key="item.icon" :name="item.icon" :size="14" />
+        </Transition>
         <span>{{ item.label }}</span>
       </div>
     </div>
@@ -505,43 +508,18 @@ const displayMessage = computed(() => {
   transform-origin: top center;
 }
 
-/* 摇铃动画：开启免打扰时铃铛左右摇摆后归位 */
-@keyframes uikit-bell-shake {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  10% {
-    transform: rotate(18deg);
-  }
-  20% {
-    transform: rotate(-15deg);
-  }
-  30% {
-    transform: rotate(12deg);
-  }
-  40% {
-    transform: rotate(-9deg);
-  }
-  50% {
-    transform: rotate(6deg);
-  }
-  60% {
-    transform: rotate(-4deg);
-  }
-  70% {
-    transform: rotate(2deg);
-  }
+/* 免打扰徽标出现/消失过渡（开启时淡入并叠加摇铃动画，取消时淡出缩小） */
+.uikit-mute-badge-enter-active,
+.uikit-mute-badge-leave-active {
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.conversation-item__mute-badge.is-shaking {
-  animation: uikit-bell-shake 0.8s ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .conversation-item__mute-badge.is-shaking {
-    animation: none;
-  }
+.uikit-mute-badge-enter-from,
+.uikit-mute-badge-leave-to {
+  opacity: 0;
+  transform: scale(0.7);
 }
 
 .conversation-item__time {
@@ -661,6 +639,24 @@ const displayMessage = computed(() => {
 
 .context-menu__item.is-danger {
   color: var(--uikit-danger-color);
+}
+
+/* 菜单项图标状态切换过渡（如免打扰 bell ↔ bell_slash） */
+.uikit-icon-swap-enter-active,
+.uikit-icon-swap-leave-active {
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.uikit-icon-swap-enter-from {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+
+.uikit-icon-swap-leave-to {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
 }
 
 @media (hover: hover) {

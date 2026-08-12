@@ -9,6 +9,7 @@
  * 实时作用于 EmChatContainer，无需在本面板内再维护副本。
  */
 import { useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const {
@@ -34,7 +35,10 @@ const {
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">输入框模式</label>
+      <DemoSettingLabel
+        title="输入框模式"
+        tip="简洁：纯文本输入 + 工具栏按钮；富文本：支持加粗、斜体、列表、@提及等排版能力"
+      />
       <div class="demo-settings__options">
         <button
           class="demo-option"
@@ -54,7 +58,10 @@ const {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">输入框风格</label>
+      <DemoSettingLabel
+        title="输入框风格"
+        tip="输入框的布局风格：微信（底部工具栏 + 发送键）、飞书（快捷栏 + 底部发送区）等参考样式"
+      />
       <div class="demo-settings__options">
         <button
           class="demo-option"
@@ -74,7 +81,10 @@ const {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">输入框功能</label>
+      <DemoSettingLabel
+        title="输入框功能"
+        tip="控制输入框工具栏展示的能力项，取消勾选后对应按钮隐藏、功能不可用"
+      />
       <div style="display: flex; flex-wrap: wrap; gap: 8px;">
         <label class="demo-check">
           <input v-model="chatInputFeatures.emoji" type="checkbox" />
@@ -104,7 +114,10 @@ const {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">输入框扩展配置</label>
+      <DemoSettingLabel
+        title="输入框扩展配置"
+        tip="输入框细节行为：自动聚焦、聚焦边框色、光标颜色、选中背景色、最大输入长度（0 表示不限制）"
+      />
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <label class="demo-check">
           <input v-model="chatInputAutoFocus" type="checkbox" />
@@ -157,7 +170,7 @@ const {
           <input
             v-model.number="chatInputMaxLength"
             type="number"
-            placeholder="0=无限制"
+            placeholder="0 表示不限制"
             class="demo-input"
             style="flex: 1;"
           />
@@ -166,7 +179,10 @@ const {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">群已读回执</label>
+      <DemoSettingLabel
+        title="群已读回执"
+        tip="群消息展示「已读 n 人」回执；人数上限控制统计范围，超过上限的群不再拉取已读明细"
+      />
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <label class="demo-check">
           <input v-model="groupReadReceiptEnabled" type="checkbox" />
@@ -186,7 +202,10 @@ const {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">消息列表</label>
+      <DemoSettingLabel
+        title="消息列表"
+        tip="时间戳显示策略（关闭 / 始终 / 悬停）、消息搜索开关、发送状态样式（经典小字 / 数字胶囊）与排列方向"
+      />
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <label class="demo-check">
           <input v-model="chatMessageSearchEnabled" type="checkbox" />

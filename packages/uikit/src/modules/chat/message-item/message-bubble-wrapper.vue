@@ -531,17 +531,20 @@ onBeforeUnmount(() => {
                   :title="statusText"
                   @click.stop="onStatusClick"
                 >
-                  <Icon
-                    v-if="statusIcon"
-                    :name="statusIcon"
-                    :size="14"
-                    class="message-bubble-wrapper__status-icon"
-                    :class="{
-                      'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
-                      'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
-                      'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
-                    }"
-                  />
+                  <Transition name="uikit-status-icon" mode="out-in">
+                    <Icon
+                      v-if="statusIcon"
+                      :key="statusIcon"
+                      :name="statusIcon"
+                      :size="14"
+                      class="message-bubble-wrapper__status-icon"
+                      :class="{
+                        'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
+                        'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                      }"
+                      :anim="messageStatus === MESSAGE_STATUS.SENDING ? 'spin' : undefined"
+                    />
+                  </Transition>
                   <Icon
                     v-if="messageStatus === MESSAGE_STATUS.FAILED"
                     :name="failedHoverIcon"
@@ -924,10 +927,6 @@ onBeforeUnmount(() => {
     transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.message-bubble-wrapper__status-icon--loading {
-  animation: message-status-loading 0.8s linear infinite;
-}
-
 .message-bubble-wrapper__status-icon--read {
   color: var(--uikit-primary-color);
 }
@@ -1013,13 +1012,22 @@ onBeforeUnmount(() => {
   padding-left: 0;
 }
 
-@keyframes message-status-loading {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* 消息状态图标切换过渡（发送中 → 已读等状态图标交替时的淡入淡出） */
+.uikit-status-icon-enter-active,
+.uikit-status-icon-leave-active {
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.uikit-status-icon-enter-from {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.uikit-status-icon-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
 }
 
 /* 通知类型消息：居中灰色小字，无背景 */

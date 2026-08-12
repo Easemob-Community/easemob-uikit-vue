@@ -31,6 +31,8 @@ const emit = defineEmits<{
   (e: 'mention-close'): void
   (e: 'focus'): void
   (e: 'typing'): void
+  /** 展开/收起输入区（供上层关闭 emoji/mention 等锚点弹层） */
+  (e: 'expand-change', expanded: boolean): void
 }>()
 
 const { t } = useLocale()
@@ -45,8 +47,20 @@ const editorHeight = ref<number | null>(null)
 /** 拖拽手柄 ref */
 const resizeHandleRef = ref<HTMLElement>()
 
-/** 是否显示拖拽手柄（PC 且未通过 config 关闭） */
-const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
+/** 组件根元素 ref（展开态测量聊天容器高度用） */
+const rootRef = ref<HTMLElement>()
+
+/** 是否处于展开态（原地撑高输入区，仅 PC） */
+const expanded = ref(false)
+
+/** 展开前的编辑器高度（含用户拖拽值），收起时恢复 */
+let preExpandHeight: number | null = null
+
+/** 是否显示展开/收起按钮（PC 且未通过 config 关闭） */
+const showExpandBtn = computed(() => !isMobile.value && props.config?.expandable !== false)
+
+/** 是否显示拖拽手柄（PC 且未通过 config 关闭；展开态下隐藏，避免拖拽 clamp 与展开高度冲突） */
+const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false && !expanded.value)
 
 useResizable(resizeHandleRef, {
   axis: 'vertical',
@@ -187,6 +201,12 @@ const editor = useEditor({
           emit('mention-trigger', anchor, keyword)
         })
       }
+      // 展开态下 Esc 收起输入区（mention 弹层打开时让弹层先处理 Esc）
+      if (event.key === 'Escape' && expanded.value && !props.mentionOpen) {
+        event.preventDefault()
+        toggleExpand()
+        return true
+      }
       if (event.key === 'Enter' && !event.shiftKey) {
         // @提及弹层打开时，Enter 优先交给弹层选择联系人，不发送消息
         if (props.mentionOpen) {
@@ -201,6 +221,28 @@ const editor = useEditor({
     },
   },
 })
+
+/** 展开态目标高度：聊天容器高度的 50%，clamp 在 240~600px */
+function getExpandedHeight(): number {
+  const container = rootRef.value?.closest('.chat') as HTMLElement | null
+  const base = container?.clientHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 600)
+  return Math.min(Math.max(Math.round(base * 0.5), 240), 600)
+}
+
+/** 切换展开/收起：只改高度，不重建编辑器，内容与光标保留 */
+function toggleExpand() {
+  if (expanded.value) {
+    editorHeight.value = preExpandHeight
+    expanded.value = false
+  }
+  else {
+    preExpandHeight = editorHeight.value
+    editorHeight.value = getExpandedHeight()
+    expanded.value = true
+  }
+  emit('expand-change', expanded.value)
+  editor.value?.commands.focus()
+}
 
 /** 是否有内容（包含文本或图片） */
 const hasContent = ref(false)
@@ -372,10 +414,12 @@ onBeforeUnmount(() => {
 
 <template>
   <div
+    ref="rootRef"
     class="rich-input"
     :class="{
       'rich-input--feishu': style === 'feishu',
       'rich-input--wechat': style === 'wechat',
+      'rich-input--expanded': expanded,
     }"
     :style="cssVars"
   >
@@ -400,6 +444,15 @@ onBeforeUnmount(() => {
         <Icon name="misc/at" :size="22" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
+      <!-- 展开/收起输入区（仅 PC，工具栏右端） -->
+      <div
+        v-if="showExpandBtn"
+        class="rich-input__tool-btn rich-input__expand-btn"
+        :title="expanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
+        @click="toggleExpand"
+      >
+        <Icon :name="expanded ? 'misc/collapse' : 'misc/expand'" :size="22" />
+      </div>
     </div>
 
     <!-- 输入区域 -->
@@ -522,6 +575,11 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: calc(var(--uikit-container-gap, 8px) * 1.5);
+}
+
+/* 展开/收起按钮：固定在工具栏右端 */
+.rich-input__expand-btn {
+  margin-left: auto;
 }
 
 .rich-input__tool-btn {

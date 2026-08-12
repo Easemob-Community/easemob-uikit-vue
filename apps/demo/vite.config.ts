@@ -48,8 +48,11 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      '@easemob/uikit': resolve(__dirname, '../../packages/uikit/src'),
-    },
+    // 临时：tgz 产物联调验证（2026-08-12），@easemob/uikit 改从 node_modules 解析 tgz 安装产物；
+    // 验证完成后恢复源码模式，需同时配置两条 alias（theme 子路径必须排在前面）：
+    // alias: [
+    //   { find: '@easemob/uikit/theme', replacement: resolve(__dirname, '../../packages/uikit/dist/theme/index.css') },
+    //   { find: '@easemob/uikit', replacement: resolve(__dirname, '../../packages/uikit/src') },
+    // ],
   },
 })

@@ -11,6 +11,7 @@
 import { computed } from 'vue'
 import { useNotification } from '@easemob/uikit'
 import { useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const { state: notificationState, ensureBrowserPermission } = useNotification()
@@ -42,7 +43,10 @@ async function requestPermission() {
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">通知开关</label>
+      <DemoSettingLabel
+        title="通知开关"
+        tip="消息通知总开关：浏览器系统通知（页面在后台时）、页内右上角弹窗（浏览器通知不可用时降级）、首次自动请求浏览器权限"
+      />
       <label class="demo-check">
         <input v-model="notificationEnable" type="checkbox">
         <span>启用消息通知</span>
@@ -62,7 +66,10 @@ async function requestPermission() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">触发模式</label>
+      <DemoSettingLabel
+        title="触发模式"
+        tip="通知触发条件：仅页面隐藏时（background）/ 非当前会话即触发（always）；均需满足 非自己发送 + 非当前会话 + 会话未免打扰"
+      />
       <div class="demo-settings__options">
         <button
           class="demo-option"
@@ -88,7 +95,10 @@ async function requestPermission() {
     </div>
 
     <div class="demo-settings__group">
-      <label class="demo-settings__label">浏览器通知权限</label>
+      <DemoSettingLabel
+        title="浏览器通知权限"
+        tip="当前浏览器对本站通知的授权状态，可手动请求授权"
+      />
       <div class="demo-settings__options">
         <span class="demo-info">状态: {{ permissionText }}</span>
         <button

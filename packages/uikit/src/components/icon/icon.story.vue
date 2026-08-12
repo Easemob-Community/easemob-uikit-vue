@@ -30,5 +30,13 @@ import Icon from './icon.vue'
         </Icon>
       </div>
     </Variant>
+    <Variant title="Animations">
+      <div class="u-flex u-gap-6 u-items-center">
+        <Icon name="actions/loading_arc" :size="32" anim="spin" />
+        <Icon name="status/info" :size="32" anim="pulse" />
+        <Icon name="misc/bell_slash" :size="32" anim="shake" />
+        <Icon name="status/warning" :size="32" anim="flash" />
+      </div>
+    </Variant>
   </Story>
 </template>

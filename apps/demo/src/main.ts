@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import UIKit, { mergeLocaleMessages } from '@easemob/uikit'
+// uikit 产物模式下组件样式集中在主题 css（源码 alias 模式下由 .vue <style> 提供，两模式均需引入）
+import '@easemob/uikit/theme'
 import App from './app.vue'
 
 // 业务方 / plugin 通过 mergeLocaleMessages 扩展自己的多语言 key

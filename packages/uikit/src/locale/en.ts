@@ -348,6 +348,8 @@ const messages: LocaleMessages = {
   'chat.input.video': 'Video',
   'chat.input.file': 'File',
   'chat.input.mention': '@ Mention',
+  'chat.input.expand': 'Expand input',
+  'chat.input.collapse': 'Collapse input',
   'toast.success': 'Success',
   'toast.error': 'Error',
   'modal.title': 'Notice',

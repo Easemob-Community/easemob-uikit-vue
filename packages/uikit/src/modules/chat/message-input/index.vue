@@ -380,6 +380,12 @@ function onMentionClose() {
   cleanupMentionAnchor()
 }
 
+/** 展开/收起输入区：布局变化会让锚点弹层错位，主动关闭 emoji/mention 弹层 */
+function onExpandChange() {
+  showEmojiPicker.value = false
+  onMentionClose()
+}
+
 /** 选择 @提及联系人 */
 function onMentionSelect(contact: MentionContact) {
   showMentionPicker.value = false
@@ -746,6 +752,7 @@ defineExpose({
       @voice-cancel="handleVoiceCancel"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @expand-change="onExpandChange"
       @focus="emit('focus')"
       @typing="handleTyping"
     >
@@ -769,6 +776,7 @@ defineExpose({
       @emoji-click="onEmojiClick"
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
+      @expand-change="onExpandChange"
       @focus="emit('focus')"
       @typing="handleTyping"
     >

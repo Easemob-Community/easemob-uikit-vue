@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
-import { getIconSvg } from './icon-map'
 import { createLogger } from '../../utils/logger'
-
-const logger = createLogger('UIKit:Icon')
+import { getIconSvg } from './icon-map'
 
 export interface IconProps {
   /** 图标名称，格式 "category/icon-name"，如 "actions/trash"；传入 name 后无需 slot */
@@ -12,6 +10,12 @@ export interface IconProps {
   color?: string
   /** 语义色类型；与 color 同时存在时 color 优先级更高 */
   type?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  /**
+   * 内置动画：spin 旋转（无限）/ pulse 脉冲（无限）/ shake 摇摆（一次）/ flash 闪烁（一次）。
+   * 时长与曲线跟随主题动画 token（--uikit-anim-duration / --uikit-anim-easing），
+   * 全局动画开关与 prefers-reduced-motion 自动生效；触发一次性动画请用 :key 或切换 anim 值。
+   */
+  anim?: 'spin' | 'pulse' | 'shake' | 'flash'
 }
 
 const props = withDefaults(defineProps<IconProps>(), {
@@ -19,6 +23,7 @@ const props = withDefaults(defineProps<IconProps>(), {
   color: 'currentColor',
 })
 
+const logger = createLogger('UIKit:Icon')
 const slots = useSlots()
 
 /** 已告警过的缺失图标名，避免重复 warn */
@@ -51,8 +56,8 @@ const svgPaintAttrs = computed<Record<string, string | undefined>>(() => {
   const data = iconSvg.value
   if (data?.stroke) {
     return {
-      fill: data.fill ?? 'none',
-      stroke: data.stroke === 'currentColor' ? props.color : data.stroke,
+      'fill': data.fill ?? 'none',
+      'stroke': data.stroke === 'currentColor' ? props.color : data.stroke,
       'stroke-width': data.strokeWidth,
       'stroke-linecap': data.strokeLinecap,
       'stroke-linejoin': data.strokeLinejoin,
@@ -67,13 +72,16 @@ const typeClass = computed(() => {
     return ''
   return `uikit-icon--${props.type}`
 })
+
+/** 内置动画类名 */
+const animClass = computed(() => (props.anim ? `uikit-icon--anim-${props.anim}` : ''))
 </script>
 
 <template>
   <svg
     v-if="useInlineSvg || slots.default"
     class="uikit-icon"
-    :class="typeClass"
+    :class="[typeClass, animClass]"
     :width="props.size"
     :height="props.size"
     v-bind="svgPaintAttrs"
@@ -108,5 +116,81 @@ const typeClass = computed(() => {
 
 .uikit-icon--info {
   color: var(--uikit-info-color, #3b82f6);
+}
+
+/* ===== 内置动画：时长/曲线跟随主题动画 token，全局开关与 reduced-motion 自动归零 ===== */
+.uikit-icon--anim-spin {
+  animation: uikit-icon-spin calc(var(--uikit-anim-duration, 300ms) * 2.6) linear infinite;
+}
+
+.uikit-icon--anim-pulse {
+  animation: uikit-icon-pulse calc(var(--uikit-anim-duration, 300ms) * 2) var(--uikit-anim-easing, ease) infinite;
+}
+
+.uikit-icon--anim-shake {
+  animation: uikit-icon-shake calc(var(--uikit-anim-duration, 300ms) * 2.6) var(--uikit-anim-easing, ease);
+}
+
+.uikit-icon--anim-flash {
+  animation: uikit-icon-flash calc(var(--uikit-anim-duration, 300ms) * 2) var(--uikit-anim-easing, ease);
+}
+
+@keyframes uikit-icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes uikit-icon-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes uikit-icon-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(18deg);
+  }
+  20% {
+    transform: rotate(-15deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  40% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes uikit-icon-flash {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.3;
+  }
 }
 </style>

@@ -387,7 +387,7 @@ async function handleDownload() {
 
     <!-- 加载中（首屏/切换原图） -->
     <div v-if="isLoading" class="image-viewer__loading">
-      <Icon name="actions/loading_arc" :size="40" class="image-viewer__spinner" />
+      <Icon name="actions/loading_arc" :size="40" class="image-viewer__spinner" anim="spin" />
     </div>
     <!-- 加载失败占位 -->
     <div v-else-if="isError" class="image-viewer__failed">
@@ -511,7 +511,6 @@ async function handleDownload() {
 
 .image-viewer__spinner {
   color: #fff;
-  animation: image-viewer-spin 1s linear infinite;
 }
 
 .image-viewer__failed {
@@ -613,15 +612,6 @@ async function handleDownload() {
 @media (hover: hover) {
   .image-viewer__tool-btn:hover:not(:disabled) {
     background-color: rgba(255, 255, 255, 0.15);
-  }
-}
-
-@keyframes image-viewer-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }
 </style>

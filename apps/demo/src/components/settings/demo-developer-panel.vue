@@ -9,6 +9,7 @@
  * 注：键盘操作演示已移至「外观」面板（键盘操作分组），本面板只保留 Dev Hints。
  */
 import { useDemoSettings } from '../../composables/use-demo-settings'
+import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const { devHintsEnabled, toggleDevHints } = useDemoSettings()
@@ -17,7 +18,10 @@ const { devHintsEnabled, toggleDevHints } = useDemoSettings()
 <template>
   <div class="demo-panel">
     <div class="demo-settings__group">
-      <label class="demo-settings__label">开发者友好模式</label>
+      <DemoSettingLabel
+        title="开发者友好模式"
+        tip="悬停会话项 / 输入框 / 聊天容器等区域，浮出该功能用到的环信接口 + UIKit 实现思路（仅桌面端生效）"
+      />
       <button
         class="demo-btn"
         :class="{ 'demo-btn--active': devHintsEnabled }"
