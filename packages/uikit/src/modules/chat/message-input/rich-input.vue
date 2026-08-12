@@ -15,6 +15,8 @@ export interface RichInputProps {
   config?: ChatConfig['input']
   /** 是否启用 @提及 */
   enableMention?: boolean
+  /** @提及选择弹层是否打开（打开时 Enter 优先用于选择联系人，不发送消息） */
+  mentionOpen?: boolean
 }
 
 const props = defineProps<RichInputProps>()
@@ -186,6 +188,11 @@ const editor = useEditor({
         })
       }
       if (event.key === 'Enter' && !event.shiftKey) {
+        // @提及弹层打开时，Enter 优先交给弹层选择联系人，不发送消息
+        if (props.mentionOpen) {
+          event.preventDefault()
+          return true
+        }
         event.preventDefault()
         handleSend()
         return true

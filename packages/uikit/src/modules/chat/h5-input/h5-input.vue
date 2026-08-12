@@ -14,6 +14,8 @@ export interface H5InputProps {
   enableMention?: boolean
   /** 当前软键盘高度（px），面板高度据此与键盘对齐 */
   keyboardHeight?: number
+  /** @提及选择弹层是否打开（打开时 Enter 优先用于选择联系人，不发送消息） */
+  mentionOpen?: boolean
 }
 
 const props = withDefaults(defineProps<H5InputProps>(), {
@@ -134,6 +136,9 @@ const mentionList = ref<MentionContact[]>([])
 
 /** 发送消息 */
 function handleSend() {
+  // @提及弹层打开时，Enter 优先交给弹层选择联系人，不发送消息
+  if (props.mentionOpen)
+    return
   const trimmed = text.value.trim()
   if (!trimmed)
     return
@@ -142,6 +147,13 @@ function handleSend() {
   emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
   text.value = ''
   mentionList.value = []
+}
+
+/** 键盘事件：@提及弹层打开时阻止 Enter 换行，交给弹层处理 */
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' && !e.shiftKey && props.mentionOpen) {
+    e.preventDefault()
+  }
 }
 
 /** 输入状态提示节流 */
@@ -557,6 +569,7 @@ defineExpose({
         :placeholder="t('chat.placeholder')"
         :maxlength="maxLengthValue"
         rows="1"
+        @keydown="onKeydown"
         @input="onInput"
         @focus="onTextareaFocus"
       />

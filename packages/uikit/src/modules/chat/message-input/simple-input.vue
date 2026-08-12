@@ -14,6 +14,8 @@ export interface SimpleInputProps {
   config?: ChatConfig['input']
   /** 是否启用 @提及 */
   enableMention?: boolean
+  /** @提及选择弹层是否打开（打开时 Enter 优先用于选择联系人，不发送消息） */
+  mentionOpen?: boolean
 }
 
 const props = defineProps<SimpleInputProps>()
@@ -106,6 +108,9 @@ const mentionList = ref<MentionContact[]>([])
 
 /** 发送消息 */
 function handleSend() {
+  // @提及弹层打开时，Enter 优先交给弹层选择联系人，不发送消息
+  if (props.mentionOpen)
+    return
   const trimmed = text.value.trim()
   if (!trimmed) {
     return
