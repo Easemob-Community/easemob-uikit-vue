@@ -209,6 +209,8 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     onAnnouncementChanged: (payload: GroupAnnouncementChangedEventPayload) => {
       groupLog.info('onAnnouncementChanged raw payload', payload)
       stores.group.updateGroup(payload.groupId, { announcement: payload.announcement })
+      // 同步到独立的公告缓存，保证聊天页顶部 group-announcement-banner 实时刷新
+      stores.group.setGroupAnnouncement(payload.groupId, payload.announcement)
       // 插入系统通知到群聊（带上最新公告内容，SDK 事件不回推操作者本人）
       insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, buildAnnouncementNoticeText(payload.announcement))
     },

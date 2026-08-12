@@ -1024,14 +1024,12 @@ onBeforeUnmount(() => {
 
 /* 通知类型消息：居中灰色小字，无背景 */
 .message-bubble-wrapper__notice {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
+  align-self: center;
+  max-width: 70%;
+  padding: 8px 12px;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-12);
   text-align: center;
-  width: 100%;
   /* 公告等长内容通知：保留换行并允许长单词折行 */
   white-space: pre-wrap;
   word-break: break-word;
