@@ -1026,6 +1026,7 @@ onBeforeUnmount(() => {
 .message-bubble-wrapper__notice {
   align-self: center;
   max-width: 70%;
+  margin: 0 auto;
   padding: 8px 12px;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-12);
