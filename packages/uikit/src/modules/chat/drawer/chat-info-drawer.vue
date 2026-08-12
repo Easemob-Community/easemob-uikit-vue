@@ -14,7 +14,7 @@ import { useToast } from '../../../composables/use-toast'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE } from '../../../constants'
 import type { ConversationTypeValue } from '../../../constants'
 import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
@@ -238,6 +238,10 @@ async function saveGroupName() {
   const id = groupId.value
   if (!id)
     return
+  if (groupNameInput.value.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH) {
+    showToast(t('chat.info.groupNameTooLong').replace('{max}', String(GROUP_INFO_LIMIT.NAME_MAX_LENGTH)), 'error')
+    return
+  }
   savingGroupName.value = true
   try {
     // 记录旧群名（updateGroupInfo 会同步更新 store，必须先取）
@@ -273,10 +277,16 @@ async function saveDescription() {
   const id = groupId.value
   if (!id)
     return
+  if (descriptionInput.value.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) {
+    showToast(t('chat.info.groupDescriptionTooLong').replace('{max}', String(GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH)), 'error')
+    return
+  }
   savingDescription.value = true
   try {
     await updateGroupInfo(id, { description: descriptionInput.value })
     isEditingDescription.value = false
+    // 重新拉取群详情，确保 store 中的 description 与后端一致并触发 UI 回显
+    await fetchGroupInfo(id)
     showToast(t('chat.info.groupInfoUpdated', '更新成功'))
   }
   catch (err) {
@@ -643,6 +653,7 @@ defineExpose({
                   v-model="groupNameInput"
                   class="chat-info-drawer__inline-input"
                   :placeholder="displayName"
+                  :maxlength="GROUP_INFO_LIMIT.NAME_MAX_LENGTH"
                   @keydown.enter="saveGroupName"
                   @keydown.esc="cancelEditGroupName"
                 >
@@ -692,6 +703,7 @@ defineExpose({
                   class="chat-info-drawer__inline-textarea"
                   :placeholder="t('chat.info.noGroupDescription', '暂无群介绍')"
                   rows="2"
+                  :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
                   @keydown.esc="isEditingDescription = false"
                 />
                 <div class="chat-info-drawer__inline-edit-actions">

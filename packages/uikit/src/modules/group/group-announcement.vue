@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useUIKit } from '../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE } from '../../constants'
 import { useGroup } from '../../composables/use-group'
 import { buildAnnouncementNoticeText, insertChatNotice } from '../../sdk/event/notice-utils'
 
@@ -44,6 +45,37 @@ const isAdminOrOwner = computed(() => isOwner.value || isAdmin.value)
 
 const announcement = computed(() => getGroupAnnouncement(props.groupId))
 
+// 默认单行省略；仅当内容确实超出一行时才提供展开/收起交互
+const collapsed = ref(true)
+const canExpand = ref(false)
+const contentRef = ref<HTMLDivElement>()
+
+function measureOverflow() {
+  const el = contentRef.value
+  // 仅在折叠态测量：展开态 scrollHeight 等于 clientHeight，无法判断是否超一行
+  if (!el || !collapsed.value)
+    return
+  canExpand.value = el.scrollHeight > el.clientHeight + 1
+}
+
+watch(
+  [() => announcement.value, () => props.loading],
+  () => {
+    // 内容更新后回到默认单行省略，并重新判断是否需要折叠交互
+    collapsed.value = true
+    nextTick(measureOverflow)
+  },
+  { immediate: true },
+)
+
+watch(collapsed, (val) => {
+  if (val)
+    nextTick(measureOverflow)
+})
+
+onMounted(measureOverflow)
+useResizeObserver(contentRef, measureOverflow)
+
 watch(
   () => announcement.value,
   (val) => {
@@ -61,6 +93,10 @@ watch(isEditing, async (editing) => {
 })
 
 async function save() {
+  if (announcementInput.value.length > GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH) {
+    showToast(t('chat.info.groupAnnouncementTooLong').replace('{max}', String(GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH)), 'error')
+    return
+  }
   saving.value = true
   try {
     await updateGroupAnnouncement(props.groupId, announcementInput.value)
@@ -103,11 +139,23 @@ function cancel() {
     </div>
     <div class="group-announcement__section">
       <template v-if="!isEditing">
-        <div class="group-announcement__content">
+        <div
+          ref="contentRef"
+          class="group-announcement__content"
+          :class="{ 'is-collapsed': collapsed }"
+        >
           <span v-if="loading" class="group-announcement__placeholder">{{ t('common.loading') }}</span>
           <span v-else-if="announcement">{{ announcement }}</span>
           <span v-else class="group-announcement__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
         </div>
+        <button
+          v-if="canExpand && announcement"
+          class="group-announcement__toggle"
+          :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
+          @click="collapsed = !collapsed"
+        >
+          <Icon :name="collapsed ? 'navigation/chevron_down' : 'navigation/chevron_up'" :size="14" />
+        </button>
       </template>
       <div v-else class="group-announcement__edit">
         <textarea
@@ -116,6 +164,7 @@ function cancel() {
           class="group-announcement__textarea"
           :placeholder="t('chat.info.groupAnnouncementPlaceholder')"
           rows="3"
+          :maxlength="GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH"
         />
         <div class="group-announcement__edit-actions">
           <IconButton
@@ -163,6 +212,9 @@ function cancel() {
 }
 
 .group-announcement__section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   padding: 10px 12px;
   border-radius: 8px;
   background-color: var(--uikit-bg-secondary);
@@ -174,6 +226,36 @@ function cancel() {
   color: var(--uikit-text-primary);
   word-break: break-all;
   white-space: pre-wrap;
+}
+
+.group-announcement__content.is-collapsed {
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.group-announcement__toggle {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+  border-radius: var(--uikit-components-radius, 6px);
+  transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+}
+
+@media (hover: hover) {
+  .group-announcement__toggle:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .group-announcement__placeholder {

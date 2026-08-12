@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import Icon from '../../components/icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
@@ -14,8 +15,37 @@ const { t } = useLocale()
 const { stores } = useUIKit()
 
 const announcement = computed(() => stores.group.getGroupAnnouncement(props.groupId))
-const collapsed = ref(false)
+// 默认单行省略；仅当内容确实超出一行时才提供展开/收起交互
+const collapsed = ref(true)
+const canExpand = ref(false)
+const textRef = ref<HTMLDivElement>()
 const hasAnnouncement = computed(() => !!announcement.value)
+
+function measureOverflow() {
+  const el = textRef.value
+  // 仅在折叠态测量：展开态 scrollHeight 等于 clientHeight，无法判断是否超一行
+  if (!el || !collapsed.value)
+    return
+  canExpand.value = el.scrollHeight > el.clientHeight + 1
+}
+
+watch(
+  () => announcement.value,
+  () => {
+    // 内容更新后回到默认单行省略，并重新判断是否需要折叠交互
+    collapsed.value = true
+    nextTick(measureOverflow)
+  },
+  { immediate: true },
+)
+
+watch(collapsed, (val) => {
+  if (val)
+    nextTick(measureOverflow)
+})
+
+onMounted(measureOverflow)
+useResizeObserver(textRef, measureOverflow)
 </script>
 
 <template>
@@ -30,12 +60,13 @@ const hasAnnouncement = computed(() => !!announcement.value)
         <div class="group-announcement-banner__title">
           {{ t('chat.announcementBanner.title', '群公告') }}
         </div>
-        <div class="group-announcement-banner__text" :class="{ 'is-collapsed': collapsed }">
+        <div ref="textRef" class="group-announcement-banner__text" :class="{ 'is-collapsed': collapsed }">
           {{ announcement }}
         </div>
       </div>
     </div>
     <button
+      v-if="canExpand"
       class="group-announcement-banner__toggle"
       :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
       @click="collapsed = !collapsed"
@@ -95,6 +126,7 @@ const hasAnnouncement = computed(() => !!announcement.value)
 
 .group-announcement-banner__text.is-collapsed {
   display: -webkit-box;
+  line-clamp: 1;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -117,8 +149,8 @@ const hasAnnouncement = computed(() => !!announcement.value)
 }
 
 @media (hover: hover) {
-.group-announcement-banner__toggle:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .group-announcement-banner__toggle:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 </style>

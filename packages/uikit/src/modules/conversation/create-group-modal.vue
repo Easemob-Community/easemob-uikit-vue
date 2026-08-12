@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useLocale } from '../../locale'
-import { CONVERSATION_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useViewport } from '../../composables/use-viewport'
 import { useGroup } from '../../composables/use-group'
@@ -139,6 +139,15 @@ async function onCreate() {
     errorMsg.value = t('group.createNeedMember', '请至少选择一位成员')
     return
   }
+  if (finalName.value.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH) {
+    errorMsg.value = t('chat.info.groupNameTooLong').replace('{max}', String(GROUP_INFO_LIMIT.NAME_MAX_LENGTH))
+    return
+  }
+  const desc = groupDescriptionInput.value.trim() || props.config.description || ''
+  if (desc.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) {
+    errorMsg.value = t('chat.info.groupDescriptionTooLong').replace('{max}', String(GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH))
+    return
+  }
 
   loading.value = true
   errorMsg.value = ''
@@ -146,7 +155,7 @@ async function onCreate() {
     const memberIds = selectedContacts.value.map(c => c.userId)
     const params: CreateGroupParams = {
       name: finalName.value,
-      description: groupDescriptionInput.value.trim() || props.config.description || '',
+      description: desc,
       memberIds,
       public: settings.public,
       joinApprovalRequired: settings.joinApprovalRequired,
@@ -240,6 +249,7 @@ watch(
                 v-model="groupNameInput"
                 variant="default"
                 :placeholder="generatedName || (t('group.createNamePlaceholder', '输入群名称'))"
+                :maxlength="GROUP_INFO_LIMIT.NAME_MAX_LENGTH"
               />
             </div>
             <div v-if="showDescriptionInput" class="create-group-modal__field">
@@ -248,6 +258,7 @@ watch(
                 v-model="groupDescriptionInput"
                 variant="default"
                 :placeholder="t('group.createDescriptionPlaceholder', '输入群介绍（可选）')"
+                :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
               />
             </div>
           </div>

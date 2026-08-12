@@ -80,6 +80,16 @@ export const INJECTION_KEY = {
   TEXT_MESSAGE_CONFIG: 'textMessageConfig',
 } as const
 
+/** 群组资料字段长度限制（与后端约束对齐） */
+export const GROUP_INFO_LIMIT = {
+  /** 群名称最大长度 */
+  NAME_MAX_LENGTH: 255,
+  /** 群介绍最大长度 */
+  DESCRIPTION_MAX_LENGTH: 2048,
+  /** 群公告最大长度 */
+  ANNOUNCEMENT_MAX_LENGTH: 512,
+} as const
+
 /** 在线状态常量（与多端保持一致，publish 时使用对应 ext） */
 export const PRESENCE_STATUS = {
   ONLINE: 'Online',
