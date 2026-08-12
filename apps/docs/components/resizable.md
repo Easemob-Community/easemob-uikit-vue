@@ -20,7 +20,7 @@ const width = ref(320)
 </template>
 ```
 
-> 手柄默认不显示视觉分隔线，仅鼠标悬停时出现 `col-resize` / `row-resize` 光标提示；如需显示分隔线，可设置 `show-line`。
+> 手柄默认不显示视觉分隔线，仅鼠标悬停时出现 `col-resize` / `row-resize` 光标提示；如需显示分隔线，可设置 `show-line`。拖拽到达 `min` / `max` 边界时，光标自动回落为默认箭头，提示已无法继续拖拽。
 
 ## 水平拖拽
 

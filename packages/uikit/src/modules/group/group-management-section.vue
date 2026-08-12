@@ -7,18 +7,17 @@ import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
 
 import { useLocale } from '../../locale'
-import { GROUP_MEMBER_ROLE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
+import { insertChatNotice } from '../../sdk/event/notice-utils'
+import { createLogger } from '../../utils/logger'
 import ChatDrawer from '../../modules/chat/drawer/chat-drawer.vue'
 import EmGroupMuteList from './group-management/mute-list.vue'
 import EmGroupBlocklist from './group-management/block-list.vue'
 import EmGroupAllowlist from './group-management/allow-list.vue'
 import EmGroupSharedFileList from './group-management/shared-file-list.vue'
 import EmGroupJoinRequestList from './group-management/join-request-list.vue'
-import { createLogger } from '../../utils/logger'
-
-const logger = createLogger('UIKit:GroupManagementSection')
 
 export interface GroupManagementSectionProps {
   /** 群 ID */
@@ -63,6 +62,8 @@ const emit = defineEmits<{
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
 }>()
 
+const logger = createLogger('UIKit:GroupManagementSection')
+
 const { t } = useLocale()
 const { stores } = useUIKit()
 const { muteAllGroupMembers, unmuteAllGroupMembers } = useGroup()
@@ -81,10 +82,14 @@ async function toggleMuteAll() {
     if (isMuteAll.value) {
       await unmuteAllGroupMembers(props.groupId)
       emit('group-operation', { type: 'unmute-all', groupId: props.groupId })
+      // 操作者本人收不到 SDK 全员禁言事件回推，本地插入系统通知（与成员禁言一致）
+      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, t('group.mutelist.unmuteAllNotice', '全员禁言已解除'))
     }
     else {
       await muteAllGroupMembers(props.groupId)
       emit('group-operation', { type: 'mute-all', groupId: props.groupId })
+      // 操作者本人收不到 SDK 全员禁言事件回推，本地插入系统通知（与成员禁言一致）
+      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, t('group.mutelist.muteAllNotice', '全员禁言已开启'))
     }
   }
   catch (err) {

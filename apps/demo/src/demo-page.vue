@@ -83,7 +83,7 @@ function toggleCustomDataSource(v: boolean) {
   emit('update:useCustomDataSource', v)
 }
 
-const { t, locale } = useLocale()
+const { t } = useLocale()
 const { stores } = useUIKit()
 const { currentUser } = useClient()
 const { selectConversation } = useConversation()
@@ -483,9 +483,9 @@ watch(() => stores.conversation.currentConversationId, (id) => {
         @open-settings="showSettings = true"
       />
 
-      <!-- 中间侧边栏：会话列表 / 联系人列表（宽度可拖拽调整 240~480，宽度记忆） -->
+      <!-- 中间侧边栏：会话列表 / 联系人列表（宽度可拖拽调整 240~480，宽度持久化到 UIKIT 内部配置存储） -->
       <EmResizable
-        v-model:size="sidebarWidth"
+        v-model="sidebarWidth"
         axis="horizontal"
         :min="240"
         :max="480"

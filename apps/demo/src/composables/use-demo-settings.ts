@@ -10,14 +10,16 @@
  *   与 demo-page.vue 的 chatConfig 共同消费，保证同一状态只有一个来源
  * - Provider 四开关仍在 app.vue 持有，通过 props/emits 双向绑定，不进入本 composable
  */
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { pinyin } from 'pinyin-pro'
 import {
   DEFAULT_CONVERSATION_TABS,
+  createUIKitStorageKey,
   setKeyboardShortcutsEnabled,
   setPinyinAdapter,
   useContactStore,
   useConversation,
+  useUIKit,
 } from '@easemob/uikit'
 import type { ConversationTabKey, EmojiStickerPack, UiContact, UiConversation } from '@easemob/uikit'
 
@@ -27,11 +29,8 @@ const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'
 /** 键盘操作总开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
 const KEYBOARD_SHORTCUTS_STORAGE_KEY = 'demo-keyboard-shortcuts-enabled'
 
-/** 会话列表侧边栏宽度记忆 key（EmResizable 拖拽调整） */
-const SIDEBAR_WIDTH_STORAGE_KEY = 'demo-sidebar-width'
-
-/** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，避免首屏过窄 */
-const SIDEBAR_DEFAULT_WIDTH = 360
+/** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，保证首屏宽度舒适 */
+const SIDEBAR_DEFAULT_WIDTH = 400
 
 /** 会话列表侧边栏宽度可调范围 */
 const SIDEBAR_MIN_WIDTH = 240
@@ -288,20 +287,26 @@ function createDemoSettings() {
 
   /* ===== 会话侧边栏宽度（EmResizable） ===== */
   /**
-   * 中间侧边栏宽度：默认 360，范围 240~480，localStorage 记忆（demo-sidebar-width）。
+   * 中间侧边栏宽度：默认 400，范围 240~480。
+   * 持久化走 UIKIT 内部配置存储（key：easemob_uikit_{hash(appKey_userId)}_layout_sidebar_width），
+   * 按 appKey + 用户隔离，与草稿/邀请通知等内部配置同一套体系。
    */
+  const { stores } = useUIKit()
+  const sidebarStorageKey = computed(() =>
+    createUIKitStorageKey(stores.client.appKey, stores.client.currentUser, 'layout_sidebar_width'),
+  )
   const sidebarWidth = ref(readStoredSidebarWidth())
   function readStoredSidebarWidth(): number {
-    const raw = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY)
+    const raw = localStorage.getItem(sidebarStorageKey.value)
     const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN
     if (Number.isNaN(parsed))
       return SIDEBAR_DEFAULT_WIDTH
     return Math.min(Math.max(parsed, SIDEBAR_MIN_WIDTH), SIDEBAR_MAX_WIDTH)
   }
-  /** 拖拽结束回调：写回状态并记忆到 localStorage */
+  /** 拖拽结束回调：写回状态并持久化到 UIKIT 内部配置存储 */
   function persistSidebarWidth(width: number) {
     sidebarWidth.value = width
-    localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(width))
+    localStorage.setItem(sidebarStorageKey.value, String(width))
   }
 
   /* ===== 开发者友好模式（Dev Hints） ===== */

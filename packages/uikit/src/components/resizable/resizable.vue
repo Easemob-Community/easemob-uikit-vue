@@ -61,6 +61,15 @@ watch(() => props.modelValue, (v) => {
     size.value = v
 })
 
+/** 是否已到达 min/max 边界：边界上继续拖拽尺寸不再变化，光标回落为默认箭头避免误导 */
+const isAtBoundary = computed(() => {
+  if (size.value <= props.min)
+    return true
+  if (props.max !== undefined && size.value >= props.max)
+    return true
+  return false
+})
+
 // 拖拽开始事件（isResizing 上升沿触发一次）
 watch(isResizing, (v) => {
   if (v)
@@ -87,7 +96,10 @@ const rootStyle = computed<Record<string, string>>(() => {
       v-if="!props.disabled"
       ref="handleRef"
       class="resizable__handle"
-      :class="[`resizable__handle--${props.axis}`, { 'resizable__handle--line': props.showLine }]"
+      :class="[
+        `resizable__handle--${props.axis}`,
+        { 'resizable__handle--line': props.showLine, 'is-at-boundary': isAtBoundary },
+      ]"
     />
   </div>
 </template>
@@ -124,6 +136,11 @@ const rootStyle = computed<Record<string, string>>(() => {
   bottom: 0;
   height: var(--resizable-handle-size);
   cursor: row-resize;
+}
+
+/* 到达 min/max 边界：光标回落为默认箭头，提示已无法继续拖拽 */
+.resizable__handle.is-at-boundary {
+  cursor: default;
 }
 
 /* 视觉分隔线（showLine 开启时显示）：1px 居中于命中区 */
