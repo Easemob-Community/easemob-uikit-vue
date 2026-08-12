@@ -361,7 +361,7 @@ function handleSelect(id: string) {
   }
 }
 
-/* ===== 键盘导航：鼠标进入列表区域后 ↑/↓ 直接切换会话（受全局键盘开关控制） ===== */
+/* ===== 键盘导航：鼠标进入列表区域后 ↑/↓ 移动高亮，Enter 确认切换会话 ===== */
 
 /** 键盘导航是否激活：鼠标进入列表区域或点击列表时启用，Esc / 鼠标离开时停用 */
 const keyboardNavActive = ref(false)
@@ -381,18 +381,17 @@ const { activeIndex } = useArrowNavigation({
   // 搜索框聚焦时方向键让位给输入光标
   ignoreWhenTyping: true,
   onActiveChange: (index) => {
-    // 方向键移动即切换会话（与点击 handleSelect 同语义：已读回执 / 草稿 / @我 清除）
+    // 方向键只移动高亮，不切换会话；Enter 才确认
     const item = filteredConversationList.value[index]
     if (item) {
-      handleSelect(item.id)
       scrollConversationIntoView(item.id)
-      // 切换后把焦点保留在列表容器，避免会话切换后输入框抢走焦点导致后续方向键失效
+      // 移动后把焦点保留在列表容器，避免后续方向键被输入态豁免拦截
       nextTick(() => itemsRef.value?.focus())
     }
   },
 })
 
-/** Enter 选中当前键盘高亮的会话（与方向键移动语义一致） */
+/** Enter 选中当前键盘高亮的会话 */
 useKeyBindings({
   Enter: () => {
     const item = filteredConversationList.value[activeIndex.value]
@@ -538,11 +537,14 @@ function handleCustomAction(key: string, conversation: Conversation) {
         <slot name="body" />
       </div>
       <ConversationItem
-        v-for="item in filteredConversationList"
+        v-for="(item, index) in filteredConversationList"
         :key="item.id"
         :data-conv-id="item.id"
         :conversation="item"
-        :class="{ 'is-active': currentConversation?.id === item.id }"
+        :class="{
+          'is-active': currentConversation?.id === item.id,
+          'is-keyboard-focus': keyboardNavActive && activeIndex === index,
+        }"
         :custom-actions="props.customActions"
         :time-formatter="props.timeFormatter"
         :message-formatter="props.messageFormatter"
@@ -739,6 +741,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
   overscroll-behavior-y: contain;
   /* 键盘导航时容器可获得焦点，但不显示默认轮廓 */
   outline: none;
+}
+
+/* 键盘方向键高亮：与当前激活会话区分开，提供导航视觉反馈 */
+.conversation-list__items :deep(.is-keyboard-focus) {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
 }
 
 .conversation-list__loading {
