@@ -81,7 +81,7 @@ async function onAccept(invite: UiContactInvite) {
   }
   catch (err) {
     logger.warn('[ContactNoticeList] accept invite failed:', formatSdkError(err))
-    showToast(t('contact.inviteAcceptFailed', '接受失败'))
+    showToast(t('contact.inviteAcceptFailed', '接受失败'), 'error')
   }
   finally {
     processingIds.value.delete(invite.id)
@@ -103,7 +103,7 @@ async function onDecline(invite: UiContactInvite) {
   }
   catch (err) {
     logger.warn('[ContactNoticeList] decline invite failed:', formatSdkError(err))
-    showToast(t('contact.inviteDeclineFailed', '拒绝失败'))
+    showToast(t('contact.inviteDeclineFailed', '拒绝失败'), 'error')
   }
   finally {
     processingIds.value.delete(invite.id)

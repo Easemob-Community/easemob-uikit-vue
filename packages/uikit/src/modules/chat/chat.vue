@@ -657,7 +657,7 @@ async function onForwardConfirm(targetConversation: Conversation) {
   }
   catch (e) {
     logger.warn('[Chat] forward messages failed:', formatSdkError(e))
-    showToast(t('message.forward.failed', '转发失败'))
+    showToast(t('message.forward.failed', '转发失败'), 'error')
   }
 }
 
@@ -698,11 +698,11 @@ async function onLeaveGroup(groupId: string) {
       stores.conversation.deleteConversation(cvs.id)
       stores.message.clearConversationMessages(cvs.id)
     }
-    showToast(t('chat.info.leaveGroupSuccess', '已退出群聊'))
+    showToast(t('chat.info.leaveGroupSuccess', '已退出群聊'), 'success')
   }
   catch (err) {
     logger.warn('[Chat] leave group failed:', formatSdkError(err))
-    showToast(t('chat.info.leaveGroupFailed', '退出群聊失败'))
+    showToast(t('chat.info.leaveGroupFailed', '退出群聊失败'), 'error')
   }
 }
 
@@ -715,11 +715,11 @@ async function onDestroyGroup(groupId: string) {
       stores.conversation.deleteConversation(cvs.id)
       stores.message.clearConversationMessages(cvs.id)
     }
-    showToast(t('chat.info.destroyGroupSuccess', '群聊已解散'))
+    showToast(t('chat.info.destroyGroupSuccess', '群聊已解散'), 'success')
   }
   catch (err) {
     logger.warn('[Chat] destroy group failed:', formatSdkError(err))
-    showToast(t('chat.info.destroyGroupFailed', '解散群聊失败'))
+    showToast(t('chat.info.destroyGroupFailed', '解散群聊失败'), 'error')
   }
 }
 
@@ -755,7 +755,7 @@ async function onInviteMembers(userIds: string[]) {
   try {
     await inviteUsersToGroup(groupId, userIds)
     showInviteModal.value = false
-    showToast(t('group.inviteMember.success', '邀请已发送'))
+    showToast(t('group.inviteMember.success', '邀请已发送'), 'success')
     // 刷新成员列表
     chatInfoDrawerRef.value?.refreshMemberList()
   }
@@ -767,6 +767,7 @@ async function onInviteMembers(userIds: string[]) {
       isForbidden
         ? (t('group.inviteMember.forbidden', '当前群组不允许邀请成员'))
         : (t('group.inviteMember.failed', '邀请失败')),
+      'error',
     )
   }
 }
@@ -885,12 +886,12 @@ async function confirmRemoveMember() {
   showRemoveConfirmModal.value = false
   try {
     await removeGroupMembers(groupId, [member.userId])
-    showToast(t('chat.info.removeMemberSuccess', '成员已移除'))
+    showToast(t('chat.info.removeMemberSuccess', '成员已移除'), 'success')
     chatInfoDrawerRef.value?.removeMember(member.userId)
   }
   catch (err) {
     logger.warn('[Chat] remove member failed:', formatSdkError(err))
-    showToast(t('chat.info.removeMemberFailed', '移除成员失败'))
+    showToast(t('chat.info.removeMemberFailed', '移除成员失败'), 'error')
   }
 }
 
@@ -906,12 +907,12 @@ async function onSetAdmin(member: UiGroupMember) {
     return
   try {
     await addGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.setAdminSuccess', '已设为管理员'))
+    showToast(t('chat.info.setAdminSuccess', '已设为管理员'), 'success')
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.ADMIN)
   }
   catch (err) {
     logger.warn('[Chat] set admin failed:', formatSdkError(err))
-    showToast(t('chat.info.setAdminFailed', '设置管理员失败'))
+    showToast(t('chat.info.setAdminFailed', '设置管理员失败'), 'error')
   }
 }
 
@@ -922,12 +923,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
     return
   try {
     await removeGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.removeAdminSuccess', '已取消管理员'))
+    showToast(t('chat.info.removeAdminSuccess', '已取消管理员'), 'success')
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.MEMBER)
   }
   catch (err) {
     logger.warn('[Chat] remove admin failed:', formatSdkError(err))
-    showToast(t('chat.info.removeAdminFailed', '取消管理员失败'))
+    showToast(t('chat.info.removeAdminFailed', '取消管理员失败'), 'error')
   }
 }
 </script>

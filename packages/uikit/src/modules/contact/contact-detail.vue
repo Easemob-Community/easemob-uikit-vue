@@ -216,11 +216,11 @@ async function saveRemark() {
     await setContactRemark(props.userId, remarkInput.value)
     isEditingRemark.value = false
     emit('remark-changed', props.userId, remarkInput.value)
-    showToast(t('contact.detail.remarkSaved', '备注已保存'))
+    showToast(t('contact.detail.remarkSaved', '备注已保存'), 'success')
   }
   catch (err) {
     logger.warn('[ContactDetail] save remark failed:', formatSdkError(err))
-    showToast(t('contact.detail.remarkSaveFailed', '备注保存失败'))
+    showToast(t('contact.detail.remarkSaveFailed', '备注保存失败'), 'error')
   }
 }
 
@@ -251,7 +251,7 @@ async function onConfirmAction() {
   try {
     if (action === 'delete') {
       await deleteContact(props.userId)
-      showToast(t('contact.detail.deleteContactSuccess', '已删除联系人'))
+      showToast(t('contact.detail.deleteContactSuccess', '已删除联系人'), 'success')
       emit('deleted', props.userId)
     }
     else if (action === 'block') {
@@ -260,18 +260,18 @@ async function onConfirmAction() {
         name: displayNameValue.value,
         avatar: displayAvatar.value || '',
       })
-      showToast(t('contact.detail.blockSuccess', '已拉黑'))
+      showToast(t('contact.detail.blockSuccess', '已拉黑'), 'success')
       emit('block-changed', props.userId, true)
     }
     else if (action === 'unblock') {
       await removeBlock(props.userId)
-      showToast(t('contact.detail.unblockSuccess', '已取消拉黑'))
+      showToast(t('contact.detail.unblockSuccess', '已取消拉黑'), 'success')
       emit('block-changed', props.userId, false)
     }
   }
   catch (err) {
     logger.warn('[ContactDetail] action failed:', formatSdkError(err))
-    showToast(t('contact.detail.actionFailed', '操作失败'))
+    showToast(t('contact.detail.actionFailed', '操作失败'), 'error')
   }
 }
 

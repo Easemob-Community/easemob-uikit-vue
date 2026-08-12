@@ -70,7 +70,7 @@ function onForward() {
     return
   }
   if (!canForward.value) {
-    showToast('选中的消息包含不可转发的消息')
+    showToast('选中的消息包含不可转发的消息', 'warning')
     return
   }
   // 单条消息直接逐条转发；多条消息弹出方式选择

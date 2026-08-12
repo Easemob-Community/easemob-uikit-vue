@@ -167,7 +167,7 @@ async function saveRemark() {
     isEditingRemark.value = false
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed', '备注设置失败'))
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed', '备注设置失败'), 'error')
   }
   finally {
     savingRemark.value = false
@@ -261,10 +261,10 @@ async function saveGroupName() {
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
     stores.conversation.updateConversation(id, { name: groupNameInput.value })
-    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'), 'error')
   }
   finally {
     savingGroupName.value = false
@@ -292,10 +292,10 @@ async function saveDescription() {
     isEditingDescription.value = false
     // 重新拉取群详情，确保 store 中的 description 与后端一致并触发 UI 回显
     await fetchGroupInfo(id)
-    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'), 'error')
   }
   finally {
     savingDescription.value = false
@@ -335,7 +335,7 @@ async function loadGroupData() {
   }
   catch (err) {
     logger.warn('[ChatInfoDrawer] load group data failed:', formatSdkError(err))
-    showToast(t('chat.info.loadGroupInfoFailed', '群信息加载失败'))
+    showToast(t('chat.info.loadGroupInfoFailed', '群信息加载失败'), 'error')
   }
   finally {
     loadingGroup.value = false

@@ -197,7 +197,7 @@ async function initialLoad() {
   }
   catch (err) {
     logger.warn('[GroupMemberList] load members failed:', formatSdkError(err))
-    showToast(t('group.memberList.loadFailed', '加载群成员失败'))
+    showToast(t('group.memberList.loadFailed', '加载群成员失败'), 'error')
   }
 }
 
@@ -213,7 +213,7 @@ async function onLoadMore() {
   }
   catch (err) {
     logger.warn('[GroupMemberList] load more members failed:', formatSdkError(err))
-    showToast(t('group.memberList.loadMoreFailed', '加载更多失败'))
+    showToast(t('group.memberList.loadMoreFailed', '加载更多失败'), 'error')
   }
   finally {
     loadingMore.value = false

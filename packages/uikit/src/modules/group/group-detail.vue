@@ -125,10 +125,10 @@ async function saveName() {
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
     stores.conversation.updateConversation(props.groupId, { name: nameInput.value })
-    showToast(t('chat.info.groupInfoUpdated', '更新成功'))
+    showToast(t('chat.info.groupInfoUpdated', '更新成功'), 'success')
   }
   catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'))
+    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.groupInfoUpdateFailed', '更新失败'), 'error')
   }
   finally {
     savingName.value = false

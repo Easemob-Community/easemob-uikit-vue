@@ -66,7 +66,7 @@ async function onSelect(_status: string, ext: string) {
   }
   catch (err) {
     logger.warn('[PresenceSelectorPopup] publish failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed', '状态设置失败'))
+    showToast(t('presence.publishFailed', '状态设置失败'), 'error')
   }
 }
 
@@ -94,7 +94,7 @@ async function onCustomConfirm() {
   }
   catch (err) {
     logger.warn('[PresenceSelectorPopup] publish custom failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed', '状态设置失败'))
+    showToast(t('presence.publishFailed', '状态设置失败'), 'error')
   }
 }
 </script>

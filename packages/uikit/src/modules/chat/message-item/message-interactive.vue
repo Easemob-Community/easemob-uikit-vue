@@ -238,7 +238,7 @@ const longPress = useLongPress(() => {
 function handleSelect(actionType: MessageActionType, actionItem?: MessageActionItem) {
   if (actionItem?.disabled) {
     const tip = actionItem.disabledTip || t('message.recallExpired', '无法撤回')
-    showToast(tip)
+    showToast(tip, 'warning')
     return
   }
   showPopup.value = false

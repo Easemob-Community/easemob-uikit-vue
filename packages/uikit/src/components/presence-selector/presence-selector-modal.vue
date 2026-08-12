@@ -54,7 +54,7 @@ async function onSelect(_status: string, ext: string) {
   }
   catch (err) {
     logger.warn('[PresenceSelectorModal] publish failed:', formatSdkError(err))
-    showToast(t('presence.publishFailed', '状态设置失败'))
+    showToast(t('presence.publishFailed', '状态设置失败'), 'error')
   }
 }
 

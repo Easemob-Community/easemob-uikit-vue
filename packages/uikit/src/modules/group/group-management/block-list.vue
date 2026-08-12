@@ -125,12 +125,12 @@ async function onConfirmAdd() {
     await loadData()
     showAddPopup.value = false
     selectedUserIds.value.clear()
-    showToast(t('group.blocklist.addSuccess', '添加成功'))
+    showToast(t('group.blocklist.addSuccess', '添加成功'), 'success')
     emit('block', ids.map(id => ({ userId: id })))
   }
   catch (err) {
     logger.warn('[BlockList] add to blocklist failed:', formatSdkError(err))
-    showToast(t('group.blocklist.addFailed', '添加失败'))
+    showToast(t('group.blocklist.addFailed', '添加失败'), 'error')
   }
 }
 

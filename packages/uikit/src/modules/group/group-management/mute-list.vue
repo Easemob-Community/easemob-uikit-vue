@@ -158,7 +158,7 @@ async function onConfirmAdd() {
     logger.info('loadData finished, members count:', members.value.length)
     showAddPopup.value = false
     selectedUserIds.value.clear()
-    showToast(t('group.mutelist.addSuccess', '添加成功'))
+    showToast(t('group.mutelist.addSuccess', '添加成功'), 'success')
     logger.info('emitting mute event', { userIds: ids })
     emit('mute', ids.map(id => ({ userId: id })))
     // 插入系统通知
@@ -172,7 +172,7 @@ async function onConfirmAdd() {
   }
   catch (err) {
     logger.warn('add to mutelist failed:', err)
-    showToast(t('group.mutelist.addFailed', '添加失败'))
+    showToast(t('group.mutelist.addFailed', '添加失败'), 'error')
   }
 }
 

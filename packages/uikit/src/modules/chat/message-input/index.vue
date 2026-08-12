@@ -186,7 +186,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
         const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
           ? t('message.edit.limitReached')
           : t('message.edit.failed')
-        showToast(msg)
+        showToast(msg, 'error')
       })
     return
   }
@@ -207,7 +207,7 @@ async function handleSendText(text: string, mentionList?: MentionContact[]) {
     })
     .catch((e: any) => {
       logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
-      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
     })
   clearQuote()
 }
@@ -226,7 +226,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
         const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
           ? t('message.edit.limitReached')
           : t('message.edit.failed')
-        showToast(msg)
+        showToast(msg, 'error')
       })
     return
   }
@@ -247,7 +247,7 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
     })
     .catch((e: any) => {
       logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
-      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
     })
   clearQuote()
 }
@@ -284,7 +284,7 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     runAfterSend(msg)
   }).catch((e: any) => {
     logger.error('[MessageInput] sendFile failed:', formatSdkError(e))
-    showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+    showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
   })
   clearQuote()
 }
@@ -353,7 +353,7 @@ async function onStickerSelect(sticker: EmojiStickerItem) {
     })
     .catch((e: any) => {
       logger.error('[MessageInput] sendSticker failed:', formatSdkError(e))
-      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
     })
 }
 
@@ -515,7 +515,7 @@ async function handleVoiceStart() {
   }
   catch (err) {
     logger.error('录音启动失败:', formatSdkError(err))
-    showToast('录音启动失败，请检查麦克风权限')
+    showToast('录音启动失败，请检查麦克风权限', 'error')
     // 清理
     voiceStream?.getTracks().forEach(track => track.stop())
     voiceStream = null
@@ -567,13 +567,13 @@ function handleVoiceEnd(durationFromInput?: number) {
           })
           .catch((e: any) => {
             logger.error('[MessageInput] sendAudioMessage failed:', formatSdkError(e))
-            showToast(resolveSdkErrorMessage(e, 'message.send.failed', t))
+            showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
           })
         clearQuote()
       }
       catch (err) {
         logger.error('[MessageInput] 语音格式转换失败:', formatSdkError(err))
-        showToast('语音处理失败，请重试')
+        showToast('语音处理失败，请重试', 'error')
       }
     }
 
