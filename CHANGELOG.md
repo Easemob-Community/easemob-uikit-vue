@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### 重大变更
+
+- **SDK 引入模式支持双模式**：
+  - 默认（生产/发布）子包依赖 `easemob-websdk` 声明为 npm registry 版本 `^5.0.0-beta.1`（跟随 5.x 正式版与 beta 线，`pnpm sdk:up` 一键更新到 range 内最新），不再使用本地 tgz 相对路径（修复发布后消费者无法解析 `file:` 依赖的问题）
+  - 本地 dev 联调可切换为仓库根目录 `easemob-websdk-5.0.0.tgz`：`pnpm sdk:use-tgz` / `pnpm sdk:use-npm` / `pnpm sdk:status`（切换后需 `pnpm install`），通过根 `package.json` 的 `pnpm.overrides` 实现，仅影响本地安装/构建，不影响发布
+
 ## 1.4.0 (2026-08-05)
 
 ### 重大变更

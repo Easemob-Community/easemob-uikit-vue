@@ -50,6 +50,19 @@ app.mount('#app')
 pnpm -F @easemob/docs dev
 ```
 
+## SDK 引入模式
+
+`easemob-websdk` 支持两种引入方式：默认使用 npm registry 版本（生产/发布），本地联调可切换为仓库内的 tgz 包（便于测试未发布的 SDK 构建）。
+
+| 命令               | 模式        | 说明                                                                                            |
+| ------------------ | ----------- | ----------------------------------------------------------------------------------------------- |
+| `pnpm sdk:use-npm` | npm（默认） | 使用 npm registry 的 `easemob-websdk@^5.0.0-beta.1`（跟随 5.x 正式版与 beta 线），生产/发布环境 |
+| `pnpm sdk:use-tgz` | tgz（dev）  | 通过 pnpm overrides 指向根目录 `easemob-websdk-5.0.0.tgz`，本地联调                             |
+| `pnpm sdk:up`      | -           | 一键将 SDK 更新到 range（`^5.0.0-beta.1`）内最新版并更新 lockfile                               |
+| `pnpm sdk:status`  | -           | 查看当前模式                                                                                    |
+
+切换后需重新执行 `pnpm install` 生效（可加 `--install` 自动重装，如 `pnpm sdk:use-tgz --install`）。tgz 模式仅影响本地安装/构建（overrides 只在仓库根生效），不会改变子包 `package.json` 中的依赖声明，发布不受影响。
+
 ## 开发验证
 
 ```bash
