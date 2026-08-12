@@ -109,10 +109,8 @@ export function useContact() {
   /** 设置备注 */
   async function setContactRemark(userId: string, remark: string) {
     await domains.contact.setRemark(userId, remark)
-    // 同步更新会话列表中的会话名称，避免需要刷新页面才能看到新备注
-    const userInfo = stores.userInfo.getUserInfo(userId)
-    const name = remark || userInfo?.nickname || userId
-    stores.conversation.updateConversation(userId, { name })
+    // SDK 5.0.0+ 设置备注成功后会自动刷新对应单聊会话的 conversationName，
+    // 并派发 onConversationListUpdate(reason='profile')，UI 侧无需额外同步。
   }
 
   /** 接受好友申请 */

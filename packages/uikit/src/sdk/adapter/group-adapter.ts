@@ -1,4 +1,4 @@
-import type { GroupMemberEntry, SdkGroupSource, UiGroup, UiGroupMember } from '../types'
+import type { GroupMemberEntry, GroupMuteEntry, SdkGroupSource, UiGroup, UiGroupMember } from '../types'
 
 /**
  * 将 SDK 群组摘要/详情转换为 UIKit 群组展示类型。
@@ -53,14 +53,14 @@ export function toUiGroups(sources: readonly SdkGroupSource[]): UiGroup[] {
   return sources.map(source => toUiGroup(source))
 }
 
-/** 将 SDK 群成员条目转换为 UIKit 群成员展示类型 */
-export function toUiGroupMember(source: GroupMemberEntry): UiGroupMember {
+/** 将 SDK 群成员/禁言条目转换为 UIKit 群成员展示类型 */
+export function toUiGroupMember(source: GroupMemberEntry | GroupMuteEntry): UiGroupMember {
   const user = source.user
   const member: UiGroupMember = {
     userId: user.userId,
     nickname: user.nickname,
     avatarUrl: user.avatarUrl,
-    role: source.role,
+    role: 'role' in source ? source.role : undefined,
   }
 
   // 0.14.192+ 服务端未返回加入时间时 SDK 不再输出该字段
@@ -68,10 +68,18 @@ export function toUiGroupMember(source: GroupMemberEntry): UiGroupMember {
     member.joinedAt = source.joinedAt
   }
 
+  // 0.20.40+ SDK 禁言列表返回 muteExpire / muteDuration（毫秒）
+  if ('muteExpire' in source && source.muteExpire !== undefined) {
+    member.muteExpire = source.muteExpire
+  }
+  if ('muteDuration' in source && source.muteDuration !== undefined) {
+    member.muteDuration = source.muteDuration
+  }
+
   return member
 }
 
-/** 批量转换 SDK 群成员 */
-export function toUiGroupMembers(sources: readonly GroupMemberEntry[]): UiGroupMember[] {
+/** 批量转换 SDK 群成员/禁言条目 */
+export function toUiGroupMembers(sources: readonly (GroupMemberEntry | GroupMuteEntry)[]): UiGroupMember[] {
   return sources.map(source => toUiGroupMember(source))
 }

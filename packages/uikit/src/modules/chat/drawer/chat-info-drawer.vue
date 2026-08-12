@@ -415,7 +415,7 @@ async function onMuteMember(member: UiGroupMember) {
   if (!id)
     return
   try {
-    // muteDuration -1：永久禁言，与群管理-禁言列表添加操作保持一致
+    // SDK 5.0.0+ muteDuration 单位为毫秒，-1 表示永久禁言，与群管理-禁言列表添加操作保持一致
     await muteGroupMembers(id, [member.userId], -1)
     showToast(t('toast.success', '操作成功'), 'success')
   }

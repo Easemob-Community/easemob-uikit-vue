@@ -8,7 +8,7 @@ import type {
 import type { ConversationTypeValue, GroupMemberRoleValue } from '../constants'
 import type { MessageStatus } from './types/message'
 
-export type { GroupMemberEntry } from 'easemob-websdk'
+export type { GroupMemberEntry, GroupMuteEntry } from 'easemob-websdk'
 
 /**
  * UIKit 对 SDK Message 的扩展字段。
@@ -208,6 +208,10 @@ export interface UiGroupMember {
   role?: GroupMemberRoleValue
   /** 入群时间戳 */
   joinedAt?: number
+  /** 禁言到期时间戳（毫秒），仅禁言列表场景有值 */
+  muteExpire?: number
+  /** 禁言时长（毫秒），仅禁言列表场景有值 */
+  muteDuration?: number
 }
 
 /** UIKit 好友申请 / 群组邀请展示类型 */

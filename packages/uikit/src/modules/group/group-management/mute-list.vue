@@ -149,6 +149,7 @@ async function onConfirmAdd() {
     return
   }
   try {
+    // SDK 5.0.0+ muteDuration 单位为毫秒，-1 表示永久禁言
     logger.info('calling muteGroupMembers', { groupId: props.groupId, userIds: ids, muteDuration: -1 })
     await muteGroupMembers(props.groupId, ids, -1)
     logger.info('muteGroupMembers succeeded')

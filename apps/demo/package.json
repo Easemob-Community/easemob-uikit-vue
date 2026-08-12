@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@easemob/uikit": "workspace:*",
-    "easemob-websdk": "file:../../easemob-websdk-next-5.0.0.tgz",
+    "easemob-websdk": "file:../../easemob-websdk-5.0.0.tgz",
     "pinia": "^2.1.0",
     "pinyin-pro": "^3.28.1",
     "vue": "^3.3.0"

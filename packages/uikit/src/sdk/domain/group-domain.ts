@@ -309,7 +309,10 @@ export class GroupDomain {
     this.store.updateGroup(groupId, { mute: false })
   }
 
-  /** 禁言指定成员 */
+  /**
+   * 禁言指定成员。
+   * @param muteDuration 禁言时长，单位为毫秒；传 -1 表示永久禁言（SDK 5.0.0+ 语义）。
+   */
   async muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
     groupDomainLog.info('muteGroupMembers request raw', { groupId, userIds, muteDuration })
     const result = await this.client.groupManager.getGroup(groupId).muteMembers({ userIds, muteDuration })

@@ -203,7 +203,10 @@ export function useGroup() {
     await domains.group.unmuteAllGroupMembers(groupId)
   }
 
-  /** 禁言指定成员 */
+  /**
+   * 禁言指定成员。
+   * @param muteDuration 禁言时长，单位为毫秒；传 -1 表示永久禁言（SDK 5.0.0+ 语义）。
+   */
   async function muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
     await domains.group.muteGroupMembers(groupId, userIds, muteDuration)
   }

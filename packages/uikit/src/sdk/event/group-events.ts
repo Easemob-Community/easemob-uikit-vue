@@ -214,8 +214,11 @@ export function createGroupHandlers(stores: RootStores): GroupEventHandlerMap {
     },
     onMuteListAdded: (payload: GroupMuteListAddedEventPayload) => {
       groupLog.info('onMuteListAdded raw payload', payload)
-      const userIds = (payload.mutes || []).map((u: any) => u.userId)
-      stores.group.addGroupMuteMembers(payload.groupId, userIds)
+      const members = (payload.mutes || []).map((u: any) => ({
+        userId: u.userId,
+        muteExpire: payload.muteExpire,
+      }))
+      stores.group.addGroupMuteMembers(payload.groupId, members)
       // 插入系统通知到群聊
       const muteNames = (payload.mutes || []).map((u: any) => u.nickname || u.userId || '')
       const muteNoticeText = muteNames.map(name => t('group.mutelist.muteNotice').replace('{name}', name)).join('、')

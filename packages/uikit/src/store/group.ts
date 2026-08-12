@@ -170,12 +170,15 @@ export const useGroupStore = defineStore('group', () => {
     groupMuteListMap.value[groupId] = members
   }
 
-  function addGroupMuteMembers(groupId: string, userIds: string[]) {
+  function addGroupMuteMembers(groupId: string, entries: string[] | Array<{ userId: string, muteExpire?: number, muteDuration?: number }>) {
     const list = groupMuteListMap.value[groupId] || []
     const existingIds = new Set(list.map(m => m.userId))
-    const newMembers = userIds
-      .filter(id => !existingIds.has(id))
-      .map(id => ({ userId: id, role: GROUP_MEMBER_ROLE.MEMBER }))
+    const normalized = entries.map((item) => {
+      if (typeof item === 'string')
+        return { userId: item, role: GROUP_MEMBER_ROLE.MEMBER }
+      return { userId: item.userId, role: GROUP_MEMBER_ROLE.MEMBER, muteExpire: item.muteExpire, muteDuration: item.muteDuration }
+    })
+    const newMembers = normalized.filter(m => !existingIds.has(m.userId))
     if (newMembers.length > 0) {
       groupMuteListMap.value[groupId] = [...list, ...newMembers]
     }
