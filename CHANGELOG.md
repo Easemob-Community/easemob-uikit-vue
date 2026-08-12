@@ -8,6 +8,29 @@
   - 默认（生产/发布）子包依赖 `easemob-websdk` 声明为 npm registry 版本 `^5.0.0-beta.1`（跟随 5.x 正式版与 beta 线，`pnpm sdk:up` 一键更新到 range 内最新），不再使用本地 tgz 相对路径（修复发布后消费者无法解析 `file:` 依赖的问题）
   - 本地 dev 联调可切换为仓库根目录 `easemob-websdk-5.0.0.tgz`：`pnpm sdk:use-tgz` / `pnpm sdk:use-npm` / `pnpm sdk:status`（切换后需 `pnpm install`），通过根 `package.json` 的 `pnpm.overrides` 实现，仅影响本地安装/构建，不影响发布
 
+### 新增
+
+- **Icon 内置动画能力**：
+  - `anim` prop 支持 spin（旋转）/ pulse（脉冲）/ shake（摇摆）/ flash（闪烁）四种内置动画
+  - 动画时长与曲线跟随主题动画 token（`--uikit-anim-duration` / `--uikit-anim-easing`），全局动画开关与 `prefers-reduced-motion` 自动生效
+- **消息输入框展开/收起**：
+  - PC 端输入框工具栏新增展开按钮，点击后输入区原地撑高至聊天容器 50% 高度（240~600px），Esc 或再次点击收起，内容与光标保留
+  - 展开态自动隐藏拖拽手柄并关闭 emoji / @提及 锚点弹层（避免布局变化错位）
+  - `ChatConfig.input` 新增 `expandable` 配置（默认 true），业务方可关闭
+- **demo 设置面板说明增强**：新增 DemoSettingLabel 组件，10 个设置面板的选项补充用途说明文案
+- **组件文档补充**：icon 组件页新增「动画」章节与演示 demo
+
+### 优化
+
+- **loading 图标统一收敛**：图片查看器 / 状态横幅 / 合并消息解析 / 消息搜索 / 会话列表同步 5 处 loading 统一改用 Icon `anim="spin"`，删除重复 keyframes，动画时长随主题
+- **图标切换过渡**：消息状态图标（发送中→已读）、免打扰铃铛徽标、操作菜单图标切换增加淡入淡出过渡
+- **免打扰铃铛动画主题化**：摇铃动画迁移到 Icon `anim="shake"`，全局动画关闭（`theme.animationEnabled`）时不再触发
+
+### 工程
+
+- **agent skills 补录**：新增 9 个开发协作 skill（消息渲染 / 聊天交互 / 插件与会话分栏 / Provider 配置 / 通知系统 / 打包发布 / demo 开发 / 文档站写作 / skill 编写规范），AGENTS.md 路由表同步登记
+- **依赖升级**：vue 3.5 / vite 5.4 / vitepress 1.6.4 / typescript 5.9 等
+
 ## 1.4.0 (2026-08-05)
 
 ### 重大变更
