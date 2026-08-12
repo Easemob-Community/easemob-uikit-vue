@@ -323,6 +323,7 @@ const displayMessage = computed(() => {
 
 <template>
   <Cell
+    v-bind="$attrs"
     auto-height
     :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': effectiveHasAtMe }]"
     @click="onClick"
@@ -653,9 +654,9 @@ const displayMessage = computed(() => {
 }
 
 @media (hover: hover) {
-.context-menu__item:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .context-menu__item:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .context-menu__item.is-danger {
@@ -663,8 +664,8 @@ const displayMessage = computed(() => {
 }
 
 @media (hover: hover) {
-.context-menu__item.is-danger:hover {
-  background-color: rgba(var(--uikit-danger-rgb), 0.08);
-}
+  .context-menu__item.is-danger:hover {
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
+  }
 }
 </style>

@@ -4,7 +4,9 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import { useLocale } from '../../../locale'
+import { useResizable } from '../../../composables/use-resizable'
 import { useViewport } from '../../../composables/use-viewport'
+import { filterActiveMentions } from '../../../utils/mention'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
 import type { ChatConfig, MentionContact } from '../types'
@@ -35,10 +37,38 @@ const { isMobile } = useViewport()
 /** 输入框风格 */
 const style = computed(() => props.config?.style ?? 'wechat')
 
-/** CSS 变量（用于全局样式中的 caret/selection） */
+/** 编辑器内容区高度（拖拽后固定，null 表示未拖拽：内容自适应 + max-height 150px） */
+const editorHeight = ref<number | null>(null)
+
+/** 拖拽手柄 ref */
+const resizeHandleRef = ref<HTMLElement>()
+
+/** 是否显示拖拽手柄（PC 且未通过 config 关闭） */
+const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
+
+useResizable(resizeHandleRef, {
+  axis: 'vertical',
+  min: 60,
+  max: 240,
+  // 手柄在编辑器上缘：向上拖动增高（反向增量）
+  invert: true,
+  disabled: () => !showResizeHandle.value,
+  onChange: (h) => {
+    editorHeight.value = h
+  },
+})
+
+/** CSS 变量（用于全局样式中的 caret/selection/编辑器高度） */
 const cssVars = computed(() => ({
   '--rich-input-caret-color': props.config?.caretColor || 'auto',
   '--rich-input-selection-color': props.config?.selectionColor || 'var(--uikit-selection-bg)',
+  // 拖拽后的编辑器固定高度：height 与 max-height 同值（内容少时撑满、内容多时滚动）；未拖拽时不输出，由 CSS fallback 兜底
+  ...(editorHeight.value !== null
+    ? {
+      '--rich-input-editor-height': `${editorHeight.value}px`,
+      '--rich-input-editor-max-height': `${editorHeight.value}px`,
+    }
+    : {}),
 }))
 
 /** 最大输入长度 */
@@ -179,7 +209,9 @@ function handleSend() {
   if (!editor.value || !hasContent.value) return
   const html = editor.value.getHTML()
   const text = editor.value.getText()
-  emit('send', html, text, mentionList.value.length > 0 ? mentionList.value : undefined)
+  // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
+  const activeMentions = filterActiveMentions(text, mentionList.value)
+  emit('send', html, text, activeMentions.length > 0 ? activeMentions : undefined)
   editor.value.commands.clearContent()
   // 发送后回收内联图片 blob URL
   inlineImageBlobUrls.forEach((url) => URL.revokeObjectURL(url))
@@ -369,6 +401,12 @@ onBeforeUnmount(() => {
         <div class="rich-input__editor-wrapper">
           <EditorContent :editor="editor" />
           <div v-if="!hasContent" class="rich-input__placeholder">{{ t('chat.placeholder') }}</div>
+          <!-- 拖拽手柄：编辑器上缘拖动调整高度（仅 PC） -->
+          <div
+            v-if="showResizeHandle"
+            ref="resizeHandleRef"
+            class="rich-input__resize-handle"
+          />
         </div>
       </template>
       <div v-else class="rich-input__voice-btn">
@@ -421,7 +459,8 @@ onBeforeUnmount(() => {
 /* Tiptap 编辑器内容区样式（全局，避免 scoped 穿透问题） */
 .rich-input__editor-content {
   min-height: 60px;
-  max-height: 150px;
+  height: var(--rich-input-editor-height, auto);
+  max-height: var(--rich-input-editor-max-height, 150px);
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   outline: none;
   font-size: var(--uikit-font-size-14);
@@ -511,6 +550,18 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
   background-color: transparent;
+}
+
+/* 拖拽手柄：顶部边缘命中区（仅光标提示，不画视觉线） */
+.rich-input__resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  z-index: 1;
+  cursor: row-resize;
+  touch-action: none;
 }
 
 .rich-input__placeholder {

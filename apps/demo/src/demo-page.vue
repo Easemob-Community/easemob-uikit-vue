@@ -10,6 +10,7 @@ import {
   EmCustomMessage,
   EmGroupDetail,
   EmIcon,
+  EmResizable,
   EmUserCardModal,
   useClient,
   useContactStore,
@@ -116,6 +117,8 @@ const {
   conversationTabsTakeover,
   conversationActiveTab,
   statusBannerEnabled,
+  sidebarWidth,
+  persistSidebarWidth,
   devHintsEnabled,
   notificationEnable,
   notificationBrowser,
@@ -480,8 +483,15 @@ watch(() => stores.conversation.currentConversationId, (id) => {
         @open-settings="showSettings = true"
       />
 
-      <!-- 中间侧边栏：会话列表 / 联系人列表 -->
-      <div class="demo-layout__sidebar">
+      <!-- 中间侧边栏：会话列表 / 联系人列表（宽度可拖拽调整 240~480，宽度记忆） -->
+      <EmResizable
+        v-model:size="sidebarWidth"
+        axis="horizontal"
+        :min="240"
+        :max="480"
+        class="demo-layout__sidebar"
+        @resize-end="persistSidebarWidth"
+      >
         <EmConversationContainer
           v-if="sidebarTab === 'conversation'"
           :tabs="effectiveConversationTabs"
@@ -515,7 +525,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
           @add-contact="showAddContactModal = true"
           @create-group="showCreateGroupModal = true"
         />
-      </div>
+      </EmResizable>
 
       <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
       <div class="demo-layout__main">
@@ -795,7 +805,6 @@ watch(() => stores.conversation.currentConversationId, (id) => {
 }
 
 .demo-layout__sidebar {
-  width: 300px;
   flex-shrink: 0;
   border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
   border-radius: var(--uikit-components-radius, 8px);

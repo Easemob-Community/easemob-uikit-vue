@@ -4,6 +4,7 @@ import { useEventListener } from '@vueuse/core'
 import Icon from '../icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
+import { useKeyBindings } from '../../composables/use-key-bindings'
 import { nextZIndex } from '../../utils/z-index'
 import { detectEnvironment, downloadFile } from '../../utils/download'
 
@@ -257,20 +258,18 @@ useEventListener(window, 'mouseup', () => {
   isDragging.value = false
 })
 
-/** 键盘操作：ESC 关闭，←/→ 切图（仅多图） */
-useEventListener(window, 'keydown', (e: KeyboardEvent) => {
-  if (!visible.value)
-    return
-  if (e.key === 'Escape') {
-    close()
-  }
-  else if (e.key === 'ArrowLeft' && props.showNavigator) {
-    goPrev()
-  }
-  else if (e.key === 'ArrowRight' && props.showNavigator) {
-    goNext()
-  }
-})
+/** 键盘操作：ESC 关闭，←/→ 切图（仅多图）；active 由展示状态控制，关闭时不监听 */
+useKeyBindings({
+  Escape: close,
+  ArrowLeft: () => {
+    if (props.showNavigator)
+      goPrev()
+  },
+  ArrowRight: () => {
+    if (props.showNavigator)
+      goNext()
+  },
+}, { active: visible })
 
 function goPrev() {
   if (props.srcs.length <= 1)

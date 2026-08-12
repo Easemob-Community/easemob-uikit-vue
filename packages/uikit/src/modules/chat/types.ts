@@ -230,6 +230,8 @@ export interface ChatConfig {
     enableTyping?: boolean
     /** 是否显示发送按钮，默认 true */
     showSendButton?: boolean
+    /** 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true */
+    resizable?: boolean
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
   }

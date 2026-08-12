@@ -5,6 +5,8 @@
  * D87「Demo 开发者友好模式」开关：
  * 开启后悬停会话项/消息气泡等区域，浮出该功能用到的环信接口 + UIKit 实现思路；
  * 气泡悬停 2s 出 💡 角标，点击展开详情抽屉。
+ *
+ * 注：键盘操作演示已移至「外观」面板（键盘操作分组），本面板只保留 Dev Hints。
  */
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'

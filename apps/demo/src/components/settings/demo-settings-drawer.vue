@@ -6,8 +6,8 @@
  * 8 个分类对应 8 个独立面板组件，切换只换内容区，面板状态由 useDemoSettings 单例持有，不丢失。
  * Provider 四开关由 app.vue 持有，经本组件 props/emits 双向转发到各面板。
  */
-import { ref } from 'vue'
-import { EmIcon, EmPopup } from '@easemob/uikit'
+import { computed, ref, watch } from 'vue'
+import { EmIcon, EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit'
 import DemoAppearancePanel from './demo-appearance-panel.vue'
 import DemoChatPanel from './demo-chat-panel.vue'
 import DemoContactPanel from './demo-contact-panel.vue'
@@ -63,6 +63,27 @@ type CategoryKey = typeof categories[number]['key']
 
 const activeCategory = ref<CategoryKey>('appearance')
 
+/**
+ * 键盘切换分类：↑/↓ + ←/→（回绕），仅抽屉打开时响应，输入控件聚焦时豁免（不抢光标）；
+ * 点击与键盘共用 setIndex，保证两者索引同步。
+ */
+const { activeIndex, setIndex, move } = useArrowNavigation({
+  count: categories.length,
+  wrap: true,
+  active: computed(() => props.show),
+  ignoreWhenTyping: true,
+})
+watch(activeIndex, (i) => {
+  activeCategory.value = categories[i].key
+})
+useKeyBindings({
+  ArrowLeft: () => move(-1),
+  ArrowRight: () => move(1),
+}, {
+  active: computed(() => props.show),
+  ignoreWhenTyping: true,
+})
+
 function close() {
   emit('update:show', false)
 }
@@ -84,12 +105,12 @@ function close() {
       <div v-if="!props.isMobile" class="demo-drawer__body demo-drawer__body--split">
         <nav class="demo-drawer__nav">
           <button
-            v-for="cat in categories"
+            v-for="(cat, i) in categories"
             :key="cat.key"
             type="button"
             class="demo-nav-item"
             :class="{ 'demo-nav-item--active': activeCategory === cat.key }"
-            @click="activeCategory = cat.key"
+            @click="setIndex(i)"
           >
             <EmIcon :name="cat.icon" :size="18" />
             <span>{{ cat.label }}</span>
@@ -128,12 +149,12 @@ function close() {
       <div v-else class="demo-drawer__body">
         <nav class="demo-drawer__tabs">
           <button
-            v-for="cat in categories"
+            v-for="(cat, i) in categories"
             :key="cat.key"
             type="button"
             class="demo-tab-item"
             :class="{ 'demo-tab-item--active': activeCategory === cat.key }"
-            @click="activeCategory = cat.key"
+            @click="setIndex(i)"
           >
             <EmIcon :name="cat.icon" :size="16" />
             <span>{{ cat.label }}</span>

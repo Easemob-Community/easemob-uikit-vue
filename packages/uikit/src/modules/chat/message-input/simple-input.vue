@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useLocale } from '../../../locale'
+import { useResizable } from '../../../composables/use-resizable'
 import { useViewport } from '../../../composables/use-viewport'
+import { filterActiveMentions } from '../../../utils/mention'
 import Input from '../../../components/input/input.vue'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
@@ -50,6 +52,34 @@ const features = computed(() => ({
 /** 是否显示发送按钮 */
 const showSendButton = computed(() => props.config?.showSendButton !== false)
 
+/** 是否显示拖拽手柄（PC 且未通过 config 关闭） */
+const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
+
+/** 输入区高度（拖拽后设置，null 表示自适应） */
+const fieldAreaHeight = ref<number | null>(null)
+
+/** 拖拽手柄 ref */
+const resizeHandleRef = ref<HTMLElement>()
+
+useResizable(resizeHandleRef, {
+  axis: 'vertical',
+  min: 76,
+  max: 240,
+  // 手柄在输入区上缘：向上拖动增高（反向增量）
+  invert: true,
+  disabled: () => !showResizeHandle.value,
+  onChange: (h) => {
+    fieldAreaHeight.value = h
+  },
+})
+
+/** 输入区域样式：拖拽后固定高度，textarea flex:1 自动跟随 */
+const fieldAreaStyle = computed<Record<string, string> | null>(() => {
+  if (fieldAreaHeight.value === null)
+    return null
+  return { height: `${fieldAreaHeight.value}px` }
+})
+
 /** 是否使用多行文本 */
 const isMultiline = computed(() => !isMobile.value)
 
@@ -80,8 +110,8 @@ function handleSend() {
   if (!trimmed) {
     return
   }
-  // 过滤出实际出现在文本中的 mention
-  const activeMentions = mentionList.value.filter(m => trimmed.includes(`@${m.name}`))
+  // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
+  const activeMentions = filterActiveMentions(trimmed, mentionList.value)
   emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
   text.value = ''
   mentionList.value = []
@@ -429,7 +459,7 @@ defineExpose({
     </div>
 
     <!-- 输入区域 -->
-    <div class="simple-input__field-area">
+    <div class="simple-input__field-area" :style="fieldAreaStyle">
       <!-- 正常输入（PC 端非录音模式，或移动端非录音模式） -->
       <template v-if="!isVoiceMode && !isMobileRecording">
         <Input
@@ -472,6 +502,13 @@ defineExpose({
       <div v-else-if="isMobileRecording" class="simple-input__voice-btn-mobile">
         {{ t('chat.voice.releaseEnd') }}
       </div>
+
+      <!-- 拖拽手柄：输入区上缘拖动调整高度（仅 PC） -->
+      <div
+        v-if="showResizeHandle"
+        ref="resizeHandleRef"
+        class="simple-input__resize-handle"
+      />
     </div>
 
     <!-- 自定义面板：由 #input-panel 插槽填充 -->
@@ -565,6 +602,19 @@ defineExpose({
   display: flex;
   align-items: flex-end;
   gap: var(--uikit-container-gap, 8px);
+  position: relative;
+}
+
+/* 拖拽手柄：顶部边缘命中区（仅光标提示，不画视觉线） */
+.simple-input__resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  z-index: 1;
+  cursor: row-resize;
+  touch-action: none;
 }
 
 .simple-input__field {
@@ -573,6 +623,8 @@ defineExpose({
 
 .simple-input__textarea {
   flex: 1;
+  /* 拖拽固定 field-area 高度时沿交叉轴撑满（默认内容高度会因 align-items: flex-end 不拉伸） */
+  align-self: stretch;
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border: none;
   border-radius: var(--uikit-components-radius, 8px);

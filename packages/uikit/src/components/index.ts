@@ -37,6 +37,8 @@ export type { StatusBannerProps, StatusBannerEmits } from './status-banner/statu
 export type { StatusBannerType, StatusBannerItem } from './status-banner/types'
 export { default as EmImageViewer } from './image-viewer/image-viewer.vue'
 export type { ImageViewerProps, ImageViewerEmits } from './image-viewer/image-viewer.vue'
+export { default as EmResizable } from './resizable/resizable.vue'
+export type { ResizableProps } from './resizable/resizable.vue'
 export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
@@ -67,4 +69,5 @@ export const componentList = [
   'em-notification-container',
   'em-status-banner',
   'em-image-viewer',
+  'em-resizable',
 ] as const

@@ -3,6 +3,9 @@ import type { ManagerHost } from '../client'
 import type { CreateGroupParams, UiGroup, UiGroupMember } from '../types'
 import { GROUP_MEMBER_ROLE } from '../../constants'
 import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
+import { createLogger } from '../../utils/logger'
+
+const groupDomainLog = createLogger('UIKit:GroupDomain')
 
 /** 飞行中的 fetchGroupInfo Promise，避免多个消息气泡/组件并发请求同一群详情 */
 const pendingGroupInfoRequests = new Map<string, Promise<UiGroup>>()
@@ -308,13 +311,17 @@ export class GroupDomain {
 
   /** 禁言指定成员 */
   async muteGroupMembers(groupId: string, userIds: string[], muteDuration: number) {
-    await this.client.groupManager.getGroup(groupId).muteMembers({ userIds, muteDuration })
+    groupDomainLog.info('muteGroupMembers request raw', { groupId, userIds, muteDuration })
+    const result = await this.client.groupManager.getGroup(groupId).muteMembers({ userIds, muteDuration })
+    groupDomainLog.info('muteGroupMembers response raw', result)
     this.store.addGroupMuteMembers(groupId, userIds)
   }
 
   /** 解除指定成员禁言 */
   async unmuteGroupMembers(groupId: string, userIds: string[]) {
-    await this.client.groupManager.getGroup(groupId).unmuteMembers({ userIds })
+    groupDomainLog.info('unmuteGroupMembers request raw', { groupId, userIds })
+    const result = await this.client.groupManager.getGroup(groupId).unmuteMembers({ userIds })
+    groupDomainLog.info('unmuteGroupMembers response raw', result)
     this.store.removeGroupMuteMembers(groupId, userIds)
   }
 

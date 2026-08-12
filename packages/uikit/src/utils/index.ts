@@ -5,6 +5,7 @@ export * from './linkify'
 export * from './download'
 export * from './sdk-error'
 export * from './resolve-last-message-text'
+export * from './mention'
 export * from './z-index'
 
 export function isEmpty(val: unknown): boolean {

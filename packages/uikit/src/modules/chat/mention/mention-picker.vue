@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useViewport } from '../../../composables/use-viewport'
 import { useLocale } from '../../../locale'
+import { useArrowNavigation, useKeyBindings } from '../../../composables/use-key-bindings'
 import Popup from '../../../components/popup/popup.vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
@@ -71,11 +72,51 @@ function onClose() {
   emit('update:show', false)
 }
 
-/** 键盘事件 */
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') {
-    onClose()
-  }
+/** 列表容器 ref（用于滚动高亮项到可视区） */
+const listRef = ref<HTMLElement>()
+
+/** 弹层显示/关键词变化时重置高亮位置 */
+watch(() => props.show, (show) => {
+  if (show)
+    activeIndex.value = 0
+})
+watch(filteredContacts, (list) => {
+  if (activeIndex.value >= list.length)
+    activeIndex.value = list.length > 0 ? 0 : 0
+})
+
+/** 键盘导航：弹层打开时 ↑/↓ 移动高亮，Enter 确认选择；输入框聚焦时也接管方向键 */
+const { activeIndex } = useArrowNavigation({
+  count: computed(() => filteredContacts.value.length),
+  wrap: true,
+  active: computed(() => props.show && filteredContacts.value.length > 0),
+  repeat: true,
+  // 提及面板方向键需要覆盖输入框默认光标移动
+  ignoreWhenTyping: false,
+  onActiveChange: () => {
+    scrollActiveIntoView()
+  },
+})
+
+/** Enter 选中当前高亮联系人；阻止默认行为避免表单提交 */
+useKeyBindings({
+  Enter: () => {
+    const contact = filteredContacts.value[activeIndex.value]
+    if (contact)
+      onSelect(contact)
+  },
+}, {
+  active: computed(() => props.show && filteredContacts.value.length > 0),
+  ignoreWhenTyping: false,
+  preventDefault: true,
+})
+
+/** 将当前高亮项滚动进可视区 */
+function scrollActiveIntoView() {
+  nextTick(() => {
+    const el = listRef.value?.querySelector<HTMLElement>('.mention-picker__cell.is-active')
+    el?.scrollIntoView({ block: 'nearest' })
+  })
 }
 </script>
 
@@ -100,15 +141,15 @@ function onKeydown(e: KeyboardEvent) {
             type="text"
             class="mention-picker__search-input"
             :placeholder="t('mention.searchPlaceholder', '搜索联系人...')"
-            @keydown="onKeydown"
           />
         </div>
         <!-- 联系人列表 -->
-        <div class="mention-picker__list">
+        <div ref="listRef" class="mention-picker__list">
           <Cell
-            v-for="contact in filteredContacts"
+            v-for="(contact, index) in filteredContacts"
             :key="contact.userId"
             class="mention-picker__cell"
+            :active="activeIndex === index"
             :title="contact.remark || contact.name"
             :subtitle="contact.remark && contact.remark !== contact.name ? contact.name : undefined"
             size="normal"
@@ -165,11 +206,12 @@ function onKeydown(e: KeyboardEvent) {
           />
         </div>
         <!-- 联系人列表 -->
-        <div class="mention-picker__list mention-picker__list--scrollable">
+        <div ref="listRef" class="mention-picker__list mention-picker__list--scrollable">
           <Cell
-            v-for="contact in filteredContacts"
+            v-for="(contact, index) in filteredContacts"
             :key="contact.userId"
             class="mention-picker__cell"
+            :active="activeIndex === index"
             :title="contact.remark || contact.name"
             :subtitle="contact.remark && contact.remark !== contact.name ? contact.name : undefined"
             size="large"

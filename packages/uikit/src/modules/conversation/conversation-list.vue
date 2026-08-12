@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useInfiniteScroll } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
 import { useViewport } from '../../composables/use-viewport'
@@ -8,6 +8,7 @@ import { useLocale } from '../../locale'
 import { CONVERSATION_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { usePresence } from '../../composables/use-presence'
+import { useArrowNavigation, useEscToClose, useKeyBindings } from '../../composables/use-key-bindings'
 import Modal from '../../components/modal/modal.vue'
 import Input from '../../components/input/input.vue'
 import Icon from '../../components/icon/icon.vue'
@@ -360,6 +361,66 @@ function handleSelect(id: string) {
   }
 }
 
+/* ===== 键盘导航：鼠标进入列表区域后 ↑/↓ 直接切换会话（受全局键盘开关控制） ===== */
+
+/** 键盘导航是否激活：鼠标进入列表区域或点击列表时启用，Esc / 鼠标离开时停用 */
+const keyboardNavActive = ref(false)
+function enableKeyboardNav() {
+  keyboardNavActive.value = true
+}
+function disableKeyboardNav() {
+  keyboardNavActive.value = false
+}
+/** Esc 退出键盘导航 */
+useEscToClose(keyboardNavActive, disableKeyboardNav)
+
+const { activeIndex } = useArrowNavigation({
+  count: computed(() => filteredConversationList.value.length),
+  wrap: true,
+  active: keyboardNavActive,
+  // 搜索框聚焦时方向键让位给输入光标
+  ignoreWhenTyping: true,
+  onActiveChange: (index) => {
+    // 方向键移动即切换会话（与点击 handleSelect 同语义：已读回执 / 草稿 / @我 清除）
+    const item = filteredConversationList.value[index]
+    if (item) {
+      handleSelect(item.id)
+      scrollConversationIntoView(item.id)
+      // 切换后把焦点保留在列表容器，避免会话切换后输入框抢走焦点导致后续方向键失效
+      nextTick(() => itemsRef.value?.focus())
+    }
+  },
+})
+
+/** Enter 选中当前键盘高亮的会话（与方向键移动语义一致） */
+useKeyBindings({
+  Enter: () => {
+    const item = filteredConversationList.value[activeIndex.value]
+    if (item)
+      handleSelect(item.id)
+  },
+}, {
+  active: keyboardNavActive,
+  ignoreWhenTyping: true,
+})
+
+/** 当前会话变化时同步键盘导航位置：首次按键从当前会话继续移动 */
+watch(currentConversation, (cvs) => {
+  if (!cvs)
+    return
+  const idx = filteredConversationList.value.findIndex(c => c.id === cvs.id)
+  if (idx >= 0)
+    activeIndex.value = idx
+}, { immediate: true })
+
+/** 将目标会话项滚动进可视区（键盘切换超出可视范围时跟随） */
+function scrollConversationIntoView(id: string) {
+  nextTick(() => {
+    const el = itemsRef.value?.querySelector<HTMLElement>(`[data-conv-id="${id}"]`)
+    el?.scrollIntoView({ block: 'nearest' })
+  })
+}
+
 /** 删除确认 */
 const showDeleteModal = ref(false)
 const pendingDeleteId = ref('')
@@ -460,7 +521,14 @@ function handleCustomAction(key: string, conversation: Conversation) {
     <div v-if="$slots.body && props.bodySticky" class="conversation-list__body conversation-list__body--sticky">
       <slot name="body" />
     </div>
-    <div ref="itemsRef" class="conversation-list__items">
+    <div
+      ref="itemsRef"
+      tabindex="0"
+      class="conversation-list__items"
+      @mouseenter="enableKeyboardNav"
+      @mouseleave="disableKeyboardNav"
+      @click="enableKeyboardNav"
+    >
       <!-- 下拉刷新指示器（H5） -->
       <div v-if="effectivePullRefresh && isPullRefreshing" class="conversation-list__pull-refresh">
         {{ t('conversation.pullRefresh') }}
@@ -472,6 +540,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <ConversationItem
         v-for="item in filteredConversationList"
         :key="item.id"
+        :data-conv-id="item.id"
         :conversation="item"
         :class="{ 'is-active': currentConversation?.id === item.id }"
         :custom-actions="props.customActions"
@@ -615,9 +684,9 @@ function handleCustomAction(key: string, conversation: Conversation) {
 }
 
 @media (hover: hover) {
-.conversation-list__menu-trigger:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .conversation-list__menu-trigger:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 /* PC Header 菜单 —— 与 conversation-item 右键菜单风格统一。
@@ -643,9 +712,9 @@ function handleCustomAction(key: string, conversation: Conversation) {
 }
 
 @media (hover: hover) {
-.context-menu__item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
+  .context-menu__item:hover {
+    background-color: var(--uikit-bg-hover, #f3f4f6);
+  }
 }
 
 .conversation-list__search {
@@ -668,6 +737,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
   overflow-y: auto;
   /* 滚动到边界时不把滚动链穿透给外层页面（H5 下拉刷新场景） */
   overscroll-behavior-y: contain;
+  /* 键盘导航时容器可获得焦点，但不显示默认轮廓 */
+  outline: none;
 }
 
 .conversation-list__loading {

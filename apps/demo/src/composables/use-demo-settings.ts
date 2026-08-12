@@ -14,6 +14,7 @@ import { ref } from 'vue'
 import { pinyin } from 'pinyin-pro'
 import {
   DEFAULT_CONVERSATION_TABS,
+  setKeyboardShortcutsEnabled,
   setPinyinAdapter,
   useContactStore,
   useConversation,
@@ -22,6 +23,19 @@ import type { ConversationTabKey, EmojiStickerPack, UiContact, UiConversation } 
 
 /** Dev Hints 开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
 const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'
+
+/** 键盘操作总开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
+const KEYBOARD_SHORTCUTS_STORAGE_KEY = 'demo-keyboard-shortcuts-enabled'
+
+/** 会话列表侧边栏宽度记忆 key（EmResizable 拖拽调整） */
+const SIDEBAR_WIDTH_STORAGE_KEY = 'demo-sidebar-width'
+
+/** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，避免首屏过窄 */
+const SIDEBAR_DEFAULT_WIDTH = 360
+
+/** 会话列表侧边栏宽度可调范围 */
+const SIDEBAR_MIN_WIDTH = 240
+const SIDEBAR_MAX_WIDTH = 480
 
 /** 预设测试账号（一键填入用户 + Token，免去每次手动复制） */
 export interface DemoPresetUser {
@@ -272,6 +286,24 @@ function createDemoSettings() {
     conversationActiveTab.value = conversationTabs.value[0] ?? 'all'
   }
 
+  /* ===== 会话侧边栏宽度（EmResizable） ===== */
+  /**
+   * 中间侧边栏宽度：默认 360，范围 240~480，localStorage 记忆（demo-sidebar-width）。
+   */
+  const sidebarWidth = ref(readStoredSidebarWidth())
+  function readStoredSidebarWidth(): number {
+    const raw = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY)
+    const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN
+    if (Number.isNaN(parsed))
+      return SIDEBAR_DEFAULT_WIDTH
+    return Math.min(Math.max(parsed, SIDEBAR_MIN_WIDTH), SIDEBAR_MAX_WIDTH)
+  }
+  /** 拖拽结束回调：写回状态并记忆到 localStorage */
+  function persistSidebarWidth(width: number) {
+    sidebarWidth.value = width
+    localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(width))
+  }
+
   /* ===== 开发者友好模式（Dev Hints） ===== */
   /**
    * 悬停会话项/气泡等区域浮出环信接口 + UIKit 实现思路（D87）。
@@ -282,6 +314,20 @@ function createDemoSettings() {
     devHintsEnabled.value = enabled
     localStorage.setItem(DEV_HINTS_STORAGE_KEY, enabled ? 'on' : 'off')
   }
+
+  /* ===== 键盘操作开关 ===== */
+  /**
+   * 键盘操作总开关：控制 UIKIT 全部快捷键（ESC 关闭弹层、方向键导航等）。
+   * 默认开启，localStorage 记忆；切换时同步调用 setKeyboardShortcutsEnabled 全局生效。
+   */
+  const keyboardShortcutsEnabled = ref(localStorage.getItem(KEYBOARD_SHORTCUTS_STORAGE_KEY) !== 'off')
+  function toggleKeyboardShortcuts(enabled: boolean) {
+    keyboardShortcutsEnabled.value = enabled
+    setKeyboardShortcutsEnabled(enabled)
+    localStorage.setItem(KEYBOARD_SHORTCUTS_STORAGE_KEY, enabled ? 'on' : 'off')
+  }
+  // 初始化时与 UIKIT 全局开关对齐（localStorage 记忆为关闭时，刷新后保持关闭）
+  setKeyboardShortcutsEnabled(keyboardShortcutsEnabled.value)
 
   /* ===== SDK 初始化 / 登录配置 ===== */
   const sdkAppKey = ref('easemob-demo#support-ngi')
@@ -380,9 +426,15 @@ function createDemoSettings() {
     togglePinyinAdapter,
     injectMockConversations,
     injectMockContacts,
+    // 侧边栏宽度
+    sidebarWidth,
+    persistSidebarWidth,
     // 开发者友好模式
     devHintsEnabled,
     toggleDevHints,
+    // 键盘操作
+    keyboardShortcutsEnabled,
+    toggleKeyboardShortcuts,
   }
 }
 

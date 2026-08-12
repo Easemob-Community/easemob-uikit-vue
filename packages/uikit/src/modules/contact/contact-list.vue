@@ -9,6 +9,7 @@ import { useViewport } from '../../composables/use-viewport'
 import { useUIKit } from '../../composables/use-uikit'
 import { usePresence } from '../../composables/use-presence'
 import { useLocale } from '../../locale'
+import { useArrowNavigation, useEscToClose, useKeyBindings } from '../../composables/use-key-bindings'
 import Input from '../../components/input/input.vue'
 import ScrollToTop from '../../components/scroll-to-top/scroll-to-top.vue'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
@@ -135,6 +136,7 @@ const {
   contactList,
   selectedIds: storeSelectedIds,
   setSelectedIds,
+  setActiveId,
 } = useContact()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -327,6 +329,61 @@ function onItemContextmenu(e: MouseEvent, contact: Contact) {
   emit('contextmenu', e, contact)
 }
 
+/* ===== 键盘导航：鼠标进入列表区域后 ↑/↓ 移动焦点，Enter 确认选择 ===== */
+
+/** 键盘导航是否激活：鼠标进入列表区域或点击列表时启用，Esc / 鼠标离开时停用 */
+const keyboardNavActive = ref(false)
+function enableKeyboardNav() {
+  keyboardNavActive.value = true
+}
+function disableKeyboardNav() {
+  keyboardNavActive.value = false
+}
+/** Esc 退出键盘导航 */
+useEscToClose(keyboardNavActive, disableKeyboardNav)
+
+/** 用于方向键导航的平铺联系人列表（跳过分组标题） */
+const navigableContacts = computed(() =>
+  groupedContacts.value.flatMap(group => group.items),
+)
+
+const { activeIndex } = useArrowNavigation({
+  count: computed(() => navigableContacts.value.length),
+  wrap: true,
+  active: keyboardNavActive,
+  // 搜索框聚焦时方向键让位给输入光标
+  ignoreWhenTyping: true,
+  disabled: index => props.disabledFn ? props.disabledFn(navigableContacts.value[index]) : false,
+  onActiveChange: (index) => {
+    const contact = navigableContacts.value[index]
+    if (contact) {
+      setActiveId(contact.userId)
+      scrollContactIntoView(contact.userId)
+      nextTick(() => itemsRef.value?.focus())
+    }
+  },
+})
+
+/** Enter 选中当前键盘高亮的联系人 */
+useKeyBindings({
+  Enter: () => {
+    const contact = navigableContacts.value[activeIndex.value]
+    if (contact && !(props.disabledFn && props.disabledFn(contact)))
+      onItemClick(contact)
+  },
+}, {
+  active: keyboardNavActive,
+  ignoreWhenTyping: true,
+})
+
+/** 将目标联系人滚动进可视区 */
+function scrollContactIntoView(userId: string) {
+  nextTick(() => {
+    const el = itemsRef.value?.querySelector<HTMLElement>(`[data-userid="${userId}"]`)
+    el?.scrollIntoView({ block: 'nearest' })
+  })
+}
+
 defineExpose({
   scrollToGroup,
   groupedContacts,
@@ -379,7 +436,14 @@ defineExpose({
       <slot name="body" />
     </div>
 
-    <div ref="itemsRef" class="contact-list__items">
+    <div
+      ref="itemsRef"
+      tabindex="0"
+      class="contact-list__items"
+      @mouseenter="enableKeyboardNav"
+      @mouseleave="disableKeyboardNav"
+      @click="enableKeyboardNav"
+    >
       <!-- body slot - 非 sticky 模式 -->
       <div v-if="$slots.body && !props.bodySticky" class="contact-list__body">
         <slot name="body" />
@@ -544,6 +608,7 @@ defineExpose({
   flex: 1;
   overflow-y: auto;
   position: relative;
+  outline: none;
 }
 
 .contact-list__group-header {

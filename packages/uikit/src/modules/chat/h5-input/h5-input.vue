@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useLocale } from '../../../locale'
+import { filterActiveMentions } from '../../../utils/mention'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
 import EmojiPicker from '../../../components/emoji-picker/emoji-picker.vue'
@@ -136,8 +137,8 @@ function handleSend() {
   const trimmed = text.value.trim()
   if (!trimmed)
     return
-  // 过滤出实际出现在文本中的 mention
-  const activeMentions = mentionList.value.filter(m => trimmed.includes(`@${m.name}`))
+  // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
+  const activeMentions = filterActiveMentions(trimmed, mentionList.value)
   emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
   text.value = ''
   mentionList.value = []

@@ -21,5 +21,8 @@ export const EasemobUIKitImports = {
     'useUserInfo',
     'useOwnUserInfo',
     'useBottomSheet',
+    'useKeyBindings',
+    'useEscToClose',
+    'useArrowNavigation',
   ],
 }

@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import IconButton from '../icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
+import { useEscToClose } from '../../composables/use-key-bindings'
 import { nextZIndex } from '../../utils/z-index'
 
 export interface PopupProps {
@@ -195,12 +196,10 @@ useEventListener(window, 'scroll', () => {
   if (props.show && isAnchored.value) updateAnchorPosition()
 }, { capture: true })
 
-// ESC 关闭（可配置）
-useEventListener(window, 'keydown', (event) => {
-  if (event.key === 'Escape' && props.show && props.closeOnEsc) {
-    emit('update:show', false)
-    emit('close')
-  }
+// ESC 关闭（可配置）：active 由展示状态与 closeOnEsc 共同控制，打开时才挂载监听
+useEscToClose(computed(() => props.show && props.closeOnEsc), () => {
+  emit('update:show', false)
+  emit('close')
 })
 
 onClickOutside(contentRef, (event) => {

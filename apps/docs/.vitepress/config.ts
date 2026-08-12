@@ -57,6 +57,7 @@ export default defineConfig({
             { text: 'Input 输入框', link: '/components/input' },
             { text: 'IconButton 图标按钮', link: '/components/icon-button' },
             { text: 'ScrollToTop 回到顶部', link: '/components/scroll-to-top' },
+            { text: 'Resizable 拖拽尺寸', link: '/components/resizable' },
           ],
         },
         {
