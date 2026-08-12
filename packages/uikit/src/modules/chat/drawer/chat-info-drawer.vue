@@ -75,6 +75,11 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+
+function formatCharCount(current: number, max: number): string {
+  return t('common.charCount', '{current}/{max}').replace('{current}', String(current)).replace('{max}', String(max))
+}
+
 const { setContactRemark, deleteContact } = useContact()
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
@@ -657,6 +662,12 @@ defineExpose({
                   @keydown.enter="saveGroupName"
                   @keydown.esc="cancelEditGroupName"
                 >
+                <div
+                  class="chat-info-drawer__char-count"
+                  :class="{ 'is-near-limit': groupNameInput.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH * 0.9 }"
+                >
+                  {{ formatCharCount(groupNameInput.length, GROUP_INFO_LIMIT.NAME_MAX_LENGTH) }}
+                </div>
                 <div class="chat-info-drawer__inline-edit-actions">
                   <IconButton
                     icon="actions/xmark_thick"
@@ -706,6 +717,12 @@ defineExpose({
                   :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
                   @keydown.esc="isEditingDescription = false"
                 />
+                <div
+                  class="chat-info-drawer__char-count"
+                  :class="{ 'is-near-limit': descriptionInput.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH * 0.9 }"
+                >
+                  {{ formatCharCount(descriptionInput.length, GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) }}
+                </div>
                 <div class="chat-info-drawer__inline-edit-actions">
                   <IconButton
                     icon="actions/xmark_thick"
@@ -1108,6 +1125,17 @@ defineExpose({
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.chat-info-drawer__char-count {
+  align-self: flex-end;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-tertiary);
+  line-height: 1;
+}
+
+.chat-info-drawer__char-count.is-near-limit {
+  color: var(--uikit-warning-color, var(--uikit-error-color, #f59e0b));
 }
 
 .chat-info-drawer__description {

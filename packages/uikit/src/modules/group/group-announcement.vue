@@ -23,6 +23,11 @@ const props = defineProps<GroupAnnouncementProps>()
 const emit = defineEmits<GroupAnnouncementEmits>()
 
 const { t } = useLocale()
+
+function formatCharCount(current: number, max: number): string {
+  return t('common.charCount', '{current}/{max}').replace('{current}', String(current)).replace('{max}', String(max))
+}
+
 const { show: showToast } = useToast()
 const { stores } = useUIKit()
 const { getGroupAnnouncement, updateGroupAnnouncement, getGroupMembers } = useGroup()
@@ -166,6 +171,12 @@ function cancel() {
           rows="3"
           :maxlength="GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH"
         />
+        <div
+          class="group-announcement__char-count"
+          :class="{ 'is-near-limit': announcementInput.length > GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH * 0.9 }"
+        >
+          {{ formatCharCount(announcementInput.length, GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH) }}
+        </div>
         <div class="group-announcement__edit-actions">
           <IconButton
             icon="actions/xmark_thick"
@@ -291,5 +302,16 @@ function cancel() {
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.group-announcement__char-count {
+  align-self: flex-end;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-tertiary);
+  line-height: 1;
+}
+
+.group-announcement__char-count.is-near-limit {
+  color: var(--uikit-warning-color, var(--uikit-error-color, #f59e0b));
 }
 </style>

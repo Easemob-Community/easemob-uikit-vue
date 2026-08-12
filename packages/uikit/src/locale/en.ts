@@ -328,6 +328,7 @@ const messages: LocaleMessages = {
   'group.createMaxMembersPlaceholder': 'Leave blank to use default limit',
   'common.back': 'Back',
   'common.loading': 'Loading...',
+  'common.charCount': '{current}/{max}',
   'common.noMore': 'No more',
   'common.next': 'Next',
   'common.copy': 'Copy',

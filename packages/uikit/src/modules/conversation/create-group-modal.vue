@@ -66,6 +66,11 @@ const props = withDefaults(defineProps<CreateGroupModalProps>(), {
 const emit = defineEmits<CreateGroupModalEmits>()
 
 const { t } = useLocale()
+
+function formatCharCount(current: number, max: number): string {
+  return t('common.charCount', '{current}/{max}').replace('{current}', String(current)).replace('{max}', String(max))
+}
+
 const { isMobile } = useViewport()
 const { stores } = useUIKit()
 const { createGroup } = useGroup()
@@ -251,6 +256,12 @@ watch(
                 :placeholder="generatedName || (t('group.createNamePlaceholder', '输入群名称'))"
                 :maxlength="GROUP_INFO_LIMIT.NAME_MAX_LENGTH"
               />
+              <div
+                class="create-group-modal__char-count"
+                :class="{ 'is-near-limit': groupNameInput.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH * 0.9 }"
+              >
+                {{ formatCharCount(groupNameInput.length, GROUP_INFO_LIMIT.NAME_MAX_LENGTH) }}
+              </div>
             </div>
             <div v-if="showDescriptionInput" class="create-group-modal__field">
               <label class="create-group-modal__label">{{ t('group.createDescription', '群介绍') }}</label>
@@ -260,6 +271,12 @@ watch(
                 :placeholder="t('group.createDescriptionPlaceholder', '输入群介绍（可选）')"
                 :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
               />
+              <div
+                class="create-group-modal__char-count"
+                :class="{ 'is-near-limit': groupDescriptionInput.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH * 0.9 }"
+              >
+                {{ formatCharCount(groupDescriptionInput.length, GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) }}
+              </div>
             </div>
           </div>
 
@@ -459,6 +476,17 @@ watch(
 .create-group-modal__label {
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
+}
+
+.create-group-modal__char-count {
+  align-self: flex-end;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-tertiary);
+  line-height: 1;
+}
+
+.create-group-modal__char-count.is-near-limit {
+  color: var(--uikit-warning-color, var(--uikit-error-color, #f59e0b));
 }
 
 .create-group-modal__selected-list {

@@ -328,6 +328,7 @@ const messages: LocaleMessages = {
   'group.createMaxMembersPlaceholder': '不填则使用默认上限',
   'common.back': '返回',
   'common.loading': '加载中...',
+  'common.charCount': '{current}/{max}',
   'common.noMore': '没有更多了',
   'common.next': '下一步',
   'common.copy': '复制',
