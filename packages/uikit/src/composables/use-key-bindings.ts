@@ -232,6 +232,8 @@ export interface UseArrowNavigationOptions {
   ignoreWhenTyping?: boolean
   /** 判断指定索引是否禁用；返回 true 时方向键会自动跳过该项 */
   disabled?: (index: number) => boolean
+  /** 命中方向键后是否调用 preventDefault 阻止浏览器默认滚动，默认 true */
+  preventDefault?: boolean
   /** 索引变化回调（move / setIndex 均触发；直接改返回的 activeIndex 不触发） */
   onActiveChange?: (index: number) => void
 }
@@ -320,6 +322,8 @@ export function useArrowNavigation(options: UseArrowNavigationOptions) {
     repeat: options.repeat ?? true,
     // 输入态豁免可配置：候选列表移动场景默认接管方向键，页面含输入框时传 true
     ignoreWhenTyping: options.ignoreWhenTyping ?? false,
+    // 方向键导航默认阻止浏览器滚动，避免列表按下 ↑/↓ 时整页/滚动条跟随移动
+    preventDefault: options.preventDefault ?? true,
   })
 
   return { activeIndex, move, next, prev, setIndex, reset }
