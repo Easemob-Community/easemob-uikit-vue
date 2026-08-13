@@ -731,6 +731,7 @@
 
 - **背景**：设计师交付面性（filled）图标集 88 个（`面性/icon/filled/`），与线性集命名 1:1 对应；缺失的 32 个为箭头/对勾等纯线条图形（无面性隐喻，属正常）。面性在小尺寸状态图标与选中态辨识度更优（典型如 `pin`）。
 - **结论**：技术可行性高（`icon-map`/`EmIcon` 已有填充/描边双渲染分支，加第二注册表 + 缺失回落即可）。推荐「主题级 `iconStyle` 开关（品牌定制）+ 组件选中态自动配对（默认体验）」组合，不做面向终端用户的全局面性开关。**详细盘点、方案权衡与落地步骤见根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（2026-08-06 预研）**。
+- **资产合并策略（2026-08-07 沉淀，原根 `ICON-ASSET-MERGE-STRATEGY.md` 已删除归档至本条目）**：`packages/uikit/src/assets/icons` 是运行时唯一权威图标库（`EmIcon`/`icon-map.ts` 只认这里）；候选素材库 `assets/icons-next` 已整目录删除（2026-08-07）；设计源目录（`线性/icon/stroked`、`面性/icon/filled`、`消息状态以及未读状态`）为设计师本地工作产物、gitignore 已排除，后续新素材统一放仓库外（设计稿/蓝湖/Figma），由负责工程师评估后复制/替换进 `assets/icons` 并在 `icon-map.ts` 注册；合并采用批次化 + 分类映射表 + 同名脚本对比，不整体覆盖，避免未经验证的视觉回归。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
 
 ### [x] D91. 数字胶囊（Digital Capsule）消息状态与未读数设计落地

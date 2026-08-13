@@ -23,7 +23,7 @@
 - eslint 是 `@antfu/eslint-config` **flat config**（根 `eslint.config.js`）：**`--ext` 无效**，直接传文件/目录路径。
 - `no-console` 允许 `warn`/`error`，只禁 `log/info/debug`；`**/*.story.vue` 已放开 console/alert。
 - 公开事件统一 **kebab-case**，由 `vue/custom-event-name-casing: ['error','kebab-case']` 强制。
-- **demo 运行时走 vite alias `@easemob/uikit` → `packages/uikit/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。2026-08-12 起 demo 处于 tgz 临时验证模式（alias 被注释，依赖 `file:../../easemob-uikit-1.3.1.tgz`），恢复源码模式与切换细节见 skill `uikit-demo-development`。
+- **demo 运行时走 vite alias `@easemob/uikit` → `packages/uikit/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。2026-08-12 起 demo 处于 tgz 临时验证模式（alias 被注释，依赖 `file:../../easemob-uikit-1.6.0.tgz`），恢复源码模式与切换细节见 skill `uikit-demo-development`。
 - **SDK 双引入模式**：`easemob-websdk` 子包依赖声明恒为 `^5.0.0`（生产/发布，跟随 5.x 正式版与 beta 线）；本地 tgz 联调用 `pnpm sdk:use-tgz` / `pnpm sdk:use-npm` 切换（根 `package.json` 的 `pnpm.overrides` 指向根目录 `easemob-websdk-5.0.0.tgz`，切换后需 `pnpm install`）；`pnpm sdk:up` 更新到 range 内最新 SDK，`pnpm sdk:status` 查看当前模式。详见根 README「SDK 引入模式」与 skill `uikit-release-build`。
 - macOS 自带 bash 3.2 无 `mapfile`。
 

@@ -3,7 +3,7 @@
  *
  * 一张声明式配置表：功能区域（DOM 选择器） → 环信接口 + UIKit 实现思路。
  * 素材来源：packages/uikit/src/sdk/domain/*.ts（接口调用唯一入口）、
- * packages/uikit/src/modules/**（UI 实现）、根目录 easemob-websdk-next-5.0.0.tgz
+ * packages/uikit/src/modules/**（UI 实现）、node_modules/easemob-websdk
  * 内的 d.ts（SDK 权威签名）。
  *
  * 维护约定：
