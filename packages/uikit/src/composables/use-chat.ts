@@ -62,6 +62,10 @@ function toCleanSdkMessage(msg: UiMessage): SdkMessage {
     const { messageList: _messageList, ...restBody } = sdkMsg.body as CombineMessageBody
     sdkMsg.body = restBody as typeof sdkMsg.body
   }
+  // 通知消息：剥离 body 级扩展字段（eventType/params），仅保留 content，避免结构化元数据泄漏进合并转发载荷
+  if (sdkMsg.type === MESSAGE_TYPE.NOTICE && sdkMsg.body && 'content' in (sdkMsg.body as { content?: unknown })) {
+    sdkMsg.body = { content: (sdkMsg.body as { content: string }).content || '' } as typeof sdkMsg.body
+  }
   return sdkMsg as unknown as SdkMessage
 }
 

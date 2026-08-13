@@ -8,7 +8,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { useToast } from '../../../composables/use-toast'
 import { useViewport } from '../../../composables/use-viewport'
 import { insertChatNotice } from '../../../sdk/event/notice-utils'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../../constants'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import Empty from '../../../components/empty/empty.vue'
@@ -141,7 +141,11 @@ async function onFileSelected(event: Event) {
     const noticeText = t('chat.notice.sharedFileAdded')
       .replace('{name}', t('chat.notice.you'))
       .replace('{fileName}', file.name)
-    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, noticeText)
+    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.SHARED_FILE_ADDED,
+      params: { name: t('chat.notice.you'), fileName: file.name },
+      defaultText: noticeText,
+    })
   }
   catch (err) {
     logger.warn('[SharedFileList] upload failed:', formatSdkError(err))

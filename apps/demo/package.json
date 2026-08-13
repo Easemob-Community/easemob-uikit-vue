@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@easemob/uikit": "file:../../easemob-uikit-1.6.0.tgz",
+    "@easemob/uikit": "workspace:*",
     "easemob-websdk": "^5.0.0",
     "pinia": "^2.3.1",
     "pinyin-pro": "^3.29.0",

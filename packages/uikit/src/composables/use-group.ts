@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { CONVERSATION_TYPE } from '../constants'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '../constants'
 import type { CreateGroupParams, UiGroup, UiGroupMember } from '../sdk/types'
 import { useLocale } from '../locale'
 import { insertChatNotice } from '../sdk/event/notice-utils'
@@ -107,7 +107,11 @@ export function useGroup() {
       ? await dataSource.createGroup(params)
       : await domains.group.createGroup(params)
     // 创建成功后在本设备群聊插入“群聊已创建”本地通知
-    insertChatNotice(stores, result.groupId, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupCreated'))
+    insertChatNotice(stores, result.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.GROUP_CREATED,
+      params: { groupName: params.name || '' },
+      defaultText: t('chat.notice.groupCreated'),
+    })
     return result
   }
 

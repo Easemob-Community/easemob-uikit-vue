@@ -1,9 +1,58 @@
 import type { UserInfo } from 'easemob-websdk'
 import { MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
-import type { ConversationTypeValue } from '../../constants'
+import type { ConversationTypeValue, NoticeEventTypeValue } from '../../constants'
 import { t } from '../../locale'
 import type { UiMessage, UiNoticeMessage } from '../types'
 import type { RootStores } from './types'
+
+/** 通知插入上下文：调用点提供事件类型/参数/默认文案，conversationId/conversationType 由管线自动补全 */
+export interface NoticeInsertContext {
+  /** 通知事件类型 */
+  eventType: NoticeEventTypeValue
+  /** 结构化参数（成员名/群名/数量等），供自定义文案与条件过滤使用 */
+  params: Record<string, string | number | boolean>
+  /** 内置文案（已按当前语言解析），renderText 返回空值时回落 */
+  defaultText: string
+}
+
+/** 通知事件完整上下文：插入上下文 + 会话信息，供 renderText / filter 消费 */
+export interface NoticeContext extends NoticeInsertContext {
+  /** 目标会话 ID */
+  conversationId: string
+  /** 目标会话类型 */
+  conversationType: ConversationTypeValue
+}
+
+/**
+ * 系统通知自定义配置。
+ * 通过 <UIKitProvider :notice-config="..." /> 传入；默认全开，所有通知按内置文案展示。
+ */
+export interface NoticeConfig {
+  /** 自定义文案：返回非空字符串覆盖内置文案；返回 null/undefined/'' 回落 defaultText */
+  renderText?: (context: NoticeContext) => string | null | undefined
+  /** 是否展示：返回 false 时该通知不上屏（不插入消息） */
+  filter?: (context: NoticeContext) => boolean
+  /** 直接禁用的通知事件类型 */
+  disabledEvents?: NoticeEventTypeValue[]
+}
+
+/** 模块级配置解析器：由 useUIKitProvider 注册（对齐 locale 的模块级 currentLocale 模式） */
+let noticeConfigResolver: () => NoticeConfig = () => ({})
+
+/** 注册通知配置解析器（内部使用，Provider 装配时调用） */
+export function setNoticeConfigResolver(resolver: () => NoticeConfig) {
+  noticeConfigResolver = resolver
+}
+
+/** 获取当前通知配置（无配置时回落空实现） */
+export function getNoticeConfig(): NoticeConfig {
+  return noticeConfigResolver()
+}
+
+/** 获取当前注册的解析器本身（内部使用：Provider 卸载时用于判断解析器是否仍属于自己） */
+export function getNoticeConfigResolver(): () => NoticeConfig {
+  return noticeConfigResolver
+}
 
 /** 从 SDK UserInfo 中提取展示名：昵称优先，其次用户 ID */
 export function resolveNoticeUserName(user?: UserInfo | null): string {
@@ -24,6 +73,8 @@ export function createNoticeMessage(
   conversationId: string,
   conversationType: ConversationTypeValue,
   currentUserId: string,
+  eventType?: NoticeEventTypeValue,
+  params?: Record<string, string | number | boolean>,
 ): UiNoticeMessage {
   const id = generateNoticeId()
   return {
@@ -35,7 +86,7 @@ export function createNoticeMessage(
     conversationId,
     conversationType,
     type: MESSAGE_TYPE.NOTICE,
-    body: { content },
+    body: { content, ...(eventType ? { eventType } : {}), ...(params ? { params } : {}) },
     timestamp: Date.now(),
     status: MESSAGE_STATUS.SENT,
     isSelf: false,
@@ -62,21 +113,53 @@ export function buildAnnouncementNoticeText(announcement: string): string {
 
 /**
  * 向指定会话插入一条本地通知消息。
- * content 为空时不插入。
+ * content 可为纯文本（向后兼容）或结构化 NoticeContext：
+ * 结构化上下文会统一流经 noticeConfig 管线（disabledEvents → filter → renderText），
+ * 最终文案为空时不插入。
  */
 export function insertChatNotice(
   stores: RootStores,
   conversationId: string,
   conversationType: ConversationTypeValue,
-  content: string,
+  content: string | NoticeInsertContext,
 ) {
-  if (!content)
+  // 纯文本：无事件类型的通知（不参与管线过滤，向后兼容）
+  if (typeof content === 'string') {
+    if (!content)
+      return
+    const notice = createNoticeMessage(
+      content,
+      conversationId,
+      conversationType,
+      stores.client.currentUser || '',
+    )
+    stores.message.addMessage(notice)
     return
+  }
+
+  // 补全完整上下文（会话信息由管线补充）
+  const context: NoticeContext = { ...content, conversationId, conversationType }
+
+  // 结构化管线：禁用事件 / 条件过滤 / 自定义文案
+  const config = getNoticeConfig()
+  if (config.disabledEvents?.includes(context.eventType))
+    return
+  if (config.filter && !config.filter(context))
+    return
+  const customText = config.renderText?.(context)
+  const finalText = typeof customText === 'string' && customText !== ''
+    ? customText
+    : context.defaultText
+  if (!finalText)
+    return
+
   const notice = createNoticeMessage(
-    content,
+    finalText,
     conversationId,
     conversationType,
     stores.client.currentUser || '',
+    context.eventType,
+    context.params,
   )
   stores.message.addMessage(notice)
 }

@@ -405,7 +405,22 @@ onBeforeUnmount(() => {
   >
     <!-- 通知类型消息：居中灰色提示，不显示头像/昵称/气泡 -->
     <template v-if="isNotice">
-      <div class="message-bubble-wrapper__notice">
+      <!-- 有 #message-notice 插槽：委托 MessageRenderer 让业务完全接管渲染 -->
+      <MessageRenderer
+        v-if="$slots['message-notice']"
+        :message="message"
+      >
+        <!-- 透传所有类型级插槽 -->
+        <template
+          v-for="(_, name) in $slots"
+          :key="name"
+          #[name]="slotProps"
+        >
+          <slot :name="name" v-bind="slotProps" />
+        </template>
+      </MessageRenderer>
+      <!-- 无插槽：保持既有默认渲染，样式零漂移 -->
+      <div v-else class="message-bubble-wrapper__notice">
         {{ (message.body as any).content || (message as any).content || '' }}
       </div>
     </template>

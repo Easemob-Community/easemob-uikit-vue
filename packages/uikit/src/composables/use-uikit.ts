@@ -20,8 +20,10 @@ import { useClientStore } from '../store/client'
 import { useThemeStore } from '../store/theme'
 import { useUserInfoStore } from '../store/user-info'
 import type { RootStores } from '../sdk/event/types'
-import type { UIKitDataSource, UIKitFeatures } from './types'
+import { getNoticeConfigResolver, setNoticeConfigResolver } from '../sdk/event/notice-utils'
+import type { NoticeConfig } from '../sdk/event/notice-utils'
 import { resolveUserDisplayName } from '../utils/resolve-last-message-text'
+import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
@@ -50,6 +52,8 @@ export interface UIKitContext {
   stores: RootStores
   features: UIKitFeatures
   dataSource: UIKitDataSource
+  /** 系统通知自定义配置（惰性读取，支持运行时变更） */
+  noticeConfig: NoticeConfig
   /** H5 适配状态（viewport / 安全区 / 键盘高度 / 下拉刷新开关） */
   h5: ReturnType<typeof useH5Adaptation>
   /** 主题 store（provider 与消费方共享同一实例） */
@@ -96,6 +100,11 @@ export function useUIKitProvider(
     features?: Partial<UIKitFeatures> | ComputedRef<Partial<UIKitFeatures>>
     /** 支持传入 computed：ctx.dataSource 以惰性代理形式在每次读取时解析最新值 */
     dataSource?: Partial<UIKitDataSource> | ComputedRef<Partial<UIKitDataSource> | undefined>
+    /**
+     * 系统通知自定义配置：renderText 自定义文案 / filter 条件隐藏 / disabledEvents 禁用事件。
+     * 支持传入 computed，运行时切换即可生效。
+     */
+    noticeConfig?: NoticeConfig | ComputedRef<NoticeConfig>
     h5?: H5AdaptationConfig
     /**
      * 用户资料订阅无权限/服务未开通时的回调；UIKit 默认将其绑定到内置 Toast。
@@ -143,6 +152,19 @@ export function useUIKitProvider(
     ownKeys: () => Reflect.ownKeys(resolveDataSource()),
     getOwnPropertyDescriptor: (_target, prop) => Object.getOwnPropertyDescriptor(resolveDataSource(), prop),
   })
+
+  const resolveNoticeConfig = (): NoticeConfig => {
+    const cfg = isRef(options.noticeConfig) ? options.noticeConfig.value : options.noticeConfig
+    return (cfg || {}) as NoticeConfig
+  }
+  const noticeConfig = new Proxy({} as NoticeConfig, {
+    get: (_target, prop) => resolveNoticeConfig()[prop as keyof NoticeConfig],
+    has: (_target, prop) => prop in resolveNoticeConfig(),
+    ownKeys: () => Reflect.ownKeys(resolveNoticeConfig()),
+    getOwnPropertyDescriptor: (_target, prop) => Object.getOwnPropertyDescriptor(resolveNoticeConfig(), prop),
+  })
+  // 注册到通知管线（模块级解析器，与 locale 的 currentLocale 同款模式；卸载时重置）
+  setNoticeConfigResolver(resolveNoticeConfig)
 
   // 真实 SDK 客户端懒加载：auto-init=false 时在 init() 调用后才创建
   let uikitClient: UIKitClient | null = null
@@ -268,6 +290,7 @@ export function useUIKitProvider(
     stores,
     features,
     dataSource,
+    noticeConfig,
     h5,
     theme: useThemeStore(),
     init,
@@ -288,6 +311,10 @@ export function useUIKitProvider(
     disposeEvents = null
     disposeUserInfoDomain?.()
     disposeUserInfoDomain = null
+    // 卸载时重置通知配置解析器，避免残留已卸载 Provider 的配置；
+    // 仅当当前解析器仍属于本实例时才重置，避免误清空后挂载 Provider 的配置（多 Provider 并存场景）
+    if (getNoticeConfigResolver() === resolveNoticeConfig)
+      setNoticeConfigResolver(() => ({}))
   })
 
   return ctx

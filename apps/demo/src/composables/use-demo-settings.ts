@@ -14,6 +14,7 @@ import { computed, ref } from 'vue'
 import { pinyin } from 'pinyin-pro'
 import {
   DEFAULT_CONVERSATION_TABS,
+  NOTICE_EVENT_TYPE,
   createUIKitStorageKey,
   setKeyboardShortcutsEnabled,
   setPinyinAdapter,
@@ -21,7 +22,7 @@ import {
   useConversation,
   useUIKit,
 } from '@easemob/uikit'
-import type { ConversationTabKey, EmojiStickerPack, UiContact, UiConversation } from '@easemob/uikit'
+import type { ConversationTabKey, EmojiStickerPack, NoticeConfig, UiContact, UiConversation } from '@easemob/uikit'
 
 /** Dev Hints 开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
 const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'
@@ -75,6 +76,47 @@ export function setDemoSdkLogLevel(level: DemoSdkLogLevel) {
   demoSdkLogLevel.value = level
   localStorage.setItem(SDK_LOG_LEVEL_STORAGE_KEY, level)
 }
+
+/** 系统通知话术档位（模块级单例）。Provider 在 app.vue 外层（无 useUIKit 上下文）也需要读取，故不放进 createDemoSettings。 */
+export const noticeTone = ref<'default' | 'playful' | 'silent'>('default')
+
+/**
+ * 系统通知自定义配置（Provider noticeConfig 示例，模块级随 noticeTone 推导）：
+ * - playful：俏皮话术覆盖成员加入/退出/群创建文案，并隐藏批量加入（>5 人）刷屏
+ * - silent：直接禁用成员加入/退出/群创建通知（演示 disabledEvents）
+ * - default：空配置回落内置多语言文案
+ */
+export const noticeConfig = computed<NoticeConfig>(() => {
+  if (noticeTone.value === 'playful') {
+    return {
+      renderText: (ctx) => {
+        if (ctx.eventType === NOTICE_EVENT_TYPE.MEMBER_JOINED)
+          return `欢迎 ${ctx.params.name} 闪亮登场~`
+        if (ctx.eventType === NOTICE_EVENT_TYPE.MEMBER_EXITED)
+          return `${ctx.params.name} 溜了溜了`
+        if (ctx.eventType === NOTICE_EVENT_TYPE.GROUP_CREATED)
+          return '新群开张，喜气洋洋！'
+        return null
+      },
+      filter: (ctx) => {
+        // 批量加入（>5 人）避免刷屏，直接隐藏
+        if (ctx.eventType === NOTICE_EVENT_TYPE.MEMBER_JOINED && (ctx.params.count as number) > 5)
+          return false
+        return true
+      },
+    }
+  }
+  if (noticeTone.value === 'silent') {
+    return {
+      disabledEvents: [
+        NOTICE_EVENT_TYPE.MEMBER_JOINED,
+        NOTICE_EVENT_TYPE.MEMBER_EXITED,
+        NOTICE_EVENT_TYPE.GROUP_CREATED,
+      ],
+    }
+  }
+  return {}
+})
 
 /** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，保证首屏宽度舒适 */
 const SIDEBAR_DEFAULT_WIDTH = 400

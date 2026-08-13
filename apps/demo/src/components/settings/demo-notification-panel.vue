@@ -10,7 +10,7 @@
  */
 import { computed } from 'vue'
 import { useNotification } from '@easemob/uikit'
-import { useDemoSettings } from '../../composables/use-demo-settings'
+import { noticeTone, useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
@@ -91,6 +91,39 @@ async function requestPermission() {
       <p class="demo-info">
         触发条件：非自己发送 + 非当前会话 + 会话未免打扰（isMuted）
         {{ notificationTriggerMode === 'background' ? '+ 页面处于后台' : '' }}
+      </p>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="系统通知文案"
+        tip="群系统通知（成员加入/退出、群创建等）的话术定制：内置多语言文案 / 俏皮话术（renderText 覆盖）/ 关闭入群相关通知（disabledEvents）"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': noticeTone === 'default' }"
+          @click="noticeTone = 'default'"
+        >
+          内置
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': noticeTone === 'playful' }"
+          @click="noticeTone = 'playful'"
+        >
+          俏皮话术
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': noticeTone === 'silent' }"
+          @click="noticeTone = 'silent'"
+        >
+          关闭入群通知
+        </button>
+      </div>
+      <p class="demo-info">
+        俏皮模式同时演示 filter：批量加入超过 5 人时不展示成员加入通知
       </p>
     </div>
 

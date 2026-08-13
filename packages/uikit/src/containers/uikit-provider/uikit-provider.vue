@@ -19,6 +19,7 @@ import type { NotificationItem } from '../../components/notification/types'
 import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
+import type { NoticeConfig } from '../../sdk/event/notice-utils'
 import { createLogger } from '../../utils/logger'
 import { configureLogPersistence } from '../../utils/log-store'
 
@@ -96,6 +97,14 @@ export interface ProviderProps {
   enableTyping?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
+  /**
+   * 系统通知自定义配置：renderText 自定义文案（俏皮/严肃话术等）、
+   * filter 条件隐藏、disabledEvents 直接禁用某类事件。默认全开，按内置多语言文案展示。
+   * 支持响应式对象，运行时变更即刻生效。
+   * System notice customization: renderText to rewrite the copy, filter to hide
+   * conditionally, disabledEvents to disable certain event types.
+   */
+  noticeConfig?: NoticeConfig
   /**
    * 是否启用内置 Toast 提示（默认 true）。
    * 关闭后仍可通过 `useToast()` 获取状态并自行渲染提示组件。
@@ -209,6 +218,8 @@ const features = computed<Partial<UIKitFeatures>>(() => ({
 
 const dataSource = computed(() => props.dataSource ?? {})
 
+const noticeConfig = computed(() => props.noticeConfig ?? {})
+
 /**
  * 初始化 UIKit 上下文：创建 SDK Client、Domain、注册事件。
  * 当 appKey 为空时仍创建上下文，但 client 实例可能无法完成登录。
@@ -217,6 +228,7 @@ const ctx = useUIKitProvider(config.value, {
   autoInit: props.autoInit,
   features,
   dataSource,
+  noticeConfig,
   h5: props.h5,
   onUserInfoSubscriptionPermissionError: props.enableToast
     ? () => showToastWarning(t('userInfo.subscriptionDisabled'))

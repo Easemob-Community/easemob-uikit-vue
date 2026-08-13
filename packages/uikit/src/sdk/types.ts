@@ -5,7 +5,7 @@ import type {
   Message as SdkMessage,
   UserInfo as SdkUserInfo,
 } from 'easemob-websdk'
-import type { ConversationTypeValue, GroupMemberRoleValue } from '../constants'
+import type { ConversationTypeValue, GroupMemberRoleValue, NoticeEventTypeValue } from '../constants'
 import type { MessageStatus } from './types/message'
 
 export type { GroupMemberEntry, GroupMuteEntry } from 'easemob-websdk'
@@ -67,6 +67,10 @@ export interface UiMessageExtension {
 export interface NoticeMessageBody {
   /** 通知文案 */
   content: string
+  /** 通知事件类型（结构化管线引入；旧消息无此字段，向后兼容） */
+  eventType?: NoticeEventTypeValue
+  /** 事件参数（成员名/群名/数量等），供自定义文案与过滤使用 */
+  params?: Record<string, string | number | boolean>
 }
 
 /**

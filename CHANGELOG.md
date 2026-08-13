@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.0 (2026-08-13)
+
+### 新增
+
+- **系统通知文案自定义与开关能力（noticeConfig）**：
+  - 新增 `NOTICE_EVENT_TYPE` 事件枚举（19 类通知事件）与 `NoticeContext` / `NoticeConfig` 公开类型，所有群系统通知（群创建/成员进出/群主变更/禁言/公告等）统一流经结构化事件管线
+  - `EmUIKitProvider` 新增 `notice-config` prop：`renderText` 自定义文案（回调接收事件类型 + 结构化参数 + 已本地化内置文案）、`filter` 条件过滤（返回 false 不上屏）、`disabledEvents` 直接禁用事件
+  - 通知消息 `body` 携带 `eventType` / `params` 结构化元数据（字段可选，旧消息完全兼容）
+  - `EmMessageRenderer` 新增 `#message-notice` 插槽，业务可完全接管通知渲染
+  - 新增文档页「系统通知文案定制」；demo 设置面板新增「系统通知文案」验收开关（内置/俏皮话术/关闭入群通知）
+- **demo 恢复源码直连模式**：vite alias 直连 packages/uikit 源码，依赖声明改回 workspace 模式
+
 ## 1.6.0 (2026-08-13)
 
 ### 重大变更

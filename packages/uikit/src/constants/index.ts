@@ -24,6 +24,32 @@ export const MESSAGE_TYPE = {
 export type MessageTypeValue =
   (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE]
 
+/** 本地系统通知事件类型常量（供 noticeConfig 自定义文案 / 过滤 / 禁用使用） */
+export const NOTICE_EVENT_TYPE = {
+  CONTACT_ADDED: 'contactAdded',
+  CONTACT_DELETED: 'contactDeleted',
+  GROUP_CREATED: 'groupCreated',
+  GROUP_NAME_CHANGED: 'groupNameChanged',
+  OWNER_CHANGED: 'ownerChanged',
+  ADMIN_ADDED: 'adminAdded',
+  ADMIN_REMOVED: 'adminRemoved',
+  MEMBER_JOINED: 'memberJoined',
+  MEMBER_EXITED: 'memberExited',
+  USER_REMOVED: 'userRemoved',
+  GROUP_DESTROYED: 'groupDestroyed',
+  ANNOUNCEMENT_CHANGED: 'announcementChanged',
+  MUTE_ADDED: 'muteAdded',
+  MUTE_REMOVED: 'muteRemoved',
+  ALL_MEMBER_MUTE_CHANGED: 'allMemberMuteChanged',
+  ALLOWLIST_ADDED: 'allowlistAdded',
+  ALLOWLIST_REMOVED: 'allowlistRemoved',
+  GROUP_DISABLED_CHANGED: 'groupDisabledChanged',
+  SHARED_FILE_ADDED: 'sharedFileAdded',
+} as const
+
+export type NoticeEventTypeValue =
+  (typeof NOTICE_EVENT_TYPE)[keyof typeof NOTICE_EVENT_TYPE]
+
 /** 消息发送状态常量 */
 export const MESSAGE_STATUS = {
   SENDING: 'sending',

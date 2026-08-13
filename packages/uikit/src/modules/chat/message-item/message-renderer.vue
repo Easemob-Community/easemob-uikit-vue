@@ -62,8 +62,8 @@ const isCmd = computed(() => (props.message.type as string) === MESSAGE_TYPE.CMD
 
 <template>
   <div v-if="!isCmd" class="message-renderer">
-    <!-- 通知类型消息：居中灰色小字 -->
-    <div v-if="isNotice" class="message-renderer__notice">
+    <!-- 通知类型消息：居中灰色小字（可通过 #message-notice 插槽完全接管渲染） -->
+    <div v-if="isNotice && !$slots[slotName]" class="message-renderer__notice">
       {{ (message.body as any).content || (message as any).content || '' }}
     </div>
 

@@ -7,7 +7,7 @@ import Popup from '../../components/popup/popup.vue'
 import Cell from '../../components/cell/cell.vue'
 
 import { useLocale } from '../../locale'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../constants'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { insertChatNotice } from '../../sdk/event/notice-utils'
@@ -83,13 +83,21 @@ async function toggleMuteAll() {
       await unmuteAllGroupMembers(props.groupId)
       emit('group-operation', { type: 'unmute-all', groupId: props.groupId })
       // 操作者本人收不到 SDK 全员禁言事件回推，本地插入系统通知（与成员禁言一致）
-      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, t('group.mutelist.unmuteAllNotice', '全员禁言已解除'))
+      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+        eventType: NOTICE_EVENT_TYPE.ALL_MEMBER_MUTE_CHANGED,
+        params: { muted: false },
+        defaultText: t('group.mutelist.unmuteAllNotice', '全员禁言已解除'),
+      })
     }
     else {
       await muteAllGroupMembers(props.groupId)
       emit('group-operation', { type: 'mute-all', groupId: props.groupId })
       // 操作者本人收不到 SDK 全员禁言事件回推，本地插入系统通知（与成员禁言一致）
-      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, t('group.mutelist.muteAllNotice', '全员禁言已开启'))
+      insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+        eventType: NOTICE_EVENT_TYPE.ALL_MEMBER_MUTE_CHANGED,
+        params: { muted: true },
+        defaultText: t('group.mutelist.muteAllNotice', '全员禁言已开启'),
+      })
     }
   }
   catch (err) {

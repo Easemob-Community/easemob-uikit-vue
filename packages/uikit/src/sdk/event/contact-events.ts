@@ -1,5 +1,5 @@
 import type { ContactEventHandlerMap, ContactRosterEventPayload } from 'easemob-websdk'
-import { CONVERSATION_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '../../constants'
 import { t } from '../../locale'
 import { createLogger } from '../../utils/logger'
 import type { UiContactInvite } from '../types'
@@ -60,7 +60,11 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
         stores.contact.removeContact(userId)
         stores.contact.removeInvite(userId)
         // 在单聊会话中插入好友关系删除通知
-        insertChatNotice(stores, userId, CONVERSATION_TYPE.SINGLECHAT, t('chat.notice.contactDeleted'))
+        insertChatNotice(stores, userId, CONVERSATION_TYPE.SINGLECHAT, {
+          eventType: NOTICE_EVENT_TYPE.CONTACT_DELETED,
+          params: {},
+          defaultText: t('chat.notice.contactDeleted'),
+        })
       }
     },
     onContactAdded: (payload) => {
@@ -71,7 +75,11 @@ export function createContactHandlers(stores: RootStores): ContactEventHandlerMa
       stores.contact.addContact({ userId, name: userId })
       stores.contact.removeInvite(userId)
       // 在单聊会话中插入好友关系建立通知
-      insertChatNotice(stores, userId, CONVERSATION_TYPE.SINGLECHAT, t('chat.notice.contactAdded'))
+      insertChatNotice(stores, userId, CONVERSATION_TYPE.SINGLECHAT, {
+        eventType: NOTICE_EVENT_TYPE.CONTACT_ADDED,
+        params: {},
+        defaultText: t('chat.notice.contactAdded'),
+      })
     },
     onContactInfoUpdated: (msg) => {
       contactLog.info('onContactInfoUpdated', { userId: msg.contact?.userId })

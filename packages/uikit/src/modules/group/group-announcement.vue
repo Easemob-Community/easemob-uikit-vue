@@ -6,7 +6,7 @@ import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useToast } from '../../composables/use-toast'
 import { useUIKit } from '../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../constants'
 import { useGroup } from '../../composables/use-group'
 import { buildAnnouncementNoticeText, insertChatNotice } from '../../sdk/event/notice-utils'
 
@@ -109,7 +109,11 @@ async function save() {
     emit('updated', announcementInput.value)
     // 发布方本地插入灰色通知：SDK 的 onAnnouncementChanged 事件不回推操作者本人，
     // 需自行插入，与接收方文案保持一致（带最新公告内容）
-    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, buildAnnouncementNoticeText(announcementInput.value))
+    insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.ANNOUNCEMENT_CHANGED,
+      params: { announcement: announcementInput.value },
+      defaultText: buildAnnouncementNoticeText(announcementInput.value),
+    })
     showToast(t('chat.info.groupInfoUpdated', '更新成功'), 'success')
   }
   catch (err) {

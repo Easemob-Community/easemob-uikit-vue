@@ -14,7 +14,7 @@ import { useToast } from '../../../composables/use-toast'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../../constants'
 import type { ConversationTypeValue } from '../../../constants'
 import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk/types'
@@ -256,7 +256,11 @@ async function saveGroupName() {
     // 发布方本地插入灰色通知：SDK 的 onGroupInfoChanged 事件不回推操作者本人，
     // 仅名称实际变更时插入，与接收方文案保持一致
     if (prevGroupName && prevGroupName !== groupNameInput.value) {
-      insertChatNotice(stores, id, CONVERSATION_TYPE.GROUPCHAT, t('chat.notice.groupNameChanged').replace('{name}', groupNameInput.value))
+      insertChatNotice(stores, id, CONVERSATION_TYPE.GROUPCHAT, {
+        eventType: NOTICE_EVENT_TYPE.GROUP_NAME_CHANGED,
+        params: { name: groupNameInput.value },
+        defaultText: t('chat.notice.groupNameChanged').replace('{name}', groupNameInput.value),
+      })
     }
     // 同步会话名称：会话列表/聊天头部/详情抽屉均展示 conversation.name，
     // 否则需刷新（重新同步会话）才能看到新群名
@@ -363,6 +367,8 @@ const confirmModal = ref<{
   action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | null
   /** transferOwner 专用：新群主用户 ID */
   targetUserId?: string
+  /** transferOwner 专用：新群主展示名（发布方本地通知用） */
+  targetUserName?: string
   /** clear 专用：是否同时删除会话 */
   deleteConversation?: boolean
 }>({
@@ -489,10 +495,11 @@ function onTransferOwner(member: UiGroupMember) {
       .replace('{name}', member.nickname || member.userId),
     action: 'transferOwner',
     targetUserId: member.userId,
+    targetUserName: member.nickname || member.userId,
   }
 }
 
-async function doTransferOwner(userId: string) {
+async function doTransferOwner(userId: string, userName?: string) {
   const id = groupId.value
   if (!id)
     return
@@ -502,6 +509,13 @@ async function doTransferOwner(userId: string) {
     stores.group.updateGroupMemberRole(id, userId, GROUP_MEMBER_ROLE.OWNER)
     if (currentUserId.value)
       stores.group.updateGroupMemberRole(id, currentUserId.value, GROUP_MEMBER_ROLE.MEMBER)
+    // 发布方本地插入灰色通知：SDK 的 onOwnerChanged 事件不回推操作者本人，与接收方文案保持一致
+    const name = userName || userId
+    insertChatNotice(stores, id, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.OWNER_CHANGED,
+      params: { name, ownerId: userId },
+      defaultText: t('chat.notice.ownerChanged').replace('{name}', name),
+    })
     showToast(t('chat.info.transferOwnerSuccess', '群主已转让'), 'success')
   }
   catch (err) {
@@ -531,11 +545,12 @@ function onModalConfirm() {
   else if (action === 'transferOwner') {
     const targetUserId = confirmModal.value.targetUserId
     if (targetUserId)
-      void doTransferOwner(targetUserId)
+      void doTransferOwner(targetUserId, confirmModal.value.targetUserName)
   }
   confirmModal.value.show = false
   confirmModal.value.action = null
   confirmModal.value.targetUserId = undefined
+  confirmModal.value.targetUserName = undefined
 }
 
 function onLeaveOrDelete() {

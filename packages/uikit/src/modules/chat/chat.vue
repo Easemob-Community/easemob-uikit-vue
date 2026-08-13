@@ -11,8 +11,9 @@ import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
 import { resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
-import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE, NOTICE_EVENT_TYPE } from '../../constants'
 import type { ConversationTypeValue, ForwardModeValue } from '../../constants'
+import { insertChatNotice } from '../../sdk/event/notice-utils'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
@@ -907,8 +908,15 @@ async function onSetAdmin(member: UiGroupMember) {
     return
   try {
     await addGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.setAdminSuccess', '已设为管理员'), 'success')
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.ADMIN)
+    // 发布方本地插入灰色通知：SDK 的 onAdminAdded 事件不回推操作者本人，与接收方文案保持一致
+    const name = member.nickname || member.userId
+    insertChatNotice(stores, groupId, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.ADMIN_ADDED,
+      params: { name, userId: member.userId },
+      defaultText: t('chat.notice.adminAdded').replace('{name}', name),
+    })
+    showToast(t('chat.info.setAdminSuccess', '已设为管理员'), 'success')
   }
   catch (err) {
     logger.warn('[Chat] set admin failed:', formatSdkError(err))
@@ -923,8 +931,15 @@ async function onRemoveAdmin(member: UiGroupMember) {
     return
   try {
     await removeGroupAdmin(groupId, member.userId)
-    showToast(t('chat.info.removeAdminSuccess', '已取消管理员'), 'success')
     chatInfoDrawerRef.value?.setMemberRole(member.userId, GROUP_MEMBER_ROLE.MEMBER)
+    // 发布方本地插入灰色通知：SDK 的 onAdminRemoved 事件不回推操作者本人，与接收方文案保持一致
+    const name = member.nickname || member.userId
+    insertChatNotice(stores, groupId, CONVERSATION_TYPE.GROUPCHAT, {
+      eventType: NOTICE_EVENT_TYPE.ADMIN_REMOVED,
+      params: { name, userId: member.userId },
+      defaultText: t('chat.notice.adminRemoved').replace('{name}', name),
+    })
+    showToast(t('chat.info.removeAdminSuccess', '已取消管理员'), 'success')
   }
   catch (err) {
     logger.warn('[Chat] remove admin failed:', formatSdkError(err))

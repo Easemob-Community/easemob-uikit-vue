@@ -2,10 +2,12 @@
 import { computed, ref, watch } from 'vue'
 import Popup from '../../../components/popup/popup.vue'
 import { useLocale } from '../../../locale'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../../constants'
+import type { NoticeEventTypeValue } from '../../../constants'
 import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import { useUIKit } from '../../../composables/use-uikit'
+import { insertChatNotice } from '../../../sdk/event/notice-utils'
 import { createLogger } from '../../../utils/logger'
 import type { UiGroupMember } from '../../../sdk/types'
 import Empty from '../../../components/empty/empty.vue'
@@ -78,32 +80,27 @@ async function onUnmute(item: any) {
       return (u?.userId || '') !== uid
     })
     emit('unmute', { userId: uid })
-    addNoticeToChat((t('group.mutelist.unmuteNotice', '{name} 被解除禁言')).replace('{name}', name))
+    addNoticeToChat(NOTICE_EVENT_TYPE.MUTE_REMOVED, name, t('group.mutelist.unmuteNotice', '{name} 被解除禁言').replace('{name}', name))
   }
   catch (err) {
     logger.warn('unmute failed:', err)
   }
 }
 
-// 通知消息：插入聊天中的灰色系统通知
-function addNoticeToChat(content: string) {
+// 通知消息：插入聊天中的灰色系统通知（统一走 insertChatNotice 管线，支持 noticeConfig 定制）
+function addNoticeToChat(
+  eventType: NoticeEventTypeValue,
+  names: string,
+  defaultText: string,
+) {
   if (!props.groupId)
     return
-  const id = `notice-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-  stores.message.addMessage({
-    msgLocalId: id,
-    msgServerId: '',
-    type: MESSAGE_TYPE.NOTICE as any,
-    body: { content } as any,
-    from: stores.client.currentUser ?? '',
-    to: props.groupId,
-    conversationId: props.groupId,
-    conversationType: CONVERSATION_TYPE.GROUPCHAT,
-    timestamp: Date.now(),
-    status: MESSAGE_STATUS.SENT,
-    isSelf: true,
-    localId: id,
-  } as any)
+  insertChatNotice(stores, props.groupId, CONVERSATION_TYPE.GROUPCHAT, {
+    eventType,
+    // params 契约与接收方（group-events.ts）对齐：names 顿号拼接 + count
+    params: { names, count: 1 },
+    defaultText,
+  })
 }
 
 function openAddMember() {
@@ -167,7 +164,7 @@ async function onConfirmAdd() {
       return member?.nickname || uid
     }).join('、')
     logger.info('adding notice to chat', { names })
-    addNoticeToChat((t('group.mutelist.muteNotice', '{name} 被禁言')).replace('{name}', names))
+    addNoticeToChat(NOTICE_EVENT_TYPE.MUTE_ADDED, names, t('group.mutelist.muteNotice', '{name} 被禁言').replace('{name}', names))
     logger.info('onConfirmAdd completed successfully')
   }
   catch (err) {

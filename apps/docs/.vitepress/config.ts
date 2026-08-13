@@ -38,6 +38,7 @@ export default defineConfig({
             { text: '主题定制', link: '/guide/theme' },
             { text: '图标', link: '/guide/icons' },
             { text: 'H5 适配', link: '/guide/h5-adaptation' },
+            { text: '系统通知文案定制', link: '/guide/notice-customization' },
             { text: '进阶指南', link: '/guide/advanced' },
             { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
             { text: '更新日志', link: '/guide/changelog' },
