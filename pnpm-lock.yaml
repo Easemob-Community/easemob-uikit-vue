@@ -380,7 +380,7 @@ packages:
     resolution: {integrity: sha512-eFaQTcfxKHB+YyTh83x7GEv+gDPuj9q5NFOTaoj5rZmQTbj6OgjjMxUicmS1R8zYcx8YAq5oA9J3YFa5U6x2gA==}
 
   '@easemob/uikit@file:easemob-uikit-1.6.0.tgz':
-    resolution: {integrity: sha512-3WYnl5yjOUjboeuZNNmyrI1qQHmI5qIUmi5KoGCq/L+6ollHzUUhte1WxUURhxH4druDAZDvrEDnzx2qjHfuqA==, tarball: file:easemob-uikit-1.6.0.tgz}
+    resolution: {integrity: sha512-y44dl4e3soHIkkUDxD3gBxjrclivwCUBOEXxpdOMUqi1XZoaapIhJNkRPt9SwZm00zK0j93S2Uqumj00FHTsjg==, tarball: file:easemob-uikit-1.6.0.tgz}
     version: 1.6.0
     peerDependencies:
       pinia: ^2.1.0

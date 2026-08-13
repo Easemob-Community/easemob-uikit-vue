@@ -16,6 +16,8 @@ export interface GroupCardInfoRow {
   value: string
   /** 是否展示复制图标并支持一键复制 value */
   copyable?: boolean
+  /** 最大展示行数，超出显示省略号 */
+  maxLines?: number
 }
 
 export interface GroupCardProps {
@@ -107,7 +109,12 @@ function onActionClick(key: string) {
             class="group-card__value"
             :text="row.value"
           />
-          <span v-else class="group-card__value">{{ row.value }}</span>
+          <span
+            v-else
+            class="group-card__value"
+            :class="{ 'group-card__value--ellipsis': row.maxLines }"
+            :style="row.maxLines ? { '-webkit-line-clamp': row.maxLines } : undefined"
+          >{{ row.value }}</span>
         </div>
       </div>
 
@@ -246,5 +253,11 @@ function onActionClick(key: string) {
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   word-break: break-all;
+}
+
+.group-card__value--ellipsis {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

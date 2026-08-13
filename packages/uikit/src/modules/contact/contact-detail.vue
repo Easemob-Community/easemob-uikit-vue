@@ -138,7 +138,7 @@ const cardInfoRows = computed(() => {
     rows.push({ key: 'signature', label: t('contact.detail.signature', '个性签名'), value: signature.value })
   if (detailUserInfo.value?.nickname)
     rows.push({ key: 'nickname', label: t('contact.detail.nickname', '昵称'), value: detailUserInfo.value.nickname })
-  rows.push({ key: 'userId', label: t('contact.detail.userId', '用户 ID'), value: props.userId })
+  // 用户 ID 已在 UserCard 顶部固定展示并支持复制，infoRows 中不再重复
   return rows
 })
 

@@ -85,8 +85,7 @@ const cardInfoRows = computed<GroupCardInfoRow[]>(() => {
   if (g?.memberCount !== undefined)
     rows.push({ key: 'memberCount', label: t('groupCard.memberCount', '成员数'), value: String(g.memberCount) })
 
-  rows.push({ key: 'groupId', label: t('groupCard.groupId', '群 ID'), value: props.groupId, copyable: true })
-
+  // 群 ID 已在 GroupCard 顶部固定展示并支持复制，infoRows 中不再重复
   return rows
 })
 

@@ -365,11 +365,14 @@ function handleSelect(id: string) {
 
 /** 键盘导航是否激活：鼠标进入列表区域或点击列表时启用，Esc / 鼠标离开时停用 */
 const keyboardNavActive = ref(false)
+/** 键盘高亮是否可见：仅在方向键真正移动后才显示，避免鼠标进入列表时当前选中项误出现灰色 hover */
+const keyboardFocusVisible = ref(false)
 function enableKeyboardNav() {
   keyboardNavActive.value = true
 }
 function disableKeyboardNav() {
   keyboardNavActive.value = false
+  keyboardFocusVisible.value = false
 }
 /** Esc 退出键盘导航 */
 useEscToClose(keyboardNavActive, disableKeyboardNav)
@@ -381,6 +384,8 @@ const { activeIndex } = useArrowNavigation({
   // 搜索框聚焦时方向键让位给输入光标
   ignoreWhenTyping: true,
   onActiveChange: (index) => {
+    // 方向键真正移动后，键盘高亮才可见
+    keyboardFocusVisible.value = true
     // 方向键只移动高亮，不切换会话；Enter 才确认
     const item = filteredConversationList.value[index]
     if (item) {
@@ -543,7 +548,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         :conversation="item"
         :class="{
           'is-active': currentConversation?.id === item.id,
-          'is-keyboard-focus': keyboardNavActive && activeIndex === index,
+          'is-keyboard-focus': keyboardFocusVisible && keyboardNavActive && activeIndex === index,
         }"
         :custom-actions="props.customActions"
         :time-formatter="props.timeFormatter"

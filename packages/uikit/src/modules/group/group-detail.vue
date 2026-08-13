@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { formatSdkError } from '../../utils/sdk-error'
 import type { UiGroup } from '../../sdk/types'
-import GroupCard from '../../components/group-card/group-card.vue'
+import GroupCard, { type GroupCardInfoRow } from '../../components/group-card/group-card.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
 import { useLocale } from '../../locale'
 import { useUIKit } from '../../composables/use-uikit'
@@ -147,17 +147,16 @@ const cardActions = computed(() => {
 })
 
 const cardInfoRows = computed(() => {
-  const rows: { key: string, label: string, value: string }[] = []
+  const rows: GroupCardInfoRow[] = []
   const g = displayGroup.value
 
   if (g?.description)
-    rows.push({ key: 'description', label: t('groupCard.description', '群介绍'), value: g.description })
+    rows.push({ key: 'description', label: t('groupCard.description', '群介绍'), value: g.description, maxLines: 2 })
 
   if (g?.memberCount !== undefined)
     rows.push({ key: 'memberCount', label: t('groupCard.memberCount', '成员数'), value: String(g.memberCount) })
 
-  rows.push({ key: 'groupId', label: t('groupCard.groupId', '群 ID'), value: props.groupId })
-
+  // 群 ID 已在 GroupCard 顶部固定展示并支持复制，infoRows 中不再重复
   return rows
 })
 

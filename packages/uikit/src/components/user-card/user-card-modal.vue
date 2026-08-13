@@ -124,7 +124,7 @@ const cardInfoRows = computed<UserCardInfoRow[]>(() => {
   if (info?.nickname)
     rows.push({ key: 'nickname', label: t('contact.detail.nickname', '昵称'), value: info.nickname })
 
-  rows.push({ key: 'userId', label: t('contact.detail.userId', '用户 ID'), value: props.userId, copyable: true })
+  // 用户 ID 已在 UserCard 顶部固定展示并支持复制，infoRows 中不再重复
 
   try {
     const ext = info?.ext ? (JSON.parse(info.ext) as Record<string, string>) : {}

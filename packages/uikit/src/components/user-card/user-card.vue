@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
 import PresenceSelectorPopup from '../presence-selector/presence-selector-popup.vue'
 import CopyableText from '../copyable-text/copyable-text.vue'
-import { useLocale } from '../../locale'
 import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
 
 export interface UserCardAction {
@@ -58,43 +57,8 @@ const emit = defineEmits<{
   (e: 'presence-changed'): void
 }>()
 
-const { t } = useLocale()
-
 const avatarRef = ref<InstanceType<typeof Avatar>>()
 const showSelector = ref(false)
-
-const statusIconMap: Record<PresenceDisplayStatus, string> = {
-  online: 'presence/empty',
-  offline: 'presence/empty',
-  away: 'presence/clock',
-  busy: 'presence/equals',
-  doNotDisturb: 'presence/minus',
-  custom: 'presence/star',
-}
-
-const statusColorMap: Record<PresenceDisplayStatus, string> = {
-  online: 'var(--uikit-presence-online-color, #6CE191)',
-  offline: 'var(--uikit-presence-offline-color, #454545)',
-  away: 'var(--uikit-presence-away-color, #B9BBC5)',
-  busy: 'var(--uikit-presence-busy-color, #ED7587)',
-  doNotDisturb: 'var(--uikit-presence-dnd-color, #EE798C)',
-  custom: 'var(--uikit-presence-custom-color, #F3C850)',
-}
-
-const statusText = computed(() => {
-  const map: Record<PresenceDisplayStatus, string> = {
-    online: t('userCard.online', '在线'),
-    offline: t('userCard.offline', '离线'),
-    away: t('presence.away', '离开'),
-    busy: t('presence.busy', '忙碌'),
-    doNotDisturb: t('presence.doNotDisturb', '勿扰'),
-    custom: t('presence.custom', '自定义'),
-  }
-  return props.status ? map[props.status] : ''
-})
-
-const statusIcon = computed(() => props.status ? statusIconMap[props.status] : '')
-const statusIconColor = computed(() => props.status ? statusColorMap[props.status] : '')
 
 function onActionClick(key: string) {
   emit('action-click', key)
@@ -149,19 +113,6 @@ function onSelectorChanged() {
         <div class="user-card__meta">
           <div class="user-card__name-row">
             <span class="user-card__name">{{ props.name }}</span>
-            <span
-              v-if="props.status"
-              class="user-card__status"
-              :class="`user-card__status--${props.status}`"
-            >
-              <Icon
-                v-if="statusIcon"
-                :name="statusIcon"
-                :size="10"
-                :style="{ color: statusIconColor }"
-              />
-              {{ statusText }}
-            </span>
           </div>
           <div class="user-card__user-id">
             <CopyableText :text="props.userId" />
@@ -280,17 +231,6 @@ function onSelectorChanged() {
   word-break: break-all;
 }
 
-.user-card__status {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-  padding: 2px 8px;
-  border-radius: 9999px;
-  background-color: var(--uikit-bg-secondary);
-}
-
 .user-card__user-id {
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
@@ -300,21 +240,19 @@ function onSelectorChanged() {
 
 .user-card__actions {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .user-card__action {
-  flex: 1 1 80px;
-  max-width: 120px;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 4px;
+  gap: 4px;
+  padding: 10px 4px;
   border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-bg-secondary);
   cursor: pointer;
@@ -345,6 +283,8 @@ function onSelectorChanged() {
 
 .user-card__action-label {
   font-size: var(--uikit-font-size-13);
+  text-align: center;
+  line-height: 1.2;
 }
 
 .user-card__info {
