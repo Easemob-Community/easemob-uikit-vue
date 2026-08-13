@@ -27,6 +27,24 @@ const LEVEL_STYLES: Record<LogLevel, string> = {
 
 let _globalLevel: LogLevel = 'info'
 
+/**
+ * 日志收集 sink：每条日志（无论是否达到 console 输出级别）都会回调，
+ * 供日志持久化模块（utils/log-store.ts）全量落库。
+ */
+export type LogCollector = (entry: {
+  level: LogLevel
+  ns: string
+  message: string
+  args: unknown[]
+}) => void
+
+let _collector: LogCollector | null = null
+
+/** 注册日志收集 sink（内部使用，由 log-store 模块注册）。 */
+export function setLogCollector(collector: LogCollector | null): void {
+  _collector = collector
+}
+
 /** 设置全局最低日志级别，低于该级别的日志不会输出。 */
 export function setLogLevel(level: LogLevel): void {
   _globalLevel = level
@@ -47,6 +65,14 @@ export interface Logger {
 /** 创建一个带命名空间的日志器。 */
 export function createLogger(namespace: string): Logger {
   function logWithLevel(level: LogLevel, message: string, ...args: unknown[]): void {
+    if (_collector) {
+      try {
+        _collector({ level, ns: namespace, message, args })
+      }
+      catch {
+        // sink 异常不影响正常日志输出
+      }
+    }
     if (LOG_LEVELS[level] < LOG_LEVELS[_globalLevel])
       return
     console.log(`%c[${namespace}] ${level.toUpperCase()}: ${message}`, LEVEL_STYLES[level], ...args)

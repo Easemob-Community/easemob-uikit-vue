@@ -1,4 +1,6 @@
 import type { App, Component, Plugin } from 'vue'
+// side-effect：注册 UIKit logger → 日志持久化内核的 sink（见 utils/logger-binding.ts）
+import './utils/logger-binding'
 
 // Components
 export * from './components'
@@ -23,6 +25,21 @@ export * from './constants'
 
 // Utils
 export * from './utils/resolve-last-message-text'
+export {
+  clearPersistedLogs,
+  configureLogPersistence,
+  exportPersistedLogs,
+  formatPersistedLogs,
+  getPersistedLogs,
+} from './utils/log-store'
+export type {
+  LogPersistenceConfig,
+  PersistedLogEntry,
+  PersistedLogFilter,
+  PersistedLogLevel,
+  PersistedLogSource,
+  SdkPersistedLogLevel,
+} from './utils/log-store'
 
 // Locale
 export * from './locale'

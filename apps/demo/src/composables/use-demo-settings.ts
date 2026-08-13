@@ -29,6 +29,53 @@ const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'
 /** 键盘操作总开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
 const KEYBOARD_SHORTCUTS_STORAGE_KEY = 'demo-keyboard-shortcuts-enabled'
 
+/** SDK 日志收集开关的 localStorage 记忆 key：值 'on' 表示开启 */
+const COLLECT_SDK_LOG_STORAGE_KEY = 'demo-collect-sdk-log'
+
+/** UIKit / SDK 日志收集级别的 localStorage 记忆 key */
+const UIKIT_LOG_LEVEL_STORAGE_KEY = 'demo-uikit-log-level'
+const SDK_LOG_LEVEL_STORAGE_KEY = 'demo-sdk-log-level'
+
+type DemoUikitLogLevel = 'debug' | 'info' | 'warn' | 'error'
+type DemoSdkLogLevel = 'debug' | 'warn' | 'error'
+
+function readStorage<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+  const raw = localStorage.getItem(key)
+  return allowed.includes(raw as T) ? (raw as T) : fallback
+}
+
+/**
+ * SDK 日志收集开关（模块级单例）。
+ * Provider 在 app.vue 外层（无 useUIKit 上下文）也需要读取，故不放进 createDemoSettings。
+ * 开启后 UIKit 同时持久化 SDK 层日志（console 拦截 / setLogger 注入自适应）。
+ */
+export const demoCollectSdkLog = ref(localStorage.getItem(COLLECT_SDK_LOG_STORAGE_KEY) === 'on')
+
+export function toggleDemoCollectSdkLog(enabled: boolean) {
+  demoCollectSdkLog.value = enabled
+  localStorage.setItem(COLLECT_SDK_LOG_STORAGE_KEY, enabled ? 'on' : 'off')
+}
+
+/** UIKit 层日志收集级别（模块级单例，默认 'info'） */
+export const demoUikitLogLevel = ref<DemoUikitLogLevel>(
+  readStorage(UIKIT_LOG_LEVEL_STORAGE_KEY, ['debug', 'info', 'warn', 'error'], 'info'),
+)
+
+export function setDemoUikitLogLevel(level: DemoUikitLogLevel) {
+  demoUikitLogLevel.value = level
+  localStorage.setItem(UIKIT_LOG_LEVEL_STORAGE_KEY, level)
+}
+
+/** SDK 层日志收集级别（模块级单例，默认 'warn'） */
+export const demoSdkLogLevel = ref<DemoSdkLogLevel>(
+  readStorage(SDK_LOG_LEVEL_STORAGE_KEY, ['debug', 'warn', 'error'], 'warn'),
+)
+
+export function setDemoSdkLogLevel(level: DemoSdkLogLevel) {
+  demoSdkLogLevel.value = level
+  localStorage.setItem(SDK_LOG_LEVEL_STORAGE_KEY, level)
+}
+
 /** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，保证首屏宽度舒适 */
 const SIDEBAR_DEFAULT_WIDTH = 400
 

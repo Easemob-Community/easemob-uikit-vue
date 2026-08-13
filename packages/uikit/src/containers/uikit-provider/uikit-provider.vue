@@ -20,6 +20,7 @@ import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
 import { createLogger } from '../../utils/logger'
+import { configureLogPersistence } from '../../utils/log-store'
 
 const logger = createLogger('UIKit:UikitProvider')
 
@@ -122,6 +123,32 @@ export interface ProviderProps {
   onTokenWillExpire?: () => void
   /** Token 已过期回调，业务可在此重新登录或提示用户 */
   onTokenExpired?: () => void
+  /**
+   * 日志持久化配置（IndexedDB 本地落库，用于问题排查）。
+   * Log persistence config (IndexedDB, for troubleshooting).
+   */
+  logger?: {
+    /** 是否持久化 UIKit 日志（默认 true） / Persist UIKit logs (default true) */
+    enabled?: boolean
+    /** 是否同时收集 SDK 日志（默认 false） / Also collect SDK logs (default false) */
+    collectSdkLog?: boolean
+    /**
+     * UIKit 层收集级别（默认 'info'），低于该级别直接丢弃。
+     * 生产建议 'info'，排查时临时调 'debug'。
+     * UIKit collect level (default 'info'); use 'debug' temporarily for troubleshooting.
+     */
+    uikitLevel?: 'debug' | 'info' | 'warn' | 'error'
+    /**
+     * SDK 层收集级别（默认 'warn'，SDK 无 info 级）。
+     * DEBUG 含心跳等高频日志，生产建议 'warn'。
+     * SDK collect level (default 'warn'; SDK has no info level).
+     */
+    sdkLevel?: 'debug' | 'warn' | 'error'
+    /** 最大保留条数（默认 5000） / Max retained entries (default 5000) */
+    maxEntries?: number
+    /** 保留天数（默认 7） / Retention days (default 7) */
+    retentionDays?: number
+  }
 }
 
 const props = withDefaults(defineProps<ProviderProps>(), {
@@ -228,6 +255,22 @@ watch(
       triggerMode: config?.triggerMode,
     })
     setNotificationClickHandler(config?.navigateOnClick === false ? null : onNotificationClick)
+  },
+  { deep: true, immediate: true },
+)
+
+/** 日志持久化配置响应式应用：collectSdkLog 变化时联动启停 SDK 日志捕获 */
+watch(
+  () => props.logger,
+  (loggerConfig) => {
+    configureLogPersistence({
+      enabled: loggerConfig?.enabled,
+      collectSdkLog: loggerConfig?.collectSdkLog,
+      uikitLevel: loggerConfig?.uikitLevel,
+      sdkLevel: loggerConfig?.sdkLevel,
+      maxEntries: loggerConfig?.maxEntries,
+      retentionDays: loggerConfig?.retentionDays,
+    })
   },
   { deep: true, immediate: true },
 )

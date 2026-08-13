@@ -4,6 +4,7 @@ import { EmUIKitProvider, useClient } from '@easemob/uikit'
 import type { UiContact } from '@easemob/uikit'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
+import { demoCollectSdkLog, demoSdkLogLevel, demoUikitLogLevel } from './composables/use-demo-settings'
 
 /**
  * Provider 三开关 × dataSource 演示
@@ -154,6 +155,7 @@ const AppContent = {
     :enable-typing="enableTyping"
     :data-source="useCustomDataSource ? customDataSource : undefined"
     :h5="{ safeArea: true, keyboardAdapt: true, pullRefresh: 'auto' }"
+    :logger="{ collectSdkLog: demoCollectSdkLog, uikitLevel: demoUikitLogLevel, sdkLevel: demoSdkLogLevel }"
   >
     <AppContent />
   </EmUIKitProvider>

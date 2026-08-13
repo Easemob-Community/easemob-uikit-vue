@@ -9,6 +9,7 @@ import {
 } from 'easemob-websdk'
 import type { ConnectionEventHandlerMap, EventHandlerMap, InitConfig } from 'easemob-websdk'
 import { log } from '../utils/logger'
+import { setSdkDebugGuard } from '../utils/sdk-log-capture'
 
 declare const __EASEMOB_SDK_VERSION__: string
 declare const __EASEMOB_UIKIT_VERSION__: string
@@ -46,6 +47,17 @@ export interface ClientConfig extends InitConfig {
   /** 是否开启 SDK 调试日志 */
   debug?: boolean
 }
+
+/** 是否有 client 实例以 debug 模式初始化（供 SDK 日志捕获模块判断级别恢复策略） */
+let _sdkDebugEnabled = false
+
+/** 当前是否处于 client debug 模式（SDK 日志级别被 client 提升至 DEBUG） */
+export function isSdkDebugEnabled(): boolean {
+  return _sdkDebugEnabled
+}
+
+// 注入 SDK 日志捕获模块的 debug 守卫，避免 capture 反向依赖本模块
+setSdkDebugGuard(() => _sdkDebugEnabled)
 
 /** SDK 已注册管理器映射 */
 interface ManagerRegistry {
@@ -88,6 +100,7 @@ export class UIKitClient {
     }) as SdkChatClient & ManagerRegistry
 
     if (debug) {
+      _sdkDebugEnabled = true
       import('easemob-websdk').then(({ setLogLevel }) => {
         setLogLevel('DEBUG')
       })
