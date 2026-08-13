@@ -135,10 +135,6 @@ export function useMessageActions() {
     }
   }
 
-  function toggleTranslation(msgId: string) {
-    messageStore.toggleTranslation(msgId)
-  }
-
   /** 语音消息转文字 */
   async function transcribeVoiceMessage(message: UiMessage) {
     // type 判别优先：排除 UiNoticeMessage，再以守卫校验 body 结构
@@ -179,10 +175,6 @@ export function useMessageActions() {
       })
       throw e
     }
-  }
-
-  function toggleVoiceText(msgId: string) {
-    messageStore.toggleVoiceText(msgId)
   }
 
   /** 置顶消息 */
@@ -244,16 +236,14 @@ export function useMessageActions() {
     deleteMessage,
     deleteMessages,
     translateTextMessage,
-    toggleTranslation,
     transcribeVoiceMessage,
-    toggleVoiceText,
     pinMessage,
     unpinMessage,
     fetchPinnedMessages,
   }
 }
 
-function resolveTranslateLang(targetLang?: string): string {
+export function resolveTranslateLang(targetLang?: string): string {
   if (targetLang?.trim())
     return targetLang.trim()
   return 'en'

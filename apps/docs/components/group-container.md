@@ -39,49 +39,11 @@ function onGroupClick() {
 
 <demo src="./demo/item.vue" title="群组列表项" desc="静态展示成员数、副标题（最近消息 / 未读）、头像形状与 large 尺寸形态。" />
 
-## Props
+## API
 
-### 容器外观
+<!-- @include: ../.vitepress/gen/group-container.md -->
 
-- `showHeader`：是否展示头部，默认 `true`
-- `title`：Header 标题文本
-- `headerAlign`：Header 对齐方式，默认 `'left'`
-- `showSearch`：是否展示搜索框，默认 `true`
-- `showScrollToTop`：是否展示滚动置顶按钮，默认 `true`
-- `searchComponent`：自定义搜索组件（完全接管搜索逻辑与 UI，传入后 `showSearch` 失效）
-
-### 列表配置
-
-- `sortBy`：排序方式（如 `'alphabet'`、`'pinyin'`），默认 `'none'`
-- `groupBy`：分组方式，默认 `'none'`
-- `showGroupHeader` / `showAlphabetNav`：分组标题 / 字母导航，默认 `true`
-- `showCount`：是否展示计数，默认 `false`
-- `selectMode`：选择模式，`'none' | 'single' | 'multiple'`，默认 `'none'`
-- `selectedIds`：受控选中 id 列表（`v-model:selectedIds`）
-- `maxSelected`：最大可选数量
-- `disabledFn`：disabled 判定函数
-- `subtitleFn`：副标题提取函数
-- `showAvatar` / `showMemberCount`：头像与成员数开关，默认 `true`
-- `avatarSize` / `avatarShape`：头像尺寸与形状
-- `itemSize`：`'compact' | 'normal' | 'large'`，默认 `'normal'`
-- `loading` / `enableLoadMore` / `loadMoreThreshold`：加载与触底分页配置
-- `emptyText` / `noMoreText`：空列表 / 没有更多提示
-- `filterFn`：自定义搜索过滤函数
-- `bodySticky` / `footerSticky`：插槽固定开关
-- `clickBehavior`：列表项点击行为，`'default'`（触发事件 + 内部选中）或 `'event-only'`（仅触发事件，由外部完全接管），默认 `'default'`
-- `autoFetch`：mount 时自动拉取群组列表，默认 `true`
-
-## 事件
-
-- `click`：点击群组项，参数 `group: Group`
-- `select`：选中群组项，参数 `group: Group`
-- `contextmenu`：右键群组项，参数 `(event, group)`
-- `load-more`：触底请求加载更多
-- `max-exceed`：超出最大选择，参数 `max: number`
-- `update:selectedIds`：选中变化，参数 `ids: string[]`
-- `search`：搜索关键字变化，参数 `keyword: string`
-
-## 插槽
+## 插槽说明
 
 - `header`：自定义头部内容
 - `body` / `footer`：列表顶部 / 底部附加内容

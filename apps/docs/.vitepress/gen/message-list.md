@@ -1,0 +1,62 @@
+<!-- 由 scripts/gen-api-docs.mjs 自动生成，请勿手动编辑 -->
+## MessageList API
+
+### Props
+
+| 属性     | 类型           | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| config | `ChatConfig` | —   | —  |
+
+#### config
+
+> 聊天页面全局配置
+
+| 属性                      | 类型                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 默认值 | 说明                                      |
+| --- | --- | --- | --- |
+| enableDraft             | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | —   | 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true      |
+| hooks                   | `ChatSendHooks`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | —   | 消息发送拦截钩子                                |
+| header                  | `{ visible?: boolean, align?: HeaderAlign, customSlot?: boolean, showAvatar?: boolean, showMemberCount?: boolean }`                                                                                                                                                                                                                                                                                                                                                                                                                           | —   | Header 配置                               |
+| messageList             | `{ layout?: MessageLayout, showAvatar?: boolean, showTime?: TimeDisplayStrategy, bubbleShape?: BubbleShape, avatarSize?: number, messageGap?: number, messagePadding?: number, groupInterval?: number, virtualScrollThreshold?: number, loadHistory?: { enable?: boolean, mode?: LoadHistoryMode }, maxMessageCount?: number, pinnedBar?: { visible?: boolean, maxPreviewLength?: number }, search?: { enabled?: boolean, enableServerSearch?: boolean, pageSize?: number }, autoLocateAtMe?: boolean, messageStatus?: MessageStatusConfig }` | —   | 消息列表配置                                  |
+| messageAction           | `{ enableQuote?: boolean, enableCopy?: boolean, enableDownload?: boolean, enableDelete?: boolean, enableRecall?: boolean, enableRecallOther?: boolean, enableEdit?: boolean, enableForward?: boolean, enableMultiSelect?: boolean, enableTranslate?: boolean, enableVoiceToText?: boolean, enablePin?: boolean, recallDisableDuration?: number, translateTargetLang?: string }`                                                                                                                                                               | —   | 消息操作配置                                  |
+| groupReadReceipt        | `{ enabled?: boolean, maxGroupSize?: number }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | —   | 群已读回执配置                                 |
+| groupMember             | `{ allowChat?: 'all' \| 'contact' \| 'none' }`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | —   | 群成员列表配置                                 |
+| groupManagement         | `{ displayMode?: 'drawer' \| 'modal', showMuteAll?: boolean, showMuteList?: boolean, showBlocklist?: boolean, showAllowlist?: boolean, showSharedFiles?: boolean, showJoinRequests?: boolean }`                                                                                                                                                                                                                                                                                                                                               | —   | 群管理功能配置                                 |
+| input                   | `{ mode?: InputMode, style?: InputStyle, features?: { emoji?: boolean, image?: boolean, file?: boolean, voice?: boolean, video?: boolean, mention?: boolean }, autoFocus?: boolean, focusBorderColor?: string, caretColor?: string, selectionColor?: string, maxLength?: number, mention?: { contacts?: MentionContact[], onlyInGroup?: boolean }, enableTyping?: boolean, showSendButton?: boolean, resizable?: boolean, expandable?: boolean, stickerPacks?: EmojiStickerPack[] }`                                                          | —   | 输入框配置                                   |
+| lastMessageTextResolver | `LastMessageTextResolver`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | —   | 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 |
+| textMessage             | `{ enableLinkify?: boolean, onLinkClick?: (url: string) => boolean \| string \| void, enableMentionHighlight?: boolean, onMentionClick?: (userId: string) => void }`                                                                                                                                                                                                                                                                                                                                                                          | —   | 文本消息配置                                  |
+
+#### config.messageList
+
+> 消息列表配置
+
+| 属性                     | 类型                                                                       | 默认值 | 说明                                                  |
+| --- | --- | --- | --- |
+| layout                 | `MessageLayout`                                                          | —   | 消息布局模式，默认 'conversation'                            |
+| showAvatar             | `boolean`                                                                | —   | 是否显示头像，默认 true                                      |
+| showTime               | `TimeDisplayStrategy`                                                    | —   | 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' |
+| bubbleShape            | `BubbleShape`                                                            | —   | 气泡形状，默认 'round'                                     |
+| avatarSize             | `number`                                                                 | —   | 头像尺寸（px），默认 36                                      |
+| messageGap             | `number`                                                                 | —   | 消息项之间的间距（px），默认 12                                  |
+| messagePadding         | `number`                                                                 | —   | 消息列表内边距（px），默认 16                                   |
+| groupInterval          | `number`                                                                 | —   | 时间分组间隔（毫秒），默认 5 分钟                                  |
+| virtualScrollThreshold | `number`                                                                 | —   | 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100                          |
+| loadHistory            | `{ enable?: boolean, mode?: LoadHistoryMode }`                           | —   | 加载历史消息配置                                            |
+| maxMessageCount        | `number`                                                                 | —   | 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300                      |
+| pinnedBar              | `{ visible?: boolean, maxPreviewLength?: number }`                       | —   | 置顶横幅配置                                              |
+| search                 | `{ enabled?: boolean, enableServerSearch?: boolean, pageSize?: number }` | —   | 消息搜索配置                                              |
+| autoLocateAtMe         | `boolean`                                                                | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                         |
+| messageStatus          | `MessageStatusConfig`                                                    | —   | 消息发送状态展示配置                                          |
+
+### Events
+
+| 事件名                     | 参数                                               | 说明 |
+| --- | --- | --- |
+| `reedit`                | message: UiMessage                               | —  |
+| `recall-failed`         | error: any, message: UiMessage                   | —  |
+| `edit`                  | message: UiMessage                               | —  |
+| `forward`               | messages: UiMessage[]                            | —  |
+| `mention-click`         | userId: string                                   | —  |
+| `location-click`        | body: LocationMessageBody, message: UiMessage    | —  |
+| `custom-message-action` | action: string, payload: any, message: UiMessage | —  |
+| `avatar-view-profile`   | userId: string                                   | —  |
+| `avatar-mention`        | `payload: { userId: string, name: string }`      | —  |

@@ -24,7 +24,9 @@ export interface UseResizableOptions {
  *
  * 实现要点：
  * - Pointer Events + setPointerCapture：拖出窗口不丢事件，无需全局 mousemove/mouseup 监听；
- * - 拖拽期间临时禁止 body 文本选中（user-select: none），结束后恢复；
+ * - 拖拽期间临时禁止 body 文本选中（user-select: none），并注入临时全局样式
+ *   `* { cursor: col/row-resize !important }` 锁定光标（继承的 body cursor 压不过
+ *   元素自带 cursor 规则，必须用通配 + important），结束后移除；
  * - pointermove 高频回调经 requestAnimationFrame 节流；
  * - min/max 在拖拽过程中 clamp；
  * - onScopeDispose 兜底清理（防拖拽中卸载遗留 user-select / 事件监听）。
@@ -54,6 +56,7 @@ export function useResizable(
   let pendingSize: number | null = null
   let lastEmittedSize = 0
   let originalUserSelect = ''
+  let cursorStyleEl: HTMLStyleElement | null = null
   let boundEl: HTMLElement | null = null
 
   function clampSize(value: number) {
@@ -88,6 +91,12 @@ export function useResizable(
     if (typeof document !== 'undefined') {
       originalUserSelect = document.body.style.userSelect
       document.body.style.userSelect = 'none'
+      // 拖拽全程注入全局光标锁：* + !important 才能压过悬停元素自带的 cursor 规则
+      // （继承的 body cursor 赢不了直接命中元素的样式），避免指针移出手柄/到达
+      // min/max 边界后光标回落为默认箭头
+      cursorStyleEl = document.createElement('style')
+      cursorStyleEl.textContent = `* { cursor: ${axis === 'horizontal' ? 'col-resize' : 'row-resize'} !important; }`
+      document.head.appendChild(cursorStyleEl)
     }
   }
 
@@ -116,6 +125,8 @@ export function useResizable(
     flushChange()
     if (typeof document !== 'undefined') {
       document.body.style.userSelect = originalUserSelect
+      cursorStyleEl?.remove()
+      cursorStyleEl = null
     }
     onEnd?.(size.value)
   }
@@ -151,11 +162,13 @@ export function useResizable(
     bind(el)
   })
 
-  // 组件卸载兜底清理：防拖拽中卸载遗留 body user-select 与事件监听
+  // 组件卸载兜底清理：防拖拽中卸载遗留 body user-select / 光标锁与事件监听
   onScopeDispose(() => {
     unbind()
     if (isResizing.value && typeof document !== 'undefined') {
       document.body.style.userSelect = originalUserSelect
+      cursorStyleEl?.remove()
+      cursorStyleEl = null
     }
     if (rafId !== null) {
       cancelAnimationFrame(rafId)

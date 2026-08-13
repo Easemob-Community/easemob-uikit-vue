@@ -30,21 +30,11 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 > 聊天容器会跟随 `useConversation()` 中的当前会话自动切换：点击左侧会话列表（`conversation-select`）后，聊天页即开始加载对应会话的消息。
 
-## Props
+## API
 
-- `config`：聊天页面配置（`ChatConfig`），包括消息气泡样式、发送器行为、`lastMessageTextResolver` 等，默认 `{}`
-- `loading`：是否处于全局加载状态，默认 `false`
-- `class`：自定义根元素 class
-- `style`：自定义根元素 style，类型 `Record<string, string>`
+<!-- @include: ../.vitepress/gen/chat-container.md -->
 
-## 事件
-
-- `recall-failed`：消息撤回失败，参数 `(error, message)`
-- `at-me-click`：点击「有人 @我」提示，参数 `userId: string`
-- `location-click`：点击位置消息，参数 `(body: LocationMessageBody, message: UiMessage)`
-- `custom-message-action`：自定义消息类型操作，参数 `(action, payload, message)`
-
-## 插槽
+## 插槽说明
 
 - `empty`：无会话时展示的空状态
 - `loading`：全局加载状态
@@ -61,6 +51,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 - 消息列表为虚拟滚动，长会话列表性能有保障；切换会话自动重置滚动位置与多选状态。
 - 引用、翻译、语音转文字、消息定位（搜索跳转）等能力由 `useChat()` 等组合式函数暴露，可在业务代码中直接调用。
+- 想直观体验 `config.messageList` 各项视觉配置（布局、头像、时间戳、气泡形状、间距、消息状态）的实时效果，请前往[消息列表 MessageList 配置演练场](./message-list)。
 
 ## 插件机制
 
@@ -87,22 +78,22 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 `useChatPlugin()` 是插件组件与 UIKit 聊天的桥梁。在 `EmChatContainer` 的插槽内调用它即可获取当前会话上下文、消息发送能力与输入框操作方法。
 
-| 属性 / 方法 | 类型 | 说明 |
-| --- | --- | --- |
-| `currentConversation` | `ComputedRef<UiConversation \| null>` | 当前正在聊天的会话对象 |
-| `currentUserId` | `ComputedRef<string \| null>` | 当前登录用户 ID |
-| `send.sendTextMessage` | `(text, ext?) => Promise<any>` | 发送文本消息 |
-| `send.sendCustomMessage` | `(event, params?, ext?) => Promise<any>` | 发送自定义消息（核心扩展能力） |
-| `send.sendImageMessage` | `(data: File \| string, ext?) => Promise<any>` | 发送图片消息 |
-| `send.sendFileMessage` | `(file: File, ext?) => Promise<any>` | 发送文件消息 |
-| `send.sendAudioMessage` | `(file, duration, ext?) => Promise<any>` | 发送语音消息 |
-| `send.sendVideoMessage` | `(file, duration, ext?) => Promise<any>` | 发送视频消息 |
-| `send.sendLocationMessage` | `(body, ext?) => Promise<any>` | 发送位置消息 |
-| `getUserDisplayName` | `(userId: string) => string` | 解析用户展示名称 |
-| `getUserAvatar` | `(userId: string) => string \| undefined` | 获取用户头像 URL |
-| `setText` | `(text: string) => void` | 设置输入框文本 |
-| `getText` | `() => string` | 读取输入框当前文本 |
-| `focus` | `() => void` | 聚焦输入框 |
+| 属性 / 方法                | 类型                                           | 说明                           |
+| -------------------------- | ---------------------------------------------- | ------------------------------ |
+| `currentConversation`      | `ComputedRef<UiConversation \| null>`          | 当前正在聊天的会话对象         |
+| `currentUserId`            | `ComputedRef<string \| null>`                  | 当前登录用户 ID                |
+| `send.sendTextMessage`     | `(text, ext?) => Promise<any>`                 | 发送文本消息                   |
+| `send.sendCustomMessage`   | `(event, params?, ext?) => Promise<any>`       | 发送自定义消息（核心扩展能力） |
+| `send.sendImageMessage`    | `(data: File \| string, ext?) => Promise<any>` | 发送图片消息                   |
+| `send.sendFileMessage`     | `(file: File, ext?) => Promise<any>`           | 发送文件消息                   |
+| `send.sendAudioMessage`    | `(file, duration, ext?) => Promise<any>`       | 发送语音消息                   |
+| `send.sendVideoMessage`    | `(file, duration, ext?) => Promise<any>`       | 发送视频消息                   |
+| `send.sendLocationMessage` | `(body, ext?) => Promise<any>`                 | 发送位置消息                   |
+| `getUserDisplayName`       | `(userId: string) => string`                   | 解析用户展示名称               |
+| `getUserAvatar`            | `(userId: string) => string \| undefined`      | 获取用户头像 URL               |
+| `setText`                  | `(text: string) => void`                       | 设置输入框文本                 |
+| `getText`                  | `() => string`                                 | 读取输入框当前文本             |
+| `focus`                    | `() => void`                                   | 聚焦输入框                     |
 
 ```ts
 import { useChatPlugin } from '@easemob/uikit'
@@ -118,11 +109,11 @@ const { currentConversation, send, setText } = useChatPlugin()
 
 **插槽 Props：**
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
+| 属性          | 类型         | 说明                                      |
+| ------------- | ------------ | ----------------------------------------- |
 | `togglePanel` | `() => void` | 切换自定义面板（#input-panel）的展开/收起 |
-| `showPanel` | `boolean` | 当前面板是否展开 |
-| `closePanel` | `() => void` | 关闭自定义面板 |
+| `showPanel`   | `boolean`    | 当前面板是否展开                          |
+| `closePanel`  | `() => void` | 关闭自定义面板                            |
 
 #### #input-panel
 
@@ -130,10 +121,10 @@ const { currentConversation, send, setText } = useChatPlugin()
 
 **插槽 Props：**
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
-| `showPanel` | `boolean` | 面板是否可见 |
-| `closePanel` | `() => void` | 关闭面板 |
+| 属性         | 类型         | 说明         |
+| ------------ | ------------ | ------------ |
+| `showPanel`  | `boolean`    | 面板是否可见 |
+| `closePanel` | `() => void` | 关闭面板     |
 
 #### #message-custom
 
@@ -141,8 +132,8 @@ const { currentConversation, send, setText } = useChatPlugin()
 
 **插槽 Props：**
 
-| 属性 | 类型 | 说明 |
-| --- | --- | --- |
+| 属性      | 类型        | 说明                                                        |
+| --------- | ----------- | ----------------------------------------------------------- |
 | `message` | `UiMessage` | 当前自定义消息对象（`message.body` 为 `CustomMessageBody`） |
 
 ### 完整示例：快捷回复面板
@@ -284,7 +275,9 @@ const { displayName, avatarUrl } = useUserInfo(uid)
   <div class="card-bubble" @click="emit('card-click', uid)">
     <EmAvatar :src="avatarUrl" :name="displayName" :size="40" />
     <span>{{ displayName || uid }}</span>
-    <div class="footer">名片</div>
+    <div class="footer">
+      名片
+    </div>
   </div>
 </template>
 ```

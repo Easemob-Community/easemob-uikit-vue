@@ -18,8 +18,6 @@ export interface MessageRendererProps {
 
 export interface MessageRendererEmits {
   (e: 'reedit', message: UiMessage): void
-  (e: 'toggle-translation', message: UiMessage): void
-  (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'view-combine', message: UiMessage): void
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
@@ -83,8 +81,6 @@ const isCmd = computed(() => (props.message.type as string) === MESSAGE_TYPE.CMD
       :message="message"
       :is-self="message.isSelf"
       @reedit="emit('reedit', $event)"
-      @toggle-translation="emit('toggle-translation', $event)"
-      @toggle-voice-text="emit('toggle-voice-text', $event)"
       @view="emit('view-combine', $event)"
       @mention-click="emit('mention-click', $event)"
       @location-click="emit('location-click', $event, message)"

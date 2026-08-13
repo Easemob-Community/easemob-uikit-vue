@@ -15,9 +15,7 @@ const props = defineProps<MessageActionMenuProps>()
 const emit = defineEmits<MessageActionMenuEmits>()
 
 function onItemClick(action: MessageActionItem) {
-  if (action.disabled) {
-    return
-  }
+  // disabled 项也上抛 select，由调用方统一处理（如弹 disabledTip toast），本组件保持纯展示
   emit('select', action)
 }
 </script>
@@ -63,9 +61,9 @@ function onItemClick(action: MessageActionItem) {
 }
 
 @media (hover: hover) {
-.message-action-menu__item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
+  .message-action-menu__item:hover {
+    background-color: var(--uikit-bg-hover, #f3f4f6);
+  }
 }
 
 .message-action-menu__item--danger {
@@ -73,9 +71,9 @@ function onItemClick(action: MessageActionItem) {
 }
 
 @media (hover: hover) {
-.message-action-menu__item--danger:hover {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
-}
+  .message-action-menu__item--danger:hover {
+    background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+  }
 }
 
 .message-action-menu__item--disabled {
@@ -85,8 +83,8 @@ function onItemClick(action: MessageActionItem) {
 }
 
 @media (hover: hover) {
-.message-action-menu__item--disabled:hover {
-  background-color: transparent;
-}
+  .message-action-menu__item--disabled:hover {
+    background-color: transparent;
+  }
 }
 </style>

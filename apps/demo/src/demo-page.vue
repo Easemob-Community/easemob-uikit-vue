@@ -489,6 +489,7 @@ watch(() => stores.conversation.currentConversationId, (id) => {
         axis="horizontal"
         :min="240"
         :max="480"
+        :handle-size="10"
         class="demo-layout__sidebar"
         @resize-end="persistSidebarWidth"
       >

@@ -61,15 +61,6 @@ watch(() => props.modelValue, (v) => {
     size.value = v
 })
 
-/** 是否已到达 min/max 边界：边界上继续拖拽尺寸不再变化，光标回落为默认箭头避免误导 */
-const isAtBoundary = computed(() => {
-  if (size.value <= props.min)
-    return true
-  if (props.max !== undefined && size.value >= props.max)
-    return true
-  return false
-})
-
 // 拖拽开始事件（isResizing 上升沿触发一次）
 watch(isResizing, (v) => {
   if (v)
@@ -98,7 +89,7 @@ const rootStyle = computed<Record<string, string>>(() => {
       class="resizable__handle"
       :class="[
         `resizable__handle--${props.axis}`,
-        { 'resizable__handle--line': props.showLine, 'is-at-boundary': isAtBoundary },
+        { 'resizable__handle--line': props.showLine },
       ]"
     />
   </div>
@@ -138,10 +129,8 @@ const rootStyle = computed<Record<string, string>>(() => {
   cursor: row-resize;
 }
 
-/* 到达 min/max 边界：光标回落为默认箭头，提示已无法继续拖拽 */
-.resizable__handle.is-at-boundary {
-  cursor: default;
-}
+/* 手柄命中区始终提示可拖拽光标：即使处于 min/max 边界也允许反方向拖回，
+   边界处回落默认光标反而会误导为「不可拖拽」 */
 
 /* 视觉分隔线（showLine 开启时显示）：1px 居中于命中区 */
 .resizable__handle--line::before {

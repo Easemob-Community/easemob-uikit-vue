@@ -104,6 +104,8 @@ export type HeaderAlignValue =
 export const INJECTION_KEY = {
   /** 文本消息配置（链接识别 & 拦截器），chat.vue provide / text-message.vue inject */
   TEXT_MESSAGE_CONFIG: 'textMessageConfig',
+  /** 气泡形状（config.messageList.bubbleShape），message-bubble-wrapper.vue provide / 气泡组件 inject */
+  BUBBLE_SHAPE: 'bubbleShape',
 } as const
 
 /** 群组资料字段长度限制（与后端约束对齐） */

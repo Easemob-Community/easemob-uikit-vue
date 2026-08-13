@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref } from 'vue'
 import Avatar from '../../../components/avatar/avatar.vue'
 import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
 import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, MessageStatusStyle, TimeDisplayStrategy } from '../types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, INJECTION_KEY, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
 import { useClientStore } from '../../../store/client'
@@ -39,8 +39,6 @@ export interface MessageBubbleWrapperEmits {
   (e: 'action', event: MessageActionEvent): void
   (e: 'group-read-click', msgId: string, groupId: string): void
   (e: 'reedit', message: UiMessage): void
-  (e: 'toggle-translation', message: UiMessage): void
-  (e: 'toggle-voice-text', message: UiMessage): void
   (e: 'resend', message: UiMessage): void
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
@@ -139,6 +137,10 @@ const isSelfConversation = computed(() => layout.value === 'conversation' && isS
 
 /** 头像尺寸 */
 const avatarSize = computed(() => props.config?.avatarSize ?? 36)
+
+/** 气泡形状：config.messageList.bubbleShape 优先于主题全局 bubbleShape，气泡组件 inject 消费 */
+const bubbleShape = computed(() => props.config?.bubbleShape)
+provide(INJECTION_KEY.BUBBLE_SHAPE, bubbleShape)
 
 /** 格式化后的时间（HH:mm） */
 const formattedTime = computed(() => {
@@ -494,8 +496,6 @@ onBeforeUnmount(() => {
                 <MessageRenderer
                   :message="message"
                   @reedit="emit('reedit', $event)"
-                  @toggle-translation="emit('toggle-translation', $event)"
-                  @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                   @location-click="emit('location-click', $event, message)"
@@ -606,8 +606,6 @@ onBeforeUnmount(() => {
                 <MessageRenderer
                   :message="message"
                   @reedit="emit('reedit', $event)"
-                  @toggle-translation="emit('toggle-translation', $event)"
-                  @toggle-voice-text="emit('toggle-voice-text', $event)"
                   @view-combine="onViewCombine"
                   @mention-click="emit('mention-click', $event)"
                   @location-click="emit('location-click', $event, message)"

@@ -6,6 +6,7 @@ import { useLongPress } from '../../../composables/use-long-press'
 import { useToast } from '../../../composables/use-toast'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useGroupStore } from '../../../store/group'
+import { resolveTranslateLang } from '../../../composables/use-message-actions'
 import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE } from '../../../constants'
 import Popup from '../../../components/popup/popup.vue'
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
@@ -117,13 +118,39 @@ const actions = computed<MessageActionItem[]>(() => {
     add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
   if (cfg?.enableMultiSelect !== false)
     add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/items_check')
-  // 翻译：仅文本消息可翻译，其他类型不展示
+  // 翻译：仅文本消息可翻译，其他类型不展示；已有译文且目标语言一致时菜单切换为「取消翻译 / 显示译文」，
+  // 目标语言不一致时展示「翻译」以重新翻译为新语言（与 translateTextMessage 的 to === lang 判定保持一致）
   if (cfg?.enableTranslate !== false && props.message.type === MESSAGE_TYPE.TEXT) {
-    add('translate', t('message.action.translate') ?? '翻译', 'misc/hanzinalpha_in_rect')
+    const hasTranslation = !!props.message.translation?.text
+    const translating = !!props.message.translating
+    const translationMatchesLang = hasTranslation && props.message.translation?.to === resolveTranslateLang(cfg?.translateTargetLang)
+    if (translationMatchesLang && !translating) {
+      if (props.message.showTranslation !== false) {
+        add('translate', t('message.action.cancelTranslate') ?? '取消翻译', 'misc/hanzinalpha_in_rect_slash')
+      }
+      else {
+        add('translate', t('message.action.showTranslation') ?? '显示译文', 'misc/hanzinalpha_in_rect')
+      }
+    }
+    else {
+      add('translate', t('message.action.translate') ?? '翻译', 'misc/hanzinalpha_in_rect', false, translating, t('message.translate.loading') ?? '翻译中…')
+    }
   }
-  // 语音转文字：仅带 url 的语音消息展示
+  // 语音转文字：仅带 url 的语音消息展示；已有转写结果时菜单切换为「收起文字 / 显示文字」
   if (cfg?.enableVoiceToText !== false && props.message.type === MESSAGE_TYPE.VOICE && (props.message.body as any).url) {
-    add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'misc/hanzi_in_rect')
+    const hasVoiceText = !!props.message.voiceText?.text
+    const transcribing = !!props.message.voiceTranscribing
+    if (hasVoiceText && !transcribing) {
+      if (props.message.showVoiceText !== false) {
+        add('voiceToText', t('message.action.hideVoiceText') ?? '收起文字', 'misc/hanzi_in_rect_slash')
+      }
+      else {
+        add('voiceToText', t('message.action.showVoiceText') ?? '显示文字', 'misc/hanzi_in_rect')
+      }
+    }
+    else {
+      add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'misc/hanzi_in_rect', false, transcribing, t('message.voiceToText.loading') ?? '转文字中…')
+    }
   }
   if (cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {
@@ -188,6 +215,8 @@ const actionSheetActions = computed(() =>
   actions.value.map(item => ({
     name: item.label,
     color: item.danger ? '#ef4444' : undefined,
+    disabled: item.disabled,
+    icon: item.icon,
   })),
 )
 
@@ -237,7 +266,7 @@ const longPress = useLongPress(() => {
 /** 处理菜单项选择 */
 function handleSelect(actionType: MessageActionType, actionItem?: MessageActionItem) {
   if (actionItem?.disabled) {
-    const tip = actionItem.disabledTip || t('message.recallExpired', '无法撤回')
+    const tip = actionItem.disabledTip || t('message.action.unavailable', '操作不可用')
     showToast(tip, 'warning')
     return
   }

@@ -11,6 +11,25 @@
   - `EmMessageRenderer` 新增 `#message-notice` 插槽，业务可完全接管通知渲染
   - 新增文档页「系统通知文案定制」；demo 设置面板新增「系统通知文案」验收开关（内置/俏皮话术/关闭入群通知）
 - **demo 恢复源码直连模式**：vite alias 直连 packages/uikit 源码，依赖声明改回 workspace 模式
+- **消息列表演练场（docs 交互式配置演示）**：
+  - 新增 DocsConfigPanel 声明式配置面板（互斥选项组 / 布尔开关 / 数字输入三类控件，问号 tip 浮层），docs 站点全局注册
+  - 新增「消息列表 MessageList」演练场页面：mock 注入免登录渲染全类型消息，开关实时切换 `layout` / `showAvatar` / `showTime` / `bubbleShape` / `avatarSize` / `messageGap` / `messagePadding` / `messageStatus` 等配置
+- **业务模块 API 文档自动生成**：
+  - `gen-api-docs.mjs` 扩展 MODULES 白名单（chat-container / conversation-container / group-container / message-list），容器 Props 表格由生成器维护不再手写
+  - `ChatConfig` 等嵌套配置类型递归展开为子表格（深度上限 3 层 + 去重，函数/联合/泛型类型显示原文）；成员说明取完整 JSDoc（多行说明不再截断）
+  - 三个业务模块页手写 Props 段落替换为 `@include` 生成表格，后续改 API 重跑 `pnpm gen:api` 即可同步
+
+### 优化
+
+- **消息翻译 / 语音转文字交互重构**：
+  - 操作菜单按状态切换：已有译文/转写时显示「取消翻译 / 显示译文」「收起文字 / 显示文字」，目标语言不一致时重新翻译；翻译/转写进行中禁用并显示 loading 文案
+  - ActionSheet 支持 `disabled` / `icon` 透传；disabled 项点击统一弹「操作不可用」提示
+  - 移除 toggleTranslation / toggleVoiceText 全局事件链，译文卡片隐藏/显示入口收敛到操作菜单；译文 loading 图标改用 spin 动画
+- **Resizable 拖拽光标优化**：拖拽全程注入全局光标锁（`*` + `!important`），指针移出手柄或到达 min/max 边界时光标不再回落默认箭头，移除边界光标回落逻辑
+
+### 修复
+
+- **`config.messageList.bubbleShape` 配置接线**：该配置此前为孤儿配置（气泡一直读主题全局 `bubbleShape`），现经注入键接通文本/图片/语音/视频四个气泡组件，config 优先、未配置回落主题值
 
 ## 1.6.0 (2026-08-13)
 

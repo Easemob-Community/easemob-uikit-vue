@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
+import { INJECTION_KEY } from '../../../constants'
 import { useLocale } from '../../../locale'
 import ImageViewer from '../../../components/image-viewer/image-viewer.vue'
 import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
+import type { BubbleShape } from '../types'
 
 export interface ImageMessageProps {
   message: UiMessage
@@ -51,9 +54,12 @@ const mediumUrl = computed(() => {
 /** 原图 URL（用于预览高清/下载） */
 const originalUrl = computed(() => (props.message.body as ImageMessageBody).localUrl || (props.message.body as ImageMessageBody).originalImageUrl || '')
 
-/** 圆角 class */
+/** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
 const radiusClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'image-message__img--square' : '',
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'image-message__img--square'
+    : '',
 )
 
 /** 图片加载状态 */

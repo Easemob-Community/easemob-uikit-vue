@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
+import { type ComputedRef, type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
 import { formatSdkError } from '../../../utils/sdk-error'
 import { useThemeStore } from '../../../store/theme'
+import { INJECTION_KEY } from '../../../constants'
 import { useLocale } from '../../../locale'
 import Icon from '../../../components/icon/icon.vue'
 import type { UiMessage, VoiceMessageBody } from '../../../sdk/types'
+import type { BubbleShape } from '../types'
 import { createLogger } from '../../../utils/logger'
 
 const logger = createLogger('UIKit:VoiceMessage')
@@ -13,18 +15,18 @@ export interface VoiceMessageProps {
   message: UiMessage
 }
 
-export interface VoiceMessageEmits {
-  (e: 'toggle-voice-text', message: UiMessage): void
-}
-
 const props = defineProps<VoiceMessageProps>()
-const emit = defineEmits<VoiceMessageEmits>()
 
 const { t } = useLocale()
 
 const themeStore = useThemeStore()
+
+/** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
 const bubbleClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'voice-message__bubble--square' : '',
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'voice-message__bubble--square'
+    : '',
 )
 
 const body = computed(() => props.message.body as VoiceMessageBody)
@@ -127,12 +129,8 @@ const showVoiceText = computed(() => hasVoiceText.value && props.message.showVoi
 /** 是否正在转写中 */
 const voiceTranscribing = computed(() => !!props.message.voiceTranscribing)
 
-/** 是否需要显示转文字卡片 */
-const showVoiceTextCard = computed(() => voiceTranscribing.value || hasVoiceText.value)
-
-function onToggleVoiceText() {
-  emit('toggle-voice-text', props.message)
-}
+/** 是否需要显示转文字卡片：转写中 / 已有结果且未隐藏（切换入口在右键菜单） */
+const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceText.value && showVoiceText.value))
 </script>
 
 <template>
@@ -148,39 +146,17 @@ function onToggleVoiceText() {
       </span>
       <span class="voice-message__duration">{{ body.duration || 0 }}"</span>
     </div>
-    <!-- 转文字结果卡片 -->
+    <!-- 转文字结果卡片（隐藏/显示文字入口在右键菜单） -->
     <div v-if="showVoiceTextCard" class="voice-message__text-card">
       <!-- 转写中 -->
       <div v-if="voiceTranscribing" class="voice-message__text voice-message__text--loading">
-        {{ t('message.voiceToText.loading') }}
+        <Icon name="actions/loading_arc" :size="14" anim="spin" />
+        <span>{{ t('message.voiceToText.loading') }}</span>
       </div>
       <!-- 已有结果：展示转写文字 -->
-      <template v-else-if="showVoiceText">
+      <template v-else>
         <div class="voice-message__text">
           {{ props.message.voiceText?.text }}
-        </div>
-        <div class="voice-message__text-footer">
-          <span class="voice-message__text-provider">
-            <Icon name="actions/check_in_circle_fill" :size="12" />
-            <span>{{ t('message.voiceToText.provider') }}</span>
-          </span>
-          <button
-            class="voice-message__text-toggle"
-            @click.stop="onToggleVoiceText"
-          >
-            {{ t('message.voiceToText.hideText') }}
-          </button>
-        </div>
-      </template>
-      <!-- 已有结果：当前隐藏，提供显示入口 -->
-      <template v-else>
-        <div class="voice-message__text-footer voice-message__text-footer--center">
-          <button
-            class="voice-message__text-toggle"
-            @click.stop="onToggleVoiceText"
-          >
-            {{ t('message.voiceToText.showText') }}
-          </button>
         </div>
       </template>
     </div>
@@ -280,9 +256,9 @@ function onToggleVoiceText() {
 }
 
 @media (hover: hover) {
-.voice-message__bubble:hover {
-  opacity: 0.85;
-}
+  .voice-message__bubble:hover {
+    opacity: 0.85;
+  }
 }
 
 /* 转文字结果卡片 */
@@ -307,46 +283,10 @@ function onToggleVoiceText() {
 }
 
 .voice-message__text--loading {
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-}
-
-.voice-message__text-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 6px;
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-}
-
-.voice-message__text-footer--center {
-  justify-content: flex-start;
-  margin-top: 0;
-}
-
-.voice-message__text-provider {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  opacity: 0.75;
-  user-select: none;
-}
-
-.voice-message__text-toggle {
-  padding: 0;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-primary-color);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-@media (hover: hover) {
-.voice-message__text-toggle:hover {
-  opacity: 0.8;
-}
+  color: var(--uikit-text-secondary);
 }
 </style>

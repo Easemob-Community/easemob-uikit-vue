@@ -34,9 +34,11 @@
 - `components/`：每个组件一对——`<name>.md`（手写正文）+ `<name>/demo/*.vue`（示例）;
   业务容器（conversation-container / chat-container / contact-container /
   address-book-container / group-container / add-contact-modal / create-group-modal）
-  只有 md，无 demo 目录（容器依赖 SDK 登录态，不便于静态演示）；
+  大多只有 md，无 demo 目录（容器依赖 SDK 登录态，不便于静态演示）；
+  例外：`message-list.md` 有 demo 目录——消息列表演练场用 mock 注入免登录渲染
+  （见 §2 交互式 demo 约定），新容器页若采用同模式可按需建 demo 目录；
 - `.vitepress/config.ts`：sidebar 结构（指南 + 组件四组分类：基础 10 / 反馈 8 /
-  数据展示 4 / 业务模块 7）、nav、`ignoreDeadLinks: [/packages\/uikit\//]`
+  数据展示 4 / 业务模块 8）、nav、`ignoreDeadLinks: [/packages\/uikit\//]`
   （icons.md 引用仓库内源码文件，跳过死链校验）；
 - `.vitepress/components/`：站点级自定义组件（如 IconGallery.vue 图标画廊）；
 - `.vitepress/gen/`：gen:api 生成产物目录，提交但**禁止手改**。
@@ -65,21 +67,41 @@
 - demo 文件命名按场景（types.vue / sizes.vue / states.vue / events.vue），
   一个 demo 只演示一个主题，别把多个能力塞进一个文件。
 
+**交互式 demo（配置演练场）约定：**
+
+- `DocsConfigPanel`（`.vitepress/components/DocsConfigPanel.vue`，已在 theme 注册为
+  全局组件）用声明式 `configItems` 数组（label / key / tip / type: select|boolean|number /
+  options / min / max）渲染互斥选项组 / 布尔开关 / 数字输入，v-model 回写一个
+  reactive 配置对象——避免每个演练场手写一堆 checkbox/按钮样板；
+- mock 免登录注入模式：`EmUIKitProvider(:auto-init="false")` 包裹 +
+  `useConversationStore().setConversationList/setCurrentConversationId` +
+  `useMessageStore().messageMap[id] = mock 消息`（参考
+  `packages/uikit/src/modules/chat/message-list/message-list.story.vue`）；
+  共享 mock 数据放 `components/<name>/demo/mock-*.ts` 供多个 demo 复用；
+- demo 经 `<demo>` 块的 ClientOnly 包裹仅在客户端执行；若未来脱离 ClientOnly
+  直引 demo 源文件，mock 注入前需 `typeof window` 守卫（避免触碰 SSR）。
+
 ## 3. API 表格自动生成（scripts/gen-api-docs.mjs）
 
 - 运行：`pnpm gen:api`（在 apps/docs 下）或 `cd apps/docs && pnpm gen:api`；
   幂等可重复执行，覆盖生成；
 - **白名单**：`COMPONENTS` 数组硬编码 22 个原子组件（action-sheet 到 user-card），
-  新组件要进 API 文档必须同时加入该数组；
+  `MODULES` 数组覆盖业务容器（chat-container / conversation-container /
+  group-container / message-list，映射到 `modules/*` 的组件文件）；新组件/容器要进
+  API 文档必须加入对应数组；
 - 解析契约（对 `packages/uikit/src/components/<name>/<name>.vue` 的 `<script setup>`）：
   - Props：`export interface XxxProps` 的成员，类型取 TS 类型文本，说明取成员
-    JSDoc **第一行**；
+    JSDoc **完整文本**（多行合并为 `<br>` 换行；嵌套小节标题的 blockquote 只取首行）；
   - 默认值：`withDefaults(defineProps<XxxProps>(), {...})` 第二个参数；
   - Events：`export interface XxxEmits`（函数签名式）或 `defineEmits<{...}>()` 内联
     类型字面量，事件名取第一个字符串字面量参数，负载取其余参数类型；
   - Slots：模板中 `<slot name="...">` 具名插槽列表（无说明列）；
 - 输出：`.vitepress/gen/<name>.md`（表头 + 对齐表格），组件页用 `@include` 引入；
-- **组件侧联动**：给 props/emits 成员写 JSDoc 第一行，就是写文档——改 API 后
+  业务容器输出在顶层 `### Props` 之外，还会为嵌套配置生成 `#### config.xxx` 子小节
+  （嵌套类型递归展开：深度上限 3、按类型名去重、函数/联合/泛型只显示类型原文），
+  `MODULES` 条目可用 `nestedOnly` 限定只展开某个子树（如 message-list 只展开
+  `config.messageList`，其余 ChatConfig 配置对该组件无效）；
+- **组件侧联动**：给 props/emits 成员写 JSDoc，就是写文档——改 API 后
   记得重跑 gen:api，否则表格与类型脱节；
 - 解析失败（语法错误/无 script setup）会 warn 跳过并计入成功率，不会中断整体。
 
@@ -125,8 +147,9 @@
 
 - 组件 demo 文件必须放 `components/<name>/demo/`，md 内 src 写 `./demo/x.vue`。
 - API 表格一律由 gen:api 生成，禁止手改 `.vitepress/gen/*.md`。
-- 改组件公开 API 后必须重跑 `pnpm gen:api`（JSDoc 第一行即文档）。
-- 新组件进 API 文档必须加入 gen-api-docs.mjs 的 COMPONENTS 白名单。
+- 改组件公开 API 后必须重跑 `pnpm gen:api`（JSDoc 即文档）。
+- 新组件进 API 文档必须加入 gen-api-docs.mjs 的白名单（原子组件 COMPONENTS，
+  业务容器 MODULES）。
 - 新页面必须登记到 `.vitepress/config.ts` 的 sidebar（组件按分类、指南按分组）。
 - demo 源文件必须能独立编译运行（docs build 会真实渲染）。
 
@@ -138,10 +161,15 @@
 
 ## 已知漂移（改到相关文件时注意）
 
-- sidebar 组件数量（基础 10 / 反馈 8 / 数据展示 4 / 业务模块 7）与首页 features
-  「18 个原子组件」是静态文案，随组件增减同步更新。
-- gen-api-docs.mjs 白名单只覆盖原子组件；业务容器页（chat-container 等）的
-  API 段落是手写的，改动容器 props 时手动维护对应 md。
+- sidebar 组件数量（基础 10 / 反馈 8 / 数据展示 4 / 业务模块 8）与首页 features
+  「18 个原子组件」是静态文案，随组件增减同步更新；message-list 属业务模块
+  （非原子组件），登记时不影响 features 数字。
+- gen-api-docs.mjs 白名单已覆盖原子组件（COMPONENTS）与业务容器（MODULES）；
+  chat-container / conversation-container / group-container / message-list 的
+  API 段落由生成器维护（`@include`），改动容器 props 后重跑 gen:api 即可，不再手写。
+  未接入的容器（contact-container / address-book-container / add-contact-modal /
+  create-group-modal）仍是手写段落；注意 contact-container.md 描述的是尚未实现的
+  EmContactContainer（通讯录聚合容器），不要错接 contact-list.vue 生成。
 - 文档站 alias 没有 `@easemob/uikit/theme` 子路径（与 demo 应用不同），demo 里
   不要 import theme 子路径。
 
@@ -156,3 +184,7 @@
 - ❌ 新组件不加入 gen-api-docs 白名单——API 表格永远缺失。
 - ❌ 只 `pnpm dev` 不 `pnpm build`——demo 编译错误（如类型/引用）在 dev 下可能
   被吞掉，build 才是文档站门禁。
+- ❌ API 表格单元格裸写含 `{ ... }` 的匿名对象文本——markdown-it-attrs 会把
+  `payload: { type: string }` 误判为元素属性块并注入相邻标签，docs build 报
+  `Duplicate attribute`；gen 脚本对 Events 参数列含 `{` 的文本已自动包反引号规避，
+  手写 md 段落同样遵循此规则（包反引号或转义）。

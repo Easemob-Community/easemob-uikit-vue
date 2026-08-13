@@ -8,7 +8,7 @@ import { linkify } from '../../../utils/linkify'
 import type { LinkSegment } from '../../../utils/linkify'
 import Icon from '../../../components/icon/icon.vue'
 import type { TextMessageType } from '../../../store/message'
-import type { ChatConfig } from '../types'
+import type { BubbleShape, ChatConfig } from '../types'
 
 export interface TextMessageProps {
   message: TextMessageType
@@ -16,7 +16,6 @@ export interface TextMessageProps {
 
 export interface TextMessageEmits {
   (e: 'reedit', message: TextMessageType): void
-  (e: 'toggle-translation', message: TextMessageType): void
   (e: 'mention-click', userId: string): void
 }
 
@@ -24,8 +23,13 @@ const props = defineProps<TextMessageProps>()
 const emit = defineEmits<TextMessageEmits>()
 
 const themeStore = useThemeStore()
+
+/** 气泡形状：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
 const bubbleClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'text-message__bubble--square' : '',
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'text-message__bubble--square'
+    : '',
 )
 
 const { t } = useLocale()
@@ -138,15 +142,11 @@ const showTranslated = computed(() => hasTranslation.value && props.message.show
 /** 是否正在翻译中 */
 const translating = computed(() => !!props.message.translating)
 
-/** 是否需要显示译文卡片：翻译中 / 已有译文（无论显示原文还是译文，均显示卡片，仅文本与切换按钮不同） */
-const showTranslationCard = computed(() => translating.value || hasTranslation.value)
+/** 是否需要显示译文卡片：翻译中 / 已有译文且未隐藏（切换入口在右键菜单） */
+const showTranslationCard = computed(() => translating.value || (hasTranslation.value && showTranslated.value))
 
 function onReedit() {
   emit('reedit', props.message)
-}
-
-function onToggleTranslation() {
-  emit('toggle-translation', props.message)
 }
 
 /** 链接点击处理：支持拦截器 */
@@ -229,14 +229,15 @@ function onMentionClick(userId: string, event: MouseEvent) {
           </span>
         </div>
       </div>
-      <!-- 译文卡片（气泡下方独立卡片） -->
+      <!-- 译文卡片（气泡下方独立卡片，隐藏/显示译文入口在右键菜单） -->
       <div v-if="showTranslationCard" class="text-message__translation-card">
         <!-- 翻译中 -->
         <div v-if="translating" class="text-message__translation-text text-message__translation-text--loading">
-          {{ t('message.translate.loading') }}
+          <Icon name="actions/loading_arc" :size="14" anim="spin" />
+          <span>{{ t('message.translate.loading') }}</span>
         </div>
         <!-- 已有译文：显示译文 -->
-        <template v-else-if="showTranslated">
+        <template v-else>
           <div class="text-message__translation-text">
             <template v-if="translationHasLinks && translationSegments">
               <template v-for="(seg, idx) in translationSegments" :key="idx">
@@ -254,29 +255,6 @@ function onMentionClick(userId: string, event: MouseEvent) {
             <template v-else>
               {{ props.message.translation?.text }}
             </template>
-          </div>
-          <div class="text-message__translation-footer">
-            <span class="text-message__translation-provider">
-              <Icon name="actions/check_in_circle_fill" :size="12" />
-              <span>{{ t('message.translate.provider') }}</span>
-            </span>
-            <button
-              class="text-message__translate-toggle"
-              @click.stop="onToggleTranslation"
-            >
-              {{ t('message.translate.showOriginal') }}
-            </button>
-          </div>
-        </template>
-        <!-- 已有译文：当前显示原文，提供切回译文入口 -->
-        <template v-else>
-          <div class="text-message__translation-footer text-message__translation-footer--center">
-            <button
-              class="text-message__translate-toggle"
-              @click.stop="onToggleTranslation"
-            >
-              {{ t('message.translate.showTranslated') }}
-            </button>
           </div>
         </template>
       </div>
@@ -354,47 +332,11 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message__translation-text--loading {
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-}
-
-.text-message__translation-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 6px;
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-}
-
-.text-message__translation-footer--center {
-  justify-content: flex-start;
-  margin-top: 0;
-}
-
-.text-message__translation-provider {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  opacity: 0.75;
-  user-select: none;
-}
-
-.text-message__translate-toggle {
-  padding: 0;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-primary-color);
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-@media (hover: hover) {
-.text-message__translate-toggle:hover {
-  opacity: 0.8;
-}
+  color: var(--uikit-text-secondary);
 }
 
 .text-message__reedit-btn {
@@ -408,9 +350,9 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.text-message__reedit-btn:hover {
-  opacity: 0.8;
-}
+  .text-message__reedit-btn:hover {
+    opacity: 0.8;
+  }
 }
 
 /* @提及高亮样式 */
@@ -422,11 +364,11 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.text-message__mention:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
+  .text-message__mention:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 .text-message--self .text-message__mention {
@@ -445,9 +387,9 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.text-message__link:hover {
-  opacity: 0.8;
-}
+  .text-message__link:hover {
+    opacity: 0.8;
+  }
 }
 
 .text-message--self .text-message__link {

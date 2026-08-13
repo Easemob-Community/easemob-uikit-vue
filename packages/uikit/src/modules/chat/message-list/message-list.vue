@@ -44,7 +44,7 @@ export interface MessageListEmits {
 const props = defineProps<MessageListProps>()
 const emit = defineEmits<MessageListEmits>()
 
-const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, toggleTranslation, transcribeVoiceMessage, toggleVoiceText, resendMessage, getHistoryCursor } = useChat()
+const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, transcribeVoiceMessage, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
 const { isMobile } = useViewport()
 const { h5, stores } = useUIKit()
@@ -478,16 +478,6 @@ function resolveTranslateErrorMessage(e: unknown): string {
   return t('message.translate.failed', '翻译失败，请稍后重试')
 }
 
-/** 文本消息翻译切换（显示译文/原文） */
-function onToggleTranslation(message: UiMessage) {
-  toggleTranslation(message.msgServerId || message.msgLocalId)
-}
-
-/** 语音消息转文字结果切换（显示/隐藏） */
-function onToggleVoiceText(message: UiMessage) {
-  toggleVoiceText(message.msgServerId || message.msgLocalId)
-}
-
 /** 通过 VueUse useClipboard 复制消息文本 */
 async function handleCopyMessage(message: UiMessage) {
   const text = message.type === MESSAGE_TYPE.TEXT ? (message.body as TextMessageBody).content || '' : ''
@@ -777,8 +767,6 @@ watch(locateRequest, (req) => {
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
           @resend="onResend"
-          @toggle-translation="onToggleTranslation"
-          @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
           @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
@@ -828,8 +816,6 @@ watch(locateRequest, (req) => {
           @group-read-click="onGroupReadClick"
           @reedit="onReedit"
           @resend="onResend"
-          @toggle-translation="onToggleTranslation"
-          @toggle-voice-text="onToggleVoiceText"
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
           @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"

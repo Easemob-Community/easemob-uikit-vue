@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
+import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
+import { INJECTION_KEY } from '../../../constants'
 import { useLocale } from '../../../locale'
 import { useToast } from '../../../composables/use-toast'
 import Icon from '../../../components/icon/icon.vue'
 import { detectEnvironment, downloadFile } from '../../../utils/download'
 import type { UiMessage, VideoMessageBody } from '../../../sdk/types'
+import type { BubbleShape } from '../types'
 
 export interface VideoMessageProps {
   message: UiMessage
@@ -16,8 +19,12 @@ const props = defineProps<VideoMessageProps>()
 const themeStore = useThemeStore()
 const { t } = useLocale()
 const { show: showToast } = useToast()
+/** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
 const videoClass = computed(() =>
-  themeStore.bubbleShape === 'square' ? 'video-message__video--square' : '',
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'video-message__video--square'
+    : '',
 )
 
 const body = computed(() => props.message.body as VideoMessageBody)

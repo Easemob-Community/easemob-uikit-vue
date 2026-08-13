@@ -88,6 +88,7 @@ export default defineConfig({
           items: [
             { text: '会话模块', link: '/components/conversation-container' },
             { text: '聊天模块', link: '/components/chat-container' },
+            { text: '消息列表 MessageList', link: '/components/message-list' },
             { text: '通讯录模块', link: '/components/contact-container' },
             { text: '地址簿容器', link: '/components/address-book-container' },
             { text: '群组模块', link: '/components/group-container' },

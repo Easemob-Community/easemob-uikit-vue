@@ -40,36 +40,11 @@ function onSelect() {
 
 <demo src="./demo/item.vue" title="会话列表项" desc="静态展示单聊、群聊置顶、免打扰与未读红点（dot）四种形态；实际业务中长按（H5）/ 右键（PC）可唤起操作菜单。" />
 
-## Props
+## API
 
-- `showSearch`：是否展示搜索框，默认 `true`
-- `showScrollToTop`：是否展示滚动置顶按钮，默认 `true`
-- `customActions`：自定义操作菜单（popup / action sheet）条目，默认 `[]`，类型 `ConversationAction[]`
-- `timeFormatter`：自定义时间格式化函数，覆盖内置智能格式，类型 `(timestamp: number) => string`
-- `messageFormatter`：自定义消息摘要格式化函数，覆盖内置类型映射，类型 `(msg: string, type?: string) => string`
-- `showSenderName`：群聊是否显示发送者名称，默认 `true`
-- `emptyText`：空列表提示文字，默认 `-`
-- `unreadMode`：未读数显示模式，`'count'` 数字 / `'dot'` 红点，默认 `'count'`
-- `showHeader`：是否展示头部区域，默认 `true`
-- `title`：Header 标题文本
-- `headerAlign`：Header 对齐方式，`'left' | 'center' | 'right'`，默认 `'left'`
-- `filterFn`：自定义搜索过滤函数，类型 `(keyword: string, item: Conversation) => boolean`
-- `bodySticky`：`#body` 插槽是否固定不随列表滚动，默认 `false`
-- `footerSticky`：`#footer` 插槽是否固定不随列表滚动，默认 `false`
-- `pullRefresh`：是否启用下拉刷新（H5），默认 `false`
-- `enablePresence`：单聊头像是否展示在线状态；不传则使用 Provider 全局配置
-- `tabs`：会话分栏 tab 集合，默认 `['all', 'unread', 'atMe', 'single', 'group']`；顺序即渲染优先级，传空数组可隐藏 tab 栏
-- `activeTab`：当前激活的分栏 tab，默认 `'all'`，支持 `v-model:active-tab` 双向绑定
-- `showStatusBanner`：是否展示连接/同步状态横幅（断网、连接中、同步中），默认 `true`
-- `draftStorage`：草稿存储模式，`'none'` 内存 / `'session'` 会话 / `'local'` 本地持久化，默认 `'none'`
+<!-- @include: ../.vitepress/gen/conversation-container.md -->
 
-## 事件
-
-- `conversation-select`：点击某个会话，参数 `conversation: Conversation`
-- `update:active-tab`：切换分栏 tab，参数 `tab: ConversationTabKey`（配合 `v-model:active-tab` 使用）
-- `reconnect`：断网/连接失败横幅被点击时触发，由业务方决定重连策略
-
-## 插槽
+## 插槽说明
 
 - `header`：自定义头部内容（替代默认标题）
 - `empty`：空列表状态，接收 `keyword` 等插槽属性
