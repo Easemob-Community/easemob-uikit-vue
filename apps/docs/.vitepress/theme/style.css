@@ -4,12 +4,27 @@
  */
 
 /* ========== 品牌变量 ========== */
+/* 标题 display 字体：得意黑 Smiley Sans（OFL-1.1 开源可商用，atelier-anchor/smiley-sans）
+   斜体动感设计，仅用于标题/hero/导航标题；正文保持系统中文栈保证阅读舒适性 */
+@font-face {
+  font-family: 'Smiley Sans';
+  src: url('/fonts/smiley-sans.woff2') format('woff2');
+  font-weight: 600;
+  font-style: oblique;
+  font-display: swap;
+}
+
 :root {
   /* 品牌色：复用 uikit 主题蓝 */
   --vp-c-brand-1: hsl(203, 100%, 47%);
   --vp-c-brand-2: hsl(203, 100%, 42%);
   --vp-c-brand-3: hsl(203, 100%, 55%);
   --vp-c-brand-soft: hsl(203, 100%, 60%, 0.14);
+
+  /* 标题 display 字体：得意黑优先，回落到系统字体 */
+  --vp-font-family-display: 'Smiley Sans', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 
   /* 首页 hero 渐变（同色系深浅过渡） */
   --vp-home-hero-name-background: linear-gradient(
@@ -20,12 +35,28 @@
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-width: calc(100% - 16px);
 
+  /* hero logo 光晕（antfu skill：image glow） */
+  --vp-home-hero-image-background-image: radial-gradient(
+    circle at 50% 50%,
+    hsl(203, 100%, 60%, 0.35),
+    hsl(196, 100%, 50%, 0.12) 45%,
+    transparent 70%
+  );
+  --vp-home-hero-image-filter: blur(56px);
+
   /* 文档内容宽度 */
   --vp-layout-max-width: 1440px;
   --vp-content-width: 960px;
 
   /* 圆角体系 */
   --vp-border-radius: 8px;
+
+  /* 字体栈：中文字体优先（theme-without-fonts 已移除默认 Inter） */
+  --vp-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+  --vp-font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
 }
 
 .dark {
@@ -33,6 +64,14 @@
   --vp-c-brand-2: hsl(203, 100%, 55%);
   --vp-c-brand-3: hsl(203, 90%, 45%);
   --vp-c-brand-soft: hsl(203, 100%, 60%, 0.2);
+}
+
+/* ========== 暗色切换过渡（View Transitions） ========== */
+/* 浅色/深色 root 切换时禁用默认交叉淡入（白闪），改由 Layout.vue 的圆形扩散接管 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /* ========== 布局 ========== */
@@ -86,11 +125,21 @@
 }
 
 /* ========== 侧边栏 ========== */
+/* 分组标题（基础组件 / 反馈组件 / 业务模块…）：标题感 —— 更大更重更深；
+   此前被覆盖为 13px/600/text-2/uppercase，反而比条目（14px）小且弱 */
 .VPSidebarItem.level-0 > .item > .text {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  color: var(--vp-c-text-1);
+}
+
+/* 条目（Button 按钮…）：次级层级，字号略小于分组标题，常规字重 */
+.VPSidebarItem.level-1 .text,
+.VPSidebarItem.level-2 .text {
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--vp-c-text-2);
 }
 
@@ -101,9 +150,45 @@
     background-color 0.2s;
 }
 
+/* 激活条目：品牌色 + 浅色底，并加重字重突出当前位置 */
 .VPSidebarItem .link.active {
   color: var(--vp-c-brand-1);
   background-color: var(--vp-c-brand-soft);
+}
+
+.VPSidebarItem .link.active .text {
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+}
+
+/* ========== 标题 display 字体应用（得意黑，设计感来源） ========== */
+/* 首页 hero 名称 / 简介 */
+.VPHero .name,
+.VPHero .text {
+  font-family: var(--vp-font-family-display);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* 文档标题 */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  font-family: var(--vp-font-family-display);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* 导航站点标题 */
+.VPNavBarTitle .title {
+  font-family: var(--vp-font-family-display);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* 侧边栏分组标题 */
+.VPSidebarItem.level-0 > .item > .text {
+  font-family: var(--vp-font-family-display);
 }
 
 /* ========== 文档内容 ========== */
@@ -135,6 +220,68 @@
 /* ========== 代码块 ========== */
 .vp-doc div[class*='language-'] {
   border-radius: 10px;
+}
+
+/* 代码块顶栏（语言标签 + 复制按钮）品牌化 */
+.vp-doc div[class*='language-']::before {
+  content: attr(class);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px 12px;
+  border-radius: 10px 0 0 0;
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--vp-c-text-2);
+  background-color: var(--vp-c-bg-soft);
+  border-right: 1px solid var(--vp-c-divider);
+  border-bottom: 1px solid var(--vp-c-divider);
+  opacity: 0.85;
+}
+
+.vp-doc div[class*='language-'] .lang {
+  display: none;
+}
+
+.vp-doc .copy {
+  top: 6px;
+  right: 6px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.vp-doc div[class*='language-']:hover .copy {
+  opacity: 1;
+}
+
+.vp-doc .copy:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-brand-soft);
+}
+
+/* ========== 提示容器 ========== */
+.vp-doc .custom-block {
+  border-radius: 8px;
+  border-left-width: 3px;
+}
+
+.vp-doc .custom-block.tip {
+  border-left-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .custom-block.warning {
+  border-left-color: var(--vp-c-warning-1);
+}
+
+.vp-doc .custom-block.danger {
+  border-left-color: var(--vp-c-danger-1);
+}
+
+.vp-doc .custom-block.info {
+  border-left-color: var(--vp-c-brand-2);
 }
 
 /* ========== Demo 容器（vite-plugin-vitepress-demo → Element UI 风格） ========== */

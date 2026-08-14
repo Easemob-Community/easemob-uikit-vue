@@ -1,16 +1,18 @@
 import type { Theme } from 'vitepress'
-import DefaultTheme from 'vitepress/theme'
+// theme-without-fonts：移除默认 Inter，字体栈由 style.css 自定义（antfu vitepress skill 规范）
+import DefaultTheme from 'vitepress/theme-without-fonts'
 import { createPinia } from 'pinia'
 import UIKit from '@easemob/uikit'
 import IconGallery from '../components/IconGallery.vue'
 import DocsConfigPanel from '../components/DocsConfigPanel.vue'
+import VuePlayground from '../components/VuePlayground.vue'
 import DemoBlock from './DemoBlock.vue'
-import HomeLayout from './HomeLayout.vue'
+import Layout from './Layout.vue'
 import './style.css'
 
 export default {
   extends: DefaultTheme,
-  Layout: HomeLayout,
+  Layout,
   enhanceApp({ app }) {
     app.use(createPinia())
     app.use(UIKit)
@@ -22,5 +24,7 @@ export default {
     // 声明式配置面板：demo 内以 items 声明 + model 对象驱动开关，
     // 复刻 demo 应用设置面板交互（按钮组 / 复选框 / 数字输入 + 问号说明）
     app.component('DocsConfigPanel', DocsConfigPanel)
+    // 可编辑代码实时预览演练场（@vue/repl 封装，本地 vendor 静态托管）
+    app.component('VuePlayground', VuePlayground)
   },
 } satisfies Theme

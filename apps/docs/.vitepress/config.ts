@@ -20,12 +20,12 @@ export default defineConfig({
     siteTitle: 'Easemob UIKit',
 
     nav: [
-      { text: '首页', link: '/' },
-      { text: '指南', link: '/guide/quickstart' },
-      { text: '组件', link: '/components/button' },
-      { text: '主题定制', link: '/guide/theme' },
-      { text: 'H5 适配', link: '/guide/h5-adaptation' },
-      { text: '更新日志', link: '/guide/changelog' },
+      { text: '首页', link: '/', activeMatch: '^/$' },
+      { text: '指南', link: '/guide/quickstart', activeMatch: '^/guide/(?!theme|h5-adaptation|changelog)' },
+      { text: '组件', link: '/components/button', activeMatch: '^/components/' },
+      { text: '主题定制', link: '/guide/theme', activeMatch: '^/guide/theme' },
+      { text: 'H5 适配', link: '/guide/h5-adaptation', activeMatch: '^/guide/h5-adaptation' },
+      { text: '更新日志', link: '/guide/changelog', activeMatch: '^/guide/changelog' },
       { text: 'GitHub', link: 'https://github.com/easemob/easemob-uikit-vue' },
     ],
 
@@ -41,6 +41,7 @@ export default defineConfig({
             { text: '系统通知文案定制', link: '/guide/notice-customization' },
             { text: '进阶指南', link: '/guide/advanced' },
             { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
+            { text: 'Demo 第二期规划（演练场）', link: '/guide/demo-phase2-plan' },
             { text: '更新日志', link: '/guide/changelog' },
           ],
         },
@@ -48,6 +49,7 @@ export default defineConfig({
       '/components/': [
         {
           text: '基础组件',
+          collapsed: false,
           items: [
             { text: 'Button 按钮', link: '/components/button' },
             { text: 'Icon 图标', link: '/components/icon' },
@@ -63,6 +65,7 @@ export default defineConfig({
         },
         {
           text: '反馈组件',
+          collapsed: false,
           items: [
             { text: 'ActionSheet 操作菜单', link: '/components/action-sheet' },
             { text: 'Modal 弹窗', link: '/components/modal' },
@@ -76,6 +79,7 @@ export default defineConfig({
         },
         {
           text: '数据展示',
+          collapsed: false,
           items: [
             { text: 'PresenceAvatar 在线头像', link: '/components/presence-avatar' },
             { text: 'PresenceSelector 状态选择', link: '/components/presence-selector' },
@@ -85,6 +89,7 @@ export default defineConfig({
         },
         {
           text: '业务模块',
+          collapsed: false,
           items: [
             { text: '会话模块', link: '/components/conversation-container' },
             { text: '聊天模块', link: '/components/chat-container' },
@@ -145,7 +150,13 @@ export default defineConfig({
 
     footer: {
       message: '基于 VitePress 构建 · 环信 Easemob UIKit',
-      copyright: `Copyright © 2024 Easemob · UIKit v${version}`,
+      copyright: `Copyright © 2024-${new Date().getFullYear()} Easemob · UIKit v${version}`,
+    },
+
+    // 编辑本页：GitHub 仓库对应路径（apps/docs 为文档源目录）
+    editLink: {
+      pattern: 'https://github.com/easemob/easemob-uikit-vue/edit/main/apps/docs/:path',
+      text: '在 GitHub 上编辑此页',
     },
   },
 })
