@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.8.0 (2026-08-13)
+
+### 新增
+
+- **二期配置演练场矩阵（docs 交互式演示，6 个方向全部落地）**：
+  - **会话列表配置演练场**：`EmConversationContainer` 覆盖 `showSenderName` / `unreadMode`（count|dot）/ `showHeader` / 分栏 Tabs（五类预设）/ `showStatusBanner` / `showSearch` / `showScrollToTop` / `headerAlign` / `bodySticky`，mock 会话直灌免登录渲染
+  - **输入框配置演练场**：`EmMessageInput` 覆盖 `mode`（simple|rich）/ `style`（feishu|wechat）/ features 六开关 / `autoFocus` / `focusBorderColor` / `caretColor` / `selectionColor` / `showSendButton` / `resizable` / `expandable`，输入回车或点发送可在下方消息列表回显
+  - **单条消息气泡演练场**：`EmMessageBubbleWrapper` 覆盖多选态（自建进入/退出驱动）、引用卡片（ext.msgQuote + 定位闪烁）、状态组合（classic|capsule × inline|below × showText / direction）+ 群已读圆圈三态
+  - **群已读回执 / 群管理演练场**：`ChatConfig.groupReadReceipt`（enabled / maxGroupSize）+ `EmGroupManagementSection`（drawer|modal 双形态 + 六入口开关），mock 群角色 owner/admin/member 实时切换视角
+  - **原子组件交互 demo 增强**：Avatar（shape 主题联动 / size / presence 实时切换）与 Badge（count / max / dot / 状态颜色 / 尺寸 / 风格）升级为交互式配置演示
+  - **主题 token 演练场**：实时调整品牌色相 / 组件圆角 / 字号档位（适老）/ 密度档位，会话列表即改即看；通过舞台局部 CSS 变量 + `data-uikit-density` 生效，不写入全局主题
+- **在线代码演练场规模化（VuePlayground，@vue/repl 可编辑代码实时预览）**：
+  - 基础设施增强：多文件模板约定（`App.vue` 主编辑区 + `mock.ts` mock 数据分离）；编辑内容按 `uikit-playground:<id>:v1` 本地持久化（刷新/切页自动恢复，「重置代码」清除缓存）；工具条新增「全屏」与「新标签打开」（`serialize()` → `public/playground.html` 独立页，全量走本地 vendor 产物）
+  - **配置演练场与在线代码演练场合并**：DocsConfigPanel 面板式演练场全部并入在线代码演练场（config.vue 移除），页面只保留一个「在线代码演练场」小节；原面板配置项（会话容器 props / 输入框 config / 群管理配置 / Avatar / Badge 等）全部体现在模板的「可编辑配置」区，改代码即改即看
+  - 演练场覆盖扩展至 8 个组件页：Avatar（shape 主题联动 / size / presence）、Badge（count/max/dot/状态色/尺寸/风格）、Button（type/size/disabled/loading/block）、Cell（title/meta/箭头/边框/尺寸/状态）、Input（形态/type/disabled/maxlength/clearable）、会话列表（容器 props + mock 会话）、聊天容器（`config.input` 配置 + mock 消息回显）、群能力（群管理入口 + 群已读回执三态，角色视角可切换）
+  - 演练场预览样式修复：预览 iframe 改注入 uikit dist 构建产物 CSS（`dist/theme/index.css`，含全部组件样式），此前仅注入 `:root` 主题变量导致 iframe 内组件无样式
+
+### 修复
+
+- **`config.input.focusBorderColor` 配置接线**：该配置此前为孤儿配置（输入框聚焦边框一直使用主题主色），现经 v-bind 接通聚焦边框颜色，config 优先、未配置回落主题值
+- **在线演练场「新标签打开」独立页白屏**：`sync:vendor` 将 @vue/repl 本体与 codemirror 编辑器分别打包成两个 bundle，共享 chunk 中的 `injectKeyProps` Symbol 在两处各求值一次，编辑器 `inject` 失配导致 setup 崩溃白屏；现合并为单一 `vendor/repl.js`（共享 chunk 单例），headless Chrome 实测无 hash / 带 hash（真实 serialize 格式）双链路均正常渲染
+
 ## 1.7.0 (2026-08-13)
 
 ### 新增
