@@ -202,15 +202,38 @@
   border-top: 1px solid var(--vp-c-divider);
 }
 
+/* API 表格：修复长内容溢出（此前 overflow: hidden 禁用了默认横向滚动，长列被裁剪） */
 .vp-doc table {
+  display: block; /* 保持 VitePress 默认块级滚动容器 */
   border-radius: 8px;
-  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  overflow-x: auto; /* 超宽表格横向滚动兜底（替代 overflow: hidden） */
 }
 
 .vp-doc th {
   font-size: 13px;
   font-weight: 600;
   background-color: var(--vp-c-bg-soft);
+  white-space: nowrap; /* 表头不换行 */
+}
+
+/* 单元格：长说明自动换行，避免撑破页面 */
+.vp-doc th,
+.vp-doc td {
+  word-break: break-word;
+  vertical-align: top;
+}
+
+/* 类型/代码列：长类型（如内联对象、Promise<...>）允许断行，替代横向撑破 */
+.vp-doc td code,
+.vp-doc th code {
+  white-space: normal;
+  word-break: break-all;
+}
+
+/* 首列（属性/事件名）：保持单行对齐 */
+.vp-doc td:first-child {
+  white-space: nowrap;
 }
 
 .vp-doc code {
