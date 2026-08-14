@@ -40,8 +40,6 @@ export default defineConfig({
             { text: 'H5 适配', link: '/guide/h5-adaptation' },
             { text: '系统通知文案定制', link: '/guide/notice-customization' },
             { text: '进阶指南', link: '/guide/advanced' },
-            { text: 'Provider 全局配置', link: '/guide/provider' },
-            { text: 'Store 状态管理', link: '/guide/stores' },
             { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
             { text: 'Demo 第二期规划（演练场）', link: '/guide/demo-phase2-plan' },
             { text: '更新日志', link: '/guide/changelog' },
@@ -49,6 +47,9 @@ export default defineConfig({
         },
       ],
       '/components/': [
+        // 顶级条目：全局能力（Provider / Store）置于分组之前
+        { text: 'Provider 全局配置', link: '/components/provider' },
+        { text: 'Store 状态管理', link: '/components/stores' },
         {
           text: '基础组件',
           collapsed: false,

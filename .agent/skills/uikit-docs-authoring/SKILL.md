@@ -10,7 +10,7 @@
 - `gen:api` / `gen-api-docs` / `API 文档` / `@include`
 - `sidebar` / `导航` / `组件目录` / `IconGallery`
 - `快速开始` / `主题定制` / `H5 适配` / `更新日志`（guide 系列页面）
-- `Provider` / `store` / `useXxxStore` / `状态管理` / `Pinia`（guide/provider.md 与 guide/stores.md）
+- `Provider` / `store` / `useXxxStore` / `状态管理` / `Pinia`（components/provider.md 与 components/stores.md，组件 sidebar 顶级条目，位于分组之前）
 
 ## 目标
 
