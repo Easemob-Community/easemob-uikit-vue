@@ -231,6 +231,23 @@ watch(
   },
 )
 
+/**
+ * 流式消息内容增长时跟随滚动：分片更新只改最后一条消息的内容、不改消息数量，
+ * 上述 length watch 不会触发，需单独监听最后一条的 stream.fullText。
+ * 仅在用户已位于底部时跟随，不打扰上翻阅读；终态后 fullText 不再变化，自动停止。
+ */
+watch(
+  () => {
+    const lastMsg = messages.value[messages.value.length - 1]
+    return lastMsg?.stream?.fullText || ''
+  },
+  () => {
+    if (isAtBottom.value && currentConversation.value?.id) {
+      scrollToBottom()
+    }
+  },
+)
+
 /** 滚动到底部 */
 function scrollToBottom() {
   nextTick(() => {
@@ -703,10 +720,11 @@ function locateAndFlash(targetMsgID: string): boolean {
     setHighlight(targetMsgID)
     if (highlightTimer)
       clearTimeout(highlightTimer)
+    // 与 message-bubble-wrapper 的高亮动画总时长（2.4s）对齐，动画结束后清除高亮态
     highlightTimer = setTimeout(() => {
       setHighlight('')
       highlightTimer = null
-    }, 1300)
+    }, 2500)
   })
   return true
 }

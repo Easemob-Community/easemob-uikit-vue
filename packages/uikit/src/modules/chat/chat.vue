@@ -14,6 +14,7 @@ import { resolveLastMessageText, resolveSenderDisplayName } from '../../utils/re
 import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE, NOTICE_EVENT_TYPE } from '../../constants'
 import type { ConversationTypeValue, ForwardModeValue } from '../../constants'
 import { insertChatNotice } from '../../sdk/event/notice-utils'
+import { normalizeUserId } from '../../sdk/adapter/message-adapter'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '../../sdk/types'
 import Icon from '../../components/icon/icon.vue'
 import IconButton from '../../components/icon-button/icon-button.vue'
@@ -814,6 +815,37 @@ function onSearchLocate(msgId: string) {
   requestLocate(msgId)
 }
 
+/**
+ * 点击消息中的 @名字：
+ * - 若未关闭 locateOnMentionClick，在消息列表内定位该用户最近一条消息（复用引用定位高亮）
+ * - 同时对外转发 at-me-click，保留外部处理（查看资料/跳单聊等）的能力
+ */
+function onMentionClick(userId: string) {
+  if (props.config?.textMessage?.locateOnMentionClick !== false) {
+    locateLatestMessageByUser(userId)
+  }
+  emit('at-me-click', userId)
+}
+
+/** 在已加载消息中从最新往前定位该用户最近一条消息；未找到时提示 */
+function locateLatestMessageByUser(userId: string) {
+  const cvsId = currentConversation.value?.id
+  if (!cvsId || !userId)
+    return
+  const messages = stores.message.getMessages(cvsId)
+  const normalized = normalizeUserId(userId)
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i]
+    if (normalizeUserId(m.from) !== normalized)
+      continue
+    const target = m.msgServerId || m.msgLocalId
+    if (target)
+      requestLocate(target)
+    return
+  }
+  showToast(t('message.mention.locatorNotFound') ?? '未找到该用户的消息', 'warning')
+}
+
 /** 从用户名片进入单聊 */
 function onUserCardSendMessage(userId: string) {
   const existing = stores.conversation.conversationList.find(c => c.id === userId)
@@ -1072,7 +1104,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @edit="onEdit"
         @forward="openForwardModal"
         @recall-failed="(err, msg) => emit('recall-failed', err, msg)"
-        @mention-click="(userId) => emit('at-me-click', userId)"
+        @mention-click="onMentionClick"
         @location-click="(body, msg) => emit('location-click', body, msg)"
         @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
         @avatar-view-profile="onAvatarViewProfile"

@@ -254,6 +254,13 @@ export interface ChatConfig {
     enableMentionHighlight?: boolean
     /** 提及点击回调（@） */
     onMentionClick?: (userId: string) => void
+    /**
+     * 点击消息中的 @名字时，是否在消息列表内滚动定位到该用户最近一条消息（默认 true）。
+     * 仅当未配置 onMentionClick 时生效；定位同时仍会对外触发 at-me-click 事件。
+     * / Whether clicking an @mention scrolls to and highlights the mentioned user's latest message in the list (default true).
+     * Only applies when onMentionClick is not configured; the at-me-click event is still emitted alongside.
+     */
+    locateOnMentionClick?: boolean
   }
 }
 
