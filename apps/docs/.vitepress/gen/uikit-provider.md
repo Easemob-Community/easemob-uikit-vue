@@ -30,7 +30,7 @@
 | onTokenExpired             | `() => void`                                                                                                                                                                                                                                           | —         | Token 已过期回调，业务可在此重新登录或提示用户                                                                                                                                                                                                                                          |
 | logger                     | `{ enabled?: boolean, collectSdkLog?: boolean, uikitLevel?: 'debug' \| 'info' \| 'warn' \| 'error', sdkLevel?: 'debug' \| 'warn' \| 'error', maxEntries?: number, retentionDays?: number }`                                                            | —         | 日志持久化配置（IndexedDB 本地落库，用于问题排查）。<br>Log persistence config (IndexedDB, for troubleshooting).                                                                                                                                                                         |
 
-#### theme
+#### theme {#theme}
 
 > 全局主题配置：模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用
 
@@ -46,7 +46,7 @@
 | chatBg       | `string`                                      | —   | 聊天背景：支持颜色 / 渐变 / url(...) 图片               |
 | inputBg      | `string`                                      | —   | 输入区背景                                      |
 
-#### notification
+#### notification {#notification}
 
 > 消息通知配置（默认全开，触发模式 background）。
 
@@ -59,7 +59,7 @@
 | triggerMode           | `NotificationTriggerMode` | —   | 触发模式：'background' 仅页面隐藏时（默认）\| 'always' 非当前会话即触发 |
 | navigateOnClick       | `boolean`                 | —   | 点击通知时跳转对应会话（默认 true）                             |
 
-#### logger
+#### logger {#logger}
 
 > 日志持久化配置（IndexedDB 本地落库，用于问题排查）。
 
