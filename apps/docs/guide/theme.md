@@ -83,6 +83,12 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，使用 `background` 简写，支持颜色/渐变/图片）
 - `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`）
 
+## 主题演练场
+
+下面的演示面板可以实时调整品牌色、组件圆角、字号档位（适老）与密度档位，直接在右侧会话列表上预览效果（覆盖已落地的 token 面：`--uikit-primary-*` / `--uikit-components-radius` / `--uikit-font-scale` / `data-uikit-density`）：
+
+<demo src="./demo/theme-playground.vue" title="主题 token 演练场" desc="左侧面板调整品牌色相、圆角、字号与密度，右侧会话列表实时生效；调整仅作用于演练场舞台，不写入全局主题。" />
+
 ## 覆盖变量
 
 在项目样式表中覆盖 `:root` 即可全局生效：
@@ -234,6 +240,12 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 `bubbleColor` 也支持传字符串同时设置自己/对方：`bubbleColor: '#7c3aed'`。`chatBg` 支持颜色、渐变或 `url(...)` 图片背景。
 
+## 在线代码演练场
+
+编辑下面的代码即可实时预览主题效果（右侧预览随代码编译即时更新，点「重置代码」恢复初始模板），体验与在线 IDE 一致：
+
+<VuePlayground :files="themePlaygroundFiles" title="主题配置在线演练场" id="theme" />
+
 ## 业务层映射
 
 业务项目可以在自己的样式表中把设计稿 Token 映射到 UIKit 变量，保持多端视觉一致：
@@ -250,3 +262,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
 ## 与文档站主题的关系
 
 本文档站（VitePress）的 `--vp-c-brand-*` 变量已映射到 UIKit 品牌蓝，因此暗色模式下文档站与组件视觉保持一致，具体样式见 `.vitepress/theme/style.css`。
+
+<script setup>
+import { themePlaygroundFiles } from '../.vitepress/components/playground-files/theme'
+</script>

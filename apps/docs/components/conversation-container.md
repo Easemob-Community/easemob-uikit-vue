@@ -40,6 +40,12 @@ function onSelect() {
 
 <demo src="./demo/item.vue" title="会话列表项" desc="静态展示单聊、群聊置顶、免打扰与未读红点（dot）四种形态；实际业务中长按（H5）/ 右键（PC）可唤起操作菜单。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（容器 props 与 mock 会话数据），右侧列表随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="conversationPlaygroundFiles" title="会话列表配置在线演练场" id="conversation" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/conversation-container.md -->
@@ -125,3 +131,7 @@ const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })
 
 - 会话项右侧操作（置顶 / 免打扰 / 删除）通过长按（H5）或右键（PC）触发，菜单行为由组件内置。
 - 草稿功能开启后，输入框内容会按 `draftStorage` 模式持久化，重新进入会话自动恢复。
+
+<script setup>
+import { conversationPlaygroundFiles } from './conversation-container/demo/playground/template'
+</script>

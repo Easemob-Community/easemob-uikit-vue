@@ -28,6 +28,16 @@
 
 <demo src="./demo/events.vue" title="点击事件" desc="点击按钮触发 click 事件；loading 状态下自动拦截点击。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（`EmButton` 的 type / size / disabled / loading / block），右侧预览随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="buttonPlaygroundFiles" title="按钮配置在线演练场" id="button" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/button.md -->
+
+<script setup>
+import { buttonPlaygroundFiles } from './button/demo/playground/template'
+</script>

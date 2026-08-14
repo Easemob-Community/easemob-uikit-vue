@@ -22,6 +22,16 @@
 
 <demo src="./demo/colors.vue" title="自定义颜色" desc="通过 color 属性设置徽标颜色，支持任意 CSS 颜色值。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（`EmBadge` 的 count / max / dot / 颜色 / 尺寸 / 风格），右侧预览随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="badgePlaygroundFiles" title="Badge 配置在线演练场" id="badge" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/badge.md -->
+
+<script setup>
+import { badgePlaygroundFiles } from './badge/demo/playground/template'
+</script>

@@ -24,6 +24,16 @@
 
 <demo src="./demo/states.vue" title="尺寸与状态" desc="compact / normal / large 三种尺寸；默认 / 激活 / 禁用三种状态。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（`EmCell` 的 title / meta / 箭头 / 边框 / 尺寸 / 状态），右侧预览随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="cellPlaygroundFiles" title="Cell 配置在线演练场" id="cell" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/cell.md -->
+
+<script setup>
+import { cellPlaygroundFiles } from './cell/demo/playground/template'
+</script>

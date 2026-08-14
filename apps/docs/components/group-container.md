@@ -39,6 +39,12 @@ function onGroupClick() {
 
 <demo src="./demo/item.vue" title="群组列表项" desc="静态展示成员数、副标题（最近消息 / 未读）、头像形状与 large 尺寸形态。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（群管理配置与 mock 群数据），切换角色视角与已读回执配置实时生效，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="groupPlaygroundFiles" title="群能力配置在线演练场" id="group-container" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/group-container.md -->
@@ -56,3 +62,7 @@ function onGroupClick() {
 ## 实例方法
 
 - `scrollToGroup(key)`：滚动到指定分组
+
+<script setup>
+import { groupPlaygroundFiles } from './group-container/demo/playground/template'
+</script>

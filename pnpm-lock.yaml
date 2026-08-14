@@ -78,6 +78,9 @@ importers:
       '@easemob/uikit':
         specifier: workspace:*
         version: link:../../packages/uikit
+      '@vue/repl':
+        specifier: ^4.7.2
+        version: 4.7.2
       easemob-websdk:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1493,6 +1496,9 @@ packages:
 
   '@vue/reactivity@3.5.41':
     resolution: {integrity: sha512-rznsqKM0np0x18EjzF8x88MpEhdNsffbvFbckLL5+oUKz1BxAImEmO7J1ArRYSyo6aQaVoBDp7jEkT91OOxydA==}
+
+  '@vue/repl@4.7.2':
+    resolution: {integrity: sha512-6x0hisEd5XRYxhLit3fvPCfeUfXEjB3a8Z2Pl3scVa3kZjck4+ERQF4XCahC7PTabWb3He04u+j8q3MK4WZHrQ==}
 
   '@vue/runtime-core@3.5.41':
     resolution: {integrity: sha512-Vcry58hiAKwGen9Z1jUZE0feFsNArPCMOImYI8el48A9Idf6DuQYD0U05zZIF2Iad1hGhPSvcbBbAOhNr55fhg==}
@@ -5314,6 +5320,8 @@ snapshots:
   '@vue/reactivity@3.5.41':
     dependencies:
       '@vue/shared': 3.5.41
+
+  '@vue/repl@4.7.2': {}
 
   '@vue/runtime-core@3.5.41':
     dependencies:

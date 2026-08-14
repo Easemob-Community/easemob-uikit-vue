@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UIKIT 在线演练场</title>
+  <!-- 独立演练场页：由文档站 VuePlayground「新标签打开」跳转（location.hash 携带 serialize() 状态），
+       也可直接访问（无 hash 时展示默认模板）。全部资源走本地 vendor，不依赖 CDN。 -->
+  <link rel="stylesheet" href="/vendor/repl.css" />
+  <link rel="stylesheet" href="/vendor/codemirror-editor.css" />
+  <link rel="stylesheet" href="/vendor/uikit-theme.css" />
+  <style>
+    html,
+    body,
+    #app {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .pg-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 14px;
+      border-bottom: 1px solid #e2e2e2;
+      background: #f7f7f7;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .pg-header a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    .pg-body {
+      height: calc(100% - 36px);
+    }
+
+    .vue-repl {
+      height: 100%;
+    }
+
+    .pg-loading {
+      padding: 48px;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+  <!-- 父页面 import map：与 VuePlayground IMPORT_MAP 一致 + @vue/repl 独立产物 -->
+  <script type="importmap">
+  {
+    "imports": {
+      "vue": "/vendor/vue.js",
+      "vue/compiler-sfc": "/vendor/compiler-sfc.js",
+      "vue/server-renderer": "/vendor/server-renderer.js",
+      "@vue/compiler-sfc": "/vendor/compiler-sfc.js",
+      "pinia": "/vendor/pinia.js",
+      "easemob-websdk": "/vendor/easemob-websdk.js",
+      "@easemob/uikit": "/vendor/easemob-uikit.js",
+      "@vue/repl": "/vendor/repl.js",
+      "@vue/repl/codemirror-editor": "/vendor/repl.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <div class="pg-header">
+      <span>UIKIT 在线演练场</span>
+      <a href="/" target="_blank">返回文档站</a>
+    </div>
+    <div id="pg-body" class="pg-body">
+      <div class="pg-loading">加载演练场中…</div>
+    </div>
+  </div>
+  <script type="module">
+    import { createApp, h } from 'vue'
+    import { Repl, useStore } from '@vue/repl'
+    import CodeMirrorEditor from '@vue/repl/codemirror-editor'
+
+    // 预览 iframe 注入（与 VuePlayground 一致）
+    const PREVIEW_HEAD_HTML = '<link rel="stylesheet" href="/vendor/uikit-theme.css">'
+    const CUSTOM_CODE = {
+      importCode: 'import { createPinia } from "pinia"',
+      useCode: 'app.use(createPinia())',
+    }
+    // 注：模板字符串内不得出现字面 `<\/script>`（HTML 解析会提前截断脚本块），统一用 `<\/script>` 转义
+    const WELCOME_SFC = `
+  <script setup>
+  import { ref } from 'vue'
+  import { EmUIKitProvider, EmButton, EmAvatar, EmBadge } from '@easemob/uikit'
+
+  const count = ref(0)
+  <\/script>
+
+  <template>
+    <EmUIKitProvider :auto-init="false">
+      <div class="stage">
+        <em-button type="primary" @click="count++">点击次数：{{ count }}</em-button>
+        <div class="row">
+          <em-avatar name="张三" />
+          <em-badge :count="count">
+            <em-avatar name="A" />
+          </em-badge>
+        </div>
+      </div>
+    </EmUIKitProvider>
+  </template>
+
+  <style scoped>
+  .stage {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+  .row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  </style>
+  `.trim()
+
+    // 无 hash 时的默认模板（直接访问本页也能用）
+    const DEFAULT_FILES = { 'App.vue': WELCOME_SFC }
+
+    // 当前 import map（与 VuePlayground IMPORT_MAP 保持一致）
+    const CURRENT_IMPORT_MAP = {
+      imports: {
+        'vue': '/vendor/vue.js',
+        'vue/compiler-sfc': '/vendor/compiler-sfc.js',
+        'vue/server-renderer': '/vendor/server-renderer.js',
+        '@vue/compiler-sfc': '/vendor/compiler-sfc.js',
+        'pinia': '/vendor/pinia.js',
+        'easemob-websdk': '/vendor/easemob-websdk.js',
+        '@easemob/uikit': '/vendor/easemob-uikit.js',
+      },
+    }
+
+    const root = document.getElementById('pg-body')
+    const raw = decodeURIComponent(location.hash.slice(1))
+    const store = raw ? useStore({}, raw) : useStore({})
+    // 无论是否来自 serialize 状态，统一按当前 import map 覆盖（防旧映射残留）
+    store.setImportMap(CURRENT_IMPORT_MAP)
+    if (!raw) {
+      // setFiles 会重建内置 import map，必须先注入文件、再写自定义映射
+      await store.setFiles(DEFAULT_FILES, 'App.vue')
+      store.setImportMap(CURRENT_IMPORT_MAP)
+    }
+
+    root.innerHTML = ''
+    const mountEl = document.createElement('div')
+    root.appendChild(mountEl)
+    createApp({
+      render: () =>
+        h(Repl, {
+          editor: CodeMirrorEditor,
+          store,
+          theme: 'light',
+          clearConsole: false,
+          showCompileOutput: false,
+          showSSROutput: false,
+          showImportMap: false,
+          previewOptions: {
+            headHTML: PREVIEW_HEAD_HTML,
+            customCode: CUSTOM_CODE,
+          },
+        }),
+    }).mount(mountEl)
+  </script>
+</body>
+</html>

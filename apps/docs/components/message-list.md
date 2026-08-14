@@ -30,11 +30,17 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit'
 
 > 通常不需要单独使用 `EmMessageList` —— [聊天模块](./chat-container) 的 `EmChatContainer` 已经内置了消息列表、输入区与消息操作。单独使用 `EmMessageList` 适用于深度定制聊天页布局（如自定义输入区）的场景。
 
-## 配置演练场
+### 在线代码演练场
 
-下面的演示面板可以实时切换 `config.messageList` 的各项视觉配置，直观对比效果（演示数据为 mock，不依赖登录态）：
+直接编辑下面的代码（`config.messageList` 配置对象与 mock 数据），右侧列表随代码编译即时更新，点「重置代码」恢复初始模板：
 
-<demo src="./demo/config-playground.vue" title="配置演练场" desc="左侧面板切换布局、头像、时间戳、气泡形状、间距与消息状态等配置，右侧列表实时生效。" />
+<VuePlayground :files="messageListPlaygroundFiles" title="消息列表配置在线演练场" id="message-list" />
+
+### 单条气泡能力演练场
+
+下面针对单条消息气泡 `EmMessageBubbleWrapper` 演示**多选态 / 引用卡片 / 状态组合 / 群已读圆圈**四类能力（演示数据为 mock，不依赖登录态）：
+
+<demo src="./demo/playground/bubble.vue" title="单条气泡能力演练场" desc="开启多选模式、切换己方消息状态、状态风格/排列/位置/文本与群已读回执开关，观察单条气泡的完整能力组合。" />
 
 ## 配置项速览
 
@@ -54,3 +60,7 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit'
 ## API
 
 <!-- @include: ../.vitepress/gen/message-list.md -->
+
+<script setup>
+import { messageListPlaygroundFiles } from './message-list/demo/playground/template'
+</script>

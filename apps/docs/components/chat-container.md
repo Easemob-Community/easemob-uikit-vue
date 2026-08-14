@@ -30,6 +30,12 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 > 聊天容器会跟随 `useConversation()` 中的当前会话自动切换：点击左侧会话列表（`conversation-select`）后，聊天页即开始加载对应会话的消息。
 
+## 在线代码演练场
+
+直接编辑下面的代码（`config.input` 配置对象与 mock 消息数据），输入回车或点发送可在下方消息列表回显，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="chatContainerPlaygroundFiles" title="聊天容器配置在线演练场" id="chat-container" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/chat-container.md -->
@@ -51,7 +57,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
 
 - 消息列表为虚拟滚动，长会话列表性能有保障；切换会话自动重置滚动位置与多选状态。
 - 引用、翻译、语音转文字、消息定位（搜索跳转）等能力由 `useChat()` 等组合式函数暴露，可在业务代码中直接调用。
-- 想直观体验 `config.messageList` 各项视觉配置（布局、头像、时间戳、气泡形状、间距、消息状态）的实时效果，请前往[消息列表 MessageList 配置演练场](./message-list)。
+- 想直观体验 `config.messageList` 各项视觉配置（布局、头像、时间戳、气泡形状、间距、消息状态）的实时效果，请前往[消息列表在线代码演练场](./message-list)。
 
 ## 插件机制
 
@@ -291,3 +297,7 @@ const { displayName, avatarUrl } = useUserInfo(uid)
 通过这套机制，开发者可以在不修改 UIKIT 源码的前提下，为聊天页面扩展任意自定义消息类型与交互面板。
 
 > **参考 Demo**：`apps/demo/src/components/demo-quick-reply-panel.vue`、`apps/demo/src/components/demo-card-message.vue`、`apps/demo/src/components/demo-card-picker-modal.vue`。
+
+<script setup>
+import { chatContainerPlaygroundFiles } from './chat-container/demo/playground/template'
+</script>

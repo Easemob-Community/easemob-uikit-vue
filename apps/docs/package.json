@@ -4,13 +4,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
+    "dev": "pnpm sync:vendor && vitepress dev",
+    "build": "pnpm sync:vendor && vitepress build",
     "preview": "vitepress preview",
+    "sync:vendor": "node scripts/sync-vendor.mjs",
     "gen:api": "node scripts/gen-api-docs.mjs"
   },
   "dependencies": {
     "@easemob/uikit": "workspace:*",
+    "@vue/repl": "^4.7.2",
     "easemob-websdk": "^5.0.0",
     "pinia": "^2.3.1",
     "pinyin-pro": "^3.29.0",

@@ -22,6 +22,16 @@
 
 <demo src="./demo/presence.vue" title="在线状态" desc="通过 presence 展示在线状态指示器；editable 模式下点击指示器可编辑状态。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（`EmAvatar` 的 shape / size / presence 与主题头像形状），右侧预览随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="avatarPlaygroundFiles" title="Avatar 配置在线演练场" id="avatar" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/avatar.md -->
+
+<script setup>
+import { avatarPlaygroundFiles } from './avatar/demo/playground/template'
+</script>

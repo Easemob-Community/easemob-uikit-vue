@@ -20,6 +20,16 @@
 
 <demo src="./demo/basic.vue" title="基础用法" desc="密码输入、禁用状态与 maxlength 字符限制。" />
 
+## 在线代码演练场
+
+直接编辑下面的代码（`EmInput` 的形态 / placeholder / type / disabled / maxlength / clearable），右侧预览随代码编译即时更新，点「重置代码」恢复初始模板：
+
+<VuePlayground :files="inputPlaygroundFiles" title="输入框配置在线演练场" id="input" />
+
 ## API
 
 <!-- @include: ../.vitepress/gen/input.md -->
+
+<script setup>
+import { inputPlaygroundFiles } from './input/demo/playground/template'
+</script>
