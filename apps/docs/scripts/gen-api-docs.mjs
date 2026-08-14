@@ -474,9 +474,28 @@ function collectNestedSections(member, path, depth, ctx, out) {
     if (!ts.isPropertySignature(child)) {
       continue
     }
+    const childName = child.name.getText(resolved.sourceFile)
+    const childPath = `${path}.${childName}`
+    // 子字段类型呈现策略（避免父表单元格内联整段匿名对象）：
+    // - 具名 interface（如 MessageStatusConfig）：显示类型名
+    // - 内联匿名对象且会展开为子小节：显示「见 <path>」引用（细节在下方子小节）
+    // - 其余（叶子标量 / 未展开的内联对象）：紧凑文本兜底
+    const childResolved = child.type ? resolveNestedType(child.type, ctx.typeIndex) : null
+    const willExpand = childResolved !== null
+      && (!ctx.nestedOnly || ctx.nestedOnly.some(n => n === childPath || n.startsWith(`${childPath}.`)))
+    let type
+    if (childResolved?.dedupeKey) {
+      type = childResolved.dedupeKey
+    }
+    else if (willExpand) {
+      type = `见 ${childPath}`
+    }
+    else {
+      type = child.type ? compactTypeText(child.type, resolved.sourceFile) : 'any'
+    }
     members.push({
-      name: child.name.getText(resolved.sourceFile),
-      type: child.type ? compactTypeText(child.type, resolved.sourceFile) : 'any',
+      name: childName,
+      type,
       doc: getDocText(child),
     })
   }
