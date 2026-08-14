@@ -4,10 +4,15 @@ import { useThemeStore } from '../../store/theme'
 import Icon from '../icon/icon.vue'
 
 export interface InputProps {
+  /** 输入框当前值（v-model 绑定） */
   modelValue?: string
+  /** 占位提示文案，无输入时显示 */
   placeholder?: string
+  /** 原生输入类型：text 文本 / password 密码 / number 数字，默认 'text' */
   type?: 'text' | 'password' | 'number'
+  /** 是否禁用输入 */
   disabled?: boolean
+  /** 最大可输入字符数，超出后无法继续输入 */
   maxlength?: number
   /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
   prefixIcon?: string
@@ -30,10 +35,15 @@ export interface InputProps {
 }
 
 export interface InputEmits {
+  /** 输入内容变化时触发，负载为最新输入值，供 v-model 双向同步 */
   (e: 'update:modelValue', value: string): void
+  /** 输入事件，负载为原生 input 事件对象（与 update:modelValue 同时触发） */
   (e: 'input', event: Event): void
+  /** 输入框获得焦点时触发，负载为原生 focus 事件 */
   (e: 'focus', event: FocusEvent): void
+  /** 输入框失去焦点时触发，负载为原生 blur 事件 */
   (e: 'blur', event: FocusEvent): void
+  /** 按下回车（非 Shift+Enter）时触发，负载为当前输入值，常用于搜索/提交 */
   (e: 'submit', value: string): void
 }
 

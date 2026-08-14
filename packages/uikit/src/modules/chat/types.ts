@@ -206,7 +206,7 @@ export interface ChatConfig {
       voice?: boolean
       /** 视频，默认 true */
       video?: boolean
-      /** @提及，默认 true */
+      /** 提及功能（@），默认 true */
       mention?: boolean
     }
     /** 是否自动聚焦输入框，默认 false */
@@ -219,7 +219,7 @@ export interface ChatConfig {
     selectionColor?: string
     /** 最大输入长度，0 或不设置表示无限制 */
     maxLength?: number
-    /** @提及配置 */
+    /** 提及配置（@） */
     mention?: {
       /** 联系人列表（也可从外部通过 chat-container 灌入） */
       contacts?: MentionContact[]
@@ -252,7 +252,7 @@ export interface ChatConfig {
     onLinkClick?: (url: string) => boolean | string | void
     /** 是否启用 @提及高亮识别，默认 true */
     enableMentionHighlight?: boolean
-    /** @提及点击回调 */
+    /** 提及点击回调（@） */
     onMentionClick?: (userId: string) => void
   }
 }

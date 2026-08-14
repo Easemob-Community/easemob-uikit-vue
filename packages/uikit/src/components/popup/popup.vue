@@ -7,14 +7,19 @@ import { useEscToClose } from '../../composables/use-key-bindings'
 import { nextZIndex } from '../../utils/z-index'
 
 export interface PopupProps {
+  /** 是否显示弹层（v-model:show 受控） */
   show: boolean
+  /** 弹层位置：center 居中 / bottom 底部 / top 顶部 / left 左侧 / right 右侧，锚定模式（传 anchor）时忽略 */
   position?: 'center' | 'bottom' | 'top' | 'left' | 'right'
   /** 显式指定 z-index；不传时由全局分配器自动递增 */
   zIndex?: number
+  /** 是否显示遮罩层，默认 true；锚定模式设为 false 时点击可穿透到下层 */
   overlay?: boolean
+  /** 点击遮罩（弹层外部）是否关闭，默认 true；锚定模式下点击 anchor 本身不关闭 */
   closeOnClickOverlay?: boolean
   /** 按 ESC 关闭，默认 true */
   closeOnEsc?: boolean
+  /** 是否显示右上角关闭按钮，默认 false */
   showClose?: boolean
   /** 相对定位的锚点元素，传入后 popup 将相对于该元素定位 */
   anchor?: HTMLElement
@@ -31,7 +36,9 @@ export interface PopupProps {
 }
 
 export interface PopupEmits {
+  /** 弹层关闭时触发（ESC/点击遮罩/关闭按钮/互斥分组关闭），负载 false，供 v-model:show 双向同步 */
   (e: 'update:show', value: boolean): void
+  /** 弹层关闭时触发（与 update:show(false) 同时发出），供业务侧感知关闭 */
   (e: 'close'): void
 }
 

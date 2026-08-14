@@ -50,10 +50,15 @@ const props = withDefaults(defineProps<UserCardProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 点击底部操作按钮时触发，负载为按钮对应的 action key */
   (e: 'action-click', key: string): void
+  /** 点击信息行时触发（仅当该行 clickable 为 true），负载为行对应的 key */
   (e: 'info-click', key: string): void
+  /** 点击头像时触发（不含在线状态指示器点击，避免与 presence-click 重复） */
   (e: 'avatar-click'): void
+  /** 点击头像上的在线状态指示器时触发（由 Avatar 内部转发）；editable 时同时弹出在线状态选择器 */
   (e: 'presence-click'): void
+  /** 在线状态选择器中成功变更状态后触发（转发 PresenceSelectorPopup 的 changed 事件） */
   (e: 'presence-changed'): void
 }>()
 

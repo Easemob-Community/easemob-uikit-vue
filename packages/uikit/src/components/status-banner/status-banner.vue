@@ -24,8 +24,11 @@ export interface StatusBannerProps {
 }
 
 export interface StatusBannerEmits {
+  /** 关闭按钮被点击时发出（配合 v-model:show 收起横幅），负载为新的可见性值 false */
   (e: 'update:show', value: boolean): void
+  /** 关闭按钮被点击时触发，通知业务方横幅已关闭 */
   (e: 'close'): void
+  /** 点击横幅主体时触发（clickable 仅影响视觉反馈，事件始终会发出），负载为原生点击事件 MouseEvent */
   (e: 'click', event: MouseEvent): void
 }
 

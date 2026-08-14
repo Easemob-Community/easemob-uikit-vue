@@ -11,15 +11,22 @@ export interface ActionSheetItem {
 }
 
 export interface ActionSheetProps {
+  /** 是否显示操作面板，控制底部弹层开合；配合 v-model:show 使用 */
   show: boolean
+  /** 顶部标题文案，为空时不渲染标题栏 */
   title?: string
+  /** 操作项列表，每项渲染为一行可点击操作；disabled 项点击不触发 select */
   actions: ActionSheetItem[]
+  /** 底部取消按钮文案，默认取 i18n 的「取消」 */
   cancelText?: string
 }
 
 export interface ActionSheetEmits {
+  /** 显隐状态变化时触发（选中操作项 / 取消 / 遮罩关闭均携带 false），用于 v-model:show 同步 */
   (e: 'update:show', value: boolean): void
+  /** 点击非禁用操作项时触发，负载为选中项对象与其下标 index */
   (e: 'select', item: ActionSheetItem, index: number): void
+  /** 点击底部取消按钮或弹层关闭（如点击遮罩）时触发 */
   (e: 'cancel'): void
 }
 

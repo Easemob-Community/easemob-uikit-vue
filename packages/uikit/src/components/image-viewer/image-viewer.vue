@@ -24,8 +24,11 @@ export interface ImageViewerProps {
 }
 
 export interface ImageViewerEmits {
+  /** 关闭预览时触发（点击遮罩/ESC），负载 false，供 v-model:show 双向同步 */
   (e: 'update:show', value: boolean): void
+  /** 当前图片索引变化时触发（打开/切换上下一张），负载为新索引，供 v-model:index 双向同步 */
   (e: 'update:index', value: number): void
+  /** 预览关闭完成时触发，与 update:show(false) 同时发出，供业务侧感知关闭 */
   (e: 'close'): void
   /** 当前图片加载完成 */
   (e: 'load', index: number): void

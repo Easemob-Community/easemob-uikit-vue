@@ -29,12 +29,17 @@ const logger = createLogger('UIKit:UikitProvider')
 export type ThemeFontSize = FontSizePreset | number
 
 export interface ProviderProps {
+  /** 环信应用标识 AppKey（orgName#appName），由环信控制台创建应用获取 */
   appKey?: string
+  /** SDK 客户端配置（除 appKey 外的 ClientConfig，如 debug / enableSyncData 等），与 appKey 合并后初始化 SDK */
   sdkConfig?: Omit<ClientConfig, 'appKey'>
+  /** 是否自动初始化 SDK 连接（默认 true）：false 时延迟初始化，待业务调用 useClient().init(config) 传入 appKey 后创建 */
   autoInit?: boolean
+  /** 全局主题配置：模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
   theme?: {
     /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
     mode?: 'light' | 'dark' | 'auto'
+    /** 品牌色相（0-360，hsl hue），默认 203 */
     primaryColor?: number
     /** 容器间距（px），默认 8，最小 0 */
     gap?: number
@@ -51,7 +56,9 @@ export interface ProviderProps {
     /** 输入区背景 */
     inputBg?: string
   }
+  /** 界面语言：zh-CN 中文（默认） / en 英文 */
   locale?: 'zh-CN' | 'en'
+  /** 全局动画配置：enabled 总开关 / level 强度（subtle|normal|expressive）/ ripple 波纹，挂载时应用一次 */
   animation?: AnimationConfig
   /**
    * H5 适配配置：安全区、键盘适配、下拉刷新等。

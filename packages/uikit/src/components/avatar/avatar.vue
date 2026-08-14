@@ -25,9 +25,13 @@ const presenceColorMap: Record<PresenceDisplayStatus, string> = {
 }
 
 export interface AvatarProps {
+  /** 头像图片地址；为空或加载失败时回退为文字头像（取 name 前 2 个字符） */
   src?: string
+  /** 用户名，用于生成文字头像内容与背景色 */
   name?: string
+  /** 头像尺寸（px），默认 40；文字字号与在线状态指示器随之自适应 */
   size?: number
+  /** 头像形状：circle（圆形）/ square（圆角方形）；不传时跟随主题 avatarShape */
   shape?: 'circle' | 'square'
   /** 在线状态，传入则展示右下角指示器 */
   presence?: PresenceDisplayStatus
@@ -44,6 +48,7 @@ const props = withDefaults(defineProps<AvatarProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 头像为可编辑态（editable）时点击触发，用于唤起更换头像等操作 */
   (e: 'presence-click'): void
 }>()
 

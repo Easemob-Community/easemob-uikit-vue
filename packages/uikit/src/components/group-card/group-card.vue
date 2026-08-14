@@ -4,15 +4,22 @@ import Icon from '../icon/icon.vue'
 import CopyableText from '../copyable-text/copyable-text.vue'
 
 export interface GroupCardAction {
+  /** 操作唯一标识，点击时作为 action-click 负载回传 */
   key: string
+  /** 按钮展示文案 */
   label: string
+  /** 可选图标名 */
   icon?: string
+  /** 按钮风格：primary / default / danger，默认 default */
   type?: 'primary' | 'default' | 'danger'
 }
 
 export interface GroupCardInfoRow {
+  /** 信息行唯一标识 */
   key: string
+  /** 行标题 */
   label: string
+  /** 行内容文本 */
   value: string
   /** 是否展示复制图标并支持一键复制 value */
   copyable?: boolean
@@ -41,6 +48,7 @@ const props = withDefaults(defineProps<GroupCardProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 点击底部操作按钮时触发，负载为被点击操作的 key（对应 actions 中某一项） */
   (e: 'action-click', key: string): void
 }>()
 

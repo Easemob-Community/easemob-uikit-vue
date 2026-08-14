@@ -44,6 +44,7 @@ interface RenderError {
 }
 
 export interface ChatProps {
+  /** 聊天容器完整配置（输入框 / 消息列表 / 消息操作 / 群能力等，见 ChatConfig） */
   config?: ChatConfig
   /** 是否处于全局加载状态 */
   loading?: boolean
@@ -54,10 +55,15 @@ export interface ChatProps {
 }
 
 export interface ChatEmits {
+  /** 消息撤回失败时触发，参数为错误对象与目标消息 / Emitted when recalling a message fails, with the error and the target message */
   (e: 'recall-failed', error: any, message: UiMessage): void
+  /** 点击消息中的 @提及（@mention）时触发，参数为被提及的用户 ID / Emitted when an @mention in a message is clicked, with the mentioned user ID */
   (e: 'at-me-click', userId: string): void
+  /** 群管理操作（全员禁言、成员禁言/拉黑、入群申请处理等）时触发，参数为操作类型、群 ID，成员类操作附带 userId / Emitted when a group management action is performed, with the action type, group ID and optional user ID */
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
+  /** 点击位置（location）消息时触发，参数为位置消息体与对应消息 / Emitted when a location message is clicked, with the location body and the message */
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
+  /** 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message */
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 

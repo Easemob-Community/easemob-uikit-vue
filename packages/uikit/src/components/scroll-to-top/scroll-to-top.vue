@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<ScrollToTopProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 点击按钮时触发（在滚动动画开始前发出，无负载） */
   (e: 'click'): void
 }>()
 

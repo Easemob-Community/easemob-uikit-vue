@@ -4,18 +4,22 @@ import EmIcon from '../icon/icon.vue'
 export interface IconButtonProps {
   /** 图标名称，格式 "category/icon-name" */
   icon: string
+  /** 图标尺寸（px）；不传时按按钮 size 回退：small 14 / medium 16 */
   iconSize?: number
   /** 按钮语义类型 */
   type?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
   /** 视觉变体：solid 实心填充 / outline 描边 / ghost 透明 */
   variant?: 'solid' | 'outline' | 'ghost'
+  /** 按钮尺寸：small 28×28 / medium 32×32，默认 'medium'；未传 iconSize 时同时决定图标默认大小 */
   size?: 'small' | 'medium'
+  /** 是否禁用；禁用后点击不触发 click，并应用半透明/不可点击样式 */
   disabled?: boolean
   /** hover/tooltip 提示 */
   title?: string
 }
 
 export interface IconButtonEmits {
+  /** 点击按钮时触发（disabled 时不触发），负载为原生鼠标事件 MouseEvent */
   (e: 'click', event: MouseEvent): void
 }
 

@@ -4,14 +4,20 @@ import { useThemeStore } from '../../store/theme'
 import { useRipple } from '../../composables/use-ripple'
 
 export interface ButtonProps {
+  /** 语义类型：primary / success / warning / danger / danger-outline / default（默认） */
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'danger-outline' | 'default'
+  /** 尺寸：small / medium（默认）/ large */
   size?: 'small' | 'medium' | 'large'
+  /** 是否禁用；禁用时按钮不可点击且不触发 click */
   disabled?: boolean
+  /** 是否加载中；显示加载动画并禁止点击（行为同 disabled） */
   loading?: boolean
+  /** 是否块级展示，占满父容器整行宽度 */
   block?: boolean
 }
 
 export interface ButtonEmits {
+  /** 按钮可点击（非 disabled / 非 loading）时触发，负载为原生点击事件 MouseEvent */
   (e: 'click', event: MouseEvent): void
 }
 

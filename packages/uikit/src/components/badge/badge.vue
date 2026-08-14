@@ -5,9 +5,13 @@ export type BadgeSize = 'normal' | 'small'
 export type BadgeVariant = 'filled' | 'stroked'
 
 export interface BadgeProps {
+  /** 徽标数字；超过 max 显示为 "max+"；为 0 或未传时不显示（dot 模式除外） */
   count?: number
+  /** 数字显示上限，超出后显示为 "max+"，默认 99 */
   max?: number
+  /** 红点模式：仅显示小圆点不显示数字，默认 false */
   dot?: boolean
+  /** 徽标颜色（默认 danger 色）：filled 作背景色，stroked 作文字与描边色 */
   color?: string
   /** 尺寸：normal（默认）/ small */
   size?: BadgeSize

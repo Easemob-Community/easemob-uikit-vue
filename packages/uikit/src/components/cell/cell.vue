@@ -45,7 +45,9 @@ const props = withDefaults(defineProps<CellProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 点击 cell 时触发（disabled 时不触发），负载为原生点击事件 */
   (e: 'click', event: MouseEvent): void
+  /** 右键点击 cell 时触发（disabled 时不触发），常用于唤出上下文菜单 */
   (e: 'contextmenu', event: MouseEvent): void
 }>()
 

@@ -31,8 +31,11 @@ const props = withDefaults(defineProps<ResizableProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 拖拽过程中持续触发（v-model 同步，rAF 节流），负载为当前尺寸（px）/ Emitted continuously while dragging (v-model sync, rAF-throttled), payload is current size in px */
   (e: 'update:model-value', size: number): void
+  /** 拖拽开始时触发一次（无负载）/ Emitted once when dragging starts (no payload) */
   (e: 'resize-start'): void
+  /** 拖拽结束时触发（pointerup），负载为最终尺寸（px）/ Emitted when dragging ends (pointerup), payload is final size in px */
   (e: 'resize-end', size: number): void
 }>()
 

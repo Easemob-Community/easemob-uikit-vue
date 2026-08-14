@@ -27,13 +27,21 @@ import AddContactModal from './add-contact-modal.vue'
 import CreateGroupModal from './create-group-modal.vue'
 
 interface ConversationListProps {
+  /** 是否展示搜索框，默认 true */
   showSearch?: boolean
+  /** 自定义操作项列表，追加到会话项右键菜单/H5 长按 ActionSheet；未提供 handler 的项点击后触发 custom-action 事件 */
   customActions?: ConversationAction[]
+  /** 是否展示滚动置顶按钮，默认 true */
   showScrollToTop?: boolean
+  /** 时间格式化函数，入参为毫秒时间戳（ms），返回展示文本；不传时按当前 locale 用 toLocaleTimeString 兜底 */
   timeFormatter?: (timestamp: number) => string
+  /** 消息摘要格式化函数，入参为原始摘要文本与消息类型（当前实现固定传入 'text'），返回展示文本；不传时原样展示 */
   messageFormatter?: (msg: string, type?: string) => string
+  /** 群聊会话摘要是否显示发送者名称前缀，默认 true */
   showSenderName?: boolean
+  /** 空列表提示文案，优先于各分栏 tab 的默认空状态文案 */
   emptyText?: string
+  /** 未读数量展示模式：count 显示数字，dot 仅显示红点，默认 'count' */
   unreadMode?: 'count' | 'dot'
   /** 是否展示头部区域，默认 true */
   showHeader?: boolean
@@ -79,10 +87,15 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 会话选中完成（已切换会话、发送已读回执、加载草稿等内部逻辑之后）时触发，负载为会话 id 与会话对象 */
   (e: 'select', id: string, conversation: Conversation): void
+  /** 点击会话项时立即触发（先于内部选中逻辑，供 H5 页面栈导航等使用），负载为会话 id 与会话对象 */
   (e: 'conversation-click', id: string, conversation: Conversation): void
+  /** 点击带未清除 @我 状态的会话时触发（在 select 之后），负载为会话 id 与会话对象 */
   (e: 'at-me-click', id: string, conversation: Conversation): void
+  /** 自定义操作项未提供 handler 时向上触发，负载为操作 key 与会话对象 */
   (e: 'custom-action', key: string, conversation: Conversation): void
+  /** 切换分栏 tab 时触发（v-model:active-tab），负载为新的 tab key */
   (e: 'update:active-tab', tab: ConversationTabKey): void
   /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
   (e: 'reconnect'): void

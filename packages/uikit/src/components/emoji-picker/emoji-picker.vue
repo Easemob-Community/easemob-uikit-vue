@@ -5,6 +5,7 @@ import IconButton from '../icon-button/icon-button.vue'
 import type { EmojiStickerItem, EmojiStickerPack } from './types'
 
 export interface EmojiPickerProps {
+  /** 是否显示面板，内部按 v-if 渲染；关闭时通过 update:show 通知父组件 / Whether to show the picker */
   show: boolean
   /** 表情包（sticker pack）列表，默认 [] 不展示表情包 tab / Sticker packs to show as extra tabs */
   stickerPacks?: EmojiStickerPack[]
@@ -18,8 +19,11 @@ const props = withDefaults(defineProps<EmojiPickerProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 面板显隐状态变化时触发（关闭携带 false），用于 v-model:show 同步 / Emitted when visibility changes */
   (e: 'update:show', value: boolean): void
+  /** 点击 emoji 时触发，负载为选中的 emoji 字符 / Emitted when an emoji is picked */
   (e: 'select', emoji: string): void
+  /** 点击表情包中的 sticker 时触发，负载为 sticker 项与其所属 pack 的 id / Emitted when a sticker is picked */
   (e: 'select-sticker', sticker: EmojiStickerItem, packId: string): void
 }>()
 

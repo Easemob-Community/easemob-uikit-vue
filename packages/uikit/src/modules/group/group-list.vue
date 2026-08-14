@@ -116,13 +116,21 @@ const props = withDefaults(defineProps<GroupListProps>(), {
 })
 
 const emit = defineEmits<{
+  /** 列表项被选中时触发（clickBehavior 为 'event-only' 时不触发），负载为群组对象 */
   (e: 'select', group: Group): void
+  /** 点击列表项时触发（不受 clickBehavior 影响，始终发出），负载为群组对象 */
   (e: 'click', group: Group): void
+  /** 右键点击列表项时触发，负载为原生右键事件 MouseEvent 与群组对象 */
   (e: 'contextmenu', event: MouseEvent, group: Group): void
+  /** 通过字母导航跳转到分组后触发，负载为分组 key */
   (e: 'group-jump', key: string): void
+  /** 选中集合变化时触发（配合 selectedIds 实现 v-model:selectedIds），负载为新的 id 数组 */
   (e: 'update:selectedIds', ids: string[]): void
+  /** 选中数量超过 maxSelected 上限时触发（内部回退到上次合法选中），负载为上限值 */
   (e: 'max-exceed', max: number): void
+  /** 滚动接近底部且满足加载条件时触发；外部加载完成后需调用 expose 的 releaseLoadMoreLock 释放锁 */
   (e: 'load-more'): void
+  /** 搜索关键词变化时触发，负载为去除首尾空格后的关键词 */
   (e: 'search', keyword: string): void
 }>()
 

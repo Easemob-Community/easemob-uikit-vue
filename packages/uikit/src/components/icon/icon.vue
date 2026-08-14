@@ -6,7 +6,9 @@ import { getIconSvg } from './icon-map'
 export interface IconProps {
   /** 图标名称，格式 "category/icon-name"，如 "actions/trash"；传入 name 后无需 slot */
   name: string
+  /** 图标尺寸（px），同时作用于宽高，默认 20 */
   size?: number
+  /** 图标颜色，默认 currentColor（跟随文字颜色）；描边图标与填充图标均适用 */
   color?: string
   /** 语义色类型；与 color 同时存在时 color 优先级更高 */
   type?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
