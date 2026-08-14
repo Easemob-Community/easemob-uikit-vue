@@ -12,6 +12,7 @@ import {
   EmIcon,
   EmResizable,
   EmUserCardModal,
+  MESSAGE_TYPE,
   useClient,
   useContactStore,
   useConversation,
@@ -28,6 +29,12 @@ import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
 import DemoQuickReplyPanel from './components/demo-quick-reply-panel.vue'
+import DemoMarkdownMessage from './components/ai/demo-markdown-message.vue'
+import {
+  getMockAiReply,
+  runMarkdownStreamDemo,
+  simulateStreamMessage,
+} from './components/ai/use-stream-demo'
 import DemoSettingsDrawer from './components/settings/demo-settings-drawer.vue'
 import DemoDevHintCard from './dev-hints/demo-dev-hint-card.vue'
 import { useDevHints } from './dev-hints/use-dev-hints'
@@ -125,6 +132,7 @@ const {
   notificationInApp,
   notificationAutoRequest,
   notificationTriggerMode,
+  aiMockReplyEnabled,
 } = useDemoSettings()
 
 /** 消息通知配置：面板改动实时同步到 useNotification 单例（Provider 已按 prop 接线） */
@@ -470,6 +478,64 @@ watch(() => stores.conversation.currentConversationId, (id) => {
     }
   }
 })
+
+/* ============== AI 流式演示（mock） ============== */
+
+/**
+ * Toolbar「AI 演示」：向当前会话注入一条 markdown 流式演示消息
+ * （代码块 / 表格 / 引用，见 use-stream-demo 的 markdownStreamDemoContent）。
+ */
+function runAiDemoFromToolbar() {
+  const cvs = stores.conversation.currentConversation
+  if (!cvs)
+    return
+  runMarkdownStreamDemo(stores.message, {
+    conversationId: cvs.id,
+    conversationType: cvs.type,
+    to: stores.client.currentUser || '',
+  })
+}
+
+/** 已触发过 AI 回复的本地消息 id（防同一条消息重复触发） */
+const aiRepliedMessageIds = new Set<string>()
+
+/**
+ * AI 应答（mock）：开启后自己发送文本消息，自动注入 mock AI 的 markdown 流式回复。
+ * 监听当前会话最后一条消息（isSelf 文本、非流式、非撤回）→ 延迟触发模拟器。
+ * 真实接入时由业务服务端 / 模型 API 的流式返回驱动，无需改动内核。
+ */
+watch(
+  () => {
+    const cvsId = stores.conversation.currentConversationId
+    if (!cvsId || !aiMockReplyEnabled.value)
+      return ''
+    const msgs = stores.message.getMessages(cvsId)
+    const last = msgs[msgs.length - 1]
+    if (!last || !last.isSelf || last.type !== MESSAGE_TYPE.TEXT || last.recalled || last.stream)
+      return ''
+    return last.msgServerId || last.msgLocalId || ''
+  },
+  (msgId) => {
+    if (!msgId || aiRepliedMessageIds.has(msgId))
+      return
+    aiRepliedMessageIds.add(msgId)
+    const cvs = stores.conversation.currentConversation
+    if (!cvs)
+      return
+    const msgs = stores.message.getMessages(cvs.id)
+    const last = msgs[msgs.length - 1]
+    const question = (last?.body as { content?: string } | undefined)?.content || ''
+    window.setTimeout(() => {
+      simulateStreamMessage(stores.message, {
+        conversationId: cvs.id,
+        conversationType: cvs.type,
+        to: stores.client.currentUser || '',
+        customType: 'markdown',
+        content: getMockAiReply(question),
+      })
+    }, 700)
+  },
+)
 </script>
 
 <template>
@@ -556,6 +622,14 @@ watch(() => stores.conversation.currentConversationId, (id) => {
             </button>
             <button
               class="demo-toolbar-btn"
+              title="AI 流式演示（注入 markdown 流式消息）"
+              :disabled="!stores.conversation.currentConversation"
+              @click="runAiDemoFromToolbar"
+            >
+              <EmIcon name="chat/bubble_fill" :size="22" />
+            </button>
+            <button
+              class="demo-toolbar-btn"
               :title="t('demo.card.send')"
               @click="showCardPickerModal = true"
             >
@@ -567,6 +641,9 @@ watch(() => stores.conversation.currentConversationId, (id) => {
               v-if="showPanel"
               @select="(text) => chatContainerRef?.setText?.(text)"
             />
+          </template>
+          <template #message-txt="{ message }">
+            <DemoMarkdownMessage :message="message as UiMessage" />
           </template>
           <template #message-custom="{ message }">
             <DemoCardMessage
@@ -674,6 +751,14 @@ watch(() => stores.conversation.currentConversationId, (id) => {
               </button>
               <button
                 class="demo-toolbar-btn"
+                title="AI 流式演示（注入 markdown 流式消息）"
+                :disabled="!stores.conversation.currentConversation"
+                @click="runAiDemoFromToolbar"
+              >
+                <EmIcon name="chat/bubble_fill" :size="22" />
+              </button>
+              <button
+                class="demo-toolbar-btn"
                 :title="t('demo.card.send')"
                 @click="showCardPickerModal = true"
               >
@@ -685,6 +770,9 @@ watch(() => stores.conversation.currentConversationId, (id) => {
                 v-if="showPanel"
                 @select="(text) => chatContainerRef?.setText?.(text)"
               />
+            </template>
+            <template #message-txt="{ message }">
+              <DemoMarkdownMessage :message="message as UiMessage" />
             </template>
             <template #message-custom="{ message }">
               <DemoCardMessage

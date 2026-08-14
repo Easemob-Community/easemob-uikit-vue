@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    DemoAiPanel: typeof import('./src/components/settings/demo-ai-panel.vue')['default']
     DemoAppearancePanel: typeof import('./src/components/settings/demo-appearance-panel.vue')['default']
     DemoCardMessage: typeof import('./src/components/demo-card-message.vue')['default']
     DemoCardPickerModal: typeof import('./src/components/demo-card-picker-modal.vue')['default']
@@ -15,6 +16,7 @@ declare module 'vue' {
     DemoConversationPanel: typeof import('./src/components/settings/demo-conversation-panel.vue')['default']
     DemoDataPanel: typeof import('./src/components/settings/demo-data-panel.vue')['default']
     DemoDeveloperPanel: typeof import('./src/components/settings/demo-developer-panel.vue')['default']
+    DemoMarkdownMessage: typeof import('./src/components/ai/demo-markdown-message.vue')['default']
     DemoNotificationPanel: typeof import('./src/components/settings/demo-notification-panel.vue')['default']
     DemoProviderPanel: typeof import('./src/components/settings/demo-provider-panel.vue')['default']
     DemoQuickReplyPanel: typeof import('./src/components/demo-quick-reply-panel.vue')['default']

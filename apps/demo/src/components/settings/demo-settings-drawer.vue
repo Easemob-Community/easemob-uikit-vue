@@ -8,6 +8,7 @@
  */
 import { computed, ref, watch } from 'vue'
 import { EmIcon, EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit'
+import DemoAiPanel from './demo-ai-panel.vue'
 import DemoAppearancePanel from './demo-appearance-panel.vue'
 import DemoChatPanel from './demo-chat-panel.vue'
 import DemoContactPanel from './demo-contact-panel.vue'
@@ -52,6 +53,7 @@ const categories = [
   { key: 'conversation', label: '会话', icon: 'chat/pin' },
   { key: 'chat', label: '聊天', icon: 'chat/bubble_fill' },
   { key: 'contact', label: '通讯录', icon: 'people/person_3lines_fill' },
+  { key: 'ai', label: 'AI', icon: 'chat/bubble_fill' },
   { key: 'data', label: '演示数据', icon: 'files-media/archives' },
   { key: 'notification', label: '通知', icon: 'status/info' },
   { key: 'developer', label: '开发者', icon: 'files-media/doc' },
@@ -121,6 +123,7 @@ function close() {
           <DemoConversationPanel v-else-if="activeCategory === 'conversation'" />
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
+          <DemoAiPanel v-else-if="activeCategory === 'ai'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
           <DemoDeveloperPanel v-else-if="activeCategory === 'developer'" />
           <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />
@@ -165,6 +168,7 @@ function close() {
           <DemoConversationPanel v-else-if="activeCategory === 'conversation'" />
           <DemoChatPanel v-else-if="activeCategory === 'chat'" />
           <DemoContactPanel v-else-if="activeCategory === 'contact'" />
+          <DemoAiPanel v-else-if="activeCategory === 'ai'" />
           <DemoDataPanel v-else-if="activeCategory === 'data'" />
           <DemoDeveloperPanel v-else-if="activeCategory === 'developer'" />
           <DemoNotificationPanel v-else-if="activeCategory === 'notification'" />

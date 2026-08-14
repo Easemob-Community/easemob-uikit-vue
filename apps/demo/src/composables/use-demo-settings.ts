@@ -462,6 +462,16 @@ function createDemoSettings() {
     contactStore.setContactList(generateMockContacts())
   }
 
+  /* ===== AI 流式演示 ===== */
+
+  /** AI 应答开关（mock）：开启后自己发送文本消息自动触发 mock AI markdown 流式回复 */
+  const aiMockReplyEnabled = ref(false)
+
+  /** 切换 AI 应答开关 */
+  function toggleAiMockReply(enabled: boolean) {
+    aiMockReplyEnabled.value = enabled
+  }
+
   return {
     // Input 组件风格演示
     inputVariant,
@@ -520,6 +530,9 @@ function createDemoSettings() {
     togglePinyinAdapter,
     injectMockConversations,
     injectMockContacts,
+    // AI 流式演示
+    aiMockReplyEnabled,
+    toggleAiMockReply,
     // 侧边栏宽度
     sidebarWidth,
     persistSidebarWidth,

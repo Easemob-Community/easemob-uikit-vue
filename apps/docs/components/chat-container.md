@@ -47,6 +47,28 @@ import { EmUIKitProvider } from '@easemob/uikit'
 - `error`：错误边界，接收插槽属性 `{ error, retry }`
 - `header` / `header-avatar` / `header-title` / `header-extra`：会话头部区域自定义
 - `message-*`：消息类型级插槽，如 `#message-txt`、`#message-footer-txt`，可自定义各类消息的渲染
+- `toolbar-extra` / `input-panel`：输入区扩展（AI 助手入口、快捷回复面板等，作用域见 `useChatPlugin`）
+- `message-action-extra`：消息操作菜单底部扩展
+
+## 流式消息（AI）
+
+内核已内置流式消息（Stream Message）的**数据链路与纯文本流式状态**，开箱即用：
+
+- `onStreamMessage` 分片按 `msgServerId` 合并到同一条气泡，`body.content` 以 `fullText` 幂等覆盖，不产生新气泡；
+- `customType='text'`（或缺省）：传输中尾部打字机光标、完成态收敛、异常态提示；
+- 流式内容增长时消息列表自动跟随滚动（仅位于底部时）。
+
+`customType='markdown'` 等富格式流式内容由插件通过 `#message-txt` 插槽接管渲染（内核无感，不引入 markdown 依赖）：
+
+```vue
+<em-chat-container :config="chatConfig">
+  <template #message-txt="{ message }">
+    <MyMarkdownMessage :message="message" />
+  </template>
+</em-chat-container>
+```
+
+完整的插件气泡参考实现与 AI 接入三模式（Mock / 直连 / 业务代理）见 [AI 流式消息](../guide/ai-stream-message)。
 
 ## 实例方法
 

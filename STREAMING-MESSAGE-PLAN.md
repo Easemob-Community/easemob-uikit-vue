@@ -1,7 +1,7 @@
 # 流式消息（Stream Message）接入 UIKIT 设计执行计划
 
-> 状态：**M1（内核数据链路）+ M2（内核纯文本流式渲染）已落地**（2026-08-14）；
-> M3（插件 markdown 验证）/ M4（AI 集成）/ M5（抽包 + 文档）待执行。
+> 状态：**M1（内核数据链路）+ M2（内核纯文本流式渲染）+ M3（demo markdown 插件验证）已落地**（2026-08-14）；
+> M4（AI 集成）demo mock 会话已完成，真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。
 > 对应 TECH-DEBT [D95](#d95)。
 > 背景参考：环信 Web SDK「接收流式消息」https://doc.easemob.com/document/web/message_stream_receive.html
 
@@ -65,7 +65,9 @@ SDK onStreamMessage 事件
 | M4 | AI 集成：DeepSeek 对接 + AI 助手会话（demo 参考实现） | 端到端 AI 对话 | 1~2 天 |
 | M5 | 抽包 + 文档：独立 `@easemob/uikit-ai` + 文档页 + 在线演练场 | 可发布插件 | 1 周内 |
 
-> ✅ M1 / M2 已于 2026-08-14 完成（含 `onMessage` 丢片补偿与流式滚动跟随）。
+> ✅ M1 / M2 / M3 已于 2026-08-14 完成（含 `onMessage` 丢片补偿、流式滚动跟随、demo markdown 流式气泡）。
+> 🟡 M4：demo 已落地 AI 助手 **mock** 会话（toolbar 入口 + 设置面板 + 分片模拟器）；
+> 真实模型对接按三模式（Mock / 直连 / 业务代理）文档指引执行，DeepSeek 直连/代理待接。
 
 ---
 
@@ -102,9 +104,9 @@ SDK onStreamMessage 事件
 
 - [x] `onStreamMessage` 分片能合并为同一条消息，气泡内 `fullText` 持续更新、无重复气泡（M1，2026-08-14）
 - [x] `customType='text'` 纯文本流式：传输中光标、完成收敛、异常提示（M2，2026-08-14）
-- [ ] 插件 markdown 流式气泡（demo）：代码块 / 表格 / 引用正确渲染 + 打字机动画（M3）
-- [ ] DeepSeek AI 助手会话端到端跑通（demo 或独立包）（M4）
-- [ ] 门禁：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + build + demo 类型检查通过（M1/M2 已通过）
+- [x] 插件 markdown 流式气泡（demo）：代码块 / 表格 / 引用正确渲染 + 打字机动画（M3，2026-08-14，`apps/demo/src/components/ai/`）
+- [ ] DeepSeek AI 助手会话端到端跑通（demo 或独立包）：demo mock 会话已通，真实模型对接待执行（M4）
+- [x] 门禁：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + build + demo 类型检查通过（M1/M2/M3 已通过）
 
 ---
 

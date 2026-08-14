@@ -307,6 +307,31 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
   /* ==================== 各类型气泡 ==================== */
 
   {
+    id: 'bubble-stream-markdown',
+    selectors: ['.demo-md-msg'],
+    title: 'AI 流式消息气泡（Demo 插件）',
+    summary: 'onStreamMessage 分片合并 → store 覆盖更新 → #message-txt 插槽接管 markdown 渲染',
+    badgeDelay: 2000,
+    apis: [
+      { name: 'chatManager.addEventHandler({ onStreamMessage })', note: '流式分片事件：按 msgServerId 排序合并，body.content = stream.fullText' },
+      { name: 'messageStore.updateMessageById(msgId, patch)', note: '分片覆盖更新同一条消息，不产生新气泡' },
+      { name: 'stream.customType', note: '业务自定义流类型：\'text\' 内核纯文本流式；\'markdown\' 由插件插槽接管' },
+    ],
+    implNotes: [
+      'chat-events.onStreamMessage：msgServerId 幂等合并 fullText + 挂载 stream 状态（M1）',
+      'text-message.vue：纯文本流式光标/终态/异常（M2，customType 非 text 时由插件接管）',
+      'demo 侧 #message-txt 插槽 → demo-markdown-message.vue（markdown-it 渲染 + 打字机光标）',
+      'demo 分片模拟器 use-stream-demo.ts 直接驱动 messageStore，完整走响应式更新链路',
+    ],
+    refs: [
+      { path: 'packages/uikit/src/sdk/event/chat-events.ts', desc: 'onStreamMessage 分片合并与丢片补偿' },
+      { path: 'packages/uikit/src/modules/chat/message-item/text-message.vue', desc: '内核纯文本流式状态渲染' },
+      { path: 'apps/demo/src/components/ai/demo-markdown-message.vue', desc: '插件 markdown 流式气泡参考实现' },
+      { path: 'apps/demo/src/components/ai/use-stream-demo.ts', desc: '流式分片模拟器 + mock AI 回复' },
+    ],
+  },
+
+  {
     id: 'bubble-text',
     selectors: ['.text-message'],
     title: '文本消息气泡',
