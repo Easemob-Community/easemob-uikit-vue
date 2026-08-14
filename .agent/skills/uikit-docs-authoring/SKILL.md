@@ -184,11 +184,14 @@
   幂等可重复执行，覆盖生成；
 - **白名单**：`COMPONENTS` 数组硬编码 22 个原子组件（action-sheet 到 user-card），
   `MODULES` 数组覆盖业务容器（chat-container / conversation-container /
-  group-container / message-list，映射到 `modules/*` 的组件文件）；新组件/容器要进
-  API 文档必须加入对应数组；
+  group-container / message-list，映射到 `modules/*` 的组件文件），`CONTAINERS`
+  数组覆盖顶级容器（uikit-provider，映射到 `containers/*`，复用 MODULES 生成逻辑）；
+  新组件/容器要进 API 文档必须加入对应数组；
 - 解析契约（对 `packages/uikit/src/components/<name>/<name>.vue` 的 `<script setup>`）：
   - Props：`export interface XxxProps` 的成员，类型取 TS 类型文本，说明取成员
     JSDoc **完整文本**（多行合并为 `<br>` 换行；嵌套小节标题的 blockquote 只取首行）；
+    **内联对象类型成员（如 ProviderProps.theme）自动用 compactTypeText 去注释压缩**，
+    外部 interface 引用保持类型原文；
   - 默认值：`withDefaults(defineProps<XxxProps>(), {...})` 第二个参数；
   - Events：`export interface XxxEmits`（函数签名式）或 `defineEmits<{...}>()` 内联
     类型字面量，事件名取第一个字符串字面量参数，负载取其余参数类型；

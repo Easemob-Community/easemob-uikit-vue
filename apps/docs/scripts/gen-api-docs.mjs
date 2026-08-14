@@ -24,6 +24,7 @@ import ts from 'typescript'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const COMPONENTS_ROOT = join(__dirname, '../../../packages/uikit/src/components')
 const MODULES_ROOT = join(__dirname, '../../../packages/uikit/src/modules')
+const CONTAINERS_ROOT = join(__dirname, '../../../packages/uikit/src/containers')
 const OUTPUT_DIR = join(__dirname, '../.vitepress/gen')
 
 /** 22 个原子组件：目录名 → 展示名 */
@@ -68,6 +69,20 @@ const MODULES = [
   // EmMessageList 的 config 为完整 ChatConfig，但组件只消费 messageList 子树，
   // 仅展开 config.messageList，避免误导读者以为其余配置对消息列表生效
   { name: 'message-list', file: 'chat/message-list/message-list.vue', nestedOnly: ['config.messageList'] },
+]
+
+/**
+ * 顶级容器白名单：相对 containers 的 .vue 路径，复用 MODULES 的生成逻辑
+ * （接口名不匹配 ${pascal}Props 时按首个 *Props 后缀宽松匹配，如 ProviderProps）。
+ * nestedOnly：仅展开这些嵌套路径（theme / notification / logger 为内联对象类型，
+ * dataSource / noticeConfig / sdkConfig / h5 等为外部类型，显示类型原文即可）。
+ */
+const CONTAINERS = [
+  {
+    name: 'uikit-provider',
+    file: 'uikit-provider/uikit-provider.vue',
+    nestedOnly: ['theme', 'notification', 'logger'],
+  },
 ]
 
 function kebabToPascal(name) {
@@ -139,8 +154,12 @@ function parseMemberSignatures(members, sourceFile) {
       continue
     }
     const name = member.name.getText(sourceFile)
+    // 内联对象类型（如 ProviderProps.theme）用 compactTypeText 去注释压缩，
+    // 避免表格单元格内联整段 JSDoc；外部 interface 引用保持类型原文
     const type = member.type
-      ? formatType(member.type.getText(sourceFile))
+      ? (ts.isTypeLiteralNode(member.type)
+          ? compactTypeText(member.type, sourceFile)
+          : formatType(member.type.getText(sourceFile)))
       : 'any'
     rows.push({ name, type, doc: getDocText(member) })
   }
@@ -451,9 +470,9 @@ function collectNestedSections(member, path, depth, ctx, out) {
   }
 }
 
-/** 生成业务模块容器 API 文档（顶层 Props 表格 + 嵌套类型递归展开子小节） */
-function buildModuleMarkdown(entry) {
-  const filePath = join(MODULES_ROOT, entry.file)
+/** 生成业务模块容器 / 顶级容器 API 文档（顶层 Props 表格 + 嵌套类型递归展开子小节） */
+function buildModuleMarkdown(entry, root = MODULES_ROOT) {
+  const filePath = join(root, entry.file)
   const source = readFileSync(filePath, 'utf-8')
   const { descriptor, errors } = parse(source, { filename: filePath })
   if (errors.length > 0) {
@@ -636,5 +655,16 @@ for (const entry of MODULES) {
   console.log(`[ok] ${entry.name} -> .vitepress/gen/${entry.name}.md`)
 }
 
-const total = COMPONENTS.length + MODULES.length
+for (const entry of CONTAINERS) {
+  const markdown = buildModuleMarkdown(entry, CONTAINERS_ROOT)
+  if (!markdown) {
+    continue
+  }
+  const outFile = join(OUTPUT_DIR, `${entry.name}.md`)
+  writeFileSync(outFile, markdown, 'utf-8')
+  success++
+  console.log(`[ok] ${entry.name} -> .vitepress/gen/${entry.name}.md`)
+}
+
+const total = COMPONENTS.length + MODULES.length + CONTAINERS.length
 console.log(`\n完成：${success}/${total} 个 API 已生成 -> ${OUTPUT_DIR}`)
