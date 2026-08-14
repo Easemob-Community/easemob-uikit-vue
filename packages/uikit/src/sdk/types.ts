@@ -4,6 +4,7 @@ import type {
   Contact as SdkContact,
   Message as SdkMessage,
   UserInfo as SdkUserInfo,
+  StreamMessageMeta,
 } from 'easemob-websdk'
 import type { ConversationTypeValue, GroupMemberRoleValue, NoticeEventTypeValue } from '../constants'
 import type { MessageStatus } from './types/message'
@@ -61,6 +62,14 @@ export interface UiMessageExtension {
   progress?: number
   /** 消息是否被编辑过 */
   modified?: boolean
+  /**
+   * 流式消息状态（复用 SDK `StreamMessageMeta`，不本地复刻）。
+   * 仅 SDK `onStreamMessage` 派发的接收方向文本消息挂载；分片由事件层
+   * 按 `msgServerId` 幂等合并（`body.content = stream.fullText` 覆盖更新），
+   * 不产生新消息。`customType` 为业务自定义流类型（text / markdown 等），
+   * 内核仅处理纯文本流，markdown 等富类型由插件插槽接管。
+   */
+  stream?: StreamMessageMeta
 }
 
 /** 通知类型消息体（本地系统通知，非 SDK 消息类型） */

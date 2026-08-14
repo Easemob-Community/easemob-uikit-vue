@@ -2,10 +2,11 @@
 import { computed, inject } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '../../../store/theme'
-import { INJECTION_KEY } from '../../../constants'
+import { INJECTION_KEY, STREAM_CUSTOM_TYPE, STREAM_MESSAGE_STATUS } from '../../../constants'
 import { useLocale } from '../../../locale'
 import { linkify } from '../../../utils/linkify'
 import type { LinkSegment } from '../../../utils/linkify'
+import { isStreamActive } from '../../../utils/stream-message'
 import Icon from '../../../components/icon/icon.vue'
 import type { TextMessageType } from '../../../store/message'
 import type { BubbleShape, ChatConfig } from '../types'
@@ -130,6 +131,30 @@ const translationHasLinks = computed(() => !!translationSegments.value?.some(s =
 /** 是否显示重新编辑 */
 const showReedit = computed(() => props.message.recalled && props.message.isSelf && props.message.originalMsg)
 
+/**
+ * 流式消息状态（仅 SDK onStreamMessage 派发的接收文本消息挂载；
+ * 分片已由事件层按 msgServerId 合并写入 body.content，这里只负责展示态）。
+ */
+const streamState = computed(() => props.message.stream)
+
+/**
+ * 是否为内核处理的纯文本流：customType 缺省或 'text'。
+ * markdown 等富格式流类型由插件通过 #message-txt / #message-custom 插槽接管，内核不渲染特殊态。
+ */
+const isPlainTextStream = computed(() => {
+  const stream = streamState.value
+  if (!stream)
+    return false
+  const customType = stream.customType
+  return customType === undefined || customType === STREAM_CUSTOM_TYPE.TEXT
+})
+
+/** 流式传输中：气泡尾部显示打字机光标 */
+const isStreaming = computed(() => isStreamActive(streamState.value?.status))
+
+/** 流式异常结束：气泡尾部提示生成异常（保留已生成的部分内容） */
+const isStreamError = computed(() => streamState.value?.status === STREAM_MESSAGE_STATUS.ERROR)
+
 /** 是否已被编辑：以消息体 modifiedInfo 字段为准（历史消息拉取也会带），兼容本地 modified 标记 */
 const isModified = computed(() => (!!props.message.modifiedInfo) && !props.message.recalled)
 
@@ -197,36 +222,47 @@ function onMentionClick(userId: string, event: MouseEvent) {
     <template v-else>
       <div class="text-message__bubble" :class="bubbleClass">
         <div class="text-message__content">
-          <!-- 启用 linkify 或包含 mention 时用分片渲染 -->
-          <template v-if="msgSegments.length > 0">
-            <template v-for="(seg, idx) in msgSegments" :key="idx">
-              <a
-                v-if="seg.type === 'link'"
-                class="text-message__link"
-                :href="seg.href"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click="onLinkClick(seg.href!, $event)"
-              >{{ seg.value }}</a>
-              <span
-                v-else-if="seg.type === 'mention'"
-                class="text-message__mention"
-                @click="onMentionClick(seg.userId, $event)"
-              >{{ seg.value }}</span>
-              <span v-else>{{ seg.value }}</span>
-            </template>
+          <!-- 流式纯文本（内核内置）：传输中尾部打字机光标 / 异常提示；终态收敛为普通文本。
+               customType 为 markdown 等富类型时由插件插槽接管，不走此分支。 -->
+          <template v-if="isPlainTextStream && (isStreaming || isStreamError)">
+            <span class="text-message__stream-text">{{ props.message.body.content }}</span>
+            <span v-if="isStreaming" class="text-message__stream-cursor" aria-hidden="true" />
+            <span v-else-if="isStreamError" class="text-message__stream-error">
+              {{ t('message.stream.error') }}
+            </span>
           </template>
-          <!-- 无链接/mention 时纯文本渲染 -->
+          <!-- 普通文本：启用 linkify 或包含 mention 时用分片渲染 -->
           <template v-else>
-            {{ props.message.body.content }}
+            <template v-if="msgSegments.length > 0">
+              <template v-for="(seg, idx) in msgSegments" :key="idx">
+                <a
+                  v-if="seg.type === 'link'"
+                  class="text-message__link"
+                  :href="seg.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  @click="onLinkClick(seg.href!, $event)"
+                >{{ seg.value }}</a>
+                <span
+                  v-else-if="seg.type === 'mention'"
+                  class="text-message__mention"
+                  @click="onMentionClick(seg.userId, $event)"
+                >{{ seg.value }}</span>
+                <span v-else>{{ seg.value }}</span>
+              </template>
+            </template>
+            <!-- 无链接/mention 时纯文本渲染 -->
+            <template v-else>
+              {{ props.message.body.content }}
+            </template>
+            <span
+              v-if="isModified"
+              class="text-message__edited"
+              :title="props.message.modifiedInfo ? `${t('message.edited')} ×${props.message.modifiedInfo.operationCount}` : ''"
+            >
+              {{ t('message.edited') }}
+            </span>
           </template>
-          <span
-            v-if="isModified"
-            class="text-message__edited"
-            :title="props.message.modifiedInfo ? `${t('message.edited')} ×${props.message.modifiedInfo.operationCount}` : ''"
-          >
-            {{ t('message.edited') }}
-          </span>
         </div>
       </div>
       <!-- 译文卡片（气泡下方独立卡片，隐藏/显示译文入口在右键菜单） -->
@@ -295,6 +331,50 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__content {
   display: inline;
+}
+
+/* 流式消息：打字机光标（仅内核纯文本流传输中显示） */
+.text-message__stream-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  margin-left: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+  vertical-align: text-bottom;
+  opacity: 0.85;
+  animation: text-message-cursor-blink 1s step-end infinite;
+}
+
+@keyframes text-message-cursor-blink {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-message__stream-cursor {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* 流式消息：异常提示（保留已生成的部分内容，尾部追加提示） */
+.text-message__stream-error {
+  margin-left: 6px;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-secondary);
+  opacity: 0.75;
+  user-select: none;
+}
+
+.text-message--self .text-message__stream-error {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.75;
 }
 
 .text-message__edited {

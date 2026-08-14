@@ -1,6 +1,7 @@
 # 流式消息（Stream Message）接入 UIKIT 设计执行计划
 
-> 状态：**仅设计计划，未开始执行**（登记日期 2026-08-14）。
+> 状态：**M1（内核数据链路）+ M2（内核纯文本流式渲染）已落地**（2026-08-14）；
+> M3（插件 markdown 验证）/ M4（AI 集成）/ M5（抽包 + 文档）待执行。
 > 对应 TECH-DEBT [D95](#d95)。
 > 背景参考：环信 Web SDK「接收流式消息」https://doc.easemob.com/document/web/message_stream_receive.html
 
@@ -64,15 +65,25 @@ SDK onStreamMessage 事件
 | M4 | AI 集成：DeepSeek 对接 + AI 助手会话（demo 参考实现） | 端到端 AI 对话 | 1~2 天 |
 | M5 | 抽包 + 文档：独立 `@easemob/uikit-ai` + 文档页 + 在线演练场 | 可发布插件 | 1 周内 |
 
+> ✅ M1 / M2 已于 2026-08-14 完成（含 `onMessage` 丢片补偿与流式滚动跟随）。
+
 ---
 
 ## 四、关键决策点（执行前逐项确认）
 
-1. **内核范围边界**：内核是否只做 `customType='text'` 纯文本流式，markdown 一律走插件？（**建议是**）
-2. **流式气泡渲染接口**：内核 TEXT 气泡暴露的流式状态如何让插件插槽接管（slot props 契约）？—— 需与 `uikit-message-rendering` / `uikit-chat-plugin-tabs` skill 对齐。
-3. **`stream` 是否影响会话摘要 / 未读**：流式传输中的消息是否计入未读、会话摘要如何显示 —— 需明确。
-4. **历史消息回流**：`loadHistory` 拉取到的流式消息，分片状态已终态，按普通文本渲染即可，需确认无重复合并。
-5. **demo 形态**：AI 层先做 demo 参考实现（推荐）还是直接抽独立包？
+> 执行状态（2026-08-14）：决策点 1/5 已由需求方确认；2/3/4 已按下列结论落地。
+
+1. **内核范围边界**：内核只做 `customType='text'`（含缺省）纯文本流式，markdown 一律走插件。**（已确认：是）**
+2. **流式气泡渲染接口**：**不加新插槽契约** —— 流式是 TEXT 消息的接收状态，`stream` 字段随 `UiMessage` 透出；
+   插件沿用现有 `#message-txt` / `#message-custom` 插槽（`message-renderer.vue` 插槽优先级最高），
+   按 `message.stream?.customType` 判定接管，内核无感。**（已落地）**
+3. **`stream` 与会话摘要 / 未读**：未读计数由 SDK 会话同步驱动，内核不做特殊处理；
+   当前会话摘要由 `chat.vue` 的 `lastMessageSummary` 响应式 watch 随 `body.content` 更新自动刷新，
+   非当前会话摘要由 SDK `onConversationListUpdate` 同步驱动。**（已落地）**
+4. **历史消息回流**：`loadHistory` 拉到的流式消息为终态，`prependMessages` 按 `msgServerId` 去重，
+   不会重复合并；离线/断连错过分片时，`onMessage` 同步到达的完整消息会覆盖 store 中未完成的
+   流式副本（丢片补偿）。**（已落地）**
+5. **demo 形态**：AI 层先做 demo 参考实现，M3 再评估是否独立抽包。**（已确认：demo 参考实现）**
 
 ---
 
@@ -89,11 +100,11 @@ SDK onStreamMessage 事件
 
 ## 六、验收标准
 
-- [ ] `onStreamMessage` 分片能合并为同一条消息，气泡内 `fullText` 持续更新、无重复气泡
-- [ ] `customType='text'` 纯文本流式：传输中光标、完成收敛、异常提示
-- [ ] 插件 markdown 流式气泡（demo）：代码块 / 表格 / 引用正确渲染 + 打字机动画
-- [ ] DeepSeek AI 助手会话端到端跑通（demo 或独立包）
-- [ ] 门禁：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + build + demo 类型检查通过
+- [x] `onStreamMessage` 分片能合并为同一条消息，气泡内 `fullText` 持续更新、无重复气泡（M1，2026-08-14）
+- [x] `customType='text'` 纯文本流式：传输中光标、完成收敛、异常提示（M2，2026-08-14）
+- [ ] 插件 markdown 流式气泡（demo）：代码块 / 表格 / 引用正确渲染 + 打字机动画（M3）
+- [ ] DeepSeek AI 助手会话端到端跑通（demo 或独立包）（M4）
+- [ ] 门禁：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + build + demo 类型检查通过（M1/M2 已通过）
 
 ---
 

@@ -10,6 +10,7 @@ import { toUiGroups } from '../adapter/group-adapter'
 import { notifyOnNewMessage } from '../notification-engine'
 import { createLogger } from '../../utils/logger'
 import { formatSdkError } from '../../utils/sdk-error'
+import { isStreamActive } from '../../utils/stream-message'
 import { markReadReceiptSent } from '../domain/message-domain'
 import { formatConversationPreview, resolveSenderDisplayName, resolveUserDisplayName } from '../../utils/resolve-last-message-text'
 import { t } from '../../locale'
@@ -359,7 +360,16 @@ export function createChatHandlers(
       }
       chatLog.info('onMessage', { conversationId: sdkMsg.conversationId, from: sdkMsg.from, type: sdkMsg.type })
       const uiMsg = toUiMessage(sdkMsg, stores.client.currentUser)
-      stores.message.addMessage(uiMsg)
+      // 流式丢片补偿：离线/断连期间错过分片后，服务端同步到达的完整消息
+      // 覆盖 store 中未完成的流式副本（msgServerId 相同），避免气泡残留半截内容。
+      const existingStreamMsg = stores.message.getMessages(sdkMsg.conversationId)
+        .find(m => m.msgServerId === sdkMsg.msgServerId)
+      if (existingStreamMsg?.stream && isStreamActive(existingStreamMsg.stream.status)) {
+        stores.message.replaceMessageById(sdkMsg.msgServerId, uiMsg)
+      }
+      else {
+        stores.message.addMessage(uiMsg)
+      }
 
       // 当前会话收到新消息时自动标记已读，避免刷新/重新同步后服务端未读数再次浮现。
       // 仅在页面可见时标记已读；页面隐藏时用户实际未看到，保持未读。
@@ -399,6 +409,48 @@ export function createChatHandlers(
 
       // 消息通知：非当前会话 + 页面隐藏（background 模式）时触发浏览器/页内通知
       notifyOnNewMessage(stores, sdkMsg)
+    },
+
+    /**
+     * 流式消息（边生成边下发，典型 AI 对话）分片合并。
+     * - 按 `msgServerId` 定位同一条 TEXT 消息，`body.content` 以 `stream.fullText`
+     *   （服务端排序合并后的累计全文）幂等覆盖，不依赖分片到达顺序 / deltaText 增量；
+     * - 先到（onMessage 全量或首个分片）则只覆盖更新，未到则插入新消息（首个分片建气泡）；
+     * - `stream` 状态整体挂载到消息上，供渲染层展示传输中光标 / 终态收敛 / 异常提示，
+     *   也供插件插槽按 `customType` 接管（markdown 等富类型）。
+     */
+    onStreamMessage: (sdkMsg) => {
+      const stream = sdkMsg.stream
+      if (!stream)
+        return
+      chatLog.info('onStreamMessage', {
+        conversationId: sdkMsg.conversationId,
+        from: sdkMsg.from,
+        msgServerId: sdkMsg.msgServerId,
+        seq: stream.seq,
+        status: stream.status,
+        customType: stream.customType,
+      })
+      const msgId = sdkMsg.msgServerId || sdkMsg.msgLocalId
+      if (!msgId)
+        return
+
+      const exists = stores.message.getMessages(sdkMsg.conversationId).some(
+        m =>
+          m.msgServerId === sdkMsg.msgServerId
+          || (sdkMsg.msgLocalId !== undefined && m.msgLocalId === sdkMsg.msgLocalId),
+      )
+      if (!exists) {
+        // 首个分片（或先于 onMessage 到达）：创建气泡，stream 字段随 toUiMessage 展开保留
+        stores.message.addMessage(toUiMessage(sdkMsg, stores.client.currentUser))
+        return
+      }
+
+      // 已有同一条消息：幂等覆盖全文与流式状态，不产生新气泡
+      stores.message.updateMessageById(msgId, {
+        body: { ...sdkMsg.body, content: stream.fullText },
+        stream: { ...stream },
+      })
     },
 
     onMessageRecalled: (payload) => {

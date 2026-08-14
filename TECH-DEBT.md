@@ -777,7 +777,8 @@
 
 - **背景**：环信 IM 支持流式消息（边生成边接收，典型 AI 对话），SDK 通过 `onStreamMessage` 按 `msgServerId` 排序合并分片，仅文本类型、客户端只收不发；消息体带 `stream`（`deltaText`/`fullText`/`status`/`customType`/`errorType`/`finishReason`）。
 - **结论**：流式是 TEXT 消息的「接收状态」而非新类型 → 内核只内置「数据链路 + 纯文本流式状态」，markdown 渲染与 AI 集成（重依赖/可选能力）走插件（`#message-txt` / `#message-custom` 插槽 + `useChatPlugin` + `dataSource`）。
-- **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（2026-08-14 登记，未开始执行）。
+- **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)。
+- **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）与 M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）已完成；M3（插件 markdown）/ M4（AI 集成）/ M5（抽包 + 文档）待执行。
 - **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
 
 ---

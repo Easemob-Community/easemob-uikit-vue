@@ -62,6 +62,38 @@ export const MESSAGE_STATUS = {
 export type MessageStatusValue =
   (typeof MESSAGE_STATUS)[keyof typeof MESSAGE_STATUS]
 
+/**
+ * 流式消息状态常量（与 SDK `StreamMessageStatus` 对齐；
+ * `STREAM_FULL` 为 SDK 内部全文兜底状态，不通过 onStreamMessage 对外派发，故不收录）。
+ */
+export const STREAM_MESSAGE_STATUS = {
+  /** 流开始 */
+  START: 'STREAM_START',
+  /** 单分片即完成（整条消息在一个分片内下发完成） */
+  START_COMPLETED: 'STREAM_START_COMPLETED',
+  /** 传输中（后续仍有分片） */
+  IN_PROGRESS: 'STREAM_IN_PROGRESS',
+  /** 正常完成 */
+  COMPLETED: 'STREAM_COMPLETED',
+  /** 流式处理异常 */
+  ERROR: 'STREAM_ERROR',
+} as const
+
+export type StreamMessageStatusValue =
+  (typeof STREAM_MESSAGE_STATUS)[keyof typeof STREAM_MESSAGE_STATUS]
+
+/**
+ * 流式消息业务自定义类型（`stream.customType`）常量。
+ * 内核仅处理纯文本流（text / 缺省）；markdown 等富格式类型由插件通过
+ * `#message-txt` / `#message-custom` 插槽接管渲染。
+ */
+export const STREAM_CUSTOM_TYPE = {
+  TEXT: 'text',
+} as const
+
+export type StreamCustomTypeValue =
+  (typeof STREAM_CUSTOM_TYPE)[keyof typeof STREAM_CUSTOM_TYPE]
+
 /** 回执消息类型常量 */
 export const ACK_TYPE = {
   CHANNEL: 'channel',
