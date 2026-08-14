@@ -299,9 +299,13 @@ export interface MessageActionEvent {
 
 /** 联系人（用于 @提及） */
 export interface MentionContact {
+  /** 用户 ID（@提及的实际目标） */
   userId: string
+  /** 展示名称（昵称，无昵称时回落到 userId） */
   name: string
+  /** 头像地址（可选） */
   avatar?: string
+  /** 备注名（可选，优先于 name 展示） */
   remark?: string
 }
 
