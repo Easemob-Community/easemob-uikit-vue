@@ -773,6 +773,13 @@
 - **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
+### [ ] D95. 流式消息（Stream Message）接入 UIKIT：内核薄 + 插件厚分层落地
+
+- **背景**：环信 IM 支持流式消息（边生成边接收，典型 AI 对话），SDK 通过 `onStreamMessage` 按 `msgServerId` 排序合并分片，仅文本类型、客户端只收不发；消息体带 `stream`（`deltaText`/`fullText`/`status`/`customType`/`errorType`/`finishReason`）。
+- **结论**：流式是 TEXT 消息的「接收状态」而非新类型 → 内核只内置「数据链路 + 纯文本流式状态」，markdown 渲染与 AI 集成（重依赖/可选能力）走插件（`#message-txt` / `#message-custom` 插槽 + `useChatPlugin` + `dataSource`）。
+- **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（2026-08-14 登记，未开始执行）。
+- **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
+
 ---
 
 ## 已修复（归档）
