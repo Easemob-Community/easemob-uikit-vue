@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.9.0 (2026-08-14)
+
+### 新增
+
+- **流式消息（Stream Message）内核接入**：
+  - `onStreamMessage` 按 `msgServerId` 幂等合并分片，`body.content` 以 `stream.fullText` 覆盖更新、不产生新气泡（分片先到时自动建气泡）
+  - 纯文本流式状态内置：传输中尾部打字机光标、完成态收敛、异常态提示（`customType='text'` 或缺省）
+  - 丢片补偿：离线/断连期间错过分片时，同步到达的完整消息自动覆盖未完成的流式副本，不留半截内容
+  - 流式内容增长时消息列表在用户位于底部时自动跟随滚动；当前会话摘要随内容响应式更新
+  - `UiMessage` 扩展可选 `stream?` 字段（复用 SDK `StreamMessageMeta`）；新增 `STREAM_MESSAGE_STATUS` / `STREAM_CUSTOM_TYPE` 常量
+  - markdown 等富格式流式内容由 `#message-txt` 插槽插件接管渲染（内核不引入 markdown 依赖）
+- **消息定位高亮增强**：点击 @名字定位该用户最近一条消息（`ChatConfig.textMessage.locateOnMentionClick`，默认开启），未找到时 toast 提示；定位高亮改为主题色边框 + 发光 + 背景着染，脉冲 3 次后静态保持再平滑淡出（2.4s），覆盖引用卡 / 置顶 / 搜索 / @我自动定位等全部入口
+- **demo：AI 流式消息演示**：
+  - 新增 markdown 流式气泡插件参考实现（`#message-txt` 接管 `customType='markdown'`，markdown-it 渲染 + 打字机光标 / 终态 / 异常）
+  - 聊天工具栏新增「AI 流式演示」入口；设置抽屉新增「AI」分类面板（AI 应答 mock 开关、手动注入 markdown / 异常流式演示）
+  - 新增流式分片模拟器与 mock AI 回复生成器（直接驱动 messageStore，完整走内核覆盖更新链路）
+- **文档**：新增「AI 流式消息」章节（SDK 语义 / 内核能力 / markdown 插件接管示例 / AI 接入三模式与安全建议），`chat-container` 组件文档补充流式消息小节
+
 ## 1.8.0 (2026-08-13)
 
 ### 新增

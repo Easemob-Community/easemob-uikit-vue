@@ -4731,7 +4731,7 @@ class tC {
       "%c[Easemob] SDK version: %s, UIKit version: %s",
       "color: green; font-weight: bold;",
       "5.0.0",
-      "1.8.0"
+      "1.9.0"
     );
   }
   /** SDK ChatManager */
