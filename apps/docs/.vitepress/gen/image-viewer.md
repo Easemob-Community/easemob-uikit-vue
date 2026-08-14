@@ -14,14 +14,14 @@
 
 ### Events
 
-| 事件名            | 参数                         | 说明                       |
+| 事件名            | 参数                         | 说明                                                 |
 | --- | --- | --- |
-| `update:show`  | value: boolean             | —                        |
-| `update:index` | value: number              | —                        |
-| `close`        | —                          | —                        |
-| `load`         | index: number              | 当前图片加载完成                 |
-| `load-error`   | index: number              | 当前图片加载失败（业务侧可据此做降级切换）    |
-| `download`     | url: string, index: number | 下载动作触发（组件内部执行下载，事件供业务感知） |
+| `update:show`  | value: boolean             | 关闭预览时触发（点击遮罩/ESC），负载 false，供 v-model:show 双向同步     |
+| `update:index` | value: number              | 当前图片索引变化时触发（打开/切换上下一张），负载为新索引，供 v-model:index 双向同步 |
+| `close`        | —                          | 预览关闭完成时触发，与 update:show(false) 同时发出，供业务侧感知关闭       |
+| `load`         | index: number              | 当前图片加载完成                                           |
+| `load-error`   | index: number              | 当前图片加载失败（业务侧可据此做降级切换）                              |
+| `download`     | url: string, index: number | 下载动作触发（组件内部执行下载，事件供业务感知）                           |
 
 ### Slots
 

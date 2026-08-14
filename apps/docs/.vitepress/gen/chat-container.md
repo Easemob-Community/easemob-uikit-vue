@@ -3,12 +3,12 @@
 
 ### Props
 
-| 属性      | 类型                       | 默认值 | 说明           |
+| 属性      | 类型                       | 默认值 | 说明                                              |
 | --- | --- | --- | --- |
-| config  | `ChatConfig`             | —   | —            |
-| loading | `boolean`                | —   | 是否处于全局加载状态   |
-| class   | `string`                 | —   | 自定义根元素 class |
-| style   | `Record<string, string>` | —   | 自定义根元素 style |
+| config  | `ChatConfig`             | —   | 聊天容器完整配置（输入框 / 消息列表 / 消息操作 / 群能力等，见 ChatConfig） |
+| loading | `boolean`                | —   | 是否处于全局加载状态                                      |
+| class   | `string`                 | —   | 自定义根元素 class                                    |
+| style   | `Record<string, string>` | —   | 自定义根元素 style                                    |
 
 #### config
 
@@ -178,7 +178,7 @@
 | caretColor       | `string`                                                                                                    | —   | 光标颜色，不设置则使用默认                                                                                                               |
 | selectionColor   | `string`                                                                                                    | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                             |
 | maxLength        | `number`                                                                                                    | —   | 最大输入长度，0 或不设置表示无限制                                                                                                          |
-| mention          | `{ contacts?: MentionContact[], onlyInGroup?: boolean }`                                                    | —   | —                                                                                                                           |
+| mention          | `{ contacts?: MentionContact[], onlyInGroup?: boolean }`                                                    | —   | 提及配置（@）                                                                                                                     |
 | enableTyping     | `boolean`                                                                                                   | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                               |
 | showSendButton   | `boolean`                                                                                                   | —   | 是否显示发送按钮，默认 true                                                                                                            |
 | resizable        | `boolean`                                                                                                   | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true              |
@@ -189,16 +189,18 @@
 
 > 功能开关
 
-| 属性      | 类型        | 默认值 | 说明            |
+| 属性      | 类型        | 默认值 | 说明              |
 | --- | --- | --- | --- |
-| emoji   | `boolean` | —   | Emoji，默认 true |
-| image   | `boolean` | —   | 图片，默认 true    |
-| file    | `boolean` | —   | 文件，默认 true    |
-| voice   | `boolean` | —   | 语音，默认 true    |
-| video   | `boolean` | —   | 视频，默认 true    |
-| mention | `boolean` | —   | —             |
+| emoji   | `boolean` | —   | Emoji，默认 true   |
+| image   | `boolean` | —   | 图片，默认 true      |
+| file    | `boolean` | —   | 文件，默认 true      |
+| voice   | `boolean` | —   | 语音，默认 true      |
+| video   | `boolean` | —   | 视频，默认 true      |
+| mention | `boolean` | —   | 提及功能（@），默认 true |
 
 #### config.input.mention
+
+> 提及配置（@）
 
 | 属性          | 类型                 | 默认值 | 说明                               |
 | --- | --- | --- | --- |
@@ -214,17 +216,17 @@
 | enableLinkify          | `boolean`                                    | —   | 是否启用 URL 识别为可点击链接，默认 true                                                                            |
 | onLinkClick            | `(url: string) => boolean \| string \| void` | —   | 链接点击拦截器<br>- 返回 false：阻止跳转<br>- 返回 string：跳转到返回值指定的地址<br>- 返回 void / undefined / true：默认行为（跳转原始 URL） |
 | enableMentionHighlight | `boolean`                                    | —   | 是否启用                                                                                                 |
-| onMentionClick         | `(userId: string) => void`                   | —   | —                                                                                                    |
+| onMentionClick         | `(userId: string) => void`                   | —   | 提及点击回调（@）                                                                                            |
 
 ### Events
 
-| 事件名                     | 参数                                                            | 说明 |
+| 事件名                     | 参数                                                            | 说明                                                                                                                                                                    |
 | --- | --- | --- |
-| `recall-failed`         | error: any, message: UiMessage                                | —  |
-| `at-me-click`           | userId: string                                                | —  |
-| `group-operation`       | `payload: { type: string, groupId: string, userId?: string }` | —  |
-| `location-click`        | body: LocationMessageBody, message: UiMessage                 | —  |
-| `custom-message-action` | action: string, payload: any, message: UiMessage              | —  |
+| `recall-failed`         | error: any, message: UiMessage                                | 消息撤回失败时触发，参数为错误对象与目标消息 / Emitted when recalling a message fails, with the error and the target message                                                                |
+| `at-me-click`           | userId: string                                                | 点击消息中的                                                                                                                                                                |
+| `group-operation`       | `payload: { type: string, groupId: string, userId?: string }` | 群管理操作（全员禁言、成员禁言/拉黑、入群申请处理等）时触发，参数为操作类型、群 ID，成员类操作附带 userId / Emitted when a group management action is performed, with the action type, group ID and optional user ID |
+| `location-click`        | body: LocationMessageBody, message: UiMessage                 | 点击位置（location）消息时触发，参数为位置消息体与对应消息 / Emitted when a location message is clicked, with the location body and the message                                                |
+| `custom-message-action` | action: string, payload: any, message: UiMessage              | 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message                 |
 
 ### Slots
 

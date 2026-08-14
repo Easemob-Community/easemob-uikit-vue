@@ -39,16 +39,16 @@
 
 ### Events
 
-| 事件名                  | 参数                              | 说明 |
+| 事件名                  | 参数                              | 说明                                                           |
 | --- | --- | --- |
-| `select`             | group: Group                    | —  |
-| `click`              | group: Group                    | —  |
-| `contextmenu`        | event: MouseEvent, group: Group | —  |
-| `group-jump`         | key: string                     | —  |
-| `update:selectedIds` | ids: string[]                   | —  |
-| `max-exceed`         | max: number                     | —  |
-| `load-more`          | —                               | —  |
-| `search`             | keyword: string                 | —  |
+| `select`             | group: Group                    | 列表项被选中时触发（clickBehavior 为 'event-only' 时不触发），负载为群组对象         |
+| `click`              | group: Group                    | 点击列表项时触发（不受 clickBehavior 影响，始终发出），负载为群组对象                   |
+| `contextmenu`        | event: MouseEvent, group: Group | 右键点击列表项时触发，负载为原生右键事件 MouseEvent 与群组对象                        |
+| `group-jump`         | key: string                     | 通过字母导航跳转到分组后触发，负载为分组 key                                     |
+| `update:selectedIds` | ids: string[]                   | 选中集合变化时触发（配合 selectedIds 实现 v-model:selectedIds），负载为新的 id 数组 |
+| `max-exceed`         | max: number                     | 选中数量超过 maxSelected 上限时触发（内部回退到上次合法选中），负载为上限值                 |
+| `load-more`          | —                               | 滚动接近底部且满足加载条件时触发；外部加载完成后需调用 expose 的 releaseLoadMoreLock 释放锁 |
+| `search`             | keyword: string                 | 搜索关键词变化时触发，负载为去除首尾空格后的关键词                                    |
 
 ### Slots
 

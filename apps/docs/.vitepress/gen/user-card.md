@@ -17,10 +17,10 @@
 
 ### Events
 
-| 事件名                | 参数          | 说明 |
+| 事件名                | 参数          | 说明                                                       |
 | --- | --- | --- |
-| `action-click`     | key: string | —  |
-| `info-click`       | key: string | —  |
-| `avatar-click`     | —           | —  |
-| `presence-click`   | —           | —  |
-| `presence-changed` | —           | —  |
+| `action-click`     | key: string | 点击底部操作按钮时触发，负载为按钮对应的 action key                          |
+| `info-click`       | key: string | 点击信息行时触发（仅当该行 clickable 为 true），负载为行对应的 key              |
+| `avatar-click`     | —           | 点击头像时触发（不含在线状态指示器点击，避免与 presence-click 重复）               |
+| `presence-click`   | —           | 点击头像上的在线状态指示器时触发（由 Avatar 内部转发）；editable 时同时弹出在线状态选择器    |
+| `presence-changed` | —           | 在线状态选择器中成功变更状态后触发（转发 PresenceSelectorPopup 的 changed 事件） |

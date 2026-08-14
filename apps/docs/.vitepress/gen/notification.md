@@ -9,7 +9,7 @@
 
 ### Events
 
-| 事件名     | 参数                     | 说明 |
+| 事件名     | 参数                     | 说明                          |
 | --- | --- | --- |
-| `close` | id: string             | —  |
-| `click` | item: NotificationItem | —  |
+| `close` | id: string             | 点击关闭按钮时触发（已阻止冒泡），负载为通知条目 id |
+| `click` | item: NotificationItem | 点击通知卡片时触发，负载为完整通知条目数据       |

@@ -16,7 +16,7 @@
 
 ### Events
 
-| 事件名                | 参数 | 说明 |
+| 事件名                | 参数 | 说明                                        |
 | --- | --- | --- |
-| `presence-click`   | —  | —  |
-| `presence-changed` | —  | —  |
+| `presence-click`   | —  | 点击头像时触发（无负载）；editable 为 true 时会同时打开状态选择弹层 |
+| `presence-changed` | —  | 在弹层中选择新的在线状态后触发（无负载），随后自动刷新状态指示器          |

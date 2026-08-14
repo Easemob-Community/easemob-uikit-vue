@@ -21,10 +21,10 @@
 
 ### Events
 
-| 事件名           | 参数                | 说明 |
+| 事件名           | 参数                | 说明                                      |
 | --- | --- | --- |
-| `click`       | event: MouseEvent | —  |
-| `contextmenu` | event: MouseEvent | —  |
+| `click`       | event: MouseEvent | 点击 cell 时触发（disabled 时不触发），负载为原生点击事件    |
+| `contextmenu` | event: MouseEvent | 右键点击 cell 时触发（disabled 时不触发），常用于唤出上下文菜单 |
 
 ### Slots
 

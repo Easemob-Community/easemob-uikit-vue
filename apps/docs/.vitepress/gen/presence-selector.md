@@ -14,8 +14,8 @@
 
 ### Events
 
-| 事件名            | 参数                                         | 说明 |
+| 事件名            | 参数                                         | 说明                                                            |
 | --- | --- | --- |
-| `select`       | status: PresenceSelectorValue, ext: string | —  |
-| `cancel`       | —                                          | —  |
-| `custom-click` | —                                          | —  |
+| `select`       | status: PresenceSelectorValue, ext: string | 选中某个状态时触发：status 为状态 key，ext 为扩展文本（固定状态为 SDK 状态常量，自定义状态为输入文本） |
+| `cancel`       | —                                          | 点击关闭按钮取消选择时触发（无负载）                                            |
+| `custom-click` | —                                          | useCustomModal 模式下点击「自定义」选项时触发（无负载），由外部弹窗接管自定义状态输入            |

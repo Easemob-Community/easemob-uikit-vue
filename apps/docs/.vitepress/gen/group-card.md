@@ -14,9 +14,9 @@
 
 ### Events
 
-| 事件名            | 参数          | 说明 |
+| 事件名            | 参数          | 说明                                         |
 | --- | --- | --- |
-| `action-click` | key: string | —  |
+| `action-click` | key: string | 点击底部操作按钮时触发，负载为被点击操作的 key（对应 actions 中某一项） |
 
 ### Slots
 

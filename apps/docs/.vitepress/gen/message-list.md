@@ -3,9 +3,9 @@
 
 ### Props
 
-| 属性     | 类型           | 默认值 | 说明 |
+| 属性     | 类型           | 默认值 | 说明                                                             |
 | --- | --- | --- | --- |
-| config | `ChatConfig` | —   | —  |
+| config | `ChatConfig` | —   | 消息列表配置（仅消费 config.messageList 子树：布局 / 头像 / 时间戳 / 气泡形状 / 消息状态等） |
 
 #### config
 
@@ -49,14 +49,14 @@
 
 ### Events
 
-| 事件名                     | 参数                                               | 说明 |
+| 事件名                     | 参数                                               | 说明                                                                                                                                                         |
 | --- | --- | --- |
-| `reedit`                | message: UiMessage                               | —  |
-| `recall-failed`         | error: any, message: UiMessage                   | —  |
-| `edit`                  | message: UiMessage                               | —  |
-| `forward`               | messages: UiMessage[]                            | —  |
-| `mention-click`         | userId: string                                   | —  |
-| `location-click`        | body: LocationMessageBody, message: UiMessage    | —  |
-| `custom-message-action` | action: string, payload: any, message: UiMessage | —  |
-| `avatar-view-profile`   | userId: string                                   | —  |
-| `avatar-mention`        | `payload: { userId: string, name: string }`      | —  |
+| `reedit`                | message: UiMessage                               | 点击自己撤回消息上的"重新编辑"按钮时触发，参数为目标消息 / Emitted when the "re-edit" button of a self-recalled message is clicked, with the target message                           |
+| `recall-failed`         | error: any, message: UiMessage                   | 消息撤回失败时触发，参数为错误对象与目标消息 / Emitted when recalling a message fails, with the error and the target message                                                     |
+| `edit`                  | message: UiMessage                               | 点击消息操作菜单中的"编辑"时触发（仅文本且未撤回的消息），参数为目标消息 / Emitted when "Edit" in the message action menu is clicked (text, non-recalled only), with the target message       |
+| `forward`               | messages: UiMessage[]                            | 点击消息操作菜单中的"转发"时触发，参数为待转发的消息数组（当前为单条）/ Emitted when "Forward" in the message action menu is clicked, with the messages to forward (currently a single item) |
+| `mention-click`         | userId: string                                   | 点击消息中的                                                                                                                                                     |
+| `location-click`        | body: LocationMessageBody, message: UiMessage    | 点击位置（location）消息时触发，参数为位置消息体与对应消息 / Emitted when a location message is clicked, with the location body and the message                                     |
+| `custom-message-action` | action: string, payload: any, message: UiMessage | 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message      |
+| `avatar-view-profile`   | userId: string                                   | 右键消息头像选择"查看资料"时触发，参数为消息发送者 ID / Emitted when "View profile" is chosen from the avatar context menu, with the sender ID                                     |
+| `avatar-mention`        | `payload: { userId: string, name: string }`      | 右键消息头像选择"@提及"时触发，参数为发送者 ID 与展示名 / Emitted when "@mention" is chosen from the avatar context menu, with the sender ID and display name                      |

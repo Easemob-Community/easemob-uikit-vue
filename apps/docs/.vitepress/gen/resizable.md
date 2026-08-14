@@ -16,8 +16,8 @@
 
 ### Events
 
-| 事件名                  | 参数           | 说明 |
+| 事件名                  | 参数           | 说明                                                                                                                                         |
 | --- | --- | --- |
-| `update:model-value` | size: number | —  |
-| `resize-start`       | —            | —  |
-| `resize-end`         | size: number | —  |
+| `update:model-value` | size: number | 拖拽过程中持续触发（v-model 同步，rAF 节流），负载为当前尺寸（px）/ Emitted continuously while dragging (v-model sync, rAF-throttled), payload is current size in px |
+| `resize-start`       | —            | 拖拽开始时触发一次（无负载）/ Emitted once when dragging starts (no payload)                                                                             |
+| `resize-end`         | size: number | 拖拽结束时触发（pointerup），负载为最终尺寸（px）/ Emitted when dragging ends (pointerup), payload is final size in px                                        |

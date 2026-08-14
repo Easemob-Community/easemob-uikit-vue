@@ -98,13 +98,34 @@ function getDocLines(node) {
   if (!jsDocs || jsDocs.length === 0) {
     return []
   }
-  const comment = jsDocs[0].comment
-  if (!comment) {
-    return []
+  const jsDoc = jsDocs[0]
+  const comment = jsDoc.comment
+  let text = ''
+  if (comment) {
+    text = Array.isArray(comment)
+      ? comment.map(part => part.text ?? '').join('')
+      : comment.text ?? String(comment)
   }
-  const text = Array.isArray(comment)
-    ? comment.map(part => part.text ?? '').join('')
-    : comment.text ?? String(comment)
+  else if (jsDoc.tags && jsDoc.tags.length > 0) {
+    // `/** @提及，默认 true */` 这类以 @ 开头的注释会被 TS 解析为 tag（comment 为空），
+    // 说明实际在 tag.comment：回退拼接非标准 tag 的说明，避免 API 表格说明列空
+    const STANDARD_TAGS = new Set(['param', 'returns', 'return', 'example', 'deprecated', 'throws', 'see', 'type', 'default', 'throws'])
+    text = jsDoc.tags
+      .map((tag) => {
+        const name = tag.tagName.getText()
+        if (STANDARD_TAGS.has(name)) {
+          return ''
+        }
+        const tagComment = tag.comment
+        const c = Array.isArray(tagComment)
+          ? tagComment.map(part => part.text ?? '').join('')
+          : tagComment ?? ''
+        // comment 为空（如 `/** @提及配置 */` 整串被当作 tag 名）时回退用 tag 名
+        return c || name
+      })
+      .filter(Boolean)
+      .join(' ')
+  }
   return text
     .split('\n')
     .map(line => line.trim())
