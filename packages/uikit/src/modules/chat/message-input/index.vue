@@ -56,6 +56,9 @@ const { t } = useLocale()
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
 
+/** 聚焦时边框颜色：不设置则使用默认主题色 */
+const focusBorderColorVar = computed(() => inputConfig.value?.focusBorderColor || 'var(--uikit-primary-color)')
+
 /** 发送 typing cmd（仅单聊且全局 enableTyping 开启，5s 节流由输入框子组件保证） */
 function handleTyping() {
   if (features.enableTyping === false)
@@ -843,7 +846,7 @@ defineExpose({
 }
 
 .message-input:focus-within {
-  border-color: var(--uikit-primary-color);
+  border-color: v-bind(focusBorderColorVar);
 }
 
 /* 移动端：去掉桌面卡片样式（margin/border/radius/shadow），改为全宽工具条容器 */
