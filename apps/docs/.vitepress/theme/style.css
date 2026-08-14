@@ -222,28 +222,10 @@
   border-radius: 10px;
 }
 
-/* 代码块顶栏（语言标签 + 复制按钮）品牌化 */
-.vp-doc div[class*='language-']::before {
-  content: attr(class);
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 4px 12px;
-  border-radius: 10px 0 0 0;
-  font-family: var(--vp-font-family-base);
-  font-size: 12px;
-  line-height: 20px;
-  color: var(--vp-c-text-2);
-  background-color: var(--vp-c-bg-soft);
-  border-right: 1px solid var(--vp-c-divider);
-  border-bottom: 1px solid var(--vp-c-divider);
-  opacity: 0.85;
-}
+/* 代码块：语言标签走 VitePress 默认 .lang 元素（右上角，只显示语言名 bash/ts），
+   不要用 ::before attr(class) —— class 含主题类名（language-bash vp-adaptive-theme）会整串显示 */
 
-.vp-doc div[class*='language-'] .lang {
-  display: none;
-}
-
+/* 复制按钮：hover 显现 + 品牌化 */
 .vp-doc .copy {
   top: 6px;
   right: 6px;
@@ -260,6 +242,18 @@
   border-color: var(--vp-c-brand-1);
   color: var(--vp-c-brand-1);
   background-color: var(--vp-c-brand-soft);
+}
+
+/* 语言标签微调：与复制按钮同侧但略左，hover 时保持可读 */
+.vp-doc [class*='language-'] > span.lang {
+  right: 34px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.vp-doc [class*='language-']:hover > span.lang,
+.vp-doc [class*='language-'] > button.copy:focus + span.lang {
+  opacity: 0;
 }
 
 /* ========== 提示容器 ========== */
