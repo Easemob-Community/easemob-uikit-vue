@@ -14,19 +14,19 @@
 
 > 聊天页面全局配置
 
-| 属性                      | 类型                                                    | 默认值 | 说明                                      |
+| 属性                      | 类型                                                                                 | 默认值 | 说明                                      |
 | --- | --- | --- | --- |
-| enableDraft             | `boolean`                                             | —   | 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true      |
-| hooks                   | `ChatSendHooks`                                       | —   | 消息发送拦截钩子                                |
-| header                  | [见 config.header](#config-header)                     | —   | Header 配置                               |
-| messageList             | [见 config.messageList](#config-messagelist)           | —   | 消息列表配置                                  |
-| messageAction           | [见 config.messageAction](#config-messageaction)       | —   | 消息操作配置                                  |
-| groupReadReceipt        | [见 config.groupReadReceipt](#config-groupreadreceipt) | —   | 群已读回执配置                                 |
-| groupMember             | [见 config.groupMember](#config-groupmember)           | —   | 群成员列表配置                                 |
-| groupManagement         | [见 config.groupManagement](#config-groupmanagement)   | —   | 群管理功能配置                                 |
-| input                   | [见 config.input](#config-input)                       | —   | 输入框配置                                   |
-| lastMessageTextResolver | `LastMessageTextResolver`                             | —   | 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 |
-| textMessage             | [见 config.textMessage](#config-textmessage)           | —   | 文本消息配置                                  |
+| enableDraft             | `boolean`                                                                          | —   | 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true      |
+| hooks                   | `ChatSendHooks`                                                                    | —   | 消息发送拦截钩子                                |
+| header                  | <a class="config-ref" href="#config-header"><strong>Header 配置</strong></a>         | —   | Header 配置                               |
+| messageList             | <a class="config-ref" href="#config-messagelist"><strong>消息列表配置</strong></a>       | —   | 消息列表配置                                  |
+| messageAction           | <a class="config-ref" href="#config-messageaction"><strong>消息操作配置</strong></a>     | —   | 消息操作配置                                  |
+| groupReadReceipt        | <a class="config-ref" href="#config-groupreadreceipt"><strong>群已读回执配置</strong></a> | —   | 群已读回执配置                                 |
+| groupMember             | <a class="config-ref" href="#config-groupmember"><strong>群成员列表配置</strong></a>      | —   | 群成员列表配置                                 |
+| groupManagement         | <a class="config-ref" href="#config-groupmanagement"><strong>群管理功能配置</strong></a>  | —   | 群管理功能配置                                 |
+| input                   | <a class="config-ref" href="#config-input"><strong>输入框配置</strong></a>              | —   | 输入框配置                                   |
+| lastMessageTextResolver | `LastMessageTextResolver`                                                          | —   | 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 |
+| textMessage             | <a class="config-ref" href="#config-textmessage"><strong>文本消息配置</strong></a>       | —   | 文本消息配置                                  |
 
 #### config.hooks {#config-hooks}
 
@@ -53,23 +53,23 @@
 
 > 消息列表配置
 
-| 属性                     | 类型                                                                  | 默认值 | 说明                                                  |
+| 属性                     | 类型                                                                                         | 默认值 | 说明                                                  |
 | --- | --- | --- | --- |
-| layout                 | `MessageLayout`                                                     | —   | 消息布局模式，默认 'conversation'                            |
-| showAvatar             | `boolean`                                                           | —   | 是否显示头像，默认 true                                      |
-| showTime               | `TimeDisplayStrategy`                                               | —   | 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' |
-| bubbleShape            | `BubbleShape`                                                       | —   | 气泡形状，默认 'round'                                     |
-| avatarSize             | `number`                                                            | —   | 头像尺寸（px），默认 36                                      |
-| messageGap             | `number`                                                            | —   | 消息项之间的间距（px），默认 12                                  |
-| messagePadding         | `number`                                                            | —   | 消息列表内边距（px），默认 16                                   |
-| groupInterval          | `number`                                                            | —   | 时间分组间隔（毫秒），默认 5 分钟                                  |
-| virtualScrollThreshold | `number`                                                            | —   | 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100                          |
-| loadHistory            | [见 config.messageList.loadHistory](#config-messagelist-loadhistory) | —   | 加载历史消息配置                                            |
-| maxMessageCount        | `number`                                                            | —   | 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300                      |
-| pinnedBar              | [见 config.messageList.pinnedBar](#config-messagelist-pinnedbar)     | —   | 置顶横幅配置                                              |
-| search                 | [见 config.messageList.search](#config-messagelist-search)           | —   | 消息搜索配置                                              |
-| autoLocateAtMe         | `boolean`                                                           | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                         |
-| messageStatus          | `MessageStatusConfig`                                               | —   | 消息发送状态展示配置                                          |
+| layout                 | `MessageLayout`                                                                            | —   | 消息布局模式，默认 'conversation'                            |
+| showAvatar             | `boolean`                                                                                  | —   | 是否显示头像，默认 true                                      |
+| showTime               | `TimeDisplayStrategy`                                                                      | —   | 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' |
+| bubbleShape            | `BubbleShape`                                                                              | —   | 气泡形状，默认 'round'                                     |
+| avatarSize             | `number`                                                                                   | —   | 头像尺寸（px），默认 36                                      |
+| messageGap             | `number`                                                                                   | —   | 消息项之间的间距（px），默认 12                                  |
+| messagePadding         | `number`                                                                                   | —   | 消息列表内边距（px），默认 16                                   |
+| groupInterval          | `number`                                                                                   | —   | 时间分组间隔（毫秒），默认 5 分钟                                  |
+| virtualScrollThreshold | `number`                                                                                   | —   | 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100                          |
+| loadHistory            | <a class="config-ref" href="#config-messagelist-loadhistory"><strong>加载历史消息配置</strong></a> | —   | 加载历史消息配置                                            |
+| maxMessageCount        | `number`                                                                                   | —   | 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300                      |
+| pinnedBar              | <a class="config-ref" href="#config-messagelist-pinnedbar"><strong>置顶横幅配置</strong></a>     | —   | 置顶横幅配置                                              |
+| search                 | <a class="config-ref" href="#config-messagelist-search"><strong>消息搜索配置</strong></a>        | —   | 消息搜索配置                                              |
+| autoLocateAtMe         | `boolean`                                                                                  | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                         |
+| messageStatus          | `MessageStatusConfig`                                                                      | —   | 消息发送状态展示配置                                          |
 
 #### config.messageList.loadHistory {#config-messagelist-loadhistory}
 
@@ -168,22 +168,22 @@
 
 > 输入框配置
 
-| 属性               | 类型                                                | 默认值 | 说明                                                                                                                          |
+| 属性               | 类型                                                                              | 默认值 | 说明                                                                                                                          |
 | --- | --- | --- | --- |
-| mode             | `InputMode`                                       | —   | 输入框模式，默认 'simple'                                                                                                           |
-| style            | `InputStyle`                                      | —   | 输入框风格，默认 'wechat'                                                                                                           |
-| features         | [见 config.input.features](#config-input-features) | —   | 功能开关                                                                                                                        |
-| autoFocus        | `boolean`                                         | —   | 是否自动聚焦输入框，默认 false                                                                                                          |
-| focusBorderColor | `string`                                          | —   | 聚焦时边框颜色，不设置则使用默认主题色                                                                                                         |
-| caretColor       | `string`                                          | —   | 光标颜色，不设置则使用默认                                                                                                               |
-| selectionColor   | `string`                                          | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                             |
-| maxLength        | `number`                                          | —   | 最大输入长度，0 或不设置表示无限制                                                                                                          |
-| mention          | [见 config.input.mention](#config-input-mention)   | —   | 提及配置（@）                                                                                                                     |
-| enableTyping     | `boolean`                                         | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                               |
-| showSendButton   | `boolean`                                         | —   | 是否显示发送按钮，默认 true                                                                                                            |
-| resizable        | `boolean`                                         | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true              |
-| expandable       | `boolean`                                         | —   | 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true |
-| stickerPacks     | `EmojiStickerPack[]`                              | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker                                 |
+| mode             | `InputMode`                                                                     | —   | 输入框模式，默认 'simple'                                                                                                           |
+| style            | `InputStyle`                                                                    | —   | 输入框风格，默认 'wechat'                                                                                                           |
+| features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>   | —   | 功能开关                                                                                                                        |
+| autoFocus        | `boolean`                                                                       | —   | 是否自动聚焦输入框，默认 false                                                                                                          |
+| focusBorderColor | `string`                                                                        | —   | 聚焦时边框颜色，不设置则使用默认主题色                                                                                                         |
+| caretColor       | `string`                                                                        | —   | 光标颜色，不设置则使用默认                                                                                                               |
+| selectionColor   | `string`                                                                        | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                             |
+| maxLength        | `number`                                                                        | —   | 最大输入长度，0 或不设置表示无限制                                                                                                          |
+| mention          | <a class="config-ref" href="#config-input-mention"><strong>提及配置（@）</strong></a> | —   | 提及配置（@）                                                                                                                     |
+| enableTyping     | `boolean`                                                                       | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                               |
+| showSendButton   | `boolean`                                                                       | —   | 是否显示发送按钮，默认 true                                                                                                            |
+| resizable        | `boolean`                                                                       | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true              |
+| expandable       | `boolean`                                                                       | —   | 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true |
+| stickerPacks     | `EmojiStickerPack[]`                                                            | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker                                 |
 
 #### config.input.features {#config-input-features}
 

@@ -493,8 +493,10 @@ function collectNestedSections(member, path, depth, ctx, out) {
       type = childResolved.dedupeKey
     }
     else if (willExpand) {
-      // 引用指向下方子小节的自定义锚点（见小节标题 {#anchorId}）
-      type = `[见 ${childPath}](#${anchorId(childPath)})`
+      // 加粗配置名（取字段说明首行作名字，如「消息列表配置」）+ 锚点跳转：
+      // 默认非链接样式，hover 才显现链接感（见 style.css .config-ref）
+      const label = (getDocText(child).split('\n')[0] || childName).trim()
+      type = `<a class="config-ref" href="#${anchorId(childPath)}"><strong>${label}</strong></a>`
     }
     else {
       type = child.type ? compactTypeText(child.type, resolved.sourceFile) : 'any'
@@ -602,10 +604,10 @@ function buildModuleMarkdown(entry, root = MODULES_ROOT) {
       lines.push('')
     }
     // 嵌套类型成员的默认值写在 JSDoc 第一行，默认值列以「—」占位；
-    // 「见 config.xxx」为锚点链接（markdown 链接），不包反引号保持可点击
+    // 配置名引用（<a class="config-ref">）为 HTML 链接，不包反引号保持可点击
     const rows = [['属性', '类型', '默认值', '说明']]
     for (const member of section.members) {
-      const typeCell = member.type.includes('](#')
+      const typeCell = member.type.includes('config-ref')
         ? member.type
         : `\`${member.type}\``
       rows.push([member.name, typeCell, '—', member.doc || '—'])

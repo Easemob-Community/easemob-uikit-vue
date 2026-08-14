@@ -236,6 +236,20 @@
   white-space: nowrap;
 }
 
+/* 嵌套配置名引用：默认加粗非链接样式，hover 才显现链接感（点击锚定到对应小节） */
+.vp-doc a.config-ref {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.vp-doc a.config-ref:hover {
+  color: var(--vp-c-brand-1);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .vp-doc code {
   font-size: 13px;
 }
