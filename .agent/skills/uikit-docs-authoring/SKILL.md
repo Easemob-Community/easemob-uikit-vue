@@ -203,8 +203,10 @@
   `MODULES` 条目可用 `nestedOnly` 限定只展开某个子树（如 message-list 只展开
   `config.messageList`，其余 ChatConfig 配置对该组件无效）；
 - **嵌套字段父表类型列呈现**：具名 interface（如 `MessageStatusConfig`）显示类型名；
-  会展开为子小节的**内联匿名对象**显示「见 config.xxx」引用（细节在下方子小节，
-  避免父表单元格内联整段匿名对象）；未展开的叶子内联对象保留紧凑文本兜底；
+  会展开为子小节的**内联匿名对象**显示可点击引用 `[见 config.xxx](#config-xxx)`（细节在
+  下方子小节，避免父表单元格内联整段匿名对象）；未展开的叶子内联对象保留紧凑文本兜底；
+  子小节标题统一带自定义锚点 `{#anchorId}`（path 点号转连字符，如
+  `#### config.messageList {#config-messagelist}`），父表引用即锚定到该小节；
 - **组件侧联动**：给 props/emits 成员写 JSDoc，就是写文档——改 API 后
   记得重跑 gen:api，否则表格与类型脱节；
 - 解析失败（语法错误/无 script setup）会 warn 跳过并计入成功率，不会中断整体。

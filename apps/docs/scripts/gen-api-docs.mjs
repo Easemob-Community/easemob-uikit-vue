@@ -66,9 +66,9 @@ const MODULES = [
   // 该组件尚未实现（无对应 .vue 文件），待 props 接口补齐后按同样方式追加；
   // 不要错接 contact-list.vue（联系人列表，与页面内容不符）
   { name: 'group-container', file: 'group/group-list.vue' },
-  // EmMessageList 的 config 为完整 ChatConfig，但组件只消费 messageList 子树，
-  // 仅展开 config.messageList，避免误导读者以为其余配置对消息列表生效
-  { name: 'message-list', file: 'chat/message-list/message-list.vue', nestedOnly: ['config.messageList'] },
+  // message-list：config 为完整 ChatConfig，本组件只消费 messageList 子树；
+  // 但为保持与 chat-container 一致的配置全景展示，仍全量展开（父表每项均可锚点跳转）
+  { name: 'message-list', file: 'chat/message-list/message-list.vue' },
 ]
 
 /**
@@ -90,6 +90,11 @@ function kebabToPascal(name) {
     .split('-')
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
+}
+
+/** 嵌套小节锚点 id：路径点号转连字符（如 config.messageList → config-message-list） */
+function anchorId(path) {
+  return path.toLowerCase().replace(/\./g, '-')
 }
 
 /** 提取 JSDoc 全部非空行（不转义） */
@@ -488,7 +493,8 @@ function collectNestedSections(member, path, depth, ctx, out) {
       type = childResolved.dedupeKey
     }
     else if (willExpand) {
-      type = `见 ${childPath}`
+      // 引用指向下方子小节的自定义锚点（见小节标题 {#anchorId}）
+      type = `[见 ${childPath}](#${anchorId(childPath)})`
     }
     else {
       type = child.type ? compactTypeText(child.type, resolved.sourceFile) : 'any'
@@ -588,16 +594,21 @@ function buildModuleMarkdown(entry, root = MODULES_ROOT) {
   }
 
   for (const section of nestedSections) {
-    lines.push(`#### ${section.path}`)
+    // 子小节标题带自定义锚点（path 的点号转连字符），供父表「见 config.xxx」链接精确跳转
+    lines.push(`#### ${section.path} {#${anchorId(section.path)}}`)
     lines.push('')
     if (section.doc) {
       lines.push(`> ${section.doc}`)
       lines.push('')
     }
-    // 嵌套类型成员的默认值写在 JSDoc 第一行，默认值列以「—」占位
+    // 嵌套类型成员的默认值写在 JSDoc 第一行，默认值列以「—」占位；
+    // 「见 config.xxx」为锚点链接（markdown 链接），不包反引号保持可点击
     const rows = [['属性', '类型', '默认值', '说明']]
     for (const member of section.members) {
-      rows.push([member.name, `\`${member.type}\``, '—', member.doc || '—'])
+      const typeCell = member.type.includes('](#')
+        ? member.type
+        : `\`${member.type}\``
+      rows.push([member.name, typeCell, '—', member.doc || '—'])
     }
     lines.push(alignTable(rows))
     lines.push('')
