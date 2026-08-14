@@ -26,7 +26,7 @@ export default defineConfig({
       { text: '主题定制', link: '/guide/theme', activeMatch: '^/guide/theme' },
       { text: 'H5 适配', link: '/guide/h5-adaptation', activeMatch: '^/guide/h5-adaptation' },
       { text: '更新日志', link: '/guide/changelog', activeMatch: '^/guide/changelog' },
-      { text: 'GitHub', link: 'https://github.com/easemob/easemob-uikit-vue' },
+      { text: 'GitHub', link: 'https://github.com/Easemob-Community/easemob-uikit-vue' },
     ],
 
     sidebar: {
@@ -158,7 +158,7 @@ export default defineConfig({
 
     // 编辑本页：GitHub 仓库对应路径（apps/docs 为文档源目录）
     editLink: {
-      pattern: 'https://github.com/easemob/easemob-uikit-vue/edit/main/apps/docs/:path',
+      pattern: 'https://github.com/Easemob-Community/easemob-uikit-vue/edit/main/apps/docs/:path',
       text: '在 GitHub 上编辑此页',
     },
   },

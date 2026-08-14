@@ -318,7 +318,7 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 
 ## 迁移指南
 
-从历史版本迁移请查阅仓库 [CHANGELOG](https://github.com/easemob/easemob-uikit-vue/blob/main/packages/uikit/CHANGELOG.md)，关注以下破坏性变更点：
+从历史版本迁移请查阅仓库 [CHANGELOG](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHANGELOG.md)，关注以下破坏性变更点：
 
 - `UIKitProvider` 取代旧的初始化写法，`appKey` 为必填
 - 组件统一 `Em` 前缀，旧版非前缀组件名不再注册
