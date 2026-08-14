@@ -1363,7 +1363,7 @@ const v5 = ["disabled"], C5 = {
   for (const [o, s] of e)
     t[o] = s;
   return t;
-}, In = /* @__PURE__ */ Ee(y5, [["__scopeId", "data-v-26b57dae"]]), b5 = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+}, In = /* @__PURE__ */ Ee(y5, [["__scopeId", "data-v-0b69e1cd"]]), b5 = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M20 12C20 7.58172 16.4183 4 12 4C10.1513 4 8.45037 4.62863 7.0957 5.68164L18.3174 16.9033C19.3703 15.5487 20 13.8486 20 12ZM4 12C4 16.4183 7.58172 20 12 20C13.8486 20 15.5487 19.3703 16.9033 18.3174L5.68164 7.0957C4.62863 8.45037 4 10.1513 4 12ZM22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="currentColor" />
 </svg>`, _5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
@@ -2611,7 +2611,7 @@ const J6 = ["width", "height", "viewBox"], X6 = ["innerHTML"], Y6 = /* @__PURE__
       }, null, 8, X6)) : P("", !0)
     ], 16, J6)) : P("", !0);
   }
-}), _e = /* @__PURE__ */ Ee(Y6, [["__scopeId", "data-v-7f3b67cd"]]), Q6 = ["disabled", "title"], e8 = /* @__PURE__ */ ke({
+}), _e = /* @__PURE__ */ Ee(Y6, [["__scopeId", "data-v-8adebac1"]]), Q6 = ["disabled", "title"], e8 = /* @__PURE__ */ ke({
   __name: "icon-button",
   props: {
     icon: {},
@@ -2644,7 +2644,7 @@ const J6 = ["width", "height", "viewBox"], X6 = ["innerHTML"], Y6 = /* @__PURE__
       }, null, 8, ["name", "size"])
     ], 10, Q6));
   }
-}), gt = /* @__PURE__ */ Ee(e8, [["__scopeId", "data-v-275d0336"]]), t8 = ["src"], n8 = /* @__PURE__ */ ke({
+}), gt = /* @__PURE__ */ Ee(e8, [["__scopeId", "data-v-fefc9d58"]]), t8 = ["src"], n8 = /* @__PURE__ */ ke({
   __name: "avatar",
   props: {
     src: {},
@@ -2725,7 +2725,7 @@ const J6 = ["width", "height", "viewBox"], X6 = ["innerHTML"], Y6 = /* @__PURE__
       ], 6)) : P("", !0)
     ], 6));
   }
-}), zt = /* @__PURE__ */ Ee(n8, [["__scopeId", "data-v-c560031f"]]), o8 = { class: "uikit-badge" }, s8 = /* @__PURE__ */ ke({
+}), zt = /* @__PURE__ */ Ee(n8, [["__scopeId", "data-v-ee9992f3"]]), o8 = { class: "uikit-badge" }, s8 = /* @__PURE__ */ ke({
   __name: "badge",
   props: {
     count: {},
@@ -2754,7 +2754,7 @@ const J6 = ["width", "height", "viewBox"], X6 = ["innerHTML"], Y6 = /* @__PURE__
       }, N(t.value), 7)) : P("", !0)
     ]));
   }
-}), r2 = /* @__PURE__ */ Ee(s8, [["__scopeId", "data-v-d7bcf176"]]), r8 = ["value", "type", "placeholder", "disabled", "maxlength"], i8 = /* @__PURE__ */ ke({
+}), r2 = /* @__PURE__ */ Ee(s8, [["__scopeId", "data-v-9ea7e87d"]]), r8 = ["value", "type", "placeholder", "disabled", "maxlength"], i8 = /* @__PURE__ */ ke({
   __name: "input",
   props: {
     modelValue: { default: "" },
@@ -2829,7 +2829,7 @@ const J6 = ["width", "height", "viewBox"], X6 = ["innerHTML"], Y6 = /* @__PURE__
       ])) : P("", !0)
     ], 2));
   }
-}), bn = /* @__PURE__ */ Ee(i8, [["__scopeId", "data-v-6ae3c90a"]]), a8 = {
+}), bn = /* @__PURE__ */ Ee(i8, [["__scopeId", "data-v-d4371a07"]]), a8 = {
   "button.confirm": "确认",
   "button.cancel": "取消",
   "button.close": "关闭",
@@ -4176,7 +4176,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       })
     ]));
   }
-}), Vt = /* @__PURE__ */ Ee(h8, [["__scopeId", "data-v-4479fbf9"]]), m8 = { class: "uikit-modal" }, g8 = {
+}), Vt = /* @__PURE__ */ Ee(h8, [["__scopeId", "data-v-509929b5"]]), m8 = { class: "uikit-modal" }, g8 = {
   key: 0,
   class: "uikit-modal__title"
 }, v8 = { class: "uikit-modal__body" }, C8 = { class: "uikit-modal__footer" }, y8 = /* @__PURE__ */ ke({
@@ -4237,7 +4237,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       _: 3
     }, 8, ["show", "close-on-click-overlay"]));
   }
-}), ks = /* @__PURE__ */ Ee(y8, [["__scopeId", "data-v-ac3e526e"]]), b8 = {
+}), ks = /* @__PURE__ */ Ee(y8, [["__scopeId", "data-v-dae55060"]]), b8 = {
   key: 0,
   class: "uikit-toast"
 }, _8 = { class: "uikit-toast__message" }, w8 = /* @__PURE__ */ ke({
@@ -4285,7 +4285,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       })
     ]));
   }
-}), l2 = /* @__PURE__ */ Ee(w8, [["__scopeId", "data-v-15291c0f"]]), k8 = { class: "uikit-action-sheet" }, M8 = {
+}), l2 = /* @__PURE__ */ Ee(w8, [["__scopeId", "data-v-c93b656a"]]), k8 = { class: "uikit-action-sheet" }, M8 = {
   key: 0,
   class: "uikit-action-sheet__title"
 }, S8 = { class: "uikit-action-sheet__actions" }, x8 = ["onClick"], I8 = { class: "uikit-action-sheet__extra" }, T8 = /* @__PURE__ */ ke({
@@ -4350,7 +4350,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       _: 3
     }, 8, ["show"]));
   }
-}), Qr = /* @__PURE__ */ Ee(T8, [["__scopeId", "data-v-6201b07a"]]), L8 = /* @__PURE__ */ ke({
+}), Qr = /* @__PURE__ */ Ee(T8, [["__scopeId", "data-v-3f6e93e9"]]), L8 = /* @__PURE__ */ ke({
   __name: "scroll-to-top",
   props: {
     target: { default: null },
@@ -4427,7 +4427,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       _: 1
     }));
   }
-}), Xa = /* @__PURE__ */ Ee(L8, [["__scopeId", "data-v-9b3de165"]]), E8 = {
+}), Xa = /* @__PURE__ */ Ee(L8, [["__scopeId", "data-v-57ad9c48"]]), E8 = {
   key: 0,
   class: "emoji-picker"
 }, A8 = { class: "emoji-picker__header" }, O8 = { class: "emoji-picker__tabs" }, R8 = ["onClick"], $8 = ["src", "alt"], N8 = { class: "emoji-picker__body" }, D8 = ["title", "onClick"], P8 = ["src", "alt"], B8 = ["onClick"], H8 = /* @__PURE__ */ ke({
@@ -4512,7 +4512,7 @@ const p8 = ["aria-modal"], wl = "uikit:popup-group-open", h8 = /* @__PURE__ */ k
       ])
     ])) : P("", !0);
   }
-}), fu = /* @__PURE__ */ Ee(H8, [["__scopeId", "data-v-cd30ea61"]]);
+}), fu = /* @__PURE__ */ Ee(H8, [["__scopeId", "data-v-aa8418f9"]]);
 function Ge(n) {
   return Wf(n) ? n.toJSON() : n;
 }
@@ -8813,7 +8813,7 @@ const dy = {
       ])) : P("", !0)
     ], 34));
   }
-}), Ft = /* @__PURE__ */ Ee(Cy, [["__scopeId", "data-v-c6aa1f4f"]]), yy = {
+}), Ft = /* @__PURE__ */ Ee(Cy, [["__scopeId", "data-v-ba5fbab3"]]), yy = {
   key: 0,
   class: "presence-selector__header"
 }, by = { class: "presence-selector__title" }, _y = ["onClick"], wy = { class: "presence-selector__label" }, ky = {
@@ -8957,7 +8957,7 @@ const dy = {
       ])) : P("", !0)
     ], 2));
   }
-}), yu = /* @__PURE__ */ Ee(My, [["__scopeId", "data-v-fcdff13c"]]), bu = /* @__PURE__ */ ke({
+}), yu = /* @__PURE__ */ Ee(My, [["__scopeId", "data-v-4b374e3b"]]), bu = /* @__PURE__ */ ke({
   __name: "presence-selector-popup",
   props: {
     show: { type: Boolean },
@@ -9210,7 +9210,7 @@ const dy = {
       ]);
     };
   }
-}), _u = /* @__PURE__ */ Ee(Uy, [["__scopeId", "data-v-d49bf628"]]);
+}), _u = /* @__PURE__ */ Ee(Uy, [["__scopeId", "data-v-51dd1eb9"]]);
 function nn(n, e = ["nickname", "avatarUrl"]) {
   const { stores: t, domains: o, features: s } = ht(), r = s.enableUserInfo !== !1, i = s.enableUserInfoSubscription !== !1, a = y(() => xt(n)), l = y(() => {
     const p = a.value;
@@ -9494,7 +9494,7 @@ const Gy = { class: "user-card-modal" }, jy = {
       ])
     ]));
   }
-}), wu = /* @__PURE__ */ Ee(sb, [["__scopeId", "data-v-bca6bc33"]]);
+}), wu = /* @__PURE__ */ Ee(sb, [["__scopeId", "data-v-fcc6f797"]]);
 function dn() {
   const { domains: n, stores: e, dataSource: t } = ht(), { t: o } = Ze(), s = e.group, r = y(() => s.groupList), i = y(() => s.currentGroup), a = y(() => s.loaded), l = y(() => s.joinedGroupCount), c = y(() => s.filterText), u = y(() => s.activeId), d = y(() => s.selectedIds), p = y(() => s.hasMore), f = T(!1);
   function h(V) {
@@ -9987,7 +9987,7 @@ const rb = { class: "group-card-modal" }, ib = {
       ], 8, bb)
     ]));
   }
-}), P2 = /* @__PURE__ */ Ee(_b, [["__scopeId", "data-v-1bea928e"]]), wb = /* @__PURE__ */ ke({
+}), P2 = /* @__PURE__ */ Ee(_b, [["__scopeId", "data-v-26044af2"]]), wb = /* @__PURE__ */ ke({
   __name: "notification-container",
   props: {
     items: {},
@@ -10106,7 +10106,7 @@ const rb = { class: "group-card-modal" }, ib = {
       _: 3
     }));
   }
-}), H2 = /* @__PURE__ */ Ee(Lb, [["__scopeId", "data-v-d79c2011"]]);
+}), H2 = /* @__PURE__ */ Ee(Lb, [["__scopeId", "data-v-4ecc7bee"]]);
 function ni() {
   const n = navigator.userAgent, e = /MicroMessenger/i.test(n), t = /iPad|iPhone|iPod/.test(n) && !window.MSStream, o = /Android/i.test(n), s = t || o || /Mobile|Tablet/i.test(n);
   return { isWechat: e, isIOS: t, isAndroid: o, isPC: !s, isMobile: s };
@@ -10457,7 +10457,7 @@ const Ob = ["src"], Rb = {
       ])) : P("", !0)
     ], 36)) : P("", !0);
   }
-}), z2 = /* @__PURE__ */ Ee(Fb, [["__scopeId", "data-v-1c3195bd"]]);
+}), z2 = /* @__PURE__ */ Ee(Fb, [["__scopeId", "data-v-57f46afc"]]);
 function ku(n, e) {
   const {
     axis: t,
@@ -10532,7 +10532,7 @@ const Ub = /* @__PURE__ */ ke({
   emits: ["update:model-value", "resize-start", "resize-end"],
   setup(n, { emit: e }) {
     Yr((c) => ({
-      v7860acd6: r.value
+      v1c9a15ca: r.value
     }));
     const t = n, o = e, s = T(), r = y(() => `${t.handleSize}px`), { size: i, isResizing: a } = ku(s, {
       axis: t.axis,
@@ -10572,7 +10572,7 @@ const Ub = /* @__PURE__ */ ke({
       }, null, 2))
     ], 6));
   }
-}), Gb = /* @__PURE__ */ Ee(Ub, [["__scopeId", "data-v-80e78b10"]]), jb = [
+}), Gb = /* @__PURE__ */ Ee(Ub, [["__scopeId", "data-v-cfd07632"]]), jb = [
   "em-button",
   "em-icon-button",
   "em-avatar",
@@ -12833,7 +12833,7 @@ const g_ = { class: "contact-alphabet-nav" }, v_ = ["onClick"], C_ = /* @__PURE_
       }, null, 8, ["show"])
     ]));
   }
-}), J2 = /* @__PURE__ */ Ee(Jw, [["__scopeId", "data-v-d584e34b"]]), ad = yt("UIKit:UseMessageSend");
+}), J2 = /* @__PURE__ */ Ee(Jw, [["__scopeId", "data-v-e9f30ce1"]]), ad = yt("UIKit:UseMessageSend");
 function fr(n, e, t, o, s) {
   var a, l, c;
   if (!t || n !== Be.GROUPCHAT)
@@ -15732,7 +15732,7 @@ const hk = { class: "text-message__content" }, mk = ["href", "onClick"], gk = ["
       }, 8, ["show", "title", "confirm-text", "cancel-text"])
     ]));
   }
-}), dp = /* @__PURE__ */ Ee(yS, [["__scopeId", "data-v-9d0dd455"]]), bS = { class: "mention-picker mention-picker--pc" }, _S = { class: "mention-picker__search" }, wS = ["placeholder"], kS = { class: "mention-picker mention-picker--h5" }, MS = { class: "mention-picker__header" }, SS = { class: "mention-picker__header-title" }, xS = { class: "mention-picker__search" }, IS = ["placeholder"], TS = /* @__PURE__ */ ke({
+}), dp = /* @__PURE__ */ Ee(yS, [["__scopeId", "data-v-e2471751"]]), bS = { class: "mention-picker mention-picker--pc" }, _S = { class: "mention-picker__search" }, wS = ["placeholder"], kS = { class: "mention-picker mention-picker--h5" }, MS = { class: "mention-picker__header" }, SS = { class: "mention-picker__header-title" }, xS = { class: "mention-picker__search" }, IS = ["placeholder"], TS = /* @__PURE__ */ ke({
   __name: "mention-picker",
   props: {
     show: { type: Boolean },
@@ -40777,7 +40777,7 @@ const rB = { class: "message-search-panel" }, iB = { class: "message-search-pane
       ], 6);
     };
   }
-}), I0 = /* @__PURE__ */ Ee(EB, [["__scopeId", "data-v-0dd1841e"]]), AB = { class: "contact-nav" }, OB = ["onClick"], RB = { class: "contact-nav__item-label" }, $B = { class: "contact-nav__item-extra" }, NB = /* @__PURE__ */ ke({
+}), I0 = /* @__PURE__ */ Ee(EB, [["__scopeId", "data-v-c3469dce"]]), AB = { class: "contact-nav" }, OB = ["onClick"], RB = { class: "contact-nav__item-label" }, $B = { class: "contact-nav__item-extra" }, NB = /* @__PURE__ */ ke({
   __name: "contact-nav",
   props: {
     entries: {},
@@ -41762,7 +41762,7 @@ const L0 = /* @__PURE__ */ ke({
       }, null, 8, ["target"])) : P("", !0)
     ]));
   }
-}), O0 = /* @__PURE__ */ Ee(ZH, [["__scopeId", "data-v-3c587456"]]), qH = { class: "group-detail" }, WH = { class: "group-detail__wrapper" }, KH = {
+}), O0 = /* @__PURE__ */ Ee(ZH, [["__scopeId", "data-v-a84d11ff"]]), qH = { class: "group-detail" }, WH = { class: "group-detail__wrapper" }, KH = {
   key: 0,
   class: "group-detail__loading"
 }, JH = {
@@ -42140,7 +42140,7 @@ const L0 = /* @__PURE__ */ ke({
       }, null, 8, ["items", "onClose"])) : P("", !0)
     ]));
   }
-}), nz = /* @__PURE__ */ Ee(tz, [["__scopeId", "data-v-15dba7db"]]), oz = /* @__PURE__ */ ke({
+}), nz = /* @__PURE__ */ Ee(tz, [["__scopeId", "data-v-08622713"]]), oz = /* @__PURE__ */ ke({
   __name: "chat-container",
   props: {
     config: {},
