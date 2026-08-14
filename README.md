@@ -1,5 +1,14 @@
 # easemob-uikit-vue
 
+![status](https://img.shields.io/badge/status-预览版%20Preview-orange) ![version](https://img.shields.io/badge/version-v1.8.0-blue)
+
+> [!WARNING]
+> **当前为预览版本（Preview），尚未正式发布。**
+>
+> - 欢迎先行体验：查看源码、本地运行文档站与 demo，了解实现思路与组件能力；
+> - 有任何建议、疑问或发现的问题，欢迎提交 **Issue / PR**，我们会认真评估每一条反馈；
+> - 正式版（Stable）将于后续发布，正式发布前 **API 与行为可能调整**，暂不建议直接用于生产环境。
+
 环信 Vue3 UIKit 组件库，基于 `easemob-websdk`（SDK5）构建，提供可复用的 IM UI 组件与业务模块。
 
 ## 特性
