@@ -1,22 +1,17 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
-import type { ClientConfig, ManagerHost, UIKitClient } from '@easemob/uikit-core'
+import type { ClientConfig, ConnectionEventCallbacks, H5AdaptationConfig, ManagerHost, NoticeConfig, UIKitClient, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
+import { useCoreUIKitProvider } from '@easemob/uikit-core'
 import type {
-  H5AdaptationConfig,
-  NoticeConfig,
-  UIKitDataSource,
-  UIKitFeatures,
-} from '@easemob/uikit-core'
-import { useCoreUIKitProvider, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
+  PresenceDomain,
+  UserInfoDomain,
+} from '../sdk/domain'
 import {
   ContactDomain,
   ConversationDomain,
   GroupDomain,
   MessageDomain,
-  PresenceDomain,
-  UserInfoDomain,
 } from '../sdk/domain'
 import { registerEventHandlers } from '../sdk/event/registry'
-import type { ConnectionEventCallbacks } from '@easemob/uikit-core'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
@@ -26,6 +21,9 @@ import { resolveUserDisplayName } from '../utils/resolve-last-message-text'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
 import { useInvitePersistenceInternal } from './use-invite-persistence'
+
+// 构建期注入：@easemob/uikit-im 包版本（vite define，见 vite.config.ts）
+declare const __EASEMOB_UIKIT_VERSION__: string
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob/uikit-core'
 export type { H5AdaptationConfig } from '@easemob/uikit-core'
@@ -112,9 +110,12 @@ export function useUIKitProvider(
   // core provider：承接 client 生命周期、core stores/domains、features/dataSource/noticeConfig/h5/theme。
   // autoInit 一律置 false，立即初始化改在下方显式触发——
   // 确保 onClientSetup 闭包在首次执行时已能拿到 coreCtx（features 代理）。
+  // clientName/clientVersion：场景包版本注入，客户端版本日志输出 SDK + UIKit-IM + Core 三版本。
   const coreCtx = useCoreUIKitProvider(config, {
     ...options,
     autoInit: false,
+    clientName: 'UIKit-IM',
+    clientVersion: __EASEMOB_UIKIT_VERSION__,
     onClientSetup: (client, coreStores) =>
       registerEventHandlers(client, { ...sceneStores, ...coreStores }, options.connectionCallbacks, coreCtx.features),
   })

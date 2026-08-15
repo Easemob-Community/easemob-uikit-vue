@@ -86,6 +86,13 @@ export interface CoreUIKitProviderOptions {
   /** 连接级事件回调（token 即将过期 / 已过期等）；core 不消费，保留给场景层挂钩使用 */
   connectionCallbacks?: ConnectionEventCallbacks
   /**
+   * 场景包名称（如 'UIKit-IM'），随 createClient 注入客户端版本日志展示；默认 'UIKit'。
+   * 延迟初始化路径（ctx.init(config)）同样生效。
+   */
+  clientName?: string
+  /** 场景包版本号（如 '2.0.0'），随 createClient 注入客户端版本日志展示；未提供时日志只输出 SDK + Core 版本 */
+  clientVersion?: string
+  /**
    * 场景层挂钩：core 在 createClient + stores.client.setAppKey + domains.userInfo.listen()
    * 之后调用，用于注册场景级 SDK 事件等；返回的 dispose 函数在重新初始化 / logout /
    * scope dispose 时调用。
@@ -220,7 +227,12 @@ export function useCoreUIKitProvider(
   function setupClient(cfg: ClientConfig): UIKitClient {
     disposeClientSetup?.()
     disposeUserInfoDomain?.()
-    uikitClient = createClient(cfg)
+    uikitClient = createClient({
+      ...cfg,
+      // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
+      clientName: options.clientName ?? cfg.clientName,
+      clientVersion: options.clientVersion ?? cfg.clientVersion,
+    })
     currentAppKey = cfg.appKey
     stores.client.setAppKey(cfg.appKey)
     domains.userInfo.listen()

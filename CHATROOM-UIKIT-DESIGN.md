@@ -61,6 +61,11 @@ packages/
 - **单群聊包独有**：conversation/contact/group/message store 与 modules、会话/通讯录/群组/聊天容器、tiptap 编辑器、已读回执/置顶/合并转发/消息搜索等交互、`registerEventHandlers`（对外签名不变）
 - **聊天室包独有**：chatroom store（房间状态 + 广播消息流）、成员管理、禁言/黑名单/白名单、公告、房间属性、礼物、麦位等
 
+> **边界判定的执行层**：本节与 §4.1 是静态边界清单；后续「新功能进 core 还是场景包」的
+> 实时判定流程（决策树 / locale 与 constants 特例 / 进 core 自检清单 / 硬规则）以 skill
+> `uikit-package-boundary` 为准，core 隔离由 `packages/uikit-core/scripts/check-core-isolation.mjs`
+> 门禁（core build 前置）强制（TECH-DEBT D99）。
+
 ## 五、聊天室包内部设计
 
 ### 5.1 目录结构（镜像现有分层，降低心智成本）

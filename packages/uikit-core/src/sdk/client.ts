@@ -49,6 +49,16 @@ export interface ManagerHost {
 export interface ClientConfig extends InitConfig {
   /** 是否开启 SDK 调试日志 */
   debug?: boolean
+  /**
+   * 场景包名称（如 'UIKit-IM' / 'UIKit-Chatroom'），仅用于客户端版本日志展示，默认 'UIKit'。
+   * 由场景包 Provider 注入，业务方无需关心。
+   */
+  clientName?: string
+  /**
+   * 场景包版本号（如 '2.0.0'），仅用于客户端版本日志展示；未提供时日志只输出 SDK + Core 版本。
+   * 由场景包 Provider 注入（对应各自构建期版本宏），业务方无需关心。
+   */
+  clientVersion?: string
 }
 
 /** 是否有 client 实例以 debug 模式初始化（供 SDK 日志捕获模块判断级别恢复策略） */
@@ -88,7 +98,8 @@ export class UIKitClient {
   private _deleteConversationOnGroupDestroyed: boolean
 
   constructor(config: ClientConfig) {
-    const { debug, ...sdkConfig } = config
+    // clientName / clientVersion 是场景包注入的日志展示字段，不传给 SDK InitConfig
+    const { debug, clientName = 'UIKit', clientVersion, ...sdkConfig } = config
     // 与 SDK 默认值保持一致：群组解散时自动删除本地群会话
     this._deleteConversationOnGroupDestroyed = sdkConfig.deleteConversationOnGroupDestroyed ?? true
     this._client = SdkChatClient.init({
@@ -110,12 +121,26 @@ export class UIKitClient {
       })
     }
 
-    log(
-      '%c[Easemob] SDK version: %s, UIKit version: %s',
-      'color: green; font-weight: bold;',
-      __EASEMOB_SDK_VERSION__,
-      __EASEMOB_UIKIT_CORE_VERSION__,
-    )
+    // 版本日志：场景包注入 clientName/clientVersion 时输出三版本（SDK + 场景包 + Core），
+    // 否则输出 SDK + Core（core 独立使用场景）
+    if (clientVersion) {
+      log(
+        '%c[Easemob] SDK version: %s, %s version: %s, Core version: %s',
+        'color: green; font-weight: bold;',
+        __EASEMOB_SDK_VERSION__,
+        clientName,
+        clientVersion,
+        __EASEMOB_UIKIT_CORE_VERSION__,
+      )
+    }
+    else {
+      log(
+        '%c[Easemob] SDK version: %s, Core version: %s',
+        'color: green; font-weight: bold;',
+        __EASEMOB_SDK_VERSION__,
+        __EASEMOB_UIKIT_CORE_VERSION__,
+      )
+    }
   }
 
   /** SDK ChatManager */

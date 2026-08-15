@@ -857,8 +857,19 @@
 - **结论**：三包架构 `@easemob/uikit-core`（共享内核）+ `@easemob/uikit-im`（1v1/群聊场景，对外 API 零变化）+ `@easemob/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
 - **关键增量/修正（评审已核实）**：① 事件注册按场景分离（core 只留连接级 + notice，chatroom 自建 `registerChatroomEventHandlers`）；② `ManagerHost` 需新增 `chatRoomManager`（当前 `SdkChatClient.init` 未注册 ChatRoomManager）；③ 所有包 external `vue/pinia/easemob-websdk`，场景包再 external core（单 websdk 实例规则）；④ chatroom 合并 i18n keys 用既有 `mergeLocaleMessages`（P1 核实 core locale 已有合并 API，无需新增 extendLocale）；⑤ `useChatroomAttributes` 四层同步（本地缓存 + set + 变更事件 + 拉取兜底），属性 key 加场景前缀；⑥ `scripts/check-version-sync.mjs` 升级为双版本校验。
 - **执行计划**（P0 决策 → P0.5 改名 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)。
-- **进度（2026-08-15）**：P0 设计评审完成；P0.5 改名 `@easemob/uikit` → `@easemob/uikit-im` 完成；**P1 抽核完成**（core 含 sdk 基座 + ChatRoomManager 注册、core stores、共享 composables、24 原子组件、core 版 EmUIKitProvider、resolver/auto-imports 参数化，10 门禁全绿，逐层判定与实施注记见 [CORE-MIGRATION-CHECKLIST.md](CORE-MIGRATION-CHECKLIST.md)）；**P1 评审修复（2026-08-15 独立复核后）**：⑥ 双版本校验已落地（`check-version-sync.mjs` 校验 im+core，根 CHANGELOG 增 `## @easemob/uikit-core 0.1.0` 段）；im vite `output.globals` 补 `@easemob/uikit-core → EasemobUIKitCore`（UMD 断链修复）；im 依赖 core 改 `workspace:^`；log-store 下载文件名前缀参数化（`setLogFilePrefix`，im 保持 `easemob-uikit-im` 语义）；core/im 新增文件 lint 清零；demo 的 core theme alias 统一指 src；下一步 P2 聊天室包骨架。
+- **进度（2026-08-15）**：P0 设计评审完成；P0.5 改名 `@easemob/uikit` → `@easemob/uikit-im` 完成；**P1 抽核完成**（core 含 sdk 基座 + ChatRoomManager 注册、core stores、共享 composables、24 原子组件、core 版 EmUIKitProvider、resolver/auto-imports 参数化，10 门禁全绿，逐层判定与实施注记见 [CORE-MIGRATION-CHECKLIST.md](CORE-MIGRATION-CHECKLIST.md)）；**P1 评审修复（2026-08-15 独立复核后）**：⑥ 双版本校验已落地（`check-version-sync.mjs` 校验 im+core，根 CHANGELOG 增 `## @easemob/uikit-core 1.0.0` 段）；im vite `output.globals` 补 `@easemob/uikit-core → EasemobUIKitCore`（UMD 断链修复）；im 依赖 core 改 `workspace:^`；log-store 下载文件名前缀参数化（`setLogFilePrefix`，im 保持 `easemob-uikit-im` 语义）；core/im 新增文件 lint 清零；demo 的 core theme alias 统一指 src；下一步 P2 聊天室包骨架。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring` / `uikit-provider-config` / `uikit-h5-adaptation` / `uikit-release-build`
+
+### [x] D99. 三包归属治理：新功能「放 core 还是场景包」无路由约束与硬门禁
+
+- **背景**：P1 抽核后形成 `@easemob/uikit-core` + 场景包（`uikit-im` / 未来 `uikit-chatroom`）三包架构，但「新功能进 core 还是场景包」的约束仅散落在设计文档（静态）与一次性迁移清单（使命已完成），20 个既有 skill 全是「怎么写」没有「放哪」；「core 禁 import 场景包」零门禁。
+- **落地（2026-08-15）**：
+  1. 新增 skill `.agent/skills/uikit-package-boundary/SKILL.md`：四步判定决策树（功能类型 → 依赖面 → 复用性 → 解耦判断）、默认留场景包倾向、locale（场景文案经 `mergeLocaleMessages` 合入，不写 core locale 文件）与 constants 特例、进 core 自检清单、硬规则/软约定、反面清单；
+  2. AGENTS.md 路由表登记（首位，触发词：`新功能放哪` / `进 core` / `core 还是 im` / `包边界` 等）；
+  3. 硬门禁 `packages/uikit-core/scripts/check-core-isolation.mjs` 挂 core build 前置：扫描 core src/scripts 的 import（含动态 import 与相对越界），违规即非零退出（已双向验证：正常通过 / 注入违规文件报错）；
+  4. `CHATROOM-UIKIT-DESIGN.md` 第四节补引用（边界判定执行层以该 skill 为准）。
+- **验证**：门禁脚本 pass/fail 双向通过；core build 前置挂载后重跑构建正常。
+- **关联 skill**：`uikit-package-boundary` / `uikit-skill-authoring` / `uikit-lint-governance`
 
 ### [ ] D98（已归档，见「已修复」区）
 

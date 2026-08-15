@@ -1,6 +1,6 @@
 # easemob-uikit-vue
 
-![status](https://img.shields.io/badge/status-预览版%20Preview-orange) ![version](https://img.shields.io/badge/version-v1.8.0-blue)
+![status](https://img.shields.io/badge/status-预览版%20Preview-orange) ![version](https://img.shields.io/badge/version-v2.0.0-blue)
 
 > [!WARNING]
 > **当前为预览版本（Preview），尚未正式发布。**
