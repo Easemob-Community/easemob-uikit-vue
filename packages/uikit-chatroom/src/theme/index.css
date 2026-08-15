@@ -1,0 +1,2 @@
+/* 聊天室场景包主题入口：变量体系整体复用 core（无场景级新增变量，P2-2 有增量时在此追加） */
+@import '@easemob/uikit-core/theme';

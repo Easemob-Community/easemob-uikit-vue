@@ -1,0 +1,50 @@
+{
+  "name": "@easemob/uikit-chatroom",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Easemob UIKit Vue3 chatroom scenario package (room lifecycle / broadcast message stream / members / mute / announcement / room attributes)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/easemob-uikit-chatroom.js",
+      "require": "./dist/easemob-uikit-chatroom.umd.cjs"
+    },
+    "./resolver": {
+      "types": "./dist/resolver.d.ts",
+      "import": "./dist/resolver.js"
+    },
+    "./auto-imports": {
+      "types": "./dist/auto-imports.d.ts",
+      "import": "./dist/auto-imports.js"
+    },
+    "./theme": "./dist/theme/index.css"
+  },
+  "main": "./dist/easemob-uikit-chatroom.umd.cjs",
+  "module": "./dist/easemob-uikit-chatroom.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "dev": "vite build --watch",
+    "auto-imports:check": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check",
+    "aux:gen": "node ../uikit-core/scripts/gen-aux-entries.mjs ."
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.0",
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@easemob/uikit-core": "workspace:*",
+    "easemob-websdk": "^5.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.6.2",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.5.41",
+    "vue-tsc": "^2.2.12"
+  }
+}
