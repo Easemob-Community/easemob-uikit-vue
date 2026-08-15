@@ -4,6 +4,20 @@ import type { NotificationItem } from '../components/notification/types'
 /** 通知触发模式：'background' 仅页面隐藏时触发（默认）| 'always' 非当前会话即触发 */
 export type NotificationTriggerMode = 'background' | 'always'
 
+/** 通知投递通道：'browser' 浏览器系统通知实际发出 | 'in-app' 页内右上角弹窗实际入列 */
+export type NotificationChannel = 'browser' | 'in-app'
+
+/**
+ * 通知送达回调：判定链命中且通知**实际投递**时触发（浏览器通知发出成功 / 页内弹窗入列）。
+ * 未投递（如权限被拒且页内弹窗关闭）不触发。
+ * 业务侧可用于播放自定义铃声、对接自定义通知服务等；音频资源与浏览器 autoplay
+ * 解锁策略由业务侧自行负责（UIKit 不内置铃声）。
+ */
+export type NotificationHandler = (
+  item: Omit<NotificationItem, 'id' | 'unreadCount'>,
+  channel: NotificationChannel,
+) => void
+
 /** 通知能力配置（可由 Provider 或业务方通过 configureNotification 设置） */
 export interface NotificationConfig {
   /** 总开关 */
@@ -63,6 +77,9 @@ const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
 /** 浏览器通知点击回调（由 Provider 注册默认跳转行为） */
 let clickHandler: ((item: Omit<NotificationItem, 'id' | 'unreadCount'>) => void) | null = null
+
+/** 通知送达回调（由 Provider 的 notification.onNotify 或业务方注册，如播放铃声） */
+let notifyHandler: NotificationHandler | null = null
 function generateId(): string {
   return `notification-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
@@ -167,6 +184,22 @@ function configureNotification(config: NotificationConfig) {
 function setNotificationClickHandler(handler: ((item: Omit<NotificationItem, 'id' | 'unreadCount'>) => void) | null) {
   clickHandler = handler
 }
+
+/**
+ * 注册通知送达回调（业务实现铃声等自定义行为；Provider 的 notification.onNotify 会调用此注册）。
+ * 传 null 注销。仅在通知实际投递时触发，通道选择仍由判定引擎负责。
+ */
+function setNotificationHandler(handler: NotificationHandler | null) {
+  notifyHandler = handler
+}
+
+/** 通知实际投递后触发已注册的送达回调（由判定引擎在投递点调用） */
+export function emitNotificationDelivered(
+  item: Omit<NotificationItem, 'id' | 'unreadCount'>,
+  channel: NotificationChannel,
+) {
+  notifyHandler?.(item, channel)
+}
 /**
  * 请求浏览器通知权限。
  * 已授权返回 true；被拒绝/不支持返回 false；未决定时自动弹出系统授权框。
@@ -238,5 +271,6 @@ export function useNotification() {
     ensureBrowserPermission,
     notifyBrowser,
     setNotificationClickHandler,
+    setNotificationHandler,
   }
 }

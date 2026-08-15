@@ -311,6 +311,8 @@ function createDemoSettings() {
   const notificationAutoRequest = ref(true)
   /** 触发模式：'background' 仅页面隐藏时（默认）| 'always' 非当前会话即触发 */
   const notificationTriggerMode = ref<'background' | 'always'>('background')
+  /** 新消息响铃（onNotify 送达回调演示：Web Audio 哔声，铃声由业务侧实现） */
+  const notificationSound = ref(false)
 
   /* ===== 联系人容器搜索控制 ===== */
   const showHomeSearch = ref(true)
@@ -503,6 +505,7 @@ function createDemoSettings() {
     notificationInApp,
     notificationAutoRequest,
     notificationTriggerMode,
+    notificationSound,
     // 搜索控制
     showHomeSearch,
     showContactSearch,

@@ -103,6 +103,7 @@ const dataSource = {
     browser: true,            // 浏览器系统通知
     inApp: true,              // 页内右上角弹窗
     triggerMode: 'background',// 仅页面隐藏时触发
+    onNotify: (item, channel) => playRingtone(), // 送达回调（自定义铃声等，见 Notification 指南）
   }"
   :logger="{
     enabled: true,            // IndexedDB 持久化

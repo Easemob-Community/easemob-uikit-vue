@@ -48,6 +48,8 @@ const EXCLUDED = new Set([
   // use-uikit 附属：context 注入 key 与 provider 内部装配函数
   'UIKIT_CONTEXT_KEY',
   'useUIKitProvider',
+  // use-notification 附属：送达回调触发（notification-engine 内部调用，业务侧走 setNotificationHandler）
+  'emitNotificationDelivered',
   // use-conversation 附属：草稿存储内部管理函数（provider 装配用）
   'clearAllDrafts',
   'initDraftStorage',

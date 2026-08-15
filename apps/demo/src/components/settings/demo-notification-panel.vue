@@ -5,6 +5,7 @@
  * 控制 EmNotification 消息通知能力：
  * - 总开关 / 浏览器系统通知 / 页内右上角弹窗 / 首次自动请求权限
  * - 触发模式：background（仅页面隐藏时通知，默认）| always（非当前会话即通知）
+ * - 新消息响铃（onNotify 送达回调演示，铃声由业务侧实现）
  * - 展示浏览器通知权限状态，支持手动请求
  * 说明：点击通知默认跳转对应会话（Provider 内置行为，navigateOnClick 默认开启）。
  */
@@ -21,6 +22,7 @@ const {
   notificationInApp,
   notificationAutoRequest,
   notificationTriggerMode,
+  notificationSound,
 } = useDemoSettings()
 
 /** 浏览器通知权限中文文案 */
@@ -62,6 +64,10 @@ async function requestPermission() {
       <label class="demo-check">
         <input v-model="notificationAutoRequest" type="checkbox" :disabled="!notificationEnable">
         <span>首次通知时自动请求浏览器权限</span>
+      </label>
+      <label class="demo-check">
+        <input v-model="notificationSound" type="checkbox" :disabled="!notificationEnable">
+        <span>新消息响铃（onNotify 送达回调演示：Web Audio 哔声）</span>
       </label>
     </div>
 

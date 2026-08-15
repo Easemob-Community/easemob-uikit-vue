@@ -132,11 +132,12 @@ const {
   notificationInApp,
   notificationAutoRequest,
   notificationTriggerMode,
+  notificationSound,
   aiMockReplyEnabled,
 } = useDemoSettings()
 
 /** 消息通知配置：面板改动实时同步到 useNotification 单例（Provider 已按 prop 接线） */
-const { configureNotification } = useNotification()
+const { configureNotification, setNotificationHandler } = useNotification()
 watch(
   [
     notificationEnable,
@@ -156,6 +157,37 @@ watch(
   },
   { immediate: true },
 )
+
+/**
+ * 新消息响铃演示：onNotify 送达回调（判定链命中且通知实际投递时触发）。
+ * 铃声由业务侧实现——此处用 Web Audio 哔声演示；音频资源与 autoplay 解锁策略
+ * （无用户手势时 AudioContext 处于 suspended）都是业务侧职责。
+ */
+let beepCtx: AudioContext | null = null
+function playNotificationBeep() {
+  try {
+    beepCtx ??= new AudioContext()
+    if (beepCtx.state === 'suspended')
+      void beepCtx.resume()
+    const osc = beepCtx.createOscillator()
+    const gain = beepCtx.createGain()
+    osc.connect(gain)
+    gain.connect(beepCtx.destination)
+    osc.frequency.value = 880
+    gain.gain.setValueAtTime(0.12, beepCtx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, beepCtx.currentTime + 0.35)
+    osc.start()
+    osc.stop(beepCtx.currentTime + 0.35)
+  }
+  catch {
+    // 音频不可用（如无用户手势）时静默失败，不影响通知本身
+  }
+}
+
+/** 响铃开关：注册/注销送达回调（Provider 的 notification.onNotify 与这条注册路径等价） */
+watch(notificationSound, (on) => {
+  setNotificationHandler(on ? () => playNotificationBeep() : null)
+}, { immediate: true })
 
 /**
  * Dev Hints 开发者友好模式（D87）：悬停会话项/气泡等区域浮出环信接口 + UIKit 实现思路。

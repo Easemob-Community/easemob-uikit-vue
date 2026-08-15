@@ -1,7 +1,7 @@
 import type { Message as SdkMessage } from 'easemob-websdk'
 import type { ConversationTypeValue } from '../constants'
 import { CONVERSATION_TYPE } from '../constants'
-import { useNotification } from '../composables/use-notification'
+import { emitNotificationDelivered, useNotification } from '../composables/use-notification'
 import { resolveLastMessageText, resolveSenderDisplayName } from '../utils/resolve-last-message-text'
 import { normalizeUserId, toUiMessage } from './adapter/message-adapter'
 import type { RootStores } from './event/types'
@@ -57,12 +57,19 @@ export function notifyOnNewMessage(stores: RootStores, sdkMsg: SdkMessage) {
 
   if (isHidden && state.value.browserEnabled) {
     void notifyBrowser(item).then((sent) => {
-      // 浏览器通知失败（权限被拒/不支持/异常）时降级为页内弹窗
-      if (!sent && state.value.inAppEnabled)
+      if (sent) {
+        // 浏览器系统通知实际发出后触发送达回调（channel: 'browser'）
+        emitNotificationDelivered(item, 'browser')
+      }
+      else if (state.value.inAppEnabled) {
+        // 浏览器通知失败（权限被拒/不支持/异常）时降级为页内弹窗
         notify(item)
+        emitNotificationDelivered(item, 'in-app')
+      }
     })
   }
   else if (state.value.inAppEnabled) {
     notify(item)
+    emitNotificationDelivered(item, 'in-app')
   }
 }

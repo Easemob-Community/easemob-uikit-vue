@@ -22,6 +22,11 @@ UIKit 的通知链路是**三件套**：`useNotification` 单例状态机（comp
 3. 页内通知不自动关闭——卡片堆积不消失；
 4. 点击通知只改会话 ID——未读数 1→0 闪烁（enter + ack 才完整）。
 
+**边界划分**：判定链 + 状态机必须留在 UIKit 内（依赖 conversationList/currentConversationId/
+currentUser 内部状态）；渲染层可替换（`notification.enable: false` + `useNotification()` 自渲染）；
+**铃声等自定义行为不做进内核**——通过 `onNotify` 送达回调交给业务（音频资源与浏览器
+autoplay 解锁策略由业务侧负责，详见 `notification-engine` 的 `emitNotificationDelivered`）。
+
 ## 1. useNotification 单例（`composables/use-notification.ts`）
 
 - **模块级单例**：`state` 是模块顶层 `ref`，`useNotification()` 只返回 `readonly(state)` +
@@ -36,6 +41,10 @@ UIKit 的通知链路是**三件套**：`useNotification` 单例状态机（comp
 - `close(id)` 必须**清对应 timer**；`closeAll()` 清全部 timer；关闭总开关 / 页内开关时清空列表；
 - `configureNotification(config)` 批量应用（enabled/browserEnabled/inAppEnabled/
   autoRequestPermission/triggerMode），Provider 与业务方共用；
+- `setNotificationHandler(handler)` 注册**送达回调**（`NotificationHandler`：
+  `(item, channel: 'browser' | 'in-app') => void`），Provider 的 `notification.onNotify`
+  走这条注册；**仅在实际投递时触发**（浏览器通知发出成功 / 页内弹窗入列），
+  未投递（权限被拒且页内关闭）不触发；
 - `autoRequestPermission` 是**模块级非响应式变量**，仅 `configureNotification` 可改，
   渲染层不要依赖它。
 
@@ -67,6 +76,10 @@ UIKit 的通知链路是**三件套**：`useNotification` 单例状态机（comp
   - 页面隐藏 + `browserEnabled` → `notifyBrowser` 优先，`then(sent => !sent && inAppEnabled && notify(item))`
     失败降级页内弹窗；
   - 其余（页面可见或浏览器关）→ `inAppEnabled` 时直接 `notify(item)`。
+- **送达回调触发点**（`emitNotificationDelivered`，与通道选择一一对应）：
+  - 浏览器通知发出成功 → `emitNotificationDelivered(item, 'browser')`；
+  - 页内弹窗入列（含浏览器失败降级）→ `emitNotificationDelivered(item, 'in-app')`；
+  - 未投递（两通道都不可用）→ 不触发。
 - 条目构造：群聊 `title` = 群名、`body` 含「发送者: 内容」前缀、`avatar` = 群头像；
   单聊 `title` = 发送者名、`avatar` = 发送者头像（走 `resolveSenderDisplayName` /
   `resolveLastMessageText` / userInfo store）。
@@ -74,9 +87,10 @@ UIKit 的通知链路是**三件套**：`useNotification` 单例状态机（comp
 ## 4. Provider 接线（`containers/uikit-provider/uikit-provider.vue`）
 
 - `notification` prop：`enable` / `browser` / `inApp` / `autoRequestPermission` 默认全 `true`；
-  `triggerMode` 默认 `'background'`；`navigateOnClick` 默认 `true`；
+  `triggerMode` 默认 `'background'`；`navigateOnClick` 默认 `true`；`onNotify` 默认不注册；
 - `watch(notification, { deep: true, immediate: true })` → `configureNotification(...)` +
-  `setNotificationClickHandler(navigateOnClick === false ? null : onNotificationClick)`，
+  `setNotificationClickHandler(navigateOnClick === false ? null : onNotificationClick)` +
+  `setNotificationHandler(config?.onNotify ?? null)`，
   运行时改 prop 即刻生效；
 - 默认点击行为 `onNotificationClick`：`window.focus()` → `navigateOnClick===false` 短路 →
   在会话列表找到会话 → `domains.conversation.enter(id, type)` + `sendChannelAck(id, type)`；
@@ -104,6 +118,8 @@ UIKit 的通知链路是**三件套**：`useNotification` 单例状态机（comp
   禁止只 filter 列表留下僵尸 timer。
 - 点击通知跳转必须走 `domains.conversation.enter` + `sendChannelAck`（与 Provider 默认一致）。
 - `notifyBrowser` 失败必须降级页内弹窗，禁止静默丢弃消息提示。
+- 送达回调（`onNotify` / `setNotificationHandler`）只能由引擎在**实际投递点**触发一次，
+  channel 为实际通道；铃声等自定义行为在回调里实现，判定链禁止外置到业务侧。
 
 **软约定：**
 

@@ -13,7 +13,7 @@ import { useLocale } from '../../locale'
 import { useThemeStore } from '../../store/theme'
 import { useToast } from '../../composables/use-toast'
 import { useNotification } from '../../composables/use-notification'
-import type { NotificationTriggerMode } from '../../composables/use-notification'
+import type { NotificationChannel, NotificationTriggerMode } from '../../composables/use-notification'
 import { EmNotificationContainer, EmToast } from '../../components'
 import type { NotificationItem } from '../../components/notification/types'
 import type { ClientConfig } from '../../sdk/client'
@@ -134,6 +134,15 @@ export interface ProviderProps {
     triggerMode?: NotificationTriggerMode
     /** 点击通知时跳转对应会话（默认 true） */
     navigateOnClick?: boolean
+    /**
+     * 通知送达回调：判定链命中且通知实际投递（浏览器通知发出成功 / 页内弹窗入列）时触发，
+     * channel 为实际投递通道。可用于播放自定义铃声、对接自定义通知服务等；
+     * 音频资源与浏览器 autoplay 解锁策略由业务侧负责（UIKit 不内置铃声）。
+     * Notification delivery callback, fired when a notification is actually delivered
+     * ('browser' on system notification success / 'in-app' on in-app toast queued).
+     * Use it to play custom sounds or hook custom notification services.
+     */
+    onNotify?: (item: Omit<NotificationItem, 'id' | 'unreadCount'>, channel: NotificationChannel) => void
   }
   /** Token 即将过期回调，业务可在此刷新 token */
   onTokenWillExpire?: () => void
@@ -191,6 +200,7 @@ const {
   close: closeNotification,
   configureNotification,
   setNotificationClickHandler,
+  setNotificationHandler,
 } = useNotification()
 const { t } = useLocale()
 
@@ -274,6 +284,7 @@ watch(
       triggerMode: config?.triggerMode,
     })
     setNotificationClickHandler(config?.navigateOnClick === false ? null : onNotificationClick)
+    setNotificationHandler(config?.onNotify ?? null)
   },
   { deep: true, immediate: true },
 )

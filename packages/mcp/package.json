@@ -1,0 +1,28 @@
+{
+  "name": "@easemob/uikit-mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Easemob UIKit 集成侧 MCP 服务：查接入指南 / 组件 API / 最新版本 / 校验 Provider 配置",
+  "bin": {
+    "easemob-uikit-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "data"
+  ],
+  "scripts": {
+    "build": "node scripts/sync-docs.mjs && tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
+  }
+}

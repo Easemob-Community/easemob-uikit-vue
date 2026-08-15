@@ -54,6 +54,57 @@ function onSend() {
 - 合并数大于 1 时卡片展示未读合并数提示
 - 关闭 / 点击事件均以通知 `id` 定位，点击后建议同时调用 `close` 移除卡片
 
+## 自定义铃声 / 通知送达回调
+
+UIKit 负责「判定 + 投递」：判定链（免打扰 / 当前会话 / 触发模式）通过后，把通知送达浏览器系统通知或页内弹窗。**铃声等自定义行为不内置**——音频资源、浏览器自动播放策略（autoplay 需用户手势解锁，iOS 限制更严）都应由业务侧管理，UIKit 只提供 `onNotify` 送达回调：
+
+- 方式一：在 Provider 的 `notification` prop 上配置（推荐）：
+
+```vue
+<EmUIKitProvider
+  :notification="{
+    onNotify: (item, channel) => {
+      // 通知实际投递时触发（浏览器通知发出成功 / 页内弹窗入列）
+      playRingtone() // 业务自实现：Web Audio / <audio> 均可
+    },
+  }"
+>
+  <EmChatContainer />
+</EmUIKitProvider>
+```
+
+- 方式二：通过 `useNotification().setNotificationHandler(handler)` 注册（Provider 内部也是走这条注册路径）：
+
+```ts
+import { useNotification } from '@easemob/uikit'
+
+const { setNotificationHandler } = useNotification()
+
+// 示例：Web Audio 哔声（AudioContext 需在用户手势后创建才能自动播放）
+let ctx: AudioContext | null = null
+function playBeep() {
+  ctx ??= new AudioContext()
+  const osc = ctx.createOscillator()
+  const gain = ctx.createGain()
+  osc.connect(gain)
+  gain.connect(ctx.destination)
+  osc.frequency.value = 880
+  gain.gain.setValueAtTime(0.15, ctx.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+  osc.start()
+  osc.stop(ctx.currentTime + 0.4)
+}
+
+setNotificationHandler((item, channel) => playBeep())
+```
+
+回调语义：
+
+- `item` 为构造中的通知条目（不含 `id` / `unreadCount`，投递后由单例分配）
+- `channel` 为**实际**投递通道：`'browser'`（浏览器系统通知发出成功）/ `'in-app'`（页内弹窗入列，含浏览器通知失败降级场景）
+- 仅在实际投递时触发：权限被拒且页内弹窗关闭（未投递）时不触发
+- 判定链仍由 UIKit 负责，回调内无需重复判断免打扰 / 当前会话
+
 ## API
 
 <!-- @include: ../.vitepress/gen/notification.md -->
