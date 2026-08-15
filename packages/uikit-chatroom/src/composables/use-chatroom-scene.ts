@@ -26,6 +26,17 @@ export interface ChatroomSceneConfig {
     muteAll?: boolean
     /** 消息过滤器（如语聊房过滤图片消息）；返回 false 不上屏 */
     messageFilter?: (message: UiMessage) => boolean
+    /**
+     * 消息区形态（直播场景：弹幕区只占页面底部一部分且背景透明，
+     * 直播画面从下层透出——用户 P4 review 需求 1）。缺省：消息区 flex:1
+     * 撑满 + 不透明背景。live preset 默认 { height: '33%', transparent: true }。
+     */
+    messageArea?: {
+      /** 高度（px 数字或 CSS 长度字符串，如 '33%' / '240px'） */
+      height?: number | string
+      /** 背景透明（直播画面透出）；消息气泡自身背景不受影响 */
+      transparent?: boolean
+    }
   }
   /** 主题 CSS 变量覆盖（容器根元素应用，如 '--uikit-primary-color': '#ff6b6b'） */
   themeOverrides?: Record<string, string>
@@ -52,7 +63,8 @@ const DEFAULT_SCENE: ChatroomSceneConfig = {
 }
 
 /**
- * 直播间 preset：全屏 + 礼物栏/礼物消息 + 成员弹层 + 公告 + 全员禁言入口。
+ * 直播间 preset：全屏 + 礼物 + 成员弹层 + 公告 + 全员禁言入口；
+ * 消息区 = 底部 33% + 透明背景（弹幕叠加在直播画面上，P4 review 需求 1）。
  */
 export const LIVE_ROOM_SCENE: ChatroomSceneConfig = {
   name: CHATROOM_SCENE_NAME.LIVE,
@@ -62,6 +74,7 @@ export const LIVE_ROOM_SCENE: ChatroomSceneConfig = {
     memberList: 'popup',
     announcement: true,
     muteAll: true,
+    messageArea: { height: '33%', transparent: true },
   },
 }
 

@@ -12,6 +12,7 @@
 import { computed, ref } from 'vue'
 import {
   EmChatroomContainer,
+  useChatroom,
   useChatroomAttributes,
   useChatroomMessage,
 } from '@easemob/uikit-chatroom'
@@ -33,6 +34,8 @@ const joinError = ref('')
 /** 商品属性（live:product）与发送能力 */
 const { attributes, setAttributes } = useChatroomAttributes()
 const { sendCustom } = useChatroomMessage()
+/** 房间信息（主播条在线人数） */
+const { roomInfo } = useChatroom()
 
 /** 当前商品（属性 JSON 解析；缺失/损坏回落 null） */
 const product = computed<LiveProduct | null>(() => {
@@ -191,44 +194,69 @@ const signalRooms = computed(() => {
       </div>
     </div>
 
-    <!-- 直播间（live preset + 商品卡 toolbar + 信令房双房） -->
-    <EmChatroomContainer
-      v-else
-      class="live-page__container"
-      :room-id="activeRoomId"
-      scene="live"
-      :signal-rooms="signalRooms"
-      @back="handleExit"
-      @kicked="handleExit"
-      @destroyed="handleExit"
-      @join-error="handleJoinError"
-      @signal-message="handleSignalMessage"
-      @signal-status="handleSignalStatus"
-    >
-      <!-- toolbar 插槽：商品卡片 + 信令房指令面板 -->
-      <template #toolbar>
-        <DemoLiveProductCard :product="product" />
-        <div class="live-page__signal">
-          <div class="live-page__signal-head">
-            <span class="live-page__signal-label">信令房</span>
-            <span
-              class="live-page__signal-status"
-              :class="`live-page__signal-status--${signalStatusKind}`"
-            >
-              {{ signalStatus }}
-            </span>
-            <button class="live-page__publish" :disabled="!signalRoomInput.trim()" @click="handlePublishProduct">
-              上架商品
-            </button>
-          </div>
-          <div v-if="signalLogs.length > 0" class="live-page__signal-logs">
-            <div v-for="(log, index) in signalLogs" :key="index" class="live-page__signal-log">
-              {{ log }}
+    <!-- 直播间（live preset：消息区底部 33% + 透明，叠加在直播画面上）
+         两层布局：底层模拟直播画面（画面区），上层容器（消息区透明透出画面） -->
+    <div v-else class="live-page__stage">
+      <!-- 模拟直播画面层（真实接入时替换为业务视频组件） -->
+      <div class="live-page__video">
+        <div class="live-page__video-hint">
+          🎥 直播画面（模拟）——接入真实播放器后，弹幕区将透明叠加在此画面上
+        </div>
+      </div>
+
+      <!-- 容器层：header 半透明主播条 + 商品卡/信令面板半透明浮层 + 底部弹幕区透明 -->
+      <EmChatroomContainer
+        class="live-page__container"
+        :room-id="activeRoomId"
+        scene="live"
+        :signal-rooms="signalRooms"
+        @back="handleExit"
+        @kicked="handleExit"
+        @destroyed="handleExit"
+        @join-error="handleJoinError"
+        @signal-message="handleSignalMessage"
+        @signal-status="handleSignalStatus"
+      >
+        <!-- header 插槽：半透明主播条（叠加在画面上） -->
+        <template #header>
+          <div class="live-page__anchor">
+            <span class="live-page__anchor-avatar">👩‍💼</span>
+            <div class="live-page__anchor-info">
+              <div class="live-page__anchor-name">
+                主播小美
+              </div>
+              <div class="live-page__anchor-count">
+                🔴 直播中 · {{ roomInfo?.memberCount ?? 0 }} 人在线
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </EmChatroomContainer>
+        </template>
+
+        <!-- toolbar 插槽：商品卡片（半透明浮层）+ 信令房指令面板 -->
+        <template #toolbar>
+          <DemoLiveProductCard :product="product" overlay />
+          <div class="live-page__signal">
+            <div class="live-page__signal-head">
+              <span class="live-page__signal-label">信令房</span>
+              <span
+                class="live-page__signal-status"
+                :class="`live-page__signal-status--${signalStatusKind}`"
+              >
+                {{ signalStatus }}
+              </span>
+              <button class="live-page__publish" :disabled="!signalRoomInput.trim()" @click="handlePublishProduct">
+                上架商品
+              </button>
+            </div>
+            <div v-if="signalLogs.length > 0" class="live-page__signal-logs">
+              <div v-for="(log, index) in signalLogs" :key="index" class="live-page__signal-log">
+                {{ log }}
+              </div>
+            </div>
+          </div>
+        </template>
+      </EmChatroomContainer>
+    </div>
   </div>
 </template>
 
@@ -310,16 +338,80 @@ const signalRooms = computed(() => {
   cursor: not-allowed;
 }
 
-.live-page__container {
+.live-page__stage {
   flex: 1;
   min-height: 0;
+  position: relative;
+  overflow: hidden;
 }
 
+/* 模拟直播画面层（真实接入时替换为业务视频组件） */
+.live-page__video {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(51, 177, 255, 0.35), transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(243, 200, 80, 0.25), transparent 50%),
+    linear-gradient(160deg, #1e3a5f 0%, #101828 55%, #0b1120 100%);
+}
+
+.live-page__video-hint {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+}
+
+/* 容器层：铺满舞台，消息区透明（live preset messageArea）透出画面 */
+.live-page__container {
+  position: absolute;
+  inset: 0;
+}
+
+/* 半透明主播条（叠加在画面上） */
+.live-page__anchor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+
+.live-page__anchor-avatar {
+  font-size: 28px;
+}
+
+.live-page__anchor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.live-page__anchor-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.live-page__anchor-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 信令面板：半透明浮层（叠加在画面上） */
 .live-page__signal {
   flex-shrink: 0;
   padding: 6px 12px 8px;
-  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
-  border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(4px);
+  border-bottom: none;
 }
 
 .live-page__signal-head {
@@ -339,6 +431,12 @@ const signalRooms = computed(() => {
 .live-page__signal-status {
   font-size: 11px;
   color: var(--uikit-text-tertiary, #9ca3af);
+}
+
+/* 半透明浮层上的状态/日志文字反白 */
+.live-page__signal-status,
+.live-page__signal-log {
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .live-page__signal-status--ok {

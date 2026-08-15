@@ -22,6 +22,8 @@ export interface LiveProduct {
 const props = defineProps<{
   /** 当前商品（无商品时渲染空态） */
   product: LiveProduct | null
+  /** 叠加形态（直播画面场景）：半透明深色浮层，画面透出 */
+  overlay?: boolean
 }>()
 
 const toast = useToast()
@@ -36,7 +38,7 @@ function handleBuy() {
 </script>
 
 <template>
-  <div class="live-product">
+  <div class="live-product" :class="{ 'live-product--overlay': overlay }">
     <!-- 空态：暂无商品 -->
     <div v-if="!display" class="live-product__empty">
       <span class="live-product__empty-icon">🛍️</span>
@@ -70,6 +72,29 @@ function handleBuy() {
   padding: 8px 12px;
   background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
+}
+
+/* 叠加形态：半透明深色浮层（直播画面场景，画面透出；文字反白） */
+.live-product--overlay {
+  background: rgba(17, 24, 39, 0.45);
+  border-bottom: none;
+  backdrop-filter: blur(4px);
+}
+
+.live-product--overlay .live-product__name {
+  color: #fff;
+}
+
+.live-product--overlay .live-product__desc {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.live-product--overlay .live-product__price {
+  color: #ff6b6b;
+}
+
+.live-product--overlay .live-product__empty-text {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .live-product__empty {
