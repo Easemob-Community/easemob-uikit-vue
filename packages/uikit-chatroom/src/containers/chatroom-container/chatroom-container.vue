@@ -22,7 +22,7 @@
  * - 被踢/解散终态：watch store 状态 → emit 事件 + 终态提示视图。
  */
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { MESSAGE_TYPE, t, useClient } from '@easemob/uikit-core'
+import { EmPopup, MESSAGE_TYPE, t, useClient } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
 import { normalizeUserId } from '../../sdk/adapter/chatroom-adapter'
