@@ -51,8 +51,12 @@ export {
 export { ChatroomAdapter, normalizeUserId, toChatroomUiMessage } from './sdk/adapter/chatroom-adapter'
 
 // sdk 层：事件注册
-export { registerChatroomEventHandlers } from './sdk/event/chatroom-events'
-export type { ChatroomEventStores, ChatroomEventCallbacks } from './sdk/event/chatroom-events'
+export { registerChatroomEventHandlers, subscribeMemberJoined } from './sdk/event/chatroom-events'
+export type {
+  ChatroomEventStores,
+  ChatroomEventCallbacks,
+  MemberJoinedPayload,
+} from './sdk/event/chatroom-events'
 
 // stores
 export { useChatroomStore } from './store/chatroom'
@@ -65,6 +69,9 @@ export { useChatroomMessage } from './composables/use-chatroom-message'
 export type { UseChatroomMessageOptions } from './composables/use-chatroom-message'
 export { useChatroomMember } from './composables/use-chatroom-member'
 export { useChatroomAttributes } from './composables/use-chatroom-attributes'
+export { useChatroomMessageUserInfo } from './composables/use-chatroom-message-user-info'
+export type { MessageUserInfoConfig } from './config/message-user-info'
+export { setChatroomMessageUserInfoConfig } from './config/message-user-info'
 export {
   useChatroomScene,
   registerChatroomScene,
@@ -91,6 +98,7 @@ export type {
   ChatroomContainerProps,
   ChatroomContainerEmits,
   ChatroomSignalRoomConfig,
+  ChatroomMemberJoinedPayload,
 } from './containers/chatroom-container/types'
 // 信令房透传/状态 payload（P3 多房间订阅，§5.9）
 export type { SignalMessagePayload, SignalStatusPayload } from './sdk/event/chatroom-events'

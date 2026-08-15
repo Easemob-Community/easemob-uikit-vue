@@ -5,6 +5,8 @@ import { registerChatroomEventHandlers } from '../sdk/event/chatroom-events'
 import type { ChatroomEventCallbacks } from '../sdk/event/chatroom-events'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
+import { setChatroomMessageUserInfoConfig } from '../config/message-user-info'
+import type { MessageUserInfoConfig } from '../config/message-user-info'
 
 // 构建期注入：@easemob/uikit-chatroom 包版本（vite define，见 vite.config.ts）
 declare const __EASEMOB_UIKIT_CHATROOM_VERSION__: string
@@ -56,6 +58,8 @@ export interface UseChatroomProviderOptions
   extends Omit<CoreUIKitProviderOptions, 'clientName' | 'clientVersion' | 'resolveClientConfig' | 'onClientSetup'> {
   /** 房间终态事件回调（被踢/解散，供容器弹 toast 或通知接入方） */
   chatroomCallbacks?: ChatroomEventCallbacks
+  /** 消息 ext 用户信息配置（昵称/头像下沉消息 ext，P4 review 需求 3；可经 useChatroomMessageUserInfo 动态覆盖） */
+  messageUserInfo?: MessageUserInfoConfig
 }
 
 /**
@@ -73,7 +77,11 @@ export function useChatroomProvider(
 ): ChatroomUIKitContext {
   const chatroomStore = useChatroomStore()
   const messageStore = useChatroomMessageStore()
-  const { chatroomCallbacks, ...coreOptions } = options
+  const { chatroomCallbacks, messageUserInfo, ...coreOptions } = options
+
+  // 消息 ext 用户信息静态配置（P4 review 需求 3；动态覆盖走 useChatroomMessageUserInfo）
+  if (messageUserInfo)
+    setChatroomMessageUserInfoConfig(messageUserInfo)
 
   // autoInit 一律置 false，立即初始化在下方显式触发——确保 onClientSetup 闭包
   // 首次执行时已能拿到 coreCtx（同 IM 场景包的处理，见 CORE-MIGRATION-CHECKLIST Step 2 注记）。

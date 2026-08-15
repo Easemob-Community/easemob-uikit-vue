@@ -8,6 +8,7 @@ import { computed, onUnmounted } from 'vue'
 import { EmAvatar, MESSAGE_TYPE, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_GIFT_EVENT } from '../../../constants'
+import { readAvatarFromMessageExt, readNicknameFromMessageExt } from '../../../config/message-user-info'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'
 
 export interface ChatroomMessageItemProps {
@@ -30,7 +31,15 @@ const isCustom = computed(() => props.message.type === MESSAGE_TYPE.CUSTOM)
 
 /** 消息发送者 ID（notice 无发送者；适配器已按会话用户归一化） */
 const senderId = computed(() => (isNotice.value ? '' : normalizeUserId(props.message.from ?? '')))
-const { displayName, avatarUrl } = useUserInfo(senderId)
+const { displayName: infoDisplayName, avatarUrl: infoAvatarUrl } = useUserInfo(senderId)
+
+/**
+ * 消息 ext 昵称/头像优先（P4 review 需求 3）：大体量直播间发送方把昵称头像
+ * 下沉到消息 ext（sendText(content, { ext: { nickname, avatar } })），
+ * 渲染端免 userInfo 查询；缺失回落 useUserInfo 服务。
+ */
+const displayName = computed(() => readNicknameFromMessageExt(props.message.ext) ?? infoDisplayName.value)
+const avatarUrl = computed(() => readAvatarFromMessageExt(props.message.ext) ?? infoAvatarUrl.value)
 
 /** 文本内容（txt 消息体） */
 const textContent = computed(() => {

@@ -3,7 +3,13 @@ import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
-import { dispatchSignalMessage, dispatchSignalStatus, subscribeSignalMessages, subscribeSignalStatus } from '../sdk/event/chatroom-events'
+import {
+  dispatchSignalMessage,
+  dispatchSignalStatus,
+  subscribeMemberJoined,
+  subscribeSignalMessages,
+  subscribeSignalStatus,
+} from '../sdk/event/chatroom-events'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -242,7 +248,7 @@ export function useChatroom(options: UseChatroomOptions = {}) {
    */
   async function joinSignalRoom(
     roomId: string,
-    options: { pullHistory?: boolean, autoRejoin?: boolean } = {},
+    options: { pullHistory?: boolean, autoRejoin?: boolean, ext?: string } = {},
   ): Promise<void> {
     if (!roomId)
       throw new Error('[UIKit:Chatroom] joinSignalRoom: roomId 不能为空')
@@ -255,8 +261,10 @@ export function useChatroom(options: UseChatroomOptions = {}) {
     room.autoRejoin = options.autoRejoin ?? true
     try {
       // 信令房与 UI 房并行：leaveOtherRooms 必须为 false（§5.9）
+      // ext：加入时透传的扩展信息（业务来源标记等），房间内其他成员经
+      // onMembersJoined 事件收到（P4 review 需求 2）
       await withJoinTimeout(
-        adapter.joinChatRoom(roomId, undefined, false),
+        adapter.joinChatRoom(roomId, options.ext, false),
         () => {
           // 使 in-flight 响应失效（按房间令牌比较——活动房令牌与信令房令牌
           // 是两回事，P3 review 修正此前误用活动房 joinToken 导致失效永不生效）
@@ -353,6 +361,8 @@ export function useChatroom(options: UseChatroomOptions = {}) {
     subscribeSignalMessages,
     /** 订阅信令房状态（joined/failed/kicked/destroyed；返回取消订阅函数） */
     subscribeSignalStatus,
+    /** 订阅成员加入事件（含 join ext，P4 review 需求 2；返回取消订阅函数） */
+    subscribeMemberJoined,
     /** 释放内部 watcher（headless 无组件作用域时使用；组件内调用可忽略） */
     dispose: () => {
       stopRejoinWatch()

@@ -24,6 +24,15 @@ export interface ChatroomEventCallbacks {
   onKicked?: (reason: number) => void
   /** 聊天室被解散 */
   onDestroyed?: () => void
+  /**
+   * 成员加入回调（P4 review 需求 2）：payload 携带 join ext——
+   * 业务可据此识别新成员来源（如「来自直播间 A」）做自定义逻辑。
+   */
+  onMemberJoined?: (payload: {
+    roomId: string
+    members: Array<{ userId: string, nickname?: string, avatarUrl?: string }>
+    ext?: string
+  }) => void
 }
 
 /** 信令房消息透传 payload（§5.9：UIKit 零渲染零假设，业务经回调自行呈现） */
@@ -42,6 +51,28 @@ export interface SignalStatusPayload {
 /** 信令房消息/状态分发器（模块级监听器集合；useChatroom 注册，容器与 headless 同一契约） */
 const signalMessageListeners = new Set<(payload: SignalMessagePayload) => void>()
 const signalStatusListeners = new Set<(payload: SignalStatusPayload) => void>()
+
+/** 成员加入事件 payload（含 join ext，P4 review 需求 2） */
+export interface MemberJoinedPayload {
+  roomId: string
+  members: Array<{ userId: string, nickname?: string, avatarUrl?: string }>
+  ext?: string
+}
+
+/** 成员加入分发器（模块级监听器集合；容器 emit member-joined，业务也可直接订阅） */
+const memberJoinedListeners = new Set<(payload: MemberJoinedPayload) => void>()
+
+/** 订阅成员加入事件（含 join ext；返回取消订阅函数） */
+export function subscribeMemberJoined(listener: (payload: MemberJoinedPayload) => void): () => void {
+  memberJoinedListeners.add(listener)
+  return () => memberJoinedListeners.delete(listener)
+}
+
+/** 分发成员加入事件 */
+function dispatchMemberJoined(payload: MemberJoinedPayload) {
+  for (const listener of memberJoinedListeners)
+    listener(payload)
+}
 
 /** 订阅信令房消息透传（返回取消订阅函数） */
 export function subscribeSignalMessages(listener: (payload: SignalMessagePayload) => void): () => void {
@@ -134,6 +165,26 @@ export function registerChatroomEventHandlers(
         return
       stores.chatroom.incrementMemberCount(payload.members.length)
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.memberJoined', '', { name: memberNames(payload.members) }))
+      // join ext 透传（P4 review 需求 2）：模块级分发（容器 emit member-joined）+
+      // Provider callbacks 双出口，业务自定义逻辑任选其一
+      dispatchMemberJoined({
+        roomId: payload.chatRoomId,
+        members: payload.members.map(m => ({
+          userId: m.userId,
+          nickname: m.nickname,
+          avatarUrl: m.avatarUrl,
+        })),
+        ext: payload.ext,
+      })
+      callbacks.onMemberJoined?.({
+        roomId: payload.chatRoomId,
+        members: payload.members.map(m => ({
+          userId: m.userId,
+          nickname: m.nickname,
+          avatarUrl: m.avatarUrl,
+        })),
+        ext: payload.ext,
+      })
     },
     onMembersExited: (payload) => {
       if (!isActiveRoom(payload.chatRoomId))
