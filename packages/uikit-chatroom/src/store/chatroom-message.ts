@@ -140,6 +140,8 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
 
   /**
    * 直接追加一条消息（本地通知 / 自己发送的乐观上屏），跳过缓冲队列。
+   * 同时通知桶订阅者（§5.10 headless「事件化出口」：系统通知等直通消息
+   * 订阅者同样可见——P4 review 补全，此前 addMessage 不进缓冲、订阅者收不到）。
    */
   function addMessage(roomId: string, message: UiMessage) {
     const bucket = ensureBucket(roomId)
@@ -150,6 +152,7 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
     }
     bucket.messages = [...bucket.messages, message]
     trimToCap(bucket)
+    notifySubscribers(roomId, [message])
   }
 
   /** 实时消息入接收缓冲队列，按窗口批量合并（事件层调用） */

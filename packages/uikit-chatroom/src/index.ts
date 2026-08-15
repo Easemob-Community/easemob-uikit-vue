@@ -17,6 +17,9 @@ export {
   CHATROOM_MESSAGE_DEFAULTS,
   CHATROOM_ATTR_PREFIX,
   CHATROOM_SCENE_NAME,
+  CHATROOM_GIFT_EVENT,
+  CHATROOM_GIFT_ITEMS,
+  CHATROOM_MIC_QUEUE_SEAT_COUNT,
 } from './constants'
 export type {
   ChatroomConversationTypeValue,
