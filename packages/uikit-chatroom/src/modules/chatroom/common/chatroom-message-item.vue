@@ -200,7 +200,7 @@ const isMutedMember = computed(() =>
   background: var(--uikit-bubble-bg-other, var(--uikit-bg-secondary));
   color: var(--uikit-bubble-text-other, var(--uikit-text-primary));
   padding: 8px 12px;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
@@ -216,7 +216,7 @@ const isMutedMember = computed(() =>
 .chatroom-message-item__image {
   max-width: 200px;
   max-height: 240px;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   display: block;
   object-fit: cover;
 }

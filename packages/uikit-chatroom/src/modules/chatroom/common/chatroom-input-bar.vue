@@ -167,8 +167,9 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base));
+  /* 底部安全区：iPhone 横条遮挡适配（H5-first，P4 UI 适配） */
+  padding: 8px 12px calc(8px + var(--uikit-safe-bottom, 0px));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base));
   border-top: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
 }
 
@@ -193,8 +194,8 @@ function handleKeydown(event: KeyboardEvent) {
   height: 36px;
   padding: 0 12px;
   border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.12));
-  border-radius: var(--uikit-radius-md, 8px);
-  background: var(--uikit-bg-input, var(--uikit-bg-secondary));
+  border-radius: var(--uikit-components-radius, 8px);
+  background: var(--uikit-input-bg, var(--uikit-bg-secondary));
   color: var(--uikit-text-primary);
   font-size: 14px;
   outline: none;
@@ -218,7 +219,7 @@ function handleKeydown(event: KeyboardEvent) {
   height: 34px;
   padding: 0 16px;
   border: none;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   background: var(--uikit-primary-color);
   color: var(--uikit-text-inverse, #fff);
   font-size: 14px;

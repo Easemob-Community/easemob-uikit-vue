@@ -70,7 +70,7 @@ defineEmits<ChatroomHeaderEmits>()
   gap: 4px;
   height: 48px;
   padding: 0 8px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
   flex-shrink: 0;
 }

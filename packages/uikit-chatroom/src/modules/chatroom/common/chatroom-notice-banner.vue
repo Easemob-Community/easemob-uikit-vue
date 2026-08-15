@@ -59,7 +59,7 @@ watch(() => props.content, () => {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: var(--uikit-bg-warning, rgba(243, 200, 80, 0.12));
+  background: rgba(var(--uikit-warning-rgb, 255, 178, 51), 0.12);
   font-size: 12px;
   color: var(--uikit-text-secondary);
   flex-shrink: 0;

@@ -122,7 +122,7 @@ async function handleSeatClick(index: number) {
 <style scoped>
 .chatroom-mic-queue {
   padding: 8px 12px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
   flex-shrink: 0;
 }
@@ -148,7 +148,7 @@ async function handleSeatClick(index: number) {
   width: 56px;
   padding: 6px 4px;
   border: none;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   background: var(--uikit-bg-secondary, rgba(0, 0, 0, 0.04));
   cursor: pointer;
 }

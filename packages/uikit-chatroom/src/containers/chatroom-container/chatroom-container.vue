@@ -532,7 +532,7 @@ defineExpose({
 .chatroom-container__terminal-btn {
   padding: 6px 20px;
   border: none;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   background: var(--uikit-primary-color);
   color: var(--uikit-text-inverse, #fff);
   font-size: 14px;

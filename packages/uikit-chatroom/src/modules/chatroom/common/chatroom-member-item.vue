@@ -95,7 +95,7 @@ const isMuted = computed(() =>
   flex-shrink: 0;
   font-size: 11px;
   padding: 1px 6px;
-  border-radius: var(--uikit-radius-sm, 4px);
+  border-radius: var(--uikit-components-radius, 4px);
 }
 
 .chatroom-member-item__badge--owner {

@@ -60,7 +60,7 @@ function handleGiftClick(giftId: string, icon: string) {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
   overflow-x: auto;
   flex-shrink: 0;
@@ -84,7 +84,7 @@ function handleGiftClick(giftId: string, icon: string) {
   gap: 2px;
   padding: 4px 10px;
   border: none;
-  border-radius: var(--uikit-radius-md, 8px);
+  border-radius: var(--uikit-components-radius, 8px);
   background: var(--uikit-bg-secondary, rgba(0, 0, 0, 0.04));
   cursor: pointer;
 }
