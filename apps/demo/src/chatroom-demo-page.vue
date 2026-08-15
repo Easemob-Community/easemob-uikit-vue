@@ -11,8 +11,8 @@
  *
  * 聊天室是独立场景包：与 IM 主界面（会话/联系人）互不干扰，页面高度 100% 全屏。
  */
-import { computed, ref } from 'vue'
-import { EmChatroomContainer, useChatroomProvider } from '@easemob/uikit-chatroom'
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { EmChatroomContainer, useChatroomMessage, useChatroomProvider } from '@easemob/uikit-chatroom'
 import { useClient } from '@easemob/uikit-im'
 
 /** 从 localStorage 读取登录配置（app.vue 写入的 uikit_demo_login_config） */
@@ -66,9 +66,42 @@ function handleExit() {
   activeRoomId.value = ''
 }
 
+/* ===== P3 验收：场景预设切换 + headless 订阅演示（同一内核，容器与纯 JS 消费两种形态） ===== */
+/** 场景切换（内置 preset 仅靠 config 变种，P3 验收口径；未注册名回落兜底场景） */
+const sceneName = ref<string>('live')
+const sceneConfig = computed(() => ({
+  name: sceneName.value,
+  layout: 'fullscreen' as const,
+}))
+
 // 页面卸载的离房清理由容器 onUnmounted 自动 leave 负责（P2 review P2-11）：
 // 不在此直调 store（公开契约纪律，且容器 leave 会同时清服务端成员资格与消息桶）。
 const isLoggedIn = computed(() => Boolean(currentUser.value))
+
+/** headless 消费：直接订阅消息流增量（不经过容器），验证 subscribe 批量/有序契约 */
+const { subscribe } = useChatroomMessage()
+const headlessMessages = ref<string[]>([])
+let headlessUnsub: (() => void) | null = null
+// 进房后订阅（容器 join 驱动；订阅绑定调用时刻的活动房间）
+watch(isLoggedIn, (loggedIn) => {
+  if (loggedIn && !headlessUnsub) {
+    headlessUnsub = subscribe((batch) => {
+      for (const msg of batch) {
+        const text = msg.type === 'text'
+          ? (msg.body as { content?: string }).content ?? ''
+          : `[${msg.type}]`
+        if (text)
+          headlessMessages.value = [...headlessMessages.value.slice(-19), text]
+      }
+    })
+  }
+})
+
+/** 页面卸载：释放 headless 订阅（容器离房由容器 onUnmounted 负责） */
+onUnmounted(() => {
+  headlessUnsub?.()
+  headlessUnsub = null
+})
 </script>
 
 <template>
@@ -99,18 +132,43 @@ const isLoggedIn = computed(() => Boolean(currentUser.value))
         </button>
       </div>
 
+      <!-- P3 验收：场景预设切换（live/voice/class 仅靠 config 变种） -->
+      <div class="chatroom-demo__scene">
+        <span class="chatroom-demo__scene-label">场景（P3 preset）：</span>
+        <button
+          v-for="name in ['live', 'voice', 'class', 'custom']"
+          :key="name"
+          class="chatroom-demo__scene-btn"
+          :class="{ 'chatroom-demo__scene-btn--active': sceneName === name }"
+          @click="sceneName = name"
+        >
+          {{ name }}
+        </button>
+      </div>
+
       <!-- 三步接入第二步：容器（room-id 变化自动 join，auto-join 默认开启） -->
       <EmChatroomContainer
         v-if="activeRoomId"
         class="chatroom-demo__container"
         :room-id="activeRoomId"
-        :scene="{ name: 'custom', layout: 'fullscreen', features: { memberList: 'panel', announcement: true } }"
+        :scene="sceneConfig"
         @back="goBack"
         @kicked="handleExit"
         @destroyed="handleExit"
       />
       <div v-else class="chatroom-demo__placeholder">
-        输入聊天室 ID 并点击「加入」开始体验（消息收发 / 成员面板 / 系统通知 / 禁言操作）
+        输入聊天室 ID 并点击「加入」开始体验（消息收发 / 成员面板 / 系统通知 / 禁言操作 / 礼物 / 麦位）
+      </div>
+
+      <!-- P3 验收：headless 订阅（纯 JS 消费同一内核，不经过容器渲染） -->
+      <div v-if="activeRoomId" class="chatroom-demo__headless">
+        <div class="chatroom-demo__headless-title">headless 订阅（useChatroomMessage().subscribe 增量批量）</div>
+        <div v-if="headlessMessages.length === 0" class="chatroom-demo__headless-empty">
+          暂无增量（发送消息后此处实时出现，不依赖容器渲染）
+        </div>
+        <div v-for="(text, index) in headlessMessages" :key="index" class="chatroom-demo__headless-item">
+          {{ text }}
+        </div>
       </div>
     </template>
   </div>
@@ -216,5 +274,60 @@ const isLoggedIn = computed(() => Boolean(currentUser.value))
   text-align: center;
   color: var(--uikit-text-tertiary);
   font-size: 13px;
+}
+
+.chatroom-demo__scene {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px 8px;
+  flex-wrap: wrap;
+}
+
+.chatroom-demo__scene-label {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+}
+
+.chatroom-demo__scene-btn {
+  padding: 3px 10px;
+  border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.12));
+  border-radius: 999px;
+  background: none;
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+}
+
+.chatroom-demo__scene-btn--active {
+  background: var(--uikit-primary-color);
+  border-color: var(--uikit-primary-color);
+  color: #fff;
+}
+
+.chatroom-demo__headless {
+  flex-shrink: 0;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 8px 16px;
+  border-top: 1px dashed var(--uikit-border-color, rgba(0, 0, 0, 0.12));
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.chatroom-demo__headless-title {
+  font-size: 11px;
+  color: var(--uikit-text-tertiary);
+  margin-bottom: 4px;
+}
+
+.chatroom-demo__headless-empty {
+  font-size: 12px;
+  color: var(--uikit-text-tertiary);
+}
+
+.chatroom-demo__headless-item {
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  padding: 1px 0;
 }
 </style>
