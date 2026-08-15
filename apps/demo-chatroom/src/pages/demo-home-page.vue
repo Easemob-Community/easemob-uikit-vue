@@ -4,9 +4,18 @@
  * 纯弹幕 headless）。每个入口说明「该页验证的 UIKit 能力」，演示变种哲学：
  * 场景 = 内置 preset config + 容器插槽，不 fork 内核。
  */
-import { useClient } from '@easemob/uikit-core'
+import { useClient, useTheme } from '@easemob/uikit-core'
+import type { ThemeMode } from '@easemob/uikit-core'
 
 const { currentUser, logout } = useClient()
+/** 主题切换（浅色 / 深色 / 跟随系统）——验证深色模式下各页面的变量适配 */
+const { mode, setMode } = useTheme()
+
+const THEME_OPTIONS: { value: ThemeMode, label: string }[] = [
+  { value: 'light', label: '浅色' },
+  { value: 'dark', label: '深色' },
+  { value: 'auto', label: '跟随系统' },
+]
 
 const entries = [
   {
@@ -71,7 +80,18 @@ async function handleLogout() {
     </div>
 
     <div class="home-page__subtitle">
-      同一个 EmChatroomContainer 内核，五种消费形态——全部仅靠 preset config + 插槽
+      <span>同一个 EmChatroomContainer 内核，五种消费形态——全部仅靠 preset config + 插槽</span>
+      <span class="home-page__theme">
+        <button
+          v-for="option in THEME_OPTIONS"
+          :key="option.value"
+          class="home-page__theme-btn"
+          :class="{ 'home-page__theme-btn--active': mode === option.value }"
+          @click="setMode(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      </span>
     </div>
 
     <div class="home-page__list">
@@ -142,9 +162,39 @@ async function handleLogout() {
 }
 
 .home-page__subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 4px 16px 14px;
   font-size: 12px;
   color: var(--uikit-text-tertiary, #9ca3af);
+}
+
+.home-page__theme {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--uikit-bg-secondary, rgba(0, 0, 0, 0.04));
+}
+
+.home-page__theme-btn {
+  border: none;
+  background: none;
+  font-size: 11px;
+  color: var(--uikit-text-secondary, #6b7280);
+  padding: 3px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.home-page__theme-btn--active {
+  background: var(--uikit-bg-elevated, #fff);
+  color: var(--uikit-primary-color);
+  box-shadow: var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
 }
 
 .home-page__list {
@@ -161,7 +211,7 @@ async function handleLogout() {
   padding: 14px 12px;
   border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.08));
   border-radius: 12px;
-  background: var(--uikit-bg-panel, #fff);
+  background: var(--uikit-bg-elevated, #fff);
   text-align: left;
   cursor: pointer;
   transition:
@@ -171,7 +221,7 @@ async function handleLogout() {
 
 .home-entry:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
 }
 
 .home-entry__icon {
@@ -204,7 +254,7 @@ async function handleLogout() {
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(51, 177, 255, 0.1);
+  background: var(--uikit-bg-active, rgba(51, 177, 255, 0.1));
   color: var(--uikit-primary-color);
 }
 

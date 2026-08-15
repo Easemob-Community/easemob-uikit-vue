@@ -68,7 +68,7 @@ function handleBuy() {
 .live-product {
   flex-shrink: 0;
   padding: 8px 12px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base, #fff));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
 }
 

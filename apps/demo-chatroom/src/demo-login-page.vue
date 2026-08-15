@@ -215,7 +215,7 @@ async function handleLogin() {
   padding: 28px 24px;
   border-radius: 12px;
   background: var(--uikit-bg-base, #fff);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--uikit-shadow, 0 6px 16px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.1));
   border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
 }
 

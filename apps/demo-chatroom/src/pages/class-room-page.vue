@@ -102,7 +102,7 @@ function handleJoinError(error: unknown) {
   padding: 24px 20px;
   border-radius: 12px;
   border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.08));
-  background: var(--uikit-bg-panel, #fff);
+  background: var(--uikit-bg-elevated, #fff);
   display: flex;
   flex-direction: column;
   gap: 10px;

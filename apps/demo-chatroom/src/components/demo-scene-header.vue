@@ -33,7 +33,7 @@ function goHome() {
   height: 48px;
   padding: 0 12px;
   flex-shrink: 0;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base, #fff));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
 }
 

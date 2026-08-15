@@ -256,7 +256,7 @@ const signalRooms = computed(() => {
   padding: 24px 20px;
   border-radius: 12px;
   border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.08));
-  background: var(--uikit-bg-panel, #fff);
+  background: var(--uikit-bg-elevated, #fff);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -318,7 +318,7 @@ const signalRooms = computed(() => {
 .live-page__signal {
   flex-shrink: 0;
   padding: 6px 12px 8px;
-  background: var(--uikit-bg-panel, var(--uikit-bg-base, #fff));
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
   border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
 }
 
@@ -332,7 +332,7 @@ const signalRooms = computed(() => {
   font-size: 11px;
   padding: 1px 6px;
   border-radius: 4px;
-  background: rgba(51, 177, 255, 0.1);
+  background: var(--uikit-bg-active, rgba(51, 177, 255, 0.1));
   color: var(--uikit-primary-color);
 }
 
