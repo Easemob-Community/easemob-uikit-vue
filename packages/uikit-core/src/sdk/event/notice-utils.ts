@@ -1,7 +1,8 @@
 import type { UserInfo } from 'easemob-websdk'
 import { MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
 import type { ConversationTypeValue, NoticeEventTypeValue } from '../../constants'
-import { t } from '../../locale'
+// 引擎层禁 vue：locale 纯逻辑在 locale/messages.ts（零 vue），勿改回 '../../locale'
+import { t } from '../../locale/messages'
 import type { UiMessage, UiNoticeMessage } from '../types'
 
 /**

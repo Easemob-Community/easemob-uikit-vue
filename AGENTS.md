@@ -72,7 +72,7 @@
 - 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
-- 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用）
+- 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）
 - 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）

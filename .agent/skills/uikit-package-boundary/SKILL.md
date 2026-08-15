@@ -63,6 +63,11 @@ uikit-chatroom（聊天室）───┘
 - sdk 基座：`sdk/client.ts`（`UIKitClient` / `ManagerHost`，含 `chatRoomManager`）、
   `sdk/types*`（wire 类型）、`sdk/domain/user-info-domain.ts`、`presence-domain.ts`、
   `sdk/event/connection-events.ts`、`sdk/event/notice-utils.ts`
+  - **manager 依赖注入规则**：core 不静态 import 任何 SDK manager 类（websdk 5.x
+    sideEffects:false + 按 manager 分 subpath，静态 import 会让所有场景的消费者无法
+    tree-shake 无关 manager 代码）；`ClientConfig.managers` 由场景包 Provider 注入
+    （未注入构造抛错），场景默认值经 core provider 的 `resolveClientConfig` 钩子在
+    `setupClient` 统一补齐（auto-init 与 `useClient().init()` 延迟初始化同一漏斗）。
 - store：`client / theme / user-info / presence`
 - composables：`useClient / useTheme / useUserInfo / useOwnUserInfo / usePresence /
   useToast / useNotification / useH5Adaptation / useKeyboard / useLongPress /
@@ -122,6 +127,13 @@ uikit-chatroom（聊天室）───┘
 
 - core 禁止 import 任何场景包（`@easemob/uikit-im` / `@easemob/uikit-chatroom` /
   相对越界），门禁 `packages/uikit-core/scripts/check-core-isolation.mjs` 挂在 core build 前置；
+- **core 引擎层（`sdk/`、`constants/`、`utils/`）保持纯 TS**：禁止值 import
+  `vue`/`pinia`/`@vueuse/*` 及相对路径进入 Vue 层模块（store/composables/components/
+  containers/locale 除 `locale/messages` 外），门禁
+  `packages/uikit-core/scripts/check-engine-isolation.mjs` 挂在 core build 前置；
+  locale 纯逻辑（`t`/`mergeLocaleMessages`/`findLocaleKey`）在 `locale/messages.ts`
+  （零 vue），组件/composable 的响应式翻译走 `useLocale`（`locale/use-locale.ts`）；
+  引擎层是未来跨端 uikit（uniapp/小程序等）可复用的部分，勿把 vue 依赖长进去；
 - 场景包之间禁止互相依赖（chatroom 只允许依赖 core）；
 - core 的公共导出一旦发布（1.0.0 起）删改视为 breaking，需 major 版本；
 - im 侧引用 core 一律经 `@easemob/uikit-core` 裸 specifier，禁止相对路径进 core src。
@@ -136,7 +148,11 @@ uikit-chatroom（聊天室）───┘
 
 - 三包架构与 P1 抽核记录：根 `CHATROOM-UIKIT-DESIGN.md`（第四节边界清单）与
   `CORE-MIGRATION-CHECKLIST.md`（一次性迁移文档，判定以本 skill 为准）；
-- 治理登记：`TECH-DEBT.md` D97（三包架构规划）与 D99（包边界治理：本 skill + 门禁）；
+- 治理登记：`TECH-DEBT.md` D97（三包架构规划）与 D99（包边界治理：本 skill + 门禁）、
+  D100（引擎层纯 TS 门禁 + domain 类型接口化待办）；
+- 引擎层对 Vue 层 store/composables 的类型级引用（`import type { UserInfoStore }` /
+  `UIKitDataSource`）已被门禁放行（运行时擦除），属已知漂移，改到 domain 时顺手
+  接口化（`UserInfoStoreLike` / `DataSourceLike`），见 TECH-DEBT D100；
 - chatroom 包（P2 起）落地后，§3 清单需补 chatroom 侧现状。
 
 ## 反面清单

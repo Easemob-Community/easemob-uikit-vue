@@ -871,6 +871,17 @@
 - **验证**：门禁脚本 pass/fail 双向通过；core build 前置挂载后重跑构建正常。
 - **关联 skill**：`uikit-package-boundary` / `uikit-skill-authoring` / `uikit-lint-governance`
 
+### [ ] D100. core 引擎层（sdk/constants/utils）保持纯 TS：门禁落地 + domain 类型接口化待办
+
+- **背景**：评估 core 对未来跨端 uikit（uniapp / 微信小程序等）的可复用性后确认：组件层必然重写（渲染链不兼容）、composable 大半重写（DOM 类失效），可复用的是纯 TS 引擎层（sdk 基座 / domain / constants / utils / locale 纯逻辑）。但当时引擎层存在一条间接 vue 运行时依赖：`sdk/event/notice-utils.ts` 值 import `locale/index.ts`（后者 import vue），ESM 模块级依赖使「引擎层零 vue」承诺失效。
+- **落地（2026-08-15）**：
+  1. locale 拆层：`locale/messages.ts`（纯 TS：文案存储/`t`/`setLocale`/`mergeLocaleMessages`/`findLocaleKey`，零 vue）+ `locale/use-locale.ts`（Vue 响应式适配 `useLocale`，内部 ref + 订阅同步 + `onScopeDispose` 清理，行为与原实现一致）+ `locale/index.ts` 公共 API 面不变（`useLocale` / `t` / `createLocale` / `mergeLocaleMessages` / `findLocaleKey` / type / zh-CN / en）；
+  2. `notice-utils.ts` 改从 `../../locale/messages` 引入 `t`（引擎层零 vue 达成）；
+  3. 新增门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs` 挂 core build 前置：扫描 `src/sdk` / `src/constants` / `src/utils`，禁值 import `vue`/`pinia`/`@vueuse/*` 及相对路径进入 Vue 层模块（store/composables/components/containers/locale 除 messages 外）；`import type` 放行（运行时擦除）；DOM API（download/log-store）属平台适配点不拦。
+- **已知漂移（放行项，后续可接口化）**：`sdk/domain/user-info-domain.ts` / `presence-domain.ts` 对 Vue 层 store/composables 的类型级引用（`import type { UserInfoStore }` / `UIKitDataSource`）运行时零依赖，但 .d.ts 会带 vue/pinia 类型——若未来跨端直接依赖 core 类型，需改为纯 TS 接口（`UserInfoStoreLike` / `DataSourceLike`）。
+- **验证**：门禁 pass/fail 双向通过（注入 `src/sdk/__probe_vue__.ts` 拦截、清理后恢复）；core build（门禁 + vite + vue-tsc）全绿；im / demo `vue-tsc --noEmit` 通过（`useLocale` 返回 `locale` 由 `ComputedRef` 变 `Ref`，无消费方显式标注类型，兼容）。
+- **关联 skill**：`uikit-package-boundary` / `uikit-release-build`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---
