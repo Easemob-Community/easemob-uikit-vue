@@ -1,4 +1,15 @@
 import type { ChatroomSceneConfig } from '../../composables/use-chatroom-scene'
+import type { SignalMessagePayload, SignalStatusPayload } from '../../sdk/event/chatroom-events'
+
+/** 信令房订阅配置（§5.9：静默订阅——不上屏不落桶，消息透传 signal-message） */
+export interface ChatroomSignalRoomConfig {
+  /** 信令房间 ID */
+  roomId: string
+  /** 是否拉取历史（默认 false：语义是订阅实时指令，历史回放由业务自调 API） */
+  pullHistory?: boolean
+  /** 断线重连是否自动重进（默认 true） */
+  autoRejoin?: boolean
+}
 
 /** EmChatroomContainer 对外 props（类型独立文件，供包入口 re-export） */
 export interface ChatroomContainerProps {
@@ -12,6 +23,11 @@ export interface ChatroomContainerProps {
   historyPageSize?: number
   /** 消息渲染列表封顶条数（默认 200，防大直播间刷屏） */
   maxMessages?: number
+  /**
+   * 信令房订阅列表（§5.9 多房间：1 个 UI 房 + N 个信令房；数组存在即多房，
+   * 不引入 isMultiChatroom 布尔）。信令房消息经 signal-message 透传，业务自行呈现。
+   */
+  signalRooms?: ChatroomSignalRoomConfig[]
 }
 
 /** EmChatroomContainer 对外 emits */
@@ -24,4 +40,8 @@ export interface ChatroomContainerEmits {
   (e: 'destroyed'): void
   /** 加入聊天室失败（错误已 toast，此事件供业务补充处理） */
   (e: 'join-error', error: unknown): void
+  /** 信令房消息透传（§5.9：UIKit 零渲染零假设，payload 为解码后的 UiMessage） */
+  (e: 'signal-message', payload: SignalMessagePayload): void
+  /** 信令房状态变化（joined/failed/kicked/destroyed；失败不拖累 UI 房） */
+  (e: 'signal-status', payload: SignalStatusPayload): void
 }

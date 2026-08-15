@@ -59,6 +59,10 @@ const {
   kickReason,
   join,
   leave,
+  joinSignalRoom,
+  leaveSignalRoom,
+  subscribeSignalMessages,
+  subscribeSignalStatus,
 } = useChatroom({
   historyPageSize: props.historyPageSize,
   maxMessages: props.maxMessages,
@@ -198,6 +202,38 @@ watch(
   },
 )
 
+/**
+ * 信令房订阅（§5.9：signal-rooms 数组存在即多房；join/离开按配置差量同步，
+ * 失败/终态降级为 signal-status 事件，不拖累 UI 房）。
+ */
+watch(
+  () => props.signalRooms,
+  (rooms, prev) => {
+    const prevIds = new Set((prev ?? []).map(r => r.roomId))
+    const nextIds = new Set((rooms ?? []).map(r => r.roomId))
+    // 移除已不在配置中的信令房
+    for (const id of prevIds) {
+      if (!nextIds.has(id))
+        void leaveSignalRoom(id).catch(() => {})
+    }
+    // 新增/仍在配置中的信令房：保证已加入
+    for (const config of rooms ?? []) {
+      void joinSignalRoom(config.roomId, {
+        pullHistory: config.pullHistory ?? false,
+        autoRejoin: config.autoRejoin ?? true,
+      }).catch(() => {
+        // 失败已降级为 signal-status（joinSignalRoom 内派发）
+      })
+    }
+  },
+  { immediate: true, deep: true },
+)
+
+/** 信令房消息透传 → signal-message 事件（容器与 headless 同一契约） */
+const stopSignalMessage = subscribeSignalMessages(payload => emit('signal-message', payload))
+/** 信令房状态 → signal-status 事件 */
+const stopSignalStatus = subscribeSignalStatus(payload => emit('signal-status', payload))
+
 /** 被踢/解散终态：事件出口（真实原因码，P2 review P1-2）+ 视图提示 */
 watch(
   () => status.value,
@@ -284,8 +320,12 @@ const visibleMessages = computed(() => {
   return filter ? messages.value.filter(filter) : messages.value
 })
 
-/** 容器卸载时自动退出房间（非终态；服务端成员资格不残留，P2 review P2-11） */
+/** 容器卸载：退信令房订阅 + 自动退出房间（非终态；服务端成员资格不残留，P2 review P2-11） */
 onUnmounted(() => {
+  stopSignalMessage()
+  stopSignalStatus()
+  for (const config of props.signalRooms ?? [])
+    void leaveSignalRoom(config.roomId).catch(() => {})
   if (status.value === CHATROOM_STATUS.JOINED || status.value === CHATROOM_STATUS.JOINING)
     void leave()
 })

@@ -1,5 +1,5 @@
 import type { ChatEventHandlerMap, ChatRoomEventHandlerMap, UserInfo } from 'easemob-websdk'
-import type { ConversationTypeValue, ManagerHost } from '@easemob/uikit-core'
+import type { ConversationTypeValue, ManagerHost, UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_TYPE, createLogger, createNoticeMessage, resolveNoticeUserName, t } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import { toChatroom, toChatroomMuteItem } from '../domain/chatroom-domain'
@@ -18,12 +18,53 @@ export interface ChatroomEventStores {
   }
 }
 
-/** 房间终态事件回调（供 Provider/容器弹 toast 或通知接入方） */
+/** 房间终态事件回调（供 Provider/容器弹 toast 或通知接入方；interact 房） */
 export interface ChatroomEventCallbacks {
   /** 当前用户被移出聊天室（reason 为 SDK 原因码） */
   onKicked?: (reason: number) => void
   /** 聊天室被解散 */
   onDestroyed?: () => void
+}
+
+/** 信令房消息透传 payload（§5.9：UIKit 零渲染零假设，业务经回调自行呈现） */
+export interface SignalMessagePayload {
+  roomId: string
+  message: UiMessage
+}
+
+/** 信令房状态 payload（join 失败 / 被踢 / 解散降级回调，不拖累 UI 房） */
+export interface SignalStatusPayload {
+  roomId: string
+  status: 'joined' | 'failed' | 'kicked' | 'destroyed'
+  error?: unknown
+}
+
+/** 信令房消息/状态分发器（模块级监听器集合；useChatroom 注册，容器与 headless 同一契约） */
+const signalMessageListeners = new Set<(payload: SignalMessagePayload) => void>()
+const signalStatusListeners = new Set<(payload: SignalStatusPayload) => void>()
+
+/** 订阅信令房消息透传（返回取消订阅函数） */
+export function subscribeSignalMessages(listener: (payload: SignalMessagePayload) => void): () => void {
+  signalMessageListeners.add(listener)
+  return () => signalMessageListeners.delete(listener)
+}
+
+/** 订阅信令房状态变化（返回取消订阅函数） */
+export function subscribeSignalStatus(listener: (payload: SignalStatusPayload) => void): () => void {
+  signalStatusListeners.add(listener)
+  return () => signalStatusListeners.delete(listener)
+}
+
+/** 分发信令房消息（无订阅者时静默丢弃——业务未消费即不关心，§5.10「透传回调」语义） */
+function dispatchSignalMessage(payload: SignalMessagePayload) {
+  for (const listener of signalMessageListeners)
+    listener(payload)
+}
+
+/** 分发信令房状态（房间终态 + useChatroom.joinSignalRoom 的 joined/failed） */
+export function dispatchSignalStatus(payload: SignalStatusPayload) {
+  for (const listener of signalStatusListeners)
+    listener(payload)
 }
 
 // core notice 工具的 conversationType 形参是 core 的 ConversationTypeValue（单群聊场景联合），
@@ -67,16 +108,24 @@ export function registerChatroomEventHandlers(
   callbacks: ChatroomEventCallbacks = {},
 ): () => void {
   /**
-   * 仅处理活动房间的事件（两层建模：成员/禁言/公告/属性等管理态只对 UI 房开放，
-   * 见设计文档 §5.9；信令房 P3 订阅，不参与管理态）。
+   * 仅处理活动房间的管理事件（两层建模：成员/禁言/公告/属性等管理态只对 UI 房开放，
+   * 见设计文档 §5.9；信令房不参与管理态，仅消息透传 + 终态降级回调）。
    */
   const isActiveRoom = (chatRoomId: string) => stores.chatroom.roomId === chatRoomId
 
   const roomHandlers: ChatRoomEventHandlerMap = {
     onChatRoomDestroyed: (payload) => {
+      if (!stores.chatroom.isKnownRoom(payload.chatRoomId))
+        return
+      if (stores.chatroom.roomKind(payload.chatRoomId) === 'signal') {
+        // 信令房解散：降级为状态回调（不拖累 UI 房，§5.9）
+        dispatchSignalStatus({ roomId: payload.chatRoomId, status: 'destroyed' })
+        stores.chatroom.removeRoom(payload.chatRoomId)
+        return
+      }
       if (!isActiveRoom(payload.chatRoomId))
         return
-      stores.chatroom.markDestroyed()
+      stores.chatroom.markDestroyed(payload.chatRoomId)
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.destroyed'))
       callbacks.onDestroyed?.()
     },
@@ -94,10 +143,18 @@ export function registerChatroomEventHandlers(
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.memberExited', '', { name: memberNames(payload.members) }))
     },
     onRemovedFromChatRoom: (payload) => {
+      if (!stores.chatroom.isKnownRoom(payload.chatRoomId))
+        return
+      if (stores.chatroom.roomKind(payload.chatRoomId) === 'signal') {
+        // 信令房被移出：降级为状态回调（§5.9）
+        dispatchSignalStatus({ roomId: payload.chatRoomId, status: 'kicked', error: payload.reason })
+        stores.chatroom.removeRoom(payload.chatRoomId)
+        return
+      }
       if (!isActiveRoom(payload.chatRoomId))
         return
       // 记录 SDK 原因码，容器 kicked 事件透传给业务（P2 review P1-2）
-      stores.chatroom.markKicked(payload.reason)
+      stores.chatroom.markKicked(payload.chatRoomId, payload.reason)
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.kicked'))
       callbacks.onKicked?.(payload.reason)
     },
@@ -182,23 +239,29 @@ export function registerChatroomEventHandlers(
 
   const chatHandlers: ChatEventHandlerMap = {
     onMessage: (message) => {
-      // 仅聊天室消息 + 仅已登记房间（两层建模：注册表内任意房间的消息都入对应桶，
-      // 活动房间由 composable 视图消费；未登记房间的广播不消费）；CMD 透传消息不上屏
+      // 仅聊天室消息 + 仅已登记房间（未登记房间的广播不消费）；CMD 透传消息不上屏
       if (message.conversationType !== CHATROOM_CONVERSATION_TYPE.CHATROOM)
         return
       if (!stores.chatroom.isKnownRoom(message.conversationId))
         return
       if (message.type === MESSAGE_TYPE.CMD)
         return
-      // 入接收缓冲队列，按窗口批量合并进渲染列表（接收侧渲染节流）
-      stores.chatroomMessage.enqueueMessages(message.conversationId, [
-        toChatroomUiMessage(message, stores.client.currentUser),
-      ])
+      const uiMessage = toChatroomUiMessage(message, stores.client.currentUser)
+      if (stores.chatroom.roomKind(message.conversationId) === 'signal') {
+        // 信令房：只透传不出屏（不进桶不渲染，§5.9/§5.10；业务经订阅自行呈现）
+        dispatchSignalMessage({ roomId: message.conversationId, message: uiMessage })
+        return
+      }
+      // UI 房：入接收缓冲队列，按窗口批量合并进渲染列表（接收侧渲染节流）
+      stores.chatroomMessage.enqueueMessages(message.conversationId, [uiMessage])
     },
     onMessageRecalled: (payload) => {
       if (payload.conversationType !== CHATROOM_CONVERSATION_TYPE.CHATROOM)
         return
       if (!stores.chatroom.isKnownRoom(payload.conversationId))
+        return
+      // 信令房撤回：透传 message 不可得（只有 messageId），状态回调降级
+      if (stores.chatroom.roomKind(payload.conversationId) === 'signal')
         return
       stores.chatroomMessage.markRecalled(payload.conversationId, payload.messageId)
     },

@@ -87,7 +87,10 @@ export { default as EmChatroomContainer } from './containers/chatroom-container/
 export type {
   ChatroomContainerProps,
   ChatroomContainerEmits,
+  ChatroomSignalRoomConfig,
 } from './containers/chatroom-container/types'
+// 信令房透传/状态 payload（P3 多房间订阅，§5.9）
+export type { SignalMessagePayload, SignalStatusPayload } from './sdk/event/chatroom-events'
 
 // locale 文案表（供业务方查阅/二次合并）
 export { chatroomLocaleZhCN, chatroomLocaleEn } from './locale'

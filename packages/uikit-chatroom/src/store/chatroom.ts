@@ -11,6 +11,8 @@ import type { Chatroom, ChatroomAttributes, ChatroomMember, ChatroomMuteItem } f
  * 异常终态：kicked（被移出）/ destroyed（房间解散），均由房间事件驱动。
  */
 export interface ChatroomRoomState {
+  /** 房间类型：interact UI 房（完整容器语义）/ signal 信令房（静默订阅，§5.9） */
+  kind: 'interact' | 'signal'
   /** 房间状态机 */
   status: ChatroomStatusValue
   /** 房间 ID（注册表 key） */
@@ -34,6 +36,8 @@ export interface ChatroomRoomState {
   joinToken: number
   /** 断线前处于 joined：连接恢复后需自动重进（useChatroom 装配消费） */
   pendingRejoin: boolean
+  /** 断线重连是否自动重进（信令房可配置 autoRejoin: false，§5.9） */
+  autoRejoin: boolean
   /** 被移出房间的 SDK 原因码（onRemovedFromChatRoom 事件驱动；供容器 kicked 事件透传） */
   kickReason?: number
 }
@@ -44,8 +48,9 @@ export interface ChatroomRoomState {
  */
 let globalJoinToken = 0
 
-function createRoomState(roomId: string): ChatroomRoomState {
+function createRoomState(roomId: string, kind: 'interact' | 'signal' = 'interact'): ChatroomRoomState {
   return reactive({
+    kind,
     status: CHATROOM_STATUS.IDLE,
     roomId,
     info: null,
@@ -58,6 +63,7 @@ function createRoomState(roomId: string): ChatroomRoomState {
     attributes: {},
     joinToken: 0,
     pendingRejoin: false,
+    autoRejoin: true,
     kickReason: undefined,
   })
 }
@@ -102,11 +108,11 @@ export const useChatroomStore = defineStore('chatroom', () => {
 
   // ===== 注册表原语 =====
 
-  /** 取指定房间状态（不存在时创建并登记，用于承载 joinToken / 竞态校验） */
-  function ensureRoom(id: string): ChatroomRoomState {
+  /** 取指定房间状态（不存在时创建并登记；kind 仅在首次创建时生效，用于承载 joinToken / 竞态校验） */
+  function ensureRoom(id: string, kind: 'interact' | 'signal' = 'interact'): ChatroomRoomState {
     let room = rooms.get(id)
     if (!room) {
-      room = createRoomState(id)
+      room = createRoomState(id, kind)
       rooms.set(id, room)
     }
     return room
@@ -115,6 +121,11 @@ export const useChatroomStore = defineStore('chatroom', () => {
   /** 指定房间是否已在注册表（消息事件入桶 / 断线重连全量重进的判定依据） */
   function isKnownRoom(id: string): boolean {
     return rooms.has(id)
+  }
+
+  /** 指定房间的类型（未登记时视为 interact） */
+  function roomKind(id: string): 'interact' | 'signal' {
+    return rooms.get(id)?.kind ?? 'interact'
   }
 
   /** 领取指定房间的 join 令牌（每次 join 调用一次；取全局单调计数器，重建不回退） */
@@ -132,15 +143,22 @@ export const useChatroomStore = defineStore('chatroom', () => {
     return room.status === CHATROOM_STATUS.JOINING || room.status === CHATROOM_STATUS.JOINED
   }
 
+  /** UI 房进入 joining（登记 + 切活动视图） */
   function setJoining(id: string) {
-    const room = ensureRoom(id)
+    const room = ensureRoom(id, 'interact')
     room.status = CHATROOM_STATUS.JOINING
     activeRoomId.value = id
   }
 
-  /** join 成功落地（调用前须过 isCurrentJoin 校验）；作用于活动房间 */
-  function setJoined(roomInfo: Chatroom | null) {
-    const room = activeRoom.value
+  /** 信令房进入 joining（登记为 signal，不切活动视图——静默订阅，§5.9） */
+  function setSignalJoining(id: string) {
+    const room = ensureRoom(id, 'signal')
+    room.status = CHATROOM_STATUS.JOINING
+  }
+
+  /** join 成功落地（调用前须过 isCurrentJoin 校验）；作用于指定房间（interact 即活动房间） */
+  function setJoined(id: string, roomInfo: Chatroom | null) {
+    const room = rooms.get(id)
     if (!room)
       return
     room.status = CHATROOM_STATUS.JOINED
@@ -151,17 +169,24 @@ export const useChatroomStore = defineStore('chatroom', () => {
     }
   }
 
-  function setLeaving() {
-    const room = activeRoom.value
+  /** 注册表内所有 joined 房间条目（断线重连全量重进与信令房状态跟踪用，§5.9） */
+  const joinedRoomEntries = computed(() =>
+    [...rooms.values()]
+      .filter(room => room.status === CHATROOM_STATUS.JOINED)
+      .map(room => ({ roomId: room.roomId, kind: room.kind, pendingRejoin: room.pendingRejoin, autoRejoin: room.autoRejoin })),
+  )
+
+  function setLeaving(id?: string) {
+    const room = id ? rooms.get(id) : activeRoom.value
     if (!room)
       return
     if (room.status === CHATROOM_STATUS.JOINED || room.status === CHATROOM_STATUS.JOINING)
       room.status = CHATROOM_STATUS.LEAVING
   }
 
-  /** 被移出房间（onRemovedFromChatRoom 事件驱动）；作用于活动房间，记录 SDK 原因码 */
-  function markKicked(reason?: number) {
-    const room = activeRoom.value
+  /** 被移出房间（onRemovedFromChatRoom 事件驱动）；作用于指定房间，记录 SDK 原因码 */
+  function markKicked(id: string, reason?: number) {
+    const room = rooms.get(id)
     if (!room)
       return
     room.status = CHATROOM_STATUS.KICKED
@@ -169,9 +194,9 @@ export const useChatroomStore = defineStore('chatroom', () => {
     room.kickReason = reason
   }
 
-  /** 房间解散（onChatRoomDestroyed 事件驱动）；作用于活动房间 */
-  function markDestroyed() {
-    const room = activeRoom.value
+  /** 房间解散（onChatRoomDestroyed 事件驱动）；作用于指定房间 */
+  function markDestroyed(id: string) {
+    const room = rooms.get(id)
     if (!room)
       return
     room.status = CHATROOM_STATUS.DESTROYED
@@ -301,6 +326,18 @@ export const useChatroomStore = defineStore('chatroom', () => {
     room.muteList = room.muteList.filter(i => !ids.has(i.userId))
   }
 
+  /** 指定房间状态机值（未登记回落 idle） */
+  function roomStatus(id: string): ChatroomStatusValue {
+    return rooms.get(id)?.status ?? CHATROOM_STATUS.IDLE
+  }
+
+  /** 设置指定房间的断线重进标记（信令房 join 时经 autoRejoin 配置） */
+  function setRoomPendingRejoin(id: string, value: boolean) {
+    const room = rooms.get(id)
+    if (room)
+      room.pendingRejoin = value
+  }
+
   function setPendingRejoin(value: boolean) {
     const room = activeRoom.value
     if (room)
@@ -311,12 +348,15 @@ export const useChatroomStore = defineStore('chatroom', () => {
     // 注册表原语
     ensureRoom,
     isKnownRoom,
+    roomKind,
     nextJoinToken,
     isCurrentJoin,
     removeRoom,
     // 状态机
     setJoining,
+    setSignalJoining,
     setJoined,
+    joinedRoomEntries,
     setLeaving,
     markKicked,
     markDestroyed,
@@ -353,6 +393,8 @@ export const useChatroomStore = defineStore('chatroom', () => {
     setMuteList,
     addMuteItems,
     removeMuteItemsByIds,
+    roomStatus,
+    setRoomPendingRejoin,
     setPendingRejoin,
   }
 })

@@ -3,6 +3,7 @@ import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
+import { dispatchSignalStatus, subscribeSignalMessages, subscribeSignalStatus } from '../sdk/event/chatroom-events'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -171,7 +172,7 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       const info = await adapter.getChatroomInfo(id).catch(() => null)
       if (!chatroomStore.isCurrentJoin(token, id))
         return
-      chatroomStore.setJoined(info ?? { id, name: id })
+      chatroomStore.setJoined(id, info ?? { id, name: id })
       // 封顶条数按房间生效（P2 review P1-4：去掉模块级默认改写，避免跨实例污染）
       if (options.maxMessages !== undefined)
         messageStore.setMaxMessages(id, options.maxMessages)
@@ -207,7 +208,7 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       chatroomStore.removeRoom(id)
       return
     }
-    chatroomStore.setLeaving()
+    chatroomStore.setLeaving(id)
     try {
       await adapter.leaveChatRoom(id)
     }
@@ -218,22 +219,98 @@ export function useChatroom(options: UseChatroomOptions = {}) {
     chatroomStore.removeRoom(id)
   }
 
-  // 断线重连自动重进：connected false→true 且断线前处于 joined 时重新 join 活动房间。
+  /**
+   * 加入信令房（§5.9 多房间订阅：静默订阅——不上屏、不落消息桶、不切活动视图）。
+   * - join 显式 `leaveOtherRooms: false`（与 UI 房并行，不会互踢）；
+   * - 默认不拉历史（`pullHistory: true` 时拉最近 N 条）；autoRejoin 控制断线重连是否自动重进；
+   * - 失败/被踢/解散降级为状态回调（subscribeSignalStatus），不拖累 UI 房。
+   */
+  async function joinSignalRoom(
+    roomId: string,
+    options: { pullHistory?: boolean, autoRejoin?: boolean } = {},
+  ): Promise<void> {
+    if (!roomId)
+      throw new Error('[UIKit:Chatroom] joinSignalRoom: roomId 不能为空')
+    const joining = chatroomStore.roomStatus(roomId)
+    if (joining === CHATROOM_STATUS.JOINING || joining === CHATROOM_STATUS.JOINED)
+      return
+    const token = chatroomStore.nextJoinToken(roomId)
+    chatroomStore.setSignalJoining(roomId)
+    if (chatroomStore.roomKind(roomId) === 'signal') {
+      const room = chatroomStore.ensureRoom(roomId, 'signal')
+      room.autoRejoin = options.autoRejoin ?? true
+    }
+    try {
+      // 信令房与 UI 房并行：leaveOtherRooms 必须为 false（§5.9）
+      await withJoinTimeout(
+        adapter.joinChatRoom(roomId, undefined, false),
+        () => {
+          if (chatroomStore.roomStatus(roomId) === CHATROOM_STATUS.JOINING && chatroomStore.joinToken === token)
+            chatroomStore.nextJoinToken(roomId)
+        },
+      )
+      if (!chatroomStore.isCurrentJoin(token, roomId))
+        return
+      // 信令房不拉详情（静默订阅）；历史按配置可选
+      chatroomStore.setJoined(roomId, { id: roomId, name: roomId })
+      if (options.pullHistory) {
+        await loadHistory(roomId).catch(() => {
+          // 信令房历史失败静默（业务可自行重试）
+        })
+      }
+      dispatchSignalStatus({ roomId, status: 'joined' })
+    }
+    catch (error) {
+      // 信令房失败降级：移除注册并派发 failed（不 toast——不打扰 UI 房交互）
+      if (chatroomStore.isKnownRoom(roomId) && chatroomStore.roomKind(roomId) === 'signal')
+        chatroomStore.removeRoom(roomId)
+      dispatchSignalStatus({ roomId, status: 'failed', error })
+      throw error
+    }
+  }
+
+  /** 退出信令房（服务端失败静默清理） */
+  async function leaveSignalRoom(roomId: string): Promise<void> {
+    if (!chatroomStore.isKnownRoom(roomId))
+      return
+    chatroomStore.nextJoinToken(roomId)
+    chatroomStore.setLeaving(roomId)
+    try {
+      await adapter.leaveChatRoom(roomId)
+    }
+    catch {
+      // 信令房退出失败不打扰 UI 房
+    }
+    messageStore.clearBucket(roomId)
+    chatroomStore.removeRoom(roomId)
+  }
+
+  // 断线重连自动重进（§5.9 全量重进）：断线时标记全部 joined 房间，
+  // 重连后按注册表逐一重进（interact 恢复活动房；signal 恢复静默订阅，autoRejoin 控制）。
   // 多个组件同时调用 useChatroom 会各装一个 watcher，重连时 join 去重逻辑保证只生效一次；
   // 组件内由 Vue 随卸载自动停止，headless 场景经 dispose() 手动释放（P2 review P1-5）。
-  // （P3 多房间订阅扩展为按注册表全量重进，见设计文档 §5.9。）
   const stopRejoinWatch = watch(() => ctx.stores.client.connected, (connected, prev) => {
-    if (!connected && chatroomStore.isJoined) {
-      chatroomStore.setPendingRejoin(true)
+    if (!connected) {
+      for (const entry of chatroomStore.joinedRoomEntries)
+        chatroomStore.setRoomPendingRejoin(entry.roomId, true)
       return
     }
-    if (connected && prev === false && chatroomStore.pendingRejoin && chatroomStore.roomId) {
-      const target = chatroomStore.roomId
-      messageStore.clearBucket(target)
-      chatroomStore.removeRoom(target)
-      void join(target).catch(() => {
-        // 重进失败已 toast（join 内部处理），保持 idle 态由业务方决定是否重试
-      })
+    if (connected && prev === false) {
+      const pending = chatroomStore.joinedRoomEntries.filter(entry => entry.pendingRejoin && entry.autoRejoin)
+      for (const entry of pending) {
+        messageStore.clearBucket(entry.roomId)
+        chatroomStore.removeRoom(entry.roomId)
+        if (entry.kind === 'signal') {
+          void joinSignalRoom(entry.roomId).catch(() => {
+            // 信令房重进失败已降级为 status 回调
+          })
+        }
+        else {
+          void join(entry.roomId).catch(() => {
+            // 重进失败已 toast（join 内部处理），保持 idle 态由业务方决定是否重试
+          })
+        }
+      }
     }
   })
 
@@ -248,6 +325,12 @@ export function useChatroom(options: UseChatroomOptions = {}) {
     join,
     leave,
     loadHistory,
+    joinSignalRoom,
+    leaveSignalRoom,
+    /** 订阅信令房消息透传（§5.9：payload { roomId, message }；返回取消订阅函数） */
+    subscribeSignalMessages,
+    /** 订阅信令房状态（joined/failed/kicked/destroyed；返回取消订阅函数） */
+    subscribeSignalStatus,
     /** 释放内部 watcher（headless 无组件作用域时使用；组件内调用可忽略） */
     dispose: () => {
       stopRejoinWatch()

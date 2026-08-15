@@ -55,6 +55,11 @@ function createBucket(): ChatroomMessageBucket {
 export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
   /** 房间消息桶注册表（reactive Map：set/delete 原生响应） */
   const buckets = reactive(new Map<string, ChatroomMessageBucket>())
+  /**
+   * 桶级增量订阅者（headless 契约 §5.10：flush 批量通知，增量有序；订阅与渲染桶并行，
+   *  封顶 trim 只影响渲染列表，订阅者不丢消息）
+   */
+  const roomSubscribers = new Map<string, Set<(messages: UiMessage[]) => void>>()
 
   function ensureBucket(roomId: string): ChatroomMessageBucket {
     let bucket = buckets.get(roomId)
@@ -63,6 +68,36 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
       buckets.set(roomId, bucket)
     }
     return bucket
+  }
+
+  // ===== 增量订阅（headless，§5.10） =====
+
+  /**
+   * 订阅指定房间的消息增量：每次缓冲窗口 flush 时批量回调（增量有序），
+   * 与渲染桶并行（封顶/去重只影响渲染列表，订阅者拿到完整增量，可自行决定丢帧）。
+   * 返回取消订阅函数。
+   */
+  function subscribe(roomId: string, listener: (messages: UiMessage[]) => void): () => void {
+    let set = roomSubscribers.get(roomId)
+    if (!set) {
+      set = new Set()
+      roomSubscribers.set(roomId, set)
+    }
+    set.add(listener)
+    return () => {
+      set!.delete(listener)
+      if (set!.size === 0)
+        roomSubscribers.delete(roomId)
+    }
+  }
+
+  /** flush 后批量通知订阅者（无订阅者零开销） */
+  function notifySubscribers(roomId: string, messages: UiMessage[]) {
+    const set = roomSubscribers.get(roomId)
+    if (!set || set.size === 0)
+      return
+    for (const listener of set)
+      listener(messages)
   }
 
   // ===== 读（按 roomId） =====
@@ -152,6 +187,8 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
       return
     bucket.messages = [...bucket.messages, ...fresh]
     trimToCap(bucket)
+    // 增量订阅（headless）：渲染桶 trim 不影响订阅者（§5.10 无消费者不丢消息）
+    notifySubscribers(roomId, fresh)
   }
 
   /** 前插历史消息（进房拉取 / 向上翻页），按 msgServerId 去重 */
@@ -225,6 +262,7 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
       bucket.flushTimer = null
     }
     buckets.delete(roomId)
+    roomSubscribers.delete(roomId)
   }
 
   /** 清空全部消息桶（logout） */
@@ -244,6 +282,7 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
     loadingHistoryFor,
     historyHasMoreFor,
     historyCursorFor,
+    subscribe,
     addMessage,
     enqueueMessages,
     flushBuffer,

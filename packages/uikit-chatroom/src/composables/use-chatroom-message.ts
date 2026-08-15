@@ -1,7 +1,8 @@
 import { computed } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
+import type { UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_STATUS, extractSdkErrorReason, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
-import { CHATROOM_MESSAGE_DEFAULTS } from '../constants'
+import { CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter, toChatroomUiMessage } from '../sdk/adapter/chatroom-adapter'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
@@ -56,7 +57,13 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
     }
   }
 
-  function requireRoomId(): string {
+  /** 校验目标房间可发送：缺省用活动房间（须 joined）；显式 roomId（信令房）须已加入 */
+  function requireRoomId(target?: string): string {
+    if (target) {
+      if (!chatroomStore.isKnownRoom(target) || chatroomStore.roomStatus(target) !== CHATROOM_STATUS.JOINED)
+        throw new Error(`[UIKit:Chatroom] 目标房间 ${target} 未加入，无法发送消息`)
+      return target
+    }
     const id = chatroomStore.roomId
     if (!id || !chatroomStore.isJoined)
       throw new Error('[UIKit:Chatroom] 未加入聊天室，无法发送消息')
@@ -68,13 +75,13 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
    * 显式指定 roomId 可发往信令房（P3 多房间订阅，见设计文档 §5.9），发送节流按房间独立统计。
    */
   function sendText(content: string, options: { ext?: Record<string, unknown>, roomId?: string } = {}) {
-    const target = options.roomId ?? requireRoomId()
+    const target = requireRoomId(options.roomId)
     return send(adapter.createTextMessage(target, content, options.ext), target)
   }
 
   /** 发送图片消息（data 为 File 或已上传的 URL） */
   function sendImage(data: File | string, options: { ext?: Record<string, unknown>, roomId?: string } = {}) {
-    const target = options.roomId ?? requireRoomId()
+    const target = requireRoomId(options.roomId)
     return send(adapter.createImageMessage(target, data, options.ext), target)
   }
 
@@ -84,7 +91,7 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
     params?: Record<string, string>,
     options: { ext?: Record<string, unknown>, roomId?: string } = {},
   ) {
-    const target = options.roomId ?? requireRoomId()
+    const target = requireRoomId(options.roomId)
     return send(adapter.createCustomMessage(target, event, params, options.ext), target)
   }
 
@@ -105,6 +112,15 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
     }
   }
 
+  /**
+   * 订阅活动房间消息增量（headless 契约 §5.10）：每次缓冲窗口 flush 批量回调，
+   * 增量有序；与渲染桶并行（封顶只影响渲染列表，订阅者不丢消息，丢帧由业务决定）。
+   * 返回取消订阅函数。
+   */
+  function subscribe(listener: (messages: UiMessage[]) => void): () => void {
+    return messageStore.subscribe(activeRoomId.value, listener)
+  }
+
   return {
     messages,
     historyLoaded,
@@ -114,5 +130,6 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
     sendImage,
     sendCustom,
     loadMoreHistory,
+    subscribe,
   }
 }
