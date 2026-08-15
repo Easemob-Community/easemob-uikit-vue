@@ -336,6 +336,13 @@ export function createChatHandlers(
     },
 
     onMessage: (sdkMsg) => {
+      // 聊天室广播消息由 @easemob/uikit-chatroom 场景包处理（两包同装隔离，TECH-DEBT D97）：
+      // SDK ChatManager 不按 chatType 分流，若不在此忽略，聊天室消息会流入 IM 的
+      // 会话/消息 store（按 conversationId 落库）与已读回执逻辑。
+      // 'chatRoom' 为 SDK wire 值（core CONVERSATION_TYPE 只覆盖单群聊；chatroom 包
+      // constants 同值定义，IM 侧不依赖 chatroom 包，保留字面量并保持对齐）。
+      if (sdkMsg.conversationType === 'chatRoom')
+        return
       // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
       // 仅处理 typing 相关 cmd，其余忽略。
       if (sdkMsg.type === MESSAGE_TYPE.CMD) {
@@ -454,6 +461,9 @@ export function createChatHandlers(
     },
 
     onMessageRecalled: (payload) => {
+      // 聊天室消息撤回由 chatroom 场景包处理（两包同装隔离，同 onMessage 的 chatRoom 过滤）
+      if (payload.conversationType === 'chatRoom')
+        return
       chatLog.info('onMessageRecalled', { messageId: payload.messageId })
       stores.message.recallMessage(payload.messageId, stores.client.currentUser)
       // 同步刷新会话列表最后一条消息摘要（当前会话由 chat.vue watch 处理，

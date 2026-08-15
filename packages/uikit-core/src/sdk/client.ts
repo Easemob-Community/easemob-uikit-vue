@@ -79,6 +79,54 @@ export function isSdkDebugEnabled(): boolean {
   return _sdkDebugEnabled
 }
 
+/**
+ * 最近一次成功传给 SDK 的规范化配置（不含 clientName/clientVersion 日志字段）。
+ *
+ * 背景：SDK `ChatClient` 是单例，第二次 `init` 时 `isSameConfig` 逐字段比较
+ * （appKey / enableSyncData 数组全等 / serviceConfig / enableUserInfoSync /
+ * deleteConversationOnGroupDestroyed / syncConversationListConfig / deviceId 等），
+ * 不一致直接抛 `ChatClient already initialized with different config`。
+ * 多场景包同装（IM + chatroom）各自 Provider 都会 init 一次，且场景默认值天然不同
+ * （IM 注入 `enableSyncData: ['conversation','contact','group']`，chatroom 不做场景化同步、
+ * 因未注入 GroupManager 需 `enableUserInfoSync: false`）——本缓存用于把后续 init
+ * 对齐到首次配置（幂等优先），避免同装即崩。
+ */
+let activeClientConfig: Omit<ClientConfig, 'clientName' | 'clientVersion'> | null = null
+
+/**
+ * 将本次 init 配置对齐到已初始化的 SDK 单例配置（两包同装硬性验收项，见 TECH-DEBT D97）：
+ * - appKey 不一致是真正的连接冲突，直接抛错；
+ * - **其余字段一律以首次初始化为准**（SDK 单例配置不可变，只有与首次全等才能复用实例）——
+ *   本次传入的不同值仅告警不覆盖（业务显式配置差异需要可见性）；
+ * - `managers` 例外：不参与 SDK `isSameConfig` 比较，SDK 会**追加注册**（同构造器去重复用），
+ *   因此各场景包仍只注入自己的 manager（tree-shake 约束不受影响）。
+ */
+function alignClientConfig(config: Omit<ClientConfig, 'clientName' | 'clientVersion'>): Omit<ClientConfig, 'clientName' | 'clientVersion'> {
+  const active = activeClientConfig
+  if (!active)
+    return config
+  if (config.appKey !== active.appKey) {
+    throw new Error(
+      `[UIKit] ClientConfig.appKey（${config.appKey}）与已初始化的 SDK 单例（${active.appKey}）不一致：`
+      + '同一应用内多个 UIKit 场景包必须使用同一个 appKey（SDK 连接与事件总线是全局单例）。',
+    )
+  }
+  const { managers: incomingManagers, ...rest } = config
+  const differing: string[] = []
+  for (const key of Object.keys(rest) as (keyof typeof rest)[]) {
+    if (JSON.stringify(rest[key]) !== JSON.stringify(active[key]))
+      differing.push(key)
+  }
+  if (differing.length > 0) {
+    log(
+      '[UIKit] SDK 已初始化，本次 init 配置以首次初始化为准（忽略字段：%s）。'
+      + '如需变更请先 logout 并刷新页面后重新初始化。',
+      differing.join(', '),
+    )
+  }
+  return { ...active, managers: incomingManagers }
+}
+
 // 注入 SDK 日志捕获模块的 debug 守卫，避免 capture 反向依赖本模块
 setSdkDebugGuard(() => _sdkDebugEnabled)
 
@@ -121,20 +169,19 @@ export class UIKitClient {
     }
     // 与 SDK 默认值保持一致：群组解散时自动删除本地群会话
     this._deleteConversationOnGroupDestroyed = sdkConfig.deleteConversationOnGroupDestroyed ?? true
-    this._client = SdkChatClient.init({
+    // 两包同装对齐：SDK 单例已初始化时以首次配置为准（见 alignClientConfig，TECH-DEBT D97）
+    const effectiveConfig = alignClientConfig({
       ...sdkConfig,
-      // 登录后自动同步的数据类型由场景包决定（IM 场景注入 conversation/contact/group；
-      // 聊天室场景无需任何同步），core 不做场景化默认值。
-      // enableSyncData: 见场景包注入
       // 启用用户资料同步增强：SDK 在消息链路中补齐发送者资料，
       // 并结合联系人备注、用户资料和群名片更新 ConversationItem.conversationName /
       // SessionMessageSnippet.sender，减少上层 patchConversationNames 的手动补全调用。
+      // （IM 场景默认开启；聊天室场景因未注入 GroupManager 需由场景包显式关闭）
       enableUserInfoSync: sdkConfig.enableUserInfoSync ?? true,
       managers: sdkConfig.managers,
-      // managers 为场景注入的宽类型（ReadonlyArray<ManagerRegistration<unknown>>），
-      // SDK 无法据此推断出具体 manager 映射，经 unknown 断言为完整 ManagerRegistry；
-      // 运行时字段存在性由场景包的注入列表保证（未注册的 manager 访问即 undefined，场景代码不使用）。
-    }) as unknown as SdkChatClient & ManagerRegistry
+    })
+    this._client = SdkChatClient.init(effectiveConfig) as unknown as SdkChatClient & ManagerRegistry
+    // init 成功后才记录为对齐基准（抛错时不污染缓存，重试仍以旧基准对齐）
+    activeClientConfig = effectiveConfig
 
     if (debug) {
       _sdkDebugEnabled = true
