@@ -128,11 +128,16 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       return
     }
 
-    const token = chatroomStore.nextJoinToken(id)
+    // 切换房间时先清理旧数据，再领令牌——顺序不能反：
+    // nextJoinToken 经 ensureRoom 创建/复用房间对象并递增其 joinToken，
+    // 若先领令牌再 reset（清空注册表），房间对象被销毁，setJoining 会重建
+    // 一个 joinToken 归零的新对象，导致 isCurrentJoin 令牌失配、join 静默丢弃、
+    // UI 永久卡「加入中」（两层建模重构引入，2026-08-15 修复）。
     if (chatroomStore.roomId !== id) {
       messageStore.clearBucket(id)
       chatroomStore.reset()
     }
+    const token = chatroomStore.nextJoinToken(id)
     chatroomStore.setJoining(id)
 
     try {
