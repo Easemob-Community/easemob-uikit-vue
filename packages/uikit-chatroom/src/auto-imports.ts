@@ -12,6 +12,9 @@
  */
 export const EasemobUIKitChatroomImports = {
   '@easemob/uikit-chatroom': [
+    'CLASS_ROOM_SCENE',
+    'LIVE_ROOM_SCENE',
+    'VOICE_ROOM_SCENE',
     'useChatroom',
     'useChatroomAttributes',
     'useChatroomMember',

@@ -5,9 +5,9 @@
  */
 import { computed } from 'vue'
 import { EmAvatar, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
-import { CHATROOM_MEMBER_ROLE } from '../../constants'
-import { useChatroomMember } from '../../composables/use-chatroom-member'
-import type { ChatroomMember } from '../../sdk/domain/chatroom-domain'
+import { CHATROOM_MEMBER_ROLE } from '../../../constants'
+import { useChatroomMember } from '../../../composables/use-chatroom-member'
+import type { ChatroomMember } from '../../../sdk/domain/chatroom-domain'
 
 export interface ChatroomMemberItemProps {
   /** 成员数据 */

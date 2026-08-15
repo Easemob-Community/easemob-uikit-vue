@@ -30,11 +30,13 @@ import { useChatroom } from '../../composables/use-chatroom'
 import { useChatroomMember } from '../../composables/use-chatroom-member'
 import { useChatroomMessage } from '../../composables/use-chatroom-message'
 import { useChatroomScene } from '../../composables/use-chatroom-scene'
-import ChatroomHeader from '../../modules/chatroom/chatroom-header.vue'
-import ChatroomInputBar from '../../modules/chatroom/chatroom-input-bar.vue'
-import ChatroomMemberPanel from '../../modules/chatroom/chatroom-member-panel.vue'
-import ChatroomMessageItem from '../../modules/chatroom/chatroom-message-item.vue'
-import ChatroomNoticeBanner from '../../modules/chatroom/chatroom-notice-banner.vue'
+import ChatroomHeader from '../../modules/chatroom/common/chatroom-header.vue'
+import ChatroomGiftBar from '../../modules/chatroom/live/chatroom-gift-bar.vue'
+import ChatroomInputBar from '../../modules/chatroom/common/chatroom-input-bar.vue'
+import ChatroomMicQueue from '../../modules/chatroom/voice/chatroom-mic-queue.vue'
+import ChatroomMemberPanel from '../../modules/chatroom/common/chatroom-member-panel.vue'
+import ChatroomMessageItem from '../../modules/chatroom/common/chatroom-message-item.vue'
+import ChatroomNoticeBanner from '../../modules/chatroom/common/chatroom-notice-banner.vue'
 import type { ChatroomContainerEmits, ChatroomContainerProps } from './types'
 
 const props = withDefaults(defineProps<ChatroomContainerProps>(), {
@@ -62,8 +64,40 @@ const {
   maxMessages: props.maxMessages,
 })
 const { messages, historyHasMore, loadingHistory, sendText, sendImage, loadMoreHistory } = useChatroomMessage()
-const { canManage, muteList, isInAllowlist } = useChatroomMember()
-const { features } = useChatroomScene(() => props.scene)
+const { canManage, muteList, isInAllowlist, updateAnnouncement } = useChatroomMember()
+const { sceneConfig, features } = useChatroomScene(() => props.scene)
+
+/** 场景主题 CSS 变量覆盖：应用到容器根元素（P3，设计文档 §5.5；卸载恢复） */
+const rootRef = ref<HTMLElement>()
+/** 已应用的覆盖变量（卸载时逐条恢复原值） */
+let appliedThemeOverrides: Record<string, string> = {}
+watch(
+  () => sceneConfig.value.themeOverrides,
+  (overrides) => {
+    const el = rootRef.value
+    if (!el)
+      return
+    // 恢复上一场景覆盖的变量
+    for (const key of Object.keys(appliedThemeOverrides))
+      el.style.removeProperty(key)
+    appliedThemeOverrides = {}
+    if (overrides) {
+      for (const [key, value] of Object.entries(overrides)) {
+        el.style.setProperty(key, value)
+        appliedThemeOverrides[key] = value
+      }
+    }
+  },
+  { immediate: true },
+)
+onUnmounted(() => {
+  const el = rootRef.value
+  if (el) {
+    for (const key of Object.keys(appliedThemeOverrides))
+      el.style.removeProperty(key)
+    appliedThemeOverrides = {}
+  }
+})
 
 /** 模板枚举常量（禁止模板内硬编码字符串） */
 const JOINING = CHATROOM_STATUS.JOINING
@@ -113,6 +147,24 @@ const inputDisabledHint = computed(() => {
 
 /** 成员面板开关 */
 const showMemberPanel = ref(false)
+
+/** 公告编辑（P3：owner/admin 经公告条编辑按钮打开） */
+const showAnnouncementEditor = ref(false)
+const announcementDraft = ref('')
+function openAnnouncementEditor() {
+  announcementDraft.value = announcement.value
+  showAnnouncementEditor.value = true
+}
+function saveAnnouncement() {
+  const content = announcementDraft.value.trim()
+  if (!content)
+    return
+  void updateAnnouncement(content).then(() => {
+    showAnnouncementEditor.value = false
+  }).catch(() => {
+    // 失败已由 useChatroomMember toast
+  })
+}
 /** 成员面板入口（场景配置开启成员列表时展示） */
 const memberPanelEnabled = computed(() => features.value.memberList !== 'none')
 const announcementEnabled = computed(() => features.value.announcement !== false)
@@ -245,7 +297,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="chatroom-container">
+  <div ref="rootRef" class="chatroom-container">
     <!-- 顶部栏（可整条覆盖） -->
     <slot name="header" :status="status" :room-info="roomInfo" :on-exit="handleExit">
       <ChatroomHeader
@@ -269,9 +321,23 @@ defineExpose({
     <!-- 工具条（header 与消息区之间，业务注入） -->
     <slot name="toolbar" :status="status" />
 
-    <!-- 公告条（场景配置开启时展示） -->
+    <!-- 礼物栏（P3：features.gift 开启时渲染，可整体覆盖；默认内置 GiftBar） -->
+    <slot v-if="features.gift" name="gift-bar" :disabled="inputDisabled">
+      <ChatroomGiftBar :disabled="inputDisabled" />
+    </slot>
+
+    <!-- 麦位栏（P3：features.micQueue 开启时渲染，可整体覆盖；默认内置 MicQueue） -->
+    <slot v-if="features.micQueue" name="mic-queue">
+      <ChatroomMicQueue />
+    </slot>
+
+    <!-- 公告条（场景配置开启时展示；owner/admin 可编辑，P3） -->
     <slot v-if="announcementEnabled" name="notice" :content="announcement">
-      <ChatroomNoticeBanner :content="announcement" />
+      <ChatroomNoticeBanner
+        :content="announcement"
+        :editable="canManage"
+        @edit="openAnnouncementEditor"
+      />
     </slot>
 
     <!-- 消息区 -->
@@ -328,19 +394,49 @@ defineExpose({
       />
     </slot>
 
-    <!-- 成员面板（可整体覆盖；场景配置 memberList !== 'none' 时可用） -->
+    <!-- 成员面板（可整体覆盖；场景配置 memberList !== 'none' 时可用；
+         mute-all-enabled 由场景 features.muteAll 驱动，P3） -->
     <slot
       v-if="memberPanelEnabled"
       name="member-panel"
       :show="showMemberPanel"
       :on-close="() => { showMemberPanel = false }"
     >
-      <ChatroomMemberPanel v-model:show="showMemberPanel">
+      <ChatroomMemberPanel
+        v-model:show="showMemberPanel"
+        :mute-all-enabled="features.muteAll === true"
+      >
         <template v-if="$slots['member-item']" #item="slotProps">
           <slot name="member-item" v-bind="slotProps" />
         </template>
       </ChatroomMemberPanel>
     </slot>
+
+    <!-- 公告编辑框（P3：owner/admin） -->
+    <EmPopup
+      v-model:show="showAnnouncementEditor"
+      position="center"
+      class="chatroom-container__announcement-editor"
+    >
+      <div class="chatroom-container__announcement-editor-body">
+        <div class="chatroom-container__announcement-editor-title">
+          {{ t('chatroom.ui.editAnnouncement') }}
+        </div>
+        <textarea
+          v-model="announcementDraft"
+          class="chatroom-container__announcement-editor-input"
+          :placeholder="t('chatroom.ui.announcementPlaceholder')"
+          rows="4"
+        />
+        <button
+          class="chatroom-container__announcement-editor-save"
+          :disabled="!announcementDraft.trim()"
+          @click="saveAnnouncement"
+        >
+          {{ t('chatroom.ui.save') }}
+        </button>
+      </div>
+    </EmPopup>
   </div>
 </template>
 

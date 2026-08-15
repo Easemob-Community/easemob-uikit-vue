@@ -1,5 +1,6 @@
-import { type MaybeRefOrGetter, computed, toValue } from 'vue'
+import { type MaybeRefOrGetter, computed, toValue, watch } from 'vue'
 import type { UiMessage } from '@easemob/uikit-core'
+import { MESSAGE_TYPE, getLocale, mergeLocaleMessages } from '@easemob/uikit-core'
 import { CHATROOM_SCENE_NAME } from '../constants'
 import type { ChatroomSceneNameValue } from '../constants'
 
@@ -26,16 +27,16 @@ export interface ChatroomSceneConfig {
     /** 消息过滤器（如语聊房过滤图片消息）；返回 false 不上屏 */
     messageFilter?: (message: UiMessage) => boolean
   }
-  /** 主题 CSS 变量覆盖 */
+  /** 主题 CSS 变量覆盖（容器根元素应用，如 '--uikit-primary-color': '#ff6b6b'） */
   themeOverrides?: Record<string, string>
-  /** 文案覆盖（key → 文案，并入 locale） */
+  /** 文案覆盖（key → 文案，经 core mergeLocaleMessages 并入当前语言包） */
   i18nOverrides?: Record<string, string>
 }
 
-/** 场景预设注册表（内置 preset 常量在 P2-2/P3 落地后经 registerChatroomScene 登记） */
+/** 场景预设注册表（内置 preset 在模块加载时登记；业务自定义场景共用此入口） */
 const sceneRegistry = new Map<string, ChatroomSceneConfig>()
 
-/** 注册场景预设（包内置 preset 与业务自定义场景共用此入口） */
+/** 注册场景预设（包内置 preset 与业务自定义场景共用此入口；同名覆盖） */
 export function registerChatroomScene(preset: ChatroomSceneConfig): void {
   sceneRegistry.set(preset.name, preset)
 }
@@ -49,6 +50,54 @@ const DEFAULT_SCENE: ChatroomSceneConfig = {
     announcement: true,
   },
 }
+
+/**
+ * 直播间 preset：全屏 + 礼物栏/礼物消息 + 成员弹层 + 公告 + 全员禁言入口。
+ */
+export const LIVE_ROOM_SCENE: ChatroomSceneConfig = {
+  name: CHATROOM_SCENE_NAME.LIVE,
+  layout: 'fullscreen',
+  features: {
+    gift: true,
+    memberList: 'popup',
+    announcement: true,
+    muteAll: true,
+  },
+}
+
+/**
+ * 语聊房 preset：全屏 + 麦位管理 + 成员面板 + 公告 + 全员禁言；
+ * messageFilter 过滤图片消息（语聊房以语音/文字互动为主，设计文档 §5.5 示例）。
+ */
+export const VOICE_ROOM_SCENE: ChatroomSceneConfig = {
+  name: CHATROOM_SCENE_NAME.VOICE,
+  layout: 'fullscreen',
+  features: {
+    micQueue: true,
+    memberList: 'panel',
+    announcement: true,
+    muteAll: true,
+    messageFilter: message => message.type !== MESSAGE_TYPE.IMAGE,
+  },
+}
+
+/**
+ * 小班课 preset：全屏 + 成员面板 + 公告（课堂纪律优先，无礼物/麦位）。
+ */
+export const CLASS_ROOM_SCENE: ChatroomSceneConfig = {
+  name: CHATROOM_SCENE_NAME.CLASS,
+  layout: 'fullscreen',
+  features: {
+    memberList: 'panel',
+    announcement: true,
+    muteAll: true,
+  },
+}
+
+// 内置 preset 登记（模块加载即注册，业务直接传 'live'/'voice'/'class' 生效）
+registerChatroomScene(LIVE_ROOM_SCENE)
+registerChatroomScene(VOICE_ROOM_SCENE)
+registerChatroomScene(CLASS_ROOM_SCENE)
 
 /**
  * 解析场景配置：字符串按注册表查找（未注册回落兜底场景），
@@ -74,13 +123,26 @@ export function resolveChatroomScene(
 }
 
 /**
- * 场景预设加载器（机制与类型先行；三个内置 preset 常量在 P2-2/P3 落地）。
- * EmChatroomContainer（P2-2）读取 config 条件渲染内置块，每个边界开命名插槽。
+ * 场景预设加载器：解析 scene prop → sceneConfig（含 features 视图）；
+ * i18nOverrides 变化时并入当前语言包（mergeLocaleMessages 覆盖式，同 key 后者生效；
+ * themeOverrides 由容器应用到根元素，headless 场景由业务自行消费 sceneConfig）。
+ * 容器（P2-2）读取 config 条件渲染内置块，每个边界开命名插槽。
  */
 export function useChatroomScene(scene?: MaybeRefOrGetter<string | Partial<ChatroomSceneConfig> | undefined>) {
   const sceneConfig = computed(() => resolveChatroomScene(toValue(scene)))
   const features = computed(() => sceneConfig.value.features)
   const layout = computed(() => sceneConfig.value.layout)
+
+  // i18nOverrides 应用：文案覆盖并入当前语言包（响应式：scene 变化重新合并；
+  // 覆盖语义为增量叠加，业务在 Provider 层面二次合并可精确控制）
+  watch(
+    () => sceneConfig.value.i18nOverrides,
+    (overrides) => {
+      if (overrides && Object.keys(overrides).length > 0)
+        mergeLocaleMessages(getLocale(), overrides)
+    },
+    { immediate: true },
+  )
 
   return {
     sceneConfig,

@@ -8,27 +8,31 @@
 import { computed, ref, watch } from 'vue'
 import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob/uikit-core'
 import type { ActionSheetItem } from '@easemob/uikit-core'
-import { CHATROOM_MEMBER_ROLE } from '../../constants'
-import { useChatroom } from '../../composables/use-chatroom'
-import { useChatroomMember } from '../../composables/use-chatroom-member'
-import type { ChatroomMember } from '../../sdk/domain/chatroom-domain'
-import ChatroomMemberItem from './chatroom-member-item.vue'
+import { CHATROOM_MEMBER_ROLE } from '../../../constants'
+import { useChatroom } from '../../../composables/use-chatroom'
+import { useChatroomMember } from '../../../composables/use-chatroom-member'
+import type { ChatroomMember } from '../../../sdk/domain/chatroom-domain'
+import ChatroomMemberItem from '../common/chatroom-member-item.vue'
 
 export interface ChatroomMemberPanelProps {
   /** 是否显示成员面板（v-model:show 受控，由容器 header 触发） */
   show: boolean
+  /** 是否展示全员禁言入口（场景 features.muteAll 驱动，P3） */
+  muteAllEnabled?: boolean
 }
 
 export interface ChatroomMemberPanelEmits {
   (e: 'update:show', value: boolean): void
 }
 
-const props = defineProps<ChatroomMemberPanelProps>()
+const props = withDefaults(defineProps<ChatroomMemberPanelProps>(), {
+  muteAllEnabled: false,
+})
 const emit = defineEmits<ChatroomMemberPanelEmits>()
 
 const { currentUser } = useClient()
 // 只消费公开 composable 契约（§5.10：禁止直取 store，P2 review P1-1）
-const { roomInfo } = useChatroom()
+const { roomInfo, isAllMuted } = useChatroom()
 const {
   members,
   membersHasMore,
@@ -42,12 +46,21 @@ const {
   kickMembers,
   addAdmin,
   removeAdmin,
+  muteAll,
+  unmuteAll,
+  loadBlocklist,
+  unblockMembers,
 } = useChatroomMember()
 
 /** 当前用户 ID（归一化，与成员列表 userId 比较口径一致，P2 review P2-3） */
 const selfId = computed(() => normalizeUserId(currentUser.value ?? ''))
 /** 在线人数（房间详情接口的当前人数，成员面板只展示已加载页） */
 const memberCount = computed(() => roomInfo.value?.memberCount ?? 0)
+
+/** 面板 tab：成员 / 黑名单（黑名单仅 owner/admin，P3） */
+const activeTab = ref<'members' | 'blocklist'>('members')
+/** 黑名单（分页加载） */
+const blocklist = ref<ChatroomMember[]>([])
 
 /** 目标成员（点击列表项设置；null 表示未选中） */
 const targetMember = ref<ChatroomMember | null>(null)
@@ -154,6 +167,35 @@ function handleListScroll(event: Event) {
     void loadMembers(true).catch(() => {})
   }
 }
+
+/** 切换 tab：黑名单（owner/admin）首次进入拉取 */
+function switchTab(tab: 'members' | 'blocklist') {
+  activeTab.value = tab
+  if (tab === 'blocklist' && blocklist.value.length === 0) {
+    void loadBlocklist(false).then((items) => {
+      blocklist.value = items
+    }).catch(() => {})
+  }
+}
+
+/** 移出黑名单（解除拉黑，成功后本地移除） */
+async function handleUnblock(userId: string) {
+  try {
+    await unblockMembers([userId])
+    blocklist.value = blocklist.value.filter(item => item.userId !== userId)
+  }
+  catch {
+    // 失败已由 useChatroomMember toast
+  }
+}
+
+/** 全员禁言 / 解除（场景 features.muteAll 开启且 owner/admin） */
+function handleToggleMuteAll() {
+  if (isAllMuted.value)
+    void unmuteAll().catch(() => {})
+  else
+    void muteAll().catch(() => {})
+}
 </script>
 
 <template>
@@ -168,7 +210,35 @@ function handleListScroll(event: Event) {
       <span class="chatroom-member-panel__title">{{ t('chatroom.ui.memberPanelTitle') }}</span>
       <span class="chatroom-member-panel__count">{{ t('chatroom.ui.memberCount', '', { count: memberCount }) }}</span>
     </div>
-    <div class="chatroom-member-panel__list" @scroll="handleListScroll">
+
+    <!-- tab 栏：成员 / 黑名单（黑名单仅 owner/admin；全员禁言入口随场景 muteAll 开启，P3） -->
+    <div class="chatroom-member-panel__tabs">
+      <button
+        class="chatroom-member-panel__tab"
+        :class="{ 'chatroom-member-panel__tab--active': activeTab === 'members' }"
+        @click="switchTab('members')"
+      >
+        {{ t('chatroom.ui.members') }}
+      </button>
+      <button
+        v-if="canManage"
+        class="chatroom-member-panel__tab"
+        :class="{ 'chatroom-member-panel__tab--active': activeTab === 'blocklist' }"
+        @click="switchTab('blocklist')"
+      >
+        {{ t('chatroom.ui.blocklist') }}
+      </button>
+      <button
+        v-if="muteAllEnabled && canManage"
+        class="chatroom-member-panel__tab chatroom-member-panel__tab--action"
+        @click="handleToggleMuteAll"
+      >
+        {{ isAllMuted ? t('chatroom.ui.unmuteAllAction') : t('chatroom.ui.muteAllAction') }}
+      </button>
+    </div>
+
+    <!-- 成员列表 -->
+    <div v-if="activeTab === 'members'" class="chatroom-member-panel__list" @scroll="handleListScroll">
       <slot
         v-for="member in members"
         :key="member.userId"
@@ -184,6 +254,23 @@ function handleListScroll(event: Event) {
       </slot>
       <div v-if="membersHasMore" class="chatroom-member-panel__more">
         {{ t('chatroom.ui.memberLoadMore') }}
+      </div>
+    </div>
+
+    <!-- 黑名单列表（owner/admin） -->
+    <div v-else class="chatroom-member-panel__list">
+      <div v-if="blocklist.length === 0" class="chatroom-member-panel__more">
+        {{ t('chatroom.ui.emptyBlocklist') }}
+      </div>
+      <div
+        v-for="member in blocklist"
+        :key="member.userId"
+        class="chatroom-member-panel__block-item"
+      >
+        <ChatroomMemberItem :member="member" :manageable="false" />
+        <button class="chatroom-member-panel__unblock" @click="handleUnblock(member.userId)">
+          {{ t('chatroom.ui.unblock') }}
+        </button>
       </div>
     </div>
   </EmPopup>
@@ -219,6 +306,48 @@ function handleListScroll(event: Event) {
 .chatroom-member-panel__count {
   font-size: 12px;
   color: var(--uikit-text-secondary);
+}
+
+.chatroom-member-panel__tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 8px;
+}
+
+.chatroom-member-panel__tab {
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: var(--uikit-text-secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chatroom-member-panel__tab--active {
+  background: var(--uikit-bg-active, rgba(51, 177, 255, 0.12));
+  color: var(--uikit-primary-color);
+}
+
+.chatroom-member-panel__tab--action {
+  margin-left: auto;
+  color: var(--uikit-danger-color, #e5484d);
+}
+
+.chatroom-member-panel__block-item {
+  display: flex;
+  align-items: center;
+}
+
+.chatroom-member-panel__unblock {
+  margin-right: 16px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--uikit-bg-secondary, rgba(0, 0, 0, 0.04));
+  color: var(--uikit-primary-color);
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .chatroom-member-panel__list {

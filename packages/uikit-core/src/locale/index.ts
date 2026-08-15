@@ -5,6 +5,6 @@
 export * from './type'
 export * from './zh-CN'
 export * from './en'
-export { t, mergeLocaleMessages, findLocaleKey } from './messages'
+export { t, getLocale, mergeLocaleMessages, findLocaleKey } from './messages'
 export type { FindLocaleKeyOptions } from './messages'
 export { useLocale, createLocale } from './use-locale'

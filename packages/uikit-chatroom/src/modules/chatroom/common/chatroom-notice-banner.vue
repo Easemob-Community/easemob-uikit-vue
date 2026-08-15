@@ -2,6 +2,7 @@
 /**
  * 聊天室公告条：公告非空时展示在消息区上方，可手动关闭（本次会话内）。
  * 公告变更事件会实时同步 store（onAnnouncementChanged → 公告更新通知入消息流）。
+ * editable（P3：owner/admin）时展示编辑按钮，点击触发 edit 事件（容器弹编辑框）。
  */
 import { ref, watch } from 'vue'
 import { EmIconButton, t } from '@easemob/uikit-core'
@@ -9,9 +10,19 @@ import { EmIconButton, t } from '@easemob/uikit-core'
 export interface ChatroomNoticeBannerProps {
   /** 公告内容（空串不渲染） */
   content: string
+  /** 是否可编辑（owner/admin 展示编辑按钮，P3） */
+  editable?: boolean
 }
 
-const props = defineProps<ChatroomNoticeBannerProps>()
+export interface ChatroomNoticeBannerEmits {
+  /** 点击编辑按钮（容器弹公告编辑框） */
+  (e: 'edit'): void
+}
+
+const props = withDefaults(defineProps<ChatroomNoticeBannerProps>(), {
+  editable: false,
+})
+defineEmits<ChatroomNoticeBannerEmits>()
 
 /** 用户关闭标记（公告变化时重置） */
 const dismissed = ref(false)
@@ -24,6 +35,14 @@ watch(() => props.content, () => {
   <div v-if="content && !dismissed" class="chatroom-notice-banner">
     <span class="chatroom-notice-banner__tag">{{ t('chatroom.ui.announcement') }}</span>
     <span class="chatroom-notice-banner__content">{{ content }}</span>
+    <EmIconButton
+      v-if="editable"
+      class="chatroom-notice-banner__edit"
+      icon="actions/edit"
+      size="small"
+      :title="t('chatroom.ui.editAnnouncement')"
+      @click="$emit('edit')"
+    />
     <EmIconButton
       class="chatroom-notice-banner__close"
       icon="actions/close"

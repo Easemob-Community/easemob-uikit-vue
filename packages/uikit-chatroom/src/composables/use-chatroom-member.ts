@@ -3,6 +3,7 @@ import { resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uiki
 import { CHATROOM_PERMISSION } from '../constants'
 import type { ChatroomPermissionValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
+import type { ChatroomMember } from '../sdk/domain/chatroom-domain'
 import { useChatroomStore } from '../store/chatroom'
 
 /**
@@ -83,6 +84,28 @@ export function useChatroomMember() {
     return run(() => adapter.checkIfInAllowList(requireRoomId()))
   }
 
+  /** 更新房间公告（仅 owner/admin，SDK 服务端做最终校验） */
+  function updateAnnouncement(content: string): Promise<void> {
+    return run(() => adapter.updateAnnouncement(requireRoomId(), content))
+  }
+
+  /** 黑名单分页加载（大房间同样不做全量加载；loadMore=true 追加下一页） */
+  async function loadBlocklist(loadMore = false, pageSize?: number): Promise<ChatroomMember[]> {
+    const id = requireRoomId()
+    const page = await run(() => adapter.getBlocklist(id, {
+      pageNum: loadMore ? Math.ceil(chatroomStore.members.length / 20) + 1 : 1,
+      pageSize: pageSize ?? 20,
+    }))
+    if (chatroomStore.roomId !== id)
+      return []
+    return page
+  }
+
+  /** 移出黑名单（解除拉黑） */
+  async function unblockMembers(userIds: string[]): Promise<void> {
+    await run(() => adapter.unblockMembers(requireRoomId(), userIds))
+  }
+
   /** 刷新禁言名单（管理面板打开时调用） */
   async function refreshMuteList(pageNum?: number, pageSize?: number): Promise<void> {
     const id = requireRoomId()
@@ -139,6 +162,9 @@ export function useChatroomMember() {
     loadMembers,
     refreshMuteList,
     isInAllowlist,
+    updateAnnouncement,
+    loadBlocklist,
+    unblockMembers,
     muteMembers,
     unmuteMembers,
     muteAll,

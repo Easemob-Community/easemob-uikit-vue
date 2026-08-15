@@ -7,7 +7,8 @@
 import { computed, onUnmounted } from 'vue'
 import { EmAvatar, MESSAGE_TYPE, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
-import { useChatroomMember } from '../../composables/use-chatroom-member'
+import { CHATROOM_GIFT_EVENT } from '../../../constants'
+import { useChatroomMember } from '../../../composables/use-chatroom-member'
 
 export interface ChatroomMessageItemProps {
   /** 待渲染消息（SDK 消息或本地系统通知） */
@@ -68,13 +69,20 @@ onUnmounted(() => {
   }
 })
 
-/** 自定义消息 event 名（P3 礼物等场景渲染走容器 message-custom 插槽，此处兜底） */
+/** 自定义消息 event 名（礼物等场景识别用；未识别 event 走兜底渲染） */
 const customEvent = computed(() => {
   const msg = props.message
   if (msg.type !== MESSAGE_TYPE.CUSTOM)
     return ''
   return (msg.body as { event?: string }).event ?? ''
 })
+
+/** 礼物消息（P3 协议：custom event = CHATROOM_GIFT_EVENT，params 带 giftName/icon） */
+const isGift = computed(() => customEvent.value === CHATROOM_GIFT_EVENT)
+const giftName = computed(() =>
+  (props.message.body as { params?: Record<string, string> }).params?.giftName ?? '')
+const giftIcon = computed(() =>
+  (props.message.body as { params?: Record<string, string> }).params?.icon ?? '')
 
 /** 已撤回标记（广播场景撤回仅从简：打标提示） */
 const isRecalled = computed(() => props.message.recalled === true)
@@ -120,6 +128,8 @@ const isMutedMember = computed(() =>
             :src="imageUrl"
             :alt="textContent || 'image'"
           >
+          <!-- 礼物消息（P3：custom event=gift，展示图标+送出文案） -->
+          <span v-else-if="isGift" class="chatroom-message-item__gift">{{ giftIcon }} {{ t('chatroom.ui.giftSent') }} {{ giftName }}</span>
           <!-- 自定义消息兜底（P3 场景渲染可经容器 message-custom 插槽覆盖） -->
           <span v-else-if="isCustom">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
           <!-- 未知类型兜底 -->
@@ -138,6 +148,7 @@ const isMutedMember = computed(() =>
           :src="imageUrl"
           alt="image"
         >
+        <span v-else-if="isGift" class="chatroom-message-item__gift">{{ giftIcon }} {{ t('chatroom.ui.giftSent') }} {{ giftName }}</span>
         <span v-else-if="isCustom">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
         <span v-else>{{ t('chatroom.ui.unknownMessage') }}</span>
       </div>
@@ -208,5 +219,10 @@ const isMutedMember = computed(() =>
   border-radius: var(--uikit-radius-md, 8px);
   display: block;
   object-fit: cover;
+}
+
+.chatroom-message-item__gift {
+  color: var(--uikit-warning-color, #f3c850);
+  font-weight: 500;
 }
 </style>

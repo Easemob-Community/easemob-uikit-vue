@@ -66,6 +66,9 @@ export {
   useChatroomScene,
   registerChatroomScene,
   resolveChatroomScene,
+  LIVE_ROOM_SCENE,
+  VOICE_ROOM_SCENE,
+  CLASS_ROOM_SCENE,
 } from './composables/use-chatroom-scene'
 export type { ChatroomSceneConfig } from './composables/use-chatroom-scene'
 export {

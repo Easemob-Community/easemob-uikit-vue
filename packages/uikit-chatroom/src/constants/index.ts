@@ -72,7 +72,7 @@ export const CHATROOM_ATTR_PREFIX = {
 export type ChatroomAttrPrefixValue =
   (typeof CHATROOM_ATTR_PREFIX)[keyof typeof CHATROOM_ATTR_PREFIX]
 
-/** 内置场景预设名（P2-2/P3 落地三个内置 preset；custom 为业务自定义场景） */
+/** 内置场景预设名（live / voice / class 三内置 preset 已注册，见 use-chatroom-scene；custom 为业务自定义场景） */
 export const CHATROOM_SCENE_NAME = {
   LIVE: 'live',
   VOICE: 'voice',
@@ -82,3 +82,20 @@ export const CHATROOM_SCENE_NAME = {
 
 export type ChatroomSceneNameValue =
   (typeof CHATROOM_SCENE_NAME)[keyof typeof CHATROOM_SCENE_NAME]
+
+/**
+ * 礼物 custom 消息协议（P3）：`sendCustom(CHATROOM_GIFT_EVENT, { giftId, giftName })`，
+ * 渲染端识别 event 展示礼物样式；业务自定义礼物消息可扩展 ext（如 url/动画）。
+ */
+export const CHATROOM_GIFT_EVENT = 'gift'
+
+/** 内置礼物清单（GiftBar 默认数据；业务可用插槽整体覆盖） */
+export const CHATROOM_GIFT_ITEMS = [
+  { giftId: 'flower', icon: '🌹' },
+  { giftId: 'like', icon: '👍' },
+  { giftId: 'rocket', icon: '🚀' },
+  { giftId: 'car', icon: '🏎️' },
+] as const
+
+/** 麦位数量（语聊房场景默认 8 个麦位） */
+export const CHATROOM_MIC_QUEUE_SEAT_COUNT = 8
