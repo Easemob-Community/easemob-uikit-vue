@@ -13,6 +13,33 @@ export interface UseChatroomOptions {
   maxMessages?: number
 }
 
+/** join 链路整体超时（ms）：ACK / 详情 / 历史任一步骤挂起时强制复位，防 UI 永久卡「加入中」 */
+const JOIN_TIMEOUT_MS = 15_000
+
+/**
+ * 给 promise 加超时：超时先执行 onTimeout（使 in-flight 响应失效），再 reject。
+ * 用于 join 链路兜底——SDK 各环节理论上都有超时，但不同版本/网络下行为可能
+ * 差异（如 ACK 不返回、REST 挂起），UIKit 侧必须保证状态机可恢复。
+ */
+function withJoinTimeout<T>(promise: Promise<T>, onTimeout: () => void): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      onTimeout()
+      reject(new Error('[UIKit:Chatroom] join 超时，请检查网络后重试'))
+    }, JOIN_TIMEOUT_MS)
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
+}
+
 /**
  * 聊天室房间生命周期：join / leave / 状态查询（活动房间视图 = UI 房）。
  *
@@ -109,7 +136,16 @@ export function useChatroom(options: UseChatroomOptions = {}) {
     chatroomStore.setJoining(id)
 
     try {
-      await adapter.joinChatRoom(id, ext)
+      // 超时兜底：join ACK / 房间详情 / 历史拉取任一环节挂起（SDK 侧行为差异、
+      // 网络异常等）时强制复位，保证 UI 永不永久卡在「加入中」。
+      await withJoinTimeout(
+        adapter.joinChatRoom(id, ext),
+        () => {
+          // 使 in-flight 响应失效（超时后到达的 ACK 不再触发 setJoined）
+          if (chatroomStore.roomId === id && chatroomStore.joinToken === token)
+            chatroomStore.nextJoinToken(id)
+        },
+      )
       // join 竞态：响应返回时已非目标房间（期间发起了新 join / 已 leave）则丢弃
       if (!chatroomStore.isCurrentJoin(token, id))
         return
@@ -122,7 +158,9 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       void refreshAttributes(id)
     }
     catch (error) {
-      if (chatroomStore.roomId === id && chatroomStore.joinToken === token) {
+      // 失败/超时恢复：仅当 UI 仍停留在该房间的加入中态时复位
+      // （竞态丢弃场景由接管方负责状态，不在此覆盖）
+      if (chatroomStore.roomId === id && chatroomStore.status === CHATROOM_STATUS.JOINING) {
         messageStore.clearBucket(id)
         chatroomStore.removeRoom(id)
       }

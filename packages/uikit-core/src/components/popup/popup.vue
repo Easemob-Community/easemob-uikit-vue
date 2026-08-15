@@ -53,6 +53,11 @@ const props = withDefaults(defineProps<PopupProps>(), {
   offset: 8,
 })
 
+// 根节点是 Teleport（无法自动继承 attrs），需显式把 class/style/事件等
+// $attrs 透传到 teleport 内根元素（uikit-popup div），否则外部传 class 会触发
+// "Extraneous non-props attributes" 警告且样式丢失。
+defineOptions({ inheritAttrs: false })
+
 const emit = defineEmits<PopupEmits>()
 const { t } = useLocale()
 
@@ -273,6 +278,7 @@ onUnmounted(() => {
         v-if="props.show"
         class="uikit-popup"
         :class="{ 'uikit-popup--pass-through': isAnchored && !props.overlay }"
+        v-bind="$attrs"
         :style="{ zIndex: effectiveZIndex }"
       >
         <!-- 遮罩层拦截 touchmove，防止弹层打开时背景滚动穿透（内容区不拦截，保证弹层内可滚动） -->
