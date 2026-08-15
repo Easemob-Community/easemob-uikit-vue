@@ -67,6 +67,8 @@
 - Demo 开发者友好模式预研：根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
+- 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit/src/**/*.story.vue`（Histoire）
+- 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）
