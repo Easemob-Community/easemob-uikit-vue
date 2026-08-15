@@ -349,10 +349,11 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认四个现象均已修复，TECH-DEBT 漏勾）。现象 1：`rich-input.vue` 语音提示已改用 `t('chat.voice.releaseEnd')` 等既有 key（全仓 grep 无硬编码「松开结束录音/按住说话」）；现象 2：`locale/index.ts:42-46` 已有 `interpolate()`，`t(key, fallback?, params?)` 签名支持 `{placeholder}` 插值（`'chat.pinnedBar.count': '{count} 条置顶消息'` 可直接插值）；现象 3：全仓已改为 `t('key', '中文')` fallback 形式（presence-selector.vue:72-81、user-card-modal、group-card-modal 等），无 `t('x') || '中文'` 死代码；现象 4：`modal.vue:33-34`（取消/确认）、`action-sheet.vue:35`（取消）、`emoji-picker.vue:33`（常用）默认值均已 `t('button.cancel', '取消')` 形式走 locale + fallback。
 - **关联 skill**：`uikit-i18n-locale`
 
-### [ ] D10. 模块层约 30% 组件用内联 `defineProps<{}>` 字面量而非命名 interface
+### [x] D10. 模块层约 30% 组件用内联 `defineProps<{}>` 字面量而非命名 interface
 
 - **现象**：components/containers 层 100% 用命名 `XxxProps` interface，modules 层约 12/42 文件内联字面量（集中在 `modules/contact/*`、`modules/group/*`）。不影响功能，但不利于 props 复用与文档化，lint 也抓不到。
 - **建议修法**：新写强制命名 interface（skill 已约定）；存量可逐步收敛，非紧急。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认存量已全部收敛，TECH-DEBT 漏勾）。全仓 `defineProps<{` 内联字面量为 **0**，107 处 `defineProps` 均为命名 `XxxProps` interface（components/containers/modules 三层统一），props 文档化（gen:api）与复用不受影响。
 - **关联 skill**：`uikit-component-authoring`
 
 ### [x] D11. `chat/message-input.vue` 与 `chat/message-input/` 目录并存，结构歧义
