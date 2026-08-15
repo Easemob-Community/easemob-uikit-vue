@@ -1,0 +1,64 @@
+import type { LocaleMessages } from '@easemob/uikit-core'
+
+/** 聊天室场景中文文案（chatroom.* 前缀段，经 core mergeLocaleMessages 并入，不复制 core locale） */
+const zhCN: LocaleMessages = {
+  // 房间事件系统通知（插入消息流的中性灰色提示）
+  'chatroom.notice.memberNamesMore': '{names} 等 {count} 人',
+  'chatroom.notice.memberJoined': '{name} 加入了聊天室',
+  'chatroom.notice.memberExited': '{name} 退出了聊天室',
+  'chatroom.notice.destroyed': '聊天室已解散',
+  'chatroom.notice.kicked': '你已被移出聊天室',
+  'chatroom.notice.muteAdded': '{name} 已被禁言',
+  'chatroom.notice.muteRemoved': '{name} 已被解除禁言',
+  'chatroom.notice.allMuteOn': '已开启全员禁言',
+  'chatroom.notice.allMuteOff': '已解除全员禁言',
+  'chatroom.notice.adminAdded': '{name} 已成为管理员',
+  'chatroom.notice.adminRemoved': '{name} 已被移除管理员',
+  'chatroom.notice.ownerChanged': '{name} 已成为新房主',
+  'chatroom.notice.announcementChanged': '公告已更新：{content}',
+  'chatroom.notice.historyHint': '以下为最近 {count} 条消息',
+
+  // 操作失败兜底文案（SDK 错误码优先经 core error.* 映射，未命中时用这里）
+  'chatroom.error.joinFailed': '加入聊天室失败',
+  'chatroom.error.leaveFailed': '退出聊天室失败',
+  'chatroom.error.sendFailed': '消息发送失败',
+  'chatroom.error.operationFailed': '操作失败，请稍后重试',
+
+  // 容器 / 模块 UI 文案
+  'chatroom.ui.back': '返回',
+  'chatroom.ui.exit': '退出聊天室',
+  'chatroom.ui.members': '成员',
+  'chatroom.ui.memberCount': '{count} 人',
+  'chatroom.ui.announcement': '公告',
+  'chatroom.ui.close': '关闭',
+  'chatroom.ui.inputPlaceholder': '说点什么…',
+  'chatroom.ui.send': '发送',
+  'chatroom.ui.image': '图片',
+  'chatroom.ui.joining': '加入中…',
+  'chatroom.ui.empty': '暂无消息',
+  'chatroom.ui.loadMore': '加载更早消息',
+  'chatroom.ui.loading': '加载中…',
+  'chatroom.ui.noMore': '没有更早的消息了',
+  'chatroom.ui.recalled': '消息已撤回',
+  'chatroom.ui.customMessage': '[自定义消息]',
+  'chatroom.ui.unknownMessage': '[不支持的消息类型]',
+  'chatroom.ui.roomDestroyed': '聊天室已解散，可退出或重新加入',
+  'chatroom.ui.kickedHint': '你已被移出聊天室',
+  'chatroom.ui.memberPanelTitle': '成员列表',
+  'chatroom.ui.memberLoadMore': '加载更多成员',
+  'chatroom.ui.memberMuted': '（已禁言）',
+  'chatroom.ui.muteMinutes': '禁言 {minutes} 分钟',
+  'chatroom.ui.muteHours': '禁言 {hours} 小时',
+  'chatroom.ui.muteDay': '禁言 1 天',
+  'chatroom.ui.unmute': '解除禁言',
+  'chatroom.ui.kickMember': '移出聊天室',
+  'chatroom.ui.setAdmin': '设为管理员',
+  'chatroom.ui.removeAdmin': '移除管理员',
+  'chatroom.ui.roleOwner': '房主',
+  'chatroom.ui.roleAdmin': '管理员',
+  'chatroom.ui.allMuted': '全员禁言中，仅管理员可发言',
+  'chatroom.ui.selfMuted': '你已被禁言',
+  'chatroom.ui.notJoined': '未加入聊天室',
+}
+
+export default zhCN

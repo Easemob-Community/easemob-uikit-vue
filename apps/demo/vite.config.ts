@@ -35,15 +35,23 @@ function getUIKitCoreVersion(): string {
   return corePackage.version ?? 'unknown'
 }
 
+function getUIKitChatroomVersion(): string {
+  const chatroomPackagePath = resolve(__dirname, '../../packages/uikit-chatroom/package.json')
+  const chatroomPackage = JSON.parse(readFileSync(chatroomPackagePath, 'utf-8')) as { version?: string }
+  return chatroomPackage.version ?? 'unknown'
+}
+
 const sdkVersion = getSdkVersion()
 const uikitVersion = getUIKitVersion()
 const uikitCoreVersion = getUIKitCoreVersion()
+const uikitChatroomVersion = getUIKitChatroomVersion()
 
 export default defineConfig({
   define: {
     __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
     __EASEMOB_UIKIT_CORE_VERSION__: JSON.stringify(uikitCoreVersion),
+    __EASEMOB_UIKIT_CHATROOM_VERSION__: JSON.stringify(uikitChatroomVersion),
   },
   plugins: [
     vue(),
@@ -64,6 +72,8 @@ export default defineConfig({
       { find: '@easemob/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
       { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
       { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
+      // chatroom 场景包源码直连（P2-2 demo 页使用；chatroom 无独立主题，theme 子路径经 exports 指 core）
+      { find: '@easemob/uikit-chatroom', replacement: resolve(__dirname, '../../packages/uikit-chatroom/src') },
     ],
   },
 })

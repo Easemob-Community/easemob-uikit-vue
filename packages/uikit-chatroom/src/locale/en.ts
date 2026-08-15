@@ -1,0 +1,64 @@
+import type { LocaleMessages } from '@easemob/uikit-core'
+
+/** 聊天室场景英文文案（chatroom.* 前缀段，经 core mergeLocaleMessages 并入，不复制 core locale） */
+const en: LocaleMessages = {
+  // Room event system notices (neutral grey tips inserted into the message stream)
+  'chatroom.notice.memberNamesMore': '{names} and {count} others',
+  'chatroom.notice.memberJoined': '{name} joined the chatroom',
+  'chatroom.notice.memberExited': '{name} left the chatroom',
+  'chatroom.notice.destroyed': 'The chatroom has been destroyed',
+  'chatroom.notice.kicked': 'You have been removed from the chatroom',
+  'chatroom.notice.muteAdded': '{name} has been muted',
+  'chatroom.notice.muteRemoved': '{name} has been unmuted',
+  'chatroom.notice.allMuteOn': 'All members have been muted',
+  'chatroom.notice.allMuteOff': 'All-member mute has been lifted',
+  'chatroom.notice.adminAdded': '{name} is now an admin',
+  'chatroom.notice.adminRemoved': '{name} is no longer an admin',
+  'chatroom.notice.ownerChanged': '{name} is now the chatroom owner',
+  'chatroom.notice.announcementChanged': 'Announcement updated: {content}',
+  'chatroom.notice.historyHint': 'Showing the latest {count} messages',
+
+  // Fallback error messages (SDK error codes are mapped via core error.* first)
+  'chatroom.error.joinFailed': 'Failed to join the chatroom',
+  'chatroom.error.leaveFailed': 'Failed to leave the chatroom',
+  'chatroom.error.sendFailed': 'Failed to send the message',
+  'chatroom.error.operationFailed': 'Operation failed, please try again later',
+
+  // Container / module UI copy
+  'chatroom.ui.back': 'Back',
+  'chatroom.ui.exit': 'Leave chatroom',
+  'chatroom.ui.members': 'Members',
+  'chatroom.ui.memberCount': '{count} members',
+  'chatroom.ui.announcement': 'Announcement',
+  'chatroom.ui.close': 'Close',
+  'chatroom.ui.inputPlaceholder': 'Say something…',
+  'chatroom.ui.send': 'Send',
+  'chatroom.ui.image': 'Image',
+  'chatroom.ui.joining': 'Joining…',
+  'chatroom.ui.empty': 'No messages',
+  'chatroom.ui.loadMore': 'Load earlier messages',
+  'chatroom.ui.loading': 'Loading…',
+  'chatroom.ui.noMore': 'No earlier messages',
+  'chatroom.ui.recalled': 'Message recalled',
+  'chatroom.ui.customMessage': '[Custom message]',
+  'chatroom.ui.unknownMessage': '[Unsupported message type]',
+  'chatroom.ui.roomDestroyed': 'The chatroom has been destroyed. You can leave or rejoin.',
+  'chatroom.ui.kickedHint': 'You have been removed from the chatroom',
+  'chatroom.ui.memberPanelTitle': 'Members',
+  'chatroom.ui.memberLoadMore': 'Load more members',
+  'chatroom.ui.memberMuted': ' (muted)',
+  'chatroom.ui.muteMinutes': 'Mute for {minutes} minutes',
+  'chatroom.ui.muteHours': 'Mute for {hours} hours',
+  'chatroom.ui.muteDay': 'Mute for 1 day',
+  'chatroom.ui.unmute': 'Unmute',
+  'chatroom.ui.kickMember': 'Remove from chatroom',
+  'chatroom.ui.setAdmin': 'Set as admin',
+  'chatroom.ui.removeAdmin': 'Remove admin',
+  'chatroom.ui.roleOwner': 'Owner',
+  'chatroom.ui.roleAdmin': 'Admin',
+  'chatroom.ui.allMuted': 'All members are muted. Only admins can speak.',
+  'chatroom.ui.selfMuted': 'You have been muted',
+  'chatroom.ui.notJoined': 'Not in the chatroom',
+}
+
+export default en

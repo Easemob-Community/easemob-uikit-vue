@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@easemob/uikit-chatroom": "workspace:*",
     "@easemob/uikit-im": "workspace:*",
     "easemob-websdk": "^5.0.0",
     "markdown-it": "^15.0.0",
