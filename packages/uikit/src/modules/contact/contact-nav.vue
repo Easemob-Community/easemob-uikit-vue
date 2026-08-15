@@ -85,7 +85,7 @@ function onEntryClick(entry: ContactNavEntry) {
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   cursor: pointer;
   transition:
-    background-color 0.15s,
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
     transform 0.15s;
   user-select: none;
 }

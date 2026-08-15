@@ -455,7 +455,7 @@ const subviewTitle = computed(() => {
 /* ===== 视图过场 ===== */
 .address-book-container-slide-enter-active,
 .address-book-container-slide-leave-active {
-  transition: transform 0.22s ease, opacity 0.22s ease;
+  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing), opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 .address-book-container-slide-enter-from {
   transform: translateX(8%);
@@ -467,7 +467,7 @@ const subviewTitle = computed(() => {
 }
 .address-book-container-fade-enter-active,
 .address-book-container-fade-leave-active {
-  transition: opacity 0.18s ease;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 .address-book-container-fade-enter-from,
 .address-book-container-fade-leave-to {

@@ -426,7 +426,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   background: none;
   border: none;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
@@ -440,7 +440,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   color: var(--uikit-primary-color);
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
@@ -461,7 +461,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
   word-break: break-all;
   -webkit-tap-highlight-color: transparent;
 }

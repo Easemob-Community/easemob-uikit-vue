@@ -153,7 +153,7 @@ function toggle() {
   gap: 6px;
   padding: 8px 12px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {

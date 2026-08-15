@@ -58,7 +58,7 @@ function handleClick() {
   cursor: pointer;
   min-width: 200px;
   max-width: 300px;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {

@@ -492,7 +492,7 @@ async function handleDownload() {
   border-radius: 4px;
   user-select: none;
   -webkit-user-drag: none;
-  transition: transform 0.15s ease;
+  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .image-viewer__img--dragging {
@@ -543,7 +543,7 @@ async function handleDownload() {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .image-viewer__nav--prev {
@@ -604,7 +604,7 @@ async function handleDownload() {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .image-viewer__tool-btn:disabled {

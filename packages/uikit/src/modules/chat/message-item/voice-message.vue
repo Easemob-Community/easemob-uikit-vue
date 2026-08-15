@@ -252,7 +252,7 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
 }
 
 .voice-message__bubble {
-  transition: opacity 0.15s;
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {

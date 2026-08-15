@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
   border: 1px solid #e5e7eb;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .voice-panel:active {
@@ -250,7 +250,7 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   background-color: var(--uikit-primary-color, #3b82f6);
   color: #fff;
-  transition: transform 0.15s;
+  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .voice-panel__mic-wrapper--recording {

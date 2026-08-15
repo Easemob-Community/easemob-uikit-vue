@@ -78,7 +78,7 @@ function onClick() {
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   width: 240px;
   max-width: 240px;
   box-sizing: border-box;

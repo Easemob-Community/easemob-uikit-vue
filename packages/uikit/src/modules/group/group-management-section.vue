@@ -446,7 +446,7 @@ function closeDrawer() {
   inset: 0;
   background-color: #d1d5db;
   border-radius: 24px;
-  transition: background-color 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .group-management-section__toggle-slider::before {
@@ -458,7 +458,7 @@ function closeDrawer() {
   bottom: 3px;
   background-color: #ffffff;
   border-radius: 50%;
-  transition: transform 0.2s;
+  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .group-management-section__toggle-input:checked + .group-management-section__toggle-slider {

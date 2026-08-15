@@ -170,7 +170,7 @@ async function handleDownload(event: MouseEvent) {
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .video-message__container:hover .video-message__overlay {
@@ -231,7 +231,7 @@ async function handleDownload(event: MouseEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   z-index: 3001;
 }
 

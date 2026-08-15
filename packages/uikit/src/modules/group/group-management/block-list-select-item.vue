@@ -48,7 +48,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 .block-list__popup-checkbox {
   color: var(--uikit-text-tertiary, #94a3b8);
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 .block-list__popup-checkbox--checked {
   color: var(--uikit-primary-color);

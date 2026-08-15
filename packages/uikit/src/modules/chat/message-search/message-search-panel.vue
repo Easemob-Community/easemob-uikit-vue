@@ -202,7 +202,7 @@ nextTick(() => {
   padding: 10px;
   border-radius: var(--uikit-components-radius, 8px);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {

@@ -173,7 +173,7 @@ function onClose() {
   cursor: pointer;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
-  transition: color 0.15s;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
   position: relative;
 }
 

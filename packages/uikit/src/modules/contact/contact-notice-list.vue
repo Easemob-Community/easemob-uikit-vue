@@ -266,7 +266,7 @@ function avatarName(invite: UiContactInvite): string {
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
-  transition: background-color 0.15s;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
@@ -341,7 +341,7 @@ function avatarName(invite: UiContactInvite): string {
   font-size: var(--uikit-font-size-13);
   cursor: pointer;
   transition:
-    opacity 0.15s,
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
     border-color 0.15s,
     background-color 0.15s;
 }

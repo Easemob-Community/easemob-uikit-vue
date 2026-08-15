@@ -77,7 +77,7 @@ function onTap(key: string) {
   color: var(--uikit-primary-color);
   cursor: pointer;
   transition:
-    color 0.15s,
+    color var(--uikit-anim-duration) var(--uikit-anim-easing),
     background-color 0.15s;
   border-radius: 4px;
 }

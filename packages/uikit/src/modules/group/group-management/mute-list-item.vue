@@ -73,7 +73,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   color: var(--uikit-text-primary);
   font-size: var(--uikit-font-size-12);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 @media (hover: hover) {
   .mute-list__action-btn:hover {

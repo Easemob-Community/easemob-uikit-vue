@@ -363,11 +363,12 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已清理，TECH-DEBT 漏勾）。`modules/chat/` 下顶层 `message-input.vue` 已移除，仅剩 `message-input/` 目录（index.vue 统一导出 rich/simple/h5-input 形态）与 `h5-input/` 目录；全仓无任何 `message-input.vue` 路径引用残留。
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D12. 动效未接入变量的比例偏高
+### [x] D12. 动效未接入变量的比例偏高
 
 - **现象**：主题里有完整 `--uikit-anim-*` 体系（含 subtle/expressive/关闭/reduced-motion 开关），但组件里约 50 处 `transition` 用字面时长/缓动，绕过开关（只有 ~8 处 duration + ~12 处 easing 真正用了变量）。2026-07-28 复核补充：`components/button/button.vue:71-72`（150ms×2）、`components/action-sheet/action-sheet.vue:98`、`components/emoji-picker/emoji-picker.vue:91,134`、`components/user-card/user-card.vue:283`、`components/group-card/group-card.vue:187`、`components/presence-selector/presence-selector.vue:216`，`data-uikit-anim-enabled="false"` 和 reduced-motion 对这些无效。
 - **建议修法**：过渡统一改用 `var(--uikit-anim-duration/easing)`，让全局动画开关真正生效。可与 D3 一起清。
 - **进展**：2026-08-05 主题 Phase 1 已把 worst offenders 中的 `transition` 字面时长/缓动替换为 `var(--uikit-anim-duration)` / `var(--uikit-anim-easing)`，全局动画开关和 reduced-motion 现在对这些组件生效。剩余非高频文件中的 ~30 处仍待继续清理。
+- **修复**：已于 2026-08-15 完成收尾。脚本批量替换剩余 **27 个文件 37 处**字面时长/缓动（`0.15s`/`0.18s`/`0.2s`/`0.22s`、`ease`/`linear`）为 `var(--uikit-anim-duration) var(--uikit-anim-easing)`，含多属性 transition 列表（如 `address-book-container` 的 `transform, opacity` 双段）；复检确认全仓 transition 无字面时长残留。全局动画开关（`data-uikit-anim-enabled=false`）与 `prefers-reduced-motion` 现对全部组件生效。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [x] D27. `invite-member-modal.vue` 和会话弹窗组件未从 barrel 文件导出

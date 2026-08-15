@@ -74,7 +74,7 @@ function onClick() {
   line-height: 1.5;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   box-sizing: border-box;
 }
 
