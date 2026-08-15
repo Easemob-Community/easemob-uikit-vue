@@ -1,4 +1,6 @@
-/** 会话类型常量 */
+/** 会话类型常量（仅单群聊场景；聊天室 wire 值 'chatRoom' 由 chatroom 包 constants 定义——
+ * 注意：本联合不可直接加入 CHATROOM，im 多处把 ConversationTypeValue 收窄为 SDK
+ * MessageChatConversationType（不含 chatRoom），扩大联合会破坏这些收窄点） */
 export const CONVERSATION_TYPE = {
   SINGLECHAT: 'singleChat',
   GROUPCHAT: 'groupChat',
