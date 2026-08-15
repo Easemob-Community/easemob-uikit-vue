@@ -107,7 +107,9 @@ onUnmounted(() => {
 <template>
   <div class="chatroom-demo">
     <div class="chatroom-demo__bar">
-      <button class="chatroom-demo__back" @click="goBack">← 返回 IM Demo</button>
+      <button class="chatroom-demo__back" @click="goBack">
+        ← 返回 IM Demo
+      </button>
       <span class="chatroom-demo__title">聊天室 Demo（P2 验证页）</span>
       <span class="chatroom-demo__badge">两包同装验证中</span>
     </div>
@@ -162,7 +164,9 @@ onUnmounted(() => {
 
       <!-- P3 验收：headless 订阅（纯 JS 消费同一内核，不经过容器渲染） -->
       <div v-if="activeRoomId" class="chatroom-demo__headless">
-        <div class="chatroom-demo__headless-title">headless 订阅（useChatroomMessage().subscribe 增量批量）</div>
+        <div class="chatroom-demo__headless-title">
+          headless 订阅（useChatroomMessage().subscribe 增量批量）
+        </div>
         <div v-if="headlessMessages.length === 0" class="chatroom-demo__headless-empty">
           暂无增量（发送消息后此处实时出现，不依赖容器渲染）
         </div>
