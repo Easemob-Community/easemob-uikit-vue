@@ -1,9 +1,9 @@
 import type { GroupUserInfo } from 'easemob-websdk'
-import type { ManagerHost } from '../client'
-import type { CreateGroupParams, UiGroup, UiGroupMember } from '../types'
-import { GROUP_MEMBER_ROLE } from '../../constants'
+import type { ManagerHost } from '@easemob/uikit-core'
+import type { CreateGroupParams, UiGroup, UiGroupMember } from '@easemob/uikit-core'
+import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
-import { createLogger } from '../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const groupDomainLog = createLogger('UIKit:GroupDomain')
 

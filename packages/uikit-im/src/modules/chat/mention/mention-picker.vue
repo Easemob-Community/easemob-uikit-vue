@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useViewport } from '../../../composables/use-viewport'
-import { useLocale } from '../../../locale'
-import { useArrowNavigation, useKeyBindings } from '../../../composables/use-key-bindings'
-import Popup from '../../../components/popup/popup.vue'
-import Avatar from '../../../components/avatar/avatar.vue'
-import Icon from '../../../components/icon/icon.vue'
-import IconButton from '../../../components/icon-button/icon-button.vue'
-import Empty from '../../../components/empty/empty.vue'
-import Cell from '../../../components/cell/cell.vue'
+import { useViewport } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { useArrowNavigation, useKeyBindings } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
 import type { MentionContact } from '../types'
 
 export interface MentionPickerProps {

@@ -1,4 +1,4 @@
-import type { GroupMemberEntry, GroupMuteEntry, SdkGroupSource, UiGroup, UiGroupMember } from '../types'
+import type { GroupMemberEntry, GroupMuteEntry, SdkGroupSource, UiGroup, UiGroupMember } from '@easemob/uikit-core'
 
 /**
  * 将 SDK 群组摘要/详情转换为 UIKit 群组展示类型。

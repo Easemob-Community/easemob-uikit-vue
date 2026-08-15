@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { formatSdkError } from '../../utils/sdk-error'
-import type { UiGroup } from '../../sdk/types'
+import { formatSdkError } from '@easemob/uikit-core'
+import type { UiGroup } from '@easemob/uikit-core'
 import GroupCard, { type GroupCardInfoRow } from '../../components/group-card/group-card.vue'
-import IconButton from '../../components/icon-button/icon-button.vue'
-import { useLocale } from '../../locale'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import { useGroup } from '../../composables/use-group'
-import { useToast } from '../../composables/use-toast'
-import { insertChatNotice } from '../../sdk/event/notice-utils'
-import { createLogger } from '../../utils/logger'
+import { useToast } from '@easemob/uikit-core'
+import { insertChatNotice } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:GroupDetail')
 

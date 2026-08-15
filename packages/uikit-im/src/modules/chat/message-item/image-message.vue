@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
-import { useThemeStore } from '../../../store/theme'
-import { INJECTION_KEY } from '../../../constants'
-import { useLocale } from '../../../locale'
-import ImageViewer from '../../../components/image-viewer/image-viewer.vue'
-import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
+import { useThemeStore } from '@easemob/uikit-core'
+import { INJECTION_KEY } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { EmImageViewer as ImageViewer } from '@easemob/uikit-core'
+import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface ImageMessageProps {

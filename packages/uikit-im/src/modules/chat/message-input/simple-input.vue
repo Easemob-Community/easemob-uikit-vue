@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useLocale } from '../../../locale'
-import { useResizable } from '../../../composables/use-resizable'
-import { useViewport } from '../../../composables/use-viewport'
+import { useLocale } from '@easemob/uikit-core'
+import { useResizable, useViewport } from '@easemob/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
-import Input from '../../../components/input/input.vue'
-import Button from '../../../components/button/button.vue'
-import Icon from '../../../components/icon/icon.vue'
+import { EmInput as Input } from '@easemob/uikit-core'
+import { EmButton as Button } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
 import type { ChatConfig, MentionContact } from '../types'
 import VoicePanel from './components/voice-panel.vue'
 

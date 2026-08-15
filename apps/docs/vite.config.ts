@@ -9,6 +9,10 @@ import { vitepressDemo } from 'vite-plugin-vitepress-demo'
 const uikitPkg = JSON.parse(
   readFileSync(new URL('../../packages/uikit-im/package.json', import.meta.url), 'utf-8'),
 )
+// uikit-core 版本：core 源码经 alias 直连，构建期版本宏需在此注入
+const uikitCorePkg = JSON.parse(
+  readFileSync(new URL('../../packages/uikit-core/package.json', import.meta.url), 'utf-8'),
+)
 
 /**
  * 修正文档 demo 引用路径。
@@ -42,10 +46,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      '@easemob/uikit-core': fileURLToPath(new URL('../../packages/uikit-core/src', import.meta.url)),
       '@easemob/uikit-im': fileURLToPath(new URL('../../packages/uikit-im/src', import.meta.url)),
     },
   },
   define: {
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitPkg.version),
+    __EASEMOB_UIKIT_CORE_VERSION__: JSON.stringify(uikitCorePkg.version),
   },
 })

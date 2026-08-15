@@ -1,4 +1,4 @@
-import type { UiContact as Contact } from '../../sdk/types'
+import type { UiContact as Contact } from '@easemob/uikit-core'
 
 /** 选择模式 */
 export type ContactSelectMode = 'none' | 'single' | 'multiple'

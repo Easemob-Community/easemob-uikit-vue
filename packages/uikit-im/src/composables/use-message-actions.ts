@@ -1,14 +1,14 @@
 import { computed, ref } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
-import { MESSAGE_STATUS, MESSAGE_TYPE } from '../constants'
-import type { ConversationTypeValue } from '../constants'
-import type { UiMessage } from '../sdk/types'
-import { isTextBody, isVoiceBody } from '../sdk/types'
-import { useLocale } from '../locale'
-import { formatSdkError } from '../utils/sdk-error'
-import { useToast } from './use-toast'
+import { MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { ConversationTypeValue } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob/uikit-core'
+import { isTextBody, isVoiceBody } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { formatSdkError } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
-import { createLogger } from '../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:UseMessageActions')
 

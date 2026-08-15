@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
-import { useToast } from '../../../composables/use-toast'
-import { FORWARD_MODE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
-import type { ForwardModeValue } from '../../../constants'
-import type { UiMessage } from '../../../sdk/types'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
+import { FORWARD_MODE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { ForwardModeValue } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob/uikit-core'
 
 export interface MultiSelectBarEmits {
   (e: 'forward-one-by-one', messages: UiMessage[]): void

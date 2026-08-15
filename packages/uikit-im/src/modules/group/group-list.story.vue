@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
-import type { UiGroup as Group } from '../../sdk/types'
+import type { UiGroup as Group } from '@easemob/uikit-core'
 import GroupList from './group-list.vue'
 
 function injectMockGroups() {

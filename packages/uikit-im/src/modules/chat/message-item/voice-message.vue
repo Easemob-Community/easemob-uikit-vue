@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { type ComputedRef, type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
-import { formatSdkError } from '../../../utils/sdk-error'
-import { useThemeStore } from '../../../store/theme'
-import { INJECTION_KEY } from '../../../constants'
-import { useLocale } from '../../../locale'
-import Icon from '../../../components/icon/icon.vue'
-import type { UiMessage, VoiceMessageBody } from '../../../sdk/types'
+import { formatSdkError } from '@easemob/uikit-core'
+import { useThemeStore } from '@easemob/uikit-core'
+import { INJECTION_KEY } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import type { UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
-import { createLogger } from '../../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:VoiceMessage')
 

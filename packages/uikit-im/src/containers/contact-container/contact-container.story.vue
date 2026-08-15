@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
 import { useGroupStore } from '../../store/group'
-import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
+import type { UiContact as Contact, UiGroup as Group } from '@easemob/uikit-core'
 import ContactContainer from './contact-container.vue'
 
 /** 构造 mock 联系人数据，覆盖多字母分组与 # 兜底 */

@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
+import process from 'node:process'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
@@ -30,6 +31,10 @@ function getUIKitVersion(): string {
 const sdkVersion = getSdkVersion()
 const uikitVersion = getUIKitVersion()
 
+// histoire（story:dev/story:build）会合并本配置；其虚拟入口 bundle-main/bundle-sandbox
+// 若经 dts 插件处理会在 dist 残留 bundle-*.d.ts，故 histoire 运行时不挂 dts。
+const isHistoire = process.argv.some(arg => arg.includes('histoire'))
+
 export default defineConfig({
   define: {
     __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
@@ -37,11 +42,17 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    dts({
-      insertTypesEntry: true,
-      outDir: 'dist',
-      exclude: ['*.config.ts', 'src/histoire-setup.ts'],
-    }),
+    ...(!isHistoire
+      ? [dts({
+        insertTypesEntry: true,
+        outDir: 'dist',
+        exclude: ['*.config.ts', 'src/histoire-setup.ts'],
+        // tsconfig paths 把 @easemob/uikit-core 映射到 core src，不做排除时
+        // d.ts 会把 re-export core 符号的模块说明符展开成 ../../uikit-core/src 相对路径，
+        // 发布给消费者后该路径不存在导致类型断裂；保持裸包名，类型经 core dist 的 d.ts 解析。
+        aliasesExclude: ['@easemob/uikit-core'],
+      })]
+      : []),
   ],
   build: {
     lib: {
@@ -51,7 +62,7 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit-im.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pinia', 'easemob-websdk'],
+      external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-core'],
       output: {
         // 同时存在命名导出与 default 导出时，显式声明使用命名导出策略，
         // 避免 Rollup 警告 "Consumers will have to use `EasemobUIKit.default`"。
@@ -61,6 +72,9 @@ export default defineConfig({
           'vue': 'Vue',
           'pinia': 'Pinia',
           'easemob-websdk': 'Easemob',
+          // core 的 UMD 全局名（core vite.config lib.name = 'EasemobUIKitCore'），
+          // 不声明时 rollup 会猜成 'uikitCore'，CDN 直引两个 UMD 产物会断链
+          '@easemob/uikit-core': 'EasemobUIKitCore',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css')
@@ -74,6 +88,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // theme @import 直指 core 源文件，uikit-im 构建不依赖 core dist 先产出
+      '@easemob/uikit-core/theme': resolve(__dirname, '../uikit-core/src/theme/index.css'),
       '@': resolve(__dirname, 'src'),
     },
   },

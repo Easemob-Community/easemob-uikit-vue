@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import ContactNoticeList from './contact-notice-list.vue'
-import type { UiContactInvite } from '../../sdk/types'
+import type { UiContactInvite } from '@easemob/uikit-core'
 
 const baseInvites: UiContactInvite[] = [
   { id: 'u_alice', type: 'contact', userId: 'u_alice', nickname: 'Alice', reason: 'Hi, I am Alice', status: 'pending', timestamp: Date.now() - 3600_000 },

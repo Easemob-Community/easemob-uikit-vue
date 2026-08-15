@@ -1,6 +1,12 @@
+/**
+ * ⚠️ 本文件由 packages/uikit-core/scripts/gen-aux-entries.mjs 参数化生成，勿手改。
+ * 配置见包根 aux-entries.config.mjs；composables 导出变更后执行 pnpm -F @easemob/uikit-im aux:gen 重新生成，
+ * build 前置 --check 会校验漂移。
+ */
+
 export interface ComponentResolver {
   type: string
-  resolve: (name: string) => { name: string; from: string } | undefined
+  resolve: (name: string) => { name: string, from: string } | undefined
 }
 
 export interface EasemobUIKitResolverOptions {
@@ -31,7 +37,8 @@ export function EasemobUIKitResolver(
   return {
     type: 'component',
     resolve: (name: string) => {
-      if (!name.startsWith(prefix)) return
+      if (!name.startsWith(prefix))
+        return
       // 直接返回 PascalCase 名称，对应 @easemob/uikit-im 的命名导出
       // 例如 <EmChatContainer /> -> import { EmChatContainer } from '@easemob/uikit-im'
       return {

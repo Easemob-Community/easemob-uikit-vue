@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GROUP_MEMBER_ROLE } from '../../constants'
+import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
-import type { UiGroupMember } from '../../sdk/types'
+import type { UiGroupMember } from '@easemob/uikit-core'
 import { useGroupStore } from '../../store/group'
-import { useUserInfoStore } from '../../store/user-info'
+import { useUserInfoStore } from '@easemob/uikit-core'
 import GroupMemberListItem from './group-member-list-item.vue'
 
 const logs = ref<string[]>([])

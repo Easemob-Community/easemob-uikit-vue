@@ -1,5 +1,5 @@
 import { type ComputedRef, type Ref, computed } from 'vue'
-import type { UiGroup as Group } from '../sdk/types'
+import type { UiGroup as Group } from '@easemob/uikit-core'
 import type { GroupSortBy } from '../modules/group/types'
 import { resolvePinyin } from './use-pinyin'
 

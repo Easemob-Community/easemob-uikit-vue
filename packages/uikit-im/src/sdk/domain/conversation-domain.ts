@@ -1,9 +1,9 @@
-import type { ManagerHost } from '../client'
-import type { UiConversation } from '../types'
-import { MESSAGE_TYPE } from '../../constants'
-import type { ConversationTypeValue } from '../../constants'
+import type { ManagerHost } from '@easemob/uikit-core'
+import type { UiConversation } from '@easemob/uikit-core'
+import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { toUiConversations } from '../adapter/conversation-adapter'
-import { createLogger } from '../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const conversationLogger = createLogger('Conversation')
 

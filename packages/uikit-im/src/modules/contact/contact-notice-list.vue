@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatSdkError } from '../../utils/sdk-error'
-import Avatar from '../../components/avatar/avatar.vue'
-import { useLocale } from '../../locale'
-import { useToast } from '../../composables/use-toast'
+import { formatSdkError } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
 import { type InvitePersistType, useInvitePersistence } from '../../composables/use-invite-persistence'
-import Empty from '../../components/empty/empty.vue'
-import type { UiContactInvite } from '../../sdk/types'
-import { createLogger } from '../../utils/logger'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
+import type { UiContactInvite } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
 
 const props = withDefaults(defineProps<ContactNoticeListProps>(), {
   invites: undefined,

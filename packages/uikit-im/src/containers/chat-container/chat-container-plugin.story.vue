@@ -4,10 +4,10 @@ import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import ChatContainer from './chat-container.vue'
-import type { UiMessage } from '../../sdk/types'
+import type { UiMessage } from '@easemob/uikit-core'
 
 /**
  * ChatContainer Plugin Extension Points

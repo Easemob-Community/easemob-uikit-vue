@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
-import type { UiContact } from '../../sdk/types'
+import type { UiContact } from '@easemob/uikit-core'
 import { useContactStore } from '../../store/contact'
 import NewChatModal from './new-chat-modal.vue'
 

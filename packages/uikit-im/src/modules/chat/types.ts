@@ -1,6 +1,6 @@
-import type { UiMessage } from '../../sdk/types'
-import type { MessageStatusValue } from '../../constants'
-import type { EmojiStickerPack } from '../../components/emoji-picker/types'
+import type { UiMessage } from '@easemob/uikit-core'
+import type { MessageStatusValue } from '@easemob/uikit-core'
+import type { EmojiStickerPack } from '@easemob/uikit-core'
 import type { LastMessageTextResolver } from '../../utils/resolve-last-message-text'
 
 /** 消息气泡布局模式 */

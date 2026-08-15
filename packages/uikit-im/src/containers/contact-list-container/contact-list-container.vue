@@ -16,7 +16,7 @@ import type {
 } from '../../modules/contact/types'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
-import type { UiContact as Contact } from '../../sdk/types'
+import type { UiContact as Contact } from '@easemob/uikit-core'
 
 /** 联系人列表项点击行为模式 */
 export type ContactListClickBehavior = 'default' | 'event-only'

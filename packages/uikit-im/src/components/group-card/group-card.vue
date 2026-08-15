@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Avatar from '../avatar/avatar.vue'
-import Icon from '../icon/icon.vue'
-import CopyableText from '../copyable-text/copyable-text.vue'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCopyableText as CopyableText } from '@easemob/uikit-core'
 
 export interface GroupCardAction {
   /** 操作唯一标识，点击时作为 action-click 负载回传 */

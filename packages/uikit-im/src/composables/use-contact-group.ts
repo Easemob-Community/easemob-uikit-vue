@@ -1,5 +1,5 @@
 import { type ComputedRef, type Ref, computed } from 'vue'
-import type { UiContact as Contact } from '../sdk/types'
+import type { UiContact as Contact } from '@easemob/uikit-core'
 import {
   type ContactGroupBy,
   type ContactGroupItem,

@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
-import type { UiConversation } from '../sdk/types'
+import type { UiConversation } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
-import { type UIKitStorageType, createUIKitStorageKey, getStorageBackend } from './use-uikit-storage'
+import { type UIKitStorageType, createUIKitStorageKey, getStorageBackend } from '@easemob/uikit-core'
 
 /** 草稿存储模式 */
 let draftStorageType: UIKitStorageType | 'none' = 'none'

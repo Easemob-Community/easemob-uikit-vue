@@ -8,8 +8,8 @@ export default defineConfig({
   title: 'Easemob UIKit',
   description: '环信 Vue3 即时通讯 UI 组件库 - 官方文档',
   cleanUrls: true,
-  // icons.md 引用了 packages/uikit-im/src 下的源码文件，属于仓库内文档链接，跳过校验
-  ignoreDeadLinks: [/packages\/uikit\//],
+  // icons.md 引用了 packages/uikit-im 下的仓内文件（docs/UI_CONVENTIONS.md 等），属于仓库内文档链接，跳过校验
+  ignoreDeadLinks: [/packages\/uikit/],
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.png', type: 'image/png' }],

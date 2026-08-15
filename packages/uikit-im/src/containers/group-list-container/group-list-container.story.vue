@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
-import type { UiGroup as Group } from '../../sdk/types'
+import type { UiGroup as Group } from '@easemob/uikit-core'
 import type { GroupSubtitleFn } from '../../modules/group/types'
 import GroupListContainer from './group-list-container.vue'
 

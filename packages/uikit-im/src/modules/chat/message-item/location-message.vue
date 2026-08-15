@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
-import { useLocale } from '../../../locale'
-import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface LocationMessageProps {
   message: UiMessage

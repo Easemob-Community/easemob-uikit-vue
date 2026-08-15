@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { formatSdkError } from '../../utils/sdk-error'
-import Popup from '../popup/popup.vue'
-import { useLocale } from '../../locale'
+import { formatSdkError } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import GroupCard, { type GroupCardInfoRow } from './group-card.vue'
-import { createLogger } from '../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:GroupCardModal')
 

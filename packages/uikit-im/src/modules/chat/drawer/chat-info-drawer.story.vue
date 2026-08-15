@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '../../../constants'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
-import Button from '../../../components/button/button.vue'
+import { EmButton as Button } from '@easemob/uikit-core'
 import { useGroupStore } from '../../../store/group'
-import type { UiConversation, UiGroupMember } from '../../../sdk/types'
+import type { UiConversation, UiGroupMember } from '@easemob/uikit-core'
 import ChatInfoDrawer from './chat-info-drawer.vue'
 
 const groupConversation: UiConversation = {

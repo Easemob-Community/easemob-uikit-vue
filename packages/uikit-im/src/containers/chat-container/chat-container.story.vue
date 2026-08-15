@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import ChatContainer from './chat-container.vue'
 

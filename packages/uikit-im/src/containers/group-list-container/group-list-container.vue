@@ -15,7 +15,7 @@ import type {
   GroupSubtitleFn,
 } from '../../modules/group/types'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
-import type { UiGroup as Group } from '../../sdk/types'
+import type { UiGroup as Group } from '@easemob/uikit-core'
 
 /** 群组列表项点击行为模式 */
 export type GroupListClickBehavior = 'default' | 'event-only'

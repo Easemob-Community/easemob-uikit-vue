@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
-import IconButton from '../../../components/icon-button/icon-button.vue'
-import { useLocale } from '../../../locale'
-import { MESSAGE_TYPE } from '../../../constants'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { MESSAGE_TYPE } from '@easemob/uikit-core'
 import { getQuotePreview } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { ImageMessageBody, UiMessage } from '../../../sdk/types'
+import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface QuoteBarProps {
   message: UiMessage

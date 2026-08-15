@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useLocale } from '../../locale'
+import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { useViewport } from '../../composables/use-viewport'
+import { useViewport } from '@easemob/uikit-core'
 import { useContact } from '../../composables/use-contact'
-import type { UiContact } from '../../sdk/types'
-import Popup from '../../components/popup/popup.vue'
-import Input from '../../components/input/input.vue'
-import Button from '../../components/button/button.vue'
-import Cell from '../../components/cell/cell.vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
+import type { UiContact } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmInput as Input } from '@easemob/uikit-core'
+import { EmButton as Button } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
 
 export interface AddContactModalProps {
   show: boolean

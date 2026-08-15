@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import Icon from '../../components/icon/icon.vue'
-import IconButton from '../../components/icon-button/icon-button.vue'
-import { useLocale } from '../../locale'
-import { useToast } from '../../composables/use-toast'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import { useGroup } from '../../composables/use-group'
-import { buildAnnouncementNoticeText, insertChatNotice } from '../../sdk/event/notice-utils'
+import { buildAnnouncementNoticeText, insertChatNotice } from '@easemob/uikit-core'
 
 export interface GroupAnnouncementProps {
   groupId: string

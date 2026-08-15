@@ -29,7 +29,7 @@ import type {
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
-import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
+import type { UiContact as Contact, UiGroup as Group } from '@easemob/uikit-core'
 
 /** 容器视图状态（兼容旧命名） */
 export type ContactContainerView = 'home' | 'group' | 'contact' | 'notice'

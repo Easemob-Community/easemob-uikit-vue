@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { MESSAGE_TYPE } from '../constants'
+import { MESSAGE_TYPE } from '@easemob/uikit-core'
 import { customEventPreviewMap } from '../utils/resolve-last-message-text'
-import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
+import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '@easemob/uikit-core'
 
 /** 引用消息协议类型（ext.msgQuote） */
 export interface MsgQuotePayload {

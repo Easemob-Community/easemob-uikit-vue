@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
-import Cell from '../../components/cell/cell.vue'
-import type { UiGroup as Group } from '../../sdk/types'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import type { UiGroup as Group } from '@easemob/uikit-core'
 import type { AvatarShape, GroupItemSize } from './types'
 
 interface GroupItemDefaultProps {

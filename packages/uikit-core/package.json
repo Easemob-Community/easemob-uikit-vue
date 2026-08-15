@@ -1,0 +1,54 @@
+{
+  "name": "@easemob/uikit-core",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Easemob UIKit Vue3 shared core (sdk abstraction / theme / locale / atomic components / provider)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/easemob-uikit-core.js",
+      "require": "./dist/easemob-uikit-core.umd.cjs"
+    },
+    "./resolver": {
+      "types": "./dist/resolver.d.ts",
+      "import": "./dist/resolver.js"
+    },
+    "./auto-imports": {
+      "types": "./dist/auto-imports.d.ts",
+      "import": "./dist/auto-imports.js"
+    },
+    "./theme": "./dist/theme/index.css"
+  },
+  "main": "./dist/easemob-uikit-core.umd.cjs",
+  "module": "./dist/easemob-uikit-core.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/check-icon-refs.mjs && node scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "dev": "vite build --watch",
+    "icons:check": "node scripts/check-icon-refs.mjs",
+    "aux:gen": "node scripts/gen-aux-entries.mjs .",
+    "story:dev": "histoire dev",
+    "story:build": "histoire build"
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.0",
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.4.0",
+    "easemob-websdk": "^5.0.0"
+  },
+  "devDependencies": {
+    "@histoire/plugin-vue": "^0.17.17",
+    "@vitejs/plugin-vue": "^4.6.2",
+    "histoire": "^0.17.17",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.5.41",
+    "vue-tsc": "^2.2.12"
+  }
+}

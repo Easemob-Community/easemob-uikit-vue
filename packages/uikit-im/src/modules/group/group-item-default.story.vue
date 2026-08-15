@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { UiGroup } from '../../sdk/types'
+import type { UiGroup } from '@easemob/uikit-core'
 import GroupItemDefault from './group-item-default.vue'
 
 const logs = ref<string[]>([])

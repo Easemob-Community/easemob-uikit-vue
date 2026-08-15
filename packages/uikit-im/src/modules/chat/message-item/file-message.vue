@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
-import { useLocale } from '../../../locale'
-import { useToast } from '../../../composables/use-toast'
-import { detectEnvironment, downloadFile } from '../../../utils/download'
-import type { FileMessageBody, UiMessage } from '../../../sdk/types'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
+import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
+import type { FileMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface FileMessageProps {
   message: UiMessage

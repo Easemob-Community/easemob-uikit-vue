@@ -3,10 +3,10 @@ import { computed, onMounted } from 'vue'
 import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
-import { useLocale } from '../../locale'
+import { useLocale } from '@easemob/uikit-core'
 import type { ConversationAction, ConversationTabKey } from '../../modules/conversation/types'
 import { DEFAULT_CONVERSATION_TABS } from '../../modules/conversation/types'
-import type { UiConversation as Conversation } from '../../sdk/types'
+import type { UiConversation as Conversation } from '@easemob/uikit-core'
 
 export interface ConversationContainerProps {
   /** 是否展示搜索框，默认 true */

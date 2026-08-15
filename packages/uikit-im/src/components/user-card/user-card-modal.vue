@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { UserInfoAttribute } from 'easemob-websdk'
-import { formatSdkError } from '../../utils/sdk-error'
-import Popup from '../popup/popup.vue'
-import { useLocale } from '../../locale'
+import { formatSdkError } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
-import { usePresence } from '../../composables/use-presence'
+import { usePresence, useToast } from '@easemob/uikit-core'
 import { useBlocklist } from '../../composables/use-blocklist'
-import { useToast } from '../../composables/use-toast'
-import type { PresenceDisplayStatus } from '../avatar/avatar.vue'
-import UserCard, { type UserCardInfoRow } from './user-card.vue'
-import { createLogger } from '../../utils/logger'
+import type { PresenceDisplayStatus } from '@easemob/uikit-core'
+import { EmUserCard as UserCard, type UserCardInfoRow } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:UserCardModal')
 

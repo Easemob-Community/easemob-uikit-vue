@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MESSAGE_TYPE } from '../../../constants'
+import { MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 

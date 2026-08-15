@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useLocale } from '../../../locale'
-import Icon from '../../../components/icon/icon.vue'
-import type { CombineMessageBody, UiMessage } from '../../../sdk/types'
+import { useLocale } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import type { CombineMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface CombineMessageProps {
   message: UiMessage

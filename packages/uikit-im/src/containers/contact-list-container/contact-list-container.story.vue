@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
-import type { UiContact as Contact } from '../../sdk/types'
+import type { UiContact as Contact } from '@easemob/uikit-core'
 import type { ContactSubtitleFn } from '../../modules/contact/types'
 import ContactListContainer from './contact-list-container.vue'
 

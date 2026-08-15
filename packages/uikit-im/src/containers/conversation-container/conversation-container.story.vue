@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useConversationStore } from '../../store/conversation'
-import { usePresenceStore } from '../../store/presence'
-import type { UiConversation, UiPresence } from '../../sdk/types'
+import { usePresenceStore } from '@easemob/uikit-core'
+import type { UiConversation, UiPresence } from '@easemob/uikit-core'
 import ConversationContainer from './conversation-container.vue'
 
 const customActions = [

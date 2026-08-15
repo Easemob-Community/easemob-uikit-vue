@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useLocale } from '../../../locale'
-import { useViewport } from '../../../composables/use-viewport'
-import { useLongPress } from '../../../composables/use-long-press'
-import { useToast } from '../../../composables/use-toast'
+import { useLocale } from '@easemob/uikit-core'
+import { useLongPress, useToast, useViewport } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useGroupStore } from '../../../store/group'
 import { resolveTranslateLang } from '../../../composables/use-message-actions'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE } from '../../../constants'
-import Popup from '../../../components/popup/popup.vue'
-import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmActionSheet as ActionSheet } from '@easemob/uikit-core'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
-import type { UiMessage } from '../../../sdk/types'
+import type { UiMessage } from '@easemob/uikit-core'
 import type { ChatConfig, MessageActionEvent, MessageActionItem, MessageActionType } from '../types'
 
 export interface MessageInteractiveProps {

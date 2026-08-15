@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useLocale } from '../../locale'
-import Empty from '../../components/empty/empty.vue'
+import { useLocale } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
 
 interface ContactEmptyProps {
   text?: string

@@ -1,45 +1,54 @@
 // Base UI Components
 // 对外统一使用 Em 前缀，避免与业务方组件命名冲突
-export { default as EmButton } from './button/button.vue'
-export { default as EmIconButton } from './icon-button/icon-button.vue'
-export { default as EmAvatar } from './avatar/avatar.vue'
-export { default as EmBadge } from './badge/badge.vue'
-export { default as EmIcon } from './icon/icon.vue'
-export { default as EmInput } from './input/input.vue'
-export { default as EmPopup } from './popup/popup.vue'
-export { default as EmModal } from './modal/modal.vue'
-export { default as EmToast } from './toast/toast.vue'
-export { default as EmActionSheet } from './action-sheet/action-sheet.vue'
-export { default as EmScrollToTop } from './scroll-to-top/scroll-to-top.vue'
-export { default as EmEmojiPicker } from './emoji-picker/emoji-picker.vue'
-export type { EmojiStickerItem, EmojiStickerPack } from './emoji-picker/types'
-export { default as EmUserCard } from './user-card/user-card.vue'
+// P1 Step 4：原子组件已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变
+export {
+  EmActionSheet,
+  EmAvatar,
+  EmBadge,
+  EmButton,
+  EmCell,
+  EmCopyableText,
+  EmEmojiPicker,
+  EmEmpty,
+  EmIcon,
+  EmIconButton,
+  EmImageViewer,
+  EmInput,
+  EmModal,
+  EmNotification,
+  EmNotificationContainer,
+  EmPopup,
+  EmPresenceAvatar,
+  EmPresenceSelector,
+  EmPresenceSelectorModal,
+  EmPresenceSelectorPopup,
+  EmResizable,
+  EmScrollToTop,
+  EmStatusBanner,
+  EmToast,
+  EmUserCard,
+} from '@easemob/uikit-core'
+export type {
+  CellProps,
+  CopyableTextProps,
+  EmojiStickerItem,
+  EmojiStickerPack,
+  EmptyProps,
+  ImageViewerEmits,
+  ImageViewerProps,
+  NotificationContainerProps,
+  NotificationItem,
+  NotificationProps,
+  PresenceDisplayStatus,
+  ResizableProps,
+  StatusBannerEmits,
+  StatusBannerItem,
+  StatusBannerProps,
+  StatusBannerType,
+} from '@easemob/uikit-core'
 export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
 export { default as EmGroupCard } from './group-card/group-card.vue'
 export { default as EmGroupCardModal } from './group-card/group-card-modal.vue'
-export { default as EmPresenceSelector } from './presence-selector/presence-selector.vue'
-export { default as EmPresenceSelectorModal } from './presence-selector/presence-selector-modal.vue'
-export { default as EmPresenceSelectorPopup } from './presence-selector/presence-selector-popup.vue'
-export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
-export { default as EmCell } from './cell/cell.vue'
-export type { CellProps } from './cell/cell.vue'
-export { default as EmCopyableText } from './copyable-text/copyable-text.vue'
-export type { CopyableTextProps } from './copyable-text/copyable-text.vue'
-export { default as EmEmpty } from './empty/empty.vue'
-export type { EmptyProps } from './empty/empty.vue'
-export { default as EmNotification } from './notification/notification.vue'
-export type { NotificationProps } from './notification/notification.vue'
-export { default as EmNotificationContainer } from './notification/notification-container.vue'
-export type { NotificationContainerProps } from './notification/notification-container.vue'
-export type { NotificationItem } from './notification/types'
-export { default as EmStatusBanner } from './status-banner/status-banner.vue'
-export type { StatusBannerProps, StatusBannerEmits } from './status-banner/status-banner.vue'
-export type { StatusBannerType, StatusBannerItem } from './status-banner/types'
-export { default as EmImageViewer } from './image-viewer/image-viewer.vue'
-export type { ImageViewerProps, ImageViewerEmits } from './image-viewer/image-viewer.vue'
-export { default as EmResizable } from './resizable/resizable.vue'
-export type { ResizableProps } from './resizable/resizable.vue'
-export type { PresenceDisplayStatus } from './avatar/avatar.vue'
 
 export const componentList = [
   'em-button',

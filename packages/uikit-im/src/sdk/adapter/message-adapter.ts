@@ -1,7 +1,7 @@
 import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websdk'
 import { markRaw } from 'vue'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
-import type { ConversationTypeValue } from '../../constants'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { ConversationTypeValue } from '@easemob/uikit-core'
 import {
   isCmdBody as isCmdMessageBody,
   isCombineBody as isCombineMessageBody,
@@ -12,11 +12,11 @@ import {
   isTextBody as isTextMessageBody,
   isVideoBody as isVideoMessageBody,
   isVoiceBody as isVoiceMessageBody,
-} from '../types/message'
-import type { UiMessage } from '../types'
-import type { CombineMessageBody } from '../types/message'
+} from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob/uikit-core'
+import type { CombineMessageBody } from '@easemob/uikit-core'
 import { customEventPreviewMap } from '../../utils/resolve-last-message-text'
-import { createLogger } from '../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const adapterLog = createLogger('UIKit:MessageAdapter')
 

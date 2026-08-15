@@ -1,5 +1,5 @@
 import type { StreamMessageStatus } from 'easemob-websdk'
-import { STREAM_MESSAGE_STATUS } from '../constants'
+import { STREAM_MESSAGE_STATUS } from '@easemob/uikit-core'
 
 /**
  * 流式消息状态判定工具（内核渲染 / 事件层共用）。

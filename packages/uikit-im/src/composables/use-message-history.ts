@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { MESSAGE_TYPE } from '../constants'
+import { MESSAGE_TYPE } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
 
 /** 历史消息游标（模块级单例，保证首屏拉取与上滑加载共享同一份游标） */

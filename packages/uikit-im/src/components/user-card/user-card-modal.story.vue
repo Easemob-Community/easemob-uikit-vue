@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
-import { useUserInfoStore } from '../../store/user-info'
+import { useUserInfoStore } from '@easemob/uikit-core'
 import UserCardModal from './user-card-modal.vue'
 
 const show = ref(false)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useLocale } from '../../locale'
+import { useLocale } from '@easemob/uikit-core'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationTabKey, ConversationTabsSlotScope } from './types'
 

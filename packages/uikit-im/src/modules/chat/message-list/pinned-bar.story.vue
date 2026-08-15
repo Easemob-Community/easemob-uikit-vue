@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
 import { useConversationStore } from '../../../store/conversation'
 import { useMessageStore } from '../../../store/message'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../../constants'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
 import PinnedBar from './pinned-bar.vue'
 
 const logs = ref<string[]>([])

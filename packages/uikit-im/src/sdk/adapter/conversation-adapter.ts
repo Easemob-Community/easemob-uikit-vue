@@ -1,7 +1,7 @@
 import type { ConversationItem } from 'easemob-websdk'
-import { CONVERSATION_TYPE } from '../../constants'
+import { CONVERSATION_TYPE } from '@easemob/uikit-core'
 import { formatConversationPreview } from '../../utils/resolve-last-message-text'
-import type { UiConversation } from '../types'
+import type { UiConversation } from '@easemob/uikit-core'
 import { extractSnippetText, normalizeUserId } from './message-adapter'
 
 export interface ToUiConversationOptions {

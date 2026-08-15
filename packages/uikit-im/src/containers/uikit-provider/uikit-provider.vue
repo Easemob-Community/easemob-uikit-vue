@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, watch } from 'vue'
 import type { UserInfo } from 'easemob-websdk'
-import { formatSdkError } from '../../utils/sdk-error'
+import { formatSdkError } from '@easemob/uikit-core'
 import {
   type ContactFetchMode,
   type H5AdaptationConfig,
@@ -9,19 +9,15 @@ import {
   type UIKitFeatures,
   useUIKitProvider,
 } from '../../composables/use-uikit'
-import { useLocale } from '../../locale'
-import { useThemeStore } from '../../store/theme'
-import { useToast } from '../../composables/use-toast'
-import { useNotification } from '../../composables/use-notification'
-import type { NotificationChannel, NotificationTriggerMode } from '../../composables/use-notification'
+import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '@easemob/uikit-core'
 import { EmNotificationContainer, EmToast } from '../../components'
-import type { NotificationItem } from '../../components/notification/types'
-import type { ClientConfig } from '../../sdk/client'
-import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
-import type { UiContact } from '../../sdk/types'
-import type { NoticeConfig } from '../../sdk/event/notice-utils'
-import { createLogger, setLogLevel } from '../../utils/logger'
-import { configureLogPersistence } from '../../utils/log-store'
+import type { NotificationItem } from '@easemob/uikit-core'
+import type { ClientConfig } from '@easemob/uikit-core'
+import type { AnimationConfig, Density, FontSizePreset } from '@easemob/uikit-core'
+import type { UiContact } from '@easemob/uikit-core'
+import type { NoticeConfig } from '@easemob/uikit-core'
+import type { NotificationChannel, NotificationTriggerMode } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:UikitProvider')
 
@@ -192,27 +188,6 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableToast: true,
 })
 
-const { setLocale } = useLocale()
-const themeStore = useThemeStore()
-const { state: toastState, warning: showToastWarning } = useToast()
-const {
-  state: notificationState,
-  close: closeNotification,
-  configureNotification,
-  setNotificationClickHandler,
-  setNotificationHandler,
-} = useNotification()
-const { t } = useLocale()
-
-const toastProps = computed(() => ({
-  show: toastState.value.visible,
-  message: toastState.value.message,
-  type: toastState.value.type,
-}))
-
-/** 页内通知容器是否挂载（notification.enable 默认 true） */
-const enableNotification = computed(() => props.notification?.enable ?? true)
-
 const config = computed<ClientConfig>(() => ({
   appKey: props.appKey ?? '',
   ...props.sdkConfig,
@@ -247,23 +222,18 @@ const ctx = useUIKitProvider(config.value, {
   dataSource,
   noticeConfig,
   h5: props.h5,
-  onUserInfoSubscriptionPermissionError: props.enableToast
-    ? () => showToastWarning(t('userInfo.subscriptionDisabled'))
-    : undefined,
+  onUserInfoSubscriptionPermissionError: createUserInfoSubscriptionErrorHandler(props.enableToast),
   connectionCallbacks: {
     onTokenWillExpire: props.onTokenWillExpire,
     onTokenExpired: props.onTokenExpired,
   },
 })
 
-/** 通知点击默认行为：聚焦页面 + 跳转对应会话（navigateOnClick=false 时仅聚焦）。
+/** 通知点击跳转对应会话（window.focus 与 navigateOnClick 判定由共享副作用统一处理）。
  * 进入流程与手动点击会话项保持一致（enter：SDK setCurrentConversation + store 当前会话
  * + 补发已读回执；sendChannelAck：清除未读数）。若只 setCurrentConversationId，
  * SDK 层仍认为该会话非当前会话，新消息到达时未读数先增后清，出现 1→0 闪烁。 */
-function onNotificationClick(item: Omit<NotificationItem, 'id' | 'unreadCount'>) {
-  window.focus()
-  if (props.notification?.navigateOnClick === false)
-    return
+function navigateToConversation(item: Omit<NotificationItem, 'id' | 'unreadCount'>) {
   const cvs = ctx.stores.conversation.conversationList.find(c => c.id === item.conversationId)
   if (!cvs)
     return
@@ -272,42 +242,23 @@ function onNotificationClick(item: Omit<NotificationItem, 'id' | 'unreadCount'>)
   void ctx.domains.conversation.sendChannelAck(cvs.id, cvs.type)
 }
 
-/** 通知配置响应式应用：开关/权限自动请求/触发模式/点击回调 */
-watch(
-  () => props.notification,
-  (config) => {
-    configureNotification({
-      enabled: config?.enable,
-      browserEnabled: config?.browser,
-      inAppEnabled: config?.inApp,
-      autoRequestPermission: config?.autoRequestPermission,
-      triggerMode: config?.triggerMode,
-    })
-    setNotificationClickHandler(config?.navigateOnClick === false ? null : onNotificationClick)
-    setNotificationHandler(config?.onNotify ?? null)
-  },
-  { deep: true, immediate: true },
-)
-
-/** 日志配置响应式应用：
- * - 持久化（log-store）：collectSdkLog 变化时联动启停 SDK 日志捕获
- * - console 输出级别（utils/logger 全局开关）：uikitLevel 同时控制控制台输出，生产 'info'、排查临时调 'debug'（D37）
- */
-watch(
-  () => props.logger,
-  (loggerConfig) => {
-    configureLogPersistence({
-      enabled: loggerConfig?.enabled,
-      collectSdkLog: loggerConfig?.collectSdkLog,
-      uikitLevel: loggerConfig?.uikitLevel,
-      sdkLevel: loggerConfig?.sdkLevel,
-      maxEntries: loggerConfig?.maxEntries,
-      retentionDays: loggerConfig?.retentionDays,
-    })
-    setLogLevel(loggerConfig?.uikitLevel ?? 'info')
-  },
-  { deep: true, immediate: true },
-)
+/** 场景无关副作用（theme/locale/animation/h5 安全区/通知/日志 watch）走 core 共享实现，
+ * 本组件只保留场景增量（通知跳会话 + 登录副作用 watch）。 */
+const {
+  toastProps,
+  enableNotification,
+  notificationState,
+  closeNotification,
+  handleNotificationClick,
+} = useProviderSideEffects({
+  theme: () => props.theme,
+  locale: () => props.locale,
+  animation: () => props.animation,
+  h5: () => props.h5,
+  notification: () => props.notification,
+  logger: () => props.logger,
+  onNotificationClick: navigateToConversation,
+})
 
 /**
  * 登录后根据开关拉取全局副作用数据：
@@ -360,106 +311,6 @@ watch(
   },
   { immediate: false },
 )
-
-/**
- * 解析 theme.fontSize：支持档位或具体 scale
- */
-function resolveFontSize(fontSize: ThemeFontSize | undefined): number | undefined {
-  if (fontSize === undefined)
-    return undefined
-  if (typeof fontSize === 'number')
-    return fontSize
-  const presetMap: Record<FontSizePreset, number> = {
-    normal: 1,
-    large: 1.125,
-    xlarge: 1.25,
-  }
-  return presetMap[fontSize]
-}
-
-/**
- * 应用 theme 配置到 store，未传字段保持当前值不变
- */
-function applyThemeConfig(theme?: ProviderProps['theme']) {
-  if (!theme)
-    return
-  if (theme.mode) {
-    themeStore.setMode(theme.mode)
-  }
-  if (theme.primaryColor !== undefined) {
-    themeStore.setPrimaryColor(theme.primaryColor)
-  }
-  if (theme.gap !== undefined) {
-    themeStore.setContainerGap(theme.gap)
-  }
-  if (theme.shape) {
-    themeStore.setComponentsShape(theme.shape)
-  }
-  const scale = resolveFontSize(theme.fontSize)
-  if (scale !== undefined) {
-    themeStore.setFontSizeScale(scale)
-  }
-  if (theme.density) {
-    themeStore.setDensity(theme.density)
-  }
-  if (theme.bubbleColor !== undefined) {
-    if (typeof theme.bubbleColor === 'string') {
-      themeStore.setBubbleBg(theme.bubbleColor, theme.bubbleColor)
-    }
-    else {
-      themeStore.setBubbleBg(theme.bubbleColor.other ?? null, theme.bubbleColor.self ?? null)
-    }
-  }
-  if (theme.chatBg !== undefined) {
-    themeStore.setChatBg(theme.chatBg)
-  }
-  if (theme.inputBg !== undefined) {
-    themeStore.setInputBg(theme.inputBg)
-  }
-}
-
-// theme 配置响应式应用
-watch(
-  () => props.theme,
-  (theme) => {
-    applyThemeConfig(theme)
-  },
-  { deep: true },
-)
-
-onMounted(() => {
-  applyThemeConfig(props.theme)
-  if (props.animation) {
-    themeStore.applyAnimationConfig(props.animation)
-  }
-  // h5.fontScale 兼容：作为初始字号缩放值（若 theme.fontSize 未显式指定）
-  if (props.h5?.fontScale !== undefined && props.theme?.fontSize === undefined) {
-    themeStore.setFontSizeScale(props.h5.fontScale)
-  }
-  setLocale(props.locale)
-})
-
-/** H5 安全区开关响应式：运行期切换 :h5="{ safeArea }" 时同步覆写/恢复 CSS 变量 */
-watch(
-  () => props.h5?.safeArea,
-  (safeArea) => {
-    if (typeof document === 'undefined')
-      return
-    const root = document.documentElement
-    if (safeArea === false) {
-      root.style.setProperty('--uikit-safe-top', '0px')
-      root.style.setProperty('--uikit-safe-right', '0px')
-      root.style.setProperty('--uikit-safe-bottom', '0px')
-      root.style.setProperty('--uikit-safe-left', '0px')
-    }
-    else {
-      root.style.removeProperty('--uikit-safe-top')
-      root.style.removeProperty('--uikit-safe-right')
-      root.style.removeProperty('--uikit-safe-bottom')
-      root.style.removeProperty('--uikit-safe-left')
-    }
-  },
-)
 </script>
 
 <template>
@@ -470,7 +321,7 @@ watch(
       v-if="enableNotification"
       :items="notificationState.list"
       @close="closeNotification"
-      @click="onNotificationClick"
+      @click="handleNotificationClick"
     />
   </div>
 </template>

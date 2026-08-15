@@ -1,5 +1,5 @@
 import type { Contact as SdkContact, UserInfo as SdkUserInfo } from 'easemob-websdk'
-import type { UiContact } from '../types'
+import type { UiContact } from '@easemob/uikit-core'
 
 /**
  * 将 SDK Contact 或 UserInfo 转换为 UIKit 联系人展示类型。

@@ -1,7 +1,7 @@
 import type { PresenceEventHandlerMap } from 'easemob-websdk'
-import { createLogger } from '../../utils/logger'
-import { parsePresenceStatus } from '../domain/presence-domain'
-import type { UiPresence } from '../types'
+import { createLogger } from '@easemob/uikit-core'
+import { parsePresenceStatus } from '@easemob/uikit-core'
+import type { UiPresence } from '@easemob/uikit-core'
 import type { RootStores } from './types'
 
 const presenceLog = createLogger('UIKit:PresenceEvents')

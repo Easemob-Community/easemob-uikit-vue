@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import Avatar from '../../components/avatar/avatar.vue'
-import Icon from '../../components/icon/icon.vue'
-import Popup from '../../components/popup/popup.vue'
-import Cell from '../../components/cell/cell.vue'
-import { useLocale } from '../../locale'
-import { GROUP_MEMBER_ROLE } from '../../constants'
-import type { GroupMemberRoleValue } from '../../constants'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
+import type { GroupMemberRoleValue } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
-import type { UiGroupMember } from '../../sdk/types'
-import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
+import type { UiGroupMember } from '@easemob/uikit-core'
+import type { PresenceDisplayStatus } from '@easemob/uikit-core'
 
 interface Props {
   member: UiGroupMember

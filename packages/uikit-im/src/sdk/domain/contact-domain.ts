@@ -1,5 +1,5 @@
-import type { ManagerHost } from '../client'
-import type { UiContact, UiContactInvite } from '../types'
+import type { ManagerHost } from '@easemob/uikit-core'
+import type { UiContact, UiContactInvite } from '@easemob/uikit-core'
 import { toUiContacts } from '../adapter/contact-adapter'
 
 /**

@@ -1,6 +1,6 @@
-import type { CustomMessageBody, UiMessage } from '../sdk/types'
+import type { CustomMessageBody, UiMessage } from '@easemob/uikit-core'
 import type { RootStores } from '../sdk/event/types'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
 
 export type LastMessageTextResolver = (message: UiMessage) => string | undefined
 

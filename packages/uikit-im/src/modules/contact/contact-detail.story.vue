@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
-import { useUserInfoStore } from '../../store/user-info'
+import { useUserInfoStore } from '@easemob/uikit-core'
 import ContactDetail from './contact-detail.vue'
 
 const logs = ref<string[]>([])

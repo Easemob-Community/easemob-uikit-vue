@@ -24,12 +24,12 @@ import type {
   GroupUserRemovedEventPayload,
   UserInfo,
 } from 'easemob-websdk'
-import { t } from '../../locale'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../constants'
-import { createLogger } from '../../utils/logger'
-import type { UiContactInvite } from '../types'
+import { t } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
+import type { UiContactInvite } from '@easemob/uikit-core'
 import type { RootStores } from './types'
-import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from './notice-utils'
+import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '@easemob/uikit-core'
 
 const groupLog = createLogger('UIKit:GroupEvents')
 

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useLocale } from '../../locale'
-import { CONVERSATION_TYPE } from '../../constants'
+import { useLocale } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { useViewport } from '../../composables/use-viewport'
+import { useViewport } from '@easemob/uikit-core'
 import { useConversation } from '../../composables/use-conversation'
 import { useContact } from '../../composables/use-contact'
-import Popup from '../../components/popup/popup.vue'
+import { EmPopup as Popup } from '@easemob/uikit-core'
 import ContactList from '../contact/contact-list.vue'
-import type { UiContact } from '../../sdk/types'
+import type { UiContact } from '@easemob/uikit-core'
 
 export interface NewChatModalProps {
   show: boolean

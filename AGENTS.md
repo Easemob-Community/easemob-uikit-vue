@@ -25,6 +25,7 @@
 - 公开事件统一 **kebab-case**，由 `vue/custom-event-name-casing: ['error','kebab-case']` 强制。
 - **demo 运行时走 vite alias `@easemob/uikit-im` → `packages/uikit-im/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。demo 当前为 workspace 源码直连模式（tgz 验证模式已于 1.9.0 收回，切换细节见 skill `uikit-demo-development`）。
 - **SDK 双引入模式**：`easemob-websdk` 子包依赖声明恒为 `^5.0.0`（生产/发布，跟随 5.x 正式版与 beta 线）；本地 tgz 联调用 `pnpm sdk:use-tgz` / `pnpm sdk:use-npm` 切换（根 `package.json` 的 `pnpm.overrides` 指向根目录 `easemob-websdk-5.0.0.tgz`，切换后需 `pnpm install`）；`pnpm sdk:up` 更新到 range 内最新 SDK，`pnpm sdk:status` 查看当前模式。详见根 README「SDK 引入模式」与 skill `uikit-release-build`。
+- **resolver/auto-imports 参数化生成**：core 与 uikit-im 的 `src/resolver.ts` / `src/auto-imports.ts` 均由 `packages/uikit-core/scripts/gen-aux-entries.mjs` 按包根 `aux-entries.config.mjs` 生成，**勿手改**；改动 composables 导出后跑 `pnpm -F <pkg> aux:gen`，build 前置 `--check` 卡漂移。
 - macOS 自带 bash 3.2 无 `mapfile`。
 
 ## Skill 路由表
@@ -70,6 +71,7 @@
 - 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
+- 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）
 - 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）

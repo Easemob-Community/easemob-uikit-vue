@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useContact } from '../../composables/use-contact'
-import type { UiContact as Contact } from '../../sdk/types'
+import type { UiContact as Contact } from '@easemob/uikit-core'
 import ContactItemDefault from './contact-item-default.vue'
 import type { AvatarShape, ContactItemSize, ContactSelectMode, OnlineStatus } from './types'
 

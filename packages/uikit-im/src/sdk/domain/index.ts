@@ -10,8 +10,8 @@ export type { ContactStoreLike } from './contact-domain'
 export { GroupDomain } from './group-domain'
 export type { GroupStoreLike } from './group-domain'
 
-export { PresenceDomain } from './presence-domain'
-export type { PresenceStoreLike } from './presence-domain'
+export { PresenceDomain } from '@easemob/uikit-core'
+export type { PresenceStoreLike } from '@easemob/uikit-core'
 
-export { UserInfoDomain } from './user-info-domain'
-export type { UserInfoStore } from './user-info-domain'
+export { UserInfoDomain } from '@easemob/uikit-core'
+export type { UserInfoStore } from '@easemob/uikit-core'

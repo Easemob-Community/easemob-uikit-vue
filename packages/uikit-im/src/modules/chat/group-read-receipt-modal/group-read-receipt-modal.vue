@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
-import Popup from '../../../components/popup/popup.vue'
-import Avatar from '../../../components/avatar/avatar.vue'
-import Cell from '../../../components/cell/cell.vue'
-import IconButton from '../../../components/icon-button/icon-button.vue'
-import Empty from '../../../components/empty/empty.vue'
-import { useLocale } from '../../../locale'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 
 export interface GroupReadReceiptModalProps {

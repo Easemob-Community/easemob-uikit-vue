@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Avatar from '../../../components/avatar/avatar.vue'
-import Cell from '../../../components/cell/cell.vue'
-import Icon from '../../../components/icon/icon.vue'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { UiGroupMember } from '../../../sdk/types'
+import type { UiGroupMember } from '@easemob/uikit-core'
 
 export interface BlockListSelectItemProps {
   member: UiGroupMember

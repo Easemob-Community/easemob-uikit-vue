@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
-import type { LocationMessageBody, UiMessage } from '../../sdk/types'
+import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface ChatContainerProps {
   /** 聊天页面配置 */

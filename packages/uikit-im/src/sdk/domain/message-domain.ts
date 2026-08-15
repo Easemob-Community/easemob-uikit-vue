@@ -1,12 +1,12 @@
 import type { GroupMessageReadUser, GroupMessageReadUsersResult, Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
-import type { MessageStatus, UiMessage } from '../types'
-import type { ConversationTypeValue } from '../../constants'
-import type { ManagerHost } from '../client'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../../constants'
+import type { MessageStatus, UiMessage } from '@easemob/uikit-core'
+import type { ConversationTypeValue } from '@easemob/uikit-core'
+import type { ManagerHost } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
 import { toUiMessage } from '../adapter/message-adapter'
-import { isVoiceBody } from '../types/message'
-import { createLogger } from '../../utils/logger'
-import { formatSdkError } from '../../utils/sdk-error'
+import { isVoiceBody } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
+import { formatSdkError } from '@easemob/uikit-core'
 
 const combineLogger = createLogger('Combine')
 const historyLogger = createLogger('History')

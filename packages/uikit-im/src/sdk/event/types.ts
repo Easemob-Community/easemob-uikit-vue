@@ -2,9 +2,9 @@ import type { useMessageStore } from '../../store/message'
 import type { useConversationStore } from '../../store/conversation'
 import type { useContactStore } from '../../store/contact'
 import type { useGroupStore } from '../../store/group'
-import type { usePresenceStore } from '../../store/presence'
-import type { useClientStore } from '../../store/client'
-import type { useUserInfoStore } from '../../store/user-info'
+import type { usePresenceStore } from '@easemob/uikit-core'
+import type { useClientStore } from '@easemob/uikit-core'
+import type { useUserInfoStore } from '@easemob/uikit-core'
 
 /**
  * 事件处理器可访问的 Pinia Store 集合。

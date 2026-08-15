@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import type { UiContact } from '../sdk/types'
+import type { UiContact } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
 
 export function useContact() {

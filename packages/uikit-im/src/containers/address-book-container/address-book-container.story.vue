@@ -4,7 +4,7 @@ import GroupListContainer from '../group-list-container/group-list-container.vue
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
 import { useGroupStore } from '../../store/group'
-import type { UiContact as Contact, UiGroup as Group } from '../../sdk/types'
+import type { UiContact as Contact, UiGroup as Group } from '@easemob/uikit-core'
 import AddressBookContainer from './address-book-container.vue'
 
 function injectMockContacts() {

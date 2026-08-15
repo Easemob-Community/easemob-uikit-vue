@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
-import { useThemeStore } from '../../../store/theme'
+import { useThemeStore } from '@easemob/uikit-core'
 
 export interface ChatDrawerProps {
   show: boolean

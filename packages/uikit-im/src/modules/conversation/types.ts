@@ -1,4 +1,4 @@
-import type { UiConversation as Conversation } from '../../sdk/types'
+import type { UiConversation as Conversation } from '@easemob/uikit-core'
 
 /**
  * 会话列表分栏 tab 类型：

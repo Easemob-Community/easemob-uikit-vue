@@ -2,12 +2,12 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { useMessageSearch } from '../../../composables/use-message-search'
-import { useLocale } from '../../../locale'
-import Avatar from '../../../components/avatar/avatar.vue'
-import Icon from '../../../components/icon/icon.vue'
-import IconButton from '../../../components/icon-button/icon-button.vue'
-import Input from '../../../components/input/input.vue'
-import Empty from '../../../components/empty/empty.vue'
+import { useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { EmInput as Input } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
 
 export interface MessageSearchPanelProps {
   /** 面板显隐 */

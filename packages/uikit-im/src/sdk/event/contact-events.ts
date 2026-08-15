@@ -1,10 +1,10 @@
 import type { ContactEventHandlerMap, ContactRosterEventPayload } from 'easemob-websdk'
-import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '../../constants'
-import { t } from '../../locale'
-import { createLogger } from '../../utils/logger'
-import type { UiContactInvite } from '../types'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
+import { t } from '@easemob/uikit-core'
+import { createLogger } from '@easemob/uikit-core'
+import type { UiContactInvite } from '@easemob/uikit-core'
 import type { RootStores } from './types'
-import { insertChatNotice } from './notice-utils'
+import { insertChatNotice } from '@easemob/uikit-core'
 
 const contactLog = createLogger('UIKit:ContactEvents')
 

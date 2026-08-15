@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
-import { useThemeStore } from '../../../store/theme'
-import { INJECTION_KEY } from '../../../constants'
-import { useLocale } from '../../../locale'
-import { useToast } from '../../../composables/use-toast'
-import Icon from '../../../components/icon/icon.vue'
-import { detectEnvironment, downloadFile } from '../../../utils/download'
-import type { UiMessage, VideoMessageBody } from '../../../sdk/types'
+import { useThemeStore } from '@easemob/uikit-core'
+import { INJECTION_KEY } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob/uikit-core'
+import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
+import type { UiMessage, VideoMessageBody } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface VideoMessageProps {

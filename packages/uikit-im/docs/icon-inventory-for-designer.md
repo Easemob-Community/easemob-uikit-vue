@@ -460,9 +460,9 @@
 
 设计师交付后，开发同学按以下步骤替换：
 
-1. 将新 SVG 按 `src/assets/icons/分类/图标名.svg` 覆盖原文件。
-2. 运行 `cd packages/uikit-im && pnpm run icons:check`，确认无缺失引用。
-3. 运行 `pnpm -F @easemob/uikit-im build`，确认构建通过。
+1. 将新 SVG 按 `packages/uikit-core/src/assets/icons/分类/图标名.svg` 覆盖原文件（P1 Step 4 起图标库归 core）。
+2. 运行 `pnpm -F @easemob/uikit-im icons:check`（或 `pnpm -F @easemob/uikit-core icons:check`），确认无缺失引用。
+3. 运行 `pnpm -F @easemob/uikit-core build && pnpm -F @easemob/uikit-im build`，确认构建通过。
 4. 在 demo 中检查关键页面：会话列表、聊天页、群详情、联系人详情、转发 Modal。
 5. 如需新增图标，同步更新 `scripts/vendor-lucide-icons.mjs` 中的 `ADD_ICONS` 映射（非 Lucide 源可跳过）。
 
@@ -473,7 +473,7 @@
 本次清单由以下脚本扫描生成，可定期重新运行以追踪 Lucide 替换进度：
 
 ```bash
-cd packages/uikit-im
+cd packages/uikit-core
 node scripts/scan-lucide-icons.mjs
 ```
 

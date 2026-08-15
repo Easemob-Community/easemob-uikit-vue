@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { formatSdkError } from '../../../utils/sdk-error'
-import { useLocale } from '../../../locale'
+import { formatSdkError } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
-import Empty from '../../../components/empty/empty.vue'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
 import JoinRequestListItem from './join-request-list-item.vue'
-import { createLogger } from '../../../utils/logger'
+import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:JoinRequestList')
 

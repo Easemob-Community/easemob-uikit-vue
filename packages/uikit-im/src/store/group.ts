@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { UserInfo as SdkUserInfo } from 'easemob-websdk'
-import { GROUP_MEMBER_ROLE } from '../constants'
-import type { UiGroup, UiGroupMember } from '../sdk/types'
+import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
+import type { UiGroup, UiGroupMember } from '@easemob/uikit-core'
 
 /** 入群申请记录：申请人 ID 扁平化为 applicantId，作为状态更新的匹配键 */
 export interface UiGroupJoinRequest {

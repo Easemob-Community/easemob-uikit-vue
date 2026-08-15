@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UiConversation } from '../sdk/types'
+import type { UiConversation } from '@easemob/uikit-core'
 
 export const useConversationStore = defineStore('conversation', () => {
   const conversationList = ref<UiConversation[]>([])

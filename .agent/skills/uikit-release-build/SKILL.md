@@ -40,14 +40,22 @@
 
 ### 2.1 build 脚本
 
-`node scripts/check-icon-refs.mjs` → `vite build`（主库）→ `vite build --config vite.aux.config.ts`
+`node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons`（P1 Step 4 起
+图标库与脚本归 core，uikit-im 参数化复用同一脚本）→
+`node ../uikit-core/scripts/gen-aux-entries.mjs . --check`（P1 Step 7 起 resolver/auto-imports
+由该共享脚本参数化生成，各包一份 `aux-entries.config.mjs` 配置 + `src/resolver.ts` /
+`src/auto-imports.ts` 产物，--check 校验漂移；改动 composables 导出后跑 `aux:gen` 重新生成）→
+`vite build`（主库）→ `vite build --config vite.aux.config.ts`
 （轻量子包）→ `vue-tsc --emitDeclarationOnly --project tsconfig.build.json`（类型产物）。
+d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `aliasesExclude`，
+防止 tsconfig paths 把它展开成 `../../uikit-core/src` 相对路径）。
 
 ### 2.2 主构建（vite.config.ts）
 
 - lib entry `src/index.ts`，formats `['es', 'umd']`，fileName `easemob-uikit-im.js` /
   `easemob-uikit-im.umd.cjs`，全局名 `EasemobUIKit`；
-- `external: ['vue', 'pinia', 'easemob-websdk']`（配合 peerDependencies）；
+- `external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-core']`（配合 peerDependencies /
+  core 基座外置，P1 Step 4 起原子组件/theme/图标库均在 core）；
 - `output.exports: 'named'`（同时有命名导出与 default 导出时显式声明，避免 Rollup 警告
   "Consumers will have to use EasemobUIKit.default"；`install` 是命名导出，UMD 用户可直接
   `app.use(EasemobUIKit)`）；globals：`Vue` / `Pinia` / `Easemob`（SDK）；
@@ -63,6 +71,11 @@
 - `@easemob/uikit-im/resolver`（EasemobUIKitResolver，unplugin-vue-components）与
   `@easemob/uikit-im/auto-imports`（EasemobUIKitImports，unplugin-auto-import）单独打包，
   避免混进全量 bundle 导致 tree-shaking 不友好；
+- P1 Step 7 起 `@easemob/uikit-core` 有平行入口 `./resolver`（EasemobUIKitCoreResolver）/
+  `./auto-imports`（EasemobUIKitCoreImports，17 个 core 共享 hook），chatroom 等场景包直接复用；
+  两包的 `src/resolver.ts` / `src/auto-imports.ts` 均由
+  `packages/uikit-core/scripts/gen-aux-entries.mjs` 按各包 `aux-entries.config.mjs` 参数化生成，
+  勿手改（build 前置 `--check` 卡漂移）；
 - `emptyOutDir: false`——**必须保留主构建产物**，不能清空 dist。
 
 ### 2.4 package.json 契约
@@ -74,17 +87,22 @@
   `@tiptap/* ^3.30.0`、`@vueuse/core ^14.4.0`、`easemob-websdk ^5.0.0`；
 - `tsconfig.build.json`：extends 主 tsconfig，exclude `node_modules` / `dist` / `*.config.ts`。
 
-## 3. 构建期图标引用校验（`scripts/check-icon-refs.mjs`）
+## 3. 构建期图标引用校验（`packages/uikit-core/scripts/check-icon-refs.mjs`）
 
-- 扫描 `packages/uikit-im/src` 下所有 `.vue` / `.ts`（**含 `*.story.vue`，它们也真实渲染**），
+- P1 Step 4 起：图标库（`src/assets/icons`）与 EmIcon 组件迁入 `@easemob/uikit-core`，
+  校验脚本随迁 core 并参数化为 `node check-icon-refs.mjs [scanPkgRoot] [iconsDir]`；
+  core 构建前置默认校验自身；uikit-im 构建前置以
+  `node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons`
+  复用同一脚本扫描自身 src（工具链防复制，禁止拷贝脚本）；
+- 扫描 `src` 下所有 `.vue` / `.ts`（**含 `*.story.vue`，它们也真实渲染**），
   提取 `EmIcon` 的 name 引用（`name="分类/图标名"`、`:name="'...'"`、TS 里 `icon: '...'`），
-  与 `src/assets/icons` 下实际 SVG 比对；
+  与 icons 目录下实际 SVG 比对；
 - 缺失引用**非零码退出**，避免图标拼错/删漏后静默不渲染；
 - 识别方式：匹配形如 `'分类/图标名'` 的字符串字面量，且分类必须是 assets/icons 下真实
   存在的目录（不会误报 `'text/plain'` 等无关字符串）；
 - **已知局限**：动态拼接的 name（如 `icon: 'actions/' + type`）无法静态扫描，依赖 code
   review 与运行期 EmIcon 的 miss warn 兜底；
-- 独立运行：`cd packages/uikit-im && pnpm run icons:check`。
+- 独立运行：`pnpm -F @easemob/uikit-core icons:check` 或 `pnpm -F @easemob/uikit-im icons:check`。
 
 ## 4. SDK 双引入模式（根 `scripts/switch-sdk.mjs`）
 

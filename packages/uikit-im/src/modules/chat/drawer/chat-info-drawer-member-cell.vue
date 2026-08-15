@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Avatar from '../../../components/avatar/avatar.vue'
-import { useLocale } from '../../../locale'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { useLocale } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
-import { GROUP_MEMBER_ROLE } from '../../../constants'
-import type { UiGroupMember } from '../../../sdk/types'
+import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
+import type { UiGroupMember } from '@easemob/uikit-core'
 
 export interface ChatInfoDrawerMemberCellProps {
   member: UiGroupMember

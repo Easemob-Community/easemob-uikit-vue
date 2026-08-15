@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Icon from '../../components/icon/icon.vue'
+import { EmIcon as Icon } from '@easemob/uikit-core'
 import type { ContactNavEntry } from './types'
 
 export type { ContactNavEntry }

@@ -20,8 +20,35 @@ export * from './store'
 // SDK
 export * from './sdk'
 
-// Constants
-export * from './constants'
+// Constants（已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变）
+export {
+  ACK_TYPE,
+  CONVERSATION_TYPE,
+  FORWARD_MODE,
+  GROUP_INFO_LIMIT,
+  GROUP_MEMBER_ROLE,
+  HEADER_ALIGN,
+  INJECTION_KEY,
+  MESSAGE_STATUS,
+  MESSAGE_TYPE,
+  NOTICE_EVENT_TYPE,
+  PRESENCE_STATUS,
+  STREAM_CUSTOM_TYPE,
+  STREAM_MESSAGE_STATUS,
+} from '@easemob/uikit-core'
+export type {
+  AckTypeValue,
+  ConversationTypeValue,
+  ForwardModeValue,
+  GroupMemberRoleValue,
+  HeaderAlignValue,
+  MessageStatusValue,
+  MessageTypeValue,
+  NoticeEventTypeValue,
+  PresenceStatusValue,
+  StreamCustomTypeValue,
+  StreamMessageStatusValue,
+} from '@easemob/uikit-core'
 
 // Utils
 export * from './utils/resolve-last-message-text'
@@ -31,7 +58,7 @@ export {
   exportPersistedLogs,
   formatPersistedLogs,
   getPersistedLogs,
-} from './utils/log-store'
+} from '@easemob/uikit-core'
 export type {
   LogPersistenceConfig,
   PersistedLogEntry,
@@ -39,10 +66,20 @@ export type {
   PersistedLogLevel,
   PersistedLogSource,
   SdkPersistedLogLevel,
-} from './utils/log-store'
+} from '@easemob/uikit-core'
 
-// Locale
-export * from './locale'
+// Locale（已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变）
+export {
+  createLocale,
+  findLocaleKey,
+  mergeLocaleMessages,
+  t,
+  useLocale,
+} from '@easemob/uikit-core'
+export type {
+  FindLocaleKeyOptions,
+  LocaleMessages,
+} from '@easemob/uikit-core'
 
 // Theme
 import './theme/index.css'

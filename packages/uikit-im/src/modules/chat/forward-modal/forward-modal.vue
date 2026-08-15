@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useUIKit } from '../../../composables/use-uikit'
-import { useLocale } from '../../../locale'
-import { useViewport } from '../../../composables/use-viewport'
-import Popup from '../../../components/popup/popup.vue'
-import Avatar from '../../../components/avatar/avatar.vue'
-import Cell from '../../../components/cell/cell.vue'
-import Input from '../../../components/input/input.vue'
-import Empty from '../../../components/empty/empty.vue'
-import type { UiConversation as Conversation } from '../../../sdk/types'
+import { useLocale } from '@easemob/uikit-core'
+import { useViewport } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmInput as Input } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob/uikit-core'
+import type { UiConversation as Conversation } from '@easemob/uikit-core'
 
 export interface ForwardModalProps {
   show: boolean

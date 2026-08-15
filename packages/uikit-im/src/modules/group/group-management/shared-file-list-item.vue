@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Icon from '../../../components/icon/icon.vue'
+import { EmIcon as Icon } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface SharedFileListItemProps {

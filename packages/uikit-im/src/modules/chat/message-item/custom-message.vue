@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CustomMessageBody, UiMessage } from '../../../sdk/types'
+import type { CustomMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface CustomMessageProps {
   message: UiMessage

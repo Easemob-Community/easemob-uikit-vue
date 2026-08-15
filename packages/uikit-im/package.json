@@ -26,10 +26,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "node scripts/check-icon-refs.mjs && node scripts/check-auto-imports.mjs && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons && node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
-    "icons:check": "node scripts/check-icon-refs.mjs",
-    "auto-imports:check": "node scripts/check-auto-imports.mjs",
+    "icons:check": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons",
+    "auto-imports:check": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check",
+    "aux:gen": "node ../uikit-core/scripts/gen-aux-entries.mjs .",
     "story:dev": "histoire dev",
     "story:build": "histoire build"
   },
@@ -38,6 +39,7 @@
     "vue": "^3.3.0"
   },
   "dependencies": {
+    "@easemob/uikit-core": "workspace:^",
     "@tiptap/extension-image": "^3.30.0",
     "@tiptap/starter-kit": "^3.30.0",
     "@tiptap/vue-3": "^3.30.0",
