@@ -100,9 +100,12 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-secondary);
 }
 
-.uikit-icon-button--default.uikit-icon-button--solid:hover:not(:disabled) {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+
+@media (hover: hover) {
+  .uikit-icon-button--default.uikit-icon-button--solid:hover:not(:disabled) {
+    background-color: var(--uikit-bg-secondary);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .uikit-icon-button--primary.uikit-icon-button--solid {
@@ -110,8 +113,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-inverse);
 }
 
-.uikit-icon-button--primary.uikit-icon-button--solid:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .uikit-icon-button--primary.uikit-icon-button--solid:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 .uikit-icon-button--success.uikit-icon-button--solid {
@@ -119,8 +125,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-inverse);
 }
 
-.uikit-icon-button--success.uikit-icon-button--solid:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .uikit-icon-button--success.uikit-icon-button--solid:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 .uikit-icon-button--warning.uikit-icon-button--solid {
@@ -128,8 +137,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-inverse);
 }
 
-.uikit-icon-button--warning.uikit-icon-button--solid:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .uikit-icon-button--warning.uikit-icon-button--solid:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 .uikit-icon-button--danger.uikit-icon-button--solid {
@@ -137,8 +149,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-inverse);
 }
 
-.uikit-icon-button--danger.uikit-icon-button--solid:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .uikit-icon-button--danger.uikit-icon-button--solid:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 /* ---------- outline ---------- */
@@ -148,9 +163,12 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-secondary);
 }
 
-.uikit-icon-button--default.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+
+@media (hover: hover) {
+  .uikit-icon-button--default.uikit-icon-button--outline:hover:not(:disabled) {
+    background-color: var(--uikit-bg-secondary);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .uikit-icon-button--primary.uikit-icon-button--outline {
@@ -159,8 +177,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-primary-color);
 }
 
-.uikit-icon-button--primary.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-primary-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--primary.uikit-icon-button--outline:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-primary-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--success.uikit-icon-button--outline {
@@ -169,8 +190,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-success-color);
 }
 
-.uikit-icon-button--success.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-success-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--success.uikit-icon-button--outline:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-success-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--warning.uikit-icon-button--outline {
@@ -179,8 +203,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-warning-color);
 }
 
-.uikit-icon-button--warning.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-warning-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--warning.uikit-icon-button--outline:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-warning-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--danger.uikit-icon-button--outline {
@@ -189,8 +216,11 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-danger-color);
 }
 
-.uikit-icon-button--danger.uikit-icon-button--outline:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-danger-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--danger.uikit-icon-button--outline:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
+  }
 }
 
 /* ---------- ghost ---------- */
@@ -199,48 +229,66 @@ function handleClick(event: MouseEvent) {
   border-color: transparent;
 }
 
-.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: var(--uikit-bg-hover);
+
+@media (hover: hover) {
+  .uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .uikit-icon-button--default.uikit-icon-button--ghost {
   color: var(--uikit-text-secondary);
 }
 
-.uikit-icon-button--default.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-primary);
+
+@media (hover: hover) {
+  .uikit-icon-button--default.uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: var(--uikit-bg-secondary);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .uikit-icon-button--primary.uikit-icon-button--ghost {
   color: var(--uikit-primary-color);
 }
 
-.uikit-icon-button--primary.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-primary-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--primary.uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-primary-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--success.uikit-icon-button--ghost {
   color: var(--uikit-success-color);
 }
 
-.uikit-icon-button--success.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-success-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--success.uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-success-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--warning.uikit-icon-button--ghost {
   color: var(--uikit-warning-color);
 }
 
-.uikit-icon-button--warning.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-warning-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--warning.uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-warning-rgb), 0.08);
+  }
 }
 
 .uikit-icon-button--danger.uikit-icon-button--ghost {
   color: var(--uikit-danger-color);
 }
 
-.uikit-icon-button--danger.uikit-icon-button--ghost:hover:not(:disabled) {
-  background-color: rgba(var(--uikit-danger-rgb), 0.08);
+
+@media (hover: hover) {
+  .uikit-icon-button--danger.uikit-icon-button--ghost:hover:not(:disabled) {
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
+  }
 }
 </style>

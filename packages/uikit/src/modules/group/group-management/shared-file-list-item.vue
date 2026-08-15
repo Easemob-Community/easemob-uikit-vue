@@ -138,8 +138,11 @@ function onMoreClick(event: MouseEvent) {
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
-.shared-file-list__item:hover .shared-file-list__name {
-  color: var(--uikit-primary-color);
+
+@media (hover: hover) {
+  .shared-file-list__item:hover .shared-file-list__name {
+    color: var(--uikit-primary-color);
+  }
 }
 .shared-file-list__more-btn {
   display: inline-flex;

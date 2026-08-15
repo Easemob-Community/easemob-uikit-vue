@@ -342,8 +342,11 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 </template>
 
 <style scoped>
-.group-member-list__item:hover .group-member-list__actions {
-  opacity: 1;
+
+@media (hover: hover) {
+  .group-member-list__item:hover .group-member-list__actions {
+    opacity: 1;
+  }
 }
 
 .group-member-list__info {

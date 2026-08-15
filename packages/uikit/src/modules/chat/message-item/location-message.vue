@@ -95,9 +95,12 @@ function onClick() {
   }
 }
 
-.location-message--self .location-message__bubble:hover {
-  background-color: var(--uikit-bubble-bg-self);
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .location-message--self .location-message__bubble:hover {
+    background-color: var(--uikit-bubble-bg-self);
+    opacity: 0.9;
+  }
 }
 
 .location-message__icon {

@@ -173,8 +173,11 @@ async function handleDownload(event: MouseEvent) {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.video-message__container:hover .video-message__overlay {
-  background-color: rgba(0, 0, 0, 0.35);
+
+@media (hover: hover) {
+  .video-message__container:hover .video-message__overlay {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
 }
 
 .video-message__play-btn {

@@ -880,8 +880,11 @@ onBeforeUnmount(() => {
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.message-bubble-wrapper--hover-time:hover .message-bubble-wrapper__time {
-  opacity: 1;
+
+@media (hover: hover) {
+  .message-bubble-wrapper--hover-time:hover .message-bubble-wrapper__time {
+    opacity: 1;
+  }
 }
 
 /* 多选模式 */

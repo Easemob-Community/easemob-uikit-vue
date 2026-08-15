@@ -971,12 +971,18 @@ defineExpose({
 }
 
 /* 抽屉背景与默认 ghost hover 色阶接近，特调关闭按钮 hover 使其更明显 */
-.chat-info-drawer__close:hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.12) !important;
+
+@media (hover: hover) {
+  .chat-info-drawer__close:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.12) !important;
+  }
 }
 
-[data-uikit-theme='dark'] .chat-info-drawer__close:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.18) !important;
+
+@media (hover: hover) {
+  [data-uikit-theme='dark'] .chat-info-drawer__close:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+  }
 }
 
 .chat-info-drawer__header-placeholder {

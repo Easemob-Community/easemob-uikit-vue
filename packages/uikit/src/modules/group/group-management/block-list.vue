@@ -278,8 +278,11 @@ defineExpose({
   background-color: var(--uikit-primary-color);
   color: var(--uikit-text-inverse);
 }
-.block-list__popup-btn--confirm:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .block-list__popup-btn--confirm:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 .block-list__popup-btn--confirm:disabled {
   opacity: 0.5;

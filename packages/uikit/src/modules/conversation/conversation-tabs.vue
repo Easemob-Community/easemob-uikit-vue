@@ -103,8 +103,11 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
   border-radius: 2px;
 }
 
-.conversation-tabs:hover::-webkit-scrollbar-thumb {
-  background-color: var(--uikit-border-color, #e5e7eb);
+
+@media (hover: hover) {
+  .conversation-tabs:hover::-webkit-scrollbar-thumb {
+    background-color: var(--uikit-border-color, #e5e7eb);
+  }
 }
 
 .conversation-tabs__tab {

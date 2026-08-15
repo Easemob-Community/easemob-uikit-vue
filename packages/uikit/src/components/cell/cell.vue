@@ -190,9 +190,12 @@ function onContextmenu(e: MouseEvent) {
   cursor: pointer;
 }
 
-.uikit-cell.is-clickable:hover::before {
-  opacity: 1;
-  background-color: var(--uikit-bg-hover);
+
+@media (hover: hover) {
+  .uikit-cell.is-clickable:hover::before {
+    opacity: 1;
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .uikit-cell.is-active::before {
@@ -201,8 +204,11 @@ function onContextmenu(e: MouseEvent) {
   background-color: var(--uikit-bg-active);
 }
 
-.uikit-cell.is-active.is-clickable:hover::before {
-  background-color: var(--uikit-bg-active);
+
+@media (hover: hover) {
+  .uikit-cell.is-active.is-clickable:hover::before {
+    background-color: var(--uikit-bg-active);
+  }
 }
 
 .uikit-cell.is-disabled {
@@ -210,8 +216,11 @@ function onContextmenu(e: MouseEvent) {
   cursor: not-allowed;
 }
 
-.uikit-cell.is-disabled:hover::before {
-  opacity: 0;
+
+@media (hover: hover) {
+  .uikit-cell.is-disabled:hover::before {
+    opacity: 0;
+  }
 }
 
 /* 危险操作 */
@@ -223,8 +232,11 @@ function onContextmenu(e: MouseEvent) {
   color: var(--uikit-danger-color);
 }
 
-.uikit-cell.is-danger.is-clickable:hover::before {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+
+@media (hover: hover) {
+  .uikit-cell.is-danger.is-clickable:hover::before {
+    background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+  }
 }
 
 /* leading */

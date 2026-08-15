@@ -172,9 +172,12 @@ async function handleDownload() {
   color: var(--uikit-bubble-text-self);
 }
 
-.file-message--self .file-message__bubble:hover {
-  background-color: var(--uikit-bubble-bg-self);
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .file-message--self .file-message__bubble:hover {
+    background-color: var(--uikit-bubble-bg-self);
+    opacity: 0.9;
+  }
 }
 
 .file-message--self .file-message__icon {

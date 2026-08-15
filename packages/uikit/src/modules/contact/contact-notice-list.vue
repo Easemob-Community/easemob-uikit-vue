@@ -357,8 +357,11 @@ function avatarName(invite: UiContactInvite): string {
   border-color: var(--uikit-primary-color);
 }
 
-.contact-notice-list__btn--primary:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .contact-notice-list__btn--primary:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 .contact-notice-list__btn--default {
@@ -367,13 +370,19 @@ function avatarName(invite: UiContactInvite): string {
   border-color: var(--uikit-border-color, #e5e7eb);
 }
 
-.contact-notice-list__item:hover .contact-notice-list__btn--default {
-  background-color: var(--uikit-text-inverse);
-  border-color: var(--uikit-border-color, #d1d5db);
+
+@media (hover: hover) {
+  .contact-notice-list__item:hover .contact-notice-list__btn--default {
+    background-color: var(--uikit-text-inverse);
+    border-color: var(--uikit-border-color, #d1d5db);
+  }
 }
 
-.contact-notice-list__btn--default:hover:not(:disabled) {
-  background-color: var(--uikit-bg-secondary);
+
+@media (hover: hover) {
+  .contact-notice-list__btn--default:hover:not(:disabled) {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .contact-notice-list__empty {

@@ -710,11 +710,13 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`components/emoji-picker/emoji-picker.vue:140-141` 与 `modules/chat/message-input/index.vue:830-832` 的 `.emoji-picker` / `.emoji-picker-wrapper` 均已有 `width: 320px; max-width: calc(100vw - 24px)`，窄屏（≤320px）由 max-width 兜底不溢出。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D83. hover 态移动端残留
+### [x] D83. hover 态移动端残留
 
 - **现象**：大量 `:hover` 样式未包 `@media (hover: hover)`，移动端 tap 后 hover 态粘住（均有 `:active` 部分兜底，影响有限）。
 - **证据**：`modules/conversation/conversation-item.vue:444`；`modules/chat/message-input/simple-input.vue:499` 等。
 - **建议修法**：`:hover` 规则统一包 `@media (hover: hover)`。
+- **修复**：已于 2026-08-15 修复。缩进感知脚本检测全仓**未包裹的顶层 `:hover` 规则 39 处**（16 个文件：icon-button 16 / cell 4 / contact-notice-list 3 / chat-info-drawer 2 / multi-select-bar 2 / group-member-list 2 等），批量包进 `@media (hover: hover) { ... }`（仅动包裹结构，属性不变）；其余组合选择器（如 `message-bubble-wrapper` 状态图标 hover）核查确认已在 `@media (hover: hover)` 内。移动端 tap 不再粘住 hover 态（依赖 `:active` 兜底反馈），桌面悬停行为不变；构建无 CSS 警告、lint 清零。
+- **关联 skill**：`uikit-h5-adaptation` / `uikit-styling-theming`
 - **关联 skill**：`uikit-h5-adaptation` / `uikit-styling-theming`
 
 ### [x] D84. 其他小项集合（2026-07-28 四路审查遗留）

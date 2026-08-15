@@ -278,8 +278,11 @@ function onCancel() {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.multi-select-bar__action:hover .multi-select-bar__icon {
-  background-color: var(--uikit-bg-tertiary);
+
+@media (hover: hover) {
+  .multi-select-bar__action:hover .multi-select-bar__icon {
+    background-color: var(--uikit-bg-tertiary);
+  }
 }
 
 .multi-select-bar__label {
@@ -296,8 +299,11 @@ function onCancel() {
   cursor: not-allowed;
 }
 
-.multi-select-bar__action--disabled:hover .multi-select-bar__icon {
-  background-color: var(--uikit-bg-secondary);
+
+@media (hover: hover) {
+  .multi-select-bar__action--disabled:hover .multi-select-bar__icon {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 /* 取消按钮：绝对定位靠右，文字按钮 */

@@ -182,9 +182,12 @@ defineExpose({
     color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.uikit-input__clear:hover {
-  background-color: var(--uikit-bg-hover);
-  color: var(--uikit-text-primary);
+
+@media (hover: hover) {
+  .uikit-input__clear:hover {
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .uikit-input__prefix-icon {

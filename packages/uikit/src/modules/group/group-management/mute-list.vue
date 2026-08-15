@@ -349,8 +349,11 @@ defineExpose({
   color: var(--uikit-text-inverse);
 }
 
-.mute-list__popup-btn--confirm:hover:not(:disabled) {
-  opacity: 0.9;
+
+@media (hover: hover) {
+  .mute-list__popup-btn--confirm:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 }
 
 .mute-list__popup-btn--confirm:disabled {
