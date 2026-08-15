@@ -741,17 +741,19 @@
 - **关联 skill**：`uikit-h5-adaptation` / `uikit-store-composable` / `uikit-message-rendering`
 - **关联 skill**：`uikit-store-composable` / `uikit-lint-governance`
 
-### [ ] D85. 未来扩展：Electron + 本地数据库（SQLite）消息/会话持久化
+### [x] D85. 未来扩展：Electron + 本地数据库（SQLite）消息/会话持久化
 
 - **背景**：未来 UIKit 有较大可能在 Electron 环境使用，消息/会话数据需外接本地 DB——登录后从库加载回流 UIKit（冷启动不依赖网络）、收发写库、翻页先读本地再漫游。
 - **结论**：架构支持低侵入扩展（Domain 依赖注入 + store 已有 `setConversationList`/`prependMessages` 批量回流入口 + `toUiMessage` 形态对齐），缺持久化抽象接口、历史加载数据源分支、会话列表与 SDK 同步快照的覆盖竞争处理。**详细调研与落地建议见根 [ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（2026-08-05 预研）**。
+- **核销（2026-08-15，转 roadmap）**：预研已完成且架构结论明确，实施需 Electron 项目场景（当前仓库无 Electron 验证环境，下周为 Web Demo）——待 Electron 项目立项后按预研步骤实施（持久化抽象接口 → dataSource 分支 → 覆盖竞争处理），非当前 Web UIKit 债务。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
 
-### [ ] D86. 主题能力扩展：字号体系 / 适老版 / 密度 / 气泡色等语义 token
+### [x] D86. 主题能力扩展：字号体系 / 适老版 / 密度 / 气泡色等语义 token
 
 - **背景**：主题机制（变量契约 + `data-uikit-*` 驱动）健康，但覆盖面不足：字号 token 空白（357 处硬编码 px、`--uikit-font-scale` 只写不读）、无全局密度、气泡颜色等高频定制点无独立 token、Provider `theme` prop 偏窄（无 auto、非响应式）。
 - **进展**：2026-08-06 Phase 2 完成核心链路：`theme/index.css` 新增 `--uikit-font-size-*` token 与 `--uikit-font-scale` 联动；`store/theme.ts` / `use-theme.ts` 新增 `fontSizeScale`、`setFontSize`（normal/large/xlarge）；`uikit-provider.vue` 支持 `theme.fontSize` 与 `theme.mode: 'auto'` 并响应式应用；`use-h5-adaptation.ts` 停止重复写 `--uikit-font-scale`；demo 外观面板加 标准/大/特大 三档切换；高频组件（chat/conversation/原子组件，45 个文件 144 处）字号已 token 化。2026-08-06 Phase 2.5 完成剩余低频文件字号 token 化：新增 `--uikit-font-size-8` token，57 个文件 207 处硬编码替换为字号 token，仅剩 4 处 story 内装饰性 emoji 尺寸保持 px。字号体系（除装饰性 emoji）已全覆盖，适老版切换可正常缩放。2026-08-06 Phase 3 完成高频语义 token：`theme/index.css` 新增 `--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self`、`--uikit-chat-bg`、`--uikit-input-bg`；store 与 Provider 新增对应配置入口；text/file/voice/video/image/location/combine/custom 消息组件、聊天容器、输入区、时间分隔线全部接入语义 token；`--uikit-chat-bg` 使用 `background` 简写，默认可支持颜色/渐变/`url(...)` 图片背景。2026-08-06 Phase 4 完成 Provider 密度扩展：新增 `Density = 'compact' | 'normal' | 'comfortable'`，`theme/index.css` 通过 `[data-uikit-density]` 覆盖 `--uikit-cell-height*` / `--uikit-cell-padding-y` / `--uikit-list-gap` / `--uikit-header-padding-y`；`Cell` 默认/紧凑/大尺寸高度与 `auto-height` 内边距、`chat.vue` 头部内边距已接入；demo 外观面板加 紧凑/标准/宽松 三档切换。**后续可选项**：把密度变量扩展到输入区、消息气泡间距、抽屉内边距等更多组件。
 - **关联 skill**：`uikit-styling-theming`
+- **核销（2026-08-15）**：Phase 2（字号 token + font-scale + 适老档位）、Phase 2.5（剩余低频字号 token 化全覆盖）、Phase 3（气泡/聊天背景/输入区语义 token）、Phase 4（密度 compact/normal/comfortable + Provider 接线）均已完成并验证；剩余「密度变量扩展到更多组件」为可选优化，非债务。
 
 ### [x] D87. Demo 开发者友好模式（Dev Hints）：悬停展示环信接口 + 实现思路
 
@@ -777,12 +779,13 @@
   - **剩余**：这 39 个文件仍有 6 个**既有 JS 逻辑错误**（`chat.vue` 2 处 / `rich-input.vue` 2 处 / `simple-input.vue` 1 处 `no-use-before-define`、unused var），与 CSS 缩进无关、不可自动修，另立条目跟进。
 - **关联 skill**：`uikit-lint-governance` / `uikit-styling-theming`
 
-### [ ] D90. 面性图标集接入：主题级 iconStyle 切换 + 组件选中态配对
+### [x] D90. 面性图标集接入：主题级 iconStyle 切换 + 组件选中态配对
 
 - **背景**：设计师交付面性（filled）图标集 88 个（`面性/icon/filled/`），与线性集命名 1:1 对应；缺失的 32 个为箭头/对勾等纯线条图形（无面性隐喻，属正常）。面性在小尺寸状态图标与选中态辨识度更优（典型如 `pin`）。
 - **结论**：技术可行性高（`icon-map`/`EmIcon` 已有填充/描边双渲染分支，加第二注册表 + 缺失回落即可）。推荐「主题级 `iconStyle` 开关（品牌定制）+ 组件选中态自动配对（默认体验）」组合，不做面向终端用户的全局面性开关。**详细盘点、方案权衡与落地步骤见根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（2026-08-06 预研）**。
 - **资产合并策略（2026-08-07 沉淀，原根 `ICON-ASSET-MERGE-STRATEGY.md` 已删除归档至本条目）**：`packages/uikit/src/assets/icons` 是运行时唯一权威图标库（`EmIcon`/`icon-map.ts` 只认这里）；候选素材库 `assets/icons-next` 已整目录删除（2026-08-07）；设计源目录（`线性/icon/stroked`、`面性/icon/filled`、`消息状态以及未读状态`）为设计师本地工作产物、gitignore 已排除，后续新素材统一放仓库外（设计稿/蓝湖/Figma），由负责工程师评估后复制/替换进 `assets/icons` 并在 `icon-map.ts` 注册；合并采用批次化 + 分类映射表 + 同名脚本对比，不整体覆盖，避免未经验证的视觉回归。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
+- **核销（2026-08-15，转 roadmap）**：方案与落地步骤已定（见 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)：第二注册表 `assets/icons-filled/` + `getIconSvg(name, style?)` 回落线性版 + 主题级 `iconStyle` 开关 + 选中态配对）；**88 个面性 SVG 资产尚未提交进包**（设计师源目录 gitignore，规范化产物待工程师按资产合并策略评估后落地）——资产就绪后按预研步骤实施，非当前债务。
 
 ### [x] D91. 数字胶囊（Digital Capsule）消息状态与未读数设计落地
 
@@ -823,13 +826,14 @@
 - **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
-### [ ] D95. 流式消息（Stream Message）接入 UIKIT：内核薄 + 插件厚分层落地
+### [x] D95. 流式消息（Stream Message）接入 UIKIT：内核薄 + 插件厚分层落地
 
 - **背景**：环信 IM 支持流式消息（边生成边接收，典型 AI 对话），SDK 通过 `onStreamMessage` 按 `msgServerId` 排序合并分片，仅文本类型、客户端只收不发；消息体带 `stream`（`deltaText`/`fullText`/`status`/`customType`/`errorType`/`finishReason`）。
 - **结论**：流式是 TEXT 消息的「接收状态」而非新类型 → 内核只内置「数据链路 + 纯文本流式状态」，markdown 渲染与 AI 集成（重依赖/可选能力）走插件（`#message-txt` / `#message-custom` 插槽 + `useChatPlugin` + `dataSource`）。
 - **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)。
 - **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）、M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）、M3（demo markdown 流式气泡 `#message-txt` 插件接管 + 打字机）已完成；M4 demo mock AI 会话已落地（toolbar 入口 + 设置面板 + 分片模拟器），真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。文档新增 `guide/ai-stream-message.md` 独立章节。
 - **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
+- **核销（2026-08-15，转 roadmap）**：M1（内核数据链路）/ M2（纯文本流式渲染）/ M3（demo markdown 插件）+ M4 demo mock AI 会话均已落地验证，内核「薄 + 插件厚」能力完整；剩余 M4 真实模型对接（DeepSeek 直连/业务代理，需外部接入方式）与 M5 抽独立包（`@easemob/uikit-ai`）属发布后增强，按 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md) 推进，非当前债务。
 
 ### [x] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
 
