@@ -796,6 +796,16 @@
 - **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）、M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）、M3（demo markdown 流式气泡 `#message-txt` 插件接管 + 打字机）已完成；M4 demo mock AI 会话已落地（toolbar 入口 + 设置面板 + 分片模拟器），真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。文档新增 `guide/ai-stream-message.md` 独立章节。
 - **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
 
+### [ ] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
+
+- **现象**：2026-08-15 D89 修复后对这 39 个文件跑 eslint，仍剩 6 处**不可自动修复**的 JS 逻辑错误（非 CSS 缩进问题，均为既有代码）：
+  - `modules/chat/chat.vue:178`（`'t' was used before it was defined`）、`:424`（`'isGroupChat' was used before it was defined`）；
+  - `modules/chat/message-input/rich-input.vue:268-269`（`inlineImageBlobUrls` used before defined）；
+  - `modules/chat/message-input/simple-input.vue:162`（`typingThrottleTimer` 赋值未使用）；
+  - `modules/chat/message-item/message-bubble-wrapper.vue:165`（`messageStatus` used before defined）。
+- **建议修法**：逐处人工判断——use-before-define 多为模板/计算属性引用顺序问题，需确认无运行时风险后调整声明位置或加类型标注；unused var 直接删除或补 `_` 前缀。修完跑 `pnpm exec eslint <file>` 确认清零。
+- **关联 skill**：`uikit-lint-governance`
+
 ---
 
 ## 已修复（归档）
