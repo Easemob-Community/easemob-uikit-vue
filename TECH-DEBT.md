@@ -352,10 +352,11 @@
 - **建议修法**：新写强制命名 interface（skill 已约定）；存量可逐步收敛，非紧急。
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D11. `chat/message-input.vue` 与 `chat/message-input/` 目录并存，结构歧义
+### [x] D11. `chat/message-input.vue` 与 `chat/message-input/` 目录并存，结构歧义
 
 - **现象**：`modules/chat/` 下同时有顶层 `message-input.vue` 和 `message-input/` 目录（内含 rich/simple input 等），命名易混。
 - **建议修法**：厘清职责后合并到目录内，或重命名顶层文件（如 `message-input-bar.vue`）。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已清理，TECH-DEBT 漏勾）。`modules/chat/` 下顶层 `message-input.vue` 已移除，仅剩 `message-input/` 目录（index.vue 统一导出 rich/simple/h5-input 形态）与 `h5-input/` 目录；全仓无任何 `message-input.vue` 路径引用残留。
 - **关联 skill**：`uikit-component-authoring`
 
 ### [ ] D12. 动效未接入变量的比例偏高
@@ -663,11 +664,12 @@
 - **修复**：已于 2026-07-28 修复。`message-list.vue` 在消息数走 `MessageVirtualList`（虚拟滚动）时禁用自定义下拉刷新手势与指示，仅保留虚拟列表 `reach-top` 加载兜底，两条加载路径不再脱节。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D80. popup 自监听 window resize，违反「统一从 useUIKit().h5 取」规则
+### [x] D80. popup 自监听 window resize，违反「统一从 useUIKit().h5 取」规则
 
 - **现象**：`useEventListener(window, 'resize', ...)`（用于锚定重定位），与 SKILL「组件禁止自监听 resize/visualViewport」的硬规则冲突。
 - **证据**：`components/popup/popup.vue:147-149`。
 - **建议修法**：改为订阅 `h5.viewport`。
+- **结论（2026-08-15 消费者验证准备时评估）**：**有意保留**。`Popup` 是完全独立的基础组件（仅依赖 vue/vueuse/locale/key-bindings/z-index，不依赖 UIKitContext，可脱离 provider 单独使用），锚定模式（传 `anchor`）下的 resize 监听是「锚点重定位跟随窗口变化」的组件级职责，与 H5 适配的全局 viewport 监听（安全区/键盘/尺寸）用途不同；`useEventListener` 由 vueuse 在作用域销毁时自动清理，无泄漏。SKILL「组件禁止自监听 resize/visualViewport」的规则适用范围应为**依赖 provider 的业务组件**（避免重复监听），不适用于自包含基础组件。维持现状，文档/skill 已注明边界。
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [x] D81. `safeArea` 开关非响应式，运行期改 `:h5` prop 不生效
