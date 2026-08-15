@@ -94,10 +94,10 @@ async function copyText() {
   transition: opacity var(--uikit-anim-duration);
 }
 
-.copyable-text:hover .copyable-text__btn,
 @media (hover: hover) {
-.copyable-text__btn:hover {
-  opacity: 1;
-}
+  .copyable-text:hover .copyable-text__btn,
+  .copyable-text__btn:hover {
+    opacity: 1;
+  }
 }
 </style>

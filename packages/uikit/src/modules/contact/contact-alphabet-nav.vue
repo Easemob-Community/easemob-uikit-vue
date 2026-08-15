@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { DEFAULT_ALPHABET_KEYS, type ContactGroupItem } from './types'
+import { type ContactGroupItem, DEFAULT_ALPHABET_KEYS } from './types'
 
 interface ContactAlphabetNavProps {
   /** 当前已渲染的分组数据，用于禁用空字母（与 keys 二选一） */
@@ -24,12 +24,14 @@ const emit = defineEmits<{
 }>()
 
 const existKeys = computed(() => {
-  if (props.keys && props.keys.length) return new Set(props.keys)
-  return new Set(props.groups.map((g) => g.key))
+  if (props.keys && props.keys.length)
+    return new Set(props.keys)
+  return new Set(props.groups.map(g => g.key))
 })
 
 function onTap(key: string) {
-  if (props.dimEmpty && !existKeys.value.has(key)) return
+  if (props.dimEmpty && !existKeys.value.has(key))
+    return
   emit('jump', key)
 }
 </script>
@@ -74,15 +76,17 @@ function onTap(key: string) {
   padding: 2px 4px;
   color: var(--uikit-primary-color);
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
   border-radius: 4px;
 }
 
 @media (hover: hover) {
-.contact-alphabet-nav__item:hover {
-  color: var(--uikit-primary-hover);
-  background-color: var(--uikit-bg-secondary);
-}
+  .contact-alphabet-nav__item:hover {
+    color: var(--uikit-primary-hover);
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .contact-alphabet-nav__item.is-active {
@@ -101,9 +105,9 @@ function onTap(key: string) {
 }
 
 @media (hover: hover) {
-.contact-alphabet-nav__item.is-empty:hover {
-  background-color: transparent;
-  color: var(--uikit-text-tertiary, #c0c4cc);
-}
+  .contact-alphabet-nav__item.is-empty:hover {
+    background-color: transparent;
+    color: var(--uikit-text-tertiary, #c0c4cc);
+  }
 }
 </style>

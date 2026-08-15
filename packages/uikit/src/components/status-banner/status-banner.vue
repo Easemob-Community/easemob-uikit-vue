@@ -80,10 +80,14 @@ function handleClick(event: MouseEvent) {
       <div class="uikit-status-banner__content">
         <slot>
           <div v-if="props.title || $slots.title" class="uikit-status-banner__title">
-            <slot name="title">{{ props.title }}</slot>
+            <slot name="title">
+              {{ props.title }}
+            </slot>
           </div>
           <div v-if="props.description || $slots.description" class="uikit-status-banner__description">
-            <slot name="description">{{ props.description }}</slot>
+            <slot name="description">
+              {{ props.description }}
+            </slot>
           </div>
         </slot>
       </div>
@@ -113,8 +117,9 @@ function handleClick(event: MouseEvent) {
   font-size: var(--uikit-font-size-13, 13px);
   line-height: 1.4;
   cursor: default;
-  transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
-              color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  transition:
+    background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
+    color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
 .uikit-status-banner--info {
@@ -142,9 +147,9 @@ function handleClick(event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.uikit-status-banner--clickable:hover {
-  filter: brightness(0.97);
-}
+  .uikit-status-banner--clickable:hover {
+    filter: brightness(0.97);
+  }
 }
 
 .uikit-status-banner__icon {
@@ -191,22 +196,24 @@ function handleClick(event: MouseEvent) {
   color: currentColor;
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
-              background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  transition:
+    opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease),
+    background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 
 @media (hover: hover) {
-.uikit-status-banner__close:hover {
-  opacity: 1;
-  background-color: rgba(0, 0, 0, 0.06);
-}
+  .uikit-status-banner__close:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.06);
+  }
 }
 
 /* 入场/出场动画 */
 .uikit-status-banner-enter-active,
 .uikit-status-banner-leave-active {
-  transition: opacity var(--uikit-anim-duration-enter, 350ms) var(--uikit-anim-easing-decel, cubic-bezier(0, 0, 0.2, 1)),
-              transform var(--uikit-anim-duration-enter, 350ms) var(--uikit-anim-easing-decel, cubic-bezier(0, 0, 0.2, 1));
+  transition:
+    opacity var(--uikit-anim-duration-enter, 350ms) var(--uikit-anim-easing-decel, cubic-bezier(0, 0, 0.2, 1)),
+    transform var(--uikit-anim-duration-enter, 350ms) var(--uikit-anim-easing-decel, cubic-bezier(0, 0, 0.2, 1));
 }
 
 .uikit-status-banner-enter-from,

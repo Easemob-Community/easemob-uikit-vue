@@ -4,6 +4,15 @@ import { useLocale } from '../../locale'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationTabKey, ConversationTabsSlotScope } from './types'
 
+const props = withDefaults(defineProps<ConversationTabsProps>(), {
+  tabs: () => [...DEFAULT_CONVERSATION_TABS],
+  activeTab: 'all',
+})
+
+const emit = defineEmits<{
+  (e: 'update:active-tab', tab: ConversationTabKey): void
+}>()
+
 const { t } = useLocale()
 
 /** 分栏 tab 文案映射（走 i18n，computed 保证语言切换后刷新） */
@@ -24,15 +33,6 @@ export interface ConversationTabsProps {
   /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
   activeTab?: ConversationTabKey
 }
-
-const props = withDefaults(defineProps<ConversationTabsProps>(), {
-  tabs: () => [...DEFAULT_CONVERSATION_TABS],
-  activeTab: 'all',
-})
-
-const emit = defineEmits<{
-  (e: 'update:active-tab', tab: ConversationTabKey): void
-}>()
 
 /** 切换分栏 tab */
 function selectTab(tab: ConversationTabKey) {
@@ -82,9 +82,9 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 
 /* hover 时滑块显色（Firefox） */
 @media (hover: hover) {
-.conversation-tabs:hover {
-  scrollbar-color: var(--uikit-border-color, #e5e7eb) transparent;
-}
+  .conversation-tabs:hover {
+    scrollbar-color: var(--uikit-border-color, #e5e7eb) transparent;
+  }
 }
 
 /* 滚动条始终占位 4px，轨道透明（WebKit） */
@@ -123,9 +123,9 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 }
 
 @media (hover: hover) {
-.conversation-tabs__tab:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
+  .conversation-tabs__tab:hover {
+    background-color: var(--uikit-bg-hover, #f3f4f6);
+  }
 }
 
 .conversation-tabs__tab.is-active {

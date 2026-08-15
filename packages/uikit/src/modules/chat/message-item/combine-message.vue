@@ -62,9 +62,9 @@ function handleClick() {
 }
 
 @media (hover: hover) {
-.combine-message:hover {
-  background-color: var(--uikit-bg-tertiary, #f0f0f0);
-}
+  .combine-message:hover {
+    background-color: var(--uikit-bg-tertiary, #f0f0f0);
+  }
 }
 
 /* 己方合并消息：使用主题色背景 */
@@ -80,9 +80,9 @@ function handleClick() {
 }
 
 @media (hover: hover) {
-.combine-message--self:hover {
-  background-color: var(--uikit-primary-hover, #4b57c7);
-}
+  .combine-message--self:hover {
+    background-color: var(--uikit-primary-hover, #4b57c7);
+  }
 }
 
 .combine-message__header {

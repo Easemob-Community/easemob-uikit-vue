@@ -22,7 +22,8 @@ const userId = computed(() => {
   return user?.userId || ''
 })
 
-/** 禁言到期说明：
+/**
+ * 禁言到期说明：
  * - muteExpire 缺失、非正数，或超过 100 年后的时间戳视为永久禁言
  * - 小于等于当前时间视为已到期
  * - 否则显示到期时间
@@ -75,8 +76,8 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   transition: all 0.15s;
 }
 @media (hover: hover) {
-.mute-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .mute-list__action-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 </style>

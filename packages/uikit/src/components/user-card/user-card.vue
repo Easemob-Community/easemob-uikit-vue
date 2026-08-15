@@ -265,9 +265,9 @@ function onSelectorChanged() {
 }
 
 @media (hover: hover) {
-.user-card__action:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .user-card__action:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .user-card__action--primary {

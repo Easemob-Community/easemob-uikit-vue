@@ -90,9 +90,9 @@ function onClick() {
 }
 
 @media (hover: hover) {
-.location-message__bubble:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .location-message__bubble:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .location-message--self .location-message__bubble:hover {

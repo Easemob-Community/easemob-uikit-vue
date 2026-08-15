@@ -12,15 +12,6 @@ import Empty from '../../components/empty/empty.vue'
 import type { UiContactInvite } from '../../sdk/types'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('UIKit:ContactNoticeList')
-
-export interface ContactNoticeListProps {
-  invites?: UiContactInvite[]
-  loading?: boolean
-  /** 是否持久化未处理通知（true = localStorage，或指定 'local' / 'session'） */
-  persist?: InvitePersistType
-}
-
 const props = withDefaults(defineProps<ContactNoticeListProps>(), {
   invites: undefined,
   loading: false,
@@ -31,6 +22,15 @@ const emit = defineEmits<{
   (e: 'accept', invite: UiContactInvite): void
   (e: 'decline', invite: UiContactInvite): void
 }>()
+
+const logger = createLogger('UIKit:ContactNoticeList')
+
+export interface ContactNoticeListProps {
+  invites?: UiContactInvite[]
+  loading?: boolean
+  /** 是否持久化未处理通知（true = localStorage，或指定 'local' / 'session'） */
+  persist?: InvitePersistType
+}
 
 useInvitePersistence(computed(() => props.persist))
 
@@ -270,9 +270,9 @@ function avatarName(invite: UiContactInvite): string {
 }
 
 @media (hover: hover) {
-.contact-notice-list__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .contact-notice-list__item:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .contact-notice-list__item--accepted,

@@ -84,14 +84,16 @@ function onEntryClick(entry: ContactNavEntry) {
   border-radius: 12px;
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   cursor: pointer;
-  transition: background-color 0.15s, transform 0.15s;
+  transition:
+    background-color 0.15s,
+    transform 0.15s;
   user-select: none;
 }
 
 @media (hover: hover) {
-.contact-nav__item:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .contact-nav__item:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .contact-nav__item:active {

@@ -79,9 +79,9 @@ function onClick() {
 }
 
 @media (hover: hover) {
-.quote-card:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .quote-card:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .quote-card:active {

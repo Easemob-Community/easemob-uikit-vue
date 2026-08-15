@@ -338,9 +338,9 @@ defineExpose({
 }
 
 @media (hover: hover) {
-.mute-list__popup-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .mute-list__popup-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .mute-list__popup-btn--confirm {

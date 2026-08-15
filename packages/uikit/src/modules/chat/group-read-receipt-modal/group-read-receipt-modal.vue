@@ -156,8 +156,6 @@ function onClose() {
   color: var(--uikit-text-primary);
 }
 
-
-
 /* Tab */
 .group-read-modal__tabs {
   display: flex;
@@ -180,9 +178,9 @@ function onClose() {
 }
 
 @media (hover: hover) {
-.group-read-modal__tab:hover {
-  color: var(--uikit-text-primary);
-}
+  .group-read-modal__tab:hover {
+    color: var(--uikit-text-primary);
+  }
 }
 
 .group-read-modal__tab--active {
@@ -216,5 +214,4 @@ function onClose() {
   padding: 8px 0;
   min-height: 120px;
 }
-
 </style>

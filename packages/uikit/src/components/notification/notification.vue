@@ -53,8 +53,12 @@ const mergedCountText = computed(() => {
         <span class="uikit-notification__title">{{ props.item.title }}</span>
         <span class="uikit-notification__time">{{ timeText }}</span>
       </div>
-      <p class="uikit-notification__body">{{ props.item.body }}</p>
-      <p v-if="mergedCountText" class="uikit-notification__merged">{{ mergedCountText }}</p>
+      <p class="uikit-notification__body">
+        {{ props.item.body }}
+      </p>
+      <p v-if="mergedCountText" class="uikit-notification__merged">
+        {{ mergedCountText }}
+      </p>
     </div>
     <button
       class="uikit-notification__close"
@@ -85,9 +89,9 @@ const mergedCountText = computed(() => {
 }
 
 @media (hover: hover) {
-.uikit-notification:hover {
-  box-shadow: var(--uikit-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
-}
+  .uikit-notification:hover {
+    box-shadow: var(--uikit-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+  }
 }
 
 .uikit-notification__avatar {
@@ -156,9 +160,9 @@ const mergedCountText = computed(() => {
 }
 
 @media (hover: hover) {
-.uikit-notification__close:hover {
-  background-color: var(--uikit-bg-hover, #e5e7eb);
-  color: var(--uikit-text-primary, #111827);
-}
+  .uikit-notification__close:hover {
+    background-color: var(--uikit-bg-hover, #e5e7eb);
+    color: var(--uikit-text-primary, #111827);
+  }
 }
 </style>

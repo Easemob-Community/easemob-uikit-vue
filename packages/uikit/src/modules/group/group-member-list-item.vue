@@ -435,9 +435,9 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 @media (hover: hover) {
-.group-member-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .group-member-list__action-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .group-member-list__action-btn--danger {
@@ -446,9 +446,9 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 @media (hover: hover) {
-.group-member-list__action-btn--danger:hover {
-  background-color: #fef2f2;
-}
+  .group-member-list__action-btn--danger:hover {
+    background-color: #fef2f2;
+  }
 }
 
 .group-member-list__action-btn--icon {

@@ -5,7 +5,7 @@ import Icon from '../../../components/icon/icon.vue'
 import Popup from '../../../components/popup/popup.vue'
 import QuoteCard from '../quote/quote-card.vue'
 import type { LocationMessageBody, UiMessage } from '../../../sdk/types'
-import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, MessageStatusStyle, TimeDisplayStrategy } from '../types'
+import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
 import { CONVERSATION_TYPE, INJECTION_KEY, MESSAGE_STATUS, MESSAGE_TYPE } from '../../../constants'
 import type { MessageStatusValue } from '../../../constants'
 import { useGroupStore } from '../../../store/group'
@@ -194,7 +194,8 @@ const classicStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.FAILED]: 'message-status/bang',
 }
 
-/** 数字胶囊状态图标映射（线性/描边版）
+/**
+ * 数字胶囊状态图标映射（线性/描边版）
  * 语义：未读=空心圆，已读=空心圆+对勾；发送中/失败保持经典图标
  */
 const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
@@ -575,7 +576,6 @@ onBeforeUnmount(() => {
                 </span>
               </slot>
             </div>
-
           </template>
 
           <!-- ===== 状态与气泡同一行（群已读回执默认与气泡同行） ===== -->
@@ -704,7 +704,9 @@ onBeforeUnmount(() => {
                 @click.stop="onGroupReadClick"
               >
                 <Icon v-if="isGroupReadAll" name="message-status/checked" :size="14" />
-                <template v-else-if="groupReadCount > 0">{{ groupReadCount }}</template>
+                <template v-else-if="groupReadCount > 0">
+                  {{ groupReadCount }}
+                </template>
               </button>
             </div>
           </div>
@@ -954,7 +956,8 @@ onBeforeUnmount(() => {
 }
 
 @media (hover: hover) {
-  .message-bubble-wrapper__status-item--failed:hover .message-bubble-wrapper__status-icon:not(.message-bubble-wrapper__status-icon--failed-hover) {
+  .message-bubble-wrapper__status-item--failed:hover
+    .message-bubble-wrapper__status-icon:not(.message-bubble-wrapper__status-icon--failed-hover) {
     opacity: 0;
   }
   .message-bubble-wrapper__status-item--failed:hover .message-bubble-wrapper__status-icon--failed-hover {
@@ -1004,10 +1007,10 @@ onBeforeUnmount(() => {
 }
 
 @media (hover: hover) {
-.message-bubble-wrapper__group-read:hover {
-  color: var(--uikit-primary-color);
-  border-color: var(--uikit-primary-color);
-}
+  .message-bubble-wrapper__group-read:hover {
+    color: var(--uikit-primary-color);
+    border-color: var(--uikit-primary-color);
+  }
 }
 
 .message-bubble-wrapper__group-read--all {
@@ -1105,9 +1108,9 @@ onBeforeUnmount(() => {
 }
 
 @media (hover: hover) {
-.avatar-context-menu__item:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .avatar-context-menu__item:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 /* 置顶角标 */
@@ -1135,18 +1138,29 @@ onBeforeUnmount(() => {
     background-color: transparent;
   }
   /* 三次主题色脉冲峰值（2px 边框 + 发光 + 背景着染） */
-  8%, 30%, 50% {
-    box-shadow: 0 0 0 2px var(--uikit-primary-color), 0 0 16px rgba(var(--uikit-primary-rgb), 0.5);
+  8%,
+  30%,
+  50% {
+    box-shadow:
+      0 0 0 2px var(--uikit-primary-color),
+      0 0 16px rgba(var(--uikit-primary-rgb), 0.5);
     background-color: rgba(var(--uikit-primary-rgb), 0.14);
   }
   /* 脉冲间回落，保留弱边框保持识别 */
-  20%, 42% {
-    box-shadow: 0 0 0 2px rgba(var(--uikit-primary-rgb), 0.55), 0 0 10px rgba(var(--uikit-primary-rgb), 0.25);
+  20%,
+  42% {
+    box-shadow:
+      0 0 0 2px rgba(var(--uikit-primary-rgb), 0.55),
+      0 0 10px rgba(var(--uikit-primary-rgb), 0.25);
     background-color: rgba(var(--uikit-primary-rgb), 0.08);
   }
   /* 静态保持：醒目但稳定的高亮态 */
-  62%, 70%, 88% {
-    box-shadow: 0 0 0 2px rgba(var(--uikit-primary-rgb), 0.6), 0 0 10px rgba(var(--uikit-primary-rgb), 0.3);
+  62%,
+  70%,
+  88% {
+    box-shadow:
+      0 0 0 2px rgba(var(--uikit-primary-rgb), 0.6),
+      0 0 10px rgba(var(--uikit-primary-rgb), 0.3);
     background-color: rgba(var(--uikit-primary-rgb), 0.1);
   }
   100% {

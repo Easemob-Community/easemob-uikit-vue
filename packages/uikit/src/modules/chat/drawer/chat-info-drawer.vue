@@ -21,9 +21,34 @@ import type { UiConversation as Conversation, UiGroupMember } from '../../../sdk
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
 import GroupAnnouncement from '../../group/group-announcement.vue'
+import { createLogger } from '../../../utils/logger'
 import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatDrawer from './chat-drawer.vue'
-import { createLogger } from '../../../utils/logger'
+
+const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
+  groupManagementDisplayMode: 'drawer',
+  allowChat: 'all',
+  showMuteAll: true,
+  showMuteList: true,
+  showBlocklist: true,
+  showAllowlist: false,
+  showSharedFiles: true,
+  showJoinRequests: false,
+})
+
+const emit = defineEmits<{
+  (e: 'update:show', value: boolean): void
+  (e: 'leave-group', groupId: string): void
+  (e: 'destroy-group', groupId: string): void
+  (e: 'clear-history', payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }): void
+  (e: 'add-member', groupId: string): void
+  (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
+  // 群成员列表事件
+  (e: 'chat-member', member: UiGroupMember): void
+  (e: 'remove-member', member: UiGroupMember): void
+  (e: 'set-admin', member: UiGroupMember): void
+  (e: 'remove-admin', member: UiGroupMember): void
+}>()
 
 const logger = createLogger('UIKit:ChatInfoDrawer')
 
@@ -49,30 +74,6 @@ export interface ChatInfoDrawerProps {
   /** 是否展示入群申请入口 */
   showJoinRequests?: boolean
 }
-
-const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
-  groupManagementDisplayMode: 'drawer',
-  allowChat: 'all',
-  showMuteAll: true,
-  showMuteList: true,
-  showBlocklist: true,
-  showAllowlist: false,
-  showSharedFiles: true,
-  showJoinRequests: false,
-})
-const emit = defineEmits<{
-  (e: 'update:show', value: boolean): void
-  (e: 'leave-group', groupId: string): void
-  (e: 'destroy-group', groupId: string): void
-  (e: 'clear-history', payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }): void
-  (e: 'add-member', groupId: string): void
-  (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
-  // 群成员列表事件
-  (e: 'chat-member', member: UiGroupMember): void
-  (e: 'remove-member', member: UiGroupMember): void
-  (e: 'set-admin', member: UiGroupMember): void
-  (e: 'remove-admin', member: UiGroupMember): void
-}>()
 
 const { t } = useLocale()
 
@@ -1243,9 +1244,9 @@ defineExpose({
 }
 
 @media (hover: hover) {
-.chat-info-drawer__view-all:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .chat-info-drawer__view-all:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .chat-info-drawer__actions {

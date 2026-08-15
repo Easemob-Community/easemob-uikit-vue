@@ -13,36 +13,8 @@ import { useToast } from '../../composables/use-toast'
 import type { UiGroup, UiGroupMember } from '../../sdk/types'
 import type { PresenceDisplayStatus } from '../../components/avatar/avatar.vue'
 import Empty from '../../components/empty/empty.vue'
-import GroupMemberListItem from './group-member-list-item.vue'
 import { createLogger } from '../../utils/logger'
-
-const logger = createLogger('UIKit:GroupMemberList')
-
-export interface GroupMemberListProps {
-  groupId: string
-  group?: UiGroup | null
-  members?: UiGroupMember[]
-  loading?: boolean
-  hasMore?: boolean
-  currentUserId?: string
-  showSearch?: boolean
-  /** 是否在标题栏显示关闭按钮 */
-  closable?: boolean
-  /** 是否展示头部标题栏 */
-  showHeader?: boolean
-  /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
-  allowChat?: 'all' | 'contact' | 'none'
-  /** 是否展示禁言/取消禁言操作 */
-  showMuteAction?: boolean
-  /** 是否展示拉黑/取消拉黑操作 */
-  showBlockAction?: boolean
-  /** 是否展示设/取消管理员操作 */
-  showAdminAction?: boolean
-  /** 是否展示移除成员操作 */
-  showRemoveAction?: boolean
-  /** 是否展示发消息操作 */
-  showChatAction?: boolean
-}
+import GroupMemberListItem from './group-member-list-item.vue'
 
 const props = withDefaults(defineProps<GroupMemberListProps>(), {
   group: null,
@@ -75,6 +47,34 @@ const emit = defineEmits<{
   (e: 'load-more'): void
   (e: 'close'): void
 }>()
+
+const logger = createLogger('UIKit:GroupMemberList')
+
+export interface GroupMemberListProps {
+  groupId: string
+  group?: UiGroup | null
+  members?: UiGroupMember[]
+  loading?: boolean
+  hasMore?: boolean
+  currentUserId?: string
+  showSearch?: boolean
+  /** 是否在标题栏显示关闭按钮 */
+  closable?: boolean
+  /** 是否展示头部标题栏 */
+  showHeader?: boolean
+  /** 是否允许对成员发起单聊：'all' 所有人，'contact' 仅联系人，'none' 不允许 */
+  allowChat?: 'all' | 'contact' | 'none'
+  /** 是否展示禁言/取消禁言操作 */
+  showMuteAction?: boolean
+  /** 是否展示拉黑/取消拉黑操作 */
+  showBlockAction?: boolean
+  /** 是否展示设/取消管理员操作 */
+  showAdminAction?: boolean
+  /** 是否展示移除成员操作 */
+  showRemoveAction?: boolean
+  /** 是否展示发消息操作 */
+  showChatAction?: boolean
+}
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -438,8 +438,8 @@ defineExpose({ refresh, removeMember, setMemberRole })
 }
 
 @media (hover: hover) {
-.group-member-list__load-more-btn:hover {
-  opacity: 0.8;
-}
+  .group-member-list__load-more-btn:hover {
+    opacity: 0.8;
+  }
 }
 </style>

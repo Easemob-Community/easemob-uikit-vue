@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useLocale } from '../../../locale'
 import { useResizable } from '../../../composables/use-resizable'
 import { useViewport } from '../../../composables/use-viewport'
@@ -7,8 +7,8 @@ import { filterActiveMentions } from '../../../utils/mention'
 import Input from '../../../components/input/input.vue'
 import Button from '../../../components/button/button.vue'
 import Icon from '../../../components/icon/icon.vue'
-import VoicePanel from './components/voice-panel.vue'
 import type { ChatConfig, MentionContact } from '../types'
+import VoicePanel from './components/voice-panel.vue'
 
 export interface SimpleInputProps {
   config?: ChatConfig['input']
@@ -218,7 +218,8 @@ function toggleMobileVoice() {
   if (isMobileRecording.value) {
     isMobileRecording.value = false
     emit('voice-end', 0)
-  } else {
+  }
+  else {
     isMobileRecording.value = true
     emit('voice-start')
   }
@@ -228,14 +229,16 @@ function toggleMobileVoice() {
 function onMicClick() {
   if (isMobile.value) {
     toggleMobileVoice()
-  } else {
+  }
+  else {
     isVoiceMode.value = true
   }
 }
 
 /** 麦克风图标高亮状态 */
 const showMicOn = computed(() => {
-  if (isMobile.value) return isMobileRecording.value
+  if (isMobile.value)
+    return isMobileRecording.value
   return isVoiceMode.value
 })
 
@@ -301,7 +304,7 @@ function getCaretCoordinates(el: HTMLInputElement | HTMLTextAreaElement, positio
   div.style.pointerEvents = 'none'
   div.textContent = el.value.substring(0, position)
   const span = document.createElement('span')
-  span.textContent = el.value.substring(position) || '\u200b'
+  span.textContent = el.value.substring(position) || '\u200B'
   div.appendChild(span)
   document.body.appendChild(div)
   const rect = span.getBoundingClientRect()
@@ -593,20 +596,20 @@ defineExpose({
       accept="image/*"
       style="display: none"
       @change="onFileSelected('image', $event)"
-    />
+    >
     <input
       ref="videoInputRef"
       type="file"
       accept="video/*"
       style="display: none"
       @change="onFileSelected('video', $event)"
-    />
+    >
     <input
       ref="fileInputRef"
       type="file"
       style="display: none"
       @change="onFileSelected('file', $event)"
-    />
+    >
   </div>
 </template>
 
@@ -655,10 +658,10 @@ defineExpose({
 }
 
 @media (hover: hover) {
-.simple-input__tool-btn:hover {
-  background-color: var(--uikit-bg-hover);
-  color: var(--uikit-text-primary);
-}
+  .simple-input__tool-btn:hover {
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .simple-input__field-area {

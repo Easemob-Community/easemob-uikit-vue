@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onUnmounted } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import Icon from '../icon/icon.vue'
 
@@ -54,7 +54,8 @@ function getScrollTop(): number {
 function setScrollTop(top: number) {
   if (scrollEl instanceof Window) {
     window.scrollTo(0, top)
-  } else {
+  }
+  else {
     scrollEl.scrollTop = top
   }
 }
@@ -65,7 +66,8 @@ function checkVisibility() {
 }
 
 function scrollToTop() {
-  if (scrolling.value) return
+  if (scrolling.value)
+    return
   scrolling.value = true
   emit('click')
 
@@ -84,13 +86,14 @@ function scrollToTop() {
     // easeInOutQuad
     const ease = progress < 0.5
       ? 2 * progress * progress
-      : 1 - Math.pow(-2 * progress + 2, 2) / 2
+      : 1 - (-2 * progress + 2) ** 2 / 2
 
     setScrollTop(startTop * (1 - ease))
 
     if (progress < 1) {
       animationFrameId = requestAnimationFrame(step)
-    } else {
+    }
+    else {
       setScrollTop(0)
       scrolling.value = false
       animationFrameId = null
@@ -161,16 +164,17 @@ onUnmounted(() => {
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-              box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
   z-index: 10;
 }
 
 @media (hover: hover) {
-.uikit-scroll-to-top:hover {
-  background-color: var(--uikit-bg-secondary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
+  .uikit-scroll-to-top:hover {
+    background-color: var(--uikit-bg-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 
 .uikit-scroll-to-top:active {
@@ -178,13 +182,15 @@ onUnmounted(() => {
 }
 
 .uikit-scroll-top-fade-enter-active {
-  transition: opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
-              transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
+  transition:
+    opacity var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel),
+    transform var(--uikit-anim-duration-enter) var(--uikit-anim-easing-spring);
 }
 
 .uikit-scroll-top-fade-leave-active {
-  transition: opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
-              transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+  transition:
+    opacity var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel),
+    transform var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
 }
 
 .uikit-scroll-top-fade-enter-from,

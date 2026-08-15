@@ -157,9 +157,9 @@ function onMoreClick(event: MouseEvent) {
   flex-shrink: 0;
 }
 @media (hover: hover) {
-.shared-file-list__more-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-primary-color);
-}
+  .shared-file-list__more-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+    color: var(--uikit-primary-color);
+  }
 }
 </style>

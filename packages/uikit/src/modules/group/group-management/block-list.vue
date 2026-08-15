@@ -8,15 +8,9 @@ import { useGroup } from '../../../composables/use-group'
 import { useToast } from '../../../composables/use-toast'
 import type { UiGroupMember } from '../../../sdk/types'
 import Empty from '../../../components/empty/empty.vue'
+import { createLogger } from '../../../utils/logger'
 import BlockListItem from './block-list-item.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
-import { createLogger } from '../../../utils/logger'
-
-const logger = createLogger('UIKit:BlockList')
-
-export interface BlockListProps {
-  groupId: string
-}
 
 const props = defineProps<BlockListProps>()
 
@@ -24,6 +18,12 @@ const emit = defineEmits<{
   (e: 'unblock', member: UiGroupMember): void
   (e: 'block', members: UiGroupMember[]): void
 }>()
+
+const logger = createLogger('UIKit:BlockList')
+
+export interface BlockListProps {
+  groupId: string
+}
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -269,9 +269,9 @@ defineExpose({
   transition: all 0.15s;
 }
 @media (hover: hover) {
-.block-list__popup-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .block-list__popup-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 .block-list__popup-btn--confirm {
   border-color: var(--uikit-primary-color);

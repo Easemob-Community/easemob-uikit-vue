@@ -244,9 +244,9 @@ function onCancel() {
 }
 
 @media (hover: hover) {
-.presence-selector__option--compact:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .presence-selector__option--compact:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .presence-selector__option--compact.is-active {
@@ -323,8 +323,8 @@ function onCancel() {
 }
 
 @media (hover: hover) {
-.presence-selector__confirm:hover {
-  opacity: 0.9;
-}
+  .presence-selector__confirm:hover {
+    opacity: 0.9;
+  }
 }
 </style>

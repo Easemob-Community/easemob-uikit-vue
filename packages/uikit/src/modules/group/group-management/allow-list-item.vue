@@ -71,17 +71,17 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   transition: all 0.15s;
 }
 @media (hover: hover) {
-.allow-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .allow-list__action-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 .allow-list__action-btn--danger {
   border-color: #fecaca;
   color: #ef4444;
 }
 @media (hover: hover) {
-.allow-list__action-btn--danger:hover {
-  background-color: #fef2f2;
-}
+  .allow-list__action-btn--danger:hover {
+    background-color: #fef2f2;
+  }
 }
 </style>

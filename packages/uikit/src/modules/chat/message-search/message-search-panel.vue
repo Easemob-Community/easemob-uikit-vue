@@ -206,9 +206,9 @@ nextTick(() => {
 }
 
 @media (hover: hover) {
-.message-search-panel__item:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .message-search-panel__item:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .message-search-panel__content {

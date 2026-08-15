@@ -212,9 +212,9 @@ function onActionClick(key: string) {
 }
 
 @media (hover: hover) {
-.group-card__action:hover {
-  background-color: var(--uikit-bg-hover);
-}
+  .group-card__action:hover {
+    background-color: var(--uikit-bg-hover);
+  }
 }
 
 .group-card__action--primary {

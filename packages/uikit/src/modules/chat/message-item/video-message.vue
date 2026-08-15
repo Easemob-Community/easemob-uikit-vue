@@ -236,8 +236,8 @@ async function handleDownload(event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.video-message__download-btn:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-}
+  .video-message__download-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
 }
 </style>

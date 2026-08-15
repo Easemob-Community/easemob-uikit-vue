@@ -58,8 +58,8 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   transition: all 0.15s;
 }
 @media (hover: hover) {
-.block-list__action-btn:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .block-list__action-btn:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 </style>

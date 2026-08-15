@@ -12,16 +12,16 @@ import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '../../.
 import ActionSheet from '../../../components/action-sheet/action-sheet.vue'
 import type { ActionSheetItem } from '../../../components/action-sheet/action-sheet.vue'
 import Empty from '../../../components/empty/empty.vue'
-import SharedFileListItem from './shared-file-list-item.vue'
 import { createLogger } from '../../../utils/logger'
+import SharedFileListItem from './shared-file-list-item.vue'
+
+const props = defineProps<SharedFileListProps>()
 
 const logger = createLogger('UIKit:SharedFileList')
 
 export interface SharedFileListProps {
   groupId: string
 }
-
-const props = defineProps<SharedFileListProps>()
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -402,9 +402,9 @@ async function onDownload(file: any) {
 }
 
 @media (hover: hover) {
-.shared-file-list__context-menu-item:hover {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
-}
+  .shared-file-list__context-menu-item:hover {
+    background-color: var(--uikit-bg-hover, #f3f4f6);
+  }
 }
 
 .shared-file-list__context-menu-item.is-danger {
@@ -412,8 +412,8 @@ async function onDownload(file: any) {
 }
 
 @media (hover: hover) {
-.shared-file-list__context-menu-item.is-danger:hover {
-  background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
-}
+  .shared-file-list__context-menu-item.is-danger:hover {
+    background-color: rgba(var(--uikit-danger-rgb, 239, 68, 68), 0.08);
+  }
 }
 </style>

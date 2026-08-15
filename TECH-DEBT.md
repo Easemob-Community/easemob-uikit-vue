@@ -82,11 +82,12 @@
 - **修复**：已于 2026-07-28 修复。分页断裂部分已修：`fetchContacts/fetchGroups` 把 dataSource 返回的 `hasMore/cursor` 落 store，`loadMore` 传 cursor 并改用 `appendContactList/appendGroupList`（详见 D43）；conversation-container 死 props 与 contact-container 废弃 props 兼容同步修复（见 D65/D66）。`hasMoreConversations` 恒 false 为**有意保留**——SDK 无服务端会话分页能力，会话列表本就全量在本地，代码中已加注释说明该取舍。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D6. composable 绕过 `useUIKit()` 直接取 store
+### [x] D6. composable 绕过 `useUIKit()` 直接取 store
 
 - **现象**：feature composable 约定通过 `useUIKit().stores` 拿 store，但个别直接 `useXxxStore()`，造成状态来源不统一。
 - **证据**：`composables/use-blocklist.ts` 直接 `useContactStore()`，同时又从 `useUIKit()` 取 `client/dataSource/features`，重复了 contact composable 已暴露的状态。（`use-theme.ts`/`use-ripple.ts` 直接 `useThemeStore()` 属可接受，因为 theme 是单独 provide 的。）
 - **建议修法**：`useBlocklist` 改为经 `useUIKit().stores.contact`；或明确 theme 之外一律走 context。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`composables/use-blocklist.ts:16-17` 已 `const { client, dataSource, features, stores } = useUIKit()` + `const contactStore = stores.contact`，黑名单读写全部走 context，无直接 `useContactStore()`。
 - **关联 skill**：`uikit-store-composable`
 
 ### [ ] D7. `auto-imports.ts` 与实际导出漂移，无守卫
@@ -677,11 +678,12 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`uikit-provider.vue:427-447` 已 `watch(() => props.h5?.safeArea)`：`false` 时把 `--uikit-safe-*` 四个变量强制覆写为 `0px`，恢复时 removeProperty；组件消费的是 CSS 变量（h5-input.vue:102,807、chat.vue:1323、message-list.vue:966、conversation-list.vue:665,796），覆写链路生效，运行期切换 `:h5="{ safeArea }"` 即时生效。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D82. emoji 面板写死 320px，窄屏溢出宽屏留白
+### [x] D82. emoji 面板写死 320px，窄屏溢出宽屏留白
 
 - **现象**：`.emoji-picker-wrapper` 与 emoji-picker 固定 `width: 320px`，≤320px 窄屏溢出、宽屏底部弹层两侧留白，移动端底部弹层内未做宽度适配。
 - **证据**：`modules/chat/message-input/index.vue:624`；`components/emoji-picker/emoji-picker.vue:69`。
 - **建议修法**：宽度改 `min(320px, 100vw)` 或弹层内自适应。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`components/emoji-picker/emoji-picker.vue:140-141` 与 `modules/chat/message-input/index.vue:830-832` 的 `.emoji-picker` / `.emoji-picker-wrapper` 均已有 `width: 320px; max-width: calc(100vw - 24px)`，窄屏（≤320px）由 max-width 兜底不溢出。
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [ ] D83. hover 态移动端残留
@@ -730,9 +732,14 @@
 - **修复**：已于 2026-08-06 修复。`message-list.vue` 的 `onGroupReadClick` 已读列表改为 `[...new Set(...)]` 按 userId 去重后赋值；未读列表的群成员 userId 同样去重后再做差集，避免异常数据重复展示。气泡上的 `groupReadCount` 为服务端统计 count（无用户列表），UIKit 侧无法去重，服务端需保证按人统计。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring`
 
-### [ ] D89. 多处 `@media (hover: hover)` 块内选择器无缩进，触发 lint 报错与构建 CSS 警告
+### [x] D89. 多处 `@media (hover: hover)` 块内选择器无缩进，触发 lint 报错与构建 CSS 警告
 - **现象**：`message-bubble-wrapper.vue`、`shared-file-list-item.vue`、`conversation-item.vue` 等多个文件存在 `@media (hover: hover) {` 块内选择器未缩进（与包裹语句同层级），lint 报 `Insert ··`，构建时 esbuild 报 `Unexpected "@media"` CSS 警告（不影响产物）。疑似历史 `wrap-hover` 脚本批量包裹 hover 样式时未补缩进。
 - **建议修法**：对 `@media (hover: hover)` 块内选择器统一补缩进；或按文件逐个修复后跑 `pnpm exec eslint --fix <file>` 校验。
+- **修复**：已于 2026-08-15 修复。三部分：
+  1. **0 缩进选择器补缩进**：脚本检测全量 `@media (hover: hover) {` 块内 0 缩进选择器，**39 个文件 56 行**补 2 空格（仅动缩进，CSS 语义不变）；另修 `shared-file-list-item.vue` 选择器块内缩进。
+  2. **构建警告真根因**（本条原归因于缩进，实际根因在 `copyable-text.vue`）：`@media` 前一行是逗号结尾的选择器列表（`.copyable-text:hover .copyable-text__btn,`），esbuild 解析错位报 `Unexpected "@media"` ——已把两个 hover 选择器合并进 `@media` 块修复，**build CSS 警告消除**（此前 1318/1321 行警告即此）。
+  3. **顺带修复**：`input.vue` 的 `@media (hover: none), (max-width: 767px)` 原嵌套在 `.uikit-input__field` 规则块内（CSS nesting 写法，原生 CSS 下浏览器可能丢弃）——平铺到顶层后，D54 的移动端 16px 覆写确认真正生效（dist 中 `@media (hover:none),(max-width:767px){.uikit-input__field{font-size:16px}}` 存在）；并对 39 个文件跑 `eslint --fix` 清理格式错误。
+  - **剩余**：这 39 个文件仍有 6 个**既有 JS 逻辑错误**（`chat.vue` 2 处 / `rich-input.vue` 2 处 / `simple-input.vue` 1 处 `no-use-before-define`、unused var），与 CSS 缩进无关、不可自动修，另立条目跟进。
 - **关联 skill**：`uikit-lint-governance` / `uikit-styling-theming`
 
 ### [ ] D90. 面性图标集接入：主题级 iconStyle 切换 + 组件选中态配对

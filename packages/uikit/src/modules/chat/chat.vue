@@ -25,6 +25,7 @@ import Popup from '../../components/popup/popup.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
 import Empty from '../../components/empty/empty.vue'
+import { createLogger } from '../../utils/logger'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input/index.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
@@ -34,7 +35,10 @@ import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
 import MessageSearchPanel from './message-search/message-search-panel.vue'
 import type { ChatConfig, MentionContact } from './types'
-import { createLogger } from '../../utils/logger'
+
+const props = defineProps<ChatProps>()
+
+const emit = defineEmits<ChatEmits>()
 
 const logger = createLogger('UIKit:Chat')
 
@@ -67,9 +71,6 @@ export interface ChatEmits {
   /** 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message */
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
-
-const props = defineProps<ChatProps>()
-const emit = defineEmits<ChatEmits>()
 
 /** 输入框组件引用 */
 const messageInputRef = ref<InstanceType<typeof MessageInput>>()
@@ -1312,15 +1313,16 @@ async function onRemoveAdmin(member: UiGroupMember) {
 }
 
 @media (hover: hover) {
-.chat__error-retry:hover {
-  opacity: 0.9;
-}
+  .chat__error-retry:hover {
+    opacity: 0.9;
+  }
 }
 
 .chat__header {
   position: relative;
   z-index: 101;
-  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px var(--uikit-header-padding-y, 12px);
+  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px
+    var(--uikit-header-padding-y, 12px);
   display: flex;
   align-items: center;
   min-height: 48px;
@@ -1427,6 +1429,4 @@ async function onRemoveAdmin(member: UiGroupMember) {
     opacity: 1;
   }
 }
-
-
 </style>

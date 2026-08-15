@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { useLocale } from '../../../../locale'
 import Icon from '../../../../components/icon/icon.vue'
@@ -43,7 +43,8 @@ const formattedDuration = computed(() => {
 
 /** 开始录音 */
 function startRecording() {
-  if (isRecording.value) return
+  if (isRecording.value)
+    return
   isRecording.value = true
   duration.value = 0
   timer = setInterval(() => {
@@ -54,7 +55,8 @@ function startRecording() {
 
 /** 停止录音并发送 */
 function stopRecording() {
-  if (!isRecording.value) return
+  if (!isRecording.value)
+    return
   isRecording.value = false
   const d = duration.value
   stopTimer()
@@ -64,7 +66,8 @@ function stopRecording() {
 
 /** 取消录音 */
 function cancelRecording() {
-  if (!isRecording.value) return
+  if (!isRecording.value)
+    return
   isRecording.value = false
   stopTimer()
   emit('cancel')
@@ -96,7 +99,8 @@ function onKeydown(e: KeyboardEvent) {
     if (isRecording.value) {
       isSpacePressed.value = false
       cancelRecording()
-    } else {
+    }
+    else {
       deactivate()
     }
   }
@@ -146,7 +150,8 @@ watch(
     if (val) {
       stopKeydown = useEventListener(window, 'keydown', onKeydown, { passive: false })
       stopKeyup = useEventListener(window, 'keyup', onKeyup, { passive: false })
-    } else {
+    }
+    else {
       stopKeydown?.()
       stopKeyup?.()
       stopKeydown = null
@@ -159,7 +164,7 @@ watch(
       isMousePressed.value = false
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 /** 组件卸载时清理 */
@@ -192,7 +197,9 @@ onBeforeUnmount(() => {
     <!-- 录音中状态 -->
     <template v-else>
       <div class="voice-panel__recording">
-        <div class="voice-panel__timer">{{ formattedDuration }}</div>
+        <div class="voice-panel__timer">
+          {{ formattedDuration }}
+        </div>
         <div class="voice-panel__mic-wrapper voice-panel__mic-wrapper--recording">
           <Icon name="audio-video/mic" :size="32" color="white" />
           <div class="voice-panel__ripple" />
@@ -297,8 +304,8 @@ onBeforeUnmount(() => {
 }
 
 @media (hover: hover) {
-.voice-panel__link:hover {
-  text-decoration: underline;
-}
+  .voice-panel__link:hover {
+    text-decoration: underline;
+  }
 }
 </style>

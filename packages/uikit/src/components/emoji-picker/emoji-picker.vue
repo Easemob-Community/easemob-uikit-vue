@@ -160,16 +160,17 @@ function onClose() {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: var(--uikit-components-radius);
-  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing),
-              background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   display: flex;
   align-items: center;
 }
 
 @media (hover: hover) {
-.emoji-picker__tab:hover {
-  color: var(--uikit-text-primary);
-}
+  .emoji-picker__tab:hover {
+    color: var(--uikit-text-primary);
+  }
 }
 
 .emoji-picker__tab--active {
@@ -213,9 +214,9 @@ function onClose() {
 }
 
 @media (hover: hover) {
-.emoji-picker__item:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .emoji-picker__item:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .emoji-picker__item--sticker {

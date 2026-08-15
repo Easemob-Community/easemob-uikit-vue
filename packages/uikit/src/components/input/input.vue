@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useThemeStore } from '../../store/theme'
 import Icon from '../icon/icon.vue'
 
@@ -61,14 +61,18 @@ const inputRef = ref<HTMLInputElement | null>(null)
 
 const themeStore = useThemeStore()
 const shapeClass = computed(() =>
-  themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : ''
+  themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : '',
 )
 
 const variantClass = computed(() => {
-  if (props.variant === 'search') return 'uikit-input__field--search'
-  if (props.variant === 'filled') return 'uikit-input__field--filled'
-  if (props.variant === 'ghost') return 'uikit-input__field--ghost'
-  if (props.variant === 'underline') return 'uikit-input__field--underline'
+  if (props.variant === 'search')
+    return 'uikit-input__field--search'
+  if (props.variant === 'filled')
+    return 'uikit-input__field--filled'
+  if (props.variant === 'ghost')
+    return 'uikit-input__field--ghost'
+  if (props.variant === 'underline')
+    return 'uikit-input__field--underline'
   return ''
 })
 
@@ -128,7 +132,7 @@ defineExpose({
       @focus="(e: FocusEvent) => emit('focus', e)"
       @blur="(e: FocusEvent) => emit('blur', e)"
       @keydown="onKeydown"
-    />
+    >
     <button
       v-if="props.clearable && props.modelValue"
       type="button"
@@ -198,15 +202,19 @@ defineExpose({
   border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius);
   font-size: var(--uikit-font-size-14);
-  /* 移动端 iOS 对 <16px 输入框 focus 自动缩放，放大到 16px 规避 */
-  @media (hover: none), (max-width: 767px) {
-    font-size: var(--uikit-font-size-16);
-  }
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-              background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+/* 移动端 iOS 对 <16px 输入框 focus 自动缩放，放大到 16px 规避（平铺 @media，避免嵌套写法被 esbuild 警告/浏览器丢弃） */
+@media (hover: none), (max-width: 767px) {
+  .uikit-input__field {
+    font-size: var(--uikit-font-size-16);
+  }
 }
 
 /* search/filled 变体：与列表 Cell 的 16px 水平内边距对齐 */

@@ -20,8 +20,12 @@ import { useToast } from '../../../composables/use-toast'
 import { resolveVoiceToTextErrorMessage } from '../../../composables/use-message-actions'
 import { detectEnvironment, downloadFile } from '../../../utils/download'
 import Icon from '../../../components/icon/icon.vue'
-import MessageVirtualList from './message-virtual-list.vue'
 import { createLogger } from '../../../utils/logger'
+import MessageVirtualList from './message-virtual-list.vue'
+
+const props = defineProps<MessageListProps>()
+
+const emit = defineEmits<MessageListEmits>()
 
 const logger = createLogger('UIKit:MessageList')
 
@@ -50,9 +54,6 @@ export interface MessageListEmits {
   /** 右键消息头像选择"@提及"时触发，参数为发送者 ID 与展示名 / Emitted when "@mention" is chosen from the avatar context menu, with the sender ID and display name */
   (e: 'avatar-mention', payload: { userId: string, name: string }): void
 }
-
-const props = defineProps<MessageListProps>()
-const emit = defineEmits<MessageListEmits>()
 
 const { messages, currentConversation, isMultiSelectMode, toggleMessageSelection, isMessageSelected, enterMultiSelectMode, fetchHistoryMessages, fetchGroupReadDetail, recallMessage, deleteMessage, pinMessage, unpinMessage, translateTextMessage, transcribeVoiceMessage, resendMessage, getHistoryCursor } = useChat()
 const { setQuote, locateRequest, setHighlight } = useQuote()
@@ -983,9 +984,9 @@ watch(locateRequest, (req) => {
 }
 
 @media (hover: hover) {
-.message-list__new-tip:hover {
-  transform: translateX(-50%) translateY(-2px);
-}
+  .message-list__new-tip:hover {
+    transform: translateX(-50%) translateY(-2px);
+  }
 }
 
 .message-list__new-tip-arrow {

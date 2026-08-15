@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount } from 'vue'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import { useLocale } from '../../../locale'
@@ -180,7 +180,8 @@ const editor = useEditor({
       if (event.key === '@' && props.enableMention) {
         mentionAnchorPos.value = _view.state.selection.from
         requestAnimationFrame(() => {
-          if (!editor.value) return
+          if (!editor.value)
+            return
           const pos = editor.value.state.selection.from
           const coords = editor.value.view.coordsAtPos(pos)
           const anchor = document.createElement('div')
@@ -255,7 +256,8 @@ function updateHasContent(e: any) {
 
 /** 发送消息 */
 function handleSend() {
-  if (!editor.value || !hasContent.value) return
+  if (!editor.value || !hasContent.value)
+    return
   const html = editor.value.getHTML()
   const text = editor.value.getText()
   // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
@@ -263,7 +265,7 @@ function handleSend() {
   emit('send', html, text, activeMentions.length > 0 ? activeMentions : undefined)
   editor.value.commands.clearContent()
   // 发送后回收内联图片 blob URL
-  inlineImageBlobUrls.forEach((url) => URL.revokeObjectURL(url))
+  inlineImageBlobUrls.forEach(url => URL.revokeObjectURL(url))
   inlineImageBlobUrls.clear()
   mentionList.value = []
 }
@@ -299,7 +301,8 @@ const inlineImageBlobUrls = new Set<string>()
 
 function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
   const files = (event.target as HTMLInputElement).files
-  if (!files || files.length === 0) return
+  if (!files || files.length === 0)
+    return
 
   if (type === 'image') {
     const file = files[0]
@@ -307,7 +310,8 @@ function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
     inlineImageBlobUrls.add(url)
     editor.value?.chain().focus().setImage({ src: url }).run()
     ;(event.target as HTMLInputElement).value = ''
-  } else {
+  }
+  else {
     emit('send-file', type, files)
     ;(event.target as HTMLInputElement).value = ''
   }
@@ -318,7 +322,8 @@ function toggleVoice() {
   if (isRecording.value) {
     isRecording.value = false
     emit('voice-end')
-  } else {
+  }
+  else {
     isRecording.value = true
     emit('voice-start')
   }
@@ -338,7 +343,8 @@ function insertEmoji(emoji: string) {
 
 /** 插入 @提及（替换当前 @keyword） */
 function insertMention(name: string, contact?: MentionContact) {
-  if (!editor.value || mentionAnchorPos.value < 0) return
+  if (!editor.value || mentionAnchorPos.value < 0)
+    return
   const currentPos = editor.value.state.selection.from
   editor.value
     .chain()
@@ -354,7 +360,8 @@ function insertMention(name: string, contact?: MentionContact) {
 
 /** 在末尾追加 @提及 */
 function appendMention(name: string, contact?: MentionContact) {
-  if (!editor.value) return
+  if (!editor.value)
+    return
   editor.value
     .chain()
     .focus()
@@ -403,7 +410,7 @@ defineExpose({
 /** 组件卸载时销毁编辑器并回收 Blob URL */
 onBeforeUnmount(() => {
   editor.value?.destroy()
-  inlineImageBlobUrls.forEach((url) => URL.revokeObjectURL(url))
+  inlineImageBlobUrls.forEach(url => URL.revokeObjectURL(url))
   inlineImageBlobUrls.clear()
   if (typingThrottleTimer) {
     clearTimeout(typingThrottleTimer)
@@ -460,7 +467,9 @@ onBeforeUnmount(() => {
       <template v-if="!isRecording">
         <div class="rich-input__editor-wrapper">
           <EditorContent :editor="editor" />
-          <div v-if="!hasContent" class="rich-input__placeholder">{{ t('chat.placeholder') }}</div>
+          <div v-if="!hasContent" class="rich-input__placeholder">
+            {{ t('chat.placeholder') }}
+          </div>
           <!-- 拖拽手柄：编辑器上缘拖动调整高度（仅 PC） -->
           <div
             v-if="showResizeHandle"
@@ -498,20 +507,20 @@ onBeforeUnmount(() => {
       accept="image/*"
       style="display: none"
       @change="onFileSelected('image', $event)"
-    />
+    >
     <input
       ref="videoInputRef"
       type="file"
       accept="video/*"
       style="display: none"
       @change="onFileSelected('video', $event)"
-    />
+    >
     <input
       ref="fileInputRef"
       type="file"
       style="display: none"
       @change="onFileSelected('file', $event)"
-    />
+    >
   </div>
 </template>
 
@@ -591,16 +600,17 @@ onBeforeUnmount(() => {
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-              color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
 @media (hover: hover) {
-.rich-input__tool-btn:hover {
-  background-color: var(--uikit-bg-hover);
-  color: var(--uikit-text-primary);
-}
+  .rich-input__tool-btn:hover {
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .rich-input__field-area {

@@ -157,9 +157,9 @@ function toggle() {
 }
 
 @media (hover: hover) {
-.pinned-bar__row:hover {
-  background-color: var(--uikit-bg-secondary);
-}
+  .pinned-bar__row:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .pinned-bar__icon {
@@ -200,9 +200,9 @@ function toggle() {
 }
 
 @media (hover: hover) {
-.pinned-bar__count:hover {
-  color: var(--uikit-primary-color, #5f6df3);
-}
+  .pinned-bar__count:hover {
+    color: var(--uikit-primary-color, #5f6df3);
+  }
 }
 
 .pinned-bar__action {

@@ -33,7 +33,7 @@ const emit = defineEmits<ButtonEmits>()
 
 const themeStore = useThemeStore()
 const shapeClass = computed(() =>
-  themeStore.componentsShape === 'square' ? 'uikit-button--square' : ''
+  themeStore.componentsShape === 'square' ? 'uikit-button--square' : '',
 )
 
 // Ripple 波纹：危险系按钮使用红色波纹，其余使用主题主色
@@ -46,7 +46,8 @@ const rippleColor = computed(() =>
 useRipple(buttonRef, { color: rippleColor.value })
 
 function handleClick(event: MouseEvent) {
-  if (props.disabled || props.loading) return
+  if (props.disabled || props.loading)
+    return
   emit('click', event)
 }
 </script>
@@ -78,9 +79,10 @@ function handleClick(event: MouseEvent) {
   border: none;
   border-radius: var(--uikit-components-radius);
   cursor: pointer;
-  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
-              transform var(--uikit-anim-duration) var(--uikit-anim-easing),
-              background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition:
+    opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
+    transform var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   font-size: var(--uikit-font-size-14);
   /* 为 Ripple 波纹提供定位上下文 */
   position: relative;
@@ -96,7 +98,7 @@ function handleClick(event: MouseEvent) {
 }
 
 /* 当全局为 square 时，保持按钮的 square 样式 */
-[data-uikit-components-radius="4px"] .uikit-button:not(.uikit-button--square) {
+[data-uikit-components-radius='4px'] .uikit-button:not(.uikit-button--square) {
   border-radius: var(--uikit-components-radius, 8px);
 }
 
@@ -140,9 +142,9 @@ function handleClick(event: MouseEvent) {
 }
 
 @media (hover: hover) {
-.uikit-button--danger-outline:hover {
-  background-color: rgba(var(--uikit-danger-rgb), 0.08);
-}
+  .uikit-button--danger-outline:hover {
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
+  }
 }
 
 .uikit-button--default {
