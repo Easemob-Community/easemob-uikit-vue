@@ -1,7 +1,7 @@
 /**
  * check-icon-refs.mjs
  *
- * 构建期校验：扫描 packages/uikit/src 下所有 .vue / .ts（含 *.story.vue，它们也真实渲染），
+ * 构建期校验：扫描 packages/uikit-im/src 下所有 .vue / .ts（含 *.story.vue，它们也真实渲染），
  * 提取 EmIcon 的 name 引用（模板 name="分类/图标名"、:name="'...'"）以及 TS 中的
  * icon: '...' 等图标名字面量，与 src/assets/icons 下实际存在的 SVG 文件比对。
  * 有缺失引用时列出清单并以非零码退出，避免图标拼错/删漏后静默不渲染。
@@ -12,7 +12,7 @@
  * 已知局限：动态拼接的 name（如 `icon: 'actions/' + type`）无法静态扫描，
  * 依赖 code review 与运行期 EmIcon 的 miss warn 兜底。
  *
- * 执行方法：cd packages/uikit && pnpm run icons:check
+ * 执行方法：cd packages/uikit-im && pnpm run icons:check
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'

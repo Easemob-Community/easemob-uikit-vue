@@ -1,15 +1,15 @@
 # AGENTS 规则（easemob-uikit-vue）
 
-本文件是仓库协作规则与 skill 路由入口。`easemob-uikit-vue` 是基于 `easemob-websdk`(websdk2 / SDK5) 的 Vue3 UIKit（pnpm workspace，核心包 `@easemob/uikit`）。
+本文件是仓库协作规则与 skill 路由入口。`easemob-uikit-vue` 是基于 `easemob-websdk`(websdk2 / SDK5) 的 Vue3 UIKit（pnpm workspace，核心包 `@easemob/uikit-im`）。
 
 ## 高优先级规则
 
 - 协作沟通、计划、变更说明默认**中文**；对外组件 API / props / emits 的注释与文档尽量中英双语。
 - 修改后**必须先验证再提交**：验证门禁是**类型检查 + 构建**，不是 lint 全绿。
-  - 类型检查：`pnpm -F @easemob/uikit exec vue-tsc --noEmit`（0 错误）
-  - 构建：`pnpm -F @easemob/uikit build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
+  - 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）
+  - 构建：`pnpm -F @easemob/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
   - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`
-- **版本号同步**：`packages/uikit/package.json` 的 `version` 必须与根 `CHANGELOG.md` 最新版本段一致；发版/改版本号后提交前跑 `pnpm changelog:check`（唯一版本数据源是根 CHANGELOG，文档站 changelog 页经 `@include` 引用，禁止手写版本段）。
+- **版本号同步**：`packages/uikit-im/package.json` 的 `version` 必须与根 `CHANGELOG.md` 最新版本段一致；发版/改版本号后提交前跑 `pnpm changelog:check`（唯一版本数据源是根 CHANGELOG，文档站 changelog 页经 `@include` 引用，禁止手写版本段）。
 - 每次 `git commit` 的 message 用**中文**；**不主动 `git push`**，不做其它 git 变更（reset/rebase/force 等），除非用户明确要求，且每次都需再确认。
 - 暂存后确认没混入产物/依赖：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'` 应为空（`dist/` 已 gitignore）。
 - 大改动先写计划、等确认再编码；涉及公开 API（组件名 / props / emits / 导出）改动先说明影响面。
@@ -23,7 +23,7 @@
 - eslint 是 `@antfu/eslint-config` **flat config**（根 `eslint.config.js`）：**`--ext` 无效**，直接传文件/目录路径。
 - `no-console` 允许 `warn`/`error`，只禁 `log/info/debug`；`**/*.story.vue` 已放开 console/alert。
 - 公开事件统一 **kebab-case**，由 `vue/custom-event-name-casing: ['error','kebab-case']` 强制。
-- **demo 运行时走 vite alias `@easemob/uikit` → `packages/uikit/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。2026-08-12 起 demo 处于 tgz 临时验证模式（alias 被注释，依赖 `file:../../easemob-uikit-1.6.0.tgz`），恢复源码模式与切换细节见 skill `uikit-demo-development`。
+- **demo 运行时走 vite alias `@easemob/uikit-im` → `packages/uikit-im/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。demo 当前为 workspace 源码直连模式（tgz 验证模式已于 1.9.0 收回，切换细节见 skill `uikit-demo-development`）。
 - **SDK 双引入模式**：`easemob-websdk` 子包依赖声明恒为 `^5.0.0`（生产/发布，跟随 5.x 正式版与 beta 线）；本地 tgz 联调用 `pnpm sdk:use-tgz` / `pnpm sdk:use-npm` 切换（根 `package.json` 的 `pnpm.overrides` 指向根目录 `easemob-websdk-5.0.0.tgz`，切换后需 `pnpm install`）；`pnpm sdk:up` 更新到 range 内最新 SDK，`pnpm sdk:status` 查看当前模式。详见根 README「SDK 引入模式」与 skill `uikit-release-build`。
 - macOS 自带 bash 3.2 无 `mapfile`。
 
@@ -67,9 +67,9 @@
 - Demo 开发者友好模式预研：根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
-- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit` 1.x 开发完后启动）
+- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
-- 核心包源码：`packages/uikit/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
+- 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
-- 组件 story：`packages/uikit/src/**/*.story.vue`（Histoire）
+- 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）
 - 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）

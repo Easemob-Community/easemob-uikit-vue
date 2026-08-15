@@ -6,7 +6,7 @@
  * 现约定单一数据源：根 CHANGELOG.md 唯一维护版本段，文档站通过 @include 引用。
  *
  * 校验点：
- * 1. packages/uikit/package.json 的 version 与根 CHANGELOG.md 最新版本段一致
+ * 1. packages/uikit-im/package.json 的 version 与根 CHANGELOG.md 最新版本段一致
  * 2. 根 CHANGELOG.md 版本段无重复、按 semver 降序排列（不含 Unreleased 之外的断层）
  * 3. apps/docs/guide/changelog.md 不再允许手写版本段（只能 @include 根 CHANGELOG）
  *
@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const pkg = JSON.parse(readFileSync(join(root, 'packages/uikit/package.json'), 'utf8'))
+const pkg = JSON.parse(readFileSync(join(root, 'packages/uikit-im/package.json'), 'utf8'))
 const rootChangelog = readFileSync(join(root, 'CHANGELOG.md'), 'utf8')
 const docsChangelog = readFileSync(join(root, 'apps/docs/guide/changelog.md'), 'utf8')
 

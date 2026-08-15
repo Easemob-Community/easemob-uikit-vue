@@ -49,7 +49,7 @@
 
 ### Badge 组件
 
-- 文件：`packages/uikit/src/components/badge/badge.vue`
+- 文件：`packages/uikit-im/src/components/badge/badge.vue`
 - 现状：CSS 实现，高度固定 `1.6em`，宽度按内容自适应；一位数时强制正圆（`border-radius: 50%`），多位数时圆角胶囊。
 - 问题：
   - 没有按位数（units/tens/hundreds）显式调整宽度，当前尺寸依赖 `min-width: 1.6em` 和 `padding: 0 0.25em`，三位数时可能过挤。
@@ -58,7 +58,7 @@
 
 ### 消息状态
 
-- 文件：`packages/uikit/src/modules/chat/message-item/message-bubble-wrapper.vue`
+- 文件：`packages/uikit-im/src/modules/chat/message-item/message-bubble-wrapper.vue`
 - 现状：通过 `messageStatusConfig.iconMap` 可自定义图标，默认映射为：
   - `SENDING` → `actions/loading_arc`
   - `SENT` → `actions/check`
@@ -132,7 +132,7 @@
 ## 落地进展
 
 - **2026-08-06**：
-  - `packages/uikit/src/assets/icons/status/` 新增 `circle`、`circle_check`、`dot`、`dot_check` 四个数字胶囊状态图标；`icon-map` 通过 `import.meta.glob` 自动注册。
+  - `packages/uikit-im/src/assets/icons/status/` 新增 `circle`、`circle_check`、`dot`、`dot_check` 四个数字胶囊状态图标；`icon-map` 通过 `import.meta.glob` 自动注册。
   - `Badge` 组件按数字胶囊规范重构：`size`（normal/small）、`variant`（filled/stroked）prop 落地；normal 尺寸按 units/tens/hundreds 位数区分为 24×24 / 32×24 / 42×24；红点模式同步提供大小两档。
   - `message-bubble-wrapper.vue` 新增 `messageStatus.style: 'classic' | 'capsule'` 配置，`capsule` 风格下 `SENT/DELIVERED` 显示空心圆、`READ` 显示空心圆+对勾，默认保持 `classic` 不破坏既有行为。
   - `badge.story.vue` 增加 Digital Capsule Sizes / Variants 两个展示变体；`message-list.story.vue` 增加 Digital Capsule 消息状态变体（mock 会话改为单聊以展示状态图标）。

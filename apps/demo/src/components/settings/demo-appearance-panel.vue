@@ -20,7 +20,7 @@ import {
   useLocale,
   useTheme,
   useUIKit,
-} from '@easemob/uikit'
+} from '@easemob/uikit-im'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'

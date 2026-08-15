@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
-import type { UIKitDataSource } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
+import type { UIKitDataSource } from '@easemob/uikit-im'
 
 const mockDataSource: UIKitDataSource = {
   subscribePresence: async () => {

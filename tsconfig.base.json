@@ -15,8 +15,8 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "@easemob/uikit": ["./packages/uikit/src"],
-      "@easemob/uikit/*": ["./packages/uikit/src/*"]
+      "@easemob/uikit-im": ["./packages/uikit-im/src"],
+      "@easemob/uikit-im/*": ["./packages/uikit-im/src/*"]
     }
   },
   "include": ["packages/*/src", "apps/*/src"],

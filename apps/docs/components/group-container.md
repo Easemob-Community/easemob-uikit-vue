@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 
 function onGroupClick() {
   // 跳转群详情或进入群聊

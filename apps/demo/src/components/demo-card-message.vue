@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar, useLocale, useUserInfo } from '@easemob/uikit'
-import type { CustomMessageBody, UiMessage } from '@easemob/uikit'
+import { EmAvatar, useLocale, useUserInfo } from '@easemob/uikit-im'
+import type { CustomMessageBody, UiMessage } from '@easemob/uikit-im'
 
 export interface DemoCardMessageProps {
   message: UiMessage

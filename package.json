@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "pnpm -F @easemob/uikit story:dev",
+    "dev": "pnpm -F @easemob/uikit-im story:dev",
     "sdk:use-tgz": "node scripts/switch-sdk.mjs tgz",
     "sdk:use-npm": "node scripts/switch-sdk.mjs npm",
     "sdk:status": "node scripts/switch-sdk.mjs status",

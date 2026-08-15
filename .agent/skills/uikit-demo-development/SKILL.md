@@ -17,7 +17,7 @@
 demo 是 UIKit 的「演示 + 联调 + 业务接入参考」三合一工程。本 skill 记录 demo 的**运行模式（源码直连 vs tgz 产物）**、**应用装配**（Provider / 登录 / 布局）、**设置面板状态单例**、
 **演示数据注入**与 **Dev Hints 注册表**的真实契约，避免以下翻车：
 
-1. 在 tgz 联调模式下改 `packages/uikit/src` 以为刷新即生效（源码模式才有 alias）；
+1. 在 tgz 联调模式下改 `packages/uikit-im/src` 以为刷新即生效（源码模式才有 alias）；
 2. 恢复源码模式时只配了一条 alias（theme 子路径必须排在前面）；
 3. 新设置状态不放进 `useDemoSettings` 单例，导致面板与页面状态分叉；
 4. 业务 key 只加了 zh-CN 忘记加 en，切换语言后 key 裸奔；
@@ -29,16 +29,16 @@ demo 是 UIKit 的「演示 + 联调 + 业务接入参考」三合一工程。�
 
 ```
 alias: [
-  { find: '@easemob/uikit/theme', replacement: resolve(__dirname, '../../packages/uikit/dist/theme/index.css') },
-  { find: '@easemob/uikit', replacement: resolve(__dirname, '../../packages/uikit/src') },
+  { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
+  { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
 ],
 ```
 
-- 源码模式下改 `packages/uikit/src` 刷新即生效，无需重建 dist；组件样式由 `.vue`
-  `<style>` 提供（产物模式由主题 css 提供，main.ts 两模式均引入 `@easemob/uikit/theme`）；
-- **tgz 临时验证模式（2026-08-12 起）**：alias 被注释，`@easemob/uikit` 从 node_modules
-  解析 `file:../../easemob-uikit-1.3.1.tgz` 安装产物。此模式下**改 src 不生效**，需
-  `pnpm -F @easemob/uikit build` 重新打包并重新安装 tgz 依赖（或直接恢复源码模式）；
+- 源码模式下改 `packages/uikit-im/src` 刷新即生效，无需重建 dist；组件样式由 `.vue`
+  `<style>` 提供（产物模式由主题 css 提供，main.ts 两模式均引入 `@easemob/uikit-im/theme`）；
+- **tgz 临时验证模式（2026-08-12 起）**：alias 被注释，`@easemob/uikit-im` 从 node_modules
+  解析 `file:../../easemob-uikit-im-1.3.1.tgz` 安装产物。此模式下**改 src 不生效**，需
+  `pnpm -F @easemob/uikit-im build` 重新打包并重新安装 tgz 依赖（或直接恢复源码模式）；
 - **demo 的 `vue-tsc` 始终解析 dist 类型**（非源码）：改公开 API（props/emits/导出）
   后必须重建 dist，否则 demo 类型检查与运行时不一致；
 - `define` 注入 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__`（构建期读
@@ -105,7 +105,7 @@ alias: [
   - `setPinyinAdapter(adapter)` / `setPinyinAdapter(null)`——拼音搜索适配器开关
     （pinyin-pro 实现：pinyin + initials + firstLetter，非 A-Z 首字母回落 `'#'`）；
   - `setKeyboardShortcutsEnabled(bool)`——UIKIT 全局快捷键开关（ESC 关弹层等）；
-- `DEFAULT_CONVERSATION_TABS` 从 `@easemob/uikit` 导入，tabs 增删/排序/预设（仅单聊 /
+- `DEFAULT_CONVERSATION_TABS` 从 `@easemob/uikit-im` 导入，tabs 增删/排序/预设（仅单聊 /
   仅群组 / 恢复默认）都有对应动作函数；
 - `demoStickerPacks`：GIF 表情包示例（EmojiStickerPack[]），验证 sticker 发送链路。
 
@@ -125,14 +125,14 @@ alias: [
 
 - 启动：`cd apps/demo && pnpm dev`（源码模式改 src 热更；tgz 模式需先 build + 重装）；
 - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`（解析 dist 类型）；
-- 联调闭环：改 src → `pnpm -F @easemob/uikit build` → 重新安装 tgz 依赖 → dev；
+- 联调闭环：改 src → `pnpm -F @easemob/uikit-im build` → 重新安装 tgz 依赖 → dev；
   长期开发建议直接恢复源码 alias 模式（见 §1），不要停留在 tgz 模式。
 
 ## 硬规则 vs 软约定
 
 **硬规则：**
 
-- 恢复源码模式必须配**两条** alias，`@easemob/uikit/theme` 排前面（顺序错误会导致
+- 恢复源码模式必须配**两条** alias，`@easemob/uikit-im/theme` 排前面（顺序错误会导致
   theme 子路径被主 alias 吞掉）。
 - 业务多语言 key 必须 zh-CN / en 成对补齐（mergeLocaleMessages）。
 - 新设置状态必须放进 `useDemoSettings` 单例，禁止面板里另起 ref。
@@ -148,16 +148,16 @@ alias: [
 
 ## 已知漂移（改到相关文件时注意）
 
-- demo 依赖声明当前是 `file:../../easemob-uikit-1.3.1.tgz`（2026-08-12 tgz 临时验证
+- demo 依赖声明当前是 `file:../../easemob-uikit-im-1.3.1.tgz`（2026-08-12 tgz 临时验证
   模式，vite.config.ts 有注释说明）；验证完成后应恢复源码 alias 模式并将依赖改回
   `workspace:*`（或 `^1.x`）并 `pnpm install`。
 - demo 自带 `pinyin-pro` 依赖仅用于拼音 adapter 演示，业务侧可自选实现。
 - `chatConfig` 的字段随 `EmChatContainer` props 演进，组装处与容器类型要同步更新
-  （以 `packages/uikit/src/modules/chat/chat.vue` 的类型契约为准）。
+  （以 `packages/uikit-im/src/modules/chat/chat.vue` 的类型契约为准）。
 
 ## 反面清单
 
-- ❌ 在 tgz 模式改 `packages/uikit/src` 后不 build 就刷新页面——改动不生效。
+- ❌ 在 tgz 模式改 `packages/uikit-im/src` 后不 build 就刷新页面——改动不生效。
 - ❌ 恢复 alias 时把 theme 子路径排在后面——theme 样式 404 或解析到错误模块。
 - ❌ 设置面板里另起 ref 不复用 useDemoSettings——面板改动不生效（状态分叉）。
 - ❌ i18n 只加 zh-CN——切英文后 key 裸奔。

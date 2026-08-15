@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar, EmIcon, EmPopup, useLocale, useUIKit } from '@easemob/uikit'
-import type { UiContact } from '@easemob/uikit'
+import { EmAvatar, EmIcon, EmPopup, useLocale, useUIKit } from '@easemob/uikit-im'
+import type { UiContact } from '@easemob/uikit-im'
 
 export interface DemoCardPickerModalProps {
   show: boolean

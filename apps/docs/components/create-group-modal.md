@@ -19,7 +19,7 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmCreateGroupModal, EmUIKitProvider } from '@easemob/uikit'
+import { EmCreateGroupModal, EmUIKitProvider } from '@easemob/uikit-im'
 
 const show = ref(false)
 
@@ -76,7 +76,7 @@ function onCreated(groupId: string) {
 
 ```vue
 <script setup lang="ts">
-import type { CreateGroupParams } from '@easemob/uikit'
+import type { CreateGroupParams } from '@easemob/uikit-im'
 
 async function createWithBusiness(params: CreateGroupParams) {
   // 例如：先调自有群服务，再回环信建群
@@ -96,8 +96,8 @@ async function createWithBusiness(params: CreateGroupParams) {
 ## 全局接管：Provider 级适配
 
 ```ts
-import { EmUIKitProvider } from '@easemob/uikit'
-import type { CreateGroupParams } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
+import type { CreateGroupParams } from '@easemob/uikit-im'
 
 const dataSource = {
   createGroup: async (params: CreateGroupParams) => {

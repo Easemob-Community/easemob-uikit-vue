@@ -49,8 +49,8 @@ export interface NoticeContext {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider, NOTICE_EVENT_TYPE } from '@easemob/uikit'
-import type { NoticeConfig } from '@easemob/uikit'
+import { EmUIKitProvider, NOTICE_EVENT_TYPE } from '@easemob/uikit-im'
+import type { NoticeConfig } from '@easemob/uikit-im'
 
 const noticeConfig: NoticeConfig = {
   // 自定义文案 / 过滤 / 禁用（见下文示例）
@@ -97,8 +97,8 @@ const noticeConfig: NoticeConfig = {
 按事件类型分支返回自定义文案，其余事件回落内置文案：
 
 ```ts
-import { NOTICE_EVENT_TYPE } from '@easemob/uikit'
-import type { NoticeConfig } from '@easemob/uikit'
+import { NOTICE_EVENT_TYPE } from '@easemob/uikit-im'
+import type { NoticeConfig } from '@easemob/uikit-im'
 
 const noticeConfig: NoticeConfig = {
   renderText: (ctx) => {
@@ -162,7 +162,7 @@ const noticeConfig: NoticeConfig = {
 - **自定义文案**：`renderText` 收到的是已本地化的 `defaultText`，业务可在回调内自行判断语言返回目标文案：
 
 ```ts
-import { useLocale } from '@easemob/uikit'
+import { useLocale } from '@easemob/uikit-im'
 
 const { locale } = useLocale()
 const noticeConfig: NoticeConfig = {
@@ -187,7 +187,7 @@ const noticeConfig: NoticeConfig = {
 | `noticeConfig.filter` / `disabledEvents` | 控制通知是否上屏 | 不影响其他通知 |
 
 ```ts
-import { mergeLocaleMessages } from '@easemob/uikit'
+import { mergeLocaleMessages } from '@easemob/uikit-im'
 
 // zh-CN 与 en 成对补齐
 mergeLocaleMessages('zh-CN', { 'chat.notice.memberJoined': '欢迎新伙伴 {name} 入群～' })

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 
 function onSelect() {
   // 切换到聊天页，例如把 conversation.id 写入路由
@@ -69,7 +69,7 @@ function onSelect() {
 
 ```vue
 <script setup lang="ts">
-import { useConversationTabs } from '@easemob/uikit'
+import { useConversationTabs } from '@easemob/uikit-im'
 
 // 业务只有单聊/群聊，不区分更多类型
 const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })

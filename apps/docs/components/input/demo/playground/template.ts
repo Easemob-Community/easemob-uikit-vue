@@ -2,7 +2,7 @@
  * 输入框在线代码演练场初始模板（VuePlayground files）
  *
  * 单文件约定：仅 'App.vue'，为用户主编辑区（组件 props + 配置对象）。
- * 模板约束：只能 import import map 已覆盖的模块（vue / pinia / @easemob/uikit），
+ * 模板约束：只能 import import map 已覆盖的模块（vue / pinia / @easemob/uikit-im），
  * 预览 iframe 才能解析；EmInput 不自带 label 前缀样式，标题 / hint 由外层 div 自绘
  * （参考 apps/docs/components/input/demo/ 下 basic.vue / variants.vue 的用法）。
  */
@@ -10,7 +10,7 @@ export const inputPlaygroundFiles: Record<string, string> = {
   'App.vue': `
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { EmInput, EmUIKitProvider } from '@easemob/uikit'
+import { EmInput, EmUIKitProvider } from '@easemob/uikit-im'
 
 // ===== 可编辑配置：改这里实时生效 =====
 const config = reactive({

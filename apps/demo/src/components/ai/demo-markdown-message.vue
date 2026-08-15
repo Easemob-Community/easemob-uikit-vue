@@ -11,8 +11,8 @@
  */
 import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
-import { EmTextMessage, STREAM_MESSAGE_STATUS, useLocale } from '@easemob/uikit'
-import type { TextMessageType, UiMessage } from '@easemob/uikit'
+import { EmTextMessage, STREAM_MESSAGE_STATUS, useLocale } from '@easemob/uikit-im'
+import type { TextMessageType, UiMessage } from '@easemob/uikit-im'
 
 /** 业务自定义流类型常量（与 STREAM_CUSTOM_TYPE 对齐；markdown 为插件侧值，不进内核） */
 export interface DemoMarkdownMessageProps {

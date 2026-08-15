@@ -19,7 +19,7 @@ export interface DevHintApi {
 
 /** UIKit 内实现参考文件（引用文件路径，不引用行号，避免随迭代漂移） */
 export interface DevHintFileRef {
-  /** 相对仓库根的文件路径，如 packages/uikit/src/sdk/domain/message-domain.ts */
+  /** 相对仓库根的文件路径，如 packages/uikit-im/src/sdk/domain/message-domain.ts */
   path: string
   /** 该文件在此功能中承担的角色 */
   desc: string

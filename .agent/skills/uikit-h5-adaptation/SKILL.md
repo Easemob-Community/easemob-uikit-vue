@@ -13,7 +13,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `@easemob/uikit`）里新增或修改 H5/移动端相关能力时，
+在 `easemob-uikit-vue`（核心包 `@easemob/uikit-im`）里新增或修改 H5/移动端相关能力时，
 保证状态来源、CSS 变量契约、组件接入方式一致，避免每个组件自己监听 `resize/visualViewport/touch`。
 
 ## 1. 对外入口：`<UIKitProvider :h5="config">`

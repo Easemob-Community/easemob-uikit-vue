@@ -75,34 +75,34 @@ UIKit 上层代码（composables、components、stores）全面直接对接 `im-
 
 | 文件 | 改动内容 |
 |------|----------|
-| `packages/uikit/package.json` | 依赖 `easemob-websdk` → `im-sdk-web`（本地路径引用） |
-| `packages/uikit/vite.config.ts` | external 和 globals 更新 |
+| `packages/uikit-im/package.json` | 依赖 `easemob-websdk` → `im-sdk-web`（本地路径引用） |
+| `packages/uikit-im/vite.config.ts` | external 和 globals 更新 |
 
 ### 3.2 SDK 层（核心）
 
 | 文件 | 改动内容 |
 |------|----------|
-| `packages/uikit/src/sdk/types.ts` | 类型定义全面替换为新 SDK 类型 |
-| `packages/uikit/src/sdk/client.ts` | `UIKitClient` 重构：包装 `ChatClient` 而非 `Connection` |
-| `packages/uikit/src/sdk/event-handler.ts` | 事件系统重写：按 Manager 分离注册，统一 `onMessage` + 字段提取构造 UI `Message` |
+| `packages/uikit-im/src/sdk/types.ts` | 类型定义全面替换为新 SDK 类型 |
+| `packages/uikit-im/src/sdk/client.ts` | `UIKitClient` 重构：包装 `ChatClient` 而非 `Connection` |
+| `packages/uikit-im/src/sdk/event-handler.ts` | 事件系统重写：按 Manager 分离注册，统一 `onMessage` + 字段提取构造 UI `Message` |
 
 ### 3.3 Store 层
 
 | 文件 | 改动内容 |
 |------|----------|
-| `packages/uikit/src/store/message.ts` | `Message` 类型重新定义，不再依赖旧 SDK `ExcludeAckMessageBody` |
+| `packages/uikit-im/src/store/message.ts` | `Message` 类型重新定义，不再依赖旧 SDK `ExcludeAckMessageBody` |
 
 ### 3.4 Composables 层
 
 | 文件 | 改动内容 |
 |------|----------|
-| `packages/uikit/src/composables/use-client.ts` | 登录/登出 API 适配，移除 `AsyncResult.data` 解包 |
-| `packages/uikit/src/composables/use-chat.ts` | 消息发送 API 适配，移除 `WebIM.message.create` 调用 |
-| `packages/uikit/src/composables/use-conversation.ts` | 会话 API 适配（getConversationList/setConversationPinned 等） |
-| `packages/uikit/src/composables/use-contact.ts` | 联系人 API 适配（contactManager.getContacts 等） |
-| `packages/uikit/src/composables/use-blocklist.ts` | 黑名单 API 适配（contactManager.getBlocklist 等） |
-| `packages/uikit/src/composables/use-group.ts` | 群组 API 适配（groupManager.getJoinedGroupList 等） |
-| `packages/uikit/src/composables/use-presence.ts` | Presence API 适配（presenceManager.subscribePresence 等） |
+| `packages/uikit-im/src/composables/use-client.ts` | 登录/登出 API 适配，移除 `AsyncResult.data` 解包 |
+| `packages/uikit-im/src/composables/use-chat.ts` | 消息发送 API 适配，移除 `WebIM.message.create` 调用 |
+| `packages/uikit-im/src/composables/use-conversation.ts` | 会话 API 适配（getConversationList/setConversationPinned 等） |
+| `packages/uikit-im/src/composables/use-contact.ts` | 联系人 API 适配（contactManager.getContacts 等） |
+| `packages/uikit-im/src/composables/use-blocklist.ts` | 黑名单 API 适配（contactManager.getBlocklist 等） |
+| `packages/uikit-im/src/composables/use-group.ts` | 群组 API 适配（groupManager.getJoinedGroupList 等） |
+| `packages/uikit-im/src/composables/use-presence.ts` | Presence API 适配（presenceManager.subscribePresence 等） |
 
 ### 3.5 组件层（仅类型引用）
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CONVERSATION_TYPE, useNotification } from '@easemob/uikit'
+import { CONVERSATION_TYPE, useNotification } from '@easemob/uikit-im'
 
 const { state, notify, close, closeAll } = useNotification()
 

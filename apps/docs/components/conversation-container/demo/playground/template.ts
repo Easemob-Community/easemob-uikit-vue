@@ -15,8 +15,8 @@ import {
   CONVERSATION_TYPE,
   useConversationStore,
   usePresenceStore,
-} from '@easemob/uikit'
-import type { ConversationTabKey } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ConversationTabKey } from '@easemob/uikit-im'
 import { mockConversations, mockPresence } from './mock'
 
 // ---------- mock 注入（免登录渲染，见 mock.ts） ----------
@@ -88,8 +88,8 @@ watch(
 </style>
 `.trim(),
   'mock.ts': `
-import { CONVERSATION_TYPE } from '@easemob/uikit'
-import type { UiConversation, UiPresence } from '@easemob/uikit'
+import { CONVERSATION_TYPE } from '@easemob/uikit-im'
+import type { UiConversation, UiPresence } from '@easemob/uikit-im'
 
 const now = Date.now()
 

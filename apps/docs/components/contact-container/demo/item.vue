@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 
 const alice = { userId: 'u_alice', name: 'Alice' }
 const bob = { userId: 'u_bob', name: 'Bob', remark: 'Bob（同事）' }

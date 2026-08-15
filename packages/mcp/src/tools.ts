@@ -26,7 +26,7 @@ interface ToolDef {
 const TOOL_DEFS: ToolDef[] = [
   {
     name: 'list_components',
-    description: '列出 @easemob/uikit 全部组件（含中文名与分类），用于快速了解可用组件。',
+    description: '列出 @easemob/uikit-im 全部组件（含中文名与分类），用于快速了解可用组件。',
     inputSchema: { type: 'object', properties: {} },
   },
   {
@@ -53,7 +53,7 @@ const TOOL_DEFS: ToolDef[] = [
   },
   {
     name: 'get_latest_version',
-    description: '查询 @easemob/uikit 最新版本（npm registry）并与本地文档快照版本对比。',
+    description: '查询 @easemob/uikit-im 最新版本（npm registry）并与本地文档快照版本对比。',
     inputSchema: { type: 'object', properties: {} },
   },
   {
@@ -128,7 +128,7 @@ function listComponentsText(): string {
     byCat.set(c.category, arr)
   }
 
-  const lines = ['# @easemob/uikit 组件清单', '']
+  const lines = ['# @easemob/uikit-im 组件清单', '']
   for (const [cat, items] of byCat) {
     lines.push(`## ${cat}`, '')
     for (const it of items) {
@@ -156,7 +156,7 @@ function formatSearchHits(query: string, hits: SearchHit[]): string {
 async function getLatestVersionText(): Promise<string> {
   const bundled = getVersion()
   try {
-    const res = await fetch('https://registry.npmjs.org/@easemob/uikit/latest', {
+    const res = await fetch('https://registry.npmjs.org/@easemob/uikit-im/latest', {
       signal: AbortSignal.timeout(5000),
     })
     if (!res.ok) {
@@ -165,9 +165,9 @@ async function getLatestVersionText(): Promise<string> {
     const data = (await res.json()) as { version?: string }
     const latest = data.version ?? bundled
     if (latest === bundled) {
-      return `@easemob/uikit 最新版本：${latest}（与本地文档快照一致）。`
+      return `@easemob/uikit-im 最新版本：${latest}（与本地文档快照一致）。`
     }
-    return `@easemob/uikit 最新版本：${latest}；本地文档快照版本：${bundled}（快照可能滞后，建议以 npm 最新文档为准）。`
+    return `@easemob/uikit-im 最新版本：${latest}；本地文档快照版本：${bundled}（快照可能滞后，建议以 npm 最新文档为准）。`
   }
   catch {
     return `无法连接 npm registry，本地文档快照版本：${bundled}。`

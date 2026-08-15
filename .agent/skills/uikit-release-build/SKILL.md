@@ -24,19 +24,19 @@
 
 ## 1. 验证门禁（提交前必做，AGENTS 规则）
 
-- 类型检查：`pnpm -F @easemob/uikit exec vue-tsc --noEmit`（0 错误）；
-- 构建：`pnpm -F @easemob/uikit build`（约 9s，链路见 §2）；
+- 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）；
+- 构建：`pnpm -F @easemob/uikit-im build`（约 9s，链路见 §2）；
 - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`；
-- **demo 运行时走 vite alias 直连 `packages/uikit/src` 源码**（改 src 刷新即生效），
+- **demo 运行时走 vite alias 直连 `packages/uikit-im/src` 源码**（改 src 刷新即生效），
   但 demo 的 `vue-tsc` 解析的是**已构建的 dist 类型**——改公开 API（props/emits/导出）后
   必须先重建 dist，否则 demo 类型检查与运行时不一致。
-- **版本号同步**：发版改版本号时，`packages/uikit/package.json` 的 `version` 必须与根
+- **版本号同步**：发版改版本号时，`packages/uikit-im/package.json` 的 `version` 必须与根
   `CHANGELOG.md` 最新版本段（`## x.y.z (日期)`）一致；提交前跑 `pnpm changelog:check`
   （`scripts/check-version-sync.mjs`：校验 package.json 与根 CHANGELOG 一致、版本段降序无重复、
   文档站 `apps/docs/guide/changelog.md` 无手写版本段）。根 CHANGELOG 是唯一版本数据源，
   文档站通过 `@include` 引用，禁止再单独维护文档站版本段。
 
-## 2. 构建链路与产物结构（`packages/uikit`）
+## 2. 构建链路与产物结构（`packages/uikit-im`）
 
 ### 2.1 build 脚本
 
@@ -45,14 +45,14 @@
 
 ### 2.2 主构建（vite.config.ts）
 
-- lib entry `src/index.ts`，formats `['es', 'umd']`，fileName `easemob-uikit.js` /
-  `easemob-uikit.umd.cjs`，全局名 `EasemobUIKit`；
+- lib entry `src/index.ts`，formats `['es', 'umd']`，fileName `easemob-uikit-im.js` /
+  `easemob-uikit-im.umd.cjs`，全局名 `EasemobUIKit`；
 - `external: ['vue', 'pinia', 'easemob-websdk']`（配合 peerDependencies）；
 - `output.exports: 'named'`（同时有命名导出与 default 导出时显式声明，避免 Rollup 警告
   "Consumers will have to use EasemobUIKit.default"；`install` 是命名导出，UMD 用户可直接
   `app.use(EasemobUIKit)`）；globals：`Vue` / `Pinia` / `Easemob`（SDK）；
 - `cssCodeSplit: false` + `assetFileNames`：`style.css` 重命名为 `theme/index.css`（导出路径
-  `@easemob/uikit/theme` 指向它）；
+  `@easemob/uikit-im/theme` 指向它）；
 - 版本注入：`define` 注入 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__`
   （构建期读 sdk 与 uikit 的 package.json，向上查找兼容 SDK 新旧入口）；
 - `vite-plugin-dts`：`insertTypesEntry: true` 生成 `dist/index.d.ts`，
@@ -60,8 +60,8 @@
 
 ### 2.3 轻量子包（vite.aux.config.ts）
 
-- `@easemob/uikit/resolver`（EasemobUIKitResolver，unplugin-vue-components）与
-  `@easemob/uikit/auto-imports`（EasemobUIKitImports，unplugin-auto-import）单独打包，
+- `@easemob/uikit-im/resolver`（EasemobUIKitResolver，unplugin-vue-components）与
+  `@easemob/uikit-im/auto-imports`（EasemobUIKitImports，unplugin-auto-import）单独打包，
   避免混进全量 bundle 导致 tree-shaking 不友好；
 - `emptyOutDir: false`——**必须保留主构建产物**，不能清空 dist。
 
@@ -76,7 +76,7 @@
 
 ## 3. 构建期图标引用校验（`scripts/check-icon-refs.mjs`）
 
-- 扫描 `packages/uikit/src` 下所有 `.vue` / `.ts`（**含 `*.story.vue`，它们也真实渲染**），
+- 扫描 `packages/uikit-im/src` 下所有 `.vue` / `.ts`（**含 `*.story.vue`，它们也真实渲染**），
   提取 `EmIcon` 的 name 引用（`name="分类/图标名"`、`:name="'...'"`、TS 里 `icon: '...'`），
   与 `src/assets/icons` 下实际 SVG 比对；
 - 缺失引用**非零码退出**，避免图标拼错/删漏后静默不渲染；
@@ -84,7 +84,7 @@
   存在的目录（不会误报 `'text/plain'` 等无关字符串）；
 - **已知局限**：动态拼接的 name（如 `icon: 'actions/' + type`）无法静态扫描，依赖 code
   review 与运行期 EmIcon 的 miss warn 兜底；
-- 独立运行：`cd packages/uikit && pnpm run icons:check`。
+- 独立运行：`cd packages/uikit-im && pnpm run icons:check`。
 
 ## 4. SDK 双引入模式（根 `scripts/switch-sdk.mjs`）
 
@@ -99,8 +99,8 @@
 
 ## 5. 根 workspace 与常用脚本（pnpm 9 / pnpm-workspace.yaml）
 
-- workspace：`packages/*`（@easemob/uikit）+ `apps/*`（demo / docs）；
-- 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob/uikit story:dev`（Histoire）；
+- workspace：`packages/*`（@easemob/uikit-im）+ `apps/*`（demo / docs）；
+- 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob/uikit-im story:dev`（Histoire）；
   `test` = vitest；`lint` = `eslint .`；`format` = `prettier --write .`；
 - `packageManager: pnpm@9.12.3`；`engines.node >= 18`；
 - **提交前检查**：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'`
@@ -112,23 +112,23 @@
 
 - 验证门禁是**类型检查 + 构建**（0 错误），不是 lint 全绿。
 - 改公开 API 后必须重建 dist（demo 类型检查解析 dist 类型）；改 src 内部实现无需重建。
-- 发布前必须 `pnpm -F @easemob/uikit build`，发布包只含 `dist`（files 白名单）。
+- 发布前必须 `pnpm -F @easemob/uikit-im build`，发布包只含 `dist`（files 白名单）。
 - 构建失败（含图标引用缺失）不允许绕过/注释校验强行发布。
 - 本地 tgz 联调后切回 npm 模式并 `pnpm install` 验证，禁止把 `pnpm.overrides` 提交上去。
 
 **软约定：**
 
-- 版本号只改 `packages/uikit/package.json` 的 `version`（构建期自动注入产物与类型）；
+- 版本号只改 `packages/uikit-im/package.json` 的 `version`（构建期自动注入产物与类型）；
   根 package.json 的 version 是 workspace 私有的，不随包发布。
 - `sdk:use-tgz` 前确认根目录存在对应 tgz（脚本会检查并提示）。
 
 ## 已知漂移（改到相关文件时注意）
 
 - `easemob-websdk` 依赖声明是 `^5.0.0`（README 中写 `^5.0.0-beta.1` 的旧描述已过时），
-  以 `packages/uikit/package.json` 为准。
+  以 `packages/uikit-im/package.json` 为准。
 - `contactFetchMode: 'page'` 目前 SDK 未暴露分页游标接口，实际按全量返回处理（与构建无关，
   但涉及发布文档措辞）。
-- UMD 产物 `easemob-uikit.umd.cjs` 是 CJS 扩展名 + UMD 格式（Vite 命名约定），不要改成
+- UMD 产物 `easemob-uikit-im.umd.cjs` 是 CJS 扩展名 + UMD 格式（Vite 命名约定），不要改成
   `.umd.js` 或 `.cjs` 单格式。
 
 ## 反面清单
@@ -139,4 +139,4 @@
 - ❌ 发布前不 build / 用 story 产物当库产物。
 - ❌ 手动改 dist 里任何文件——一律由 build 重新生成。
 - ❌ 在 resolver/auto-imports 子包里塞组件本体——破坏轻量子包设计。
-- ❌ `git add` 把 `easemob-websdk-*.tgz` / `easemob-uikit-*.tgz` 当发布源——仓库根 tgz 仅联调用。
+- ❌ `git add` 把 `easemob-websdk-*.tgz` / `easemob-uikit-im-*.tgz` 当发布源——仓库根 tgz 仅联调用。

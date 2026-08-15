@@ -216,7 +216,7 @@ async function Zz() {
   if (typeof document > "u")
     return n.length;
   const e = Vg(n), t = new Blob([e], { type: "text/plain;charset=utf-8" }), o = URL.createObjectURL(t), s = document.createElement("a"), r = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  return s.href = o, s.download = `easemob-uikit-logs-${r}.log`, s.click(), URL.revokeObjectURL(o), n.length;
+  return s.href = o, s.download = `easemob-uikit-im-logs-${r}.log`, s.click(), URL.revokeObjectURL(o), n.length;
 }
 Tg((n) => {
   e2({

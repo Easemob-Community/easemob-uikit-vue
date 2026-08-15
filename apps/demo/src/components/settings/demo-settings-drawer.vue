@@ -7,7 +7,7 @@
  * Provider 四开关由 app.vue 持有，经本组件 props/emits 双向转发到各面板。
  */
 import { computed, ref, watch } from 'vue'
-import { EmIcon, EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit'
+import { EmIcon, EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit-im'
 import DemoAiPanel from './demo-ai-panel.vue'
 import DemoAppearancePanel from './demo-appearance-panel.vue'
 import DemoChatPanel from './demo-chat-panel.vue'

@@ -5,8 +5,8 @@
  * 供 EmMessageBubbleWrapper 直接渲染（EmUIKitProvider(:auto-init="false") 内）。
  * （消息列表配置面板演练场已并入在线代码演练场 template.ts，其 mock 为自包含构造。）
  */
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit'
-import type { UiMessage } from '@easemob/uikit'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-im'
+import type { UiMessage } from '@easemob/uikit-im'
 
 /** mock 会话 ID */
 export const MOCK_BUBBLE_CONVERSATION_ID = 'mock_bubble_docs_001'

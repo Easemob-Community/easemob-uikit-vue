@@ -18,7 +18,7 @@
 
 ### 1. 单条消息气泡演练场（EmMessageBubbleWrapper）
 
-- **目标组件**：`packages/uikit/src/modules/chat/message-item/message-bubble-wrapper.vue`（公开导出 `EmMessageBubbleWrapper`）。
+- **目标组件**：`packages/uikit-im/src/modules/chat/message-item/message-bubble-wrapper.vue`（公开导出 `EmMessageBubbleWrapper`）。
 - **覆盖能力**：
   - 多选态：`isMultiSelectMode` prop + `toggle-select` emit + 气泡复选框显隐；
   - 引用卡片：`ext.msgQuote` + `msgPreview` 驱动的 QuoteCard（气泡下方），含点击定位/闪烁（`requestLocate` / `locateRequest`）；
@@ -29,7 +29,7 @@
 
 ### 2. 会话列表配置演练场
 
-- **目标组件**：`packages/uikit/src/containers/conversation-container/conversation-container.vue`。
+- **目标组件**：`packages/uikit-im/src/containers/conversation-container/conversation-container.vue`。
 - **覆盖配置**（容器 **props** 驱动，非 ChatConfig 段，已核实全部存在）：
   - `showSenderName`（默认 true）、`unreadMode`（'count' | 'dot'）、`showHeader`（默认 true）、`showStatusBanner`（默认 true）、`tabs`（五类分栏 all / unread / atMe / single / group）、`showSearch`、`showScrollToTop`、`headerAlign`、`bodySticky` / `footerSticky` 等。
 - **mock 会话列表注入**：`conversation-container.story.vue` 已有先例（mock 会话数据注入 store），docs 侧沿用该模式。
@@ -38,7 +38,7 @@
 
 ### 3. 输入框配置演练场
 
-- **目标组件**：`packages/uikit/src/modules/chat/message-input/`（index / simple-input / rich-input / editing-bar）。
+- **目标组件**：`packages/uikit-im/src/modules/chat/message-input/`（index / simple-input / rich-input / editing-bar）。
 - **覆盖配置**（`ChatConfig.input`，已核实全部存在）：
   - `mode`（simple | rich）、`style`（feishu | wechat）、`features` 六开关（emoji / image / file / voice / video / mention）、`autoFocus`、`focusBorderColor`、`caretColor`、`selectionColor`、`showSendButton`、`resizable`、`expandable`。
 - **硬约束**：`EmMessageInput` 依赖 Provider 上下文（`useChat()`），演练场必须套 `EmUIKitProvider` 渲染；无 SDK 连接时需 mock 发送通道（dataSource 接管或注入 mock 发送），否则发送类交互不可用。

@@ -47,8 +47,8 @@ Demo 提供了完整参考实现（`apps/demo/src/components/ai/demo-markdown-me
 <script setup lang="ts">
 import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
-import { EmTextMessage, STREAM_MESSAGE_STATUS } from '@easemob/uikit'
-import type { UiMessage } from '@easemob/uikit'
+import { EmTextMessage, STREAM_MESSAGE_STATUS } from '@easemob/uikit-im'
+import type { UiMessage } from '@easemob/uikit-im'
 
 const props = defineProps<{ message: UiMessage }>()
 

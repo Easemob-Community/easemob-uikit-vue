@@ -12,7 +12,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `packages/uikit/src`）里任何需要展示用户昵称、头像、在线状态的场景，
+在 `easemob-uikit-vue`（核心包 `packages/uikit-im/src`）里任何需要展示用户昵称、头像、在线状态的场景，
 统一走 **`useUserInfo(userId)` / `useOwnUserInfo()`** 这一条路，避免三类翻车：
 
 1. **头像用文字占位**而非 `Avatar` 组件 + 真实 `avatarUrl`（如合并转发弹窗曾只用首字母圆圈）；

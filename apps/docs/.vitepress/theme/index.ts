@@ -2,7 +2,7 @@ import type { Theme } from 'vitepress'
 // theme-without-fonts：移除默认 Inter，字体栈由 style.css 自定义（antfu vitepress skill 规范）
 import DefaultTheme from 'vitepress/theme-without-fonts'
 import { createPinia } from 'pinia'
-import UIKit from '@easemob/uikit'
+import UIKit from '@easemob/uikit-im'
 import IconGallery from '../components/IconGallery.vue'
 import DocsConfigPanel from '../components/DocsConfigPanel.vue'
 import VuePlayground from '../components/VuePlayground.vue'

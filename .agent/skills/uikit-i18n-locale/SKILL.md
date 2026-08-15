@@ -12,14 +12,14 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `@easemob/uikit`）里加文案 / 改多语言时，
+在 `easemob-uikit-vue`（核心包 `@easemob/uikit-im`）里加文案 / 改多语言时，
 统一走 **`useLocale().t('dotted.key')`** 这一条路，避免三类翻车：
 
 1. 组件里硬编码中文/英文字面量，英文环境漏翻；
 2. 只往一种语言的 map 加 key，另一种环境渲染出原始 key；
 3. 以为 `t()` 会自动替换 `{placeholder}`（**不会**），或以为改 provider `:locale` prop 能在挂载后切语言（**不生效**）。
 
-## 结构：`packages/uikit/src/locale/`（4 文件）
+## 结构：`packages/uikit-im/src/locale/`（4 文件）
 
 - `type.ts` —— **扁平** map 类型，key→string，无嵌套：
 

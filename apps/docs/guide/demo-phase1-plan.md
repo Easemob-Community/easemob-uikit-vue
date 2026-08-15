@@ -2,7 +2,7 @@
 
 > 来源：`/Users/neohuang/Downloads/Demo优化第一期.xlsx`
 > 评估范围：第一期需求中标记为 **P0** 且设计端为 **全端** 的条目。
-> 目的：明确哪些能力属于 UIKIT 通用能力（应在 `packages/uikit` 内补齐），哪些属于 Demo 层业务（应在 `apps/demo` 实现）。
+> 目的：明确哪些能力属于 UIKIT 通用能力（应在 `packages/uikit-im` 内补齐），哪些属于 Demo 层业务（应在 `apps/demo` 实现）。
 
 ---
 

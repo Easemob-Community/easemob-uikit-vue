@@ -12,7 +12,7 @@
 
 ## 目标
 
-本 skill 汇总 `websdk2` 已暴露的 **单人（联系人/好友）** 与 **群组** 相关公开 API，并给出在 `packages/uikit` 中补全 UI/业务层的实现建议，方便按优先级指挥 AI 分模块实现。
+本 skill 汇总 `websdk2` 已暴露的 **单人（联系人/好友）** 与 **群组** 相关公开 API，并给出在 `packages/uikit-im` 中补全 UI/业务层的实现建议，方便按优先级指挥 AI 分模块实现。
 
 > 边界：本 skill 只关注 **ContactManager / GroupManager / UserInfoManager** 中与人、群关系直接相关的 API。消息收发、会话管理、聊天室、Thread、Presence 等能力由其他 skill 覆盖。
 

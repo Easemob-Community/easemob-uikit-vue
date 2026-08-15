@@ -8,8 +8,8 @@
  * 默认 dry-run，打印迁移清单；加 --apply 才真实执行。
  *
  * 用法：
- *   cd packages/uikit && node scripts/flatten-icons.mjs
- *   cd packages/uikit && node scripts/flatten-icons.mjs --apply
+ *   cd packages/uikit-im && node scripts/flatten-icons.mjs
+ *   cd packages/uikit-im && node scripts/flatten-icons.mjs --apply
  */
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, statSync, writeFileSync } from 'node:fs'
@@ -322,8 +322,8 @@ if (apply) {
     errorExit('图标引用校验失败，请检查上述缺失项。')
   }
   console.log('\n迁移完成。建议继续执行：')
-  console.log('  pnpm -F @easemob/uikit exec vue-tsc --noEmit')
-  console.log('  pnpm -F @easemob/uikit build')
+  console.log('  pnpm -F @easemob/uikit-im exec vue-tsc --noEmit')
+  console.log('  pnpm -F @easemob/uikit-im build')
 } else {
   console.log('\n本次为 dry-run，未修改任何文件。加 --apply 执行真实迁移。')
 }

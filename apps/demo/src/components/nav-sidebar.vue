@@ -3,12 +3,12 @@
  * Demo 应用的左侧导航栏（仿微信形态）
  *
  * 设计取舍：
- * - 仅作为 demo 业务壳存在，不进入 @easemob/uikit 包，避免 IM UIKit 边界扩散到"应用 Shell"层
+ * - 仅作为 demo 业务壳存在，不进入 @easemob/uikit-im 包，避免 IM UIKit 边界扩散到"应用 Shell"层
  * - tab 列表硬编码 + 底部工具区，结构稳定且简单；如需扩展，复制本组件即可
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
 import { computed } from 'vue'
-import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence, useContact } from '@easemob/uikit'
+import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence, useContact } from '@easemob/uikit-im'
 
 interface Props {
   /** 当前激活 tab key */

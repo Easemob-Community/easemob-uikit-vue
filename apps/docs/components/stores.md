@@ -32,7 +32,7 @@ UIKit 基于 **Pinia** 管理全局状态：所有组件（会话列表、聊天
 SDK Client 实例与连接状态：
 
 ```ts
-import { useClientStore } from '@easemob/uikit'
+import { useClientStore } from '@easemob/uikit-im'
 
 const { connected, currentUser, isLoggedIn, setCurrentUser } = useClientStore()
 ```

@@ -63,7 +63,7 @@
 - **下载桌面化体验**：`utils/download.ts` 的 `downloadFile` 是 fetch → Blob → a.download，无注入点；做"另存为/打开所在目录"需加下载策略注入点（`file-message.vue`/`image-message.vue`/`video-message.vue` 直接调 `downloadFile`）。
 - **本地文件路径 → File 对象**：渲染进程无文件路径概念，业务"拖入本地文件直接发"需主进程读文件转 `File`/`Blob`；websdk `InitConfig.useCustomAttachmentUpload` 提供自定义附件上传通道，可接主进程直传。
 - **websdk 平台适配层**：`easemob-websdk/platform/`（socket/request/runtime/env），`InitConfig.platformAdapterOptions` 可覆盖宿主能力——SDK 侧已预留非标准宿主适配口。
-- **依赖引用隐患**：`packages/uikit/package.json` 当前 `easemob-websdk` 是 `file:../../easemob-websdk-next-5.0.0.tgz` 本地 tgz 引用，外部项目（含 Electron 工程）引用时需注意。
+- **依赖引用隐患**：`packages/uikit-im/package.json` 当前 `easemob-websdk` 是 `file:../../easemob-websdk-next-5.0.0.tgz` 本地 tgz 引用，外部项目（含 Electron 工程）引用时需注意。
 
 ## 一句话总结
 

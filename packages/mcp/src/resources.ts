@@ -18,7 +18,7 @@ export function registerResources(server: Server): void {
     {
       uri: `${BASE}changelog`,
       name: 'UIKit 更新日志（CHANGELOG）',
-      description: '@easemob/uikit 版本更新与破坏性变更说明',
+      description: '@easemob/uikit-im 版本更新与破坏性变更说明',
       mimeType: 'text/markdown',
     },
     ...listGuides().map(g => ({

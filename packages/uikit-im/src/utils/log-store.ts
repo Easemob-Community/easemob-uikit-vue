@@ -427,7 +427,7 @@ export async function exportPersistedLogs(): Promise<number> {
   const a = document.createElement('a')
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   a.href = url
-  a.download = `easemob-uikit-logs-${stamp}.log`
+  a.download = `easemob-uikit-im-logs-${stamp}.log`
   a.click()
   URL.revokeObjectURL(url)
   return entries.length

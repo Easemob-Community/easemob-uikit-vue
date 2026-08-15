@@ -16,8 +16,8 @@ import {
   useConversationStore,
   useGroupStore,
   useMessageStore,
-} from '@easemob/uikit'
-import type { GroupMemberRoleValue, UiConversation, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { GroupMemberRoleValue, UiConversation, UiMessage } from '@easemob/uikit-im'
 
 /** mock 群 ID */
 export const MOCK_GROUP_ID = 'mock_group_docs_001'

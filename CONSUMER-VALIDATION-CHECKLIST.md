@@ -1,7 +1,7 @@
 # 消费者验证清单（Consumer Validation Checklist）
 
-> 创建日期：2026-08-15。目标：在**独立 Vue3 工程**中以「下游接入者」身份验证 `@easemob/uikit` 是否够好用。
-> 背景：仓库内 `apps/demo` 走 vite alias 直连源码（`packages/uikit/src`），验证的是**功能对不对**；本清单在**只消费发布产物（tgz / npm）**的干净工程中逐项打勾，验证的是**接入顺不顺**。
+> 创建日期：2026-08-15。目标：在**独立 Vue3 工程**中以「下游接入者」身份验证 `@easemob/uikit-im` 是否够好用。
+> 背景：仓库内 `apps/demo` 走 vite alias 直连源码（`packages/uikit-im/src`），验证的是**功能对不对**；本清单在**只消费发布产物（tgz / npm）**的干净工程中逐项打勾，验证的是**接入顺不顺**。
 > 记录方式：每项勾选后写「结果 / 卡点 / 建议」；发现的卡点回灌根 [TECH-DEBT.md](TECH-DEBT.md)，文档缺口回灌 `apps/docs`。
 > 关联：构建/发布事实见 skill `uikit-release-build`；Demo 工程模式见 skill `uikit-demo-development`。
 
@@ -11,7 +11,7 @@
 
 ### A1. 包内容自检
 
-- [ ] `pnpm -F @easemob/uikit pack --dry-run`：确认包内只有 `dist/`，无 `.map` / `node_modules` / 多余文件（`files: ["dist"]` 白名单生效）。
+- [ ] `pnpm -F @easemob/uikit-im pack --dry-run`：确认包内只有 `dist/`，无 `.map` / `node_modules` / 多余文件（`files: ["dist"]` 白名单生效）。
 - [ ] `exports` 四条子路径全部可 resolve：`.` / `./resolver` / `./auto-imports` / `./theme`。
 - [ ] `dist/theme/index.css` 在包内，且是构建产物（非 src 拷贝）。
 
@@ -20,18 +20,18 @@
 仓库外新建最小 Vue3 工程（create-vue 默认模板），只依赖发布产物：
 
 - [ ] `npm i <uikit-tgz>`（或 registry 安装）后 `vite dev` 可启动、首屏无报错。
-- [ ] 全量引入：`import UIKit from '@easemob/uikit'` + `app.use(UIKit)` 后组件渲染**有样式**。
+- [ ] 全量引入：`import UIKit from '@easemob/uikit-im'` + `app.use(UIKit)` 后组件渲染**有样式**。
 - [ ] ⚠️ **主题样式引入方式**：验证 `quickstart.md:18` 的声明「入口已内置主题样式，接入后无需单独引入 CSS」是否成立。
-  - 现状证据（2026-08-15 核查）：lib 构建 `cssCodeSplit: false` 把 CSS 提取为独立 `theme/index.css`，`dist/easemob-uikit.js` 内**无任何 CSS 导入**；demo 自身也是靠 `apps/demo/src/main.ts:5` 的 `import '@easemob/uikit/theme'` 引入的。→ **大概率消费者必须手动引 `@easemob/uikit/theme`**，若属实需修 quickstart 文档与 README。
+  - 现状证据（2026-08-15 核查）：lib 构建 `cssCodeSplit: false` 把 CSS 提取为独立 `theme/index.css`，`dist/easemob-uikit-im.js` 内**无任何 CSS 导入**；demo 自身也是靠 `apps/demo/src/main.ts:5` 的 `import '@easemob/uikit-im/theme'` 引入的。→ **大概率消费者必须手动引 `@easemob/uikit-im/theme`**，若属实需修 quickstart 文档与 README。
   - 记录：不引 theme.css 时组件是否无样式？引了之后是否正常？
 - [ ] 按需引入：`unplugin-vue-components` + `EasemobUIKitResolver` 组合下 `Em*` 组件可用、样式仍生效。
 - [ ] `vite build` 成功，无 peer 依赖版本冲突告警（vue `^3.3.0` / pinia `^2.1.0` 与宿主项目实际版本组合）。
-- [ ] UMD 产物（`easemob-uikit.umd.cjs`）：非构建环境（CDN script 标签 + `app.use(EasemobUIKit)`）可用。
+- [ ] UMD 产物（`easemob-uikit-im.umd.cjs`）：非构建环境（CDN script 标签 + `app.use(EasemobUIKit)`）可用。
 
 ### A3. 验证流程固化（可选，建议做）
 
 - [ ] 把「切 tgz → 独立工程冒烟 → 切回源码」做成一条命令/脚本，避免手工改。
-  - 现状问题：`AGENTS.md` 记录 demo 处于 tgz 临时验证模式，但 `apps/demo/vite.config.ts` 的 alias 仍开着、依赖是 `workspace:*`（实际是源码模式）；根目录 `easemob-uikit-1.6.0.tgz` 落后于当前版本 1.9.0。模式描述与实际状态不一致，需统一。
+  - 现状问题：`AGENTS.md` 记录 demo 处于 tgz 临时验证模式，但 `apps/demo/vite.config.ts` 的 alias 仍开着、依赖是 `workspace:*`（实际是源码模式）；根目录 `easemob-uikit-im-1.6.0.tgz` 落后于当前版本 1.9.0。模式描述与实际状态不一致，需统一。
 
 ---
 

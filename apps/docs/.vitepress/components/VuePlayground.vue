@@ -14,7 +14,7 @@
  *   <VuePlayground :files="themePlaygroundFiles" title="主题配置演练场" id="theme" />
  *
  * 模板自包含约束：playground 源码只能 import import map 已覆盖的模块
- * （vue / pinia / easemob-websdk / @easemob/uikit），其余依赖无法在预览 iframe 中解析。
+ * （vue / pinia / easemob-websdk / @easemob/uikit-im），其余依赖无法在预览 iframe 中解析。
  *
  * 多文件模板：files 键可为 'App.vue' + 'mock.ts'（mock 数据与主代码分离），
  * Repl 原生渲染文件 tab，主文件恒为 'App.vue'。
@@ -53,7 +53,7 @@ const IMPORT_MAP = {
     // pinia 为 esbuild 打包单文件（依赖链 vue-demi/devtools-api 已内联，仅 external vue）
     'pinia': '/vendor/pinia.js',
     'easemob-websdk': '/vendor/easemob-websdk.js',
-    '@easemob/uikit': '/vendor/easemob-uikit.js',
+    '@easemob/uikit-im': '/vendor/easemob-uikit-im.js',
   },
 }
 

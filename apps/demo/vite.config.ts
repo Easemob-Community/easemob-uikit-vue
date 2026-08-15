@@ -24,7 +24,7 @@ function getSdkVersion(): string {
 }
 
 function getUIKitVersion(): string {
-  const uikitPackagePath = resolve(__dirname, '../../packages/uikit/package.json')
+  const uikitPackagePath = resolve(__dirname, '../../packages/uikit-im/package.json')
   const uikitPackage = JSON.parse(readFileSync(uikitPackagePath, 'utf-8')) as { version?: string }
   return uikitPackage.version ?? 'unknown'
 }
@@ -48,11 +48,11 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    // 源码直连模式：theme 子路径必须排在 @easemob/uikit 主 alias 之前
+    // 源码直连模式：theme 子路径必须排在 @easemob/uikit-im 主 alias 之前
     // （临时 tgz 产物联调验证时注释掉以下两条 alias，并同步切换 package.json 依赖）
     alias: [
-      { find: '@easemob/uikit/theme', replacement: resolve(__dirname, '../../packages/uikit/dist/theme/index.css') },
-      { find: '@easemob/uikit', replacement: resolve(__dirname, '../../packages/uikit/src') },
+      { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
+      { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
     ],
   },
 })

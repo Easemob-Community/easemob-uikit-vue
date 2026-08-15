@@ -7,7 +7,7 @@
  * 说明：SDK 实例与登录态来自 useClient；登出成功后 emit('logout') 由
  * demo-page → app.vue 处理，清空本地登录缓存并回到登录页。
  */
-import { useClient } from '@easemob/uikit'
+import { useClient } from '@easemob/uikit-im'
 import { demoPresetUsers, useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'

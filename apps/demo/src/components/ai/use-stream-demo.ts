@@ -12,8 +12,8 @@ import {
   MESSAGE_STATUS,
   MESSAGE_TYPE,
   STREAM_MESSAGE_STATUS,
-} from '@easemob/uikit'
-import type { ConversationTypeValue, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ConversationTypeValue, UiMessage } from '@easemob/uikit-im'
 
 /** Mock AI 助手身份 */
 export const AI_ASSISTANT_ID = 'ai_assistant'

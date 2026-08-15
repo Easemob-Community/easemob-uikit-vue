@@ -8,8 +8,8 @@
  *    及其附属工具函数等，业务侧按需显式 import，不自动导入）；
  * 4. 剩余「应登记名单」与 auto-imports.ts 白名单比对，缺漏/多余均非零退出。
  *
- * 挂载：packages/uikit build 前置（与 check-icon-refs 并列），也可单独跑
- * `pnpm -F @easemob/uikit auto-imports:check`。
+ * 挂载：packages/uikit-im build 前置（与 check-icon-refs 并列），也可单独跑
+ * `pnpm -F @easemob/uikit-im auto-imports:check`。
  */
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'

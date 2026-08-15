@@ -2,11 +2,11 @@
 
 ## 安装 / 依赖
 
-- ❌ 只装 `@easemob/uikit` 不装 `pinia` / `vue`——它们是 peerDependencies，运行时 pinia 缺失报错。
-- ✅ `pnpm add @easemob/uikit pinia vue`。
+- ❌ 只装 `@easemob/uikit-im` 不装 `pinia` / `vue`——它们是 peerDependencies，运行时 pinia 缺失报错。
+- ✅ `pnpm add @easemob/uikit-im pinia vue`。
 - ❌ 忘记 `app.use(createPinia())`——UIKit 组件内部 store 依赖 pinia 实例。
 - ✅ `EmUIKitProvider` **不自带 pinia**，必须项目自行注册。
-- ✅ 入口已内置主题样式，**无需**再 `import '@easemob/uikit/theme'` 之类的 CSS。
+- ✅ 入口已内置主题样式，**无需**再 `import '@easemob/uikit-im/theme'` 之类的 CSS。
 
 ## 组件与 Provider
 

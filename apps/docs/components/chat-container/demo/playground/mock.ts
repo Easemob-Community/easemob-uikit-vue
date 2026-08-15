@@ -15,8 +15,8 @@ import {
   MESSAGE_TYPE,
   useConversationStore,
   useMessageStore,
-} from '@easemob/uikit'
-import type { UiConversation, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { UiConversation, UiMessage } from '@easemob/uikit-im'
 
 /** mock 会话 ID（多次注入时复用同一会话，避免列表残留） */
 export const MOCK_INPUT_CONVERSATION_ID = 'mock_input_docs_001'

@@ -17,7 +17,7 @@
 **可行性高，成本低。** 三个关键前提都已具备：
 
 1. **DOM 可识别**：UIKit 组件根 class 统一 kebab-case 且稳定（`.message-bubble-wrapper`、`.text-message`、`.chat`、`.conversation-list` 等），事件委托 + `closest()` 即可识别悬停目标；消息气泡还带 `data-msg-id`（`message-bubble-wrapper.vue:354-356`，现有生产用途是滚动定位），可反查消息对象做更精准的展示。
-2. **API 映射素材现成**：所有环信接口调用集中在 `packages/uikit/src/sdk/domain/*.ts`，按域分文件（message/conversation/contact/group/presence/userInfo），逐方法对得上功能点（见下文映射表骨架）。
+2. **API 映射素材现成**：所有环信接口调用集中在 `packages/uikit-im/src/sdk/domain/*.ts`，按域分文件（message/conversation/contact/group/presence/userInfo），逐方法对得上功能点（见下文映射表骨架）。
 3. **开关机制现成**：demo 设置抽屉 `demo-settings-drawer.vue` 已有 7 个分类面板，状态统一由单例 `useDemoSettings()`（`apps/demo/src/composables/use-demo-settings.ts:144-331`）持有。新增「开发者模式」= 加一个 ref + 一个开关行，模式与现有 `chatInputMode` 完全一致。
 
 ## 已识别的悬停目标 → class 对照

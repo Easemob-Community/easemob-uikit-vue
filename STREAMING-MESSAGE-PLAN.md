@@ -106,7 +106,7 @@ SDK onStreamMessage 事件
 - [x] `customType='text'` 纯文本流式：传输中光标、完成收敛、异常提示（M2，2026-08-14）
 - [x] 插件 markdown 流式气泡（demo）：代码块 / 表格 / 引用正确渲染 + 打字机动画（M3，2026-08-14，`apps/demo/src/components/ai/`）
 - [ ] DeepSeek AI 助手会话端到端跑通（demo 或独立包）：demo mock 会话已通，真实模型对接待执行（M4）
-- [x] 门禁：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + build + demo 类型检查通过（M1/M2/M3 已通过）
+- [x] 门禁：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + build + demo 类型检查通过（M1/M2/M3 已通过）
 
 ---
 

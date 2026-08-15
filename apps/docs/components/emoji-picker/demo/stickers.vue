@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { EmojiStickerItem, EmojiStickerPack } from '@easemob/uikit'
+import type { EmojiStickerItem, EmojiStickerPack } from '@easemob/uikit-im'
 
 const show = ref(true)
 const selectedSticker = ref('')

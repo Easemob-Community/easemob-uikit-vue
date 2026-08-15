@@ -10,8 +10,8 @@ import {
   EmMessageBubbleWrapper,
   EmUIKitProvider,
   MESSAGE_STATUS,
-} from '@easemob/uikit'
-import type { ChatConfig, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ChatConfig, UiMessage } from '@easemob/uikit-im'
 import type { ConfigItem } from '../../../../.vitepress/components/DocsConfigPanel.vue'
 import {
   buildGroupReadMessage,

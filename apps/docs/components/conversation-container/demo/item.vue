@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 
 const now = Date.now()
 

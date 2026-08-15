@@ -2,14 +2,14 @@
  * Badge 在线代码演练场初始模板（VuePlayground files）
  *
  * 模板约束：只能 import import map 已覆盖的模块
- * （vue / pinia / easemob-websdk / @easemob/uikit），预览 iframe 才能解析。
+ * （vue / pinia / easemob-websdk / @easemob/uikit-im），预览 iframe 才能解析。
  * 用户可自由编辑下方 config 配置对象与组件组合，右侧预览实时生效。
  */
 export const badgePlaygroundFiles: Record<string, string> = {
   'App.vue': `
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { EmUIKitProvider, EmBadge, EmAvatar } from '@easemob/uikit'
+import { EmUIKitProvider, EmBadge, EmAvatar } from '@easemob/uikit-im'
 
 // 状态色映射：status 选择器映射到主题 CSS 变量
 const statusColors: Record<'danger' | 'primary' | 'success' | 'warning', string> = {

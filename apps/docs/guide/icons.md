@@ -65,7 +65,7 @@ PC 端发送失败图标 hover 时会放大 `1.2` 倍并切换为 `message-statu
 
 ## 操作图标交互约束
 
-业务中所有“操作类图标按钮”（关闭、返回、`+`、设置、编辑、删除等）必须统一使用 `IconButton` 组件，禁止自行用 `<button>` + `<Icon>` 实现。详细约束见：[UIKIT UI 交互约束](../../packages/uikit/docs/UI_CONVENTIONS.md)。
+业务中所有“操作类图标按钮”（关闭、返回、`+`、设置、编辑、删除等）必须统一使用 `IconButton` 组件，禁止自行用 `<button>` + `<Icon>` 实现。详细约束见：[UIKIT UI 交互约束](../../packages/uikit-im/docs/UI_CONVENTIONS.md)。
 
 核心原则：
 
@@ -86,7 +86,7 @@ PC 端发送失败图标 hover 时会放大 `1.2` 倍并切换为 `message-statu
 构建时会自动执行 `icons:check` 校验：扫描源码中所有图标 `name` 引用并与图标库文件比对，引用不存在的图标会导致构建失败并列出缺失清单，避免图标静默不渲染。也可单独执行：
 
 ```bash
-pnpm -F @easemob/uikit run icons:check
+pnpm -F @easemob/uikit-im run icons:check
 ```
 
 ## 许可与免责声明

@@ -6,7 +6,7 @@
 
 ```vue
 <script setup lang="ts">
-import { UIKitProvider } from '@easemob/uikit'
+import { UIKitProvider } from '@easemob/uikit-im'
 </script>
 
 <template>
@@ -91,7 +91,7 @@ H5 下的长按菜单（消息长按、会话长按）已经统一封装在 `use
 - 如果你需要更细粒度的控制，可以直接读取 `useUIKit().h5`：
 
 ```ts
-import { useUIKit } from '@easemob/uikit'
+import { useUIKit } from '@easemob/uikit-im'
 
 const { h5 } = useUIKit()
 

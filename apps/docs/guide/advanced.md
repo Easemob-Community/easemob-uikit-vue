@@ -20,7 +20,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 </script>
 
 <template>
@@ -51,7 +51,7 @@ UIKit 为列表类交互提供了一套声明式键盘导航 hooks，默认已�
 业务侧如需给自定义列表增加同样的键盘导航，可直接复用 `useArrowNavigation` 与 `useKeyBindings`：
 
 ```ts
-import { useArrowNavigation, useKeyBindings } from '@easemob/uikit'
+import { useArrowNavigation, useKeyBindings } from '@easemob/uikit-im'
 
 const items = ref([...])
 const keyboardNavActive = ref(false)
@@ -76,7 +76,7 @@ useKeyBindings({
 可通过 `setKeyboardShortcutsEnabled(false)` 一键禁用所有 `useKeyBindings` 绑定（包括 ESC 关闭、方向键导航等）：
 
 ```ts
-import { setKeyboardShortcutsEnabled, isKeyboardShortcutsEnabled } from '@easemob/uikit'
+import { setKeyboardShortcutsEnabled, isKeyboardShortcutsEnabled } from '@easemob/uikit-im'
 
 setKeyboardShortcutsEnabled(false)
 console.log(isKeyboardShortcutsEnabled()) // false
@@ -128,7 +128,7 @@ UIKit 内置单聊「对方正在输入」提示，基于环信 CMD（透传）�
 UIKit 允许业务完全接管数据层，通过 `dataSource` prop 传入自定义拉取函数：
 
 ```ts
-import type { UIKitDataSource } from '@easemob/uikit'
+import type { UIKitDataSource } from '@easemob/uikit-im'
 
 const dataSource: UIKitDataSource = {
   // 会话列表
@@ -158,7 +158,7 @@ const dataSource: UIKitDataSource = {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 import { dataSource } from './data-source'
 </script>
 
@@ -187,7 +187,7 @@ UIKit 暴露一组与组件同构的组合式函数，业务可直接复用状�
 例如在业务代码中监听会话切换：
 
 ```ts
-import { useConversation } from '@easemob/uikit'
+import { useConversation } from '@easemob/uikit-im'
 
 const { currentConversation, switchConversation } = useConversation()
 
@@ -207,7 +207,7 @@ function onConversationClick(id: string) {
 业务可通过 `useUserInfo()` 手动获取或更新：
 
 ```ts
-import { useUserInfo } from '@easemob/uikit'
+import { useUserInfo } from '@easemob/uikit-im'
 
 const { getUserInfo, updateOwnUserInfo } = useUserInfo()
 
@@ -227,7 +227,7 @@ UIKit 内置中英文双语言包，组件文案自动跟随 `useLocale().setLoc
 增量注入自定义翻译 key。业务初始化或插件注册时调用，不会覆盖 UIKit 内置 key（同名 key 会被业务值覆盖）。
 
 ```ts
-import { mergeLocaleMessages } from '@easemob/uikit'
+import { mergeLocaleMessages } from '@easemob/uikit-im'
 
 // 向中文包注入自定义文案
 mergeLocaleMessages('zh-CN', {
@@ -249,7 +249,7 @@ mergeLocaleMessages('en', {
 当你看到界面上某个文案想要覆盖、却不知道对应哪个 key 时，用 `findLocaleKey` 直接将文案反查为 key 列表。支持单个 / 批量查询、模糊 / 精确匹配、指定语言包。
 
 ```ts
-import { findLocaleKey } from '@easemob/uikit'
+import { findLocaleKey } from '@easemob/uikit-im'
 
 // 单个查询（默认模糊匹配）
 findLocaleKey('暂无会话')
@@ -269,7 +269,7 @@ findLocaleKey('No conversation', { locale: 'en' })
 `findLocaleKey` 返回的 key 数组可直接配合 `mergeLocaleMessages` 覆盖内置文案：
 
 ```ts
-import { findLocaleKey, mergeLocaleMessages } from '@easemob/uikit'
+import { findLocaleKey, mergeLocaleMessages } from '@easemob/uikit-im'
 
 function overrideLocale(text: string, newText: string, locale = 'zh-CN') {
   const keys = findLocaleKey(text, { locale })
@@ -308,7 +308,7 @@ export function findLocaleKey(
 
 UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组件模板或业务逻辑中硬编码中文 / 英文**。新增文案时：
 
-1. 先在中英文 locale 文件中补充 key（`packages/uikit/src/locale/lang/zh-CN.ts` / `en.ts`）；
+1. 先在中英文 locale 文件中补充 key（`packages/uikit-im/src/locale/lang/zh-CN.ts` / `en.ts`）；
 2. 组件内通过 `useLocale().t(key)` 读取；
 3. 时间、数字、状态等同样需要通过 locale 配置渲染，确保切换语言后实时刷新。
 

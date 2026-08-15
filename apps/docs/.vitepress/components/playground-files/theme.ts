@@ -2,13 +2,13 @@
  * 主题定制页在线演练场初始模板（VuePlayground files）
  *
  * 模板约束：只能 import import map 已覆盖的模块
- * （vue / pinia / easemob-websdk / @easemob/uikit），预览 iframe 才能解析。
+ * （vue / pinia / easemob-websdk / @easemob/uikit-im），预览 iframe 才能解析。
  * 用户可自由编辑 theme 配置对象与组件组合，右侧预览实时生效。
  */
 export const themePlaygroundFiles: Record<string, string> = {
   'App.vue': `
 <script setup lang="ts">
-import { EmUIKitProvider, EmButton, EmAvatar, EmBadge, EmCell } from '@easemob/uikit'
+import { EmUIKitProvider, EmButton, EmAvatar, EmBadge, EmCell } from '@easemob/uikit-im'
 </script>
 
 <template>

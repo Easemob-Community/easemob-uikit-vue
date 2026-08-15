@@ -6,7 +6,7 @@ export interface ComponentResolver {
 export interface EasemobUIKitResolverOptions {
   /**
    * 组件名前缀，必须与 PascalCase 名称的开头一致。
-   * 默认 'Em'，例如模板中写 <EmChatContainer /> 会被解析到 @easemob/uikit 的 EmChatContainer 导出。
+   * 默认 'Em'，例如模板中写 <EmChatContainer /> 会被解析到 @easemob/uikit-im 的 EmChatContainer 导出。
    */
   prefix?: string
 }
@@ -17,7 +17,7 @@ export interface EasemobUIKitResolverOptions {
  * 使用示例：
  * ```ts
  * import Components from 'unplugin-vue-components/vite'
- * import { EasemobUIKitResolver } from '@easemob/uikit/resolver'
+ * import { EasemobUIKitResolver } from '@easemob/uikit-im/resolver'
  *
  * export default {
  *   plugins: [Components({ resolvers: [EasemobUIKitResolver()] })],
@@ -32,11 +32,11 @@ export function EasemobUIKitResolver(
     type: 'component',
     resolve: (name: string) => {
       if (!name.startsWith(prefix)) return
-      // 直接返回 PascalCase 名称，对应 @easemob/uikit 的命名导出
-      // 例如 <EmChatContainer /> -> import { EmChatContainer } from '@easemob/uikit'
+      // 直接返回 PascalCase 名称，对应 @easemob/uikit-im 的命名导出
+      // 例如 <EmChatContainer /> -> import { EmChatContainer } from '@easemob/uikit-im'
       return {
         name,
-        from: '@easemob/uikit',
+        from: '@easemob/uikit-im',
       }
     },
   }

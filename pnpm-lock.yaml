@@ -38,9 +38,9 @@ importers:
 
   apps/demo:
     dependencies:
-      '@easemob/uikit':
+      '@easemob/uikit-im':
         specifier: workspace:*
-        version: link:../../packages/uikit
+        version: link:../../packages/uikit-im
       easemob-websdk:
         specifier: ^5.0.0
         version: 5.0.0
@@ -81,9 +81,9 @@ importers:
 
   apps/docs:
     dependencies:
-      '@easemob/uikit':
+      '@easemob/uikit-im':
         specifier: workspace:*
-        version: link:../../packages/uikit
+        version: link:../../packages/uikit-im
       '@vue/repl':
         specifier: ^4.7.2
         version: 4.7.2
@@ -132,7 +132,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/uikit:
+  packages/uikit-im:
     dependencies:
       '@tiptap/extension-image':
         specifier: ^3.30.0

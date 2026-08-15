@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from 'vue'
-import { EmUIKitProvider, useClient } from '@easemob/uikit'
-import type { UiContact } from '@easemob/uikit'
+import { EmUIKitProvider, useClient } from '@easemob/uikit-im'
+import type { UiContact } from '@easemob/uikit-im'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
 import { demoCollectSdkLog, demoSdkLogLevel, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'

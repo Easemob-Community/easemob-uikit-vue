@@ -5,7 +5,7 @@
  * 数据源：https://github.com/microsoft/fluentui-emoji（MIT）
  * 只映射 emoji-picker.vue 内置列表里出现的 glyph（约 120 个），控制体积。
  *
- * 用法：node packages/uikit/scripts/generate-fluent-emoji-map.mjs
+ * 用法：node packages/uikit-im/scripts/generate-fluent-emoji-map.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'

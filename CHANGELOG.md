@@ -50,7 +50,7 @@
   - 通知消息 `body` 携带 `eventType` / `params` 结构化元数据（字段可选，旧消息完全兼容）
   - `EmMessageRenderer` 新增 `#message-notice` 插槽，业务可完全接管通知渲染
   - 新增文档页「系统通知文案定制」；demo 设置面板新增「系统通知文案」验收开关（内置/俏皮话术/关闭入群通知）
-- **demo 恢复源码直连模式**：vite alias 直连 packages/uikit 源码，依赖声明改回 workspace 模式
+- **demo 恢复源码直连模式**：vite alias 直连 packages/uikit-im 源码，依赖声明改回 workspace 模式
 - **消息列表演练场（docs 交互式配置演示）**：
   - 新增 DocsConfigPanel 声明式配置面板（互斥选项组 / 布尔开关 / 数字输入三类控件，问号 tip 浮层），docs 站点全局注册
   - 新增「消息列表 MessageList」演练场页面：mock 注入免登录渲染全类型消息，开关实时切换 `layout` / `showAvatar` / `showTime` / `bubbleShape` / `avatarSize` / `messageGap` / `messagePadding` / `messageStatus` 等配置

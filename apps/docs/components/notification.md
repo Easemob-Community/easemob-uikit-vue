@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { useNotification } from '@easemob/uikit'
+import { useNotification } from '@easemob/uikit-im'
 
 const { state, notify, close, closeAll } = useNotification()
 
@@ -76,7 +76,7 @@ UIKit 负责「判定 + 投递」：判定链（免打扰 / 当前会话 / 触�
 - 方式二：通过 `useNotification().setNotificationHandler(handler)` 注册（Provider 内部也是走这条注册路径）：
 
 ```ts
-import { useNotification } from '@easemob/uikit'
+import { useNotification } from '@easemob/uikit-im'
 
 const { setNotificationHandler } = useNotification()
 

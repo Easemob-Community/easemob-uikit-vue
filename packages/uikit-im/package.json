@@ -1,13 +1,13 @@
 {
-  "name": "@easemob/uikit",
+  "name": "@easemob/uikit-im",
   "type": "module",
   "version": "1.9.0",
   "description": "Easemob UIKit Vue3 Components",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/easemob-uikit.js",
-      "require": "./dist/easemob-uikit.umd.cjs"
+      "import": "./dist/easemob-uikit-im.js",
+      "require": "./dist/easemob-uikit-im.umd.cjs"
     },
     "./resolver": {
       "types": "./dist/resolver.d.ts",
@@ -19,8 +19,8 @@
     },
     "./theme": "./dist/theme/index.css"
   },
-  "main": "./dist/easemob-uikit.umd.cjs",
-  "module": "./dist/easemob-uikit.js",
+  "main": "./dist/easemob-uikit-im.umd.cjs",
+  "module": "./dist/easemob-uikit-im.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"

@@ -43,7 +43,7 @@ features:
 安装依赖：
 
 ```bash
-pnpm add @easemob/uikit pinia vue
+pnpm add @easemob/uikit-im pinia vue
 ```
 
 全局注册并挂载：
@@ -51,7 +51,7 @@ pnpm add @easemob/uikit pinia vue
 ```ts
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import UIKit from '@easemob/uikit'
+import UIKit from '@easemob/uikit-im'
 import App from './App.vue'
 
 const app = createApp(App)

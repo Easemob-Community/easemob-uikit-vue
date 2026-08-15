@@ -4,7 +4,7 @@
  * 多文件约定：'App.vue' 为用户主编辑区（容器 props + 可编辑配置对象），
  * 'mock.ts' 为 mock 群数据（群资料 / 角色 / 成员 / 公告 + 群会话 +
  * 含已读回执的群消息，一般不需要修改）。
- * 模板约束：只能 import import map 已覆盖的模块（vue / @easemob/uikit），
+ * 模板约束：只能 import import map 已覆盖的模块（vue / @easemob/uikit-im），
  * 预览 iframe 才能解析；外层必须包 EmUIKitProvider(:auto-init="false")。
  */
 export const groupPlaygroundFiles: Record<string, string> = {
@@ -16,8 +16,8 @@ import {
   EmMessageList,
   EmUIKitProvider,
   GROUP_MEMBER_ROLE,
-} from '@easemob/uikit'
-import type { ChatConfig, GroupMemberRoleValue } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ChatConfig, GroupMemberRoleValue } from '@easemob/uikit-im'
 import { MOCK_GROUP_ID, injectMockGroup, injectMockGroupChat } from './mock'
 
 // ---------- mock 注入（免登录渲染，见 mock.ts） ----------
@@ -143,8 +143,8 @@ import {
   useConversationStore,
   useGroupStore,
   useMessageStore,
-} from '@easemob/uikit'
-import type { GroupMemberRoleValue, UiConversation, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { GroupMemberRoleValue, UiConversation, UiMessage } from '@easemob/uikit-im'
 
 /** mock 群 ID */
 export const MOCK_GROUP_ID = 'mock_group_docs_001'

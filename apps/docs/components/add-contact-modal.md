@@ -19,7 +19,7 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmAddContactModal, EmUIKitProvider } from '@easemob/uikit'
+import { EmAddContactModal, EmUIKitProvider } from '@easemob/uikit-im'
 
 const show = ref(false)
 
@@ -41,7 +41,7 @@ function onAdded(userId: string) {
 
 ```vue
 <script setup lang="ts">
-import type { UiContact } from '@easemob/uikit'
+import type { UiContact } from '@easemob/uikit-im'
 
 /** 业务搜索接口：手机号 / 邮箱 / 昵称 → 环信 userId */
 async function searchByPhoneOrEmail(keyword: string): Promise<UiContact[]> {
@@ -93,8 +93,8 @@ async function addWithBusiness(userId: string, message?: string) {
 ## 全局接管：Provider 级适配
 
 ```ts
-import { EmUIKitProvider } from '@easemob/uikit'
-import type { UiContact } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
+import type { UiContact } from '@easemob/uikit-im'
 
 const dataSource = {
   // 业务统一搜索接口（手机号 / 邮箱 → 环信 userId）

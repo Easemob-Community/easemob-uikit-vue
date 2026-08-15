@@ -11,7 +11,7 @@
 
 ## 目标
 
-在 `packages/uikit/src` 里新增/修改 **Pinia store** 或 **composable** 时，保证与既有 7 个
+在 `packages/uikit-im/src` 里新增/修改 **Pinia store** 或 **composable** 时，保证与既有 7 个
 setup-store、`sdk/domain/*` 契约、`useUIKit()` 装配枢纽保持一致，并落地一套明确的
 `@vueuse/core` 使用规定。
 
@@ -210,7 +210,7 @@ Actions`（`use-message.ts` 里 `const history = useMessageHistory()` 再转发�
 - **识别 payload**：SDK 返回的 `messageList`、`ext` 中的大数组等，都是潜在风险点。
 - **在 adapter 层隔离**：把这类数据标记为 `markRaw`，或干脆剔除 UI 不需要的字段，避免进入响应式系统。
 
-**真实片段（`packages/uikit/src/sdk/adapter/message-adapter.ts`）：**
+**真实片段（`packages/uikit-im/src/sdk/adapter/message-adapter.ts`）：**
 
 ```ts
 import { markRaw } from 'vue'
@@ -243,7 +243,7 @@ UIKit 里大量组件会在挂载/切换时触发同一类 SDK 请求（如进�
 - **区分 "未获取" 与 "已获取但为空"**：store getter 不要无脑 `|| ''` / `|| []` fallback，否则调用方无法判断是否需要发起首次请求。空值应保留其原始语义（`undefined` / 空数组）。
 - **登出 reset 必须清空缓存标记**：所有模块级/ store 级去重 Set/Map 都要在 `clearXxx()` 或 `resetXxxState()` 中清空，防止切账号后残留旧状态。
 
-**真实片段（`packages/uikit/src/sdk/domain/group-domain.ts`）：**
+**真实片段（`packages/uikit-im/src/sdk/domain/group-domain.ts`）：**
 
 ```ts
 const pendingGroupInfoRequests = new Map<string, Promise<UiGroup>>()

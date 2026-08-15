@@ -6,8 +6,8 @@
  * 供 VuePlayground（@vue/repl）的 import map 引用，全程本地静态托管、不依赖 CDN。
  *
  * 运行时机：docs 的 dev / build 前置执行（见 package.json scripts）。
- * 注意：easemob-uikit.js 来自 uikit 构建产物，改 uikit 源码后需先
- * `pnpm -F @easemob/uikit build` 再运行本脚本，playground 预览才会同步。
+ * 注意：easemob-uikit-im.js 来自 uikit 构建产物，改 uikit 源码后需先
+ * `pnpm -F @easemob/uikit-im build` 再运行本脚本，playground 预览才会同步。
  */
 import { copyFileSync, existsSync, mkdirSync, realpathSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -53,16 +53,16 @@ const esbuildRoot = siblingPkgRoot('vite', 'esbuild')
 /** 复制类产物：src 源文件 / dest 目标文件名 / required 缺失是否报错 / hint 缺失提示 */
 const entries = [
   {
-    src: join(docsRoot, '..', '..', 'packages', 'uikit', 'dist', 'easemob-uikit.js'),
-    dest: 'easemob-uikit.js',
+    src: join(docsRoot, '..', '..', 'packages', 'uikit-im', 'dist', 'easemob-uikit-im.js'),
+    dest: 'easemob-uikit-im.js',
     required: true,
-    hint: '请先执行 pnpm -F @easemob/uikit build',
+    hint: '请先执行 pnpm -F @easemob/uikit-im build',
   },
   {
     // uikit 构建产物 CSS（dist/theme/index.css = :root 主题变量 + 全部组件样式，
     // 由 vite lib 构建 cssCodeSplit:false 合并而成），playground iframe 预览必须注入，
     // 否则组件无任何样式（docs 页面本体经 alias 直连 src 有样式，iframe 预览没有）
-    src: join(docsRoot, '..', '..', 'packages', 'uikit', 'dist', 'theme', 'index.css'),
+    src: join(docsRoot, '..', '..', 'packages', 'uikit-im', 'dist', 'theme', 'index.css'),
     dest: 'uikit-theme.css',
     required: true,
   },

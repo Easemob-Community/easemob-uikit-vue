@@ -1,7 +1,7 @@
 # Easemob UIKit Vue 图标资产清单（交付 UI 设计师）
 
 > **用途**：供 UI 设计师按当前在用的图标进行统一重绘或替换。  
-> **来源说明**：图标资产位于 `packages/uikit/src/assets/icons/`。其中部分仍直接沿用 [Lucide](https://lucide.dev/)（ISC License），部分已替换为设计师新版线性图标，另有部分为设计师原创/业务新增图标。  
+> **来源说明**：图标资产位于 `packages/uikit-im/src/assets/icons/`。其中部分仍直接沿用 [Lucide](https://lucide.dev/)（ISC License），部分已替换为设计师新版线性图标，另有部分为设计师原创/业务新增图标。  
 > **最后更新**：2026-08-06（分支 `dev`）
 
 ---
@@ -23,7 +23,7 @@
 
 ### 2.1 技术实现
 
-- **组件入口**：`packages/uikit/src/components/icon/icon.vue`
+- **组件入口**：`packages/uikit-im/src/components/icon/icon.vue`
 - **注册方式**：Vite `import.meta.glob` 自动扫描 `src/assets/icons/**/*.svg`
 - **引用格式**：`name="category/icon-name"`，例如 `name="actions/trash"`
 - **默认尺寸**：`20px`（Icon 组件默认），`IconButton` small `14px` / medium `16px`
@@ -461,8 +461,8 @@
 设计师交付后，开发同学按以下步骤替换：
 
 1. 将新 SVG 按 `src/assets/icons/分类/图标名.svg` 覆盖原文件。
-2. 运行 `cd packages/uikit && pnpm run icons:check`，确认无缺失引用。
-3. 运行 `pnpm -F @easemob/uikit build`，确认构建通过。
+2. 运行 `cd packages/uikit-im && pnpm run icons:check`，确认无缺失引用。
+3. 运行 `pnpm -F @easemob/uikit-im build`，确认构建通过。
 4. 在 demo 中检查关键页面：会话列表、聊天页、群详情、联系人详情、转发 Modal。
 5. 如需新增图标，同步更新 `scripts/vendor-lucide-icons.mjs` 中的 `ADD_ICONS` 映射（非 Lucide 源可跳过）。
 
@@ -473,7 +473,7 @@
 本次清单由以下脚本扫描生成，可定期重新运行以追踪 Lucide 替换进度：
 
 ```bash
-cd packages/uikit
+cd packages/uikit-im
 node scripts/scan-lucide-icons.mjs
 ```
 
@@ -486,7 +486,7 @@ node scripts/scan-lucide-icons.mjs
 本项目仍在沿用的图标基于 [Lucide](https://lucide.dev/)，许可证为 ISC。完整许可文本见：
 
 ```
-packages/uikit/src/assets/icons/LICENSE.lucide.txt
+packages/uikit-im/src/assets/icons/LICENSE.lucide.txt
 ```
 
 如设计师提供自绘图标替换 Lucide 图标，建议在产品文档或 README 中保留类似声明，直至全部替换为非 Lucide 图标。

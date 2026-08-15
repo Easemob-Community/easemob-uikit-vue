@@ -7,7 +7,7 @@
  * - 手动注入演示：markdown 流式（代码块/表格/引用）与异常流式（异常态提示）。
  * 真实接入请走业务服务端代理（见文档「AI 流式消息」章节）。
  */
-import { useUIKit } from '@easemob/uikit'
+import { useUIKit } from '@easemob/uikit-im'
 import {
   runMarkdownStreamDemo,
   runMarkdownStreamErrorDemo,

@@ -12,7 +12,7 @@
  * 注：键盘操作演示已移至「外观」面板（键盘操作分组）。
  */
 import { ref } from 'vue'
-import { clearPersistedLogs, exportPersistedLogs } from '@easemob/uikit'
+import { clearPersistedLogs, exportPersistedLogs } from '@easemob/uikit-im'
 import {
   demoCollectSdkLog,
   demoSdkLogLevel,

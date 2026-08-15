@@ -14,7 +14,7 @@
 
 ## 目标
 
-在 `packages/uikit/src/modules/chat/message-item/` 里新增或修改消息渲染组件时，
+在 `packages/uikit-im/src/modules/chat/message-item/` 里新增或修改消息渲染组件时，
 **保证与既有 13 个渲染组件的类型读取、插槽契约、状态展示逻辑一致**，避免三类翻车：
 
 1. 渲染层直接 `(msg as any).xxx` 读 SDK 裸字段，绕过类型守卫，改 SDK 后编译不过；

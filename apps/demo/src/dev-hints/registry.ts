@@ -2,8 +2,8 @@
  * Dev Hints 元数据注册表
  *
  * 一张声明式配置表：功能区域（DOM 选择器） → 环信接口 + UIKit 实现思路。
- * 素材来源：packages/uikit/src/sdk/domain/*.ts（接口调用唯一入口）、
- * packages/uikit/src/modules/**（UI 实现）、node_modules/easemob-websdk
+ * 素材来源：packages/uikit-im/src/sdk/domain/*.ts（接口调用唯一入口）、
+ * packages/uikit-im/src/modules/**（UI 实现）、node_modules/easemob-websdk
  * 内的 d.ts（SDK 权威签名）。
  *
  * 维护约定：
@@ -12,7 +12,7 @@
  */
 import type { DevHintEntry } from './types'
 
-const SDK_TYPES = 'packages/uikit/src/sdk/types'
+const SDK_TYPES = 'packages/uikit-im/src/sdk/types'
 
 /** UIKit SDK 类型契约文件（气泡类条目的参考文件公共部分） */
 const SDK_TYPE_REFS = [
@@ -21,7 +21,7 @@ const SDK_TYPE_REFS = [
     desc: 'UiMessage 等 UI 层消息类型契约',
   },
   {
-    path: 'packages/uikit/src/sdk/adapter/message-adapter.ts',
+    path: 'packages/uikit-im/src/sdk/adapter/message-adapter.ts',
     desc: 'SDK 消息 → UiMessage 适配（toUiMessage）',
   },
 ]
@@ -29,7 +29,7 @@ const SDK_TYPE_REFS = [
 /** 气泡类条目的公共参考文件 */
 const BUBBLE_REFS = [
   {
-    path: 'packages/uikit/src/sdk/domain/message-domain.ts',
+    path: 'packages/uikit-im/src/sdk/domain/message-domain.ts',
     desc: '消息域：发送/历史/已读回执/置顶/翻译等全部 SDK 调用入口',
   },
   ...SDK_TYPE_REFS,
@@ -57,9 +57,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '会话项右键操作：置顶 setConversationPinned / 免打扰 pushManager.setConversationSilentMode / 标记 addConversationMark',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/conversation-domain.ts', desc: '会话域：enter/leave/syncLocal/refresh/pin/setMuted 等' },
-      { path: 'packages/uikit/src/containers/conversation-container/conversation-container.vue', desc: '会话容器：tabs + 搜索 + 列表编排' },
-      { path: 'packages/uikit/src/modules/conversation/conversation-list.vue', desc: '会话列表 UI + 本地/服务端数据合并渲染' },
+      { path: 'packages/uikit-im/src/sdk/domain/conversation-domain.ts', desc: '会话域：enter/leave/syncLocal/refresh/pin/setMuted 等' },
+      { path: 'packages/uikit-im/src/containers/conversation-container/conversation-container.vue', desc: '会话容器：tabs + 搜索 + 列表编排' },
+      { path: 'packages/uikit-im/src/modules/conversation/conversation-list.vue', desc: '会话列表 UI + 本地/服务端数据合并渲染' },
     ],
   },
 
@@ -84,9 +84,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '联系人搜索：searchContactsByNoUser 按 userId/昵称匹配，支持本地过滤',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/contact-domain.ts', desc: '联系人域：getContacts/addContact/acceptInvitation/blocklist' },
-      { path: 'packages/uikit/src/containers/contact-list-container/contact-list-container.vue', desc: '联系人列表容器' },
-      { path: 'packages/uikit/src/modules/contact/contact-list.vue', desc: '联系人列表 UI（BEM 分组渲染）' },
+      { path: 'packages/uikit-im/src/sdk/domain/contact-domain.ts', desc: '联系人域：getContacts/addContact/acceptInvitation/blocklist' },
+      { path: 'packages/uikit-im/src/containers/contact-list-container/contact-list-container.vue', desc: '联系人列表容器' },
+      { path: 'packages/uikit-im/src/modules/contact/contact-list.vue', desc: '联系人列表 UI（BEM 分组渲染）' },
     ],
   },
 
@@ -111,9 +111,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群搜索：searchGroupsByNoUser 按群 ID/群名匹配',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/group-domain.ts', desc: '群组域：getGroupInfoList/create/join/leave/destroy' },
-      { path: 'packages/uikit/src/containers/group-list-container/group-list-container.vue', desc: '群组列表容器' },
-      { path: 'packages/uikit/src/modules/group/group-list.vue', desc: '群组列表 UI' },
+      { path: 'packages/uikit-im/src/sdk/domain/group-domain.ts', desc: '群组域：getGroupInfoList/create/join/leave/destroy' },
+      { path: 'packages/uikit-im/src/containers/group-list-container/group-list-container.vue', desc: '群组列表容器' },
+      { path: 'packages/uikit-im/src/modules/group/group-list.vue', desc: '群组列表 UI' },
     ],
   },
 
@@ -135,9 +135,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '备注编辑内联交互：双击进入编辑 → enter 保存 → esc 取消',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/contact-domain.ts', desc: '备注/删除/黑名单 API 入口' },
-      { path: 'packages/uikit/src/modules/contact/contact-detail.vue', desc: '联系人详情面板 UI' },
-      { path: 'packages/uikit/src/modules/contact/contact-user-card.vue', desc: '联系人头像+昵称+在线状态卡片' },
+      { path: 'packages/uikit-im/src/sdk/domain/contact-domain.ts', desc: '备注/删除/黑名单 API 入口' },
+      { path: 'packages/uikit-im/src/modules/contact/contact-detail.vue', desc: '联系人详情面板 UI' },
+      { path: 'packages/uikit-im/src/modules/contact/contact-user-card.vue', desc: '联系人头像+昵称+在线状态卡片' },
     ],
   },
 
@@ -160,8 +160,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群成员入口 → 展开 group-member-list 子组件',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/group-domain.ts', desc: '群域：getGroupInfo/changeOwner/admins/mute 等全量 SDK 调用' },
-      { path: 'packages/uikit/src/modules/group/group-detail.vue', desc: '群详情面板 UI' },
+      { path: 'packages/uikit-im/src/sdk/domain/group-domain.ts', desc: '群域：getGroupInfo/changeOwner/admins/mute 等全量 SDK 调用' },
+      { path: 'packages/uikit-im/src/modules/group/group-detail.vue', desc: '群详情面板 UI' },
     ],
   },
 
@@ -183,9 +183,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群聊点击更多 → EmChatDrawer → chat-info-drawer（群管理全套入口）',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/chat-header.vue', desc: '聊天头部 UI：标题/状态/更多菜单' },
-      { path: 'packages/uikit/src/modules/chat/chat.vue', desc: '聊天编排：header + messageList + input' },
-      { path: 'packages/uikit/src/sdk/domain/presence-domain.ts', desc: '在线状态订阅/发布' },
+      { path: 'packages/uikit-im/src/modules/chat/chat-header.vue', desc: '聊天头部 UI：标题/状态/更多菜单' },
+      { path: 'packages/uikit-im/src/modules/chat/chat.vue', desc: '聊天编排：header + messageList + input' },
+      { path: 'packages/uikit-im/src/sdk/domain/presence-domain.ts', desc: '在线状态订阅/发布' },
     ],
   },
 
@@ -208,9 +208,9 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群公告有独立公告横幅组件 group-announcement-banner.vue，随新公告自动弹出',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/drawer/chat-info-drawer.vue', desc: '聊天信息抽屉：成员/公告/共享文件编排' },
-      { path: 'packages/uikit/src/modules/group/group-member-list.vue', desc: '群成员列表：搜索/角色筛选/分页加载' },
-      { path: 'packages/uikit/src/sdk/domain/group-domain.ts', desc: '群域：全部群管理 SDK 调用入口' },
+      { path: 'packages/uikit-im/src/modules/chat/drawer/chat-info-drawer.vue', desc: '聊天信息抽屉：成员/公告/共享文件编排' },
+      { path: 'packages/uikit-im/src/modules/group/group-member-list.vue', desc: '群成员列表：搜索/角色筛选/分页加载' },
+      { path: 'packages/uikit-im/src/sdk/domain/group-domain.ts', desc: '群域：全部群管理 SDK 调用入口' },
     ],
   },
 
@@ -231,8 +231,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '摘要生成逻辑与 conversation-item 的 lastMessageText 共享 toConversationSummary',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/forward-modal/forward-modal.vue', desc: '转发弹窗 UI：会话列表选择 + 预览' },
-      { path: 'packages/uikit/src/sdk/domain/message-domain.ts', desc: '消息域：createCombineMessage/sendMessage 入口' },
+      { path: 'packages/uikit-im/src/modules/chat/forward-modal/forward-modal.vue', desc: '转发弹窗 UI：会话列表选择 + 预览' },
+      { path: 'packages/uikit-im/src/sdk/domain/message-domain.ts', desc: '消息域：createCombineMessage/sendMessage 入口' },
     ],
   },
 
@@ -251,8 +251,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群历史消息批量补全：fillGroupReadCounts 按 20 条分批请求 getGroupMessageReadReceipts',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/group-read-receipt-modal/group-read-receipt-modal.vue', desc: '群已读详情弹窗 UI' },
-      { path: 'packages/uikit/src/sdk/domain/message-domain.ts', desc: 'fillGroupReadCounts 批量补全逻辑' },
+      { path: 'packages/uikit-im/src/modules/chat/group-read-receipt-modal/group-read-receipt-modal.vue', desc: '群已读详情弹窗 UI' },
+      { path: 'packages/uikit-im/src/sdk/domain/message-domain.ts', desc: 'fillGroupReadCounts 批量补全逻辑' },
     ],
   },
 
@@ -273,8 +273,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '在线状态变更是全应用范围事件（不是会话级），状态变化通过 onPresenceChanged 事件通知',
     ],
     refs: [
-      { path: 'packages/uikit/src/components/presence-selector/presence-selector.vue', desc: '在线状态选择器 UI' },
-      { path: 'packages/uikit/src/sdk/domain/presence-domain.ts', desc: '在线状态域：发布/订阅/查询' },
+      { path: 'packages/uikit-im/src/components/presence-selector/presence-selector.vue', desc: '在线状态选择器 UI' },
+      { path: 'packages/uikit-im/src/sdk/domain/presence-domain.ts', desc: '在线状态域：发布/订阅/查询' },
     ],
   },
 
@@ -298,8 +298,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '进入会话补发未回执消息（sendPendingReadReceipts，sentReadReceiptIds 去重）',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/message-bubble-wrapper.vue', desc: '气泡外壳：布局/状态/已读/多选' },
-      { path: 'packages/uikit/src/modules/chat/message-list/message-list.vue', desc: '消息列表：时间线/滚动加载/置顶消息区' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/message-bubble-wrapper.vue', desc: '气泡外壳：布局/状态/已读/多选' },
+      { path: 'packages/uikit-im/src/modules/chat/message-list/message-list.vue', desc: '消息列表：时间线/滚动加载/置顶消息区' },
       ...BUBBLE_REFS,
     ],
   },
@@ -324,8 +324,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       'demo 分片模拟器 use-stream-demo.ts 直接驱动 messageStore，完整走响应式更新链路',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/event/chat-events.ts', desc: 'onStreamMessage 分片合并与丢片补偿' },
-      { path: 'packages/uikit/src/modules/chat/message-item/text-message.vue', desc: '内核纯文本流式状态渲染' },
+      { path: 'packages/uikit-im/src/sdk/event/chat-events.ts', desc: 'onStreamMessage 分片合并与丢片补偿' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/text-message.vue', desc: '内核纯文本流式状态渲染' },
       { path: 'apps/demo/src/components/ai/demo-markdown-message.vue', desc: '插件 markdown 流式气泡参考实现' },
       { path: 'apps/demo/src/components/ai/use-stream-demo.ts', desc: '流式分片模拟器 + mock AI 回复' },
     ],
@@ -349,7 +349,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '@提及：SDK 侧无独立 API，正文内嵌 @xxx 标记 + atMeMap 驱动会话列表「@我」角标',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/text-message.vue', desc: '文本气泡 UI：译文卡片/链接/提及' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/text-message.vue', desc: '文本气泡 UI：译文卡片/链接/提及' },
       ...BUBBLE_REFS,
     ],
   },
@@ -371,7 +371,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '点击大图预览：消息列表内放大查看，左右切换相邻图片',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/image-message.vue', desc: '图片气泡：进度/失败重发/预览' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/image-message.vue', desc: '图片气泡：进度/失败重发/预览' },
       ...BUBBLE_REFS,
     ],
   },
@@ -391,7 +391,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '本地文件消息未上传完时点击无操作，失败态支持重发',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/file-message.vue', desc: '文件气泡 UI' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/file-message.vue', desc: '文件气泡 UI' },
       ...BUBBLE_REFS,
     ],
   },
@@ -411,7 +411,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '转文字：isVoiceBody 类型守卫收窄 → VoiceMessageSource 补 type 字段 → voiceMessageToText',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/voice-message.vue', desc: '语音气泡：播放/转文字入口' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/voice-message.vue', desc: '语音气泡：播放/转文字入口' },
       ...BUBBLE_REFS,
     ],
   },
@@ -429,7 +429,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       'video-message.vue：封面图 + 播放按钮；点击进入播放层（原生 video 标签）',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/video-message.vue', desc: '视频气泡 UI' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/video-message.vue', desc: '视频气泡 UI' },
       ...BUBBLE_REFS,
     ],
   },
@@ -449,8 +449,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '展开后按类型复用各消息渲染组件；发送者昵称解析走 useUserInfo 缓存',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/combine-message.vue', desc: '合并消息气泡 UI' },
-      { path: 'packages/uikit/src/modules/chat/message-item/combine-message-detail.vue', desc: '合并消息展开详情（若存在）' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/combine-message.vue', desc: '合并消息气泡 UI' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/combine-message-detail.vue', desc: '合并消息展开详情（若存在）' },
       ...BUBBLE_REFS,
     ],
   },
@@ -469,7 +469,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       'demo-page.vue 通过 #message-custom 插槽接管渲染，未识别事件回落 EmCustomMessage',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-item/custom-message.vue', desc: '默认自定义消息渲染' },
+      { path: 'packages/uikit-im/src/modules/chat/message-item/custom-message.vue', desc: '默认自定义消息渲染' },
       { path: 'apps/demo/src/components/demo-card-message.vue', desc: 'demo 名片消息示例（插槽接管）' },
       ...BUBBLE_REFS,
     ],
@@ -492,8 +492,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '群聊历史消息不带已读数 → fillGroupReadCounts 按 20 条分批请求补全，异步不阻塞渲染',
     ],
     refs: [
-      { path: 'packages/uikit/src/sdk/domain/message-domain.ts', desc: 'fetchHistory / fillGroupReadCounts' },
-      { path: 'packages/uikit/src/modules/chat/message-list/message-list.vue', desc: '滚动触顶加载 / 下拉刷新' },
+      { path: 'packages/uikit-im/src/sdk/domain/message-domain.ts', desc: 'fetchHistory / fillGroupReadCounts' },
+      { path: 'packages/uikit-im/src/modules/chat/message-list/message-list.vue', desc: '滚动触顶加载 / 下拉刷新' },
     ],
   },
 
@@ -514,8 +514,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       '发送后清空编辑器并滚动到底部；离线/失败消息保留在列表中可重发',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/message-input/index.vue', desc: '输入框容器（simple/rich 切换、工具栏）' },
-      { path: 'packages/uikit/src/sdk/domain/message-domain.ts', desc: 'sendText/sendImage/… 各类型发送' },
+      { path: 'packages/uikit-im/src/modules/chat/message-input/index.vue', desc: '输入框容器（simple/rich 切换、工具栏）' },
+      { path: 'packages/uikit-im/src/sdk/domain/message-domain.ts', desc: 'sendText/sendImage/… 各类型发送' },
     ],
   },
 
@@ -537,8 +537,8 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       'config 透传：header/input/messageList/groupReadReceipt 等分组配置',
     ],
     refs: [
-      { path: 'packages/uikit/src/modules/chat/chat.vue', desc: '聊天容器编排' },
-      { path: 'packages/uikit/src/modules/chat/chat-header.vue', desc: '会话标题/状态/更多入口' },
+      { path: 'packages/uikit-im/src/modules/chat/chat.vue', desc: '聊天容器编排' },
+      { path: 'packages/uikit-im/src/modules/chat/chat-header.vue', desc: '会话标题/状态/更多入口' },
     ],
   },
 ]

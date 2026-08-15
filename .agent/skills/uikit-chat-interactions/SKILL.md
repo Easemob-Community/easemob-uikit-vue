@@ -14,7 +14,7 @@
 
 ## 目标
 
-在 `packages/uikit/src/modules/chat/` 的交互子系统（操作菜单/引用/转发/多选/编辑/翻译/
+在 `packages/uikit-im/src/modules/chat/` 的交互子系统（操作菜单/引用/转发/多选/编辑/翻译/
 置顶/搜索/已读）里新增或修改行为时，**先看清 `ChatConfig` 契约与既有实现**，避免三类翻车：
 
 1. 新增一个操作类型只改菜单 UI，漏掉 `MessageActionType` 联合、`bubble-wrapper` 事件转发、

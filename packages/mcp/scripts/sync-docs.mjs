@@ -5,7 +5,7 @@
  * - apps/docs/guide/*.md（白名单过滤，排除 demo-phase 内部规划页）
  * - apps/docs/.vitepress/gen/*.md（gen-api-docs.mjs 产出的组件 API）
  * - 根 CHANGELOG.md
- * - packages/uikit/package.json 的 version
+ * - packages/uikit-im/package.json 的 version
  *
  * 产物：packages/mcp/data/{guide,api,CHANGELOG.md,manifest.json}
  *
@@ -63,7 +63,7 @@ const COMPONENTS = [
 ]
 
 const uikitVersion = JSON.parse(
-  readFileSync(join(ROOT, 'packages/uikit/package.json'), 'utf-8'),
+  readFileSync(join(ROOT, 'packages/uikit-im/package.json'), 'utf-8'),
 ).version
 
 // 清理并重建 data 目录

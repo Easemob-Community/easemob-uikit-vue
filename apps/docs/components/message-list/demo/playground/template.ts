@@ -2,7 +2,7 @@
  * 消息列表页在线演练场初始模板（VuePlayground files）
  *
  * 模板约束：只能 import import map 已覆盖的模块
- * （vue / pinia / easemob-websdk / @easemob/uikit），预览 iframe 才能解析。
+ * （vue / pinia / easemob-websdk / @easemob/uikit-im），预览 iframe 才能解析。
  * mock 注入复用文档站 message-list 演练场模式（无登录态渲染），
  * 用户可自由编辑 messageList 配置对象，右侧列表实时生效。
  */
@@ -18,8 +18,8 @@ import {
   CONVERSATION_TYPE,
   MESSAGE_STATUS,
   MESSAGE_TYPE,
-} from '@easemob/uikit'
-import type { ChatConfig, UiConversation, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ChatConfig, UiConversation, UiMessage } from '@easemob/uikit-im'
 
 // ---------- mock 注入（无登录态演示） ----------
 const conversationStore = useConversationStore()

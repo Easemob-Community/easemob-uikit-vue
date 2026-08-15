@@ -49,7 +49,7 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 ThemeStore 支持 `light / dark / auto`，`auto` 跟随系统：
 
 ```ts
-import { useTheme } from '@easemob/uikit'
+import { useTheme } from '@easemob/uikit-im'
 const { setMode, isDark } = useTheme()
 setMode('auto')
 ```
@@ -57,7 +57,7 @@ setMode('auto')
 ## 运行时定制（useTheme）
 
 ```ts
-import { useTheme } from '@easemob/uikit'
+import { useTheme } from '@easemob/uikit-im'
 
 const {
   primaryColor, avatarShape, bubbleShape, componentsShape,

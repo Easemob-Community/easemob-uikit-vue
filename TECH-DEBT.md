@@ -103,7 +103,7 @@
 - **建议修法**：决定哪些属「对外主 hook」并补齐；理想加一个生成/校验脚本从 `index.ts` 派生 auto-imports 列表，杜绝再漂移。
 - **修复**：已于 2026-08-15 修复。
   1. **白名单补齐**：`src/auto-imports.ts` 扩到 **34 个业务主 hook**（新增 `useMessageSend/useMessageHistory/useMessageActions`、`useContactFilter/useContactGroup/useContactSort`、`useGroupFilter/useGroupSort`、`usePullRefresh`、`useChatPlugin`、`useResizable`，补全 `usePresence`/`useBlocklist`），排序归一；排除名单明确为内部实现细节（`usePinyin`/`useRipple`/`useQuote`/`useUIKitStorage` 及附属工具函数等 23 个，业务侧显式 import）。
-  2. **校验脚本防漂移**：新增 `packages/uikit/scripts/check-auto-imports.mjs`——从 `composables/index.ts` 派生导出并剔除排除名单，与白名单比对，**漏登记硬失败**（`extra` 仅提示，允许 locale 等其他模块的合法登记）；已挂载到 `build` 前置（与 `check-icon-refs` 并列），也可单独跑 `pnpm -F @easemob/uikit auto-imports:check`。
+  2. **校验脚本防漂移**：新增 `packages/uikit-im/scripts/check-auto-imports.mjs`——从 `composables/index.ts` 派生导出并剔除排除名单，与白名单比对，**漏登记硬失败**（`extra` 仅提示，允许 locale 等其他模块的合法登记）；已挂载到 `build` 前置（与 `check-icon-refs` 并列），也可单独跑 `pnpm -F @easemob/uikit-im auto-imports:check`。
 - **关联 skill**：`uikit-store-composable`
 
 ### [x] D17. `updateUploadProgress` 未实际更新上传进度值
@@ -343,7 +343,7 @@
 - **现象**：`composables/use-long-press.ts` 是自写 `setTimeout` 实现，`modules/conversation/conversation-item.vue` 又直接用 vueuse 的 `onLongPress`，功能重复。
 - **修复**：2026-07 H5 适配专项中统一为 `useLongPress`，内部改用 vueuse `onLongPress`，并增加 touchmove 阈值（超过阈值取消长按）与长按时临时禁止 body 滚动，解决 H5 长按与页面滚动冲突。
 - **关联 skill**：`uikit-store-composable` / `uikit-h5-adaptation`
-- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 通过。
+- **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 通过。
 
 ### [x] D9. i18n：一处硬编码中文漏翻 + `t()` 无插值
 
@@ -462,7 +462,7 @@
 ### [x] D37. 统一 UIKit 日志体系，替换直接 console 输出
 
 - **现象**：UIKit 已新建 `utils/logger.ts` 但能力较薄（仅提供原始 `log`）；代码中仍存在多处直接 `console.warn` 等原生输出，且各模块没有统一命名空间、级别控制和运行开关，不利于问题排查和生产环境管控。
-- **证据**：`packages/uikit/src/utils/logger.ts` 目前只有 `log`；`sdk/domain/group-domain.ts` L270 等仍有 `console.warn`；多个模块错误处理仅 `console.warn` 或无日志。
+- **证据**：`packages/uikit-im/src/utils/logger.ts` 目前只有 `log`；`sdk/domain/group-domain.ts` L270 等仍有 `console.warn`；多个模块错误处理仅 `console.warn` 或无日志。
 - **建议修法**：
   1. 扩展 `utils/logger.ts`：增加 `debug/info/warn/error` 级别、`createLogger(namespace)` 命名空间、`setLogLevel/getLogLevel` 全局开关、基于级别的过滤；
   2. 在 `UIKitClient` / `UIKitProvider` 初始化时根据 `debug` 配置自动设置日志级别；
@@ -783,7 +783,7 @@
 
 - **背景**：设计师交付面性（filled）图标集 88 个（`面性/icon/filled/`），与线性集命名 1:1 对应；缺失的 32 个为箭头/对勾等纯线条图形（无面性隐喻，属正常）。面性在小尺寸状态图标与选中态辨识度更优（典型如 `pin`）。
 - **结论**：技术可行性高（`icon-map`/`EmIcon` 已有填充/描边双渲染分支，加第二注册表 + 缺失回落即可）。推荐「主题级 `iconStyle` 开关（品牌定制）+ 组件选中态自动配对（默认体验）」组合，不做面向终端用户的全局面性开关。**详细盘点、方案权衡与落地步骤见根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（2026-08-06 预研）**。
-- **资产合并策略（2026-08-07 沉淀，原根 `ICON-ASSET-MERGE-STRATEGY.md` 已删除归档至本条目）**：`packages/uikit/src/assets/icons` 是运行时唯一权威图标库（`EmIcon`/`icon-map.ts` 只认这里）；候选素材库 `assets/icons-next` 已整目录删除（2026-08-07）；设计源目录（`线性/icon/stroked`、`面性/icon/filled`、`消息状态以及未读状态`）为设计师本地工作产物、gitignore 已排除，后续新素材统一放仓库外（设计稿/蓝湖/Figma），由负责工程师评估后复制/替换进 `assets/icons` 并在 `icon-map.ts` 注册；合并采用批次化 + 分类映射表 + 同名脚本对比，不整体覆盖，避免未经验证的视觉回归。
+- **资产合并策略（2026-08-07 沉淀，原根 `ICON-ASSET-MERGE-STRATEGY.md` 已删除归档至本条目）**：`packages/uikit-im/src/assets/icons` 是运行时唯一权威图标库（`EmIcon`/`icon-map.ts` 只认这里）；候选素材库 `assets/icons-next` 已整目录删除（2026-08-07）；设计源目录（`线性/icon/stroked`、`面性/icon/filled`、`消息状态以及未读状态`）为设计师本地工作产物、gitignore 已排除，后续新素材统一放仓库外（设计稿/蓝湖/Figma），由负责工程师评估后复制/替换进 `assets/icons` 并在 `icon-map.ts` 注册；合并采用批次化 + 分类映射表 + 同名脚本对比，不整体覆盖，避免未经验证的视觉回归。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
 - **核销（2026-08-15，转 roadmap）**：方案与落地步骤已定（见 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)：第二注册表 `assets/icons-filled/` + `getIconSvg(name, style?)` 回落线性版 + 主题级 `iconStyle` 开关 + 选中态配对）；**88 个面性 SVG 资产尚未提交进包**（设计师源目录 gitignore，规范化产物待工程师按资产合并策略评估后落地）——资产就绪后按预研步骤实施，非当前债务。
 
@@ -808,7 +808,7 @@
   1. `sdk/adapter/message-adapter.ts`：新增 `normalizeUserId()`，剥离 `/deviceId`、`@appKey`、`#appKey` 等后缀；`toUiMessage` 与 `resolvePeerUserId` 改用归一化比较；对空 `currentUserId` 增加 warning。
   2. `modules/chat/message-item/message-bubble-wrapper.vue`：渲染层以 `clientStore.currentUser` 实时重新判定 `isSelf`，fallback 到消息对象存储的 `isSelf`，确保已入库的异常消息也能在渲染时纠正。
   3. `sdk/event/chat-events.ts` / `sdk/notification-engine.ts`：新消息去重、自动清未读、@我判定、通知过滤等依赖 `from === currentUser` 的逻辑统一走 `normalizeUserId`。
-- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
+- **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
 ### [x] D93. 会话列表自定义消息（userCard）刷新后空白，群聊摘要发送者名点击后才出现
@@ -823,7 +823,7 @@
   2. `conversation-adapter.ts` 新增 `ToUiConversationOptions.resolveSenderName`，构造时优先用 UIKit 资料解析发送者名；`from` / `sender.userId` 统一 `normalizeUserId` 去掉多设备后缀；`UiConversation` 新增可选 `lastMessageFrom` 字段。
   3. `ConversationDomain` / `use-uikit.ts` / `chat-events.ts` 传入基于 `contact` / `userInfo` store 的 `resolveSenderName`。
   4. `modules/conversation/conversation-item.vue` 群聊场景下用 `useUserInfo(props.conversation.lastMessageFrom)` 监听资料变化，实时把 `userId: ` 前缀替换为备注/昵称。
-- **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build`。
+- **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`。
 - **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
 
 ### [x] D95. 流式消息（Stream Message）接入 UIKIT：内核薄 + 插件厚分层落地
@@ -854,10 +854,10 @@
 ### [ ] D97. 聊天室 UIKit（`@easemob/uikit-chatroom`）：独立场景包 + 抽 `@easemob/uikit-core` 设计规划
 
 - **背景**：聊天室（直播/语聊房/小班课/私域直播，H5 居多）与单群聊场景几乎不重合（无离线/未读/回执/会话列表，消息为广播流），需独立场景包；但主题/i18n/sdk 抽象/原子组件必须单一维护，故抽共享基座。底层 `easemob-websdk@5.0.0` 已具备完整 `ChatRoomManager`（join/leave/成员/管理员/禁言/黑/白名单/公告/房间属性 KV），能力底座齐备。
-- **结论**：三包架构 `@easemob/uikit-core`（共享内核）+ `@easemob/uikit`（1v1/群聊场景，对外 API 零变化）+ `@easemob/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
+- **结论**：三包架构 `@easemob/uikit-core`（共享内核）+ `@easemob/uikit-im`（1v1/群聊场景，对外 API 零变化）+ `@easemob/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
 - **关键增量/修正（评审已核实）**：① 事件注册按场景分离（core 只留连接级 + notice，chatroom 自建 `registerChatroomEventHandlers`）；② `ManagerHost` 需新增 `chatRoomManager`（当前 `SdkChatClient.init` 未注册 ChatRoomManager）；③ 所有包 external `vue/pinia/easemob-websdk`，场景包再 external core（单 websdk 实例规则）；④ core 增加 `extendLocale`（约 10 行）供 chatroom 合并 i18n keys；⑤ `useChatroomAttributes` 四层同步（本地缓存 + set + 变更事件 + 拉取兜底），属性 key 加场景前缀；⑥ `scripts/check-version-sync.mjs` 升级为双版本校验。
 - **执行计划**（P0 决策 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)。
-- **进度（2026-08-15）**：P0 设计评审完成、文档落盘；按用户时序 `@easemob/uikit` 1.x 开发完后启动 P1。
+- **进度（2026-08-15）**：P0 设计评审完成、文档落盘；按用户时序 `@easemob/uikit-im` 1.x 开发完后启动 P1。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring` / `uikit-provider-config` / `uikit-h5-adaptation` / `uikit-release-build`
 
 ---
@@ -866,13 +866,13 @@
 
 - [x] **D1. 移除未使用的 UnoCSS（含 demo 侧）**
   - 已于 <待填 commit> 修复。
-  - 改动：删除 `packages/uikit/uno.config.ts`、`apps/demo/uno.config.ts`；从 `packages/uikit/package.json`、`apps/demo/package.json` 移除 `unocss` 及 `@unocss/*` 依赖；从 `packages/uikit/histoire.config.ts`、`apps/demo/vite.config.ts`、`packages/uikit/src/histoire-setup.ts` 移除 UnoCSS 插件/import。
-  - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过；产物 `dist/easemob-uikit.js` 不再包含 UnoCSS。
+  - 改动：删除 `packages/uikit-im/uno.config.ts`、`apps/demo/uno.config.ts`；从 `packages/uikit-im/package.json`、`apps/demo/package.json` 移除 `unocss` 及 `@unocss/*` 依赖；从 `packages/uikit-im/histoire.config.ts`、`apps/demo/vite.config.ts`、`packages/uikit-im/src/histoire-setup.ts` 移除 UnoCSS 插件/import。
+  - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过；产物 `dist/easemob-uikit-im.js` 不再包含 UnoCSS。
 
 - [x] **D2. 修正库构建 external，把 `im-sdk-web` 改为 `easemob-websdk`**
   - 已于此前提交修复。
-  - 改动：`packages/uikit/vite.config.ts` 的 `rollupOptions.external` 与 `output.globals` 中 `im-sdk-web` → `easemob-websdk`。
-  - 验证：构建产物 `dist/easemob-uikit.js` 以 `import { ChatClient as H2, ... } from "easemob-websdk"` 引入 SDK；UMD 产物以 `require("easemob-websdk")` 引入；SDK 不再内联到 UIKit 包中。
+  - 改动：`packages/uikit-im/vite.config.ts` 的 `rollupOptions.external` 与 `output.globals` 中 `im-sdk-web` → `easemob-websdk`。
+  - 验证：构建产物 `dist/easemob-uikit-im.js` 以 `import { ChatClient as H2, ... } from "easemob-websdk"` 引入 SDK；UMD 产物以 `require("easemob-websdk")` 引入；SDK 不再内联到 UIKit 包中。
 
 - [x] **D8. 统一长按实现并修复 H5 长按与滚动冲突**
   - 已于 2026-07 H5 适配专项修复。
@@ -882,7 +882,7 @@
 - [x] **H5 适配核心能力落地（2026-07 专项）**
   - 已于 `04e07ca` 修复。
   - 改动：
-    - 新增 `packages/uikit/src/composables/use-h5-adaptation.ts`，集中管理 viewport/安全区/键盘高度/下拉刷新/字号缩放预留；
+    - 新增 `packages/uikit-im/src/composables/use-h5-adaptation.ts`，集中管理 viewport/安全区/键盘高度/下拉刷新/字号缩放预留；
     - `theme/index.css` 新增 `--uikit-safe-*` 与 `--uikit-font-scale`；
     - `use-uikit.ts` 的 `UIKitContext` 注入 `h5` 单一实例；`use-viewport.ts` 优先从 context 读取；
     - `uikit-provider.vue` 新增 `h5?: H5AdaptationConfig` prop，`safeArea=false` 时覆写 CSS 变量为 `0px`；
@@ -890,7 +890,7 @@
     - 键盘适配：`chat.vue` 读取 `h5.keyboardHeight` 传给 `MessageInput`，输入框 focus 触发 `message-list.scrollToBottom()`；
     - 动画修复：`message-input` emoji sheet 改用 `uikit-slide-up` Vue Transition，多处硬编码 `0.15s/0.2s` transition 改接 `--uikit-anim-*`；
     - 导出更新：`composables/index.ts`、`auto-imports.ts` 加入 `useH5Adaptation`。
-  - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
+  - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
 
 - [x] **H5 专用微信式输入区组件（h5-input）落地 + 键盘适配三件套**
   - 已于 2026-07-28 修复。
@@ -916,5 +916,5 @@
     - `GroupDomain` 增加 `pendingGroupInfoRequests` / `pendingGroupAdminRequests` / `pendingGroupAnnouncementRequests` 三套 Promise 去重；
     - `store/group.ts` 增加 `groupAdminSyncedIds` 标记，已同步管理员的群不再重复拉取；`getGroupAnnouncement` 返回 `string | undefined`；
     - `modules/chat/chat.vue` 预拉公告条件改为 `announcement === undefined`。
-  - 验证：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
+  - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
   - 关联 skill：`uikit-store-composable` / `uikit-component-authoring` / `websdk2-uikit-migration`。

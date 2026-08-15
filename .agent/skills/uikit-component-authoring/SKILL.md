@@ -10,7 +10,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `packages/uikit/src`）里新增或改写 SFC 组件时，
+在 `easemob-uikit-vue`（核心包 `packages/uikit-im/src`）里新增或改写 SFC 组件时，
 **保证与既有 60+ 组件的写法、命名、导出契约完全一致**，尤其是对外 API（组件名 + 事件名）
 这条「一旦发出去就不能改」的红线。
 
@@ -140,14 +140,14 @@ const emit = defineEmits<{
 ## 6. resolver / 插件契约：barrel 别名名就是公开 API
 
 `src/resolver.ts` 的 `EasemobUIKitResolver`（默认 prefix `Em`）把模板里 `<EmXxx/>`
-直接解析到 `@easemob/uikit` 的**同名命名导出**——所以别名名 = 用户可写的标签名 = 公开 API，
+直接解析到 `@easemob/uikit-im` 的**同名命名导出**——所以别名名 = 用户可写的标签名 = 公开 API，
 这正是不需要 `defineOptions` 的根因：
 
 ```ts
 // src/resolver.ts
 const prefix = options.prefix ?? 'Em'
 if (!name.startsWith(prefix)) return
-return { name, from: '@easemob/uikit' } // <EmChatContainer/> → import { EmChatContainer }
+return { name, from: '@easemob/uikit-im' } // <EmChatContainer/> → import { EmChatContainer }
 ```
 
 全量注册（`app.use(UIKit)`）走 `src/index.ts` 的 `install`：**只注册以 `Em` 开头且是组件的具名导出**，支持自定义 prefix：
@@ -244,7 +244,7 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
   模板 ref 命名统一为 `{field}InputRef`（如 `groupNameInputRef`、`remarkInputRef`）。
 - **结构歧义**：`modules/chat/message-input.vue` 与 `modules/chat/message-input/` 目录并存，命名易混，
   新增别踩这坑，见 `TECH-DEBT.md` **D11**。
-- **打包契约提醒**：`packages/uikit/vite.config.ts` 的 external 里 `im-sdk-web` 是**过时名**
+- **打包契约提醒**：`packages/uikit-im/vite.config.ts` 的 external 里 `im-sdk-web` 是**过时名**
   （真实包名 `easemob-websdk`），SDK 现被打进 dist，见 `TECH-DEBT.md` **D2**；改 external 时留意。
 
 ## 反面清单

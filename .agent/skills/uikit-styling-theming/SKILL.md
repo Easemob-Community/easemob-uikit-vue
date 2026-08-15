@@ -13,7 +13,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `@easemob/uikit`，源码 `packages/uikit/src`）里写或改样式时，
+在 `easemob-uikit-vue`（核心包 `@easemob/uikit-im`，源码 `packages/uikit-im/src`）里写或改样式时，
 **用对本库真实的样式约定，别被仓库里的「死配置」带偏**：
 
 1. 组件样式 = `<style scoped>` + BEM 类名 + `var(--uikit-*)` CSS 变量；
@@ -22,11 +22,11 @@
 
 ## ⚠️ 头等事实：UnoCSS 是「死配置」，本库不用工具类
 
-`packages/uikit/uno.config.ts` 看起来很完整——配了 `presetWind` / `presetAttributify` /
+`packages/uikit-im/uno.config.ts` 看起来很完整——配了 `presetWind` / `presetAttributify` /
 `preset-rem-to-px`、`u-center` / `u-transition` 等 `u-*` shortcuts、`primary` / `text-primary` /
 `rounded-uikit-*` 一整套色板 token。**但库里真实组件命中 0 次**，照它写不生效：
 
-- 库构建 `packages/uikit/vite.config.ts` 的 `plugins` 只有 `vue()` + `dts()`，**没有挂 `unocss()`**，
+- 库构建 `packages/uikit-im/vite.config.ts` 的 `plugins` 只有 `vue()` + `dts()`，**没有挂 `unocss()`**，
   `dist/` 只产出 `dist/theme/index.css`，没有 `uno.css`。
 - `virtual:uno.css` 只在 `src/histoire-setup.ts` 里 `import 'virtual:uno.css'`，**仅 Histoire 预览生效**。
 - 非 story 的 `.vue` 组件里 `u-*` / attributify / `text-text-primary` / `rounded-uikit-*` 全 0 命中。
@@ -181,7 +181,7 @@ const presenceColorMap = {
 - H5 安全区**禁止直接写 `env(safe-area-inset-*)`**，统一通过 `--uikit-safe-*` 变量传递；需要开关时由 `UIKitProvider :h5` 覆写变量，组件不感知开关逻辑。
 - 过渡 / 动画统一用 `var(--uikit-anim-duration / -easing)`（及 `-enter/-leave/-decel/-accel`），让全局动画开关和 reduced-motion 真正生效。
 - 只在 `var(--uikit-x, fallback)` 的 fallback 位置允许出现字面量 hex / 时长，且 fallback 要和 `:root` 默认值一致。
-- 可作为 lint 守卫方向：禁止 `packages/uikit/src/**/*.vue` 的 `<style>` 出现裸 hex / 裸 `rgba()` / 裸 `Ns|Nms` 时长（fallback 参数除外）。
+- 可作为 lint 守卫方向：禁止 `packages/uikit-im/src/**/*.vue` 的 `<style>` 出现裸 hex / 裸 `rgba()` / 裸 `Ns|Nms` 时长（fallback 参数除外）。
 
 **软约定**
 

@@ -48,7 +48,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'EasemobUIKit',
       formats: ['es', 'umd'],
-      fileName: (format: string) => `easemob-uikit.${format === 'es' ? 'js' : 'umd.cjs'}`,
+      fileName: (format: string) => `easemob-uikit-im.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
       external: ['vue', 'pinia', 'easemob-websdk'],

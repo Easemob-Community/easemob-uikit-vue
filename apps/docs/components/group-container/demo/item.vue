@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 
 const vue = { groupId: 'g_001', groupName: 'Vue 技术交流', owner: 'me', memberCount: 128 }
 const react = { groupId: 'g_002', groupName: 'React 开发者', owner: 'me', memberCount: 64 }

@@ -10,7 +10,7 @@
  * 说明：点击通知默认跳转对应会话（Provider 内置行为，navigateOnClick 默认开启）。
  */
 import { computed } from 'vue'
-import { useNotification } from '@easemob/uikit'
+import { useNotification } from '@easemob/uikit-im'
 import { noticeTone, useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'

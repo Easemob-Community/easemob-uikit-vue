@@ -22,9 +22,9 @@ import { parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const COMPONENTS_ROOT = join(__dirname, '../../../packages/uikit/src/components')
-const MODULES_ROOT = join(__dirname, '../../../packages/uikit/src/modules')
-const CONTAINERS_ROOT = join(__dirname, '../../../packages/uikit/src/containers')
+const COMPONENTS_ROOT = join(__dirname, '../../../packages/uikit-im/src/components')
+const MODULES_ROOT = join(__dirname, '../../../packages/uikit-im/src/modules')
+const CONTAINERS_ROOT = join(__dirname, '../../../packages/uikit-im/src/containers')
 const OUTPUT_DIR = join(__dirname, '../.vitepress/gen')
 
 /** 22 个原子组件：目录名 → 展示名 */

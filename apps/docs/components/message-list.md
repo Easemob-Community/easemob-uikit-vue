@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmMessageList, EmUIKitProvider } from '@easemob/uikit'
+import { EmMessageList, EmUIKitProvider } from '@easemob/uikit-im'
 </script>
 
 <template>

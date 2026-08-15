@@ -10,7 +10,7 @@
 
 ## 目标
 
-将 `packages/uikit/src/sdk` 从「对 SDK5 的简单代理 + 旧 SDK 习惯代码」重构为「按业务域聚合、事件直接注册 manager、SDK Message 作为真相源」的最佳实践形态。
+将 `packages/uikit-im/src/sdk` 从「对 SDK5 的简单代理 + 旧 SDK 习惯代码」重构为「按业务域聚合、事件直接注册 manager、SDK Message 作为真相源」的最佳实践形态。
 
 ## 核心原则
 
@@ -47,7 +47,7 @@
 ## 目录结构目标
 
 ```text
-packages/uikit/src/
+packages/uikit-im/src/
 ├── sdk/
 │   ├── index.ts                    # 导出 createClient、UIKitClient、类型
 │   ├── client.ts                   # UIKitClient：初始化 + 生命周期
@@ -96,8 +96,8 @@ packages/uikit/src/
 1. 确保当前分支已提交，或创建新分支 `refactor/sdk5-best-practice`
 2. 运行基线检查：
    - `pnpm lint`（记录 error 数量）
-   - `pnpm -F @easemob/uikit type-check` 或 `pnpm -F @easemob/uikit build`
-3. 删除旧目录前先复制一份到 `packages/uikit/src/sdk-old` 作为临时参考（最终删除）
+   - `pnpm -F @easemob/uikit-im type-check` 或 `pnpm -F @easemob/uikit-im build`
+3. 删除旧目录前先复制一份到 `packages/uikit-im/src/sdk-old` 作为临时参考（最终删除）
 
 ### Step 1: 重写 SDK 类型层与 Adapter
 
@@ -221,14 +221,14 @@ packages/uikit/src/
 
 ### Step 7: 验证与清理
 
-1. 删除 `packages/uikit/src/sdk-old` 临时备份
+1. 删除 `packages/uikit-im/src/sdk-old` 临时备份
 2. 删除不再使用的文件：
    - `sdk/client/index.ts` 及下面所有 service
    - `sdk/event-handler/`
    - 旧的 `sdk/types.ts`（已替换）
 3. 运行检查：
-   - `pnpm -F @easemob/uikit type-check`
-   - `pnpm -F @easemob/uikit build`
+   - `pnpm -F @easemob/uikit-im type-check`
+   - `pnpm -F @easemob/uikit-im build`
    - `pnpm lint`（如错误过多，可先跑 `pnpm lint --fix`）
 4. 更新 `AGENTS.md` 或相关文档（如仓库要求）
 
@@ -276,10 +276,10 @@ packages/uikit/src/
 
 ```bash
 # 类型检查
-pnpm -F @easemob/uikit type-check
+pnpm -F @easemob/uikit-im type-check
 
 # 构建
-pnpm -F @easemob/uikit build
+pnpm -F @easemob/uikit-im build
 
 # lint（可先用 --fix）
 pnpm lint
@@ -291,10 +291,10 @@ pnpm -F @easemob/demo build
 
 ## 完成标准
 
-- `packages/uikit/src/sdk` 目录结构符合本 skill 的目录结构目标
+- `packages/uikit-im/src/sdk` 目录结构符合本 skill 的目录结构目标
 - 不再出现 `SdkMsgBase` 等手写推断类型
 - 不再出现 `as unknown as Message` 满天飞
 - `onMessage` 按单个 Message 处理
 - `getClient()` 全局单例已删除
-- `pnpm -F @easemob/uikit build` 通过
+- `pnpm -F @easemob/uikit-im build` 通过
 - `pnpm lint` 无新增 error（允许先 auto-fix style 问题）

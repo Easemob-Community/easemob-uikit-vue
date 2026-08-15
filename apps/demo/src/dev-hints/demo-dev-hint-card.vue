@@ -7,7 +7,7 @@
  * 根 class 统一 .demo-dev-hint，悬停引擎据此忽略覆盖层自身。
  */
 import { computed, ref, watch } from 'vue'
-import { EmIcon, EmPopup } from '@easemob/uikit'
+import { EmIcon, EmPopup } from '@easemob/uikit-im'
 import type { DevHintBadgeState, DevHintContext } from './types'
 
 const props = defineProps<{

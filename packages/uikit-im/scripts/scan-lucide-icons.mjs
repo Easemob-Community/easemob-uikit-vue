@@ -5,7 +5,7 @@
  * 有多少已被设计师版本替换，有多少是项目自定义/无 Lucide 映射。
  *
  * 运行方法：
- *   cd packages/uikit && node scripts/scan-lucide-icons.mjs
+ *   cd packages/uikit-im && node scripts/scan-lucide-icons.mjs
  *
  * 输出：
  *   - 当前总数

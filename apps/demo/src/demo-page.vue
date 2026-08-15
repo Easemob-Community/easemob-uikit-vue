@@ -23,8 +23,8 @@ import {
   useOwnUserInfo,
   useUIKit,
   useViewport,
-} from '@easemob/uikit'
-import type { ConversationTabKey, CustomMessageBody, UiContact, UiConversation, UiGroup, UiMessage } from '@easemob/uikit'
+} from '@easemob/uikit-im'
+import type { ConversationTabKey, CustomMessageBody, UiContact, UiConversation, UiGroup, UiMessage } from '@easemob/uikit-im'
 import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'

@@ -24,7 +24,7 @@
 ## 落点唯一：只有 `rich-input.vue` 碰 tiptap
 
 所有 `@tiptap/*` import 都集中在
-`packages/uikit/src/modules/chat/message-input/rich-input.vue`，别处 0 引用：
+`packages/uikit-im/src/modules/chat/message-input/rich-input.vue`，别处 0 引用：
 
 ```ts
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -110,7 +110,7 @@ const text = editor.value.getText()
 emit('send', html, text, mentionList.value.length > 0 ? mentionList.value : undefined)
 ```
 
-但消费方 `packages/uikit/src/modules/chat/message-input.vue` 的 `handleSendRich` **忽略 `_html`**（下划线前缀即弃用），
+但消费方 `packages/uikit-im/src/modules/chat/message-input.vue` 的 `handleSendRich` **忽略 `_html`**（下划线前缀即弃用），
 只发 `text`，mention 写进 `ext.em_at_list`：
 
 ```ts

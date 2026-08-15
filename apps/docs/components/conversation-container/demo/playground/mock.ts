@@ -8,8 +8,8 @@
  * 注意：本模块只在 demo 组件 <script setup> 顶层调用；demo 经 Docs 主题
  * DemoBlock 的 ClientOnly 包裹，仅客户端挂载时执行，不触碰 SSR。
  */
-import { CONVERSATION_TYPE, useConversationStore, usePresenceStore } from '@easemob/uikit'
-import type { UiConversation, UiPresence } from '@easemob/uikit'
+import { CONVERSATION_TYPE, useConversationStore, usePresenceStore } from '@easemob/uikit-im'
+import type { UiConversation, UiPresence } from '@easemob/uikit-im'
 
 /**
  * 注入 mock 会话列表（覆盖未读 / 置顶 / 免打扰 / @我 / 单聊 / 群聊场景）

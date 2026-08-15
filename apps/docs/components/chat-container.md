@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 </script>
 
 <template>
@@ -124,7 +124,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
 | `focus`                    | `() => void`                                   | 聚焦输入框                     |
 
 ```ts
-import { useChatPlugin } from '@easemob/uikit'
+import { useChatPlugin } from '@easemob/uikit-im'
 
 const { currentConversation, send, setText } = useChatPlugin()
 ```
@@ -172,7 +172,7 @@ const { currentConversation, send, setText } = useChatPlugin()
 
 ```vue
 <script setup lang="ts">
-import { EmChatContainer } from '@easemob/uikit'
+import { EmChatContainer } from '@easemob/uikit-im'
 import DemoQuickReplyPanel from './demo-quick-reply-panel.vue'
 
 const chatContainerRef = ref<InstanceType<typeof EmChatContainer>>()
@@ -202,7 +202,7 @@ const chatContainerRef = ref<InstanceType<typeof EmChatContainer>>()
 
 ```vue
 <script setup lang="ts">
-import { useChatPlugin } from '@easemob/uikit'
+import { useChatPlugin } from '@easemob/uikit-im'
 
 const emit = defineEmits<{ (e: 'select', text: string): void }>()
 
@@ -269,7 +269,7 @@ function onSelect(item) {
 **Step 2 — 发送名片（在工具栏按钮的点击回调中）：**
 
 ```ts
-import { useChatPlugin } from '@easemob/uikit'
+import { useChatPlugin } from '@easemob/uikit-im'
 
 const { send } = useChatPlugin()
 
@@ -286,8 +286,8 @@ function sendCard(userId: string) {
 
 ```vue
 <script setup lang="ts">
-import { useUserInfo } from '@easemob/uikit'
-import type { CustomMessageBody, UiMessage } from '@easemob/uikit'
+import { useUserInfo } from '@easemob/uikit-im'
+import type { CustomMessageBody, UiMessage } from '@easemob/uikit-im'
 
 const props = defineProps<{ message: UiMessage }>()
 const emit = defineEmits<{ (e: 'card-click', userId: string): void }>()

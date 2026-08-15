@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmUIKitProvider, useContactStore } from '@easemob/uikit'
-import type { CreateGroupParams } from '@easemob/uikit'
+import { EmUIKitProvider, useContactStore } from '@easemob/uikit-im'
+import type { CreateGroupParams } from '@easemob/uikit-im'
 
 const show = ref(false)
 const createdLog = ref('')

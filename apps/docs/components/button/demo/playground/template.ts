@@ -2,14 +2,14 @@
  * Button 在线代码演练场初始模板（VuePlayground files）
  *
  * 模板约束：只能 import import map 已覆盖的模块
- * （vue / pinia / easemob-websdk / @easemob/uikit），预览 iframe 才能解析。
+ * （vue / pinia / easemob-websdk / @easemob/uikit-im），预览 iframe 才能解析。
  * 用户可自由编辑下方 config 配置对象与组件组合，右侧预览实时生效。
  */
 export const buttonPlaygroundFiles: Record<string, string> = {
   'App.vue': `
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { EmUIKitProvider, EmButton, EmIcon } from '@easemob/uikit'
+import { EmUIKitProvider, EmButton, EmIcon } from '@easemob/uikit-im'
 
 // ===== 可编辑配置：改这里实时生效 =====
 const config = reactive({

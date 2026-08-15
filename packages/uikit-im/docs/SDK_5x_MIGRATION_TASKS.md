@@ -32,10 +32,10 @@ Task 1: 构建配置
 
 | 子任务 | 文件 | 具体操作 |
 |--------|------|---------|
-| 1.1 更新依赖声明 | `packages/uikit/package.json` | `"easemob-websdk": "^4.21.0"` → `"im-sdk-web": "file:../../../../SDK/websdk2"`（本地路径），后续发布时改为正式版本号 |
-| 1.2 更新 external | `packages/uikit/vite.config.ts` | `rollupOptions.external` 中 `'easemob-websdk'` → `'im-sdk-web'` |
-| 1.3 更新 globals | `packages/uikit/vite.config.ts` | `globals` 中 `'easemob-websdk': 'Easemob'` → `'im-sdk-web': 'Easemob'` |
-| 1.4 安装依赖 | 终端 | `cd packages/uikit && pnpm install` |
+| 1.1 更新依赖声明 | `packages/uikit-im/package.json` | `"easemob-websdk": "^4.21.0"` → `"im-sdk-web": "file:../../../../SDK/websdk2"`（本地路径），后续发布时改为正式版本号 |
+| 1.2 更新 external | `packages/uikit-im/vite.config.ts` | `rollupOptions.external` 中 `'easemob-websdk'` → `'im-sdk-web'` |
+| 1.3 更新 globals | `packages/uikit-im/vite.config.ts` | `globals` 中 `'easemob-websdk': 'Easemob'` → `'im-sdk-web': 'Easemob'` |
+| 1.4 安装依赖 | 终端 | `cd packages/uikit-im && pnpm install` |
 
 **验证**：
 1. `pnpm install` 成功，无 peer dependency 警告
@@ -50,7 +50,7 @@ Task 1: 构建配置
 
 | 子任务 | 文件 | 具体操作 |
 |--------|------|---------|
-| 2.1 重命名常量键 | `packages/uikit/src/constants/index.ts` | `TXT` → `TEXT`, `IMG` → `IMAGE`, `AUDIO` → `VOICE`, `LOC` → `LOCATION` |
+| 2.1 重命名常量键 | `packages/uikit-im/src/constants/index.ts` | `TXT` → `TEXT`, `IMG` → `IMAGE`, `AUDIO` → `VOICE`, `LOC` → `LOCATION` |
 | 2.2 更新值 | 同上 | `'txt'` → `'text'`, `'img'` → `'image'`, `'audio'` → `'voice'`, `'loc'` → `'location'` |
 | 2.3 新增 COMBINE | 同上 | 新增 `COMBINE: 'combine'` |
 
@@ -67,7 +67,7 @@ Task 1: 构建配置
 
 ### 子任务 3.1: 定义独立 Message 类型
 
-**文件**：`packages/uikit/src/store/message.ts`
+**文件**：`packages/uikit-im/src/store/message.ts`
 
 移除 `import type { EasemobChat } from 'easemob-websdk'`，重写 `Message` 类型：
 
@@ -148,7 +148,7 @@ export interface Message extends MessageUiExtension {
 
 | 子任务 | 文件 | 操作 |
 |--------|------|------|
-| 4.1 切换导入源 | `packages/uikit/src/sdk/types.ts` | `import type { EasemobChat } from 'easemob-websdk'` → `import type { ChatClient as SdkChatClient, InitConfig } from 'im-sdk-web'` |
+| 4.1 切换导入源 | `packages/uikit-im/src/sdk/types.ts` | `import type { EasemobChat } from 'easemob-websdk'` → `import type { ChatClient as SdkChatClient, InitConfig } from 'im-sdk-web'` |
 | 4.2 `ClientConfig` | 同上 | 从 `EasemobChat.ConnectionParameters & { debug?: boolean }` → 基于 `InitConfig` 扩展 |
 | 4.3 `ChatClient` | 同上 | `EasemobChat.Connection` → `SdkChatClient` |
 | 4.4 `ChatEventHandler` | 同上 | `EasemobChat.EventHandlerType` → 新 SDK 事件处理器映射类型 |
@@ -167,7 +167,7 @@ export interface Message extends MessageUiExtension {
 
 **目标**：UIKitClient 从包装 `EasemobChat.Connection` 改为包装 `ChatClient`（含 manager 体系）。
 
-**文件**：`packages/uikit/src/sdk/client.ts`
+**文件**：`packages/uikit-im/src/sdk/client.ts`
 
 ### 5.1 初始化变更
 
@@ -258,7 +258,7 @@ export interface Message extends MessageUiExtension {
 
 **目标**：按 Manager 分离事件注册，接入新 SDK 的 WebSocket 驱动事件体系。
 
-**文件**：`packages/uikit/src/sdk/event-handler.ts`
+**文件**：`packages/uikit-im/src/sdk/event-handler.ts`
 
 ### 6.1 连接事件注册
 
@@ -363,7 +363,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.1 use-client.ts
 
-**文件**：`packages/uikit/src/composables/use-client.ts`
+**文件**：`packages/uikit-im/src/composables/use-client.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -374,7 +374,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.2 use-chat.ts（改动最大）
 
-**文件**：`packages/uikit/src/composables/use-chat.ts`
+**文件**：`packages/uikit-im/src/composables/use-chat.ts`
 
 **移除**：`import type { EasemobChat } from 'easemob-websdk'`
 
@@ -429,7 +429,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.3 use-conversation.ts（WebSocket 驱动）
 
-**文件**：`packages/uikit/src/composables/use-conversation.ts`
+**文件**：`packages/uikit-im/src/composables/use-conversation.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -445,7 +445,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.4 use-contact.ts
 
-**文件**：`packages/uikit/src/composables/use-contact.ts`
+**文件**：`packages/uikit-im/src/composables/use-contact.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -456,7 +456,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.5 use-blocklist.ts
 
-**文件**：`packages/uikit/src/composables/use-blocklist.ts`
+**文件**：`packages/uikit-im/src/composables/use-blocklist.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -464,7 +464,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.6 use-group.ts（WebSocket 驱动）
 
-**文件**：`packages/uikit/src/composables/use-group.ts`
+**文件**：`packages/uikit-im/src/composables/use-group.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -477,7 +477,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.7 use-presence.ts
 
-**文件**：`packages/uikit/src/composables/use-presence.ts`
+**文件**：`packages/uikit-im/src/composables/use-presence.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -486,7 +486,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.8 use-quote.ts
 
-**文件**：`packages/uikit/src/composables/use-quote.ts`
+**文件**：`packages/uikit-im/src/composables/use-quote.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -496,7 +496,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.9 store/conversation.ts
 
-**文件**：`packages/uikit/src/store/conversation.ts`
+**文件**：`packages/uikit-im/src/store/conversation.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -504,7 +504,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 7.10 store/group.ts
 
-**文件**：`packages/uikit/src/store/group.ts`
+**文件**：`packages/uikit-im/src/store/group.ts`
 
 | 操作 | 具体改动 |
 |------|---------|
@@ -612,7 +612,7 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 ### 9.1 format-message.ts
 
-**文件**：`packages/uikit/src/utils/format-message.ts`
+**文件**：`packages/uikit-im/src/utils/format-message.ts`
 
 | 行号 | 旧代码 | 新代码 |
 |------|--------|--------|
@@ -660,10 +660,10 @@ function handleIncomingMessage(sdkMsg: SdkMessage) {
 
 完成所有代码修改后：
 
-1. **TypeScript 编译**：`cd packages/uikit && npx vue-tsc --noEmit`，修复所有类型错误
-2. **Vite 构建**：`cd packages/uikit && pnpm build`，确保 UMD + ES 双格式构建通过
+1. **TypeScript 编译**：`cd packages/uikit-im && npx vue-tsc --noEmit`，修复所有类型错误
+2. **Vite 构建**：`cd packages/uikit-im && pnpm build`，确保 UMD + ES 双格式构建通过
 3. **Demo 运行**：`cd apps/demo && pnpm dev`，验证登录、收发消息、会话列表等核心流程
-4. **Storybook**：`cd packages/uikit && pnpm story:dev`，验证组件文档正常渲染
+4. **Storybook**：`cd packages/uikit-im && pnpm story:dev`，验证组件文档正常渲染
 
 ---
 

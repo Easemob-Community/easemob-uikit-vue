@@ -24,7 +24,7 @@
 - `icon-map` 按每个图标解析根节点 fill/stroke 绘制属性，`EmIcon` 已有**填充式 / 描边式两个渲染分支**——面性图标接入**不需要动渲染逻辑**。
 - 接入方式 = 加第二个注册表（`assets/icons-filled/**/*.svg`，同一套 `import.meta.glob` 逻辑），`getIconSvg(name, style?)` 按主题态选表，面性缺失的 32 个 name **自动回落线性版**。
 - 体积：88 个 SVG（约 1-2KB/个）eager 进 bundle 约增加 50-150KB raw（gzip 后远小于此）。可接受；若介意可对面性表做异步 `import` 按需加载，但会增加首图标渲染异步态，**不建议初版做**。
-- 注意：`面性/` 与 `线性/` 源目录当前在 `.gitignore` 中（设计源资产不入库），规范化产物需像 `assets/icons-next/` 一样提交进包内（建议路径 `packages/uikit/src/assets/icons-filled/`）。
+- 注意：`面性/` 与 `线性/` 源目录当前在 `.gitignore` 中（设计源资产不入库），规范化产物需像 `assets/icons-next/` 一样提交进包内（建议路径 `packages/uikit-im/src/assets/icons-filled/`）。
 
 ## 方案权衡
 
@@ -49,7 +49,7 @@ A 作为主题能力（品牌定制入口），B 作为组件内置约定（默�
 
 ## 落地计划（待确认后实施）
 
-1. 归一化面性集 → `packages/uikit/src/assets/icons-filled/`（复用 prepare 脚本规则，产物提交入库）。
+1. 归一化面性集 → `packages/uikit-im/src/assets/icons-filled/`（复用 prepare 脚本规则，产物提交入库）。
 2. `icon-map.ts` 支持双注册表；`EmIcon` 按 `themeStore.iconStyle` 选表 + 缺失回落线性。
 3. 主题配置新增 `iconStyle`（`store/theme.ts` / `use-theme.ts` / `uikit-provider.vue` 的 `theme` prop），demo 外观面板加切换开关。
 4. 组件选中态配对（导航选中、多选圈、已读态等），逐点接入。

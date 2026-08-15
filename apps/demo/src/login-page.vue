@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmIcon, useClient } from '@easemob/uikit'
+import { EmIcon, useClient } from '@easemob/uikit-im'
 import { demoPresetUsers } from './composables/use-demo-settings'
 import type { DemoPresetUser } from './composables/use-demo-settings'
 

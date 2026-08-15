@@ -1,7 +1,7 @@
 # easemob-uikit-integration（集成侧 Agent Skill）
 
 面向**下游接入者**的 Agent 技能：让 AI 助手（Claude Code / Cursor / 其他支持 Agent Skills 的客户端）在
-帮用户把 `@easemob/uikit` 接入 Vue3 项目时，能正确写出安装、`EmUIKitProvider` 配置、组件用法、主题与
+帮用户把 `@easemob/uikit-im` 接入 Vue3 项目时，能正确写出安装、`EmUIKitProvider` 配置、组件用法、主题与
 H5 适配代码。
 
 > 与仓库 `.agent/skills/*`（维护者内部开发技能）**相互独立**，本目录描述的是**发布包的对外契约**。

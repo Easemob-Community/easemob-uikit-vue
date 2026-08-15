@@ -40,7 +40,7 @@ integrations/skills/
 ```jsonc
 {
   "mcpServers": {
-    "easemob-uikit": {
+    "easemob-uikit-im": {
       "command": "npx",
       "args": ["-y", "@easemob/uikit-mcp"]
     }

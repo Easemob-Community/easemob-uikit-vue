@@ -36,27 +36,27 @@
 
 ## 业务模块子组件（高级定制用）
 
-`@easemob/uikit` 还导出大量业务模块子组件，供深度定制插槽/列表项时复用。按域分组（均为 `Em` 前缀具名导出）：
+`@easemob/uikit-im` 还导出大量业务模块子组件，供深度定制插槽/列表项时复用。按域分组（均为 `Em` 前缀具名导出）：
 
 - 会话：`EmConversationList`、`EmConversationItem`、`EmConversationTabs`、`EmNewChatModal`、`EmAddContactModal`、`EmCreateGroupModal`
 - 聊天：`EmChat`、`EmMessageList`、`EmMessageInput`、`EmMessageVirtualList`、`EmMessageRenderer`、`EmMessageBubbleWrapper`、`EmMessageInteractive`、`EmMessageActionMenu`、`EmMentionPicker`、`EmForwardModal`、`EmGroupReadReceiptModal`、`EmChatInfoDrawer`，以及各类型气泡 `EmTextMessage` / `EmImageMessage` / `EmVoiceMessage` / `EmVideoMessage` / `EmFileMessage` / `EmCustomMessage` / `EmLocationMessage`
 - 联系人：`EmContactList`、`EmContactItem`、`EmContactDetail`、`EmContactAlphabetNav`、`EmContactNoticeList` 等
 - 群组：`EmGroupList`、`EmGroupItem`、`EmGroupDetail`、`EmGroupMemberList`、`EmGroupAnnouncement`、`EmInviteMemberModal`、`EmGroupManagementSection`、`EmGroupMuteList`、`EmGroupBlocklist`、`EmGroupAllowlist`、`EmGroupSharedFileList`、`EmGroupJoinRequestList`
 
-> 完整导出以 `@easemob/uikit` 包内具名导出为准；上表是高频入口。
+> 完整导出以 `@easemob/uikit-im` 包内具名导出为准；上表是高频入口。
 
 ## 按需引入 resolver
 
 ```ts
 import Components from 'unplugin-vue-components/vite'
-import { EasemobUIKitResolver } from '@easemob/uikit/resolver'
+import { EasemobUIKitResolver } from '@easemob/uikit-im/resolver'
 
 export default {
   plugins: [Components({ resolvers: [EasemobUIKitResolver()] })],
 }
 ```
 
-resolver 默认解析 `Em` 前缀组件到 `@easemob/uikit`，可传 `{ prefix: 'My' }` 自定义。
+resolver 默认解析 `Em` 前缀组件到 `@easemob/uikit-im`，可传 `{ prefix: 'My' }` 自定义。
 
 ## 组合式函数（与组件同构）
 

@@ -9,11 +9,11 @@
 ## 安装
 
 ```bash
-pnpm add @easemob/uikit pinia vue
+pnpm add @easemob/uikit-im pinia vue
 ```
 
-> `pinia` 与 `vue` 是 `@easemob/uikit` 的 peerDependencies，**接入方必须显式安装**。
-> `@easemob/uikit` 入口已内置主题样式，接入后**无需**再单独引入 CSS。
+> `pinia` 与 `vue` 是 `@easemob/uikit-im` 的 peerDependencies，**接入方必须显式安装**。
+> `@easemob/uikit-im` 入口已内置主题样式，接入后**无需**再单独引入 CSS。
 
 ## 全局注册
 
@@ -21,7 +21,7 @@ pnpm add @easemob/uikit pinia vue
 // main.ts
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import UIKit from '@easemob/uikit'
+import UIKit from '@easemob/uikit-im'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -46,7 +46,7 @@ app.mount('#app')
 ```ts
 // vite.config.ts
 import Components from 'unplugin-vue-components/vite'
-import { EasemobUIKitResolver } from '@easemob/uikit/resolver'
+import { EasemobUIKitResolver } from '@easemob/uikit-im/resolver'
 
 export default {
   plugins: [
@@ -66,7 +66,7 @@ export default {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
 </script>
 
 <template>
@@ -88,7 +88,7 @@ import { EmUIKitProvider } from '@easemob/uikit'
 不依赖容器组件、或需要延迟初始化时，用 `useClient()`：
 
 ```ts
-import { useClient } from '@easemob/uikit'
+import { useClient } from '@easemob/uikit-im'
 
 const { init, login, logout, isLoggedIn, currentUser } = useClient()
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmUIKitProvider } from '@easemob/uikit'
-import type { UiContact } from '@easemob/uikit'
+import { EmUIKitProvider } from '@easemob/uikit-im'
+import type { UiContact } from '@easemob/uikit-im'
 
 const show = ref(false)
 const addedLog = ref('')

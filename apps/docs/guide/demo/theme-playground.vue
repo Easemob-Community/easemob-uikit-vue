@@ -9,7 +9,7 @@
  * （--uikit-*）+ data-uikit-density 属性生效，仅作用于演练场内部，不污染全局主题。
  */
 import { computed, reactive } from 'vue'
-import { EmConversationContainer, EmUIKitProvider } from '@easemob/uikit'
+import { EmConversationContainer, EmUIKitProvider } from '@easemob/uikit-im'
 import type { ConfigItem } from '../../.vitepress/components/DocsConfigPanel.vue'
 import { injectMockConversations } from '../../components/conversation-container/demo/playground/mock'
 
