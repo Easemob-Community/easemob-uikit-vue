@@ -22,6 +22,7 @@ const zhCN: LocaleMessages = {
   'chatroom.error.joinFailed': '加入聊天室失败',
   'chatroom.error.leaveFailed': '退出聊天室失败',
   'chatroom.error.sendFailed': '消息发送失败',
+  'chatroom.error.historyFailed': '历史消息拉取失败，可向上翻页重试',
   'chatroom.error.operationFailed': '操作失败，请稍后重试',
 
   // 容器 / 模块 UI 文案

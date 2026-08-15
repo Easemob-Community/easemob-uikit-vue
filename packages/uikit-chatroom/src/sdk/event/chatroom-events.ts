@@ -76,7 +76,6 @@ export function registerChatroomEventHandlers(
     onChatRoomDestroyed: (payload) => {
       if (!isActiveRoom(payload.chatRoomId))
         return
-      eventLog.info('onChatRoomDestroyed', payload)
       stores.chatroom.markDestroyed()
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.destroyed'))
       callbacks.onDestroyed?.()
@@ -97,8 +96,8 @@ export function registerChatroomEventHandlers(
     onRemovedFromChatRoom: (payload) => {
       if (!isActiveRoom(payload.chatRoomId))
         return
-      eventLog.info('onRemovedFromChatRoom', payload)
-      stores.chatroom.markKicked()
+      // 记录 SDK 原因码，容器 kicked 事件透传给业务（P2 review P1-2）
+      stores.chatroom.markKicked(payload.reason)
       pushNotice(stores, payload.chatRoomId, t('chatroom.notice.kicked'))
       callbacks.onKicked?.(payload.reason)
     },
@@ -124,12 +123,13 @@ export function registerChatroomEventHandlers(
     },
     onAllowListAdded: (payload) => {
       // 白名单变更属管理侧状态（本步不维护白名单缓存），仅记日志不上屏
+      // （debug 级别：高频管理事件不刷屏，P2 review P2-11）
       if (isActiveRoom(payload.chatRoomId))
-        eventLog.info('onAllowListAdded', payload)
+        eventLog.debug('onAllowListAdded', payload)
     },
     onAllowListRemoved: (payload) => {
       if (isActiveRoom(payload.chatRoomId))
-        eventLog.info('onAllowListRemoved', payload)
+        eventLog.debug('onAllowListRemoved', payload)
     },
     onAdminAdded: (payload) => {
       if (!isActiveRoom(payload.chatRoomId) || !payload.admin)

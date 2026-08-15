@@ -31,13 +31,10 @@ export interface ChatroomMessageBucket {
   serverIdIndex: Set<string>
 }
 
-/** 新桶默认封顶条数（setDefaultMaxMessages 修改；已存在的桶不受影响） */
-let defaultMaxMessages: number = CHATROOM_MESSAGE_DEFAULTS.MAX_MESSAGES
-
 function createBucket(): ChatroomMessageBucket {
   return {
     messages: [],
-    maxMessages: defaultMaxMessages,
+    maxMessages: CHATROOM_MESSAGE_DEFAULTS.MAX_MESSAGES,
     historyLoaded: false,
     loadingHistory: false,
     historyCursor: undefined,
@@ -46,11 +43,6 @@ function createBucket(): ChatroomMessageBucket {
     flushTimer: null,
     serverIdIndex: new Set(),
   }
-}
-
-/** 设置后续新建消息桶的封顶条数（composable 的 maxMessages 选项走这里，未进房时也生效） */
-function setDefaultMaxMessages(value: number) {
-  defaultMaxMessages = Math.max(1, value)
 }
 
 /**
@@ -252,7 +244,6 @@ export const useChatroomMessageStore = defineStore('chatroomMessage', () => {
     loadingHistoryFor,
     historyHasMoreFor,
     historyCursorFor,
-    setDefaultMaxMessages,
     addMessage,
     enqueueMessages,
     flushBuffer,

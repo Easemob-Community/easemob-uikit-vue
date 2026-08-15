@@ -7,26 +7,24 @@ import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
 
 export interface UseChatroomMessageOptions {
-  /** 消息渲染列表封顶条数（默认 200，防大直播间刷屏） */
-  maxMessages?: number
+  // 封顶条数配置已收敛到 useChatroom({ maxMessages })（进房时按房间生效，P2 review P1-4）：
+  // 本 composable 只读渲染列表，不再持有全局可变默认值（避免多实例互相污染）。
 }
 
 /**
  * 聊天室消息收发渲染管线（活动房间视图 = UI 房）：
  * - 发送走 `ChatManager`（conversationType='chatRoom'），乐观上屏（sending → sent/failed）；
- *   发送侧频率限制由 SDK 控制，触发时限流错误 toast 并把消息标记 failed（不静默失败）；
+ *   发送侧频率限制由 SDK 控制，触发时限流错误 toast（core error.trafficLimit 文案
+ *   「发送频率过快，请稍后重试」）并把消息标记 failed（不静默失败）；
  * - 历史拉取经 `getHistoryMessages`（进房由 useChatroom 触发，此处暴露向上翻页）；
  * - 接收侧封顶/批量合并策略在 chatroom-message store 内按 roomId 分桶接线
  *   （本层基于活动房间 ID 组装渲染视图；P3 信令房经显式 roomId 发送/订阅）。
  */
-export function useChatroomMessage(options: UseChatroomMessageOptions = {}) {
+export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
   const ctx = useCoreUIKit()
   const chatroomStore = useChatroomStore()
   const messageStore = useChatroomMessageStore()
   const toast = useToast()
-
-  if (options.maxMessages !== undefined)
-    messageStore.setDefaultMaxMessages(options.maxMessages)
 
   const adapter = new ChatroomAdapter(ctx.client.value)
 

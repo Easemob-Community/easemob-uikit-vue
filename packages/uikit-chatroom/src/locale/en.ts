@@ -22,6 +22,7 @@ const en: LocaleMessages = {
   'chatroom.error.joinFailed': 'Failed to join the chatroom',
   'chatroom.error.leaveFailed': 'Failed to leave the chatroom',
   'chatroom.error.sendFailed': 'Failed to send the message',
+  'chatroom.error.historyFailed': 'Failed to load history messages, try scrolling up to retry',
   'chatroom.error.operationFailed': 'Operation failed, please try again later',
 
   // Container / module UI copy

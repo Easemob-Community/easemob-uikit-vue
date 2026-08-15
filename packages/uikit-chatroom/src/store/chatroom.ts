@@ -30,11 +30,19 @@ export interface ChatroomRoomState {
   announcement: string
   /** 房间自定义属性 KV 缓存（四层同步之一：本地即时生效，见 useChatroomAttributes） */
   attributes: ChatroomAttributes
-  /** join 竞态令牌（单调递增，removeRoom 后重建归零） */
+  /** join 竞态令牌（取全局单调计数器，removeRoom 重建后不回退，防陈旧 ACK 撞号） */
   joinToken: number
   /** 断线前处于 joined：连接恢复后需自动重进（useChatroom 装配消费） */
   pendingRejoin: boolean
+  /** 被移出房间的 SDK 原因码（onRemovedFromChatRoom 事件驱动；供容器 kicked 事件透传） */
+  kickReason?: number
 }
+
+/**
+ * 全局 join 令牌计数器：跨房间单调递增，removeRoom 后重建的房间也不会与
+ * 历史令牌撞号（leave-in-flight + 同房重入场景下陈旧 ACK 不会被误接受，P2 review）
+ */
+let globalJoinToken = 0
 
 function createRoomState(roomId: string): ChatroomRoomState {
   return reactive({
@@ -50,6 +58,7 @@ function createRoomState(roomId: string): ChatroomRoomState {
     attributes: {},
     joinToken: 0,
     pendingRejoin: false,
+    kickReason: undefined,
   })
 }
 
@@ -85,6 +94,7 @@ export const useChatroomStore = defineStore('chatroom', () => {
   const attributes = computed<ChatroomAttributes>(() => activeRoom.value?.attributes ?? {})
   const joinToken = computed(() => activeRoom.value?.joinToken ?? 0)
   const pendingRejoin = computed(() => activeRoom.value?.pendingRejoin ?? false)
+  const kickReason = computed(() => activeRoom.value?.kickReason)
 
   const isJoined = computed(() => status.value === CHATROOM_STATUS.JOINED)
   const admins = computed(() => members.value.filter(m => m.role === CHATROOM_MEMBER_ROLE.ADMIN))
@@ -107,10 +117,10 @@ export const useChatroomStore = defineStore('chatroom', () => {
     return rooms.has(id)
   }
 
-  /** 领取指定房间的 join 令牌（每次 join 调用一次；joinToken 单调递增不回退） */
+  /** 领取指定房间的 join 令牌（每次 join 调用一次；取全局单调计数器，重建不回退） */
   function nextJoinToken(id: string): number {
     const room = ensureRoom(id)
-    room.joinToken += 1
+    room.joinToken = ++globalJoinToken
     return room.joinToken
   }
 
@@ -149,13 +159,14 @@ export const useChatroomStore = defineStore('chatroom', () => {
       room.status = CHATROOM_STATUS.LEAVING
   }
 
-  /** 被移出房间（onRemovedFromChatRoom 事件驱动）；作用于活动房间 */
-  function markKicked() {
+  /** 被移出房间（onRemovedFromChatRoom 事件驱动）；作用于活动房间，记录 SDK 原因码 */
+  function markKicked(reason?: number) {
     const room = activeRoom.value
     if (!room)
       return
     room.status = CHATROOM_STATUS.KICKED
     room.pendingRejoin = false
+    room.kickReason = reason
   }
 
   /** 房间解散（onChatRoomDestroyed 事件驱动）；作用于活动房间 */
@@ -323,6 +334,7 @@ export const useChatroomStore = defineStore('chatroom', () => {
     attributes,
     joinToken,
     pendingRejoin,
+    kickReason,
     isJoined,
     admins,
     owner,

@@ -54,17 +54,33 @@ export function useChatroomMember() {
     }
   }
 
+  /** 成员列表加载中（in-flight 守卫，防快速滚动连续 loadMore 并发拉取同游标重复追加） */
+  let loadingMembers = false
+
   /**
    * 加载成员列表（游标分页）。
    * 大房间不做全量加载：成员面板只渲染已加载页，滚动到底部传 loadMore=true 继续加载。
    */
   async function loadMembers(loadMore = false, pageSize?: number): Promise<void> {
-    const id = requireRoomId()
-    const page = await run(() =>
-      adapter.getMemberList(id, loadMore ? chatroomStore.memberCursor : undefined, pageSize))
-    if (chatroomStore.roomId !== id)
+    if (loadingMembers)
       return
-    chatroomStore.setMemberPage(page.items, page.cursor, page.hasMore ?? false, loadMore)
+    const id = requireRoomId()
+    loadingMembers = true
+    try {
+      const page = await run(() =>
+        adapter.getMemberList(id, loadMore ? chatroomStore.memberCursor : undefined, pageSize))
+      if (chatroomStore.roomId !== id)
+        return
+      chatroomStore.setMemberPage(page.items, page.cursor, page.hasMore ?? false, loadMore)
+    }
+    finally {
+      loadingMembers = false
+    }
+  }
+
+  /** 当前用户是否在白名单中（全员禁言时白名单成员仍可发言；P2 review P1-8） */
+  function isInAllowlist(): Promise<boolean> {
+    return run(() => adapter.checkIfInAllowList(requireRoomId()))
   }
 
   /** 刷新禁言名单（管理面板打开时调用） */
@@ -122,6 +138,7 @@ export function useChatroomMember() {
     canManage,
     loadMembers,
     refreshMuteList,
+    isInAllowlist,
     muteMembers,
     unmuteMembers,
     muteAll,

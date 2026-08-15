@@ -9,7 +9,7 @@ import type {
   UserInfo,
 } from 'easemob-websdk'
 import type { ManagerHost, UiMessage } from '@easemob/uikit-core'
-import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, formatSdkError } from '@easemob/uikit-core'
+import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, formatSdkError, normalizeUserId } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import type {
   Chatroom,
@@ -29,15 +29,8 @@ import {
 
 const adapterLog = createLogger('UIKit:ChatroomAdapter')
 
-/**
- * 归一化用户标识（自己其他设备发送时 from 为 `当前用户ID/来源设备ID`）。
- * 与 IM 场景包 message-adapter 同一规则，聊天室包独立实现一份（禁止跨场景包引用）。
- */
-export function normalizeUserId(id: string): string {
-  if (!id)
-    return id
-  return id.split('/')[0]!.split('@')[0]!.split('#')[0]!
-}
+/** 归一化用户标识：P2 review 上提至 core（与 uikit-im 共用同一实现），此处 re-export 兼容既有导入 */
+export { normalizeUserId }
 
 /**
  * SDK Message → UIKit UiMessage（聊天室场景：无未读/无回执语义，
