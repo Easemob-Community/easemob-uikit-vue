@@ -593,18 +593,21 @@
 - **修复**：已于 2026-07-28 修复。`group-member-list.vue` 移除 `localMembers` 本地副本，成员列表统一读 store，`MEMBERS_JOINED/EXITED` 事件更新 store 后打开中的成员页即时刷新，与抽屉头像九宫格数据源一致。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D69. Popup 无键盘可访问性
+### [x] D69. Popup 无键盘可访问性
 
 - **现象**：全文无 ESC 关闭、无 focus trap、无 `role="dialog"`/`aria-modal`，键盘/读屏用户无法关闭弹层。
 - **证据**：`components/popup/popup.vue`。
 - **建议修法**：至少加 ESC → close（可配 prop），补 `role="dialog"`/`aria-modal`。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`popup.vue` 已有 `useEscToClose`（`closeOnEsc` prop 可配，L207）+ 模板 `role="dialog"`/`:aria-modal="props.overlay"`（L287-288）。focus trap 未实现（需引入 focus-trap 依赖，属增强项，可另立条目）。
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D70. 弹层关闭事件重复触发链
+### [x] D70. 弹层关闭事件重复触发链
 
 - **现象**：popup 遮罩点击同时 emit `update:show` + `close`；user-card-modal 两个 handler 各自再 emit `update:show(false)` → 消费者收两次；presence-selector-modal 更糟：setter 发 close，`@close→onCancel` 又走一次 setter → `close` 发两次，`onPresenceSelectorClose` 连带 `loadData()` 跑两遍。
 - **证据**：`components/popup/popup.vue:159-162`；`components/user-card/user-card-modal.vue:170-175,183-184`；`components/presence-selector/presence-selector-modal.vue:26-33,46-48`。
 - **建议修法**：Popup 只 emit `update:show`，`close` 由消费者自行推导；或 modal 层去掉重复转发。
+- **修复**：已于 2026-08-15 核销 + 补修。`user-card-modal.vue` 已修（`onClose` 注释明确「Popup 的 close 事件已携带 update:show(false)，不再重复 emit」，只发 `close`）；**本轮补修 `presence-selector-modal.vue`**：移除 `showModel` computed setter 的重复转发（原 `@update:show → setter → 再 emit` 导致 `update:show` 双发），改为 Popup `@update:show` 直接转发 + `@close` 转发，`onCancel` 显式 `emit('update:show', false)` + `emit('close')` 各一次；消费者 `update:show`/`close` 均单发。
+- **关联 skill**：`uikit-component-authoring`
 - **关联 skill**：`uikit-component-authoring`
 
 ### [x] D71. Avatar 图片加载失败无占位
@@ -631,25 +634,31 @@
 - **修复**：已于 2026-07-28 修复。`input.vue` 删除从未使用的 `rows` prop（全仓无调用方）；search/filled/ghost/underline 四变体去掉无条件 `padding-left: 28px`，有 prefixIcon 时由 `.uikit-input--with-prefix`（优先级更高）接管缩进，渲染结果与改前一致。
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D74. emoji-picker 关闭能力薄弱
+### [x] D74. emoji-picker 关闭能力薄弱
 
 - **现象**：只能靠右上角 × 关闭，无遮罩、无外部点击关闭、select 后不收起（也不提供该选项）。
 - **证据**：`components/emoji-picker/emoji-picker.vue:49`。
 - **建议修法**：加 `closeOnSelect` / 外部点击关闭，或明确由 Popup 包裹使用。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`emoji-picker.vue` 已有 `closeOnSelect` prop（默认 false，select 后经 `emit('update:show', false)` 收起）+ 右上角关闭按钮；外部点击关闭由 Popup 包裹（`close-on-click-overlay`）提供，组件自身 `update:show` 受控。
+- **关联 skill**：`uikit-component-authoring`
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D75. 弹层 z-index 体系单薄
+### [x] D75. 弹层 z-index 体系单薄
 
 - **现象**：所有弹层默认 zIndex 2000，toast 硬编码 9999。嵌套弹窗（user-card-modal → presence-selector-modal）同级靠 DOM 顺序取胜，非常规关闭顺序下有被压风险。
 - **证据**：`components/popup/popup.vue:31`；`components/toast/toast.vue:45`。
 - **建议修法**：引入递增 z-index 管理。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`utils/z-index.ts` 已实现全局递增分配器（`nextZIndex()` 从 2000 起每次 +1 不复用，`resetZIndex()` 供测试/登出），`popup.vue` 打开时经 `allocatedZIndex = nextZIndex()` 取递增 z-index，后开弹层必在上层；toast 9999 保持（Toast 独立于弹层体系，须恒高于所有弹层）。
+- **关联 skill**：`uikit-component-authoring`
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D76. presence-selector 空自定义文本可提交
+### [x] D76. presence-selector 空自定义文本可提交
 
 - **现象**：`onConfirmCustom` trim 后为空也 emit `select('custom', '')`。
 - **证据**：`components/presence-selector/presence-selector.vue:79-82`。
 - **建议修法**：空值禁用或回退。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`onConfirmCustom`（L123-129）已 `const text = customText.value.trim(); if (!text) return` 空值短路，不再提交空自定义文本。
+- **关联 skill**：`uikit-component-authoring`
 - **关联 skill**：`uikit-component-authoring`
 
 ### [x] D77. 移动端强制 simple 输入模式，tiptap 富文本配置被静默忽略
@@ -660,11 +669,13 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`modules/chat/message-input/index.vue:108-115` 移动端 + `mode:'rich'` 时已 `logger.warn('[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略')`，不再是静默丢弃；「移动端固定渲染 H5Input，不走 simple/rich 分支」已有注释说明。文档标注本轮补充：`apps/docs/guide/h5-adaptation.md` 新增「输入框模式」小节。multi-line 移动端形态仍属能力缺口，如需支持另立新条目。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D78. 长按滚动锁对真实滚动容器无效，`preventScroll` 名不副实
+### [x] D78. 长按滚动锁对真实滚动容器无效，`preventScroll` 名不副实
 
 - **现象**：`use-long-press.ts` 锁 `document.body.overflow`，而消息列表/会话列表是内部容器滚动，锁不住；实际防冲突只靠 10px `moveThreshold`。功能上可用，但 `preventScroll` 选项名不副实。
 - **证据**：`composables/use-long-press.ts:42-52`。
 - **建议修法**：锁定实际滚动容器，或文档/命名说明只锁 body。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`use-long-press.ts` JSDoc 已明确「`preventScroll` 仅锁 body，对内部滚动容器无效，防冲突主要依赖 `moveThreshold`」（L8-9），命名/文档说明已补，与实现一致。
+- **关联 skill**：`uikit-h5-adaptation`
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [x] D79. 虚拟滚动模式下拉加载静默失效

@@ -38,15 +38,6 @@ const currentExt = computed(() => {
   return get(userId).value?.ext || ''
 })
 
-const showModel = computed({
-  get: () => props.show,
-  set: (v) => {
-    emit('update:show', v)
-    if (!v)
-      emit('close')
-  },
-})
-
 async function onSelect(_status: string, ext: string) {
   try {
     await publishPresence(ext)
@@ -59,16 +50,19 @@ async function onSelect(_status: string, ext: string) {
 }
 
 function onCancel() {
-  showModel.value = false
+  // 与 Popup 关闭路径一致：update:show + close 各发一次，避免 setter 转发造成重复
+  emit('update:show', false)
+  emit('close')
 }
 </script>
 
 <template>
   <Popup
-    :show="showModel"
+    :show="props.show"
     position="center"
     :close-on-click-overlay="true"
-    @update:show="(v: boolean) => showModel = v"
+    @update:show="(v: boolean) => emit('update:show', v)"
+    @close="() => emit('close')"
   >
     <PresenceSelector
       :value="currentExt"
