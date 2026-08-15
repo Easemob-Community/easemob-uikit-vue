@@ -39,3 +39,6 @@ tmp/
 面性/
 消息状态以及未读状态/
 packages/uikit-im/src/assets/icons-next/
+
+# VitePress vite-node 加载 vite.config.ts 的临时产物（dev server 被强杀时残留）
+*.timestamp-*.mjs

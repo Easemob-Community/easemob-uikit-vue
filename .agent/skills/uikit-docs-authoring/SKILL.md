@@ -92,6 +92,27 @@
 - `.vitepress/components/`：站点级自定义组件（如 IconGallery.vue 图标画廊）；
 - `.vitepress/gen/`：gen:api 生成产物目录，提交但**禁止手改**。
 
+**双 UIKit 文档架构（2026-08-15 起）**：站点复用 VitePress `locales` 机制承载**两套并列
+文档树**（非多语言，两树 lang 均为 zh-CN）：
+
+- `root`（label「单群聊 UIKit」）：既有 uikit-im 文档（URL 无前缀），nav/sidebar 在
+  `locales.root.themeConfig`；
+- `chatroom`（label「聊天室 UIKit」）：uikit-chatroom 文档骨架（`chatroom/` 目录：index /
+  guide / components，URL 前缀 `/chatroom/`），nav/sidebar 在 `locales.chatroom.themeConfig`；
+- **locale key 必须不带斜杠**：`root` 是默认 locale 保留字，非 root key 会被拼成 `/<key>/`
+  正则做前缀匹配——写成 `'/'` / `'/chatroom/'` 会拼出 `'//'` / `'//chatroom//'` 永不匹配，
+  所有页面回退 `root` 而 `locales['root']` 不存在，**两套 nav/sidebar 全部丢失**（2026-08-15
+  事故）；sidebar 的路径前缀（`'/chatroom/guide/'` 等）与 nav link（`/chatroom/...`）不受影响；
+- per-locale `themeConfig` 对顶层浅合并覆盖，所以 **nav/sidebar 必须写在各自 locale 内**，
+  顶层 `themeConfig` 只留共享项（logo/outline/search/footer/editLink 等）；
+- 顶部标题旁切换器：`.vitepress/theme/components/UiKitDocsSwitcher.vue`（`#nav-bar-title-after`
+  插槽），按路由前缀判定上下文；桌面端默认「语言」下拉已被 style.css 隐藏（
+  `.VPNavBar .VPNavBarTranslations`），移动端菜单内切换入口保留；
+- 聊天室版本宏 `__EASEMOB_UIKIT_CHATROOM_VERSION__` 由 vite.config.ts 注入，包未落地时为空串，
+  hero 徽章降级为仅产品名；`@easemob/uikit-chatroom` alias 已预置（包落地后 demo 可直接引用）。
+- 新增聊天室文档页 = 在 `chatroom/` 下建页 + 在 `locales.chatroom.themeConfig.sidebar`
+  登记；gen:api 白名单待聊天室组件落地后接入。
+
 ## 2. 组件文档写作规范（components/<name>.md）
 
 标准页面结构（参考 button.md）：
@@ -223,8 +244,17 @@
 - **alias**：`@easemob/uikit-im` → `packages/uikit-im/src`（文档站 demo 直接编译源码，
   与 demo 应用源码模式同思路；注意这里没有 theme 子路径 alias，demo 内不要
   import `@easemob/uikit-im/theme`，组件样式由 `.vue` 自带）；
-- **版本注入**：`define.__EASEMOB_UIKIT_VERSION__` 构建期读 packages/uikit-im 的
-  package.json（首页徽章/页脚 copyright 使用）；
+- **版本注入（双轨 define，勿删任一轨）**：
+  - 裸宏 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__` / `__EASEMOB_UIKIT_CORE_VERSION__` /
+    `__EASEMOB_UIKIT_CHATROOM_VERSION__`：三包源码经 alias 直连，docs demo 挂载 Provider 时包内会
+    求值这些宏（`clientVersion` 等）。dev 下靠 `@vite/env` 注入 `globalThis`、build 由 vite:define
+    静态替换，demo 应用同款约定；
+  - `import.meta.env.EASEMOB_UIKIT_*` 自定义键：**站点主题侧代码（Layout.vue 版本徽章）专用**。
+    裸宏在「dev server 配置过期（define 缺键）而文件已 HMR」时 ReferenceError 白屏（2026-08-15
+    事故），import.meta.env 缺键仅得 undefined 优雅降级，故主题侧一律走此通道；
+  - 首页徽章/页脚版本来源：徽章经 Layout.vue 的 import.meta.env 键；**页脚 copyright 的
+    `v__EASEMOB_UIKIT_VERSION__` 是历史遗留问题**（config.ts 在 vite define 生效前加载，宏永不
+    替换，渲染为字面量），已知未修；
 - sidebar / nav 维护：新增组件页必须在 `.vitepress/config.ts` 按分类登记
   （基础/反馈/数据展示/业务模块），新增 guide 页面在 `/guide/` 分组登记；
 - 构建产物在 `.vitepress/dist`，仓库根 gitignore 覆盖。
@@ -239,7 +269,8 @@
   新增图标集时同步它的数据源；
 - `guide/changelog.md`：**单一数据源**——整页只保留说明 + `<!-- @include: ../../../CHANGELOG.md -->`，内容自动引用根 `CHANGELOG.md`，禁止在站点页手写版本段（曾发生双写分叉：1.5.0/1.5.1 只进站点、根 CHANGELOG 停在 1.4.0、package.json 停在 1.3.1）；改根 CHANGELOG 后 `cd apps/docs && pnpm build` 验证渲染与死链；
 - 文档站无多语言（lang 固定 zh-CN），文案只写中文（组件 API 注释保持中英双语，
-  那是组件侧的事）。
+  那是组件侧的事）；**注意 `locales` 配置已用于「单群聊 / 聊天室」双文档树切换**
+  （见 §1 双 UIKit 文档架构），不要再往 `locales` 里加语言条目，也不要移除现有两树。
 
 ## 6. 常用验证
 

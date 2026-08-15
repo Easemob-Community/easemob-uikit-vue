@@ -464,3 +464,10 @@
   font-size: 13px;
   line-height: 1.8;
 }
+
+/* ========== 双 UIKit 文档切换 ========== */
+/* 桌面端（≥1280px）默认「语言」下拉与标题旁自定义切换器功能重复，隐藏之；
+   移动端菜单内的切换入口（VPNavScreenTranslations）保留。 */
+.VPNavBar .VPNavBarTranslations {
+  display: none !important;
+}

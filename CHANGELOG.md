@@ -505,3 +505,24 @@
   - core 版 `EmUIKitProvider` 容器（props 子集 + 场景无关共享副作用）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`）：`EasemobUIKitCoreResolver` / `EasemobUIKitCoreImports`
 - 对外 API 零回归：`@easemob/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。
+
+
+---
+
+## @easemob/uikit-chatroom 0.1.0 (2026-08-15)
+
+### 新增
+
+- **聊天室场景包（P2 完整落地：P2-1 无头内核 + P2-2 容器/UI/demo）**：
+  - sdk 层：`Chatroom` / `ChatroomMember` / `ChatroomMuteItem` / `ChatroomAnnouncement` / `ChatroomAttributes` domain 类型；`ChatroomAdapter` 薄封装 websdk `ChatRoomManager` 全量能力（进退房/成员分页/管理员/禁言（含全员）/黑/白名单/公告/房间属性 KV/房间信息）+ `ChatManager` 聊天室消息收发与历史拉取
+  - 事件层：`registerChatroomEventHandlers` 注册 `chatRoomManager` 全量房间事件（成员进出/禁言/管理员/公告/属性/被踢/解散等）+ `chatManager` 消息事件（按 `conversationType === 'chatRoom'` 过滤，与单群聊互不污染），房间事件转系统通知插入消息流（复用 core notice 工具）
+  - store：**按「房间注册表 `Map<roomId, RoomState>` + `activeRoomId` 活动视图」两层建模**（设计文档 §5.9，单房为其特例，P3 多房间/信令房零返工）：房间状态机（idle/joining/joined/leaving/kicked/destroyed，joinToken + roomId 双重防竞态）+ 消息流**按 roomId 分桶**（无未读/无会话/无回执；渲染列表默认封顶 200 条可配 + 接收缓冲队列按 150ms 窗口批量合并）
+  - composables：`useChatroom`（join/leave/断线重连自动重进 + 进房「最近 N 条」提示）/ `useChatroomMessage`（按房发送：`sendText(text, { roomId })` 支持显式指定房间，P3 信令房契约就绪）/ `useChatroomMember`（按角色权限位）/ `useChatroomAttributes`（四层同步 + 场景前缀约定）/ `useChatroomScene`（场景预设机制与类型，内置 preset P3 落地）/ `useChatroomProvider`（不新增 Provider 概念，组合 core `useCoreUIKitProvider` + 场景 manager 注入 `[ChatManager, ChatRoomManager, UserInfoManager]`，**显式 `enableUserInfoSync: false`**——未注入 GroupManager，避免 SDK 能力校验抛错）
+  - **`EmChatroomContainer` 容器（P2-2）**：三步接入（Provider + 容器 + room-id），props（room-id / scene / auto-join / history-page-size / max-messages）+ emits（back / kicked / destroyed / join-error）+ 命名插槽（header / header-title / header-extra / toolbar / message-item / message-custom / member-item / member-panel / empty / notice / input-bar）；只消费公开 composable 契约（防「第二 API 面」，headless 契约 P3 验收同内核）；场景 features 控制公告条/成员面板显隐
+  - modules/chatroom：消息项（文本/图片/custom 兜底/系统通知/撤回标记）、输入条（文本+图片，发送即清空 + 列表内失败反馈）、成员面板（底部 Popup + 分页加载 + 禁言/踢人/管理员操作菜单）、成员项（角色徽章/禁言标记）、顶部栏（返回/人数/退出）、公告条；H5-first 样式（全屏 flex + 安全区）
+  - demo 验证页：`apps/demo` hash 路由 `#/chatroom` 独立页，嵌套在 IM Provider 内**验证两包同装**；输入房间 ID 三步接入跑通（历史拉取/消息收发/成员面板/系统通知）
+  - `chatroom.*` locale keys（zh-CN/en）经 core `mergeLocaleMessages` 并入；resolver/auto-imports（`EasemobUIKitChatroomResolver` / `EasemobUIKitChatroomImports`）经共享 `gen-aux-entries.mjs` 参数化生成
+- **两包同装硬性验收项落地（TECH-DEBT D97）**：
+  - core `sdk/client.ts` 新增 **SDK 单例配置对齐**：首次 init 的规范化配置为基准，后续 init（另一场景包）自动对齐（appKey 冲突抛错、其余字段以首次为准 + 告警、managers 追加注册不受影响）——IM + chatroom 同装不再触发 `ChatClient already initialized with different config`；
+  - uikit-im `chat-events.ts` `onMessage` / `onMessageRecalled` 忽略 `conversationType === 'chatRoom'` 消息（聊天室广播不流入 IM 会话/消息 store）。
+- **版本同步工具升级**：`changelog:check` 扩展为多包版本段校验——裸格式段归入 uikit-im 历史段，新段统一 `@easemob/<pkg>` 前缀；逐包校验最新段一致、段内无重复且 semver 降序。

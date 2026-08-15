@@ -173,6 +173,40 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 - 首屏 bundle 控制：chatroom 包独立打包、core 设为 external；**不引入 tiptap**（聊天室输入条先做 文本+表情+图片+语音转文字）；通讯录/群组代码完全不进包。
 - 复用仓库 `uikit-h5-adaptation` skill 沉淀的模式（键盘/安全区/下拉刷新/长按/viewport）。
 
+### 5.9 多房间订阅：UI 房 + 信令房（私域直播双聊天室/多聊天室架构）
+
+> **需求背景**：私域直播为保障消息到达率，常采用**双聊天室/多聊天室**架构——一个**互动直播间**承载弹幕/礼物等高频消息（上屏展示、可容忍偶发丢失），一个或多个**信令直播间**承载商品链接、上下架、连麦指令等低量高可达消息（必须可靠送达，通常不上屏、由业务层自行呈现）。2026-08-15 补充评审确认：**SDK 层已支持多房并行**（`joinChatRoom({ chatRoomId, ext, leaveOtherRooms })` 已核实，并行 join 需显式 `leaveOtherRooms: false`，服务端多房并发上限以实施时实测为准）；卡点在 UIKit 模型，按「**1 个 UI 房 + N 个信令房**」建模——多聊天室是它的一般形式，单房是 N=0 特例。
+
+- **角色语义**：
+  - **UI 房（interact）**：完整容器语义——消息流上屏、成员/禁言/公告/属性/礼物、输入条发送目标、场景预设全部生效；
+  - **信令房（signal）**：**静默订阅**——不上屏、不落消息桶、不参与任何 UI 状态（成员面板/禁言/公告一律只对 UI 房开放）；消息**透传回调**给业务层（UIKit 零渲染、零假设，连「未识别 custom 消息兜底渲染」都不做）；发送由业务显式指定 roomId。
+- **接入 API（草案）**：主房保持**显式单数 prop**（现有插槽体系零改动），信令房用数组表达，**不引入 `isMultiChatroom` 布尔开关**（数组存在即多房，消除「布尔 + 数组不一致」的非法状态）：
+
+```vue
+<EmChatroomContainer
+  room-id="room_interact"
+  :signal-rooms="[{ roomId: 'room_signal', pullHistory: false, autoRejoin: true }]"
+  @signal-message="onSignalMessage"   <!-- payload: { roomId, message } -->
+/>
+```
+
+  - **发送路由**：容器输入条默认发 UI 房；`useChatroomMessage().sendText(text, { roomId })` 显式指定信令房（商品链接/指令走这里）；**发送节流按房间独立统计**（信令房消息量小通常不触发）。
+  - **上屏策略**：UI 房消息走 5.7 全量管线（含未识别 custom 兜底）；信令房消息**只透传不出屏**，上屏与否完全由业务层经 `signal-message` 回调决定。
+  - scene config（5.5）增加 `signalRooms` 段，带货直播等 preset 默认开双房模板，业务可覆盖（符合「变种靠配置 + 插槽」哲学，不 fork）。
+- **store 建模（影响 P2 节奏，关键）**：`chatroom.ts` 按**两层**写，而不是单房间状态机——**房间注册表 `Map<roomId, RoomState>` + 活动房间视图 `activeRoomId`**（= UI 房）；join 竞态从「丢弃」改为「按 roomId 校验响应归属」；断线重连按注册表**全量重进**。**P2 启动即按此建模（单房为其特例），避免 P3 返工**；P2 验收口径不变（单房三步接入照旧）。
+- **消息管线**：`chatroom-message.ts` 按 roomId 分桶；UI 房走完整管线，信令房只订阅增量、不进桶、不渲染（零渲染成本，与 5.3 渲染节流不冲突）；`pullHistory: false` 的信令房不拉历史（语义是订阅实时指令，历史回放由业务自调 API）。
+
+### 5.10 headless 弹幕模式（无 UI 接入，一等公民）
+
+> **需求背景**：弹幕轨道/飘屏/礼物特效是直播间强差异化 UI，成熟直播间几乎不用通用消息列表渲染弹幕；业务方需要的是「连接 + 房间 + 消息流 + 发送」的数据能力，渲染完全自管。2026-08-15 补充评审确认：**headless 不是新增模式，而是当前架构的自然形态**——composable 层（5.1）本就与容器平级、不依赖容器（uikit-im 22 个 composables 已证明该路线成熟），容器只是「把 composable 状态映射成模板」的薄壳；5.9 信令房透传（`signal-message`）就是 headless 的先行实例。**决策：headless 为一等公民，与容器模式并列，同一内核、同一份 API 契约。**
+
+- **依赖方向（硬约束）**：store/composable 层**零组件 import**；容器是内核的「可选消费者」之一，**容器必须只消费公开 composable 契约，不得绕过公开 API 直取内部状态**——防止 headless 与容器 API 分叉成两套面（「第二 API 面」是唯一要防的风险）。
+- **消息消费契约（headless 友好）**：`useChatroomMessage()` 除消息列表绑定外，提供 `subscribe(fn)` 增量有序回调 + **批量消费 + 可丢弃中间帧策略**——弹幕高吞吐时业务按自身帧率消费，UIKit 只保证「增量有序 + 批量能力」，不替业务决定丢帧。
+- **渲染节流职责分层（修正 5.3 表述）**：UIKit 提供「缓冲队列 + 批量消费能力」，**默认容器用内置渲染节流**（5.3）；headless 下节流/丢帧策略由业务决定，**UIKit 不得在无消费者时自行丢弃消息**（保证可订阅性）。
+- **事件面**：headless 下没有 notice 条/成员面板——进出房/禁言/公告/礼物等系统通知全部走**事件回调**（payload 为解码后的 domain 类型）；礼物即 custom 消息解码后透传。
+- **发送/房间生命周期**：与容器共享同一内核（`useChatroom` / `useChatroomMessage` / `useChatroomMember`）；发送限流反馈由返回值/回调承载（headless 无输入框可展示，反馈必须程序化）。
+- **与多房间订阅的关系**：headless 与 5.9 **正交**——「容器 + 信令房」「headless + 多房」任意组合，同一套 store 建模（注册表 Map + activeRoomId）同时服务两种消费形态。
+
 ## 六、复审修正记录（2026-08-15 评审，均已在仓库/SDK 实际代码验证）
 
 1. **事件注册边界（架构修正）**：core 的 `registerEventHandlers` 硬编码单群聊全部 handler 与 stores（`sdk/event/registry.ts` 已核实）。修正：core 只保留连接级事件 + notice 工具 + 注册原语；场景级 handler 工厂留在各场景包 —— uikit 的 `registerEventHandlers` 对外签名原样保留；chatroom 包自建 `registerChatroomEventHandlers`。
@@ -181,6 +215,8 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 4. **i18n 合并机制缺失（core 小增量）**：locale 是模块级 messages 对象 + `useLocale`，无合并 API（`locale/index.ts` 已核实）。P1 给 core 加 `extendLocale(locale, keys)`（向后兼容），chatroom 安装时把自己的 keys（`chatroom.*` 前缀段）并入，不复制整个 locale 文件。**注意这不是「约 10 行」能收尾的事**，实施时需处理三个点：① 键冲突策略（同 key 后注册覆盖 or 报错，需定死）；② 合并后切换语言的响应式更新（已渲染组件须跟着变）；③ messages 若带 TS 类型约束，扩展 key 不能破坏现有类型推导。P1 任务清单中单独列项。
 5. **房间属性实时性（表述修正）**：SDK 存在 `ATTRIBUTES_UPDATE`/`ATTRIBUTES_REMOVED` 等事件类型，具备实时通知能力；`useChatroomAttributes` 按 5.6 四层同步设计，确切事件名以实施时 SDK 实际 API 为准。
 6. **双版本 changelog 工具（确认）**：`scripts/check-version-sync.mjs` 需升级为分别校验两包 version 与根 CHANGELOG 各自版本段一致（单一数据源原则不变），docs 站 changelog `@include` 同步适配。
+7. **多房间订阅模型（补充评审，2026-08-15）**：私域直播双聊天室/多聊天室需求确认——SDK 支持多房并行（`joinChatRoom.leaveOtherRooms` 已核实，见 5.9）；UIKit 按「1 个 UI 房 + N 个信令房」建模。核心修正：`chatroom.ts` store **不写单房间状态机**，P2 即按「房间注册表 Map + activeRoomId 视图」两层建模（单房为特例）；信令房消息**透传回调**（`signal-message`）、零渲染零假设、默认不拉历史；不引入 `isMultiChatroom` 布尔开关（`signal-rooms` 数组存在即多房）。
+8. **headless 弹幕模式（补充评审，2026-08-15）**：确认「无 UI 接入」为**一等公民**而非隐藏模式（见 5.10）——composable 层与容器解耦是既有架构事实，headless 只是把该契约显式化。核心修正：① **渲染节流职责分层**（5.3 表述修正为「容器默认内置节流；headless 由业务决定，UIKit 保证增量有序 + 批量消费能力、无消费者时不得丢消息」）；② 容器必须只消费公开 composable 契约，防止「第二 API 面」；③ P4 增 headless 弹幕 demo 页作验收。
 
 ## 七、边界情况与失败模式清单
 
@@ -195,6 +231,8 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 - 未识别 custom 消息兜底渲染（见 5.5）。
 - 变种属性 key 冲突 → 加场景前缀（见 5.6）。
 - chatroom 包与单群聊包同时被同一应用安装时：事件按 manager + chatType 过滤互不污染（见 5.2）。
+- **多房并行（UI 房 + 信令房，见 5.9）**：join 必须显式 `leaveOtherRooms: false`，否则可能「加入新房自动离开旧房」；信令房 join 失败/被踢/解散 → 降级为「信令不可达」回调（`signal-status` 事件），**不拖累 UI 房**；断线重连按注册表全量重进，信令房失败退避重试 + 回调；**跨房消息无全序**——两房不是同一时序流，业务不得按全序消费（商品指令与弹幕之间无先后保证）；`pullHistory: false` 的信令房不拉历史。
+- **headless 弹幕接入（见 5.10）**：UIKit 不替业务决定丢帧——**无消费者时不得自行丢弃消息**（增量有序 + 批量消费契约兜底）；系统通知必须事件化出口（headless 无 notice 条可显示）；发送限流反馈程序化（无输入框）；容器与 headless 消费同一公开契约，禁止容器绕过公开 API 直取内部状态。
 
 ## 八、构建、版本与发布规则
 
@@ -211,10 +249,10 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 - **P0 决策与基座准备**：确认设计（包名、共享边界清单、场景预设接口）。产出：本文档 + TECH-DEBT D97 登记。（已完成，2026-08-15）
 - **P0.5 纯改名 `@easemob/uikit` → `@easemob/uikit-im`**（**已完成，2026-08-15**）：**零代码结构变化，只改包名与全仓引用**——目录 `packages/uikit` → `packages/uikit-im`、`package.json` name、demo alias 与依赖声明（实施时 demo 已恢复 workspace 源码模式，无 tgz 产物名需处理）、docs 站（vitepress 配置/gen:api/组件页包名）、`packages/mcp` 数据源与 `scripts/sync-docs.mjs`、`integrations/skills` reference、`scripts/check-version-sync.mjs` 与 CHANGELOG 版本段约定、resolver/auto-imports 包名常量、README/AGENTS.md/skill 路由表。**改名与抽核必须分离**，同阶段混入则回归无法定位。验收：门禁全绿 + 全仓 grep 无 `@easemob/uikit`（非 `-im`/`-core`/`-chatroom` 后缀）残留。**豁免项（伞形产物保留原名）**：`@easemob/uikit-mcp`（MCP 服务，未来覆盖三包文档数据）与 `easemob-uikit-integration`（集成侧 skill 名，面向全部场景包的接入者），二者不随单群聊包改名。
 - **P1 抽核 `@easemob/uikit-core`**：**第一个产出物是「逐组件/逐模块迁移判定清单」**——每个原子组件/composable/store 先判定「进 core / 留 uikit-im / 视依赖待定」（UserCard 等待定项在此全部定论），评审通过后再动手迁移，禁止边迁边判。迁移顺序：「sdk 层（含 ChatRoomManager 注册 + ManagerHost 增量）→ 原子组件 → theme/locale/constants/utils（含 `extendLocale`）→ client/theme store → Provider → 共享 composables」逐层迁移，`@easemob/uikit-im` 全量 re-export core 保持组件/composable 对外签名不变；**每移一层跑一次门禁**；恢复 demo alias 模式回归。验收：现有 demo/docs/MCP 数据全部照常，`@easemob/uikit-im` 类型与构建 0 回归，core 包独立可构建。
-- **P2 聊天室包骨架**：package 脚手架（含 resolver/auto-imports/theme/locale 扩展）、**CHANGELOG 双版本工具升级（从 P5 前移至此——包骨架一落地 version 就需要被 `changelog:check` 校验）**、chatroom domain/adapter/event、chatroom store、`EmChatroomContainer` 外壳（加入/退出/历史/消息收发/成员面板/系统通知/基础插槽）、H5 容器样式。验收：独立 demo 页三步接入跑通基础聊天室。
-- **P3 场景预设系统**：scene config 类型 + 三内置 preset + `useChatroomScene` + 插槽全接线；礼物（custom 消息）与兜底渲染；麦位（语聊房）；禁言/公告/黑名单管理；`useChatroomAttributes`。验收：三个变种均仅靠 config+插槽实现。
-- **P4 变种 Demo（H5-first）**：新 app `apps/demo-chatroom`（移动视口、自动登录、Dev Hints 复用 demo 模式）：基础聊天室 + 语聊房 + 私域直播/带货 + 小班课 四个页面。
-- **P5 文档与集成**：docs 站聊天室章节（gen:api、demo 块、sidebar）、聊天室集成 skill（`integrations/skills`）、MCP 数据更新（`scripts/sync-docs.mjs`）。
+- **P2 聊天室包骨架**（**已完成，2026-08-15**）：package 脚手架（含 resolver/auto-imports/theme/locale 扩展）、**CHANGELOG 双版本工具升级（从 P5 前移至此——包骨架一落地 version 就需要被 `changelog:check` 校验）**、chatroom domain/adapter/event、chatroom store（**按 5.9「房间注册表 Map + activeRoomId」两层建模，单房为其特例**）、`EmChatroomContainer` 外壳（加入/退出/历史/消息收发/成员面板/系统通知/基础插槽）、H5 容器样式。验收：独立 demo 页三步接入跑通基础聊天室（**已达成**：apps/demo `#/chatroom` 页嵌套 IM Provider 验证两包同装，TECH-DEBT D97 进度记录）。
+- **P3 场景预设系统**：scene config 类型 + 三内置 preset + `useChatroomScene` + 插槽全接线；礼物（custom 消息）与兜底渲染；麦位（语聊房）；禁言/公告/黑名单管理；`useChatroomAttributes`；**多房间订阅（UI 房 + 信令房：`signal-rooms` 配置 + `signal-message` 透传回调 + `useChatroomMessage` 按 roomId 发送，见 5.9）**；**headless 契约（`subscribe` 增量有序 + 批量消费 + 可丢弃中间帧策略 + 系统通知事件出口，容器只消费公开契约，见 5.10）**。验收：三个变种均仅靠 config+插槽实现；headless 契约在容器与纯 JS 消费两种形态下行为一致。
+- **P4 变种 Demo（H5-first）**：新 app `apps/demo-chatroom`（移动视口、自动登录、Dev Hints 复用 demo 模式）：基础聊天室 + 语聊房 + 私域直播/带货 + 小班课 四个页面 + **纯弹幕 headless 页**（无容器、自绘弹幕轨道，同时验证 headless 契约与 P2 store 建模的 UI 解耦）。
+- **P5 文档与集成**：docs 站聊天室章节（gen:api、demo 块、sidebar）、聊天室集成 skill（`integrations/skills`）、MCP 数据更新（`scripts/sync-docs.mjs`）。（**docs 双 UIKit 架构骨架已提前落地，2026-08-15**：`apps/docs` 复用 VitePress locales 承载 `/` 与 `/chatroom/` 两套并列文档树，顶部标题旁 `UiKitDocsSwitcher` 切换；聊天室侧现有 index / architecture / quickstart / chatroom-container 占位页，组件页与 API 表格待 P2/P3 产出后按本计划补齐。）
 
 ## 十、明确假设（实施时如与预期不符，以当时实际情况为准）
 
@@ -223,3 +261,4 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 3. 聊天室包独立版本号，与 `@easemob/uikit-im` 互不绑架（共享 core 用 range 约束）。
 4. 变种首期交付三个内置 preset（语聊房 / 私域直播带货 / 小班课），更多场景靠插槽由用户自建。
 5. 实施时若 `easemob-websdk` 已升级，以当时的 `ChatRoomManager` 实际 API 为准做 adapter 映射（本文档 API 清单基于 5.0.0 核实）。
+6. **多房并行（见 5.9）**：SDK `joinChatRoom` 支持并行多房（`leaveOtherRooms: false`）；服务端多房并发上限、`leaveOtherRooms` 默认值、信令房历史消息可达性以实施时 SDK/服务端实际行为为准。
