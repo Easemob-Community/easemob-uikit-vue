@@ -10,6 +10,8 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -F @easemob/uikit-im story:dev",
+    "dev:demo": "pnpm -F @easemob/demo dev",
+    "dev:demo-chatroom": "pnpm -F @easemob/demo-chatroom dev",
     "sdk:use-tgz": "node scripts/switch-sdk.mjs tgz",
     "sdk:use-npm": "node scripts/switch-sdk.mjs npm",
     "sdk:status": "node scripts/switch-sdk.mjs status",
