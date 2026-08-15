@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import type { Message as SdkMessage } from 'easemob-websdk'
 import type { UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_STATUS, extractSdkErrorReason, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
@@ -115,10 +115,22 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
   /**
    * 订阅活动房间消息增量（headless 契约 §5.10）：每次缓冲窗口 flush 批量回调，
    * 增量有序；与渲染桶并行（封顶只影响渲染列表，订阅者不丢消息，丢帧由业务决定）。
+   * 订阅**跟随活动房间**：进房前调用（绑定空房，加入后自动生效）、换房/断线重进后
+   * 自动重绑定（P3 review 修正——此前一次性绑定调用时刻的房间，进房前订阅永久失效）。
    * 返回取消订阅函数。
    */
   function subscribe(listener: (messages: UiMessage[]) => void): () => void {
-    return messageStore.subscribe(activeRoomId.value, listener)
+    let unsub: (() => void) | null = null
+    // 活动房间变化（进房 / 换房 / 重进）时重绑定；'' 表示未进房，不持有订阅
+    const stop = watch(activeRoomId, (id) => {
+      unsub?.()
+      unsub = id ? messageStore.subscribe(id, listener) : null
+    }, { immediate: true })
+    return () => {
+      unsub?.()
+      unsub = null
+      stop()
+    }
   }
 
   return {

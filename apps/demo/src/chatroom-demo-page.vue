@@ -11,7 +11,7 @@
  *
  * 聊天室是独立场景包：与 IM 主界面（会话/联系人）互不干扰，页面高度 100% 全屏。
  */
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import { EmChatroomContainer, useChatroomMessage, useChatroomProvider } from '@easemob/uikit-chatroom'
 import { useClient } from '@easemob/uikit-im'
 
@@ -78,29 +78,26 @@ const sceneConfig = computed(() => ({
 // 不在此直调 store（公开契约纪律，且容器 leave 会同时清服务端成员资格与消息桶）。
 const isLoggedIn = computed(() => Boolean(currentUser.value))
 
-/** headless 消费：直接订阅消息流增量（不经过容器），验证 subscribe 批量/有序契约 */
+/**
+ * headless 消费：直接订阅消息流增量（不经过容器），验证 subscribe 批量/有序契约。
+ * 订阅跟随活动房间（P3 review 修正）：setup 即订阅，进房/换房自动重绑定——此前
+ * 在 isLoggedIn watch 内订阅，页面进入时已登录则永不触发、触发时也绑定到空房。
+ */
 const { subscribe } = useChatroomMessage()
 const headlessMessages = ref<string[]>([])
-let headlessUnsub: (() => void) | null = null
-// 进房后订阅（容器 join 驱动；订阅绑定调用时刻的活动房间）
-watch(isLoggedIn, (loggedIn) => {
-  if (loggedIn && !headlessUnsub) {
-    headlessUnsub = subscribe((batch) => {
-      for (const msg of batch) {
-        const text = msg.type === 'text'
-          ? (msg.body as { content?: string }).content ?? ''
-          : `[${msg.type}]`
-        if (text)
-          headlessMessages.value = [...headlessMessages.value.slice(-19), text]
-      }
-    })
+const headlessUnsub = subscribe((batch) => {
+  for (const msg of batch) {
+    const text = msg.type === 'text'
+      ? (msg.body as { content?: string }).content ?? ''
+      : `[${msg.type}]`
+    if (text)
+      headlessMessages.value = [...headlessMessages.value.slice(-19), text]
   }
 })
 
 /** 页面卸载：释放 headless 订阅（容器离房由容器 onUnmounted 负责） */
 onUnmounted(() => {
-  headlessUnsub?.()
-  headlessUnsub = null
+  headlessUnsub()
 })
 </script>
 

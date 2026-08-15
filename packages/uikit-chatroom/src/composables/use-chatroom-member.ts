@@ -89,15 +89,20 @@ export function useChatroomMember() {
     return run(() => adapter.updateAnnouncement(requireRoomId(), content))
   }
 
+  /** 黑名单分页页码（按黑名单自身计数，P3 review 修正——此前误用成员列表长度推算页码） */
+  let blocklistPage = 0
+
   /** 黑名单分页加载（大房间同样不做全量加载；loadMore=true 追加下一页） */
   async function loadBlocklist(loadMore = false, pageSize?: number): Promise<ChatroomMember[]> {
     const id = requireRoomId()
+    const pageNum = loadMore ? blocklistPage + 1 : 1
     const page = await run(() => adapter.getBlocklist(id, {
-      pageNum: loadMore ? Math.ceil(chatroomStore.members.length / 20) + 1 : 1,
+      pageNum,
       pageSize: pageSize ?? 20,
     }))
     if (chatroomStore.roomId !== id)
       return []
+    blocklistPage = pageNum
     return page
   }
 

@@ -55,8 +55,8 @@ export function subscribeSignalStatus(listener: (payload: SignalStatusPayload) =
   return () => signalStatusListeners.delete(listener)
 }
 
-/** 分发信令房消息（无订阅者时静默丢弃——业务未消费即不关心，§5.10「透传回调」语义） */
-function dispatchSignalMessage(payload: SignalMessagePayload) {
+/** 分发信令房消息（实时消息透传 + 信令房历史回放（joinSignalRoom pullHistory）共用同一出口） */
+export function dispatchSignalMessage(payload: SignalMessagePayload) {
   for (const listener of signalMessageListeners)
     listener(payload)
 }
@@ -260,7 +260,8 @@ export function registerChatroomEventHandlers(
         return
       if (!stores.chatroom.isKnownRoom(payload.conversationId))
         return
-      // 信令房撤回：透传 message 不可得（只有 messageId），状态回调降级
+      // 信令房撤回：透传事件只携带 messageId，无法构造完整 UiMessage payload，
+      // 直接忽略（信令房消息仅经 signal-message 透传，撤回降级由业务自行处理）
       if (stores.chatroom.roomKind(payload.conversationId) === 'signal')
         return
       stores.chatroomMessage.markRecalled(payload.conversationId, payload.messageId)

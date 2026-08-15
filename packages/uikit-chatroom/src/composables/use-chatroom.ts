@@ -3,7 +3,7 @@ import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
-import { dispatchSignalStatus, subscribeSignalMessages, subscribeSignalStatus } from '../sdk/event/chatroom-events'
+import { dispatchSignalMessage, dispatchSignalStatus, subscribeSignalMessages, subscribeSignalStatus } from '../sdk/event/chatroom-events'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -126,7 +126,9 @@ export function useChatroom(options: UseChatroomOptions = {}) {
 
   /**
    * 加入聊天室（加入后设为活动房间 = UI 房）。
-   * 重复进入同一房间（joining/joined 态）直接去重返回；切换房间时清理旧房间数据。
+   * 重复进入同一房间（joining/joined 态）直接去重返回；切换房间时清理旧 UI 房数据。
+   * 换房只移除旧 UI 房、保留信令房（§5.9 多房并行，P3 review 修正——此前 reset()
+   * 清空整个注册表，信令房被静默清除且服务端成员资格残留）。
    */
   async function join(id: string, ext?: string): Promise<void> {
     if (!id)
@@ -138,18 +140,28 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       return
     }
 
-    // 切换房间时先清理旧数据，再领令牌——顺序不能反：
+    // 切换房间时先清理旧 UI 房数据，再领令牌——顺序不能反：
     // nextJoinToken 经 ensureRoom 创建/复用房间对象并递增其 joinToken，
-    // 若先领令牌再 reset（清空注册表），房间对象被销毁，setJoining 会重建
-    // 一个 joinToken 归零的新对象，导致 isCurrentJoin 令牌失配、join 静默丢弃、
+    // 若先领令牌再清数据（removeRoom 删除对象），setJoining 会重建一个
+    // joinToken 归零的新对象，导致 isCurrentJoin 令牌失配、join 静默丢弃、
     // UI 永久卡「加入中」（两层建模重构引入，2026-08-15 修复）。
-    if (chatroomStore.roomId !== id) {
-      // 同时清理旧房消息桶（P2 review P1-3：此前只清注册表，旧桶与挂起定时器泄漏）
-      const prev = chatroomStore.roomId
-      if (prev)
-        messageStore.clearBucket(prev)
+    const prev = chatroomStore.roomId
+    if (prev && prev !== id) {
+      // 旧 UI 房：清消息桶 + 移除注册表（信令房注册表条目保留，§5.9）
+      const prevStatus = chatroomStore.roomStatus(prev)
+      messageStore.clearBucket(prev)
+      // 新房若有历史残留桶（如曾被用作信令房）一并清理
       messageStore.clearBucket(id)
-      chatroomStore.reset()
+      chatroomStore.removeRoom(prev)
+      // 旧 UI 房服务端退出：显式 leave。UI 房 join 恒用 leaveOtherRooms: false
+      // （见下方），不再依赖 SDK「加入新房自动离开旧房」默认——否则会连带踢掉
+      // 并行加入的信令房（§5.9 硬约束）。JOINING 中的 prev leave 可能未落地，
+      // 由 SDK 报错 catch 兜底（join 落地后此 leave 请求后到，服务端按序生效）。
+      if (prevStatus !== CHATROOM_STATUS.LEAVING) {
+        void adapter.leaveChatRoom(prev).catch(() => {
+          // 旧房退出失败不阻断换房（服务端残留由重连清理）
+        })
+      }
     }
     const token = chatroomStore.nextJoinToken(id)
     chatroomStore.setJoining(id)
@@ -158,7 +170,8 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       // ACK 超时兜底：join ACK 挂起（SDK 侧行为差异、网络异常等）时强制复位，
       // 保证 UI 永不永久卡在「加入中」。
       await withJoinTimeout(
-        adapter.joinChatRoom(id, ext),
+        // leaveOtherRooms: false——与信令房并行（§5.9）；旧 UI 房已显式 leave
+        adapter.joinChatRoom(id, ext, false),
         () => {
           // 使 in-flight 响应失效（超时后到达的 ACK 不再触发 setJoined）
           if (chatroomStore.roomId === id && chatroomStore.joinToken === token)
@@ -222,7 +235,9 @@ export function useChatroom(options: UseChatroomOptions = {}) {
   /**
    * 加入信令房（§5.9 多房间订阅：静默订阅——不上屏、不落消息桶、不切活动视图）。
    * - join 显式 `leaveOtherRooms: false`（与 UI 房并行，不会互踢）；
-   * - 默认不拉历史（`pullHistory: true` 时拉最近 N 条）；autoRejoin 控制断线重连是否自动重进；
+   * - 默认不拉历史（`pullHistory: true` 时拉最近 N 条，按序经 signal-message 透传回调——
+   *   P3 review 修正：此前经 loadHistory 拉取被「活动房间守卫」丢弃，历史永远到不了业务）；
+   * - autoRejoin 控制断线重连是否自动重进；
    * - 失败/被踢/解散降级为状态回调（subscribeSignalStatus），不拖累 UI 房。
    */
   async function joinSignalRoom(
@@ -236,27 +251,34 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       return
     const token = chatroomStore.nextJoinToken(roomId)
     chatroomStore.setSignalJoining(roomId)
-    if (chatroomStore.roomKind(roomId) === 'signal') {
-      const room = chatroomStore.ensureRoom(roomId, 'signal')
-      room.autoRejoin = options.autoRejoin ?? true
-    }
+    const room = chatroomStore.ensureRoom(roomId, 'signal')
+    room.autoRejoin = options.autoRejoin ?? true
     try {
       // 信令房与 UI 房并行：leaveOtherRooms 必须为 false（§5.9）
       await withJoinTimeout(
         adapter.joinChatRoom(roomId, undefined, false),
         () => {
-          if (chatroomStore.roomStatus(roomId) === CHATROOM_STATUS.JOINING && chatroomStore.joinToken === token)
+          // 使 in-flight 响应失效（按房间令牌比较——活动房令牌与信令房令牌
+          // 是两回事，P3 review 修正此前误用活动房 joinToken 导致失效永不生效）
+          if (chatroomStore.roomStatus(roomId) === CHATROOM_STATUS.JOINING
+            && chatroomStore.roomJoinToken(roomId) === token) {
             chatroomStore.nextJoinToken(roomId)
+          }
         },
       )
       if (!chatroomStore.isCurrentJoin(token, roomId))
         return
-      // 信令房不拉详情（静默订阅）；历史按配置可选
+      // 信令房不拉详情（静默订阅）；历史按配置可选：按序经 signal-message 透传
       chatroomStore.setJoined(roomId, { id: roomId, name: roomId })
       if (options.pullHistory) {
-        await loadHistory(roomId).catch(() => {
-          // 信令房历史失败静默（业务可自行重试）
-        })
+        await adapter.fetchHistory(roomId, ctx.stores.client.currentUser)
+          .then((page) => {
+            for (const msg of page.items)
+              dispatchSignalMessage({ roomId, message: msg })
+          })
+          .catch(() => {
+            // 信令房历史失败静默（业务可自行重试）
+          })
       }
       dispatchSignalStatus({ roomId, status: 'joined' })
     }
@@ -301,7 +323,7 @@ export function useChatroom(options: UseChatroomOptions = {}) {
         messageStore.clearBucket(entry.roomId)
         chatroomStore.removeRoom(entry.roomId)
         if (entry.kind === 'signal') {
-          void joinSignalRoom(entry.roomId).catch(() => {
+          void joinSignalRoom(entry.roomId, { autoRejoin: entry.autoRejoin }).catch(() => {
             // 信令房重进失败已降级为 status 回调
           })
         }

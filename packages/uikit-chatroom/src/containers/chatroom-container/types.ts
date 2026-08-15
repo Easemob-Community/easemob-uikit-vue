@@ -5,7 +5,10 @@ import type { SignalMessagePayload, SignalStatusPayload } from '../../sdk/event/
 export interface ChatroomSignalRoomConfig {
   /** 信令房间 ID */
   roomId: string
-  /** 是否拉取历史（默认 false：语义是订阅实时指令，历史回放由业务自调 API） */
+  /**
+   * 是否拉取历史（默认 false：语义是订阅实时指令，历史回放由业务自调 API）。
+   * true 时进房拉最近 N 条并按序经 signal-message 透传（P3 review 起真实生效）。
+   */
   pullHistory?: boolean
   /** 断线重连是否自动重进（默认 true） */
   autoRejoin?: boolean

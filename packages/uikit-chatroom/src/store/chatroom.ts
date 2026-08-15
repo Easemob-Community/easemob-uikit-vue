@@ -108,7 +108,7 @@ export const useChatroomStore = defineStore('chatroom', () => {
 
   // ===== 注册表原语 =====
 
-  /** 取指定房间状态（不存在时创建并登记；kind 仅在首次创建时生效，用于承载 joinToken / 竞态校验） */
+  /** 取指定房间状态（不存在时创建并登记；kind 为创建默认值，实际以 setJoining/setSignalJoining 显式声明为准） */
   function ensureRoom(id: string, kind: 'interact' | 'signal' = 'interact'): ChatroomRoomState {
     let room = rooms.get(id)
     if (!room) {
@@ -128,6 +128,11 @@ export const useChatroomStore = defineStore('chatroom', () => {
     return rooms.get(id)?.kind ?? 'interact'
   }
 
+  /** 指定房间的 join 令牌（未登记时 0；join 超时失效等按房间校验用，P3 review） */
+  function roomJoinToken(id: string): number {
+    return rooms.get(id)?.joinToken ?? 0
+  }
+
   /** 领取指定房间的 join 令牌（每次 join 调用一次；取全局单调计数器，重建不回退） */
   function nextJoinToken(id: string): number {
     const room = ensureRoom(id)
@@ -143,16 +148,18 @@ export const useChatroomStore = defineStore('chatroom', () => {
     return room.status === CHATROOM_STATUS.JOINING || room.status === CHATROOM_STATUS.JOINED
   }
 
-  /** UI 房进入 joining（登记 + 切活动视图） */
+  /** UI 房进入 joining（登记 + 切活动视图；kind 显式声明为 interact，P3 review——防已登记信令房被复用为 UI 房的歧义） */
   function setJoining(id: string) {
     const room = ensureRoom(id, 'interact')
+    room.kind = 'interact'
     room.status = CHATROOM_STATUS.JOINING
     activeRoomId.value = id
   }
 
-  /** 信令房进入 joining（登记为 signal，不切活动视图——静默订阅，§5.9） */
+  /** 信令房进入 joining（登记为 signal，不切活动视图——静默订阅，§5.9；kind 显式声明） */
   function setSignalJoining(id: string) {
     const room = ensureRoom(id, 'signal')
+    room.kind = 'signal'
     room.status = CHATROOM_STATUS.JOINING
   }
 
@@ -349,6 +356,7 @@ export const useChatroomStore = defineStore('chatroom', () => {
     ensureRoom,
     isKnownRoom,
     roomKind,
+    roomJoinToken,
     nextJoinToken,
     isCurrentJoin,
     removeRoom,
