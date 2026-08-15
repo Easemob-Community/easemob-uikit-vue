@@ -4,7 +4,7 @@
  * 聊天室为广播流，无未读/回执/会话语义，不展示时间分组与已读状态。
  * 接收侧渲染节流在 store 层（缓冲队列按 150ms 窗口批量合并），本组件只负责单条渲染。
  */
-import { computed } from 'vue'
+import { computed, onUnmounted } from 'vue'
 import { EmAvatar, MESSAGE_TYPE, t, useUserInfo } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '../../sdk/adapter/chatroom-adapter'
@@ -34,13 +34,32 @@ const textContent = computed(() => {
   return ''
 })
 
-/** 图片地址（img 消息体：thumb 优先，回落原图） */
+/** 图片地址（img 消息体：thumb 优先，回落原图；本地乐观上屏阶段 body.data 为 File 时生成本地预览） */
 const imageUrl = computed(() => {
   const msg = props.message
   if (msg.type !== MESSAGE_TYPE.IMAGE)
     return ''
-  const body = msg.body as { thumb?: string, url?: string, originalUrl?: string }
-  return body.thumb || body.url || body.originalUrl || ''
+  const body = msg.body as { thumb?: string, url?: string, originalUrl?: string, data?: File }
+  const remote = body.thumb || body.url || body.originalUrl
+  if (remote)
+    return remote
+  // 自己发送的图片：上传完成前没有服务端 URL，用 objectURL 显示本地预览
+  // （发送成功后消息体带 thumb/url，走 remote 分支；本地 URL 随组件卸载 revoke）
+  if (body.data instanceof File) {
+    if (!localPreviewUrl)
+      localPreviewUrl = URL.createObjectURL(body.data)
+    return localPreviewUrl
+  }
+  return ''
+})
+
+/** 本地图片预览 URL（组件生命周期内最多创建一个，卸载时 revoke） */
+let localPreviewUrl = ''
+onUnmounted(() => {
+  if (localPreviewUrl) {
+    URL.revokeObjectURL(localPreviewUrl)
+    localPreviewUrl = ''
+  }
 })
 
 /** 自定义消息 event 名（P3 礼物等场景渲染走容器 message-custom 插槽，此处兜底） */
