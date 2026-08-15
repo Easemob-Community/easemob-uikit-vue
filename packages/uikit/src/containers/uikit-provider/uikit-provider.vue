@@ -20,7 +20,7 @@ import type { ClientConfig } from '../../sdk/client'
 import type { AnimationConfig, Density, FontSizePreset } from '../../store/theme'
 import type { UiContact } from '../../sdk/types'
 import type { NoticeConfig } from '../../sdk/event/notice-utils'
-import { createLogger } from '../../utils/logger'
+import { createLogger, setLogLevel } from '../../utils/logger'
 import { configureLogPersistence } from '../../utils/log-store'
 
 const logger = createLogger('UIKit:UikitProvider')
@@ -278,7 +278,10 @@ watch(
   { deep: true, immediate: true },
 )
 
-/** 日志持久化配置响应式应用：collectSdkLog 变化时联动启停 SDK 日志捕获 */
+/** 日志配置响应式应用：
+ * - 持久化（log-store）：collectSdkLog 变化时联动启停 SDK 日志捕获
+ * - console 输出级别（utils/logger 全局开关）：uikitLevel 同时控制控制台输出，生产 'info'、排查临时调 'debug'（D37）
+ */
 watch(
   () => props.logger,
   (loggerConfig) => {
@@ -290,6 +293,7 @@ watch(
       maxEntries: loggerConfig?.maxEntries,
       retentionDays: loggerConfig?.retentionDays,
     })
+    setLogLevel(loggerConfig?.uikitLevel ?? 'info')
   },
   { deep: true, immediate: true },
 )

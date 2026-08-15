@@ -446,7 +446,7 @@
 
 ---
 
-### [ ] D37. 统一 UIKit 日志体系，替换直接 console 输出
+### [x] D37. 统一 UIKit 日志体系，替换直接 console 输出
 
 - **现象**：UIKit 已新建 `utils/logger.ts` 但能力较薄（仅提供原始 `log`）；代码中仍存在多处直接 `console.warn` 等原生输出，且各模块没有统一命名空间、级别控制和运行开关，不利于问题排查和生产环境管控。
 - **证据**：`packages/uikit/src/utils/logger.ts` 目前只有 `log`；`sdk/domain/group-domain.ts` L270 等仍有 `console.warn`；多个模块错误处理仅 `console.warn` 或无日志。
@@ -455,6 +455,7 @@
   2. 在 `UIKitClient` / `UIKitProvider` 初始化时根据 `debug` 配置自动设置日志级别；
   3. 按模块为 `client.ts` 和各 `domain`/`composable` 创建 `createLogger('UIKit:xxx')`，替换所有 `console.warn`；
   4. 版本输出等需要自定义样式的地方仍保留 `log` 作为底层输出能力。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认建议 1/3/4 已落地，建议 2 本轮补接线，TECH-DEBT 漏勾）。现状：`utils/logger.ts` 已完整实现四级 `debug/info/warn/error` + `createLogger(namespace)` + `setLogLevel/getLogLevel` 全局开关 + `setLogCollector` sink（全量日志经 `logger-binding.ts` 接入 `log-store.ts` IndexedDB 持久化，超出原建议）；全仓 22 处 `createLogger('UIKit:xxx')` 命名空间（composables/sdk/domain/client），原生 `console.warn` 残留仅 `log-store.ts:148` 一处（独立通用内核，注释声明设计如此）；`log` 保留为底层自定义样式输出。**本轮补建议 2**：`uikit-provider.vue` 的 `logger.uikitLevel` prop 此前只控制持久化收集级别（`configureLogPersistence`），未控制 console 输出级别——已在同 watch 中接线 `setLogLevel(loggerConfig?.uikitLevel ?? 'info')`，生产 'info'、排查临时调 'debug' 即时生效（含运行期切换）。SDK 日志级别走 `sdk-log-capture.ts` 的 `setLogLevel('DEBUG')` 捕获链路，独立于 UIKit 层。
 - **关联 skill**：`uikit-lint-governance` / `uikit-store-composable`
 
 ---
