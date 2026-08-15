@@ -55,6 +55,12 @@ import { UIKitProvider } from '@easemob/uikit'
 
 > 不需要在业务代码里手动监听 `resize` 或 `visualViewport`。
 
+## 输入框模式
+
+移动端（触屏设备）输入框**固定使用 H5 形态**（单行 + 语音 + 表情 + 长按交互），不渲染 tiptap 富文本编辑器；此时配置 `mode: 'rich'` 会被忽略，控制台会输出一条 warn 提示（`[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略`）。
+
+需要富文本 / 多行长文本编辑能力的场景请使用桌面端；若 H5 业务必须支持多行输入，可自行通过 `#message-input` 插槽接管输入区（见组件文档），或改用原生 `textarea` 方案。
+
 ## 下拉刷新
 
 `pullRefresh: 'auto'` 会在触屏设备上为会话列表等可滚动区域启用下拉刷新；PC 环境下保持原有滚动行为。

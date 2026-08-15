@@ -308,11 +308,12 @@
 - **修复**：已于 2026-07-28 修复。`.message-list__scroll`（message-list.vue）与 `.conversation-list__items`（conversation-list.vue）均加 `overscroll-behavior-y: contain`，列表触顶下拉不再触发浏览器原生刷新/整页橡皮筋。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D54. 输入框 font-size 14px 触发 iOS 自动缩放，进一步打乱键盘计算
+### [x] D54. 输入框 font-size 14px 触发 iOS 自动缩放，进一步打乱键盘计算
 
 - **现象**：Input 组件 `font-size: 14px`，移动端单聊输入用的正是该组件；iOS Safari 对 font-size < 16px 的输入框 focus 时自动放大页面（宿主未禁缩放时），页面 zoom 后 `visualViewport.scale ≠ 1`，键盘高度差值在缩放坐标系下失真，键盘适配连带出错。demo 靠 `user-scalable=no` 压住，库消费者若不禁缩放必现。
 - **证据**：`components/input/input.vue:134`；`modules/chat/message-input/simple-input.vue:54,382-392`；`composables/use-keyboard.ts:10`。
 - **建议修法**：移动端（或全局）输入框 font-size ≥ 16px；或文档明确宿主需禁缩放（不推荐）。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`input.vue:200-204` 基础字号仍为 `--uikit-font-size-14`，但已加 `@media (hover: none), (max-width: 767px)` 移动端 16px 覆写（注释注明「移动端 iOS 对 <16px 输入框 focus 自动缩放，放大到 16px 规避」），宿主不禁缩放也不会被 iOS 放大。
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [x] D55. `100vh` 写死，移动浏览器地址栏场景高度错误
@@ -334,13 +335,14 @@
 - **关联 skill**：`uikit-store-composable` / `uikit-h5-adaptation`
 - **验证**：`pnpm -F @easemob/uikit exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 通过。
 
-### [ ] D9. i18n：一处硬编码中文漏翻 + `t()` 无插值
+### [x] D9. i18n：一处硬编码中文漏翻 + `t()` 无插值
 
 - **现象 1**：`modules/chat/message-input/rich-input.vue` 语音提示 `{{ isRecording ? '松开结束录音' : '按住说话' }}` 硬编码中文，英文环境不翻译；而 `simple-input.vue`/`voice-panel.vue` 同处正确用了 `t('chat.voice.releaseEnd')` 等已存在的 key。
 - **现象 2**：`useLocale().t(key)` 只做 map 查找 + key 兜底，**不做 `{placeholder}` 插值**；`'chat.pinnedBar.count': '{count} 条置顶消息'` 这类 key 需调用方自己 replace，易漏。
 - **现象 3**（2026-07-28 复核新增）：`locale/index.ts:21` 的 `t()` 缺 key 时返回 key 名本身（truthy），全仓 `t('x') || '中文'` 写法（`components/presence-selector/presence-selector.vue:39-46`、`components/user-card/user-card-modal.vue:93-162`、`components/group-card/group-card-modal.vue:67-84` 等）的中文兜底是死代码——一旦新增 key 漏配，用户直接看到 `userCard.message` 这样的 key 名（当前引用 key 均存在，属机制隐患）。
 - **现象 4**（2026-07-28 复核新增）：`components/modal/modal.vue:23-24`（取消/确认）、`components/action-sheet/action-sheet.vue:27`（取消）、`components/emoji-picker/emoji-picker.vue:18`（常用）硬编码中文默认值，完全不走 locale（locale 里已有 `button.confirm`/`button.cancel`）。
 - **建议修法**：rich-input 改用既有 key；评估是否给 `t()` 加最小插值能力（`t(key, params)`）与 fallback 参数（`t(key, fallback)`），或统一约定调用方替换并在 skill 里写死；modal/action-sheet/emoji-picker 默认值改从 locale 取。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认四个现象均已修复，TECH-DEBT 漏勾）。现象 1：`rich-input.vue` 语音提示已改用 `t('chat.voice.releaseEnd')` 等既有 key（全仓 grep 无硬编码「松开结束录音/按住说话」）；现象 2：`locale/index.ts:42-46` 已有 `interpolate()`，`t(key, fallback?, params?)` 签名支持 `{placeholder}` 插值（`'chat.pinnedBar.count': '{count} 条置顶消息'` 可直接插值）；现象 3：全仓已改为 `t('key', '中文')` fallback 形式（presence-selector.vue:72-81、user-card-modal、group-card-modal 等），无 `t('x') || '中文'` 死代码；现象 4：`modal.vue:33-34`（取消/确认）、`action-sheet.vue:35`（取消）、`emoji-picker.vue:33`（常用）默认值均已 `t('button.cancel', '取消')` 形式走 locale + fallback。
 - **关联 skill**：`uikit-i18n-locale`
 
 ### [ ] D10. 模块层约 30% 组件用内联 `defineProps<{}>` 字面量而非命名 interface
@@ -457,13 +459,14 @@
 
 ---
 
-### [ ] D35. H5 集成体验改进（demo 集成时反向发现）
+### [x] D35. H5 集成体验改进（demo 集成时反向发现）
 
 - **现象 1**：`EmConversationContainer` 未暴露「用户点击某会话」事件供 H5 页面栈导航。内部 `conversation-list` emit 了 `@select`，容器层只 emit `conversation-select`，且选中后直接调 `selectConversation()` 设置 currentConversationId。H5 场景只能 watch `stores.conversation.currentConversationId` 间接实现推页面栈，不够直观。
 - **现象 2**：`EmContactContainer` 的 `@contact-click` / `@group-click` 事件只告知「谁被点了」，不管导航。H5 业务需自己管页面跳转，缺少标准做法示例。
 - **现象 3**：`EmPopup` `position="bottom"` 时无 `max-height` 约束，H5 弹出会占满全屏，需业务侧自行加 `max-height` + 圆角。
 - **现象 4**：`h5.fontScale` 目前纯占位，设值后无组件消费 `--uikit-font-scale` 做字号缩放，文档应标注「暂未生效」避免误解。
 - **现象 5**：缺乏官方 H5 集成示例 / guide 页面，业务方从零摸索成本高。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认四个现象均已修复，TECH-DEBT 漏勾）。现象 1：`conversation-container.vue:81,104-106` 已暴露 `conversation-select` 与 `conversation-click` 事件；现象 2：`contact-container.vue:220,226,378,447` 已暴露 `contact-click` / `group-click`；现象 3：`popup.vue:370-372` bottom 弹出层已加 `max-height: 80vh` + `padding-bottom: var(--uikit-safe-bottom)`；现象 4：`uikit-provider.vue:420-423` 已把 `h5.fontScale` 接线到 `themeStore.setFontSizeScale`（写入 `--uikit-font-scale` 驱动字号 token），`apps/docs/guide/h5-adaptation.md:32` 已更新为「已由主题字号体系接管，建议使用 theme.fontSize」；现象 5：官方 H5 适配指南页 `apps/docs/guide/h5-adaptation.md` 已存在（安全区/键盘/下拉刷新/长按）。
 - **建议修法**：
   1. `EmConversationContainer` 增加 `@conversation-click` 事件或文档说明 H5 导航标准模式；
   2. `EmPopup` bottom 模式自动限制 `max-height: 85vh` + 顶部圆角；
@@ -528,11 +531,12 @@
 - **修复**：已于 2026-07-28 修复。`use-conversation.ts` 的 `deleteConversation` 默认 `deleteRoamingMessages` 改为 `false`（注释同步改为「默认保留漫游消息，删除会话≠删历史」）；`conversation-list.vue` 删除弹窗的 `deleteWithHistory` 初始值及 `handleDelete` 重置值均改为 `false`，默认不再勾选删除历史。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D63. 会话切换即已读，不判断页面可见性
+### [x] D63. 会话切换即已读，不判断页面可见性
 
 - **现象**：当前会话收到消息立即清未读，不看 `document.visibilityState`。页面在后台标签时消息被标记已读，用户实际并未看到。
 - **证据**：`sdk/event/chat-events.ts:159-171`。
 - **建议修法**：清未读前判断页面可见性，不可见时保持未读。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`sdk/event/chat-events.ts:374-395` onMessage 清未读已加 `isPageVisible = document.visibilityState === 'visible'` 守卫（注释「仅在页面可见时标记已读；页面隐藏时用户实际未看到，保持未读」），后台标签收消息不再清未读。
 - **关联 skill**：`uikit-store-composable`
 
 ### [x] D64. token 过期无对外回调
@@ -634,11 +638,12 @@
 - **建议修法**：空值禁用或回退。
 - **关联 skill**：`uikit-component-authoring`
 
-### [ ] D77. 移动端强制 simple 输入模式，tiptap 富文本配置被静默忽略
+### [x] D77. 移动端强制 simple 输入模式，tiptap 富文本配置被静默忽略
 
 - **现象**：`isMobile` 时 `inputMode` 强制 `'simple'`，用户配 `mode:'rich'` 无任何警告地被丢弃；同时移动端只有单行 input，多行长文本输入体验差（tiptap 编辑器在移动端根本不会出现，属能力阉割）。
 - **证据**：`modules/chat/message-input/index.vue:85-90`；`modules/chat/message-input/simple-input.vue:54`。
 - **建议修法**：至少文档注明或在 rich 被丢弃时 warn；或提供 multi-line 移动端形态。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`modules/chat/message-input/index.vue:108-115` 移动端 + `mode:'rich'` 时已 `logger.warn('[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略')`，不再是静默丢弃；「移动端固定渲染 H5Input，不走 simple/rich 分支」已有注释说明。文档标注本轮补充：`apps/docs/guide/h5-adaptation.md` 新增「输入框模式」小节。multi-line 移动端形态仍属能力缺口，如需支持另立新条目。
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [ ] D78. 长按滚动锁对真实滚动容器无效，`preventScroll` 名不副实
@@ -663,11 +668,12 @@
 - **建议修法**：改为订阅 `h5.viewport`。
 - **关联 skill**：`uikit-h5-adaptation`
 
-### [ ] D81. `safeArea` 开关非响应式，运行期改 `:h5` prop 不生效
+### [x] D81. `safeArea` 开关非响应式，运行期改 `:h5` prop 不生效
 
 - **现象**：`uikit-provider.vue` 只在 `onMounted` 覆写一次；`use-uikit.ts` 把 `options.h5` 快照传入 `useH5Adaptation`，运行期改 `:h5` prop 不生效（与 D31 features 静态快照同源）。
 - **证据**：`containers/uikit-provider/uikit-provider.vue:202`；`composables/use-uikit.ts:106`。
 - **建议修法**：watch `props.h5` 变更重新应用覆写，或与 D31 一并改 computed。
+- **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`uikit-provider.vue:427-447` 已 `watch(() => props.h5?.safeArea)`：`false` 时把 `--uikit-safe-*` 四个变量强制覆写为 `0px`，恢复时 removeProperty；组件消费的是 CSS 变量（h5-input.vue:102,807、chat.vue:1323、message-list.vue:966、conversation-list.vue:665,796），覆写链路生效，运行期切换 `:h5="{ safeArea }"` 即时生效。
 - **关联 skill**：`uikit-h5-adaptation`
 
 ### [ ] D82. emoji 面板写死 320px，窄屏溢出宽屏留白
