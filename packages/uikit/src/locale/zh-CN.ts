@@ -395,6 +395,7 @@ const messages: LocaleMessages = {
   'message.status.read': '已读',
   'message.status.failed': '发送失败',
   'message.resend.failed': '重发失败',
+  'message.resendMediaUnsupported': '图片/语音/视频/文件消息暂不支持重发',
   'message.translate.failed': '翻译失败，请稍后重试',
   'message.translate.serviceUnavailable': '翻译服务未开通，请联系管理员开通',
   'message.translate.noPermission': '暂无翻译权限',

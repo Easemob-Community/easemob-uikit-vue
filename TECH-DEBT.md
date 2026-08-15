@@ -693,7 +693,7 @@
 - **建议修法**：`:hover` 规则统一包 `@media (hover: hover)`。
 - **关联 skill**：`uikit-h5-adaptation` / `uikit-styling-theming`
 
-### [ ] D84. 其他小项集合（2026-07-28 四路审查遗留）
+### [x] D84. 其他小项集合（2026-07-28 四路审查遗留）
 
 - **现象/证据**：
   - `modules/chat/chat.vue:430` `fetchPinnedMessages()` 未 await 且无 catch，失败产生 unhandled rejection；
@@ -704,6 +704,15 @@
   - `modules/chat/chat.vue:634-649` `onGroupCardSendMessage` 不校验是否已加入该群即建会话并跳转，发送必然失败且无前置提示；
   - `composables/use-keyboard.ts:15-17` 只在 focusin 后 300ms 重算，无 focusout 处理，部分 Android WebView 下 `keyboardHeight` 会残留非 0。
 - **建议修法**：逐条小修（补 catch / logout 清理 / 入群校验 / focusout 重算），无架构改动。
+- **修复**：已于 2026-08-15 逐条核销（消费者验证准备时核查 + 本轮补修，TECH-DEBT 漏勾/部分残留）：
+  1. `fetchPinnedMessages` unhandled rejection——已修：`chat.vue` 会话进入处 `fetchPinnedMessages().catch(...)`（失败仅 warn 不阻断）。
+  2. `draftCache` logout 清理——已修：`use-uikit.ts` logout 内调用 `clearAllDrafts()`（草稿 key 本身含 appKey+currentUser 维度，跨账号不串）。
+  3. 多选状态 logout 重置——已修：`use-uikit.ts` logout 内调用 `resetMultiSelectState()`。
+  4. `unreadNewCount` 按条数计数——已修：`message-list.vue:227` `+= newLen - (oldLen || 0)`。
+  5. 媒体消息重发无反馈——**本轮修复**：`use-message-send.ts` `resendMessage` 媒体分支由静默 `return` 改为抛 `MEDIA_RESEND_UNSUPPORTED` 标识错误；`message-list.vue` `onResend` catch 识别后 toast「图片/语音/视频/文件消息暂不支持重发」（新增 locale key `message.resendMediaUnsupported`，zh/en 双语）。
+  6. `onGroupCardSendMessage` 入群校验——已修：`chat.vue` 先 `stores.group.getGroupById(groupId)`，未加入则 toast「尚未加入该群」并 return。
+  7. `useKeyboard` focusout 重算——已修：已有 `handleFocusOut`（300ms 延迟后归零/重算）。
+- **关联 skill**：`uikit-h5-adaptation` / `uikit-store-composable` / `uikit-message-rendering`
 - **关联 skill**：`uikit-store-composable` / `uikit-lint-governance`
 
 ### [ ] D85. 未来扩展：Electron + 本地数据库（SQLite）消息/会话持久化
@@ -796,7 +805,7 @@
 - **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）、M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）、M3（demo markdown 流式气泡 `#message-txt` 插件接管 + 打字机）已完成；M4 demo mock AI 会话已落地（toolbar 入口 + 设置面板 + 分片模拟器），真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。文档新增 `guide/ai-stream-message.md` 独立章节。
 - **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
 
-### [ ] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
+### [x] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
 
 - **现象**：2026-08-15 D89 修复后对这 39 个文件跑 eslint，仍剩 6 处**不可自动修复**的 JS 逻辑错误（非 CSS 缩进问题，均为既有代码）：
   - `modules/chat/chat.vue:178`（`'t' was used before it was defined`）、`:424`（`'isGroupChat' was used before it was defined`）；
@@ -804,6 +813,12 @@
   - `modules/chat/message-input/simple-input.vue:162`（`typingThrottleTimer` 赋值未使用）；
   - `modules/chat/message-item/message-bubble-wrapper.vue:165`（`messageStatus` used before defined）。
 - **建议修法**：逐处人工判断——use-before-define 多为模板/计算属性引用顺序问题，需确认无运行时风险后调整声明位置或加类型标注；unused var 直接删除或补 `_` 前缀。修完跑 `pnpm exec eslint <file>` 确认清零。
+- **修复**：已于 2026-08-15 修复（均为无运行时风险的声明位置调整/清理）：
+  - `chat.vue`：`const { t } = useLocale()` 前移至 `lastMessageSummary` 之前；`conversationType` / `isGroupChat` 两个 computed 前移至 `isPeerTyping` 之前（依赖 `currentConversation` 均更早定义，computed 惰性求值无行为变化）。
+  - `rich-input.vue`：`inlineImageBlobUrls` Set 定义前移至 `handleSend` 之前。
+  - `simple-input.vue`：删除值从未被读取的 `typingThrottleTimer` 变量（保留 `isTypingThrottled` 节流语义，setTimeout 匿名化）。
+  - `message-bubble-wrapper.vue`：`messageStatus` computed 前移至 `isGroupReadReceiptActive` 之前。
+  - 验证：6 处 lint 错误清零（`pnpm exec eslint <file>`）。
 - **关联 skill**：`uikit-lint-governance`
 
 ---

@@ -157,6 +157,7 @@ const lastMessageTextResolver = computed(() => props.config?.lastMessageTextReso
  * computed 会自动重算，watch 随之重新写入会话 store；senderReady 为 false
  * 时跳过写入，保证摘要不会闪动到 userId 中间态。
  */
+const { t } = useLocale()
 const lastMessageSummary = computed(() => {
   const lastMsg = messages.value[messages.value.length - 1]
   const cvs = currentConversation.value
@@ -245,7 +246,6 @@ watch(h5.keyboardHeight, async () => {
   await nextTick()
   messageListRef.value?.scrollToBottom?.()
 })
-const { t } = useLocale()
 const { show: showToast } = useToast()
 
 /** 错误边界状态 */
@@ -419,6 +419,12 @@ const headerTitle = computed(() => {
   )
 })
 
+/** 当前会话类型 */
+const conversationType = computed(() => currentConversation.value?.type)
+
+/** 是否是群聊 */
+const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
+
 /** 当前单聊会话对方是否正在输入 */
 const isPeerTyping = computed(() => {
   if (!currentConversation.value || isGroupChat.value)
@@ -451,12 +457,6 @@ onMounted(() => {
 onUnmounted(() => {
   resizeObserver?.disconnect()
 })
-
-/** 当前会话类型 */
-const conversationType = computed(() => currentConversation.value?.type)
-
-/** 是否是群聊 */
-const isGroupChat = computed(() => conversationType.value === CONVERSATION_TYPE.GROUPCHAT)
 
 /** 是否显示群成员数后缀 */
 const showHeaderMemberCount = computed(() => headerConfig.value?.showMemberCount ?? true)

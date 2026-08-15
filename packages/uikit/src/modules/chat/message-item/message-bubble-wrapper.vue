@@ -157,6 +157,9 @@ const shouldShowTime = computed(() => {
   return true // 'always' | 'hover' | true 都默认显示，hover 样式通过 CSS 控制
 })
 
+/** 消息状态 */
+const messageStatus = computed(() => props.message.status)
+
 /** 群聊已读回执是否激活（用圆圈替代普通状态）。发送失败消息优先展示失败重发图标，不走已读回执。 */
 const isGroupReadReceiptActive = computed(() => {
   if (!isSelf.value || props.message.conversationType !== CONVERSATION_TYPE.GROUPCHAT)
@@ -176,9 +179,6 @@ const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
 
 /** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
 const showStatus = computed(() => isSelf.value && !isGroupReadReceiptActive.value)
-
-/** 消息状态 */
-const messageStatus = computed(() => props.message.status)
 
 /** 消息状态展示配置 */
 const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageStatus || {})

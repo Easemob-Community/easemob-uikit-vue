@@ -395,6 +395,7 @@ const messages: LocaleMessages = {
   'message.status.read': 'Read',
   'message.status.failed': 'Failed',
   'message.resend.failed': 'Resend failed',
+  'message.resendMediaUnsupported': 'Image/voice/video/file messages cannot be resent',
   'message.translate.failed': 'Translation failed, please try again later',
   'message.translate.serviceUnavailable': 'Translation service is not enabled, please contact the admin',
   'message.translate.noPermission': 'No translation permission',

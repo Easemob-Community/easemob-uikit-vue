@@ -1,8 +1,8 @@
 import type { CustomMessageBody, TextMessageBody, UiMessage } from '../sdk/types'
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '../constants'
 import type { ConversationTypeValue } from '../constants'
-import { useUIKit } from './use-uikit'
 import { createLogger } from '../utils/logger'
+import { useUIKit } from './use-uikit'
 
 const logger = createLogger('UIKit:UseMessageSend')
 
@@ -180,8 +180,9 @@ export function useMessageSend() {
       case MESSAGE_TYPE.VIDEO:
       case MESSAGE_TYPE.FILE:
         // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
+        // 抛标识错误由调用方（message-list onResend）转为 toast，避免静默无反馈
         logger.warn('[useMessageSend] resendMessage: media resend requires original File')
-        return
+        throw new Error('MEDIA_RESEND_UNSUPPORTED')
       default:
         logger.warn('[useMessageSend] resendMessage: unsupported message type', message.type)
     }

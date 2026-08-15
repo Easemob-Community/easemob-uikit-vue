@@ -573,6 +573,11 @@ async function onResend(message: UiMessage) {
     await resendMessage(message)
   }
   catch (e: unknown) {
+    // 媒体消息重发需要原始 File，composable 层抛标识错误 → 专属提示
+    if ((e as Error)?.message === 'MEDIA_RESEND_UNSUPPORTED') {
+      showToast(t('message.resendMediaUnsupported'), 'warning')
+      return
+    }
     logger.warn('[MessageList] resend failed:', formatSdkError(e))
     showToast(resolveSdkErrorMessage(e, 'message.resend.failed', t), 'error')
   }

@@ -159,7 +159,6 @@ function handleSend() {
 }
 
 /** 输入状态提示节流 */
-let typingThrottleTimer: ReturnType<typeof setTimeout> | null = null
 let isTypingThrottled = false
 
 /** 触发输入状态 */
@@ -169,9 +168,8 @@ function triggerTyping() {
   }
   isTypingThrottled = true
   emit('typing')
-  typingThrottleTimer = setTimeout(() => {
+  setTimeout(() => {
     isTypingThrottled = false
-    typingThrottleTimer = null
   }, 5000)
 }
 

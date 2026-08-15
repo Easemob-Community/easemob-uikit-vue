@@ -254,6 +254,9 @@ function updateHasContent(e: any) {
   hasContent.value = text.length > 0 || html.includes('<img')
 }
 
+/** 待回收的内联图片 Blob URL 列表 */
+const inlineImageBlobUrls = new Set<string>()
+
 /** 发送消息 */
 function handleSend() {
   if (!editor.value || !hasContent.value)
@@ -295,9 +298,6 @@ function triggerFileInput(type: 'image' | 'file' | 'video') {
   const ref = type === 'image' ? imageInputRef : type === 'video' ? videoInputRef : fileInputRef
   ref.value?.click()
 }
-
-/** 待回收的内联图片 Blob URL 列表 */
-const inlineImageBlobUrls = new Set<string>()
 
 function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
   const files = (event.target as HTMLInputElement).files
