@@ -15,7 +15,7 @@ pnpm add @easemob/uikit pinia vue
 ```
 
 > 组件库将 `pinia` 与 `vue` 声明为 peerDependencies，需要在使用方项目中显式安装。
-> `@easemob/uikit` 的入口已内置主题样式，接入后无需再单独引入 CSS。
+> **主题样式需要单独引入**：构建产物将 CSS 提取为独立文件（子路径 `@easemob/uikit/theme`），入口 JS 不会自动注入样式，请在入口处加一行 `import '@easemob/uikit/theme'`（见下方示例）。
 
 ## 全局注册
 
@@ -26,6 +26,7 @@ pnpm add @easemob/uikit pinia vue
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import UIKit from '@easemob/uikit'
+import '@easemob/uikit/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
 import App from './App.vue'
 
 const app = createApp(App)

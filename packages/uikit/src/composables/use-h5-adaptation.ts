@@ -94,9 +94,12 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
     }
   }
 
-  useEventListener(window, 'resize', updateViewportAndSafeArea)
-  if (window.visualViewport) {
-    useEventListener(window.visualViewport, 'resize', updateViewportAndSafeArea)
+  // SSR 守卫：无 window 环境（如 VitePress 预渲染 / Nuxt setup）跳过事件监听，避免 ReferenceError
+  if (typeof window !== 'undefined') {
+    useEventListener(window, 'resize', updateViewportAndSafeArea)
+    if (window.visualViewport) {
+      useEventListener(window.visualViewport, 'resize', updateViewportAndSafeArea)
+    }
   }
   // 初始化一次
   updateViewportAndSafeArea()

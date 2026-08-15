@@ -535,11 +535,12 @@
 - **建议修法**：清未读前判断页面可见性，不可见时保持未读。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D64. token 过期无对外回调
+### [x] D64. token 过期无对外回调
 
 - **现象**：`onTokenWillExpire/onTokenExpired` 只打日志，UIKit 未向应用层暴露刷新 token 的钩子，过期后用户无感知地断链。
 - **证据**：`sdk/event/connection-events.ts:33-40`。
 - **建议修法**：通过 provider options 暴露 `onTokenWillExpire/onTokenExpired` 回调。
+- **修复**：已于 2026-08-15 核销（2026-08-15 消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。链路完整：`EmUIKitProvider` props `onTokenWillExpire/onTokenExpired`（`uikit-provider.vue:139,141,243-246`）→ `useUIKit` options `connectionCallbacks`（`use-uikit.ts:114,245`）→ `registerEventHandlers`（`sdk/event/registry.ts:18-21`）→ `createConnectionHandlers` 触发 `callbacks.onTokenWillExpire?.()/onTokenExpired?.()`（`connection-events.ts:47-56`）。核销时补对外类型导出：`ConnectionEventCallbacks` 从 `sdk/index.ts` re-export（此前类型仅内部可见）。真实接入验证（业务侧刷新 token 后自动恢复）列入 CONSUMER-VALIDATION-CHECKLIST.md 阶段 B3 首个验证项。
 - **关联 skill**：`websdk2-uikit-migration`
 
 ### [x] D65. `conversation-container` 的 `pageSize`/`includeEmptyConversations` 是死 props

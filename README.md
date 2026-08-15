@@ -28,6 +28,7 @@ pnpm install @easemob/uikit
 ```ts
 import { createApp } from 'vue'
 import UIKit from '@easemob/uikit'
+import '@easemob/uikit/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
 import App from './App.vue'
 
 const app = createApp(App)
