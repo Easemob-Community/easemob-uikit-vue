@@ -1,12 +1,29 @@
 /// <reference types="node" />
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 
-function getPackageVersion(pkgName: string, relativePath: string): string {
+function getSdkVersion(): string {
+  const _require = createRequire(import.meta.url)
+  let dir = dirname(_require.resolve('easemob-websdk'))
+  // 向上查找 easemob-websdk 的 package.json（兼容旧版 dist 入口与新版根目录入口）
+  while (dir !== dirname(dir)) {
+    const sdkPackagePath = resolve(dir, 'package.json')
+    if (existsSync(sdkPackagePath)) {
+      const sdkPackage = JSON.parse(readFileSync(sdkPackagePath, 'utf-8')) as { name?: string, version?: string }
+      if (sdkPackage.name === 'easemob-websdk')
+        return sdkPackage.version ?? 'unknown'
+    }
+    dir = dirname(dir)
+  }
+  return 'unknown'
+}
+
+function getPackageVersion(relativePath: string): string {
   const pkgPath = resolve(__dirname, relativePath)
   if (!existsSync(pkgPath))
     return 'unknown'
@@ -14,11 +31,14 @@ function getPackageVersion(pkgName: string, relativePath: string): string {
   return pkg.version ?? 'unknown'
 }
 
-const coreVersion = getPackageVersion('core', '../../packages/uikit-core/package.json')
-const chatroomVersion = getPackageVersion('chatroom', '../../packages/uikit-chatroom/package.json')
+const sdkVersion = getSdkVersion()
+const coreVersion = getPackageVersion('../../packages/uikit-core/package.json')
+const chatroomVersion = getPackageVersion('../../packages/uikit-chatroom/package.json')
 
 export default defineConfig({
   define: {
+    // core sdk 基座（client.ts）与 chatroom Provider 均引用版本宏，必须全部定义
+    __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
     __EASEMOB_UIKIT_CORE_VERSION__: JSON.stringify(coreVersion),
     __EASEMOB_UIKIT_CHATROOM_VERSION__: JSON.stringify(chatroomVersion),
   },
