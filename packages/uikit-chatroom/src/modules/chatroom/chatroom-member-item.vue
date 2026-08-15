@@ -4,10 +4,10 @@
  * 点击触发 manage 事件（成员面板弹操作菜单）；Avatar 形状跟随主题（不硬编码 shape）。
  */
 import { computed } from 'vue'
-import { EmAvatar, t, useUserInfo } from '@easemob/uikit-core'
+import { EmAvatar, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../constants'
+import { useChatroomMember } from '../../composables/use-chatroom-member'
 import type { ChatroomMember } from '../../sdk/domain/chatroom-domain'
-import { useChatroomStore } from '../../store/chatroom'
 
 export interface ChatroomMemberItemProps {
   /** 成员数据 */
@@ -25,7 +25,8 @@ const emit = defineEmits<{
   (e: 'manage', member: ChatroomMember): void
 }>()
 
-const chatroomStore = useChatroomStore()
+// 只消费公开 composable 契约（§5.10：禁止直取 store，P2 review P1-1）
+const { muteList } = useChatroomMember()
 const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 
 /** 角色徽章文案（owner/admin 展示） */
@@ -37,9 +38,9 @@ const roleBadge = computed(() => {
   return ''
 })
 
-/** 是否在禁言名单中 */
+/** 是否在禁言名单中（双方归一化后比较，P2 review P2-4） */
 const isMuted = computed(() =>
-  chatroomStore.muteList.some(item => item.userId === props.member.userId))
+  muteList.value.some(item => normalizeUserId(item.userId) === props.member.userId))
 </script>
 
 <template>

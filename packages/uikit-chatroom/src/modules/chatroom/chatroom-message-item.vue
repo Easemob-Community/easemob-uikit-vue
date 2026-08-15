@@ -5,10 +5,9 @@
  * 接收侧渲染节流在 store 层（缓冲队列按 150ms 窗口批量合并），本组件只负责单条渲染。
  */
 import { computed, onUnmounted } from 'vue'
-import { EmAvatar, MESSAGE_TYPE, t, useUserInfo } from '@easemob/uikit-core'
+import { EmAvatar, MESSAGE_TYPE, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
-import { normalizeUserId } from '../../sdk/adapter/chatroom-adapter'
-import { useChatroomStore } from '../../store/chatroom'
+import { useChatroomMember } from '../../composables/use-chatroom-member'
 
 export interface ChatroomMessageItemProps {
   /** 待渲染消息（SDK 消息或本地系统通知） */
@@ -17,10 +16,16 @@ export interface ChatroomMessageItemProps {
 
 const props = defineProps<ChatroomMessageItemProps>()
 
-const chatroomStore = useChatroomStore()
+// 只消费公开 composable 契约（§5.10：禁止直取 store，P2 review P1-1）
+const { muteList } = useChatroomMember()
 
 /** 系统通知消息（成员进出/禁言/公告等，居中灰条） */
 const isNotice = computed(() => props.message.type === MESSAGE_TYPE.NOTICE)
+
+/** 消息类型分支（模板内避免硬编码字面量，P2 review P1-7） */
+const isText = computed(() => props.message.type === MESSAGE_TYPE.TEXT)
+const isImage = computed(() => props.message.type === MESSAGE_TYPE.IMAGE)
+const isCustom = computed(() => props.message.type === MESSAGE_TYPE.CUSTOM)
 
 /** 消息发送者 ID（notice 无发送者；适配器已按会话用户归一化） */
 const senderId = computed(() => (isNotice.value ? '' : normalizeUserId(props.message.from ?? '')))
@@ -33,6 +38,9 @@ const textContent = computed(() => {
     return (msg.body as { content?: string }).content ?? ''
   return ''
 })
+
+/** 本地图片预览 URL（组件生命周期内最多创建一个，卸载时 revoke） */
+let localPreviewUrl = ''
 
 /** 图片地址（img 消息体：thumb 优先，回落原图；本地乐观上屏阶段 body.data 为 File 时生成本地预览） */
 const imageUrl = computed(() => {
@@ -53,8 +61,6 @@ const imageUrl = computed(() => {
   return ''
 })
 
-/** 本地图片预览 URL（组件生命周期内最多创建一个，卸载时 revoke） */
-let localPreviewUrl = ''
 onUnmounted(() => {
   if (localPreviewUrl) {
     URL.revokeObjectURL(localPreviewUrl)
@@ -77,8 +83,9 @@ const isRecalled = computed(() => props.message.recalled === true)
 const noticeContent = computed(() =>
   (props.message as { body?: { content?: string } }).body?.content ?? '')
 
+/** 发送者是否在禁言名单（双方都归一化后比较，P2 review P2-4） */
 const isMutedMember = computed(() =>
-  chatroomStore.muteList.some(item => item.userId === senderId.value))
+  muteList.value.some(item => normalizeUserId(item.userId) === senderId.value))
 </script>
 
 <template>
@@ -103,18 +110,18 @@ const isMutedMember = computed(() =>
         </div>
         <div class="chatroom-message-item__bubble">
           <!-- 文本 -->
-          <template v-if="message.type === 'text'">
+          <template v-if="isText">
             {{ textContent }}
           </template>
           <!-- 图片 -->
           <img
-            v-else-if="message.type === 'image' && imageUrl"
+            v-else-if="isImage && imageUrl"
             class="chatroom-message-item__image"
             :src="imageUrl"
             :alt="textContent || 'image'"
           >
           <!-- 自定义消息兜底（P3 场景渲染可经容器 message-custom 插槽覆盖） -->
-          <span v-else-if="message.type === 'custom'">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
+          <span v-else-if="isCustom">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
           <!-- 未知类型兜底 -->
           <span v-else>{{ t('chatroom.ui.unknownMessage') }}</span>
         </div>
@@ -122,16 +129,16 @@ const isMutedMember = computed(() =>
     </template>
     <template v-else>
       <div class="chatroom-message-item__bubble chatroom-message-item__bubble--self">
-        <template v-if="message.type === 'text'">
+        <template v-if="isText">
           {{ textContent }}
         </template>
         <img
-          v-else-if="message.type === 'image' && imageUrl"
+          v-else-if="isImage && imageUrl"
           class="chatroom-message-item__image"
           :src="imageUrl"
           alt="image"
         >
-        <span v-else-if="message.type === 'custom'">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
+        <span v-else-if="isCustom">{{ t('chatroom.ui.customMessage') }}{{ customEvent ? ` ${customEvent}` : '' }}</span>
         <span v-else>{{ t('chatroom.ui.unknownMessage') }}</span>
       </div>
     </template>

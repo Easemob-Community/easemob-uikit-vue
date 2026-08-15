@@ -10,8 +10,10 @@ import { ref } from 'vue'
 import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob/uikit-core'
 
 export interface ChatroomInputBarProps {
-  /** 是否禁用输入（未进房 / 全员禁言非管理员 / 自己被禁言） */
+  /** 是否禁用输入（未进房 / 全员禁言非管理员且不在白名单 / 自己被禁言） */
   disabled?: boolean
+  /** 禁用原因提示（禁用时显示在输入条下方小字，P2 review P2-8） */
+  disabledHint?: string
   /** 占位文案，缺省用 locale（chatroom.ui.inputPlaceholder） */
   placeholder?: string
 }
@@ -25,6 +27,7 @@ export interface ChatroomInputBarEmits {
 
 const props = withDefaults(defineProps<ChatroomInputBarProps>(), {
   disabled: false,
+  disabledHint: '',
   placeholder: '',
 })
 
@@ -78,13 +81,19 @@ function handleEmojiSelect(emoji: string) {
   const start = el.selectionStart ?? text.value.length
   const end = el.selectionEnd ?? start
   text.value = text.value.slice(0, start) + emoji + text.value.slice(end)
-  // 光标移到插入内容之后并聚焦（不主动唤起 H5 键盘，避免遮挡表情面板）
+  // 仅当输入框已有焦点时恢复光标位置（focus() 会唤起移动端软键盘遮挡表情面板，
+  // P2 review P2-7）；未聚焦时值已更新，下次聚焦光标在末尾
   const caret = start + emoji.length
-  requestAnimationFrame(() => {
-    el.focus()
+  if (document.activeElement === el)
     el.setSelectionRange(caret, caret)
-  })
 }
+
+/** 设置输入框文本（容器在发送失败后回填，P2 review P1-6） */
+function setText(value: string) {
+  text.value = value
+}
+
+defineExpose({ setText })
 
 /** 回车发送（移动端软键盘确认键）；Shift+Enter 换行由 textarea 自带，此处仅 input 单行场景 */
 function handleKeydown(event: KeyboardEvent) {
@@ -136,6 +145,11 @@ function handleKeydown(event: KeyboardEvent) {
       @change="handleFileChange"
     >
 
+    <!-- 禁用原因提示（全员禁言/被禁言等，P2 review P2-8） -->
+    <div v-if="disabled && disabledHint" class="chatroom-input-bar__hint">
+      {{ disabledHint }}
+    </div>
+
     <!-- 表情面板（H5 底部弹层；选中插入不自动关闭，可连续选择） -->
     <EmPopup
       v-model:show="showEmojiPicker"
@@ -149,6 +163,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 <style scoped>
 .chatroom-input-bar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -159,6 +174,17 @@ function handleKeydown(event: KeyboardEvent) {
 
 .chatroom-input-bar--disabled {
   opacity: 0.6;
+}
+
+.chatroom-input-bar__hint {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(100% + 4px);
+  font-size: 12px;
+  color: var(--uikit-text-secondary);
+  text-align: center;
+  pointer-events: none;
 }
 
 .chatroom-input-bar__field {

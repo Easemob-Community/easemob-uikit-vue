@@ -21,7 +21,7 @@
  * - 接收侧渲染节流在 store 层（缓冲队列按窗口批量合并），容器直接绑定渲染列表；
  * - 被踢/解散终态：watch store 状态 → emit 事件 + 终态提示视图。
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { MESSAGE_TYPE, t, useClient } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
@@ -54,16 +54,15 @@ const {
   announcement,
   isAllMuted,
   isJoined,
+  kickReason,
   join,
   leave,
 } = useChatroom({
   historyPageSize: props.historyPageSize,
   maxMessages: props.maxMessages,
 })
-const { messages, historyHasMore, loadingHistory, sendText, sendImage, loadMoreHistory } = useChatroomMessage({
-  maxMessages: props.maxMessages,
-})
-const { canManage, muteList } = useChatroomMember()
+const { messages, historyHasMore, loadingHistory, sendText, sendImage, loadMoreHistory } = useChatroomMessage()
+const { canManage, muteList, isInAllowlist } = useChatroomMember()
 const { features } = useChatroomScene(() => props.scene)
 
 /** 模板枚举常量（禁止模板内硬编码字符串） */
@@ -77,10 +76,40 @@ const selfId = computed(() => normalizeUserId(currentUser.value ?? ''))
 const selfMuted = computed(() =>
   muteList.value.some(item => normalizeUserId(item.userId) === selfId.value))
 
-/** 输入条禁用：未进房 / 全员禁言且非管理员 / 自己被禁言 */
-const inputDisabled = computed(
-  () => !isJoined.value || (isAllMuted.value && !canManage.value) || selfMuted.value,
+/** 全员禁言时自己是否在白名单（白名单成员可发言豁免，P2 review P1-8；进房/全员禁言状态变化时刷新） */
+const inAllowlist = ref(false)
+watch(
+  [isAllMuted, isJoined] as const,
+  ([allMuted, joined]) => {
+    if (joined && allMuted && !canManage.value) {
+      void isInAllowlist().then((v) => {
+        inAllowlist.value = v
+      }).catch(() => {
+        inAllowlist.value = false
+      })
+    }
+    else {
+      inAllowlist.value = false
+    }
+  },
+  { immediate: true },
 )
+
+/** 输入条禁用：未进房 / 全员禁言且非管理员且不在白名单 / 自己被禁言 */
+const inputDisabled = computed(
+  () => !isJoined.value || (isAllMuted.value && !canManage.value && !inAllowlist.value) || selfMuted.value,
+)
+
+/** 输入条禁用原因提示（P2 review P2-8） */
+const inputDisabledHint = computed(() => {
+  if (!inputDisabled.value)
+    return ''
+  if (isAllMuted.value && !canManage.value && !inAllowlist.value)
+    return t('chatroom.ui.allMuted')
+  if (selfMuted.value)
+    return t('chatroom.ui.selfMuted')
+  return ''
+})
 
 /** 成员面板开关 */
 const showMemberPanel = ref(false)
@@ -92,10 +121,12 @@ const announcementEnabled = computed(() => features.value.announcement !== false
 const listRef = ref<HTMLElement>()
 const stickToBottom = ref(true)
 
-/** 自动加入：roomId 就绪且已登录时 join（roomId 变化自动换房） */
+/** 自动加入：roomId 就绪且已登录时 join（roomId 变化自动换房；换房重置滚动跟随） */
 watch(
   () => props.roomId,
   (id) => {
+    // 换房/退房重置滚底跟随（P2 review P1-4：旧房上翻状态不得带到新房）
+    stickToBottom.value = true
     if (!props.autoJoin || !id)
       return
     if (currentUser.value) {
@@ -115,12 +146,12 @@ watch(
   },
 )
 
-/** 被踢/解散终态：事件出口 + 视图提示 */
+/** 被踢/解散终态：事件出口（真实原因码，P2 review P1-2）+ 视图提示 */
 watch(
   () => status.value,
   (next, prev) => {
     if (next === CHATROOM_STATUS.KICKED && prev !== CHATROOM_STATUS.KICKED)
-      emit('kicked', 0)
+      emit('kicked', kickReason.value ?? 0)
     if (next === CHATROOM_STATUS.DESTROYED && prev !== CHATROOM_STATUS.DESTROYED)
       emit('destroyed')
   },
@@ -146,9 +177,14 @@ function handleListScroll(event: Event) {
   stickToBottom.value = el.scrollHeight - el.scrollTop - el.clientHeight < 40
 }
 
-/** 发送文本 */
+/** 输入条组件引用（发送失败回填用，P2 review P1-6） */
+const inputBarRef = ref<InstanceType<typeof ChatroomInputBar>>()
+
+/** 发送文本：乐观上屏清空后失败回填输入框（不丢文本） */
 function handleSend(text: string) {
-  void sendText(text).catch(() => {})
+  void sendText(text).catch(() => {
+    inputBarRef.value?.setText(text)
+  })
 }
 
 /** 发送图片 */
@@ -161,9 +197,19 @@ function handleExit() {
   void leave()
 }
 
-/** 向上加载更早历史 */
+/** 向上加载更早历史（记录滚动位置，加载后补偿防跳位，P2 review P1-3） */
 function handleLoadMore() {
-  void loadMoreHistory(props.historyPageSize).catch(() => {})
+  const el = listRef.value
+  const prevScrollGap = el ? el.scrollHeight - el.scrollTop : 0
+  void loadMoreHistory(props.historyPageSize)
+    .then(() => {
+      requestAnimationFrame(() => {
+        const target = listRef.value
+        if (target && prevScrollGap > 0)
+          target.scrollTop = target.scrollHeight - prevScrollGap
+      })
+    })
+    .catch(() => {})
 }
 
 /** 终态（被踢/解散）视图 */
@@ -179,6 +225,18 @@ const terminalView = computed(() => {
 function isCustomMessage(message: UiMessage): boolean {
   return message.type === MESSAGE_TYPE.CUSTOM
 }
+
+/** 场景消息过滤器接线（features.messageFilter，如语聊房过滤图片；P2 review P1-5） */
+const visibleMessages = computed(() => {
+  const filter = features.value.messageFilter
+  return filter ? messages.value.filter(filter) : messages.value
+})
+
+/** 容器卸载时自动退出房间（非终态；服务端成员资格不残留，P2 review P2-11） */
+onUnmounted(() => {
+  if (status.value === CHATROOM_STATUS.JOINED || status.value === CHATROOM_STATUS.JOINING)
+    void leave()
+})
 
 defineExpose({
   join: (id: string) => join(id),
@@ -227,8 +285,8 @@ defineExpose({
         {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
       </button>
 
-      <template v-if="messages.length > 0">
-        <template v-for="message in messages" :key="message.msgLocalId || message.msgServerId || message.localId">
+      <template v-if="visibleMessages.length > 0">
+        <template v-for="message in visibleMessages" :key="message.msgLocalId || message.msgServerId || message.localId">
           <!-- custom 消息：业务 message-custom 插槽优先，否则回落消息项兜底渲染 -->
           <slot
             v-if="$slots['message-custom'] && isCustomMessage(message)"
@@ -259,10 +317,12 @@ defineExpose({
       </div>
     </div>
 
-    <!-- 输入条（可整体覆盖） -->
+    <!-- 输入条（可整体覆盖；ref 供发送失败回填） -->
     <slot name="input-bar" :disabled="inputDisabled">
       <ChatroomInputBar
+        ref="inputBarRef"
         :disabled="inputDisabled"
+        :disabled-hint="inputDisabledHint"
         @send="handleSend"
         @send-image="handleSendImage"
       />

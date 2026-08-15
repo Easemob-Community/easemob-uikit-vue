@@ -6,12 +6,12 @@
  *   （设/移除管理员）；成员不可管理房主与自己。
  */
 import { computed, ref, watch } from 'vue'
-import { EmActionSheet, EmPopup, t, useClient } from '@easemob/uikit-core'
+import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob/uikit-core'
 import type { ActionSheetItem } from '@easemob/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../constants'
+import { useChatroom } from '../../composables/use-chatroom'
 import { useChatroomMember } from '../../composables/use-chatroom-member'
 import type { ChatroomMember } from '../../sdk/domain/chatroom-domain'
-import { useChatroomStore } from '../../store/chatroom'
 import ChatroomMemberItem from './chatroom-member-item.vue'
 
 export interface ChatroomMemberPanelProps {
@@ -27,13 +27,16 @@ const props = defineProps<ChatroomMemberPanelProps>()
 const emit = defineEmits<ChatroomMemberPanelEmits>()
 
 const { currentUser } = useClient()
-const chatroomStore = useChatroomStore()
+// 只消费公开 composable 契约（§5.10：禁止直取 store，P2 review P1-1）
+const { roomInfo } = useChatroom()
 const {
   members,
   membersHasMore,
+  muteList,
   isOwner,
   canManage,
   loadMembers,
+  refreshMuteList,
   muteMembers,
   unmuteMembers,
   kickMembers,
@@ -41,20 +44,21 @@ const {
   removeAdmin,
 } = useChatroomMember()
 
-/** 当前用户 ID（归一化，成员列表 userId 为纯 ID） */
-const selfId = computed(() => currentUser.value.split('/')[0] ?? '')
+/** 当前用户 ID（归一化，与成员列表 userId 比较口径一致，P2 review P2-3） */
+const selfId = computed(() => normalizeUserId(currentUser.value ?? ''))
 /** 在线人数（房间详情接口的当前人数，成员面板只展示已加载页） */
-const memberCount = computed(() => chatroomStore.info?.memberCount ?? 0)
+const memberCount = computed(() => roomInfo.value?.memberCount ?? 0)
 
 /** 目标成员（点击列表项设置；null 表示未选中） */
 const targetMember = ref<ChatroomMember | null>(null)
 /** 操作菜单显隐 */
 const showSheet = ref(false)
 
-/** 打开面板时拉取成员首页 */
+/** 打开面板时拉取成员首页 + 刷新禁言名单（进房前已禁言的成员也能正确显示，P2 review P2-2） */
 watch(() => props.show, (show) => {
   if (show) {
     void loadMembers(false).catch(() => {})
+    void refreshMuteList().catch(() => {})
   }
 })
 
@@ -74,12 +78,12 @@ const targetManageable = computed(() => {
   return true
 })
 
-/** 目标成员是否在禁言名单中 */
+/** 目标成员是否在禁言名单中（归一化比较） */
 const targetMuteState = computed(() => {
   const target = targetMember.value
   if (!target)
     return false
-  return chatroomStore.muteList.some(item => item.userId === target.userId)
+  return muteList.value.some(item => normalizeUserId(item.userId) === target.userId)
 })
 
 /** 组装操作菜单（按权限过滤） */
@@ -106,9 +110,12 @@ const sheetActions = computed<ActionSheetItem[]>(() => {
   return actions
 })
 
-/** 点击成员 → 弹操作菜单 */
+/** 点击成员 → 弹操作菜单（无管理权限的成员不弹，防空菜单，P2 review P2-1） */
 function handleManage(member: ChatroomMember) {
   targetMember.value = member
+  // targetManageable 依赖 targetMember，需在赋值后读取
+  if (!targetManageable.value)
+    return
   showSheet.value = true
 }
 
@@ -217,7 +224,7 @@ function handleListScroll(event: Event) {
 .chatroom-member-panel__list {
   max-height: 60vh;
   overflow-y: auto;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--uikit-safe-bottom, 0px);
   -webkit-overflow-scrolling: touch;
 }
 

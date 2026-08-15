@@ -1,5 +1,6 @@
-// @easemob/uikit-chatroom 聊天室场景包入口（P2-1 无头部分：sdk/store/composables，
-// UI 组件与容器在 P2-2 落地）。显式具名导出，不用 export * 跨包 re-export core 符号。
+// @easemob/uikit-chatroom 聊天室场景包入口（P2 完整落地：P2-1 无头内核 +
+// P2-2 容器/UI/demo）。显式具名导出，不用 export * 跨包 re-export core 符号
+// （normalizeUserId 等共享工具由 core 定义，本包 re-export 保持 API 兼容）。
 
 // 主题入口（构建时经 vite 收拢为 dist/theme/index.css；当前整体复用 core 变量）
 import './theme/index.css'

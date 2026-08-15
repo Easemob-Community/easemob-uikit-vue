@@ -11,7 +11,7 @@
  *
  * 聊天室是独立场景包：与 IM 主界面（会话/联系人）互不干扰，页面高度 100% 全屏。
  */
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { EmChatroomContainer, useChatroomProvider } from '@easemob/uikit-chatroom'
 import { useClient } from '@easemob/uikit-im'
 
@@ -34,7 +34,7 @@ const roomIdInput = ref('315874547400706')
 const activeRoomId = ref('')
 
 /** 聊天室 Provider（两包同装：SDK 单例已由 IM 初始化，此处经 core 对齐复用并追加注册 ChatRoomManager） */
-const chatroomCtx = useChatroomProvider(
+useChatroomProvider(
   { appKey: config?.appKey ?? '' },
   {
     chatroomCallbacks: {
@@ -66,11 +66,8 @@ function handleExit() {
   activeRoomId.value = ''
 }
 
-/** 页面卸载：离开聊天室（两包同装下不登出 IM 登录态） */
-onUnmounted(() => {
-  void chatroomCtx.stores.chatroom.reset()
-})
-
+// 页面卸载的离房清理由容器 onUnmounted 自动 leave 负责（P2 review P2-11）：
+// 不在此直调 store（公开契约纪律，且容器 leave 会同时清服务端成员资格与消息桶）。
 const isLoggedIn = computed(() => Boolean(currentUser.value))
 </script>
 
@@ -108,6 +105,7 @@ const isLoggedIn = computed(() => Boolean(currentUser.value))
         class="chatroom-demo__container"
         :room-id="activeRoomId"
         :scene="{ name: 'custom', layout: 'fullscreen', features: { memberList: 'panel', announcement: true } }"
+        @back="goBack"
         @kicked="handleExit"
         @destroyed="handleExit"
       />
