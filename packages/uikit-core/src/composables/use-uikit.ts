@@ -98,6 +98,12 @@ export interface CoreUIKitProviderOptions {
    * scope dispose 时调用。
    */
   onClientSetup?: (client: UIKitClient, coreStores: CoreStores) => (() => void) | void
+  /**
+   * 场景层 ClientConfig 解析钩子：在 createClient 前对配置做场景化补齐
+   * （如 IM 场景注入全量 managers / enableSyncData 默认值）。
+   * auto-init 与延迟初始化（ctx.init）路径统一经过该钩子。
+   */
+  resolveClientConfig?: (config: ClientConfig) => ClientConfig
 }
 
 /**
@@ -227,14 +233,16 @@ export function useCoreUIKitProvider(
   function setupClient(cfg: ClientConfig): UIKitClient {
     disposeClientSetup?.()
     disposeUserInfoDomain?.()
+    // 场景化配置补齐（managers / enableSyncData 等场景默认值），两条初始化路径统一经过
+    const resolved = options.resolveClientConfig?.(cfg) ?? cfg
     uikitClient = createClient({
-      ...cfg,
+      ...resolved,
       // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
-      clientName: options.clientName ?? cfg.clientName,
-      clientVersion: options.clientVersion ?? cfg.clientVersion,
+      clientName: options.clientName ?? resolved.clientName,
+      clientVersion: options.clientVersion ?? resolved.clientVersion,
     })
-    currentAppKey = cfg.appKey
-    stores.client.setAppKey(cfg.appKey)
+    currentAppKey = resolved.appKey
+    stores.client.setAppKey(resolved.appKey)
     domains.userInfo.listen()
     disposeUserInfoDomain = () => domains.userInfo.dispose()
     // 场景层挂钩（如 uikit-im 注册场景事件），返回的 dispose 随客户端生命周期清理

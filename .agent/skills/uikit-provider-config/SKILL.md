@@ -116,9 +116,12 @@ Provider 默认 `false` 保守，defaultFeatures 默认 `true` 供直接 `useUIK
 ## 5. 延迟初始化（autoInit=false）
 
 - setup 阶段不创建 SDK client；`ManagerHost` 代理把 domains 的访问运行时委托到
-  `requireClient()`（未初始化时 throw `[UIKit] SDK 尚未初始化：请先调用 useClient().init(config)…`）；
+  `requireClient()`（未初始化时 throw `[UIKit] SDK 尚未初始化：请先调用 init(config)…`）；
 - 业务侧 `useClient().init(config)`（内部 `createClient` + `registerEventHandlers` +
   `domains.userInfo.listen()`，可重复调用完成重新初始化）；
+- **场景默认值自动补齐**：`init({ appKey })` 无需关心 managers / enableSyncData——
+  场景包经 core provider 的 `resolveClientConfig` 钩子在 `setupClient` 统一注入
+  （auto-init 与延迟初始化同一路径），业务显式传入时以业务配置为准；
 - Domain 层在初始化前构建、初始化后正常工作，是延迟初始化的设计前提。
 
 ## 6. useUIKit() 与 UIKitContext

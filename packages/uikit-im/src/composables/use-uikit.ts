@@ -1,4 +1,5 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
+import { ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager } from 'easemob-websdk'
 import type { ClientConfig, ConnectionEventCallbacks, H5AdaptationConfig, ManagerHost, NoticeConfig, UIKitClient, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
 import { useCoreUIKitProvider } from '@easemob/uikit-core'
 import type {
@@ -65,6 +66,35 @@ export interface UIKitContext {
 export const UIKIT_CONTEXT_KEY: InjectionKey<UIKitContext> = Symbol('uikit')
 
 /**
+ * IM 场景的 SDK manager 注册列表。
+ * core 不静态 import manager 类（tree-shaking 约束），由场景包在此注入；
+ * 不含 ChatRoomManager——IM 场景不使用聊天室能力，不注入可让消费者摇掉
+ * websdk 的 chatroom manager 代码（websdk 5.x 按 manager 分 subpath、sideEffects:false）。
+ */
+const IM_SDK_MANAGERS: ClientConfig['managers'] = [
+  ChatManager,
+  ContactManager,
+  GroupManager,
+  PresenceManager,
+  PushManager,
+  UserInfoManager,
+]
+
+/**
+ * 注入 IM 场景默认 ClientConfig：全量 managers + 登录同步会话/联系人/群。
+ * 业务方经 sdkConfig 显式传入时以业务配置为准（覆盖默认）。
+ */
+function resolveClientConfig(config: ClientConfig): ClientConfig {
+  return {
+    ...config,
+    managers: config.managers ?? IM_SDK_MANAGERS,
+    // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
+    // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
+    enableSyncData: config.enableSyncData ?? ['conversation', 'contact', 'group'],
+  }
+}
+
+/**
  * 初始化 UIKit Provider。
  * 在 <UIKitProvider> 组件的 setup 中调用。
  *
@@ -111,11 +141,14 @@ export function useUIKitProvider(
   // autoInit 一律置 false，立即初始化改在下方显式触发——
   // 确保 onClientSetup 闭包在首次执行时已能拿到 coreCtx（features 代理）。
   // clientName/clientVersion：场景包版本注入，客户端版本日志输出 SDK + UIKit-IM + Core 三版本。
+  // resolveClientConfig：IM 默认 managers/enableSyncData 注入下沉到 core setupClient，
+  // auto-init 与 useClient().init() 延迟初始化路径统一生效。
   const coreCtx = useCoreUIKitProvider(config, {
     ...options,
     autoInit: false,
     clientName: 'UIKit-IM',
     clientVersion: __EASEMOB_UIKIT_VERSION__,
+    resolveClientConfig,
     onClientSetup: (client, coreStores) =>
       registerEventHandlers(client, { ...sceneStores, ...coreStores }, options.connectionCallbacks, coreCtx.features),
   })
@@ -143,7 +176,9 @@ export function useUIKitProvider(
     userInfo: coreCtx.domains.userInfo,
   }
 
-  // 立即初始化：仅当 auto-init 未关闭且已提供 appKey（语义同 core 的 auto-init）
+  // 立即初始化：仅当 auto-init 未关闭且已提供 appKey（语义同 core 的 auto-init）。
+  // IM 默认 managers/enableSyncData 由 core setupClient 内的 resolveClientConfig 钩子补齐，
+  // 此处与延迟初始化（ctx.init）均传原始 config 即可。
   if (options.autoInit !== false && config.appKey) {
     coreCtx.init(config)
   }

@@ -1,14 +1,16 @@
-import {
+import { ChatClient as SdkChatClient } from 'easemob-websdk'
+import type {
   ChatManager,
   ChatRoomManager,
+  ConnectionEventHandlerMap,
   ContactManager,
+  EventHandlerMap,
   GroupManager,
+  InitConfig,
   PresenceManager,
   PushManager,
-  ChatClient as SdkChatClient,
   UserInfoManager,
 } from 'easemob-websdk'
-import type { ConnectionEventHandlerMap, EventHandlerMap, InitConfig } from 'easemob-websdk'
 import { log } from '../utils/logger'
 import { setSdkDebugGuard } from '../utils/sdk-log-capture'
 
@@ -49,6 +51,14 @@ export interface ManagerHost {
 export interface ClientConfig extends InitConfig {
   /** 是否开启 SDK 调试日志 */
   debug?: boolean
+  /**
+   * SDK manager 注册列表（继承 InitConfig.managers）。
+   * **由场景包注入**：core 不静态 import 任何 manager 类——websdk 5.x 是 sideEffects:false 且按
+   * manager 分 subpath 的 ESM，场景包只传自己需要的 manager，消费者 bundler 才能摇掉无关
+   * manager 代码（如聊天室场景不传 Contact/Group/PushManager）。
+   * 未注入时构造抛错，不做静默默认。
+   */
+  managers?: InitConfig['managers']
   /**
    * 场景包名称（如 'UIKit-IM' / 'UIKit-Chatroom'），仅用于客户端版本日志展示，默认 'UIKit'。
    * 由场景包 Provider 注入，业务方无需关心。
@@ -100,19 +110,31 @@ export class UIKitClient {
   constructor(config: ClientConfig) {
     // clientName / clientVersion 是场景包注入的日志展示字段，不传给 SDK InitConfig
     const { debug, clientName = 'UIKit', clientVersion, ...sdkConfig } = config
+    // manager 列表必须由场景包注入（见 ClientConfig.managers 注释）：
+    // core 若静态 import manager 类，所有场景的消费者都无法 tree-shake 无关 manager。
+    if (!sdkConfig.managers?.length) {
+      throw new Error(
+        '[UIKit] ClientConfig.managers 未注入：SDK manager 列表由场景包 Provider 负责传入'
+        + '（如 IM 场景传 ChatManager/ContactManager/GroupManager/PresenceManager/PushManager/UserInfoManager，'
+        + '聊天室场景传 ChatManager/ChatRoomManager/UserInfoManager）。',
+      )
+    }
     // 与 SDK 默认值保持一致：群组解散时自动删除本地群会话
     this._deleteConversationOnGroupDestroyed = sdkConfig.deleteConversationOnGroupDestroyed ?? true
     this._client = SdkChatClient.init({
       ...sdkConfig,
-      // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
-      // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
-      enableSyncData: sdkConfig.enableSyncData ?? ['conversation', 'contact', 'group'],
+      // 登录后自动同步的数据类型由场景包决定（IM 场景注入 conversation/contact/group；
+      // 聊天室场景无需任何同步），core 不做场景化默认值。
+      // enableSyncData: 见场景包注入
       // 启用用户资料同步增强：SDK 在消息链路中补齐发送者资料，
       // 并结合联系人备注、用户资料和群名片更新 ConversationItem.conversationName /
       // SessionMessageSnippet.sender，减少上层 patchConversationNames 的手动补全调用。
       enableUserInfoSync: sdkConfig.enableUserInfoSync ?? true,
-      managers: [ChatManager, ChatRoomManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager],
-    }) as SdkChatClient & ManagerRegistry
+      managers: sdkConfig.managers,
+      // managers 为场景注入的宽类型（ReadonlyArray<ManagerRegistration<unknown>>），
+      // SDK 无法据此推断出具体 manager 映射，经 unknown 断言为完整 ManagerRegistry；
+      // 运行时字段存在性由场景包的注入列表保证（未注册的 manager 访问即 undefined，场景代码不使用）。
+    }) as unknown as SdkChatClient & ManagerRegistry
 
     if (debug) {
       _sdkDebugEnabled = true
