@@ -29,8 +29,8 @@ function getLoginConfig() {
 const config = getLoginConfig()
 const { currentUser } = useClient()
 
-/** 房间 ID 输入与当前活动房间 */
-const roomIdInput = ref('')
+/** 房间 ID 输入（默认填入联调聊天室，可改）与当前活动房间 */
+const roomIdInput = ref('315874547400706')
 const activeRoomId = ref('')
 
 /** 聊天室 Provider（两包同装：SDK 单例已由 IM 初始化，此处经 core 对齐复用并追加注册 ChatRoomManager） */
