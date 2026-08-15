@@ -64,12 +64,12 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 }
 
 .chat-info-drawer__member-tag--owner {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: rgba(var(--uikit-warning-rgb), 0.12);
+  color: var(--uikit-warning-color);
 }
 
 .chat-info-drawer__member-tag--admin {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: rgba(var(--uikit-info-rgb), 0.12);
+  color: var(--uikit-info-color);
 }
 </style>

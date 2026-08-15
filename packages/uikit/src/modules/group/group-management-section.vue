@@ -444,7 +444,7 @@ function closeDrawer() {
 .group-management-section__toggle-slider {
   position: absolute;
   inset: 0;
-  background-color: #d1d5db;
+  background-color: var(--uikit-border-color);
   border-radius: 24px;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

@@ -54,7 +54,7 @@
 - **修复**：已于 2026-07-29 修复。涉及文件：`user-card.vue`、`group-card.vue`、`contact-list.vue`、`contact-item.vue`、`contact-item-default.vue`、`group-list.vue`、`group-item.vue`、`group-item-default.vue`。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
 
-### [ ] D3. 主题 token 漂移：大量硬编码颜色 / 圆角 / 动效时长
+### [x] D3. 主题 token 漂移：大量硬编码颜色 / 圆角 / 动效时长
 
 - **现象**：库的样式契约是「只用 `var(--uikit-*)` token」，但组件 `<style>` 里散落 **140 处 hex + 51 处 rgba** 字面量，还有 ~50 处硬编码 `transition` 时长绕过动画开关。
 - **证据（worst offenders）**：`modules/chat/multi-select-bar/multi-select-bar.vue`(16 hex)、`modules/chat/message-item/message-bubble-wrapper.vue`(10)、`components/input/input.vue`(10)、`modules/conversation/conversation-item.vue`(7)、`modules/chat/drawer/chat-info-drawer.vue`(7)、`components/avatar/avatar.vue`(6)、`components/button/button.vue`(5)。多处手抄 theme 值（`#e5e7eb`≈border ×20、`#f3f4f6`≈bg-secondary ×16、`#fff` ×28），还引入了不在色板里的 `#5f6df3/#3b82f6/#007aff/#155eef/#ef4444/#ff4d4f`。2026-07-28 复核补充（暗色必现）：`components/user-card/user-card.vue:281,287` 与 `components/group-card/group-card.vue:185,191` action 按钮 `#f3f4f6`/hover `#e5e7eb`；`components/action-sheet/action-sheet.vue:84,99,109` 分隔线与按下态 `#f3f4f6`；`components/user-card/user-card-modal.vue:226`、`components/group-card/group-card-modal.vue:144` loading 遮罩 `rgba(255,255,255,0.7)`（暗色下盖白幕）；名片 banner 渐变 `#4f8cff/#2b6bf3/#7a5cff`（`user-card.vue:179`、`group-card.vue:128`）不跟随 primary token。
@@ -64,6 +64,8 @@
   1. **白色文字/背景**（41 处 `#fff`/`#ffffff`）：新增语义 token `--uikit-text-inverse: #ffffff`（浅色+暗色均恒白，强调色/彩色背景上的文字：按钮/badge/toast/播放按钮/头像等 21 个文件）；`background-color: #fff`（4 处）→ `var(--uikit-bg-elevated)`；模板内 `color="#fff"` prop（video-message）保留。
   2. **危险色**（9 处裸 `#ef4444`）→ `var(--uikit-danger-color)`（含 3 处 JS 动态样式 `color: 'var(--uikit-danger-color)'`，Vue 内联 style 支持 CSS 变量）；同时清理了 fallback 形式被全局替换误产生的自引用嵌套 `var(--uikit-danger-color, var(--uikit-danger-color))`。
   - **剩余约 33 处**：状态标签浅色（`#fef2f2`/`#dbeafe`/`#d1fae5`/`#fecaca` 等 role/status 徽章）、名片 banner 渐变（`#4f8cff`/`#2b6bf3`/`#7a5cff`，D3 证据提及不跟随 primary）、`#2563eb` 等——需新增状态/渐变 token 或按语义决策，留待 D3 收尾续做。
+- **修复（2026-08-15 收尾完成）**：第三轮清理剩余状态色——**零新增 token 方案**：role/status 徽章（owner/admin/muted/blocked/allowlist、declined/accepted 状态、danger/accept/reject 按钮）全部改用已有 `--uikit-*-rgb` 派生 rgba 浅色背景/边框（`rgba(var(--uikit-warning-rgb), 0.12)` 等）+ `var(--uikit-*-color)` 文字，**自动跟随主题色、暗色自然适配**；涉及 `group-member-list-item.vue`（13 处）、`chat-info-drawer-member-cell.vue`（owner/admin）、`join-request-list-item.vue`（状态+按钮）、`allow-list-item.vue`（danger 按钮）、`group-management-section.vue`（toggle 开关灰 → `--uikit-border-color`）、`voice-panel.vue`（border → `--uikit-border-color`）。
+  - **有意保留（全仓最后 4 处裸 hex）**：名片 banner 渐变 `#4f8cff/#2b6bf3/#7a5cff`（user-card/group-card，品牌渐变视觉，不跟随主题为设计选择）、avatar 无头像随机占位色板（5 色，加 token 无意义）、video-message 模板 Icon prop `color="#fff"`（非 CSS）。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [x] D4. 组件引用了「未定义」的 `--uikit-*` 变量，永远走 fallback 且 fallback 互相不一致

@@ -95,12 +95,12 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
   width: fit-content;
 }
 .join-request-list__status--declined {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: rgba(var(--uikit-danger-rgb), 0.12);
+  color: var(--uikit-danger-color);
 }
 .join-request-list__status--accepted {
-  background-color: #d1fae5;
-  color: #059669;
+  background-color: rgba(var(--uikit-success-rgb), 0.12);
+  color: var(--uikit-success-color);
 }
 .join-request-list__actions {
   display: flex;
@@ -123,21 +123,21 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
   }
 }
 .join-request-list__action-btn--accept {
-  border-color: #bbf7d0;
-  color: #16a34a;
+  border-color: rgba(var(--uikit-success-rgb), 0.25);
+  color: var(--uikit-success-color);
 }
 @media (hover: hover) {
   .join-request-list__action-btn--accept:hover {
-    background-color: #f0fdf4;
+    background-color: rgba(var(--uikit-success-rgb), 0.08);
   }
 }
 .join-request-list__action-btn--reject {
-  border-color: #fecaca;
+  border-color: rgba(var(--uikit-danger-rgb), 0.25);
   color: var(--uikit-danger-color);
 }
 @media (hover: hover) {
   .join-request-list__action-btn--reject:hover {
-    background-color: #fef2f2;
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
   }
 }
 </style>

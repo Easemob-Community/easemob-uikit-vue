@@ -378,13 +378,13 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__role--owner {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: rgba(var(--uikit-warning-rgb), 0.12);
+  color: var(--uikit-warning-color);
 }
 
 .group-member-list__role--admin {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: rgba(var(--uikit-info-rgb), 0.12);
+  color: var(--uikit-info-color);
 }
 
 .group-member-list__status-tag {
@@ -396,18 +396,18 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__status-tag--muted {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: rgba(var(--uikit-danger-rgb), 0.12);
+  color: var(--uikit-danger-color);
 }
 
 .group-member-list__status-tag--blocked {
-  background-color: #f3f4f6;
-  color: #6b7280;
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-secondary);
 }
 
 .group-member-list__status-tag--allowlist {
-  background-color: #d1fae5;
-  color: #059669;
+  background-color: rgba(var(--uikit-success-rgb), 0.12);
+  color: var(--uikit-success-color);
 }
 
 .group-member-list__id {
@@ -441,13 +441,13 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 }
 
 .group-member-list__action-btn--danger {
-  border-color: #fecaca;
+  border-color: rgba(var(--uikit-danger-rgb), 0.25);
   color: var(--uikit-danger-color);
 }
 
 @media (hover: hover) {
   .group-member-list__action-btn--danger:hover {
-    background-color: #fef2f2;
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
   }
 }
 

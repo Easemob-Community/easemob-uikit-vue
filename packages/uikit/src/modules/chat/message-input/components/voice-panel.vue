@@ -222,7 +222,7 @@ onBeforeUnmount(() => {
   min-height: 120px;
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-input-bg);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--uikit-border-color);
   cursor: pointer;
   user-select: none;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);

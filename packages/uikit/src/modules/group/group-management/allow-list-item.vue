@@ -76,12 +76,12 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   }
 }
 .allow-list__action-btn--danger {
-  border-color: #fecaca;
+  border-color: rgba(var(--uikit-danger-rgb), 0.25);
   color: var(--uikit-danger-color);
 }
 @media (hover: hover) {
   .allow-list__action-btn--danger:hover {
-    background-color: #fef2f2;
+    background-color: rgba(var(--uikit-danger-rgb), 0.08);
   }
 }
 </style>
