@@ -21,10 +21,12 @@ import DemoLiveProductCard from '../components/demo-live-product-card.vue'
 import type { LiveProduct } from '../components/demo-live-product-card.vue'
 
 const DEFAULT_ROOM_ID = '315874547400706'
+/** 信令房默认 ID（用户提供的联调信令房）；可改，清空退回单房形态 */
+const DEFAULT_SIGNAL_ROOM_ID = '315874557886465'
 
 const roomIdInput = ref(DEFAULT_ROOM_ID)
-/** 信令房 ID：默认空（用户联调时填写）；空数组 = 单房形态 */
-const signalRoomInput = ref('')
+/** 信令房 ID：默认填入联调信令房；清空 = 单房形态 */
+const signalRoomInput = ref(DEFAULT_SIGNAL_ROOM_ID)
 const activeRoomId = ref('')
 const joinError = ref('')
 
