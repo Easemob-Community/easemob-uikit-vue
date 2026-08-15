@@ -851,6 +851,15 @@
   - 验证：6 处 lint 错误清零（`pnpm exec eslint <file>`）。
 - **关联 skill**：`uikit-lint-governance`
 
+### [ ] D97. 聊天室 UIKit（`@easemob/uikit-chatroom`）：独立场景包 + 抽 `@easemob/uikit-core` 设计规划
+
+- **背景**：聊天室（直播/语聊房/小班课/私域直播，H5 居多）与单群聊场景几乎不重合（无离线/未读/回执/会话列表，消息为广播流），需独立场景包；但主题/i18n/sdk 抽象/原子组件必须单一维护，故抽共享基座。底层 `easemob-websdk@5.0.0` 已具备完整 `ChatRoomManager`（join/leave/成员/管理员/禁言/黑/白名单/公告/房间属性 KV），能力底座齐备。
+- **结论**：三包架构 `@easemob/uikit-core`（共享内核）+ `@easemob/uikit`（1v1/群聊场景，对外 API 零变化）+ `@easemob/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
+- **关键增量/修正（评审已核实）**：① 事件注册按场景分离（core 只留连接级 + notice，chatroom 自建 `registerChatroomEventHandlers`）；② `ManagerHost` 需新增 `chatRoomManager`（当前 `SdkChatClient.init` 未注册 ChatRoomManager）；③ 所有包 external `vue/pinia/easemob-websdk`，场景包再 external core（单 websdk 实例规则）；④ core 增加 `extendLocale`（约 10 行）供 chatroom 合并 i18n keys；⑤ `useChatroomAttributes` 四层同步（本地缓存 + set + 变更事件 + 拉取兜底），属性 key 加场景前缀；⑥ `scripts/check-version-sync.mjs` 升级为双版本校验。
+- **执行计划**（P0 决策 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)。
+- **进度（2026-08-15）**：P0 设计评审完成、文档落盘；按用户时序 `@easemob/uikit` 1.x 开发完后启动 P1。
+- **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring` / `uikit-provider-config` / `uikit-h5-adaptation` / `uikit-release-build`
+
 ---
 
 ## 已修复（归档）

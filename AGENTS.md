@@ -67,6 +67,7 @@
 - Demo 开发者友好模式预研：根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
+- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit` 1.x 开发完后启动）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
