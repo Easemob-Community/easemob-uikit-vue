@@ -153,8 +153,8 @@ function handleKeydown(event: KeyboardEvent) {
 
     <!-- 表情面板（H5 底部弹层；选中插入不自动关闭，可连续选择） -->
     <EmPopup
-      :to="getChatroomPopupTarget() ?? undefined"
       v-model:show="showEmojiPicker"
+      :to="getChatroomPopupTarget() ?? undefined"
       position="bottom"
       class="chatroom-input-bar__emoji-popup"
     >

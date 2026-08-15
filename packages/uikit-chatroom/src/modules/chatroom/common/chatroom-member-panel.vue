@@ -278,8 +278,8 @@ function handleToggleMuteAll() {
   </EmPopup>
 
   <EmActionSheet
-    :to="getChatroomPopupTarget() ?? undefined"
     v-model:show="showSheet"
+    :to="getChatroomPopupTarget() ?? undefined"
     :title="t('chatroom.ui.members')"
     :actions="sheetActions"
     @select="handleSelect"
