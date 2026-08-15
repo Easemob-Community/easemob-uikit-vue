@@ -8,6 +8,7 @@
  */
 import { ref } from 'vue'
 import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob/uikit-core'
+import { getChatroomPopupTarget } from '../../../config/popup-target'
 
 export interface ChatroomInputBarProps {
   /** 是否禁用输入（未进房 / 全员禁言非管理员且不在白名单 / 自己被禁言） */
@@ -152,6 +153,7 @@ function handleKeydown(event: KeyboardEvent) {
 
     <!-- 表情面板（H5 底部弹层；选中插入不自动关闭，可连续选择） -->
     <EmPopup
+      :to="getChatroomPopupTarget() ?? undefined"
       v-model:show="showEmojiPicker"
       position="bottom"
       class="chatroom-input-bar__emoji-popup"

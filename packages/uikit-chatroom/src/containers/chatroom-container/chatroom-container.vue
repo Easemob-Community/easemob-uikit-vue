@@ -25,6 +25,7 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import { EmPopup, MESSAGE_TYPE, t, useClient } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
+import { getChatroomPopupTarget } from '../../config/popup-target'
 import { normalizeUserId } from '../../sdk/adapter/chatroom-adapter'
 import { useChatroom } from '../../composables/use-chatroom'
 import { useChatroomMember } from '../../composables/use-chatroom-member'
@@ -454,6 +455,7 @@ defineExpose({
 
     <!-- 公告编辑框（P3：owner/admin） -->
     <EmPopup
+      :to="getChatroomPopupTarget() ?? undefined"
       v-model:show="showAnnouncementEditor"
       position="center"
       class="chatroom-container__announcement-editor"

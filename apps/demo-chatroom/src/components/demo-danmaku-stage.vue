@@ -7,7 +7,7 @@
  *
  * props.items 为新增条目流（页面 push 追加，本组件 watch 长度增量消费）。
  */
-import { ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 export interface DanmakuItem {
   id: number
@@ -37,6 +37,28 @@ interface ActiveItem extends DanmakuItem {
 const active = ref<ActiveItem[]>([])
 /** 轨道轮询索引 */
 let trackCursor = 0
+
+/**
+ * 舞台容器实测宽度（弹幕滚出终点用）：动画终点不能按视口宽度（100vw）——
+ * PC 上容器 375px 居中、视口 1400px+，弹幕 9s 飞过整个视口在容器内观感过快。
+ * 以容器实测宽度计算滚出距离，PC/移动端观感一致。
+ */
+const stageRef = ref<HTMLElement>()
+
+function syncStageWidth() {
+  const el = stageRef.value
+  if (el)
+    el.style.setProperty('--stage-width', `${el.clientWidth}px`)
+}
+
+onMounted(() => {
+  syncStageWidth()
+  window.addEventListener('resize', syncStageWidth)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', syncStageWidth)
+})
 
 /** 活跃系统通知（单条，2.8s 后消失） */
 const notice = ref<DanmakuItem | null>(null)
@@ -154,7 +176,8 @@ watch(
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-100vw - 100%));
+    /* 终点 = 容器宽度 + 自身宽度（--stage-width 由组件挂载时实测，见 script） */
+    transform: translateX(calc(-1 * var(--stage-width, 375px) - 100%));
   }
 }
 

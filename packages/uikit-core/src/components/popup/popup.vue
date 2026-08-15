@@ -33,6 +33,11 @@ export interface PopupProps {
   boundary?: HTMLElement
   /** 互斥分组：同一 group 内同时只能有一个 popup 打开，打开新的会自动关闭其他的 */
   group?: string
+  /**
+   * Teleport 目标（默认 'body'）。嵌套弹层容器（如 demo 手机壳）场景传入
+   * 壳内元素选择器/元素，弹层随壳定位（配合壳的 transform 包含块）。
+   */
+  to?: string | HTMLElement
 }
 
 export interface PopupEmits {
@@ -41,6 +46,11 @@ export interface PopupEmits {
   /** 弹层关闭时触发（与 update:show(false) 同时发出），供业务侧感知关闭 */
   (e: 'close'): void
 }
+
+// 根节点是 Teleport（无法自动继承 attrs），需显式把 class/style/事件等
+// $attrs 透传到 teleport 内根元素（uikit-popup div），否则外部传 class 会触发
+// "Extraneous non-props attributes" 警告且样式丢失。
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<PopupProps>(), {
   position: 'center',
@@ -52,11 +62,6 @@ const props = withDefaults(defineProps<PopupProps>(), {
   align: 'center',
   offset: 8,
 })
-
-// 根节点是 Teleport（无法自动继承 attrs），需显式把 class/style/事件等
-// $attrs 透传到 teleport 内根元素（uikit-popup div），否则外部传 class 会触发
-// "Extraneous non-props attributes" 警告且样式丢失。
-defineOptions({ inheritAttrs: false })
 
 const emit = defineEmits<PopupEmits>()
 const { t } = useLocale()
@@ -95,7 +100,8 @@ const contentStyle = ref<Record<string, string>>({})
 const ignoreClickOutside = ref(false)
 
 function updateAnchorPosition() {
-  if (!isAnchored.value || !props.anchor || !contentRef.value) return
+  if (!isAnchored.value || !props.anchor || !contentRef.value)
+    return
 
   const anchorRect = props.anchor.getBoundingClientRect()
   const contentRect = contentRef.value.getBoundingClientRect()
@@ -116,16 +122,16 @@ function updateAnchorPosition() {
       x = alignStart
         ? anchorRect.left
         : alignEnd
-            ? anchorRect.right - contentRect.width
-            : anchorRect.left + (anchorRect.width - contentRect.width) / 2
+          ? anchorRect.right - contentRect.width
+          : anchorRect.left + (anchorRect.width - contentRect.width) / 2
       y = anchorRect.bottom + offset
       break
     case 'top':
       x = alignStart
         ? anchorRect.left
         : alignEnd
-            ? anchorRect.right - contentRect.width
-            : anchorRect.left + (anchorRect.width - contentRect.width) / 2
+          ? anchorRect.right - contentRect.width
+          : anchorRect.left + (anchorRect.width - contentRect.width) / 2
       y = anchorRect.top - contentRect.height - offset
       break
     case 'left':
@@ -133,27 +139,30 @@ function updateAnchorPosition() {
       y = alignStart
         ? anchorRect.top
         : alignEnd
-            ? anchorRect.bottom - contentRect.height
-            : anchorRect.top + (anchorRect.height - contentRect.height) / 2
+          ? anchorRect.bottom - contentRect.height
+          : anchorRect.top + (anchorRect.height - contentRect.height) / 2
       break
     case 'right':
       x = anchorRect.right + offset
       y = alignStart
         ? anchorRect.top
         : alignEnd
-            ? anchorRect.bottom - contentRect.height
-            : anchorRect.top + (anchorRect.height - contentRect.height) / 2
+          ? anchorRect.bottom - contentRect.height
+          : anchorRect.top + (anchorRect.height - contentRect.height) / 2
       break
   }
 
   // 边界检测与翻转
   if (props.placement === 'bottom' && y + contentRect.height > vh) {
     y = anchorRect.top - contentRect.height - offset
-  } else if (props.placement === 'top' && y < 0) {
+  }
+  else if (props.placement === 'top' && y < 0) {
     y = anchorRect.bottom + offset
-  } else if (props.placement === 'right' && x + contentRect.width > vw) {
+  }
+  else if (props.placement === 'right' && x + contentRect.width > vw) {
     x = anchorRect.left - contentRect.width - offset
-  } else if (props.placement === 'left' && x < 0) {
+  }
+  else if (props.placement === 'left' && x < 0) {
     x = anchorRect.right + offset
   }
 
@@ -201,11 +210,13 @@ watch(() => [props.show, props.anchor], ([show]) => {
 }, { flush: 'sync' })
 
 useEventListener(window, 'resize', () => {
-  if (props.show && isAnchored.value) updateAnchorPosition()
+  if (props.show && isAnchored.value)
+    updateAnchorPosition()
 })
 
 useEventListener(window, 'scroll', () => {
-  if (props.show && isAnchored.value) updateAnchorPosition()
+  if (props.show && isAnchored.value)
+    updateAnchorPosition()
 }, { capture: true })
 
 // ESC 关闭（可配置）：active 由展示状态与 closeOnEsc 共同控制，打开时才挂载监听
@@ -215,9 +226,11 @@ useEscToClose(computed(() => props.show && props.closeOnEsc), () => {
 })
 
 onClickOutside(contentRef, (event) => {
-  if (ignoreClickOutside.value) return
+  if (ignoreClickOutside.value)
+    return
   // 锚定模式下点击 anchor 本身不关闭 popup
-  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node)) return
+  if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node))
+    return
   if (props.closeOnClickOverlay && props.show) {
     emit('update:show', false)
     emit('close')
@@ -272,7 +285,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="props.to ?? 'body'">
     <Transition name="uikit-fade">
       <div
         v-if="props.show"

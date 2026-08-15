@@ -9,6 +9,7 @@ import { computed, ref, watch } from 'vue'
 import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob/uikit-core'
 import type { ActionSheetItem } from '@easemob/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../../constants'
+import { getChatroomPopupTarget } from '../../../config/popup-target'
 import { useChatroom } from '../../../composables/use-chatroom'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'
 import type { ChatroomMember } from '../../../sdk/domain/chatroom-domain'
@@ -200,6 +201,7 @@ function handleToggleMuteAll() {
 
 <template>
   <EmPopup
+    :to="getChatroomPopupTarget() ?? undefined"
     :show="props.show"
     position="bottom"
     :close-on-click-overlay="true"
@@ -276,6 +278,7 @@ function handleToggleMuteAll() {
   </EmPopup>
 
   <EmActionSheet
+    :to="getChatroomPopupTarget() ?? undefined"
     v-model:show="showSheet"
     :title="t('chatroom.ui.members')"
     :actions="sheetActions"

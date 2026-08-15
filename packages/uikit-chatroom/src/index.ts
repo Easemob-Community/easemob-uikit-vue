@@ -97,3 +97,6 @@ export type { SignalMessagePayload, SignalStatusPayload } from './sdk/event/chat
 
 // locale 文案表（供业务方查阅/二次合并）
 export { chatroomLocaleZhCN, chatroomLocaleEn } from './locale'
+
+// 弹层 Teleport 目标（嵌套弹层容器场景，如 demo 手机壳；默认 body）
+export { setChatroomPopupTarget, getChatroomPopupTarget } from './config/popup-target'

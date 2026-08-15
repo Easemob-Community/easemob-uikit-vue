@@ -6,7 +6,8 @@
  * Vue 的 inject 只解析父组件链，同一组件 setup 内 provide 的值对自身不可见。
  * 消费侧逻辑在 app-shell.vue（子组件）。
  */
-import { useChatroomProvider } from '@easemob/uikit-chatroom'
+import { onMounted } from 'vue'
+import { setChatroomPopupTarget, useChatroomProvider } from '@easemob/uikit-chatroom'
 import AppShell from './app-shell.vue'
 
 /** 从 localStorage 读取登录配置（与 apps/demo 共用 uikit_demo_login_config） */
@@ -27,6 +28,12 @@ useChatroomProvider({
   appKey: config?.appKey ?? '',
   ...(config?.apiUrl ? { apiUrl: config.apiUrl } : {}),
   ...(config?.debug ? { debug: true } : {}),
+})
+
+// 弹层打进手机壳（表情/成员面板/操作菜单/公告编辑随壳定位与限宽，
+// 而非视口全宽错位——壳 transform 建立 fixed 包含块，见 .phone-shell__screen）
+onMounted(() => {
+  setChatroomPopupTarget('.phone-shell__screen')
 })
 </script>
 
@@ -57,6 +64,8 @@ useChatroomProvider({
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* fixed 包含块：弹层（EmPopup 等 teleport 进壳）按壳定位限宽，而非视口全宽 */
+  transform: translateZ(0);
 }
 
 @media (min-width: 500px) {
