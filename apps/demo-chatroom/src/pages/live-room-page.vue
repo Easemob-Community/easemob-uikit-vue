@@ -1,25 +1,36 @@
 <script setup lang="ts">
 /**
- * 私域直播页：live preset + 信令房双房实证（§5.9）。
+ * 私域直播页（P4 review UI 规范重构）：视频画面上四层绝对定位 overlay——
+ * 顶层（顶部信息栏/抽奖入口）+ 左下区（欢迎横幅 + 弹幕流）+ 右中区
+ * （商品讲解卡片）+ 底部（快捷输入区）。全部 UI 为包内直播组件集
+ * （ChatroomLive*），内核走 headless 契约（useChatroom + useChatroomMessage
+ * subscribe + member-joined），不经过 EmChatroomContainer。
  *
- * 双房链路：UI 房承载弹幕/礼物（容器全量管线），信令房承载商品指令
- * （不上屏，业务经 signal-message 回调消费）。本页演示完整业务闭环：
- * 「上架商品」→ sendCustom 发往信令房 → 业务解析指令 → 写 live:product
- * 房间属性 → 商品卡片全房间实时刷新（属性四层同步）。
- *
- * 信令房 ID 默认空（用户联调时填写；填入即数组存在即多房，无布尔开关）。
+ * 双房链路保留：商品指令/签到指令发信令房 → signal-message 回调 →
+ * 写 live:product 属性 / push 弹幕。
  */
 import { computed, ref } from 'vue'
 import {
-  EmChatroomContainer,
+  CHATROOM_GIFT_EVENT,
+  ChatroomLiveDanmakuStream,
+  ChatroomLiveInputBar,
+  ChatroomLiveLotteryEntry,
+  ChatroomLiveProductCard,
+  ChatroomLiveTopBar,
+  ChatroomLiveWelcomeBanner,
   useChatroom,
   useChatroomAttributes,
   useChatroomMessage,
 } from '@easemob/uikit-chatroom'
-import type { SignalMessagePayload, SignalStatusPayload } from '@easemob/uikit-chatroom'
+import type {
+  LiveDanmakuItem,
+  LiveProduct,
+  MemberJoinedPayload,
+  SignalMessagePayload,
+  SignalStatusPayload,
+} from '@easemob/uikit-chatroom'
+import { MESSAGE_TYPE, useToast } from '@easemob/uikit-core'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
-import DemoLiveProductCard from '../components/demo-live-product-card.vue'
-import type { LiveProduct } from '../components/demo-live-product-card.vue'
 
 const DEFAULT_ROOM_ID = '315874547400706'
 /** 信令房默认 ID（用户提供的联调信令房）；可改，清空退回单房形态 */
@@ -31,11 +42,21 @@ const signalRoomInput = ref(DEFAULT_SIGNAL_ROOM_ID)
 const activeRoomId = ref('')
 const joinError = ref('')
 
-/** 商品属性（live:product）与发送能力 */
+const toast = useToast()
+const {
+  isJoined,
+  join,
+  leave,
+  joinSignalRoom,
+  leaveSignalRoom,
+  subscribeMemberJoined,
+  subscribeSignalMessages,
+  subscribeSignalStatus,
+} = useChatroom()
+const { subscribe, sendText, sendCustom } = useChatroomMessage()
 const { attributes, setAttributes } = useChatroomAttributes()
-const { sendCustom } = useChatroomMessage()
-/** 房间信息（主播条在线人数） */
-const { roomInfo } = useChatroom()
+
+/* ===== 商品（live:product 属性 + 信令指令驱动） ===== */
 
 /** 当前商品（属性 JSON 解析；缺失/损坏回落 null） */
 const product = computed<LiveProduct | null>(() => {
@@ -58,11 +79,9 @@ const product = computed<LiveProduct | null>(() => {
   }
 })
 
-/** 信令房状态（signal-status 事件） */
-const signalStatus = ref('未启用')
-const signalStatusKind = ref<'idle' | 'ok' | 'err'>('idle')
-/** 信令房最近指令日志（signal-message 事件，仅展示业务关心的指令） */
-const signalLogs = ref<string[]>([])
+/** 商品讲解状态（模拟：上架即讲解中；抢购完售罄） */
+const productExplaining = ref(true)
+const productSoldOut = ref(false)
 
 /** 模拟商品清单（演示「上架商品」循环） */
 const DEMO_PRODUCTS: LiveProduct[] = [
@@ -73,14 +92,16 @@ const DEMO_PRODUCTS: LiveProduct[] = [
 ]
 let productIndex = 0
 
-/** 商品指令事件名（信令房 custom 消息；UI 房属性 key 同名前缀对齐 CHATROOM_ATTR_PREFIX.LIVE） */
+/** 商品指令事件名（信令房 custom 消息） */
 const PRODUCT_EVENT = 'live:product'
+/** 签到指令事件名（信令房 custom 消息，低量高可达指令通道演示） */
+const CHECKIN_EVENT = 'live:checkin'
 
 /** 上架商品：指令发往信令房（sendCustom 显式 roomId，§5.9 按房发送实证） */
 async function handlePublishProduct() {
   const signalRoomId = signalRoomInput.value.trim()
   if (!signalRoomId) {
-    joinError.value = '请先填写信令房 ID（商品指令走信令房通道）'
+    toast.error('请先填写信令房 ID（商品指令走信令房通道）')
     return
   }
   const next = DEMO_PRODUCTS[productIndex % DEMO_PRODUCTS.length]!
@@ -92,68 +113,213 @@ async function handlePublishProduct() {
       emoji: next.emoji,
       desc: next.desc ?? '',
     }, { roomId: signalRoomId })
-    signalLogs.value = [...signalLogs.value.slice(-4), `📤 已发送上架指令：${next.name}`]
+    productExplaining.value = true
+    productSoldOut.value = false
+    pushDanmaku({ kind: 'checkin', name: '系统', content: `📦 新商品上架：${next.name}` })
   }
   catch {
-    signalLogs.value = [...signalLogs.value.slice(-4), '⚠️ 指令发送失败（信令房未加入？）']
+    toast.error('指令发送失败（信令房未加入？）')
   }
 }
 
-/** 信令房消息透传（§5.9）：解析商品指令 → 写 UI 房属性 → 商品卡刷新 */
+/** 信令房消息透传：商品指令 → 写 live:product 属性；签到指令 → checkin 弹幕 */
 function handleSignalMessage(payload: SignalMessagePayload) {
   const body = payload.message.body as { event?: string, params?: Record<string, string> }
-  if (body.event !== PRODUCT_EVENT)
-    return
-  const { name, price, emoji, desc } = body.params ?? {}
-  if (!name || !price)
-    return
-  const productToSet: LiveProduct = {
-    name,
-    price: Number(price) || 0,
-    emoji: emoji || '🛍️',
-    desc: desc || undefined,
+  if (body.event === PRODUCT_EVENT) {
+    const { name, price, emoji, desc } = body.params ?? {}
+    if (!name || !price)
+      return
+    void setAttributes({ 'live:product': JSON.stringify({
+      name,
+      price: Number(price) || 0,
+      emoji: emoji || '🛍️',
+      desc: desc || undefined,
+    }) }).catch(() => {})
+    productExplaining.value = true
+    productSoldOut.value = false
   }
-  void setAttributes({ 'live:product': JSON.stringify(productToSet) }).catch(() => {})
-  signalLogs.value = [...signalLogs.value.slice(-4), `📦 商品指令：${name} ¥${productToSet.price}`]
+  else if (body.event === CHECKIN_EVENT) {
+    // 签到系统消息（红色渐变胶囊）
+    pushDanmaku({ kind: 'checkin', name: '系统', content: '签到力泉会员活动！！' })
+  }
 }
 
-/** 信令房状态（joined/failed/kicked/destroyed，不拖累 UI 房） */
+/** 商品卡交互 */
+function handleProductBuy(_product: LiveProduct) {
+  if (productSoldOut.value) {
+    toast.error('已抢光啦，下次早点来~')
+    return
+  }
+  // 购买提示弹幕（脱敏用户名 + 随机人数合并）
+  pushDanmaku({
+    kind: 'purchase',
+    name: '朱长士',
+    content: '正在去购买',
+    count: 1 + Math.floor(Math.random() * 5),
+  })
+  productSoldOut.value = true
+}
+
+function handleProductClose() {
+  void setAttributes({ 'live:product': '' }).catch(() => {})
+}
+
+function handleProductClick(prod: LiveProduct) {
+  toast.success(`跳转商品详情：${prod.name}（演示）`)
+}
+
+/* ===== 弹幕流（headless subscribe 驱动） ===== */
+
+const danmakuItems = ref<LiveDanmakuItem[]>([])
+let danmakuSeq = 0
+
+function pushDanmaku(item: Omit<LiveDanmakuItem, 'id'>) {
+  danmakuSeq += 1
+  danmakuItems.value = [...danmakuItems.value, { ...item, id: danmakuSeq }]
+}
+
+/** 消息增量订阅：按类型分流到弹幕（普通/礼物） */
+subscribe((batch) => {
+  for (const msg of batch) {
+    const from = msg.from || '游客'
+    if (msg.type === MESSAGE_TYPE.TEXT) {
+      pushDanmaku({ kind: 'normal', name: from, content: (msg.body as { content?: string }).content ?? '' })
+      continue
+    }
+    if (msg.type === MESSAGE_TYPE.CUSTOM) {
+      const body = msg.body as { event?: string, params?: Record<string, string> }
+      if (body.event === CHATROOM_GIFT_EVENT) {
+        pushDanmaku({
+          kind: 'gift',
+          name: from,
+          content: `送出 ${body.params?.giftName ?? '礼物'}`,
+          giftIcon: body.params?.icon ?? '🎁',
+        })
+      }
+    }
+  }
+})
+
+/** 成员加入 → 欢迎横幅（VIP 判定：ext 透传 '1' 或随机模拟） */
+const welcomeShow = ref(false)
+const welcomeName = ref('')
+const welcomeVip = ref(false)
+let welcomeQueue: Array<{ name: string, vip: boolean }> = []
+let welcomeBusy = false
+
+function showNextWelcome() {
+  if (welcomeBusy || welcomeQueue.length === 0)
+    return
+  welcomeBusy = true
+  const next = welcomeQueue.shift()!
+  welcomeName.value = next.name
+  welcomeVip.value = next.vip
+  welcomeShow.value = true
+}
+
+subscribeMemberJoined((payload: MemberJoinedPayload) => {
+  for (const member of payload.members) {
+    welcomeQueue.push({
+      name: member.nickname || member.userId,
+      vip: payload.ext === '1' || Math.random() < 0.2,
+    })
+  }
+  showNextWelcome()
+})
+
+function handleWelcomeHidden() {
+  welcomeShow.value = false
+  welcomeBusy = false
+  showNextWelcome()
+}
+
+/* ===== 底部输入区 ===== */
+
+const QUICK_PHRASES = ['欢迎新来的小伙伴~', '主播真棒！', '666', '链接在哪里？']
+const likeCount = ref(0)
+const likeCountText = computed(() => {
+  if (likeCount.value === 0)
+    return ''
+  if (likeCount.value >= 10000)
+    return `${(likeCount.value / 10000).toFixed(1)}w`
+  return String(likeCount.value)
+})
+
+function handleSendText(content: string) {
+  void sendText(content).catch(() => {
+    toast.error('发送失败')
+  })
+}
+
+function handleLike() {
+  likeCount.value += 1
+}
+
+/* ===== 信令房状态 ===== */
+
+const signalStatus = ref('未启用')
+const signalStatusKind = ref<'idle' | 'ok' | 'err'>('idle')
+const signalPanelOpen = ref(false)
+
 function handleSignalStatus(payload: SignalStatusPayload) {
   signalStatus.value = payload.status
   signalStatusKind.value = payload.status === 'joined' ? 'ok' : 'err'
-  if (payload.status === 'joined') {
-    signalLogs.value = [...signalLogs.value.slice(-4), `🔗 信令房已接入：${payload.roomId.slice(0, 8)}…`]
+}
+
+/** 签到指令（信令房通道演示）：发 custom 到信令房 → signal-message → checkin 弹幕 */
+async function handleCheckin() {
+  const signalRoomId = signalRoomInput.value.trim()
+  if (!signalRoomId) {
+    toast.error('请先填写信令房 ID（签到指令走信令房通道）')
+    return
   }
-  else if (payload.status === 'failed' || payload.status === 'kicked' || payload.status === 'destroyed') {
-    signalLogs.value = [...signalLogs.value.slice(-4), `⚠️ 信令房 ${payload.status}（UI 房不受影响）`]
+  try {
+    await sendCustom(CHECKIN_EVENT, {}, { roomId: signalRoomId })
+  }
+  catch {
+    toast.error('签到指令发送失败')
   }
 }
 
-/** 进入直播：UI 房 + 可选信令房 */
+/* ===== 信令房订阅接线（页面不经容器，显式订阅） ===== */
+subscribeSignalMessages(handleSignalMessage)
+subscribeSignalStatus(handleSignalStatus)
+
+/* ===== 房间生命周期 ===== */
+
 function handleJoin() {
   const id = roomIdInput.value.trim()
   if (!id)
     return
   joinError.value = ''
   signalStatus.value = signalRoomInput.value.trim() ? '接入中…' : '未启用'
-  signalLogs.value = []
-  activeRoomId.value = id
+  danmakuItems.value = []
+  likeCount.value = 0
+  welcomeQueue = []
+  const signalRoomId = signalRoomInput.value.trim()
+  if (signalRoomId) {
+    // 信令房并行入房（leaveOtherRooms: false 由 joinSignalRoom 内部保证）
+    void joinSignalRoom(signalRoomId, { pullHistory: false, autoRejoin: true }).catch(() => {
+      // 失败已降级为 signal-status
+    })
+  }
+  void join(id, JSON.stringify({ source: 'live-page' })).catch((error: unknown) => {
+    joinError.value = (error as Error).message || '加入失败'
+  }).then(() => {
+    if (isJoined.value)
+      activeRoomId.value = id
+  })
 }
 
 function handleExit() {
-  activeRoomId.value = ''
-  joinError.value = ''
+  const signalRoomId = signalRoomInput.value.trim()
+  if (signalRoomId)
+    void leaveSignalRoom(signalRoomId).catch(() => {})
+  void leave().then(() => {
+    activeRoomId.value = ''
+    joinError.value = ''
+  })
 }
-
-function handleJoinError(error: unknown) {
-  joinError.value = (error as Error).message || '加入失败'
-}
-
-/** 容器 signal-rooms：数组存在即多房（无布尔开关）；信令房默认不拉历史 */
-const signalRooms = computed(() => {
-  const id = signalRoomInput.value.trim()
-  return id ? [{ roomId: id, pullHistory: false, autoRejoin: true }] : []
-})
 </script>
 
 <template>
@@ -169,7 +335,7 @@ const signalRooms = computed(() => {
           🎥 开启直播
         </div>
         <div class="live-page__entry-desc">
-          私域直播双房架构：UI 房（弹幕/礼物）+ 信令房（商品指令，低量高可达）。
+          私域直播双房架构：UI 房（弹幕/礼物）+ 信令房（商品/签到指令，低量高可达）。
           两个 ID 用不同聊天室；信令房留空则退回单房形态。
         </div>
         <input
@@ -182,7 +348,7 @@ const signalRooms = computed(() => {
           v-model="signalRoomInput"
           class="live-page__input"
           type="text"
-          placeholder="信令房聊天室 ID（商品指令，可稍后填）"
+          placeholder="信令房聊天室 ID（商品/签到指令，可稍后填）"
           @keydown.enter="handleJoin"
         >
         <div v-if="joinError" class="live-page__error">
@@ -194,68 +360,86 @@ const signalRooms = computed(() => {
       </div>
     </div>
 
-    <!-- 直播间（live preset：消息区底部 33% + 透明，叠加在直播画面上）
-         两层布局：底层模拟直播画面（画面区），上层容器（消息区透明透出画面） -->
-    <div v-else class="live-page__stage">
-      <!-- 模拟直播画面层（真实接入时替换为业务视频组件） -->
-      <div class="live-page__video">
-        <div class="live-page__video-hint">
-          🎥 直播画面（模拟）——接入真实播放器后，弹幕区将透明叠加在此画面上
+    <!-- 直播间：视频画面上四层绝对定位 overlay（P4 review UI 规范） -->
+    <div v-else class="live-stage">
+      <!-- 底层：视频画面（模拟；真实接入替换为业务播放器） -->
+      <div class="live-stage__video">
+        <div class="live-stage__video-hint">
+          🎥 直播画面（模拟）——接入真实播放器后，overlay 组件将叠加在此画面上
         </div>
       </div>
 
-      <!-- 容器层：header 半透明主播条 + 商品卡/信令面板半透明浮层 + 底部弹幕区透明 -->
-      <EmChatroomContainer
-        class="live-page__container"
-        :room-id="activeRoomId"
-        scene="live"
-        :signal-rooms="signalRooms"
-        @back="handleExit"
-        @kicked="handleExit"
-        @destroyed="handleExit"
-        @join-error="handleJoinError"
-        @signal-message="handleSignalMessage"
-        @signal-status="handleSignalStatus"
-      >
-        <!-- header 插槽：半透明主播条（叠加在画面上） -->
-        <template #header>
-          <div class="live-page__anchor">
-            <span class="live-page__anchor-avatar">👩‍💼</span>
-            <div class="live-page__anchor-info">
-              <div class="live-page__anchor-name">
-                主播小美
-              </div>
-              <div class="live-page__anchor-count">
-                🔴 直播中 · {{ roomInfo?.memberCount ?? 0 }} 人在线
-              </div>
-            </div>
-          </div>
-        </template>
+      <!-- 顶层：顶部信息栏（红色渐变横幅） -->
+      <ChatroomLiveTopBar
+        class="live-stage__top"
+        title="会员年中福利"
+        heat="1.4万"
+        @more="toast.success('更多（演示）')"
+        @report="toast.success('投诉（演示）')"
+      />
 
-        <!-- toolbar 插槽：商品卡片（半透明浮层）+ 信令房指令面板 -->
-        <template #toolbar>
-          <DemoLiveProductCard :product="product" overlay />
-          <div class="live-page__signal">
-            <div class="live-page__signal-head">
-              <span class="live-page__signal-label">信令房</span>
-              <span
-                class="live-page__signal-status"
-                :class="`live-page__signal-status--${signalStatusKind}`"
-              >
-                {{ signalStatus }}
-              </span>
-              <button class="live-page__publish" :disabled="!signalRoomInput.trim()" @click="handlePublishProduct">
-                上架商品
-              </button>
-            </div>
-            <div v-if="signalLogs.length > 0" class="live-page__signal-logs">
-              <div v-for="(log, index) in signalLogs" :key="index" class="live-page__signal-log">
-                {{ log }}
-              </div>
-            </div>
+      <!-- 顶层：评论抽奖入口（右侧顶部偏下） -->
+      <ChatroomLiveLotteryEntry class="live-stage__lottery" @click="toast.success('评论抽奖（演示）')" />
+
+      <!-- 右中区：商品讲解卡片（距顶部 40%） -->
+      <ChatroomLiveProductCard
+        class="live-stage__product"
+        :product="product"
+        :explaining="productExplaining"
+        :sold-out="productSoldOut"
+        @click="handleProductClick"
+        @close="handleProductClose"
+        @buy="handleProductBuy"
+      />
+
+      <!-- 左下区：欢迎横幅 + 弹幕流 -->
+      <div class="live-stage__danmaku">
+        <ChatroomLiveWelcomeBanner
+          :show="welcomeShow"
+          :name="welcomeName"
+          :is-vip="welcomeVip"
+          @hidden="handleWelcomeHidden"
+        />
+        <ChatroomLiveDanmakuStream :items="danmakuItems" />
+      </div>
+
+      <!-- 信令房悬浮面板（右下角，可折叠） -->
+      <div class="live-stage__signal">
+        <button class="live-stage__signal-toggle" @click="signalPanelOpen = !signalPanelOpen">
+          <span class="live-stage__signal-dot" :class="`live-stage__signal-dot--${signalStatusKind}`" />
+          {{ signalPanelOpen ? '信令房 ▾' : '信令房 ▴' }}
+        </button>
+        <div v-if="signalPanelOpen" class="live-stage__signal-panel">
+          <div class="live-stage__signal-row">
+            <span>状态：{{ signalStatus }}</span>
           </div>
-        </template>
-      </EmChatroomContainer>
+          <div class="live-stage__signal-row">
+            <button class="live-stage__signal-btn" @click="handlePublishProduct">
+              上架商品
+            </button>
+            <button class="live-stage__signal-btn" @click="handleCheckin">
+              模拟签到
+            </button>
+          </div>
+          <div class="live-stage__signal-row">
+            <button class="live-stage__signal-btn live-stage__signal-btn--exit" @click="handleExit">
+              退出直播
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部：快捷输入区 -->
+      <ChatroomLiveInputBar
+        class="live-stage__input"
+        :quick-phrases="QUICK_PHRASES"
+        :like-count="likeCountText"
+        :disabled="!isJoined"
+        @send="handleSendText"
+        @like="handleLike"
+        @menu="toast.success('菜单（演示）')"
+        @share="toast.success('分享（演示）')"
+      />
     </div>
   </div>
 </template>
@@ -269,6 +453,7 @@ const signalRooms = computed(() => {
   background: var(--uikit-bg-base, #fff);
 }
 
+/* ===== 开播入口 ===== */
 .live-page__entry {
   flex: 1;
   display: flex;
@@ -338,15 +523,17 @@ const signalRooms = computed(() => {
   cursor: not-allowed;
 }
 
-.live-page__stage {
+/* ===== 直播间舞台：四层绝对定位 ===== */
+.live-stage {
+  position: relative;
   flex: 1;
   min-height: 0;
-  position: relative;
   overflow: hidden;
+  background: #000;
 }
 
-/* 模拟直播画面层（真实接入时替换为业务视频组件） */
-.live-page__video {
+/* 底层：视频画面（模拟） */
+.live-stage__video {
   position: absolute;
   inset: 0;
   display: flex;
@@ -358,7 +545,7 @@ const signalRooms = computed(() => {
     linear-gradient(160deg, #1e3a5f 0%, #101828 55%, #0b1120 100%);
 }
 
-.live-page__video-hint {
+.live-stage__video-hint {
   padding: 10px 18px;
   border-radius: 999px;
   background: rgba(17, 24, 39, 0.55);
@@ -367,112 +554,125 @@ const signalRooms = computed(() => {
   font-size: 13px;
 }
 
-/* 容器层：铺满舞台，消息区透明（live preset messageArea）透出画面 */
-.live-page__container {
+/* 顶层：顶部信息栏 */
+.live-stage__top {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
 }
 
-/* 半透明主播条（叠加在画面上） */
-.live-page__anchor {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: rgba(17, 24, 39, 0.45);
-  backdrop-filter: blur(4px);
-  flex-shrink: 0;
+/* 顶层：评论抽奖入口（右侧顶部偏下） */
+.live-stage__lottery {
+  position: absolute;
+  top: 62px;
+  right: 8px;
+  z-index: 10;
 }
 
-.live-page__anchor-avatar {
-  font-size: 28px;
+/* 右中区：商品讲解卡片（距顶部 40%） */
+.live-stage__product {
+  position: absolute;
+  top: 40%;
+  right: 8px;
+  z-index: 10;
 }
 
-.live-page__anchor-info {
+/* 左下区：欢迎横幅 + 弹幕流 */
+.live-stage__danmaku {
+  position: absolute;
+  left: 8px;
+  bottom: 108px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
+  align-items: flex-start;
+  max-width: 70%;
 }
 
-.live-page__anchor-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
+/* 信令房悬浮面板（右下角） */
+.live-stage__signal {
+  position: absolute;
+  right: 8px;
+  bottom: 108px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
-.live-page__anchor-count {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* 信令面板：半透明浮层（叠加在画面上） */
-.live-page__signal {
-  flex-shrink: 0;
-  padding: 6px 12px 8px;
-  background: rgba(17, 24, 39, 0.45);
-  backdrop-filter: blur(4px);
-  border-bottom: none;
-}
-
-.live-page__signal-head {
+.live-stage__signal-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.live-page__signal-label {
-  font-size: 11px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--uikit-bg-active, rgba(51, 177, 255, 0.1));
-  color: var(--uikit-primary-color);
-}
-
-.live-page__signal-status {
-  font-size: 11px;
-  color: var(--uikit-text-tertiary, #9ca3af);
-}
-
-/* 半透明浮层上的状态/日志文字反白 */
-.live-page__signal-status,
-.live-page__signal-log {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.live-page__signal-status--ok {
-  color: #16a34a;
-}
-
-.live-page__signal-status--err {
-  color: var(--uikit-danger-color, #e5484d);
-}
-
-.live-page__publish {
-  margin-left: auto;
-  height: 26px;
+  gap: 6px;
+  height: 30px;
   padding: 0 12px;
   border: none;
   border-radius: 999px;
-  background: var(--uikit-danger-color, #e5484d);
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(4px);
   color: #fff;
   font-size: 12px;
   cursor: pointer;
 }
 
-.live-page__publish:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.live-stage__signal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b7280;
 }
 
-.live-page__signal-logs {
+.live-stage__signal-dot--ok {
+  background: #22c55e;
+}
+
+.live-stage__signal-dot--err {
+  background: #ef4444;
+}
+
+.live-stage__signal-panel {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.65);
+  backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
 }
 
-.live-page__signal-log {
-  font-size: 11px;
-  color: var(--uikit-text-secondary, #6b7280);
+.live-stage__signal-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.live-stage__signal-btn {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.live-stage__signal-btn--exit {
+  background: rgba(229, 72, 77, 0.85);
+}
+
+/* 底部：快捷输入区 */
+.live-stage__input {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
 }
 </style>

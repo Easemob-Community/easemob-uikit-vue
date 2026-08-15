@@ -100,6 +100,17 @@ export type {
   ChatroomSignalRoomConfig,
   ChatroomMemberJoinedPayload,
 } from './containers/chatroom-container/types'
+// 直播 overlay UI 组件集（P4 review：直播场景自绘弹幕/横幅/商品卡/输入区/抽奖入口）
+export {
+  ChatroomLiveTopBar,
+  ChatroomLiveDanmakuStream,
+  ChatroomLiveWelcomeBanner,
+  ChatroomLiveProductCard,
+  ChatroomLiveInputBar,
+  ChatroomLiveLotteryEntry,
+  maskUsername,
+} from './modules/chatroom'
+export type { LiveDanmakuItem, LiveProduct } from './modules/chatroom'
 // 信令房透传/状态 payload（P3 多房间订阅，§5.9）
 export type { SignalMessagePayload, SignalStatusPayload } from './sdk/event/chatroom-events'
 
