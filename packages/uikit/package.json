@@ -26,9 +26,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "node scripts/check-icon-refs.mjs && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node scripts/check-icon-refs.mjs && node scripts/check-auto-imports.mjs && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
     "icons:check": "node scripts/check-icon-refs.mjs",
+    "auto-imports:check": "node scripts/check-auto-imports.mjs",
     "story:dev": "histoire dev",
     "story:build": "histoire build"
   },

@@ -90,11 +90,14 @@
 - **修复**：已于 2026-08-15 核销（消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。`composables/use-blocklist.ts:16-17` 已 `const { client, dataSource, features, stores } = useUIKit()` + `const contactStore = stores.contact`，黑名单读写全部走 context，无直接 `useContactStore()`。
 - **关联 skill**：`uikit-store-composable`
 
-### [ ] D7. `auto-imports.ts` 与实际导出漂移，无守卫
+### [x] D7. `auto-imports.ts` 与实际导出漂移，无守卫
 
 - **现象**：`src/auto-imports.ts` 是手工维护的 13 个「主 hook」白名单，与 `composables/index.ts` 的 28 个导出没有任何同步机制，已经漂移。
 - **证据**：`usePresence`、`useBlocklist` 是完整 feature composable 却未登记；另有 `useMessageSend/History/Actions`、`useContactFilter/Sort/Group`、`useGroupFilter/Sort`、`useQuote`、`usePullRefresh`、`useRipple`、`usePinyin`、`useUIKitStorage` 未登记（部分是刻意，部分是漏）。
 - **建议修法**：决定哪些属「对外主 hook」并补齐；理想加一个生成/校验脚本从 `index.ts` 派生 auto-imports 列表，杜绝再漂移。
+- **修复**：已于 2026-08-15 修复。
+  1. **白名单补齐**：`src/auto-imports.ts` 扩到 **34 个业务主 hook**（新增 `useMessageSend/useMessageHistory/useMessageActions`、`useContactFilter/useContactGroup/useContactSort`、`useGroupFilter/useGroupSort`、`usePullRefresh`、`useChatPlugin`、`useResizable`，补全 `usePresence`/`useBlocklist`），排序归一；排除名单明确为内部实现细节（`usePinyin`/`useRipple`/`useQuote`/`useUIKitStorage` 及附属工具函数等 23 个，业务侧显式 import）。
+  2. **校验脚本防漂移**：新增 `packages/uikit/scripts/check-auto-imports.mjs`——从 `composables/index.ts` 派生导出并剔除排除名单，与白名单比对，**漏登记硬失败**（`extra` 仅提示，允许 locale 等其他模块的合法登记）；已挂载到 `build` 前置（与 `check-icon-refs` 并列），也可单独跑 `pnpm -F @easemob/uikit auto-imports:check`。
 - **关联 skill**：`uikit-store-composable`
 
 ### [x] D17. `updateUploadProgress` 未实际更新上传进度值
