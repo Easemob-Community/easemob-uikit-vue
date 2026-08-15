@@ -316,7 +316,7 @@ function onCancel() {
   border: none;
   border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-primary-color);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);

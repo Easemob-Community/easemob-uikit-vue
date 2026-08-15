@@ -182,7 +182,7 @@ async function handleDownload(event: MouseEvent) {
   height: 44px;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@ async function handleDownload(event: MouseEvent) {
   padding: 2px 6px;
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-12);
 }
 
@@ -225,7 +225,7 @@ async function handleDownload(event: MouseEvent) {
   height: 44px;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   border: none;
   cursor: pointer;
   display: flex;

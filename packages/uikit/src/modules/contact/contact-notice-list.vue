@@ -248,8 +248,8 @@ function avatarName(invite: UiContactInvite): string {
 .contact-notice-list__count {
   font-size: var(--uikit-font-size-12);
   font-weight: 500;
-  color: #fff;
-  background-color: #ef4444;
+  color: var(--uikit-text-inverse);
+  background-color: var(--uikit-danger-color);
   padding: 1px 7px;
   border-radius: 10px;
 }
@@ -353,7 +353,7 @@ function avatarName(invite: UiContactInvite): string {
 
 .contact-notice-list__btn--primary {
   background-color: var(--uikit-primary-color);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   border-color: var(--uikit-primary-color);
 }
 
@@ -362,13 +362,13 @@ function avatarName(invite: UiContactInvite): string {
 }
 
 .contact-notice-list__btn--default {
-  background-color: #fff;
+  background-color: var(--uikit-text-inverse);
   color: var(--uikit-text-primary);
   border-color: var(--uikit-border-color, #e5e7eb);
 }
 
 .contact-notice-list__item:hover .contact-notice-list__btn--default {
-  background-color: #fff;
+  background-color: var(--uikit-text-inverse);
   border-color: var(--uikit-border-color, #d1d5db);
 }
 

@@ -275,7 +275,7 @@ function onSelectorChanged() {
 }
 
 .user-card__action--danger {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .user-card__action--default {

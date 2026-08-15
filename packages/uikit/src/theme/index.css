@@ -10,6 +10,8 @@
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
   --uikit-text-tertiary: #9ca3af;
+  /* 强调色/彩色背景上的文字（按钮、badge、toast、播放按钮等）：恒白 */
+  --uikit-text-inverse: #ffffff;
 
   /* 弱化图标/占位图标色 */
   --uikit-icon-muted: #B6B8BF;
@@ -176,6 +178,8 @@
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
   --uikit-text-tertiary: #6b7280;
+  /* 强调色/彩色背景上的文字：暗色下同样恒白 */
+  --uikit-text-inverse: #ffffff;
 
   /* 弱化图标/占位图标色 */
   --uikit-icon-muted: #6b7280;

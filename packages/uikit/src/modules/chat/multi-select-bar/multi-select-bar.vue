@@ -412,7 +412,7 @@ function onCancel() {
 
 .multi-select-bar__modal-btn--confirm {
   background-color: var(--uikit-danger-color);
-  color: #fff;
+  color: var(--uikit-text-inverse);
 }
 
 @media (hover: hover) {

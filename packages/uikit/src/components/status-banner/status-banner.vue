@@ -134,7 +134,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-status-banner--error {
   background-color: rgba(var(--uikit-danger-rgb, 255, 51, 68), 0.08);
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .uikit-status-banner--success {

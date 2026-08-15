@@ -129,7 +129,7 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 }
 
 .conversation-tabs__tab.is-active {
-  color: #fff;
+  color: var(--uikit-text-inverse);
   background-color: var(--uikit-primary, #3b82f6);
 }
 </style>

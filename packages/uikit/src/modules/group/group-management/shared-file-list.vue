@@ -53,7 +53,7 @@ const actionSheetActions = computed<ActionSheetItem[]>(() => {
   if (canDelete(activeFile.value)) {
     actions.push({
       name: t('group.sharedFile.delete', '删除'),
-      color: '#ef4444',
+      color: 'var(--uikit-danger-color)',
     })
   }
   return actions
@@ -408,7 +408,7 @@ async function onDownload(file: any) {
 }
 
 .shared-file-list__context-menu-item.is-danger {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 @media (hover: hover) {

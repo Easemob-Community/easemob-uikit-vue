@@ -139,8 +139,8 @@ function onEntryClick(entry: ContactNavEntry) {
   justify-content: center;
   font-size: var(--uikit-font-size-11);
   font-weight: 600;
-  color: #fff;
-  background-color: #ef4444;
+  color: var(--uikit-text-inverse);
+  background-color: var(--uikit-danger-color);
   border-radius: 9px;
 }
 

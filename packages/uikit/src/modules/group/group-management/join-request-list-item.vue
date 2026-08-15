@@ -133,7 +133,7 @@ const { displayName, avatarUrl } = useUserInfo(applicantId)
 }
 .join-request-list__action-btn--reject {
   border-color: #fecaca;
-  color: #ef4444;
+  color: var(--uikit-danger-color);
 }
 @media (hover: hover) {
   .join-request-list__action-btn--reject:hover {

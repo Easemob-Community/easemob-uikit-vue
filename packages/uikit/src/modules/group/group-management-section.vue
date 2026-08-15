@@ -456,7 +456,7 @@ function closeDrawer() {
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: #ffffff;
+  background-color: var(--uikit-text-inverse);
   border-radius: 50%;
   transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

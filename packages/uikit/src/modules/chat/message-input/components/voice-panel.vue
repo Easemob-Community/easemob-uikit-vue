@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
   height: 56px;
   border-radius: 50%;
   background-color: var(--uikit-primary-color, #3b82f6);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 

@@ -298,7 +298,7 @@ watch(
 
 .add-contact-modal__error {
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .add-contact-modal__footer {

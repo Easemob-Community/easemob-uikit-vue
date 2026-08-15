@@ -346,7 +346,7 @@ defineExpose({
 .mute-list__popup-btn--confirm {
   border-color: var(--uikit-primary-color);
   background-color: var(--uikit-primary-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .mute-list__popup-btn--confirm:hover:not(:disabled) {

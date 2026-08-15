@@ -513,7 +513,7 @@ async function handleDownload() {
 }
 
 .image-viewer__spinner {
-  color: #fff;
+  color: var(--uikit-text-inverse);
 }
 
 .image-viewer__failed {
@@ -524,7 +524,7 @@ async function handleDownload() {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-14);
   pointer-events: none;
 }
@@ -537,7 +537,7 @@ async function handleDownload() {
   height: 44px;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   border: none;
   cursor: pointer;
   display: flex;
@@ -575,7 +575,7 @@ async function handleDownload() {
   padding: 6px 14px;
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-12);
   pointer-events: none;
 }
@@ -598,7 +598,7 @@ async function handleDownload() {
   height: 36px;
   border-radius: 50%;
   background-color: transparent;
-  color: #fff;
+  color: var(--uikit-text-inverse);
   border: none;
   cursor: pointer;
   display: flex;

@@ -87,13 +87,13 @@ onBeforeUnmount(clearTimer)
   padding: 16px 24px;
   border-radius: var(--uikit-components-radius, 12px);
   background-color: rgba(0, 0, 0, 0.75);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-14);
   min-width: 120px;
 }
 
 .uikit-toast__icon {
-  color: #fff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-toast__message {

@@ -154,7 +154,7 @@ const digitCount = computed(() => {
 
 .uikit-badge__content--filled {
   background-color: var(--uikit-badge-color);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   border: none;
 }
 

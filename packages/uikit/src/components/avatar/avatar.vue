@@ -175,7 +175,7 @@ function onClick() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-weight: 500;
 }
 

@@ -67,7 +67,7 @@ function onItemClick(action: MessageActionItem) {
 }
 
 .message-action-menu__item--danger {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 @media (hover: hover) {

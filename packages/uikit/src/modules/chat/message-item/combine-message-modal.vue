@@ -221,7 +221,7 @@ watch(() => props.show, (show) => {
 .combine-message-modal__error {
   text-align: center;
   padding: 40px 0;
-  color: #ef4444;
+  color: var(--uikit-danger-color);
   font-size: var(--uikit-font-size-14);
 }
 

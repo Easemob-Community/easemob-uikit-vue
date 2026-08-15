@@ -220,7 +220,7 @@ function onContextmenu(e: MouseEvent) {
 .uikit-cell.is-danger .uikit-cell__subtitle,
 .uikit-cell.is-danger .uikit-cell__meta,
 .uikit-cell.is-danger .uikit-cell__leading {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .uikit-cell.is-danger.is-clickable:hover::before {

@@ -118,22 +118,22 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--primary {
   background-color: var(--uikit-primary-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-button--success {
   background-color: var(--uikit-success-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-button--warning {
   background-color: var(--uikit-warning-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-button--danger {
   background-color: var(--uikit-danger-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-button--danger-outline {
@@ -166,7 +166,7 @@ function handleClick(event: MouseEvent) {
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border-top-color: var(--uikit-text-inverse);
   border-radius: 50%;
   animation: uikit-spin 0.8s linear infinite;
 }

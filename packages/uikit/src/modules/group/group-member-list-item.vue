@@ -442,7 +442,7 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
 
 .group-member-list__action-btn--danger {
   border-color: #fecaca;
-  color: #ef4444;
+  color: var(--uikit-danger-color);
 }
 
 @media (hover: hover) {

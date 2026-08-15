@@ -107,7 +107,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-icon-button--primary.uikit-icon-button--solid {
   background-color: var(--uikit-primary-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-icon-button--primary.uikit-icon-button--solid:hover:not(:disabled) {
@@ -116,7 +116,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-icon-button--success.uikit-icon-button--solid {
   background-color: var(--uikit-success-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-icon-button--success.uikit-icon-button--solid:hover:not(:disabled) {
@@ -125,7 +125,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-icon-button--warning.uikit-icon-button--solid {
   background-color: var(--uikit-warning-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-icon-button--warning.uikit-icon-button--solid:hover:not(:disabled) {
@@ -134,7 +134,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-icon-button--danger.uikit-icon-button--solid {
   background-color: var(--uikit-danger-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
 }
 
 .uikit-icon-button--danger.uikit-icon-button--solid:hover:not(:disabled) {

@@ -214,7 +214,7 @@ const actions = computed<MessageActionItem[]>(() => {
 const actionSheetActions = computed(() =>
   actions.value.map(item => ({
     name: item.label,
-    color: item.danger ? '#ef4444' : undefined,
+    color: item.danger ? 'var(--uikit-danger-color)' : undefined,
     disabled: item.disabled,
     icon: item.icon,
   })),

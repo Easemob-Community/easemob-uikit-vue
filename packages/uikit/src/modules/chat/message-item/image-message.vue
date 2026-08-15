@@ -251,7 +251,7 @@ function onPreviewError(index: number) {
   padding: 6px 14px;
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-12);
   border: none;
   cursor: pointer;
@@ -269,7 +269,7 @@ function onPreviewError(index: number) {
   padding: 6px 14px;
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-12);
   pointer-events: none;
 }

@@ -1306,7 +1306,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
   border-radius: var(--uikit-components-radius, 8px);
   border: none;
   background-color: var(--uikit-primary-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);

@@ -211,7 +211,7 @@ const mergedActions = computed<MergedAction[]>(() => {
     key: 'delete',
     label: t('conversation.delete'),
     icon: 'actions/trash',
-    color: '#ef4444',
+    color: 'var(--uikit-danger-color)',
     danger: true,
     handler: () => emit('delete', props.conversation.id),
     position: 'both',

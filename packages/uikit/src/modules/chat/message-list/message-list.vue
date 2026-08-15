@@ -975,7 +975,7 @@ watch(locateRequest, (req) => {
   padding: 8px 16px;
   border-radius: 20px;
   background-color: var(--uikit-primary-color);
-  color: #ffffff;
+  color: var(--uikit-text-inverse);
   font-size: var(--uikit-font-size-13);
   cursor: pointer;
   display: flex;

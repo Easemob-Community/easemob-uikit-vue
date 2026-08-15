@@ -113,7 +113,7 @@ const animClass = computed(() => (props.anim ? `uikit-icon--anim-${props.anim}` 
 }
 
 .uikit-icon--danger {
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
 }
 
 .uikit-icon--info {

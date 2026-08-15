@@ -519,15 +519,15 @@ watch(
 
 @media (hover: hover) {
   .create-group-modal__selected-remove:hover {
-    background-color: var(--uikit-danger-color, #ef4444);
-    color: #fff;
+    background-color: var(--uikit-danger-color);
+    color: var(--uikit-text-inverse);
   }
 }
 
 .create-group-modal__error {
   padding: 8px 16px;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-danger-color, #ef4444);
+  color: var(--uikit-danger-color);
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   flex-shrink: 0;
   text-align: center;
@@ -570,7 +570,7 @@ watch(
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #fff;
+  background-color: var(--uikit-text-inverse);
   transition: transform var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
 }
 

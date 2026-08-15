@@ -381,7 +381,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 .group-member-list__count {
   font-size: var(--uikit-font-size-12);
   font-weight: 500;
-  color: #fff;
+  color: var(--uikit-text-inverse);
   background-color: var(--uikit-text-secondary);
   padding: 1px 7px;
   border-radius: 10px;
