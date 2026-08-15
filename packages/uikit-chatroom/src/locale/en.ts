@@ -34,6 +34,7 @@ const en: LocaleMessages = {
   'chatroom.ui.inputPlaceholder': 'Say something…',
   'chatroom.ui.send': 'Send',
   'chatroom.ui.image': 'Image',
+  'chatroom.ui.emoji': 'Emoji',
   'chatroom.ui.joining': 'Joining…',
   'chatroom.ui.empty': 'No messages',
   'chatroom.ui.loadMore': 'Load earlier messages',

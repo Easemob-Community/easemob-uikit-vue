@@ -34,6 +34,7 @@ const zhCN: LocaleMessages = {
   'chatroom.ui.inputPlaceholder': '说点什么…',
   'chatroom.ui.send': '发送',
   'chatroom.ui.image': '图片',
+  'chatroom.ui.emoji': '表情',
   'chatroom.ui.joining': '加入中…',
   'chatroom.ui.empty': '暂无消息',
   'chatroom.ui.loadMore': '加载更早消息',

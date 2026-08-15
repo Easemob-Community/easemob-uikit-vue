@@ -1,12 +1,13 @@
 <script setup lang="ts">
 /**
- * 聊天室输入条（H5-first）：文本 + 图片，无 tiptap（聊天室输入条从简，见设计文档 5.8）。
+ * 聊天室输入条（H5-first）：文本 + 表情 + 图片，无 tiptap（聊天室输入条从简，
+ * 见设计文档 §5.8——首屏 bundle 不引入编辑器，先做「文本+表情+图片+语音转文字」）。
  * 发送流程：乐观上屏（消息先入列表 sending 态）→ 失败由消息层 toast + failed 标记，
  * 触发 SDK 发送侧限流时输入框不清空文本由容器按需回填（此处发送即清空，限流反馈
  * 在消息列表可见）。
  */
 import { ref } from 'vue'
-import { EmIconButton, t } from '@easemob/uikit-core'
+import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob/uikit-core'
 
 export interface ChatroomInputBarProps {
   /** 是否禁用输入（未进房 / 全员禁言非管理员 / 自己被禁言） */
@@ -32,6 +33,9 @@ const emit = defineEmits<ChatroomInputBarEmits>()
 const text = ref('')
 const sending = ref(false)
 const fileInput = ref<HTMLInputElement>()
+const textInput = ref<HTMLInputElement>()
+/** 表情面板显隐（H5 底部弹层，可连续选择不自动关闭） */
+const showEmojiPicker = ref(false)
 
 /** 发送（空文本忽略；发送期间防连点） */
 async function handleSend() {
@@ -64,6 +68,24 @@ function handleFileChange(event: Event) {
   input.value = ''
 }
 
+/** 选择 emoji：插入输入框光标处（无选区时追加到末尾），保持面板打开可连续选择 */
+function handleEmojiSelect(emoji: string) {
+  const el = textInput.value
+  if (!el) {
+    text.value += emoji
+    return
+  }
+  const start = el.selectionStart ?? text.value.length
+  const end = el.selectionEnd ?? start
+  text.value = text.value.slice(0, start) + emoji + text.value.slice(end)
+  // 光标移到插入内容之后并聚焦（不主动唤起 H5 键盘，避免遮挡表情面板）
+  const caret = start + emoji.length
+  requestAnimationFrame(() => {
+    el.focus()
+    el.setSelectionRange(caret, caret)
+  })
+}
+
 /** 回车发送（移动端软键盘确认键）；Shift+Enter 换行由 textarea 自带，此处仅 input 单行场景 */
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -76,6 +98,7 @@ function handleKeydown(event: KeyboardEvent) {
 <template>
   <div class="chatroom-input-bar" :class="{ 'chatroom-input-bar--disabled': disabled }">
     <input
+      ref="textInput"
       v-model="text"
       class="chatroom-input-bar__field"
       type="text"
@@ -84,6 +107,13 @@ function handleKeydown(event: KeyboardEvent) {
       enterkeyhint="send"
       @keydown="handleKeydown"
     >
+    <EmIconButton
+      class="chatroom-input-bar__emoji"
+      icon="emojis-reactions/face"
+      :disabled="disabled"
+      :title="t('chatroom.ui.emoji')"
+      @click="showEmojiPicker = !showEmojiPicker"
+    />
     <EmIconButton
       class="chatroom-input-bar__image"
       icon="files-media/img"
@@ -105,6 +135,15 @@ function handleKeydown(event: KeyboardEvent) {
       accept="image/*"
       @change="handleFileChange"
     >
+
+    <!-- 表情面板（H5 底部弹层；选中插入不自动关闭，可连续选择） -->
+    <EmPopup
+      v-model:show="showEmojiPicker"
+      position="bottom"
+      class="chatroom-input-bar__emoji-popup"
+    >
+      <EmEmojiPicker :show="true" @select="handleEmojiSelect" />
+    </EmPopup>
   </div>
 </template>
 
@@ -143,6 +182,7 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: not-allowed;
 }
 
+.chatroom-input-bar__emoji,
 .chatroom-input-bar__image {
   flex-shrink: 0;
 }
@@ -166,5 +206,10 @@ function handleKeydown(event: KeyboardEvent) {
 
 .chatroom-input-bar__file {
   display: none;
+}
+
+.chatroom-input-bar__emoji-popup {
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 </style>
