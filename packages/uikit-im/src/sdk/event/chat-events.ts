@@ -1,19 +1,21 @@
 import type { ChatEventHandlerMap } from 'easemob-websdk'
-import type { ManagerHost } from '@easemob/uikit-core'
-import type { ConversationTypeValue } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { UIKitFeatures } from '@easemob/uikit-core'
+import {
+  CONVERSATION_TYPE,
+  MESSAGE_STATUS,
+  MESSAGE_TYPE,
+  createLogger,
+  formatSdkError,
+  t,
+} from '@easemob/uikit-core'
+import type { ConversationTypeValue, ManagerHost, UIKitFeatures } from '@easemob/uikit-core'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
 import { notifyOnNewMessage } from '../notification-engine'
-import { createLogger } from '@easemob/uikit-core'
-import { formatSdkError } from '@easemob/uikit-core'
 import { isStreamActive } from '../../utils/stream-message'
 import { markReadReceiptSent } from '../domain/message-domain'
 import { formatConversationPreview, resolveSenderDisplayName, resolveUserDisplayName } from '../../utils/resolve-last-message-text'
-import { t } from '@easemob/uikit-core'
 import type { RootStores } from './types'
 
 const chatLog = createLogger('UIKit:ChatEvents')
@@ -269,7 +271,10 @@ export function createChatHandlers(
         case 'conversation':
           stores.conversation.setSyncingConversations(false)
           {
+            // 聊天室会话由 chatroom 场景包消费，过滤后回填 IM 会话列表
+            // （两包同装隔离，TECH-DEBT D97；SDK 会话列表面会 upsert chatRoom 会话）
             const rawItems = client.chatManager.getConversationList()
+              .filter(item => item.conversationType !== 'chatRoom')
             chatLog.info('getConversationList raw (onSyncDataFinished)', rawItems)
             const incoming = toUiConversations(rawItems, { resolveSenderName })
             const merged = mergeWithExistingConversations(stores, incoming)
@@ -296,13 +301,15 @@ export function createChatHandlers(
     },
 
     onConversationListUpdate: (payload) => {
-      chatLog.info('onConversationListUpdate', { count: payload.items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
-      chatLog.info('getConversationList raw (onConversationListUpdate)', payload.items)
+      // 过滤聊天室会话（两包同装隔离，同 onSyncDataFinished conversation 分支）
+      const items = payload.items.filter(item => item.conversationType !== 'chatRoom')
+      chatLog.info('onConversationListUpdate', { count: items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
+      chatLog.info('getConversationList raw (onConversationListUpdate)', items)
       // 诊断：打印 combine/unknown snippet 的 SDK 原始形态（定位合并消息预览空白）
       {
         const typeCount: Record<string, number> = {}
         const suspects: unknown[] = []
-        for (const item of payload.items) {
+        for (const item of items) {
           const type = String(item.lastMessage?.type ?? '(null)')
           typeCount[type] = (typeCount[type] ?? 0) + 1
           if (type === MESSAGE_TYPE.COMBINE || type === 'unknown') {
@@ -315,7 +322,7 @@ export function createChatHandlers(
       }
       // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
-      const incoming = toUiConversations(payload.items, { resolveSenderName })
+      const incoming = toUiConversations(items, { resolveSenderName })
       const merged = mergeWithExistingConversations(stores, incoming)
 
       if (payload.patch.reset || payload.patch.removed.length > 0) {
@@ -339,8 +346,7 @@ export function createChatHandlers(
       // 聊天室广播消息由 @easemob/uikit-chatroom 场景包处理（两包同装隔离，TECH-DEBT D97）：
       // SDK ChatManager 不按 chatType 分流，若不在此忽略，聊天室消息会流入 IM 的
       // 会话/消息 store（按 conversationId 落库）与已读回执逻辑。
-      // 'chatRoom' 为 SDK wire 值（core CONVERSATION_TYPE 只覆盖单群聊；chatroom 包
-      // constants 同值定义，IM 侧不依赖 chatroom 包，保留字面量并保持对齐）。
+      // （wire 值经 core CONVERSATION_TYPE.CHATROOM 统一，P2 review 消除两包字面量漂移）
       if (sdkMsg.conversationType === 'chatRoom')
         return
       // cmd 透传消息不进消息流（否则会被渲染成 "[命令]" 气泡）；
@@ -427,6 +433,9 @@ export function createChatHandlers(
      *   也供插件插槽按 `customType` 接管（markdown 等富类型）。
      */
     onStreamMessage: (sdkMsg) => {
+      // 聊天室流式消息由 chatroom 场景包处理（两包同装隔离，同 onMessage 过滤）
+      if (sdkMsg.conversationType === 'chatRoom')
+        return
       const stream = sdkMsg.stream
       if (!stream)
         return
@@ -461,7 +470,7 @@ export function createChatHandlers(
     },
 
     onMessageRecalled: (payload) => {
-      // 聊天室消息撤回由 chatroom 场景包处理（两包同装隔离，同 onMessage 的 chatRoom 过滤）
+      // 聊天室消息撤回由 chatroom 场景包处理（两包同装隔离，同 onMessage 过滤）
       if (payload.conversationType === 'chatRoom')
         return
       chatLog.info('onMessageRecalled', { messageId: payload.messageId })
@@ -500,6 +509,9 @@ export function createChatHandlers(
     },
 
     onMessageUpdated: (payload) => {
+      // 聊天室消息编辑由 chatroom 场景包处理（两包同装隔离，同 onMessage 过滤）
+      if (payload.conversationType === 'chatRoom')
+        return
       chatLog.info('onMessageUpdated', { messageId: payload.messageId })
       // payload.message 仅含 type/body/ext/modifiedInfo（无 msgServerId），
       // 必须用 payload.messageId 定位，只 patch 编辑相关字段并标记已编辑。
@@ -512,6 +524,9 @@ export function createChatHandlers(
     },
 
     onPinnedMessageChanged: async (payload) => {
+      // 聊天室消息置顶由 chatroom 场景包处理（两包同装隔离，同 onMessage 过滤）
+      if (payload.conversationType === 'chatRoom')
+        return
       chatLog.info('onPinnedMessageChanged', { conversationId: payload.conversationId, operation: payload.operation })
       if (!payload.messageId)
         return

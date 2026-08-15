@@ -120,6 +120,9 @@ function alignClientConfig(config: Omit<ClientConfig, 'clientName' | 'clientVers
   if (differing.length > 0) {
     log(
       '[UIKit] SDK 已初始化，本次 init 配置以首次初始化为准（忽略字段：%s）。'
+      + '同装多个 UIKit 场景包（IM + chatroom）时建议先挂载 IM Provider：'
+      + 'chatroom 先初始化会把 IM 的 enableSyncData（contact/group 同步）与 '
+      + 'enableUserInfoSync 对齐关闭（SDK 单例配置不可变）；'
       + '如需变更请先 logout 并刷新页面后重新初始化。',
       differing.join(', '),
     )
@@ -168,8 +171,9 @@ export class UIKitClient {
       )
     }
     // 与 SDK 默认值保持一致：群组解散时自动删除本地群会话
-    this._deleteConversationOnGroupDestroyed = sdkConfig.deleteConversationOnGroupDestroyed ?? true
-    // 两包同装对齐：SDK 单例已初始化时以首次配置为准（见 alignClientConfig，TECH-DEBT D97）
+    // 对齐后的配置才是 SDK 实际生效值：deleteConversationOnGroupDestroyed 必须取
+    // effectiveConfig（两包同装时首次配置为准），否则包装 getter 与 SDK 行为错位
+    // （P2 review P1-4）
     const effectiveConfig = alignClientConfig({
       ...sdkConfig,
       // 启用用户资料同步增强：SDK 在消息链路中补齐发送者资料，
@@ -179,6 +183,7 @@ export class UIKitClient {
       enableUserInfoSync: sdkConfig.enableUserInfoSync ?? true,
       managers: sdkConfig.managers,
     })
+    this._deleteConversationOnGroupDestroyed = effectiveConfig.deleteConversationOnGroupDestroyed ?? true
     this._client = SdkChatClient.init(effectiveConfig) as unknown as SdkChatClient & ManagerRegistry
     // init 成功后才记录为对齐基准（抛错时不污染缓存，重试仍以旧基准对齐）
     activeClientConfig = effectiveConfig
