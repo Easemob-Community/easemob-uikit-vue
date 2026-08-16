@@ -29,6 +29,10 @@ function sendText(text: string) { /* 发送（useChatroomMessage().sendText） *
 </template>
 ```
 
+## 运行示例
+
+<demo src="./demo/live-input-bar.vue" title="直播间输入条" desc="输入回车发送（回显演示）、快捷短语、敏感词拦截与 `#actions` 动作插槽。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-input-bar.md -->

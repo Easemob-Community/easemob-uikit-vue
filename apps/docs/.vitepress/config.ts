@@ -145,6 +145,7 @@ export default defineConfig({
                 { text: '双 UIKit 架构', link: '/chatroom/guide/architecture' },
                 { text: '快速开始', link: '/chatroom/guide/quickstart' },
                 { text: '权限模型与业务角色', link: '/chatroom/guide/permissions-roles' },
+                { text: '更新日志', link: '/chatroom/guide/changelog' },
               ],
             },
           ],

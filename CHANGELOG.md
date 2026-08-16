@@ -487,7 +487,7 @@
 
 ### 文档
 
-- 新增 [H5 适配指南](./h5-adaptation)。
+- 新增 [H5 适配指南](/guide/h5-adaptation)。
 - 更新根 `README.md`、`apps/docs/index.md` 与 `apps/docs/.vitepress/config.ts`。
 - 新增 `.agent/skills/uikit-h5-adaptation/SKILL.md`，并更新 `AGENTS.md`、相关 skill 与 `TECH-DEBT.md`。
 

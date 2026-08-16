@@ -28,6 +28,10 @@ import { ChatroomLiveInteractiveCard } from '@easemob/uikit-chatroom'
 
 > 多个卡片同时存在时用 [ChatroomLiveOverlayManager](./live-overlay-manager) 统一锚定，避免重叠。
 
+## 运行示例
+
+<demo src="./demo/live-interactive-card.vue" title="可交互卡片" desc="商品卡：呼吸灯 active 态、`#title` / 默认 / `#footer` 插槽、action / close 事件与已抢光遮罩。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-interactive-card.md -->

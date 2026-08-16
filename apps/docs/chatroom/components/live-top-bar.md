@@ -22,6 +22,10 @@ import { ChatroomLiveTopBar } from '@easemob/uikit-chatroom'
 </template>
 ```
 
+## 运行示例
+
+<demo src="./demo/live-top-bar.vue" title="直播顶部栏" desc="红色渐变横幅 + 右侧动作区；点击「分享」演示 `#extra` 插槽。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-top-bar.md -->

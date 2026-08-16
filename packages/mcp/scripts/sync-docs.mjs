@@ -69,6 +69,7 @@ const CHATROOM_GUIDES = [
   ['architecture', '双 UIKit 架构'],
   ['quickstart', '快速开始'],
   ['permissions-roles', '权限模型与业务角色'],
+  ['changelog', '更新日志'],
 ]
 
 /** 聊天室组件清单：文件名 → [标题, 分类]，对应 .vitepress/gen/chatroom/*.md */

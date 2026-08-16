@@ -28,6 +28,10 @@ const effects = ref<LiveFullscreenEffectItem[]>([])
 </template>
 ```
 
+## 运行示例
+
+<demo src="./demo/live-fullscreen-effect.vue" title="全屏动效" desc="队列消费 + 自动播放/移除（定时推送模拟大礼物）；点击动效区域可提前结束。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-fullscreen-effect.md -->
