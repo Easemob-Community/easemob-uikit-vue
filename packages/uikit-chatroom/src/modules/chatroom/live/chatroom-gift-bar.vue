@@ -5,8 +5,8 @@
  * 选中即发送并关闭面板——与表情面板一致的交互形态。
  * 业务可整体覆盖容器 gift-bar 插槽接入自有礼物面板。
  */
-import { ref } from 'vue'
-import { EmPopup, t } from '@easemob/uikit-core'
+import { inject, ref } from 'vue'
+import { CORE_UIKIT_CONTEXT_KEY, EmPopup, t } from '@easemob/uikit-core'
 import { CHATROOM_GIFT_EVENT, CHATROOM_GIFT_ITEMS } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'
@@ -25,15 +25,14 @@ const props = withDefaults(defineProps<ChatroomGiftBarProps>(), {
 })
 
 /**
- * 发送能力惰性获取：无 UIKit Provider 上下文（纯 UI 预览 / 文档演示）时降级为
- * 「选中仅关闭面板」的预览模式，不抛错；正常接入环境行为不变（选中即发送）。
+ * 发送能力惰性获取：先探测 UIKit Provider 上下文（带默认值的 inject 不会产生
+ * 「injection not found」警告），无 Provider（纯 UI 预览 / 文档演示）时降级为
+ * 「选中仅关闭面板」的预览模式；正常接入环境行为不变（选中即发送）。
  */
+const hasUIKitContext = !!inject(CORE_UIKIT_CONTEXT_KEY, null)
 let sendCustom: ReturnType<typeof useChatroomMessage>['sendCustom'] | null = null
-try {
+if (hasUIKitContext) {
   sendCustom = useChatroomMessage().sendCustom
-}
-catch {
-  // 无 Provider 上下文：预览模式（面板交互可用，发送降级）
 }
 
 /** 礼物面板显隐（底部弹层，选中即发送并关闭） */

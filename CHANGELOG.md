@@ -538,8 +538,9 @@
   `ChatroomMicQueue`（语聊房麦位）此前仅模块层导出、未进包入口——补入直播组件集
   公开导出（组件文档与按需 import 可正常使用）。
 - **`ChatroomGiftBar` 无 Provider 降级（文档演示修复）**：发送能力（`useChatroomMessage`）
-  改为惰性获取——无 UIKit Provider 上下文（纯 UI 预览 / 文档演示）时降级为
-  「选中仅关闭面板」预览模式，不再抛错；正常接入环境行为不变（选中即发送）。
+  改为**探测式惰性获取**——先 `inject(CORE_UIKIT_CONTEXT_KEY, null)` 检测 Provider 上下文
+  （带默认值不产生 inject 警告），无上下文（纯 UI 预览 / 文档演示）时降级为
+  「选中仅关闭面板」预览模式，**零警告零抛错**；正常接入环境行为不变（选中即发送）。
 - **`ChatroomLiveFullscreenEffect` 新增 `fullscreen?: boolean` prop**（缺省 true 向后兼容）：
   false 时动效改为铺满**最近定位祖先**（absolute + inset 0），
   服务嵌套容器 / 文档演示等需要把动效约束在局部区域的场景。
