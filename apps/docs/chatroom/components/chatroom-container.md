@@ -87,6 +87,7 @@ interface ChatroomSceneConfig {
 把容器改造成私域直播带货页：管理位上架商品、成员列表项插徽章、礼物栏换业务面板、
 被踢/解散走自定义终态：
 
+::: v-pre
 ```vue
 <EmChatroomContainer room-id="r1" scene="live">
   <!-- 管理位：按 canManage 门控（owner/admin 可见），上架商品入口 -->
@@ -118,6 +119,7 @@ interface ChatroomSceneConfig {
   </template>
 </EmChatroomContainer>
 ```
+:::
 
 > 原则：插槽优先于 config——能覆盖的边界全部开槽，无需 fork 容器。
 
@@ -150,6 +152,7 @@ interface ChatroomSceneConfig {
 直播场景若要在容器内把普通消息流换成弹幕/轨道渲染，用 `#message-list` 插槽整体接管
 （提供后容器不再渲染 VirtualList/空态/加载更多，滚动跟随与加载职责转移给业务）：
 
+::: v-pre
 ```vue
 <EmChatroomContainer room-id="r1" scene="live">
   <template #message-list="{ messages, loadMore, historyHasMore, loadingHistory }">
@@ -162,6 +165,7 @@ interface ChatroomSceneConfig {
   </template>
 </EmChatroomContainer>
 ```
+:::
 
 ## 相关文档
 

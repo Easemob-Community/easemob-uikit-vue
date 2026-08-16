@@ -920,6 +920,13 @@
 - **验证**：chatroom `vue-tsc --noEmit` + build + demo-chatroom `vue-tsc --noEmit` + `changelog:check` + 涉及文件 lint；demo 双层 header 消失、弹幕插槽演示可跑；docs 插槽清单与实现一致。
 - **关联 skill**：`uikit-chatroom-design` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`
 
+### [ ] D103. docs 站 vue 代码块 `{{ }}` 被 Vue 编译（VitePress 1.6.4 对 vue 语言 fence 不加 v-pre）
+
+- **背景**：VitePress 1.6.4 的 fence 渲染对**非 vue 语言**代码块输出 `v-pre`，对 **vue 语言**不加（源码 `const vPre = vueRE.test(lang) ? "" : "v-pre"`），且 shiki 高亮把代码拆成 `<span>` 结构后，`{{ }}` 落在 span 文本节点 → **页面 md 编译为 Vue 组件模板时被当作插值** → dev 控制台「Property xx was accessed during render but is not defined」警告 + **渲染时示例文本被吞**（`{{word}}` 求值为空）。已核实构建产物：代码块容器无 v-pre、`{{word}}` 原样在 span 内。
+- **修复（聊天室侧已完成，2026-08-15）**：含 `{{ }}` 的示例代码块用 VitePress 内置 **`::: v-pre` 容器**包裹（渲染 `<div v-pre>`，Vue 编译跳过）；正文中的 `{{word}}` 占位符改 **HTML 实体 `&#123;&#123;word&#125;&#125;`**。已修页面：live-input-bar（敏感词示例）/ live-danmaku（prefix/badge、item 自定义两示例）/ chatroom-container（插槽组合、消息列表替换两示例）。验证：docs build 产物出现 v-pre、示例文本完整。
+- **待办**：**单群聊侧（apps/docs/components、guide）同样存在**——含 `{{ }}` 的 vue 代码块（如 button/chat-container 等页的模板示例）需同样包裹 `::: v-pre`；正文 `{{ }}` 需实体转义。修完勾选归档。
+- **关联 skill**：`uikit-docs-authoring`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

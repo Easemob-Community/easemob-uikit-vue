@@ -72,6 +72,7 @@ interface LiveDanmakuItem {
 
 ### 示例：左侧前缀 + 右侧徽章（左右各插一个业务栏位）
 
+::: v-pre
 ```vue
 <ChatroomLiveDanmakuStream :items="items">
   <!-- 左侧：头像 / 皇冠 / 等级（渲染在最左端，welcome 的内置 👑 之前） -->
@@ -86,12 +87,14 @@ interface LiveDanmakuItem {
   </template>
 </ChatroomLiveDanmakuStream>
 ```
+:::
 
 ### 示例：整条自定义（自定义 kind + zone）
 
 > 注意：一旦提供 `#item` 插槽，**所有 kind** 的条目内容都由插槽渲染（无内置回退）；
 > 若只想给自定义 kind 特殊样式、其余保持内置观感，请在插槽内自行分支渲染内置字段。
 
+::: v-pre
 ```vue
 <script setup lang="ts">
 function pushAuction() {
@@ -122,6 +125,7 @@ function pushAuction() {
   </ChatroomLiveDanmakuStream>
 </template>
 ```
+:::
 
 ## 主题 token（`--live-danmaku-*`）
 
