@@ -11,16 +11,22 @@
  * - H5 字号按 viewport 相对缩放（clamp 11px~13px），避免大屏占比失衡；
  * - 用户名脱敏可开关（mask-name prop，默认 true）；
  * - 购买提示 / 普通消息在 1s 窗口内合并计数；超出最大条数按优先级挤出。
+ *
+ * 自定义插槽（CHATROOM-CAPABILITY-REVIEW.md §五 P6-2，合并/挤出/进出场动画仍由组件管理）：
+ * - `#prefix`：scope `{ item, display-name }`——渲染在整条气泡**最左端**（用户名/内置图标
+ *   之前，全 kind 通用），左侧头像/等级/VIP 皇冠等栏位直插位；
+ * - `#badge`：scope `{ item, display-name }`——渲染在用户名之后、内容之前，全 kind 通用
+ *   （VIP 徽章/等级/勋章等业务栏位直插位；业务数据放 item.meta 透传）；
+ * - `#item`：scope `{ item, display-name, display-count }`——整条覆盖内置气泡渲染
+ *   （通知区与聊天区均生效）；自定义 kind 建议配合本插槽；
+ * - `#empty`：覆盖空态文案。
  */
 import { computed, ref, watch } from 'vue'
 import { maskUsername } from './mask-username'
 import {
-  CHAT_KINDS,
-  isChatKind,
-  isNotificationKind,
-  NOTIFICATION_KINDS,
   type LiveDanmakuItem,
   type LiveDanmakuKind,
+  isNotificationKind,
 } from './live-danmaku-types'
 
 export type { LiveDanmakuItem } from './live-danmaku-types'
@@ -50,13 +56,6 @@ export interface LiveDanmakuStreamProps {
   size?: 'small' | 'medium' | 'large'
 }
 
-/** 字号档位映射（写入 --live-danmaku-font-size，图标/计数徽标按系数跟随） */
-const DANMAKU_FONT_SIZES: Record<NonNullable<LiveDanmakuStreamProps['size']>, string> = {
-  small: 'clamp(10px, 2.8vw, 12px)',
-  medium: 'clamp(11px, 3.2vw, 13px)',
-  large: 'clamp(12px, 3.6vw, 15px)',
-}
-
 const props = withDefaults(defineProps<LiveDanmakuStreamProps>(), {
   maskName: true,
   maxChatItems: 5,
@@ -66,13 +65,28 @@ const props = withDefaults(defineProps<LiveDanmakuStreamProps>(), {
   size: undefined,
 })
 
-/** 类型优先级（越高越难被挤出）：欢迎 > 系统签到 > 礼物 > 购买提示 > 普通弹幕 */
-const KIND_PRIORITY: Record<LiveDanmakuKind, number> = {
+/** 字号档位映射（写入 --live-danmaku-font-size，图标/计数徽标按系数跟随） */
+const DANMAKU_FONT_SIZES: Record<NonNullable<LiveDanmakuStreamProps['size']>, string> = {
+  small: 'clamp(10px, 2.8vw, 12px)',
+  medium: 'clamp(11px, 3.2vw, 13px)',
+  large: 'clamp(12px, 3.6vw, 15px)',
+}
+
+/**
+ * 类型优先级（越高越难被挤出）：欢迎 > 系统签到 > 礼物 > 购买提示 > 普通弹幕；
+ * 业务自定义 kind 回落 0（与普通弹幕同级，priorityOf 兜底）。
+ */
+const KIND_PRIORITY: Partial<Record<LiveDanmakuKind, number>> = {
   welcome: 4,
   checkin: 3,
   gift: 2,
   purchase: 1,
   normal: 0,
+}
+
+/** 自定义 kind 优先级回落 0 */
+function priorityOf(kind: LiveDanmakuKind): number {
+  return KIND_PRIORITY[kind] ?? 0
 }
 
 /** 根元素样式：maxLines 始终写入；size 仅显式传入时写入（否则保留祖先 token 覆盖通道） */
@@ -143,7 +157,7 @@ function evictIfNeeded(
   // 找到最低优先级的条目（同优先级取最旧 = 数组尾）
   let evictIndex = list.length - 1
   for (let i = list.length - 1; i >= 0; i--) {
-    if (KIND_PRIORITY[list[i]!.kind] < KIND_PRIORITY[list[evictIndex]!.kind])
+    if (priorityOf(list[i]!.kind) < priorityOf(list[evictIndex]!.kind))
       evictIndex = i
   }
   const [target] = list.splice(evictIndex, 1)
@@ -159,9 +173,9 @@ function evictIfNeeded(
   }, LEAVE_MS)
 }
 
-/** 消费单条新增条目 */
+/** 消费单条新增条目（条目级 zone 优先于常量分区，自定义 kind 可显式指定） */
 function consumeItem(item: LiveDanmakuItem) {
-  const isNotice = isNotificationKind(item.kind)
+  const isNotice = item.zone ? item.zone === 'notice' : isNotificationKind(item.kind)
   const list = isNotice ? notices.value : chats.value
   const windows = isNotice ? noticeWindows : chatWindows
   const max = isNotice ? props.maxNoticeItems : props.maxChatItems
@@ -224,20 +238,28 @@ watch(
         class="live-danmaku__item live-danmaku__item--leaving"
         :class="[`live-danmaku__item--${item.kind}`, `live-danmaku__item--${props.shape}`]"
       >
-        <span v-if="item.kind === 'purchase'" class="live-danmaku__cart">🛒</span>
-        <template v-if="item.kind === 'purchase'">
-          <span class="live-danmaku__name">{{ displayName(item) }}</span>
-          <span class="live-danmaku__count live-danmaku__count--inline">等{{ item.displayCount }}人</span>
-          <span class="live-danmaku__content">{{ item.content }}</span>
-        </template>
-        <template v-else-if="item.kind === 'welcome'">
-          <span v-if="item.isVip" class="live-danmaku__crown">👑</span>
-          <span class="live-danmaku__welcome-text">欢迎 <span class="live-danmaku__welcome-name" :class="{ 'live-danmaku__welcome-name--vip': item.isVip }">{{ displayName(item) }}</span> 💕 {{ item.content || '进入' }}</span>
-        </template>
-        <template v-else>
-          <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
-          <span class="live-danmaku__content">{{ item.content }}</span>
-        </template>
+        <slot name="item" :item="item" :display-name="displayName(item)" :display-count="item.displayCount">
+          <template v-if="item.kind === 'purchase'">
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__cart">🛒</span>
+            <span class="live-danmaku__name">{{ displayName(item) }}</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__count live-danmaku__count--inline">等{{ item.displayCount }}人</span>
+            <span class="live-danmaku__content">{{ item.content }}</span>
+          </template>
+          <template v-else-if="item.kind === 'welcome'">
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span v-if="item.isVip" class="live-danmaku__crown">👑</span>
+            <span class="live-danmaku__welcome-text">欢迎 <span class="live-danmaku__welcome-name" :class="{ 'live-danmaku__welcome-name--vip': item.isVip }">{{ displayName(item) }}</span> 💕 {{ item.content || '进入' }}</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+          </template>
+          <template v-else>
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__content">{{ item.content }}</span>
+          </template>
+        </slot>
       </div>
 
       <div
@@ -246,20 +268,28 @@ watch(
         class="live-danmaku__item"
         :class="[`live-danmaku__item--${item.kind}`, `live-danmaku__item--${props.shape}`, { 'live-danmaku__item--enter': !item.entering }]"
       >
-        <span v-if="item.kind === 'purchase'" class="live-danmaku__cart">🛒</span>
-        <template v-if="item.kind === 'purchase'">
-          <span class="live-danmaku__name">{{ displayName(item) }}</span>
-          <span class="live-danmaku__count live-danmaku__count--inline">等{{ item.displayCount }}人</span>
-          <span class="live-danmaku__content">{{ item.content }}</span>
-        </template>
-        <template v-else-if="item.kind === 'welcome'">
-          <span v-if="item.isVip" class="live-danmaku__crown">👑</span>
-          <span class="live-danmaku__welcome-text">欢迎 <span class="live-danmaku__welcome-name" :class="{ 'live-danmaku__welcome-name--vip': item.isVip }">{{ displayName(item) }}</span> 💕 {{ item.content || '进入' }}</span>
-        </template>
-        <template v-else>
-          <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
-          <span class="live-danmaku__content">{{ item.content }}</span>
-        </template>
+        <slot name="item" :item="item" :display-name="displayName(item)" :display-count="item.displayCount">
+          <template v-if="item.kind === 'purchase'">
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__cart">🛒</span>
+            <span class="live-danmaku__name">{{ displayName(item) }}</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__count live-danmaku__count--inline">等{{ item.displayCount }}人</span>
+            <span class="live-danmaku__content">{{ item.content }}</span>
+          </template>
+          <template v-else-if="item.kind === 'welcome'">
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span v-if="item.isVip" class="live-danmaku__crown">👑</span>
+            <span class="live-danmaku__welcome-text">欢迎 <span class="live-danmaku__welcome-name" :class="{ 'live-danmaku__welcome-name--vip': item.isVip }">{{ displayName(item) }}</span> 💕 {{ item.content || '进入' }}</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+          </template>
+          <template v-else>
+            <slot name="prefix" :item="item" :display-name="displayName(item)" />
+            <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
+            <slot name="badge" :item="item" :display-name="displayName(item)" />
+            <span class="live-danmaku__content">{{ item.content }}</span>
+          </template>
+        </slot>
       </div>
     </div>
 
@@ -271,10 +301,14 @@ watch(
         class="live-danmaku__item live-danmaku__item--leaving"
         :class="[`live-danmaku__item--${item.kind}`, `live-danmaku__item--${props.shape}`]"
       >
-        <span v-if="item.kind === 'gift'" class="live-danmaku__gift-icon">{{ item.giftIcon }}</span>
-        <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
-        <span class="live-danmaku__content">{{ item.content }}</span>
-        <span v-if="item.kind === 'normal' && item.displayCount > 1" class="live-danmaku__count">×{{ item.displayCount }}</span>
+        <slot name="item" :item="item" :display-name="displayName(item)" :display-count="item.displayCount">
+          <slot name="prefix" :item="item" :display-name="displayName(item)" />
+          <span v-if="item.kind === 'gift'" class="live-danmaku__gift-icon">{{ item.giftIcon }}</span>
+          <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
+          <slot name="badge" :item="item" :display-name="displayName(item)" />
+          <span class="live-danmaku__content">{{ item.content }}</span>
+          <span v-if="item.kind === 'normal' && item.displayCount > 1" class="live-danmaku__count">×{{ item.displayCount }}</span>
+        </slot>
       </div>
 
       <div
@@ -283,16 +317,22 @@ watch(
         class="live-danmaku__item"
         :class="[`live-danmaku__item--${item.kind}`, `live-danmaku__item--${props.shape}`, { 'live-danmaku__item--enter': !item.entering }]"
       >
-        <span v-if="item.kind === 'gift'" class="live-danmaku__gift-icon">{{ item.giftIcon }}</span>
-        <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
-        <span class="live-danmaku__content">{{ item.content }}</span>
-        <span v-if="item.kind === 'normal' && item.displayCount > 1" class="live-danmaku__count">×{{ item.displayCount }}</span>
+        <slot name="item" :item="item" :display-name="displayName(item)" :display-count="item.displayCount">
+          <slot name="prefix" :item="item" :display-name="displayName(item)" />
+          <span v-if="item.kind === 'gift'" class="live-danmaku__gift-icon">{{ item.giftIcon }}</span>
+          <span v-if="displayName(item)" class="live-danmaku__name">{{ displayName(item) }}：</span>
+          <slot name="badge" :item="item" :display-name="displayName(item)" />
+          <span class="live-danmaku__content">{{ item.content }}</span>
+          <span v-if="item.kind === 'normal' && item.displayCount > 1" class="live-danmaku__count">×{{ item.displayCount }}</span>
+        </slot>
       </div>
     </div>
 
-    <!-- 空态 -->
+    <!-- 空态（可经 #empty 插槽覆盖） -->
     <div v-if="notices.length === 0 && chats.length === 0 && leavingNotices.length === 0 && leavingChats.length === 0" class="live-danmaku__empty">
-      等待弹幕…（发送消息或让另一账号发言）
+      <slot name="empty">
+        等待弹幕…（发送消息或让另一账号发言）
+      </slot>
     </div>
   </div>
 </template>

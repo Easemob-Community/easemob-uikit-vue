@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-chatroom",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Easemob UIKit Vue3 chatroom scenario package (room lifecycle / broadcast message stream / members / mute / announcement / room attributes)",
   "exports": {
     ".": {

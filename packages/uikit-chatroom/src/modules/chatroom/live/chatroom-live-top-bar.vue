@@ -3,7 +3,8 @@
  * 直播顶部信息栏（P4 review UI 规范）：
  * - 红色渐变横幅（高度 50px + 刘海安全区）；
  * - 左：主播头像（圆形 40px）+ 直播间标题（白色粗体）+ 🔥热度；
- * - 右：更多（...）+ 投诉按钮。
+ * - 右：更多（...）+ 投诉按钮 + `#extra` 插槽（业务注入分享/关注/在线数等自定义动作，
+ *   渲染在 more/report 之后；CHATROOM-CAPABILITY-REVIEW.md §五 P6-3）。
  */
 import { t } from '@easemob/uikit-core'
 
@@ -55,6 +56,8 @@ const emit = defineEmits<{
       <button class="live-top-bar__report" @click="emit('report')">
         {{ t('chatroom.ui.report') }}
       </button>
+      <!-- 业务自定义动作插槽（分享/关注/在线数等） -->
+      <slot name="extra" />
     </div>
   </div>
 </template>

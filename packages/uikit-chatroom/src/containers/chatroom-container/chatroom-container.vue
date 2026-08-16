@@ -31,7 +31,7 @@
  * - 接收侧渲染节流在 store 层（缓冲队列按窗口批量合并），容器直接绑定渲染列表；
  * - 被踢/解散终态：watch store 状态 → emit 事件 + 终态提示视图。
  */
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, useSlots, watch } from 'vue'
 import { EmPopup, MESSAGE_TYPE, t, useClient, useEscToClose, useViewport } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
@@ -136,6 +136,8 @@ onUnmounted(() => {
 /** 模板枚举常量（禁止模板内硬编码字符串） */
 const JOINING = CHATROOM_STATUS.JOINING
 const IDLE = CHATROOM_STATUS.IDLE
+const KICKED = CHATROOM_STATUS.KICKED
+const DESTROYED = CHATROOM_STATUS.DESTROYED
 
 /** 当前用户 ID（归一化） */
 const selfId = computed(() => normalizeUserId(currentUser.value ?? ''))
@@ -235,6 +237,13 @@ const splitPanels = computed(() => sceneConfig.value.panels)
 /** 管理位能力开关（scene features.management） */
 const managementFeatures = computed(() => features.value.management)
 
+/**
+ * 消息列表整块替换插槽（P6-4）：提供时容器不再渲染 VirtualList/空态/加载更多，
+ * 滚动跟随与加载职责转移给业务；message-item/message-custom/empty 自然失效。
+ */
+const slots = useSlots()
+const usingMessageListSlot = computed(() => !!slots['message-list'])
+
 /** 消息列表：虚拟滚动（P4 review 需求 5）与滚动跟随 */
 const virtualListRef = ref<InstanceType<typeof VirtualList>>()
 const stickToBottom = ref(true)
@@ -317,11 +326,11 @@ watch(
   },
 )
 
-/** 新消息滚动跟随（用户停留在底部时） */
+/** 新消息滚动跟随（用户停留在底部时；#message-list 接管时滚动职责在业务侧） */
 watch(
   () => messages.value.length,
   () => {
-    if (!stickToBottom.value)
+    if (usingMessageListSlot.value || !stickToBottom.value)
       return
     requestAnimationFrame(() => {
       virtualListRef.value?.scrollToBottom()
@@ -413,9 +422,18 @@ defineExpose({
 
 <template>
   <div ref="rootRef" class="chatroom-container" :class="{ 'chatroom-container--overlay': messageAreaTransparent }">
-    <!-- 顶部栏（可整条覆盖） -->
-    <slot name="header" :status="status" :room-info="roomInfo" :on-exit="handleExit">
+    <!-- 顶部栏（可整条覆盖；features.header: false 隐藏内置 header——同时提供
+         #header 插槽则插槽仍渲染（容器内接管），完全无头时业务自绘头部放容器外，
+         见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-1） -->
+    <slot
+      v-if="features.header !== false || $slots.header"
+      name="header"
+      :status="status"
+      :room-info="roomInfo"
+      :on-exit="handleExit"
+    >
       <ChatroomHeader
+        v-if="features.header !== false"
         :title="roomInfo?.name ?? roomId"
         :member-count="roomInfo?.memberCount"
         :joining="status === JOINING"
@@ -466,49 +484,72 @@ defineExpose({
           />
         </slot>
         <div class="chatroom-container__list">
-          <button
-            v-if="historyHasMore && isJoined"
-            class="chatroom-container__load-more"
-            :disabled="loadingHistory"
-            @click="handleLoadMore"
-          >
-            {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
-          </button>
-          <VirtualList
-            v-if="visibleMessages.length > 0"
-            ref="virtualListRef"
-            class="chatroom-container__virtual"
-            :items="visibleMessages"
-            :estimate-height="56"
-            :item-key="messageListKey"
-            @scroll="handleListScroll"
-          >
-            <template #item="{ item }">
-              <div class="chatroom-container__message">
-                <slot
-                  v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
-                  name="message-custom"
-                  :message="item"
-                />
-                <slot v-else name="message-item" :message="item">
-                  <ChatroomMessageItem :message="item as UiMessage" />
-                </slot>
+          <!-- 消息列表整块（#message-list 提供时整体接管：加载更多 + 列表 + 空态；
+               滚动跟随与加载职责转移业务，message-item/message-custom/empty 自然失效，
+               见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+          <slot
+            v-if="$slots['message-list']"
+            name="message-list"
+            :messages="visibleMessages"
+            :status="status"
+            :history-has-more="historyHasMore"
+            :loading-history="loadingHistory"
+            :load-more="handleLoadMore"
+          />
+          <template v-else>
+            <button
+              v-if="historyHasMore && isJoined"
+              class="chatroom-container__load-more"
+              :disabled="loadingHistory"
+              @click="handleLoadMore"
+            >
+              {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
+            </button>
+            <VirtualList
+              v-if="visibleMessages.length > 0"
+              ref="virtualListRef"
+              class="chatroom-container__virtual"
+              :items="visibleMessages"
+              :estimate-height="56"
+              :item-key="messageListKey"
+              @scroll="handleListScroll"
+            >
+              <template #item="{ item }">
+                <div class="chatroom-container__message">
+                  <slot
+                    v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
+                    name="message-custom"
+                    :message="item"
+                  />
+                  <slot v-else name="message-item" :message="item">
+                    <ChatroomMessageItem :message="item as UiMessage" />
+                  </slot>
+                </div>
+              </template>
+            </VirtualList>
+            <slot v-else name="empty" :status="status">
+              <div class="chatroom-container__empty">
+                {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
               </div>
-            </template>
-          </VirtualList>
-          <slot v-else name="empty" :status="status">
-            <div class="chatroom-container__empty">
-              {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
+            </slot>
+          </template>
+          <!-- 终态（被踢/解散）提示（可经 #terminal 插槽覆盖） -->
+          <slot
+            name="terminal"
+            :status="status"
+            :kicked="status === KICKED"
+            :destroyed="status === DESTROYED"
+            :on-exit="handleExit"
+          >
+            <div v-if="terminalView" class="chatroom-container__terminal">
+              <div class="chatroom-container__terminal-text">
+                {{ terminalView.text }}
+              </div>
+              <button class="chatroom-container__terminal-btn" @click="handleExit">
+                {{ t('chatroom.ui.exit') }}
+              </button>
             </div>
           </slot>
-          <div v-if="terminalView" class="chatroom-container__terminal">
-            <div class="chatroom-container__terminal-text">
-              {{ terminalView.text }}
-            </div>
-            <button class="chatroom-container__terminal-btn" @click="handleExit">
-              {{ t('chatroom.ui.exit') }}
-            </button>
-          </div>
         </div>
         <div class="chatroom-container__input-row">
           <slot v-if="features.gift" name="gift-bar" :disabled="inputDisabled">
@@ -561,56 +602,78 @@ defineExpose({
         :class="{ 'chatroom-container__list--transparent': messageAreaTransparent }"
         :style="messageAreaStyle"
       >
-        <button
-          v-if="historyHasMore && isJoined"
-          class="chatroom-container__load-more"
-          :disabled="loadingHistory"
-          @click="handleLoadMore"
-        >
-          {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
-        </button>
+        <!-- 消息列表整块（#message-list 提供时整体接管：加载更多 + 列表 + 空态；
+             滚动跟随与加载职责转移业务，message-item/message-custom/empty 自然失效，
+             见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+        <slot
+          v-if="$slots['message-list']"
+          name="message-list"
+          :messages="visibleMessages"
+          :status="status"
+          :history-has-more="historyHasMore"
+          :loading-history="loadingHistory"
+          :load-more="handleLoadMore"
+        />
+        <template v-else>
+          <button
+            v-if="historyHasMore && isJoined"
+            class="chatroom-container__load-more"
+            :disabled="loadingHistory"
+            @click="handleLoadMore"
+          >
+            {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
+          </button>
 
-        <!-- 消息流：虚拟滚动（P4 review 需求 5：大体量消息性能；只渲染可视区+缓冲行） -->
-        <VirtualList
-          v-if="visibleMessages.length > 0"
-          ref="virtualListRef"
-          class="chatroom-container__virtual"
-          :items="visibleMessages"
-          :estimate-height="56"
-          :item-key="messageListKey"
-          @scroll="handleListScroll"
-        >
-          <template #item="{ item }">
-            <div class="chatroom-container__message">
-              <!-- custom 消息：业务 message-custom 插槽优先，否则回落消息项兜底渲染 -->
-              <slot
-                v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
-                name="message-custom"
-                :message="item"
-              />
-              <slot v-else name="message-item" :message="item">
-                <ChatroomMessageItem :message="item as UiMessage" />
-              </slot>
+          <!-- 消息流：虚拟滚动（P4 review 需求 5：大体量消息性能；只渲染可视区+缓冲行） -->
+          <VirtualList
+            v-if="visibleMessages.length > 0"
+            ref="virtualListRef"
+            class="chatroom-container__virtual"
+            :items="visibleMessages"
+            :estimate-height="56"
+            :item-key="messageListKey"
+            @scroll="handleListScroll"
+          >
+            <template #item="{ item }">
+              <div class="chatroom-container__message">
+                <!-- custom 消息：业务 message-custom 插槽优先，否则回落消息项兜底渲染 -->
+                <slot
+                  v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
+                  name="message-custom"
+                  :message="item"
+                />
+                <slot v-else name="message-item" :message="item">
+                  <ChatroomMessageItem :message="item as UiMessage" />
+                </slot>
+              </div>
+            </template>
+          </VirtualList>
+
+          <!-- 空态（未进房/暂无消息） -->
+          <slot v-else name="empty" :status="status">
+            <div class="chatroom-container__empty">
+              {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
             </div>
-          </template>
-        </VirtualList>
+          </slot>
+        </template>
 
-        <!-- 空态（未进房/暂无消息） -->
-        <slot v-else name="empty" :status="status">
-          <div class="chatroom-container__empty">
-            {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
+        <!-- 终态（被踢/解散）提示（可经 #terminal 插槽覆盖） -->
+        <slot
+          name="terminal"
+          :status="status"
+          :kicked="status === KICKED"
+          :destroyed="status === DESTROYED"
+          :on-exit="handleExit"
+        >
+          <div v-if="terminalView" class="chatroom-container__terminal">
+            <div class="chatroom-container__terminal-text">
+              {{ terminalView.text }}
+            </div>
+            <button class="chatroom-container__terminal-btn" @click="handleExit">
+              {{ t('chatroom.ui.exit') }}
+            </button>
           </div>
         </slot>
-
-        <!-- 终态（被踢/解散）提示 -->
-        <div v-if="terminalView" class="chatroom-container__terminal">
-          <div class="chatroom-container__terminal-text">
-            {{ terminalView.text }}
-          </div>
-          <button class="chatroom-container__terminal-btn" @click="handleExit">
-            {{ t('chatroom.ui.exit') }}
-          </button>
-        </div>
       </div>
 
       <!-- 底部操作行（P4 review 需求 4）：[礼物按钮] [输入条] 同行；礼物在输入条左侧 -->
@@ -652,32 +715,41 @@ defineExpose({
       </ChatroomMemberPanel>
     </slot>
 
-    <!-- 公告编辑框（P3：owner/admin） -->
-    <EmPopup
-      v-model:show="showAnnouncementEditor"
-      :to="getChatroomPopupTarget() ?? undefined"
-      position="center"
-      class="chatroom-container__announcement-editor"
+    <!-- 公告编辑框（P3：owner/admin；可经 #announcement-editor 插槽整体覆盖，
+         见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+    <slot
+      name="announcement-editor"
+      :show="showAnnouncementEditor"
+      :content="announcementDraft"
+      :save="saveAnnouncement"
+      :close="() => { showAnnouncementEditor = false }"
     >
-      <div class="chatroom-container__announcement-editor-body">
-        <div class="chatroom-container__announcement-editor-title">
-          {{ t('chatroom.ui.editAnnouncement') }}
+      <EmPopup
+        v-model:show="showAnnouncementEditor"
+        :to="getChatroomPopupTarget() ?? undefined"
+        position="center"
+        class="chatroom-container__announcement-editor"
+      >
+        <div class="chatroom-container__announcement-editor-body">
+          <div class="chatroom-container__announcement-editor-title">
+            {{ t('chatroom.ui.editAnnouncement') }}
+          </div>
+          <textarea
+            v-model="announcementDraft"
+            class="chatroom-container__announcement-editor-input"
+            :placeholder="t('chatroom.ui.announcementPlaceholder')"
+            rows="4"
+          />
+          <button
+            class="chatroom-container__announcement-editor-save"
+            :disabled="!announcementDraft.trim()"
+            @click="saveAnnouncement"
+          >
+            {{ t('chatroom.ui.save') }}
+          </button>
         </div>
-        <textarea
-          v-model="announcementDraft"
-          class="chatroom-container__announcement-editor-input"
-          :placeholder="t('chatroom.ui.announcementPlaceholder')"
-          rows="4"
-        />
-        <button
-          class="chatroom-container__announcement-editor-save"
-          :disabled="!announcementDraft.trim()"
-          @click="saveAnnouncement"
-        >
-          {{ t('chatroom.ui.save') }}
-        </button>
-      </div>
-    </EmPopup>
+      </EmPopup>
+    </slot>
   </div>
 </template>
 

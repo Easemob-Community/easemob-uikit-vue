@@ -64,12 +64,13 @@ function handleJoinError(error: unknown) {
       </div>
     </div>
 
-    <!-- 课堂容器（class preset：公告 + 消息流 + 输入条 + 成员面板） -->
+    <!-- 课堂容器（class preset：公告 + 消息流 + 输入条 + 成员面板；
+         features.header:false 隐藏内置 header，导航头由 DemoSceneHeader 承担） -->
     <EmChatroomContainer
       v-else
       class="class-page__container"
       :room-id="activeRoomId"
-      scene="class"
+      :scene="{ name: 'class', features: { header: false } }"
       @back="handleExit"
       @kicked="handleExit"
       @destroyed="handleExit"

@@ -15,6 +15,14 @@ const roomIdInput = ref(DEFAULT_ROOM_ID)
 const activeRoomId = ref('')
 /** 加入失败提示（容器 join-error 事件） */
 const joinError = ref('')
+/** 消息区形态：默认列表 / 弹幕流（示范 #message-list 插槽整块替换消息流） */
+const danmakuMode = ref(false)
+
+/** 消息文本（notice/txt 消息体均为 { content }；模板内避免 TS 断言） */
+function messageText(msg: { body?: unknown }): string {
+  const body = msg.body as { content?: string } | undefined
+  return body?.content ?? ''
+}
 
 function handleJoin() {
   const id = roomIdInput.value.trim()
@@ -65,17 +73,47 @@ function handleJoinError(error: unknown) {
       </div>
     </div>
 
-    <!-- 已进房：完整聊天室（容器） -->
+    <!-- 已进房：完整聊天室（容器；features.header:false 隐藏内置 header——
+         页面导航头由 DemoSceneHeader 承担，示范「隐藏内置 header 让用户接管」） -->
     <EmChatroomContainer
       v-else
       class="basic-page__container"
       :room-id="activeRoomId"
-      scene="custom"
+      :scene="{ name: 'custom', features: { header: false } }"
       @back="handleExit"
       @kicked="handleExit"
       @destroyed="handleExit"
       @join-error="handleJoinError"
-    />
+    >
+      <!-- 工具条：消息区形态切换（默认列表 / 弹幕流，示范 #message-list 整块替换） -->
+      <template #toolbar>
+        <div class="basic-page__toolbar">
+          <button class="basic-page__toolbar-btn" @click="danmakuMode = !danmakuMode">
+            {{ danmakuMode ? '弹幕流（#message-list 接管中）' : '默认消息列表' }}
+          </button>
+        </div>
+      </template>
+
+      <!-- #message-list：整块替换消息列表区（加载更多/空态/滚动跟随职责转移业务；
+           提供后 message-item/message-custom/empty 插槽自然失效） -->
+      <template v-if="danmakuMode" #message-list="{ messages }">
+        <div class="basic-page__danmaku">
+          <div
+            v-for="msg in messages"
+            :key="msg.msgLocalId || msg.msgServerId || msg.localId"
+            class="basic-page__danmaku-item"
+          >
+            <span class="basic-page__danmaku-name">{{ msg.from }}</span>
+            <span class="basic-page__danmaku-content">
+              {{ messageText(msg) }}
+            </span>
+          </div>
+          <div v-if="messages.length === 0" class="basic-page__danmaku-empty">
+            暂无消息（消息流已由 #message-list 插槽接管）
+          </div>
+        </div>
+      </template>
+    </EmChatroomContainer>
   </div>
 </template>
 
@@ -159,5 +197,66 @@ function handleJoinError(error: unknown) {
 .basic-page__container {
   flex: 1;
   min-height: 0;
+}
+
+/* ===== #message-list 整块替换演示（P6-4） ===== */
+.basic-page__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
+  border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
+}
+
+.basic-page__toolbar-btn {
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.14));
+  border-radius: 999px;
+  background: var(--uikit-bg-base, #fff);
+  color: var(--uikit-text-secondary, #6b7280);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.basic-page__danmaku {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.basic-page__danmaku-item {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.6);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.basic-page__danmaku-name {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #ffd666;
+}
+
+.basic-page__danmaku-content {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.basic-page__danmaku-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--uikit-text-tertiary, #9ca3af);
+  font-size: 12px;
 }
 </style>

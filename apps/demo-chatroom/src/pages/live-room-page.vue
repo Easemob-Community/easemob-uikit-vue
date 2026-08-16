@@ -75,7 +75,7 @@ const { attributes, setAttributes, removeAttributes } = useChatroomAttributes()
 
 /** 当前商品（属性 JSON 解析；缺失/损坏回落 null） */
 const product = computed<LiveProduct | null>(() => {
-  const raw = attributes.value['live_product']
+  const raw = attributes.value.live_product
   if (!raw)
     return null
   try {
@@ -199,7 +199,7 @@ async function handlePublishProduct() {
   try {
     // 本地立即写属性：商品卡立即弹出；信令消息用于跨端同步
     void setAttributes({
-      'live_product': JSON.stringify({
+      live_product: JSON.stringify({
         name: next.name,
         price: next.price,
         imageUrl: next.imageUrl,
@@ -232,7 +232,7 @@ function handleSignalMessage(payload: SignalMessagePayload) {
     const { name, price, imageUrl, emoji, tag, desc } = body.params ?? {}
     if (!name || !price)
       return
-    void setAttributes({ 'live_product': JSON.stringify({
+    void setAttributes({ live_product: JSON.stringify({
       name,
       price: Number(price) || 0,
       imageUrl: imageUrl || undefined,
@@ -287,12 +287,20 @@ function pushDanmaku(item: Omit<LiveDanmakuItem, 'id'>) {
   danmakuItems.value = [...danmakuItems.value, { ...item, id: danmakuSeq }]
 }
 
-/** 消息增量订阅：按类型分流到弹幕（普通/礼物） */
+/** 消息增量订阅：按类型分流到弹幕（普通/礼物；普通消息随机带 VIP meta，供 #badge 演示） */
 subscribe((batch) => {
   for (const msg of batch) {
     const from = msg.from || '游客'
     if (msg.type === MESSAGE_TYPE.TEXT) {
-      pushDanmaku({ kind: 'normal', name: from, content: (msg.body as { content?: string }).content ?? '' })
+      pushDanmaku({
+        kind: 'normal',
+        name: from,
+        content: (msg.body as { content?: string }).content ?? '',
+        // 随机 VIP 数据（P6-2：#badge 插槽消费 item.meta）
+        meta: Math.random() < 0.25
+          ? { vipLevel: 1 + Math.floor(Math.random() * 6) }
+          : undefined,
+      })
       continue
     }
     if (msg.type === MESSAGE_TYPE.CUSTOM) {
@@ -309,7 +317,7 @@ subscribe((batch) => {
   }
 })
 
-/** 成员加入 → 推入弹幕通知区（welcome 类型，VIP 高亮） */
+/** 成员加入 → 推入弹幕通知区（welcome 类型，VIP 高亮 + meta 透传） */
 subscribeMemberJoined((payload: MemberJoinedPayload) => {
   for (const member of payload.members) {
     const isVip = payload.ext === '1' || Math.random() < 0.2
@@ -318,9 +326,21 @@ subscribeMemberJoined((payload: MemberJoinedPayload) => {
       name: member.nickname || member.userId,
       content: '进入',
       isVip,
+      meta: isVip ? { vipLevel: 6 } : undefined,
     })
   }
 })
+
+/** 弹幕自定义插槽演示（P6-2）：#prefix 左侧栏位 / #badge 右侧徽章 / #item 整条自定义 */
+const danmakuPrefix = ref(false)
+const danmakuBadge = ref(true)
+const danmakuCustomItem = ref(false)
+
+/** 弹幕 VIP 等级（#badge/#item 演示读 item.meta；模板内避免 TS 断言） */
+function danmakuVipLevel(item: LiveDanmakuItem): number | undefined {
+  const meta = item.meta as { vipLevel?: number } | undefined
+  return typeof meta?.vipLevel === 'number' ? meta.vipLevel : undefined
+}
 
 /* ===== 底部输入区 ===== */
 
@@ -405,11 +425,11 @@ const danmakuTheme = ref<'default' | 'warm'>('default')
 const danmakuThemeVars = computed(() =>
   danmakuTheme.value === 'warm'
     ? {
-        '--live-danmaku-bg': 'rgba(194, 65, 12, 0.45)',
-        '--live-danmaku-normal-name-color': '#ffedd5',
-        '--live-danmaku-checkin-bg': 'linear-gradient(90deg, #7c3aed, #a78bfa)',
-        '--live-danmaku-purchase-bg': 'rgba(124, 58, 237, 0.9)',
-      }
+      '--live-danmaku-bg': 'rgba(194, 65, 12, 0.45)',
+      '--live-danmaku-normal-name-color': '#ffedd5',
+      '--live-danmaku-checkin-bg': 'linear-gradient(90deg, #7c3aed, #a78bfa)',
+      '--live-danmaku-purchase-bg': 'rgba(124, 58, 237, 0.9)',
+    }
     : {},
 )
 
@@ -520,14 +540,18 @@ function handleExit() {
         </div>
       </div>
 
-      <!-- 顶层：顶部信息栏（红色渐变横幅） -->
+      <!-- 顶层：顶部信息栏（红色渐变横幅；#extra 插槽示范业务自定义动作，P6-3） -->
       <ChatroomLiveTopBar
         class="live-stage__top"
         title="会员年中福利"
         heat="1.4万"
         @more="toast.success('更多（演示）')"
         @report="toast.success('投诉（演示）')"
-      />
+      >
+        <button class="live-top-bar-share" @click="toast.success('分享（演示）')">
+          分享
+        </button>
+      </ChatroomLiveTopBar>
 
       <!-- 顶层：评论抽奖入口（右侧顶部偏下） -->
       <ChatroomLiveLotteryEntry class="live-stage__lottery" @click="toast.success('评论抽奖（演示）')" />
@@ -604,9 +628,33 @@ function handleExit() {
         </template>
       </ChatroomLiveOverlayManager>
 
-      <!-- 左下区：弹幕流（上部通知区 + 下部聊天区） -->
+      <!-- 左下区：弹幕流（上部通知区 + 下部聊天区；P6-2 自定义插槽演示：
+           #badge 渲染 VIP 徽章（读 item.meta.vipLevel），#item 整条自定义渲染） -->
       <div class="live-stage__danmaku" :style="danmakuThemeVars">
-        <ChatroomLiveDanmakuStream :items="danmakuItems" :mask-name="maskName" :shape="danmakuShape" :max-lines="danmakuMaxLines" :size="danmakuSize" />
+        <ChatroomLiveDanmakuStream :items="danmakuItems" :mask-name="maskName" :shape="danmakuShape" :max-lines="danmakuMaxLines" :size="danmakuSize">
+          <!-- 左侧栏位插槽（渲染在最左端，用户名/内置图标之前；信令面板可开关） -->
+          <template v-if="danmakuPrefix" #prefix="{ item }">
+            <span v-if="danmakuVipLevel(item)" class="demo-danmaku-prefix">👑</span>
+          </template>
+          <!-- VIP 徽章插槽（用户名后插入；信令面板可开关） -->
+          <template v-if="danmakuBadge" #badge="{ item }">
+            <span v-if="danmakuVipLevel(item)" class="demo-danmaku-vip-badge">
+              👑L{{ danmakuVipLevel(item) }}
+            </span>
+          </template>
+          <!-- 整条自定义插槽（信令面板可开关；提供后所有 kind 走此渲染） -->
+          <template v-if="danmakuCustomItem" #item="{ item, displayName, displayCount }">
+            <div class="demo-danmaku-custom" :class="`demo-danmaku-custom--${item.kind}`">
+              <span v-if="item.kind === 'gift'" class="demo-danmaku-custom__icon">{{ item.giftIcon }}</span>
+              <span v-if="danmakuVipLevel(item)" class="demo-danmaku-vip-badge">
+                👑L{{ danmakuVipLevel(item) }}
+              </span>
+              <span v-if="displayName" class="demo-danmaku-custom__name">{{ displayName }}</span>
+              <span class="demo-danmaku-custom__content">{{ item.content }}</span>
+              <span v-if="displayCount > 1" class="demo-danmaku-custom__count">×{{ displayCount }}</span>
+            </div>
+          </template>
+        </ChatroomLiveDanmakuStream>
       </div>
 
       <!-- 信令房悬浮面板（右下角，可折叠） -->
@@ -633,6 +681,17 @@ function handleExit() {
             </button>
             <button class="live-stage__signal-btn" @click="maskName = !maskName">
               脱敏：{{ maskName ? '开' : '关' }}
+            </button>
+          </div>
+          <div class="live-stage__signal-row">
+            <button class="live-stage__signal-btn" @click="danmakuPrefix = !danmakuPrefix">
+              前缀插槽：{{ danmakuPrefix ? '开' : '关' }}
+            </button>
+            <button class="live-stage__signal-btn" @click="danmakuBadge = !danmakuBadge">
+              徽章插槽：{{ danmakuBadge ? '开' : '关' }}
+            </button>
+            <button class="live-stage__signal-btn" @click="danmakuCustomItem = !danmakuCustomItem">
+              自定义项：{{ danmakuCustomItem ? '开' : '关' }}
             </button>
           </div>
           <div class="live-stage__signal-row">
@@ -663,8 +722,12 @@ function handleExit() {
           <div class="demo-fs-effect" :class="`demo-fs-effect--${item.type}`">
             <span class="demo-fs-effect__icon">{{ item.icon }}</span>
             <div class="demo-fs-effect__text">
-              <div class="demo-fs-effect__name">{{ item.name }}</div>
-              <div class="demo-fs-effect__desc">{{ item.text }}</div>
+              <div class="demo-fs-effect__name">
+                {{ item.name }}
+              </div>
+              <div class="demo-fs-effect__desc">
+                {{ item.text }}
+              </div>
             </div>
           </div>
         </template>
@@ -681,7 +744,7 @@ function handleExit() {
         @block="(_text, reason) => toast.error(reason)"
         @send-too-fast="(remaining) => toast.warning(`请 ${Math.ceil(remaining / 1000)}s 后再发`)"
       >
-        <template #actions="{ canSend, send }">
+        <template #actions>
           <!-- 礼物 -->
           <button
             class="live-input-bar__action live-input-bar__gift"
@@ -888,6 +951,17 @@ function handleExit() {
   pointer-events: none;
 }
 
+.live-top-bar-share {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 /* 左下区：欢迎横幅 + 弹幕流
    弹幕流容器必须给出「定宽」（width: 70% 对定宽舞台解析），不能用 max-width 只做上限：
    abs 只设 left 时宽度为 shrink-to-fit（不定宽），后代百分比 max-width 会循环依赖，
@@ -903,6 +977,68 @@ function handleExit() {
   align-items: flex-start;
   width: 70%;
   max-width: 280px;
+}
+
+/* ===== 弹幕自定义插槽演示（P6-2） ===== */
+.demo-danmaku-prefix {
+  flex-shrink: 0;
+  font-size: calc(var(--live-danmaku-font-size, clamp(10px, 2.8vw, 12px)) * 1.15);
+  line-height: 1;
+}
+
+.demo-danmaku-vip-badge {
+  flex-shrink: 0;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+  color: #fff;
+  font-size: calc(var(--live-danmaku-font-size, clamp(10px, 2.8vw, 12px)) * 0.9);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.demo-danmaku-custom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.85), rgba(168, 85, 247, 0.85));
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: var(--live-danmaku-font-size, clamp(10px, 2.8vw, 12px));
+}
+
+.demo-danmaku-custom--gift {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.9), rgba(239, 68, 68, 0.9));
+}
+
+.demo-danmaku-custom--welcome {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.9), rgba(14, 165, 233, 0.9));
+}
+
+.demo-danmaku-custom__icon {
+  flex-shrink: 0;
+}
+
+.demo-danmaku-custom__name {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #ffd666;
+}
+
+.demo-danmaku-custom__content {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo-danmaku-custom__count {
+  flex-shrink: 0;
+  font-weight: 700;
 }
 
 /* 信令房悬浮面板（右下角） */

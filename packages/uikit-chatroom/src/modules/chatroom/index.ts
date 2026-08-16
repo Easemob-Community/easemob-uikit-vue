@@ -23,7 +23,7 @@ export {
   isNotificationKind,
   NOTIFICATION_KINDS,
 } from './live/live-danmaku-types'
-export type { LiveDanmakuItem, LiveDanmakuKind } from './live/live-danmaku-types'
+export type { LiveDanmakuItem, LiveDanmakuKind, LiveDanmakuZone } from './live/live-danmaku-types'
 export type { LiveDanmakuStreamProps } from './live/chatroom-live-danmaku-stream.vue'
 export { maskUsername } from './live/mask-username'
 

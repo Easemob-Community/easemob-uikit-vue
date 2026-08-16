@@ -509,6 +509,44 @@
 
 ---
 
+## @easemob/uikit-chatroom 0.3.0 (2026-08-15)
+
+### 新增
+
+- **插槽 / props 可控性补全（P6，消费者视角反向评估，详见根 CHATROOM-CAPABILITY-REVIEW.md）**：
+  - **隐藏 / 接管 header**：scene `features.header?: boolean`（缺省 true 向后兼容）——`header: false`
+    隐藏内置 `ChatroomHeader`；`#header` 插槽提供时仍渲染（容器内接管）；完全无头时业务自绘
+    头部放容器外。demo 基础聊天室 / 语聊房 / 小班课三页改用 `features.header: false`，
+    消除「DemoSceneHeader + 容器内置 header」双层重合；
+  - **弹幕流自定义插槽**（`ChatroomLiveDanmakuStream`）：新增 `#prefix`（scope `{ item,
+    display-name }`，渲染在整条气泡最左端——左侧头像/等级/VIP 皇冠栏位直插位）、`#badge`
+    （scope `{ item, display-name }`，渲染在用户名后、内容前——VIP 徽章/等级/勋章直插位）、
+    `#item`（scope `{ item, display-name, display-count }`，整条覆盖内置气泡渲染，
+    合并/挤出/动画仍由组件管理）、`#empty`（空态覆盖）；
+    `LiveDanmakuKind` 加宽 `| (string & {})`（业务自定义 kind 类型安全透传）；`LiveDanmakuItem`
+    新增 `zone?: 'notice' | 'chat'`（条目级分区覆盖，优先于 NOTIFICATION_KINDS/CHAT_KINDS 常量）
+    与 `meta?: Record<string, unknown>`（业务数据透传）；`isNotificationKind`/`isChatKind`
+    参数加宽为 `string`；自定义 kind 优先级回落 0（防永不被挤出）；
+  - **容器插槽补全**：`#message-list`（scope `{ messages, status, history-has-more,
+    loading-history, load-more }`，整块替换「加载更多 + VirtualList + 空态」，滚动/加载职责
+    转移业务；提供后 message-item/message-custom/empty 自然失效）、`#terminal`（被踢/解散终态
+    视图覆盖）、`#announcement-editor`（公告编辑弹窗覆盖，scope `{ show, content, save, close }`）；
+  - **`ChatroomLiveTopBar` 新增 `#extra` 插槽**（more/report 之后，业务注入分享/关注/在线数等）。
+- **文档**：docs `chatroom-container` 页重写（真实 props/emits/19 插槽全表 + 隐藏/重写 header
+  三种形态示例 + `#message-list` 容器内弹幕示例）；新增「直播弹幕流 DanmakuStream」组件页
+  （props/插槽/自定义 kind 指南/CSS token 清单）；sidebar 登记。
+- **Demo**：live 页弹幕流新增 `#prefix`（左侧 👑 皇冠）、`#badge`（👑L 徽章，读
+  `item.meta.vipLevel`）与 `#item`（整条自定义渲染）开关演示；`ChatroomLiveTopBar` 注入分享
+  按钮示范 `#extra`；基础聊天室页新增 `#toolbar` 消息区形态切换 + `#message-list` 弹幕流接管演示。
+- 类型导出：`LiveDanmakuZone` 加入公开类型面。
+
+### 兼容性
+
+- 全部新增项可选、默认行为不变：`features.header` 缺省 true、弹幕未提供插槽时内置渲染不变、
+  容器未提供新插槽时行为与 0.2.0 一致；既有五变种 demo 页零回归。
+
+---
+
 ## @easemob/uikit-chatroom 0.2.0 (2026-08-15)
 
 ### 新增

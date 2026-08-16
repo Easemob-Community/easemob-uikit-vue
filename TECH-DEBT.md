@@ -912,6 +912,13 @@
 - **验证**：门禁 pass/fail 双向通过（注入 `src/sdk/__probe_vue__.ts` 拦截、清理后恢复）；core build（门禁 + vite + vue-tsc）全绿；im / demo `vue-tsc --noEmit` 通过（`useLocale` 返回 `locale` 由 `ComputedRef` 变 `Ref`，无消费方显式标注类型，兼容）。
 - **关联 skill**：`uikit-package-boundary` / `uikit-release-build`
 
+### [ ] D101. chatroom 插槽/props 可控性缺口补全（header 隐藏开关 + 弹幕自定义插槽 + 容器消息区整体替换）
+
+- **背景**：消费者视角反向评估 `@easemob/uikit-chatroom` 0.2.0 插槽与 props 可控性（详见根 `CHATROOM-CAPABILITY-REVIEW.md`）后确认三处硬缺口：① 无「隐藏内置 header」开关（uikit-im 系容器有 `showHeader` prop 惯例而 chatroom 缺失），demo 五页「DemoSceneHeader + 容器内置 ChatroomHeader」双层 header 重合；② 弹幕流 `ChatroomLiveDanmakuStream` 零插槽——无法在用户名旁插入 VIP 徽章/等级、无法整条自定义、`LiveDanmakuItem.kind` 封闭联合导致业务自定义消息语义进不了类型系统、分区常量封闭；③ 容器消息区不可整体替换（无 `message-list` 插槽），被踢/解散终态视图与公告编辑弹窗同样不可插槽覆盖。次要：`ChatroomLiveTopBar` 零插槽；docs `chatroom-container.md` 仍为「规划中」占位页（插槽列 11 < 实际 16）。
+- **方案（P6，全部向后兼容）**：① scene `features.header?: boolean`（缺省 true，`header: false` 隐藏内置 header，`#header` 插槽提供时仍渲染=容器内接管）；② 弹幕流新增 `#badge`/`#item`/`#empty` 插槽，`LiveDanmakuKind` 加宽 `| (string & {})`，`LiveDanmakuItem` 增 `zone?: 'notice'|'chat'` 与 `meta?: Record<string, unknown>`，`isNotificationKind`/`isChatKind` 参数加宽；③ `ChatroomLiveTopBar` 增 `#extra` 插槽；④ 容器增 `#message-list`（替换加载更多+VirtualList+空态整块，滚动/加载职责转移业务）/`#terminal`/`#announcement-editor` 插槽；⑤ docs container 页重写 + 新增弹幕流组件页 + demo 改造（basic/voice/class 三页 `features.header:false` 消除双层 header，live 页弹幕 `#badge`/`#item` 演示）；⑥ 版本 0.3.0 + CHANGELOG 段。不做：消息项/成员项细粒度徽章插槽、`ChatroomHeader` 细粒度按钮开关、内置 live 顶部栏进容器。
+- **验证**：chatroom `vue-tsc --noEmit` + build + demo-chatroom `vue-tsc --noEmit` + `changelog:check` + 涉及文件 lint；demo 双层 header 消失、弹幕插槽演示可跑；docs 插槽清单与实现一致。
+- **关联 skill**：`uikit-chatroom-design` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

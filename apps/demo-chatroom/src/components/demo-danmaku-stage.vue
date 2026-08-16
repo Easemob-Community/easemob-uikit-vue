@@ -182,25 +182,31 @@ watch(
 }
 
 .danmaku-item--gift {
+  /* 覆盖 .danmaku-item 的 left: 100%（弹幕滚动起点）——礼物为居中飘屏，水平居中定位。
+     此前沿用 left:100% 且 gift-pop 无水平位移，礼物条停在右缘外被 overflow:hidden 裁掉，
+     「卡在视窗右侧展示不出来」。 */
+  left: 50%;
   background: linear-gradient(90deg, rgba(243, 200, 80, 0.35), rgba(255, 107, 107, 0.35));
   border: 1px solid rgba(243, 200, 80, 0.5);
   animation: gift-pop 3.2s ease-out forwards;
+  /* 礼物不参与弹幕错峰 delay（简写已重置为 0s，此处显式声明防回归） */
+  animation-delay: 0s;
 }
 
 @keyframes gift-pop {
   0% {
-    transform: scale(0.3) translateY(0);
+    transform: translateX(-50%) scale(0.3) translateY(0);
     opacity: 0;
   }
   15% {
-    transform: scale(1.15) translateY(-6px);
+    transform: translateX(-50%) scale(1.15) translateY(-6px);
     opacity: 1;
   }
   30% {
-    transform: scale(1) translateY(-4px);
+    transform: translateX(-50%) scale(1) translateY(-4px);
   }
   100% {
-    transform: scale(1.1) translateY(-20px);
+    transform: translateX(-50%) scale(1.1) translateY(-20px);
     opacity: 0;
   }
 }

@@ -126,7 +126,7 @@ export {
   isNotificationKind,
   NOTIFICATION_KINDS,
 } from './modules/chatroom'
-export type { LiveDanmakuItem, LiveDanmakuKind, LiveDanmakuStreamProps, LiveOverlayAnchor, LiveOverlayItem, LiveFullscreenEffectItem } from './modules/chatroom'
+export type { LiveDanmakuItem, LiveDanmakuKind, LiveDanmakuZone, LiveDanmakuStreamProps, LiveOverlayAnchor, LiveOverlayItem, LiveFullscreenEffectItem } from './modules/chatroom'
 // PC 模式 UI（P5）：split 分栏布局 / 成员常驻侧栏 / 上下文菜单
 export {
   ChatroomSplitLayout,

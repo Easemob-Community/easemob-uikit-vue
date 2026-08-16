@@ -115,7 +115,13 @@ packages/uikit-chatroom/
 
 - 复用 core 的 `EmUIKitProvider`（只负责 client/主题/i18n），**不新增 Provider 概念**；join/leave 由容器驱动。
 - 导出：`EmChatroomContainer` + composables + 场景预设常量 + 类型；全部 `Em` 前缀、事件 kebab-case，与现有规范一致。
-- 命名插槽清单（每个边界都开槽）：`header` / `toolbar` / `message-item` / `message-custom`（对齐现有插槽习惯）/ `gift-bar` / `mic-queue` / `member-item` / `member-panel` / `empty` / `notice` / `input-bar`。
+- 命名插槽清单（每个边界都开槽；现状 19 个，见根 `CHATROOM-CAPABILITY-REVIEW.md` 一/五节）：
+  `header` / `header-title` / `header-extra` / `toolbar` / `manage-actions` / `stage` /
+  `mic-queue` / `notice` / `message-item` / `message-custom` / `message-list`（整块替换消息流）/
+  `empty` / `gift-bar` / `input-bar` / `member-panel` / `member-item` / `member-sidebar` /
+  `terminal`（被踢/解散终态）/ `announcement-editor`（公告编辑弹窗）。
+  另：`features.header?: boolean`（缺省 true）控制内置顶部栏显隐——`header: false` 隐藏内置，
+  `#header` 插槽提供时仍渲染（容器内接管），完全无头时业务自绘头部放容器外（P6-1）。
 - 权限模型：owner / admin / member 三级，控制禁言、踢人、全员禁言、公告编辑、黑/白名单的 UI 显隐（ChatRoomManager 全部具备）。
 
 ### 5.5 场景预设系统（「方便用户变种」的核心机制）

@@ -66,12 +66,13 @@ function handleJoinError(error: unknown) {
       </div>
     </div>
 
-    <!-- 语聊房容器（voice preset：公告 + 麦位 + 消息流 + 输入条） -->
+    <!-- 语聊房容器（voice preset：公告 + 麦位 + 消息流 + 输入条；
+         features.header:false 隐藏内置 header，导航头由 DemoSceneHeader 承担） -->
     <EmChatroomContainer
       v-else
       class="voice-page__container"
       :room-id="activeRoomId"
-      scene="voice"
+      :scene="{ name: 'voice', features: { header: false } }"
       @back="handleExit"
       @kicked="handleExit"
       @destroyed="handleExit"

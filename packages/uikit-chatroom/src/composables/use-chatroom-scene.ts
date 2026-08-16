@@ -53,6 +53,14 @@ export interface ChatroomSceneConfig {
   features: {
     /** 礼物栏 / 礼物消息渲染 */
     gift?: boolean
+    /**
+     * 是否渲染内置顶部栏（ChatroomHeader），缺省 true。
+     * - false：隐藏内置 header（业务自绘头部放容器外）；
+     *   若同时提供 `#header` 插槽则插槽内容仍渲染（容器内接管）。
+     * 组合语义：内置（默认）/ #header 插槽重写 / header:false + #header 容器内接管 /
+     * header:false 完全无头区。见 CHATROOM-CAPABILITY-REVIEW.md §五。
+     */
+    header?: boolean
     /** 麦位管理（语聊房） */
     micQueue?: boolean
     /** 成员列表形态：面板 / 弹层 / 不展示 */
