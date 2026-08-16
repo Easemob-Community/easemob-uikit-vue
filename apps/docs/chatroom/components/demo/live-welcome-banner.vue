@@ -6,11 +6,15 @@ const show = ref(false)
 const name = ref('E***')
 const isVip = ref(true)
 
-/** 模拟成员进场：触发横幅入场，3s 后自动收起 */
+/** 模拟成员进场：show=true 触发入场；组件退场完成派发 hidden，这里复位以便再次触发 */
 function welcome() {
   name.value = 'E***'
   isVip.value = Math.random() > 0.4
   show.value = true
+}
+
+function onHidden() {
+  show.value = false
 }
 </script>
 
@@ -20,11 +24,17 @@ function welcome() {
       模拟成员进场
     </button>
     <div class="wb-demo__stage">
-      <ChatroomLiveWelcomeBanner :show="show" :name="name" :is-vip="isVip" />
+      <ChatroomLiveWelcomeBanner
+        :show="show"
+        :name="name"
+        :is-vip="isVip"
+        @hidden="onHidden"
+      />
       <span class="wb-demo__placeholder">弹幕区（横幅在此上方居中滑入）</span>
     </div>
     <p class="hint">
       入场从左侧滑入（400ms），显示 3 秒后自动收起；VIP 用户带 👑 皇冠 + 用户名高亮。
+      退场完成派发 <code>hidden</code> 事件，可反复触发。
     </p>
   </div>
 </template>
