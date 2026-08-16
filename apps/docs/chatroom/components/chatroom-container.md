@@ -1,17 +1,18 @@
 # ChatroomContainer 聊天室容器
 
-`EmChatroomContainer` 是聊天室场景的页面容器：负责加入/退出房间、历史消息、
-消息收发、成员面板、系统通知，并把每个 UI 边界开放为命名插槽。
-场景 = 纯配置（`scene` prop）+ 插槽覆盖，变种时优先插槽、其次 config、最后才考虑 fork。
+聊天室场景的页面容器：负责加入 / 退出房间、历史消息、消息收发、成员面板、系统通知，
+并把每个 UI 边界开放为命名插槽。场景 = 纯配置（`scene` prop）+ 插槽覆盖，
+变种时优先插槽、其次 config、最后才考虑 fork。
 
-> 完整能力评估见仓库根目录 [CHATROOM-CAPABILITY-REVIEW.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-CAPABILITY-REVIEW.md)。
+## 使用方式
 
-## 快速接入
+组件以 `EmChatroomContainer` 为名导出（具名导出，按需 import）。需先经
+`useChatroomProvider()` 初始化（自带 pinia 注入，无 Provider 组件概念）：
 
 ```vue
 <script setup lang="ts">
 import { useChatroomProvider, EmChatroomContainer } from '@easemob/uikit-chatroom'
-useChatroomProvider({ appKey })
+useChatroomProvider({ appKey: 'orgName#appName' })
 </script>
 
 <template>
@@ -19,40 +20,16 @@ useChatroomProvider({ appKey })
 </template>
 ```
 
+- `roomId` 变化时自动退出旧房并入新房；`auto-join` 关闭时仅渲染外壳（由业务手动进房）；
+- `scene`：内置 `'live'` / `'voice'` / `'class'` 或部分配置对象（与预设合并），见下方「场景配置」。
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-container.md -->
 
 > 插槽 scope 与默认内容见下方「插槽说明」表（gen 表仅列插槽名）。
 
-### 场景配置（`ChatroomSceneConfig`，可经 `scene` 传部分覆盖）
-
-```ts
-interface ChatroomSceneConfig {
-  name: 'live' | 'voice' | 'class' | (string & {})
-  layout: 'fullscreen' | 'split' | 'auto'   // 缺省 fullscreen；auto 按视口 <768px 选择
-  features: {
-    gift?: boolean                 // 礼物栏 / 礼物消息渲染
-    micQueue?: boolean             // 麦位管理（语聊房）
-    memberList?: 'panel' | 'popup' | 'none'
-    announcement?: boolean         // 公告展示
-    header?: boolean               // 是否渲染内置顶部栏（缺省 true，见下方「隐藏/重写 header」）
-    messageFilter?: (msg) => boolean
-    messageArea?: { height?, transparent? }  // 直播消息区限高 + 透明（弹幕叠加画面）
-    management?: { mute?, kick?, muteAll?, announcement?, blocklist?, admin? }
-    multilineInput?: boolean       // PC 输入条多行（textarea + Shift+Enter）
-    keyboard?: boolean             // 键盘快捷键（Esc 关闭弹层）
-  }
-  panels?: { stageWidth?, memberWidth? }   // split 分栏尺寸
-  popupMode?: 'auto' | 'sheet' | 'dialog'  // 弹层形态（缺省 auto）
-  themeOverrides?: Record<string, string>  // CSS 变量覆盖（容器根元素应用）
-  i18nOverrides?: Record<string, string>   // 文案覆盖（mergeLocaleMessages 并入）
-}
-```
-
 ## 插槽说明
-
-> 插槽名清单与 gen 表一致；下表补充 **scope 与默认内容**（gen 表仅列插槽名）：
 
 | 插槽 | scope | 默认内容 | 覆盖粒度 |
 |---|---|---|---|
@@ -71,12 +48,41 @@ interface ChatroomSceneConfig {
 | `gift-bar` | `{ disabled }` | `ChatroomGiftBar` | 礼物栏 |
 | `input-bar` | `{ disabled }` | `ChatroomInputBar` | 输入条 |
 | `member-panel` | `{ show, on-close }` | `ChatroomMemberPanel` | 成员面板整层 |
-| `member-item` | 透传 | `ChatroomMemberItem` | 成员列表项 |
+| `member-item` | 透传自成员面板（`{ member, manageable }`） | `ChatroomMemberItem` | 成员列表项 |
 | `member-sidebar` | — | `ChatroomMemberSidebar` | PC 常驻成员侧栏 |
 | `terminal` | `{ status, kicked, destroyed, on-exit }` | 被踢/解散提示 | 终态视图 |
 | `announcement-editor` | `{ show, content, save, close }` | 内置编辑弹窗 | 公告编辑弹窗 |
 
-## 常用插槽组合（直播带货页示例）
+## 场景配置
+
+`scene` 传内置预设名或部分配置对象（与预设合并），完整结构如下：
+
+```ts
+interface ChatroomSceneConfig {
+  name: 'live' | 'voice' | 'class' | (string & {})
+  layout: 'fullscreen' | 'split' | 'auto'   // 缺省 fullscreen；auto 按视口 <768px 选择
+  features: {
+    gift?: boolean                 // 礼物栏 / 礼物消息渲染
+    micQueue?: boolean             // 麦位管理（语聊房）
+    memberList?: 'panel' | 'popup' | 'none'
+    announcement?: boolean         // 公告展示
+    header?: boolean               // 是否渲染内置顶部栏（缺省 true，见「隐藏 / 重写 header」）
+    messageFilter?: (msg) => boolean
+    messageArea?: { height?, transparent? }  // 直播消息区限高 + 透明（弹幕叠加画面）
+    management?: { mute?, kick?, muteAll?, announcement?, blocklist?, admin? }
+    multilineInput?: boolean       // PC 输入条多行（textarea + Shift+Enter）
+    keyboard?: boolean             // 键盘快捷键（Esc 关闭弹层）
+  }
+  panels?: { stageWidth?, memberWidth? }   // split 分栏尺寸
+  popupMode?: 'auto' | 'sheet' | 'dialog'  // 弹层形态（缺省 auto）
+  themeOverrides?: Record<string, string>  // CSS 变量覆盖（容器根元素应用）
+  i18nOverrides?: Record<string, string>   // 文案覆盖（mergeLocaleMessages 并入）
+}
+```
+
+## 进阶
+
+### 常用插槽组合（直播带货页示例）
 
 把容器改造成私域直播带货页：管理位上架商品、成员列表项插徽章、礼物栏换业务面板、
 被踢/解散走自定义终态：
@@ -115,7 +121,7 @@ interface ChatroomSceneConfig {
 
 > 原则：插槽优先于 config——能覆盖的边界全部开槽，无需 fork 容器。
 
-## 隐藏 / 重写 header
+### 隐藏 / 重写 header
 
 接入方自绘导航头（如直播间顶部栏）时，容器内置 `ChatroomHeader`（返回 + 房间名 + 人数 + 退出）
 可能与业务头部重叠。三种接管形态：
@@ -139,7 +145,7 @@ interface ChatroomSceneConfig {
 <EmChatroomContainer room-id="r1" :scene="{ name: 'custom', features: { header: false } }" />
 ```
 
-## 消息列表整体替换（容器内弹幕形态）
+### 消息列表整体替换（容器内弹幕形态）
 
 直播场景若要在容器内把普通消息流换成弹幕/轨道渲染，用 `#message-list` 插槽整体接管
 （提供后容器不再渲染 VirtualList/空态/加载更多，滚动跟随与加载职责转移给业务）：
@@ -160,6 +166,6 @@ interface ChatroomSceneConfig {
 ## 相关文档
 
 - [直播弹幕流 DanmakuStream](./live-danmaku)
-- [PC 模式组件（split / 成员侧栏 / 右键菜单）](./pc-mode-components)
+- [ChatroomSplitLayout 分栏布局](./chatroom-split-layout)（PC 三栏形态）
 - [双 UIKit 架构](../guide/architecture)
 - [权限模型与业务角色](../guide/permissions-roles)

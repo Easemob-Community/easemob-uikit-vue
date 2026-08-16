@@ -150,12 +150,33 @@ export default defineConfig({
           ],
           '/chatroom/components/': [
             {
-              text: '组件',
+              text: '容器',
+              collapsed: false,
               items: [
                 { text: 'ChatroomContainer 聊天室容器', link: '/chatroom/components/chatroom-container' },
+              ],
+            },
+            {
+              text: '直播组件',
+              collapsed: false,
+              items: [
                 { text: '直播弹幕流 DanmakuStream', link: '/chatroom/components/live-danmaku' },
-                { text: '直播组件集（top bar / 输入条 / 卡片 / 动效）', link: '/chatroom/components/live-components' },
-                { text: 'PC 模式组件（split / 成员侧栏 / 右键菜单）', link: '/chatroom/components/pc-mode-components' },
+                { text: '直播顶部栏 LiveTopBar', link: '/chatroom/components/live-top-bar' },
+                { text: '直播间输入条 LiveInputBar', link: '/chatroom/components/live-input-bar' },
+                { text: '礼物入口 GiftBar', link: '/chatroom/components/gift-bar' },
+                { text: '欢迎横幅 WelcomeBanner', link: '/chatroom/components/live-welcome-banner' },
+                { text: '可交互卡片 InteractiveCard', link: '/chatroom/components/live-interactive-card' },
+                { text: 'overlay 锚定管理器', link: '/chatroom/components/live-overlay-manager' },
+                { text: '全屏动效 FullscreenEffect', link: '/chatroom/components/live-fullscreen-effect' },
+              ],
+            },
+            {
+              text: 'PC 模式',
+              collapsed: false,
+              items: [
+                { text: '分栏布局 SplitLayout', link: '/chatroom/components/chatroom-split-layout' },
+                { text: '成员侧栏 MemberSidebar', link: '/chatroom/components/chatroom-member-sidebar' },
+                { text: '右键菜单 ContextMenu', link: '/chatroom/components/chatroom-context-menu' },
               ],
             },
           ],

@@ -60,14 +60,15 @@ useChatroomProvider({ appKey: 'orgName#appName' })
 | 页面容器 | [`EmChatroomContainer`](./components/chatroom-container) | 进出房 / 历史 / 消息收发 / 成员面板 / 系统通知，**19 个命名插槽** + 场景预设 |
 | 场景预设 | `scene` 配置 | 内置 `live` / `voice` / `class`，或传部分配置对象合并 |
 | 直播弹幕流 | [`ChatroomLiveDanmakuStream`](./components/live-danmaku) | 通知区 + 聊天区双区，合并计数 / 挤出 / 动画，`#prefix` `#badge` `#item` 插槽 |
-| 直播组件集 | [top bar / 输入条 / 卡片 / 动效](./components/live-components) | 纯 UI 壳子，props + 插槽驱动，可脱离容器独立使用 |
-| PC 模式 | [split / 成员侧栏 / 右键菜单](./components/pc-mode-components) | 三栏分栏、管理位（`manage-actions`）、权限门控 |
+| 直播组件集 | [顶部栏 / 输入条 / 卡片 / 动效](./components/live-top-bar) | 纯 UI 壳子，props + 插槽驱动，可脱离容器独立使用 |
+| PC 模式 | [分栏 / 成员侧栏 / 右键菜单](./components/chatroom-split-layout) | 三栏分栏、管理位（`manage-actions`）、权限门控 |
 | headless 接入 | `useChatroom` / `useChatroomMessage` | 无 UI 自绘弹幕轨道，增量有序 + 批量消费契约 |
 | 信令房 | `signalRooms` | 1 个 UI 房 + N 个信令房并行订阅，消息零渲染透传 |
 
 ## 文档导航
 
 - **指南**：[双 UIKit 架构](./guide/architecture) · [快速开始](./guide/quickstart) · [权限模型与业务角色](./guide/permissions-roles)
-- **组件**：[聊天室容器](./components/chatroom-container) · [直播弹幕流](./components/live-danmaku) · [直播组件集](./components/live-components) · [PC 模式组件](./components/pc-mode-components)
+- **组件**：[聊天室容器](./components/chatroom-container) · [直播弹幕流](./components/live-danmaku) ·
+  [直播组件](./components/live-top-bar)（顶部栏 / 输入条 / 礼物 / 卡片 / 动效）· [PC 模式](./components/chatroom-split-layout)（分栏 / 侧栏 / 菜单）
 
 > `@easemob/uikit-chatroom` 当前版本 **1.0.0**（首个稳定版）。组件 API 表格由 `gen:api` 从源码自动生成，与实现保持同步。

@@ -7,7 +7,10 @@
 
 > 能力评估见仓库根目录 [CHATROOM-CAPABILITY-REVIEW.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-CAPABILITY-REVIEW.md)（§二 / §五 P6-2）。
 
-## 基础用法
+## 使用方式
+
+组件以 `ChatroomLiveDanmakuStream` 为名导出（具名导出，按需 import），
+可脱离容器独立使用：
 
 ```vue
 <script setup lang="ts">
