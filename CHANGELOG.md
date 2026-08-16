@@ -509,6 +509,39 @@
 
 ---
 
+## @easemob/uikit-chatroom 1.0.0 (2026-08-15)
+
+### 里程碑
+
+- **首个稳定版（P5 文档与集成收尾）**：功能面完整（容器 / 场景预设 / PC 模式 / headless
+  契约 / 弹幕流 / 直播组件集），文档站、集成 skill 与 MCP 数据齐备；自 0.3.0 起对外 API
+  保持向后兼容，0.2.0 起的五变种 demo 页零回归。
+
+### 新增
+
+- **文档与集成（P5，设计文档 §九 P5）**：
+  - `gen:api` 参数化支持聊天室包：`PACKAGES` 配置表驱动，输出隔离到
+    `.vitepress/gen/chatroom/`（uikit-im 根目录零漂移）；props 查找支持同目录
+    `types.ts` 声明（如 `ChatroomContainerProps`）与内联 `defineProps<{...}>()` 兜底；
+  - docs 聊天室章节正式化：ChatroomContainer / 直播弹幕流 / 直播组件集（新页）/
+    PC 模式组件页全部接入自动生成 API 表格，弹幕流页新增**运行 demo 块**（纯 UI 模拟数据）；
+  - 聊天室集成 skill（`integrations/skills/chatroom`）：SKILL.md + quickstart /
+    provider / components / danmaku / pc-mode / gotchas + 自动同步 API 明细；
+    `gen-skill.mjs` 参数化双目标（IM + 聊天室）；
+  - MCP 数据纳入聊天室：guide + 组件 API + manifest `chatroom` 段（独立 version），
+    `search_docs` 搜索覆盖两包、`get_component_api` 兼容聊天室组件名。
+- **工具链修正（P1 抽核遗留）**：`gen:api` 原子组件根目录跟随抽核迁移到
+  `@easemob/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
+  插槽提取增强——`name` 属性不在 `<slot` 首位的多行写法不再漏提取，
+  容器 19 个命名插槽全量落表（此前仅 10 个）。
+
+### 兼容性
+
+- 自 0.3.0 起无公开 API 破坏性变更；`layout` 缺省 `fullscreen`、`popupMode` 缺省 `auto`、
+  新增 prop / 插槽全部可选；版本号与根 CHANGELOG 同步（`changelog:check` 通过）。
+
+---
+
 ## @easemob/uikit-chatroom 0.3.0 (2026-08-15)
 
 ### 新增

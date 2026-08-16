@@ -23,11 +23,6 @@
 </ChatroomSplitLayout>
 ```
 
-| Prop | 类型 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `memberWidth` | `number \| string` | `280` | 成员栏初始宽度（px / CSS 长度） |
-| `showMembers` | `boolean` | `true` | 是否渲染成员栏 |
-
 ## ChatroomMemberSidebar 成员侧栏
 
 split 布局下的常驻成员列（与 H5 底部弹层面板并列的 PC 原生形态）：
@@ -38,11 +33,6 @@ split 布局下的常驻成员列（与 H5 底部弹层面板并列的 PC 原生
 ```vue
 <ChatroomMemberSidebar :mute-all-enabled="true" :management="{ mute: true, kick: true }" />
 ```
-
-| Prop | 类型 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `muteAllEnabled` | `boolean` | `false` | 全员禁言入口（场景 `features.muteAll`） |
-| `management` | `ChatroomManagementFeature` | — | 管理位开关组（缺省按权限可用） |
 
 ## ChatroomContextMenu 上下文菜单
 
@@ -59,11 +49,13 @@ split 布局下的常驻成员列（与 H5 底部弹层面板并列的 PC 原生
 />
 ```
 
-| Prop | 类型 | 说明 |
-| --- | --- | --- |
-| `show` | `boolean` | 是否显示（`v-model:show`） |
-| `x` / `y` | `number` | 触发点坐标（`clientX` / `clientY`） |
-| `items` | `ChatroomContextMenuItem[]` | 菜单项（`label` / `danger` / `disabled`） |
+## API
+
+<!-- @include: ../../.vitepress/gen/chatroom/chatroom-split-layout.md -->
+
+<!-- @include: ../../.vitepress/gen/chatroom/chatroom-member-sidebar.md -->
+
+<!-- @include: ../../.vitepress/gen/chatroom/chatroom-context-menu.md -->
 
 ## 场景配置（scene）扩展
 

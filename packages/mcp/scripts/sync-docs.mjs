@@ -4,10 +4,12 @@
  * 数据源（单一数据源 = apps/docs + 根 CHANGELOG）：
  * - apps/docs/guide/*.md（白名单过滤，排除 demo-phase 内部规划页）
  * - apps/docs/.vitepress/gen/*.md（gen-api-docs.mjs 产出的组件 API）
+ * - apps/docs/chatroom/guide/*.md（聊天室指南，P5 起）
+ * - apps/docs/.vitepress/gen/chatroom/*.md（聊天室组件 API，P5 起）
  * - 根 CHANGELOG.md
- * - packages/uikit-im/package.json 的 version
+ * - packages/uikit-im/package.json 与 packages/uikit-chatroom/package.json 的 version
  *
- * 产物：packages/mcp/data/{guide,api,CHANGELOG.md,manifest.json}
+ * 产物：packages/mcp/data/{guide,api,chatroom/{guide,api},CHANGELOG.md,manifest.json}
  *
  * 用法：node packages/mcp/scripts/sync-docs.mjs（或在 packages/mcp 下 pnpm build 自动执行）
  */
@@ -62,8 +64,34 @@ const COMPONENTS = [
   ['group-container', '群组模块', '业务模块'],
 ]
 
+/** 聊天室 guide 白名单：文件名 → 标题（apps/docs/chatroom/guide/） */
+const CHATROOM_GUIDES = [
+  ['architecture', '双 UIKit 架构'],
+  ['quickstart', '快速开始'],
+  ['permissions-roles', '权限模型与业务角色'],
+]
+
+/** 聊天室组件清单：文件名 → [标题, 分类]，对应 .vitepress/gen/chatroom/*.md */
+const CHATROOM_COMPONENTS = [
+  ['chatroom-container', 'ChatroomContainer 聊天室容器', '容器'],
+  ['chatroom-live-danmaku-stream', 'ChatroomLiveDanmakuStream 直播弹幕流', '直播组件'],
+  ['chatroom-live-top-bar', 'ChatroomLiveTopBar 直播顶部栏', '直播组件'],
+  ['chatroom-live-input-bar', 'ChatroomLiveInputBar 直播间输入条', '直播组件'],
+  ['chatroom-gift-bar', 'ChatroomGiftBar 礼物入口', '直播组件'],
+  ['chatroom-live-welcome-banner', 'ChatroomLiveWelcomeBanner 欢迎横幅', '直播组件'],
+  ['chatroom-live-interactive-card', 'ChatroomLiveInteractiveCard 可交互卡片', '直播组件'],
+  ['chatroom-live-overlay-manager', 'ChatroomLiveOverlayManager overlay 管理器', '直播组件'],
+  ['chatroom-live-fullscreen-effect', 'ChatroomLiveFullscreenEffect 全屏动效', '直播组件'],
+  ['chatroom-split-layout', 'ChatroomSplitLayout 分栏布局', 'PC 模式'],
+  ['chatroom-member-sidebar', 'ChatroomMemberSidebar 成员侧栏', 'PC 模式'],
+  ['chatroom-context-menu', 'ChatroomContextMenu 右键菜单', 'PC 模式'],
+]
+
 const uikitVersion = JSON.parse(
   readFileSync(join(ROOT, 'packages/uikit-im/package.json'), 'utf-8'),
+).version
+const chatroomVersion = JSON.parse(
+  readFileSync(join(ROOT, 'packages/uikit-chatroom/package.json'), 'utf-8'),
 ).version
 
 // 清理并重建 data 目录
@@ -72,6 +100,8 @@ if (existsSync(OUT)) {
 }
 mkdirSync(join(OUT, 'guide'), { recursive: true })
 mkdirSync(join(OUT, 'api'), { recursive: true })
+mkdirSync(join(OUT, 'chatroom', 'guide'), { recursive: true })
+mkdirSync(join(OUT, 'chatroom', 'api'), { recursive: true })
 
 // guide
 for (const [name] of GUIDES) {
@@ -95,6 +125,26 @@ for (const [name] of COMPONENTS) {
   console.log(`[ok] api/${name}.md`)
 }
 
+// chatroom guide / api（P5：聊天室文档纳入 MCP 数据）
+for (const [name] of CHATROOM_GUIDES) {
+  const src = join(ROOT, 'apps/docs/chatroom/guide', `${name}.md`)
+  if (!existsSync(src)) {
+    console.warn(`[skip] chatroom/guide/${name}.md 不存在`)
+    continue
+  }
+  writeFileSync(join(OUT, 'chatroom', 'guide', `${name}.md`), readFileSync(src, 'utf-8'), 'utf-8')
+  console.log(`[ok] chatroom/guide/${name}.md`)
+}
+for (const [name] of CHATROOM_COMPONENTS) {
+  const src = join(ROOT, 'apps/docs/.vitepress/gen/chatroom', `${name}.md`)
+  if (!existsSync(src)) {
+    console.warn(`[skip] chatroom/api/${name}.md 不存在`)
+    continue
+  }
+  writeFileSync(join(OUT, 'chatroom', 'api', `${name}.md`), readFileSync(src, 'utf-8'), 'utf-8')
+  console.log(`[ok] chatroom/api/${name}.md`)
+}
+
 // changelog
 writeFileSync(join(OUT, 'CHANGELOG.md'), readFileSync(join(ROOT, 'CHANGELOG.md'), 'utf-8'), 'utf-8')
 console.log('[ok] CHANGELOG.md')
@@ -104,7 +154,12 @@ const manifest = {
   version: uikitVersion,
   guides: GUIDES.map(([name, title]) => ({ name, title })),
   components: COMPONENTS.map(([name, title, category]) => ({ name, title, category, api: true })),
+  chatroom: {
+    version: chatroomVersion,
+    guides: CHATROOM_GUIDES.map(([name, title]) => ({ name, title })),
+    components: CHATROOM_COMPONENTS.map(([name, title, category]) => ({ name, title, category, api: true })),
+  },
 }
 writeFileSync(join(OUT, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf-8')
 
-console.log(`\n完成：${manifest.components.length} 组件 / ${manifest.guides.length} 指南 -> ${OUT}（UIKit version ${uikitVersion}）`)
+console.log(`\n完成：${manifest.components.length} 组件 / ${manifest.guides.length} 指南（uikit-im ${uikitVersion}）+ ${manifest.chatroom.components.length} 组件 / ${manifest.chatroom.guides.length} 指南（chatroom ${chatroomVersion}）-> ${OUT}`)

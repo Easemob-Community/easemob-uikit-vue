@@ -19,17 +19,11 @@ useChatroomProvider({ appKey })
 </template>
 ```
 
-## Props
+## API
 
-| prop | 类型 | 默认 | 说明 |
-|---|---|---|---|
-| `roomId` | `string` | `''` | 目标聊天室 ID，变化时自动退出旧房并入新房；`auto-join` 关闭时仅渲染外壳 |
-| `scene` | `string \| Partial\<ChatroomSceneConfig\>` | — | 场景预设：内置 `'live'` / `'voice'` / `'class'` 或部分配置对象（与 preset 合并） |
-| `autoJoin` | `boolean` | `true` | 有 `roomId` 时自动加入 |
-| `historyPageSize` | `number` | `50` | 进房拉取的历史消息条数（展示「最近 N 条」提示） |
-| `maxMessages` | `number` | `200` | 消息渲染列表封顶条数（防大直播间刷屏） |
-| `joinExt` | `string` | — | 加入 UI 房时透传的扩展信息（房间内成员经 `member-joined` 事件收到） |
-| `signalRooms` | `ChatroomSignalRoomConfig[]` | — | 信令房订阅列表（1 个 UI 房 + N 个信令房；数组存在即多房）。信令房消息经 `signal-message` 透传，业务自行呈现 |
+<!-- @include: ../../.vitepress/gen/chatroom/chatroom-container.md -->
+
+> 插槽 scope 与默认内容见下方「插槽说明」表（gen 表仅列插槽名）。
 
 ### 场景配置（`ChatroomSceneConfig`，可经 `scene` 传部分覆盖）
 
@@ -56,19 +50,9 @@ interface ChatroomSceneConfig {
 }
 ```
 
-## Emits
+## 插槽说明
 
-| 事件 | payload | 说明 |
-|---|---|---|
-| `back` | — | 点击顶部返回（业务决定路由/关闭） |
-| `kicked` | `reason: number` | 当前用户被移出聊天室 |
-| `destroyed` | — | 聊天室被解散 |
-| `join-error` | `error: unknown` | 加入失败（错误已 toast，此事件供业务补充处理） |
-| `member-joined` | `{ roomId, members, ext }` | 成员加入（含 join ext 透传） |
-| `signal-message` | `{ roomId, message }` | 信令房消息透传（UIKit 零渲染零假设） |
-| `signal-status` | `{ roomId, status }` | 信令房状态变化（joined/failed/kicked/destroyed） |
-
-## 命名插槽
+> 插槽名清单与 gen 表一致；下表补充 **scope 与默认内容**（gen 表仅列插槽名）：
 
 | 插槽 | scope | 默认内容 | 覆盖粒度 |
 |---|---|---|---|

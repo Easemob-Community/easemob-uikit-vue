@@ -4,12 +4,15 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import {
-  getVersion,
-  listComponents,
-  readComponentApi,
-  searchDocs,
   type ComponentInfo,
   type SearchHit,
+  getChatroomVersion,
+  getVersion,
+  listChatroomComponents,
+  listComponents,
+  readChatroomComponentApi,
+  readComponentApi,
+  searchDocs,
 } from './store.js'
 import { validateProviderConfig } from './validate.js'
 
@@ -26,16 +29,16 @@ interface ToolDef {
 const TOOL_DEFS: ToolDef[] = [
   {
     name: 'list_components',
-    description: '列出 @easemob/uikit-im 全部组件（含中文名与分类），用于快速了解可用组件。',
+    description: '列出 @easemob/uikit-im 与 @easemob/uikit-chatroom 全部组件（含中文名与分类），用于快速了解可用组件。',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'get_component_api',
-    description: '返回指定组件的 props / emits / slots 明细（Markdown）。组件名用 kebab-case，如 button、chat-container、uikit-provider。',
+    description: '返回指定组件的 props / emits / slots 明细（Markdown）。组件名用 kebab-case，如 button、chat-container、uikit-provider、chatroom-container、chatroom-live-danmaku-stream。',
     inputSchema: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: '组件名（kebab-case），如 button / chat-container / uikit-provider' },
+        name: { type: 'string', description: '组件名（kebab-case），如 button / chat-container / uikit-provider / chatroom-container / chatroom-live-danmaku-stream' },
       },
       required: ['name'],
     },
@@ -96,7 +99,7 @@ async function dispatch(name: string, args: Record<string, unknown>): Promise<st
 
     case 'get_component_api': {
       const n = typeof args.name === 'string' ? args.name : ''
-      const content = readComponentApi(n)
+      const content = readComponentApi(n) ?? readChatroomComponentApi(n)
       if (!content) {
         return `未找到组件「${n}」。请用 list_components 查看可用组件名（kebab-case）。`
       }
@@ -120,23 +123,30 @@ async function dispatch(name: string, args: Record<string, unknown>): Promise<st
 }
 
 function listComponentsText(): string {
-  const comps = listComponents()
-  const byCat = new Map<string, ComponentInfo[]>()
-  for (const c of comps) {
-    const arr = byCat.get(c.category) ?? []
-    arr.push(c)
-    byCat.set(c.category, arr)
+  const lines = [`# 组件清单（uikit-im ${getVersion()} / chatroom ${getChatroomVersion()}）`, '']
+  const render = (title: string, comps: ComponentInfo[]) => {
+    const byCat = new Map<string, ComponentInfo[]>()
+    for (const c of comps) {
+      const arr = byCat.get(c.category) ?? []
+      arr.push(c)
+      byCat.set(c.category, arr)
+    }
+    lines.push(`## ${title}`, '')
+    for (const [cat, items] of byCat) {
+      lines.push(`### ${cat}`, '')
+      for (const it of items) {
+        lines.push(`- ${it.title}（\`${it.name}\`）`)
+      }
+      lines.push('')
+    }
   }
 
-  const lines = ['# @easemob/uikit-im 组件清单', '']
-  for (const [cat, items] of byCat) {
-    lines.push(`## ${cat}`, '')
-    for (const it of items) {
-      lines.push(`- ${it.title}（\`${it.name}\`）`)
-    }
-    lines.push('')
-  }
-  lines.push(`共 ${comps.length} 个组件。查某组件的 props / emits / slots 用 get_component_api。`)
+  render('@easemob/uikit-im', listComponents())
+  render('@easemob/uikit-chatroom（聊天室）', listChatroomComponents())
+
+  lines.push(
+    `共 ${listComponents().length + listChatroomComponents().length} 个组件。查某组件的 props / emits / slots 用 get_component_api。`,
+  )
   return lines.join('\n')
 }
 
@@ -147,7 +157,8 @@ function formatSearchHits(query: string, hits: SearchHit[]): string {
   const lines = [`「${query}」命中 ${hits.length} 处：`, '']
   for (const h of hits) {
     const kind = h.kind === 'guide' ? '指南' : '组件'
-    lines.push(`### ${h.title}（${kind}，\`${h.file}\`）`)
+    const pkg = h.pkg === 'chatroom' ? '聊天室' : 'IM'
+    lines.push(`### ${h.title}（${pkg}·${kind}，\`${h.file}\`）`)
     lines.push(`> ${h.snippet}`, '')
   }
   return lines.join('\n')

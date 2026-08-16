@@ -121,6 +121,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@easemob/uikit-chatroom':
+        specifier: workspace:*
+        version: link:../../packages/uikit-chatroom
       '@easemob/uikit-im':
         specifier: workspace:*
         version: link:../../packages/uikit-im

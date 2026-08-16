@@ -11,6 +11,7 @@
     "gen:api": "node scripts/gen-api-docs.mjs"
   },
   "dependencies": {
+    "@easemob/uikit-chatroom": "workspace:*",
     "@easemob/uikit-im": "workspace:*",
     "@vue/repl": "^4.7.2",
     "easemob-websdk": "^5.0.0",

@@ -18,16 +18,26 @@ export interface GuideInfo {
   title: string
 }
 
+export interface ChatroomManifest {
+  version: string
+  guides: GuideInfo[]
+  components: ComponentInfo[]
+}
+
 export interface Manifest {
   version: string
   guides: GuideInfo[]
   components: ComponentInfo[]
+  /** 聊天室文档段（P5 起，sync-docs.mjs 写入；旧快照可能缺失） */
+  chatroom?: ChatroomManifest
 }
 
 export interface SearchHit {
   file: string
   title: string
   kind: 'guide' | 'component'
+  /** 文档所属包：im / chatroom */
+  pkg: 'im' | 'chatroom'
   snippet: string
   score: number
 }
@@ -36,6 +46,7 @@ interface DocEntry {
   file: string
   title: string
   kind: 'guide' | 'component'
+  pkg: 'im' | 'chatroom'
   content: string
 }
 
@@ -70,19 +81,45 @@ export function listGuides(): GuideInfo[] {
   return manifest.guides
 }
 
+export function getChatroomVersion(): string {
+  return manifest.chatroom?.version ?? 'unknown'
+}
+
+export function listChatroomComponents(): ComponentInfo[] {
+  return manifest.chatroom?.components ?? []
+}
+
+export function listChatroomGuides(): GuideInfo[] {
+  return manifest.chatroom?.guides ?? []
+}
+
 /** 防目录穿越：组件名只允许小写字母/数字/连字符 */
 function isSafeName(name: string): boolean {
   return /^[a-z0-9-]+$/.test(name)
 }
 
 export function readComponentApi(name: string): string | null {
-  if (!isSafeName(name)) return null
+  if (!isSafeName(name))
+    return null
   return readText(join(DATA_DIR, 'api', `${name}.md`))
 }
 
 export function readGuide(name: string): string | null {
-  if (!isSafeName(name)) return null
+  if (!isSafeName(name))
+    return null
   return readText(join(DATA_DIR, 'guide', `${name}.md`))
+}
+
+export function readChatroomComponentApi(name: string): string | null {
+  if (!isSafeName(name))
+    return null
+  return readText(join(DATA_DIR, 'chatroom', 'api', `${name}.md`))
+}
+
+export function readChatroomGuide(name: string): string | null {
+  if (!isSafeName(name))
+    return null
+  return readText(join(DATA_DIR, 'chatroom', 'guide', `${name}.md`))
 }
 
 export function readChangelog(): string | null {
@@ -93,18 +130,32 @@ function collectDocs(): DocEntry[] {
   const docs: DocEntry[] = []
   for (const g of manifest.guides) {
     const content = readGuide(g.name)
-    if (content) docs.push({ file: g.name, title: g.title, kind: 'guide', content })
+    if (content)
+      docs.push({ file: g.name, title: g.title, kind: 'guide', pkg: 'im', content })
   }
   for (const c of manifest.components) {
     const content = readComponentApi(c.name)
-    if (content) docs.push({ file: c.name, title: c.title, kind: 'component', content })
+    if (content)
+      docs.push({ file: c.name, title: c.title, kind: 'component', pkg: 'im', content })
+  }
+  // 聊天室文档（P5 起纳入搜索）
+  for (const g of manifest.chatroom?.guides ?? []) {
+    const content = readChatroomGuide(g.name)
+    if (content)
+      docs.push({ file: g.name, title: g.title, kind: 'guide', pkg: 'chatroom', content })
+  }
+  for (const c of manifest.chatroom?.components ?? []) {
+    const content = readChatroomComponentApi(c.name)
+    if (content)
+      docs.push({ file: c.name, title: c.title, kind: 'component', pkg: 'chatroom', content })
   }
   return docs
 }
 
 export function searchDocs(query: string, limit = 8): SearchHit[] {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
-  if (terms.length === 0) return []
+  if (terms.length === 0)
+    return []
 
   const hits: SearchHit[] = []
   for (const doc of collectDocs()) {
@@ -115,15 +166,17 @@ export function searchDocs(query: string, limit = 8): SearchHit[] {
       const idx = lower.indexOf(term)
       if (idx >= 0) {
         score++
-        if (firstIndex < 0 || idx < firstIndex) firstIndex = idx
+        if (firstIndex < 0 || idx < firstIndex)
+          firstIndex = idx
       }
     }
-    if (score === 0) continue
+    if (score === 0)
+      continue
 
     const start = Math.max(0, firstIndex - 80)
     const end = Math.min(doc.content.length, firstIndex + 160)
     const snippet = `${start > 0 ? '…' : ''}${doc.content.slice(start, end).replace(/\s+/g, ' ').trim()}${end < doc.content.length ? '…' : ''}`
-    hits.push({ file: doc.file, title: doc.title, kind: doc.kind, snippet, score })
+    hits.push({ file: doc.file, title: doc.title, kind: doc.kind, pkg: doc.pkg, snippet, score })
   }
 
   return hits

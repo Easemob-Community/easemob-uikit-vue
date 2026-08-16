@@ -154,6 +154,7 @@ export default defineConfig({
               items: [
                 { text: 'ChatroomContainer 聊天室容器', link: '/chatroom/components/chatroom-container' },
                 { text: '直播弹幕流 DanmakuStream', link: '/chatroom/components/live-danmaku' },
+                { text: '直播组件集（top bar / 输入条 / 卡片 / 动效）', link: '/chatroom/components/live-components' },
                 { text: 'PC 模式组件（split / 成员侧栏 / 右键菜单）', link: '/chatroom/components/pc-mode-components' },
               ],
             },

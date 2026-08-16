@@ -2,17 +2,19 @@
  * UIKit API 文档自动生成脚本
  *
  * 解析组件 <script setup> 中的：
- * - `export interface XxxProps`（属性 + JSDoc 注释）
+ * - `export interface XxxProps`（属性 + JSDoc 注释），支持同目录 types.ts 声明
+ *   （如 chatroom-container 的 ChatroomContainerProps）与内联 `defineProps<{...}>()`
  * - `withDefaults(defineProps<XxxProps>(), {...})` 默认值
- * - `export interface XxxEmits` / `defineEmits<{...}>()` 事件
+ * - `export interface XxxEmits` / `defineEmits<{...}>()` 事件（含 types.ts 声明兜底）
  * - 模板中的 <slot name="..."> 插槽
  *
- * 原子组件（COMPONENTS）生成 markdown 表格片段到 .vitepress/gen/<component>.md；
- * 业务模块容器（MODULES）额外递归展开嵌套配置类型（如 ChatConfig）为子小节，
- * 输出 .vitepress/gen/<module>.md。页面通过
- * `<!-- @include: ../.vitepress/gen/<x>.md -->` 引用。
+ * 多包参数化（P5）：PACKAGES 配置表驱动，每个包独立声明源根目录与白名单，
+ * 输出隔离到 .vitepress/gen/<pkg>/ 子目录（uikit-im 保持根目录零漂移）。
+ * 原子组件（components）生成 markdown 表格片段；业务模块容器（modules）与
+ * 顶级容器（containers）额外递归展开嵌套配置类型（如 ChatConfig）为子小节。
+ * 页面通过 `<!-- @include: ../.vitepress/gen/<pkg>/<x>.md -->` 引用。
  *
- * 用法：pnpm gen:api（支持增量重跑，重复执行覆盖生成）
+ * 用法：pnpm gen:api（全量遍历 PACKAGES，支持增量重跑，重复执行覆盖生成）
  */
 /* eslint-disable no-console -- CLI 脚本日志输出 */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -22,66 +24,110 @@ import { parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const COMPONENTS_ROOT = join(__dirname, '../../../packages/uikit-im/src/components')
-const MODULES_ROOT = join(__dirname, '../../../packages/uikit-im/src/modules')
-const CONTAINERS_ROOT = join(__dirname, '../../../packages/uikit-im/src/containers')
-const OUTPUT_DIR = join(__dirname, '../.vitepress/gen')
 
-/** 22 个原子组件：目录名 → 展示名 */
-const COMPONENTS = [
-  'action-sheet',
-  'avatar',
-  'badge',
-  'button',
-  'cell',
-  'empty',
-  'emoji-picker',
-  'group-card',
-  'icon',
-  'icon-button',
-  'image-viewer',
-  'input',
-  'modal',
-  'notification',
-  'popup',
-  'presence-avatar',
-  'presence-selector',
-  'resizable',
-  'scroll-to-top',
-  'status-banner',
-  'toast',
-  'user-card',
-]
-
-/**
- * 业务模块容器白名单：输出名 → 组件相对 modules 的文件路径。
- * Props 接口按「首个 *Props 结尾的 interface」宽松匹配（如 ChatProps /
- * ConversationListProps），emits 按「首个 *Emits 结尾的 interface」匹配。
- * nestedOnly：仅展开这些嵌套路径（其余成员显示类型原文）；不配置则全量展开。
- */
-const MODULES = [
-  { name: 'chat-container', file: 'chat/chat.vue' },
-  { name: 'conversation-container', file: 'conversation/conversation-list.vue' },
-  // 注意：contact-container.md 页面描述的是 EmContactContainer（通讯录聚合容器），
-  // 该组件尚未实现（无对应 .vue 文件），待 props 接口补齐后按同样方式追加；
-  // 不要错接 contact-list.vue（联系人列表，与页面内容不符）
-  { name: 'group-container', file: 'group/group-list.vue' },
-  // message-list：config 为完整 ChatConfig，本组件只消费 messageList 子树；
-  // 但为保持与 chat-container 一致的配置全景展示，仍全量展开（父表每项均可锚点跳转）
-  { name: 'message-list', file: 'chat/message-list/message-list.vue' },
-]
-
-/**
- * 顶级容器白名单：相对 containers 的 .vue 路径，复用 MODULES 的生成逻辑
- * （接口名不匹配 ${pascal}Props 时按首个 *Props 后缀宽松匹配，如 ProviderProps）。
- * nestedOnly：仅展开这些嵌套路径（theme / notification / logger 为内联对象类型，
- * dataSource / noticeConfig / sdkConfig / h5 等为外部类型，显示类型原文即可）。
- */
-const CONTAINERS = [
+/** 各包 API 生成配置：包名 → 源根目录 + 白名单 + 输出目录（.vitepress/gen/<pkg>/） */
+const PACKAGES = [
   {
-    name: 'uikit-provider',
-    file: 'uikit-provider/uikit-provider.vue',
-    nestedOnly: ['theme', 'notification', 'logger'],
+    name: 'uikit-im',
+    // 原子组件 P1 抽核后位于 core 包（uikit-im 全量 re-export，文档页归属不变）
+    componentsRoot: join(__dirname, '../../../packages/uikit-core/src/components'),
+    modulesRoot: join(__dirname, '../../../packages/uikit-im/src/modules'),
+    containersRoot: join(__dirname, '../../../packages/uikit-im/src/containers'),
+    outputDir: join(__dirname, '../.vitepress/gen'),
+    /**
+     * 22 个原子组件（P1 抽核后大部分位于 core 包，uikit-im 全量 re-export，
+     * 文档页归属不变）：字符串 = 当前包 componentsRoot 下；对象 = 显式指定根目录
+     */
+    components: [
+      'action-sheet',
+      'avatar',
+      'badge',
+      'button',
+      'cell',
+      'empty',
+      'emoji-picker',
+      // group-card 仍在 uikit-im 包内（未迁 core），显式指向本包组件根
+      { name: 'group-card', root: join(__dirname, '../../../packages/uikit-im/src/components') },
+      'icon',
+      'icon-button',
+      'image-viewer',
+      'input',
+      'modal',
+      'notification',
+      'popup',
+      'presence-avatar',
+      'presence-selector',
+      'resizable',
+      'scroll-to-top',
+      'status-banner',
+      'toast',
+      'user-card',
+    ],
+    /**
+     * 业务模块容器白名单：输出名 → 组件相对 modules 的文件路径。
+     * Props 接口按「首个 *Props 结尾的 interface」宽松匹配（如 ChatProps /
+     * ConversationListProps），emits 按「首个 *Emits 结尾的 interface」匹配。
+     * nestedOnly：仅展开这些嵌套路径（其余成员显示类型原文）；不配置则全量展开。
+     */
+    modules: [
+      { name: 'chat-container', file: 'chat/chat.vue' },
+      { name: 'conversation-container', file: 'conversation/conversation-list.vue' },
+      // 注意：contact-container.md 页面描述的是 EmContactContainer（通讯录聚合容器），
+      // 该组件尚未实现（无对应 .vue 文件），待 props 接口补齐后按同样方式追加；
+      // 不要错接 contact-list.vue（联系人列表，与页面内容不符）
+      { name: 'group-container', file: 'group/group-list.vue' },
+      // message-list：config 为完整 ChatConfig，本组件只消费 messageList 子树；
+      // 但为保持与 chat-container 一致的配置全景展示，仍全量展开（父表每项均可锚点跳转）
+      { name: 'message-list', file: 'chat/message-list/message-list.vue' },
+    ],
+    /**
+     * 顶级容器白名单：相对 containers 的 .vue 路径，复用 MODULES 的生成逻辑
+     * （接口名不匹配 ${pascal}Props 时按首个 *Props 后缀宽松匹配，如 ProviderProps）。
+     * nestedOnly：仅展开这些嵌套路径（theme / notification / logger 为内联对象类型，
+     * dataSource / noticeConfig / sdkConfig / h5 等为外部类型，显示类型原文即可）。
+     */
+    containers: [
+      {
+        name: 'uikit-provider',
+        file: 'uikit-provider/uikit-provider.vue',
+        nestedOnly: ['theme', 'notification', 'logger'],
+      },
+    ],
+  },
+  {
+    name: 'chatroom',
+    modulesRoot: join(__dirname, '../../../packages/uikit-chatroom/src/modules'),
+    containersRoot: join(__dirname, '../../../packages/uikit-chatroom/src/containers'),
+    outputDir: join(__dirname, '../.vitepress/gen/chatroom'),
+    /**
+     * 聊天室场景包业务组件白名单（相对 modules 的文件路径，输出名即文档页引用名）。
+     * Props 查找顺序：scriptSetup 内精确 ${pascal}Props → 宽松 *Props 后缀 →
+     * 同目录 types.ts 精确（如 ChatroomContainerProps）→ 内联 defineProps<{...}>()。
+     * 无 props/emits/slots 的内部件（mic-queue / lottery-entry / virtual-list）不进白名单。
+     */
+    modules: [
+      // 直播组件集（P4 review 自绘弹幕/横幅/商品卡/输入区）
+      { name: 'chatroom-live-danmaku-stream', file: 'chatroom/live/chatroom-live-danmaku-stream.vue' },
+      { name: 'chatroom-live-top-bar', file: 'chatroom/live/chatroom-live-top-bar.vue' },
+      { name: 'chatroom-live-input-bar', file: 'chatroom/live/chatroom-live-input-bar.vue' },
+      { name: 'chatroom-gift-bar', file: 'chatroom/live/chatroom-gift-bar.vue' },
+      { name: 'chatroom-live-welcome-banner', file: 'chatroom/live/chatroom-live-welcome-banner.vue' },
+      { name: 'chatroom-live-interactive-card', file: 'chatroom/live/chatroom-live-interactive-card.vue' },
+      { name: 'chatroom-live-overlay-manager', file: 'chatroom/live/chatroom-live-overlay-manager.vue' },
+      { name: 'chatroom-live-fullscreen-effect', file: 'chatroom/live/chatroom-live-fullscreen-effect.vue' },
+      // PC 模式（P5）：split 分栏 / 成员常驻侧栏 / 右键菜单
+      { name: 'chatroom-split-layout', file: 'chatroom/pc/chatroom-split-layout.vue' },
+      { name: 'chatroom-member-sidebar', file: 'chatroom/pc/chatroom-member-sidebar.vue' },
+      { name: 'chatroom-context-menu', file: 'chatroom/pc/chatroom-context-menu.vue' },
+    ],
+    /**
+     * 顶级容器：EmChatroomContainer。Props/Emits 声明在 types.ts
+     * （ChatroomContainerProps / ChatroomContainerEmits，脚本经 typeIndex 兜底查找）；
+     * ChatroomSceneConfig 定义在 composables，不在类型索引内，显示类型原文。
+     */
+    containers: [
+      { name: 'chatroom-container', file: 'chatroom-container/chatroom-container.vue' },
+    ],
   },
 ]
 
@@ -184,8 +230,8 @@ function parseMemberSignatures(members, sourceFile) {
     // 避免表格单元格内联整段 JSDoc；外部 interface 引用保持类型原文
     const type = member.type
       ? (ts.isTypeLiteralNode(member.type)
-          ? compactTypeText(member.type, sourceFile)
-          : formatType(member.type.getText(sourceFile)))
+        ? compactTypeText(member.type, sourceFile)
+        : formatType(member.type.getText(sourceFile)))
       : 'any'
     rows.push({ name, type, doc: getDocText(member) })
   }
@@ -260,18 +306,45 @@ function findInterfaceBySuffix(sourceFile, suffix) {
   )
 }
 
+/** 解析内联 `defineProps<{...}>()` 类型字面量成员（chatroom 部分组件无 interface 形态） */
+function parseInlineDefineProps(sourceFile) {
+  let members = null
+  function visit(node) {
+    if (
+      ts.isCallExpression(node)
+      && node.expression.getText(sourceFile) === 'defineProps'
+      && node.typeArguments
+      && node.typeArguments.length > 0
+      && ts.isTypeLiteralNode(node.typeArguments[0])
+    ) {
+      members = node.typeArguments[0].members
+      return
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sourceFile)
+  return members
+}
+
 /** 解析事件：兼容 interface XxxEmits 与 defineEmits<{...}> 两种写法 */
-function parseEmits(sourceFile, componentName) {
+function parseEmits(sourceFile, componentName, typeIndex) {
   const events = []
   const pascal = kebabToPascal(componentName)
   const interfaceName = `${pascal}Emits`
 
-  // 1) interface XxxEmits（精确匹配优先，失败后宽松匹配首个 *Emits）
+  // 1) interface XxxEmits（精确匹配优先，失败后宽松匹配首个 *Emits；types.ts 声明经 typeIndex 兜底）
   let emitsInterface = sourceFile.statements.find(
     stmt => ts.isInterfaceDeclaration(stmt) && stmt.name.text === interfaceName,
   )
   if (!emitsInterface) {
     emitsInterface = findInterfaceBySuffix(sourceFile, 'Emits')
+  }
+  if (!emitsInterface && typeIndex) {
+    const info = typeIndex.get(interfaceName)
+    if (info) {
+      // types.ts 声明的节点必须用其自身 sourceFile 取文本
+      events.push(...collectFromCallSignatures(info.node.members, info.sourceFile))
+    }
   }
   if (emitsInterface) {
     events.push(...collectFromCallSignatures(emitsInterface.members, sourceFile))
@@ -299,10 +372,11 @@ function parseEmits(sourceFile, componentName) {
   return events
 }
 
-/** 从模板中提取具名插槽 */
+/** 从模板中提取具名插槽（name 属性可能在 `<slot` 后任意位置，如多行 v-if 前置） */
 function parseSlots(templateContent) {
   const slots = []
-  const re = /<slot\s+name=["']([^"']+)["']/g
+  // `\sname=` 前置空白要求排除动态绑定（`:name="x"`）；`[^>]*?` 非贪婪跨行
+  const re = /<slot\b[^>]*?\sname=["']([^"']+)["']/g
   let match = re.exec(templateContent)
   while (match !== null) {
     if (!slots.includes(match[1])) {
@@ -519,7 +593,7 @@ function collectNestedSections(member, path, depth, ctx, out) {
 }
 
 /** 生成业务模块容器 / 顶级容器 API 文档（顶层 Props 表格 + 嵌套类型递归展开子小节） */
-function buildModuleMarkdown(entry, root = MODULES_ROOT) {
+function buildModuleMarkdown(entry, root) {
   const filePath = join(root, entry.file)
   const source = readFileSync(filePath, 'utf-8')
   const { descriptor, errors } = parse(source, { filename: filePath })
@@ -541,7 +615,15 @@ function buildModuleMarkdown(entry, root = MODULES_ROOT) {
     ts.ScriptKind.TS,
   )
 
-  // Props：精确 XxxProps 优先，失败后宽松匹配首个 *Props 接口
+  // 嵌套类型：索引组件自身 + types.ts，递归展开（先建索引——props 查找需其做 types.ts 兜底）
+  const ctx = {
+    typeIndex: buildTypeIndex(filePath, sf),
+    nestedOnly: entry.nestedOnly ?? null,
+    seen: new Set(),
+  }
+
+  // Props 查找顺序：scriptSetup 精确 ${pascal}Props → 宽松 *Props 后缀 →
+  // types.ts 精确（如 ChatroomContainerProps）→ 内联 defineProps<{...}>()
   const pascal = kebabToPascal(entry.name)
   let propsInterface = sf.statements.find(
     stmt => ts.isInterfaceDeclaration(stmt) && stmt.name.text === `${pascal}Props`,
@@ -549,28 +631,29 @@ function buildModuleMarkdown(entry, root = MODULES_ROOT) {
   if (!propsInterface) {
     propsInterface = findInterfaceBySuffix(sf, 'Props')
   }
-  const propsMembers = propsInterface ? parsePropsMembers(propsInterface) : []
+  const typeIndexProps = propsInterface ? null : (ctx.typeIndex.get(`${pascal}Props`) ?? null)
+  const inlinePropsMembers = !propsInterface && !typeIndexProps ? parseInlineDefineProps(sf) : null
+  // interface 形态（scriptSetup 或 types.ts）支持嵌套展开；内联形态仅顶层表格
+  const propsSource = propsInterface ?? typeIndexProps?.node ?? null
+  const propsMembers = propsSource
+    ? parseMemberSignatures(propsSource.members, propsSource.getSourceFile())
+    : (inlinePropsMembers ? parseMemberSignatures(inlinePropsMembers, sf) : [])
   const defaults = parseDefaults(sf)
 
-  // 嵌套类型：索引组件自身 + types.ts，递归展开
-  const ctx = {
-    typeIndex: buildTypeIndex(filePath, sf),
-    nestedOnly: entry.nestedOnly ?? null,
-    seen: new Set(),
-  }
   const nestedSections = []
-  if (propsInterface) {
-    for (const member of propsInterface.members) {
+  if (propsSource) {
+    const propsSf = propsSource.getSourceFile()
+    for (const member of propsSource.members) {
       if (!ts.isPropertySignature(member)) {
         continue
       }
-      const name = member.name.getText(sf)
+      const name = member.name.getText(propsSf)
       collectNestedSections(member, name, 1, ctx, nestedSections)
     }
   }
 
   // Events / Slots
-  const events = parseEmits(sf, entry.name)
+  const events = parseEmits(sf, entry.name, ctx.typeIndex)
   const slots = parseSlots(descriptor.template?.content ?? '')
 
   // ---- 生成 markdown ----
@@ -621,8 +704,8 @@ function buildModuleMarkdown(entry, root = MODULES_ROOT) {
   return lines.join('\n')
 }
 
-function buildMarkdown(componentName, pascal) {
-  const filePath = join(COMPONENTS_ROOT, componentName, `${componentName}.vue`)
+function buildMarkdown(componentName, pascal, root) {
+  const filePath = join(root, componentName, `${componentName}.vue`)
   const source = readFileSync(filePath, 'utf-8')
   const { descriptor, errors } = parse(source, { filename: filePath })
   if (errors.length > 0) {
@@ -681,43 +764,50 @@ function buildMarkdown(componentName, pascal) {
   return lines.join('\n')
 }
 
-// ---- 主流程 ----
-mkdirSync(OUTPUT_DIR, { recursive: true })
-
+// ---- 主流程（按 PACKAGES 参数化遍历，输出隔离到 .vitepress/gen/<pkg>/） ----
 let success = 0
-for (const componentName of COMPONENTS) {
-  const pascal = kebabToPascal(componentName)
-  const markdown = buildMarkdown(componentName, pascal)
-  if (!markdown) {
-    continue
+let total = 0
+for (const pkg of PACKAGES) {
+  mkdirSync(pkg.outputDir, { recursive: true })
+  for (const item of pkg.components ?? []) {
+    total++
+    // 字符串 = 当前包 componentsRoot；对象 = 显式根目录（跨包组件，如 group-card）
+    const componentName = typeof item === 'string' ? item : item.name
+    const root = typeof item === 'string' ? pkg.componentsRoot : item.root
+    const pascal = kebabToPascal(componentName)
+    const markdown = buildMarkdown(componentName, pascal, root)
+    if (!markdown) {
+      continue
+    }
+    const outFile = join(pkg.outputDir, `${componentName}.md`)
+    writeFileSync(outFile, markdown, 'utf-8')
+    success++
+    console.log(`[ok] ${pkg.name}/${componentName} -> .vitepress/gen/${pkg.name}/${componentName}.md`)
   }
-  const outFile = join(OUTPUT_DIR, `${componentName}.md`)
-  writeFileSync(outFile, markdown, 'utf-8')
-  success++
-  console.log(`[ok] ${componentName} -> .vitepress/gen/${componentName}.md`)
+
+  for (const entry of pkg.modules ?? []) {
+    total++
+    const markdown = buildModuleMarkdown(entry, pkg.modulesRoot)
+    if (!markdown) {
+      continue
+    }
+    const outFile = join(pkg.outputDir, `${entry.name}.md`)
+    writeFileSync(outFile, markdown, 'utf-8')
+    success++
+    console.log(`[ok] ${pkg.name}/${entry.name} -> .vitepress/gen/${pkg.name}/${entry.name}.md`)
+  }
+
+  for (const entry of pkg.containers ?? []) {
+    total++
+    const markdown = buildModuleMarkdown(entry, pkg.containersRoot)
+    if (!markdown) {
+      continue
+    }
+    const outFile = join(pkg.outputDir, `${entry.name}.md`)
+    writeFileSync(outFile, markdown, 'utf-8')
+    success++
+    console.log(`[ok] ${pkg.name}/${entry.name} -> .vitepress/gen/${pkg.name}/${entry.name}.md`)
+  }
 }
 
-for (const entry of MODULES) {
-  const markdown = buildModuleMarkdown(entry)
-  if (!markdown) {
-    continue
-  }
-  const outFile = join(OUTPUT_DIR, `${entry.name}.md`)
-  writeFileSync(outFile, markdown, 'utf-8')
-  success++
-  console.log(`[ok] ${entry.name} -> .vitepress/gen/${entry.name}.md`)
-}
-
-for (const entry of CONTAINERS) {
-  const markdown = buildModuleMarkdown(entry, CONTAINERS_ROOT)
-  if (!markdown) {
-    continue
-  }
-  const outFile = join(OUTPUT_DIR, `${entry.name}.md`)
-  writeFileSync(outFile, markdown, 'utf-8')
-  success++
-  console.log(`[ok] ${entry.name} -> .vitepress/gen/${entry.name}.md`)
-}
-
-const total = COMPONENTS.length + MODULES.length + CONTAINERS.length
-console.log(`\n完成：${success}/${total} 个 API 已生成 -> ${OUTPUT_DIR}`)
+console.log(`\n完成：${success}/${total} 个 API 已生成（${PACKAGES.map(p => p.name).join(' / ')}）`)

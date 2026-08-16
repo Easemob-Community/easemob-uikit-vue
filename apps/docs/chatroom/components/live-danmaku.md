@@ -27,17 +27,15 @@ function pushDanmaku(item: Omit<LiveDanmakuItem, 'id'>) {
 </template>
 ```
 
-## Props
+## 运行示例
 
-| prop | 类型 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `items` | `LiveDanmakuItem[]` | — | 弹幕条目流（页面 push 追加，组件按 `id` 增量消费） |
-| `maskName` | `boolean` | `true` | 用户名脱敏（`E***` 式） |
-| `maxChatItems` | `number` | `5` | 聊天区最多同时显示条数 |
-| `maxNoticeItems` | `number` | `3` | 通知区最多同时显示条数 |
-| `shape` | `'rounded' \| 'pill' \| 'square'` | `'rounded'` | 气泡圆角预设 |
-| `maxLines` | `number` | `2` | 单条最大展示行数，超出截断省略 |
-| `size` | `'small' \| 'medium' \| 'large'` | — | 字号档位（不传走 `--live-danmaku-font-size` token） |
+<demo src="./demo/live-danmaku.vue" title="弹幕流" desc="模拟推送普通弹幕 / 礼物 / 签到 / 购买 / 欢迎通知，演示通知区与聊天区双区、合并计数与 `#badge` / `#prefix` 插槽。纯 UI 演示，无需登录。" />
+
+## API
+
+<!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-danmaku-stream.md -->
+
+> 插槽 scope 见下方「插槽」表（gen 表仅列插槽名）。
 
 ## 弹幕条目（`LiveDanmakuItem`）
 

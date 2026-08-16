@@ -61,7 +61,7 @@ PC / Electron 开播端、小班课双端等场景，用 `layout: 'split'` 三�
 - [x] `EmChatroomContainer` 容器与命名插槽
 - [x] 场景预设（live / voice / class / custom）
 - [x] PC 模式（split 布局 / 管理位 / 成员侧栏 / 弹层退化）
-- [ ] 组件文档 / API 表格补齐（gen:api）
+- [x] 组件文档 / API 表格补齐（gen:api，P5 参数化后自动生成）
 
 ::: tip 设计文档
 接入 API 的完整契约草案见 [双 UIKit 架构](./architecture) 与仓库根目录
