@@ -75,6 +75,8 @@ const en: LocaleMessages = {
   'chatroom.ui.liveMemberBenefit': 'Member deal',
   'chatroom.ui.liveGrab': 'Grab',
   'chatroom.ui.liveInputPlaceholder': 'Say something~',
+  'chatroom.ui.liveSendTooFast': 'Sending too fast. Please try again in {0}s',
+  'chatroom.ui.liveBlockedWord': 'Contains sensitive word "{0}". Please revise.',
   'chatroom.ui.liveShare': 'Share',
   'chatroom.ui.liveLike': 'Like',
   'chatroom.ui.liveLottery': 'Comment Lottery',
@@ -91,6 +93,13 @@ const en: LocaleMessages = {
   'chatroom.ui.unblock': 'Unblock',
   'chatroom.ui.muteAllAction': 'Mute all',
   'chatroom.ui.unmuteAllAction': 'Unmute all',
+  // PC management UI (P5): member hover quick actions / context menu / confirm dialog
+  'chatroom.ui.muteShort': 'Mute',
+  'chatroom.ui.kickShort': 'Remove',
+  'chatroom.ui.cancel': 'Cancel',
+  'chatroom.ui.confirm': 'Confirm',
+  'chatroom.ui.confirmKick': 'Remove {name} from the chatroom?',
+  'chatroom.ui.confirmRemoveAdmin': 'Remove {name}\'s admin role?',
 }
 
 export default en

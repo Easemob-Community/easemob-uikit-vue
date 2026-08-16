@@ -9,15 +9,19 @@ import { ref } from 'vue'
 import { EmPopup, t } from '@easemob/uikit-core'
 import { CHATROOM_GIFT_EVENT, CHATROOM_GIFT_ITEMS } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
+import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'
 import { useChatroomMessage } from '../../../composables/use-chatroom-message'
 
 export interface ChatroomGiftBarProps {
   /** 是否禁用（未进房/被禁言时不可送礼） */
   disabled?: boolean
+  /** 弹层形态（P5 PC 模式：sheet 底部弹层 / dialog 居中弹窗；容器按场景 popupMode 解析传入） */
+  popupMode?: ChatroomPopupModeResolvedValue
 }
 
 const props = withDefaults(defineProps<ChatroomGiftBarProps>(), {
   disabled: false,
+  popupMode: 'sheet',
 })
 
 const { sendCustom } = useChatroomMessage()
@@ -55,12 +59,13 @@ function handleGiftClick(giftId: string, icon: string) {
       <span class="chatroom-gift-bar__trigger-icon">🎁</span>
     </button>
 
-    <!-- 礼物面板（底部弹出，覆盖输入区） -->
+    <!-- 礼物面板（sheet：底部弹出覆盖输入区；dialog：PC 居中弹窗） -->
     <EmPopup
       v-model:show="showPanel"
-      position="bottom"
+      :position="props.popupMode === 'dialog' ? 'center' : 'bottom'"
       :to="getChatroomPopupTarget() ?? undefined"
       class="chatroom-gift-bar__popup"
+      :class="{ 'chatroom-gift-bar__popup--dialog': props.popupMode === 'dialog' }"
     >
       <div class="chatroom-gift-bar__panel">
         <div class="chatroom-gift-bar__panel-title">
@@ -122,6 +127,10 @@ function handleGiftClick(giftId: string, icon: string) {
 .chatroom-gift-bar__popup {
   border-radius: 12px 12px 0 0;
   overflow: hidden;
+}
+
+.chatroom-gift-bar__popup--dialog {
+  border-radius: 12px;
 }
 
 .chatroom-gift-bar__panel {

@@ -253,6 +253,59 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 - **P3 场景预设系统**（**已完成，2026-08-15**）：scene config 类型 + 三内置 preset（`LIVE_ROOM_SCENE`/`VOICE_ROOM_SCENE`/`CLASS_ROOM_SCENE` 模块加载即注册）+ `useChatroomScene`（`themeOverrides` 容器根元素应用 + `i18nOverrides` locale 并入）+ 插槽全接线（含 `gift-bar`/`mic-queue`）；礼物（custom 消息 `CHATROOM_GIFT_EVENT` 协议 + `ChatroomGiftBar` + 消息项礼物渲染，未识别 custom 仍兜底）；麦位（语聊房 `ChatroomMicQueue`，状态存 `voice:micQueue` 房间属性 JSON）；禁言/公告（编辑 Popup）/黑名单管理（成员面板 tab）；`useChatroomAttributes`；**多房间订阅（UI 房 + 信令房：`signal-rooms` 配置 + `signal-message`/`signal-status` 透传回调 + `useChatroomMessage` 按 roomId 发送 + 断线全量重进，见 5.9）**；**headless 契约（`subscribe` 增量有序 + flush 批量消费 + 可丢弃中间帧策略，容器只消费公开契约，见 5.10）**。验收已达成：三个变种仅靠 config+插槽实现（demo 场景切换按钮实证）；headless 契约在容器与纯 JS 消费两种形态下行为一致（demo headless 订阅面板实证）。**P3 review（2026-08-15）修复 5 处缺陷后验收口径成立**：subscribe 跟随活动房间（此前进房前订阅永久失效，demo headless 面板在标准流程收不到消息）；UI 房换房只清理旧 UI 房保留信令房（此前 reset 清空注册表）；UI 房 join 显式 `leaveOtherRooms: false`（此前默认 true 会踢掉并行信令房）；信令房 `pullHistory` 改为按序经 `signal-message` 透传（此前拉取被活动房守卫丢弃）；join 超时失效按房间令牌校验（store 增 `roomJoinToken`）。详见 TECH-DEBT D97 复核记录。
 - **P4 变种 Demo（H5-first）**（**已完成，2026-08-15**）：新 app `apps/demo-chatroom`（375px 移动视口居中壳、纯 chatroom 单包形态、登录复用 `uikit_demo_login_config`）——基础聊天室 + 语聊房 + 私域直播/带货 + 小班课 四个页面（均按「正常场景页面」标准：场景化导航/入口卡/完整交互闭环）+ **纯弹幕 headless 页**（无容器、自绘弹幕轨道 + 礼物飘屏 + 系统通知条，实证 headless 契约与 store 建模的 UI 解耦）。私域直播页同时实证 `signal-rooms` 双房链路（商品指令发信令房 → signal-message 回调 → 写 `live:product` 属性 → 商品卡全房间刷新）。验收：五个页面 dev server 冒烟通过、门禁全绿。
 - **P5 文档与集成**：docs 站聊天室章节（gen:api、demo 块、sidebar）、聊天室集成 skill（`integrations/skills`）、MCP 数据更新（`scripts/sync-docs.mjs`）。（**docs 双 UIKit 架构骨架已提前落地，2026-08-15**：`apps/docs` 复用 VitePress locales 承载 `/` 与 `/chatroom/` 两套并列文档树，顶部标题旁 `UiKitDocsSwitcher` 切换；聊天室侧现有 index / architecture / quickstart / chatroom-container 占位页，组件页与 API 表格待 P2/P3 产出后按本计划补齐。）
+- **P5 增量：PC 模式与角色能力（2026-08-15 评审后实施）**：见 §11——split 分栏布局（`layout` 死字段变活）、`canManageMember` 权限原语上提、`manage-actions` 管理位插槽 + `features.management` 开关组、`ChatroomContextMenu`/`ChatroomMemberSidebar`/`ChatroomSplitLayout`（`modules/chatroom/pc/`）、弹层退化 `popupMode`、输入条多行与 Esc 键盘交互；**业务角色不内置**（demo 层 `demo-role.ts` 参考实现 + `#/pc-live`/`#/pc-class` 宽屏验收页）；docs「权限模型与业务角色」页落盘权限矩阵与角色抽象指南；版本 0.2.0。
+
+## 十一、PC 模式与角色边界（2026-08-15 评审决策，P5 增量）
+
+> **需求背景**：私域直播的开播端是 PC 网页/Electron，H5 只是观众端；小班课师生都在
+> PC web。纯 H5 不够，且 PC 交互与角色权限不同——主播可禁言某人/移除某人/发布公告/
+> 上架商品等。用户评审定案（关键决策）：**角色不内置，UIKit 权限面天花板 = SDK 原生
+> 权限（owner/admin/member/none）**，业务角色由应用层自行抽象。
+
+### 11.1 决策：业务角色由应用层抽象，UIKit 只做权限能力
+
+理由：① 服务端只认权限——任何业务角色最终落到 owner/admin/member 才能执行操作，
+内置「anchor/teacher」枚举服务端无法理解，只能自欺欺人做 UI 显隐；② 业务角色无界
+（主播/场控/客服/嘉宾/助教……），内置枚举必然 churn API；③ 与「壳子 vs 内容」哲学
+及 headless 一等公民（§5.10）自洽；④ 角色名单可存房间属性（§5.6 KV 四层同步），
+持久化问题 UIKit 已解决。详见 docs「权限模型与业务角色」。
+
+- **不新增**：`CHATROOM_PLAYER_ROLE` 枚举、`player-role` prop、`useChatroomRole`——角色概念不进包；
+- **补齐权限原语**：`useChatroomMember.canManageMember(target)`——原内嵌成员面板的
+  「当前用户能否管理目标成员」判定（不能管房主/自己、admin 只能由 owner 管理）上提为公开 API；
+- **能力壳子**（按 `canManage` 门控，与角色无关）：
+  - **`layout: 'split'` 实现**（§5.5 死字段变活）：三栏 [舞台 `#stage` | 消息主栏 |
+    成员侧栏]，成员栏宽度可拖拽（core `useResizable`，200~480 clamp），窄视口
+    （<768px）成员侧栏退化为 H5 底部弹层；`layout: 'auto'` 按视口自动选择；
+  - **`#manage-actions` 插槽**（`canManage` 门控）+ `features.management` 开关组
+    （mute/kick/muteAll/announcement/blocklist/admin）——业务把「上架商品/公告」等
+    操作台入口放插槽，UIKit 不感知业务角色；
+  - **PC 交互**：成员行 hover 快捷操作（`@media (hover:hover)` 包裹）、
+    `ChatroomContextMenu` 右键菜单（视口翻转/点击外部/Esc 关闭）、危险操作居中确认
+    弹窗、`popupMode` 弹层退化（宽视口 sheet→dialog，成员/礼物/表情面板）、
+    输入条多行（textarea + Shift+Enter 换行）、Esc 关闭弹层（`useEscToClose`）；
+  - 新模块目录 `modules/chatroom/pc/`：`ChatroomSplitLayout` / `ChatroomMemberSidebar` /
+    `ChatroomContextMenu`；
+- **Demo 示范**：`apps/demo-chatroom` 新增 `src/demo-role.ts`（业务角色抽象参考实现：
+  主播=owner / 场控=admin / 观众=member；老师=owner / 学生=member，演示「场控=admin」
+  角色与权限解耦）+ 宽屏路由 `#/pc-live`（开播端三栏 + 管理位 + 信令房双房商品链路）
+  与 `#/pc-class`（双端角色切换，不套 375px 手机壳）；
+- **文档**：docs「权限模型与业务角色」页（权限矩阵 + 角色抽象指南 + 名单存房间属性建议）、
+  quickstart PC 接入段、PC 组件页（split/成员侧栏/右键菜单 + scene 扩展字段）。
+
+### 11.2 向后兼容
+
+`layout` 缺省 `fullscreen`、`popupMode` 缺省 `auto`（H5 视口行为与现状一致）、新增
+prop 全部可选——P2~P4 五变种 demo 页零回归；H5 页面在桌面浏览器打开仍保持 H5 形态。
+
+### 11.3 边界情况
+
+- **角色与权限冲突**（member 账号切「主播」视角）：管理 UI 按 `canManage` 不出现 +
+  服务端拒绝兜底（现有 toast 链路）——UIKit 无需感知角色；
+- **窄窗口 split 坍缩**：成员侧栏退化为弹层（header 成员按钮），主栏优先；
+- **多容器并存**：角色是业务层状态（页面局部），无全局污染；
+- **Electron**：v1 单窗口 split 分栏为主；多窗口由业务每窗口一个 Provider/容器实例
+  （不提供多窗口 UIKit 原语）。
 
 ## 十、明确假设（实施时如与预期不符，以当时实际情况为准）
 
@@ -262,3 +315,4 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 4. 变种首期交付三个内置 preset（语聊房 / 私域直播带货 / 小班课），更多场景靠插槽由用户自建。
 5. 实施时若 `easemob-websdk` 已升级，以当时的 `ChatRoomManager` 实际 API 为准做 adapter 映射（本文档 API 清单基于 5.0.0 核实）。
 6. **多房并行（见 5.9）**：SDK `joinChatRoom` 支持并行多房（`leaveOtherRooms: false`）；服务端多房并发上限、`leaveOtherRooms` 默认值、信令房历史消息可达性以实施时 SDK/服务端实际行为为准。
+7. **业务角色不进 UIKit（见 §11）**：服务端权限模型不变（permissionType 快照）；业务角色纯客户端/业务层概念，UIKit 不感知；断点沿用 core `isMobile`（768px）；多窗口 Electron 不在 v1。

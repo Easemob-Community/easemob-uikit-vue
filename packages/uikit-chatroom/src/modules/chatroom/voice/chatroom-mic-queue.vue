@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * 麦位栏（P3，语聊房场景）：8 个麦位，状态存房间属性 KV
- * （key = voice:micQueue 场景前缀，见 CHATROOM_ATTR_PREFIX / 设计文档 §5.6）。
- * 数据协议：`voice:micQueue` → JSON `{ seats: [{ userId, nickname }] }`。
+ * （key = voice_micQueue 场景前缀，见 CHATROOM_ATTR_PREFIX / 设计文档 §5.6）。
+ * 数据协议：`voice_micQueue` → JSON `{ seats: [{ userId, nickname }] }`。
  * - 空麦位点击上麦（自己入座）；自己的麦位点击下麦；他人麦位（管理员）点击下麦；
  * - 属性四层同步（本地乐观 → set 推送 → 事件同步 → 拉取兜底）由 useChatroomAttributes 承担，
  *   麦位变更对全房间实时可见（直播间卖点：无需自建服务端）。

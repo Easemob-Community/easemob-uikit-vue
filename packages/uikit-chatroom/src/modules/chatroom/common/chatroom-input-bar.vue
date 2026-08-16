@@ -9,6 +9,7 @@
 import { ref } from 'vue'
 import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob/uikit-core'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
+import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'
 
 export interface ChatroomInputBarProps {
   /** 是否禁用输入（未进房 / 全员禁言非管理员且不在白名单 / 自己被禁言） */
@@ -17,6 +18,10 @@ export interface ChatroomInputBarProps {
   disabledHint?: string
   /** 占位文案，缺省用 locale（chatroom.ui.inputPlaceholder） */
   placeholder?: string
+  /** 多行输入形态（P5 PC 模式：textarea + Shift+Enter 换行 + Enter 发送；H5 单行 input 不变） */
+  multiline?: boolean
+  /** 表情面板弹层形态（P5 PC 模式：sheet 底部弹层 / dialog 居中弹窗；容器按场景 popupMode 解析传入） */
+  popupMode?: ChatroomPopupModeResolvedValue
 }
 
 export interface ChatroomInputBarEmits {
@@ -30,6 +35,8 @@ const props = withDefaults(defineProps<ChatroomInputBarProps>(), {
   disabled: false,
   disabledHint: '',
   placeholder: '',
+  multiline: false,
+  popupMode: 'sheet',
 })
 
 const emit = defineEmits<ChatroomInputBarEmits>()
@@ -103,11 +110,33 @@ function handleKeydown(event: KeyboardEvent) {
     void handleSend()
   }
 }
+
+/** 多行输入自适应高度（内容增长撑高，上限 96px 内滚动；清空恢复单行） */
+function handleMultilineInput() {
+  const el = textInput.value as HTMLTextAreaElement | undefined
+  if (!el)
+    return
+  el.style.height = 'auto'
+  el.style.height = `${Math.min(el.scrollHeight, 96)}px`
+}
 </script>
 
 <template>
   <div class="chatroom-input-bar" :class="{ 'chatroom-input-bar--disabled': disabled }">
+    <!-- 多行（PC）：textarea + Shift+Enter 换行；单行（H5）：input -->
+    <textarea
+      v-if="multiline"
+      ref="textInput"
+      v-model="text"
+      class="chatroom-input-bar__field chatroom-input-bar__field--multiline"
+      :placeholder="placeholder || t('chatroom.ui.inputPlaceholder')"
+      :disabled="disabled"
+      rows="1"
+      @keydown="handleKeydown"
+      @input="handleMultilineInput"
+    />
     <input
+      v-else
       ref="textInput"
       v-model="text"
       class="chatroom-input-bar__field"
@@ -151,12 +180,13 @@ function handleKeydown(event: KeyboardEvent) {
       {{ disabledHint }}
     </div>
 
-    <!-- 表情面板（H5 底部弹层；选中插入不自动关闭，可连续选择） -->
+    <!-- 表情面板（sheet：H5 底部弹层；dialog：PC 居中弹窗；选中插入不自动关闭，可连续选择） -->
     <EmPopup
       v-model:show="showEmojiPicker"
       :to="getChatroomPopupTarget() ?? undefined"
-      position="bottom"
+      :position="popupMode === 'dialog' ? 'center' : 'bottom'"
       class="chatroom-input-bar__emoji-popup"
+      :class="{ 'chatroom-input-bar__emoji-popup--dialog': popupMode === 'dialog' }"
     >
       <EmEmojiPicker :show="true" @select="handleEmojiSelect" />
     </EmPopup>
@@ -211,6 +241,17 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: not-allowed;
 }
 
+/* 多行形态（PC）：textarea 自适应高度，上限 96px 内滚动 */
+.chatroom-input-bar__field--multiline {
+  height: 38px;
+  min-height: 38px;
+  padding: 8px 12px;
+  line-height: 20px;
+  resize: none;
+  overflow-y: auto;
+  display: block;
+}
+
 .chatroom-input-bar__emoji,
 .chatroom-input-bar__image {
   flex-shrink: 0;
@@ -240,5 +281,9 @@ function handleKeydown(event: KeyboardEvent) {
 .chatroom-input-bar__emoji-popup {
   border-radius: 12px 12px 0 0;
   overflow: hidden;
+}
+
+.chatroom-input-bar__emoji-popup--dialog {
+  border-radius: 12px;
 }
 </style>

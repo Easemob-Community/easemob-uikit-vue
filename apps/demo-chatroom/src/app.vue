@@ -6,9 +6,10 @@
  * Vue 的 inject 只解析父组件链，同一组件 setup 内 provide 的值对自身不可见。
  * 消费侧逻辑在 app-shell.vue（子组件）。
  */
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { setChatroomPopupTarget, useChatroomProvider } from '@easemob/uikit-chatroom'
 import AppShell from './app-shell.vue'
+import { demoRoute, isDemoPcRoute } from './demo-route'
 
 /** 从 localStorage 读取登录配置（与 apps/demo 共用 uikit_demo_login_config） */
 function getLoginConfig() {
@@ -35,18 +36,21 @@ useChatroomProvider({
 onMounted(() => {
   setChatroomPopupTarget('.phone-shell__screen')
 })
+
+/** PC 宽屏路由：不套 375px 手机壳，全窗口渲染（P5 split 布局验收） */
+const isPcPage = computed(() => isDemoPcRoute(demoRoute.value))
 </script>
 
 <template>
   <div class="phone-shell">
-    <div class="phone-shell__screen">
+    <div class="phone-shell__screen" :class="{ 'phone-shell__screen--wide': isPcPage }">
       <AppShell />
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 移动端窄屏壳：PC 上 375px 居中呈现手机页面，移动端全宽 */
+/* 移动端窄屏壳：PC 上 375px 居中呈现手机页面，移动端全宽；PC 路由全窗口宽 */
 .phone-shell {
   position: fixed;
   inset: 0;
@@ -68,8 +72,13 @@ onMounted(() => {
   transform: translateZ(0);
 }
 
+/* PC 宽屏路由（#/pc-live、#/pc-class）：去掉 375px 上限，全窗口渲染 */
+.phone-shell__screen--wide {
+  max-width: none;
+}
+
 @media (min-width: 500px) {
-  .phone-shell__screen {
+  .phone-shell__screen:not(.phone-shell__screen--wide) {
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.08),
       0 12px 48px rgba(0, 0, 0, 0.5);

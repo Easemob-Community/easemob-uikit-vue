@@ -1,6 +1,12 @@
 import { computed } from 'vue'
-import { resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
-import { CHATROOM_PERMISSION } from '../constants'
+import {
+  normalizeUserId,
+  resolveSdkErrorMessage,
+  t,
+  useCoreUIKit,
+  useToast,
+} from '@easemob/uikit-core'
+import { CHATROOM_MEMBER_ROLE, CHATROOM_PERMISSION } from '../constants'
 import type { ChatroomPermissionValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
 import type { ChatroomMember } from '../sdk/domain/chatroom-domain'
@@ -11,8 +17,13 @@ import { useChatroomStore } from '../store/chatroom'
  *
  * 权限模型：owner / admin / member 三级（currentRole 来自房间详情接口的
  * permissionType 快照）；`canManage`（owner/admin）供 UI 控制禁言、踢人、
- * 全员禁言、公告编辑、黑/白名单入口显隐。服务端仍做最终权限校验，
- * 越权操作会以错误 toast 兜底。
+ * 全员禁言、公告编辑、黑/白名单入口显隐；`canManageMember(target)` 判定
+ * 「当前用户能否管理目标成员」（不能管房主/自己，admin 只能由 owner 管理）。
+ * 服务端仍做最终权限校验，越权操作会以错误 toast 兜底。
+ *
+ * 业务角色（主播/老师/场控等）不属于 UIKit 概念：UIKit 的权限面天花板就是
+ * SDK 原生权限模型，业务层自行把角色映射到 owner/admin/member（见
+ * 「权限模型与业务角色」文档）。
  */
 export function useChatroomMember() {
   const ctx = useCoreUIKit()
@@ -36,6 +47,26 @@ export function useChatroomMember() {
   const canManage = computed(
     () => currentRole.value === CHATROOM_PERMISSION.OWNER || currentRole.value === CHATROOM_PERMISSION.ADMIN,
   )
+
+  /**
+   * 当前用户能否管理目标成员（PC 控制台/成员面板管理位判定的唯一入口，
+   * 原实现内嵌于成员面板，P5 PC 模式上提为公开原语）：
+   * - 无管理权限（member/none）不可管理任何人；
+   * - 房主不可被管理（owner 只能由服务端变更）；
+   * - 不可管理自己；
+   * - 管理员（admin）只能由房主管理（owner 可设/移除管理员）。
+   */
+  function canManageMember(target: ChatroomMember | null | undefined): boolean {
+    if (!target || !canManage.value)
+      return false
+    if (target.role === CHATROOM_MEMBER_ROLE.OWNER)
+      return false
+    if (normalizeUserId(target.userId) === normalizeUserId(ctx.stores.client.currentUser ?? ''))
+      return false
+    if (target.role === CHATROOM_MEMBER_ROLE.ADMIN && !isOwner.value)
+      return false
+    return true
+  }
 
   function requireRoomId(): string {
     const id = chatroomStore.roomId
@@ -164,6 +195,7 @@ export function useChatroomMember() {
     currentRole,
     isOwner,
     canManage,
+    canManageMember,
     loadMembers,
     refreshMuteList,
     isInAllowlist,

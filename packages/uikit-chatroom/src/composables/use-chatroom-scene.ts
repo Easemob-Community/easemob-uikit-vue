@@ -5,14 +5,51 @@ import { CHATROOM_SCENE_NAME } from '../constants'
 import type { ChatroomSceneNameValue } from '../constants'
 
 /**
+ * 管理位能力开关（P5 PC 模式）：控制成员面板/PC 控制台里各管理操作的显隐。
+ * 缺省（undefined）= 按权限可用（owner/admin 全量）；显式 false 关闭某项。
+ * 注意：开关只影响 UIKit 内置管理 UI，业务经 manage-actions 插槽自建的
+ * 操作不受此约束；服务端仍做最终权限校验。
+ */
+export interface ChatroomManagementFeature {
+  /** 单成员禁言入口 */
+  mute?: boolean
+  /** 踢人入口 */
+  kick?: boolean
+  /** 全员禁言入口（覆盖旧 features.muteAll 语义，旧字段保留兼容） */
+  muteAll?: boolean
+  /** 公告编辑入口 */
+  announcement?: boolean
+  /** 黑名单 tab/入口 */
+  blocklist?: boolean
+  /** 设/移除管理员入口（仅 owner 可见） */
+  admin?: boolean
+}
+
+/** 弹层形态：sheet 底部弹层（H5）/ dialog 居中弹窗（PC）；auto 按视口自动选择 */
+export type ChatroomPopupModeValue = 'auto' | 'sheet' | 'dialog'
+
+/** PC 分栏面板尺寸（layout: 'split' 时生效） */
+export interface ChatroomSplitPanels {
+  /** 舞台栏宽度（px 数字或 CSS 长度；缺省由内容决定） */
+  stageWidth?: number | string
+  /** 成员栏宽度（px 数字或 CSS 长度，缺省 280px；可拖拽调整） */
+  memberWidth?: number | string
+}
+
+/**
  * 聊天室场景预设配置（「方便用户变种」的核心机制，见设计文档 5.5）。
  * 场景 = 纯配置 + 插槽覆盖，不是独立代码库；变种优先级：插槽 > config > fork。
  */
 export interface ChatroomSceneConfig {
   /** 场景名（内置 live / voice / class；custom 或自定义字符串走注册表） */
   name: ChatroomSceneNameValue | (string & {})
-  /** 布局：fullscreen 全屏房间（H5 优先）/ split 分栏（桌面） */
-  layout: 'fullscreen' | 'split'
+  /**
+   * 布局（P5 PC 模式实现）：
+   * - fullscreen：全屏房间（H5 优先，默认）——纵向 flex，成员面板走弹层；
+   * - split：PC 三栏分栏（舞台区 #stage | 消息主栏 | 成员侧栏），成员列表变常驻侧栏；
+   * - auto：按视口自动选择（窄视口 fullscreen，宽视口 split）。
+   */
+  layout: 'fullscreen' | 'split' | 'auto'
   features: {
     /** 礼物栏 / 礼物消息渲染 */
     gift?: boolean
@@ -22,7 +59,7 @@ export interface ChatroomSceneConfig {
     memberList?: 'panel' | 'popup' | 'none'
     /** 公告展示 */
     announcement?: boolean
-    /** 全员禁言入口 */
+    /** 全员禁言入口（旧字段；新配置走 management.muteAll） */
     muteAll?: boolean
     /** 消息过滤器（如语聊房过滤图片消息）；返回 false 不上屏 */
     messageFilter?: (message: UiMessage) => boolean
@@ -30,6 +67,7 @@ export interface ChatroomSceneConfig {
      * 消息区形态（直播场景：弹幕区只占页面底部一部分且背景透明，
      * 直播画面从下层透出——用户 P4 review 需求 1）。缺省：消息区 flex:1
      * 撑满 + 不透明背景。live preset 默认 { height: '33%', transparent: true }。
+     * split 布局下忽略（三栏消息主栏恒为不透明列表）。
      */
     messageArea?: {
       /** 高度（px 数字或 CSS 长度字符串，如 '33%' / '240px'） */
@@ -37,7 +75,17 @@ export interface ChatroomSceneConfig {
       /** 背景透明（直播画面透出）；消息气泡自身背景不受影响 */
       transparent?: boolean
     }
+    /** 管理位能力开关（P5 PC 模式；缺省按权限可用） */
+    management?: ChatroomManagementFeature
+    /** PC 输入条多行形态（textarea + Shift+Enter 换行；split 布局缺省开启） */
+    multilineInput?: boolean
+    /** 键盘快捷键开关（PC：Esc 关闭弹层等；缺省开启） */
+    keyboard?: boolean
   }
+  /** PC 分栏面板尺寸（layout: 'split' 时生效） */
+  panels?: ChatroomSplitPanels
+  /** 弹层形态（auto 按视口：窄视口底部弹层，宽视口居中弹窗；缺省 auto） */
+  popupMode?: ChatroomPopupModeValue
   /** 主题 CSS 变量覆盖（容器根元素应用，如 '--uikit-primary-color': '#ff6b6b'） */
   themeOverrides?: Record<string, string>
   /** 文案覆盖（key → 文案，经 core mergeLocaleMessages 并入当前语言包） */

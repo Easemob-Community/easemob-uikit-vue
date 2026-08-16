@@ -6,8 +6,11 @@
  *
  * 本应用是**纯 chatroom 单包形态**（不依赖 @easemob/uikit-im），验证聊天室
  * 场景包独立可用的接入路径（P2 review 遗留项 d 的补证）。
+ *
+ * P5 PC 模式：新增 #/pc-live（PC 私域直播开播端）、#/pc-class（PC 小班课双端）
+ * 两个宽屏路由——app.vue 据此去掉 375px 手机壳、全窗口渲染 split 布局。
  */
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useClient } from '@easemob/uikit-core'
 import DemoLoginPage from './demo-login-page.vue'
 import DemoHomePage from './pages/demo-home-page.vue'
@@ -16,13 +19,15 @@ import VoiceRoomPage from './pages/voice-room-page.vue'
 import LiveRoomPage from './pages/live-room-page.vue'
 import ClassRoomPage from './pages/class-room-page.vue'
 import DanmakuPage from './pages/danmaku-page.vue'
+import PcLivePage from './pages/pc-live-page.vue'
+import PcClassPage from './pages/pc-class-page.vue'
+import { demoRoute } from './demo-route'
+import type { DemoRoute } from './demo-route'
 
 const { currentUser } = useClient()
 
-/* ===== hash 路由（#/basic #/voice #/live #/class #/danmaku；空 = 首页） ===== */
-type RouteName = 'home' | 'basic' | 'voice' | 'live' | 'class' | 'danmaku'
-
-const ROUTE_ALIAS: Record<string, RouteName> = {
+/* ===== hash 路由（空 = 首页；pc-* 为 PC 宽屏页） ===== */
+const ROUTE_ALIAS: Record<string, DemoRoute> = {
   '': 'home',
   '#/': 'home',
   '#/basic': 'basic',
@@ -30,12 +35,12 @@ const ROUTE_ALIAS: Record<string, RouteName> = {
   '#/live': 'live',
   '#/class': 'class',
   '#/danmaku': 'danmaku',
+  '#/pc-live': 'pc-live',
+  '#/pc-class': 'pc-class',
 }
 
-const route = ref<RouteName>('home')
-
 function onHashChange() {
-  route.value = ROUTE_ALIAS[window.location.hash] ?? 'home'
+  demoRoute.value = ROUTE_ALIAS[window.location.hash] ?? 'home'
 }
 
 onMounted(() => {
@@ -60,10 +65,12 @@ function handleLoginSuccess() {
   <DemoLoginPage v-if="!isLoggedIn" @login-success="handleLoginSuccess" />
 
   <!-- 已登录：hash 路由 -->
-  <DemoHomePage v-else-if="route === 'home'" />
-  <BasicChatroomPage v-else-if="route === 'basic'" />
-  <VoiceRoomPage v-else-if="route === 'voice'" />
-  <LiveRoomPage v-else-if="route === 'live'" />
-  <ClassRoomPage v-else-if="route === 'class'" />
-  <DanmakuPage v-else-if="route === 'danmaku'" />
+  <DemoHomePage v-else-if="demoRoute === 'home'" />
+  <BasicChatroomPage v-else-if="demoRoute === 'basic'" />
+  <VoiceRoomPage v-else-if="demoRoute === 'voice'" />
+  <LiveRoomPage v-else-if="demoRoute === 'live'" />
+  <ClassRoomPage v-else-if="demoRoute === 'class'" />
+  <DanmakuPage v-else-if="demoRoute === 'danmaku'" />
+  <PcLivePage v-else-if="demoRoute === 'pc-live'" />
+  <PcClassPage v-else-if="demoRoute === 'pc-class'" />
 </template>

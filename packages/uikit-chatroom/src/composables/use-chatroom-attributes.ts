@@ -16,7 +16,7 @@ import { useChatroomStore } from '../store/chatroom'
  * 4. 全量拉取兜底（进房时 useChatroom 自动 refresh，事件丢失后可手动 refresh）。
  *
  * **属性 key 场景前缀约定**：变种共用房间 KV 命名空间，key 必须加场景前缀
- * （`CHATROOM_ATTR_PREFIX`：live: / voice: / class:），用 `prefixedKey` 拼接防冲突。
+ * （`CHATROOM_ATTR_PREFIX`：live_ / voice_ / class_），用 `prefixedKey` 拼接防冲突。
  */
 export function useChatroomAttributes() {
   const ctx = useCoreUIKit()
@@ -39,7 +39,7 @@ export function useChatroomAttributes() {
     return chatroomStore.attributes[key]
   }
 
-  /** 拼接带场景前缀的属性 key（如 prefixedKey(CHATROOM_ATTR_PREFIX.LIVE, 'productId') → 'live:productId'） */
+  /** 拼接带场景前缀的属性 key（如 prefixedKey(CHATROOM_ATTR_PREFIX.LIVE, 'productId') → 'live_productId'） */
   function prefixedKey(prefix: ChatroomAttrPrefixValue, key: string): string {
     return `${prefix}${key}`
   }

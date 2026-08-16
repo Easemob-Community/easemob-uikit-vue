@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
  * EmChatroomContainer —— 聊天室场景容器（P2-2 外壳：加入/退出/历史/消息收发/
- * 成员面板/系统通知/基础插槽，H5-first 全屏布局）。
+ * 成员面板/系统通知/基础插槽，H5-first 全屏布局；P5 PC 模式：split 三栏分栏 +
+ * 弹层退化 + 管理位插槽）。
  *
  * 三步接入（与 Provider 组合使用，见 demo 与 docs quickstart）：
  * ```vue
@@ -11,6 +12,15 @@
  * template:
  *   <EmChatroomContainer room-id="room123" scene="live" auto-join />
  * ```
+ *
+ * PC 模式（P5，scene 配置驱动，向后兼容）：
+ * - `scene: { layout: 'split' }`（或 'auto' 按视口）→ 三栏分栏：`#stage` 舞台区
+ *   （业务注入视频/白板）+ 消息主栏 + 成员常驻侧栏（memberList: 'panel' 时），
+ *   成员栏宽度可拖拽；窄视口自动退化为 H5 弹层；
+ * - `#manage-actions` 插槽：仅 owner/admin（canManage）可见的管理操作条，
+ *   UIKit 不感知业务角色（主播/老师等由业务层映射到权限）；
+ * - `popupMode`（scene，缺省 auto）：成员/礼物/表情面板在宽视口自动居中弹窗；
+ * - 输入条多行（textarea + Shift+Enter）与 Esc 关闭弹层随布局自动生效。
  *
  * 设计要点：
  * - **容器只消费公开 composable 契约**（useChatroom / useChatroomMessage /
@@ -22,7 +32,7 @@
  * - 被踢/解散终态：watch store 状态 → emit 事件 + 终态提示视图。
  */
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { EmPopup, MESSAGE_TYPE, t, useClient } from '@easemob/uikit-core'
+import { EmPopup, MESSAGE_TYPE, t, useClient, useEscToClose, useViewport } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
 import { getChatroomPopupTarget } from '../../config/popup-target'
@@ -31,13 +41,17 @@ import { useChatroom } from '../../composables/use-chatroom'
 import { useChatroomMember } from '../../composables/use-chatroom-member'
 import { useChatroomMessage } from '../../composables/use-chatroom-message'
 import { useChatroomScene } from '../../composables/use-chatroom-scene'
+import { useChatroomLayout } from '../../composables/use-chatroom-layout'
+import { useChatroomPopupMode } from '../../composables/use-chatroom-popup-mode'
 import ChatroomHeader from '../../modules/chatroom/common/chatroom-header.vue'
 import ChatroomGiftBar from '../../modules/chatroom/live/chatroom-gift-bar.vue'
 import ChatroomInputBar from '../../modules/chatroom/common/chatroom-input-bar.vue'
 import ChatroomMicQueue from '../../modules/chatroom/voice/chatroom-mic-queue.vue'
 import ChatroomMemberPanel from '../../modules/chatroom/common/chatroom-member-panel.vue'
+import ChatroomMemberSidebar from '../../modules/chatroom/pc/chatroom-member-sidebar.vue'
 import ChatroomMessageItem from '../../modules/chatroom/common/chatroom-message-item.vue'
 import ChatroomNoticeBanner from '../../modules/chatroom/common/chatroom-notice-banner.vue'
+import ChatroomSplitLayout from '../../modules/chatroom/pc/chatroom-split-layout.vue'
 import VirtualList from '../../components/virtual-list.vue'
 import type { ChatroomContainerEmits, ChatroomContainerProps } from './types'
 
@@ -71,7 +85,7 @@ const {
   maxMessages: props.maxMessages,
 })
 const { messages, historyHasMore, loadingHistory, sendText, sendImage, loadMoreHistory } = useChatroomMessage()
-const { canManage, muteList, isInAllowlist, updateAnnouncement } = useChatroomMember()
+const { canManage, isOwner, currentRole, muteList, isInAllowlist, updateAnnouncement } = useChatroomMember()
 const { sceneConfig, features } = useChatroomScene(() => props.scene)
 
 /** 消息区形态（直播场景：底部限高 + 透明，弹幕叠加画面，P4 review 需求 1） */
@@ -188,6 +202,38 @@ function saveAnnouncement() {
 /** 成员面板入口（场景配置开启成员列表时展示） */
 const memberPanelEnabled = computed(() => features.value.memberList !== 'none')
 const announcementEnabled = computed(() => features.value.announcement !== false)
+
+/* ===== PC 模式（P5）：split 分栏布局 + 弹层退化 + 键盘交互 ===== */
+
+/** 布局形态（scene layout：fullscreen / split / auto，缺省 fullscreen 向后兼容） */
+const { layoutMode } = useChatroomLayout(() => sceneConfig.value.layout)
+const split = computed(() => layoutMode.value === 'split')
+/** 弹层形态（scene popupMode：auto 按视口 sheet/dialog，缺省 auto） */
+const { popupMode } = useChatroomPopupMode(() => sceneConfig.value.popupMode)
+const { isMobile } = useViewport()
+
+/**
+ * split 下成员常驻侧栏：scene memberList === 'panel' 且宽视口；
+ * 窄视口退化为 header 成员按钮 + 底部弹层面板（graceful degradation）。
+ */
+const showMemberSidebar = computed(
+  () => split.value && memberPanelEnabled.value && features.value.memberList === 'panel' && !isMobile.value,
+)
+/** PC 输入条多行形态（scene multilineInput 显式指定；split 布局缺省开启） */
+const inputMultiline = computed(() => features.value.multilineInput ?? split.value)
+/** 键盘快捷键开关（scene keyboard !== false 时开启） */
+const keyboardEnabled = computed(() => features.value.keyboard !== false)
+/** Esc 关闭成员面板（PC 统一弹层 Esc 语义；面板打开且键盘开启时生效） */
+useEscToClose(
+  computed(() => keyboardEnabled.value && showMemberPanel.value),
+  () => {
+    showMemberPanel.value = false
+  },
+)
+/** split 分栏尺寸（scene panels） */
+const splitPanels = computed(() => sceneConfig.value.panels)
+/** 管理位能力开关（scene features.management） */
+const managementFeatures = computed(() => features.value.management)
 
 /** 消息列表：虚拟滚动（P4 review 需求 5）与滚动跟随 */
 const virtualListRef = ref<InstanceType<typeof VirtualList>>()
@@ -373,7 +419,7 @@ defineExpose({
         :title="roomInfo?.name ?? roomId"
         :member-count="roomInfo?.memberCount"
         :joining="status === JOINING"
-        :member-panel-enabled="memberPanelEnabled"
+        :member-panel-enabled="memberPanelEnabled && !showMemberSidebar"
         @back="emit('back')"
         @member-click="showMemberPanel = true"
         @exit="handleExit"
@@ -390,94 +436,202 @@ defineExpose({
     <!-- 工具条（header 与消息区之间，业务注入） -->
     <slot name="toolbar" :status="status" />
 
-    <!-- 麦位栏（P3：features.micQueue 开启时渲染，可整体覆盖；默认内置 MicQueue） -->
-    <slot v-if="features.micQueue" name="mic-queue">
-      <ChatroomMicQueue />
-    </slot>
-
-    <!-- 公告条（场景配置开启时展示；owner/admin 可编辑，P3） -->
-    <slot v-if="announcementEnabled" name="notice" :content="announcement">
-      <ChatroomNoticeBanner
-        :content="announcement"
-        :editable="canManage"
-        @edit="openAnnouncementEditor"
-      />
-    </slot>
-
-    <!-- 消息区（直播场景 messageArea 限高 + 透明，弹幕叠加在画面上，P4 review 需求 1） -->
-    <div
-      class="chatroom-container__list"
-      :class="{ 'chatroom-container__list--transparent': messageAreaTransparent }"
-      :style="messageAreaStyle"
-    >
-      <button
-        v-if="historyHasMore && isJoined"
-        class="chatroom-container__load-more"
-        :disabled="loadingHistory"
-        @click="handleLoadMore"
-      >
-        {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
-      </button>
-
-      <!-- 消息流：虚拟滚动（P4 review 需求 5：大体量消息性能；只渲染可视区+缓冲行） -->
-      <VirtualList
-        v-if="visibleMessages.length > 0"
-        ref="virtualListRef"
-        class="chatroom-container__virtual"
-        :items="visibleMessages"
-        :estimate-height="56"
-        :item-key="messageListKey"
-        @scroll="handleListScroll"
-      >
-        <template #item="{ item }">
-          <div class="chatroom-container__message">
-            <!-- custom 消息：业务 message-custom 插槽优先，否则回落消息项兜底渲染 -->
-            <slot
-              v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
-              name="message-custom"
-              :message="item"
-            />
-            <slot v-else name="message-item" :message="item">
-              <ChatroomMessageItem :message="item as UiMessage" />
-            </slot>
-          </div>
-        </template>
-      </VirtualList>
-
-      <!-- 空态（未进房/暂无消息） -->
-      <slot v-else name="empty" :status="status">
-        <div class="chatroom-container__empty">
-          {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
-        </div>
-      </slot>
-
-      <!-- 终态（被踢/解散）提示 -->
-      <div v-if="terminalView" class="chatroom-container__terminal">
-        <div class="chatroom-container__terminal-text">
-          {{ terminalView.text }}
-        </div>
-        <button class="chatroom-container__terminal-btn" @click="handleExit">
-          {{ t('chatroom.ui.exit') }}
-        </button>
-      </div>
+    <!-- 管理位操作条（P5 PC 模式：仅 owner/admin 可见，业务注入「上架商品/公告」等
+         操作台入口；UIKit 不感知业务角色，只按服务端权限 canManage 门控） -->
+    <div v-if="canManage && $slots['manage-actions']" class="chatroom-container__manage-actions">
+      <slot name="manage-actions" :can-manage="canManage" :is-owner="isOwner" :current-role="currentRole" />
     </div>
 
-    <!-- 底部操作行（P4 review 需求 4）：[礼物按钮] [输入条] 同行；礼物在输入条左侧 -->
-    <div class="chatroom-container__input-row">
-      <slot v-if="features.gift" name="gift-bar" :disabled="inputDisabled">
-        <ChatroomGiftBar :disabled="inputDisabled" />
+    <!-- PC 三栏分栏（P5：scene layout split/auto 宽视口；舞台区 #stage + 消息主栏 + 成员侧栏） -->
+    <ChatroomSplitLayout
+      v-if="split"
+      :member-width="splitPanels?.memberWidth"
+      :show-members="showMemberSidebar"
+    >
+      <!-- 舞台区：业务注入视频/白板/商品区（未提供插槽则不渲染） -->
+      <template v-if="$slots.stage" #stage>
+        <slot name="stage" :status="status" :room-info="roomInfo" />
+      </template>
+
+      <!-- 消息主栏：麦位 + 公告 + 消息流 + 输入行（与 fullscreen 分支保持同步） -->
+      <template #default>
+        <slot v-if="features.micQueue" name="mic-queue">
+          <ChatroomMicQueue />
+        </slot>
+        <slot v-if="announcementEnabled" name="notice" :content="announcement">
+          <ChatroomNoticeBanner
+            :content="announcement"
+            :editable="canManage"
+            @edit="openAnnouncementEditor"
+          />
+        </slot>
+        <div class="chatroom-container__list">
+          <button
+            v-if="historyHasMore && isJoined"
+            class="chatroom-container__load-more"
+            :disabled="loadingHistory"
+            @click="handleLoadMore"
+          >
+            {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
+          </button>
+          <VirtualList
+            v-if="visibleMessages.length > 0"
+            ref="virtualListRef"
+            class="chatroom-container__virtual"
+            :items="visibleMessages"
+            :estimate-height="56"
+            :item-key="messageListKey"
+            @scroll="handleListScroll"
+          >
+            <template #item="{ item }">
+              <div class="chatroom-container__message">
+                <slot
+                  v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
+                  name="message-custom"
+                  :message="item"
+                />
+                <slot v-else name="message-item" :message="item">
+                  <ChatroomMessageItem :message="item as UiMessage" />
+                </slot>
+              </div>
+            </template>
+          </VirtualList>
+          <slot v-else name="empty" :status="status">
+            <div class="chatroom-container__empty">
+              {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
+            </div>
+          </slot>
+          <div v-if="terminalView" class="chatroom-container__terminal">
+            <div class="chatroom-container__terminal-text">
+              {{ terminalView.text }}
+            </div>
+            <button class="chatroom-container__terminal-btn" @click="handleExit">
+              {{ t('chatroom.ui.exit') }}
+            </button>
+          </div>
+        </div>
+        <div class="chatroom-container__input-row">
+          <slot v-if="features.gift" name="gift-bar" :disabled="inputDisabled">
+            <ChatroomGiftBar :disabled="inputDisabled" :popup-mode="popupMode" />
+          </slot>
+          <slot name="input-bar" :disabled="inputDisabled">
+            <ChatroomInputBar
+              ref="inputBarRef"
+              :disabled="inputDisabled"
+              :disabled-hint="inputDisabledHint"
+              :multiline="inputMultiline"
+              :popup-mode="popupMode"
+              @send="handleSend"
+              @send-image="handleSendImage"
+            />
+          </slot>
+        </div>
+      </template>
+
+      <!-- 成员侧栏（scene memberList: 'panel' 且宽视口；可整体覆盖） -->
+      <template v-if="showMemberSidebar" #members>
+        <slot name="member-sidebar">
+          <ChatroomMemberSidebar
+            :mute-all-enabled="features.muteAll === true"
+            :management="managementFeatures"
+          />
+        </slot>
+      </template>
+    </ChatroomSplitLayout>
+
+    <!-- H5 全屏形态（scene layout fullscreen/auto 窄视口；与 split 主栏内容保持同步） -->
+    <template v-else>
+      <!-- 麦位栏（P3：features.micQueue 开启时渲染，可整体覆盖；默认内置 MicQueue） -->
+      <slot v-if="features.micQueue" name="mic-queue">
+        <ChatroomMicQueue />
       </slot>
-      <!-- 输入条（可整体覆盖；ref 供发送失败回填） -->
-      <slot name="input-bar" :disabled="inputDisabled">
-        <ChatroomInputBar
-          ref="inputBarRef"
-          :disabled="inputDisabled"
-          :disabled-hint="inputDisabledHint"
-          @send="handleSend"
-          @send-image="handleSendImage"
+
+      <!-- 公告条（场景配置开启时展示；owner/admin 可编辑，P3） -->
+      <slot v-if="announcementEnabled" name="notice" :content="announcement">
+        <ChatroomNoticeBanner
+          :content="announcement"
+          :editable="canManage"
+          @edit="openAnnouncementEditor"
         />
       </slot>
-    </div>
+
+      <!-- 消息区（直播场景 messageArea 限高 + 透明，弹幕叠加在画面上，P4 review 需求 1） -->
+      <div
+        class="chatroom-container__list"
+        :class="{ 'chatroom-container__list--transparent': messageAreaTransparent }"
+        :style="messageAreaStyle"
+      >
+        <button
+          v-if="historyHasMore && isJoined"
+          class="chatroom-container__load-more"
+          :disabled="loadingHistory"
+          @click="handleLoadMore"
+        >
+          {{ loadingHistory ? t('chatroom.ui.loading') : t('chatroom.ui.loadMore') }}
+        </button>
+
+        <!-- 消息流：虚拟滚动（P4 review 需求 5：大体量消息性能；只渲染可视区+缓冲行） -->
+        <VirtualList
+          v-if="visibleMessages.length > 0"
+          ref="virtualListRef"
+          class="chatroom-container__virtual"
+          :items="visibleMessages"
+          :estimate-height="56"
+          :item-key="messageListKey"
+          @scroll="handleListScroll"
+        >
+          <template #item="{ item }">
+            <div class="chatroom-container__message">
+              <!-- custom 消息：业务 message-custom 插槽优先，否则回落消息项兜底渲染 -->
+              <slot
+                v-if="$slots['message-custom'] && isCustomMessage(item as UiMessage)"
+                name="message-custom"
+                :message="item"
+              />
+              <slot v-else name="message-item" :message="item">
+                <ChatroomMessageItem :message="item as UiMessage" />
+              </slot>
+            </div>
+          </template>
+        </VirtualList>
+
+        <!-- 空态（未进房/暂无消息） -->
+        <slot v-else name="empty" :status="status">
+          <div class="chatroom-container__empty">
+            {{ status === IDLE ? t('chatroom.ui.notJoined') : t('chatroom.ui.empty') }}
+          </div>
+        </slot>
+
+        <!-- 终态（被踢/解散）提示 -->
+        <div v-if="terminalView" class="chatroom-container__terminal">
+          <div class="chatroom-container__terminal-text">
+            {{ terminalView.text }}
+          </div>
+          <button class="chatroom-container__terminal-btn" @click="handleExit">
+            {{ t('chatroom.ui.exit') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 底部操作行（P4 review 需求 4）：[礼物按钮] [输入条] 同行；礼物在输入条左侧 -->
+      <div class="chatroom-container__input-row">
+        <slot v-if="features.gift" name="gift-bar" :disabled="inputDisabled">
+          <ChatroomGiftBar :disabled="inputDisabled" :popup-mode="popupMode" />
+        </slot>
+        <!-- 输入条（可整体覆盖；ref 供发送失败回填） -->
+        <slot name="input-bar" :disabled="inputDisabled">
+          <ChatroomInputBar
+            ref="inputBarRef"
+            :disabled="inputDisabled"
+            :disabled-hint="inputDisabledHint"
+            :multiline="inputMultiline"
+            :popup-mode="popupMode"
+            @send="handleSend"
+            @send-image="handleSendImage"
+          />
+        </slot>
+      </div>
+    </template>
 
     <!-- 成员面板（可整体覆盖；场景配置 memberList !== 'none' 时可用；
          mute-all-enabled 由场景 features.muteAll 驱动，P3） -->
@@ -490,6 +644,7 @@ defineExpose({
       <ChatroomMemberPanel
         v-model:show="showMemberPanel"
         :mute-all-enabled="features.muteAll === true"
+        :popup-mode="popupMode"
       >
         <template v-if="$slots['member-item']" #item="slotProps">
           <slot name="member-item" v-bind="slotProps" />
@@ -548,6 +703,17 @@ defineExpose({
   flex-shrink: 0;
   padding-left: 12px;
   background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
+}
+
+/* 管理位操作条（P5 PC 模式）：owner/admin 可见，业务注入操作台入口 */
+.chatroom-container__manage-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: var(--uikit-bg-elevated, var(--uikit-bg-base, #fff));
+  border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
 }
 
 .chatroom-container__input-row > :deep(.chatroom-input-bar) {

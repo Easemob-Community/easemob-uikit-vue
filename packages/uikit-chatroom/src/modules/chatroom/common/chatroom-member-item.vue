@@ -2,6 +2,10 @@
 /**
  * 聊天室成员项：头像 + 昵称 + 角色徽章（房主/管理员）+ 禁言标记。
  * 点击触发 manage 事件（成员面板弹操作菜单）；Avatar 形状跟随主题（不硬编码 shape）。
+ *
+ * PC 管理位（P5）：提供 #manage-actions 插槽——业务/侧栏注入悬停快捷操作
+ * （禁言/移除等），仅在有插槽且处于 hover 能力设备时显示
+ * （@media (hover: hover) 包裹，移动端 tap 不粘住）。
  */
 import { computed } from 'vue'
 import { EmAvatar, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
@@ -21,8 +25,8 @@ const props = withDefaults(defineProps<ChatroomMemberItemProps>(), {
 })
 
 const emit = defineEmits<{
-  /** 点击成员（manageable 时由面板弹操作菜单） */
-  (e: 'manage', member: ChatroomMember): void
+  /** 点击成员（manageable 时由面板/侧栏弹操作菜单；携带点击事件供定位） */
+  (e: 'manage', member: ChatroomMember, event: MouseEvent): void
 }>()
 
 // 只消费公开 composable 契约（§5.10：禁止直取 store，P2 review P1-1）
@@ -47,7 +51,7 @@ const isMuted = computed(() =>
   <div
     class="chatroom-member-item"
     :class="{ 'chatroom-member-item--manageable': manageable }"
-    @click="manageable && emit('manage', member)"
+    @click="manageable && emit('manage', member, $event)"
   >
     <EmAvatar :src="avatarUrl || undefined" :name="displayName" :size="36" />
     <span class="chatroom-member-item__name">
@@ -57,6 +61,10 @@ const isMuted = computed(() =>
     <span v-if="roleBadge" class="chatroom-member-item__badge" :class="`chatroom-member-item__badge--${member.role}`">
       {{ roleBadge }}
     </span>
+    <!-- PC 悬停快捷操作（P5：仅 hover 能力设备显示；内容由业务/侧栏注入） -->
+    <div v-if="$slots['manage-actions']" class="chatroom-member-item__actions" @click.stop>
+      <slot name="manage-actions" :member="member" />
+    </div>
   </div>
 </template>
 
@@ -106,5 +114,19 @@ const isMuted = computed(() =>
 .chatroom-member-item__badge--admin {
   color: var(--uikit-primary-color);
   border: 1px solid currentColor;
+}
+
+/* PC 悬停快捷操作：默认隐藏，hover 能力设备上悬停成员项时显示 */
+.chatroom-member-item__actions {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (hover: hover) {
+  .chatroom-member-item:hover .chatroom-member-item__actions {
+    display: flex;
+  }
 }
 </style>

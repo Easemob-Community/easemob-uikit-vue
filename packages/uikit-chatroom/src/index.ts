@@ -80,7 +80,17 @@ export {
   VOICE_ROOM_SCENE,
   CLASS_ROOM_SCENE,
 } from './composables/use-chatroom-scene'
-export type { ChatroomSceneConfig } from './composables/use-chatroom-scene'
+export type {
+  ChatroomSceneConfig,
+  ChatroomManagementFeature,
+  ChatroomSplitPanels,
+  ChatroomPopupModeValue,
+} from './composables/use-chatroom-scene'
+// PC 模式（P5）：布局解析 + 弹层形态解析
+export { useChatroomLayout } from './composables/use-chatroom-layout'
+export type { ChatroomLayoutValue, ChatroomLayoutResolveValue } from './composables/use-chatroom-layout'
+export { useChatroomPopupMode } from './composables/use-chatroom-popup-mode'
+export type { ChatroomPopupModeResolvedValue } from './composables/use-chatroom-popup-mode'
 export {
   useChatroomProvider,
   resolveChatroomClientConfig,
@@ -105,12 +115,30 @@ export {
   ChatroomLiveTopBar,
   ChatroomLiveDanmakuStream,
   ChatroomLiveWelcomeBanner,
-  ChatroomLiveProductCard,
+  ChatroomLiveInteractiveCard,
+  ChatroomLiveOverlayManager,
+  ChatroomLiveFullscreenEffect,
   ChatroomLiveInputBar,
   ChatroomLiveLotteryEntry,
   maskUsername,
+  CHAT_KINDS,
+  isChatKind,
+  isNotificationKind,
+  NOTIFICATION_KINDS,
 } from './modules/chatroom'
-export type { LiveDanmakuItem, LiveProduct } from './modules/chatroom'
+export type { LiveDanmakuItem, LiveDanmakuKind, LiveDanmakuStreamProps, LiveOverlayAnchor, LiveOverlayItem, LiveFullscreenEffectItem } from './modules/chatroom'
+// PC 模式 UI（P5）：split 分栏布局 / 成员常驻侧栏 / 上下文菜单
+export {
+  ChatroomSplitLayout,
+  ChatroomMemberSidebar,
+  ChatroomContextMenu,
+} from './modules/chatroom'
+export type {
+  ChatroomSplitLayoutProps,
+  ChatroomMemberSidebarProps,
+  ChatroomContextMenuItem,
+  ChatroomContextMenuProps,
+} from './modules/chatroom'
 // 信令房透传/状态 payload（P3 多房间订阅，§5.9）
 export type { SignalMessagePayload, SignalStatusPayload } from './sdk/event/chatroom-events'
 

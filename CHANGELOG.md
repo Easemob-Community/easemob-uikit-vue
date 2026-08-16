@@ -509,6 +509,44 @@
 
 ---
 
+## @easemob/uikit-chatroom 0.2.0 (2026-08-15)
+
+### 新增
+
+- **PC 模式与角色能力（P5 增量，设计文档 §11）**——角色不内置，UIKit 权限面天花板 =
+  SDK 原生权限（owner/admin/member/none），业务角色由应用层抽象：
+  - **权限原语上提**：`useChatroomMember.canManageMember(target)`——「当前用户能否管理
+    目标成员」判定（不能管房主/自己、admin 只能由 owner 管理）从成员面板内嵌上提为公开
+    API，成员面板改复用（单一实现）；
+  - **split 分栏布局实现**（scene `layout: 'fullscreen' | 'split' | 'auto'`，`fullscreen`
+    缺省向后兼容；auto 按视口 <768px 选择）：新 `ChatroomSplitLayout`（三栏
+    [舞台 `#stage` | 消息主栏 | 成员侧栏]，成员栏可拖拽 200~480px）+ 容器 split 分支
+    （`#stage` 插槽、成员侧栏、窄视口退化 H5 弹层）；
+  - **管理位**：容器新 `manage-actions` 插槽（`canManage` 门控，业务注入操作台入口）+
+    scene `features.management` 开关组（mute/kick/muteAll/announcement/blocklist/admin）；
+  - **PC 交互**：新 `ChatroomContextMenu`（右键/点击菜单：视口翻转/外部点击/Esc 关闭）、
+    新 `ChatroomMemberSidebar`（成员/黑名单 tab + 分页 + 行悬停快捷操作 + 右键菜单 +
+    危险操作居中确认）、成员项 `#manage-actions` 悬停插槽（`@media (hover:hover)` 包裹）、
+    `popupMode` 弹层退化（成员/礼物/表情面板宽视口 sheet→dialog，`useChatroomPopupMode`）、
+    输入条多行（textarea + Shift+Enter 换行，scene `features.multilineInput`）、
+    Esc 关闭弹层（scene `features.keyboard`）；
+  - **新 composables**：`useChatroomLayout`（布局解析）、`useChatroomPopupMode`（弹层形态）；
+  - **Demo 验收**：`apps/demo-chatroom` 新增 `src/demo-role.ts`（业务角色抽象参考实现：
+    主播=owner / 场控=admin / 观众=member；老师=owner / 学生=member）+ 宽屏路由
+    `#/pc-live`（开播端三栏 + 管理位 + 信令房双房商品链路）与 `#/pc-class`（双端角色
+    切换），PC 路由不套 375px 手机壳（全窗口渲染）；
+  - **文档**：docs「权限模型与业务角色」页（权限矩阵 + 角色抽象指南 + 名单存房间属性建议）、
+    quickstart PC 接入段、PC 组件页；设计文档 §11「PC 模式与角色边界」决策落盘。
+
+### 变更
+
+- `ChatroomMemberItem` manage 事件携带点击事件（`(member, event)`，供 PC 菜单定位；
+  组件为模块内部实现，不对外导出，事件签名变更无外部影响）；
+- `ChatroomMemberPanel` / `ChatroomGiftBar` / `ChatroomInputBar` 新增 `popupMode` prop
+  （缺省 sheet，行为不变）。
+
+---
+
 ## @easemob/uikit-chatroom 0.1.0 (2026-08-15)
 
 ### 新增

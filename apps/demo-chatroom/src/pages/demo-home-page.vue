@@ -53,6 +53,20 @@ const entries = [
     desc: '无容器接入：自绘弹幕轨道 + 礼物飘屏，纯 composable 驱动同一内核',
     tag: '§5.10 headless',
   },
+  {
+    route: 'pc-live',
+    icon: '🖥️',
+    title: 'PC 私域直播（开播端）',
+    desc: 'split 三栏：舞台 + 消息 + 成员侧栏（悬停管理/右键菜单）；管理位插槽 + 信令房双房',
+    tag: 'P5 split 布局',
+  },
+  {
+    route: 'pc-class',
+    icon: '🏫',
+    title: 'PC 小班课（双端）',
+    desc: '老师/学生同房不同界面：业务角色抽象（demo 层）驱动管理位显隐，权限仍以服务端为准',
+    tag: 'P5 角色抽象',
+  },
 ]
 
 function go(route: string) {
@@ -80,7 +94,7 @@ async function handleLogout() {
     </div>
 
     <div class="home-page__subtitle">
-      <span>同一个 EmChatroomContainer 内核，五种消费形态——全部仅靠 preset config + 插槽</span>
+      <span>同一个 EmChatroomContainer 内核，七种消费形态——全部仅靠 preset config + 插槽</span>
       <span class="home-page__theme">
         <button
           v-for="option in THEME_OPTIONS"
@@ -112,7 +126,7 @@ async function handleLogout() {
     </div>
 
     <div class="home-page__footer">
-      H5-first · 375px 移动视口 · 双账号（hfp / pfh）联调麦位 / 礼物 / 管理
+      H5-first · 375px 移动视口 · PC 路由（#/pc-live #/pc-class）全窗口 split 布局 · 双账号（hfp / pfh）联调
     </div>
   </div>
 </template>

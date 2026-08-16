@@ -76,6 +76,8 @@ const zhCN: LocaleMessages = {
   'chatroom.ui.liveMemberBenefit': '会员福利',
   'chatroom.ui.liveGrab': '抢',
   'chatroom.ui.liveInputPlaceholder': '说点什么吧~',
+  'chatroom.ui.liveSendTooFast': '发送太快啦，请 {0} 秒后再试',
+  'chatroom.ui.liveBlockedWord': '包含敏感词「{0}」，请修改后发送',
   'chatroom.ui.liveShare': '分享',
   'chatroom.ui.liveLike': '点赞',
   'chatroom.ui.liveLottery': '评论抽奖',
@@ -91,6 +93,13 @@ const zhCN: LocaleMessages = {
   'chatroom.ui.unblock': '移出黑名单',
   'chatroom.ui.muteAllAction': '全员禁言',
   'chatroom.ui.unmuteAllAction': '解除全员禁言',
+  // PC 管理位（P5）：成员行悬停快捷操作 / 右键菜单 / 确认弹窗
+  'chatroom.ui.muteShort': '禁言',
+  'chatroom.ui.kickShort': '移除',
+  'chatroom.ui.cancel': '取消',
+  'chatroom.ui.confirm': '确认',
+  'chatroom.ui.confirmKick': '确认将 {name} 移出聊天室？',
+  'chatroom.ui.confirmRemoveAdmin': '确认移除 {name} 的管理员身份？',
 }
 
 export default zhCN

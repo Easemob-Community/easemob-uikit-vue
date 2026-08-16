@@ -10,6 +10,7 @@ import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob/
 import type { ActionSheetItem } from '@easemob/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
+import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'
 import { useChatroom } from '../../../composables/use-chatroom'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'
 import type { ChatroomMember } from '../../../sdk/domain/chatroom-domain'
@@ -20,6 +21,8 @@ export interface ChatroomMemberPanelProps {
   show: boolean
   /** 是否展示全员禁言入口（场景 features.muteAll 驱动，P3） */
   muteAllEnabled?: boolean
+  /** 弹层形态（P5 PC 模式：sheet 底部弹层 / dialog 居中弹窗；容器按场景 popupMode 解析传入） */
+  popupMode?: ChatroomPopupModeResolvedValue
 }
 
 export interface ChatroomMemberPanelEmits {
@@ -28,6 +31,7 @@ export interface ChatroomMemberPanelEmits {
 
 const props = withDefaults(defineProps<ChatroomMemberPanelProps>(), {
   muteAllEnabled: false,
+  popupMode: 'sheet',
 })
 const emit = defineEmits<ChatroomMemberPanelEmits>()
 
@@ -40,6 +44,7 @@ const {
   muteList,
   isOwner,
   canManage,
+  canManageMember,
   loadMembers,
   refreshMuteList,
   muteMembers,
@@ -76,21 +81,8 @@ watch(() => props.show, (show) => {
   }
 })
 
-/** 目标成员是否可被当前用户管理 */
-const targetManageable = computed(() => {
-  const target = targetMember.value
-  if (!target || !canManage.value)
-    return false
-  // 不能管理房主与自己
-  if (target.role === CHATROOM_MEMBER_ROLE.OWNER)
-    return false
-  if (target.userId === selfId.value)
-    return false
-  // 管理员只能由房主管理
-  if (target.role === CHATROOM_MEMBER_ROLE.ADMIN && !isOwner.value)
-    return false
-  return true
-})
+/** 目标成员是否可被当前用户管理（判定统一走公开原语 canManageMember，P5） */
+const targetManageable = computed(() => canManageMember(targetMember.value))
 
 /** 目标成员是否在禁言名单中（归一化比较） */
 const targetMuteState = computed(() => {
@@ -203,9 +195,10 @@ function handleToggleMuteAll() {
   <EmPopup
     :to="getChatroomPopupTarget() ?? undefined"
     :show="props.show"
-    position="bottom"
+    :position="props.popupMode === 'dialog' ? 'center' : 'bottom'"
     :close-on-click-overlay="true"
     class="chatroom-member-panel"
+    :class="{ 'chatroom-member-panel--dialog': props.popupMode === 'dialog' }"
     @update:show="emit('update:show', $event)"
   >
     <div class="chatroom-member-panel__header">
@@ -290,6 +283,13 @@ function handleToggleMuteAll() {
 .chatroom-member-panel {
   border-radius: 12px 12px 0 0;
   overflow: hidden;
+}
+
+/* PC 居中弹窗形态（P5：popupMode dialog） */
+.chatroom-member-panel--dialog {
+  width: 360px;
+  max-height: 70vh;
+  border-radius: 12px;
 }
 
 .chatroom-member-panel__header {

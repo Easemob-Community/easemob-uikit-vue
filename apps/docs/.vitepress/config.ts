@@ -143,7 +143,8 @@ export default defineConfig({
               text: '指南',
               items: [
                 { text: '双 UIKit 架构', link: '/chatroom/guide/architecture' },
-                { text: '快速开始（建设中）', link: '/chatroom/guide/quickstart' },
+                { text: '快速开始', link: '/chatroom/guide/quickstart' },
+                { text: '权限模型与业务角色', link: '/chatroom/guide/permissions-roles' },
               ],
             },
           ],
@@ -152,6 +153,7 @@ export default defineConfig({
               text: '组件',
               items: [
                 { text: 'ChatroomContainer 聊天室容器（规划中）', link: '/chatroom/components/chatroom-container' },
+                { text: 'PC 模式组件（split / 成员侧栏 / 右键菜单）', link: '/chatroom/components/pc-mode-components' },
               ],
             },
           ],

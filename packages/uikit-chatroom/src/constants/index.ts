@@ -61,12 +61,13 @@ export const CHATROOM_MESSAGE_DEFAULTS = {
 
 /**
  * 房间属性 key 场景前缀约定：变种之间共用房间 KV 命名空间，
- * key 必须加场景前缀防冲突（如 `live:productId` / `voice:micQueue`，见设计文档 5.6）。
+ * key 必须加场景前缀防冲突（websdk 属性 key 不支持冒号，故用下划线分隔，
+ * 如 `live_productId` / `voice_micQueue`，见设计文档 5.6）。
  */
 export const CHATROOM_ATTR_PREFIX = {
-  LIVE: 'live:',
-  VOICE: 'voice:',
-  CLASS: 'class:',
+  LIVE: 'live_',
+  VOICE: 'voice_',
+  CLASS: 'class_',
 } as const
 
 export type ChatroomAttrPrefixValue =
