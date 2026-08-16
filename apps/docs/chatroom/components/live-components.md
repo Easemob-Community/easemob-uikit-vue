@@ -21,6 +21,12 @@
 </ChatroomLiveTopBar>
 ```
 
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| `#extra` | — | 右侧动作区（更多 / 投诉按钮之后）：分享 / 关注 / 在线数等业务动作 |
+
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-top-bar.md -->
 
 ## ChatroomLiveInputBar 直播间输入条
@@ -35,11 +41,19 @@
   :block-words="['脏话']"
   @send="sendText"
 >
-  <template #actions>
-    <button @click="openGift">🎁</button>
+  <template #actions="{ text, send, canSend }">
+    <button :disabled="!canSend" @click="send()">🎁 礼物</button>
   </template>
 </ChatroomLiveInputBar>
 ```
+
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| `#quick-phrases` | `{ phrases, send }` | 快捷短语区整块覆盖（内置短语按钮 → 自定义布局） |
+| `#actions` | `{ text, send, can-send }` | 输入框右侧动作区（礼物 / 菜单 / 分享 / 点赞） |
+| `#panels` | — | 底部弹层面板区（礼物面板 / 表情面板等，显示逻辑业务自理） |
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-input-bar.md -->
 
@@ -62,12 +76,24 @@
 
 ```vue
 <ChatroomLiveInteractiveCard :active="true" :sold-out="false" @action="buy">
-  <template #content>
-    <img src="./sku.png" />
+  <template #title>
     <b>限时 5 折</b>
+  </template>
+  <img src="./sku.png" />
+  <template #footer="{ action }">
+    <button @click="action">立即抢购</button>
   </template>
 </ChatroomLiveInteractiveCard>
 ```
+
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| `#title` | — | 卡片标题区（默认空） |
+| `#close` | — | 关闭按钮（默认内置 ✕，点击派发 `close` 事件） |
+| 默认插槽 | — | 卡片主体内容（商品图 / 文案 / 优惠券面值等） |
+| `#footer` | `{ action }` | 底部行动区（默认空；`action` 触发 `action` 事件） |
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-interactive-card.md -->
 
@@ -77,12 +103,21 @@
 `bottom-right`（右下交互卡片堆叠），内容完全插槽化。
 
 ```vue
-<ChatroomLiveOverlayManager>
-  <template #bottom-right="{ item }">
-    <ChatroomLiveInteractiveCard v-if="item.kind === 'product'" ... />
+<ChatroomLiveOverlayManager :items="overlayItems">
+  <!-- 锚定区条目（top 与 bottom-right 共用 #item，条目带 zone 区分） -->
+  <template #item="{ item, close }">
+    <ChatroomLiveInteractiveCard v-if="item.kind === 'product'" @close="close">
+      ...
+    </ChatroomLiveInteractiveCard>
   </template>
 </ChatroomLiveOverlayManager>
 ```
+
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| `#item` | `{ item, close }` | 浮动条目渲染（top 公告与 bottom-right 卡片共用；`close` 移除条目并触发回调） |
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-overlay-manager.md -->
 
@@ -90,6 +125,21 @@
 
 大礼物 / 全屏公告 / PK 胜利的强提示容器：全屏 overlay、入场/退场动画、
 自动移除、队列消费，内容插槽自定义（火箭 / 跑车 / SVG / Lottie）。
+
+```vue
+<ChatroomLiveFullscreenEffect :items="effects">
+  <!-- 默认插槽：当前播放条目（item 为当前队列项，end 提前结束进入下一条） -->
+  <template #default="{ item, end }">
+    <RocketAnimation v-if="item.kind === 'rocket'" @done="end" />
+  </template>
+</ChatroomLiveFullscreenEffect>
+```
+
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| 默认插槽 | `{ item, end }` | 全屏内容渲染（`item` 为当前队列项；`end` 提前结束当前条进入下一条） |
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-fullscreen-effect.md -->
 

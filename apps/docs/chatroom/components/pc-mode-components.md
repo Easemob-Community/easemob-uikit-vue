@@ -23,6 +23,14 @@
 </ChatroomSplitLayout>
 ```
 
+**插槽：**
+
+| 插槽 | scope | 说明 |
+| --- | --- | --- |
+| `#stage` | — | 舞台区（视频 / 白板 / 商品区）；未提供时自动两栏（消息 + 成员） |
+| 默认插槽 | — | 消息主栏内容 |
+| `#members` | — | 成员侧栏内容（通常放 `ChatroomMemberSidebar`） |
+
 ## ChatroomMemberSidebar 成员侧栏
 
 split 布局下的常驻成员列（与 H5 底部弹层面板并列的 PC 原生形态）：

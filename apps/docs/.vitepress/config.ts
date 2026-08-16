@@ -27,7 +27,7 @@ export default defineConfig({
    *
    * - root      → 单群聊 UIKit（@easemob/uikit-im）文档（既有文档，URL 无前缀）
    * - chatroom  → 聊天室 UIKit（@easemob/uikit-chatroom）文档（URL 前缀 /chatroom/，
-   *               骨架占位，随开发推进补齐）
+   *               指南 + 组件页 + 自动生成 API 表格，1.0.0 起完整落地）
    *
    * 顶部标题旁的自定义切换器（.vitepress/theme/components/UiKitDocsSwitcher.vue）负责两树切换；
    * 桌面端默认的「语言」下拉已隐藏（theme/style.css），移动端菜单内的切换入口保留。

@@ -76,6 +76,45 @@ interface ChatroomSceneConfig {
 | `terminal` | `{ status, kicked, destroyed, on-exit }` | 被踢/解散提示 | 终态视图 |
 | `announcement-editor` | `{ show, content, save, close }` | 内置编辑弹窗 | 公告编辑弹窗 |
 
+## 常用插槽组合（直播带货页示例）
+
+把容器改造成私域直播带货页：管理位上架商品、成员列表项插徽章、礼物栏换业务面板、
+被踢/解散走自定义终态：
+
+```vue
+<EmChatroomContainer room-id="r1" scene="live">
+  <!-- 管理位：按 canManage 门控（owner/admin 可见），上架商品入口 -->
+  <template #manage-actions="{ canManage }">
+    <button v-if="canManage" @click="publishProduct">上架商品</button>
+  </template>
+
+  <!-- 成员列表项：插入角色徽章（scope 透传自成员面板：{ member, manageable }） -->
+  <template #member-item="{ member }">
+    <div class="my-member">
+      <span>{{ member.nickname }}</span>
+      <span v-if="member.role !== 'member'" class="badge">{{ member.role }}</span>
+    </div>
+  </template>
+
+  <!-- 礼物栏：接入自有礼物面板 -->
+  <template #gift-bar="{ disabled }">
+    <button :disabled="disabled" @click="openMyGiftPanel">🎁 我的礼物</button>
+  </template>
+
+  <!-- 输入条：整条替换为业务输入（发送走 useChatroomMessage().sendText） -->
+  <template #input-bar>
+    <MyDanmakuInput @send="(text) => sendText(text)" />
+  </template>
+
+  <!-- 被踢/解散终态：自定义视图 + 退出动作 -->
+  <template #terminal="{ kicked, destroyed, onExit }">
+    <MyTerminalView :kicked="kicked" :destroyed="destroyed" @exit="onExit" />
+  </template>
+</EmChatroomContainer>
+```
+
+> 原则：插槽优先于 config——能覆盖的边界全部开槽，无需 fork 容器。
+
 ## 隐藏 / 重写 header
 
 接入方自绘导航头（如直播间顶部栏）时，容器内置 `ChatroomHeader`（返回 + 房间名 + 人数 + 退出）
