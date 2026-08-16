@@ -27,7 +27,9 @@ import { ChatroomGiftBar } from '@easemob/uikit-chatroom'
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-gift-bar.md -->
+:::
 
 ## 相关文档
 

@@ -35,7 +35,9 @@ function onMemberJoined(payload: { members: Array<{ nickname?: string }> }) {
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-welcome-banner.md -->
+:::
 
 ## 相关文档
 

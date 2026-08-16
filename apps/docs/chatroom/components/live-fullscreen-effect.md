@@ -34,7 +34,9 @@ const effects = ref<LiveFullscreenEffectItem[]>([])
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-fullscreen-effect.md -->
+:::
 
 ## 插槽说明
 

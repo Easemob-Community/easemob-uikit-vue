@@ -3,14 +3,14 @@
 
 ### Props
 
-| 属性              | 类型        | 默认值              | 说明                               |
+| 属性              | 类型        | 默认值                                  | 说明                                               |
 | --- | --- | --- | --- |
-| active          | `boolean` | `true`           | 激活态（金色呼吸灯边框）                     |
-| soldOut         | `boolean` | `false`          | 已抢光/已领完遮罩                        |
-| closable        | `boolean` | `true`           | 是否显示右上角关闭（false = 常驻，用户无法关闭）     |
-| soldOutText     | `string`  | `''`             | 已售罄/已结束文案                        |
-| autoCloseMs     | `number`  | —                | 自动关闭倒计时（毫秒），到达后触发 close；常用于抢购倒计时 |
-| countdownFormat | `string`  | `'{{seconds}}s'` | 倒计时文案格式（{{seconds}} 为剩余秒数占位）     |
+| active          | `boolean` | `true`                               | 激活态（金色呼吸灯边框）                                     |
+| soldOut         | `boolean` | `false`                              | 已抢光/已领完遮罩                                        |
+| closable        | `boolean` | `true`                               | 是否显示右上角关闭（false = 常驻，用户无法关闭）                     |
+| soldOutText     | `string`  | `''`                                 | 已售罄/已结束文案                                        |
+| autoCloseMs     | `number`  | —                                    | 自动关闭倒计时（毫秒），到达后触发 close；常用于抢购倒计时                 |
+| countdownFormat | `string`  | `'&#123;&#123;seconds&#125;&#125;s'` | 倒计时文案格式（&#123;&#123;seconds&#125;&#125; 为剩余秒数占位） |
 
 ### Events
 

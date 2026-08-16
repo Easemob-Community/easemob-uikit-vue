@@ -25,7 +25,9 @@ useChatroomProvider({ appKey: 'orgName#appName' })
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-container.md -->
+:::
 
 > 插槽 scope 与默认内容见下方「插槽说明」表（gen 表仅列插槽名）。
 

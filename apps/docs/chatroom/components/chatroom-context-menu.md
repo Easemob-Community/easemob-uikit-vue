@@ -55,7 +55,9 @@ function handleSelect(item: { label: string }) {
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-context-menu.md -->
+:::
 
 ## 相关文档
 

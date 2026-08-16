@@ -35,7 +35,9 @@ function sendText(text: string) { /* 发送（useChatroomMessage().sendText） *
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-input-bar.md -->
+:::
 
 ## 插槽说明
 
@@ -72,7 +74,7 @@ function sendText(text: string) { /* 发送（useChatroomMessage().sendText） *
 :::
 
 - **注入方式**：`block-words` prop 传入词库（大小写不敏感），`block-hint` 自定义提示
-  （`&#123;&#123;word&#125;&#125;` 占位命中词），命中派发 `block` 事件（业务可上报服务端二次审核）；
+  （`word` 为命中词占位），命中派发 `block` 事件（业务可上报服务端二次审核）；
 - **乐观模式**：`optimistic` 为 true 时跳过客户端拦截 / 节流 / 敏感词检查，直接 emit send，
   由业务 / 服务端兜底（适合已做服务端审核的场景）；
 - **设计方向（D102，尚未实施）**：core 引入 AC 自动机引擎（大词库 O(n) 匹配 + 字符归一化

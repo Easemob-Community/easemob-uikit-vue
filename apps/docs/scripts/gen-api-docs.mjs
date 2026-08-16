@@ -183,9 +183,15 @@ function getDocLines(node) {
     .filter(Boolean)
 }
 
-/** 转义说明文本中的 `<`，避免 `Promise<false>` 之类被 markdown-it 误判为 HTML 标签 */
+/**
+ * 转义说明文本中的 `<`（避免 `Promise<false>` 之类被 markdown-it 误判为 HTML 标签），
+ * 并转义双花括号占位符（{{word}} 等——页面处于 Vue 模板环境，见 escapeCell 注释）。
+ */
 function escapeDocHtml(text) {
-  return text.replace(/</g, '&lt;')
+  return text
+    .replace(/</g, '&lt;')
+    .replace(/\{\{/g, '&#123;&#123;')
+    .replace(/\}\}/g, '&#125;&#125;')
 }
 
 /**
@@ -202,11 +208,18 @@ function getDocFirstLine(node) {
   return escapeDocHtml(first)
 }
 
-/** 转义 markdown 表格单元格内容 */
+/**
+ * 转义 markdown 表格单元格内容。
+ * 双花括号转义为 HTML 实体：gen 表格经页面 @include 后处于 Vue 模板环境，
+ * JSDoc 占位符（如 {{remaining}} / {{word}} / {{seconds}}）若不转义会被当插值
+ * 编译（渲染警告 + 文本被吞），实体在浏览器渲染回原文。
+ */
 function escapeCell(text) {
   return String(text)
     .replace(/\|/g, '\\|')
     .replace(/\n/g, '<br>')
+    .replace(/\{\{/g, '&#123;&#123;')
+    .replace(/\}\}/g, '&#125;&#125;')
 }
 
 /** 格式化类型文本：压缩多行、避免超长 */

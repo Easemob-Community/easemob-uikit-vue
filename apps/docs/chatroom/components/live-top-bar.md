@@ -28,7 +28,9 @@ import { ChatroomLiveTopBar } from '@easemob/uikit-chatroom'
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-top-bar.md -->
+:::
 
 ## 插槽说明
 

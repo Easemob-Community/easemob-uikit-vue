@@ -36,7 +36,9 @@ import { ChatroomSplitLayout, ChatroomMemberSidebar } from '@easemob/uikit-chatr
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-split-layout.md -->
+:::
 
 ## 插槽说明
 

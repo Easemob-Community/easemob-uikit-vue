@@ -36,7 +36,9 @@ function pushDanmaku(item: Omit<LiveDanmakuItem, 'id'>) {
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-danmaku-stream.md -->
+:::
 
 > 插槽 scope 见下方「插槽」表（gen 表仅列插槽名）。
 

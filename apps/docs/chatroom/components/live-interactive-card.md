@@ -34,7 +34,9 @@ import { ChatroomLiveInteractiveCard } from '@easemob/uikit-chatroom'
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-interactive-card.md -->
+:::
 
 ## 插槽说明
 

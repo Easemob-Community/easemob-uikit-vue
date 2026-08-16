@@ -35,7 +35,9 @@ const overlayItems = ref<LiveOverlayItem[]>([])
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-overlay-manager.md -->
+:::
 
 ## 插槽说明
 

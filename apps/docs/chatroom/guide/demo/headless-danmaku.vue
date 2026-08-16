@@ -18,46 +18,59 @@ const NAMES = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve']
 const COMMENTS = ['主播好棒！', '666', '这个商品不错', '哈哈哈', '来了来了', '蹲一个优惠']
 const COLORS = ['#7dd3fc', '#fbbf24', '#f472b6', '#86efac', '#c4b5fd']
 
-/** 轨道可见区（最多同时显示 6 条，旧的向上滑出被裁掉） */
 const lanes = ref<Danmaku[]>([])
+const maxLanes = 4
 let seq = 0
+let buffer: Danmaku[] = []
+let rafId = 0
+let sourceTimer: ReturnType<typeof setInterval> | undefined
 
-/** 模拟消息源：每 900ms 产生 1~3 条（一批） */
-const sourceTimer = setInterval(() => {
-  const batchCount = 1 + Math.floor(Math.random() * 3)
-  for (let i = 0; i < batchCount; i++) {
-    const id = ++seq
-    lanes.value = [
-      ...lanes.value,
-      {
-        id,
-        name: NAMES[id % NAMES.length],
-        content: COMMENTS[Math.floor(Math.random() * COMMENTS.length)],
-        color: COLORS[id % COLORS.length],
-      },
-    ]
-  }
-  // 轨道封顶：保留最近 24 条（丢弃中间帧由业务决定——此处为演示轨道滑动）
-  if (lanes.value.length > 24)
-    lanes.value = lanes.value.slice(-24)
-}, 900)
+/** 模拟消息源：随机产生一条弹幕 */
+function produce() {
+  buffer.push({
+    id: ++seq,
+    name: NAMES[seq % NAMES.length],
+    content: COMMENTS[Math.floor(Math.random() * COMMENTS.length)],
+    color: COLORS[seq % COLORS.length],
+  })
+}
 
-onUnmounted(() => clearInterval(sourceTimer))
+/** 消费端：按帧批量 flush（对应 subscribe 回调），增量追加 + 轨道滑动 */
+function flush() {
+  if (buffer.length === 0)
+    return
+  const batch = buffer
+  buffer = []
+  lanes.value = [...lanes.value, ...batch].slice(-maxLanes * 6)
+}
+
+function tick() {
+  flush()
+  rafId = requestAnimationFrame(tick)
+}
+
+sourceTimer = setInterval(produce, 900)
+rafId = requestAnimationFrame(tick)
+
+onUnmounted(() => {
+  clearInterval(sourceTimer)
+  cancelAnimationFrame(rafId)
+})
 </script>
 
 <template>
   <div class="headless-demo">
     <div class="headless-demo__stage">
-      <div class="headless-demo__lanes">
+      <TransitionGroup name="lane" tag="div" class="headless-demo__lanes">
         <div v-for="item in lanes" :key="item.id" class="headless-demo__lane">
           <span class="headless-demo__name" :style="{ color: item.color }">{{ item.name }}</span>
           <span class="headless-demo__content">{{ item.content }}</span>
         </div>
-      </div>
+      </TransitionGroup>
     </div>
     <p class="headless-demo__hint">
-      无容器自绘弹幕轨道：模拟消息源批量产生消息（对应 <code>subscribe</code> 的增量有序 +
-      flush 批量消费契约），UI 完全由业务自绘。真实接入时替换为
+      无容器自绘弹幕轨道：模拟消息源按帧批量回调（对应 <code>subscribe</code> 的增量有序 + flush
+      批量消费契约），UI 完全由业务自绘。真实接入时替换为
       <code>useChatroom()</code> + <code>useChatroomMessage()</code> 即可。
     </p>
   </div>
@@ -93,7 +106,6 @@ onUnmounted(() => clearInterval(sourceTimer))
   background: rgba(255, 255, 255, 0.14);
   font-size: 13px;
   white-space: nowrap;
-  animation: headless-lane-in 0.25s ease;
 }
 
 .headless-demo__name {
@@ -110,15 +122,23 @@ onUnmounted(() => clearInterval(sourceTimer))
   font-size: 13px;
 }
 
-@keyframes headless-lane-in {
-  from {
-    opacity: 0;
-    transform: translateX(24px);
-  }
+/* 新条目滑入动画 */
+.lane-enter-active {
+  transition: all 0.25s ease;
+}
 
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.lane-enter-from {
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+.lane-leave-active {
+  transition: all 0.2s ease;
+  position: absolute;
+}
+
+.lane-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>

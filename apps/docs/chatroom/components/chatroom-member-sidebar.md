@@ -27,7 +27,9 @@ import { ChatroomMemberSidebar } from '@easemob/uikit-chatroom'
 
 ## API
 
+::: v-pre
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-member-sidebar.md -->
+:::
 
 ## 相关文档
 
