@@ -124,10 +124,13 @@ subscribe((messages) => {
 })
 ```
 
+能力全景、消息订阅契约与各场景角色见 [headless 接入](./headless)（含在线弹幕演示）。
+
 ## 参考
 
 - 组件与插槽清单：[ChatroomContainer](../components/chatroom-container) ·
   [直播弹幕流](../components/live-danmaku) · [直播顶部栏](../components/live-top-bar) ·
   [分栏布局](../components/chatroom-split-layout)
+- 数据与样式：[headless 接入](./headless) · [数据层（stores）](./stores) · [样式定制](./styling)
 - 架构与设计：[双 UIKit 架构](./architecture) · 仓库根目录
   [CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-UIKIT-DESIGN.md)

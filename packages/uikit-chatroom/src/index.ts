@@ -110,7 +110,8 @@ export type {
   ChatroomSignalRoomConfig,
   ChatroomMemberJoinedPayload,
 } from './containers/chatroom-container/types'
-// 直播 overlay UI 组件集（P4 review：直播场景自绘弹幕/横幅/商品卡/输入区/抽奖入口）
+// 直播 overlay UI 组件集（P4 review：直播场景自绘弹幕/横幅/商品卡/输入区/抽奖入口；
+// P5 文档整改补公开导出：ChatroomGiftBar 礼物入口 / ChatroomMicQueue 语聊房麦位）
 export {
   ChatroomLiveTopBar,
   ChatroomLiveDanmakuStream,
@@ -120,6 +121,8 @@ export {
   ChatroomLiveFullscreenEffect,
   ChatroomLiveInputBar,
   ChatroomLiveLotteryEntry,
+  ChatroomGiftBar,
+  ChatroomMicQueue,
   maskUsername,
   CHAT_KINDS,
   isChatKind,

@@ -534,6 +534,12 @@
   `@easemob/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
   插槽提取增强——`name` 属性不在 `<slot` 首位的多行写法不再漏提取，
   容器 19 个命名插槽全量落表（此前仅 10 个）。
+- **组件公开导出补全（文档整改自查）**：`ChatroomGiftBar`（礼物入口）与
+  `ChatroomMicQueue`（语聊房麦位）此前仅模块层导出、未进包入口——补入直播组件集
+  公开导出（组件文档与按需 import 可正常使用）。
+- **`ChatroomLiveFullscreenEffect` 新增 `fullscreen?: boolean` prop**（缺省 true 向后兼容）：
+  false 时动效改为铺满**最近定位祖先**（absolute + inset 0），
+  服务嵌套容器 / 文档演示等需要把动效约束在局部区域的场景。
 
 ### 兼容性
 

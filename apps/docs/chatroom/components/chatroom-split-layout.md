@@ -30,6 +30,10 @@ import { ChatroomSplitLayout, ChatroomMemberSidebar } from '@easemob/uikit-chatr
 > 用容器时无需手动组合：`scene.layout: 'split'` 即启用三栏（成员栏可拖拽），
 > 窄视口（<768px）自动退化为 H5 底部弹层。
 
+## 运行示例
+
+<demo src="./demo/chatroom-split-layout.vue" title="分栏布局" desc="三栏布局壳：舞台 / 消息主栏 / 成员侧栏，成员栏宽度可拖拽。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-split-layout.md -->

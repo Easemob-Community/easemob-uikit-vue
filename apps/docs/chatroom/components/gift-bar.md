@@ -21,6 +21,10 @@ import { ChatroomGiftBar } from '@easemob/uikit-chatroom'
 > 直播间场景通常不直接使用本组件：容器在 `features.gift` 开启时自动渲染，
 > 业务换自有面板时用容器 `#gift-bar` 插槽整体覆盖。
 
+## 运行示例
+
+<demo src="./demo/gift-bar.vue" title="礼物入口" desc="点击 🎁 打开礼物面板、选中即发送并关闭。演示为模拟环境（未登录），发送不会真实上屏。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-gift-bar.md -->

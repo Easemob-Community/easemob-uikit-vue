@@ -45,6 +45,38 @@ function sendText(text: string) { /* 发送（useChatroomMessage().sendText） *
 | `#actions` | `{ text, send, can-send }` | 输入框右侧动作区（礼物 / 菜单 / 分享 / 点赞） |
 | `#panels` | — | 底部弹层面板区（礼物面板 / 表情面板等，显示逻辑业务自理） |
 
+## 敏感词拦截
+
+直播间公开广播，刷屏 / 脏话治理是上线刚需。按「**四层分界**」各归其位
+（详见仓库根 [SENSITIVE-WORD-FILTER-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/SENSITIVE-WORD-FILTER-DESIGN.md)）：
+
+```
+词库层（内容）  → 业务方：词库从哪来、如何更新、内容合规责任（UIKit 绝不内置词表）
+策略层（决策）  → 业务方：拦截 or 替换 or 仅提示、服务端联动、谐音对抗策略
+接线层（管线）  → UIKit：发送拦截点、接收过滤/脱敏点、命中事件出口
+算法层（引擎）  → UIKit(core)：AC 状态机、字符归一化（设计中，D102）
+```
+
+**当前能力（发送侧拦截）**：客户端第一道防线（服务端审核仍须兜底——客户端拦截
+可被绕过，只是体验层）。命中即禁止发送 + 输入条内提示，不进入消息链路：
+
+```vue
+<ChatroomLiveInputBar
+  :block-words="['脏话', '广告', '代购']"
+  block-hint="包含敏感词 {{word}}，请修改后重试"
+  @block="(text, reason) => myToast.warning(reason)"
+  @send="sendText"
+/>
+```
+
+- **注入方式**：`block-words` prop 传入词库（大小写不敏感），`block-hint` 自定义提示
+  （`{{word}}` 占位命中词），命中派发 `block` 事件（业务可上报服务端二次审核）；
+- **乐观模式**：`optimistic` 为 true 时跳过客户端拦截 / 节流 / 敏感词检查，直接 emit send，
+  由业务 / 服务端兜底（适合已做服务端审核的场景）；
+- **设计方向（D102，尚未实施）**：core 引入 AC 自动机引擎（大词库 O(n) 匹配 + 字符归一化
+  对抗），容器新增 `sensitive-words` 透传与接收侧 `filter / mask` 策略 + `sensitive-hit`
+  审计事件——当前线性扫描在词库 < 500 词时完全够用，升级对现有用法零破坏。
+
 ## 相关文档
 
 - [ChatroomLiveTopBar 直播顶部栏](./live-top-bar)

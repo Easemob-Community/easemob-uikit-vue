@@ -133,7 +133,9 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: '首页', link: '/chatroom/', activeMatch: '^/chatroom/$' },
-          { text: '指南', link: '/chatroom/guide/quickstart', activeMatch: '^/chatroom/guide/' },
+          { text: '指南', link: '/chatroom/guide/quickstart', activeMatch: '^/chatroom/guide/(?!styling)' },
+          { text: '组件', link: '/chatroom/components/chatroom-container', activeMatch: '^/chatroom/components/' },
+          { text: '样式', link: '/chatroom/guide/styling', activeMatch: '^/chatroom/guide/styling' },
           { text: 'GitHub', link: 'https://github.com/Easemob-Community/easemob-uikit-vue' },
         ],
 
@@ -145,6 +147,9 @@ export default defineConfig({
                 { text: '双 UIKit 架构', link: '/chatroom/guide/architecture' },
                 { text: '快速开始', link: '/chatroom/guide/quickstart' },
                 { text: '权限模型与业务角色', link: '/chatroom/guide/permissions-roles' },
+                { text: 'headless 接入（无 UI 数据层）', link: '/chatroom/guide/headless' },
+                { text: '数据层（stores 与 composables）', link: '/chatroom/guide/stores' },
+                { text: '样式定制', link: '/chatroom/guide/styling' },
                 { text: '更新日志', link: '/chatroom/guide/changelog' },
               ],
             },

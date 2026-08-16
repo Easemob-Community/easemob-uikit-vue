@@ -49,6 +49,10 @@ function handleSelect(item: { label: string }) {
 </template>
 ```
 
+## 运行示例
+
+<demo src="./demo/chatroom-context-menu.vue" title="右键菜单" desc="在成员行上右键打开菜单；危险项标红；视口边缘自动翻转。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-context-menu.md -->

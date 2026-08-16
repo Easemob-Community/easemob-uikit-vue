@@ -29,6 +29,10 @@ function onMemberJoined(payload: { members: Array<{ nickname?: string }> }) {
 > 收到成员加入事件（容器 `member-joined` / `useChatroomMember` 订阅）时 push 一条即可；
 > 入场动画与自动收起由组件管理。
 
+## 运行示例
+
+<demo src="./demo/live-welcome-banner.vue" title="欢迎横幅" desc="点击「模拟成员进场」触发横幅滑入（400ms），3 秒后自动收起；VIP 用户带皇冠高亮。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-welcome-banner.md -->

@@ -27,6 +27,11 @@ export interface LiveFullscreenEffectItem {
 export interface ChatroomLiveFullscreenEffectProps {
   /** 动效队列（push 新增条目，组件按 id 增量消费） */
   items: LiveFullscreenEffectItem[]
+  /**
+   * 是否全屏铺满视口（缺省 true）。false 时改为铺满**最近定位祖先**
+   * （absolute + inset 0）——嵌套容器 / 文档演示等需要把动效约束在局部区域时使用。
+   */
+  fullscreen?: boolean
 }
 
 const props = defineProps<ChatroomLiveFullscreenEffectProps>()
@@ -96,7 +101,7 @@ watch(
       v-if="current"
       :key="`fs-${current.id}`"
       class="live-fs-effect"
-      :class="`live-fs-effect--${current.type}`"
+      :class="[`live-fs-effect--${current.type}`, { 'live-fs-effect--inline': !props.fullscreen }]"
     >
       <!-- 默认展示：emoji + 文案 -->
       <slot :item="current" :end="() => emit('end', current!.id)">
@@ -122,6 +127,11 @@ watch(
   justify-content: center;
   pointer-events: none;
   background: rgba(0, 0, 0, 0.35);
+}
+
+/* fullscreen: false —— 铺满最近定位祖先（嵌套容器 / 文档演示） */
+.live-fs-effect--inline {
+  position: absolute;
 }
 
 .live-fs-effect__content {

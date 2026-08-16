@@ -29,6 +29,10 @@ const overlayItems = ref<LiveOverlayItem[]>([])
 </template>
 ```
 
+## 运行示例
+
+<demo src="./demo/live-overlay-manager.vue" title="overlay 锚定管理" desc="顶部公告与右下商品卡双锚点：同锚点堆叠不重叠、互不干扰。纯 UI 演示，无需登录。" />
+
 ## API
 
 <!-- @include: ../../.vitepress/gen/chatroom/chatroom-live-overlay-manager.md -->
