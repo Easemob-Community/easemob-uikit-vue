@@ -24,7 +24,17 @@ const props = withDefaults(defineProps<ChatroomGiftBarProps>(), {
   popupMode: 'sheet',
 })
 
-const { sendCustom } = useChatroomMessage()
+/**
+ * 发送能力惰性获取：无 UIKit Provider 上下文（纯 UI 预览 / 文档演示）时降级为
+ * 「选中仅关闭面板」的预览模式，不抛错；正常接入环境行为不变（选中即发送）。
+ */
+let sendCustom: ReturnType<typeof useChatroomMessage>['sendCustom'] | null = null
+try {
+  sendCustom = useChatroomMessage().sendCustom
+}
+catch {
+  // 无 Provider 上下文：预览模式（面板交互可用，发送降级）
+}
 
 /** 礼物面板显隐（底部弹层，选中即发送并关闭） */
 const showPanel = ref(false)
@@ -41,8 +51,10 @@ const GIFT_NAME_KEYS: Record<string, string> = {
 function handleGiftClick(giftId: string, icon: string) {
   if (props.disabled)
     return
-  const giftName = t(GIFT_NAME_KEYS[giftId] ?? giftId, giftId)
-  void sendCustom(CHATROOM_GIFT_EVENT, { giftId, giftName, icon }).catch(() => {})
+  if (sendCustom) {
+    const giftName = t(GIFT_NAME_KEYS[giftId] ?? giftId, giftId)
+    void sendCustom(CHATROOM_GIFT_EVENT, { giftId, giftName, icon }).catch(() => {})
+  }
   showPanel.value = false
 }
 </script>
