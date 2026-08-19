@@ -234,7 +234,7 @@ export interface ChatConfig {
     resizable?: boolean
     /** 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true */
     expandable?: boolean
-    /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab / Sticker packs shown as extra tabs in the emoji picker */
+    /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
   }
   /** 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 */

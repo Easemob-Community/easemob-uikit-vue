@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob/uikit-core'
 import { customEventPreviewMap } from '../utils/resolve-last-message-text'
 import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '@easemob/uikit-core'
 
@@ -32,7 +32,8 @@ export function getQuotePreview(message: UiMessage): string {
     case MESSAGE_TYPE.TEXT:
       return (message.body as TextMessageBody).content || ''
     case MESSAGE_TYPE.IMAGE:
-      return '[图片]'
+      // 表情包（sticker/GIF，ext.isSticker 标记）按表情预览，与普通图片区分
+      return message.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true ? '[表情]' : '[图片]'
     case MESSAGE_TYPE.VOICE:
       return '[语音]'
     case MESSAGE_TYPE.VIDEO:

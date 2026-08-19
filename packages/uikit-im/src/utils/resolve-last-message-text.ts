@@ -1,6 +1,6 @@
 import type { CustomMessageBody, UiMessage } from '@easemob/uikit-core'
 import type { RootStores } from '../sdk/event/types'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob/uikit-core'
 
 export type LastMessageTextResolver = (message: UiMessage) => string | undefined
 
@@ -26,7 +26,8 @@ export function defaultLastMessageTextResolver(message: UiMessage): string {
     case MESSAGE_TYPE.TEXT:
       return (message.body as { content?: string }).content || ''
     case MESSAGE_TYPE.IMAGE:
-      return '[图片]'
+      // 表情包（sticker/GIF，ext.isSticker 标记）按表情摘要，与普通图片区分
+      return message.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true ? '[表情]' : '[图片]'
     case MESSAGE_TYPE.VOICE:
       return '[语音]'
     case MESSAGE_TYPE.VIDEO:

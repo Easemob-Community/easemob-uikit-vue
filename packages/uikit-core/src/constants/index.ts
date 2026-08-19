@@ -134,6 +134,14 @@ export const HEADER_ALIGN = {
 export type HeaderAlignValue =
   (typeof HEADER_ALIGN)[keyof typeof HEADER_ALIGN]
 
+/** 消息 ext 扩展字段键常量（UIKit 自有 wire 约定，随消息透传收发双端） */
+export const MESSAGE_EXT_KEY = {
+  /** 表情包（sticker/GIF）图片消息标记：值为 true 时按表情渲染，不启用图片三级预览 */
+  IS_STICKER: 'isSticker',
+} as const
+
+export type MessageExtKeyValue = (typeof MESSAGE_EXT_KEY)[keyof typeof MESSAGE_EXT_KEY]
+
 /** 组件注入（provide/inject）键常量 */
 export const INJECTION_KEY = {
   /** 文本消息配置（链接识别 & 拦截器），chat.vue provide / text-message.vue inject */

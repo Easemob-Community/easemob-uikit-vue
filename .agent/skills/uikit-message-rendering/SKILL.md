@@ -125,6 +125,11 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
 - **失败降级**：`degradedIndexes: Set<number>` 记录已降级索引，大图失败升原图、原图失败回大图，
   **同一索引只降级一次，防止互跳死循环**。
 - 加载失败显示 `t('message.image.loadFailed')`；无 URL 显示 `t('message.image')` 占位。
+- **表情包（sticker/GIF）**：发送侧 `onStickerSelect` 以图片消息发出并打 `ext.isSticker = true`
+  （键常量 `MESSAGE_EXT_KEY.IS_STICKER`，core constants）；渲染侧按表情处理——
+  **不启用三级预览**（点击无响应、`EmImageViewer` 不挂载）、透明底 `object-fit: contain`
+  不裁切、无圆角、无灰底加载占位，尺寸上限 `STICKER_MAX_SIZE = 120`；
+  会话摘要/引用预览文案为 `[表情]`（`resolve-last-message-text.ts` / `use-quote.ts`）。
 
 ### 4.3 语音消息（voice-message.vue）
 

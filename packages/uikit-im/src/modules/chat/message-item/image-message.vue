@@ -3,6 +3,7 @@ import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '@easemob/uikit-core'
 import { INJECTION_KEY } from '@easemob/uikit-core'
+import { MESSAGE_EXT_KEY } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { EmImageViewer as ImageViewer } from '@easemob/uikit-core'
 import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
@@ -20,15 +21,24 @@ const { t } = useLocale()
 /** 图片展示最大约束 */
 const MAX_WIDTH = 240
 const MAX_HEIGHT = 240
+/** 表情包（sticker）展示最大约束（方形小图，透明底不裁切） */
+const STICKER_MAX_SIZE = 120
+
+/** 表情包消息：发送侧经 ext.isSticker 标记，按表情渲染，不启用图片三级预览 */
+const isSticker = computed(() => props.message.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true)
 
 /** 根据消息体 width/height 等比计算展示尺寸 */
 const displaySize = computed(() => {
   const w = (props.message.body as ImageMessageBody).width
   const h = (props.message.body as ImageMessageBody).height
+  const maxW = isSticker.value ? STICKER_MAX_SIZE : MAX_WIDTH
+  const maxH = isSticker.value ? STICKER_MAX_SIZE : MAX_HEIGHT
   if (!w || !h || w <= 0 || h <= 0) {
-    return { width: 160, height: 120 }
+    return isSticker.value
+      ? { width: STICKER_MAX_SIZE, height: STICKER_MAX_SIZE }
+      : { width: 160, height: 120 }
   }
-  const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h, 1)
+  const ratio = Math.min(maxW / w, maxH / h, 1)
   return {
     width: Math.round(w * ratio),
     height: Math.round(h * ratio),
@@ -89,6 +99,9 @@ const previewSrcs = computed(() => {
 const degradedIndexes = ref<Set<number>>(new Set())
 
 function openPreview() {
+  // 表情包是表情不是图片：不启用图片三级预览
+  if (isSticker.value)
+    return
   if (previewSrcs.value.length === 0)
     return
   previewIndex.value = 0
@@ -127,27 +140,27 @@ function onPreviewError(index: number) {
 
 <template>
   <div class="image-message" :class="{ 'image-message--self': props.message.isSelf }">
-    <!-- 有图片 URL 时 -->
+    <!-- 有图片 URL 时（sticker 表情透明底不裁切、无圆角、点击不预览） -->
     <div
       v-if="displayUrl"
       class="image-message__container"
-      :class="radiusClass"
+      :class="isSticker ? 'image-message__container--sticker' : radiusClass"
       :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }"
       @click="openPreview"
     >
       <!-- 加载中占位 -->
-      <div v-if="!isLoaded && !isError" class="image-message__loading" :class="radiusClass" />
+      <div v-if="!isLoaded && !isError && !isSticker" class="image-message__loading" :class="radiusClass" />
       <!-- 图片 -->
       <img
         :src="displayUrl"
         class="image-message__img"
-        :class="radiusClass"
+        :class="isSticker ? 'image-message__img--sticker' : radiusClass"
         alt="image"
         @load="onLoad"
         @error="onError"
       >
       <!-- 加载失败 -->
-      <div v-if="isError" class="image-message__error" :class="radiusClass">
+      <div v-if="isError" class="image-message__error" :class="isSticker ? '' : radiusClass">
         {{ t('message.image.loadFailed', '[图片加载失败]') }}
       </div>
     </div>
@@ -157,8 +170,9 @@ function onPreviewError(index: number) {
       {{ t('message.image', '[图片]') }}
     </div>
 
-    <!-- 全屏预览（缩放/旋转/loading/下载由 EmImageViewer 提供，大图/原图切换走底部按钮） -->
+    <!-- 全屏预览（缩放/旋转/loading/下载由 EmImageViewer 提供，大图/原图切换走底部按钮；sticker 不预览） -->
     <ImageViewer
+      v-if="!isSticker"
       v-model:show="isPreviewing"
       v-model:index="previewIndex"
       :srcs="previewSrcs"
@@ -225,6 +239,19 @@ function onPreviewError(index: number) {
 
 .image-message__img--square {
   border-radius: 4px;
+}
+
+/* sticker 表情：透明底、不裁切、无圆角、无点击态 */
+.image-message__container--sticker {
+  cursor: default;
+  border-radius: 0;
+  overflow: visible;
+  background-color: transparent;
+}
+
+.image-message__img--sticker {
+  object-fit: contain;
+  border-radius: 0;
 }
 
 .image-message__error {

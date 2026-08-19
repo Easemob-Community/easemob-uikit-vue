@@ -12,6 +12,7 @@ import type { EmojiStickerItem } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { MESSAGE_EXT_KEY } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'
 import MentionPicker from '../mention/mention-picker.vue'
 import QuoteBar from '../quote/quote-bar.vue'
@@ -342,13 +343,13 @@ function onEmojiSelect(emoji: string) {
   }
 }
 
-/** 选择表情包（sticker）：SDK 图片消息支持 GIF，按 URL 以图片消息发送 */
+/** 选择表情包（sticker）：SDK 图片消息支持 GIF，按 URL 以图片消息发送，ext 打 isSticker 标记供收发双端按表情渲染（不启用图片预览） */
 async function onStickerSelect(sticker: EmojiStickerItem) {
   showEmojiPicker.value = false
   const canSend = await runBeforeSend({ type: MESSAGE_TYPE.IMAGE })
   if (!canSend)
     return
-  sendImageMessage(sticker.url, groupReadReceiptConfig.value)
+  sendImageMessage(sticker.url, groupReadReceiptConfig.value, { [MESSAGE_EXT_KEY.IS_STICKER]: true })
     .then((msg) => {
       emit('send-success')
       runAfterSend(msg)
