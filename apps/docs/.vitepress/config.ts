@@ -53,6 +53,7 @@ export default defineConfig({
               items: [
                 { text: '快速开始', link: '/guide/quickstart' },
                 { text: '主题定制', link: '/guide/theme' },
+                { text: 'Design Tokens', link: '/guide/design-tokens' },
                 { text: '图标', link: '/guide/icons' },
                 { text: 'H5 适配', link: '/guide/h5-adaptation' },
                 { text: '系统通知文案定制', link: '/guide/notice-customization' },
@@ -82,6 +83,7 @@ export default defineConfig({
                 { text: 'Input 输入框', link: '/components/input' },
                 { text: 'IconButton 图标按钮', link: '/components/icon-button' },
                 { text: 'ScrollToTop 回到顶部', link: '/components/scroll-to-top' },
+                { text: 'Skeleton 骨架屏', link: '/components/skeleton' },
                 { text: 'Resizable 拖拽尺寸', link: '/components/resizable' },
               ],
             },

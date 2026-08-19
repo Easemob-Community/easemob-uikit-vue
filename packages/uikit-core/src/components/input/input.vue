@@ -23,6 +23,14 @@ export interface InputProps {
   clearable?: boolean
   /** 清除按钮图标名称，默认 "xmark/light" */
   clearIcon?: string
+  /** 是否处于错误状态；为 true 时边框变红并显示错误图标 */
+  error?: boolean
+  /** 错误提示文案；传入时显示在输入框下方 */
+  errorMessage?: string
+  /** 错误图标名称，默认 "status/info" */
+  errorIcon?: string
+  /** 是否只读；只读时背景置灰但文字仍可选中复制 */
+  readonly?: boolean
   /**
    * 输入框风格变体
    * - 'default': 白色背景 + 边框 + 圆角，适用于表单输入（默认）
@@ -54,6 +62,10 @@ const props = withDefaults(defineProps<InputProps>(), {
   variant: 'default',
   clearable: false,
   clearIcon: 'xmark/light',
+  error: false,
+  errorMessage: '',
+  errorIcon: 'status/info',
+  readonly: false,
 })
 
 const emit = defineEmits<InputEmits>()
@@ -106,47 +118,71 @@ defineExpose({
     class="uikit-input"
     :class="{
       'uikit-input--with-prefix': props.prefixIcon,
-      'uikit-input--with-clear': props.clearable,
+      'uikit-input--with-clear': props.clearable && !props.error,
+      'uikit-input--with-error': props.error,
+      'uikit-input--with-error-message': props.errorMessage,
       'uikit-input--search': props.variant === 'search',
       'uikit-input--filled': props.variant === 'filled',
       'uikit-input--ghost': props.variant === 'ghost',
       'uikit-input--underline': props.variant === 'underline',
+      'uikit-input--readonly': props.readonly,
     }"
   >
-    <Icon
-      v-if="props.prefixIcon"
-      :name="props.prefixIcon"
-      :size="16"
-      class="uikit-input__prefix-icon"
-    />
-    <input
-      ref="inputRef"
-      class="uikit-input__field"
-      :class="[shapeClass, variantClass]"
-      :value="props.modelValue"
-      :type="props.type"
-      :placeholder="props.placeholder"
-      :disabled="props.disabled"
-      :maxlength="props.maxlength"
-      @input="onInput"
-      @focus="(e: FocusEvent) => emit('focus', e)"
-      @blur="(e: FocusEvent) => emit('blur', e)"
-      @keydown="onKeydown"
-    >
-    <button
-      v-if="props.clearable && props.modelValue"
-      type="button"
-      class="uikit-input__clear"
-      title="clear"
-      @click="onClear"
-    >
-      <Icon :name="props.clearIcon" :size="14" />
-    </button>
+    <div class="uikit-input__row">
+      <Icon
+        v-if="props.prefixIcon"
+        :name="props.prefixIcon"
+        :size="16"
+        class="uikit-input__prefix-icon"
+      />
+      <input
+        ref="inputRef"
+        class="uikit-input__field"
+        :class="[shapeClass, variantClass]"
+        :value="props.modelValue"
+        :type="props.type"
+        :placeholder="props.placeholder"
+        :disabled="props.disabled"
+        :readonly="props.readonly"
+        :maxlength="props.maxlength"
+        @input="onInput"
+        @focus="(e: FocusEvent) => emit('focus', e)"
+        @blur="(e: FocusEvent) => emit('blur', e)"
+        @keydown="onKeydown"
+      >
+      <button
+        v-if="props.error"
+        type="button"
+        class="uikit-input__error-icon"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <Icon :name="props.errorIcon" :size="14" />
+      </button>
+      <button
+        v-else-if="props.clearable && props.modelValue"
+        type="button"
+        class="uikit-input__clear"
+        title="clear"
+        @click="onClear"
+      >
+        <Icon :name="props.clearIcon" :size="14" />
+      </button>
+    </div>
+    <div v-if="props.errorMessage" class="uikit-input__error-message">
+      {{ props.errorMessage }}
+    </div>
   </div>
 </template>
 
 <style scoped>
 .uikit-input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.uikit-input__row {
   display: flex;
   width: 100%;
   position: relative;
@@ -161,7 +197,13 @@ defineExpose({
   padding-right: 32px;
 }
 
-.uikit-input__clear {
+/* 错误态：右侧留出错误图标空间 */
+.uikit-input--with-error .uikit-input__field {
+  padding-right: 32px;
+}
+
+.uikit-input__clear,
+.uikit-input__error-icon {
   position: absolute;
   right: 8px;
   top: 50%;
@@ -182,6 +224,11 @@ defineExpose({
     color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
+.uikit-input__error-icon {
+  background-color: transparent;
+  color: var(--uikit-danger-color);
+  cursor: default;
+}
 
 @media (hover: hover) {
   .uikit-input__clear:hover {
@@ -242,6 +289,28 @@ defineExpose({
 
 .uikit-input__field:focus {
   border-color: var(--uikit-primary-color);
+}
+
+/* Error 状态：边框变红 */
+.uikit-input--with-error .uikit-input__field {
+  border-color: var(--uikit-danger-color);
+}
+
+.uikit-input--with-error .uikit-input__field:focus {
+  border-color: var(--uikit-danger-color);
+}
+
+/* Readonly 状态：灰底但文字可选中 */
+.uikit-input--readonly .uikit-input__field {
+  background-color: var(--uikit-bg-secondary);
+  cursor: default;
+}
+
+.uikit-input__error-message {
+  margin-top: 4px;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-danger-color);
+  line-height: 1.4;
 }
 
 /* Search 风格：灰色背景 + 无边框 + 圆角 + 聚焦光环（飞书风格） */
@@ -315,6 +384,24 @@ defineExpose({
 .uikit-input--underline .uikit-input__prefix-icon {
   color: var(--uikit-text-secondary);
   left: 4px;
+}
+
+/* Error 状态：各变体差异化呈现 */
+.uikit-input--with-error .uikit-input__field--search,
+.uikit-input--with-error .uikit-input__field--search:focus {
+  box-shadow: 0 0 0 2px rgba(var(--uikit-danger-rgb), 0.25);
+}
+
+.uikit-input--with-error .uikit-input__field--filled,
+.uikit-input--with-error .uikit-input__field--filled:focus {
+  border-color: rgba(var(--uikit-danger-rgb), 0.5);
+}
+
+.uikit-input--with-error .uikit-input__field--ghost,
+.uikit-input--with-error .uikit-input__field--ghost:focus,
+.uikit-input--with-error .uikit-input__field--underline,
+.uikit-input--with-error .uikit-input__field--underline:focus {
+  border-bottom-color: var(--uikit-danger-color);
 }
 
 .uikit-input__field::placeholder {

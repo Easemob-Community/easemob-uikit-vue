@@ -124,7 +124,7 @@ function onContextmenu(e: MouseEvent) {
   z-index: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--uikit-spacing-3);
   padding: 0 var(--uikit-item-hover-padding-x, 16px);
   margin: 0 var(--uikit-item-hover-margin-x, 0px) var(--uikit-cell-gap, 3px);
   height: var(--uikit-cell-height, 64px);

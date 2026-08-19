@@ -1,5 +1,38 @@
 # Changelog
 
+## 2.1.0 (2026-08-19)
+
+### 新增
+
+- **Skeleton 骨架屏组件**：`@easemob/uikit-core` 新增 `EmSkeleton`，支持头像 + 文字行变体；会话/联系人/群组列表首次加载接入骨架屏，减少空白等待感。
+- **Modal danger 变体**：`EmModal` 新增 `type?: 'default' | 'danger'`，危险操作确认按钮自动切换为 danger 语义；同步限制最大宽度与正文溢出滚动。
+- **Toast 能力补全**：`EmToast` / `useToast` 新增 `closable`、`position`、`actionText`、 `#action` 插槽与 `duration=0` 不自动关闭；`show` 方法通过重载兼容旧签名与新签名。
+- **Input error / readonly 态**：`EmInput` 新增 `error` / `error-message` / `readonly` props，支持表单校验失败视觉反馈与只读可复制状态。
+- **Empty 空状态模板**：`EmEmpty` 扩展 `illustration` / `title` / `description` / `action` slot，统一会话/通讯录/群组/搜索无结果四类模板。
+
+### 视觉与主题
+
+- **全局焦点环**：`:focus-visible` 焦点环覆盖所有可交互元素，键盘导航可见，满足 WCAG 2.4.7。
+- **间距阶梯**：新增 `--uikit-spacing-1~7`（4/8/12/16/24/32/48px），高频组件 padding/gap 映射到阶梯变量。
+- **Type Scale 排版规范**：补齐 `--uikit-font-lineheight-*` / `--uikit-font-weight-*` / `--uikit-font-family`，文档输出 10 级排版层级表。
+- **暗色对比度验证**：9 组文字×背景暗色组合按 WCAG 2.1 AA 验证通过，`text-tertiary` 由 `#6b7280` 提亮为 `#8a92a0`。
+- **移动端触摸热区扩展**：`EmIconButton` 在触屏设备下扩展最小触摸区域至 44×44px，视觉尺寸保持不变。
+
+### 文档站
+
+- **Design Tokens 总览页**：新增 `guide/design-tokens.md`，按 Color/Type/Spacing/Radius/Elevation/Motion/Z-Index 分类展示全部 `--uikit-*` 变量。
+- **图标总览**：`components/icon.md` 新增图标网格，支持分类筛选、搜索、点击复制 name。
+- **z-index 设计层级表**：`guide/theme.md` 定义 Toast/Modal/Drawer/Popover/Sticky/内容层级区间。
+- **动效可视化面板**：`guide/theme.md` 新增交互式动效演练场，演示 fade-scale 过渡、四种 easing 曲线、Ripple 与 scale-press。
+- **H5 适配文档增强**：`guide/h5-adaptation.md` 补充断点系统、双栏布局规则、手势映射表、横屏/折叠屏适配、输入区布局规范。
+- **组件使用建议**：Button/Input/IconButton/Cell/Modal 文档新增 Do/Don't 对比表。
+- **设计原则**：`guide/theme.md` 提炼 5 条核心设计原则（变量优先、层级清晰、无障碍默认、移动端优先、一致优于花哨）。
+- **图标与时间戳规范**：`guide/icons.md` 补充图标设计规范；`components/message-list.md` 补充时间戳策略建议。
+
+### 关联技术债
+
+- 已于 `TECH-DEBT.md` 登记 D104-D113 并勾选归档。
+
 ## 2.0.0 (2026-08-15)
 
 ### 视觉
@@ -496,6 +529,31 @@
 - 新增 [H5 适配指南](/guide/h5-adaptation)。
 - 更新根 `README.md`、`apps/docs/index.md` 与 `apps/docs/.vitepress/config.ts`。
 - 新增 `.agent/skills/uikit-h5-adaptation/SKILL.md`，并更新 `AGENTS.md`、相关 skill 与 `TECH-DEBT.md`。
+
+---
+
+## @easemob/uikit-core 1.1.0 (2026-08-19)
+
+### 新增
+
+- **Skeleton 骨架屏组件**：新增 `EmSkeleton` 组件，支持头像 + 文字行变体，动画 shimmer 跟随 `--uikit-anim-*` 并尊重 `prefers-reduced-motion`。
+- **Modal danger 变体**：`EmModal` 新增 `type?: 'default' | 'danger'`。
+- **Toast 能力补全**：`EmToast` / `useToast` 新增 `closable` / `position` / `actionText` / `#action` 插槽；`duration=0` 表示不自动关闭。
+- **Input error / readonly 态**：`EmInput` 新增 `error` / `error-message` / `readonly` props。
+- **Empty 空状态模板**：`EmEmpty` 扩展 `illustration` / `title` / `description` / `action` slot。
+
+### 视觉与主题
+
+- **全局焦点环**：`theme/index.css` 新增 `--uikit-focus-ring-color` 与全局 `:focus-visible` 样式。
+- **间距阶梯**：新增 `--uikit-spacing-1~7` 与密度档映射。
+- **Type Scale 排版规范**：新增 `--uikit-font-lineheight-*` / `--uikit-font-weight-*` / `--uikit-font-family`。
+- **暗色对比度**：`text-tertiary` 暗色值提亮为 `#8a92a0`。
+- **动画系统完善**：新增 `data-uikit-anim-level`（subtle/normal/expressive）与 `data-uikit-anim-enabled` 覆盖。
+
+### 修复
+
+- **图标 color 行为统一**：描边/填充图标均通过 `color` prop 改色，无需 `:style` 特例。
+- **移动端触摸热区**：`EmIconButton` 在触屏设备下扩展最小触摸区域至 44×44px。
 
 ---
 

@@ -12,6 +12,7 @@ import { useLocale } from '@easemob/uikit-core'
 import { useArrowNavigation, useEscToClose, useKeyBindings } from '@easemob/uikit-core'
 import { EmInput as Input } from '@easemob/uikit-core'
 import { EmScrollToTop as ScrollToTop } from '@easemob/uikit-core'
+import { EmSkeleton as Skeleton } from '@easemob/uikit-core'
 import type { ContactFilterFn } from '../../composables/use-contact-filter'
 import type { ContactSortBy } from '../../composables/use-contact-sort'
 import type { UiContact as Contact } from '@easemob/uikit-core'
@@ -449,13 +450,21 @@ defineExpose({
         <slot name="body" />
       </div>
 
-      <!-- loading（有数据时也展示在顶部覆盖；无数据时占位） -->
+      <!-- loading（有数据时也展示在顶部覆盖；无数据时占位）：默认骨架屏 -->
       <div
         v-if="props.loading && groupedContacts.length === 0"
         class="contact-list__loading-wrap"
       >
         <slot name="loading">
-          <span class="contact-list__loading-text">{{ t('common.loading') }}</span>
+          <div class="contact-list__skeleton">
+            <div v-for="i in 8" :key="i" class="contact-list__skeleton-item">
+              <Skeleton variant="avatar" shape="rounded" />
+              <div class="contact-list__skeleton-lines">
+                <Skeleton variant="text" style="width: 35%;" />
+                <Skeleton variant="text" style="width: 65%;" />
+              </div>
+            </div>
+          </div>
         </slot>
       </div>
 
@@ -649,6 +658,27 @@ defineExpose({
 .contact-list__loading-text {
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
+}
+
+.contact-list__skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.contact-list__skeleton-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-list__skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .contact-list__load-more {

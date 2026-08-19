@@ -25,24 +25,27 @@
         border-radius: 8px;
       "
     >
+      <em-empty illustration title="默认插画" description="未传 icon 时使用内置线描插画" />
       <em-empty icon="empty/contact" title="仅标题">
         <template #description>
           自定义描述插槽内容
         </template>
       </em-empty>
-      <em-empty icon="empty/files" description="带操作按钮">
-        <button
-          style="
-            padding: 6px 16px;
-            border-radius: 8px;
-            background: var(--uikit-primary-color);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-          "
-        >
-          新建文件
-        </button>
+      <em-empty illustration title="暂无联系人" description="点击下方按钮添加新朋友">
+        <template #action>
+          <button
+            style="
+              padding: 6px 16px;
+              border-radius: 8px;
+              background: var(--uikit-primary-color);
+              color: #fff;
+              border: none;
+              cursor: pointer;
+            "
+          >
+            添加联系人
+          </button>
+        </template>
       </em-empty>
     </div>
   </div>

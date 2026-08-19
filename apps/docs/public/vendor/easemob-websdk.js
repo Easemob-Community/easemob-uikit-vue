@@ -4,7 +4,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/common-DN_g4O3n.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/common-DN_g4O3n.js
 var e = { VALIDATION_REQUIRED: 110, VALIDATION_INVALID_FORMAT: 110, VALIDATION_UNKNOWN: 110, AUTH_ALREADY_LOGIN: 200, AUTH_NOT_LOGIN: 201, AUTH_UNAUTHORIZED: 202, AUTH_FORBIDDEN: 210, AUTH_TOKEN_EXPIRED: 108, AUTH_BIND_ANOTHER_DEVICE: 213, AUTH_LOGIN_TOO_MANY_DEVICES: 214, AUTH_USER_MUTED: 215, CONNECTION_TIMEOUT: 301, CONNECTION_WEBSOCKET_ERROR: 300, CONNECTION_NOT_CREATED: 1, CONNECTION_CLOSED_BEFORE_READY: 300, CONNECTION_CANCELLED: 1, CONNECTION_PROVISION_TIMEOUT: 301, CONNECTION_PROVISION_REJECTED: 202, CONNECTION_PROVISION_CLOSED: 300, CONNECTION_DNSLIST_FAILED: 304, STORAGE_OPERATION_FAILED: 3, MESSAGE_NOT_CONNECTED: 300, MESSAGE_ACK_TIMEOUT: 301, MESSAGE_SEND_FAILED: 303, MESSAGE_SENDER_DESTROYED: 1, MESSAGE_ENCODE_FAILED: 500, MESSAGE_DECODE_FAILED: 500, MESSAGE_ACK_MISSING: 301, MESSAGE_BLOCKED_BY_RECIPIENT: 222, OPERATION_UNSUPPORTED: 111, SERVER_BUSY: 302, ATTACHMENT_NOT_FOUND: 400, ATTACHMENT_INVALID: 401, ATTACHMENT_EXPIRED: 407, MESSAGE_INCLUDE_ILLEGAL_CONTENT: 501, MESSAGE_SEND_TRAFFIC_LIMIT: 502, MESSAGE_RECALL_TIME_LIMIT: 504, SERVICE_NOT_ENABLED: 505, MESSAGE_EXPIRED: 506, MESSAGE_ILLEGAL_WHITELIST: 507, MESSAGE_EXTERNAL_LOGIC_BLOCKED: 508, MESSAGE_CURRENT_LIMITING: 509, MESSAGE_SIZE_LIMIT: 510, MESSAGE_EDIT_FAILED: 511, INVALID_CONVERSATION: 107, USER_LOGIN_ANOTHER_DEVICE: 206, USER_REMOVED: 207, USER_KICKED_BY_CHANGE_PASSWORD: 216, USER_KICKED_BY_OTHER_DEVICE: 217, USER_ALREADY_LOGIN_ANOTHER: 218, USER_MUTED_BY_ADMIN: 219, USER_DEVICE_CHANGED: 220, USER_NOT_ON_ROSTER: 221, SERVER_SERVING_DISABLED: 305, FILE_DOWNLOAD_FAILED: 403, FILE_TOO_LARGE: 405, FILE_CONTENT_IMPROPER: 406, THIRD_MODERATION_FAILED: 1200, THIRD_DEFAULT_FAILED: 1299, STREAM_SEND_NOT_SUPPORTED: 303, STREAM_CHUNK_INVALID: 500, STREAM_TIMEOUT_BY_SERVER: 500, STREAM_STATE_CONFLICT: 500, COMBINE_INVALID_INPUT: 110, COMBINE_LEVEL_EXCEEDED: 4, COMBINE_ITEM_LIMIT_EXCEEDED: 4, COMBINE_ENCODE_FAILED: 500, COMBINE_UPLOAD_FAILED: 402, COMBINE_DOWNLOAD_FAILED: 2, COMBINE_PARSE_FAILED: 500, REST_NETWORK_ERROR: 2, REST_TIMEOUT: 301, REST_HTTP_ERROR: 303, REST_BUSINESS_UNKNOWN: 303, PUSH_TOKEN_UPLOAD_FAILED: 1500, PUSH_SILENT_MODE_OPERATION_FAILED: 1501, PUSH_LANGUAGE_OPERATION_FAILED: 1502, USER_INFO_SUBSCRIPTION_LIMIT_EXCEEDED: 1600, USER_INFO_SUBSCRIPTION_TARGET_LIMIT_EXCEEDED: 1601, USERINFO_USERCOUNT_EXCEED: 900, USERINFO_DATALENGTH_EXCEED: 901, CONTACT_ADD_USER_NOT_FOUND: 204, CONTACT_ADD_ALREADY_FRIEND: 1e3, CONTACT_ADD_BLOCKED_BY_USER: 210, CONTACT_SET_REMARK_NOT_FRIEND: 223, CONTACT_REACH_LIMIT: 1001, CONTACT_REACH_LIMIT_PEER: 1002, CONTACT_BLOCKLIST_USER_NOT_FOUND: 204, GROUP_INVALID_ID: 600, GROUP_ALREADY_JOINED: 601, GROUP_NOT_JOINED: 602, GROUP_PERMISSION_DENIED: 603, GROUP_MEMBERS_FULL: 604, GROUP_SHARED_FILE_INVALID_ID: 605, GROUP_NOT_EXIST: 606, GROUP_DISABLED: 607, GROUP_NAME_VIOLATION: 608, GROUP_MEMBER_ATTRIBUTES_REACH_LIMIT: 609, GROUP_MEMBER_ATTRIBUTES_UPDATE_FAILED: 610, GROUP_MEMBER_ATTRIBUTES_KEY_REACH_LIMIT: 611, GROUP_MEMBER_ATTRIBUTES_VALUE_REACH_LIMIT: 612, GROUP_USER_IN_BLOCKLIST: 613, CHATROOM_INVALID_ID: 700, CHATROOM_NOT_JOINED: 702, CHATROOM_PERMISSION_DENIED: 703, CHATROOM_MEMBERS_FULL: 704, CHATROOM_NOT_EXIST: 705, CHATROOM_OWNER_NOT_ALLOW_LEAVE: 706, CHATROOM_USER_IN_BLOCKLIST: 707, CONTACT_SYNC_METADATA_FAILED: 1700, CONTACT_SYNC_SOCKET_FAILED: 1701, CONTACT_SYNC_CURSOR_INVALID: 1702, CONTACT_SYNC_PROTO_DECODE_FAILED: 1703, CONTACT_SYNC_CANCELLED: 1704, SESSION_LIST_SOCKET_FAILED: 300, SESSION_LIST_PROTO_DECODE_FAILED: 500, SESSION_LIST_REQUEST_INVALID: 110, SESSION_LIST_FETCH_FAILED: 303, SESSION_LIST_SERVICE_DISABLED: 305, SESSION_LIST_CANCELLED: 1, PRESENCE_PARAM_LENGTH_EXCEED: 1100, PRESENCE_CANNOT_SUBSCRIBE_YOURSELF: 1101, TRANSLATE_PARAM_INVALID: 1110, TRANSLATE_SERVICE_NOT_ENABLED: 1111, TRANSLATE_USAGE_LIMIT: 1112, TRANSLATE_FAILED: 1113, VOICE_TO_TEXT_FILE_INVALID: 407, VOICE_TO_TEXT_FILE_DURATION_TOO_LONG: 408, VOICE_TO_TEXT_FAILED: 409, VOICE_TO_TEXT_FILE_NOT_FOUND: 410, VOICE_TO_TEXT_FILE_TOO_LARGE: 411, REACTION_REACH_LIMIT: 1300, REACTION_ALREADY_OPERATED: 1301, REACTION_OPERATION_ILLEGAL: 1302, UPLOAD_REQUIRED_FIELD_MISSING: 110, UPLOAD_INVALID_APPKEY: 100, UPLOAD_SIZE_EXCEEDED: 405, UPLOAD_REQUEST_FAILED: 402, UPLOAD_TIMEOUT: 301, UPLOAD_ABORTED: 1, SERVICE_LIMIT_EXCEEDED: 4, UNKNOWN: 1 };
 var t = "[REDACTED]";
 var o = (e6) => {
@@ -790,7 +790,7 @@ var nt = (...e6) => {
 };
 var Et = { common: { validation: { range: "100-110", errors: { MISSING_REQUIRED: { code: 110 }, INVALID_FORMAT: { code: 110 }, UNKNOWN: { code: 110 } } }, auth: { range: "108,200-215", errors: { ALREADY_LOGIN: { code: 200 }, NOT_LOGIN: { code: 201 }, UNAUTHORIZED: { code: 202 }, FORBIDDEN: { code: 210 }, TOKEN_EXPIRED: { code: 108 }, BIND_ANOTHER_DEVICE: { code: 213 }, LOGIN_TOO_MANY_DEVICES: { code: 214 }, USER_MUTED: { code: 215 } } }, connection: { range: "1,100,202,300-304", errors: { TIMEOUT: { code: 301 }, WEBSOCKET_ERROR: { code: 300 }, NOT_CREATED: { code: 1 }, CLOSED_BEFORE_READY: { code: 300 }, CANCELLED: { code: 1 }, PROVISION_TIMEOUT: { code: 301 }, PROVISION_REJECTED: { code: 202 }, PROVISION_CLOSED: { code: 300 }, DNSLIST_FAILED: { code: 304 }, SERVER_BUSY: { code: 302 } } }, storage: { range: "3", errors: { OPERATION_FAILED: { code: 3 } } }, message: { range: "1,300-511", errors: { NOT_CONNECTED: { code: 300 }, ACK_TIMEOUT: { code: 301 }, SEND_FAILED: { code: 303 }, SENDER_DESTROYED: { code: 1 }, ENCODE_FAILED: { code: 500 }, DECODE_FAILED: { code: 500 }, ACK_MISSING: { code: 301 } } }, transport: { range: "2,301,303", errors: { NETWORK_ERROR: { code: 2 }, TIMEOUT: { code: 301 }, HTTP_ERROR: { code: 303 }, BUSINESS_UNKNOWN: { code: 303 } } }, upload: { range: "1,100,110,301,402,405", errors: { REQUIRED_FIELD_MISSING: { code: 110 }, INVALID_APPKEY: { code: 100 }, SIZE_EXCEEDED: { code: 405 }, REQUEST_FAILED: { code: 402 }, TIMEOUT: { code: 301 }, ABORTED: { code: 1 } } }, unknown: { range: "1,4", errors: { UNKNOWN: { code: 1 }, SERVICE_LIMIT_EXCEEDED: { code: 4 } } }, push: { range: "1500,1501,1502", errors: { TOKEN_UPLOAD_FAILED: { code: 1500 }, SILENT_MODE_OPERATION_FAILED: { code: 1501 }, PUSH_LANGUAGE_OPERATION_FAILED: { code: 1502 } } }, chatroom: { range: "700-707", errors: { CHATROOM_INVALID_ID: { code: 700 }, CHATROOM_NOT_JOINED: { code: 702 }, CHATROOM_PERMISSION_DENIED: { code: 703 }, CHATROOM_MEMBERS_FULL: { code: 704 }, CHATROOM_NOT_EXIST: { code: 705 }, CHATROOM_OWNER_NOT_ALLOW_LEAVE: { code: 706 }, CHATROOM_USER_IN_BLOCKLIST: { code: 707 } } } }, apis: {} };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/cache-utils-BwRPIZ7n.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/cache-utils-BwRPIZ7n.js
 var e2 = (e6) => "object" == typeof e6 && null !== e6 && !Array.isArray(e6);
 var r2 = (e6, r6) => {
   if (!e6) return r6;
@@ -809,7 +809,7 @@ var t2 = (e6) => {
 };
 var n2 = (e6) => !!e6 && ("undefined" != typeof DOMException && e6 instanceof DOMException ? "QuotaExceededError" === e6.name || "NS_ERROR_DOM_QUOTA_REACHED" === e6.name : e6 instanceof Error && ("QuotaExceededError" === e6.name || e6.message.includes("quota")));
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/session-list-query-Dnp2HbpW.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/session-list-query-Dnp2HbpW.js
 var t3 = (t6) => new E(`${t6} must be a local paging cursor returned by SDK`, { code: e.VALIDATION_INVALID_FORMAT, details: { fields: [{ path: t6, message: `${t6} must be a local paging cursor returned by SDK`, rule: "invalid_format" }] } });
 var n3 = (e6, s5, t6) => {
   const n8 = e6 + s5;
@@ -839,7 +839,7 @@ var o2 = (a5) => {
 };
 var d2 = (e6, s5) => e6.marks.includes(s5);
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/group-user-info-resolver-FNRqDg18.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/group-user-info-resolver-FNRqDg18.js
 var a3 = { WEB: "web", WECHAT_MINIAPP: "wechat-miniapp", QQ_MINIAPP: "qq-miniapp", TOUTIAO_MINIAPP: "toutiao-miniapp", BAIDU_MINIAPP: "baidu-miniapp", ALIPAY_MINIAPP: "alipay-miniapp", DINGTALK_MINIAPP: "dingtalk-miniapp", LARK_MINIAPP: "lark-miniapp", KUAISHOU_MINIAPP: "kuaishou-miniapp", JD_MINIAPP: "jd-miniapp", MINIAPP_360: "360-miniapp", HARMONY_MINIAPP: "harmony-miniapp", QUICKAPP: "quickapp", UNIAPP: "uniapp", REACT_NATIVE: "react-native", ELECTRON_RENDERER: "electron-renderer", ELECTRON_MAIN: "electron-main", UNKNOWN: "unknown" };
 var n4 = { INIT: "init", REQUEST: "request", UPLOAD: "upload", SOCKET: "socket", PROTO: "proto", RUNTIME: "runtime", STORAGE: "storage" };
 var o3 = { INIT_FAILED: "PLATFORM_INIT_FAILED", MISSING_CAPABILITY: "PLATFORM_MISSING_CAPABILITY", REQUEST_FAILED: "PLATFORM_REQUEST_FAILED", UPLOAD_FAILED: "PLATFORM_UPLOAD_FAILED", SOCKET_FAILED: "PLATFORM_SOCKET_FAILED", PROTO_FAILED: "PLATFORM_PROTO_FAILED" };
@@ -959,7 +959,7 @@ var P2 = async (e6) => {
   return { usersById: s5, fetchedUserInfos: r6.fetchedUserInfos, missingUserIds: r6.missingUserIds };
 };
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
 var external_exports = {};
 __export(external_exports, {
   BRAND: () => BRAND,
@@ -1071,7 +1071,7 @@ __export(external_exports, {
   void: () => voidType
 });
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/util.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/util.js
 var util;
 (function(util2) {
   util2.assertEqual = (_8) => {
@@ -1205,7 +1205,7 @@ var getParsedType = (data) => {
   }
 };
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/ZodError.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/ZodError.js
 var ZodIssueCode = util.arrayToEnum([
   "invalid_type",
   "invalid_literal",
@@ -1323,7 +1323,7 @@ ZodError.create = (issues) => {
   return error;
 };
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/locales/en.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/locales/en.js
 var errorMap = (issue, _ctx) => {
   let message;
   switch (issue.code) {
@@ -1426,7 +1426,7 @@ var errorMap = (issue, _ctx) => {
 };
 var en_default = errorMap;
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/errors.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/errors.js
 var overrideErrorMap = en_default;
 function setErrorMap(map) {
   overrideErrorMap = map;
@@ -1435,7 +1435,7 @@ function getErrorMap() {
   return overrideErrorMap;
 }
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
   const { data, path, errorMaps, issueData } = params;
   const fullPath = [...path, ...issueData.path || []];
@@ -1545,14 +1545,14 @@ var isDirty = (x8) => x8.status === "dirty";
 var isValid = (x8) => x8.status === "valid";
 var isAsync = (x8) => typeof Promise !== "undefined" && x8 instanceof Promise;
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/errorUtil.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/errorUtil.js
 var errorUtil;
 (function(errorUtil2) {
   errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
   errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
 })(errorUtil || (errorUtil = {}));
 
-// node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
   constructor(parent, value, path, key) {
     this._cachedPath = [];
@@ -5000,7 +5000,7 @@ var coerce = {
 };
 var NEVER = INVALID;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/chat-manager-DH8a6Qj9.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/chat-manager-DH8a6Qj9.js
 var O2 = { DISCONNECTED: "disconnected", CONNECTING: "connecting", CONNECTED: "connected", RECONNECTING: "reconnecting", RECONNECT_FAILED: "reconnectFailed" };
 var N2 = { CONNECTING: "onConnecting", CONNECTED: "onConnected", DISCONNECTED: "onDisconnected", RECONNECT_FAILED: "onReconnectFailed", TOKEN_WILL_EXPIRE: "onTokenWillExpire", TOKEN_EXPIRED: "onTokenExpired", OFFLINE_MESSAGE_SYNC_START: "onOfflineMessageSyncStart", OFFLINE_MESSAGE_SYNC_FINISH: "onOfflineMessageSyncFinish" };
 var M2 = { SEND_TIMEOUT: "onSendTimeout", GROUP_NOTIFY: "onGroupNotify", CHATROOM_NOTIFY: "onChatRoomNotify", CHAT_THREAD_NOTIFY: "onChatThreadNotify", USER_INFO_NOTIFY: "onUserInfoNotify", MESSAGE_SENT: "__internal:onMessageSent" };
@@ -5874,7 +5874,7 @@ var ut = class {
 ut.key = "chatManager";
 var mt = ut;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/reflection-proto-codec-64ocOTHU.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/reflection-proto-codec-64ocOTHU.js
 var e3 = null;
 try {
   e3 = new WebAssembly.Instance(new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 13, 2, 96, 0, 1, 127, 96, 4, 127, 127, 127, 127, 1, 127, 3, 7, 6, 0, 1, 1, 1, 1, 1, 6, 6, 1, 127, 1, 65, 0, 11, 7, 50, 6, 3, 109, 117, 108, 0, 1, 5, 100, 105, 118, 95, 115, 0, 2, 5, 100, 105, 118, 95, 117, 0, 3, 5, 114, 101, 109, 95, 115, 0, 4, 5, 114, 101, 109, 95, 117, 0, 5, 8, 103, 101, 116, 95, 104, 105, 103, 104, 0, 0, 10, 191, 1, 6, 4, 0, 35, 0, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 126, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 127, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 128, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 129, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 130, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11])), {}).exports;
@@ -8219,14 +8219,14 @@ var Xt = () => {
   }, e6.__reflectionRuntimeInstalled = true);
 };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/event-system-D6IJA0C4.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/event-system-D6IJA0C4.js
 var e4 = { MESSAGE: "onMessage", STREAM_MESSAGE: "onStreamMessage", CONVERSATION_LIST_UPDATE: "onConversationListUpdate", MESSAGE_READ_RECEIPTS: "onMessageReadReceipts", MESSAGE_DELIVERED: "onMessageDelivered", MESSAGE_RECALLED: "onMessageRecalled", MESSAGE_UPDATED: "onMessageUpdated", REACTION_CHANGED: "onReactionChanged", PINNED_MESSAGE_CHANGED: "onPinnedMessageChanged", MULTI_DEVICE_CONTACT: "onMultiDeviceContact", MULTI_DEVICE_CONVERSATION: "onMultiDeviceConversation", SYNC_DATA_START: "onSyncDataStart", SYNC_DATA_FINISHED: "onSyncDataFinished" };
 var E4 = { STATUS_CHANGE: "onPresenceStatusChange" };
 var o5 = { INVITED: "onContactInvited", DELETED: "onContactDeleted", ADDED: "onContactAdded", REFUSE: "onContactRefuse", AGREED: "onContactAgreed", CONTACT_INFO_UPDATED: "onContactInfoUpdated" };
 var _3 = { INVITATION_RECEIVED: "onInvitationReceived", REQUEST_TO_JOIN_RECEIVED: "onRequestToJoinReceived", REQUEST_TO_JOIN_ACCEPTED: "onRequestToJoinAccepted", REQUEST_TO_JOIN_DECLINED: "onRequestToJoinDeclined", INVITATION_ACCEPTED: "onInvitationAccepted", INVITATION_DECLINED: "onInvitationDeclined", USER_REMOVED: "onUserRemoved", GROUP_DESTROYED: "onGroupDestroyed", AUTO_ACCEPT_INVITATION: "onAutoAcceptInvitationFromGroup", MUTE_LIST_ADDED: "onMuteListAdded", MUTE_LIST_REMOVED: "onMuteListRemoved", ALLOW_LIST_ADDED: "onAllowListAdded", ALLOW_LIST_REMOVED: "onAllowListRemoved", ALL_MEMBER_MUTE_STATE_CHANGED: "onAllMemberMuteStateChanged", ADMIN_ADDED: "onAdminAdded", ADMIN_REMOVED: "onAdminRemoved", OWNER_CHANGED: "onOwnerChanged", MEMBERS_JOINED: "onMembersJoined", MEMBERS_EXITED: "onMembersExited", ANNOUNCEMENT_CHANGED: "onAnnouncementChanged", SHARED_FILE_ADDED: "onSharedFileAdded", SHARED_FILE_DELETED: "onSharedFileDeleted", GROUP_INFO_CHANGED: "onGroupInfoChanged", GROUP_DISABLED_CHANGED: "onGroupDisabledChanged", GROUP_MEMBER_ATTRIBUTE_CHANGED: "onGroupMemberAttributeChanged", USER_GROUP_NAMECARD_UPDATED: "onUserGroupNamecardUpdated" };
 var n6 = { CHAT_ROOM_DESTROYED: "__chatroom:onChatRoomDestroyed", MEMBERS_JOINED: "__chatroom:onMembersJoined", MEMBERS_EXITED: "__chatroom:onMembersExited", REMOVED_FROM_CHAT_ROOM: "__chatroom:onRemovedFromChatRoom", MUTE_LIST_ADDED: "__chatroom:onMuteListAdded", MUTE_LIST_REMOVED: "__chatroom:onMuteListRemoved", ALLOW_LIST_ADDED: "__chatroom:onAllowListAdded", ALLOW_LIST_REMOVED: "__chatroom:onAllowListRemoved", ALL_MEMBER_MUTE_STATE_CHANGED: "__chatroom:onAllMemberMuteStateChanged", ADMIN_ADDED: "__chatroom:onAdminAdded", ADMIN_REMOVED: "__chatroom:onAdminRemoved", OWNER_CHANGED: "__chatroom:onOwnerChanged", ANNOUNCEMENT_CHANGED: "__chatroom:onAnnouncementChanged", CHAT_ROOM_INFO_CHANGED: "__chatroom:onChatRoomInfoChanged", ATTRIBUTES_UPDATE: "__chatroom:onAttributesUpdate", ATTRIBUTES_REMOVED: "__chatroom:onAttributesRemoved" };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/profile-version-DLMz8lqW.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/profile-version-DLMz8lqW.js
 var r5 = 2147483647;
 var t5 = (t6) => {
   const e6 = Number(t6);
@@ -8240,7 +8240,7 @@ var e5 = (e6) => {
   return t5(o8);
 };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/user-info-BfRwS4ZA.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/user-info-BfRwS4ZA.js
 var n7 = { nickname: "nickname", avatarUrl: "avatarurl", mail: "mail", phone: "phone", gender: "gender", sign: "sign", birth: "birth", ext: "ext" };
 var i5 = (e6, r6, n8) => new E(e6, { code: "required" === n8 ? e.VALIDATION_REQUIRED : e.VALIDATION_INVALID_FORMAT, details: { fields: [{ path: r6, message: e6, rule: n8 }] } });
 var s3 = (e6, r6) => {
@@ -8332,7 +8332,7 @@ var A5 = (e6, r6) => {
   return w3([[t6, String(a5)]]);
 };
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/index-CjofwvEQ.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/index-CjofwvEQ.js
 var O4 = ["nickname", "avatarUrl", "mail", "phone", "gender", "sign", "birth", "ext"];
 var T3 = (e6) => ({ userId: e6.userId, nickname: e6.nickname, avatarUrl: e6.avatarUrl, sign: e6.sign, ext: e6.ext });
 var M4 = (e6) => ({ userId: e6 });
@@ -9913,7 +9913,7 @@ var dt3 = class {
 dt3.key = "groupManager";
 var ct3 = dt3;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/index-uKWbjx-u.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/chunks/index-uKWbjx-u.js
 var I5 = (e6) => ({ userId: e6 });
 var C3 = (e6) => ({ userId: e6.userId, nickname: e6.nickname, avatarUrl: e6.avatarUrl, sign: e6.sign, ext: e6.ext });
 var f5 = (e6) => e6;
@@ -10364,7 +10364,7 @@ var re5 = class {
 re5.key = "contactManager";
 var ae5 = re5;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/chat-thread/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/chat-thread/index.js
 var h4 = class {
   constructor(e6, t6) {
     this.chatThreadId = e6, this.manager = t6;
@@ -10646,7 +10646,7 @@ var R4 = class {
 R4.key = "chatThreadManager";
 var O6 = R4;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/chatroom/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/chatroom/index.js
 var l6 = class {
   constructor(e6, t6) {
     this.chatRoomId = e6, this.manager = t6;
@@ -11419,7 +11419,7 @@ var ie5 = class {
 ie5.key = "chatRoomManager";
 var ce5 = ie5;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/presence/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/presence/index.js
 var u6 = nt(Et, { common: {}, apis: { publishPresence: { range: "1100", errors: { PRESENCE_PARAM_EXCEED: { code: 1100, httpStatus: 400, retryable: false } } }, subscribePresences: { range: "1100,1101", errors: { cannot_subscribe_yourself: { code: 1101, httpStatus: 400, retryable: false, matchField: "result", matchPattern: "you can't sub yourself" }, param_length_exceed: { code: 1100, httpStatus: 400, retryable: false } } }, unsubscribePresence: { range: "1100", errors: { param_length_exceed: { code: 1100, httpStatus: 400, retryable: false } } }, getSubscribedPresenceList: { range: "1100", errors: { param_length_exceed: { code: 1100, httpStatus: 400, retryable: false } } }, getPresenceStatus: { range: "1100", errors: { param_length_exceed: { code: 1100, httpStatus: 400, retryable: false } } } } });
 var o7 = class {
   constructor() {
@@ -11547,7 +11547,7 @@ var o7 = class {
 o7.key = "presenceManager";
 var l7 = o7;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/push/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/push/index.js
 var l8 = nt(Et, { common: {}, apis: { setGlobalSilentMode: { range: "110,1501", localErrors: { setGlobalSilentMode: { validation_invalid: { code: 110, retryable: false } } }, errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, httpStatus: 400, retryable: false } } }, setConversationSilentMode: { range: "110,1501", localErrors: { setConversationSilentMode: { validation_invalid: { code: 110, retryable: false } } }, errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, httpStatus: 400, retryable: false } } }, setPushLanguage: { range: "110,1502", localErrors: { setPushLanguage: { validation_invalid: { code: 110, retryable: false } } }, errors: { PUSH_LANGUAGE_OPERATION_FAILED: { code: 1502, httpStatus: 400, retryable: false } } }, uploadPushToken: { range: "110,1500", localErrors: { uploadPushToken: { validation_invalid: { code: 110, retryable: false } } }, errors: { TOKEN_UPLOAD_FAILED: { code: 1500, httpStatus: 400, retryable: true } } }, getGlobalSilentMode: { range: "1501", errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, retryable: false } } }, getConversationSilentMode: { range: "110,1501", localErrors: { getConversationSilentMode: { validation_invalid: { code: 110, retryable: false } } }, errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, retryable: false } } }, clearConversationRemindType: { range: "110,1501", localErrors: { clearConversationRemindType: { validation_invalid: { code: 110, retryable: false } } }, errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, retryable: false } } }, getConversationSilentModes: { range: "110,1501", localErrors: { getConversationSilentModes: { validation_invalid: { code: 110, retryable: false } } }, errors: { SILENT_MODE_OPERATION_FAILED: { code: 1501, retryable: false } } }, getConversationListByRemindType: { range: "110", localErrors: { getConversationListByRemindType: { validation_invalid: { code: 110, retryable: false } } }, errors: {} }, getPushLanguage: { range: "1502", errors: { PUSH_LANGUAGE_OPERATION_FAILED: { code: 1502, retryable: false } } } } });
 var u7 = ["singleChat", "groupChat"];
 var d6 = ["ALL", "AT", "NONE", "DEFAULT"];
@@ -11805,7 +11805,7 @@ var h5 = class {
 h5.key = "pushManager";
 var g6 = h5;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/user-info/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/managers/user-info/index.js
 var U6 = (e6) => {
   const { orgName: t6, appName: s5 } = ae(e6.appKey);
   return `/${t6}/${s5}/user/${encodeURIComponent(e6.userId)}/metadata/subscription`;
@@ -11995,7 +11995,7 @@ var x7 = class {
 x7.key = "userInfoManager";
 var T7 = x7;
 
-// node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/index.js
+// ../../node_modules/.pnpm/easemob-websdk@5.0.0/node_modules/easemob-websdk/index.js
 var At2 = "onChatRoomDestroyed";
 var Tt2 = "onMembersJoined";
 var wt2 = "onMembersExited";

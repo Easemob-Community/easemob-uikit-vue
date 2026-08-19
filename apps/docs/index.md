@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Easemob UIKit
   text: Vue 3 即时通讯 UI 组件库
-  tagline: 基于环信 Web IM SDK 构建的高质量 Vue 3 组件库，提供 18 个原子组件与业务容器模块，支持主题定制、暗色模式与 H5 移动端适配，开箱即用。
+  tagline: 基于环信 Web IM SDK 构建的高质量 Vue 3 组件库，提供原子组件、业务模块与容器组件，支持主题定制、暗色模式与 H5 移动端适配，开箱即用。
   image:
     light: /logo-light.png
     dark: /logo-dark.png
@@ -20,7 +20,7 @@ hero:
 features:
   - icon: 🧩
     title: 组件丰富
-    details: 基础、反馈、数据展示三大类 18 个原子组件，覆盖 IM 场景常见 UI 需求。
+    details: 基础、反馈、数据展示、业务容器等 30+ 组件页，覆盖 IM 场景常见 UI 需求。
   - icon: 🎨
     title: 主题定制
     details: 基于 CSS 变量与 ThemeStore 的双层定制能力，一键切换品牌色与组件形态。

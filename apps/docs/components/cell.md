@@ -30,6 +30,16 @@
 
 <VuePlayground :files="cellPlaygroundFiles" title="Cell 配置在线演练场" id="cell" />
 
+## 使用建议
+
+| ✅ Do | ❌ Don't |
+| --- | --- |
+| 列表项主文案用 `title`，辅助信息用 `meta` | 在 title 里塞入两行以上内容 |
+| 导航入口设置 `show-arrow` 提示可点击 | 所有 Cell 都默认带箭头 |
+| 头像、图标放在 `leading` 插槽，操作放在 `trailing` | 在 title 区手写 flex 布局塞图标 |
+| 相关设置项用分组标题 + 边框分隔 | 一个长列表无任何分组 |
+| 禁用项使用 `disabled` 并配合说明 | 禁用项不给出任何原因 |
+
 ## API
 
 <!-- @include: ../.vitepress/gen/cell.md -->

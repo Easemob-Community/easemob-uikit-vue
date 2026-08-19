@@ -133,6 +133,11 @@ export function useProviderSideEffects(options: ProviderSideEffectsOptions) {
     show: toastState.value.visible,
     message: toastState.value.message,
     type: toastState.value.type,
+    duration: toastState.value.duration,
+    closable: toastState.value.closable,
+    position: toastState.value.position,
+    actionText: toastState.value.actionText,
+    onAction: toastState.value.onAction,
   }))
 
   /** 页内通知容器是否挂载（notification.enable 默认 true） */

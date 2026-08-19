@@ -34,5 +34,14 @@
     >
       <em-empty icon="empty/group" title="暂无群组" description="你可以通过搜索或创建加入群组" />
     </div>
+    <div
+      style="
+        width: 360px;
+        background: var(--uikit-bg-base);
+        border-radius: 8px;
+      "
+    >
+      <em-empty icon="empty/search" title="未找到结果" description="换个关键词试试" />
+    </div>
   </div>
 </template>

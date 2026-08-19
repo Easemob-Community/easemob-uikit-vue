@@ -37,5 +37,11 @@ const underlineValue = ref('')
     <Variant title="Maxlength">
       <Input v-model="textValue" :maxlength="10" placeholder="最多10个字符" />
     </Variant>
+    <Variant title="Error">
+      <Input v-model="textValue" error error-message="内容不能为空" placeholder="请输入内容" />
+    </Variant>
+    <Variant title="Readonly">
+      <Input model-value="只读内容，可复制" readonly />
+    </Variant>
   </Story>
 </template>

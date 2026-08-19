@@ -10,6 +10,7 @@ import { useArrowNavigation, useEscToClose, useKeyBindings } from '@easemob/uiki
 import ContactAlphabetNav from '../contact/contact-alphabet-nav.vue'
 import { EmInput as Input } from '@easemob/uikit-core'
 import { EmScrollToTop as ScrollToTop } from '@easemob/uikit-core'
+import { EmSkeleton as Skeleton } from '@easemob/uikit-core'
 import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { UiGroup as Group } from '@easemob/uikit-core'
 import type {
@@ -432,13 +433,21 @@ defineExpose({
         <slot name="body" />
       </div>
 
-      <!-- loading -->
+      <!-- loading：默认骨架屏 -->
       <div
         v-if="props.loading && (groupedGroups.length === 0 || groupedGroups.every((g) => g.items.length === 0))"
         class="group-list__loading-wrap"
       >
         <slot name="loading">
-          <span class="group-list__loading-text">{{ t('common.loading') }}</span>
+          <div class="group-list__skeleton">
+            <div v-for="i in 8" :key="i" class="group-list__skeleton-item">
+              <Skeleton variant="avatar" shape="rounded" />
+              <div class="group-list__skeleton-lines">
+                <Skeleton variant="text" style="width: 35%;" />
+                <Skeleton variant="text" style="width: 65%;" />
+              </div>
+            </div>
+          </div>
         </slot>
       </div>
 
@@ -631,6 +640,27 @@ defineExpose({
 .group-list__loading-text {
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
+}
+
+.group-list__skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.group-list__skeleton-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.group-list__skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .group-list__load-more {

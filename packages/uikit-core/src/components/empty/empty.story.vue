@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Empty from './empty.vue'
+import Button from '../button/button.vue'
 </script>
 
 <template>
@@ -22,6 +23,18 @@ import Empty from './empty.vue'
       </div>
     </Variant>
 
+    <Variant title="搜索无结果">
+      <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
+        <Empty icon="empty/search" title="未找到结果" description="换个关键词试试" />
+      </div>
+    </Variant>
+
+    <Variant title="默认线描插画">
+      <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
+        <Empty illustration title="暂无数据" description="数据加载失败或为空" />
+      </div>
+    </Variant>
+
     <Variant title="尺寸">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
         <Empty icon="empty/files" title="Small" description="弹窗/抽屉内使用" size="small" />
@@ -30,19 +43,12 @@ import Empty from './empty.vue'
       </div>
     </Variant>
 
-    <Variant title="插槽扩展">
+    <Variant title="行动按钮">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/contact" title="仅标题">
-          <template #description>
-            自定义描述插槽内容
+        <Empty illustration title="暂无联系人" description="点击下方按钮添加新朋友">
+          <template #action>
+            <Button type="primary">添加联系人</Button>
           </template>
-        </Empty>
-        <Empty icon="empty/files" description="带操作按钮">
-          <button
-            style="padding: 6px 16px; border-radius: 8px; background: var(--uikit-primary-color); color: #fff; border: none; cursor: pointer;"
-          >
-            新建文件
-          </button>
         </Empty>
       </div>
     </Variant>

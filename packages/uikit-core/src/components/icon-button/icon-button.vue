@@ -72,6 +72,8 @@ function handleClick(event: MouseEvent) {
               box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
   box-sizing: border-box;
+  /* 为 ::after 热区扩展提供定位上下文 */
+  position: relative;
 }
 
 .uikit-icon-button:active:not(:disabled) {
@@ -91,6 +93,19 @@ function handleClick(event: MouseEvent) {
 .uikit-icon-button--medium {
   width: 32px;
   height: 32px;
+}
+
+/* 触屏设备扩展最小触摸热区至 44×44px，保持视觉尺寸不变 */
+@media (hover: none) {
+  .uikit-icon-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(44px, 100%);
+    height: max(44px, 100%);
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* ---------- solid ---------- */

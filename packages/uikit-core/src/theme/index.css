@@ -6,6 +6,9 @@
   --uikit-danger-color: hsl(350, 100%, 60%);
   --uikit-info-color: hsl(203, 100%, 60%);
 
+  /* 焦点环：键盘导航时所有可交互元素的可见焦点指示器 */
+  --uikit-focus-ring-color: var(--uikit-primary-color);
+
   /* 文字层级 */
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
@@ -63,24 +66,33 @@
   --uikit-scrollbar-thumb-hover: #a0a0a0;
   --uikit-scrollbar-thumb-radius: 3px;
 
+  /* 间距阶梯：4 / 8 / 12 / 16 / 24 / 32 / 48px，覆盖紧凑~页面级留白 */
+  --uikit-spacing-1: 4px;
+  --uikit-spacing-2: 8px;
+  --uikit-spacing-3: 12px;
+  --uikit-spacing-4: 16px;
+  --uikit-spacing-5: 24px;
+  --uikit-spacing-6: 32px;
+  --uikit-spacing-7: 48px;
+
   /* 容器间距与组件圆角 */
-  --uikit-container-gap: 8px;
+  --uikit-container-gap: var(--uikit-spacing-2);
   --uikit-cell-gap: 3px;
   /* 密度档变量（默认 normal）：Cell 高度、内边距、列表间距、Header 内边距、输入区、气泡、抽屉、按钮 */
   --uikit-cell-height: 64px;
   --uikit-cell-height-compact: 48px;
   --uikit-cell-height-large: 72px;
-  --uikit-cell-padding-y: 12px;
-  --uikit-list-gap: 8px;
-  --uikit-header-padding-y: 12px;
-  --uikit-input-wrapper-spacing: 12px;
-  --uikit-input-padding-y: 8px;
-  --uikit-input-padding-x: 12px;
-  --uikit-bubble-gap: 8px;
-  --uikit-message-gap: 12px;
-  --uikit-message-padding: 16px;
-  --uikit-drawer-padding: 16px;
-  --uikit-button-padding-y: 8px;
+  --uikit-cell-padding-y: var(--uikit-spacing-3);
+  --uikit-list-gap: var(--uikit-spacing-2);
+  --uikit-header-padding-y: var(--uikit-spacing-3);
+  --uikit-input-wrapper-spacing: var(--uikit-spacing-3);
+  --uikit-input-padding-y: var(--uikit-spacing-2);
+  --uikit-input-padding-x: var(--uikit-spacing-3);
+  --uikit-bubble-gap: var(--uikit-spacing-2);
+  --uikit-message-gap: var(--uikit-spacing-3);
+  --uikit-message-padding: var(--uikit-spacing-4);
+  --uikit-drawer-padding: var(--uikit-spacing-4);
+  --uikit-button-padding-y: var(--uikit-spacing-2);
   --uikit-banner-padding-y: 8px;
   --uikit-banner-padding-x: 12px;
   --uikit-components-radius: 8px;
@@ -133,12 +145,23 @@
   /* 交错动画间隔（Action-Sheet 项列） */
   --uikit-anim-stagger-delay: 30ms;
 
-  /* 字体族：标准跨平台系统字体栈，确保不同浏览器字体表现一致 */
-  --uikit-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* 字体族：优先使用系统字体与中文黑体，确保跨平台一致 */
+  --uikit-font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Source Han Sans SC', sans-serif;
   font-family: var(--uikit-font-family);
 
   /* 字体缩放：由 themeStore / useH5Adaptation 统一写入 */
   --uikit-font-scale: 1;
+
+  /* 字重 token */
+  --uikit-font-weight-regular: 400;
+  --uikit-font-weight-medium: 500;
+  --uikit-font-weight-semibold: 600;
+  --uikit-font-weight-bold: 700;
+
+  /* 行高 token */
+  --uikit-font-lineheight-tight: 1.25;
+  --uikit-font-lineheight-normal: 1.5;
+  --uikit-font-lineheight-relaxed: 1.75;
 
   /* 字号 token：与 --uikit-font-scale 联动，实现全局字号缩放（适老版） */
   --uikit-font-size-8: calc(8px * var(--uikit-font-scale));
@@ -177,7 +200,8 @@
   --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
   --uikit-text-primary: #f9fafb;
   --uikit-text-secondary: #9ca3af;
-  --uikit-text-tertiary: #6b7280;
+  /* 暗色下三级文字适度提亮，保证在 secondary/elevated 背景上达到 WCAG AA 4.5:1 */
+  --uikit-text-tertiary: #8a92a0;
   /* 强调色/彩色背景上的文字：暗色下同样恒白 */
   --uikit-text-inverse: #ffffff;
 
@@ -242,6 +266,12 @@
   /* 阴影系统 - 暗色（提高不透明度避免深色背景看不出阴影） */
   --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.40), 0 12px 32px rgba(0, 0, 0, 0.45);
   --uikit-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.50), 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+/* ===== 全局焦点环：确保键盘用户可定位焦点，覆盖组件内 outline: none ===== */
+:focus-visible {
+  outline: 2px solid var(--uikit-focus-ring-color) !important;
+  outline-offset: 2px !important;
 }
 
 /* ===== 密度档变量覆盖 ===== */

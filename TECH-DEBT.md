@@ -920,6 +920,144 @@
 - **验证**：chatroom `vue-tsc --noEmit` + build + demo-chatroom `vue-tsc --noEmit` + `changelog:check` + 涉及文件 lint；demo 双层 header 消失、弹幕插槽演示可跑；docs 插槽清单与实现一致。
 - **关联 skill**：`uikit-chatroom-design` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`
 
+### [x] D104. UI/UX 验收：文档准确性修复（P1-1）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P1-1 / P0-8。
+- **现象**：文档站首页写「18 个原子组件」，与实际 32 个组件页不符；QuickStart 头像示例使用 `:url`，但 `Avatar` 组件 prop 实为 `src`。
+- **修复**：`apps/docs/index.md` 组件数量描述改为「30+ 组件页」并按功能分组；`apps/docs/guide/quickstart.md` 与 `integrations/skills/reference/quickstart.md` 的 `em-avatar` 示例改为 `:src`。
+- **验证**：全站 grep 无 `<em-avatar[^>]*:url` 残留；docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [x] D105. UI/UX 验收：全局 focus-visible 焦点环（P1-2）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P1-2 / P0-2。
+- **现象**：全库无可交互元素的 `:focus-visible` 样式，键盘用户无法定位焦点（WCAG 2.4.7）。
+- **修复**：`packages/uikit-core/src/theme/index.css` 新增 `--uikit-focus-ring-color` token 与全局 `:focus-visible { outline: 2px solid ... !important; outline-offset: 2px !important; }`，确保组件内 `outline: none` 不吞掉焦点环。
+- **验证**：`vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` 通过。
+- **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
+
+### [x] D106. UI/UX 验收：IconButton 移动端触摸热区扩展（P1-3）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P1-3 / P0-1。
+- **现象**：`IconButton` small=28×28 / medium=32×32，低于 HIG 44pt / MD 48dp。
+- **修复**：`packages/uikit-core/src/components/icon-button/icon-button.vue` 在 `@media (hover: none)` 下通过 `::after` 扩展最小触摸区域至 44×44px，视觉尺寸保持不变。
+- **验证**：`vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` 通过。
+- **关联 skill**：`uikit-h5-adaptation` / `uikit-component-authoring`
+
+### [x] D107. UI/UX 验收：Input error / readonly 态（P1-4）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P1-4 / P0-5。
+- **现象**：`Input` 仅 default/focus/disabled/clearable 四态，表单校验失败无感知。
+- **修复**：`packages/uikit-core/src/components/input/input.vue` 新增 `error` / `errorMessage` / `errorIcon` / `readonly` props：错误态显示红色边框 + 右侧错误图标 + 下方错误文案；只读态灰底但文字可选中。同步补全 `input.story.vue` 演示。
+- **验证**：`vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` 通过。
+- **关联 skill**：`uikit-component-authoring`
+
+### [x] D116. UI/UX 验收：Type Scale 排版规范（P3-2）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-2 / P0-4。
+- **现象**：主题无 line-height / font-weight token，无排版层级规范。
+- **修复**：`packages/uikit-core/src/theme/index.css` 新增 `--uikit-font-weight-regular/medium/semibold/bold` 与 `--uikit-font-lineheight-tight/normal/relaxed`；字体族调整为中文优先栈；`apps/docs/guide/theme.md` 新增「字重与行高」「排版层级」两节，输出 Display/H1-H4/Body-L/M/S/Caption/Overline 十级排版表（字号/行高/字重/颜色/用途）。
+- **验证**：core build + uikit-im build + docs build 通过。
+- **关联 skill**：`uikit-styling-theming` / `uikit-docs-authoring`
+
+### [x] D115. UI/UX 验收：间距阶梯（P3-1）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-1 / P0-9。
+- **现象**：`theme/index.css` 仅 `--uikit-container-gap` 一个间距变量，缺规范阶梯。
+- **修复**：`packages/uikit-core/src/theme/index.css` 新增 `--uikit-spacing-1~7`（4/8/12/16/24/32/48px）并标注用途；将 `--uikit-container-gap` / `--uikit-list-gap` / `--uikit-bubble-gap` / `--uikit-message-gap` / `--uikit-message-padding` / `--uikit-drawer-padding` / `--uikit-button-padding-y` / `--uikit-header-padding-y` / `--uikit-input-wrapper-spacing` / `--uikit-input-padding-*` / `--uikit-cell-padding-y` 等底层映射到间距阶梯；`Cell` 的 flex gap 改用 `--uikit-spacing-3`；`apps/docs/guide/theme.md` 补间距阶梯表。
+- **验证**：core build + uikit-im build 通过。
+- **关联 skill**：`uikit-styling-theming`
+
+### [x] D114. UI/UX 验收：z-index 设计层级表（P3-4）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-4 / P0-6。
+- **现象**：技术层有全局分配器但缺设计规范文档。
+- **修复**：`apps/docs/guide/theme.md` 新增 z-index 层级表，按实际组件（Toast/Notification 9999、Popup/Modal/ActionSheet/ImageViewer/Drawer 2000+、ScrollToTop 10、内容 1/0）梳理并说明 `nextZIndex()` 递增规则与显式 `z-index` prop。
+- **验证**：docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [x] D113. UI/UX 验收：空状态统一模板（P2-4）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P2-4 / P0-10 / I-09。
+- **现象**：`Empty` 组件无插画/行动按钮，各容器空态文案不统一。
+- **修复**：
+  - `packages/uikit-core/src/components/empty/empty.vue` 新增 `illustration` prop 与 `#illustration` 插槽（默认线描插画），新增 `#action` 插槽；保持原有 icon/title/description 行为完全向后兼容。
+  - 文档 demo 补全「联系人 / 聊天 / 群组 / 搜索无结果」四种 IM 场景模板与 action 按钮示例；story 同步更新。
+- **验证**：core build + uikit-im build + docs build（含 gen:api）通过。
+- **关联 skill**：`uikit-component-authoring`
+
+### [x] D112. UI/UX 验收：Skeleton 骨架屏组件（P2-3）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P2-3 / P0-10。
+- **现象**：列表首次加载仅 loading 转圈，无骨架屏。
+- **修复**：
+  - 新增 `packages/uikit-core/src/components/skeleton/skeleton.vue`：支持 avatar / text / paragraph / card 变体，可关闭动画，自动尊重 `prefers-reduced-motion`。
+  - 接入 `packages/uikit-im/src/modules/conversation/conversation-list.vue`、`contact/contact-list.vue`、`group/group-list.vue` 首次加载占位。
+  - 补 story、文档页 `apps/docs/components/skeleton.md`、demo、sidebar 登记与 `gen:api` 白名单；core/uikit-im 导出与 resolver/auto-imports 经 `aux:gen` 同步。
+- **验证**：core build + uikit-im `vue-tsc --noEmit` + build + docs build（含 gen:api）通过。
+- **关联 skill**：`uikit-component-authoring` / `uikit-release-build`
+
+### [x] D111. UI/UX 验收：Toast 能力补全（P2-2）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P2-2 / I-06。
+- **现象**：Toast 仅 type/duration 可配，不支持手动关闭、操作按钮、位置配置。
+- **修复**：
+  - `packages/uikit-core/src/components/toast/toast.vue` 新增 `closable` / `position` / `actionText` props 与 `#action` 插槽，支持 `duration=0` 不自动关闭；新增 `action` / `update:show` 事件。
+  - `packages/uikit-core/src/composables/use-toast.ts` 单例状态扩展对应字段，`show` 方法通过 TypeScript 重载同时兼容旧签名 `(msg, type, duration)` 与新签名 `(msg, options)`。
+  - `packages/uikit-core/src/composables/use-provider-side-effects.ts` 的 `toastProps` 同步透出新增字段。
+  - story 补 closable / position / action 演示。
+- **验证**：`vue-tsc --noEmit` + build + docs build 通过。
+- **关联 skill**：`uikit-component-authoring` / `uikit-store-composable`
+
+### [x] D112. UI/UX 验收：Design Tokens 总览页 + 图标总览（P3-3）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-3 / V-01 / V-15。
+- **现象**：docs 缺少 Design Tokens 总览页与图标总览页，设计系统变量可发现性不足。
+- **修复**：
+  - 新增 `apps/docs/guide/design-tokens.md`：按 Color / Type / Spacing / Radius / Elevation / Motion / Z-Index 分类表格展示所有 `--uikit-*` 变量，含 light/dark 默认值与用途说明；颜色 token 以可视化色块渲染。
+  - 扩展 `apps/docs/components/icon.md`：新增图标总览网格，支持分类筛选、搜索、点击复制图标 name；补充 color 行为说明与图标设计规范摘要。
+  - 登记 sidebar：`apps/docs/.vitepress/config.ts` 将「Design Tokens」放入「设计规范」分组。
+- **验证**：`pnpm gen:api` + docs build 通过；token 页与 `theme/index.css` 手动核对一致。
+- **关联 skill**：`uikit-docs-authoring` / `uikit-styling-theming`
+
+### [x] D113. UI/UX 验收：Phase 4 体验与文档完善（P4-1/2/3/4 文档项）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` Phase 4。
+- **修复**：
+  - `apps/docs/guide/demo/animation-playground.vue` 新增动效可视化面板，演示 fade-scale 过渡、四种 easing 曲线、Ripple 波纹与 scale-press；`apps/docs/guide/theme.md` 插入「动效演练场」小节。
+  - `apps/docs/guide/h5-adaptation.md` 补充断点系统表（sm/md/lg/xl/2xl）、双栏布局规则、手势映射表、横屏/折叠屏适配说明、输入区布局规范。
+  - `apps/docs/guide/theme.md` 扩展「设计原则」为 5 条核心决策依据。
+  - `apps/docs/components/{button,input,icon-button,cell,modal}.md` 各新增「使用建议」Do/Don't 表格。
+  - `apps/docs/guide/icons.md` 补充图标设计规范（画布/描边/端点/转角/着色/命名）。
+  - `apps/docs/components/message-list.md` 补充时间戳策略建议。
+- **验证**：docs build 通过。
+- **关联 skill**：`uikit-docs-authoring` / `uikit-styling-theming` / `uikit-h5-adaptation`
+
+### [x] D110. UI/UX 验收：Modal danger 变体（P2-1）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P2-1 / I-08。
+- **现象**：`Modal` 确认按钮仅 `type="primary"`，删除等危险操作无红色确认。
+- **修复**：`packages/uikit-core/src/components/modal/modal.vue` 新增 `type?: 'default' | 'danger'` prop，`danger` 时确认按钮自动切换为 `type="danger"`；调整 `.uikit-modal` 为 flex 纵向布局，限制最大宽度 `min(420px, 90vw - 40px)`、最大高度 `90vh - 40px`，正文区域支持溢出滚动；`apps/docs/guide/theme.md` 补 `--uikit-popup-padding` 说明。
+- **验证**：story 补 danger 演示；`vue-tsc --noEmit` + build + docs build 通过。
+- **关联 skill**：`uikit-component-authoring` / `uikit-docs-authoring`
+
+### [x] D109. UI/UX 验收：图标 color 行为复核（P2-5）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P2-5 / P0-7。
+- **现象**：验收报告提出「填充式图标 color prop 不生效，需 `:style` 传色」。
+- **复核结论**：2.0.0 的 `packages/uikit-core/src/components/icon/icon.vue` 已统一处理：描边图标 `stroke="currentColor"` 时改绑 `props.color`，填充图标 `fill="currentColor"` 时改绑 `props.color`；实测 icons-v2 中 `trash.svg`（描边）与 `pin/fill.svg` / `archive.svg`（填充）均生效。无需代码改动。
+- **动作**：`apps/docs/components/icon.md` 颜色小节补一句说明，明确描边/填充图标均可通过 `color` prop 改色。
+- **验证**：docs build 通过。
+- **关联 skill**：`uikit-component-authoring`
+
+### [x] D108. UI/UX 验收：暗色模式对比度验证（P1-5）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P1-5 / P0-3。
+- **现象**：暗色模式技术完整，但文字×背景组合对比度未经验证。
+- **修复**：测算 9 组暗色对比度，将 `theme/index.css` 暗色段 `--uikit-text-tertiary` 由 `#6b7280` 提亮为 `#8a92a0`，确保在 secondary/elevated 背景上达到 WCAG AA 4.5:1；`apps/docs/guide/theme.md` 补对比度验证表。
+- **验证**：9 组暗色组合全部 PASS AA（正文）；`vue-tsc --noEmit` + build + docs build 通过。
+- **关联 skill**：`uikit-styling-theming` / `uikit-docs-authoring`
+
 ### [ ] D103. docs 站 vue 代码块 `{{ }}` 被 Vue 编译（VitePress 1.6.4 对 vue 语言 fence 不加 v-pre）
 
 - **背景**：VitePress 1.6.4 的 fence 渲染对**非 vue 语言**代码块输出 `v-pre`，对 **vue 语言**不加（源码 `const vPre = vueRE.test(lang) ? "" : "v-pre"`），且 shiki 高亮把代码拆成 `<span>` 结构后，`{{ }}` 落在 span 文本节点 → **页面 md 编译为 Vue 组件模板时被当作插值** → dev 控制台「Property xx was accessed during render but is not defined」警告 + **渲染时示例文本被吞**（`{{word}}` 求值为空）。已核实构建产物：代码块容器无 v-pre、`{{word}}` 原样在 span 内。

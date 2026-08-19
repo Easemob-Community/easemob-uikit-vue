@@ -24,6 +24,7 @@ export {
   EmPresenceSelectorPopup,
   EmResizable,
   EmScrollToTop,
+  EmSkeleton,
   EmStatusBanner,
   EmToast,
   EmUserCard,
@@ -41,6 +42,7 @@ export type {
   NotificationProps,
   PresenceDisplayStatus,
   ResizableProps,
+  SkeletonProps,
   StatusBannerEmits,
   StatusBannerItem,
   StatusBannerProps,
@@ -79,4 +81,5 @@ export const componentList = [
   'em-status-banner',
   'em-image-viewer',
   'em-resizable',
+  'em-skeleton',
 ] as const

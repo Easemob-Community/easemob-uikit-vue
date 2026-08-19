@@ -6,6 +6,7 @@ import Button from '../button/button.vue'
 const show1 = ref(false)
 const show2 = ref(false)
 const show3 = ref(false)
+const show4 = ref(false)
 </script>
 
 <template>
@@ -31,6 +32,17 @@ const show3 = ref(false)
         confirm-text="确认退出"
       >
         确定要退出当前账号吗？
+      </Modal>
+    </Variant>
+    <Variant title="Danger">
+      <Button type="danger" @click="show4 = true">删除</Button>
+      <Modal
+        v-model:show="show4"
+        type="danger"
+        title="确认删除？"
+        confirm-text="删除"
+      >
+        删除后数据将无法恢复，是否继续？
       </Modal>
     </Variant>
   </Story>

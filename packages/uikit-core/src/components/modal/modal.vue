@@ -16,6 +16,8 @@ export interface ModalProps {
   confirmText?: string
   /** 点击遮罩是否关闭弹窗，默认 false（需通过按钮或 ESC 关闭） */
   closeOnClickOverlay?: boolean
+  /** 弹窗类型：default（默认）/ danger（危险操作，确认按钮变红色） */
+  type?: 'default' | 'danger'
 }
 
 export interface ModalEmits {
@@ -33,6 +35,7 @@ const props = withDefaults(defineProps<ModalProps>(), {
   cancelText: t('button.cancel', '取消'),
   confirmText: t('button.confirm', '确认'),
   closeOnClickOverlay: false,
+  type: 'default',
 })
 
 const emit = defineEmits<ModalEmits>()
@@ -65,7 +68,7 @@ function onCancel() {
         <Button v-if="props.showCancel" type="default" @click="onCancel">
           {{ props.cancelText }}
         </Button>
-        <Button type="primary" @click="onConfirm">
+        <Button :type="props.type === 'danger' ? 'danger' : 'primary'" @click="onConfirm">
           {{ props.confirmText }}
         </Button>
       </div>
@@ -75,9 +78,14 @@ function onCancel() {
 
 <style scoped>
 .uikit-modal {
-  width: 300px;
+  width: min(420px, calc(90vw - 40px));
+  min-width: 280px;
+  max-height: calc(90vh - 40px);
   padding: 20px;
   border-radius: var(--uikit-components-radius, 12px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .uikit-modal__title {
@@ -86,6 +94,7 @@ function onCancel() {
   text-align: center;
   margin-bottom: 12px;
   color: var(--uikit-text-primary);
+  flex-shrink: 0;
 }
 
 .uikit-modal__body {
@@ -93,6 +102,8 @@ function onCancel() {
   color: var(--uikit-text-secondary);
   text-align: center;
   margin-bottom: 20px;
+  overflow-y: auto;
+  word-break: break-word;
 }
 
 .uikit-modal__footer {

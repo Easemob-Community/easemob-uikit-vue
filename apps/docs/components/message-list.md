@@ -57,6 +57,24 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit-im'
 
 完整配置（含历史加载、置顶条、搜索、@我定位等）见 [聊天模块](./chat-container) 的 `ChatConfig` API 表格。
 
+## 时间戳策略建议
+
+`showTime` 控制时间戳展示，推荐按场景选择：
+
+| 策略 | 配置 | 适用场景 |
+| --- | --- | --- |
+| 始终显示 | `showTime: 'always'` | 客服、审计等对时间敏感的场景 |
+| 悬停显示 | `showTime: 'hover'` | 桌面端常规聊天，减少界面噪音 |
+| 不显示 | `showTime: false` | 极简模式或业务侧自行渲染时间轴 |
+
+内部默认规则（当 `showTime` 开启时）：
+
+- 同一天内，相邻消息间隔 ≥ 5 分钟显示一次时间戳。
+- 跨天、跨会话首条消息强制显示时间戳。
+- 时间戳格式跟随 locale（中文「14:32」、英文「2:32 PM」等）。
+
+业务侧若需要更细粒度控制（如间隔 3 分钟、显示完整日期），可通过 `#message-time` 插槽或 `messageTimeFormatter` 自定义。
+
 ## API
 
 <!-- @include: ../.vitepress/gen/message-list.md -->

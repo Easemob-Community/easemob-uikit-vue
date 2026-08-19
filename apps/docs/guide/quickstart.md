@@ -40,7 +40,7 @@ app.mount('#app')
 ```vue
 <template>
   <em-button type="primary">发送消息</em-button>
-  <em-avatar :url="user.avatarUrl" />
+  <em-avatar :src="user.avatarUrl" />
 </template>
 ```
 

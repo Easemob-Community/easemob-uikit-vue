@@ -26,6 +26,16 @@
 
 <VuePlayground :files="inputPlaygroundFiles" title="输入框配置在线演练场" id="input" />
 
+## 使用建议
+
+| ✅ Do | ❌ Don't |
+| --- | --- |
+| 表单校验失败时设置 `error` 并给出 `error-message` | 仅依赖边框变红，不说明错误原因 |
+| 只读信息使用 `readonly`，禁用操作使用 `disabled` | 用 disabled 展示需要复制的信息 |
+| 搜索框使用 `variant="search"` 并配合 `prefix-icon` | 在普通输入框内手动塞搜索图标 |
+| 密码、手机号等敏感输入设置正确的 `type` | 所有输入都用 `type="text"` |
+| 占位文案说明输入预期，如「请输入群名称」 | 占位文案与 label 完全重复 |
+
 ## API
 
 <!-- @include: ../.vitepress/gen/input.md -->

@@ -14,6 +14,7 @@ import { EmActionSheet as ActionSheet } from '@easemob/uikit-core'
 import { EmScrollToTop as ScrollToTop } from '@easemob/uikit-core'
 import { EmEmpty as Empty } from '@easemob/uikit-core'
 import { EmStatusBanner as StatusBanner } from '@easemob/uikit-core'
+import { EmSkeleton as Skeleton } from '@easemob/uikit-core'
 import type { UiConversation as Conversation } from '@easemob/uikit-core'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationAction, ConversationTabKey } from './types'
@@ -574,10 +575,15 @@ function handleCustomAction(key: string, conversation: Conversation) {
         @read="sendChannelAck"
         @custom-action="handleCustomAction"
       />
-      <!-- 会话列表同步中（WebSocket 首次同步） -->
-      <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__syncing">
-        <Icon name="loading/arc/big" :size="20" anim="spin" />
-        <span>{{ t('conversation.syncing') }}</span>
+      <!-- 会话列表同步中（WebSocket 首次同步）：骨架屏替代转圈 -->
+      <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__skeleton">
+        <div v-for="i in 6" :key="i" class="conversation-list__skeleton-item">
+          <Skeleton variant="avatar" shape="rounded" />
+          <div class="conversation-list__skeleton-lines">
+            <Skeleton variant="text" style="width: 40%;" />
+            <Skeleton variant="text" style="width: 70%;" />
+          </div>
+        </div>
       </div>
       <div v-if="loadingMore" class="conversation-list__loading">
         {{ t('conversation.loadingMore') }}
@@ -770,15 +776,24 @@ function handleCustomAction(key: string, conversation: Conversation) {
   color: var(--uikit-text-secondary);
 }
 
-.conversation-list__syncing {
+.conversation-list__skeleton {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.conversation-list__skeleton-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+}
+
+.conversation-list__skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  padding: 40px 16px;
-  text-align: center;
-  font-size: var(--uikit-font-size-14);
-  color: var(--uikit-text-secondary);
 }
 
 .conversation-list__body {

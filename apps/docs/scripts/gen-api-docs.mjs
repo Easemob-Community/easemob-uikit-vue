@@ -59,6 +59,7 @@ const PACKAGES = [
       'presence-selector',
       'resizable',
       'scroll-to-top',
+      'skeleton',
       'status-banner',
       'toast',
       'user-card',
