@@ -4,10 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm sync:vendor && vitepress dev",
-    "build": "pnpm sync:vendor && vitepress build",
+    "dev": "pnpm split-changelog && pnpm sync:vendor && vitepress dev",
+    "build": "pnpm split-changelog && pnpm sync:vendor && vitepress build",
     "preview": "vitepress preview",
     "sync:vendor": "node scripts/sync-vendor.mjs",
+    "split-changelog": "node scripts/split-changelog.mjs",
     "gen:api": "node scripts/gen-api-docs.mjs"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-vitepress-demo": "^2.2.1",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-tabs": "^0.9.1"
   }
 }

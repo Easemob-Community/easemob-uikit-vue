@@ -1,6 +1,6 @@
 # 更新日志
 
-本页内容与仓库根 `CHANGELOG.md` 保持单一数据源，通过 `@include` 自动同步；发版时只需更新根 CHANGELOG，本页无需（也不应）手动修改版本段。
+本页内容与仓库根 `CHANGELOG.md` 保持单一数据源，构建时由脚本自动拆分为三个包的更新日志；发版时只需更新根 CHANGELOG，本页无需手动修改版本段。
 
 ::: tip 版本说明
 
@@ -10,4 +10,18 @@
 
 :::
 
-<!-- @include: ../../../CHANGELOG.md -->
+::: tabs
+
+== @easemob/uikit-im
+
+<!-- @include: ../.vitepress/gen/changelog-im.md -->
+
+== @easemob/uikit-core
+
+<!-- @include: ../.vitepress/gen/changelog-core.md -->
+
+== @easemob/uikit-chatroom
+
+<!-- @include: ../.vitepress/gen/changelog-chatroom.md -->
+
+:::

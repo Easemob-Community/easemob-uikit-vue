@@ -92,13 +92,17 @@ for (const [pkg, pkgPath] of Object.entries(PACKAGES)) {
 // ---- 4. 文档站 changelog 不得再手写版本段 ----
 // （另起非全局正则：复用带 /g 的 SECTION_RE.test 会受 lastIndex 状态影响）
 if (/^## (?:@[\w./-]+ )?\d+\.\d+\.\d+ \(\d{4}-\d{2}-\d{2}\)$/m.test(docsChangelog)) {
-  fail('apps/docs/guide/changelog.md 仍包含手写版本段，应只保留 @include 根 CHANGELOG.md')
+  fail('apps/docs/guide/changelog.md 仍包含手写版本段，应只保留 @include 引用')
 }
 else {
   ok('apps/docs/guide/changelog.md 无手写版本段（单一数据源生效）')
 }
-if (!docsChangelog.includes('@include: ../../../CHANGELOG.md'))
-  fail('apps/docs/guide/changelog.md 缺少 @include 引用根 CHANGELOG.md')
+const includesRootChangelog = docsChangelog.includes('@include: ../../../CHANGELOG.md')
+const includesSplitChangelog = ['changelog-im', 'changelog-core', 'changelog-chatroom'].some(name =>
+  docsChangelog.includes(`@include: ../.vitepress/gen/${name}.md`),
+)
+if (!includesRootChangelog && !includesSplitChangelog)
+  fail('apps/docs/guide/changelog.md 缺少 @include 引用根 CHANGELOG.md 或拆分后的生成文件')
 
 // ---- 汇总 ----
 console.log(failures.length === 0 ? '\n版本同步校验通过 ✓' : `\n校验失败 ${failures.length} 项：`)

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
 // 版本号：由 vitepress build 时注入（见 vite.config.ts）
 const version = '__EASEMOB_UIKIT_VERSION__'
@@ -10,6 +11,12 @@ export default defineConfig({
   cleanUrls: true,
   // icons.md 引用了 packages/uikit-im 下的仓内文件（docs/UI_CONVENTIONS.md 等），属于仓库内文档链接，跳过校验
   ignoreDeadLinks: [/packages\/uikit/],
+
+  markdown: {
+    config(md) {
+      md.use(tabsMarkdownPlugin)
+    },
+  },
 
   head: [
     ['link', { rel: 'icon', href: '/favicon.png', type: 'image/png' }],
