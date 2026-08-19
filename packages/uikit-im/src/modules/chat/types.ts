@@ -114,11 +114,11 @@ export interface ChatConfig {
       /** 预览文本最大长度，默认 30 */
       maxPreviewLength?: number
     }
-    /** 消息搜索配置 */
+    /** 消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选） */
     search?: {
       /** 是否启用消息搜索入口，默认 false */
       enabled?: boolean
-      /** 是否启用 SDK 服务端消息搜索，默认 false（仅搜索本地已加载消息） */
+      /** 是否启用 SDK 服务端消息搜索（websdk2 searchMessages），默认 false（仅搜索本地已加载消息）；开启后出现「当前会话/全部会话」作用域切换 */
       enableServerSearch?: boolean
       /** 每页条数，默认 20 */
       pageSize?: number

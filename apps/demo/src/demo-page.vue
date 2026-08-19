@@ -112,6 +112,7 @@ const {
   groupReadReceiptMaxSize,
   chatShowTime,
   chatMessageSearchEnabled,
+  chatMessageServerSearchEnabled,
   chatMessageStatusShowText,
   chatMessageStatusDirection,
   chatMessageStatusPosition,
@@ -375,7 +376,10 @@ const chatConfig = computed(() => ({
   },
   messageList: {
     showTime: chatShowTime.value,
-    search: { enabled: chatMessageSearchEnabled.value },
+    search: {
+      enabled: chatMessageSearchEnabled.value,
+      enableServerSearch: chatMessageServerSearchEnabled.value,
+    },
     messageStatus: {
       showText: chatMessageStatusShowText.value,
       direction: chatMessageStatusDirection.value,

@@ -1081,12 +1081,17 @@ onBeforeUnmount(() => {
   color: var(--uikit-text-secondary);
 }
 
-/* 被引用/定位后的高亮：作用于气泡主体，避免影响头像/名称/状态。
- * 三阶段：主题色脉冲（边框+背景+发光）→ 静态保持 → 平滑淡出；
- * 总时长 2.4s 与 message-list 高亮计时器（2500ms）对齐，动画结束后类移除无视觉突变。 */
-.message-bubble-wrapper--highlight .message-bubble-wrapper__body {
+/* 被引用/定位后的高亮：整行底色横带。
+ * 横带用中性灰 --uikit-bg-hover（随明/暗主题），不占用主题色；圆角跟随
+ * --uikit-components-radius（主题设直角即为直角）。
+ * 三阶段：脉冲（2 次）→ 静态保持 → 平滑淡出；
+ * 总时长 2.8s 与 message-list 高亮计时器（3000ms）对齐，动画结束后类移除无视觉突变。 */
+.message-bubble-wrapper--highlight {
+  /* 高亮横带内边距：负 margin 抵消，避免高亮时布局抖动 */
+  padding: 4px 8px;
+  margin: -4px -8px;
   border-radius: var(--uikit-components-radius, 8px);
-  animation: message-bubble-flash 2.4s ease-in-out forwards;
+  animation: message-row-flash 2.8s ease-in-out forwards;
 }
 
 /* 头像右键菜单 */
@@ -1135,39 +1140,23 @@ onBeforeUnmount(() => {
   align-self: flex-end;
 }
 
-@keyframes message-bubble-flash {
+/* 整行底色横带：2 次脉冲 → 保持 → 淡出（中性灰，随明/暗主题） */
+@keyframes message-row-flash {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--uikit-primary-rgb), 0);
     background-color: transparent;
   }
-  /* 三次主题色脉冲峰值（2px 边框 + 发光 + 背景着染） */
   8%,
-  30%,
-  50% {
-    box-shadow:
-      0 0 0 2px var(--uikit-primary-color),
-      0 0 16px rgba(var(--uikit-primary-rgb), 0.5);
-    background-color: rgba(var(--uikit-primary-rgb), 0.14);
+  30% {
+    background-color: var(--uikit-bg-hover);
   }
-  /* 脉冲间回落，保留弱边框保持识别 */
-  20%,
-  42% {
-    box-shadow:
-      0 0 0 2px rgba(var(--uikit-primary-rgb), 0.55),
-      0 0 10px rgba(var(--uikit-primary-rgb), 0.25);
-    background-color: rgba(var(--uikit-primary-rgb), 0.08);
+  18% {
+    background-color: transparent;
   }
-  /* 静态保持：醒目但稳定的高亮态 */
-  62%,
-  70%,
-  88% {
-    box-shadow:
-      0 0 0 2px rgba(var(--uikit-primary-rgb), 0.6),
-      0 0 10px rgba(var(--uikit-primary-rgb), 0.3);
-    background-color: rgba(var(--uikit-primary-rgb), 0.1);
+  45%,
+  70% {
+    background-color: var(--uikit-bg-hover);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(var(--uikit-primary-rgb), 0);
     background-color: transparent;
   }
 }

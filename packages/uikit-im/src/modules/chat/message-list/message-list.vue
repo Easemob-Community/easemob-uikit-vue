@@ -723,14 +723,20 @@ function locateAndFlash(targetMsgID: string): boolean {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
     }
-    setHighlight(targetMsgID)
-    if (highlightTimer)
+    if (highlightTimer) {
       clearTimeout(highlightTimer)
-    // 与 message-bubble-wrapper 的高亮动画总时长（2.4s）对齐，动画结束后清除高亮态
-    highlightTimer = setTimeout(() => {
-      setHighlight('')
       highlightTimer = null
-    }, 2500)
+    }
+    // 先清空再在下一帧重设：重复定位同一消息时强制移除/重加高亮类，让 CSS 动画重新触发
+    setHighlight('')
+    nextTick(() => {
+      setHighlight(targetMsgID)
+      // 与 message-bubble-wrapper 的高亮动画总时长（2.8s）对齐，动画结束后清除高亮态
+      highlightTimer = setTimeout(() => {
+        setHighlight('')
+        highlightTimer = null
+      }, 3000)
+    })
   })
   return true
 }

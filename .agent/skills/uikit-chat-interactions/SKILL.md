@@ -138,8 +138,13 @@ resetMultiSelectState() // 模块级导出函数，登出/切会话时调用
 - **置顶消息**（`pinned-bar.vue` + `pinned-bar-item.vue`）：顶部横幅展示最多 20 条置顶；
   `pinnedBar.visible` 默认 true、`maxPreviewLength` 默认 30；数据来自
   `chatManager.getPinnedMessageList`（不分页），点击置顶项可滚动定位（`requestLocate`）。
-- **消息搜索**（`message-search-panel.vue`）：`search.enabled` 默认 false（入口默认关闭）；
-  `enableServerSearch` 默认 false 时仅搜本地已加载消息，`pageSize` 默认 20。
+- **消息搜索**（`message-search-modal.vue`，居中 Modal 壳，非锚定 Popup）：`search.enabled` 默认 false（入口默认关闭）；
+  `enableServerSearch` 默认 false 时仅搜本地已加载消息，`pageSize` 默认 20。开启服务端搜索后出现
+  「当前会话/全部会话」作用域切换（全局限服务端，不传 conversationId 即全局）；类型筛选（文本/图片/视频/
+  文件/位置，映射 wire `txt/img/video/file/loc`，websdk2 不支持 audio/cmd、combine 会被 SDK 丢弃）；
+  结果关键词前端拆分高亮（不用 v-html）；505（服务未开通）降级为本地结果 + 轻提示；全局结果点击先切会话
+  再 `requestLocate`。SDK 调用走 `client.chatManager.searchMessages`（websdk2 唯一入口，文档里的
+  `WebIM.conn.contact.searchMessages` 不存在；本地校验错误码 110，不是 -3）。
 - **群已读回执**（`group-read-receipt-modal.vue`）：点击气泡上的已读圆圈打开，
   展示已读成员列表与未读数；数据用 `fetchGroupReadDetail`（SDK 批量接口，按群会话获取），
   userId 去重 + 本地成员列表补全（见历史任务「群已读详情去重与批量补全修复」）。

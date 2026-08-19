@@ -25,6 +25,7 @@ const {
   groupReadReceiptMaxSize,
   chatShowTime,
   chatMessageSearchEnabled,
+  chatMessageServerSearchEnabled,
   chatMessageStatusShowText,
   chatMessageStatusDirection,
   chatMessageStatusPosition,
@@ -210,6 +211,10 @@ const {
         <label class="demo-check">
           <input v-model="chatMessageSearchEnabled" type="checkbox" />
           <span>启用消息搜索</span>
+        </label>
+        <label class="demo-check">
+          <input v-model="chatMessageServerSearchEnabled" type="checkbox" :disabled="!chatMessageSearchEnabled" />
+          <span>启用服务端搜索（增值付费服务，需在环信控制台开通；关闭时纯本地搜索）</span>
         </label>
         <div>
           <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">时间戳显示</span>

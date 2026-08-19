@@ -291,6 +291,8 @@ function createDemoSettings() {
   /* ===== 消息列表配置 ===== */
   const chatShowTime = ref<false | true | 'always' | 'hover'>(false)
   const chatMessageSearchEnabled = ref(false)
+  /** 服务端消息搜索（付费增值服务，需在环信控制台开通；关闭时纯本地搜索） */
+  const chatMessageServerSearchEnabled = ref(false)
   const chatMessageStatusShowText = ref(false)
   const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
   const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
@@ -493,6 +495,7 @@ function createDemoSettings() {
     // 消息列表
     chatShowTime,
     chatMessageSearchEnabled,
+    chatMessageServerSearchEnabled,
     chatMessageStatusShowText,
     chatMessageStatusDirection,
     chatMessageStatusPosition,

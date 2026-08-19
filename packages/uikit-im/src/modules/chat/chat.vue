@@ -33,7 +33,7 @@ import GroupAnnouncementBanner from './group-announcement-banner.vue'
 import ChatInfoDrawer from './drawer/chat-info-drawer.vue'
 import ForwardModal from './forward-modal/forward-modal.vue'
 import MultiSelectBar from './multi-select-bar/multi-select-bar.vue'
-import MessageSearchPanel from './message-search/message-search-panel.vue'
+import MessageSearchModal from './message-search/message-search-modal.vue'
 import type { ChatConfig, MentionContact } from './types'
 
 const props = defineProps<ChatProps>()
@@ -358,12 +358,8 @@ const searchEnabled = computed(() => props.config?.messageList?.search?.enabled 
 /** 是否显示 drawer */
 const showDrawer = ref(false)
 
-/** 是否显示消息搜索面板 */
+/** 是否显示消息搜索弹窗 */
 const showSearchPanel = ref(false)
-
-/** 消息搜索触发按钮 ref */
-const searchBtnRef = ref<InstanceType<typeof IconButton>>()
-const searchBtnEl = computed(() => searchBtnRef.value?.$el as HTMLElement | undefined)
 
 /** 群信息抽屉组件引用 */
 const chatInfoDrawerRef = ref<InstanceType<typeof ChatInfoDrawer>>()
@@ -811,9 +807,36 @@ function onAvatarMention(payload: { userId: string, name: string }) {
   messageInputRef.value?.appendMention?.(contact)
 }
 
-/** 消息搜索定位 */
-function onSearchLocate(msgId: string) {
-  requestLocate(msgId)
+/**
+ * 消息搜索定位：全局搜索可能命中其它会话的消息，需先切换会话并等消息加载后再定位
+ */
+function onSearchLocate(payload: { msgId: string, conversationId: string }) {
+  const { msgId, conversationId } = payload
+  if (!conversationId || conversationId === currentConversation.value?.id) {
+    requestLocate(msgId)
+    return
+  }
+  const cvs = stores.conversation.conversationList.find(c => c.id === conversationId)
+  if (!cvs) {
+    showToast(t('message.search.cvsNotLoaded') ?? '会话不存在或未加载', 'warning')
+    return
+  }
+  selectConversation(conversationId)
+  if (stores.message.getMessages(conversationId).length > 0) {
+    nextTick(() => requestLocate(msgId))
+    return
+  }
+  // 等目标会话首批消息加载完成再定位；3s 超时兜底防泄漏
+  const stop = watch(
+    () => stores.message.getMessages(conversationId).length,
+    (len) => {
+      if (len > 0) {
+        stop()
+        nextTick(() => requestLocate(msgId))
+      }
+    },
+  )
+  setTimeout(stop, 3000)
 }
 
 /**
@@ -1070,7 +1093,6 @@ async function onRemoveAdmin(member: UiGroupMember) {
           </div>
           <IconButton
             v-if="searchEnabled"
-            ref="searchBtnRef"
             icon="misc/magnifier2"
             :icon-size="20"
             @click.stop="showSearchPanel = true"
@@ -1180,24 +1202,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
         @remove-admin="onRemoveAdmin"
       />
 
-      <!-- 消息搜索面板 -->
-      <Popup
+      <!-- 消息搜索弹窗（居中 Modal，自带 Popup 壳） -->
+      <MessageSearchModal
         v-if="searchEnabled"
-        :show="showSearchPanel"
-        :anchor="searchBtnEl || undefined"
-        placement="bottom"
-        align="end"
-        :overlay="false"
-        :offset="8"
-        @update:show="showSearchPanel = $event"
-      >
-        <MessageSearchPanel
-          :show="showSearchPanel"
-          :config="props.config?.messageList?.search"
-          @locate="onSearchLocate"
-          @close="showSearchPanel = false"
-        />
-      </Popup>
+        v-model:show="showSearchPanel"
+        :config="props.config?.messageList?.search"
+        @locate="onSearchLocate"
+        @close="showSearchPanel = false"
+      />
 
       <!-- 移除成员二次确认 -->
       <Modal

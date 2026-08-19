@@ -34,6 +34,27 @@ export interface UseMessageSearchOptions {
   pageSize?: number
 }
 
+/** 搜索范围：当前会话 / 全部会话（全部会话依赖服务端搜索） */
+export type MessageSearchScope = 'conversation' | 'global'
+
+/** 可筛选的消息类型（'' 表示全部）；取 MESSAGE_TYPE 子集，服务端调用时再映射 wire 类型 */
+export type MessageSearchTypeFilter =
+  | ''
+  | typeof MESSAGE_TYPE.TEXT
+  | typeof MESSAGE_TYPE.IMAGE
+  | typeof MESSAGE_TYPE.VIDEO
+  | typeof MESSAGE_TYPE.FILE
+  | typeof MESSAGE_TYPE.LOCATION
+
+/** UI 消息类型 → websdk2 searchMessages 的 wire msgTypes 字面量（SDK 协议字段，保留字面量） */
+const SEARCH_WIRE_TYPE_MAP: Record<Exclude<MessageSearchTypeFilter, ''>, 'txt' | 'img' | 'video' | 'file' | 'loc'> = {
+  [MESSAGE_TYPE.TEXT]: 'txt',
+  [MESSAGE_TYPE.IMAGE]: 'img',
+  [MESSAGE_TYPE.VIDEO]: 'video',
+  [MESSAGE_TYPE.FILE]: 'file',
+  [MESSAGE_TYPE.LOCATION]: 'loc',
+}
+
 /** 判断消息内容是否命中关键词 */
 function matchMessageContent(msg: UiMessage, keyword: string): boolean {
   const k = keyword.toLowerCase()
@@ -98,6 +119,12 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
   const pageNum = ref(1)
   const hasMore = ref(false)
   const totalPages = ref(0)
+  /** 搜索范围（全部会话仅在 enableServerSearch=true 时可用） */
+  const scope = ref<MessageSearchScope>('conversation')
+  /** 消息类型筛选（'' = 全部） */
+  const activeType = ref<MessageSearchTypeFilter>('')
+  /** 服务端搜索不可用（服务未开通，505），UI 据此显示降级提示 */
+  const serverUnavailable = ref(false)
 
   const currentConversation = computed(() => stores.conversation.currentConversation)
   const currentConversationId = computed(() => stores.conversation.currentConversationId)
@@ -109,6 +136,9 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
     hasMore.value = false
     totalPages.value = 0
     error.value = ''
+    scope.value = 'conversation'
+    activeType.value = ''
+    serverUnavailable.value = false
   }
 
   function buildResultFromUiMessage(msg: UiMessage): MessageSearchResult {
@@ -134,23 +164,40 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
       return []
     const messages = stores.message.getMessages(cvsId)
     return messages
-      .filter(msg => matchMessageContent(msg, k))
+      .filter(msg => (!activeType.value || msg.type === activeType.value) && matchMessageContent(msg, k))
       .map(msg => buildResultFromUiMessage(msg))
   }
 
-  async function searchServer(): Promise<MessageSearchResult[]> {
-    const cvs = currentConversation.value
-    if (!cvs?.id)
-      return []
+  /** 判断是否为「搜索服务未开通」错误（websdk2 映射 HTTP 403 / 别名 4030204 为 505） */
+  function isServiceNotEnabled(e: any): boolean {
+    return e?.code === 505 || e?.name === 'service_not_enabled'
+  }
 
+  async function searchServer(): Promise<MessageSearchResult[]> {
     const opts = toValue(options)
     const pageSize = opts.pageSize ?? 20
+    const isGlobal = scope.value === 'global'
+    const cvs = currentConversation.value
+    // 会话内搜索必须有当前会话；全局搜索不传 conversationId/conversationType
+    if (!isGlobal && !cvs?.id)
+      return []
+
+    const option = {
+      keywordList: [keyword.value.trim()],
+      // 会话内搜索传会话 ID 与类型（必同传）；全局搜索两者都不传
+      ...(!isGlobal && cvs?.id
+        ? {
+            conversationId: cvs.id,
+            conversationType: (cvs.type === CONVERSATION_TYPE.GROUPCHAT
+              ? CONVERSATION_TYPE.GROUPCHAT
+              : CONVERSATION_TYPE.SINGLECHAT) as 'singleChat' | 'groupChat',
+          }
+        : {}),
+      ...(activeType.value ? { msgTypes: [SEARCH_WIRE_TYPE_MAP[activeType.value]] } : {}),
+    }
+
     const res: any = await client.value.chatManager.searchMessages({
-      option: {
-        keywordList: [keyword.value.trim()],
-        conversationId: cvs.id,
-        conversationType: cvs.type === CONVERSATION_TYPE.GROUPCHAT ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT,
-      },
+      option,
       pageNum: pageNum.value,
       pageSize,
     })
@@ -162,7 +209,7 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
       const contact = stores.contact.getContact(msg.from)
       return {
         msgId: msg.id || msg.msgId || msg.msgServerId || msg.msgLocalId || '',
-        conversationId: msg.conversationId || cvs.id,
+        conversationId: msg.conversationId || cvs?.id || '',
         senderId: msg.from,
         senderName: contact?.remark || userInfo?.nickname || msg.from,
         avatar: userInfo?.avatarUrl,
@@ -189,7 +236,9 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
     error.value = ''
 
     try {
-      const localResults = searchLocal()
+      // 全局范围只走服务端（本地仅加载了当前会话消息，混入会误导）
+      const isGlobal = scope.value === 'global'
+      const localResults = isGlobal ? [] : searchLocal()
       let serverResults: MessageSearchResult[] = []
       const opts = toValue(options)
       let serverFailed = false
@@ -201,13 +250,17 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
         }
         try {
           serverResults = await searchServer()
+          serverUnavailable.value = false
         }
         catch (e: any) {
           serverFailed = true
           if (nextPage) {
             pageNum.value = Math.max(1, pageNum.value - 1)
           }
-          // 服务未开通等错误不阻断本地搜索结果，仅记录日志
+          // 服务未开通（505）：置降级标记供 UI 提示；其余错误仅记录日志，均不阻断本地结果
+          if (isServiceNotEnabled(e)) {
+            serverUnavailable.value = true
+          }
           logger.warn('[useMessageSearch] server search failed:', e)
         }
       }
@@ -249,6 +302,9 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
     error,
     hasMore,
     totalPages,
+    scope,
+    activeType,
+    serverUnavailable,
     search,
     loadMore,
     reset,
