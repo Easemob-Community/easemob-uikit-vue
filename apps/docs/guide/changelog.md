@@ -10,18 +10,20 @@
 
 :::
 
-::: tabs
-
-== @easemob/uikit-im
+<ChangelogTabs>
+<template #im>
 
 <!-- @include: ../.vitepress/gen/changelog-im.md -->
 
-== @easemob/uikit-core
+</template>
+<template #core>
 
 <!-- @include: ../.vitepress/gen/changelog-core.md -->
 
-== @easemob/uikit-chatroom
+</template>
+<template #chatroom>
 
 <!-- @include: ../.vitepress/gen/changelog-chatroom.md -->
 
-:::
+</template>
+</ChangelogTabs>

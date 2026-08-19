@@ -62,7 +62,7 @@ async function copyName(name: string) {
         线性图标（V2）
         <span class="icon-gallery__count">({{ filterNames(v2Names).length }})</span>
       </h2>
-      <details v-for="[category, list] in v2Grouped" :key="category" class="icon-gallery__section">
+      <details v-for="[category, list] in v2Grouped" :key="category" class="icon-gallery__section" open>
         <summary :id="category" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
@@ -89,7 +89,7 @@ async function copyName(name: string) {
         面性图标（Filled）
         <span class="icon-gallery__count">({{ filterNames(filledNames).length }})</span>
       </h2>
-      <details v-for="[category, list] in filledGrouped" :key="`filled-${category}`" class="icon-gallery__section">
+      <details v-for="[category, list] in filledGrouped" :key="`filled-${category}`" class="icon-gallery__section" open>
         <summary :id="`filled-${category}`" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
@@ -116,7 +116,7 @@ async function copyName(name: string) {
         旧版图标（Legacy）
         <span class="icon-gallery__count">({{ filterNames(legacyNames).length }})</span>
       </h2>
-      <details v-for="[category, list] in legacyGrouped" :key="`legacy-${category}`" class="icon-gallery__section">
+      <details v-for="[category, list] in legacyGrouped" :key="`legacy-${category}`" class="icon-gallery__section" open>
         <summary :id="`legacy-${category}`" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
