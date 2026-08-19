@@ -117,12 +117,12 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
 ### 4.2 图片消息（image-message.vue）— 三级展示策略
 
 - **气泡展示**：`thumbnailUrl || localUrl || bigImageUrl || originalImageUrl`（优先最小图，避免气泡拉大图流量）。
-- **点击中图**：`bigImageUrl || localUrl || originalImageUrl`。
+- **点击大图**：`bigImageUrl || localUrl || originalImageUrl`。
 - **原图**：`localUrl || originalImageUrl`（预览高清/下载用）。
 - **展示尺寸**：按 body `width/height` 等比缩放，上限 `MAX_WIDTH/MAX_HEIGHT = 240`，无尺寸时默认 `160×120`。
-- **预览**：`EmImageViewer` 受控（`v-model:show` + `v-model:index`），srcs = `[中图, 原图]` 去重；
-  底部按钮「查看原图/切回中图」做 toggle。
-- **失败降级**：`degradedIndexes: Set<number>` 记录已降级索引，中图失败升原图、原图失败回中图，
+- **预览**：`EmImageViewer` 受控（`v-model:show` + `v-model:index`），srcs = `[大图, 原图]` 去重；
+  底部按钮「查看原图/查看大图」做 toggle。
+- **失败降级**：`degradedIndexes: Set<number>` 记录已降级索引，大图失败升原图、原图失败回大图，
   **同一索引只降级一次，防止互跳死循环**。
 - 加载失败显示 `t('message.image.loadFailed')`；无 URL 显示 `t('message.image')` 占位。
 
@@ -185,8 +185,8 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
 - ❌ 渲染组件里 `(msg as any).body.xxx` 裸读，不用类型守卫——SDK 升级后编译期失守。
 - ❌ 新消息类型忘了加 `messageComponentMap` 映射，用户看到 `[未知消息类型]` 兜底块。
 - ❌ 改单类型渲染时顺手动 `bubble-wrapper` 的 isSelf/状态/已读逻辑——外壳逻辑影响所有消息。
-- ❌ 图片气泡直接显示原图 URL——三级展示策略要求气泡最小图、点击中图、原图仅预览/下载用。
-- ❌ 图片预览失败降级不记录 `degradedIndexes`——中图/原图互跳死循环。
+- ❌ 图片气泡直接显示原图 URL——三级展示策略要求气泡缩略图、点击大图、原图仅预览/下载用。
+- ❌ 图片预览失败降级不记录 `degradedIndexes`——大图/原图互跳死循环。
 - ❌ 每个语音组件各自维护一个 audio 实例——必须经 `AudioController` 互斥。
 - ❌ 合并消息弹窗里 `v-for` 内联渲染子消息不拆子组件——`useUserInfo` 跟踪失效（见用户属性 skill）。
 - ❌ 在 `message-list.vue` 里写死间距/圆角替代 `--uikit-message-gap / --uikit-message-padding` 密度变量。

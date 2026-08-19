@@ -36,17 +36,17 @@ const displaySize = computed(() => {
 })
 
 /**
- * 展示用图片 URL（三级策略：气泡最小图 → 点击中图 → 点击原图）。
+ * 展示用图片 URL（三级策略：气泡缩略图 → 点击大图 → 点击原图）。
  * 气泡统一优先缩略图（thumbnailUrl 最小图），缺缩略图时回退本地图（己方发送中），
- * 最后才回退中图/原图，避免气泡直接拉大图流量。
+ * 最后才回退大图/原图，避免气泡直接拉大图流量。
  */
 const displayUrl = computed(() => {
   const body = props.message.body as ImageMessageBody
   return body.thumbnailUrl || body.localUrl || body.bigImageUrl || body.originalImageUrl || ''
 })
 
-/** 中图 URL（点击气泡后首屏展示：优先 bigImageUrl 中图，己方发送中回退本地图，最后原图兜底） */
-const mediumUrl = computed(() => {
+/** 大图 URL（点击气泡后首屏展示：优先 bigImageUrl 大图，己方发送中回退本地图，最后原图兜底） */
+const bigUrl = computed(() => {
   const body = props.message.body as ImageMessageBody
   return body.bigImageUrl || body.localUrl || body.originalImageUrl || ''
 })
@@ -76,16 +76,16 @@ function onError() {
 
 /** 全屏预览（EmImageViewer 受控） */
 const isPreviewing = ref(false)
-/** 预览索引：0=中图，1=原图 */
+/** 预览索引：0=大图，1=原图 */
 const previewIndex = ref(0)
 
-/** 预览图片列表：中图 → 原图（同图双分辨率，供 EmImageViewer 展示与加载状态上报） */
+/** 预览图片列表：大图 → 原图（同图双分辨率，供 EmImageViewer 展示与加载状态上报） */
 const previewSrcs = computed(() => {
-  const list = [mediumUrl.value, originalUrl.value].filter(Boolean) as string[]
+  const list = [bigUrl.value, originalUrl.value].filter(Boolean) as string[]
   return list.length > 1 && list[0] === list[1] ? [list[0]] : list
 })
 
-/** 已触发过失败降级的索引（防止中图/原图失败互跳死循环） */
+/** 已触发过失败降级的索引（防止大图/原图失败互跳死循环） */
 const degradedIndexes = ref<Set<number>>(new Set())
 
 function openPreview() {
@@ -96,22 +96,22 @@ function openPreview() {
   isPreviewing.value = true
 }
 
-/** 升级到原图（中图阶段底部按钮触发） */
+/** 升级到原图（大图阶段底部按钮触发） */
 function upgradeToOriginal() {
   if (previewIndex.value !== 0 || previewSrcs.value.length <= 1)
     return
   previewIndex.value = 1
 }
 
-/** 切回中图（原图阶段底部按钮触发，与"查看原图"形成 toggle） */
-function backToMedium() {
+/** 切回大图（原图阶段底部按钮触发，与"查看原图"形成 toggle） */
+function backToBig() {
   if (previewIndex.value !== 1)
     return
   previewIndex.value = 0
 }
 
 /**
- * 预览图片加载失败：中图失败自动升原图；原图失败回退中图；
+ * 预览图片加载失败：大图失败自动升原图；原图失败回退大图；
  * 同一索引已降级过一次则停止互跳，避免死循环。
  */
 function onPreviewError(index: number) {
@@ -157,7 +157,7 @@ function onPreviewError(index: number) {
       {{ t('message.image', '[图片]') }}
     </div>
 
-    <!-- 全屏预览（缩放/旋转/loading/下载由 EmImageViewer 提供，中图/原图切换走底部按钮） -->
+    <!-- 全屏预览（缩放/旋转/loading/下载由 EmImageViewer 提供，大图/原图切换走底部按钮） -->
     <ImageViewer
       v-model:show="isPreviewing"
       v-model:index="previewIndex"
@@ -166,7 +166,7 @@ function onPreviewError(index: number) {
       @load-error="onPreviewError"
     >
       <template #footer="{ index: viewIndex, loading }">
-        <!-- 中图阶段 → 点击查看原图 -->
+        <!-- 大图阶段 → 点击查看原图 -->
         <button
           v-if="viewIndex === 0 && previewSrcs.length > 1 && !loading"
           class="image-message__preview-toggle"
@@ -178,13 +178,13 @@ function onPreviewError(index: number) {
         <div v-else-if="viewIndex === 1 && loading" class="image-message__preview-tip">
           {{ t('message.image.loadingOriginal', '加载原图中…') }}
         </div>
-        <!-- 原图已展示 → 点击切回中图 -->
+        <!-- 原图已展示 → 点击切回大图 -->
         <button
           v-else-if="viewIndex === 1 && !loading"
           class="image-message__preview-toggle"
-          @click="backToMedium"
+          @click="backToBig"
         >
-          {{ t('message.image.viewMedium', '查看中图') }}
+          {{ t('message.image.viewBig', '查看大图') }}
         </button>
       </template>
     </ImageViewer>

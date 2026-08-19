@@ -1,5 +1,5 @@
-import { setLogFilePrefix as Dv, setLogCollector as Pv, appendLog as Bv, MESSAGE_TYPE as he, CONVERSATION_TYPE as Oe, createLogger as St, MESSAGE_STATUS as At, isCombineBody as Nf, isTextBody as $f, isImageBody as zv, isVoiceBody as vc, isVideoBody as Gv, isFileBody as Uv, isLocationBody as Fv, isCustomBody as Hv, isCmdBody as Vv, formatSdkError as Ze, GROUP_MEMBER_ROLE as ft, useNotification as jv, emitNotificationDelivered as Fa, STREAM_MESSAGE_STATUS as xl, t as Ft, insertChatNotice as Lt, NOTICE_EVENT_TYPE as Nt, resolveNoticeUserName as As, buildAnnouncementNoticeText as Lf, parsePresenceStatus as qv, createConnectionHandlers as Kv, getStorageBackend as ci, createUIKitStorageKey as Of, useLocale as et, useToast as rn, useCoreUIKitProvider as Wv, useUserInfo as Jv, usePresence as ao, EmPopup as Ht, EmUserCard as yc, EmAvatar as Ut, EmCopyableText as yi, EmIcon as $e, EmActionSheet as Cr, EmBadge as Df, EmButton as Nn, EmCell as Bt, EmEmojiPicker as bc, EmEmpty as Zt, EmIconButton as gt, EmImageViewer as Pf, EmInput as Mn, EmModal as Po, EmNotification as Xv, EmNotificationContainer as Bf, EmPresenceAvatar as Yv, EmPresenceSelector as Qv, EmPresenceSelectorModal as Zv, EmPresenceSelectorPopup as ey, EmResizable as ty, EmScrollToTop as pa, EmStatusBanner as zf, EmToast as Gf, useViewport as In, useLongPress as Uf, useEscToClose as wc, useArrowNavigation as ha, useKeyBindings as ma, GROUP_INFO_LIMIT as Pt, usePullRefresh as Ff, useThemeStore as Sr, INJECTION_KEY as no, linkify as Ur, STREAM_CUSTOM_TYPE as ny, detectEnvironment as kc, downloadFile as _c, useClientStore as sy, resolveSdkErrorMessage as go, useResizable as Hf, FORWARD_MODE as ps, HEADER_ALIGN as Fr, createUserInfoSubscriptionErrorHandler as oy, useProviderSideEffects as ry, createConversationTimeFormatter as iy, useOwnUserInfo as ay } from "@easemob/uikit-core";
-import { ACK_TYPE as Q2, CONVERSATION_TYPE as Z2, EmActionSheet as eP, EmAvatar as tP, EmBadge as nP, EmButton as sP, EmCell as oP, EmCopyableText as rP, EmEmojiPicker as iP, EmEmpty as aP, EmIcon as lP, EmIconButton as cP, EmImageViewer as uP, EmInput as dP, EmModal as fP, EmNotification as pP, EmNotificationContainer as hP, EmPopup as mP, EmPresenceAvatar as gP, EmPresenceSelector as vP, EmPresenceSelectorModal as yP, EmPresenceSelectorPopup as bP, EmResizable as wP, EmScrollToTop as kP, EmStatusBanner as _P, EmToast as MP, EmUserCard as CP, FORWARD_MODE as SP, GROUP_INFO_LIMIT as IP, GROUP_MEMBER_ROLE as xP, HEADER_ALIGN as TP, INJECTION_KEY as EP, MESSAGE_STATUS as AP, MESSAGE_TYPE as RP, NOTICE_EVENT_TYPE as NP, PRESENCE_STATUS as $P, PresenceDomain as LP, STREAM_CUSTOM_TYPE as OP, STREAM_MESSAGE_STATUS as DP, UIKitClient as PP, UserInfoDomain as BP, buildAnnouncementNoticeText as zP, clearPersistedLogs as GP, configureLogPersistence as UP, createClient as FP, createLocale as HP, createNoticeMessage as VP, createUIKitStorageKey as jP, emitNotificationDelivered as qP, exportPersistedLogs as KP, findLocaleKey as WP, formatPersistedLogs as JP, getPersistedLogs as XP, getStorageBackend as YP, insertChatNotice as QP, isCmdBody as ZP, isCombineBody as eB, isCustomBody as tB, isFileBody as nB, isImageBody as sB, isKeyboardShortcutsEnabled as oB, isLocationBody as rB, isNoticeMessage as iB, isTextBody as aB, isVideoBody as lB, isVoiceBody as cB, mergeLocaleMessages as uB, resolveNoticeUserName as dB, setKeyboardShortcutsEnabled as fB, t as pB, useArrowNavigation as hB, useBottomSheet as mB, useClient as gB, useClientStore as vB, useEscToClose as yB, useH5Adaptation as bB, useKeyBindings as wB, useKeyboard as kB, useLocale as _B, useLongPress as MB, useNotification as CB, usePresence as SB, usePresenceStore as IB, usePullRefresh as xB, useResizable as TB, useRipple as EB, useTheme as AB, useThemeStore as RB, useToast as NB, useUIKitStorage as $B, useViewport as LB } from "@easemob/uikit-core";
+import { setLogFilePrefix as Dv, setLogCollector as Pv, appendLog as Bv, MESSAGE_TYPE as he, CONVERSATION_TYPE as Oe, createLogger as St, normalizeUserId as cn, MESSAGE_STATUS as At, isCombineBody as Nf, isTextBody as $f, isImageBody as zv, isVoiceBody as vc, isVideoBody as Gv, isFileBody as Uv, isLocationBody as Fv, isCustomBody as Hv, isCmdBody as Vv, formatSdkError as Ze, GROUP_MEMBER_ROLE as ft, useNotification as jv, emitNotificationDelivered as Fa, STREAM_MESSAGE_STATUS as xl, t as Ft, insertChatNotice as Lt, NOTICE_EVENT_TYPE as Nt, resolveNoticeUserName as As, buildAnnouncementNoticeText as Lf, parsePresenceStatus as qv, createConnectionHandlers as Kv, getStorageBackend as ci, createUIKitStorageKey as Of, useLocale as et, useToast as rn, useCoreUIKitProvider as Wv, useUserInfo as Jv, usePresence as ao, EmPopup as Ht, EmUserCard as yc, EmAvatar as Ut, EmCopyableText as yi, EmIcon as $e, EmActionSheet as Cr, EmBadge as Df, EmButton as Nn, EmCell as Bt, EmEmojiPicker as bc, EmEmpty as Zt, EmIconButton as gt, EmImageViewer as Pf, EmInput as Mn, EmModal as Po, EmNotification as Xv, EmNotificationContainer as Bf, EmPresenceAvatar as Yv, EmPresenceSelector as Qv, EmPresenceSelectorModal as Zv, EmPresenceSelectorPopup as ey, EmResizable as ty, EmScrollToTop as pa, EmStatusBanner as zf, EmToast as Gf, useViewport as In, useLongPress as Uf, useEscToClose as wc, useArrowNavigation as ha, useKeyBindings as ma, GROUP_INFO_LIMIT as Pt, usePullRefresh as Ff, useThemeStore as Sr, INJECTION_KEY as no, linkify as Ur, STREAM_CUSTOM_TYPE as ny, detectEnvironment as kc, downloadFile as _c, useClientStore as sy, resolveSdkErrorMessage as go, useResizable as Hf, FORWARD_MODE as ps, HEADER_ALIGN as Fr, createUserInfoSubscriptionErrorHandler as oy, useProviderSideEffects as ry, createConversationTimeFormatter as iy, useOwnUserInfo as ay } from "@easemob/uikit-core";
+import { ACK_TYPE as Q2, CONVERSATION_TYPE as Z2, EmActionSheet as eP, EmAvatar as tP, EmBadge as nP, EmButton as sP, EmCell as oP, EmCopyableText as rP, EmEmojiPicker as iP, EmEmpty as aP, EmIcon as lP, EmIconButton as cP, EmImageViewer as uP, EmInput as dP, EmModal as fP, EmNotification as pP, EmNotificationContainer as hP, EmPopup as mP, EmPresenceAvatar as gP, EmPresenceSelector as vP, EmPresenceSelectorModal as yP, EmPresenceSelectorPopup as bP, EmResizable as wP, EmScrollToTop as kP, EmStatusBanner as _P, EmToast as MP, EmUserCard as CP, FORWARD_MODE as SP, GROUP_INFO_LIMIT as IP, GROUP_MEMBER_ROLE as xP, HEADER_ALIGN as TP, INJECTION_KEY as EP, MESSAGE_STATUS as AP, MESSAGE_TYPE as RP, NOTICE_EVENT_TYPE as NP, PRESENCE_STATUS as $P, PresenceDomain as LP, STREAM_CUSTOM_TYPE as OP, STREAM_MESSAGE_STATUS as DP, UIKitClient as PP, UserInfoDomain as BP, buildAnnouncementNoticeText as zP, clearPersistedLogs as GP, configureLogPersistence as UP, createClient as FP, createLocale as HP, createNoticeMessage as VP, createUIKitStorageKey as jP, emitNotificationDelivered as qP, exportPersistedLogs as KP, findLocaleKey as WP, formatPersistedLogs as JP, getPersistedLogs as XP, getStorageBackend as YP, insertChatNotice as QP, isCmdBody as ZP, isCombineBody as eB, isCustomBody as tB, isFileBody as nB, isImageBody as sB, isKeyboardShortcutsEnabled as oB, isLocationBody as rB, isNoticeMessage as iB, isTextBody as aB, isVideoBody as lB, isVoiceBody as cB, mergeLocaleMessages as uB, normalizeUserId as dB, resolveNoticeUserName as fB, setKeyboardShortcutsEnabled as pB, t as hB, useArrowNavigation as mB, useBottomSheet as gB, useClient as vB, useClientStore as yB, useEscToClose as bB, useH5Adaptation as wB, useKeyBindings as kB, useKeyboard as _B, useLocale as MB, useLongPress as CB, useNotification as SB, usePresence as IB, usePresenceStore as xB, usePullRefresh as TB, useResizable as EB, useRipple as AB, useTheme as RB, useThemeStore as NB, useToast as $B, useUIKitStorage as LB, useViewport as OB } from "@easemob/uikit-core";
 import { markRaw as Mc, ref as E, computed as k, getCurrentScope as ly, onScopeDispose as cy, shallowRef as bn, shallowReadonly as Io, onMounted as an, nextTick as nt, watch as Ge, onUnmounted as fr, toValue as $t, getCurrentInstance as Cc, toRef as uy, readonly as dy, customRef as Vf, isRef as Sc, reactive as bi, unref as m, toRaw as wi, inject as bs, provide as Ir, defineComponent as Le, openBlock as b, createBlock as ne, withCtx as X, createElementVNode as C, createVNode as V, createElementBlock as M, toDisplayString as L, createCommentVNode as B, normalizeStyle as Wt, normalizeClass as Ae, renderSlot as Q, createTextVNode as Ct, Fragment as Pe, renderList as pt, mergeProps as xr, Transition as To, withModifiers as yt, normalizeProps as it, guardReactiveProps as lt, createSlots as Qt, onBeforeUnmount as Jn, resolveDynamicComponent as Ic, withDirectives as Bn, vModelCheckbox as jf, watchEffect as xc, vModelText as ts, useCssVars as ga, h as va, withKeys as hs, Teleport as Gu, onErrorCaptured as fy } from "vue";
 import { ChatManager as py, ContactManager as hy, GroupManager as my, PresenceManager as gy, PushManager as vy, UserInfoManager as yy } from "easemob-websdk";
 import { defineStore as ya } from "pinia";
@@ -78,9 +78,6 @@ function Kf(n, e, t, s) {
   return ki(n.conversationType, t, o);
 }
 const by = St("UIKit:MessageAdapter");
-function cn(n) {
-  return n && n.split("/")[0].split("@")[0].split("#")[0];
-}
 function Fu(n) {
   if (n.event && typeof n.event == "string")
     return n.event;
@@ -1192,7 +1189,7 @@ function Gy(n, e, t) {
         case "conversation":
           e.conversation.setSyncingConversations(!1);
           {
-            const r = n.chatManager.getConversationList();
+            const r = n.chatManager.getConversationList().filter((l) => l.conversationType !== "chatRoom");
             qt.info("getConversationList raw (onSyncDataFinished)", r);
             const i = _i(r, { resolveSenderName: s }), a = Hu(e, i);
             e.conversation.setConversationList(a);
@@ -1208,26 +1205,29 @@ function Gy(n, e, t) {
       }
     },
     onConversationListUpdate: (o) => {
-      var a;
-      qt.info("onConversationListUpdate", { count: o.items.length, reset: o.patch.reset, removed: o.patch.removed.length }), qt.info("getConversationList raw (onConversationListUpdate)", o.items);
+      var l;
+      const r = o.items.filter((c) => c.conversationType !== "chatRoom");
+      qt.info("onConversationListUpdate", { count: r.length, reset: o.patch.reset, removed: o.patch.removed.length }), qt.info("getConversationList raw (onConversationListUpdate)", r);
       {
-        const l = {}, c = [];
-        for (const u of o.items) {
-          const d = String(((a = u.lastMessage) == null ? void 0 : a.type) ?? "(null)");
-          l[d] = (l[d] ?? 0) + 1, (d === he.COMBINE || d === "unknown") && c.push({ conversationId: u.conversationId, lastMessage: u.lastMessage });
+        const c = {}, u = [];
+        for (const d of r) {
+          const p = String(((l = d.lastMessage) == null ? void 0 : l.type) ?? "(null)");
+          c[p] = (c[p] ?? 0) + 1, (p === he.COMBINE || p === "unknown") && u.push({ conversationId: d.conversationId, lastMessage: d.lastMessage });
         }
-        c.length > 0 && qt.info("raw snippets (onConversationListUpdate)", { typeCount: l, suspects: c });
+        u.length > 0 && qt.info("raw snippets (onConversationListUpdate)", { typeCount: c, suspects: u });
       }
-      const r = _i(o.items, { resolveSenderName: s }), i = Hu(e, r);
+      const i = _i(r, { resolveSenderName: s }), a = Hu(e, i);
       if (o.patch.reset || o.patch.removed.length > 0)
-        e.conversation.setConversationList(i);
+        e.conversation.setConversationList(a);
       else
-        for (const l of i)
-          e.conversation.conversationList.find((u) => u.id === l.id) ? e.conversation.updateConversation(l.id, l) : e.conversation.addConversation(l);
+        for (const c of a)
+          e.conversation.conversationList.find((d) => d.id === c.id) ? e.conversation.updateConversation(c.id, c) : e.conversation.addConversation(c);
       Vr(e, n);
     },
     onMessage: (o) => {
       var c;
+      if (o.conversationType === "chatRoom")
+        return;
       if (o.type === he.CMD) {
         const u = o.body.action;
         qt.info("[CMD received]", {
@@ -1262,6 +1262,8 @@ function Gy(n, e, t) {
      *   也供插件插槽按 `customType` 接管（markdown 等富类型）。
      */
     onStreamMessage: (o) => {
+      if (o.conversationType === "chatRoom")
+        return;
       const r = o.stream;
       if (!r)
         return;
@@ -1288,12 +1290,12 @@ function Gy(n, e, t) {
       });
     },
     onMessageRecalled: (o) => {
-      qt.info("onMessageRecalled", { messageId: o.messageId }), e.message.recallMessage(o.messageId, e.client.currentUser), zy(
+      o.conversationType !== "chatRoom" && (qt.info("onMessageRecalled", { messageId: o.messageId }), e.message.recallMessage(o.messageId, e.client.currentUser), zy(
         e,
         o.conversationId,
         o.conversationType,
         o.messageId
-      );
+      ));
     },
     onMessageDelivered: (o) => {
       qt.info("onMessageDelivered", { messageId: o.messageId }), e.message.updateMessageStatus(o.messageId, At.DELIVERED);
@@ -1309,18 +1311,18 @@ function Gy(n, e, t) {
             e.message.updateMessageStatus(i, At.READ);
     },
     onMessageUpdated: (o) => {
-      qt.info("onMessageUpdated", { messageId: o.messageId }), e.message.updateMessageById(o.messageId, {
+      o.conversationType !== "chatRoom" && (qt.info("onMessageUpdated", { messageId: o.messageId }), e.message.updateMessageById(o.messageId, {
         body: o.message.body,
         ext: o.message.ext,
         modifiedInfo: o.message.modifiedInfo,
         modified: !0
-      });
+      }));
     },
     onPinnedMessageChanged: async (o) => {
-      if (qt.info("onPinnedMessageChanged", { conversationId: o.conversationId, operation: o.operation }), !!o.messageId && (o.operation === "pin" ? e.message.setMessagePinned(o.messageId, {
+      if (o.conversationType !== "chatRoom" && (qt.info("onPinnedMessageChanged", { conversationId: o.conversationId, operation: o.operation }), !!o.messageId && (o.operation === "pin" ? e.message.setMessagePinned(o.messageId, {
         operatorId: o.operatorId || "",
         pinTime: o.pinTime || Date.now()
-      }) : o.operation === "unpin" && e.message.setMessageUnpinned(o.messageId), o.conversationId && o.conversationType))
+      }) : o.operation === "unpin" && e.message.setMessageUnpinned(o.messageId), o.conversationId && o.conversationType)))
         try {
           const i = (await n.chatManager.getPinnedMessageList({
             conversationId: o.conversationId,
@@ -7319,13 +7321,13 @@ const a0 = { class: "invite-member-modal__header" }, l0 = { class: "invite-membe
             key: 2,
             class: "image-message__preview-toggle",
             onClick: x
-          }, L(m(s)("message.image.viewMedium", "查看中图")), 1)) : B("", !0)
+          }, L(m(s)("message.image.viewBig", "查看大图")), 1)) : B("", !0)
         ]),
         _: 1
       }, 8, ["show", "index", "srcs"])
     ], 2));
   }
-}), xp = /* @__PURE__ */ Be(D0, [["__scopeId", "data-v-ae54be7e"]]), P0 = { class: "voice-message__icon" }, B0 = {
+}), xp = /* @__PURE__ */ Be(D0, [["__scopeId", "data-v-a9e8e720"]]), P0 = { class: "voice-message__icon" }, B0 = {
   key: 0,
   class: "voice-message__wave"
 }, z0 = { class: "voice-message__duration" }, G0 = {
@@ -37184,22 +37186,22 @@ export {
   lB as isVideoBody,
   cB as isVoiceBody,
   uB as mergeLocaleMessages,
-  cn as normalizeUserId,
+  dB as normalizeUserId,
   r0 as provideChatPluginContext,
   i0 as provideMessageInputPluginContext,
   qy as registerEventHandlers,
   Xy as resetMultiSelectState,
   Kf as resolveLastMessageText,
-  dB as resolveNoticeUserName,
+  fB as resolveNoticeUserName,
   F2 as resolvePeerUserId,
   Wn as resolvePinyin,
   ba as resolveSenderDisplayName,
   Qf as resolveTranslateLang,
   qf as resolveUserDisplayName,
   Yy as resolveVoiceToTextErrorMessage,
-  fB as setKeyboardShortcutsEnabled,
+  pB as setKeyboardShortcutsEnabled,
   pw as setPinyinAdapter,
-  pB as t,
+  hB as t,
   Ay as toUiContact,
   El as toUiContacts,
   Iy as toUiConversation,
@@ -37210,13 +37212,13 @@ export {
   Mi as toUiGroups,
   ns as toUiMessage,
   G2 as toUiMessages,
-  hB as useArrowNavigation,
+  mB as useArrowNavigation,
   dp as useBlocklist,
-  mB as useBottomSheet,
+  gB as useBottomSheet,
   ka as useChat,
   V2 as useChatPlugin,
-  gB as useClient,
-  vB as useClientStore,
+  vB as useClient,
+  yB as useClientStore,
   Xn as useContact,
   gw as useContactFilter,
   yw as useContactGroup,
@@ -37225,36 +37227,36 @@ export {
   Er as useConversation,
   Ky as useConversationStore,
   K2 as useConversationTabs,
-  yB as useEscToClose,
+  bB as useEscToClose,
   ln as useGroup,
   ED as useGroupFilter,
   AD as useGroupSort,
   Tr as useGroupStore,
-  bB as useH5Adaptation,
-  wB as useKeyBindings,
-  kB as useKeyboard,
-  _B as useLocale,
-  MB as useLongPress,
+  wB as useH5Adaptation,
+  kB as useKeyBindings,
+  _B as useKeyboard,
+  MB as useLocale,
+  CB as useLongPress,
   q2 as useMessage,
   Yf as useMessageActions,
   _p as useMessageHistory,
   t0 as useMessageSend,
   Xf as useMessageStore,
-  CB as useNotification,
+  SB as useNotification,
   W2 as useOwnUserInfo,
   H2 as usePinyin,
-  SB as usePresence,
-  IB as usePresenceStore,
-  xB as usePullRefresh,
+  IB as usePresence,
+  xB as usePresenceStore,
+  TB as usePullRefresh,
   _a as useQuote,
-  TB as useResizable,
-  EB as useRipple,
-  AB as useTheme,
-  RB as useThemeStore,
-  NB as useToast,
+  EB as useResizable,
+  AB as useRipple,
+  RB as useTheme,
+  NB as useThemeStore,
+  $B as useToast,
   mt as useUIKit,
   Ab as useUIKitProvider,
-  $B as useUIKitStorage,
+  LB as useUIKitStorage,
   en as useUserInfo,
-  LB as useViewport
+  OB as useViewport
 };

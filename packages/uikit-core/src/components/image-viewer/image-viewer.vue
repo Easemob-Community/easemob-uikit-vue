@@ -414,7 +414,7 @@ async function handleDownload() {
       <Icon name="navigation/chevron_right" :size="28" />
     </button>
 
-    <!-- 底部插槽：业务侧放中图/原图切换按钮；默认显示索引指示器 -->
+    <!-- 底部插槽：业务侧放大图/原图切换按钮；默认显示索引指示器 -->
     <div class="image-viewer__footer" @click.stop>
       <slot name="footer" :index="currentIndex" :loading="isLoading" :error="isError">
         <span v-if="showNavigator && srcs.length > 1" class="image-viewer__counter">

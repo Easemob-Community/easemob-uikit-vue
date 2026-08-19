@@ -124,7 +124,7 @@ const messages: LocaleMessages = {
   'notification.messagesCount': '{count} new messages',
   'message.image': '[Image]',
   'message.image.viewOriginal': 'View Original',
-  'message.image.viewMedium': 'View Medium',
+  'message.image.viewBig': 'View Large',
   'message.image.loadingOriginal': 'Loading original...',
   'message.image.loadFailed': '[Image failed to load]',
   'message.audio': '[Voice]',

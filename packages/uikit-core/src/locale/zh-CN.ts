@@ -124,7 +124,7 @@ const messages: LocaleMessages = {
   'notification.messagesCount': '{count} 条新消息',
   'message.image': '[图片]',
   'message.image.viewOriginal': '查看原图',
-  'message.image.viewMedium': '查看中图',
+  'message.image.viewBig': '查看大图',
   'message.image.loadingOriginal': '加载原图中…',
   'message.image.loadFailed': '[图片加载失败]',
   'message.audio': '[语音]',

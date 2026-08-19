@@ -35,7 +35,7 @@ const multiSrcs = [
     <Variant title="footer 插槽 Footer Slot">
       <div class="u-flex u-flex-col u-gap-2 u-items-start">
         <button class="uikit-story-btn" @click="multiShow = true">
-          打开预览（自定义底部按钮，如"查看原图/查看中图"）
+          打开预览（自定义底部按钮，如"查看原图/查看大图"）
         </button>
         <ImageViewer v-model:show="multiShow" v-model:index="multiIndex" :srcs="multiSrcs" :show-navigator="false">
           <template #footer="{ index, loading }">
