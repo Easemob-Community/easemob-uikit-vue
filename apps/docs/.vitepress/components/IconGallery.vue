@@ -62,11 +62,11 @@ async function copyName(name: string) {
         线性图标（V2）
         <span class="icon-gallery__count">({{ filterNames(v2Names).length }})</span>
       </h2>
-      <section v-for="[category, list] in v2Grouped" :key="category" class="icon-gallery__section">
-        <h3 :id="category" class="icon-gallery__title">
+      <details v-for="[category, list] in v2Grouped" :key="category" class="icon-gallery__section">
+        <summary :id="category" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
-        </h3>
+        </summary>
         <div class="icon-gallery__grid">
           <div
             v-for="name in list"
@@ -81,7 +81,7 @@ async function copyName(name: string) {
             <span class="icon-gallery__copy">{{ copied === name ? '已复制' : '点击复制' }}</span>
           </div>
         </div>
-      </section>
+      </details>
     </template>
 
     <template v-if="filledGrouped.length">
@@ -89,11 +89,11 @@ async function copyName(name: string) {
         面性图标（Filled）
         <span class="icon-gallery__count">({{ filterNames(filledNames).length }})</span>
       </h2>
-      <section v-for="[category, list] in filledGrouped" :key="`filled-${category}`" class="icon-gallery__section">
-        <h3 :id="`filled-${category}`" class="icon-gallery__title">
+      <details v-for="[category, list] in filledGrouped" :key="`filled-${category}`" class="icon-gallery__section">
+        <summary :id="`filled-${category}`" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
-        </h3>
+        </summary>
         <div class="icon-gallery__grid">
           <div
             v-for="name in list"
@@ -108,7 +108,7 @@ async function copyName(name: string) {
             <span class="icon-gallery__copy">{{ copied === name ? '已复制' : '点击复制' }}</span>
           </div>
         </div>
-      </section>
+      </details>
     </template>
 
     <template v-if="legacyGrouped.length">
@@ -116,11 +116,11 @@ async function copyName(name: string) {
         旧版图标（Legacy）
         <span class="icon-gallery__count">({{ filterNames(legacyNames).length }})</span>
       </h2>
-      <section v-for="[category, list] in legacyGrouped" :key="`legacy-${category}`" class="icon-gallery__section">
-        <h3 :id="`legacy-${category}`" class="icon-gallery__title">
+      <details v-for="[category, list] in legacyGrouped" :key="`legacy-${category}`" class="icon-gallery__section">
+        <summary :id="`legacy-${category}`" class="icon-gallery__title">
           {{ category }}
           <span class="icon-gallery__count">({{ list.length }})</span>
-        </h3>
+        </summary>
         <div class="icon-gallery__grid">
           <div
             v-for="name in list"
@@ -135,7 +135,7 @@ async function copyName(name: string) {
             <span class="icon-gallery__copy">{{ copied === name ? '已复制' : '点击复制' }}</span>
           </div>
         </div>
-      </section>
+      </details>
     </template>
 
     <p v-if="!v2Grouped.length && !filledGrouped.length && !legacyGrouped.length" class="icon-gallery__empty">
@@ -178,13 +178,41 @@ async function copyName(name: string) {
   margin-top: 48px;
 }
 .icon-gallery__section {
-  margin: 24px 0;
+  margin: 12px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  overflow: hidden;
 }
 .icon-gallery__title {
-  margin: 0 0 12px;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 15px;
   font-weight: 600;
   text-transform: capitalize;
+  cursor: pointer;
+  list-style: none;
+  background-color: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  user-select: none;
+}
+.icon-gallery__title::-webkit-details-marker {
+  display: none;
+}
+.icon-gallery__title::before {
+  content: '▸';
+  margin-right: 4px;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  transition: transform 0.15s;
+}
+.icon-gallery__section[open] > .icon-gallery__title::before {
+  transform: rotate(90deg);
+}
+.icon-gallery__section > .icon-gallery__grid {
+  padding: 12px;
 }
 .icon-gallery__count {
   margin-left: 6px;
