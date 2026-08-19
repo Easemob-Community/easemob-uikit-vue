@@ -6,14 +6,14 @@ import MessageActionMenu from './message-action-menu.vue'
 const logs = ref<string[]>([])
 
 const actions: MessageActionItem[] = [
-  { type: 'quote', label: '引用', icon: 'arrows/arrow_turn_left' },
+  { type: 'quote', label: '引用', icon: 'arrow/turn_left' },
   { type: 'copy', label: '复制', icon: 'files-media/doc_on_doc' },
-  { type: 'edit', label: '编辑', icon: 'chat/modifyMsg' },
-  { type: 'forward', label: '转发', icon: 'chat/3lines_n_arrow' },
-  { type: 'multiSelect', label: '多选', icon: 'actions/items_check' },
-  { type: 'recall', label: '撤回', icon: 'arrows/arrow_Uturn_anti_clockwise' },
-  { type: 'delete', label: '删除', icon: 'actions/trash', danger: true },
-  { type: 'translate', label: '翻译', icon: 'misc/hanzinalpha_in_rect', disabled: true, disabledTip: '暂不支持' },
+  { type: 'edit', label: '编辑', icon: 'rect/pencil' },
+  { type: 'forward', label: '转发', icon: 'lines/arrow-right_3bars' },
+  { type: 'multiSelect', label: '多选', icon: 'items_check' },
+  { type: 'recall', label: '撤回', icon: 'arrow/lft_uturn' },
+  { type: 'delete', label: '删除', icon: 'trash', danger: true },
+  { type: 'translate', label: '翻译', icon: 'rect/hanzinalpha', disabled: true, disabledTip: '暂不支持' },
 ]
 
 function onSelect(action: MessageActionItem) {
@@ -35,7 +35,7 @@ function onSelect(action: MessageActionItem) {
           :actions="[
             { type: 'copy', label: '复制' },
             { type: 'recall', label: '撤回' },
-            { type: 'delete', label: '删除', icon: 'actions/trash', danger: true },
+            { type: 'delete', label: '删除', icon: 'trash', danger: true },
             { type: 'edit', label: '编辑', disabled: true },
           ]"
           @select="onSelect"

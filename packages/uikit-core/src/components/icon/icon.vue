@@ -4,7 +4,7 @@ import { createLogger } from '../../utils/logger'
 import { getIconSvg } from './icon-map'
 
 export interface IconProps {
-  /** 图标名称，格式 "category/icon-name"，如 "actions/trash"；传入 name 后无需 slot */
+  /** 图标名称，格式 "category/icon-name"，如 "trash"；传入 name 后无需 slot */
   name: string
   /** 图标尺寸（px），同时作用于宽高，默认 20 */
   size?: number
@@ -77,6 +77,11 @@ const typeClass = computed(() => {
 
 /** 内置动画类名 */
 const animClass = computed(() => (props.anim ? `uikit-icon--anim-${props.anim}` : ''))
+
+/** 让 path 使用 fill/stroke="currentColor" 的图标也能响应 color prop */
+const colorStyle = computed(() => ({
+  color: props.color,
+}))
 </script>
 
 <template>
@@ -86,6 +91,7 @@ const animClass = computed(() => (props.anim ? `uikit-icon--anim-${props.anim}` 
     :class="[typeClass, animClass]"
     :width="props.size"
     :height="props.size"
+    :style="colorStyle"
     v-bind="svgPaintAttrs"
     :viewBox="viewBox"
   >

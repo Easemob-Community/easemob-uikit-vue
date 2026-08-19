@@ -66,7 +66,7 @@ const mergedCountText = computed(() => {
       :aria-label="t('button.close')"
       @click.stop="emit('close', props.item.id)"
     >
-      <Icon name="common/close" :size="14">
+      <Icon name="xmark/light" :size="14">
         <path d="M18 6L6 18M6 6l12 12" />
       </Icon>
     </button>

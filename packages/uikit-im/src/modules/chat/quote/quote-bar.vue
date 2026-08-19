@@ -43,7 +43,7 @@ function onClose() {
 
 <template>
   <div class="quote-bar">
-    <Icon class="quote-bar__icon" name="chat/quote" :size="14" />
+    <Icon class="quote-bar__icon" name="circle/quote" :size="14" />
     <img
       v-if="isImage && thumbUrl"
       class="quote-bar__thumb"
@@ -56,7 +56,7 @@ function onClose() {
     </div>
     <IconButton
       class="quote-bar__close"
-      icon="actions/close"
+      icon="xmark/light"
       size="small"
       variant="ghost"
       :title="t('quote.cancel', '取消引用')"

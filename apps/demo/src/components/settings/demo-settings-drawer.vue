@@ -49,16 +49,16 @@ const emit = defineEmits<{
 
 /** 分类定义：key 与面板组件一一对应 */
 const categories = [
-  { key: 'appearance', label: '外观', icon: 'misc/gear' },
-  { key: 'conversation', label: '会话', icon: 'chat/pin' },
-  { key: 'chat', label: '聊天', icon: 'chat/bubble_fill' },
-  { key: 'contact', label: '通讯录', icon: 'people/person_3lines_fill' },
-  { key: 'ai', label: 'AI', icon: 'chat/bubble_fill' },
-  { key: 'data', label: '演示数据', icon: 'files-media/archives' },
+  { key: 'appearance', label: '外观', icon: 'flower' },
+  { key: 'conversation', label: '会话', icon: 'pin' },
+  { key: 'chat', label: '聊天', icon: 'bubble/rect/empty' },
+  { key: 'contact', label: '通讯录', icon: 'person/list' },
+  { key: 'ai', label: 'AI', icon: 'bubble/rect/empty' },
+  { key: 'data', label: '演示数据', icon: 'archive' },
   { key: 'notification', label: '通知', icon: 'status/info' },
-  { key: 'developer', label: '开发者', icon: 'files-media/doc' },
-  { key: 'provider', label: 'Provider', icon: 'actions/shield' },
-  { key: 'sdk', label: 'SDK 登录', icon: 'actions/unlock' },
+  { key: 'developer', label: '开发者', icon: 'doc' },
+  { key: 'provider', label: 'Provider', icon: 'shield' },
+  { key: 'sdk', label: 'SDK 登录', icon: 'lock/open' },
 ] as const
 
 type CategoryKey = typeof categories[number]['key']

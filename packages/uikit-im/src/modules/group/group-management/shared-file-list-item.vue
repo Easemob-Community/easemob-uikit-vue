@@ -20,35 +20,35 @@ const { displayName: ownerDisplayName } = useUserInfo(ownerUserId)
 
 /** 文件扩展名 → 类型图标（无匹配时回落通用文件图标） */
 const FILE_TYPE_ICONS: Record<string, string> = {
-  pdf: 'files-media/file_pdf',
-  xls: 'files-media/file_xls',
-  xlsx: 'files-media/file_xls',
-  ppt: 'files-media/file_ppt',
-  pptx: 'files-media/file_ppt',
-  jpg: 'files-media/file_img',
-  jpeg: 'files-media/file_img',
-  png: 'files-media/file_img',
-  gif: 'files-media/file_img',
-  webp: 'files-media/file_img',
-  bmp: 'files-media/file_img',
-  svg: 'files-media/file_img',
-  mp3: 'files-media/file_audio',
-  wav: 'files-media/file_audio',
-  m4a: 'files-media/file_audio',
-  aac: 'files-media/file_audio',
-  ogg: 'files-media/file_audio',
-  mp4: 'files-media/file_video',
-  mov: 'files-media/file_video',
-  avi: 'files-media/file_video',
-  mkv: 'files-media/file_video',
-  webm: 'files-media/file_video',
+  pdf: 'file/pdf',
+  xls: 'file/xls',
+  xlsx: 'file/xls',
+  ppt: 'file/ppt',
+  pptx: 'file/ppt',
+  jpg: 'file/img',
+  jpeg: 'file/img',
+  png: 'file/img',
+  gif: 'file/img',
+  webp: 'file/img',
+  bmp: 'file/img',
+  svg: 'file/img',
+  mp3: 'file/audio',
+  wav: 'file/audio',
+  m4a: 'file/audio',
+  aac: 'file/audio',
+  ogg: 'file/audio',
+  mp4: 'file/video',
+  mov: 'file/video',
+  avi: 'file/video',
+  mkv: 'file/video',
+  webm: 'file/video',
 }
 
 /** 当前文件类型图标 */
 const fileIcon = computed(() => {
   const fileName = props.file.fileName || ''
   const ext = fileName.includes('.') ? fileName.split('.').pop()?.toLowerCase() : ''
-  return (ext && FILE_TYPE_ICONS[ext]) || 'files-media/file'
+  return (ext && FILE_TYPE_ICONS[ext]) || 'file/empty'
 })
 
 function formatSize(bytes?: number): string {
@@ -103,7 +103,7 @@ function onMoreClick(event: MouseEvent) {
       class="shared-file-list__more-btn"
       @click.stop="onMoreClick"
     >
-      <Icon name="actions/ellipsis_vertical" :size="20" />
+      <Icon name="vertical" :size="20" />
     </button>
   </div>
 </template>

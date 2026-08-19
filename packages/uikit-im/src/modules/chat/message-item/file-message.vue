@@ -35,16 +35,16 @@ const fileSize = computed(() => {
 const fileIcon = computed(() => {
   const name = fileName.value.toLowerCase()
   if (/\.(?:jpg|jpeg|png|gif|webp|svg)$/.test(name))
-    return 'files-media/img'
+    return 'rect/img'
   if (/\.(?:mp4|mov|avi|mkv)$/.test(name))
-    return 'audio-video/video_camera'
+    return 'video'
   if (/\.(?:mp3|wav|aac|flac|ogg|m4a)$/.test(name))
-    return 'audio-video/speaker_wave_2'
+    return 'speaker/wave_2'
   if (/\.(?:pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name))
-    return 'files-media/doc'
+    return 'doc'
   if (/\.(?:zip|rar|7z|tar|gz)$/.test(name))
-    return 'files-media/archives'
-  return 'files-media/file'
+    return 'archive'
+  return 'file/empty'
 })
 
 async function handleDownload() {

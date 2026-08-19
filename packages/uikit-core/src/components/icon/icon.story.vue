@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import Icon from './icon.vue'
+import { getV2IconNames } from './icon-map'
+
+const v2Names = getV2IconNames()
+const search = ref('')
+const filteredNames = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  return q ? v2Names.filter(n => n.toLowerCase().includes(q)) : v2Names
+})
 </script>
 
 <template>
@@ -32,11 +41,51 @@ import Icon from './icon.vue'
     </Variant>
     <Variant title="Animations">
       <div class="u-flex u-gap-6 u-items-center">
-        <Icon name="actions/loading_arc" :size="32" anim="spin" />
+        <Icon name="loading/arc/normal" :size="32" anim="spin" />
         <Icon name="status/info" :size="32" anim="pulse" />
-        <Icon name="misc/bell_slash" :size="32" anim="shake" />
-        <Icon name="status/warning" :size="32" anim="flash" />
+        <Icon name="bell/slash" :size="32" anim="shake" />
+        <Icon name="triangle/exclamation" :size="32" anim="flash" />
+      </div>
+    </Variant>
+    <Variant title="V2 icons">
+      <div class="u-flex u-flex-col u-gap-4">
+        <input
+          v-model="search"
+          placeholder="search icon name..."
+          class="u-border u-rounded u-px-3 u-py-2"
+        >
+        <div class="icon-grid">
+          <div v-for="name in filteredNames" :key="name" class="icon-grid__item">
+            <Icon :name="name" :size="24" />
+            <span class="icon-grid__name">{{ name }}</span>
+          </div>
+        </div>
       </div>
     </Variant>
   </Story>
 </template>
+
+<style scoped>
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.icon-grid__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: 8px;
+}
+
+.icon-grid__name {
+  font-size: 12px;
+  color: var(--uikit-text-secondary, #6b7280);
+  word-break: break-all;
+  text-align: center;
+}
+</style>

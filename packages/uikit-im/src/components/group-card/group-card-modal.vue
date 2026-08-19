@@ -69,7 +69,7 @@ const cardActions = computed(() => {
     {
       key: 'message',
       label: t('groupCard.message', '消息'),
-      icon: 'chat/bubble_fill',
+      icon: 'bubble/rect/empty',
       type: 'primary' as const,
     },
   ]

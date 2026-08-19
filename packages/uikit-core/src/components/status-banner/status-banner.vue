@@ -45,9 +45,9 @@ const { t } = useLocale()
 
 const typeIconMap: Record<StatusBannerType, string> = {
   info: 'status/info',
-  warning: 'status/warning',
-  error: 'status/error',
-  success: 'status/success',
+  warning: 'triangle/exclamation',
+  error: 'circle/xmark',
+  success: 'circle/checked',
 }
 
 const iconName = computed(() => props.icon || typeIconMap[props.type])
@@ -73,7 +73,7 @@ function handleClick(event: MouseEvent) {
     >
       <span class="uikit-status-banner__icon">
         <slot name="icon">
-          <Icon v-if="props.loading" name="actions/loading_circle" :size="18" anim="spin" />
+          <Icon v-if="props.loading" name="loading/arc/big" :size="18" anim="spin" />
           <Icon v-else :name="iconName" :size="18" />
         </slot>
       </span>
@@ -100,7 +100,7 @@ function handleClick(event: MouseEvent) {
           :aria-label="t('button.close')"
           @click.stop="handleClose"
         >
-          <Icon name="actions/close" :size="14" />
+          <Icon name="xmark/light" :size="14" />
         </button>
       </div>
     </div>

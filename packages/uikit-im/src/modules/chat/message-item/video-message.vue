@@ -119,7 +119,7 @@ async function handleDownload(event: MouseEvent) {
       <!-- 播放按钮覆盖层 -->
       <div class="video-message__overlay">
         <div class="video-message__play-btn">
-          <Icon name="audio-video/play" :size="20" color="#fff" />
+          <Icon name="triangle" :size="20" color="#fff" />
         </div>
       </div>
       <!-- 时长标签 -->
@@ -147,7 +147,7 @@ async function handleDownload(event: MouseEvent) {
         :title="t('message.download.success', '下载')"
         @click.stop="handleDownload"
       >
-        <Icon name="arrows/arrow_down_n_box" :size="20" />
+        <Icon name="arrow/down_tray" :size="20" />
       </button>
     </div>
   </div>

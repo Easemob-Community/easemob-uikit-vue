@@ -118,7 +118,7 @@ function onCancel() {
     <!-- 全选按钮 -->
     <div class="multi-select-bar__select-all" @click="onToggleSelectAll">
       <Icon
-        :name="isAllSelected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+        :name="isAllSelected ? 'circle/checked' : 'circle/empty'"
         :size="22"
         class="multi-select-bar__check-icon"
         :class="{ 'multi-select-bar__check-icon--checked': isAllSelected }"
@@ -137,13 +137,13 @@ function onCancel() {
         @click="onForward"
       >
         <div class="multi-select-bar__icon">
-          <Icon name="arrows/arrow_turn_right" :size="22" />
+          <Icon name="arrow/turn_right" :size="22" />
         </div>
         <span class="multi-select-bar__label">转发</span>
       </div>
       <div class="multi-select-bar__action" @click="onDelete">
         <div class="multi-select-bar__icon">
-          <Icon name="actions/trash" :size="22" type="danger" />
+          <Icon name="trash" :size="22" type="danger" />
         </div>
         <span class="multi-select-bar__label multi-select-bar__label--danger">删除</span>
       </div>

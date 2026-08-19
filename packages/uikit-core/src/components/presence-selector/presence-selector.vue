@@ -140,7 +140,7 @@ function onCancel() {
       <span class="presence-selector__title">{{ t('presence.setStatus', '设置在线状态') }}</span>
       <IconButton
         class="presence-selector__close"
-        icon="actions/close"
+        icon="xmark/light"
         size="small"
         variant="ghost"
         :title="t('button.close', '关闭')"
@@ -161,7 +161,7 @@ function onCancel() {
           <span class="presence-selector__label">{{ option.label }}</span>
           <Icon
             v-if="isActive(option)"
-            name="actions/check"
+            name="check/single"
             :size="16"
             class="presence-selector__check"
           />
@@ -183,7 +183,7 @@ function onCancel() {
           <template #trailing>
             <Icon
               v-if="isActive(option)"
-              name="actions/check"
+              name="check/single"
               :size="16"
               class="presence-selector__check"
             />

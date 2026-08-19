@@ -421,9 +421,9 @@ defineExpose({
           v-model="searchKeyword"
           variant="search"
           clearable
-          clear-icon="misc/search_clear"
+          clear-icon="search/xmark"
           :placeholder="t('contact.searchPlaceholder')"
-          prefix-icon="misc/magnifier2"
+          prefix-icon="search"
         />
       </slot>
     </div>

@@ -134,12 +134,12 @@ function cancel() {
   <div class="group-announcement">
     <div class="group-announcement__label-row">
       <div class="group-announcement__label">
-        <Icon name="group/board" :size="16" />
+        <Icon name="board" :size="16" />
         <span>{{ t('chat.info.groupAnnouncement') }}</span>
       </div>
       <IconButton
         v-if="isAdminOrOwner && !isEditing"
-        icon="actions/edit"
+        icon="rect/pencil"
         size="small"
         type="primary"
         :title="t('chat.info.edit', '编辑')"
@@ -163,7 +163,7 @@ function cancel() {
           :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
           @click="collapsed = !collapsed"
         >
-          <Icon :name="collapsed ? 'navigation/chevron_down' : 'navigation/chevron_up'" :size="14" />
+          <Icon :name="collapsed ? 'chevron/down' : 'chevron/up'" :size="14" />
         </button>
       </template>
       <div v-else class="group-announcement__edit">
@@ -183,7 +183,7 @@ function cancel() {
         </div>
         <div class="group-announcement__edit-actions">
           <IconButton
-            icon="actions/xmark_thick"
+            icon="xmark/bold"
             size="small"
             type="danger"
             :title="t('button.cancel', '取消')"
@@ -191,7 +191,7 @@ function cancel() {
           />
           <IconButton
             class="group-announcement__save"
-            icon="actions/check"
+            icon="check/single"
             size="small"
             type="success"
             :disabled="saving"

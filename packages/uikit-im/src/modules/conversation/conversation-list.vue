@@ -206,9 +206,9 @@ function onHeaderMenuClose() {
 
 /** Header 菜单项定义 */
 const headerMenuItems = computed(() => [
-  { key: 'newChat', label: t('conversation.newChat'), icon: 'chat/bubble_fill' },
-  { key: 'addContact', label: t('conversation.addContact'), icon: 'people/person_add' },
-  { key: 'createGroup', label: t('conversation.createGroup'), icon: 'people/person_double_fill' },
+  { key: 'newChat', label: t('conversation.newChat'), icon: 'bubble/rect/empty' },
+  { key: 'addContact', label: t('conversation.addContact'), icon: 'person/plus' },
+  { key: 'createGroup', label: t('conversation.createGroup'), icon: 'person/double' },
 ])
 
 const headerActionSheetActions = computed(() =>
@@ -469,7 +469,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       </slot>
       <div class="conversation-list__menu-wrapper">
         <div ref="headerMenuTriggerRef" class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
-          <Icon name="actions/plus_in_circle" :size="22" />
+          <Icon name="circle/plus" :size="22" />
         </div>
         <Popup
           :show="showHeaderMenu && !isMobile"
@@ -511,9 +511,9 @@ function handleCustomAction(key: string, conversation: Conversation) {
         v-model="searchKeyword"
         variant="search"
         clearable
-        clear-icon="misc/search_clear"
+        clear-icon="search/xmark"
         :placeholder="t('conversation.searchPlaceholder')"
-        prefix-icon="misc/magnifier2"
+        prefix-icon="search"
       />
     </div>
     <!-- 连接/同步状态横幅：搜索栏下方、列表上方 -->
@@ -576,7 +576,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       />
       <!-- 会话列表同步中（WebSocket 首次同步） -->
       <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__syncing">
-        <Icon name="actions/loading_circle" :size="20" anim="spin" />
+        <Icon name="loading/arc/big" :size="20" anim="spin" />
         <span>{{ t('conversation.syncing') }}</span>
       </div>
       <div v-if="loadingMore" class="conversation-list__loading">

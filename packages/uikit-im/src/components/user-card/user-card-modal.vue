@@ -92,20 +92,20 @@ const cardActions = computed(() => {
     {
       key: 'message',
       label: t('userCard.message', '消息'),
-      icon: 'chat/bubble_fill',
+      icon: 'bubble/rect/empty',
       type: 'primary' as const,
     },
     // 语音/视频通话当前未支持，先注释入口，避免用户误点
     // {
     //   key: 'voice',
     //   label: t('userCard.voice', '语音'),
-    //   icon: 'audio-video/phone_pick',
+    //   icon: 'phone',
     //   type: 'default' as const,
     // },
     // {
     //   key: 'video',
     //   label: t('userCard.video', '视频'),
-    //   icon: 'audio-video/video_camera',
+    //   icon: 'video',
     //   type: 'default' as const,
     // },
   ]

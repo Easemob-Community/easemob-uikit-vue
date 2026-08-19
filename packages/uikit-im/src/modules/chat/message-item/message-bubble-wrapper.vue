@@ -186,12 +186,12 @@ const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageSt
 /** 经典状态图标映射（默认） */
 const classicStatusIconMap: Record<MessageStatusValue, string> = {
   // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
-  [MESSAGE_STATUS.SENDING]: 'message-status/loading',
-  [MESSAGE_STATUS.SENT]: 'message-status/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'message-status/empty',
-  [MESSAGE_STATUS.READ]: 'message-status/checked',
+  [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
+  [MESSAGE_STATUS.SENT]: 'circle/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
+  [MESSAGE_STATUS.READ]: 'check/double',
   // 发送失败：圆圈内感叹号提示可点击重发
-  [MESSAGE_STATUS.FAILED]: 'message-status/bang',
+  [MESSAGE_STATUS.FAILED]: 'circle/bang',
 }
 
 /**
@@ -199,11 +199,11 @@ const classicStatusIconMap: Record<MessageStatusValue, string> = {
  * 语义：未读=空心圆，已读=空心圆+对勾；发送中/失败保持经典图标
  */
 const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
-  [MESSAGE_STATUS.SENDING]: 'message-status/loading',
-  [MESSAGE_STATUS.SENT]: 'message-status/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'message-status/empty',
-  [MESSAGE_STATUS.READ]: 'message-status/checked',
-  [MESSAGE_STATUS.FAILED]: 'message-status/bang',
+  [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
+  [MESSAGE_STATUS.SENT]: 'circle/empty',
+  [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
+  [MESSAGE_STATUS.READ]: 'check/double',
+  [MESSAGE_STATUS.FAILED]: 'circle/bang',
 }
 
 /** 当前状态图标 */
@@ -216,7 +216,7 @@ const statusIcon = computed(() => {
 })
 
 /** PC 端发送失败图标 hover 时显示的替换图标（重发提示） */
-const failedHoverIcon = 'message-status/retry'
+const failedHoverIcon = 'ringarrow/cw'
 
 /** 当前状态文本 */
 const statusText = computed(() => {
@@ -445,7 +445,7 @@ onBeforeUnmount(() => {
       <!-- 多选 Checkbox：微信风格，所有消息统一放在最左侧（独立于内层 row-reverse 之外） -->
       <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
         <Icon
-          :name="props.isSelected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+          :name="props.isSelected ? 'circle/checked' : 'circle/empty'"
           :size="18"
           class="message-bubble-wrapper__check-icon"
           :class="{ 'message-bubble-wrapper__check-icon--checked': props.isSelected }"
@@ -486,7 +486,7 @@ onBeforeUnmount(() => {
                 class="message-bubble-wrapper__pin-badge"
                 :title="t('message.action.pin')"
               >
-                <Icon name="chat/pin" :size="12" />
+                <Icon name="pin" :size="12" />
                 <span>{{ t('message.action.pin') }}</span>
               </div>
               <MessageInteractive
@@ -595,7 +595,7 @@ onBeforeUnmount(() => {
                 class="message-bubble-wrapper__pin-badge"
                 :title="t('message.action.pin')"
               >
-                <Icon name="chat/pin" :size="12" />
+                <Icon name="pin" :size="12" />
                 <span>{{ t('message.action.pin') }}</span>
               </div>
               <MessageInteractive
@@ -703,7 +703,7 @@ onBeforeUnmount(() => {
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="message-status/checked" :size="14" />
+                <Icon v-if="isGroupReadAll" name="check/double" :size="14" />
                 <template v-else-if="groupReadCount > 0">
                   {{ groupReadCount }}
                 </template>
@@ -744,7 +744,7 @@ onBeforeUnmount(() => {
     >
       <div class="avatar-context-menu" @click.stop>
         <div class="avatar-context-menu__item" @click="onViewProfileFromAvatar">
-          <Icon name="people/person_single" :size="16" />
+          <Icon name="person/single" :size="16" />
           <span>{{ t('message.avatar.viewProfile') }}</span>
         </div>
         <div v-if="isGroupChat" class="avatar-context-menu__item" @click="onMentionFromAvatar">

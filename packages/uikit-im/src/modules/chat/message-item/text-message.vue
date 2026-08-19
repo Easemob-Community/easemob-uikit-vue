@@ -269,7 +269,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
       <div v-if="showTranslationCard" class="text-message__translation-card">
         <!-- 翻译中 -->
         <div v-if="translating" class="text-message__translation-text text-message__translation-text--loading">
-          <Icon name="actions/loading_arc" :size="14" anim="spin" />
+          <Icon name="loading/arc/normal" :size="14" anim="spin" />
           <span>{{ t('message.translate.loading') }}</span>
         </div>
         <!-- 已有译文：显示译文 -->

@@ -226,7 +226,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
           v-model="keyword"
           variant="search"
           clearable
-          clear-icon="misc/search_clear"
+          clear-icon="search/xmark"
           :placeholder="t('message.search.placeholder', '搜索关键词...')"
         />
       </div>
@@ -294,7 +294,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
         </template>
 
         <div v-else-if="loading" class="message-search-modal__loading">
-          <Icon name="actions/loading_circle" :size="20" anim="spin" />
+          <Icon name="loading/arc/big" :size="20" anim="spin" />
           <span>{{ t('message.search.loading', '搜索中...') }}</span>
         </div>
 

@@ -352,9 +352,9 @@ const subviewTitle = computed(() => {
               v-model="homeSearchKeyword"
               variant="search"
               clearable
-              clear-icon="misc/search_clear"
+              clear-icon="search/xmark"
               :placeholder="t('contact.homeSearchPlaceholder')"
-              prefix-icon="misc/magnifier2"
+              prefix-icon="search"
             />
           </div>
 
@@ -388,7 +388,7 @@ const subviewTitle = computed(() => {
             <span class="address-book-container__back">
               <slot name="back-icon">
                 <IconButton
-                  icon="navigation/chevron_left"
+                  icon="chevron/left"
                   size="small"
                   variant="ghost"
                   :icon-size="20"
@@ -402,7 +402,7 @@ const subviewTitle = computed(() => {
               <slot name="subheader-extra" :view="view" />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
-                icon="actions/plus_in_circle"
+                icon="circle/plus"
                 size="small"
                 variant="ghost"
                 :icon-size="22"
@@ -411,7 +411,7 @@ const subviewTitle = computed(() => {
               />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'group' && props.showGroupCreateButton"
-                icon="actions/plus_in_circle"
+                icon="circle/plus"
                 size="small"
                 variant="ghost"
                 :icon-size="22"

@@ -45,7 +45,7 @@ function onClick() {
   >
     <div class="location-message__bubble">
       <div class="location-message__icon">
-        <Icon name="misc/map_pin" :size="28" />
+        <Icon name="loc" :size="28" />
       </div>
       <div class="location-message__info">
         <div class="location-message__address" :title="addressText">

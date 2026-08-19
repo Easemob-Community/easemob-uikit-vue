@@ -42,13 +42,13 @@ import Cell from './cell.vue'
       <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
         <Cell auto-height border @click="() => {}">
           <template #leading>
-            <Icon name="actions/trash" :size="18" />
+            <Icon name="trash" :size="18" />
           </template>
           <template #default>清空聊天记录</template>
         </Cell>
         <Cell auto-height border @click="() => {}">
           <template #leading>
-            <Icon name="actions/plus" :size="18" />
+            <Icon name="plus" :size="18" />
           </template>
           <template #default>添加成员</template>
         </Cell>

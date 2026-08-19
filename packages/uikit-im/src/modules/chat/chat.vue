@@ -1023,7 +1023,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <div v-else-if="renderError" class="chat__error">
       <slot name="error" :error="renderError">
         <div class="chat__error-content">
-          <Icon name="status/warning" :size="48" type="warning" class="chat__error-icon" />
+          <Icon name="triangle/exclamation" :size="48" type="warning" class="chat__error-icon" />
           <span class="chat__error-text">{{ renderError.message }}</span>
           <button class="chat__error-retry" @click="clearRenderError">
             {{ t('button.confirm', '重试') }}
@@ -1093,13 +1093,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
           </div>
           <IconButton
             v-if="searchEnabled"
-            icon="misc/magnifier2"
+            icon="search"
             :icon-size="20"
             @click.stop="showSearchPanel = true"
           />
           <IconButton
             v-if="currentConversation"
-            icon="actions/ellipsis_vertical"
+            icon="vertical"
             :icon-size="20"
             @click.stop="showDrawer = true"
           />

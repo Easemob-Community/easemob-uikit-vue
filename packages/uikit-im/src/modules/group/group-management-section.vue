@@ -114,7 +114,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'mute',
       label: t('group.management.muteList', '禁言列表'),
       show: true,
-      icon: 'group/bubble-slash',
+      icon: 'bubble/slash',
       count: (stores.group.groupMuteListMap[id] || []).length,
     })
   }
@@ -124,7 +124,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'block',
       label: t('group.management.blocklist', '黑名单'),
       show: true,
-      icon: 'actions/user-x',
+      icon: 'person/xmark',
       count: (stores.group.groupBlocklistMap[id] || []).length,
     })
   }
@@ -134,7 +134,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'allow',
       label: t('group.management.allowlist', '白名单'),
       show: true,
-      icon: 'actions/user-check',
+      icon: 'person/check',
       count: (stores.group.groupAllowlistMap[id] || []).length,
     })
   }
@@ -144,7 +144,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'files',
       label: t('group.management.sharedFiles', '共享文件'),
       show: true,
-      icon: 'group/doc',
+      icon: 'doc',
       count: (stores.group.groupSharedFilesMap[id] || []).length,
     })
   }
@@ -154,7 +154,7 @@ const managementEntries = computed<ManagementEntry[]>(() => {
       key: 'requests',
       label: t('group.management.joinRequests', '入群申请'),
       show: true,
-      icon: 'group/person-clock',
+      icon: 'person/clock',
       count: (stores.group.groupJoinRequestsMap[id] || []).length,
     })
   }
@@ -213,7 +213,7 @@ function closeDrawer() {
         :inset-hover="false"
       >
         <template #leading>
-          <Icon name="group/bubble-slash" :size="18" />
+          <Icon name="bubble/slash" :size="18" />
         </template>
         <template #trailing>
           <label class="group-management-section__toggle" @click.stop>
@@ -257,7 +257,7 @@ function closeDrawer() {
         <div class="group-management-section__drawer-header">
           <IconButton
             class="group-management-section__drawer-close"
-            icon="navigation/chevron_left"
+            icon="chevron/left"
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"
@@ -266,7 +266,7 @@ function closeDrawer() {
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
-            icon="arrows/arrow_up_n_box"
+            icon="arrow/up_tray"
             size="small"
             type="primary"
             :title="t('group.sharedFile.uploadText', '上传')"
@@ -274,7 +274,7 @@ function closeDrawer() {
           />
           <IconButton
             v-else-if="activeDrawerKey === 'block'"
-            icon="actions/plus"
+            icon="plus"
             size="small"
             type="primary"
             :title="t('group.blocklist.add', '添加')"
@@ -282,7 +282,7 @@ function closeDrawer() {
           />
           <IconButton
             v-else-if="activeDrawerKey === 'mute'"
-            icon="actions/plus"
+            icon="plus"
             size="small"
             type="primary"
             :title="t('group.mutelist.add', '添加禁言')"
@@ -338,7 +338,7 @@ function closeDrawer() {
         <div class="group-management-section__drawer-header">
           <IconButton
             class="group-management-section__drawer-close"
-            icon="navigation/chevron_left"
+            icon="chevron/left"
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"
@@ -347,7 +347,7 @@ function closeDrawer() {
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
-            icon="arrows/arrow_up_n_box"
+            icon="arrow/up_tray"
             size="small"
             type="primary"
             :title="t('group.sharedFile.uploadText', '上传')"
@@ -355,7 +355,7 @@ function closeDrawer() {
           />
           <IconButton
             v-else-if="activeDrawerKey === 'block'"
-            icon="actions/plus"
+            icon="plus"
             size="small"
             type="primary"
             :title="t('group.blocklist.add', '添加')"
@@ -363,7 +363,7 @@ function closeDrawer() {
           />
           <IconButton
             v-else-if="activeDrawerKey === 'mute'"
-            icon="actions/plus"
+            icon="plus"
             size="small"
             type="primary"
             :title="t('group.mutelist.add', '添加禁言')"

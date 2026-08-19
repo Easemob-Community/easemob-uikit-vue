@@ -110,7 +110,7 @@ function onContextmenu(e: MouseEvent) {
       <slot name="trailing" />
       <Icon
         v-if="props.showArrow && !$slots.trailing"
-        name="navigation/chevron_right"
+        name="chevron/right"
         :size="16"
         class="uikit-cell__arrow"
       />

@@ -47,8 +47,8 @@ const totalUnread = computed(() => {
 })
 
 const tabs = [
-  { key: 'conversation' as const, icon: 'chat/bubble_fill', label: '消息' },
-  { key: 'contact' as const, icon: 'people/person_3lines_fill', label: '通讯录' },
+  { key: 'conversation' as const, icon: 'bubble/rect/empty', label: '消息' },
+  { key: 'contact' as const, icon: 'person/list', label: '通讯录' },
 ]
 
 function selectTab(key: Props['modelValue']) {
@@ -121,7 +121,7 @@ function toggleMode() {
         title="设置"
         @click="emit('open-settings')"
       >
-        <EmIcon name="misc/gear" :size="22" />
+        <EmIcon name="flower" :size="22" />
       </button>
     </div>
 

@@ -207,7 +207,7 @@ async function handleLogin() {
               :title="showPassword ? '隐藏密码' : '显示密码'"
               @click="showPassword = !showPassword"
             >
-              <EmIcon :name="showPassword ? 'actions/eye_off' : 'actions/eye'" :size="18" />
+              <EmIcon :name="showPassword ? 'eye/slash' : 'eye'" :size="18" />
             </button>
           </div>
           <input

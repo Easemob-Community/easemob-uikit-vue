@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<ScrollToTopProps>(), {
   duration: 300,
   right: 16,
   bottom: 16,
-  icon: 'arrows/arrow_up_thick',
+  icon: 'arrow/up',
   size: 36,
 })
 

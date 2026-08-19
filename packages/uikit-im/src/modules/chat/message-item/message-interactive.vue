@@ -105,17 +105,17 @@ const actions = computed<MessageActionItem[]>(() => {
   }
 
   if (cfg?.enableQuote !== false)
-    add('quote', t('message.action.quote') ?? '引用', 'arrows/arrow_turn_left')
+    add('quote', t('message.action.quote') ?? '引用', 'arrow/turn_left')
   // 复制：仅文本消息支持；图片/视频/文件等类型暂不提供复制
   if (cfg?.enableCopy !== false && props.message.type === MESSAGE_TYPE.TEXT)
     add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
   // 下载：仅文件消息在右键/长按菜单中提供下载入口
   if (cfg?.enableDownload !== false && props.message.type === MESSAGE_TYPE.FILE)
-    add('download', t('message.action.download') ?? '下载', 'arrows/arrow_down_n_box')
+    add('download', t('message.action.download') ?? '下载', 'arrow/down_tray')
   if (cfg?.enableForward !== false)
-    add('forward', t('message.action.forward') ?? '转发', 'chat/3lines_n_arrow')
+    add('forward', t('message.action.forward') ?? '转发', 'lines/arrow-right_3bars')
   if (cfg?.enableMultiSelect !== false)
-    add('multiSelect', t('message.action.multiSelect') ?? '多选', 'actions/items_check')
+    add('multiSelect', t('message.action.multiSelect') ?? '多选', 'items_check')
   // 翻译：仅文本消息可翻译，其他类型不展示；已有译文且目标语言一致时菜单切换为「取消翻译 / 显示译文」，
   // 目标语言不一致时展示「翻译」以重新翻译为新语言（与 translateTextMessage 的 to === lang 判定保持一致）
   if (cfg?.enableTranslate !== false && props.message.type === MESSAGE_TYPE.TEXT) {
@@ -124,14 +124,14 @@ const actions = computed<MessageActionItem[]>(() => {
     const translationMatchesLang = hasTranslation && props.message.translation?.to === resolveTranslateLang(cfg?.translateTargetLang)
     if (translationMatchesLang && !translating) {
       if (props.message.showTranslation !== false) {
-        add('translate', t('message.action.cancelTranslate') ?? '取消翻译', 'misc/hanzinalpha_in_rect_slash')
+        add('translate', t('message.action.cancelTranslate') ?? '取消翻译', 'rect/hanzinalpha/slash')
       }
       else {
-        add('translate', t('message.action.showTranslation') ?? '显示译文', 'misc/hanzinalpha_in_rect')
+        add('translate', t('message.action.showTranslation') ?? '显示译文', 'rect/hanzinalpha')
       }
     }
     else {
-      add('translate', t('message.action.translate') ?? '翻译', 'misc/hanzinalpha_in_rect', false, translating, t('message.translate.loading') ?? '翻译中…')
+      add('translate', t('message.action.translate') ?? '翻译', 'rect/hanzinalpha', false, translating, t('message.translate.loading') ?? '翻译中…')
     }
   }
   // 语音转文字：仅带 url 的语音消息展示；已有转写结果时菜单切换为「收起文字 / 显示文字」
@@ -140,22 +140,22 @@ const actions = computed<MessageActionItem[]>(() => {
     const transcribing = !!props.message.voiceTranscribing
     if (hasVoiceText && !transcribing) {
       if (props.message.showVoiceText !== false) {
-        add('voiceToText', t('message.action.hideVoiceText') ?? '收起文字', 'misc/hanzi_in_rect_slash')
+        add('voiceToText', t('message.action.hideVoiceText') ?? '收起文字', 'rect/hanzi/slash')
       }
       else {
-        add('voiceToText', t('message.action.showVoiceText') ?? '显示文字', 'misc/hanzi_in_rect')
+        add('voiceToText', t('message.action.showVoiceText') ?? '显示文字', 'rect/hanzi')
       }
     }
     else {
-      add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'misc/hanzi_in_rect', false, transcribing, t('message.voiceToText.loading') ?? '转文字中…')
+      add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'rect/hanzi', false, transcribing, t('message.voiceToText.loading') ?? '转文字中…')
     }
   }
   if (cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {
-      add('unpin', t('message.action.unpin') ?? '取消置顶', 'chat/unpin')
+      add('unpin', t('message.action.unpin') ?? '取消置顶', 'pin/slash')
     }
     else {
-      add('pin', t('message.action.pin') ?? '置顶', 'chat/pin')
+      add('pin', t('message.action.pin') ?? '置顶', 'pin')
     }
   }
   if (cfg?.enableRecall !== false && props.message.isSelf && !props.message.recalled) {
@@ -164,7 +164,7 @@ const actions = computed<MessageActionItem[]>(() => {
     add(
       'recall',
       t('message.action.recall') ?? '撤回',
-      'arrows/arrow_Uturn_anti_clockwise',
+      'arrow/lft_uturn',
       false,
       expired,
       t('message.recallExpired').replace('{duration}', String(minutes)) ?? `超过${minutes}分钟，无法撤回`,
@@ -177,7 +177,7 @@ const actions = computed<MessageActionItem[]>(() => {
     add(
       'recallOther',
       t('message.action.recallOther') ?? '撤回',
-      'arrows/arrow_Uturn_anti_clockwise',
+      'arrow/lft_uturn',
       false,
       expired,
       t('message.recallExpired').replace('{duration}', String(minutes)) ?? `超过${minutes}分钟，无法撤回`,
@@ -196,14 +196,14 @@ const actions = computed<MessageActionItem[]>(() => {
     add(
       'edit',
       t('message.action.edit') ?? '编辑',
-      'chat/modifyMsg',
+      'rect/pencil',
       false,
       limitReached,
       t('message.edit.limitReached') ?? '此消息编辑次数已达上限',
     )
   }
   if (cfg?.enableDelete !== false)
-    add('delete', t('message.action.delete') ?? '删除', 'actions/trash', true)
+    add('delete', t('message.action.delete') ?? '删除', 'trash', true)
 
   return items
 })

@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
     <template v-if="!isRecording">
       <div class="voice-panel__ready">
         <div class="voice-panel__mic-wrapper">
-          <Icon name="audio-video/mic" :size="32" color="white" />
+          <Icon name="mic" :size="32" color="white" />
         </div>
         <div class="voice-panel__hint">
           {{ t('chat.voice.holdSpace') }}<span class="voice-panel__link" @mousedown.stop @click="deactivate">{{ t('chat.voice.exit') }}</span>
@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
           {{ formattedDuration }}
         </div>
         <div class="voice-panel__mic-wrapper voice-panel__mic-wrapper--recording">
-          <Icon name="audio-video/mic" :size="32" color="white" />
+          <Icon name="mic" :size="32" color="white" />
           <div class="voice-panel__ripple" />
           <div class="voice-panel__ripple" />
         </div>

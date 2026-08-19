@@ -6,10 +6,10 @@ import ContactNav from './contact-nav.vue'
 const logs = ref<string[]>([])
 
 const entries: ContactNavEntry[] = [
-  { key: 'new-friends', label: '新的朋友', icon: 'people/person_add' },
-  { key: 'group-chat', label: '群聊', icon: 'people/person_double_fill' },
+  { key: 'new-friends', label: '新的朋友', icon: 'person/plus' },
+  { key: 'group-chat', label: '群聊', icon: 'person/double' },
   { key: 'tags', label: '标签', count: 3 },
-  { key: 'official', label: '公众号', icon: 'misc/bell', hot: true, count: 1 },
+  { key: 'official', label: '公众号', icon: 'bell', hot: true, count: 1 },
 ]
 
 function onEntryClick(key: string) {
@@ -29,8 +29,8 @@ function onEntryClick(key: string) {
       <div style="padding: 24px; max-width: 320px;">
         <ContactNav
           :entries="[
-            { key: 'new-friends', label: '新的朋友', icon: 'people/person_add' },
-            { key: 'group-chat', label: '群聊', icon: 'people/person_double_fill' },
+            { key: 'new-friends', label: '新的朋友', icon: 'person/plus' },
+            { key: 'group-chat', label: '群聊', icon: 'person/double' },
           ]"
           @entry-click="onEntryClick"
         />

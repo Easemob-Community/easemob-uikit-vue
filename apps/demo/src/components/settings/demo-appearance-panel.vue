@@ -472,7 +472,7 @@ const navTip = computed(() => {
         <EmInput
           v-model="inputDemoValue"
           :variant="inputVariant"
-          prefix-icon="misc/magnifier2"
+          prefix-icon="search"
           placeholder="预览 Input 风格..."
         />
       </div>

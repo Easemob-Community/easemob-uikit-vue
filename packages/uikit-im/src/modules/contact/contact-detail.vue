@@ -111,7 +111,7 @@ const cardActions = computed<UserCardAction[]>(() => {
     {
       key: 'message',
       label: t('contact.detail.sendMessage', '发消息'),
-      icon: 'chat/bubble_fill',
+      icon: 'bubble/rect/empty',
       type: 'primary',
     },
     {
@@ -119,13 +119,13 @@ const cardActions = computed<UserCardAction[]>(() => {
       label: blocked
         ? (t('contact.detail.unblock', '取消拉黑'))
         : (t('contact.detail.block', '拉黑')),
-      icon: 'actions/ban',
+      icon: 'circle/slash',
       type: blocked ? 'danger' : 'primary',
     },
     {
       key: 'delete',
       label: t('contact.detail.deleteContact', '删除好友'),
-      icon: 'actions/trash',
+      icon: 'trash',
       type: 'danger',
     },
   ]
@@ -327,14 +327,14 @@ function onPresenceChanged() {
                 @keyup.esc="cancelEditRemark"
               >
               <IconButton
-                icon="actions/check"
+                icon="check/single"
                 size="small"
                 type="success"
                 :title="t('button.confirm', '确认')"
                 @click="saveRemark"
               />
               <IconButton
-                icon="actions/xmark_thick"
+                icon="xmark/bold"
                 size="small"
                 type="danger"
                 :title="t('button.cancel', '取消')"
@@ -344,7 +344,7 @@ function onPresenceChanged() {
             <template v-else>
               <span class="contact-detail__value">{{ remark || '-' }}</span>
               <IconButton
-                icon="actions/edit"
+                icon="rect/pencil"
                 size="small"
                 type="primary"
                 :title="t('contact.detail.edit', '编辑')"

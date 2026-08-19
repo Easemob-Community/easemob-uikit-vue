@@ -76,7 +76,7 @@ function toggle() {
       class="pinned-bar__row"
       @click="currentItem && onLocate(currentItem)"
     >
-      <Icon class="pinned-bar__icon" name="chat/pin" :size="14" />
+      <Icon class="pinned-bar__icon" name="pin" :size="14" />
       <div class="pinned-bar__content">
         <PinnedBarItem
           v-if="currentItem"
@@ -94,7 +94,7 @@ function toggle() {
       <IconButton
         v-if="currentItem"
         class="pinned-bar__action"
-        icon="actions/close"
+        icon="xmark/light"
         size="small"
         variant="ghost"
         :title="t('message.action.unpin')"
@@ -105,9 +105,9 @@ function toggle() {
     <!-- 展开态：滚动列表 -->
     <div v-else class="pinned-bar__list">
       <div class="pinned-bar__list-header" @click="toggle">
-        <Icon class="pinned-bar__icon" name="chat/pin" :size="14" />
+        <Icon class="pinned-bar__icon" name="pin" :size="14" />
         <span>{{ t('chat.pinnedBar.count').replace('{count}', String(pinnedList.length)) }}</span>
-        <Icon name="navigation/chevron_up" :size="12" />
+        <Icon name="chevron/up" :size="12" />
       </div>
       <Cell
         v-for="msg in pinnedList"
@@ -125,7 +125,7 @@ function toggle() {
         <template #trailing>
           <IconButton
             class="pinned-bar__action"
-            icon="actions/close"
+            icon="xmark/light"
             size="small"
             variant="ghost"
             :title="t('message.action.unpin')"

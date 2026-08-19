@@ -128,7 +128,7 @@ watch(() => props.show, (show) => {
     <div class="combine-message-modal">
       <!-- 标题栏 -->
       <div class="combine-message-modal__header">
-        <Icon name="files-media/folder" :size="18" class="combine-message-modal__header-icon" />
+        <Icon name="folder" :size="18" class="combine-message-modal__header-icon" />
         <span class="combine-message-modal__header-title">{{ title }}</span>
       </div>
 
@@ -136,7 +136,7 @@ watch(() => props.show, (show) => {
       <div class="combine-message-modal__body">
         <!-- 加载中 -->
         <div v-if="isLoading" class="combine-message-modal__loading">
-          <Icon name="actions/loading_circle" :size="20" anim="spin" />
+          <Icon name="loading/arc/big" :size="20" anim="spin" />
           <span>{{ t('message.forward.parsing', '解析中...') }}</span>
         </div>
 

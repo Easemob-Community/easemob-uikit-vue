@@ -184,7 +184,7 @@ const mergedActions = computed<MergedAction[]>(() => {
     actions.push({
       key: 'read',
       label: t('conversation.read'),
-      icon: 'chat/doneAll',
+      icon: 'check/double',
       handler: () => emit('read', props.conversation.id),
       position: 'both',
     })
@@ -193,7 +193,7 @@ const mergedActions = computed<MergedAction[]>(() => {
   actions.push({
     key: 'pin',
     label: props.conversation.isPinned ? t('conversation.unpin') : t('conversation.pin'),
-    icon: props.conversation.isPinned ? 'arrows/arrow_n_line' : 'arrows/line_n_arrow',
+    icon: props.conversation.isPinned ? 'pin/slash' : 'pin',
     handler: () => emit('pin', props.conversation.id, !props.conversation.isPinned),
     position: 'both',
   })
@@ -201,7 +201,7 @@ const mergedActions = computed<MergedAction[]>(() => {
   actions.push({
     key: 'mute',
     label: props.conversation.isMuted ? t('conversation.unmute') : t('conversation.mute'),
-    icon: props.conversation.isMuted ? 'misc/bell' : 'misc/bell_slash',
+    icon: props.conversation.isMuted ? 'bell' : 'bell/slash',
     handler: () => emit('mute', props.conversation.id, !props.conversation.isMuted),
     position: 'both',
   })
@@ -209,7 +209,7 @@ const mergedActions = computed<MergedAction[]>(() => {
   actions.push({
     key: 'delete',
     label: t('conversation.delete'),
-    icon: 'actions/trash',
+    icon: 'trash',
     color: 'var(--uikit-danger-color)',
     danger: true,
     handler: () => emit('delete', props.conversation.id),
@@ -342,14 +342,14 @@ const displayMessage = computed(() => {
           <span class="conversation-item__name" :class="{ 'is-at-me': effectiveHasAtMe }">
             <Icon
               v-if="effectiveHasAtMe"
-              name="conversation/at"
+              name="at"
               :size="14"
               class="conversation-item__at-me-icon"
             />
             {{ conversationName }}
           </span>
           <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
-            <Icon name="chat/pinned" :size="12" />
+            <Icon name="pin/fill" :size="12" />
           </span>
           <Transition name="uikit-mute-badge">
             <span
@@ -357,7 +357,7 @@ const displayMessage = computed(() => {
               class="conversation-item__mute-badge"
               @animationend="onMuteBadgeAnimEnd"
             >
-              <Icon name="misc/bell_slash" :size="12" :anim="muteShaking ? 'shake' : undefined" />
+              <Icon name="bell/slash" :size="12" :anim="muteShaking ? 'shake' : undefined" />
             </span>
           </Transition>
         </div>
@@ -379,7 +379,7 @@ const displayMessage = computed(() => {
             <span v-if="effectiveHasAtMe" class="conversation-item__at-me-prefix">{{ t('conversation.atMeInMessage', '@我的') }}</span>
             <Icon
               v-if="displayDraft"
-              name="conversation/draft"
+              name="rect/pencil"
               :size="14"
               class="conversation-item__draft-icon"
             />

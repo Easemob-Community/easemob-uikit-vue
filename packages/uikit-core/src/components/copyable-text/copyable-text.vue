@@ -55,7 +55,7 @@ async function copyText() {
     <IconButton
       v-if="props.showIcon"
       class="copyable-text__btn"
-      icon="actions/copy"
+      icon="rects"
       :icon-size="props.iconSize"
       variant="ghost"
       :title="t('common.copy', '复制')"

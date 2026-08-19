@@ -79,7 +79,7 @@ function onClose() {
       <div class="group-read-modal__header">
         <span class="group-read-modal__title">{{ t('groupReadReceipt.title') }}</span>
         <IconButton
-          icon="actions/close"
+          icon="xmark/light"
           size="small"
           variant="ghost"
           :title="t('button.close', '关闭')"

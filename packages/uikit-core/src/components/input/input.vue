@@ -14,14 +14,14 @@ export interface InputProps {
   disabled?: boolean
   /** 最大可输入字符数，超出后无法继续输入 */
   maxlength?: number
-  /** 前缀图标名称，格式 "category/icon-name"，如 "misc/magnifier2" */
+  /** 前缀图标名称，格式 "category/icon-name"，如 "search" */
   prefixIcon?: string
   /**
    * 是否显示清除按钮（有输入内容时右侧出现）。
-   * 默认清除图标为 `actions/close`，搜索场景可传 `clear-icon="misc/search_clear"`。
+   * 默认清除图标为 `xmark/light`，搜索场景可传 `clear-icon="search/xmark"`。
    */
   clearable?: boolean
-  /** 清除按钮图标名称，默认 "actions/close" */
+  /** 清除按钮图标名称，默认 "xmark/light" */
   clearIcon?: string
   /**
    * 输入框风格变体
@@ -53,7 +53,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   disabled: false,
   variant: 'default',
   clearable: false,
-  clearIcon: 'actions/close',
+  clearIcon: 'xmark/light',
 })
 
 const emit = defineEmits<InputEmits>()

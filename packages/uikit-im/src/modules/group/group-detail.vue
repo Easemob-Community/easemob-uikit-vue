@@ -144,7 +144,7 @@ const cardActions = computed(() => {
     {
       key: 'message',
       label: t('contact.detail.sendMessage', '发消息'),
-      icon: 'chat/bubble_fill',
+      icon: 'bubble/rect/empty',
       type: 'primary' as const,
     },
   ]
@@ -189,7 +189,7 @@ function onCardAction(key: string) {
           <template v-if="!isEditingName">
             <span>{{ displayName }}</span>
             <IconButton
-              icon="actions/edit"
+              icon="rect/pencil"
               size="small"
               type="primary"
               :title="t('chat.info.edit', '编辑')"
@@ -205,7 +205,7 @@ function onCardAction(key: string) {
               @keydown.esc="cancelEditName"
             >
             <IconButton
-              icon="actions/xmark_thick"
+              icon="xmark/bold"
               size="small"
               type="danger"
               :title="t('button.cancel', '取消')"
@@ -213,7 +213,7 @@ function onCardAction(key: string) {
             />
             <IconButton
               class="group-detail__edit-save"
-              icon="actions/check"
+              icon="check/single"
               size="small"
               type="success"
               :disabled="savingName"

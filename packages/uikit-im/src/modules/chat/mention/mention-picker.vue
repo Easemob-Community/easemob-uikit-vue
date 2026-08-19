@@ -135,7 +135,7 @@ function scrollActiveIntoView() {
       <div class="mention-picker mention-picker--pc">
         <!-- 搜索栏 -->
         <div class="mention-picker__search">
-          <Icon name="misc/magnifier2" :size="16" class="mention-picker__search-icon" />
+          <Icon name="search" :size="16" class="mention-picker__search-icon" />
           <input
             v-model="searchText"
             type="text"
@@ -188,7 +188,7 @@ function scrollActiveIntoView() {
           <span class="mention-picker__header-title">{{ displayTitle }}</span>
           <IconButton
             class="mention-picker__header-close"
-            icon="actions/close"
+            icon="xmark/light"
             size="small"
             variant="ghost"
             :title="t('button.close', '关闭')"
@@ -197,7 +197,7 @@ function scrollActiveIntoView() {
         </div>
         <!-- 搜索栏 -->
         <div class="mention-picker__search">
-          <Icon name="misc/magnifier2" :size="16" class="mention-picker__search-icon" />
+          <Icon name="search" :size="16" class="mention-picker__search-icon" />
           <input
             v-model="searchText"
             type="text"

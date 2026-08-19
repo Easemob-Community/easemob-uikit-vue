@@ -384,8 +384,8 @@ function injectMock() {
           <AddressBookContainer
             :notice-count="2"
             :entries="[
-              { key: 'favorite', label: '收藏', icon: 'misc/gear', count: 5 },
-              { key: 'blacklist', label: '黑名单', icon: 'misc/lock' },
+              { key: 'favorite', label: '收藏', icon: 'flower', count: 5 },
+              { key: 'blacklist', label: '黑名单', icon: 'lock/closed' },
             ]"
             @vue:mounted="injectMock"
             @entry-click="(k) => console.log('entry-click:', k)"
@@ -415,10 +415,10 @@ function injectMock() {
           <AddressBookContainer
             :notice-count="2"
             :entries="[
-              { key: 'favorite', label: '收藏', icon: 'misc/gear', count: 5, sort: 0 },
-              { key: 'contact', label: '我的好友', icon: 'people/person_single', sort: 1 },
-              { key: 'group', label: '我的群组', icon: 'people/member_group', sort: 2 },
-              { key: 'blacklist', label: '黑名单', icon: 'misc/lock', sort: 3 },
+              { key: 'favorite', label: '收藏', icon: 'flower', count: 5, sort: 0 },
+              { key: 'contact', label: '我的好友', icon: 'person/single', sort: 1 },
+              { key: 'group', label: '我的群组', icon: 'person/double', sort: 2 },
+              { key: 'blacklist', label: '黑名单', icon: 'lock/closed', sort: 3 },
             ]"
             :show-notice="false"
             :show-group="false"

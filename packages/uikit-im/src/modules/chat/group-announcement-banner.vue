@@ -55,7 +55,7 @@ useResizeObserver(textRef, measureOverflow)
     :class="{ 'is-collapsed': collapsed }"
   >
     <div class="group-announcement-banner__main">
-      <Icon class="group-announcement-banner__icon" name="group/board" :size="14" />
+      <Icon class="group-announcement-banner__icon" name="board" :size="14" />
       <div class="group-announcement-banner__content">
         <div class="group-announcement-banner__title">
           {{ t('chat.announcementBanner.title', '群公告') }}
@@ -71,7 +71,7 @@ useResizeObserver(textRef, measureOverflow)
       :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
       @click="collapsed = !collapsed"
     >
-      <Icon :name="collapsed ? 'navigation/chevron_down' : 'navigation/chevron_up'" :size="14" />
+      <Icon :name="collapsed ? 'chevron/down' : 'chevron/up'" :size="14" />
     </button>
   </div>
 </template>

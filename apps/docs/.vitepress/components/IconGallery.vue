@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { getIconNames } from '@easemob/uikit-core/components/icon/icon-map'
+import { getV2IconNames } from '@easemob/uikit-core/components/icon/icon-map'
 import EmIcon from '@easemob/uikit-core/components/icon/icon.vue'
 
-const names = getIconNames()
+const names = getV2IconNames()
 
 const grouped = computed(() => {
   const map = new Map<string, string[]>()

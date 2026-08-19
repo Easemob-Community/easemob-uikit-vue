@@ -19,7 +19,7 @@ import ScrollToTop from './scroll-to-top.vue'
         <div v-for="i in 50" :key="i" style="padding: 12px 16px; border-bottom: 1px solid #f3f4f6;">
           列表项 {{ i }}
         </div>
-        <ScrollToTop icon="arrows/arrow_up_n_box" :size="44" :visibility-height="100" :right="20" :bottom="20" />
+        <ScrollToTop icon="arrow/up_tray" :size="44" :visibility-height="100" :right="20" :bottom="20" />
       </div>
     </Variant>
 

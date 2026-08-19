@@ -85,7 +85,7 @@ function onClose() {
         <div class="demo-card-picker__item">
           <EmAvatar :src="ownInfo.avatar" :name="ownInfo.name" :size="36" />
           <span class="demo-card-picker__name">{{ ownInfo.name }}</span>
-          <EmIcon name="arrow/arrow_right" :size="16" class="demo-card-picker__arrow" />
+          <EmIcon name="arrow/right" :size="16" class="demo-card-picker__arrow" />
         </div>
       </div>
 
@@ -103,7 +103,7 @@ function onClose() {
           >
             <EmAvatar :src="contact.avatar" :name="contact.name" :size="36" />
             <span class="demo-card-picker__name">{{ contact.name }}</span>
-            <EmIcon name="arrow/arrow_right" :size="16" class="demo-card-picker__arrow" />
+            <EmIcon name="arrow/right" :size="16" class="demo-card-picker__arrow" />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ const customActions = [
   {
     key: 'mute',
     label: '静音',
-    icon: 'audio-video/speaker_xmark',
+    icon: 'speaker/xmark',
     handler: (cvs: any) => {
       // eslint-disable-next-line no-console
       console.log('mute conversation', cvs.id)

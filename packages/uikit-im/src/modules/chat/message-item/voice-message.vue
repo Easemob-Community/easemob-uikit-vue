@@ -142,7 +142,7 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
           <span class="voice-message__wave-bar" />
           <span class="voice-message__wave-bar" />
         </span>
-        <Icon v-else name="audio-video/play" :size="14" />
+        <Icon v-else name="triangle" :size="14" />
       </span>
       <span class="voice-message__duration">{{ body.duration || 0 }}"</span>
     </div>
@@ -150,7 +150,7 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
     <div v-if="showVoiceTextCard" class="voice-message__text-card">
       <!-- 转写中 -->
       <div v-if="voiceTranscribing" class="voice-message__text voice-message__text--loading">
-        <Icon name="actions/loading_arc" :size="14" anim="spin" />
+        <Icon name="loading/arc/normal" :size="14" anim="spin" />
         <span>{{ t('message.voiceToText.loading') }}</span>
       </div>
       <!-- 已有结果：展示转写文字 -->

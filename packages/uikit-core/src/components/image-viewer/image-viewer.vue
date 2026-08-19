@@ -390,11 +390,11 @@ async function handleDownload() {
 
     <!-- 加载中（首屏/切换原图） -->
     <div v-if="isLoading" class="image-viewer__loading">
-      <Icon name="actions/loading_arc" :size="40" class="image-viewer__spinner" anim="spin" />
+      <Icon name="loading/arc/normal" :size="40" class="image-viewer__spinner" anim="spin" />
     </div>
     <!-- 加载失败占位 -->
     <div v-else-if="isError" class="image-viewer__failed">
-      <Icon name="status/warning" :size="36" />
+      <Icon name="triangle/exclamation" :size="36" />
       <span>{{ t('imageViewer.loadFailed', '图片加载失败') }}</span>
     </div>
 
@@ -404,14 +404,14 @@ async function handleDownload() {
       class="image-viewer__nav image-viewer__nav--prev"
       @click.stop="goPrev"
     >
-      <Icon name="navigation/chevron_left" :size="28" />
+      <Icon name="chevron/left" :size="28" />
     </button>
     <button
       v-if="showNavigator && srcs.length > 1"
       class="image-viewer__nav image-viewer__nav--next"
       @click.stop="goNext"
     >
-      <Icon name="navigation/chevron_right" :size="28" />
+      <Icon name="chevron/right" :size="28" />
     </button>
 
     <!-- 底部插槽：业务侧放大图/原图切换按钮；默认显示索引指示器 -->
@@ -431,7 +431,7 @@ async function handleDownload() {
         :disabled="scale <= 1"
         @click="zoomOut"
       >
-        <Icon name="actions/zoom_out" :size="18" />
+        <Icon name="search/minus" :size="18" />
       </button>
       <button
         class="image-viewer__tool-btn"
@@ -439,7 +439,7 @@ async function handleDownload() {
         :disabled="scale >= 5"
         @click="zoomIn"
       >
-        <Icon name="actions/zoom_in" :size="18" />
+        <Icon name="search/plus" :size="18" />
       </button>
       <button
         class="image-viewer__tool-btn"
@@ -447,28 +447,28 @@ async function handleDownload() {
         :disabled="isViewReset"
         @click="resetView"
       >
-        <Icon name="actions/reset" :size="18" />
+        <Icon name="ringarrow/ccw" :size="18" />
       </button>
       <button
         class="image-viewer__tool-btn"
         :title="t('imageViewer.rotateLeft', '向左旋转')"
         @click="rotateLeft"
       >
-        <Icon name="actions/rotate_left" :size="18" />
+        <Icon name="ringarrow/ccw" :size="18" />
       </button>
       <button
         class="image-viewer__tool-btn"
         :title="t('imageViewer.rotateRight', '向右旋转')"
         @click="rotateRight"
       >
-        <Icon name="actions/rotate_right" :size="18" />
+        <Icon name="ringarrow/cw" :size="18" />
       </button>
       <button
         class="image-viewer__tool-btn"
         :title="t('imageViewer.download', '下载')"
         @click="handleDownload"
       >
-        <Icon name="arrows/arrow_down_n_box" :size="18" />
+        <Icon name="arrow/down_tray" :size="18" />
       </button>
     </div>
   </div>

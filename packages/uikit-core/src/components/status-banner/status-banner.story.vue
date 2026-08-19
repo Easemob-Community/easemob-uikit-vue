@@ -37,7 +37,7 @@ const closableShow = ref(true)
 
     <Variant title="自定义图标">
       <div style="padding: 16px; background: var(--uikit-bg-base);">
-        <StatusBanner type="info" icon="misc/magnifier2" title="自定义图标" description="使用 misc/magnifier2 图标" />
+        <StatusBanner type="info" icon="search" title="自定义图标" description="使用 misc/magnifier2 图标" />
       </div>
     </Variant>
 

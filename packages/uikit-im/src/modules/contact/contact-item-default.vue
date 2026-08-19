@@ -89,7 +89,7 @@ const resolvedAvatarShape = computed(() => {
       <span class="contact-item-default__leading">
         <span v-if="props.showCheckbox" class="contact-item-default__check">
           <Icon
-            :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+            :name="props.selected ? 'circle/checked' : 'circle/empty'"
             :size="20"
           />
         </span>

@@ -85,7 +85,7 @@ const highlightStyle = computed(() => {
           class="demo-dev-hint__drawer-close"
           @click="emit('close-detail')"
         >
-          <EmIcon name="actions/close" :size="16" />
+          <EmIcon name="xmark/light" :size="16" />
         </button>
       </div>
 

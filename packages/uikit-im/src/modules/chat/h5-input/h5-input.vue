@@ -293,13 +293,13 @@ const moreItems = computed(() => {
   if (features.value.image) {
     items.push({
       key: 'album',
-      icon: 'files-media/img',
+      icon: 'rect/img',
       label: t('chat.input.album'),
       action: () => albumInputRef.value?.click(),
     })
     items.push({
       key: 'camera',
-      icon: 'audio-video/camera',
+      icon: 'camera',
       label: t('chat.input.camera'),
       action: () => cameraInputRef.value?.click(),
     })
@@ -307,7 +307,7 @@ const moreItems = computed(() => {
   if (features.value.video) {
     items.push({
       key: 'video',
-      icon: 'audio-video/video_camera',
+      icon: 'video',
       label: t('chat.input.video'),
       action: () => videoInputRef.value?.click(),
     })
@@ -315,7 +315,7 @@ const moreItems = computed(() => {
   if (features.value.file) {
     items.push({
       key: 'file',
-      icon: 'files-media/folder',
+      icon: 'folder',
       label: t('chat.input.file'),
       action: () => fileInputRef.value?.click(),
     })
@@ -323,7 +323,7 @@ const moreItems = computed(() => {
   if (props.enableMention) {
     items.push({
       key: 'mention',
-      icon: 'misc/at',
+      icon: 'at',
       label: t('chat.input.mention'),
       action: () => {
         activePanel.value = 'none'
@@ -557,7 +557,7 @@ defineExpose({
         :class="{ 'h5-input__icon-btn--active': isVoiceMode }"
         @click="toggleVoiceMode"
       >
-        <Icon :name="isVoiceMode ? 'audio-video/mic_on' : 'audio-video/mic'" :size="24" />
+        <Icon :name="isVoiceMode ? 'mic' : 'mic'" :size="24" />
       </button>
 
       <!-- 文本输入：auto-grow textarea -->
@@ -596,7 +596,7 @@ defineExpose({
         :class="{ 'h5-input__icon-btn--active': activePanel === 'emoji' }"
         @click="togglePanel('emoji')"
       >
-        <Icon name="emojis-reactions/face" :size="24" />
+        <Icon name="circle/face" :size="24" />
       </button>
 
       <!-- 有文本时「+」替换为发送按钮 -->
@@ -616,7 +616,7 @@ defineExpose({
         :class="{ 'h5-input__icon-btn--active': activePanel === 'more' }"
         @click="togglePanel('more')"
       >
-        <Icon name="actions/plus_in_circle" :size="24" />
+        <Icon name="circle/plus" :size="24" />
       </button>
     </div>
 
@@ -673,7 +673,7 @@ defineExpose({
       class="h5-input__record-overlay"
       :class="{ 'h5-input__record-overlay--cancel': isCancelZone }"
     >
-      <Icon name="audio-video/mic_on" :size="32" />
+      <Icon name="mic" :size="32" />
       <span class="h5-input__record-duration">{{ recordDuration }}s</span>
       <span class="h5-input__record-hint">
         {{ isCancelZone ? t('chat.voice.releaseToCancel') : t('chat.voice.slideUpCancel') }}

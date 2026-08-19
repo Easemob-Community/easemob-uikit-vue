@@ -55,7 +55,7 @@ function onEntryClick(entry: ContactNavEntry) {
               </span>
             </slot>
             <Icon
-              name="navigation/chevron_right"
+              name="chevron/right"
               :size="14"
               class="contact-nav__item-arrow"
             />

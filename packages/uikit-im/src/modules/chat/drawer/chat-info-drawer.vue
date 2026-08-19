@@ -628,7 +628,7 @@ defineExpose({
         </span>
         <IconButton
           class="chat-info-drawer__close"
-          icon="actions/close"
+          icon="xmark/light"
           size="small"
           variant="ghost"
           :title="t('button.close', '关闭')"
@@ -638,7 +638,7 @@ defineExpose({
       <div v-else class="chat-info-drawer__header">
         <IconButton
           class="chat-info-drawer__back"
-          icon="navigation/chevron_left"
+          icon="chevron/left"
           size="small"
           variant="ghost"
           :title="t('button.back', '返回')"
@@ -661,7 +661,7 @@ defineExpose({
                 <span class="chat-info-drawer__name">{{ displayName }}</span>
                 <IconButton
                   v-if="isOwner"
-                  icon="actions/edit"
+                  icon="rect/pencil"
                   size="small"
                   type="primary"
                   :title="t('chat.info.edit', '编辑')"
@@ -686,7 +686,7 @@ defineExpose({
                 </div>
                 <div class="chat-info-drawer__inline-edit-actions">
                   <IconButton
-                    icon="actions/xmark_thick"
+                    icon="xmark/bold"
                     size="small"
                     type="danger"
                     :title="t('button.cancel', '取消')"
@@ -694,7 +694,7 @@ defineExpose({
                   />
                   <IconButton
                     class="chat-info-drawer__inline-save"
-                    icon="actions/check"
+                    icon="check/single"
                     size="small"
                     type="success"
                     :disabled="savingGroupName"
@@ -716,7 +716,7 @@ defineExpose({
                 </span>
                 <IconButton
                   v-if="isOwner"
-                  icon="actions/edit"
+                  icon="rect/pencil"
                   size="small"
                   type="primary"
                   :title="t('chat.info.edit', '编辑')"
@@ -741,7 +741,7 @@ defineExpose({
                 </div>
                 <div class="chat-info-drawer__inline-edit-actions">
                   <IconButton
-                    icon="actions/xmark_thick"
+                    icon="xmark/bold"
                     size="small"
                     type="danger"
                     :title="t('button.cancel', '取消')"
@@ -749,7 +749,7 @@ defineExpose({
                   />
                   <IconButton
                     class="chat-info-drawer__inline-save"
-                    icon="actions/check"
+                    icon="check/single"
                     size="small"
                     type="success"
                     :disabled="savingDescription"
@@ -774,7 +774,7 @@ defineExpose({
             <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
               <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
               <IconButton
-                icon="actions/edit"
+                icon="rect/pencil"
                 size="small"
                 type="primary"
                 :title="t('chat.info.edit', '编辑')"
@@ -791,7 +791,7 @@ defineExpose({
                 @keydown.esc="cancelEditRemark"
               >
               <IconButton
-                icon="actions/xmark_thick"
+                icon="xmark/bold"
                 size="small"
                 type="danger"
                 :title="t('button.cancel', '取消')"
@@ -799,7 +799,7 @@ defineExpose({
               />
               <IconButton
                 class="chat-info-drawer__remark-save"
-                icon="actions/check"
+                icon="check/single"
                 size="small"
                 type="success"
                 :disabled="savingRemark"
@@ -832,7 +832,7 @@ defineExpose({
                 class="chat-info-drawer__member-cell chat-info-drawer__member-cell--add"
                 @click.stop="onAddMember"
               >
-                <Icon name="actions/plus_in_rectangle" :size="48" />
+                <Icon name="rect/plus" :size="48" />
               </div>
             </div>
             <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
@@ -854,7 +854,7 @@ defineExpose({
               @click="onViewMembersForTransfer"
             >
               <template #leading>
-                <Icon name="group/crown" :size="18" />
+                <Icon name="crown" :size="18" />
               </template>
             </Cell>
             <Cell
@@ -864,7 +864,7 @@ defineExpose({
               @click="onViewMembersForAdmin"
             >
               <template #leading>
-                <Icon name="group/shield-person" :size="18" />
+                <Icon name="shield/person" :size="18" />
               </template>
             </Cell>
           </div>
@@ -893,7 +893,7 @@ defineExpose({
         <!-- 通用操作 -->
         <div class="chat-info-drawer__section">
           <Button type="danger-outline" block @click="onClearHistory">
-            <Icon name="actions/trash" :size="18" />
+            <Icon name="trash" :size="18" />
             {{ t('chat.info.clearHistory') }}
           </Button>
         </div>

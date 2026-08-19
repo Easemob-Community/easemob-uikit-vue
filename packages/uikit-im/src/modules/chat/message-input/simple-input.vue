@@ -487,22 +487,22 @@ defineExpose({
     <!-- 工具栏 -->
     <div class="simple-input__toolbar">
       <div v-if="features.emoji" ref="emojiBtnRef" class="simple-input__tool-btn" @click="onEmojiClick">
-        <Icon name="emojis-reactions/face" :size="22" />
+        <Icon name="circle/face" :size="22" />
       </div>
       <div v-if="features.image" class="simple-input__tool-btn" @click="triggerFileInput('image')">
-        <Icon name="files-media/img" :size="22" />
+        <Icon name="rect/img" :size="22" />
       </div>
       <div v-if="features.video" class="simple-input__tool-btn" @click="triggerFileInput('video')">
-        <Icon name="misc/triangle_in_rect" :size="22" />
+        <Icon name="rect/triangle" :size="22" />
       </div>
       <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
-        <Icon name="files-media/file" :size="22" />
+        <Icon name="file/empty" :size="22" />
       </div>
       <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
-        <Icon :name="showMicOn ? 'audio-video/mic_on' : 'audio-video/mic'" :size="22" />
+        <Icon :name="showMicOn ? 'mic' : 'mic'" :size="22" />
       </div>
       <div v-if="props.enableMention" ref="mentionBtnRef" class="simple-input__tool-btn" title="@" @click="onMentionBtnClick">
-        <Icon name="misc/at" :size="22" />
+        <Icon name="at" :size="22" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
       <!-- 展开/收起输入区（仅 PC，工具栏右端） -->
@@ -512,7 +512,7 @@ defineExpose({
         :title="expanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
         @click="toggleExpand"
       >
-        <Icon :name="expanded ? 'misc/collapse' : 'misc/expand'" :size="22" />
+        <Icon :name="expanded ? 'chevron/up' : 'chevron/down'" :size="22" />
       </div>
     </div>
 

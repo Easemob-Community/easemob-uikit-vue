@@ -10,9 +10,9 @@ function log(event: string, key?: string) {
 }
 
 const actions: GroupCardAction[] = [
-  { key: 'message', label: '发消息', icon: 'chat/bubble_fill', type: 'primary' },
-  { key: 'share', label: '分享', icon: 'actions/plus' },
-  { key: 'quit', label: '退群', icon: 'actions/xmark_thick', type: 'danger' },
+  { key: 'message', label: '发消息', icon: 'bubble/rect/empty', type: 'primary' },
+  { key: 'share', label: '分享', icon: 'plus' },
+  { key: 'quit', label: '退群', icon: 'xmark/bold', type: 'danger' },
 ]
 
 const infoRows: GroupCardInfoRow[] = [

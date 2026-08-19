@@ -10,10 +10,10 @@ function log(event: string, key?: string) {
 }
 
 const actions: UserCardAction[] = [
-  { key: 'message', label: '发消息', icon: 'chat/bubble_fill', type: 'primary' },
+  { key: 'message', label: '发消息', icon: 'bubble/rect/empty', type: 'primary' },
   // 语音通话当前未支持，故事书里先注释示例
-  // { key: 'call', label: '语音通话', icon: 'audio-video/phone_pick' },
-  { key: 'block', label: '拉黑', icon: 'actions/xmark_thick', type: 'danger' },
+  // { key: 'call', label: '语音通话', icon: 'phone' },
+  { key: 'block', label: '拉黑', icon: 'xmark/bold', type: 'danger' },
 ]
 
 const infoRows: UserCardInfoRow[] = [

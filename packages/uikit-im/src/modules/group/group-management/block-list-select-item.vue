@@ -32,7 +32,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
     </template>
     <template #trailing>
       <Icon
-        :name="props.selected ? 'actions/checked_ellipse' : 'actions/unchecked_ellipse'"
+        :name="props.selected ? 'circle/checked' : 'circle/empty'"
         :size="20"
         class="block-list__popup-checkbox"
         :class="{ 'block-list__popup-checkbox--checked': props.selected }"

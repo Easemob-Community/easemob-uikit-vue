@@ -654,7 +654,7 @@ watch(
               :title="t('demo.quickReply.title')"
               @click="toggleQuickReplyPanel"
             >
-              <EmIcon name="chat/3lines_n_arrow" :size="22" />
+              <EmIcon name="lines/arrow-right_3bars" :size="22" />
             </button>
             <button
               class="demo-toolbar-btn"
@@ -662,14 +662,14 @@ watch(
               :disabled="!stores.conversation.currentConversation"
               @click="runAiDemoFromToolbar"
             >
-              <EmIcon name="chat/bubble_fill" :size="22" />
+              <EmIcon name="bubble/rect/empty" :size="22" />
             </button>
             <button
               class="demo-toolbar-btn"
               :title="t('demo.card.send')"
               @click="showCardPickerModal = true"
             >
-              <EmIcon name="people/person_single" :size="22" />
+              <EmIcon name="person/single" :size="22" />
             </button>
           </template>
           <template #input-panel="{ showPanel }">
@@ -699,11 +699,11 @@ watch(
       <div v-show="h5Page === 'list'" class="h5-page">
         <div class="h5-page__header">
           <button class="h5-page__header-btn" @click="showSettings = true">
-            <EmIcon name="actions/menu" :size="20" />
+            <EmIcon name="hamburger" :size="20" />
           </button>
           <span class="h5-page__title">{{ sidebarTab === 'conversation' ? '消息' : '通讯录' }}</span>
           <button class="h5-page__header-btn" @click="showSettings = true">
-            <EmIcon name="misc/gear" :size="20" />
+            <EmIcon name="flower" :size="20" />
           </button>
         </div>
         <div class="h5-page__body">
@@ -749,7 +749,7 @@ watch(
             :class="{ 'h5-tabbar__item--active': sidebarTab === 'conversation' }"
             @click="sidebarTab = 'conversation'"
           >
-            <EmIcon name="chat/bubble_fill" :size="22" />
+            <EmIcon name="bubble/rect/empty" :size="22" />
             <span class="h5-tabbar__label">消息</span>
           </button>
           <button
@@ -757,7 +757,7 @@ watch(
             :class="{ 'h5-tabbar__item--active': sidebarTab === 'contact' }"
             @click="sidebarTab = 'contact'"
           >
-            <EmIcon name="people/person_3lines_fill" :size="22" />
+            <EmIcon name="person/list" :size="22" />
             <span class="h5-tabbar__label">通讯录</span>
           </button>
         </nav>
@@ -767,7 +767,7 @@ watch(
       <div v-show="h5Page === 'chat'" class="h5-page">
         <div class="h5-page__header">
           <button class="h5-page__header-btn" @click="h5BackToList">
-            <EmIcon name="arrows/arrow_left" :size="20" />
+            <EmIcon name="arrow/left" :size="20" />
           </button>
           <span class="h5-page__title">聊天</span>
           <span class="h5-page__header-spacer" />
@@ -783,7 +783,7 @@ watch(
                 :title="t('demo.quickReply.title')"
                 @click="toggleQuickReplyPanel"
               >
-                <EmIcon name="chat/3lines_n_arrow" :size="22" />
+                <EmIcon name="lines/arrow-right_3bars" :size="22" />
               </button>
               <button
                 class="demo-toolbar-btn"
@@ -791,14 +791,14 @@ watch(
                 :disabled="!stores.conversation.currentConversation"
                 @click="runAiDemoFromToolbar"
               >
-                <EmIcon name="chat/bubble_fill" :size="22" />
+                <EmIcon name="bubble/rect/empty" :size="22" />
               </button>
               <button
                 class="demo-toolbar-btn"
                 :title="t('demo.card.send')"
                 @click="showCardPickerModal = true"
               >
-                <EmIcon name="people/person_single" :size="22" />
+                <EmIcon name="person/single" :size="22" />
               </button>
             </template>
             <template #input-panel="{ showPanel }">
@@ -826,7 +826,7 @@ watch(
       <div v-show="h5Page === 'detail'" class="h5-page">
         <div class="h5-page__header">
           <button class="h5-page__header-btn" @click="h5Page = 'list'">
-            <EmIcon name="arrows/arrow_left" :size="20" />
+            <EmIcon name="arrow/left" :size="20" />
           </button>
           <span class="h5-page__title">详情</span>
           <span class="h5-page__header-spacer" />

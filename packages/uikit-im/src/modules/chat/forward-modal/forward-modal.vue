@@ -68,9 +68,9 @@ function onSelect(conversation: Conversation) {
           v-model="searchKeyword"
           variant="search"
           clearable
-          clear-icon="misc/search_clear"
+          clear-icon="search/xmark"
           :placeholder="t('conversation.searchPlaceholder')"
-          prefix-icon="misc/magnifier2"
+          prefix-icon="search"
         />
       </div>
       <div class="forward-modal__list">

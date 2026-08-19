@@ -97,7 +97,7 @@ function onClose() {
       </div>
       <IconButton
         class="emoji-picker__close"
-        icon="actions/close"
+        icon="xmark/light"
         size="small"
         variant="ghost"
         :title="t('button.close', '关闭')"

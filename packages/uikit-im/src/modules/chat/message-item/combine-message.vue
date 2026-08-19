@@ -34,7 +34,7 @@ function handleClick() {
   <div class="combine-message" :class="{ 'combine-message--self': props.isSelf }" @click="handleClick">
     <!-- 标题 -->
     <div class="combine-message__header">
-      <Icon name="files-media/folder" :size="16" class="combine-message__icon" />
+      <Icon name="folder" :size="16" class="combine-message__icon" />
       <span class="combine-message__title">{{ title }}</span>
     </div>
 

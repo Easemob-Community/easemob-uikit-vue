@@ -254,7 +254,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <IconButton
         v-if="props.closable"
         class="group-member-list__close"
-        icon="actions/close"
+        icon="xmark/light"
         size="small"
         variant="ghost"
         :title="t('button.close', '关闭')"
@@ -268,9 +268,9 @@ defineExpose({ refresh, removeMember, setMemberRole })
         v-model="searchKeyword"
         variant="search"
         clearable
-        clear-icon="misc/search_clear"
+        clear-icon="search/xmark"
         :placeholder="t('group.memberList.searchPlaceholder', '搜索群成员')"
-        prefix-icon="misc/magnifier2"
+        prefix-icon="search"
       />
     </div>
 
