@@ -54,22 +54,53 @@ export default defineConfig({
         ],
 
         sidebar: {
-          '/guide/': [
+          '/guide/theme/': [
             {
-              text: '指南',
+              text: '设计系统',
               items: [
-                { text: '快速开始', link: '/guide/quickstart' },
                 { text: '主题定制', link: '/guide/theme' },
                 { text: 'Design Tokens', link: '/guide/design-tokens' },
                 { text: '图标', link: '/guide/icons' },
-                { text: 'H5 适配', link: '/guide/h5-adaptation' },
+              ],
+            },
+          ],
+          '/guide/h5-adaptation/': [
+            {
+              text: 'H5 适配',
+              items: [
+                { text: 'H5 适配指南', link: '/guide/h5-adaptation' },
+              ],
+            },
+          ],
+          '/guide/changelog/': [
+            {
+              text: '更新日志',
+              items: [
+                { text: '查看更新日志', link: '/guide/changelog' },
+              ],
+            },
+          ],
+          '/guide/': [
+            {
+              text: '开始',
+              items: [
+                { text: '快速开始', link: '/guide/quickstart' },
+              ],
+            },
+            {
+              text: '功能指南',
+              items: [
                 { text: '系统通知文案定制', link: '/guide/notice-customization' },
                 { text: 'AI 流式消息', link: '/guide/ai-stream-message' },
                 { text: '进阶指南', link: '/guide/advanced' },
                 { text: 'AI 集成（Skills / MCP）', link: '/guide/ai-integration' },
+              ],
+            },
+            {
+              text: 'Demo 规划',
+              items: [
                 { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
                 { text: 'Demo 第二期规划（演练场）', link: '/guide/demo-phase2-plan' },
-                { text: '更新日志', link: '/guide/changelog' },
               ],
             },
           ],
