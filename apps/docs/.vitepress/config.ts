@@ -54,7 +54,7 @@ export default defineConfig({
         ],
 
         sidebar: {
-          '/guide/theme/': [
+          '/guide/theme': [
             {
               text: '设计系统',
               items: [
@@ -64,7 +64,7 @@ export default defineConfig({
               ],
             },
           ],
-          '/guide/h5-adaptation/': [
+          '/guide/h5-adaptation': [
             {
               text: 'H5 适配',
               items: [
@@ -72,7 +72,7 @@ export default defineConfig({
               ],
             },
           ],
-          '/guide/changelog/': [
+          '/guide/changelog': [
             {
               text: '更新日志',
               items: [
