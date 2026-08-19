@@ -1,7 +1,7 @@
 /**
  * 校验 @easemob/uikit-core 的包隔离：core 内禁止依赖任何场景包。
  *
- * 背景：三包架构（CHATROOM-UIKIT-DESIGN.md / TECH-DEBT D97）约定依赖方向
+ * 背景：三包架构（docs/CHATROOM-UIKIT-DESIGN.md / TECH-DEBT D97）约定依赖方向
  * 只能是 场景包 → core；core 一旦反向依赖场景包（uikit-im / uikit-chatroom），
  * 聊天室等场景 bundle 会把单群聊代码全链进来，抽核失效。
  * 判定归属（新功能放 core 还是场景包）见 skill `uikit-package-boundary`。

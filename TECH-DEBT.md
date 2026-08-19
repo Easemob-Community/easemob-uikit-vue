@@ -558,7 +558,7 @@
 - **现象**：`onTokenWillExpire/onTokenExpired` 只打日志，UIKit 未向应用层暴露刷新 token 的钩子，过期后用户无感知地断链。
 - **证据**：`sdk/event/connection-events.ts:33-40`。
 - **建议修法**：通过 provider options 暴露 `onTokenWillExpire/onTokenExpired` 回调。
-- **修复**：已于 2026-08-15 核销（2026-08-15 消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。链路完整：`EmUIKitProvider` props `onTokenWillExpire/onTokenExpired`（`uikit-provider.vue:139,141,243-246`）→ `useUIKit` options `connectionCallbacks`（`use-uikit.ts:114,245`）→ `registerEventHandlers`（`sdk/event/registry.ts:18-21`）→ `createConnectionHandlers` 触发 `callbacks.onTokenWillExpire?.()/onTokenExpired?.()`（`connection-events.ts:47-56`）。核销时补对外类型导出：`ConnectionEventCallbacks` 从 `sdk/index.ts` re-export（此前类型仅内部可见）。真实接入验证（业务侧刷新 token 后自动恢复）列入 CONSUMER-VALIDATION-CHECKLIST.md 阶段 B3 首个验证项。
+- **修复**：已于 2026-08-15 核销（2026-08-15 消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。链路完整：`EmUIKitProvider` props `onTokenWillExpire/onTokenExpired`（`uikit-provider.vue:139,141,243-246`）→ `useUIKit` options `connectionCallbacks`（`use-uikit.ts:114,245`）→ `registerEventHandlers`（`sdk/event/registry.ts:18-21`）→ `createConnectionHandlers` 触发 `callbacks.onTokenWillExpire?.()/onTokenExpired?.()`（`connection-events.ts:47-56`）。核销时补对外类型导出：`ConnectionEventCallbacks` 从 `sdk/index.ts` re-export（此前类型仅内部可见）。真实接入验证（业务侧刷新 token 后自动恢复）列入 docs/CONSUMER-VALIDATION-CHECKLIST.md 阶段 B3 首个验证项。
 - **关联 skill**：`websdk2-uikit-migration`
 
 ### [x] D65. `conversation-container` 的 `pageSize`/`includeEmptyConversations` 是死 props
@@ -744,7 +744,7 @@
 ### [x] D85. 未来扩展：Electron + 本地数据库（SQLite）消息/会话持久化
 
 - **背景**：未来 UIKit 有较大可能在 Electron 环境使用，消息/会话数据需外接本地 DB——登录后从库加载回流 UIKit（冷启动不依赖网络）、收发写库、翻页先读本地再漫游。
-- **结论**：架构支持低侵入扩展（Domain 依赖注入 + store 已有 `setConversationList`/`prependMessages` 批量回流入口 + `toUiMessage` 形态对齐），缺持久化抽象接口、历史加载数据源分支、会话列表与 SDK 同步快照的覆盖竞争处理。**详细调研与落地建议见根 [ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（2026-08-05 预研）**。
+- **结论**：架构支持低侵入扩展（Domain 依赖注入 + store 已有 `setConversationList`/`prependMessages` 批量回流入口 + `toUiMessage` 形态对齐），缺持久化抽象接口、历史加载数据源分支、会话列表与 SDK 同步快照的覆盖竞争处理。**详细调研与落地建议见 [ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（2026-08-05 预研）**。
 - **核销（2026-08-15，转 roadmap）**：预研已完成且架构结论明确，实施需 Electron 项目场景（当前仓库无 Electron 验证环境，下周为 Web Demo）——待 Electron 项目立项后按预研步骤实施（持久化抽象接口 → dataSource 分支 → 覆盖竞争处理），非当前 Web UIKit 债务。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
 
@@ -782,10 +782,10 @@
 ### [x] D90. 面性图标集接入：主题级 iconStyle 切换 + 组件选中态配对
 
 - **背景**：设计师交付面性（filled）图标集 88 个（`面性/icon/filled/`），与线性集命名 1:1 对应；缺失的 32 个为箭头/对勾等纯线条图形（无面性隐喻，属正常）。面性在小尺寸状态图标与选中态辨识度更优（典型如 `pin`）。
-- **结论**：技术可行性高（`icon-map`/`EmIcon` 已有填充/描边双渲染分支，加第二注册表 + 缺失回落即可）。推荐「主题级 `iconStyle` 开关（品牌定制）+ 组件选中态自动配对（默认体验）」组合，不做面向终端用户的全局面性开关。**详细盘点、方案权衡与落地步骤见根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（2026-08-06 预研）**。
+- **结论**：技术可行性高（`icon-map`/`EmIcon` 已有填充/描边双渲染分支，加第二注册表 + 缺失回落即可）。推荐「主题级 `iconStyle` 开关（品牌定制）+ 组件选中态自动配对（默认体验）」组合，不做面向终端用户的全局面性开关。**详细盘点、方案权衡与落地步骤见 [ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)（2026-08-06 预研）**。
 - **资产合并策略（2026-08-07 沉淀，原根 `ICON-ASSET-MERGE-STRATEGY.md` 已删除归档至本条目）**：`packages/uikit-im/src/assets/icons` 是运行时唯一权威图标库（`EmIcon`/`icon-map.ts` 只认这里）；候选素材库 `assets/icons-next` 已整目录删除（2026-08-07）；设计源目录（`线性/icon/stroked`、`面性/icon/filled`、`消息状态以及未读状态`）为设计师本地工作产物、gitignore 已排除，后续新素材统一放仓库外（设计稿/蓝湖/Figma），由负责工程师评估后复制/替换进 `assets/icons` 并在 `icon-map.ts` 注册；合并采用批次化 + 分类映射表 + 同名脚本对比，不整体覆盖，避免未经验证的视觉回归。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
-- **核销（2026-08-15，转 roadmap）**：方案与落地步骤已定（见 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)：第二注册表 `assets/icons-filled/` + `getIconSvg(name, style?)` 回落线性版 + 主题级 `iconStyle` 开关 + 选中态配对）；**88 个面性 SVG 资产尚未提交进包**（设计师源目录 gitignore，规范化产物待工程师按资产合并策略评估后落地）——资产就绪后按预研步骤实施，非当前债务。
+- **核销（2026-08-15，转 roadmap）**：方案与落地步骤已定（见 [ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)：第二注册表 `assets/icons-filled/` + `getIconSvg(name, style?)` 回落线性版 + 主题级 `iconStyle` 开关 + 选中态配对）；**88 个面性 SVG 资产尚未提交进包**（设计师源目录 gitignore，规范化产物待工程师按资产合并策略评估后落地）——资产就绪后按预研步骤实施，非当前债务。
 
 ### [x] D91. 数字胶囊（Digital Capsule）消息状态与未读数设计落地
 
@@ -797,7 +797,7 @@
   3. `badge.story.vue` / `message-list.story.vue` 增加数字胶囊展示变体。
 - **修复（2026-08-07）**：修正 `Badge` small 尺寸与字号。原实现 small 高度仅 16px、字号 9px，与数字胶囊规范（18×18 / 24×18 / 32×18）不符，造成会话列表未读数显大、拥挤。已调整为 small 统一 18px 高，一位 18×18、两位 min-width 24px、三位 min-width 32px，字号降至 8px。
 - **残留**：D90 `iconStyle` 实施后，需把 `Badge.variant` 与 `capsule` 消息状态默认绑定 `themeStore.iconStyle`，并补齐 `dot`/`dot_check` 在面性风格下的使用。
-- **详细预研与落地记录见根 [DIGITAL-CAPSULE-ICON-RESEARCH.md](DIGITAL-CAPSULE-ICON-RESEARCH.md)**。
+- **详细预研与落地记录见 [DIGITAL-CAPSULE-ICON-RESEARCH.md](docs/DIGITAL-CAPSULE-ICON-RESEARCH.md)**。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
 
 ### [x] D92. 群聊中己方消息偶现出现在左侧（isSelf 误判）
@@ -830,10 +830,10 @@
 
 - **背景**：环信 IM 支持流式消息（边生成边接收，典型 AI 对话），SDK 通过 `onStreamMessage` 按 `msgServerId` 排序合并分片，仅文本类型、客户端只收不发；消息体带 `stream`（`deltaText`/`fullText`/`status`/`customType`/`errorType`/`finishReason`）。
 - **结论**：流式是 TEXT 消息的「接收状态」而非新类型 → 内核只内置「数据链路 + 纯文本流式状态」，markdown 渲染与 AI 集成（重依赖/可选能力）走插件（`#message-txt` / `#message-custom` 插槽 + `useChatPlugin` + `dataSource`）。
-- **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)。
+- **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见 [STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)。
 - **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）、M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）、M3（demo markdown 流式气泡 `#message-txt` 插件接管 + 打字机）已完成；M4 demo mock AI 会话已落地（toolbar 入口 + 设置面板 + 分片模拟器），真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。文档新增 `guide/ai-stream-message.md` 独立章节。
 - **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
-- **核销（2026-08-15，转 roadmap）**：M1（内核数据链路）/ M2（纯文本流式渲染）/ M3（demo markdown 插件）+ M4 demo mock AI 会话均已落地验证，内核「薄 + 插件厚」能力完整；剩余 M4 真实模型对接（DeepSeek 直连/业务代理，需外部接入方式）与 M5 抽独立包（`@easemob/uikit-ai`）属发布后增强，按 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md) 推进，非当前债务。
+- **核销（2026-08-15，转 roadmap）**：M1（内核数据链路）/ M2（纯文本流式渲染）/ M3（demo markdown 插件）+ M4 demo mock AI 会话均已落地验证，内核「薄 + 插件厚」能力完整；剩余 M4 真实模型对接（DeepSeek 直连/业务代理，需外部接入方式）与 M5 抽独立包（`@easemob/uikit-ai`）属发布后增强，按 [STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md) 推进，非当前债务。
 
 ### [x] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
 
@@ -856,16 +856,16 @@
 - **背景**：聊天室（直播/语聊房/小班课/私域直播，H5 居多）与单群聊场景几乎不重合（无离线/未读/回执/会话列表，消息为广播流），需独立场景包；但主题/i18n/sdk 抽象/原子组件必须单一维护，故抽共享基座。底层 `easemob-websdk@5.0.0` 已具备完整 `ChatRoomManager`（join/leave/成员/管理员/禁言/黑/白名单/公告/房间属性 KV），能力底座齐备。
 - **结论**：三包架构 `@easemob/uikit-core`（共享内核）+ `@easemob/uikit-im`（1v1/群聊场景，对外 API 零变化）+ `@easemob/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
 - **关键增量/修正（评审已核实）**：① 事件注册按场景分离（core 只留连接级 + notice，chatroom 自建 `registerChatroomEventHandlers`）；② `ManagerHost` 需新增 `chatRoomManager`（当前 `SdkChatClient.init` 未注册 ChatRoomManager）；③ 所有包 external `vue/pinia/easemob-websdk`，场景包再 external core（单 websdk 实例规则）；④ chatroom 合并 i18n keys 用既有 `mergeLocaleMessages`（P1 核实 core locale 已有合并 API，无需新增 extendLocale）；⑤ `useChatroomAttributes` 四层同步（本地缓存 + set + 变更事件 + 拉取兜底），属性 key 加场景前缀；⑥ `scripts/check-version-sync.mjs` 升级为双版本校验。
-- **执行计划**（P0 决策 → P0.5 改名 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)。
-- **进度（2026-08-15）**：P0 设计评审完成；P0.5 改名 `@easemob/uikit` → `@easemob/uikit-im` 完成；**P1 抽核完成**（core 含 sdk 基座 + ChatRoomManager 注册、core stores、共享 composables、24 原子组件、core 版 EmUIKitProvider、resolver/auto-imports 参数化，10 门禁全绿，逐层判定与实施注记见 [CORE-MIGRATION-CHECKLIST.md](CORE-MIGRATION-CHECKLIST.md)）；**P1 评审修复（2026-08-15 独立复核后）**：⑥ 双版本校验已落地（`check-version-sync.mjs` 校验 im+core，根 CHANGELOG 增 `## @easemob/uikit-core 1.0.0` 段）；im vite `output.globals` 补 `@easemob/uikit-core → EasemobUIKitCore`（UMD 断链修复）；im 依赖 core 改 `workspace:^`；log-store 下载文件名前缀参数化（`setLogFilePrefix`，im 保持 `easemob-uikit-im` 语义）；core/im 新增文件 lint 清零；demo 的 core theme alias 统一指 src。
+- **执行计划**（P0 决策 → P0.5 改名 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见 [CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)。
+- **进度（2026-08-15）**：P0 设计评审完成；P0.5 改名 `@easemob/uikit` → `@easemob/uikit-im` 完成；**P1 抽核完成**（core 含 sdk 基座 + ChatRoomManager 注册、core stores、共享 composables、24 原子组件、core 版 EmUIKitProvider、resolver/auto-imports 参数化，10 门禁全绿，逐层判定与实施注记见 [CORE-MIGRATION-CHECKLIST.md](docs/CORE-MIGRATION-CHECKLIST.md)）；**P1 评审修复（2026-08-15 独立复核后）**：⑥ 双版本校验已落地（`check-version-sync.mjs` 校验 im+core，根 CHANGELOG 增 `## @easemob/uikit-core 1.0.0` 段）；im vite `output.globals` 补 `@easemob/uikit-core → EasemobUIKitCore`（UMD 断链修复）；im 依赖 core 改 `workspace:^`；log-store 下载文件名前缀参数化（`setLogFilePrefix`，im 保持 `easemob-uikit-im` 语义）；core/im 新增文件 lint 清零；demo 的 core theme alias 统一指 src。
 - **进度（2026-08-15，P2 完成）**：聊天室场景包 `@easemob/uikit-chatroom` 0.1.0 完整落地——P2-1 无头内核（sdk domain/adapter/event、store、6 composables、locale/theme/resolver/auto-imports、双版本 changelog 工具）+ P2-2 容器与 UI（`EmChatroomContainer` 外壳 + modules/chatroom 六个业务块 + H5 样式 + demo 验证页）；**store 按「房间注册表 Map + activeRoomId」两层建模**（设计文档 §5.9，消息流按 roomId 分桶，P3 多房间/信令房零返工）；**两包同装硬性验收项全部落地**（① core `sdk/client.ts` SDK 单例配置对齐——首次配置为基准、appKey 冲突抛错、managers 追加注册；② uikit-im `chat-events.ts` 忽略 `chatRoom` 消息；③ chatroom `enableUserInfoSync: false` 显式关闭，避免无 GroupManager 时 SDK 能力校验抛错；Provider 组合经 demo 嵌套实证：IM Provider 内嵌 chatroom Provider，`#/chatroom` hash 页验证通过）；门禁全绿（三包 vue-tsc + build + demo typecheck + changelog:check + core 隔离 + lint）。
 - **两包同装待办（2026-08-15 架构核查，uikit-im + uikit-chatroom 同时被同一应用使用）**：设计文档 §7 已把「两包同装」列为边界场景（事件按 manager + chatType 过滤互不污染），SDK 底层机制也允许（`ChatClient.init` 单例 + 相同配置复用 + 追加注册 manager），但按当前已落地代码核查出 3 个缺口，**P2 实施时必须作为硬性验收项**：
   1. **SDK 配置一致性（硬约束）**：`ChatClient.init` 为单例，后续调用若 `isSameConfig` 逐字段比较不一致（appKey / `enableSyncData` 数组全等 / serviceConfig / enableUserInfoSync / deleteConversationOnGroupDestroyed / syncConversationListConfig / deviceId 等）**直接抛错** `ChatClient already initialized with different config`。两场景 Provider 各自调一次 init，而 IM 默认注入 `enableSyncData: ['conversation','contact','group']`、chatroom 按设计不做场景化同步——默认值天然不同，**当前无任何合并机制**。需统一有效 ClientConfig（manager 并集去重 + enableSyncData 对齐）。
   2. **IM 侧事件过滤缺失（另一半隔离）**：SDK ChatManager 不按 chatType 分流，聊天室广播消息经 chatManager 事件面到达；uikit-im 的 `chat-events.ts` 当前**无 `chatType` 过滤**（已核实），两包同装时聊天室广播会流入 IM 消息 store（按 conversationId 落库）与 SDK 会话列表。IM 侧 handler 需显式忽略 `chatType === 'chatroom'` 的消息（设计文档只写了 chatroom 侧过滤，IM 侧需配套补上）。
   3. **Provider 组合机制缺失**：每个场景包各自组合 core provider（`useCoreUIKitProvider` + 各自 `resolveClientConfig`/`onClientSetup`/场景 stores），两包同装 = 两个 UIKitClient 包装器 + 两套 core ctx，登录/登出/重连生命周期需协调，theme/locale/notice 重复安装（幂等未验证）。建议 core 提供组合原语（如多场景 options 合并的「组合 Provider」），而非让用户叠两个场景 Provider。
   - **连带注意（chatroom 包单跑即踩）**：SDK 在 `enableUserInfoSync: true` 时强制要求 `group:namecard` 能力（GroupManager），而 core `UIKitClient` 默认 `enableUserInfoSync ?? true`；chatroom 只注入 `[ChatManager, ChatRoomManager, UserInfoManager]`（无 GroupManager），必须显式 `enableUserInfoSync: false`。
-- **多房间订阅（UI 房 + 信令房）设计决策（2026-08-15 补充评审，详见 CHATROOM-UIKIT-DESIGN.md §5.9/§6-7/§9/§10）**：私域直播双聊天室/多聊天室（互动房 + 信令房）架构需求——SDK 已支持多房并行（`joinChatRoom({ leaveOtherRooms: false })` 已核实）；UIKit 按「1 个 UI 房 + N 个信令房」建模：`EmChatroomContainer` 主房保持单数 `room-id`，信令房经 `signal-rooms` 数组订阅（**不引入 `isMultiChatroom` 布尔**，数组存在即多房），信令消息透传 `signal-message` 回调（零渲染零假设、默认不拉历史），`useChatroomMessage().sendText(text, { roomId })` 支持按房发送、节流按房间独立；**`chatroom.ts` store 按「注册表 `Map<roomId, RoomState>` + `activeRoomId`」两层建模（P2 即按此写，单房为特例）**；信令房 join 失败降级不拖累 UI 房；跨房消息无全序（业务不得按全序消费）。
-- **headless 弹幕模式（无 UI 接入）设计决策（2026-08-15 补充评审，详见 CHATROOM-UIKIT-DESIGN.md §5.10/§6-8/§9）**：弹幕轨道/飘屏/礼物特效是强差异化 UI，业务需「连接 + 房间 + 消息流 + 发送」数据能力、渲染自管——**headless 为一等公民**（非新增模式，composable 层本就与容器解耦，信令房透传即先行实例）。关键契约：① store/composable 层零组件 import，**容器必须只消费公开 composable 契约**（防「第二 API 面」）；② `useChatroomMessage` 提供 `subscribe` 增量有序 + **批量消费 + 可丢弃中间帧策略**（headless 下节流/丢帧由业务决定，**无消费者时 UIKit 不得自行丢消息**，修正 5.3 渲染节流表述为「容器默认内置节流」）；③ 系统通知全部事件化出口（payload 为 domain 类型）；④ 发送限流反馈程序化（无输入框）；⑤ 与多房间订阅正交（容器+信令房 / headless+多房任意组合，同一 store 建模）。P3 交付 headless 契约，P4 demo-chatroom 增纯弹幕 headless 页作验收。
+- **多房间订阅（UI 房 + 信令房）设计决策（2026-08-15 补充评审，详见 docs/CHATROOM-UIKIT-DESIGN.md §5.9/§6-7/§9/§10）**：私域直播双聊天室/多聊天室（互动房 + 信令房）架构需求——SDK 已支持多房并行（`joinChatRoom({ leaveOtherRooms: false })` 已核实）；UIKit 按「1 个 UI 房 + N 个信令房」建模：`EmChatroomContainer` 主房保持单数 `room-id`，信令房经 `signal-rooms` 数组订阅（**不引入 `isMultiChatroom` 布尔**，数组存在即多房），信令消息透传 `signal-message` 回调（零渲染零假设、默认不拉历史），`useChatroomMessage().sendText(text, { roomId })` 支持按房发送、节流按房间独立；**`chatroom.ts` store 按「注册表 `Map<roomId, RoomState>` + `activeRoomId`」两层建模（P2 即按此写，单房为特例）**；信令房 join 失败降级不拖累 UI 房；跨房消息无全序（业务不得按全序消费）。
+- **headless 弹幕模式（无 UI 接入）设计决策（2026-08-15 补充评审，详见 docs/CHATROOM-UIKIT-DESIGN.md §5.10/§6-8/§9）**：弹幕轨道/飘屏/礼物特效是强差异化 UI，业务需「连接 + 房间 + 消息流 + 发送」数据能力、渲染自管——**headless 为一等公民**（非新增模式，composable 层本就与容器解耦，信令房透传即先行实例）。关键契约：① store/composable 层零组件 import，**容器必须只消费公开 composable 契约**（防「第二 API 面」）；② `useChatroomMessage` 提供 `subscribe` 增量有序 + **批量消费 + 可丢弃中间帧策略**（headless 下节流/丢帧由业务决定，**无消费者时 UIKit 不得自行丢消息**，修正 5.3 渲染节流表述为「容器默认内置节流」）；③ 系统通知全部事件化出口（payload 为 domain 类型）；④ 发送限流反馈程序化（无输入框）；⑤ 与多房间订阅正交（容器+信令房 / headless+多房任意组合，同一 store 建模）。P3 交付 headless 契约，P4 demo-chatroom 增纯弹幕 headless 页作验收。
 - **进度（2026-08-15，P3 场景预设系统完成）**：`@easemob/uikit-chatroom` P3 全量落地——**场景预设**（`LIVE_ROOM_SCENE`/`VOICE_ROOM_SCENE`/`CLASS_ROOM_SCENE` 三内置 preset 模块加载即注册，`scene='live'` 等直接生效；`themeOverrides` 容器根元素应用 + `i18nOverrides` 经 `mergeLocaleMessages` 并入；`gift-bar`/`mic-queue` 插槽开放）；**礼物**（`CHATROOM_GIFT_EVENT` custom 协议 + `ChatroomGiftBar` + 消息项礼物渲染，未识别 custom 仍兜底）；**麦位**（`ChatroomMicQueue` 8 麦位存 `voice:micQueue` 房间属性 JSON，四层同步实时可见，变种无需自建服务端）；**管理 UI**（公告编辑 Popup + 成员面板黑名单 tab + 全员禁言入口，`features.muteAll` 驱动）；**多房间订阅（§5.9）**（`signal-rooms` 数组即多房、无布尔开关；信令房 `leaveOtherRooms: false` 并行入房、默认不拉历史、消息只透传不出屏（`signal-message` 事件）、失败/被踢/解散降级 `signal-status` 不拖累 UI 房；断线重连按注册表全量重进，信令房按 `autoRejoin` 配置）；**headless 契约（§5.10）**（`useChatroomMessage().subscribe` 增量有序 + flush 批量回调，与渲染桶并行——封顶 trim 不影响订阅者、无消费者不丢消息；容器与纯 JS 消费同内核，demo 页 headless 订阅面板实证）；**模块按场景分目录**（`modules/chatroom/{common,live,voice}`）；**P3 验收达成**（demo 页场景切换按钮验证三变种仅靠 config+插槽；headless 面板验证订阅契约）；门禁全绿；**下一步 P4 变种 Demo**（`apps/demo-chatroom` 四页面 + 纯弹幕 headless 页）。
 - **进度（2026-08-15，P4 变种 Demo 完成）**：新 app `apps/demo-chatroom`（H5-first，375px 移动视口居中壳，**纯 chatroom 单包形态**——不依赖 IM 包，补 P2 review 遗留 d 项）——登录页（纯 core useClient，复用 `uikit_demo_login_config` + hfp/pfh 预设账号）、首页五入口宫格、**基础聊天室页**（custom preset 三步接入）、**语聊房页**（voice preset + 麦位区，双账号联调）、**私域直播页**（live preset + 商品卡片 toolbar 插槽 + **signal-rooms 双房实证**：上架商品指令经 `sendCustom({ roomId })` 发信令房 → `signal-message` 回调解析 → 写 `live:product` 属性 → 商品卡全房间实时刷新；信令房 ID 可输入、留空退单房形态）、**小班课页**（class preset）、**纯弹幕 headless 页**（无容器：`useChatroom` + `useChatroomMessage` 驱动，自绘弹幕轨道/礼物飘屏/系统通知条，§5.10 一等公民实证）。**P4 前置补全（headless 事件化出口）**：`addMessage` 通知桶订阅者（系统通知/乐观上屏直通消息订阅者同样可见，此前 headless 收不到 notice）；index 补导出 `CHATROOM_GIFT_EVENT`/`CHATROOM_GIFT_ITEMS`/`CHATROOM_MIC_QUEUE_SEAT_COUNT`（P3 遗留）。门禁全绿（demo-chatroom vue-tsc/build/lint + apps/demo 复检 + changelog + core 隔离）；冒烟：dev server 200 + 三包源码直连生效。**下一步 P5 文档与集成**（docs 聊天室章节正式化 + gen:api 参数化 + 聊天室集成 skill + MCP 数据更新）。
 - **P4 review 运行时 UI 适配（2026-08-15 起，用户 5 项需求逐条落地）**：
@@ -898,7 +898,7 @@
   1. 新增 skill `.agent/skills/uikit-package-boundary/SKILL.md`：四步判定决策树（功能类型 → 依赖面 → 复用性 → 解耦判断）、默认留场景包倾向、locale（场景文案经 `mergeLocaleMessages` 合入，不写 core locale 文件）与 constants 特例、进 core 自检清单、硬规则/软约定、反面清单；
   2. AGENTS.md 路由表登记（首位，触发词：`新功能放哪` / `进 core` / `core 还是 im` / `包边界` 等）；
   3. 硬门禁 `packages/uikit-core/scripts/check-core-isolation.mjs` 挂 core build 前置：扫描 core src/scripts 的 import（含动态 import 与相对越界），违规即非零退出（已双向验证：正常通过 / 注入违规文件报错）；
-  4. `CHATROOM-UIKIT-DESIGN.md` 第四节补引用（边界判定执行层以该 skill 为准）。
+  4. `docs/CHATROOM-UIKIT-DESIGN.md` 第四节补引用（边界判定执行层以该 skill 为准）。
 - **验证**：门禁脚本 pass/fail 双向通过；core build 前置挂载后重跑构建正常。
 - **关联 skill**：`uikit-package-boundary` / `uikit-skill-authoring` / `uikit-lint-governance`
 
@@ -915,7 +915,7 @@
 
 ### [ ] D101. chatroom 插槽/props 可控性缺口补全（header 隐藏开关 + 弹幕自定义插槽 + 容器消息区整体替换）
 
-- **背景**：消费者视角反向评估 `@easemob/uikit-chatroom` 0.2.0 插槽与 props 可控性（详见根 `CHATROOM-CAPABILITY-REVIEW.md`）后确认三处硬缺口：① 无「隐藏内置 header」开关（uikit-im 系容器有 `showHeader` prop 惯例而 chatroom 缺失），demo 五页「DemoSceneHeader + 容器内置 ChatroomHeader」双层 header 重合；② 弹幕流 `ChatroomLiveDanmakuStream` 零插槽——无法在用户名旁插入 VIP 徽章/等级、无法整条自定义、`LiveDanmakuItem.kind` 封闭联合导致业务自定义消息语义进不了类型系统、分区常量封闭；③ 容器消息区不可整体替换（无 `message-list` 插槽），被踢/解散终态视图与公告编辑弹窗同样不可插槽覆盖。次要：`ChatroomLiveTopBar` 零插槽；docs `chatroom-container.md` 仍为「规划中」占位页（插槽列 11 < 实际 16）。
+- **背景**：消费者视角反向评估 `@easemob/uikit-chatroom` 0.2.0 插槽与 props 可控性（详见 `docs/CHATROOM-CAPABILITY-REVIEW.md`）后确认三处硬缺口：① 无「隐藏内置 header」开关（uikit-im 系容器有 `showHeader` prop 惯例而 chatroom 缺失），demo 五页「DemoSceneHeader + 容器内置 ChatroomHeader」双层 header 重合；② 弹幕流 `ChatroomLiveDanmakuStream` 零插槽——无法在用户名旁插入 VIP 徽章/等级、无法整条自定义、`LiveDanmakuItem.kind` 封闭联合导致业务自定义消息语义进不了类型系统、分区常量封闭；③ 容器消息区不可整体替换（无 `message-list` 插槽），被踢/解散终态视图与公告编辑弹窗同样不可插槽覆盖。次要：`ChatroomLiveTopBar` 零插槽；docs `chatroom-container.md` 仍为「规划中」占位页（插槽列 11 < 实际 16）。
 - **方案（P6，全部向后兼容）**：① scene `features.header?: boolean`（缺省 true，`header: false` 隐藏内置 header，`#header` 插槽提供时仍渲染=容器内接管）；② 弹幕流新增 `#badge`/`#item`/`#empty` 插槽，`LiveDanmakuKind` 加宽 `| (string & {})`，`LiveDanmakuItem` 增 `zone?: 'notice'|'chat'` 与 `meta?: Record<string, unknown>`，`isNotificationKind`/`isChatKind` 参数加宽；③ `ChatroomLiveTopBar` 增 `#extra` 插槽；④ 容器增 `#message-list`（替换加载更多+VirtualList+空态整块，滚动/加载职责转移业务）/`#terminal`/`#announcement-editor` 插槽；⑤ docs container 页重写 + 新增弹幕流组件页 + demo 改造（basic/voice/class 三页 `features.header:false` 消除双层 header，live 页弹幕 `#badge`/`#item` 演示）；⑥ 版本 0.3.0 + CHANGELOG 段。不做：消息项/成员项细粒度徽章插槽、`ChatroomHeader` 细粒度按钮开关、内置 live 顶部栏进容器。
 - **验证**：chatroom `vue-tsc --noEmit` + build + demo-chatroom `vue-tsc --noEmit` + `changelog:check` + 涉及文件 lint；demo 双层 header 消失、弹幕插槽演示可跑；docs 插槽清单与实现一致。
 - **关联 skill**：`uikit-chatroom-design` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`

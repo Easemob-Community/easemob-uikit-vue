@@ -556,7 +556,7 @@
 
 ### 新增
 
-- **插槽 / props 可控性补全（P6，消费者视角反向评估，详见根 CHATROOM-CAPABILITY-REVIEW.md）**：
+- **插槽 / props 可控性补全（P6，消费者视角反向评估，详见 docs/CHATROOM-CAPABILITY-REVIEW.md）**：
   - **隐藏 / 接管 header**：scene `features.header?: boolean`（缺省 true 向后兼容）——`header: false`
     隐藏内置 `ChatroomHeader`；`#header` 插槽提供时仍渲染（容器内接管）；完全无头时业务自绘
     头部放容器外。demo 基础聊天室 / 语聊房 / 小班课三页改用 `features.header: false`，

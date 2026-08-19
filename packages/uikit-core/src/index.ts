@@ -10,7 +10,7 @@
 //（src/theme/index.css）、通用 utils（download / z-index）。
 // P1 Step 6 已迁入：Provider 容器（EmUIKitProvider）+ Provider 共享副作用
 // composable（use-provider-side-effects）。
-// 详见根目录 CORE-MIGRATION-CHECKLIST.md。
+// 详见 docs/CORE-MIGRATION-CHECKLIST.md。
 
 // 主题 CSS 变量入口（构建时经 vite 收拢为 dist/theme/index.css）
 import './theme/index.css'

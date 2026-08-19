@@ -64,14 +64,14 @@
 ## 上下文入口
 
 - 依赖/规范体系：本文件「Skill 路由表」+ `.agent/skills/*`
-- 技术债与待修：根 [TECH-DEBT.md](TECH-DEBT.md)
-- Electron + 本地 DB 持久化预研：根 [ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）
-- 主题配置能力审查（字号/适老/密度）：根 [THEME-CAPABILITY-REVIEW.md](THEME-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D86，关联 D3/D4/D12）
-- Demo 开发者友好模式预研：根 [DEMO-DEV-MODE-RESEARCH.md](DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
-- 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：根 [ICON-STYLE-SYSTEM-RESEARCH.md](ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
-- 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：根 [STREAMING-MESSAGE-PLAN.md](STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
-- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：根 [CHATROOM-UIKIT-DESIGN.md](CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
-- 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：根 [CONSUMER-VALIDATION-CHECKLIST.md](CONSUMER-VALIDATION-CHECKLIST.md)
+- 技术债与待修：[TECH-DEBT.md](TECH-DEBT.md)
+- Electron + 本地 DB 持久化预研：[ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）
+- 主题配置能力审查（字号/适老/密度）：[THEME-CAPABILITY-REVIEW.md](docs/THEME-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D86，关联 D3/D4/D12）
+- Demo 开发者友好模式预研：[DEMO-DEV-MODE-RESEARCH.md](docs/DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
+- 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：[ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
+- 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：[STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
+- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：[CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
+- 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：[CONSUMER-VALIDATION-CHECKLIST.md](docs/CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）

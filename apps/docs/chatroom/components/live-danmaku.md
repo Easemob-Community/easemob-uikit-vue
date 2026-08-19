@@ -5,7 +5,7 @@
 合并计数、优先级挤出、进出场动画由组件管理；**内容渲染完全可插槽化**，
 业务可在不动内核的情况下插入 VIP 徽章、等级、勋章等自定义栏位或整条重绘。
 
-> 能力评估见仓库根目录 [CHATROOM-CAPABILITY-REVIEW.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-CAPABILITY-REVIEW.md)（§二 / §五 P6-2）。
+> 能力评估见仓库 [CHATROOM-CAPABILITY-REVIEW.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/docs/CHATROOM-CAPABILITY-REVIEW.md)（§二 / §五 P6-2）。
 
 ## 使用方式
 

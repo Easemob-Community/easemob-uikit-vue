@@ -133,4 +133,4 @@ subscribe((messages) => {
   [分栏布局](../components/chatroom-split-layout)
 - 数据与样式：[headless 接入](./headless) · [数据层（stores）](./stores) · [样式定制](./styling)
 - 架构与设计：[双 UIKit 架构](./architecture) · 仓库根目录
-  [CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-UIKIT-DESIGN.md)
+  [CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/docs/CHATROOM-UIKIT-DESIGN.md)

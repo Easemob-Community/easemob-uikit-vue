@@ -146,8 +146,8 @@ uikit-chatroom（聊天室）───┘
 
 ## 已知漂移（改到相关文件时注意）
 
-- 三包架构与 P1 抽核记录：根 `CHATROOM-UIKIT-DESIGN.md`（第四节边界清单）与
-  `CORE-MIGRATION-CHECKLIST.md`（一次性迁移文档，判定以本 skill 为准）；
+- 三包架构与 P1 抽核记录：`docs/CHATROOM-UIKIT-DESIGN.md`（第四节边界清单）与
+  `docs/CORE-MIGRATION-CHECKLIST.md`（一次性迁移文档，判定以本 skill 为准）；
 - 治理登记：`TECH-DEBT.md` D97（三包架构规划）与 D99（包边界治理：本 skill + 门禁）、
   D100（引擎层纯 TS 门禁 + domain 类型接口化待办）；
 - 引擎层对 Vue 层 store/composables 的类型级引用（`import type { UserInfoStore }` /

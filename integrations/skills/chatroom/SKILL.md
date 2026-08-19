@@ -66,4 +66,4 @@ description: 在 Vue3 项目中集成环信聊天室 UIKit（npm 包 @easemob/ui
 ## 相关材料
 
 - 对外文档站：`apps/docs/chatroom/`（VitePress，双 UIKit 架构）
-- 设计文档：仓库根 `CHATROOM-UIKIT-DESIGN.md`（内部）
+- 设计文档：仓库 `docs/CHATROOM-UIKIT-DESIGN.md`（内部）

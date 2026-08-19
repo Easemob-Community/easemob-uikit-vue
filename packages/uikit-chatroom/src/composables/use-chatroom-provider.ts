@@ -84,7 +84,7 @@ export function useChatroomProvider(
     setChatroomMessageUserInfoConfig(messageUserInfo)
 
   // autoInit 一律置 false，立即初始化在下方显式触发——确保 onClientSetup 闭包
-  // 首次执行时已能拿到 coreCtx（同 IM 场景包的处理，见 CORE-MIGRATION-CHECKLIST Step 2 注记）。
+  // 首次执行时已能拿到 coreCtx（同 IM 场景包的处理，见 docs/CORE-MIGRATION-CHECKLIST.md Step 2 注记）。
   const coreCtx = useCoreUIKitProvider(config, {
     ...coreOptions,
     autoInit: false,

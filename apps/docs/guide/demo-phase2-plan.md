@@ -60,7 +60,7 @@
 
 ### 6. 主题 token 演练场
 
-- **范围**：圆角 / 密度 / 字号（适老），关联根 `THEME-CAPABILITY-REVIEW.md`（TECH-DEBT D86）。
+- **范围**：圆角 / 密度 / 字号（适老），关联 `docs/THEME-CAPABILITY-REVIEW.md`（TECH-DEBT D86）。
 - **待确认**：D86 主题能力（字号 / 密度 / 适老 token）当前落地状态，演练场以实际已落地的 token 面为准，不提前引入未实现能力。
 - **实现要点**：DocsConfigPanel 需扩展 CSS 变量类控件（或按 D86 结论的主题 token 面实现），实时改写 `--uikit-*` 变量预览效果。
 - **页面登记**：挂在 `guide/theme.md` 或独立「主题演练场」页。
@@ -81,7 +81,7 @@
 ## 四、待确认项（执行前逐项复核）
 
 - 输入框无 SDK 登录态下的 mock 渲染 / 发送通道方案。
-- 主题 token 演练场与 D86 的依赖关系（先复核 D86 落地状态，见根 `THEME-CAPABILITY-REVIEW.md`）。
+- 主题 token 演练场与 D86 的依赖关系（先复核 D86 落地状态，见 `docs/THEME-CAPABILITY-REVIEW.md`）。
 - 各演练场页面登记位置（组件页内嵌 vs 独立页）与 docs sidebar 结构。
 - 会话列表配置为容器 props（非 ChatConfig），演练场操作 props 即可，**无需改公开 API**；其余方向如需新增配置项，按 AGENTS 规则先说明影响面再改。
 

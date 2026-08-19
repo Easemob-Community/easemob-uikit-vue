@@ -142,4 +142,4 @@ await setAttributes({ [prefixedKey(CHATROOM_ATTR_PREFIX.LIVE, 'operators')]: JSO
 
 - [双 UIKit 架构](./architecture)
 - [快速开始](./quickstart)
-- 仓库根目录 [CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-UIKIT-DESIGN.md)（§11 PC 模式与角色边界）
+- 仓库 [CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/docs/CHATROOM-UIKIT-DESIGN.md)（§11 PC 模式与角色边界）

@@ -78,4 +78,4 @@
 ## 设计文档
 
 完整设计决策（三包边界、聊天室包内部设计、场景预设系统、分阶段计划）见仓库根目录
-[CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHATROOM-UIKIT-DESIGN.md)。
+[CHATROOM-UIKIT-DESIGN.md](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/docs/CHATROOM-UIKIT-DESIGN.md)。

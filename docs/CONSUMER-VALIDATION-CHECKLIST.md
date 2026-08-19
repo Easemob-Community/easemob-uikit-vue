@@ -2,7 +2,7 @@
 
 > 创建日期：2026-08-15。目标：在**独立 Vue3 工程**中以「下游接入者」身份验证 `@easemob/uikit-im` 是否够好用。
 > 背景：仓库内 `apps/demo` 走 vite alias 直连源码（`packages/uikit-im/src`），验证的是**功能对不对**；本清单在**只消费发布产物（tgz / npm）**的干净工程中逐项打勾，验证的是**接入顺不顺**。
-> 记录方式：每项勾选后写「结果 / 卡点 / 建议」；发现的卡点回灌根 [TECH-DEBT.md](TECH-DEBT.md)，文档缺口回灌 `apps/docs`。
+> 记录方式：每项勾选后写「结果 / 卡点 / 建议」；发现的卡点回灌根 [TECH-DEBT.md](../TECH-DEBT.md)，文档缺口回灌 `apps/docs`。
 > 关联：构建/发布事实见 skill `uikit-release-build`；Demo 工程模式见 skill `uikit-demo-development`。
 
 ---
@@ -40,7 +40,7 @@
 ### B1. 接入成本（从零到第一个会话页）
 
 - [ ] 安装 → 配 `EmUIKitProvider`（appKey / features / dataSource / connectionCallbacks / theme / h5）→ 渲染会话列表 → 进入单聊 → 收发消息，**完整链路共多少步、多少行代码、涉及几个概念**？记录耗时与困惑点。
-- [ ] 对照 [快速开始](apps/docs/guide/quickstart.md) 逐行复制，确认文档步骤与真实行为一致（含上面的 theme 引入问题）。
+- [ ] 对照 [快速开始](../apps/docs/guide/quickstart.md) 逐行复制，确认文档步骤与真实行为一致（含上面的 theme 引入问题）。
 - [ ] 中英文切换（`useLocale` / locale）后文案是否完整、无 key 名裸奔（关联 TECH-DEBT D9：`t()` 缺 key 返回 key 名本身、部分组件硬编码中文）。
 
 ### B2. 契约一致性（docs vs 实现）
@@ -78,7 +78,7 @@
 ## 阶段 C：回灌机制（Demo 期间每天执行）
 
 - [ ] 建立「体验日志」：每条卡点记 **现象 / 期望 / 实际 / 修复建议**。
-- [ ] 日志逐条落进根 [TECH-DEBT.md](TECH-DEBT.md)（复用现有条目格式，标来源「2026-08 消费者验证」），已勾选项顺手核销（如 D64）。
+- [ ] 日志逐条落进根 [TECH-DEBT.md](../TECH-DEBT.md)（复用现有条目格式，标来源「2026-08 消费者验证」），已勾选项顺手核销（如 D64）。
 - [ ] 文档缺口（quickstart / 组件页 / API 表格）当日记入、集中修。
 - [ ] Demo 结束产出一份「好不好用」结论：接入成本数据 + 卡点清单按优先级排序（P0 阻断 / P1 影响体验 / P2 优化）。
 

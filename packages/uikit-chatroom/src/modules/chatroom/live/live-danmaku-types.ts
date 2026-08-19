@@ -6,7 +6,7 @@
  * - 视觉分区由 NOTIFICATION_KINDS / CHAT_KINDS 决定，便于 live/voice 场景复用；
  * - 业务自定义 kind 通过联合加宽 `| (string & {})` 透传：内置 kind 走常量分区，
  *   自定义 kind 用条目级 `zone` 显式指定分区（缺省回落聊天区），并建议配合
- *   ChatroomLiveDanmakuStream 的 `#item` 插槽自定义渲染（见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-2）。
+ *   ChatroomLiveDanmakuStream 的 `#item` 插槽自定义渲染（见 docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-2）。
  */
 
 /** 弹幕消息类型（内置语义；业务自定义 kind 经 `| (string & {})` 加宽透传） */

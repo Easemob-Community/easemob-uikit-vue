@@ -8,7 +8,7 @@ UIKit 对流式消息采用**「内核薄、插件厚」**的分层设计：
 - **插件按需**：markdown 等富格式渲染（重依赖不进内核）、AI 助手集成，全部通过既有插槽扩展点接入。
 
 > 背景参考：环信 Web SDK「接收流式消息」[官方文档](https://doc.easemob.com/document/web/message_stream_receive.html)。
-> 设计与执行计划：根目录 `STREAMING-MESSAGE-PLAN.md`（对应 TECH-DEBT D95）。
+> 设计与执行计划：`docs/STREAMING-MESSAGE-PLAN.md`（对应 TECH-DEBT D95）。
 
 ## SDK 语义（先读，避免踩坑）
 

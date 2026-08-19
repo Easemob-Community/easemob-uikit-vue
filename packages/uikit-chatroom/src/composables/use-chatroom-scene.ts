@@ -58,7 +58,7 @@ export interface ChatroomSceneConfig {
      * - false：隐藏内置 header（业务自绘头部放容器外）；
      *   若同时提供 `#header` 插槽则插槽内容仍渲染（容器内接管）。
      * 组合语义：内置（默认）/ #header 插槽重写 / header:false + #header 容器内接管 /
-     * header:false 完全无头区。见 CHATROOM-CAPABILITY-REVIEW.md §五。
+     * header:false 完全无头区。见 docs/CHATROOM-CAPABILITY-REVIEW.md §五。
      */
     header?: boolean
     /** 麦位管理（语聊房） */

@@ -424,7 +424,7 @@ defineExpose({
   <div ref="rootRef" class="chatroom-container" :class="{ 'chatroom-container--overlay': messageAreaTransparent }">
     <!-- 顶部栏（可整条覆盖；features.header: false 隐藏内置 header——同时提供
          #header 插槽则插槽仍渲染（容器内接管），完全无头时业务自绘头部放容器外，
-         见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-1） -->
+         见 docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-1） -->
     <slot
       v-if="features.header !== false || $slots.header"
       name="header"
@@ -486,7 +486,7 @@ defineExpose({
         <div class="chatroom-container__list">
           <!-- 消息列表整块（#message-list 提供时整体接管：加载更多 + 列表 + 空态；
                滚动跟随与加载职责转移业务，message-item/message-custom/empty 自然失效，
-               见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+               见 docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
           <slot
             v-if="$slots['message-list']"
             name="message-list"
@@ -604,7 +604,7 @@ defineExpose({
       >
         <!-- 消息列表整块（#message-list 提供时整体接管：加载更多 + 列表 + 空态；
              滚动跟随与加载职责转移业务，message-item/message-custom/empty 自然失效，
-             见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+             见 docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
         <slot
           v-if="$slots['message-list']"
           name="message-list"
@@ -716,7 +716,7 @@ defineExpose({
     </slot>
 
     <!-- 公告编辑框（P3：owner/admin；可经 #announcement-editor 插槽整体覆盖，
-         见 CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
+         见 docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-4） -->
     <slot
       name="announcement-editor"
       :show="showAnnouncementEditor"

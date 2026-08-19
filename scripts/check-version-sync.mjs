@@ -5,7 +5,7 @@
  * （1.5.0/1.5.1 只写进文档站，根 CHANGELOG 停在 1.4.0，package.json 停在 1.3.1）。
  * 现约定单一数据源：根 CHANGELOG.md 唯一维护版本段，文档站通过 @include 引用。
  *
- * 多包约定（P2 落地，对应 CHATROOM-UIKIT-DESIGN.md「复审修正 6」）：
+ * 多包约定（P2 落地，对应 docs/CHATROOM-UIKIT-DESIGN.md「复审修正 6」）：
  * - 版本段标题两种格式并存：
  *   - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 `@easemob/uikit-im` 的历史段（不动）；
  *   - 带包名前缀 `## @easemob/<pkg> x.y.z (yyyy-mm-dd)`：各包新段统一用前缀格式

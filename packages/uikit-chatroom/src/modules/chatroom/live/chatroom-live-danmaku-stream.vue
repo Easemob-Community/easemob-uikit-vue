@@ -12,7 +12,7 @@
  * - 用户名脱敏可开关（mask-name prop，默认 true）；
  * - 购买提示 / 普通消息在 1s 窗口内合并计数；超出最大条数按优先级挤出。
  *
- * 自定义插槽（CHATROOM-CAPABILITY-REVIEW.md §五 P6-2，合并/挤出/进出场动画仍由组件管理）：
+ * 自定义插槽（docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-2，合并/挤出/进出场动画仍由组件管理）：
  * - `#prefix`：scope `{ item, display-name }`——渲染在整条气泡**最左端**（用户名/内置图标
  *   之前，全 kind 通用），左侧头像/等级/VIP 皇冠等栏位直插位；
  * - `#badge`：scope `{ item, display-name }`——渲染在用户名之后、内容之前，全 kind 通用

@@ -49,7 +49,7 @@ export const CHATROOM_PERMISSION = {
 export type ChatroomPermissionValue =
   (typeof CHATROOM_PERMISSION)[keyof typeof CHATROOM_PERMISSION]
 
-/** 消息流默认配置（接收侧渲染节流与封顶，见 CHATROOM-UIKIT-DESIGN 5.3/5.7） */
+/** 消息流默认配置（接收侧渲染节流与封顶，见 docs/CHATROOM-UIKIT-DESIGN.md 5.3/5.7） */
 export const CHATROOM_MESSAGE_DEFAULTS = {
   /** 渲染列表封顶条数（默认保留最近 200 条，可配） */
   MAX_MESSAGES: 200,
