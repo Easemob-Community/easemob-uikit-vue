@@ -1,6 +1,17 @@
 import { defineConfig } from 'vitepress'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
+const designSystemSidebar = [
+  {
+    text: '设计系统',
+    items: [
+      { text: '主题定制', link: '/guide/theme' },
+      { text: '设计变量', link: '/guide/design-tokens' },
+      { text: '图标', link: '/guide/icons' },
+    ],
+  },
+]
+
 // 版本号：由 vitepress build 时注入（见 vite.config.ts）
 const version = '__EASEMOB_UIKIT_VERSION__'
 
@@ -54,16 +65,9 @@ export default defineConfig({
         ],
 
         sidebar: {
-          '/guide/theme': [
-            {
-              text: '设计系统',
-              items: [
-                { text: '主题定制', link: '/guide/theme' },
-                { text: 'Design Tokens', link: '/guide/design-tokens' },
-                { text: '图标', link: '/guide/icons' },
-              ],
-            },
-          ],
+          '/guide/theme': designSystemSidebar,
+          '/guide/design-tokens': designSystemSidebar,
+          '/guide/icons': designSystemSidebar,
           '/guide/h5-adaptation': [
             {
               text: 'H5 适配',
@@ -90,6 +94,7 @@ export default defineConfig({
             {
               text: '功能指南',
               items: [
+                { text: '术语与数据模型', link: '/guide/data-model' },
                 { text: '系统通知文案定制', link: '/guide/notice-customization' },
                 { text: 'AI 流式消息', link: '/guide/ai-stream-message' },
                 { text: '进阶指南', link: '/guide/advanced' },
