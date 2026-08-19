@@ -1,11 +1,12 @@
 /**
  * 图标资源注册表
  *
- * 使用 Vite import.meta.glob 预加载 assets/icons 与 assets/icons-v2 下所有 SVG 为原始字符串，
+ * 使用 Vite import.meta.glob 预加载 assets/icons、assets/icons-v2 与 assets/icons-filled 下所有 SVG 为原始字符串，
  * Icon 组件通过 name 查找并内联渲染。
  *
- * - assets/icons：旧版类目命名（如 "actions/trash"），逐步迁移中
- * - assets/icons-v2：设计师约定命名（如 "chevron/down"），新图标统一放这里
+ * - assets/icons：旧版类目命名（如 "actions/trash"），仅剩少量缺口插画
+ * - assets/icons-v2：线性图标（设计师约定命名，如 "chevron/down"）
+ * - assets/icons-filled：面性图标（命名带 `filled/` 前缀，如 "filled/circle/empty"）
  */
 // 本文件会被消费方（demo/docs）经 tsconfig paths 以源码形式纳入类型检查，
 // 自行引用 vite/client，不依赖消费方 tsconfig 的 types 配置
@@ -20,9 +21,15 @@ const v2SvgModules = import.meta.glob<{ default: string }>(
   { eager: true, query: '?raw' }
 )
 
+const filledSvgModules = import.meta.glob<{ default: string }>(
+  '../../assets/icons-filled/**/*.svg',
+  { eager: true, query: '?raw' }
+)
+
 const svgModuleGroups = [
   { modules: legacySvgModules, prefix: 'assets/icons/' },
   { modules: v2SvgModules, prefix: 'assets/icons-v2/' },
+  { modules: filledSvgModules, prefix: 'assets/icons-filled/' },
 ]
 
 /** 解析后的图标数据：body 为 <svg> 内部子元素，viewBox 保留原 svg 画布 */
@@ -84,11 +91,13 @@ function loadIconMap(modules: Record<string, unknown>, prefix: string): Map<stri
 
 const legacyIconMap = loadIconMap(legacySvgModules, 'assets/icons/')
 const v2IconMap = loadIconMap(v2SvgModules, 'assets/icons-v2/')
+const filledIconMap = loadIconMap(filledSvgModules, 'assets/icons-filled/')
 
-/** 合并后的总表：v2 与旧库同名时，v2 覆盖（用于渐进替换） */
+/** 合并后的总表：v2 与旧库同名时，v2 覆盖；filled 独立前缀不冲突 */
 const iconMap = new Map<string, IconSvgData>([
   ...legacyIconMap,
   ...v2IconMap,
+  ...filledIconMap,
 ])
 
 /**
@@ -107,6 +116,11 @@ export function getIconNames(): string[] {
 /** 获取 V2 图标名称列表（仅设计师约定名） */
 export function getV2IconNames(): string[] {
   return Array.from(v2IconMap.keys())
+}
+
+/** 获取面性图标名称列表 */
+export function getFilledIconNames(): string[] {
+  return Array.from(filledIconMap.keys())
 }
 
 /** 检查某个图标名是否已注册 */

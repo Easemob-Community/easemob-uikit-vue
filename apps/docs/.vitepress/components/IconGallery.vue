@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { getV2IconNames } from '@easemob/uikit-core/components/icon/icon-map'
+import { getV2IconNames, getFilledIconNames } from '@easemob/uikit-core/components/icon/icon-map'
 import EmIcon from '@easemob/uikit-core/components/icon/icon.vue'
 
-const names = getV2IconNames()
+const v2Names = getV2IconNames()
+const filledNames = getFilledIconNames()
 
-const grouped = computed(() => {
+function groupByCategory(names: string[]) {
   const map = new Map<string, string[]>()
   for (const name of names) {
     const category = name.split('/')[0] || 'uncategorized'
@@ -14,13 +15,37 @@ const grouped = computed(() => {
     map.get(category)!.push(name)
   }
   return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b))
-})
+}
+
+const v2Grouped = computed(() => groupByCategory(v2Names))
+const filledGrouped = computed(() => groupByCategory(filledNames))
 </script>
 
 <template>
   <div class="icon-gallery">
-    <section v-for="[category, list] in grouped" :key="category" class="icon-gallery__section">
+    <h2 class="icon-gallery__heading">
+      线性图标（V2）
+      <span class="icon-gallery__count">({{ v2Names.length }})</span>
+    </h2>
+    <section v-for="[category, list] in v2Grouped" :key="category" class="icon-gallery__section">
       <h3 :id="category" class="icon-gallery__title">
+        {{ category }}
+        <span class="icon-gallery__count">({{ list.length }})</span>
+      </h3>
+      <div class="icon-gallery__grid">
+        <div v-for="name in list" :key="name" class="icon-gallery__item" :title="name">
+          <EmIcon :name="name" :size="24" />
+          <code class="icon-gallery__name">{{ name }}</code>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="icon-gallery__heading icon-gallery__heading--filled">
+      面性图标（Filled）
+      <span class="icon-gallery__count">({{ filledNames.length }})</span>
+    </h2>
+    <section v-for="[category, list] in filledGrouped" :key="`filled-${category}`" class="icon-gallery__section">
+      <h3 :id="`filled-${category}`" class="icon-gallery__title">
         {{ category }}
         <span class="icon-gallery__count">({{ list.length }})</span>
       </h3>
@@ -35,6 +60,14 @@ const grouped = computed(() => {
 </template>
 
 <style scoped>
+.icon-gallery__heading {
+  margin: 32px 0 16px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.icon-gallery__heading--filled {
+  margin-top: 48px;
+}
 .icon-gallery__section {
   margin: 24px 0;
 }

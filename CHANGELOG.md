@@ -5,7 +5,8 @@
 ### 视觉
 
 - **线性图标集全新替换为设计师约定命名（v2）**：新增 `packages/uikit-core/src/assets/icons-v2/` 图标库，命名与设计师 svg 文件名 1:1（如 `chevron/down`、`file/pdf`、`person/single`）；`EmIcon` 支持通过 `name` 自动索引，业务代码已完成 300+ 处 name 替换。旧库仅保留空状态插画等少量缺口图标，待设计师补图后清理。
-- `IconGallery` 文档画廊改为展示 V2 图标，并在 `apps/docs/guide/icons.md` 同步命名规则与业务映射。
+- **面性图标集接入**：新增 `packages/uikit-core/src/assets/icons-filled/` 图标库，在线状态 `PresenceSelector` / `Avatar` 已从旧 `presence/*` 切换为 `filled/circle/*` 图标。
+- `IconGallery` 文档画廊改为展示 V2 + Filled 全部图标，并在 `apps/docs/guide/icons.md` 同步命名规则与业务映射。
 
 ### 重构
 
@@ -502,7 +503,7 @@
 
 ### 新增
 
-- **图标体系**：`EmIcon` 支持双注册表（`assets/icons` + `assets/icons-v2`），`icon-map.ts` 新增 `getV2IconNames()`，为设计师约定命名的新图标库提供自动索引；`color` prop 对 `fill="currentColor"` 的填充式图标同样生效。
+- **图标体系**：`EmIcon` 支持多注册表（`assets/icons` + `assets/icons-v2` + `assets/icons-filled`），`icon-map.ts` 新增 `getV2IconNames()` / `getFilledIconNames()`，为线性/面性图标库提供自动索引；`color` prop 对 `fill="currentColor"` 的填充式图标同样生效。
 - **共享基座首版（P1 抽核自 `@easemob/uikit-im` 迁出）**：
   - SDK 基座层：`UIKitClient` / `ManagerHost`（**含 `ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
   - Pinia stores：`useClientStore` / `useThemeStore` / `useUserInfoStore` / `usePresenceStore`

@@ -7,12 +7,12 @@ import Icon from '../icon/icon.vue'
 export type PresenceDisplayStatus = 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
 
 const presenceIconMap: Record<PresenceDisplayStatus, string> = {
-  online: 'presence/empty',
-  offline: 'presence/empty',
-  away: 'presence/clock',
-  busy: 'presence/equals',
-  doNotDisturb: 'presence/minus',
-  custom: 'presence/star',
+  online: 'filled/circle/empty',
+  offline: 'filled/circle/empty',
+  away: 'filled/circle/clock',
+  busy: 'filled/circle/equals',
+  doNotDisturb: 'filled/circle/minus',
+  custom: 'filled/circle/star',
 }
 
 const presenceColorMap: Record<PresenceDisplayStatus, string> = {
