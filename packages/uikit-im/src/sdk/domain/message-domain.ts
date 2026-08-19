@@ -16,6 +16,42 @@ const messageLogger = createLogger('MessageDomain')
 const PROGRESS_FLUSH_INTERVAL = 150
 
 /**
+ * 读取本地视频文件的分辨率（发送视频消息时自动补全 width/height，
+ * 供接收方/己方气泡按元数据预留尺寸，避免列表高度抖动）。失败静默返回 undefined。
+ */
+function readVideoDimensions(file: Blob): Promise<{ width: number, height: number } | undefined> {
+  return new Promise((resolve) => {
+    if (typeof document === 'undefined' || typeof URL.createObjectURL !== 'function') {
+      resolve(undefined)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    const video = document.createElement('video')
+    video.muted = true
+    video.playsInline = true
+    video.preload = 'metadata'
+    video.src = url
+
+    let settled = false
+    const finish = (result?: { width: number, height: number }) => {
+      if (settled)
+        return
+      settled = true
+      URL.revokeObjectURL(url)
+      video.removeAttribute('src')
+      resolve(result)
+    }
+    video.addEventListener('loadedmetadata', () => {
+      const { videoWidth, videoHeight } = video
+      finish(videoWidth > 0 && videoHeight > 0 ? { width: videoWidth, height: videoHeight } : undefined)
+    })
+    video.addEventListener('error', () => finish(undefined))
+    // 兜底：5s 未拿到 metadata 视为失败
+    setTimeout(() => finish(undefined), 5000)
+  })
+}
+
+/**
  * 已发送过已读回执的消息 ID 集合（模块级去重）。
  * 实时回执路径（chat-events）与进入会话补发路径共享，避免重复发送。
  */
@@ -153,12 +189,15 @@ export class MessageDomain {
     /** 是否请求消息已读回执（仅群聊生效） */
     needReadReceipt?: boolean,
   ) {
+    // 本地文件发送时自动补全视频分辨率，供渲染层按元数据预留气泡尺寸
+    const dimensions = typeof data === 'string' ? undefined : await readVideoDimensions(data)
     const sdkMsg = this.client.chatManager.createVideoMessage({
       conversationId,
       conversationType,
       duration,
       ext,
       needReadReceipt,
+      ...(dimensions ? { width: dimensions.width, height: dimensions.height } : {}),
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
     })
     return this._send(sdkMsg)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClipboard, useScroll } from '@vueuse/core'
 import type { GroupMessageReadUsersResult } from 'easemob-websdk'
 import { formatSdkError, resolveSdkErrorMessage } from '@easemob/uikit-core'
@@ -68,6 +68,8 @@ const { copy: copyToClipboard, isSupported: isClipboardSupported } = useClipboar
 
 /** 消息列表容器引用 */
 const listRef = ref<HTMLElement>()
+/** 内容层（普通滚动模式）：ResizeObserver 观测对象，尺寸即列表内容高度 */
+const contentRef = ref<HTMLElement>()
 /** 虚拟列表引用 */
 const virtualListRef = ref<InstanceType<typeof MessageVirtualList>>()
 
@@ -88,16 +90,18 @@ const messagePadding = computed(() => messageListConfig.value?.messagePadding)
 
 /** 普通滚动模式样式：显式配置优先，否则走 --uikit-message-gap / --uikit-message-padding */
 const nativeScrollStyle = computed(() => {
-  if (messageGap.value !== undefined || messagePadding.value !== undefined) {
-    return {
-      gap: `${messageGap.value ?? 12}px`,
-      padding: `${messagePadding.value ?? 16}px`,
-    }
+  if (messagePadding.value !== undefined) {
+    return { padding: `${messagePadding.value}px` }
   }
-  return {
-    gap: 'var(--uikit-message-gap, 12px)',
-    padding: 'var(--uikit-message-padding, 16px)',
+  return { padding: 'var(--uikit-message-padding, 16px)' }
+})
+
+/** 内容层样式（gap 挂内容层，padding 留滚动容器，内容层尺寸即列表内容高度，供 ResizeObserver 观测） */
+const nativeContentStyle = computed(() => {
+  if (messageGap.value !== undefined) {
+    return { gap: `${messageGap.value}px` }
   }
+  return { gap: 'var(--uikit-message-gap, 12px)' }
 })
 
 /** 时间分组间隔 */
@@ -135,6 +139,13 @@ const historyLoadFailed = ref(false)
 
 /** 是否在底部 */
 const isAtBottom = ref(true)
+
+/**
+ * 进入会话后的强制吸底窗口截止时间戳（媒体加载补偿用，见下方 ResizeObserver 块）。
+ * 注意：必须声明在「会话切换 watch」之前——该 watch immediate 触发时会写这个变量。
+ */
+let stickToBottomUntil = 0
+let contentResizeObserver: ResizeObserver | null = null
 
 /** 未读新消息数 */
 const unreadNewCount = ref(0)
@@ -189,6 +200,9 @@ watch(
     hasMoreHistory.value = !cached.isLast
     loadingHistory.value = false
     scrollToBottom()
+    // 进入会话后开启短暂吸底窗口：首屏媒体（图片/视频）加载撑高列表时自动贴底，
+    // 用户一旦有滚动意图即取消（见 cancelStickWindow）
+    stickToBottomUntil = Date.now() + 1500
     // 如果消息不足以撑满视口，自动加载历史，直到可滚动或没有更多
     void ensureHistoryFill()
   },
@@ -260,6 +274,51 @@ function scrollToBottom() {
     }
   })
 }
+
+/**
+ * 媒体消息（图片/视频）加载完成后高度变化会导致「进入会话没滚到底 / 在底部被顶上去」。
+ * 补偿策略（仅普通滚动模式）：ResizeObserver 观测内容层尺寸，变化时
+ * - 用户在底部（isAtBottom）：直接重新贴底；
+ * - 进入会话后的短暂吸底窗口内（首屏媒体加载属于首屏渲染的一部分）：强制贴底，
+ *   用户一有明显滚动意图（wheel/touchmove）即取消窗口，不打扰上翻。
+ */
+
+/** 用户主动滚动脉冲：取消吸底窗口 */
+function cancelStickWindow() {
+  stickToBottomUntil = 0
+}
+
+onMounted(() => {
+  const container = listRef.value
+  const content = contentRef.value
+  if (container) {
+    container.addEventListener('wheel', cancelStickWindow, { passive: true })
+    container.addEventListener('touchmove', cancelStickWindow, { passive: true })
+  }
+  if (content && typeof ResizeObserver !== 'undefined') {
+    contentResizeObserver = new ResizeObserver(() => {
+      if (enableVirtual.value)
+        return
+      const el = listRef.value
+      if (!el)
+        return
+      if (isAtBottom.value || Date.now() < stickToBottomUntil) {
+        el.scrollTop = el.scrollHeight
+      }
+    })
+    contentResizeObserver.observe(content)
+  }
+})
+
+onUnmounted(() => {
+  contentResizeObserver?.disconnect()
+  contentResizeObserver = null
+  const container = listRef.value
+  if (container) {
+    container.removeEventListener('wheel', cancelStickWindow)
+    container.removeEventListener('touchmove', cancelStickWindow)
+  }
+})
 
 defineExpose({
   scrollToBottom,
@@ -833,44 +892,51 @@ watch(locateRequest, (req) => {
       :style="nativeScrollStyle"
       @scroll="onNativeScroll"
     >
+      <!-- 内容层：尺寸即列表内容高度，ResizeObserver 观测它以补偿媒体加载导致的高度变化 -->
       <div
-        v-for="item in messagesWithDividers"
-        :key="item.key"
-        class="message-list__item"
+        ref="contentRef"
+        class="message-list__content"
+        :style="nativeContentStyle"
       >
-        <!-- 时间分割线 -->
-        <div v-if="item.type === 'divider'" class="message-list__divider">
-          <span>{{ item.data }}</span>
-        </div>
-        <!-- 消息气泡 -->
-        <MessageBubbleWrapper
-          v-else
-          :message="item.data as UiMessage"
-          :config="messageListConfig"
-          :action-config="config?.messageAction"
-          :group-read-receipt-config="config?.groupReadReceipt"
-          :is-multi-select-mode="isMultiSelectMode"
-          :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
-          @toggle-select="onToggleSelect"
-          @action="onMessageAction"
-          @group-read-click="onGroupReadClick"
-          @reedit="onReedit"
-          @resend="onResend"
-          @mention-click="emit('mention-click', $event)"
-          @location-click="emit('location-click', $event, item.data as UiMessage)"
-          @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
-          @avatar-view-profile="emit('avatar-view-profile', $event)"
-          @avatar-mention="emit('avatar-mention', $event)"
+        <div
+          v-for="item in messagesWithDividers"
+          :key="item.key"
+          class="message-list__item"
         >
-          <!-- 透传消息类型级插槽到气泡包装器 -->
-          <template
-            v-for="(_, name) in $slots"
-            :key="name"
-            #[name]="slotProps"
+          <!-- 时间分割线 -->
+          <div v-if="item.type === 'divider'" class="message-list__divider">
+            <span>{{ item.data }}</span>
+          </div>
+          <!-- 消息气泡 -->
+          <MessageBubbleWrapper
+            v-else
+            :message="item.data as UiMessage"
+            :config="messageListConfig"
+            :action-config="config?.messageAction"
+            :group-read-receipt-config="config?.groupReadReceipt"
+            :is-multi-select-mode="isMultiSelectMode"
+            :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
+            @toggle-select="onToggleSelect"
+            @action="onMessageAction"
+            @group-read-click="onGroupReadClick"
+            @reedit="onReedit"
+            @resend="onResend"
+            @mention-click="emit('mention-click', $event)"
+            @location-click="emit('location-click', $event, item.data as UiMessage)"
+            @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
+            @avatar-view-profile="emit('avatar-view-profile', $event)"
+            @avatar-mention="emit('avatar-mention', $event)"
           >
-            <slot :name="name" v-bind="slotProps" />
-          </template>
-        </MessageBubbleWrapper>
+            <!-- 透传消息类型级插槽到气泡包装器 -->
+            <template
+              v-for="(_, name) in $slots"
+              :key="name"
+              #[name]="slotProps"
+            >
+              <slot :name="name" v-bind="slotProps" />
+            </template>
+          </MessageBubbleWrapper>
+        </div>
       </div>
     </div>
 
@@ -926,6 +992,12 @@ watch(locateRequest, (req) => {
 }
 
 .message-list__item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 内容层：承载 gap（原在滚动容器上），供 ResizeObserver 观测内容高度变化 */
+.message-list__content {
   display: flex;
   flex-direction: column;
 }

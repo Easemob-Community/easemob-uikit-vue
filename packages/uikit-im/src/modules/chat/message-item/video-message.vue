@@ -29,6 +29,28 @@ const videoClass = computed(() =>
 
 const body = computed(() => props.message.body as VideoMessageBody)
 
+/** 视频展示最大约束（与图片消息对齐） */
+const MAX_WIDTH = 240
+const MAX_HEIGHT = 240
+
+/**
+ * 根据消息体 width/height 等比预留展示尺寸：气泡一渲染就占位，
+ * 避免 metadata 加载前 <video> 默认 300×150 → 加载后突变撑高列表（滚动位置被顶飞）。
+ * 无元数据时回落 16:9 默认占位（240×135）。
+ */
+const displaySize = computed(() => {
+  const w = body.value.width
+  const h = body.value.height
+  if (!w || !h || w <= 0 || h <= 0) {
+    return { width: MAX_WIDTH, height: 135 }
+  }
+  const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h, 1)
+  return {
+    width: Math.round(w * ratio),
+    height: Math.round(h * ratio),
+  }
+})
+
 /** 是否正在预览 */
 const isPreviewing = ref(false)
 
@@ -78,10 +100,15 @@ async function handleDownload(event: MouseEvent) {
 
 <template>
   <div class="video-message" :class="{ 'video-message--self': props.message.isSelf }">
-    <div class="video-message__container" @click="openPreview">
+    <div
+      class="video-message__container"
+      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }"
+      @click="openPreview"
+    >
       <video
         v-if="body.url"
         :src="body.url"
+        :poster="body.thumbnailUrl || undefined"
         class="video-message__video"
         :class="videoClass"
         preload="metadata"
@@ -129,10 +156,14 @@ async function handleDownload(event: MouseEvent) {
 <style scoped>
 .video-message {
   display: flex;
-  max-width: 60%;
+  /* 不限定宽度：收缩包裹视频内容，状态列才能贴住气泡；
+     曾用 max-width:60% 导致盒子比视频宽，己方消息的状态图标/头像侧出现大空隙 */
 }
 
 .video-message--self {
+  /* 盒子本身推到行右边缘贴住头像（margin-left:auto 对块级/flex 容器都生效）；
+     仅 justify-content 只能在盒子内部对齐 */
+  margin-left: auto;
   justify-content: flex-end;
 }
 
@@ -144,8 +175,9 @@ async function handleDownload(event: MouseEvent) {
 }
 
 .video-message__video {
-  max-width: 100%;
-  max-height: 240px;
+  /* 尺寸由容器按消息体 width/height 预留（displaySize），视频填满容器 */
+  width: 100%;
+  height: 100%;
   border-radius: 12px;
   object-fit: cover;
   display: block;
