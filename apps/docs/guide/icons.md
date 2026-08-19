@@ -39,7 +39,7 @@ UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。当前�
 | 发送中 | `MESSAGE_STATUS.SENDING` | `loading/arc/normal` | 旋转 loading |
 | 已发送 | `MESSAGE_STATUS.SENT` | `circle/empty` | 空心圆 |
 | 已送达 | `MESSAGE_STATUS.DELIVERED` | `circle/empty` | 空心圆 |
-| 已读 | `MESSAGE_STATUS.READ` | `check/double` | 双勾 |
+| 已读 | `MESSAGE_STATUS.READ` | `circle/checked` | 圆圈内对勾 |
 | 发送失败 | `MESSAGE_STATUS.FAILED` | `circle/bang` | 圆圈内感叹号，可点击重发 |
 
 PC 端发送失败图标 hover 时会放大 `1.2` 倍并切换为 `ringarrow/cw`（重发箭头）；H5 直接点击感叹号触发重发。颜色上失败状态使用 `--uikit-danger-color`，已读状态使用 `--uikit-primary-color`，其余跟随 `--uikit-text-secondary`。

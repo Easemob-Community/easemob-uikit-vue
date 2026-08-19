@@ -189,7 +189,7 @@ const classicStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
   [MESSAGE_STATUS.SENT]: 'circle/empty',
   [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
-  [MESSAGE_STATUS.READ]: 'check/double',
+  [MESSAGE_STATUS.READ]: 'circle/checked',
   // 发送失败：圆圈内感叹号提示可点击重发
   [MESSAGE_STATUS.FAILED]: 'circle/bang',
 }
@@ -202,7 +202,7 @@ const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
   [MESSAGE_STATUS.SENT]: 'circle/empty',
   [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
-  [MESSAGE_STATUS.READ]: 'check/double',
+  [MESSAGE_STATUS.READ]: 'circle/checked',
   [MESSAGE_STATUS.FAILED]: 'circle/bang',
 }
 
@@ -703,7 +703,7 @@ onBeforeUnmount(() => {
                 :title="`${groupReadCount}人已读${groupUnreadCount > 0 ? `/${groupMemberCount}人` : ''}`"
                 @click.stop="onGroupReadClick"
               >
-                <Icon v-if="isGroupReadAll" name="check/double" :size="14" />
+                <Icon v-if="isGroupReadAll" name="circle/checked" :size="14" />
                 <template v-else-if="groupReadCount > 0">
                   {{ groupReadCount }}
                 </template>

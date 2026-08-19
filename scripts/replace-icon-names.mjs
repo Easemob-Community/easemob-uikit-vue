@@ -16,6 +16,11 @@ const SCAN_ROOTS = [
   'apps/demo/src',
 ]
 
+// 这些文件里的旧名用于注释/文档说明，不应被替换
+const SKIP_FILES = new Set([
+  'packages/uikit-core/src/components/icon/icon-map.ts',
+])
+
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -45,6 +50,9 @@ async function main() {
   let total = 0
   for (const root of SCAN_ROOTS) {
     for await (const file of walk(root)) {
+      const rel = file.slice(process.cwd().length + 1)
+      if (SKIP_FILES.has(rel))
+        continue
       let content = await readFile(file, 'utf8')
       let modified = false
       let fileReplaces = 0
