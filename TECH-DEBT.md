@@ -968,6 +968,45 @@
 - **验证**：core build + uikit-im build 通过。
 - **关联 skill**：`uikit-styling-theming`
 
+### [x] D115. UI/UX 验收（第二轮）：预设主题档位 Theme Presets（R2-2）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` R2-2。
+- **现象**：主题机制只有「一套默认 `:root` 变量 + 单维度覆盖」（mode/density/primaryColor/shape/fontSize 等），无「多套成体系预设主题一键切换」，设计师评审提出该诉求。
+- **修复**：
+  - `packages/uikit-core/src/store/theme.ts` 新增 `ThemePreset` 类型（`'default' | 'business' | 'fresh'`）、`THEME_PRESETS` 预设表（主色相 / 圆角 / 间距 / 密度 / hover 风格）、`preset` 状态（含 localStorage 持久化与旧缓存回落）与 `setPreset()`（批量应用各维度，预设为基底、单项 setter 可再覆盖）。
+  - `use-theme.ts` 转发 `preset` / `setPreset`。
+  - `use-provider-side-effects.ts` 的 `ProviderThemeConfig` 新增 `preset`，`applyThemeConfig` 预设优先应用、后续单项覆盖。
+  - `uikit-provider.vue` 的 `theme` prop 新增 `preset` 字段。
+  - `apps/docs/guide/theme.md` 新增「预设主题」章节（三套预设对照表 + `setPreset` 示例 + Provider 声明式示例）。
+- **验证**：core `vue-tsc --noEmit` + core build + uikit-im `vue-tsc --noEmit` + build + docs build + demo `vue-tsc --noEmit` 均通过。
+- **关联 skill**：`uikit-styling-theming` / `uikit-store-composable` / `uikit-provider-config`
+
+### [x] D116. UI/UX 验收（第二轮）：认知对齐表沉淀进 docs（R2-3）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` R2-3。
+- **现象**：《UIKit认知对齐》术语对照表（Conversation/Contact/UserInfo/Presence/marks/remindType 防混淆）散落在 Excel，未沉淀进文档。
+- **修复**：新增 `apps/docs/guide/data-model.md`「术语与数据模型」章节：术语对照表（十项概念定义 / 易混淆点 / 数据来源 / UIKit 表现）+ 三大列表项字段默认展示规则（默认 / 条件 / 不展示三档）+ Store/Composable 关系说明；`config.ts` 指南 sidebar「功能指南」分组登记。
+- **验证**：docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [x] D117. UI/UX 验收（第二轮）：docs 演练场隔离第一阶段（R2-1）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` R2-1。
+- **现象**：docs 经 `app.use(UIKit)` 全局注册，uikit 全局非 scoped 样式（滚动条美化）污染文档站；demo 中展示型组件不跟随站点暗色。
+- **修复（第一阶段）**：
+  - `Layout.vue` 新增 `watch(isDark)` 同步 `data-uikit-theme`（含 SSR `document` 守卫），未挂 Provider 的展示型 demo 组件跟随站点暗色。
+  - `style.css` 末尾中和 uikit 全局滚动条美化（`::-webkit-scrollbar` / `scrollbar-width` 恢复浏览器/VitePress 默认），在 UIKit CSS 之后加载、同特异性后者胜出。
+- **残留**：完整 iframe 隔离（demo 编译产物独立运行 + 独立 Pinia 防 Provider 串扰）作为后续单独推进，见 D118。
+- **验证**：docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [ ] D118. docs 演练场完整 iframe 隔离（R2-1 第二阶段，待续）
+
+- **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` R2-1 残留。
+- **现象**：demo 组件经 `vite-plugin-vitepress-demo` 的 AntdTheme `<component :is="demo">` 直接挂载主文档页，与 docs 共享同一 DOM/CSS/Pinia：容器 demo 挂 Provider 会污染全局 store，uikit 全局样式仍与文档站共用渲染树。
+- **建议修法**：demo 块改为 iframe 隔离渲染（参考 `VuePlayground.vue` 的 iframe + dist CSS + 独立 pinia 思路），iframe 内独立引 uikit 样式与 Pinia、注入 `data-uikit-theme` 跟随暗色；复杂容器 demo 保持「真实组件 + mock 数据层」。**不采用纯 mock 组件**（漂移风险）。
+- **关联 skill**：`uikit-docs-authoring`
+
 ### [x] D114. UI/UX 验收：z-index 设计层级表（P3-4）
 
 - **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-4 / P0-6。

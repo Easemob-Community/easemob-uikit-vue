@@ -6,7 +6,7 @@
  *    按文档上下文显示：聊天室首页（/chatroom/）显示聊天室 UIKit 版本，其余显示 uikit-im 版本
  * 3. 顶部标题旁的双 UIKit 文档切换器（#nav-bar-title-after 插槽）
  */
-import { computed, nextTick, provide } from 'vue'
+import { computed, nextTick, provide, watch } from 'vue'
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import UiKitDocsSwitcher from './components/UiKitDocsSwitcher.vue'
@@ -16,6 +16,21 @@ const { isDark, page } = useData()
 // injected by vite define as import.meta.env keys, see vite.config.ts
 const version = import.meta.env.EASEMOB_UIKIT_VERSION
 const chatroomVersion = import.meta.env.EASEMOB_UIKIT_CHATROOM_VERSION
+
+/**
+ * 暗色联动：文档站切暗色时，同步设置 data-uikit-theme，让 demo 中未挂 Provider 的 UIKit 组件
+ * （button / icon / badge 等展示型组件）跟随站点暗色。挂 Provider 的容器 demo 由其自身 theme.mode 管理。
+ * SSR 阶段无 document，守卫返回；客户端 hydration 后 immediate 触发写入。
+ */
+watch(
+  isDark,
+  (dark) => {
+    if (typeof document === 'undefined')
+      return
+    document.documentElement.setAttribute('data-uikit-theme', dark ? 'dark' : 'light')
+  },
+  { immediate: true },
+)
 
 // 首页 hero 版本徽章：聊天室首页显示聊天室版本（包未落地时仅显示产品名）
 const heroVersionText = computed(() => {

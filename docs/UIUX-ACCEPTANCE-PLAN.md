@@ -5,7 +5,8 @@
 > - 《UIKit认知对齐.xlsx》——三大列表项（会话/消息/联系人）可配置项全览，设计-开发对接资料（无整改项，仅沉淀价值）。
 > 验收基准为 v1.8.0 文档；仓库当前 2.0.0（1.9.0/2.0.0 为内部重构，对外 API 零回归，结论仍适用）。
 > 本计划已逐条与当前源码/文档核实，**「实锤」栏标注的是 2.0.0 下的验证结果**，避免重复排查。
-> 状态：**计划已产出，逐项实施中（勾选推进）**。建议实施时逐项登记 TECH-DEBT（D10x 区间）。
+> 状态：**第一轮（18 项 UI/UX 验收整改）已于 2.1.0 全量落地**（D104-D113b 登记归档，见下方勾选记录）；
+> **第二轮（预设主题 / 认知对齐沉淀 / docs 演练场隔离）已实施**（D115-D118 登记），完整 iframe 隔离见 D118 待续。
 
 ---
 
@@ -199,7 +200,7 @@
 - **文档同步**：docs 组件页 API 表格经 `gen:api` 自动生成，组件改完需重跑；新增文档页登记 sidebar。
 - **版本**：所有改动集中在 2.0.0 之后的下一个 minor（2.x），发版前跑 `pnpm changelog:check` 同步版本段。
 
-## 七、进度追踪（勾选）
+## 七、进度追踪（第一轮 · 已完成，2.1.0 落地）
 
 - [x] Phase 1：P1-1 文档准确性（已于 D104 修复）
 - [x] Phase 1：P1-2 focus-visible（已于 D105 修复）
@@ -219,3 +220,51 @@
 - [x] Phase 4：P4-2 手势/断点（已于 D113 修复）
 - [x] Phase 4：P4-3 Do/Don't + 设计原则（已于 D113 修复）
 - [x] Phase 4：P4-4 文档类补充项（图标规范 / 输入区布局 / 时间戳策略，其余 P2 项按需排期）
+
+---
+
+## 八、第二轮优化方案（2026-08-19 评审会后续发现）
+
+> 范围：第一轮验收整改之外，评审会与后续讨论新发现的三项 + 一项顺带整理。登记：R2-1 → D117/D118、R2-2 → D115、R2-3 → D116、R2-4 → 顺带完成（D112b/D113b）。
+
+### [x] R2-1. docs 演练场隔离渲染（第一阶段已落地，完整 iframe 待续）｜ P1
+
+- **背景**：docs 全局 `app.use(UIKit)` + alias 直连源码注入 demo，效果不好。根因是**注入方式**而非真实组件本身。已确认**不采用纯 mock 组件**（漂移 = 文档与 API 不一致的放大器；不可复制；hover/focus/暗色等真实行为失真）。
+- **现状证据**：`apps/docs/.vitepress/theme/index.ts` 全局注册 UIKit（`uikit-im/src/index.ts:85` 引入 `theme/index.css` → 全局非 scoped 样式污染文档站）；docs 与 demo 共享 Pinia；`DemoBlock.vue` 用 `ClientOnly` 兜底 SSR 空白；暗色不联动。
+- **已落地（第一阶段，D117）**：
+  1. `Layout.vue` `watch(isDark)` 同步 `data-uikit-theme`（含 SSR `document` 守卫），未挂 Provider 的展示型 demo 组件跟随站点暗色；
+  2. `style.css` 末尾中和 uikit 全局滚动条美化（`::-webkit-scrollbar` / `scrollbar-width` 恢复默认），在 UIKit CSS 之后加载、同特异性后者胜出。
+- **待续（D118）**：完整 iframe 隔离（demo 编译产物独立运行 + 独立 Pinia 防 Provider 串扰），参考 `VuePlayground.vue` 的 iframe + dist CSS + 独立 pinia 思路；复杂容器 demo 保持「真实组件 + mock 数据层」（mock Provider/client/dataSource，不 mock 组件）。
+- **验收**：docs 站滚动条恢复默认；demo 暗色跟随；docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [x] R2-2. 预设主题档位（Theme Presets）｜ P2
+
+- **背景**：设计师提出 UIKit 缺「预设主题档位」。当前只有「一套默认 `:root` 变量 + 单维度覆盖」，无多套成体系预设主题一键切换。CSS 变量契约使「一套预设 = 一组变量覆盖」，采用 TS 预设表 + 批量应用现有 setter 实现（不引入 CSS 覆盖块，保持架构一致）。
+- **已落地（D115）**：
+  1. `core/store/theme.ts`：`ThemePreset`（`'default' | 'business' | 'fresh'`）+ `THEME_PRESETS` 表（主色相/圆角/间距/密度/hover）+ `preset` 状态（localStorage 持久化、旧缓存回落 default）+ `setPreset()`（批量应用，预设为基底、单项 setter 可再覆盖）；
+  2. `use-theme.ts` 转发 `preset` / `setPreset`；
+  3. `use-provider-side-effects.ts` `ProviderThemeConfig.preset` + `applyThemeConfig` 预设优先应用；
+  4. `uikit-provider.vue` `theme` prop 新增 `preset`；
+  5. `docs/guide/theme.md` 新增「预设主题」章节（三套对照表 + 运行时/声明式示例）。
+- **验收**：三套预设切换整套生效、单项可覆盖、持久化；core/uikit-im `vue-tsc` + build + docs build + demo `vue-tsc` 通过。
+- **关联 skill**：`uikit-styling-theming` / `uikit-store-composable` / `uikit-provider-config`
+
+### [x] R2-3. 认知对齐表沉淀进 docs（价值落地）｜ P3
+
+- **已落地（D116）**：新增 `apps/docs/guide/data-model.md`「术语与数据模型」章节（十项术语对照 + 三大列表项字段展示规则 + Store/Composable 关系）；`config.ts` 指南 sidebar「功能指南」分组登记。
+- **验收**：docs build 通过。
+- **关联 skill**：`uikit-docs-authoring`
+
+### [x] R2-4. TECH-DEBT 登记编号整理（顺带）｜ P3
+
+- **已落地**：第一轮登记时 D112 / D113 各重复一次（D112 = Skeleton 与 Design Tokens；D113 = 空状态模板 与 Phase 4 文档项），重复条目加 b 后缀区分（D112b / D113b），不影响内容与检索。
+- **验收**：TECH-DEBT 无同号条目。
+- **关联 skill**：`uikit-lint-governance`（收尾）
+
+## 九、进度追踪（第二轮）
+
+- [x] R2-1 docs 演练场隔离渲染（第一阶段：暗色联动 + 滚动条中和，D117；完整 iframe 待续，D118）
+- [x] R2-2 预设主题档位（Theme Presets，D115）
+- [x] R2-3 认知对齐表沉淀进 docs（D116）
+- [x] R2-4 TECH-DEBT 登记编号整理（D112b/D113b）

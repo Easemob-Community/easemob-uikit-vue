@@ -27,6 +27,9 @@
 - **组件使用建议**：Button/Input/IconButton/Cell/Modal 文档新增 Do/Don't 对比表。
 - **设计原则**：`guide/theme.md` 提炼 5 条核心设计原则（变量优先、层级清晰、无障碍默认、移动端优先、一致优于花哨）。
 - **图标与时间戳规范**：`guide/icons.md` 补充图标设计规范；`components/message-list.md` 补充时间戳策略建议。
+- **更新日志三包拆分**：`guide/changelog.md` 改用自定义 `ChangelogTabs` 组件，按 `@easemob/uikit-im` / `@easemob/uikit-core` / `@easemob/uikit-chatroom` 三 tab 展示各包更新日志；构建时由根 `CHANGELOG.md` 自动拆分生成。
+- **文档站导航重构**：顶部导航收敛为「首页 / 指南 / 组件 / GitHub」；左侧边栏按「开始 / 功能指南 / 设计系统 / H5 适配 / Demo 规划 / 更新日志」板块聚合，同一板块内只展示当前板块导航，消除 mix 感。
+- **图标总览默认展开**：`IconGallery` 分类默认展开，进入图标/Design Tokens 页即可直接浏览全部图标。
 
 ### 关联技术债
 
