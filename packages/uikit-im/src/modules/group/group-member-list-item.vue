@@ -183,7 +183,10 @@ interface MoreAction {
   danger?: boolean
 }
 
-function getMoreActions(member: UiGroupMember): MoreAction[] {
+/** 成员操作菜单项（#member-menu 插槽 scope 的 actions 元素类型） */
+export interface GroupMemberMoreAction extends MoreAction {}
+
+function getMoreActions(member: UiGroupMember): GroupMemberMoreAction[] {
   const actions: MoreAction[] = []
   if (canMute(member))
     actions.push({ key: 'mute', icon: 'person/clock', label: t('group.memberList.mute', '禁言') })
@@ -232,6 +235,11 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
       emit('remove-member', member)
       break
   }
+}
+
+/** 关闭成员操作菜单（#member-menu 插槽 scope） */
+function closeMoreMenu() {
+  activeMoreMenu.value = false
 }
 </script>
 
@@ -319,21 +327,30 @@ function onMoreActionClick(member: UiGroupMember, actionKey: string) {
             @update:show="activeMoreMenu = false"
             @close="activeMoreMenu = false"
           >
-            <div class="group-member-list__context-menu">
-              <Cell
-                v-for="action in getMoreActions(props.member)"
-                :key="action.key"
-                size="compact"
-                :inset-hover="false"
-                :danger="action.danger"
-                :title="action.label"
-                @click.stop="onMoreActionClick(props.member, action.key)"
-              >
-                <template #leading>
-                  <Icon :name="action.icon" :size="18" />
-                </template>
-              </Cell>
-            </div>
+            <!-- #member-menu：完全接管成员操作菜单内容，scope 提供成员、内置动作列表与选择/关闭句柄 -->
+            <slot
+              name="member-menu"
+              :member="props.member"
+              :actions="getMoreActions(props.member)"
+              :select="(key: string) => onMoreActionClick(props.member, key)"
+              :close="closeMoreMenu"
+            >
+              <div class="group-member-list__context-menu">
+                <Cell
+                  v-for="action in getMoreActions(props.member)"
+                  :key="action.key"
+                  size="compact"
+                  :inset-hover="false"
+                  :danger="action.danger"
+                  :title="action.label"
+                  @click.stop="onMoreActionClick(props.member, action.key)"
+                >
+                  <template #leading>
+                    <Icon :name="action.icon" :size="18" />
+                  </template>
+                </Cell>
+              </div>
+            </slot>
           </Popup>
         </div>
       </div>

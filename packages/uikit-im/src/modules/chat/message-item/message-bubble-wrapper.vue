@@ -511,6 +511,9 @@ onBeforeUnmount(() => {
                     <slot :name="name" v-bind="slotProps" />
                   </template>
                 </MessageRenderer>
+                <template #message-action-menu="slotProps">
+                  <slot name="message-action-menu" v-bind="slotProps" />
+                </template>
                 <template #message-action-extra="slotProps">
                   <slot name="message-action-extra" v-bind="slotProps" />
                 </template>
@@ -620,6 +623,9 @@ onBeforeUnmount(() => {
                     <slot :name="name" v-bind="slotProps" />
                   </template>
                 </MessageRenderer>
+                <template #message-action-menu="slotProps">
+                  <slot name="message-action-menu" v-bind="slotProps" />
+                </template>
                 <template #message-action-extra="slotProps">
                   <slot name="message-action-extra" v-bind="slotProps" />
                 </template>

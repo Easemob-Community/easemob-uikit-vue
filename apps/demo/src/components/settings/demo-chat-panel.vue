@@ -30,6 +30,8 @@ const {
   chatMessageStatusDirection,
   chatMessageStatusPosition,
   chatMessageStatusStyle,
+  messageActionMenuTakeover,
+  userCardTakeover,
 } = useDemoSettings()
 </script>
 
@@ -300,6 +302,39 @@ const {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="消息操作菜单接管（#message-action-menu）"
+        tip="接管右键/长按菜单：内置动作 + 自定义「举报」主菜单项"
+      />
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label class="demo-check">
+          <input v-model="messageActionMenuTakeover" type="checkbox">
+          <span>使用 #message-action-menu 插槽自绘菜单（含举报项）</span>
+        </label>
+      </div>
+      <div class="demo-info">
+        消息右键（PC）/ 长按（H5）菜单由内置列表切换为自定义渲染：
+        先展示内置动作（引用/转发/置顶等），底部追加「举报」主菜单项。
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="名片弹窗接管（#user-card / #group-card）"
+        tip="点击聊天头部头像打开业务自定义名片"
+      />
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label class="demo-check">
+          <input v-model="userCardTakeover" type="checkbox">
+          <span>使用 #user-card / #group-card 插槽自绘名片弹窗</span>
+        </label>
+      </div>
+      <div class="demo-info">
+        点击聊天头部头像时不再打开内置名片弹窗，改为渲染业务自定义名片卡片。
       </div>
     </div>
   </div>

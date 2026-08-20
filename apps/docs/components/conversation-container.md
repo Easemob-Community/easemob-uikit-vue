@@ -58,6 +58,72 @@ function onSelect() {
 - `footer`：列表底部附加内容，可通过 `footer-sticky` 固定
 - `tabs`：完全接管分栏 tab 栏渲染，作用域提供 `{ tabs, activeTab, selectTab }`（`ConversationTabsSlotScope`）
 - `status-banner`：自定义连接/同步状态横幅，作用域提供当前横幅状态（`{ visible, type, loading, title, description, clickable }`）
+- `item`：完全接管会话项渲染，作用域提供 `{ conversation, active, keyboardFocus, select, pin, mute, delete, read, customAction }`（`ConversationItemSlotScope`）；不传时默认渲染内置 `EmConversationItem`
+- `header-menu`：完全接管 Header `+` 菜单区域（触发按钮 + 弹出层），作用域提供 `{ menuItems, open, close }`；不传时默认渲染内置菜单
+- `new-chat` / `add-contact` / `create-group`：分别接管「新建会话 / 添加联系人 / 创建群组」弹窗渲染，作用域提供 `{ show, open, close }`；不传时默认渲染内置弹窗
+
+## 会话项完全接管
+
+会话列表支持 `#item` 插槽完全接管会话项渲染（与联系人/群组列表的 `#item` 惯例一致），作用域提供会话数据、选中/高亮态与内置动作句柄：
+
+```vue
+<template>
+  <em-conversation-container>
+    <template #item="{ conversation, active, keyboardFocus, select }">
+      <div
+        class="my-conv-item"
+        :class="{ active }"
+        @click="select"
+      >
+        <span>{{ conversation.name }}</span>
+        <span v-if="conversation.unreadCount" class="badge">{{ conversation.unreadCount }}</span>
+      </div>
+    </template>
+  </em-conversation-container>
+</template>
+```
+
+## Header 菜单定制
+
+Header `+` 菜单默认提供「新建会话 / 添加联系人 / 创建群组」三项，通过 `menu-items` prop 注入自定义项（`ConversationHeaderMenuItem[]`），或 `#header-menu` 插槽整体接管：
+
+```vue
+<script setup lang="ts">
+import type { ConversationHeaderMenuItem } from '@easemob/uikit-im'
+
+// 自定义菜单项：未提供 handler 的项点击触发 header-menu-action 事件
+const menuItems: ConversationHeaderMenuItem[] = [
+  { key: 'newChat', label: '新建会话', icon: 'bubble/rect/empty' },
+  { key: 'joinGroup', label: '加入群组', icon: 'person/plus', handler: (key) => openMyJoinGroup() },
+]
+</script>
+
+<template>
+  <em-conversation-container :menu-items="menuItems" @header-menu-action="onHeaderMenuAction" />
+</template>
+```
+
+- 不传 `menu-items`：使用内置三项
+- 传空数组：隐藏菜单入口
+- 自定义项命中内置 key（`newChat` / `addContact` / `createGroup`）且未提供 handler 时，仍走内置弹窗
+- 传 `#header-menu` 插槽：整个菜单区域（触发按钮 + 弹出层）由业务方渲染，作用域提供 `{ menuItems, open, close }`
+
+## 弹窗接管
+
+接入方接自己的选人器 / 好友体系 / 企业通讯录时，可通过 `#new-chat` / `#add-contact` / `#create-group` 插槽分别接管三个弹窗：
+
+```vue
+<template>
+  <em-conversation-container>
+    <!-- 接管「新建会话」弹窗：点击 + 菜单的新建会话时打开业务自己的选人器 -->
+    <template #new-chat="{ show, open, close }">
+      <MyPicker v-model:show="show" @confirm="onPick">…</MyPicker>
+    </template>
+  </em-conversation-container>
+</template>
+```
+
+作用域提供 `show`（当前是否显示）、`open`（打开）、`close`（关闭）三个句柄，业务可完全控制弹窗渲染与开关。
 
 ## 会话分栏
 

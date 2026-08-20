@@ -328,6 +328,12 @@ function createDemoSettings() {
   const conversationTabsVisible = ref(true)
   /** 是否用 #tabs 插槽完全接管渲染（配合 useConversationTabs hook） */
   const conversationTabsTakeover = ref(false)
+  /** 是否用 #item 插槽完全接管会话项渲染 */
+  const conversationItemTakeover = ref(false)
+  /** 是否用 #message-action-menu 插槽完全接管消息操作菜单 */
+  const messageActionMenuTakeover = ref(false)
+  /** 是否用 #user-card / #group-card 插槽完全接管名片弹窗 */
+  const userCardTakeover = ref(false)
   /** 当前激活的分栏 tab */
   const conversationActiveTab = ref<ConversationTabKey>('all')
 
@@ -517,6 +523,9 @@ function createDemoSettings() {
     conversationTabs,
     conversationTabsVisible,
     conversationTabsTakeover,
+    conversationItemTakeover,
+    messageActionMenuTakeover,
+    userCardTakeover,
     conversationActiveTab,
     conversationTabLabels,
     toggleConversationTab,

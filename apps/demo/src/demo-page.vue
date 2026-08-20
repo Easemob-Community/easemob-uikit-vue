@@ -123,6 +123,9 @@ const {
   conversationTabs,
   conversationTabsVisible,
   conversationTabsTakeover,
+  conversationItemTakeover,
+  messageActionMenuTakeover,
+  userCardTakeover,
   conversationActiveTab,
   statusBannerEnabled,
   sidebarWidth,
@@ -616,6 +619,26 @@ watch(
               </button>
             </div>
           </template>
+          <!-- 自定义会话项接管：显示会话名 + 摘要 + 未读角标 -->
+          <template v-if="conversationItemTakeover" #item="{ conversation, active, select }">
+            <div
+              class="demo-conv-item"
+              :class="{ 'is-active': active }"
+              :data-conv-id="conversation.id"
+              @click="select"
+            >
+              <div class="demo-conv-item__info">
+                <span class="demo-conv-item__name">{{ conversation.name }}</span>
+                <span class="demo-conv-item__text">{{ conversation.lastMessageText }}</span>
+              </div>
+              <span
+                v-if="(conversation.unreadCount ?? 0) > 0"
+                class="demo-conv-item__badge"
+              >
+                {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
+              </span>
+            </div>
+          </template>
         </EmConversationContainer>
         <EmContactContainer
           v-else
@@ -689,6 +712,48 @@ watch(
             />
             <EmCustomMessage v-else :message="message as UiMessage" />
           </template>
+          <!-- 消息操作菜单接管：内置动作 + 自定义「举报」主菜单项 -->
+          <template v-if="messageActionMenuTakeover" #message-action-menu="{ actions, select, close }">
+            <div class="demo-action-menu">
+              <button
+                v-for="action in actions"
+                :key="action.type"
+                type="button"
+                class="demo-action-menu__item"
+                :class="{ 'is-danger': action.danger }"
+                :disabled="action.disabled"
+                @click="select(action.type, action)"
+              >
+                {{ action.label }}
+              </button>
+              <button
+                type="button"
+                class="demo-action-menu__item demo-action-menu__item--danger"
+                @click="close"
+              >
+                举报（示例：业务在此接入举报接口）
+              </button>
+            </div>
+          </template>
+          <!-- 名片弹窗接管：点击头部头像时渲染业务自定义名片 -->
+          <template v-if="userCardTakeover" #user-card="{ show, userId, close }">
+            <div v-if="show" class="demo-card-overlay" @click.self="close">
+              <div class="demo-card-popup">
+                <p class="demo-card-popup__title">业务自定义用户名片</p>
+                <p class="demo-card-popup__id">userId: {{ userId }}</p>
+                <button type="button" class="demo-card-popup__btn" @click="close">关闭</button>
+              </div>
+            </div>
+          </template>
+          <template v-if="userCardTakeover" #group-card="{ show, groupId, close }">
+            <div v-if="show" class="demo-card-overlay" @click.self="close">
+              <div class="demo-card-popup">
+                <p class="demo-card-popup__title">业务自定义群名片</p>
+                <p class="demo-card-popup__id">groupId: {{ groupId }}</p>
+                <button type="button" class="demo-card-popup__btn" @click="close">关闭</button>
+              </div>
+            </div>
+          </template>
         </EmChatContainer>
       </div>
     </template>
@@ -727,6 +792,26 @@ watch(
                 >
                   {{ takeoverTabLabels[tab] || tab }}
                 </button>
+              </div>
+            </template>
+            <!-- 自定义会话项接管（H5） -->
+            <template v-if="conversationItemTakeover" #item="{ conversation, active, select }">
+              <div
+                class="demo-conv-item"
+                :class="{ 'is-active': active }"
+                :data-conv-id="conversation.id"
+                @click="select"
+              >
+                <div class="demo-conv-item__info">
+                  <span class="demo-conv-item__name">{{ conversation.name }}</span>
+                  <span class="demo-conv-item__text">{{ conversation.lastMessageText }}</span>
+                </div>
+                <span
+                  v-if="(conversation.unreadCount ?? 0) > 0"
+                  class="demo-conv-item__badge"
+                >
+                  {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
+                </span>
               </div>
             </template>
           </EmConversationContainer>
@@ -1075,5 +1160,143 @@ watch(
   color: var(--uikit-primary-color, #3b82f6);
   border-bottom-color: var(--uikit-primary-color, #3b82f6);
   font-weight: 600;
+}
+
+/* ===== 会话项 #item 插槽完全接管 ===== */
+
+.demo-conv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.demo-conv-item:hover {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
+}
+
+.demo-conv-item.is-active {
+  background-color: rgba(var(--uikit-primary-rgb, 59, 130, 246), 0.06);
+}
+
+.demo-conv-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.demo-conv-item__name {
+  font-size: var(--uikit-font-size-15);
+  font-weight: 500;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.demo-conv-item__text {
+  font-size: var(--uikit-font-size-13);
+  color: var(--uikit-text-secondary, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-conv-item__badge {
+  flex-shrink: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  background: var(--uikit-danger-color, #ef4444);
+  color: #fff;
+  font-size: var(--uikit-font-size-12);
+}
+
+/* ===== 消息操作菜单 #message-action-menu 插槽完全接管 ===== */
+
+.demo-action-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  padding: 6px;
+}
+
+.demo-action-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--uikit-components-radius, 8px);
+  background: none;
+  cursor: pointer;
+  font-size: var(--uikit-font-size-14);
+  color: var(--uikit-text-primary, #111827);
+  white-space: nowrap;
+  transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
+}
+
+.demo-action-menu__item:hover:not(:disabled) {
+  background-color: var(--uikit-bg-hover, #f3f4f6);
+}
+
+.demo-action-menu__item:disabled {
+  color: var(--uikit-text-secondary, #6b7280);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.demo-action-menu__item--danger {
+  color: var(--uikit-danger-color, #ef4444);
+}
+
+/* ===== 名片弹窗 #user-card / #group-card 插槽完全接管 ===== */
+
+.demo-card-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.demo-card-popup {
+  width: 280px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--uikit-bg-elevated, #fff);
+  box-shadow: var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.demo-card-popup__title {
+  margin: 0 0 8px;
+  font-size: var(--uikit-font-size-16);
+  font-weight: 600;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.demo-card-popup__id {
+  margin: 0 0 16px;
+  font-size: var(--uikit-font-size-13);
+  color: var(--uikit-text-secondary, #6b7280);
+  word-break: break-all;
+}
+
+.demo-card-popup__btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--uikit-components-radius, 8px);
+  background: var(--uikit-primary-color, #3b82f6);
+  color: #fff;
+  cursor: pointer;
+  font-size: var(--uikit-font-size-14);
 }
 </style>

@@ -51,6 +51,60 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `message-*`：消息类型级插槽，如 `#message-txt`、`#message-footer-txt`，可自定义各类消息的渲染
 - `toolbar-extra` / `input-panel`：输入区扩展（AI 助手入口、快捷回复面板等，作用域见 `useChatPlugin`）
 - `message-action-extra`：消息操作菜单底部扩展
+- `message-action-menu`：完全接管消息操作菜单内容（PC 右键 Popup 与 H5 长按 ActionSheet 双端生效），作用域提供 `{ message, actions, select, close }`（见下方「消息操作菜单接管」）
+- `user-card` / `group-card`：分别接管用户 / 群名片弹窗渲染，作用域提供 `{ show, open, close, userId/groupId }`（见下方「弹窗接管」）
+- `invite-member`：接管入群邀请弹窗渲染，作用域提供 `{ show, groupId, existingMemberIds, open, close }`
+- `forward`：接管转发弹窗渲染，作用域提供 `{ show, messages, mode, open, close }`
+- `message-search`：接管消息搜索弹窗渲染，作用域提供 `{ show, config, locate, open, close }`
+- `multi-select-bar`：接管多选操作栏渲染，作用域提供 `{ visible, selectedMessages, totalMessages, selectAll, deselectAll, forwardOneByOne, forwardCombine, delete, close }`
+
+## 消息操作菜单接管
+
+消息右键（PC）/ 长按（H5）菜单默认由内置动作集合（引用/复制/转发/多选/翻译/置顶/撤回/编辑/删除等）按消息类型裁剪生成。通过 `#message-action-menu` 插槽可完全接管菜单内容——例如插入自定义主菜单项（举报/收藏/业务菜单）或整体改分组/顺序：
+
+```vue
+<template>
+  <em-chat-container>
+    <!-- actions：内置动作列表；select：触发内置动作（含关闭菜单）；close：关闭菜单 -->
+    <template #message-action-menu="{ message, actions, select, close }">
+      <div class="my-action-menu">
+        <button v-for="action in actions" :key="action.type" @click="select(action.type, action)">
+          {{ action.label }}
+        </button>
+        <button @click="report(message)">举报</button>
+      </div>
+    </template>
+  </em-chat-container>
+</template>
+```
+
+- `select(actionType, action?)`：触发内置动作（内部自动关闭菜单并执行引用/转发/置顶等逻辑）
+- `close()`：关闭菜单
+- 插槽提供时，PC Popup 与 H5 ActionSheet 双端均接管；H5 端默认 actions 列表自动隐藏
+
+## 弹窗接管
+
+聊天页内置的名片、邀请、转发、搜索、多选栏等子界面均支持接管（默认内容 = 内置实现，不传插槽行为不变）：
+
+```vue
+<template>
+  <em-chat-container>
+    <!-- 名片弹窗：点头像/右键头像时打开业务自己的资料卡 -->
+    <template #user-card="{ show, userId, open, close }">
+      <MyUserCard v-model:show="show" :user-id="userId" @send-message="onSend" />
+    </template>
+    <!-- 多选栏：自定义多选底部操作 -->
+    <template #multi-select-bar="{ visible, selectedMessages, forwardOneByOne, delete, close }">
+      <div v-if="visible" class="my-select-bar">
+        <span>已选 {{ selectedMessages.length }} 条</span>
+        <button @click="forwardOneByOne">转发</button>
+        <button @click="delete(selectedMessages)">删除</button>
+        <button @click="close">取消</button>
+      </div>
+    </template>
+  </em-chat-container>
+</template>
+```
 
 ## 抽屉接管
 

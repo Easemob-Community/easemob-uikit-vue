@@ -72,6 +72,8 @@
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：[ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：[STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
 - 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：[CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
+- Chat 抽屉三种接管能力设计执行计划（整块 `#drawer` + 部分 `drawer-*` + 自绘壳 `EmChatDrawer`）：[CHAT-DRAWER-EXTENSION-PLAN.md](docs/CHAT-DRAWER-EXTENSION-PLAN.md)（对应 TECH-DEBT D119）
+- uikit-im 组件插槽/Props 可控性反向评估（会话列表弹窗、名片弹窗、消息操作菜单等缺口矩阵）：[UIIM-CAPABILITY-REVIEW.md](docs/UIIM-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D120）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：[CONSUMER-VALIDATION-CHECKLIST.md](docs/CONSUMER-VALIDATION-CHECKLIST.md)
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）

@@ -396,6 +396,18 @@ const showInviteModal = ref(false)
 /** 当前添加成员对应的群 ID */
 const inviteGroupId = ref('')
 
+/** 添加成员弹窗关闭句柄（#invite-member 插槽 scope；open 复用 onAddMember） */
+function closeInviteModal() {
+  showInviteModal.value = false
+}
+/** 消息搜索弹窗开关句柄（#message-search 插槽 scope） */
+function openSearchPanel() {
+  showSearchPanel.value = true
+}
+function closeSearchPanel() {
+  showSearchPanel.value = false
+}
+
 /** 是否显示移除成员二次确认 */
 const showRemoveConfirmModal = ref(false)
 
@@ -412,6 +424,21 @@ const userCardUserId = ref('')
 const showGroupCardModal = ref(false)
 /** 群名片弹窗展示的群 ID */
 const groupCardGroupId = ref('')
+
+/** 用户名片弹窗开关句柄（#user-card 插槽 scope） */
+function openUserCardModal() {
+  showUserCardModal.value = true
+}
+function closeUserCardModal() {
+  showUserCardModal.value = false
+}
+/** 群名片弹窗开关句柄（#group-card 插槽 scope） */
+function openGroupCardModal() {
+  showGroupCardModal.value = true
+}
+function closeGroupCardModal() {
+  showGroupCardModal.value = false
+}
 
 /** 当前登录用户 ID */
 const currentUserId = computed(() => client.value.currentUserId ?? '')
@@ -649,6 +676,11 @@ watch(currentConversation, async (cvs, oldCvs) => {
 /** 多选模式底部操作 */
 /** 转发弹窗显示状态 */
 const showForwardModal = ref(false)
+
+/** 转发弹窗关闭句柄（#forward 插槽 scope；open 复用 openForwardModal） */
+function closeForwardModal() {
+  showForwardModal.value = false
+}
 
 /** 待转发的消息（单条或多选） */
 const pendingForwardMessages = ref<UiMessage[]>([])
@@ -1169,18 +1201,31 @@ async function onRemoveAdmin(member: UiGroupMember) {
         </template>
       </MessageList>
 
-      <!-- 多选模式底部操作栏 -->
-      <MultiSelectBar
-        v-if="isMultiSelectMode"
+      <!-- 多选模式底部操作栏（#multi-select-bar：完全接管多选操作栏渲染） -->
+      <slot
+        name="multi-select-bar"
+        :visible="isMultiSelectMode"
         :selected-messages="selectedMessages"
         :total-messages="messages.length"
-        @forward-one-by-one="onMultiSelectForwardOneByOne"
-        @forward-combine="onMultiSelectForwardCombine"
-        @delete="onMultiSelectDelete"
-        @select-all="selectAllMessages(messages)"
-        @deselect-all="deselectAllMessages()"
-        @close="exitMultiSelectMode"
-      />
+        :select-all="() => selectAllMessages(messages)"
+        :deselect-all="deselectAllMessages"
+        :forward-one-by-one="onMultiSelectForwardOneByOne"
+        :forward-combine="onMultiSelectForwardCombine"
+        :delete="onMultiSelectDelete"
+        :close="exitMultiSelectMode"
+      >
+        <MultiSelectBar
+          v-if="isMultiSelectMode"
+          :selected-messages="selectedMessages"
+          :total-messages="messages.length"
+          @forward-one-by-one="onMultiSelectForwardOneByOne"
+          @forward-combine="onMultiSelectForwardCombine"
+          @delete="onMultiSelectDelete"
+          @select-all="selectAllMessages(messages)"
+          @deselect-all="deselectAllMessages()"
+          @close="exitMultiSelectMode"
+        />
+      </slot>
 
       <!-- 输入框 -->
       <MessageInput
@@ -1246,14 +1291,23 @@ async function onRemoveAdmin(member: UiGroupMember) {
         </ChatInfoDrawer>
       </slot>
 
-      <!-- 消息搜索弹窗（居中 Modal，自带 Popup 壳） -->
-      <MessageSearchModal
-        v-if="searchEnabled"
-        v-model:show="showSearchPanel"
+      <!-- 消息搜索弹窗（居中 Modal，自带 Popup 壳；#message-search：完全接管搜索弹窗渲染） -->
+      <slot
+        name="message-search"
+        :show="showSearchPanel"
         :config="props.config?.messageList?.search"
-        @locate="onSearchLocate"
-        @close="showSearchPanel = false"
-      />
+        :locate="onSearchLocate"
+        :open="openSearchPanel"
+        :close="closeSearchPanel"
+      >
+        <MessageSearchModal
+          v-if="searchEnabled"
+          v-model:show="showSearchPanel"
+          :config="props.config?.messageList?.search"
+          @locate="onSearchLocate"
+          @close="showSearchPanel = false"
+        />
+      </slot>
 
       <!-- 移除成员二次确认 -->
       <Modal
@@ -1269,33 +1323,67 @@ async function onRemoveAdmin(member: UiGroupMember) {
         </template>
       </Modal>
 
-      <!-- 添加成员弹窗 -->
-      <InviteMemberModal
-        v-model:show="showInviteModal"
+      <!-- 添加成员弹窗（#invite-member：完全接管入群邀请弹窗渲染） -->
+      <slot
+        name="invite-member"
+        :show="showInviteModal"
         :group-id="inviteGroupId"
         :existing-member-ids="stores.group.getGroupMembers(inviteGroupId).map(m => m.userId)"
-        @invited="onInviteMembers"
-      />
+        :open="onAddMember"
+        :close="closeInviteModal"
+      >
+        <InviteMemberModal
+          v-model:show="showInviteModal"
+          :group-id="inviteGroupId"
+          :existing-member-ids="stores.group.getGroupMembers(inviteGroupId).map(m => m.userId)"
+          @invited="onInviteMembers"
+        />
+      </slot>
 
-      <!-- 转发弹窗 -->
-      <ForwardModal
-        v-model:show="showForwardModal"
-        @forward="onForwardConfirm"
-      />
+      <!-- 转发弹窗（#forward：完全接管转发弹窗渲染） -->
+      <slot
+        name="forward"
+        :show="showForwardModal"
+        :messages="pendingForwardMessages"
+        :mode="forwardMode"
+        :open="openForwardModal"
+        :close="closeForwardModal"
+      >
+        <ForwardModal
+          v-model:show="showForwardModal"
+          @forward="onForwardConfirm"
+        />
+      </slot>
 
-      <!-- 用户名片弹窗 -->
-      <UserCardModal
-        v-model:show="showUserCardModal"
+      <!-- 用户名片弹窗（#user-card：完全接管用户名片弹窗渲染） -->
+      <slot
+        name="user-card"
+        :show="showUserCardModal"
         :user-id="userCardUserId"
-        @send-message="onUserCardSendMessage"
-      />
+        :open="openUserCardModal"
+        :close="closeUserCardModal"
+      >
+        <UserCardModal
+          v-model:show="showUserCardModal"
+          :user-id="userCardUserId"
+          @send-message="onUserCardSendMessage"
+        />
+      </slot>
 
-      <!-- 群名片弹窗 -->
-      <GroupCardModal
-        v-model:show="showGroupCardModal"
+      <!-- 群名片弹窗（#group-card：完全接管群名片弹窗渲染） -->
+      <slot
+        name="group-card"
+        :show="showGroupCardModal"
         :group-id="groupCardGroupId"
-        @send-message="onGroupCardSendMessage"
-      />
+        :open="openGroupCardModal"
+        :close="closeGroupCardModal"
+      >
+        <GroupCardModal
+          v-model:show="showGroupCardModal"
+          :group-id="groupCardGroupId"
+          @send-message="onGroupCardSendMessage"
+        />
+      </slot>
     </template>
   </div>
 </template>

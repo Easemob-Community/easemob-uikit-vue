@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useSlots } from 'vue'
 import { useLocale } from '@easemob/uikit-core'
 import { useLongPress, useToast, useViewport } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
@@ -23,6 +23,7 @@ export interface MessageInteractiveEmits {
 
 const props = defineProps<MessageInteractiveProps>()
 const emit = defineEmits<MessageInteractiveEmits>()
+const slots = useSlots()
 
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -218,6 +219,11 @@ const actionSheetActions = computed(() =>
   })),
 )
 
+/** H5 ActionSheet 实际 actions：#message-action-menu 插槽接管时隐藏默认列表，仅渲染插槽内容 */
+const effectiveActionSheetActions = computed(() =>
+  slots['message-action-menu'] ? [] : actionSheetActions.value,
+)
+
 /** PC 端右键菜单 */
 function onContextMenu(event: MouseEvent) {
   if (isMobile.value)
@@ -254,6 +260,17 @@ function closePopup() {
   }
 }
 
+/** 关闭消息操作菜单（PC Popup 与 H5 ActionSheet 双端，供 #message-action-menu 插槽 scope 使用） */
+function closeMenu() {
+  showPopup.value = false
+  showActionSheet.value = false
+  isActive.value = false
+  if (anchorRef.value) {
+    document.body.removeChild(anchorRef.value)
+    anchorRef.value = undefined
+  }
+}
+
 /** H5 端长按触发 */
 const longPress = useLongPress(() => {
   if (!isMobile.value)
@@ -268,15 +285,8 @@ function handleSelect(actionType: MessageActionType, actionItem?: MessageActionI
     showToast(tip, 'warning')
     return
   }
-  showPopup.value = false
-  showActionSheet.value = false
-  isActive.value = false
+  closeMenu()
   emit('action', { action: actionType, message: props.message })
-  // 清理锚点
-  if (anchorRef.value) {
-    document.body.removeChild(anchorRef.value)
-    anchorRef.value = undefined
-  }
 }
 
 /** PC popup 菜单选择 */
@@ -318,21 +328,39 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
     @update:show="onPopupClose"
     @close="onPopupClose"
   >
-    <MessageActionMenu :actions="actions" @select="onMenuSelect">
-      <template #extra>
-        <slot name="message-action-extra" :message="props.message" />
-      </template>
-    </MessageActionMenu>
+    <!-- #message-action-menu：完全接管消息操作菜单内容（PC Popup 与 H5 ActionSheet 双端生效），
+         scope 提供消息、内置动作列表与选择/关闭句柄；不传时默认渲染内置 MessageActionMenu -->
+    <slot
+      name="message-action-menu"
+      :message="props.message"
+      :actions="actions"
+      :select="handleSelect"
+      :close="closeMenu"
+    >
+      <MessageActionMenu :actions="actions" @select="onMenuSelect">
+        <template #extra>
+          <slot name="message-action-extra" :message="props.message" />
+        </template>
+      </MessageActionMenu>
+    </slot>
   </Popup>
 
-  <!-- H5 端：ActionSheet 底部菜单 -->
+  <!-- H5 端：ActionSheet 底部菜单（#message-action-menu 接管时隐藏默认 actions 列表，仅渲染插槽内容） -->
   <ActionSheet
     :show="showActionSheet"
-    :actions="actionSheetActions"
+    :actions="effectiveActionSheetActions"
     @update:show="showActionSheet = $event"
     @select="onActionSheetSelect"
   >
-    <slot name="message-action-extra" :message="props.message" />
+    <slot
+      name="message-action-menu"
+      :message="props.message"
+      :actions="actions"
+      :select="handleSelect"
+      :close="closeMenu"
+    >
+      <slot name="message-action-extra" :message="props.message" />
+    </slot>
   </ActionSheet>
 </template>
 

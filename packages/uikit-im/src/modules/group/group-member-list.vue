@@ -312,7 +312,12 @@ defineExpose({ refresh, removeMember, setMemberRole })
           @block-member="emit('block-member', $event)"
           @unblock-member="emit('unblock-member', $event)"
           @transfer-owner="emit('transfer-owner', $event)"
-        />
+        >
+          <!-- 透传成员操作菜单接管插槽到列表项 -->
+          <template v-if="$slots.memberMenu" #member-menu="slotProps">
+            <slot name="member-menu" v-bind="slotProps" />
+          </template>
+        </GroupMemberListItem>
 
         <!-- 加载更多 -->
         <div v-if="localHasMore || loadingMore" class="group-member-list__load-more">

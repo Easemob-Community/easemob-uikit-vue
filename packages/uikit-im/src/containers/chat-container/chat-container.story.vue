@@ -417,6 +417,62 @@ injectMockData()
         </UIKitProvider>
       </div>
     </Variant>
+
+    <Variant title="#message-action-menu 菜单整体接管">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="baseConfig"
+            @vue:mounted="injectMockData"
+          >
+            <!-- 接管消息操作菜单：内置 actions + 自定义「举报」主菜单项 -->
+            <template #message-action-menu="{ actions, select, close }">
+              <div style="display: flex; flex-direction: column; gap: 4px; min-width: 160px; padding: 6px;">
+                <button
+                  v-for="action in actions"
+                  :key="action.type"
+                  type="button"
+                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-14); color: var(--uikit-text-primary);"
+                  :disabled="action.disabled"
+                  @click="select(action.type, action)"
+                >
+                  {{ action.label }}
+                </button>
+                <button
+                  type="button"
+                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-14); color: var(--uikit-danger-color);"
+                  @click="close"
+                >
+                  举报（示例：关闭菜单，业务在此处理举报逻辑）
+                </button>
+              </div>
+            </template>
+          </ChatContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="#group-card 名片弹窗接管">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="baseConfig"
+            @vue:mounted="injectMockData"
+          >
+            <!-- 点击 header 头像打开群名片时，渲染业务自己的名片 -->
+            <template #group-card="{ show, groupId, close }">
+              <div v-if="show" style="position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4);" @click.self="close">
+                <div style="width: 280px; padding: 20px; border-radius: 12px; background: var(--uikit-bg-elevated);">
+                  <p style="margin: 0 0 8px; font-weight: 600;">业务自定义群名片</p>
+                  <p style="margin: 0 0 16px; font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">groupId: {{ groupId }}</p>
+                  <button type="button" @click="close">关闭</button>
+                </div>
+              </div>
+            </template>
+          </ChatContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>
 

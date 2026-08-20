@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3.0 (2026-08-20)
+
+### 新增
+
+- **会话列表接管能力**（`EmConversationList` / `EmConversationContainer`）：
+  - `#item` 插槽完全接管会话项渲染，作用域提供 `{ conversation, active, keyboardFocus, select, pin, mute, delete, read, customAction }`（对齐 contact/group 列表的 `#item` 惯例）；
+  - `menuItems` prop 注入 Header `+` 菜单自定义项（`ConversationHeaderMenuItem[]`），传空数组隐藏菜单入口；`#header-menu` 插槽整块接管菜单区域；未提供 handler 的自定义项触发 `header-menu-action` 事件；
+  - `#new-chat` / `#add-contact` / `#create-group` 三个插槽分别接管「新建会话 / 添加联系人 / 创建群组」弹窗（作用域 `{ show, open, close }`），客户可接自己的选人器 / 好友体系 / 企业通讯录。
+- **聊天页弹窗接管能力**（`EmChat` / `EmChatContainer`）：
+  - `#user-card` / `#group-card` 插槽接管用户 / 群名片弹窗，`#invite-member` / `#forward` / `#message-search` / `#multi-select-bar` 插槽分别接管邀请成员 / 转发 / 搜索 / 多选栏渲染，默认内容 = 内置实现，不传插槽行为不变；
+  - `#message-action-menu` 插槽完全接管消息操作菜单内容（PC 右键 Popup 与 H5 长按 ActionSheet 双端生效），作用域提供 `{ message, actions, select, close }`，支持插入自定义主菜单项（举报 / 收藏 / 业务菜单）。
+- **群组模块接管能力**：群管理五个二级页新增 `#mute-list` / `#block-list` / `#allow-list` / `#shared-files` / `#join-requests` 插槽（`EmGroupManagementSection`）；成员操作菜单新增 `#member-menu` 插槽（`EmGroupMemberList`，作用域 `{ member, actions, select, close }`）。
+
+### 类型导出
+
+- 新增 `ConversationHeaderMenuItem` / `ConversationItemSlotScope` / `GroupManagementKey` / `GroupManagementSectionSlotScope` / `GroupMemberMoreAction` 公开类型。
+
 ## 2.2.0 (2026-08-20)
 
 ### 新增

@@ -24,6 +24,7 @@ const {
   conversationTabs,
   conversationTabsVisible,
   conversationTabsTakeover,
+  conversationItemTakeover,
   conversationActiveTab,
   conversationTabLabels,
   toggleConversationTab,
@@ -200,6 +201,23 @@ function restoreStatus() {
       <div class="demo-info">
         演示 useConversationTabs hook + #tabs 插槽完全接管：demo-page 用 hook 持有
         tabs / activeTab / selectTab，插槽内自行渲染按钮。
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="会话项完全接管（#item 插槽）"
+        tip="用 #item 插槽自绘会话项（含未读角标），演示自定义列表项布局"
+      />
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label class="demo-check">
+          <input v-model="conversationItemTakeover" type="checkbox">
+          <span>使用 #item 插槽自绘会话项</span>
+        </label>
+      </div>
+      <div class="demo-info">
+        会话列表由默认 EmConversationItem 切换到自定义会话项：显示
+        会话名 + 最后一条消息摘要 + 未读角标，点击仍走内置选中逻辑。
       </div>
     </div>
   </div>

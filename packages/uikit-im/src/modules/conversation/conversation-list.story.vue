@@ -197,5 +197,59 @@ function log(event: string, payload?: string) {
         </div>
       </div>
     </Variant>
+
+    <Variant title="#item 插槽完全接管会话项">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationList
+            title="消息"
+            :tabs="[]"
+            @vue:mounted="injectMockConversations"
+          >
+            <template #item="{ conversation, active, keyboardFocus, select }">
+              <div
+                style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--uikit-border-color);"
+                :style="{ backgroundColor: (active || keyboardFocus) ? 'rgba(59, 130, 246, 0.06)' : 'transparent' }"
+                @click="select"
+              >
+                <span style="font-size: var(--uikit-font-size-14); font-weight: 500;">
+                  {{ conversation.name }}
+                </span>
+                <span v-if="conversation.unreadCount" style="min-width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 9px; background: var(--uikit-danger-color); color: #fff; font-size: var(--uikit-font-size-12);">
+                  {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
+                </span>
+              </div>
+            </template>
+          </ConversationList>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Header 菜单定制 + 三弹窗接管">
+      <div style="height: 600px; width: 320px;">
+        <UIKitProvider :auto-init="false">
+          <ConversationList
+            title="消息"
+            :tabs="[]"
+            :menu-items="[
+              { key: 'newChat', label: '发起会话', icon: 'bubble/rect/empty' },
+              { key: 'joinGroup', label: '加入群组', icon: 'person/double' },
+            ]"
+            @header-menu-action="(key: string) => log('header-menu-action', key)"
+            @vue:mounted="injectMockConversations"
+          >
+            <!-- 接管「新建会话」弹窗：业务自己的选人器 -->
+            <template #new-chat="{ show, close }">
+              <div v-if="show" style="position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4);">
+                <div style="width: 260px; padding: 16px; border-radius: 12px; background: var(--uikit-bg-elevated);">
+                  <p style="margin: 0 0 12px;">业务自定义选人器</p>
+                  <button type="button" @click="close">关闭</button>
+                </div>
+              </div>
+            </template>
+          </ConversationList>
+        </UIKitProvider>
+      </div>
+    </Variant>
   </Story>
 </template>

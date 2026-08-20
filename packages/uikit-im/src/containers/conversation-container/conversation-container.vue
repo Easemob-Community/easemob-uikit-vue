@@ -4,7 +4,7 @@ import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
 import { useLocale } from '@easemob/uikit-core'
-import type { ConversationAction, ConversationTabKey } from '../../modules/conversation/types'
+import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from '../../modules/conversation/types'
 import { DEFAULT_CONVERSATION_TABS } from '../../modules/conversation/types'
 import type { UiConversation as Conversation } from '@easemob/uikit-core'
 
@@ -51,6 +51,11 @@ export interface ConversationContainerProps {
   /** 是否展示连接/同步状态横幅，默认 true */
   showStatusBanner?: boolean
   /**
+   * Header `+` 菜单自定义项；不传时使用内置三项（新建会话/添加联系人/创建群组）；
+   * 传空数组可隐藏菜单入口。
+   */
+  menuItems?: ConversationHeaderMenuItem[]
+  /**
    * 草稿存储模式：
    * - 'none' 仅内存缓存，页面关闭即丢失（默认）
    * - 'session' sessionStorage 持久化，浏览器标签关闭后丢失
@@ -83,6 +88,8 @@ const emit = defineEmits<{
   (e: 'update:active-tab', tab: ConversationTabKey): void
   /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
   (e: 'reconnect'): void
+  /** 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key */
+  (e: 'header-menu-action', key: string): void
 }>()
 
 const { refreshConversations } = useConversation()
@@ -140,10 +147,12 @@ function handleReconnect() {
       :tabs="props.tabs"
       :active-tab="props.activeTab"
       :show-status-banner="props.showStatusBanner"
+      :menu-items="props.menuItems"
       @update:active-tab="handleActiveTabChange"
       @select="handleConversationSelect"
       @conversation-click="handleConversationClick"
       @reconnect="handleReconnect"
+      @header-menu-action="(key: string) => emit('header-menu-action', key)"
     >
       <template v-if="$slots.tabs" #tabs="slotProps">
         <slot name="tabs" v-bind="slotProps" />
@@ -162,6 +171,21 @@ function handleReconnect() {
       </template>
       <template v-if="$slots.footer" #footer>
         <slot name="footer" />
+      </template>
+      <template v-if="$slots.item" #item="slotProps">
+        <slot name="item" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.headerMenu" #header-menu="slotProps">
+        <slot name="header-menu" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.newChat" #new-chat="slotProps">
+        <slot name="new-chat" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.addContact" #add-contact="slotProps">
+        <slot name="add-contact" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots.createGroup" #create-group="slotProps">
+        <slot name="create-group" v-bind="slotProps" />
       </template>
     </ConversationList>
   </div>

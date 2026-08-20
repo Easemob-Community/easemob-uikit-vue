@@ -1014,6 +1014,22 @@
 - **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` + `pnpm changelog:check` 均通过；`chat-info-drawer.story.vue` 新增 Section Slots Takeover 示例；`apps/docs/components/chat-container.md` 补充抽屉接管文档。
 - **关联 skill**：`uikit-chat-plugin-tabs` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`
 
+### [x] D120. uikit-im 组件插槽/Props 可控性缺口补全（会话列表弹窗、名片弹窗、消息操作菜单等）
+
+- **背景**：Chat 抽屉「不支持自定义」被客户点名后（D119 已补三种接管），按同口径全面反向排查（详见 `docs/UIIM-CAPABILITY-REVIEW.md`），确认还有一批「组件内部硬编码渲染子界面、无接管点」的同类缺口，集中在：① 会话列表 `conversation-list`：Header `+` 菜单与「新建会话/添加联系人/创建群组」三弹窗硬编码，且**会话项无 `#item` 插槽**（contact/group 列表都有，唯 conversation 缺失）；② 聊天页 `chat`：名片弹窗（`UserCardModal`/`GroupCardModal`）点头像直接开内置、无对外 emit，邀请成员/转发/搜索/多选栏均硬编码；③ 消息操作菜单 `message-interactive`：菜单本体只能 config 裁剪 + `#message-action-extra` 底部追加，无法整体接管或插入主菜单项。次要：群管理五个二级页、群成员右键菜单、删除确认弹窗、群公告/置顶横幅。
+- **方案（复用 D119 的「slot 默认内容 + scope」范式，纯增量向后兼容，按优先级排期）**：① CL-2 会话列表三弹窗接管（`#new-chat`/`#add-contact`/`#create-group`）；② CH-1 名片弹窗接管（`avatar-click` emit 或 `#user-card`/`#group-card` 插槽）；③ MS-1 消息操作菜单整体接管（`#message-action-menu` 或 `messageAction.customItems`）；④ CL-4 会话项 `#item` 插槽；⑤ CL-1 Header 菜单定制（`menuItems` props + `#header-menu`）；⑥ CH-2/3/4/5 + GM-1/GM-2（邀请/转发/搜索/多选栏 + 群管理二级页 + 成员菜单）。完整缺口矩阵与语义约定见 `docs/UIIM-CAPABILITY-REVIEW.md`。
+- **修复**：已于 2026-08-20 按优先级全部落地（`docs/UIIM-CAPABILITY-REVIEW.md` 建议实施顺序 1-6 项）：
+  1. **CL-2 三弹窗接管**：`conversation-list.vue` 新增 `#new-chat` / `#add-contact` / `#create-group` 插槽（scope `show/open/close`），`conversation-container` 透传；
+  2. **CH-1 名片弹窗接管**：`chat.vue` 新增 `#user-card` / `#group-card` 插槽（scope `show/userId|groupId/open/close`），选用「插槽接管」而非 `avatar-click` emit（插槽覆盖点头像与右键头像两条路径，默认内容不变）；
+  3. **MS-1 菜单整体接管**：`message-interactive.vue` 新增 `#message-action-menu` 插槽（scope `message/actions/select/close`），PC Popup 与 H5 ActionSheet 双端生效（H5 接管时隐藏默认 actions 列表），`message-bubble-wrapper` 两处挂载点透传；
+  4. **CL-4 会话项 `#item`**：`conversation-list.vue` 新增 `#item` 插槽（scope `conversation/active/keyboardFocus` + `select/pin/mute/delete/read/customAction` 句柄），`conversation-container` 透传，对齐 contact/group 惯例；
+  5. **CL-1 Header 菜单定制**：`menuItems` prop（`ConversationHeaderMenuItem[]`，空数组隐藏入口）+ `#header-menu` 插槽 + `header-menu-action` 事件（未提供 handler 且非内置 key 时触发）；
+  6. **CH-2/3/4/5 + GM-1/GM-2**：`chat.vue` 新增 `#invite-member` / `#forward` / `#message-search` / `#multi-select-bar` 插槽；`group-management-section.vue` 五个二级页各新增 `#mute-list` / `#block-list` / `#allow-list` / `#shared-files` / `#join-requests` 插槽（drawer 与 modal 双模式均包插槽）；`group-member-list-item.vue` 新增 `#member-menu` 插槽（`group-member-list` 透传）。
+  - 全部遵循「slot 默认内容 = 现有实现，不传插槽零变化」语义约定；新增公开类型 `ConversationHeaderMenuItem` / `ConversationItemSlotScope` / `GroupManagementKey` / `GroupManagementSectionSlotScope` / `GroupMemberMoreAction` 经模块 barrel 导出。
+  - docs：`apps/docs/components/conversation-container.md`（会话项接管 / Header 菜单定制 / 弹窗接管）与 `chat-container.md`（消息操作菜单接管 / 弹窗接管）补充插槽清单与示例；story：`conversation-list.story.vue`（#item / 菜单定制 + 弹窗接管）、`chat-container.story.vue`（#message-action-menu / #group-card）补接管 Variant；demo：`demo-page.vue` + 设置面板加三个开关（自定义会话项 / 消息操作菜单 / 名片弹窗接管）。
+- **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过；lint 新引入错误清零（存量 import 重复/顺序、Popup unused、style 空行等未动）；CHANGELOG 2.3.0 版本段与 package.json 版本同步。
+- **关联 skill**：`uikit-component-authoring` / `uikit-chat-plugin-tabs` / `uikit-chat-interactions` / `uikit-contact-group-capabilities` / `uikit-docs-authoring` / `uikit-release-build`
+
 ### [x] D114. UI/UX 验收：z-index 设计层级表（P3-4）
 
 - **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-4 / P0-6。

@@ -38,7 +38,25 @@ export interface GroupManagementSectionProps {
   showJoinRequests?: boolean
 }
 
-type ManagementKey = 'mute' | 'block' | 'allow' | 'files' | 'requests'
+/** 群管理二级页 key */
+export type GroupManagementKey = 'mute' | 'block' | 'allow' | 'files' | 'requests'
+
+/**
+ * 群管理二级页接管插槽作用域（#mute-list / #block-list / #allow-list / #shared-files / #join-requests）。
+ * 提供当前页激活态与开关句柄；业务传插槽即接管对应二级页渲染，不传则默认内置。
+ */
+export interface GroupManagementSectionSlotScope {
+  /** 该二级页当前是否激活 */
+  show: boolean
+  /** 群 ID */
+  groupId: string
+  /** 打开指定二级页（key: 'mute' | 'block' | 'allow' | 'files' | 'requests'） */
+  open: (key: GroupManagementKey) => void
+  /** 关闭二级页 */
+  close: () => void
+}
+
+type ManagementKey = GroupManagementKey
 
 interface ManagementEntry {
   key: ManagementKey
@@ -293,36 +311,81 @@ function closeDrawer() {
       </template>
 
       <div class="group-management-section__drawer-body">
-        <EmGroupMuteList
-          v-if="activeDrawerKey === 'mute'"
-          ref="muteListRef"
+        <!-- #mute-list：完全接管禁言列表二级页渲染，scope 提供激活态与开关句柄 -->
+        <slot
+          name="mute-list"
+          :show="activeDrawerKey === 'mute'"
           :group-id="props.groupId"
-          @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
-          @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
-        />
-        <EmGroupBlocklist
-          v-if="activeDrawerKey === 'block'"
-          ref="blockListRef"
+          :open="openDrawer"
+          :close="closeDrawer"
+        >
+          <EmGroupMuteList
+            v-if="activeDrawerKey === 'mute'"
+            ref="muteListRef"
+            :group-id="props.groupId"
+            @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
+            @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
+          />
+        </slot>
+        <!-- #block-list：完全接管黑名单二级页渲染，scope 提供激活态与开关句柄 -->
+        <slot
+          name="block-list"
+          :show="activeDrawerKey === 'block'"
           :group-id="props.groupId"
-          @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
-          @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
-        />
-        <EmGroupAllowlist
-          v-if="activeDrawerKey === 'allow'"
+          :open="openDrawer"
+          :close="closeDrawer"
+        >
+          <EmGroupBlocklist
+            v-if="activeDrawerKey === 'block'"
+            ref="blockListRef"
+            :group-id="props.groupId"
+            @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
+            @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
+          />
+        </slot>
+        <!-- #allow-list：完全接管白名单二级页渲染，scope 提供激活态与开关句柄 -->
+        <slot
+          name="allow-list"
+          :show="activeDrawerKey === 'allow'"
           :group-id="props.groupId"
-          @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
-        />
-        <EmGroupSharedFileList
-          v-if="activeDrawerKey === 'files'"
-          ref="sharedFileListRef"
+          :open="openDrawer"
+          :close="closeDrawer"
+        >
+          <EmGroupAllowlist
+            v-if="activeDrawerKey === 'allow'"
+            :group-id="props.groupId"
+            @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
+          />
+        </slot>
+        <!-- #shared-files：完全接管共享文件二级页渲染，scope 提供激活态与开关句柄 -->
+        <slot
+          name="shared-files"
+          :show="activeDrawerKey === 'files'"
           :group-id="props.groupId"
-        />
-        <EmGroupJoinRequestList
-          v-if="activeDrawerKey === 'requests'"
+          :open="openDrawer"
+          :close="closeDrawer"
+        >
+          <EmGroupSharedFileList
+            v-if="activeDrawerKey === 'files'"
+            ref="sharedFileListRef"
+            :group-id="props.groupId"
+          />
+        </slot>
+        <!-- #join-requests：完全接管入群申请二级页渲染，scope 提供激活态与开关句柄 -->
+        <slot
+          name="join-requests"
+          :show="activeDrawerKey === 'requests'"
           :group-id="props.groupId"
-          @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
-          @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
-        />
+          :open="openDrawer"
+          :close="closeDrawer"
+        >
+          <EmGroupJoinRequestList
+            v-if="activeDrawerKey === 'requests'"
+            :group-id="props.groupId"
+            @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
+            @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
+          />
+        </slot>
       </div>
     </ChatDrawer>
 
@@ -372,36 +435,81 @@ function closeDrawer() {
           <span v-else class="group-management-section__drawer-placeholder" />
         </div>
         <div class="group-management-section__drawer-body">
-          <EmGroupMuteList
-            v-if="activeDrawerKey === 'mute'"
-            ref="muteListRef"
+          <!-- #mute-list：完全接管禁言列表二级页渲染，scope 提供激活态与开关句柄 -->
+          <slot
+            name="mute-list"
+            :show="activeDrawerKey === 'mute'"
             :group-id="props.groupId"
-            @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
-            @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
-          />
-          <EmGroupBlocklist
-            v-if="activeDrawerKey === 'block'"
-            ref="blockListRef"
+            :open="openDrawer"
+            :close="closeDrawer"
+          >
+            <EmGroupMuteList
+              v-if="activeDrawerKey === 'mute'"
+              ref="muteListRef"
+              :group-id="props.groupId"
+              @unmute="emit('group-operation', { type: 'unmute-member', groupId: props.groupId, userId: $event.userId })"
+              @mute="emit('group-operation', { type: 'mute-member', groupId: props.groupId, userId: $event[0]?.userId })"
+            />
+          </slot>
+          <!-- #block-list：完全接管黑名单二级页渲染，scope 提供激活态与开关句柄 -->
+          <slot
+            name="block-list"
+            :show="activeDrawerKey === 'block'"
             :group-id="props.groupId"
-            @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
-            @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
-          />
-          <EmGroupAllowlist
-            v-if="activeDrawerKey === 'allow'"
+            :open="openDrawer"
+            :close="closeDrawer"
+          >
+            <EmGroupBlocklist
+              v-if="activeDrawerKey === 'block'"
+              ref="blockListRef"
+              :group-id="props.groupId"
+              @unblock="emit('group-operation', { type: 'unblock-member', groupId: props.groupId, userId: $event.userId })"
+              @block="emit('group-operation', { type: 'block-member', groupId: props.groupId, userId: $event[0]?.userId })"
+            />
+          </slot>
+          <!-- #allow-list：完全接管白名单二级页渲染，scope 提供激活态与开关句柄 -->
+          <slot
+            name="allow-list"
+            :show="activeDrawerKey === 'allow'"
             :group-id="props.groupId"
-            @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
-          />
-          <EmGroupSharedFileList
-            v-if="activeDrawerKey === 'files'"
-            ref="sharedFileListRef"
+            :open="openDrawer"
+            :close="closeDrawer"
+          >
+            <EmGroupAllowlist
+              v-if="activeDrawerKey === 'allow'"
+              :group-id="props.groupId"
+              @remove="emit('group-operation', { type: 'remove-allowlist-member', groupId: props.groupId, userId: $event.userId })"
+            />
+          </slot>
+          <!-- #shared-files：完全接管共享文件二级页渲染，scope 提供激活态与开关句柄 -->
+          <slot
+            name="shared-files"
+            :show="activeDrawerKey === 'files'"
             :group-id="props.groupId"
-          />
-          <EmGroupJoinRequestList
-            v-if="activeDrawerKey === 'requests'"
+            :open="openDrawer"
+            :close="closeDrawer"
+          >
+            <EmGroupSharedFileList
+              v-if="activeDrawerKey === 'files'"
+              ref="sharedFileListRef"
+              :group-id="props.groupId"
+            />
+          </slot>
+          <!-- #join-requests：完全接管入群申请二级页渲染，scope 提供激活态与开关句柄 -->
+          <slot
+            name="join-requests"
+            :show="activeDrawerKey === 'requests'"
             :group-id="props.groupId"
-            @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
-            @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
-          />
+            :open="openDrawer"
+            :close="closeDrawer"
+          >
+            <EmGroupJoinRequestList
+              v-if="activeDrawerKey === 'requests'"
+              :group-id="props.groupId"
+              @accepted="emit('group-operation', { type: 'accept-join-request', groupId: props.groupId, userId: $event })"
+              @rejected="emit('group-operation', { type: 'reject-join-request', groupId: props.groupId, userId: $event })"
+            />
+          </slot>
         </div>
       </div>
     </Popup>

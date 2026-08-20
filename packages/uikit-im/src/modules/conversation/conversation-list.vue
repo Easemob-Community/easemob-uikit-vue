@@ -17,7 +17,7 @@ import { EmStatusBanner as StatusBanner } from '@easemob/uikit-core'
 import { EmSkeleton as Skeleton } from '@easemob/uikit-core'
 import type { UiConversation as Conversation } from '@easemob/uikit-core'
 import { DEFAULT_CONVERSATION_TABS } from './types'
-import type { ConversationAction, ConversationTabKey } from './types'
+import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from './types'
 import ConversationItem from './conversation-item.vue'
 import ConversationTabs from './conversation-tabs.vue'
 import NewChatModal from './new-chat-modal.vue'
@@ -66,6 +66,11 @@ interface ConversationListProps {
   activeTab?: ConversationTabKey
   /** 是否展示连接/同步状态横幅，默认 true */
   showStatusBanner?: boolean
+  /**
+   * Header `+` 菜单自定义项；不传时使用内置三项（新建会话/添加联系人/创建群组）；
+   * 传空数组可隐藏菜单入口。
+   */
+  menuItems?: ConversationHeaderMenuItem[]
 }
 
 const props = withDefaults(defineProps<ConversationListProps>(), {
@@ -97,6 +102,8 @@ const emit = defineEmits<{
   (e: 'update:active-tab', tab: ConversationTabKey): void
   /** 断网/连接失败横幅被点击时触发，由业务方决定重连策略 */
   (e: 'reconnect'): void
+  /** 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key */
+  (e: 'header-menu-action', key: string): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
@@ -205,12 +212,19 @@ function onHeaderMenuClose() {
   showHeaderMenu.value = false
 }
 
-/** Header 菜单项定义 */
-const headerMenuItems = computed(() => [
-  { key: 'newChat', label: t('conversation.newChat'), icon: 'bubble/rect/empty' },
-  { key: 'addContact', label: t('conversation.addContact'), icon: 'person/plus' },
-  { key: 'createGroup', label: t('conversation.createGroup'), icon: 'person/double' },
-])
+/** Header 菜单项定义：props.menuItems 提供时使用自定义项；未提供时使用内置三项 */
+const headerMenuItems = computed<ConversationHeaderMenuItem[]>(() => {
+  if (props.menuItems)
+    return props.menuItems
+  return [
+    { key: 'newChat', label: t('conversation.newChat'), icon: 'bubble/rect/empty' },
+    { key: 'addContact', label: t('conversation.addContact'), icon: 'person/plus' },
+    { key: 'createGroup', label: t('conversation.createGroup'), icon: 'person/double' },
+  ]
+})
+
+/** 是否展示 Header 菜单入口：菜单项非空才展示（传空数组可隐藏） */
+const showHeaderMenuEntry = computed(() => headerMenuItems.value.length > 0)
 
 const headerActionSheetActions = computed(() =>
   headerMenuItems.value.map(item => ({ name: item.label, icon: item.icon })),
@@ -225,24 +239,56 @@ function onHeaderMenuClick() {
   }
 }
 
-function onHeaderActionSheetSelect(item: { name: string, icon?: string }, index: number) {
-  const key = headerMenuItems.value[index]?.key
-  if (key)
-    handleHeaderAction(key)
+function onHeaderActionSheetSelect(_item: { name: string, icon?: string }, index: number) {
+  const menuItem = headerMenuItems.value[index]
+  if (menuItem)
+    onHeaderMenuItemClick(menuItem)
 }
 
-function onHeaderMenuItemClick(key: string) {
+function onHeaderMenuItemClick(item: ConversationHeaderMenuItem) {
   showHeaderMenu.value = false
-  handleHeaderAction(key)
+  handleHeaderAction(item)
 }
 
-function handleHeaderAction(key: string) {
-  if (key === 'newChat')
-    showNewChatModal.value = true
-  else if (key === 'addContact')
-    showAddContactModal.value = true
-  else if (key === 'createGroup')
-    showCreateGroupModal.value = true
+/**
+ * 处理 Header 菜单项点击：自定义 handler 优先；未提供 handler 时内置 key 走内置弹窗，
+ * 其余 key 上抛 header-menu-action 事件由业务处理。
+ */
+function handleHeaderAction(item: ConversationHeaderMenuItem) {
+  if (item.handler) {
+    item.handler(item.key)
+    return
+  }
+  if (item.key === 'newChat')
+    openNewChatModal()
+  else if (item.key === 'addContact')
+    openAddContactModal()
+  else if (item.key === 'createGroup')
+    openCreateGroupModal()
+  else
+    emit('header-menu-action', item.key)
+}
+
+/** 新会话弹窗开关句柄（#new-chat 插槽 scope） */
+function openNewChatModal() {
+  showNewChatModal.value = true
+}
+function closeNewChatModal() {
+  showNewChatModal.value = false
+}
+/** 添加联系人弹窗开关句柄（#add-contact 插槽 scope） */
+function openAddContactModal() {
+  showAddContactModal.value = true
+}
+function closeAddContactModal() {
+  showAddContactModal.value = false
+}
+/** 创建群组弹窗开关句柄（#create-group 插槽 scope） */
+function openCreateGroupModal() {
+  showCreateGroupModal.value = true
+}
+function closeCreateGroupModal() {
+  showCreateGroupModal.value = false
 }
 
 /** 获取会话可用于搜索的文本字段（ID、会话名、备注、昵称、群名、最后消息等） */
@@ -469,31 +515,41 @@ function handleCustomAction(key: string, conversation: Conversation) {
         <span class="conversation-list__title">{{ props.title || t('conversation.title') }}</span>
       </slot>
       <div class="conversation-list__menu-wrapper">
-        <div ref="headerMenuTriggerRef" class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
-          <Icon name="circle/plus" :size="22" />
-        </div>
-        <Popup
-          :show="showHeaderMenu && !isMobile"
-          :anchor="headerMenuTriggerRef ?? undefined"
-          placement="bottom"
-          :overlay="false"
-          :close-on-click-overlay="true"
-          group="conversation-header-menu"
-          @update:show="onHeaderMenuClose"
-          @close="onHeaderMenuClose"
+        <!-- #header-menu：完全接管 Header 菜单区域（触发按钮 + 弹出层），scope 提供菜单项与开关句柄 -->
+        <slot
+          name="header-menu"
+          :menu-items="headerMenuItems"
+          :open="onHeaderMenuClick"
+          :close="onHeaderMenuClose"
         >
-          <div class="context-menu">
-            <div
-              v-for="item in headerMenuItems"
-              :key="item.key"
-              class="context-menu__item"
-              @click.stop="onHeaderMenuItemClick(item.key)"
-            >
-              <Icon :name="item.icon" :size="18" />
-              <span>{{ item.label }}</span>
+          <template v-if="showHeaderMenuEntry">
+            <div ref="headerMenuTriggerRef" class="conversation-list__menu-trigger" @click="onHeaderMenuClick">
+              <Icon name="circle/plus" :size="22" />
             </div>
-          </div>
-        </Popup>
+            <Popup
+              :show="showHeaderMenu && !isMobile"
+              :anchor="headerMenuTriggerRef ?? undefined"
+              placement="bottom"
+              :overlay="false"
+              :close-on-click-overlay="true"
+              group="conversation-header-menu"
+              @update:show="onHeaderMenuClose"
+              @close="onHeaderMenuClose"
+            >
+              <div class="context-menu">
+                <div
+                  v-for="item in headerMenuItems"
+                  :key="item.key"
+                  class="context-menu__item"
+                  @click.stop="onHeaderMenuItemClick(item)"
+                >
+                  <Icon v-if="item.icon" :name="item.icon" :size="18" />
+                  <span>{{ item.label }}</span>
+                </div>
+              </div>
+            </Popup>
+          </template>
+        </slot>
       </div>
     </div>
     <!-- 分栏 tab：header 之下、搜索框之上；tabs 为空数组时隐藏；
@@ -552,29 +608,44 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <div v-if="$slots.body && !props.bodySticky" class="conversation-list__body">
         <slot name="body" />
       </div>
-      <ConversationItem
-        v-for="(item, index) in filteredConversationList"
-        :key="item.id"
-        :data-conv-id="item.id"
-        :conversation="item"
-        :class="{
-          'is-active': currentConversation?.id === item.id,
-          'is-keyboard-focus': keyboardFocusVisible && keyboardNavActive && activeIndex === index,
-        }"
-        :custom-actions="props.customActions"
-        :time-formatter="props.timeFormatter"
-        :message-formatter="props.messageFormatter"
-        :show-sender-name="props.showSenderName"
-        :unread-mode="props.unreadMode"
-        :has-at-me="!!stores.conversation.atMeMap[item.id]"
-        :is-typing="item.type === CONVERSATION_TYPE.SINGLECHAT && !!stores.conversation.typingMap[item.id]"
-        @select="handleSelect"
-        @pin="pinConversation"
-        @mute="muteConversation"
-        @delete="handleDelete"
-        @read="sendChannelAck"
-        @custom-action="handleCustomAction"
-      />
+      <!-- #item：完全接管会话项渲染（对齐 contact/group 列表的 #item 惯例），
+           scope 提供会话数据、选中/高亮态与内置动作句柄；不传时默认渲染 ConversationItem -->
+      <template v-for="(item, index) in filteredConversationList" :key="item.id">
+        <slot
+          name="item"
+          :conversation="item"
+          :active="currentConversation?.id === item.id"
+          :keyboard-focus="keyboardFocusVisible && keyboardNavActive && activeIndex === index"
+          :select="() => handleSelect(item.id)"
+          :pin="(pinned: boolean) => pinConversation(item.id, pinned)"
+          :mute="(muted: boolean) => muteConversation(item.id, muted)"
+          :delete="() => handleDelete(item.id)"
+          :read="() => sendChannelAck(item.id)"
+          :custom-action="(key: string) => handleCustomAction(key, item)"
+        >
+          <ConversationItem
+            :data-conv-id="item.id"
+            :conversation="item"
+            :class="{
+              'is-active': currentConversation?.id === item.id,
+              'is-keyboard-focus': keyboardFocusVisible && keyboardNavActive && activeIndex === index,
+            }"
+            :custom-actions="props.customActions"
+            :time-formatter="props.timeFormatter"
+            :message-formatter="props.messageFormatter"
+            :show-sender-name="props.showSenderName"
+            :unread-mode="props.unreadMode"
+            :has-at-me="!!stores.conversation.atMeMap[item.id]"
+            :is-typing="item.type === CONVERSATION_TYPE.SINGLECHAT && !!stores.conversation.typingMap[item.id]"
+            @select="handleSelect"
+            @pin="pinConversation"
+            @mute="muteConversation"
+            @delete="handleDelete"
+            @read="sendChannelAck"
+            @custom-action="handleCustomAction"
+          />
+        </slot>
+      </template>
       <!-- 会话列表同步中（WebSocket 首次同步）：骨架屏替代转圈 -->
       <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__skeleton">
         <div v-for="i in 6" :key="i" class="conversation-list__skeleton-item">
@@ -643,14 +714,35 @@ function handleCustomAction(key: string, conversation: Conversation) {
       @select="onHeaderActionSheetSelect"
     />
 
-    <!-- 新会话 -->
-    <NewChatModal v-model:show="showNewChatModal" />
+    <!-- 新会话（#new-chat：接管弹窗渲染，scope 提供开关句柄） -->
+    <slot
+      name="new-chat"
+      :show="showNewChatModal"
+      :open="openNewChatModal"
+      :close="closeNewChatModal"
+    >
+      <NewChatModal v-model:show="showNewChatModal" />
+    </slot>
 
-    <!-- 添加联系人 -->
-    <AddContactModal v-model:show="showAddContactModal" />
+    <!-- 添加联系人（#add-contact：接管弹窗渲染，scope 提供开关句柄） -->
+    <slot
+      name="add-contact"
+      :show="showAddContactModal"
+      :open="openAddContactModal"
+      :close="closeAddContactModal"
+    >
+      <AddContactModal v-model:show="showAddContactModal" />
+    </slot>
 
-    <!-- 创建群组 -->
-    <CreateGroupModal v-model:show="showCreateGroupModal" />
+    <!-- 创建群组（#create-group：接管弹窗渲染，scope 提供开关句柄） -->
+    <slot
+      name="create-group"
+      :show="showCreateGroupModal"
+      :open="openCreateGroupModal"
+      :close="closeCreateGroupModal"
+    >
+      <CreateGroupModal v-model:show="showCreateGroupModal" />
+    </slot>
   </div>
 </template>
 
