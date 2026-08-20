@@ -1,7 +1,7 @@
 import { type MaybeRefOrGetter, computed, onMounted, toValue, watch } from 'vue'
 import type { NotificationItem } from '../components/notification/types'
 import { useLocale } from '../locale'
-import { type AnimationConfig, type Density, type FontSizePreset, useThemeStore } from '../store/theme'
+import { type AnimationConfig, type Density, type FontSizePreset, type ThemePreset, useThemeStore } from '../store/theme'
 import { configureLogPersistence } from '../utils/log-store'
 import { setLogLevel } from '../utils/logger'
 import type { H5AdaptationConfig } from './use-h5-adaptation'
@@ -11,8 +11,10 @@ import { type NotificationChannel, type NotificationTriggerMode, useNotification
 /** 字号配置：支持档位或具体 scale */
 export type ThemeFontSize = FontSizePreset | number
 
-/** Provider 主题配置（theme prop）：模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色 */
+/** Provider 主题配置（theme prop）：预设 / 模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色 */
 export interface ProviderThemeConfig {
+  /** 预设主题档位：'default' | 'business' | 'fresh'，应用后单项配置可继续覆盖 */
+  preset?: ThemePreset
   /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
   mode?: 'light' | 'dark' | 'auto'
   /** 品牌色相（0-360，hsl hue），默认 203 */
@@ -214,6 +216,10 @@ export function useProviderSideEffects(options: ProviderSideEffectsOptions) {
   function applyThemeConfig(theme?: ProviderThemeConfig) {
     if (!theme)
       return
+    // 预设优先应用（作为基底），后续单项配置可覆盖预设值
+    if (theme.preset) {
+      themeStore.setPreset(theme.preset)
+    }
     if (theme.mode) {
       themeStore.setMode(theme.mode)
     }

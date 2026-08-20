@@ -17,6 +17,31 @@ export type FontSizePreset = 'normal' | 'large' | 'xlarge'
 /** 密度档位 */
 export type Density = 'compact' | 'normal' | 'comfortable'
 
+/** 预设主题档位 */
+export type ThemePreset = 'default' | 'business' | 'fresh'
+
+/** 预设主题配置：一次应用多个维度 */
+export interface ThemePresetConfig {
+  /** 主色相（0-360，hsl hue） */
+  primaryColor: number
+  /** 组件圆角模式 */
+  componentsShape: 'ground' | 'square'
+  /** 气泡形状 */
+  bubbleShape: 'ground' | 'square'
+  /** 容器间距（px） */
+  containerGap: number
+  /** 密度档位 */
+  density: Density
+  /** 列表项 hover 风格 */
+  hoverStyle: HoverStyle
+  /** 可选：对方气泡背景 */
+  bubbleBgOther?: string
+  /** 可选：自己气泡背景 */
+  bubbleBgSelf?: string
+  /** 可选：聊天背景 */
+  chatBg?: string
+}
+
 /** 动画配置 */
 export interface AnimationConfig {
   /** 全局动画开关，默认 true */
@@ -45,6 +70,8 @@ interface ThemeStorageState {
   fontSizeScale: number
   /** 密度档位 */
   density: Density
+  /** 预设主题档位 */
+  preset: ThemePreset
   /** 对方气泡背景色 */
   bubbleBgOther?: string
   /** 自己气泡背景色 */
@@ -68,6 +95,7 @@ const defaultState: ThemeStorageState = {
   animationRipple: true,
   fontSizeScale: 1,
   density: 'normal',
+  preset: 'default',
   bubbleBgOther: undefined,
   bubbleBgSelf: undefined,
   chatBg: undefined,
@@ -79,6 +107,34 @@ const FONT_SIZE_PRESET_MAP: Record<FontSizePreset, number> = {
   normal: 1,
   large: 1.125,
   xlarge: 1.25,
+}
+
+/** 预设主题表：setPreset 时批量应用到各维度（对外导出，便于 docs / 业务读取可用预设） */
+export const THEME_PRESETS: Record<ThemePreset, ThemePresetConfig> = {
+  default: {
+    primaryColor: 203,
+    componentsShape: 'ground',
+    bubbleShape: 'ground',
+    containerGap: 8,
+    density: 'normal',
+    hoverStyle: 'default',
+  },
+  business: {
+    primaryColor: 217,
+    componentsShape: 'square',
+    bubbleShape: 'ground',
+    containerGap: 4,
+    density: 'compact',
+    hoverStyle: 'default',
+  },
+  fresh: {
+    primaryColor: 150,
+    componentsShape: 'ground',
+    bubbleShape: 'ground',
+    containerGap: 12,
+    density: 'comfortable',
+    hoverStyle: 'rounded',
+  },
 }
 
 /** hsl → "r, g, b" 字符串，用于 --uikit-primary-rgb（供 rgba(var(--uikit-primary-rgb), α) 场景） */
@@ -165,6 +221,11 @@ export const useThemeStore = defineStore('theme', () => {
     // 兼容旧 localStorage：旧缓存中可能无 density 字段，回落到 normal
     get: () => storage.value.density ?? 'normal',
     set: (v: Density) => { storage.value.density = v },
+  })
+  const preset = computed({
+    // 兼容旧 localStorage：旧缓存中可能无 preset 字段，回落到 default
+    get: () => storage.value.preset ?? 'default',
+    set: (v: ThemePreset) => { storage.value.preset = v },
   })
   const bubbleBgOther = computed({
     get: () => storage.value.bubbleBgOther,
@@ -344,6 +405,29 @@ export const useThemeStore = defineStore('theme', () => {
     density.value = value
   }
 
+  /**
+   * 应用预设主题：一次性覆盖主色 / 形状 / 间距 / 密度 / hover 风格。
+   * 预设是基底，应用后仍可用单项 setter 继续微调（单项覆盖优先）。
+   */
+  function setPreset(key: ThemePreset) {
+    preset.value = key
+    const config = THEME_PRESETS[key]
+    if (!config)
+      return
+    primaryColor.value = config.primaryColor
+    componentsShape.value = config.componentsShape
+    bubbleShape.value = config.bubbleShape
+    containerGap.value = config.containerGap
+    density.value = config.density
+    hoverStyle.value = config.hoverStyle
+    if (config.bubbleBgOther !== undefined)
+      bubbleBgOther.value = config.bubbleBgOther
+    if (config.bubbleBgSelf !== undefined)
+      bubbleBgSelf.value = config.bubbleBgSelf
+    if (config.chatBg !== undefined)
+      chatBg.value = config.chatBg
+  }
+
   function setBubbleBg(other?: string | null, self?: string | null) {
     if (other !== undefined) bubbleBgOther.value = other ?? undefined
     if (self !== undefined) bubbleBgSelf.value = self ?? undefined
@@ -380,6 +464,7 @@ export const useThemeStore = defineStore('theme', () => {
     animationRipple,
     fontSizeScale,
     density,
+    preset,
     bubbleBgOther,
     bubbleBgSelf,
     chatBg,
@@ -397,6 +482,7 @@ export const useThemeStore = defineStore('theme', () => {
     setFontSizeScale,
     setFontSize,
     setDensity,
+    setPreset,
     setBubbleBg,
     setChatBg,
     setInputBg,

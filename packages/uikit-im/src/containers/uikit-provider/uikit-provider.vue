@@ -13,7 +13,7 @@ import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '
 import { EmNotificationContainer, EmToast } from '../../components'
 import type { NotificationItem } from '@easemob/uikit-core'
 import type { ClientConfig } from '@easemob/uikit-core'
-import type { AnimationConfig, Density, FontSizePreset } from '@easemob/uikit-core'
+import type { AnimationConfig, Density, FontSizePreset, ThemePreset } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
 import type { NoticeConfig } from '@easemob/uikit-core'
 import type { NotificationChannel, NotificationTriggerMode } from '@easemob/uikit-core'
@@ -31,8 +31,10 @@ export interface ProviderProps {
   sdkConfig?: Omit<ClientConfig, 'appKey'>
   /** 是否自动初始化 SDK 连接（默认 true）：false 时延迟初始化，待业务调用 useClient().init(config) 传入 appKey 后创建 */
   autoInit?: boolean
-  /** 全局主题配置：模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
+  /** 全局主题配置：预设 / 模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
   theme?: {
+    /** 预设主题档位：'default' | 'business' | 'fresh'，应用后单项配置可继续覆盖 */
+    preset?: ThemePreset
     /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
     mode?: 'light' | 'dark' | 'auto'
     /** 品牌色相（0-360，hsl hue），默认 203 */

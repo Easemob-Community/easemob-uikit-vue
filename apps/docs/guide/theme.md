@@ -244,6 +244,7 @@ const {
   animationLevel,
   fontSizeScale,
   density,
+  preset,
   setPrimaryColor,
   setAvatarShape,
   setBubbleShape,
@@ -257,6 +258,7 @@ const {
   setBubbleBg,
   setChatBg,
   setInputBg,
+  setPreset,
   toggleMode,
 } = useTheme()
 
@@ -280,6 +282,9 @@ setFontSizeScale(1.25)
 // 密度：紧凑 / 标准 / 宽松（信息密度控制）
 setDensity('compact') // 'compact' | 'normal' | 'comfortable'
 
+// 预设主题：一键切换整套风格（'default' | 'business' | 'fresh'）
+setPreset('business')
+
 // 气泡色、聊天背景、输入区背景
 setBubbleBg('#f3f4f6', '#7c3aed')
 setBubbleBg(null) // 传 null 重置为默认主题色
@@ -292,6 +297,26 @@ setAnimationEnabled(false)
 
 // 一键切换 light / dark / auto
 toggleMode()
+```
+
+### 预设主题
+
+UIKit 内置 3 套预设主题档位，`setPreset()` 一键切换整套风格（主色相 / 圆角 / 间距 / 密度 / hover 风格）：
+
+| 预设 | 主色相 | 圆角 | 间距 | 密度 | hover |
+| --- | --- | --- | --- | --- | --- |
+| `default` | 203（品牌蓝） | ground 圆角 | 8px | normal | default |
+| `business` | 217（深蓝商务） | square 直角 | 4px | compact | default |
+| `fresh` | 150（清新绿） | ground 圆角 | 12px | comfortable | rounded |
+
+```ts
+import { useTheme } from '@easemob/uikit-im'
+
+const { setPreset, preset } = useTheme()
+
+setPreset('business') // 整套切换
+// 预设是基底，应用后仍可单项微调（单项覆盖优先）
+setPrimaryColor(262)
 ```
 
 ## Provider 声明式配置
@@ -307,6 +332,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
   <EmUIKitProvider
     app-key="your-app-key"
     :theme="{
+      preset: 'business', // 'default' | 'business' | 'fresh'，应用后单项可覆盖
       mode: 'dark',
       primaryColor: 262,
       gap: 12,

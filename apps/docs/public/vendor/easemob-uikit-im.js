@@ -3681,7 +3681,7 @@ function Ob(n, e = {}) {
     ...e,
     autoInit: !1,
     clientName: "UIKit-IM",
-    clientVersion: "2.0.0",
+    clientVersion: "2.1.0",
     resolveClientConfig: Lb,
     onClientSetup: (c, u) => Yy(c, { ...t, ...u }, e.connectionCallbacks, s.features)
   }), o = {
@@ -35972,7 +35972,7 @@ const lv = /* @__PURE__ */ Ne({
       }, null, 8, ["items", "onClose", "onClick"])) : B("", !0)
     ]));
   }
-}), S2 = /* @__PURE__ */ ze(C2, [["__scopeId", "data-v-9399fd5a"]]), I2 = /* @__PURE__ */ Ne({
+}), S2 = /* @__PURE__ */ ze(C2, [["__scopeId", "data-v-4e0bdbc7"]]), I2 = /* @__PURE__ */ Ne({
   __name: "chat-container",
   props: {
     config: {},
