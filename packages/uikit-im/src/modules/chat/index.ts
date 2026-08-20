@@ -4,6 +4,7 @@ export { default as EmChat } from './chat.vue'
 export { default as EmMessageList } from './message-list/message-list.vue'
 export { default as EmMessageInput } from './message-input/index.vue'
 export { default as EmChatInfoDrawer } from './drawer/chat-info-drawer.vue'
+export { default as EmChatDrawer } from './drawer/chat-drawer.vue'
 export { default as EmMessageVirtualList } from './message-list/message-virtual-list.vue'
 export { default as EmMessageRenderer } from './message-item/message-renderer.vue'
 export { default as EmMessageBubbleWrapper } from './message-item/message-bubble-wrapper.vue'
@@ -24,4 +25,13 @@ export { default as EmGroupReadReceiptModal } from './group-read-receipt-modal/g
 export { default as EmForwardModal } from './forward-modal/forward-modal.vue'
 
 // Types
-export type { ChatConfig, MessageActionItem, MessageActionEvent, MessageActionType, MentionContact } from './types'
+export type {
+  ChatConfig,
+  ChatDrawerProps,
+  ChatDrawerSlotScope,
+  ChatInfoDrawerSlotScope,
+  MessageActionItem,
+  MessageActionEvent,
+  MessageActionType,
+  MentionContact,
+} from './types'

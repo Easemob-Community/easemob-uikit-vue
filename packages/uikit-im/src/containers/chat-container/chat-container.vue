@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, useSlots } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
@@ -29,6 +29,12 @@ const emit = defineEmits<ChatContainerEmits>()
 const chatRef = ref<InstanceType<typeof Chat>>()
 
 const { h5 } = useUIKit()
+const slots = useSlots()
+
+/** 除 #drawer 外的其余插槽名（#drawer 单独显式透传以保留类型；useSlots 非响应式，无需 computed） */
+function getOtherSlotNames() {
+  return Object.keys(slots).filter(name => name !== 'drawer')
+}
 
 defineExpose({
   setText: (text: string) => chatRef.value?.setText?.(text),
@@ -77,9 +83,13 @@ defineExpose({
       <template #header-extra="slotProps">
         <slot name="header-extra" v-bind="slotProps" />
       </template>
+      <!-- 透传 drawer 插槽（显式声明以保留 ChatDrawerSlotScope 类型提示） -->
+      <template #drawer="slotProps">
+        <slot name="drawer" v-bind="slotProps" />
+      </template>
       <!-- 透传所有消息类型级插槽（如 #message-txt, #message-footer-txt 等） -->
       <template
-        v-for="(_, name) in $slots"
+        v-for="name in getOtherSlotNames()"
         :key="name"
         #[name]="slotProps"
       >

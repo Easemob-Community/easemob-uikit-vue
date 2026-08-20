@@ -1,6 +1,11 @@
-import type { UiMessage } from '@easemob/uikit-core'
-import type { MessageStatusValue } from '@easemob/uikit-core'
-import type { EmojiStickerPack } from '@easemob/uikit-core'
+import type {
+  EmojiStickerPack,
+  MessageStatusValue,
+  UiConversation as Conversation,
+  UiGroup,
+  UiGroupMember,
+  UiMessage,
+} from '@easemob/uikit-core'
 import type { LastMessageTextResolver } from '../../utils/resolve-last-message-text'
 
 /** 消息气泡布局模式 */
@@ -71,12 +76,12 @@ export interface ChatConfig {
     visible?: boolean
     /** 标题对齐方式，默认 'center'；对单聊/群聊同时生效 */
     align?: HeaderAlign
-    /** 是否启用自定义插槽，默认 false */
-    customSlot?: boolean
     /** 是否显示头像，默认 false */
     showAvatar?: boolean
     /** 是否显示群成员数后缀，默认 true；仅群聊生效 */
     showMemberCount?: boolean
+    /** 是否显示抽屉入口按钮（聊天信息），默认 true */
+    showDrawerEntry?: boolean
   }
   /** 消息列表配置 */
   messageList?: {
@@ -321,3 +326,65 @@ export type MessageSlotName = `message-${UiMessage['type']}`
 
 /** 消息底部扩展插槽名称映射 */
 export type MessageFooterSlotName = `message-footer-${UiMessage['type']}`
+
+/** 通用抽屉壳 props / Props for the generic chat drawer shell */
+export interface ChatDrawerProps {
+  /** 是否显示抽屉 */
+  show: boolean
+  /** 是否显示遮罩层，默认 true */
+  overlay?: boolean
+  /** 点击遮罩层是否关闭抽屉，默认 true */
+  closeOnClickOverlay?: boolean
+  /** 抽屉宽度，默认 320（数字表示 px，字符串透传 CSS 值） */
+  width?: string | number
+  /** 抽屉顶部偏移，默认 0（数字表示 px，字符串透传 CSS 值） */
+  offsetTop?: string | number
+}
+
+/** 整块接管 `#drawer` 插槽的 scope / Slot scope for the whole-drawer takeover */
+export interface ChatDrawerSlotScope {
+  /** 当前会话 */
+  conversation: Conversation | null | undefined
+  /** 是否群聊 */
+  isGroup: boolean
+  /** 抽屉是否打开 */
+  show: boolean
+  /** 打开抽屉 */
+  open: () => void
+  /** 关闭抽屉 */
+  close: () => void
+  /** 抽屉顶部偏移（header 实际高度，单位 px） */
+  offsetTop: number
+}
+
+/** 部分接管 `ChatInfoDrawer` section 插槽的 scope / Slot scope for ChatInfoDrawer section takeovers */
+export interface ChatInfoDrawerSlotScope {
+  /** 当前会话 */
+  conversation: Conversation | null | undefined
+  /** 是否群聊 */
+  isGroup: boolean
+  /** 群 ID（非群聊时为空字符串） */
+  groupId: string
+  /** 当前群信息 */
+  group?: UiGroup
+  /** 群成员列表 */
+  members: UiGroupMember[]
+  /** 群成员数 */
+  memberCount: number
+  /** 当前登录用户 ID */
+  currentUserId: string
+  /** 当前用户是否为群主 */
+  isOwner: boolean
+  /** 当前用户是否为管理员 */
+  isAdmin: boolean
+  /** 当前用户是否可添加成员 */
+  canAddMember: boolean
+  /** 群信息加载中 */
+  loadingGroup: boolean
+  /** 是否处于群成员列表二级页 */
+  showMemberList: boolean
+  /** 关闭成员列表二级页（返回一级页） */
+  closeMemberList: () => void
+  /** 关闭抽屉 */
+  close: () => void
+}

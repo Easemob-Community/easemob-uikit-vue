@@ -46,9 +46,122 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `loading`：全局加载状态
 - `error`：错误边界，接收插槽属性 `{ error, retry }`
 - `header` / `header-avatar` / `header-title` / `header-extra`：会话头部区域自定义
+- `drawer`：整块接管聊天信息抽屉，作用域见下方「抽屉接管」
+- `drawer-*`：部分接管 `ChatInfoDrawer` 内部区块，如 `#drawer-profile`、`#drawer-members`、`#drawer-footer` 等，作用域见下方「抽屉接管」
 - `message-*`：消息类型级插槽，如 `#message-txt`、`#message-footer-txt`，可自定义各类消息的渲染
 - `toolbar-extra` / `input-panel`：输入区扩展（AI 助手入口、快捷回复面板等，作用域见 `useChatPlugin`）
 - `message-action-extra`：消息操作菜单底部扩展
+
+## 抽屉接管
+
+`EmChatContainer` / `EmChat` 提供三种抽屉接管能力，满足从「整体替换」到「局部定制」的不同需求。
+
+### 1. 整块接管 `#drawer`
+
+完全替换默认的聊天信息抽屉，自己控制开合与内容。常用于需要自绘资料卡/业务信息的场景。
+
+```vue
+<script setup lang="ts">
+import { EmChatContainer, EmChatDrawer } from '@easemob/uikit-im'
+</script>
+
+<template>
+  <EmChatContainer>
+    <template #drawer="{ conversation, isGroup, show, close, offsetTop }">
+      <EmChatDrawer :show="show" :overlay="false" :offset-top="offsetTop" @update:show="close">
+        <div style="padding: 16px;">
+          <h3>{{ conversation?.name }}</h3>
+          <p>{{ isGroup ? '群聊' : '单聊' }} ID: {{ conversation?.id }}</p>
+          <button @click="close">
+            关闭
+          </button>
+        </div>
+      </EmChatDrawer>
+    </template>
+  </EmChatContainer>
+</template>
+```
+
+**作用域：**
+
+| 属性           | 类型                                  | 说明                                |
+| -------------- | ------------------------------------- | ----------------------------------- |
+| `conversation` | `UiConversation \| null \| undefined` | 当前会话                            |
+| `isGroup`      | `boolean`                             | 是否群聊                            |
+| `show`         | `boolean`                             | 抽屉是否打开                        |
+| `open`         | `() => void`                          | 打开抽屉                            |
+| `close`        | `() => void`                          | 关闭抽屉                            |
+| `offsetTop`    | `number`                              | 抽屉顶部偏移（header 实际高度，px） |
+
+### 2. 部分接管 `drawer-*`
+
+只重写抽屉内单个区块（如成员列表、群管理、footer），其余保持默认。
+
+```vue
+<EmChatContainer>
+  <template #drawer-footer="{ conversation, isGroup, close }">
+    <div style="padding: 16px;">
+      <button @click="close">返回聊天</button>
+    </div>
+  </template>
+</EmChatContainer>
+```
+
+可用 section 插槽：
+
+| 插槽名                 | 覆盖区块                    | 显示条件               |
+| ---------------------- | --------------------------- | ---------------------- |
+| `drawer-header`        | 标题栏（返回/关闭）         | 恒显示                 |
+| `drawer-profile`       | 头像/名称/群名群描述编辑/ID | 恒显示                 |
+| `drawer-remark`        | 单聊备注                    | 仅单聊                 |
+| `drawer-announcement`  | 群公告                      | 仅群聊                 |
+| `drawer-members`       | 群成员九宫格 + 查看全部     | 仅群聊                 |
+| `drawer-admin-actions` | 转让群主/设置管理员         | 仅群聊 + 群主          |
+| `drawer-management`    | 群管理 section              | 仅群聊                 |
+| `drawer-actions`       | 清空聊天记录等通用操作      | 恒显示                 |
+| `drawer-footer`        | 退出/解散/删除好友          | 恒显示（非成员列表页） |
+| `drawer-member-detail` | 群成员列表二级页            | 二级页打开时           |
+
+Section 插槽统一作用域：
+
+| 属性            | 类型                                  | 说明                        |
+| --------------- | ------------------------------------- | --------------------------- |
+| `conversation`  | `UiConversation \| null \| undefined` | 当前会话                    |
+| `isGroup`       | `boolean`                             | 是否群聊                    |
+| `groupId`       | `string`                              | 群 ID（非群聊时为空字符串） |
+| `group`         | `UiGroup \| undefined`                | 当前群信息                  |
+| `members`       | `UiGroupMember[]`                     | 群成员列表                  |
+| `memberCount`   | `number`                              | 群成员数                    |
+| `currentUserId` | `string`                              | 当前登录用户 ID             |
+| `isOwner`       | `boolean`                             | 当前用户是否为群主          |
+| `isAdmin`       | `boolean`                             | 当前用户是否为管理员        |
+| `canAddMember`  | `boolean`                             | 当前用户是否可添加成员      |
+| `loadingGroup`  | `boolean`                             | 群信息加载中                |
+| `close`         | `() => void`                          | 关闭抽屉                    |
+
+### 3. 自绘壳 `EmChatDrawer`
+
+若只想使用通用抽屉壳（overlay / 偏移 / header/body/footer 插槽），可直接引入 `EmChatDrawer`：
+
+```vue
+<script setup lang="ts">
+import { EmChatDrawer } from '@easemob/uikit-im'
+</script>
+
+<template>
+  <EmChatDrawer :show="true" :overlay="true" :width="360" :offset-top="56">
+    <template #header>
+      自定义标题
+    </template>
+    <div>自定义内容</div>
+    <template #footer>
+      自定义底部
+    </template>
+  </EmChatDrawer>
+</template>
+```
+
+> 注意：section 插槽被接管后，对应内置交互不再触发（如接管 `drawer-members` 后，成员事件需由用户自行处理）。
 
 ## 流式消息（AI）
 

@@ -1007,6 +1007,13 @@
 - **建议修法**：demo 块改为 iframe 隔离渲染（参考 `VuePlayground.vue` 的 iframe + dist CSS + 独立 pinia 思路），iframe 内独立引 uikit 样式与 Pinia、注入 `data-uikit-theme` 跟随暗色；复杂容器 demo 保持「真实组件 + mock 数据层」。**不采用纯 mock 组件**（漂移风险）。
 - **关联 skill**：`uikit-docs-authoring`
 
+### [x] D119. Chat 抽屉三种接管能力（整块 / 部分 / 自绘壳）：插槽与导出补全
+
+- **背景**：`EmChatContainer` / `EmChat` 内聊天信息抽屉（`ChatInfoDrawer`）为硬编码渲染，业务方无法接管或重写：① `chat.vue` 中 `<ChatInfoDrawer>` 无插槽包裹，无法整体替换；② `ChatInfoDrawer` 内部各 section 写死、无 `<slot>` 透传，无法部分重写；③ 通用抽屉壳 `ChatDrawer` 未导出，无法自绘。当前仅能靠 `ChatConfig` 显隐开关裁剪，改不了布局/内容/自定义区块。
+- **修复**：按 `docs/CHAT-DRAWER-EXTENSION-PLAN.md` 完成纯增量实现：① `EmChatContainer`/`EmChat` 新增 `#drawer` 插槽（scope：conversation/isGroup/show/open/close/offsetTop）；② `ChatInfoDrawer` 内部十处 section 新增 `drawer-*` 具名插槽（header/profile/remark/announcement/members/admin-actions/management/actions/footer/member-detail）并逐层透传；③ 导出 `EmChatDrawer` 通用抽屉壳与 `ChatDrawerProps` / `ChatDrawerSlotScope` / `ChatInfoDrawerSlotScope` 公开类型；④ `ChatConfig.header` 新增 `showDrawerEntry` 开关，清理 dead 字段 `customSlot`。
+- **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` + `pnpm changelog:check` 均通过；`chat-info-drawer.story.vue` 新增 Section Slots Takeover 示例；`apps/docs/components/chat-container.md` 补充抽屉接管文档。
+- **关联 skill**：`uikit-chat-plugin-tabs` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`
+
 ### [x] D114. UI/UX 验收：z-index 设计层级表（P3-4）
 
 - **来源**：`docs/UIUX-ACCEPTANCE-PLAN.md` P3-4 / P0-6。

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
-import { EmButton as Button } from '@easemob/uikit-core'
-import { useGroupStore } from '../../../store/group'
+import { EmButton as Button, CONVERSATION_TYPE, GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import type { UiConversation, UiGroupMember } from '@easemob/uikit-core'
+import { useGroupStore } from '../../../store/group'
+import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
 import ChatInfoDrawer from './chat-info-drawer.vue'
 
 const groupConversation: UiConversation = {
@@ -65,7 +64,9 @@ function onEvent(name: string, payload?: unknown) {
     <Variant title="Group Chat">
       <UIKitProvider :auto-init="false">
         <div style="position: relative; height: 600px; border: 1px solid #e5e7eb;">
-          <Button @click="showGroup = true">打开群信息抽屉</Button>
+          <Button @click="showGroup = true">
+            打开群信息抽屉
+          </Button>
           <ChatInfoDrawer
             v-model:show="showGroup"
             :conversation="groupConversation"
@@ -86,13 +87,68 @@ function onEvent(name: string, payload?: unknown) {
     <Variant title="Single Chat">
       <UIKitProvider :auto-init="false">
         <div style="position: relative; height: 600px; border: 1px solid #e5e7eb;">
-          <Button @click="showSingle = true">打开好友信息抽屉</Button>
+          <Button @click="showSingle = true">
+            打开好友信息抽屉
+          </Button>
           <ChatInfoDrawer
             v-model:show="showSingle"
             :conversation="singleConversation"
             :is-group="false"
             @clear-history="(p) => onEvent('clear-history', p)"
           />
+        </div>
+      </UIKitProvider>
+    </Variant>
+
+    <Variant title="Section Slots Takeover">
+      <UIKitProvider :auto-init="false">
+        <div style="position: relative; height: 600px; border: 1px solid #e5e7eb;">
+          <Button @click="showGroup = true">
+            打开 Section 接管示例
+          </Button>
+          <ChatInfoDrawer
+            v-model:show="showGroup"
+            :conversation="groupConversation"
+            :is-group="true"
+            @leave-group="(id) => onEvent('leave-group', id)"
+            @destroy-group="(id) => onEvent('destroy-group', id)"
+            @clear-history="(p) => onEvent('clear-history', p)"
+            @add-member="(id) => onEvent('add-member', id)"
+            @chat-member="(m) => onEvent('chat-member', m)"
+            @remove-member="(m) => onEvent('remove-member', m)"
+            @set-admin="(m) => onEvent('set-admin', m)"
+            @remove-admin="(m) => onEvent('remove-admin', m)"
+          >
+            <template #drawer-footer="{ isGroup, memberCount }">
+              <div style="padding: 16px; background: var(--uikit-bg-secondary);">
+                <div style="margin-bottom: 8px; color: var(--uikit-text-secondary); font-size: 13px;">
+                  自定义 Footer：{{ isGroup ? `共 ${memberCount} 位成员` : '单聊自定义操作区' }}
+                </div>
+                <Button type="danger-outline" block @click="showGroup = false">
+                  关闭抽屉
+                </Button>
+              </div>
+            </template>
+            <template #drawer-members="{ members, canAddMember }">
+              <div style="padding: 16px; background: var(--uikit-bg-base); border-radius: 8px;">
+                <div style="margin-bottom: 8px; color: var(--uikit-text-secondary); font-size: 13px;">
+                  自定义成员区（{{ members.length }} 人）
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <span
+                    v-for="member in members.slice(0, 4)"
+                    :key="member.userId"
+                    style="padding: 4px 8px; background: var(--uikit-bg-secondary); border-radius: 4px; font-size: 13px;"
+                  >
+                    {{ member.nickname || member.userId }}
+                  </span>
+                  <span v-if="canAddMember" style="padding: 4px 8px; color: var(--uikit-primary-color); font-size: 13px;">
+                    + 添加成员
+                  </span>
+                </div>
+              </div>
+            </template>
+          </ChatInfoDrawer>
         </div>
       </UIKitProvider>
     </Variant>

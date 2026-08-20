@@ -2,14 +2,7 @@
 import { computed, ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 import { useThemeStore } from '@easemob/uikit-core'
-
-export interface ChatDrawerProps {
-  show: boolean
-  overlay?: boolean
-  closeOnClickOverlay?: boolean
-  width?: string | number
-  offsetTop?: string | number
-}
+import type { ChatDrawerProps } from '../types'
 
 const props = withDefaults(defineProps<ChatDrawerProps>(), {
   overlay: true,

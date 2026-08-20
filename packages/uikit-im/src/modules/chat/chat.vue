@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, watch, watchEffect } from 'vue'
+import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, useSlots, watch, watchEffect } from 'vue'
 import { formatSdkError } from '@easemob/uikit-core'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
@@ -352,11 +352,37 @@ const headerAlign = computed(() => headerConfig.value?.align ?? HEADER_ALIGN.CEN
 /** 是否显示 header 头像 */
 const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 
+/** 是否显示 header 抽屉入口按钮，默认 true */
+const showDrawerEntry = computed(() => headerConfig.value?.showDrawerEntry !== false)
+
 /** 是否启用消息搜索入口 */
 const searchEnabled = computed(() => props.config?.messageList?.search?.enabled === true)
 
 /** 是否显示 drawer */
 const showDrawer = ref(false)
+
+/** 打开抽屉 */
+function openDrawer() {
+  showDrawer.value = true
+}
+
+/** 关闭抽屉 */
+function closeDrawer() {
+  showDrawer.value = false
+}
+
+const slots = useSlots()
+
+/** 过滤出 drawer-* 前缀的 section 插槽，透传给 ChatInfoDrawer（useSlots 返回非响应式对象，无需 computed） */
+function getDrawerSectionSlots() {
+  const result: Record<string, any> = {}
+  for (const name of Object.keys(slots)) {
+    if (name.startsWith('drawer-')) {
+      result[name] = slots[name]
+    }
+  }
+  return result
+}
 
 /** 是否显示消息搜索弹窗 */
 const showSearchPanel = ref(false)
@@ -1098,10 +1124,10 @@ async function onRemoveAdmin(member: UiGroupMember) {
             @click.stop="showSearchPanel = true"
           />
           <IconButton
-            v-if="currentConversation"
+            v-if="showDrawerEntry && currentConversation"
             icon="vertical"
             :icon-size="20"
-            @click.stop="showDrawer = true"
+            @click.stop="openDrawer"
           />
         </slot>
       </div>
@@ -1177,30 +1203,48 @@ async function onRemoveAdmin(member: UiGroupMember) {
       </MessageInput>
 
       <!-- 聊天信息抽屉 -->
-      <ChatInfoDrawer
-        ref="chatInfoDrawerRef"
-        v-model:show="showDrawer"
+      <slot
+        name="drawer"
         :conversation="currentConversation"
         :is-group="isGroupChat"
+        :show="showDrawer"
+        :open="openDrawer"
+        :close="closeDrawer"
         :offset-top="headerHeight"
-        :group-management-display-mode="props.config?.groupManagement?.displayMode"
-        :allow-chat="props.config?.groupMember?.allowChat"
-        :show-mute-all="props.config?.groupManagement?.showMuteAll"
-        :show-mute-list="props.config?.groupManagement?.showMuteList"
-        :show-blocklist="props.config?.groupManagement?.showBlocklist"
-        :show-allowlist="props.config?.groupManagement?.showAllowlist"
-        :show-shared-files="props.config?.groupManagement?.showSharedFiles"
-        :show-join-requests="props.config?.groupManagement?.showJoinRequests"
-        @leave-group="onLeaveGroup"
-        @destroy-group="onDestroyGroup"
-        @clear-history="onClearHistory"
-        @add-member="onAddMember"
-        @group-operation="emit('group-operation', $event)"
-        @chat-member="onChatMember"
-        @remove-member="onRemoveMember"
-        @set-admin="onSetAdmin"
-        @remove-admin="onRemoveAdmin"
-      />
+      >
+        <ChatInfoDrawer
+          ref="chatInfoDrawerRef"
+          v-model:show="showDrawer"
+          :conversation="currentConversation"
+          :is-group="isGroupChat"
+          :offset-top="headerHeight"
+          :group-management-display-mode="props.config?.groupManagement?.displayMode"
+          :allow-chat="props.config?.groupMember?.allowChat"
+          :show-mute-all="props.config?.groupManagement?.showMuteAll"
+          :show-mute-list="props.config?.groupManagement?.showMuteList"
+          :show-blocklist="props.config?.groupManagement?.showBlocklist"
+          :show-allowlist="props.config?.groupManagement?.showAllowlist"
+          :show-shared-files="props.config?.groupManagement?.showSharedFiles"
+          :show-join-requests="props.config?.groupManagement?.showJoinRequests"
+          @leave-group="onLeaveGroup"
+          @destroy-group="onDestroyGroup"
+          @clear-history="onClearHistory"
+          @add-member="onAddMember"
+          @group-operation="emit('group-operation', $event)"
+          @chat-member="onChatMember"
+          @remove-member="onRemoveMember"
+          @set-admin="onSetAdmin"
+          @remove-admin="onRemoveAdmin"
+        >
+          <template
+            v-for="(_, name) in getDrawerSectionSlots()"
+            :key="name"
+            #[name]="slotProps"
+          >
+            <slot :name="name" v-bind="slotProps" />
+          </template>
+        </ChatInfoDrawer>
+      </slot>
 
       <!-- 消息搜索弹窗（居中 Modal，自带 Popup 壳） -->
       <MessageSearchModal

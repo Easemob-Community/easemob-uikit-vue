@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.0 (2026-08-20)
+
+### 新增
+
+- **Chat 抽屉三种接管能力**：`EmChatContainer` / `EmChat` 新增 `#drawer` 整块接管插槽；`ChatInfoDrawer` 新增 `drawer-header` / `drawer-profile` / `drawer-remark` / `drawer-announcement` / `drawer-members` / `drawer-admin-actions` / `drawer-management` / `drawer-actions` / `drawer-footer` / `drawer-member-detail` 十处 section 插槽；导出通用抽屉壳 `EmChatDrawer` 与 `ChatDrawerProps` / `ChatDrawerSlotScope` / `ChatInfoDrawerSlotScope` 类型。业务方可从整体替换、局部定制、自绘壳三个层级接管聊天信息抽屉。
+
+### 破坏性变更
+
+- 移除 `ChatConfig.header.customSlot` 字段（该字段此前未被代码读取，属于历史残留）。如需关闭默认抽屉入口，请改用新增的 `ChatConfig.header.showDrawerEntry`。
+
 ## 2.1.0 (2026-08-19)
 
 ### 新增
