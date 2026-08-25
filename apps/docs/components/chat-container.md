@@ -54,7 +54,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `message-action-menu`：完全接管消息操作菜单内容（PC 右键 Popup 与 H5 长按 ActionSheet 双端生效），作用域提供 `{ message, actions, select, close }`（见下方「消息操作菜单接管」）
 - `user-card` / `group-card`：分别接管用户 / 群名片弹窗渲染，作用域提供 `{ show, open, close, userId/groupId }`（见下方「弹窗接管」）
 - `invite-member`：接管入群邀请弹窗渲染，作用域提供 `{ show, groupId, existingMemberIds, open, close }`
-- `forward`：接管转发弹窗渲染，作用域提供 `{ show, messages, mode, open, close }`
+- `forward`：接管转发弹窗渲染，作用域提供 `{ show, messages, mode, open, close }`；`open(messages, mode?)` 需传入待转发的消息数组（单条默认逐条转发，多条默认合并转发）
 - `message-search`：接管消息搜索弹窗渲染，作用域提供 `{ show, config, locate, open, close }`
 - `multi-select-bar`：接管多选操作栏渲染，作用域提供 `{ visible, selectedMessages, totalMessages, selectAll, deselectAll, forwardOneByOne, forwardCombine, delete, close }`
 
@@ -101,6 +101,10 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
         <button @click="delete(selectedMessages)">删除</button>
         <button @click="close">取消</button>
       </div>
+    </template>
+    <!-- 转发弹窗：open(messages, mode?) 必须传入消息数组 -->
+    <template #forward="{ show, messages, mode, open, close }">
+      <MyForwardModal v-if="show" :messages="messages" :mode="mode" @forward="open($event.messages, $event.mode); close()" @cancel="close" />
     </template>
   </em-chat-container>
 </template>

@@ -47,6 +47,9 @@ export default defineConfig({
         insertTypesEntry: true,
         outDir: 'dist',
         exclude: ['*.config.ts', 'src/histoire-setup.ts'],
+        // 手写 .d.ts（如 src/theme/index.d.ts）一并拷贝进 dist：主题子路径需要类型声明
+        // （见 package.json exports ./theme 的 types 条件）。
+        copyDtsFiles: true,
       })]
       : []),
   ],

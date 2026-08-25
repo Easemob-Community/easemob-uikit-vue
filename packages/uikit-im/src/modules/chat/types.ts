@@ -216,7 +216,7 @@ export interface ChatConfig {
     }
     /** 是否自动聚焦输入框，默认 false */
     autoFocus?: boolean
-    /** 聚焦时边框颜色，不设置则使用默认主题色 */
+    /** 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色 */
     focusBorderColor?: string
     /** 光标颜色，不设置则使用默认 */
     caretColor?: string

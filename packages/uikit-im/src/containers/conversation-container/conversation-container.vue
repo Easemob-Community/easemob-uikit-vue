@@ -154,37 +154,37 @@ function handleReconnect() {
       @reconnect="handleReconnect"
       @header-menu-action="(key: string) => emit('header-menu-action', key)"
     >
-      <template v-if="$slots.tabs" #tabs="slotProps">
+      <template v-if="$slots['tabs']" #tabs="slotProps">
         <slot name="tabs" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.header" #header>
+      <template v-if="$slots['header']" #header>
         <slot name="header" />
       </template>
-      <template v-if="$slots.empty" #empty="slotProps">
+      <template v-if="$slots['empty']" #empty="slotProps">
         <slot name="empty" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.statusBanner" #status-banner="slotProps">
+      <template v-if="$slots['statusBanner']" #status-banner="slotProps">
         <slot name="status-banner" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.body" #body>
+      <template v-if="$slots['body']" #body>
         <slot name="body" />
       </template>
-      <template v-if="$slots.footer" #footer>
+      <template v-if="$slots['footer']" #footer>
         <slot name="footer" />
       </template>
-      <template v-if="$slots.item" #item="slotProps">
+      <template v-if="$slots['item']" #item="slotProps">
         <slot name="item" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.headerMenu" #header-menu="slotProps">
+      <template v-if="$slots['headerMenu']" #header-menu="slotProps">
         <slot name="header-menu" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.newChat" #new-chat="slotProps">
+      <template v-if="$slots['newChat']" #new-chat="slotProps">
         <slot name="new-chat" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.addContact" #add-contact="slotProps">
+      <template v-if="$slots['addContact']" #add-contact="slotProps">
         <slot name="add-contact" v-bind="slotProps" />
       </template>
-      <template v-if="$slots.createGroup" #create-group="slotProps">
+      <template v-if="$slots['createGroup']" #create-group="slotProps">
         <slot name="create-group" v-bind="slotProps" />
       </template>
     </ConversationList>

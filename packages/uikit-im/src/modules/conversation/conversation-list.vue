@@ -62,7 +62,7 @@ interface ConversationListProps {
    * 顺序即渲染优先级；传空数组可隐藏 tab 栏。
    */
   tabs?: ConversationTabKey[]
-  /** 当前激活的分栏 tab（v-model:active-tab），默认 'all' */
+  /** 当前激活的分栏 tab（v-model:active-tab）。可受控（绑定 v-model 由外部驱动）也可不受控（默认，组件内部自行维护，开箱即用） */
   activeTab?: ConversationTabKey
   /** 是否展示连接/同步状态横幅，默认 true */
   showStatusBanner?: boolean
@@ -111,6 +111,24 @@ const { stores, h5, features } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 const presence = usePresence()
+
+/**
+ * 分栏 tab 支持「受控 / 不受控」两种用法：
+ * - 受控：外部绑定 v-model:active-tab（显式传 activeTab），由外部驱动；prop 变化同步进内部态。
+ * - 不受控（默认）：外部不绑定 v-model:active-tab，组件内部自行维护态，
+ *   保证分栏 tab「开箱即用」——点击即可切换会话列表数据，无需消费者额外接线。
+ * 实现：以 internalActiveTab 为唯一状态源；activeTab prop 变化时经 watch 覆写进来；
+ * 点击 tab 时更新内部态并向上 emit update:active-tab（供受控场景/上层同步）。
+ * 注意：外部传入默认值 'all' 且不再变化时（多数不受控场景），watch 不会触发，
+ * 故内部态不被外部覆盖，点击切换得以生效。
+ */
+const internalActiveTab = ref<ConversationTabKey>(props.activeTab ?? 'all')
+watch(() => props.activeTab, (value) => {
+  if (value !== undefined && value !== null)
+    internalActiveTab.value = value
+})
+/** 实际生效的分栏 tab：不受控场景下等于 internalActiveTab，受控场景下随 prop 同步 */
+const effectiveActiveTab = computed<ConversationTabKey>(() => internalActiveTab.value)
 
 /** 会话列表是否正在从服务端同步（WebSocket 同步阶段） */
 const isSyncing = computed(() => stores.conversation.isSyncingConversations)
@@ -317,8 +335,9 @@ const tabEmptyTexts: Record<ConversationTabKey, string> = {
 
 /** 切换分栏 tab */
 function selectTab(tab: ConversationTabKey) {
-  if (tab === props.activeTab)
+  if (tab === effectiveActiveTab.value)
     return
+  internalActiveTab.value = tab
   emit('update:active-tab', tab)
 }
 
@@ -330,7 +349,7 @@ function selectTab(tab: ConversationTabKey) {
  * - single / group：按会话类型过滤
  */
 const tabFilteredList = computed(() => {
-  const tab = props.activeTab
+  const tab = effectiveActiveTab.value
   if (tab === 'all' || !tab)
     return conversationList.value
   if (tab === 'unread')
@@ -360,7 +379,7 @@ const filteredConversationList = computed(() => {
 const emptyDescription = computed(() => {
   if (normalizedSearchKeyword.value)
     return t('conversation.noSearchResult')
-  return props.emptyText || tabEmptyTexts[props.activeTab] || t('conversation.empty')
+  return props.emptyText || tabEmptyTexts[effectiveActiveTab.value] || t('conversation.empty')
 })
 
 /** 当前会话列表中可见的单聊对方用户 ID，用于 Presence 兜底拉取 */
@@ -556,7 +575,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
          提供 #tabs 插槽（作用域 tabs/activeTab/selectTab）时完全接管渲染 -->
     <ConversationTabs
       :tabs="props.tabs"
-      :active-tab="props.activeTab"
+      :active-tab="effectiveActiveTab"
       @update:active-tab="selectTab"
     >
       <template v-if="$slots.tabs" #default="slotScope">
@@ -665,7 +684,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         :description="emptyDescription"
       >
         <template #description>
-          <slot name="empty" :search-keyword="normalizedSearchKeyword" :active-tab="props.activeTab">
+          <slot name="empty" :search-keyword="normalizedSearchKeyword" :active-tab="effectiveActiveTab">
             {{ emptyDescription }}
           </slot>
         </template>

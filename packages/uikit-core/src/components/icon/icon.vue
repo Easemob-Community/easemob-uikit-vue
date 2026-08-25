@@ -78,10 +78,14 @@ const typeClass = computed(() => {
 /** 内置动画类名 */
 const animClass = computed(() => (props.anim ? `uikit-icon--anim-${props.anim}` : ''))
 
-/** 让 path 使用 fill/stroke="currentColor" 的图标也能响应 color prop */
-const colorStyle = computed(() => ({
-  color: props.color,
-}))
+/**
+ * 让 path 使用 fill/stroke="currentColor" 的图标也能响应 color prop。
+ * 注意：只有**显式传入 color** 时才内联 color —— inline style 优先级高于 CSS 类，
+ * 若默认 currentColor 也内联，会覆盖业务侧通过 class 设置的图标色
+ * （如会话草稿 icon 的 `.conversation-item__draft-icon { color: var(--uikit-danger-color) }`），
+ * 且 currentColor 循环解析会回落到继承色导致 class 色失效。
+ */
+const colorStyle = computed(() => (props.color === 'currentColor' ? {} : { color: props.color }))
 </script>
 
 <template>

@@ -210,11 +210,11 @@ const drawerTitle = computed(() => {
   return map[key]
 })
 
-function openDrawer(key: ManagementKey) {
+function openPanel(key: ManagementKey) {
   activeDrawerKey.value = key
 }
 
-function closeDrawer() {
+function closePanel() {
   activeDrawerKey.value = null
 }
 </script>
@@ -255,7 +255,7 @@ function closeDrawer() {
         show-arrow
         size="compact"
         :inset-hover="false"
-        @click="openDrawer(entry.key)"
+        @click="openPanel(entry.key)"
       >
         <template #leading>
           <Icon :name="entry.icon" :size="18" />
@@ -269,7 +269,7 @@ function closeDrawer() {
       v-model:show="showDrawer"
       :overlay="true"
       :close-on-click-overlay="true"
-      @close="closeDrawer"
+      @close="closePanel"
     >
       <template #header>
         <div class="group-management-section__drawer-header">
@@ -279,7 +279,7 @@ function closeDrawer() {
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"
-            @click="closeDrawer"
+            @click="closePanel"
           />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
@@ -316,8 +316,8 @@ function closeDrawer() {
           name="mute-list"
           :show="activeDrawerKey === 'mute'"
           :group-id="props.groupId"
-          :open="openDrawer"
-          :close="closeDrawer"
+          :open="openPanel"
+          :close="closePanel"
         >
           <EmGroupMuteList
             v-if="activeDrawerKey === 'mute'"
@@ -332,8 +332,8 @@ function closeDrawer() {
           name="block-list"
           :show="activeDrawerKey === 'block'"
           :group-id="props.groupId"
-          :open="openDrawer"
-          :close="closeDrawer"
+          :open="openPanel"
+          :close="closePanel"
         >
           <EmGroupBlocklist
             v-if="activeDrawerKey === 'block'"
@@ -348,8 +348,8 @@ function closeDrawer() {
           name="allow-list"
           :show="activeDrawerKey === 'allow'"
           :group-id="props.groupId"
-          :open="openDrawer"
-          :close="closeDrawer"
+          :open="openPanel"
+          :close="closePanel"
         >
           <EmGroupAllowlist
             v-if="activeDrawerKey === 'allow'"
@@ -362,8 +362,8 @@ function closeDrawer() {
           name="shared-files"
           :show="activeDrawerKey === 'files'"
           :group-id="props.groupId"
-          :open="openDrawer"
-          :close="closeDrawer"
+          :open="openPanel"
+          :close="closePanel"
         >
           <EmGroupSharedFileList
             v-if="activeDrawerKey === 'files'"
@@ -376,8 +376,8 @@ function closeDrawer() {
           name="join-requests"
           :show="activeDrawerKey === 'requests'"
           :group-id="props.groupId"
-          :open="openDrawer"
-          :close="closeDrawer"
+          :open="openPanel"
+          :close="closePanel"
         >
           <EmGroupJoinRequestList
             v-if="activeDrawerKey === 'requests'"
@@ -395,7 +395,7 @@ function closeDrawer() {
       v-model:show="showDrawer"
       position="center"
       :close-on-click-overlay="true"
-      @close="closeDrawer"
+      @close="closePanel"
     >
       <div class="group-management-section__modal">
         <div class="group-management-section__drawer-header">
@@ -405,7 +405,7 @@ function closeDrawer() {
             size="small"
             variant="ghost"
             :title="t('button.back', '返回')"
-            @click="closeDrawer"
+            @click="closePanel"
           />
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
@@ -440,8 +440,8 @@ function closeDrawer() {
             name="mute-list"
             :show="activeDrawerKey === 'mute'"
             :group-id="props.groupId"
-            :open="openDrawer"
-            :close="closeDrawer"
+            :open="openPanel"
+            :close="closePanel"
           >
             <EmGroupMuteList
               v-if="activeDrawerKey === 'mute'"
@@ -456,8 +456,8 @@ function closeDrawer() {
             name="block-list"
             :show="activeDrawerKey === 'block'"
             :group-id="props.groupId"
-            :open="openDrawer"
-            :close="closeDrawer"
+            :open="openPanel"
+            :close="closePanel"
           >
             <EmGroupBlocklist
               v-if="activeDrawerKey === 'block'"
@@ -472,8 +472,8 @@ function closeDrawer() {
             name="allow-list"
             :show="activeDrawerKey === 'allow'"
             :group-id="props.groupId"
-            :open="openDrawer"
-            :close="closeDrawer"
+            :open="openPanel"
+            :close="closePanel"
           >
             <EmGroupAllowlist
               v-if="activeDrawerKey === 'allow'"
@@ -486,8 +486,8 @@ function closeDrawer() {
             name="shared-files"
             :show="activeDrawerKey === 'files'"
             :group-id="props.groupId"
-            :open="openDrawer"
-            :close="closeDrawer"
+            :open="openPanel"
+            :close="closePanel"
           >
             <EmGroupSharedFileList
               v-if="activeDrawerKey === 'files'"
@@ -500,8 +500,8 @@ function closeDrawer() {
             name="join-requests"
             :show="activeDrawerKey === 'requests'"
             :group-id="props.groupId"
-            :open="openDrawer"
-            :close="closeDrawer"
+            :open="openPanel"
+            :close="closePanel"
           >
             <EmGroupJoinRequestList
               v-if="activeDrawerKey === 'requests'"

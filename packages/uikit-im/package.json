@@ -17,7 +17,10 @@
       "types": "./dist/auto-imports.d.ts",
       "import": "./dist/auto-imports.js"
     },
-    "./theme": "./dist/theme/index.css"
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "default": "./dist/theme/index.css"
+    }
   },
   "main": "./dist/easemob-uikit-im.umd.cjs",
   "module": "./dist/easemob-uikit-im.js",
@@ -35,7 +38,7 @@
     "story:build": "histoire build"
   },
   "peerDependencies": {
-    "pinia": "^2.1.0",
+    "pinia": "^2.1.0 || ^4.0.0",
     "vue": "^3.3.0"
   },
   "dependencies": {

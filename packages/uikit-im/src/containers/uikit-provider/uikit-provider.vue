@@ -310,6 +310,17 @@ watch(
         logger.warn('[UIKit] fetch contacts failed:', formatSdkError(e))
       }
     }
+
+    // 在线状态：服务端禁止订阅自己（cannot_subscribe_yourself），自身状态只能主动查询；
+    // 登录后拉取一次自己的状态，让 EmPresenceAvatar 等"自己头像"立即展示在线状态点。
+    if (features.value.enablePresence && ctx.stores.client.currentUser) {
+      try {
+        await ctx.domains.presence.fetchStatus([ctx.stores.client.currentUser])
+      }
+      catch (e) {
+        logger.warn('[UIKit] fetch own presence failed:', formatSdkError(e))
+      }
+    }
   },
   { immediate: false },
 )

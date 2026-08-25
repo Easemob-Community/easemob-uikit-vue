@@ -1,6 +1,9 @@
-/* uikit-im 主题入口：CSS 变量已迁入 @easemob/uikit-core（P1 Step 4），
-   此处 @import 由 vite 内联展开 core 的变量表，保持 `@easemob/uikit-im/theme` 产物兼容。
-   解析位置：uikit-im 自身构建 / histoire 经 vite alias 指向 core src（无需先构建 core dist）；
-   外部消费者经 package exports 指向 core dist/theme/index.css。
+/* uikit-im 主题入口：CSS 变量与 core 原子组件（Avatar/Icon/Popup…）的 scoped 样式
+   已迁入 @easemob/uikit-core（P1 Step 4）。
+   此处 @import 由 vite 内联展开 **core 的 dist/theme/index.css**（变量表 + core 组件 scoped 样式），
+   使 `@easemob/uikit-im/theme` 对外自包含：外部消费者只 import '@easemob/uikit-im/theme'
+   即可获得 im 组件样式 + core 组件样式，避免 core 组件（头像/右键菜单等）失去样式。
+   解析位置：uikit-im 自身构建经 vite alias 指向 core dist（要求 core 先构建，pnpm -r build 自动排序）；
+   histoire 预览直接编译 core src SFC，样式由 core src 注入，alias 指向 core src 即可。
    uikit-im 自有补充变量追加在本文件下方。 */
 @import '@easemob/uikit-core/theme';

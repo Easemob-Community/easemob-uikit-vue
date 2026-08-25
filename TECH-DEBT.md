@@ -1192,3 +1192,13 @@
     - `modules/chat/chat.vue` 预拉公告条件改为 `announcement === undefined`。
   - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
   - 关联 skill：`uikit-store-composable` / `uikit-component-authoring` / `websdk2-uikit-migration`。
+
+- [x] **D121. `@easemob/uikit-im/theme` 只内联 core 变量表、缺 core 组件样式，外部消费者 core 组件（Avatar/Icon/Popup 等）全失样式**
+  - 已于 2026-08-25 修复（本次）。
+  - 现象：把 `@easemob/uikit-im` 以 tgz 引入独立 Vue3 工程并只 `import '@easemob/uikit-im/theme'` 后，出现：① Avatar 完全失去样式能力、无法展示有效头像；② 右键会话列表的菜单弹层直接飞到屏幕左侧；③ 右键消息气泡的菜单同理飞到左侧。而 uikit 内 docs/demo 源码直连（apps/demo vite alias → src）无此问题。
+  - 根因：`@easemob/uikit-core` 是 im 的**外置依赖**，其原子组件（Avatar/Icon/Popup/IconButton/Button…）的 scoped 样式只存在于 core 自己的 `dist/theme/index.css`（`cssCodeSplit:false` 把 core 全部组件样式抽进该文件）。而 `packages/uikit-im/vite.config.ts` 的 alias 把 `@easemob/uikit-core/theme` 指向 core 的 **src** `src/theme/index.css`（仅 `:root` 变量表，无组件 scoped 样式），于是 im 构建把该 @import 内联成"只有变量"的产物——`@easemob/uikit-im/theme` 丢失 core 组件样式。demo/docs 源码直连因为会直接编译 core 的 `.vue` SFC（demo 把 `@easemob/uikit-core` alias 到 src），core 组件样式由 demo 的 Vite 注入，所以 demo 正常、tgz 消费者异常。核心迁移设计（CORE-MIGRATION-CHECKLIST ⑤）假设"外部消费者走 package exports → core dist"，但被 im 构建的 @import 内联行为破坏，属设计意图与实际产物不一致。
+  - 证据：对比 `packages/uikit-im/dist/theme/index.css`（仅 149KB，无 `.uikit-avatar[data-v-*]` / `.uikit-popup[data-v-*]`）与 `packages/uikit-core/dist/theme/index.css`（65.8KB，含上述组件 scoped 样式）；`conversation-item.vue` L403 / `message-bubble-wrapper.vue` 的右键菜单均经 `EmPopup`（core）锚定，而 popup 的 `position:fixed` scoped 规则缺失导致菜单飞到左上。
+  - 建议修法：im 构建的 theme @import 指向 core 的 **dist** `dist/theme/index.css`（变量 + core 组件 scoped 样式一起内联），使 `@easemob/uikit-im/theme` 对外自包含；历史（histoire 预览）仍指向 core src（直接编译 SFC）。
+  - 修复：`packages/uikit-im/vite.config.ts` 的 `@easemob/uikit-core/theme` alias 由 `../uikit-core/src/theme/index.css` 改为 `../uikit-core/dist/theme/index.css`；同步更新 `src/theme/index.css` 注释说明"内联 core dist（变量+组件样式）"与新构建顺序要求（core 先构建，`pnpm -r build` 按拓扑序自动满足）。重建后 `dist/theme/index.css` 由 149KB 增至 201KB，已确认内联 `.uikit-avatar` / `.uikit-popup` / `.uikit-icon-button` 等 core 组件 scoped 样式；重新 `pnpm pack` 生成的 tgz 已替换进复现工程并 `pnpm install`，`node_modules/@easemob/uikit-im/dist/theme/index.css` 现含 core 组件样式（`uikit-avatar[data-v-c6ed0614]`、`uikit-popup[data-v-45fed6cb]`）。
+  - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）+ `pnpm -F @easemob/uikit-im build`（成功）+ `cd apps/demo && pnpm exec vue-tsc --noEmit`（0 错误）均通过。
+  - 关联 skill：`uikit-release-build` / `uikit-styling-theming` / `uikit-chat-interactions`。

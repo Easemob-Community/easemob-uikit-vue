@@ -3,7 +3,64 @@ import { ref, useSlots } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
+import type { ForwardModeValue } from '@easemob/uikit-core'
 import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
+
+/** #user-card 插槽作用域 */
+export interface ChatContainerUserCardSlotScope {
+  show: boolean
+  userId: string
+  open: () => void
+  close: () => void
+}
+
+/** #group-card 插槽作用域 */
+export interface ChatContainerGroupCardSlotScope {
+  show: boolean
+  groupId: string
+  open: () => void
+  close: () => void
+}
+
+/** #invite-member 插槽作用域 */
+export interface ChatContainerInviteMemberSlotScope {
+  show: boolean
+  groupId: string
+  existingMemberIds: string[]
+  open: (groupId: string) => void
+  close: () => void
+}
+
+/** #forward 插槽作用域 */
+export interface ChatContainerForwardSlotScope {
+  show: boolean
+  messages: UiMessage[]
+  mode: ForwardModeValue
+  open: (messages: UiMessage[], mode?: ForwardModeValue) => void
+  close: () => void
+}
+
+/** #message-search 插槽作用域 */
+export interface ChatContainerMessageSearchSlotScope {
+  show: boolean
+  config: Record<string, any> | undefined
+  locate: (payload: { msgId: string, conversationId: string }) => void
+  open: () => void
+  close: () => void
+}
+
+/** #multi-select-bar 插槽作用域 */
+export interface ChatContainerMultiSelectBarSlotScope {
+  visible: boolean
+  selectedMessages: UiMessage[]
+  totalMessages: number
+  selectAll: () => void
+  deselectAll: () => void
+  forwardOneByOne: () => void
+  forwardCombine: () => void
+  delete: (messages: UiMessage[]) => void
+  close: () => void
+}
 
 export interface ChatContainerProps {
   /** 聊天页面配置 */
@@ -86,6 +143,25 @@ defineExpose({
       <!-- 透传 drawer 插槽（显式声明以保留 ChatDrawerSlotScope 类型提示） -->
       <template #drawer="slotProps">
         <slot name="drawer" v-bind="slotProps" />
+      </template>
+      <!-- 透传名片 / 邀请 / 转发 / 搜索 / 多选栏插槽（显式声明以保留作用域类型提示） -->
+      <template #user-card="slotProps">
+        <slot name="user-card" v-bind="slotProps" />
+      </template>
+      <template #group-card="slotProps">
+        <slot name="group-card" v-bind="slotProps" />
+      </template>
+      <template #invite-member="slotProps">
+        <slot name="invite-member" v-bind="slotProps" />
+      </template>
+      <template #forward="slotProps">
+        <slot name="forward" v-bind="slotProps" />
+      </template>
+      <template #message-search="slotProps">
+        <slot name="message-search" v-bind="slotProps" />
+      </template>
+      <template #multi-select-bar="slotProps">
+        <slot name="multi-select-bar" v-bind="slotProps" />
       </template>
       <!-- 透传所有消息类型级插槽（如 #message-txt, #message-footer-txt 等） -->
       <template

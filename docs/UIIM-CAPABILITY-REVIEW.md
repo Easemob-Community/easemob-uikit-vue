@@ -1,6 +1,6 @@
 # uikit-im 组件插槽与 Props 可控性反向评估（UIIM-CAPABILITY-REVIEW）
 
-> 评估日期：2026-08-20。评估对象：`@easemob/uikit-im` 2.1.0（`packages/uikit-im/src`）。
+> 评估日期：2026-08-20。评估对象：`@easemob/uikit-im` 2.3.0（`packages/uikit-im/src`）。
 > 方法：消费者视角反向推演——「接入方想做什么 → 当前 API 能否做到 → 卡在哪」，
 > 覆盖容器层 / 会话模块 / 聊天模块 / 群组模块四层。
 > 状态：**评估完成，待按优先级排期实施**。关联 TECH-DEBT：D120。
