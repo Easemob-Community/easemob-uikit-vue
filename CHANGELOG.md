@@ -1,5 +1,18 @@
 # Changelog
 
+## @easemob/uikit-im 2.4.0 (2026-08-25)
+
+### 新增
+
+- **通讯录黑名单同级入口**（`EmContactContainer` / `EmAddressBookContainer`）：
+  - 新增 `showBlocklist` / `blocklistLabel` / `blocklistIcon` props、`blocklist-click` 事件与 `goBlocklist()` 命令式方法；黑名单入口在 Provider `enableBlocklist=true` 时展示，与「群组 / 通讯录(好友)」同级；
+  - 新增黑名单列表组件 **`EmBlockList` / `EmBlockListContainer`**：空态占位、列表项复用 `EmContactItem` 并遵循头像形状主题配置，行右键菜单「移出黑名单」（确认后 `removeBlock` 并同步 store），对外事件 `click` / `contextmenu` / `unblock`，容器层透传 `blocklist-item-click` / `blocklist-item-contextmenu` / `blocklist-unblock`；
+  - 新增 i18n `contact.entryBlocklist` 与 `contact.blocklist.*` 文案（zh-CN / en）。
+
+### 类型导出
+
+- 新增 `BlockListContainerProps` 公开类型。
+
 ## 2.3.0 (2026-08-20)
 
 ### 新增
@@ -561,6 +574,12 @@
 - 新增 `.agent/skills/uikit-h5-adaptation/SKILL.md`，并更新 `AGENTS.md`、相关 skill 与 `TECH-DEBT.md`。
 
 ---
+
+## @easemob/uikit-core 1.2.0 (2026-08-25)
+
+### 新增
+
+- **通讯录黑名单 i18n 文案**：新增 `contact.entryBlocklist` 与 `contact.blocklist.empty` / `contact.blocklist.remove` / `contact.blocklist.removeConfirmTitle` / `contact.blocklist.removeConfirm` / `contact.blocklist.removeSuccess` / `contact.blocklist.removeFailed`（zh-CN / en），供 uikit-im 黑名单列表使用。
 
 ## @easemob/uikit-core 1.1.0 (2026-08-19)
 

@@ -14,7 +14,7 @@ import { useGroupStore } from '../../store/group'
 import type { ContactNavEntry } from '../../modules/contact/contact-nav.vue'
 
 /** 容器视图状态 */
-export type AddressBookContainerView = 'home' | 'contact' | 'group' | 'notice' | string
+export type AddressBookContainerView = 'home' | 'contact' | 'group' | 'notice' | 'blocklist' | string
 
 /** 入口项配置 */
 export interface AddressBookContainerEntry {
@@ -66,6 +66,8 @@ export interface AddressBookContainerProps {
   showGroup?: boolean
   /** 是否展示「联系人」入口，默认 true */
   showContact?: boolean
+  /** 是否展示「黑名单」入口，默认 true（Provider.enableBlocklist=false 时强制隐藏） */
+  showBlocklist?: boolean
   /** 「通知」徽标数量，默认 0（外部注入） */
   noticeCount?: number
   /** 「群组」入口右侧数量，不传默认取 store 实际数量；传 0 则不展示 */
@@ -74,16 +76,18 @@ export interface AddressBookContainerProps {
   contactCount?: number
   /** 是否自动从 store 推断 groupCount/contactCount（仅未显式传入时生效），默认 true */
   autoEntryCount?: boolean
-  /** 入口顺序，默认 ['notice', 'group', 'contact'] */
+  /** 入口顺序，默认 ['notice', 'group', 'contact', 'blocklist'] */
   entryOrder?: AddressBookContainerEntryKey[]
   /** 自定义入口标签，不传则走 i18n */
   noticeLabel?: string
   groupLabel?: string
   contactLabel?: string
+  blocklistLabel?: string
   /** 自定义入口图标 */
   noticeIcon?: string
   groupIcon?: string
   contactIcon?: string
+  blocklistIcon?: string
   /** 是否持久化未处理通知（好友申请 + 群邀请），开启后首页徽标在刷新后也能立即显示红点 */
   noticePersistInvites?: boolean | 'local' | 'session'
   /** 初始视图（默认 home） */
@@ -102,9 +106,10 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   showNotice: true,
   showGroup: true,
   showContact: true,
+  showBlocklist: true,
   noticeCount: undefined,
   autoEntryCount: true,
-  entryOrder: () => ['notice', 'group', 'contact'] as const,
+  entryOrder: () => ['notice', 'group', 'contact', 'blocklist'] as const,
   noticePersistInvites: false,
   showContactAddButton: true,
   showGroupCreateButton: true,
@@ -117,6 +122,7 @@ const emit = defineEmits<{
   (e: 'home-search', keyword: string): void
   (e: 'add-contact'): void
   (e: 'create-group'): void
+  (e: 'blocklist-click'): void
 }>()
 
 const { t } = useLocale()
@@ -131,6 +137,9 @@ const groupStore = useGroupStore()
 
 /** 群组能力是否启用（Provider 层冻结） */
 const groupEnabled = computed(() => features.enableGroup !== false)
+
+/** 黑名单能力是否启用（Provider 层冻结） */
+const blocklistEnabled = computed(() => props.showBlocklist && features.enableBlocklist !== false)
 
 const view = ref<AddressBookContainerView>(resolveInitialView())
 
@@ -156,7 +165,7 @@ onMounted(() => {
 })
 
 const enabledCount = computed(() => {
-  const builtIn = [props.showNotice, props.showGroup, props.showContact].filter(Boolean).length
+  const builtIn = [props.showNotice, props.showGroup, props.showContact, blocklistEnabled.value].filter(Boolean).length
   const custom = (props.entries ?? []).filter((e) => e.visible !== false).length
   return builtIn + custom
 })
@@ -168,17 +177,18 @@ function resolveInitialView(): AddressBookContainerView {
   if (props.initialView) return props.initialView
   // 单入口降级（仅内置入口）
   const customVisible = (props.entries ?? []).filter((e) => e.visible !== false)
-  if (customVisible.length === 1 && !props.showContact && !props.showGroup && !props.showNotice) {
+  if (customVisible.length === 1 && !props.showContact && !props.showGroup && !props.showNotice && !props.showBlocklist) {
     return customVisible[0].key
   }
-  if (props.showContact && !props.showGroup && !props.showNotice) return 'contact'
-  if (props.showGroup && !props.showContact && !props.showNotice) return 'group'
-  if (props.showNotice && !props.showContact && !props.showGroup) return 'notice'
+  if (props.showContact && !props.showGroup && !props.showNotice && !props.showBlocklist) return 'contact'
+  if (props.showGroup && !props.showContact && !props.showNotice && !props.showBlocklist) return 'group'
+  if (props.showNotice && !props.showContact && !props.showGroup && !props.showBlocklist) return 'notice'
+  if (blocklistEnabled.value && !props.showContact && !props.showGroup && !props.showNotice) return 'blocklist'
   return 'home'
 }
 
 watch(
-  () => [props.showContact, props.showGroup, props.showNotice, props.initialView] as const,
+  () => [props.showContact, props.showGroup, props.showNotice, props.showBlocklist, props.initialView] as const,
   () => {
     view.value = resolveInitialView()
   },
@@ -215,10 +225,15 @@ const resolvedNoticeCount = computed(() => {
   return stores.contact.pendingCount
 })
 
+const resolvedBlocklistCount = computed(() => {
+  if (!props.autoEntryCount) return 0
+  return stores.contact.blackList.length
+})
+
 type NavEntryWithSort = ContactNavEntry & { sort?: number }
 
 const navEntries = computed<ContactNavEntry[]>(() => {
-  const order = props.entryOrder ?? (['notice', 'group', 'contact'] as const)
+  const order = props.entryOrder ?? (['notice', 'group', 'contact', 'blocklist'] as const)
   const map: Record<string, ContactNavEntry> = {
     notice: {
       key: 'notice',
@@ -241,6 +256,13 @@ const navEntries = computed<ContactNavEntry[]>(() => {
       count: resolvedContactCount.value,
       icon: props.contactIcon,
       visible: props.showContact,
+    },
+    blocklist: {
+      key: 'blocklist',
+      label: props.blocklistLabel || t('contact.entryBlocklist'),
+      count: resolvedBlocklistCount.value,
+      icon: props.blocklistIcon,
+      visible: blocklistEnabled.value,
     },
   }
   const builtInEntries = order.map((k) => map[k]).filter((e): e is ContactNavEntry => Boolean(e))
@@ -278,6 +300,9 @@ function onEntryClick(key: string) {
   if (key === 'notice') {
     emit('notice-click')
   }
+  if (key === 'blocklist') {
+    emit('blocklist-click')
+  }
   // 自定义入口若声明了 to = false，则仅触发事件，不自动跳转视图
   const custom = (props.entries ?? []).find((e) => e.key === key)
   if (custom && custom.to === false) {
@@ -299,6 +324,9 @@ function goGroup() {
 function goNotice() {
   view.value = 'notice'
 }
+function goBlocklist() {
+  view.value = 'blocklist'
+}
 function goTo(key: string) {
   view.value = key
 }
@@ -309,6 +337,7 @@ defineExpose({
   goContact,
   goGroup,
   goNotice,
+  goBlocklist,
   goTo,
 })
 
@@ -317,6 +346,7 @@ const subviewTitle = computed(() => {
   if (view.value === 'group') return props.groupLabel || t('contact.entryGroup')
   if (view.value === 'contact') return props.contactLabel || t('contact.entryContact')
   if (view.value === 'notice') return props.noticeLabel || t('contact.entryNotice')
+  if (view.value === 'blocklist') return props.blocklistLabel || t('contact.entryBlocklist')
   const custom = (props.entries ?? []).find((e) => e.key === view.value)
   if (custom) return custom.label
   return ''

@@ -4,6 +4,7 @@ import type { Component } from 'vue'
 import AddressBookContainer from '../address-book-container/address-book-container.vue'
 import ContactListContainer from '../contact-list-container/contact-list-container.vue'
 import GroupListContainer from '../group-list-container/group-list-container.vue'
+import BlockListContainer from '../block-list-container/block-list-container.vue'
 import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
 import type {
   AddressBookContainerEntry,
@@ -32,10 +33,10 @@ import type { GroupFilterFn } from '../../composables/use-group-filter'
 import type { UiContact as Contact, UiGroup as Group } from '@easemob/uikit-core'
 
 /** 容器视图状态（兼容旧命名） */
-export type ContactContainerView = 'home' | 'group' | 'contact' | 'notice'
+export type ContactContainerView = 'home' | 'group' | 'contact' | 'notice' | 'blocklist'
 
 /** 入口标识（兼容旧命名） */
-export type ContactContainerEntryKey = 'notice' | 'group' | 'contact'
+export type ContactContainerEntryKey = 'notice' | 'group' | 'contact' | 'blocklist'
 
 /** 视图过场名称 */
 export type ContactContainerTransition = 'none' | 'slide' | 'fade'
@@ -65,6 +66,8 @@ export interface ContactContainerProps {
   showNewRequest?: boolean
   showGroup?: boolean
   showContact?: boolean
+  /** 是否展示「黑名单」入口，默认 true（Provider.enableBlocklist=false 时强制隐藏） */
+  showBlocklist?: boolean
   /** 「通知」徽标数量，默认 0（外部注入） */
   noticeCount?: number
   /** @deprecated 请使用 noticeCount */
@@ -78,11 +81,13 @@ export interface ContactContainerProps {
   newRequestLabel?: string
   groupLabel?: string
   contactLabel?: string
+  blocklistLabel?: string
   noticeIcon?: string
   /** @deprecated 请使用 noticeIcon */
   newRequestIcon?: string
   groupIcon?: string
   contactIcon?: string
+  blocklistIcon?: string
   initialView?: ContactContainerView
   /** 自定义入口列表，传入后按数组顺序展示，可与内置入口共存 */
   entries?: AddressBookContainerEntry[]
@@ -167,6 +172,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showNotice: true,
   showGroup: true,
   showContact: true,
+  showBlocklist: true,
   autoEntryCount: true,
   sortBy: 'none',
   groupBy: 'alphabet',
@@ -230,6 +236,10 @@ const emit = defineEmits<{
   (e: 'update:groupSelectedIds', ids: string[]): void
   (e: 'add-contact'): void
   (e: 'create-group'): void
+  (e: 'blocklist-click'): void
+  (e: 'blocklist-item-click', contact: Contact): void
+  (e: 'blocklist-item-contextmenu', event: MouseEvent, contact: Contact): void
+  (e: 'blocklist-unblock', contact: Contact): void
 }>()
 
 const addressBookRef = ref<InstanceType<typeof AddressBookContainer>>()
@@ -256,6 +266,9 @@ function goGroup() {
 function goNotice() {
   addressBookRef.value?.goNotice()
 }
+function goBlocklist() {
+  addressBookRef.value?.goBlocklist()
+}
 function goTo(key: string) {
   addressBookRef.value?.goTo(key)
 }
@@ -271,6 +284,7 @@ defineExpose({
   goContact,
   goGroup,
   goNotice,
+  goBlocklist,
   goTo,
   setView: goTo,
   scrollToGroup,
@@ -290,6 +304,7 @@ defineExpose({
     :show-notice="effectiveShowNotice"
     :show-group="props.showGroup"
     :show-contact="props.showContact"
+    :show-blocklist="props.showBlocklist"
     :notice-count="effectiveNoticeCount"
     :group-count="props.groupCount"
     :contact-count="props.contactCount"
@@ -298,9 +313,11 @@ defineExpose({
     :notice-label="props.noticeLabel ?? props.newRequestLabel"
     :group-label="props.groupLabel"
     :contact-label="props.contactLabel"
+    :blocklist-label="props.blocklistLabel"
     :notice-icon="props.noticeIcon ?? props.newRequestIcon"
     :group-icon="props.groupIcon"
     :contact-icon="props.contactIcon"
+    :blocklist-icon="props.blocklistIcon"
     :entries="props.entries"
     :initial-view="props.initialView as AddressBookContainerView"
     :show-contact-add-button="props.showContactAddButton"
@@ -311,6 +328,7 @@ defineExpose({
     @home-search="(k) => emit('home-search', k)"
     @add-contact="emit('add-contact')"
     @create-group="emit('create-group')"
+    @blocklist-click="emit('blocklist-click')"
   >
     <template #header>
       <slot name="header" />
@@ -488,12 +506,33 @@ defineExpose({
         <slot name="notice" />
         <ContactNoticeList v-if="!$slots.notice" />
       </div>
+
+      <!-- Blocklist 子视图 -->
+      <BlockListContainer
+        v-else-if="view === 'blocklist'"
+        class="contact-container__blocklist-view"
+        :show-header="false"
+        :title="props.blocklistLabel"
+        @click="(c: Contact) => emit('blocklist-item-click', c)"
+        @contextmenu="(e: MouseEvent, c: Contact) => emit('blocklist-item-contextmenu', e, c)"
+        @unblock="(c: Contact) => emit('blocklist-unblock', c)"
+      >
+        <template v-if="$slots['blocklist-header']" #header>
+          <slot name="blocklist-header" />
+        </template>
+      </BlockListContainer>
     </template>
   </AddressBookContainer>
 </template>
 
 <style scoped>
 .contact-container__notice-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.contact-container__blocklist-view {
   flex: 1;
   min-height: 0;
   display: flex;

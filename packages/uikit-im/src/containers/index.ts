@@ -7,6 +7,7 @@ export { default as EmContactContainer } from './contact-container/contact-conta
 export { default as EmAddressBookContainer } from './address-book-container/address-book-container.vue'
 export { default as EmContactListContainer } from './contact-list-container/contact-list-container.vue'
 export { default as EmGroupListContainer } from './group-list-container/group-list-container.vue'
+export { default as EmBlockListContainer } from './block-list-container/block-list-container.vue'
 
 export type {
   ContactContainerProps,
@@ -23,6 +24,7 @@ export type {
 } from './address-book-container/address-book-container.vue'
 export type { ContactListContainerProps } from './contact-list-container/contact-list-container.vue'
 export type { GroupListContainerProps } from './group-list-container/group-list-container.vue'
+export type { BlockListContainerProps } from './block-list-container/block-list-container.vue'
 export type {
   ChatContainerProps,
   ChatContainerEmits,
