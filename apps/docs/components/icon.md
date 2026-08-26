@@ -8,7 +8,7 @@
 
 ```vue
 <template>
-  <em-icon name="check">
+  <em-icon name="check/single">
     <path d="..." />
   </em-icon>
 </template>

@@ -35,10 +35,10 @@ apps/docs/.vitepress/cache
 tmp/
 
 # Design source assets (icon sets, see 线性/icon, 面性/icon, icon/, 消息状态以及未读状态, assets/icons-next)
-线性/
-面性/
-icon/
-消息状态以及未读状态/
+/线性/
+/面性/
+/icon/
+/消息状态以及未读状态/
 packages/uikit-im/src/assets/icons-next/
 
 # VitePress vite-node 加载 vite.config.ts 的临时产物（dev server 被强杀时残留）

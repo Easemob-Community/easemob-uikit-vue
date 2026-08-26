@@ -76,7 +76,7 @@ const sizes = ['small', 'medium', 'large'] as const
             :disabled="config.disabled"
             :loading="config.loading"
           >
-            <em-icon name="check" :size="16" />
+            <em-icon name="check/single" :size="16" />
             带图标
           </em-button>
         </div>

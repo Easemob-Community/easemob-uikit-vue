@@ -29,9 +29,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons && node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons ../uikit-core/src/assets/icons-v2 && node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
-    "icons:check": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons",
+    "icons:check": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons ../uikit-core/src/assets/icons-v2",
     "auto-imports:check": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check",
     "aux:gen": "node ../uikit-core/scripts/gen-aux-entries.mjs .",
     "story:dev": "histoire dev",

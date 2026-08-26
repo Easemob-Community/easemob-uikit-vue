@@ -925,7 +925,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                   class="chat-info-drawer__member-cell chat-info-drawer__member-cell--add"
                   @click.stop="onAddMember"
                 >
-                  <Icon name="rect/plus" :size="48" />
+                  <Icon name="plus" :size="48" />
                 </div>
               </div>
               <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
