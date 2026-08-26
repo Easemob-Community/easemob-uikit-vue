@@ -55,7 +55,7 @@ const categories = [
   { key: 'contact', label: '通讯录', icon: 'person/list' },
   { key: 'ai', label: 'AI', icon: 'bubble/rect/empty' },
   { key: 'data', label: '演示数据', icon: 'archive' },
-  { key: 'notification', label: '通知', icon: 'status/info' },
+  { key: 'notification', label: '通知', icon: 'bell' },
   { key: 'developer', label: '开发者', icon: 'doc' },
   { key: 'provider', label: 'Provider', icon: 'shield' },
   { key: 'sdk', label: 'SDK 登录', icon: 'lock/open' },

@@ -27,7 +27,7 @@ export interface InputProps {
   error?: boolean
   /** 错误提示文案；传入时显示在输入框下方 */
   errorMessage?: string
-  /** 错误图标名称，默认 "status/info" */
+  /** 错误图标名称，默认 "circle/bang" */
   errorIcon?: string
   /** 是否只读；只读时背景置灰但文字仍可选中复制 */
   readonly?: boolean
@@ -64,7 +64,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   clearIcon: 'xmark/light',
   error: false,
   errorMessage: '',
-  errorIcon: 'status/info',
+  errorIcon: 'circle/bang',
   readonly: false,
 })
 

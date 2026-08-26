@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 const iconMap: Record<NonNullable<ToastProps['type']>, { name: string, type: IconProps['type'] }> = {
-  info: { name: 'status/info', type: 'info' },
+  info: { name: 'circle/bang', type: 'info' },
   success: { name: 'circle/checked', type: 'success' },
   error: { name: 'circle/xmark', type: 'danger' },
   warning: { name: 'triangle/exclamation', type: 'warning' },

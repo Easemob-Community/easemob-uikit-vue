@@ -7,7 +7,7 @@ const logs = ref<string[]>([])
 
 const actions: MessageActionItem[] = [
   { type: 'quote', label: '引用', icon: 'arrow/turn_left' },
-  { type: 'copy', label: '复制', icon: 'files-media/doc_on_doc' },
+  { type: 'copy', label: '复制', icon: 'rects' },
   { type: 'edit', label: '编辑', icon: 'rect/pencil' },
   { type: 'forward', label: '转发', icon: 'lines/arrow-right_3bars' },
   { type: 'multiSelect', label: '多选', icon: 'items_check' },

@@ -44,7 +44,7 @@ const emit = defineEmits<StatusBannerEmits>()
 const { t } = useLocale()
 
 const typeIconMap: Record<StatusBannerType, string> = {
-  info: 'status/info',
+  info: 'circle/bang',
   warning: 'triangle/exclamation',
   error: 'circle/xmark',
   success: 'circle/checked',

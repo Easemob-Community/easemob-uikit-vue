@@ -109,7 +109,7 @@ const actions = computed<MessageActionItem[]>(() => {
     add('quote', t('message.action.quote') ?? '引用', 'arrow/turn_left')
   // 复制：仅文本消息支持；图片/视频/文件等类型暂不提供复制
   if (cfg?.enableCopy !== false && props.message.type === MESSAGE_TYPE.TEXT)
-    add('copy', t('message.action.copy') ?? '复制', 'files-media/doc_on_doc')
+    add('copy', t('message.action.copy') ?? '复制', 'rects')
   // 下载：仅文件消息在右键/长按菜单中提供下载入口
   if (cfg?.enableDownload !== false && props.message.type === MESSAGE_TYPE.FILE)
     add('download', t('message.action.download') ?? '下载', 'arrow/down_tray')

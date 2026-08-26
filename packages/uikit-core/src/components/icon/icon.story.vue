@@ -42,7 +42,7 @@ const filteredNames = computed(() => {
     <Variant title="Animations">
       <div class="u-flex u-gap-6 u-items-center">
         <Icon name="loading/arc/normal" :size="32" anim="spin" />
-        <Icon name="status/info" :size="32" anim="pulse" />
+        <Icon name="circle/bang" :size="32" anim="pulse" />
         <Icon name="bell/slash" :size="32" anim="shake" />
         <Icon name="triangle/exclamation" :size="32" anim="flash" />
       </div>
