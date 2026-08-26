@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, EmIconButton as IconButton, useLocale, useToast } from '@easemob/uikit-core'
+import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, EmIcon as Icon, EmIconButton as IconButton, useLocale, useToast } from '@easemob/uikit-core'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useUIKit } from '../../composables/use-uikit'
 import type { UiContact as Contact } from '@easemob/uikit-core'
@@ -203,7 +203,8 @@ defineExpose({
           class="block-list-contact__menu-item block-list-contact__menu-item--danger"
           @click="onMenuSelect"
         >
-          {{ t('contact.blocklist.remove', '移出黑名单') }}
+          <Icon name="person/minus" :size="16" />
+          <span>{{ t('contact.blocklist.remove', '移出黑名单') }}</span>
         </div>
       </div>
     </Popup>
@@ -288,6 +289,9 @@ defineExpose({
 }
 
 .block-list-contact__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);

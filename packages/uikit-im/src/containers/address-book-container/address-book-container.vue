@@ -133,7 +133,7 @@ const { t } = useLocale()
 
 useInvitePersistence(computed(() => props.noticePersistInvites))
 
-const { contactList, contactCount: contactStoreCount, fetchContactCount } = useContact()
+const { visibleContactList, visibleContactCount, fetchContactCount } = useContact()
 const { groupList, joinedGroupCount: groupStoreCount, fetchJoinedGroupCount } = useGroup()
 const { features, stores } = useUIKit()
 const contactStore = useContactStore()
@@ -218,9 +218,9 @@ const resolvedContactCount = computed(() => {
   if (props.contactCount !== undefined) return props.contactCount
   if (!props.autoEntryCount) return 0
   if (view.value === 'home') {
-    return contactStoreCount.value || contactList.value.length
+    return visibleContactCount.value || visibleContactList.value.length
   }
-  return contactList.value.length
+  return visibleContactList.value.length
 })
 
 const resolvedNoticeCount = computed(() => {

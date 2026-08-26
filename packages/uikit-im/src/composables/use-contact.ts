@@ -3,13 +3,25 @@ import type { UiContact } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
 
 export function useContact() {
-  const { domains, stores, dataSource } = useUIKit()
+  const { domains, stores, dataSource, features } = useUIKit()
   const contactStore = stores.contact
 
   const contactList = computed(() => contactStore.contactList)
   const blackList = computed(() => contactStore.blackList)
   const inviteList = computed(() => contactStore.inviteList)
   const loaded = computed(() => contactStore.loaded)
+
+  /** 好友列表可见联系人：按 Provider 配置（filterBlockedContacts，默认 true）过滤掉已拉黑用户；选人弹窗等仍用原始 contactList */
+  const visibleContactList = computed(() => {
+    if (features.filterBlockedContacts === false)
+      return contactStore.contactList
+    return contactStore.contactList.filter(c => !contactStore.isBlocked(c.userId))
+  })
+
+  /** 好友入口徽标数：跟随可见列表；未加载完整列表时回落原始计数 */
+  const visibleContactCount = computed(() =>
+    contactStore.loaded ? visibleContactList.value.length : contactStore.contactCount,
+  )
 
   // ===== UI 交互状态 =====
   const filterText = computed(() => contactStore.filterText)
@@ -163,6 +175,9 @@ export function useContact() {
 
   return {
     contactList,
+    visibleContactList,
+    contactCount,
+    visibleContactCount,
     blackList,
     inviteList,
     loaded,
@@ -171,7 +186,6 @@ export function useContact() {
     activeId,
     selectedIds,
     hasMore,
-    contactCount,
     setFilterText,
     setActiveId,
     isSelected,
