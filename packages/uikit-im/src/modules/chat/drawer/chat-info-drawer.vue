@@ -10,6 +10,7 @@ import { EmCopyableText as CopyableText } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useContact } from '../../../composables/use-contact'
+import { useBlocklist } from '../../../composables/use-blocklist'
 import { useToast } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
@@ -49,6 +50,8 @@ const emit = defineEmits<{
   (e: 'remove-member', member: UiGroupMember): void
   (e: 'set-admin', member: UiGroupMember): void
   (e: 'remove-admin', member: UiGroupMember): void
+  /** 单聊拉黑/取消拉黑状态变更 */
+  (e: 'block-changed', userId: string, blocked: boolean): void
 }>()
 
 const logger = createLogger('UIKit:ChatInfoDrawer')
@@ -83,8 +86,9 @@ function formatCharCount(current: number, max: number): string {
 }
 
 const { setContactRemark, deleteContact } = useContact()
+const { isBlocked: isUserBlocked, addBlock, removeBlock } = useBlocklist()
 const { show: showToast } = useToast()
-const { stores } = useUIKit()
+const { features, stores } = useUIKit()
 const {
   fetchGroupInfo,
   fetchGroupMembers,
@@ -366,7 +370,7 @@ const confirmModal = ref<{
   show: boolean
   title: string
   content: string
-  action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | null
+  action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | 'block' | 'unblock' | null
   /** transferOwner 专用：新群主用户 ID */
   targetUserId?: string
   /** transferOwner 专用：新群主展示名（发布方本地通知用） */
@@ -381,7 +385,7 @@ const confirmModal = ref<{
   deleteConversation: false,
 })
 
-function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
+function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'block' | 'unblock') {
   const id = props.conversation?.id
   if (!id)
     return
@@ -409,6 +413,22 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend') {
       action,
     }
   }
+  else if (action === 'block') {
+    confirmModal.value = {
+      show: true,
+      title: t('contact.detail.block', '拉黑'),
+      content: t('contact.detail.blockConfirm', '确定拉黑该联系人吗？'),
+      action,
+    }
+  }
+  else if (action === 'unblock') {
+    confirmModal.value = {
+      show: true,
+      title: t('contact.detail.unblock', '取消拉黑'),
+      content: t('contact.detail.unblockConfirm', '确定取消拉黑吗？'),
+      action,
+    }
+  }
   else {
     confirmModal.value = {
       show: true,
@@ -429,6 +449,45 @@ async function doDeleteFriend(userId: string) {
   }
   catch (err) {
     showToast(err instanceof Error ? err.message : String(err) || t('chat.info.deleteFriendFailed', '删除好友失败'), 'error')
+  }
+}
+
+/** 单聊是否已拉黑（黑名单功能关闭时恒为 false） */
+const isPeerBlocked = computed(() => {
+  if (!features.enableBlocklist || !peerUserId.value)
+    return false
+  return isUserBlocked(peerUserId.value)
+})
+
+/** 单聊：打开拉黑 / 取消拉黑确认弹窗 */
+function onToggleBlock() {
+  if (!peerUserId.value)
+    return
+  openConfirm(isPeerBlocked.value ? 'unblock' : 'block')
+}
+
+/** 单聊：执行拉黑 / 取消拉黑 */
+async function doToggleBlock(blocked: boolean) {
+  const userId = peerUserId.value
+  if (!userId)
+    return
+  try {
+    if (blocked) {
+      await addBlock({
+        userId,
+        name: displayName.value,
+        avatar: displayAvatar.value || '',
+      })
+      showToast(t('contact.detail.blockSuccess', '已拉黑'), 'success')
+    }
+    else {
+      await removeBlock(userId)
+      showToast(t('contact.detail.unblockSuccess', '已取消拉黑'), 'success')
+    }
+    emit('block-changed', userId, blocked)
+  }
+  catch {
+    showToast(t('contact.detail.actionFailed', '操作失败'), 'error')
   }
 }
 
@@ -543,6 +602,12 @@ function onModalConfirm() {
   }
   else if (action === 'deleteFriend') {
     void doDeleteFriend(id)
+  }
+  else if (action === 'block') {
+    void doToggleBlock(true)
+  }
+  else if (action === 'unblock') {
+    void doToggleBlock(false)
   }
   else if (action === 'transferOwner') {
     const targetUserId = confirmModal.value.targetUserId
@@ -926,6 +991,16 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
         <!-- 通用操作 -->
         <slot name="drawer-actions" v-bind="drawerSlotScope">
           <div class="chat-info-drawer__section">
+            <!-- 单聊：拉黑 / 取消拉黑（黑名单功能关闭时隐藏） -->
+            <Button
+              v-if="!isGroup && features.enableBlocklist && peerUserId"
+              type="danger-outline"
+              block
+              @click="onToggleBlock"
+            >
+              <Icon :name="isPeerBlocked ? 'person/check' : 'person/xmark'" :size="18" />
+              {{ isPeerBlocked ? t('contact.detail.unblock', '取消拉黑') : t('contact.detail.block', '拉黑') }}
+            </Button>
             <Button type="danger-outline" block @click="onClearHistory">
               <Icon name="trash" :size="18" />
               {{ t('chat.info.clearHistory') }}

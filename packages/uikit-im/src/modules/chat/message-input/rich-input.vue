@@ -371,21 +371,6 @@ function appendMention(name: string, contact?: MentionContact) {
   }
 }
 
-/** @按钮 ref（作为提及面板锚点） */
-const mentionBtnRef = ref<HTMLElement>()
-
-/** 点击 @按钮：编辑器末尾插入 '@' 并打开提及面板（选择联系人后 insertMention 可定位替换） */
-function onMentionBtnClick() {
-  if (!editor.value || !props.enableMention)
-    return
-  editor.value.commands.focus()
-  editor.value.commands.insertContent('@')
-  // insertContent 后光标位于 '@' 之后，记录 '@' 位置供选择联系人后替换
-  mentionAnchorPos.value = editor.value.state.selection.from - 1
-  if (mentionBtnRef.value)
-    emit('mention-trigger', mentionBtnRef.value, '')
-}
-
 /** 设置编辑器内容（用于重新编辑等场景） */
 function setText(value: string) {
   editor.value?.commands.setContent(value)
@@ -445,9 +430,6 @@ onBeforeUnmount(() => {
       </div>
       <div v-if="features.voice" class="rich-input__tool-btn" @click="toggleVoice">
         <Icon :name="isRecording ? 'mic' : 'mic'" :size="22" />
-      </div>
-      <div v-if="props.enableMention" ref="mentionBtnRef" class="rich-input__tool-btn" title="@" @click="onMentionBtnClick">
-        <Icon name="at" :size="22" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
       <!-- 展开/收起输入区（仅 PC，工具栏右端） -->

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, useLocale, useToast } from '@easemob/uikit-core'
+import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, EmIconButton as IconButton, useLocale, useToast } from '@easemob/uikit-core'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useUIKit } from '../../composables/use-uikit'
 import type { UiContact as Contact } from '@easemob/uikit-core'
 import type { AvatarShape, ContactItemSize } from './types'
 import ContactItem from './contact-item.vue'
+import BlockListAddModal from './block-list-add-modal.vue'
 
 export interface BlockListProps {
   /** 是否展示头部，默认 true */
@@ -52,6 +53,8 @@ const { blockList, refresh: refreshBlocklist, removeBlock } = useBlocklist()
 const { show: showToast } = useToast()
 
 const loading = ref(false)
+/** 是否展示「添加黑名单」选人弹窗 */
+const showAddModal = ref(false)
 
 const resolvedCount = computed(() => blockList.value.length)
 
@@ -69,8 +72,6 @@ function onItemContextmenu(e: MouseEvent, contact: Contact) {
 
 function onItemClick(contact: Contact) {
   emit('click', contact)
-  if (props.clickBehavior === 'event-only')
-    return
 }
 
 function closeMenu() {
@@ -98,7 +99,7 @@ async function onConfirmRemove() {
     showToast(t('contact.blocklist.removeSuccess', '已移出黑名单'), 'success')
     emit('unblock', contact)
   }
-  catch (err) {
+  catch {
     showToast(t('contact.blocklist.removeFailed', '移出失败'), 'error')
   }
 }
@@ -115,7 +116,7 @@ async function maybeFetch() {
   try {
     await refreshBlocklist()
   }
-  catch (err) {
+  catch {
     // refresh 内部已做 warn 日志，这里仅复位 loading
   }
   finally {
@@ -143,6 +144,16 @@ defineExpose({
           {{ props.title || t('contact.entryBlocklist', '黑名单') }}
           <span v-if="props.showCount" class="block-list-contact__count">({{ resolvedCount }})</span>
         </span>
+      </slot>
+      <slot name="header-extra">
+        <IconButton
+          icon="circle/plus"
+          size="small"
+          variant="ghost"
+          :icon-size="22"
+          :title="t('contact.blocklist.add', '添加黑名单')"
+          @click="showAddModal = true"
+        />
       </slot>
     </div>
 
@@ -204,6 +215,9 @@ defineExpose({
     >
       {{ t('contact.blocklist.removeConfirm', '确定将其移出黑名单吗？') }}
     </Modal>
+
+    <!-- 添加黑名单：选人弹窗 -->
+    <BlockListAddModal v-model:show="showAddModal" />
   </div>
 </template>
 
@@ -221,6 +235,7 @@ defineExpose({
   padding: 12px 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   min-height: 48px;
 }
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## @easemob/uikit-im 2.5.0 (2026-08-25)
+
+### 新增
+
+- **单聊抽屉拉黑**（`EmChatContainer` / `ChatInfoDrawer`）：单聊信息抽屉「通用操作」区新增「拉黑 / 取消拉黑」按钮（随 Provider `enableBlocklist` 显隐，黑名单关闭时隐藏），确认后调用黑名单能力并同步 store，抽屉新增 `block-changed` 事件。
+- **黑名单选人拉黑**：通讯录黑名单列表右上角新增「+」入口（`EmAddressBookContainer` 黑名单子视图头部 + `EmBlockList` 自身 header），点击弹出 **`EmBlockListAddModal`** 选人弹窗（好友全量多选 + 搜索框，排除自己与已拉黑者），确定后批量加入黑名单并即时刷新列表；`EmContactContainer` 内置接线，业务零配置。新增 `showBlocklistAddButton` prop 与 `blocklist-add` 事件。
+
+### 类型导出
+
+- 新增 `BlockListAddModalProps` 公开类型。
+
 ## @easemob/uikit-im 2.4.0 (2026-08-25)
 
 ### 新增
@@ -574,6 +585,12 @@
 - 新增 `.agent/skills/uikit-h5-adaptation/SKILL.md`，并更新 `AGENTS.md`、相关 skill 与 `TECH-DEBT.md`。
 
 ---
+
+## @easemob/uikit-core 1.3.0 (2026-08-25)
+
+### 新增
+
+- **黑名单选人 i18n 文案**：新增 `contact.blocklist.add` / `contact.blocklist.emptySelectable` / `contact.blocklist.addSuccess` / `contact.blocklist.addFailed`（zh-CN / en），供黑名单「添加」选人弹窗使用。
 
 ## @easemob/uikit-core 1.2.0 (2026-08-25)
 

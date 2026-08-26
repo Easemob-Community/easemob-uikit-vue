@@ -6,6 +6,7 @@ import ContactListContainer from '../contact-list-container/contact-list-contain
 import GroupListContainer from '../group-list-container/group-list-container.vue'
 import BlockListContainer from '../block-list-container/block-list-container.vue'
 import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
+import BlockListAddModal from '../../modules/contact/block-list-add-modal.vue'
 import type {
   AddressBookContainerEntry,
   AddressBookContainerView,
@@ -95,6 +96,8 @@ export interface ContactContainerProps {
   showContactAddButton?: boolean
   /** 是否在群组子视图头部展示创建群组按钮，默认 true */
   showGroupCreateButton?: boolean
+  /** 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true */
+  showBlocklistAddButton?: boolean
 
   // ---------- Contact 子列表配置 ----------
   emptyText?: string
@@ -205,6 +208,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   enablePresence: undefined,
   showContactAddButton: true,
   showGroupCreateButton: true,
+  showBlocklistAddButton: true,
 })
 
 /** showNotice 缺省视为 true，兼容废弃 prop showNewRequest */
@@ -237,6 +241,7 @@ const emit = defineEmits<{
   (e: 'add-contact'): void
   (e: 'create-group'): void
   (e: 'blocklist-click'): void
+  (e: 'blocklist-add'): void
   (e: 'blocklist-item-click', contact: Contact): void
   (e: 'blocklist-item-contextmenu', event: MouseEvent, contact: Contact): void
   (e: 'blocklist-unblock', contact: Contact): void
@@ -247,6 +252,13 @@ const contactListContainerRef = ref<InstanceType<typeof ContactListContainer>>()
 const groupListContainerRef = ref<InstanceType<typeof GroupListContainer>>()
 
 const currentView = computed(() => addressBookRef.value?.view)
+
+/** 黑名单「添加」选人弹窗 */
+const showBlocklistAddModal = ref(false)
+function onBlocklistAdd() {
+  showBlocklistAddModal.value = true
+  emit('blocklist-add')
+}
 
 watch(currentView, (v) => {
   if (v !== undefined) {
@@ -322,6 +334,7 @@ defineExpose({
     :initial-view="props.initialView as AddressBookContainerView"
     :show-contact-add-button="props.showContactAddButton"
     :show-group-create-button="props.showGroupCreateButton"
+    :show-blocklist-add-button="props.showBlocklistAddButton"
     @view-change="(v) => emit('view-change', v as ContactContainerView)"
     @entry-click="(k) => emit('entry-click', k)"
     @notice-click="() => { emit('notice-click'); emit('new-request-click') }"
@@ -329,6 +342,7 @@ defineExpose({
     @add-contact="emit('add-contact')"
     @create-group="emit('create-group')"
     @blocklist-click="emit('blocklist-click')"
+    @blocklist-add="onBlocklistAdd"
   >
     <template #header>
       <slot name="header" />
@@ -523,6 +537,9 @@ defineExpose({
       </BlockListContainer>
     </template>
   </AddressBookContainer>
+
+  <!-- 黑名单「添加」选人弹窗（容器内置，业务零接线） -->
+  <BlockListAddModal v-model:show="showBlocklistAddModal" />
 </template>
 
 <style scoped>

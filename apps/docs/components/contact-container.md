@@ -45,6 +45,59 @@ function onCreateGroup() {
 
 <demo src="./demo/item.vue" title="联系人列表项" desc="静态展示在线状态（online / away / busy / offline）、备注名与副标题；select-mode 可切换单选 / 多选交互。" />
 
+## 联系人排序（sortBy）与拼音分组
+
+联系人子列表（`EmContactList`）与通讯录容器的联系人子视图通过 `sortBy` / `groupBy` 控制排序与分组：
+
+- `sortBy`：`'none'`（保持 store 顺序）｜`'pinyin'`（按 remark/name 拼音字典序升序）｜`(a,b)=>number`（自定义比较器），默认 `'none'`
+- `groupBy`：`'alphabet'`（A-Z + `#` 字母分组）｜`'none'`（不分组）｜函数，默认 `'alphabet'`
+
+> **⚠️ 关键：UIKit 不内置任何拼音库。** 要让 `sortBy='pinyin'` 真正按中文拼音排序、让 `groupBy='alphabet'` 把中文姓归入 A-Z 分组，必须先调用 `setPinyinAdapter` 注入拼音 adapter。未注入时 `resolvePinyin` 返回 `null`，中文会降级为按原文 `localeCompare` 排序，并统一落入 `#` 分组。
+
+### 注入拼音 adapter
+
+UIKit 把具体拼音库（pinyin-pro / tiny-pinyin / pinyinlite …）解耦成可注入的 adapter，接口：
+
+```ts
+type PinyinAdapter = (text: string) => {
+  pinyin: string       // 完整拼音（小写无声调），如 "zhangsan"
+  initials: string     // 首字母缩写（小写），如 "zs"，用于拼音搜索
+  firstLetter: string  // 首字母大写 A-Z 或 '#' 兜底，用于字母分组
+}
+```
+
+在你应用初始化时（渲染联系人列表之前）调用一次即可：
+
+```ts
+import { pinyin } from 'pinyin-pro'
+import { setPinyinAdapter } from '@easemob/uikit-im'
+
+setPinyinAdapter((text) => {
+  const full = pinyin(text, { toneType: 'none', type: 'string', nonZh: 'consecutive' })
+    .replace(/\s+/g, '')
+    .toLowerCase()
+  const initialsRaw = pinyin(text, { pattern: 'first', toneType: 'none', type: 'string' })
+    .replace(/\s+/g, '')
+    .toLowerCase()
+  const firstChar = initialsRaw.charAt(0).toUpperCase()
+  return {
+    pinyin: full,
+    initials: initialsRaw,
+    firstLetter: /^[A-Z]$/.test(firstChar) ? firstChar : '#',
+  }
+})
+```
+
+`setPinyinAdapter` 是**模块级全局单例**：注入一次对当前页面所有联系人 / 群组列表生效；传入 `null` 可解除注入（恢复默认行为）。
+
+<demo src="./demo/pinyin-sort.vue" title="对照组：未注入 vs 注入拼音 adapter" desc="同一批中文联系人，未注入 adapter 时全部落入 # 分组、不按拼音排序；注入 adapter 后按拼音字典序排序并按首字母 A-Z 分组（sort-by='pinyin' + group-by='alphabet'）。点击按钮切换。" />
+
+### 配套能力
+
+- **拼音搜索**：注入 adapter 后，搜索框同时按完整拼音 / 首字母缩写匹配（`useContactFilter` / `useGroupFilter`）。
+- **清理缓存**：`resolvePinyin` 内部按文本缓存（上限 1000）。联系人备注 / 名称更新后可调用 `clearPinyinCache()`（同样从 `@easemob/uikit-im` 导出）刷新结果。
+- **群组列表**：群组子列表走同一机制，`group-sort-by="pinyin"` / `group-group-by="alphabet"`。
+
 ## Props
 
 ### 容器外观
@@ -77,7 +130,7 @@ function onCreateGroup() {
 
 - `emptyText`：空列表提示文字
 - `filterFn`：自定义搜索过滤函数
-- `sortBy`：排序方式（如 `'alphabet'`、`'pinyin'`）
+- `sortBy`：排序方式，`'none' | 'pinyin' | 自定义比较器`，默认 `'none'`
 - `groupBy`：分组方式，默认 `'alphabet'`
 - `showGroupHeader` / `showAlphabetNav`：分组标题 / 字母导航，默认 `true`
 - `selectMode`：选择模式，`'none' | 'single' | 'multiple'`，默认 `'none'`

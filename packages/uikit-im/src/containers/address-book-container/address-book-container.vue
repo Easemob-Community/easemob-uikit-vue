@@ -96,6 +96,8 @@ export interface AddressBookContainerProps {
   showContactAddButton?: boolean
   /** 是否在群组子视图头部展示创建群组按钮，默认 true */
   showGroupCreateButton?: boolean
+  /** 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true */
+  showBlocklistAddButton?: boolean
 }
 
 const props = withDefaults(defineProps<AddressBookContainerProps>(), {
@@ -113,6 +115,7 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   noticePersistInvites: false,
   showContactAddButton: true,
   showGroupCreateButton: true,
+  showBlocklistAddButton: true,
 })
 
 const emit = defineEmits<{
@@ -123,6 +126,7 @@ const emit = defineEmits<{
   (e: 'add-contact'): void
   (e: 'create-group'): void
   (e: 'blocklist-click'): void
+  (e: 'blocklist-add'): void
 }>()
 
 const { t } = useLocale()
@@ -447,6 +451,15 @@ const subviewTitle = computed(() => {
                 :icon-size="22"
                 :title="t('group.createGroup')"
                 @click="emit('create-group')"
+              />
+              <IconButton
+                v-if="!$slots['subheader-extra'] && view === 'blocklist' && props.showBlocklistAddButton"
+                icon="circle/plus"
+                size="small"
+                variant="ghost"
+                :icon-size="22"
+                :title="t('contact.blocklist.add', '添加黑名单')"
+                @click="emit('blocklist-add')"
               />
             </span>
           </div>
