@@ -65,6 +65,7 @@ const defaultFeatures: UIKitFeatures = {
   enableDraft: true,
   enableAtMe: true,
   enableTyping: true,
+  filterBlockedContacts: true,
 }
 
 export interface CoreUIKitProviderOptions {

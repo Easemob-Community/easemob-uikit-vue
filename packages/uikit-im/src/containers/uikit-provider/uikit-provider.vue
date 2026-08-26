@@ -100,6 +100,8 @@ export interface ProviderProps {
   enableAtMe?: boolean
   /** 是否启用对方正在输入提示（默认 true） */
   enableTyping?: boolean
+  /** 好友列表是否过滤掉已拉黑用户（默认 true；仅联系人子视图/好友列表生效，选人弹窗不受影响） */
+  filterBlockedContacts?: boolean
   /** 业务接管数据源，不传走 SDK 默认 */
   dataSource?: UIKitDataSource
   /**
@@ -187,6 +189,7 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableDraft: true,
   enableAtMe: true,
   enableTyping: true,
+  filterBlockedContacts: true,
   enableToast: true,
 })
 
@@ -208,6 +211,7 @@ const features = computed<Partial<UIKitFeatures>>(() => ({
   enableDraft: props.enableDraft,
   enableAtMe: props.enableAtMe,
   enableTyping: props.enableTyping,
+  filterBlockedContacts: props.filterBlockedContacts,
 }))
 
 const dataSource = computed(() => props.dataSource ?? {})

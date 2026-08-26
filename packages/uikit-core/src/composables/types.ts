@@ -61,4 +61,6 @@ export interface UIKitFeatures {
   enableAtMe?: boolean
   /** 是否启用对方正在输入提示（typing CMD），默认 true */
   enableTyping?: boolean
+  /** 好友列表是否过滤掉已拉黑用户，默认 true（仅联系人子视图/好友列表生效，选人弹窗不受影响） */
+  filterBlockedContacts?: boolean
 }

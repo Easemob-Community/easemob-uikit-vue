@@ -13,7 +13,7 @@
 | 能力域 | 相关配置 |
 | --- | --- |
 | 连接与登录 | `appKey`、`sdkConfig`、`autoInit`、`onTokenWillExpire`、`onTokenExpired` |
-| 功能开关 | `enableContact`、`contactFetchMode`、`enableBlocklist`、`enablePresence`、`enableGroup`、`enableUserInfo`、`enableUserInfoSubscription`、`enableDraft`、`enableAtMe`、`enableTyping`、`enableToast` |
+| 功能开关 | `enableContact`、`contactFetchMode`、`enableBlocklist`、`enablePresence`、`enableGroup`、`enableUserInfo`、`enableUserInfoSubscription`、`enableDraft`、`enableAtMe`、`enableTyping`、`filterBlockedContacts`、`enableToast` |
 | 主题 | `theme`（模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色） |
 | 国际化 | `locale`（zh-CN / en） |
 | 动画与 H5 | `animation`（开关 / 强度 / 波纹）、`h5`（安全区 / 键盘 / 下拉刷新） |

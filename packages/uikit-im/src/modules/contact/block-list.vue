@@ -64,6 +64,9 @@ const menuContact = ref<Contact | null>(null)
 const menuAnchor = ref<HTMLElement | undefined>()
 
 function onItemContextmenu(e: MouseEvent, contact: Contact) {
+  // 拦截浏览器默认右键菜单（对齐会话右键的处理，避免弹出系统菜单）
+  e.preventDefault()
+  e.stopPropagation()
   menuAnchor.value = e.currentTarget as HTMLElement
   menuContact.value = contact
   menuVisible.value = true
@@ -272,7 +275,8 @@ defineExpose({
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 4px 16px 8px;
+  /* 与好友列表容器对齐：不再额外内缩，避免 hover 背景/内容距离面板边缘过宽（双内缩） */
+  padding: 4px 0 8px;
 }
 
 .block-list-contact__menu {

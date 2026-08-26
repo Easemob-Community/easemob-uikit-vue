@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { Component } from 'vue'
 import { useContact } from '../../composables/use-contact'
+import { useBlocklist } from '../../composables/use-blocklist'
 import { useContactFilter } from '../../composables/use-contact-filter'
 import { useContactGroup } from '../../composables/use-contact-group'
 import { useContactSort } from '../../composables/use-contact-sort'
@@ -49,6 +50,8 @@ export interface ContactListProps {
   emptyText?: string
   /** 自定义搜索过滤函数 */
   filterFn?: ContactFilterFn
+  /** 是否过滤掉已拉黑用户，默认 false（好友列表容器按 Provider 配置开启，选人弹窗复用不受影响） */
+  filterBlockedContacts?: boolean
   /** 排序方式，默认 'none' */
   sortBy?: ContactSortBy
   /** 分组方式，默认 'alphabet' */
@@ -120,6 +123,7 @@ const props = withDefaults(defineProps<ContactListProps>(), {
   bodySticky: false,
   footerSticky: false,
   clickBehavior: 'default',
+  filterBlockedContacts: false,
 })
 
 const emit = defineEmits<{
@@ -140,6 +144,7 @@ const {
   setActiveId,
 } = useContact()
 const { t } = useLocale()
+const { isBlocked } = useBlocklist()
 const { isMobile } = useViewport()
 void isMobile
 
@@ -170,7 +175,14 @@ const normalizedKeyword = computed(() => searchKeyword.value.trim())
 const sortByRef = computed(() => props.sortBy)
 const groupByRef = computed(() => props.groupBy)
 
-const sortedContacts = useContactSort(contactList, sortByRef)
+/** 原始联系人列表：仅好友列表场景按 Provider 配置过滤掉已拉黑用户；选人弹窗复用时不开启，保持完整列表 */
+const baseContactList = computed(() => {
+  if (!props.filterBlockedContacts)
+    return contactList.value
+  return contactList.value.filter(c => !isBlocked(c.userId))
+})
+
+const sortedContacts = useContactSort(baseContactList, sortByRef)
 const filteredContacts = useContactFilter(sortedContacts, searchKeyword, {
   filterFn: props.filterFn,
 })

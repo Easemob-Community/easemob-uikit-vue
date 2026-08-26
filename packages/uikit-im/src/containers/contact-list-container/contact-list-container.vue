@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { Component } from 'vue'
 import ContactList from '../../modules/contact/contact-list.vue'
 import { useContact } from '../../composables/use-contact'
@@ -151,6 +151,9 @@ const contactStore = useContactStore()
 
 const contactListRef = ref<InstanceType<typeof ContactList>>()
 
+/** 好友列表是否过滤掉已拉黑用户（跟随 Provider 配置，默认 true） */
+const filterBlockedContacts = computed(() => features.filterBlockedContacts !== false)
+
 /** 自治拉取 */
 function maybeFetchContacts() {
   if (!props.autoFetch)
@@ -198,6 +201,7 @@ defineExpose({
       :show-count="props.showCount"
       :empty-text="props.emptyText"
       :filter-fn="props.filterFn"
+      :filter-blocked-contacts="filterBlockedContacts"
       :sort-by="props.sortBy"
       :group-by="props.groupBy"
       :show-group-header="props.showGroupHeader"
