@@ -31,6 +31,31 @@ const bubbleClass = computed(() =>
 
 const body = computed(() => props.message.body as VoiceMessageBody)
 
+/**
+ * 语音气泡宽度随录音时长自动缩放（微信式）：
+ * - 短录音回落最小宽度，保证图标+时长文本不裁剪、不溢出；
+ * - 时长越长气泡越宽，封顶 MAX，避免超长语音无限撑开。
+ * 常量可调：PX_PER_SECOND 越大，同样时长下气泡越宽。
+ */
+const VOICE_MIN_WIDTH = 72
+const VOICE_MAX_WIDTH = 240
+const VOICE_PX_PER_SECOND = 6
+
+/** 语音时长（秒，取整，兼容小数/异常值） */
+const durationSeconds = computed(() => {
+  const d = Number(body.value.duration)
+  return Number.isFinite(d) ? Math.max(0, Math.round(d)) : 0
+})
+
+/** 气泡宽度：夹在 [MIN_WIDTH, MAX_WIDTH]，随 durationSeconds 线性缩放 */
+const bubbleWidth = computed(() => {
+  const w = Math.min(VOICE_MAX_WIDTH, Math.max(VOICE_MIN_WIDTH, durationSeconds.value * VOICE_PX_PER_SECOND))
+  return `${w}px`
+})
+
+/** 展示用时长文案，如 5" */
+const durationText = computed(() => `${durationSeconds.value}"`)
+
 /** 音频播放控制器接口 */
 interface AudioController {
   play: (audio: HTMLAudioElement, id: string) => void
@@ -135,7 +160,7 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
 
 <template>
   <div class="voice-message" :class="{ 'voice-message--self': props.message.isSelf }">
-    <div class="voice-message__bubble" :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying }]" @click="onPlayClick">
+    <div class="voice-message__bubble" :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying }]" :style="{ width: bubbleWidth }" @click="onPlayClick">
       <span class="voice-message__icon">
         <span v-if="isPlaying" class="voice-message__wave">
           <span class="voice-message__wave-bar" />
@@ -144,7 +169,7 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
         </span>
         <Icon v-else name="triangle" :size="14" />
       </span>
-      <span class="voice-message__duration">{{ body.duration || 0 }}"</span>
+      <span class="voice-message__duration">{{ durationText }}</span>
     </div>
     <!-- 转文字结果卡片（隐藏/显示文字入口在右键菜单） -->
     <div v-if="showVoiceTextCard" class="voice-message__text-card">
@@ -182,7 +207,13 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
-  max-width: 60%;
+  /* 宽度由 JS 按时长计算（:style width），这里兜底： */
+  box-sizing: border-box;
+  /* min-width: fit-content 保证内容（图标+时长文本+内边距）永不窄于内容 → 不溢出气泡 */
+  min-width: fit-content;
+  max-width: 100%;
+  /* 时长文本不换行，避免长时长被折行撑出气泡 */
+  white-space: nowrap;
 }
 
 .voice-message__bubble--square {

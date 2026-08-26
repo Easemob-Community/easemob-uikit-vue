@@ -281,12 +281,25 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.setAttribute('data-uikit-density', density.value)
   })
 
-  // 高频语义 token：气泡色、聊天背景、输入区背景
+  // 高频语义 token：气泡色、聊天背景、输入区背景。
+  // 注意：值为空（未自定义）时不能用 setProperty 写入空串——空串以 inline 覆盖
+  // 样式表里的 :root/[data-uikit-theme] 默认值（如 --uikit-chat-bg: var(--uikit-bg-base)），
+  // 导致 background: var(--uikit-chat-bg) 替换成空值后在计算值阶段非法，回落为 transparent，
+  // 使聊天容器/空态背景透出父容器，与使用 --uikit-bg-base 的列表容器在深色下不一致。
+  // 统一改写：有值才写入，没值则移除 inline 覆盖，让主题 CSS 默认值（随明暗模式切换）生效。
+  function applySemanticToken(name: string, value: string | undefined) {
+    if (value) {
+      document.documentElement.style.setProperty(name, value)
+    }
+    else {
+      document.documentElement.style.removeProperty(name)
+    }
+  }
   watchEffect(() => {
-    document.documentElement.style.setProperty('--uikit-bubble-bg-other', bubbleBgOther.value || '')
-    document.documentElement.style.setProperty('--uikit-bubble-bg-self', bubbleBgSelf.value || '')
-    document.documentElement.style.setProperty('--uikit-chat-bg', chatBg.value || '')
-    document.documentElement.style.setProperty('--uikit-input-bg', inputBg.value || '')
+    applySemanticToken('--uikit-bubble-bg-other', bubbleBgOther.value)
+    applySemanticToken('--uikit-bubble-bg-self', bubbleBgSelf.value)
+    applySemanticToken('--uikit-chat-bg', chatBg.value)
+    applySemanticToken('--uikit-input-bg', inputBg.value)
   })
 
   // Hover 风格 DOM 属性联动
