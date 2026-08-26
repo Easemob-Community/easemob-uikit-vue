@@ -9,6 +9,9 @@
 | Badge API | [badge.md](./badge.md) |
 | Button API | [button.md](./button.md) |
 | Cell API | [cell.md](./cell.md) |
+| @easemob/uikit-chatroom 1.0.0 (2026-08-15) | [changelog-chatroom.md](./changelog-chatroom.md) |
+| @easemob/uikit-core 1.1.0 (2026-08-19) | [changelog-core.md](./changelog-core.md) |
+| 2.3.0 (2026-08-20) | [changelog-im.md](./changelog-im.md) |
 | ChatContainer API | [chat-container.md](./chat-container.md) |
 | ConversationContainer API | [conversation-container.md](./conversation-container.md) |
 | EmojiPicker API | [emoji-picker.md](./emoji-picker.md) |
@@ -27,6 +30,7 @@
 | PresenceSelector API | [presence-selector.md](./presence-selector.md) |
 | Resizable API | [resizable.md](./resizable.md) |
 | ScrollToTop API | [scroll-to-top.md](./scroll-to-top.md) |
+| Skeleton API | [skeleton.md](./skeleton.md) |
 | StatusBanner API | [status-banner.md](./status-banner.md) |
 | Toast API | [toast.md](./toast.md) |
 | UikitProvider API | [uikit-provider.md](./uikit-provider.md) |

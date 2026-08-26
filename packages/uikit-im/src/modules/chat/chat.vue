@@ -1093,7 +1093,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <!-- 空状态：无当前会话 -->
     <div v-else-if="!currentConversation" class="chat__empty">
       <Empty
-        icon="empty/chat"
+        icon="bubble/rect/empty"
         :description="t('chat.empty', '请选择会话')"
         size="large"
       >

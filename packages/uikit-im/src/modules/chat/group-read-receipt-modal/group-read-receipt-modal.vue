@@ -122,7 +122,7 @@ function onClose() {
         </Cell>
         <Empty
           v-if="displayList.length === 0"
-          icon="empty/members"
+          icon="person/double"
           :description="t('groupReadReceipt.empty')"
           size="small"
         />

@@ -42,9 +42,9 @@
 | --- | --- | --- | --- |
 | visible         | `boolean`     | —   | 是否显示 header，默认 true           |
 | align           | `HeaderAlign` | —   | 标题对齐方式，默认 'center'；对单聊/群聊同时生效 |
-| customSlot      | `boolean`     | —   | 是否启用自定义插槽，默认 false            |
 | showAvatar      | `boolean`     | —   | 是否显示头像，默认 false               |
 | showMemberCount | `boolean`     | —   | 是否显示群成员数后缀，默认 true；仅群聊生效      |
+| showDrawerEntry | `boolean`     | —   | 是否显示抽屉入口按钮（聊天信息），默认 true      |
 
 #### config.messageList {#config-messagelist}
 
@@ -171,7 +171,7 @@
 | style            | `InputStyle`                                                                    | —   | 输入框风格，默认 'wechat'                                                                                                                    |
 | features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>   | —   | 功能开关                                                                                                                                 |
 | autoFocus        | `boolean`                                                                       | —   | 是否自动聚焦输入框，默认 false                                                                                                                   |
-| focusBorderColor | `string`                                                                        | —   | 聚焦时边框颜色，不设置则使用默认主题色                                                                                                                  |
+| focusBorderColor | `string`                                                                        | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                       |
 | caretColor       | `string`                                                                        | —   | 光标颜色，不设置则使用默认                                                                                                                        |
 | selectionColor   | `string`                                                                        | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                                      |
 | maxLength        | `number`                                                                        | —   | 最大输入长度，0 或不设置表示无限制                                                                                                                   |

@@ -22,8 +22,9 @@
 | pullRefresh      | `boolean`                                          | `false`                                | 是否启用下拉刷新（H5），默认 false                                                                     |
 | enablePresence   | `boolean`                                          | —                                      | 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置                                          |
 | tabs             | `ConversationTabKey[]`                             | `() => [...DEFAULT_CONVERSATION_TABS]` | 会话分栏 tab 集合，默认全量 ['all', 'unread', 'atMe', 'single', 'group']；<br>顺序即渲染优先级；传空数组可隐藏 tab 栏。 |
-| activeTab        | `ConversationTabKey`                               | `'all'`                                | 当前激活的分栏 tab（v-model:active-tab），默认 'all'                                                  |
+| activeTab        | `ConversationTabKey`                               | `'all'`                                | 当前激活的分栏 tab（v-model:active-tab）。可受控（绑定 v-model 由外部驱动）也可不受控（默认，组件内部自行维护，开箱即用）              |
 | showStatusBanner | `boolean`                                          | `true`                                 | 是否展示连接/同步状态横幅，默认 true                                                                     |
+| menuItems        | `ConversationHeaderMenuItem[]`                     | —                                      | Header `+` 菜单自定义项；不传时使用内置三项（新建会话/添加联系人/创建群组）；<br>传空数组可隐藏菜单入口。                             |
 
 ### Events
 
@@ -35,14 +36,20 @@
 | `custom-action`      | key: string, conversation: Conversation | 自定义操作项未提供 handler 时向上触发，负载为操作 key 与会话对象            |
 | `update:active-tab`  | tab: ConversationTabKey                 | 切换分栏 tab 时触发（v-model:active-tab），负载为新的 tab key     |
 | `reconnect`          | —                                       | 断网/连接失败横幅被点击时触发，由业务方决定重连策略                         |
+| `header-menu-action` | key: string                             | 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key   |
 
 ### Slots
 
 | 插槽名             | 说明 |
 | --- | --- |
 | `header`        | —  |
+| `header-menu`   | —  |
 | `tabs`          | —  |
 | `status-banner` | —  |
 | `body`          | —  |
+| `item`          | —  |
 | `empty`         | —  |
 | `footer`        | —  |
+| `new-chat`      | —  |
+| `add-contact`   | —  |
+| `create-group`  | —  |

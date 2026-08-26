@@ -1030,22 +1030,20 @@
 - **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过；lint 新引入错误清零（存量 import 重复/顺序、Popup unused、style 空行等未动）；CHANGELOG 2.3.0 版本段与 package.json 版本同步。
 - **关联 skill**：`uikit-component-authoring` / `uikit-chat-plugin-tabs` / `uikit-chat-interactions` / `uikit-contact-group-capabilities` / `uikit-docs-authoring` / `uikit-release-build`
 
-### [ ] D121. 图标 V2 对齐收尾：9 个空状态插画 + V2 命名规范统一
+### [x] D121. 图标 V2 对齐收尾：业务代码不再引用旧库图标
 
 - **背景**：设计师交付的线性图标集已大部分替换旧库，扫描源码发现仍有旧库图标在业务代码中被引用，且 V2 内部命名存在拼写错误、下划线/连字符/数字混用、根目录文件未分类等问题。
-- **已落地（本轮）**：
+- **修复**：
   - 面性图标目录 `assets/icons-filled/` 并入 `assets/icons-v2/filled/`，name 仍带 `filled/` 前缀；
   - `check-icon-refs.mjs` 扩展为同时扫描旧库 + V2，构建期硬失败拦截缺失引用；
   - 修复 3 个未使用的拼写错误：`singal` → `signal`、`rect/personnclock` → `rect/person-clock`、`rectnarrowreturn` → `rect/narrow-return`；
   - 修复 docs 动画 demo 中 4 个过期 V1 name；
   - `chat-info-drawer.vue` 中缺失的 `rect/plus` 改为使用现有 `plus`；
-  - `empty/mentions`（@提及空态）改为 V2 `at`，删除旧库文件；
-  - `files-media/doc_on_doc`（合并转发）改为 V2 `rects`，删除旧库目录；
-  - `status/info`（Toast info / StatusBanner info / Input 错误图标）改为 V2 `circle/bang`，demo 通知设置改用 `bell`，删除旧库目录。
-- **仍待设计师确认/补图**：
-  1. **空状态插画 9 个**：`empty/blocklist`、`empty/chat`、`empty/contact`、`empty/conversation`、`empty/files`、`empty/group`、`empty/members`、`empty/mutelist`、`empty/search`。
-  2. **统一 V2 命名规范**：根目录 38 个未分类文件进目录；已使用的不规范名（`items_check`、`lines/arrow-right_3bars`、`arrow/lft_uturn` 等）需与设计师约定连字符/斜杠用法后批量重命名并同步代码。
-- **证据**：`tmp/icon-v2-mapping.md` 记录完整映射与命名异常清单；`pnpm -F @easemob/uikit-im run icons:check` 已通过，旧库仅剩 `empty/*` 9 个插画。
+  - `empty/mentions` → `at`、`files-media/doc_on_doc` → `rects`、`status/info` → `circle/bang`（demo 通知改用 `bell`）；
+  - 9 个空状态插画用 V2 功能图标替换：`empty/contact`→`person/single`、`empty/chat`/`empty/conversation`→`bubble/rect/empty`、`empty/group`/`empty/members`→`person/double`、`empty/mutelist`→`bell/slash`、`empty/blocklist`→`circle/slash`、`empty/files`→`folder`、`empty/search`→`search`；
+  - 删除整个旧库 `packages/uikit-core/src/assets/icons/` 目录。
+- **残留**：V2 内部命名规范仍待统一（根目录未分类文件、下划线/连字符混用等），但不影响功能与构建，转日常维护。
+- **验证**：`pnpm -F @easemob/uikit-im run icons:check` 扫描 200 个源文件、命中 77 个图标引用、166 个 V2 SVG，全部通过；core/uikit-im typecheck + build、demo typecheck、docs build、changelog:check 全绿。
 - **关联 skill**：`uikit-component-authoring` / `uikit-docs-authoring`
 
 ### [x] D114. UI/UX 验收：z-index 设计层级表（P3-4）

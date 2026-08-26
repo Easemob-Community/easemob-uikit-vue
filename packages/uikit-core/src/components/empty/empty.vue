@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import Icon from '../icon/icon.vue'
 
 export interface EmptyProps {
-  /** 图标名，格式 "category/icon-name"，如 "empty/contact" */
+  /** 图标名，格式 "category/icon-name"，如 "person/single" */
   icon?: string
   /** 标题文本 */
   title?: string

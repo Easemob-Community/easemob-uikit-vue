@@ -349,7 +349,7 @@ watch(
             </ContactItemDefault>
             <Empty
               v-if="selectedCount === 0"
-              icon="empty/contact"
+              icon="person/single"
               :description="t('group.createSelectedEmpty', '请选择联系人')"
               size="small"
             />

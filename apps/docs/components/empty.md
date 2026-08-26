@@ -8,7 +8,7 @@
 
 ```vue
 <template>
-  <em-empty icon="empty/contact" title="暂无联系人" description="你可以通过搜索添加新的联系人" />
+  <em-empty icon="person/single" title="暂无联系人" description="你可以通过搜索添加新的联系人" />
 </template>
 ```
 

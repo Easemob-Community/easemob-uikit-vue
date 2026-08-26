@@ -166,7 +166,7 @@ defineExpose({
       </div>
       <Empty
         v-else-if="blockList.length === 0"
-        icon="empty/blocklist"
+        icon="circle/slash"
         :description="props.emptyText || t('contact.blocklist.empty', '暂无黑名单')"
         size="small"
       />

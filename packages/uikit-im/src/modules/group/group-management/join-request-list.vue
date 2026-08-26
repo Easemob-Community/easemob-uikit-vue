@@ -74,7 +74,7 @@ async function onReject(item: any) {
     </div>
     <Empty
       v-else-if="requests.length === 0"
-      icon="empty/members"
+      icon="person/double"
       :description="t('group.memberList.empty', '暂无入群申请')"
       size="small"
     />

@@ -1,3 +1,21 @@
+## @easemob/uikit-core 1.3.0 (2026-08-25)
+
+
+### 新增
+
+- **黑名单选人 i18n 文案**：新增 `contact.blocklist.add` / `contact.blocklist.emptySelectable` / `contact.blocklist.addSuccess` / `contact.blocklist.addFailed`（zh-CN / en），供黑名单「添加」选人弹窗使用。
+
+---
+
+## @easemob/uikit-core 1.2.0 (2026-08-25)
+
+
+### 新增
+
+- **通讯录黑名单 i18n 文案**：新增 `contact.entryBlocklist` 与 `contact.blocklist.empty` / `contact.blocklist.remove` / `contact.blocklist.removeConfirmTitle` / `contact.blocklist.removeConfirm` / `contact.blocklist.removeSuccess` / `contact.blocklist.removeFailed`（zh-CN / en），供 uikit-im 黑名单列表使用。
+
+---
+
 ## @easemob/uikit-core 1.1.0 (2026-08-19)
 
 

@@ -197,7 +197,7 @@ defineExpose({
     </div>
     <Empty
       v-else-if="members.length === 0"
-      icon="empty/mutelist"
+      icon="bell/slash"
       :description="t('group.memberList.empty', '暂无禁言成员')"
       size="small"
     />
@@ -225,7 +225,7 @@ defineExpose({
           </div>
           <Empty
             v-else-if="selectableMembers.length === 0"
-            icon="empty/mutelist"
+            icon="bell/slash"
             :description="t('group.mutelist.emptySelectable', '暂无可添加的成员')"
             size="small"
           />

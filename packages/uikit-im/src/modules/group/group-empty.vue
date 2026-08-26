@@ -12,5 +12,5 @@ const { t } = useLocale()
 </script>
 
 <template>
-  <Empty icon="empty/group" :description="props.text || t('group.empty')" />
+  <Empty icon="person/double" :description="props.text || t('group.empty')" />
 </template>

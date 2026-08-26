@@ -7,25 +7,25 @@ import Button from '../button/button.vue'
   <Story title="Empty">
     <Variant title="联系人空态">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/contact" title="暂无联系人" description="你可以通过搜索添加新的联系人" />
+        <Empty icon="person/single" title="暂无联系人" description="你可以通过搜索添加新的联系人" />
       </div>
     </Variant>
 
     <Variant title="聊天空态">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/chat" title="尚未选择会话" description="从左侧选择一个会话开始聊天" />
+        <Empty icon="bubble/rect/empty" title="尚未选择会话" description="从左侧选择一个会话开始聊天" />
       </div>
     </Variant>
 
     <Variant title="群组空态">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/group" title="暂无群组" description="你可以通过搜索或创建加入群组" />
+        <Empty icon="person/double" title="暂无群组" description="你可以通过搜索或创建加入群组" />
       </div>
     </Variant>
 
     <Variant title="搜索无结果">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/search" title="未找到结果" description="换个关键词试试" />
+        <Empty icon="search" title="未找到结果" description="换个关键词试试" />
       </div>
     </Variant>
 
@@ -37,9 +37,9 @@ import Button from '../button/button.vue'
 
     <Variant title="尺寸">
       <div style="width: 360px; background: var(--uikit-bg-base); border-radius: 8px;">
-        <Empty icon="empty/files" title="Small" description="弹窗/抽屉内使用" size="small" />
-        <Empty icon="empty/files" title="Normal" description="列表中使用（默认）" size="normal" />
-        <Empty icon="empty/files" title="Large" description="页面级使用" size="large" />
+        <Empty icon="folder" title="Small" description="弹窗/抽屉内使用" size="small" />
+        <Empty icon="folder" title="Normal" description="列表中使用（默认）" size="normal" />
+        <Empty icon="folder" title="Large" description="页面级使用" size="large" />
       </div>
     </Variant>
 

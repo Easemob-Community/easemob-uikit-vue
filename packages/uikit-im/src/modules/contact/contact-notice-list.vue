@@ -164,7 +164,7 @@ function avatarName(invite: UiContactInvite): string {
     <!-- Empty -->
     <Empty
       v-else-if="displayInvites.length === 0"
-      icon="empty/contact"
+      icon="person/single"
       :description="t('contact.inviteEmpty', '暂无好友申请')"
     />
 

@@ -300,7 +300,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 
         <Empty
           v-else-if="keyword.trim()"
-          icon="empty/search"
+          icon="search"
           :description="t('message.search.empty', '无搜索结果')"
           size="small"
         />

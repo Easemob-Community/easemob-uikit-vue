@@ -158,7 +158,7 @@ watch(() => props.show, (show) => {
         <!-- 空状态 -->
         <Empty
           v-else
-          icon="empty/chat"
+          icon="bubble/rect/empty"
           :description="t('message.forward.combineEmpty', '暂无消息')"
           size="small"
         />

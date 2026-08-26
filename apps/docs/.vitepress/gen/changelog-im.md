@@ -1,3 +1,33 @@
+## @easemob/uikit-im 2.5.0 (2026-08-25)
+
+
+### 新增
+
+- **单聊抽屉拉黑**（`EmChatContainer` / `ChatInfoDrawer`）：单聊信息抽屉「通用操作」区新增「拉黑 / 取消拉黑」按钮（随 Provider `enableBlocklist` 显隐，黑名单关闭时隐藏），确认后调用黑名单能力并同步 store，抽屉新增 `block-changed` 事件。
+- **黑名单选人拉黑**：通讯录黑名单列表右上角新增「+」入口（`EmAddressBookContainer` 黑名单子视图头部 + `EmBlockList` 自身 header），点击弹出 **`EmBlockListAddModal`** 选人弹窗（好友全量多选 + 搜索框，排除自己与已拉黑者），确定后批量加入黑名单并即时刷新列表；`EmContactContainer` 内置接线，业务零配置。新增 `showBlocklistAddButton` prop 与 `blocklist-add` 事件。
+
+### 类型导出
+
+- 新增 `BlockListAddModalProps` 公开类型。
+
+---
+
+## @easemob/uikit-im 2.4.0 (2026-08-25)
+
+
+### 新增
+
+- **通讯录黑名单同级入口**（`EmContactContainer` / `EmAddressBookContainer`）：
+  - 新增 `showBlocklist` / `blocklistLabel` / `blocklistIcon` props、`blocklist-click` 事件与 `goBlocklist()` 命令式方法；黑名单入口在 Provider `enableBlocklist=true` 时展示，与「群组 / 通讯录(好友)」同级；
+  - 新增黑名单列表组件 **`EmBlockList` / `EmBlockListContainer`**：空态占位、列表项复用 `EmContactItem` 并遵循头像形状主题配置，行右键菜单「移出黑名单」（确认后 `removeBlock` 并同步 store），对外事件 `click` / `contextmenu` / `unblock`，容器层透传 `blocklist-item-click` / `blocklist-item-contextmenu` / `blocklist-unblock`；
+  - 新增 i18n `contact.entryBlocklist` 与 `contact.blocklist.*` 文案（zh-CN / en）。
+
+### 类型导出
+
+- 新增 `BlockListContainerProps` 公开类型。
+
+---
+
 ## 2.3.0 (2026-08-20)
 
 

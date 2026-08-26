@@ -680,7 +680,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       </div>
       <Empty
         v-if="!filteredConversationList.length && !loadingMore && !isSyncing"
-        :icon="normalizedSearchKeyword ? 'empty/search' : 'empty/conversation'"
+        :icon="normalizedSearchKeyword ? 'search' : 'bubble/rect/empty'"
         :description="emptyDescription"
       >
         <template #description>

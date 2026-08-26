@@ -318,7 +318,7 @@ async function onDownload(file: any) {
     </div>
     <Empty
       v-else-if="files.length === 0"
-      icon="empty/files"
+      icon="folder"
       :description="t('group.sharedFile.empty', '暂无群文件')"
       size="small"
     />

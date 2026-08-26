@@ -14,9 +14,9 @@
         border-radius: 8px;
       "
     >
-      <em-empty icon="empty/files" title="Small" description="弹窗/抽屉内使用" size="small" />
-      <em-empty icon="empty/files" title="Normal" description="列表中使用（默认）" size="normal" />
-      <em-empty icon="empty/files" title="Large" description="页面级使用" size="large" />
+      <em-empty icon="folder" title="Small" description="弹窗/抽屉内使用" size="small" />
+      <em-empty icon="folder" title="Normal" description="列表中使用（默认）" size="normal" />
+      <em-empty icon="folder" title="Large" description="页面级使用" size="large" />
     </div>
     <div
       style="
@@ -26,7 +26,7 @@
       "
     >
       <em-empty illustration title="默认插画" description="未传 icon 时使用内置线描插画" />
-      <em-empty icon="empty/contact" title="仅标题">
+      <em-empty icon="person/single" title="仅标题">
         <template #description>
           自定义描述插槽内容
         </template>

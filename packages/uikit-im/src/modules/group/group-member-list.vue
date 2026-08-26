@@ -282,7 +282,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
 
       <Empty
         v-else-if="filteredMembers.length === 0"
-        :icon="searchKeyword ? 'empty/search' : 'empty/members'"
+        :icon="searchKeyword ? 'search' : 'person/double'"
         :description="searchKeyword ? (t('group.memberList.noSearchResult', '未找到相关成员')) : (t('group.memberList.empty', '暂无成员'))"
         size="small"
       />

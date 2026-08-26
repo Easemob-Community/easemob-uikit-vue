@@ -88,7 +88,7 @@ function onSelect(conversation: Conversation) {
         </Cell>
         <Empty
           v-if="!filteredConversations.length"
-          icon="empty/conversation"
+          icon="bubble/rect/empty"
           :description="t('conversation.empty')"
           size="small"
         />
