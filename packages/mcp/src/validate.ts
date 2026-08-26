@@ -81,8 +81,21 @@ export function validateProviderConfig(config: unknown): ValidationIssue[] {
     if ('density' in theme && !['compact', 'normal', 'comfortable'].includes(theme.density as string)) {
       issues.push({ path: 'theme.density', level: 'error', message: "应为 'compact' | 'normal' | 'comfortable'" })
     }
-    if ('primaryColor' in theme && (typeof theme.primaryColor !== 'number' || theme.primaryColor < 0 || theme.primaryColor > 360)) {
-      issues.push({ path: 'theme.primaryColor', level: 'error', message: '应为 0-360 的色相数值' })
+    if ('primaryColor' in theme) {
+      const pc = theme.primaryColor
+      if (typeof pc === 'number') {
+        if (pc < 0 || pc > 360) {
+          issues.push({ path: 'theme.primaryColor', level: 'error', message: '色相数值应在 0-360 之间' })
+        }
+      }
+      else if (isRecord(pc) && typeof pc.h === 'number' && typeof pc.s === 'number' && typeof pc.l === 'number') {
+        if (pc.h < 0 || pc.h > 360 || pc.s < 0 || pc.s > 100 || pc.l < 0 || pc.l > 100) {
+          issues.push({ path: 'theme.primaryColor', level: 'error', message: 'HSL 对象 h ∈ 0-360，s/l ∈ 0-100' })
+        }
+      }
+      else {
+        issues.push({ path: 'theme.primaryColor', level: 'error', message: '应为 0-360 色相数值，或 { h, s, l } 对象' })
+      }
     }
   }
   else if ('theme' in c) {

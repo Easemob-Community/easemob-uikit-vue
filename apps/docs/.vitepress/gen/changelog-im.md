@@ -1,3 +1,17 @@
+## @easemob/uikit-im 2.6.0 (2026-08-26)
+
+
+### 破坏性变更
+
+- **图标体系旧库清零，全面切换 V2**：删除 `packages/uikit-core/src/assets/icons/` 旧库目录；业务代码中所有空状态插画（`empty/*`）改用 V2 功能图标：`empty/contact`→`person/single`、`empty/chat`/`empty/conversation`→`bubble/rect/empty`、`empty/group`/`empty/members`→`person/double`、`empty/mutelist`→`bell/slash`、`empty/blocklist`→`circle/slash`、`empty/files`→`folder`、`empty/search`→`search`。`empty/mentions`、`files-media/doc_on_doc`、`status/info` 也已分别替换为 `at`、`rects`、`circle/bang`。
+- 若业务侧此前通过 `EmIcon` 直接引用旧库 name（如 `empty/contact`），需按上述映射切换到 V2 name。
+
+### 重构
+
+- `check-icon-refs.mjs` 扩展为同时校验旧库与 V2 目录，旧库删除后仅校验 `assets/icons-v2/`；构建期缺失图标引用会硬失败。
+
+---
+
 ## @easemob/uikit-im 2.5.0 (2026-08-25)
 
 

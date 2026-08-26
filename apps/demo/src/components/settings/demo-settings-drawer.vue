@@ -7,7 +7,7 @@
  * Provider 四开关由 app.vue 持有，经本组件 props/emits 双向转发到各面板。
  */
 import { computed, ref, watch } from 'vue'
-import { EmIcon, EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit-im'
+import { EmPopup, useArrowNavigation, useKeyBindings } from '@easemob/uikit-im'
 import DemoAiPanel from './demo-ai-panel.vue'
 import DemoAppearancePanel from './demo-appearance-panel.vue'
 import DemoChatPanel from './demo-chat-panel.vue'
@@ -99,7 +99,7 @@ function close() {
   >
     <div class="demo-drawer">
       <div class="demo-drawer__header">
-        <span class="demo-drawer__title">设置</span>
+        <span class="demo-drawer__title">特性开关</span>
         <button class="demo-btn demo-btn--icon" @click="close">✕</button>
       </div>
 
@@ -114,7 +114,6 @@ function close() {
             :class="{ 'demo-nav-item--active': activeCategory === cat.key }"
             @click="setIndex(i)"
           >
-            <EmIcon :name="cat.icon" :size="18" />
             <span>{{ cat.label }}</span>
           </button>
         </nav>
@@ -159,7 +158,6 @@ function close() {
             :class="{ 'demo-tab-item--active': activeCategory === cat.key }"
             @click="setIndex(i)"
           >
-            <EmIcon :name="cat.icon" :size="16" />
             <span>{{ cat.label }}</span>
           </button>
         </nav>
@@ -214,7 +212,7 @@ function close() {
 }
 
 .demo-drawer {
-  width: 420px;
+  width: 460px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -266,14 +264,13 @@ function close() {
 .demo-nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 10px;
+  height: 40px;
+  padding: 0 14px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   color: var(--uikit-text-secondary, #6b7280);
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   transition:
     background-color 0.15s,
@@ -287,7 +284,7 @@ function close() {
 }
 
 .demo-nav-item--active {
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  background-color: var(--uikit-primary-color-opacity, rgba(59, 130, 246, 0.25));
   color: var(--uikit-primary-color, hsl(203, 100%, 60%));
   font-weight: 600;
 }

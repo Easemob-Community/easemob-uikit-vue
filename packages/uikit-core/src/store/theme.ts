@@ -17,6 +17,14 @@ export type FontSizePreset = 'normal' | 'large' | 'xlarge'
 /** 密度档位 */
 export type Density = 'compact' | 'normal' | 'comfortable'
 
+/**
+ * 主色输入：色相数字（0-360，保留当前 S/L）或完整 HSL 对象。
+ * 完整 HSL 对象用于「取色器选完整颜色」场景；数字则只改色相、保留饱和度与亮度。
+ */
+export type PrimaryColorInput =
+  | number
+  | { h: number; s: number; l: number }
+
 /** 预设主题档位 */
 export type ThemePreset = 'default' | 'business' | 'fresh'
 
@@ -58,6 +66,10 @@ const THEME_STORAGE_KEY = 'easemob_uikit_theme'
 /** 持久化的主题状态 */
 interface ThemeStorageState {
   primaryColor: number
+  /** 主色饱和度（0-100 %），默认 100 */
+  primaryColorSat: number
+  /** 主色亮度（0-100 %），默认 60 */
+  primaryColorLum: number
   mode: ThemeMode
   avatarShape: 'circle' | 'square'
   bubbleShape: 'ground' | 'square'
@@ -84,6 +96,8 @@ interface ThemeStorageState {
 
 const defaultState: ThemeStorageState = {
   primaryColor: 203,
+  primaryColorSat: 100,
+  primaryColorLum: 60,
   mode: 'auto',
   avatarShape: 'circle',
   bubbleShape: 'ground',
@@ -137,6 +151,11 @@ export const THEME_PRESETS: Record<ThemePreset, ThemePresetConfig> = {
   },
 }
 
+/** 数值夹取到 [min, max] */
+function clamp(v: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, v))
+}
+
 /** hsl → "r, g, b" 字符串，用于 --uikit-primary-rgb（供 rgba(var(--uikit-primary-rgb), α) 场景） */
 function hslToRgbString(h: number, s: number, l: number): string {
   const sat = s / 100
@@ -165,6 +184,20 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.primaryColor,
     set: (v: number) => { storage.value.primaryColor = v },
   })
+  // 主色饱和度/亮度（兼容旧 localStorage：旧缓存无这些字段，回落到 100 / 60）
+  const primaryColorSat = computed({
+    get: () => storage.value.primaryColorSat ?? 100,
+    set: (v: number) => { storage.value.primaryColorSat = v },
+  })
+  const primaryColorLum = computed({
+    get: () => storage.value.primaryColorLum ?? 60,
+    set: (v: number) => { storage.value.primaryColorLum = v },
+  })
+  const primaryColorHsl = computed(() => ({
+    h: primaryColor.value,
+    s: primaryColorSat.value,
+    l: primaryColorLum.value,
+  }))
   const mode = computed({
     get: () => storage.value.mode,
     set: (v: ThemeMode) => { storage.value.mode = v },
@@ -246,23 +279,26 @@ export const useThemeStore = defineStore('theme', () => {
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
-    const hue = primaryColor.value
+    const h = primaryColor.value
+    const s = clamp(primaryColorSat.value, 0, 100)
+    const l = clamp(primaryColorLum.value, 0, 100)
     document.documentElement.style.setProperty(
       '--uikit-primary-color',
-      `hsl(${hue}, 100%, 60%)`
+      `hsl(${h}, ${s}%, ${l}%)`
     )
     document.documentElement.style.setProperty(
       '--uikit-primary-color-opacity',
-      `hsla(${hue}, 100%, 60%, 0.25)`
+      `hsla(${h}, ${s}%, ${l}%, 0.25)`
     )
     // 同步重算 primary-rgb，保证 rgba(var(--uikit-primary-rgb), α) 跟随主题色
     document.documentElement.style.setProperty(
       '--uikit-primary-rgb',
-      hslToRgbString(hue, 100, 60)
+      hslToRgbString(h, s, l)
     )
+    // hover 态：保留主色饱和度，亮度略降（默认 60→50，与既有视觉一致）
     document.documentElement.style.setProperty(
       '--uikit-primary-hover',
-      `hsl(${hue}, 100%, 50%)`
+      `hsl(${h}, ${s}%, ${Math.max(0, l - 10)}%)`
     )
     document.documentElement.setAttribute('data-uikit-theme', effectiveMode.value)
   })
@@ -359,8 +395,23 @@ export const useThemeStore = defineStore('theme', () => {
     )
   })
 
-  function setPrimaryColor(hue: number) {
-    primaryColor.value = hue
+  function setPrimaryColor(color: PrimaryColorInput) {
+    if (typeof color === 'number') {
+      primaryColor.value = color
+    }
+    else {
+      primaryColor.value = color.h
+      primaryColorSat.value = color.s
+      primaryColorLum.value = color.l
+    }
+  }
+
+  function setPrimaryColorSat(value: number) {
+    primaryColorSat.value = clamp(value, 0, 100)
+  }
+
+  function setPrimaryColorLum(value: number) {
+    primaryColorLum.value = clamp(value, 0, 100)
   }
 
   function setMode(value: ThemeMode) {
@@ -465,6 +516,9 @@ export const useThemeStore = defineStore('theme', () => {
 
   return {
     primaryColor,
+    primaryColorSat,
+    primaryColorLum,
+    primaryColorHsl,
     mode,
     effectiveMode,
     avatarShape,
@@ -483,6 +537,8 @@ export const useThemeStore = defineStore('theme', () => {
     chatBg,
     inputBg,
     setPrimaryColor,
+    setPrimaryColorSat,
+    setPrimaryColorLum,
     setMode,
     setAvatarShape,
     setBubbleShape,

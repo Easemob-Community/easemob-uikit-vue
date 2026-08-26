@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useThemeStore } from '../store/theme'
-import type { AnimationConfig, AnimationLevel, Density, FontSizePreset, HoverStyle, ThemeMode, ThemePreset } from '../store/theme'
+import type { AnimationConfig, AnimationLevel, Density, FontSizePreset, HoverStyle, PrimaryColorInput, ThemeMode, ThemePreset } from '../store/theme'
 
 export function useTheme() {
   const themeStore = useThemeStore()
@@ -8,14 +8,25 @@ export function useTheme() {
   const mode = computed(() => themeStore.mode)
   const effectiveMode = computed(() => themeStore.effectiveMode)
   const primaryColor = computed(() => themeStore.primaryColor)
+  const primaryColorSat = computed(() => themeStore.primaryColorSat)
+  const primaryColorLum = computed(() => themeStore.primaryColorLum)
+  const primaryColorHsl = computed(() => themeStore.primaryColorHsl)
   const isDark = computed(() => themeStore.effectiveMode === 'dark')
 
   function setMode(value: ThemeMode) {
     themeStore.setMode(value)
   }
 
-  function setPrimaryColor(hue: number) {
-    themeStore.setPrimaryColor(hue)
+  function setPrimaryColor(color: PrimaryColorInput) {
+    themeStore.setPrimaryColor(color)
+  }
+
+  function setPrimaryColorSat(value: number) {
+    themeStore.setPrimaryColorSat(value)
+  }
+
+  function setPrimaryColorLum(value: number) {
+    themeStore.setPrimaryColorLum(value)
   }
 
   function setAvatarShape(shape: 'circle' | 'square') {
@@ -111,6 +122,9 @@ export function useTheme() {
     mode,
     effectiveMode,
     primaryColor,
+    primaryColorSat,
+    primaryColorLum,
+    primaryColorHsl,
     isDark,
     avatarShape: computed(() => themeStore.avatarShape),
     bubbleShape: computed(() => themeStore.bubbleShape),
@@ -126,6 +140,8 @@ export function useTheme() {
     inputBg,
     setMode,
     setPrimaryColor,
+    setPrimaryColorSat,
+    setPrimaryColorLum,
     setAvatarShape,
     setBubbleShape,
     setComponentsShape,

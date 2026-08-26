@@ -16,7 +16,8 @@ import { EmUIKitProvider, EmButton, EmAvatar, EmBadge, EmCell } from '@easemob/u
     :auto-init="false"
     :theme="{
       mode: 'light',
-      primaryColor: 203,
+      // 主色可用色相数字(0-360)，也可传完整 HSL 对象 { h, s, l }
+      primaryColor: { h: 203, s: 100, l: 60 },
       gap: 8,
       shape: 'ground',
       fontSize: 'normal',

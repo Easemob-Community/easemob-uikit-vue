@@ -1,7 +1,7 @@
 import { type MaybeRefOrGetter, computed, onMounted, toValue, watch } from 'vue'
 import type { NotificationItem } from '../components/notification/types'
 import { useLocale } from '../locale'
-import { type AnimationConfig, type Density, type FontSizePreset, type ThemePreset, useThemeStore } from '../store/theme'
+import { type AnimationConfig, type Density, type FontSizePreset, type PrimaryColorInput, type ThemePreset, useThemeStore } from '../store/theme'
 import { configureLogPersistence } from '../utils/log-store'
 import { setLogLevel } from '../utils/logger'
 import type { H5AdaptationConfig } from './use-h5-adaptation'
@@ -17,8 +17,11 @@ export interface ProviderThemeConfig {
   preset?: ThemePreset
   /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
   mode?: 'light' | 'dark' | 'auto'
-  /** 品牌色相（0-360，hsl hue），默认 203 */
-  primaryColor?: number
+  /**
+   * 品牌主色：色相数字(0-360，默认 203，保留当前 S/L) 或完整 HSL 对象 { h, s, l }。
+   * 完整 HSL 对象配合取色器「选完整主色」场景使用。
+   */
+  primaryColor?: PrimaryColorInput
   /** 容器间距（px），默认 8，最小 0 */
   gap?: number
   /** 组件圆角模式：'ground' 圆角（默认）| 'square' 直角 */

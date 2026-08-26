@@ -25,13 +25,15 @@ UIKit 设计系统遵循以下核心原则，作为模糊场景下的决策依�
 
 ### 品牌色与语义色
 
-- `--uikit-primary-color`：主品牌色，默认 `hsl(203, 100%, 60%)` 环信蓝
-- `--uikit-primary-hover`：主色 hover 态
+- `--uikit-primary-color`：主品牌色，默认 `hsl(203, 100%, 60%)` 环信蓝；运行时由 `primaryColor + primaryColorSaturation/Lightness` 重算（`hsl(h, s%, l%)`）
+- `--uikit-primary-hover`：主色 hover 态（随主色饱和度/亮度联动）
 - `--uikit-primary-rgb`：主色 RGB 三元组（用于 `rgba()` 半透明背景）
 - `--uikit-success-color`：成功色
 - `--uikit-warning-color`：警告色
 - `--uikit-danger-color`：危险色
 - `--uikit-info-color`：信息色
+
+> 品牌主色支持「完整 HSL」：`theme.primaryColor` 与 `useTheme().setPrimaryColor` 既可传色相数字（0-360，保留当前饱和度/亮度），也可传 `{ h, s, l }` 对象（取色器选完整主色场景）。
 
 ### 文字与背景层级
 
@@ -235,6 +237,8 @@ import { useTheme } from '@easemob/uikit-im'
 
 const {
   primaryColor,
+  primaryColorSat,
+  primaryColorLum,
   avatarShape,
   bubbleShape,
   componentsShape,
@@ -246,6 +250,8 @@ const {
   density,
   preset,
   setPrimaryColor,
+  setPrimaryColorSat,
+  setPrimaryColorLum,
   setAvatarShape,
   setBubbleShape,
   setComponentsShape,
@@ -262,8 +268,13 @@ const {
   toggleMode,
 } = useTheme()
 
-// 按品牌色相环调整主色（0-360）
+// 按品牌色相环调整主色（0-360，保留当前饱和度/亮度）
 setPrimaryColor(262)
+
+// 也可以传入完整 HSL 对象（取色器「选完整主色」场景，同时更新 H/S/L）
+setPrimaryColor({ h: 262, s: 72, l: 52 })
+setPrimaryColorSat(72)   // 单独调饱和度（0-100）
+setPrimaryColorLum(52)   // 单独调亮度（0-100）
 
 // 头像 / 气泡 / 组件圆角形态：'circle' | 'square' / 'ground' | 'square'
 setAvatarShape('square')
@@ -334,7 +345,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
     :theme="{
       preset: 'business', // 'default' | 'business' | 'fresh'，应用后单项可覆盖
       mode: 'dark',
-      primaryColor: 262,
+      primaryColor: 262, // 色相(0-360)，或传完整 HSL 对象 { h, s, l }
       gap: 12,
       shape: 'square',
       fontSize: 'xlarge', // 'normal' | 'large' | 'xlarge' 或具体倍数

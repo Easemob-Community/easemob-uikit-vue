@@ -3681,7 +3681,7 @@ function Qb(n, e = {}) {
     ...e,
     autoInit: !1,
     clientName: "UIKit-IM",
-    clientVersion: "2.5.0",
+    clientVersion: "2.6.0",
     resolveClientConfig: Yb,
     onClientSetup: (c, u) => hb(c, { ...t, ...u }, e.connectionCallbacks, s.features)
   }), o = {

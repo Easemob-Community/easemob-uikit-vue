@@ -13,7 +13,7 @@ import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '
 import { EmNotificationContainer, EmToast } from '../../components'
 import type { NotificationItem } from '@easemob/uikit-core'
 import type { ClientConfig } from '@easemob/uikit-core'
-import type { AnimationConfig, Density, FontSizePreset, ThemePreset } from '@easemob/uikit-core'
+import type { AnimationConfig, Density, FontSizePreset, PrimaryColorInput, ThemePreset } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
 import type { NoticeConfig } from '@easemob/uikit-core'
 import type { NotificationChannel, NotificationTriggerMode } from '@easemob/uikit-core'
@@ -37,8 +37,10 @@ export interface ProviderProps {
     preset?: ThemePreset
     /** 主题模式：'light' | 'dark' | 'auto'（跟随系统） */
     mode?: 'light' | 'dark' | 'auto'
-    /** 品牌色相（0-360，hsl hue），默认 203 */
-    primaryColor?: number
+    /**
+     * 品牌主色：色相数字(0-360，默认 203，保留当前 S/L) 或完整 HSL 对象 { h, s, l }
+     */
+    primaryColor?: PrimaryColorInput
     /** 容器间距（px），默认 8，最小 0 */
     gap?: number
     /** 组件圆角模式：'ground' 圆角（默认）| 'square' 直角 */

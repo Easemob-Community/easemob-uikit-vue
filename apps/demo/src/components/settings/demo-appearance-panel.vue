@@ -1,33 +1,31 @@
 <script setup lang="ts">
 /**
- * 设置面板 - 外观
+ * 特性开关 - 外观面板
  *
- * 包含：主题模式 / 主题色 / Hover 风格 / 头像·气泡·组件形状 / 容器间距 /
- * 动画开关·强度·波纹 / Input 组件风格实时预览 / 键盘操作（开关 + Cell 类型切换演示）/ 语言
+ * 按图片一比一布局，包含：
+ * - 主题与颜色：主题模式、主题色取色器（2D 饱和度×亮度面板 + 色相条 + 明度条 + Hex/RGB/HSL/HSB 标签页）。
+ * - 颜色微调：对方气泡、自己气泡、输入区背景、聊天背景。
+ * - 组件风格：Hover 风格、气泡形状、容器间距、字号、密度、动画开关、动画强度、Input 组件风格。
+ * - 一键重置。
  *
- * 说明：直接消费 useTheme / useUIKit(theme) / useLocale，改动即时作用于全局主题；
- * Input 风格与预览值来自 useDemoSettings（输入框演示属于聊天面板，风格演示留在外观）；
- * 键盘操作开关调用 setKeyboardShortcutsEnabled 全局生效（外观面板的交互偏好）。
+ * 说明：UIKIT 主题色支持「色相 0-360 + 饱和度 0-100 + 亮度 0-100」，2D 色板映射饱和度×亮度，
+ * 色相条与明度条分别控制 H/L；颜色模式标签页为快捷格式切换（Hex/RGB/HSL/HSB 同色不同表达）。
  */
 import { computed, ref } from 'vue'
 import {
-  EmCell,
   EmInput,
-  EmPopup,
-  useArrowNavigation,
-  useEscToClose,
-  useKeyBindings,
   useLocale,
   useTheme,
   useUIKit,
 } from '@easemob/uikit-im'
 import { useDemoSettings } from '../../composables/use-demo-settings'
-import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const {
   mode,
   primaryColor,
+  primaryColorSat,
+  primaryColorLum,
   hoverStyle,
   containerGap,
   fontSizeScale,
@@ -38,489 +36,378 @@ const {
   inputBg,
   animationEnabled,
   animationLevel,
-  animationRipple,
   setMode,
   setPrimaryColor,
+  setPrimaryColorSat,
+  setPrimaryColorLum,
   setHoverStyle,
   setContainerGap,
   setFontSize,
   setDensity,
   setAnimationEnabled,
   setAnimationLevel,
-  setAnimationRipple,
   setBubbleBg,
   setChatBg,
   setInputBg,
 } = useTheme()
 const { theme: themeStore } = useUIKit()
 const { locale, setLocale } = useLocale()
-const { inputVariant, inputDemoValue, keyboardShortcutsEnabled, toggleKeyboardShortcuts } = useDemoSettings()
+const { inputVariant, inputDemoValue } = useDemoSettings()
 
-function updatePrimaryColor(e: Event) {
-  const val = Number((e.target as HTMLInputElement).value)
-  setPrimaryColor(val)
+/* ===== 主题色 2D 面板（饱和度×亮度，hue 由色相条控制） ===== */
+const colorPanelRef = ref<HTMLElement>()
+const isDraggingPanel = ref(false)
+
+function panelColorFromEvent(e: MouseEvent | TouchEvent): { s: number; l: number } {
+  const panel = colorPanelRef.value
+  if (!panel) return { s: primaryColorSat.value, l: primaryColorLum.value }
+  const rect = panel.getBoundingClientRect()
+  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+  const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+  const x = Math.min(Math.max(clientX - rect.left, 0), rect.width)
+  const y = Math.min(Math.max(clientY - rect.top, 0), rect.height)
+  return {
+    s: Math.round((x / rect.width) * 100),
+    l: Math.round((1 - y / rect.height) * 100),
+  }
 }
 
-/* ===== Cell 类型键盘切换演示（useArrowNavigation + useKeyBindings + useEscToClose 示例） ===== */
-
-interface CellTypeItem {
-  key: string
-  label: string
-  size: 'compact' | 'normal' | 'large'
-  /** 状态覆盖：active / disabled */
-  state?: 'active' | 'disabled'
+function applyPanelColor(e: MouseEvent | TouchEvent) {
+  const { s, l } = panelColorFromEvent(e)
+  setPrimaryColor({ h: Math.round(primaryColor.value), s, l })
 }
 
-const cellTypes: CellTypeItem[] = [
-  { key: 'compact', label: 'Compact 紧凑', size: 'compact' },
-  { key: 'normal', label: 'Normal 标准', size: 'normal' },
-  { key: 'large', label: 'Large 宽松', size: 'large' },
-  { key: 'active', label: '激活状态', size: 'normal', state: 'active' },
-  { key: 'disabled', label: '禁用状态', size: 'normal', state: 'disabled' },
+function onPanelMouseDown(e: MouseEvent) {
+  isDraggingPanel.value = true
+  applyPanelColor(e)
+}
+function onPanelTouchStart(e: TouchEvent) {
+  isDraggingPanel.value = true
+  applyPanelColor(e)
+}
+function onPanelMouseMove(e: MouseEvent) {
+  if (!isDraggingPanel.value) return
+  applyPanelColor(e)
+}
+function onPanelTouchMove(e: TouchEvent) {
+  if (!isDraggingPanel.value) return
+  applyPanelColor(e)
+}
+function stopDraggingPanel() {
+  isDraggingPanel.value = false
+}
+
+/* ===== 色相条 ===== */
+const hueSliderRef = ref<HTMLElement>()
+const isDraggingHue = ref(false)
+
+function hueFromEvent(e: MouseEvent | TouchEvent): number {
+  const bar = hueSliderRef.value
+  if (!bar) return primaryColor.value
+  const rect = bar.getBoundingClientRect()
+  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+  const x = Math.min(Math.max(clientX - rect.left, 0), rect.width)
+  return Math.round((x / rect.width) * 360)
+}
+
+function onHueMouseDown(e: MouseEvent) {
+  isDraggingHue.value = true
+  setPrimaryColor(hueFromEvent(e))
+}
+function onHueTouchStart(e: TouchEvent) {
+  isDraggingHue.value = true
+  setPrimaryColor(hueFromEvent(e))
+}
+function onHueMouseMove(e: MouseEvent) {
+  if (!isDraggingHue.value) return
+  setPrimaryColor(hueFromEvent(e))
+}
+function onHueTouchMove(e: TouchEvent) {
+  if (!isDraggingHue.value) return
+  setPrimaryColor(hueFromEvent(e))
+}
+function stopDraggingHue() {
+  isDraggingHue.value = false
+}
+
+/* ===== 颜色模式标签页（快捷展示当前色，HSL 为编辑态） ===== */
+type ColorMode = 'hex' | 'rgb' | 'hsl' | 'hsb'
+const activeColorMode = ref<ColorMode>('hsl')
+const colorModes: { key: ColorMode; label: string }[] = [
+  { key: 'hex', label: 'Hex' },
+  { key: 'rgb', label: 'RGB' },
+  { key: 'hsl', label: 'HSL' },
+  { key: 'hsb', label: 'HSB' },
 ]
 
-/** 演示区是否持有键盘焦点：仅聚焦时 ↑/↓ 才响应（active 条件控制示例） */
-const navActive = ref(false)
-const navBoxRef = ref<HTMLElement>()
+const hslPreview = computed(() => ({
+  h: Math.round(primaryColor.value),
+  s: Math.round(primaryColorSat.value),
+  l: Math.round(primaryColorLum.value),
+}))
 
-const { activeIndex, setIndex } = useArrowNavigation({
-  count: cellTypes.length,
-  wrap: true,
-  active: navActive,
-})
-const currentCell = computed(() => cellTypes[activeIndex.value])
+/* ===== 明度条（控制 L） ===== */
+const lightnessSliderRef = ref<HTMLElement>()
+const isDraggingLightness = ref(false)
 
-/** Enter 打开当前类型的预览 popup */
-const showPreview = ref(false)
-useKeyBindings({
-  Enter: () => {
-    if (navActive.value && !showPreview.value)
-      showPreview.value = true
-  },
-}, { active: navActive })
+function lightnessFromEvent(e: MouseEvent | TouchEvent): number {
+  const bar = lightnessSliderRef.value
+  if (!bar) return primaryColorLum.value
+  const rect = bar.getBoundingClientRect()
+  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+  const x = Math.min(Math.max(clientX - rect.left, 0), rect.width)
+  return Math.round((x / rect.width) * 100)
+}
+function onLightnessMouseDown(e: MouseEvent) {
+  isDraggingLightness.value = true
+  setPrimaryColorLum(lightnessFromEvent(e))
+}
+function onLightnessTouchStart(e: TouchEvent) {
+  isDraggingLightness.value = true
+  setPrimaryColorLum(lightnessFromEvent(e))
+}
+function onLightnessMouseMove(e: MouseEvent) {
+  if (!isDraggingLightness.value) return
+  setPrimaryColorLum(lightnessFromEvent(e))
+}
+function onLightnessTouchMove(e: TouchEvent) {
+  if (!isDraggingLightness.value) return
+  setPrimaryColorLum(lightnessFromEvent(e))
+}
+function stopDraggingLightness() {
+  isDraggingLightness.value = false
+}
 
-/** Esc 退出演示区聚焦态（预览 popup 的 Esc 关闭由 EmPopup 内置的 useEscToClose 处理） */
-useEscToClose(computed(() => navActive.value && !showPreview.value), () => {
-  navBoxRef.value?.blur()
-})
+/* ===== 一键重置 ===== */
+function resetAll() {
+  setMode('auto')
+  setPrimaryColor({ h: 203, s: 100, l: 60 })
+  themeStore.setBubbleShape('ground')
+  setHoverStyle('default')
+  setContainerGap(8)
+  setFontSize('normal')
+  setDensity('normal')
+  setAnimationEnabled(true)
+  setAnimationLevel('normal')
+  setBubbleBg(null, null)
+  setChatBg(undefined)
+  setInputBg(undefined)
+  inputVariant.value = 'search'
+  setLocale('zh-CN')
+}
 
-/** 演示区提示文案：未聚焦 / 聚焦可用 / 全局关闭三种状态 */
-const navTip = computed(() => {
-  if (!navActive.value)
-    return '点击此处聚焦，使用键盘操作'
-  return keyboardShortcutsEnabled.value
-    ? '↑ / ↓ 切换类型 · Enter 预览 · Esc 退出'
-    : '键盘操作已关闭，点击上方「开启」后可用'
-})
+/* ===== 辅助：当前主题色预览 ===== */
+const currentColorStyle = computed(() => ({
+  backgroundColor: `hsl(${primaryColor.value}, ${primaryColorSat.value}%, ${primaryColorLum.value}%)`,
+}))
 </script>
 
 <template>
   <div class="demo-panel">
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="主题模式"
-        tip="全局明暗主题：亮色 / 暗色 / 跟随系统（跟随系统时随系统深浅自动切换）"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': mode === 'light' }"
-          @click="setMode('light')"
-        >
-          亮色
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': mode === 'dark' }"
-          @click="setMode('dark')"
-        >
-          暗色
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': mode === 'auto' }"
-          @click="setMode('auto')"
-        >
-          跟随系统
-        </button>
-      </div>
-    </div>
+    <!-- ===== 主题与颜色 ===== -->
+    <section class="demo-section">
+      <h3 class="demo-section__title">主题与颜色</h3>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="主题色"
-        tip="调整 UIKIT 主色调（色相 0-360），影响按钮、选中态、链接等主色元素"
-      />
-      <div class="demo-settings__color">
-        <input
-          type="range"
-          min="0"
-          max="360"
-          :value="primaryColor"
-          class="demo-slider"
-          @input="updatePrimaryColor"
-        />
+      <div class="demo-row">
+        <div class="demo-row__left">
+          <span class="demo-row__label">切换主题</span>
+        </div>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': mode === 'light' }"
+              @click="setMode('light')"
+            >
+              亮色
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': mode === 'dark' }"
+              @click="setMode('dark')"
+            >
+              暗色
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': mode === 'auto' }"
+              @click="setMode('auto')"
+            >
+              跟随系统
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="demo-row__desc">全局明暗主题：亮色 / 暗色 / 跟随系统主题色</p>
+
+      <div class="demo-row demo-row--column">
+        <span class="demo-row__label">主题色色相</span>
+        <p class="demo-row__desc">调整 UIKIT 主题色，影响按钮、选中态、链接等主色元素</p>
+
+        <!-- 2D 色板（饱和度×亮度） -->
         <div
-          class="demo-color-preview"
-          :style="{ backgroundColor: `hsl(${primaryColor}, 100%, 60%)` }"
-        />
-      </div>
-    </div>
+          ref="colorPanelRef"
+          class="demo-color-panel"
+          :style="{ '--panel-hue': primaryColor }"
+          @mousedown="onPanelMouseDown"
+          @mousemove="onPanelMouseMove"
+          @mouseup="stopDraggingPanel"
+          @mouseleave="stopDraggingPanel"
+          @touchstart.prevent="onPanelTouchStart"
+          @touchmove.prevent="onPanelTouchMove"
+          @touchend="stopDraggingPanel"
+        >
+          <div
+            class="demo-color-panel__cursor"
+            :style="{ left: `${primaryColorSat}%`, top: `${100 - primaryColorLum}%` }"
+          />
+        </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="Hover 风格"
-        tip="列表项（会话 / 联系人等）的悬停样式：默认整行高亮；圆角卡片带圆角与左右缩进"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': hoverStyle === 'default' }"
-          @click="setHoverStyle('default')"
-        >
-          默认
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': hoverStyle === 'rounded' }"
-          @click="setHoverStyle('rounded')"
-        >
-          圆角卡片
-        </button>
-      </div>
-    </div>
+        <!-- 色相条 + 预览 -->
+        <div class="demo-hue-row">
+          <div class="demo-color-dot" :style="currentColorStyle" />
+          <div
+            ref="hueSliderRef"
+            class="demo-hue-slider"
+            @mousedown="onHueMouseDown"
+            @mousemove="onHueMouseMove"
+            @mouseup="stopDraggingHue"
+            @mouseleave="stopDraggingHue"
+            @touchstart.prevent="onHueTouchStart"
+            @touchmove.prevent="onHueTouchMove"
+            @touchend="stopDraggingHue"
+          >
+            <div class="demo-hue-slider__thumb" :style="{ left: `${(primaryColor / 360) * 100}%` }" />
+          </div>
+        </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="头像形状"
-        tip="全局头像形状：圆形（50% 圆）或圆角方形（8px 圆角）。未单独指定形状的头像统一生效"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.avatarShape === 'circle' }"
-          @click="themeStore.setAvatarShape('circle')"
-        >
-          圆形
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.avatarShape === 'square' }"
-          @click="themeStore.setAvatarShape('square')"
-        >
-          圆角方形
-        </button>
-      </div>
-    </div>
+        <!-- 亮度条（控制 L） -->
+        <div class="demo-hue-row">
+          <div class="demo-color-dot" :style="currentColorStyle" />
+          <div
+            ref="lightnessSliderRef"
+            class="demo-lightness-slider"
+            :style="{ '--panel-hue': primaryColor }"
+            @mousedown="onLightnessMouseDown"
+            @mousemove="onLightnessMouseMove"
+            @mouseup="stopDraggingLightness"
+            @mouseleave="stopDraggingLightness"
+            @touchstart.prevent="onLightnessTouchStart"
+            @touchmove.prevent="onLightnessTouchMove"
+            @touchend="stopDraggingLightness"
+          >
+            <div class="demo-lightness-slider__thumb" :style="{ left: `${primaryColorLum}%` }" />
+          </div>
+        </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="气泡形状"
-        tip="消息气泡的圆角大小：大圆角为默认样式，小圆角约 4px（接近直角但保留过渡）"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.bubbleShape === 'ground' }"
-          @click="themeStore.setBubbleShape('ground')"
-        >
-          大圆角
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.bubbleShape === 'square' }"
-          @click="themeStore.setBubbleShape('square')"
-        >
-          小圆角
-        </button>
-      </div>
-      <div class="demo-info">
-        影响消息气泡的圆角大小：大圆角为默认样式，小圆角约 4px（接近直角但保留过渡）。
-      </div>
-    </div>
+        <!-- 颜色模式标签页 -->
+        <div class="demo-color-modes">
+          <button
+            v-for="m in colorModes"
+            :key="m.key"
+            class="demo-color-modes__item"
+            :class="{ 'demo-color-modes__item--active': activeColorMode === m.key }"
+            @click="activeColorMode = m.key"
+          >
+            {{ m.label }}
+          </button>
+        </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="组件圆角"
-        tip="输入框、按钮、弹层、列表项等控件的圆角大小。消息气泡的圆角由「气泡形状」控制"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.componentsShape === 'ground' }"
-          @click="themeStore.setComponentsShape('ground')"
-        >
-          大圆角（8px）
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': themeStore.componentsShape === 'square' }"
-          @click="themeStore.setComponentsShape('square')"
-        >
-          小圆角（4px）
-        </button>
-      </div>
-      <div class="demo-info">
-        影响输入框、按钮、弹层、列表项等控件的圆角大小。消息气泡的圆角请用上方的「气泡形状」调整。
-      </div>
-    </div>
+        <!-- H / S / L 数值 -->
+        <div class="demo-color-values">
+          <div class="demo-color-value">
+            <span class="demo-color-value__prefix">H</span>
+            <input
+              type="number"
+              min="0"
+              max="360"
+              :value="hslPreview.h"
+              class="demo-color-value__input"
+              @input="(e: Event) => setPrimaryColor(Number((e.target as HTMLInputElement).value))"
+            >
+          </div>
+          <div class="demo-color-value">
+            <span class="demo-color-value__prefix">S</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              :value="hslPreview.s"
+              class="demo-color-value__input"
+              @input="(e: Event) => setPrimaryColorSat(Number((e.target as HTMLInputElement).value))"
+            >
+          </div>
+          <div class="demo-color-value">
+            <span class="demo-color-value__prefix">L</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              :value="hslPreview.l"
+              class="demo-color-value__input"
+              @input="(e: Event) => setPrimaryColorLum(Number((e.target as HTMLInputElement).value))"
+            >
+          </div>
+          <div class="demo-color-value demo-color-value--percent demo-color-value--disabled">
+            <span class="demo-color-value__static">{{ hslPreview.l }}</span>
+            <span class="demo-color-value__unit">%</span>
+          </div>
+        </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="容器间距"
-        tip="聊天输入区（工具栏、表情面板等）各元素之间的间距"
-      />
-      <div class="demo-settings__color">
-        <input
-          type="range"
-          min="0"
-          max="24"
-          :value="containerGap"
-          class="demo-slider"
-          style="background: linear-gradient(to right, #e5e7eb, var(--uikit-primary-color, hsl(203, 100%, 60%)));"
-          @input="(e: Event) => setContainerGap(Number((e.target as HTMLInputElement).value))"
-        />
-        <span style="font-size: 13px; color: var(--uikit-text-secondary, #6b7280); min-width: 28px; text-align: right;">{{ containerGap }}px</span>
+        <p class="demo-row__desc">
+          * 2D 色板调整饱和度/亮度，色相条与亮度条分别调整 H/L；颜色模式标签页为格式切换。
+        </p>
       </div>
-      <div class="demo-info">
-        调整聊天输入区（工具栏、表情面板等）各元素之间的间距。
-      </div>
-    </div>
+    </section>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="字号"
-        tip="全局字号档位：标准 1.0 / 大 1.125 / 特大 1.25 倍"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': fontSizeScale === 1 }"
-          @click="setFontSize('normal')"
-        >
-          标准
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': fontSizeScale === 1.125 }"
-          @click="setFontSize('large')"
-        >
-          大
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': fontSizeScale === 1.25 }"
-          @click="setFontSize('xlarge')"
-        >
-          特大
-        </button>
-      </div>
-    </div>
+    <!-- ===== 颜色微调 ===== -->
+    <section class="demo-section">
+      <h3 class="demo-section__title">颜色微调（气泡 / 输入区 / 聊天背景）</h3>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="密度"
-        tip="列表项与容器的高度、内边距、间距档位：紧凑 / 标准 / 宽松"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': density === 'compact' }"
-          @click="setDensity('compact')"
-        >
-          紧凑
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': density === 'normal' }"
-          @click="setDensity('normal')"
-        >
-          标准
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': density === 'comfortable' }"
-          @click="setDensity('comfortable')"
-        >
-          宽松
-        </button>
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">对方气泡</span>
+        <div class="demo-row__right">
+          <input
+            type="color"
+            :value="bubbleBgOther || '#f3f4f6'"
+            class="demo-color-input"
+            @input="(e: Event) => setBubbleBg((e.target as HTMLInputElement).value, undefined)"
+          >
+          <button class="demo-text-btn" @click="setBubbleBg(null, undefined)">恢复</button>
+        </div>
       </div>
-    </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="动画开关"
-        tip="全局动效总开关，关闭后悬停、弹层、波纹等动画全部停用"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': animationEnabled }"
-          @click="setAnimationEnabled(true)"
-        >
-          开启
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': !animationEnabled }"
-          @click="setAnimationEnabled(false)"
-        >
-          关闭
-        </button>
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">自己气泡</span>
+        <div class="demo-row__right">
+          <input
+            type="color"
+            :value="bubbleBgSelf || '#3bb1ff'"
+            class="demo-color-input"
+            @input="(e: Event) => setBubbleBg(undefined, (e.target as HTMLInputElement).value)"
+          >
+          <button class="demo-text-btn" @click="setBubbleBg(undefined, null)">恢复</button>
+        </div>
       </div>
-    </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="动画强度"
-        tip="动效幅度档位：轻柔 / 标准 / 生动"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': animationLevel === 'subtle' }"
-          @click="setAnimationLevel('subtle')"
-        >
-          轻柔
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': animationLevel === 'normal' }"
-          @click="setAnimationLevel('normal')"
-        >
-          标准
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': animationLevel === 'expressive' }"
-          @click="setAnimationLevel('expressive')"
-        >
-          生动
-        </button>
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">输入区背景</span>
+        <div class="demo-row__right">
+          <input
+            type="color"
+            :value="inputBg || '#ffffff'"
+            class="demo-color-input"
+            @input="(e: Event) => setInputBg((e.target as HTMLInputElement).value)"
+          >
+          <button class="demo-text-btn" @click="setInputBg(undefined)">恢复</button>
+        </div>
       </div>
-    </div>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="波纹效果"
-        tip="按钮 / 列表项点击时的波纹扩散效果"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': animationRipple }"
-          @click="setAnimationRipple(true)"
-        >
-          开启
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': !animationRipple }"
-          @click="setAnimationRipple(false)"
-        >
-          关闭
-        </button>
-      </div>
-    </div>
-
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="Input 组件风格"
-        tip="EmInput 的五种内置样式，下方输入框实时预览效果"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': inputVariant === 'default' }"
-          @click="inputVariant = 'default'"
-        >
-          default
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': inputVariant === 'search' }"
-          @click="inputVariant = 'search'"
-        >
-          search
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': inputVariant === 'filled' }"
-          @click="inputVariant = 'filled'"
-        >
-          filled
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': inputVariant === 'ghost' }"
-          @click="inputVariant = 'ghost'"
-        >
-          ghost
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': inputVariant === 'underline' }"
-          @click="inputVariant = 'underline'"
-        >
-          underline
-        </button>
-      </div>
-      <div class="demo-info">
-        风格说明：default 默认 / search 搜索 / filled 填充 / ghost 幽灵 / underline 下划线。
-      </div>
-      <div style="margin-top: 8px;">
-        <EmInput
-          v-model="inputDemoValue"
-          :variant="inputVariant"
-          prefix-icon="search"
-          placeholder="预览 Input 风格..."
-        />
-      </div>
-    </div>
-
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="颜色微调（气泡 / 输入区 / 聊天背景）"
-        tip="覆盖语义色 token：对方 / 自己气泡底色、输入区背景、聊天区背景（支持颜色、渐变或图片 url），随时可恢复默认"
-      />
-      <div class="demo-settings__row">
-        <span class="demo-settings__row-label">对方气泡</span>
-        <input
-          type="color"
-          :value="bubbleBgOther || '#f3f4f6'"
-          class="demo-color-input"
-          @input="(e: Event) => setBubbleBg((e.target as HTMLInputElement).value, undefined)"
-        >
-        <button class="demo-reset-btn" @click="setBubbleBg(null, null)">
-          恢复
-        </button>
-      </div>
-      <div class="demo-settings__row">
-        <span class="demo-settings__row-label">自己气泡</span>
-        <input
-          type="color"
-          :value="bubbleBgSelf || '#3bb1ff'"
-          class="demo-color-input"
-          @input="(e: Event) => setBubbleBg(undefined, (e.target as HTMLInputElement).value)"
-        >
-        <button class="demo-reset-btn" @click="setBubbleBg(null, null)">
-          恢复
-        </button>
-      </div>
-      <div class="demo-settings__row">
-        <span class="demo-settings__row-label">输入区背景</span>
-        <input
-          type="color"
-          :value="inputBg || '#ffffff'"
-          class="demo-color-input"
-          @input="(e: Event) => setInputBg((e.target as HTMLInputElement).value)"
-        >
-        <button class="demo-reset-btn" @click="setInputBg(undefined)">
-          恢复
-        </button>
-      </div>
-      <div class="demo-settings__row demo-settings__row--column">
-        <span class="demo-settings__row-label">聊天背景</span>
+      <div class="demo-row demo-row--column demo-row--bordered">
+        <div class="demo-row__spread">
+          <span class="demo-row__label">聊天背景</span>
+          <button class="demo-text-btn" @click="setChatBg(undefined)">恢复</button>
+        </div>
         <input
           :value="chatBg || ''"
           type="text"
@@ -528,165 +415,621 @@ const navTip = computed(() => {
           class="demo-text-input"
           @input="(e: Event) => setChatBg((e.target as HTMLInputElement).value || undefined)"
         >
-        <div class="demo-settings__row-actions">
-          <button class="demo-reset-btn" @click="setChatBg(undefined)">
-            恢复
-          </button>
-        </div>
       </div>
-      <div class="demo-settings__row">
-        <button class="demo-option" @click="setBubbleBg(null, null); setChatBg(undefined); setInputBg(undefined)">
-          全部重置
-        </button>
-      </div>
-    </div>
+    </section>
 
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="键盘操作"
-        tip="UIKIT 全局键盘操作总开关：Esc 关闭弹层、方向键切换导航等。关闭后所有快捷键立即失效（含下方演示）"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': keyboardShortcutsEnabled }"
-          @click="toggleKeyboardShortcuts(true)"
-        >
-          开启
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': !keyboardShortcutsEnabled }"
-          @click="toggleKeyboardShortcuts(false)"
-        >
-          关闭
-        </button>
-      </div>
-      <div class="demo-info">
-        控制 UIKIT 全部键盘操作：Esc 关闭弹层、方向键切换导航项等。关闭后所有快捷键立即失效（含下方演示）。<br>
-        会话列表：鼠标悬停列表区域后可用 ↑ / ↓ 直接切换会话，Esc 退出键盘导航。
-      </div>
-      <div
-        ref="navBoxRef"
-        class="demo-keynav"
-        :class="{ 'demo-keynav--active': navActive }"
-        tabindex="0"
-        @focus="navActive = true"
-        @blur="navActive = false"
-      >
-        <div class="demo-keynav__tip">
-          {{ navTip }}
-        </div>
-        <div class="demo-keynav__list">
-          <EmCell
-            v-for="(item, i) in cellTypes"
-            :key="item.key"
-            :title="item.label"
-            :size="item.size"
-            :disabled="item.state === 'disabled'"
-            :active="i === activeIndex && item.state !== 'disabled'"
-            border
-            @click="setIndex(i)"
-          />
-        </div>
-        <div class="demo-keynav__current">
-          当前：{{ currentCell.label }}（{{ activeIndex + 1 }} / {{ cellTypes.length }}）
-        </div>
-      </div>
+    <!-- ===== 组件风格 ===== -->
+    <section class="demo-section">
+      <h3 class="demo-section__title">组件风格</h3>
 
-      <EmPopup v-model:show="showPreview" :close-on-esc="true">
-        <div class="demo-cell-preview">
-          <div class="demo-cell-preview__title">
-            {{ currentCell.label }} 预览
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">Hover 风格</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': hoverStyle === 'default' }"
+              @click="setHoverStyle('default')"
+            >
+              默认
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': hoverStyle === 'rounded' }"
+              @click="setHoverStyle('rounded')"
+            >
+              圆角
+            </button>
           </div>
-          <EmCell
-            :title="currentCell.label"
-            :size="currentCell.size"
-            :disabled="currentCell.state === 'disabled'"
-            :active="currentCell.state === 'active'"
-            border
-          />
-          <button class="demo-btn" @click="showPreview = false">
-            关闭（Esc）
+        </div>
+      </div>
+      <p class="demo-row__desc">列表项（会话 / 联系人等）的悬停样式：默认整行高亮；圆角卡片带圆角与左右缩进。</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">气泡形状</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': themeStore.bubbleShape === 'ground' }"
+              @click="themeStore.setBubbleShape('ground')"
+            >
+              大圆角
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': themeStore.bubbleShape === 'square' }"
+              @click="themeStore.setBubbleShape('square')"
+            >
+              小圆角
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="demo-row__desc">影响消息气泡的圆角大小：大圆角为默认样式，小圆角约 4px（接近直角但保留过渡）。</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">容器间距</span>
+        <div class="demo-row__right">
+          <input
+            type="range"
+            min="0"
+            max="24"
+            :value="containerGap"
+            class="demo-range-input"
+            @input="(e: Event) => setContainerGap(Number((e.target as HTMLInputElement).value))"
+          >
+          <span class="demo-range-value">{{ containerGap }}</span>
+        </div>
+      </div>
+      <p class="demo-row__desc">调整聊天输入区（工具栏、表情面板等）各元素之间的间距。</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">字号</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': fontSizeScale === 1 }"
+              @click="setFontSize('normal')"
+            >
+              标准
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': fontSizeScale === 1.125 }"
+              @click="setFontSize('large')"
+            >
+              大
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': fontSizeScale === 1.25 }"
+              @click="setFontSize('xlarge')"
+            >
+              特大
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="demo-row__desc">全局字号档位：标准 1.0 / 大 1.125 / 特大 1.25 倍</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">密度</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': density === 'compact' }"
+              @click="setDensity('compact')"
+            >
+              紧凑
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': density === 'normal' }"
+              @click="setDensity('normal')"
+            >
+              标准
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': density === 'comfortable' }"
+              @click="setDensity('comfortable')"
+            >
+              宽松
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="demo-row__desc">列表项与容器的高度、内边距、间距档位：紧凑 / 标准 / 宽松</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">动画开关</span>
+        <div class="demo-row__right">
+          <button
+            class="demo-switch"
+            :class="{ 'demo-switch--active': animationEnabled }"
+            @click="setAnimationEnabled(!animationEnabled)"
+          >
+            <span class="demo-switch__thumb" />
           </button>
         </div>
-      </EmPopup>
-    </div>
-
-    <div class="demo-settings__group">
-      <DemoSettingLabel
-        title="语言"
-        tip="界面语言：中文 / English，影响 UIKIT 内置文案（列表项、按钮、弹层等）"
-      />
-      <div class="demo-settings__options">
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': locale === 'zh-CN' }"
-          @click="setLocale('zh-CN')"
-        >
-          中文
-        </button>
-        <button
-          class="demo-option"
-          :class="{ 'demo-option--active': locale === 'en' }"
-          @click="setLocale('en')"
-        >
-          English
-        </button>
       </div>
-    </div>
+      <p class="demo-row__desc">全局动效总开关，关闭后悬停、弹层、波纹等动画全部停用</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">动画强度</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': animationLevel === 'subtle' }"
+              @click="setAnimationLevel('subtle')"
+            >
+              轻柔
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': animationLevel === 'normal' }"
+              @click="setAnimationLevel('normal')"
+            >
+              标准
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': animationLevel === 'expressive' }"
+              @click="setAnimationLevel('expressive')"
+            >
+              生动
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">Input 组件风格</span>
+        <div class="demo-row__right">
+          <select v-model="inputVariant" class="demo-select">
+            <option value="default">default</option>
+            <option value="search">search</option>
+            <option value="filled">filled</option>
+            <option value="ghost">ghost</option>
+            <option value="underline">underline</option>
+          </select>
+        </div>
+      </div>
+      <p class="demo-row__desc">Input 的五种内置样式，下方输入框实时预览效果</p>
+      <div class="demo-input-preview">
+        <EmInput
+          v-model="inputDemoValue"
+          :variant="inputVariant"
+          placeholder="Input"
+        />
+      </div>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">语言</span>
+        <div class="demo-row__right">
+          <div class="demo-segmented">
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': locale === 'zh-CN' }"
+              @click="setLocale('zh-CN')"
+            >
+              中文
+            </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': locale === 'en' }"
+              @click="setLocale('en')"
+            >
+              English
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 一键重置 ===== -->
+    <button class="demo-reset-all" @click="resetAll">
+      一键重置
+    </button>
   </div>
 </template>
 
 <style scoped>
-.demo-keynav {
-  margin-top: 8px;
-  padding: 8px;
-  border: 1px dashed var(--uikit-border-color, #e5e7eb);
-  border-radius: 8px;
-  outline: none;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-
-.demo-keynav--active {
-  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
-  border-style: solid;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
-}
-
-.demo-keynav__tip {
-  font-size: 12px;
-  color: var(--uikit-text-tertiary, #9ca3af);
-  margin-bottom: 8px;
-}
-
-.demo-keynav__list {
-  overflow: hidden;
-  border-radius: 8px;
-  background: var(--uikit-bg-base, #ffffff);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-}
-
-.demo-keynav__current {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--uikit-text-secondary, #6b7280);
-}
-
-.demo-cell-preview {
-  width: 300px;
-  padding: 16px;
+.demo-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.demo-cell-preview__title {
-  font-size: 14px;
+.demo-section__title {
+  margin: 0;
+  font-size: 13px;
   font-weight: 600;
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+.demo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+}
+
+.demo-row--column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.demo-row--bordered {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+}
+
+.demo-row__left,
+.demo-row__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-row__right {
+  flex-shrink: 0;
+}
+
+.demo-row__spread {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.demo-row__label {
+  font-size: 15px;
+  font-weight: 500;
   color: var(--uikit-text-primary, #111827);
+}
+
+.demo-row__desc {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--uikit-text-secondary, #6b7280);
+  line-height: 1.5;
+}
+
+/* 分段按钮 */
+.demo-segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 8px;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+}
+
+.demo-segmented__item {
+  height: 30px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--uikit-text-primary, #111827);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.demo-segmented__item--active {
+  background-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 2D 色板 */
+.demo-color-panel {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  background:
+    linear-gradient(to bottom, transparent, #000),
+    linear-gradient(to right, #fff, hsl(var(--panel-hue, 203), 100%, 50%));
+  cursor: crosshair;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.demo-color-panel__cursor {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* 色相条 */
+.demo-hue-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-hue-row--disabled {
+  opacity: 0.6;
+}
+
+.demo-color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.demo-color-dot--empty {
+  background: linear-gradient(135deg, #e5e7eb 25%, transparent 25%, transparent 50%, #e5e7eb 50%, #e5e7eb 75%, transparent 75%);
+  background-size: 10px 10px;
+}
+
+.demo-hue-slider,
+.demo-lightness-slider {
+  position: relative;
+  flex: 1;
+  height: 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.demo-hue-slider {
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.demo-lightness-slider {
+  background: linear-gradient(to right, #fff, hsl(var(--panel-hue, 203), 100%, 50%));
+}
+
+.demo-hue-slider__thumb,
+.demo-lightness-slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 28px;
+  border: 2px solid #ffffff;
+  border-radius: 7px;
+  background-color: transparent;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* 颜色模式标签页 */
+.demo-color-modes {
+  display: flex;
+  padding: 3px;
+  border-radius: 8px;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+}
+
+.demo-color-modes__item {
+  flex: 1;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--uikit-text-secondary, #6b7280);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-color-modes__item--active {
+  background-color: #ffffff;
+  color: var(--uikit-text-primary, #111827);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* 颜色数值 */
+.demo-color-values {
+  display: flex;
+  gap: 8px;
+}
+
+.demo-color-value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+}
+
+.demo-color-value--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.demo-color-value--percent {
+  flex: 0.6;
+}
+
+.demo-color-value__prefix,
+.demo-color-value__unit,
+.demo-color-value__static {
+  font-size: 13px;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.demo-color-value__prefix {
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+.demo-color-value__input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--uikit-text-primary, #111827);
+  outline: none;
+}
+
+.demo-unsupported-tip {
+  margin: 0;
+  font-size: 11px;
+  color: var(--uikit-text-tertiary, #9ca3af);
+}
+
+/* 行内颜色选择 */
+.demo-color-input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.demo-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.demo-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
+
+.demo-text-btn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--uikit-text-secondary, #6b7280);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.demo-text-btn:hover {
+  color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+/* 滑块 */
+.demo-range-input {
+  flex: 1;
+  width: 120px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  background: linear-gradient(to right, #e5e7eb, var(--uikit-primary-color, hsl(203, 100%, 60%)));
+  outline: none;
+}
+
+.demo-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--uikit-primary-color, hsl(203, 100%, 60%));
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.demo-range-value {
+  min-width: 24px;
+  text-align: right;
+  font-size: 14px;
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+/* Toggle switch */
+.demo-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--uikit-bg-secondary, #e5e7eb);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.demo-switch--active {
+  background-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+.demo-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+}
+
+.demo-switch--active .demo-switch__thumb {
+  transform: translateX(20px);
+}
+
+/* 下拉选择 */
+.demo-select {
+  height: 32px;
+  padding: 0 28px 0 12px;
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-radius: 8px;
+  background-color: var(--uikit-bg-base, #ffffff);
+  color: var(--uikit-text-primary, #111827);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+}
+
+.demo-select:focus {
+  border-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
+}
+
+/* Input 预览 */
+.demo-input-preview {
+  margin-top: 4px;
+}
+
+/* 一键重置 */
+.demo-reset-all {
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  color: var(--uikit-text-primary, #111827);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.demo-reset-all:hover {
+  background-color: var(--uikit-border-color, #e5e7eb);
 }
 </style>
