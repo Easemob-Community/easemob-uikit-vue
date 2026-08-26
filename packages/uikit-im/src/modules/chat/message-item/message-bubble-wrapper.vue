@@ -754,7 +754,7 @@ onBeforeUnmount(() => {
           <span>{{ t('message.avatar.viewProfile') }}</span>
         </div>
         <div v-if="isGroupChat" class="avatar-context-menu__item" @click="onMentionFromAvatar">
-          <Icon name="empty/mentions" :size="16" />
+          <Icon name="at" :size="16" />
           <span>{{ t('message.avatar.mention') }}</span>
         </div>
       </div>

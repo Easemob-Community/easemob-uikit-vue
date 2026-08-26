@@ -163,7 +163,7 @@ function scrollActiveIntoView() {
           </Cell>
           <Empty
             v-if="filteredContacts.length === 0"
-            icon="empty/mentions"
+            icon="at"
             :description="t('mention.noResult', '未找到联系人')"
             size="small"
           />
@@ -225,7 +225,7 @@ function scrollActiveIntoView() {
           </Cell>
           <Empty
             v-if="filteredContacts.length === 0"
-            icon="empty/mentions"
+            icon="at"
             :description="t('mention.noResult', '未找到联系人')"
             size="small"
           />
