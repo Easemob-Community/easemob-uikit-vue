@@ -1,5 +1,27 @@
 # Changelog
 
+## @easemob/uikit-im 2.6.0 (2026-08-26)
+
+### 破坏性变更
+
+- **图标体系旧库清零，全面切换 V2**：删除 `packages/uikit-core/src/assets/icons/` 旧库目录；业务代码中所有空状态插画（`empty/*`）改用 V2 功能图标：`empty/contact`→`person/single`、`empty/chat`/`empty/conversation`→`bubble/rect/empty`、`empty/group`/`empty/members`→`person/double`、`empty/mutelist`→`bell/slash`、`empty/blocklist`→`circle/slash`、`empty/files`→`folder`、`empty/search`→`search`。`empty/mentions`、`files-media/doc_on_doc`、`status/info` 也已分别替换为 `at`、`rects`、`circle/bang`。
+- 若业务侧此前通过 `EmIcon` 直接引用旧库 name（如 `empty/contact`），需按上述映射切换到 V2 name。
+
+### 重构
+
+- `check-icon-refs.mjs` 扩展为同时校验旧库与 V2 目录，旧库删除后仅校验 `assets/icons-v2/`；构建期缺失图标引用会硬失败。
+
+## @easemob/uikit-core 1.4.0 (2026-08-26)
+
+### 破坏性变更
+
+- **图标资源目录整合**：`assets/icons-filled/` 下 7 个面性 SVG 迁移到 `assets/icons-v2/filled/`，`icon-map.ts` 移除独立 filled 注册表，面性图标 name 仍保持 `filled/` 前缀；`assets/icons/` 旧库整目录删除，V2 成为唯一图标库。
+- 修复 3 个 V2 资源拼写错误：`singal`→`signal`、`rect/personnclock`→`rect/person-clock`、`rectnarrowreturn`→`rect/narrow-return`。
+
+### 修复
+
+- `icons:check` 脚本覆盖 `assets/icons-v2/`（含 `filled/`）与 `assets/icons/`，旧库删除后自动仅校验 V2；支持无 `src/` 目录的包扫描。
+
 ## @easemob/uikit-im 2.5.0 (2026-08-25)
 
 ### 新增

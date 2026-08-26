@@ -1,6 +1,6 @@
 # 图标
 
-UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。所有图标集中在 `packages/uikit-core/src/assets/icons-v2/`（旧库 `assets/icons/` 仅保留少量缺口插画），命名与设计师 svg 文件名 1:1。面性图标放在 `icons-v2/filled/`，name 带 `filled/` 前缀，目前主要用于在线状态等需要实心图形的场景。
+UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。所有图标集中在 `packages/uikit-core/src/assets/icons-v2/`，命名与设计师 svg 文件名 1:1。面性图标放在 `icons-v2/filled/`，name 带 `filled/` 前缀，目前主要用于在线状态等需要实心图形的场景。旧库 `assets/icons/` 已整目录删除，V2 是唯一图标库。
 
 不再依赖外部图标库兜底。
 
