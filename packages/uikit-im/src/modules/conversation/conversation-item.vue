@@ -247,7 +247,15 @@ const actionSheetActions = computed(() => {
 const contextMenuItems = computed(() => {
   return mergedActions.value
     .filter(a => a.position === 'pc' || a.position === 'both')
-    .map(a => ({ label: a.label, action: a.key, danger: a.danger, icon: a.icon }))
+    .map(a => ({
+      label: a.label,
+      action: a.key,
+      danger: a.danger,
+      icon: a.icon,
+      // pin 为填充式图标，在 24×24 画布中占位比描边式（bell/trash）窄，同尺寸下视觉偏小，
+      // 放大一档使其与其余菜单项视觉一致。
+      size: a.key === 'pin' ? 16 : 14,
+    }))
 })
 
 function onActionSheetSelect(_item: { name: string, color?: string, icon?: string }, index: number) {
@@ -418,7 +426,7 @@ const displayMessage = computed(() => {
         @click.stop="onContextMenuItemClick(item.action)"
       >
         <Transition name="uikit-icon-swap" mode="out-in">
-          <Icon v-if="item.icon" :key="item.icon" :name="item.icon" :size="14" />
+          <Icon v-if="item.icon" :key="item.icon" :name="item.icon" :size="item.size ?? 14" />
         </Transition>
         <span>{{ item.label }}</span>
       </div>
