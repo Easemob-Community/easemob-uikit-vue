@@ -1,6 +1,6 @@
 # 地址簿容器
 
-地址簿容器是通讯录模块的底层基础组件（`EmContactContainer` 内部即由其组合联系人 / 群组 / 通知子视图），适合需要完全自定义子视图内容的场景，或单独作为「聚合入口 + 内容区」的壳使用。
+地址簿容器是通讯录模块的底层基础组件（`EmContactContainer` 内部即由其组合好友列表 / 群组列表 / 通知子视图），适合需要完全自定义子视图内容的场景，或单独作为「聚合入口 + 内容区」的壳使用。
 
 ## 使用方式
 
@@ -55,9 +55,9 @@ const customEntries = [
 
 - `entries`：自定义入口列表，类型 `AddressBookContainerEntry[]`（`key` / `label` / `count` / `icon` / `visible` / `to` / `sort`）
 - `showNotice` / `showGroup` / `showContact`：内置入口开关，默认 `true`
-- `noticeCount` / `groupCount` / `contactCount`：入口右侧数量；群组 / 联系人数量不传默认取 store 实际数量
+- `noticeCount` / `groupCount` / `contactCount`：入口右侧数量；群组列表 / 好友列表数量不传默认取 store 实际数量
 - `autoEntryCount`：是否自动推断入口数量，默认 `true`
-- `entryOrder`：入口顺序，默认 `['notice', 'group', 'contact']`
+- `entryOrder`：入口顺序，默认 `['notice', 'group', 'contact', 'blocklist']`
 - `noticeLabel` / `groupLabel` / `contactLabel`：自定义入口文案
 - `noticeIcon` / `groupIcon` / `contactIcon`：自定义入口图标
 - `noticePersistInvites`：是否持久化未处理通知（好友申请 + 群邀请），支持 `boolean | 'local' | 'session'`，默认 `false`

@@ -1,6 +1,6 @@
 # 通讯录模块
 
-通讯录容器，聚合「通知 / 群组 / 联系人」三大入口：首页入口导航 + 联系人子列表（字母分组、在线状态、多选）+ 群组子列表 + 通知子视图，内置视图切换过场动画。
+通讯录容器，聚合「通知 / 群组列表 / 好友列表」三大入口：首页入口导航 + 好友列表子视图（字母分组、在线状态、多选）+ 群组列表子视图 + 通知子视图，内置视图切换过场动画。
 
 ## 使用方式
 
@@ -56,14 +56,16 @@ function onCreateGroup() {
 - `showScrollToTop`：是否展示滚动置顶按钮，默认 `true`
 - `transition`：视图切换过场，`'none' | 'slide' | 'fade'`，默认 `'slide'`
 
+> `title` 仅作用于首页（home）头部；好友列表 / 群组列表等**子视图头部**文案跟随各自入口 `label`（默认走 i18n「好友列表」「群组列表」，可用 `contactLabel` / `groupLabel` 覆盖）。
+
 ### 聚合入口
 
 - `showNotice`：是否展示「通知」入口，默认 `true`（`showNewRequest` 为废弃别名）
-- `showGroup` / `showContact`：是否展示「群组」/「联系人」入口，默认 `true`
+- `showGroup` / `showContact`：是否展示「群组列表」/「好友列表」入口，默认 `true`
 - `noticeCount`：通知徽标数量，默认 `0`（`newRequestCount` 为废弃别名）
 - `groupCount` / `contactCount`：入口右侧数量，不传默认取 store 实际数量
 - `autoEntryCount`：是否自动推断入口数量，默认 `true`
-- `entryOrder`：入口顺序，默认 `['notice', 'group', 'contact']`
+- `entryOrder`：入口顺序，默认 `['notice', 'group', 'contact', 'blocklist']`
 - `noticeLabel` / `groupLabel` / `contactLabel`：自定义入口文案
 - `noticeIcon` / `groupIcon` / `contactIcon`：自定义入口图标
 - `entries`：自定义入口列表（`AddressBookContainerEntry[]`），可与内置入口共存
@@ -102,7 +104,7 @@ function onCreateGroup() {
 
 ## 事件
 
-- `view-change`：视图切换，参数 `view: 'home' | 'group' | 'contact' | 'notice'`
+- `view-change`：视图切换，参数 `view: 'home' | 'group' | 'contact' | 'notice' | 'blocklist'`
 - `entry-click`：点击入口，参数 `key: string`
 - `notice-click`：点击「通知」入口（`new-request-click` 为废弃别名）
 - `home-search` / `contact-search` / `group-search`：各视图搜索，参数 `keyword: string`
