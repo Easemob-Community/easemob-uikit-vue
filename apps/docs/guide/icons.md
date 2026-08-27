@@ -24,7 +24,7 @@ UIKit 内置一套 SVG 图标体系，由 `EmIcon` 组件统一渲染。所有�
 </template>
 ```
 
-线性图标常见顶层分类包括：`arrow`（箭头）、`audio-video`（音视频）、`bell`（通知）、`bubble`（气泡）、`camera`（相机）、`check`（勾选）、`chevron`（折角箭头）、`circle`（圆圈状态）、`file`（文件类型）、`folder`（文件夹）、`mic`（麦克风）、`person`（人员）、`pin`（置顶）、`rect`（矩形容器内的图形）、`search`（搜索）、`shield`（权限）、`speaker`（扬声器）、`trash`（删除）、`xmark`（关闭）等。
+线性图标常见顶层分类包括：`arrow`（箭头）、`audio-video`（音视频）、`bell`（通知）、`bubble`（气泡）、`camera`（相机）、`check`（勾选）、`chevron`（折角箭头）、`circle`（圆圈状态）、`console`（控制台）、`file`（文件类型）、`folder`（文件夹）、`mic`（麦克风）、`person`（人员）、`pin`（置顶）、`rect`（矩形容器内的图形）、`search`（搜索）、`shield`（权限）、`speaker`（扬声器）、`trash`（删除）、`xmark`（关闭）等。
 
 ## 图标一览
 

@@ -1,6 +1,10 @@
 ## @easemob/uikit-im 2.7.0 (2026-08-27)
 
 
+### 破坏性变更
+
+- **输入框风格枚举更名**（`ChatConfig.input.style` / `InputStyle`）：`'feishu' | 'wechat'` 替换为 `'toolbar-top' | 'toolbar-bottom'`（脱离厂牌话术，改为工具栏方向语义），默认值由 `'wechat'` 变为 `'toolbar-top'`。迁移映射：`wechat`（工具栏在上）→ `toolbar-top`，`feishu`（工具栏在下）→ `toolbar-bottom`；旧值直接移除，下游调用方需同步替换。
+
 ### 新增
 
 - **消息列表隐藏自己头像**（`ChatConfig.messageList.showSelfAvatar`）：新增 `showSelfAvatar` 配置（默认 `true`），设为 `false` 时隐藏己方消息头像、对方头像照常显示（微信/QQ 式「隐藏我的头像」）；`showAvatar: false` 仍作为总开关同时隐藏双方头像。
