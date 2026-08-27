@@ -1143,6 +1143,14 @@
 - **待办**：**单群聊侧（apps/docs/components、guide）同样存在**——含 `{{ }}` 的 vue 代码块（如 button/chat-container 等页的模板示例）需同样包裹 `::: v-pre`；正文 `{{ }}` 需实体转义。修完勾选归档。
 - **关联 skill**：`uikit-docs-authoring`
 
+### [ ] D122. SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）落地计划：4.x 私有化低成本切换
+
+- **背景**：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已开发接近尾声）；存量用户主力仍是 IM4.x；另有一个**私有化项目仅支持 4.x**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合），且**运行在 Electron 环境**，聊天消息/会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
+- **结论/方案**：采用「端口-适配器 + 中立契约」，**不做"4.x 单独再开发"**（两套 UI 双份维护违背"不重来"诉求）。当前架构"先进但未收口"：im 有约 23 处 `import ... from 'easemob-websdk'` + `composables/use-uikit.ts` 6 个 manager 构造器 value import + `package.json` 硬依赖 + `vite.config.ts` external/globals；`UiMessage = SdkMessage & UiMessageExtension` 直接 extend SDK5 `Message`（core `sdk/types.ts`）、`ManagerHost` 直接暴露 7 个 SDK5 `*Manager` 类型、body 类型守卫按 5.x wire 写死（core `sdk/types/message.ts`）。分三阶段：**Phase 1 防腐层收口**（契约包 `@easemob/uikit-sdk-contract` + 中立化 + SDK5 adapter 化 + uikit-im 剥干净，UI 零重写）；**Phase 2 新写 `webim4` adapter** + 语义归一化（**4.x 能力全支持**，合并/置顶/流式/回执均在，差异在字段/API/事件形状，尤其回执是"消息类型"vs"专用 API"，详见计划文档第八节）；**Phase 3 数据入口层 repository + Electron 持久化**（`MessageRepository`/`ConversationRepository` 接口 + 本地优先历史加载 + 会话覆盖竞争 + 序列化清洗 + SQLite 主进程/IPC）。
+- **联动**：与 D85（`docs/ELECTRON-PERSISTENCE-RESEARCH.md`，Electron 持久化预研）同构合并——SDK 与本地库是两个数据来源，统一收敛到同一中立契约；`UIKitDataSource`（`composables/types.ts`）只覆盖联系人/群/presence，消息/会话的持久化抽象目前是空白，store 回流入口（`setConversationList`/`prependMessages`）与 `toUiMessage` adapter 已现成，属"中等规模、不动组件层"扩展。
+- **建议修法**：见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（含四层架构、包拆分、中立契约以 5.x 字段命名为基准、`SdkCapabilities` 能力矩阵、repository 接口、事件推法 + Provider 注入、三阶段里程碑、验证门禁、14 项已确认决策、归一化映射表）。
+- **关联 skill**：`websdk2-uikit-migration` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

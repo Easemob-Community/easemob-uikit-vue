@@ -10,8 +10,8 @@
 | Button API | [button.md](./button.md) |
 | Cell API | [cell.md](./cell.md) |
 | @easemob/uikit-chatroom 1.0.0 (2026-08-15) | [changelog-chatroom.md](./changelog-chatroom.md) |
-| @easemob/uikit-core 1.1.0 (2026-08-19) | [changelog-core.md](./changelog-core.md) |
-| 2.3.0 (2026-08-20) | [changelog-im.md](./changelog-im.md) |
+| @easemob/uikit-core 1.4.0 (2026-08-26) | [changelog-core.md](./changelog-core.md) |
+| @easemob/uikit-im 2.7.0 (2026-08-27) | [changelog-im.md](./changelog-im.md) |
 | ChatContainer API | [chat-container.md](./chat-container.md) |
 | ConversationContainer API | [conversation-container.md](./conversation-container.md) |
 | EmojiPicker API | [emoji-picker.md](./emoji-picker.md) |

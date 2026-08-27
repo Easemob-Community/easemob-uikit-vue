@@ -126,8 +126,18 @@ const { highlightedMessageId, requestLocate } = useQuote()
 /** 布局模式 */
 const layout = computed<MessageLayout>(() => props.config?.layout ?? 'conversation')
 
-/** 是否显示头像 */
-const showAvatar = computed(() => props.config?.showAvatar ?? true)
+/**
+ * 是否显示头像。
+ * showAvatar 是总开关（默认 true，关闭后自己与对方头像均隐藏）；
+ * showSelfAvatar 仅在 showAvatar 开启时单独控制己方消息头像（默认 true），
+ * 设为 false 即隐藏自己的头像而对方头像照常显示（微信/QQ 式「隐藏我的头像」）。
+ */
+const showAvatar = computed(() => {
+  const global = props.config?.showAvatar ?? true
+  if (!global)
+    return false
+  return isSelf.value ? (props.config?.showSelfAvatar ?? true) : true
+})
 
 /** 是否显示时间 */
 const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? false)

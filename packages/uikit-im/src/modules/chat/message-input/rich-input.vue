@@ -38,7 +38,7 @@ const { t } = useLocale()
 const { isMobile } = useViewport()
 
 /** 输入框风格 */
-const style = computed(() => props.config?.style ?? 'wechat')
+const style = computed(() => props.config?.style ?? 'toolbar-top')
 
 /** 编辑器内容区高度（拖拽后固定，null 表示未拖拽：内容自适应 + max-height 150px） */
 const editorHeight = ref<number | null>(null)
@@ -408,8 +408,8 @@ onBeforeUnmount(() => {
     ref="rootRef"
     class="rich-input"
     :class="{
-      'rich-input--feishu': style === 'feishu',
-      'rich-input--wechat': style === 'wechat',
+      'rich-input--toolbar-bottom': style === 'toolbar-bottom',
+      'rich-input--toolbar-top': style === 'toolbar-top',
       'rich-input--expanded': expanded,
     }"
     :style="cssVars"
@@ -551,13 +551,13 @@ onBeforeUnmount(() => {
   background-color: transparent;
 }
 
-/* 飞书风格：输入框在上，工具栏在下 */
-.rich-input--feishu {
+/* 工具栏在下：输入框在上 */
+.rich-input--toolbar-bottom {
   flex-direction: column-reverse;
 }
 
-/* 微信风格：工具栏在上，输入框在下 */
-.rich-input--wechat {
+/* 工具栏在上：输入框在下 */
+.rich-input--toolbar-top {
   flex-direction: column;
 }
 

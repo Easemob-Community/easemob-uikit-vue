@@ -108,6 +108,7 @@ messageStore.messageMap[conversation.id] = [
 const messageListConfig = reactive({
   layout: 'conversation',
   showAvatar: true,
+  showSelfAvatar: true,
   showTime: 'always',
   bubbleShape: 'round',
   avatarSize: 36,

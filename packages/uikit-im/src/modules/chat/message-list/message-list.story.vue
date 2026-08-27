@@ -162,6 +162,16 @@ const baseConfig: ChatConfig = {
       </div>
     </Variant>
 
+    <Variant title="隐藏自己的头像">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <MessageList
+            :config="{ ...baseConfig, messageList: { ...baseConfig.messageList, showSelfAvatar: false } }"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
     <Variant title="悬停显示时间">
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">

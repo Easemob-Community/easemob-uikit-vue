@@ -56,7 +56,7 @@ UIKit 的列表项（会话 / 联系人 / 消息）数据来自环信 Web SDK �
 | 元素 | 默认展示 | 控制方式 |
 |---|---|---|
 | 消息正文 | ✅ 气泡内部 | 不可隐藏，由 `body.type` 决定形态 |
-| 发送者头像 | ✅（对方左 / 自己右） | `config.messageList.showAvatar` / `avatarSize` |
+| 发送者头像 | ✅（对方左 / 自己右） | `config.messageList.showAvatar` / `showSelfAvatar` / `avatarSize` |
 | 发送者昵称 | ⚡ 条件（群聊） | 群聊显示，单聊隐藏；`getUserDisplayName()` 自定义 |
 | 阶段性时间分组 | ✅ 居中文案 | `config.messageList.groupInterval` |
 | 精确时间戳 | ❌ 默认不展示 | `config.messageList.showTime: false / true / 'hover'` |

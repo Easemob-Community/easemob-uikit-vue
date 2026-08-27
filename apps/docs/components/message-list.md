@@ -47,7 +47,8 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit-im'
 `config.messageList` 常用视觉配置：
 
 - `layout`：`'conversation' | 'left'`，默认 `'conversation'` —— 对话式左右分列 / 全部靠左对齐
-- `showAvatar`：`boolean`，默认 `true` —— 是否显示发送者头像
+- `showAvatar`：`boolean`，默认 `true` —— 是否显示发送者头像（自己与对方的统一开关）
+- `showSelfAvatar`：`boolean`，默认 `true` —— 是否显示「自己」的头像；仅 `showAvatar` 开启时生效，设为 `false` 可隐藏自己的头像而对方照常显示（微信/QQ 式「隐藏我的头像」）
 - `showTime`：`boolean | 'always' | 'hover'`，默认 `false` —— 时间戳显示策略
 - `bubbleShape`：`'round' | 'square'`，默认 `'round'` —— 气泡圆角 / 直角
 - `avatarSize`：`number`，默认 `36` —— 头像尺寸（px）

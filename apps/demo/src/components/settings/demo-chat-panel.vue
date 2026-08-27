@@ -63,22 +63,22 @@ const {
     <div class="demo-settings__group">
       <DemoSettingLabel
         title="输入框风格"
-        tip="输入框的布局风格：微信（底部工具栏 + 发送键）、飞书（快捷栏 + 底部发送区）等参考样式"
+        tip="输入框工具栏位置：工具栏在上（输入框在下）或工具栏在下（输入框在上）"
       />
       <div class="demo-settings__options">
         <button
           class="demo-option"
-          :class="{ 'demo-option--active': chatInputStyle === 'wechat' }"
-          @click="chatInputStyle = 'wechat'"
+          :class="{ 'demo-option--active': chatInputStyle === 'toolbar-top' }"
+          @click="chatInputStyle = 'toolbar-top'"
         >
-          微信
+          工具栏在上
         </button>
         <button
           class="demo-option"
-          :class="{ 'demo-option--active': chatInputStyle === 'feishu' }"
-          @click="chatInputStyle = 'feishu'"
+          :class="{ 'demo-option--active': chatInputStyle === 'toolbar-bottom' }"
+          @click="chatInputStyle = 'toolbar-bottom'"
         >
-          飞书
+          工具栏在下
         </button>
       </div>
     </div>

@@ -96,7 +96,7 @@ injectMockData()
 const baseConfig: ChatConfig = {
   header: { visible: true, align: 'center' },
   messageList: { layout: 'conversation', showAvatar: true, showTime: true },
-  input: { mode: 'simple', style: 'wechat', features: { emoji: true, image: true, file: true, voice: false } },
+  input: { mode: 'simple', style: 'toolbar-top', features: { emoji: true, image: true, file: true, voice: false } },
 }
 
 /** 自定义会话预览文案 */

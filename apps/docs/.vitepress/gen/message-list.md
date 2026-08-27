@@ -50,23 +50,24 @@
 
 > 消息列表配置
 
-| 属性                     | 类型                                                                                                              | 默认值 | 说明                                                  |
+| 属性                     | 类型                                                                                                              | 默认值 | 说明                                                                                            |
 | --- | --- | --- | --- |
-| layout                 | `MessageLayout`                                                                                                 | —   | 消息布局模式，默认 'conversation'                            |
-| showAvatar             | `boolean`                                                                                                       | —   | 是否显示头像，默认 true                                      |
-| showTime               | `TimeDisplayStrategy`                                                                                           | —   | 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' |
-| bubbleShape            | `BubbleShape`                                                                                                   | —   | 气泡形状，默认 'round'                                     |
-| avatarSize             | `number`                                                                                                        | —   | 头像尺寸（px），默认 36                                      |
-| messageGap             | `number`                                                                                                        | —   | 消息项之间的间距（px），默认 12                                  |
-| messagePadding         | `number`                                                                                                        | —   | 消息列表内边距（px），默认 16                                   |
-| groupInterval          | `number`                                                                                                        | —   | 时间分组间隔（毫秒），默认 5 分钟                                  |
-| virtualScrollThreshold | `number`                                                                                                        | —   | 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100                          |
-| loadHistory            | <a class="config-ref" href="#config-messagelist-loadhistory"><strong>加载历史消息配置</strong></a>                      | —   | 加载历史消息配置                                            |
-| maxMessageCount        | `number`                                                                                                        | —   | 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300                      |
-| pinnedBar              | <a class="config-ref" href="#config-messagelist-pinnedbar"><strong>置顶横幅配置</strong></a>                          | —   | 置顶横幅配置                                              |
-| search                 | <a class="config-ref" href="#config-messagelist-search"><strong>消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）</strong></a> | —   | 消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）                  |
-| autoLocateAtMe         | `boolean`                                                                                                       | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                         |
-| messageStatus          | `MessageStatusConfig`                                                                                           | —   | 消息发送状态展示配置                                          |
+| layout                 | `MessageLayout`                                                                                                 | —   | 消息布局模式，默认 'conversation'                                                                      |
+| showAvatar             | `boolean`                                                                                                       | —   | 是否显示头像（自己与对方的统一开关），默认 true                                                                    |
+| showSelfAvatar         | `boolean`                                                                                                       | —   | 是否显示「自己」的头像，默认 true；仅在 showAvatar 为 true 时生效。<br>设为 false 可隐藏自己的头像而对方头像照常显示（微信/QQ 式「隐藏我的头像」）。 |
+| showTime               | `TimeDisplayStrategy`                                                                                           | —   | 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover'                                           |
+| bubbleShape            | `BubbleShape`                                                                                                   | —   | 气泡形状，默认 'round'                                                                               |
+| avatarSize             | `number`                                                                                                        | —   | 头像尺寸（px），默认 36                                                                                |
+| messageGap             | `number`                                                                                                        | —   | 消息项之间的间距（px），默认 12                                                                            |
+| messagePadding         | `number`                                                                                                        | —   | 消息列表内边距（px），默认 16                                                                             |
+| groupInterval          | `number`                                                                                                        | —   | 时间分组间隔（毫秒），默认 5 分钟                                                                            |
+| virtualScrollThreshold | `number`                                                                                                        | —   | 虚拟滚动阈值，超过该消息数启用虚拟滚动，默认 100                                                                    |
+| loadHistory            | <a class="config-ref" href="#config-messagelist-loadhistory"><strong>加载历史消息配置</strong></a>                      | —   | 加载历史消息配置                                                                                      |
+| maxMessageCount        | `number`                                                                                                        | —   | 单个会话最大消息存储数，超出时从旧消息开始裁剪，默认 300                                                                |
+| pinnedBar              | <a class="config-ref" href="#config-messagelist-pinnedbar"><strong>置顶横幅配置</strong></a>                          | —   | 置顶横幅配置                                                                                        |
+| search                 | <a class="config-ref" href="#config-messagelist-search"><strong>消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）</strong></a> | —   | 消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）                                                            |
+| autoLocateAtMe         | `boolean`                                                                                                       | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                                                                   |
+| messageStatus          | `MessageStatusConfig`                                                                                           | —   | 消息发送状态展示配置                                                                                    |
 
 #### config.messageList.loadHistory {#config-messagelist-loadhistory}
 
@@ -168,7 +169,7 @@
 | 属性               | 类型                                                                              | 默认值 | 说明                                                                                                                                   |
 | --- | --- | --- | --- |
 | mode             | `InputMode`                                                                     | —   | 输入框模式，默认 'simple'                                                                                                                    |
-| style            | `InputStyle`                                                                    | —   | 输入框风格，默认 'wechat'                                                                                                                    |
+| style            | `InputStyle`                                                                    | —   | 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上                                                                 |
 | features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>   | —   | 功能开关                                                                                                                                 |
 | autoFocus        | `boolean`                                                                       | —   | 是否自动聚焦输入框，默认 false                                                                                                                   |
 | focusBorderColor | `string`                                                                        | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                       |

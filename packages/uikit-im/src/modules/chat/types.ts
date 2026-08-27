@@ -20,8 +20,8 @@ export type HeaderAlign = 'left' | 'center' | 'right'
 /** 输入框模式 */
 export type InputMode = 'simple' | 'rich'
 
-/** 输入框风格 */
-export type InputStyle = 'feishu' | 'wechat'
+/** 输入框工具栏位置（方向性语义，脱离厂牌话术） */
+export type InputStyle = 'toolbar-top' | 'toolbar-bottom'
 
 /** 加载历史消息模式 */
 export type LoadHistoryMode = 'pull-down' | 'scroll-top' | 'auto'
@@ -87,8 +87,13 @@ export interface ChatConfig {
   messageList?: {
     /** 消息布局模式，默认 'conversation' */
     layout?: MessageLayout
-    /** 是否显示头像，默认 true */
+    /** 是否显示头像（自己与对方的统一开关），默认 true */
     showAvatar?: boolean
+    /**
+     * 是否显示「自己」的头像，默认 true；仅在 showAvatar 为 true 时生效。
+     * 设为 false 可隐藏自己的头像而对方头像照常显示（微信/QQ 式「隐藏我的头像」）。
+     */
+    showSelfAvatar?: boolean
     /** 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' */
     showTime?: TimeDisplayStrategy
     /** 气泡形状，默认 'round' */
@@ -197,7 +202,7 @@ export interface ChatConfig {
   input?: {
     /** 输入框模式，默认 'simple' */
     mode?: InputMode
-    /** 输入框风格，默认 'wechat' */
+    /** 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上 */
     style?: InputStyle
     /** 功能开关 */
     features?: {

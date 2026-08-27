@@ -1,3 +1,12 @@
+## @easemob/uikit-im 2.7.0 (2026-08-27)
+
+
+### 新增
+
+- **消息列表隐藏自己头像**（`ChatConfig.messageList.showSelfAvatar`）：新增 `showSelfAvatar` 配置（默认 `true`），设为 `false` 时隐藏己方消息头像、对方头像照常显示（微信/QQ 式「隐藏我的头像」）；`showAvatar: false` 仍作为总开关同时隐藏双方头像。
+
+---
+
 ## @easemob/uikit-im 2.6.0 (2026-08-26)
 
 

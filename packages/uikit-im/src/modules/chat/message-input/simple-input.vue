@@ -41,7 +41,7 @@ const { isMobile } = useViewport()
 const text = ref('')
 
 /** 输入框风格 */
-const style = computed(() => props.config?.style ?? 'wechat')
+const style = computed(() => props.config?.style ?? 'toolbar-top')
 
 /** 功能开关 */
 const features = computed(() => ({
@@ -461,8 +461,8 @@ defineExpose({
     ref="rootRef"
     class="simple-input"
     :class="{
-      'simple-input--feishu': style === 'feishu',
-      'simple-input--wechat': style === 'wechat',
+      'simple-input--toolbar-bottom': style === 'toolbar-bottom',
+      'simple-input--toolbar-top': style === 'toolbar-top',
       'simple-input--expanded': expanded,
     }"
   >
@@ -597,13 +597,13 @@ defineExpose({
   background-color: transparent;
 }
 
-/* 飞书风格：输入框在上，工具栏在下 */
-.simple-input--feishu {
+/* 工具栏在下：输入框在上 */
+.simple-input--toolbar-bottom {
   flex-direction: column-reverse;
 }
 
-/* 微信风格：工具栏在上，输入框在下 */
-.simple-input--wechat {
+/* 工具栏在上：输入框在下 */
+.simple-input--toolbar-top {
   flex-direction: column;
 }
 

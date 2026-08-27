@@ -1,3 +1,56 @@
+## @easemob/uikit-im 2.7.0 (2026-08-27)
+
+
+### 新增
+
+- **消息列表隐藏自己头像**（`ChatConfig.messageList.showSelfAvatar`）：新增 `showSelfAvatar` 配置（默认 `true`），设为 `false` 时隐藏己方消息头像、对方头像照常显示（微信/QQ 式「隐藏我的头像」）；`showAvatar: false` 仍作为总开关同时隐藏双方头像。
+
+---
+
+## @easemob/uikit-im 2.6.0 (2026-08-26)
+
+
+### 破坏性变更
+
+- **图标体系旧库清零，全面切换 V2**：删除 `packages/uikit-core/src/assets/icons/` 旧库目录；业务代码中所有空状态插画（`empty/*`）改用 V2 功能图标：`empty/contact`→`person/single`、`empty/chat`/`empty/conversation`→`bubble/rect/empty`、`empty/group`/`empty/members`→`person/double`、`empty/mutelist`→`bell/slash`、`empty/blocklist`→`circle/slash`、`empty/files`→`folder`、`empty/search`→`search`。`empty/mentions`、`files-media/doc_on_doc`、`status/info` 也已分别替换为 `at`、`rects`、`circle/bang`。
+- 若业务侧此前通过 `EmIcon` 直接引用旧库 name（如 `empty/contact`），需按上述映射切换到 V2 name。
+
+### 重构
+
+- `check-icon-refs.mjs` 扩展为同时校验旧库与 V2 目录，旧库删除后仅校验 `assets/icons-v2/`；构建期缺失图标引用会硬失败。
+
+---
+
+## @easemob/uikit-im 2.5.0 (2026-08-25)
+
+
+### 新增
+
+- **单聊抽屉拉黑**（`EmChatContainer` / `ChatInfoDrawer`）：单聊信息抽屉「通用操作」区新增「拉黑 / 取消拉黑」按钮（随 Provider `enableBlocklist` 显隐，黑名单关闭时隐藏），确认后调用黑名单能力并同步 store，抽屉新增 `block-changed` 事件。
+- **黑名单选人拉黑**：通讯录黑名单列表右上角新增「+」入口（`EmAddressBookContainer` 黑名单子视图头部 + `EmBlockList` 自身 header），点击弹出 **`EmBlockListAddModal`** 选人弹窗（好友全量多选 + 搜索框，排除自己与已拉黑者），确定后批量加入黑名单并即时刷新列表；`EmContactContainer` 内置接线，业务零配置。新增 `showBlocklistAddButton` prop 与 `blocklist-add` 事件。
+
+### 类型导出
+
+- 新增 `BlockListAddModalProps` 公开类型。
+
+---
+
+## @easemob/uikit-im 2.4.0 (2026-08-25)
+
+
+### 新增
+
+- **通讯录黑名单同级入口**（`EmContactContainer` / `EmAddressBookContainer`）：
+  - 新增 `showBlocklist` / `blocklistLabel` / `blocklistIcon` props、`blocklist-click` 事件与 `goBlocklist()` 命令式方法；黑名单入口在 Provider `enableBlocklist=true` 时展示，与「群组 / 通讯录(好友)」同级；
+  - 新增黑名单列表组件 **`EmBlockList` / `EmBlockListContainer`**：空态占位、列表项复用 `EmContactItem` 并遵循头像形状主题配置，行右键菜单「移出黑名单」（确认后 `removeBlock` 并同步 store），对外事件 `click` / `contextmenu` / `unblock`，容器层透传 `blocklist-item-click` / `blocklist-item-contextmenu` / `blocklist-unblock`；
+  - 新增 i18n `contact.entryBlocklist` 与 `contact.blocklist.*` 文案（zh-CN / en）。
+
+### 类型导出
+
+- 新增 `BlockListContainerProps` 公开类型。
+
+---
+
 ## 2.3.0 (2026-08-20)
 
 

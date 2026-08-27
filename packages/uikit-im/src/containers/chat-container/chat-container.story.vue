@@ -62,14 +62,14 @@ function injectMockData() {
 const baseConfig: ChatConfig = {
   header: { visible: true, align: 'center' },
   messageList: { layout: 'conversation', showAvatar: true, showTime: true },
-  input: { mode: 'simple', style: 'wechat', features: { emoji: true, image: true, file: true, voice: true } },
+  input: { mode: 'simple', style: 'toolbar-top', features: { emoji: true, image: true, file: true, voice: true } },
 }
 
 /** 各种变体配置 */
-const feishuConfig: ChatConfig = {
+const toolbarBottomConfig: ChatConfig = {
   header: { visible: true, align: 'left' },
   messageList: { layout: 'conversation', showAvatar: true, showTime: 'always', bubbleShape: 'square' },
-  input: { mode: 'simple', style: 'feishu', features: { emoji: true, image: true, file: true, voice: false } },
+  input: { mode: 'simple', style: 'toolbar-bottom', features: { emoji: true, image: true, file: true, voice: false } },
 }
 
 const leftLayoutConfig: ChatConfig = {
@@ -84,7 +84,7 @@ const hiddenHeaderConfig: ChatConfig = {
 
 const richInputConfig: ChatConfig = {
   ...baseConfig,
-  input: { mode: 'rich', style: 'wechat', features: { emoji: true, image: true, file: true, voice: false } },
+  input: { mode: 'rich', style: 'toolbar-top', features: { emoji: true, image: true, file: true, voice: false } },
 }
 
 const disabledActionsConfig: ChatConfig = {
@@ -219,10 +219,10 @@ injectMockData()
       </div>
     </Variant>
 
-    <Variant title="Feishu Style">
+    <Variant title="Toolbar Bottom">
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">
-          <ChatContainer :config="feishuConfig" />
+          <ChatContainer :config="toolbarBottomConfig" />
         </UIKitProvider>
       </div>
     </Variant>

@@ -29,7 +29,7 @@ injectMockContext()
 // 也可改为任意颜色值（如 '#10b981'）
 const config = reactive({
   mode: 'simple' as 'simple' | 'rich',
-  style: 'wechat' as 'wechat' | 'feishu',
+  style: 'toolbar-top' as 'toolbar-top' | 'toolbar-bottom',
   features: {
     emoji: true,
     image: true,

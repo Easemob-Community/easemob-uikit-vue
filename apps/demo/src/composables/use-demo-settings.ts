@@ -269,7 +269,7 @@ function createDemoSettings() {
 
   /* ===== 聊天输入框配置 ===== */
   const chatInputMode = ref<'simple' | 'rich'>('simple')
-  const chatInputStyle = ref<'wechat' | 'feishu'>('wechat')
+  const chatInputStyle = ref<'toolbar-top' | 'toolbar-bottom'>('toolbar-top')
   const chatInputFeatures = ref({
     emoji: true,
     image: true,

@@ -40,7 +40,7 @@
 
 - **目标组件**：`packages/uikit-im/src/modules/chat/message-input/`（index / simple-input / rich-input / editing-bar）。
 - **覆盖配置**（`ChatConfig.input`，已核实全部存在）：
-  - `mode`（simple | rich）、`style`（feishu | wechat）、`features` 六开关（emoji / image / file / voice / video / mention）、`autoFocus`、`focusBorderColor`、`caretColor`、`selectionColor`、`showSendButton`、`resizable`、`expandable`。
+  - `mode`（simple | rich）、`style`（toolbar-top | toolbar-bottom）、`features` 六开关（emoji / image / file / voice / video / mention）、`autoFocus`、`focusBorderColor`、`caretColor`、`selectionColor`、`showSendButton`、`resizable`、`expandable`。
 - **硬约束**：`EmMessageInput` 依赖 Provider 上下文（`useChat()`），演练场必须套 `EmUIKitProvider` 渲染；无 SDK 连接时需 mock 发送通道（dataSource 接管或注入 mock 发送），否则发送类交互不可用。
 - **待确认**：输入框无登录态下的 mock 渲染可行性（`sendMessage` 依赖 client 连接），执行前先做最小验证。
 - **页面登记**：挂在 `components/chat-container.md` 或独立「输入框」页。
