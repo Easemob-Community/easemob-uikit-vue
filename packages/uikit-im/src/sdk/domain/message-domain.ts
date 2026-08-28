@@ -132,12 +132,19 @@ export class MessageDomain {
     /** 是否请求消息已读回执（仅群聊生效） */
     needReadReceipt?: boolean,
   ) {
+    // GIF 判定：File 的 MIME 为 image/gif 或文件名以 .gif 结尾（含 URL 字符串）。
+    // 必须显式传 createImageMessage 的 isGif: true，SDK 才会按 GIF 动图上传处理；
+    // 否则走普通图片上传，服务端返回的是静态图地址，动图无法播放。
+    const isGif = typeof data === 'string'
+      ? /\.gif($|\?)/i.test(data)
+      : data.type === 'image/gif' || /\.gif$/i.test(data.name)
     const sdkMsg = this.client.chatManager.createImageMessage({
       conversationId,
       conversationType,
       ext,
       needReadReceipt,
       ...(typeof data === 'string' ? { originalUrl: data } : { data }),
+      ...(isGif ? { isGif: true } : {}),
     })
     return this._send(sdkMsg)
   }

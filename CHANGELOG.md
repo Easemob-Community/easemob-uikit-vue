@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.5 (2026-08-28)
+
+### 修复
+
+- **GIF / 表情包发送后动图不播放（服务端返回静态图地址）**：`sendImage` 发送图片消息时未给 SDK 传 `createImageMessage` 的 `isGif` 标记，SDK 把 GIF 当普通图片上传，返回的 `chatfiles/*` 地址是静态图。现按 MIME（`image/gif`）或文件名/URL 后缀（`.gif`）自动判定并传 `isGif: true`，SDK 按 GIF 动图处理，配合 2.8.4 的渲染修复（`isGif` 消息展示动画原图）动图可正常播放。
+
 ## @easemob/uikit-im 2.8.4 (2026-08-28)
 
 ### 修复
