@@ -259,8 +259,6 @@ export interface ChatConfig {
       stickerHover?: boolean
       /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text */
       emojiIcon?: string
-      /** 内置 emoji 悬停时放大预览，默认 true / Enlarge a built-in emoji on hover, default true */
-      emojiPreview?: boolean
     }
   }
   /** 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 */

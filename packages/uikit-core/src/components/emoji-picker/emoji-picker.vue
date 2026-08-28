@@ -23,8 +23,6 @@ export interface EmojiPickerProps {
   stickerHover?: boolean
   /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text */
   emojiIcon?: string
-  /** 内置 emoji 悬停时放大预览，默认 true / Enlarge a built-in emoji on hover, default true */
-  emojiPreview?: boolean
 }
 
 const props = withDefaults(defineProps<EmojiPickerProps>(), {
@@ -34,7 +32,6 @@ const props = withDefaults(defineProps<EmojiPickerProps>(), {
   recentCount: 5,
   tabsPosition: 'bottom',
   stickerHover: true,
-  emojiPreview: true,
 })
 
 const emit = defineEmits<{
@@ -120,8 +117,6 @@ const hoveredStickerKey = ref('')
 function onTabClick(index: number) {
   activeTab.value = index
   hoveredStickerKey.value = ''
-  hoveredEmoji.value = ''
-  hoveredEmojiEl.value = undefined
 }
 
 /** sticker 展示图：hover 且启用时切 gif，否则预览图（无预览图则直接展示 gif） */
@@ -138,43 +133,6 @@ function onStickerEnter(sticker: EmojiStickerItem) {
 
 function onStickerLeave() {
   hoveredStickerKey.value = ''
-}
-
-/** 当前 hover 的 emoji 与其所在元素（放大预览用） */
-const hoveredEmoji = ref('')
-const hoveredEmojiEl = ref<HTMLElement>()
-
-/** 放大预览可见性：启用 + 有 hover 目标 + 设备支持 hover */
-const emojiPreviewVisible = computed(() => props.emojiPreview && canHover && hoveredEmoji.value !== '')
-
-/** 放大预览位置：跟随 hover 的 emoji 项，优先显示在其上方，首行回落到下方 */
-const emojiPreviewStyle = computed(() => {
-  const el = hoveredEmojiEl.value
-  if (!el || !el.parentElement)
-    return {}
-  const body = el.parentElement
-  const bodyRect = body.getBoundingClientRect()
-  const elRect = el.getBoundingClientRect()
-  const centerX = elRect.left - bodyRect.left + elRect.width / 2
-  const elTop = elRect.top - bodyRect.top
-  const PREVIEW_HEIGHT = 56
-  const GAP = 8
-  const top = elTop >= PREVIEW_HEIGHT + GAP
-    ? elTop - PREVIEW_HEIGHT - GAP
-    : elTop + elRect.height + GAP
-  return { left: `${centerX}px`, top: `${top}px`, transform: 'translateX(-50%)' }
-})
-
-function onEmojiEnter(emoji: string, el: HTMLElement) {
-  if (props.emojiPreview && canHover) {
-    hoveredEmoji.value = emoji
-    hoveredEmojiEl.value = el
-  }
-}
-
-function onEmojiLeave() {
-  hoveredEmoji.value = ''
-  hoveredEmojiEl.value = undefined
 }
 
 /** 记录最近使用：去重后前插，截断到 recentCount */
@@ -268,28 +226,19 @@ function onClose() {
         </button>
       </template>
 
-      <!-- 「Emoji」综合视图：常用（可开关）在上、完整列表在下，单一滚动区 -->
+      <!-- 「Emoji」综合视图：常用（有内容才显示）在上、完整列表在下，单一滚动区 -->
       <template v-else>
-        <template v-if="props.recent">
+        <template v-if="props.recent && recentList.length > 0">
           <div class="emoji-picker__section-title">{{ t('emoji.recent', '常用') }}</div>
-          <template v-if="recentList.length > 0">
-            <button
-              v-for="emoji in recentList"
-              :key="`recent-${emoji}`"
-              type="button"
-              class="emoji-picker__item"
-              @mouseenter="onEmojiEnter(emoji, $event.currentTarget as HTMLElement)"
-              @mouseleave="onEmojiLeave"
-              @click="onSelect(emoji)"
-            >
-              {{ emoji }}
-            </button>
-          </template>
-          <template v-else>
-            <div class="emoji-picker__empty">
-              {{ t('emoji.recentEmpty', '暂无常用表情') }}
-            </div>
-          </template>
+          <button
+            v-for="emoji in recentList"
+            :key="`recent-${emoji}`"
+            type="button"
+            class="emoji-picker__item"
+            @click="onSelect(emoji)"
+          >
+            {{ emoji }}
+          </button>
         </template>
 
         <div class="emoji-picker__section-title">{{ t('emoji.full', '表情') }}</div>
@@ -298,23 +247,11 @@ function onClose() {
           :key="emoji"
           type="button"
           class="emoji-picker__item"
-          @mouseenter="onEmojiEnter(emoji, $event.currentTarget as HTMLElement)"
-          @mouseleave="onEmojiLeave"
           @click="onSelect(emoji)"
         >
           {{ emoji }}
         </button>
       </template>
-
-      <!-- 内置 emoji 放大预览（跟随 hover 项，pointer-events 穿透） -->
-      <div
-        v-if="emojiPreviewVisible"
-        class="emoji-picker__preview"
-        :style="emojiPreviewStyle"
-        aria-hidden="true"
-      >
-        <span class="emoji-picker__preview-emoji">{{ hoveredEmoji }}</span>
-      </div>
     </div>
   </div>
 </template>
@@ -495,37 +432,5 @@ function onClose() {
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   line-height: 1.4;
-}
-
-.emoji-picker__empty {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 8px;
-  font-size: var(--uikit-font-size-13);
-  color: var(--uikit-text-tertiary);
-}
-
-/* 内置 emoji 放大预览气泡：绝对定位跟随 hover 项，不拦截鼠标事件 */
-.emoji-picker__preview {
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 56px;
-  min-height: 56px;
-  padding: 8px;
-  pointer-events: none;
-  background-color: var(--uikit-bg-elevated);
-  border: 1px solid var(--uikit-border-light);
-  border-radius: var(--uikit-components-radius);
-  box-shadow: var(--uikit-shadow-sm);
-}
-
-.emoji-picker__preview-emoji {
-  font-size: 40px;
-  line-height: 1;
 }
 </style>

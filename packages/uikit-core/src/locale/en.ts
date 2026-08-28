@@ -69,7 +69,6 @@ const messages: LocaleMessages = {
   'error.pushFailed': 'Push settings failed',
   'emoji.recent': 'Recent',
   'emoji.full': 'Emoji',
-  'emoji.recentEmpty': 'No recent emojis',
   'chat.title': 'Chat',
   'chat.empty': 'Please select a conversation',
   'chat.placeholder': 'Type a message...',

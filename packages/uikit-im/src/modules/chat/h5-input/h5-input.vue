@@ -612,7 +612,6 @@ defineExpose({
         :tabs-position="emojiPickerConfig.tabsPosition"
         :sticker-hover="emojiPickerConfig.stickerHover"
         :emoji-icon="emojiPickerConfig.emojiIcon"
-        :emoji-preview="emojiPickerConfig.emojiPreview"
         @select="insertEmoji"
         @select-sticker="onSelectSticker"
         @update:show="activePanel = 'none'"

@@ -109,7 +109,6 @@ function onTabIconSelect(emoji: string) {
           v-model:show="showRecent"
           :recent="true"
           :recent-count="5"
-          :emoji-preview="true"
           @select="recentInfo = `已选择：${$event}（已记录到「常用」区，保留最近 5 个）`"
         />
         <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
@@ -158,7 +157,7 @@ function onTabIconSelect(emoji: string) {
       </div>
     </Variant>
 
-    <Variant title="tab 预览小图 + emoji 放大预览">
+    <Variant title="tab 预览小图">
       <div style="width: 340px;">
         <div class="u-flex u-gap-2 u-items-center" style="margin-bottom: 8px;">
           <Button size="small" @click="showTabIcons = !showTabIcons">
@@ -172,11 +171,10 @@ function onTabIconSelect(emoji: string) {
           v-model:show="showTabIcons"
           :sticker-packs="stickerPacks"
           :emoji-icon="placeholder('#0ea5e9', 'E')"
-          :emoji-preview="true"
           @select="onTabIconSelect"
         />
         <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
-          表情视图 tab 可配预览小图（emojiIcon），表情包取 iconUrl 或自动回落包内第一个 sticker 预览图；内置 emoji 悬停显示放大预览（emojiPreview 可关闭）。
+          表情视图 tab 可配预览小图（emojiIcon），表情包取 iconUrl 或自动回落包内第一个 sticker 预览图。
         </p>
       </div>
     </Variant>
