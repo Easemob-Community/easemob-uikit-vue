@@ -25,3 +25,12 @@ export interface EmojiStickerPack {
   /** 包内表情列表 / Stickers in this pack */
   stickers: EmojiStickerItem[]
 }
+
+/**
+ * Emoji 面板 tab 位置 / Tabs position of the emoji picker
+ * - top：顶部横排（默认）/ horizontal bar on top (default)
+ * - bottom：底部横排 / horizontal bar on bottom
+ * - left：左侧竖排 / vertical bar on the left
+ * - right：右侧竖排 / vertical bar on the right
+ */
+export type EmojiTabsPosition = 'top' | 'bottom' | 'left' | 'right'

@@ -121,6 +121,9 @@ const showEmojiPicker = ref(false)
 /** 表情包（sticker）配置 */
 const stickerPacks = computed(() => inputConfig.value?.stickerPacks ?? [])
 
+/** Emoji 面板配置（recent/tabsPosition/stickerHover 等，未配置时走组件默认值） */
+const emojiPickerConfig = computed(() => inputConfig.value?.emoji ?? {})
+
 /** Emoji 锚点元素 */
 const emojiAnchorRef = ref<HTMLElement>()
 
@@ -806,6 +809,10 @@ defineExpose({
         <EmojiPicker
           :show="true"
           :sticker-packs="stickerPacks"
+          :recent="emojiPickerConfig.recent"
+          :recent-count="emojiPickerConfig.recentCount"
+          :tabs-position="emojiPickerConfig.tabsPosition"
+          :sticker-hover="emojiPickerConfig.stickerHover"
           @select="onEmojiSelect"
           @select-sticker="onStickerSelect"
           @update:show="showEmojiPicker = $event"

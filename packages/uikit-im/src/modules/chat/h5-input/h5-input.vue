@@ -43,6 +43,9 @@ const text = ref('')
 /** 表情包（sticker）配置 */
 const stickerPacks = computed(() => props.config?.stickerPacks ?? [])
 
+/** Emoji 面板配置（recent/tabsPosition/stickerHover 等，未配置时走组件默认值） */
+const emojiPickerConfig = computed(() => props.config?.emoji ?? {})
+
 /** 功能开关 */
 const features = computed(() => ({
   emoji: props.config?.features?.emoji !== false,
@@ -604,6 +607,10 @@ defineExpose({
         class="h5-input__emoji-picker"
         :show="true"
         :sticker-packs="stickerPacks"
+        :recent="emojiPickerConfig.recent"
+        :recent-count="emojiPickerConfig.recentCount"
+        :tabs-position="emojiPickerConfig.tabsPosition"
+        :sticker-hover="emojiPickerConfig.stickerHover"
         @select="insertEmoji"
         @select-sticker="onSelectSticker"
         @update:show="activePanel = 'none'"

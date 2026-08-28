@@ -1,5 +1,6 @@
 import type {
   EmojiStickerPack,
+  EmojiTabsPosition,
   MessageStatusValue,
   UiConversation as Conversation,
   UiGroup,
@@ -246,6 +247,17 @@ export interface ChatConfig {
     expandable?: boolean
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
+    /** Emoji 面板配置 / Emoji picker config */
+    emoji?: {
+      /** 是否启用「常用」最近使用 tab，默认 true；关闭后不展示常用 tab 也不再记录 / Whether to enable the recent-emoji tab, default true */
+      recent?: boolean
+      /** 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5 */
+      recentCount?: number
+      /** tab 位置：顶部/底部/左侧/右侧，默认 'top' / Tabs position: top/bottom/left/right, default 'top' */
+      tabsPosition?: EmojiTabsPosition
+      /** sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true */
+      stickerHover?: boolean
+    }
   }
   /** 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 */
   lastMessageTextResolver?: LastMessageTextResolver

@@ -68,6 +68,8 @@ const messages: LocaleMessages = {
   'error.reactionOperationIllegal': 'Reaction 操作不合法',
   'error.pushFailed': '推送设置失败',
   'emoji.recent': '常用',
+  'emoji.full': '表情',
+  'emoji.recentEmpty': '暂无常用表情',
   'chat.title': '聊天',
   'chat.empty': '请选择会话',
   'chat.placeholder': '请输入消息...',
