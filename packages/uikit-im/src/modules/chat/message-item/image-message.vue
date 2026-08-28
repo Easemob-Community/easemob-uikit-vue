@@ -49,9 +49,13 @@ const displaySize = computed(() => {
  * 展示用图片 URL（三级策略：气泡缩略图 → 点击大图 → 点击原图）。
  * 气泡统一优先缩略图（thumbnailUrl 最小图），缺缩略图时回退本地图（己方发送中），
  * 最后才回退大图/原图，避免气泡直接拉大图流量。
+ * - GIF（isGif）/ 表情包（isSticker）：缩略图是静态帧，会导致动图不播放，故优先展示动画原图
+ *   （originalImageUrl / bigImageUrl / localUrl），保证表情包动图动画生效。
  */
 const displayUrl = computed(() => {
   const body = props.message.body as ImageMessageBody
+  if (body.isGif || isSticker.value)
+    return body.originalImageUrl || body.bigImageUrl || body.localUrl || body.thumbnailUrl || ''
   return body.thumbnailUrl || body.localUrl || body.bigImageUrl || body.originalImageUrl || ''
 })
 

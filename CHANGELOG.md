@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.4 (2026-08-28)
+
+### 修复
+
+- **GIF / 表情包消息展示为静态缩略图、不播放动图**：`image-message.vue` 的 `displayUrl` 对图片消息统一优先 `thumbnailUrl`（SDK 生成的静态缩略图），当消息体 `isGif` 为真（或 `ext.isSticker` 表情包）时改为优先展示动画原图（`originalImageUrl` / `bigImageUrl` / `localUrl`），恢复 gif 动图播放。
+
 ## @easemob/uikit-im 2.8.3 (2026-08-28)
 
 ### 修复
