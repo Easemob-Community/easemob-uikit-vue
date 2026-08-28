@@ -347,13 +347,34 @@ function onEmojiSelect(emoji: string) {
   }
 }
 
-/** 选择表情包（sticker）：SDK 图片消息支持 GIF，按 URL 以图片消息发送，ext 打 isSticker 标记供收发双端按表情渲染（不启用图片预览） */
+/**
+ * 把 sticker 资源地址解析为可上传的 File。
+ * 本地打包资源（如 demo 的 gif 资产路径）SDK 无法直接按 URL 上传，需 fetch 转成 File；
+ * 远程 URL（如 CDN）能 fetch 到也走 File；跨域 fetch 失败则回落为原 URL 字符串（保持按 URL 引用）。
+ */
+async function resolveStickerFile(sticker: EmojiStickerItem): Promise<File | string> {
+  try {
+    const res = await fetch(sticker.url)
+    if (!res.ok)
+      return sticker.url
+    const blob = await res.blob()
+    const ext = /\.(\w+)(?:\?.*)?$/.exec(sticker.url)?.[1] || 'gif'
+    const fileName = sticker.url.split('?')[0].split('/').pop() || `sticker.${ext}`
+    return new File([blob], fileName, { type: blob.type || `image/${ext}` })
+  }
+  catch {
+    return sticker.url
+  }
+}
+
+/** 选择表情包（sticker）：以图片消息发送（本地资源先转 File），ext 打 isSticker 标记供收发双端按表情渲染（不启用图片预览） */
 async function onStickerSelect(sticker: EmojiStickerItem) {
   showEmojiPicker.value = false
   const canSend = await runBeforeSend({ type: MESSAGE_TYPE.IMAGE })
   if (!canSend)
     return
-  sendImageMessage(sticker.url, groupReadReceiptConfig.value, { [MESSAGE_EXT_KEY.IS_STICKER]: true })
+  const file = await resolveStickerFile(sticker)
+  sendImageMessage(file, groupReadReceiptConfig.value, { [MESSAGE_EXT_KEY.IS_STICKER]: true })
     .then((msg) => {
       emit('send-success')
       runAfterSend(msg)

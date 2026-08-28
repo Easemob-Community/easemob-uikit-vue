@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.3 (2026-08-28)
+
+### 修复
+
+- **表情包（sticker）发送失败**：本地打包资源（如 demo 的 gif 资产路径）作为 sticker `url` 时，SDK 无法按 URL 上传（`Attachment file is required`）。现 `onStickerSelect` 先 `fetch` 该地址转成 `File` 再以图片消息发送；远程 URL 能 fetch 也走 File，跨域失败则回落为原 URL 字符串（保持按 URL 引用）。
+
 ## @easemob/uikit-im 2.8.2 (2026-08-28)
 
 ### 调整
