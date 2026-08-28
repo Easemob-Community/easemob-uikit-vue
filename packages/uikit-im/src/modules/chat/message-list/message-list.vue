@@ -560,7 +560,7 @@ function resolveTranslateErrorMessage(e: unknown): string {
     return t('message.translate.noPermission', '暂无翻译权限')
   }
   if (typeof httpStatus === 'number' && (httpStatus === 404 || httpStatus === 503 || httpStatus >= 500)) {
-    return t('message.translate.serviceUnavailable', '翻译服务未开通，请联系管理员开通')
+    return t('message.translate.serviceUnavailable', '翻译服务未开通，请联系商务经理开通')
   }
   return t('message.translate.failed', '翻译失败，请稍后重试')
 }

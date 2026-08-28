@@ -256,7 +256,7 @@ export function resolveVoiceToTextErrorMessage(
 ): string {
   const code = (e as { code?: number | string })?.code
   if (code === 505 || code === '505')
-    return t('message.voiceToText.noPermission', '语音转文字服务未开通，请联系管理员开通')
+    return t('message.voiceToText.noPermission', '语音转文字服务未开通，请联系商务经理开通')
   if (code === 408 || code === '408')
     return t('message.voiceToText.durationTooLong', '语音时长超过限制')
   if (code === 411 || code === '411')
