@@ -264,6 +264,12 @@ const {
   setBubbleBg,
   setChatBg,
   setInputBg,
+  hoverColor,
+  activeColor,
+  iconMutedColor,
+  setHoverColor,
+  setActiveColor,
+  setIconMutedColor,
   setPreset,
   toggleMode,
 } = useTheme()
@@ -301,6 +307,13 @@ setBubbleBg('#f3f4f6', '#7c3aed')
 setBubbleBg(null) // 传 null 重置为默认主题色
 setChatBg('url(/chat-bg.png)')
 setInputBg('#ffffff')
+
+// 自定义 hover / 选中（active）/ 弱化图标色：
+// 单值同时作用于浅色与深色模式；不设置（undefined）时走内置浅/深默认
+setHoverColor('#e5e7eb')                       // 列表项 / 菜单项悬停背景
+setActiveColor('rgba(51, 177, 255, 0.08)')     // 会话列表当前选中项背景（默认跟随主色）
+setIconMutedColor('#b6b8bf')                   // 占位 / 弱化图标
+setHoverColor(undefined)                       // 传 undefined 恢复内置默认
 
 // 动画：subtle / normal / expressive
 setAnimationLevel('expressive')
@@ -353,6 +366,9 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
       bubbleColor: { other: '#f3f4f6', self: '#7c3aed' },
       chatBg: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       inputBg: '#ffffff',
+      hoverColor: '#e5e7eb',                    // 悬停背景色（深浅模式同值，缺省走内置默认）
+      activeColor: 'rgba(51, 177, 255, 0.08)', // 选中项背景色（缺省跟随品牌主色）
+      iconMutedColor: '#b6b8bf',               // 弱化/占位图标色（缺省走内置默认）
     }"
   >
     <em-conversation-container />
@@ -360,7 +376,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 </template>
 ```
 
-`bubbleColor` 也支持传字符串同时设置自己/对方：`bubbleColor: '#7c3aed'`。`chatBg` 支持颜色、渐变或 `url(...)` 图片背景。
+`bubbleColor` 也支持传字符串同时设置自己/对方：`bubbleColor: '#7c3aed'`。`chatBg` 支持颜色、渐变或 `url(...)` 图片背景。`hoverColor` / `activeColor` / `iconMutedColor` 均为单值（任意 CSS 颜色），自定义后浅色与深色模式共用该值；不配置时分别走内置浅/深默认（`--uikit-bg-hover` / `--uikit-bg-active` 跟随主色 / `--uikit-icon-muted`），也可以通过覆盖同名 CSS 变量微调。
 
 ## 在线代码演练场
 

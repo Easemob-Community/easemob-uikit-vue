@@ -1084,17 +1084,13 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-shrink: 0;
 }
 
-/* 抽屉背景与默认 ghost hover 色阶接近，特调关闭按钮 hover 使其更明显 */
+/* 关闭按钮 hover 底色走 --uikit-bg-hover 语义 token：
+   跟随主题明暗默认值（浅 #e5e7eb / 深 #374151），也跟随 hoverColor 自定义配置；
+   相比旧硬编码 rgba 值视觉接近，且不再需要单独维护深色覆盖。 */
 
 @media (hover: hover) {
   .chat-info-drawer__close:hover:not(:disabled) {
-    background-color: rgba(0, 0, 0, 0.12) !important;
-  }
-}
-
-@media (hover: hover) {
-  [data-uikit-theme='dark'] .chat-info-drawer__close:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.18) !important;
+    background-color: var(--uikit-bg-hover) !important;
   }
 }
 

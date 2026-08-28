@@ -34,6 +34,8 @@ const {
   bubbleBgSelf,
   chatBg,
   inputBg,
+  hoverColor,
+  activeColor,
   animationEnabled,
   animationLevel,
   setMode,
@@ -49,6 +51,8 @@ const {
   setBubbleBg,
   setChatBg,
   setInputBg,
+  setHoverColor,
+  setActiveColor,
 } = useTheme()
 const { theme: themeStore } = useUIKit()
 const { locale, setLocale } = useLocale()
@@ -192,6 +196,8 @@ function resetAll() {
   setBubbleBg(null, null)
   setChatBg(undefined)
   setInputBg(undefined)
+  setHoverColor(undefined)
+  setActiveColor(undefined)
   inputVariant.value = 'search'
   setLocale('zh-CN')
 }
@@ -402,6 +408,34 @@ const currentColorStyle = computed(() => ({
           <button class="demo-text-btn" @click="setInputBg(undefined)">恢复</button>
         </div>
       </div>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">Hover 背景色</span>
+        <div class="demo-row__right">
+          <input
+            type="color"
+            :value="hoverColor || '#e5e7eb'"
+            class="demo-color-input"
+            @input="(e: Event) => setHoverColor((e.target as HTMLInputElement).value)"
+          >
+          <button class="demo-text-btn" @click="setHoverColor(undefined)">恢复</button>
+        </div>
+      </div>
+      <p class="demo-row__desc">列表项 / 菜单项的悬停背景色，自定义后浅色与深色模式同值。</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">选中背景色</span>
+        <div class="demo-row__right">
+          <input
+            type="color"
+            :value="activeColor || '#33b1ff'"
+            class="demo-color-input"
+            @input="(e: Event) => setActiveColor((e.target as HTMLInputElement).value)"
+          >
+          <button class="demo-text-btn" @click="setActiveColor(undefined)">恢复</button>
+        </div>
+      </div>
+      <p class="demo-row__desc">会话列表等当前选中项的背景色；不自定义时跟随品牌主色（半透明）。</p>
 
       <div class="demo-row demo-row--column demo-row--bordered">
         <div class="demo-row__spread">

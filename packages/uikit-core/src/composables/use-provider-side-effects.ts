@@ -36,6 +36,24 @@ export interface ProviderThemeConfig {
   chatBg?: string
   /** 输入区背景 */
   inputBg?: string
+  /**
+   * 自定义 hover 背景色（任意 CSS 颜色值）。单值同时作用于浅色与深色模式；
+   * 不配置时走内置浅/深默认（--uikit-bg-hover）。
+   * Custom hover background color. Applies to both light and dark modes.
+   */
+  hoverColor?: string
+  /**
+   * 自定义 active（选中项）背景色。单值同时作用于浅色与深色模式；
+   * 不配置时走内置 rgba(primary-rgb, α) 跟随品牌主色。
+   * Custom active background color. Applies to both light and dark modes.
+   */
+  activeColor?: string
+  /**
+   * 自定义弱化/占位图标色。单值同时作用于浅色与深色模式；
+   * 不配置时走内置浅/深默认（--uikit-icon-muted）。
+   * Custom muted icon color. Applies to both light and dark modes.
+   */
+  iconMutedColor?: string
 }
 
 /** Provider 消息通知配置（notification prop，默认全开，触发模式 background） */
@@ -255,6 +273,15 @@ export function useProviderSideEffects(options: ProviderSideEffectsOptions) {
     }
     if (theme.inputBg !== undefined) {
       themeStore.setInputBg(theme.inputBg)
+    }
+    if (theme.hoverColor !== undefined) {
+      themeStore.setHoverColor(theme.hoverColor)
+    }
+    if (theme.activeColor !== undefined) {
+      themeStore.setActiveColor(theme.activeColor)
+    }
+    if (theme.iconMutedColor !== undefined) {
+      themeStore.setIconMutedColor(theme.iconMutedColor)
     }
   }
 

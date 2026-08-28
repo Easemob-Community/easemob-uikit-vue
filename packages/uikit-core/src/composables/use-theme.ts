@@ -106,6 +106,14 @@ export function useTheme() {
   const chatBg = computed(() => themeStore.chatBg)
   const inputBg = computed(() => themeStore.inputBg)
 
+  // ===== 自定义 hover / active / 弱化图标色 =====
+  /** 自定义 hover 背景色（undefined 时走内置浅/深默认） */
+  const hoverColor = computed(() => themeStore.hoverColor)
+  /** 自定义 active（选中）背景色（undefined 时走内置跟随主色） */
+  const activeColor = computed(() => themeStore.activeColor)
+  /** 自定义弱化/占位图标色（undefined 时走内置浅/深默认） */
+  const iconMutedColor = computed(() => themeStore.iconMutedColor)
+
   function setBubbleBg(other?: string | null, self?: string | null) {
     themeStore.setBubbleBg(other, self)
   }
@@ -116,6 +124,21 @@ export function useTheme() {
 
   function setInputBg(value?: string) {
     themeStore.setInputBg(value)
+  }
+
+  /** 设置自定义 hover 背景色；传 undefined 恢复内置浅/深默认 */
+  function setHoverColor(value?: string) {
+    themeStore.setHoverColor(value)
+  }
+
+  /** 设置自定义 active（选中）背景色；传 undefined 恢复内置跟随主色 */
+  function setActiveColor(value?: string) {
+    themeStore.setActiveColor(value)
+  }
+
+  /** 设置自定义弱化/占位图标色；传 undefined 恢复内置浅/深默认 */
+  function setIconMutedColor(value?: string) {
+    themeStore.setIconMutedColor(value)
   }
 
   return {
@@ -138,6 +161,9 @@ export function useTheme() {
     bubbleBgSelf,
     chatBg,
     inputBg,
+    hoverColor,
+    activeColor,
+    iconMutedColor,
     setMode,
     setPrimaryColor,
     setPrimaryColorSat,
@@ -154,6 +180,9 @@ export function useTheme() {
     setBubbleBg,
     setChatBg,
     setInputBg,
+    setHoverColor,
+    setActiveColor,
+    setIconMutedColor,
     toggleMode,
     animationEnabled,
     animationLevel,

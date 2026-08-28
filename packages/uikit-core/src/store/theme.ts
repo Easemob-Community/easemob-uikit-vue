@@ -92,6 +92,12 @@ interface ThemeStorageState {
   chatBg?: string
   /** 输入区背景 */
   inputBg?: string
+  /** 自定义 hover 背景色（可选；不配置时走内置浅/深默认 --uikit-bg-hover） */
+  hoverColor?: string
+  /** 自定义 active（选中）背景色（可选；不配置时走内置 rgba(primary-rgb, α) 跟随主色） */
+  activeColor?: string
+  /** 自定义弱化/占位图标色（可选；不配置时走内置浅/深默认 --uikit-icon-muted） */
+  iconMutedColor?: string
 }
 
 const defaultState: ThemeStorageState = {
@@ -114,6 +120,9 @@ const defaultState: ThemeStorageState = {
   bubbleBgSelf: undefined,
   chatBg: undefined,
   inputBg: undefined,
+  hoverColor: undefined,
+  activeColor: undefined,
+  iconMutedColor: undefined,
 }
 
 /** 字号档位 → scale 映射 */
@@ -276,6 +285,18 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.inputBg,
     set: (v: string | undefined) => { storage.value.inputBg = v },
   })
+  const hoverColor = computed({
+    get: () => storage.value.hoverColor,
+    set: (v: string | undefined) => { storage.value.hoverColor = v },
+  })
+  const activeColor = computed({
+    get: () => storage.value.activeColor,
+    set: (v: string | undefined) => { storage.value.activeColor = v },
+  })
+  const iconMutedColor = computed({
+    get: () => storage.value.iconMutedColor,
+    set: (v: string | undefined) => { storage.value.iconMutedColor = v },
+  })
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
@@ -336,6 +357,15 @@ export const useThemeStore = defineStore('theme', () => {
     applySemanticToken('--uikit-bubble-bg-self', bubbleBgSelf.value)
     applySemanticToken('--uikit-chat-bg', chatBg.value)
     applySemanticToken('--uikit-input-bg', inputBg.value)
+  })
+
+  // 自定义 hover / active / 弱化图标色：有值才写入，无值则移除 inline，让主题 CSS 的
+  // 浅/深默认值（--uikit-bg-hover / --uikit-bg-active / --uikit-icon-muted）生效。
+  // 注意：自定义值为单值，同时作用于浅色与深色模式（inline 优先级高于 [data-uikit-theme="dark"]）。
+  watchEffect(() => {
+    applySemanticToken('--uikit-bg-hover', hoverColor.value)
+    applySemanticToken('--uikit-bg-active', activeColor.value)
+    applySemanticToken('--uikit-icon-muted', iconMutedColor.value)
   })
 
   // Hover 风格 DOM 属性联动
@@ -505,6 +535,21 @@ export const useThemeStore = defineStore('theme', () => {
     inputBg.value = value
   }
 
+  /** 设置自定义 hover 背景色；传 undefined 恢复内置浅/深默认 */
+  function setHoverColor(value?: string) {
+    hoverColor.value = value
+  }
+
+  /** 设置自定义 active（选中）背景色；传 undefined 恢复内置跟随主色 */
+  function setActiveColor(value?: string) {
+    activeColor.value = value
+  }
+
+  /** 设置自定义弱化/占位图标色；传 undefined 恢复内置浅/深默认 */
+  function setIconMutedColor(value?: string) {
+    iconMutedColor.value = value
+  }
+
   /**
    * 批量应用动画配置
    */
@@ -536,6 +581,9 @@ export const useThemeStore = defineStore('theme', () => {
     bubbleBgSelf,
     chatBg,
     inputBg,
+    hoverColor,
+    activeColor,
+    iconMutedColor,
     setPrimaryColor,
     setPrimaryColorSat,
     setPrimaryColorLum,
@@ -555,6 +603,9 @@ export const useThemeStore = defineStore('theme', () => {
     setBubbleBg,
     setChatBg,
     setInputBg,
+    setHoverColor,
+    setActiveColor,
+    setIconMutedColor,
     applyAnimationConfig,
   }
 })

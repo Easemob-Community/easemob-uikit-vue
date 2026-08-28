@@ -55,6 +55,24 @@ export interface ProviderProps {
     chatBg?: string
     /** 输入区背景 */
     inputBg?: string
+    /**
+     * 自定义 hover 背景色（任意 CSS 颜色值）。单值同时作用于浅色与深色模式；
+     * 不配置时走内置浅/深默认（--uikit-bg-hover）。
+     * Custom hover background color; applies to both light and dark modes.
+     */
+    hoverColor?: string
+    /**
+     * 自定义 active（选中项）背景色。单值同时作用于浅色与深色模式；
+     * 不配置时走内置 rgba(primary-rgb, α) 跟随品牌主色。
+     * Custom active background color; applies to both light and dark modes.
+     */
+    activeColor?: string
+    /**
+     * 自定义弱化/占位图标色。单值同时作用于浅色与深色模式；
+     * 不配置时走内置浅/深默认（--uikit-icon-muted）。
+     * Custom muted icon color; applies to both light and dark modes.
+     */
+    iconMutedColor?: string
   }
   /** 界面语言：zh-CN 中文（默认） / en 英文 */
   locale?: 'zh-CN' | 'en'
