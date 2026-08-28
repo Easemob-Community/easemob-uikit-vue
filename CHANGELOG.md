@@ -1,5 +1,34 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.0 (2026-08-28)
+
+### 新增
+
+- **表情面板重构与配置化**（`EmEmojiPicker` / `ChatConfig.input.emoji`）：
+  - 「常用」改为**动态最近使用**：默认开启、localStorage 按 `appKey + userId` 隔离持久化、保留最近 5 个（`recentCount` 可配）；关闭 `recent` 后不展示常用 tab 也不再记录；
+  - 新增独立「Emoji」完整列表 tab；表情包（`stickerPacks`）注入的 tab **默认不自动选中**（打开时常用有内容优先常用，否则回落到 Emoji）；
+  - 新增配置：`recent` / `recentCount` / `tabsPosition`（`top | bottom | left | right`，**默认 `bottom`**）/ `stickerHover` / `recentIcon` / `emojiIcon` / `emojiPreview`；
+  - sticker 支持 `thumbUrl` 预览图 + `url` 动图 + `name` 标题：默认展示预览图，悬停切换 gif、移出恢复（触屏不启用）；内置 emoji 悬停放大预览（`emojiPreview` 可关）；
+  - 每个 tab 项均可配预览小图：表情包取 `iconUrl`（缺省自动回落包内第一个 sticker 预览图），内置「常用 / Emoji」tab 走 `recentIcon` / `emojiIcon`。
+
+### 修复
+
+- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob/uikit-core` 1.5.0）。
+
+## @easemob/uikit-core 1.5.0 (2026-08-28)
+
+### 新增
+
+- **EmojiPicker 组件重构**：
+  - 「常用」改为动态最近使用：`useUIKitStorage` 按 `appKey + userId` 隔离持久化（无 `<UIKitProvider>` 时降级内存），默认保留最近 5 个（`recentCount` 可配）；
+  - 独立「Emoji」完整列表 tab（新增 `EMOJI_ALL` 常量）；表情包注入 tab 默认不自动选中；
+  - 新增 props：`recent` / `recentCount` / `tabsPosition`（默认 `bottom`）/ `stickerHover` / `recentIcon` / `emojiIcon` / `emojiPreview`；支持 sticker hover 预览图 ↔ gif 切换、内置 emoji 悬停放大预览、每个 tab 项预览小图（表情包缺省自动回落包内第一个 sticker 预览图）；
+  - 新增公开类型 `EmojiTabsPosition`；新增 i18n `emoji.full` / `emoji.recentEmpty`（zh-CN / en）。
+
+### 修复
+
+- **重登后事件处理器未恢复注册**（D123）：`useCoreUIKitProvider` 抽取 `registerClientSetup()`（幂等重建 `onClientSetup` 场景挂钩 + user-info 监听），`setupClient` 与 `login()` 共用；登出后重新登录先恢复注册再连接，连接事件不再无人消费；`client` 新增 `isConnected` 访问器。
+
 ## @easemob/uikit-im 2.7.0 (2026-08-27)
 
 ### 破坏性变更
