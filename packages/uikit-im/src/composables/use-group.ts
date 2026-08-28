@@ -314,11 +314,11 @@ export function useGroup() {
     }
   }
 
-  /** 轻量获取已加入群组总数（不强制拉取完整列表） */
+  /** 轻量获取已加入群组总数（只读计数：不写 store、不锁定 loaded；同步完成后徽标随列表自动更新） */
   async function fetchJoinedGroupCount(): Promise<number> {
     const count = groupStore.loaded
       ? groupStore.groupList.length
-      : domains.group.syncLocal().length
+      : domains.group.getLocalCount()
     groupStore.setJoinedGroupCount(count)
     return count
   }

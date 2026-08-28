@@ -1,5 +1,12 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.6 (2026-08-28)
+
+### 修复
+
+- **数据同步「有数据但 UI 空」**：SDK 自动同步完成后好友/群组列表仍可能为空——通讯录计数、列表容器挂载等路径在同步完成前读 SDK 内存（尚未同步的空快照）并锁定 `loaded`，导致 `onSyncDataFinished` 的回填被 `if (!loaded)` 跳过（日志呈现 `contact 回填 {loaded: true, sdkCount: N, storeCount: 0}`）。修复三层配合：① 计数改为只读（`getLocalCount()` 不写 store 不锁定 loaded）；② 回填兜底（`loaded` 为真但列表为空时仍回填 SDK 数据）；③ 消费 `onSyncDataFinished` 的 `status` 字段——同步失败输出日志，conversation 失败且可重试时自动 `refreshSessionList()` 重试一次。
+- **新增 `useSyncStatus()` hook**：暴露 conversation / contact / group 三类数据的同步阶段（idle / syncing / success / failed）与 `isSyncing` / `allFinished`，业务方可感知同步进度并在失败后自行补偿（contact/group 无 SDK 主动同步接口，失败后只能等待下次连接/登录自动同步）。
+
 ## @easemob/uikit-im 2.8.5 (2026-08-28)
 
 ### 修复

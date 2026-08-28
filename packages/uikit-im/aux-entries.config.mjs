@@ -49,5 +49,8 @@ export default {
     // use-conversation 附属：草稿存储内部管理函数（provider 装配用）
     'clearAllDrafts',
     'initDraftStorage',
+    // use-sync-status 附属：同步状态内部更新/重置（chat-events / registry 内部调用，业务侧走 useSyncStatus）
+    'setSyncStatus',
+    'resetSyncStatus',
   ],
 }

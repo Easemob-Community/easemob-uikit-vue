@@ -15,6 +15,7 @@ import { toUiGroups } from '../adapter/group-adapter'
 import { notifyOnNewMessage } from '../notification-engine'
 import { isStreamActive } from '../../utils/stream-message'
 import { markReadReceiptSent } from '../domain/message-domain'
+import { setSyncStatus } from '../../composables/use-sync-status'
 import { formatConversationPreview, resolveSenderDisplayName, resolveUserDisplayName } from '../../utils/resolve-last-message-text'
 import type { RootStores } from './types'
 
@@ -259,13 +260,46 @@ export function createChatHandlers(
   return {
     onSyncDataStart: (payload) => {
       chatLog.info('onSyncDataStart', { dataType: payload.dataType })
+      setSyncStatus(payload.dataType, { status: 'syncing' })
       if (payload.dataType === 'conversation') {
         stores.conversation.setSyncingConversations(true)
       }
     },
 
     onSyncDataFinished: (payload) => {
-      chatLog.info('onSyncDataFinished', { dataType: payload.dataType })
+      chatLog.info('onSyncDataFinished', { dataType: payload.dataType, status: payload.status })
+      // 同步失败：记录状态并告警；conversation 支持主动刷新，失败且可重试时补一次。
+      // contact/group 无「主动触发同步」的 SDK 公开接口，只能等待下次连接/登录的自动同步，
+      // 业务方可通过 useSyncStatus() 感知失败并自行补偿。
+      if (payload.status === 'failed') {
+        const err = payload.error
+        setSyncStatus(payload.dataType, {
+          status: 'failed',
+          finishedAt: Date.now(),
+          error: {
+            stage: err?.stage,
+            retryable: err?.retryable,
+            message: err?.message,
+          },
+        })
+        chatLog.warn('[ChatEvents] 数据同步失败', {
+          dataType: payload.dataType,
+          stage: err?.stage,
+          retryable: err?.retryable,
+          message: err?.message,
+        })
+        if (payload.dataType === 'conversation') {
+          stores.conversation.setSyncingConversations(false)
+          if (err?.retryable) {
+            void client.chatManager.refreshSessionList().catch((e: unknown) => {
+              chatLog.warn('[ChatEvents] conversation 同步失败重试未成功:', formatSdkError(e))
+            })
+          }
+        }
+        return
+      }
+
+      setSyncStatus(payload.dataType, { status: 'success', finishedAt: Date.now() })
       // SDK 按数据类型分别触发同步完成（conversation / contact / group），逐类回填。
       switch (payload.dataType) {
         case 'conversation':
@@ -279,21 +313,34 @@ export function createChatHandlers(
             const incoming = toUiConversations(rawItems, { resolveSenderName })
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
+            chatLog.info('conversation 同步回填', { count: merged.length })
           }
           stores.conversation.setConversationsLoaded(true)
           void patchConversationNames(stores, client)
           void patchConversationMuteStates(stores, client)
           break
         case 'contact':
-          // 已由自定义数据源填充（loaded 为真）则跳过，避免覆盖业务数据
-          if (!stores.contact.loaded) {
-            stores.contact.setContactList(toUiContacts(client.contactManager.getContacts()))
+          // 已由自定义数据源填充（loaded 为真且列表非空）则跳过，避免覆盖业务数据；
+          // loaded 为真但列表为空视为「同步完成前被抢跑锁定」，仍回填，避免列表永久为空。
+          if (!stores.contact.loaded || stores.contact.contactList.length === 0) {
+            const sdkContacts = client.contactManager.getContacts()
+            stores.contact.setContactList(toUiContacts(sdkContacts))
+            chatLog.info('contact 同步回填', { count: sdkContacts.length })
+          }
+          else {
+            chatLog.info('contact 同步回填跳过（列表已由业务方填充）', { count: stores.contact.contactList.length })
           }
           void patchConversationNames(stores, client)
           break
         case 'group':
-          if (!stores.group.loaded) {
-            stores.group.setGroupList(toUiGroups(client.groupManager.getJoinedGroupList()))
+          // 同 contact：loaded 为真但列表为空时仍回填，防抢跑锁定
+          if (!stores.group.loaded || stores.group.groupList.length === 0) {
+            const sdkGroups = client.groupManager.getJoinedGroupList()
+            stores.group.setGroupList(toUiGroups(sdkGroups))
+            chatLog.info('group 同步回填', { count: sdkGroups.length })
+          }
+          else {
+            chatLog.info('group 同步回填跳过（列表已由业务方填充）', { count: stores.group.groupList.length })
           }
           void patchConversationNames(stores, client)
           break

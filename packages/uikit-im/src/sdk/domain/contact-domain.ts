@@ -33,6 +33,15 @@ export class ContactDomain {
     return list
   }
 
+  /**
+   * 只读：获取当前本地联系人数量（不写 store、不锁定 loaded）。
+   * 供「轻量计数」场景使用，避免在 roster 同步完成前抢跑锁定 loaded
+   * 导致 onSyncDataFinished 的回填被跳过（列表永久为空）。
+   */
+  getLocalCount(): number {
+    return this.client.contactManager.getContacts().length
+  }
+
   /** 添加好友 */
   async addContact(userId: string, message?: string) {
     await this.client.contactManager.addContact({

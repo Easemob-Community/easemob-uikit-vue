@@ -1,8 +1,7 @@
-import type { ManagerHost } from '@easemob/uikit-core'
-import type { UIKitFeatures } from '@easemob/uikit-core'
-import type { RootStores } from './types'
 import { createConnectionHandlers } from '@easemob/uikit-core'
-import type { ConnectionEventCallbacks } from '@easemob/uikit-core'
+import type { ConnectionEventCallbacks, ManagerHost, UIKitFeatures } from '@easemob/uikit-core'
+import { resetSyncStatus } from '../../composables/use-sync-status'
+import type { RootStores } from './types'
 import { createChatHandlers, resetChatEventState } from './chat-events'
 import { createContactHandlers } from './contact-events'
 import { createGroupHandlers } from './group-events'
@@ -40,5 +39,7 @@ export function registerEventHandlers(
     client.groupManager.removeEventHandler('uikit-group')
     client.presenceManager.removeEventHandler('uikit-presence')
     resetChatEventState()
+    // 同步状态随事件注册周期归零，防止跨登录会话残留
+    resetSyncStatus()
   }
 }

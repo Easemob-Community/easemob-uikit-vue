@@ -1161,6 +1161,28 @@
 - **关联**：D29（logout 清理事件处理器）引入的副作用；`uikit-provider-config` / `websdk2-uikit-migration` / `uikit-store-composable`
 - **遗留备忘**：`packages/uikit-im/src/sdk/domain/message-domain.ts` 模块级 `sentReadReceiptIds`（已回执消息 ID 去重集合）跨登录会话残留，logout 未清；不影响本现象（仅可能少发一次回执），后续随登出清理专项一并处理。
 
+### [x] D124. 数据同步「有数据但 UI 空」：挂载/计数抢跑锁定 loaded 挡住回填；同步失败无感知、无补偿
+
+- **现象**：SDK 自动同步完成（`onSyncDataFinished` contact/group 正常触发）后，好友/群组列表仍为空——日志呈现 `contact 回填 {loaded: true, sdkCount: 1, storeCount: 0}`（SDK 内存有数据，store 为空且 `loaded` 已被置 true）；「点击到通讯录/群组页面」或「刷新页面后快速进入」同样为空。同步失败（`payload.status === 'failed'`）时 UIKit 无感知、无重试、无提示。
+- **根因**：
+  - ① 抢跑锁定：`fetchContactCount()`/`fetchJoinedGroupCount()`（通讯录 home 挂载）与 `ContactListContainer`/`GroupListContainer` 的 `autoFetch`（子列表挂载 → `refreshContacts()`/`refreshGroups()`）都会在 SDK 同步完成**前**调 `syncLocal()` 读空内存并 `setList([])` 置 `loaded=true`；`onSyncDataFinished` 回填分支 `if (!loaded)` 因此被跳过 → 列表永久为空。`uikit-provider.vue` 对 dataSource 分支有防抢跑注释与保护，但计数/挂载路径漏了。
+  - ② 忽略失败信号：`onSyncDataFinished` payload 自带 `status: 'success' | 'failed'` 与 `error.retryable`，UIKit 回填时完全未消费，失败时用不完整内存回填且无任何补偿。
+  - ③ 无对外同步状态：业务方感知不到「同步进行中/完成/失败」，无法在失败后自行补偿。
+- **修复**（本轮，2026-08）：四层配合——
+  - **A 根因**：`contact-domain.ts`/`group-domain.ts` 新增只读 `getLocalCount()`（只读 `getContacts()`/`getJoinedGroupList()` 长度，不写 store 不置 loaded）；`use-contact.fetchContactCount` / `use-group.fetchJoinedGroupCount` 改用只读计数，不再抢跑锁定。
+  - **B 兜底**：`chat-events.ts` `onSyncDataFinished` 回填条件放宽为「`loaded` 为 true **但列表为空**仍回填」（contact/group 两分支），任何入口抢跑锁定都无法再造成永久空列表。
+  - **C 失败补偿**：`onSyncDataFinished` 检查 `payload.status`，`failed` 时记 warn（stage/retryable/message）+ 状态置 failed；conversation 且 `retryable` 时自动 `refreshSessionList()` 重试一次（contact/group 无 SDK 主动同步接口，只能等下次连接/登录自动同步）。
+  - **D 对外 hook**：新增 `useSyncStatus()`（`packages/uikit-im/src/composables/use-sync-status.ts`），暴露 conversation/contact/group 三类同步阶段（idle/syncing/success/failed）+ `isSyncing`/`allFinished`，业务方可在同步完成/失败后自行补偿；内部 `setSyncStatus`/`resetSyncStatus` 已加入 aux exclude（不进 auto-imports 白名单），`resetSyncStatus` 在事件反注册时调用防跨登录残留。
+- **能力边界备忘**：contact/group 的完整列表同步只能靠 SDK 登录时 `enableSyncData` 自动同步，SDK 未提供「主动重新同步 roster/群组」的公开接口（仅 conversation 有 `refreshSessionList()`）；故 contact/group 失败后的重试只能「等重连/重登自动同步」+ 业务方经 `useSyncStatus` 感知后补偿。
+- **日志判据清单（复现「无法同步」时按此定位 UIKit / SDK）**：
+  - `onSyncDataStart` 未出现 → SDK 未启动同步（`enableSyncData` 配置 / SDK 版本 / 服务端未开通能力）；
+  - `onSyncDataFinished {status: 'success'}` 但 `XXX 同步回填 {count: 0}` → SDK 同步成功但内存为空（SDK/服务端数据问题）；
+  - `onSyncDataFinished {status: 'failed'}` 且 `retryable: false`（或重试后仍 failed）→ SDK 侧同步失败（网络/权限/服务端），UIKit 已尽力；
+  - `status: 'success'` 且 `回填 {count: N>0}` 但 UI 仍空 → 才需查 UIKit 展示层/业务方（回填日志会先暴露，此类已由 B 兜底杜绝）。
+  - 分界结论：日志显示 `success` + `count>0` 则 UI 必有数据；count=0 或 start 未触发则属 SDK 层。
+- **验证**：uikit-im `vue-tsc --noEmit` 0 错误 + `pnpm -F @easemob/uikit-im build`（含 aux --check）通过；新增文件 lint 干净（存量 import/no-duplicates 报错位于未改动区域，按规则未 --fix）。
+- **关联 skill**：`uikit-store-composable` / `uikit-component-authoring` / `uikit-provider-config`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

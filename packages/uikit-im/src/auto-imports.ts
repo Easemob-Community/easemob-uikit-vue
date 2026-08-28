@@ -42,6 +42,7 @@ export const EasemobUIKitImports = {
     'usePresence',
     'usePullRefresh',
     'useResizable',
+    'useSyncStatus',
     'useTheme',
     'useToast',
     'useUIKit',

@@ -59,6 +59,15 @@ export class GroupDomain {
     return list
   }
 
+  /**
+   * 只读：获取当前本地已加入群组数量（不写 store、不锁定 loaded）。
+   * 供「轻量计数」场景使用，避免在群组同步完成前抢跑锁定 loaded
+   * 导致 onSyncDataFinished 的回填被跳过（群组列表永久为空）。
+   */
+  getLocalCount(): number {
+    return this.client.groupManager.getJoinedGroupList().length
+  }
+
   /** 获取单个群详情 */
   async fetchGroupInfo(groupId: string): Promise<UiGroup> {
     const existing = pendingGroupInfoRequests.get(groupId)

@@ -164,11 +164,11 @@ export function useContact() {
     }
   }
 
-  /** 轻量获取好友总数（不强制拉取完整列表） */
+  /** 轻量获取好友总数（只读计数：不写 store、不锁定 loaded；同步完成后徽标随列表自动更新） */
   async function fetchContactCount(): Promise<number> {
     const count = contactStore.loaded
       ? contactStore.contactList.length
-      : domains.contact.syncLocal().length
+      : domains.contact.getLocalCount()
     contactStore.setContactCount(count)
     return count
   }
