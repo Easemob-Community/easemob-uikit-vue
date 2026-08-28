@@ -13,7 +13,7 @@ export interface EmojiPickerProps {
   stickerPacks?: EmojiStickerPack[]
   /** 选择 emoji / sticker 后自动关闭，默认 false */
   closeOnSelect?: boolean
-  /** 是否启用「常用」最近使用 tab，默认 true；关闭后不展示常用 tab 也不再记录 / Whether to enable the recent-emoji tab, default true */
+  /** 是否启用「常用」最近使用区（置于表情视图顶部），默认 true；关闭后不展示常用区也不再记录 / Whether to enable the recent-emoji section at the top of the emoji view, default true */
   recent?: boolean
   /** 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5 */
   recentCount?: number
@@ -21,9 +21,7 @@ export interface EmojiPickerProps {
   tabsPosition?: EmojiTabsPosition
   /** sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true */
   stickerHover?: boolean
-  /** 「常用」tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Recent" tab, shown as an image preview instead of text */
-  recentIcon?: string
-  /** 「Emoji」tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" tab, shown as an image preview instead of text */
+  /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text */
   emojiIcon?: string
   /** 内置 emoji 悬停时放大预览，默认 true / Enlarge a built-in emoji on hover, default true */
   emojiPreview?: boolean
@@ -74,13 +72,11 @@ interface TabItem {
   iconUrl?: string
 }
 
-/** tab 列表：常用（可开关）→ Emoji 完整列表 → 注入的表情包；
- *  每个 tab 项都尽量带一张预览小图：sticker 包取 pack.iconUrl，缺省回落到包内第一个 sticker 的预览图；
- *  内置「常用/Emoji」tab 通过 recentIcon/emojiIcon 配置，未配置时显示文字 */
+/** tab 列表：「Emoji」综合视图（常用 + 完整列表合并）+ 注入的表情包；
+ *  表情包 tab 尽量带一张预览小图：取 pack.iconUrl，缺省回落到包内第一个 sticker 的预览图；
+ *  「Emoji」视图 tab 通过 emojiIcon 配置，未配置时显示文字 */
 const tabItems = computed<TabItem[]>(() => {
   const tabs: TabItem[] = []
-  if (props.recent)
-    tabs.push({ key: 'recent', name: t('emoji.recent', '常用'), iconUrl: props.recentIcon })
   tabs.push({ key: 'emoji', name: t('emoji.full', '表情'), iconUrl: props.emojiIcon })
   for (const pack of props.stickerPacks) {
     const firstSticker = pack.stickers[0]
@@ -93,44 +89,21 @@ const tabItems = computed<TabItem[]>(() => {
   return tabs
 })
 
-/** 默认打开的 tab：常用有内容时优先常用，否则落到 Emoji 完整列表；绝不自动选中注入的 sticker tab */
-function defaultTabIndex(): number {
-  const tabs = tabItems.value
-  if (props.recent && recentList.value.length > 0) {
-    const recentIdx = tabs.findIndex(tab => tab.key === 'recent')
-    if (recentIdx >= 0)
-      return recentIdx
-  }
-  const emojiIdx = tabs.findIndex(tab => tab.key === 'emoji')
-  return emojiIdx >= 0 ? emojiIdx : 0
-}
+const activeTab = ref(0)
 
-const activeTab = ref(defaultTabIndex())
-
-/** 每次打开面板回到默认 tab（常用有内容 → 常用；否则 Emoji），不自动选中注入的 sticker tab */
+/** 每次打开面板回到「Emoji」综合视图，不自动选中注入的 sticker tab */
 watch(() => props.show, (v) => {
   if (v)
-    activeTab.value = defaultTabIndex()
+    activeTab.value = 0
 })
 
-/** tab 列表变化（常用开关/注入包增减）时钳制越界索引 */
+/** tab 列表变化（注入包增减）时钳制越界索引 */
 watch(tabItems, (tabs) => {
   if (activeTab.value >= tabs.length)
     activeTab.value = Math.max(0, tabs.length - 1)
 })
 
 const activeTabItem = computed(() => tabItems.value[activeTab.value])
-const isRecentTab = computed(() => activeTabItem.value?.key === 'recent')
-const isEmojiTab = computed(() => activeTabItem.value?.key === 'emoji')
-
-/** 当前 tab 的 emoji 列表（表情包 tab 时为空） */
-const activeEmojis = computed(() => {
-  if (isRecentTab.value)
-    return recentList.value
-  if (isEmojiTab.value)
-    return EMOJI_ALL
-  return []
-})
 
 /** 当前 tab 的表情包（非 sticker tab 时为 undefined） */
 const activeStickerPack = computed(() => {
@@ -238,7 +211,11 @@ function onClose() {
     :class="`emoji-picker--tabs-${props.tabsPosition}`"
   >
     <div class="emoji-picker__tabs-bar">
-      <div class="emoji-picker__tabs" role="tablist">
+      <div
+        v-if="props.stickerPacks.length > 0"
+        class="emoji-picker__tabs"
+        role="tablist"
+      >
         <button
           v-for="(tab, index) in tabItems"
           :key="tab.key"
@@ -290,14 +267,34 @@ function onClose() {
           >
         </button>
       </template>
-      <template v-else-if="isRecentTab && activeEmojis.length === 0">
-        <div class="emoji-picker__empty">
-          {{ t('emoji.recentEmpty', '暂无常用表情') }}
-        </div>
-      </template>
+
+      <!-- 「Emoji」综合视图：常用（可开关）在上、完整列表在下，单一滚动区 -->
       <template v-else>
+        <template v-if="props.recent">
+          <div class="emoji-picker__section-title">{{ t('emoji.recent', '常用') }}</div>
+          <template v-if="recentList.length > 0">
+            <button
+              v-for="emoji in recentList"
+              :key="`recent-${emoji}`"
+              type="button"
+              class="emoji-picker__item"
+              @mouseenter="onEmojiEnter(emoji, $event.currentTarget as HTMLElement)"
+              @mouseleave="onEmojiLeave"
+              @click="onSelect(emoji)"
+            >
+              {{ emoji }}
+            </button>
+          </template>
+          <template v-else>
+            <div class="emoji-picker__empty">
+              {{ t('emoji.recentEmpty', '暂无常用表情') }}
+            </div>
+          </template>
+        </template>
+
+        <div class="emoji-picker__section-title">{{ t('emoji.full', '表情') }}</div>
         <button
-          v-for="emoji in activeEmojis"
+          v-for="emoji in EMOJI_ALL"
           :key="emoji"
           type="button"
           class="emoji-picker__item"
@@ -490,6 +487,14 @@ function onClose() {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.emoji-picker__section-title {
+  width: 100%;
+  padding: 4px 4px 2px;
+  font-size: var(--uikit-font-size-13);
+  color: var(--uikit-text-secondary);
+  line-height: 1.4;
 }
 
 .emoji-picker__empty {

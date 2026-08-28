@@ -249,7 +249,7 @@ export interface ChatConfig {
     stickerPacks?: EmojiStickerPack[]
     /** Emoji 面板配置 / Emoji picker config */
     emoji?: {
-      /** 是否启用「常用」最近使用 tab，默认 true；关闭后不展示常用 tab 也不再记录 / Whether to enable the recent-emoji tab, default true */
+      /** 是否启用「常用」最近使用区（置于表情视图顶部），默认 true；关闭后不展示常用区也不再记录 / Whether to enable the recent-emoji section at the top of the emoji view, default true */
       recent?: boolean
       /** 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5 */
       recentCount?: number
@@ -257,9 +257,7 @@ export interface ChatConfig {
       tabsPosition?: EmojiTabsPosition
       /** sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true */
       stickerHover?: boolean
-      /** 「常用」tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Recent" tab, shown as an image preview instead of text */
-      recentIcon?: string
-      /** 「Emoji」tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Emoji" tab, shown as an image preview instead of text */
+      /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text */
       emojiIcon?: string
       /** 内置 emoji 悬停时放大预览，默认 true / Enlarge a built-in emoji on hover, default true */
       emojiPreview?: boolean

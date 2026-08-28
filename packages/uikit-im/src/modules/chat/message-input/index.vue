@@ -813,7 +813,6 @@ defineExpose({
           :recent-count="emojiPickerConfig.recentCount"
           :tabs-position="emojiPickerConfig.tabsPosition"
           :sticker-hover="emojiPickerConfig.stickerHover"
-          :recent-icon="emojiPickerConfig.recentIcon"
           :emoji-icon="emojiPickerConfig.emojiIcon"
           :emoji-preview="emojiPickerConfig.emojiPreview"
           @select="onEmojiSelect"
