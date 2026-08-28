@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UserInfo } from 'easemob-websdk'
+import type { UserInfo, UserInfoAttribute } from 'easemob-websdk'
 
 export interface UserInfoState {
   userInfoMap: Record<string, UserInfo>
@@ -17,21 +17,48 @@ export const useUserInfoStore = defineStore('userInfo', () => {
   const subscribedSet = ref<Set<string>>(new Set())
   const subscribeFailedSet = ref<Set<string>>(new Set())
   const subscriptionDisabled = ref(false)
+  /** 每个 userId 已成功拉取过的属性集合，用于判断缓存是否满足后续更大属性集的请求 */
+  const fetchedAttributesMap = ref<Record<string, Set<UserInfoAttribute>>>({})
 
   function getUserInfo(userId: string): UserInfo | undefined {
     return userInfoMap.value[userId]
   }
 
   function setUserInfo(userInfo: UserInfo) {
-    userInfoMap.value[userInfo.userId] = { ...userInfo }
+    // 合并写入：事件推送/单属性更新可能只带部分字段，合并保留已拉取的全量字段
+    userInfoMap.value[userInfo.userId] = {
+      ...userInfoMap.value[userInfo.userId],
+      ...userInfo,
+    }
     fetchFailedSet.value.delete(userInfo.userId)
   }
 
   function setUserInfos(infos: UserInfo[]) {
     for (const info of infos) {
-      userInfoMap.value[info.userId] = { ...info }
+      userInfoMap.value[info.userId] = {
+        ...userInfoMap.value[info.userId],
+        ...info,
+      }
       fetchFailedSet.value.delete(info.userId)
     }
+  }
+
+  /** 记录指定用户已成功拉取过的属性集合（与既有集合取并集） */
+  function markFetchedAttributes(userIds: string[], attributes: UserInfoAttribute[]) {
+    for (const id of userIds) {
+      const current = fetchedAttributesMap.value[id] ?? new Set<UserInfoAttribute>()
+      for (const attr of attributes)
+        current.add(attr)
+      fetchedAttributesMap.value[id] = current
+    }
+  }
+
+  /** 指定用户的缓存是否已覆盖请求的全部属性 */
+  function areAttributesFetched(userId: string, attributes: UserInfoAttribute[]): boolean {
+    const fetched = fetchedAttributesMap.value[userId]
+    if (!fetched)
+      return false
+    return attributes.every(attr => fetched.has(attr))
   }
 
   function markLoading(userIds: string[]) {
@@ -102,6 +129,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     subscribedSet.value.clear()
     subscribeFailedSet.value.clear()
     subscriptionDisabled.value = false
+    fetchedAttributesMap.value = {}
   }
 
   return {
@@ -114,6 +142,8 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     getUserInfo,
     setUserInfo,
     setUserInfos,
+    markFetchedAttributes,
+    areAttributesFetched,
     markLoading,
     markLoaded,
     markFetchFailed,

@@ -13,8 +13,8 @@ export interface UIKitDataSource {
   fetchPresence?: (userIds: string[]) => Promise<UiPresence[]>
   subscribePresence?: (userIds: string[]) => Promise<void> | void
   unsubscribePresence?: (userIds: string[]) => Promise<void> | void
-  /** 业务自定义用户资料源；返回数组至少包含 userId，可选 nickname/avatarUrl 等 */
-  fetchUserInfos?: (userIds: string[]) => Promise<Array<Pick<UserInfo, 'userId' | 'nickname' | 'avatarUrl' | 'sign' | 'ext'>>>
+  /** 业务自定义用户资料源；返回数组至少包含 userId，可选 nickname/avatarUrl/sign/mail/phone/gender/birth/ext */
+  fetchUserInfos?: (userIds: string[]) => Promise<Array<Pick<UserInfo, 'userId' | 'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'>>>
   /**
    * 服务端搜索用户：按手机号/邮箱/昵称等业务字段查询环信 userId。
    * 不传时添加联系人组件退化为直接输入 userId 添加。

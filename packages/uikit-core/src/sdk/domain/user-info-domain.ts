@@ -8,6 +8,22 @@ import { createLogger } from '../../utils/logger'
 const logger = createLogger('UIKit:UserInfoDomain')
 
 /**
+ * 用户资料全部可查属性（SDK UserInfoAttribute 全集）。
+ * 登录/自身资料默认全量拉取，保证昵称、头像、签名、邮箱、手机号等登录后均可回显；
+ * 场景列表类轻量消费可显式传子集（如 ['nickname', 'avatarUrl']）减少带宽。
+ */
+export const ALL_USER_INFO_ATTRIBUTES: UserInfoAttribute[] = [
+  'nickname',
+  'avatarUrl',
+  'mail',
+  'phone',
+  'gender',
+  'sign',
+  'birth',
+  'ext',
+]
+
+/**
  * 用户资料业务域：封装 SDK UserInfoManager 的查询、订阅与缓存能力。
  */
 export class UserInfoDomain {
@@ -31,17 +47,19 @@ export class UserInfoDomain {
   }
 
   /**
-   * 批量获取用户资料；已缓存或正在加载中的 userId 会被跳过。
+   * 批量获取用户资料；已缓存（且请求属性已覆盖）或正在加载中的 userId 会被跳过。
    * @param userIds 目标用户 ID 列表
-   * @param attributes 需要查询的属性，默认只查 nickname/avatarUrl
+   * @param attributes 需要查询的属性，默认全量 8 个属性
    */
   async fetchUserInfos(
     userIds: string[],
-    attributes: UserInfoAttribute[] = ['nickname', 'avatarUrl'],
+    attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
   ): Promise<UserInfo[]> {
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     const missingIds = uniqueIds.filter(
-      id => !this.store.getUserInfo(id) && !this.store.isLoading(id) && !this.store.isFetchFailed(id),
+      id => !this.store.areAttributesFetched(id, attributes)
+        && !this.store.isLoading(id)
+        && !this.store.isFetchFailed(id),
     )
 
     if (missingIds.length === 0) {
@@ -61,6 +79,8 @@ export class UserInfoDomain {
         this.store.markFetchFailed(failedIds)
 
       this.store.setUserInfos(infos)
+      // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
+      this.store.markFetchedAttributes(missingIds, attributes)
       return uniqueIds
         .map(id => this.store.getUserInfo(id))
         .filter((info): info is UserInfo => Boolean(info))
@@ -96,7 +116,11 @@ export class UserInfoDomain {
       userId: info.userId,
       nickname: info.nickname,
       avatarUrl: info.avatarUrl,
+      mail: info.mail,
+      phone: info.phone,
+      gender: info.gender,
       sign: info.sign,
+      birth: info.birth,
       ext: info.ext,
     }))
   }
@@ -178,9 +202,9 @@ export class UserInfoDomain {
   }
 
   /**
-   * 获取当前登录用户自己的资料。
+   * 获取当前登录用户自己的资料（默认全量属性，保证签名等登录后回显）。
    */
-  async fetchOwnInfo(attributes: UserInfoAttribute[] = ['nickname', 'avatarUrl']): Promise<UserInfo | undefined> {
+  async fetchOwnInfo(attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES): Promise<UserInfo | undefined> {
     const currentUserId = this.client.currentUserId
     if (!currentUserId)
       return undefined

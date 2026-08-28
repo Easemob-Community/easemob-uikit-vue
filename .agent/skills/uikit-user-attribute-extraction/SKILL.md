@@ -60,9 +60,9 @@ export function useUserInfo(
 
 ```ts
 export function useOwnUserInfo() {
-  // 自动拉取自身资料，通过 SDK onOwnInfoUpdated 事件同步
+  // 自动全量拉取自身资料（昵称/头像/签名/邮箱/手机号/性别/生日/ext），通过 SDK onOwnInfoUpdated 事件同步
   return {
-    userInfo, // 当前用户 SDK 资料
+    userInfo, // 当前用户 SDK 资料（含 sign 等全量字段）
     displayName, // 备注 > 昵称 > currentUserId
     avatarUrl, // 自身头像
     updateOwnInfo, // 批量更新
@@ -274,7 +274,8 @@ Provider 层暴露两个功能开关（`uikit-provider.vue`）：
 
 - 消息 `ext.ease_chat_uikit_user_info` 作为**兜底补充**而非主源；`useUserInfo` 无结果时才回退到 ext。
 - 在线状态（Presence）按需消费——仅消息气泡、联系人列表等需要展示在线指示器的场景才引入 `usePresence`。
-- `useUserInfo` 的 `attributes` 参数默认 `['nickname', 'avatarUrl']`，如需更多字段（如 `mail`/`phoneNumber`）按需传。
+- **属性拉取范围**：`fetchUserInfos` / `fetchOwnInfo` / `useOwnUserInfo` 默认拉取**全量 8 个属性**（`nickname/avatarUrl/mail/phone/gender/sign/birth/ext`），保证登录后签名等资料可回显；`useUserInfo` 的 `attributes` 参数默认 `['nickname', 'avatarUrl']`（列表类轻量消费省带宽），需要更多字段（如 `sign`/`mail`/`phone`）时按需传（参考 `contact-detail.vue` / `user-card-modal.vue` 显式传全量）。
+- **缓存按属性补拉**：store 会记录每个 userId 已成功拉取的属性集合；先以部分属性（昵称/头像）拉过缓存后，再请求更大属性集（如全量）会自动补拉剩余属性，不会因"缓存非空"而跳过。
 
 ## 反面清单
 
