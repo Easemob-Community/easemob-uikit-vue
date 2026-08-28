@@ -59,14 +59,23 @@ const recentInfo = ref('')
 
 // ===== tab 位置 Variant =====
 
-const positions: EmojiTabsPosition[] = ['top', 'bottom', 'left', 'right']
+const positions: EmojiTabsPosition[] = ['bottom', 'top', 'left', 'right']
 const positionIndex = ref(0)
-const tabsPosition = ref<EmojiTabsPosition>('top')
+const tabsPosition = ref<EmojiTabsPosition>('bottom')
 const showPosition = ref(true)
 
 function cyclePosition() {
   positionIndex.value = (positionIndex.value + 1) % positions.length
   tabsPosition.value = positions[positionIndex.value]
+}
+
+// ===== tab 预览小图 Variant =====
+
+const showTabIcons = ref(true)
+const tabIconInfo = ref('')
+
+function onTabIconSelect(emoji: string) {
+  tabIconInfo.value = `已选择：${emoji}`
 }
 </script>
 
@@ -142,6 +151,31 @@ function cyclePosition() {
           :sticker-packs="stickerPacks"
           :tabs-position="tabsPosition"
         />
+      </div>
+    </Variant>
+
+    <Variant title="tab 预览小图 + emoji 放大预览">
+      <div style="width: 340px;">
+        <div class="u-flex u-gap-2 u-items-center" style="margin-bottom: 8px;">
+          <Button size="small" @click="showTabIcons = !showTabIcons">
+            {{ showTabIcons ? '关闭' : '打开' }}表情
+          </Button>
+          <span v-if="tabIconInfo" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
+            {{ tabIconInfo }}
+          </span>
+        </div>
+        <EmojiPicker
+          v-model:show="showTabIcons"
+          :sticker-packs="stickerPacks"
+          :recent-icon="placeholder('#64748b', '近')"
+          :emoji-icon="placeholder('#0ea5e9', 'E')"
+          :emoji-preview="true"
+          @select="onTabIconSelect"
+        />
+        <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
+          每个 tab 项均可配预览小图（常用/Emoji 走 recentIcon/emojiIcon，表情包取 iconUrl 或自动回落包内第一个 sticker 预览图）；
+          内置 emoji 悬停显示放大预览（emojiPreview 可关闭）。
+        </p>
       </div>
     </Variant>
   </Story>

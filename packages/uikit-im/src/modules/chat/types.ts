@@ -253,10 +253,16 @@ export interface ChatConfig {
       recent?: boolean
       /** 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5 */
       recentCount?: number
-      /** tab 位置：顶部/底部/左侧/右侧，默认 'top' / Tabs position: top/bottom/left/right, default 'top' */
+      /** tab 位置：顶部/底部/左侧/右侧，默认 'bottom' / Tabs position: top/bottom/left/right, default 'bottom' */
       tabsPosition?: EmojiTabsPosition
       /** sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true */
       stickerHover?: boolean
+      /** 「常用」tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Recent" tab, shown as an image preview instead of text */
+      recentIcon?: string
+      /** 「Emoji」tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Emoji" tab, shown as an image preview instead of text */
+      emojiIcon?: string
+      /** 内置 emoji 悬停时放大预览，默认 true / Enlarge a built-in emoji on hover, default true */
+      emojiPreview?: boolean
     }
   }
   /** 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 */

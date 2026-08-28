@@ -28,8 +28,8 @@ export interface EmojiStickerPack {
 
 /**
  * Emoji 面板 tab 位置 / Tabs position of the emoji picker
- * - top：顶部横排（默认）/ horizontal bar on top (default)
- * - bottom：底部横排 / horizontal bar on bottom
+ * - top：顶部横排 / horizontal bar on top
+ * - bottom：底部横排（默认）/ horizontal bar on bottom (default)
  * - left：左侧竖排 / vertical bar on the left
  * - right：右侧竖排 / vertical bar on the right
  */
