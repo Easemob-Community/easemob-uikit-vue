@@ -1,5 +1,19 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.2 (2026-08-28)
+
+### 调整
+
+- **表情面板「常用」区仅在有最近使用时显示**：从未选过表情不展示「常用」空态占位；`emoji.recentEmpty` 文案随之移除。
+- **移除内置 emoji 悬停放大预览**：删除 `ChatConfig.input.emoji.emojiPreview` 配置，表情视图不再弹放大预览小窗；sticker 的 hover 预览图 → gif 切换保留不变。
+
+## @easemob/uikit-core 1.5.2 (2026-08-28)
+
+### 调整
+
+- **EmojiPicker「常用」区空时隐藏**：仅当有最近使用 emoji 时展示「常用」区；移除 `emoji.recentEmpty` i18n key。
+- **移除 `emojiPreview` prop**：删除内置 emoji 悬停放大预览气泡（逻辑 + 样式）；sticker 的 `stickerHover` 预览切换不受影响。
+
 ## @easemob/uikit-im 2.8.1 (2026-08-28)
 
 ### 调整
