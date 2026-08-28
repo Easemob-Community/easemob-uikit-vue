@@ -59,7 +59,12 @@ export interface UIKitContext {
   init: (config: ClientConfig) => UIKitClient
   /** 登录（支持 accessToken 或密码） */
   login: (params: UIKitLoginParams) => Promise<void>
-  /** 登出 */
+  /**
+   * UIKit 层完整退出：SDK 断开 + core stores（client/presence/userInfo）
+   * + 场景 stores（conversation/message/contact/group）+ 模块级单例
+   * （多选状态/草稿缓存）全部重置；下次登录自动重建 SDK 事件处理器。
+   * 与 useClient().logout（仅断开 SDK 连接）区分：业务侧「退出登录」应调用本方法。
+   */
   logout: () => Promise<void>
 }
 

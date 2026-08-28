@@ -18,7 +18,9 @@ export * from './use-group-sort'
 // use-h5-adaptation / use-keyboard 已迁至 @easemob/uikit-core（P1 Step 2），此处显式具名 re-export 保持对外 API 不变
 export { useH5Adaptation, useKeyboard } from '@easemob/uikit-core'
 export type { H5AdaptationConfig } from '@easemob/uikit-core'
-// 共享 composables 已迁至 @easemob/uikit-core（P1 Step 3），此处显式具名 re-export 保持对外 API 不变
+// 共享 composables 已迁至 @easemob/uikit-core（P1 Step 3），此处显式具名 re-export 保持对外 API 不变。
+// 语义分层：useClient（SDK client 句柄）的 logout 仅断开 SDK 连接；
+// UIKit 内部状态完整重置请用 useUIKit().logout()（见 use-uikit.ts）
 export { useClient, useTheme, usePresence, useToast, useViewport } from '@easemob/uikit-core'
 export { useNotification, emitNotificationDelivered } from '@easemob/uikit-core'
 export type { NotificationChannel, NotificationConfig, NotificationHandler, NotificationTriggerMode } from '@easemob/uikit-core'

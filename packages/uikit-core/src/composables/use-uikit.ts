@@ -208,6 +208,9 @@ export function useCoreUIKitProvider(
     get currentUserId() {
       return uikitClient?.currentUserId ?? null
     },
+    get isConnected() {
+      return uikitClient?.isConnected ?? false
+    },
     addEventHandler(id, handlers) {
       requireClient().addEventHandler(id, handlers)
     },
@@ -230,10 +233,23 @@ export function useCoreUIKitProvider(
     ),
   }
 
+  /**
+   * 注册场景层挂钩（onClientSetup）与 user-info domain 监听。
+   * setupClient（首次/重新初始化）与登出后重新登录共用；幂等：先清理旧注册再重建。
+   */
+  function registerClientSetup(instance: UIKitClient) {
+    disposeClientSetup?.()
+    disposeClientSetup = null
+    disposeUserInfoDomain?.()
+    disposeUserInfoDomain = null
+    domains.userInfo.listen()
+    disposeUserInfoDomain = () => domains.userInfo.dispose()
+    // 场景层挂钩（如 uikit-im 注册场景事件），返回的 dispose 随客户端生命周期清理
+    disposeClientSetup = options.onClientSetup?.(instance, stores) || null
+  }
+
   /** 创建 SDK 客户端并完成 core 侧初始化（首次或重新初始化） */
   function setupClient(cfg: ClientConfig): UIKitClient {
-    disposeClientSetup?.()
-    disposeUserInfoDomain?.()
     // 场景化配置补齐（managers / enableSyncData 等场景默认值），两条初始化路径统一经过
     const resolved = options.resolveClientConfig?.(cfg) ?? cfg
     uikitClient = createClient({
@@ -244,10 +260,7 @@ export function useCoreUIKitProvider(
     })
     currentAppKey = resolved.appKey
     stores.client.setAppKey(resolved.appKey)
-    domains.userInfo.listen()
-    disposeUserInfoDomain = () => domains.userInfo.dispose()
-    // 场景层挂钩（如 uikit-im 注册场景事件），返回的 dispose 随客户端生命周期清理
-    disposeClientSetup = options.onClientSetup?.(uikitClient, stores) || null
+    registerClientSetup(uikitClient)
     return uikitClient
   }
 
@@ -262,6 +275,13 @@ export function useCoreUIKitProvider(
 
   async function login(params: CoreUIKitLoginParams): Promise<void> {
     const instance = requireClient()
+    // 登出后再登录：事件处理器（连接级 + 各 manager + user-info 监听）已在登出时
+    // dispose 移除，必须在重新建立连接前恢复注册，否则 onConnected/onDisconnected
+    // 等连接事件无人消费，stores.client.connected 恒为 false，
+    // 会话列表会误展示“网络异常”横幅。
+    if (!disposeClientSetup) {
+      registerClientSetup(instance)
+    }
     await instance.login(params.user, params.accessToken ?? params.password ?? '')
     stores.client.setCurrentUser(params.user)
     stores.client.setAppKey(currentAppKey)

@@ -4,10 +4,12 @@
  *
  * 包含：SDK 初始化（appKey / apiUrl / debug）、登录登出（密码 / Token 两种模式）、
  * 连接状态展示与 sdkClient 信息。
- * 说明：SDK 实例与登录态来自 useClient；登出成功后 emit('logout') 由
+ * 说明：SDK 实例与登录态来自 useClient（SDK client 句柄）；**登出走 useUIKit().logout()**
+ * ——useClient().logout 只断开 SDK 连接，useUIKit().logout 才是 UIKit 层完整退出
+ * （SDK 断开 + 场景 stores / 模块级单例重置）。登出成功后 emit('logout') 由
  * demo-page → app.vue 处理，清空本地登录缓存并回到登录页。
  */
-import { useClient } from '@easemob/uikit-im'
+import { useClient, useUIKit } from '@easemob/uikit-im'
 import { demoPresetUsers, useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
@@ -16,7 +18,9 @@ const emit = defineEmits<{
   (e: 'logout'): void
 }>()
 
-const { client, connected, isLoggedIn, currentUser, sdkClient, init, login, logout } = useClient()
+const { client, connected, isLoggedIn, currentUser, sdkClient, init, login } = useClient()
+// UIKit 层完整退出入口（区别于 useClient().logout 的 SDK 层断开）
+const { logout } = useUIKit()
 const { sdkAppKey, sdkApiUrl, sdkDebug, loginUser, loginPassword, loginToken, loginMode, applyPresetUser } = useDemoSettings()
 
 function handleInit() {

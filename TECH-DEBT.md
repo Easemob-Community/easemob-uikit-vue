@@ -1151,6 +1151,16 @@
 - **建议修法**：见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（含四层架构、包拆分、中立契约以 5.x 字段命名为基准、`SdkCapabilities` 能力矩阵、repository 接口、事件推法 + Provider 注入、三阶段里程碑、验证门禁、14 项已确认决策、归一化映射表）。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
 
+### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）
+
+- **现象**：点击退出登录后再次登录成功，会话列表顶部横幅显示 `status.networkError`（「请检查网络情况」），会话不加载；刷新页面（重建 Provider）后恢复正常。Demo `confirmLogout` → `useClient().logout()` 即复现；Provider 在 demo 中常驻（登出仅切到登录页），不涉及组件卸载重建。
+- **根因**：D29 修复后 `logout()` 会把 UIKit 注册在 SDK 上的**全部事件处理器**移除（core `useCoreUIKitProvider` 的 `disposeClientSetup` 移除 `uikit-conn`/`uikit-chat`/`uikit-contact`/`uikit-group`/`uikit-presence`，`disposeUserInfoDomain` 移除 user-info 监听），并 `stores.client.clearClient()`（connected/connecting 置 false）。但 **`login()` 没有任何恢复注册的逻辑**——SDK `ChatClient` 是全局单例，logout 只断开连接（`this.core.destroy()`），事件注册表 `eventHub` 常驻，再次 `login()` 正常触发 `onConnecting`/`onConnected`，却**无人监听** → `stores.client.connected` 恒为 false、`connecting` 恒为 false → `conversation-list.vue` 的 `bannerState` 命中 `!connected && !connecting` 分支展示网络异常。生命周期不对称：登出时清理了监听，重新登录未重建。
+- **修复**（已于 2026-07-28 之后的本轮修复）：`packages/uikit-core/src/composables/use-uikit.ts` 抽取 `registerClientSetup(instance)`（先 dispose 旧注册再重建 `onClientSetup` 场景挂钩 + `domains.userInfo.listen()`），`setupClient` 与 `login` 共用；`login()` 中 `disposeClientSetup` 为空（即登出后）时先恢复注册再 `await instance.login()`。uikit-chatroom 复用 core provider，自动同修；两条初始化路径（auto-init / 延迟 init）行为不变。
+- **连带修复（API 语义分层）**：登出清理入口需分层——`useClient().logout()` 是 **SDK client 句柄**（只断开 SDK 连接 + core stores），UIKit 内部状态（场景 stores、多选、草稿）的完整重置属 **UIKit 层**，应由 `useUIKit().logout()` 负责。曾一度把 uikit-im 的 useClient 包装为完整清理版，后经评审否决（混淆边界）。最终：uikit-im 恢复 re-export core `useClient`（SDK 层语义）；`demo-sdk-panel.vue` 登出改用 `useUIKit().logout()`；`useClient`/`useUIKit` 的 logout 注释均明确分层（core `use-client.ts`、uikit-im `use-uikit.ts`）。
+- **验证**：core `vue-tsc --noEmit` + uikit-im `vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`（含 aux --check）+ demo `vue-tsc --noEmit` 全绿。
+- **关联**：D29（logout 清理事件处理器）引入的副作用；`uikit-provider-config` / `websdk2-uikit-migration` / `uikit-store-composable`
+- **遗留备忘**：`packages/uikit-im/src/sdk/domain/message-domain.ts` 模块级 `sentReadReceiptIds`（已回执消息 ID 去重集合）跨登录会话残留，logout 未清；不影响本现象（仅可能少发一次回执），后续随登出清理专项一并处理。
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

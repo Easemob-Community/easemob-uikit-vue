@@ -55,6 +55,10 @@ export class UserInfoDomain {
     userIds: string[],
     attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
   ): Promise<UserInfo[]> {
+    // 未连接时不发起请求，直接返回空结果（缓存数据由 store 层兜底展示）
+    if (!this.client.isConnected) {
+      return []
+    }
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     const missingIds = uniqueIds.filter(
       id => !this.store.areAttributesFetched(id, attributes)
@@ -131,6 +135,9 @@ export class UserInfoDomain {
    * 若服务端返回无权限，则自动熔断后续订阅并缓存失败用户，避免重复请求与控制台警告刷屏。
    */
   async subscribeUserInfos(userIds: string[]): Promise<void> {
+    if (!this.client.isConnected) {
+      return
+    }
     if (this.store.isSubscriptionDisabled())
       return
 
@@ -216,6 +223,9 @@ export class UserInfoDomain {
    * 更新当前登录用户资料。
    */
   async updateOwnInfo(params: Partial<Pick<UserInfo, 'nickname' | 'avatarUrl' | 'sign' | 'ext' | 'mail' | 'phone' | 'gender' | 'birth'>>): Promise<UserInfo | undefined> {
+    if (!this.client.isConnected) {
+      return undefined
+    }
     try {
       const info = await this.client.userInfoManager.updateOwnInfo(params)
       this.store.setUserInfo(info)
@@ -231,6 +241,9 @@ export class UserInfoDomain {
    * 更新当前登录用户的单个资料属性。
    */
   async updateOwnInfoByAttribute(attribute: UserInfoAttribute, value: string | number | boolean): Promise<UserInfo | undefined> {
+    if (!this.client.isConnected) {
+      return undefined
+    }
     try {
       const info = await this.client.userInfoManager.updateOwnInfoByAttribute(attribute, value)
       this.store.setUserInfo(info)
@@ -246,6 +259,9 @@ export class UserInfoDomain {
    * 取消订阅指定用户的资料变更通知。
    */
   async unsubscribeUsersInfo(userIds: string[]): Promise<void> {
+    if (!this.client.isConnected) {
+      return
+    }
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     if (uniqueIds.length === 0)
       return
@@ -262,6 +278,9 @@ export class UserInfoDomain {
    * 获取当前用户已订阅资料变更的用户列表。
    */
   async getSubscribedUsers() {
+    if (!this.client.isConnected) {
+      return []
+    }
     try {
       return await this.client.userInfoManager.getSubscribedUsers()
     }

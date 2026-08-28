@@ -26,7 +26,12 @@ export function useClient() {
     init: ctx.init,
     /** 登录（支持 accessToken 或密码） */
     login: ctx.login,
-    /** 登出 */
+    /**
+     * SDK 层登出：断开 SDK 连接并清理 core stores（client/presence/userInfo）。
+     * 注意：core 无场景状态；场景包（如 uikit-im）的 UIKit 内部状态
+     * （会话/消息/联系人/群、草稿、多选等）请用场景包提供的退出入口
+     * （uikit-im 为 useUIKit().logout()）做完整重置。
+     */
     logout: ctx.logout,
   }
 }

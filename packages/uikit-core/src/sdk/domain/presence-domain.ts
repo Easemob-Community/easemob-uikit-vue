@@ -69,6 +69,10 @@ export class PresenceDomain {
 
   /** 订阅用户在线状态 */
   async subscribe(userIds: string[], expiry = 7 * 24 * 60 * 60) {
+    // 未连接时不发起请求（SDK 未就绪时调用会报错/空转）
+    if (!this.client.isConnected) {
+      return
+    }
     const result = await this.client.presenceManager.subscribePresence({
       userIds,
       expiry,
@@ -83,11 +87,17 @@ export class PresenceDomain {
 
   /** 取消订阅 */
   async unsubscribe(userIds: string[]) {
+    if (!this.client.isConnected) {
+      return
+    }
     await this.client.presenceManager.unsubscribePresence({ userIds })
   }
 
   /** 主动查询在线状态 */
   async fetchStatus(userIds: string[]) {
+    if (!this.client.isConnected) {
+      return
+    }
     const result = await this.client.presenceManager.getPresenceStatus({ userIds })
     const mapped = result
       .map(toUiPresence)
@@ -98,6 +108,9 @@ export class PresenceDomain {
 
   /** 发布自定义在线状态 */
   async publish(description: string) {
+    if (!this.client.isConnected) {
+      return
+    }
     await this.client.presenceManager.publishPresence({ customStatus: description })
   }
 }

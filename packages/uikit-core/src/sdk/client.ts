@@ -38,6 +38,11 @@ export interface ManagerHost {
   readonly userInfoManager: UserInfoManager
   /** 当前登录用户 ID（未登录时为 null） */
   readonly currentUserId: string | null
+  /**
+   * 当前是否已建立连接（等价于 `connectionState === 'connected'`）。
+   * Domain 层据此在未连接时短路，避免对未就绪的 SDK 发起无意义的网络请求。
+   */
+  readonly isConnected: boolean
   /** 注册连接级事件处理器（委托到底层 ChatClient） */
   addEventHandler: (id: string, handlers: ConnectionEventHandlerMap) => void
   /** 注销连接级事件处理器 */
@@ -255,6 +260,11 @@ export class UIKitClient {
   /** 当前连接状态 */
   get connectionState() {
     return this._client.getConnectionState()
+  }
+
+  /** 当前是否已建立连接（`connected` 对应 SDK `ConnectionStatus.CONNECTED`） */
+  get isConnected() {
+    return this._client.getConnectionState() === 'connected'
   }
 
   /**
