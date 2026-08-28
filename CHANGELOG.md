@@ -1,5 +1,17 @@
 # Changelog
 
+## @easemob/uikit-im 2.8.1 (2026-08-28)
+
+### 调整
+
+- **表情面板「常用」与「Emoji」合并为单一视图**：不再分「常用 / Emoji」两个 tab，改为在表情视图顶部展示「常用」最近使用区、下方为完整 Emoji 列表，同一滚动区（与设计稿对齐）；底部 tab 只区分表情视图与表情包。`recentIcon` 配置随之移除（无消费方）；`recent` / `recentCount` / `emojiIcon` / `emojiPreview` 等其余配置语义不变。
+
+## @easemob/uikit-core 1.5.1 (2026-08-28)
+
+### 调整
+
+- **EmojiPicker「常用」与「Emoji」合并为单一视图**：常用最近使用区置于视图顶部、完整 Emoji 列表在下，同一滚动区；移除已无用的 `recentIcon` prop（`emojiIcon` 改为表情视图 tab 图标），其余 props（`recent` / `recentCount` / `tabsPosition` / `stickerHover` / `emojiPreview`）语义不变。
+
 ## @easemob/uikit-im 2.8.0 (2026-08-28)
 
 ### 新增
