@@ -17,6 +17,10 @@
     "paths": {
       "@easemob/uikit-core": ["./packages/uikit-core/src"],
       "@easemob/uikit-core/*": ["./packages/uikit-core/src/*"],
+      "@easemob/uikit-sdk-contract": ["./packages/uikit-sdk-contract/src"],
+      "@easemob/uikit-sdk-contract/*": ["./packages/uikit-sdk-contract/src/*"],
+      "@easemob/uikit-sdk-websdk5": ["./packages/uikit-sdk-websdk5/src"],
+      "@easemob/uikit-sdk-websdk5/*": ["./packages/uikit-sdk-websdk5/src/*"],
       "@easemob/uikit-im": ["./packages/uikit-im/src"],
       "@easemob/uikit-im/*": ["./packages/uikit-im/src/*"],
       "@easemob/uikit-chatroom": ["./packages/uikit-chatroom/src"],
