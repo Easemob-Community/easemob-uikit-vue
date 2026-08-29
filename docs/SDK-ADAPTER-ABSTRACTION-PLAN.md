@@ -365,6 +365,7 @@ interface MessageRepository {
 19. **`useClient()` 返回中立 `SdkAdapter`，不泄漏 SDK 类型**：当前 `useClient()` 返回的 `client`/`sdkClient` 是 `ManagerHost` 代理（`packages/uikit-core/src/composables/use-client.ts`，2026-08 复核修正：并非原生 `ChatClient` 本体），但 `ManagerHost` 的 7 个 manager 字段均为 SDK5 原生类型，同样会从公开 API 泄漏 SDK 类型、破坏"纯 UIKIT"。Phase 1 后改为返回中立 `SdkAdapter`；原生实例经 `adapter.client`（`unknown`/可选）拿；需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带 `ChatClient`/`connection`。
 20. **非 Vue 上下文的独立调用入口**：`useClient()` 是 `provide/inject` 绑定、只能在 Provider 子树内用；OA 基座里"SDK 对外独立调用"往往意味着非 Vue 上下文（别的子应用 / 主进程 IPC / 定时任务）。除 `useClient()` 外，需提供非 context 访问口（如 `login()` 返回实例，或 adapter 实例挂在确定位置 / 模块级 getter）。Phase 1 落地时一并设计。
 21. **UIKit 层门面生命周期（launch/disposer + 单实例，借鉴声网灵动课堂）**：SDK 生命周期（决策 18）之外，UIKit 自身还有一层"门面 + 生命周期"语义需要显式化——IM 作为 OA 的常驻全局能力，对外只有一个门面（`UIKitProvider` + `useUIKit()`，已是雏形），需补齐「挂载 → 卸载」的 disposer 语义 + 单实例约束（同一 OA 窗口内 IM 单实例）。借鉴声网 `AgoraEduSDK.launch(dom, option) → disposer` + `lock()/unlock()` 模式：对外最小化门面、内部复杂度全隐藏、启动返回可完整卸载的 disposer、`lock/unlock` 保证单实例。落地牵引：Phase 1 收口时把 `useUIKit()` 的 logout/重置语义补齐为**对称的 mount/unmount 生命周期**（与 D123 生命周期对称原则一致）；D125 微前端专项时验证子应用卸载能经 disposer 干净回收（store/事件/监听全清）。
+22. **按注入隔离天然摇树，默认内置快捷方式走子路径入口**：uikit-im 不依赖任何 adapter/SDK（adapter 由下游装并注入），因此**下游用 4.x 时 5.x adapter 与 `easemob-websdk@5.x` 不进其依赖图、物理不进包，反之亦然**——不需要「打 4.x 版 / 5.x 版两套 uikit」，uikit-im 只发一份。唯一会破坏此性质的点是决策 17 的「未传 adapter 时内部 `new Websdk5Adapter()`」：若该引用以**顶层静态 import** 写在主入口，运行时分支会导致摇树器无法剔除，4.x 下游的包也会带进 5.x adapter。因此落地约束：**默认内置快捷方式必须放子路径入口**（如 `@easemob/uikit-im/websdk5` 或独立小壳包），主入口保持零 adapter 静态引用；不用动态 import 或 optional peer 作为主手段（产物仍含 chunk / 对下游构建器假设更多）。配套：各包 `package.json` 标 `"sideEffects": false`；**禁止搞同时导出两个 adapter 的聚合 barrel**；若需 script 标签直引的预打包单文件，由 adapter 包侧出两份 UMD（各自 external 对方 SDK），属构建矩阵而非 fork uikit。
 
 > 微前端 OA 基座宿主兼容性（单例作用域 / 主题作用域 / window 副作用 / SDK 卸载）是**独立维度**，与本节 SDK 适配正交，见 [`docs/MICRO-FRONTEND-COMPATIBILITY.md`](MICRO-FRONTEND-COMPATIBILITY.md)（TECH-DEBT D125）。
 
@@ -382,6 +383,7 @@ interface MessageRepository {
 - 5.x 全功能回归（Phase 1 后必须"行为不变"）
 - 4.x 手测可用（Phase 2 第一版：核心 IM 逐项手测，对照 5.x 行为）
 - 4.x 私有化端到端验收（Phase 2 收尾）
+- **摇树验收**（Phase 2，对应决策 22）：分别用 4.x / 5.x 各起一个独立消费者工程跑 bundle analyzer——4.x 工程产物中搜不到 5.x 符号（`ChatClient`/`Easemob` 全局名），5.x 工程产物中搜不到 4.x 符号（`WebIM`/`connection`）；结果并入 `docs/CONSUMER-VALIDATION-CHECKLIST.md`
 - 消费者验证（tgz 独立工程，参考 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）
 
 ---

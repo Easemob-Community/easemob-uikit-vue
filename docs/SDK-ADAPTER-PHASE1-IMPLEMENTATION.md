@@ -315,7 +315,7 @@ export interface SdkAdapter {
 | `sdk/notification-engine.ts` | 【修改】`Message` → contract `SdkMessage` | |
 | `store/message.ts` / `store/group.ts` | 【修改】`Message`/`UserInfo` → contract | |
 | `composables/use-chat.ts` / `use-message-actions.ts` / `use-user-info.ts` / `use-blocklist.ts` | 【修改】`Message`/`UserInfoAttribute` → contract | |
-| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」） | 兼容存量业务方，非 breaking |
+| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」）⚠️ 快捷方式**禁止在主入口顶层静态 import `Websdk5Adapter`**（会破坏 4.x 下游的摇树隔离），默认构造逻辑放子路径入口（如 `@easemob/uikit-im/websdk5`），见主计划决策 22 | 兼容存量业务方，非 breaking |
 | `components/user-card/user-card-modal.vue` | 【修改】`UserInfoAttribute` → contract | |
 | `modules/chat/message-item/combine-message-modal.vue` | 【修改】`Message` → contract | |
 | `modules/chat/message-list/message-list.vue` | 【修改】`GroupMessageReadUsersResult` → contract（中立） | |
