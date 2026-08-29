@@ -70,6 +70,9 @@ export default defineConfig({
       // core 主 alias 已指 src，theme 子路径同步指 src（改 CSS 变量无需先构建 core dist）
       { find: '@easemob/uikit-core/theme', replacement: resolve(__dirname, '../../packages/uikit-core/src/theme/index.css') },
       { find: '@easemob/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
+      // SDK 中立契约包 + websdk5 适配器源码直连（D122 双 adapter 拆包）
+      { find: '@easemob/uikit-sdk-contract', replacement: resolve(__dirname, '../../packages/uikit-sdk-contract/src') },
+      { find: '@easemob/uikit-sdk-websdk5', replacement: resolve(__dirname, '../../packages/uikit-sdk-websdk5/src') },
       { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
       { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
       // chatroom 场景包源码直连（P2-2 demo 页使用；chatroom 无独立主题，theme 子路径经 exports 指 core）
