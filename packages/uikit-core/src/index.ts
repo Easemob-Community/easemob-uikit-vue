@@ -16,12 +16,7 @@
 import './theme/index.css'
 
 // SDK 基座层
-export * from './sdk/client'
 export * from './sdk/types'
-export { UserInfoDomain } from './sdk/domain/user-info-domain'
-export { PresenceDomain, parsePresenceStatus } from './sdk/domain/presence-domain'
-export type { PresenceStoreLike } from './sdk/domain/presence-domain'
-export * from './sdk/event/connection-events'
 export * from './sdk/event/notice-utils'
 
 // Pinia Stores（client / theme / user-info / presence）
@@ -86,10 +81,18 @@ export * from './locale'
 // 通用工具（日志 / SDK 错误 / 下载 / z-index）
 export * from './utils/logger'
 export * from './utils/log-store'
-export * from './utils/sdk-log-capture'
-export * from './utils/sdk-error'
 export * from './utils/download'
 export * from './utils/z-index'
 export * from './utils/format-time'
 export * from './utils/linkify'
 export * from './utils/normalize-user-id'
+
+// SDK 错误工具：签名中立（error: unknown），实现已下沉 @easemob/uikit-sdk-websdk5，
+// 此处 re-export 保持 core 既有公开 API 不变。
+export {
+  extractSdkErrorReason,
+  formatSdkError,
+  resolveSdkErrorCodeI18nKey,
+  resolveSdkErrorI18nKey,
+  resolveSdkErrorMessage,
+} from '@easemob/uikit-sdk-websdk5'

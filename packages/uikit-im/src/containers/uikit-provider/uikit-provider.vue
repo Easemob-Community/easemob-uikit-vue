@@ -12,7 +12,7 @@ import {
 import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '@easemob/uikit-core'
 import { EmNotificationContainer, EmToast } from '../../components'
 import type { NotificationItem } from '@easemob/uikit-core'
-import type { ClientConfig } from '@easemob/uikit-core'
+import type { ClientConfig } from '@easemob/uikit-sdk-websdk5'
 import type { AnimationConfig, Density, FontSizePreset, PrimaryColorInput, ThemePreset } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
 import type { NoticeConfig } from '@easemob/uikit-core'

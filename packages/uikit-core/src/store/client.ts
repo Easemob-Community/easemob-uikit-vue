@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
-import type { UIKitClient } from '../sdk/client'
+import type { UIKitClient } from '@easemob/uikit-sdk-websdk5'
 
 export const useClientStore = defineStore('client', () => {
   const client = shallowRef<UIKitClient | null>(null)

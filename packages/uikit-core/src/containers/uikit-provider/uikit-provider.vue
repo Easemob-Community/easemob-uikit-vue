@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { ClientConfig } from '../../sdk/client'
+import type { ClientConfig } from '@easemob/uikit-sdk-websdk5'
 import type { NoticeConfig } from '../../sdk/event/notice-utils'
 import type { AnimationConfig } from '../../store/theme'
 import type { NotificationItem } from '../../components/notification/types'
