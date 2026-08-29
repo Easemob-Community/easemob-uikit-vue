@@ -570,8 +570,13 @@ export class MessageDomain {
   }
 
   /** 下载并解析合并消息 */
-  async downloadCombineMessage(message: SdkMessage) {
+  async downloadAndParseCombineMessage(message: SdkMessage) {
     return this.client.chatManager.downloadAndParseCombineMessage({ message })
+  }
+
+  /** 下载并解析合并消息（兼容旧名） */
+  async downloadCombineMessage(message: SdkMessage) {
+    return this.downloadAndParseCombineMessage(message)
   }
 
   /** 获取群消息已读用户列表 */
@@ -611,9 +616,9 @@ export class MessageDomain {
     groupId: string,
     messageId: string,
     pageSize = 100,
-  ): Promise<GroupMessageReadUsersResult> {
+  ): Promise<{ groupId: string, messageId: string, users: { userId: string, timestamp?: number }[], count: number }> {
     let cursor: string | undefined
-    const users: GroupMessageReadUser[] = []
+    const users: { userId: string, timestamp?: number }[] = []
     let count = 0
     do {
       const page = await this.client.chatManager.getGroupMessageReadUsers({
@@ -622,7 +627,7 @@ export class MessageDomain {
         cursor,
         pageSize,
       })
-      users.push(...page.users)
+      users.push(...page.users.map(u => ({ userId: u.userId, timestamp: u.timestamp })))
       count = page.count
       cursor = page.cursor || undefined
     } while (cursor)
@@ -631,8 +636,6 @@ export class MessageDomain {
       messageId,
       users,
       count,
-      cursor: '',
-      hasMore: false,
     }
   }
 

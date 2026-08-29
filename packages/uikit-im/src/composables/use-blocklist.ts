@@ -1,5 +1,4 @@
 import { computed } from 'vue'
-import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import type { UiContact as Contact } from '@easemob/uikit-core'
 import { formatSdkError } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
@@ -10,10 +9,10 @@ const logger = createLogger('UIKit:UseBlocklist')
 /**
  * 黑名单能力集成
  * - 读走 context.stores.contact.blackList
- * - 写走 client + dataSource（需 Provider.enableBlocklist=true）
+ * - 写走 domains.contact + dataSource（需 Provider.enableBlocklist=true）
  */
 export function useBlocklist() {
-  const { client, dataSource, features, stores } = useUIKit()
+  const { domains, dataSource, features, stores } = useUIKit()
   const contactStore = stores.contact
 
   const blockList = computed(() => contactStore.blackList)
@@ -32,12 +31,8 @@ export function useBlocklist() {
         contactStore.setBlackList(list)
         return
       }
-      const userInfos: ReadonlyArray<UserInfo> = await client.value.contactManager.getBlocklist()
-      contactStore.setBlackList(userInfos.map((info: UserInfo) => ({
-        userId: info.userId,
-        name: info.nickname || info.userId,
-        avatar: info.avatarUrl,
-      })))
+      const list = await domains.contact.syncBlocklist()
+      contactStore.setBlackList(list)
     }
     catch (error) {
       logger.warn('[useBlocklist] refresh failed:', formatSdkError(error))
@@ -48,7 +43,7 @@ export function useBlocklist() {
   /** \u5c06\u67d0\u4eba\u52a0\u9ed1 */
   async function addBlock(contact: Contact) {
     try {
-      await client.value.contactManager.addUsersToBlocklist({ userIds: [contact.userId] })
+      await domains.contact.addToBlocklist([contact.userId])
       contactStore.addToBlackList(contact)
     }
     catch (error) {
@@ -60,7 +55,7 @@ export function useBlocklist() {
   /** \u53d6\u6d88\u62c9\u9ed1 */
   async function removeBlock(userId: string) {
     try {
-      await client.value.contactManager.removeUserFromBlocklist({ userIds: [userId] })
+      await domains.contact.removeFromBlocklist([userId])
       contactStore.removeFromBlackList(userId)
     }
     catch (error) {

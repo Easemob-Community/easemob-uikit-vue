@@ -4,7 +4,7 @@ import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
-import { toUiMessage } from '@easemob/uikit-sdk-websdk5'
+import { toUiMessage } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmEmpty as Empty } from '@easemob/uikit-core'
@@ -29,7 +29,7 @@ const props = defineProps<CombineMessageModalProps>()
 const emit = defineEmits<CombineMessageModalEmits>()
 
 const { t } = useLocale()
-const { client, stores } = useUIKit()
+const { domains, stores } = useUIKit()
 const messageStore = useMessageStore()
 
 /** 是否正在加载 */
@@ -82,7 +82,7 @@ async function loadMessages() {
   isLoading.value = true
   loadError.value = ''
   try {
-    const result = await client.value.chatManager.downloadAndParseCombineMessage({ url, secret })
+    const result = await domains.message.downloadAndParseCombineMessage(props.message as SdkMessage)
     const list = Array.isArray(result) ? result : []
     const finalList = list.map(adaptMessage)
     parsedMessages.value = finalList

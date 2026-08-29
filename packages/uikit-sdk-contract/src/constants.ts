@@ -152,3 +152,19 @@ export const MESSAGE_EXT_KEY = {
 
 export type MessageExtKeyValue =
   (typeof MESSAGE_EXT_KEY)[keyof typeof MESSAGE_EXT_KEY]
+
+/** 全量用户资料属性列表（拉取自身资料时使用） */
+export const ALL_USER_INFO_ATTRIBUTES: Array<
+  'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'
+> = [
+  'nickname',
+  'avatarUrl',
+  'mail',
+  'phone',
+  'gender',
+  'sign',
+  'birth',
+  'ext',
+]
+
+export type AllUserInfoAttributes = typeof ALL_USER_INFO_ATTRIBUTES

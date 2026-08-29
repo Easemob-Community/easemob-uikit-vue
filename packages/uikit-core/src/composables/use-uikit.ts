@@ -1,16 +1,16 @@
 import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
-import type { ClientConfig, ManagerHost, UIKitClient } from '@easemob/uikit-sdk-websdk5'
-import { createClient } from '@easemob/uikit-sdk-websdk5'
-import { UserInfoDomain } from '@easemob/uikit-sdk-websdk5'
-import { PresenceDomain } from '@easemob/uikit-sdk-websdk5'
-import type { ConnectionEventCallbacks } from '@easemob/uikit-sdk-websdk5'
+import type { SdkAdapter, SdkConfig, SdkPresenceDomain, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
 import { type NoticeConfig, getNoticeConfigResolver, setNoticeConfigResolver } from '../sdk/event/notice-utils'
+import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '../sdk/event/notice-utils'
+import { t } from '../locale/messages'
 import { useClientStore } from '../store/client'
 import { usePresenceStore } from '../store/presence'
 import { useUserInfoStore } from '../store/user-info'
 import { useThemeStore } from '../store/theme'
 import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
+import { emitNotificationDelivered, useNotification } from './use-notification'
+import { resetSyncState, setSyncState } from './use-sync-status'
 
 /** core 侧 UIKit 登录参数：支持 accessToken 或密码登录 */
 export interface CoreUIKitLoginParams {
@@ -26,11 +26,24 @@ export interface CoreStores {
   userInfo: ReturnType<typeof useUserInfoStore>
 }
 
+/**
+ * 延迟初始化配置：兼容旧 ClientConfig 平铺字段（apiUrl / enableSyncData / deviceId 等），
+ * 未知字段统一下沉 adapterConfig 透传给 adapter。
+ */
+export type CoreUIKitInitConfig = SdkConfig & Record<string, unknown>
+
+/** 连接级事件回调（token 即将过期 / 已过期） */
+export interface CoreConnectionCallbacks {
+  onTokenWillExpire?: () => void
+  onTokenExpired?: () => void
+}
+
 export interface CoreUIKitContext {
-  client: Ref<ManagerHost>
+  /** 中立 SDK 适配器实例 */
+  client: Ref<SdkAdapter>
   domains: {
-    presence: PresenceDomain
-    userInfo: UserInfoDomain
+    presence: SdkPresenceDomain
+    userInfo: SdkUserInfoDomain
   }
   stores: CoreStores
   features: UIKitFeatures
@@ -41,8 +54,8 @@ export interface CoreUIKitContext {
   h5: ReturnType<typeof useH5Adaptation>
   /** 主题 store（provider 与消费方共享同一实例） */
   theme: ReturnType<typeof useThemeStore>
-  /** 手动初始化 SDK 客户端（延迟初始化场景，auto-init=false 时使用） */
-  init: (config: ClientConfig) => UIKitClient
+  /** 手动初始化 SDK（延迟初始化场景，auto-init=false 时使用） */
+  init: (config: CoreUIKitInitConfig) => Promise<void>
   /** 登录（支持 accessToken 或密码） */
   login: (params: CoreUIKitLoginParams) => Promise<void>
   /** 登出 */
@@ -70,6 +83,13 @@ const defaultFeatures: UIKitFeatures = {
 
 export interface CoreUIKitProviderOptions {
   autoInit?: boolean
+  /**
+   * 注入的中立 SDK 适配器（注入模式：业务全权管理生命周期）。
+   * 未传时由 `createDefaultAdapter` 创建内置适配器（内置模式：UIKit 全权）。
+   */
+  adapter?: SdkAdapter
+  /** 内置模式下的默认适配器工厂（由场景包/core 容器注入，避免 core 静态依赖具体 adapter） */
+  createDefaultAdapter?: () => SdkAdapter
   /** 支持传入 computed：ctx.features 以 getter 形式在每次读取时解析最新值 */
   features?: Partial<UIKitFeatures> | ComputedRef<Partial<UIKitFeatures>>
   /** 支持传入 computed：ctx.dataSource 以惰性代理形式在每次读取时解析最新值 */
@@ -84,39 +104,78 @@ export interface CoreUIKitProviderOptions {
    * 用户资料订阅无权限/服务未开通时的回调；UIKit 默认将其绑定到内置 Toast。
    */
   onUserInfoSubscriptionPermissionError?: () => void
-  /** 连接级事件回调（token 即将过期 / 已过期等）；core 不消费，保留给场景层挂钩使用 */
-  connectionCallbacks?: ConnectionEventCallbacks
+  /** 连接级事件回调（token 即将过期 / 已过期等） */
+  connectionCallbacks?: CoreConnectionCallbacks
   /**
-   * 场景包名称（如 'UIKit-IM'），随 createClient 注入客户端版本日志展示；默认 'UIKit'。
-   * 延迟初始化路径（ctx.init(config)）同样生效。
+   * 场景包名称（如 'UIKit-IM'），透传给 adapter 用于客户端版本日志展示；默认 'UIKit'。
    */
   clientName?: string
-  /** 场景包版本号（如 '2.0.0'），随 createClient 注入客户端版本日志展示；未提供时日志只输出 SDK + Core 版本 */
+  /** 场景包版本号（如 '2.0.0'），透传给 adapter 用于客户端版本日志展示 */
   clientVersion?: string
   /**
-   * 场景层挂钩：core 在 createClient + stores.client.setAppKey + domains.userInfo.listen()
-   * 之后调用，用于注册场景级 SDK 事件等；返回的 dispose 函数在重新初始化 / logout /
-   * scope dispose 时调用。
+   * 场景层 store 注入：场景包（uikit-im）把场景 Pinia stores（message/conversation/contact/group）
+   * 经 adapterConfig.stores 传给 adapter，事件与 Domain 直接写业务 store（结构兼容即可）。
+   * core 自身的 client/presence/userInfo store 由 core 自动注入。
    */
-  onClientSetup?: (client: UIKitClient, coreStores: CoreStores) => (() => void) | void
+  sceneStores?: Record<string, unknown>
   /**
-   * 场景层 ClientConfig 解析钩子：在 createClient 前对配置做场景化补齐
-   * （如 IM 场景注入全量 managers / enableSyncData 默认值）。
-   * auto-init 与延迟初始化（ctx.init）路径统一经过该钩子。
+   * 场景层挂钩：core 在 adapter.init + stores.client.setAppKey 之后调用，
+   * 用于注册场景级 SDK 事件（如 chatroom 房间事件）等；返回的 dispose 函数在
+   * 重新初始化 / logout / scope dispose 时调用。
    */
-  resolveClientConfig?: (config: ClientConfig) => ClientConfig
+  onAdapterReady?: (adapter: SdkAdapter) => (() => void) | void
+  /**
+   * 场景层 SdkConfig 解析钩子：在 adapter.init 前对配置做场景化补齐
+   * （如 IM 场景注入 enableSyncData 默认值）。auto-init 与延迟初始化路径统一经过该钩子。
+   */
+  resolveSdkConfig?: (config: CoreUIKitInitConfig) => CoreUIKitInitConfig
 }
 
 /**
- * 初始化 core 侧 UIKit Provider（客户端生命周期 + core stores/domains）。
- * 场景包（uikit-im 等）的 Provider 在此基础上组合场景 stores/domains 与事件注册。
+ * 组装事件层依赖（i18n / 通知 / 系统通知插入），经 adapterConfig.eventDeps 注入 adapter。
+ * 这些能力都属于 core UI 层；adapter 零依赖 core，靠注入解耦。
+ */
+function buildEventHandlerDeps(): Record<string, unknown> {
+  return {
+    t,
+    insertChatNotice,
+    buildAnnouncementNoticeText,
+    resolveNoticeUserName,
+    useNotification,
+    emitNotificationDelivered,
+  }
+}
+
+/**
+ * 把兼容旧 ClientConfig 的平铺初始化配置归一化为 SdkConfig：
+ * 标准字段（appKey/debug/userId/token/adapterConfig）保留，其余平铺字段下沉 adapterConfig。
+ */
+function normalizeInitConfig(config: CoreUIKitInitConfig): CoreUIKitInitConfig {
+  const { appKey, debug, userId, token, adapterConfig, ...rest } = config
+  return {
+    appKey,
+    debug,
+    userId,
+    token,
+    adapterConfig: { ...rest, ...adapterConfig },
+  }
+}
+
+/**
+ * 初始化 core 侧 UIKit Provider（SDK 适配器生命周期 + core stores）。
+ * 场景包（uikit-im 等）的 Provider 在此基础上注入场景 stores 与场景配置钩子。
  *
- * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey）时，setup 阶段不创建 SDK 客户端，
- * 待业务通过 `init(config)` 传入 appKey 后再创建。Domain 层通过 ManagerHost 代理
- * 在运行时读取当前客户端，因此可在初始化前构建、初始化后正常工作。
+ * 架构（D122）：core 只面向 `SdkAdapter` 中立接口（init/login/logout/subscribe/domains），
+ * 不再直接 createClient / 构造 Domain / registerEventHandlers——这些都封进 adapter。
+ * 事件流：adapter 事件层直接写注入的 Pinia stores（adapterConfig.stores），
+ * 中立事件（adapter.subscribe）仅承担 token 回调与同步状态桥接。
+ *
+ * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey）时，setup 阶段不初始化 SDK，
+ * 待业务通过 `init(config)` 传入 appKey 后再初始化。Domain 访问在初始化前调用会抛错，
+ * 初始化后正常工作（与旧 ManagerHost 代理语义一致）。
  */
 export function useCoreUIKitProvider(
-  config: ClientConfig,
+  config: CoreUIKitInitConfig,
   options: CoreUIKitProviderOptions = {},
 ): CoreUIKitContext {
   const stores: CoreStores = {
@@ -167,134 +226,129 @@ export function useCoreUIKitProvider(
   // 注册到通知管线（模块级解析器，与 locale 的 currentLocale 同款模式；卸载时重置）
   setNoticeConfigResolver(resolveNoticeConfig)
 
-  // 真实 SDK 客户端懒加载：auto-init=false 时在 init() 调用后才创建
-  let uikitClient: UIKitClient | null = null
-  let disposeClientSetup: (() => void) | null = null
-  let disposeUserInfoDomain: (() => void) | null = null
+  // 适配器实例：注入模式用业务传入的，内置模式用 createDefaultAdapter 工厂创建
+  const adapterMaybe = options.adapter ?? options.createDefaultAdapter?.()
+  if (!adapterMaybe) {
+    throw new Error(
+      '[UIKit] 缺少 SDK 适配器：请传入 adapter prop，或由 Provider 注入 createDefaultAdapter',
+    )
+  }
+  const adapter: SdkAdapter = adapterMaybe
+
+  // 使用 shallowRef 避免深层 UnwrapRef 丢失适配器/Domain 的私有字段导致类型不兼容
+  const client: Ref<SdkAdapter> = shallowRef(adapter)
+
   let currentAppKey = config.appKey || ''
+  let initialized = false
+  /** 进行中的初始化 Promise：允许业务 init() 后不 await 直接 login（login 内部会等待） */
+  let initPromise: Promise<void> | null = null
+  let disposeSubscription: (() => void) | null = null
+  /** 场景层挂钩（onAdapterReady）返回的清理函数，随初始化/登出/卸载生命周期清理 */
+  let disposeAdapterReady: (() => void) | null = null
 
-  function requireClient(): UIKitClient {
-    if (!uikitClient) {
-      throw new Error(
-        '[UIKit] SDK 尚未初始化：请先调用 init(config)，或在 Provider 上提供 appKey 且保持 auto-init 开启',
-      )
-    }
-    return uikitClient
-  }
-
-  // ManagerHost 代理：domains 持有它，运行时委托到当前 client（支持延迟/重新初始化）
-  const host: ManagerHost = {
-    get chatManager() {
-      return requireClient().chatManager
-    },
-    get chatRoomManager() {
-      return requireClient().chatRoomManager
-    },
-    get contactManager() {
-      return requireClient().contactManager
-    },
-    get groupManager() {
-      return requireClient().groupManager
-    },
-    get presenceManager() {
-      return requireClient().presenceManager
-    },
-    get pushManager() {
-      return requireClient().pushManager
-    },
-    get userInfoManager() {
-      return requireClient().userInfoManager
-    },
-    get currentUserId() {
-      return uikitClient?.currentUserId ?? null
-    },
-    get isConnected() {
-      return uikitClient?.isConnected ?? false
-    },
-    addEventHandler(id, handlers) {
-      requireClient().addEventHandler(id, handlers)
-    },
-    removeEventHandler(id) {
-      requireClient().removeEventHandler(id)
-    },
-  }
-
-  // 使用 shallowRef 避免深层 UnwrapRef 丢失 SDK Manager 的私有字段导致类型不兼容
-  const client: Ref<ManagerHost> = shallowRef(host)
-
+  /**
+   * core 域面：惰性委托 adapter.domains，未初始化时访问即抛错（同旧 ManagerHost 语义）。
+   * 用 getter 延迟到调用点取值，保证 auto-init=false 场景下 context 构建不炸。
+   */
   const domains = {
-    presence: new PresenceDomain(host, stores.presence),
-    userInfo: new UserInfoDomain(
-      host,
-      stores.userInfo,
-      // Domain 构造时解析一次快照（初始化行为不变）；ctx.dataSource 则为惰性代理
-      resolveDataSource(),
-      options.onUserInfoSubscriptionPermissionError,
-    ),
+    get presence(): SdkPresenceDomain {
+      return adapter.domains.presence
+    },
+    get userInfo(): SdkUserInfoDomain {
+      return adapter.domains.userInfo
+    },
   }
 
   /**
-   * 注册场景层挂钩（onClientSetup）与 user-info domain 监听。
-   * setupClient（首次/重新初始化）与登出后重新登录共用；幂等：先清理旧注册再重建。
+   * 订阅中立事件：token 过期回调 + 同步状态桥接（useSyncStatus 数据源）。
+   * 幂等：重复初始化先取消旧订阅再重建。
    */
-  function registerClientSetup(instance: UIKitClient) {
-    disposeClientSetup?.()
-    disposeClientSetup = null
-    disposeUserInfoDomain?.()
-    disposeUserInfoDomain = null
-    domains.userInfo.listen()
-    disposeUserInfoDomain = () => domains.userInfo.dispose()
-    // 场景层挂钩（如 uikit-im 注册场景事件），返回的 dispose 随客户端生命周期清理
-    disposeClientSetup = options.onClientSetup?.(instance, stores) || null
+  function subscribeAdapterEvents(): void {
+    disposeSubscription?.()
+    disposeSubscription = adapter.subscribe({
+      onTokenWillExpire: () => options.connectionCallbacks?.onTokenWillExpire?.(),
+      onTokenExpired: () => options.connectionCallbacks?.onTokenExpired?.(),
+      onSyncStatus: payload => setSyncState(payload),
+    })
   }
 
-  /** 创建 SDK 客户端并完成 core 侧初始化（首次或重新初始化） */
-  function setupClient(cfg: ClientConfig): UIKitClient {
-    // 场景化配置补齐（managers / enableSyncData 等场景默认值），两条初始化路径统一经过
-    const resolved = options.resolveClientConfig?.(cfg) ?? cfg
-    uikitClient = createClient({
+  /** 初始化 SDK（首次或重新初始化） */
+  async function setupAdapter(cfg: CoreUIKitInitConfig): Promise<void> {
+    // 场景化配置补齐（enableSyncData 等场景默认值），两条初始化路径统一经过；
+    // 先归一化（平铺字段下沉 adapterConfig）再走场景钩子，场景钩子只见中立形态
+    const normalized = normalizeInitConfig(cfg)
+    const resolved = options.resolveSdkConfig?.(normalized) ?? normalized
+    await adapter.init({
       ...resolved,
-      // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
-      clientName: options.clientName ?? resolved.clientName,
-      clientVersion: options.clientVersion ?? resolved.clientVersion,
+      adapterConfig: {
+        ...resolved.adapterConfig,
+        // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
+        clientName: options.clientName ?? (resolved.adapterConfig?.clientName as string | undefined),
+        clientVersion: options.clientVersion ?? (resolved.adapterConfig?.clientVersion as string | undefined),
+        // live 对象引用：事件层运行时读取最新开关
+        features,
+        // 业务数据源接管（惰性代理）
+        dataSource,
+        // store 注入：core stores + 场景 stores（事件层/Domain 直写）
+        stores: {
+          client: stores.client,
+          presence: stores.presence,
+          userInfo: stores.userInfo,
+          ...options.sceneStores,
+        },
+        eventDeps: buildEventHandlerDeps(),
+        onUserInfoSubscriptionPermissionError: options.onUserInfoSubscriptionPermissionError,
+      },
     })
+    initialized = true
     currentAppKey = resolved.appKey
     stores.client.setAppKey(resolved.appKey)
-    registerClientSetup(uikitClient)
-    return uikitClient
+    // 连接配置快照：事件层（群解散删会话等）读取 deleteConversationOnGroupDestroyed
+    const rawClient = adapter.client as { deleteConversationOnGroupDestroyed?: boolean } | null | undefined
+    stores.client.setClient({
+      deleteConversationOnGroupDestroyed: rawClient?.deleteConversationOnGroupDestroyed ?? true,
+    })
+    subscribeAdapterEvents()
+    // 场景层挂钩（如 chatroom 注册场景事件），返回的 dispose 随生命周期清理
+    disposeAdapterReady?.()
+    disposeAdapterReady = options.onAdapterReady?.(adapter) || null
   }
 
   // 立即初始化：仅当 auto-init 未关闭且已提供 appKey
   if (options.autoInit !== false && config.appKey) {
-    setupClient(config)
+    initPromise = setupAdapter(config)
   }
 
-  function init(cfg: ClientConfig): UIKitClient {
-    return setupClient(cfg)
+  async function init(cfg: CoreUIKitInitConfig): Promise<void> {
+    initPromise = setupAdapter(cfg)
+    await initPromise
   }
 
   async function login(params: CoreUIKitLoginParams): Promise<void> {
-    const instance = requireClient()
-    // 登出后再登录：事件处理器（连接级 + 各 manager + user-info 监听）已在登出时
-    // dispose 移除，必须在重新建立连接前恢复注册，否则 onConnected/onDisconnected
-    // 等连接事件无人消费，stores.client.connected 恒为 false，
-    // 会话列表会误展示“网络异常”横幅。
-    if (!disposeClientSetup) {
-      registerClientSetup(instance)
+    // 兼容「init() 后不 await 直接 login」的旧调用时序：等待进行中的初始化完成
+    if (!initialized && initPromise) {
+      await initPromise
     }
-    await instance.login(params.user, params.accessToken ?? params.password ?? '')
+    if (!initialized) {
+      throw new Error(
+        '[UIKit] SDK 尚未初始化：请先调用 init(config)，或在 Provider 上提供 appKey 且保持 auto-init 开启',
+      )
+    }
+    await adapter.login(params.user, params.accessToken ?? params.password ?? '')
+    // 登出后再登录：场景层挂钩已在登出时 dispose，需重新执行（同旧 registerClientSetup 语义）
+    if (!disposeAdapterReady) {
+      disposeAdapterReady = options.onAdapterReady?.(adapter) || null
+    }
     stores.client.setCurrentUser(params.user)
     stores.client.setAppKey(currentAppKey)
   }
 
   async function logout(): Promise<void> {
-    if (uikitClient) {
-      await uikitClient.logout()
-    }
-    disposeClientSetup?.()
-    disposeClientSetup = null
-    disposeUserInfoDomain?.()
-    disposeUserInfoDomain = null
+    await adapter.logout()
+    disposeAdapterReady?.()
+    disposeAdapterReady = null
+    // 同步状态随登出归零，防止跨登录会话残留
+    resetSyncState()
     stores.client.clearClient()
     stores.presence.clearPresence()
     stores.userInfo.clearUserInfos()
@@ -317,10 +371,10 @@ export function useCoreUIKitProvider(
   provide(CORE_UIKIT_CONTEXT_KEY, ctx)
 
   onScopeDispose(() => {
-    disposeClientSetup?.()
-    disposeClientSetup = null
-    disposeUserInfoDomain?.()
-    disposeUserInfoDomain = null
+    disposeSubscription?.()
+    disposeSubscription = null
+    disposeAdapterReady?.()
+    disposeAdapterReady = null
     // 卸载时重置通知配置解析器，避免残留已卸载 Provider 的配置；
     // 仅当当前解析器仍属于本实例时才重置，避免误清空后挂载 Provider 的配置（多 Provider 并存场景）
     if (getNoticeConfigResolver() === resolveNoticeConfig)

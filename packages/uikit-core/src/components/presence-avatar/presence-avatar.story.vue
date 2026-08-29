@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, defineComponent } from 'vue'
 import { useCoreUIKitProvider } from '../../composables/use-uikit'
+import { createDeferredSdkAdapter } from '../../composables/deferred-adapter'
 import type { UIKitDataSource } from '../../composables/types'
 import PresenceAvatar from './presence-avatar.vue'
 
@@ -16,6 +17,7 @@ const CoreProviderStub = defineComponent({
   setup(props, { slots }) {
     useCoreUIKitProvider({ appKey: '' }, {
       autoInit: false,
+      createDefaultAdapter: () => createDeferredSdkAdapter(),
       features: computed(() => ({ enablePresence: props.enablePresence })),
       dataSource: computed(() => props.dataSource as UIKitDataSource | undefined),
     })

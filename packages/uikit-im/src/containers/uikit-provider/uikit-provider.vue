@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '@easemob/uikit-core'
 import {
   type ContactFetchMode,
@@ -11,8 +10,8 @@ import {
 } from '../../composables/use-uikit'
 import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '@easemob/uikit-core'
 import { EmNotificationContainer, EmToast } from '../../components'
-import type { NotificationItem } from '@easemob/uikit-core'
-import type { ClientConfig } from '@easemob/uikit-sdk-websdk5'
+import type { CoreUIKitInitConfig, NotificationItem } from '@easemob/uikit-core'
+import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
 import type { AnimationConfig, Density, FontSizePreset, PrimaryColorInput, ThemePreset } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
 import type { NoticeConfig } from '@easemob/uikit-core'
@@ -27,8 +26,13 @@ export type ThemeFontSize = FontSizePreset | number
 export interface ProviderProps {
   /** 环信应用标识 AppKey（orgName#appName），由环信控制台创建应用获取 */
   appKey?: string
-  /** SDK 客户端配置（除 appKey 外的 ClientConfig，如 debug / enableSyncData 等），与 appKey 合并后初始化 SDK */
-  sdkConfig?: Omit<ClientConfig, 'appKey'>
+  /**
+   * 注入的中立 SDK 适配器（SdkAdapter）。传入后业务全权管理其生命周期（D122 注入模式）；
+   * 不传时内置默认适配器（websdk5，动态加载，UIKit 全权管理）。
+   */
+  adapter?: SdkAdapter
+  /** SDK 客户端配置（除 appKey 外的 SDK 初始化字段，如 debug / enableSyncData 等），与 appKey 合并后透传给 adapter */
+  sdkConfig?: Omit<CoreUIKitInitConfig, 'appKey'>
   /** 是否自动初始化 SDK 连接（默认 true）：false 时延迟初始化，待业务调用 useClient().init(config) 传入 appKey 后创建 */
   autoInit?: boolean
   /** 全局主题配置：预设 / 模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
@@ -213,7 +217,7 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableToast: true,
 })
 
-const config = computed<ClientConfig>(() => ({
+const config = computed<CoreUIKitInitConfig>(() => ({
   appKey: props.appKey ?? '',
   ...props.sdkConfig,
 }))
@@ -243,6 +247,7 @@ const noticeConfig = computed(() => props.noticeConfig ?? {})
  * 当 appKey 为空时仍创建上下文，但 client 实例可能无法完成登录。
  */
 const ctx = useUIKitProvider(config.value, {
+  adapter: props.adapter,
   autoInit: props.autoInit,
   features,
   dataSource,
@@ -302,19 +307,13 @@ watch(
       return
     }
     const ds = dataSource.value
-    const client = ctx.client.value
-    if (!client)
-      return
 
     // 黑名单
     if (features.value.enableBlocklist && !ctx.stores.contact.blockListLoaded) {
       try {
         const list: UiContact[] = ds.fetchBlocklist
           ? await ds.fetchBlocklist()
-          : (await client.contactManager.getBlocklist()).map((userInfo: UserInfo) => ({
-            userId: userInfo.userId || '',
-            name: userInfo.nickname || userInfo.userId || '',
-          }))
+          : await ctx.domains.contact.syncBlocklist()
         ctx.stores.contact.setBlackList(list)
       }
       catch (e) {

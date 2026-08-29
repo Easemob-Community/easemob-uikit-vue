@@ -15,6 +15,7 @@ export const EasemobUIKitChatroomImports = {
     'CLASS_ROOM_SCENE',
     'LIVE_ROOM_SCENE',
     'VOICE_ROOM_SCENE',
+    'resolveChatroomSdkConfig',
     'useChatroom',
     'useChatroomAttributes',
     'useChatroomMember',

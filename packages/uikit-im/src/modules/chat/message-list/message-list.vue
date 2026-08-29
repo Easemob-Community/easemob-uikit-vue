@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClipboard, useScroll } from '@vueuse/core'
-import type { GroupMessageReadUsersResult } from '@easemob/uikit-sdk-websdk5'
 import { formatSdkError, resolveSdkErrorMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
@@ -651,7 +650,7 @@ async function onGroupReadClick(msgId: string, groupId: string) {
     // 优先使用 store 缓存，避免重复翻页拉取；缓存为空时一次性拉取全部已读成员
     let readUsers = stores.message.getGroupMessageReadUsers(groupId, msgId)
     if (readUsers.length === 0) {
-      const result: GroupMessageReadUsersResult = await fetchGroupReadDetail(msgId, groupId)
+      const result = await fetchGroupReadDetail(msgId, groupId)
       readUsers = [...new Set(
         (result?.users || [])
           .map(u => u.userId)

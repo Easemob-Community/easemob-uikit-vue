@@ -1,8 +1,10 @@
 /** 中立初始化配置，只含 SDK 无关字段 */
 export interface SdkConfig {
   appKey: string
-  userId: string
-  token: string
+  /** 用户 ID：延迟初始化场景可在 login 时再提供 */
+  userId?: string
+  /** Token：延迟初始化场景可在 login 时再提供 */
+  token?: string
   debug?: boolean
   /**
    * SDK 特定配置透传槽：现有 `sdkConfig` 的 `enableSyncData`/`deviceId`/

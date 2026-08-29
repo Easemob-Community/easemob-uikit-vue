@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatSdkError } from '@easemob/uikit-sdk-websdk5'
+import { formatSdkError } from '../../utils/sdk-error'
 import { useLocale } from '../../locale'
 import { useClient } from '../../composables/use-client'
 import { usePresence } from '../../composables/use-presence'

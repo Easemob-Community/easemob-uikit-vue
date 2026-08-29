@@ -20,6 +20,10 @@ export * from './store'
 // SDK
 export * from './sdk'
 
+// 消歧：./sdk 全量 re-export（adapter 包）与 ./composables（core 版本）存在同名导出，显式以 core 版本为准
+export { useSyncStatus } from './composables'
+export type { SyncPhase, SyncState } from './composables'
+
 // Constants（已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变）
 export {
   ACK_TYPE,
@@ -52,6 +56,8 @@ export type {
 
 // Utils
 export * from './utils/resolve-last-message-text'
+// 消歧：./sdk 全量 re-export（adapter 包）与本模块本地实现同名，显式以本地实现为准
+export { resolveSenderDisplayName, resolveUserDisplayName } from './utils/resolve-last-message-text'
 export {
   clearPersistedLogs,
   configureLogPersistence,

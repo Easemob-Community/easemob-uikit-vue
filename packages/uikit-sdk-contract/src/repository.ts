@@ -8,6 +8,9 @@ import type {
   UiGroup,
   UiGroupMember,
   UiPresence,
+  UserInfo,
+  UserInfoAttribute,
+  UserInfoAttributeValue,
 } from './types'
 
 /** 消息历史分页结果（统一游标语义：cursor 空拉第一页；返回 list + cursor + hasMore） */
@@ -231,4 +234,14 @@ export interface PresenceRepository {
   unsubscribe(userIds: string[]): Promise<void>
   fetchStatus(userIds: string[]): Promise<void>
   publish(description: string): Promise<void>
+}
+
+/** 用户资料数据入口 */
+export interface UserInfoRepository {
+  fetchUserInfos(userIds: string[], attributes?: UserInfoAttribute[]): Promise<void>
+  updateOwnInfo(input: Partial<Pick<UserInfo, 'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'>>): Promise<void>
+  updateOwnInfoByAttribute(attribute: UserInfoAttribute, value: UserInfoAttributeValue): Promise<void>
+  subscribeUserInfos(userIds: string[]): Promise<void>
+  unsubscribeUsersInfo(userIds: string[]): Promise<void>
+  getSubscribedUsers(): Promise<string[]>
 }

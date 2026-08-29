@@ -1,5 +1,6 @@
 import type { SdkCapabilities } from './capabilities'
 import type { SdkConfig } from './config'
+import type { SdkDomainSet } from './domains'
 import type { SdkEventHandlers } from './events'
 import type {
   ContactRepository,
@@ -7,6 +8,7 @@ import type {
   GroupRepository,
   MessageRepository,
   PresenceRepository,
+  UserInfoRepository,
 } from './repository'
 
 /**
@@ -24,12 +26,22 @@ export interface SdkAdapter {
   logout(): Promise<void>
   /** 订阅中立事件，返回取消订阅函数 */
   subscribe(handlers: SdkEventHandlers): () => void
+  /** 当前登录用户 ID（未登录时为空字符串） */
+  readonly currentUserId: string
+  /** 当前是否已建立连接 */
+  readonly isConnected: boolean
   readonly capabilities: SdkCapabilities
   readonly message: MessageRepository
   readonly conversation: ConversationRepository
   readonly contact: ContactRepository
   readonly group: GroupRepository
   readonly presence: PresenceRepository
+  readonly userInfo: UserInfoRepository
+  /**
+   * 业务域对象（中立 Domain Port，见 domains.ts）。
+   * uikit-im / uikit-core 的 UI 层经此消费既有 Domain API。
+   */
+  readonly domains: SdkDomainSet
   /**
    * 原生 SDK 实例（可选，`unknown` 类型）。
    * 需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带原生 SDK 类型

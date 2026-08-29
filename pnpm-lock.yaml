@@ -180,9 +180,9 @@ importers:
       '@easemob/uikit-core':
         specifier: workspace:*
         version: link:../uikit-core
-      '@easemob/uikit-sdk-websdk5':
+      '@easemob/uikit-sdk-contract':
         specifier: workspace:*
-        version: link:../uikit-sdk-websdk5
+        version: link:../uikit-sdk-contract
       easemob-websdk:
         specifier: ^5.0.0
         version: 5.0.0

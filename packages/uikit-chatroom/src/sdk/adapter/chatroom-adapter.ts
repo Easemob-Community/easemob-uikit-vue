@@ -8,10 +8,10 @@ import type {
   Message as SdkMessage,
   UserInfo,
 } from 'easemob-websdk'
-import type { ManagerHost } from '@easemob/uikit-sdk-websdk5'
+import type { ChatroomSdkHost } from '../host'
 import type { UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, normalizeUserId } from '@easemob/uikit-core'
-import { formatSdkError } from '@easemob/uikit-sdk-websdk5'
+import { formatSdkError } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import type {
   Chatroom,
@@ -57,7 +57,7 @@ export function toChatroomUiMessage(sdkMsg: SdkMessage, currentUserId: string): 
  * （core locale 已有 `error.chatroom*` 段）。
  */
 export class ChatroomAdapter {
-  constructor(private host: ManagerHost) {}
+  constructor(private host: ChatroomSdkHost) {}
 
   private get rooms() {
     return this.host.chatRoomManager

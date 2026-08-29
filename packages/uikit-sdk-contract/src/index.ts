@@ -20,6 +20,9 @@ export * from './stream-message'
 // 数据入口（repository）
 export * from './repository'
 
+// 业务域接口（Domain Port）
+export * from './domains'
+
 // 能力矩阵
 export * from './capabilities'
 

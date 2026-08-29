@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { ClientConfig } from '@easemob/uikit-sdk-websdk5'
+import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
 import type { NoticeConfig } from '../../sdk/event/notice-utils'
 import type { AnimationConfig } from '../../store/theme'
 import type { NotificationItem } from '../../components/notification/types'
 import type { ContactFetchMode, UIKitDataSource, UIKitFeatures } from '../../composables/types'
+import type { CoreUIKitInitConfig } from '../../composables/use-uikit'
 import type { H5AdaptationConfig } from '../../composables/use-h5-adaptation'
 import { useCoreUIKitProvider } from '../../composables/use-uikit'
+import { createDeferredSdkAdapter } from '../../composables/deferred-adapter'
 import {
   type ProviderLoggerConfig,
   type ProviderNotificationConfig,
@@ -19,8 +21,13 @@ import { EmNotificationContainer, EmToast } from '../../components'
 export interface CoreProviderProps {
   /** 环信应用标识 AppKey（orgName#appName），由环信控制台创建应用获取 */
   appKey?: string
-  /** SDK 客户端配置（除 appKey 外的 ClientConfig，如 debug / enableSyncData 等），与 appKey 合并后初始化 SDK */
-  sdkConfig?: Omit<ClientConfig, 'appKey'>
+  /**
+   * 注入的中立 SDK 适配器（SdkAdapter）。传入后业务全权管理其生命周期；
+   * 不传时内置默认适配器（websdk5，动态加载）。
+   */
+  adapter?: SdkAdapter
+  /** SDK 客户端配置（除 appKey 外的 SDK 初始化字段，如 debug / enableSyncData 等），与 appKey 合并后透传给 adapter */
+  sdkConfig?: Omit<CoreUIKitInitConfig, 'appKey'>
   /** 是否自动初始化 SDK 连接（默认 true）：false 时延迟初始化，待业务调用 useClient().init(config) 传入 appKey 后创建 */
   autoInit?: boolean
   /** 全局主题配置：模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
@@ -115,7 +122,7 @@ const props = withDefaults(defineProps<CoreProviderProps>(), {
   enableToast: true,
 })
 
-const config = computed<ClientConfig>(() => ({
+const config = computed<CoreUIKitInitConfig>(() => ({
   appKey: props.appKey ?? '',
   ...props.sdkConfig,
 }))
@@ -140,10 +147,12 @@ const dataSource = computed(() => props.dataSource ?? {})
 const noticeConfig = computed(() => props.noticeConfig ?? {})
 
 /**
- * 初始化 core UIKit 上下文：创建 SDK Client、core Domain、连接级事件。
- * 当 appKey 为空时仍创建上下文，但 client 实例可能无法完成登录。
+ * 初始化 core UIKit 上下文：SDK 适配器生命周期 + core stores。
+ * adapter prop 注入时业务全权管理其生命周期；未注入时内置默认适配器（websdk5，动态加载）。
  */
 useCoreUIKitProvider(config.value, {
+  adapter: props.adapter,
+  createDefaultAdapter: () => createDeferredSdkAdapter(),
   autoInit: props.autoInit,
   features,
   dataSource,

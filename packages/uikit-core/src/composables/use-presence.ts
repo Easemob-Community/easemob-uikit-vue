@@ -1,8 +1,8 @@
 import { computed, onScopeDispose, ref, toValue, watch as vueWatch } from 'vue'
 import type { ComputedRef, MaybeRefOrGetter } from 'vue'
 import type { UiPresence } from '../sdk/types'
-import { parsePresenceStatus } from '@easemob/uikit-sdk-websdk5'
-import { formatSdkError } from '@easemob/uikit-sdk-websdk5'
+import { parsePresenceStatus } from '../utils/presence-status'
+import { formatSdkError } from '../utils/sdk-error'
 import { createLogger } from '../utils/logger'
 import { useCoreUIKit } from './use-uikit'
 

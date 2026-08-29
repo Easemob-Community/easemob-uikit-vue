@@ -12,6 +12,11 @@
  */
 export const EasemobUIKitCoreImports = {
   '@easemob/uikit-core': [
+    'createDeferredSdkAdapter',
+    'resetSyncState',
+    'setSyncState',
+    'toUiMessage',
+    'toUiMessages',
     'useArrowNavigation',
     'useBottomSheet',
     'useClient',
@@ -27,6 +32,7 @@ export const EasemobUIKitCoreImports = {
     'usePresence',
     'usePullRefresh',
     'useResizable',
+    'useSyncStatus',
     'useTheme',
     'useToast',
     'useUserInfo',
