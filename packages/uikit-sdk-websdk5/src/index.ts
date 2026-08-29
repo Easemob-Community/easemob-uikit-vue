@@ -4,8 +4,18 @@
 export * from './adapter'
 export * from './client'
 
-// 连接级事件
+// 事件层（连接级 + 各 manager 事件 + 注册器 + 显示名解析）
 export * from './event/connection-events'
+export * from './event/registry'
+export * from './event/chat-events'
+export * from './event/contact-events'
+export * from './event/group-events'
+export * from './event/presence-events'
+export * from './event/resolve-display-name'
+
+// 通知引擎 / 同步状态
+export * from './notification-engine'
+export * from './use-sync-status'
 
 // 工具
 export * from './utils/sdk-error'

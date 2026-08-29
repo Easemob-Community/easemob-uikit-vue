@@ -47,6 +47,7 @@ export interface MessageStoreLike {
 export interface ConversationStoreLike {
   conversationList: UiConversation[]
   currentConversationId: string | null
+  conversationsLoaded: boolean
   setList: (list: UiConversation[]) => void
   setCurrentConversationId: (id: string | null) => void
   setSyncing: (syncing: boolean) => void

@@ -143,3 +143,12 @@ export const PRESENCE_STATUS = {
 
 export type PresenceStatusValue =
   (typeof PRESENCE_STATUS)[keyof typeof PRESENCE_STATUS]
+
+/** 消息 ext 扩展字段键常量（UIKit 自有 wire 约定，随消息透传收发双端） */
+export const MESSAGE_EXT_KEY = {
+  /** 表情包（sticker/GIF）图片消息标记：值为 true 时按表情渲染，不启用图片三级预览 */
+  IS_STICKER: 'isSticker',
+} as const
+
+export type MessageExtKeyValue =
+  (typeof MESSAGE_EXT_KEY)[keyof typeof MESSAGE_EXT_KEY]
