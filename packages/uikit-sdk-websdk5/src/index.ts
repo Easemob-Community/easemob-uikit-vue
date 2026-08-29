@@ -4,6 +4,9 @@
 export * from './adapter'
 export * from './client'
 
+// SDK5 专属来源/条目类型（SdkContactSource / SdkGroupSource / GroupMemberEntry / GroupMuteEntry）
+export * from './sdk-types'
+
 // 事件层（连接级 + 各 manager 事件 + 注册器 + 显示名解析）
 export * from './event/connection-events'
 export * from './event/registry'

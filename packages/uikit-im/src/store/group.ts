@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UserInfo as SdkUserInfo } from 'easemob-websdk'
+import type { UserInfo as SdkUserInfo } from '@easemob/uikit-sdk-contract'
 import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import type { UiGroup, UiGroupMember } from '@easemob/uikit-core'
 

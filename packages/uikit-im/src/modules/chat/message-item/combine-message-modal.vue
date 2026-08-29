@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { Message as SdkMessage } from 'easemob-websdk'
+import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
-import { toUiMessage } from '../../../sdk/adapter/message-adapter'
+import { toUiMessage } from '@easemob/uikit-sdk-websdk5'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmEmpty as Empty } from '@easemob/uikit-core'

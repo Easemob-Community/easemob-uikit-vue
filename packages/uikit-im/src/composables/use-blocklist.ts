@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import type { UserInfo } from 'easemob-websdk'
+import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import type { UiContact as Contact } from '@easemob/uikit-core'
 import { formatSdkError } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'

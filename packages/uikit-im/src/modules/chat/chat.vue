@@ -14,7 +14,7 @@ import { resolveLastMessageText, resolveSenderDisplayName } from '../../utils/re
 import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import type { ConversationTypeValue, ForwardModeValue } from '@easemob/uikit-core'
 import { insertChatNotice } from '@easemob/uikit-core'
-import { normalizeUserId } from '../../sdk/adapter/message-adapter'
+import { normalizeUserId } from '@easemob/uikit-sdk-websdk5'
 import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'

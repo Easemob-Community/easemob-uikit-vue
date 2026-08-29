@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, markRaw, ref } from 'vue'
-import type { Message as SdkMessage } from 'easemob-websdk'
+import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_STATUS } from '@easemob/uikit-core'
 import type { MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { MessageStatus, TextMessageBody, UiMessage } from '@easemob/uikit-core'
-import { toUiMessage } from '../sdk/adapter/message-adapter'
+import { toUiMessage } from '@easemob/uikit-sdk-websdk5'
 
 /** 按消息类型提取具体的 UiMessage 子类型（用于组件 props 精确类型） */
 export type TextMessageType = UiMessage & { type: typeof MESSAGE_TYPE.TEXT, body: { content: string } }

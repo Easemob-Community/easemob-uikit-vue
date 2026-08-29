@@ -1,24 +1,16 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
-import { ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager } from 'easemob-websdk'
+import { WEBSDK5_MANAGERS } from '@easemob/uikit-sdk-websdk5'
 import type { ClientConfig, ConnectionEventCallbacks, H5AdaptationConfig, ManagerHost, NoticeConfig, UIKitClient, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
 import { useCoreUIKitProvider } from '@easemob/uikit-core'
-import type {
-  PresenceDomain,
-  UserInfoDomain,
-} from '../sdk/domain'
-import {
-  ContactDomain,
-  ConversationDomain,
-  GroupDomain,
-  MessageDomain,
-} from '../sdk/domain'
-import { registerEventHandlers } from '../sdk/event/registry'
+import type { PresenceDomain, UserInfoDomain } from '@easemob/uikit-core'
+import { ContactDomain, ConversationDomain, GroupDomain, MessageDomain } from '@easemob/uikit-sdk-websdk5'
+import { registerEventHandlers } from '@easemob/uikit-sdk-websdk5'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
 import { useGroupStore } from '../store/group'
-import type { RootStores } from '../sdk/event/types'
-import { resolveUserDisplayName } from '../utils/resolve-last-message-text'
+import type { RootStores } from '../sdk/types'
+import { resolveUserDisplayName } from '@easemob/uikit-sdk-websdk5'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
 import { useInvitePersistenceInternal } from './use-invite-persistence'
@@ -76,14 +68,7 @@ export const UIKIT_CONTEXT_KEY: InjectionKey<UIKitContext> = Symbol('uikit')
  * 不含 ChatRoomManager——IM 场景不使用聊天室能力，不注入可让消费者摇掉
  * websdk 的 chatroom manager 代码（websdk 5.x 按 manager 分 subpath、sideEffects:false）。
  */
-const IM_SDK_MANAGERS: ClientConfig['managers'] = [
-  ChatManager,
-  ContactManager,
-  GroupManager,
-  PresenceManager,
-  PushManager,
-  UserInfoManager,
-]
+const IM_SDK_MANAGERS: ClientConfig['managers'] = WEBSDK5_MANAGERS
 
 /**
  * 注入 IM 场景默认 ClientConfig：全量 managers + 登录同步会话/联系人/群。

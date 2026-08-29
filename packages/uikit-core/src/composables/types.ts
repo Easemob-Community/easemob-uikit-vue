@@ -1,4 +1,4 @@
-import type { UserInfo } from 'easemob-websdk'
+import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import type { CreateGroupParams, UiContact, UiGroup, UiPresence } from '../sdk/types'
 
 /**

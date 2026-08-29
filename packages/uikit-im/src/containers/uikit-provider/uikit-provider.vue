@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import type { UserInfo } from 'easemob-websdk'
+import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '@easemob/uikit-core'
 import {
   type ContactFetchMode,

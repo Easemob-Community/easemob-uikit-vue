@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClipboard, useScroll } from '@vueuse/core'
-import type { GroupMessageReadUsersResult } from 'easemob-websdk'
+import type { GroupMessageReadUsersResult } from '@easemob/uikit-sdk-websdk5'
 import { formatSdkError, resolveSdkErrorMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
