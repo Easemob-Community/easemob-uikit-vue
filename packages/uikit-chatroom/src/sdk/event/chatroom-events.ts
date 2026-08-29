@@ -1,5 +1,6 @@
 import type { ChatEventHandlerMap, ChatRoomEventHandlerMap, UserInfo } from 'easemob-websdk'
-import type { ConversationTypeValue, ManagerHost, UiMessage } from '@easemob/uikit-core'
+import type { ManagerHost } from '@easemob/uikit-sdk-websdk5'
+import type { ConversationTypeValue, UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_TYPE, createLogger, createNoticeMessage, resolveNoticeUserName, t } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import { toChatroom, toChatroomMuteItem } from '../domain/chatroom-domain'

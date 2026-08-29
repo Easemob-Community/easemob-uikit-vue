@@ -1,4 +1,5 @@
-import type { ClientConfig, CoreStores, CoreUIKitContext, CoreUIKitProviderOptions } from '@easemob/uikit-core'
+import type { ClientConfig } from '@easemob/uikit-sdk-websdk5'
+import type { CoreStores, CoreUIKitContext, CoreUIKitProviderOptions } from '@easemob/uikit-core'
 import { useCoreUIKitProvider } from '@easemob/uikit-core'
 import { ChatManager, ChatRoomManager, UserInfoManager } from 'easemob-websdk'
 import { registerChatroomEventHandlers } from '../sdk/event/chatroom-events'

@@ -8,8 +8,10 @@ import type {
   Message as SdkMessage,
   UserInfo,
 } from 'easemob-websdk'
-import type { ManagerHost, UiMessage } from '@easemob/uikit-core'
-import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, formatSdkError, normalizeUserId } from '@easemob/uikit-core'
+import type { ManagerHost } from '@easemob/uikit-sdk-websdk5'
+import type { UiMessage } from '@easemob/uikit-core'
+import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, normalizeUserId } from '@easemob/uikit-core'
+import { formatSdkError } from '@easemob/uikit-sdk-websdk5'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import type {
   Chatroom,
