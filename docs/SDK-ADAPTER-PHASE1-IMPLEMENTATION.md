@@ -4,6 +4,7 @@
 > 关联：`docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（设计/决策），本文是它的 Phase 0/1 施工细化。
 > 目标：把 `easemob-websdk` 从 core 与 uikit-im 中剥离，收敛到「契约包 + websdk5 adapter」，**5.x 行为与 UI 不变**。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：中立消息 ID 沿用 `msgServerId`/`msgLocalId`（UI 零改名）；`SdkConfig` 加 `adapterConfig` 透传槽；`MessageRepository` 补操作面；Provider 保留 `appKey`/`sdkConfig` 快捷方式（非 breaking）；UMD 全局名修正（4.x=`WebIM`、5.x=`Easemob`）；新增 adapter 反依赖解耦、`UIKitDataSource` deprecated 过渡、core 隔离门禁扩展。
+> **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
 
 ---
 

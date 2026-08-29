@@ -34,6 +34,11 @@ apps/docs/.vitepress/cache
 # Temporary debug / regression scripts
 tmp/
 
+# 本地参考/产物（不入库）：OA 底座参考稿（待迁 OA 仓库）、文档站 dist 压缩包
+/OA-BASE-ARCHITECTURE-ADVICE.md
+/easemob-docs-dist.zip
+apps/docs/.vitepress/dist.zip
+
 # Design source assets (icon sets, see 线性/icon, 面性/icon, icon/, 消息状态以及未读状态, assets/icons-next)
 /线性/
 /面性/

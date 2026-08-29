@@ -3,6 +3,7 @@
 > 状态：**关键决策已全部确认，待 Phase 1 启动**（规划完成，用于未来 4.x 私有化落地评估）
 > 对应 TECH-DEBT D122（SDK 抽象），联动 D85（Electron 持久化预研，见 `docs/ELECTRON-PERSISTENCE-RESEARCH.md`）。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：会话列表 API 修正为 `getServerConversations`（游标分页）；补 4.x 消息体字段映射表（`msg`/`thumb`/`length`/`addr`/`customEvent` 等差异）与事件模型差异（`onMessage` 批量数组、回执独立回调）；`SdkAdapter` 补操作面；Provider 兼容策略明确为非 breaking；UMD 全局名决策修正；chatroom 本期暂缓接入 adapter。
+> **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
 > 背景：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已接近开发尾声）；存量用户主力仍是 IM4.x；另有一个**私有化项目仅支持 4.x SDK，且运行在 Electron 环境**，聊天消息 / 会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
 
 ---
@@ -139,7 +140,7 @@ interface ConversationRepository {
 
 - **SDK 默认实现**：repository 不注入时，退回"直连 SDK 内存 + 服务端漫游"（现状行为）。
 - **Electron 实现**：SQLite 住主进程（如 better-sqlite3），渲染进程经 IPC 调 repository——UIKit 侧只面向接口、不感知 Electron。
-- **`UIKitDataSource` 规划为最新形式（已确认）**：现有 `UIKitDataSource`（`composables/types.ts:9-36`，联系人/群/presence/用户资料/search/addContact/createGroup 接管）**无生产使用**，不保留旧双线——统一迁移为 repository 数据入口层（消息/会话/联系人/群/presence 全部走 repository 接口），旧 `dataSource` 废弃或作为薄别名过渡。
+- **`UIKitDataSource` 规划为最新形式（已确认）**：现有 `UIKitDataSource`（`composables/types.ts:9-36`，联系人/群/presence/用户资料/search/addContact/createGroup 接管）**生产环境无使用，但 demo 有演示使用**（`apps/demo/src/app.vue:179` 自定义 dataSource 开关，2026-08 复核补充——废弃时 demo 需同步迁移），不保留旧双线——统一迁移为 repository 数据入口层（消息/会话/联系人/群/presence 全部走 repository 接口），旧 `dataSource` 废弃或作为薄别名过渡。
 
 ### 2.6 现状对数据入口层的支撑点（证据，D85 已核）
 
@@ -216,7 +217,7 @@ interface SdkAdapter {
 }
 ```
 
-- **操作面（不能只定义查询）**：repository 接口必须是**读写一体**的，否则现有 Domain 层（`MessageDomain.sendText/sendImage/recall/markRead/modifyText/pinMessage` 等，`message-domain.ts` 约 30 个方法）无处安放。契约层按域聚合操作：
+- **操作面（不能只定义查询）**：repository 接口必须是**读写一体**的，否则现有 Domain 层（`MessageDomain.sendText/sendImage/recall/markRead/modifyText/pinMessage` 等，`message-domain.ts` 共 24 个公开方法，2026-08 实测复核，修正原"约 30 个"口径）无处安放。契约层按域聚合操作：
 
 ```ts
 interface MessageRepository {
@@ -269,13 +270,13 @@ interface MessageRepository {
    - core `sdk/client.ts`：`import { ChatClient }`、`import('easemob-websdk').then(({ setLogLevel }))`
    - core `utils/sdk-error.ts`：`import { isSDKError }`
    - im `composables/use-uikit.ts`：`import { ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager }`（6 个 SDK5 manager 构造器）
-2. **类型（type）import，约 40 处**：core 约 21 处、im 约 23 处（`store/message.ts`、`sdk/adapter/message-adapter.ts`、`sdk/event/chat-events.ts`、`modules/chat/message-list.vue`、`components/user-card/user-card-modal.vue` 等）。
-3. **类型真相源耦合**：`UiMessage = SdkMessage & UiMessageExtension`（core `sdk/types.ts:96`）直接 extend SDK5 `Message`；`ClientConfig extends InitConfig`（core `sdk/client.ts:51`）；`ManagerHost` 直接暴露 7 个 SDK5 `*Manager` 类型（core `sdk/client.ts:24-45`）。
+2. **类型（type）import，共 36 处**（2026-08 实测复核，修正原"约 40 处/core 约 21 处"口径）：core 13 处、im 23 处（`store/message.ts`、`sdk/adapter/message-adapter.ts`、`sdk/event/chat-events.ts`、`modules/chat/message-list.vue`、`components/user-card/user-card-modal.vue` 等）。
+3. **类型真相源耦合**：`UiMessage = (SdkMessage & UiMessageExtension) | UiNoticeMessage`（core `sdk/types.ts:96`，其中 `SdkMessage` 直接 extend SDK5 `Message`；`UiNoticeMessage` 为本地通知分支，文件实际 302 行）；`ClientConfig extends InitConfig`（core `sdk/client.ts:56`）；`ManagerHost` 直接暴露 7 个 SDK5 `*Manager` 类型（core `sdk/client.ts:24-50`）。
 4. **body 类型守卫按 5.x wire 写死**：core `sdk/types/message.ts:39-74`（`isImageBody` 判 `'localUrl'`、`isVideoBody` 判 `'thumbnailUrl'/'width'`）。
 5. **包依赖与构建假设**：
-   - im `package.json` `"easemob-websdk": "^5.0.0"` 硬依赖；
-   - im `vite.config.ts:69` `external: [... 'easemob-websdk' ...]`、`:78` `globals: { 'easemob-websdk': 'Easemob' }`（UMD 全局名假设）；
-   - im `vite.config.ts:10-24` `getSdkVersion()` 读 SDK `package.json` 注入 `__EASEMOB_SDK_VERSION__`。
+   - im `package.json` `"easemob-websdk": "^5.0.0"` 硬依赖（**core `package.json` 同样有此硬依赖**，2026-08 复核补充）；
+   - im `vite.config.ts:69` `external: [... 'easemob-websdk' ...]`、`:78` `globals: { 'easemob-websdk': 'Easemob' }`（UMD 全局名假设）（**core `vite.config.ts:64/:70` 有同款**，复核补充）；
+   - im `vite.config.ts:10-24` `getSdkVersion()` 读 SDK `package.json` 注入 `__EASEMOB_SDK_VERSION__`（**core `vite.config.ts:10-24/:40` 同款**，复核补充）。
 
 ### 3.3 判断
 
@@ -350,7 +351,7 @@ interface MessageRepository {
 
 9. **契约独立包**：`@easemob/uikit-sdk-contract` 独立包（单一真相源 + 两 adapter 与 im 三方可共享）。
 10. **repository 并入契约包**：`MessageRepository`/`ConversationRepository`/`ContactRepository`/`GroupRepository`/`PresenceRepository` 统一放契约包，与中立类型同源。
-11. **`UIKitDataSource` 规划为最新形式**：无生产使用，**不保留旧双线**，统一迁移为 repository 数据入口层，旧 `dataSource` 废弃或薄别名过渡。
+11. **`UIKitDataSource` 规划为最新形式**：生产环境无使用（demo 有演示使用，见 2.5 节复核注），**不保留旧双线**，统一迁移为 repository 数据入口层，旧 `dataSource` 废弃或薄别名过渡。
 12. **Electron IPC 序列化边界**：IPC/落库只传**纯数据 DTO**（`MessageRecord`/`ConversationRecord`，JSON 安全、无 `File`/`Blob`/`markRaw`）；分页游标传输不拉全量；附件二进制不进 IPC/SQLite，只存元数据（`url`/`secret`/`filename`/`size`/`duration`）。
 13. **本地/服务端数据一致性**：服务端（SDK 漫游）**权威**，本地库是缓存 + 冷启动加速；去重键 `msgServerId`（4.x `id`→中立 `msgServerId`，与决策 6/16 一致）；撤回/删除用**墓碑**（`recalled`/`deleted` + 时间戳）不物理删；本地 pending（仅 `msgLocalId`）回执确认后升格。
 14. **验收标准**：Phase 1 门禁全绿 + 5.x 行为不变 + 无 breaking；Phase 2 门禁全绿 + **核心 IM 手测矩阵**（登录/会话/消息/回执/撤回/联系人/群）+ 高级功能正确隐藏 + 消费者验证。
@@ -361,7 +362,7 @@ interface MessageRepository {
 
 17. **「创建权」与「暴露」解耦**：SDK 实例「由谁创建」（内置 vs 注入）与「能否被业务直接调用」（暴露）是两个正交问题。满足"SDK 对外暴露、业务可独立调用"**不需要**业务自己 import SDK 建实例——UIKit 内置创建后经 `useClient()` 暴露实例同样满足。两个入口并存：**默认内置**（未传 `adapter` 时内部 `new Websdk5Adapter()`，私有化项目里 `new Webim4Adapter()`）+ **可选注入**（业务已自建 client 时传 `new Webim4Adapter(connection)`），避免双 client。这样"开箱即用"与"用户可独立调用"同时成立。
 18. **单一生命周期所有者（压复杂度的核心原则）**：内置模式 = UIKit 全权（login/logout/dispose 归 UIKit）；注入模式 = 业务全权（UIKit 只订阅事件 + 借实例操作，绝不替业务 login/logout/dispose）。**禁止"半注入"**（业务建 client 但 UIKit 管 login）。此条写进 `SdkAdapter` 契约注释并加断言/门禁，把复杂度封死在适配层边界，不扩散到 UI 层。这是"支持注入"唯一会引入复杂度的点，用这条原则压死它。
-19. **`useClient()` 返回中立 `SdkAdapter`，不泄漏 SDK 类型**：当前 `useClient()` 返回 `client`/`sdkClient`（SDK5 原生类型，`packages/uikit-core/src/composables/use-client.ts`），会从公开 API 泄漏 SDK 类型、破坏"纯 UIKIT"。Phase 1 后改为返回中立 `SdkAdapter`；原生实例经 `adapter.client`（`unknown`/可选）拿；需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带 `ChatClient`/`connection`。
+19. **`useClient()` 返回中立 `SdkAdapter`，不泄漏 SDK 类型**：当前 `useClient()` 返回的 `client`/`sdkClient` 是 `ManagerHost` 代理（`packages/uikit-core/src/composables/use-client.ts`，2026-08 复核修正：并非原生 `ChatClient` 本体），但 `ManagerHost` 的 7 个 manager 字段均为 SDK5 原生类型，同样会从公开 API 泄漏 SDK 类型、破坏"纯 UIKIT"。Phase 1 后改为返回中立 `SdkAdapter`；原生实例经 `adapter.client`（`unknown`/可选）拿；需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带 `ChatClient`/`connection`。
 20. **非 Vue 上下文的独立调用入口**：`useClient()` 是 `provide/inject` 绑定、只能在 Provider 子树内用；OA 基座里"SDK 对外独立调用"往往意味着非 Vue 上下文（别的子应用 / 主进程 IPC / 定时任务）。除 `useClient()` 外，需提供非 context 访问口（如 `login()` 返回实例，或 adapter 实例挂在确定位置 / 模块级 getter）。Phase 1 落地时一并设计。
 21. **UIKit 层门面生命周期（launch/disposer + 单实例，借鉴声网灵动课堂）**：SDK 生命周期（决策 18）之外，UIKit 自身还有一层"门面 + 生命周期"语义需要显式化——IM 作为 OA 的常驻全局能力，对外只有一个门面（`UIKitProvider` + `useUIKit()`，已是雏形），需补齐「挂载 → 卸载」的 disposer 语义 + 单实例约束（同一 OA 窗口内 IM 单实例）。借鉴声网 `AgoraEduSDK.launch(dom, option) → disposer` + `lock()/unlock()` 模式：对外最小化门面、内部复杂度全隐藏、启动返回可完整卸载的 disposer、`lock/unlock` 保证单实例。落地牵引：Phase 1 收口时把 `useUIKit()` 的 logout/重置语义补齐为**对称的 mount/unmount 生命周期**（与 D123 生命周期对称原则一致）；D125 微前端专项时验证子应用卸载能经 disposer 干净回收（store/事件/监听全清）。
 
@@ -395,8 +396,8 @@ interface MessageRepository {
 6. **Electron 环境本身障碍少**（渲染进程 = Chromium、纯 ESM 无 Node 依赖），真正要处理的是权限/外链/下载/文件路径等"注入点"级适配，见 D85「Electron 环境适配点」。
 7. **双 adapter 同包名共存**：两代 SDK 同为 `easemob-websdk`（4.24.2 vs ^5.0.0），同装两 adapter 时 npm/pnpm 按版本 range 嵌套共存（合法），但根 `pnpm.overrides` 的 `sdk:use-tgz` 切换脚本只针对 5.x——4.x 联调需要独立的本地引入机制（file: 协议或单独 override），别复用错脚本。
 8. **结构型 body 守卫的字段精确性**：中立 `MessageBody` 无 `type` 判别字段，守卫靠字段存在性（`'duration' in body` 等）。4.x 原始 body 字段比中立命名多（如 `ImgMsgBody` 同时有 `url`/`thumb`/`bigImageUrl`）——adapter 映射时**必须精确产出中立字段集**（多余的原始字段要剔除），否则守卫误判（带 `duration` 的视频被误判语音、带 `url` 的图片被误判文件）。这是 4.x adapter 最容易踩的坑，需要针对性单测。
-9. **adapter 不能反向依赖 uikit-im**：现有 `sdk/adapter/message-adapter.ts` import 了 im 内部的 `customEventPreviewMap`（`utils/resolve-last-message-text`）。迁入 adapter 包时该工具需下沉 core（贴近 locale）或改为**依赖注入**（adapter 构造参数传入 preview resolver，与 `ConversationDomain` 注入 `resolveSenderName` 同模式）。
-10. **`UIKitDataSource` 是已发布的公开 prop**：`uikit-provider.vue` 的 `dataSource?: UIKitDataSource` 即使无生产使用也已发版。处理路径：Phase 1 标记 `@deprecated` 并薄别名转发到 repository 实现；大版本升级时再移除。不直接删。
+9. **adapter 不能反向依赖 uikit-im**：现有 `sdk/adapter/message-adapter.ts` import 了 im 内部的 `customEventPreviewMap`（`utils/resolve-last-message-text`）。迁入 adapter 包时该工具需下沉 core（贴近 locale）或改为**依赖注入**（adapter 构造参数传入 preview resolver，与 `ConversationDomain` 注入 `resolveSenderName` 同模式）。**2026-08 复核：反向依赖不止这一处，完整清单**——value 依赖：`sdk/adapter/conversation-adapter.ts:3` → `utils/resolve-last-message-text`、`sdk/event/registry.ts:3` → `composables/use-sync-status`、`sdk/event/chat-events.ts:16/18/19` → `utils/stream-message` / `composables/use-sync-status` / `utils/resolve-last-message-text`；type-only 依赖：`sdk/event/types.ts:1-4` → `store/message|conversation|contact|group` 的 store 类型（需下沉为契约层 StoreLike 接口）。迁入 adapter 包前须逐项解耦。
+10. **`UIKitDataSource` 是已发布的公开 prop**：`uikit-provider.vue` 的 `dataSource?: UIKitDataSource` 即使生产环境无使用（demo 有演示使用，见 2.5 节复核注）也已发版。处理路径：Phase 1 标记 `@deprecated` 并薄别名转发到 repository 实现；大版本升级时再移除。不直接删。
 11. **core 隔离门禁需扩展**：core 现有 `check-engine-isolation.mjs` 只禁 vue/pinia/@vueuse 值依赖；收口后必须把 `easemob-websdk` 加入禁用列表（值 + 类型 import 都禁），防止耦合回流。
 
 ---
