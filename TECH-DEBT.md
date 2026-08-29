@@ -1149,6 +1149,9 @@
 - **结论/方案**：采用「端口-适配器 + 中立契约」，**不做"4.x 单独再开发"**（两套 UI 双份维护违背"不重来"诉求）。当前架构"先进但未收口"：im 有约 23 处 `import ... from 'easemob-websdk'` + `composables/use-uikit.ts` 6 个 manager 构造器 value import + `package.json` 硬依赖 + `vite.config.ts` external/globals；`UiMessage = SdkMessage & UiMessageExtension` 直接 extend SDK5 `Message`（core `sdk/types.ts`）、`ManagerHost` 直接暴露 7 个 SDK5 `*Manager` 类型、body 类型守卫按 5.x wire 写死（core `sdk/types/message.ts`）。分三阶段：**Phase 1 防腐层收口**（契约包 `@easemob/uikit-sdk-contract` + 中立化 + SDK5 adapter 化 + uikit-im 剥干净，UI 零重写）；**Phase 2 新写 `webim4` adapter** + 语义归一化（**4.x 能力全支持**，合并/置顶/流式/回执均在，差异在字段/API/事件形状，尤其回执是"消息类型"vs"专用 API"，详见计划文档第八节）；**Phase 3 数据入口层 repository + Electron 持久化**（`MessageRepository`/`ConversationRepository` 接口 + 本地优先历史加载 + 会话覆盖竞争 + 序列化清洗 + SQLite 主进程/IPC）。
 - **联动**：与 D85（`docs/ELECTRON-PERSISTENCE-RESEARCH.md`，Electron 持久化预研）同构合并——SDK 与本地库是两个数据来源，统一收敛到同一中立契约；`UIKitDataSource`（`composables/types.ts`）只覆盖联系人/群/presence，消息/会话的持久化抽象目前是空白，store 回流入口（`setConversationList`/`prependMessages`）与 `toUiMessage` adapter 已现成，属"中等规模、不动组件层"扩展。
 - **建议修法**：见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（含四层架构、包拆分、中立契约以 5.x 字段命名为基准、`SdkCapabilities` 能力矩阵、repository 接口、事件推法 + Provider 注入、三阶段里程碑、验证门禁、14 项已确认决策、归一化映射表）。
+- **进度备忘（2026-08-29）**：
+  - Phase 1 已落地：`@easemob/uikit-sdk-contract` 扩展 `SdkEventHandlers` / repository 接口；`Websdk5Adapter` 内部实例化 Domain 与轻量 store，`subscribe()` 复用现有 event handlers 并通过 store 写入派发中立事件，五个 repository 代理到 Domain。`uikit-sdk-contract`、`uikit-sdk-websdk5`、`uikit-core`、`uikit-im`、`apps/demo` 的 `vue-tsc --noEmit` 与 uikit-sdk-websdk5 / uikit-core / uikit-im 的 `build` 全绿。
+  - 下一步：Provider 切到 `SdkAdapter` 生命周期，最终移除 `uikit-im`/`uikit-core` 对 `@easemob/uikit-sdk-websdk5` 的直接依赖。
 - **关联 skill**：`websdk2-uikit-migration` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
 
 ### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）
