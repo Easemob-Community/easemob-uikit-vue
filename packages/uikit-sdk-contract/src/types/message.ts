@@ -331,6 +331,8 @@ export interface SdkMessage {
   groupReadCount?: number
   /** 单聊发送消息是否已被对端阅读 */
   isPeerRead?: boolean
+  /** 单聊发送消息是否已送达对端（4.x `isDelivered` 映射；5.x 经送达回执事件驱动） */
+  isPeerDelivered?: boolean
   /** 是否需要消息已读回执 */
   needReadReceipt?: boolean
   /** 是否为 Thread 回复消息 */
