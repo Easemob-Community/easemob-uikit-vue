@@ -1,6 +1,7 @@
 import { computed, reactive } from 'vue'
 import type { SyncDataType } from 'easemob-websdk'
 import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { SyncStatusPayload } from '@easemob/uikit-sdk-contract'
 
 const syncLog = createLogger('UIKit:SyncStatus')
 
@@ -29,6 +30,17 @@ const syncStateMap = reactive<Record<SyncDataType, SyncState>>({
   group: { status: 'idle' },
 })
 
+/** 同步状态变更监听器（由 adapter 注入，用于把模块内状态翻译成 SdkEventHandlers.onSyncStatus） */
+let syncStatusListener: ((payload: SyncStatusPayload) => void) | null = null
+
+/** 注册同步状态监听器；返回取消注册函数 */
+export function setSyncStatusListener(listener: ((payload: SyncStatusPayload) => void) | null): () => void {
+  syncStatusListener = listener
+  return () => {
+    syncStatusListener = null
+  }
+}
+
 /** 更新单类数据的同步状态（仅供事件层 chat-events 内部调用） */
 export function setSyncStatus(dataType: SyncDataType, patch: SyncState) {
   const target = syncStateMap[dataType]
@@ -40,6 +52,12 @@ export function setSyncStatus(dataType: SyncDataType, patch: SyncState) {
   syncLog.info(`sync ${dataType} -> ${patch.status}`, patch.error
     ? { stage: patch.error.stage, retryable: patch.error.retryable, message: patch.error.message }
     : undefined)
+
+  syncStatusListener?.({
+    type: dataType,
+    status: patch.status === 'idle' ? 'syncing' : patch.status,
+    error: patch.error,
+  })
 }
 
 /** 重置全部同步状态为 idle（登出/事件反注册时调用，防止跨登录会话残留） */

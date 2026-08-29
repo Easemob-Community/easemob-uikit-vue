@@ -1,5 +1,14 @@
 import type { ConversationTypeValue } from './constants'
-import type { SdkMessage, UiContact, UiConversation, UiGroup, UiPresence } from './types'
+import type {
+  CreateGroupParams,
+  SdkMessage,
+  UiContact,
+  UiContactInvite,
+  UiConversation,
+  UiGroup,
+  UiGroupMember,
+  UiPresence,
+} from './types'
 
 /** 消息历史分页结果（统一游标语义：cursor 空拉第一页；返回 list + cursor + hasMore） */
 export interface MessagePage {
@@ -15,10 +24,17 @@ export interface ConversationPage {
   hasMore: boolean
 }
 
+/** 联系人分页结果 */
+export interface ContactPage {
+  list: UiContact[]
+  cursor?: string
+  hasMore: boolean
+}
+
 /** 群消息已读回执用户条目 */
 export interface GroupReadReceiptUser {
   userId: string
-  readTime?: number
+  timestamp?: number
 }
 
 /** 群消息已读回执分页结果 */
@@ -30,10 +46,6 @@ export interface GroupReadReceiptPage {
 
 /**
  * 消息数据入口（读写一体）。
- * 读操作在 Phase 1 落地；写/操作面在 Phase 1 迁移 MessageDomain 时对照其公开方法逐项落地
- * （sendText/sendImage/sendFile/sendVoice/sendVideo/sendLocation/sendCustom/sendCmd/sendCombine/
- * recall/markMessagesRead/markConversationRead/modifyText/getGroupReadReceiptUsers 等）。
- * Phase 3 DB 接入时补：saveMessage / updateMessageStatus / recallMessage。
  */
 export interface MessageRepository {
   loadMessages(params: {
@@ -159,17 +171,64 @@ export interface ConversationRepository {
   fetchConversations(params: { cursor?: string, pageSize?: number }): Promise<ConversationPage>
 }
 
-/** 联系人数据入口（由旧 UIKitDataSource 迁移） */
+/** 联系人数据入口 */
 export interface ContactRepository {
-  // TODO：fetchContacts / fetchBlocklist / addContact / searchUsers —— 由旧 UIKitDataSource 迁移
+  fetchContacts(params?: { cursor?: string, pageSize?: number }): Promise<ContactPage>
+  fetchBlocklist(): Promise<UiContact[]>
+  addContact(userId: string, message?: string): Promise<void>
+  deleteContact(userId: string): Promise<void>
+  setRemark(userId: string, remark: string): Promise<void>
+  addToBlocklist(userIds: string[]): Promise<void>
+  removeFromBlocklist(userIds: string[]): Promise<void>
 }
 
-/** 群组数据入口（由旧 UIKitDataSource 迁移） */
+/** 群组数据入口 */
 export interface GroupRepository {
-  // TODO：fetchGroups / createGroup / fetchGroupInfo —— 由旧 UIKitDataSource 迁移
+  fetchGroups(): Promise<UiGroup[]>
+  fetchGroupInfo(groupId: string): Promise<UiGroup>
+  createGroup(params: CreateGroupParams): Promise<{ groupId: string }>
+  joinGroup(groupId: string, message?: string): Promise<void>
+  leaveGroup(groupId: string): Promise<void>
+  destroyGroup(groupId: string): Promise<void>
+  fetchGroupMembers(
+    groupId: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<{ members: UiGroupMember[], cursor?: string, hasMore?: boolean }>
+  removeGroupMembers(groupId: string, userIds: string[]): Promise<void>
+  inviteUsersToGroup(groupId: string, userIds: string[]): Promise<void>
+  addGroupAdmin(groupId: string, userId: string): Promise<void>
+  removeGroupAdmin(groupId: string, userId: string): Promise<void>
+  changeGroupOwner(groupId: string, newOwnerId: string): Promise<void>
+  updateGroupInfo(
+    groupId: string,
+    input: { name?: string, description?: string, avatar?: string, ext?: string },
+  ): Promise<void>
+  updateGroupConfigs(
+    groupId: string,
+    input: {
+      public?: boolean
+      joinApprovalRequired?: boolean
+      allowInvites?: boolean
+      inviteNeedConfirm?: boolean
+      maxMembers?: number
+    },
+  ): Promise<void>
+  muteAllGroupMembers(groupId: string): Promise<void>
+  unmuteAllGroupMembers(groupId: string): Promise<void>
+  muteGroupMembers(groupId: string, userIds: string[], muteDuration: number): Promise<void>
+  unmuteGroupMembers(groupId: string, userIds: string[]): Promise<void>
+  updateGroupAnnouncement(groupId: string, announcement: string): Promise<void>
+  acceptGroupInvitation(groupId: string): Promise<void>
+  declineGroupInvitation(groupId: string): Promise<void>
+  acceptGroupJoinRequest(groupId: string, userId: string): Promise<void>
+  rejectGroupJoinRequest(groupId: string, userId: string, reason: string): Promise<void>
 }
 
-/** 在线状态数据入口（由旧 UIKitDataSource 迁移） */
+/** 在线状态数据入口 */
 export interface PresenceRepository {
-  // TODO：fetchPresence / subscribePresence / unsubscribePresence —— 由旧 UIKitDataSource 迁移
+  subscribe(userIds: string[], expiry?: number): Promise<void>
+  unsubscribe(userIds: string[]): Promise<void>
+  fetchStatus(userIds: string[]): Promise<void>
+  publish(description: string): Promise<void>
 }

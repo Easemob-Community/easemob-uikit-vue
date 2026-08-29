@@ -10,9 +10,44 @@ import type {
   SdkAdapter,
   SdkCapabilities,
   SdkConfig,
+  SdkEventHandlers,
+  UIKitFeatures,
 } from '@easemob/uikit-sdk-contract'
+import type {
+  ContactRepository,
+  ConversationRepository,
+  GroupRepository,
+  MessageRepository,
+  PresenceRepository,
+} from '@easemob/uikit-sdk-contract'
+import type {
+  SdkMessage,
+  UiContact,
+  UiContactInvite,
+  UiConversation,
+  UiGroup,
+  UiGroupMember,
+  UiMessage,
+  UiPresence,
+  UserInfo,
+  UserInfoAttribute,
+} from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
+import { createLogger } from '@easemob/uikit-sdk-contract'
 import type { ClientConfig, UIKitClient } from './client'
 import { createClient } from './client'
+import { MessageDomain } from './domain/message-domain'
+import { ConversationDomain } from './domain/conversation-domain'
+import { ContactDomain } from './domain/contact-domain'
+import { GroupDomain } from './domain/group-domain'
+import { PresenceDomain } from './domain/presence-domain'
+import { UserInfoDomain } from './domain/user-info-domain'
+import { registerEventHandlers } from './event/registry'
+import { setEventHandlerDeps, getEventHandlerDeps } from './event/deps'
+import type { EventStores } from './event/types'
+import { setSyncStatusListener } from './use-sync-status'
+
+const adapterLog = createLogger('UIKit:Websdk5Adapter')
 
 /**
  * IM 场景默认 SDK manager 注册列表（不含 ChatRoomManager）。
@@ -27,6 +62,910 @@ export const WEBSDK5_MANAGERS: ClientConfig['managers'] = [
   PushManager,
   UserInfoManager,
 ]
+
+/** 默认 UIKit 能力开关：adapter 独立运行或未传 features 时全开 */
+function getDefaultFeatures(): UIKitFeatures {
+  return {
+    enableContact: true,
+    enableBlocklist: true,
+    enablePresence: true,
+    presenceStrangerMode: 'query-on-visible',
+    fetchGroupMemberPresenceOnVisible: true,
+    contactFetchMode: 'all',
+    enableGroup: true,
+    enableUserInfo: true,
+    enableUserInfoSubscription: true,
+    enableInvitePersistence: true,
+    enableDraft: true,
+    enableAtMe: true,
+    enableTyping: true,
+    filterBlockedContacts: true,
+  }
+}
+
+/** 内部消息类型：SDK 消息 + UIKit 扩展字段 */
+type SdkUiMessage = SdkMessage & {
+  recalled?: boolean
+  recalledBy?: string
+  status?: string
+  pinned?: boolean
+  pinTime?: number
+  pinOperatorId?: string
+  translation?: { text: string, to: string }
+  showTranslation?: boolean
+  translating?: boolean
+  voiceText?: { text: string }
+  showVoiceText?: boolean
+  voiceTranscribing?: boolean
+  progress?: number
+  failReason?: string
+  modified?: boolean
+}
+
+/** 事件处理器引用类型 */
+type HandlersRef = () => SdkEventHandlers | undefined
+
+/**
+ * 若业务层（core/uikit-im）未注入事件层依赖，则注入一组最小兜底实现，
+ * 保证 adapter 独立运行时不因 `getEventHandlerDeps()` 抛错而崩溃。
+ * 真正使用通知/系统通知/i18n 时，业务层应在 subscribe 前调用 setEventHandlerDeps。
+ */
+function ensureEventHandlerDeps(): void {
+  try {
+    getEventHandlerDeps()
+  }
+  catch {
+    adapterLog.warn('[Websdk5Adapter] 事件层依赖未注入，使用最小兜底实现')
+    setEventHandlerDeps({
+      t: (key: string) => key,
+      insertChatNotice: () => {},
+      buildAnnouncementNoticeText: (announcement: string) => announcement || '',
+      resolveNoticeUserName: (user) => user?.nickname || user?.userId || '',
+      useNotification: () => ({
+        state: {
+          value: {
+            enabled: false,
+            browserEnabled: false,
+            inAppEnabled: false,
+            triggerMode: 'background' as const,
+          },
+        },
+        notify: () => {},
+        notifyBrowser: async () => false,
+      }),
+      emitNotificationDelivered: () => {},
+    })
+  }
+}
+
+/** 创建连接状态 store：跟踪 connected/connecting/hasConnectedOnce 并翻译为 ConnectState */
+function createClientStore(
+  adapter: Websdk5Adapter,
+  handlersRef: HandlersRef,
+): EventStores['client'] {
+  let connected = false
+  let connecting = false
+  let hasConnectedOnce = false
+
+  function getConnectState(): import('@easemob/uikit-sdk-contract').ConnectState {
+    if (connecting)
+      return 'connecting'
+    if (connected)
+      return 'connected'
+    if (hasConnectedOnce)
+      return 'reconnectFailed'
+    return 'disconnected'
+  }
+
+  function emit() {
+    handlersRef()?.onConnectStateChange?.(getConnectState())
+  }
+
+  return {
+    get currentUser() {
+      return adapter.client?.currentUserId || ''
+    },
+    get client() {
+      return adapter.client
+        ? { deleteConversationOnGroupDestroyed: adapter.client.deleteConversationOnGroupDestroyed }
+        : null
+    },
+    setConnected(value: boolean) {
+      connected = value
+      emit()
+    },
+    setConnecting(value: boolean) {
+      connecting = value
+      emit()
+    },
+    setHasConnectedOnce(value: boolean) {
+      hasConnectedOnce = value
+    },
+  }
+}
+
+/** 创建消息 store：维护会话消息列表并把写入翻译为 SdkEventHandlers */
+function createMessageStore(handlersRef: HandlersRef): EventStores['message'] {
+  const messages = new Map<string, SdkUiMessage[]>()
+  const sending = new Map<string, SdkMessage>()
+  let syncingMessages = false
+
+  function getList(conversationId: string): UiMessage[] {
+    return (messages.get(conversationId) ?? []) as UiMessage[]
+  }
+
+  function findMessage(
+    msgId: string,
+  ): { list: SdkUiMessage[], index: number, conversationId: string } | null {
+    for (const [conversationId, list] of messages) {
+      const index = list.findIndex(m => m.msgServerId === msgId || m.msgLocalId === msgId)
+      if (index >= 0)
+        return { list, index, conversationId }
+    }
+    return null
+  }
+
+  function upsertMessage(msg: UiMessage) {
+    const sdkMsg = msg as SdkUiMessage
+    const list = messages.get(sdkMsg.conversationId) ?? []
+    const idx = list.findIndex(
+      m => m.msgServerId && m.msgServerId === sdkMsg.msgServerId,
+    )
+    if (idx >= 0) {
+      list[idx] = sdkMsg
+    }
+    else {
+      list.push(sdkMsg)
+    }
+    list.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0))
+    messages.set(sdkMsg.conversationId, list)
+  }
+
+  return {
+    getMessages: getList,
+
+    addMessage(msg) {
+      upsertMessage(msg)
+      handlersRef()?.onMessage?.(msg as SdkMessage)
+    },
+
+    addSendingMessage(localId, sdkMsg) {
+      sending.set(localId, sdkMsg)
+    },
+
+    replaceWithSent(localId, msg) {
+      sending.delete(localId)
+      upsertMessage(msg)
+      handlersRef()?.onMessage?.(msg as SdkMessage)
+    },
+
+    updateUploadProgress(localId, percent) {
+      const sdkMsg = sending.get(localId)
+      if (!sdkMsg)
+        return
+      const found = findMessage(sdkMsg.msgLocalId || sdkMsg.msgServerId || '')
+      if (found) {
+        const updated = { ...found.list[found.index], progress: percent }
+        found.list[found.index] = updated
+      }
+    },
+
+    markFailed(localId, reason) {
+      const sdkMsg = sending.get(localId)
+      sending.delete(localId)
+      const msgId = sdkMsg?.msgLocalId || sdkMsg?.msgServerId
+      if (!msgId)
+        return
+      const found = findMessage(msgId)
+      if (found) {
+        const updated = { ...found.list[found.index], status: 'failed', failReason: reason }
+        found.list[found.index] = updated
+      }
+    },
+
+    prependMessages(conversationId, msgs) {
+      const existing = messages.get(conversationId) ?? []
+      const map = new Map<string, SdkUiMessage>()
+      for (const msg of msgs) {
+        const sdkMsg = msg as SdkUiMessage
+        if (sdkMsg.msgServerId)
+          map.set(sdkMsg.msgServerId, sdkMsg)
+      }
+      for (const msg of existing) {
+        if (msg.msgServerId && !map.has(msg.msgServerId))
+          map.set(msg.msgServerId, msg)
+      }
+      const merged = Array.from(map.values()).sort(
+        (a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0),
+      )
+      messages.set(conversationId, merged)
+    },
+
+    updateStatusByServerId(serverId, status) {
+      const found = findMessage(serverId)
+      if (!found)
+        return
+      found.list[found.index] = { ...found.list[found.index], status }
+      handlersRef()?.onMessageStatusChanged?.({ messageId: serverId, status })
+    },
+
+    recallMessage(serverId, operatorId) {
+      const found = findMessage(serverId)
+      if (!found)
+        return
+      const msg = found.list[found.index]
+      msg.recalled = true
+      msg.recalledBy = operatorId
+      handlersRef()?.onMessagesRecalled?.({
+        messageId: serverId,
+        conversationId: found.conversationId,
+        conversationType: msg.conversationType as ConversationTypeValue,
+        operatorId,
+      })
+    },
+
+    updateMessage(serverId, msg) {
+      const found = findMessage(serverId)
+      if (!found)
+        return
+      const sdkMsg = msg as SdkUiMessage
+      found.list[found.index] = sdkMsg
+      if (sdkMsg.modified)
+        handlersRef()?.onMessageUpdated?.(sdkMsg)
+    },
+
+    setPinnedMessages(_conversationId, _msgs) {
+      // 内部缓存：事件层刷新置顶列表时写入，暂不通过事件暴露
+    },
+
+    setTranslation(msgId, translation) {
+      const found = findMessage(msgId)
+      if (!found)
+        return
+      const msg = found.list[found.index]
+      msg.translation = translation
+      msg.showTranslation = true
+    },
+
+    setTranslating(msgId, translating) {
+      const found = findMessage(msgId)
+      if (found)
+        found.list[found.index] = { ...found.list[found.index], translating }
+    },
+
+    setVoiceText(msgId, voiceText) {
+      const found = findMessage(msgId)
+      if (!found)
+        return
+      const msg = found.list[found.index]
+      msg.voiceText = voiceText
+      msg.showVoiceText = true
+    },
+
+    setVoiceTranscribing(msgId, transcribing) {
+      const found = findMessage(msgId)
+      if (found)
+        found.list[found.index] = { ...found.list[found.index], voiceTranscribing: transcribing }
+    },
+
+    clearConversationMessages(conversationId) {
+      messages.delete(conversationId)
+    },
+
+    updateMessageById(msgId, patch) {
+      const found = findMessage(msgId)
+      if (!found)
+        return
+      const prev = found.list[found.index]
+      const updated = { ...prev, ...patch } as SdkUiMessage
+      found.list[found.index] = updated
+
+      if (patch.modified || patch.modifiedInfo)
+        handlersRef()?.onMessageUpdated?.(updated)
+
+      if (patch.status && patch.status !== prev.status) {
+        handlersRef()?.onMessageStatusChanged?.({
+          messageId: msgId,
+          status: patch.status,
+        })
+      }
+    },
+
+    replaceMessageById(msgId, msg) {
+      const found = findMessage(msgId)
+      if (!found)
+        return
+      const sdkMsg = msg as SdkUiMessage
+      found.list[found.index] = sdkMsg
+      handlersRef()?.onMessageUpdated?.(sdkMsg)
+    },
+
+    addAtMeMessage(conversationId, msgId) {
+      handlersRef()?.onAtMe?.({ conversationId, messageId: msgId })
+    },
+
+    updateMessageStatus(msgId, status) {
+      const found = findMessage(msgId)
+      if (!found)
+        return
+      found.list[found.index] = { ...found.list[found.index], status }
+      handlersRef()?.onMessageStatusChanged?.({ messageId: msgId, status })
+    },
+
+    setMessagePinned(serverId, info) {
+      const found = findMessage(serverId)
+      if (!found)
+        return
+      const msg = found.list[found.index]
+      msg.pinned = true
+      msg.pinTime = info.pinTime
+      msg.pinOperatorId = info.operatorId
+    },
+
+    setMessageUnpinned(serverId) {
+      const found = findMessage(serverId)
+      if (!found)
+        return
+      const msg = found.list[found.index]
+      msg.pinned = false
+    },
+
+    deleteMessages(msgIds) {
+      const idSet = new Set(msgIds)
+      const deletedByConversation = new Map<string, string[]>()
+      for (const [conversationId, list] of messages) {
+        const remaining: SdkUiMessage[] = []
+        for (const m of list) {
+          const id = m.msgServerId || m.msgLocalId
+          if (id && idSet.has(id)) {
+            const arr = deletedByConversation.get(conversationId) ?? []
+            arr.push(id)
+            deletedByConversation.set(conversationId, arr)
+          }
+          else {
+            remaining.push(m)
+          }
+        }
+        messages.set(conversationId, remaining)
+      }
+      for (const [conversationId, ids] of deletedByConversation) {
+        handlersRef()?.onMessagesDeleted?.({ messageIds: ids, conversationId })
+      }
+    },
+
+    setSyncingMessages(value) {
+      if (syncingMessages === value)
+        return
+      syncingMessages = value
+      handlersRef()?.onSyncStatus?.({
+        type: 'message',
+        status: value ? 'syncing' : 'success',
+      })
+    },
+  }
+}
+
+/** 创建会话 store */
+function createConversationStore(handlersRef: HandlersRef): EventStores['conversation'] {
+  let conversationList: UiConversation[] = []
+  let currentConversationId: string | null = null
+  let conversationsLoaded = false
+
+  function emitChange() {
+    handlersRef()?.onConversationChange?.(conversationList)
+  }
+
+  return {
+    get conversationList() {
+      return conversationList
+    },
+    get currentConversationId() {
+      return currentConversationId
+    },
+    get conversationsLoaded() {
+      return conversationsLoaded
+    },
+
+    setList(list) {
+      conversationList = list
+      emitChange()
+    },
+
+    setCurrentConversationId(id) {
+      currentConversationId = id
+    },
+
+    setSyncing(_syncing) {
+      // domain 层可能调用，但同步状态事件由 setSyncStatusListener 处理
+    },
+
+    delete(id) {
+      conversationList = conversationList.filter(c => c.id !== id)
+      handlersRef()?.onConversationDeleted?.(id)
+    },
+
+    update(id, patch) {
+      const idx = conversationList.findIndex(c => c.id === id)
+      if (idx < 0)
+        return
+      conversationList[idx] = { ...conversationList[idx], ...patch }
+      emitChange()
+      handlersRef()?.onConversationUpdated?.({ id, conversation: patch })
+    },
+
+    setConversationList(list) {
+      this.setList(list)
+    },
+
+    addConversation(cvs) {
+      const idx = conversationList.findIndex(c => c.id === cvs.id)
+      if (idx >= 0)
+        conversationList[idx] = cvs
+      else
+        conversationList.push(cvs)
+      emitChange()
+    },
+
+    deleteConversation(id) {
+      this.delete(id)
+    },
+
+    updateConversation(id, patch) {
+      this.update(id, patch)
+    },
+
+    setConversationsLoaded(v) {
+      conversationsLoaded = v
+    },
+
+    setSyncingConversations(_v) {
+      // 同步状态由 use-sync-status 监听器发出
+    },
+
+    setTyping(conversationId, userId) {
+      handlersRef()?.onTyping?.({ conversationId, userId })
+    },
+
+    setAtMe(_conversationId, _hasAtMe) {
+      // 具体 messageId 由 message store.addAtMeMessage 触发 onAtMe
+    },
+
+    updateUnreadCount(id, count) {
+      this.update(id, { unreadCount: count })
+    },
+  }
+}
+
+/** 创建联系人 store */
+function createContactStore(handlersRef: HandlersRef): EventStores['contact'] {
+  let contactList: UiContact[] = []
+  let blocklist: UiContact[] = []
+  let invites: UiContactInvite[] = []
+  let loaded = false
+
+  function emitChange() {
+    handlersRef()?.onContactChange?.(contactList)
+  }
+
+  function emitInviteChange() {
+    handlersRef()?.onInviteChange?.(invites)
+  }
+
+  return {
+    get contactList() {
+      return contactList
+    },
+    get loaded() {
+      return loaded
+    },
+
+    setList(list) {
+      contactList = list
+      emitChange()
+    },
+
+    addContact(contact) {
+      const idx = contactList.findIndex(c => c.userId === contact.userId)
+      if (idx >= 0)
+        contactList[idx] = { ...contactList[idx], ...contact }
+      else
+        contactList.push(contact)
+      emitChange()
+      handlersRef()?.onContactUpdated?.(contact)
+    },
+
+    removeContact(userId) {
+      const removed = contactList.find(c => c.userId === userId)
+      contactList = contactList.filter(c => c.userId !== userId)
+      if (removed) {
+        emitChange()
+        handlersRef()?.onContactUpdated?.(removed)
+      }
+    },
+
+    updateRemark(userId, remark) {
+      const idx = contactList.findIndex(c => c.userId === userId)
+      if (idx < 0)
+        return
+      contactList[idx] = { ...contactList[idx], remark, name: remark || contactList[idx].name }
+      emitChange()
+      handlersRef()?.onContactUpdated?.(contactList[idx])
+    },
+
+    setBlocklist(list) {
+      blocklist = list
+    },
+
+    addInvite(invite) {
+      const idx = invites.findIndex(i => i.id === invite.id)
+      if (idx >= 0)
+        invites[idx] = { ...invites[idx], ...invite }
+      else
+        invites.push(invite)
+      emitInviteChange()
+    },
+
+    removeInvite(id) {
+      invites = invites.filter(i => i.id !== id)
+      emitInviteChange()
+    },
+
+    updateInviteStatus(id, status) {
+      const idx = invites.findIndex(i => i.id === id)
+      if (idx < 0)
+        return
+      invites[idx] = { ...invites[idx], status }
+      emitInviteChange()
+    },
+
+    getContact(userId) {
+      return contactList.find(c => c.userId === userId)
+    },
+
+    getInvite(id) {
+      return invites.find(i => i.id === id)
+    },
+
+    setContactList(list) {
+      this.setList(list)
+    },
+
+    updateContactRemark(userId, remark) {
+      this.updateRemark(userId, remark)
+    },
+  }
+}
+
+/** 创建群组 store */
+function createGroupStore(handlersRef: HandlersRef): EventStores['group'] {
+  let groupList: UiGroup[] = []
+  const members = new Map<string, UiGroupMember[]>()
+  const announcements = new Map<string, string>()
+  const muteList = new Map<string, UiGroupMember[]>()
+  const blocklist = new Map<string, UiGroupMember[]>()
+  const allowlist = new Map<string, UiGroupMember[]>()
+  const sharedFiles = new Map<string, any[]>()
+  const joinRequests = new Map<string, any[]>()
+  const adminSynced = new Set<string>()
+  let loaded = false
+
+  function emitChange() {
+    handlersRef()?.onGroupChange?.(groupList)
+  }
+
+  return {
+    get groupList() {
+      return groupList
+    },
+    get loaded() {
+      return loaded
+    },
+
+    setList(list) {
+      groupList = list
+      emitChange()
+    },
+
+    addGroup(group) {
+      const idx = groupList.findIndex(g => g.groupId === group.groupId)
+      if (idx >= 0)
+        groupList[idx] = { ...groupList[idx], ...group }
+      else
+        groupList.push(group)
+      emitChange()
+      handlersRef()?.onGroupUpdated?.(group)
+    },
+
+    removeGroup(groupId) {
+      const removed = groupList.find(g => g.groupId === groupId)
+      groupList = groupList.filter(g => g.groupId !== groupId)
+      if (removed) {
+        emitChange()
+        handlersRef()?.onGroupUpdated?.(removed)
+      }
+    },
+
+    updateGroup(groupId, patch) {
+      const idx = groupList.findIndex(g => g.groupId === groupId)
+      if (idx < 0)
+        return
+      groupList[idx] = { ...groupList[idx], ...patch }
+      emitChange()
+      handlersRef()?.onGroupUpdated?.(groupList[idx])
+    },
+
+    setGroupMembers(groupId, list) {
+      members.set(groupId, list)
+      handlersRef()?.onGroupMembersChanged?.({ groupId, members: list })
+    },
+
+    appendGroupMembers(groupId, list) {
+      const existing = members.get(groupId) ?? []
+      const map = new Map(existing.map(m => [m.userId, m]))
+      for (const m of list)
+        map.set(m.userId, m)
+      const merged = Array.from(map.values())
+      members.set(groupId, merged)
+      handlersRef()?.onGroupMembersChanged?.({ groupId, members: merged })
+    },
+
+    removeGroupMembers(groupId, userIds) {
+      const idSet = new Set(userIds)
+      const list = (members.get(groupId) ?? []).filter(m => !idSet.has(m.userId))
+      members.set(groupId, list)
+      handlersRef()?.onGroupMembersChanged?.({ groupId, members: list })
+    },
+
+    updateGroupMemberRole(groupId, userId, role) {
+      const list = members.get(groupId) ?? []
+      const idx = list.findIndex(m => m.userId === userId)
+      if (idx < 0)
+        return
+      list[idx] = { ...list[idx], role }
+      members.set(groupId, list)
+      handlersRef()?.onGroupMembersChanged?.({ groupId, members: list })
+    },
+
+    setGroupAnnouncement(groupId, announcement) {
+      announcements.set(groupId, announcement)
+      handlersRef()?.onGroupAnnouncementChanged?.({ groupId, announcement })
+    },
+
+    isGroupAdminSynced(groupId) {
+      return adminSynced.has(groupId)
+    },
+
+    markGroupAdminSynced(groupId) {
+      adminSynced.add(groupId)
+    },
+
+    setGroupMuteList(groupId, list) {
+      muteList.set(groupId, list)
+    },
+
+    addGroupMuteMembers(groupId, entries) {
+      const existing = muteList.get(groupId) ?? []
+      const userIds: string[] = Array.isArray(entries) && entries.length > 0 && typeof entries[0] === 'string'
+        ? entries as string[]
+        : (entries as Array<{ userId: string }>).map(e => e.userId)
+      for (const userId of userIds) {
+        if (!existing.some(m => m.userId === userId))
+          existing.push({ userId })
+      }
+      muteList.set(groupId, existing)
+    },
+
+    removeGroupMuteMembers(groupId, userIds) {
+      const idSet = new Set(userIds)
+      muteList.set(groupId, (muteList.get(groupId) ?? []).filter(m => !idSet.has(m.userId)))
+    },
+
+    setGroupBlocklist(groupId, list) {
+      blocklist.set(groupId, list)
+    },
+
+    addGroupBlocklistMembers(groupId, userIds) {
+      const existing = blocklist.get(groupId) ?? []
+      for (const userId of userIds) {
+        if (!existing.some(m => m.userId === userId))
+          existing.push({ userId })
+      }
+      blocklist.set(groupId, existing)
+    },
+
+    removeGroupBlocklistMembers(groupId, userIds) {
+      const idSet = new Set(userIds)
+      blocklist.set(groupId, (blocklist.get(groupId) ?? []).filter(m => !idSet.has(m.userId)))
+    },
+
+    setGroupAllowlist(groupId, list) {
+      allowlist.set(groupId, list)
+    },
+
+    addGroupAllowlistMembers(groupId, userIds) {
+      const existing = allowlist.get(groupId) ?? []
+      for (const userId of userIds) {
+        if (!existing.some(m => m.userId === userId))
+          existing.push({ userId })
+      }
+      allowlist.set(groupId, existing)
+    },
+
+    removeGroupAllowlistMembers(groupId, userIds) {
+      const idSet = new Set(userIds)
+      allowlist.set(groupId, (allowlist.get(groupId) ?? []).filter(m => !idSet.has(m.userId)))
+    },
+
+    setGroupList(list) {
+      this.setList(list)
+    },
+
+    getGroupById(groupId) {
+      return groupList.find(g => g.groupId === groupId)
+    },
+
+    incrementMemberCount(groupId, delta) {
+      const g = this.getGroupById(groupId)
+      if (g)
+        this.updateGroup(groupId, { memberCount: (g.memberCount ?? 0) + delta })
+    },
+
+    decrementMemberCount(groupId, delta) {
+      const g = this.getGroupById(groupId)
+      if (g)
+        this.updateGroup(groupId, { memberCount: Math.max(0, (g.memberCount ?? 0) - delta) })
+    },
+
+    addGroupSharedFile(groupId, file) {
+      const existing = sharedFiles.get(groupId) ?? []
+      existing.push(file)
+      sharedFiles.set(groupId, existing)
+    },
+
+    removeGroupSharedFile(groupId, fileId) {
+      sharedFiles.set(groupId, (sharedFiles.get(groupId) ?? []).filter(f => f.fileId !== fileId))
+    },
+
+    getGroupJoinRequests(groupId) {
+      return joinRequests.get(groupId) ?? []
+    },
+
+    setGroupJoinRequests(groupId, requests) {
+      joinRequests.set(groupId, requests)
+    },
+
+    updateGroupJoinRequest(groupId, userId, status) {
+      const list = joinRequests.get(groupId) ?? []
+      const req = list.find(
+        (r: any) => r.applicantId === userId || r.applicant?.userId === userId,
+      )
+      if (req)
+        req.status = status
+    },
+  }
+}
+
+/** 创建在线状态 store */
+function createPresenceStore(handlersRef: HandlersRef): EventStores['presence'] {
+  let presenceList: UiPresence[] = []
+  const subscribed = new Set<string>()
+
+  return {
+    updateBatch(list) {
+      const map = new Map(presenceList.map(p => [p.userId, p]))
+      for (const p of list)
+        map.set(p.userId, p)
+      presenceList = Array.from(map.values())
+      handlersRef()?.onPresenceChanged?.(presenceList)
+    },
+
+    setSubscribed(userIds) {
+      for (const id of userIds)
+        subscribed.add(id)
+    },
+  }
+}
+
+/** 创建用户资料 store */
+function createUserInfoStore(handlersRef: HandlersRef): EventStores['userInfo'] {
+  const userInfos = new Map<string, UserInfo>()
+  const loading = new Set<string>()
+  const failed = new Set<string>()
+  const subscribed = new Set<string>()
+  let subscriptionDisabled = false
+  const fetchedAttributes = new Map<string, Set<UserInfoAttribute>>()
+
+  function emitChange() {
+    handlersRef()?.onUserInfoChanged?.(Array.from(userInfos.values()))
+  }
+
+  return {
+    getUserInfo(userId) {
+      return userInfos.get(userId)
+    },
+
+    setUserInfo(info) {
+      userInfos.set(info.userId, info)
+      emitChange()
+    },
+
+    setUserInfos(infos) {
+      for (const info of infos)
+        userInfos.set(info.userId, info)
+      emitChange()
+    },
+
+    areAttributesFetched(userId, attributes) {
+      const fetched = fetchedAttributes.get(userId)
+      if (!fetched)
+        return false
+      return attributes.every(a => fetched.has(a))
+    },
+
+    markFetchedAttributes(userIds, attributes) {
+      for (const userId of userIds) {
+        const set = fetchedAttributes.get(userId) ?? new Set<UserInfoAttribute>()
+        for (const a of attributes)
+          set.add(a)
+        fetchedAttributes.set(userId, set)
+      }
+    },
+
+    markLoading(userIds) {
+      for (const id of userIds)
+        loading.add(id)
+    },
+
+    markLoaded(userIds) {
+      for (const id of userIds)
+        loading.delete(id)
+    },
+
+    markFetchFailed(userIds) {
+      for (const id of userIds)
+        failed.add(id)
+    },
+
+    isFetchFailed(userId) {
+      return failed.has(userId)
+    },
+
+    markSubscribed(userIds) {
+      for (const id of userIds)
+        subscribed.add(id)
+    },
+
+    markUnsubscribed(userIds) {
+      for (const id of userIds)
+        subscribed.delete(id)
+    },
+
+    markSubscribeFailed(userIds) {
+      for (const id of userIds)
+        failed.add(id)
+    },
+
+    isSubscribeFailed(userId) {
+      return failed.has(userId)
+    },
+
+    disableSubscription() {
+      subscriptionDisabled = true
+    },
+
+    isSubscriptionDisabled() {
+      return subscriptionDisabled
+    },
+
+    isSubscribed(userId) {
+      return subscribed.has(userId)
+    },
+
+    isLoading(userId) {
+      return loading.has(userId)
+    },
+  }
+}
 
 /**
  * easemob-websdk@5.x 适配器。
@@ -44,6 +983,20 @@ export class Websdk5Adapter implements SdkAdapter {
   }
 
   private _client: UIKitClient | null = null
+  private _domains?: {
+    message: MessageDomain
+    conversation: ConversationDomain
+    contact: ContactDomain
+    group: GroupDomain
+    presence: PresenceDomain
+  }
+  private _userInfoDomain?: UserInfoDomain
+  private _stores?: EventStores
+  private _features?: UIKitFeatures
+  private _handlers?: SdkEventHandlers
+  private _disposeEventHandlers?: () => void
+  private _disposeSyncListener?: () => void
+  private _subscriptionId = 0
 
   constructor(private injectedClient?: UIKitClient) {}
 
@@ -65,6 +1018,47 @@ export class Websdk5Adapter implements SdkAdapter {
       managers: adapterCfg.managers ?? WEBSDK5_MANAGERS,
       ...adapterCfg,
     })
+
+    this._features = (config.adapterConfig?.features as UIKitFeatures | undefined) ?? getDefaultFeatures()
+
+    const handlersRef = () => this._handlers
+    const stores: EventStores = {
+      client: createClientStore(this, handlersRef),
+      message: createMessageStore(handlersRef),
+      conversation: createConversationStore(handlersRef),
+      contact: createContactStore(handlersRef),
+      group: createGroupStore(handlersRef),
+      presence: createPresenceStore(handlersRef),
+      userInfo: createUserInfoStore(handlersRef),
+    }
+    this._stores = stores
+
+    this._domains = {
+      message: new MessageDomain(this._client, stores.message),
+      conversation: new ConversationDomain(this._client, stores.conversation, {
+        sendPendingReadReceipts: (conversationId, conversationType) => {
+          void this._domains?.message.sendPendingReadReceipts(conversationId, conversationType)
+        },
+        resolveSenderName: (userId) => {
+          const contact = stores.contact.getContact(userId)
+          if (contact?.remark || contact?.name)
+            return contact.remark || contact.name
+          return stores.userInfo.getUserInfo(userId)?.nickname
+        },
+      }),
+      contact: new ContactDomain(this._client, stores.contact),
+      group: new GroupDomain(this._client, stores.group),
+      presence: new PresenceDomain(this._client, stores.presence),
+    }
+
+    // 用户资料域：内部监听 SDK 用户资料变更事件，通过 userInfo store 触发 onUserInfoChanged
+    this._userInfoDomain = new UserInfoDomain(this._client, stores.userInfo, {}, () => {
+      adapterLog.warn('[Websdk5Adapter] 用户资料订阅无权限，已自动熔断')
+    })
+    this._userInfoDomain.listen()
+
+    if (this._handlers)
+      this._setupEventHandlers()
   }
 
   async login(user: string, token: string): Promise<void> {
@@ -77,14 +1071,367 @@ export class Websdk5Adapter implements SdkAdapter {
     await this._client?.logout()
   }
 
-  subscribe(): () => void {
-    // TODO（事件迁移轮次落地）：注册连接级 + 各 manager 事件并翻译为中立事件回调
-    return () => {}
+  /** 订阅中立事件，返回取消订阅函数 */
+  subscribe(handlers: SdkEventHandlers): () => void {
+    const subscriptionId = ++this._subscriptionId
+    this._handlers = handlers
+    if (this._client)
+      this._setupEventHandlers()
+
+    return () => {
+      if (this._subscriptionId !== subscriptionId)
+        return
+      this._handlers = undefined
+      this._disposeEventHandlers?.()
+      this._disposeEventHandlers = undefined
+      this._disposeSyncListener?.()
+      this._disposeSyncListener = undefined
+    }
   }
 
-  readonly message: never = undefined as never
-  readonly conversation: never = undefined as never
-  readonly contact: never = undefined as never
-  readonly group: never = undefined as never
-  readonly presence: never = undefined as never
+  private _setupEventHandlers(): void {
+    if (!this._client || !this._stores)
+      return
+
+    ensureEventHandlerDeps()
+
+    this._disposeSyncListener?.()
+    this._disposeSyncListener = setSyncStatusListener((payload) => {
+      this._handlers?.onSyncStatus?.(payload)
+    })
+
+    this._disposeEventHandlers?.()
+    this._disposeEventHandlers = registerEventHandlers(
+      this._client,
+      this._stores,
+      {
+        onTokenWillExpire: () => this._handlers?.onTokenWillExpire?.(),
+        onTokenExpired: () => this._handlers?.onTokenExpired?.(),
+      },
+      this._features,
+    )
+  }
+
+  get message(): MessageRepository {
+    if (!this._domains)
+      throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
+    const messageDomain = this._domains.message
+    const conversationDomain = this._domains.conversation
+
+    return {
+      loadMessages: async (params) => {
+        const result = await messageDomain.fetchHistory(
+          params.conversationId,
+          params.conversationType,
+          params.cursor,
+          params.pageSize,
+        )
+        return {
+          list: result.items as SdkMessage[],
+          cursor: result.cursor,
+          hasMore: result.hasMore,
+        }
+      },
+
+      sendText: async (params) => {
+        return messageDomain.sendText(
+          params.conversationId,
+          params.conversationType,
+          params.content,
+          params.ext,
+          params.needReadReceipt,
+        )
+      },
+
+      sendImage: async (params) => {
+        return messageDomain.sendImage(
+          params.conversationId,
+          params.conversationType,
+          params.data,
+          params.ext,
+          params.needReadReceipt,
+        )
+      },
+
+      sendFile: async (params) => {
+        return messageDomain.sendFile(
+          params.conversationId,
+          params.conversationType,
+          params.data,
+          params.ext,
+          params.needReadReceipt,
+        )
+      },
+
+      sendVoice: async (params) => {
+        return messageDomain.sendVoice(
+          params.conversationId,
+          params.conversationType,
+          params.data,
+          params.duration,
+          params.ext,
+          params.needReadReceipt,
+        )
+      },
+
+      sendVideo: async (params) => {
+        return messageDomain.sendVideo(
+          params.conversationId,
+          params.conversationType,
+          params.data,
+          params.duration,
+          params.ext,
+          params.needReadReceipt,
+        )
+      },
+
+      sendLocation: async (params) => {
+        return messageDomain.sendLocation(
+          params.conversationId,
+          params.conversationType,
+          params.latitude,
+          params.longitude,
+          params.address,
+          params.ext,
+        )
+      },
+
+      sendCustom: async (params) => {
+        const mappedParams = params.customParams
+          ? Object.fromEntries(Object.entries(params.customParams).map(([k, v]) => [k, String(v)]))
+          : undefined
+        return messageDomain.sendCustom(
+          params.conversationId,
+          params.conversationType,
+          params.event,
+          mappedParams,
+          params.ext,
+        )
+      },
+
+      sendCmd: async (params) => {
+        return messageDomain.sendCmd(
+          params.conversationId,
+          params.conversationType,
+          params.action,
+          params.ext,
+        )
+      },
+
+      sendCombine: async (params) => {
+        return messageDomain.sendCombine(
+          params.conversationId,
+          params.conversationType,
+          params.title,
+          params.summary,
+          '',
+          params.messageList,
+          params.ext,
+        )
+      },
+
+      recall: async (params) => {
+        await messageDomain.recall(params.conversationId, params.conversationType, params.messageId)
+      },
+
+      markMessagesRead: async (params) => {
+        await messageDomain.markMessagesRead(
+          params.conversationId,
+          params.conversationType,
+          params.messageIds,
+        )
+      },
+
+      markConversationRead: async (params) => {
+        await conversationDomain.markRead(params.conversationId, params.conversationType)
+      },
+
+      modifyText: async (params) => {
+        await messageDomain.modifyText(
+          params.conversationId,
+          params.conversationType,
+          params.messageId,
+          params.text,
+        )
+      },
+
+      getGroupReadReceiptUsers: async (params) => {
+        const result = await messageDomain.getGroupMessageReadUsers(
+          params.groupId,
+          params.messageId,
+          params.cursor,
+          params.pageSize,
+        )
+        return {
+          list: result.users.map(u => ({ userId: u.userId, timestamp: u.timestamp })),
+          cursor: result.cursor || undefined,
+          hasMore: result.hasMore,
+        }
+      },
+    }
+  }
+
+  get conversation(): ConversationRepository {
+    if (!this._domains)
+      throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
+    const conversationDomain = this._domains.conversation
+    return {
+      fetchConversations: async (_params) => {
+        // SDK5 当前无游标分页，直接返回本地会话全量快照
+        const list = conversationDomain.syncLocal()
+        return { list, cursor: undefined, hasMore: false }
+      },
+    }
+  }
+
+  get contact(): ContactRepository {
+    if (!this._domains)
+      throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
+    const contactDomain = this._domains.contact
+    return {
+      fetchContacts: async (_params) => {
+        // SDK5 联系人当前为全量本地缓存，cursor 与 hasMore 暂不可用
+        const list = contactDomain.syncLocal()
+        return { list, cursor: undefined, hasMore: false }
+      },
+
+      fetchBlocklist: async () => contactDomain.syncBlocklist(),
+
+      addContact: async (userId, message) => {
+        await contactDomain.addContact(userId, message)
+      },
+
+      deleteContact: async (userId) => {
+        await contactDomain.deleteContact(userId)
+      },
+
+      setRemark: async (userId, remark) => {
+        await contactDomain.setRemark(userId, remark)
+      },
+
+      addToBlocklist: async (userIds) => {
+        await contactDomain.addToBlocklist(userIds)
+      },
+
+      removeFromBlocklist: async (userIds) => {
+        await contactDomain.removeFromBlocklist(userIds)
+      },
+    }
+  }
+
+  get group(): GroupRepository {
+    if (!this._domains)
+      throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
+    const groupDomain = this._domains.group
+    return {
+      fetchGroups: async () => groupDomain.syncLocal(),
+
+      fetchGroupInfo: async (groupId) => groupDomain.fetchGroupInfo(groupId),
+
+      createGroup: async (params) => groupDomain.createGroup(params),
+
+      joinGroup: async (groupId, message) => {
+        await groupDomain.joinGroup(groupId, message)
+      },
+
+      leaveGroup: async (groupId) => {
+        await groupDomain.leaveGroup(groupId)
+      },
+
+      destroyGroup: async (groupId) => {
+        await groupDomain.destroyGroup(groupId)
+      },
+
+      fetchGroupMembers: async (groupId, cursor, pageSize) => {
+        return groupDomain.fetchGroupMembers(groupId, cursor, pageSize)
+      },
+
+      removeGroupMembers: async (groupId, userIds) => {
+        await groupDomain.removeGroupMembers(groupId, userIds)
+      },
+
+      inviteUsersToGroup: async (groupId, userIds) => {
+        await groupDomain.inviteUsersToGroup(groupId, userIds)
+      },
+
+      addGroupAdmin: async (groupId, userId) => {
+        await groupDomain.addGroupAdmin(groupId, userId)
+      },
+
+      removeGroupAdmin: async (groupId, userId) => {
+        await groupDomain.removeGroupAdmin(groupId, userId)
+      },
+
+      changeGroupOwner: async (groupId, newOwnerId) => {
+        await groupDomain.changeGroupOwner(groupId, newOwnerId)
+      },
+
+      updateGroupInfo: async (groupId, input) => {
+        await groupDomain.updateGroupInfo(groupId, input)
+      },
+
+      updateGroupConfigs: async (groupId, input) => {
+        await groupDomain.updateGroupConfigs(groupId, input)
+      },
+
+      muteAllGroupMembers: async (groupId) => {
+        await groupDomain.muteAllGroupMembers(groupId)
+      },
+
+      unmuteAllGroupMembers: async (groupId) => {
+        await groupDomain.unmuteAllGroupMembers(groupId)
+      },
+
+      muteGroupMembers: async (groupId, userIds, muteDuration) => {
+        await groupDomain.muteGroupMembers(groupId, userIds, muteDuration)
+      },
+
+      unmuteGroupMembers: async (groupId, userIds) => {
+        await groupDomain.unmuteGroupMembers(groupId, userIds)
+      },
+
+      updateGroupAnnouncement: async (groupId, announcement) => {
+        await groupDomain.updateGroupAnnouncement(groupId, announcement)
+      },
+
+      acceptGroupInvitation: async (groupId) => {
+        await groupDomain.acceptGroupInvitation(groupId)
+      },
+
+      declineGroupInvitation: async (groupId) => {
+        await groupDomain.declineGroupInvitation(groupId)
+      },
+
+      acceptGroupJoinRequest: async (groupId, userId) => {
+        await groupDomain.acceptGroupJoinRequest(groupId, userId)
+      },
+
+      rejectGroupJoinRequest: async (groupId, userId, reason) => {
+        await groupDomain.rejectGroupJoinRequest(groupId, userId, reason)
+      },
+    }
+  }
+
+  get presence(): PresenceRepository {
+    if (!this._domains)
+      throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
+    const presenceDomain = this._domains.presence
+    return {
+      subscribe: async (userIds, expiry) => {
+        await presenceDomain.subscribe(userIds, expiry)
+      },
+
+      unsubscribe: async (userIds) => {
+        await presenceDomain.unsubscribe(userIds)
+      },
+
+      fetchStatus: async (userIds) => {
+        await presenceDomain.fetchStatus(userIds)
+      },
+
+      publish: async (description) => {
+        await presenceDomain.publish(description)
+      },
+    }
+  }
 }
