@@ -1,4 +1,4 @@
-import type { ConversationTypeValue } from './constants'
+import type { ChatConversationType } from './types/message'
 import { CONVERSATION_TYPE } from './constants'
 
 /**
@@ -18,7 +18,7 @@ export const customEventPreviewMap: Record<string, string> = {
  * 保证两端摘要展示一致。
  */
 export function formatConversationPreview(
-  conversationType: ConversationTypeValue,
+  conversationType: ChatConversationType,
   senderName: string | undefined,
   text: string,
 ): string {

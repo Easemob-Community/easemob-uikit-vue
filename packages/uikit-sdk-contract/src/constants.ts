@@ -71,7 +71,8 @@ export type MessageStatusValue =
 
 /**
  * 流式消息状态常量（与 SDK `StreamMessageStatus` 对齐；
- * `STREAM_FULL` 为 SDK 内部全文兜底状态，不通过 onStreamMessage 对外派发，故不收录）。
+ * `STREAM_FULL` 为 SDK 内部全文兜底状态，不通过 onStreamMessage 对外派发，
+ * 类型上保留以兼容 SDK wire 值，避免 SDK5 → 中立消息的结构型赋值报错）。
  */
 export const STREAM_MESSAGE_STATUS = {
   /** 流开始 */
@@ -84,6 +85,8 @@ export const STREAM_MESSAGE_STATUS = {
   COMPLETED: 'STREAM_COMPLETED',
   /** 流式处理异常 */
   ERROR: 'STREAM_ERROR',
+  /** SDK 内部全文兜底状态（不通过 onStreamMessage 对外派发，类型上保留以兼容 SDK wire 值） */
+  STREAM_FULL: 'STREAM_FULL',
 } as const
 
 export type StreamMessageStatusValue =

@@ -310,6 +310,37 @@ importers:
         specifier: ^2.2.12
         version: 2.2.12(typescript@5.9.3)
 
+  packages/uikit-sdk-websdk5:
+    dependencies:
+      '@easemob/uikit-core':
+        specifier: workspace:*
+        version: link:../uikit-core
+      '@easemob/uikit-sdk-contract':
+        specifier: workspace:*
+        version: link:../uikit-sdk-contract
+      easemob-websdk:
+        specifier: ^5.0.0
+        version: 5.0.0
+      pinia:
+        specifier: ^2.1.0 || ^4.0.0
+        version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.21
+        version: 5.4.21(@types/node@26.2.0)
+      vite-plugin-dts:
+        specifier: ^3.9.1
+        version: 3.9.1(@types/node@26.2.0)(rollup@4.62.4)(typescript@5.9.3)(vite@5.4.21(@types/node@26.2.0))
+      vue:
+        specifier: ^3.5.41
+        version: 3.5.41(typescript@5.9.3)
+      vue-tsc:
+        specifier: ^2.2.12
+        version: 2.2.12(typescript@5.9.3)
+
 packages:
 
   '@akryum/tinypool@0.3.1':
