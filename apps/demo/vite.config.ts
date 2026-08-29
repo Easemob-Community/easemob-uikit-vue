@@ -41,10 +41,17 @@ function getUIKitChatroomVersion(): string {
   return chatroomPackage.version ?? 'unknown'
 }
 
+function getUIKitSdkWebsdk5Version(): string {
+  const pkgPath = resolve(__dirname, '../../packages/uikit-sdk-websdk5/package.json')
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version?: string }
+  return pkg.version ?? 'unknown'
+}
+
 const sdkVersion = getSdkVersion()
 const uikitVersion = getUIKitVersion()
 const uikitCoreVersion = getUIKitCoreVersion()
 const uikitChatroomVersion = getUIKitChatroomVersion()
+const uikitSdkWebsdk5Version = getUIKitSdkWebsdk5Version()
 
 export default defineConfig({
   define: {
@@ -52,6 +59,8 @@ export default defineConfig({
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
     __EASEMOB_UIKIT_CORE_VERSION__: JSON.stringify(uikitCoreVersion),
     __EASEMOB_UIKIT_CHATROOM_VERSION__: JSON.stringify(uikitChatroomVersion),
+    // websdk5 适配器源码直连时，adapter client.ts 的版本日志宏需在此定义
+    __EASEMOB_UIKIT_SDK_WEBSDK5_VERSION__: JSON.stringify(uikitSdkWebsdk5Version),
   },
   plugins: [
     vue(),
