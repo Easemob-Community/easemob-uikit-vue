@@ -11,7 +11,8 @@ export * from './types'
 // 中立事件集
 export * from './events'
 
-// 中立纯工具（logger 暂留 core，见迁移注记）
+// 中立纯工具
+export * from './utils/logger'
 export * from './utils/normalize-user-id'
 export * from './message-preview'
 export * from './stream-message'

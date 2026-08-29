@@ -41,6 +41,7 @@
     "vue": "^3.3.0"
   },
   "dependencies": {
+    "@easemob/uikit-sdk-contract": "workspace:*",
     "@vueuse/core": "^14.4.0",
     "easemob-websdk": "^5.0.0"
   },
