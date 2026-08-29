@@ -1183,6 +1183,29 @@
 - **验证**：uikit-im `vue-tsc --noEmit` 0 错误 + `pnpm -F @easemob/uikit-im build`（含 aux --check）通过；新增文件 lint 干净（存量 import/no-duplicates 报错位于未改动区域，按规则未 --fix）。
 - **关联 skill**：`uikit-store-composable` / `uikit-component-authoring` / `uikit-provider-config`
 
+### [ ] D125. 微前端 OA 基座宿主兼容性：单例作用域 / 主题作用域 / window 副作用 / SDK 单例与卸载
+
+- **背景**：私有化 OA 项目提出「OA 基座 + 微前端」，IM 为核心协同能力，UIKIT 定位「未来包提供者 + IM 能力基座」。微前端与 SDK 适配（D122）是两个正交维度：D122 解决"切 4.x/5.x"，微前端解决"UIKIT 被宿主加载时的隔离/单例/生命周期"。当前 UIKIT 有几处"全局假设"在共享 document 的微前端宿主下会变成硬约束。
+- **证据（代码级）**：
+  1. **模块级单例**：`use-toast` / `use-notification`（顶层 `state = ref(...)`，`packages/uikit-core/src/composables/use-notification.ts:63`）、`use-quote`（顶层 `quotedMessage`，`packages/uikit-im/src/composables/use-quote.ts:21`）、`useMessageActions` 多选态、`useLocale` `currentLocale`、`useTheme` —— 多子应用/多实例并存时状态串扰。
+  2. **主题作用域全局**：`packages/uikit-core/src/theme/index.css:1` 变量挂 `:root`，`:412` 暗色用 `[data-uikit-theme="dark"]` 属性选择器（非容器 class），兄弟子应用可互相污染 `--uikit-*`。
+  3. **全局 window 副作用**：通知点击 `window.focus()`、键盘 `window` listener、`download` 走 `window.open`。
+  4. **SDK 单例**：`ChatClient` 全局单例，子应用反复挂载/卸载 + 宿主也可能集成时存在"已初始化/配置冲突"（仓库已有 IM+chatroom 同装配置对齐案例）。
+- **结论/方案**：不重写 UI，把"全局假设"变成"可作用域化/可清理"边界；推荐集成形态为**共享依赖包**（宿主与 IM 子应用共享同一份 Vue + UIKIT），非子应用内独立打包。落地时点：Phase 1 收口后、私有化 OA 基座集成前做专项评估。
+- **建议修法**：见 `docs/MICRO-FRONTEND-COMPATIBILITY.md`（集成形态选择 + 4 点风险清单 + 与 D122 决策 17–20 衔接 + 待确认问题）。
+- **联动**：D122（SDK adapter 抽象，决策 17–20 即微前端催生的补充决策）/ D85（Electron 持久化，window.open/download 注入点同源）/ D123（生命周期对称：卸载清理事件监听）。
+- **关联 skill**：`uikit-package-boundary` / `uikit-provider-config` / `uikit-styling-theming`
+
+### [ ] D126. IM 职责边界与 OA↔UIKIT 接入契约（不做清单）
+
+- **背景**：私有化 OA 项目把 UIKIT 定位为「IM 能力基座 + 包提供者」。为避免 UIKIT 越界耦合、做无谓设计/开发，把"守好 IM 职责"落成可执行的边界清单与接入契约。
+- **结论/方案**：架构五包封顶（core / sdk-contract / uikit-im / websdk5 adapter / webim4 adapter），不再新增 portal/集成/消息总线层；扩展点复用现有（`useChatPlugin`/插槽/`dataSource`→repository/adapter/`features`），不新造；定开两级接入（最小接入 + 源码直连）。
+- **不做清单（守职责核心）**：① 不碰登录/认证（只接受 token）；② 不碰组织架构/用户主数据（走 `dataSource`/repository 注入）；③ 不建消息队列/缓存/权限中心；④ 不引入 Vuetify3/微前端框架/Electron 专属逻辑（只提供 D85 注入点）；⑤ 不改公开组件 API 迁就平台。
+- **接入契约**：OA 底座管 token/用户数据/路由/权限；UIKIT 管拿到 token + appKey 后的一切 IM 行为（会话/消息/联系人/群/回执/通知）。
+- **建议修法**：见 `docs/IM-RESPONSIBILITY-BOUNDARY.md`。
+- **联动**：D122（SDK adapter 抽象）/ D125（微前端宿主兼容）/ D85（Electron 持久化注入点）。
+- **关联 skill**：`uikit-package-boundary` / `uikit-provider-config` / `uikit-chat-plugin-tabs`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

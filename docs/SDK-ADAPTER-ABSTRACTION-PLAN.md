@@ -357,6 +357,16 @@ interface MessageRepository {
 15. **`SdkConfig` 透传槽**：中立 `SdkConfig` 保留 `adapterConfig?: Record<string, unknown>` 透传槽（或等价机制），现有 `sdkConfig` 里的 SDK 特定字段（`enableSyncData`/`deviceId`/`enableUserInfoSync`/`managers` 等）经此透传给 adapter 的 `init`，不被中立契约约束。chatroom 的 `ChatManager/ChatRoomManager/UserInfoManager` 注入也走该槽。
 16. **消息 ID 去重键沿用 `msgServerId`**：不新造 `serverId` 字段名，避免 UI 层大面积改名；4.x `id` → `msgServerId` 的映射由 adapter 承担（与决策 6 一致）。
 
+### 已确认决策（SDK 暴露模型与生命周期，OA 微前端讨论补充）
+
+17. **「创建权」与「暴露」解耦**：SDK 实例「由谁创建」（内置 vs 注入）与「能否被业务直接调用」（暴露）是两个正交问题。满足"SDK 对外暴露、业务可独立调用"**不需要**业务自己 import SDK 建实例——UIKit 内置创建后经 `useClient()` 暴露实例同样满足。两个入口并存：**默认内置**（未传 `adapter` 时内部 `new Websdk5Adapter()`，私有化项目里 `new Webim4Adapter()`）+ **可选注入**（业务已自建 client 时传 `new Webim4Adapter(connection)`），避免双 client。这样"开箱即用"与"用户可独立调用"同时成立。
+18. **单一生命周期所有者（压复杂度的核心原则）**：内置模式 = UIKit 全权（login/logout/dispose 归 UIKit）；注入模式 = 业务全权（UIKit 只订阅事件 + 借实例操作，绝不替业务 login/logout/dispose）。**禁止"半注入"**（业务建 client 但 UIKit 管 login）。此条写进 `SdkAdapter` 契约注释并加断言/门禁，把复杂度封死在适配层边界，不扩散到 UI 层。这是"支持注入"唯一会引入复杂度的点，用这条原则压死它。
+19. **`useClient()` 返回中立 `SdkAdapter`，不泄漏 SDK 类型**：当前 `useClient()` 返回 `client`/`sdkClient`（SDK5 原生类型，`packages/uikit-core/src/composables/use-client.ts`），会从公开 API 泄漏 SDK 类型、破坏"纯 UIKIT"。Phase 1 后改为返回中立 `SdkAdapter`；原生实例经 `adapter.client`（`unknown`/可选）拿；需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带 `ChatClient`/`connection`。
+20. **非 Vue 上下文的独立调用入口**：`useClient()` 是 `provide/inject` 绑定、只能在 Provider 子树内用；OA 基座里"SDK 对外独立调用"往往意味着非 Vue 上下文（别的子应用 / 主进程 IPC / 定时任务）。除 `useClient()` 外，需提供非 context 访问口（如 `login()` 返回实例，或 adapter 实例挂在确定位置 / 模块级 getter）。Phase 1 落地时一并设计。
+21. **UIKit 层门面生命周期（launch/disposer + 单实例，借鉴声网灵动课堂）**：SDK 生命周期（决策 18）之外，UIKit 自身还有一层"门面 + 生命周期"语义需要显式化——IM 作为 OA 的常驻全局能力，对外只有一个门面（`UIKitProvider` + `useUIKit()`，已是雏形），需补齐「挂载 → 卸载」的 disposer 语义 + 单实例约束（同一 OA 窗口内 IM 单实例）。借鉴声网 `AgoraEduSDK.launch(dom, option) → disposer` + `lock()/unlock()` 模式：对外最小化门面、内部复杂度全隐藏、启动返回可完整卸载的 disposer、`lock/unlock` 保证单实例。落地牵引：Phase 1 收口时把 `useUIKit()` 的 logout/重置语义补齐为**对称的 mount/unmount 生命周期**（与 D123 生命周期对称原则一致）；D125 微前端专项时验证子应用卸载能经 disposer 干净回收（store/事件/监听全清）。
+
+> 微前端 OA 基座宿主兼容性（单例作用域 / 主题作用域 / window 副作用 / SDK 卸载）是**独立维度**，与本节 SDK 适配正交，见 [`docs/MICRO-FRONTEND-COMPATIBILITY.md`](MICRO-FRONTEND-COMPATIBILITY.md)（TECH-DEBT D125）。
+
 > 剩余**实施细节**（DTO 精确字段清单、归一化映射表补齐、手测矩阵 checklist）在 Phase 1/2 开发前逐项生成，不影响架构决策。
 
 ---
