@@ -3,6 +3,7 @@ import type {
   MessageStatusValue,
   MessageTypeValue,
   NoticeEventTypeValue,
+  StreamMessageStatusValue,
 } from '../constants'
 
 /**
@@ -82,7 +83,7 @@ export interface StreamMessageMeta {
   /** 当前分片序号 */
   seq: number
   /** 当前对外流式消息状态 */
-  status: MessageStatusValue
+  status: StreamMessageStatusValue
   /** 流式处理错误码；0 表示无错误 */
   errorType: number
   /** 服务端返回的结束原因 */
