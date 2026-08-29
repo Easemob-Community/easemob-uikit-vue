@@ -3,4 +3,7 @@
 // 翻译成中立契约，UI 与下游零改动。
 
 export * from './sdk-types'
+export * from './client'
+export * from './adapter'
 export * from './adapter/message-adapter'
+export * from './domain/message-domain'

@@ -24,12 +24,10 @@ import type {
   GroupUserRemovedEventPayload,
   UserInfo,
 } from 'easemob-websdk'
-import { t } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import type { UiContactInvite } from '@easemob/uikit-sdk-contract'
+import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
-import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '@easemob/uikit-core'
 
 const groupLog = createLogger('UIKit:GroupEvents')
 
@@ -57,6 +55,7 @@ function formatMemberNotice(
   singleKey: string,
   multipleKey: string,
 ): string {
+  const { t, resolveNoticeUserName } = getEventHandlerDeps()
   if (members.length === 0)
     return ''
   const first = members[0]
@@ -74,6 +73,7 @@ function buildMemberNoticeParams(
   members: ReadonlyArray<UserInfo>,
   currentUserId: string,
 ): Record<string, string | number | boolean> {
+  const { t, resolveNoticeUserName } = getEventHandlerDeps()
   const nonSelf = members.find(m => m.userId !== currentUserId) ?? members[0]
   const name = nonSelf?.userId === currentUserId ? t('chat.notice.you') : resolveNoticeUserName(nonSelf)
   return {
@@ -85,6 +85,8 @@ function buildMemberNoticeParams(
 
 /** 创建 GroupManager 事件处理器。 */
 export function createGroupHandlers(stores: EventStores): GroupEventHandlerMap {
+  const { t, insertChatNotice, buildAnnouncementNoticeText, resolveNoticeUserName } = getEventHandlerDeps()
+
   function isJoinedGroup(groupId: string): boolean {
     return stores.group.groupList.some(g => g.groupId === groupId)
   }

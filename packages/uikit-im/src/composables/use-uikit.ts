@@ -1,23 +1,57 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
-import { WEBSDK5_MANAGERS } from '@easemob/uikit-sdk-websdk5'
-import type { ClientConfig, ConnectionEventCallbacks, ManagerHost, UIKitClient } from '@easemob/uikit-sdk-websdk5'
+import {
+  ContactDomain,
+  ConversationDomain,
+  GroupDomain,
+  MessageDomain,
+  WEBSDK5_MANAGERS,
+  registerEventHandlers,
+  resolveUserDisplayName,
+  setEventHandlerDeps,
+} from '@easemob/uikit-sdk-websdk5'
+import type {
+  ClientConfig,
+  ConnectionEventCallbacks,
+  EventHandlerDeps,
+  ManagerHost,
+  PresenceDomain,
+  UIKitClient,
+  UserInfoDomain,
+} from '@easemob/uikit-sdk-websdk5'
 import type { H5AdaptationConfig, NoticeConfig, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
-import { useCoreUIKitProvider } from '@easemob/uikit-core'
-import type { PresenceDomain, UserInfoDomain } from '@easemob/uikit-sdk-websdk5'
-import { ContactDomain, ConversationDomain, GroupDomain, MessageDomain } from '@easemob/uikit-sdk-websdk5'
-import { registerEventHandlers } from '@easemob/uikit-sdk-websdk5'
+import {
+  buildAnnouncementNoticeText,
+  emitNotificationDelivered,
+  insertChatNotice,
+  resolveNoticeUserName,
+  t,
+  useCoreUIKitProvider,
+  useNotification,
+} from '@easemob/uikit-core'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
 import { useGroupStore } from '../store/group'
 import type { RootStores } from '../sdk/types'
-import { resolveUserDisplayName } from '@easemob/uikit-sdk-websdk5'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
 import { useInvitePersistenceInternal } from './use-invite-persistence'
 
 // 构建期注入：@easemob/uikit-im 包版本（vite define，见 vite.config.ts）
 declare const __EASEMOB_UIKIT_VERSION__: string
+
+// 注入 adapter 事件层所需的 UIKit 能力（i18n / 通知 / 系统通知插入）。
+// adapter 包零依赖 core，依赖由场景包在启动前注入。
+setEventHandlerDeps({
+  t,
+  // core 的 insertChatNotice 实际只需要 EventStores 子集，签名窄于 adapter 侧接口；
+  // 用结构超集调用是安全的，这里做一次类型适配。
+  insertChatNotice: insertChatNotice as EventHandlerDeps['insertChatNotice'],
+  buildAnnouncementNoticeText,
+  resolveNoticeUserName,
+  useNotification,
+  emitNotificationDelivered,
+})
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob/uikit-core'
 export type { H5AdaptationConfig } from '@easemob/uikit-core'

@@ -1,19 +1,23 @@
 import type { ChatEventHandlerMap } from 'easemob-websdk'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
-import { formatSdkError } from '../utils/sdk-error'
-import { t } from '@easemob/uikit-core'
-import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
-import type { ManagerHost } from '../client'
-import type { UIKitFeatures } from '@easemob/uikit-core'
+import {
+  CONVERSATION_TYPE,
+  MESSAGE_STATUS,
+  MESSAGE_TYPE,
+  createLogger,
+  formatConversationPreview,
+  isStreamActive,
+} from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
 import { toUiGroups } from '../adapter/group-adapter'
-import { notifyOnNewMessage } from '../notification-engine'
-import { isStreamActive } from '@easemob/uikit-sdk-contract'
 import { markReadReceiptSent } from '../domain/message-domain'
+import { formatSdkError } from '../utils/sdk-error'
+import { notifyOnNewMessage } from '../notification-engine'
 import { setSyncStatus } from '../use-sync-status'
-import { formatConversationPreview } from '@easemob/uikit-sdk-contract'
+import type { ManagerHost } from '../client'
+import { getEventHandlerDeps } from './deps'
 import { resolveSenderDisplayName, resolveUserDisplayName } from './resolve-display-name'
 import type { EventStores } from './types'
 
@@ -215,6 +219,7 @@ function patchConversationLastMessageOnRecall(
 
   const isGroup = conversationType === CONVERSATION_TYPE.GROUPCHAT
   const senderName = isGroup ? resolveSenderDisplayName(stores, recalledMsg) : undefined
+  const { t } = getEventHandlerDeps()
   stores.conversation.updateConversation(conversationId, {
     lastMessageText: formatConversationPreview(
       conversationType,

@@ -26,9 +26,26 @@
  * 则恢复 WARN。
  */
 
-import { appendLog } from '@easemob/uikit-core'
-
 type SdkLogLevelName = 'DEBUG' | 'WARN' | 'ERROR'
+
+/** 日志落库回调（由 UIKit core 注入，避免 adapter 反向依赖 core） */
+export interface LogEntry {
+  level: 'debug' | 'warn' | 'error'
+  source: 'sdk'
+  message: string
+  args: unknown[]
+}
+
+let _appendLog: ((entry: LogEntry) => void) | null = null
+
+/** 注入 SDK 日志落库实现（core 在启用日志持久化时调用） */
+export function setSdkLogAppender(appender: (entry: LogEntry) => void): void {
+  _appendLog = appender
+}
+
+function appendLog(entry: LogEntry): void {
+  _appendLog?.(entry)
+}
 
 /** SDK 模块的鸭子类型（setLogger/getLogger 为前瞻能力，5.0.0 未导出） */
 interface SdkLoggerModule {

@@ -1,9 +1,8 @@
-import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
-import type { ManagerHost } from '../client'
-import type { UserInfoStore } from '@easemob/uikit-core'
-import type { UIKitDataSource } from '@easemob/uikit-core'
-import { formatSdkError } from '../utils/sdk-error'
 import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { UIKitDataSource, UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
+import type { ManagerHost } from '../client'
+import type { UserInfoStoreLike } from '../event/types'
+import { formatSdkError } from '../utils/sdk-error'
 
 const logger = createLogger('UIKit:UserInfoDomain')
 
@@ -34,7 +33,7 @@ export class UserInfoDomain {
 
   constructor(
     private client: ManagerHost,
-    private store: UserInfoStore,
+    private store: UserInfoStoreLike,
     private dataSource: UIKitDataSource = {},
     private onSubscriptionPermissionError?: () => void,
   ) {}
@@ -312,4 +311,4 @@ export class UserInfoDomain {
   }
 }
 
-export type { UserInfoStore }
+export type { UserInfoStoreLike }

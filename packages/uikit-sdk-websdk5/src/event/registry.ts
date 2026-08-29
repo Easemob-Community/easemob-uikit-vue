@@ -1,7 +1,7 @@
 import { createConnectionHandlers } from './connection-events'
 import type { ConnectionEventCallbacks } from './connection-events'
 import type { ManagerHost } from '../client'
-import type { UIKitFeatures } from '@easemob/uikit-core'
+import type { UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import { resetSyncStatus } from '../use-sync-status'
 import type { EventStores } from './types'
 import { createChatHandlers, resetChatEventState } from './chat-events'

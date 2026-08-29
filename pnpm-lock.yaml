@@ -318,9 +318,6 @@ importers:
 
   packages/uikit-sdk-webim4:
     dependencies:
-      '@easemob/uikit-core':
-        specifier: workspace:*
-        version: link:../uikit-core
       '@easemob/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
@@ -349,9 +346,6 @@ importers:
 
   packages/uikit-sdk-websdk5:
     dependencies:
-      '@easemob/uikit-core':
-        specifier: workspace:*
-        version: link:../uikit-core
       '@easemob/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract

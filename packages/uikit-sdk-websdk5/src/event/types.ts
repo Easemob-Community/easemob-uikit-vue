@@ -9,6 +9,7 @@ import type {
   UiMessage,
   UiPresence,
   UserInfo,
+  UserInfoAttribute,
 } from '@easemob/uikit-sdk-contract'
 
 /**
@@ -130,6 +131,22 @@ export interface ClientStoreLike {
 
 export interface UserInfoStoreLike {
   getUserInfo: (userId: string) => UserInfo | undefined
+  setUserInfo: (userInfo: UserInfo) => void
+  setUserInfos: (infos: UserInfo[]) => void
+  areAttributesFetched: (userId: string, attributes: UserInfoAttribute[]) => boolean
+  markFetchedAttributes: (userIds: string[], attributes: UserInfoAttribute[]) => void
+  markLoading: (userIds: string[]) => void
+  markLoaded: (userIds: string[]) => void
+  markFetchFailed: (userIds: string[]) => void
+  isFetchFailed: (userId: string) => boolean
+  markSubscribed: (userIds: string[]) => void
+  markUnsubscribed: (userIds: string[]) => void
+  markSubscribeFailed: (userIds: string[]) => void
+  isSubscribeFailed: (userId: string) => boolean
+  isSubscribed: (userId: string) => boolean
+  disableSubscription: () => void
+  isSubscriptionDisabled: () => boolean
+  isLoading: (userId: string) => boolean
 }
 
 /** 事件处理器可访问的 store 集合（中立最小接口） */

@@ -333,7 +333,9 @@ export function configureLogPersistence(config: LogPersistenceConfig): void {
     warnOnce(`dbName changed after database opened ("${prev.dbName}"), keeping the original one`)
   if (_config.collectSdkLog !== prev.collectSdkLog || _config.enabled !== prev.enabled) {
     // 动态引入避免与 sdk-log-capture 形成静态循环依赖
-    void import('@easemob/uikit-sdk-websdk5').then(({ disableSdkLogCapture, enableSdkLogCapture }) => {
+    void import('@easemob/uikit-sdk-websdk5').then(({ disableSdkLogCapture, enableSdkLogCapture, setSdkLogAppender }) => {
+      // 注入日志落库实现：adapter 只负责捕获，持久化由 core 提供
+      setSdkLogAppender(appendLog)
       if (_config.enabled && _config.collectSdkLog)
         enableSdkLogCapture()
       else

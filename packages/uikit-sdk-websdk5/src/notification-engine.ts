@@ -1,10 +1,9 @@
 import type { Message as SdkMessage } from 'easemob-websdk'
+import { CONVERSATION_TYPE, resolveLastMessageText } from '@easemob/uikit-sdk-contract'
 import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE } from '@easemob/uikit-sdk-contract'
-import { emitNotificationDelivered, useNotification } from '@easemob/uikit-core'
-import { resolveLastMessageText } from '@easemob/uikit-sdk-contract'
-import { resolveSenderDisplayName } from './event/resolve-display-name'
 import { normalizeUserId, toUiMessage } from './adapter/message-adapter'
+import { getEventHandlerDeps } from './event/deps'
+import { resolveSenderDisplayName } from './event/resolve-display-name'
 import type { EventStores } from './event/types'
 
 /**
@@ -23,6 +22,7 @@ import type { EventStores } from './event/types'
  * - 页面可见（always 模式）：仅页内右上角弹窗
  */
 export function notifyOnNewMessage(stores: EventStores, sdkMsg: SdkMessage) {
+  const { useNotification, emitNotificationDelivered } = getEventHandlerDeps()
   const { state, notify, notifyBrowser } = useNotification()
 
   if (!state.value.enabled)

@@ -7,7 +7,7 @@ export * from './client'
 // SDK5 专属来源/条目类型（SdkContactSource / SdkGroupSource / GroupMemberEntry / GroupMuteEntry）
 export * from './sdk-types'
 
-// 事件层（连接级 + 各 manager 事件 + 注册器 + 显示名解析）
+// 事件层（连接级 + 各 manager 事件 + 注册器 + 显示名解析 + 依赖注入）
 export * from './event/connection-events'
 export * from './event/registry'
 export * from './event/chat-events'
@@ -15,6 +15,8 @@ export * from './event/contact-events'
 export * from './event/group-events'
 export * from './event/presence-events'
 export * from './event/resolve-display-name'
+export { setEventHandlerDeps } from './event/deps'
+export type { EventHandlerDeps } from './event/deps'
 
 // 通知引擎 / 同步状态
 export * from './notification-engine'

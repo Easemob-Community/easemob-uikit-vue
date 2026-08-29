@@ -1,10 +1,8 @@
 import type { ContactEventHandlerMap, ContactRosterEventPayload } from 'easemob-websdk'
-import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-sdk-contract'
-import { t } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import type { UiContactInvite } from '@easemob/uikit-sdk-contract'
+import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
-import { insertChatNotice } from '@easemob/uikit-core'
 
 const contactLog = createLogger('UIKit:ContactEvents')
 
@@ -28,6 +26,7 @@ function toUiInvite(payload: ContactRosterEventPayload, status: UiContactInvite[
  * 创建 ContactManager 事件处理器。
  */
 export function createContactHandlers(stores: EventStores): ContactEventHandlerMap {
+  const { t, insertChatNotice } = getEventHandlerDeps()
   return {
     onContactInvited: (payload) => {
       contactLog.info('onContactInvited', { from: payload.from })
