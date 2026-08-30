@@ -1,7 +1,7 @@
 import type { Message as SdkMessage } from 'easemob-websdk'
 import { CONVERSATION_TYPE, resolveLastMessageText } from '@easemob/uikit-sdk-contract'
 import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
-import { normalizeUserId, toUiMessage } from './adapter/message-adapter'
+import { defaultAdapterPreviewLabels, normalizeUserId, toUiMessage } from './adapter/message-adapter'
 import { getEventHandlerDeps } from './event/deps'
 import { resolveSenderDisplayName } from './event/resolve-display-name'
 import type { EventStores } from './event/types'
@@ -48,7 +48,7 @@ export function notifyOnNewMessage(stores: EventStores, sdkMsg: SdkMessage) {
   const item = {
     // 群聊标题为群名（正文含 "发送者: 内容" 前缀），单聊标题为发送者名
     title: isGroup ? (cvs?.name || senderName) : senderName,
-    body: resolveLastMessageText(uiMsg, undefined, senderName),
+    body: resolveLastMessageText(uiMsg, undefined, senderName, undefined, defaultAdapterPreviewLabels),
     // 群聊用群头像，单聊用发送者头像
     avatar: isGroup ? cvs?.avatar : stores.userInfo.getUserInfo(sdkMsg.from)?.avatarUrl,
     timestamp: uiMsg.timestamp || Date.now(),

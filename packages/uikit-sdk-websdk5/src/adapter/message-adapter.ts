@@ -16,10 +16,27 @@ import {
   isVoiceBody as isVoiceMessageBody,
   normalizeUserId,
 } from '@easemob/uikit-sdk-contract'
-import type { CombineMessageBody, ConversationTypeValue, UiMessage } from '@easemob/uikit-sdk-contract'
-import { customEventPreviewMap } from '@easemob/uikit-sdk-contract'
+import type { CombineMessageBody, ConversationTypeValue, MessagePreviewLabels, UiMessage } from '@easemob/uikit-sdk-contract'
+import { customEventPreviewMap, mergeMessagePreviewLabels } from '@easemob/uikit-sdk-contract'
 
 const adapterLog = createLogger('UIKit:MessageAdapter')
+
+/**
+ * websdk5 adapter 内部默认摘要标签（中文，与历史 UI 行为保持一致）。
+ * 后续可通过 adapterConfig 注入覆盖，实现多语言。
+ */
+export const defaultAdapterPreviewLabels: MessagePreviewLabels = {
+  image: '[图片]',
+  sticker: '[表情]',
+  voice: '[语音]',
+  video: '[视频]',
+  file: '[文件]',
+  location: '[位置]',
+  combine: '[聊天记录]',
+  custom: customEventPreviewMap,
+  customFallback: '[自定义]',
+  unknown: '',
+}
 
 /**
  * 归一化用户标识（跨设备/资源后缀场景下的身份比较）。
@@ -88,38 +105,46 @@ export function toUiMessages(sdkMsgs: readonly SdkMessage[], currentUserId: stri
 }
 
 /** 从 SDK Message 提取消息摘要文本 */
-export function extractLastMessageText(sdkMsg: SdkMessage | null | undefined): string {
+export function extractLastMessageText(
+  sdkMsg: SdkMessage | null | undefined,
+  labels?: Partial<MessagePreviewLabels>,
+): string {
   if (!sdkMsg)
     return ''
 
+  const l = mergeMessagePreviewLabels({ ...defaultAdapterPreviewLabels, ...labels })
   const { body } = sdkMsg
   if (isTextMessageBody(body))
     return body.content || ''
   if (isImageMessageBody(body))
-    return '[图片]'
+    return l.image
   if (isVoiceMessageBody(body))
-    return '[语音]'
+    return l.voice
   if (isVideoMessageBody(body))
-    return '[视频]'
+    return l.video
   if (isFileMessageBody(body))
-    return body.filename || '[文件]'
+    return body.filename || l.file
   if (isLocationMessageBody(body))
-    return '[位置]'
+    return l.location
   if (isCustomMessageBody(body))
     // 自定义消息按 event 查共享映射（与消息驱动摘要一致，如名片 userCard → [名片]）
-    return customEventPreviewMap[body.event || ''] || '[自定义]'
+    return l.custom[body.event || ''] || l.customFallback
   if (isCmdMessageBody(body))
     return '[命令]'
   if (isCombineMessageBody(body))
-    return body.summary || '[聊天记录]'
+    return body.summary || l.combine
   return ''
 }
 
 /** 从会话最后一条消息摘要（SessionMessageSnippet）提取文本 */
-export function extractSnippetText(snippet: SessionMessageSnippet | null | undefined): string {
+export function extractSnippetText(
+  snippet: SessionMessageSnippet | null | undefined,
+  labels?: Partial<MessagePreviewLabels>,
+): string {
   if (!snippet)
     return ''
 
+  const l = mergeMessagePreviewLabels({ ...defaultAdapterPreviewLabels, ...labels })
   const body = snippet.body || {}
   switch (snippet.type) {
     case MESSAGE_TYPE.TEXT:
@@ -127,24 +152,24 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
       // content 为空时尝试 summary，避免预览空白
       return (body.content as string) || (body.summary as string) || ''
     case MESSAGE_TYPE.IMAGE:
-      return '[图片]'
+      return l.image
     case MESSAGE_TYPE.VOICE:
-      return '[语音]'
+      return l.voice
     case MESSAGE_TYPE.VIDEO:
-      return '[视频]'
+      return l.video
     case MESSAGE_TYPE.FILE:
-      return (body.filename as string) || '[文件]'
+      return (body.filename as string) || l.file
     case MESSAGE_TYPE.LOCATION:
-      return '[位置]'
+      return l.location
     case MESSAGE_TYPE.CUSTOM: {
       // 自定义消息按 event 查共享映射（与消息驱动摘要一致，如名片 userCard → [名片]）
       const event = extractCustomEvent(body)
-      return customEventPreviewMap[event] || '[自定义]'
+      return l.custom[event] || l.customFallback
     }
     case MESSAGE_TYPE.CMD:
       return '[命令]'
     case MESSAGE_TYPE.COMBINE:
-      return (body.summary as string) || '[聊天记录]'
+      return (body.summary as string) || l.combine
     default: {
       // SDK 链路异常时 snippet.type 可能落为 'unknown' 等未知值
       // （如 toConversationSummary 从被 stripBodyType 清空的 body.type 读类型）。
@@ -153,7 +178,7 @@ export function extractSnippetText(snippet: SessionMessageSnippet | null | undef
       // 优先识别自定义 event，避免 userCard 等自定义消息在会话列表空白。
       const event = extractCustomEvent(body)
       if (event)
-        return customEventPreviewMap[event] || '[自定义]'
+        return l.custom[event] || l.customFallback
       return (body.content as string) || (body.summary as string) || (body.msg as string) || ''
     }
   }
