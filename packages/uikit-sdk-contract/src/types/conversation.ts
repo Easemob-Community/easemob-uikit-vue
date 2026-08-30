@@ -1,5 +1,12 @@
 import type { ConversationTypeValue } from '../constants'
 
+/**
+ * 会话类型（wire 层，含 chatRoom）。
+ * UIKit 业务侧用 `ConversationTypeValue`（singleChat/groupChat）收窄单群聊；
+ * SDK 消息的 `conversationType` 用本三值联合（与 SDK5 `ChatConversationType` 对齐）。
+ */
+export type ChatConversationType = 'singleChat' | 'groupChat' | 'chatRoom'
+
 /** UIKit 会话展示类型 */
 export interface UiConversation {
   /** 会话 ID */

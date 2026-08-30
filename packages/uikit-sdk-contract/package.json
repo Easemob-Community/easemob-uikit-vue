@@ -18,13 +18,12 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "vite build && tsc --noEmit --project tsconfig.build.json",
     "dev": "vite build --watch"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
-    "vite-plugin-dts": "^3.9.1",
-    "vue-tsc": "^2.2.12"
+    "vite-plugin-dts": "^3.9.1"
   }
 }

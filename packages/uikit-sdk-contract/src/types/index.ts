@@ -1,4 +1,4 @@
-export * from './message'
+export * from './message/index'
 export * from './conversation'
 export * from './contact'
 export * from './group'
