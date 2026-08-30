@@ -1,11 +1,26 @@
 import type { ManagerHost } from '../client'
 import type { UiConversation } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
+import type { ConversationRepository, ConversationTypeValue } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { createLogger } from '@easemob/uikit-sdk-contract'
 
 const conversationLogger = createLogger('Conversation')
+
+/**
+ * 会话排序：置顶优先（按 pinnedTime 倒序），其余按最后一条消息时间倒序。
+ * 注入 repository 的 refresh 路径使用（SDK 默认路径由 refreshSessionList 事件回填，
+ * 不经本函数）。稳定排序，时间相同项保持追加顺序（对齐 webim4 sortConversations）。
+ */
+function sortConversations(list: readonly UiConversation[]): UiConversation[] {
+  return [...list].sort((a, b) => {
+    if (a.isPinned !== b.isPinned)
+      return a.isPinned ? -1 : 1
+    if (a.isPinned)
+      return (b.pinnedTime ?? 0) - (a.pinnedTime ?? 0)
+    return (b.lastMessageTime ?? 0) - (a.lastMessageTime ?? 0)
+  })
+}
 
 /**
  * 诊断：打印 SDK 原始会话项中 combine/unknown 类型的 lastMessage 形态。
@@ -70,6 +85,13 @@ export class ConversationDomain {
        * 优先于 SDK lastMessage.sender.nickname，用于资料已缓存时直接展示昵称。
        */
       resolveSenderName?: (userId: string) => string | undefined
+      /**
+       * 会话数据入口接管注入（Phase 3.1 留口子）：当前仅消费 `fetchConversations`
+       * （refresh 委托），其余方法为后续 DB 阶段预留。
+       * Conversation repository override (Phase 3.1 seam): only
+       * `fetchConversations` is consumed (refresh delegation) for now.
+       */
+      conversationRepository?: Partial<ConversationRepository>
     } = {},
   ) {}
 
@@ -97,8 +119,39 @@ export class ConversationDomain {
     return list
   }
 
-  /** 主动刷新服务端会话列表，由 onConversationListUpdate 事件回填 store */
+  /**
+   * 主动刷新服务端会话列表，由 onConversationListUpdate 事件回填 store。
+   * 数据入口接管（Phase 3.1）：注入 fetchConversations 时改走注入实现
+   * （游标翻页至 hasMore=false 合并全量后直接 setList，不触 SDK 也无事件回填）。
+   */
   async refresh(includeEmpty = false) {
+    const fetchConversations = this.hooks.conversationRepository?.fetchConversations
+    if (fetchConversations) {
+      const items: UiConversation[] = []
+      let cursor: string | undefined
+      do {
+        const page = await fetchConversations({ cursor, pageSize: 50 })
+        items.push(...page.list)
+        cursor = page.hasMore ? page.cursor : undefined
+      } while (cursor)
+      // 去重（同 id 后者覆盖前者），并继承现有列表已补全的名称/头像，
+      // 避免注入源缺资料时把已补全值冲回 ID（对齐 mergeWithExistingConversations 语义）
+      const existing = this.store.conversationList ?? []
+      const prevById = new Map(existing.map(cvs => [cvs.id, cvs]))
+      const merged = new Map<string, UiConversation>()
+      for (const item of items) {
+        const prev = prevById.get(item.id)
+        merged.set(item.id, prev
+          ? {
+            ...item,
+            name: (!item.name || item.name === item.id) && prev.name && prev.name !== prev.id ? prev.name : item.name,
+            avatar: item.avatar || prev.avatar,
+          }
+          : item)
+      }
+      this.store.setList(sortConversations(Array.from(merged.values())))
+      return
+    }
     await this.client.chatManager.refreshSessionList({ includeEmpty })
   }
 

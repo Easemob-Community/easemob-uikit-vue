@@ -1,8 +1,10 @@
-import type { GroupMessageReadUser, GroupMessageReadUsersResult, Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
+import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
 import type { MessageStatus, UiMessage } from '@easemob/uikit-sdk-contract'
 import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
+import type { MessageRepository, SdkMessage as NeutralSdkMessage } from '@easemob/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
+import { MESSAGE_STATUS, normalizeUserId } from '@easemob/uikit-sdk-contract'
 import { toUiMessage } from '../adapter/message-adapter'
 import { isVoiceBody } from '@easemob/uikit-sdk-contract'
 import { createLogger } from '@easemob/uikit-sdk-contract'
@@ -95,6 +97,34 @@ export interface MessageStoreLike {
   updateMessageById: (msgId: string, patch: Partial<UiMessage>) => void
 }
 
+/** MessageDomain 装配选项 */
+export interface MessageDomainOptions {
+  /**
+   * 消息数据入口接管注入（Phase 3.1 留口子）：当前仅消费 `loadMessages`
+   * （fetchHistory 委托），其余方法为后续 DB 阶段预留。
+   * Message repository override (Phase 3.1 seam): only `loadMessages`
+   * is consumed (fetchHistory delegation) for now.
+   */
+  messageRepository?: Partial<MessageRepository>
+}
+
+/**
+ * 中立 SdkMessage → UiMessage（注入 repository 路径用）：
+ * 注入方返回的是中立形状，补 UI 派生字段（isSelf/localId/status），
+ * 推导规则与 adapter/message-adapter 的 toUiMessage 保持一致。
+ */
+function hydrateUiMessage(msg: NeutralSdkMessage, currentUserId: string): UiMessage {
+  const isSelf = normalizeUserId(msg.from) === normalizeUserId(currentUserId)
+  return {
+    ...msg,
+    isSelf,
+    localId: msg.msgLocalId,
+    status: isSelf && msg.isPeerRead === true
+      ? MESSAGE_STATUS.READ
+      : (msg.sendStatus ?? MESSAGE_STATUS.SENT),
+  }
+}
+
 /**
  * 消息业务域：封装 SDK ChatManager 的消息相关能力。
  */
@@ -102,6 +132,7 @@ export class MessageDomain {
   constructor(
     private client: ManagerHost,
     private store: MessageStoreLike,
+    private options: MessageDomainOptions = {},
   ) {}
 
   // ===== 发送消息 =====
@@ -354,6 +385,25 @@ export class MessageDomain {
     cursor?: string,
     pageSize = 20,
   ) {
+    // 数据入口接管（Phase 3.1）：注入 loadMessages 时走注入实现，不触 SDK；
+    // store 写入 / 群已读数补全等副作用与 SDK 默认路径完全对齐。
+    const loadMessages = this.options.messageRepository?.loadMessages
+    if (loadMessages) {
+      const page = await loadMessages({ conversationId, conversationType, cursor, pageSize })
+      // CMD 消息为透传命令不上屏，注入路径同样过滤
+      const injectedMsgs = page.list
+        .filter(msg => msg.type !== MESSAGE_TYPE.CMD)
+        .map(msg => hydrateUiMessage(msg, this.currentUserId))
+      this.store.prependMessages(conversationId, injectedMsgs)
+      if (conversationType === CONVERSATION_TYPE.GROUPCHAT)
+        void this.fillGroupReadCounts(injectedMsgs, conversationId)
+      return {
+        items: injectedMsgs,
+        cursor: page.cursor,
+        hasMore: page.hasMore,
+      }
+    }
+
     const page = await this.client.chatManager.getHistoryMessages({
       conversationId,
       conversationType,

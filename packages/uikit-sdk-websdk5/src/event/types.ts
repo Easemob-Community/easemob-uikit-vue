@@ -127,6 +127,13 @@ export interface ClientStoreLike {
   setConnected: (value: boolean) => void
   setConnecting: (value: boolean) => void
   setHasConnectedOnce: (value: boolean) => void
+  /**
+   * 记录当前登录用户（可选）。login 成功后由 adapter 调用——
+   * 注入模式（业务全权）下业务直接调 adapter.login，不经过 core Provider 的
+   * login 记账（决策 18），currentUser 必须在此处同步，否则 isLoggedIn 恒为 false。
+   * adapter 内置 store 无需实现（currentUser 派生自 adapter.currentUserId）。
+   */
+  setCurrentUser?: (userId: string) => void
 }
 
 export interface UserInfoStoreLike {
