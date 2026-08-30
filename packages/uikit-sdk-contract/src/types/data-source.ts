@@ -8,8 +8,11 @@ import type { UiPresence } from './presence'
  * 不传任意一项 -> 走 SDK 默认实现。
  * 传入 -> 业务接管该接口的数据获取/订阅。
  *
- * 注：主计划 2.5 已明确旧 UIKitDataSource 将迁移为 repository 数据入口层；
- * 本接口目前保持与旧签名兼容，供 adapter / core / UIKit 过渡使用。
+ * @deprecated 主计划 2.5 / 决策 11 已明确：统一迁移为 repository 数据入口层
+ * （`ContactRepository` / `GroupRepository` / `PresenceRepository` / `UserInfoRepository`，
+ * 经 `SdkAdapter.contact` / `.group` / `.presence` / `.userInfo` 暴露），不保留旧双线。
+ * 本接口保持与旧签名兼容继续可用，Provider `dataSource` prop 保留至下个大版本移除；
+ * 薄别名转发随 Phase 3.1（repository 注入 Domain）落地时收口。
  */
 export interface UIKitDataSource {
   fetchContacts?: (params?: { cursor?: string, pageSize?: number }) => Promise<{ list: UiContact[], cursor?: string, hasMore?: boolean }>

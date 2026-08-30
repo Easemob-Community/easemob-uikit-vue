@@ -113,9 +113,18 @@ export interface SdkCapabilities {
 }
 ```
 
+## 数据入口注入（Phase 3.1）
+
+`SdkConfig.repositories`（`SdkRepositoryOverrides`）允许下游注入自有数据入口实现（如 Electron 本地库），接管 Domain 读取路径；不注入时走 SDK 默认实现，行为不变。core 归一化会把该字段随平铺字段下沉 `adapterConfig`，websdk5 / webim4 两 adapter 均按 `config.repositories ?? adapterCfg.repositories` 读取。
+
+当前消费的方法（其余字段为后续 DB 阶段预留，注入暂不生效）：
+
+- `message.loadMessages` → `MessageDomain.fetchHistory` 委托
+- `conversation.fetchConversations` → `ConversationDomain.refresh` 委托
+
 ## 废弃说明
 
-- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`，计划随 repository 注入 Domain 落地后移除。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
+- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`：Phase 3.1 已落地 message / conversation 两域的 repository 注入；`dataSource` 覆盖的 contact / group / presence / userInfo 域待对应 repository 注入收口后，于下个大版本移除。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
 
 ## 本地开发
 
