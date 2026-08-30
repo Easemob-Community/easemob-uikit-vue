@@ -10,7 +10,7 @@ import { useToast } from '@easemob/uikit-core'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
-import { resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
+import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
 import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import type { ConversationTypeValue, ForwardModeValue } from '@easemob/uikit-core'
 import { insertChatNotice } from '@easemob/uikit-core'
@@ -176,7 +176,7 @@ const lastMessageSummary = computed(() => {
   const senderReady = !isGroup || senderName !== from || !stores.userInfo.isLoading(from)
   return {
     id: lastMsg.msgServerId || lastMsg.msgLocalId,
-    text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName, t('message.recalledPreview')),
+    text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName, t('message.recalledPreview'), chineseMessagePreviewLabels),
     timestamp: lastMsg.timestamp,
     senderReady,
   }

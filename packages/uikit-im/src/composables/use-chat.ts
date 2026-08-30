@@ -3,7 +3,7 @@ import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { CombineMessageBody, CustomMessageBody, FileMessageBody, ImageMessageBody, LocationMessageBody, TextMessageBody, UiConversation, UiMessage, VideoMessageBody, VoiceMessageBody } from '@easemob/uikit-core'
 import { createLogger } from '@easemob/uikit-core'
-import { resolveLastMessageText, resolveSenderDisplayName } from '../utils/resolve-last-message-text'
+import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../utils/resolve-last-message-text'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
 import { useMessageSend } from './use-message-send'
@@ -228,7 +228,7 @@ export function useChat() {
     const title = type === CONVERSATION_TYPE.GROUPCHAT ? (target.name || id) : t('message.forward.combineTitle', '聊天记录')
     const summary = messages.map((m) => {
       // 本地通知消息不经过 SDK 适配器，直接取通知文案；其余走 SDK 摘要提取
-      const text = m.type === MESSAGE_TYPE.NOTICE ? m.body.content : resolveLastMessageText(m)
+      const text = m.type === MESSAGE_TYPE.NOTICE ? m.body.content : resolveLastMessageText(m, undefined, undefined, undefined, chineseMessagePreviewLabels)
       return `${resolveSenderName(m)}: ${text}`
     }).join('\n')
     // 旧版本客户端展示的兼容文案（SDK compatibleText sidecar）

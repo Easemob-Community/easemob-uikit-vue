@@ -1,14 +1,43 @@
 // 消息摘要 / 显示名解析工具已下沉：
-// - customEventPreviewMap / formatConversationPreview / defaultLastMessageTextResolver /
-//   resolveLastMessageText / LastMessageTextResolver → @easemob/uikit-sdk-contract
+// - formatConversationPreview / defaultLastMessageTextResolver / resolveLastMessageText /
+//   LastMessageTextResolver / MessagePreviewLabels / mergeMessagePreviewLabels /
+//   defaultMessagePreviewLabels → @easemob/uikit-sdk-contract
 // - resolveUserDisplayName / resolveSenderDisplayName → 本文件本地实现，避免依赖具体 adapter
 export {
   customEventPreviewMap,
   defaultLastMessageTextResolver,
+  defaultMessagePreviewLabels,
   formatConversationPreview,
+  mergeMessagePreviewLabels,
   resolveLastMessageText,
 } from '@easemob/uikit-sdk-contract'
-export type { LastMessageTextResolver } from '@easemob/uikit-sdk-contract'
+export type {
+  LastMessageTextResolver,
+  MessagePreviewLabels,
+} from '@easemob/uikit-sdk-contract'
+
+import type { MessagePreviewLabels } from '@easemob/uikit-sdk-contract'
+
+/**
+ * 中文消息摘要预览标签（供 UIKit 默认中文 UI 使用）。
+ * 业务可在调用 `resolveLastMessageText` 时传入自定义标签以覆盖。
+ */
+export const chineseMessagePreviewLabels: MessagePreviewLabels = {
+  image: '[图片]',
+  sticker: '[表情]',
+  voice: '[语音]',
+  video: '[视频]',
+  file: '[文件]',
+  location: '[位置]',
+  combine: '[聊天记录]',
+  custom: {
+    userCard: '[名片]',
+    order: '[订单]',
+    vote: '[投票]',
+  },
+  customFallback: '[自定义]',
+  unknown: '[未知消息]',
+}
 
 import type { UiMessage } from '@easemob/uikit-core'
 import type { RootStores } from '../sdk/types'
