@@ -34,6 +34,15 @@ export interface ContactPage {
   hasMore: boolean
 }
 
+/** 群组分页结果
+ * 当前 SDK 本地群列表无游标分页，adapter 返回 `hasMore: false`。
+ */
+export interface GroupPage {
+  list: UiGroup[]
+  cursor?: string
+  hasMore: boolean
+}
+
 /** 群消息已读回执用户条目 */
 export interface GroupReadReceiptUser {
   userId: string
@@ -174,6 +183,18 @@ export interface ConversationRepository {
   fetchConversations(params: { cursor?: string, pageSize?: number }): Promise<ConversationPage>
 }
 
+/**
+ * 数据入口接管注入（Phase 3.1 留口子）：当前仅消费 `message.loadMessages` 与
+ * `conversation.fetchConversations`，其余方法为后续 DB 阶段预留。
+ * Repository override injection (Phase 3.1 seam): only `message.loadMessages`
+ * and `conversation.fetchConversations` are consumed for now; the remaining
+ * methods are reserved for later DB phases.
+ */
+export interface SdkRepositoryOverrides {
+  message?: Partial<MessageRepository>
+  conversation?: Partial<ConversationRepository>
+}
+
 /** 联系人数据入口 */
 export interface ContactRepository {
   fetchContacts(params?: { cursor?: string, pageSize?: number }): Promise<ContactPage>
@@ -187,7 +208,8 @@ export interface ContactRepository {
 
 /** 群组数据入口 */
 export interface GroupRepository {
-  fetchGroups(): Promise<UiGroup[]>
+  /** 获取群组列表；当前无游标分页，返回单页 `GroupPage` */
+  fetchGroups(): Promise<GroupPage>
   fetchGroupInfo(groupId: string): Promise<UiGroup>
   createGroup(params: CreateGroupParams): Promise<{ groupId: string }>
   joinGroup(groupId: string, message?: string): Promise<void>
@@ -232,16 +254,16 @@ export interface GroupRepository {
 export interface PresenceRepository {
   subscribe(userIds: string[], expiry?: number): Promise<void>
   unsubscribe(userIds: string[]): Promise<void>
-  fetchStatus(userIds: string[]): Promise<void>
+  fetchStatus(userIds: string[]): Promise<UiPresence[]>
   publish(description: string): Promise<void>
 }
 
 /** 用户资料数据入口 */
 export interface UserInfoRepository {
-  fetchUserInfos(userIds: string[], attributes?: UserInfoAttribute[]): Promise<void>
+  fetchUserInfos(userIds: string[], attributes?: UserInfoAttribute[]): Promise<UserInfo[]>
   updateOwnInfo(input: Partial<Pick<UserInfo, 'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'>>): Promise<void>
   updateOwnInfoByAttribute(attribute: UserInfoAttribute, value: UserInfoAttributeValue): Promise<void>
   subscribeUserInfos(userIds: string[]): Promise<void>
   unsubscribeUsersInfo(userIds: string[]): Promise<void>
-  getSubscribedUsers(): Promise<string[]>
+  getSubscribedUsers(): Promise<readonly UserInfo[]>
 }
