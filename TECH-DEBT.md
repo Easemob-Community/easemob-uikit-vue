@@ -120,7 +120,7 @@
 - **证据**：`sdk/event/group-events.ts` L56-L59，对比 L43 `const members = payload.members || []`。
 - **建议修法**：`const members = (p.members as unknown[]) || []; stores.group.decrementMemberCount(p.groupId, members.length)`。
 - **修复**：已于 2026-07-28 修复。`sdk/event/group-events.ts` 的 `onMembersExited` 增加空值守卫 `(p.members as unknown[]) || []`，与同文件 `onMembersJoined` 的降级方式对齐。
-- **关联 skill**：`websdk2-uikit-migration`
+- **关联 skill**：`uikit-sdk-adapter-architecture`
 
 ### [x] D19. `resendMessage` 对媒体消息先删除后不重发，导致消息丢失
 
@@ -136,7 +136,7 @@
 - **证据**：`sdk/domain/group-domain.ts` L275-L284，`let response: unknown` + `await ...uploadSharedFile({...})` + `return response`。
 - **建议修法**：用 Promise 包装回调：`return new Promise((resolve, reject) => { ...uploadSharedFile({ file, onFileUploadComplete: resolve, onFileUploadError: reject }) })`。
 - **修复**：已于 2026-07-28 修复。`sdk/domain/group-domain.ts` 的 `uploadGroupSharedFile` 改为 Promise 包装 `onFileUploadComplete`/`onFileUploadError` 回调，`response` 不再依赖回调与 Promise 的先后时序。
-- **关联 skill**：`websdk2-uikit-migration`
+- **关联 skill**：`uikit-sdk-adapter-architecture`
 
 ### [x] D21. ThemeStore 和 `useH5Adaptation` 直接访问 `document`/`window` 无 SSR 保护
 
@@ -153,7 +153,7 @@
 - **证据**：`sdk/event/connection-events.ts` L17-L21 `onDisconnected` 清空 `currentUser`；L13-L16 `onConnected` 不恢复。
 - **建议修法**：不在 `onDisconnected` 时清空 `currentUser`（仅 `logout()` 时清空），或在 `onConnected` 中从 SDK 恢复：`const uid = (stores.client as any).client?.getCurrentUserId?.(); if (uid) stores.client.setCurrentUser(uid)`。
 - **修复**：已于 2026-07-28 修复。`connection-events.ts` 的 `onDisconnected` 删除 `setCurrentUser('')`，保留 `setConnected(false)`/`setConnecting(false)`，并加注释说明 currentUser 仅 logout 时清除；`store/client.ts` 的 `clearClient` 补上漏清的 `connecting.value = false`。
-- **关联 skill**：`websdk2-uikit-migration`
+- **关联 skill**：`uikit-sdk-adapter-architecture`
 
 ### [x] D23. Group store 直接对象修改绕过 `computed` 响应式
 
@@ -197,7 +197,7 @@
 - **修复**：
   - 扩展 `GroupStoreLike` 接口添加 `setGroupMuteList/addGroupMuteMembers/removeGroupMuteMembers/setGroupBlocklist/addGroupBlocklistMembers/removeGroupBlocklistMembers/setGroupAllowlist/addGroupAllowlistMembers/removeGroupAllowlistMembers` 方法；
   - 所有查询/写操作方法追加对应的 store 缓存同步调用。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-store-composable`
 
 ### [x] D39. `group-management-section` 全员禁言 Cell 与其他管理项字体不一致
 
@@ -212,7 +212,7 @@
 - **证据**：`composables/use-chat.ts:95-100`（`sendReadAckForMessage` 唯一定义，无任何组件调用）；`sdk/domain/conversation-domain.ts:126-129`；`modules/chat/chat.vue:401-419`、`modules/conversation/conversation-list.vue:206-208`（进入会话只调 sendChannelAck）；`sdk/event/chat-events.ts:204-207`。
 - **建议修法**：在进入会话/收到当前会话单聊消息时，对未读消息批量调用 `domains.message.markMessagesRead`（注意与清未读节流合并）。
 - **修复**：已于 2026-07-28 修复。`sdk/event/chat-events.ts` 在当前会话收到单聊消息时，经 `queueMessageReadReceipt` 批量发送已读回执，`onMessageReadReceipts` 单聊分支不再是无输入的死代码，对端可正常看到「已读」。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-store-composable`
 
 ### [x] D41. 群成员「禁言/取消禁言/拉黑/取消拉黑」菜单点击无任何效果
 
@@ -494,7 +494,7 @@
 - **证据**：`sdk/event/chat-events.ts:188-191`；`store/message.ts:194-197`。
 - **建议修法**：加状态序（sending<sent<delivered<read）只升不降。
 - **修复**：已于 2026-07-28 修复。`store/message.ts` 引入 `STATUS_ORDER`（sending < sent < delivered < read）状态机，`updateMessageStatus` 只升不降，后到的送达回执不再把已读消息降级回 delivered。
-- **关联 skill**：`websdk2-uikit-migration`
+- **关联 skill**：`uikit-sdk-adapter-architecture`
 
 ### [x] D57. `clearConversationMessages` 清理键错位，合并消息缓存泄漏
 
@@ -535,7 +535,7 @@
 - **证据**：`composables/use-message-send.ts:35-48`；`sdk/event/chat-events.ts:198-202`；`modules/chat/message-list/message-list.vue:449-458`。
 - **建议修法**：发送时按开关设置 `needReadReceipt`，未读列表接群成员差集；或下掉 UI 上的已读人数/未读 Tab 展示。
 - **修复**：现象 1 已于 2026-07-28 早些时候修复（`use-message-send.ts` 发送群消息按开关接通 `needReadReceipt`）。现象 2 已于 2026-07-28 修复：`message-list.vue` 的 `onGroupReadClick` 未读列表改为「群成员 − 已读 − 消息发送者」差集——成员优先取 `stores.group.getGroupMembers` 缓存，缺失时 `fetchGroupMembers` 拉取一页后重取；成员拉取失败降级为未读列表为空（不影响已读 Tab）。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-store-composable`
 
 ### [x] D62. 删除会话默认连漫游消息一起删
 
@@ -559,7 +559,7 @@
 - **证据**：`sdk/event/connection-events.ts:33-40`。
 - **建议修法**：通过 provider options 暴露 `onTokenWillExpire/onTokenExpired` 回调。
 - **修复**：已于 2026-08-15 核销（2026-08-15 消费者验证准备时核查确认已实现，TECH-DEBT 漏勾）。链路完整：`EmUIKitProvider` props `onTokenWillExpire/onTokenExpired`（`uikit-provider.vue:139,141,243-246`）→ `useUIKit` options `connectionCallbacks`（`use-uikit.ts:114,245`）→ `registerEventHandlers`（`sdk/event/registry.ts:18-21`）→ `createConnectionHandlers` 触发 `callbacks.onTokenWillExpire?.()/onTokenExpired?.()`（`connection-events.ts:47-56`）。核销时补对外类型导出：`ConnectionEventCallbacks` 从 `sdk/index.ts` re-export（此前类型仅内部可见）。真实接入验证（业务侧刷新 token 后自动恢复）列入 docs/CONSUMER-VALIDATION-CHECKLIST.md 阶段 B3 首个验证项。
-- **关联 skill**：`websdk2-uikit-migration`
+- **关联 skill**：`uikit-sdk-adapter-architecture`
 
 ### [x] D65. `conversation-container` 的 `pageSize`/`includeEmptyConversations` 是死 props
 
@@ -746,7 +746,7 @@
 - **背景**：未来 UIKit 有较大可能在 Electron 环境使用，消息/会话数据需外接本地 DB——登录后从库加载回流 UIKit（冷启动不依赖网络）、收发写库、翻页先读本地再漫游。
 - **结论**：架构支持低侵入扩展（Domain 依赖注入 + store 已有 `setConversationList`/`prependMessages` 批量回流入口 + `toUiMessage` 形态对齐），缺持久化抽象接口、历史加载数据源分支、会话列表与 SDK 同步快照的覆盖竞争处理。**详细调研与落地建议见 [ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（2026-08-05 预研）**。
 - **核销（2026-08-15，转 roadmap）**：预研已完成且架构结论明确，实施需 Electron 项目场景（当前仓库无 Electron 验证环境，下周为 Web Demo）——待 Electron 项目立项后按预研步骤实施（持久化抽象接口 → dataSource 分支 → 覆盖竞争处理），非当前 Web UIKit 债务。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-store-composable`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-store-composable`
 
 ### [x] D86. 主题能力扩展：字号体系 / 适老版 / 密度 / 气泡色等语义 token
 
@@ -759,7 +759,7 @@
 
 - **背景**：demo 登录后默认开启教学覆盖层——悬停会话项/气泡等区域，浮出该功能用到的环信接口 + 文档链接 + UIKit 实现思路；气泡悬停延时出"点子"角标，点击展开详情抽屉。
 - **实施（2026-08-06，uikit 零侵入）**：`apps/demo/src/dev-hints/` 三件套已落地——`types.ts`（类型定义）+ `registry.ts`（13 条元数据：会话列表/7 种类型气泡/通用气泡/历史消息/输入框/聊天容器，每条含环信接口 + 实现思路 + 参考文件；两轮匹配：具体内容优先，`.chat` 等容器级兜底）+ `use-dev-hints.ts`（`.demo-layout` 事件委托引擎：L0 悬停 200ms 出提示卡、L1 气泡 2s 出 💡 角标、离开后 300ms 延迟隐藏 + 移入覆盖层取消隐藏、scroll/resize 隐藏）+ `demo-dev-hint-card.vue`（提示卡 + 💡 角标 + EmPopup 右侧详情抽屉）。开关挂 `useDemoSettings` 新增 `devHintsEnabled`（默认开 + localStorage 记忆），设置抽屉新增「开发者」分类面板，移动端自动禁用。**待办**：5.x 官方文档站上线后补录 `api.docUrl`；注册表条目随 uikit 迭代同步维护。
-- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+- **关联 skill**：`uikit-component-authoring` / `uikit-sdk-adapter-architecture`
 
 ### [x] D88. 群已读详情未按 userId 去重，多端登录记作不同人已读
 
@@ -767,7 +767,7 @@
 - **证据**：`modules/chat/message-list/message-list.vue` 的 `onGroupReadClick`（`modalReadList.value = readUsers` 直接赋值）；SDK 类型 `GroupMessageReadUsersResult.users: ReadonlyArray<GroupMessageReadUser>`。
 - **建议修法**：展示前按 `userId` 去重；成员差集侧同步防御去重。
 - **修复**：已于 2026-08-06 修复。`message-list.vue` 的 `onGroupReadClick` 已读列表改为 `[...new Set(...)]` 按 userId 去重后赋值；未读列表的群成员 userId 同样去重后再做差集，避免异常数据重复展示。气泡上的 `groupReadCount` 为服务端统计 count（无用户列表），UIKit 侧无法去重，服务端需保证按人统计。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-component-authoring`
 
 ### [x] D89. 多处 `@media (hover: hover)` 块内选择器无缩进，触发 lint 报错与构建 CSS 警告
 - **现象**：`message-bubble-wrapper.vue`、`shared-file-list-item.vue`、`conversation-item.vue` 等多个文件存在 `@media (hover: hover) {` 块内选择器未缩进（与包裹语句同层级），lint 报 `Insert ··`，构建时 esbuild 报 `Unexpected "@media"` CSS 警告（不影响产物）。疑似历史 `wrap-hover` 脚本批量包裹 hover 样式时未补缩进。
@@ -809,7 +809,7 @@
   2. `modules/chat/message-item/message-bubble-wrapper.vue`：渲染层以 `clientStore.currentUser` 实时重新判定 `isSelf`，fallback 到消息对象存储的 `isSelf`，确保已入库的异常消息也能在渲染时纠正。
   3. `sdk/event/chat-events.ts` / `sdk/notification-engine.ts`：新消息去重、自动清未读、@我判定、通知过滤等依赖 `from === currentUser` 的逻辑统一走 `normalizeUserId`。
 - **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`。
-- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+- **关联 skill**：`uikit-component-authoring` / `uikit-sdk-adapter-architecture`
 
 ### [x] D93. 会话列表自定义消息（userCard）刷新后空白，群聊摘要发送者名点击后才出现
 
@@ -824,7 +824,7 @@
   3. `ConversationDomain` / `use-uikit.ts` / `chat-events.ts` 传入基于 `contact` / `userInfo` store 的 `resolveSenderName`。
   4. `modules/conversation/conversation-item.vue` 群聊场景下用 `useUserInfo(props.conversation.lastMessageFrom)` 监听资料变化，实时把 `userId: ` 前缀替换为备注/昵称。
 - **验证**：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`。
-- **关联 skill**：`uikit-component-authoring` / `websdk2-uikit-migration`
+- **关联 skill**：`uikit-component-authoring` / `uikit-sdk-adapter-architecture`
 
 ### [x] D95. 流式消息（Stream Message）接入 UIKIT：内核薄 + 插件厚分层落地
 
@@ -832,7 +832,7 @@
 - **结论**：流式是 TEXT 消息的「接收状态」而非新类型 → 内核只内置「数据链路 + 纯文本流式状态」，markdown 渲染与 AI 集成（重依赖/可选能力）走插件（`#message-txt` / `#message-custom` 插槽 + `useChatPlugin` + `dataSource`）。
 - **执行计划**（分层任务 / 里程碑 / 决策点 / 风险 / 验收）：见 [STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)。
 - **进度（2026-08-14）**：M1（类型层 `STREAM_MESSAGE_STATUS` + `UiMessage.stream`、事件层 `onStreamMessage` 按 `msgServerId` 幂等合并 `fullText`、`onMessage` 丢片补偿）、M2（`text-message.vue` 纯文本流式光标 / 终态收敛 / 异常提示、message-list 流式滚动跟随）、M3（demo markdown 流式气泡 `#message-txt` 插件接管 + 打字机）已完成；M4 demo mock AI 会话已落地（toolbar 入口 + 设置面板 + 分片模拟器），真实模型对接（DeepSeek 直连 / 业务代理）待执行；M5（抽包 + 文档）待执行。文档新增 `guide/ai-stream-message.md` 独立章节。
-- **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `websdk2-uikit-migration` / `uikit-component-authoring`
+- **关联 skill**：`uikit-message-rendering` / `uikit-chat-plugin-tabs` / `uikit-sdk-adapter-architecture` / `uikit-component-authoring`
 - **核销（2026-08-15，转 roadmap）**：M1（内核数据链路）/ M2（纯文本流式渲染）/ M3（demo markdown 插件）+ M4 demo mock AI 会话均已落地验证，内核「薄 + 插件厚」能力完整；剩余 M4 真实模型对接（DeepSeek 直连/业务代理，需外部接入方式）与 M5 抽独立包（`@easemob/uikit-ai`）属发布后增强，按 [STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md) 推进，非当前债务。
 
 ### [x] D96. D89 清理后遗留的 6 处既有 JS lint 错误（no-use-before-define / unused var）
@@ -889,7 +889,7 @@
   - **遗留记录（未修，P3 前评估）**：a. im `sdk/` 既有 lint 债（`conversation-adapter`/`contact-domain`/`conversation-domain`/`group-domain`/`message-domain` 的 core import 重复与顺序，P1 迁移遗留，非 P2 引入，按「不顺手改未动文件」原则记录）；b. `alignClientConfig` 用 JSON.stringify 比较原始配置（SDK 归一化后字段差异产生告警噪声、函数字段静默，行为安全）；c. 消息流「无消费者不丢消息」模式（headless 订阅层 P3 落地）；d. demo 仅覆盖「IM 前置登录 + chatroom 嵌套」形态，纯 chatroom 单包页待 P4。
 - **进度（2026-08-15，P5 增量 PC 模式与角色能力完成）**：`@easemob/uikit-chatroom` 0.2.0——**角色不内置（用户评审定案，设计文档 §11）**：UIKit 权限面天花板 = SDK 原生权限（owner/admin/member/none），业务角色由应用层抽象；`canManageMember` 原语上提公开（成员面板改复用）；**split 分栏布局实现**（scene `layout: 'fullscreen'|'split'|'auto'`，`ChatroomSplitLayout` 三栏 + 成员栏拖拽 + 窄视口退化弹层）；**管理位**（容器 `manage-actions` 插槽按 `canManage` 门控 + `features.management` 开关组）；**PC 交互**（`ChatroomContextMenu` 右键菜单、`ChatroomMemberSidebar` 常驻侧栏（悬停快捷 + 右键 + 确认弹窗）、成员项 hover 插槽、`popupMode` 弹层退化、输入条多行、Esc 关闭）；新 composables `useChatroomLayout`/`useChatroomPopupMode`；demo `#/pc-live`/`#/pc-class` 宽屏验收页（`demo-role.ts` 角色抽象参考实现：主播=owner/场控=admin/观众=member；老师=owner/学生=member）+ docs「权限模型与业务角色」页。向后兼容：`layout` 缺省 fullscreen、`popupMode` 缺省 auto、新增 prop 全可选，五变种 demo 页零回归。门禁全绿。
 - **进度（2026-08-15，P5 文档与集成完成，`@easemob/uikit-chatroom` 升 1.0.0）**：① **`gen:api` 参数化**（`PACKAGES` 配置表驱动 uikit-im + chatroom，输出隔离 `.vitepress/gen/chatroom/`，uikit-im 根目录零漂移）；props 查找新增同目录 `types.ts` 声明兜底（`ChatroomContainerProps/Emits`）与内联 `defineProps<{...}>()` 兜底；**顺带修正 P1 抽核遗留**：原子组件根目录迁移到 `@easemob/uikit-core`（此前指向 uikit-im 必 ENOENT）、插槽提取增强（`name` 属性不在 `<slot` 首位的多行写法漏提取，容器 19 插槽此前仅落 10 个）；② **docs 聊天室章节正式化**：**一组件一页**（按单群聊格式：「使用方式 → API → 插槽说明」+ sidebar 分组 容器/直播 8 项/PC 3 项，12 组件页全接入自动 API 表格；chatroom-container 场景配置独立成节、进阶章节收纳插槽组合/隐藏 header/消息列表替换）+ guide 四页（架构/快速开始/权限模型/更新日志）+ 直播组件页运行 demo 块（danmaku/top-bar/input-bar/interactive-card/fullscreen-effect 五个，纯 UI 模拟数据，docs 补 `@easemob/uikit-chatroom` workspace 依赖）；③ **聊天室集成 skill**（`integrations/skills/chatroom`：SKILL.md + quickstart/provider/components/danmaku/pc-mode/gotchas + api 自动同步；`gen-skill.mjs` 参数化双目标，一次同步 39 个 API）；④ **MCP 数据纳入聊天室**（`sync-docs.mjs` 增 chatroom guide/api/version，manifest 增 `chatroom` 段，`search_docs` 覆盖两包、`get_component_api`/`list_components` 兼容聊天室）。验收：docs build 全绿、MCP vue-tsc/build 通过、`changelog:check` 通过（1.0.0 版本段 + package.json 同步）。**至此 P0→P5 全阶段完成，D97 关项**。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-component-authoring` / `uikit-provider-config` / `uikit-h5-adaptation` / `uikit-release-build`
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-component-authoring` / `uikit-provider-config` / `uikit-h5-adaptation` / `uikit-release-build`
 
 ### [x] D99. 三包归属治理：新功能「放 core 还是场景包」无路由约束与硬门禁
 
@@ -1155,7 +1155,34 @@
   - 验证：contract/websdk5/core/im/chatroom 的 `vue-tsc --noEmit` 与 `build`、demo 与 demo-chatroom 的 `vue-tsc --noEmit` 全绿（core/chatroom 已跑 `aux:gen` 同步派生入口）。
   - 残留（下一步）：① im `src/sdk/index.ts` 仍 `export * from '@easemob/uikit-sdk-websdk5'`（公开 API 兼容面，需评估收敛）；② core `utils/log-store.ts` SDK 日志捕获为动态 import（可保留）；③ 注入模式（业务传入 adapter）下 core `login/logout` 目前仍委托 adapter（决策 18 的「业务全权」尚未在 core 强制，后续按需收紧）；④ chatroom sdk 层仍有 `easemob-websdk` 的 type-only wire 类型导入（事件 map/房间属性等），chatroom 中立化留待其 adapter 变体落地时处理；⑤ `Websdk5Adapter` 注入 client 模式（`new Websdk5Adapter(injectedClient)`）尚未有真实消费者验证。
   - 下一步：webim4 adapter（Phase 2）+ repository 数据入口层补全（Phase 3）。
-- **关联 skill**：`websdk2-uikit-migration` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
+- **进度备忘（2026-08-29，Phase 1 评审收尾，决策修订与偏差处理）**：
+  - **决策 22 按原设计落地**：新增子路径入口 `@easemob/uikit-im/websdk5`（`src/websdk5.ts`，aux 构建独立 ES 产物），import 即调 core `registerDefaultSdkAdapterFactory` 自注册默认适配器；删除 `createDeferredSdkAdapter` 动态 import 方案；core `useCoreUIKitProvider` 默认适配器解析顺序 `adapter prop → createDefaultAdapter → 注册表`；im `src/sdk/index.ts` 对 adapter 包改 `export type *`（主入口零 adapter 值级静态引用），SDK5 值级导出由子路径入口承接；core/im 的 `@easemob/uikit-sdk-websdk5` 降为 optional peer + devDep（workspace）；core 标 `sideEffects: ["*.css"]`、im 标 `["*.css", "./dist/websdk5.js"]`；core `log-store.ts` 动态 import 补 `.catch` 降级（4.x 下游未装 websdk5 时静默跳过）。
+  - **决策 1 修订**（计划文档已同步）：事件流定为混合模型——adapter 事件层经 `adapterConfig.stores` 注入的 StoreLike 直写业务 store（行为不变），`subscribe()` 中立事件收敛为跨层通知（token/同步状态）+ 未注入域扇出；不做「纯推事件」重写（Phase 1 行为不变门禁下风险大于收益）。
+  - **决策 18 在 core 强制**：注入模式（传 `adapter` prop）下 core `login/logout` 告警且不转发 adapter；core 仍负责 `adapter.init` 接线（stores/features/eventDeps 注入）。配套：`Websdk5Adapter.login` 成功后经注入 stores 记账 `setCurrentUser`（`ClientStoreLike.setCurrentUser?` 新增可选方法），业务直连 `adapter.login` 时 `isLoggedIn` 正常。
+  - **决策 20 落地**：core 新增模块级 `getUIKitAdapter()`（`composables/default-adapter.ts`，主入口导出），Provider 装配登记、卸载清空。
+  - **`UIKitDataSource` 标 `@deprecated`**（contract `types/data-source.ts` + core/im Provider 的 `dataSource` prop）；薄别名转发推迟到 Phase 3.1 随 repository 注入 Domain 一并收口（风险 10 注记已更新）。
+  - **顺带修复**：demo-chatroom 此前未注入任何 adapter（core 无默认工厂后会在装配期抛错）——现经 `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())` 显式注册；demo 入口加 `import '@easemob/uikit-im/websdk5'`；两 demo 补 `@easemob/uikit-sdk-websdk5` 依赖。
+  - **残留（下一步）**：① chatroom sdk 层仍有 `easemob-websdk` type-only wire 类型导入（chatroom 中立化留待其 adapter 变体）；② `Websdk5Adapter` 注入 client 模式（`new Websdk5Adapter(injectedClient)`）尚无真实消费者验证；③ `SdkCapabilities` 已定义并由 adapter 上报，uikit-im 侧分支消费推迟到 Phase 2（两代均 true，Phase 1 无差异可消费）；④ 摇树验收（决策 22 配套门禁，4.x/5.x 双消费者工程 bundle analyzer）待 Phase 2 执行；⑤ 发版时需补 CHANGELOG + 版本号（本分支未发版，`sdk/index.ts` 值级导出迁移属 breaking，主版本升级时随 `dataSource` 移除一并处理）。
+- **进度备忘（2026-08-29，Phase 2 webim4 adapter 核心 IM 落地，静态门禁全绿）**：
+  - `@easemob/uikit-sdk-webim4` 核心 IM 全量落地（镜像 websdk5 组合根结构）：`client.ts`（Webim4Client 包装 `new WebIM.connection({appKey})`）+ 六个 domain（message/conversation/contact/group/presence/userInfo，全部满足 contract `SdkDomainSet`）+ 四个字段映射 adapter + 事件层（4.x 单 `connection.addEventHandler` 模型，`registry.ts` 合并各域 Partial handler 一次注册；`onMessage` 批量数组逐条展开、read/delivery/channel 独立回调归一化、流式 `stream.text` 增量→`deltaText`/累计 `fullText`、群事件 `onGroupEvent` 按 operation 分发 30 项）+ 组合根 `adapter.ts`（内部 store 工厂 ×7 + `adapterConfig.stores` 注入覆盖 + subscribe Proxy 扇出 + 六 repository 代理 + login/logout 生命周期对齐 websdk5）。会话链路：`getServerConversations` 游标分页（refresh/loadMore + 置顶合并 + 排序稳定）、资料补全两级去重（`fetchConversationProfiles` 注入，单聊走 fetchUserInfos 批量、群聊走群信息）、清未读走 read/channel 回执消息（`mid` 由 `getLastMessageId`/`noteLastMessageId` 内部维护）。
+  - **4.x 源码核对新事实（修正/补充计划文档）**：① 4.x **无用户资料订阅能力**（`subscribeUserInfos` 熔断降级 + `onSubscriptionPermissionError`）；② `updateGroupConfigs` 4.x 无 API（`modifyGroup` 仅 name/avatar/description/ext，告警跳过）；③ `getGroupMsgReadUser` **不分页**（源码 limit 固定 500，TODO 标注）；④ 群禁用事件（disable_group/able_group）4.24.2 源码为空实现、实际不可得；⑤ `removeAdmin` 事件载荷缺目标 userId；⑥ 共享文件 upload/delete 事件载荷无文件详情；⑦ 联系人拒绝事件叫 `onContactRefuse`、带备注联系人用 `getAllContacts()`（`getContacts()` 仅返回 ID）；⑧ `clearChatHistory` 参数名 `beforeTimeStamp`（大写 S）；⑨ `types/message.d.ts` 的 `CreateAudioMsgParameters.type` 误写 `'video'`（d.ts bug，以主入口 namespace 类型为准）；⑩ 会话免打扰经 `setSilentModeForConversation`/`getSilentModeForConversations`（20 条/批）维护，不在会话项里。
+  - **验证**：webim4 整包 `vue-tsc --noEmit` 0 错误、`pnpm build` 通过（esm 113.6 kB / umd 78.6 kB）、message-adapter 映射单测 20/20（含风险 #8「中立 body 零 4.x 原始字段残留」断言）、eslint 0 错误、uikit-im `vue-tsc --noEmit` 0 错误 + `build` 通过（webim4 不在 im 依赖图，无回归面）。
+  - **残留（下一步）**：① 核心 IM 手测矩阵（登录/会话/收发/回执/撤回/联系人/群）——本次仅静态门禁，需真实 4.x 环境手测；② 4.x 私有化端到端验收（Phase 2.4）；③ 摇树验收（4.x 消费者工程产物搜不到 5.x 符号）；④ 二期能力：Reaction/Thread/翻译/语音转文字/chatroom 变体；⑤ websdk5 adapter.ts 有 13 个与 webim4 同源的 eslint 风格错误（复制方向相反带入），如需清零单独跟进；⑥ Phase 3 repository 数据入口层（SQLite/IPC）未启动。
+- **进度备忘（2026-08-30，4.x 注入手测反馈两项修复，静态门禁全绿）**：
+  - **会话群名不显示（只显示群 id）**：链路本身完整（dist + 模拟 connection 运行时复现通过），根因是三个静默脆弱点——① `conversation-domain.ts` `patchConversationProfiles` 先标记 `profileRequestedIds` 后请求，首次 `getGroupInfo` 失败/空名即终身不补 → 改为**成功拿到名称才永久标记**，失败/空名计 `profileAttemptCounts` 允许后续 refresh 重试、达 `MAX_PROFILE_ATTEMPTS=3` 放弃；② `group-adapter.ts` `toUiGroup` 仅靠 `affiliations_count/maxusers` 判别 `GroupDetailInfo`，私有化服务裁剪字段时静默产出空 `groupName` → 判别补 `id` 字段（另两种形状无 `id`），兜底分支形状不匹配时显式 warn；③ `applyServerItems` 的 `'replace'` 模式用空 existing 重建列表，后续 refresh 把已补全群名冲回 id → 改为两种模式都从现有项继承 name/avatar（replace 仍控制成员去留，对齐 websdk5 `mergeWithExistingConversations`）。
+  - **联系人/群组数需二次进入才显示**：5.x 靠 SDK 登录后 `enableSyncData` 自动同步 + `onSyncDataFinished` 回填 store（进页面前数据已备好）；4.x SDK 无此通道且 webim4 登录后零预取，首页计数 `getLocalCount()` 纯只读永远等不到数据 → `Webim4Adapter.login` 成功后按 `features.enableContact/enableGroup` 触发 `contactDomain.syncFromServer()`（改 public 并返回 boolean）+ `groupDomain.refreshJoinedGroups()`（改 public），并补发 `contact`/`group` 中立 `onSyncStatus` 事件（syncing→success/failed），对齐 5.x 体感；新增 `adapterConfig.prefetchOnLogin` 开关（默认 true，可关退回懒加载）。注入模式业务直连 `adapter.login` 同样生效。
+  - **验证**：webim4 `vue-tsc --noEmit` 0 错误、`build` 通过（esm 117.9 kB）、vitest 28/28（新增 `group-adapter.test.ts` 5 例含裁剪字段判别回归）、改动文件 eslint 0 错误、demo `vue-tsc --noEmit` 0 错误。待用户真实 4.x 环境复测两个现象。
+  - **群已读详情弹窗崩溃（`charCodeAt is not a function` + `metadata/user/get` 400）**：`getGroupMsgReadUser` 的 d.ts 标注 `userlist: string[]`（`UserId = string`），但实测服务端 wire 返回**对象数组** `{username, meta_id, timestamp, ack_content}`（d.ts 与 wire 不一致，该 API 源码是纯 GET 直通无转换）——adapter 原样透传导致对象被当 userId 流入 `fetchUserInfos`（targets 400）与 Avatar `name`（charCodeAt 崩溃）。修复：`message-domain.ts fetchGroupReadDetail` 兼容两种形状（对象取 `username` 为 userId、逐项 timestamp）、按 userId 去重（多端重复上报）、无法识别项告警丢弃、`count` 缺省回落去重后长度；UI 侧 `message-list.vue` readUsers filter 收紧为 `typeof id === 'string'` 防御。门禁：webim4 vue-tsc/build/vitest 28/28、uikit-im vue-tsc 全绿（message-list.vue 头部 import 区 18 个存量 import/order+no-duplicates 报错为 Phase 1 遗留，未 --fix）。
+- **进度备忘（2026-08-30，契约层质量整改）**：
+  - **结构治理**：`@easemob/uikit-sdk-contract` `src/types/message.ts`（462 行）拆分为 `src/types/message/{body,message,guards,index}.ts`；`ChatConversationType` 迁回 `src/types/conversation.ts`；`SdkAdapter` 拆分为 `SdkLifecycle`/`SdkConnectionState`/`SdkEventSource`/`SdkRepositories`/`SdkDomains` 组合接口（additive，保持 `SdkAdapter` 不变）。
+  - **Repository 类型一致性**：`UserInfoRepository.fetchUserInfos` → `Promise<UserInfo[]>`；`PresenceRepository.fetchStatus` → `Promise<UiPresence[]>`；`UserInfoRepository.getSubscribedUsers` → `Promise<readonly UserInfo[]>`；新增 `GroupPage` 并收紧 `GroupRepository.fetchGroups` 返回类型；websdk5/webim4 adapter 同步修正 repository getter 实现。
+  - **类型守卫强化**：`MessageBody` 无 discriminant 字段的现状下，将单字段存在性守卫增强为组合判定（如 `isImageBody` 要求 `localUrl` + 图片特有字段、`isFileBody` 排除 `duration`/`width`/`latitude` 等），降低不同 body 之间的误匹配风险；webim4 message-adapter 映射单测 20/20 保持通过。
+  - **消息预览文案可注入**：`message-preview.ts` 新增 `MessagePreviewLabels` 与 `mergeMessagePreviewLabels`，`defaultLastMessageTextResolver`/`resolveLastMessageText` 支持注入标签；契约包默认英文标签，不再硬编码中文；`uikit-im` 提供 `chineseMessagePreviewLabels` 并在 `use-chat.ts`/`chat.vue`/`use-quote.ts` 注入；websdk5/webim4 adapter 内部保留中文默认标签（与历史 UI 一致）并支持通过参数覆盖。
+  - **工程配置**：契约包新增 `README.md`；`package.json` build 脚本由 `vue-tsc` 改为 `tsc`（包内无 `.vue` 文件），移除 `vue-tsc` devDependency。
+  - **顺带修复**：websdk5/webim4 两个未跟踪的 `src/domain/__tests__/repository-injection.test.ts` 相对导入路径错误（`../client` 应为 `../../client`）。
+  - **验证**：contract/websdk5/webim4/core/im `vue-tsc --noEmit` 全绿、build 全绿、demo `vue-tsc --noEmit` 全绿；websdk5/webim4 vitest 全绿。
+  - **残留债务**：① `repository.ts` 与 `domains.ts` 双线并存，签名风格（位置参数 vs 命名参数）与返回类型仍有差异，需规划收敛时间表；② `UIKitDataSource` 已标 `@deprecated`，需明确移除版本；③ `SdkCapabilities` 缺少版本/能力协商机制（`version`/`minSdkVersion`/`reason`）。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
 
 ### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）
 
@@ -1164,7 +1191,7 @@
 - **修复**（已于 2026-07-28 之后的本轮修复）：`packages/uikit-core/src/composables/use-uikit.ts` 抽取 `registerClientSetup(instance)`（先 dispose 旧注册再重建 `onClientSetup` 场景挂钩 + `domains.userInfo.listen()`），`setupClient` 与 `login` 共用；`login()` 中 `disposeClientSetup` 为空（即登出后）时先恢复注册再 `await instance.login()`。uikit-chatroom 复用 core provider，自动同修；两条初始化路径（auto-init / 延迟 init）行为不变。
 - **连带修复（API 语义分层）**：登出清理入口需分层——`useClient().logout()` 是 **SDK client 句柄**（只断开 SDK 连接 + core stores），UIKit 内部状态（场景 stores、多选、草稿）的完整重置属 **UIKit 层**，应由 `useUIKit().logout()` 负责。曾一度把 uikit-im 的 useClient 包装为完整清理版，后经评审否决（混淆边界）。最终：uikit-im 恢复 re-export core `useClient`（SDK 层语义）；`demo-sdk-panel.vue` 登出改用 `useUIKit().logout()`；`useClient`/`useUIKit` 的 logout 注释均明确分层（core `use-client.ts`、uikit-im `use-uikit.ts`）。
 - **验证**：core `vue-tsc --noEmit` + uikit-im `vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`（含 aux --check）+ demo `vue-tsc --noEmit` 全绿。
-- **关联**：D29（logout 清理事件处理器）引入的副作用；`uikit-provider-config` / `websdk2-uikit-migration` / `uikit-store-composable`
+- **关联**：D29（logout 清理事件处理器）引入的副作用；`uikit-provider-config` / `uikit-sdk-adapter-architecture` / `uikit-store-composable`
 - **遗留备忘**：`packages/uikit-im/src/sdk/domain/message-domain.ts` 模块级 `sentReadReceiptIds`（已回执消息 ID 去重集合）跨登录会话残留，logout 未清；不影响本现象（仅可能少发一次回执），后续随登出清理专项一并处理。
 
 ### [x] D124. 数据同步「有数据但 UI 空」：挂载/计数抢跑锁定 loaded 挡住回填；同步失败无感知、无补偿
@@ -1276,7 +1303,7 @@
     - `store/group.ts` 增加 `groupAdminSyncedIds` 标记，已同步管理员的群不再重复拉取；`getGroupAnnouncement` 返回 `string | undefined`；
     - `modules/chat/chat.vue` 预拉公告条件改为 `announcement === undefined`。
   - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` + `cd apps/demo && pnpm exec vue-tsc --noEmit` 均通过。
-  - 关联 skill：`uikit-store-composable` / `uikit-component-authoring` / `websdk2-uikit-migration`。
+  - 关联 skill：`uikit-store-composable` / `uikit-component-authoring` / `uikit-sdk-adapter-architecture`。
 
 - [x] **D121. `@easemob/uikit-im/theme` 只内联 core 变量表、缺 core 组件样式，外部消费者 core 组件（Avatar/Icon/Popup 等）全失样式**
   - 已于 2026-08-25 修复（本次）。
