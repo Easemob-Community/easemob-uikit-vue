@@ -1182,6 +1182,11 @@
   - **顺带修复**：websdk5/webim4 两个未跟踪的 `src/domain/__tests__/repository-injection.test.ts` 相对导入路径错误（`../client` 应为 `../../client`）。
   - **验证**：contract/websdk5/webim4/core/im `vue-tsc --noEmit` 全绿、build 全绿、demo `vue-tsc --noEmit` 全绿；websdk5/webim4 vitest 全绿。
   - **残留债务**：① `repository.ts` 与 `domains.ts` 双线并存，签名风格（位置参数 vs 命名参数）与返回类型仍有差异，需规划收敛时间表；② `UIKitDataSource` 已标 `@deprecated`，需明确移除版本；③ `SdkCapabilities` 缺少版本/能力协商机制（`version`/`minSdkVersion`/`reason`）。
+- **进度备忘（2026-08-30，Phase 3.1 repository 注入留口子落地，门禁全绿）**：
+  - **契约**：`SdkConfig` 新增 `repositories?: SdkRepositoryOverrides`（`{ message?: Partial<MessageRepository>, conversation?: Partial<ConversationRepository> }`，contract `repository.ts` + `config.ts`）；core `normalizeInitConfig` 零改动——平铺字段自动下沉 `adapterConfig`，两 adapter init 按 `config.repositories ?? adapterCfg.repositories` 读取。
+  - **两 adapter 同构落地**：`MessageDomain` 构造新增 options（webim4 为 `messageRepository` 字段）——注入 `loadMessages` 时 `fetchHistory` 整体委托（store 写入语义与 SDK 路径一致）；`ConversationDomain` options/deps 新增 `conversationRepository`——注入 `fetchConversations` 时 `refresh` 游标翻页至 `hasMore=false` 合并全量、去重并继承已补全名称/头像后 `setList`，不触 SDK；未注入路径零变化。adapter 的 repository getter 不做注入合并（Domain 委托已覆盖，getter 处注释说明）。
+  - **验证**：contract/websdk5/webim4 `vue-tsc --noEmit` + `build` 全绿；repository-injection 单测 websdk5 4/4、webim4 32/32 全绿；uikit-im `vue-tsc`+`build`、demo `vue-tsc` 全绿；本阶段改动引入的 2 个 eslint 新增错误（websdk5 message-domain 未使用 import）已清，存量风格错误不动。
+  - **残留（下一步）**：① Phase 3.2~3.5（fetchHistory 本地优先分支、会话覆盖竞争、序列化清洗、Electron SQLite/IPC）待 DB 专项；② `UIKitDataSource` 薄别名转发待 contact/group/presence/userInfo 域 repository 注入落地后收口（计划文档风险 10 已同步）；③ `SdkRepositoryOverrides` 当前仅 `loadMessages`/`fetchConversations` 两方法生效，注入其余字段静默无效（类型已预留）。
 - **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
 
 ### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）

@@ -16,6 +16,7 @@
     "sdk:use-npm": "node scripts/switch-sdk.mjs npm",
     "sdk:status": "node scripts/switch-sdk.mjs status",
     "sdk:up": "pnpm up easemob-websdk",
+    "adapter:isolation": "node packages/uikit-im/scripts/check-sdk-isolation.mjs && node packages/uikit-sdk-websdk5/scripts/check-reverse-dependency.mjs && node packages/uikit-sdk-webim4/scripts/check-reverse-dependency.mjs",
     "test": "vitest",
     "lint": "eslint .",
     "format": "prettier --write .",
