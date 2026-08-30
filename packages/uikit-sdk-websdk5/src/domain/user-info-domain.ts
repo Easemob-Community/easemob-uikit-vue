@@ -276,7 +276,7 @@ export class UserInfoDomain {
   /**
    * 获取当前用户已订阅资料变更的用户列表。
    */
-  async getSubscribedUsers() {
+  async getSubscribedUsers(): Promise<readonly UserInfo[]> {
     if (!this.client.isConnected) {
       return []
     }

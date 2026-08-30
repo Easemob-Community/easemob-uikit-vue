@@ -68,10 +68,10 @@ export class PresenceDomain {
   ) {}
 
   /** 订阅用户在线状态 */
-  async subscribe(userIds: string[], expiry = 7 * 24 * 60 * 60) {
+  async subscribe(userIds: string[], expiry = 7 * 24 * 60 * 60): Promise<UiPresence[]> {
     // 未连接时不发起请求（SDK 未就绪时调用会报错/空转）
     if (!this.client.isConnected) {
-      return
+      return []
     }
     const result = await this.client.presenceManager.subscribePresence({
       userIds,
@@ -82,7 +82,7 @@ export class PresenceDomain {
       .map(toUiPresence)
       .filter((p): p is UiPresence => p !== null)
     this.store.updateBatch(mapped)
-    return result
+    return mapped
   }
 
   /** 取消订阅 */
@@ -94,16 +94,16 @@ export class PresenceDomain {
   }
 
   /** 主动查询在线状态 */
-  async fetchStatus(userIds: string[]) {
+  async fetchStatus(userIds: string[]): Promise<UiPresence[]> {
     if (!this.client.isConnected) {
-      return
+      return []
     }
     const result = await this.client.presenceManager.getPresenceStatus({ userIds })
     const mapped = result
       .map(toUiPresence)
       .filter((p): p is UiPresence => p !== null)
     this.store.updateBatch(mapped)
-    return result
+    return mapped
   }
 
   /** 发布自定义在线状态 */

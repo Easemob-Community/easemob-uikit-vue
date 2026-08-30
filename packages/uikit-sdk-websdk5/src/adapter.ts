@@ -21,6 +21,7 @@ import type {
   GroupRepository,
   MessageRepository,
   PresenceRepository,
+  SdkRepositoryOverrides,
   UserInfoRepository,
 } from '@easemob/uikit-sdk-contract'
 import type {
@@ -51,6 +52,7 @@ import { setEventHandlerDeps, getEventHandlerDeps } from './event/deps'
 import type { EventHandlerDeps } from './event/deps'
 import type { EventStores } from './event/types'
 import { setSyncStatusListener } from './use-sync-status'
+import { formatSdkError } from './utils/sdk-error'
 
 const adapterLog = createLogger('UIKit:Websdk5Adapter')
 
@@ -1078,6 +1080,11 @@ export class Websdk5Adapter implements SdkAdapter {
       registerImEvents?: boolean
       /** manager 预设：'im'（默认）| 'chatroom'；显式传 managers 数组时优先 */
       managerPreset?: Websdk5ManagerPreset
+      /**
+       * 数据入口接管注入（Phase 3.1 留口子）：core 归一化会把 SdkConfig.repositories
+       * 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，两处都读。
+       */
+      repositories?: SdkRepositoryOverrides
     }
     // clientCfg 仅保留 SDK 初始化字段，剥离 features/stores/eventDeps 等 adapter 装配字段
     const {
@@ -1088,8 +1095,11 @@ export class Websdk5Adapter implements SdkAdapter {
       onUserInfoSubscriptionPermissionError,
       registerImEvents,
       managerPreset,
+      repositories: adapterRepositories,
       ...clientCfg
     } = adapterCfg
+    // 数据入口接管：SdkConfig 顶层字段优先（直连 adapter 场景），core 归一化下沉的 adapterConfig 次之
+    const repositories = config.repositories ?? adapterRepositories
 
     this._client = this.injectedClient ?? createClient({
       appKey: config.appKey,
@@ -1103,6 +1113,23 @@ export class Websdk5Adapter implements SdkAdapter {
 
     this._features = features ?? getDefaultFeatures()
     this._registerImEvents = registerImEvents !== false
+
+    // 注入的 store 域：未注入的域回落 adapter 内置 store（写入经中立事件扇出）。
+    // 排查「事件在跑但 UI 不更新」时先看这里——多半是对应域的 store 没注入。
+    const injectedStoreDomains = providedStores ? Object.keys(providedStores) : []
+    adapterLog.info('[Websdk5Adapter] init 开始', {
+      mode: this.injectedClient ? 'injected-client' : 'builtin',
+      managerPreset: managerPreset ?? 'im',
+      registerImEvents: this._registerImEvents,
+      injectedStores: injectedStoreDomains,
+    })
+    if (injectedStoreDomains.length < 7) {
+      const allDomains = ['client', 'message', 'conversation', 'contact', 'group', 'presence', 'userInfo']
+      adapterLog.debug(
+        '[Websdk5Adapter] 以下 store 域未注入，回落 adapter 内置 store：',
+        allDomains.filter(d => !injectedStoreDomains.includes(d)),
+      )
+    }
 
     const handlersRef = () => this._getFanout()
     const internalStores: EventStores = {
@@ -1120,7 +1147,9 @@ export class Websdk5Adapter implements SdkAdapter {
     this._stores = stores
 
     this._domains = {
-      message: new MessageDomain(this._client, stores.message),
+      message: new MessageDomain(this._client, stores.message, {
+        messageRepository: repositories?.message,
+      }),
       conversation: new ConversationDomain(this._client, stores.conversation, {
         sendPendingReadReceipts: (conversationId, conversationType) => {
           void this._domains?.message.sendPendingReadReceipts(conversationId, conversationType)
@@ -1131,6 +1160,7 @@ export class Websdk5Adapter implements SdkAdapter {
             return contact.remark || contact.name
           return stores.userInfo.getUserInfo(userId)?.nickname
         },
+        conversationRepository: repositories?.conversation,
       }),
       contact: new ContactDomain(this._client, stores.contact),
       group: new GroupDomain(this._client, stores.group),
@@ -1149,6 +1179,7 @@ export class Websdk5Adapter implements SdkAdapter {
 
     // SDK 事件处理器随初始化注册（旧 setupClient 语义）；logout 后由 login 重建
     this._setupEventHandlers()
+    adapterLog.info('[Websdk5Adapter] init 完成')
   }
 
   async login(user: string, token: string): Promise<void> {
@@ -1156,13 +1187,26 @@ export class Websdk5Adapter implements SdkAdapter {
       throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
     // 登出后再登录：事件处理器与用户资料监听已在登出时 dispose，需在重新建立连接前恢复注册
     if (!this._eventsRegistered) {
+      adapterLog.debug('[Websdk5Adapter] 登出后重新登录，恢复事件处理器与用户资料监听')
       this._userInfoDomain?.listen()
       this._setupEventHandlers()
     }
-    await this._client.login(user, token)
+    adapterLog.info('[Websdk5Adapter] login 开始', { user })
+    try {
+      await this._client.login(user, token)
+    }
+    catch (err) {
+      adapterLog.error('[Websdk5Adapter] login 失败:', formatSdkError(err))
+      throw err
+    }
+    // 登录成功即记账 currentUser（注入模式下业务直连本方法、不经 core login，见决策 18）；
+    // 内置 store 的 currentUser 派生自 adapter.currentUserId，无需显式 set（可选方法）
+    this._stores?.client.setCurrentUser?.(user)
+    adapterLog.info('[Websdk5Adapter] login 成功', { user })
   }
 
   async logout(): Promise<void> {
+    adapterLog.info('[Websdk5Adapter] logout')
     await this._client?.logout()
     // dispose 事件处理器 / 同步状态监听 / 用户资料监听（旧 registerClientSetup 清理链）
     this._disposeEventHandlers?.()
@@ -1203,8 +1247,10 @@ export class Websdk5Adapter implements SdkAdapter {
       return
     // 聊天室等场景可关闭 IM 事件套件（manager 未注入时注册会崩），
     // 场景事件改经 core onAdapterReady 挂钩自行注册
-    if (!this._registerImEvents)
+    if (!this._registerImEvents) {
+      adapterLog.debug('[Websdk5Adapter] IM 事件套件已关闭（registerImEvents=false），场景事件由业务经 onAdapterReady 自行注册')
       return
+    }
 
     ensureEventHandlerDeps()
 
@@ -1224,6 +1270,7 @@ export class Websdk5Adapter implements SdkAdapter {
       this._features,
     )
     this._eventsRegistered = true
+    adapterLog.debug('[Websdk5Adapter] SDK 事件处理器已注册')
   }
 
   get message(): MessageRepository {
@@ -1232,6 +1279,9 @@ export class Websdk5Adapter implements SdkAdapter {
     const messageDomain = this._domains.message
     const conversationDomain = this._domains.conversation
 
+    // 注意：repositories 注入不在此 getter 合并——loadMessages 已由
+    // MessageDomain.fetchHistory 委托覆盖（UI 实际消费 domains.*），
+    // 其余注入方法本期不消费（Phase 3.1 仅留口子）。
     return {
       loadMessages: async (params) => {
         const result = await messageDomain.fetchHistory(
@@ -1389,6 +1439,9 @@ export class Websdk5Adapter implements SdkAdapter {
     if (!this._domains)
       throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
     const conversationDomain = this._domains.conversation
+    // 注意：repositories 注入不在此 getter 合并——fetchConversations 已由
+    // ConversationDomain.refresh 委托覆盖（UI 实际消费 domains.*），
+    // 其余注入方法本期不消费（Phase 3.1 仅留口子）。
     return {
       fetchConversations: async (_params) => {
         // SDK5 当前无游标分页，直接返回本地会话全量快照
@@ -1438,7 +1491,7 @@ export class Websdk5Adapter implements SdkAdapter {
       throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
     const groupDomain = this._domains.group
     return {
-      fetchGroups: async () => groupDomain.syncLocal(),
+      fetchGroups: async () => ({ list: groupDomain.syncLocal(), hasMore: false }),
 
       fetchGroupInfo: async (groupId) => groupDomain.fetchGroupInfo(groupId),
 
@@ -1540,7 +1593,7 @@ export class Websdk5Adapter implements SdkAdapter {
       },
 
       fetchStatus: async (userIds) => {
-        await presenceDomain.fetchStatus(userIds)
+        return presenceDomain.fetchStatus(userIds)
       },
 
       publish: async (description) => {
@@ -1555,7 +1608,7 @@ export class Websdk5Adapter implements SdkAdapter {
     const domain = this._userInfoDomain
     return {
       fetchUserInfos: async (userIds, attributes) => {
-        await domain.fetchUserInfos(userIds, attributes)
+        return domain.fetchUserInfos(userIds, attributes)
       },
       updateOwnInfo: async (input) => {
         await domain.updateOwnInfo(input)
@@ -1570,8 +1623,7 @@ export class Websdk5Adapter implements SdkAdapter {
         await domain.unsubscribeUsersInfo(userIds)
       },
       getSubscribedUsers: async () => {
-        const result = await domain.getSubscribedUsers()
-        return Array.from(result).map(item => typeof item === 'string' ? item : item.userId)
+        return domain.getSubscribedUsers()
       },
     }
   }
