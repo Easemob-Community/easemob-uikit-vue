@@ -77,6 +77,49 @@ export function setDemoSdkLogLevel(level: DemoSdkLogLevel) {
   localStorage.setItem(SDK_LOG_LEVEL_STORAGE_KEY, level)
 }
 
+/** SDK 版本切换的 localStorage 记忆 key */
+const SDK_VERSION_STORAGE_KEY = 'demo-sdk-version'
+
+/** 4.x isHttpDNS 开关的 localStorage 记忆 key：值 'off' 表示关闭（私有化部署验证） */
+const SDK_IS_HTTP_DNS_STORAGE_KEY = 'demo-sdk-is-http-dns'
+
+/** demo 侧可选 SDK 版本：5.x（websdk5，默认工厂自注册）/ 4.x（webim4，注入模式） */
+export type DemoSdkVersion = 'websdk5' | 'webim4'
+
+/**
+ * SDK 版本（模块级单例，默认 'websdk5'）。
+ * app.vue 的 Provider 需要根据它决定 adapter prop，且登录页在 useDemoSettings 上下文之外
+ * 也要读，故不放进 createDemoSettings。
+ */
+export const demoSdkVersion = ref<DemoSdkVersion>(
+  readStorage(SDK_VERSION_STORAGE_KEY, ['websdk5', 'webim4'], 'websdk5'),
+)
+
+/**
+ * 切换 SDK 版本：持久化后整页刷新。
+ * adapter 实例随 Provider 常驻（注入模式登录/登出归业务），运行时热切换会残留旧实例状态，
+ * 最简可靠做法是切完直接 reload，由新一轮挂载按记忆值装配。
+ */
+export function setDemoSdkVersion(version: DemoSdkVersion) {
+  if (demoSdkVersion.value === version)
+    return
+  demoSdkVersion.value = version
+  localStorage.setItem(SDK_VERSION_STORAGE_KEY, version)
+  location.reload()
+}
+
+/**
+ * 4.x isHttpDNS 开关（模块级单例，默认 true）。
+ * 私有化部署验证时关闭，配合 sdkApiUrl 透传给 4.x `new WebIM.connection(params)`；
+ * 仅 webim4 模式下参与 init 配置组装。
+ */
+export const sdkIsHttpDNS = ref(localStorage.getItem(SDK_IS_HTTP_DNS_STORAGE_KEY) !== 'off')
+
+export function setSdkIsHttpDNS(enabled: boolean) {
+  sdkIsHttpDNS.value = enabled
+  localStorage.setItem(SDK_IS_HTTP_DNS_STORAGE_KEY, enabled ? 'on' : 'off')
+}
+
 /** 系统通知话术档位（模块级单例）。Provider 在 app.vue 外层（无 useUIKit 上下文）也需要读取，故不放进 createDemoSettings。 */
 export const noticeTone = ref<'default' | 'playful' | 'silent'>('default')
 

@@ -5,7 +5,8 @@ import type { UiContact } from '@easemob/uikit-im'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
 import ChatroomDemoPage from './chatroom-demo-page.vue'
-import { demoCollectSdkLog, demoSdkLogLevel, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
+import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
+import { buildDemoSdkInitConfig, demoLogin, webim4Adapter } from './composables/use-demo-sdk-adapter'
 
 /**
  * Provider 三开关 × dataSource 演示
@@ -71,11 +72,11 @@ const AppContent = {
       autoLoggingIn.value = true
       autoLoginError.value = ''
       try {
-        init({
+        init(buildDemoSdkInitConfig({
           appKey: config.appKey,
-          ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
+          apiUrl: config.apiUrl,
           debug: config.debug,
-        })
+        }))
 
         const params: { user: string; accessToken?: string; password?: string } = {
           user: config.user,
@@ -86,7 +87,8 @@ const AppContent = {
           params.password = config.password
         }
 
-        await login(params)
+        // webim4 注入模式下 core 不转发 login，demoLogin 内部直连 webim4Adapter
+        await demoLogin(login, params)
         isLoggedIn.value = true
       } catch (err) {
         autoLoginError.value = (err as Error).message
@@ -170,6 +172,7 @@ const AppContent = {
 <template>
   <EmUIKitProvider
     :auto-init="false"
+    :adapter="demoSdkVersion === 'webim4' ? webim4Adapter : undefined"
     :enable-contact="enableContact"
     :enable-blocklist="enableBlocklist"
     :enable-presence="enablePresence"
