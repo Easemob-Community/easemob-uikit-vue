@@ -17,6 +17,10 @@
       "types": "./dist/auto-imports.d.ts",
       "import": "./dist/auto-imports.js"
     },
+    "./websdk5": {
+      "types": "./dist/websdk5.d.ts",
+      "import": "./dist/websdk5.js"
+    },
     "./theme": {
       "types": "./dist/theme/index.d.ts",
       "default": "./dist/theme/index.css"
@@ -28,8 +32,12 @@
   "files": [
     "dist"
   ],
+  "sideEffects": [
+    "*.css",
+    "./dist/websdk5.js"
+  ],
   "scripts": {
-    "build": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons ../uikit-core/src/assets/icons-v2 && node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node scripts/check-sdk-isolation.mjs && node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons ../uikit-core/src/assets/icons-v2 && node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
     "icons:check": "node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons ../uikit-core/src/assets/icons-v2",
     "auto-imports:check": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check",
@@ -38,19 +46,25 @@
     "story:build": "histoire build"
   },
   "peerDependencies": {
+    "@easemob/uikit-sdk-websdk5": "workspace:^",
     "pinia": "^2.1.0 || ^4.0.0",
     "vue": "^3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "@easemob/uikit-sdk-websdk5": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@easemob/uikit-core": "workspace:^",
     "@easemob/uikit-sdk-contract": "workspace:^",
-    "@easemob/uikit-sdk-websdk5": "workspace:^",
     "@tiptap/extension-image": "^3.30.0",
     "@tiptap/starter-kit": "^3.30.0",
     "@tiptap/vue-3": "^3.30.0",
     "@vueuse/core": "^14.4.0"
   },
   "devDependencies": {
+    "@easemob/uikit-sdk-websdk5": "workspace:^",
     "@histoire/plugin-vue": "^0.17.17",
     "@vitejs/plugin-vue": "^4.6.2",
     "histoire": "^0.17.17",

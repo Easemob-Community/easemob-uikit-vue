@@ -10,7 +10,6 @@ import type {
 } from '@easemob/uikit-sdk-contract'
 import type { CoreConnectionCallbacks, CoreUIKitInitConfig, H5AdaptationConfig, NoticeConfig, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
 import {
-  createDeferredSdkAdapter,
   useCoreUIKitProvider,
 } from '@easemob/uikit-core'
 import { useMessageStore } from '../store/message'
@@ -105,8 +104,9 @@ export function useUIKitProvider(
   config: CoreUIKitInitConfig,
   options: {
     /**
-     * 注入的中立 SDK 适配器（注入模式：业务全权管理其生命周期）。
-     * 未传时内置默认适配器（websdk5，经 core createDeferredSdkAdapter 动态加载）。
+     * 注入的中立 SDK 适配器（注入模式：业务全权管理其生命周期，决策 18）。
+     * 未传时走 core 注册表默认适配器（由 `@easemob/uikit-im/websdk5` 子路径入口
+     * import 时自注册，决策 22；未注册会在 Provider 装配时抛出明确错误）。
      */
     adapter?: SdkAdapter
     autoInit?: boolean
@@ -139,13 +139,13 @@ export function useUIKitProvider(
 
   // core provider：承接 adapter 生命周期、core stores/domains、features/dataSource/noticeConfig/h5/theme。
   // autoInit 一律置 false，立即初始化改在下方显式触发。
+  // 默认适配器由 core 注册表解析（子路径入口 @easemob/uikit-im/websdk5 自注册，决策 22）。
   // clientName/clientVersion：场景包版本注入，客户端版本日志输出 SDK + UIKit-IM + Core 三版本。
   // resolveSdkConfig：IM 默认 enableSyncData 注入下沉到 core setupAdapter，
   // auto-init 与 useClient().init() 延迟初始化路径统一生效。
   // sceneStores：场景 Pinia stores 注入 adapter（事件层/Domain 直写）。
   const coreCtx = useCoreUIKitProvider(config, {
     ...options,
-    createDefaultAdapter: () => createDeferredSdkAdapter(),
     autoInit: false,
     clientName: 'UIKit-IM',
     clientVersion: __EASEMOB_UIKIT_VERSION__,

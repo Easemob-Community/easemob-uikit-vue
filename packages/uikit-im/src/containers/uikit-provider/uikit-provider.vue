@@ -28,7 +28,8 @@ export interface ProviderProps {
   appKey?: string
   /**
    * 注入的中立 SDK 适配器（SdkAdapter）。传入后业务全权管理其生命周期（D122 注入模式）；
-   * 不传时内置默认适配器（websdk5，动态加载，UIKit 全权管理）。
+   * 不传时使用注册表默认适配器——由 `import '@easemob/uikit-im/websdk5'` 子路径入口
+   * 自注册（UIKit 全权管理）；4.x 接入方改为 import webim4 adapter 并显式传本 prop。
    */
   adapter?: SdkAdapter
   /** SDK 客户端配置（除 appKey 外的 SDK 初始化字段，如 debug / enableSyncData 等），与 appKey 合并后透传给 adapter */
@@ -126,7 +127,11 @@ export interface ProviderProps {
   enableTyping?: boolean
   /** 好友列表是否过滤掉已拉黑用户（默认 true；仅联系人子视图/好友列表生效，选人弹窗不受影响） */
   filterBlockedContacts?: boolean
-  /** 业务接管数据源，不传走 SDK 默认 */
+  /**
+   * 业务接管数据源，不传走 SDK 默认
+   * @deprecated 统一迁移为 repository 数据入口层（经 adapter.contact/.group/.presence/.userInfo），
+   * 本 prop 保留至下个大版本移除（D122 决策 11 / 风险 10）。
+   */
   dataSource?: UIKitDataSource
   /**
    * 系统通知自定义配置：renderText 自定义文案（俏皮/严肃话术等）、
