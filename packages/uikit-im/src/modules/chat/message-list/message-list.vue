@@ -653,8 +653,9 @@ async function onGroupReadClick(msgId: string, groupId: string) {
       const result = await fetchGroupReadDetail(msgId, groupId)
       readUsers = [...new Set(
         (result?.users || [])
+          // typeof 守卫：adapter 异常返回非字符串 userId 时丢弃，避免污染 Avatar/userInfo 链路
           .map(u => u.userId)
-          .filter((id): id is string => !!id),
+          .filter((id): id is string => typeof id === 'string' && !!id),
       )]
       stores.message.setGroupMessageReadUsers(groupId, msgId, readUsers)
       // 用服务端权威 count 更新消息已读数，补齐离线消息/多端同步等场景下气泡数字缺失

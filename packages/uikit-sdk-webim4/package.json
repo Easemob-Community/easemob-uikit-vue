@@ -18,7 +18,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node scripts/check-reverse-dependency.mjs && vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch"
   },
   "peerDependencies": {
