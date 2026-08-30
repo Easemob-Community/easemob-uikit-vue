@@ -12,7 +12,7 @@
  */
 export const EasemobUIKitCoreImports = {
   '@easemob/uikit-core': [
-    'createDeferredSdkAdapter',
+    'getUIKitAdapter',
     'resetSyncState',
     'setSyncState',
     'toUiMessage',

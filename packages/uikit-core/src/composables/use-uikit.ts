@@ -11,6 +11,10 @@ import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 import { emitNotificationDelivered, useNotification } from './use-notification'
 import { resetSyncState, setSyncState } from './use-sync-status'
+import { getDefaultSdkAdapterFactory, getUIKitAdapter, setCurrentUIKitAdapter } from './default-adapter'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('UIKit:CoreProvider')
 
 /** core 侧 UIKit 登录参数：支持 accessToken 或密码登录 */
 export interface CoreUIKitLoginParams {
@@ -84,11 +88,13 @@ const defaultFeatures: UIKitFeatures = {
 export interface CoreUIKitProviderOptions {
   autoInit?: boolean
   /**
-   * 注入的中立 SDK 适配器（注入模式：业务全权管理生命周期）。
-   * 未传时由 `createDefaultAdapter` 创建内置适配器（内置模式：UIKit 全权）。
+   * 注入的中立 SDK 适配器（注入模式：业务全权管理 login/logout/dispose，
+   * core 只负责 init 接线与事件订阅，绝不替业务做连接生命周期——决策 18）。
+   * 未传时按 `createDefaultAdapter` → 注册表默认工厂（决策 22 子路径入口自注册）
+   * 的顺序解析内置适配器（内置模式：UIKit 全权）。
    */
   adapter?: SdkAdapter
-  /** 内置模式下的默认适配器工厂（由场景包/core 容器注入，避免 core 静态依赖具体 adapter） */
+  /** 内置模式下的默认适配器工厂（显式覆盖；优先于注册表默认工厂） */
   createDefaultAdapter?: () => SdkAdapter
   /** 支持传入 computed：ctx.features 以 getter 形式在每次读取时解析最新值 */
   features?: Partial<UIKitFeatures> | ComputedRef<Partial<UIKitFeatures>>
@@ -226,14 +232,32 @@ export function useCoreUIKitProvider(
   // 注册到通知管线（模块级解析器，与 locale 的 currentLocale 同款模式；卸载时重置）
   setNoticeConfigResolver(resolveNoticeConfig)
 
-  // 适配器实例：注入模式用业务传入的，内置模式用 createDefaultAdapter 工厂创建
-  const adapterMaybe = options.adapter ?? options.createDefaultAdapter?.()
+  // 适配器实例：注入模式用业务传入的；内置模式优先 createDefaultAdapter 显式工厂，
+  // 其次注册表默认工厂（由场景包子路径入口 import 时自注册，如 @easemob/uikit-im/websdk5）
+  const adapterSource = options.adapter
+    ? 'adapter prop（注入模式）'
+    : options.createDefaultAdapter
+      ? 'createDefaultAdapter 工厂'
+      : '注册表默认工厂（子路径入口自注册）'
+  const adapterMaybe = options.adapter
+    ?? options.createDefaultAdapter?.()
+    ?? getDefaultSdkAdapterFactory()?.()
   if (!adapterMaybe) {
     throw new Error(
-      '[UIKit] 缺少 SDK 适配器：请传入 adapter prop，或由 Provider 注入 createDefaultAdapter',
+      '[UIKit] 缺少 SDK 适配器：请传入 adapter prop（注入模式），'
+      + '或 import 对应 SDK 的子路径入口完成默认注册（如 import \'@easemob/uikit-im/websdk5\'）',
     )
   }
   const adapter: SdkAdapter = adapterMaybe
+  /**
+   * 生命周期所有权（决策 18，单一所有者，禁止半注入）：
+   * 业务经 adapter prop 传入即为注入模式——login/logout 归业务，
+   * core 只 init 接线 + 订阅事件；否则为内置模式，UIKit 全权。
+   */
+  const adapterOwnership: 'injected' | 'builtin' = options.adapter ? 'injected' : 'builtin'
+  logger.debug('适配器解析完成', { source: adapterSource, ownership: adapterOwnership })
+  // 决策 20：非 Vue 上下文访问口（卸载时经 onScopeDispose 清空）
+  setCurrentUIKitAdapter(adapter)
 
   // 使用 shallowRef 避免深层 UnwrapRef 丢失适配器/Domain 的私有字段导致类型不兼容
   const client: Ref<SdkAdapter> = shallowRef(adapter)
@@ -278,28 +302,39 @@ export function useCoreUIKitProvider(
     // 先归一化（平铺字段下沉 adapterConfig）再走场景钩子，场景钩子只见中立形态
     const normalized = normalizeInitConfig(cfg)
     const resolved = options.resolveSdkConfig?.(normalized) ?? normalized
-    await adapter.init({
-      ...resolved,
-      adapterConfig: {
-        ...resolved.adapterConfig,
-        // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
-        clientName: options.clientName ?? (resolved.adapterConfig?.clientName as string | undefined),
-        clientVersion: options.clientVersion ?? (resolved.adapterConfig?.clientVersion as string | undefined),
-        // live 对象引用：事件层运行时读取最新开关
-        features,
-        // 业务数据源接管（惰性代理）
-        dataSource,
-        // store 注入：core stores + 场景 stores（事件层/Domain 直写）
-        stores: {
-          client: stores.client,
-          presence: stores.presence,
-          userInfo: stores.userInfo,
-          ...options.sceneStores,
-        },
-        eventDeps: buildEventHandlerDeps(),
-        onUserInfoSubscriptionPermissionError: options.onUserInfoSubscriptionPermissionError,
-      },
+    logger.info('adapter 装配开始', {
+      ownership: adapterOwnership,
+      appKey: resolved.appKey,
+      reinit: initialized,
     })
+    try {
+      await adapter.init({
+        ...resolved,
+        adapterConfig: {
+          ...resolved.adapterConfig,
+          // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
+          clientName: options.clientName ?? (resolved.adapterConfig?.clientName as string | undefined),
+          clientVersion: options.clientVersion ?? (resolved.adapterConfig?.clientVersion as string | undefined),
+          // live 对象引用：事件层运行时读取最新开关
+          features,
+          // 业务数据源接管（惰性代理）
+          dataSource,
+          // store 注入：core stores + 场景 stores（事件层/Domain 直写）
+          stores: {
+            client: stores.client,
+            presence: stores.presence,
+            userInfo: stores.userInfo,
+            ...options.sceneStores,
+          },
+          eventDeps: buildEventHandlerDeps(),
+          onUserInfoSubscriptionPermissionError: options.onUserInfoSubscriptionPermissionError,
+        },
+      })
+    }
+    catch (err) {
+      logger.error('adapter 装配失败:', err)
+      throw err
+    }
     initialized = true
     currentAppKey = resolved.appKey
     stores.client.setAppKey(resolved.appKey)
@@ -312,6 +347,7 @@ export function useCoreUIKitProvider(
     // 场景层挂钩（如 chatroom 注册场景事件），返回的 dispose 随生命周期清理
     disposeAdapterReady?.()
     disposeAdapterReady = options.onAdapterReady?.(adapter) || null
+    logger.info('adapter 装配完成', { ownership: adapterOwnership, appKey: resolved.appKey })
   }
 
   // 立即初始化：仅当 auto-init 未关闭且已提供 appKey
@@ -325,6 +361,12 @@ export function useCoreUIKitProvider(
   }
 
   async function login(params: CoreUIKitLoginParams): Promise<void> {
+    // 决策 18 注入模式：连接生命周期归业务，UIKit 不替业务调 adapter.login。
+    // 业务应直接调用自己持有的 adapter.login()；store 记账由 adapter 经注入 stores 完成。
+    if (adapterOwnership === 'injected') {
+      logger.warn('注入模式（adapter prop）下登录由业务方全权负责，useClient().login 不会转发到 adapter；请直接调用业务持有的 adapter.login(user, token)')
+      return
+    }
     // 兼容「init() 后不 await 直接 login」的旧调用时序：等待进行中的初始化完成
     if (!initialized && initPromise) {
       await initPromise
@@ -344,7 +386,14 @@ export function useCoreUIKitProvider(
   }
 
   async function logout(): Promise<void> {
-    await adapter.logout()
+    // 决策 18 注入模式：不替业务断开连接（adapter.logout 归业务调用）；
+    // UIKit 自身状态（core stores / 同步状态 / 场景挂钩）的清理仍由本函数负责。
+    if (adapterOwnership === 'injected') {
+      logger.warn('注入模式（adapter prop）下登出由业务方全权负责，useClient().logout 不会转发到 adapter；请直接调用业务持有的 adapter.logout()')
+    }
+    else {
+      await adapter.logout()
+    }
     disposeAdapterReady?.()
     disposeAdapterReady = null
     // 同步状态随登出归零，防止跨登录会话残留
@@ -375,6 +424,9 @@ export function useCoreUIKitProvider(
     disposeSubscription = null
     disposeAdapterReady?.()
     disposeAdapterReady = null
+    // 清空非 Vue 上下文访问口（决策 20）；仅当仍指向本实例时清空，避免误清后挂载 Provider
+    if (getUIKitAdapter() === adapter)
+      setCurrentUIKitAdapter(null)
     // 卸载时重置通知配置解析器，避免残留已卸载 Provider 的配置；
     // 仅当当前解析器仍属于本实例时才重置，避免误清空后挂载 Provider 的配置（多 Provider 并存场景）
     if (getNoticeConfigResolver() === resolveNoticeConfig)

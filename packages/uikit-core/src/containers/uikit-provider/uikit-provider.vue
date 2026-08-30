@@ -8,7 +8,6 @@ import type { ContactFetchMode, UIKitDataSource, UIKitFeatures } from '../../com
 import type { CoreUIKitInitConfig } from '../../composables/use-uikit'
 import type { H5AdaptationConfig } from '../../composables/use-h5-adaptation'
 import { useCoreUIKitProvider } from '../../composables/use-uikit'
-import { createDeferredSdkAdapter } from '../../composables/deferred-adapter'
 import {
   type ProviderLoggerConfig,
   type ProviderNotificationConfig,
@@ -69,7 +68,10 @@ export interface CoreProviderProps {
   enableAtMe?: boolean
   /** 是否启用对方正在输入提示（默认 true） */
   enableTyping?: boolean
-  /** 业务接管数据源，不传走 SDK 默认 */
+  /**
+   * 业务接管数据源，不传走 SDK 默认
+   * @deprecated 统一迁移为 repository 数据入口层（D122 决策 11 / 风险 10），保留至下个大版本移除。
+   */
   dataSource?: UIKitDataSource
   /**
    * 系统通知自定义配置：renderText 自定义文案（俏皮/严肃话术等）、
@@ -148,11 +150,11 @@ const noticeConfig = computed(() => props.noticeConfig ?? {})
 
 /**
  * 初始化 core UIKit 上下文：SDK 适配器生命周期 + core stores。
- * adapter prop 注入时业务全权管理其生命周期；未注入时内置默认适配器（websdk5，动态加载）。
+ * adapter prop 注入时业务全权管理其生命周期；未注入时走注册表默认适配器
+ * （由场景包子路径入口自注册，如 @easemob/uikit-im/websdk5，决策 22）。
  */
 useCoreUIKitProvider(config.value, {
   adapter: props.adapter,
-  createDefaultAdapter: () => createDeferredSdkAdapter(),
   autoInit: props.autoInit,
   features,
   dataSource,

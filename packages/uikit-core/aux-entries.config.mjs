@@ -33,5 +33,10 @@ export default {
     'createUserInfoSubscriptionErrorHandler',
     // use-notification 附属：送达回调触发（notification-engine 内部调用）
     'emitNotificationDelivered',
+    // default-adapter 附属：注册表内部读写（业务只需 register/getUIKitAdapter 两个公开口，
+    // 其中 register 由子路径入口调用而非 auto-import 场景；内部 setter 不对外）
+    'getDefaultSdkAdapterFactory',
+    'registerDefaultSdkAdapterFactory',
+    'setCurrentUIKitAdapter',
   ],
 }

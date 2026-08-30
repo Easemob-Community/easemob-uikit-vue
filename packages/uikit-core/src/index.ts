@@ -31,7 +31,8 @@ export * from './composables/types'
 // core Provider 生命周期（SDK 适配器生命周期 + core stores）
 export { useCoreUIKitProvider, useCoreUIKit, CORE_UIKIT_CONTEXT_KEY } from './composables/use-uikit'
 export type { CoreUIKitContext, CoreUIKitLoginParams, CoreStores, CoreUIKitProviderOptions, CoreUIKitInitConfig, CoreConnectionCallbacks } from './composables/use-uikit'
-export { createDeferredSdkAdapter } from './composables/deferred-adapter'
+// 默认适配器注册表（决策 22 子路径入口自注册）+ 非 Vue 上下文访问口（决策 20）
+export { getUIKitAdapter, registerDefaultSdkAdapterFactory } from './composables/default-adapter'
 export { useSyncStatus } from './composables/use-sync-status'
 export type { SyncDataType, SyncPhase, SyncState } from './composables/use-sync-status'
 
