@@ -935,6 +935,7 @@
 - **修复**：`packages/uikit-core/src/theme/index.css` 新增 `--uikit-focus-ring-color` token 与全局 `:focus-visible { outline: 2px solid ... !important; outline-offset: 2px !important; }`，确保组件内 `outline: none` 不吞掉焦点环。
 - **验证**：`vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build` 通过。
 - **关联 skill**：`uikit-styling-theming` / `uikit-component-authoring`
+- **后续变更**：全局 `:focus-visible` 强制规则（含 `--uikit-focus-ring-color` token）已按产品决策移除——`!important` 全局 outline 会被业务容器 `overflow: hidden` 裁成残缺竖杠，视觉不可接受。组件级 `:focus-visible` 样式按需自行实现，不再有全局兜底。
 
 ### [x] D106. UI/UX 验收：IconButton 移动端触摸热区扩展（P1-3）
 

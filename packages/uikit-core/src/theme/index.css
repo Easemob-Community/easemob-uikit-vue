@@ -6,9 +6,6 @@
   --uikit-danger-color: hsl(350, 100%, 60%);
   --uikit-info-color: hsl(203, 100%, 60%);
 
-  /* 焦点环：键盘导航时所有可交互元素的可见焦点指示器 */
-  --uikit-focus-ring-color: var(--uikit-primary-color);
-
   /* 文字层级 */
   --uikit-text-primary: #111827;
   --uikit-text-secondary: #6b7280;
@@ -266,12 +263,6 @@
   /* 阴影系统 - 暗色（提高不透明度避免深色背景看不出阴影） */
   --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.40), 0 12px 32px rgba(0, 0, 0, 0.45);
   --uikit-shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.50), 0 18px 48px rgba(0, 0, 0, 0.55);
-}
-
-/* ===== 全局焦点环：确保键盘用户可定位焦点，覆盖组件内 outline: none ===== */
-:focus-visible {
-  outline: 2px solid var(--uikit-focus-ring-color) !important;
-  outline-offset: 2px !important;
 }
 
 /* ===== 密度档变量覆盖 ===== */

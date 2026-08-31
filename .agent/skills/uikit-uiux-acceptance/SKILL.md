@@ -28,13 +28,13 @@
 
 | 检查项 | 标准 | 实现位置 | 验证方式 |
 | --- | --- | --- | --- |
-| 焦点环 | 所有可交互元素 `:focus-visible` 可见 | `packages/uikit-core/src/theme/index.css` 全局规则 + 组件不吞 outline | Tab 遍历 demo 页面 |
+| 焦点环 | 可交互元素按需实现 `:focus-visible`（全局强制规则已移除，见 TECH-DEBT D105） | 组件自身样式 | Tab 遍历 demo 页面 |
 | 对比度 | 正文 ≥4.5:1，大文字 ≥3:1（WCAG 2.1 AA） | `theme/index.css` 明暗色值 | 对比度工具测算 |
 | 动画 | 尊重 `prefers-reduced-motion`，全局可关 | `data-uikit-anim-enabled="false"` / `@media (prefers-reduced-motion: reduce)` | 切换动画开关实测 |
 | 触摸热区 | H5 下可点击区域 ≥44×44px | `icon-button.vue` 等通过 `::after` / padding 扩展 | 浏览器 devtools 测量 |
 
-> 新增可交互组件时，先在 `theme/index.css` 确认 `--uikit-focus-ring-color` 已覆盖；
-> 若组件内写 `outline: none`，必须同时补 `:focus-visible` 样式。
+> 新增可交互组件时，按需自行实现 `:focus-visible` 样式（全局强制规则已移除，见 TECH-DEBT D105）；
+> 若组件内写 `outline: none`，键盘可达性场景需自行评估是否补焦点样式。
 
 ### 1.2 组件形态 —— 走设计系统 token
 

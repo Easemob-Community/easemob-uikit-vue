@@ -861,18 +861,6 @@ defineExpose({
   width: 320px;
   max-width: calc(100vw - 24px);
 }
-
-/* 输入框默认关闭"聚焦外边光环"：全局 :focus-visible 会给可聚焦元素加蓝色 outline 环
-   （theme/index.css 全局焦点环，为键盘可达性设计），但它会覆盖 message-input 内部
-   编辑区（textarea / contenteditable）的 outline: none，形成内圈聚焦光环。
-   这里仅对 message-input 内的**编辑区**（textarea / [contenteditable] / 原生 input 字段）
-   强制消除 outline（非 scoped，需跨子组件（simple-input / rich-input / h5-input）命中内部
-   可聚焦元素；以更高优先级压制全局 !important 规则）。工具栏按钮等仍保留全局焦点环，兼顾键盘可达性。 */
-.message-input textarea:focus-visible,
-.message-input [contenteditable]:focus-visible,
-.message-input .uikit-input__field:focus-visible {
-  outline: none !important;
-}
 </style>
 
 <style scoped>
