@@ -1,21 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref } from 'vue'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import QuoteCard from '../quote/quote-card.vue'
-import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
-import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
-import { CONVERSATION_TYPE, INJECTION_KEY, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { MessageStatusValue } from '@easemob/uikit-core'
-import { useGroupStore } from '../../../store/group'
-import { useClientStore } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { type MsgQuotePayload, useQuote } from '../../../composables/use-quote'
-import { useUserInfo } from '../../../composables/use-user-info'
-import { usePresence } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob/uikit-core'
+import type { LocationMessageBody, MessageStatusValue, PresenceDisplayStatus, UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '@easemob/uikit-sdk-contract'
-import type { PresenceDisplayStatus } from '@easemob/uikit-core'
+import QuoteCard from '../quote/quote-card.vue'
+import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
+import { useGroupStore } from '../../../store/group'
+import { type MsgQuotePayload, useQuote } from '../../../composables/use-quote'
+import { useUIKit } from '../../../composables/use-uikit'
+import { useUserInfo } from '../../../composables/use-user-info'
 import CombineMessageModal from './combine-message-modal.vue'
 import MessageInteractive from './message-interactive.vue'
 import MessageRenderer from './message-renderer.vue'
@@ -83,6 +76,8 @@ function onViewCombine(message: UiMessage) {
 const { t } = useLocale()
 
 const clientStore = useClientStore()
+
+const { capabilities } = useUIKit()
 
 const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
 const { get: getPresence } = usePresence()
@@ -180,8 +175,9 @@ const isGroupReadReceiptActive = computed(() => {
   // 消息本身已请求回执或已有回执数据，直接激活
   if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
     return true
-  // 配置开启时，群聊己方消息默认激活（兼容历史消息与未收到回执的新消息）
-  return props.groupReadReceiptConfig?.enabled === true
+  // 配置开启时，群聊己方消息默认激活（兼容历史消息与未收到回执的新消息）；
+  // 与 SDK 客观能力取交集：adapter 上报 groupReadReceipt=false 时不按配置激活
+  return capabilities.groupReadReceipt !== false && props.groupReadReceiptConfig?.enabled === true
 })
 
 /** 是否显示群已读人数标注 */
@@ -895,7 +891,6 @@ onBeforeUnmount(() => {
   opacity: 0;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
-
 
 @media (hover: hover) {
   .message-bubble-wrapper--hover-time:hover .message-bubble-wrapper__time {

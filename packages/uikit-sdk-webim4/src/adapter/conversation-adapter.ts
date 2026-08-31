@@ -9,8 +9,8 @@ import {
 } from '@easemob/uikit-sdk-contract'
 import { toUiMessage } from './message-adapter'
 
-/** 4.x adapter 默认中文摘要标签（与历史 UI 行为保持一致）。 */
-const adapterPreviewLabels: MessagePreviewLabels = {
+/** 4.x adapter 默认中文摘要标签（与历史 UI 行为保持一致）；notification-engine 复用。 */
+export const adapterPreviewLabels: MessagePreviewLabels = {
   image: '[图片]',
   sticker: '[表情]',
   voice: '[语音]',

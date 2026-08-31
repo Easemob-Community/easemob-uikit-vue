@@ -9,7 +9,7 @@ import { useCoreUIKit } from './use-uikit'
 const logger = createLogger('UIKit:UsePresence')
 
 export function usePresence() {
-  const { domains, stores, dataSource } = useCoreUIKit()
+  const { domains, stores } = useCoreUIKit()
   const presenceStore = stores.presence
 
   const presenceMap = computed(() => presenceStore.presenceMap)
@@ -22,26 +22,19 @@ export function usePresence() {
     return !!currentUserId.value && userId === currentUserId.value
   }
 
-  /** 订阅在线状态 */
+  /** 订阅在线状态（dataSource.subscribePresence 已经 core 翻译为 presence.subscribe 注入，由 Domain 委托） */
   async function subscribePresence(userIds: string[], expiry?: number) {
-    if (dataSource.subscribePresence) {
-      await dataSource.subscribePresence(userIds)
-      return
-    }
     await domains.presence.subscribe(userIds, expiry)
   }
 
   /** 取消订阅 */
   async function unsubscribePresence(userIds: string[]) {
-    if (dataSource.unsubscribePresence) {
-      await dataSource.unsubscribePresence(userIds)
-      return
-    }
     await domains.presence.unsubscribe(userIds)
   }
 
   /**
-   * 查询在线状态。
+   * 查询在线状态（dataSource.fetchPresence 已翻译为 presence.fetchStatus 注入，
+   * 注入路径与 SDK 路径均由 Domain 统一写入 presence store）。
    * 注意：订阅自己会被服务端拒绝（cannot_subscribe_yourself，见 watch），
    * 但主动查询（getPresenceStatus）允许查询自己，因此这里不再过滤当前用户——
    * 侧边栏等"自己的头像"正是依赖此能力拉取并展示自己的在线状态点。
@@ -49,11 +42,6 @@ export function usePresence() {
   async function fetchPresence(userIds: string[]): Promise<UiPresence[]> {
     if (userIds.length === 0)
       return []
-    if (dataSource.fetchPresence) {
-      const list = await dataSource.fetchPresence(userIds)
-      presenceStore.updateBatch(list)
-      return list
-    }
     await domains.presence.fetchStatus(userIds)
     return userIds
       .map(userId => presenceStore.get(userId))

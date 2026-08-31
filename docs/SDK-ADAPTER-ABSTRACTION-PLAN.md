@@ -1,6 +1,6 @@
 # SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）设计执行计划
 
-> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 已落地（静态门禁全绿，手测反馈修复中）；Phase 3.1 已落地（repository 注入留口子：`SdkConfig.repositories` → Domain 委托，门禁全绿）；Phase 3.2~3.5（DB/Electron 专项）未启动**（2026-08-30 更新，4.x 源码核对新事实见 TECH-DEBT D122 进度备忘）
+> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 代码项全部落地——含 webim4 子路径入口、新消息通知引擎、注入 client 模式单测、摇树验收（2026-08-31 执行通过，结果见 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）——剩真实 4.x 环境手测矩阵 + 私有化端到端验收（人工项）；契约层残留债务已闭环（repository/domains 双线收敛、capabilities 协商机制、四域 repository 注入、`UIKitDataSource` 薄别名收口、im 侧 capabilities 消费接线）；Phase 3.2~3.5（DB/Electron 专项）未启动**（2026-08-31 更新，明细见 TECH-DEBT D122 进度备忘）
 > 对应 TECH-DEBT D122（SDK 抽象），联动 D85（Electron 持久化预研，见 `docs/ELECTRON-PERSISTENCE-RESEARCH.md`）。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：会话列表 API 修正为 `getServerConversations`（游标分页）；补 4.x 消息体字段映射表（`msg`/`thumb`/`length`/`addr`/`customEvent` 等差异）与事件模型差异（`onMessage` 批量数组、回执独立回调）；`SdkAdapter` 补操作面；Provider 兼容策略明确为非 breaking；UMD 全局名决策修正；chatroom 本期暂缓接入 adapter。
 > **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
@@ -400,7 +400,7 @@ interface MessageRepository {
 7. **双 adapter 同包名共存**：两代 SDK 同为 `easemob-websdk`（4.24.2 vs ^5.0.0），同装两 adapter 时 npm/pnpm 按版本 range 嵌套共存（合法），但根 `pnpm.overrides` 的 `sdk:use-tgz` 切换脚本只针对 5.x——4.x 联调需要独立的本地引入机制（file: 协议或单独 override），别复用错脚本。
 8. **结构型 body 守卫的字段精确性**：中立 `MessageBody` 无 `type` 判别字段，守卫靠字段存在性（`'duration' in body` 等）。4.x 原始 body 字段比中立命名多（如 `ImgMsgBody` 同时有 `url`/`thumb`/`bigImageUrl`）——adapter 映射时**必须精确产出中立字段集**（多余的原始字段要剔除），否则守卫误判（带 `duration` 的视频被误判语音、带 `url` 的图片被误判文件）。这是 4.x adapter 最容易踩的坑，需要针对性单测。
 9. **adapter 不能反向依赖 uikit-im**：现有 `sdk/adapter/message-adapter.ts` import 了 im 内部的 `customEventPreviewMap`（`utils/resolve-last-message-text`）。迁入 adapter 包时该工具需下沉 core（贴近 locale）或改为**依赖注入**（adapter 构造参数传入 preview resolver，与 `ConversationDomain` 注入 `resolveSenderName` 同模式）。**2026-08 复核：反向依赖不止这一处，完整清单**——value 依赖：`sdk/adapter/conversation-adapter.ts:3` → `utils/resolve-last-message-text`、`sdk/event/registry.ts:3` → `composables/use-sync-status`、`sdk/event/chat-events.ts:16/18/19` → `utils/stream-message` / `composables/use-sync-status` / `utils/resolve-last-message-text`；type-only 依赖：`sdk/event/types.ts:1-4` → `store/message|conversation|contact|group` 的 store 类型（需下沉为契约层 StoreLike 接口）。迁入 adapter 包前须逐项解耦。
-10. **`UIKitDataSource` 是已发布的公开 prop**：`uikit-provider.vue` 的 `dataSource?: UIKitDataSource` 即使生产环境无使用（demo 有演示使用，见 2.5 节复核注）也已发版。处理路径：Phase 1 标记 `@deprecated`（2026-08-29 已标：contract `types/data-source.ts` + core/im 两侧 Provider 的 `dataSource` prop）；薄别名转发到 repository 实现随**对应域**的 repository 注入落地时收口（Phase 3.1 已于 2026-08-30 落地 message/conversation 两域注入；`dataSource` 覆盖的 contact/group/presence/userInfo 域待后续阶段补齐后再转发）——提前转发会改变现有调用点的分支语义，得不偿失。大版本升级时再移除。不直接删。
+10. **`UIKitDataSource` 是已发布的公开 prop**：`uikit-provider.vue` 的 `dataSource?: UIKitDataSource` 即使生产环境无使用（demo 有演示使用，见 2.5 节复核注）也已发版。处理路径：Phase 1 标记 `@deprecated`（2026-08-29 已标：contract `types/data-source.ts` + core/im 两侧 Provider 的 `dataSource` prop）；薄别名转发已收口（2026-08-31：四域 repository 注入落地后，core 新增 `composables/data-source-repositories.ts` 把 dataSource 逐项翻译为 `SdkRepositoryOverrides` 注入 adapter Domain，惰性 getter 保持运行时切换语义，显式 `repositories` 按域整体优先；`searchUsers` 无契约对应项保留 UI 层单点消费；demo 已同步迁移）。大版本升级时再移除。不直接删。
 11. **core 隔离门禁需扩展**：core 现有 `check-engine-isolation.mjs` 只禁 vue/pinia/@vueuse 值依赖；收口后必须把 `easemob-websdk` 加入禁用列表（值 + 类型 import 都禁），防止耦合回流。
 
 ---
@@ -563,7 +563,7 @@ interface MessageRepository {
 ```text
 1. 业务代码当前是哪一种入口？
    ├─ 内置模式（import '@easemob/uikit-im/websdk5' + 不传 adapter prop）
-   │   → 改为 import '@easemob/uikit-im/webim4'（待 webim4 子路径入口落地）
+   │   → 改为 import '@easemob/uikit-im/webim4'（子路径入口已于 2026-08-31 落地）
    │   → 或显式 import { Webim4Adapter } from '@easemob/uikit-sdk-webim4' 并传 adapter prop
    └─ 注入模式（已传 adapter prop）
       → 把 new Websdk5Adapter() 换成 new Webim4Adapter()

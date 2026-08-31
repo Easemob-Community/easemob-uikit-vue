@@ -8,24 +8,20 @@ import {
   UserInfoManager,
 } from 'easemob-websdk'
 import type {
+  ContactRepository,
+  ConversationRepository,
+  ConversationTypeValue,
+  GroupRepository,
+  MessageRepository,
+  PresenceRepository,
   SdkAdapter,
   SdkCapabilities,
   SdkConfig,
   SdkEventHandlers,
+  SdkMessage,
+  SdkRepositoryOverrides,
   UIKitDataSource,
   UIKitFeatures,
-} from '@easemob/uikit-sdk-contract'
-import type {
-  ContactRepository,
-  ConversationRepository,
-  GroupRepository,
-  MessageRepository,
-  PresenceRepository,
-  SdkRepositoryOverrides,
-  UserInfoRepository,
-} from '@easemob/uikit-sdk-contract'
-import type {
-  SdkMessage,
   UiContact,
   UiContactInvite,
   UiConversation,
@@ -36,9 +32,9 @@ import type {
   UserInfo,
   UserInfoAttribute,
   UserInfoAttributeValue,
+  UserInfoRepository,
 } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { SDK_CONTRACT_VERSION, createLogger } from '@easemob/uikit-sdk-contract'
 import type { ClientConfig, UIKitClient } from './client'
 import { createClient } from './client'
 import { MessageDomain } from './domain/message-domain'
@@ -48,7 +44,7 @@ import { GroupDomain } from './domain/group-domain'
 import { PresenceDomain } from './domain/presence-domain'
 import { UserInfoDomain } from './domain/user-info-domain'
 import { registerEventHandlers } from './event/registry'
-import { setEventHandlerDeps, getEventHandlerDeps } from './event/deps'
+import { getEventHandlerDeps, setEventHandlerDeps } from './event/deps'
 import type { EventHandlerDeps } from './event/deps'
 import type { EventStores } from './event/types'
 import { setSyncStatusListener } from './use-sync-status'
@@ -128,6 +124,20 @@ type SdkUiMessage = SdkMessage & {
 type HandlersRef = () => SdkEventHandlers | undefined
 
 /**
+ * 旧 dataSource 直连兼容：adapterConfig.dataSource.fetchUserInfos 收敛为
+ * userInfo repository 形态（core 装配已改为 repositories 翻译注入，本路径仅供
+ * 直连 adapter 的旧调用方；`SdkConfig.repositories` 注入优先）。
+ * 返回类型差异（dataSource 允许部分字段）由 UserInfoDomain 的字段收敛兜底。
+ */
+function legacyDataSourceToUserInfoRepository(
+  ds?: UIKitDataSource,
+): Partial<UserInfoRepository> | undefined {
+  if (!ds?.fetchUserInfos)
+    return undefined
+  return { fetchUserInfos: ds.fetchUserInfos as UserInfoRepository['fetchUserInfos'] }
+}
+
+/**
  * 若业务层（core/uikit-im）未注入事件层依赖，则注入一组最小兜底实现，
  * 保证 adapter 独立运行时不因 `getEventHandlerDeps()` 抛错而崩溃。
  * 真正使用通知/系统通知/i18n 时，业务层应在 subscribe 前调用 setEventHandlerDeps。
@@ -142,7 +152,7 @@ function ensureEventHandlerDeps(): void {
       t: (key: string) => key,
       insertChatNotice: () => {},
       buildAnnouncementNoticeText: (announcement: string) => announcement || '',
-      resolveNoticeUserName: (user) => user?.nickname || user?.userId || '',
+      resolveNoticeUserName: user => user?.nickname || user?.userId || '',
       useNotification: () => ({
         state: {
           value: {
@@ -561,9 +571,9 @@ function createConversationStore(handlersRef: HandlersRef): EventStores['convers
 /** 创建联系人 store */
 function createContactStore(handlersRef: HandlersRef): EventStores['contact'] {
   let contactList: UiContact[] = []
-  let blocklist: UiContact[] = []
+  let _blocklist: UiContact[] = []
   let invites: UiContactInvite[] = []
-  let loaded = false
+  const loaded = false
 
   function emitChange() {
     handlersRef()?.onContactChange?.(contactList)
@@ -615,7 +625,7 @@ function createContactStore(handlersRef: HandlersRef): EventStores['contact'] {
     },
 
     setBlocklist(list) {
-      blocklist = list
+      _blocklist = list
     },
 
     addInvite(invite) {
@@ -669,7 +679,7 @@ function createGroupStore(handlersRef: HandlersRef): EventStores['group'] {
   const sharedFiles = new Map<string, any[]>()
   const joinRequests = new Map<string, any[]>()
   const adminSynced = new Set<string>()
-  let loaded = false
+  const loaded = false
 
   function emitChange() {
     handlersRef()?.onGroupChange?.(groupList)
@@ -1002,6 +1012,8 @@ export class Websdk5Adapter implements SdkAdapter {
     pinnedMessage: true,
     streamingMessage: true,
     groupReadReceipt: true,
+    // 本 adapter 遵循的契约版本（协商机制见 contract capabilities.ts）
+    contractVersion: SDK_CONTRACT_VERSION,
   }
 
   private _client: UIKitClient | null = null
@@ -1012,6 +1024,7 @@ export class Websdk5Adapter implements SdkAdapter {
     group: GroupDomain
     presence: PresenceDomain
   }
+
   private _userInfoDomain?: UserInfoDomain
   private _stores?: EventStores
   private _features?: UIKitFeatures
@@ -1060,7 +1073,11 @@ export class Websdk5Adapter implements SdkAdapter {
     const adapterCfg = (config.adapterConfig ?? {}) as Partial<ClientConfig> & {
       /** UIKit 功能开关（live 对象引用，事件层运行时读取最新值） */
       features?: UIKitFeatures
-      /** 业务数据源接管（透传给 UserInfoDomain 等） */
+      /**
+       * 旧版业务数据源接管（@deprecated，仅兼容直连 adapter 的旧调用方，
+       * 且仅消费 fetchUserInfos）：core 装配已改为把 dataSource 翻译成
+       * `SdkConfig.repositories` 注入；新接入请直接用 repositories。
+       */
       dataSource?: UIKitDataSource
       /**
        * 事件层 store 注入：Provider 模式传入 Pinia stores（结构兼容 EventStores），
@@ -1162,18 +1179,25 @@ export class Websdk5Adapter implements SdkAdapter {
         },
         conversationRepository: repositories?.conversation,
       }),
-      contact: new ContactDomain(this._client, stores.contact),
-      group: new GroupDomain(this._client, stores.group),
-      presence: new PresenceDomain(this._client, stores.presence),
+      contact: new ContactDomain(this._client, stores.contact, {
+        contactRepository: repositories?.contact,
+      }),
+      group: new GroupDomain(this._client, stores.group, {
+        groupRepository: repositories?.group,
+      }),
+      presence: new PresenceDomain(this._client, stores.presence, {
+        presenceRepository: repositories?.presence,
+      }),
     }
 
     // 用户资料域：内部监听 SDK 用户资料变更事件，通过 userInfo store 触发 onUserInfoChanged
+    // 数据入口注入优先取 repositories.userInfo；旧 adapterConfig.dataSource 直连仅兼容兜底
     this._userInfoDomain = new UserInfoDomain(
       this._client,
       stores.userInfo,
-      dataSource ?? {},
+      repositories?.userInfo ?? legacyDataSourceToUserInfoRepository(dataSource) ?? {},
       onUserInfoSubscriptionPermissionError
-        ?? (() => adapterLog.warn('[Websdk5Adapter] 用户资料订阅无权限，已自动熔断')),
+      ?? (() => adapterLog.warn('[Websdk5Adapter] 用户资料订阅无权限，已自动熔断')),
     )
     this._userInfoDomain.listen()
 
@@ -1283,149 +1307,63 @@ export class Websdk5Adapter implements SdkAdapter {
     // MessageDomain.fetchHistory 委托覆盖（UI 实际消费 domains.*），
     // 其余注入方法本期不消费（Phase 3.1 仅留口子）。
     return {
-      loadMessages: async (params) => {
-        const result = await messageDomain.fetchHistory(
-          params.conversationId,
-          params.conversationType,
-          params.cursor,
-          params.pageSize,
-        )
+      loadMessages: async (conversationId, conversationType, cursor, pageSize) => {
+        const result = await messageDomain.fetchHistory(conversationId, conversationType, cursor, pageSize)
         return {
-          list: result.items as SdkMessage[],
+          list: result.list as SdkMessage[],
           cursor: result.cursor,
           hasMore: result.hasMore,
         }
       },
 
-      sendText: async (params) => {
-        return messageDomain.sendText(
-          params.conversationId,
-          params.conversationType,
-          params.content,
-          params.ext,
-          params.needReadReceipt,
-        )
-      },
+      sendText: (conversationId, conversationType, content, ext, needReadReceipt) =>
+        messageDomain.sendText(conversationId, conversationType, content, ext, needReadReceipt),
 
-      sendImage: async (params) => {
-        return messageDomain.sendImage(
-          params.conversationId,
-          params.conversationType,
-          params.data,
-          params.ext,
-          params.needReadReceipt,
-        )
-      },
+      sendImage: (conversationId, conversationType, data, ext, needReadReceipt) =>
+        messageDomain.sendImage(conversationId, conversationType, data, ext, needReadReceipt),
 
-      sendFile: async (params) => {
-        return messageDomain.sendFile(
-          params.conversationId,
-          params.conversationType,
-          params.data,
-          params.ext,
-          params.needReadReceipt,
-        )
-      },
+      sendFile: (conversationId, conversationType, data, ext, needReadReceipt) =>
+        messageDomain.sendFile(conversationId, conversationType, data, ext, needReadReceipt),
 
-      sendVoice: async (params) => {
-        return messageDomain.sendVoice(
-          params.conversationId,
-          params.conversationType,
-          params.data,
-          params.duration,
-          params.ext,
-          params.needReadReceipt,
-        )
-      },
+      sendVoice: (conversationId, conversationType, data, duration, ext, needReadReceipt) =>
+        messageDomain.sendVoice(conversationId, conversationType, data, duration, ext, needReadReceipt),
 
-      sendVideo: async (params) => {
-        return messageDomain.sendVideo(
-          params.conversationId,
-          params.conversationType,
-          params.data,
-          params.duration,
-          params.ext,
-          params.needReadReceipt,
-        )
-      },
+      sendVideo: (conversationId, conversationType, data, duration, ext, needReadReceipt) =>
+        messageDomain.sendVideo(conversationId, conversationType, data, duration, ext, needReadReceipt),
 
-      sendLocation: async (params) => {
-        return messageDomain.sendLocation(
-          params.conversationId,
-          params.conversationType,
-          params.latitude,
-          params.longitude,
-          params.address,
-          params.ext,
-        )
-      },
+      // 契约的 needReadReceipt 未透传：domain sendLocation 无此参数（SDK 不支持位置消息回执）
+      sendLocation: (conversationId, conversationType, latitude, longitude, address, ext) =>
+        messageDomain.sendLocation(conversationId, conversationType, latitude, longitude, address, ext),
 
-      sendCustom: async (params) => {
-        const mappedParams = params.customParams
-          ? Object.fromEntries(Object.entries(params.customParams).map(([k, v]) => [k, String(v)]))
+      sendCustom: (conversationId, conversationType, event, customParams, ext) => {
+        // 契约 customParams 为 unknown 值域，domain/SDK wire 仅接受 string 值域，做浅层 String 收敛
+        const mappedParams = customParams
+          ? Object.fromEntries(Object.entries(customParams).map(([k, v]) => [k, String(v)]))
           : undefined
-        return messageDomain.sendCustom(
-          params.conversationId,
-          params.conversationType,
-          params.event,
-          mappedParams,
-          params.ext,
-        )
+        return messageDomain.sendCustom(conversationId, conversationType, event, mappedParams, ext)
       },
 
-      sendCmd: async (params) => {
-        return messageDomain.sendCmd(
-          params.conversationId,
-          params.conversationType,
-          params.action,
-          params.ext,
-        )
-      },
+      sendCmd: (conversationId, conversationType, action, ext) =>
+        messageDomain.sendCmd(conversationId, conversationType, action, ext),
 
-      sendCombine: async (params) => {
-        return messageDomain.sendCombine(
-          params.conversationId,
-          params.conversationType,
-          params.title,
-          params.summary,
-          '',
-          params.messageList,
-          params.ext,
-        )
-      },
+      // 契约 sendCombine 无 compatibleText 参数，domain 侧以空串占位
+      sendCombine: (conversationId, conversationType, title, summary, messageList, ext) =>
+        messageDomain.sendCombine(conversationId, conversationType, title, summary, '', messageList, ext),
 
-      recall: async (params) => {
-        await messageDomain.recall(params.conversationId, params.conversationType, params.messageId)
-      },
+      recall: (conversationId, conversationType, messageId) =>
+        messageDomain.recall(conversationId, conversationType, messageId),
 
-      markMessagesRead: async (params) => {
-        await messageDomain.markMessagesRead(
-          params.conversationId,
-          params.conversationType,
-          params.messageIds,
-        )
-      },
+      markMessagesRead: (conversationId, conversationType, messageIds) =>
+        messageDomain.markMessagesRead(conversationId, conversationType, messageIds),
 
-      markConversationRead: async (params) => {
-        await conversationDomain.markRead(params.conversationId, params.conversationType)
-      },
+      markConversationRead: (conversationId, conversationType) =>
+        conversationDomain.markRead(conversationId, conversationType),
 
-      modifyText: async (params) => {
-        await messageDomain.modifyText(
-          params.conversationId,
-          params.conversationType,
-          params.messageId,
-          params.text,
-        )
-      },
+      modifyText: (conversationId, conversationType, messageId, text) =>
+        messageDomain.modifyText(conversationId, conversationType, messageId, text),
 
-      getGroupReadReceiptUsers: async (params) => {
-        const result = await messageDomain.getGroupMessageReadUsers(
-          params.groupId,
-          params.messageId,
-          params.cursor,
-          params.pageSize,
-        )
+      getGroupReadReceiptUsers: async (groupId, messageId, cursor, pageSize) => {
+        const result = await messageDomain.getGroupMessageReadUsers(groupId, messageId, cursor, pageSize)
         return {
           list: result.users.map(u => ({ userId: u.userId, timestamp: u.timestamp })),
           cursor: result.cursor || undefined,
@@ -1443,7 +1381,7 @@ export class Websdk5Adapter implements SdkAdapter {
     // ConversationDomain.refresh 委托覆盖（UI 实际消费 domains.*），
     // 其余注入方法本期不消费（Phase 3.1 仅留口子）。
     return {
-      fetchConversations: async (_params) => {
+      fetchConversations: async () => {
         // SDK5 当前无游标分页，直接返回本地会话全量快照
         const list = conversationDomain.syncLocal()
         return { list, cursor: undefined, hasMore: false }
@@ -1456,11 +1394,8 @@ export class Websdk5Adapter implements SdkAdapter {
       throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
     const contactDomain = this._domains.contact
     return {
-      fetchContacts: async (_params) => {
-        // SDK5 联系人当前为全量本地缓存，cursor 与 hasMore 暂不可用
-        const list = contactDomain.syncLocal()
-        return { list, cursor: undefined, hasMore: false }
-      },
+      // 经 domain.fetchContacts 读取：注入 contact.fetchContacts 时由 domain 委托覆盖
+      fetchContacts: async (cursor, pageSize) => contactDomain.fetchContacts(cursor, pageSize),
 
       fetchBlocklist: async () => contactDomain.syncBlocklist(),
 
@@ -1491,11 +1426,12 @@ export class Websdk5Adapter implements SdkAdapter {
       throw new Error('[Websdk5Adapter] 尚未初始化，请先调用 init()')
     const groupDomain = this._domains.group
     return {
-      fetchGroups: async () => ({ list: groupDomain.syncLocal(), hasMore: false }),
+      // 经 domain.fetchGroups 读取：注入 group.fetchGroups 时由 domain 委托覆盖
+      fetchGroups: async (cursor, pageSize) => groupDomain.fetchGroups(cursor, pageSize),
 
-      fetchGroupInfo: async (groupId) => groupDomain.fetchGroupInfo(groupId),
+      fetchGroupInfo: async groupId => groupDomain.fetchGroupInfo(groupId),
 
-      createGroup: async (params) => groupDomain.createGroup(params),
+      createGroup: async params => groupDomain.createGroup(params),
 
       joinGroup: async (groupId, message) => {
         await groupDomain.joinGroup(groupId, message)

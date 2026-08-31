@@ -63,6 +63,19 @@ export default defineConfig({
     __EASEMOB_UIKIT_SDK_WEBSDK5_VERSION__: JSON.stringify(uikitSdkWebsdk5Version),
   },
   plugins: [
+    // 双 SDK 共存钉版：webim4 adapter 源码内的 easemob-websdk 一律重定向到 easemob-websdk-4（npm alias，4.24.2）
+    // 原因：vite 预构建对裸说明符按「名字」注册唯一产物，websdk5 adapter 先注册 easemob-websdk(5.x) 后，
+    // webim4 的同名 import 会被 tryOptimizedResolve 直接劫持到 5.x 产物（不经 node 向上查找）；
+    // 换成独立 specifier 后两份 SDK 各自预构建、互不干扰。类型层不受影响（tsc 仍按 webim4 自身 node_modules 解析 4.24.2 类型）
+    {
+      name: 'demo-pin-webim4-sdk',
+      enforce: 'pre',
+      resolveId(source, importer) {
+        if (source === 'easemob-websdk' && importer && importer.includes('/packages/uikit-sdk-webim4/'))
+          return this.resolve('easemob-websdk-4', importer, { skipSelf: true })
+        return null
+      },
+    },
     vue(),
     Components({
       dts: true,
@@ -72,6 +85,10 @@ export default defineConfig({
       dts: true,
     }),
   ],
+  optimizeDeps: {
+    // 确保 4.24.2 副本被预构建（扫描器不一定追踪插件重定向后的 specifier）
+    include: ['easemob-websdk-4'],
+  },
   resolve: {
     // 源码直连模式：theme 子路径必须排在 @easemob/uikit-im 主 alias 之前
     // （临时 tgz 产物联调验证时注释掉以下两条 alias，并同步切换 package.json 依赖）
@@ -79,9 +96,11 @@ export default defineConfig({
       // core 主 alias 已指 src，theme 子路径同步指 src（改 CSS 变量无需先构建 core dist）
       { find: '@easemob/uikit-core/theme', replacement: resolve(__dirname, '../../packages/uikit-core/src/theme/index.css') },
       { find: '@easemob/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
-      // SDK 中立契约包 + websdk5 适配器源码直连（D122 双 adapter 拆包）
+      // SDK 中立契约包 + 双 adapter 源码直连（D122 双 adapter 拆包）
+      // webim4 的 easemob-websdk 运行时经上方 demo-pin-webim4-sdk 插件钉到 easemob-websdk-4(4.24.2)，与 5.x 互不干扰
       { find: '@easemob/uikit-sdk-contract', replacement: resolve(__dirname, '../../packages/uikit-sdk-contract/src') },
       { find: '@easemob/uikit-sdk-websdk5', replacement: resolve(__dirname, '../../packages/uikit-sdk-websdk5/src') },
+      { find: '@easemob/uikit-sdk-webim4', replacement: resolve(__dirname, '../../packages/uikit-sdk-webim4/src') },
       { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
       { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
       // chatroom 场景包源码直连（P2-2 demo 页使用；chatroom 无独立主题，theme 子路径经 exports 指 core）

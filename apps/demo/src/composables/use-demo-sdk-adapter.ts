@@ -12,11 +12,35 @@
  * - webim4（注入模式）：core 只负责 adapter.init 装配与 stores 清理，
  *   登录/登出必须直连本文件持有的 `webim4Adapter`。
  */
+import { ref } from 'vue'
 import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
+import type { SdkRepositoryOverrides } from '@easemob/uikit-im'
 import { demoSdkVersion, sdkIsHttpDNS } from './use-demo-settings'
 
 /** 4.x adapter 单例（模块级持有，与 Provider 解耦；demo 全权管理其 login/logout） */
 export const webim4Adapter = new Webim4Adapter()
+
+/**
+ * 是否启用 demo 自定义联系人数据源（设置面板开关）。
+ * 数据入口接管已收口为 repositories 注入（D122 风险 10：dataSource 薄别名迁移），
+ * 注入发生在 adapter init 时，切换开关后需重新登录生效。
+ */
+export const demoUseCustomDataSource = ref(false)
+
+/** 示例：业务从自己后端拉取联系人（repositories.contact.fetchContacts 注入演示） */
+const demoContactRepository: SdkRepositoryOverrides['contact'] = {
+  async fetchContacts() {
+    // 实际使用时请替换为业务 API
+    return {
+      list: [
+        { userId: 'biz_alice', name: 'Alice (业务接口)' },
+        { userId: 'biz_bob', name: 'Bob (业务接口)' },
+      ],
+      cursor: undefined,
+      hasMore: false,
+    }
+  },
+}
 
 /** 当前是否 4.x（webim4）模式 */
 export function isWebim4Mode() {
@@ -31,7 +55,9 @@ export interface DemoSdkInitInput {
 }
 
 /**
- * 组装 init 配置：apiUrl 非空才传；webim4 模式追加 isHttpDNS（私有化部署验证时关闭）。
+ * 组装 init 配置：apiUrl 非空才传；webim4 模式追加 isHttpDNS（私有化部署验证时关闭）；
+ * 开启自定义数据源开关时注入 repositories.contact（core 归一化会下沉 adapterConfig，
+ * 并与 dataSource 翻译结果合并，显式 repositories 优先）。
  * core 会把 appKey/debug 之外的平铺字段下沉 adapterConfig，
  * 4.x adapter 再将剩余字段原样透传给 `new WebIM.connection(params)`。
  */
@@ -40,6 +66,7 @@ export function buildDemoSdkInitConfig(input: DemoSdkInitInput) {
     appKey: input.appKey,
     ...(input.apiUrl ? { apiUrl: input.apiUrl } : {}),
     ...(isWebim4Mode() ? { isHttpDNS: sdkIsHttpDNS.value } : {}),
+    ...(demoUseCustomDataSource.value ? { repositories: { contact: demoContactRepository } } : {}),
     debug: input.debug,
   }
 }

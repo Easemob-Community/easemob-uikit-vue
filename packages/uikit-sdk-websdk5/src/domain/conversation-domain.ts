@@ -1,9 +1,7 @@
-import type { ManagerHost } from '../client'
-import type { UiConversation } from '@easemob/uikit-sdk-contract'
-import { MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
-import type { ConversationRepository, ConversationTypeValue } from '@easemob/uikit-sdk-contract'
+import type { ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { ManagerHost } from '../client'
 
 const conversationLogger = createLogger('Conversation')
 
@@ -130,7 +128,7 @@ export class ConversationDomain {
       const items: UiConversation[] = []
       let cursor: string | undefined
       do {
-        const page = await fetchConversations({ cursor, pageSize: 50 })
+        const page = await fetchConversations(cursor, 50)
         items.push(...page.list)
         cursor = page.hasMore ? page.cursor : undefined
       } while (cursor)

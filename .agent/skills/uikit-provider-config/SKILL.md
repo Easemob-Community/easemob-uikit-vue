@@ -73,7 +73,7 @@ theme?: {
 - `watch(notification, deep + immediate)` → `configureNotification` + `setNotificationClickHandler`，
   运行时改 prop 即刻生效。
 
-### 1.6 dataSource（`composables/types.ts` 的 `UIKitDataSource`）
+### 1.6 dataSource（`composables/types.ts` 的 `UIKitDataSource`，已 `@deprecated`）
 
 - `fetchContacts` / `fetchBlocklist` / `fetchGroups` — 列表类数据源，返回 `{ list, cursor?, hasMore? }`
 - `fetchPresence` / `subscribePresence` / `unsubscribePresence` — 在线状态
@@ -81,6 +81,8 @@ theme?: {
 - `searchUsers` — 服务端搜索用户（不传时添加联系人退化为直接输入 userId）
 - `addContact` / `createGroup` — 业务先登记自有系统再调 SDK 的动作接管
 - 任一接口不传 → 走 SDK 默认实现；传入 → 业务接管该接口。
+- **D122 收口后定位为薄别名**：除 `searchUsers` 外全部由 core 翻译为 repository 注入
+  （见第 3 节）；新接入方请直接用 `SdkConfig.repositories`。
 
 ## 2. features：响应式开关（运行时切换即生效）
 
@@ -97,11 +99,17 @@ theme?: {
 Provider 默认 `false` 保守，defaultFeatures 默认 `true` 供直接 `useUIKitProvider` 且未显式传参时
 兜底）。Provider 传入的 computed 始终覆盖 defaultFeatures，实际生效以 Provider props 为准。
 
-## 3. dataSource：Proxy 惰性代理
+## 3. dataSource：薄别名 → repository 注入（D122 风险 10 收口，2026-08-31）
 
-- `ctx.dataSource` 是 **Proxy**：`get/has/ownKeys/getOwnPropertyDescriptor` 全部委托到
-  `resolveDataSource()`，每次属性访问解析最新值（支持传入 computed）；
-- 例外：`UserInfoDomain` 在构造时解析**一次快照**（初始化行为不变），其余域运行期读代理。
+- core 装配时经 `translateDataSourceToRepositories`（core `composables/data-source-repositories.ts`）
+  把 `dataSource` 逐项翻译为 `SdkRepositoryOverrides`，随 `SdkConfig.repositories` 下发，
+  由 adapter 的 Contact/Group/Presence/UserInfo Domain 判空委托（未配置回落 SDK 默认路径）；
+- 优先级：显式传入的 `repositories`（SdkConfig/sdkConfig）**按域整体优先**于 dataSource
+  翻译结果（`mergeRepositoryOverrides`）；
+- `ctx.dataSource` 仍是 **Proxy**（`get/has/ownKeys` 委托 `resolveDataSource()`，支持传入
+  computed），但保留的唯一直接消费点是 `searchUsers`（SDK 无搜索能力、repository 契约无
+  对应项，add-contact-modal 单点消费）；其余项不再由 UI 层直接读取；
+- 惰性语义不变：翻译层各覆盖项为 getter，Domain 每次读取时解析最新 dataSource。
 
 ## 4. 登录后副作用时序（`watch(stores.client.isLoggedIn)`）
 

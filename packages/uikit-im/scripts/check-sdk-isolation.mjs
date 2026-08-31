@@ -10,6 +10,7 @@
  *   2. 禁止 import ... from '@easemob/uikit-sdk-websdk5' / '@easemob/uikit-sdk-webim4'（值 + 类型）
  *   3. 仅以下白名单文件例外：
  *        - src/websdk5.ts     子路径入口，负责默认 adapter 自注册
+ *        - src/webim4.ts      子路径入口，负责默认 adapter 自注册（镜像 websdk5.ts）
  *        - src/sdk/index.ts   公开类型再导出（仅 export type）
  *   4. import type 也禁止（除白名单外），防止类型真相源漂移
  *
@@ -26,6 +27,7 @@ const extensions = ['.ts', '.vue', '.mjs', '.js']
 // 白名单：这些文件允许静态绑定 adapter / 再导出 adapter 类型
 const allowlist = new Set([
   'src/websdk5.ts',
+  'src/webim4.ts',
   'src/sdk/index.ts',
 ])
 

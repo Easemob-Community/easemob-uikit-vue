@@ -1,5 +1,5 @@
 import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
-import type { SdkAdapter, SdkConfig, SdkPresenceDomain, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter, SdkCapabilities, SdkCapabilityFlags, SdkConfig, SdkPresenceDomain, SdkRepositoryOverrides, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
 import { type NoticeConfig, getNoticeConfigResolver, setNoticeConfigResolver } from '../sdk/event/notice-utils'
 import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '../sdk/event/notice-utils'
 import { t } from '../locale/messages'
@@ -7,12 +7,13 @@ import { useClientStore } from '../store/client'
 import { usePresenceStore } from '../store/presence'
 import { useUserInfoStore } from '../store/user-info'
 import { useThemeStore } from '../store/theme'
+import { createLogger } from '../utils/logger'
 import type { UIKitDataSource, UIKitFeatures } from './types'
 import { type H5AdaptationConfig, useH5Adaptation } from './use-h5-adaptation'
 import { emitNotificationDelivered, useNotification } from './use-notification'
 import { resetSyncState, setSyncState } from './use-sync-status'
 import { getDefaultSdkAdapterFactory, getUIKitAdapter, setCurrentUIKitAdapter } from './default-adapter'
-import { createLogger } from '../utils/logger'
+import { mergeRepositoryOverrides, translateDataSourceToRepositories } from './data-source-repositories'
 
 const logger = createLogger('UIKit:CoreProvider')
 
@@ -51,7 +52,17 @@ export interface CoreUIKitContext {
   }
   stores: CoreStores
   features: UIKitFeatures
+  /**
+   * 业务数据源接管（@deprecated 薄别名）：已收口为 repositories 翻译注入
+   * （见 data-source-repositories.ts），本字段仅保留给 searchUsers（无 repository
+   * 对应项）与「是否配置自定义数据源」的判定读取，下个大版本移除。
+   */
   dataSource: UIKitDataSource
+  /**
+   * SDK 客观能力矩阵（adapter 如实上报）：与 features（业务开关）取交集决定展示。
+   * adapter 未上报时缺省全 true（行为零变化）。静态快照，随 adapter 实例固定。
+   */
+  capabilities: SdkCapabilities
   /** 系统通知自定义配置（惰性读取，支持运行时变更） */
   noticeConfig: NoticeConfig
   /** H5 适配状态（viewport / 安全区 / 键盘高度 / 下拉刷新开关） */
@@ -83,6 +94,14 @@ const defaultFeatures: UIKitFeatures = {
   enableAtMe: true,
   enableTyping: true,
   filterBlockedContacts: true,
+}
+
+/** capabilities 缺省值：adapter 未上报时全 true（行为零变化） */
+const DEFAULT_SDK_CAPABILITIES: SdkCapabilityFlags = {
+  combineMessage: true,
+  pinnedMessage: true,
+  streamingMessage: true,
+  groupReadReceipt: true,
 }
 
 export interface CoreUIKitProviderOptions {
@@ -219,6 +238,10 @@ export function useCoreUIKitProvider(
     getOwnPropertyDescriptor: (_target, prop) => Object.getOwnPropertyDescriptor(resolveDataSource(), prop),
   })
 
+  // dataSource 薄别名（D122 风险 10）：翻译为 repositories 覆盖项注入 adapter Domain，
+  // 惰性求值保持运行时切换语义；显式 repositories 优先（setupAdapter 内合并）
+  const translatedRepositories = translateDataSourceToRepositories(resolveDataSource)
+
   const resolveNoticeConfig = (): NoticeConfig => {
     const cfg = isRef(options.noticeConfig) ? options.noticeConfig.value : options.noticeConfig
     return (cfg || {}) as NoticeConfig
@@ -258,6 +281,11 @@ export function useCoreUIKitProvider(
   logger.debug('适配器解析完成', { source: adapterSource, ownership: adapterOwnership })
   // 决策 20：非 Vue 上下文访问口（卸载时经 onScopeDispose 清空）
   setCurrentUIKitAdapter(adapter)
+
+  // SDK 客观能力矩阵：adapter 上报覆盖缺省全 true（adapter 构造即可读，静态快照）。
+  // streamingMessage 暂无对应 features 门控点（流式渲染为数据驱动，按消息自带
+  // stream 元信息展示），本期仅暴露能力位，消费侧接入见 uikit-im 三处交集。
+  const capabilities: SdkCapabilities = { ...DEFAULT_SDK_CAPABILITIES, ...(adapter.capabilities ?? {}) }
 
   // 使用 shallowRef 避免深层 UnwrapRef 丢失适配器/Domain 的私有字段导致类型不兼容
   const client: Ref<SdkAdapter> = shallowRef(adapter)
@@ -302,6 +330,14 @@ export function useCoreUIKitProvider(
     // 先归一化（平铺字段下沉 adapterConfig）再走场景钩子，场景钩子只见中立形态
     const normalized = normalizeInitConfig(cfg)
     const resolved = options.resolveSdkConfig?.(normalized) ?? normalized
+    // 数据入口接管合并：显式 repositories（平铺字段已归一化下沉 adapterConfig）
+    // 按域整体优先于 dataSource 翻译结果；合并后走 SdkConfig 顶层字段下发
+    // （adapter 读取优先级 config.repositories > adapterConfig.repositories）
+    const { repositories: explicitRepositories, ...restAdapterConfig } = (resolved.adapterConfig ?? {}) as Record<string, unknown>
+    const repositories = mergeRepositoryOverrides(
+      translatedRepositories,
+      (resolved.repositories ?? explicitRepositories) as SdkRepositoryOverrides | undefined,
+    )
     logger.info('adapter 装配开始', {
       ownership: adapterOwnership,
       appKey: resolved.appKey,
@@ -310,15 +346,14 @@ export function useCoreUIKitProvider(
     try {
       await adapter.init({
         ...resolved,
+        repositories,
         adapterConfig: {
-          ...resolved.adapterConfig,
+          ...restAdapterConfig,
           // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）
-          clientName: options.clientName ?? (resolved.adapterConfig?.clientName as string | undefined),
-          clientVersion: options.clientVersion ?? (resolved.adapterConfig?.clientVersion as string | undefined),
+          clientName: options.clientName ?? (restAdapterConfig.clientName as string | undefined),
+          clientVersion: options.clientVersion ?? (restAdapterConfig.clientVersion as string | undefined),
           // live 对象引用：事件层运行时读取最新开关
           features,
-          // 业务数据源接管（惰性代理）
-          dataSource,
           // store 注入：core stores + 场景 stores（事件层/Domain 直写）
           stores: {
             client: stores.client,
@@ -409,6 +444,7 @@ export function useCoreUIKitProvider(
     stores,
     features,
     dataSource,
+    capabilities,
     noticeConfig,
     h5,
     theme: useThemeStore(),

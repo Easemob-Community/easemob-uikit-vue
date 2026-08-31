@@ -1,5 +1,5 @@
 import { createLogger } from '@easemob/uikit-sdk-contract'
-import type { UIKitDataSource, UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
+import type { UserInfo, UserInfoAttribute, UserInfoRepository } from '@easemob/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import type { UserInfoStoreLike } from '../event/types'
 import { formatSdkError } from '../utils/sdk-error'
@@ -34,7 +34,11 @@ export class UserInfoDomain {
   constructor(
     private client: ManagerHost,
     private store: UserInfoStoreLike,
-    private dataSource: UIKitDataSource = {},
+    /**
+     * 用户资料数据入口接管注入：当前仅消费 `fetchUserInfos`（fetchUserInfos 委托），
+     * 其余方法（update/subscribe 系列）保持 SDK 直连。未注入时走 SDK 默认路径。
+     */
+    private userInfoRepository: Partial<UserInfoRepository> = {},
     private onSubscriptionPermissionError?: () => void,
   ) {}
 
@@ -71,8 +75,8 @@ export class UserInfoDomain {
 
     this.store.markLoading(missingIds)
     try {
-      const infos = this.dataSource.fetchUserInfos
-        ? await this.fetchFromDataSource(missingIds)
+      const infos = this.userInfoRepository.fetchUserInfos
+        ? await this.fetchFromRepository(missingIds)
         : await this.fetchFromSdk(missingIds, attributes)
 
       // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
@@ -111,10 +115,11 @@ export class UserInfoDomain {
     return Array.from(result)
   }
 
-  private async fetchFromDataSource(userIds: string[]): Promise<UserInfo[]> {
-    if (!this.dataSource.fetchUserInfos)
+  private async fetchFromRepository(userIds: string[]): Promise<UserInfo[]> {
+    if (!this.userInfoRepository.fetchUserInfos)
       return []
-    const result = await this.dataSource.fetchUserInfos(userIds)
+    const result = await this.userInfoRepository.fetchUserInfos(userIds)
+    // 防御性字段收敛：注入源可能携带额外字段，只保留契约九属性
     return result.map(info => ({
       userId: info.userId,
       nickname: info.nickname,

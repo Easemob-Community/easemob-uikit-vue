@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
-import { FORWARD_MODE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { ForwardModeValue } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { FORWARD_MODE, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, useToast } from '@easemob/uikit-core'
+import type { ForwardModeValue, UiMessage } from '@easemob/uikit-core'
+import { useUIKit } from '../../../composables/use-uikit'
 
 export interface MultiSelectBarEmits {
   (e: 'forward-one-by-one', messages: UiMessage[]): void
@@ -24,6 +22,10 @@ const props = defineProps<MultiSelectBarProps>()
 
 const emit = defineEmits<MultiSelectBarEmits>()
 const { show: showToast } = useToast()
+const { capabilities } = useUIKit()
+
+/** SDK 客观能力：不支持合并消息时隐藏「合并转发」入口（与业务开关取交集的交集侧） */
+const combineForwardSupported = computed(() => capabilities.combineMessage !== false)
 
 /** 可转发的消息类型集合 */
 const FORWARDABLE_TYPES = new Set<string>([
@@ -164,7 +166,7 @@ function onCancel() {
           <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType(FORWARD_MODE.ONE_BY_ONE)">
             逐条转发
           </button>
-          <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType(FORWARD_MODE.COMBINE)">
+          <button v-if="combineForwardSupported" class="multi-select-bar__modal-btn multi-select-bar__modal-btn--option" @click="onSelectForwardType(FORWARD_MODE.COMBINE)">
             合并转发
           </button>
           <button class="multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel" @click="showForwardTypeSelect = false">
@@ -278,7 +280,6 @@ function onCancel() {
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-
 @media (hover: hover) {
   .multi-select-bar__action:hover .multi-select-bar__icon {
     background-color: var(--uikit-bg-tertiary);
@@ -298,7 +299,6 @@ function onCancel() {
   opacity: 0.45;
   cursor: not-allowed;
 }
-
 
 @media (hover: hover) {
   .multi-select-bar__action--disabled:hover .multi-select-bar__icon {

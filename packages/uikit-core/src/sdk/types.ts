@@ -43,7 +43,14 @@ export type {
   VideoMessageBody,
   VoiceMessageBody,
   CreateGroupParams,
+  GroupMemberPage,
   PresenceInfo,
+  // 数据入口层与能力矩阵（D122）：repository 注入覆盖项 / adapter 能力上报
+  ContactPage,
+  GroupPage,
+  SdkCapabilities,
+  SdkCapabilityFlags,
+  SdkRepositoryOverrides,
 } from '@easemob/uikit-sdk-contract'
 
 export {

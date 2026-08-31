@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
+import { createLogger, createUserInfoSubscriptionErrorHandler, formatSdkError, useProviderSideEffects } from '@easemob/uikit-core'
+import type { AnimationConfig, CoreUIKitInitConfig, Density, FontSizePreset, NoticeConfig, NotificationChannel, NotificationItem, NotificationTriggerMode, PrimaryColorInput, ThemePreset, UiContact } from '@easemob/uikit-core'
+import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import { EmNotificationContainer, EmToast } from '../../components'
 import {
   type ContactFetchMode,
   type H5AdaptationConfig,
@@ -8,15 +11,23 @@ import {
   type UIKitFeatures,
   useUIKitProvider,
 } from '../../composables/use-uikit'
-import { createUserInfoSubscriptionErrorHandler, useProviderSideEffects } from '@easemob/uikit-core'
-import { EmNotificationContainer, EmToast } from '../../components'
-import type { CoreUIKitInitConfig, NotificationItem } from '@easemob/uikit-core'
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
-import type { AnimationConfig, Density, FontSizePreset, PrimaryColorInput, ThemePreset } from '@easemob/uikit-core'
-import type { UiContact } from '@easemob/uikit-core'
-import type { NoticeConfig } from '@easemob/uikit-core'
-import type { NotificationChannel, NotificationTriggerMode } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
+
+const props = withDefaults(defineProps<ProviderProps>(), {
+  locale: 'zh-CN',
+  autoInit: true,
+  enableContact: false,
+  enableBlocklist: false,
+  enablePresence: false,
+  enableGroup: true,
+  enableUserInfo: true,
+  enableUserInfoSubscription: true,
+  contactFetchMode: 'page',
+  enableDraft: true,
+  enableAtMe: true,
+  enableTyping: true,
+  filterBlockedContacts: true,
+  enableToast: true,
+})
 
 const logger = createLogger('UIKit:UikitProvider')
 
@@ -55,7 +66,7 @@ export interface ProviderProps {
     /** 密度：compact 紧凑 / normal 标准 / comfortable 宽松 */
     density?: Density
     /** 气泡颜色：传字符串时同时设置自己/对方；传对象可分别设置 */
-    bubbleColor?: string | { self?: string; other?: string }
+    bubbleColor?: string | { self?: string, other?: string }
     /** 聊天背景：支持颜色 / 渐变 / url(...) 图片 */
     chatBg?: string
     /** 输入区背景 */
@@ -129,8 +140,9 @@ export interface ProviderProps {
   filterBlockedContacts?: boolean
   /**
    * 业务接管数据源，不传走 SDK 默认
-   * @deprecated 统一迁移为 repository 数据入口层（经 adapter.contact/.group/.presence/.userInfo），
-   * 本 prop 保留至下个大版本移除（D122 决策 11 / 风险 10）。
+   * @deprecated 已收口为薄别名：装配时逐项翻译为 repository 覆盖项注入 adapter
+   * （显式 repositories 优先），UI 层不再直接消费（searchUsers 除外——SDK 无搜索
+   * 能力，repository 契约无对应项）。本 prop 保留至下个大版本移除（D122 决策 11 / 风险 10）。
    */
   dataSource?: UIKitDataSource
   /**
@@ -205,23 +217,6 @@ export interface ProviderProps {
   }
 }
 
-const props = withDefaults(defineProps<ProviderProps>(), {
-  locale: 'zh-CN',
-  autoInit: true,
-  enableContact: false,
-  enableBlocklist: false,
-  enablePresence: false,
-  enableGroup: true,
-  enableUserInfo: true,
-  enableUserInfoSubscription: true,
-  contactFetchMode: 'page',
-  enableDraft: true,
-  enableAtMe: true,
-  enableTyping: true,
-  filterBlockedContacts: true,
-  enableToast: true,
-})
-
 const config = computed<CoreUIKitInitConfig>(() => ({
   appKey: props.appKey ?? '',
   ...props.sdkConfig,
@@ -265,10 +260,12 @@ const ctx = useUIKitProvider(config.value, {
   },
 })
 
-/** 通知点击跳转对应会话（window.focus 与 navigateOnClick 判定由共享副作用统一处理）。
+/**
+ * 通知点击跳转对应会话（window.focus 与 navigateOnClick 判定由共享副作用统一处理）。
  * 进入流程与手动点击会话项保持一致（enter：SDK setCurrentConversation + store 当前会话
  * + 补发已读回执；sendChannelAck：清除未读数）。若只 setCurrentConversationId，
- * SDK 层仍认为该会话非当前会话，新消息到达时未读数先增后清，出现 1→0 闪烁。 */
+ * SDK 层仍认为该会话非当前会话，新消息到达时未读数先增后清，出现 1→0 闪烁。
+ */
 function navigateToConversation(item: Omit<NotificationItem, 'id' | 'unreadCount'>) {
   const cvs = ctx.stores.conversation.conversationList.find(c => c.id === item.conversationId)
   if (!cvs)
@@ -278,8 +275,10 @@ function navigateToConversation(item: Omit<NotificationItem, 'id' | 'unreadCount
   void ctx.domains.conversation.sendChannelAck(cvs.id, cvs.type)
 }
 
-/** 场景无关副作用（theme/locale/animation/h5 安全区/通知/日志 watch）走 core 共享实现，
- * 本组件只保留场景增量（通知跳会话 + 登录副作用 watch）。 */
+/**
+ * 场景无关副作用（theme/locale/animation/h5 安全区/通知/日志 watch）走 core 共享实现，
+ * 本组件只保留场景增量（通知跳会话 + 登录副作用 watch）。
+ */
 const {
   toastProps,
   enableNotification,
@@ -313,12 +312,10 @@ watch(
     }
     const ds = dataSource.value
 
-    // 黑名单
+    // 黑名单（dataSource.fetchBlocklist 已经 core 翻译为 contact.fetchBlocklist 注入，由 Domain 委托）
     if (features.value.enableBlocklist && !ctx.stores.contact.blockListLoaded) {
       try {
-        const list: UiContact[] = ds.fetchBlocklist
-          ? await ds.fetchBlocklist()
-          : await ctx.domains.contact.syncBlocklist()
+        const list: UiContact[] = await ctx.domains.contact.syncBlocklist()
         ctx.stores.contact.setBlackList(list)
       }
       catch (e) {
@@ -329,9 +326,11 @@ watch(
     // 好友列表：仅当业务提供了自定义数据源时在登录后立即拉取；
     // 默认走 SDK 的场景由 onSyncDataFinished 在数据同步完成后回填，
     // 避免在 roster 同步完成前抢跑 getContacts() 拿到空列表并锁定 loaded。
+    // （判定仍读 dataSource prop；ds.fetchContacts 已经 core 翻译为
+    // contact.fetchContacts 注入，这里经 Domain 委托走同一实现）
     if (features.value.enableContact && ds.fetchContacts && !ctx.stores.contact.loaded) {
       try {
-        const result = await ds.fetchContacts()
+        const result = await ctx.domains.contact.fetchContacts()
         ctx.stores.contact.setContactList(result.list)
       }
       catch (e) {

@@ -9,10 +9,11 @@ import type { UiPresence } from './presence'
  * 传入 -> 业务接管该接口的数据获取/订阅。
  *
  * @deprecated 主计划 2.5 / 决策 11 已明确：统一迁移为 repository 数据入口层
- * （`ContactRepository` / `GroupRepository` / `PresenceRepository` / `UserInfoRepository`，
- * 经 `SdkAdapter.contact` / `.group` / `.presence` / `.userInfo` 暴露），不保留旧双线。
- * 本接口保持与旧签名兼容继续可用，Provider `dataSource` prop 保留至下个大版本移除；
- * 薄别名转发随 Phase 3.1（repository 注入 Domain）落地时收口。
+ * （`SdkRepositoryOverrides`，经 `SdkConfig.repositories` / Provider sdkConfig 注入）。
+ * 本接口已收口为薄别名：core Provider 装配时把 dataSource 逐项翻译为
+ * repositories 覆盖项（显式 repositories 优先），不再保留独立的 dataSource 消费链路；
+ * `searchUsers` 无 repository 对应项（SDK 无搜索能力），仍由 UI 层单点消费。
+ * Provider `dataSource` prop 保留至下个大版本移除。
  */
 export interface UIKitDataSource {
   fetchContacts?: (params?: { cursor?: string, pageSize?: number }) => Promise<{ list: UiContact[], cursor?: string, hasMore?: boolean }>

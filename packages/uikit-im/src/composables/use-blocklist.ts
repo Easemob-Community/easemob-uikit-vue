@@ -1,18 +1,17 @@
 import { computed } from 'vue'
 import type { UiContact as Contact } from '@easemob/uikit-core'
-import { formatSdkError } from '@easemob/uikit-core'
+import { createLogger, formatSdkError } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
-import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:UseBlocklist')
 
 /**
  * 黑名单能力集成
  * - 读走 context.stores.contact.blackList
- * - 写走 domains.contact + dataSource（需 Provider.enableBlocklist=true）
+ * - 写走 domains.contact（dataSource 接管已收口为 repository 注入；需 Provider.enableBlocklist=true）
  */
 export function useBlocklist() {
-  const { domains, dataSource, features, stores } = useUIKit()
+  const { domains, features, stores } = useUIKit()
   const contactStore = stores.contact
 
   const blockList = computed(() => contactStore.blackList)
@@ -26,11 +25,7 @@ export function useBlocklist() {
     if (!features.enableBlocklist)
       return
     try {
-      if (dataSource.fetchBlocklist) {
-        const list = await dataSource.fetchBlocklist()
-        contactStore.setBlackList(list)
-        return
-      }
+      // dataSource.fetchBlocklist 已经 core 翻译为 contact.fetchBlocklist 注入，由 Domain 委托
       const list = await domains.contact.syncBlocklist()
       contactStore.setBlackList(list)
     }

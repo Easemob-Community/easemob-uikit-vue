@@ -234,6 +234,12 @@ await adapter.init({
 - **domain port**：`adapter.domains.*` —— 现有 UI 操作面，当前优先使用。
 - **repository**：`adapter.message` / `adapter.conversation` / `adapter.contact` / `adapter.group` / `adapter.presence` / `adapter.userInfo` —— 数据入口层，读写一体、游标分页。
 
+**签名风格约定（2026-08-31 契约层质量整改收敛，repository 与 domains 共用一套）：**
+
+- 统一**位置参数**（以 `SdkMessageDomain` 既有公开方法为基准，消费方调用点最多）；
+- 分页返回统一为 **`{ list, cursor?, hasMore }`**（`hasMore` 必填 boolean；`cursor` 空拉第一页），群成员分页用 `GroupMemberPage`，历史消息 `fetchHistory` 返回 `list`（不再是 `items`）；
+- 接口声明用**函数属性风格**（`ts/method-signature-style` 强制），不要写 shorthand 方法签名。
+
 **当前状态：**
 
 - repository 接口在 Phase 1 已定义好，但**第一版 5.x adapter 仍以 domain port 为主**。
@@ -286,6 +292,7 @@ await adapter.init({
 - body 类型守卫用字段存在性判断（`'duration' in body`），因此 adapter 映射时必须**精确产出中立字段集**，不要携带多余原始字段。
 - 4.x 未实现的方法用 `never = undefined as never` 占位并 TODO，不要空实现误导。
 - repository 与 domain port 并存时，优先用 domain port 满足当前 UI 消费；repository 留给 Phase 3 DB 接入。
+- capabilities 协商机制（2026-08-31 落地）：能力位保持 boolean 映射不动；契约包导出 `SDK_CONTRACT_VERSION` 常量（契约 breaking 变更时递增），adapter 经 `SdkCapabilities.contractVersion` 上报遵循的契约版本；某能力为 `false` 或语义有差异时，在 `SdkCapabilities.meta.<能力名>.reason` 写原因，语义演进需要新版本契约时填 `meta.<能力名>.minContractVersion`。当前两代能力全 true，元信息可空。
 
 ## 已知漂移（改到相关文件时注意）
 

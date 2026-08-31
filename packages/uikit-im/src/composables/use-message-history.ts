@@ -47,7 +47,7 @@ export function useMessageHistory() {
       const isLast = !result.hasMore
       setHistoryCursor(cvs.id, newCursor, isLast)
       return {
-        messages: result.items,
+        messages: result.list,
         cursor: newCursor,
         isLast,
       }

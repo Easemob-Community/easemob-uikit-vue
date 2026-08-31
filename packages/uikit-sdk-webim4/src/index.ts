@@ -34,6 +34,9 @@ export type {
 // 同步状态
 export * from './use-sync-status'
 
+// 新消息通知判定引擎（browser/in-app，对齐 websdk5）
+export * from './notification-engine'
+
 // 展示适配器（SDK wire → 中立 UiX）
 export * from './adapter/message-adapter'
 export * from './adapter/conversation-adapter'

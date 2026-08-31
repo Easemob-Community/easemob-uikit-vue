@@ -1,3 +1,77 @@
+## @easemob/uikit-im 2.8.6 (2026-08-28)
+
+
+### 修复
+
+- **数据同步「有数据但 UI 空」**：SDK 自动同步完成后好友/群组列表仍可能为空——通讯录计数、列表容器挂载等路径在同步完成前读 SDK 内存（尚未同步的空快照）并锁定 `loaded`，导致 `onSyncDataFinished` 的回填被 `if (!loaded)` 跳过（日志呈现 `contact 回填 {loaded: true, sdkCount: N, storeCount: 0}`）。修复三层配合：① 计数改为只读（`getLocalCount()` 不写 store 不锁定 loaded）；② 回填兜底（`loaded` 为真但列表为空时仍回填 SDK 数据）；③ 消费 `onSyncDataFinished` 的 `status` 字段——同步失败输出日志，conversation 失败且可重试时自动 `refreshSessionList()` 重试一次。
+- **新增 `useSyncStatus()` hook**：暴露 conversation / contact / group 三类数据的同步阶段（idle / syncing / success / failed）与 `isSyncing` / `allFinished`，业务方可感知同步进度并在失败后自行补偿（contact/group 无 SDK 主动同步接口，失败后只能等待下次连接/登录自动同步）。
+
+---
+
+## @easemob/uikit-im 2.8.5 (2026-08-28)
+
+
+### 修复
+
+- **GIF / 表情包发送后动图不播放（服务端返回静态图地址）**：`sendImage` 发送图片消息时未给 SDK 传 `createImageMessage` 的 `isGif` 标记，SDK 把 GIF 当普通图片上传，返回的 `chatfiles/*` 地址是静态图。现按 MIME（`image/gif`）或文件名/URL 后缀（`.gif`）自动判定并传 `isGif: true`，SDK 按 GIF 动图处理，配合 2.8.4 的渲染修复（`isGif` 消息展示动画原图）动图可正常播放。
+
+---
+
+## @easemob/uikit-im 2.8.4 (2026-08-28)
+
+
+### 修复
+
+- **GIF / 表情包消息展示为静态缩略图、不播放动图**：`image-message.vue` 的 `displayUrl` 对图片消息统一优先 `thumbnailUrl`（SDK 生成的静态缩略图），当消息体 `isGif` 为真（或 `ext.isSticker` 表情包）时改为优先展示动画原图（`originalImageUrl` / `bigImageUrl` / `localUrl`），恢复 gif 动图播放。
+
+---
+
+## @easemob/uikit-im 2.8.3 (2026-08-28)
+
+
+### 修复
+
+- **表情包（sticker）发送失败**：本地打包资源（如 demo 的 gif 资产路径）作为 sticker `url` 时，SDK 无法按 URL 上传（`Attachment file is required`）。现 `onStickerSelect` 先 `fetch` 该地址转成 `File` 再以图片消息发送；远程 URL 能 fetch 也走 File，跨域失败则回落为原 URL 字符串（保持按 URL 引用）。
+
+---
+
+## @easemob/uikit-im 2.8.2 (2026-08-28)
+
+
+### 调整
+
+- **表情面板「常用」区仅在有最近使用时显示**：从未选过表情不展示「常用」空态占位；`emoji.recentEmpty` 文案随之移除。
+- **移除内置 emoji 悬停放大预览**：删除 `ChatConfig.input.emoji.emojiPreview` 配置，表情视图不再弹放大预览小窗；sticker 的 hover 预览图 → gif 切换保留不变。
+
+---
+
+## @easemob/uikit-im 2.8.1 (2026-08-28)
+
+
+### 调整
+
+- **表情面板「常用」与「Emoji」合并为单一视图**：不再分「常用 / Emoji」两个 tab，改为在表情视图顶部展示「常用」最近使用区、下方为完整 Emoji 列表，同一滚动区（与设计稿对齐）；底部 tab 只区分表情视图与表情包。`recentIcon` 配置随之移除（无消费方）；`recent` / `recentCount` / `emojiIcon` / `emojiPreview` 等其余配置语义不变。
+
+---
+
+## @easemob/uikit-im 2.8.0 (2026-08-28)
+
+
+### 新增
+
+- **表情面板重构与配置化**（`EmEmojiPicker` / `ChatConfig.input.emoji`）：
+  - 「常用」改为**动态最近使用**：默认开启、localStorage 按 `appKey + userId` 隔离持久化、保留最近 5 个（`recentCount` 可配）；关闭 `recent` 后不展示常用 tab 也不再记录；
+  - 新增独立「Emoji」完整列表 tab；表情包（`stickerPacks`）注入的 tab **默认不自动选中**（打开时常用有内容优先常用，否则回落到 Emoji）；
+  - 新增配置：`recent` / `recentCount` / `tabsPosition`（`top | bottom | left | right`，**默认 `bottom`**）/ `stickerHover` / `recentIcon` / `emojiIcon` / `emojiPreview`；
+  - sticker 支持 `thumbUrl` 预览图 + `url` 动图 + `name` 标题：默认展示预览图，悬停切换 gif、移出恢复（触屏不启用）；内置 emoji 悬停放大预览（`emojiPreview` 可关）；
+  - 每个 tab 项均可配预览小图：表情包取 `iconUrl`（缺省自动回落包内第一个 sticker 预览图），内置「常用 / Emoji」tab 走 `recentIcon` / `emojiIcon`。
+
+### 修复
+
+- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob/uikit-core` 1.5.0）。
+
+---
+
 ## @easemob/uikit-im 2.7.0 (2026-08-27)
 
 

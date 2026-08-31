@@ -12,6 +12,7 @@ import type { ConversationTypeValue, UIKitFeatures } from '@easemob/uikit-sdk-co
 import { toUiMessage } from '../adapter/message-adapter'
 import { deriveConversationUpsertFromMessage } from '../adapter/conversation-adapter'
 import { markReadReceiptSent } from '../domain/message-domain'
+import { notifyOnNewMessage } from '../notification-engine'
 import type { Webim4Client } from '../client'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
@@ -288,7 +289,8 @@ export function createChatHandlers(
           }
         }
 
-        // TODO: 新消息通知（browser/in-app）——webim4 侧 notification-engine 待后续轮次补齐
+        // 消息通知：非当前会话 + 页面隐藏（background 模式）时触发浏览器/页内通知（对齐 websdk5，入参为已转换的中立消息）
+        notifyOnNewMessage(stores, uiMsg)
       }
     },
 

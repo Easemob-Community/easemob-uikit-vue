@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { formatSdkError, resolveSdkErrorMessage } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
+import type { EmojiStickerItem, UiMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { useUIKit } from '../../../composables/use-uikit'
 import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
-import { useToast, useViewport } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE } from '@easemob/uikit-core'
-import { EmEmojiPicker as EmojiPicker } from '@easemob/uikit-core'
-import type { EmojiStickerItem } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
-import { MESSAGE_EXT_KEY } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
 import MentionPicker from '../mention/mention-picker.vue'
 import QuoteBar from '../quote/quote-bar.vue'
 import type { ChatConfig, ChatSendHooks, MentionContact } from '../types'
@@ -21,7 +13,10 @@ import H5Input from '../h5-input/h5-input.vue'
 import SimpleInput from './simple-input.vue'
 import RichInput from './rich-input.vue'
 import EditingBar from './editing-bar.vue'
-import { createLogger } from '@easemob/uikit-core'
+
+const props = defineProps<MessageInputProps>()
+
+const emit = defineEmits<MessageInputEmits>()
 
 const logger = createLogger('UIKit:Index')
 
@@ -43,11 +38,8 @@ export interface MessageInputEmits {
   (e: 'focus'): void
 }
 
-const props = defineProps<MessageInputProps>()
-const emit = defineEmits<MessageInputEmits>()
-
 const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
-const { features } = useUIKit()
+const { features, capabilities } = useUIKit()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
@@ -56,8 +48,10 @@ const { t } = useLocale()
 /** 输入框配置 */
 const inputConfig = computed(() => props.config?.input)
 
-/** 聚焦时边框颜色：默认关闭聚焦高亮（与容器默认边框一致，不产生"内圈聚焦光环"），
- *  仅当显式传入 input.focusBorderColor 时才启用对应边框色。 */
+/**
+ * 聚焦时边框颜色：默认关闭聚焦高亮（与容器默认边框一致，不产生"内圈聚焦光环"），
+ *  仅当显式传入 input.focusBorderColor 时才启用对应边框色。
+ */
 const focusBorderColorVar = computed(() => inputConfig.value?.focusBorderColor || 'var(--uikit-border-color)')
 
 /** 发送 typing cmd（仅单聊且全局 enableTyping 开启，5s 节流由输入框子组件保证） */
@@ -162,8 +156,9 @@ const messageInputRef = ref<HTMLElement>()
 /** RichInput 引用 */
 const richInputRef = ref<InstanceType<typeof RichInput>>()
 
-/** 群已读回执配置 */
-const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
+/** 群已读回执配置（与 SDK 客观能力取交集：adapter 上报不支持时强制关闭） */
+const groupReadReceiptConfig = computed(() =>
+  capabilities.groupReadReceipt === false ? undefined : props.config?.groupReadReceipt)
 
 /** 构造包含引用 ext 的合并对象；无引用时返回 undefined */
 function buildExtWithQuote(): Record<string, any> | undefined {

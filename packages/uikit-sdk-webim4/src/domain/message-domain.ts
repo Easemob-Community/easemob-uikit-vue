@@ -376,24 +376,27 @@ export class MessageDomain {
     // store 写入等副作用与 SDK 默认路径完全对齐（对齐 websdk5 委托语义）。
     const loadMessages = this.options.messageRepository?.loadMessages
     if (loadMessages) {
-      const page = await loadMessages({ conversationId, conversationType, cursor, pageSize })
+      const page = await loadMessages(conversationId, conversationType, cursor, pageSize)
       // CMD 为透传命令不上屏，注入路径同样过滤
       const injectedMsgs = page.list
         .filter(msg => msg.type !== MESSAGE_TYPE.CMD)
         .map(msg => hydrateUiMessage(msg, this.currentUserId))
       this.store.prependMessages(conversationId, injectedMsgs)
       return {
-        items: injectedMsgs,
+        list: injectedMsgs,
         cursor: page.cursor,
         hasMore: page.hasMore,
       }
     }
 
+    // cursor 缺省必须给 -1（从最新漫游消息拉起）：4.x SDK 仅在 cursor === undefined 时
+    // 应用默认值 -1，传空串会被原样发给服务端（start: ''），漫游接口返回异常消息窗口，
+    // 可能带回 SDK pb schema 无法解码的旧消息（invalid wire type at offset N）。
     const page = await this.connection.getHistoryMessages({
       targetId: conversationId,
       chatType: conversationType,
       pageSize,
-      cursor: cursor || '',
+      cursor: cursor || -1,
       searchDirection: 'up',
     })
 
@@ -414,7 +417,7 @@ export class MessageDomain {
     this.store.prependMessages(conversationId, uiMsgs)
 
     return {
-      items: uiMsgs,
+      list: uiMsgs,
       cursor: page.cursor ? String(page.cursor) : undefined,
       hasMore: page.isLast === false,
     }

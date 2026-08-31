@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk'
-import type { CreateGroupParams, UiGroup, UiGroupMember } from '@easemob/uikit-sdk-contract'
+import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup } from '@easemob/uikit-sdk-contract'
 import { GROUP_MEMBER_ROLE, createLogger } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import type { GroupStoreLike } from '../event/types'
@@ -30,6 +30,17 @@ function unwrap<T>(res: EasemobChat.AsyncResult<T>): T {
   return (res?.data ?? res?.entities) as T
 }
 
+/** GroupDomain 装配选项 */
+export interface GroupDomainOptions {
+  /**
+   * 群组数据入口接管注入（与 websdk5 同构）：消费 `fetchGroups`
+   * （fetchGroups 分页读委托）、`createGroup`（创建群组动作接管，
+   * 兼容旧 dataSource 语义——委托后不再调 SDK 创建、也不写本地群缓存/拉权威详情）；
+   * 其余群管理写操作保持 SDK 直连。未注入时全部走 SDK 默认路径（行为零变化）。
+   */
+  groupRepository?: Partial<GroupRepository>
+}
+
 /**
  * 群组业务域（4.x）：全部 API 挂单一 `connection`（无 GroupManager 拆分）。
  * 行为镜像 websdk5 GroupDomain；参数形状差异（pageNum/cursor、字段命名）在本层收敛。
@@ -38,6 +49,7 @@ export class GroupDomain {
   constructor(
     private client: Webim4Client,
     private store: GroupStoreLike,
+    private options: GroupDomainOptions = {},
   ) {}
 
   private get connection() {
@@ -64,6 +76,19 @@ export class GroupDomain {
    */
   getLocalCount(): number {
     return this.store.groupList?.length ?? 0
+  }
+
+  /**
+   * 分页拉取已加入群组列表（数据入口读路径，与 websdk5 同构）。
+   * 注入 fetchGroups 时委托注入实现，store 写入由消费方（UI 层）按分页语义负责；
+   * 未注入时走服务端分页拉取（refreshJoinedGroups 内部写 store，4.x 无游标分页）。
+   */
+  async fetchGroups(cursor?: string, pageSize?: number): Promise<GroupPage> {
+    const repo = this.options.groupRepository?.fetchGroups
+    if (repo)
+      return repo(cursor, pageSize)
+    const list = await this.refreshJoinedGroups()
+    return { list, cursor: undefined, hasMore: false }
   }
 
   /** 服务端分页拉取已加入群组（needRole/needAffiliations 时 pageNum 从 0 起、pageSize 上限 20）；adapter 登录后预取也走此方法 */
@@ -135,8 +160,11 @@ export class GroupDomain {
     return groups
   }
 
-  /** 创建群组 */
+  /** 创建群组（注入 createGroup 时整体委托业务接管：不调 SDK、不写本地缓存，权威数据由业务源负责） */
   async createGroup(params: CreateGroupParams): Promise<{ groupId: string }> {
+    const repo = this.options.groupRepository?.createGroup
+    if (repo)
+      return repo(params)
     const res = await this.connection.createGroupVNext({
       groupName: params.name,
       description: params.description ?? '',
@@ -194,7 +222,7 @@ export class GroupDomain {
     groupId: string,
     cursor?: string,
     pageSize = 20,
-  ): Promise<{ members: UiGroupMember[], cursor?: string, hasMore?: boolean }> {
+  ): Promise<GroupMemberPage> {
     const res = await this.connection.getGroupMembers({ groupId, cursor, limit: pageSize })
     const data = unwrap(res)
     const members = toUiGroupMembers(data?.members ?? [])
@@ -212,7 +240,7 @@ export class GroupDomain {
         // 管理员列表失败不应阻塞成员列表展示
       }
     }
-    return { members, cursor: nextCursor, hasMore: !!nextCursor }
+    return { list: members, cursor: nextCursor, hasMore: !!nextCursor }
   }
 
   /** 拉取并合并群管理员到成员缓存（4.x getGroupAdmin 仅返回 userId 列表） */

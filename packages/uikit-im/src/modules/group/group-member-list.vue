@@ -1,18 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import type { GroupMemberRoleValue } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmIconButton as IconButton, EmInput as Input, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
+import type { GroupMemberRoleValue, PresenceDisplayStatus, UiGroup, UiGroupMember } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
-import { usePresence, useToast } from '@easemob/uikit-core'
-import type { UiGroup, UiGroupMember } from '@easemob/uikit-core'
-import type { PresenceDisplayStatus } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
 import GroupMemberListItem from './group-member-list-item.vue'
 
 const props = withDefaults(defineProps<GroupMemberListProps>(), {
@@ -192,7 +183,7 @@ async function initialLoad() {
     const result = await fetchGroupMembers(props.groupId)
     hasFetched.value = true
     cursor.value = result.cursor
-    localHasMore.value = result.hasMore ?? false
+    localHasMore.value = result.hasMore
   }
   catch (err) {
     logger.warn('[GroupMemberList] load members failed:', formatSdkError(err))
@@ -207,7 +198,7 @@ async function onLoadMore() {
   try {
     const result = await fetchGroupMembers(props.groupId, cursor.value)
     cursor.value = result.cursor
-    localHasMore.value = result.hasMore ?? false
+    localHasMore.value = result.hasMore
     emit('load-more')
   }
   catch (err) {
@@ -314,7 +305,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           @transfer-owner="emit('transfer-owner', $event)"
         >
           <!-- 透传成员操作菜单接管插槽到列表项 -->
-          <template v-if="$slots['memberMenu']" #member-menu="slotProps">
+          <template v-if="$slots.memberMenu" #member-menu="slotProps">
             <slot name="member-menu" v-bind="slotProps" />
           </template>
         </GroupMemberListItem>
@@ -374,7 +365,6 @@ defineExpose({ refresh, removeMember, setMemberRole })
     background-color: rgba(0, 0, 0, 0.12) !important;
   }
 }
-
 
 @media (hover: hover) {
   [data-uikit-theme='dark'] .group-member-list__close:hover:not(:disabled) {

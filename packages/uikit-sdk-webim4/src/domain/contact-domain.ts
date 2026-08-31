@@ -1,4 +1,4 @@
-import type { UiContact, UiContactInvite } from '@easemob/uikit-sdk-contract'
+import type { ContactPage, ContactRepository, UiContact, UiContactInvite } from '@easemob/uikit-sdk-contract'
 import { createLogger } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { blocklistIdsToUiContacts, toUiContacts } from '../adapter/contact-adapter'
@@ -23,6 +23,17 @@ export interface ContactStoreLike {
   updateInviteStatus: (id: string, status: UiContactInvite['status']) => void
 }
 
+/** ContactDomain 装配选项 */
+export interface ContactDomainOptions {
+  /**
+   * 联系人数据入口接管注入（与 websdk5 同构）：消费 `fetchContacts`
+   * （fetchContacts 分页读委托）、`fetchBlocklist`（syncBlocklist 委托）、
+   * `addContact`（添加好友动作接管，兼容旧 dataSource 语义）；
+   * 其余写操作保持 SDK 直连。未注入时全部走 SDK 默认路径（行为零变化）。
+   */
+  contactRepository?: Partial<ContactRepository>
+}
+
 /**
  * 联系人业务域（4.x）：好友/黑名单能力全部挂单一 `connection`
  * （无 ContactManager 拆分，主计划 8.2）。
@@ -41,6 +52,7 @@ export class ContactDomain {
   constructor(
     private client: Webim4Client,
     private store: ContactStoreLike,
+    private options: ContactDomainOptions = {},
   ) {}
 
   private get connection() {
@@ -62,13 +74,30 @@ export class ContactDomain {
     return this.store.contactList
   }
 
+  /**
+   * 分页拉取联系人列表（数据入口读路径，与 websdk5 同构）。
+   * 注入 fetchContacts 时委托注入实现，store 写入由消费方（UI 层）按分页语义负责；
+   * 未注入时先确保服务端全量同步完成（syncFromServer），再返回 store 快照
+   * （4.x 无游标分页，hasMore=false）。
+   */
+  async fetchContacts(cursor?: string, pageSize?: number): Promise<ContactPage> {
+    const repo = this.options.contactRepository?.fetchContacts
+    if (repo)
+      return repo(cursor, pageSize)
+    await this.syncFromServer()
+    return { list: this.store.contactList, cursor: undefined, hasMore: false }
+  }
+
   /** 只读：获取当前本地联系人数量（不写 store） */
   getLocalCount(): number {
     return this.store.contactList.length
   }
 
-  /** 添加好友（申请附言可选） */
+  /** 添加好友（注入 addContact 时委托业务接管——业务可先登记自有系统再决定是否调 SDK） */
   async addContact(userId: string, message?: string) {
+    const repo = this.options.contactRepository?.addContact
+    if (repo)
+      return repo(userId, message)
     await this.connection.addContact(userId, message || '')
   }
 
@@ -100,8 +129,14 @@ export class ContactDomain {
     this.store.removeInvite(userId)
   }
 
-  /** 获取黑名单（4.x getBlocklist 仅返回用户 ID 列表） */
+  /** 获取黑名单（4.x getBlocklist 仅返回用户 ID 列表；注入 fetchBlocklist 时委托注入实现，结果仍写 store） */
   async syncBlocklist(): Promise<UiContact[]> {
+    const repo = this.options.contactRepository?.fetchBlocklist
+    if (repo) {
+      const list = await repo()
+      this.store.setBlocklist(list)
+      return list
+    }
     const res = await this.connection.getBlocklist()
     const list = blocklistIdsToUiContacts(res.data || [])
     this.store.setBlocklist(list)

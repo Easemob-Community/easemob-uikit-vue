@@ -1,6 +1,7 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
 import type {
   SdkAdapter,
+  SdkCapabilities,
   SdkContactDomain,
   SdkConversationDomain,
   SdkGroupDomain,
@@ -25,6 +26,7 @@ import { useInvitePersistenceInternal } from './use-invite-persistence'
 declare const __EASEMOB_UIKIT_VERSION__: string
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob/uikit-core'
+export type { SdkCapabilities, SdkCapabilityFlags, SdkRepositoryOverrides, ContactPage, GroupPage } from '@easemob/uikit-core'
 export type { H5AdaptationConfig } from '@easemob/uikit-core'
 
 /** UIKit 登录参数：支持 accessToken 或密码登录 */
@@ -47,7 +49,17 @@ export interface UIKitContext {
   }
   stores: RootStores
   features: UIKitFeatures
+  /**
+   * 业务数据源接管（@deprecated 薄别名）：core 装配时已翻译为 repositories 注入
+   * adapter Domain；本字段仅保留 searchUsers（无 repository 对应项）与
+   * 「是否配置自定义数据源」判定读取，下个大版本移除。
+   */
   dataSource: UIKitDataSource
+  /**
+   * SDK 客观能力矩阵（adapter 上报，缺省全 true）：与 features（业务开关）
+   * 取交集决定能力入口展示，见 message-interactive / multi-select-bar / 群已读回执。
+   */
+  capabilities: SdkCapabilities
   /** 系统通知自定义配置（惰性读取，支持运行时变更） */
   noticeConfig: NoticeConfig
   /** H5 适配状态（viewport / 安全区 / 键盘高度 / 下拉刷新开关） */
@@ -211,6 +223,7 @@ export function useUIKitProvider(
     stores,
     features: coreCtx.features,
     dataSource: coreCtx.dataSource,
+    capabilities: coreCtx.capabilities,
     noticeConfig: coreCtx.noticeConfig,
     h5: coreCtx.h5,
     theme: coreCtx.theme,

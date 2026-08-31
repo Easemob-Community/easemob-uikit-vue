@@ -53,6 +53,9 @@ importers:
       easemob-websdk:
         specifier: ^5.0.0
         version: 5.0.0
+      easemob-websdk-4:
+        specifier: npm:easemob-websdk@4.24.2
+        version: easemob-websdk@4.24.2
       markdown-it:
         specifier: ^15.0.0
         version: 15.0.0
@@ -282,6 +285,9 @@ importers:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
     devDependencies:
+      '@easemob/uikit-sdk-webim4':
+        specifier: workspace:^
+        version: link:../uikit-sdk-webim4
       '@easemob/uikit-sdk-websdk5':
         specifier: workspace:^
         version: link:../uikit-sdk-websdk5
@@ -2761,7 +2767,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@13.24.0:
     resolution: {integrity: sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==}

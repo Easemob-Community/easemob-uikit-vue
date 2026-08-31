@@ -105,13 +105,15 @@ export class MyAdapter implements SdkAdapter {
 `SdkCapabilities` 由 adapter 如实上报，UIKit 结合 Provider 的 `features` 开关决定最终展示与否。
 
 ```ts
-export interface SdkCapabilities {
-  combineMessage: boolean
-  pinnedMessage: boolean
-  streamingMessage: boolean
-  groupReadReceipt: boolean
+export interface SdkCapabilities extends SdkCapabilityFlags {
+  /** adapter 实现所遵循的契约版本；缺省视为当前 `SDK_CONTRACT_VERSION` */
+  contractVersion?: string
+  /** 各能力位的可选协商元信息（能力为 false 时建议填 `reason`） */
+  meta?: Partial<Record<SdkCapabilityKey, SdkCapabilityMeta>>
 }
 ```
+
+能力位（`SdkCapabilityFlags`）保持 boolean 映射（`combineMessage` / `pinnedMessage` / `streamingMessage` / `groupReadReceipt`）；协商元信息（`contractVersion` / `meta.reason` / `meta.minContractVersion`）全部可选，仅在未来出现真实差异或契约版本演进时填写。契约包导出 `SDK_CONTRACT_VERSION` 常量，契约发生 breaking 变更时递增，adapter 经 `contractVersion` 上报自己遵循的版本。
 
 ## 数据入口注入（Phase 3.1）
 

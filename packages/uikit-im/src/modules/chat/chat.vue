@@ -1,31 +1,19 @@
 <script setup lang="ts">
 import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, useSlots, watch, watchEffect } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
+import type { UiConversation as Conversation, ConversationTypeValue, ForwardModeValue, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
+import { normalizeUserId } from '@easemob/uikit-sdk-contract'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'
 import { useQuote } from '../../composables/use-quote'
-import { useLocale } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
 import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
-import { CONVERSATION_TYPE, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, MESSAGE_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
-import type { ConversationTypeValue, ForwardModeValue } from '@easemob/uikit-core'
-import { insertChatNotice } from '@easemob/uikit-core'
-import { normalizeUserId } from '@easemob/uikit-sdk-contract'
-import type { UiConversation as Conversation, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
 import InviteMemberModal from '../group/invite-member-modal.vue'
-import { EmModal as Modal } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
 import MessageList from './message-list/message-list.vue'
 import MessageInput from './message-input/index.vue'
 import PinnedBar from './message-list/pinned-bar.vue'
@@ -107,13 +95,18 @@ const {
   sendVideoMessage,
   sendLocationMessage,
 } = useChat()
-const { stores, domains, h5, client } = useUIKit()
+const { stores, domains, h5, client, capabilities } = useUIKit()
 const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo, fetchGroupAnnouncement } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
-/** 群已读回执配置：透传给 plugin 的发送方法 */
-const groupReadReceiptConfig = computed(() => props.config?.groupReadReceipt)
+/**
+ * 群已读回执配置：透传给 plugin 的发送方法。
+ * 与 SDK 客观能力取交集：adapter 上报 groupReadReceipt=false 时强制关闭
+ * （能力缺省 true，未上报的 adapter 行为不变）。
+ */
+const groupReadReceiptConfig = computed(() =>
+  capabilities.groupReadReceipt === false ? undefined : props.config?.groupReadReceipt)
 
 /** 获取用户显示名（备注 > 用户资料昵称 > ID） */
 function getUserDisplayName(userId: string): string {
@@ -693,8 +686,9 @@ function openForwardModal(messages: UiMessage[], mode?: ForwardModeValue) {
   if (messages.length === 0)
     return
   pendingForwardMessages.value = messages
-  // 显式指定模式优先；未指定时单条默认逐条转发，多条默认合并转发
-  forwardMode.value = mode ?? (messages.length === 1 ? FORWARD_MODE.ONE_BY_ONE : FORWARD_MODE.COMBINE)
+  // 显式指定模式优先；未指定时单条默认逐条转发，多条默认合并转发；
+  // SDK 上报不支持合并消息（capabilities.combineMessage=false）时多条也回落逐条转发
+  forwardMode.value = mode ?? (messages.length === 1 || capabilities.combineMessage === false ? FORWARD_MODE.ONE_BY_ONE : FORWARD_MODE.COMBINE)
   showForwardModal.value = true
 }
 

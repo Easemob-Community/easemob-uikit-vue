@@ -14,6 +14,7 @@
     "@easemob/uikit-sdk-webim4": "workspace:*",
     "@easemob/uikit-sdk-websdk5": "workspace:*",
     "easemob-websdk": "^5.0.0",
+    "easemob-websdk-4": "npm:easemob-websdk@4.24.2",
     "markdown-it": "^15.0.0",
     "pinia": "^2.3.1",
     "pinyin-pro": "^3.29.0",

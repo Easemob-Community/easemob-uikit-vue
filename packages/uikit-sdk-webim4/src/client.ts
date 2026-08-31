@@ -1,6 +1,8 @@
 import WebIM from 'easemob-websdk'
 import type { EasemobChat } from 'easemob-websdk'
 import { createLogger } from '@easemob/uikit-sdk-contract'
+import { patchPbMetaDecode } from './patch-pb-decode'
+import type { PbPatchableConnection } from './patch-pb-decode'
 
 const log = createLogger('UIKit:Webim4Client')
 
@@ -28,6 +30,7 @@ export class Webim4Client {
   constructor(params: Webim4ConnectionParameters) {
     // eslint-disable-next-line new-cap -- 4.x 入口即小写 `new WebIM.connection(...)`，SDK API 约定
     this._conn = new WebIM.connection(params) as Webim4Connection
+    patchPbMetaDecode(this._conn as unknown as PbPatchableConnection)
   }
 
   /** 底层 4.x Connection 实例（Domain/事件层唯一 SDK 操作入口） */

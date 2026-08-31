@@ -186,7 +186,7 @@ export class ConversationDomain {
         const items: UiConversation[] = []
         let cursor: string | undefined
         do {
-          const page = await fetchConversations({ cursor, pageSize: CONVERSATION_PAGE_SIZE })
+          const page = await fetchConversations(cursor, CONVERSATION_PAGE_SIZE)
           items.push(...page.list)
           cursor = page.hasMore ? page.cursor : undefined
         } while (cursor)

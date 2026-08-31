@@ -55,7 +55,7 @@
 ## 四、4.x 语义差异（已在 adapter/domain 层收敛）
 
 - **会话列表**：原生游标分页 `getServerConversations` + `getServerPinnedConversations` 合并；
-  repository `fetchConversations` 语义：「`params.cursor` 空 → `refresh()` 第一页，否则 `loadMore()`」，
+  repository `fetchConversations` 语义：「`cursor` 空 → `refresh()` 第一页，否则 `loadMore()`」，
   游标由 domain 内部维护，返回 store 快照 + `hasMore`。
 - **会话名称/头像补全**：4.x 会话项不携带资料，由注入的 `fetchConversationProfiles` 批量补全——
   单聊批量 `fetchUserInfos` 后读 userInfo store，群聊优先 group store 缓存、未命中 `fetchGroupInfo`
@@ -122,15 +122,23 @@
 await adapter.init({
   appKey,
   repositories: {
-    message: { loadMessages: async ({ conversationId, conversationType, cursor, pageSize }) => /* ... */ },
-    conversation: { fetchConversations: async ({ cursor, pageSize }) => /* ... */ },
+    message: {
+      loadMessages: async (conversationId, conversationType, cursor, pageSize) => {
+        // 返回 MessagePage：{ list, cursor, hasMore }
+      },
+    },
+    conversation: {
+      fetchConversations: async (cursor, pageSize) => {
+        // 返回 ConversationPage：{ list, cursor, hasMore }
+      },
+    },
   },
 })
 ```
 
 当前仅消费两个方法（`SdkRepositoryOverrides` 其余字段为后续 DB 阶段预留，注入暂不生效）：
 
-- `message.loadMessages` → `MessageDomain.fetchHistory` 整体委托（`MessagePage` 映射为现有 `{ items, cursor, hasMore }`，store 写入语义与 SDK 路径一致）
+- `message.loadMessages` → `MessageDomain.fetchHistory` 整体委托（`MessagePage` 映射为现有 `{ list, cursor, hasMore }`，store 写入语义与 SDK 路径一致）
 - `conversation.fetchConversations` → `ConversationDomain.refresh` 委托（游标翻页至 `hasMore=false` 合并全量，去重并继承已补全名称/头像后回填 store，不触 SDK）
 
 adapter 的 `adapter.message` / `adapter.conversation` repository getter 不做注入合并——上述两个方法由 Domain 委托覆盖，其余注入方法本期不消费。

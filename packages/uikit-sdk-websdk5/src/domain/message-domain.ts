@@ -1,13 +1,8 @@
 import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
-import type { MessageStatus, UiMessage } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
-import type { MessageRepository, SdkMessage as NeutralSdkMessage } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId } from '@easemob/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
-import { MESSAGE_STATUS, normalizeUserId } from '@easemob/uikit-sdk-contract'
 import { toUiMessage } from '../adapter/message-adapter'
-import { isVoiceBody } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '../utils/sdk-error'
 
 const combineLogger = createLogger('Combine')
@@ -167,7 +162,7 @@ export class MessageDomain {
     // 必须显式传 createImageMessage 的 isGif: true，SDK 才会按 GIF 动图上传处理；
     // 否则走普通图片上传，服务端返回的是静态图地址，动图无法播放。
     const isGif = typeof data === 'string'
-      ? /\.gif($|\?)/i.test(data)
+      ? /\.gif(?:$|\?)/i.test(data)
       : data.type === 'image/gif' || /\.gif$/i.test(data.name)
     const sdkMsg = this.client.chatManager.createImageMessage({
       conversationId,
@@ -389,7 +384,7 @@ export class MessageDomain {
     // store 写入 / 群已读数补全等副作用与 SDK 默认路径完全对齐。
     const loadMessages = this.options.messageRepository?.loadMessages
     if (loadMessages) {
-      const page = await loadMessages({ conversationId, conversationType, cursor, pageSize })
+      const page = await loadMessages(conversationId, conversationType, cursor, pageSize)
       // CMD 消息为透传命令不上屏，注入路径同样过滤
       const injectedMsgs = page.list
         .filter(msg => msg.type !== MESSAGE_TYPE.CMD)
@@ -398,7 +393,7 @@ export class MessageDomain {
       if (conversationType === CONVERSATION_TYPE.GROUPCHAT)
         void this.fillGroupReadCounts(injectedMsgs, conversationId)
       return {
-        items: injectedMsgs,
+        list: injectedMsgs,
         cursor: page.cursor,
         hasMore: page.hasMore,
       }
@@ -434,7 +429,7 @@ export class MessageDomain {
       void this.fillGroupReadCounts(uiMsgs, conversationId)
 
     return {
-      items: uiMsgs,
+      list: uiMsgs,
       cursor: page.cursor,
       hasMore: page.hasMore,
     }
