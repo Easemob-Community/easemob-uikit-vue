@@ -130,6 +130,8 @@ export interface ClientStoreLike {
   setConnected: (value: boolean) => void
   setConnecting: (value: boolean) => void
   setHasConnectedOnce: (value: boolean) => void
+  /** 标记账号被踢/失效（被踢类错误码见 sdk-contract KICK_ERROR_CODE） */
+  setKicked: (code?: number) => void
   /**
    * 记录当前登录用户（可选）。login 成功后由 adapter 调用——
    * 注入模式（业务全权）下业务直接调 adapter.login，不经过 core Provider 的

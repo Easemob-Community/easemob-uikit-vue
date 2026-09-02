@@ -402,7 +402,7 @@ async function onDownload(file: any) {
 
 @media (hover: hover) {
   .shared-file-list__context-menu-item:hover {
-    background-color: var(--uikit-bg-hover, #f3f4f6);
+    background-color: var(--uikit-bg-hover, #F5F5F5);
   }
 }
 

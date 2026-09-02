@@ -154,6 +154,10 @@ alias: [
 - demo 自带 `pinyin-pro` 依赖仅用于拼音 adapter 演示，业务侧可自选实现。
 - `chatConfig` 的字段随 `EmChatContainer` props 演进，组装处与容器类型要同步更新
   （以 `packages/uikit-im/src/modules/chat/chat.vue` 的类型契约为准）。
+- **新增 SVG 图标后运行中的老 dev server 不会拾取**：图标注册走 `import.meta.glob(eager)`，
+  在模块首次转换时展开，新增文件不触发重新展开（glob 目录在 monorepo 根之外时 watcher 更易漏）；
+  症状是 `EmIcon` 静默不渲染、只剩文字（console 有一次「未在 icon-map 中注册」warn）。
+  已有模块的编辑（locale/SFC）能 HMR 热更，更容易造成「代码生效了但图标没有」的假象——重启 dev server 即可。
 
 ## 反面清单
 

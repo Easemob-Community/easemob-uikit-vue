@@ -183,6 +183,7 @@ function createClientStore(
   let connected = false
   let connecting = false
   let hasConnectedOnce = false
+  let kicked = false
 
   function getConnectState(): import('@easemob/uikit-sdk-contract').ConnectState {
     if (connecting)
@@ -209,6 +210,9 @@ function createClientStore(
     },
     setConnected(value: boolean) {
       connected = value
+      // 重新连接成功即恢复账号态（清除被踢标记）
+      if (value)
+        kicked = false
       emit()
     },
     setConnecting(value: boolean) {
@@ -217,6 +221,11 @@ function createClientStore(
     },
     setHasConnectedOnce(value: boolean) {
       hasConnectedOnce = value
+    },
+    setKicked(_code?: number) {
+      // 被踢为账号态终态（SDK 不再自动重连）：内置 store 记账，避免影响 ConnectState 翻译
+      kicked = true
+      emit()
     },
   }
 }

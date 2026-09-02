@@ -168,3 +168,31 @@ export const ALL_USER_INFO_ATTRIBUTES: Array<
 ]
 
 export type AllUserInfoAttributes = typeof ALL_USER_INFO_ATTRIBUTES
+
+/**
+ * 连接断开错误码：账号被踢/失效类（websdk 两代同码，见 4.x status.ts / 5.x error-codes）。
+ * 此类断开是账号态终态（retryable=false，SDK 不再自动重连），UI 不得展示「网络异常」，
+ * 应提示账号在其他设备登录/被踢并引导重新登录。
+ */
+export const KICK_ERROR_CODE = {
+  /** 账号在其他设备登录（多端互踢） */
+  USER_LOGIN_ANOTHER_DEVICE: 206,
+  /** 账号已被注销 */
+  USER_REMOVED: 207,
+  /** 登录设备数超过限制，当前设备被踢 */
+  USER_LOGIN_TOO_MANY_DEVICES: 214,
+  /** 修改密码导致被踢下线 */
+  USER_KICKED_BY_CHANGE_PASSWORD: 216,
+  /** 被其他设备主动踢下线 */
+  USER_KICKED_BY_OTHER_DEVICE: 217,
+} as const
+
+export type KickErrorCodeValue =
+  (typeof KICK_ERROR_CODE)[keyof typeof KICK_ERROR_CODE]
+
+/** 判断断开错误码是否为被踢/账号失效类（5.x 取 payload.errorCode，4.x 取 error.type） */
+export function isKickErrorCode(code: number | undefined | null): code is KickErrorCodeValue {
+  return code !== undefined
+    && code !== null
+    && (Object.values(KICK_ERROR_CODE) as number[]).includes(code)
+}

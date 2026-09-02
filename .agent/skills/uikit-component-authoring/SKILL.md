@@ -217,6 +217,31 @@ export type ConversationTypeValue = (typeof CONVERSATION_TYPE)[keyof typeof CONV
 
 ---
 
+## 10. 局部插槽的三层透传命名规约（item → list → container）
+
+给列表项加「局部扩展位」时，不要让接入方用 `#item` 整项接管（牵一发动全身），
+而是按固定三层命名逐级透传（2026-09 会话项 `#name-suffix` 首次跑通，为范式）：
+
+| 层 | 命名 | 示例 |
+| --- | --- | --- |
+| item（行组件） | 短名，kebab-case | `#name-suffix`（`conversation-item.vue`） |
+| list（列表模块） | 加 `item-` 前缀 | `#item-name-suffix`（`conversation-list.vue`） |
+| container（容器） | 转 camelCase 暴露 | `#itemNameSuffix`（`conversation-container.vue`，沿用 `headerMenu`/`newChat` 的 camelCase 约定） |
+
+透传写法统一为「条件转发 + scope 透传」，三层同一写法：
+
+```vue
+<template v-if="$slots['itemNameSuffix']" #item-name-suffix="slotProps">
+  <slot name="item-name-suffix" v-bind="slotProps" />
+</template>
+```
+
+- item 层 slot 的 scope 至少透传行数据（如 `{ conversation }`），中间层原样 `v-bind` 转发、不增删字段。
+- 插槽位置要写在注释里说明（如「名字后、pin/mute 标前」），story 补一个演示变体。
+- 文档无需手写：`gen:api` 会从模板 `<slot name>` 自动生成 Slots 表，跑一遍即可。
+
+---
+
 ## 硬规则 vs 软约定
 
 **硬规则（lint / 构建 / resolver 会拦或直接影响可用性，100% 遵守）：**

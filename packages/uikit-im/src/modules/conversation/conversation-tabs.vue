@@ -127,7 +127,7 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 
 @media (hover: hover) {
   .conversation-tabs__tab:hover {
-    background-color: var(--uikit-bg-hover, #f3f4f6);
+    background-color: var(--uikit-bg-hover, #F5F5F5);
   }
 }
 

@@ -13,7 +13,7 @@
 | showSenderName   | `boolean`                                          | `true`                                 | 群聊会话摘要是否显示发送者名称前缀，默认 true                                                                 |
 | emptyText        | `string`                                           | —                                      | 空列表提示文案，优先于各分栏 tab 的默认空状态文案                                                               |
 | unreadMode       | `'count' \| 'dot'`                                 | `'count'`                              | 未读数量展示模式：count 显示数字，dot 仅显示红点，默认 'count'                                                  |
-| badgePlacement   | `'top-right' \| 'bottom-right'`                    | —                                      | 未读 Badge 统一位置：top-right（默认）/ bottom-right                                                 |
+| badgePlacement   | `'top-right' \| 'bottom-right'`                    | —                                      | 未读 Badge 位置（仅 unreadPlacement=avatar 头像角标时生效）：top-right（默认）/ bottom-right                 |
 | variant          | `'card' \| 'compact'`                              | `'card'`                               | 列表风格变体：card（默认；圆角白卡、无分割线、项间距 4px）/<br>compact（无圆角、无分割线、零间距的平铺列表）                          |
 | showAvatar       | `boolean`                                          | `true`                                 | 会话项是否展示头像（false = 仅会话信息模式），默认 true                                                        |
 | unreadPlacement  | `'inline' \| 'avatar'`                             | `'inline'`                             | 未读徽标归位：inline 信息区行尾（默认）/ avatar 头像右上角角标                                                   |

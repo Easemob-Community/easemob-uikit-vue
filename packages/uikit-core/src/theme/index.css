@@ -72,6 +72,13 @@
   --uikit-spacing-6: 32px;
   --uikit-spacing-7: 48px;
 
+  /* 项级 hover/active 圆角与内缩静态默认（与 themeStore hoverStyle='default' 档一致；
+     运行时由 themeStore 按 hoverStyle 档位覆写：rounded 加左右缩进、square 归零直角） */
+  --uikit-item-hover-radius: 8px;
+  --uikit-item-active-radius: 8px;
+  --uikit-item-hover-margin-x: 0px;
+  --uikit-item-hover-padding-x: 16px;
+
   /* 容器间距与组件圆角 */
   --uikit-container-gap: var(--uikit-spacing-2);
   --uikit-cell-gap: 3px;
@@ -191,6 +198,9 @@
   /* 语义 token：会话列表容器背景（接入方可覆盖定制） */
   --uikit-conversation-list-bg: #FAFAFA;
 
+  /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框） */
+  --uikit-input-border-color: #F5F5F5;
+
   /* 语义 token：空状态占位（图标 / 文案） */
   --uikit-empty-icon-color: #E6E6E6;
   --uikit-empty-text-color: #BDBDBD;
@@ -253,6 +263,9 @@
 
   /* 语义 token：会话列表容器背景 - 暗色（与页面底色一致） */
   --uikit-conversation-list-bg: #111827;
+
+  /* 语义 token：输入框默认边框 - 暗色（与边框色一致） */
+  --uikit-input-border-color: #374151;
 
   /* 语义 token：空状态占位 - 暗色 */
   --uikit-empty-icon-color: #4B5563;

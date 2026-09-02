@@ -704,14 +704,15 @@ const displayMessage = computed(() => {
   padding: 6px;
 }
 
-/* 菜单项 —— 自身带圆角，hover 时是独立的圆角色块（不贴卡片边） */
+/* 菜单项 —— 自身带圆角，hover 时是独立的圆角色块（不贴卡片边）；
+   圆角走项级 hover 圆角 token（跟随主题形状档位，与 Cell 一致） */
 .context-menu__item {
   padding: 10px 12px;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
-  border-radius: var(--uikit-components-radius);
+  border-radius: var(--uikit-item-hover-radius, 8px);
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   display: flex;
   align-items: center;

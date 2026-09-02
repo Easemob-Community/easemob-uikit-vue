@@ -1,6 +1,6 @@
-import { MESSAGE_STATUS as xt, toUiMessage as wf, GROUP_MEMBER_ROLE as ut, getStorageBackend as oi, createUIKitStorageKey as _f, useLocale as qe, useToast as Wt, MESSAGE_TYPE as Ce, isVoiceBody as _v, formatSdkError as Je, isTextBody as Cv, createLogger as Ot, useCoreUIKitProvider as Mv, useUserInfo as Sv, usePresence as ro, EmPopup as Lt, EmUserCard as Xl, EmAvatar as $t, EmCopyableText as di, EmIcon as Oe, insertChatNotice as qn, CONVERSATION_TYPE as lt, NOTICE_EVENT_TYPE as Fn, EmActionSheet as br, EmBadge as cl, EmButton as xn, EmCell as Tt, EmEmojiPicker as Yl, EmEmpty as Ht, EmIconButton as pt, EmImageViewer as Cf, EmInput as gn, EmModal as io, EmNotification as Iv, EmNotificationContainer as Mf, EmPresenceAvatar as xv, EmPresenceSelector as Tv, EmPresenceSelectorModal as Ev, EmPresenceSelectorPopup as Av, EmResizable as $v, EmScrollToTop as ra, EmSkeleton as es, EmStatusBanner as Sf, EmToast as If, useViewport as Mn, useLongPress as xf, useEscToClose as Ql, useArrowNavigation as ia, useKeyBindings as aa, GROUP_INFO_LIMIT as Nt, usePullRefresh as Tf, MESSAGE_EXT_KEY as Zl, useThemeStore as kr, INJECTION_KEY as eo, linkify as zr, STREAM_CUSTOM_TYPE as Rv, STREAM_MESSAGE_STATUS as Nv, detectEnvironment as ec, downloadFile as tc, useClientStore as Lv, resolveSdkErrorMessage as mo, useResizable as Ef, buildAnnouncementNoticeText as Ov, FORWARD_MODE as hs, HEADER_ALIGN as Fr, createUserInfoSubscriptionErrorHandler as Dv, useProviderSideEffects as Bv, createConversationTimeFormatter as Pv, useOwnUserInfo as zv } from "@easemob/uikit-core";
+import { MESSAGE_STATUS as xt, toUiMessage as wf, GROUP_MEMBER_ROLE as ut, getStorageBackend as oi, createUIKitStorageKey as _f, useLocale as qe, useToast as Wt, MESSAGE_TYPE as Ce, isVoiceBody as _v, formatSdkError as Je, isTextBody as Cv, createLogger as Dt, useCoreUIKitProvider as Mv, useUserInfo as Sv, usePresence as ro, EmPopup as Ot, EmUserCard as Xl, EmAvatar as $t, EmCopyableText as di, EmIcon as De, insertChatNotice as qn, CONVERSATION_TYPE as lt, NOTICE_EVENT_TYPE as Fn, EmActionSheet as br, EmBadge as cl, EmButton as xn, EmCell as Tt, EmEmojiPicker as Yl, EmEmpty as Ht, EmIconButton as pt, EmImageViewer as Cf, EmInput as gn, EmModal as io, EmNotification as Iv, EmNotificationContainer as Mf, EmPresenceAvatar as xv, EmPresenceSelector as Tv, EmPresenceSelectorModal as Ev, EmPresenceSelectorPopup as Av, EmResizable as $v, EmScrollToTop as ra, EmSkeleton as es, EmStatusBanner as Sf, EmToast as If, useViewport as Mn, useLongPress as xf, useEscToClose as Ql, useArrowNavigation as ia, useKeyBindings as aa, GROUP_INFO_LIMIT as Lt, usePullRefresh as Tf, MESSAGE_EXT_KEY as Zl, useThemeStore as kr, INJECTION_KEY as eo, linkify as zr, STREAM_CUSTOM_TYPE as Rv, STREAM_MESSAGE_STATUS as Nv, detectEnvironment as ec, downloadFile as tc, useClientStore as Lv, resolveSdkErrorMessage as mo, useResizable as Ef, buildAnnouncementNoticeText as Ov, FORWARD_MODE as hs, HEADER_ALIGN as Fr, createUserInfoSubscriptionErrorHandler as Dv, useProviderSideEffects as Bv, createConversationTimeFormatter as Pv, useOwnUserInfo as zv } from "@easemob/uikit-core";
 import { ACK_TYPE as E2, CONVERSATION_TYPE as A2, EmActionSheet as $2, EmAvatar as R2, EmBadge as N2, EmButton as L2, EmCell as O2, EmCopyableText as D2, EmEmojiPicker as B2, EmEmpty as P2, EmIcon as z2, EmIconButton as F2, EmImageViewer as U2, EmInput as H2, EmModal as G2, EmNotification as V2, EmNotificationContainer as j2, EmPopup as K2, EmPresenceAvatar as W2, EmPresenceSelector as q2, EmPresenceSelectorModal as J2, EmPresenceSelectorPopup as X2, EmResizable as Y2, EmScrollToTop as Q2, EmSkeleton as Z2, EmStatusBanner as eB, EmToast as tB, EmUserCard as nB, FORWARD_MODE as sB, GROUP_INFO_LIMIT as oB, GROUP_MEMBER_ROLE as rB, HEADER_ALIGN as iB, INJECTION_KEY as aB, MESSAGE_STATUS as lB, MESSAGE_TYPE as cB, NOTICE_EVENT_TYPE as uB, PRESENCE_STATUS as dB, STREAM_CUSTOM_TYPE as fB, STREAM_MESSAGE_STATUS as pB, buildAnnouncementNoticeText as hB, clearPersistedLogs as mB, configureLogPersistence as gB, createLocale as vB, createNoticeMessage as yB, createUIKitStorageKey as bB, emitNotificationDelivered as kB, exportPersistedLogs as wB, findLocaleKey as _B, formatPersistedLogs as CB, formatSdkError as MB, getPersistedLogs as SB, getStorageBackend as IB, insertChatNotice as xB, isKeyboardShortcutsEnabled as TB, isNoticeMessage as EB, mergeLocaleMessages as AB, resolveNoticeUserName as $B, setKeyboardShortcutsEnabled as RB, t as NB, toUiMessage as LB, toUiMessages as OB, useArrowNavigation as DB, useBottomSheet as BB, useClient as PB, useClientStore as zB, useEscToClose as FB, useH5Adaptation as UB, useKeyBindings as HB, useKeyboard as GB, useLocale as VB, useLongPress as jB, useNotification as KB, usePresence as WB, usePresenceStore as qB, usePullRefresh as JB, useResizable as XB, useRipple as YB, useSyncStatus as QB, useTheme as ZB, useThemeStore as eP, useToast as tP, useUIKitStorage as nP, useViewport as sP } from "@easemob/uikit-core";
-import { ref as A, computed as k, markRaw as Af, getCurrentScope as Fv, onScopeDispose as Uv, shallowRef as vn, shallowReadonly as Mo, onMounted as qt, nextTick as Ye, watch as Pe, onUnmounted as Ds, toValue as Mt, getCurrentInstance as nc, toRef as Hv, readonly as Gv, customRef as $f, isRef as sc, reactive as fi, unref as m, toRaw as pi, inject as ks, provide as wr, defineComponent as Re, openBlock as y, createBlock as ce, withCtx as X, createElementVNode as _, createVNode as q, createElementBlock as w, toDisplayString as P, createCommentVNode as U, normalizeStyle as Et, normalizeClass as Te, renderSlot as V, createTextVNode as mt, Fragment as $e, renderList as et, mergeProps as ao, Transition as Io, withModifiers as ft, normalizeProps as Fe, guardReactiveProps as Ue, createSlots as At, onBeforeUnmount as Xn, resolveDynamicComponent as oc, withDirectives as Dn, vModelCheckbox as Rf, useSlots as rc, watchEffect as ic, vModelText as ts, useCssVars as la, h as ca, withKeys as ms, Teleport as Au, onErrorCaptured as Vv } from "vue";
+import { ref as A, computed as k, markRaw as Af, getCurrentScope as Fv, onScopeDispose as Uv, shallowRef as vn, shallowReadonly as Mo, onMounted as qt, nextTick as Ye, watch as Pe, onUnmounted as Ds, toValue as Mt, getCurrentInstance as nc, toRef as Hv, readonly as Gv, customRef as $f, isRef as sc, reactive as fi, unref as m, toRaw as pi, inject as ks, provide as wr, defineComponent as Le, openBlock as y, createBlock as de, withCtx as J, createElementVNode as _, createVNode as W, createElementBlock as w, toDisplayString as P, createCommentVNode as F, normalizeStyle as Et, normalizeClass as Te, renderSlot as G, createTextVNode as mt, Fragment as $e, renderList as tt, mergeProps as ao, Transition as Io, withModifiers as ft, normalizeProps as Fe, guardReactiveProps as Ue, createSlots as At, onBeforeUnmount as Xn, resolveDynamicComponent as oc, withDirectives as Dn, vModelCheckbox as Rf, useSlots as rc, watchEffect as ic, vModelText as ts, useCssVars as la, h as ca, withKeys as ms, Teleport as Au, onErrorCaptured as Vv } from "vue";
 import { defineStore as ua } from "pinia";
 import { resolveLastMessageText as Nf, isStreamActive as jv, normalizeUserId as hi } from "@easemob/uikit-sdk-contract";
 import { customEventPreviewMap as rP, defaultLastMessageTextResolver as iP, defaultMessagePreviewLabels as aP, formatConversationPreview as lP, isCmdBody as cP, isCombineBody as uP, isCustomBody as dP, isFileBody as fP, isImageBody as pP, isLocationBody as hP, isTextBody as mP, isVideoBody as gP, isVoiceBody as vP, mergeMessagePreviewLabels as yP, resolveLastMessageText as bP } from "@easemob/uikit-sdk-contract";
@@ -26,296 +26,296 @@ const Of = ua("message", () => {
     delivered: 2,
     read: 3
   };
-  function f(Q) {
-    (Q == null ? void 0 : Q.maxMessageCount) !== void 0 && Q.maxMessageCount > 0 && (a = Q.maxMessageCount), (Q == null ? void 0 : Q.maxCachedConversations) !== void 0 && Q.maxCachedConversations > 0 && (l = Q.maxCachedConversations);
+  function f(X) {
+    (X == null ? void 0 : X.maxMessageCount) !== void 0 && X.maxMessageCount > 0 && (a = X.maxMessageCount), (X == null ? void 0 : X.maxCachedConversations) !== void 0 && X.maxCachedConversations > 0 && (l = X.maxCachedConversations);
   }
-  function h(Q) {
-    return n.value[Q] || [];
+  function h(X) {
+    return n.value[X] || [];
   }
-  function g(Q) {
-    return t.value[Q] || [];
+  function g(X) {
+    return t.value[X] || [];
   }
-  function v(Q) {
-    return s.value[Q] || [];
+  function v(X) {
+    return s.value[X] || [];
   }
-  function b(Q, H) {
-    s.value[Q] = H;
+  function b(X, U) {
+    s.value[X] = U;
   }
-  function $(Q, H) {
-    return o.value[`${Q}:${H}`] || [];
+  function $(X, U) {
+    return o.value[`${X}:${U}`] || [];
   }
-  function R(Q, H, ae) {
-    o.value[`${Q}:${H}`] = ae;
+  function R(X, U, le) {
+    o.value[`${X}:${U}`] = le;
   }
-  function M(Q) {
-    i.value = Q;
+  function M(X) {
+    i.value = X;
   }
-  function x(Q) {
-    return r.value[Q] || [];
+  function x(X) {
+    return r.value[X] || [];
   }
-  function T(Q) {
-    return Q.length <= a ? Q : Q.slice(-a);
+  function T(X) {
+    return X.length <= a ? X : X.slice(-a);
   }
-  function I(Q, H) {
-    for (const ae of [H.msgServerId, H.msgLocalId, H.localId])
-      ae && c.set(ae, Q);
+  function I(X, U) {
+    for (const le of [U.msgServerId, U.msgLocalId, U.localId])
+      le && c.set(le, X);
   }
-  function O(Q) {
-    for (const H of [Q.msgServerId, Q.msgLocalId, Q.localId])
-      H && c.delete(H);
+  function N(X) {
+    for (const U of [X.msgServerId, X.msgLocalId, X.localId])
+      U && c.delete(U);
   }
-  function E(Q) {
-    if (Q.length > a)
-      for (const H of Q.slice(0, Q.length - a))
-        O(H);
-    return T(Q);
+  function E(X) {
+    if (X.length > a)
+      for (const U of X.slice(0, X.length - a))
+        N(U);
+    return T(X);
   }
-  function G(Q, H) {
-    let ae = 0, K = Q.length;
-    for (; ae < K; ) {
-      const pe = ae + K >> 1;
-      Q[pe].timestamp <= H ? ae = pe + 1 : K = pe;
+  function H(X, U) {
+    let le = 0, K = X.length;
+    for (; le < K; ) {
+      const pe = le + K >> 1;
+      X[pe].timestamp <= U ? le = pe + 1 : K = pe;
     }
-    return ae;
+    return le;
   }
-  function N(Q, H) {
-    if (Q.length === 0 || H.timestamp >= Q[Q.length - 1].timestamp)
-      return [...Q, H];
-    const ae = G(Q, H.timestamp);
-    return [...Q.slice(0, ae), H, ...Q.slice(ae)];
+  function D(X, U) {
+    if (X.length === 0 || U.timestamp >= X[X.length - 1].timestamp)
+      return [...X, U];
+    const le = H(X, U.timestamp);
+    return [...X.slice(0, le), U, ...X.slice(le)];
   }
-  function D(Q, H) {
-    return (n.value[Q] || []).findIndex(
-      (ae) => ae.msgServerId === H || ae.msgLocalId === H || ae.localId === H
+  function L(X, U) {
+    return (n.value[X] || []).findIndex(
+      (le) => le.msgServerId === U || le.msgLocalId === U || le.localId === U
     );
   }
-  function S(Q) {
-    const H = c.get(Q);
-    if (H !== void 0) {
-      const ae = D(H, Q);
-      if (ae > -1)
-        return { conversationId: H, index: ae };
-      c.delete(Q);
+  function S(X) {
+    const U = c.get(X);
+    if (U !== void 0) {
+      const le = L(U, X);
+      if (le > -1)
+        return { conversationId: U, index: le };
+      c.delete(X);
     }
-    for (const ae in n.value) {
-      const K = D(ae, Q);
+    for (const le in n.value) {
+      const K = L(le, X);
       if (K > -1)
-        return c.set(Q, ae), { conversationId: ae, index: K };
+        return c.set(X, le), { conversationId: le, index: K };
     }
     return null;
   }
-  function C(Q, H) {
-    const ae = S(Q);
-    if (!ae)
+  function C(X, U) {
+    const le = S(X);
+    if (!le)
       return !1;
-    const { conversationId: K, index: pe } = ae, Ne = n.value[K];
+    const { conversationId: K, index: pe } = le, Ne = n.value[K];
     return n.value[K] = [
       ...Ne.slice(0, pe),
-      H(Ne[pe]),
+      U(Ne[pe]),
       ...Ne.slice(pe + 1)
     ], !0;
   }
-  function L(Q) {
-    const H = n.value[Q.conversationId] || [];
-    if (!H.find(
-      (K) => Q.msgServerId && K.msgServerId === Q.msgServerId || Q.msgLocalId && K.msgLocalId === Q.msgLocalId
+  function O(X) {
+    const U = n.value[X.conversationId] || [];
+    if (!U.find(
+      (K) => X.msgServerId && K.msgServerId === X.msgServerId || X.msgLocalId && K.msgLocalId === X.msgLocalId
     )) {
-      const K = E(N(H, Q));
-      n.value[Q.conversationId] = K, K.includes(Q) && I(Q.conversationId, Q);
+      const K = E(D(U, X));
+      n.value[X.conversationId] = K, K.includes(X) && I(X.conversationId, X);
     }
-    tt(Q.conversationId);
+    st(X.conversationId);
   }
-  function J(Q, H) {
-    e.value[Q] = { sdkMsg: Af(H), timestamp: Date.now() };
-    const ae = H.from, K = {
-      ...wf(H, ae),
+  function q(X, U) {
+    e.value[X] = { sdkMsg: Af(U), timestamp: Date.now() };
+    const le = U.from, K = {
+      ...wf(U, le),
       status: xt.SENDING,
       isSelf: !0,
       // 请求了已读回执的群消息需要展示已读人数标注（replaceWithSent 会保留该字段）
-      requireGroupAck: H.needReadReceipt === !0 ? !0 : void 0
+      requireGroupAck: U.needReadReceipt === !0 ? !0 : void 0
     }, pe = n.value[K.conversationId] || [];
     if (!pe.find(
-      (Qe) => K.msgServerId && Qe.msgServerId === K.msgServerId || K.msgLocalId && Qe.msgLocalId === K.msgLocalId
+      (Ze) => K.msgServerId && Ze.msgServerId === K.msgServerId || K.msgLocalId && Ze.msgLocalId === K.msgLocalId
     )) {
-      const Qe = E(N(pe, K));
-      n.value[K.conversationId] = Qe, Qe.includes(K) && I(K.conversationId, K);
+      const Ze = E(D(pe, K));
+      n.value[K.conversationId] = Ze, Ze.includes(K) && I(K.conversationId, K);
     }
-    tt(K.conversationId);
+    st(K.conversationId);
   }
-  function te(Q, H) {
-    delete e.value[Q];
-    const ae = S(Q);
-    if (!ae) {
-      L(H);
+  function te(X, U) {
+    delete e.value[X];
+    const le = S(X);
+    if (!le) {
+      O(U);
       return;
     }
-    const { conversationId: K, index: pe } = ae, Ne = n.value[K], Qe = Ne[pe], wt = {
-      ...H,
+    const { conversationId: K, index: pe } = le, Ne = n.value[K], Ze = Ne[pe], St = {
+      ...U,
       isSelf: !0,
-      localId: Q,
-      translation: Qe.translation,
-      showTranslation: Qe.showTranslation,
-      voiceText: Qe.voiceText,
-      showVoiceText: Qe.showVoiceText,
-      requireGroupAck: Qe.requireGroupAck
+      localId: X,
+      translation: Ze.translation,
+      showTranslation: Ze.showTranslation,
+      voiceText: Ze.voiceText,
+      showVoiceText: Ze.showVoiceText,
+      requireGroupAck: Ze.requireGroupAck
     };
     n.value[K] = [
       ...Ne.slice(0, pe),
-      wt,
+      St,
       ...Ne.slice(pe + 1)
-    ], I(K, wt);
+    ], I(K, St);
   }
-  function ve(Q, H) {
-    C(Q, (ae) => ({ ...ae, progress: H }));
+  function ye(X, U) {
+    C(X, (le) => ({ ...le, progress: U }));
   }
-  function be(Q, H) {
-    delete e.value[Q], C(Q, (ae) => ({
-      ...ae,
+  function ke(X, U) {
+    delete e.value[X], C(X, (le) => ({
+      ...le,
       status: xt.FAILED,
-      failReason: H
+      failReason: U
     }));
   }
-  function W(Q, H) {
-    const ae = n.value[Q] || [], K = new Set(
-      ae.flatMap((St) => [St.msgServerId, St.msgLocalId].filter(Boolean))
-    ), pe = H.filter(
-      (St) => !K.has(St.msgServerId) && !K.has(St.msgLocalId)
-    ), Ne = [...pe, ...ae];
-    Ne.sort((St, on) => St.timestamp - on.timestamp);
-    const Qe = E(Ne);
-    n.value[Q] = Qe;
-    const wt = new Set(Qe);
-    for (const St of pe)
-      wt.has(St) && I(Q, St);
-    tt(Q);
+  function j(X, U) {
+    const le = n.value[X] || [], K = new Set(
+      le.flatMap((wt) => [wt.msgServerId, wt.msgLocalId].filter(Boolean))
+    ), pe = U.filter(
+      (wt) => !K.has(wt.msgServerId) && !K.has(wt.msgLocalId)
+    ), Ne = [...pe, ...le];
+    Ne.sort((wt, hn) => wt.timestamp - hn.timestamp);
+    const Ze = E(Ne);
+    n.value[X] = Ze;
+    const St = new Set(Ze);
+    for (const wt of pe)
+      St.has(wt) && I(X, wt);
+    st(X);
   }
-  function re(Q, H) {
-    C(Q, (ae) => ({ ...ae, ...H }));
+  function ie(X, U) {
+    C(X, (le) => ({ ...le, ...U }));
   }
-  function ue(Q, H) {
-    C(Q, () => H);
+  function fe(X, U) {
+    C(X, () => U);
   }
-  function j(Q, H) {
-    C(Q, (ae) => p[ae.status] > p[H] ? ae : { ...ae, status: H });
+  function V(X, U) {
+    C(X, (le) => p[le.status] > p[U] ? le : { ...le, status: U });
   }
-  function de(Q, H) {
-    const ae = S(Q), K = ae ? n.value[ae.conversationId][ae.index].body : void 0;
-    re(Q, {
+  function ue(X, U) {
+    const le = S(X), K = le ? n.value[le.conversationId][le.index].body : void 0;
+    ie(X, {
       recalled: !0,
-      recalledBy: H,
+      recalledBy: U,
       originalMsg: K == null ? void 0 : K.content
     });
   }
-  function se(Q) {
-    C(Q.msgServerId, () => ({ ...Q }));
+  function se(X) {
+    C(X.msgServerId, () => ({ ...X }));
   }
-  function Me(Q, H) {
-    ue(Q, H);
+  function Me(X, U) {
+    fe(X, U);
   }
-  function ge(Q) {
-    const H = S(Q);
-    if (!H)
+  function ge(X) {
+    const U = S(X);
+    if (!U)
       return;
-    const { conversationId: ae, index: K } = H, pe = n.value[ae];
-    O(pe[K]), n.value[ae] = [
+    const { conversationId: le, index: K } = U, pe = n.value[le];
+    N(pe[K]), n.value[le] = [
       ...pe.slice(0, K),
       ...pe.slice(K + 1)
     ];
   }
-  function Ie(Q) {
-    const H = new Set(Q);
-    for (const ae in n.value) {
-      const K = n.value[ae], pe = [], Ne = K.filter((Qe) => {
-        const wt = H.has(Qe.msgServerId) || H.has(Qe.msgLocalId) || H.has(Qe.localId || "");
-        return wt && pe.push(Qe), !wt;
+  function Ie(X) {
+    const U = new Set(X);
+    for (const le in n.value) {
+      const K = n.value[le], pe = [], Ne = K.filter((Ze) => {
+        const St = U.has(Ze.msgServerId) || U.has(Ze.msgLocalId) || U.has(Ze.localId || "");
+        return St && pe.push(Ze), !St;
       });
       if (pe.length !== 0) {
-        for (const Qe of pe)
-          O(Qe);
-        n.value[ae] = Ne;
+        for (const Ze of pe)
+          N(Ze);
+        n.value[le] = Ne;
       }
     }
   }
-  function Ke(Q, H) {
-    t.value[Q] = H;
+  function Ke(X, U) {
+    t.value[X] = U;
   }
-  function _e(Q, H) {
-    re(Q, {
+  function _e(X, U) {
+    ie(X, {
       pinned: !0,
-      pinTime: H.pinTime,
-      pinOperatorId: H.operatorId
+      pinTime: U.pinTime,
+      pinOperatorId: U.operatorId
     });
   }
-  function He(Q) {
-    re(Q, {
+  function He(X) {
+    ie(X, {
       pinned: !1,
       pinTime: void 0,
       pinOperatorId: void 0
     });
   }
-  function ee(Q, H) {
-    const ae = r.value[Q] || [];
-    ae.includes(H) || (r.value[Q] = [...ae, H]);
+  function ee(X, U) {
+    const le = r.value[X] || [];
+    le.includes(U) || (r.value[X] = [...le, U]);
   }
-  function me(Q) {
-    delete r.value[Q];
+  function ve(X) {
+    delete r.value[X];
   }
-  function Be(Q) {
-    const H = n.value[Q] || [];
-    for (const K of H)
+  function Be(X) {
+    const U = n.value[X] || [];
+    for (const K of U)
       for (const pe of [K.msgServerId, K.msgLocalId, K.localId])
         pe && (delete s.value[pe], c.delete(pe));
-    delete n.value[Q], delete t.value[Q], delete r.value[Q];
-    const ae = Object.entries(e.value).filter(([, K]) => K.sdkMsg.conversationId === Q).map(([K]) => K);
-    for (const K of ae)
+    delete n.value[X], delete t.value[X], delete r.value[X];
+    const le = Object.entries(e.value).filter(([, K]) => K.sdkMsg.conversationId === X).map(([K]) => K);
+    for (const K of le)
       delete e.value[K];
-    u.delete(Q), d === Q && (d = null);
+    u.delete(X), d === X && (d = null);
   }
-  function tt(Q) {
+  function st(X) {
     if (!(!l || l <= 0))
-      for (u.delete(Q), u.set(Q, !0), d = Q; u.size > l; ) {
-        const H = u.keys().next();
-        if (H.done || H.value === d)
+      for (u.delete(X), u.set(X, !0), d = X; u.size > l; ) {
+        const U = u.keys().next();
+        if (U.done || U.value === d)
           break;
-        u.delete(H.value), nt(H.value);
+        u.delete(U.value), nt(U.value);
       }
   }
-  function nt(Q) {
-    Be(Q), Lf(Q);
+  function nt(X) {
+    Be(X), Lf(X);
   }
-  function dt(Q, H) {
-    re(Q, { translating: H });
+  function dt(X, U) {
+    ie(X, { translating: U });
   }
-  function vt(Q, H) {
-    re(Q, {
-      translation: H,
+  function gt(X, U) {
+    ie(X, {
+      translation: U,
       showTranslation: !0,
       translating: !1
     });
   }
-  function kt(Q) {
-    C(Q, (H) => ({
-      ...H,
-      showTranslation: !H.showTranslation
+  function kt(X) {
+    C(X, (U) => ({
+      ...U,
+      showTranslation: !U.showTranslation
     }));
   }
-  function fe(Q, H) {
-    re(Q, { voiceTranscribing: H });
+  function he(X, U) {
+    ie(X, { voiceTranscribing: U });
   }
-  function Z(Q, H) {
-    re(Q, {
-      voiceText: H,
+  function Q(X, U) {
+    ie(X, {
+      voiceText: U,
       showVoiceText: !0,
       voiceTranscribing: !1
     });
   }
-  function ie(Q) {
-    C(Q, (H) => ({
-      ...H,
-      showVoiceText: !H.showVoiceText
+  function ae(X) {
+    C(X, (U) => ({
+      ...U,
+      showVoiceText: !U.showVoiceText
     }));
   }
-  function ke() {
+  function we() {
     n.value = {}, e.value = {}, t.value = {}, s.value = {}, o.value = {}, r.value = {}, i.value = !1, c.clear(), u.clear(), d = null;
   }
   return {
@@ -335,17 +335,17 @@ const Of = ua("message", () => {
     getGroupMessageReadUsers: $,
     setGroupMessageReadUsers: R,
     getAtMeMessages: x,
-    addMessage: L,
-    addSendingMessage: J,
+    addMessage: O,
+    addSendingMessage: q,
     replaceWithSent: te,
-    updateUploadProgress: ve,
-    markFailed: be,
-    prependMessages: W,
-    updateMessageById: re,
-    replaceMessageById: ue,
-    updateMessageStatus: j,
-    updateStatusByServerId: j,
-    recallMessage: de,
+    updateUploadProgress: ye,
+    markFailed: ke,
+    prependMessages: j,
+    updateMessageById: ie,
+    replaceMessageById: fe,
+    updateMessageStatus: V,
+    updateStatusByServerId: V,
+    recallMessage: ue,
     applyModifiedMessage: se,
     updateMessage: Me,
     deleteMessage: ge,
@@ -354,93 +354,93 @@ const Of = ua("message", () => {
     setMessagePinned: _e,
     setMessageUnpinned: He,
     addAtMeMessage: ee,
-    clearAtMeMessages: me,
-    clearAtMe: me,
+    clearAtMeMessages: ve,
+    clearAtMe: ve,
     setTranslating: dt,
-    setTranslation: vt,
+    setTranslation: gt,
     toggleTranslation: kt,
-    setVoiceTranscribing: fe,
-    setVoiceText: Z,
-    toggleVoiceText: ie,
-    clearMessages: ke,
+    setVoiceTranscribing: he,
+    setVoiceText: Q,
+    toggleVoiceText: ae,
+    clearMessages: we,
     clearConversationMessages: Be,
-    touchConversation: tt
+    touchConversation: st
   };
 }), Kv = ua("conversation", () => {
   const n = A([]), e = A(null), t = A(!1), s = A(!1), o = A({}), r = A({}), i = A({}), a = A(!0), l = /* @__PURE__ */ new Map(), c = 5e3, u = k(
-    () => n.value.find((W) => W.id === e.value) || null
-  ), d = k(() => [...n.value].sort((W, re) => {
-    if (W.isPinned && !re.isPinned)
+    () => n.value.find((j) => j.id === e.value) || null
+  ), d = k(() => [...n.value].sort((j, ie) => {
+    if (j.isPinned && !ie.isPinned)
       return -1;
-    if (!W.isPinned && re.isPinned)
+    if (!j.isPinned && ie.isPinned)
       return 1;
-    const ue = W.pinnedTime || W.lastMessageTime || 0;
-    return (re.pinnedTime || re.lastMessageTime || 0) - ue;
+    const fe = j.pinnedTime || j.lastMessageTime || 0;
+    return (ie.pinnedTime || ie.lastMessageTime || 0) - fe;
   })), p = A(!1);
-  function f(W) {
-    const re = n.value.findIndex((ue) => ue.id === W.id);
-    re > -1 ? n.value[re] = { ...n.value[re], ...W } : n.value.unshift(W);
+  function f(j) {
+    const ie = n.value.findIndex((fe) => fe.id === j.id);
+    ie > -1 ? n.value[ie] = { ...n.value[ie], ...j } : n.value.unshift(j);
   }
-  function h(W) {
-    const re = e.value, ue = re ? n.value.find((j) => j.id === re) : void 0;
-    n.value = W, re && ue && !W.some((j) => j.id === re) && (n.value = [ue, ...W]);
+  function h(j) {
+    const ie = e.value, fe = ie ? n.value.find((V) => V.id === ie) : void 0;
+    n.value = j, ie && fe && !j.some((V) => V.id === ie) && (n.value = [fe, ...j]);
   }
-  function g(W) {
-    n.value = n.value.filter((re) => re.id !== W), e.value === W && (e.value = null);
+  function g(j) {
+    n.value = n.value.filter((ie) => ie.id !== j), e.value === j && (e.value = null);
   }
-  function v(W) {
-    e.value = W;
+  function v(j) {
+    e.value = j;
   }
-  function b(W, re) {
-    const ue = n.value.findIndex((j) => j.id === W);
-    ue > -1 && (n.value[ue] = { ...n.value[ue], ...re });
+  function b(j, ie) {
+    const fe = n.value.findIndex((V) => V.id === j);
+    fe > -1 && (n.value[fe] = { ...n.value[fe], ...ie });
   }
-  function $(W, re) {
-    b(W, { unreadCount: re });
+  function $(j, ie) {
+    b(j, { unreadCount: ie });
   }
-  function R(W, re, ue) {
-    b(W, {
-      isPinned: re,
-      pinnedTime: re ? ue || Date.now() : void 0
+  function R(j, ie, fe) {
+    b(j, {
+      isPinned: ie,
+      pinnedTime: ie ? fe || Date.now() : void 0
     });
   }
-  function M(W) {
-    t.value = W;
+  function M(j) {
+    t.value = j;
   }
-  function x(W) {
-    s.value = W;
+  function x(j) {
+    s.value = j;
   }
-  function T(W, re) {
-    o.value[W] = re;
+  function T(j, ie) {
+    o.value[j] = ie;
   }
-  function I(W) {
-    return o.value[W] || 0;
+  function I(j) {
+    return o.value[j] || 0;
   }
-  function O(W, re) {
-    r.value[W] = re;
+  function N(j, ie) {
+    r.value[j] = ie;
   }
-  function E(W) {
-    a.value = W, W || (l.forEach((re) => clearTimeout(re)), l.clear(), i.value = {});
+  function E(j) {
+    a.value = j, j || (l.forEach((ie) => clearTimeout(ie)), l.clear(), i.value = {});
   }
-  function G(W, re) {
+  function H(j, ie) {
     if (!a.value)
       return;
-    const ue = l.get(W);
-    ue && clearTimeout(ue), l.set(W, setTimeout(() => {
-      N(W);
+    const fe = l.get(j);
+    fe && clearTimeout(fe), l.set(j, setTimeout(() => {
+      D(j);
     }, c));
-    const j = i.value[W];
-    (!j || j.userId !== re) && (i.value[W] = { userId: re });
+    const V = i.value[j];
+    (!V || V.userId !== ie) && (i.value[j] = { userId: ie });
   }
-  function N(W) {
-    const re = l.get(W);
-    re && (clearTimeout(re), l.delete(W)), i.value[W] && delete i.value[W];
+  function D(j) {
+    const ie = l.get(j);
+    ie && (clearTimeout(ie), l.delete(j)), i.value[j] && delete i.value[j];
   }
-  function D(W) {
-    p.value = W;
+  function L(j) {
+    p.value = j;
   }
   function S() {
-    n.value = [], e.value = null, t.value = !1, s.value = !1, p.value = !1, o.value = {}, r.value = {}, l.forEach((W) => clearTimeout(W)), l.clear(), i.value = {};
+    n.value = [], e.value = null, t.value = !1, s.value = !1, p.value = !1, o.value = {}, r.value = {}, l.forEach((j) => clearTimeout(j)), l.clear(), i.value = {};
   }
   return {
     conversationList: n,
@@ -471,11 +471,11 @@ const Of = ua("message", () => {
     setSyncing: x,
     setGroupMemberCount: T,
     getGroupMemberCount: I,
-    setAtMe: O,
+    setAtMe: N,
     setTypingEnabled: E,
-    setTyping: G,
-    clearTyping: N,
-    setHasMoreConversations: D,
+    setTyping: H,
+    clearTyping: D,
+    setHasMoreConversations: L,
     clearConversations: S
   };
 }), lc = ua("contact", () => {
@@ -523,21 +523,21 @@ const Of = ua("message", () => {
     return p.value.has(se);
   }
   const I = k(() => t.value.filter((se) => se.status === "pending").length);
-  function O(se) {
+  function N(se) {
     const Me = t.value.findIndex((ge) => ge.id === se.id);
     Me >= 0 ? t.value[Me] = { ...t.value[Me], ...se } : t.value.unshift(se);
   }
   function E(se) {
     t.value = t.value.filter((Me) => Me.id !== se);
   }
-  function G(se, Me) {
+  function H(se, Me) {
     const ge = t.value.findIndex((Ie) => Ie.id === se);
     ge >= 0 && (t.value[ge] = { ...t.value[ge], status: Me });
   }
-  function N(se) {
+  function D(se) {
     return t.value.find((Me) => Me.id === se);
   }
-  function D() {
+  function L() {
     t.value = [];
   }
   function S(se) {
@@ -546,26 +546,26 @@ const Of = ua("message", () => {
   function C(se) {
     i.value = se;
   }
-  function L(se) {
+  function O(se) {
     return a.value.has(se);
   }
-  function J(se) {
+  function q(se) {
     const Me = new Set(a.value);
     Me.has(se) ? Me.delete(se) : Me.add(se), a.value = Me;
   }
   function te(se) {
     a.value = new Set(se);
   }
-  function ve(se) {
+  function ye(se) {
     l.value = se;
   }
-  function be(se) {
+  function ke(se) {
     c.value = se;
   }
-  function W(se) {
+  function j(se) {
     u.value = se;
   }
-  function re() {
+  function ie() {
     n.value = [], e.value = [], t.value = [], s.value = !1, o.value = !1, r.value = "", i.value = "", a.value = /* @__PURE__ */ new Set(), l.value = !1, c.value = void 0, u.value = 0;
   }
   return {
@@ -595,248 +595,248 @@ const Of = ua("message", () => {
     addToBlackList: M,
     removeFromBlackList: x,
     isBlocked: T,
-    addInvite: O,
+    addInvite: N,
     removeInvite: E,
-    updateInviteStatus: G,
-    getInvite: N,
-    clearInvites: D,
+    updateInviteStatus: H,
+    getInvite: D,
+    clearInvites: L,
     setFilterText: S,
     setActiveId: C,
-    isSelected: L,
-    toggleSelect: J,
+    isSelected: O,
+    toggleSelect: q,
     setSelectedIds: te,
-    setHasMore: ve,
-    setCursor: be,
-    setContactCount: W,
-    clearContacts: re
+    setHasMore: ye,
+    setCursor: ke,
+    setContactCount: j,
+    clearContacts: ie
   };
 }), _r = ua("group", () => {
   const n = A([]), e = A(null), t = A(!1), s = A(0), o = k(
     () => t.value ? n.value.length : s.value
   ), r = A({}), i = A({}), a = A(/* @__PURE__ */ new Set()), l = A({}), c = A({}), u = A({}), d = A({}), p = A({}), f = A({}), h = A(""), g = A(""), v = A(/* @__PURE__ */ new Set()), b = A(!1), $ = A(void 0);
-  function R(ye) {
-    n.value = ye, t.value = !0;
+  function R(be) {
+    n.value = be, t.value = !0;
   }
-  function M(ye) {
-    const Ae = new Set(n.value.map((F) => F.groupId));
-    for (const F of ye)
-      Ae.has(F.groupId) || (n.value.push(F), Ae.add(F.groupId));
+  function M(be) {
+    const Re = new Set(n.value.map((oe) => oe.groupId));
+    for (const oe of be)
+      Re.has(oe.groupId) || (n.value.push(oe), Re.add(oe.groupId));
   }
-  function x(ye) {
-    n.value.find((F) => F.groupId === ye.groupId) || n.value.push(ye);
+  function x(be) {
+    n.value.find((oe) => oe.groupId === be.groupId) || n.value.push(be);
   }
-  function T(ye) {
-    n.value = n.value.filter((Ae) => Ae.groupId !== ye);
+  function T(be) {
+    n.value = n.value.filter((Re) => Re.groupId !== be);
   }
-  function I(ye) {
-    return n.value.find((Ae) => Ae.groupId === ye);
+  function I(be) {
+    return n.value.find((Re) => Re.groupId === be);
   }
-  function O(ye, Ae) {
-    const F = n.value.find((le) => le.groupId === ye);
-    F ? F.memberCount = Ae : n.value.push({
-      groupId: ye,
-      groupName: ye,
-      memberCount: Ae
+  function N(be, Re) {
+    const oe = n.value.find((Z) => Z.groupId === be);
+    oe ? oe.memberCount = Re : n.value.push({
+      groupId: be,
+      groupName: be,
+      memberCount: Re
     });
   }
-  function E(ye) {
-    e.value = ye;
+  function E(be) {
+    e.value = be;
   }
-  function G(ye) {
-    s.value = ye;
+  function H(be) {
+    s.value = be;
   }
-  function N(ye, Ae) {
+  function D(be, Re) {
     n.value = n.value.map(
-      (F) => F.groupId === ye ? { ...F, ...Ae } : F
+      (oe) => oe.groupId === be ? { ...oe, ...Re } : oe
     );
   }
-  function D(ye, Ae) {
+  function L(be, Re) {
     n.value = n.value.map(
-      (F) => F.groupId === ye ? { ...F, memberCount: Math.max(0, (F.memberCount || 0) + Ae) } : F
+      (oe) => oe.groupId === be ? { ...oe, memberCount: Math.max(0, (oe.memberCount || 0) + Re) } : oe
     );
   }
-  function S(ye, Ae) {
+  function S(be, Re) {
     n.value = n.value.map(
-      (F) => F.groupId === ye ? { ...F, memberCount: Math.max(0, (F.memberCount || 0) - Ae) } : F
+      (oe) => oe.groupId === be ? { ...oe, memberCount: Math.max(0, (oe.memberCount || 0) - Re) } : oe
     );
   }
-  function C(ye) {
-    return a.value.has(ye);
+  function C(be) {
+    return a.value.has(be);
   }
-  function L(ye) {
-    a.value = /* @__PURE__ */ new Set([...a.value, ye]);
+  function O(be) {
+    a.value = /* @__PURE__ */ new Set([...a.value, be]);
   }
-  function J(ye) {
-    if (ye) {
-      const Ae = new Set(a.value);
-      Ae.delete(ye), a.value = Ae;
+  function q(be) {
+    if (be) {
+      const Re = new Set(a.value);
+      Re.delete(be), a.value = Re;
     } else
       a.value = /* @__PURE__ */ new Set();
   }
-  function te(ye, Ae) {
-    l.value = { ...l.value, [ye]: Ae };
+  function te(be, Re) {
+    l.value = { ...l.value, [be]: Re };
   }
-  function ve(ye) {
-    if (l.value[ye] === void 0)
+  function ye(be) {
+    if (l.value[be] === void 0)
       return;
-    const Ae = { ...l.value };
-    delete Ae[ye], l.value = Ae;
+    const Re = { ...l.value };
+    delete Re[be], l.value = Re;
   }
-  function be(ye) {
-    return l.value[ye];
+  function ke(be) {
+    return l.value[be];
   }
-  function W(ye, Ae, F) {
-    const le = c.value[ye] || [];
-    if (F) {
-      const oe = new Set(le.map((De) => De.userId)), we = Ae.filter((De) => !oe.has(De)).map((De) => ({ userId: De, role: ut.MEMBER }));
-      we.length > 0 && (c.value[ye] = [...le, ...we]);
+  function j(be, Re, oe) {
+    const Z = c.value[be] || [];
+    if (oe) {
+      const ce = new Set(Z.map((Ee) => Ee.userId)), re = Re.filter((Ee) => !ce.has(Ee)).map((Ee) => ({ userId: Ee, role: ut.MEMBER }));
+      re.length > 0 && (c.value[be] = [...Z, ...re]);
     } else {
-      const oe = new Set(Ae);
-      c.value[ye] = le.filter((we) => !oe.has(we.userId));
+      const ce = new Set(Re);
+      c.value[be] = Z.filter((re) => !ce.has(re.userId));
     }
   }
-  function re(ye, Ae) {
-    c.value[ye] = Ae;
+  function ie(be, Re) {
+    c.value[be] = Re;
   }
-  function ue(ye, Ae) {
-    const F = c.value[ye] || [], le = new Set(F.map((De) => De.userId)), we = Ae.map((De) => typeof De == "string" ? { userId: De, role: ut.MEMBER } : { userId: De.userId, role: ut.MEMBER, muteExpire: De.muteExpire, muteDuration: De.muteDuration }).filter((De) => !le.has(De.userId));
-    we.length > 0 && (c.value[ye] = [...F, ...we]);
+  function fe(be, Re) {
+    const oe = c.value[be] || [], Z = new Set(oe.map((Ee) => Ee.userId)), re = Re.map((Ee) => typeof Ee == "string" ? { userId: Ee, role: ut.MEMBER } : { userId: Ee.userId, role: ut.MEMBER, muteExpire: Ee.muteExpire, muteDuration: Ee.muteDuration }).filter((Ee) => !Z.has(Ee.userId));
+    re.length > 0 && (c.value[be] = [...oe, ...re]);
   }
-  function j(ye, Ae) {
-    const F = new Set(Ae);
-    c.value[ye] = (c.value[ye] || []).filter((le) => !F.has(le.userId));
+  function V(be, Re) {
+    const oe = new Set(Re);
+    c.value[be] = (c.value[be] || []).filter((Z) => !oe.has(Z.userId));
   }
-  function de(ye) {
-    return c.value[ye] || [];
+  function ue(be) {
+    return c.value[be] || [];
   }
-  function se(ye, Ae) {
-    u.value[ye] = Ae;
+  function se(be, Re) {
+    u.value[be] = Re;
   }
-  function Me(ye, Ae) {
-    const F = u.value[ye] || [], le = new Set(F.map((we) => we.userId)), oe = Ae.filter((we) => !le.has(we)).map((we) => ({ userId: we, role: ut.MEMBER }));
-    oe.length > 0 && (u.value[ye] = [...F, ...oe]);
+  function Me(be, Re) {
+    const oe = u.value[be] || [], Z = new Set(oe.map((re) => re.userId)), ce = Re.filter((re) => !Z.has(re)).map((re) => ({ userId: re, role: ut.MEMBER }));
+    ce.length > 0 && (u.value[be] = [...oe, ...ce]);
   }
-  function ge(ye, Ae) {
-    const F = new Set(Ae);
-    u.value[ye] = (u.value[ye] || []).filter((le) => !F.has(le.userId));
+  function ge(be, Re) {
+    const oe = new Set(Re);
+    u.value[be] = (u.value[be] || []).filter((Z) => !oe.has(Z.userId));
   }
-  function Ie(ye) {
-    return u.value[ye] || [];
+  function Ie(be) {
+    return u.value[be] || [];
   }
-  function Ke(ye, Ae) {
-    d.value[ye] = Ae;
+  function Ke(be, Re) {
+    d.value[be] = Re;
   }
-  function _e(ye, Ae) {
-    const F = d.value[ye] || [], le = new Set(F.map((we) => we.userId)), oe = Ae.filter((we) => !le.has(we)).map((we) => ({ userId: we, role: ut.MEMBER }));
-    oe.length > 0 && (d.value[ye] = [...F, ...oe]);
+  function _e(be, Re) {
+    const oe = d.value[be] || [], Z = new Set(oe.map((re) => re.userId)), ce = Re.filter((re) => !Z.has(re)).map((re) => ({ userId: re, role: ut.MEMBER }));
+    ce.length > 0 && (d.value[be] = [...oe, ...ce]);
   }
-  function He(ye, Ae) {
-    const F = new Set(Ae);
-    d.value[ye] = (d.value[ye] || []).filter((le) => !F.has(le.userId));
+  function He(be, Re) {
+    const oe = new Set(Re);
+    d.value[be] = (d.value[be] || []).filter((Z) => !oe.has(Z.userId));
   }
-  function ee(ye) {
-    return d.value[ye] || [];
+  function ee(be) {
+    return d.value[be] || [];
   }
-  function me(ye, Ae) {
-    p.value[ye] = Ae;
+  function ve(be, Re) {
+    p.value[be] = Re;
   }
-  function Be(ye, Ae) {
-    const F = p.value[ye] || [];
-    p.value[ye] = [...F, Ae];
+  function Be(be, Re) {
+    const oe = p.value[be] || [];
+    p.value[be] = [...oe, Re];
   }
-  function tt(ye, Ae) {
-    p.value[ye] = (p.value[ye] || []).filter((F) => F.fileId !== Ae && F.id !== Ae);
+  function st(be, Re) {
+    p.value[be] = (p.value[be] || []).filter((oe) => oe.fileId !== Re && oe.id !== Re);
   }
-  function nt(ye) {
-    return p.value[ye] || [];
+  function nt(be) {
+    return p.value[be] || [];
   }
-  function dt(ye, Ae) {
-    f.value[ye] = Ae;
+  function dt(be, Re) {
+    f.value[be] = Re;
   }
-  function vt(ye, Ae, F) {
-    const le = f.value[ye] || [];
+  function gt(be, Re, oe) {
+    const Z = f.value[be] || [];
     f.value = {
       ...f.value,
-      [ye]: le.map(
-        (oe) => {
-          var we;
-          return oe.applicantId === Ae || ((we = oe.applicant) == null ? void 0 : we.userId) === Ae ? { ...oe, status: F } : oe;
+      [be]: Z.map(
+        (ce) => {
+          var re;
+          return ce.applicantId === Re || ((re = ce.applicant) == null ? void 0 : re.userId) === Re ? { ...ce, status: oe } : ce;
         }
       )
     };
   }
-  function kt(ye) {
-    return f.value[ye] || [];
+  function kt(be) {
+    return f.value[be] || [];
   }
-  function fe(ye, Ae) {
-    var we;
-    const F = r.value[ye] || [], le = new Map(F.map((De) => [De.userId, De.role])), oe = (we = I(ye)) == null ? void 0 : we.owner;
-    r.value[ye] = Ae.map((De) => {
-      const Ge = le.get(De.userId);
-      if (oe) {
-        if (De.userId === oe)
-          return { ...De, role: ut.OWNER };
-        if (De.role === ut.OWNER)
-          return { ...De, role: ut.MEMBER };
+  function he(be, Re) {
+    var re;
+    const oe = r.value[be] || [], Z = new Map(oe.map((Ee) => [Ee.userId, Ee.role])), ce = (re = I(be)) == null ? void 0 : re.owner;
+    r.value[be] = Re.map((Ee) => {
+      const Ve = Z.get(Ee.userId);
+      if (ce) {
+        if (Ee.userId === ce)
+          return { ...Ee, role: ut.OWNER };
+        if (Ee.role === ut.OWNER)
+          return { ...Ee, role: ut.MEMBER };
       }
-      return Ge === ut.ADMIN && De.role === ut.MEMBER ? { ...De, role: Ge } : De;
+      return Ve === ut.ADMIN && Ee.role === ut.MEMBER ? { ...Ee, role: Ve } : Ee;
     });
   }
-  function Z(ye, Ae) {
-    const F = r.value[ye] || [], le = new Set(F.map((we) => we.userId)), oe = [...F];
-    for (const we of Ae)
-      le.has(we.userId) || (oe.push(we), le.add(we.userId));
-    r.value[ye] = oe;
+  function Q(be, Re) {
+    const oe = r.value[be] || [], Z = new Set(oe.map((re) => re.userId)), ce = [...oe];
+    for (const re of Re)
+      Z.has(re.userId) || (ce.push(re), Z.add(re.userId));
+    r.value[be] = ce;
   }
-  function ie(ye, Ae) {
-    const F = new Set(Ae);
-    r.value[ye] = (r.value[ye] || []).filter((le) => !F.has(le.userId));
+  function ae(be, Re) {
+    const oe = new Set(Re);
+    r.value[be] = (r.value[be] || []).filter((Z) => !oe.has(Z.userId));
   }
-  function ke(ye, Ae, F) {
-    const le = r.value[ye] || [];
+  function we(be, Re, oe) {
+    const Z = r.value[be] || [];
     r.value = {
       ...r.value,
-      [ye]: le.map((oe) => oe.userId === Ae ? { ...oe, role: F } : oe)
+      [be]: Z.map((ce) => ce.userId === Re ? { ...ce, role: oe } : ce)
     };
   }
-  function Q(ye) {
-    return r.value[ye] || [];
+  function X(be) {
+    return r.value[be] || [];
   }
-  function H(ye) {
-    ye ? delete r.value[ye] : r.value = {};
+  function U(be) {
+    be ? delete r.value[be] : r.value = {};
   }
-  function ae(ye, Ae) {
-    i.value[ye] = Ae;
+  function le(be, Re) {
+    i.value[be] = Re;
   }
-  function K(ye) {
-    return i.value[ye];
+  function K(be) {
+    return i.value[be];
   }
-  function pe(ye) {
-    h.value = ye;
+  function pe(be) {
+    h.value = be;
   }
-  function Ne(ye) {
-    g.value = ye;
+  function Ne(be) {
+    g.value = be;
   }
-  function Qe(ye) {
-    return v.value.has(ye);
+  function Ze(be) {
+    return v.value.has(be);
   }
-  function wt(ye) {
-    const Ae = new Set(v.value);
-    Ae.has(ye) ? Ae.delete(ye) : Ae.add(ye), v.value = Ae;
+  function St(be) {
+    const Re = new Set(v.value);
+    Re.has(be) ? Re.delete(be) : Re.add(be), v.value = Re;
   }
-  function St(ye) {
-    v.value = new Set(ye);
+  function wt(be) {
+    v.value = new Set(be);
   }
-  function on(ye) {
-    b.value = ye;
+  function hn(be) {
+    b.value = be;
   }
-  function Jt(ye) {
-    $.value = ye;
+  function on(be) {
+    $.value = be;
   }
-  function Zt() {
+  function Jt() {
     n.value = [], e.value = null, t.value = !1, s.value = 0, h.value = "", g.value = "", v.value = /* @__PURE__ */ new Set(), b.value = !1, $.value = void 0, r.value = {}, i.value = {}, a.value = /* @__PURE__ */ new Set(), c.value = {}, u.value = {}, d.value = {}, p.value = {}, f.value = {}, l.value = {};
   }
-  const rn = R;
+  const Xt = R;
   return {
     groupList: n,
     currentGroup: e,
@@ -855,36 +855,36 @@ const Of = ua("message", () => {
     hasMore: b,
     cursor: $,
     setGroupList: R,
-    setList: rn,
+    setList: Xt,
     appendGroupList: M,
     addGroup: x,
     removeGroup: T,
     getGroupById: I,
-    updateGroupMemberCount: O,
+    updateGroupMemberCount: N,
     setCurrentGroup: E,
-    setJoinedGroupCount: G,
-    updateGroup: N,
-    incrementMemberCount: D,
+    setJoinedGroupCount: H,
+    updateGroup: D,
+    incrementMemberCount: L,
     decrementMemberCount: S,
-    setMuted: W,
-    setGroupMembers: fe,
-    appendGroupMembers: Z,
-    removeGroupMembers: ie,
-    updateGroupMemberRole: ke,
-    getGroupMembers: Q,
-    clearGroupMembers: H,
-    setGroupAnnouncement: ae,
+    setMuted: j,
+    setGroupMembers: he,
+    appendGroupMembers: Q,
+    removeGroupMembers: ae,
+    updateGroupMemberRole: we,
+    getGroupMembers: X,
+    clearGroupMembers: U,
+    setGroupAnnouncement: le,
     getGroupAnnouncement: K,
     isGroupAdminSynced: C,
-    markGroupAdminSynced: L,
-    clearGroupAdminSynced: J,
+    markGroupAdminSynced: O,
+    clearGroupAdminSynced: q,
     setPendingOwnerTransfer: te,
-    clearPendingOwnerTransfer: ve,
-    getPendingOwnerTransfer: be,
-    setGroupMuteList: re,
-    addGroupMuteMembers: ue,
-    removeGroupMuteMembers: j,
-    getGroupMuteList: de,
+    clearPendingOwnerTransfer: ye,
+    getPendingOwnerTransfer: ke,
+    setGroupMuteList: ie,
+    addGroupMuteMembers: fe,
+    removeGroupMuteMembers: V,
+    getGroupMuteList: ue,
     setGroupBlocklist: se,
     addGroupBlocklistMembers: Me,
     removeGroupBlocklistMembers: ge,
@@ -893,21 +893,21 @@ const Of = ua("message", () => {
     addGroupAllowlistMembers: _e,
     removeGroupAllowlistMembers: He,
     getGroupAllowlist: ee,
-    setGroupSharedFiles: me,
+    setGroupSharedFiles: ve,
     addGroupSharedFile: Be,
-    removeGroupSharedFile: tt,
+    removeGroupSharedFile: st,
     getGroupSharedFiles: nt,
     setGroupJoinRequests: dt,
-    updateGroupJoinRequest: vt,
+    updateGroupJoinRequest: gt,
     getGroupJoinRequests: kt,
     setFilterText: pe,
     setActiveId: Ne,
-    isSelected: Qe,
-    toggleSelect: wt,
-    setSelectedIds: St,
-    setHasMore: on,
-    setCursor: Jt,
-    clearGroups: Zt
+    isSelected: Ze,
+    toggleSelect: St,
+    setSelectedIds: wt,
+    setHasMore: hn,
+    setCursor: on,
+    clearGroups: Jt
   };
 });
 let Us = "none";
@@ -920,25 +920,25 @@ function qv() {
 }
 function Cr() {
   const { domains: n, stores: e, features: t } = at(), s = e.conversation, o = e.client, r = k(() => s.sortedConversationList), i = k(() => s.currentConversation), a = k(() => s.isSyncingConversations), l = k(() => s.hasMoreConversations), c = A(!1);
-  function u(N) {
+  function u(D) {
     return _f(
       o.appKey,
       o.currentUser,
-      `draft_${N}`
+      `draft_${D}`
     );
   }
-  function d(N, D) {
+  function d(D, L) {
     if (t.enableDraft === !1) {
-      f(N);
+      f(D);
       return;
     }
-    if (!D) {
-      f(N);
+    if (!L) {
+      f(D);
       return;
     }
-    const S = u(N), C = { text: D, time: Date.now() };
-    if (Go.set(S, C), s.updateConversation(N, {
-      draft: D,
+    const S = u(D), C = { text: L, time: Date.now() };
+    if (Go.set(S, C), s.updateConversation(D, {
+      draft: L,
       draftTime: C.time
     }), Us !== "none")
       try {
@@ -946,40 +946,40 @@ function Cr() {
       } catch {
       }
   }
-  function p(N) {
+  function p(D) {
     if (t.enableDraft === !1)
-      return f(N), "";
-    const D = u(N), S = Go.get(D);
+      return f(D), "";
+    const L = u(D), S = Go.get(L);
     if (S)
       return S.text;
     if (Us !== "none")
       try {
-        const C = oi(Us).getItem(D);
+        const C = oi(Us).getItem(L);
         if (C) {
-          const L = JSON.parse(C);
-          return Go.set(D, L), s.updateConversation(N, {
-            draft: L.text,
-            draftTime: L.time
-          }), L.text;
+          const O = JSON.parse(C);
+          return Go.set(L, O), s.updateConversation(D, {
+            draft: O.text,
+            draftTime: O.time
+          }), O.text;
         }
       } catch {
       }
     return "";
   }
-  function f(N) {
-    const D = u(N);
-    if (Go.delete(D), s.updateConversation(N, {
+  function f(D) {
+    const L = u(D);
+    if (Go.delete(L), s.updateConversation(D, {
       draft: "",
       draftTime: 0
     }), Us !== "none")
       try {
-        oi(Us).removeItem(D);
+        oi(Us).removeItem(L);
       } catch {
       }
   }
-  function h(N) {
-    const D = s.conversationList.find((S) => S.id === N);
-    D && n.conversation.enter(N, D.type);
+  function h(D) {
+    const L = s.conversationList.find((S) => S.id === D);
+    L && n.conversation.enter(D, L.type);
   }
   function g() {
     n.conversation.leave();
@@ -987,49 +987,49 @@ function Cr() {
   function v() {
     return n.conversation.syncLocal();
   }
-  async function b(N = !1) {
-    await n.conversation.refresh(N);
+  async function b(D = !1) {
+    await n.conversation.refresh(D);
   }
-  async function $(N = 50) {
+  async function $(D = 50) {
     if (!(c.value || !l.value)) {
       c.value = !0;
       try {
-        await n.conversation.loadMore(N);
+        await n.conversation.loadMore(D);
       } finally {
         c.value = !1;
       }
     }
   }
-  async function R(N, D) {
-    const S = s.conversationList.find((C) => C.id === N);
-    S && await n.conversation.pin(N, S.type, D);
+  async function R(D, L) {
+    const S = s.conversationList.find((C) => C.id === D);
+    S && await n.conversation.pin(D, S.type, L);
   }
-  async function M(N, D) {
-    const S = s.conversationList.find((C) => C.id === N);
-    S && await n.conversation.setMuted(N, S.type, D);
+  async function M(D, L) {
+    const S = s.conversationList.find((C) => C.id === D);
+    S && await n.conversation.setMuted(D, S.type, L);
   }
-  async function x(N) {
-    const D = s.conversationList.find((S) => S.id === N);
-    D && await n.conversation.markRead(N, D.type);
+  async function x(D) {
+    const L = s.conversationList.find((S) => S.id === D);
+    L && await n.conversation.markRead(D, L.type);
   }
-  async function T(N) {
-    const D = s.conversationList.find((S) => S.id === N);
-    D && await n.conversation.sendChannelAck(N, D.type);
+  async function T(D) {
+    const L = s.conversationList.find((S) => S.id === D);
+    L && await n.conversation.sendChannelAck(D, L.type);
   }
-  async function I(N, D = !1) {
-    const S = s.conversationList.find((C) => C.id === N);
-    S && (await n.conversation.clearChatHistory(N, S.type, D), e.message.clearConversationMessages(N));
+  async function I(D, L = !1) {
+    const S = s.conversationList.find((C) => C.id === D);
+    S && (await n.conversation.clearChatHistory(D, S.type, L), e.message.clearConversationMessages(D));
   }
-  async function O(N, D = !1) {
-    const S = s.conversationList.find((C) => C.id === N);
-    S && (await n.conversation.remove(N, S.type, D), G(N));
+  async function N(D, L = !1) {
+    const S = s.conversationList.find((C) => C.id === D);
+    S && (await n.conversation.remove(D, S.type, L), H(D));
   }
-  async function E(N) {
-    const D = s.conversationList.find((S) => S.id === N);
-    D && (await n.conversation.removeLocal(N, D.type), G(N));
+  async function E(D) {
+    const L = s.conversationList.find((S) => S.id === D);
+    L && (await n.conversation.removeLocal(D, L.type), H(D));
   }
-  function G(N) {
-    s.currentConversationId === N && (s.setCurrentConversationId(null), e.message.clearConversationMessages(N)), s.deleteConversation(N);
+  function H(D) {
+    s.currentConversationId === D && (s.setCurrentConversationId(null), e.message.clearConversationMessages(D)), s.deleteConversation(D);
   }
   return {
     conversationList: r,
@@ -1047,25 +1047,25 @@ function Cr() {
     markConversationRead: x,
     sendChannelAck: T,
     clearChatHistory: I,
-    deleteConversation: O,
+    deleteConversation: N,
     removeConversation: E,
     /** 直接设置本地会话列表（业务自定义数据源 / demo 注入 mock 用） */
-    setLocalConversationList(N) {
-      s.setConversationList(N);
+    setLocalConversationList(D) {
+      s.setConversationList(D);
     },
     saveDraft: d,
     loadDraft: p,
     clearDraft: f
   };
 }
-const Nu = Ot("UIKit:UseMessageActions"), ri = A(!1), Hn = A(/* @__PURE__ */ new Set());
+const Nu = Dt("UIKit:UseMessageActions"), ri = A(!1), Hn = A(/* @__PURE__ */ new Set());
 function Jv() {
   ri.value = !1, Hn.value.clear();
 }
 function Df() {
   const { domains: n, stores: e } = at(), { t } = qe(), s = Wt(), o = e.conversation, r = e.message, i = k(() => {
     const T = o.currentConversationId;
-    return T ? r.getMessages(T).filter((O) => Hn.value.has(O.msgServerId || O.msgLocalId)) : [];
+    return T ? r.getMessages(T).filter((N) => Hn.value.has(N.msgServerId || N.msgLocalId)) : [];
   });
   function a() {
     ri.value = !0, Hn.value.clear();
@@ -1080,7 +1080,7 @@ function Df() {
     return Hn.value.has(T);
   }
   function d(T) {
-    const I = T.filter((O) => O.status === xt.SENT && !O.recalled).map((O) => O.msgServerId || O.msgLocalId);
+    const I = T.filter((N) => N.status === xt.SENT && !N.recalled).map((N) => N.msgServerId || N.msgLocalId);
     Hn.value = new Set(I);
   }
   function p() {
@@ -1091,9 +1091,9 @@ function Df() {
     if (I)
       try {
         await n.message.recall(I.id, I.type, T), r.recallMessage(T, e.client.currentUser);
-      } catch (O) {
-        const E = Yv(O);
-        throw Qv(E, t, s), O;
+      } catch (N) {
+        const E = Yv(N);
+        throw Qv(E, t, s), N;
       }
   }
   function h(T) {
@@ -1103,35 +1103,35 @@ function Df() {
     r.deleteMessages(T);
   }
   async function v(T, I) {
-    var N, D;
+    var D, L;
     if (T.type !== Ce.TEXT || !Cv(T.body) || !T.body.content)
       return;
-    const E = Bf(I), G = T.msgServerId || T.msgLocalId;
-    if (((N = T.translation) == null ? void 0 : N.to) === E) {
-      r.toggleTranslation(G);
+    const E = Bf(I), H = T.msgServerId || T.msgLocalId;
+    if (((D = T.translation) == null ? void 0 : D.to) === E) {
+      r.toggleTranslation(H);
       return;
     }
-    r.setTranslating(G, !0);
+    r.setTranslating(H, !0);
     try {
-      const S = await n.message.translateMessage(T, [E]), C = (D = S == null ? void 0 : S.translations) == null ? void 0 : D[0];
-      C ? r.setTranslation(G, C) : r.setTranslating(G, !1);
+      const S = await n.message.translateMessage(T, [E]), C = (L = S == null ? void 0 : S.translations) == null ? void 0 : L[0];
+      C ? r.setTranslation(H, C) : r.setTranslating(H, !1);
     } catch (S) {
-      throw r.setTranslating(G, !1), S;
+      throw r.setTranslating(H, !1), S;
     }
   }
   async function b(T) {
-    var O;
+    var N;
     if (T.type !== Ce.VOICE || !_v(T.body) || !T.body.url)
       return;
     const I = T.msgServerId || T.msgLocalId;
-    if ((O = T.voiceText) != null && O.text) {
+    if ((N = T.voiceText) != null && N.text) {
       r.toggleVoiceText(I);
       return;
     }
     r.setVoiceTranscribing(I, !0);
     try {
-      const E = await n.message.transcribeVoiceMessage(T), G = E == null ? void 0 : E.text;
-      typeof G == "string" && G.length > 0 ? r.setVoiceText(I, { text: G }) : r.setVoiceTranscribing(I, !1);
+      const E = await n.message.transcribeVoiceMessage(T), H = E == null ? void 0 : E.text;
+      typeof H == "string" && H.length > 0 ? r.setVoiceText(I, { text: H }) : r.setVoiceTranscribing(I, !1);
     } catch (E) {
       throw r.setVoiceTranscribing(I, !1), Nu.warn("[UIKit] voiceMessageToText raw error:", {
         code: E.code,
@@ -1145,8 +1145,8 @@ function Df() {
     const I = o.currentConversation;
     if (!I || !T)
       return;
-    const O = T.msgServerId || T.msgLocalId;
-    await n.message.pinMessage(I.id, I.type, O), r.setMessagePinned(O, {
+    const N = T.msgServerId || T.msgLocalId;
+    await n.message.pinMessage(I.id, I.type, N), r.setMessagePinned(N, {
       operatorId: e.client.currentUser || "",
       pinTime: Date.now()
     }), await M(I.id, I.type);
@@ -1155,14 +1155,14 @@ function Df() {
     const I = o.currentConversation;
     if (!I || !T)
       return;
-    const O = T.msgServerId || T.msgLocalId;
-    await n.message.unpinMessage(I.id, I.type, O), r.setMessageUnpinned(O), await M(I.id, I.type);
+    const N = T.msgServerId || T.msgLocalId;
+    await n.message.unpinMessage(I.id, I.type, N), r.setMessageUnpinned(N), await M(I.id, I.type);
   }
   async function M(T, I) {
     try {
       await n.message.getPinnedMessages(T, I);
-    } catch (O) {
-      Nu.warn("[UIKit] refresh pinned messages failed:", Je(O));
+    } catch (N) {
+      Nu.warn("[UIKit] refresh pinned messages failed:", Je(N));
     }
   }
   async function x() {
@@ -1217,14 +1217,14 @@ function da(n, e) {
 }
 const cc = typeof window < "u" && typeof document < "u";
 typeof WorkerGlobalScope < "u" && globalThis instanceof WorkerGlobalScope;
-const Pf = (n) => n != null, Zv = Object.prototype.toString, ey = (n) => Zv.call(n) === "[object Object]", an = () => {
+const Pf = (n) => n != null, Zv = Object.prototype.toString, ey = (n) => Zv.call(n) === "[object Object]", rn = () => {
 };
 function ty(...n) {
   if (n.length !== 1) return Hv(...n);
   const e = n[0];
   return typeof e == "function" ? Gv($f(() => ({
     get: e,
-    set: an
+    set: rn
   }))) : A(e);
 }
 function uc(n, e) {
@@ -1245,9 +1245,9 @@ function uc(n, e) {
 }
 const zf = (n) => n();
 function ny(n, e = {}) {
-  let t, s, o = an, r = an;
+  let t, s, o = rn, r = rn;
   const i = vn(!1), a = (u) => {
-    clearTimeout(u), o(), o = an;
+    clearTimeout(u), o(), o = rn;
   };
   let l;
   return Object.assign((u) => {
@@ -1261,23 +1261,23 @@ function ny(n, e = {}) {
     }));
   }, {
     cancel: () => {
-      t && (a(t), t = void 0), s && (a(s), s = void 0), i.value = !1, r = an;
+      t && (a(t), t = void 0), s && (a(s), s = void 0), i.value = !1, r = rn;
     },
     flush: () => {
       if (i.value) {
         t && (clearTimeout(t), t = void 0), s && (clearTimeout(s), s = void 0), i.value = !1;
         const u = r;
-        o = an, r = an, u(l());
+        o = rn, r = rn, u(l());
       }
     },
     isPending: Mo(i)
   });
 }
 function sy(...n) {
-  let e = 0, t, s = !0, o = an, r, i, a, l, c;
+  let e = 0, t, s = !0, o = rn, r, i, a, l, c;
   !sc(n[0]) && typeof n[0] == "object" ? { delay: i, trailing: a = !0, leading: l = !0, rejectOnCancel: c = !1 } = n[0] : [i, a = !0, l = !0, c = !1] = n;
   const u = () => {
-    t && (clearTimeout(t), t = void 0, o(), o = an);
+    t && (clearTimeout(t), t = void 0, o(), o = rn);
   };
   return (p) => {
     const f = Mt(i), h = Date.now() - e, g = () => r = p();
@@ -1413,10 +1413,10 @@ function Kn(...n) {
 function Vf(n, e, t = {}) {
   const { window: s = Vn, ignore: o = [], capture: r = !0, detectIframe: i = !1, controls: a = !1 } = t;
   if (!s) return a ? {
-    stop: an,
-    cancel: an,
-    trigger: an
-  } : an;
+    stop: rn,
+    cancel: rn,
+    trigger: rn
+  } : rn;
   let l = !0;
   const c = (v) => Mt(o).some((b) => {
     if (typeof b == "string") return Array.from(s.document.querySelectorAll(b)).some(($) => $ === v.target || v.composedPath().includes($));
@@ -1554,16 +1554,16 @@ function my(n = {}) {
       p.value = !0;
       let I = !(i.value && M(l.value));
       if (!I) try {
-        const O = b(T);
-        await e.clipboard.write([O]);
+        const N = b(T);
+        await e.clipboard.write([N]);
       } catch {
         I = !0;
       }
       if (I) if (typeof T == "string")
         u.value = T, $(T);
       else {
-        const O = ++h, E = await T();
-        E != null && O === h && (u.value = E, $(E));
+        const N = ++h, E = await T();
+        E != null && N === h && (u.value = E, $(E));
       }
       d.value = !0, f.start(), p.value = !1;
     }
@@ -1645,58 +1645,58 @@ function wy(n, e, t, s = {}) {
     f(C);
   }
   if (!t) return g;
-  const b = Mt(e), $ = by(b), R = (o = s.serializer) !== null && o !== void 0 ? o : ky[$], { pause: M, resume: x } = ly(g, (C) => G(C), {
+  const b = Mt(e), $ = by(b), R = (o = s.serializer) !== null && o !== void 0 ? o : ky[$], { pause: M, resume: x } = ly(g, (C) => H(C), {
     flush: r,
     deep: i,
     eventFilter: p
   });
-  Pe(v, () => D(), { flush: r });
+  Pe(v, () => L(), { flush: r });
   let T = !1;
   const I = (C) => {
-    h && !T || D(C);
-  }, O = (C) => {
+    h && !T || L(C);
+  }, N = (C) => {
     h && !T || S(C);
   };
-  d && a && (t instanceof Storage ? Kn(d, "storage", I, { passive: !0 }) : Kn(d, Ou, O)), h ? Hf(() => {
-    T = !0, D();
-  }) : D();
-  function E(C, L) {
+  d && a && (t instanceof Storage ? Kn(d, "storage", I, { passive: !0 }) : Kn(d, Ou, N)), h ? Hf(() => {
+    T = !0, L();
+  }) : L();
+  function E(C, O) {
     if (d) {
-      const J = {
+      const q = {
         key: v.value,
         oldValue: C,
-        newValue: L,
+        newValue: O,
         storageArea: t
       };
-      d.dispatchEvent(t instanceof Storage ? new StorageEvent("storage", J) : new CustomEvent(Ou, { detail: J }));
+      d.dispatchEvent(t instanceof Storage ? new StorageEvent("storage", q) : new CustomEvent(Ou, { detail: q }));
     }
   }
-  function G(C) {
+  function H(C) {
     try {
-      const L = t.getItem(v.value);
+      const O = t.getItem(v.value);
       if (C == null)
-        E(L, null), t.removeItem(v.value);
+        E(O, null), t.removeItem(v.value);
       else {
-        const J = R.write(C);
-        L !== J && (t.setItem(v.value, J), E(L, J));
+        const q = R.write(C);
+        O !== q && (t.setItem(v.value, q), E(O, q));
       }
-    } catch (L) {
-      f(L);
+    } catch (O) {
+      f(O);
     }
-  }
-  function N(C) {
-    const L = C ? C.newValue : t.getItem(v.value);
-    if (L == null)
-      return l && b != null && t.setItem(v.value, R.write(b)), b;
-    if (!C && c) {
-      const J = R.read(L);
-      return typeof c == "function" ? c(J, b) : $ === "object" && !Array.isArray(J) ? {
-        ...b,
-        ...J
-      } : J;
-    } else return typeof L != "string" ? L : R.read(L);
   }
   function D(C) {
+    const O = C ? C.newValue : t.getItem(v.value);
+    if (O == null)
+      return l && b != null && t.setItem(v.value, R.write(b)), b;
+    if (!C && c) {
+      const q = R.read(O);
+      return typeof c == "function" ? c(q, b) : $ === "object" && !Array.isArray(q) ? {
+        ...b,
+        ...q
+      } : q;
+    } else return typeof O != "string" ? O : R.read(O);
+  }
+  function L(C) {
     if (!(C && C.storageArea !== t)) {
       if (C && C.key == null) {
         g.value = b;
@@ -1705,10 +1705,10 @@ function wy(n, e, t, s = {}) {
       if (!(C && C.key !== v.value)) {
         M();
         try {
-          const L = R.write(g.value);
-          (C === void 0 || (C == null ? void 0 : C.newValue) !== L) && (g.value = N(C));
-        } catch (L) {
-          f(L);
+          const O = R.write(g.value);
+          (C === void 0 || (C == null ? void 0 : C.newValue) !== O) && (g.value = D(C));
+        } catch (O) {
+          f(O);
         } finally {
           C ? Ye(x) : x();
         }
@@ -1716,7 +1716,7 @@ function wy(n, e, t, s = {}) {
     }
   }
   function S(C) {
-    D(C.detail);
+    L(C.detail);
   }
   return g;
 }
@@ -1746,7 +1746,7 @@ function jf(n, e, t = {}) {
 }
 function _y(n, e, t = {}) {
   const { root: s, rootMargin: o, threshold: r = 0, window: i = Vn, immediate: a = !0 } = t, l = /* @__PURE__ */ Mr(() => i && "IntersectionObserver" in i), c = k(() => Jo(Mt(n)).map(Bn).filter(Pf));
-  let u = an;
+  let u = rn;
   const d = vn(a), p = l.value ? Pe(() => [
     c.value,
     Bn(s),
@@ -1760,12 +1760,12 @@ function _y(n, e, t = {}) {
       threshold: r
     });
     h.forEach(($) => $ && b.observe($)), u = () => {
-      b.disconnect(), u = an;
+      b.disconnect(), u = rn;
     };
   }, {
     immediate: a,
     flush: "post"
-  }) : an, f = () => {
+  }) : rn, f = () => {
     u(), p(), d.value = !1;
   };
   return da(f), {
@@ -1803,7 +1803,7 @@ function My(n) {
 }
 const Du = 1;
 function Kf(n, e = {}) {
-  const { throttle: t = 0, idle: s = 200, onStop: o = an, onScroll: r = an, offset: i = {
+  const { throttle: t = 0, idle: s = 200, onStop: o = rn, onScroll: r = rn, offset: i = {
     left: 0,
     right: 0,
     top: 0,
@@ -1828,18 +1828,18 @@ function Kf(n, e = {}) {
       b(void 0, E);
     }
   });
-  function b(E, G) {
-    var N, D, S, C;
+  function b(E, H) {
+    var D, L, S, C;
     if (!u) return;
-    const L = Mt(n);
-    if (!L) return;
-    (N = L instanceof Document ? u.document.body : L) === null || N === void 0 || N.scrollTo({
-      top: (D = Mt(G)) !== null && D !== void 0 ? D : v.value,
+    const O = Mt(n);
+    if (!O) return;
+    (D = O instanceof Document ? u.document.body : O) === null || D === void 0 || D.scrollTo({
+      top: (L = Mt(H)) !== null && L !== void 0 ? L : v.value,
       left: (S = Mt(E)) !== null && S !== void 0 ? S : g.value,
       behavior: Mt(c)
     });
-    const J = (L == null || (C = L.document) === null || C === void 0 ? void 0 : C.documentElement) || (L == null ? void 0 : L.documentElement) || L;
-    g != null && (f.value = J.scrollLeft), v != null && (h.value = J.scrollTop);
+    const q = (O == null || (C = O.document) === null || C === void 0 ? void 0 : C.documentElement) || (O == null ? void 0 : O.documentElement) || O;
+    g != null && (f.value = q.scrollLeft), v != null && (h.value = q.scrollTop);
   }
   const $ = vn(!1), R = fi({
     left: !0,
@@ -1854,23 +1854,23 @@ function Kf(n, e = {}) {
   }), x = (E) => {
     $.value && ($.value = !1, M.left = !1, M.right = !1, M.top = !1, M.bottom = !1, o(E));
   }, T = Uf(x, t + s), I = (E) => {
-    var G;
+    var H;
     if (!u) return;
-    const N = (E == null || (G = E.document) === null || G === void 0 ? void 0 : G.documentElement) || (E == null ? void 0 : E.documentElement) || Bn(E), { display: D, flexDirection: S, direction: C } = u.getComputedStyle(N), L = C === "rtl" ? -1 : 1, J = N.scrollLeft;
-    M.left = J < f.value, M.right = J > f.value;
-    const te = Math.abs(J * L) <= (i.left || 0), ve = Math.abs(J * L) + N.clientWidth >= N.scrollWidth - (i.right || 0) - Du;
-    D === "flex" && S === "row-reverse" ? (R.left = ve, R.right = te) : (R.left = te, R.right = ve), f.value = J;
-    let be = N.scrollTop;
-    E === u.document && !be && (be = u.document.body.scrollTop), M.top = be < h.value, M.bottom = be > h.value;
-    const W = Math.abs(be) <= (i.top || 0), re = Math.abs(be) + N.clientHeight >= N.scrollHeight - (i.bottom || 0) - Du;
-    D === "flex" && S === "column-reverse" ? (R.top = re, R.bottom = W) : (R.top = W, R.bottom = re), h.value = be;
-  }, O = (E) => {
-    var G;
+    const D = (E == null || (H = E.document) === null || H === void 0 ? void 0 : H.documentElement) || (E == null ? void 0 : E.documentElement) || Bn(E), { display: L, flexDirection: S, direction: C } = u.getComputedStyle(D), O = C === "rtl" ? -1 : 1, q = D.scrollLeft;
+    M.left = q < f.value, M.right = q > f.value;
+    const te = Math.abs(q * O) <= (i.left || 0), ye = Math.abs(q * O) + D.clientWidth >= D.scrollWidth - (i.right || 0) - Du;
+    L === "flex" && S === "row-reverse" ? (R.left = ye, R.right = te) : (R.left = te, R.right = ye), f.value = q;
+    let ke = D.scrollTop;
+    E === u.document && !ke && (ke = u.document.body.scrollTop), M.top = ke < h.value, M.bottom = ke > h.value;
+    const j = Math.abs(ke) <= (i.top || 0), ie = Math.abs(ke) + D.clientHeight >= D.scrollHeight - (i.bottom || 0) - Du;
+    L === "flex" && S === "column-reverse" ? (R.top = ie, R.bottom = j) : (R.top = j, R.bottom = ie), h.value = ke;
+  }, N = (E) => {
+    var H;
     if (!u) return;
-    const N = (G = E.target.documentElement) !== null && G !== void 0 ? G : E.target;
-    I(N), $.value = !0, T(E), r(E);
+    const D = (H = E.target.documentElement) !== null && H !== void 0 ? H : E.target;
+    I(D), $.value = !0, T(E), r(E);
   };
-  return Kn(n, "scroll", t ? /* @__PURE__ */ iy(O, t, !0, !1) : O, l), Hf(() => {
+  return Kn(n, "scroll", t ? /* @__PURE__ */ iy(N, t, !0, !1) : N, l), Hf(() => {
     try {
       const E = Mt(n);
       if (!E) return;
@@ -2005,7 +2005,7 @@ function Ty(n, e = {}) {
     ...e,
     autoInit: !1,
     clientName: "UIKit-IM",
-    clientVersion: "3.1.0",
+    clientVersion: "3.2.0",
     resolveSdkConfig: xy,
     sceneStores: t
   }), o = {
@@ -2077,7 +2077,7 @@ function jt(n, e = ["nickname", "avatarUrl"]) {
     avatarUrl: a
   };
 }
-const $a = Ot("UIKit:UseBlocklist");
+const $a = Dt("UIKit:UseBlocklist");
 function Oo() {
   const { domains: n, features: e, stores: t } = at(), s = t.contact, o = k(() => s.blackList);
   function r(c) {
@@ -2117,7 +2117,7 @@ function Oo() {
 const Ey = { class: "user-card-modal" }, Ay = {
   key: 0,
   class: "user-card-modal__loading"
-}, $y = /* @__PURE__ */ Re({
+}, $y = /* @__PURE__ */ Le({
   __name: "user-card-modal",
   props: {
     show: { type: Boolean },
@@ -2125,7 +2125,7 @@ const Ey = { class: "user-card-modal" }, Ay = {
   },
   emits: ["update:show", "send-message", "close"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:UserCardModal"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { client: a, stores: l, features: c } = at(), { fetchPresence: u } = ro(), { refresh: d } = Oo(), p = [
+    const t = Dt("UIKit:UserCardModal"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { client: a, stores: l, features: c } = at(), { fetchPresence: u } = ro(), { refresh: d } = Oo(), p = [
       "nickname",
       "avatarUrl",
       "sign",
@@ -2184,52 +2184,52 @@ const Ey = { class: "user-card-modal" }, Ay = {
       const S = [], C = f.value;
       C != null && C.sign && S.push({ key: "signature", label: r("contact.detail.signature", "个性签名"), value: C.sign }), C != null && C.nickname && S.push({ key: "nickname", label: r("contact.detail.nickname", "昵称"), value: C.nickname });
       try {
-        const L = C != null && C.ext ? JSON.parse(C.ext) : {};
-        L.calendar && S.push({ key: "calendar", label: r("userCard.calendar", "日历"), value: L.calendar, clickable: !0 }), L.department && S.push({ key: "department", label: r("userCard.department", "部门"), value: L.department, clickable: !0 });
+        const O = C != null && C.ext ? JSON.parse(C.ext) : {};
+        O.calendar && S.push({ key: "calendar", label: r("userCard.calendar", "日历"), value: O.calendar, clickable: !0 }), O.department && S.push({ key: "department", label: r("userCard.department", "部门"), value: O.department, clickable: !0 });
       } catch {
       }
       return S;
     }), I = k(() => {
       var S;
       return h.value || ((S = f.value) == null ? void 0 : S.avatarUrl);
-    }), O = k(() => {
+    }), N = k(() => {
       var S;
       return g.value || ((S = f.value) == null ? void 0 : S.nickname) || s.userId;
     });
     function E() {
       o("close");
     }
-    function G(S) {
+    function H(S) {
       S === "message" && (o("send-message", s.userId), E());
     }
-    function N(S) {
+    function D(S) {
       S === "calendar" ? i(r("userCard.viewCalendar", "查看日程")) : S === "department" && i(r("userCard.department", "部门"));
     }
-    function D() {
+    function L() {
       c.enablePresence && R.value && M();
     }
-    return (S, C) => (y(), ce(m(Lt), {
+    return (S, C) => (y(), de(m(Ot), {
       show: s.show,
       position: "center",
       "close-on-click-overlay": !0,
-      "onUpdate:show": C[0] || (C[0] = (L) => o("update:show", L)),
+      "onUpdate:show": C[0] || (C[0] = (O) => o("update:show", O)),
       onClose: E
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", Ey, [
-          q(m(Xl), {
+          W(m(Xl), {
             "user-id": s.userId,
-            name: O.value,
+            name: N.value,
             avatar: I.value,
             status: $.value,
             editable: R.value,
             actions: x.value,
             "info-rows": T.value,
-            onActionClick: G,
-            onInfoClick: N,
-            onPresenceChanged: D
+            onActionClick: H,
+            onInfoClick: D,
+            onPresenceChanged: L
           }, null, 8, ["user-id", "name", "avatar", "status", "editable", "actions", "info-rows"]),
-          b.value ? (y(), w("div", Ay, P(m(r)("common.loading", "加载中...")), 1)) : U("", !0)
+          b.value ? (y(), w("div", Ay, P(m(r)("common.loading", "加载中...")), 1)) : F("", !0)
         ])
       ]),
       _: 1
@@ -2246,7 +2246,7 @@ const Ey = { class: "user-card-modal" }, Ay = {
 }, zy = ["onClick"], Fy = { class: "group-card__action-label" }, Uy = {
   key: 1,
   class: "group-card__info"
-}, Hy = { class: "group-card__label" }, Gy = /* @__PURE__ */ Re({
+}, Hy = { class: "group-card__label" }, Gy = /* @__PURE__ */ Le({
   __name: "group-card",
   props: {
     groupId: {},
@@ -2269,7 +2269,7 @@ const Ey = { class: "user-card-modal" }, Ay = {
       }, "   ", 6),
       _("div", Ny, [
         _("div", Ly, [
-          q(m($t), {
+          W(m($t), {
             class: "group-card__avatar",
             src: t.avatar,
             name: t.name,
@@ -2277,39 +2277,39 @@ const Ey = { class: "user-card-modal" }, Ay = {
           }, null, 8, ["src", "name"]),
           _("div", Oy, [
             _("div", Dy, [
-              V(r.$slots, "name", {}, () => [
+              G(r.$slots, "name", {}, () => [
                 mt(P(t.name), 1)
               ], !0)
             ]),
             _("div", By, [
-              q(m(di), {
+              W(m(di), {
                 text: t.groupId
               }, null, 8, ["text"])
             ])
           ])
         ]),
         t.actions.length ? (y(), w("div", Py, [
-          (y(!0), w($e, null, et(t.actions, (a) => (y(), w("div", {
+          (y(!0), w($e, null, tt(t.actions, (a) => (y(), w("div", {
             key: a.key,
             class: Te(["group-card__action", `group-card__action--${a.type || "default"}`]),
             onClick: (l) => o(a.key)
           }, [
-            a.icon ? (y(), ce(m(Oe), {
+            a.icon ? (y(), de(m(De), {
               key: 0,
               name: a.icon,
               size: 22,
               class: "group-card__action-icon"
-            }, null, 8, ["name"])) : U("", !0),
+            }, null, 8, ["name"])) : F("", !0),
             _("span", Fy, P(a.label), 1)
           ], 10, zy))), 128))
-        ])) : U("", !0),
+        ])) : F("", !0),
         t.infoRows.length ? (y(), w("div", Uy, [
-          (y(!0), w($e, null, et(t.infoRows, (a) => (y(), w("div", {
+          (y(!0), w($e, null, tt(t.infoRows, (a) => (y(), w("div", {
             key: a.key,
             class: "group-card__row"
           }, [
             _("span", Hy, P(a.label), 1),
-            a.copyable ? (y(), ce(m(di), {
+            a.copyable ? (y(), de(m(di), {
               key: 0,
               class: "group-card__value",
               text: a.value
@@ -2319,170 +2319,170 @@ const Ey = { class: "user-card-modal" }, Ay = {
               style: Et(a.maxLines ? { "-webkit-line-clamp": a.maxLines } : void 0)
             }, P(a.value), 7))
           ]))), 128))
-        ])) : U("", !0),
-        V(r.$slots, "default", {}, void 0, !0)
+        ])) : F("", !0),
+        G(r.$slots, "default", {}, void 0, !0)
       ])
     ]));
   }
 }), dc = /* @__PURE__ */ ze(Gy, [["__scopeId", "data-v-d8740aba"]]);
 function sn() {
   const { domains: n, stores: e } = at(), { t } = qe(), s = e.group, o = k(() => s.groupList), r = k(() => s.currentGroup), i = k(() => s.loaded), a = k(() => s.joinedGroupCount), l = k(() => s.filterText), c = k(() => s.activeId), u = k(() => s.selectedIds), d = k(() => s.hasMore), p = A(!1);
-  function f(H) {
-    s.setFilterText(H);
+  function f(U) {
+    s.setFilterText(U);
   }
-  function h(H) {
-    s.setActiveId(H);
+  function h(U) {
+    s.setActiveId(U);
   }
-  function g(H) {
-    return s.isSelected(H);
+  function g(U) {
+    return s.isSelected(U);
   }
-  function v(H) {
-    s.toggleSelect(H);
+  function v(U) {
+    s.toggleSelect(U);
   }
-  function b(H) {
-    s.setSelectedIds(H);
+  function b(U) {
+    s.setSelectedIds(U);
   }
   function $() {
-    const H = n.group.syncLocal();
-    return s.setJoinedGroupCount(H.length), H;
+    const U = n.group.syncLocal();
+    return s.setJoinedGroupCount(U.length), U;
   }
-  async function R(H) {
+  async function R(U) {
     p.value = !0;
     try {
-      const ae = await n.group.fetchGroups(H == null ? void 0 : H.cursor, H == null ? void 0 : H.pageSize);
-      return H != null && H.cursor ? s.appendGroupList(ae.list) : s.setGroupList(ae.list), s.setHasMore(ae.hasMore ?? !1), s.setCursor(ae.cursor), ae;
+      const le = await n.group.fetchGroups(U == null ? void 0 : U.cursor, U == null ? void 0 : U.pageSize);
+      return U != null && U.cursor ? s.appendGroupList(le.list) : s.setGroupList(le.list), s.setHasMore(le.hasMore ?? !1), s.setCursor(le.cursor), le;
     } finally {
       p.value = !1;
     }
   }
-  async function M(H) {
-    return n.group.fetchGroupInfo(H);
+  async function M(U) {
+    return n.group.fetchGroupInfo(U);
   }
-  async function x(H, ae, K = 20) {
-    return n.group.fetchGroupMembers(H, ae, K);
+  async function x(U, le, K = 20) {
+    return n.group.fetchGroupMembers(U, le, K);
   }
-  async function T(H) {
-    return n.group.fetchGroupAnnouncement(H);
+  async function T(U) {
+    return n.group.fetchGroupAnnouncement(U);
   }
-  async function I(H, ae) {
-    await n.group.updateGroupAnnouncement(H, ae);
+  async function I(U, le) {
+    await n.group.updateGroupAnnouncement(U, le);
   }
-  async function O(H) {
-    const ae = await n.group.createGroup(H);
-    return qn(e, ae.groupId, lt.GROUPCHAT, {
+  async function N(U) {
+    const le = await n.group.createGroup(U);
+    return qn(e, le.groupId, lt.GROUPCHAT, {
       eventType: Fn.GROUP_CREATED,
-      params: { groupName: H.name || "" },
+      params: { groupName: U.name || "" },
       defaultText: t("chat.notice.groupCreated")
-    }), ae;
+    }), le;
   }
-  async function E(H, ae) {
-    await n.group.joinGroup(H, ae);
+  async function E(U, le) {
+    await n.group.joinGroup(U, le);
   }
-  async function G(H) {
-    await n.group.leaveGroup(H);
+  async function H(U) {
+    await n.group.leaveGroup(U);
   }
-  async function N(H) {
-    await n.group.destroyGroup(H);
+  async function D(U) {
+    await n.group.destroyGroup(U);
   }
-  async function D(H, ae) {
-    await n.group.changeGroupOwner(H, ae);
+  async function L(U, le) {
+    await n.group.changeGroupOwner(U, le);
   }
-  async function S(H, ae) {
-    await n.group.removeGroupMembers(H, ae);
+  async function S(U, le) {
+    await n.group.removeGroupMembers(U, le);
   }
-  async function C(H, ae) {
-    await n.group.inviteUsersToGroup(H, ae);
+  async function C(U, le) {
+    await n.group.inviteUsersToGroup(U, le);
   }
-  async function L(H, ae) {
-    await n.group.addGroupAdmin(H, ae);
+  async function O(U, le) {
+    await n.group.addGroupAdmin(U, le);
   }
-  async function J(H, ae) {
-    await n.group.removeGroupAdmin(H, ae);
+  async function q(U, le) {
+    await n.group.removeGroupAdmin(U, le);
   }
-  async function te(H) {
-    await n.group.acceptGroupInvitation(H);
+  async function te(U) {
+    await n.group.acceptGroupInvitation(U);
   }
-  async function ve(H) {
-    await n.group.declineGroupInvitation(H);
+  async function ye(U) {
+    await n.group.declineGroupInvitation(U);
   }
-  function be(H) {
-    return s.getGroupMembers(H);
+  function ke(U) {
+    return s.getGroupMembers(U);
   }
-  function W(H) {
-    return s.getGroupAnnouncement(H);
+  function j(U) {
+    return s.getGroupAnnouncement(U);
   }
-  async function re(H, ae) {
-    await n.group.updateGroupInfo(H, ae);
+  async function ie(U, le) {
+    await n.group.updateGroupInfo(U, le);
   }
-  async function ue(H, ae) {
-    await n.group.updateGroupConfigs(H, ae);
+  async function fe(U, le) {
+    await n.group.updateGroupConfigs(U, le);
   }
-  async function j(H) {
-    await n.group.muteAllGroupMembers(H);
+  async function V(U) {
+    await n.group.muteAllGroupMembers(U);
   }
-  async function de(H) {
-    await n.group.unmuteAllGroupMembers(H);
+  async function ue(U) {
+    await n.group.unmuteAllGroupMembers(U);
   }
-  async function se(H, ae, K) {
-    await n.group.muteGroupMembers(H, ae, K);
+  async function se(U, le, K) {
+    await n.group.muteGroupMembers(U, le, K);
   }
-  async function Me(H, ae) {
-    await n.group.unmuteGroupMembers(H, ae);
+  async function Me(U, le) {
+    await n.group.unmuteGroupMembers(U, le);
   }
-  async function ge(H, ae, K) {
-    return n.group.getGroupMuteList(H, ae, K);
+  async function ge(U, le, K) {
+    return n.group.getGroupMuteList(U, le, K);
   }
-  async function Ie(H, ae, K) {
-    return n.group.getGroupBlocklist(H, ae, K);
+  async function Ie(U, le, K) {
+    return n.group.getGroupBlocklist(U, le, K);
   }
-  async function Ke(H, ae) {
-    await n.group.blockGroupMembers(H, ae);
+  async function Ke(U, le) {
+    await n.group.blockGroupMembers(U, le);
   }
-  async function _e(H, ae) {
-    await n.group.unblockGroupMembers(H, ae);
+  async function _e(U, le) {
+    await n.group.unblockGroupMembers(U, le);
   }
-  async function He(H) {
-    return n.group.getGroupAllowlist(H);
+  async function He(U) {
+    return n.group.getGroupAllowlist(U);
   }
-  async function ee(H, ae) {
-    await n.group.addUsersToGroupAllowlist(H, ae);
+  async function ee(U, le) {
+    await n.group.addUsersToGroupAllowlist(U, le);
   }
-  async function me(H, ae) {
-    await n.group.removeUsersFromGroupAllowlist(H, ae);
+  async function ve(U, le) {
+    await n.group.removeUsersFromGroupAllowlist(U, le);
   }
-  async function Be(H) {
-    return n.group.checkIfInGroupAllowList(H);
+  async function Be(U) {
+    return n.group.checkIfInGroupAllowList(U);
   }
-  async function tt(H) {
-    return n.group.checkIfInGroupMuteList(H);
+  async function st(U) {
+    return n.group.checkIfInGroupMuteList(U);
   }
-  async function nt(H, ae, K) {
-    return n.group.getGroupSharedFileList(H, ae, K);
+  async function nt(U, le, K) {
+    return n.group.getGroupSharedFileList(U, le, K);
   }
-  async function dt(H, ae) {
-    return n.group.uploadGroupSharedFile(H, ae);
+  async function dt(U, le) {
+    return n.group.uploadGroupSharedFile(U, le);
   }
-  async function vt(H, ae) {
-    await n.group.deleteGroupSharedFile(H, ae);
+  async function gt(U, le) {
+    await n.group.deleteGroupSharedFile(U, le);
   }
-  async function kt(H, ae) {
-    return n.group.downloadGroupSharedFile(H, ae);
+  async function kt(U, le) {
+    return n.group.downloadGroupSharedFile(U, le);
   }
-  async function fe(H, ae) {
-    await n.group.acceptGroupJoinRequest(H, ae);
+  async function he(U, le) {
+    await n.group.acceptGroupJoinRequest(U, le);
   }
-  async function Z(H, ae, K) {
-    await n.group.rejectGroupJoinRequest(H, ae, K);
+  async function Q(U, le, K) {
+    await n.group.rejectGroupJoinRequest(U, le, K);
   }
-  async function ie() {
+  async function ae() {
     await R(), s.setJoinedGroupCount(s.groupList.length);
   }
-  async function ke() {
+  async function we() {
     s.hasMore && await R({ cursor: s.cursor });
   }
-  async function Q() {
-    const H = s.loaded ? s.groupList.length : n.group.getLocalCount();
-    return s.setJoinedGroupCount(H), H;
+  async function X() {
+    const U = s.loaded ? s.groupList.length : n.group.getLocalCount();
+    return s.setJoinedGroupCount(U), U;
   }
   return {
     groupList: o,
@@ -2505,23 +2505,23 @@ function sn() {
     fetchGroupMembers: x,
     fetchGroupAnnouncement: T,
     updateGroupAnnouncement: I,
-    createGroup: O,
+    createGroup: N,
     joinGroup: E,
-    leaveGroup: G,
-    destroyGroup: N,
-    changeGroupOwner: D,
+    leaveGroup: H,
+    destroyGroup: D,
+    changeGroupOwner: L,
     removeGroupMembers: S,
     inviteUsersToGroup: C,
-    addGroupAdmin: L,
-    removeGroupAdmin: J,
+    addGroupAdmin: O,
+    removeGroupAdmin: q,
     acceptGroupInvitation: te,
-    declineGroupInvitation: ve,
-    getGroupMembers: be,
-    getGroupAnnouncement: W,
-    updateGroupInfo: re,
-    updateGroupConfigs: ue,
-    muteAllGroupMembers: j,
-    unmuteAllGroupMembers: de,
+    declineGroupInvitation: ye,
+    getGroupMembers: ke,
+    getGroupAnnouncement: j,
+    updateGroupInfo: ie,
+    updateGroupConfigs: fe,
+    muteAllGroupMembers: V,
+    unmuteAllGroupMembers: ue,
     muteGroupMembers: se,
     unmuteGroupMembers: Me,
     getGroupMuteList: ge,
@@ -2530,24 +2530,24 @@ function sn() {
     unblockGroupMembers: _e,
     getGroupAllowlist: He,
     addUsersToGroupAllowlist: ee,
-    removeUsersFromGroupAllowlist: me,
+    removeUsersFromGroupAllowlist: ve,
     checkIfInGroupAllowList: Be,
-    checkIfInGroupMuteList: tt,
+    checkIfInGroupMuteList: st,
     getGroupSharedFileList: nt,
     uploadGroupSharedFile: dt,
-    deleteGroupSharedFile: vt,
+    deleteGroupSharedFile: gt,
     downloadGroupSharedFile: kt,
-    acceptGroupJoinRequest: fe,
-    rejectGroupJoinRequest: Z,
-    refresh: ie,
-    loadMore: ke,
-    fetchJoinedGroupCount: Q
+    acceptGroupJoinRequest: he,
+    rejectGroupJoinRequest: Q,
+    refresh: ae,
+    loadMore: we,
+    fetchJoinedGroupCount: X
   };
 }
 const Vy = { class: "group-card-modal" }, jy = {
   key: 0,
   class: "group-card-modal__loading"
-}, Ky = /* @__PURE__ */ Re({
+}, Ky = /* @__PURE__ */ Le({
   __name: "group-card-modal",
   props: {
     show: { type: Boolean },
@@ -2555,7 +2555,7 @@ const Vy = { class: "group-card-modal" }, jy = {
   },
   emits: ["update:show", "send-message", "close"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:GroupCardModal"), s = n, o = e, { t: r } = qe(), { stores: i } = at(), { fetchGroupInfo: a } = sn(), l = A(!1), c = A(/* @__PURE__ */ new Set()), u = k(() => i.group.getGroupById(s.groupId));
+    const t = Dt("UIKit:GroupCardModal"), s = n, o = e, { t: r } = qe(), { stores: i } = at(), { fetchGroupInfo: a } = sn(), l = A(!1), c = A(/* @__PURE__ */ new Set()), u = k(() => i.group.getGroupById(s.groupId));
     Pe(
       () => s.show,
       ($) => {
@@ -2600,16 +2600,16 @@ const Vy = { class: "group-card-modal" }, jy = {
     function b($) {
       $ === "message" && (o("send-message", s.groupId), v());
     }
-    return ($, R) => (y(), ce(m(Lt), {
+    return ($, R) => (y(), de(m(Ot), {
       show: s.show,
       position: "center",
       "close-on-click-overlay": !0,
       "onUpdate:show": R[0] || (R[0] = (M) => o("update:show", M)),
       onClose: v
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", Vy, [
-          q(dc, {
+          W(dc, {
             "group-id": s.groupId,
             name: g.value,
             avatar: h.value,
@@ -2617,7 +2617,7 @@ const Vy = { class: "group-card-modal" }, jy = {
             "info-rows": f.value,
             onActionClick: b
           }, null, 8, ["group-id", "name", "avatar", "actions", "info-rows"]),
-          l.value ? (y(), w("div", jy, P(m(r)("common.loading", "加载中...")), 1)) : U("", !0)
+          l.value ? (y(), w("div", jy, P(m(r)("common.loading", "加载中...")), 1)) : F("", !0)
         ])
       ]),
       _: 1
@@ -2665,14 +2665,14 @@ const Vy = { class: "group-card-modal" }, jy = {
   EmEmpty: Ht,
   EmGroupCard: dc,
   EmGroupCardModal: Yf,
-  EmIcon: Oe,
+  EmIcon: De,
   EmIconButton: pt,
   EmImageViewer: Cf,
   EmInput: gn,
   EmModal: io,
   EmNotification: Iv,
   EmNotificationContainer: Mf,
-  EmPopup: Lt,
+  EmPopup: Ot,
   EmPresenceAvatar: xv,
   EmPresenceSelector: Tv,
   EmPresenceSelectorModal: Ev,
@@ -2700,7 +2700,7 @@ const Vy = { class: "group-card-modal" }, jy = {
 }, sb = {
   key: 2,
   class: "conversation-item__draft"
-}, ob = { class: "context-menu" }, rb = ["onClick"], ib = /* @__PURE__ */ Re({
+}, ob = { class: "context-menu" }, rb = ["onClick"], ib = /* @__PURE__ */ Le({
   __name: "conversation-item",
   props: {
     conversation: {},
@@ -2744,39 +2744,39 @@ const Vy = { class: "group-card-modal" }, jy = {
     function I() {
       T.value = !1;
     }
-    const O = A(!1);
+    const N = A(!1);
     Pe(() => t.conversation.isPinned, (ge, Ie) => {
-      ge && !Ie && a.animationEnabled && (O.value = !1, requestAnimationFrame(() => {
-        O.value = !0;
+      ge && !Ie && a.animationEnabled && (N.value = !1, requestAnimationFrame(() => {
+        N.value = !0;
       }));
     });
     function E() {
-      O.value = !1;
+      N.value = !1;
     }
-    const G = A(!1), N = A(!1), D = xf(() => {
-      l.value && (N.value = !0, G.value = !0);
+    const H = A(!1), D = A(!1), L = xf(() => {
+      l.value && (D.value = !0, H.value = !0);
     }), S = A(!1), C = A();
-    function L(ge) {
+    function O(ge) {
       if (l.value)
         return;
       ge.preventDefault(), C.value && (document.body.removeChild(C.value), C.value = void 0);
       const Ie = document.createElement("div");
       Ie.style.position = "fixed", Ie.style.left = `${ge.clientX}px`, Ie.style.top = `${ge.clientY}px`, Ie.style.width = "1px", Ie.style.height = "1px", document.body.appendChild(Ie), C.value = Ie, S.value = !0;
     }
-    function J() {
+    function q() {
       S.value = !1, C.value && (document.body.removeChild(C.value), C.value = void 0);
     }
     Ds(() => {
       C.value && (document.body.removeChild(C.value), C.value = void 0);
     });
     function te() {
-      if (N.value) {
-        N.value = !1;
+      if (D.value) {
+        D.value = !1;
         return;
       }
       s("select", t.conversation.id);
     }
-    const ve = k(() => {
+    const ye = k(() => {
       var Ie;
       const ge = [];
       return t.conversation.unreadCount && ge.push({
@@ -2818,7 +2818,7 @@ const Vy = { class: "group-card-modal" }, jy = {
           }
         });
       }), ge;
-    }), be = k(() => ve.value.filter((ge) => ge.position === "mobile" || ge.position === "both").map((ge) => ({ name: ge.label, color: ge.color, icon: ge.icon }))), W = k(() => ve.value.filter((ge) => ge.position === "pc" || ge.position === "both").map((ge) => ({
+    }), ke = k(() => ye.value.filter((ge) => ge.position === "mobile" || ge.position === "both").map((ge) => ({ name: ge.label, color: ge.color, icon: ge.icon }))), j = k(() => ye.value.filter((ge) => ge.position === "pc" || ge.position === "both").map((ge) => ({
       label: ge.label,
       action: ge.key,
       danger: ge.danger,
@@ -2827,21 +2827,21 @@ const Vy = { class: "group-card-modal" }, jy = {
       // 放大一档使其与其余菜单项视觉一致。
       size: ge.key === "pin" ? 16 : 14
     })));
-    function re(ge, Ie) {
+    function ie(ge, Ie) {
       var _e;
-      (_e = ve.value.filter(
+      (_e = ye.value.filter(
         (He) => He.position === "mobile" || He.position === "both"
       )[Ie]) == null || _e.handler();
     }
-    function ue(ge) {
-      J();
-      const Ie = ve.value.find((Ke) => Ke.key === ge);
+    function fe(ge) {
+      q();
+      const Ie = ye.value.find((Ke) => Ke.key === ge);
       Ie == null || Ie.handler();
     }
-    const j = k(() => {
+    const V = k(() => {
       const ge = r.value, Ie = t.conversation.draftTime || t.conversation.lastMessageTime;
       return Ie ? t.timeFormatter ? t.timeFormatter(Ie) : new Date(Ie).toLocaleTimeString(ge) : "";
-    }), de = k(() => i.enableDraft !== !1 && !!t.conversation.draft), se = k(() => t.unreadMode === "dot" || t.conversation.isMuted), Me = k(() => {
+    }), ue = k(() => i.enableDraft !== !1 && !!t.conversation.draft), se = k(() => t.unreadMode === "dot" || t.conversation.isMuted), Me = k(() => {
       if (t.isTyping)
         return o("chat.typing", "对方正在输入...");
       if (t.conversation.draft)
@@ -2854,27 +2854,28 @@ const Vy = { class: "group-card-modal" }, jy = {
       return t.messageFormatter ? t.messageFormatter(ge, Ce.TEXT) : ge;
     });
     return (ge, Ie) => (y(), w($e, null, [
-      q(m(Tt), ao(ge.$attrs, {
+      W(m(Tt), ao(ge.$attrs, {
         "auto-height": "",
         class: [t.class, { "is-pinned": n.conversation.isPinned, "is-muted": n.conversation.isMuted, "has-at-me": x.value, "conversation-item--no-avatar": !t.showAvatar }],
         onClick: te,
-        onContextmenu: L,
-        onTouchstart: m(D).start,
-        onTouchmove: m(D).move,
-        onTouchend: m(D).end,
-        onTouchcancel: m(D).cancel
+        onContextmenu: O,
+        onTouchstart: m(L).start,
+        onTouchmove: m(L).move,
+        onTouchend: m(L).end,
+        onTouchcancel: m(L).cancel
       }), {
-        leading: X(() => [
-          t.showAvatar && t.unreadPlacement === "avatar" && t.conversation.unreadCount ? (y(), ce(m(cl), {
+        leading: J(() => [
+          t.showAvatar && t.unreadPlacement === "avatar" && t.conversation.unreadCount ? (y(), de(m(cl), {
             key: 0,
+            class: "conversation-item__avatar-badge",
             count: t.conversation.unreadCount,
             dot: se.value,
             size: se.value ? "xs" : "l",
-            placement: "top-right",
+            placement: t.badgePlacement,
             bordered: ""
           }, {
-            default: X(() => [
-              q(m($t), {
+            default: J(() => [
+              W(m($t), {
                 name: R.value,
                 src: M.value,
                 size: 48,
@@ -2882,31 +2883,31 @@ const Vy = { class: "group-card-modal" }, jy = {
               }, null, 8, ["name", "src", "presence"])
             ]),
             _: 1
-          }, 8, ["count", "dot", "size"])) : t.showAvatar ? (y(), ce(m($t), {
+          }, 8, ["count", "dot", "size", "placement"])) : t.showAvatar ? (y(), de(m($t), {
             key: 1,
             name: R.value,
             src: M.value,
             size: 48,
             presence: $.value
-          }, null, 8, ["name", "src", "presence"])) : U("", !0),
-          V(ge.$slots, "item-prefix", {}, void 0, !0)
+          }, null, 8, ["name", "src", "presence"])) : F("", !0),
+          G(ge.$slots, "item-prefix", {}, void 0, !0)
         ]),
-        default: X(() => [
+        default: J(() => [
           _("div", Jy, [
             _("div", Xy, [
               _("div", Yy, [
                 _("span", {
                   class: Te(["conversation-item__name", { "is-at-me": x.value }])
                 }, [
-                  x.value ? (y(), ce(m(Oe), {
+                  x.value ? (y(), de(m(De), {
                     key: 0,
                     name: "at",
                     size: 14,
                     class: "conversation-item__at-me-icon"
-                  })) : U("", !0),
+                  })) : F("", !0),
                   mt(" " + P(R.value), 1)
                 ], 2),
-                V(ge.$slots, "name-suffix", {
+                G(ge.$slots, "name-suffix", {
                   conversation: t.conversation
                 }, void 0, !0),
                 t.conversation.isPinned ? (y(), w("span", {
@@ -2914,30 +2915,30 @@ const Vy = { class: "group-card-modal" }, jy = {
                   class: "conversation-item__pin-badge",
                   onAnimationend: E
                 }, [
-                  q(m(Oe), {
+                  W(m(De), {
                     name: "filled/pin",
                     size: 12,
-                    anim: O.value ? "shake" : void 0
+                    anim: N.value ? "shake" : void 0
                   }, null, 8, ["anim"])
-                ], 32)) : U("", !0),
-                q(Io, { name: "uikit-mute-badge" }, {
-                  default: X(() => [
+                ], 32)) : F("", !0),
+                W(Io, { name: "uikit-mute-badge" }, {
+                  default: J(() => [
                     t.conversation.isMuted ? (y(), w("span", {
                       key: 0,
                       class: "conversation-item__mute-badge",
                       onAnimationend: I
                     }, [
-                      q(m(Oe), {
+                      W(m(De), {
                         name: "filled/bell/slash",
                         size: 12,
                         anim: T.value ? "shake" : void 0
                       }, null, 8, ["anim"])
-                    ], 32)) : U("", !0)
+                    ], 32)) : F("", !0)
                   ]),
                   _: 1
                 })
               ]),
-              j.value ? (y(), w("span", Qy, P(j.value), 1)) : U("", !0)
+              V.value ? (y(), w("span", Qy, P(V.value), 1)) : F("", !0)
             ]),
             _("div", Zy, [
               _("span", eb, [
@@ -2952,57 +2953,56 @@ const Vy = { class: "group-card-modal" }, jy = {
                   ], -1)),
                   _("span", tb, P(Me.value), 1)
                 ], 64)) : (y(), w($e, { key: 1 }, [
-                  x.value ? (y(), w("span", nb, P(m(o)("conversation.atMeInMessage", "@我的")), 1)) : U("", !0),
-                  de.value ? (y(), ce(m(Oe), {
+                  x.value ? (y(), w("span", nb, P(m(o)("conversation.atMeInMessage", "@我的")), 1)) : F("", !0),
+                  ue.value ? (y(), de(m(De), {
                     key: 1,
                     name: "rect/pencil",
                     size: 14,
                     class: "conversation-item__draft-icon"
-                  })) : U("", !0),
-                  de.value ? (y(), w("span", sb, "[" + P(m(o)("conversation.draft")) + "]", 1)) : U("", !0),
+                  })) : F("", !0),
+                  ue.value ? (y(), w("span", sb, "[" + P(m(o)("conversation.draft")) + "]", 1)) : F("", !0),
                   mt(P(Me.value), 1)
                 ], 64))
               ]),
-              t.conversation.unreadCount && t.unreadPlacement === "inline" ? (y(), ce(m(cl), {
+              t.conversation.unreadCount && t.unreadPlacement === "inline" ? (y(), de(m(cl), {
                 key: 0,
                 count: t.conversation.unreadCount,
                 dot: se.value,
-                size: se.value ? "xs" : "l",
-                placement: t.badgePlacement
-              }, null, 8, ["count", "dot", "size", "placement"])) : U("", !0)
+                size: se.value ? "xs" : "l"
+              }, null, 8, ["count", "dot", "size"])) : F("", !0)
             ]),
-            V(ge.$slots, "item-suffix", {}, void 0, !0)
+            G(ge.$slots, "item-suffix", {}, void 0, !0)
           ])
         ]),
         _: 3
       }, 16, ["class", "onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"]),
-      q(m(Lt), {
+      W(m(Ot), {
         show: S.value,
         anchor: C.value,
         placement: "bottom",
         overlay: !1,
         "close-on-click-overlay": !0,
         group: "conversation-context-menu",
-        "onUpdate:show": J,
-        onClose: J
+        "onUpdate:show": q,
+        onClose: q
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", ob, [
-            (y(!0), w($e, null, et(W.value, (Ke) => (y(), w("div", {
+            (y(!0), w($e, null, tt(j.value, (Ke) => (y(), w("div", {
               key: Ke.action,
               class: Te(["context-menu__item", { "is-danger": Ke.danger }]),
-              onClick: ft((_e) => ue(Ke.action), ["stop"])
+              onClick: ft((_e) => fe(Ke.action), ["stop"])
             }, [
-              q(Io, {
+              W(Io, {
                 name: "uikit-icon-swap",
                 mode: "out-in"
               }, {
-                default: X(() => [
-                  Ke.icon ? (y(), ce(m(Oe), {
+                default: J(() => [
+                  Ke.icon ? (y(), de(m(De), {
                     key: Ke.icon,
                     name: Ke.icon,
                     size: Ke.size ?? 14
-                  }, null, 8, ["name", "size"])) : U("", !0)
+                  }, null, 8, ["name", "size"])) : F("", !0)
                 ]),
                 _: 2
               }, 1024),
@@ -3012,18 +3012,18 @@ const Vy = { class: "group-card-modal" }, jy = {
         ]),
         _: 1
       }, 8, ["show", "anchor"]),
-      q(m(br), {
-        show: G.value,
-        "onUpdate:show": Ie[0] || (Ie[0] = (Ke) => G.value = Ke),
-        actions: be.value,
-        onSelect: re
+      W(m(br), {
+        show: H.value,
+        "onUpdate:show": Ie[0] || (Ie[0] = (Ke) => H.value = Ke),
+        actions: ke.value,
+        onSelect: ie
       }, null, 8, ["show", "actions"])
     ], 64));
   }
-}), Qf = /* @__PURE__ */ ze(ib, [["__scopeId", "data-v-2e5ca545"]]), ab = {
+}), Qf = /* @__PURE__ */ ze(ib, [["__scopeId", "data-v-ea62949a"]]), ab = {
   key: 0,
   class: "conversation-tabs"
-}, lb = ["onClick"], cb = /* @__PURE__ */ Re({
+}, lb = ["onClick"], cb = /* @__PURE__ */ Le({
   __name: "conversation-tabs",
   props: {
     tabs: { default: () => [...Sr] },
@@ -3049,86 +3049,86 @@ const Vy = { class: "group-card-modal" }, jy = {
     return (l, c) => {
       var u;
       return (u = t.tabs) != null && u.length ? (y(), w("div", ab, [
-        V(l.$slots, "default", Fe(Ue(a.value)), () => [
-          (y(!0), w($e, null, et(t.tabs, (d) => (y(), w("button", {
+        G(l.$slots, "default", Fe(Ue(a.value)), () => [
+          (y(!0), w($e, null, tt(t.tabs, (d) => (y(), w("button", {
             key: d,
             type: "button",
             class: Te(["conversation-tabs__tab", { "is-active": t.activeTab === d }]),
             onClick: (p) => i(d)
           }, P(r.value[d]), 11, lb))), 128))
         ], !0)
-      ])) : U("", !0);
+      ])) : F("", !0);
     };
   }
-}), Zf = /* @__PURE__ */ ze(cb, [["__scopeId", "data-v-44b7eee5"]]);
+}), Zf = /* @__PURE__ */ ze(cb, [["__scopeId", "data-v-5656ce38"]]);
 function Un() {
-  const { domains: n, stores: e, dataSource: t, features: s } = at(), o = e.contact, r = k(() => o.contactList), i = k(() => o.blackList), a = k(() => o.inviteList), l = k(() => o.loaded), c = k(() => s.filterBlockedContacts === !1 ? o.contactList : o.contactList.filter((W) => !o.isBlocked(W.userId))), u = k(
+  const { domains: n, stores: e, dataSource: t, features: s } = at(), o = e.contact, r = k(() => o.contactList), i = k(() => o.blackList), a = k(() => o.inviteList), l = k(() => o.loaded), c = k(() => s.filterBlockedContacts === !1 ? o.contactList : o.contactList.filter((j) => !o.isBlocked(j.userId))), u = k(
     () => o.loaded ? c.value.length : o.contactCount
   ), d = k(() => o.filterText), p = k(() => o.activeId), f = k(() => o.selectedIds), h = k(() => o.hasMore), g = k(() => o.contactCount), v = A(!1);
-  function b(W) {
-    o.setFilterText(W);
+  function b(j) {
+    o.setFilterText(j);
   }
-  function $(W) {
-    o.setActiveId(W);
+  function $(j) {
+    o.setActiveId(j);
   }
-  function R(W) {
-    return o.isSelected(W);
+  function R(j) {
+    return o.isSelected(j);
   }
-  function M(W) {
-    o.toggleSelect(W);
+  function M(j) {
+    o.toggleSelect(j);
   }
-  function x(W) {
-    o.setSelectedIds(W);
+  function x(j) {
+    o.setSelectedIds(j);
   }
   function T() {
     return n.contact.syncLocal();
   }
-  async function I(W) {
+  async function I(j) {
     v.value = !0;
     try {
-      const re = await n.contact.fetchContacts(W == null ? void 0 : W.cursor, W == null ? void 0 : W.pageSize);
-      return W != null && W.cursor ? o.appendContactList(re.list) : o.setContactList(re.list), o.setHasMore(re.hasMore ?? !1), o.setCursor(re.cursor), re;
+      const ie = await n.contact.fetchContacts(j == null ? void 0 : j.cursor, j == null ? void 0 : j.pageSize);
+      return j != null && j.cursor ? o.appendContactList(ie.list) : o.setContactList(ie.list), o.setHasMore(ie.hasMore ?? !1), o.setCursor(ie.cursor), ie;
     } finally {
       v.value = !1;
     }
   }
-  async function O() {
-    const W = await n.contact.syncBlocklist();
-    return o.setBlackList(W), W;
+  async function N() {
+    const j = await n.contact.syncBlocklist();
+    return o.setBlackList(j), j;
   }
-  async function E(W) {
-    return t.searchUsers ? t.searchUsers(W) : [];
+  async function E(j) {
+    return t.searchUsers ? t.searchUsers(j) : [];
   }
-  async function G(W, re) {
-    await n.contact.addContact(W, re);
+  async function H(j, ie) {
+    await n.contact.addContact(j, ie);
   }
-  async function N(W) {
-    await n.contact.deleteContact(W);
+  async function D(j) {
+    await n.contact.deleteContact(j);
   }
-  async function D(W, re) {
-    await n.contact.setRemark(W, re);
+  async function L(j, ie) {
+    await n.contact.setRemark(j, ie);
   }
-  async function S(W) {
-    await n.contact.acceptInvite(W);
+  async function S(j) {
+    await n.contact.acceptInvite(j);
   }
-  async function C(W) {
-    await n.contact.declineInvite(W);
+  async function C(j) {
+    await n.contact.declineInvite(j);
   }
-  async function L(W) {
-    await n.contact.addToBlocklist(W);
+  async function O(j) {
+    await n.contact.addToBlocklist(j);
   }
-  async function J(W) {
-    await n.contact.removeFromBlocklist(W);
+  async function q(j) {
+    await n.contact.removeFromBlocklist(j);
   }
   async function te() {
     await I(), o.setContactCount(o.contactList.length);
   }
-  async function ve() {
+  async function ye() {
     o.hasMore && await I({ cursor: o.cursor });
   }
-  async function be() {
-    const W = o.loaded ? o.contactList.length : n.contact.getLocalCount();
-    return o.setContactCount(W), W;
+  async function ke() {
+    const j = o.loaded ? o.contactList.length : n.contact.getLocalCount();
+    return o.setContactCount(j), j;
   }
   return {
     contactList: r,
@@ -3150,18 +3150,18 @@ function Un() {
     setSelectedIds: x,
     syncLocalContacts: T,
     fetchContacts: I,
-    fetchBlocklist: O,
-    fetchContactCount: be,
+    fetchBlocklist: N,
+    fetchContactCount: ke,
     refresh: te,
-    loadMore: ve,
+    loadMore: ye,
     searchUsers: E,
-    addContact: G,
-    deleteContact: N,
-    setContactRemark: D,
+    addContact: H,
+    deleteContact: D,
+    setContactRemark: L,
     acceptContactInvite: S,
     declineContactInvite: C,
-    addToBlocklist: L,
-    removeFromBlocklist: J
+    addToBlocklist: O,
+    removeFromBlocklist: q
   };
 }
 let mi = null;
@@ -3280,7 +3280,7 @@ function gb(n, e) {
     }) : o;
   });
 }
-const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE__ */ Re({
+const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE__ */ Le({
   __name: "contact-alphabet-nav",
   props: {
     groups: { default: () => [] },
@@ -3295,7 +3295,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       t.dimEmpty && !o.value.has(i) || s("jump", i);
     }
     return (i, a) => (y(), w("div", vb, [
-      (y(!0), w($e, null, et(m(fc), (l) => (y(), w("span", {
+      (y(!0), w($e, null, tt(m(fc), (l) => (y(), w("span", {
         key: l,
         class: Te(["contact-alphabet-nav__item", {
           "is-active": t.activeKey === l,
@@ -3305,14 +3305,14 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       }, P(l), 11, yb))), 128))
     ]));
   }
-}), pc = /* @__PURE__ */ ze(bb, [["__scopeId", "data-v-b2481fbf"]]), ep = /* @__PURE__ */ Re({
+}), pc = /* @__PURE__ */ ze(bb, [["__scopeId", "data-v-b2481fbf"]]), ep = /* @__PURE__ */ Le({
   __name: "contact-empty",
   props: {
     text: {}
   },
   setup(n) {
     const e = n, { t } = qe();
-    return (s, o) => (y(), ce(m(Ht), {
+    return (s, o) => (y(), de(m(Ht), {
       icon: "person/single",
       description: e.text || m(t)("contact.empty")
     }, null, 8, ["description"]));
@@ -3320,7 +3320,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
 }), kb = { class: "contact-item-default__leading" }, wb = {
   key: 0,
   class: "contact-item-default__check"
-}, _b = /* @__PURE__ */ Re({
+}, _b = /* @__PURE__ */ Le({
   __name: "contact-item-default",
   props: {
     contact: {},
@@ -3350,7 +3350,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       if (e.avatarShape === "rounded" || e.avatarShape === "square")
         return "square";
     });
-    return (c, u) => (y(), ce(m(Tt), {
+    return (c, u) => (y(), de(m(Tt), {
       "auto-height": "",
       class: "contact-item-default",
       title: r.value,
@@ -3361,46 +3361,46 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       disabled: e.disabled,
       clickable: e.clickable
     }, {
-      leading: X(() => [
+      leading: J(() => [
         _("span", kb, [
           e.showCheckbox ? (y(), w("span", wb, [
-            q(m(Oe), {
+            W(m(De), {
               name: e.selected ? "circle/checked" : "circle/empty",
               size: 20
             }, null, 8, ["name"])
-          ])) : U("", !0),
-          V(c.$slots, "avatar", {
+          ])) : F("", !0),
+          G(c.$slots, "avatar", {
             contact: e.contact,
             size: a.value
           }, () => [
-            e.showAvatar ? (y(), ce(m($t), {
+            e.showAvatar ? (y(), de(m($t), {
               key: 0,
               src: i.value,
               name: r.value,
               size: a.value,
               shape: l.value,
               presence: e.onlineStatus
-            }, null, 8, ["src", "name", "size", "shape", "presence"])) : U("", !0)
+            }, null, 8, ["src", "name", "size", "shape", "presence"])) : F("", !0)
           ], !0)
         ])
       ]),
-      trailing: X(() => [
+      trailing: J(() => [
         c.$slots.extra ? (y(), w("span", {
           key: 0,
           class: "contact-item-default__extra",
           onClick: u[0] || (u[0] = ft(() => {
           }, ["stop"]))
         }, [
-          V(c.$slots, "extra", {
+          G(c.$slots, "extra", {
             contact: e.contact,
             disabled: e.disabled
           }, void 0, !0)
-        ])) : U("", !0)
+        ])) : F("", !0)
       ]),
       _: 3
     }, 8, ["title", "subtitle", "size", "active", "selected", "disabled", "clickable"]));
   }
-}), hc = /* @__PURE__ */ ze(_b, [["__scopeId", "data-v-4ced3139"]]), Cb = ["data-userid"], Mb = /* @__PURE__ */ Re({
+}), hc = /* @__PURE__ */ ze(_b, [["__scopeId", "data-v-4ced3139"]]), Cb = ["data-userid"], Mb = /* @__PURE__ */ Le({
   __name: "contact-item",
   props: {
     contact: {},
@@ -3428,14 +3428,14 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       onClick: d,
       onContextmenu: p
     }, [
-      V(f.$slots, "default", {
+      G(f.$slots, "default", {
         contact: t.contact,
         active: l.value,
         selected: c.value,
         disabled: t.disabled,
         toggleSelect: () => m(a)(t.contact.userId)
       }, () => [
-        q(hc, {
+        W(hc, {
           contact: t.contact,
           active: l.value,
           selected: c.value,
@@ -3450,15 +3450,15 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         }, At({ _: 2 }, [
           f.$slots.avatar ? {
             name: "avatar",
-            fn: X((g) => [
-              V(f.$slots, "avatar", Fe(Ue(g)), void 0, !0)
+            fn: J((g) => [
+              G(f.$slots, "avatar", Fe(Ue(g)), void 0, !0)
             ]),
             key: "0"
           } : void 0,
           f.$slots.extra ? {
             name: "extra",
-            fn: X((g) => [
-              V(f.$slots, "extra", Fe(Ue(g)), void 0, !0)
+            fn: J((g) => [
+              G(f.$slots, "extra", Fe(Ue(g)), void 0, !0)
             ]),
             key: "1"
           } : void 0
@@ -3502,7 +3502,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
 }, Gb = {
   key: 6,
   class: "contact-list__watermark"
-}, Vb = /* @__PURE__ */ Re({
+}, Vb = /* @__PURE__ */ Le({
   __name: "contact-list",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -3552,13 +3552,13 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
     function R(_e) {
       $.value = _e, o("search", _e.trim());
     }
-    const M = k(() => $.value.trim()), x = k(() => s.sortBy), T = k(() => s.groupBy), I = k(() => s.filterBlockedContacts ? r.value.filter((_e) => !u(_e.userId)) : r.value), O = gb(I, x), E = pb(O, $, {
+    const M = k(() => $.value.trim()), x = k(() => s.sortBy), T = k(() => s.groupBy), I = k(() => s.filterBlockedContacts ? r.value.filter((_e) => !u(_e.userId)) : r.value), N = gb(I, x), E = pb(N, $, {
       filterFn: s.filterFn
-    }), G = mb(E, T), N = k(() => s.groupBy === "alphabet"), D = k(() => s.groupBy === "none"), S = k(() => E.value.length), C = k(
+    }), H = mb(E, T), D = k(() => s.groupBy === "alphabet"), L = k(() => s.groupBy === "none"), S = k(() => E.value.length), C = k(
       () => f.value ? E.value.map((_e) => _e.userId) : []
     );
     f.value && h.watch(C);
-    function L(_e) {
+    function O(_e) {
       if (s.onlineStatusFn)
         return s.onlineStatusFn(_e);
       if (!(s.enablePresence ?? p.enablePresence))
@@ -3567,25 +3567,25 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       if (He)
         return He.status;
     }
-    const J = A(!1), te = A([]);
+    const q = A(!1), te = A([]);
     Pe(
       () => s.selectedIds,
       (_e) => {
         if (!_e)
           return;
         const He = Array.from(i.value).slice().sort().join(","), ee = [..._e].slice().sort().join(",");
-        He !== ee && (J.value = !0, a(_e), te.value = [..._e], Ye(() => {
-          J.value = !1;
+        He !== ee && (q.value = !0, a(_e), te.value = [..._e], Ye(() => {
+          q.value = !1;
         }));
       },
       { immediate: !0 }
     ), Pe(
       () => Array.from(i.value),
       (_e) => {
-        if (!J.value) {
+        if (!q.value) {
           if (s.maxSelected && _e.length > s.maxSelected) {
-            J.value = !0, a(te.value), Ye(() => {
-              J.value = !1;
+            q.value = !0, a(te.value), Ye(() => {
+              q.value = !1;
             }), o("max-exceed", s.maxSelected);
             return;
           }
@@ -3593,13 +3593,13 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         }
       }
     );
-    function ve() {
+    function ye() {
       const _e = g.value;
-      if (_e && (s.enableLoadMore && !s.loading && !v.value && s.hasMore && _e.scrollHeight - _e.scrollTop - _e.clientHeight <= s.loadMoreThreshold && (v.value = !0, o("load-more")), N.value && s.showAlphabetNav && G.value.length > 0)) {
+      if (_e && (s.enableLoadMore && !s.loading && !v.value && s.hasMore && _e.scrollHeight - _e.scrollTop - _e.clientHeight <= s.loadMoreThreshold && (v.value = !0, o("load-more")), D.value && s.showAlphabetNav && H.value.length > 0)) {
         const He = _e.querySelectorAll("[data-group-key]");
         let ee = "";
-        for (let me = He.length - 1; me >= 0; me--) {
-          const Be = He[me];
+        for (let ve = He.length - 1; ve >= 0; ve--) {
+          const Be = He[ve];
           if (Be.offsetTop <= _e.scrollTop + 4) {
             ee = Be.getAttribute("data-group-key") || "";
             break;
@@ -3608,17 +3608,17 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         !ee && He.length > 0 && (ee = He[0].getAttribute("data-group-key") || ""), b.value = ee;
       }
     }
-    function be() {
+    function ke() {
       v.value = !1;
     }
-    const W = A(null);
+    const j = A(null);
     qt(() => {
       var _e;
-      W.value = g.value ?? null, (_e = W.value) == null || _e.addEventListener("scroll", ve, { passive: !0 });
+      j.value = g.value ?? null, (_e = j.value) == null || _e.addEventListener("scroll", ye, { passive: !0 });
     }), Xn(() => {
-      W.value && W.value.removeEventListener("scroll", ve), i.value.size > 0 && a([]);
+      j.value && j.value.removeEventListener("scroll", ye), i.value.size > 0 && a([]);
     });
-    async function re(_e) {
+    async function ie(_e) {
       await Ye();
       const He = g.value;
       if (!He)
@@ -3626,26 +3626,26 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       const ee = He.querySelector(`[data-group-key="${_e}"]`);
       ee && ee.scrollIntoView({ behavior: "smooth", block: "start" }), o("group-jump", _e);
     }
-    function ue(_e) {
+    function fe(_e) {
       o("click", _e), s.clickBehavior !== "event-only" && o("select", _e);
     }
-    function j(_e, He) {
+    function V(_e, He) {
       o("contextmenu", _e, He);
     }
-    const de = A(!1);
+    const ue = A(!1);
     function se() {
-      de.value = !0;
+      ue.value = !0;
     }
     function Me() {
-      de.value = !1;
+      ue.value = !1;
     }
-    Ql(de, Me);
+    Ql(ue, Me);
     const ge = k(
-      () => G.value.flatMap((_e) => _e.items)
+      () => H.value.flatMap((_e) => _e.items)
     ), { activeIndex: Ie } = ia({
       count: k(() => ge.value.length),
       wrap: !0,
-      active: de,
+      active: ue,
       // 搜索框聚焦时方向键让位给输入光标
       ignoreWhenTyping: !0,
       disabled: (_e) => s.disabledFn ? s.disabledFn(ge.value[_e]) : !1,
@@ -3660,10 +3660,10 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
     aa({
       Enter: () => {
         const _e = ge.value[Ie.value];
-        _e && !(s.disabledFn && s.disabledFn(_e)) && ue(_e);
+        _e && !(s.disabledFn && s.disabledFn(_e)) && fe(_e);
       }
     }, {
-      active: de,
+      active: ue,
       ignoreWhenTyping: !0
     });
     function Ke(_e) {
@@ -3674,31 +3674,31 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       });
     }
     return e({
-      scrollToGroup: re,
-      groupedContacts: G,
-      releaseLoadMoreLock: be
+      scrollToGroup: ie,
+      groupedContacts: H,
+      releaseLoadMoreLock: ke
     }), (_e, He) => (y(), w("div", Sb, [
       s.showHeader ? (y(), w("div", {
         key: 0,
         class: Te(["contact-list__header", `contact-list__header--${s.headerAlign}`])
       }, [
-        V(_e.$slots, "header", {}, () => [
+        G(_e.$slots, "header", {}, () => [
           _("span", Ib, [
             mt(P(s.title || m(c)("contact.title")) + " ", 1),
-            s.showCount ? (y(), w("span", xb, "(" + P(S.value) + ")", 1)) : U("", !0)
+            s.showCount ? (y(), w("span", xb, "(" + P(S.value) + ")", 1)) : F("", !0)
           ])
         ], !0)
-      ], 2)) : U("", !0),
+      ], 2)) : F("", !0),
       _e.$slots.search || s.searchComponent || s.showSearch ? (y(), w("div", Tb, [
-        V(_e.$slots, "search", {
+        G(_e.$slots, "search", {
           keyword: $.value,
           setKeyword: R
         }, () => [
-          s.searchComponent ? (y(), ce(oc(s.searchComponent), {
+          s.searchComponent ? (y(), de(oc(s.searchComponent), {
             key: 0,
             modelValue: $.value,
             "onUpdate:modelValue": He[0] || (He[0] = (ee) => $.value = ee)
-          }, null, 8, ["modelValue"])) : (y(), ce(m(gn), {
+          }, null, 8, ["modelValue"])) : (y(), de(m(gn), {
             key: 1,
             modelValue: $.value,
             "onUpdate:modelValue": He[1] || (He[1] = (ee) => $.value = ee),
@@ -3709,10 +3709,10 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"]))
         ], !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
       _e.$slots.body && s.bodySticky ? (y(), w("div", Eb, [
-        V(_e.$slots, "body", {}, void 0, !0)
-      ])) : U("", !0),
+        G(_e.$slots, "body", {}, void 0, !0)
+      ])) : F("", !0),
       _("div", {
         ref_key: "itemsRef",
         ref: g,
@@ -3723,25 +3723,25 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         onClick: se
       }, [
         _e.$slots.body && !s.bodySticky ? (y(), w("div", Ab, [
-          V(_e.$slots, "body", {}, void 0, !0)
-        ])) : U("", !0),
-        s.loading && m(G).length === 0 ? (y(), w("div", $b, [
-          V(_e.$slots, "loading", {}, () => [
+          G(_e.$slots, "body", {}, void 0, !0)
+        ])) : F("", !0),
+        s.loading && m(H).length === 0 ? (y(), w("div", $b, [
+          G(_e.$slots, "loading", {}, () => [
             _("div", Rb, [
-              (y(), w($e, null, et(8, (ee) => _("div", {
+              (y(), w($e, null, tt(8, (ee) => _("div", {
                 key: ee,
                 class: "contact-list__skeleton-item"
               }, [
-                q(m(es), {
+                W(m(es), {
                   variant: "avatar",
                   shape: "rounded"
                 }),
                 _("div", Nb, [
-                  q(m(es), {
+                  W(m(es), {
                     variant: "text",
                     style: { width: "35%" }
                   }),
-                  q(m(es), {
+                  W(m(es), {
                     variant: "text",
                     style: { width: "65%" }
                   })
@@ -3749,86 +3749,86 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
               ])), 64))
             ])
           ], !0)
-        ])) : m(G).length === 0 ? (y(), w("div", Lb, [
-          V(_e.$slots, "empty", { searchKeyword: M.value }, () => [
-            q(ep, {
+        ])) : m(H).length === 0 ? (y(), w("div", Lb, [
+          G(_e.$slots, "empty", { searchKeyword: M.value }, () => [
+            W(ep, {
               text: s.emptyText || (M.value ? m(c)("contact.noSearchResult") : m(c)("contact.empty"))
             }, null, 8, ["text"])
           ], !0)
         ])) : (y(), w($e, { key: 3 }, [
-          (y(!0), w($e, null, et(m(G), (ee) => (y(), w("div", {
+          (y(!0), w($e, null, tt(m(H), (ee) => (y(), w("div", {
             key: ee.key,
             class: "contact-list__group",
             "data-group-key": ee.key
           }, [
-            s.showGroupHeader && !D.value ? (y(), w("div", Db, [
-              V(_e.$slots, "group-header", { group: ee }, () => [
+            s.showGroupHeader && !L.value ? (y(), w("div", Db, [
+              G(_e.$slots, "group-header", { group: ee }, () => [
                 _("span", null, P(ee.title), 1)
               ], !0)
-            ])) : U("", !0),
-            (y(!0), w($e, null, et(ee.items, (me) => (y(), ce(mc, {
-              key: me.userId,
-              contact: me,
+            ])) : F("", !0),
+            (y(!0), w($e, null, tt(ee.items, (ve) => (y(), de(mc, {
+              key: ve.userId,
+              contact: ve,
               "select-mode": s.selectMode,
-              disabled: s.disabledFn ? s.disabledFn(me) : !1,
+              disabled: s.disabledFn ? s.disabledFn(ve) : !1,
               "show-avatar": s.showAvatar,
               "avatar-size": s.avatarSize,
               "avatar-shape": s.avatarShape,
-              subtitle: s.subtitleFn ? s.subtitleFn(me) : void 0,
-              "online-status": L(me),
+              subtitle: s.subtitleFn ? s.subtitleFn(ve) : void 0,
+              "online-status": O(ve),
               size: s.itemSize,
-              onClick: ue,
-              onContextmenu: j
+              onClick: fe,
+              onContextmenu: V
             }, At({ _: 2 }, [
               _e.$slots.item ? {
                 name: "default",
-                fn: X((Be) => [
-                  V(_e.$slots, "item", ao({ ref_for: !0 }, Be), void 0, !0)
+                fn: J((Be) => [
+                  G(_e.$slots, "item", ao({ ref_for: !0 }, Be), void 0, !0)
                 ]),
                 key: "0"
               } : void 0
             ]), 1032, ["contact", "select-mode", "disabled", "show-avatar", "avatar-size", "avatar-shape", "subtitle", "online-status", "size"]))), 128))
           ], 8, Ob))), 128)),
-          s.loading && m(G).length > 0 ? (y(), w("div", Bb, [
-            V(_e.$slots, "loading-more", {}, () => [
+          s.loading && m(H).length > 0 ? (y(), w("div", Bb, [
+            G(_e.$slots, "loading-more", {}, () => [
               _("span", Pb, P(m(c)("common.loading")), 1)
             ], !0)
-          ])) : U("", !0),
-          !s.loading && !s.hasMore && m(G).length > 0 ? (y(), w("div", zb, [
-            V(_e.$slots, "no-more", {}, () => [
+          ])) : F("", !0),
+          !s.loading && !s.hasMore && m(H).length > 0 ? (y(), w("div", zb, [
+            G(_e.$slots, "no-more", {}, () => [
               _("span", Fb, P(s.noMoreText || m(c)("common.noMore")), 1)
             ], !0)
-          ])) : U("", !0)
+          ])) : F("", !0)
         ], 64)),
         _e.$slots.footer && !s.footerSticky ? (y(), w("div", Ub, [
-          V(_e.$slots, "footer", {}, void 0, !0)
-        ])) : U("", !0)
+          G(_e.$slots, "footer", {}, void 0, !0)
+        ])) : F("", !0)
       ], 544),
       _e.$slots.footer && s.footerSticky ? (y(), w("div", Hb, [
-        V(_e.$slots, "footer", {}, void 0, !0)
-      ])) : U("", !0),
-      N.value && s.showAlphabetNav && m(G).length > 0 ? (y(), ce(pc, {
+        G(_e.$slots, "footer", {}, void 0, !0)
+      ])) : F("", !0),
+      D.value && s.showAlphabetNav && m(H).length > 0 ? (y(), de(pc, {
         key: 4,
-        groups: m(G),
+        groups: m(H),
         "active-key": b.value,
-        onJump: re
-      }, null, 8, ["groups", "active-key"])) : U("", !0),
-      s.showScrollToTop ? (y(), ce(m(ra), {
+        onJump: ie
+      }, null, 8, ["groups", "active-key"])) : F("", !0),
+      s.showScrollToTop ? (y(), de(m(ra), {
         key: 5,
         target: g.value ?? void 0,
         "visibility-height": 200,
         bottom: 12,
         right: 12
-      }, null, 8, ["target"])) : U("", !0),
+      }, null, 8, ["target"])) : F("", !0),
       _e.$slots.watermark ? (y(), w("div", Gb, [
-        V(_e.$slots, "watermark", {}, void 0, !0)
-      ])) : U("", !0)
+        G(_e.$slots, "watermark", {}, void 0, !0)
+      ])) : F("", !0)
     ]));
   }
 }), Ir = /* @__PURE__ */ ze(Vb, [["__scopeId", "data-v-13111fbb"]]), jb = { class: "new-chat-modal__header" }, Kb = { class: "new-chat-modal__title" }, Wb = { class: "new-chat-modal__body" }, qb = {
   key: 0,
   class: "new-chat-modal__error"
-}, Jb = /* @__PURE__ */ Re({
+}, Jb = /* @__PURE__ */ Le({
   __name: "new-chat-modal",
   props: {
     show: { type: Boolean }
@@ -3874,14 +3874,14 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       async (h) => {
         h && (p(), await l());
       }
-    ), (h, g) => (y(), ce(m(Lt), {
+    ), (h, g) => (y(), de(m(Ot), {
       show: t.show,
       position: m(r) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": g[0] || (g[0] = (v) => s("update:show", v)),
       onClose: d
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: Te(["new-chat-modal", { "new-chat-modal--mobile": m(r) }])
         }, [
@@ -3889,7 +3889,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
             _("span", Kb, P(m(o)("conversation.newChat", "新会话")), 1)
           ]),
           _("div", Wb, [
-            q(Ir, {
+            W(Ir, {
               "show-header": !1,
               "show-scroll-to-top": !1,
               "show-alphabet-nav": !1,
@@ -3898,7 +3898,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
               loading: c.value,
               onSelect: f
             }, null, 8, ["loading"]),
-            u.value ? (y(), w("div", qb, P(u.value), 1)) : U("", !0)
+            u.value ? (y(), w("div", qb, P(u.value), 1)) : F("", !0)
           ])
         ], 2)
       ]),
@@ -3926,7 +3926,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
 }, dk = {
   key: 3,
   class: "add-contact-modal__footer"
-}, fk = /* @__PURE__ */ Re({
+}, fk = /* @__PURE__ */ Le({
   __name: "add-contact-modal",
   props: {
     show: { type: Boolean },
@@ -3942,34 +3942,34 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
     function I() {
       u.value = "", d.value = "", p.value = "", $.value = "", f.value = !1, h.value = !1, g.value = [], v.value = !1, b.value = "";
     }
-    async function O() {
-      const N = u.value.trim();
-      if (!(!N || h.value)) {
-        h.value = !0, $.value = "", s("search", N);
+    async function N() {
+      const D = u.value.trim();
+      if (!(!D || h.value)) {
+        h.value = !0, $.value = "", s("search", D);
         try {
-          g.value = t.searchFn ? await t.searchFn(N) : await c(N), v.value = !0;
-        } catch (D) {
-          g.value = [], v.value = !0, $.value = D.message || o("contact.searchFailed", "搜索失败");
+          g.value = t.searchFn ? await t.searchFn(D) : await c(D), v.value = !0;
+        } catch (L) {
+          g.value = [], v.value = !0, $.value = L.message || o("contact.searchFailed", "搜索失败");
         } finally {
           h.value = !1;
         }
       }
     }
-    function E(N) {
-      b.value = N.userId, d.value = N.userId, $.value = "";
+    function E(D) {
+      b.value = D.userId, d.value = D.userId, $.value = "";
     }
-    async function G() {
-      const N = d.value.trim();
-      if (N) {
-        if (N === R.value) {
+    async function H() {
+      const D = d.value.trim();
+      if (D) {
+        if (D === R.value) {
           $.value = o("contact.addSelfError", "不能添加自己为好友");
           return;
         }
         f.value = !0, $.value = "";
         try {
-          t.addFn ? await t.addFn(N, p.value.trim()) : await l(N, p.value.trim()), s("added", N), T();
-        } catch (D) {
-          $.value = D.message || o("contact.addFailed", "添加失败");
+          t.addFn ? await t.addFn(D, p.value.trim()) : await l(D, p.value.trim()), s("added", D), T();
+        } catch (L) {
+          $.value = L.message || o("contact.addFailed", "添加失败");
         } finally {
           f.value = !1;
         }
@@ -3977,45 +3977,45 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
     }
     return Pe(
       () => t.show,
-      (N) => {
-        N && I();
+      (D) => {
+        D && I();
       }
-    ), (N, D) => (y(), ce(m(Lt), {
+    ), (D, L) => (y(), de(m(Ot), {
       show: t.show,
       position: m(r) ? "bottom" : "center",
       "show-close": !0,
-      "onUpdate:show": D[3] || (D[3] = (S) => s("update:show", S)),
+      "onUpdate:show": L[3] || (L[3] = (S) => s("update:show", S)),
       onClose: T
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: Te(["add-contact-modal", { "add-contact-modal--mobile": m(r) }])
         }, [
           _("div", Xb, [
             _("span", Yb, P(m(o)("conversation.addContact", "添加联系人")), 1)
           ]),
-          N.$slots.body ? (y(), w("div", Qb, [
-            V(N.$slots, "body", {}, void 0, !0)
+          D.$slots.body ? (y(), w("div", Qb, [
+            G(D.$slots, "body", {}, void 0, !0)
           ])) : (y(), w("div", Zb, [
             x.value ? (y(), w($e, { key: 0 }, [
               _("div", ek, [
                 _("label", tk, P(m(o)("contact.searchUser", "搜索用户")), 1),
                 _("div", nk, [
-                  q(m(gn), {
+                  W(m(gn), {
                     modelValue: u.value,
-                    "onUpdate:modelValue": D[0] || (D[0] = (S) => u.value = S),
+                    "onUpdate:modelValue": L[0] || (L[0] = (S) => u.value = S),
                     variant: "default",
                     placeholder: m(o)("contact.searchUserPlaceholder", "输入手机号 / 邮箱 / 用户 ID"),
-                    onSubmit: O
+                    onSubmit: N
                   }, null, 8, ["modelValue", "placeholder"]),
-                  q(m(xn), {
+                  W(m(xn), {
                     type: "primary",
                     size: "small",
                     disabled: !u.value.trim(),
                     loading: h.value,
-                    onClick: O
+                    onClick: N
                   }, {
-                    default: X(() => [
+                    default: J(() => [
                       mt(P(m(o)("contact.search", "搜索")), 1)
                     ]),
                     _: 1
@@ -4023,7 +4023,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
                 ])
               ]),
               v.value ? (y(), w("div", sk, [
-                (y(!0), w($e, null, et(g.value, (S) => (y(), ce(m(Tt), {
+                (y(!0), w($e, null, tt(g.value, (S) => (y(), de(m(Tt), {
                   key: S.userId,
                   title: S.name || S.userId,
                   subtitle: S.userId,
@@ -4033,68 +4033,68 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
                   "auto-height": !0,
                   onClick: (C) => E(S)
                 }, {
-                  leading: X(() => [
-                    q(m($t), {
+                  leading: J(() => [
+                    W(m($t), {
                       src: S.avatar,
                       name: S.name,
                       size: 36
                     }, null, 8, ["src", "name"])
                   ]),
-                  trailing: X(() => [
-                    V(N.$slots, "search-result", { item: S }, () => [
-                      b.value === S.userId ? (y(), ce(m(Oe), {
+                  trailing: J(() => [
+                    G(D.$slots, "search-result", { item: S }, () => [
+                      b.value === S.userId ? (y(), de(m(De), {
                         key: 0,
                         name: "check",
                         size: 16,
                         class: "add-contact-modal__result-check"
-                      })) : U("", !0)
+                      })) : F("", !0)
                     ], !0)
                   ]),
                   _: 2
                 }, 1032, ["title", "subtitle", "active", "onClick"]))), 128)),
-                g.value.length === 0 ? (y(), w("div", ok, P($.value || m(o)("contact.searchEmpty", "未找到匹配的用户")), 1)) : U("", !0)
-              ])) : U("", !0)
-            ], 64)) : U("", !0),
+                g.value.length === 0 ? (y(), w("div", ok, P($.value || m(o)("contact.searchEmpty", "未找到匹配的用户")), 1)) : F("", !0)
+              ])) : F("", !0)
+            ], 64)) : F("", !0),
             _("div", rk, [
               _("label", ik, P(m(o)("contact.userId", "用户 ID")), 1),
-              q(m(gn), {
+              W(m(gn), {
                 modelValue: d.value,
-                "onUpdate:modelValue": D[1] || (D[1] = (S) => d.value = S),
+                "onUpdate:modelValue": L[1] || (L[1] = (S) => d.value = S),
                 variant: "default",
                 placeholder: m(o)("contact.addContactPlaceholder", "输入用户 ID"),
-                onSubmit: G
+                onSubmit: H
               }, null, 8, ["modelValue", "placeholder"])
             ]),
             _("div", ak, [
               _("label", lk, P(m(o)("contact.inviteReason", "附言")), 1),
-              q(m(gn), {
+              W(m(gn), {
                 modelValue: p.value,
-                "onUpdate:modelValue": D[2] || (D[2] = (S) => p.value = S),
+                "onUpdate:modelValue": L[2] || (L[2] = (S) => p.value = S),
                 variant: "default",
                 placeholder: m(o)("contact.addContactReasonPlaceholder", "输入验证信息（可选）")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
-            $.value && !(x.value && v.value && g.value.length === 0) ? (y(), w("div", ck, P($.value), 1)) : U("", !0)
+            $.value && !(x.value && v.value && g.value.length === 0) ? (y(), w("div", ck, P($.value), 1)) : F("", !0)
           ])),
-          N.$slots.footer ? (y(), w("div", uk, [
-            V(N.$slots, "footer", {}, void 0, !0)
+          D.$slots.footer ? (y(), w("div", uk, [
+            G(D.$slots, "footer", {}, void 0, !0)
           ])) : (y(), w("div", dk, [
-            q(m(xn), {
+            W(m(xn), {
               type: "default",
               onClick: T
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            q(m(xn), {
+            W(m(xn), {
               type: "primary",
               disabled: !M.value,
               loading: f.value,
-              onClick: G
+              onClick: H
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("button.confirm", "确认")), 1)
               ]),
               _: 1
@@ -4132,7 +4132,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
 }, Ok = {
   key: 4,
   class: "create-group-modal__footer"
-}, Dk = /* @__PURE__ */ Re({
+}, Dk = /* @__PURE__ */ Le({
   __name: "create-group-modal",
   props: {
     show: { type: Boolean },
@@ -4142,73 +4142,73 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
   emits: ["update:show", "created"],
   setup(n, { emit: e }) {
     const t = n, s = e, { t: o } = qe();
-    function r(te, ve) {
-      return o("common.charCount", "{current}/{max}").replace("{current}", String(te)).replace("{max}", String(ve));
+    function r(te, ye) {
+      return o("common.charCount", "{current}/{max}").replace("{current}", String(te)).replace("{max}", String(ye));
     }
-    const { isMobile: i } = Mn(), { stores: a } = at(), { createGroup: l } = sn(), { contactList: c, selectedIds: u, setSelectedIds: d, toggleSelect: p, fetchContacts: f } = Un(), { selectConversation: h } = Cr(), g = A(!1), v = A(""), b = A(""), $ = A(""), R = k(() => a.client.currentUser), M = k(() => t.config.showNameInput === !0), x = k(() => t.config.showDescriptionInput === !0), T = k(() => t.config.autoName !== !1), I = k(() => t.config.showSettings === !0), O = fi({
+    const { isMobile: i } = Mn(), { stores: a } = at(), { createGroup: l } = sn(), { contactList: c, selectedIds: u, setSelectedIds: d, toggleSelect: p, fetchContacts: f } = Un(), { selectConversation: h } = Cr(), g = A(!1), v = A(""), b = A(""), $ = A(""), R = k(() => a.client.currentUser), M = k(() => t.config.showNameInput === !0), x = k(() => t.config.showDescriptionInput === !0), T = k(() => t.config.autoName !== !1), I = k(() => t.config.showSettings === !0), N = fi({
       public: !1,
       joinApprovalRequired: !1,
       allowInvites: !1,
       inviteNeedConfirm: !1,
       maxMembers: ""
     }), E = k(() => {
-      const te = [...u.value], ve = new Map(c.value.map((be) => [be.userId, be]));
-      return te.map((be) => ve.get(be)).filter((be) => !!be && be.userId !== R.value);
-    }), G = k(() => E.value.length), N = k(() => {
+      const te = [...u.value], ye = new Map(c.value.map((ke) => [ke.userId, ke]));
+      return te.map((ke) => ye.get(ke)).filter((ke) => !!ke && ke.userId !== R.value);
+    }), H = k(() => E.value.length), D = k(() => {
       if (t.config.name)
         return t.config.name;
       if (!T.value)
         return "";
-      const te = E.value.slice(0, 3).map((ve) => ve.name || ve.userId);
-      return G.value > 3 && te.push("..."), te.join("、") || o("group.createDefaultName", "群聊");
-    }), D = k(() => b.value.trim() || N.value);
+      const te = E.value.slice(0, 3).map((ye) => ye.name || ye.userId);
+      return H.value > 3 && te.push("..."), te.join("、") || o("group.createDefaultName", "群聊");
+    }), L = k(() => b.value.trim() || D.value);
     function S() {
       s("update:show", !1);
     }
     function C() {
-      g.value = !1, v.value = "", b.value = "", $.value = "", O.public = t.config.public ?? !1, O.joinApprovalRequired = t.config.joinApprovalRequired ?? !1, O.allowInvites = t.config.allowInvites ?? !1, O.inviteNeedConfirm = t.config.inviteNeedConfirm ?? !1, O.maxMembers = t.config.maxMembers ? String(t.config.maxMembers) : "", d([]);
+      g.value = !1, v.value = "", b.value = "", $.value = "", N.public = t.config.public ?? !1, N.joinApprovalRequired = t.config.joinApprovalRequired ?? !1, N.allowInvites = t.config.allowInvites ?? !1, N.inviteNeedConfirm = t.config.inviteNeedConfirm ?? !1, N.maxMembers = t.config.maxMembers ? String(t.config.maxMembers) : "", d([]);
     }
-    function L(te) {
+    function O(te) {
       p(te);
     }
-    async function J() {
-      if (G.value === 0) {
+    async function q() {
+      if (H.value === 0) {
         v.value = o("group.createNeedMember", "请至少选择一位成员");
         return;
       }
-      if (D.value.length > Nt.NAME_MAX_LENGTH) {
-        v.value = o("chat.info.groupNameTooLong").replace("{max}", String(Nt.NAME_MAX_LENGTH));
+      if (L.value.length > Lt.NAME_MAX_LENGTH) {
+        v.value = o("chat.info.groupNameTooLong").replace("{max}", String(Lt.NAME_MAX_LENGTH));
         return;
       }
       const te = $.value.trim() || t.config.description || "";
-      if (te.length > Nt.DESCRIPTION_MAX_LENGTH) {
-        v.value = o("chat.info.groupDescriptionTooLong").replace("{max}", String(Nt.DESCRIPTION_MAX_LENGTH));
+      if (te.length > Lt.DESCRIPTION_MAX_LENGTH) {
+        v.value = o("chat.info.groupDescriptionTooLong").replace("{max}", String(Lt.DESCRIPTION_MAX_LENGTH));
         return;
       }
       g.value = !0, v.value = "";
       try {
-        const ve = E.value.map((ue) => ue.userId), be = {
-          name: D.value,
+        const ye = E.value.map((fe) => fe.userId), ke = {
+          name: L.value,
           description: te,
-          memberIds: ve,
-          public: O.public,
-          joinApprovalRequired: O.joinApprovalRequired,
-          allowInvites: O.allowInvites,
-          inviteNeedConfirm: O.inviteNeedConfirm,
-          maxMembers: O.maxMembers ? Number(O.maxMembers) : void 0
-        }, re = (t.createFn ? await t.createFn(be) : await l(be)).groupId;
+          memberIds: ye,
+          public: N.public,
+          joinApprovalRequired: N.joinApprovalRequired,
+          allowInvites: N.allowInvites,
+          inviteNeedConfirm: N.inviteNeedConfirm,
+          maxMembers: N.maxMembers ? Number(N.maxMembers) : void 0
+        }, ie = (t.createFn ? await t.createFn(ke) : await l(ke)).groupId;
         a.conversation.addConversation({
-          id: re,
-          name: D.value,
+          id: ie,
+          name: L.value,
           type: lt.GROUPCHAT,
           unreadCount: 0,
           lastMessageText: "",
           isPinned: !1,
           isMuted: !1,
           marks: []
-        }), h(re), s("created", re), S();
-      } catch (ve) {
-        v.value = ve.message || o("group.createFailed", "创建群组失败");
+        }), h(ie), s("created", ie), S();
+      } catch (ye) {
+        v.value = ye.message || o("group.createFailed", "创建群组失败");
       } finally {
         g.value = !1;
       }
@@ -4218,14 +4218,14 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
       async (te) => {
         te && (C(), await f());
       }
-    ), (te, ve) => (y(), ce(m(Lt), {
+    ), (te, ye) => (y(), de(m(Ot), {
       show: t.show,
       position: m(i) ? "bottom" : "center",
       "show-close": !0,
-      "onUpdate:show": ve[7] || (ve[7] = (be) => s("update:show", be)),
+      "onUpdate:show": ye[7] || (ye[7] = (ke) => s("update:show", ke)),
       onClose: S
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: Te(["create-group-modal", { "create-group-modal--mobile": m(i) }])
         }, [
@@ -4233,116 +4233,116 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
             _("span", hk, P(m(o)("conversation.createGroup", "创建群组")), 1)
           ]),
           te.$slots.body ? (y(), w("div", mk, [
-            V(te.$slots, "body", {}, void 0, !0)
+            G(te.$slots, "body", {}, void 0, !0)
           ])) : (y(), w("div", gk, [
             _("div", vk, [
-              q(Ir, {
+              W(Ir, {
                 "show-header": !1,
                 "show-scroll-to-top": !1,
                 "show-alphabet-nav": !1,
                 "group-by": "alphabet",
                 "select-mode": "multiple",
-                "disabled-fn": (be) => be.userId === R.value
+                "disabled-fn": (ke) => ke.userId === R.value
               }, null, 8, ["disabled-fn"])
             ]),
             _("div", yk, [
               _("div", bk, [
                 _("span", kk, P(m(o)("group.createSelectedTitle", "已选择的联系人")), 1),
-                _("span", wk, P(m(o)("group.createSelectedPrefix", "已选择")) + " " + P(G.value) + " " + P(m(o)("group.createSelectedUnit", "人")), 1)
+                _("span", wk, P(m(o)("group.createSelectedPrefix", "已选择")) + " " + P(H.value) + " " + P(m(o)("group.createSelectedUnit", "人")), 1)
               ]),
               M.value || x.value ? (y(), w("div", _k, [
                 M.value ? (y(), w("div", Ck, [
                   _("label", Mk, P(m(o)("group.createName", "群名称")), 1),
-                  q(m(gn), {
+                  W(m(gn), {
                     modelValue: b.value,
-                    "onUpdate:modelValue": ve[0] || (ve[0] = (be) => b.value = be),
+                    "onUpdate:modelValue": ye[0] || (ye[0] = (ke) => b.value = ke),
                     variant: "default",
-                    placeholder: N.value || m(o)("group.createNamePlaceholder", "输入群名称"),
-                    maxlength: m(Nt).NAME_MAX_LENGTH
+                    placeholder: D.value || m(o)("group.createNamePlaceholder", "输入群名称"),
+                    maxlength: m(Lt).NAME_MAX_LENGTH
                   }, null, 8, ["modelValue", "placeholder", "maxlength"]),
                   _("div", {
-                    class: Te(["create-group-modal__char-count", { "is-near-limit": b.value.length > m(Nt).NAME_MAX_LENGTH * 0.9 }])
-                  }, P(r(b.value.length, m(Nt).NAME_MAX_LENGTH)), 3)
-                ])) : U("", !0),
+                    class: Te(["create-group-modal__char-count", { "is-near-limit": b.value.length > m(Lt).NAME_MAX_LENGTH * 0.9 }])
+                  }, P(r(b.value.length, m(Lt).NAME_MAX_LENGTH)), 3)
+                ])) : F("", !0),
                 x.value ? (y(), w("div", Sk, [
                   _("label", Ik, P(m(o)("group.createDescription", "群介绍")), 1),
-                  q(m(gn), {
+                  W(m(gn), {
                     modelValue: $.value,
-                    "onUpdate:modelValue": ve[1] || (ve[1] = (be) => $.value = be),
+                    "onUpdate:modelValue": ye[1] || (ye[1] = (ke) => $.value = ke),
                     variant: "default",
                     placeholder: m(o)("group.createDescriptionPlaceholder", "输入群介绍（可选）"),
-                    maxlength: m(Nt).DESCRIPTION_MAX_LENGTH
+                    maxlength: m(Lt).DESCRIPTION_MAX_LENGTH
                   }, null, 8, ["modelValue", "placeholder", "maxlength"]),
                   _("div", {
-                    class: Te(["create-group-modal__char-count", { "is-near-limit": $.value.length > m(Nt).DESCRIPTION_MAX_LENGTH * 0.9 }])
-                  }, P(r($.value.length, m(Nt).DESCRIPTION_MAX_LENGTH)), 3)
-                ])) : U("", !0)
-              ])) : U("", !0),
+                    class: Te(["create-group-modal__char-count", { "is-near-limit": $.value.length > m(Lt).DESCRIPTION_MAX_LENGTH * 0.9 }])
+                  }, P(r($.value.length, m(Lt).DESCRIPTION_MAX_LENGTH)), 3)
+                ])) : F("", !0)
+              ])) : F("", !0),
               I.value ? (y(), w("div", xk, [
                 _("div", Tk, P(m(o)("group.createSettings", "群设置")), 1),
-                q(m(Tt), {
+                W(m(Tt), {
                   size: "compact",
                   border: !1,
-                  onClick: ve[2] || (ve[2] = (be) => O.public = !O.public)
+                  onClick: ye[2] || (ye[2] = (ke) => N.public = !N.public)
                 }, {
-                  default: X(() => [
+                  default: J(() => [
                     mt(P(m(o)("group.createPublic", "公开群")), 1)
                   ]),
-                  trailing: X(() => [
+                  trailing: J(() => [
                     _("span", {
-                      class: Te(["create-group-modal__switch", { "is-on": O.public }])
-                    }, [...ve[8] || (ve[8] = [
+                      class: Te(["create-group-modal__switch", { "is-on": N.public }])
+                    }, [...ye[8] || (ye[8] = [
                       _("i", null, null, -1)
                     ])], 2)
                   ]),
                   _: 1
                 }),
-                q(m(Tt), {
+                W(m(Tt), {
                   size: "compact",
                   border: !1,
-                  onClick: ve[3] || (ve[3] = (be) => O.joinApprovalRequired = !O.joinApprovalRequired)
+                  onClick: ye[3] || (ye[3] = (ke) => N.joinApprovalRequired = !N.joinApprovalRequired)
                 }, {
-                  default: X(() => [
+                  default: J(() => [
                     mt(P(m(o)("group.createApproval", "入群需审批")), 1)
                   ]),
-                  trailing: X(() => [
+                  trailing: J(() => [
                     _("span", {
-                      class: Te(["create-group-modal__switch", { "is-on": O.joinApprovalRequired }])
-                    }, [...ve[9] || (ve[9] = [
+                      class: Te(["create-group-modal__switch", { "is-on": N.joinApprovalRequired }])
+                    }, [...ye[9] || (ye[9] = [
                       _("i", null, null, -1)
                     ])], 2)
                   ]),
                   _: 1
                 }),
-                q(m(Tt), {
+                W(m(Tt), {
                   size: "compact",
                   border: !1,
-                  onClick: ve[4] || (ve[4] = (be) => O.allowInvites = !O.allowInvites)
+                  onClick: ye[4] || (ye[4] = (ke) => N.allowInvites = !N.allowInvites)
                 }, {
-                  default: X(() => [
+                  default: J(() => [
                     mt(P(m(o)("group.createAllowInvites", "允许成员邀请")), 1)
                   ]),
-                  trailing: X(() => [
+                  trailing: J(() => [
                     _("span", {
-                      class: Te(["create-group-modal__switch", { "is-on": O.allowInvites }])
-                    }, [...ve[10] || (ve[10] = [
+                      class: Te(["create-group-modal__switch", { "is-on": N.allowInvites }])
+                    }, [...ye[10] || (ye[10] = [
                       _("i", null, null, -1)
                     ])], 2)
                   ]),
                   _: 1
                 }),
-                q(m(Tt), {
+                W(m(Tt), {
                   size: "compact",
                   border: !1,
-                  onClick: ve[5] || (ve[5] = (be) => O.inviteNeedConfirm = !O.inviteNeedConfirm)
+                  onClick: ye[5] || (ye[5] = (ke) => N.inviteNeedConfirm = !N.inviteNeedConfirm)
                 }, {
-                  default: X(() => [
+                  default: J(() => [
                     mt(P(m(o)("group.createInviteNeedConfirm", "被邀请人需确认")), 1)
                   ]),
-                  trailing: X(() => [
+                  trailing: J(() => [
                     _("span", {
-                      class: Te(["create-group-modal__switch", { "is-on": O.inviteNeedConfirm }])
-                    }, [...ve[11] || (ve[11] = [
+                      class: Te(["create-group-modal__switch", { "is-on": N.inviteNeedConfirm }])
+                    }, [...ye[11] || (ye[11] = [
                       _("i", null, null, -1)
                     ])], 2)
                   ]),
@@ -4350,63 +4350,63 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
                 }),
                 _("div", Ek, [
                   _("label", Ak, P(m(o)("group.createMaxMembers", "最大成员数")), 1),
-                  q(m(gn), {
-                    modelValue: O.maxMembers,
-                    "onUpdate:modelValue": ve[6] || (ve[6] = (be) => O.maxMembers = be),
+                  W(m(gn), {
+                    modelValue: N.maxMembers,
+                    "onUpdate:modelValue": ye[6] || (ye[6] = (ke) => N.maxMembers = ke),
                     type: "number",
                     variant: "default",
                     placeholder: m(o)("group.createMaxMembersPlaceholder", "不填则使用默认上限")
                   }, null, 8, ["modelValue", "placeholder"])
                 ])
-              ])) : U("", !0),
+              ])) : F("", !0),
               _("div", $k, [
-                (y(!0), w($e, null, et(E.value, (be) => (y(), ce(hc, {
-                  key: be.userId,
+                (y(!0), w($e, null, tt(E.value, (ke) => (y(), de(hc, {
+                  key: ke.userId,
                   class: "create-group-modal__selected-item",
-                  contact: be,
+                  contact: ke,
                   size: "normal",
                   "show-checkbox": !1,
                   clickable: !1
                 }, {
-                  extra: X(() => [
+                  extra: J(() => [
                     _("button", {
                       class: "create-group-modal__selected-remove",
-                      onClick: (W) => L(be.userId)
-                    }, [...ve[12] || (ve[12] = [
+                      onClick: (j) => O(ke.userId)
+                    }, [...ye[12] || (ye[12] = [
                       _("span", null, "×", -1)
                     ])], 8, Rk)
                   ]),
                   _: 2
                 }, 1032, ["contact"]))), 128)),
-                G.value === 0 ? (y(), ce(m(Ht), {
+                H.value === 0 ? (y(), de(m(Ht), {
                   key: 0,
                   icon: "person/single",
                   description: m(o)("group.createSelectedEmpty", "请选择联系人"),
                   size: "small"
-                }, null, 8, ["description"])) : U("", !0)
+                }, null, 8, ["description"])) : F("", !0)
               ])
             ])
           ])),
-          v.value ? (y(), w("div", Nk, P(v.value), 1)) : U("", !0),
+          v.value ? (y(), w("div", Nk, P(v.value), 1)) : F("", !0),
           te.$slots.footer ? (y(), w("div", Lk, [
-            V(te.$slots, "footer", {}, void 0, !0)
+            G(te.$slots, "footer", {}, void 0, !0)
           ])) : (y(), w("div", Ok, [
-            q(m(xn), {
+            W(m(xn), {
               type: "default",
               onClick: S
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            q(m(xn), {
+            W(m(xn), {
               type: "primary",
-              disabled: G.value === 0,
+              disabled: H.value === 0,
               loading: g.value,
-              onClick: J
+              onClick: q
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("group.createSubmit", "完成")), 1)
               ]),
               _: 1
@@ -4447,7 +4447,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
 }, Yk = {
   key: 4,
   class: "conversation-list__footer conversation-list__footer--sticky"
-}, Qk = { class: "conversation-list__delete-body" }, Zk = { class: "conversation-list__delete-option" }, ew = /* @__PURE__ */ Re({
+}, Qk = { class: "conversation-list__delete-body" }, Zk = { class: "conversation-list__delete-option" }, ew = /* @__PURE__ */ Le({
   __name: "conversation-list",
   props: {
     showSearch: { type: Boolean, default: !0 },
@@ -4478,19 +4478,37 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
   emits: ["select", "conversation-click", "at-me-click", "custom-action", "update:active-tab", "reconnect", "header-menu-action", "search"],
   setup(n, { emit: e }) {
     const t = n, s = e, { conversationList: o, currentConversation: r, hasMore: i, loadingMore: a, selectConversation: l, pinConversation: c, muteConversation: u, sendChannelAck: d, deleteConversation: p, loadMoreConversations: f, refreshConversations: h, loadDraft: g, clearDraft: v } = Cr(), { stores: b, h5: $, features: R } = at(), { t: M } = qe(), { isMobile: x } = Mn(), T = ro(), I = A(t.activeTab ?? "all");
-    Pe(() => t.activeTab, (F) => {
-      F != null && (I.value = F);
+    Pe(() => t.activeTab, (Z) => {
+      Z != null && (I.value = Z);
     });
-    const O = k(() => I.value), E = k(() => b.conversation.isSyncingConversations), G = k(() => b.message.isSyncingMessages), N = k(() => {
-      const F = b.client.connected, le = b.client.connecting;
-      return !F && !le ? {
+    const N = k(() => I.value), E = k(() => b.conversation.isSyncingConversations), H = k(() => b.message.isSyncingMessages), D = k(() => {
+      switch (b.client.kickCode) {
+        case 206:
+          return M("status.kickedAnotherDevice");
+        case 216:
+          return M("status.kickedPasswordChanged");
+        case 214:
+          return M("status.kickedDeviceLimit");
+        default:
+          return M("status.kickedOffline");
+      }
+    }), L = k(() => {
+      const Z = b.client.connected, ce = b.client.connecting;
+      return b.client.kicked ? {
+        visible: !0,
+        type: "error",
+        loading: !1,
+        title: D.value,
+        description: "",
+        clickable: !1
+      } : !Z && !ce ? {
         visible: !0,
         type: "error",
         loading: !1,
         title: M("status.networkError"),
         description: "",
         clickable: !0
-      } : le ? {
+      } : ce ? {
         visible: !0,
         type: "warning",
         loading: !0,
@@ -4505,7 +4523,7 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         title: M("status.syncingConversations"),
         description: "",
         clickable: !1
-      } : G.value ? {
+      } : H.value ? {
         visible: !0,
         type: "info",
         loading: !0,
@@ -4521,294 +4539,294 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         clickable: !1
       };
     });
-    function D() {
-      N.value.clickable && s("reconnect");
+    function S() {
+      L.value.clickable && s("reconnect");
     }
-    const S = k(() => t.pullRefresh || $.enablePullRefresh.value), C = k(() => t.enablePresence ?? R.enablePresence), L = A(), J = A(""), te = k(() => J.value.trim());
-    Pe(te, (F) => s("search", F));
-    const ve = A(!1), be = A(), W = A(!1), re = A(!1), ue = A(!1), j = A(!1), { isRefreshing: de } = Tf(
-      L,
+    const C = k(() => t.pullRefresh || $.enablePullRefresh.value), O = k(() => t.enablePresence ?? R.enablePresence), q = A(), te = A(""), ye = k(() => te.value.trim());
+    Pe(ye, (Z) => s("search", Z));
+    const ke = A(!1), j = A(), ie = A(!1), fe = A(!1), V = A(!1), ue = A(!1), { isRefreshing: se } = Tf(
+      q,
       {
-        enabled: S,
+        enabled: C,
         onRefresh: async () => {
           await h();
         }
       }
     );
-    function se() {
-      ve.value = !1;
+    function Me() {
+      ke.value = !1;
     }
-    const Me = k(() => t.menuItems ? t.menuItems : [
+    const ge = k(() => t.menuItems ? t.menuItems : [
       { key: "newChat", label: M("conversation.newChat"), icon: "bubble/rect/empty" },
       { key: "addContact", label: M("conversation.addContact"), icon: "person/plus" },
       { key: "createGroup", label: M("conversation.createGroup"), icon: "person/double" }
-    ]), ge = k(() => Me.value.length > 0), Ie = k(
-      () => Me.value.map((F) => ({ name: F.label, icon: F.icon }))
+    ]), Ie = k(() => ge.value.length > 0), Ke = k(
+      () => ge.value.map((Z) => ({ name: Z.label, icon: Z.icon }))
     );
-    function Ke() {
-      x.value ? W.value = !0 : ve.value = !0;
+    function _e() {
+      x.value ? ie.value = !0 : ke.value = !0;
     }
-    function _e(F, le) {
-      const oe = Me.value[le];
-      oe && He(oe);
+    function He(Z, ce) {
+      const re = ge.value[ce];
+      re && ee(re);
     }
-    function He(F) {
-      ve.value = !1, ee(F);
+    function ee(Z) {
+      ke.value = !1, ve(Z);
     }
-    function ee(F) {
-      if (F.handler) {
-        F.handler(F.key);
+    function ve(Z) {
+      if (Z.handler) {
+        Z.handler(Z.key);
         return;
       }
-      F.key === "newChat" ? me() : F.key === "addContact" ? tt() : F.key === "createGroup" ? dt() : s("header-menu-action", F.key);
-    }
-    function me() {
-      re.value = !0;
+      Z.key === "newChat" ? Be() : Z.key === "addContact" ? nt() : Z.key === "createGroup" ? gt() : s("header-menu-action", Z.key);
     }
     function Be() {
-      re.value = !1;
+      fe.value = !0;
     }
-    function tt() {
-      ue.value = !0;
+    function st() {
+      fe.value = !1;
     }
     function nt() {
-      ue.value = !1;
+      V.value = !0;
     }
     function dt() {
-      j.value = !0;
+      V.value = !1;
     }
-    function vt() {
-      j.value = !1;
+    function gt() {
+      ue.value = !0;
     }
-    function kt(F) {
-      const le = [F.id, F.name, F.lastMessageText];
-      if (F.type === lt.SINGLECHAT) {
-        const oe = b.contact.getContact(F.id), we = b.userInfo.getUserInfo(F.id);
-        le.push(oe == null ? void 0 : oe.remark, oe == null ? void 0 : oe.name, we == null ? void 0 : we.nickname);
-      } else if (F.type === lt.GROUPCHAT) {
-        const oe = b.group.getGroupById(F.id);
-        le.push(oe == null ? void 0 : oe.groupName);
+    function kt() {
+      ue.value = !1;
+    }
+    function he(Z) {
+      const ce = [Z.id, Z.name, Z.lastMessageText];
+      if (Z.type === lt.SINGLECHAT) {
+        const re = b.contact.getContact(Z.id), Ee = b.userInfo.getUserInfo(Z.id);
+        ce.push(re == null ? void 0 : re.remark, re == null ? void 0 : re.name, Ee == null ? void 0 : Ee.nickname);
+      } else if (Z.type === lt.GROUPCHAT) {
+        const re = b.group.getGroupById(Z.id);
+        ce.push(re == null ? void 0 : re.groupName);
       }
-      return le.filter((oe) => !!oe);
+      return ce.filter((re) => !!re);
     }
-    const fe = {
+    const Q = {
       all: M("conversation.empty"),
       unread: M("conversation.emptyUnread"),
       atMe: M("conversation.emptyAtMe"),
       single: M("conversation.emptySingle"),
       group: M("conversation.emptyGroup")
     };
-    function Z(F) {
-      F !== O.value && (I.value = F, s("update:active-tab", F));
+    function ae(Z) {
+      Z !== N.value && (I.value = Z, s("update:active-tab", Z));
     }
-    const ie = k(() => {
-      const F = O.value;
-      return F === "all" || !F ? o.value : F === "unread" ? o.value.filter((le) => (le.unreadCount ?? 0) > 0) : F === "atMe" ? o.value.filter((le) => !!b.conversation.atMeMap[le.id]) : F === "single" ? o.value.filter((le) => le.type === lt.SINGLECHAT) : F === "group" ? o.value.filter((le) => le.type === lt.GROUPCHAT) : o.value;
-    }), ke = k(() => {
-      if (!te.value)
-        return ie.value;
-      const F = te.value.toLowerCase();
-      return t.filterFn ? ie.value.filter((le) => t.filterFn(F, le)) : ie.value.filter((le) => kt(le).some((oe) => oe.toLowerCase().includes(F)));
-    }), Q = k(() => te.value ? M("conversation.noSearchResult") : t.emptyText || fe[O.value] || M("conversation.empty")), H = k(
-      () => C.value ? ke.value.filter((F) => F.type === lt.SINGLECHAT).map((F) => F.id) : []
+    const we = k(() => {
+      const Z = N.value;
+      return Z === "all" || !Z ? o.value : Z === "unread" ? o.value.filter((ce) => (ce.unreadCount ?? 0) > 0) : Z === "atMe" ? o.value.filter((ce) => !!b.conversation.atMeMap[ce.id]) : Z === "single" ? o.value.filter((ce) => ce.type === lt.SINGLECHAT) : Z === "group" ? o.value.filter((ce) => ce.type === lt.GROUPCHAT) : o.value;
+    }), X = k(() => {
+      if (!ye.value)
+        return we.value;
+      const Z = ye.value.toLowerCase();
+      return t.filterFn ? we.value.filter((ce) => t.filterFn(Z, ce)) : we.value.filter((ce) => he(ce).some((re) => re.toLowerCase().includes(Z)));
+    }), U = k(() => ye.value ? M("conversation.noSearchResult") : t.emptyText || Q[N.value] || M("conversation.empty")), le = k(
+      () => O.value ? X.value.filter((Z) => Z.type === lt.SINGLECHAT).map((Z) => Z.id) : []
     );
-    T.watch(H), Sy(
-      L,
+    T.watch(le), Sy(
+      q,
       () => {
         i.value && !a.value && f();
       },
       { distance: 50 }
     );
-    function ae(F) {
-      const le = o.value.find((we) => we.id === F), oe = !!b.conversation.atMeMap[F];
-      le && s("conversation-click", F, le), l(F), d(F), g(F), oe && b.conversation.setAtMe(F, !1), le && (s("select", F, le), oe && s("at-me-click", F, le));
+    function K(Z) {
+      const ce = o.value.find((Ee) => Ee.id === Z), re = !!b.conversation.atMeMap[Z];
+      ce && s("conversation-click", Z, ce), l(Z), d(Z), g(Z), re && b.conversation.setAtMe(Z, !1), ce && (s("select", Z, ce), re && s("at-me-click", Z, ce));
     }
-    const K = A(!1), pe = A(!1);
-    function Ne() {
-      K.value = !0;
+    const pe = A(!1), Ne = A(!1);
+    function Ze() {
+      pe.value = !0;
     }
-    function Qe() {
-      K.value = !1, pe.value = !1;
+    function St() {
+      pe.value = !1, Ne.value = !1;
     }
-    Ql(K, Qe);
+    Ql(pe, St);
     const { activeIndex: wt } = ia({
-      count: k(() => ke.value.length),
+      count: k(() => X.value.length),
       wrap: !0,
-      active: K,
+      active: pe,
       // 搜索框聚焦时方向键让位给输入光标
       ignoreWhenTyping: !0,
-      onActiveChange: (F) => {
-        pe.value = !0;
-        const le = ke.value[F];
-        le && (St(le.id), Ye(() => {
-          var oe;
-          return (oe = L.value) == null ? void 0 : oe.focus();
+      onActiveChange: (Z) => {
+        Ne.value = !0;
+        const ce = X.value[Z];
+        ce && (hn(ce.id), Ye(() => {
+          var re;
+          return (re = q.value) == null ? void 0 : re.focus();
         }));
       }
     });
     aa({
       Enter: () => {
-        const F = ke.value[wt.value];
-        F && ae(F.id);
+        const Z = X.value[wt.value];
+        Z && K(Z.id);
       }
     }, {
-      active: K,
+      active: pe,
       ignoreWhenTyping: !0
-    }), Pe(r, (F) => {
-      if (!F)
+    }), Pe(r, (Z) => {
+      if (!Z)
         return;
-      const le = ke.value.findIndex((oe) => oe.id === F.id);
-      le >= 0 && (wt.value = le);
+      const ce = X.value.findIndex((re) => re.id === Z.id);
+      ce >= 0 && (wt.value = ce);
     }, { immediate: !0 });
-    function St(F) {
+    function hn(Z) {
       Ye(() => {
-        var oe;
-        const le = (oe = L.value) == null ? void 0 : oe.querySelector(`[data-conv-id="${F}"]`);
-        le == null || le.scrollIntoView({ block: "nearest" });
+        var re;
+        const ce = (re = q.value) == null ? void 0 : re.querySelector(`[data-conv-id="${Z}"]`);
+        ce == null || ce.scrollIntoView({ block: "nearest" });
       });
     }
-    const on = A(!1), Jt = A(""), Zt = A(!1);
-    function rn(F) {
-      Jt.value = F, Zt.value = !1, on.value = !0;
+    const on = A(!1), Jt = A(""), Xt = A(!1);
+    function be(Z) {
+      Jt.value = Z, Xt.value = !1, on.value = !0;
     }
-    function ye() {
-      Jt.value && (v(Jt.value), p(Jt.value, Zt.value), Jt.value = "");
+    function Re() {
+      Jt.value && (v(Jt.value), p(Jt.value, Xt.value), Jt.value = "");
     }
-    function Ae(F, le) {
-      s("custom-action", F, le);
+    function oe(Z, ce) {
+      s("custom-action", Z, ce);
     }
-    return (F, le) => (y(), w("div", {
+    return (Z, ce) => (y(), w("div", {
       class: Te(["conversation-list", `conversation-list--${t.variant}`])
     }, [
       t.showHeader ? (y(), w("div", {
         key: 0,
         class: Te(["conversation-list__header", `conversation-list__header--${t.headerAlign}`])
       }, [
-        V(F.$slots, "header", {}, () => [
+        G(Z.$slots, "header", {}, () => [
           _("span", Bk, P(t.title || m(M)("conversation.title")), 1)
         ], !0),
         _("div", Pk, [
-          V(F.$slots, "header-menu", {
-            menuItems: Me.value,
-            open: Ke,
-            close: se
+          G(Z.$slots, "header-menu", {
+            menuItems: ge.value,
+            open: _e,
+            close: Me
           }, () => [
-            ge.value ? (y(), w($e, { key: 0 }, [
+            Ie.value ? (y(), w($e, { key: 0 }, [
               _("div", {
                 ref_key: "headerMenuTriggerRef",
-                ref: be,
+                ref: j,
                 class: "conversation-list__menu-trigger",
-                onClick: Ke
+                onClick: _e
               }, [
-                q(m(Oe), {
+                W(m(De), {
                   name: "circle/plus",
                   size: 22
                 })
               ], 512),
-              q(m(Lt), {
-                show: ve.value && !m(x),
-                anchor: be.value ?? void 0,
+              W(m(Ot), {
+                show: ke.value && !m(x),
+                anchor: j.value ?? void 0,
                 placement: "bottom",
                 overlay: !1,
                 "close-on-click-overlay": !0,
                 group: "conversation-header-menu",
-                "onUpdate:show": se,
-                onClose: se
+                "onUpdate:show": Me,
+                onClose: Me
               }, {
-                default: X(() => [
+                default: J(() => [
                   _("div", zk, [
-                    (y(!0), w($e, null, et(Me.value, (oe) => (y(), w("div", {
-                      key: oe.key,
+                    (y(!0), w($e, null, tt(ge.value, (re) => (y(), w("div", {
+                      key: re.key,
                       class: "context-menu__item",
-                      onClick: ft((we) => He(oe), ["stop"])
+                      onClick: ft((Ee) => ee(re), ["stop"])
                     }, [
-                      oe.icon ? (y(), ce(m(Oe), {
+                      re.icon ? (y(), de(m(De), {
                         key: 0,
-                        name: oe.icon,
+                        name: re.icon,
                         size: 18
-                      }, null, 8, ["name"])) : U("", !0),
-                      _("span", null, P(oe.label), 1)
+                      }, null, 8, ["name"])) : F("", !0),
+                      _("span", null, P(re.label), 1)
                     ], 8, Fk))), 128))
                   ])
                 ]),
                 _: 1
               }, 8, ["show", "anchor"])
-            ], 64)) : U("", !0)
+            ], 64)) : F("", !0)
           ], !0)
         ])
-      ], 2)) : U("", !0),
-      q(Zf, {
+      ], 2)) : F("", !0),
+      W(Zf, {
         tabs: t.tabs,
-        "active-tab": O.value,
-        "onUpdate:activeTab": Z
+        "active-tab": N.value,
+        "onUpdate:activeTab": ae
       }, At({ _: 2 }, [
-        F.$slots.tabs ? {
+        Z.$slots.tabs ? {
           name: "default",
-          fn: X((oe) => [
-            V(F.$slots, "tabs", Fe(Ue(oe)), void 0, !0)
+          fn: J((re) => [
+            G(Z.$slots, "tabs", Fe(Ue(re)), void 0, !0)
           ]),
           key: "0"
         } : void 0
       ]), 1032, ["tabs", "active-tab"]),
       t.showSearch ? (y(), w("div", Uk, [
-        q(m(gn), {
-          modelValue: J.value,
-          "onUpdate:modelValue": le[0] || (le[0] = (oe) => J.value = oe),
+        W(m(gn), {
+          modelValue: te.value,
+          "onUpdate:modelValue": ce[0] || (ce[0] = (re) => te.value = re),
           variant: "search",
           clearable: "",
           "clear-icon": "search/xmark",
           placeholder: m(M)("conversation.searchPlaceholder"),
           "prefix-icon": "search"
         }, null, 8, ["modelValue", "placeholder"])
-      ])) : U("", !0),
-      t.showStatusBanner && N.value.visible ? (y(), w("div", Hk, [
-        V(F.$slots, "status-banner", Fe(Ue(N.value)), () => [
-          q(m(Sf), {
-            type: N.value.type,
-            loading: N.value.loading,
-            title: N.value.title,
-            clickable: N.value.clickable,
-            onClick: D
+      ])) : F("", !0),
+      t.showStatusBanner && L.value.visible ? (y(), w("div", Hk, [
+        G(Z.$slots, "status-banner", Fe(Ue(L.value)), () => [
+          W(m(Sf), {
+            type: L.value.type,
+            loading: L.value.loading,
+            title: L.value.title,
+            clickable: L.value.clickable,
+            onClick: S
           }, null, 8, ["type", "loading", "title", "clickable"])
         ], !0)
-      ])) : U("", !0),
-      F.$slots.body && t.bodySticky ? (y(), w("div", Gk, [
-        V(F.$slots, "body", {}, void 0, !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
+      Z.$slots.body && t.bodySticky ? (y(), w("div", Gk, [
+        G(Z.$slots, "body", {}, void 0, !0)
+      ])) : F("", !0),
       _("div", {
         ref_key: "itemsRef",
-        ref: L,
+        ref: q,
         tabindex: "0",
         class: "conversation-list__items",
-        onMouseenter: Ne,
-        onMouseleave: Qe,
-        onClick: Ne
+        onMouseenter: Ze,
+        onMouseleave: St,
+        onClick: Ze
       }, [
-        S.value && m(de) ? (y(), w("div", Vk, P(m(M)("conversation.pullRefresh")), 1)) : U("", !0),
-        F.$slots.body && !t.bodySticky ? (y(), w("div", jk, [
-          V(F.$slots, "body", {}, void 0, !0)
-        ])) : U("", !0),
-        (y(!0), w($e, null, et(ke.value, (oe, we) => {
-          var De;
-          return V(F.$slots, "item", {
-            conversation: oe,
-            active: ((De = m(r)) == null ? void 0 : De.id) === oe.id,
-            keyboardFocus: pe.value && K.value && m(wt) === we,
-            select: () => ae(oe.id),
-            pin: (Ge) => m(c)(oe.id, Ge),
-            mute: (Ge) => m(u)(oe.id, Ge),
-            delete: () => rn(oe.id),
-            read: () => m(d)(oe.id),
-            customAction: (Ge) => Ae(Ge, oe)
+        C.value && m(se) ? (y(), w("div", Vk, P(m(M)("conversation.pullRefresh")), 1)) : F("", !0),
+        Z.$slots.body && !t.bodySticky ? (y(), w("div", jk, [
+          G(Z.$slots, "body", {}, void 0, !0)
+        ])) : F("", !0),
+        (y(!0), w($e, null, tt(X.value, (re, Ee) => {
+          var Ve;
+          return G(Z.$slots, "item", {
+            conversation: re,
+            active: ((Ve = m(r)) == null ? void 0 : Ve.id) === re.id,
+            keyboardFocus: Ne.value && pe.value && m(wt) === Ee,
+            select: () => K(re.id),
+            pin: (Qe) => m(c)(re.id, Qe),
+            mute: (Qe) => m(u)(re.id, Qe),
+            delete: () => be(re.id),
+            read: () => m(d)(re.id),
+            customAction: (Qe) => oe(Qe, re)
           }, () => {
-            var Ge;
+            var Qe;
             return [
-              q(Qf, {
-                "data-conv-id": oe.id,
-                conversation: oe,
+              W(Qf, {
+                "data-conv-id": re.id,
+                conversation: re,
                 class: Te({
-                  "is-active": ((Ge = m(r)) == null ? void 0 : Ge.id) === oe.id,
-                  "is-keyboard-focus": pe.value && K.value && m(wt) === we
+                  "is-active": ((Qe = m(r)) == null ? void 0 : Qe.id) === re.id,
+                  "is-keyboard-focus": Ne.value && pe.value && m(wt) === Ee
                 }),
                 "custom-actions": t.customActions,
                 "time-formatter": t.timeFormatter,
@@ -4818,96 +4836,96 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
                 "badge-placement": t.badgePlacement,
                 "show-avatar": t.showAvatar,
                 "unread-placement": t.unreadPlacement,
-                "has-at-me": !!m(b).conversation.atMeMap[oe.id],
-                "is-typing": oe.type === m(lt).SINGLECHAT && !!m(b).conversation.typingMap[oe.id],
-                onSelect: ae,
+                "has-at-me": !!m(b).conversation.atMeMap[re.id],
+                "is-typing": re.type === m(lt).SINGLECHAT && !!m(b).conversation.typingMap[re.id],
+                onSelect: K,
                 onPin: m(c),
                 onMute: m(u),
-                onDelete: rn,
+                onDelete: be,
                 onRead: m(d),
-                onCustomAction: Ae
+                onCustomAction: oe
               }, At({ _: 2 }, [
-                F.$slots["item-name-suffix"] ? {
+                Z.$slots["item-name-suffix"] ? {
                   name: "name-suffix",
-                  fn: X((it) => [
-                    V(F.$slots, "item-name-suffix", ao({ ref_for: !0 }, it), void 0, !0)
+                  fn: J((Rt) => [
+                    G(Z.$slots, "item-name-suffix", ao({ ref_for: !0 }, Rt), void 0, !0)
                   ]),
                   key: "0"
                 } : void 0
               ]), 1032, ["data-conv-id", "conversation", "class", "custom-actions", "time-formatter", "message-formatter", "show-sender-name", "unread-mode", "badge-placement", "show-avatar", "unread-placement", "has-at-me", "is-typing", "onPin", "onMute", "onRead"])
             ];
-          }, !0, oe.id);
+          }, !0, re.id);
         }), 128)),
-        E.value && !ke.value.length ? (y(), w("div", Kk, [
-          (y(), w($e, null, et(6, (oe) => _("div", {
-            key: oe,
+        E.value && !X.value.length ? (y(), w("div", Kk, [
+          (y(), w($e, null, tt(6, (re) => _("div", {
+            key: re,
             class: "conversation-list__skeleton-item"
           }, [
-            q(m(es), {
+            W(m(es), {
               variant: "avatar",
               shape: "rounded"
             }),
             _("div", Wk, [
-              q(m(es), {
+              W(m(es), {
                 variant: "text",
                 style: { width: "40%" }
               }),
-              q(m(es), {
+              W(m(es), {
                 variant: "text",
                 style: { width: "70%" }
               })
             ])
           ])), 64))
-        ])) : U("", !0),
-        m(a) ? (y(), w("div", qk, P(m(M)("conversation.loadingMore")), 1)) : U("", !0),
-        !ke.value.length && !m(a) && !E.value ? (y(), w("div", Jk, [
-          q(m(Ht), {
+        ])) : F("", !0),
+        m(a) ? (y(), w("div", qk, P(m(M)("conversation.loadingMore")), 1)) : F("", !0),
+        !X.value.length && !m(a) && !E.value ? (y(), w("div", Jk, [
+          W(m(Ht), {
             class: "conversation-list__empty",
-            icon: te.value ? "search" : "list/bullet",
-            description: Q.value
+            icon: ye.value ? "search" : "list/bullet",
+            description: U.value
           }, {
-            description: X(() => [
-              V(F.$slots, "empty", {
-                searchKeyword: te.value,
-                activeTab: O.value
+            description: J(() => [
+              G(Z.$slots, "empty", {
+                searchKeyword: ye.value,
+                activeTab: N.value
               }, () => [
-                mt(P(Q.value), 1)
+                mt(P(U.value), 1)
               ], !0)
             ]),
             _: 3
           }, 8, ["icon", "description"])
-        ])) : U("", !0),
-        F.$slots.footer && !t.footerSticky ? (y(), w("div", Xk, [
-          V(F.$slots, "footer", {}, void 0, !0)
-        ])) : U("", !0)
+        ])) : F("", !0),
+        Z.$slots.footer && !t.footerSticky ? (y(), w("div", Xk, [
+          G(Z.$slots, "footer", {}, void 0, !0)
+        ])) : F("", !0)
       ], 544),
-      F.$slots.footer && t.footerSticky ? (y(), w("div", Yk, [
-        V(F.$slots, "footer", {}, void 0, !0)
-      ])) : U("", !0),
-      t.showScrollToTop ? (y(), ce(m(ra), {
+      Z.$slots.footer && t.footerSticky ? (y(), w("div", Yk, [
+        G(Z.$slots, "footer", {}, void 0, !0)
+      ])) : F("", !0),
+      t.showScrollToTop ? (y(), de(m(ra), {
         key: 5,
-        target: L.value ?? void 0,
+        target: q.value ?? void 0,
         "visibility-height": 200,
         bottom: 12,
         right: 12
-      }, null, 8, ["target"])) : U("", !0),
-      q(m(io), {
+      }, null, 8, ["target"])) : F("", !0),
+      W(m(io), {
         show: on.value,
-        "onUpdate:show": le[2] || (le[2] = (oe) => on.value = oe),
+        "onUpdate:show": ce[2] || (ce[2] = (re) => on.value = re),
         title: m(M)("conversation.delete"),
         "confirm-text": m(M)("button.confirm"),
         "cancel-text": m(M)("button.cancel"),
-        onConfirm: ye
+        onConfirm: Re
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", Qk, [
             _("div", null, P(m(M)("conversation.deleteConfirm")), 1),
             _("label", Zk, [
               Dn(_("input", {
-                "onUpdate:modelValue": le[1] || (le[1] = (oe) => Zt.value = oe),
+                "onUpdate:modelValue": ce[1] || (ce[1] = (re) => Xt.value = re),
                 type: "checkbox"
               }, null, 512), [
-                [Rf, Zt.value]
+                [Rf, Xt.value]
               ]),
               _("span", null, P(m(M)("conversation.deleteWithHistory", "同时删除聊天记录")), 1)
             ])
@@ -4915,45 +4933,45 @@ const vb = { class: "contact-alphabet-nav" }, yb = ["onClick"], bb = /* @__PURE_
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      q(m(br), {
-        show: W.value,
-        "onUpdate:show": le[3] || (le[3] = (oe) => W.value = oe),
-        actions: Ie.value,
-        onSelect: _e
+      W(m(br), {
+        show: ie.value,
+        "onUpdate:show": ce[3] || (ce[3] = (re) => ie.value = re),
+        actions: Ke.value,
+        onSelect: He
       }, null, 8, ["show", "actions"]),
-      V(F.$slots, "new-chat", {
-        show: re.value,
-        open: me,
-        close: Be
+      G(Z.$slots, "new-chat", {
+        show: fe.value,
+        open: Be,
+        close: st
       }, () => [
-        q(tp, {
-          show: re.value,
-          "onUpdate:show": le[4] || (le[4] = (oe) => re.value = oe)
+        W(tp, {
+          show: fe.value,
+          "onUpdate:show": ce[4] || (ce[4] = (re) => fe.value = re)
         }, null, 8, ["show"])
       ], !0),
-      V(F.$slots, "add-contact", {
+      G(Z.$slots, "add-contact", {
+        show: V.value,
+        open: nt,
+        close: dt
+      }, () => [
+        W(np, {
+          show: V.value,
+          "onUpdate:show": ce[5] || (ce[5] = (re) => V.value = re)
+        }, null, 8, ["show"])
+      ], !0),
+      G(Z.$slots, "create-group", {
         show: ue.value,
-        open: tt,
-        close: nt
+        open: gt,
+        close: kt
       }, () => [
-        q(np, {
+        W(sp, {
           show: ue.value,
-          "onUpdate:show": le[5] || (le[5] = (oe) => ue.value = oe)
-        }, null, 8, ["show"])
-      ], !0),
-      V(F.$slots, "create-group", {
-        show: j.value,
-        open: dt,
-        close: vt
-      }, () => [
-        q(sp, {
-          show: j.value,
-          "onUpdate:show": le[6] || (le[6] = (oe) => j.value = oe)
+          "onUpdate:show": ce[6] || (ce[6] = (re) => ue.value = re)
         }, null, 8, ["show"])
       ], !0)
     ], 2));
   }
-}), op = /* @__PURE__ */ ze(ew, [["__scopeId", "data-v-9f66e91d"]]), gi = {
+}), op = /* @__PURE__ */ ze(ew, [["__scopeId", "data-v-21833e5f"]]), gi = {
   image: "[图片]",
   sticker: "[表情]",
   voice: "[语音]",
@@ -4988,7 +5006,7 @@ function rp(n, e) {
   const r = (i = e.ext) == null ? void 0 : i.ease_chat_uikit_user_info;
   return r != null && r.nickname ? r.nickname : r != null && r.remark ? r.remark : t;
 }
-const Pu = Ot("UIKit:UseMessageSend");
+const Pu = Dt("UIKit:UseMessageSend");
 function Fo(n, e, t, s, o) {
   var a, l, c;
   if (!t || n !== lt.GROUPCHAT)
@@ -5144,7 +5162,7 @@ function ip() {
     clearHistoryCursor: Lf
   };
 }
-const uo = Ot("Combine"), Ra = 300, nw = 10;
+const uo = Dt("Combine"), Ra = 300, nw = 10;
 function sw(n) {
   const e = pi(n), {
     isSelf: t,
@@ -5275,28 +5293,28 @@ function fa() {
       s(t("message.forward.tooMany", `最多支持 ${Ra} 条消息`).replace("{max}", String(Ra)), "warning");
       return;
     }
-    if (v.reduce((G, N) => {
-      if (N.type !== Ce.COMBINE)
-        return G;
-      const D = N.body.combineLevel ?? 0;
-      return Math.max(G, D);
+    if (v.reduce((H, D) => {
+      if (D.type !== Ce.COMBINE)
+        return H;
+      const L = D.body.combineLevel ?? 0;
+      return Math.max(H, L);
     }, 0) + 1 > nw) {
       s(t("message.forward.combineLevelExceeded", "聊天记录嵌套层级过高，无法合并转发"), "warning");
       return;
     }
-    const { id: R, type: M } = b, x = M === lt.GROUPCHAT ? b.name || R : t("message.forward.combineTitle", "聊天记录"), T = v.map((G) => {
-      const N = G.type === Ce.NOTICE ? G.body.content : Nf(G, void 0, void 0, void 0, gi);
-      return `${h(G)}: ${N}`;
+    const { id: R, type: M } = b, x = M === lt.GROUPCHAT ? b.name || R : t("message.forward.combineTitle", "聊天记录"), T = v.map((H) => {
+      const D = H.type === Ce.NOTICE ? H.body.content : Nf(H, void 0, void 0, void 0, gi);
+      return `${h(H)}: ${D}`;
     }).join(`
-`), I = t("message.forward.combineCompatible", "[聊天记录]"), O = v.map(sw);
+`), I = t("message.forward.combineCompatible", "[聊天记录]"), N = v.map(sw);
     let E = -1;
     try {
-      E = Math.round(JSON.stringify(O).length / 1024);
+      E = Math.round(JSON.stringify(N).length / 1024);
     } catch {
       E = -2;
     }
     return uo.info("forwardCombineMessages", {
-      items: O.length,
+      items: N.length,
       payloadKB: E
     }), e.message.sendCombine(
       R,
@@ -5304,7 +5322,7 @@ function fa() {
       x,
       T,
       I,
-      O
+      N
     );
   }
   return {
@@ -5422,7 +5440,7 @@ function pa() {
     getQuotePreview: gc
   };
 }
-const Oa = Ot("UIKit:UseChatPlugin"), ap = Symbol("chat-plugin"), lp = Symbol("message-input-plugin");
+const Oa = Dt("UIKit:UseChatPlugin"), ap = Symbol("chat-plugin"), lp = Symbol("message-input-plugin");
 function rw(n) {
   wr(ap, n);
 }
@@ -5452,7 +5470,7 @@ function w2() {
 const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-member-modal__title" }, cw = {
   key: 0,
   class: "invite-member-modal__count"
-}, uw = { class: "invite-member-modal__list" }, dw = { class: "invite-member-modal__footer" }, fw = /* @__PURE__ */ Re({
+}, uw = { class: "invite-member-modal__list" }, dw = { class: "invite-member-modal__footer" }, fw = /* @__PURE__ */ Le({
   __name: "invite-member-modal",
   props: {
     show: { type: Boolean },
@@ -5489,23 +5507,23 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       async (v) => {
         v && (l([]), await c());
       }
-    ), (v, b) => (y(), ce(m(Lt), {
+    ), (v, b) => (y(), de(m(Ot), {
       show: t.show,
       position: m(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": b[0] || (b[0] = ($) => s("update:show", $)),
       onClose: f
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: Te(["invite-member-modal", { "invite-member-modal--mobile": m(i) }])
         }, [
           _("div", aw, [
             _("span", lw, P(m(o)("group.inviteMember.title", "添加成员")), 1),
-            m(a).size > 0 ? (y(), w("span", cw, "(" + P(m(a).size) + ")", 1)) : U("", !0)
+            m(a).size > 0 ? (y(), w("span", cw, "(" + P(m(a).size) + ")", 1)) : F("", !0)
           ]),
           _("div", uw, [
-            q(Ir, {
+            W(Ir, {
               "show-header": !1,
               "show-scroll-to-top": !1,
               "show-alphabet-nav": !1,
@@ -5515,22 +5533,22 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             })
           ]),
           _("div", dw, [
-            q(m(xn), {
+            W(m(xn), {
               type: "default",
               onClick: h
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            q(m(xn), {
+            W(m(xn), {
               type: "primary",
               disabled: m(a).size === 0,
               loading: u.value,
               onClick: g
             }, {
-              default: X(() => [
+              default: J(() => [
                 mt(P(m(o)("group.inviteMember.invite", "邀请")), 1)
               ]),
               _: 1
@@ -5544,7 +5562,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }), cp = /* @__PURE__ */ ze(fw, [["__scopeId", "data-v-f92ae5f3"]]), pw = { class: "quote-card__content" }, hw = { class: "quote-card__sender" }, mw = ["src"], gw = {
   key: 1,
   class: "quote-card__preview"
-}, vw = /* @__PURE__ */ Re({
+}, vw = /* @__PURE__ */ Le({
   __name: "quote-card",
   props: {
     quote: {},
@@ -5592,7 +5610,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, Tw = {
   key: 1,
   class: "text-message__translation-text"
-}, Ew = ["href", "onClick"], Aw = { key: 1 }, $w = /* @__PURE__ */ Re({
+}, Ew = ["href", "onClick"], Aw = { key: 1 }, $w = /* @__PURE__ */ Le({
   __name: "text-message",
   props: {
     message: {}
@@ -5618,46 +5636,46 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     }), f = k(() => {
       if (!d.value)
         return [];
-      const C = t.message.ext, L = C == null ? void 0 : C.em_at_list;
-      return Array.isArray(L) ? L : [];
+      const C = t.message.ext, O = C == null ? void 0 : C.em_at_list;
+      return Array.isArray(O) ? O : [];
     }), h = k(() => {
       const C = t.message.body.content || "";
       if (!C)
         return [];
       if (f.value.length === 0)
         return c.value ? zr(C) : [{ type: "text", value: C }];
-      const J = [];
+      const q = [];
       let te = 0;
-      const ve = /@(\S+)/g;
-      let be = ve.exec(C);
-      for (; be !== null; ) {
-        const W = be.index, re = be[1], ue = be[0];
-        if (W > te) {
-          const j = C.substring(te, W);
-          c.value ? J.push(...zr(j)) : J.push({ type: "text", value: j });
+      const ye = /@(\S+)/g;
+      let ke = ye.exec(C);
+      for (; ke !== null; ) {
+        const j = ke.index, ie = ke[1], fe = ke[0];
+        if (j > te) {
+          const V = C.substring(te, j);
+          c.value ? q.push(...zr(V)) : q.push({ type: "text", value: V });
         }
-        J.push({ type: "mention", value: ue, userId: re }), te = W + ue.length, be = ve.exec(C);
+        q.push({ type: "mention", value: fe, userId: ie }), te = j + fe.length, ke = ye.exec(C);
       }
       if (te < C.length) {
-        const W = C.substring(te);
-        c.value ? J.push(...zr(W)) : J.push({ type: "text", value: W });
+        const j = C.substring(te);
+        c.value ? q.push(...zr(j)) : q.push({ type: "text", value: j });
       }
-      return J;
+      return q;
     }), g = k(() => {
-      var L;
+      var O;
       if (!c.value)
         return null;
-      const C = (L = t.message.translation) == null ? void 0 : L.text;
+      const C = (O = t.message.translation) == null ? void 0 : O.text;
       return C ? zr(C) : null;
     }), v = k(() => {
       var C;
-      return !!((C = g.value) != null && C.some((L) => L.type === "link"));
+      return !!((C = g.value) != null && C.some((O) => O.type === "link"));
     }), b = k(() => t.message.recalled && t.message.isSelf && t.message.originalMsg), $ = k(() => t.message.stream), R = k(() => {
       const C = $.value;
       if (!C)
         return !1;
-      const L = C.customType;
-      return L === void 0 || L === Rv.TEXT;
+      const O = C.customType;
+      return O === void 0 || O === Rv.TEXT;
     }), M = k(() => {
       var C;
       return jv((C = $.value) == null ? void 0 : C.status);
@@ -5667,15 +5685,15 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     }), T = k(() => !!t.message.modifiedInfo && !t.message.recalled), I = k(() => {
       var C;
       return !!((C = t.message.translation) != null && C.text);
-    }), O = k(() => I.value && t.message.showTranslation !== !1), E = k(() => !!t.message.translating), G = k(() => E.value || I.value && O.value);
-    function N() {
+    }), N = k(() => I.value && t.message.showTranslation !== !1), E = k(() => !!t.message.translating), H = k(() => E.value || I.value && N.value);
+    function D() {
       s("reedit", t.message);
     }
-    function D(C, L) {
-      L.preventDefault(), L.stopPropagation();
-      const J = u.value;
-      if (J) {
-        const te = J(C);
+    function L(C, O) {
+      O.preventDefault(), O.stopPropagation();
+      const q = u.value;
+      if (q) {
+        const te = q(C);
         if (te === !1)
           return;
         if (typeof te == "string") {
@@ -5685,17 +5703,17 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       }
       window.open(C, "_blank", "noopener,noreferrer");
     }
-    function S(C, L) {
-      L.preventDefault(), L.stopPropagation();
-      const J = p.value;
-      if (J) {
-        J(C);
+    function S(C, O) {
+      O.preventDefault(), O.stopPropagation();
+      const q = p.value;
+      if (q) {
+        q(C);
         return;
       }
       s("mention-click", C);
     }
-    return (C, L) => {
-      var J;
+    return (C, O) => {
+      var q;
       return y(), w("div", {
         class: Te(["text-message", { "text-message--self": t.message.isSelf }])
       }, [
@@ -5703,8 +5721,8 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           b.value ? (y(), w("button", {
             key: 0,
             class: "text-message__reedit-btn",
-            onClick: ft(N, ["stop"])
-          }, P(m(a)("message.reedit") ?? "重新编辑"), 1)) : U("", !0)
+            onClick: ft(D, ["stop"])
+          }, P(m(a)("message.reedit") ?? "重新编辑"), 1)) : F("", !0)
         ], 64)) : (y(), w($e, { key: 1 }, [
           _("div", {
             class: Te(["text-message__bubble", i.value])
@@ -5712,20 +5730,20 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             _("div", yw, [
               R.value && (M.value || x.value) ? (y(), w($e, { key: 0 }, [
                 _("span", bw, P(t.message.body.content), 1),
-                M.value ? (y(), w("span", kw)) : x.value ? (y(), w("span", ww, P(m(a)("message.stream.error")), 1)) : U("", !0)
+                M.value ? (y(), w("span", kw)) : x.value ? (y(), w("span", ww, P(m(a)("message.stream.error")), 1)) : F("", !0)
               ], 64)) : (y(), w($e, { key: 1 }, [
-                h.value.length > 0 ? (y(!0), w($e, { key: 0 }, et(h.value, (te, ve) => (y(), w($e, { key: ve }, [
+                h.value.length > 0 ? (y(!0), w($e, { key: 0 }, tt(h.value, (te, ye) => (y(), w($e, { key: ye }, [
                   te.type === "link" ? (y(), w("a", {
                     key: 0,
                     class: "text-message__link",
                     href: te.href,
                     target: "_blank",
                     rel: "noopener noreferrer",
-                    onClick: (be) => D(te.href, be)
+                    onClick: (ke) => L(te.href, ke)
                   }, P(te.value), 9, _w)) : te.type === "mention" ? (y(), w("span", {
                     key: 1,
                     class: "text-message__mention",
-                    onClick: (be) => S(te.userId, be)
+                    onClick: (ke) => S(te.userId, ke)
                   }, P(te.value), 9, Cw)) : (y(), w("span", Mw, P(te.value), 1))
                 ], 64))), 128)) : (y(), w($e, { key: 1 }, [
                   mt(P(t.message.body.content), 1)
@@ -5734,33 +5752,33 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
                   key: 2,
                   class: "text-message__edited",
                   title: t.message.modifiedInfo ? `${m(a)("message.edited")} ×${t.message.modifiedInfo.operationCount}` : ""
-                }, P(m(a)("message.edited")), 9, Sw)) : U("", !0)
+                }, P(m(a)("message.edited")), 9, Sw)) : F("", !0)
               ], 64))
             ])
           ], 2),
-          G.value ? (y(), w("div", Iw, [
+          H.value ? (y(), w("div", Iw, [
             E.value ? (y(), w("div", xw, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "loading/arc/normal",
                 size: 14,
                 anim: "spin"
               }),
               _("span", null, P(m(a)("message.translate.loading")), 1)
             ])) : (y(), w("div", Tw, [
-              v.value && g.value ? (y(!0), w($e, { key: 0 }, et(g.value, (te, ve) => (y(), w($e, { key: ve }, [
+              v.value && g.value ? (y(!0), w($e, { key: 0 }, tt(g.value, (te, ye) => (y(), w($e, { key: ye }, [
                 te.type === "link" ? (y(), w("a", {
                   key: 0,
                   class: "text-message__link text-message__link--translation",
                   href: te.href,
                   target: "_blank",
                   rel: "noopener noreferrer",
-                  onClick: (be) => D(te.href, be)
+                  onClick: (ke) => L(te.href, ke)
                 }, P(te.value), 9, Ew)) : (y(), w("span", Aw, P(te.value), 1))
               ], 64))), 128)) : (y(), w($e, { key: 1 }, [
-                mt(P((J = t.message.translation) == null ? void 0 : J.text), 1)
+                mt(P((q = t.message.translation) == null ? void 0 : q.text), 1)
               ], 64))
             ]))
-          ])) : U("", !0)
+          ])) : F("", !0)
         ], 64))
       ], 2);
     };
@@ -5768,7 +5786,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }), up = /* @__PURE__ */ ze($w, [["__scopeId", "data-v-c7b007c0"]]), Rw = ["src"], Nw = {
   key: 1,
   class: "image-message__preview-tip"
-}, Lw = 240, Ow = 240, Gr = 120, Dw = /* @__PURE__ */ Re({
+}, Lw = 240, Ow = 240, Gr = 120, Dw = /* @__PURE__ */ Le({
   __name: "image-message",
   props: {
     message: {}
@@ -5778,13 +5796,13 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       var I;
       return ((I = e.message.ext) == null ? void 0 : I[Zl.IS_STICKER]) === !0;
     }), r = k(() => {
-      const I = e.message.body.width, O = e.message.body.height, E = o.value ? Gr : Lw, G = o.value ? Gr : Ow;
-      if (!I || !O || I <= 0 || O <= 0)
+      const I = e.message.body.width, N = e.message.body.height, E = o.value ? Gr : Lw, H = o.value ? Gr : Ow;
+      if (!I || !N || I <= 0 || N <= 0)
         return o.value ? { width: Gr, height: Gr } : { width: 160, height: 120 };
-      const N = Math.min(E / I, G / O, 1);
+      const D = Math.min(E / I, H / N, 1);
       return {
-        width: Math.round(I * N),
-        height: Math.round(O * N)
+        width: Math.round(I * D),
+        height: Math.round(N * D)
       };
     }), i = k(() => {
       const I = e.message.body;
@@ -5818,7 +5836,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     function T(I) {
       $.value.has(I) || ($.value.add(I), I === 0 && b.value.length > 1 ? v.value = 1 : I === 1 && b.value.length > 1 && (v.value = 0));
     }
-    return (I, O) => (y(), w("div", {
+    return (I, N) => (y(), w("div", {
       class: Te(["image-message", { "image-message--self": e.message.isSelf }])
     }, [
       i.value ? (y(), w("div", {
@@ -5830,7 +5848,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         !d.value && !p.value && !o.value ? (y(), w("div", {
           key: 0,
           class: Te(["image-message__loading", u.value])
-        }, null, 2)) : U("", !0),
+        }, null, 2)) : F("", !0),
         _("img", {
           src: i.value,
           class: Te(["image-message__img", o.value ? "image-message__img--sticker" : u.value]),
@@ -5842,31 +5860,31 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         p.value ? (y(), w("div", {
           key: 1,
           class: Te(["image-message__error", o.value ? "" : u.value])
-        }, P(m(s)("message.image.loadFailed", "[图片加载失败]")), 3)) : U("", !0)
+        }, P(m(s)("message.image.loadFailed", "[图片加载失败]")), 3)) : F("", !0)
       ], 6)) : (y(), w("div", {
         key: 1,
         class: Te(["image-message__placeholder", u.value])
       }, P(m(s)("message.image", "[图片]")), 3)),
-      o.value ? U("", !0) : (y(), ce(m(Cf), {
+      o.value ? F("", !0) : (y(), de(m(Cf), {
         key: 2,
         show: g.value,
-        "onUpdate:show": O[0] || (O[0] = (E) => g.value = E),
+        "onUpdate:show": N[0] || (N[0] = (E) => g.value = E),
         index: v.value,
-        "onUpdate:index": O[1] || (O[1] = (E) => v.value = E),
+        "onUpdate:index": N[1] || (N[1] = (E) => v.value = E),
         srcs: b.value,
         "show-navigator": !1,
         onLoadError: T
       }, {
-        footer: X(({ index: E, loading: G }) => [
-          E === 0 && b.value.length > 1 && !G ? (y(), w("button", {
+        footer: J(({ index: E, loading: H }) => [
+          E === 0 && b.value.length > 1 && !H ? (y(), w("button", {
             key: 0,
             class: "image-message__preview-toggle",
             onClick: M
-          }, P(m(s)("message.image.viewOriginal", "查看原图")), 1)) : E === 1 && G ? (y(), w("div", Nw, P(m(s)("message.image.loadingOriginal", "加载原图中…")), 1)) : E === 1 && !G ? (y(), w("button", {
+          }, P(m(s)("message.image.viewOriginal", "查看原图")), 1)) : E === 1 && H ? (y(), w("div", Nw, P(m(s)("message.image.loadingOriginal", "加载原图中…")), 1)) : E === 1 && !H ? (y(), w("button", {
             key: 2,
             class: "image-message__preview-toggle",
             onClick: x
-          }, P(m(s)("message.image.viewBig", "查看大图")), 1)) : U("", !0)
+          }, P(m(s)("message.image.viewBig", "查看大图")), 1)) : F("", !0)
         ]),
         _: 1
       }, 8, ["show", "index", "srcs"]))
@@ -5884,13 +5902,13 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, Hw = {
   key: 1,
   class: "voice-message__text"
-}, Gw = 72, Vw = 240, jw = 6, Kw = /* @__PURE__ */ Re({
+}, Gw = 72, Vw = 240, jw = 6, Kw = /* @__PURE__ */ Le({
   __name: "voice-message",
   props: {
     message: {}
   },
   setup(n) {
-    const e = Ot("UIKit:VoiceMessage"), t = n, { t: s } = qe(), o = kr(), r = ks(eo.BUBBLE_SHAPE, k(() => {
+    const e = Dt("UIKit:VoiceMessage"), t = n, { t: s } = qe(), o = kr(), r = ks(eo.BUBBLE_SHAPE, k(() => {
     })), i = k(
       () => (r.value ?? o.bubbleShape) === "square" ? "voice-message__bubble--square" : ""
     ), a = k(() => t.message.body), l = k(() => {
@@ -5900,14 +5918,14 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     function p() {
       let T = null, I = "";
       return {
-        play(O, E) {
-          T && T !== O && (T.pause(), T.currentTime = 0), T = O, I = E;
+        play(N, E) {
+          T && T !== N && (T.pause(), T.currentTime = 0), T = N, I = E;
         },
-        stop(O) {
-          I === O && (T = null, I = "");
+        stop(N) {
+          I === N && (T = null, I = "");
         },
-        isPlaying(O) {
-          return I === O && T !== null && !T.paused;
+        isPlaying(N) {
+          return I === N && T !== null && !T.paused;
         }
       };
     }
@@ -5932,8 +5950,8 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         v();
       }), I.play().then(() => {
         h.value = !0, f.play(I, t.message.msgServerId || t.message.msgLocalId);
-      }).catch((O) => {
-        e.warn("[VoiceMessage] play failed:", Je(O)), v();
+      }).catch((N) => {
+        e.warn("[VoiceMessage] play failed:", Je(N)), v();
       });
     }
     Ds(() => {
@@ -5944,7 +5962,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       return !!((T = t.message.voiceText) != null && T.text);
     }), R = k(() => $.value && t.message.showVoiceText !== !1), M = k(() => !!t.message.voiceTranscribing), x = k(() => M.value || $.value && R.value);
     return (T, I) => {
-      var O;
+      var N;
       return y(), w("div", {
         class: Te(["voice-message", { "voice-message--self": t.message.isSelf }])
       }, [
@@ -5958,7 +5976,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               _("span", { class: "voice-message__wave-bar" }, null, -1),
               _("span", { class: "voice-message__wave-bar" }, null, -1),
               _("span", { class: "voice-message__wave-bar" }, null, -1)
-            ])])) : (y(), ce(m(Oe), {
+            ])])) : (y(), de(m(De), {
               key: 1,
               name: "triangle",
               size: 14
@@ -5968,21 +5986,21 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         ], 6),
         x.value ? (y(), w("div", Fw, [
           M.value ? (y(), w("div", Uw, [
-            q(m(Oe), {
+            W(m(De), {
               name: "loading/arc/normal",
               size: 14,
               anim: "spin"
             }),
             _("span", null, P(m(s)("message.voiceToText.loading")), 1)
-          ])) : (y(), w("div", Hw, P((O = t.message.voiceText) == null ? void 0 : O.text), 1))
-        ])) : U("", !0)
+          ])) : (y(), w("div", Hw, P((N = t.message.voiceText) == null ? void 0 : N.text), 1))
+        ])) : F("", !0)
       ], 2);
     };
   }
 }), fp = /* @__PURE__ */ ze(Kw, [["__scopeId", "data-v-a3f8dc5b"]]), Ww = ["src", "poster"], qw = { class: "video-message__overlay" }, Jw = { class: "video-message__play-btn" }, Xw = {
   key: 2,
   class: "video-message__duration"
-}, Yw = ["src"], Qw = ["title"], Hu = 240, Zw = 240, e0 = /* @__PURE__ */ Re({
+}, Yw = ["src"], Qw = ["title"], Hu = 240, Zw = 240, e0 = /* @__PURE__ */ Le({
   __name: "video-message",
   props: {
     message: {}
@@ -6050,14 +6068,14 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         }, P(m(s)("message.video", "[视频]")), 3)),
         _("div", qw, [
           _("div", Jw, [
-            q(m(Oe), {
+            W(m(De), {
               name: "triangle",
               size: 20,
               color: "#fff"
             })
           ])
         ]),
-        a.value.duration ? (y(), w("div", Xw, P(Math.floor(a.value.duration / 60)) + ":" + P(String(a.value.duration % 60).padStart(2, "0")), 1)) : U("", !0)
+        a.value.duration ? (y(), w("div", Xw, P(Math.floor(a.value.duration / 60)) + ":" + P(String(a.value.duration % 60).padStart(2, "0")), 1)) : F("", !0)
       ], 4),
       c.value && a.value.url ? (y(), w("div", {
         key: 0,
@@ -6077,18 +6095,18 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           title: m(s)("message.download.success", "下载"),
           onClick: ft(p, ["stop"])
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "arrow/down_tray",
             size: 20
           })
         ], 8, Qw)
-      ])) : U("", !0)
+      ])) : F("", !0)
     ], 2));
   }
 }), pp = /* @__PURE__ */ ze(e0, [["__scopeId", "data-v-0f8a62ca"]]), t0 = { class: "file-message__bubble" }, n0 = { class: "file-message__info" }, s0 = ["title"], o0 = {
   key: 0,
   class: "file-message__size"
-}, r0 = { class: "file-message__icon" }, i0 = /* @__PURE__ */ Re({
+}, r0 = { class: "file-message__icon" }, i0 = /* @__PURE__ */ Le({
   __name: "file-message",
   props: {
     message: {}
@@ -6133,10 +6151,10 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             class: "file-message__name",
             title: r.value
           }, P(r.value), 9, s0),
-          i.value ? (y(), w("div", o0, P(i.value), 1)) : U("", !0)
+          i.value ? (y(), w("div", o0, P(i.value), 1)) : F("", !0)
         ]),
         _("div", r0, [
-          q(m(Oe), {
+          W(m(De), {
             name: a.value,
             size: 36
           }, null, 8, ["name"])
@@ -6147,7 +6165,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }), hp = /* @__PURE__ */ ze(i0, [["__scopeId", "data-v-ae4df7b2"]]), a0 = { class: "combine-message__header" }, l0 = { class: "combine-message__title" }, c0 = {
   key: 0,
   class: "combine-message__summary"
-}, u0 = /* @__PURE__ */ Re({
+}, u0 = /* @__PURE__ */ Le({
   __name: "combine-message",
   props: {
     message: {},
@@ -6164,7 +6182,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       onClick: l
     }, [
       _("div", a0, [
-        q(m(Oe), {
+        W(m(De), {
           name: "folder",
           size: 16,
           class: "combine-message__icon"
@@ -6172,12 +6190,12 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         _("span", l0, P(i.value), 1)
       ]),
       a.value ? (y(), w("div", c0, [
-        (y(!0), w($e, null, et(a.value.split(`
+        (y(!0), w($e, null, tt(a.value.split(`
 `), (d, p) => (y(), w("p", { key: p }, P(d), 1))), 128))
-      ])) : U("", !0)
+      ])) : F("", !0)
     ], 2));
   }
-}), d0 = /* @__PURE__ */ ze(u0, [["__scopeId", "data-v-d8c8c95f"]]), f0 = { class: "custom-message__bubble" }, p0 = { class: "custom-message__label" }, h0 = /* @__PURE__ */ Re({
+}), d0 = /* @__PURE__ */ ze(u0, [["__scopeId", "data-v-d8c8c95f"]]), f0 = { class: "custom-message__bubble" }, p0 = { class: "custom-message__label" }, h0 = /* @__PURE__ */ Le({
   __name: "custom-message",
   props: {
     message: {}
@@ -6198,7 +6216,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }), mp = /* @__PURE__ */ ze(h0, [["__scopeId", "data-v-7944133c"]]), m0 = { class: "location-message__bubble" }, g0 = { class: "location-message__icon" }, v0 = { class: "location-message__info" }, y0 = ["title"], b0 = {
   key: 0,
   class: "location-message__coordinates"
-}, k0 = /* @__PURE__ */ Re({
+}, k0 = /* @__PURE__ */ Le({
   __name: "location-message",
   props: {
     message: {}
@@ -6220,7 +6238,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     }, [
       _("div", m0, [
         _("div", g0, [
-          q(m(Oe), {
+          W(m(De), {
             name: "loc",
             size: 28
           })
@@ -6230,7 +6248,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             class: "location-message__address",
             title: i.value
           }, P(i.value), 9, y0),
-          a.value ? (y(), w("div", b0, P(a.value), 1)) : U("", !0)
+          a.value ? (y(), w("div", b0, P(a.value), 1)) : F("", !0)
         ])
       ])
     ], 2));
@@ -6250,7 +6268,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, S0 = {
   key: 4,
   class: "message-renderer__footer"
-}, I0 = /* @__PURE__ */ Re({
+}, I0 = /* @__PURE__ */ Le({
   __name: "message-renderer",
   props: {
     message: {}
@@ -6270,13 +6288,13 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       const u = t.message.type;
       return o[u] || null;
     }), i = k(() => `message-${t.message.type}`), a = k(() => `message-footer-${t.message.type}`), l = k(() => t.message.type === Ce.NOTICE), c = k(() => t.message.type === Ce.CMD);
-    return (u, d) => c.value ? U("", !0) : (y(), w("div", w0, [
+    return (u, d) => c.value ? F("", !0) : (y(), w("div", w0, [
       l.value && !u.$slots[i.value] ? (y(), w("div", _0, P(n.message.body.content || n.message.content || ""), 1)) : u.$slots[i.value] ? (y(), w("div", C0, [
-        V(u.$slots, i.value, {
+        G(u.$slots, i.value, {
           message: n.message,
           emitAction: (p, f) => s("custom-message-action", p, f, n.message)
         }, void 0, !0)
-      ])) : r.value ? (y(), ce(oc(r.value), {
+      ])) : r.value ? (y(), de(oc(r.value), {
         key: 2,
         message: n.message,
         "is-self": n.message.isSelf,
@@ -6286,11 +6304,11 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         onLocationClick: d[3] || (d[3] = (p) => s("location-click", p, n.message))
       }, null, 40, ["message", "is-self"])) : (y(), w("div", M0, " [未知消息类型: " + P(n.message.type) + "] ", 1)),
       u.$slots[a.value] ? (y(), w("div", S0, [
-        V(u.$slots, a.value, { message: n.message }, void 0, !0)
-      ])) : U("", !0)
+        G(u.$slots, a.value, { message: n.message }, void 0, !0)
+      ])) : F("", !0)
     ]));
   }
-}), Co = /* @__PURE__ */ ze(I0, [["__scopeId", "data-v-0451abb5"]]), x0 = { class: "combine-message-modal-item__content" }, T0 = { class: "combine-message-modal-item__meta" }, E0 = { class: "combine-message-modal-item__sender" }, A0 = { class: "combine-message-modal-item__time" }, $0 = { class: "combine-message-modal-item__bubble" }, R0 = /* @__PURE__ */ Re({
+}), Co = /* @__PURE__ */ ze(I0, [["__scopeId", "data-v-0451abb5"]]), x0 = { class: "combine-message-modal-item__content" }, T0 = { class: "combine-message-modal-item__meta" }, E0 = { class: "combine-message-modal-item__sender" }, A0 = { class: "combine-message-modal-item__time" }, $0 = { class: "combine-message-modal-item__bubble" }, R0 = /* @__PURE__ */ Le({
   __name: "combine-message-modal-item",
   props: {
     message: {}
@@ -6309,26 +6327,26 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     function l(c) {
       s("view-combine", c);
     }
-    return (c, u) => (y(), ce(m(Tt), {
+    return (c, u) => (y(), de(m(Tt), {
       class: "combine-message-modal-item",
       "auto-height": "",
       clickable: !1
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: i.value,
           src: m(r),
           size: 32
         }, null, 8, ["name", "src"])
       ]),
-      default: X(() => [
+      default: J(() => [
         _("div", x0, [
           _("div", T0, [
             _("span", E0, P(i.value), 1),
             _("span", A0, P(a(t.message.timestamp)), 1)
           ]),
           _("div", $0, [
-            q(Co, {
+            W(Co, {
               message: t.message,
               onViewCombine: l
             }, null, 8, ["message"])
@@ -6347,7 +6365,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, F0 = {
   key: 2,
   class: "combine-message-modal__list"
-}, U0 = /* @__PURE__ */ Re({
+}, U0 = /* @__PURE__ */ Le({
   __name: "combine-message-modal",
   props: {
     show: { type: Boolean },
@@ -6355,7 +6373,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
   },
   emits: ["update:show", "view-combine"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:CombineMessageModal"), s = n, o = e, { t: r } = qe(), { domains: i, stores: a } = at(), l = Of(), c = A(!1), u = A([]), d = A(""), p = k(() => s.message.body), f = k(() => p.value.title || r("message.forward.combineTitle", "聊天记录"));
+    const t = Dt("UIKit:CombineMessageModal"), s = n, o = e, { t: r } = qe(), { domains: i, stores: a } = at(), l = Of(), c = A(!1), u = A([]), d = A(""), p = k(() => s.message.body), f = k(() => p.value.title || r("message.forward.combineTitle", "聊天记录"));
     function h(R) {
       const M = a.client.currentUser || "";
       return wf(R, M);
@@ -6368,9 +6386,9 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       var T, I;
       const R = ((T = s.message) == null ? void 0 : T.msgServerId) || ((I = s.message) == null ? void 0 : I.msgLocalId);
       if (R) {
-        const O = l.getParsedCombineMessages(R);
-        if (O && O.length > 0) {
-          u.value = O;
+        const N = l.getParsedCombineMessages(R);
+        if (N && N.length > 0) {
+          u.value = N;
           return;
         }
       }
@@ -6381,11 +6399,11 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       }
       c.value = !0, d.value = "";
       try {
-        const O = await i.message.downloadAndParseCombineMessage(s.message), G = (Array.isArray(O) ? O : []).map(h);
-        u.value = G, R && G.length > 0 && l.setParsedCombineMessages(R, G);
-      } catch (O) {
-        t.warn("[CombineMessageModal] downloadAndParseCombineMessage failed:", Je(O));
-        const E = O instanceof Error ? O.message : String(O);
+        const N = await i.message.downloadAndParseCombineMessage(s.message), H = (Array.isArray(N) ? N : []).map(h);
+        u.value = H, R && H.length > 0 && l.setParsedCombineMessages(R, H);
+      } catch (N) {
+        t.warn("[CombineMessageModal] downloadAndParseCombineMessage failed:", Je(N));
+        const E = N instanceof Error ? N.message : String(N);
         d.value = r("message.forward.parseFailed", "解析失败") + (E ? `: ${E}` : "");
       } finally {
         c.value = !1;
@@ -6396,7 +6414,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     }
     return Pe(() => s.show, (R) => {
       R && (u.value = [], d.value = "", b());
-    }, { immediate: !0 }), (R, M) => (y(), ce(m(Lt), {
+    }, { immediate: !0 }), (R, M) => (y(), de(m(Ot), {
       show: s.show,
       position: "center",
       "show-close": !0,
@@ -6404,10 +6422,10 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       "onUpdate:show": M[0] || (M[0] = (x) => o("update:show", x)),
       onClose: $
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", L0, [
           _("div", O0, [
-            q(m(Oe), {
+            W(m(De), {
               name: "folder",
               size: 18,
               class: "combine-message-modal__header-icon"
@@ -6416,19 +6434,19 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           ]),
           _("div", B0, [
             c.value ? (y(), w("div", P0, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "loading/arc/big",
                 size: 20,
                 anim: "spin"
               }),
               _("span", null, P(m(r)("message.forward.parsing", "解析中...")), 1)
             ])) : d.value ? (y(), w("div", z0, P(d.value), 1)) : g.value.length > 0 ? (y(), w("div", F0, [
-              (y(!0), w($e, null, et(g.value, (x, T) => (y(), ce(N0, {
+              (y(!0), w($e, null, tt(g.value, (x, T) => (y(), de(N0, {
                 key: x.msgServerId || x.msgLocalId || T,
                 message: x,
                 onViewCombine: v
               }, null, 8, ["message"]))), 128))
-            ])) : (y(), ce(m(Ht), {
+            ])) : (y(), de(m(Ht), {
               key: 3,
               icon: "bubble/rect/empty",
               description: m(r)("message.forward.combineEmpty", "暂无消息"),
@@ -6440,7 +6458,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       _: 1
     }, 8, ["show"]));
   }
-}), H0 = /* @__PURE__ */ ze(U0, [["__scopeId", "data-v-fb75696e"]]), G0 = { class: "message-action-menu" }, V0 = ["onClick"], j0 = /* @__PURE__ */ Re({
+}), H0 = /* @__PURE__ */ ze(U0, [["__scopeId", "data-v-fb75696e"]]), G0 = { class: "message-action-menu" }, V0 = ["onClick"], j0 = /* @__PURE__ */ Le({
   __name: "message-action-menu",
   props: {
     actions: {}
@@ -6452,7 +6470,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       s("select", r);
     }
     return (r, i) => (y(), w("div", G0, [
-      (y(!0), w($e, null, et(t.actions, (a) => (y(), w("div", {
+      (y(!0), w($e, null, tt(t.actions, (a) => (y(), w("div", {
         key: a.type,
         class: Te(["message-action-menu__item", {
           "message-action-menu__item--danger": a.danger,
@@ -6460,17 +6478,17 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         }]),
         onClick: (l) => o(a)
       }, [
-        a.icon ? (y(), ce(m(Oe), {
+        a.icon ? (y(), de(m(De), {
           key: 0,
           name: a.icon,
           size: 16
-        }, null, 8, ["name"])) : U("", !0),
+        }, null, 8, ["name"])) : F("", !0),
         _("span", null, P(a.label), 1)
       ], 10, V0))), 128)),
-      V(r.$slots, "extra", {}, void 0, !0)
+      G(r.$slots, "extra", {}, void 0, !0)
     ]));
   }
-}), vp = /* @__PURE__ */ ze(j0, [["__scopeId", "data-v-999dd151"]]), Gu = 2 * 60 * 1e3, K0 = /* @__PURE__ */ Re({
+}), vp = /* @__PURE__ */ ze(j0, [["__scopeId", "data-v-218b90fd"]]), Gu = 2 * 60 * 1e3, K0 = /* @__PURE__ */ Le({
   __name: "message-interactive",
   props: {
     message: {},
@@ -6479,159 +6497,159 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
   emits: ["action"],
   setup(n, { emit: e }) {
     const t = n, s = e, o = rc(), { t: r } = qe(), { isMobile: i } = Mn(), { show: a } = Wt(), { domains: l, capabilities: c } = at(), u = _r(), d = A(), p = A(), f = A(!1), h = A(!1), g = A(!1), v = k(() => {
-      var ve;
-      const L = ((ve = t.config) == null ? void 0 : ve.recallDisableDuration) ?? Gu, J = Date.now(), te = t.message.timestamp || J;
-      return J - te > L;
+      var ye;
+      const O = ((ye = t.config) == null ? void 0 : ye.recallDisableDuration) ?? Gu, q = Date.now(), te = t.message.timestamp || q;
+      return q - te > O;
     }), b = k(() => {
-      var J;
-      const L = ((J = t.config) == null ? void 0 : J.recallDisableDuration) ?? Gu;
-      return Math.round(L / 60 / 1e3);
+      var q;
+      const O = ((q = t.config) == null ? void 0 : q.recallDisableDuration) ?? Gu;
+      return Math.round(O / 60 / 1e3);
     }), $ = k(() => {
-      var ve;
-      if (((ve = t.config) == null ? void 0 : ve.enableRecallOther) === !1 || t.message.isSelf || t.message.conversationType !== lt.GROUPCHAT || t.message.recalled)
+      var ye;
+      if (((ye = t.config) == null ? void 0 : ye.enableRecallOther) === !1 || t.message.isSelf || t.message.conversationType !== lt.GROUPCHAT || t.message.recalled)
         return !1;
-      const L = t.message.conversationId;
-      if (!L)
+      const O = t.message.conversationId;
+      if (!O)
         return !1;
-      const J = u.getGroupById(L), te = J == null ? void 0 : J.role;
+      const q = u.getGroupById(O), te = q == null ? void 0 : q.role;
       return te === ut.OWNER || te === ut.ADMIN;
     }), R = A(!1);
     qt(() => {
-      const L = t.message.conversationId;
-      t.message.conversationType === lt.GROUPCHAT && L && !u.getGroupById(L) && !R.value && (R.value = !0, l.group.fetchGroupInfo(L).catch(() => {
+      const O = t.message.conversationId;
+      t.message.conversationType === lt.GROUPCHAT && O && !u.getGroupById(O) && !R.value && (R.value = !0, l.group.fetchGroupInfo(O).catch(() => {
       }));
     });
     const M = k(() => {
-      var ve, be, W, re;
-      const L = t.config, J = [], te = (ue, j, de, se, Me, ge) => {
-        J.push({ type: ue, label: j, icon: de, danger: se, disabled: Me, disabledTip: ge });
+      var ye, ke, j, ie;
+      const O = t.config, q = [], te = (fe, V, ue, se, Me, ge) => {
+        q.push({ type: fe, label: V, icon: ue, danger: se, disabled: Me, disabledTip: ge });
       };
-      if ((L == null ? void 0 : L.enableQuote) !== !1 && te("quote", r("message.action.quote") ?? "引用", "arrow/turn_left"), (L == null ? void 0 : L.enableCopy) !== !1 && t.message.type === Ce.TEXT && te("copy", r("message.action.copy") ?? "复制", "rects"), (L == null ? void 0 : L.enableDownload) !== !1 && t.message.type === Ce.FILE && te("download", r("message.action.download") ?? "下载", "arrow/down_tray"), (L == null ? void 0 : L.enableForward) !== !1 && te("forward", r("message.action.forward") ?? "转发", "lines/arrow-right_3bars"), (L == null ? void 0 : L.enableMultiSelect) !== !1 && te("multiSelect", r("message.action.multiSelect") ?? "多选", "items_check"), (L == null ? void 0 : L.enableTranslate) !== !1 && t.message.type === Ce.TEXT) {
-        const ue = !!((ve = t.message.translation) != null && ve.text), j = !!t.message.translating;
-        ue && ((be = t.message.translation) == null ? void 0 : be.to) === Bf(L == null ? void 0 : L.translateTargetLang) && !j ? t.message.showTranslation !== !1 ? te("translate", r("message.action.cancelTranslate") ?? "取消翻译", "rect/hanzinalpha/slash") : te("translate", r("message.action.showTranslation") ?? "显示译文", "rect/hanzinalpha") : te("translate", r("message.action.translate") ?? "翻译", "rect/hanzinalpha", !1, j, r("message.translate.loading") ?? "翻译中…");
+      if ((O == null ? void 0 : O.enableQuote) !== !1 && te("quote", r("message.action.quote") ?? "引用", "arrow/turn_left"), (O == null ? void 0 : O.enableCopy) !== !1 && t.message.type === Ce.TEXT && te("copy", r("message.action.copy") ?? "复制", "rects"), (O == null ? void 0 : O.enableDownload) !== !1 && t.message.type === Ce.FILE && te("download", r("message.action.download") ?? "下载", "arrow/down_tray"), (O == null ? void 0 : O.enableForward) !== !1 && te("forward", r("message.action.forward") ?? "转发", "lines/arrow-right_3bars"), (O == null ? void 0 : O.enableMultiSelect) !== !1 && te("multiSelect", r("message.action.multiSelect") ?? "多选", "items_check"), (O == null ? void 0 : O.enableTranslate) !== !1 && t.message.type === Ce.TEXT) {
+        const fe = !!((ye = t.message.translation) != null && ye.text), V = !!t.message.translating;
+        fe && ((ke = t.message.translation) == null ? void 0 : ke.to) === Bf(O == null ? void 0 : O.translateTargetLang) && !V ? t.message.showTranslation !== !1 ? te("translate", r("message.action.cancelTranslate") ?? "取消翻译", "rect/hanzinalpha/slash") : te("translate", r("message.action.showTranslation") ?? "显示译文", "rect/hanzinalpha") : te("translate", r("message.action.translate") ?? "翻译", "rect/hanzinalpha", !1, V, r("message.translate.loading") ?? "翻译中…");
       }
-      if ((L == null ? void 0 : L.enableVoiceToText) !== !1 && t.message.type === Ce.VOICE && t.message.body.url) {
-        const ue = !!((W = t.message.voiceText) != null && W.text), j = !!t.message.voiceTranscribing;
-        ue && !j ? t.message.showVoiceText !== !1 ? te("voiceToText", r("message.action.hideVoiceText") ?? "收起文字", "rect/hanzi/slash") : te("voiceToText", r("message.action.showVoiceText") ?? "显示文字", "rect/hanzi") : te("voiceToText", r("message.action.voiceToText") ?? "转文字", "rect/hanzi", !1, j, r("message.voiceToText.loading") ?? "转文字中…");
+      if ((O == null ? void 0 : O.enableVoiceToText) !== !1 && t.message.type === Ce.VOICE && t.message.body.url) {
+        const fe = !!((j = t.message.voiceText) != null && j.text), V = !!t.message.voiceTranscribing;
+        fe && !V ? t.message.showVoiceText !== !1 ? te("voiceToText", r("message.action.hideVoiceText") ?? "收起文字", "rect/hanzi/slash") : te("voiceToText", r("message.action.showVoiceText") ?? "显示文字", "rect/hanzi") : te("voiceToText", r("message.action.voiceToText") ?? "转文字", "rect/hanzi", !1, V, r("message.voiceToText.loading") ?? "转文字中…");
       }
-      if (c.pinnedMessage !== !1 && (L == null ? void 0 : L.enablePin) !== !1 && !t.message.recalled && (t.message.pinned ? te("unpin", r("message.action.unpin") ?? "取消置顶", "pin/slash") : te("pin", r("message.action.pin") ?? "置顶", "pin")), (L == null ? void 0 : L.enableRecall) !== !1 && t.message.isSelf && !t.message.recalled) {
-        const ue = v.value, j = b.value;
+      if (c.pinnedMessage !== !1 && (O == null ? void 0 : O.enablePin) !== !1 && !t.message.recalled && (t.message.pinned ? te("unpin", r("message.action.unpin") ?? "取消置顶", "pin/slash") : te("pin", r("message.action.pin") ?? "置顶", "pin")), (O == null ? void 0 : O.enableRecall) !== !1 && t.message.isSelf && !t.message.recalled) {
+        const fe = v.value, V = b.value;
         te(
           "recall",
           r("message.action.recall") ?? "撤回",
           "arrow/lft_uturn",
           !1,
-          ue,
-          r("message.recallExpired").replace("{duration}", String(j)) ?? `超过${j}分钟，无法撤回`
+          fe,
+          r("message.recallExpired").replace("{duration}", String(V)) ?? `超过${V}分钟，无法撤回`
         );
       }
       if ($.value) {
-        const ue = v.value, j = b.value;
+        const fe = v.value, V = b.value;
         te(
           "recallOther",
           r("message.action.recallOther") ?? "撤回",
           "arrow/lft_uturn",
           !1,
-          ue,
-          r("message.recallExpired").replace("{duration}", String(j)) ?? `超过${j}分钟，无法撤回`
+          fe,
+          r("message.recallExpired").replace("{duration}", String(V)) ?? `超过${V}分钟，无法撤回`
         );
       }
-      if ((L == null ? void 0 : L.enableEdit) !== !1 && t.message.isSelf && !t.message.recalled && t.message.type === Ce.TEXT) {
-        const j = (((re = t.message.modifiedInfo) == null ? void 0 : re.operationCount) ?? 0) >= 5;
+      if ((O == null ? void 0 : O.enableEdit) !== !1 && t.message.isSelf && !t.message.recalled && t.message.type === Ce.TEXT) {
+        const V = (((ie = t.message.modifiedInfo) == null ? void 0 : ie.operationCount) ?? 0) >= 5;
         te(
           "edit",
           r("message.action.edit") ?? "编辑",
           "rect/pencil",
           !1,
-          j,
+          V,
           r("message.edit.limitReached") ?? "此消息编辑次数已达上限"
         );
       }
-      return (L == null ? void 0 : L.enableDelete) !== !1 && te("delete", r("message.action.delete") ?? "删除", "trash", !0), J;
+      return (O == null ? void 0 : O.enableDelete) !== !1 && te("delete", r("message.action.delete") ?? "删除", "trash", !0), q;
     }), x = k(
-      () => M.value.map((L) => ({
-        name: L.label,
-        color: L.danger ? "var(--uikit-danger-color)" : void 0,
-        disabled: L.disabled,
-        icon: L.icon
+      () => M.value.map((O) => ({
+        name: O.label,
+        color: O.danger ? "var(--uikit-danger-color)" : void 0,
+        disabled: O.disabled,
+        icon: O.icon
       }))
     ), T = k(
       () => o["message-action-menu"] ? [] : x.value
     );
-    function I(L) {
+    function I(O) {
       if (i.value)
         return;
-      L.preventDefault(), g.value = !0;
-      const J = document.createElement("div");
-      J.style.position = "fixed", J.style.left = `${L.clientX}px`, J.style.top = `${L.clientY}px`, J.style.width = "1px", J.style.height = "1px", document.body.appendChild(J), p.value = J, f.value = !0;
+      O.preventDefault(), g.value = !0;
+      const q = document.createElement("div");
+      q.style.position = "fixed", q.style.left = `${O.clientX}px`, q.style.top = `${O.clientY}px`, q.style.width = "1px", q.style.height = "1px", document.body.appendChild(q), p.value = q, f.value = !0;
     }
-    function O() {
+    function N() {
       E();
     }
     function E() {
       f.value && (f.value = !1, g.value = !1, p.value && (document.body.removeChild(p.value), p.value = void 0));
     }
-    function G() {
+    function H() {
       f.value = !1, h.value = !1, g.value = !1, p.value && (document.body.removeChild(p.value), p.value = void 0);
     }
-    const N = xf(() => {
+    const D = xf(() => {
       i.value && (h.value = !0);
     });
-    function D(L, J) {
-      if (J != null && J.disabled) {
-        const te = J.disabledTip || r("message.action.unavailable", "操作不可用");
+    function L(O, q) {
+      if (q != null && q.disabled) {
+        const te = q.disabledTip || r("message.action.unavailable", "操作不可用");
         a(te, "warning");
         return;
       }
-      G(), s("action", { action: L, message: t.message });
+      H(), s("action", { action: O, message: t.message });
     }
-    function S(L) {
-      D(L.type, L);
+    function S(O) {
+      L(O.type, O);
     }
-    function C(L, J) {
-      const te = M.value[J];
-      te && D(te.type, te);
+    function C(O, q) {
+      const te = M.value[q];
+      te && L(te.type, te);
     }
-    return (L, J) => (y(), w($e, null, [
+    return (O, q) => (y(), w($e, null, [
       _("div", {
         ref_key: "triggerRef",
         ref: d,
         class: Te(["message-interactive", { "message-interactive--active": g.value }]),
         onContextmenu: I,
-        onTouchstart: J[0] || (J[0] = //@ts-ignore
-        (...te) => m(N).start && m(N).start(...te)),
-        onTouchmove: J[1] || (J[1] = //@ts-ignore
-        (...te) => m(N).move && m(N).move(...te)),
-        onTouchend: J[2] || (J[2] = //@ts-ignore
-        (...te) => m(N).end && m(N).end(...te)),
-        onTouchcancel: J[3] || (J[3] = //@ts-ignore
-        (...te) => m(N).cancel && m(N).cancel(...te))
+        onTouchstart: q[0] || (q[0] = //@ts-ignore
+        (...te) => m(D).start && m(D).start(...te)),
+        onTouchmove: q[1] || (q[1] = //@ts-ignore
+        (...te) => m(D).move && m(D).move(...te)),
+        onTouchend: q[2] || (q[2] = //@ts-ignore
+        (...te) => m(D).end && m(D).end(...te)),
+        onTouchcancel: q[3] || (q[3] = //@ts-ignore
+        (...te) => m(D).cancel && m(D).cancel(...te))
       }, [
-        V(L.$slots, "default", {}, void 0, !0)
+        G(O.$slots, "default", {}, void 0, !0)
       ], 34),
-      q(m(Lt), {
+      W(m(Ot), {
         show: f.value,
         anchor: p.value,
         placement: "bottom",
         overlay: !1,
         "close-on-click-overlay": !0,
         group: "message-action",
-        "onUpdate:show": O,
-        onClose: O
+        "onUpdate:show": N,
+        onClose: N
       }, {
-        default: X(() => [
-          V(L.$slots, "message-action-menu", {
+        default: J(() => [
+          G(O.$slots, "message-action-menu", {
             message: t.message,
             actions: M.value,
-            select: D,
-            close: G
+            select: L,
+            close: H
           }, () => [
-            q(vp, {
+            W(vp, {
               actions: M.value,
               onSelect: S
             }, {
-              extra: X(() => [
-                V(L.$slots, "message-action-extra", {
+              extra: J(() => [
+                G(O.$slots, "message-action-extra", {
                   message: t.message
                 }, void 0, !0)
               ]),
@@ -6641,20 +6659,20 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         ]),
         _: 3
       }, 8, ["show", "anchor"]),
-      q(m(br), {
+      W(m(br), {
         show: h.value,
         actions: T.value,
-        "onUpdate:show": J[4] || (J[4] = (te) => h.value = te),
+        "onUpdate:show": q[4] || (q[4] = (te) => h.value = te),
         onSelect: C
       }, {
-        default: X(() => [
-          V(L.$slots, "message-action-menu", {
+        default: J(() => [
+          G(O.$slots, "message-action-menu", {
             message: t.message,
             actions: M.value,
-            select: D,
-            close: G
+            select: L,
+            close: H
           }, () => [
-            V(L.$slots, "message-action-extra", {
+            G(O.$slots, "message-action-extra", {
               message: t.message
             }, void 0, !0)
           ], !0)
@@ -6684,7 +6702,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, a_ = ["title"], l_ = {
   key: 3,
   class: "message-bubble-wrapper__time"
-}, Vu = "ringarrow/cw", c_ = /* @__PURE__ */ Re({
+}, Vu = "ringarrow/cw", c_ = /* @__PURE__ */ Le({
   __name: "message-bubble-wrapper",
   props: {
     message: {},
@@ -6721,27 +6739,27 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     }), I = k(() => {
       var pe, Ne;
       return ((pe = t.config) == null ? void 0 : pe.showAvatar) ?? !0 ? h.value ? ((Ne = t.config) == null ? void 0 : Ne.showSelfAvatar) ?? !0 : !0 : !1;
-    }), O = k(() => {
+    }), N = k(() => {
       var K;
       return ((K = t.config) == null ? void 0 : K.showTime) ?? !1;
-    }), E = k(() => T.value === "conversation" && h.value), G = k(() => {
+    }), E = k(() => T.value === "conversation" && h.value), H = k(() => {
       var K;
       return ((K = t.config) == null ? void 0 : K.avatarSize) ?? 36;
-    }), N = k(() => {
+    }), D = k(() => {
       var K;
       return (K = t.config) == null ? void 0 : K.bubbleShape;
     });
-    wr(eo.BUBBLE_SHAPE, N);
-    const D = k(() => {
+    wr(eo.BUBBLE_SHAPE, D);
+    const L = k(() => {
       const K = new Date(t.message.timestamp), pe = String(K.getHours()).padStart(2, "0"), Ne = String(K.getMinutes()).padStart(2, "0");
       return `${pe}:${Ne}`;
-    }), S = k(() => O.value !== !1), C = k(() => t.message.status), L = k(() => {
+    }), S = k(() => N.value !== !1), C = k(() => t.message.status), O = k(() => {
       var K;
       return !h.value || t.message.conversationType !== lt.GROUPCHAT || C.value === xt.FAILED ? !1 : t.message.requireGroupAck || (t.message.groupReadCount ?? 0) > 0 ? !0 : u.groupReadReceipt !== !1 && ((K = t.groupReadReceiptConfig) == null ? void 0 : K.enabled) === !0;
-    }), J = k(() => L.value), te = k(() => h.value && !L.value), ve = k(() => {
+    }), q = k(() => O.value), te = k(() => h.value && !O.value), ye = k(() => {
       var K;
       return ((K = t.config) == null ? void 0 : K.messageStatus) || {};
-    }), be = {
+    }), ke = {
       // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
       [xt.SENDING]: "loading/arc/normal",
       [xt.SENT]: "circle/empty",
@@ -6749,26 +6767,26 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       [xt.READ]: "circle/checked",
       // 发送失败：圆圈内感叹号提示可点击重发
       [xt.FAILED]: "circle/bang"
-    }, W = {
+    }, j = {
       [xt.SENDING]: "loading/arc/normal",
       [xt.SENT]: "circle/empty",
       [xt.DELIVERED]: "circle/empty",
       [xt.READ]: "circle/checked",
       [xt.FAILED]: "circle/bang"
-    }, re = k(() => {
-      const K = ve.value.iconMap;
-      return K != null && K[C.value] ? K[C.value] : (ve.value.style === "capsule" ? W : be)[C.value];
-    }), ue = k(() => {
-      const K = ve.value.textMap;
+    }, ie = k(() => {
+      const K = ye.value.iconMap;
+      return K != null && K[C.value] ? K[C.value] : (ye.value.style === "capsule" ? j : ke)[C.value];
+    }), fe = k(() => {
+      const K = ye.value.textMap;
       return (K == null ? void 0 : K[C.value]) ?? l(`message.status.${C.value}`) ?? C.value;
-    }), j = k(() => ve.value.showText ?? !1), de = k(() => ve.value.direction ?? "horizontal"), se = k(() => ve.value.position ?? "below"), Me = A(), ge = A(), Ie = A(!1);
+    }), V = k(() => ye.value.showText ?? !1), ue = k(() => ye.value.direction ?? "horizontal"), se = k(() => ye.value.position ?? "below"), Me = A(), ge = A(), Ie = A(!1);
     function Ke() {
       const K = Me.value, pe = ge.value;
       !K || !pe || (Ie.value = K.clientHeight > pe.clientHeight + 8);
     }
     let _e = null;
     qt(() => {
-      (se.value === "inline" || J.value) && (Ke(), Me.value && typeof ResizeObserver < "u" && (_e = new ResizeObserver(Ke), _e.observe(Me.value)));
+      (se.value === "inline" || q.value) && (Ke(), Me.value && typeof ResizeObserver < "u" && (_e = new ResizeObserver(Ke), _e.observe(Me.value)));
     });
     function He() {
       C.value === xt.FAILED && s("resend", t.message);
@@ -6776,10 +6794,10 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     const ee = k(() => {
       var K;
       return t.message.groupMemberCount || ((K = R.getGroupById(t.message.to || t.message.conversationId)) == null ? void 0 : K.memberCount) || 0;
-    }), me = k(() => t.message.groupReadCount || 0), Be = k(
-      () => ee.value > 0 ? ee.value - me.value : 0
-    ), tt = k(
-      () => ee.value > 0 && me.value >= ee.value
+    }), ve = k(() => t.message.groupReadCount || 0), Be = k(
+      () => ee.value > 0 ? ee.value - ve.value : 0
+    ), st = k(
+      () => ee.value > 0 && ve.value >= ee.value
     );
     function nt() {
       t.message.conversationType === lt.GROUPCHAT && s("group-read-click", t.message.msgServerId, t.message.to || t.message.conversationId);
@@ -6794,40 +6812,40 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         msgThumbUrl: String(pe.msgThumbUrl || "")
       };
     });
-    function vt() {
+    function gt() {
       var K;
       (K = dt.value) != null && K.msgID && x(dt.value.msgID);
     }
     const kt = k(() => {
       const K = M.value;
       return K ? K === t.message.msgServerId || K === t.message.msgLocalId : !1;
-    }), fe = A(!1), Z = A(), ie = k(() => t.message.conversationType === lt.GROUPCHAT);
-    function ke(K) {
+    }), he = A(!1), Q = A(), ae = k(() => t.message.conversationType === lt.GROUPCHAT);
+    function we(K) {
       var Ne;
-      K.preventDefault(), K.stopPropagation(), (Ne = Z.value) != null && Ne.parentNode && Z.value.parentNode.removeChild(Z.value);
+      K.preventDefault(), K.stopPropagation(), (Ne = Q.value) != null && Ne.parentNode && Q.value.parentNode.removeChild(Q.value);
       const pe = document.createElement("div");
-      pe.style.position = "fixed", pe.style.left = `${K.clientX}px`, pe.style.top = `${K.clientY}px`, pe.style.width = "1px", pe.style.height = "1px", pe.style.pointerEvents = "none", document.body.appendChild(pe), Z.value = pe, fe.value = !0;
+      pe.style.position = "fixed", pe.style.left = `${K.clientX}px`, pe.style.top = `${K.clientY}px`, pe.style.width = "1px", pe.style.height = "1px", pe.style.pointerEvents = "none", document.body.appendChild(pe), Q.value = pe, he.value = !0;
     }
-    function Q() {
-      fe.value = !1, Ye(() => {
+    function X() {
+      he.value = !1, Ye(() => {
         var K;
-        (K = Z.value) != null && K.parentNode && Z.value.parentNode.removeChild(Z.value), Z.value = void 0;
+        (K = Q.value) != null && K.parentNode && Q.value.parentNode.removeChild(Q.value), Q.value = void 0;
       });
     }
-    function H() {
-      Q(), s("avatar-view-profile", t.message.from);
+    function U() {
+      X(), s("avatar-view-profile", t.message.from);
     }
-    function ae() {
-      Q(), s("avatar-mention", { userId: t.message.from, name: d.value || t.message.from });
+    function le() {
+      X(), s("avatar-mention", { userId: t.message.from, name: d.value || t.message.from });
     }
     return Xn(() => {
       var K;
-      _e == null || _e.disconnect(), (K = Z.value) != null && K.parentNode && Z.value.parentNode.removeChild(Z.value);
+      _e == null || _e.disconnect(), (K = Q.value) != null && K.parentNode && Q.value.parentNode.removeChild(Q.value);
     }), (K, pe) => (y(), w("div", {
       class: Te(["message-bubble-wrapper", {
         "message-bubble-wrapper--self": E.value,
         "message-bubble-wrapper--left": T.value === "left",
-        "message-bubble-wrapper--hover-time": O.value === "hover",
+        "message-bubble-wrapper--hover-time": N.value === "hover",
         "message-bubble-wrapper--selected": t.isSelected,
         "message-bubble-wrapper--recalled": b.value,
         "message-bubble-wrapper--highlight": kt.value
@@ -6836,32 +6854,32 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       onClick: pe[13] || (pe[13] = (Ne) => t.isMultiSelectMode && s("toggle-select", t.message.msgServerId || t.message.msgLocalId))
     }, [
       v.value ? (y(), w($e, { key: 0 }, [
-        K.$slots["message-notice"] ? (y(), ce(Co, {
+        K.$slots["message-notice"] ? (y(), de(Co, {
           key: 0,
           message: n.message
         }, At({ _: 2 }, [
-          et(K.$slots, (Ne, Qe) => ({
-            name: Qe,
-            fn: X((wt) => [
-              V(K.$slots, Qe, Fe(Ue(wt)), void 0, !0)
+          tt(K.$slots, (Ne, Ze) => ({
+            name: Ze,
+            fn: J((St) => [
+              G(K.$slots, Ze, Fe(Ue(St)), void 0, !0)
             ])
           }))
         ]), 1032, ["message"])) : (y(), w("div", q0, P(n.message.body.content || n.message.content || ""), 1))
       ], 64)) : b.value ? (y(), w("div", J0, [
         _("span", X0, P($.value), 1),
-        n.message.type === m(Ce).TEXT && h.value && n.message.originalMsg ? (y(), ce(Co, {
+        n.message.type === m(Ce).TEXT && h.value && n.message.originalMsg ? (y(), de(Co, {
           key: 0,
           message: n.message,
           onReedit: pe[0] || (pe[0] = (Ne) => s("reedit", Ne))
-        }, null, 8, ["message"])) : U("", !0)
+        }, null, 8, ["message"])) : F("", !0)
       ])) : (y(), w($e, { key: 2 }, [
         t.isMultiSelectMode ? (y(), w("div", Y0, [
-          q(m(Oe), {
+          W(m(De), {
             name: t.isSelected ? "circle/checked" : "circle/empty",
             size: 18,
             class: Te(["message-bubble-wrapper__check-icon", { "message-bubble-wrapper__check-icon--checked": t.isSelected }])
           }, null, 8, ["name", "class"])
-        ])) : U("", !0),
+        ])) : F("", !0),
         _("div", {
           class: Te(["message-bubble-wrapper__main", {
             "message-bubble-wrapper__main--self": E.value,
@@ -6871,120 +6889,120 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           I.value ? (y(), w("div", {
             key: 0,
             class: "message-bubble-wrapper__avatar",
-            onContextmenu: ft(ke, ["stop"])
+            onContextmenu: ft(we, ["stop"])
           }, [
-            V(K.$slots, "avatar", { message: n.message }, () => [
-              q(m($t), {
+            G(K.$slots, "avatar", { message: n.message }, () => [
+              W(m($t), {
                 name: m(d),
                 src: m(p),
-                size: G.value,
+                size: H.value,
                 presence: g.value
               }, null, 8, ["name", "src", "size", "presence"])
             ], !0)
-          ], 32)) : U("", !0),
+          ], 32)) : F("", !0),
           _("div", Q0, [
-            h.value ? U("", !0) : (y(), w("div", Z0, [
-              V(K.$slots, "nickname", { message: n.message }, () => [
+            h.value ? F("", !0) : (y(), w("div", Z0, [
+              G(K.$slots, "nickname", { message: n.message }, () => [
                 mt(P(m(d)), 1)
               ], !0)
             ])),
-            se.value === "below" && !J.value ? (y(), w($e, { key: 1 }, [
+            se.value === "below" && !q.value ? (y(), w($e, { key: 1 }, [
               _("div", e_, [
                 n.message.pinned ? (y(), w("div", {
                   key: 0,
                   class: "message-bubble-wrapper__pin-badge",
                   title: m(l)("message.action.pin")
                 }, [
-                  q(m(Oe), {
+                  W(m(De), {
                     name: "pin",
                     size: 12
                   }),
                   _("span", null, P(m(l)("message.action.pin")), 1)
-                ], 8, t_)) : U("", !0),
-                q(ul, {
+                ], 8, t_)) : F("", !0),
+                W(ul, {
                   message: n.message,
                   config: n.actionConfig,
                   onAction: pe[5] || (pe[5] = (Ne) => s("action", Ne))
                 }, {
-                  "message-action-menu": X((Ne) => [
-                    V(K.$slots, "message-action-menu", Fe(Ue(Ne)), void 0, !0)
+                  "message-action-menu": J((Ne) => [
+                    G(K.$slots, "message-action-menu", Fe(Ue(Ne)), void 0, !0)
                   ]),
-                  "message-action-extra": X((Ne) => [
-                    V(K.$slots, "message-action-extra", Fe(Ue(Ne)), void 0, !0)
+                  "message-action-extra": J((Ne) => [
+                    G(K.$slots, "message-action-extra", Fe(Ue(Ne)), void 0, !0)
                   ]),
-                  default: X(() => [
-                    q(Co, {
+                  default: J(() => [
+                    W(Co, {
                       message: n.message,
                       onReedit: pe[1] || (pe[1] = (Ne) => s("reedit", Ne)),
                       onViewCombine: a,
                       onMentionClick: pe[2] || (pe[2] = (Ne) => s("mention-click", Ne)),
                       onLocationClick: pe[3] || (pe[3] = (Ne) => s("location-click", Ne, n.message)),
-                      onCustomMessageAction: pe[4] || (pe[4] = (Ne, Qe) => s("custom-message-action", Ne, Qe, n.message))
+                      onCustomMessageAction: pe[4] || (pe[4] = (Ne, Ze) => s("custom-message-action", Ne, Ze, n.message))
                     }, At({ _: 2 }, [
-                      et(K.$slots, (Ne, Qe) => ({
-                        name: Qe,
-                        fn: X((wt) => [
-                          V(K.$slots, Qe, Fe(Ue(wt)), void 0, !0)
+                      tt(K.$slots, (Ne, Ze) => ({
+                        name: Ze,
+                        fn: J((St) => [
+                          G(K.$slots, Ze, Fe(Ue(St)), void 0, !0)
                         ])
                       }))
                     ]), 1032, ["message"])
                   ]),
                   _: 3
                 }, 8, ["message", "config"]),
-                dt.value ? (y(), ce(Uu, {
+                dt.value ? (y(), de(Uu, {
                   key: 1,
                   quote: dt.value,
                   "align-right": E.value,
-                  onClick: vt
-                }, null, 8, ["quote", "align-right"])) : U("", !0)
+                  onClick: gt
+                }, null, 8, ["quote", "align-right"])) : F("", !0)
               ]),
               te.value ? (y(), w("div", {
                 key: 0,
                 class: Te(["message-bubble-wrapper__status", {
-                  "message-bubble-wrapper__status--vertical": de.value === "vertical"
+                  "message-bubble-wrapper__status--vertical": ue.value === "vertical"
                 }])
               }, [
-                V(K.$slots, "message-status", {
+                G(K.$slots, "message-status", {
                   status: C.value,
                   message: n.message,
-                  text: ue.value,
-                  icon: re.value
+                  text: fe.value,
+                  icon: ie.value
                 }, () => [
                   _("span", {
                     class: Te(["message-bubble-wrapper__status-item", {
                       "message-bubble-wrapper__status-item--failed": C.value === m(xt).FAILED
                     }]),
-                    title: ue.value,
+                    title: fe.value,
                     onClick: ft(He, ["stop"])
                   }, [
-                    q(Io, {
+                    W(Io, {
                       name: "uikit-status-icon",
                       mode: "out-in"
                     }, {
-                      default: X(() => [
-                        re.value ? (y(), ce(m(Oe), {
-                          key: re.value,
-                          name: re.value,
+                      default: J(() => [
+                        ie.value ? (y(), de(m(De), {
+                          key: ie.value,
+                          name: ie.value,
                           size: 14,
                           class: Te(["message-bubble-wrapper__status-icon", {
                             "message-bubble-wrapper__status-icon--delivered": C.value === m(xt).DELIVERED,
                             "message-bubble-wrapper__status-icon--read": C.value === m(xt).READ
                           }]),
                           anim: C.value === m(xt).SENDING ? "spin" : void 0
-                        }, null, 8, ["name", "class", "anim"])) : U("", !0)
+                        }, null, 8, ["name", "class", "anim"])) : F("", !0)
                       ]),
                       _: 1
                     }),
-                    C.value === m(xt).FAILED ? (y(), ce(m(Oe), {
+                    C.value === m(xt).FAILED ? (y(), de(m(De), {
                       key: 0,
                       name: Vu,
                       size: 14,
                       class: "message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed-hover"
-                    })) : U("", !0),
-                    j.value ? (y(), w("span", s_, P(ue.value), 1)) : U("", !0)
+                    })) : F("", !0),
+                    V.value ? (y(), w("span", s_, P(fe.value), 1)) : F("", !0)
                   ], 10, n_)
                 ], !0)
-              ], 2)) : U("", !0)
+              ], 2)) : F("", !0)
             ], 64)) : (y(), w("div", {
               key: 2,
               class: Te(["message-bubble-wrapper__message-row", {
@@ -7002,149 +7020,149 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
                   class: "message-bubble-wrapper__pin-badge",
                   title: m(l)("message.action.pin")
                 }, [
-                  q(m(Oe), {
+                  W(m(De), {
                     name: "pin",
                     size: 12
                   }),
                   _("span", null, P(m(l)("message.action.pin")), 1)
-                ], 8, o_)) : U("", !0),
-                q(ul, {
+                ], 8, o_)) : F("", !0),
+                W(ul, {
                   message: n.message,
                   config: n.actionConfig,
                   onAction: pe[10] || (pe[10] = (Ne) => s("action", Ne))
                 }, {
-                  "message-action-menu": X((Ne) => [
-                    V(K.$slots, "message-action-menu", Fe(Ue(Ne)), void 0, !0)
+                  "message-action-menu": J((Ne) => [
+                    G(K.$slots, "message-action-menu", Fe(Ue(Ne)), void 0, !0)
                   ]),
-                  "message-action-extra": X((Ne) => [
-                    V(K.$slots, "message-action-extra", Fe(Ue(Ne)), void 0, !0)
+                  "message-action-extra": J((Ne) => [
+                    G(K.$slots, "message-action-extra", Fe(Ue(Ne)), void 0, !0)
                   ]),
-                  default: X(() => [
-                    q(Co, {
+                  default: J(() => [
+                    W(Co, {
                       message: n.message,
                       onReedit: pe[6] || (pe[6] = (Ne) => s("reedit", Ne)),
                       onViewCombine: a,
                       onMentionClick: pe[7] || (pe[7] = (Ne) => s("mention-click", Ne)),
                       onLocationClick: pe[8] || (pe[8] = (Ne) => s("location-click", Ne, n.message)),
-                      onCustomMessageAction: pe[9] || (pe[9] = (Ne, Qe) => s("custom-message-action", Ne, Qe, n.message))
+                      onCustomMessageAction: pe[9] || (pe[9] = (Ne, Ze) => s("custom-message-action", Ne, Ze, n.message))
                     }, At({ _: 2 }, [
-                      et(K.$slots, (Ne, Qe) => ({
-                        name: Qe,
-                        fn: X((wt) => [
-                          V(K.$slots, Qe, Fe(Ue(wt)), void 0, !0)
+                      tt(K.$slots, (Ne, Ze) => ({
+                        name: Ze,
+                        fn: J((St) => [
+                          G(K.$slots, Ze, Fe(Ue(St)), void 0, !0)
                         ])
                       }))
                     ]), 1032, ["message"])
                   ]),
                   _: 3
                 }, 8, ["message", "config"]),
-                dt.value ? (y(), ce(Uu, {
+                dt.value ? (y(), de(Uu, {
                   key: 1,
                   quote: dt.value,
                   "align-right": E.value,
-                  onClick: vt
-                }, null, 8, ["quote", "align-right"])) : U("", !0)
+                  onClick: gt
+                }, null, 8, ["quote", "align-right"])) : F("", !0)
               ], 512),
-              te.value || J.value ? (y(), w("div", {
+              te.value || q.value ? (y(), w("div", {
                 key: 0,
                 ref_key: "statusColumnRef",
                 ref: ge,
                 class: Te(["message-bubble-wrapper__status-column", {
-                  "message-bubble-wrapper__status-column--vertical": de.value === "vertical"
+                  "message-bubble-wrapper__status-column--vertical": ue.value === "vertical"
                 }])
               }, [
                 te.value ? (y(), w("div", {
                   key: 0,
                   class: Te(["message-bubble-wrapper__status", {
-                    "message-bubble-wrapper__status--vertical": de.value === "vertical"
+                    "message-bubble-wrapper__status--vertical": ue.value === "vertical"
                   }])
                 }, [
-                  V(K.$slots, "message-status", {
+                  G(K.$slots, "message-status", {
                     status: C.value,
                     message: n.message,
-                    text: ue.value,
-                    icon: re.value
+                    text: fe.value,
+                    icon: ie.value
                   }, () => [
                     _("span", {
                       class: Te(["message-bubble-wrapper__status-item", {
                         "message-bubble-wrapper__status-item--failed": C.value === m(xt).FAILED
                       }]),
-                      title: ue.value,
+                      title: fe.value,
                       onClick: ft(He, ["stop"])
                     }, [
-                      re.value ? (y(), ce(m(Oe), {
+                      ie.value ? (y(), de(m(De), {
                         key: 0,
-                        name: re.value,
+                        name: ie.value,
                         size: 14,
                         class: Te(["message-bubble-wrapper__status-icon", {
                           "message-bubble-wrapper__status-icon--loading": C.value === m(xt).SENDING,
                           "message-bubble-wrapper__status-icon--delivered": C.value === m(xt).DELIVERED,
                           "message-bubble-wrapper__status-icon--read": C.value === m(xt).READ
                         }])
-                      }, null, 8, ["name", "class"])) : U("", !0),
-                      C.value === m(xt).FAILED ? (y(), ce(m(Oe), {
+                      }, null, 8, ["name", "class"])) : F("", !0),
+                      C.value === m(xt).FAILED ? (y(), de(m(De), {
                         key: 1,
                         name: Vu,
                         size: 14,
                         class: "message-bubble-wrapper__status-icon message-bubble-wrapper__status-icon--failed-hover"
-                      })) : U("", !0),
-                      j.value ? (y(), w("span", i_, P(ue.value), 1)) : U("", !0)
+                      })) : F("", !0),
+                      V.value ? (y(), w("span", i_, P(fe.value), 1)) : F("", !0)
                     ], 10, r_)
                   ], !0)
-                ], 2)) : U("", !0),
-                J.value ? (y(), w("button", {
+                ], 2)) : F("", !0),
+                q.value ? (y(), w("button", {
                   key: 1,
                   type: "button",
                   class: Te(["message-bubble-wrapper__group-read", {
-                    "message-bubble-wrapper__group-read--all": tt.value,
-                    "message-bubble-wrapper__group-read--zero": me.value === 0
+                    "message-bubble-wrapper__group-read--all": st.value,
+                    "message-bubble-wrapper__group-read--zero": ve.value === 0
                   }]),
-                  title: `${me.value}人已读${Be.value > 0 ? `/${ee.value}人` : ""}`,
+                  title: `${ve.value}人已读${Be.value > 0 ? `/${ee.value}人` : ""}`,
                   onClick: ft(nt, ["stop"])
                 }, [
-                  tt.value ? (y(), ce(m(Oe), {
+                  st.value ? (y(), de(m(De), {
                     key: 0,
                     name: "circle/checked",
                     size: 14
-                  })) : me.value > 0 ? (y(), w($e, { key: 1 }, [
-                    mt(P(me.value), 1)
-                  ], 64)) : U("", !0)
-                ], 10, a_)) : U("", !0)
-              ], 2)) : U("", !0)
+                  })) : ve.value > 0 ? (y(), w($e, { key: 1 }, [
+                    mt(P(ve.value), 1)
+                  ], 64)) : F("", !0)
+                ], 10, a_)) : F("", !0)
+              ], 2)) : F("", !0)
             ], 2)),
             S.value ? (y(), w("div", l_, [
-              V(K.$slots, "time", { message: n.message }, () => [
-                mt(P(D.value), 1)
+              G(K.$slots, "time", { message: n.message }, () => [
+                mt(P(L.value), 1)
               ], !0)
-            ])) : U("", !0)
+            ])) : F("", !0)
           ])
         ], 2)
       ], 64)),
-      (y(!0), w($e, null, et(o.value, (Ne, Qe) => {
-        var wt, St;
-        return y(), ce(H0, {
-          key: ((wt = Ne.message) == null ? void 0 : wt.msgServerId) || ((St = Ne.message) == null ? void 0 : St.msgLocalId) || Qe,
+      (y(!0), w($e, null, tt(o.value, (Ne, Ze) => {
+        var St, wt;
+        return y(), de(H0, {
+          key: ((St = Ne.message) == null ? void 0 : St.msgServerId) || ((wt = Ne.message) == null ? void 0 : wt.msgLocalId) || Ze,
           show: Ne.show,
           message: Ne.message,
-          "onUpdate:show": (on) => {
-            on || i(Qe);
+          "onUpdate:show": (hn) => {
+            hn || i(Ze);
           },
           onViewCombine: a
         }, null, 8, ["show", "message", "onUpdate:show"]);
       }), 128)),
-      q(m(Lt), {
-        show: fe.value,
-        anchor: Z.value,
+      W(m(Ot), {
+        show: he.value,
+        anchor: Q.value,
         placement: "right",
         align: "start",
         overlay: !1,
         offset: 4,
         "onUpdate:show": pe[12] || (pe[12] = (Ne) => {
-          fe.value = Ne, Ne || Q();
+          he.value = Ne, Ne || X();
         }),
-        onClose: Q
+        onClose: X
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", {
             class: "avatar-context-menu",
             onClick: pe[11] || (pe[11] = ft(() => {
@@ -7152,32 +7170,32 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           }, [
             _("div", {
               class: "avatar-context-menu__item",
-              onClick: H
+              onClick: U
             }, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "person/single",
                 size: 16
               }),
               _("span", null, P(m(l)("message.avatar.viewProfile")), 1)
             ]),
-            ie.value ? (y(), w("div", {
+            ae.value ? (y(), w("div", {
               key: 0,
               class: "avatar-context-menu__item",
-              onClick: ae
+              onClick: le
             }, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "at",
                 size: 16
               }),
               _("span", null, P(m(l)("message.avatar.mention")), 1)
-            ])) : U("", !0)
+            ])) : F("", !0)
           ])
         ]),
         _: 1
       }, 8, ["show", "anchor"])
     ], 10, W0));
   }
-}), dl = /* @__PURE__ */ ze(c_, [["__scopeId", "data-v-10b275e9"]]), u_ = { class: "group-read-modal" }, d_ = { class: "group-read-modal__header" }, f_ = { class: "group-read-modal__title" }, p_ = { class: "group-read-modal__tabs" }, h_ = { class: "group-read-modal__tab-count" }, m_ = { class: "group-read-modal__tab-label" }, g_ = { class: "group-read-modal__tab-count" }, v_ = { class: "group-read-modal__tab-label" }, y_ = { class: "group-read-modal__list" }, b_ = /* @__PURE__ */ Re({
+}), dl = /* @__PURE__ */ ze(c_, [["__scopeId", "data-v-10b275e9"]]), u_ = { class: "group-read-modal" }, d_ = { class: "group-read-modal__header" }, f_ = { class: "group-read-modal__title" }, p_ = { class: "group-read-modal__tabs" }, h_ = { class: "group-read-modal__tab-count" }, m_ = { class: "group-read-modal__tab-label" }, g_ = { class: "group-read-modal__tab-count" }, v_ = { class: "group-read-modal__tab-label" }, y_ = { class: "group-read-modal__list" }, b_ = /* @__PURE__ */ Le({
   __name: "group-read-receipt-modal",
   props: {
     show: { type: Boolean },
@@ -7207,18 +7225,18 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     function h() {
       s("update:show", !1);
     }
-    return (g, v) => (y(), ce(m(Lt), {
+    return (g, v) => (y(), de(m(Ot), {
       show: t.show,
       position: "center",
       "close-on-click-overlay": !0,
       "onUpdate:show": v[2] || (v[2] = (b) => s("update:show", b)),
       onClose: h
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", u_, [
           _("div", d_, [
             _("span", f_, P(m(o)("groupReadReceipt.title")), 1),
-            q(m(pt), {
+            W(m(pt), {
               icon: "xmark/light",
               size: "small",
               variant: "ghost",
@@ -7243,14 +7261,14 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             ], 2)
           ]),
           _("div", y_, [
-            (y(!0), w($e, null, et(f.value, (b) => (y(), ce(m(Tt), {
+            (y(!0), w($e, null, tt(f.value, (b) => (y(), de(m(Tt), {
               key: b,
               title: c(b),
               clickable: !1,
               size: "compact"
             }, {
-              leading: X(() => [
-                q(m($t), {
+              leading: J(() => [
+                W(m($t), {
                   name: c(b),
                   src: u(b),
                   size: 36
@@ -7258,19 +7276,19 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["title"]))), 128)),
-            f.value.length === 0 ? (y(), ce(m(Ht), {
+            f.value.length === 0 ? (y(), de(m(Ht), {
               key: 0,
               icon: "person/double",
               description: m(o)("groupReadReceipt.empty"),
               size: "small"
-            }, null, 8, ["description"])) : U("", !0)
+            }, null, 8, ["description"])) : F("", !0)
           ])
         ])
       ]),
       _: 1
     }, 8, ["show"]));
   }
-}), yp = /* @__PURE__ */ ze(b_, [["__scopeId", "data-v-7417b507"]]), k_ = ["data-virtual-index"], w_ = /* @__PURE__ */ Re({
+}), yp = /* @__PURE__ */ ze(b_, [["__scopeId", "data-v-7417b507"]]), k_ = ["data-virtual-index"], w_ = /* @__PURE__ */ Le({
   __name: "message-virtual-list",
   props: {
     items: {},
@@ -7298,36 +7316,36 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       if (!s.items.length || !r.value)
         return { start: 0, end: 0, paddingTop: 0, paddingBottom: 0 };
       const R = a.value, M = r.value.clientHeight, x = s.buffer;
-      let T = 0, I = 0, O = 0, E = 0;
-      for (let N = 0; N < s.items.length; N++) {
-        const D = String(s.items[N][s.keyField]), S = i.value[D] || s.estimateHeight;
+      let T = 0, I = 0, N = 0, E = 0;
+      for (let D = 0; D < s.items.length; D++) {
+        const L = String(s.items[D][s.keyField]), S = i.value[L] || s.estimateHeight;
         if (I === 0 && T + S > R) {
-          I = Math.max(0, N - x), E = T;
-          for (let C = N - 1; C >= I; C--) {
-            const L = String(s.items[C][s.keyField]);
-            E -= i.value[L] || s.estimateHeight;
+          I = Math.max(0, D - x), E = T;
+          for (let C = D - 1; C >= I; C--) {
+            const O = String(s.items[C][s.keyField]);
+            E -= i.value[O] || s.estimateHeight;
           }
         }
         if (T += S, T >= R + M) {
-          O = Math.min(s.items.length - 1, N + x);
+          N = Math.min(s.items.length - 1, D + x);
           break;
         }
-        O = N;
+        N = D;
       }
       if (I === 0 && T <= R) {
         I = Math.max(0, s.items.length - 1 - x), E = 0;
-        for (let N = 0; N < I; N++) {
-          const D = String(s.items[N][s.keyField]);
-          E += i.value[D] || s.estimateHeight;
+        for (let D = 0; D < I; D++) {
+          const L = String(s.items[D][s.keyField]);
+          E += i.value[L] || s.estimateHeight;
         }
-        O = s.items.length - 1;
+        N = s.items.length - 1;
       }
-      let G = 0;
-      for (let N = O + 1; N < s.items.length; N++) {
-        const D = String(s.items[N][s.keyField]);
-        G += i.value[D] || s.estimateHeight;
+      let H = 0;
+      for (let D = N + 1; D < s.items.length; D++) {
+        const L = String(s.items[D][s.keyField]);
+        H += i.value[L] || s.estimateHeight;
       }
-      return { start: I, end: O, paddingTop: E, paddingBottom: G };
+      return { start: I, end: N, paddingTop: E, paddingBottom: H };
     }), d = k(() => {
       if (!s.items.length) return [];
       const { start: R, end: M } = u.value;
@@ -7391,8 +7409,8 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         if (!r.value) return;
         const x = r.value.scrollHeight, T = R + (x - M);
         r.value.scrollTop = T, a.value = T;
-        const I = r.value, O = 2;
-        l.value.top = I.scrollTop <= 0, l.value.bottom = I.scrollTop + I.clientHeight >= I.scrollHeight - O;
+        const I = r.value, N = 2;
+        l.value.top = I.scrollTop <= 0, l.value.bottom = I.scrollTop + I.clientHeight >= I.scrollHeight - N;
       });
     }
     return e({
@@ -7411,12 +7429,12 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         class: "message-virtual-list__spacer",
         style: Et({ paddingTop: `${p.value}px`, paddingBottom: `${f.value}px` })
       }, [
-        (y(!0), w($e, null, et(d.value, ({ item: x, index: T }) => (y(), w("div", {
+        (y(!0), w($e, null, tt(d.value, ({ item: x, index: T }) => (y(), w("div", {
           key: String(x[n.keyField]),
           "data-virtual-index": T,
           class: "message-virtual-list__item"
         }, [
-          V(R.$slots, "default", {
+          G(R.$slots, "default", {
             item: x,
             index: T
           }, void 0, !0)
@@ -7433,50 +7451,50 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
 }, E_ = {
   key: 0,
   class: "message-list__divider"
-}, A_ = /* @__PURE__ */ Re({
+}, A_ = /* @__PURE__ */ Le({
   __name: "message-list",
   props: {
     config: {}
   },
   emits: ["reedit", "recall-failed", "edit", "forward", "mention-click", "location-click", "custom-message-action", "avatar-view-profile", "avatar-mention"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("UIKit:MessageList"), { messages: i, currentConversation: a, isMultiSelectMode: l, toggleMessageSelection: c, isMessageSelected: u, enterMultiSelectMode: d, fetchHistoryMessages: p, fetchGroupReadDetail: f, recallMessage: h, deleteMessage: g, pinMessage: v, unpinMessage: b, translateTextMessage: $, transcribeVoiceMessage: R, resendMessage: M, getHistoryCursor: x } = fa(), { setQuote: T, locateRequest: I, setHighlight: O } = pa(), { isMobile: E } = Mn(), { h5: G, stores: N } = at(), { fetchGroupMembers: D } = sn(), { t: S } = qe(), { show: C } = Wt(), { copy: L, isSupported: J } = my({ legacy: !0 }), te = A(), ve = A(), be = A(), W = k(() => {
+    const s = n, o = t, r = Dt("UIKit:MessageList"), { messages: i, currentConversation: a, isMultiSelectMode: l, toggleMessageSelection: c, isMessageSelected: u, enterMultiSelectMode: d, fetchHistoryMessages: p, fetchGroupReadDetail: f, recallMessage: h, deleteMessage: g, pinMessage: v, unpinMessage: b, translateTextMessage: $, transcribeVoiceMessage: R, resendMessage: M, getHistoryCursor: x } = fa(), { setQuote: T, locateRequest: I, setHighlight: N } = pa(), { isMobile: E } = Mn(), { h5: H, stores: D } = at(), { fetchGroupMembers: L } = sn(), { t: S } = qe(), { show: C } = Wt(), { copy: O, isSupported: q } = my({ legacy: !0 }), te = A(), ye = A(), ke = A(), j = k(() => {
       var B;
       return (B = s.config) == null ? void 0 : B.messageList;
-    }), re = k(() => {
+    }), ie = k(() => {
       var B;
-      return ((B = W.value) == null ? void 0 : B.virtualScrollThreshold) ?? 100;
-    }), ue = k(() => i.value.length > re.value), j = k(() => {
+      return ((B = j.value) == null ? void 0 : B.virtualScrollThreshold) ?? 100;
+    }), fe = k(() => i.value.length > ie.value), V = k(() => {
       var B;
-      return (B = W.value) == null ? void 0 : B.messageGap;
-    }), de = k(() => {
+      return (B = j.value) == null ? void 0 : B.messageGap;
+    }), ue = k(() => {
       var B;
-      return (B = W.value) == null ? void 0 : B.messagePadding;
-    }), se = k(() => de.value !== void 0 ? { padding: `${de.value}px` } : { padding: "var(--uikit-message-padding, 16px)" }), Me = k(() => j.value !== void 0 ? { gap: `${j.value}px` } : { gap: "var(--uikit-message-gap, 12px)" }), ge = k(() => {
+      return (B = j.value) == null ? void 0 : B.messagePadding;
+    }), se = k(() => ue.value !== void 0 ? { padding: `${ue.value}px` } : { padding: "var(--uikit-message-padding, 16px)" }), Me = k(() => V.value !== void 0 ? { gap: `${V.value}px` } : { gap: "var(--uikit-message-gap, 12px)" }), ge = k(() => {
       var B;
-      return ((B = W.value) == null ? void 0 : B.groupInterval) ?? 5 * 60 * 1e3;
+      return ((B = j.value) == null ? void 0 : B.groupInterval) ?? 5 * 60 * 1e3;
     }), Ie = k(() => {
       var B;
-      return (B = W.value) == null ? void 0 : B.loadHistory;
+      return (B = j.value) == null ? void 0 : B.loadHistory;
     }), Ke = k(() => {
       var B;
       return ((B = Ie.value) == null ? void 0 : B.enable) !== !1;
     }), _e = k(() => {
-      var he;
-      const B = ((he = Ie.value) == null ? void 0 : he.mode) ?? "auto";
+      var me;
+      const B = ((me = Ie.value) == null ? void 0 : me.mode) ?? "auto";
       return B !== "auto" ? B : ("ontouchstart" in window || navigator.maxTouchPoints > 0) && E.value ? "pull-down" : "scroll-top";
-    }), He = A(""), ee = A(!1), me = A(!0), Be = A(!1), tt = A(!0);
+    }), He = A(""), ee = A(!1), ve = A(!0), Be = A(!1), st = A(!0);
     let nt = 0, dt = null;
-    const vt = A(0), kt = A(""), fe = A(""), { arrivedState: Z } = Kf(te, { throttle: 100 });
-    Pe(() => Z.bottom, (B) => {
-      ue.value || (tt.value = B, B && vt.value > 0 && (vt.value = 0));
+    const gt = A(0), kt = A(""), he = A(""), { arrivedState: Q } = Kf(te, { throttle: 100 });
+    Pe(() => Q.bottom, (B) => {
+      fe.value || (st.value = B, B && gt.value > 0 && (gt.value = 0));
     });
-    function ie(B) {
+    function ae(B) {
       const Y = B.target;
       if (!Y)
         return;
-      const Le = Y.scrollTop + Y.clientHeight >= Y.scrollHeight - 2;
-      tt.value = Le, Le && vt.value > 0 && (vt.value = 0);
+      const Oe = Y.scrollTop + Y.clientHeight >= Y.scrollHeight - 2;
+      st.value = Oe, Oe && gt.value > 0 && (gt.value = 0);
     }
     Pe(
       () => {
@@ -7484,27 +7502,27 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         return (B = a.value) == null ? void 0 : B.id;
       },
       (B) => {
-        var he, Le;
+        var me, Oe;
         if (!B)
           return;
-        vt.value = 0, tt.value = !0, kt.value = B, fe.value = ((he = i.value[i.value.length - 1]) == null ? void 0 : he.msgServerId) || ((Le = i.value[i.value.length - 1]) == null ? void 0 : Le.msgLocalId) || "";
+        gt.value = 0, st.value = !0, kt.value = B, he.value = ((me = i.value[i.value.length - 1]) == null ? void 0 : me.msgServerId) || ((Oe = i.value[i.value.length - 1]) == null ? void 0 : Oe.msgLocalId) || "";
         const Y = x(B);
-        He.value = Y.cursor, me.value = !Y.isLast, ee.value = !1, ke(), nt = Date.now() + 1500, K();
+        He.value = Y.cursor, ve.value = !Y.isLast, ee.value = !1, we(), nt = Date.now() + 1500, K();
       },
       { flush: "post", immediate: !0 }
     ), Pe(
       () => i.value.length,
       async (B, Y) => {
         var ct, bt, Sn;
-        const he = ((ct = a.value) == null ? void 0 : ct.id) || "";
-        if (he !== kt.value) {
-          kt.value = he, fe.value = ((bt = i.value[B - 1]) == null ? void 0 : bt.msgServerId) || ((Sn = i.value[B - 1]) == null ? void 0 : Sn.msgLocalId) || "";
+        const me = ((ct = a.value) == null ? void 0 : ct.id) || "";
+        if (me !== kt.value) {
+          kt.value = me, he.value = ((bt = i.value[B - 1]) == null ? void 0 : bt.msgServerId) || ((Sn = i.value[B - 1]) == null ? void 0 : Sn.msgLocalId) || "";
           return;
         }
         if (B <= (Y || 0))
           return;
-        const Le = i.value[B - 1], ot = (Le == null ? void 0 : Le.msgServerId) || (Le == null ? void 0 : Le.msgLocalId) || "", We = ot !== "" && ot !== fe.value;
-        fe.value = ot, We && (Le != null && Le.isSelf || tt.value ? ke() : vt.value += B - (Y || 0)), await K();
+        const Oe = i.value[B - 1], rt = (Oe == null ? void 0 : Oe.msgServerId) || (Oe == null ? void 0 : Oe.msgLocalId) || "", We = rt !== "" && rt !== he.value;
+        he.value = rt, We && (Oe != null && Oe.isSelf || st.value ? we() : gt.value += B - (Y || 0)), await K();
       }
     ), Pe(
       () => {
@@ -7514,88 +7532,88 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       },
       () => {
         var B;
-        tt.value && ((B = a.value) != null && B.id) && ke();
+        st.value && ((B = a.value) != null && B.id) && we();
       }
     );
-    function ke() {
+    function we() {
       Ye(() => {
         var B;
-        ue.value ? (B = be.value) == null || B.scrollToBottom() : te.value && (te.value.scrollTop = te.value.scrollHeight);
+        fe.value ? (B = ke.value) == null || B.scrollToBottom() : te.value && (te.value.scrollTop = te.value.scrollHeight);
       });
     }
-    function Q() {
+    function X() {
       nt = 0;
     }
     qt(() => {
-      const B = te.value, Y = ve.value;
-      B && (B.addEventListener("wheel", Q, { passive: !0 }), B.addEventListener("touchmove", Q, { passive: !0 })), Y && typeof ResizeObserver < "u" && (dt = new ResizeObserver(() => {
-        if (ue.value)
+      const B = te.value, Y = ye.value;
+      B && (B.addEventListener("wheel", X, { passive: !0 }), B.addEventListener("touchmove", X, { passive: !0 })), Y && typeof ResizeObserver < "u" && (dt = new ResizeObserver(() => {
+        if (fe.value)
           return;
-        const he = te.value;
-        he && (tt.value || Date.now() < nt) && (he.scrollTop = he.scrollHeight);
+        const me = te.value;
+        me && (st.value || Date.now() < nt) && (me.scrollTop = me.scrollHeight);
       }), dt.observe(Y));
     }), Ds(() => {
       dt == null || dt.disconnect(), dt = null;
       const B = te.value;
-      B && (B.removeEventListener("wheel", Q), B.removeEventListener("touchmove", Q));
+      B && (B.removeEventListener("wheel", X), B.removeEventListener("touchmove", X));
     }), e({
-      scrollToBottom: ke
+      scrollToBottom: we
     });
-    function H() {
-      vt.value = 0, ke();
+    function U() {
+      gt.value = 0, we();
     }
-    async function ae() {
-      var ot, We, ct;
-      if (ee.value || !me.value)
+    async function le() {
+      var rt, We, ct;
+      if (ee.value || !ve.value)
         return;
       ee.value = !0;
-      const B = ue.value, Y = B ? (ot = be.value) == null ? void 0 : ot.listRef : te.value, he = (Y == null ? void 0 : Y.scrollHeight) ?? 0, Le = (Y == null ? void 0 : Y.scrollTop) ?? 0;
+      const B = fe.value, Y = B ? (rt = ke.value) == null ? void 0 : rt.listRef : te.value, me = (Y == null ? void 0 : Y.scrollHeight) ?? 0, Oe = (Y == null ? void 0 : Y.scrollTop) ?? 0;
       try {
         const bt = await p();
-        Be.value = !1, bt ? (He.value = bt.cursor, (bt.isLast || bt.messages.length === 0) && (me.value = !1)) : me.value = !1;
+        Be.value = !1, bt ? (He.value = bt.cursor, (bt.isLast || bt.messages.length === 0) && (ve.value = !1)) : ve.value = !1;
       } catch (bt) {
         r.error("[MessageList] loadMoreHistory failed:", Je(bt)), Be.value = !0;
       }
-      if (ee.value = !1, B && be.value)
-        (ct = (We = be.value) == null ? void 0 : We.preserveScrollPosition) == null || ct.call(We, Le, he);
-      else if (Y && he > 0) {
+      if (ee.value = !1, B && ke.value)
+        (ct = (We = ke.value) == null ? void 0 : We.preserveScrollPosition) == null || ct.call(We, Oe, me);
+      else if (Y && me > 0) {
         await Ye();
-        const bt = Y.scrollHeight, Sn = Le + (bt - he);
+        const bt = Y.scrollHeight, Sn = Oe + (bt - me);
         Y.scrollTop = Math.max(Sn, 60);
       }
     }
     async function K() {
-      if (!Ke.value || !me.value || ee.value || ue.value)
+      if (!Ke.value || !ve.value || ee.value || fe.value)
         return;
       await Ye();
       const B = te.value;
       if (!B)
         return;
       let Y = 0;
-      const he = 5;
-      for (; B.scrollHeight <= B.clientHeight + 1 && me.value && !ee.value && Y < he; )
-        Y++, await ae(), await Ye();
+      const me = 5;
+      for (; B.scrollHeight <= B.clientHeight + 1 && ve.value && !ee.value && Y < me; )
+        Y++, await le(), await Ye();
     }
     function pe(B) {
       const Y = B.target;
-      if (!Y || _e.value !== "scroll-top" || !Ke.value || ee.value || !me.value || i.value.length === 0)
+      if (!Y || _e.value !== "scroll-top" || !Ke.value || ee.value || !ve.value || i.value.length === 0)
         return;
-      Y.scrollTop <= 0 && ae();
+      Y.scrollTop <= 0 && le();
     }
     const Ne = k(
-      () => _e.value === "pull-down" && Ke.value && !ue.value && G.enablePullRefresh.value
-    ), { isPulling: Qe, isRefreshing: wt, pullDistance: St } = Tf(te, {
+      () => _e.value === "pull-down" && Ke.value && !fe.value && H.enablePullRefresh.value
+    ), { isPulling: Ze, isRefreshing: St, pullDistance: wt } = Tf(te, {
       enabled: Ne,
       onRefresh: async () => {
-        _e.value === "pull-down" && Ke.value && await ae();
+        _e.value === "pull-down" && Ke.value && await le();
       }
     });
-    function on() {
-      Be.value = !1, ae();
+    function hn() {
+      Be.value = !1, le();
     }
-    const Jt = A(!1), Zt = A([]), rn = A([]), ye = A(!1), Ae = A(null);
-    async function F(B) {
-      var Y, he;
+    const on = A(!1), Jt = A([]), Xt = A([]), be = A(!1), Re = A(null);
+    async function oe(B) {
+      var Y, me;
       if (B.action === "multiSelect") {
         d(), c(B.message.msgServerId || B.message.msgLocalId);
         return;
@@ -7603,17 +7621,17 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       if (B.action === "recall" || B.action === "recallOther") {
         try {
           await h(B.message.msgServerId || B.message.msgLocalId);
-        } catch (Le) {
-          o("recall-failed", Le, B.message);
+        } catch (Oe) {
+          o("recall-failed", Oe, B.message);
         }
         return;
       }
       if (B.action === "copy") {
-        await oe(B.message);
+        await ce(B.message);
         return;
       }
       if (B.action === "download") {
-        await we(B.message);
+        await re(B.message);
         return;
       }
       if (B.action === "quote") {
@@ -7621,7 +7639,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         return;
       }
       if (B.action === "delete") {
-        Ae.value = B.message, ye.value = !0;
+        Re.value = B.message, be.value = !0;
         return;
       }
       if (B.action === "forward") {
@@ -7635,16 +7653,16 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       if (B.action === "pin") {
         try {
           await v(B.message);
-        } catch (Le) {
-          r.warn("[MessageList] pinMessage failed:", Je(Le)), C(Le instanceof Error ? Le.message : String(Le) || S("message.action.pin", "置顶失败"), "error");
+        } catch (Oe) {
+          r.warn("[MessageList] pinMessage failed:", Je(Oe)), C(Oe instanceof Error ? Oe.message : String(Oe) || S("message.action.pin", "置顶失败"), "error");
         }
         return;
       }
       if (B.action === "unpin") {
         try {
           await b(B.message);
-        } catch (Le) {
-          r.warn("[MessageList] unpinMessage failed:", Je(Le)), C(Le instanceof Error ? Le.message : String(Le) || S("message.action.unpin", "取消置顶失败"), "error");
+        } catch (Oe) {
+          r.warn("[MessageList] unpinMessage failed:", Je(Oe)), C(Oe instanceof Error ? Oe.message : String(Oe) || S("message.action.unpin", "取消置顶失败"), "error");
         }
         return;
       }
@@ -7652,9 +7670,9 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         if (B.message.type !== Ce.TEXT)
           return;
         try {
-          await $(B.message, (he = (Y = s.config) == null ? void 0 : Y.messageAction) == null ? void 0 : he.translateTargetLang);
-        } catch (Le) {
-          r.warn("[MessageList] translateTextMessage failed:", Je(Le)), C(le(Le), "error");
+          await $(B.message, (me = (Y = s.config) == null ? void 0 : Y.messageAction) == null ? void 0 : me.translateTargetLang);
+        } catch (Oe) {
+          r.warn("[MessageList] translateTextMessage failed:", Je(Oe)), C(Z(Oe), "error");
         }
         return;
       }
@@ -7663,51 +7681,51 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           return;
         try {
           await R(B.message);
-        } catch (Le) {
+        } catch (Oe) {
           r.warn("[MessageList] transcribeVoiceMessage failed:", {
-            code: Le.code,
-            message: Le instanceof Error ? Le.message : String(Le),
-            details: Le.details,
-            raw: Je(Le)
-          }), C(Xv(Le, S), "error");
+            code: Oe.code,
+            message: Oe instanceof Error ? Oe.message : String(Oe),
+            details: Oe.details,
+            raw: Je(Oe)
+          }), C(Xv(Oe, S), "error");
         }
       }
     }
-    function le(B) {
-      var he;
-      const Y = (he = B == null ? void 0 : B.details) == null ? void 0 : he.httpStatus;
+    function Z(B) {
+      var me;
+      const Y = (me = B == null ? void 0 : B.details) == null ? void 0 : me.httpStatus;
       return Y === 403 ? S("message.translate.noPermission", "暂无翻译权限") : typeof Y == "number" && (Y === 404 || Y === 503 || Y >= 500) ? S("message.translate.serviceUnavailable", "翻译服务未开通，请联系商务经理开通") : S("message.translate.failed", "翻译失败，请稍后重试");
     }
-    async function oe(B) {
+    async function ce(B) {
       const Y = B.type === Ce.TEXT && B.body.content || "";
       if (!Y) {
         C(S("message.copyFailed") ?? "复制失败", "error");
         return;
       }
-      if (!J.value) {
+      if (!q.value) {
         C(S("message.copyFailed") ?? "复制失败", "error");
         return;
       }
       try {
-        await L(Y), C(S("message.copySuccess") ?? "已复制", "success");
+        await O(Y), C(S("message.copySuccess") ?? "已复制", "success");
       } catch {
         C(S("message.copyFailed") ?? "复制失败", "error");
       }
     }
-    async function we(B) {
+    async function re(B) {
       if (B.type !== Ce.FILE)
         return;
-      const Y = B.body, he = Y.url, Le = Y.filename || S("message.file", "file");
-      if (!he) {
+      const Y = B.body, me = Y.url, Oe = Y.filename || S("message.file", "file");
+      if (!me) {
         C(S("message.download.failed", "下载失败"), "error");
         return;
       }
-      const ot = ec();
+      const rt = ec();
       try {
         await tc({
-          url: he,
-          filename: Le,
-          env: ot,
+          url: me,
+          filename: Oe,
+          env: rt,
           onSuccess: () => {
             C(S("message.download.success", "下载成功"), "success");
           },
@@ -7718,10 +7736,10 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       } catch {
       }
     }
-    function De(B) {
+    function Ee(B) {
       o("reedit", B);
     }
-    async function Ge(B) {
+    async function Ve(B) {
       try {
         await M(B);
       } catch (Y) {
@@ -7732,41 +7750,41 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         r.warn("[MessageList] resend failed:", Je(Y)), C(mo(Y, "message.resend.failed", S), "error");
       }
     }
-    async function it(B, Y) {
-      var he, Le;
-      if (((he = a.value) == null ? void 0 : he.type) === lt.GROUPCHAT)
+    async function Qe(B, Y) {
+      var me, Oe;
+      if (((me = a.value) == null ? void 0 : me.type) === lt.GROUPCHAT)
         try {
-          let ot = N.message.getGroupMessageReadUsers(Y, B);
-          if (ot.length === 0) {
+          let rt = D.message.getGroupMessageReadUsers(Y, B);
+          if (rt.length === 0) {
             const zt = await f(B, Y);
-            ot = [...new Set(
+            rt = [...new Set(
               ((zt == null ? void 0 : zt.users) || []).map((rs) => rs.userId).filter((rs) => typeof rs == "string" && !!rs)
-            )], N.message.setGroupMessageReadUsers(Y, B, ot), zt && zt.count > 0 && N.message.updateMessageById(B, { groupReadCount: zt.count });
+            )], D.message.setGroupMessageReadUsers(Y, B, rt), zt && zt.count > 0 && D.message.updateMessageById(B, { groupReadCount: zt.count });
           }
-          Zt.value = ot;
-          let We = N.group.getGroupMembers(Y);
+          Jt.value = rt;
+          let We = D.group.getGroupMembers(Y);
           if (We.length === 0)
             try {
-              await D(Y), We = N.group.getGroupMembers(Y);
+              await L(Y), We = D.group.getGroupMembers(Y);
             } catch (zt) {
               r.warn("[MessageList] fetchGroupMembers for unread list failed:", Je(zt));
             }
-          const ct = new Set(ot), bt = (Le = i.value.find((zt) => (zt.msgServerId || zt.msgLocalId) === B)) == null ? void 0 : Le.from, Sn = [...new Set(
+          const ct = new Set(rt), bt = (Oe = i.value.find((zt) => (zt.msgServerId || zt.msgLocalId) === B)) == null ? void 0 : Oe.from, Sn = [...new Set(
             We.map((zt) => zt.userId).filter((zt) => !!zt)
           )];
-          rn.value = Sn.filter((zt) => !ct.has(zt) && zt !== bt), Jt.value = !0;
-        } catch (ot) {
-          r.warn("[MessageList] fetchGroupReadDetail failed:", Je(ot));
+          Xt.value = Sn.filter((zt) => !ct.has(zt) && zt !== bt), on.value = !0;
+        } catch (rt) {
+          r.warn("[MessageList] fetchGroupReadDetail failed:", Je(rt));
         }
     }
-    function Pt(B) {
+    function Rt(B) {
       l.value && c(B);
     }
     function en(B, Y) {
       return Y ? B.timestamp - Y.timestamp > ge.value : !0;
     }
     function kn(B) {
-      const Y = new Date(B), he = /* @__PURE__ */ new Date(), Le = String(Y.getHours()).padStart(2, "0"), ot = String(Y.getMinutes()).padStart(2, "0"), We = `${Le}:${ot}`, ct = new Date(he.getFullYear(), he.getMonth(), he.getDate()), bt = new Date(Y.getFullYear(), Y.getMonth(), Y.getDate()), Sn = Math.round((ct.getTime() - bt.getTime()) / (24 * 60 * 60 * 1e3));
+      const Y = new Date(B), me = /* @__PURE__ */ new Date(), Oe = String(Y.getHours()).padStart(2, "0"), rt = String(Y.getMinutes()).padStart(2, "0"), We = `${Oe}:${rt}`, ct = new Date(me.getFullYear(), me.getMonth(), me.getDate()), bt = new Date(Y.getFullYear(), Y.getMonth(), Y.getDate()), Sn = Math.round((ct.getTime() - bt.getTime()) / (24 * 60 * 60 * 1e3));
       if (Sn === 0)
         return We;
       if (Sn === 1)
@@ -7774,43 +7792,43 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       if (Sn === 2)
         return `${S("time.beforeYesterday")} ${We}`;
       const zt = String(Y.getMonth() + 1).padStart(2, "0"), rs = String(Y.getDate()).padStart(2, "0");
-      return `${Y.getFullYear() === he.getFullYear() ? `${zt}-${rs}` : `${Y.getFullYear()}-${zt}-${rs}`} ${We}`;
+      return `${Y.getFullYear() === me.getFullYear() ? `${zt}-${rs}` : `${Y.getFullYear()}-${zt}-${rs}`} ${We}`;
     }
     const tn = k(() => {
       const B = [];
       let Y = null;
-      return i.value.forEach((he, Le) => {
-        en(he, Y) && B.push({ key: `divider-${he.timestamp}`, type: "divider", data: kn(he.timestamp), index: -1 }), B.push({ key: he.msgServerId || he.msgLocalId, type: "message", data: he, index: Le }), Y = he;
+      return i.value.forEach((me, Oe) => {
+        en(me, Y) && B.push({ key: `divider-${me.timestamp}`, type: "divider", data: kn(me.timestamp), index: -1 }), B.push({ key: me.msgServerId || me.msgLocalId, type: "message", data: me, index: Oe }), Y = me;
       }), B;
     });
-    let Bt = null;
+    let Pt = null;
     Ds(() => {
-      Bt && (clearTimeout(Bt), Bt = null);
+      Pt && (clearTimeout(Pt), Pt = null);
     });
-    function un(B) {
-      var Le;
+    function cn(B) {
+      var Oe;
       if (!B)
         return !1;
-      const Y = i.value.findIndex((ot) => ot.msgServerId === B || ot.msgLocalId === B);
+      const Y = i.value.findIndex((rt) => rt.msgServerId === B || rt.msgLocalId === B);
       if (Y === -1)
         return !1;
-      const he = ue.value;
-      if (he) {
-        const ot = i.value[Y], We = tn.value.findIndex(
-          (ct) => ct.type === "message" && (ct.data.msgServerId === ot.msgServerId || ct.data.msgLocalId === ot.msgLocalId)
+      const me = fe.value;
+      if (me) {
+        const rt = i.value[Y], We = tn.value.findIndex(
+          (ct) => ct.type === "message" && (ct.data.msgServerId === rt.msgServerId || ct.data.msgLocalId === rt.msgLocalId)
         );
-        We !== -1 && ((Le = be.value) == null || Le.scrollToIndex(We));
+        We !== -1 && ((Oe = ke.value) == null || Oe.scrollToIndex(We));
       }
       return Ye(() => {
         var We;
-        const ot = he ? (We = be.value) == null ? void 0 : We.listRef : te.value;
-        if (ot) {
-          const ct = ot.querySelector(`[data-msg-id="${B}"]`);
+        const rt = me ? (We = ke.value) == null ? void 0 : We.listRef : te.value;
+        if (rt) {
+          const ct = rt.querySelector(`[data-msg-id="${B}"]`);
           ct && ct.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        Bt && (clearTimeout(Bt), Bt = null), O(""), Ye(() => {
-          O(B), Bt = setTimeout(() => {
-            O(""), Bt = null;
+        Pt && (clearTimeout(Pt), Pt = null), N(""), Ye(() => {
+          N(B), Pt = setTimeout(() => {
+            N(""), Pt = null;
           }, 3e3);
         });
       }), !0;
@@ -7818,62 +7836,62 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
     return Pe(I, (B) => {
       if (!B)
         return;
-      un(B.msgID) || C(S("message.quote.notFound") ?? "原消息已删除或未加载", "warning");
+      cn(B.msgID) || C(S("message.quote.notFound") ?? "原消息已删除或未加载", "warning");
     }), (B, Y) => (y(), w("div", __, [
       _e.value === "pull-down" && Ke.value ? (y(), w("div", {
         key: 0,
         class: "message-list__pull-indicator",
-        style: Et({ height: `${m(St)}px` })
+        style: Et({ height: `${m(wt)}px` })
       }, [
-        m(wt) ? (y(), w("span", C_, P(m(S)("conversation.loadingMore")), 1)) : m(Qe) ? (y(), w("span", M_, P(m(S)("conversation.pullRefresh")), 1)) : U("", !0)
-      ], 4)) : U("", !0),
-      m(i).length > 0 && (ee.value || Be.value || _e.value === "scroll-top" && !me.value) ? (y(), w("div", S_, [
+        m(St) ? (y(), w("span", C_, P(m(S)("conversation.loadingMore")), 1)) : m(Ze) ? (y(), w("span", M_, P(m(S)("conversation.pullRefresh")), 1)) : F("", !0)
+      ], 4)) : F("", !0),
+      m(i).length > 0 && (ee.value || Be.value || _e.value === "scroll-top" && !ve.value) ? (y(), w("div", S_, [
         ee.value ? (y(), w("span", I_, P(m(S)("conversation.loadingMore")), 1)) : Be.value ? (y(), w("span", {
           key: 1,
           class: "message-list__top-retry",
-          onClick: on
+          onClick: hn
         }, P(m(S)("conversation.loadHistoryFailed", "加载失败，点击重试")), 1)) : (y(), w("span", x_, P(m(S)("conversation.noMoreHistory", "没有更多历史消息")), 1))
-      ])) : U("", !0),
-      ue.value ? (y(), ce(bp, {
+      ])) : F("", !0),
+      fe.value ? (y(), de(bp, {
         key: 2,
         ref_key: "virtualListRef",
-        ref: be,
+        ref: ke,
         items: tn.value,
         "key-field": "key",
         "estimate-height": 80,
-        gap: j.value ?? 12,
-        padding: de.value ?? 16,
-        onReachTop: ae,
-        onScroll: ie
+        gap: V.value ?? 12,
+        padding: ue.value ?? 16,
+        onReachTop: le,
+        onScroll: ae
       }, {
-        default: X(({ item: he }) => {
-          var Le, ot;
+        default: J(({ item: me }) => {
+          var Oe, rt;
           return [
-            he.type === "divider" ? (y(), w("div", T_, [
-              _("span", null, P(he.data), 1)
-            ])) : (y(), ce(dl, {
+            me.type === "divider" ? (y(), w("div", T_, [
+              _("span", null, P(me.data), 1)
+            ])) : (y(), de(dl, {
               key: 1,
-              message: he.data,
-              config: W.value,
-              "action-config": (Le = n.config) == null ? void 0 : Le.messageAction,
-              "group-read-receipt-config": (ot = n.config) == null ? void 0 : ot.groupReadReceipt,
+              message: me.data,
+              config: j.value,
+              "action-config": (Oe = n.config) == null ? void 0 : Oe.messageAction,
+              "group-read-receipt-config": (rt = n.config) == null ? void 0 : rt.groupReadReceipt,
               "is-multi-select-mode": m(l),
-              "is-selected": m(u)(he.data.msgServerId || he.data.msgLocalId),
-              onToggleSelect: Pt,
-              onAction: F,
-              onGroupReadClick: it,
-              onReedit: De,
-              onResend: Ge,
+              "is-selected": m(u)(me.data.msgServerId || me.data.msgLocalId),
+              onToggleSelect: Rt,
+              onAction: oe,
+              onGroupReadClick: Qe,
+              onReedit: Ee,
+              onResend: Ve,
               onMentionClick: Y[0] || (Y[0] = (We) => o("mention-click", We)),
-              onLocationClick: (We) => o("location-click", We, he.data),
-              onCustomMessageAction: (We, ct) => o("custom-message-action", We, ct, he.data),
+              onLocationClick: (We) => o("location-click", We, me.data),
+              onCustomMessageAction: (We, ct) => o("custom-message-action", We, ct, me.data),
               onAvatarViewProfile: Y[1] || (Y[1] = (We) => o("avatar-view-profile", We)),
               onAvatarMention: Y[2] || (Y[2] = (We) => o("avatar-mention", We))
             }, At({ _: 2 }, [
-              et(B.$slots, (We, ct) => ({
+              tt(B.$slots, (We, ct) => ({
                 name: ct,
-                fn: X((bt) => [
-                  V(B.$slots, ct, Fe(Ue(bt)), void 0, !0)
+                fn: J((bt) => [
+                  G(B.$slots, ct, Fe(Ue(bt)), void 0, !0)
                 ])
               }))
             ]), 1032, ["message", "config", "action-config", "group-read-receipt-config", "is-multi-select-mode", "is-selected", "onLocationClick", "onCustomMessageAction"]))
@@ -7890,41 +7908,41 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       }, [
         _("div", {
           ref_key: "contentRef",
-          ref: ve,
+          ref: ye,
           class: "message-list__content",
           style: Et(Me.value)
         }, [
-          (y(!0), w($e, null, et(tn.value, (he) => {
-            var Le, ot;
+          (y(!0), w($e, null, tt(tn.value, (me) => {
+            var Oe, rt;
             return y(), w("div", {
-              key: he.key,
+              key: me.key,
               class: "message-list__item"
             }, [
-              he.type === "divider" ? (y(), w("div", E_, [
-                _("span", null, P(he.data), 1)
-              ])) : (y(), ce(dl, {
+              me.type === "divider" ? (y(), w("div", E_, [
+                _("span", null, P(me.data), 1)
+              ])) : (y(), de(dl, {
                 key: 1,
-                message: he.data,
-                config: W.value,
-                "action-config": (Le = n.config) == null ? void 0 : Le.messageAction,
-                "group-read-receipt-config": (ot = n.config) == null ? void 0 : ot.groupReadReceipt,
+                message: me.data,
+                config: j.value,
+                "action-config": (Oe = n.config) == null ? void 0 : Oe.messageAction,
+                "group-read-receipt-config": (rt = n.config) == null ? void 0 : rt.groupReadReceipt,
                 "is-multi-select-mode": m(l),
-                "is-selected": m(u)(he.data.msgServerId || he.data.msgLocalId),
-                onToggleSelect: Pt,
-                onAction: F,
-                onGroupReadClick: it,
-                onReedit: De,
-                onResend: Ge,
+                "is-selected": m(u)(me.data.msgServerId || me.data.msgLocalId),
+                onToggleSelect: Rt,
+                onAction: oe,
+                onGroupReadClick: Qe,
+                onReedit: Ee,
+                onResend: Ve,
                 onMentionClick: Y[3] || (Y[3] = (We) => o("mention-click", We)),
-                onLocationClick: (We) => o("location-click", We, he.data),
-                onCustomMessageAction: (We, ct) => o("custom-message-action", We, ct, he.data),
+                onLocationClick: (We) => o("location-click", We, me.data),
+                onCustomMessageAction: (We, ct) => o("custom-message-action", We, ct, me.data),
                 onAvatarViewProfile: Y[4] || (Y[4] = (We) => o("avatar-view-profile", We)),
                 onAvatarMention: Y[5] || (Y[5] = (We) => o("avatar-mention", We))
               }, At({ _: 2 }, [
-                et(B.$slots, (We, ct) => ({
+                tt(B.$slots, (We, ct) => ({
                   name: ct,
-                  fn: X((bt) => [
-                    V(B.$slots, ct, ao({ ref_for: !0 }, bt), void 0, !0)
+                  fn: J((bt) => [
+                    G(B.$slots, ct, ao({ ref_for: !0 }, bt), void 0, !0)
                   ])
                 }))
               ]), 1032, ["message", "config", "action-config", "group-read-receipt-config", "is-multi-select-mode", "is-selected", "onLocationClick", "onCustomMessageAction"]))
@@ -7932,43 +7950,43 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
           }), 128))
         ], 4)
       ], 36)),
-      vt.value > 0 ? (y(), w("div", {
+      gt.value > 0 ? (y(), w("div", {
         key: 4,
         class: "message-list__new-tip",
-        onClick: H
+        onClick: U
       }, [
-        _("span", null, P(vt.value) + " 条新消息", 1),
-        q(m(Oe), {
+        _("span", null, P(gt.value) + " 条新消息", 1),
+        W(m(De), {
           name: "arrow/down",
           size: 12,
           class: "message-list__new-tip-arrow"
         })
-      ])) : U("", !0),
-      q(yp, {
-        show: Jt.value,
-        "onUpdate:show": Y[6] || (Y[6] = (he) => Jt.value = he),
-        "read-list": Zt.value,
-        "unread-list": rn.value
+      ])) : F("", !0),
+      W(yp, {
+        show: on.value,
+        "onUpdate:show": Y[6] || (Y[6] = (me) => on.value = me),
+        "read-list": Jt.value,
+        "unread-list": Xt.value
       }, null, 8, ["show", "read-list", "unread-list"]),
-      q(m(io), {
-        show: ye.value,
-        "onUpdate:show": Y[7] || (Y[7] = (he) => ye.value = he),
+      W(m(io), {
+        show: be.value,
+        "onUpdate:show": Y[7] || (Y[7] = (me) => be.value = me),
         title: m(S)("message.action.delete"),
         "confirm-text": m(S)("button.confirm"),
         "cancel-text": m(S)("button.cancel"),
-        onConfirm: Y[8] || (Y[8] = (he) => {
-          Ae.value && m(g)(Ae.value.msgServerId || Ae.value.msgLocalId), Ae.value = null;
+        onConfirm: Y[8] || (Y[8] = (me) => {
+          Re.value && m(g)(Re.value.msgServerId || Re.value.msgLocalId), Re.value = null;
         }),
-        onCancel: Y[9] || (Y[9] = (he) => Ae.value = null)
+        onCancel: Y[9] || (Y[9] = (me) => Re.value = null)
       }, {
-        default: X(() => [
+        default: J(() => [
           mt(P(m(S)("message.delete.confirm")), 1)
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"])
     ]));
   }
-}), kp = /* @__PURE__ */ ze(A_, [["__scopeId", "data-v-d557dedf"]]), $_ = { class: "mention-picker mention-picker--pc" }, R_ = { class: "mention-picker__search" }, N_ = ["placeholder"], L_ = { class: "mention-picker mention-picker--h5" }, O_ = { class: "mention-picker__header" }, D_ = { class: "mention-picker__header-title" }, B_ = { class: "mention-picker__search" }, P_ = ["placeholder"], z_ = /* @__PURE__ */ Re({
+}), kp = /* @__PURE__ */ ze(A_, [["__scopeId", "data-v-d557dedf"]]), $_ = { class: "mention-picker mention-picker--pc" }, R_ = { class: "mention-picker__search" }, N_ = ["placeholder"], L_ = { class: "mention-picker mention-picker--h5" }, O_ = { class: "mention-picker__header" }, D_ = { class: "mention-picker__header-title" }, B_ = { class: "mention-picker__search" }, P_ = ["placeholder"], z_ = /* @__PURE__ */ Le({
   __name: "mention-picker",
   props: {
     show: { type: Boolean },
@@ -8030,7 +8048,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         h == null || h.scrollIntoView({ block: "nearest" });
       });
     }
-    return (h, g) => m(o) ? (y(), ce(m(Lt), {
+    return (h, g) => m(o) ? (y(), de(m(Ot), {
       key: 1,
       show: t.show,
       position: "bottom",
@@ -8039,11 +8057,11 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       "onUpdate:show": u,
       onClose: u
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", L_, [
           _("div", O_, [
             _("span", D_, P(l.value), 1),
-            q(m(pt), {
+            W(m(pt), {
               class: "mention-picker__header-close",
               icon: "xmark/light",
               size: "small",
@@ -8053,7 +8071,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             }, null, 8, ["title"])
           ]),
           _("div", B_, [
-            q(m(Oe), {
+            W(m(De), {
               name: "search",
               size: 16,
               class: "mention-picker__search-icon"
@@ -8072,7 +8090,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             ref: d,
             class: "mention-picker__list mention-picker__list--scrollable"
           }, [
-            (y(!0), w($e, null, et(a.value, (v, b) => (y(), ce(m(Tt), {
+            (y(!0), w($e, null, tt(a.value, (v, b) => (y(), de(m(Tt), {
               key: v.userId,
               class: "mention-picker__cell",
               active: m(p) === b,
@@ -8083,8 +8101,8 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               "auto-height": !0,
               onClick: ($) => c(v)
             }, {
-              leading: X(() => [
-                q(m($t), {
+              leading: J(() => [
+                W(m($t), {
                   src: v.avatar,
                   name: v.name,
                   size: 40
@@ -8092,17 +8110,17 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["active", "title", "subtitle", "onClick"]))), 128)),
-            a.value.length === 0 ? (y(), ce(m(Ht), {
+            a.value.length === 0 ? (y(), de(m(Ht), {
               key: 0,
               icon: "at",
               description: m(r)("mention.noResult", "未找到联系人"),
               size: "small"
-            }, null, 8, ["description"])) : U("", !0)
+            }, null, 8, ["description"])) : F("", !0)
           ], 512)
         ])
       ]),
       _: 1
-    }, 8, ["show"])) : (y(), ce(m(Lt), {
+    }, 8, ["show"])) : (y(), de(m(Ot), {
       key: 0,
       show: t.show,
       anchor: t.anchor,
@@ -8112,10 +8130,10 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       "onUpdate:show": u,
       onClose: u
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", $_, [
           _("div", R_, [
-            q(m(Oe), {
+            W(m(De), {
               name: "search",
               size: 16,
               class: "mention-picker__search-icon"
@@ -8134,7 +8152,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
             ref: d,
             class: "mention-picker__list"
           }, [
-            (y(!0), w($e, null, et(a.value, (v, b) => (y(), ce(m(Tt), {
+            (y(!0), w($e, null, tt(a.value, (v, b) => (y(), de(m(Tt), {
               key: v.userId,
               class: "mention-picker__cell",
               active: m(p) === b,
@@ -8145,8 +8163,8 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               "auto-height": !0,
               onClick: ($) => c(v)
             }, {
-              leading: X(() => [
-                q(m($t), {
+              leading: J(() => [
+                W(m($t), {
                   src: v.avatar,
                   name: v.name,
                   size: 36
@@ -8154,19 +8172,19 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["active", "title", "subtitle", "onClick"]))), 128)),
-            a.value.length === 0 ? (y(), ce(m(Ht), {
+            a.value.length === 0 ? (y(), de(m(Ht), {
               key: 0,
               icon: "at",
               description: m(r)("mention.noResult", "未找到联系人"),
               size: "small"
-            }, null, 8, ["description"])) : U("", !0)
+            }, null, 8, ["description"])) : F("", !0)
           ], 512)
         ])
       ]),
       _: 1
     }, 8, ["show", "anchor"]));
   }
-}), wp = /* @__PURE__ */ ze(z_, [["__scopeId", "data-v-fbcfb7ae"]]), F_ = { class: "quote-bar" }, U_ = ["src"], H_ = { class: "quote-bar__text" }, G_ = { class: "quote-bar__sender" }, V_ = { class: "quote-bar__preview" }, j_ = /* @__PURE__ */ Re({
+}), wp = /* @__PURE__ */ ze(z_, [["__scopeId", "data-v-fbcfb7ae"]]), F_ = { class: "quote-bar" }, U_ = ["src"], H_ = { class: "quote-bar__text" }, G_ = { class: "quote-bar__sender" }, V_ = { class: "quote-bar__preview" }, j_ = /* @__PURE__ */ Le({
   __name: "quote-bar",
   props: {
     message: {}
@@ -8181,7 +8199,7 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
       s("close");
     }
     return (d, p) => (y(), w("div", F_, [
-      q(m(Oe), {
+      W(m(De), {
         class: "quote-bar__icon",
         name: "circle/quote",
         size: 14
@@ -8191,12 +8209,12 @@ const aw = { class: "invite-member-modal__header" }, lw = { class: "invite-membe
         class: "quote-bar__thumb",
         src: c.value,
         alt: "quote-thumb"
-      }, null, 8, U_)) : U("", !0),
+      }, null, 8, U_)) : F("", !0),
       _("div", H_, [
         _("span", G_, P(i.value) + "：", 1),
         _("span", V_, P(a.value), 1)
       ]),
-      q(m(pt), {
+      W(m(pt), {
         class: "quote-bar__close",
         icon: "xmark/light",
         size: "small",
@@ -8222,7 +8240,7 @@ function vc(n, e) {
     return !1;
   });
 }
-const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_ = { class: "h5-input__more-grid" }, Y_ = ["onClick"], Q_ = { class: "h5-input__more-icon" }, Z_ = { class: "h5-input__more-label" }, e1 = { class: "h5-input__record-duration" }, t1 = { class: "h5-input__record-hint" }, n1 = 60, s1 = /* @__PURE__ */ Re({
+const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_ = { class: "h5-input__more-grid" }, Y_ = ["onClick"], Q_ = { class: "h5-input__more-icon" }, Z_ = { class: "h5-input__more-label" }, e1 = { class: "h5-input__record-duration" }, t1 = { class: "h5-input__record-hint" }, n1 = 60, s1 = /* @__PURE__ */ Le({
   __name: "h5-input",
   props: {
     config: {},
@@ -8232,35 +8250,35 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
   },
   emits: ["send", "send-file", "voice-start", "voice-end", "voice-cancel", "mention-trigger", "mention-close", "sticker-select", "typing", "focus"],
   setup(n, { expose: e, emit: t }) {
-    la((Z) => ({
+    la((Q) => ({
       v2106de82: d.value,
       v5112d470: p.value
     }));
     const s = n, o = t, { t: r } = qe(), i = A(""), a = k(() => {
-      var Z;
-      return ((Z = s.config) == null ? void 0 : Z.stickerPacks) ?? [];
+      var Q;
+      return ((Q = s.config) == null ? void 0 : Q.stickerPacks) ?? [];
     }), l = k(() => {
-      var Z;
-      return ((Z = s.config) == null ? void 0 : Z.emoji) ?? {};
+      var Q;
+      return ((Q = s.config) == null ? void 0 : Q.emoji) ?? {};
     }), c = k(() => {
-      var Z, ie, ke, Q, H, ae, K, pe, Ne, Qe;
+      var Q, ae, we, X, U, le, K, pe, Ne, Ze;
       return {
-        emoji: ((ie = (Z = s.config) == null ? void 0 : Z.features) == null ? void 0 : ie.emoji) !== !1,
-        image: ((Q = (ke = s.config) == null ? void 0 : ke.features) == null ? void 0 : Q.image) !== !1,
-        file: ((ae = (H = s.config) == null ? void 0 : H.features) == null ? void 0 : ae.file) !== !1,
+        emoji: ((ae = (Q = s.config) == null ? void 0 : Q.features) == null ? void 0 : ae.emoji) !== !1,
+        image: ((X = (we = s.config) == null ? void 0 : we.features) == null ? void 0 : X.image) !== !1,
+        file: ((le = (U = s.config) == null ? void 0 : U.features) == null ? void 0 : le.file) !== !1,
         voice: ((pe = (K = s.config) == null ? void 0 : K.features) == null ? void 0 : pe.voice) !== !1,
-        video: ((Qe = (Ne = s.config) == null ? void 0 : Ne.features) == null ? void 0 : Qe.video) !== !1
+        video: ((Ze = (Ne = s.config) == null ? void 0 : Ne.features) == null ? void 0 : Ze.video) !== !1
       };
     }), u = k(() => {
-      var ie;
-      const Z = (ie = s.config) == null ? void 0 : ie.maxLength;
-      return Z && Z > 0 ? Z : void 0;
+      var ae;
+      const Q = (ae = s.config) == null ? void 0 : ae.maxLength;
+      return Q && Q > 0 ? Q : void 0;
     }), d = k(() => {
-      var Z;
-      return ((Z = s.config) == null ? void 0 : Z.caretColor) || "auto";
+      var Q;
+      return ((Q = s.config) == null ? void 0 : Q.caretColor) || "auto";
     }), p = k(() => {
-      var Z;
-      return ((Z = s.config) == null ? void 0 : Z.selectionColor) || "var(--uikit-selection-bg)";
+      var Q;
+      return ((Q = s.config) == null ? void 0 : Q.selectionColor) || "var(--uikit-selection-bg)";
     }), f = A("none");
     function h() {
       f.value = f.value === "custom" ? "none" : "custom";
@@ -8269,216 +8287,216 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
       f.value === "custom" && (f.value = "none");
     }
     const v = k(() => (s.keyboardHeight ?? 0) > 0), b = k(() => `${Math.max(s.keyboardHeight ?? 0, 280)}px`), $ = k(() => v.value ? { paddingBottom: `${s.keyboardHeight}px` } : f.value !== "none" ? { paddingBottom: "0px" } : { paddingBottom: "var(--uikit-safe-bottom, 0px)" }), R = A();
-    function M(Z) {
-      var ie;
-      if (f.value === Z) {
+    function M(Q) {
+      var ae;
+      if (f.value === Q) {
         f.value = "none";
         return;
       }
-      (ie = R.value) == null || ie.blur(), f.value = Z, o("focus");
+      (ae = R.value) == null || ae.blur(), f.value = Q, o("focus");
     }
     function x() {
       f.value = "none", o("focus");
     }
-    Pe(v, (Z) => {
-      Z && (f.value = "none");
+    Pe(v, (Q) => {
+      Q && (f.value = "none");
     });
     const T = A([]);
     function I() {
       if (s.mentionOpen)
         return;
-      const Z = i.value.trim();
-      if (!Z)
+      const Q = i.value.trim();
+      if (!Q)
         return;
-      const ie = vc(Z, T.value);
-      o("send", Z, ie.length > 0 ? ie : void 0), i.value = "", T.value = [];
+      const ae = vc(Q, T.value);
+      o("send", Q, ae.length > 0 ? ae : void 0), i.value = "", T.value = [];
     }
-    function O(Z) {
-      Z.key === "Enter" && !Z.shiftKey && s.mentionOpen && Z.preventDefault();
+    function N(Q) {
+      Q.key === "Enter" && !Q.shiftKey && s.mentionOpen && Q.preventDefault();
     }
-    let E = null, G = !1;
-    function N() {
-      G || (G = !0, o("typing"), E = setTimeout(() => {
-        G = !1, E = null;
+    let E = null, H = !1;
+    function D() {
+      H || (H = !0, o("typing"), E = setTimeout(() => {
+        H = !1, E = null;
       }, 5e3));
     }
-    function D() {
-      Be(), N();
+    function L() {
+      Be(), D();
     }
     function S() {
-      const Z = R.value;
-      if (!Z)
+      const Q = R.value;
+      if (!Q)
         return;
-      Z.style.height = "auto";
-      const ie = getComputedStyle(Z), ke = Number.parseFloat(ie.lineHeight) || 22, Q = (Number.parseFloat(ie.paddingTop) || 0) + (Number.parseFloat(ie.paddingBottom) || 0), H = ke * 5 + Q;
-      Z.style.height = `${Math.min(Z.scrollHeight, H)}px`, Z.style.overflowY = Z.scrollHeight > H ? "auto" : "hidden";
+      Q.style.height = "auto";
+      const ae = getComputedStyle(Q), we = Number.parseFloat(ae.lineHeight) || 22, X = (Number.parseFloat(ae.paddingTop) || 0) + (Number.parseFloat(ae.paddingBottom) || 0), U = we * 5 + X;
+      Q.style.height = `${Math.min(Q.scrollHeight, U)}px`, Q.style.overflowY = Q.scrollHeight > U ? "auto" : "hidden";
     }
     Pe(i, () => {
       Ye(S);
     });
-    const C = A(!1), L = A(!1), J = A(!1), te = A(0);
-    let ve = 0, be = 0, W = null;
-    const re = A();
-    function ue() {
-      var Z;
-      C.value = !C.value, C.value && ((Z = R.value) == null || Z.blur(), f.value = "none");
+    const C = A(!1), O = A(!1), q = A(!1), te = A(0);
+    let ye = 0, ke = 0, j = null;
+    const ie = A();
+    function fe() {
+      var Q;
+      C.value = !C.value, C.value && ((Q = R.value) == null || Q.blur(), f.value = "none");
     }
-    function j() {
-      W && (clearInterval(W), W = null);
+    function V() {
+      j && (clearInterval(j), j = null);
     }
-    function de(Z) {
-      var ie, ke;
-      L.value || ((ke = (ie = re.value) == null ? void 0 : ie.setPointerCapture) == null || ke.call(ie, Z.pointerId), ve = Date.now(), be = Z.clientY, te.value = 0, J.value = !1, L.value = !0, W = setInterval(() => {
-        te.value = Math.floor((Date.now() - ve) / 1e3);
+    function ue(Q) {
+      var ae, we;
+      O.value || ((we = (ae = ie.value) == null ? void 0 : ae.setPointerCapture) == null || we.call(ae, Q.pointerId), ye = Date.now(), ke = Q.clientY, te.value = 0, q.value = !1, O.value = !0, j = setInterval(() => {
+        te.value = Math.floor((Date.now() - ye) / 1e3);
       }, 200), o("voice-start"));
     }
-    function se(Z) {
-      L.value && (J.value = be - Z.clientY > n1);
+    function se(Q) {
+      O.value && (q.value = ke - Q.clientY > n1);
     }
-    function Me(Z = !1) {
-      if (!L.value)
+    function Me(Q = !1) {
+      if (!O.value)
         return;
-      L.value = !1, j();
-      const ie = Math.floor((Date.now() - ve) / 1e3);
-      Z || J.value ? o("voice-cancel") : o("voice-end", ie), J.value = !1;
+      O.value = !1, V();
+      const ae = Math.floor((Date.now() - ye) / 1e3);
+      Q || q.value ? o("voice-cancel") : o("voice-end", ae), q.value = !1;
     }
     const ge = A(), Ie = A(), Ke = A(), _e = A(), He = k(() => {
-      const Z = [];
-      return c.value.image && (Z.push({
+      const Q = [];
+      return c.value.image && (Q.push({
         key: "album",
         icon: "rect/img",
         label: r("chat.input.album"),
         action: () => {
-          var ie;
-          return (ie = ge.value) == null ? void 0 : ie.click();
+          var ae;
+          return (ae = ge.value) == null ? void 0 : ae.click();
         }
-      }), Z.push({
+      }), Q.push({
         key: "camera",
         icon: "camera",
         label: r("chat.input.camera"),
         action: () => {
-          var ie;
-          return (ie = Ie.value) == null ? void 0 : ie.click();
+          var ae;
+          return (ae = Ie.value) == null ? void 0 : ae.click();
         }
-      })), c.value.video && Z.push({
+      })), c.value.video && Q.push({
         key: "video",
         icon: "video",
         label: r("chat.input.video"),
         action: () => {
-          var ie;
-          return (ie = Ke.value) == null ? void 0 : ie.click();
+          var ae;
+          return (ae = Ke.value) == null ? void 0 : ae.click();
         }
-      }), c.value.file && Z.push({
+      }), c.value.file && Q.push({
         key: "file",
         icon: "folder",
         label: r("chat.input.file"),
         action: () => {
-          var ie;
-          return (ie = _e.value) == null ? void 0 : ie.click();
+          var ae;
+          return (ae = _e.value) == null ? void 0 : ae.click();
         }
-      }), Z;
+      }), Q;
     });
-    function ee(Z, ie) {
-      const ke = ie.target.files;
-      ke && ke.length > 0 && (o("send-file", Z, ke), ie.target.value = ""), f.value = "none";
+    function ee(Q, ae) {
+      const we = ae.target.files;
+      we && we.length > 0 && (o("send-file", Q, we), ae.target.value = ""), f.value = "none";
     }
-    function me(Z, ie) {
-      const ke = document.createElement("div"), Q = getComputedStyle(Z), H = Z.getBoundingClientRect();
+    function ve(Q, ae) {
+      const we = document.createElement("div"), X = getComputedStyle(Q), U = Q.getBoundingClientRect();
       ["fontSize", "fontFamily", "fontWeight", "lineHeight", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth", "boxSizing", "whiteSpace", "wordWrap", "width"].forEach((Ne) => {
-        ke.style.setProperty(Ne, Q.getPropertyValue(Ne));
-      }), ke.style.position = "fixed", ke.style.left = `${H.left}px`, ke.style.top = `${H.top}px`, ke.style.visibility = "hidden", ke.style.height = "auto", ke.style.zIndex = "-9999", ke.style.pointerEvents = "none", ke.textContent = Z.value.substring(0, ie);
+        we.style.setProperty(Ne, X.getPropertyValue(Ne));
+      }), we.style.position = "fixed", we.style.left = `${U.left}px`, we.style.top = `${U.top}px`, we.style.visibility = "hidden", we.style.height = "auto", we.style.zIndex = "-9999", we.style.pointerEvents = "none", we.textContent = Q.value.substring(0, ae);
       const K = document.createElement("span");
-      K.textContent = Z.value.substring(ie) || "​", ke.appendChild(K), document.body.appendChild(ke);
+      K.textContent = Q.value.substring(ae) || "​", we.appendChild(K), document.body.appendChild(we);
       const pe = K.getBoundingClientRect();
-      return document.body.removeChild(ke), { left: pe.left, top: pe.top + pe.height };
+      return document.body.removeChild(we), { left: pe.left, top: pe.top + pe.height };
     }
     function Be() {
       if (!s.enableMention)
         return;
-      const Z = R.value;
-      if (!Z)
+      const Q = R.value;
+      if (!Q)
         return;
-      const ie = Z.selectionStart || 0, ke = Z.value;
-      let Q = -1;
-      for (let pe = ie - 1; pe >= 0; pe--) {
-        if (ke[pe] === "@") {
-          Q = pe;
+      const ae = Q.selectionStart || 0, we = Q.value;
+      let X = -1;
+      for (let pe = ae - 1; pe >= 0; pe--) {
+        if (we[pe] === "@") {
+          X = pe;
           break;
         }
-        if (ke[pe] === " " || ke[pe] === `
+        if (we[pe] === " " || we[pe] === `
 `)
           break;
       }
-      if (Q === -1) {
+      if (X === -1) {
         o("mention-close");
         return;
       }
-      const H = ke.substring(Q + 1, ie), ae = me(Z, ie), K = document.createElement("div");
-      K.style.position = "fixed", K.style.left = `${ae.left}px`, K.style.top = `${ae.top}px`, K.style.width = "1px", K.style.height = "1px", K.style.pointerEvents = "none", document.body.appendChild(K), o("mention-trigger", K, H);
+      const U = we.substring(X + 1, ae), le = ve(Q, ae), K = document.createElement("div");
+      K.style.position = "fixed", K.style.left = `${le.left}px`, K.style.top = `${le.top}px`, K.style.width = "1px", K.style.height = "1px", K.style.pointerEvents = "none", document.body.appendChild(K), o("mention-trigger", K, U);
     }
-    function tt(Z) {
-      const ie = R.value;
-      if (!ie)
+    function st(Q) {
+      const ae = R.value;
+      if (!ae)
         return;
-      const ke = ie.selectionStart || 0, Q = ie.value;
-      let H = ke - 1;
-      for (; H >= 0 && Q[H] !== "@"; )
-        H--;
-      if (H < 0)
+      const we = ae.selectionStart || 0, X = ae.value;
+      let U = we - 1;
+      for (; U >= 0 && X[U] !== "@"; )
+        U--;
+      if (U < 0)
         return;
-      const ae = Q.substring(0, H), K = Q.substring(ke);
-      i.value = `${ae}@${Z.name} ${K}`, T.value.find((pe) => pe.userId === Z.userId) || T.value.push(Z), Ye(() => {
-        const pe = ae.length + Z.name.length + 2;
-        ie.setSelectionRange(pe, pe), ie.focus();
+      const le = X.substring(0, U), K = X.substring(we);
+      i.value = `${le}@${Q.name} ${K}`, T.value.find((pe) => pe.userId === Q.userId) || T.value.push(Q), Ye(() => {
+        const pe = le.length + Q.name.length + 2;
+        ae.setSelectionRange(pe, pe), ae.focus();
       });
     }
-    function nt(Z) {
-      const ie = R.value;
-      if (!ie)
+    function nt(Q) {
+      const ae = R.value;
+      if (!ae)
         return;
-      const ke = i.value.length > 0 && !i.value.endsWith(" ") ? " " : "";
-      i.value = `${i.value}${ke}@${Z.name} `, T.value.find((Q) => Q.userId === Z.userId) || T.value.push(Z), Ye(() => {
-        ie.focus();
-        const Q = i.value.length;
-        ie.setSelectionRange(Q, Q);
+      const we = i.value.length > 0 && !i.value.endsWith(" ") ? " " : "";
+      i.value = `${i.value}${we}@${Q.name} `, T.value.find((X) => X.userId === Q.userId) || T.value.push(Q), Ye(() => {
+        ae.focus();
+        const X = i.value.length;
+        ae.setSelectionRange(X, X);
       });
     }
-    function dt(Z) {
-      const ie = R.value;
-      if (!ie) {
-        i.value += Z;
+    function dt(Q) {
+      const ae = R.value;
+      if (!ae) {
+        i.value += Q;
         return;
       }
-      const ke = ie.selectionStart || 0, Q = ie.selectionEnd || 0, H = ie.value;
-      i.value = H.substring(0, ke) + Z + H.substring(Q), Ye(() => {
-        const ae = ke + Z.length;
-        ie.setSelectionRange(ae, ae);
+      const we = ae.selectionStart || 0, X = ae.selectionEnd || 0, U = ae.value;
+      i.value = U.substring(0, we) + Q + U.substring(X), Ye(() => {
+        const le = we + Q.length;
+        ae.setSelectionRange(le, le);
       });
     }
-    function vt(Z) {
-      f.value = "none", o("sticker-select", Z);
+    function gt(Q) {
+      f.value = "none", o("sticker-select", Q);
     }
-    function kt(Z) {
-      i.value = Z, T.value = [], Ye(() => {
-        var ie;
-        (ie = R.value) == null || ie.focus();
+    function kt(Q) {
+      i.value = Q, T.value = [], Ye(() => {
+        var ae;
+        (ae = R.value) == null || ae.focus();
       });
     }
-    function fe() {
+    function he() {
       return i.value;
     }
     return qt(() => {
-      var Z, ie;
-      (Z = s.config) != null && Z.autoFocus && ((ie = R.value) == null || ie.focus());
+      var Q, ae;
+      (Q = s.config) != null && Q.autoFocus && ((ae = R.value) == null || ae.focus());
     }), Xn(() => {
-      j(), E && (clearTimeout(E), E = null);
+      V(), E && (clearTimeout(E), E = null);
     }), e({
       setText: kt,
-      getText: fe,
+      getText: he,
       insertEmoji: dt,
-      insertMention: tt,
+      insertMention: st,
       appendMention: nt
-    }), (Z, ie) => (y(), w("div", {
+    }), (Q, ae) => (y(), w("div", {
       class: "h5-input",
       style: Et($.value)
     }, [
@@ -8487,35 +8505,35 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           key: 0,
           type: "button",
           class: Te(["h5-input__icon-btn", { "h5-input__icon-btn--active": C.value }]),
-          onClick: ue
+          onClick: fe
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: (C.value, "mic"),
             size: 24
           }, null, 8, ["name"])
-        ], 2)) : U("", !0),
+        ], 2)) : F("", !0),
         C.value ? (y(), w("div", {
           key: 2,
           ref_key: "voiceBtnRef",
-          ref: re,
-          class: Te(["h5-input__voice-btn", { "h5-input__voice-btn--recording": L.value }]),
-          onPointerdown: ft(de, ["prevent"]),
+          ref: ie,
+          class: Te(["h5-input__voice-btn", { "h5-input__voice-btn--recording": O.value }]),
+          onPointerdown: ft(ue, ["prevent"]),
           onPointermove: se,
-          onPointerup: ie[1] || (ie[1] = (ke) => Me()),
-          onPointercancel: ie[2] || (ie[2] = (ke) => Me(!0)),
-          onContextmenu: ie[3] || (ie[3] = ft(() => {
+          onPointerup: ae[1] || (ae[1] = (we) => Me()),
+          onPointercancel: ae[2] || (ae[2] = (we) => Me(!0)),
+          onContextmenu: ae[3] || (ae[3] = ft(() => {
           }, ["prevent"]))
-        }, P(L.value ? m(r)("chat.voice.releaseEnd") : m(r)("chat.voice.holdTalk")), 35)) : Dn((y(), w("textarea", {
+        }, P(O.value ? m(r)("chat.voice.releaseEnd") : m(r)("chat.voice.holdTalk")), 35)) : Dn((y(), w("textarea", {
           key: 1,
           ref_key: "textareaRef",
           ref: R,
-          "onUpdate:modelValue": ie[0] || (ie[0] = (ke) => i.value = ke),
+          "onUpdate:modelValue": ae[0] || (ae[0] = (we) => i.value = we),
           class: "h5-input__textarea",
           placeholder: m(r)("chat.placeholder"),
           maxlength: u.value,
           rows: "1",
-          onKeydown: O,
-          onInput: D,
+          onKeydown: N,
+          onInput: L,
           onFocus: x
         }, null, 40, J_)), [
           [ts, i.value]
@@ -8524,21 +8542,21 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           key: 3,
           type: "button",
           class: Te(["h5-input__icon-btn", { "h5-input__icon-btn--active": f.value === "emoji" }]),
-          onClick: ie[4] || (ie[4] = (ke) => M("emoji"))
+          onClick: ae[4] || (ae[4] = (we) => M("emoji"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "circle/face",
             size: 24
           })
-        ], 2)) : U("", !0),
-        i.value.trim() ? (y(), ce(m(xn), {
+        ], 2)) : F("", !0),
+        i.value.trim() ? (y(), de(m(xn), {
           key: 4,
           type: "primary",
           size: "small",
           class: "h5-input__send-btn",
           onClick: I
         }, {
-          default: X(() => [
+          default: J(() => [
             mt(P(m(r)("chat.send")), 1)
           ]),
           _: 1
@@ -8546,9 +8564,9 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           key: 5,
           type: "button",
           class: Te(["h5-input__icon-btn", { "h5-input__icon-btn--active": f.value === "more" }]),
-          onClick: ie[5] || (ie[5] = (ke) => M("more"))
+          onClick: ae[5] || (ae[5] = (we) => M("more"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "circle/plus",
             size: 24
           })
@@ -8559,7 +8577,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         class: "h5-input__panel",
         style: Et({ height: b.value })
       }, [
-        q(m(Yl), {
+        W(m(Yl), {
           class: "h5-input__emoji-picker",
           show: !0,
           "sticker-packs": a.value,
@@ -8569,8 +8587,8 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           "sticker-hover": l.value.stickerHover,
           "emoji-icon": l.value.emojiIcon,
           onSelect: dt,
-          onSelectSticker: vt,
-          "onUpdate:show": ie[6] || (ie[6] = (ke) => f.value = "none")
+          onSelectSticker: gt,
+          "onUpdate:show": ae[6] || (ae[6] = (we) => f.value = "none")
         }, null, 8, ["sticker-packs", "recent", "recent-count", "tabs-position", "sticker-hover", "emoji-icon"])
       ], 4)) : f.value === "more" ? (y(), w("div", {
         key: 1,
@@ -8578,20 +8596,20 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         style: Et({ height: b.value })
       }, [
         _("div", X_, [
-          (y(!0), w($e, null, et(He.value, (ke) => (y(), w("div", {
-            key: ke.key,
+          (y(!0), w($e, null, tt(He.value, (we) => (y(), w("div", {
+            key: we.key,
             class: "h5-input__more-item",
-            onClick: ke.action
+            onClick: we.action
           }, [
             _("div", Q_, [
-              q(m(Oe), {
-                name: ke.icon,
+              W(m(De), {
+                name: we.icon,
                 size: 26
               }, null, 8, ["name"])
             ]),
-            _("span", Z_, P(ke.label), 1)
+            _("span", Z_, P(we.label), 1)
           ], 8, Y_))), 128)),
-          V(Z.$slots, "toolbar-extra", {
+          G(Q.$slots, "toolbar-extra", {
             togglePanel: h,
             showPanel: !1,
             closePanel: g
@@ -8602,22 +8620,22 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         class: "h5-input__panel",
         style: Et({ height: b.value })
       }, [
-        V(Z.$slots, "input-panel", {
+        G(Q.$slots, "input-panel", {
           showPanel: !0,
           closePanel: g
         }, void 0, !0)
-      ], 4)) : U("", !0),
-      L.value ? (y(), w("div", {
+      ], 4)) : F("", !0),
+      O.value ? (y(), w("div", {
         key: 3,
-        class: Te(["h5-input__record-overlay", { "h5-input__record-overlay--cancel": J.value }])
+        class: Te(["h5-input__record-overlay", { "h5-input__record-overlay--cancel": q.value }])
       }, [
-        q(m(Oe), {
+        W(m(De), {
           name: "mic",
           size: 32
         }),
         _("span", e1, P(te.value) + "s", 1),
-        _("span", t1, P(J.value ? m(r)("chat.voice.releaseToCancel") : m(r)("chat.voice.slideUpCancel")), 1)
-      ], 2)) : U("", !0),
+        _("span", t1, P(q.value ? m(r)("chat.voice.releaseToCancel") : m(r)("chat.voice.slideUpCancel")), 1)
+      ], 2)) : F("", !0),
       _("input", {
         ref_key: "albumInputRef",
         ref: ge,
@@ -8625,7 +8643,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         accept: "image/*",
         multiple: "",
         style: { display: "none" },
-        onChange: ie[7] || (ie[7] = (ke) => ee("image", ke))
+        onChange: ae[7] || (ae[7] = (we) => ee("image", we))
       }, null, 544),
       _("input", {
         ref_key: "cameraInputRef",
@@ -8634,7 +8652,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         accept: "image/*",
         capture: "",
         style: { display: "none" },
-        onChange: ie[8] || (ie[8] = (ke) => ee("image", ke))
+        onChange: ae[8] || (ae[8] = (we) => ee("image", we))
       }, null, 544),
       _("input", {
         ref_key: "videoInputRef",
@@ -8642,14 +8660,14 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         type: "file",
         accept: "video/*",
         style: { display: "none" },
-        onChange: ie[9] || (ie[9] = (ke) => ee("video", ke))
+        onChange: ae[9] || (ae[9] = (we) => ee("video", we))
       }, null, 544),
       _("input", {
         ref_key: "fileInputRef",
         ref: _e,
         type: "file",
         style: { display: "none" },
-        onChange: ie[10] || (ie[10] = (ke) => ee("file", ke))
+        onChange: ae[10] || (ae[10] = (we) => ee("file", we))
       }, null, 544)
     ], 4));
   }
@@ -8659,7 +8677,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
 }, i1 = { class: "voice-panel__mic-wrapper" }, a1 = { class: "voice-panel__hint" }, l1 = {
   key: 1,
   class: "voice-panel__recording"
-}, c1 = { class: "voice-panel__timer" }, u1 = { class: "voice-panel__mic-wrapper voice-panel__mic-wrapper--recording" }, d1 = { class: "voice-panel__hint" }, f1 = /* @__PURE__ */ Re({
+}, c1 = { class: "voice-panel__timer" }, u1 = { class: "voice-panel__mic-wrapper voice-panel__mic-wrapper--recording" }, d1 = { class: "voice-panel__hint" }, f1 = /* @__PURE__ */ Le({
   __name: "voice-panel",
   props: {
     active: { type: Boolean }
@@ -8669,8 +8687,8 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
     const t = n, s = e, { t: o } = qe(), r = A(!1), i = A(0);
     let a = null;
     const l = A(!1), c = A(!1), u = k(() => {
-      const I = Math.floor(i.value / 60), O = i.value % 60;
-      return `${I}:${O.toString().padStart(2, "0")}`;
+      const I = Math.floor(i.value / 60), N = i.value % 60;
+      return `${I}:${N.toString().padStart(2, "0")}`;
     });
     function d() {
       r.value || (r.value = !0, i.value = 0, a = setInterval(() => {
@@ -8717,7 +8735,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
       { immediate: !0 }
     ), Xn(() => {
       x == null || x(), T == null || T(), h();
-    }), (I, O) => (y(), w("div", {
+    }), (I, N) => (y(), w("div", {
       class: "voice-panel",
       onMousedown: $,
       onMouseup: R,
@@ -8726,26 +8744,26 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
       r.value ? (y(), w("div", l1, [
         _("div", c1, P(u.value), 1),
         _("div", u1, [
-          q(m(Oe), {
+          W(m(De), {
             name: "mic",
             size: 32,
             color: "white"
           }),
-          O[2] || (O[2] = _("div", { class: "voice-panel__ripple" }, null, -1)),
-          O[3] || (O[3] = _("div", { class: "voice-panel__ripple" }, null, -1))
+          N[2] || (N[2] = _("div", { class: "voice-panel__ripple" }, null, -1)),
+          N[3] || (N[3] = _("div", { class: "voice-panel__ripple" }, null, -1))
         ]),
         _("div", d1, [
           mt(P(m(o)("chat.voice.releaseSend")), 1),
           _("span", {
             class: "voice-panel__link",
-            onMousedown: O[1] || (O[1] = ft(() => {
+            onMousedown: N[1] || (N[1] = ft(() => {
             }, ["stop"])),
             onClick: f
           }, P(m(o)("chat.voice.cancelSend")), 33)
         ])
       ])) : (y(), w("div", r1, [
         _("div", i1, [
-          q(m(Oe), {
+          W(m(De), {
             name: "mic",
             size: 32,
             color: "white"
@@ -8755,7 +8773,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           mt(P(m(o)("chat.voice.holdSpace")), 1),
           _("span", {
             class: "voice-panel__link",
-            onMousedown: O[0] || (O[0] = ft(() => {
+            onMousedown: N[0] || (N[0] = ft(() => {
             }, ["stop"])),
             onClick: g
           }, P(m(o)("chat.voice.exit")), 33)
@@ -8772,7 +8790,7 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
 }, b1 = {
   key: 1,
   class: "simple-input__actions"
-}, k1 = /* @__PURE__ */ Re({
+}, k1 = /* @__PURE__ */ Le({
   __name: "simple-input",
   props: {
     config: {},
@@ -8781,33 +8799,33 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
   },
   emits: ["send", "send-file", "emoji-click", "voice-start", "voice-end", "voice-cancel", "mention-trigger", "mention-close", "typing", "focus", "expand-change"],
   setup(n, { expose: e, emit: t }) {
-    la((fe) => ({
+    la((he) => ({
       v2bacfec5: T.value,
       ebd6de64: I.value
     }));
     const s = n, o = t, { t: r } = qe(), { isMobile: i } = Mn(), a = A(""), l = k(() => {
-      var fe;
-      return ((fe = s.config) == null ? void 0 : fe.style) ?? "toolbar-top";
+      var he;
+      return ((he = s.config) == null ? void 0 : he.style) ?? "toolbar-top";
     }), c = k(() => {
-      var fe, Z, ie, ke, Q, H, ae, K, pe, Ne;
+      var he, Q, ae, we, X, U, le, K, pe, Ne;
       return {
-        emoji: ((Z = (fe = s.config) == null ? void 0 : fe.features) == null ? void 0 : Z.emoji) !== !1,
-        image: ((ke = (ie = s.config) == null ? void 0 : ie.features) == null ? void 0 : ke.image) !== !1,
-        file: ((H = (Q = s.config) == null ? void 0 : Q.features) == null ? void 0 : H.file) !== !1,
-        voice: ((K = (ae = s.config) == null ? void 0 : ae.features) == null ? void 0 : K.voice) !== !1,
+        emoji: ((Q = (he = s.config) == null ? void 0 : he.features) == null ? void 0 : Q.emoji) !== !1,
+        image: ((we = (ae = s.config) == null ? void 0 : ae.features) == null ? void 0 : we.image) !== !1,
+        file: ((U = (X = s.config) == null ? void 0 : X.features) == null ? void 0 : U.file) !== !1,
+        voice: ((K = (le = s.config) == null ? void 0 : le.features) == null ? void 0 : K.voice) !== !1,
         video: ((Ne = (pe = s.config) == null ? void 0 : pe.features) == null ? void 0 : Ne.video) !== !1
       };
     }), u = k(() => {
-      var fe;
-      return ((fe = s.config) == null ? void 0 : fe.showSendButton) !== !1;
+      var he;
+      return ((he = s.config) == null ? void 0 : he.showSendButton) !== !1;
     }), d = A(), p = A(!1);
     let f = null;
     const h = k(() => {
-      var fe;
-      return !i.value && ((fe = s.config) == null ? void 0 : fe.expandable) !== !1;
+      var he;
+      return !i.value && ((he = s.config) == null ? void 0 : he.expandable) !== !1;
     }), g = k(() => {
-      var fe;
-      return !i.value && ((fe = s.config) == null ? void 0 : fe.resizable) !== !1 && !p.value;
+      var he;
+      return !i.value && ((he = s.config) == null ? void 0 : he.resizable) !== !1 && !p.value;
     }), v = A(null), b = A();
     Ef(b, {
       axis: "vertical",
@@ -8816,39 +8834,39 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
       // 手柄在输入区上缘：向上拖动增高（反向增量）
       invert: !0,
       disabled: () => !g.value,
-      onChange: (fe) => {
-        v.value = fe;
+      onChange: (he) => {
+        v.value = he;
       }
     });
     const $ = k(() => v.value === null ? null : { height: `${v.value}px` });
     function R() {
-      var ie;
-      const fe = (ie = d.value) == null ? void 0 : ie.closest(".chat"), Z = (fe == null ? void 0 : fe.clientHeight) ?? (typeof window < "u" ? window.innerHeight : 600);
-      return Math.min(Math.max(Math.round(Z * 0.5), 240), 600);
+      var ae;
+      const he = (ae = d.value) == null ? void 0 : ae.closest(".chat"), Q = (he == null ? void 0 : he.clientHeight) ?? (typeof window < "u" ? window.innerHeight : 600);
+      return Math.min(Math.max(Math.round(Q * 0.5), 240), 600);
     }
     function M() {
-      var fe;
-      p.value ? (v.value = f, p.value = !1) : (f = v.value, v.value = R(), p.value = !0), o("expand-change", p.value), (fe = He()) == null || fe.focus();
+      var he;
+      p.value ? (v.value = f, p.value = !1) : (f = v.value, v.value = R(), p.value = !0), o("expand-change", p.value), (he = He()) == null || he.focus();
     }
     const x = k(() => !i.value), T = k(() => {
-      var fe;
-      return ((fe = s.config) == null ? void 0 : fe.caretColor) || "auto";
+      var he;
+      return ((he = s.config) == null ? void 0 : he.caretColor) || "auto";
     }), I = k(() => {
-      var fe;
-      return ((fe = s.config) == null ? void 0 : fe.selectionColor) || "var(--uikit-selection-bg)";
-    }), O = k(() => {
-      var Z;
-      const fe = (Z = s.config) == null ? void 0 : Z.maxLength;
-      return fe && fe > 0 ? fe : void 0;
-    }), E = A(!1), G = A(!1), N = A([]);
-    function D() {
+      var he;
+      return ((he = s.config) == null ? void 0 : he.selectionColor) || "var(--uikit-selection-bg)";
+    }), N = k(() => {
+      var Q;
+      const he = (Q = s.config) == null ? void 0 : Q.maxLength;
+      return he && he > 0 ? he : void 0;
+    }), E = A(!1), H = A(!1), D = A([]);
+    function L() {
       if (s.mentionOpen)
         return;
-      const fe = a.value.trim();
-      if (!fe)
+      const he = a.value.trim();
+      if (!he)
         return;
-      const Z = vc(fe, N.value);
-      o("send", fe, Z.length > 0 ? Z : void 0), a.value = "", N.value = [];
+      const Q = vc(he, D.value);
+      o("send", he, Q.length > 0 ? Q : void 0), a.value = "", D.value = [];
     }
     let S = !1;
     function C() {
@@ -8856,32 +8874,32 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
         S = !1;
       }, 5e3));
     }
-    function L() {
-      me(), C();
+    function O() {
+      ve(), C();
     }
-    function J(fe) {
-      if (fe.key === "Escape" && p.value && !s.mentionOpen) {
-        fe.preventDefault(), M();
+    function q(he) {
+      if (he.key === "Escape" && p.value && !s.mentionOpen) {
+        he.preventDefault(), M();
         return;
       }
-      fe.key === "Enter" && !fe.shiftKey && (fe.preventDefault(), D());
+      he.key === "Enter" && !he.shiftKey && (he.preventDefault(), L());
     }
-    const te = A(), ve = A(), be = A();
-    function W(fe) {
-      var ie;
-      (ie = (fe === "image" ? te : fe === "video" ? be : ve).value) == null || ie.click();
+    const te = A(), ye = A(), ke = A();
+    function j(he) {
+      var ae;
+      (ae = (he === "image" ? te : he === "video" ? ke : ye).value) == null || ae.click();
     }
-    function re(fe, Z) {
-      const ie = Z.target.files;
-      ie && ie.length > 0 && (o("send-file", fe, ie), Z.target.value = "");
+    function ie(he, Q) {
+      const ae = Q.target.files;
+      ae && ae.length > 0 && (o("send-file", he, ae), Q.target.value = "");
     }
-    function ue() {
+    function fe() {
       E.value ? (E.value = !1, o("voice-end", 0)) : (E.value = !0, o("voice-start"));
     }
-    function j() {
-      i.value ? ue() : G.value = !0;
+    function V() {
+      i.value ? fe() : H.value = !0;
     }
-    const de = k(() => i.value ? E.value : G.value), se = A(), Me = A(!1);
+    const ue = k(() => i.value ? E.value : H.value), se = A(), Me = A(!1);
     function ge() {
       Me.value = !Me.value;
     }
@@ -8890,96 +8908,96 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
     }
     const Ke = A(), _e = A();
     function He() {
-      var fe;
-      return Ke.value || ((fe = _e.value) == null ? void 0 : fe.inputRef) || void 0;
+      var he;
+      return Ke.value || ((he = _e.value) == null ? void 0 : he.inputRef) || void 0;
     }
-    function ee(fe, Z) {
-      const ie = document.createElement("div"), ke = getComputedStyle(fe), Q = fe.getBoundingClientRect();
+    function ee(he, Q) {
+      const ae = document.createElement("div"), we = getComputedStyle(he), X = he.getBoundingClientRect();
       ["fontSize", "fontFamily", "fontWeight", "lineHeight", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth", "boxSizing", "whiteSpace", "wordWrap", "width"].forEach((pe) => {
-        ie.style.setProperty(pe, ke.getPropertyValue(pe));
-      }), ie.style.position = "fixed", ie.style.left = `${Q.left}px`, ie.style.top = `${Q.top}px`, ie.style.visibility = "hidden", ie.style.height = "auto", ie.style.zIndex = "-9999", ie.style.pointerEvents = "none", ie.textContent = fe.value.substring(0, Z);
-      const ae = document.createElement("span");
-      ae.textContent = fe.value.substring(Z) || "​", ie.appendChild(ae), document.body.appendChild(ie);
-      const K = ae.getBoundingClientRect();
-      return document.body.removeChild(ie), { left: K.left, top: K.top + K.height };
+        ae.style.setProperty(pe, we.getPropertyValue(pe));
+      }), ae.style.position = "fixed", ae.style.left = `${X.left}px`, ae.style.top = `${X.top}px`, ae.style.visibility = "hidden", ae.style.height = "auto", ae.style.zIndex = "-9999", ae.style.pointerEvents = "none", ae.textContent = he.value.substring(0, Q);
+      const le = document.createElement("span");
+      le.textContent = he.value.substring(Q) || "​", ae.appendChild(le), document.body.appendChild(ae);
+      const K = le.getBoundingClientRect();
+      return document.body.removeChild(ae), { left: K.left, top: K.top + K.height };
     }
-    function me() {
+    function ve() {
       if (!s.enableMention)
         return;
-      const fe = He();
-      if (!fe)
+      const he = He();
+      if (!he)
         return;
-      const Z = fe.selectionStart || 0, ie = fe.value;
-      let ke = -1;
-      for (let K = Z - 1; K >= 0; K--) {
-        if (ie[K] === "@") {
-          ke = K;
+      const Q = he.selectionStart || 0, ae = he.value;
+      let we = -1;
+      for (let K = Q - 1; K >= 0; K--) {
+        if (ae[K] === "@") {
+          we = K;
           break;
         }
-        if (ie[K] === " " || ie[K] === `
+        if (ae[K] === " " || ae[K] === `
 `)
           break;
       }
-      if (ke === -1) {
+      if (we === -1) {
         o("mention-close");
         return;
       }
-      const Q = ie.substring(ke + 1, Z), H = ee(fe, Z), ae = document.createElement("div");
-      ae.style.position = "fixed", ae.style.left = `${H.left}px`, ae.style.top = `${H.top}px`, ae.style.width = "1px", ae.style.height = "1px", ae.style.pointerEvents = "none", document.body.appendChild(ae), o("mention-trigger", ae, Q);
+      const X = ae.substring(we + 1, Q), U = ee(he, Q), le = document.createElement("div");
+      le.style.position = "fixed", le.style.left = `${U.left}px`, le.style.top = `${U.top}px`, le.style.width = "1px", le.style.height = "1px", le.style.pointerEvents = "none", document.body.appendChild(le), o("mention-trigger", le, X);
     }
-    function Be(fe) {
-      const Z = He();
-      if (!Z)
+    function Be(he) {
+      const Q = He();
+      if (!Q)
         return;
-      const ie = Z.selectionStart || 0, ke = Z.value;
-      let Q = ie - 1;
-      for (; Q >= 0 && ke[Q] !== "@"; )
-        Q--;
-      if (Q < 0)
+      const ae = Q.selectionStart || 0, we = Q.value;
+      let X = ae - 1;
+      for (; X >= 0 && we[X] !== "@"; )
+        X--;
+      if (X < 0)
         return;
-      const H = ke.substring(0, Q), ae = ke.substring(ie);
-      a.value = `${H}@${fe.name} ${ae}`, N.value.find((K) => K.userId === fe.userId) || N.value.push(fe), Ye(() => {
-        const K = H.length + fe.name.length + 2;
-        Z.setSelectionRange(K, K), Z.focus();
+      const U = we.substring(0, X), le = we.substring(ae);
+      a.value = `${U}@${he.name} ${le}`, D.value.find((K) => K.userId === he.userId) || D.value.push(he), Ye(() => {
+        const K = U.length + he.name.length + 2;
+        Q.setSelectionRange(K, K), Q.focus();
       });
     }
-    function tt(fe) {
-      const Z = He();
-      if (!Z)
+    function st(he) {
+      const Q = He();
+      if (!Q)
         return;
-      const ie = a.value.length > 0 && !a.value.endsWith(" ") ? " " : "";
-      a.value = `${a.value}${ie}@${fe.name} `, N.value.find((ke) => ke.userId === fe.userId) || N.value.push(fe), Ye(() => {
-        Z.focus();
-        const ke = a.value.length;
-        Z.setSelectionRange(ke, ke);
+      const ae = a.value.length > 0 && !a.value.endsWith(" ") ? " " : "";
+      a.value = `${a.value}${ae}@${he.name} `, D.value.find((we) => we.userId === he.userId) || D.value.push(he), Ye(() => {
+        Q.focus();
+        const we = a.value.length;
+        Q.setSelectionRange(we, we);
       });
     }
     function nt() {
       se.value && o("emoji-click", se.value);
     }
-    function dt(fe) {
-      const Z = He();
-      if (!Z)
+    function dt(he) {
+      const Q = He();
+      if (!Q)
         return;
-      const ie = Z.selectionStart || 0, ke = Z.selectionEnd || 0, Q = Z.value;
-      a.value = Q.substring(0, ie) + fe + Q.substring(ke), Ye(() => {
-        const H = ie + fe.length;
-        Z.setSelectionRange(H, H), Z.focus();
+      const ae = Q.selectionStart || 0, we = Q.selectionEnd || 0, X = Q.value;
+      a.value = X.substring(0, ae) + he + X.substring(we), Ye(() => {
+        const U = ae + he.length;
+        Q.setSelectionRange(U, U), Q.focus();
       });
     }
     qt(() => {
-      var fe;
-      if ((fe = s.config) != null && fe.autoFocus) {
-        const Z = He();
-        Z == null || Z.focus();
+      var he;
+      if ((he = s.config) != null && he.autoFocus) {
+        const Q = He();
+        Q == null || Q.focus();
       }
     }), Xn(() => {
-      G.value = !1;
+      H.value = !1;
     });
-    function vt(fe) {
-      a.value = fe, N.value = [], Ye(() => {
-        const Z = He();
-        Z == null || Z.focus();
+    function gt(he) {
+      a.value = he, D.value = [], Ye(() => {
+        const Q = He();
+        Q == null || Q.focus();
       });
     }
     function kt() {
@@ -8987,11 +9005,11 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
     }
     return e({
       insertMention: Be,
-      appendMention: tt,
+      appendMention: st,
       insertEmoji: dt,
-      setText: vt,
+      setText: gt,
       getText: kt
-    }), (fe, Z) => (y(), w("div", {
+    }), (he, Q) => (y(), w("div", {
       ref_key: "rootRef",
       ref: d,
       class: Te(["simple-input", {
@@ -9008,52 +9026,52 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           class: "simple-input__tool-btn",
           onClick: nt
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "circle/face",
             size: 22
           })
-        ], 512)) : U("", !0),
+        ], 512)) : F("", !0),
         c.value.image ? (y(), w("div", {
           key: 1,
           class: "simple-input__tool-btn",
-          onClick: Z[0] || (Z[0] = (ie) => W("image"))
+          onClick: Q[0] || (Q[0] = (ae) => j("image"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "rect/img",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         c.value.video ? (y(), w("div", {
           key: 2,
           class: "simple-input__tool-btn",
-          onClick: Z[1] || (Z[1] = (ie) => W("video"))
+          onClick: Q[1] || (Q[1] = (ae) => j("video"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "rect/triangle",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         c.value.file ? (y(), w("div", {
           key: 3,
           class: "simple-input__tool-btn",
-          onClick: Z[2] || (Z[2] = (ie) => W("file"))
+          onClick: Q[2] || (Q[2] = (ae) => j("file"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "file/empty",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         c.value.voice ? (y(), w("div", {
           key: 4,
           class: "simple-input__tool-btn",
-          onClick: j
+          onClick: V
         }, [
-          q(m(Oe), {
-            name: (de.value, "mic"),
+          W(m(De), {
+            name: (ue.value, "mic"),
             size: 22
           }, null, 8, ["name"])
-        ])) : U("", !0),
-        V(fe.$slots, "toolbar-extra", {
+        ])) : F("", !0),
+        G(he.$slots, "toolbar-extra", {
           togglePanel: ge,
           showPanel: Me.value,
           closePanel: Ie
@@ -9064,109 +9082,109 @@ const q_ = { class: "h5-input__toolbar" }, J_ = ["placeholder", "maxlength"], X_
           title: p.value ? m(r)("chat.input.collapse", "收起输入框") : m(r)("chat.input.expand", "展开输入框"),
           onClick: M
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: p.value ? "chevron/up" : "chevron/down",
             size: 22
           }, null, 8, ["name"])
-        ], 8, m1)) : U("", !0)
+        ], 8, m1)) : F("", !0)
       ]),
       _("div", {
         class: "simple-input__field-area",
         style: Et($.value)
       }, [
-        !G.value && !E.value ? (y(), w($e, { key: 0 }, [
+        !H.value && !E.value ? (y(), w($e, { key: 0 }, [
           x.value ? Dn((y(), w("textarea", {
             key: 1,
             ref_key: "textareaRef",
             ref: Ke,
-            "onUpdate:modelValue": Z[5] || (Z[5] = (ie) => a.value = ie),
+            "onUpdate:modelValue": Q[5] || (Q[5] = (ae) => a.value = ae),
             class: "simple-input__textarea",
             placeholder: m(r)("chat.placeholder"),
-            maxlength: O.value,
+            maxlength: N.value,
             rows: "3",
-            onKeydown: J,
-            onInput: L,
-            onFocus: Z[6] || (Z[6] = (ie) => o("focus"))
+            onKeydown: q,
+            onInput: O,
+            onFocus: Q[6] || (Q[6] = (ae) => o("focus"))
           }, null, 40, g1)), [
             [ts, a.value]
-          ]) : (y(), ce(m(gn), {
+          ]) : (y(), de(m(gn), {
             key: 0,
             ref_key: "inputComponentRef",
             ref: _e,
             modelValue: a.value,
-            "onUpdate:modelValue": Z[3] || (Z[3] = (ie) => a.value = ie),
+            "onUpdate:modelValue": Q[3] || (Q[3] = (ae) => a.value = ae),
             placeholder: m(r)("chat.placeholder"),
-            maxlength: O.value,
+            maxlength: N.value,
             class: "simple-input__field",
-            onSubmit: D,
-            onInput: L,
-            onFocus: Z[4] || (Z[4] = (ie) => o("focus"))
+            onSubmit: L,
+            onInput: O,
+            onFocus: Q[4] || (Q[4] = (ae) => o("focus"))
           }, null, 8, ["modelValue", "placeholder", "maxlength"]))
-        ], 64)) : G.value && !m(i) ? (y(), ce(p1, {
+        ], 64)) : H.value && !m(i) ? (y(), de(p1, {
           key: 1,
-          active: G.value,
-          "onUpdate:active": Z[7] || (Z[7] = (ie) => G.value = ie),
-          onStart: Z[8] || (Z[8] = (ie) => o("voice-start")),
-          onEnd: Z[9] || (Z[9] = (ie) => o("voice-end", ie)),
-          onCancel: Z[10] || (Z[10] = (ie) => o("voice-cancel"))
-        }, null, 8, ["active"])) : E.value ? (y(), w("div", v1, P(m(r)("chat.voice.releaseEnd")), 1)) : U("", !0),
+          active: H.value,
+          "onUpdate:active": Q[7] || (Q[7] = (ae) => H.value = ae),
+          onStart: Q[8] || (Q[8] = (ae) => o("voice-start")),
+          onEnd: Q[9] || (Q[9] = (ae) => o("voice-end", ae)),
+          onCancel: Q[10] || (Q[10] = (ae) => o("voice-cancel"))
+        }, null, 8, ["active"])) : E.value ? (y(), w("div", v1, P(m(r)("chat.voice.releaseEnd")), 1)) : F("", !0),
         g.value ? (y(), w("div", {
           key: 3,
           ref_key: "resizeHandleRef",
           ref: b,
           class: "simple-input__resize-handle"
-        }, null, 512)) : U("", !0)
+        }, null, 512)) : F("", !0)
       ], 4),
       Me.value ? (y(), w("div", y1, [
-        V(fe.$slots, "input-panel", {
+        G(he.$slots, "input-panel", {
           showPanel: Me.value,
           closePanel: Ie
         }, void 0, !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
       u.value ? (y(), w("div", b1, [
-        q(m(xn), {
+        W(m(xn), {
           type: "primary",
           size: "small",
           disabled: !a.value.trim(),
-          onClick: D
+          onClick: L
         }, {
-          default: X(() => [
+          default: J(() => [
             mt(P(m(r)("chat.send")), 1)
           ]),
           _: 1
         }, 8, ["disabled"])
-      ])) : U("", !0),
+      ])) : F("", !0),
       _("input", {
         ref_key: "imageInputRef",
         ref: te,
         type: "file",
         accept: "image/*",
         style: { display: "none" },
-        onChange: Z[11] || (Z[11] = (ie) => re("image", ie))
+        onChange: Q[11] || (Q[11] = (ae) => ie("image", ae))
       }, null, 544),
       _("input", {
         ref_key: "videoInputRef",
-        ref: be,
+        ref: ke,
         type: "file",
         accept: "video/*",
         style: { display: "none" },
-        onChange: Z[12] || (Z[12] = (ie) => re("video", ie))
+        onChange: Q[12] || (Q[12] = (ae) => ie("video", ae))
       }, null, 544),
       _("input", {
         ref_key: "fileInputRef",
-        ref: ve,
+        ref: ye,
         type: "file",
         style: { display: "none" },
-        onChange: Z[13] || (Z[13] = (ie) => re("file", ie))
+        onChange: Q[13] || (Q[13] = (ae) => ie("file", ae))
       }, null, 544)
     ], 2));
   }
 }), _p = /* @__PURE__ */ ze(k1, [["__scopeId", "data-v-737a9b85"]]);
-function dn(n) {
+function un(n) {
   this.content = n;
 }
-dn.prototype = {
-  constructor: dn,
+un.prototype = {
+  constructor: un,
   find: function(n) {
     for (var e = 0; e < this.content.length; e += 2)
       if (this.content[e] === n) return e;
@@ -9185,7 +9203,7 @@ dn.prototype = {
   // given, the key of the binding will be replaced with that key.
   update: function(n, e, t) {
     var s = t && t != n ? this.remove(t) : this, o = s.find(n), r = s.content.slice();
-    return o == -1 ? r.push(t || n, e) : (r[o + 1] = e, t && (r[o] = t)), new dn(r);
+    return o == -1 ? r.push(t || n, e) : (r[o + 1] = e, t && (r[o] = t)), new un(r);
   },
   // :: (string) → OrderedMap
   // Return a map with the given key removed, if it existed.
@@ -9193,25 +9211,25 @@ dn.prototype = {
     var e = this.find(n);
     if (e == -1) return this;
     var t = this.content.slice();
-    return t.splice(e, 2), new dn(t);
+    return t.splice(e, 2), new un(t);
   },
   // :: (string, any) → OrderedMap
   // Add a new key to the start of the map.
   addToStart: function(n, e) {
-    return new dn([n, e].concat(this.remove(n).content));
+    return new un([n, e].concat(this.remove(n).content));
   },
   // :: (string, any) → OrderedMap
   // Add a new key to the end of the map.
   addToEnd: function(n, e) {
     var t = this.remove(n).content.slice();
-    return t.push(n, e), new dn(t);
+    return t.push(n, e), new un(t);
   },
   // :: (string, string, any) → OrderedMap
   // Add a key after the given key. If `place` is not found, the new
   // key is added to the end.
   addBefore: function(n, e, t) {
     var s = this.remove(e), o = s.content.slice(), r = s.find(n);
-    return o.splice(r == -1 ? o.length : r, 0, e, t), new dn(o);
+    return o.splice(r == -1 ? o.length : r, 0, e, t), new un(o);
   },
   // :: ((key: string, value: any))
   // Call the given function for each key/value pair in the map, in
@@ -9224,20 +9242,20 @@ dn.prototype = {
   // Create a new map by prepending the keys in this map that don't
   // appear in `map` before the keys in `map`.
   prepend: function(n) {
-    return n = dn.from(n), n.size ? new dn(n.content.concat(this.subtract(n).content)) : this;
+    return n = un.from(n), n.size ? new un(n.content.concat(this.subtract(n).content)) : this;
   },
   // :: (union<Object, OrderedMap>) → OrderedMap
   // Create a new map by appending the keys in this map that don't
   // appear in `map` after the keys in `map`.
   append: function(n) {
-    return n = dn.from(n), n.size ? new dn(this.subtract(n).content.concat(n.content)) : this;
+    return n = un.from(n), n.size ? new un(this.subtract(n).content.concat(n.content)) : this;
   },
   // :: (union<Object, OrderedMap>) → OrderedMap
   // Create a map containing all the keys in this map that don't
   // appear in `map`.
   subtract: function(n) {
     var e = this;
-    n = dn.from(n);
+    n = un.from(n);
     for (var t = 0; t < n.content.length; t += 2)
       e = e.remove(n.content[t]);
     return e;
@@ -9256,11 +9274,11 @@ dn.prototype = {
     return this.content.length >> 1;
   }
 };
-dn.from = function(n) {
-  if (n instanceof dn) return n;
+un.from = function(n) {
+  if (n instanceof un) return n;
   var e = [];
   if (n) for (var t in n) e.push(t, n[t]);
-  return new dn(e);
+  return new un(e);
 };
 function Cp(n, e, t) {
   for (let s = 0; ; s++) {
@@ -11222,7 +11240,7 @@ class Fp {
     let t = this.spec = {};
     for (let o in e)
       t[o] = e[o];
-    t.nodes = dn.from(e.nodes), t.marks = dn.from(e.marks || {}), this.nodes = qu.compile(this.spec.nodes, this), this.marks = ha.compile(this.spec.marks, this);
+    t.nodes = un.from(e.nodes), t.marks = un.from(e.marks || {}), this.nodes = qu.compile(this.spec.nodes, this), this.marks = ha.compile(this.spec.marks, this);
     let s = /* @__PURE__ */ Object.create(null);
     for (let o in this.nodes) {
       if (o in this.marks)
@@ -12283,7 +12301,7 @@ class bn {
     return Ba[e] = t, t.prototype.jsonID = e, t;
   }
 }
-class Xt {
+class Yt {
   /**
   @internal
   */
@@ -12294,13 +12312,13 @@ class Xt {
   Create a successful step result.
   */
   static ok(e) {
-    return new Xt(e, null);
+    return new Yt(e, null);
   }
   /**
   Create a failed step result.
   */
   static fail(e) {
-    return new Xt(null, e);
+    return new Yt(null, e);
   }
   /**
   Call [`Node.replace`](https://prosemirror.net/docs/ref/#model.Node.replace) with the given
@@ -12309,10 +12327,10 @@ class Xt {
   */
   static fromReplace(e, t, s, o) {
     try {
-      return Xt.ok(e.replace(t, s, o));
+      return Yt.ok(e.replace(t, s, o));
     } catch (r) {
       if (r instanceof cr)
-        return Xt.fail(r.message);
+        return Yt.fail(r.message);
       throw r;
     }
   }
@@ -12334,7 +12352,7 @@ class Es extends bn {
   }
   apply(e) {
     let t = e.slice(this.from, this.to), s = e.resolve(this.from), o = s.node(s.sharedDepth(this.to)), r = new je(yc(t.content, (i, a) => !i.isAtom || !a.type.allowsMarkType(this.mark.type) ? i : i.mark(this.mark.addToSet(i.marks)), o), t.openStart, t.openEnd);
-    return Xt.fromReplace(e, this.from, this.to, r);
+    return Yt.fromReplace(e, this.from, this.to, r);
   }
   invert() {
     return new jn(this.from, this.to, this.mark);
@@ -12373,7 +12391,7 @@ class jn extends bn {
   }
   apply(e) {
     let t = e.slice(this.from, this.to), s = new je(yc(t.content, (o) => o.mark(this.mark.removeFromSet(o.marks)), e), t.openStart, t.openEnd);
-    return Xt.fromReplace(e, this.from, this.to, s);
+    return Yt.fromReplace(e, this.from, this.to, s);
   }
   invert() {
     return new Es(this.from, this.to, this.mark);
@@ -12413,9 +12431,9 @@ class As extends bn {
   apply(e) {
     let t = e.nodeAt(this.pos);
     if (!t)
-      return Xt.fail("No node at mark step's position");
+      return Yt.fail("No node at mark step's position");
     let s = t.type.create(t.attrs, null, this.mark.addToSet(t.marks));
-    return Xt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(s), 0, t.isLeaf ? 0 : 1));
+    return Yt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(s), 0, t.isLeaf ? 0 : 1));
   }
   invert(e) {
     let t = e.nodeAt(this.pos);
@@ -12457,9 +12475,9 @@ class no extends bn {
   apply(e) {
     let t = e.nodeAt(this.pos);
     if (!t)
-      return Xt.fail("No node at mark step's position");
+      return Yt.fail("No node at mark step's position");
     let s = t.type.create(t.attrs, null, this.mark.removeFromSet(t.marks));
-    return Xt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(s), 0, t.isLeaf ? 0 : 1));
+    return Yt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(s), 0, t.isLeaf ? 0 : 1));
   }
   invert(e) {
     let t = e.nodeAt(this.pos);
@@ -12496,7 +12514,7 @@ class Vt extends bn {
     super(), this.from = e, this.to = t, this.slice = s, this.structure = o;
   }
   apply(e) {
-    return this.structure && gl(e, this.from, this.to) ? Xt.fail("Structure replace would overwrite content") : Xt.fromReplace(e, this.from, this.to, this.slice);
+    return this.structure && gl(e, this.from, this.to) ? Yt.fail("Structure replace would overwrite content") : Yt.fromReplace(e, this.from, this.to, this.slice);
   }
   getMap() {
     return new An([this.from, this.to - this.from, this.slice.size]);
@@ -12535,7 +12553,7 @@ class Vt extends bn {
 }
 Vt.MAP_BIAS = 1;
 bn.jsonID("replace", Vt);
-class ln extends bn {
+class an extends bn {
   /**
   Create a replace-around step with the given range and gap.
   `insert` should be the point in the slice into which the content
@@ -12547,12 +12565,12 @@ class ln extends bn {
   }
   apply(e) {
     if (this.structure && (gl(e, this.from, this.gapFrom) || gl(e, this.gapTo, this.to)))
-      return Xt.fail("Structure gap-replace would overwrite content");
+      return Yt.fail("Structure gap-replace would overwrite content");
     let t = e.slice(this.gapFrom, this.gapTo);
     if (t.openStart || t.openEnd)
-      return Xt.fail("Gap is not a flat range");
+      return Yt.fail("Gap is not a flat range");
     let s = this.slice.insertAt(this.insert, t.content);
-    return s ? Xt.fromReplace(e, this.from, this.to, s) : Xt.fail("Content does not fit in gap");
+    return s ? Yt.fromReplace(e, this.from, this.to, s) : Yt.fail("Content does not fit in gap");
   }
   getMap() {
     return new An([
@@ -12566,11 +12584,11 @@ class ln extends bn {
   }
   invert(e) {
     let t = this.gapTo - this.gapFrom;
-    return new ln(this.from, this.from + this.slice.size + t, this.from + this.insert, this.from + this.insert + t, e.slice(this.from, this.to).removeBetween(this.gapFrom - this.from, this.gapTo - this.from), this.gapFrom - this.from, this.structure);
+    return new an(this.from, this.from + this.slice.size + t, this.from + this.insert, this.from + this.insert + t, e.slice(this.from, this.to).removeBetween(this.gapFrom - this.from, this.gapTo - this.from), this.gapFrom - this.from, this.structure);
   }
   map(e) {
     let t = e.mapResult(this.from, 1), s = e.mapResult(this.to, -1), o = this.from == this.gapFrom ? t.pos : e.map(this.gapFrom, -1), r = this.to == this.gapTo ? s.pos : e.map(this.gapTo, 1);
-    return t.deletedAcross && s.deletedAcross || o < t.pos || r > s.pos ? null : new ln(t.pos, s.pos, o, r, this.slice, this.insert, this.structure);
+    return t.deletedAcross && s.deletedAcross || o < t.pos || r > s.pos ? null : new an(t.pos, s.pos, o, r, this.slice, this.insert, this.structure);
   }
   toJSON() {
     let e = {
@@ -12589,10 +12607,10 @@ class ln extends bn {
   static fromJSON(e, t) {
     if (typeof t.from != "number" || typeof t.to != "number" || typeof t.gapFrom != "number" || typeof t.gapTo != "number" || typeof t.insert != "number")
       throw new RangeError("Invalid input for ReplaceAroundStep.fromJSON");
-    return new ln(t.from, t.to, t.gapFrom, t.gapTo, je.fromJSON(e, t.slice), t.insert, !!t.structure);
+    return new an(t.from, t.to, t.gapFrom, t.gapTo, je.fromJSON(e, t.slice), t.insert, !!t.structure);
   }
 }
-bn.jsonID("replaceAround", ln);
+bn.jsonID("replaceAround", an);
 function gl(n, e, t) {
   let s = n.resolve(e), o = t - e, r = s.depth;
   for (; o > 0 && r > 0 && s.indexAfter(r) == s.node(r).childCount; )
@@ -12693,7 +12711,7 @@ function J1(n, e, t) {
   let p = xe.empty, f = 0;
   for (let h = r, g = !1; h > t; h--)
     g || o.after(h + 1) < o.end(h) ? (g = !0, p = xe.from(o.node(h).copy(p)), f++) : c++;
-  n.step(new ln(l, c, i, a, new je(u.append(p), d, f), u.size - d, !0));
+  n.step(new an(l, c, i, a, new je(u.append(p), d, f), u.size - d, !0));
 }
 function kc(n, e, t = null, s = n) {
   let o = X1(n, e), r = o && Y1(s, e);
@@ -12729,7 +12747,7 @@ function Q1(n, e, t) {
     s = xe.from(t[i].type.create(t[i].attrs, s));
   }
   let o = e.start, r = e.end;
-  n.step(new ln(o, r, o, r, new je(s, 0, 0), t.length, !0));
+  n.step(new an(o, r, o, r, new je(s, 0, 0), t.length, !0));
 }
 function Z1(n, e, t, s, o) {
   if (!s.isTextblock)
@@ -12745,7 +12763,7 @@ function Z1(n, e, t, s, o) {
       }
       c === !1 && Jp(n, i, a, r), bc(n, n.mapping.slice(r).map(a, 1), s, void 0, c === null);
       let u = n.mapping.slice(r), d = u.map(a, 1), p = u.map(a + i.nodeSize, 1);
-      return n.step(new ln(d, p, d + 1, p - 1, new je(xe.from(s.create(l, null, i.marks)), 0, 0), 1, !0)), c === !0 && qp(n, i, a, r), !1;
+      return n.step(new an(d, p, d + 1, p - 1, new je(xe.from(s.create(l, null, i.marks)), 0, 0), 1, !0)), c === !0 && qp(n, i, a, r), !1;
     }
   });
 }
@@ -12783,7 +12801,7 @@ function tC(n, e, t, s, o) {
     return n.replaceWith(e, e + r.nodeSize, i);
   if (!t.validContent(r.content))
     throw new RangeError("Invalid content for node type " + t.name);
-  n.step(new ln(e, e + r.nodeSize, e + 1, e + r.nodeSize - 1, new je(xe.from(i), 0, 0), 1, !0));
+  n.step(new an(e, e + r.nodeSize, e + 1, e + r.nodeSize - 1, new je(xe.from(i), 0, 0), 1, !0));
 }
 function ys(n, e, t = 1, s) {
   let o = n.resolve(e), r = o.depth - t, i = s && s[s.length - 1] || o.parent;
@@ -12938,7 +12956,7 @@ class iC {
     for (; i && a && r.childCount == 1; )
       r = r.firstChild.content, i--, a--;
     let l = new je(r, i, a);
-    return e > -1 ? new ln(s.pos, e, this.$to.pos, this.$to.end(), l, t) : l.size || s.pos != this.$to.pos ? new Vt(s.pos, o.pos, l) : null;
+    return e > -1 ? new an(s.pos, e, this.$to.pos, this.$to.end(), l, t) : l.size || s.pos != this.$to.pos ? new Vt(s.pos, o.pos, l) : null;
   }
   // Find a position on the start spine of `this.unplaced` that has
   // content that can be moved somewhere on the frontier. Returns two
@@ -13204,13 +13222,13 @@ class So extends bn {
   apply(e) {
     let t = e.nodeAt(this.pos);
     if (!t)
-      return Xt.fail("No node at attribute step's position");
+      return Yt.fail("No node at attribute step's position");
     let s = /* @__PURE__ */ Object.create(null);
     for (let r in t.attrs)
       s[r] = t.attrs[r];
     s[this.attr] = this.value;
     let o = t.type.create(s, null, t.marks);
-    return Xt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(o), 0, t.isLeaf ? 0 : 1));
+    return Yt.fromReplace(e, this.pos, this.pos + 1, new je(xe.from(o), 0, t.isLeaf ? 0 : 1));
   }
   getMap() {
     return An.empty;
@@ -13245,7 +13263,7 @@ class pr extends bn {
       t[o] = e.attrs[o];
     t[this.attr] = this.value;
     let s = e.type.create(t, e.content, e.marks);
-    return Xt.ok(s);
+    return Yt.ok(s);
   }
   getMap() {
     return An.empty;
@@ -13611,7 +13629,7 @@ class ht {
   found.
   */
   static findFrom(e, t, s = !1) {
-    let o = e.parent.inlineContent ? new rt(e) : vo(e.node(0), e.parent, e.pos, e.index(), t, s);
+    let o = e.parent.inlineContent ? new it(e) : vo(e.node(0), e.parent, e.pos, e.index(), t, s);
     if (o)
       return o;
     for (let r = e.depth - 1; r >= 0; r--) {
@@ -13678,7 +13696,7 @@ class ht {
   returns the bookmark for that.
   */
   getBookmark() {
-    return rt.between(this.$anchor, this.$head).getBookmark();
+    return it.between(this.$anchor, this.$head).getBookmark();
   }
 }
 ht.prototype.visible = !0;
@@ -13694,7 +13712,7 @@ let od = !1;
 function rd(n) {
   !od && !n.parent.inlineContent && (od = !0, console.warn("TextSelection endpoint not pointing into a node with inline content (" + n.parent.type.name + ")"));
 }
-class rt extends ht {
+class it extends ht {
   /**
   Construct a text selection between the given points.
   */
@@ -13713,7 +13731,7 @@ class rt extends ht {
     if (!s.parent.inlineContent)
       return ht.near(s);
     let o = e.resolve(t.map(this.anchor));
-    return new rt(o.parent.inlineContent ? o : s, s);
+    return new it(o.parent.inlineContent ? o : s, s);
   }
   replace(e, t = je.empty) {
     if (super.replace(e, t), t == je.empty) {
@@ -13722,7 +13740,7 @@ class rt extends ht {
     }
   }
   eq(e) {
-    return e instanceof rt && e.anchor == this.anchor && e.head == this.head;
+    return e instanceof it && e.anchor == this.anchor && e.head == this.head;
   }
   getBookmark() {
     return new va(this.anchor, this.head);
@@ -13736,7 +13754,7 @@ class rt extends ht {
   static fromJSON(e, t) {
     if (typeof t.anchor != "number" || typeof t.head != "number")
       throw new RangeError("Invalid input for TextSelection.fromJSON");
-    return new rt(e.resolve(t.anchor), e.resolve(t.head));
+    return new it(e.resolve(t.anchor), e.resolve(t.head));
   }
   /**
   Create a text selection from non-resolved positions.
@@ -13762,10 +13780,10 @@ class rt extends ht {
       else
         return ht.near(t, s);
     }
-    return e.parent.inlineContent || (o == 0 ? e = t : (e = (ht.findFrom(e, -s, !0) || ht.findFrom(e, s, !0)).$anchor, e.pos < t.pos != o < 0 && (e = t))), new rt(e, t);
+    return e.parent.inlineContent || (o == 0 ? e = t : (e = (ht.findFrom(e, -s, !0) || ht.findFrom(e, s, !0)).$anchor, e.pos < t.pos != o < 0 && (e = t))), new it(e, t);
   }
 }
-ht.jsonID("text", rt);
+ht.jsonID("text", it);
 class va {
   constructor(e, t) {
     this.anchor = e, this.head = t;
@@ -13774,10 +13792,10 @@ class va {
     return new va(e.map(this.anchor), e.map(this.head));
   }
   resolve(e) {
-    return rt.between(e.resolve(this.anchor), e.resolve(this.head));
+    return it.between(e.resolve(this.anchor), e.resolve(this.head));
   }
 }
-class st extends ht {
+class ot extends ht {
   /**
   Create a node selection. Does not verify the validity of its
   argument.
@@ -13788,13 +13806,13 @@ class st extends ht {
   }
   map(e, t) {
     let { deleted: s, pos: o } = t.mapResult(this.anchor), r = e.resolve(o);
-    return s ? ht.near(r) : new st(r);
+    return s ? ht.near(r) : new ot(r);
   }
   content() {
     return new je(xe.from(this.node), 0, 0);
   }
   eq(e) {
-    return e instanceof st && e.anchor == this.anchor;
+    return e instanceof ot && e.anchor == this.anchor;
   }
   toJSON() {
     return { type: "node", anchor: this.anchor };
@@ -13808,13 +13826,13 @@ class st extends ht {
   static fromJSON(e, t) {
     if (typeof t.anchor != "number")
       throw new RangeError("Invalid input for NodeSelection.fromJSON");
-    return new st(e.resolve(t.anchor));
+    return new ot(e.resolve(t.anchor));
   }
   /**
   Create a node selection from non-resolved positions.
   */
   static create(e, t) {
-    return new st(e.resolve(t));
+    return new ot(e.resolve(t));
   }
   /**
   Determines whether the given node may be selected as a node
@@ -13824,8 +13842,8 @@ class st extends ht {
     return !e.isText && e.type.spec.selectable !== !1;
   }
 }
-st.prototype.visible = !1;
-ht.jsonID("node", st);
+ot.prototype.visible = !1;
+ht.jsonID("node", ot);
 class wc {
   constructor(e) {
     this.anchor = e;
@@ -13836,7 +13854,7 @@ class wc {
   }
   resolve(e) {
     let t = e.resolve(this.anchor), s = t.nodeAfter;
-    return s && st.isSelectable(s) ? new st(t) : ht.near(t);
+    return s && ot.isSelectable(s) ? new ot(t) : ht.near(t);
   }
 }
 class $n extends ht {
@@ -13884,12 +13902,12 @@ const pC = {
 };
 function vo(n, e, t, s, o, r = !1) {
   if (e.inlineContent)
-    return rt.create(n, t);
+    return it.create(n, t);
   for (let i = s - (o > 0 ? 0 : 1); o > 0 ? i < e.childCount : i >= 0; i += o) {
     let a = e.child(i);
     if (a.isAtom) {
-      if (!r && st.isSelectable(a))
-        return st.create(n, t - (o < 0 ? a.nodeSize : 0));
+      if (!r && ot.isSelectable(a))
+        return ot.create(n, t - (o < 0 ? a.nodeSize : 0));
     } else {
       let l = vo(n, a, t + o, o < 0 ? a.childCount : 0, o, r);
       if (l)
@@ -13904,7 +13922,7 @@ function id(n, e, t) {
   if (s < e)
     return;
   let o = n.steps[s];
-  if (!(o instanceof Vt || o instanceof ln))
+  if (!(o instanceof Vt || o instanceof an))
     return;
   let r = n.mapping.maps[s], i;
   r.forEach((a, l, c, u) => {
@@ -14286,7 +14304,7 @@ function sh(n, e, t) {
   }
   return t;
 }
-class Dt {
+class Bt {
   /**
   Create a plugin.
   */
@@ -14304,7 +14322,7 @@ const Ha = /* @__PURE__ */ Object.create(null);
 function oh(n) {
   return n in Ha ? n + "$" + ++Ha[n] : (Ha[n] = 0, n + "$");
 }
-class Qt {
+class Zt {
   /**
   Create a plugin key.
   */
@@ -14342,13 +14360,13 @@ const ah = (n, e, t) => {
   let r = o.nodeBefore;
   if (gh(n, o, e, -1))
     return !0;
-  if (s.parent.content.size == 0 && (To(r, "end") || st.isSelectable(r)))
+  if (s.parent.content.size == 0 && (To(r, "end") || ot.isSelectable(r)))
     for (let i = s.depth; ; i--) {
       let a = ga(n.doc, s.before(i), s.after(i), je.empty);
       if (a && a.slice.size < a.to - a.from) {
         if (e) {
           let l = n.tr.step(a);
-          l.setSelection(To(r, "end") ? ht.findFrom(l.doc.resolve(l.mapping.map(o.pos, -1)), -1) : st.create(l.doc, o.pos - r.nodeSize)), e(l.scrollIntoView());
+          l.setSelection(To(r, "end") ? ht.findFrom(l.doc.resolve(l.mapping.map(o.pos, -1)), -1) : ot.create(l.doc, o.pos - r.nodeSize)), e(l.scrollIntoView());
         }
         return !0;
       }
@@ -14393,7 +14411,7 @@ function lh(n, e, t) {
     return !1;
   if (t) {
     let u = n.tr.step(c);
-    u.setSelection(rt.create(u.doc, r)), t(u.scrollIntoView());
+    u.setSelection(it.create(u.doc, r)), t(u.scrollIntoView());
   }
   return !0;
 }
@@ -14416,7 +14434,7 @@ const ch = (n, e, t) => {
     r = _c(s);
   }
   let i = r && r.nodeBefore;
-  return !i || !st.isSelectable(i) ? !1 : (e && e(n.tr.setSelection(st.create(n.doc, r.pos - i.nodeSize)).scrollIntoView()), !0);
+  return !i || !ot.isSelectable(i) ? !1 : (e && e(n.tr.setSelection(ot.create(n.doc, r.pos - i.nodeSize)).scrollIntoView()), !0);
 };
 function _c(n) {
   if (!n.parent.type.spec.isolating)
@@ -14442,12 +14460,12 @@ const dh = (n, e, t) => {
   let r = o.nodeAfter;
   if (gh(n, o, e, 1))
     return !0;
-  if (s.parent.content.size == 0 && (To(r, "start") || st.isSelectable(r))) {
+  if (s.parent.content.size == 0 && (To(r, "start") || ot.isSelectable(r))) {
     let i = ga(n.doc, s.before(), s.after(), je.empty);
     if (i && i.slice.size < i.to - i.from) {
       if (e) {
         let a = n.tr.step(i);
-        a.setSelection(To(r, "start") ? ht.findFrom(a.doc.resolve(a.mapping.map(o.pos)), 1) : st.create(a.doc, a.mapping.map(o.pos))), e(a.scrollIntoView());
+        a.setSelection(To(r, "start") ? ht.findFrom(a.doc.resolve(a.mapping.map(o.pos)), 1) : ot.create(a.doc, a.mapping.map(o.pos))), e(a.scrollIntoView());
       }
       return !0;
     }
@@ -14463,7 +14481,7 @@ const dh = (n, e, t) => {
     r = Cc(s);
   }
   let i = r && r.nodeAfter;
-  return !i || !st.isSelectable(i) ? !1 : (e && e(n.tr.setSelection(st.create(n.doc, r.pos)).scrollIntoView()), !0);
+  return !i || !ot.isSelectable(i) ? !1 : (e && e(n.tr.setSelection(ot.create(n.doc, r.pos)).scrollIntoView()), !0);
 };
 function Cc(n) {
   if (!n.parent.type.spec.isolating)
@@ -14477,7 +14495,7 @@ function Cc(n) {
   return null;
 }
 const yC = (n, e) => {
-  let t = n.selection, s = t instanceof st, o;
+  let t = n.selection, s = t instanceof ot, o;
   if (s) {
     if (t.node.isTextblock || !zs(n.doc, t.from))
       return !1;
@@ -14486,12 +14504,12 @@ const yC = (n, e) => {
     return !1;
   if (e) {
     let r = n.tr.join(o);
-    s && r.setSelection(st.create(r.doc, o - n.doc.resolve(o).nodeBefore.nodeSize)), e(r.scrollIntoView());
+    s && r.setSelection(ot.create(r.doc, o - n.doc.resolve(o).nodeBefore.nodeSize)), e(r.scrollIntoView());
   }
   return !0;
 }, bC = (n, e) => {
   let t = n.selection, s;
-  if (t instanceof st) {
+  if (t instanceof ot) {
     if (t.node.isTextblock || !zs(n.doc, t.to))
       return !1;
     s = t.to;
@@ -14535,7 +14553,7 @@ const wC = (n, e) => {
     return !1;
   if (e) {
     let i = (!s.parentOffset && o.index() < o.parent.childCount ? s : o).pos, a = n.tr.insert(i, r.createAndFill());
-    a.setSelection(rt.create(a.doc, i + 1)), e(a.scrollIntoView());
+    a.setSelection(it.create(a.doc, i + 1)), e(a.scrollIntoView());
   }
   return !0;
 }, mh = (n, e) => {
@@ -14552,14 +14570,14 @@ const wC = (n, e) => {
 };
 function _C(n) {
   return (e, t) => {
-    if (e.selection instanceof st && e.selection.node.isBlock) {
+    if (e.selection instanceof ot && e.selection.node.isBlock) {
       let { $from: f } = e.selection;
       return !f.parentOffset || !ys(e.doc, f.pos) ? !1 : (t && t(e.tr.split(f.pos).scrollIntoView()), !0);
     }
     if (!e.selection.$from.depth)
       return !1;
     let s = e.tr;
-    !e.selection.empty && (e.selection instanceof rt || e.selection instanceof $n) && s.deleteSelection();
+    !e.selection.empty && (e.selection instanceof it || e.selection instanceof $n) && s.deleteSelection();
     let { $from: o } = s.selection, r = s.steps.length, i = [], a, l, c = !1, u = !1;
     for (let f = o.depth; ; f--)
       if (o.node(f).isBlock) {
@@ -14582,7 +14600,7 @@ function _C(n) {
 }
 const CC = _C(), MC = (n, e) => {
   let { $from: t, to: s } = n.selection, o, r = t.sharedDepth(s);
-  return r == 0 ? !1 : (o = t.before(r), e && e(n.tr.setSelection(st.create(n.doc, o))), !0);
+  return r == 0 ? !1 : (o = t.before(r), e && e(n.tr.setSelection(ot.create(n.doc, o))), !0);
 };
 function SC(n, e, t) {
   let s = e.nodeBefore, o = e.nodeAfter, r = e.index();
@@ -14599,7 +14617,7 @@ function gh(n, e, t, s) {
       for (let b = i.length - 1; b >= 0; b--)
         h = xe.from(i[b].create(null, h));
       h = xe.from(o.copy(h));
-      let g = n.tr.step(new ln(e.pos - 1, f, e.pos, f, new je(h, 1, 0), i.length, !0)), v = g.doc.resolve(f + 2 * i.length);
+      let g = n.tr.step(new an(e.pos - 1, f, e.pos, f, new je(h, 1, 0), i.length, !0)), v = g.doc.resolve(f + 2 * i.length);
       v.nodeAfter && v.nodeAfter.type == o.type && zs(g.doc, v.pos) && g.join(v.pos), t(g.scrollIntoView());
     }
     return !0;
@@ -14619,7 +14637,7 @@ function gh(n, e, t, s) {
         let b = xe.empty;
         for (let R = h.length - 1; R >= 0; R--)
           b = xe.from(h[R].copy(b));
-        let $ = n.tr.step(new ln(e.pos - h.length, e.pos + r.nodeSize, e.pos + v, e.pos + r.nodeSize - v, new je(b, h.length, 0), 0, !0));
+        let $ = n.tr.step(new an(e.pos - h.length, e.pos + r.nodeSize, e.pos + v, e.pos + r.nodeSize - v, new je(b, h.length, 0), 0, !0));
         t($.scrollIntoView());
       }
       return !0;
@@ -14635,7 +14653,7 @@ function vh(n) {
         return !1;
       r--;
     }
-    return o.node(r).isTextblock ? (t && t(e.tr.setSelection(rt.create(e.doc, n < 0 ? o.start(r) : o.end(r)))), !0) : !1;
+    return o.node(r).isTextblock ? (t && t(e.tr.setSelection(it.create(e.doc, n < 0 ? o.start(r) : o.end(r)))), !0) : !1;
   };
 }
 const IC = vh(-1), xC = vh(1);
@@ -14711,7 +14729,7 @@ function $C(n, e, t, s, o) {
   let r = xe.empty;
   for (let u = t.length - 1; u >= 0; u--)
     r = xe.from(t[u].type.create(t[u].attrs, r));
-  n.step(new ln(e.start - (s ? 2 : 0), e.end, e.start, e.end, new je(r, 0, 0), t.length, !0));
+  n.step(new an(e.start - (s ? 2 : 0), e.end, e.start, e.end, new je(r, 0, 0), t.length, !0));
   let i = 0;
   for (let u = 0; u < t.length; u++)
     t[u].type == o && (i = u + 1);
@@ -14728,7 +14746,7 @@ function RC(n) {
 }
 function NC(n, e, t, s) {
   let o = n.tr, r = s.end, i = s.$to.end(s.depth);
-  r < i && (o.step(new ln(r - 1, i, r, i, new je(xe.from(t.create(null, s.parent.copy())), 1, 0), 1, !0)), s = new bi(o.doc.resolve(s.$from.pos), o.doc.resolve(i), s.depth));
+  r < i && (o.step(new an(r - 1, i, r, i, new je(xe.from(t.create(null, s.parent.copy())), 1, 0), 1, !0)), s = new bi(o.doc.resolve(s.$from.pos), o.doc.resolve(i), s.depth));
   const a = Do(s);
   if (a == null)
     return !1;
@@ -14747,7 +14765,7 @@ function LC(n, e, t) {
   if (!c.canReplace(u + (a ? 0 : 1), u + 1, i.content.append(l ? xe.empty : xe.from(o))))
     return !1;
   let d = r.pos, p = d + i.nodeSize;
-  return s.step(new ln(d - (a ? 1 : 0), p + (l ? 1 : 0), d + 1, p - 1, new je((a ? xe.empty : xe.from(o.copy(xe.empty))).append(l ? xe.empty : xe.from(o.copy(xe.empty))), a ? 0 : 1, l ? 0 : 1), a ? 0 : 1)), e(s.scrollIntoView()), !0;
+  return s.step(new an(d - (a ? 1 : 0), p + (l ? 1 : 0), d + 1, p - 1, new je((a ? xe.empty : xe.from(o.copy(xe.empty))).append(l ? xe.empty : xe.from(o.copy(xe.empty))), a ? 0 : 1, l ? 0 : 1), a ? 0 : 1)), e(s.scrollIntoView()), !0;
 }
 function OC(n) {
   return function(e, t) {
@@ -14762,12 +14780,12 @@ function OC(n) {
       return !1;
     if (t) {
       let c = l.lastChild && l.lastChild.type == a.type, u = xe.from(c ? n.create() : null), d = new je(xe.from(n.create(null, xe.from(a.type.create(null, u)))), c ? 3 : 1, 0), p = r.start, f = r.end;
-      t(e.tr.step(new ln(p - (c ? 3 : 1), f, p, f, d, 1, !0)).scrollIntoView());
+      t(e.tr.step(new an(p - (c ? 3 : 1), f, p, f, d, 1, !0)).scrollIntoView());
     }
     return !0;
   };
 }
-const fn = function(n) {
+const dn = function(n) {
   for (var e = 0; ; e++)
     if (n = n.previousSibling, !n)
       return e;
@@ -14792,7 +14810,7 @@ function dd(n, e, t, s, o) {
       let i = n.parentNode;
       if (!i || i.nodeType != 1 || xr(n) || BC.test(n.nodeName) || n.contentEditable == "false")
         return !1;
-      e = fn(n) + (o < 0 ? 0 : 1), n = i;
+      e = dn(n) + (o < 0 ? 0 : 1), n = i;
     } else if (n.nodeType == 1) {
       let i = n.childNodes[e + (o < 0 ? -1 : 0)];
       if (i.nodeType == 1 && i.contentEditable == "false")
@@ -14818,7 +14836,7 @@ function PC(n, e) {
         return null;
       n = n.childNodes[e - 1], e = On(n);
     } else if (n.parentNode && !xr(n))
-      e = fn(n), n = n.parentNode;
+      e = dn(n), n = n.parentNode;
     else
       return null;
   }
@@ -14832,7 +14850,7 @@ function zC(n, e) {
         return null;
       n = n.childNodes[e], e = 0;
     } else if (n.parentNode && !xr(n))
-      e = fn(n) + 1, n = n.parentNode;
+      e = dn(n) + 1, n = n.parentNode;
     else
       return null;
   }
@@ -14841,7 +14859,7 @@ function FC(n, e, t) {
   for (let s = e == 0, o = e == On(n); s || o; ) {
     if (n == t)
       return !0;
-    let r = fn(n);
+    let r = dn(n);
     if (n = n.parentNode, !n)
       return !1;
     s = s && r == 0, o = o && r == On(n);
@@ -14882,7 +14900,7 @@ function HC(n, e, t) {
 }
 const ss = typeof navigator < "u" ? navigator : null, fd = typeof document < "u" ? document : null, Fs = ss && ss.userAgent || "", yl = /Edge\/(\d+)/.exec(Fs), yh = /MSIE \d/.exec(Fs), bl = /Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(Fs), Tn = !!(yh || bl || yl), Rs = yh ? document.documentMode : bl ? +bl[1] : yl ? +yl[1] : 0, Pn = !Tn && /gecko\/(\d+)/i.test(Fs);
 Pn && +(/Firefox\/(\d+)/.exec(Fs) || [0, 0])[1];
-const kl = !Tn && /Chrome\/(\d+)/.exec(Fs), hn = !!kl, bh = kl ? +kl[1] : 0, yn = !Tn && !!ss && /Apple Computer/.test(ss.vendor), Ao = yn && (/Mobile\/\w+/.test(Fs) || !!ss && ss.maxTouchPoints > 2), Ln = Ao || (ss ? /Mac/.test(ss.platform) : !1), kh = ss ? /Win/.test(ss.platform) : !1, gs = /Android \d/.test(Fs), Tr = !!fd && "webkitFontSmoothing" in fd.documentElement.style, GC = Tr ? +(/\bAppleWebKit\/(\d+)/.exec(navigator.userAgent) || [0, 0])[1] : 0;
+const kl = !Tn && /Chrome\/(\d+)/.exec(Fs), pn = !!kl, bh = kl ? +kl[1] : 0, yn = !Tn && !!ss && /Apple Computer/.test(ss.vendor), Ao = yn && (/Mobile\/\w+/.test(Fs) || !!ss && ss.maxTouchPoints > 2), Ln = Ao || (ss ? /Mac/.test(ss.platform) : !1), kh = ss ? /Win/.test(ss.platform) : !1, gs = /Android \d/.test(Fs), Tr = !!fd && "webkitFontSmoothing" in fd.documentElement.style, GC = Tr ? +(/\bAppleWebKit\/(\d+)/.exec(navigator.userAgent) || [0, 0])[1] : 0;
 function VC(n) {
   let e = n.defaultView && n.defaultView.visualViewport;
   return e ? {
@@ -15316,7 +15334,7 @@ class Er {
       }
     let o;
     if (e == this.dom && this.contentDOM)
-      o = t > fn(this.contentDOM);
+      o = t > dn(this.contentDOM);
     else if (this.contentDOM && this.contentDOM != this.dom && this.dom.contains(this.contentDOM))
       o = e.compareDocumentPosition(this.contentDOM) & 2;
     else if (this.dom.firstChild) {
@@ -15406,12 +15424,12 @@ class Er {
       let r, i = !0;
       for (; r = s ? this.children[s - 1] : null, !(!r || r.dom.parentNode == this.contentDOM); s--, i = !1)
         ;
-      return r && t && i && !r.border && !r.domAtom ? r.domFromPos(r.size, t) : { node: this.contentDOM, offset: r ? fn(r.dom) + 1 : 0 };
+      return r && t && i && !r.border && !r.domAtom ? r.domFromPos(r.size, t) : { node: this.contentDOM, offset: r ? dn(r.dom) + 1 : 0 };
     } else {
       let r, i = !0;
       for (; r = s < this.children.length ? this.children[s] : null, !(!r || r.dom.parentNode == this.contentDOM); s++, i = !1)
         ;
-      return r && i && !r.border && !r.domAtom ? r.domFromPos(0, t) : { node: this.contentDOM, offset: r ? fn(r.dom) : this.contentDOM.childNodes.length };
+      return r && i && !r.border && !r.domAtom ? r.domFromPos(0, t) : { node: this.contentDOM, offset: r ? dn(r.dom) : this.contentDOM.childNodes.length };
     }
   }
   // Used to find a DOM range in a single parent for a given changed
@@ -15430,7 +15448,7 @@ class Er {
         for (let d = a; d > 0; d--) {
           let p = this.children[d - 1];
           if (p.size && p.dom.parentNode == this.contentDOM && !p.emptyChildAt(1)) {
-            o = fn(p.dom) + 1;
+            o = dn(p.dom) + 1;
             break;
           }
           e -= p.size;
@@ -15442,7 +15460,7 @@ class Er {
         for (let u = a + 1; u < this.children.length; u++) {
           let d = this.children[u];
           if (d.size && d.dom.parentNode == this.contentDOM && !d.emptyChildAt(-1)) {
-            r = fn(d.dom);
+            r = dn(d.dom);
             break;
           }
           t += d.size;
@@ -15487,7 +15505,7 @@ class Er {
 `), d && h == f.nodeValue.length)
           for (let g = f, v; g; g = g.parentNode) {
             if (v = g.nextSibling) {
-              v.nodeName == "BR" && (a = l = { node: v.parentNode, offset: fn(v) + 1 });
+              v.nodeName == "BR" && (a = l = { node: v.parentNode, offset: dn(v) + 1 });
               break;
             }
             let b = g.pmViewDesc;
@@ -15739,7 +15757,7 @@ class Ls extends Er {
   }
   localCompositionInfo(e, t) {
     let { from: s, to: o } = e.state.selection;
-    if (!(e.state.selection instanceof rt) || s < t || o > t + this.node.content.size)
+    if (!(e.state.selection instanceof it) || s < t || o > t + this.node.content.size)
       return null;
     let r = e.input.compositionNode;
     if (!r || !this.dom.contains(r.parentNode))
@@ -16116,7 +16134,7 @@ class lM {
     for (; e instanceof Ns; )
       t = e, e = t.children[t.children.length - 1];
     (!e || // Empty textblock
-    !(e instanceof ba) || /\n$/.test(e.node.text) || this.view.requiresGeckoHackNode && /\s$/.test(e.node.text)) && ((yn || hn) && e && e.dom.contentEditable == "false" && this.addHackNode("IMG", t), this.addHackNode("BR", this.top));
+    !(e instanceof ba) || /\n$/.test(e.node.text) || this.view.requiresGeckoHackNode && /\s$/.test(e.node.text)) && ((yn || pn) && e && e.dom.contentEditable == "false" && this.addHackNode("IMG", t), this.addHackNode("BR", this.top));
   }
   addHackNode(e, t) {
     if (t == this.top && this.index < t.children.length && t.children[this.index].matchesHack(e))
@@ -16260,9 +16278,9 @@ function xc(n, e = null) {
     for (l = i; o && !o.node; )
       o = o.parent;
     let d = o.node;
-    if (o && d.isAtom && st.isSelectable(d) && o.parent && !(d.isInline && FC(t.focusNode, t.focusOffset, o.dom))) {
+    if (o && d.isAtom && ot.isSelectable(d) && o.parent && !(d.isInline && FC(t.focusNode, t.focusOffset, o.dom))) {
       let p = o.posBefore;
-      c = new st(i == p ? a : s.resolve(p));
+      c = new ot(i == p ? a : s.resolve(p));
     }
   } else {
     if (t instanceof n.dom.ownerDocument.defaultView.Selection && t.rangeCount > 1) {
@@ -16294,7 +16312,7 @@ function bs(n, e = !1) {
   if (Nh(n, t), !Rh(n))
     return;
   let s = n.input.mouseDown;
-  if (!e && hn && s) {
+  if (!e && pn && s) {
     let o = n.domSelectionRange(), r = n.domObserver.currentSelection;
     if (o.anchorNode && r.anchorNode && so(o.anchorNode, o.anchorOffset, r.anchorNode, r.anchorOffset) && s.delaySelUpdate()) {
       n.domObserver.setCurSelection();
@@ -16305,11 +16323,11 @@ function bs(n, e = !1) {
     mM(n);
   else {
     let { anchor: o, head: r } = t, i, a;
-    kd && !(t instanceof rt) && (t.$from.parent.inlineContent || (i = wd(n, t.from)), !t.empty && !t.$from.parent.inlineContent && (a = wd(n, t.to))), n.docView.setSelection(o, r, n, e), kd && (i && _d(i), a && _d(a)), t.visible ? n.dom.classList.remove("ProseMirror-hideselection") : (n.dom.classList.add("ProseMirror-hideselection"), "onselectionchange" in document && hM(n));
+    kd && !(t instanceof it) && (t.$from.parent.inlineContent || (i = wd(n, t.from)), !t.empty && !t.$from.parent.inlineContent && (a = wd(n, t.to))), n.docView.setSelection(o, r, n, e), kd && (i && _d(i), a && _d(a)), t.visible ? n.dom.classList.remove("ProseMirror-hideselection") : (n.dom.classList.add("ProseMirror-hideselection"), "onselectionchange" in document && hM(n));
   }
   n.domObserver.setCurSelection(), n.domObserver.connectSelection();
 }
-const kd = yn || hn && bh < 63;
+const kd = yn || pn && bh < 63;
 function wd(n, e) {
   let { node: t, offset: s } = n.docView.domFromPos(e, 0), o = s < t.childNodes.length ? t.childNodes[s] : null, r = s ? t.childNodes[s - 1] : null;
   if (yn && o && o.contentEditable == "false")
@@ -16342,10 +16360,10 @@ function mM(n) {
   if (!e)
     return;
   let t = n.cursorWrapper.dom, s = t.nodeName == "IMG";
-  s ? e.collapse(t.parentNode, fn(t) + 1) : e.collapse(t, 0), !s && !n.state.selection.visible && Tn && Rs <= 11 && (t.disabled = !0, t.disabled = !1);
+  s ? e.collapse(t.parentNode, dn(t) + 1) : e.collapse(t, 0), !s && !n.state.selection.visible && Tn && Rs <= 11 && (t.disabled = !0, t.disabled = !1);
 }
 function Nh(n, e) {
-  if (e instanceof st) {
+  if (e instanceof ot) {
     let t = n.docView.descAt(e.from);
     t != n.lastSelectedViewDesc && (Cd(n), t && t.selectNode(), n.lastSelectedViewDesc = t);
   } else
@@ -16355,7 +16373,7 @@ function Cd(n) {
   n.lastSelectedViewDesc && (n.lastSelectedViewDesc.parent && n.lastSelectedViewDesc.deselectNode(), n.lastSelectedViewDesc = void 0);
 }
 function Tc(n, e, t, s) {
-  return n.someProp("createSelectionBetween", (o) => o(n, e, t)) || rt.between(e, t, s);
+  return n.someProp("createSelectionBetween", (o) => o(n, e, t)) || it.between(e, t, s);
 }
 function Md(n) {
   return n.editable && !n.hasFocus() ? !1 : Lh(n);
@@ -16383,28 +16401,28 @@ function Ss(n, e) {
 }
 function Sd(n, e, t) {
   let s = n.state.selection;
-  if (s instanceof rt)
+  if (s instanceof it)
     if (t.indexOf("s") > -1) {
       let { $head: o } = s, r = o.textOffset ? null : e < 0 ? o.nodeBefore : o.nodeAfter;
       if (!r || r.isText || !r.isLeaf)
         return !1;
       let i = n.state.doc.resolve(o.pos + r.nodeSize * (e < 0 ? -1 : 1));
-      return Ss(n, new rt(s.$anchor, i));
+      return Ss(n, new it(s.$anchor, i));
     } else if (s.empty) {
       if (n.endOfTextblock(e > 0 ? "forward" : "backward")) {
         let o = Ml(n.state, e);
-        return o && o instanceof st ? Ss(n, o) : !1;
+        return o && o instanceof ot ? Ss(n, o) : !1;
       } else if (!(Ln && t.indexOf("m") > -1)) {
         let o = s.$head, r = o.textOffset ? null : e < 0 ? o.nodeBefore : o.nodeAfter, i;
         if (!r || r.isText)
           return !1;
         let a = e < 0 ? o.pos - r.nodeSize : o.pos;
-        return r.isAtom || (i = n.docView.descAt(a)) && !i.contentDOM ? st.isSelectable(r) ? Ss(n, new st(e < 0 ? n.state.doc.resolve(o.pos - r.nodeSize) : o)) : Tr ? Ss(n, new rt(n.state.doc.resolve(e < 0 ? a : a + r.nodeSize))) : !1 : !1;
+        return r.isAtom || (i = n.docView.descAt(a)) && !i.contentDOM ? ot.isSelectable(r) ? Ss(n, new ot(e < 0 ? n.state.doc.resolve(o.pos - r.nodeSize) : o)) : Tr ? Ss(n, new it(n.state.doc.resolve(e < 0 ? a : a + r.nodeSize))) : !1 : !1;
       }
     } else return !1;
   else {
-    if (s instanceof st && s.node.isInline)
-      return Ss(n, new rt(e > 0 ? s.$to : s.$from));
+    if (s instanceof ot && s.node.isInline)
+      return Ss(n, new it(e > 0 ? s.$to : s.$from));
     {
       let o = Ml(n.state, e);
       return o ? Ss(n, o) : !1;
@@ -16445,7 +16463,7 @@ function vM(n) {
       {
         let a = t.previousSibling;
         for (; a && Zo(a, -1); )
-          o = t.parentNode, r = fn(a), a = a.previousSibling;
+          o = t.parentNode, r = dn(a), a = a.previousSibling;
         if (a)
           t = a, s = _i(t);
         else {
@@ -16477,7 +16495,7 @@ function yM(n) {
       {
         let a = t.nextSibling;
         for (; a && Zo(a, 1); )
-          r = a.parentNode, i = fn(a) + 1, a = a.nextSibling;
+          r = a.parentNode, i = dn(a) + 1, a = a.nextSibling;
         if (a)
           t = a, s = 0, o = _i(t);
         else {
@@ -16495,7 +16513,7 @@ function Oh(n) {
 }
 function bM(n, e) {
   for (; n && e == n.childNodes.length && !xr(n); )
-    e = fn(n) + 1, n = n.parentNode;
+    e = dn(n) + 1, n = n.parentNode;
   for (; n && e < n.childNodes.length; ) {
     let t = n.childNodes[e];
     if (t.nodeType == 3)
@@ -16507,7 +16525,7 @@ function bM(n, e) {
 }
 function kM(n, e) {
   for (; n && !e && !xr(n); )
-    e = fn(n), n = n.parentNode;
+    e = dn(n), n = n.parentNode;
   for (; n && e; ) {
     let t = n.childNodes[e - 1];
     if (t.nodeType == 3)
@@ -16537,7 +16555,7 @@ function Sl(n, e, t) {
 }
 function Id(n, e) {
   let t = n.state.doc.resolve(e);
-  if (!(hn || kh) && t.parent.inlineContent) {
+  if (!(pn || kh) && t.parent.inlineContent) {
     let o = n.coordsAtPos(e);
     if (e > t.start()) {
       let r = n.coordsAtPos(e - 1), i = (r.top + r.bottom) / 2;
@@ -16554,12 +16572,12 @@ function Id(n, e) {
 }
 function xd(n, e, t) {
   let s = n.state.selection;
-  if (s instanceof rt && !s.empty || t.indexOf("s") > -1 || Ln && t.indexOf("m") > -1)
+  if (s instanceof it && !s.empty || t.indexOf("s") > -1 || Ln && t.indexOf("m") > -1)
     return !1;
   let { $from: o, $to: r } = s;
   if (!o.parent.inlineContent || n.endOfTextblock(e < 0 ? "up" : "down")) {
     let i = Ml(n.state, e);
-    if (i && i instanceof st)
+    if (i && i instanceof ot)
       return Ss(n, i);
   }
   if (!o.parent.inlineContent) {
@@ -16569,7 +16587,7 @@ function xd(n, e, t) {
   return !1;
 }
 function Td(n, e) {
-  if (!(n.state.selection instanceof rt))
+  if (!(n.state.selection instanceof it))
     return !0;
   let { $head: t, $anchor: s, empty: o } = n.state.selection;
   if (!t.sameParent(s))
@@ -16802,7 +16820,7 @@ function xM(n) {
   return s;
 }
 function TM(n) {
-  let e = n.querySelectorAll(hn ? "span:not([class]):not([style])" : "span.Apple-converted-space");
+  let e = n.querySelectorAll(pn ? "span:not([class]):not([style])" : "span.Apple-converted-space");
   for (let t = 0; t < e.length; t++) {
     let s = e[t];
     s.childNodes.length == 1 && s.textContent == " " && s.parentNode && s.parentNode.replaceChild(n.ownerDocument.createTextNode(" "), s);
@@ -16877,7 +16895,7 @@ function OM(n, e) {
 }
 Cn.keydown = (n, e) => {
   let t = e;
-  if (n.input.shiftKey = t.keyCode == 16 || t.shiftKey, !jh(n) && (n.input.lastKeyCode = t.keyCode, n.input.lastKeyCodeTime = Date.now(), !(gs && hn && t.keyCode == 13)))
+  if (n.input.shiftKey = t.keyCode == 16 || t.shiftKey, !jh(n) && (n.input.lastKeyCode = t.keyCode, n.input.lastKeyCodeTime = Date.now(), !(gs && pn && t.keyCode == 13)))
     if (t.keyCode != 229 && n.domObserver.forceFlush(), Ao && t.keyCode == 13 && !t.ctrlKey && !t.altKey && !t.metaKey) {
       let s = Date.now();
       n.input.lastIOSEnter = s, n.input.lastIOSEnterFallbackTimeout = setTimeout(() => {
@@ -16897,7 +16915,7 @@ Cn.keypress = (n, e) => {
     return;
   }
   let s = n.state.selection;
-  if (!(s instanceof rt) || !s.$from.sameParent(s.$to)) {
+  if (!(s instanceof it) || !s.$from.sameParent(s.$to)) {
     let o = String.fromCharCode(t.charCode), r = () => n.state.tr.insertText(o).scrollIntoView();
     !/[\r\n]/.test(o) && !n.someProp("handleTextInput", (i) => i(n, s.$from.pos, s.$to.pos, o, r)) && n.dispatch(r()), t.preventDefault();
   }
@@ -16928,22 +16946,22 @@ function BM(n, e) {
   if (e == -1)
     return !1;
   let t = n.state.doc.resolve(e), s = t.nodeAfter;
-  return s && s.isAtom && st.isSelectable(s) ? ($r(n, new st(t)), !0) : !1;
+  return s && s.isAtom && ot.isSelectable(s) ? ($r(n, new ot(t)), !0) : !1;
 }
 function PM(n, e) {
   if (e == -1)
     return !1;
   let t = n.state.selection, s, o;
-  t instanceof st && (s = t.node);
+  t instanceof ot && (s = t.node);
   let r = n.state.doc.resolve(e);
   for (let i = r.depth + 1; i > 0; i--) {
     let a = i > r.depth ? r.nodeAfter : r.node(i);
-    if (st.isSelectable(a)) {
+    if (ot.isSelectable(a)) {
       s && t.$from.depth > 0 && i >= t.$from.depth && r.before(t.$from.depth + 1) == t.$from.pos ? o = r.before(t.$from.depth) : o = r.before(i);
       break;
     }
   }
-  return o != null ? ($r(n, st.create(n.state.doc, o)), !0) : !1;
+  return o != null ? ($r(n, ot.create(n.state.doc, o)), !0) : !1;
 }
 function zM(n, e, t, s, o) {
   return $c(n, "handleClickOn", e, t, s) || n.someProp("handleClick", (r) => r(n, e, s)) || (o ? PM(n, t) : BM(n, t));
@@ -16958,19 +16976,19 @@ function HM(n, e, t) {
   if (t.button != 0)
     return !1;
   let s = Hh(n, e, !0), o = n.state.doc;
-  return s ? ($r(n, s), s instanceof rt && o.eq(n.state.doc) && (n.input.mouseDown = new VM(n, s)), !0) : !1;
+  return s ? ($r(n, s), s instanceof it && o.eq(n.state.doc) && (n.input.mouseDown = new VM(n, s)), !0) : !1;
 }
 function Hh(n, e, t) {
   let s = n.state.doc;
   if (e == -1)
-    return s.inlineContent ? rt.create(s, 0, s.content.size) : null;
+    return s.inlineContent ? it.create(s, 0, s.content.size) : null;
   let o = s.resolve(e);
   for (let r = o.depth + 1; r > 0; r--) {
     let i = r > o.depth ? o.nodeAfter : o.node(r), a = o.before(r);
     if (i.inlineContent)
-      return rt.create(s, a + 1, a + 1 + i.content.size);
-    if (t && st.isSelectable(i))
-      return st.create(s, a);
+      return it.create(s, a + 1, a + 1 + i.content.size);
+    if (t && ot.isSelectable(i))
+      return ot.create(s, a);
   }
   return null;
 }
@@ -17016,7 +17034,7 @@ class GM extends Vh {
     const a = o ? null : s.target, l = a ? e.docView.nearestDesc(a, !0) : null;
     this.target = l && l.nodeDOM.nodeType == 1 ? l.nodeDOM : null;
     let { selection: c } = e.state;
-    s.button == 0 && (r.type.spec.draggable && r.type.spec.selectable !== !1 || c instanceof st && c.from <= i && c.to > i) && (this.mightDrag = {
+    s.button == 0 && (r.type.spec.draggable && r.type.spec.selectable !== !1 || c instanceof ot && c.from <= i && c.to > i) && (this.mightDrag = {
       node: r,
       pos: i,
       addAttr: !!(this.target && !this.target.draggable),
@@ -17042,7 +17060,7 @@ class GM extends Vh {
     // (hidden) cursor is doesn't change the selection, and
     // thus doesn't get a reaction from ProseMirror. This
     // works around that.
-    hn && !this.view.state.selection.visible && Math.min(Math.abs(t.pos - this.view.state.selection.from), Math.abs(t.pos - this.view.state.selection.to)) <= 2) ? ($r(this.view, ht.near(this.view.state.doc.resolve(t.pos))), e.preventDefault()) : vs(this.view, "pointer");
+    pn && !this.view.state.selection.visible && Math.min(Math.abs(t.pos - this.view.state.selection.from), Math.abs(t.pos - this.view.state.selection.to)) <= 2) ? ($r(this.view, ht.near(this.view.state.doc.resolve(t.pos))), e.preventDefault()) : vs(this.view, "pointer");
   }
   move(e) {
     this.updateAllowDefault(e), vs(this.view, "pointer"), super.move(e);
@@ -17068,7 +17086,7 @@ class VM extends Vh {
     if (!s)
       return;
     let { doc: o } = this.view.state, r = this.startSelection, [i, a] = s.from < r.from ? [r.to, s.from] : [r.from, s.to];
-    $r(this.view, rt.create(o, i, a));
+    $r(this.view, it.create(o, i, a));
   }
 }
 _n.touchstart = (n) => {
@@ -17086,7 +17104,7 @@ Cn.compositionstart = Cn.compositionupdate = (n) => {
   if (!n.composing) {
     n.domObserver.flush();
     let { state: e } = n, t = e.selection.$to;
-    if (e.selection instanceof rt && (e.storedMarks || !t.textOffset && t.parentOffset && t.nodeBefore.marks.some((s) => s.type.spec.inclusive === !1) || hn && kh && KM(n)))
+    if (e.selection instanceof it && (e.storedMarks || !t.textOffset && t.parentOffset && t.nodeBefore.marks.some((s) => s.type.spec.inclusive === !1) || pn && kh && KM(n)))
       n.markCursor = n.state.storedMarks || t.marks(), Ci(n, !0), n.markCursor = null;
     else if (Ci(n, !e.selection.empty), Pn && e.selection.empty && t.parentOffset && !t.textOffset && t.nodeBefore.marks.length) {
       let s = n.domSelectionRange();
@@ -17222,16 +17240,16 @@ _n.dragstart = (n, e) => {
   if (s && s.done(), !t.dataTransfer)
     return;
   let o = n.state.selection, r = o.empty ? null : n.posAtCoords(Ar(t)), i;
-  if (!(r && r.pos >= o.from && r.pos <= (o instanceof st ? o.to - 1 : o.to))) {
+  if (!(r && r.pos >= o.from && r.pos <= (o instanceof ot ? o.to - 1 : o.to))) {
     if (s && s.mightDrag)
-      i = st.create(n.state.doc, s.mightDrag.pos);
+      i = ot.create(n.state.doc, s.mightDrag.pos);
     else if (t.target && t.target.nodeType == 1) {
       let d = n.docView.nearestDesc(t.target, !0);
-      d && d.node.type.spec.draggable && d != n.docView && (i = st.create(n.state.doc, d.posBefore));
+      d && d.node.type.spec.draggable && d != n.docView && (i = ot.create(n.state.doc, d.posBefore));
     }
   }
   let a = (i || n.state.selection).content(), { dom: l, text: c, slice: u } = Ec(n, a);
-  (!t.dataTransfer.files.length || !hn || bh > 120) && t.dataTransfer.clearData(), t.dataTransfer.setData(hr ? "Text" : "text/html", l.innerHTML), t.dataTransfer.effectAllowed = "copyMove", hr || t.dataTransfer.setData("text/plain", c), n.dragging = new Jh(u, Xh(n, t), i);
+  (!t.dataTransfer.files.length || !pn || bh > 120) && t.dataTransfer.clearData(), t.dataTransfer.setData(hr ? "Text" : "text/html", l.innerHTML), t.dataTransfer.effectAllowed = "copyMove", hr || t.dataTransfer.setData("text/plain", c), n.dragging = new Jh(u, Xh(n, t), i);
 };
 _n.dragend = (n) => {
   let e = n.dragging;
@@ -17276,8 +17294,8 @@ function QM(n, e, t) {
   if (u ? l.replaceRangeWith(c, c, r.content.firstChild) : l.replaceRange(c, c, r), l.doc.eq(d))
     return;
   let p = l.doc.resolve(c);
-  if (u && st.isSelectable(r.content.firstChild) && p.nodeAfter && p.nodeAfter.sameMarkup(r.content.firstChild))
-    l.setSelection(new st(p));
+  if (u && ot.isSelectable(r.content.firstChild) && p.nodeAfter && p.nodeAfter.sameMarkup(r.content.firstChild))
+    l.setSelection(new ot(p));
   else {
     let f = l.mapping.map(a);
     l.mapping.maps[l.mapping.maps.length - 1].forEach((h, g, v, b) => f = b), l.setSelection(Tc(n, p, l.doc.resolve(f)));
@@ -17930,7 +17948,7 @@ class oS {
         let d = this.registerMutation(t[u], l);
         d && (r = r < 0 ? d.from : Math.min(d.from, r), i = i < 0 ? d.to : Math.max(d.to, i), d.typeOver && (a = !0));
       }
-    if (l.some((u) => u.nodeName == "BR") && (e.input.lastKeyCode == 8 || e.input.lastKeyCode == 46 || hn && (e.composing || e.input.compositionEndedAt > Date.now() - 50) && t.some((u) => u.type == "childList" && u.removedNodes.length))) {
+    if (l.some((u) => u.nodeName == "BR") && (e.input.lastKeyCode == 8 || e.input.lastKeyCode == 46 || pn && (e.composing || e.input.compositionEndedAt > Date.now() - 50) && t.some((u) => u.type == "childList" && u.removedNodes.length))) {
       for (let u of l)
         if (u.nodeName == "BR" && u.parentNode) {
           let d = u.nextSibling;
@@ -17978,7 +17996,7 @@ class oS {
           let { previousSibling: d, nextSibling: p } = e.addedNodes[u];
           (!d || Array.prototype.indexOf.call(e.addedNodes, d) < 0) && (o = d), (!p || Array.prototype.indexOf.call(e.addedNodes, p) < 0) && (r = p);
         }
-      let i = o && o.parentNode == e.target ? fn(o) + 1 : 0, a = s.localPosFromDOM(e.target, i, -1), l = r && r.parentNode == e.target ? fn(r) : e.target.childNodes.length, c = s.localPosFromDOM(e.target, l, 1);
+      let i = o && o.parentNode == e.target ? dn(o) + 1 : 0, a = s.localPosFromDOM(e.target, i, -1), l = r && r.parentNode == e.target ? dn(r) : e.target.childNodes.length, c = s.localPosFromDOM(e.target, l, 1);
       return { from: a, to: c };
     } else return e.type == "attributes" ? { from: s.posAtStart - s.border, to: s.posAtEnd + s.border } : (this.lastChangedTextNode = e.target, {
       from: s.posAtStart,
@@ -18046,7 +18064,7 @@ function lS(n, e) {
 }
 function cS(n, e, t, s) {
   let { node: o, fromOffset: r, toOffset: i, from: a, to: l } = n.docView.parseRange(e, t), c = n.domSelectionRange(), u, d = c.anchorNode;
-  if (d && n.dom.contains(d.nodeType == 1 ? d : d.parentNode) && (u = [{ node: d, offset: c.anchorOffset }], ya(c) || u.push({ node: c.focusNode, offset: c.focusOffset })), hn && n.input.lastKeyCode === 8)
+  if (d && n.dom.contains(d.nodeType == 1 ? d : d.parentNode) && (u = [{ node: d, offset: c.anchorOffset }], ya(c) || u.push({ node: c.focusNode, offset: c.focusOffset })), pn && n.input.lastKeyCode === 8)
     for (let b = i; b > r; b--) {
       let $ = o.childNodes[b - 1], R = $.pmViewDesc;
       if ($.nodeName == "BR" && !R) {
@@ -18090,11 +18108,11 @@ const uS = (n) => (e) => {
 function fS(n, e, t, s, o) {
   let r = n.input.compositionPendingChanges || (n.composing ? n.input.compositionID : 0);
   if (n.input.compositionPendingChanges = 0, e < 0) {
-    let I = n.input.lastSelectionTime > Date.now() - 50 ? n.input.lastSelectionOrigin : null, O = xc(n, I);
-    if (O && !n.state.selection.eq(O)) {
-      if (hn && gs && n.input.lastKeyCode === 13 && Date.now() - 100 < n.input.lastKeyCodeTime && n.someProp("handleKeyDown", (G) => G(n, Hs(13, "Enter"))))
+    let I = n.input.lastSelectionTime > Date.now() - 50 ? n.input.lastSelectionOrigin : null, N = xc(n, I);
+    if (N && !n.state.selection.eq(N)) {
+      if (pn && gs && n.input.lastKeyCode === 13 && Date.now() - 100 < n.input.lastKeyCodeTime && n.someProp("handleKeyDown", (H) => H(n, Hs(13, "Enter"))))
         return;
-      let E = n.state.tr.setSelection(O);
+      let E = n.state.tr.setSelection(N);
       I == "pointer" ? E.setMeta("pointer", !0) : I == "key" && E.scrollIntoView(), r && E.setMeta("composition", r), n.dispatch(E);
     }
     return;
@@ -18109,46 +18127,46 @@ function fS(n, e, t, s, o) {
     return;
   }
   if (!h)
-    if (s && l instanceof rt && !l.empty && l.$head.sameParent(l.$anchor) && !n.composing && !(c.sel && c.sel.anchor != c.sel.head))
+    if (s && l instanceof it && !l.empty && l.$head.sameParent(l.$anchor) && !n.composing && !(c.sel && c.sel.anchor != c.sel.head))
       h = { start: l.from, endA: l.to, endB: l.to };
     else {
       if (c.sel) {
         let I = Od(n, n.state.doc, c.sel);
         if (I && !I.eq(n.state.selection)) {
-          let O = n.state.tr.setSelection(I);
-          r && O.setMeta("composition", r), n.dispatch(O);
+          let N = n.state.tr.setSelection(I);
+          r && N.setMeta("composition", r), n.dispatch(N);
         }
       }
       return;
     }
-  n.state.selection.from < n.state.selection.to && h.start == h.endB && n.state.selection instanceof rt && (h.start > n.state.selection.from && h.start <= n.state.selection.from + 2 && n.state.selection.from >= c.from ? h.start = n.state.selection.from : h.endA < n.state.selection.to && h.endA >= n.state.selection.to - 2 && n.state.selection.to <= c.to && (h.endB += n.state.selection.to - h.endA, h.endA = n.state.selection.to)), Tn && Rs <= 11 && h.endB == h.start + 1 && h.endA == h.start && h.start > c.from && c.doc.textBetween(h.start - c.from - 1, h.start - c.from + 1) == "  " && (h.start--, h.endA--, h.endB--);
+  n.state.selection.from < n.state.selection.to && h.start == h.endB && n.state.selection instanceof it && (h.start > n.state.selection.from && h.start <= n.state.selection.from + 2 && n.state.selection.from >= c.from ? h.start = n.state.selection.from : h.endA < n.state.selection.to && h.endA >= n.state.selection.to - 2 && n.state.selection.to <= c.to && (h.endB += n.state.selection.to - h.endA, h.endA = n.state.selection.to)), Tn && Rs <= 11 && h.endB == h.start + 1 && h.endA == h.start && h.start > c.from && c.doc.textBetween(h.start - c.from - 1, h.start - c.from + 1) == "  " && (h.start--, h.endA--, h.endB--);
   let g = c.doc.resolveNoCache(h.start - c.from), v = c.doc.resolveNoCache(h.endB - c.from), b = u.resolve(h.start), $ = g.sameParent(v) && g.parent.inlineContent && b.end() >= h.endA;
   if ((Ao && n.input.lastIOSEnter > Date.now() - 225 && (!$ || o.some((I) => I.nodeName == "DIV" || I.nodeName == "P")) || !$ && g.pos < c.doc.content.size && (!g.sameParent(v) || !g.parent.inlineContent) && g.pos < v.pos && !/\S/.test(c.doc.textBetween(g.pos, v.pos, "", ""))) && n.someProp("handleKeyDown", (I) => I(n, Hs(13, "Enter")))) {
     n.input.lastIOSEnter = 0;
     return;
   }
   if (n.state.selection.anchor > h.start && hS(u, h.start, h.endA, g, v) && n.someProp("handleKeyDown", (I) => I(n, Hs(8, "Backspace")))) {
-    gs && hn && n.domObserver.suppressSelectionUpdates();
+    gs && pn && n.domObserver.suppressSelectionUpdates();
     return;
   }
-  hn && h.endB == h.start && (n.input.lastChromeDelete = Date.now()), gs && !$ && g.start() != v.start() && v.parentOffset == 0 && g.depth == v.depth && c.sel && c.sel.anchor == c.sel.head && c.sel.head == h.endA && (h.endB -= 2, v = c.doc.resolveNoCache(h.endB - c.from), setTimeout(() => {
+  pn && h.endB == h.start && (n.input.lastChromeDelete = Date.now()), gs && !$ && g.start() != v.start() && v.parentOffset == 0 && g.depth == v.depth && c.sel && c.sel.anchor == c.sel.head && c.sel.head == h.endA && (h.endB -= 2, v = c.doc.resolveNoCache(h.endB - c.from), setTimeout(() => {
     n.someProp("handleKeyDown", function(I) {
       return I(n, Hs(13, "Enter"));
     });
   }, 20));
   let R = h.start, M = h.endA, x = (I) => {
-    let O = I || n.state.tr.replace(R, M, c.doc.slice(h.start - c.from, h.endB - c.from));
+    let N = I || n.state.tr.replace(R, M, c.doc.slice(h.start - c.from, h.endB - c.from));
     if (c.sel) {
-      let E = Od(n, O.doc, c.sel);
-      E && !(hn && n.composing && E.empty && (h.start != h.endB || n.input.lastChromeDelete < Date.now() - 100) && (E.head == R || E.head == O.mapping.map(M) - 1) || Tn && E.empty && E.head == R) && O.setSelection(E);
+      let E = Od(n, N.doc, c.sel);
+      E && !(pn && n.composing && E.empty && (h.start != h.endB || n.input.lastChromeDelete < Date.now() - 100) && (E.head == R || E.head == N.mapping.map(M) - 1) || Tn && E.empty && E.head == R) && N.setSelection(E);
     }
-    return r && O.setMeta("composition", r), O.scrollIntoView();
+    return r && N.setMeta("composition", r), N.scrollIntoView();
   }, T;
   if ($)
     if (g.pos == v.pos) {
       Tn && Rs <= 11 && g.parentOffset == 0 && (n.domObserver.suppressSelectionUpdates(), setTimeout(() => bs(n), 20));
-      let I = x(n.state.tr.delete(R, M)), O = u.resolve(h.start).marksAcross(u.resolve(h.endA));
-      O && I.ensureMarks(O), n.dispatch(I);
+      let I = x(n.state.tr.delete(R, M)), N = u.resolve(h.start).marksAcross(u.resolve(h.endA));
+      N && I.ensureMarks(N), n.dispatch(I);
     } else if (
       // Adding or removing a mark
       h.endA == h.endB && (T = pS(g.parent.content.cut(g.parentOffset, v.parentOffset), b.parent.content.cut(b.parentOffset, h.endA - b.start())))
@@ -18156,8 +18174,8 @@ function fS(n, e, t, s, o) {
       let I = x(n.state.tr);
       T.type == "add" ? I.addMark(R, M, T.mark) : I.removeMark(R, M, T.mark), n.dispatch(I);
     } else if (g.parent.child(g.index()).isText && g.index() == v.index() - (v.textOffset ? 0 : 1)) {
-      let I = g.parent.textBetween(g.parentOffset, v.parentOffset), O = () => x(n.state.tr.insertText(I, R, M));
-      n.someProp("handleTextInput", (E) => E(n, R, M, I, O)) || n.dispatch(O());
+      let I = g.parent.textBetween(g.parentOffset, v.parentOffset), N = () => x(n.state.tr.insertText(I, R, M));
+      n.someProp("handleTextInput", (E) => E(n, R, M, I, N)) || n.dispatch(N());
     } else
       n.dispatch(x());
   else
@@ -18307,9 +18325,9 @@ class em {
     let p = u == "preserve" && i && this.dom.style.overflowAnchor == null && KC(this);
     if (i) {
       this.domObserver.stop();
-      let f = d && (Tn || hn) && !this.composing && !o.selection.empty && !e.selection.empty && gS(o.selection, e.selection);
+      let f = d && (Tn || pn) && !this.composing && !o.selection.empty && !e.selection.empty && gS(o.selection, e.selection);
       if (d) {
-        let g = hn ? this.trackWrites = this.domSelectionRange().focusNode : null;
+        let g = pn ? this.trackWrites = this.domSelectionRange().focusNode : null;
         this.composing && (this.input.compositionNode = WM(this)), (r || !this.docView.update(e.doc, c, l, this)) && (this.docView.updateOuterDeco(c), this.docView.destroy(), this.docView = yd(e.doc, c, l, this.dom, this)), g && (!this.trackWrites || !this.dom.contains(this.trackWrites)) && (f = !0);
       }
       let h = this.input.mouseDown;
@@ -18323,7 +18341,7 @@ class em {
   scrollToSelection() {
     let e = this.domSelectionRange().focusNode;
     if (!(!e || !this.dom.contains(e.nodeType == 1 ? e : e.parentNode))) {
-      if (!this.someProp("handleScrollToSelection", (t) => t(this))) if (this.state.selection instanceof st) {
+      if (!this.someProp("handleScrollToSelection", (t) => t(this))) if (this.state.selection instanceof ot) {
         let t = this.docView.domAfterPos(this.state.selection.from);
         t.nodeType == 1 && pd(this, t.getBoundingClientRect(), e);
       } else
@@ -18360,7 +18378,7 @@ class em {
       let r = s.from + (this.state.doc.content.size - t.doc.content.size);
       (r > 0 && r < this.state.doc.content.size && this.state.doc.nodeAt(r)) == s.node && (o = r);
     }
-    this.dragging = new Jh(e.slice, e.move, o < 0 ? void 0 : st.create(this.state.doc, o));
+    this.dragging = new Jh(e.slice, e.move, o < 0 ? void 0 : ot.create(this.state.doc, o));
   }
   someProp(e, t) {
     let s = this._props && this._props[e], o;
@@ -18691,10 +18709,10 @@ var Bs = {
   221: "}",
   222: '"'
 }, yS = typeof navigator < "u" && /Mac/.test(navigator.platform), bS = typeof navigator < "u" && /MSIE \d|Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
-for (var pn = 0; pn < 10; pn++) Bs[48 + pn] = Bs[96 + pn] = String(pn);
-for (var pn = 1; pn <= 24; pn++) Bs[pn + 111] = "F" + pn;
-for (var pn = 65; pn <= 90; pn++)
-  Bs[pn] = String.fromCharCode(pn + 32), Ii[pn] = String.fromCharCode(pn);
+for (var fn = 0; fn < 10; fn++) Bs[48 + fn] = Bs[96 + fn] = String(fn);
+for (var fn = 1; fn <= 24; fn++) Bs[fn + 111] = "F" + fn;
+for (var fn = 65; fn <= 90; fn++)
+  Bs[fn] = String.fromCharCode(fn + 32), Ii[fn] = String.fromCharCode(fn);
 for (var qa in Bs) Ii.hasOwnProperty(qa) || (Ii[qa] = Bs[qa]);
 function kS(n) {
   var e = yS && n.metaKey && n.shiftKey && !n.ctrlKey && !n.altKey || bS && n.shiftKey && n.key && n.key.length == 1 || n.key == "Unidentified", t = !e && n.key || (n.shiftKey ? Ii : Bs)[n.keyCode] || n.key || "Unidentified";
@@ -18732,7 +18750,7 @@ function Ja(n, e, t = !0) {
   return e.altKey && (n = "Alt-" + n), e.ctrlKey && (n = "Ctrl-" + n), e.metaKey && (n = "Meta-" + n), t && e.shiftKey && (n = "Shift-" + n), n;
 }
 function SS(n) {
-  return new Dt({ props: { handleKeyDown: tm(n) } });
+  return new Bt({ props: { handleKeyDown: tm(n) } });
 }
 function tm(n) {
   let e = MS(n);
@@ -18941,7 +18959,7 @@ var xS = () => ({ editor: n, view: e }) => (requestAnimationFrame(() => {
   const { state: o } = t, r = o.doc.slice(n.from, n.to);
   s.deleteRange(n.from, n.to);
   const i = s.mapping.map(e);
-  return s.insert(i, r.content), s.setSelection(new rt(s.doc.resolve(Math.max(i - 1, 0)))), !0;
+  return s.insert(i, r.content), s.setSelection(new it(s.doc.resolve(Math.max(i - 1, 0)))), !0;
 }, NS = () => ({ tr: n, dispatch: e }) => {
   const { selection: t } = n, s = t.$anchor.node();
   if (s.content.size > 0)
@@ -18957,7 +18975,7 @@ var xS = () => ({ editor: n, view: e }) => (requestAnimationFrame(() => {
     }
   return !1;
 };
-function Yt(n, e) {
+function Qt(n, e) {
   if (typeof n == "string") {
     if (!e.nodes[n])
       throw Error(
@@ -18968,7 +18986,7 @@ function Yt(n, e) {
   return n;
 }
 var LS = (n) => ({ tr: e, state: t, dispatch: s }) => {
-  const o = Yt(n, t.schema), r = e.selection.$anchor;
+  const o = Qt(n, t.schema), r = e.selection.$anchor;
   for (let i = r.depth; i > 0; i -= 1)
     if (r.node(i).type === o) {
       if (s) {
@@ -18997,7 +19015,7 @@ var LS = (n) => ({ tr: e, state: t, dispatch: s }) => {
     s.forEach((r) => {
       const i = t.mapping.slice(o), a = t.doc.resolve(i.map(r.$from.pos)), l = t.doc.resolve(i.map(r.$to.pos)), { from: c, to: u } = BS(a, l, n.schema);
       t.deleteRange(c, u);
-    }), t.selection.empty || t.setSelection(rt.near(t.doc.resolve(t.selection.from))), t.scrollIntoView(), e(t);
+    }), t.selection.empty || t.setSelection(it.near(t.doc.resolve(t.selection.from))), t.scrollIntoView(), e(t);
   }
   return !0;
 }, zS = () => ({ commands: n }) => n.keyboardShortcut("Enter"), FS = () => ({ state: n, dispatch: e }) => wC(n, e);
@@ -19055,7 +19073,7 @@ var US = (n, e) => ({ tr: t, state: s, dispatch: o }) => {
   if (o) {
     const d = Bc(l, r, e);
     if (d && d.from <= c && d.to >= u) {
-      const p = rt.create(i, d.from, d.to);
+      const p = it.create(i, d.from, d.to);
       t.setSelection(p);
     }
   }
@@ -19068,7 +19086,7 @@ var US = (n, e) => ({ tr: t, state: s, dispatch: o }) => {
   return !1;
 };
 function om(n) {
-  return n instanceof rt;
+  return n instanceof it;
 }
 function Ks(n = 0, e = 0, t = 0) {
   return Math.min(Math.max(n, e), t);
@@ -19082,11 +19100,11 @@ function Tl(n, e = null) {
   if (e === "end")
     return s;
   const o = t.from, r = s.to;
-  return e === "all" ? rt.create(
+  return e === "all" ? it.create(
     n,
     Ks(0, o, r),
     Ks(n.content.size, o, r)
-  ) : rt.create(
+  ) : it.create(
     n,
     Ks(e, o, r),
     Ks(e, o, r)
@@ -19213,7 +19231,7 @@ function lm(n, e, t) {
   if (s < e)
     return;
   const o = n.steps[s];
-  if (!(o instanceof Vt || o instanceof ln))
+  if (!(o instanceof Vt || o instanceof an))
     return;
   const r = n.mapping.maps[s];
   let i = 0;
@@ -19365,7 +19383,7 @@ var oI = (n) => ({ editor: e, view: t, tr: s, dispatch: o }) => {
   }), !0;
 };
 function ws(n, e, t = {}) {
-  const { from: s, to: o, empty: r } = n.selection, i = e ? Yt(e, n.schema) : null, a = [];
+  const { from: s, to: o, empty: r } = n.selection, i = e ? Qt(e, n.schema) : null, a = [];
   n.doc.nodesBetween(s, o, (d, p) => {
     if (d.isText)
       return;
@@ -19380,10 +19398,10 @@ function ws(n, e, t = {}) {
   return r ? !!c.length : c.reduce((d, p) => d + p.to - p.from, 0) >= l;
 }
 var rI = (n, e = {}) => ({ state: t, dispatch: s }) => {
-  const o = Yt(n, t.schema);
+  const o = Qt(n, t.schema);
   return ws(t, o, e) ? kC(t, s) : !1;
 }, iI = () => ({ state: n, dispatch: e }) => mh(n, e), aI = (n) => ({ state: e, dispatch: t }) => {
-  const s = Yt(n, e.schema);
+  const s = Qt(n, e.schema);
   return RC(s)(e, t);
 }, lI = () => ({ state: n, dispatch: e }) => ph(n, e);
 function _a(n, e) {
@@ -19401,7 +19419,7 @@ var cI = (n, e) => ({ tr: t, state: s, dispatch: o }) => {
   );
   if (!a)
     return !1;
-  a === "node" && (r = Yt(n, s.schema)), a === "mark" && (i = _s(n, s.schema));
+  a === "node" && (r = Qt(n, s.schema)), a === "mark" && (i = _s(n, s.schema));
   let l = !1;
   return t.selection.ranges.forEach((c) => {
     s.doc.nodesBetween(c.$from.pos, c.$to.pos, (u, d) => {
@@ -19873,7 +19891,7 @@ function vm(n) {
   );
 }
 function II(n, e) {
-  const t = Yt(e, n.schema), { from: s, to: o } = n.selection, r = [];
+  const t = Qt(e, n.schema), { from: s, to: o } = n.selection, r = [];
   n.doc.nodesBetween(s, o, (a) => {
     r.push(a);
   });
@@ -20075,7 +20093,7 @@ function Rr(n, {
   return !1;
 }
 function bm(n) {
-  return n instanceof st;
+  return n instanceof ot;
 }
 var km = class wm {
   constructor(e) {
@@ -20158,12 +20176,12 @@ var PI = (n, e = {}) => ({ tr: t, state: s, dispatch: o }) => {
       });
   return BI(s, t, l);
 }, zI = (n, e) => ({ tr: t }) => (t.setMeta(n, e), !0), FI = (n, e = {}) => ({ state: t, dispatch: s, chain: o }) => {
-  const r = Yt(n, t.schema);
+  const r = Qt(n, t.schema);
   let i;
   return t.selection.$anchor.sameParent(t.selection.$head) && (i = t.selection.$anchor.parent.attrs), r.isTextblock ? o().command(({ commands: a }) => ud(r, { ...i, ...e })(t) ? !0 : a.clearNodes()).command(({ state: a }) => ud(r, { ...i, ...e })(a, s)).run() : (console.warn('[tiptap warn]: Currently "setNode()" only supports text block nodes.'), !1);
 }, UI = (n) => ({ tr: e, dispatch: t }) => {
   if (t) {
-    const { doc: s } = e, o = Ks(n, 0, s.content.size), r = st.create(s, o);
+    const { doc: s } = e, o = Ks(n, 0, s.content.size), r = ot.create(s, o);
     e.setSelection(r);
   }
   return !0;
@@ -20178,12 +20196,12 @@ var PI = (n, e = {}) => ({ tr: t, state: s, dispatch: o }) => {
   }), !0;
 }, GI = (n) => ({ tr: e, dispatch: t }) => {
   if (t) {
-    const { doc: s } = e, { from: o, to: r } = typeof n == "number" ? { from: n, to: n } : n, i = rt.atStart(s).from, a = rt.atEnd(s).to, l = Ks(o, i, a), c = Ks(r, i, a), u = rt.create(s, l, c);
+    const { doc: s } = e, { from: o, to: r } = typeof n == "number" ? { from: n, to: n } : n, i = it.atStart(s).from, a = it.atEnd(s).to, l = Ks(o, i, a), c = Ks(r, i, a), u = it.create(s, l, c);
     e.setSelection(u);
   }
   return !0;
 }, VI = (n) => ({ state: e, dispatch: t }) => {
-  const s = Yt(n, e.schema);
+  const s = Qt(n, e.schema);
   return OC(s)(e, t);
 };
 function Xd(n, e) {
@@ -20199,7 +20217,7 @@ var jI = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: s, editor
     a.node().type.name,
     a.node().attrs
   );
-  if (r instanceof st && r.node.isBlock)
+  if (r instanceof ot && r.node.isBlock)
     return !a.parentOffset || !ys(i, a.pos) ? !1 : (s && (n && Xd(t, o.extensionManager.splittableMarks), e.split(a.pos).scrollIntoView()), !0);
   if (!a.parent.isBlock)
     return !1;
@@ -20216,7 +20234,7 @@ var jI = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: s, editor
       attrs: u
     }
   ] : void 0), s) {
-    if (h && (r instanceof rt && e.deleteSelection(), e.split(e.mapping.map(a.pos), 1, f), p && !d && !a.parentOffset && a.parent.type !== p)) {
+    if (h && (r instanceof it && e.deleteSelection(), e.split(e.mapping.map(a.pos), 1, f), p && !d && !a.parentOffset && a.parent.type !== p)) {
       const g = e.mapping.map(a.before()), v = e.doc.resolve(g);
       a.node(-1).canReplaceWith(v.index(), v.index() + 1, p) && e.setNodeMarkup(e.mapping.map(a.before()), p);
     }
@@ -20225,7 +20243,7 @@ var jI = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: s, editor
   return h;
 }, KI = (n, e = {}) => ({ tr: t, state: s, dispatch: o, editor: r }) => {
   var i;
-  const a = Yt(n, s.schema), { $from: l, $to: c } = s.selection, u = s.selection.node;
+  const a = Qt(n, s.schema), { $from: l, $to: c } = s.selection, u = s.selection.node;
   if (u && u.isBlock || l.depth < 2 || !l.sameParent(c))
     return !1;
   const d = l.node(-1);
@@ -20238,8 +20256,8 @@ var jI = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: s, editor
     if (o) {
       let b = xe.empty;
       const $ = l.index(-1) ? 1 : l.index(-2) ? 2 : 3;
-      for (let O = l.depth - $; O >= l.depth - 3; O -= 1)
-        b = xe.from(l.node(O).copy(b));
+      for (let N = l.depth - $; N >= l.depth - 3; N -= 1)
+        b = xe.from(l.node(N).copy(b));
       const R = (
         // oxlint-disable-next-line no-nested-ternary
         l.indexAfter(-1) < l.node(-2).childCount ? 1 : l.indexAfter(-2) < l.node(-3).childCount ? 2 : 3
@@ -20251,11 +20269,11 @@ var jI = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: s, editor
       const T = l.before(l.depth - ($ - 1));
       t.replace(T, l.after(-R), new je(b, 4 - $, 0));
       let I = -1;
-      t.doc.nodesBetween(T, t.doc.content.size, (O, E) => {
+      t.doc.nodesBetween(T, t.doc.content.size, (N, E) => {
         if (I > -1)
           return !1;
-        O.isTextblock && O.content.size === 0 && (I = E + 1);
-      }), I > -1 && t.setSelection(rt.near(t.doc.resolve(I))), t.scrollIntoView();
+        N.isTextblock && N.content.size === 0 && (I = E + 1);
+      }), I > -1 && t.setSelection(it.near(t.doc.resolve(I))), t.scrollIntoView();
     }
     return !0;
   }
@@ -20312,38 +20330,38 @@ function WI(n) {
   if (!t)
     return null;
   const s = e.resolve(1), o = e.resolve(t.nodeSize - 1);
-  return rt.between(s, o);
+  return it.between(s, o);
 }
 var qI = (n, e, t, s = {}) => ({ editor: o, tr: r, state: i, dispatch: a, chain: l, commands: c, can: u }) => {
-  const { extensions: d, splittableMarks: p } = o.extensionManager, f = Yt(n, i.schema), h = Yt(e, i.schema), { selection: g, storedMarks: v } = i, { $from: b, $to: $ } = g, R = b.blockRange($), M = v || g.$to.parentOffset && g.$from.marks();
+  const { extensions: d, splittableMarks: p } = o.extensionManager, f = Qt(n, i.schema), h = Qt(e, i.schema), { selection: g, storedMarks: v } = i, { $from: b, $to: $ } = g, R = b.blockRange($), M = v || g.$to.parentOffset && g.$from.marks();
   if (!R)
     return !1;
-  const x = Ca((S) => Xa(S.type.name, d))(g), T = g.from === 0 && g.to === i.doc.content.size, I = i.doc.content.content, O = I.length === 1 ? I[0] : null, E = T && O && Xa(O.type.name, d) ? {
-    node: O,
+  const x = Ca((S) => Xa(S.type.name, d))(g), T = g.from === 0 && g.to === i.doc.content.size, I = i.doc.content.content, N = I.length === 1 ? I[0] : null, E = T && N && Xa(N.type.name, d) ? {
+    node: N,
     pos: 0
-  } : null, G = x ?? E, N = !!x && R.depth >= 1 && R.depth - x.depth <= 1, D = !!E;
-  if ((N || D) && G) {
-    if (G.node.type === f)
-      return T && D ? l().command(({ tr: S, dispatch: C }) => {
-        const L = WI(S);
-        return L ? (S.setSelection(L), C && C(S), !0) : !1;
+  } : null, H = x ?? E, D = !!x && R.depth >= 1 && R.depth - x.depth <= 1, L = !!E;
+  if ((D || L) && H) {
+    if (H.node.type === f)
+      return T && L ? l().command(({ tr: S, dispatch: C }) => {
+        const O = WI(S);
+        return O ? (S.setSelection(O), C && C(S), !0) : !1;
       }).liftListItem(h).run() : c.liftListItem(h);
-    if (Xa(G.node.type.name, d) && f.validContent(G.node.content))
-      return l().command(() => (r.setNodeMarkup(G.pos, f), !0)).command(() => Ya(r, f)).command(() => Qa(r, f)).run();
+    if (Xa(H.node.type.name, d) && f.validContent(H.node.content))
+      return l().command(() => (r.setNodeMarkup(H.pos, f), !0)).command(() => Ya(r, f)).command(() => Qa(r, f)).run();
   }
   return !t || !M || !a ? l().command(() => u().wrapInList(f, s) ? !0 : c.clearNodes()).wrapInList(f, s).command(() => Ya(r, f)).command(() => Qa(r, f)).run() : l().command(() => {
-    const S = u().wrapInList(f, s), C = M.filter((L) => p.includes(L.type.name));
+    const S = u().wrapInList(f, s), C = M.filter((O) => p.includes(O.type.name));
     return r.ensureMarks(C), S ? !0 : c.clearNodes();
   }).wrapInList(f, s).command(() => Ya(r, f)).command(() => Qa(r, f)).run();
 }, JI = (n, e = {}, t = {}) => ({ state: s, commands: o }) => {
   const { extendEmptyMarkRange: r = !1 } = t, i = _s(n, s.schema);
   return Al(s, i, e) ? o.unsetMark(i, { extendEmptyMarkRange: r }) : o.setMark(i, e);
 }, XI = (n, e, t = {}) => ({ state: s, commands: o }) => {
-  const r = Yt(n, s.schema), i = Yt(e, s.schema), a = ws(s, r, t);
+  const r = Qt(n, s.schema), i = Qt(e, s.schema), a = ws(s, r, t);
   let l;
   return s.selection.$anchor.sameParent(s.selection.$head) && (l = s.selection.$anchor.parent.attrs), a ? o.setNode(i, l) : o.setNode(r, { ...l, ...t });
 }, YI = (n, e = {}) => ({ state: t, commands: s }) => {
-  const o = Yt(n, t.schema);
+  const o = Qt(n, t.schema);
   return ws(t, o, e) ? s.lift(o) : s.wrapIn(o, e);
 }, QI = () => ({ state: n, dispatch: e }) => {
   const t = n.plugins;
@@ -20411,7 +20429,7 @@ var qI = (n, e, t, s = {}) => ({ editor: o, tr: r, state: i, dispatch: a, chain:
   );
   if (!a)
     return !1;
-  a === "node" && (r = Yt(n, s.schema)), a === "mark" && (i = _s(n, s.schema));
+  a === "node" && (r = Qt(n, s.schema)), a === "mark" && (i = _s(n, s.schema));
   let l = !1;
   return t.selection.ranges.forEach((c) => {
     const u = c.$from.pos, d = c.$to.pos;
@@ -20449,13 +20467,13 @@ var qI = (n, e, t, s = {}) => ({ editor: o, tr: r, state: i, dispatch: a, chain:
       );
     }));
   }), l;
-}, sx = "__tiptap_decorations__", bo = new Qt(
+}, sx = "__tiptap_decorations__", bo = new Zt(
   sx
 ), ox = (n) => ({ tr: e, dispatch: t }) => (t && e.setMeta(bo, { type: "force", name: n }), !0), rx = (n, e = {}) => ({ state: t, dispatch: s }) => {
-  const o = Yt(n, t.schema);
+  const o = Qt(n, t.schema);
   return TC(o, e)(t, s);
 }, ix = (n, e = {}) => ({ state: t, dispatch: s }) => {
-  const o = Yt(n, t.schema);
+  const o = Qt(n, t.schema);
   return EC(o, e)(t, s);
 }, ko = /* @__PURE__ */ new WeakMap();
 function ax(n, e) {
@@ -20700,7 +20718,7 @@ var kx = /* @__PURE__ */ new Set(), wx = class {
    */
   createPlugin() {
     const { editor: n, entries: e } = this;
-    return new Dt({
+    return new Bt({
       key: bo,
       state: {
         init: (t, s) => {
@@ -20911,7 +20929,7 @@ var kx = /* @__PURE__ */ new Set(), wx = class {
 };
 function _x(n, e) {
   const { selection: t } = n, { $from: s } = t;
-  if (t instanceof st) {
+  if (t instanceof ot) {
     const r = s.index();
     return s.parent.canReplaceWith(r, r + 1, e);
   }
@@ -21073,27 +21091,27 @@ function Tx(n) {
         let M = 1;
         const x = b.length;
         let T = "";
-        const I = /^:::([\w-]*)(\s.*)?/gm, O = d.slice(x);
+        const I = /^:::([\w-]*)(\s.*)?/gm, N = d.slice(x);
         for (I.lastIndex = 0; ; ) {
-          const E = I.exec(O);
+          const E = I.exec(N);
           if (E === null)
             break;
-          const G = E.index, N = E[1];
+          const H = E.index, D = E[1];
           if (!((h = E[2]) != null && h.endsWith(":::"))) {
-            if (N)
+            if (D)
               M += 1;
             else if (M -= 1, M === 0) {
-              const D = O.slice(0, G);
-              T = D.trim();
-              const S = d.slice(0, x + G + E[0].length);
+              const L = N.slice(0, H);
+              T = L.trim();
+              const S = d.slice(0, x + H + E[0].length);
               let C = [];
               if (T)
                 if (a === "block")
-                  for (C = f.blockTokens(D), C.forEach((L) => {
-                    L.text && (!L.tokens || L.tokens.length === 0) && (L.tokens = f.inlineTokens(L.text));
+                  for (C = f.blockTokens(L), C.forEach((O) => {
+                    O.text && (!O.tokens || O.tokens.length === 0) && (O.tokens = f.inlineTokens(O.text));
                   }); C.length > 0; ) {
-                    const L = C[C.length - 1];
-                    if (L.type === "paragraph" && (!L.text || L.text.trim() === ""))
+                    const O = C[C.length - 1];
+                    if (O.type === "paragraph" && (!O.text || O.text.trim() === ""))
                       C.pop();
                     else
                       break;
@@ -21233,7 +21251,7 @@ function $l(n, e, t) {
     for (u += 1; u < a.length; ) {
       const x = a[u];
       if (x.trim() === "") {
-        const I = a.slice(u + 1).findIndex((G) => G.trim() !== "");
+        const I = a.slice(u + 1).findIndex((H) => H.trim() !== "");
         if (I === -1)
           break;
         if ((((o = (s = a[u + 1 + I].match(/^(\s*)/)) == null ? void 0 : s[1]) == null ? void 0 : o.length) || 0) > g) {
@@ -21380,7 +21398,7 @@ function Xr(n) {
   }), u;
 }
 function Lx(n) {
-  const { editor: e, rules: t } = n, s = new Dt({
+  const { editor: e, rules: t } = n, s = new Bt({
     state: {
       init() {
         return null;
@@ -21551,12 +21569,12 @@ function Dx(n) {
     Ox(I, r.find, i).forEach((E) => {
       if (E.index === void 0)
         return;
-      const G = x + E.index + 1, N = G + E[0].length, D = {
-        from: t.tr.mapping.map(G),
-        to: t.tr.mapping.map(N)
+      const H = x + E.index + 1, D = H + E[0].length, L = {
+        from: t.tr.mapping.map(H),
+        to: t.tr.mapping.map(D)
       }, S = r.handler({
         state: t,
-        range: D,
+        range: L,
         match: E,
         commands: l,
         chain: c,
@@ -21611,7 +21629,7 @@ function Px(n) {
       return i = typeof ClipboardEvent < "u" ? new ClipboardEvent("paste") : null, g;
     }
   };
-  return t.map((u) => new Dt({
+  return t.map((u) => new Bt({
     // we register a global drag handler to track the current drag source element
     view(d) {
       const p = (h) => {
@@ -21655,13 +21673,13 @@ function Px(n) {
       if ($) {
         let { text: x } = b;
         typeof x == "string" ? x = x : x = zc(xe.from(x), f.schema);
-        const { from: T } = b, I = T + x.length, O = Bx(x);
+        const { from: T } = b, I = T + x.length, N = Bx(x);
         return l({
           rule: u,
           state: f,
           from: T,
           to: { b: I },
-          pasteEvt: O
+          pasteEvt: N
         });
       }
       const R = p.doc.content.findDiffStart(f.doc.content), M = p.doc.content.findDiffEnd(f.doc.content);
@@ -21818,7 +21836,7 @@ var Sa = class {
           options: t.options,
           storage: this.editor.extensionStorage[t.name],
           editor: n,
-          type: Yt(t.name, this.schema)
+          type: Qt(t.name, this.schema)
         }, r = Xe(
           t,
           "addNodeView",
@@ -22045,8 +22063,8 @@ var Gt = class Rm extends Vc {
   },
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("clipboardTextSerializer"),
+      new Bt({
+        key: new Zt("clipboardTextSerializer"),
         props: {
           clipboardTextSerializer: () => {
             const { editor: n } = this, { state: e, schema: t } = n, { doc: s, selection: o } = e, r = vm(t), { blockSeparator: i } = this.options, a = {
@@ -22137,8 +22155,8 @@ var Gt = class Rm extends Vc {
   name: "drop",
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("tiptapDrop"),
+      new Bt({
+        key: new Zt("tiptapDrop"),
         props: {
           handleDrop: (n, e, t, s) => {
             this.editor.emit("drop", {
@@ -22156,20 +22174,20 @@ var Gt = class Rm extends Vc {
   name: "editable",
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("editable"),
+      new Bt({
+        key: new Zt("editable"),
         props: {
           editable: () => this.editor.options.editable
         }
       })
     ];
   }
-}), Pm = new Qt("focusEvents"), zm = Gt.create({
+}), Pm = new Zt("focusEvents"), zm = Gt.create({
   name: "focusEvents",
   addProseMirrorPlugins() {
     const { editor: n } = this;
     return [
-      new Dt({
+      new Bt({
         key: Pm,
         props: {
           handleDOMEvents: {
@@ -22242,8 +22260,8 @@ var Gt = class Rm extends Vc {
       // to a paragraph if necessary.
       // This is an alternative to ProseMirror's `AllSelection`, which doesn’t work well
       // with many other commands.
-      new Dt({
-        key: new Qt("clearDocument"),
+      new Bt({
+        key: new Zt("clearDocument"),
         appendTransaction: (n, e, t) => {
           if (n.some((g) => g.getMeta("composition")))
             return;
@@ -22272,8 +22290,8 @@ var Gt = class Rm extends Vc {
   name: "paste",
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("tiptapPaste"),
+      new Bt({
+        key: new Zt("tiptapPaste"),
         props: {
           handlePaste: (n, e, t) => {
             this.editor.emit("paste", {
@@ -22295,8 +22313,8 @@ var Gt = class Rm extends Vc {
   },
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("tabindex"),
+      new Bt({
+        key: new Zt("tabindex"),
         props: {
           attributes: () => {
             var n;
@@ -22337,8 +22355,8 @@ var Gt = class Rm extends Vc {
   },
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("textDirection"),
+      new Bt({
+        key: new Zt("textDirection"),
         props: {
           attributes: () => {
             const n = this.options.direction;
@@ -23455,7 +23473,7 @@ var Kx = class extends Gx {
     const e = super.unregisterPlugin(n);
     return this.reactiveState && e && (this.reactiveState.value = e), e;
   }
-}, Wx = Re({
+}, Wx = Le({
   name: "EditorContent",
   props: {
     editor: {
@@ -23495,7 +23513,7 @@ var Kx = class extends Gx {
     });
   }
 });
-Re({
+Le({
   name: "NodeViewContent",
   props: {
     as: {
@@ -23523,7 +23541,7 @@ Re({
     });
   }
 });
-Re({
+Le({
   name: "NodeViewWrapper",
   props: {
     as: {
@@ -23559,7 +23577,7 @@ var qx = (n = {}) => {
     (t = e.value) == null || t.destroy();
   }), e;
 };
-Re({
+Le({
   name: "MarkViewContent",
   props: {
     as: {
@@ -23607,7 +23625,7 @@ var Ei = (n, e) => {
     if (!h)
       return !0;
     const g = r.parent.content, v = new je(g, 0, 0);
-    return f.replace(p, r.after(), v), f.setSelection(rt.create(f.doc, p + g.size)), f.scrollIntoView(), h(f), !0;
+    return f.replace(p, r.after(), v), f.setSelection(it.create(f.doc, p + g.size)), f.scrollIntoView(), h(f), !0;
   });
 }, Xx = /^\s*>\s$/, Yx = En.create({
   name: "blockquote",
@@ -23937,7 +23955,7 @@ ${t}
           let M = u;
           for (let T = 0; T < h; T += 1)
             M += f[T].length + 1;
-          return a.delete(M, M + R), c - M <= R && a.setSelection(rt.create(a.doc, M)), !0;
+          return a.delete(M, M + R), c - M <= R && a.setSelection(it.create(a.doc, M)), !0;
         }) : n.commands.command(({ tr: a }) => {
           const { from: l, to: c } = o, p = s.doc.textBetween(l, c, `
 `, `
@@ -24007,8 +24025,8 @@ ${t}
     return [
       // this plugin creates a code block for pasted content from VS Code
       // we can also detect the copied code language
-      new Dt({
-        key: new Qt("codeBlockVSCodeHandler"),
+      new Bt({
+        key: new Zt("codeBlockVSCodeHandler"),
         props: {
           handlePaste: (n, e) => {
             if (!e.clipboardData || this.editor.isActive(this.type.name))
@@ -24019,7 +24037,7 @@ ${t}
             const { tr: i, schema: a } = n.state, l = a.text(t.replace(/\r\n?/g, `
 `));
             return i.replaceSelectionWith(this.type.create({ language: r }, l)), i.selection.$from.parent.type !== this.type && i.setSelection(
-              rt.near(i.doc.resolve(Math.max(0, i.selection.from - 2)))
+              it.near(i.doc.resolve(Math.max(0, i.selection.from - 2)))
             ), i.setMeta("paste", !0), n.dispatch(i), !0;
           }
         }
@@ -24181,10 +24199,10 @@ ${t}
           if (a) {
             const { $to: l } = i.selection, c = l.end();
             if (l.nodeAfter)
-              l.nodeAfter.isTextblock ? i.setSelection(rt.create(i.doc, l.pos + 1)) : l.nodeAfter.isBlock ? i.setSelection(st.create(i.doc, l.pos)) : i.setSelection(rt.create(i.doc, l.pos));
+              l.nodeAfter.isTextblock ? i.setSelection(it.create(i.doc, l.pos + 1)) : l.nodeAfter.isBlock ? i.setSelection(ot.create(i.doc, l.pos)) : i.setSelection(it.create(i.doc, l.pos));
             else {
               const u = r.schema.nodes[this.options.nextNodeType] || l.parent.type.contentMatch.defaultType, d = u == null ? void 0 : u.create();
-              d && (i.insert(c, d), i.setSelection(rt.create(i.doc, c + 1)));
+              d && (i.insert(c, d), i.setSelection(it.create(i.doc, c + 1)));
             }
             i.scrollIntoView();
           }
@@ -24417,7 +24435,7 @@ In.prototype = {
     return o.j[n] = i, i;
   }
 };
-const gt = (n, e, t, s, o) => n.ta(e, t, s, o), Ft = (n, e, t, s, o) => n.tr(e, t, s, o), nf = (n, e, t, s, o) => n.ts(e, t, s, o), Ee = (n, e, t, s, o) => n.tt(e, t, s, o), fs = "WORD", Bl = "UWORD", Wm = "ASCIINUMERICAL", qm = "ALPHANUMERICAL", vr = "LOCALHOST", Pl = "TLD", zl = "UTLD", ci = "SCHEME", wo = "SLASH_SCHEME", jc = "NUM", Fl = "WS", Kc = "NL", nr = "OPENBRACE", sr = "CLOSEBRACE", Ai = "OPENBRACKET", $i = "CLOSEBRACKET", Ri = "OPENPAREN", Ni = "CLOSEPAREN", Li = "OPENANGLEBRACKET", Oi = "CLOSEANGLEBRACKET", Di = "FULLWIDTHLEFTPAREN", Bi = "FULLWIDTHRIGHTPAREN", Pi = "LEFTCORNERBRACKET", zi = "RIGHTCORNERBRACKET", Fi = "LEFTWHITECORNERBRACKET", Ui = "RIGHTWHITECORNERBRACKET", Hi = "FULLWIDTHLESSTHAN", Gi = "FULLWIDTHGREATERTHAN", Vi = "AMPERSAND", ji = "APOSTROPHE", Ki = "ASTERISK", Is = "AT", Wi = "BACKSLASH", qi = "BACKTICK", Ji = "CARET", qs = "COLON", Wc = "COMMA", Xi = "DOLLAR", Yn = "DOT", Yi = "EQUALS", qc = "EXCLAMATION", Nn = "HYPHEN", or = "PERCENT", Qi = "PIPE", Zi = "PLUS", ea = "POUND", rr = "QUERY", Jc = "QUOTE", Jm = "FULLWIDTHMIDDLEDOT", Xc = "SEMI", Qn = "SLASH", ir = "TILDE", ta = "UNDERSCORE", Xm = "EMOJI", na = "SYM";
+const vt = (n, e, t, s, o) => n.ta(e, t, s, o), Ft = (n, e, t, s, o) => n.tr(e, t, s, o), nf = (n, e, t, s, o) => n.ts(e, t, s, o), Ae = (n, e, t, s, o) => n.tt(e, t, s, o), fs = "WORD", Bl = "UWORD", Wm = "ASCIINUMERICAL", qm = "ALPHANUMERICAL", vr = "LOCALHOST", Pl = "TLD", zl = "UTLD", ci = "SCHEME", wo = "SLASH_SCHEME", jc = "NUM", Fl = "WS", Kc = "NL", nr = "OPENBRACE", sr = "CLOSEBRACE", Ai = "OPENBRACKET", $i = "CLOSEBRACKET", Ri = "OPENPAREN", Ni = "CLOSEPAREN", Li = "OPENANGLEBRACKET", Oi = "CLOSEANGLEBRACKET", Di = "FULLWIDTHLEFTPAREN", Bi = "FULLWIDTHRIGHTPAREN", Pi = "LEFTCORNERBRACKET", zi = "RIGHTCORNERBRACKET", Fi = "LEFTWHITECORNERBRACKET", Ui = "RIGHTWHITECORNERBRACKET", Hi = "FULLWIDTHLESSTHAN", Gi = "FULLWIDTHGREATERTHAN", Vi = "AMPERSAND", ji = "APOSTROPHE", Ki = "ASTERISK", Is = "AT", Wi = "BACKSLASH", qi = "BACKTICK", Ji = "CARET", qs = "COLON", Wc = "COMMA", Xi = "DOLLAR", Yn = "DOT", Yi = "EQUALS", qc = "EXCLAMATION", Nn = "HYPHEN", or = "PERCENT", Qi = "PIPE", Zi = "PLUS", ea = "POUND", rr = "QUERY", Jc = "QUOTE", Jm = "FULLWIDTHMIDDLEDOT", Xc = "SEMI", Qn = "SLASH", ir = "TILDE", ta = "UNDERSCORE", Xm = "EMOJI", na = "SYM";
 var Ym = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   ALPHANUMERICAL: qm,
@@ -24483,7 +24501,7 @@ function IT(n = []) {
   const e = {};
   In.groups = e;
   const t = new In();
-  Qr == null && (Qr = of(yT)), Zr == null && (Zr = of(bT)), Ee(t, "'", ji), Ee(t, "{", nr), Ee(t, "}", sr), Ee(t, "[", Ai), Ee(t, "]", $i), Ee(t, "(", Ri), Ee(t, ")", Ni), Ee(t, "<", Li), Ee(t, ">", Oi), Ee(t, "（", Di), Ee(t, "）", Bi), Ee(t, "「", Pi), Ee(t, "」", zi), Ee(t, "『", Fi), Ee(t, "』", Ui), Ee(t, "＜", Hi), Ee(t, "＞", Gi), Ee(t, "&", Vi), Ee(t, "*", Ki), Ee(t, "@", Is), Ee(t, "`", qi), Ee(t, "^", Ji), Ee(t, ":", qs), Ee(t, ",", Wc), Ee(t, "$", Xi), Ee(t, ".", Yn), Ee(t, "=", Yi), Ee(t, "!", qc), Ee(t, "-", Nn), Ee(t, "%", or), Ee(t, "|", Qi), Ee(t, "+", Zi), Ee(t, "#", ea), Ee(t, "?", rr), Ee(t, '"', Jc), Ee(t, "/", Qn), Ee(t, ";", Xc), Ee(t, "~", ir), Ee(t, "_", ta), Ee(t, "\\", Wi), Ee(t, "・", Jm);
+  Qr == null && (Qr = of(yT)), Zr == null && (Zr = of(bT)), Ae(t, "'", ji), Ae(t, "{", nr), Ae(t, "}", sr), Ae(t, "[", Ai), Ae(t, "]", $i), Ae(t, "(", Ri), Ae(t, ")", Ni), Ae(t, "<", Li), Ae(t, ">", Oi), Ae(t, "（", Di), Ae(t, "）", Bi), Ae(t, "「", Pi), Ae(t, "」", zi), Ae(t, "『", Fi), Ae(t, "』", Ui), Ae(t, "＜", Hi), Ae(t, "＞", Gi), Ae(t, "&", Vi), Ae(t, "*", Ki), Ae(t, "@", Is), Ae(t, "`", qi), Ae(t, "^", Ji), Ae(t, ":", qs), Ae(t, ",", Wc), Ae(t, "$", Xi), Ae(t, ".", Yn), Ae(t, "=", Yi), Ae(t, "!", qc), Ae(t, "-", Nn), Ae(t, "%", or), Ae(t, "|", Qi), Ae(t, "+", Zi), Ae(t, "#", ea), Ae(t, "?", rr), Ae(t, '"', Jc), Ae(t, "/", Qn), Ae(t, ";", Xc), Ae(t, "~", ir), Ae(t, "_", ta), Ae(t, "\\", Wi), Ae(t, "・", Jm);
   const s = Ft(t, cs, jc, {
     [Nl]: !0
   });
@@ -24500,20 +24518,20 @@ function IT(n = []) {
     [Ol]: !0
   });
   Ft(a, ls), Ft(a, cs, r), Ft(a, Ho, a), Ft(r, cs, r), Ft(r, ls), Ft(r, Ho, r);
-  const l = Ee(t, sl, Kc, {
+  const l = Ae(t, sl, Kc, {
     [el]: !0
-  }), c = Ee(t, sf, Fl, {
+  }), c = Ae(t, sf, Fl, {
     [el]: !0
   }), u = Ft(t, nl, Fl, {
     [el]: !0
   });
-  Ee(t, ol, u), Ee(c, sl, l), Ee(c, ol, u), Ft(c, nl, u), Ee(u, sf), Ee(u, sl), Ft(u, nl, u), Ee(u, ol, u);
+  Ae(t, ol, u), Ae(c, sl, l), Ae(c, ol, u), Ft(c, nl, u), Ae(u, sf), Ae(u, sl), Ft(u, nl, u), Ae(u, ol, u);
   const d = Ft(t, tl, Xm, {
     [Km]: !0
   });
-  Ee(d, "#"), Ft(d, tl, d), Ee(d, MT, d);
-  const p = Ee(d, ST);
-  Ee(p, "#"), Ft(p, tl, d);
+  Ae(d, "#"), Ft(d, tl, d), Ae(d, MT, d);
+  const p = Ae(d, ST);
+  Ae(p, "#"), Ft(p, tl, d);
   const f = [[ls, i], [cs, o]], h = [[ls, null], [Ho, a], [cs, r]];
   for (let g = 0; g < Qr.length; g++)
     Cs(t, Qr[g], Pl, fs, f);
@@ -24839,33 +24857,33 @@ const TT = Ia("email", {
 function AT({
   groups: n
 }) {
-  const e = n.domain.concat([Vi, Ki, Is, Wi, qi, Ji, Xi, Yi, Nn, jc, or, Qi, Zi, ea, Qn, na, ir, ta]), t = [ji, qs, Wc, Yn, qc, or, rr, Jc, Xc, Li, Oi, nr, sr, $i, Ai, Ri, Ni, Di, Bi, Pi, zi, Fi, Ui, Hi, Gi], s = [Vi, ji, Ki, Wi, qi, Ji, Xi, Yi, Nn, nr, sr, or, Qi, Zi, ea, rr, Qn, na, ir, ta], o = Rn(), r = Ee(o, ir);
-  gt(r, s, r), gt(r, n.domain, r);
+  const e = n.domain.concat([Vi, Ki, Is, Wi, qi, Ji, Xi, Yi, Nn, jc, or, Qi, Zi, ea, Qn, na, ir, ta]), t = [ji, qs, Wc, Yn, qc, or, rr, Jc, Xc, Li, Oi, nr, sr, $i, Ai, Ri, Ni, Di, Bi, Pi, zi, Fi, Ui, Hi, Gi], s = [Vi, ji, Ki, Wi, qi, Ji, Xi, Yi, Nn, nr, sr, or, Qi, Zi, ea, rr, Qn, na, ir, ta], o = Rn(), r = Ae(o, ir);
+  vt(r, s, r), vt(r, n.domain, r);
   const i = Rn(), a = Rn(), l = Rn();
-  gt(o, n.domain, i), gt(o, n.scheme, a), gt(o, n.slashscheme, l), gt(i, s, r), gt(i, n.domain, i);
-  const c = Ee(i, Is);
-  Ee(r, Is, c), Ee(a, Is, c), Ee(l, Is, c);
-  const u = Ee(r, Yn);
-  gt(u, s, r), gt(u, n.domain, r);
+  vt(o, n.domain, i), vt(o, n.scheme, a), vt(o, n.slashscheme, l), vt(i, s, r), vt(i, n.domain, i);
+  const c = Ae(i, Is);
+  Ae(r, Is, c), Ae(a, Is, c), Ae(l, Is, c);
+  const u = Ae(r, Yn);
+  vt(u, s, r), vt(u, n.domain, r);
   const d = Rn();
-  gt(c, n.domain, d), gt(d, n.domain, d);
-  const p = Ee(d, Yn);
-  gt(p, n.domain, d);
+  vt(c, n.domain, d), vt(d, n.domain, d);
+  const p = Ae(d, Yn);
+  vt(p, n.domain, d);
   const f = Rn(TT);
-  gt(p, n.tld, f), gt(p, n.utld, f), Ee(c, vr, f);
-  const h = Ee(d, Nn);
-  Ee(h, Nn, h), gt(h, n.domain, d), gt(f, n.domain, d), Ee(f, Yn, p), Ee(f, Nn, h);
-  const g = Ee(i, Nn), v = Ee(i, Yn);
-  Ee(g, Nn, g), gt(g, n.domain, i), gt(v, s, r), gt(v, n.domain, i);
+  vt(p, n.tld, f), vt(p, n.utld, f), Ae(c, vr, f);
+  const h = Ae(d, Nn);
+  Ae(h, Nn, h), vt(h, n.domain, d), vt(f, n.domain, d), Ae(f, Yn, p), Ae(f, Nn, h);
+  const g = Ae(i, Nn), v = Ae(i, Yn);
+  Ae(g, Nn, g), vt(g, n.domain, i), vt(v, s, r), vt(v, n.domain, i);
   const b = Rn(ei);
-  gt(v, n.tld, b), gt(v, n.utld, b), gt(b, n.domain, i), gt(b, s, r), Ee(b, Yn, v), Ee(b, Nn, g), Ee(b, Is, c);
-  const $ = Ee(b, qs), R = Rn(ei);
-  gt($, n.numeric, R);
+  vt(v, n.tld, b), vt(v, n.utld, b), vt(b, n.domain, i), vt(b, s, r), Ae(b, Yn, v), Ae(b, Nn, g), Ae(b, Is, c);
+  const $ = Ae(b, qs), R = Rn(ei);
+  vt($, n.numeric, R);
   const M = Rn(ei), x = Rn();
-  gt(M, e, M), gt(M, t, x), gt(x, e, M), gt(x, t, x), Ee(b, Qn, M), Ee(R, Qn, M);
-  const T = Ee(a, qs), I = Ee(l, qs), O = Ee(I, Qn), E = Ee(O, Qn);
-  gt(a, n.domain, i), Ee(a, Yn, v), Ee(a, Nn, g), gt(l, n.domain, i), Ee(l, Yn, v), Ee(l, Nn, g), gt(T, n.domain, M), Ee(T, Qn, M), Ee(T, rr, M), gt(E, n.domain, M), gt(E, e, M), Ee(E, Qn, M);
-  const G = [
+  vt(M, e, M), vt(M, t, x), vt(x, e, M), vt(x, t, x), Ae(b, Qn, M), Ae(R, Qn, M);
+  const T = Ae(a, qs), I = Ae(l, qs), N = Ae(I, Qn), E = Ae(N, Qn);
+  vt(a, n.domain, i), Ae(a, Yn, v), Ae(a, Nn, g), vt(l, n.domain, i), Ae(l, Yn, v), Ae(l, Nn, g), vt(T, n.domain, M), Ae(T, Qn, M), Ae(T, rr, M), vt(E, n.domain, M), vt(E, e, M), Ae(E, Qn, M);
+  const H = [
     [nr, sr],
     // {}
     [Ai, $i],
@@ -24883,15 +24901,15 @@ function AT({
     [Hi, Gi]
     // ＜＞
   ];
-  for (let N = 0; N < G.length; N++) {
-    const [D, S] = G[N], C = Ee(M, D);
-    Ee(x, D, C);
-    const L = Rn(ei);
-    gt(C, e, L);
-    const J = Rn();
-    gt(C, t, J), Ee(C, S, M), gt(L, e, L), gt(L, t, J), gt(J, e, L), gt(J, t, J), Ee(L, S, M), Ee(J, S, M);
+  for (let D = 0; D < H.length; D++) {
+    const [L, S] = H[D], C = Ae(M, L);
+    Ae(x, L, C);
+    const O = Rn(ei);
+    vt(C, e, O);
+    const q = Rn();
+    vt(C, t, q), Ae(C, S, M), vt(O, e, O), vt(O, t, q), vt(q, e, O), vt(q, t, q), Ae(O, S, M), Ae(q, S, M);
   }
-  return Ee(o, vr, b), Ee(o, Kc, ET), {
+  return Ae(o, vr, b), Ae(o, Kc, ET), {
     start: o,
     tokens: Ym
   };
@@ -24919,7 +24937,7 @@ function rl(n, e, t) {
   return new n(r, t);
 }
 const RT = typeof console < "u" && console && console.warn || (() => {
-}), NT = "until manual call of linkify.init(). Register all schemes and plugins before invoking linkify the first time.", Rt = {
+}), NT = "until manual call of linkify.init(). Register all schemes and plugins before invoking linkify the first time.", Nt = {
   scanner: null,
   parser: null,
   tokenQueue: [],
@@ -24928,32 +24946,32 @@ const RT = typeof console < "u" && console && console.warn || (() => {
   initialized: !1
 };
 function LT() {
-  return In.groups = {}, Rt.scanner = null, Rt.parser = null, Rt.tokenQueue = [], Rt.pluginQueue = [], Rt.customSchemes = [], Rt.initialized = !1, Rt;
+  return In.groups = {}, Nt.scanner = null, Nt.parser = null, Nt.tokenQueue = [], Nt.pluginQueue = [], Nt.customSchemes = [], Nt.initialized = !1, Nt;
 }
 function lf(n, e = !1) {
-  if (Rt.initialized && RT(`linkifyjs: already initialized - will not register custom scheme "${n}" ${NT}`), !/^[0-9a-z]+(-[0-9a-z]+)*$/.test(n))
+  if (Nt.initialized && RT(`linkifyjs: already initialized - will not register custom scheme "${n}" ${NT}`), !/^[0-9a-z]+(-[0-9a-z]+)*$/.test(n))
     throw new Error(`linkifyjs: incorrect scheme format.
 1. Must only contain digits, lowercase ASCII letters or "-"
 2. Cannot start or end with "-"
 3. "-" cannot repeat`);
-  Rt.customSchemes.push([n, e]);
+  Nt.customSchemes.push([n, e]);
 }
 function OT() {
-  Rt.scanner = IT(Rt.customSchemes);
-  for (let n = 0; n < Rt.tokenQueue.length; n++)
-    Rt.tokenQueue[n][1]({
-      scanner: Rt.scanner
+  Nt.scanner = IT(Nt.customSchemes);
+  for (let n = 0; n < Nt.tokenQueue.length; n++)
+    Nt.tokenQueue[n][1]({
+      scanner: Nt.scanner
     });
-  Rt.parser = AT(Rt.scanner.tokens);
-  for (let n = 0; n < Rt.pluginQueue.length; n++)
-    Rt.pluginQueue[n][1]({
-      scanner: Rt.scanner,
-      parser: Rt.parser
+  Nt.parser = AT(Nt.scanner.tokens);
+  for (let n = 0; n < Nt.pluginQueue.length; n++)
+    Nt.pluginQueue[n][1]({
+      scanner: Nt.scanner,
+      parser: Nt.parser
     });
-  return Rt.initialized = !0, Rt;
+  return Nt.initialized = !0, Nt;
 }
 function Qc(n) {
-  return Rt.initialized || OT(), $T(Rt.parser.start, n, Qm(Rt.scanner.start, n));
+  return Nt.initialized || OT(), $T(Nt.parser.start, n, Qm(Nt.scanner.start, n));
 }
 Qc.scan = Qm;
 function eg(n, e = null, t = null) {
@@ -24974,8 +24992,8 @@ function zT(n) {
   return n.length === 1 ? n[0].isLink : n.length === 3 && n[1].isLink ? ["()", "[]"].includes(n[0].value + n[2].value) : !1;
 }
 function FT(n) {
-  return new Dt({
-    key: new Qt("autolink"),
+  return new Bt({
+    key: new Zt("autolink"),
     appendTransaction: (e, t, s) => {
       const o = e.some((c) => c.docChanged) && !t.doc.eq(s.doc), r = e.some(
         (c) => c.getMeta("preventAutolink")
@@ -25042,8 +25060,8 @@ function FT(n) {
   });
 }
 function UT(n) {
-  return new Dt({
-    key: new Qt("handleClickLink"),
+  return new Bt({
+    key: new Zt("handleClickLink"),
     props: {
       handleClick: (e, t, s) => {
         var o, r;
@@ -25168,8 +25186,8 @@ function WT(n) {
   });
 }
 function qT(n) {
-  return new Dt({
-    key: new Qt("handlePasteLink"),
+  return new Bt({
+    key: new Zt("handlePasteLink"),
     props: {
       handlePaste: (e, t, s) => {
         const { shouldAutoLink: o } = n, { state: r } = e, { selection: i } = r, { empty: a } = i;
@@ -25809,7 +25827,7 @@ YT(fE, {
   nextListIsHigher: () => pg
 });
 var Ea = (n, e) => {
-  const { $from: t } = e.selection, s = Yt(n, e.schema);
+  const { $from: t } = e.selection, s = Qt(n, e.schema);
   let o = null, r = t.depth, i = t.pos, a = null;
   for (; r > 0 && a === null; )
     o = t.node(r), o.type === s ? a = r : (r -= 1, i -= 1);
@@ -25867,7 +25885,7 @@ var Ea = (n, e) => {
   if (!a.canReplace(a.childCount, a.childCount, xe.from(l)))
     return !1;
   const c = r.before(), u = r.after(), d = c - 2;
-  return n.commands.command(({ tr: p, dispatch: f }) => (f && (p.delete(c, u).insert(d, xe.from(l)), p.setSelection(rt.create(p.doc, d + 1)), p.scrollIntoView()), !0));
+  return n.commands.command(({ tr: p, dispatch: f }) => (f && (p.delete(c, u).insert(d, xe.from(l)), p.setSelection(it.create(p.doc, d + 1)), p.scrollIntoView()), !0));
 }, pE = (n, e) => {
   var t;
   const { $anchor: s } = e.selection, o = e.doc.resolve(s.pos - s.parentOffset - 2);
@@ -25879,7 +25897,7 @@ var Ea = (n, e) => {
 }, mE = (n, e, t) => {
   if (!t)
     return !1;
-  const s = Yt(n, e.schema);
+  const s = Qt(n, e.schema);
   let o = !1;
   return t.descendants((r) => {
     r.type === s && (o = !0);
@@ -26257,7 +26275,7 @@ var vg = En.create({
   },
   addProseMirrorPlugins() {
     return [
-      new Dt({
+      new Bt({
         props: {
           handlePaste: (n, e) => {
             var t, s;
@@ -26746,7 +26764,7 @@ var ni = "&nbsp;", il = " ", $E = En.create({
   }
 });
 function BE(n = {}) {
-  return new Dt({
+  return new Bt({
     view(e) {
       return new PE(e, n);
     }
@@ -26906,7 +26924,7 @@ class Ut extends ht {
       for (; ; ) {
         let i = t > 0 ? r.firstChild : r.lastChild;
         if (!i) {
-          if (r.isAtom && !r.isText && !st.isSelectable(r)) {
+          if (r.isAtom && !r.isText && !ot.isSelectable(r)) {
             e = e.doc.resolve(o + r.nodeSize * t), s = !1;
             continue e;
           }
@@ -26974,7 +26992,7 @@ function FE(n) {
   return !0;
 }
 function UE() {
-  return new Dt({
+  return new Bt({
     props: {
       decorations: jE,
       createSelectionBetween(n, e, t) {
@@ -26996,7 +27014,7 @@ function si(n, e) {
   const t = n == "vert" ? e > 0 ? "down" : "up" : e > 0 ? "right" : "left";
   return function(s, o, r) {
     let i = s.selection, a = e > 0 ? i.$to : i.$from, l = i.empty;
-    if (i instanceof rt) {
+    if (i instanceof it) {
       if (!r.endOfTextblock(t) || a.depth == 0)
         return !1;
       l = !1, a = s.doc.resolve(e > 0 ? a.after() : a.before());
@@ -27012,7 +27030,7 @@ function GE(n, e, t) {
   if (!Ut.valid(s))
     return !1;
   let o = n.posAtCoords({ left: t.clientX, top: t.clientY });
-  return o && o.inside > -1 && st.isSelectable(n.state.doc.nodeAt(o.inside)) ? !1 : (n.dispatch(n.state.tr.setSelection(new Ut(s))), !0);
+  return o && o.inside > -1 && ot.isSelectable(n.state.doc.nodeAt(o.inside)) ? !1 : (n.dispatch(n.state.tr.setSelection(new Ut(s))), !0);
 }
 function VE(n, e) {
   if (e.inputType != "insertCompositionText" || !(n.state.selection instanceof Ut))
@@ -27024,7 +27042,7 @@ function VE(n, e) {
   for (let i = s.length - 1; i >= 0; i--)
     o = xe.from(s[i].createAndFill(null, o));
   let r = n.state.tr.replace(t.pos, t.pos, new je(o, 0, 0));
-  return r.setSelection(rt.near(r.doc.resolve(t.pos + 1))), n.dispatch(r), !1;
+  return r.setSelection(it.near(r.doc.resolve(t.pos + 1))), n.dispatch(r), !1;
 }
 function jE(n) {
   if (!(n.selection instanceof Ut))
@@ -27032,36 +27050,36 @@ function jE(n) {
   let e = document.createElement("div");
   return e.className = "ProseMirror-gapcursor", _t.create(n.doc, [wn.widget(n.selection.head, e, { key: "gapcursor" })]);
 }
-var oa = 200, cn = function() {
+var oa = 200, ln = function() {
 };
-cn.prototype.append = function(e) {
-  return e.length ? (e = cn.from(e), !this.length && e || e.length < oa && this.leafAppend(e) || this.length < oa && e.leafPrepend(this) || this.appendInner(e)) : this;
+ln.prototype.append = function(e) {
+  return e.length ? (e = ln.from(e), !this.length && e || e.length < oa && this.leafAppend(e) || this.length < oa && e.leafPrepend(this) || this.appendInner(e)) : this;
 };
-cn.prototype.prepend = function(e) {
-  return e.length ? cn.from(e).append(this) : this;
+ln.prototype.prepend = function(e) {
+  return e.length ? ln.from(e).append(this) : this;
 };
-cn.prototype.appendInner = function(e) {
+ln.prototype.appendInner = function(e) {
   return new KE(this, e);
 };
-cn.prototype.slice = function(e, t) {
-  return e === void 0 && (e = 0), t === void 0 && (t = this.length), e >= t ? cn.empty : this.sliceInner(Math.max(0, e), Math.min(this.length, t));
+ln.prototype.slice = function(e, t) {
+  return e === void 0 && (e = 0), t === void 0 && (t = this.length), e >= t ? ln.empty : this.sliceInner(Math.max(0, e), Math.min(this.length, t));
 };
-cn.prototype.get = function(e) {
+ln.prototype.get = function(e) {
   if (!(e < 0 || e >= this.length))
     return this.getInner(e);
 };
-cn.prototype.forEach = function(e, t, s) {
+ln.prototype.forEach = function(e, t, s) {
   t === void 0 && (t = 0), s === void 0 && (s = this.length), t <= s ? this.forEachInner(e, t, s, 0) : this.forEachInvertedInner(e, t, s, 0);
 };
-cn.prototype.map = function(e, t, s) {
+ln.prototype.map = function(e, t, s) {
   t === void 0 && (t = 0), s === void 0 && (s = this.length);
   var o = [];
   return this.forEach(function(r, i) {
     return o.push(e(r, i));
   }, t, s), o;
 };
-cn.from = function(e) {
-  return e instanceof cn ? e : e && e.length ? new bg(e) : cn.empty;
+ln.from = function(e) {
+  return e instanceof ln ? e : e && e.length ? new bg(e) : ln.empty;
 };
 var bg = /* @__PURE__ */ function(n) {
   function e(s) {
@@ -27094,8 +27112,8 @@ var bg = /* @__PURE__ */ function(n) {
   }, t.depth.get = function() {
     return 0;
   }, Object.defineProperties(e.prototype, t), e;
-}(cn);
-cn.empty = new bg([]);
+}(ln);
+ln.empty = new bg([]);
 var KE = /* @__PURE__ */ function(n) {
   function e(t, s) {
     n.call(this), this.left = t, this.right = s, this.length = t.length + s.length, this.depth = Math.max(t.depth, s.depth) + 1;
@@ -27128,7 +27146,7 @@ var KE = /* @__PURE__ */ function(n) {
   }, e.prototype.appendInner = function(s) {
     return this.left.depth >= Math.max(this.right.depth, s.depth) + 1 ? new e(this.left, new e(this.right, s)) : new e(this, s);
   }, e;
-}(cn);
+}(ln);
 const WE = 500;
 class Gn {
   constructor(e, t) {
@@ -27239,10 +27257,10 @@ class Gn {
           (p = o.length && o[f].merge(d)) ? o[f] = p : o.push(d);
         }
       } else i.map && s--;
-    }, this.items.length, 0), new Gn(cn.from(o.reverse()), r);
+    }, this.items.length, 0), new Gn(ln.from(o.reverse()), r);
   }
 }
-Gn.empty = new Gn(cn.empty, 0);
+Gn.empty = new Gn(ln.empty, 0);
 function qE(n, e) {
   let t;
   return n.forEach((s, o) => {
@@ -27330,12 +27348,12 @@ function ui(n) {
   }
   return ll;
 }
-const Zs = new Qt("history"), ZE = new Qt("closeHistory");
+const Zs = new Zt("history"), ZE = new Zt("closeHistory");
 function eA(n = {}) {
   return n = {
     depth: n.depth || 100,
     newGroupDelay: n.newGroupDelay || 500
-  }, new Dt({
+  }, new Bt({
     key: Zs,
     state: {
       init() {
@@ -27402,8 +27420,8 @@ Gt.create({
   addProseMirrorPlugins() {
     let n = !1;
     return [
-      new Dt({
-        key: new Qt("characterCount"),
+      new Bt({
+        key: new Zt("characterCount"),
         appendTransaction: (e, t, s) => {
           if (n)
             return;
@@ -27462,8 +27480,8 @@ Gt.create({
   },
   addProseMirrorPlugins() {
     return [
-      new Dt({
-        key: new Qt("focus"),
+      new Bt({
+        key: new Zt("focus"),
         props: {
           decorations: ({ doc: n, selection: e }) => {
             const { isEditable: t, isFocused: s } = this.editor, { anchor: o } = e, r = [];
@@ -27511,7 +27529,7 @@ var nA = Gt.create({
       allowGapCursor: (e = Ct(Xe(n, "allowGapCursor", t))) != null ? e : null
     };
   }
-}), Cg = "placeholder", gf = new Qt("tiptap__placeholder");
+}), Cg = "placeholder", gf = new Zt("tiptap__placeholder");
 function Mg(n) {
   const {
     editor: e,
@@ -27755,7 +27773,7 @@ function uA(n) {
 }
 function dA({ editor: n, options: e }) {
   const t = e.dataAttribute ? `data-${uA(e.dataAttribute)}` : `data-${Cg}`, s = e.showOnlyCurrent && !e.includeChildren;
-  return new Dt({
+  return new Bt({
     key: gf,
     ...s ? {} : {
       state: cA({ editor: n, options: e, dataAttribute: t })
@@ -27808,8 +27826,8 @@ Gt.create({
   addProseMirrorPlugins() {
     const { editor: n, options: e } = this;
     return [
-      new Dt({
-        key: new Qt("selection"),
+      new Bt({
+        key: new Zt("selection"),
         props: {
           decorations(t) {
             return fA(t, n) ? _t.create(t.doc, [
@@ -27850,9 +27868,9 @@ var gA = Gt.create({
   },
   addProseMirrorPlugins() {
     var n;
-    const e = new Qt(this.name), t = this.options.node || ((n = this.editor.schema.topNodeType.contentMatch.defaultType) == null ? void 0 : n.name) || "paragraph", s = Object.entries(this.editor.schema.nodes).map(([, o]) => o).filter((o) => (this.options.notAfter || []).concat(t).includes(o.name));
+    const e = new Zt(this.name), t = this.options.node || ((n = this.editor.schema.topNodeType.contentMatch.defaultType) == null ? void 0 : n.name) || "paragraph", s = Object.entries(this.editor.schema.nodes).map(([, o]) => o).filter((o) => (this.options.notAfter || []).concat(t).includes(o.name));
     return [
-      new Dt({
+      new Bt({
         key: e,
         appendTransaction: (o, r, i) => {
           const { doc: a, tr: l, schema: c } = i, u = e.getState(i), d = a.content.size, p = c.nodes[t];
@@ -28070,7 +28088,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, AA = {
   key: 1,
   class: "rich-input__actions"
-}, $A = /* @__PURE__ */ Re({
+}, $A = /* @__PURE__ */ Le({
   __name: "rich-input",
   props: {
     config: {},
@@ -28103,10 +28121,10 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }
     });
     const g = k(() => {
-      var ee, me;
+      var ee, ve;
       return {
         "--rich-input-caret-color": ((ee = s.config) == null ? void 0 : ee.caretColor) || "auto",
-        "--rich-input-selection-color": ((me = s.config) == null ? void 0 : me.selectionColor) || "var(--uikit-selection-bg)",
+        "--rich-input-selection-color": ((ve = s.config) == null ? void 0 : ve.selectionColor) || "var(--uikit-selection-bg)",
         // 拖拽后的编辑器固定高度：height 与 max-height 同值（内容少时撑满、内容多时滚动）；未拖拽时不输出，由 CSS fallback 兜底
         ...l.value !== null ? {
           "--rich-input-editor-height": `${l.value}px`,
@@ -28117,20 +28135,20 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       var ee;
       return ((ee = s.config) == null ? void 0 : ee.maxLength) ?? 0;
     }), b = k(() => {
-      var ee, me, Be, tt, nt, dt, vt, kt, fe, Z;
+      var ee, ve, Be, st, nt, dt, gt, kt, he, Q;
       return {
-        emoji: ((me = (ee = s.config) == null ? void 0 : ee.features) == null ? void 0 : me.emoji) !== !1,
-        image: ((tt = (Be = s.config) == null ? void 0 : Be.features) == null ? void 0 : tt.image) !== !1,
+        emoji: ((ve = (ee = s.config) == null ? void 0 : ee.features) == null ? void 0 : ve.emoji) !== !1,
+        image: ((st = (Be = s.config) == null ? void 0 : Be.features) == null ? void 0 : st.image) !== !1,
         file: ((dt = (nt = s.config) == null ? void 0 : nt.features) == null ? void 0 : dt.file) !== !1,
-        voice: ((kt = (vt = s.config) == null ? void 0 : vt.features) == null ? void 0 : kt.voice) !== !1,
-        video: ((Z = (fe = s.config) == null ? void 0 : fe.features) == null ? void 0 : Z.video) !== !1
+        voice: ((kt = (gt = s.config) == null ? void 0 : gt.features) == null ? void 0 : kt.voice) !== !1,
+        video: ((Q = (he = s.config) == null ? void 0 : he.features) == null ? void 0 : Q.video) !== !1
       };
     }), $ = k(() => {
       var ee;
       return ((ee = s.config) == null ? void 0 : ee.showSendButton) !== !1;
     }), R = A(!1), M = A(-1), x = A([]);
     let T = null, I = !1;
-    function O() {
+    function N() {
       I || (I = !0, o("typing"), T = setTimeout(() => {
         I = !1, T = null;
       }, 5e3));
@@ -28149,101 +28167,101 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       ],
       content: "",
       onCreate: ({ editor: ee }) => {
-        var me;
-        S(ee), (me = s.config) != null && me.autoFocus && ee.commands.focus();
+        var ve;
+        S(ee), (ve = s.config) != null && ve.autoFocus && ee.commands.focus();
       },
       onUpdate: ({ editor: ee }) => {
-        S(ee), O();
+        S(ee), N();
       },
       onFocus: () => o("focus"),
       editorProps: {
         attributes: {
           class: "rich-input__editor-content"
         },
-        handlePaste: (ee, me) => {
+        handlePaste: (ee, ve) => {
           var Be;
           if (v.value > 0) {
-            const tt = ee.state.doc.textContent, nt = ((Be = me.clipboardData) == null ? void 0 : Be.getData("text/plain")) || "";
-            if (tt.length + nt.length > v.value)
-              return me.preventDefault(), !0;
+            const st = ee.state.doc.textContent, nt = ((Be = ve.clipboardData) == null ? void 0 : Be.getData("text/plain")) || "";
+            if (st.length + nt.length > v.value)
+              return ve.preventDefault(), !0;
           }
           return !1;
         },
-        handleKeyDown: (ee, me) => v.value > 0 && me.key.length === 1 && !me.ctrlKey && !me.metaKey && !me.altKey && ee.state.doc.textContent.length >= v.value ? (me.preventDefault(), !0) : (me.key === "@" && s.enableMention && (M.value = ee.state.selection.from, requestAnimationFrame(() => {
+        handleKeyDown: (ee, ve) => v.value > 0 && ve.key.length === 1 && !ve.ctrlKey && !ve.metaKey && !ve.altKey && ee.state.doc.textContent.length >= v.value ? (ve.preventDefault(), !0) : (ve.key === "@" && s.enableMention && (M.value = ee.state.selection.from, requestAnimationFrame(() => {
           if (!E.value)
             return;
-          const Be = E.value.state.selection.from, tt = E.value.view.coordsAtPos(Be), nt = document.createElement("div");
-          nt.style.position = "fixed", nt.style.left = `${tt.left}px`, nt.style.top = `${tt.top + 20}px`, nt.style.width = "1px", nt.style.height = "1px", nt.style.pointerEvents = "none", document.body.appendChild(nt);
-          const dt = E.value.getText(), vt = E.value.state.selection.from, kt = dt.substring(0, vt), fe = kt.lastIndexOf("@"), Z = fe >= 0 ? kt.substring(fe + 1) : "";
-          o("mention-trigger", nt, Z);
-        })), me.key === "Escape" && d.value && !s.mentionOpen ? (me.preventDefault(), N(), !0) : me.key === "Enter" && !me.shiftKey ? s.mentionOpen ? (me.preventDefault(), !0) : (me.preventDefault(), L(), !0) : !1)
+          const Be = E.value.state.selection.from, st = E.value.view.coordsAtPos(Be), nt = document.createElement("div");
+          nt.style.position = "fixed", nt.style.left = `${st.left}px`, nt.style.top = `${st.top + 20}px`, nt.style.width = "1px", nt.style.height = "1px", nt.style.pointerEvents = "none", document.body.appendChild(nt);
+          const dt = E.value.getText(), gt = E.value.state.selection.from, kt = dt.substring(0, gt), he = kt.lastIndexOf("@"), Q = he >= 0 ? kt.substring(he + 1) : "";
+          o("mention-trigger", nt, Q);
+        })), ve.key === "Escape" && d.value && !s.mentionOpen ? (ve.preventDefault(), D(), !0) : ve.key === "Enter" && !ve.shiftKey ? s.mentionOpen ? (ve.preventDefault(), !0) : (ve.preventDefault(), O(), !0) : !1)
       }
     });
-    function G() {
+    function H() {
       var Be;
-      const ee = (Be = u.value) == null ? void 0 : Be.closest(".chat"), me = (ee == null ? void 0 : ee.clientHeight) ?? (typeof window < "u" ? window.innerHeight : 600);
-      return Math.min(Math.max(Math.round(me * 0.5), 240), 600);
+      const ee = (Be = u.value) == null ? void 0 : Be.closest(".chat"), ve = (ee == null ? void 0 : ee.clientHeight) ?? (typeof window < "u" ? window.innerHeight : 600);
+      return Math.min(Math.max(Math.round(ve * 0.5), 240), 600);
     }
-    function N() {
+    function D() {
       var ee;
-      d.value ? (l.value = p, d.value = !1) : (p = l.value, l.value = G(), d.value = !0), o("expand-change", d.value), (ee = E.value) == null || ee.commands.focus();
+      d.value ? (l.value = p, d.value = !1) : (p = l.value, l.value = H(), d.value = !0), o("expand-change", d.value), (ee = E.value) == null || ee.commands.focus();
     }
-    const D = A(!1);
+    const L = A(!1);
     function S(ee) {
-      const me = ee.getText().trim(), Be = ee.getHTML();
-      D.value = me.length > 0 || Be.includes("<img");
+      const ve = ee.getText().trim(), Be = ee.getHTML();
+      L.value = ve.length > 0 || Be.includes("<img");
     }
     const C = /* @__PURE__ */ new Set();
-    function L() {
-      if (!E.value || !D.value)
+    function O() {
+      if (!E.value || !L.value)
         return;
-      const ee = E.value.getHTML(), me = E.value.getText(), Be = vc(me, x.value);
-      o("send", ee, me, Be.length > 0 ? Be : void 0), E.value.commands.clearContent(), C.forEach((tt) => URL.revokeObjectURL(tt)), C.clear(), x.value = [];
+      const ee = E.value.getHTML(), ve = E.value.getText(), Be = vc(ve, x.value);
+      o("send", ee, ve, Be.length > 0 ? Be : void 0), E.value.commands.clearContent(), C.forEach((st) => URL.revokeObjectURL(st)), C.clear(), x.value = [];
     }
-    const J = A(), te = A(!1);
-    function ve() {
+    const q = A(), te = A(!1);
+    function ye() {
       te.value = !te.value;
     }
-    function be() {
+    function ke() {
       te.value = !1;
     }
-    const W = A(), re = A(), ue = A();
-    function j(ee) {
+    const j = A(), ie = A(), fe = A();
+    function V(ee) {
       var Be;
-      (Be = (ee === "image" ? W : ee === "video" ? ue : re).value) == null || Be.click();
+      (Be = (ee === "image" ? j : ee === "video" ? fe : ie).value) == null || Be.click();
     }
-    function de(ee, me) {
-      var tt;
-      const Be = me.target.files;
+    function ue(ee, ve) {
+      var st;
+      const Be = ve.target.files;
       if (!(!Be || Be.length === 0))
         if (ee === "image") {
           const nt = Be[0], dt = URL.createObjectURL(nt);
-          C.add(dt), (tt = E.value) == null || tt.chain().focus().setImage({ src: dt }).run(), me.target.value = "";
+          C.add(dt), (st = E.value) == null || st.chain().focus().setImage({ src: dt }).run(), ve.target.value = "";
         } else
-          o("send-file", ee, Be), me.target.value = "";
+          o("send-file", ee, Be), ve.target.value = "";
     }
     function se() {
       R.value ? (R.value = !1, o("voice-end")) : (R.value = !0, o("voice-start"));
     }
     function Me() {
-      J.value && o("emoji-click", J.value);
+      q.value && o("emoji-click", q.value);
     }
     function ge(ee) {
-      var me;
-      (me = E.value) == null || me.chain().focus().insertContent(ee).run();
+      var ve;
+      (ve = E.value) == null || ve.chain().focus().insertContent(ee).run();
     }
-    function Ie(ee, me) {
+    function Ie(ee, ve) {
       if (!E.value || M.value < 0)
         return;
       const Be = E.value.state.selection.from;
-      E.value.chain().focus().deleteRange({ from: M.value, to: Be }).insertContent(`@${ee} `).run(), M.value = -1, me && !x.value.find((tt) => tt.userId === me.userId) && x.value.push(me);
+      E.value.chain().focus().deleteRange({ from: M.value, to: Be }).insertContent(`@${ee} `).run(), M.value = -1, ve && !x.value.find((st) => st.userId === ve.userId) && x.value.push(ve);
     }
-    function Ke(ee, me) {
-      E.value && (E.value.chain().focus().insertContent(`@${ee} `).run(), me && !x.value.find((Be) => Be.userId === me.userId) && x.value.push(me));
+    function Ke(ee, ve) {
+      E.value && (E.value.chain().focus().insertContent(`@${ee} `).run(), ve && !x.value.find((Be) => Be.userId === ve.userId) && x.value.push(ve));
     }
     function _e(ee) {
-      var me;
-      (me = E.value) == null || me.commands.setContent(ee), x.value = [];
+      var ve;
+      (ve = E.value) == null || ve.commands.setContent(ee), x.value = [];
     }
     function He() {
       var ee;
@@ -28257,8 +28275,8 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       getText: He
     }), Xn(() => {
       var ee;
-      (ee = E.value) == null || ee.destroy(), C.forEach((me) => URL.revokeObjectURL(me)), C.clear(), T && (clearTimeout(T), T = null);
-    }), (ee, me) => (y(), w("div", {
+      (ee = E.value) == null || ee.destroy(), C.forEach((ve) => URL.revokeObjectURL(ve)), C.clear(), T && (clearTimeout(T), T = null);
+    }), (ee, ve) => (y(), w("div", {
       ref_key: "rootRef",
       ref: u,
       class: Te(["rich-input", {
@@ -28272,129 +28290,129 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         b.value.emoji ? (y(), w("div", {
           key: 0,
           ref_key: "emojiBtnRef",
-          ref: J,
+          ref: q,
           class: "rich-input__tool-btn",
           onClick: Me
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "circle/face",
             size: 22
           })
-        ], 512)) : U("", !0),
+        ], 512)) : F("", !0),
         b.value.image ? (y(), w("div", {
           key: 1,
           class: "rich-input__tool-btn",
-          onClick: me[0] || (me[0] = (Be) => j("image"))
+          onClick: ve[0] || (ve[0] = (Be) => V("image"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "rect/img",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         b.value.video ? (y(), w("div", {
           key: 2,
           class: "rich-input__tool-btn",
-          onClick: me[1] || (me[1] = (Be) => j("video"))
+          onClick: ve[1] || (ve[1] = (Be) => V("video"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "rect/triangle",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         b.value.file ? (y(), w("div", {
           key: 3,
           class: "rich-input__tool-btn",
-          onClick: me[2] || (me[2] = (Be) => j("file"))
+          onClick: ve[2] || (ve[2] = (Be) => V("file"))
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "file/empty",
             size: 22
           })
-        ])) : U("", !0),
+        ])) : F("", !0),
         b.value.voice ? (y(), w("div", {
           key: 4,
           class: "rich-input__tool-btn",
           onClick: se
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: (R.value, "mic"),
             size: 22
           }, null, 8, ["name"])
-        ])) : U("", !0),
-        V(ee.$slots, "toolbar-extra", {
-          togglePanel: ve,
+        ])) : F("", !0),
+        G(ee.$slots, "toolbar-extra", {
+          togglePanel: ye,
           showPanel: te.value,
-          closePanel: be
+          closePanel: ke
         }, void 0, !0),
         f.value ? (y(), w("div", {
           key: 5,
           class: "rich-input__tool-btn rich-input__expand-btn",
           title: d.value ? m(r)("chat.input.collapse", "收起输入框") : m(r)("chat.input.expand", "展开输入框"),
-          onClick: N
+          onClick: D
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: d.value ? "chevron/up" : "chevron/down",
             size: 22
           }, null, 8, ["name"])
-        ], 8, MA)) : U("", !0)
+        ], 8, MA)) : F("", !0)
       ]),
       _("div", SA, [
         R.value ? (y(), w("div", TA, P(R.value ? m(r)("chat.voice.releaseEnd") : m(r)("chat.voice.holdTalk")), 1)) : (y(), w("div", IA, [
-          q(m(Wx), { editor: m(E) }, null, 8, ["editor"]),
-          D.value ? U("", !0) : (y(), w("div", xA, P(m(r)("chat.placeholder")), 1)),
+          W(m(Wx), { editor: m(E) }, null, 8, ["editor"]),
+          L.value ? F("", !0) : (y(), w("div", xA, P(m(r)("chat.placeholder")), 1)),
           h.value ? (y(), w("div", {
             key: 1,
             ref_key: "resizeHandleRef",
             ref: c,
             class: "rich-input__resize-handle"
-          }, null, 512)) : U("", !0)
+          }, null, 512)) : F("", !0)
         ]))
       ]),
       te.value ? (y(), w("div", EA, [
-        V(ee.$slots, "input-panel", {
+        G(ee.$slots, "input-panel", {
           showPanel: te.value,
-          closePanel: be
+          closePanel: ke
         }, void 0, !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
       $.value ? (y(), w("div", AA, [
-        q(m(xn), {
+        W(m(xn), {
           type: "primary",
           size: "small",
-          disabled: !D.value,
-          onClick: L
+          disabled: !L.value,
+          onClick: O
         }, {
-          default: X(() => [
+          default: J(() => [
             mt(P(m(r)("chat.send")), 1)
           ]),
           _: 1
         }, 8, ["disabled"])
-      ])) : U("", !0),
+      ])) : F("", !0),
       _("input", {
         ref_key: "imageInputRef",
-        ref: W,
+        ref: j,
         type: "file",
         accept: "image/*",
         style: { display: "none" },
-        onChange: me[3] || (me[3] = (Be) => de("image", Be))
+        onChange: ve[3] || (ve[3] = (Be) => ue("image", Be))
       }, null, 544),
       _("input", {
         ref_key: "videoInputRef",
-        ref: ue,
+        ref: fe,
         type: "file",
         accept: "video/*",
         style: { display: "none" },
-        onChange: me[4] || (me[4] = (Be) => de("video", Be))
+        onChange: ve[4] || (ve[4] = (Be) => ue("video", Be))
       }, null, 544),
       _("input", {
         ref_key: "fileInputRef",
-        ref: re,
+        ref: ie,
         type: "file",
         style: { display: "none" },
-        onChange: me[5] || (me[5] = (Be) => de("file", Be))
+        onChange: ve[5] || (ve[5] = (Be) => ue("file", Be))
       }, null, 544)
     ], 6));
   }
-}), Tg = /* @__PURE__ */ ze($A, [["__scopeId", "data-v-ce7bd308"]]), RA = { class: "editing-bar" }, NA = { class: "editing-bar__text" }, LA = { class: "editing-bar__title" }, OA = { class: "editing-bar__preview" }, DA = /* @__PURE__ */ Re({
+}), Tg = /* @__PURE__ */ ze($A, [["__scopeId", "data-v-ce7bd308"]]), RA = { class: "editing-bar" }, NA = { class: "editing-bar__text" }, LA = { class: "editing-bar__title" }, OA = { class: "editing-bar__preview" }, DA = /* @__PURE__ */ Le({
   __name: "editing-bar",
   props: {
     message: {}
@@ -28406,7 +28424,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       s("close");
     }
     return (a, l) => (y(), w("div", RA, [
-      q(m(Oe), {
+      W(m(De), {
         class: "editing-bar__icon",
         name: "rect/pencil",
         size: 14
@@ -28415,7 +28433,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         _("span", LA, P(m(o)("message.editing")), 1),
         _("span", OA, P(r.value), 1)
       ]),
-      q(m(pt), {
+      W(m(pt), {
         class: "editing-bar__close",
         icon: "xmark/light",
         size: "small",
@@ -28428,7 +28446,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }), BA = /* @__PURE__ */ ze(DA, [["__scopeId", "data-v-4e0d1708"]]), PA = {
   key: 0,
   class: "message-input__muted-overlay"
-}, zA = { class: "message-input__muted-text" }, FA = { class: "emoji-picker-wrapper" }, UA = /* @__PURE__ */ Re({
+}, zA = { class: "message-input__muted-text" }, FA = { class: "emoji-picker-wrapper" }, UA = /* @__PURE__ */ Le({
   __name: "index",
   props: {
     config: {},
@@ -28439,294 +28457,294 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   },
   emits: ["send-success", "focus"],
   setup(n, { expose: e, emit: t }) {
-    la((F) => ({
+    la((oe) => ({
       v21b13306: E.value
     }));
-    const s = n, o = t, r = Ot("UIKit:Index"), { sendTextMessage: i, sendImageMessage: a, sendFileMessage: l, sendAudioMessage: c, sendVideoMessage: u, sendCmdMessage: d, currentConversation: p, editingMessage: f, exitEditMode: h, modifyTextMessage: g } = fa(), { features: v, capabilities: b } = at(), { quotedMessage: $, clearQuote: R, buildQuoteExt: M } = pa(), { isMobile: x } = Mn(), { show: T } = Wt(), { t: I } = qe(), O = k(() => {
-      var F;
-      return (F = s.config) == null ? void 0 : F.input;
+    const s = n, o = t, r = Dt("UIKit:Index"), { sendTextMessage: i, sendImageMessage: a, sendFileMessage: l, sendAudioMessage: c, sendVideoMessage: u, sendCmdMessage: d, currentConversation: p, editingMessage: f, exitEditMode: h, modifyTextMessage: g } = fa(), { features: v, capabilities: b } = at(), { quotedMessage: $, clearQuote: R, buildQuoteExt: M } = pa(), { isMobile: x } = Mn(), { show: T } = Wt(), { t: I } = qe(), N = k(() => {
+      var oe;
+      return (oe = s.config) == null ? void 0 : oe.input;
     }), E = k(() => {
-      var F;
-      return ((F = O.value) == null ? void 0 : F.focusBorderColor) || "var(--uikit-border-color)";
+      var oe;
+      return ((oe = N.value) == null ? void 0 : oe.focusBorderColor) || "var(--uikit-border-color)";
     });
-    function G() {
+    function H() {
       if (v.enableTyping === !1)
         return;
-      const F = p.value;
-      !F || F.type !== lt.SINGLECHAT || d("TypingBegin");
+      const oe = p.value;
+      !oe || oe.type !== lt.SINGLECHAT || d("TypingBegin");
     }
-    const N = k(() => {
-      var F;
-      return (F = s.config) == null ? void 0 : F.hooks;
-    });
-    async function D(F) {
+    const D = k(() => {
       var oe;
-      const le = (oe = N.value) == null ? void 0 : oe.beforeSend;
-      if (!le)
+      return (oe = s.config) == null ? void 0 : oe.hooks;
+    });
+    async function L(oe) {
+      var ce;
+      const Z = (ce = D.value) == null ? void 0 : ce.beforeSend;
+      if (!Z)
         return !0;
       try {
-        return await le(F) !== !1;
-      } catch (we) {
-        return r.error("[MessageInput] beforeSend hook error:", Je(we)), !0;
+        return await Z(oe) !== !1;
+      } catch (re) {
+        return r.error("[MessageInput] beforeSend hook error:", Je(re)), !0;
       }
     }
-    function S(F) {
-      var oe;
-      const le = (oe = N.value) == null ? void 0 : oe.afterSend;
-      if (le)
+    function S(oe) {
+      var ce;
+      const Z = (ce = D.value) == null ? void 0 : ce.afterSend;
+      if (Z)
         try {
-          le(F);
-        } catch (we) {
-          r.error("[MessageInput] afterSend hook error:", Je(we));
+          Z(oe);
+        } catch (re) {
+          r.error("[MessageInput] afterSend hook error:", Je(re));
         }
     }
     const C = k(() => {
-      var le;
-      const F = ((le = O.value) == null ? void 0 : le.mode) ?? "simple";
-      return x.value && F === "rich" && r.warn("[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略"), F;
-    }), L = A(!1), J = k(() => {
-      var F;
-      return ((F = O.value) == null ? void 0 : F.stickerPacks) ?? [];
+      var Z;
+      const oe = ((Z = N.value) == null ? void 0 : Z.mode) ?? "simple";
+      return x.value && oe === "rich" && r.warn("[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略"), oe;
+    }), O = A(!1), q = k(() => {
+      var oe;
+      return ((oe = N.value) == null ? void 0 : oe.stickerPacks) ?? [];
     }), te = k(() => {
-      var F;
-      return ((F = O.value) == null ? void 0 : F.emoji) ?? {};
-    }), ve = A(), be = A(!1), W = A(), re = A(""), ue = k(() => {
-      var oe, we;
-      const F = O.value;
-      return !(((oe = F == null ? void 0 : F.features) == null ? void 0 : oe.mention) === !1 || (((we = F == null ? void 0 : F.mention) == null ? void 0 : we.onlyInGroup) ?? !0) && !s.isGroup);
-    }), j = k(() => {
-      var F, le;
-      return s.mentionContacts ?? ((le = (F = O.value) == null ? void 0 : F.mention) == null ? void 0 : le.contacts) ?? [];
-    }), de = A(), se = A(), Me = A(), ge = A(), Ie = k(() => {
-      var F;
-      return b.groupReadReceipt === !1 || (F = s.config) == null ? void 0 : F.groupReadReceipt;
+      var oe;
+      return ((oe = N.value) == null ? void 0 : oe.emoji) ?? {};
+    }), ye = A(), ke = A(!1), j = A(), ie = A(""), fe = k(() => {
+      var ce, re;
+      const oe = N.value;
+      return !(((ce = oe == null ? void 0 : oe.features) == null ? void 0 : ce.mention) === !1 || (((re = oe == null ? void 0 : oe.mention) == null ? void 0 : re.onlyInGroup) ?? !0) && !s.isGroup);
+    }), V = k(() => {
+      var oe, Z;
+      return s.mentionContacts ?? ((Z = (oe = N.value) == null ? void 0 : oe.mention) == null ? void 0 : Z.contacts) ?? [];
+    }), ue = A(), se = A(), Me = A(), ge = A(), Ie = k(() => {
+      var oe;
+      return b.groupReadReceipt === !1 || (oe = s.config) == null ? void 0 : oe.groupReadReceipt;
     });
     function Ke() {
       if ($.value)
         return { ...M($.value) };
     }
     function _e() {
-      h(), Zt("");
+      h(), Jt("");
     }
-    async function He(F, le) {
+    async function He(oe, Z) {
       if (f.value) {
-        const De = f.value;
-        g(De, F).then(() => {
-          Zt(""), o("send-success");
-        }).catch((Ge) => {
-          const Pt = ((Ge == null ? void 0 : Ge.type) ?? (Ge == null ? void 0 : Ge.code)) === "modifiedCountExceedLimit" || /limit|count|5/i.test(String((Ge == null ? void 0 : Ge.message) || "")) ? I("message.edit.limitReached") : I("message.edit.failed");
-          T(Pt, "error");
+        const Ee = f.value;
+        g(Ee, oe).then(() => {
+          Jt(""), o("send-success");
+        }).catch((Ve) => {
+          const Rt = ((Ve == null ? void 0 : Ve.type) ?? (Ve == null ? void 0 : Ve.code)) === "modifiedCountExceedLimit" || /limit|count|5/i.test(String((Ve == null ? void 0 : Ve.message) || "")) ? I("message.edit.limitReached") : I("message.edit.failed");
+          T(Rt, "error");
         });
         return;
       }
-      let oe = Ke();
-      le && le.length > 0 && (oe = oe || {}, oe.em_at_list = le.map((De) => De.userId)), await D({ type: Ce.TEXT, body: { content: F } }) && (i(F, oe).then((De) => {
-        o("send-success"), S(De);
-      }).catch((De) => {
-        r.error("[MessageInput] sendTextMessage failed:", Je(De)), T(mo(De, "message.send.failed", I), "error");
+      let ce = Ke();
+      Z && Z.length > 0 && (ce = ce || {}, ce.em_at_list = Z.map((Ee) => Ee.userId)), await L({ type: Ce.TEXT, body: { content: oe } }) && (i(oe, ce).then((Ee) => {
+        o("send-success"), S(Ee);
+      }).catch((Ee) => {
+        r.error("[MessageInput] sendTextMessage failed:", Je(Ee)), T(mo(Ee, "message.send.failed", I), "error");
       }), R());
     }
-    async function ee(F, le, oe) {
+    async function ee(oe, Z, ce) {
       if (f.value) {
-        const Ge = f.value;
-        g(Ge, le).then(() => {
-          Zt(""), o("send-success");
-        }).catch((it) => {
-          const en = ((it == null ? void 0 : it.type) ?? (it == null ? void 0 : it.code)) === "modifiedCountExceedLimit" || /limit|count|5/i.test(String((it == null ? void 0 : it.message) || "")) ? I("message.edit.limitReached") : I("message.edit.failed");
+        const Ve = f.value;
+        g(Ve, Z).then(() => {
+          Jt(""), o("send-success");
+        }).catch((Qe) => {
+          const en = ((Qe == null ? void 0 : Qe.type) ?? (Qe == null ? void 0 : Qe.code)) === "modifiedCountExceedLimit" || /limit|count|5/i.test(String((Qe == null ? void 0 : Qe.message) || "")) ? I("message.edit.limitReached") : I("message.edit.failed");
           T(en, "error");
         });
         return;
       }
-      let we = Ke();
-      oe && oe.length > 0 && (we = we || {}, we.em_at_list = oe.map((Ge) => Ge.userId)), await D({ type: Ce.TEXT, body: { content: le } }) && (i(le, we).then((Ge) => {
-        o("send-success"), S(Ge);
-      }).catch((Ge) => {
-        r.error("[MessageInput] sendTextMessage failed:", Je(Ge)), T(mo(Ge, "message.send.failed", I), "error");
+      let re = Ke();
+      ce && ce.length > 0 && (re = re || {}, re.em_at_list = ce.map((Ve) => Ve.userId)), await L({ type: Ce.TEXT, body: { content: Z } }) && (i(Z, re).then((Ve) => {
+        o("send-success"), S(Ve);
+      }).catch((Ve) => {
+        r.error("[MessageInput] sendTextMessage failed:", Je(Ve)), T(mo(Ve, "message.send.failed", I), "error");
       }), R());
     }
-    const me = /* @__PURE__ */ new Set();
-    async function Be(F, le) {
-      const oe = le[0];
-      if (!oe)
+    const ve = /* @__PURE__ */ new Set();
+    async function Be(oe, Z) {
+      const ce = Z[0];
+      if (!ce)
         return;
-      const we = Ke();
-      if (!await D({ type: F === Ce.IMAGE ? Ce.IMAGE : F }))
+      const re = Ke();
+      if (!await L({ type: oe === Ce.IMAGE ? Ce.IMAGE : oe }))
         return;
-      let Ge;
-      if (F === Ce.IMAGE)
-        Ge = a(oe, Ie.value, we);
-      else if (F === Ce.VIDEO) {
-        const it = await tt(oe);
-        Ge = u(oe, it, Ie.value, we);
+      let Ve;
+      if (oe === Ce.IMAGE)
+        Ve = a(ce, Ie.value, re);
+      else if (oe === Ce.VIDEO) {
+        const Qe = await st(ce);
+        Ve = u(ce, Qe, Ie.value, re);
       } else
-        Ge = l(oe, Ie.value, we);
-      Ge == null || Ge.then((it) => {
-        o("send-success"), S(it);
-      }).catch((it) => {
-        r.error("[MessageInput] sendFile failed:", Je(it)), T(mo(it, "message.send.failed", I), "error");
+        Ve = l(ce, Ie.value, re);
+      Ve == null || Ve.then((Qe) => {
+        o("send-success"), S(Qe);
+      }).catch((Qe) => {
+        r.error("[MessageInput] sendFile failed:", Je(Qe)), T(mo(Qe, "message.send.failed", I), "error");
       }), R();
     }
-    function tt(F) {
-      return new Promise((le) => {
+    function st(oe) {
+      return new Promise((Z) => {
         if (typeof document > "u") {
-          le(1);
+          Z(1);
           return;
         }
-        const oe = document.createElement("video"), we = URL.createObjectURL(F);
-        oe.preload = "metadata", oe.muted = !0, oe.playsInline = !0, oe.src = we;
-        let De = !1;
-        const Ge = (it) => {
-          De || (De = !0, URL.revokeObjectURL(we), le(Math.max(1, Math.floor(it || 0))));
+        const ce = document.createElement("video"), re = URL.createObjectURL(oe);
+        ce.preload = "metadata", ce.muted = !0, ce.playsInline = !0, ce.src = re;
+        let Ee = !1;
+        const Ve = (Qe) => {
+          Ee || (Ee = !0, URL.revokeObjectURL(re), Z(Math.max(1, Math.floor(Qe || 0))));
         };
-        oe.addEventListener("loadedmetadata", () => Ge(oe.duration)), oe.addEventListener("error", () => Ge(1)), setTimeout(() => Ge(1), 5e3);
+        ce.addEventListener("loadedmetadata", () => Ve(ce.duration)), ce.addEventListener("error", () => Ve(1)), setTimeout(() => Ve(1), 5e3);
       });
     }
-    function nt(F) {
-      ve.value = F, L.value = !0;
+    function nt(oe) {
+      ye.value = oe, O.value = !0;
     }
-    function dt(F) {
-      var le, oe, we, De, Ge, it;
-      L.value = !1, x.value ? (oe = (le = se.value) == null ? void 0 : le.insertEmoji) == null || oe.call(le, F) : C.value === "simple" ? (De = (we = de.value) == null ? void 0 : we.insertEmoji) == null || De.call(we, F) : (it = (Ge = ge.value) == null ? void 0 : Ge.insertEmoji) == null || it.call(Ge, F);
+    function dt(oe) {
+      var Z, ce, re, Ee, Ve, Qe;
+      O.value = !1, x.value ? (ce = (Z = se.value) == null ? void 0 : Z.insertEmoji) == null || ce.call(Z, oe) : C.value === "simple" ? (Ee = (re = ue.value) == null ? void 0 : re.insertEmoji) == null || Ee.call(re, oe) : (Qe = (Ve = ge.value) == null ? void 0 : Ve.insertEmoji) == null || Qe.call(Ve, oe);
     }
-    async function vt(F) {
-      var le;
+    async function gt(oe) {
+      var Z;
       try {
-        const oe = await fetch(F.url);
-        if (!oe.ok)
-          return F.url;
-        const we = await oe.blob(), De = ((le = /\.(\w+)(?:\?.*)?$/.exec(F.url)) == null ? void 0 : le[1]) || "gif", Ge = F.url.split("?")[0].split("/").pop() || `sticker.${De}`;
-        return new File([we], Ge, { type: we.type || `image/${De}` });
+        const ce = await fetch(oe.url);
+        if (!ce.ok)
+          return oe.url;
+        const re = await ce.blob(), Ee = ((Z = /\.(\w+)(?:\?.*)?$/.exec(oe.url)) == null ? void 0 : Z[1]) || "gif", Ve = oe.url.split("?")[0].split("/").pop() || `sticker.${Ee}`;
+        return new File([re], Ve, { type: re.type || `image/${Ee}` });
       } catch {
-        return F.url;
+        return oe.url;
       }
     }
-    async function kt(F) {
-      if (L.value = !1, !await D({ type: Ce.IMAGE }))
+    async function kt(oe) {
+      if (O.value = !1, !await L({ type: Ce.IMAGE }))
         return;
-      const oe = await vt(F);
-      a(oe, Ie.value, { [Zl.IS_STICKER]: !0 }).then((we) => {
-        o("send-success"), S(we);
-      }).catch((we) => {
-        r.error("[MessageInput] sendSticker failed:", Je(we)), T(mo(we, "message.send.failed", I), "error");
+      const ce = await gt(oe);
+      a(ce, Ie.value, { [Zl.IS_STICKER]: !0 }).then((re) => {
+        o("send-success"), S(re);
+      }).catch((re) => {
+        r.error("[MessageInput] sendSticker failed:", Je(re)), T(mo(re, "message.send.failed", I), "error");
       });
     }
-    function fe() {
-      W.value && W.value.parentNode && W.value.parentNode.removeChild(W.value), W.value = void 0;
+    function he() {
+      j.value && j.value.parentNode && j.value.parentNode.removeChild(j.value), j.value = void 0;
     }
-    function Z(F, le) {
-      fe(), W.value = F, re.value = le, be.value = !0;
+    function Q(oe, Z) {
+      he(), j.value = oe, ie.value = Z, ke.value = !0;
     }
-    function ie() {
-      be.value = !1, fe();
+    function ae() {
+      ke.value = !1, he();
     }
-    function ke() {
-      L.value = !1, ie();
+    function we() {
+      O.value = !1, ae();
     }
-    function Q(F) {
-      var oe, we, De, Ge, it, Pt;
-      be.value = !1;
-      const le = F.remark || F.name;
-      x.value ? (we = (oe = se.value) == null ? void 0 : oe.insertMention) == null || we.call(oe, F) : C.value === "simple" ? (Ge = (De = de.value) == null ? void 0 : De.insertMention) == null || Ge.call(De, F) : (Pt = (it = ge.value) == null ? void 0 : it.insertMention) == null || Pt.call(it, le, F), fe();
+    function X(oe) {
+      var ce, re, Ee, Ve, Qe, Rt;
+      ke.value = !1;
+      const Z = oe.remark || oe.name;
+      x.value ? (re = (ce = se.value) == null ? void 0 : ce.insertMention) == null || re.call(ce, oe) : C.value === "simple" ? (Ve = (Ee = ue.value) == null ? void 0 : Ee.insertMention) == null || Ve.call(Ee, oe) : (Rt = (Qe = ge.value) == null ? void 0 : Qe.insertMention) == null || Rt.call(Qe, Z, oe), he();
     }
-    Pe(be, (F) => {
-      F || fe();
+    Pe(ke, (oe) => {
+      oe || he();
     });
-    let H = null, ae = [], K = 0, pe = null, Ne = !1, Qe = !1;
-    async function wt(F) {
-      const le = new AudioContext();
+    let U = null, le = [], K = 0, pe = null, Ne = !1, Ze = !1;
+    async function St(oe) {
+      const Z = new AudioContext();
       try {
-        const oe = await F.arrayBuffer(), we = await le.decodeAudioData(oe), De = we.numberOfChannels, Ge = we.sampleRate, it = 1, Pt = 16, en = Pt / 8, kn = De * en, tn = we.length, Bt = tn * De * en, un = new ArrayBuffer(44 + Bt), B = new DataView(un), Y = (We, ct) => {
+        const ce = await oe.arrayBuffer(), re = await Z.decodeAudioData(ce), Ee = re.numberOfChannels, Ve = re.sampleRate, Qe = 1, Rt = 16, en = Rt / 8, kn = Ee * en, tn = re.length, Pt = tn * Ee * en, cn = new ArrayBuffer(44 + Pt), B = new DataView(cn), Y = (We, ct) => {
           for (let bt = 0; bt < ct.length; bt++)
             B.setUint8(We + bt, ct.charCodeAt(bt));
         };
-        Y(0, "RIFF"), B.setUint32(4, 36 + Bt, !0), Y(8, "WAVE"), Y(12, "fmt "), B.setUint32(16, 16, !0), B.setUint16(20, it, !0), B.setUint16(22, De, !0), B.setUint32(24, Ge, !0), B.setUint32(28, Ge * kn, !0), B.setUint16(32, kn, !0), B.setUint16(34, Pt, !0), Y(36, "data"), B.setUint32(40, Bt, !0);
-        const he = 44, Le = [];
-        for (let We = 0; We < De; We++)
-          Le.push(we.getChannelData(We));
-        let ot = 0;
+        Y(0, "RIFF"), B.setUint32(4, 36 + Pt, !0), Y(8, "WAVE"), Y(12, "fmt "), B.setUint32(16, 16, !0), B.setUint16(20, Qe, !0), B.setUint16(22, Ee, !0), B.setUint32(24, Ve, !0), B.setUint32(28, Ve * kn, !0), B.setUint16(32, kn, !0), B.setUint16(34, Rt, !0), Y(36, "data"), B.setUint32(40, Pt, !0);
+        const me = 44, Oe = [];
+        for (let We = 0; We < Ee; We++)
+          Oe.push(re.getChannelData(We));
+        let rt = 0;
         for (let We = 0; We < tn; We++)
-          for (let ct = 0; ct < De; ct++) {
-            const bt = Math.max(-1, Math.min(1, Le[ct][We])), Sn = bt < 0 ? bt * 32768 : bt * 32767;
-            B.setInt16(he + ot, Sn, !0), ot += 2;
+          for (let ct = 0; ct < Ee; ct++) {
+            const bt = Math.max(-1, Math.min(1, Oe[ct][We])), Sn = bt < 0 ? bt * 32768 : bt * 32767;
+            B.setInt16(me + rt, Sn, !0), rt += 2;
           }
-        return new Blob([un], { type: "audio/wav" });
+        return new Blob([cn], { type: "audio/wav" });
       } finally {
-        le.close();
+        Z.close();
       }
     }
-    async function St() {
-      Ne = !1, Qe = !1;
+    async function wt() {
+      Ne = !1, Ze = !1;
       try {
-        pe = await navigator.mediaDevices.getUserMedia({ audio: !0 }), H = new MediaRecorder(pe), ae = [], H.ondataavailable = (F) => {
-          F.data.size > 0 && ae.push(F.data);
-        }, H.start(), K = Date.now(), Qe && Jt();
-      } catch (F) {
-        r.error("录音启动失败:", Je(F)), T("录音启动失败，请检查麦克风权限", "error"), pe == null || pe.getTracks().forEach((le) => le.stop()), pe = null, H = null;
+        pe = await navigator.mediaDevices.getUserMedia({ audio: !0 }), U = new MediaRecorder(pe), le = [], U.ondataavailable = (oe) => {
+          oe.data.size > 0 && le.push(oe.data);
+        }, U.start(), K = Date.now(), Ze && on();
+      } catch (oe) {
+        r.error("录音启动失败:", Je(oe)), T("录音启动失败，请检查麦克风权限", "error"), pe == null || pe.getTracks().forEach((Z) => Z.stop()), pe = null, U = null;
       }
     }
-    function on(F) {
-      if (!H) {
-        Qe = !0;
+    function hn(oe) {
+      if (!U) {
+        Ze = !0;
         return;
       }
-      const le = F ?? Math.floor((Date.now() - K) / 1e3), oe = H;
-      if (oe.state === "inactive") {
-        pe == null || pe.getTracks().forEach((we) => we.stop()), ae = [], pe = null, H = null;
+      const Z = oe ?? Math.floor((Date.now() - K) / 1e3), ce = U;
+      if (ce.state === "inactive") {
+        pe == null || pe.getTracks().forEach((re) => re.stop()), le = [], pe = null, U = null;
         return;
       }
-      H.onstop = async () => {
-        if (pe == null || pe.getTracks().forEach((we) => we.stop()), !Ne && ae.length > 0)
+      U.onstop = async () => {
+        if (pe == null || pe.getTracks().forEach((re) => re.stop()), !Ne && le.length > 0)
           try {
-            const we = new Blob(ae, { type: "audio/webm" }), De = await wt(we), Ge = Ke();
-            if (!await D({ type: Ce.VOICE })) {
+            const re = new Blob(le, { type: "audio/webm" }), Ee = await St(re), Ve = Ke();
+            if (!await L({ type: Ce.VOICE })) {
               R();
               return;
             }
-            c(new File([De], "voice.wav", { type: "audio/wav" }), le, void 0, Ge).then((Pt) => {
-              o("send-success"), S(Pt);
-            }).catch((Pt) => {
-              r.error("[MessageInput] sendAudioMessage failed:", Je(Pt)), T(mo(Pt, "message.send.failed", I), "error");
+            c(new File([Ee], "voice.wav", { type: "audio/wav" }), Z, void 0, Ve).then((Rt) => {
+              o("send-success"), S(Rt);
+            }).catch((Rt) => {
+              r.error("[MessageInput] sendAudioMessage failed:", Je(Rt)), T(mo(Rt, "message.send.failed", I), "error");
             }), R();
-          } catch (we) {
-            r.error("[MessageInput] 语音格式转换失败:", Je(we)), T("语音处理失败，请重试", "error");
+          } catch (re) {
+            r.error("[MessageInput] 语音格式转换失败:", Je(re)), T("语音处理失败，请重试", "error");
           }
-        ae = [], pe = null, oe === H && (H = null);
-      }, oe.stop();
+        le = [], pe = null, ce === U && (U = null);
+      }, ce.stop();
     }
-    function Jt() {
-      Ne = !0, H && H.state !== "inactive" && H.stop(), pe == null || pe.getTracks().forEach((F) => F.stop()), H = null, pe = null, ae = [];
+    function on() {
+      Ne = !0, U && U.state !== "inactive" && U.stop(), pe == null || pe.getTracks().forEach((oe) => oe.stop()), U = null, pe = null, le = [];
     }
     Xn(() => {
-      fe(), me.forEach((F) => {
-        URL.revokeObjectURL(F);
-      }), me.clear(), Jt();
+      he(), ve.forEach((oe) => {
+        URL.revokeObjectURL(oe);
+      }), ve.clear(), on();
     });
-    function Zt(F) {
-      var le, oe, we, De, Ge, it;
-      x.value ? (oe = (le = se.value) == null ? void 0 : le.setText) == null || oe.call(le, F) : C.value === "simple" ? (De = (we = de.value) == null ? void 0 : we.setText) == null || De.call(we, F) : (it = (Ge = ge.value) == null ? void 0 : Ge.setText) == null || it.call(Ge, F);
+    function Jt(oe) {
+      var Z, ce, re, Ee, Ve, Qe;
+      x.value ? (ce = (Z = se.value) == null ? void 0 : Z.setText) == null || ce.call(Z, oe) : C.value === "simple" ? (Ee = (re = ue.value) == null ? void 0 : re.setText) == null || Ee.call(re, oe) : (Qe = (Ve = ge.value) == null ? void 0 : Ve.setText) == null || Qe.call(Ve, oe);
     }
-    function rn() {
-      var F, le, oe, we, De, Ge;
-      return x.value ? ((le = (F = se.value) == null ? void 0 : F.getText) == null ? void 0 : le.call(F)) || "" : C.value === "simple" ? ((we = (oe = de.value) == null ? void 0 : oe.getText) == null ? void 0 : we.call(oe)) || "" : ((Ge = (De = ge.value) == null ? void 0 : De.getText) == null ? void 0 : Ge.call(De)) || "";
+    function Xt() {
+      var oe, Z, ce, re, Ee, Ve;
+      return x.value ? ((Z = (oe = se.value) == null ? void 0 : oe.getText) == null ? void 0 : Z.call(oe)) || "" : C.value === "simple" ? ((re = (ce = ue.value) == null ? void 0 : ce.getText) == null ? void 0 : re.call(ce)) || "" : ((Ve = (Ee = ge.value) == null ? void 0 : Ee.getText) == null ? void 0 : Ve.call(Ee)) || "";
     }
-    function ye() {
-      var F, le, oe, we, De, Ge, it, Pt, en, kn, tn, Bt;
-      x.value ? (oe = (le = (F = se.value) == null ? void 0 : F.$el) == null ? void 0 : le.querySelector("textarea")) == null || oe.focus() : C.value === "simple" ? ((Ge = (De = (we = de.value) == null ? void 0 : we.$el) == null ? void 0 : De.querySelector("textarea")) == null || Ge.focus(), (en = (Pt = (it = de.value) == null ? void 0 : it.$el) == null ? void 0 : Pt.querySelector("input")) == null || en.focus()) : (Bt = (tn = (kn = ge.value) == null ? void 0 : kn.$el) == null ? void 0 : tn.querySelector("[contenteditable]")) == null || Bt.focus();
+    function be() {
+      var oe, Z, ce, re, Ee, Ve, Qe, Rt, en, kn, tn, Pt;
+      x.value ? (ce = (Z = (oe = se.value) == null ? void 0 : oe.$el) == null ? void 0 : Z.querySelector("textarea")) == null || ce.focus() : C.value === "simple" ? ((Ve = (Ee = (re = ue.value) == null ? void 0 : re.$el) == null ? void 0 : Ee.querySelector("textarea")) == null || Ve.focus(), (en = (Rt = (Qe = ue.value) == null ? void 0 : Qe.$el) == null ? void 0 : Rt.querySelector("input")) == null || en.focus()) : (Pt = (tn = (kn = ge.value) == null ? void 0 : kn.$el) == null ? void 0 : tn.querySelector("[contenteditable]")) == null || Pt.focus();
     }
-    function Ae(F) {
-      var le, oe, we, De, Ge, it;
-      x.value ? (oe = (le = se.value) == null ? void 0 : le.appendMention) == null || oe.call(le, F) : C.value === "simple" ? (De = (we = de.value) == null ? void 0 : we.appendMention) == null || De.call(we, F) : (it = (Ge = ge.value) == null ? void 0 : Ge.appendMention) == null || it.call(Ge, F.name, F);
+    function Re(oe) {
+      var Z, ce, re, Ee, Ve, Qe;
+      x.value ? (ce = (Z = se.value) == null ? void 0 : Z.appendMention) == null || ce.call(Z, oe) : C.value === "simple" ? (Ee = (re = ue.value) == null ? void 0 : re.appendMention) == null || Ee.call(re, oe) : (Qe = (Ve = ge.value) == null ? void 0 : Ve.appendMention) == null || Qe.call(Ve, oe.name, oe);
     }
     return iw({
-      setText: Zt,
-      getText: rn,
-      focus: ye,
-      appendMention: Ae
+      setText: Jt,
+      getText: Xt,
+      focus: be,
+      appendMention: Re
     }), e({
-      setText: Zt,
-      getText: rn,
-      appendMention: Ae
-    }), (F, le) => (y(), w("div", {
+      setText: Jt,
+      getText: Xt,
+      appendMention: Re
+    }), (oe, Z) => (y(), w("div", {
       ref_key: "messageInputRef",
       ref: Me,
       class: Te(["message-input", { "message-input--mobile": m(x) }]),
@@ -28734,107 +28752,107 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     }, [
       s.muted ? (y(), w("div", PA, [
         _("span", zA, P(m(I)("chat.input.mutedAll", "全员禁言中")), 1)
-      ])) : U("", !0),
-      m(f) ? (y(), ce(BA, {
+      ])) : F("", !0),
+      m(f) ? (y(), de(BA, {
         key: 1,
         message: m(f),
         onClose: _e
-      }, null, 8, ["message"])) : U("", !0),
-      !m(f) && m($) ? (y(), ce(K_, {
+      }, null, 8, ["message"])) : F("", !0),
+      !m(f) && m($) ? (y(), de(K_, {
         key: 2,
         message: m($),
         onClose: m(R)
-      }, null, 8, ["message", "onClose"])) : U("", !0),
-      m(x) ? (y(), ce(o1, {
+      }, null, 8, ["message", "onClose"])) : F("", !0),
+      m(x) ? (y(), de(o1, {
         key: 3,
         ref_key: "h5InputRef",
         ref: se,
-        config: O.value,
-        "enable-mention": ue.value,
-        "mention-open": be.value,
+        config: N.value,
+        "enable-mention": fe.value,
+        "mention-open": ke.value,
         "keyboard-height": s.keyboardHeight,
         onSend: He,
         onSendFile: Be,
-        onVoiceStart: St,
-        onVoiceEnd: on,
-        onVoiceCancel: Jt,
-        onMentionTrigger: Z,
-        onMentionClose: ie,
+        onVoiceStart: wt,
+        onVoiceEnd: hn,
+        onVoiceCancel: on,
+        onMentionTrigger: Q,
+        onMentionClose: ae,
         onStickerSelect: kt,
-        onFocus: le[0] || (le[0] = (oe) => o("focus")),
-        onTyping: G
+        onFocus: Z[0] || (Z[0] = (ce) => o("focus")),
+        onTyping: H
       }, {
-        "toolbar-extra": X((oe) => [
-          V(F.$slots, "toolbar-extra", Fe(Ue(oe)), void 0, !0)
+        "toolbar-extra": J((ce) => [
+          G(oe.$slots, "toolbar-extra", Fe(Ue(ce)), void 0, !0)
         ]),
-        "input-panel": X((oe) => [
-          V(F.$slots, "input-panel", Fe(Ue(oe)), void 0, !0)
+        "input-panel": J((ce) => [
+          G(oe.$slots, "input-panel", Fe(Ue(ce)), void 0, !0)
         ]),
         _: 3
-      }, 8, ["config", "enable-mention", "mention-open", "keyboard-height"])) : C.value === "simple" ? (y(), ce(_p, {
+      }, 8, ["config", "enable-mention", "mention-open", "keyboard-height"])) : C.value === "simple" ? (y(), de(_p, {
         key: 4,
         ref_key: "simpleInputRef",
-        ref: de,
-        config: O.value,
-        "enable-mention": ue.value,
-        "mention-open": be.value,
+        ref: ue,
+        config: N.value,
+        "enable-mention": fe.value,
+        "mention-open": ke.value,
         onSend: He,
         onSendFile: Be,
         onEmojiClick: nt,
-        onVoiceStart: St,
-        onVoiceEnd: on,
-        onVoiceCancel: Jt,
-        onMentionTrigger: Z,
-        onMentionClose: ie,
-        onExpandChange: ke,
-        onFocus: le[1] || (le[1] = (oe) => o("focus")),
-        onTyping: G
+        onVoiceStart: wt,
+        onVoiceEnd: hn,
+        onVoiceCancel: on,
+        onMentionTrigger: Q,
+        onMentionClose: ae,
+        onExpandChange: we,
+        onFocus: Z[1] || (Z[1] = (ce) => o("focus")),
+        onTyping: H
       }, {
-        "toolbar-extra": X((oe) => [
-          V(F.$slots, "toolbar-extra", Fe(Ue(oe)), void 0, !0)
+        "toolbar-extra": J((ce) => [
+          G(oe.$slots, "toolbar-extra", Fe(Ue(ce)), void 0, !0)
         ]),
-        "input-panel": X((oe) => [
-          V(F.$slots, "input-panel", Fe(Ue(oe)), void 0, !0)
+        "input-panel": J((ce) => [
+          G(oe.$slots, "input-panel", Fe(Ue(ce)), void 0, !0)
         ]),
         _: 3
-      }, 8, ["config", "enable-mention", "mention-open"])) : (y(), ce(Tg, {
+      }, 8, ["config", "enable-mention", "mention-open"])) : (y(), de(Tg, {
         key: 5,
         ref_key: "richInputRef",
         ref: ge,
-        config: O.value,
-        "enable-mention": ue.value,
-        "mention-open": be.value,
+        config: N.value,
+        "enable-mention": fe.value,
+        "mention-open": ke.value,
         onSend: ee,
         onSendFile: Be,
         onEmojiClick: nt,
-        onMentionTrigger: Z,
-        onMentionClose: ie,
-        onExpandChange: ke,
-        onFocus: le[2] || (le[2] = (oe) => o("focus")),
-        onTyping: G
+        onMentionTrigger: Q,
+        onMentionClose: ae,
+        onExpandChange: we,
+        onFocus: Z[2] || (Z[2] = (ce) => o("focus")),
+        onTyping: H
       }, {
-        "toolbar-extra": X((oe) => [
-          V(F.$slots, "toolbar-extra", Fe(Ue(oe)), void 0, !0)
+        "toolbar-extra": J((ce) => [
+          G(oe.$slots, "toolbar-extra", Fe(Ue(ce)), void 0, !0)
         ]),
-        "input-panel": X((oe) => [
-          V(F.$slots, "input-panel", Fe(Ue(oe)), void 0, !0)
+        "input-panel": J((ce) => [
+          G(oe.$slots, "input-panel", Fe(Ue(ce)), void 0, !0)
         ]),
         _: 3
       }, 8, ["config", "enable-mention", "mention-open"])),
-      m(x) ? U("", !0) : (y(), ce(m(Lt), {
+      m(x) ? F("", !0) : (y(), de(m(Ot), {
         key: 6,
-        show: L.value,
-        anchor: ve.value,
+        show: O.value,
+        anchor: ye.value,
         boundary: Me.value,
         placement: "top",
         overlay: !1,
-        "onUpdate:show": le[4] || (le[4] = (oe) => L.value = oe)
+        "onUpdate:show": Z[4] || (Z[4] = (ce) => O.value = ce)
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", FA, [
-            q(m(Yl), {
+            W(m(Yl), {
               show: !0,
-              "sticker-packs": J.value,
+              "sticker-packs": q.value,
               recent: te.value.recent,
               "recent-count": te.value.recentCount,
               "tabs-position": te.value.tabsPosition,
@@ -28842,24 +28860,24 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               "emoji-icon": te.value.emojiIcon,
               onSelect: dt,
               onSelectSticker: kt,
-              "onUpdate:show": le[3] || (le[3] = (oe) => L.value = oe)
+              "onUpdate:show": Z[3] || (Z[3] = (ce) => O.value = ce)
             }, null, 8, ["sticker-packs", "recent", "recent-count", "tabs-position", "sticker-hover", "emoji-icon"])
           ])
         ]),
         _: 1
       }, 8, ["show", "anchor", "boundary"])),
-      ue.value ? (y(), ce(wp, {
+      fe.value ? (y(), de(wp, {
         key: 7,
-        show: be.value,
-        contacts: j.value,
-        keyword: re.value,
-        anchor: W.value,
-        "onUpdate:show": le[5] || (le[5] = (oe) => be.value = oe),
-        onSelect: Q
-      }, null, 8, ["show", "contacts", "keyword", "anchor"])) : U("", !0)
+        show: ke.value,
+        contacts: V.value,
+        keyword: ie.value,
+        anchor: j.value,
+        "onUpdate:show": Z[5] || (Z[5] = (ce) => ke.value = ce),
+        onSelect: X
+      }, null, 8, ["show", "contacts", "keyword", "anchor"])) : F("", !0)
     ], 6));
   }
-}), Eg = /* @__PURE__ */ ze(UA, [["__scopeId", "data-v-c6b96646"]]), HA = { class: "pinned-bar__sender" }, GA = { class: "pinned-bar__preview" }, VA = /* @__PURE__ */ Re({
+}), Eg = /* @__PURE__ */ ze(UA, [["__scopeId", "data-v-c6b96646"]]), HA = { class: "pinned-bar__sender" }, GA = { class: "pinned-bar__preview" }, VA = /* @__PURE__ */ Le({
   __name: "pinned-bar-item",
   props: {
     message: {},
@@ -28885,7 +28903,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, KA = { class: "pinned-bar__content" }, WA = {
   key: 1,
   class: "pinned-bar__list"
-}, qA = { class: "pinned-bar__content" }, JA = /* @__PURE__ */ Re({
+}, qA = { class: "pinned-bar__content" }, JA = /* @__PURE__ */ Le({
   __name: "pinned-bar",
   props: {
     maxPreviewLength: { default: 30 }
@@ -28916,34 +28934,34 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           class: "pinned-bar__list-header",
           onClick: h
         }, [
-          q(m(Oe), {
+          W(m(De), {
             class: "pinned-bar__icon",
             name: "pin",
             size: 14
           }),
           _("span", null, P(m(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1),
-          q(m(Oe), {
+          W(m(De), {
             name: "chevron/up",
             size: 12
           })
         ]),
-        (y(!0), w($e, null, et(l.value, (b) => (y(), ce(m(Tt), {
+        (y(!0), w($e, null, tt(l.value, (b) => (y(), de(m(Tt), {
           key: b.msgServerId || b.msgLocalId,
           class: "pinned-bar__item",
           "auto-height": "",
           border: "bottom",
           onClick: ($) => p(b)
         }, {
-          default: X(() => [
+          default: J(() => [
             _("div", qA, [
-              q(yf, {
+              W(yf, {
                 message: b,
                 "max-preview-length": t.maxPreviewLength
               }, null, 8, ["message", "max-preview-length"])
             ])
           ]),
-          trailing: X(() => [
-            q(m(pt), {
+          trailing: J(() => [
+            W(m(pt), {
               class: "pinned-bar__action",
               icon: "xmark/light",
               size: "small",
@@ -28959,24 +28977,24 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         class: "pinned-bar__row",
         onClick: v[1] || (v[1] = (b) => d.value && p(d.value))
       }, [
-        q(m(Oe), {
+        W(m(De), {
           class: "pinned-bar__icon",
           name: "pin",
           size: 14
         }),
         _("div", KA, [
-          d.value ? (y(), ce(yf, {
+          d.value ? (y(), de(yf, {
             key: 0,
             message: d.value,
             "max-preview-length": t.maxPreviewLength
-          }, null, 8, ["message", "max-preview-length"])) : U("", !0)
+          }, null, 8, ["message", "max-preview-length"])) : F("", !0)
         ]),
         l.value.length > 1 ? (y(), w("span", {
           key: 0,
           class: "pinned-bar__count",
           onClick: ft(h, ["stop"])
-        }, P(m(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1)) : U("", !0),
-        d.value ? (y(), ce(m(pt), {
+        }, P(m(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1)) : F("", !0),
+        d.value ? (y(), de(m(pt), {
           key: 1,
           class: "pinned-bar__action",
           icon: "xmark/light",
@@ -28984,11 +29002,11 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           variant: "ghost",
           title: m(a)("message.action.unpin"),
           onClick: v[0] || (v[0] = (b) => f(d.value, b))
-        }, null, 8, ["title"])) : U("", !0)
+        }, null, 8, ["title"])) : F("", !0)
       ]))
-    ])) : U("", !0);
+    ])) : F("", !0);
   }
-}), XA = /* @__PURE__ */ ze(JA, [["__scopeId", "data-v-0391545a"]]), YA = { class: "group-announcement-banner__main" }, QA = { class: "group-announcement-banner__content" }, ZA = { class: "group-announcement-banner__title" }, e$ = ["title"], t$ = /* @__PURE__ */ Re({
+}), XA = /* @__PURE__ */ ze(JA, [["__scopeId", "data-v-0391545a"]]), YA = { class: "group-announcement-banner__main" }, QA = { class: "group-announcement-banner__content" }, ZA = { class: "group-announcement-banner__title" }, e$ = ["title"], t$ = /* @__PURE__ */ Le({
   __name: "group-announcement-banner",
   props: {
     groupId: {}
@@ -29012,7 +29030,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       class: Te(["group-announcement-banner", { "is-collapsed": r.value }])
     }, [
       _("div", YA, [
-        q(m(Oe), {
+        W(m(De), {
           class: "group-announcement-banner__icon",
           name: "board",
           size: 14
@@ -29032,12 +29050,12 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         title: r.value ? m(t)("chat.announcementBanner.expand", "展开") : m(t)("chat.announcementBanner.collapse", "收起"),
         onClick: d[0] || (d[0] = (p) => r.value = !r.value)
       }, [
-        q(m(Oe), {
+        W(m(De), {
           name: r.value ? "chevron/down" : "chevron/up",
           size: 14
         }, null, 8, ["name"])
-      ], 8, e$)) : U("", !0)
-    ], 2)) : U("", !0);
+      ], 8, e$)) : F("", !0)
+    ], 2)) : F("", !0);
   }
 }), n$ = /* @__PURE__ */ ze(t$, [["__scopeId", "data-v-cc6bf7df"]]), s$ = {
   key: 0,
@@ -29048,7 +29066,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, r$ = { class: "chat-drawer__body" }, i$ = {
   key: 1,
   class: "chat-drawer__footer"
-}, a$ = /* @__PURE__ */ Re({
+}, a$ = /* @__PURE__ */ Le({
   __name: "chat-drawer",
   props: {
     show: { type: Boolean },
@@ -29075,8 +29093,8 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       if (!t.show || !t.closeOnClickOverlay) return;
       const d = u.target;
       d != null && d.closest(".uikit-popup") || l();
-    }, { capture: !1 }), (u, d) => (y(), ce(Io, { name: "chat-drawer-fade" }, {
-      default: X(() => [
+    }, { capture: !1 }), (u, d) => (y(), de(Io, { name: "chat-drawer-fade" }, {
+      default: J(() => [
         n.show ? (y(), w("div", s$, [
           n.overlay ? (y(), w("div", {
             key: 0,
@@ -29087,8 +29105,8 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             class: "chat-drawer__click-layer",
             onClick: c
           })),
-          q(Io, { name: "chat-drawer-slide" }, {
-            default: X(() => [
+          W(Io, { name: "chat-drawer-slide" }, {
+            default: J(() => [
               n.show ? (y(), w("div", {
                 key: 0,
                 ref_key: "panelRef",
@@ -29097,24 +29115,24 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                 style: Et({ width: typeof n.width == "number" ? `${n.width}px` : n.width })
               }, [
                 u.$slots.header ? (y(), w("div", o$, [
-                  V(u.$slots, "header", {}, void 0, !0)
-                ])) : U("", !0),
+                  G(u.$slots, "header", {}, void 0, !0)
+                ])) : F("", !0),
                 _("div", r$, [
-                  V(u.$slots, "default", {}, void 0, !0)
+                  G(u.$slots, "default", {}, void 0, !0)
                 ]),
                 u.$slots.footer ? (y(), w("div", i$, [
-                  V(u.$slots, "footer", {}, void 0, !0)
-                ])) : U("", !0)
-              ], 6)) : U("", !0)
+                  G(u.$slots, "footer", {}, void 0, !0)
+                ])) : F("", !0)
+              ], 6)) : F("", !0)
             ]),
             _: 3
           })
-        ])) : U("", !0)
+        ])) : F("", !0)
       ]),
       _: 3
     }));
   }
-}), ou = /* @__PURE__ */ ze(a$, [["__scopeId", "data-v-024486e4"]]), l$ = 30 * 365 * 24 * 60 * 60 * 1e3, c$ = /* @__PURE__ */ Re({
+}), ou = /* @__PURE__ */ ze(a$, [["__scopeId", "data-v-024486e4"]]), l$ = 30 * 365 * 24 * 60 * 60 * 1e3, c$ = /* @__PURE__ */ Le({
   __name: "mute-list-item",
   props: {
     item: {}
@@ -29129,21 +29147,21 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       const c = (u = t.item) == null ? void 0 : u.muteExpire;
       return c == null || c <= 0 || c - Date.now() > l$ ? o("group.mutelist.permanent", "永久禁言") : c <= Date.now() ? o("group.mutelist.expired", "禁言已到期") : `${o("group.mutelist.expireAt", "禁言至")} ${new Date(c).toLocaleString()}`;
     }), { displayName: a, avatarUrl: l } = jt(r);
-    return (c, u) => (y(), ce(m(Tt), {
+    return (c, u) => (y(), de(m(Tt), {
       class: "mute-list__item",
       size: "compact",
       title: m(a),
       subtitle: i.value,
       clickable: !1
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: m(a),
           src: m(l),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
-      trailing: X(() => [
+      trailing: J(() => [
         _("button", {
           class: "mute-list__action-btn",
           onClick: u[0] || (u[0] = ft((d) => s("unmute"), ["stop"]))
@@ -29152,7 +29170,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       _: 1
     }, 8, ["title", "subtitle"]));
   }
-}), u$ = /* @__PURE__ */ ze(c$, [["__scopeId", "data-v-36f9a96e"]]), d$ = /* @__PURE__ */ Re({
+}), u$ = /* @__PURE__ */ ze(c$, [["__scopeId", "data-v-36f9a96e"]]), d$ = /* @__PURE__ */ Le({
   __name: "mute-list-select-item",
   props: {
     member: {},
@@ -29161,22 +29179,22 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   emits: ["toggle"],
   setup(n, { emit: e }) {
     const t = n, s = e, { displayName: o, avatarUrl: r } = jt(() => t.member.userId);
-    return (i, a) => (y(), ce(m(Tt), {
+    return (i, a) => (y(), de(m(Tt), {
       class: "mute-list__popup-item",
       size: "compact",
       title: m(o),
       selected: t.selected,
       onClick: a[0] || (a[0] = (l) => s("toggle"))
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: m(o),
           src: m(r),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
-      trailing: X(() => [
-        q(m(Oe), {
+      trailing: J(() => [
+        W(m(De), {
           name: t.selected ? "circle/checked" : "circle/empty",
           size: 20,
           class: Te(["mute-list__popup-checkbox", { "mute-list__popup-checkbox--checked": t.selected }])
@@ -29191,14 +29209,14 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, v$ = { class: "mute-list__popup-header" }, y$ = { class: "mute-list__popup-title" }, b$ = { class: "mute-list__popup-body" }, k$ = {
   key: 0,
   class: "mute-list__popup-status"
-}, w$ = { class: "mute-list__popup-footer" }, _$ = ["disabled"], C$ = /* @__PURE__ */ Re({
+}, w$ = { class: "mute-list__popup-footer" }, _$ = ["disabled"], C$ = /* @__PURE__ */ Le({
   __name: "mute-list",
   props: {
     groupId: {}
   },
   emits: ["unmute", "mute"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("MuteList"), { t: i } = qe(), { show: a } = Wt(), { stores: l } = at(), {
+    const s = n, o = t, r = Dt("MuteList"), { t: i } = qe(), { show: a } = Wt(), { stores: l } = at(), {
       getGroupMuteList: c,
       unmuteGroupMembers: u,
       muteGroupMembers: d,
@@ -29222,28 +29240,28 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     }
     Pe(() => s.groupId, M, { immediate: !0 });
     async function x(S) {
-      const C = S.user || S, L = (C == null ? void 0 : C.userId) || "", J = (C == null ? void 0 : C.nickname) || L;
+      const C = S.user || S, O = (C == null ? void 0 : C.userId) || "", q = (C == null ? void 0 : C.nickname) || O;
       try {
-        await u(s.groupId, [L]), h.value = h.value.filter((te) => {
-          const ve = te.user || te;
-          return ((ve == null ? void 0 : ve.userId) || "") !== L;
-        }), o("unmute", { userId: L }), T(Fn.MUTE_REMOVED, J, i("group.mutelist.unmuteNotice", "{name} 被解除禁言").replace("{name}", J));
+        await u(s.groupId, [O]), h.value = h.value.filter((te) => {
+          const ye = te.user || te;
+          return ((ye == null ? void 0 : ye.userId) || "") !== O;
+        }), o("unmute", { userId: O }), T(Fn.MUTE_REMOVED, q, i("group.mutelist.unmuteNotice", "{name} 被解除禁言").replace("{name}", q));
       } catch (te) {
         r.warn("unmute failed:", te);
       }
     }
-    function T(S, C, L) {
+    function T(S, C, O) {
       s.groupId && qn(l, s.groupId, lt.GROUPCHAT, {
         eventType: S,
         // params 契约与接收方（group-events.ts）对齐：names 顿号拼接 + count
         params: { names: C, count: 1 },
-        defaultText: L
+        defaultText: O
       });
     }
     function I() {
-      g.value = !0, $.value.clear(), O();
+      g.value = !0, $.value.clear(), N();
     }
-    async function O() {
+    async function N() {
       if (s.groupId) {
         v.value = !0;
         try {
@@ -29257,28 +29275,28 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }
     }
     const E = k(() => b.value.filter((S) => !R.value.has(S.userId) && S.role !== ut.OWNER));
-    function G(S) {
+    function H(S) {
       const C = new Set($.value);
       C.has(S.userId) ? C.delete(S.userId) : C.add(S.userId), $.value = C;
     }
-    async function N() {
+    async function D() {
       const S = Array.from($.value);
       if (r.info("onConfirmAdd clicked", { groupId: s.groupId, count: S.length, userIds: S }), S.length === 0 || !s.groupId) {
         r.info("onConfirmAdd early return: empty selection or no groupId");
         return;
       }
       try {
-        r.info("calling muteGroupMembers", { groupId: s.groupId, userIds: S, muteDuration: -1 }), await d(s.groupId, S, -1), r.info("muteGroupMembers succeeded"), r.info("calling loadData to refresh mute list"), await M(), r.info("loadData finished, members count:", h.value.length), g.value = !1, $.value.clear(), a(i("group.mutelist.addSuccess", "添加成功"), "success"), r.info("emitting mute event", { userIds: S }), o("mute", S.map((L) => ({ userId: L })));
-        const C = S.map((L) => {
-          const J = b.value.find((te) => te.userId === L);
-          return (J == null ? void 0 : J.nickname) || L;
+        r.info("calling muteGroupMembers", { groupId: s.groupId, userIds: S, muteDuration: -1 }), await d(s.groupId, S, -1), r.info("muteGroupMembers succeeded"), r.info("calling loadData to refresh mute list"), await M(), r.info("loadData finished, members count:", h.value.length), g.value = !1, $.value.clear(), a(i("group.mutelist.addSuccess", "添加成功"), "success"), r.info("emitting mute event", { userIds: S }), o("mute", S.map((O) => ({ userId: O })));
+        const C = S.map((O) => {
+          const q = b.value.find((te) => te.userId === O);
+          return (q == null ? void 0 : q.nickname) || O;
         }).join("、");
         r.info("adding notice to chat", { names: C }), T(Fn.MUTE_ADDED, C, i("group.mutelist.muteNotice", "{name} 被禁言").replace("{name}", C)), r.info("onConfirmAdd completed successfully");
       } catch (C) {
         r.warn("add to mutelist failed:", C), a(i("group.mutelist.addFailed", "添加失败"), "error");
       }
     }
-    function D() {
+    function L() {
       g.value = !1, $.value.clear();
     }
     return e({
@@ -29287,28 +29305,28 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       _("div", h$, [
         _("span", m$, P(h.value.length) + " " + P(m(i)("group.mutelist.memberCount", "名禁言成员")), 1)
       ]),
-      f.value ? (y(), w("div", g$, P(m(i)("common.loading")), 1)) : h.value.length === 0 ? (y(), ce(m(Ht), {
+      f.value ? (y(), w("div", g$, P(m(i)("common.loading")), 1)) : h.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "bell/slash",
         description: m(i)("group.memberList.empty", "暂无禁言成员"),
         size: "small"
-      }, null, 8, ["description"])) : U("", !0),
-      (y(!0), w($e, null, et(h.value, (L) => {
-        var J;
-        return y(), ce(u$, {
-          key: ((J = L.user || L) == null ? void 0 : J.userId) || "",
-          item: L,
-          onUnmute: (te) => x(L)
+      }, null, 8, ["description"])) : F("", !0),
+      (y(!0), w($e, null, tt(h.value, (O) => {
+        var q;
+        return y(), de(u$, {
+          key: ((q = O.user || O) == null ? void 0 : q.userId) || "",
+          item: O,
+          onUnmute: (te) => x(O)
         }, null, 8, ["item", "onUnmute"]);
       }), 128)),
-      q(m(Lt), {
+      W(m(Ot), {
         show: g.value,
-        "onUpdate:show": C[2] || (C[2] = (L) => g.value = L),
+        "onUpdate:show": C[2] || (C[2] = (O) => g.value = O),
         position: "center",
         "close-on-click-overlay": !0,
-        onClose: D
+        onClose: L
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", {
             class: "mute-list__popup",
             onPointerdown: C[0] || (C[0] = ft(() => {
@@ -29320,28 +29338,28 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               _("span", y$, P(m(i)("group.mutelist.addTitle", "添加禁言成员")), 1)
             ]),
             _("div", b$, [
-              v.value ? (y(), w("div", k$, P(m(i)("common.loading")), 1)) : E.value.length === 0 ? (y(), ce(m(Ht), {
+              v.value ? (y(), w("div", k$, P(m(i)("common.loading")), 1)) : E.value.length === 0 ? (y(), de(m(Ht), {
                 key: 1,
                 icon: "bell/slash",
                 description: m(i)("group.mutelist.emptySelectable", "暂无可添加的成员"),
                 size: "small"
-              }, null, 8, ["description"])) : U("", !0),
-              (y(!0), w($e, null, et(E.value, (L) => (y(), ce(f$, {
-                key: L.userId,
-                member: L,
-                selected: $.value.has(L.userId),
-                onToggle: (J) => G(L)
+              }, null, 8, ["description"])) : F("", !0),
+              (y(!0), w($e, null, tt(E.value, (O) => (y(), de(f$, {
+                key: O.userId,
+                member: O,
+                selected: $.value.has(O.userId),
+                onToggle: (q) => H(O)
               }, null, 8, ["member", "selected", "onToggle"]))), 128))
             ]),
             _("div", w$, [
               _("button", {
                 class: "mute-list__popup-btn mute-list__popup-btn--cancel",
-                onClick: D
+                onClick: L
               }, P(m(i)("group.blocklist.cancel", "取消")), 1),
               _("button", {
                 class: "mute-list__popup-btn mute-list__popup-btn--confirm",
                 disabled: $.value.size === 0,
-                onClick: N
+                onClick: D
               }, P(m(i)("group.blocklist.confirm", "确定")), 9, _$)
             ])
           ], 32)
@@ -29350,7 +29368,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }, 8, ["show"])
     ]));
   }
-}), jl = /* @__PURE__ */ ze(C$, [["__scopeId", "data-v-3e90cde6"]]), M$ = /* @__PURE__ */ Re({
+}), jl = /* @__PURE__ */ ze(C$, [["__scopeId", "data-v-3e90cde6"]]), M$ = /* @__PURE__ */ Le({
   __name: "block-list-item",
   props: {
     item: {}
@@ -29361,20 +29379,20 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       const l = t.item.user || t.item;
       return (l == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = jt(r);
-    return (l, c) => (y(), ce(m(Tt), {
+    return (l, c) => (y(), de(m(Tt), {
       class: "block-list__item",
       size: "compact",
       title: m(i),
       clickable: !1
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: m(i),
           src: m(a),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
-      trailing: X(() => [
+      trailing: J(() => [
         _("button", {
           class: "block-list__action-btn",
           onClick: c[0] || (c[0] = ft((u) => s("unblock"), ["stop"]))
@@ -29383,7 +29401,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       _: 1
     }, 8, ["title"]));
   }
-}), S$ = /* @__PURE__ */ ze(M$, [["__scopeId", "data-v-4ed7a36a"]]), I$ = /* @__PURE__ */ Re({
+}), S$ = /* @__PURE__ */ ze(M$, [["__scopeId", "data-v-4ed7a36a"]]), I$ = /* @__PURE__ */ Le({
   __name: "block-list-select-item",
   props: {
     member: {},
@@ -29392,22 +29410,22 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   emits: ["toggle"],
   setup(n, { emit: e }) {
     const t = n, s = e, { displayName: o, avatarUrl: r } = jt(() => t.member.userId);
-    return (i, a) => (y(), ce(m(Tt), {
+    return (i, a) => (y(), de(m(Tt), {
       class: "block-list__popup-item",
       size: "compact",
       title: m(o),
       selected: t.selected,
       onClick: a[0] || (a[0] = (l) => s("toggle"))
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: m(o),
           src: m(r),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
-      trailing: X(() => [
-        q(m(Oe), {
+      trailing: J(() => [
+        W(m(De), {
           name: t.selected ? "circle/checked" : "circle/empty",
           size: 20,
           class: Te(["block-list__popup-checkbox", { "block-list__popup-checkbox--checked": t.selected }])
@@ -29422,42 +29440,42 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, A$ = { class: "block-list__popup-header" }, $$ = { class: "block-list__popup-title" }, R$ = { class: "block-list__popup-body" }, N$ = {
   key: 0,
   class: "block-list__popup-status"
-}, L$ = { class: "block-list__popup-footer" }, O$ = ["disabled"], D$ = /* @__PURE__ */ Re({
+}, L$ = { class: "block-list__popup-footer" }, O$ = ["disabled"], D$ = /* @__PURE__ */ Le({
   __name: "block-list",
   props: {
     groupId: {}
   },
   emits: ["unblock", "block"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("UIKit:BlockList"), { t: i } = qe(), { show: a } = Wt(), {
+    const s = n, o = t, r = Dt("UIKit:BlockList"), { t: i } = qe(), { show: a } = Wt(), {
       getGroupBlocklist: l,
       unblockGroupMembers: c,
       blockGroupMembers: u,
       fetchGroupMembers: d
-    } = sn(), p = A(!1), f = A([]), h = A(!1), g = A(!1), v = A([]), b = A(/* @__PURE__ */ new Set()), $ = k(() => new Set(f.value.map((N) => {
-      const D = N.user || N;
-      return (D == null ? void 0 : D.userId) || "";
+    } = sn(), p = A(!1), f = A([]), h = A(!1), g = A(!1), v = A([]), b = A(/* @__PURE__ */ new Set()), $ = k(() => new Set(f.value.map((D) => {
+      const L = D.user || D;
+      return (L == null ? void 0 : L.userId) || "";
     }).filter(Boolean)));
     async function R() {
       if (s.groupId) {
         p.value = !0;
         try {
-          const N = await l(s.groupId);
-          f.value = Array.isArray(N) ? N : [];
-        } catch (N) {
-          r.warn("[BlockList] load failed:", Je(N));
+          const D = await l(s.groupId);
+          f.value = Array.isArray(D) ? D : [];
+        } catch (D) {
+          r.warn("[BlockList] load failed:", Je(D));
         } finally {
           p.value = !1;
         }
       }
     }
     Pe(() => s.groupId, R, { immediate: !0 });
-    async function M(N) {
-      const D = N.user || N, S = (D == null ? void 0 : D.userId) || "";
+    async function M(D) {
+      const L = D.user || D, S = (L == null ? void 0 : L.userId) || "";
       try {
         await c(s.groupId, [S]), f.value = f.value.filter((C) => {
-          const L = C.user || C;
-          return ((L == null ? void 0 : L.userId) || "") !== S;
+          const O = C.user || C;
+          return ((O == null ? void 0 : O.userId) || "") !== S;
         }), o("unblock", { userId: S });
       } catch (C) {
         r.warn("[BlockList] unblock failed:", Je(C));
@@ -29470,85 +29488,85 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       if (s.groupId) {
         g.value = !0;
         try {
-          const { list: N } = await d(s.groupId, void 0, 200);
-          v.value = N || [];
-        } catch (N) {
-          r.warn("[BlockList] load group members failed:", Je(N));
+          const { list: D } = await d(s.groupId, void 0, 200);
+          v.value = D || [];
+        } catch (D) {
+          r.warn("[BlockList] load group members failed:", Je(D));
         } finally {
           g.value = !1;
         }
       }
     }
-    const I = k(() => v.value.filter((N) => !$.value.has(N.userId) && N.role !== ut.OWNER));
-    function O(N) {
-      const D = new Set(b.value);
-      D.has(N.userId) ? D.delete(N.userId) : D.add(N.userId), b.value = D;
+    const I = k(() => v.value.filter((D) => !$.value.has(D.userId) && D.role !== ut.OWNER));
+    function N(D) {
+      const L = new Set(b.value);
+      L.has(D.userId) ? L.delete(D.userId) : L.add(D.userId), b.value = L;
     }
     async function E() {
-      const N = Array.from(b.value);
-      if (!(N.length === 0 || !s.groupId))
+      const D = Array.from(b.value);
+      if (!(D.length === 0 || !s.groupId))
         try {
-          await u(s.groupId, N), await R(), h.value = !1, b.value.clear(), a(i("group.blocklist.addSuccess", "添加成功"), "success"), o("block", N.map((D) => ({ userId: D })));
-        } catch (D) {
-          r.warn("[BlockList] add to blocklist failed:", Je(D)), a(i("group.blocklist.addFailed", "添加失败"), "error");
+          await u(s.groupId, D), await R(), h.value = !1, b.value.clear(), a(i("group.blocklist.addSuccess", "添加成功"), "success"), o("block", D.map((L) => ({ userId: L })));
+        } catch (L) {
+          r.warn("[BlockList] add to blocklist failed:", Je(L)), a(i("group.blocklist.addFailed", "添加失败"), "error");
         }
     }
-    function G() {
+    function H() {
       h.value = !1, b.value.clear();
     }
     return e({
       openAddMember: x
-    }), (N, D) => (y(), w("div", T$, [
-      p.value ? (y(), w("div", E$, P(m(i)("common.loading")), 1)) : f.value.length === 0 ? (y(), ce(m(Ht), {
+    }), (D, L) => (y(), w("div", T$, [
+      p.value ? (y(), w("div", E$, P(m(i)("common.loading")), 1)) : f.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "circle/slash",
         description: m(i)("group.memberList.empty", "暂无黑名单成员"),
         size: "small"
-      }, null, 8, ["description"])) : U("", !0),
-      (y(!0), w($e, null, et(f.value, (S) => {
+      }, null, 8, ["description"])) : F("", !0),
+      (y(!0), w($e, null, tt(f.value, (S) => {
         var C;
-        return y(), ce(S$, {
+        return y(), de(S$, {
           key: ((C = S.user || S) == null ? void 0 : C.userId) || "",
           item: S,
-          onUnblock: (L) => M(S)
+          onUnblock: (O) => M(S)
         }, null, 8, ["item", "onUnblock"]);
       }), 128)),
-      q(m(Lt), {
+      W(m(Ot), {
         show: h.value,
-        "onUpdate:show": D[2] || (D[2] = (S) => h.value = S),
+        "onUpdate:show": L[2] || (L[2] = (S) => h.value = S),
         position: "center",
         "close-on-click-overlay": !0,
-        onClose: G
+        onClose: H
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", {
             class: "block-list__popup",
-            onPointerdown: D[0] || (D[0] = ft(() => {
+            onPointerdown: L[0] || (L[0] = ft(() => {
             }, ["stop"])),
-            onClick: D[1] || (D[1] = ft(() => {
+            onClick: L[1] || (L[1] = ft(() => {
             }, ["stop"]))
           }, [
             _("div", A$, [
               _("span", $$, P(m(i)("group.blocklist.addTitle", "添加黑名单成员")), 1)
             ]),
             _("div", R$, [
-              g.value ? (y(), w("div", N$, P(m(i)("common.loading")), 1)) : I.value.length === 0 ? (y(), ce(m(Ht), {
+              g.value ? (y(), w("div", N$, P(m(i)("common.loading")), 1)) : I.value.length === 0 ? (y(), de(m(Ht), {
                 key: 1,
                 icon: "circle/slash",
                 description: m(i)("group.blocklist.emptySelectable", "暂无可添加的成员"),
                 size: "small"
-              }, null, 8, ["description"])) : U("", !0),
-              (y(!0), w($e, null, et(I.value, (S) => (y(), ce(x$, {
+              }, null, 8, ["description"])) : F("", !0),
+              (y(!0), w($e, null, tt(I.value, (S) => (y(), de(x$, {
                 key: S.userId,
                 member: S,
                 selected: b.value.has(S.userId),
-                onToggle: (C) => O(S)
+                onToggle: (C) => N(S)
               }, null, 8, ["member", "selected", "onToggle"]))), 128))
             ]),
             _("div", L$, [
               _("button", {
                 class: "block-list__popup-btn block-list__popup-btn--cancel",
-                onClick: G
+                onClick: H
               }, P(m(i)("group.blocklist.cancel", "取消")), 1),
               _("button", {
                 class: "block-list__popup-btn block-list__popup-btn--confirm",
@@ -29562,7 +29580,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }, 8, ["show"])
     ]));
   }
-}), Kl = /* @__PURE__ */ ze(D$, [["__scopeId", "data-v-1902c544"]]), B$ = { class: "allow-list__item" }, P$ = { class: "allow-list__info" }, z$ = { class: "allow-list__name" }, F$ = /* @__PURE__ */ Re({
+}), Kl = /* @__PURE__ */ ze(D$, [["__scopeId", "data-v-1902c544"]]), B$ = { class: "allow-list__item" }, P$ = { class: "allow-list__info" }, z$ = { class: "allow-list__name" }, F$ = /* @__PURE__ */ Le({
   __name: "allow-list-item",
   props: {
     item: {}
@@ -29574,7 +29592,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       return (l == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = jt(r);
     return (l, c) => (y(), w("div", B$, [
-      q(m($t), {
+      W(m($t), {
         class: "allow-list__avatar",
         name: m(i),
         src: m(a),
@@ -29592,14 +29610,14 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }), U$ = /* @__PURE__ */ ze(F$, [["__scopeId", "data-v-2840b4c0"]]), H$ = { class: "allow-list" }, G$ = {
   key: 0,
   class: "allow-list__loading"
-}, V$ = /* @__PURE__ */ Re({
+}, V$ = /* @__PURE__ */ Le({
   __name: "allow-list",
   props: {
     groupId: {}
   },
   emits: ["remove"],
   setup(n, { emit: e }) {
-    const t = n, s = e, o = Ot("AllowList"), { t: r } = qe(), { getGroupAllowlist: i, removeUsersFromGroupAllowlist: a } = sn(), l = A(!1), c = A([]);
+    const t = n, s = e, o = Dt("AllowList"), { t: r } = qe(), { getGroupAllowlist: i, removeUsersFromGroupAllowlist: a } = sn(), l = A(!1), c = A([]);
     async function u() {
       if (t.groupId) {
         l.value = !0;
@@ -29626,15 +29644,15 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }
     }
     return (p, f) => (y(), w("div", H$, [
-      l.value ? (y(), w("div", G$, P(m(r)("common.loading")), 1)) : c.value.length === 0 ? (y(), ce(m(Ht), {
+      l.value ? (y(), w("div", G$, P(m(r)("common.loading")), 1)) : c.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "person/double",
         description: m(r)("group.memberList.empty", "暂无白名单成员"),
         size: "small"
-      }, null, 8, ["description"])) : U("", !0),
-      (y(!0), w($e, null, et(c.value, (h) => {
+      }, null, 8, ["description"])) : F("", !0),
+      (y(!0), w($e, null, tt(c.value, (h) => {
         var g;
-        return y(), ce(U$, {
+        return y(), de(U$, {
           key: ((g = h.user || h) == null ? void 0 : g.userId) || "",
           item: h,
           onRemove: (v) => d(h)
@@ -29642,7 +29660,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }), 128))
     ]));
   }
-}), Wl = /* @__PURE__ */ ze(V$, [["__scopeId", "data-v-4b98265e"]]), j$ = { class: "shared-file-list__info" }, K$ = ["title"], W$ = { class: "shared-file-list__meta" }, q$ = /* @__PURE__ */ Re({
+}), Wl = /* @__PURE__ */ ze(V$, [["__scopeId", "data-v-4b98265e"]]), j$ = { class: "shared-file-list__info" }, K$ = ["title"], W$ = { class: "shared-file-list__meta" }, q$ = /* @__PURE__ */ Le({
   __name: "shared-file-list-item",
   props: {
     file: {},
@@ -29707,7 +29725,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         class: "shared-file-list__item",
         onClick: u
       }, [
-        q(m(Oe), {
+        W(m(De), {
           name: a.value,
           size: 20,
           class: "shared-file-list__icon"
@@ -29720,17 +29738,17 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           _("span", W$, [
             t.file.fileSize ? (y(), w($e, { key: 0 }, [
               mt(P(l(t.file.fileSize)), 1)
-            ], 64)) : U("", !0),
+            ], 64)) : F("", !0),
             t.file.fileOwner ? (y(), w($e, { key: 1 }, [
               mt(P(m(r) || ((f = t.file.fileOwner) == null ? void 0 : f.userId)), 1)
-            ], 64)) : U("", !0)
+            ], 64)) : F("", !0)
           ])
         ]),
         _("button", {
           class: "shared-file-list__more-btn",
           onClick: ft(u, ["stop"])
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: "vertical",
             size: 20
           })
@@ -29741,13 +29759,13 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }), J$ = /* @__PURE__ */ ze(q$, [["__scopeId", "data-v-81e82986"]]), X$ = { class: "shared-file-list" }, Y$ = {
   key: 0,
   class: "shared-file-list__loading"
-}, Q$ = { class: "shared-file-list__context-menu" }, Z$ = /* @__PURE__ */ Re({
+}, Q$ = { class: "shared-file-list__context-menu" }, Z$ = /* @__PURE__ */ Le({
   __name: "shared-file-list",
   props: {
     groupId: {}
   },
   setup(n, { expose: e }) {
-    const t = n, s = Ot("UIKit:SharedFileList"), { t: o } = qe(), { show: r } = Wt(), { stores: i } = at(), { isMobile: a } = Mn(), {
+    const t = n, s = Dt("UIKit:SharedFileList"), { t: o } = qe(), { show: r } = Wt(), { stores: i } = at(), { isMobile: a } = Mn(), {
       getGroupSharedFileList: l,
       uploadGroupSharedFile: c,
       deleteGroupSharedFile: u,
@@ -29755,47 +29773,47 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     } = sn(), p = A(!1), f = A(!1), h = A([]), g = A(null), v = A(!1), b = A(!1), $ = A(), R = A(null), M = k(() => {
       if (!R.value)
         return [];
-      const j = [
+      const V = [
         { name: o("group.sharedFile.download", "下载") }
       ];
-      return J(R.value) && j.push({
+      return q(R.value) && V.push({
         name: o("group.sharedFile.delete", "删除"),
         color: "var(--uikit-danger-color)"
-      }), j;
+      }), V;
     }), x = k(() => i.client.currentUser), T = k(() => i.group.getGroupById(t.groupId)), I = k(() => {
-      var de;
-      const j = (de = T.value) == null ? void 0 : de.role;
-      return j === ut.OWNER || j === ut.ADMIN;
+      var ue;
+      const V = (ue = T.value) == null ? void 0 : ue.role;
+      return V === ut.OWNER || V === ut.ADMIN;
     });
-    async function O() {
+    async function N() {
       if (t.groupId) {
         p.value = !0;
         try {
-          const j = await l(t.groupId);
-          s.warn("[SharedFileList] load result:", j);
-          const de = E(j);
-          h.value = de;
-        } catch (j) {
-          s.warn("[SharedFileList] load failed:", Je(j));
+          const V = await l(t.groupId);
+          s.warn("[SharedFileList] load result:", V);
+          const ue = E(V);
+          h.value = ue;
+        } catch (V) {
+          s.warn("[SharedFileList] load failed:", Je(V));
         } finally {
           p.value = !1;
         }
       }
     }
-    Pe(() => t.groupId, O, { immediate: !0 }), qt(O);
-    function E(j) {
-      return Array.isArray(j) ? [...j] : !j || typeof j != "object" ? [] : Array.isArray(j.items) ? [...j.items] : Array.isArray(j.data) ? [...j.data] : j.data && Array.isArray(j.data.items) ? [...j.data.items] : Array.isArray(j.entities) ? [...j.entities] : [];
+    Pe(() => t.groupId, N, { immediate: !0 }), qt(N);
+    function E(V) {
+      return Array.isArray(V) ? [...V] : !V || typeof V != "object" ? [] : Array.isArray(V.items) ? [...V.items] : Array.isArray(V.data) ? [...V.data] : V.data && Array.isArray(V.data.items) ? [...V.data.items] : Array.isArray(V.entities) ? [...V.entities] : [];
     }
-    function G() {
-      var j;
-      (j = g.value) == null || j.click();
+    function H() {
+      var V;
+      (V = g.value) == null || V.click();
     }
     e({
-      triggerUpload: G
+      triggerUpload: H
     });
-    async function N(j) {
+    async function D(V) {
       var Me;
-      const se = (Me = j.target.files) == null ? void 0 : Me[0];
+      const se = (Me = V.target.files) == null ? void 0 : Me[0];
       if (!(!se || !t.groupId) && !f.value) {
         f.value = !0;
         try {
@@ -29803,7 +29821,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           s.warn("[SharedFileList] upload response:", ge);
           const Ie = S(ge);
           if (Ie.length > 0)
-            if (D(ge))
+            if (L(ge))
               h.value = Ie;
             else {
               const _e = new Set(h.value.map((ee) => ee.fileId).filter(Boolean)), He = Ie.filter((ee) => ee.fileId && !_e.has(ee.fileId));
@@ -29823,144 +29841,144 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         }
       }
     }
-    function D(j) {
-      if (Array.isArray(j))
+    function L(V) {
+      if (Array.isArray(V))
         return !0;
-      let de = j;
-      if (typeof de == "string")
+      let ue = V;
+      if (typeof ue == "string")
         try {
-          de = JSON.parse(de);
+          ue = JSON.parse(ue);
         } catch {
           return !1;
         }
-      return !de || typeof de != "object" ? !1 : Array.isArray(de.items) || Array.isArray(de.data);
+      return !ue || typeof ue != "object" ? !1 : Array.isArray(ue.items) || Array.isArray(ue.data);
     }
-    function S(j) {
-      let de = j;
-      if (typeof de == "string")
+    function S(V) {
+      let ue = V;
+      if (typeof ue == "string")
         try {
-          de = JSON.parse(de);
+          ue = JSON.parse(ue);
         } catch {
           return [];
         }
-      if (!de || typeof de != "object")
+      if (!ue || typeof ue != "object")
         return [];
-      const se = de.data ?? de;
+      const se = ue.data ?? ue;
       if (Array.isArray(se))
         return se.map(C).filter(Boolean);
-      if (Array.isArray(de.items))
-        return de.items.map(C).filter(Boolean);
+      if (Array.isArray(ue.items))
+        return ue.items.map(C).filter(Boolean);
       const Me = C(se);
       return Me ? [Me] : [];
     }
-    function C(j) {
-      if (!j || typeof j != "object")
+    function C(V) {
+      if (!V || typeof V != "object")
         return null;
-      const de = j.fileId ?? j.file_id ?? j.id, se = j.fileName ?? j.file_name ?? j.name;
-      return !de || !se ? null : {
-        fileId: de,
+      const ue = V.fileId ?? V.file_id ?? V.id, se = V.fileName ?? V.file_name ?? V.name;
+      return !ue || !se ? null : {
+        fileId: ue,
         fileName: se,
-        fileSize: j.fileSize ?? j.file_size ?? j.size,
-        createdAt: j.createdAt ?? j.created ?? j.created_at ?? j.timestamp,
-        fileOwner: L(j.fileOwner ?? j.file_owner ?? j.owner)
+        fileSize: V.fileSize ?? V.file_size ?? V.size,
+        createdAt: V.createdAt ?? V.created ?? V.created_at ?? V.timestamp,
+        fileOwner: O(V.fileOwner ?? V.file_owner ?? V.owner)
       };
     }
-    function L(j) {
-      if (j)
-        return typeof j == "string" ? { userId: j } : {
-          userId: j.userId ?? j.user_id ?? j.username ?? j.id,
-          nickname: j.nickname ?? j.nickName ?? j.nick
+    function O(V) {
+      if (V)
+        return typeof V == "string" ? { userId: V } : {
+          userId: V.userId ?? V.user_id ?? V.username ?? V.id,
+          nickname: V.nickname ?? V.nickName ?? V.nick
         };
     }
-    function J(j) {
-      var de;
-      return x.value ? I.value ? !0 : ((de = j.fileOwner) == null ? void 0 : de.userId) === x.value : !1;
+    function q(V) {
+      var ue;
+      return x.value ? I.value ? !0 : ((ue = V.fileOwner) == null ? void 0 : ue.userId) === x.value : !1;
     }
-    async function te(j) {
-      if (!(!t.groupId || !j.fileId))
+    async function te(V) {
+      if (!(!t.groupId || !V.fileId))
         try {
-          await u(t.groupId, j.fileId), h.value = h.value.filter((de) => de.fileId !== j.fileId), r(o("group.sharedFile.deleteSuccess", "删除成功"), "success");
-        } catch (de) {
-          s.warn("[SharedFileList] delete failed:", Je(de)), r(o("group.sharedFile.deleteFailed", "删除失败"), "error");
+          await u(t.groupId, V.fileId), h.value = h.value.filter((ue) => ue.fileId !== V.fileId), r(o("group.sharedFile.deleteSuccess", "删除成功"), "success");
+        } catch (ue) {
+          s.warn("[SharedFileList] delete failed:", Je(ue)), r(o("group.sharedFile.deleteFailed", "删除失败"), "error");
         }
     }
-    function ve(j, de) {
-      R.value = j, a.value ? v.value = !0 : ($.value = de == null ? void 0 : de.currentTarget, b.value = !0);
+    function ye(V, ue) {
+      R.value = V, a.value ? v.value = !0 : ($.value = ue == null ? void 0 : ue.currentTarget, b.value = !0);
     }
-    function be() {
+    function ke() {
       b.value = !1, $.value = void 0;
     }
-    function W(j) {
-      be();
-      const de = R.value;
-      de && (j === "download" ? ue(de) : j === "delete" && te(de));
+    function j(V) {
+      ke();
+      const ue = R.value;
+      ue && (V === "download" ? fe(ue) : V === "delete" && te(ue));
     }
-    async function re(j, de) {
+    async function ie(V, ue) {
       const se = R.value;
-      se && (de === 0 ? await ue(se) : await te(se));
+      se && (ue === 0 ? await fe(se) : await te(se));
     }
-    async function ue(j) {
-      if (!(!t.groupId || !j.fileId))
+    async function fe(V) {
+      if (!(!t.groupId || !V.fileId))
         try {
-          const de = await d(t.groupId, j.fileId), se = URL.createObjectURL(de), Me = document.createElement("a");
-          Me.href = se, Me.download = j.fileName || "download", document.body.appendChild(Me), Me.click(), document.body.removeChild(Me), URL.revokeObjectURL(se), r(o("group.sharedFile.downloadSuccess", "下载成功"), "success");
-        } catch (de) {
-          s.warn("[SharedFileList] download failed:", Je(de)), r(o("group.sharedFile.downloadFailed", "下载失败"), "error");
+          const ue = await d(t.groupId, V.fileId), se = URL.createObjectURL(ue), Me = document.createElement("a");
+          Me.href = se, Me.download = V.fileName || "download", document.body.appendChild(Me), Me.click(), document.body.removeChild(Me), URL.revokeObjectURL(se), r(o("group.sharedFile.downloadSuccess", "下载成功"), "success");
+        } catch (ue) {
+          s.warn("[SharedFileList] download failed:", Je(ue)), r(o("group.sharedFile.downloadFailed", "下载失败"), "error");
         }
     }
-    return (j, de) => (y(), w("div", X$, [
+    return (V, ue) => (y(), w("div", X$, [
       _("input", {
         ref_key: "fileInputRef",
         ref: g,
         type: "file",
         class: "shared-file-list__file-input",
-        onChange: N
+        onChange: D
       }, null, 544),
-      p.value ? (y(), w("div", Y$, P(m(o)("common.loading")), 1)) : h.value.length === 0 ? (y(), ce(m(Ht), {
+      p.value ? (y(), w("div", Y$, P(m(o)("common.loading")), 1)) : h.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "folder",
         description: m(o)("group.sharedFile.empty", "暂无群文件"),
         size: "small"
-      }, null, 8, ["description"])) : U("", !0),
-      (y(!0), w($e, null, et(h.value, (se) => (y(), ce(J$, {
+      }, null, 8, ["description"])) : F("", !0),
+      (y(!0), w($e, null, tt(h.value, (se) => (y(), de(J$, {
         key: se.fileId,
         file: se,
-        onMore: (Me, ge) => ve(Me, ge)
+        onMore: (Me, ge) => ye(Me, ge)
       }, null, 8, ["file", "onMore"]))), 128)),
-      q(m(br), {
+      W(m(br), {
         show: v.value,
-        "onUpdate:show": de[0] || (de[0] = (se) => v.value = se),
+        "onUpdate:show": ue[0] || (ue[0] = (se) => v.value = se),
         actions: M.value,
-        onSelect: re
+        onSelect: ie
       }, null, 8, ["show", "actions"]),
-      q(m(Lt), {
+      W(m(Ot), {
         show: b.value,
         anchor: $.value,
         placement: "bottom",
         overlay: !1,
         "close-on-click-overlay": !0,
         group: "shared-file-context-menu",
-        "onUpdate:show": be,
-        onClose: be
+        "onUpdate:show": ke,
+        onClose: ke
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", Q$, [
             _("div", {
               class: "shared-file-list__context-menu-item",
-              onClick: de[1] || (de[1] = ft((se) => W("download"), ["stop"]))
+              onClick: ue[1] || (ue[1] = ft((se) => j("download"), ["stop"]))
             }, P(m(o)("group.sharedFile.download", "下载")), 1),
-            R.value && J(R.value) ? (y(), w("div", {
+            R.value && q(R.value) ? (y(), w("div", {
               key: 0,
               class: "shared-file-list__context-menu-item is-danger",
-              onClick: de[2] || (de[2] = ft((se) => W("delete"), ["stop"]))
-            }, P(m(o)("group.sharedFile.delete", "删除")), 1)) : U("", !0)
+              onClick: ue[2] || (ue[2] = ft((se) => j("delete"), ["stop"]))
+            }, P(m(o)("group.sharedFile.delete", "删除")), 1)) : F("", !0)
           ])
         ]),
         _: 1
       }, 8, ["show", "anchor"])
     ]));
   }
-}), ql = /* @__PURE__ */ ze(Z$, [["__scopeId", "data-v-ac99e4bb"]]), eR = { class: "join-request-list__item" }, tR = { class: "join-request-list__info" }, nR = { class: "join-request-list__name" }, sR = {
+}), ql = /* @__PURE__ */ ze(Z$, [["__scopeId", "data-v-2e767f39"]]), eR = { class: "join-request-list__item" }, tR = { class: "join-request-list__info" }, nR = { class: "join-request-list__name" }, sR = {
   key: 0,
   class: "join-request-list__reason"
 }, oR = {
@@ -29972,7 +29990,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, iR = {
   key: 0,
   class: "join-request-list__actions"
-}, aR = /* @__PURE__ */ Re({
+}, aR = /* @__PURE__ */ Le({
   __name: "join-request-list-item",
   props: {
     item: {}
@@ -29984,7 +30002,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       return ((l = t.item.applicant) == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = jt(r);
     return (l, c) => (y(), w("div", eR, [
-      q(m($t), {
+      W(m($t), {
         class: "join-request-list__avatar",
         name: m(i),
         src: m(a),
@@ -29992,8 +30010,8 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }, null, 8, ["name", "src"]),
       _("div", tR, [
         _("span", nR, P(m(i)), 1),
-        t.item.reason ? (y(), w("span", sR, P(t.item.reason), 1)) : U("", !0),
-        t.item.status === "declined" ? (y(), w("span", oR, P(m(o)("contact.inviteDeclined", "已拒绝")), 1)) : t.item.status === "accepted" ? (y(), w("span", rR, P(m(o)("contact.inviteAccepted", "已接受")), 1)) : U("", !0)
+        t.item.reason ? (y(), w("span", sR, P(t.item.reason), 1)) : F("", !0),
+        t.item.status === "declined" ? (y(), w("span", oR, P(m(o)("contact.inviteDeclined", "已拒绝")), 1)) : t.item.status === "accepted" ? (y(), w("span", rR, P(m(o)("contact.inviteAccepted", "已接受")), 1)) : F("", !0)
       ]),
       t.item.status === "pending" ? (y(), w("div", iR, [
         _("button", {
@@ -30004,20 +30022,20 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           class: "join-request-list__action-btn join-request-list__action-btn--reject",
           onClick: c[1] || (c[1] = (u) => s("reject"))
         }, P(m(o)("group.joinRequest.reject", "拒绝")), 1)
-      ])) : U("", !0)
+      ])) : F("", !0)
     ]));
   }
 }), lR = /* @__PURE__ */ ze(aR, [["__scopeId", "data-v-791314e5"]]), cR = { class: "join-request-list" }, uR = {
   key: 0,
   class: "join-request-list__loading"
-}, dR = /* @__PURE__ */ Re({
+}, dR = /* @__PURE__ */ Le({
   __name: "join-request-list",
   props: {
     groupId: {}
   },
   emits: ["accepted", "rejected"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:JoinRequestList"), s = n, o = e, { t: r } = qe(), { stores: i } = at(), { acceptGroupJoinRequest: a, rejectGroupJoinRequest: l } = sn(), c = A(!1), u = A([]);
+    const t = Dt("UIKit:JoinRequestList"), s = n, o = e, { t: r } = qe(), { stores: i } = at(), { acceptGroupJoinRequest: a, rejectGroupJoinRequest: l } = sn(), c = A(!1), u = A([]);
     Pe(() => s.groupId, () => {
       u.value = i.group.groupJoinRequestsMap[s.groupId] || [];
     }, { immediate: !0 }), Pe(
@@ -30052,15 +30070,15 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }
     }
     return (f, h) => (y(), w("div", cR, [
-      c.value ? (y(), w("div", uR, P(m(r)("common.loading")), 1)) : u.value.length === 0 ? (y(), ce(m(Ht), {
+      c.value ? (y(), w("div", uR, P(m(r)("common.loading")), 1)) : u.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "person/double",
         description: m(r)("group.memberList.empty", "暂无入群申请"),
         size: "small"
-      }, null, 8, ["description"])) : U("", !0),
-      (y(!0), w($e, null, et(u.value, (g) => {
+      }, null, 8, ["description"])) : F("", !0),
+      (y(!0), w($e, null, tt(u.value, (g) => {
         var v;
-        return y(), ce(lR, {
+        return y(), de(lR, {
           key: ((v = g.applicant) == null ? void 0 : v.userId) || "" || g.timestamp,
           item: g,
           onAccept: (b) => d(g),
@@ -30078,7 +30096,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, yR = { class: "group-management-section__drawer-body" }, bR = { class: "group-management-section__modal" }, kR = { class: "group-management-section__drawer-header" }, wR = { class: "group-management-section__drawer-title" }, _R = {
   key: 3,
   class: "group-management-section__drawer-placeholder"
-}, CR = { class: "group-management-section__drawer-body" }, MR = /* @__PURE__ */ Re({
+}, CR = { class: "group-management-section__drawer-body" }, MR = /* @__PURE__ */ Le({
   __name: "group-management-section",
   props: {
     groupId: {},
@@ -30092,7 +30110,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   },
   emits: ["group-operation"],
   setup(n, { emit: e }) {
-    const t = n, s = e, o = Ot("UIKit:GroupManagementSection"), { t: r } = qe(), { stores: i } = at(), { muteAllGroupMembers: a, unmuteAllGroupMembers: l } = sn(), c = k(() => i.group.getGroupById(t.groupId)), u = k(() => {
+    const t = n, s = e, o = Dt("UIKit:GroupManagementSection"), { t: r } = qe(), { stores: i } = at(), { muteAllGroupMembers: a, unmuteAllGroupMembers: l } = sn(), c = k(() => i.group.getGroupById(t.groupId)), u = k(() => {
       var E;
       return ((E = c.value) == null ? void 0 : E.mute) === !0;
     }), d = k(() => {
@@ -30116,37 +30134,37 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         }
     }
     const g = k(() => {
-      const E = [], G = t.groupId;
+      const E = [], H = t.groupId;
       return t.showMuteList && f.value && E.push({
         key: "mute",
         label: r("group.management.muteList", "禁言列表"),
         show: !0,
         icon: "bubble/slash",
-        count: (i.group.groupMuteListMap[G] || []).length
+        count: (i.group.groupMuteListMap[H] || []).length
       }), t.showBlocklist && f.value && E.push({
         key: "block",
         label: r("group.management.blocklist", "黑名单"),
         show: !0,
         icon: "person/xmark",
-        count: (i.group.groupBlocklistMap[G] || []).length
+        count: (i.group.groupBlocklistMap[H] || []).length
       }), t.showAllowlist && p.value && E.push({
         key: "allow",
         label: r("group.management.allowlist", "白名单"),
         show: !0,
         icon: "person/check",
-        count: (i.group.groupAllowlistMap[G] || []).length
+        count: (i.group.groupAllowlistMap[H] || []).length
       }), t.showSharedFiles && E.push({
         key: "files",
         label: r("group.management.sharedFiles", "共享文件"),
         show: !0,
         icon: "doc",
-        count: (i.group.groupSharedFilesMap[G] || []).length
+        count: (i.group.groupSharedFilesMap[H] || []).length
       }), t.showJoinRequests && f.value && E.push({
         key: "requests",
         label: r("group.management.joinRequests", "入群申请"),
         show: !0,
         icon: "person/clock",
-        count: (i.group.groupJoinRequestsMap[G] || []).length
+        count: (i.group.groupJoinRequestsMap[H] || []).length
       }), E;
     }), v = k(() => g.value.length > 0 || t.showMuteAll && f.value), b = A(null), $ = A(null), R = A(null), M = A(null), x = k({
       get: () => b.value !== null,
@@ -30166,28 +30184,28 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     function I(E) {
       b.value = E;
     }
-    function O() {
+    function N() {
       b.value = null;
     }
-    return (E, G) => v.value ? (y(), w("div", fR, [
+    return (E, H) => v.value ? (y(), w("div", fR, [
       _("div", pR, [
-        t.showMuteAll && f.value ? (y(), ce(m(Tt), {
+        t.showMuteAll && f.value ? (y(), de(m(Tt), {
           key: 0,
           clickable: !1,
           size: "compact",
           title: m(r)("group.management.muteAll", "全员禁言"),
           "inset-hover": !1
         }, {
-          leading: X(() => [
-            q(m(Oe), {
+          leading: J(() => [
+            W(m(De), {
               name: "bubble/slash",
               size: 18
             })
           ]),
-          trailing: X(() => [
+          trailing: J(() => [
             _("label", {
               class: "group-management-section__toggle",
-              onClick: G[0] || (G[0] = ft(() => {
+              onClick: H[0] || (H[0] = ft(() => {
               }, ["stop"]))
             }, [
               _("input", {
@@ -30196,293 +30214,293 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                 class: "group-management-section__toggle-input",
                 onChange: h
               }, null, 40, hR),
-              G[23] || (G[23] = _("span", { class: "group-management-section__toggle-slider" }, null, -1))
+              H[23] || (H[23] = _("span", { class: "group-management-section__toggle-slider" }, null, -1))
             ])
           ]),
           _: 1
-        }, 8, ["title"])) : U("", !0),
-        (y(!0), w($e, null, et(g.value, (N) => (y(), ce(m(Tt), {
-          key: N.key,
-          title: N.label,
-          meta: N.count ? String(N.count) : void 0,
+        }, 8, ["title"])) : F("", !0),
+        (y(!0), w($e, null, tt(g.value, (D) => (y(), de(m(Tt), {
+          key: D.key,
+          title: D.label,
+          meta: D.count ? String(D.count) : void 0,
           "show-arrow": "",
           size: "compact",
           "inset-hover": !1,
-          onClick: (D) => I(N.key)
+          onClick: (L) => I(D.key)
         }, {
-          leading: X(() => [
-            q(m(Oe), {
-              name: N.icon,
+          leading: J(() => [
+            W(m(De), {
+              name: D.icon,
               size: 18
             }, null, 8, ["name"])
           ]),
           _: 2
         }, 1032, ["title", "meta", "onClick"]))), 128))
       ]),
-      t.displayMode === "drawer" ? (y(), ce(ou, {
+      t.displayMode === "drawer" ? (y(), de(ou, {
         key: 0,
         show: x.value,
-        "onUpdate:show": G[11] || (G[11] = (N) => x.value = N),
+        "onUpdate:show": H[11] || (H[11] = (D) => x.value = D),
         overlay: !0,
         "close-on-click-overlay": !0,
-        onClose: O
+        onClose: N
       }, {
-        header: X(() => [
+        header: J(() => [
           _("div", mR, [
-            q(m(pt), {
+            W(m(pt), {
               class: "group-management-section__drawer-close",
               icon: "chevron/left",
               size: "small",
               variant: "ghost",
               title: m(r)("button.back", "返回"),
-              onClick: O
+              onClick: N
             }, null, 8, ["title"]),
             _("span", gR, P(T.value), 1),
-            b.value === "files" ? (y(), ce(m(pt), {
+            b.value === "files" ? (y(), de(m(pt), {
               key: 0,
               icon: "arrow/up_tray",
               size: "small",
               type: "primary",
               title: m(r)("group.sharedFile.uploadText", "上传"),
-              onClick: G[1] || (G[1] = (N) => {
-                var D;
-                return (D = $.value) == null ? void 0 : D.triggerUpload();
+              onClick: H[1] || (H[1] = (D) => {
+                var L;
+                return (L = $.value) == null ? void 0 : L.triggerUpload();
               })
-            }, null, 8, ["title"])) : b.value === "block" ? (y(), ce(m(pt), {
+            }, null, 8, ["title"])) : b.value === "block" ? (y(), de(m(pt), {
               key: 1,
               icon: "plus",
               size: "small",
               type: "primary",
               title: m(r)("group.blocklist.add", "添加"),
-              onClick: G[2] || (G[2] = (N) => {
-                var D;
-                return (D = R.value) == null ? void 0 : D.openAddMember();
+              onClick: H[2] || (H[2] = (D) => {
+                var L;
+                return (L = R.value) == null ? void 0 : L.openAddMember();
               })
-            }, null, 8, ["title"])) : b.value === "mute" ? (y(), ce(m(pt), {
+            }, null, 8, ["title"])) : b.value === "mute" ? (y(), de(m(pt), {
               key: 2,
               icon: "plus",
               size: "small",
               type: "primary",
               title: m(r)("group.mutelist.add", "添加禁言"),
-              onClick: G[3] || (G[3] = (N) => {
-                var D;
-                return (D = M.value) == null ? void 0 : D.openAddMember();
+              onClick: H[3] || (H[3] = (D) => {
+                var L;
+                return (L = M.value) == null ? void 0 : L.openAddMember();
               })
             }, null, 8, ["title"])) : (y(), w("span", vR))
           ])
         ]),
-        default: X(() => [
+        default: J(() => [
           _("div", yR, [
-            V(E.$slots, "mute-list", {
+            G(E.$slots, "mute-list", {
               show: b.value === "mute",
               groupId: t.groupId,
               open: I,
-              close: O
+              close: N
             }, () => [
-              b.value === "mute" ? (y(), ce(jl, {
+              b.value === "mute" ? (y(), de(jl, {
                 key: 0,
                 ref_key: "muteListRef",
                 ref: M,
                 "group-id": t.groupId,
-                onUnmute: G[4] || (G[4] = (N) => s("group-operation", { type: "unmute-member", groupId: t.groupId, userId: N.userId })),
-                onMute: G[5] || (G[5] = (N) => {
-                  var D;
-                  return s("group-operation", { type: "mute-member", groupId: t.groupId, userId: (D = N[0]) == null ? void 0 : D.userId });
+                onUnmute: H[4] || (H[4] = (D) => s("group-operation", { type: "unmute-member", groupId: t.groupId, userId: D.userId })),
+                onMute: H[5] || (H[5] = (D) => {
+                  var L;
+                  return s("group-operation", { type: "mute-member", groupId: t.groupId, userId: (L = D[0]) == null ? void 0 : L.userId });
                 })
-              }, null, 8, ["group-id"])) : U("", !0)
+              }, null, 8, ["group-id"])) : F("", !0)
             ], !0),
-            V(E.$slots, "block-list", {
+            G(E.$slots, "block-list", {
               show: b.value === "block",
               groupId: t.groupId,
               open: I,
-              close: O
+              close: N
             }, () => [
-              b.value === "block" ? (y(), ce(Kl, {
+              b.value === "block" ? (y(), de(Kl, {
                 key: 0,
                 ref_key: "blockListRef",
                 ref: R,
                 "group-id": t.groupId,
-                onUnblock: G[6] || (G[6] = (N) => s("group-operation", { type: "unblock-member", groupId: t.groupId, userId: N.userId })),
-                onBlock: G[7] || (G[7] = (N) => {
-                  var D;
-                  return s("group-operation", { type: "block-member", groupId: t.groupId, userId: (D = N[0]) == null ? void 0 : D.userId });
+                onUnblock: H[6] || (H[6] = (D) => s("group-operation", { type: "unblock-member", groupId: t.groupId, userId: D.userId })),
+                onBlock: H[7] || (H[7] = (D) => {
+                  var L;
+                  return s("group-operation", { type: "block-member", groupId: t.groupId, userId: (L = D[0]) == null ? void 0 : L.userId });
                 })
-              }, null, 8, ["group-id"])) : U("", !0)
+              }, null, 8, ["group-id"])) : F("", !0)
             ], !0),
-            V(E.$slots, "allow-list", {
+            G(E.$slots, "allow-list", {
               show: b.value === "allow",
               groupId: t.groupId,
               open: I,
-              close: O
+              close: N
             }, () => [
-              b.value === "allow" ? (y(), ce(Wl, {
+              b.value === "allow" ? (y(), de(Wl, {
                 key: 0,
                 "group-id": t.groupId,
-                onRemove: G[8] || (G[8] = (N) => s("group-operation", { type: "remove-allowlist-member", groupId: t.groupId, userId: N.userId }))
-              }, null, 8, ["group-id"])) : U("", !0)
+                onRemove: H[8] || (H[8] = (D) => s("group-operation", { type: "remove-allowlist-member", groupId: t.groupId, userId: D.userId }))
+              }, null, 8, ["group-id"])) : F("", !0)
             ], !0),
-            V(E.$slots, "shared-files", {
+            G(E.$slots, "shared-files", {
               show: b.value === "files",
               groupId: t.groupId,
               open: I,
-              close: O
+              close: N
             }, () => [
-              b.value === "files" ? (y(), ce(ql, {
+              b.value === "files" ? (y(), de(ql, {
                 key: 0,
                 ref_key: "sharedFileListRef",
                 ref: $,
                 "group-id": t.groupId
-              }, null, 8, ["group-id"])) : U("", !0)
+              }, null, 8, ["group-id"])) : F("", !0)
             ], !0),
-            V(E.$slots, "join-requests", {
+            G(E.$slots, "join-requests", {
               show: b.value === "requests",
               groupId: t.groupId,
               open: I,
-              close: O
+              close: N
             }, () => [
-              b.value === "requests" ? (y(), ce(Jl, {
+              b.value === "requests" ? (y(), de(Jl, {
                 key: 0,
                 "group-id": t.groupId,
-                onAccepted: G[9] || (G[9] = (N) => s("group-operation", { type: "accept-join-request", groupId: t.groupId, userId: N })),
-                onRejected: G[10] || (G[10] = (N) => s("group-operation", { type: "reject-join-request", groupId: t.groupId, userId: N }))
-              }, null, 8, ["group-id"])) : U("", !0)
+                onAccepted: H[9] || (H[9] = (D) => s("group-operation", { type: "accept-join-request", groupId: t.groupId, userId: D })),
+                onRejected: H[10] || (H[10] = (D) => s("group-operation", { type: "reject-join-request", groupId: t.groupId, userId: D }))
+              }, null, 8, ["group-id"])) : F("", !0)
             ], !0)
           ])
         ]),
         _: 3
-      }, 8, ["show"])) : (y(), ce(m(Lt), {
+      }, 8, ["show"])) : (y(), de(m(Ot), {
         key: 1,
         show: x.value,
-        "onUpdate:show": G[22] || (G[22] = (N) => x.value = N),
+        "onUpdate:show": H[22] || (H[22] = (D) => x.value = D),
         position: "center",
         "close-on-click-overlay": !0,
-        onClose: O
+        onClose: N
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", bR, [
             _("div", kR, [
-              q(m(pt), {
+              W(m(pt), {
                 class: "group-management-section__drawer-close",
                 icon: "chevron/left",
                 size: "small",
                 variant: "ghost",
                 title: m(r)("button.back", "返回"),
-                onClick: O
+                onClick: N
               }, null, 8, ["title"]),
               _("span", wR, P(T.value), 1),
-              b.value === "files" ? (y(), ce(m(pt), {
+              b.value === "files" ? (y(), de(m(pt), {
                 key: 0,
                 icon: "arrow/up_tray",
                 size: "small",
                 type: "primary",
                 title: m(r)("group.sharedFile.uploadText", "上传"),
-                onClick: G[12] || (G[12] = (N) => {
-                  var D;
-                  return (D = $.value) == null ? void 0 : D.triggerUpload();
+                onClick: H[12] || (H[12] = (D) => {
+                  var L;
+                  return (L = $.value) == null ? void 0 : L.triggerUpload();
                 })
-              }, null, 8, ["title"])) : b.value === "block" ? (y(), ce(m(pt), {
+              }, null, 8, ["title"])) : b.value === "block" ? (y(), de(m(pt), {
                 key: 1,
                 icon: "plus",
                 size: "small",
                 type: "primary",
                 title: m(r)("group.blocklist.add", "添加"),
-                onClick: G[13] || (G[13] = (N) => {
-                  var D;
-                  return (D = R.value) == null ? void 0 : D.openAddMember();
+                onClick: H[13] || (H[13] = (D) => {
+                  var L;
+                  return (L = R.value) == null ? void 0 : L.openAddMember();
                 })
-              }, null, 8, ["title"])) : b.value === "mute" ? (y(), ce(m(pt), {
+              }, null, 8, ["title"])) : b.value === "mute" ? (y(), de(m(pt), {
                 key: 2,
                 icon: "plus",
                 size: "small",
                 type: "primary",
                 title: m(r)("group.mutelist.add", "添加禁言"),
-                onClick: G[14] || (G[14] = (N) => {
-                  var D;
-                  return (D = M.value) == null ? void 0 : D.openAddMember();
+                onClick: H[14] || (H[14] = (D) => {
+                  var L;
+                  return (L = M.value) == null ? void 0 : L.openAddMember();
                 })
               }, null, 8, ["title"])) : (y(), w("span", _R))
             ]),
             _("div", CR, [
-              V(E.$slots, "mute-list", {
+              G(E.$slots, "mute-list", {
                 show: b.value === "mute",
                 groupId: t.groupId,
                 open: I,
-                close: O
+                close: N
               }, () => [
-                b.value === "mute" ? (y(), ce(jl, {
+                b.value === "mute" ? (y(), de(jl, {
                   key: 0,
                   ref_key: "muteListRef",
                   ref: M,
                   "group-id": t.groupId,
-                  onUnmute: G[15] || (G[15] = (N) => s("group-operation", { type: "unmute-member", groupId: t.groupId, userId: N.userId })),
-                  onMute: G[16] || (G[16] = (N) => {
-                    var D;
-                    return s("group-operation", { type: "mute-member", groupId: t.groupId, userId: (D = N[0]) == null ? void 0 : D.userId });
+                  onUnmute: H[15] || (H[15] = (D) => s("group-operation", { type: "unmute-member", groupId: t.groupId, userId: D.userId })),
+                  onMute: H[16] || (H[16] = (D) => {
+                    var L;
+                    return s("group-operation", { type: "mute-member", groupId: t.groupId, userId: (L = D[0]) == null ? void 0 : L.userId });
                   })
-                }, null, 8, ["group-id"])) : U("", !0)
+                }, null, 8, ["group-id"])) : F("", !0)
               ], !0),
-              V(E.$slots, "block-list", {
+              G(E.$slots, "block-list", {
                 show: b.value === "block",
                 groupId: t.groupId,
                 open: I,
-                close: O
+                close: N
               }, () => [
-                b.value === "block" ? (y(), ce(Kl, {
+                b.value === "block" ? (y(), de(Kl, {
                   key: 0,
                   ref_key: "blockListRef",
                   ref: R,
                   "group-id": t.groupId,
-                  onUnblock: G[17] || (G[17] = (N) => s("group-operation", { type: "unblock-member", groupId: t.groupId, userId: N.userId })),
-                  onBlock: G[18] || (G[18] = (N) => {
-                    var D;
-                    return s("group-operation", { type: "block-member", groupId: t.groupId, userId: (D = N[0]) == null ? void 0 : D.userId });
+                  onUnblock: H[17] || (H[17] = (D) => s("group-operation", { type: "unblock-member", groupId: t.groupId, userId: D.userId })),
+                  onBlock: H[18] || (H[18] = (D) => {
+                    var L;
+                    return s("group-operation", { type: "block-member", groupId: t.groupId, userId: (L = D[0]) == null ? void 0 : L.userId });
                   })
-                }, null, 8, ["group-id"])) : U("", !0)
+                }, null, 8, ["group-id"])) : F("", !0)
               ], !0),
-              V(E.$slots, "allow-list", {
+              G(E.$slots, "allow-list", {
                 show: b.value === "allow",
                 groupId: t.groupId,
                 open: I,
-                close: O
+                close: N
               }, () => [
-                b.value === "allow" ? (y(), ce(Wl, {
+                b.value === "allow" ? (y(), de(Wl, {
                   key: 0,
                   "group-id": t.groupId,
-                  onRemove: G[19] || (G[19] = (N) => s("group-operation", { type: "remove-allowlist-member", groupId: t.groupId, userId: N.userId }))
-                }, null, 8, ["group-id"])) : U("", !0)
+                  onRemove: H[19] || (H[19] = (D) => s("group-operation", { type: "remove-allowlist-member", groupId: t.groupId, userId: D.userId }))
+                }, null, 8, ["group-id"])) : F("", !0)
               ], !0),
-              V(E.$slots, "shared-files", {
+              G(E.$slots, "shared-files", {
                 show: b.value === "files",
                 groupId: t.groupId,
                 open: I,
-                close: O
+                close: N
               }, () => [
-                b.value === "files" ? (y(), ce(ql, {
+                b.value === "files" ? (y(), de(ql, {
                   key: 0,
                   ref_key: "sharedFileListRef",
                   ref: $,
                   "group-id": t.groupId
-                }, null, 8, ["group-id"])) : U("", !0)
+                }, null, 8, ["group-id"])) : F("", !0)
               ], !0),
-              V(E.$slots, "join-requests", {
+              G(E.$slots, "join-requests", {
                 show: b.value === "requests",
                 groupId: t.groupId,
                 open: I,
-                close: O
+                close: N
               }, () => [
-                b.value === "requests" ? (y(), ce(Jl, {
+                b.value === "requests" ? (y(), de(Jl, {
                   key: 0,
                   "group-id": t.groupId,
-                  onAccepted: G[20] || (G[20] = (N) => s("group-operation", { type: "accept-join-request", groupId: t.groupId, userId: N })),
-                  onRejected: G[21] || (G[21] = (N) => s("group-operation", { type: "reject-join-request", groupId: t.groupId, userId: N }))
-                }, null, 8, ["group-id"])) : U("", !0)
+                  onAccepted: H[20] || (H[20] = (D) => s("group-operation", { type: "accept-join-request", groupId: t.groupId, userId: D })),
+                  onRejected: H[21] || (H[21] = (D) => s("group-operation", { type: "reject-join-request", groupId: t.groupId, userId: D }))
+                }, null, 8, ["group-id"])) : F("", !0)
               ], !0)
             ])
           ])
         ]),
         _: 3
       }, 8, ["show"]))
-    ])) : U("", !0);
+    ])) : F("", !0);
   }
 }), Ag = /* @__PURE__ */ ze(MR, [["__scopeId", "data-v-0c7dbcb2"]]), SR = { class: "group-member-list__info" }, IR = { class: "group-member-list__name-row" }, xR = { class: "group-member-list__name" }, TR = {
   key: 1,
@@ -30493,7 +30511,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, AR = {
   key: 3,
   class: "group-member-list__status-tag group-member-list__status-tag--allowlist"
-}, $R = { class: "group-member-list__id" }, RR = { class: "group-member-list__context-menu" }, NR = /* @__PURE__ */ Re({
+}, $R = { class: "group-member-list__id" }, RR = { class: "group-member-list__context-menu" }, NR = /* @__PURE__ */ Le({
   __name: "group-member-list-item",
   props: {
     member: {},
@@ -30517,14 +30535,14 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     function d(C) {
       return C === ut.OWNER ? o("group.memberList.owner", "群主") : C === ut.ADMIN ? o("group.memberList.admin", "管理员") : o("group.memberList.member", "成员");
     }
-    function p(C, L) {
-      return (r.group.groupMuteListMap[C] || []).some((te) => te.userId === L);
+    function p(C, O) {
+      return (r.group.groupMuteListMap[C] || []).some((te) => te.userId === O);
     }
-    function f(C, L) {
-      return (r.group.groupBlocklistMap[C] || []).some((te) => te.userId === L);
+    function f(C, O) {
+      return (r.group.groupBlocklistMap[C] || []).some((te) => te.userId === O);
     }
-    function h(C, L) {
-      return (r.group.groupAllowlistMap[C] || []).some((te) => te.userId === L);
+    function h(C, O) {
+      return (r.group.groupAllowlistMap[C] || []).some((te) => te.userId === O);
     }
     function g(C) {
       return C.userId === t.currentUserId ? !1 : !!(l.value || c.value && C.role === ut.MEMBER);
@@ -30553,16 +30571,16 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     function I(C) {
       return l.value && C.userId !== t.currentUserId;
     }
-    const O = A(!1), E = A();
-    function G(C) {
+    const N = A(!1), E = A();
+    function H(C) {
       E.value = C ?? void 0;
     }
-    function N(C) {
-      const L = [];
-      return R(C) && L.push({ key: "mute", icon: "person/clock", label: o("group.memberList.mute", "禁言") }), M(C) && L.push({ key: "unmute", icon: "person/clock", label: o("group.memberList.unmute", "取消禁言") }), x(C) && L.push({ key: "block", icon: "person/xmark", label: o("group.memberList.block", "拉黑") }), T(C) && L.push({ key: "unblock", icon: "person/check", label: o("group.memberList.unblock", "取消拉黑") }), t.showAdminAction && v(C) && L.push({ key: "setAdmin", icon: "shield/person", label: o("group.memberList.setAdmin", "设管理员") }), t.showAdminAction && b(C) && L.push({ key: "removeAdmin", icon: "shield/person", label: o("group.memberList.removeAdmin", "取消管理员") }), I(C) && L.push({ key: "transferOwner", icon: "crown", label: o("group.memberList.transferOwner", "转让群主"), danger: !0 }), t.showRemoveAction && g(C) && L.push({ key: "remove", icon: "person/minus", label: o("group.memberList.remove", "移除"), danger: !0 }), L;
+    function D(C) {
+      const O = [];
+      return R(C) && O.push({ key: "mute", icon: "person/clock", label: o("group.memberList.mute", "禁言") }), M(C) && O.push({ key: "unmute", icon: "person/clock", label: o("group.memberList.unmute", "取消禁言") }), x(C) && O.push({ key: "block", icon: "person/xmark", label: o("group.memberList.block", "拉黑") }), T(C) && O.push({ key: "unblock", icon: "person/check", label: o("group.memberList.unblock", "取消拉黑") }), t.showAdminAction && v(C) && O.push({ key: "setAdmin", icon: "shield/person", label: o("group.memberList.setAdmin", "设管理员") }), t.showAdminAction && b(C) && O.push({ key: "removeAdmin", icon: "shield/person", label: o("group.memberList.removeAdmin", "取消管理员") }), I(C) && O.push({ key: "transferOwner", icon: "crown", label: o("group.memberList.transferOwner", "转让群主"), danger: !0 }), t.showRemoveAction && g(C) && O.push({ key: "remove", icon: "person/minus", label: o("group.memberList.remove", "移除"), danger: !0 }), O;
     }
-    function D(C, L) {
-      switch (O.value = !1, L) {
+    function L(C, O) {
+      switch (N.value = !1, O) {
         case "mute":
           s("mute-member", C);
           break;
@@ -30590,92 +30608,92 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       }
     }
     function S() {
-      O.value = !1;
+      N.value = !1;
     }
-    return (C, L) => (y(), ce(m(Tt), {
+    return (C, O) => (y(), de(m(Tt), {
       class: "group-member-list__item",
       "auto-height": "",
       clickable: !1,
       "data-member-id": t.member.userId,
-      onClick: L[5] || (L[5] = (J) => s("click-member", t.member))
+      onClick: O[5] || (O[5] = (q) => s("click-member", t.member))
     }, {
-      leading: X(() => [
-        q(m($t), {
+      leading: J(() => [
+        W(m($t), {
           name: m(i),
           src: m(a),
           size: 40,
           presence: t.presence
         }, null, 8, ["name", "src", "presence"])
       ]),
-      default: X(() => [
+      default: J(() => [
         _("div", SR, [
           _("div", IR, [
             _("span", xR, P(m(i)), 1),
             t.member.role !== m(ut).MEMBER ? (y(), w("span", {
               key: 0,
               class: Te(["group-member-list__role", u(t.member.role)])
-            }, P(d(t.member.role)), 3)) : U("", !0),
-            p(t.groupId, t.member.userId) ? (y(), w("span", TR, P(m(o)("group.memberList.muted", "禁言中")), 1)) : U("", !0),
-            f(t.groupId, t.member.userId) ? (y(), w("span", ER, P(m(o)("group.memberList.blocked", "已拉黑")), 1)) : U("", !0),
-            h(t.groupId, t.member.userId) ? (y(), w("span", AR, P(m(o)("group.memberList.inAllowlist", "白名单")), 1)) : U("", !0)
+            }, P(d(t.member.role)), 3)) : F("", !0),
+            p(t.groupId, t.member.userId) ? (y(), w("span", TR, P(m(o)("group.memberList.muted", "禁言中")), 1)) : F("", !0),
+            f(t.groupId, t.member.userId) ? (y(), w("span", ER, P(m(o)("group.memberList.blocked", "已拉黑")), 1)) : F("", !0),
+            h(t.groupId, t.member.userId) ? (y(), w("span", AR, P(m(o)("group.memberList.inAllowlist", "白名单")), 1)) : F("", !0)
           ]),
           _("div", $R, " ID: " + P(t.member.userId), 1)
         ])
       ]),
-      trailing: X(() => [
+      trailing: J(() => [
         _("div", {
           class: "group-member-list__actions",
-          onClick: L[4] || (L[4] = ft(() => {
+          onClick: O[4] || (O[4] = ft(() => {
           }, ["stop"]))
         }, [
           $(t.member) ? (y(), w("button", {
             key: 0,
             class: "group-member-list__action-btn",
-            onClick: L[0] || (L[0] = (J) => s("chat-member", t.member))
-          }, P(m(o)("group.memberList.chat", "发消息")), 1)) : U("", !0),
-          N(t.member).length > 0 ? (y(), w("div", {
+            onClick: O[0] || (O[0] = (q) => s("chat-member", t.member))
+          }, P(m(o)("group.memberList.chat", "发消息")), 1)) : F("", !0),
+          D(t.member).length > 0 ? (y(), w("div", {
             key: 1,
-            ref: (J) => G(J),
+            ref: (q) => H(q),
             class: "group-member-list__more"
           }, [
             _("button", {
               class: "group-member-list__action-btn group-member-list__action-btn--icon",
-              onClick: L[1] || (L[1] = ft((J) => O.value = !0, ["stop"]))
+              onClick: O[1] || (O[1] = ft((q) => N.value = !0, ["stop"]))
             }, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "vertical",
                 size: 16
               })
             ]),
-            q(m(Lt), {
-              show: O.value,
+            W(m(Ot), {
+              show: N.value,
               anchor: E.value,
               placement: "bottom",
               overlay: !1,
               "close-on-click-overlay": !0,
               group: "group-member-more-menu",
-              "onUpdate:show": L[2] || (L[2] = (J) => O.value = !1),
-              onClose: L[3] || (L[3] = (J) => O.value = !1)
+              "onUpdate:show": O[2] || (O[2] = (q) => N.value = !1),
+              onClose: O[3] || (O[3] = (q) => N.value = !1)
             }, {
-              default: X(() => [
-                V(C.$slots, "member-menu", {
+              default: J(() => [
+                G(C.$slots, "member-menu", {
                   member: t.member,
-                  actions: N(t.member),
-                  select: (J) => D(t.member, J),
+                  actions: D(t.member),
+                  select: (q) => L(t.member, q),
                   close: S
                 }, () => [
                   _("div", RR, [
-                    (y(!0), w($e, null, et(N(t.member), (J) => (y(), ce(m(Tt), {
-                      key: J.key,
+                    (y(!0), w($e, null, tt(D(t.member), (q) => (y(), de(m(Tt), {
+                      key: q.key,
                       size: "compact",
                       "inset-hover": !1,
-                      danger: J.danger,
-                      title: J.label,
-                      onClick: ft((te) => D(t.member, J.key), ["stop"])
+                      danger: q.danger,
+                      title: q.label,
+                      onClick: ft((te) => L(t.member, q.key), ["stop"])
                     }, {
-                      leading: X(() => [
-                        q(m(Oe), {
-                          name: J.icon,
+                      leading: J(() => [
+                        W(m(De), {
+                          name: q.icon,
                           size: 18
                         }, null, 8, ["name"])
                       ]),
@@ -30686,7 +30704,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               ]),
               _: 3
             }, 8, ["show", "anchor"])
-          ], 512)) : U("", !0)
+          ], 512)) : F("", !0)
         ])
       ]),
       _: 3
@@ -30710,7 +30728,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, jR = {
   key: 1,
   class: "group-member-list__no-more"
-}, KR = /* @__PURE__ */ Re({
+}, KR = /* @__PURE__ */ Le({
   __name: "group-member-list",
   props: {
     groupId: {},
@@ -30731,136 +30749,136 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   },
   emits: ["click-member", "chat-member", "remove-member", "set-admin", "remove-admin", "mute-member", "unmute-member", "block-member", "unblock-member", "transfer-owner", "load-more", "close"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("UIKit:GroupMemberList"), { t: i } = qe(), { show: a } = Wt(), { stores: l, features: c } = at(), { fetchGroupMembers: u } = sn(), { fetchPresence: d, getPresence: p } = ro(), f = A(""), h = A(!1), g = A(void 0), v = A(s.hasMore), b = A(!1), $ = k(() => l.group.getGroupMembers(s.groupId)), R = k(
+    const s = n, o = t, r = Dt("UIKit:GroupMemberList"), { t: i } = qe(), { show: a } = Wt(), { stores: l, features: c } = at(), { fetchGroupMembers: u } = sn(), { fetchPresence: d, getPresence: p } = ro(), f = A(""), h = A(!1), g = A(void 0), v = A(s.hasMore), b = A(!1), $ = k(() => l.group.getGroupMembers(s.groupId)), R = k(
       () => b.value || $.value.length > 0 ? $.value : s.members
     ), M = A(), x = A(/* @__PURE__ */ new Set()), T = A(/* @__PURE__ */ new Set());
-    let I = null, O = null;
+    let I = null, N = null;
     function E() {
-      I || !M.value || !c.fetchGroupMemberPresenceOnVisible || (I = new IntersectionObserver((re) => {
-        re.forEach((ue) => {
-          const j = ue.target.getAttribute("data-member-id");
-          j && (ue.isIntersecting ? x.value.add(j) : x.value.delete(j));
-        }), N();
+      I || !M.value || !c.fetchGroupMemberPresenceOnVisible || (I = new IntersectionObserver((ie) => {
+        ie.forEach((fe) => {
+          const V = fe.target.getAttribute("data-member-id");
+          V && (fe.isIntersecting ? x.value.add(V) : x.value.delete(V));
+        }), D();
       }, { root: M.value, threshold: 0 }));
     }
-    function G() {
+    function H() {
       Ye(() => {
-        var ue;
-        E(), (((ue = M.value) == null ? void 0 : ue.querySelectorAll("[data-member-id]")) ?? []).forEach((j) => {
-          const de = j.getAttribute("data-member-id");
-          de && !T.value.has(de) && (I == null || I.observe(j), T.value.add(de));
+        var fe;
+        E(), (((fe = M.value) == null ? void 0 : fe.querySelectorAll("[data-member-id]")) ?? []).forEach((V) => {
+          const ue = V.getAttribute("data-member-id");
+          ue && !T.value.has(ue) && (I == null || I.observe(V), T.value.add(ue));
         });
       });
     }
-    function N() {
-      O && clearTimeout(O), O = setTimeout(() => {
+    function D() {
+      N && clearTimeout(N), N = setTimeout(() => {
         if (!c.enablePresence)
           return;
-        const re = Array.from(x.value).filter((ue) => !p(ue));
-        re.length > 0 && d(re);
+        const ie = Array.from(x.value).filter((fe) => !p(fe));
+        ie.length > 0 && d(ie);
       }, 200);
     }
-    function D(re) {
-      var ue;
-      return (ue = p(re)) == null ? void 0 : ue.status;
+    function L(ie) {
+      var fe;
+      return (fe = p(ie)) == null ? void 0 : fe.status;
     }
     Xn(() => {
-      I && (I.disconnect(), I = null), O && (clearTimeout(O), O = null);
-    }), Pe(() => s.hasMore, (re) => {
-      v.value = re;
+      I && (I.disconnect(), I = null), N && (clearTimeout(N), N = null);
+    }), Pe(() => s.hasMore, (ie) => {
+      v.value = ie;
     }, { immediate: !0 });
     const S = k(() => s.group || l.group.getGroupById(s.groupId)), C = k(() => {
-      const re = R.value.find((ue) => ue.userId === s.currentUserId);
-      return (re == null ? void 0 : re.role) || ut.MEMBER;
-    }), L = k(() => {
-      const re = f.value.trim().toLowerCase();
-      return re ? R.value.filter((ue) => (ue.nickname || ue.userId).toLowerCase().includes(re)) : R.value;
+      const ie = R.value.find((fe) => fe.userId === s.currentUserId);
+      return (ie == null ? void 0 : ie.role) || ut.MEMBER;
+    }), O = k(() => {
+      const ie = f.value.trim().toLowerCase();
+      return ie ? R.value.filter((fe) => (fe.nickname || fe.userId).toLowerCase().includes(ie)) : R.value;
     });
     Pe(
-      () => L.value.map((re) => re.userId).join(","),
+      () => O.value.map((ie) => ie.userId).join(","),
       () => {
-        G();
+        H();
       },
       { immediate: !0 }
     );
-    async function J() {
+    async function q() {
       try {
-        const re = await u(s.groupId);
-        b.value = !0, g.value = re.cursor, v.value = re.hasMore;
-      } catch (re) {
-        r.warn("[GroupMemberList] load members failed:", Je(re)), a(i("group.memberList.loadFailed", "加载群成员失败"), "error");
+        const ie = await u(s.groupId);
+        b.value = !0, g.value = ie.cursor, v.value = ie.hasMore;
+      } catch (ie) {
+        r.warn("[GroupMemberList] load members failed:", Je(ie)), a(i("group.memberList.loadFailed", "加载群成员失败"), "error");
       }
     }
     async function te() {
       if (!(h.value || !v.value)) {
         h.value = !0;
         try {
-          const re = await u(s.groupId, g.value);
-          g.value = re.cursor, v.value = re.hasMore, o("load-more");
-        } catch (re) {
-          r.warn("[GroupMemberList] load more members failed:", Je(re)), a(i("group.memberList.loadMoreFailed", "加载更多失败"), "error");
+          const ie = await u(s.groupId, g.value);
+          g.value = ie.cursor, v.value = ie.hasMore, o("load-more");
+        } catch (ie) {
+          r.warn("[GroupMemberList] load more members failed:", Je(ie)), a(i("group.memberList.loadMoreFailed", "加载更多失败"), "error");
         } finally {
           h.value = !1;
         }
       }
     }
-    Pe(() => s.groupId, (re) => {
-      re && (f.value = "", g.value = void 0, J());
+    Pe(() => s.groupId, (ie) => {
+      ie && (f.value = "", g.value = void 0, q());
     }, { immediate: !0 });
-    async function ve() {
-      g.value = void 0, await J();
+    async function ye() {
+      g.value = void 0, await q();
     }
-    function be(re) {
-      l.group.removeGroupMembers(s.groupId, [re]);
+    function ke(ie) {
+      l.group.removeGroupMembers(s.groupId, [ie]);
     }
-    function W(re, ue) {
-      l.group.updateGroupMemberRole(s.groupId, re, ue);
+    function j(ie, fe) {
+      l.group.updateGroupMemberRole(s.groupId, ie, fe);
     }
-    return e({ refresh: ve, removeMember: be, setMemberRole: W }), (re, ue) => {
-      var j;
+    return e({ refresh: ye, removeMember: ke, setMemberRole: j }), (ie, fe) => {
+      var V;
       return y(), w("div", OR, [
         s.showHeader ? (y(), w("div", DR, [
           _("div", BR, [
             _("span", PR, P(m(i)("group.memberList.title", "群成员")), 1),
-            _("span", zR, P(((j = S.value) == null ? void 0 : j.memberCount) ?? R.value.length), 1)
+            _("span", zR, P(((V = S.value) == null ? void 0 : V.memberCount) ?? R.value.length), 1)
           ]),
-          s.closable ? (y(), ce(m(pt), {
+          s.closable ? (y(), de(m(pt), {
             key: 0,
             class: "group-member-list__close",
             icon: "xmark/light",
             size: "small",
             variant: "ghost",
             title: m(i)("button.close", "关闭"),
-            onClick: ue[0] || (ue[0] = (de) => o("close"))
-          }, null, 8, ["title"])) : U("", !0)
-        ])) : U("", !0),
+            onClick: fe[0] || (fe[0] = (ue) => o("close"))
+          }, null, 8, ["title"])) : F("", !0)
+        ])) : F("", !0),
         s.showSearch ? (y(), w("div", FR, [
-          q(m(gn), {
+          W(m(gn), {
             modelValue: f.value,
-            "onUpdate:modelValue": ue[1] || (ue[1] = (de) => f.value = de),
+            "onUpdate:modelValue": fe[1] || (fe[1] = (ue) => f.value = ue),
             variant: "search",
             clearable: "",
             "clear-icon": "search/xmark",
             placeholder: m(i)("group.memberList.searchPlaceholder", "搜索群成员"),
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"])
-        ])) : U("", !0),
+        ])) : F("", !0),
         _("div", {
           ref_key: "itemsRef",
           ref: M,
           class: "group-member-list__items"
         }, [
-          s.loading && L.value.length === 0 ? (y(), w("div", UR, [
+          s.loading && O.value.length === 0 ? (y(), w("div", UR, [
             _("span", HR, P(m(i)("common.loading")), 1)
-          ])) : L.value.length === 0 ? (y(), ce(m(Ht), {
+          ])) : O.value.length === 0 ? (y(), de(m(Ht), {
             key: 1,
             icon: f.value ? "search" : "person/double",
             description: f.value ? m(i)("group.memberList.noSearchResult", "未找到相关成员") : m(i)("group.memberList.empty", "暂无成员"),
             size: "small"
           }, null, 8, ["icon", "description"])) : (y(), w($e, { key: 2 }, [
-            (y(!0), w($e, null, et(L.value, (de) => (y(), ce(LR, {
-              key: de.userId,
-              member: de,
+            (y(!0), w($e, null, tt(O.value, (ue) => (y(), de(LR, {
+              key: ue.userId,
+              member: ue,
               "group-id": s.groupId,
               "current-user-id": s.currentUserId,
               "current-user-role": C.value,
@@ -30870,22 +30888,22 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               "show-remove-action": s.showRemoveAction,
               "show-chat-action": s.showChatAction,
               "allow-chat": s.allowChat,
-              presence: D(de.userId),
-              onClickMember: ue[2] || (ue[2] = (se) => o("click-member", se)),
-              onChatMember: ue[3] || (ue[3] = (se) => o("chat-member", se)),
-              onRemoveMember: ue[4] || (ue[4] = (se) => o("remove-member", se)),
-              onSetAdmin: ue[5] || (ue[5] = (se) => o("set-admin", se)),
-              onRemoveAdmin: ue[6] || (ue[6] = (se) => o("remove-admin", se)),
-              onMuteMember: ue[7] || (ue[7] = (se) => o("mute-member", se)),
-              onUnmuteMember: ue[8] || (ue[8] = (se) => o("unmute-member", se)),
-              onBlockMember: ue[9] || (ue[9] = (se) => o("block-member", se)),
-              onUnblockMember: ue[10] || (ue[10] = (se) => o("unblock-member", se)),
-              onTransferOwner: ue[11] || (ue[11] = (se) => o("transfer-owner", se))
+              presence: L(ue.userId),
+              onClickMember: fe[2] || (fe[2] = (se) => o("click-member", se)),
+              onChatMember: fe[3] || (fe[3] = (se) => o("chat-member", se)),
+              onRemoveMember: fe[4] || (fe[4] = (se) => o("remove-member", se)),
+              onSetAdmin: fe[5] || (fe[5] = (se) => o("set-admin", se)),
+              onRemoveAdmin: fe[6] || (fe[6] = (se) => o("remove-admin", se)),
+              onMuteMember: fe[7] || (fe[7] = (se) => o("mute-member", se)),
+              onUnmuteMember: fe[8] || (fe[8] = (se) => o("unmute-member", se)),
+              onBlockMember: fe[9] || (fe[9] = (se) => o("block-member", se)),
+              onUnblockMember: fe[10] || (fe[10] = (se) => o("unblock-member", se)),
+              onTransferOwner: fe[11] || (fe[11] = (se) => o("transfer-owner", se))
             }, At({ _: 2 }, [
-              re.$slots.memberMenu ? {
+              ie.$slots.memberMenu ? {
                 name: "member-menu",
-                fn: X((se) => [
-                  V(re.$slots, "member-menu", ao({ ref_for: !0 }, se), void 0, !0)
+                fn: J((se) => [
+                  G(ie.$slots, "member-menu", ao({ ref_for: !0 }, se), void 0, !0)
                 ]),
                 key: "0"
               } : void 0
@@ -30896,9 +30914,9 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                 class: "group-member-list__load-more-btn",
                 onClick: te
               }, P(m(i)("group.memberList.loadMore", "加载更多")), 1))
-            ])) : !v.value && L.value.length > 0 ? (y(), w("div", jR, [
+            ])) : !v.value && O.value.length > 0 ? (y(), w("div", jR, [
               _("span", null, P(m(i)("group.memberList.noMore", "没有更多了")), 1)
-            ])) : U("", !0)
+            ])) : F("", !0)
           ], 64))
         ], 512)
       ]);
@@ -30913,7 +30931,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, eN = ["title"], tN = {
   key: 1,
   class: "group-announcement__edit"
-}, nN = ["placeholder", "maxlength"], sN = { class: "group-announcement__edit-actions" }, oN = /* @__PURE__ */ Re({
+}, nN = ["placeholder", "maxlength"], sN = { class: "group-announcement__edit-actions" }, oN = /* @__PURE__ */ Le({
   __name: "group-announcement",
   props: {
     groupId: {},
@@ -30922,17 +30940,17 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   emits: ["updated"],
   setup(n, { emit: e }) {
     const t = n, s = e, { t: o } = qe();
-    function r(D, S) {
-      return o("common.charCount", "{current}/{max}").replace("{current}", String(D)).replace("{max}", String(S));
+    function r(L, S) {
+      return o("common.charCount", "{current}/{max}").replace("{current}", String(L)).replace("{max}", String(S));
     }
     const { show: i } = Wt(), { stores: a } = at(), { getGroupAnnouncement: l, updateGroupAnnouncement: c, getGroupMembers: u } = sn(), d = A(!1), p = A(), f = A(""), h = A(!1), g = k(() => a.client.currentUser), v = k(() => u(t.groupId)), b = k(() => {
-      var D;
+      var L;
       if (g.value)
-        return (D = v.value.find((S) => S.userId === g.value)) == null ? void 0 : D.role;
-    }), $ = k(() => b.value === ut.OWNER), R = k(() => b.value === ut.ADMIN), M = k(() => $.value || R.value), x = k(() => l(t.groupId)), T = A(!0), I = A(!1), O = A();
+        return (L = v.value.find((S) => S.userId === g.value)) == null ? void 0 : L.role;
+    }), $ = k(() => b.value === ut.OWNER), R = k(() => b.value === ut.ADMIN), M = k(() => $.value || R.value), x = k(() => l(t.groupId)), T = A(!0), I = A(!1), N = A();
     function E() {
-      const D = O.value;
-      !D || !T.value || (I.value = D.scrollHeight > D.clientHeight + 1);
+      const L = N.value;
+      !L || !T.value || (I.value = L.scrollHeight > L.clientHeight + 1);
     }
     Pe(
       [() => x.value, () => t.loading],
@@ -30940,21 +30958,21 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         T.value = !0, Ye(E);
       },
       { immediate: !0 }
-    ), Pe(T, (D) => {
-      D && Ye(E);
-    }), qt(E), jf(O, E), Pe(
+    ), Pe(T, (L) => {
+      L && Ye(E);
+    }), qt(E), jf(N, E), Pe(
       () => x.value,
-      (D) => {
-        d.value || (f.value = D || "");
+      (L) => {
+        d.value || (f.value = L || "");
       },
       { immediate: !0 }
-    ), Pe(d, async (D) => {
+    ), Pe(d, async (L) => {
       var S;
-      D && (await Ye(), (S = p.value) == null || S.focus());
+      L && (await Ye(), (S = p.value) == null || S.focus());
     });
-    async function G() {
-      if (f.value.length > Nt.ANNOUNCEMENT_MAX_LENGTH) {
-        i(o("chat.info.groupAnnouncementTooLong").replace("{max}", String(Nt.ANNOUNCEMENT_MAX_LENGTH)), "error");
+    async function H() {
+      if (f.value.length > Lt.ANNOUNCEMENT_MAX_LENGTH) {
+        i(o("chat.info.groupAnnouncementTooLong").replace("{max}", String(Lt.ANNOUNCEMENT_MAX_LENGTH)), "error");
         return;
       }
       h.value = !0;
@@ -30964,32 +30982,32 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           params: { announcement: f.value },
           defaultText: Ov(f.value)
         }), i(o("chat.info.groupInfoUpdated", "更新成功"), "success");
-      } catch (D) {
-        i(D instanceof Error ? D.message : String(D) || o("chat.info.groupInfoUpdateFailed", "更新失败"), "error");
+      } catch (L) {
+        i(L instanceof Error ? L.message : String(L) || o("chat.info.groupInfoUpdateFailed", "更新失败"), "error");
       } finally {
         h.value = !1;
       }
     }
-    function N() {
+    function D() {
       d.value = !1, f.value = x.value || "";
     }
-    return (D, S) => (y(), w("div", WR, [
+    return (L, S) => (y(), w("div", WR, [
       _("div", qR, [
         _("div", JR, [
-          q(m(Oe), {
+          W(m(De), {
             name: "board",
             size: 16
           }),
           _("span", null, P(m(o)("chat.info.groupAnnouncement")), 1)
         ]),
-        M.value && !d.value ? (y(), ce(m(pt), {
+        M.value && !d.value ? (y(), de(m(pt), {
           key: 0,
           icon: "rect/pencil",
           size: "small",
           type: "primary",
           title: m(o)("chat.info.edit", "编辑"),
           onClick: S[0] || (S[0] = (C) => d.value = !0)
-        }, null, 8, ["title"])) : U("", !0)
+        }, null, 8, ["title"])) : F("", !0)
       ]),
       _("div", XR, [
         d.value ? (y(), w("div", tN, [
@@ -31000,35 +31018,35 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             class: "group-announcement__textarea",
             placeholder: m(o)("chat.info.groupAnnouncementPlaceholder"),
             rows: "3",
-            maxlength: m(Nt).ANNOUNCEMENT_MAX_LENGTH
+            maxlength: m(Lt).ANNOUNCEMENT_MAX_LENGTH
           }, null, 8, nN), [
             [ts, f.value]
           ]),
           _("div", {
-            class: Te(["group-announcement__char-count", { "is-near-limit": f.value.length > m(Nt).ANNOUNCEMENT_MAX_LENGTH * 0.9 }])
-          }, P(r(f.value.length, m(Nt).ANNOUNCEMENT_MAX_LENGTH)), 3),
+            class: Te(["group-announcement__char-count", { "is-near-limit": f.value.length > m(Lt).ANNOUNCEMENT_MAX_LENGTH * 0.9 }])
+          }, P(r(f.value.length, m(Lt).ANNOUNCEMENT_MAX_LENGTH)), 3),
           _("div", sN, [
-            q(m(pt), {
+            W(m(pt), {
               icon: "xmark/bold",
               size: "small",
               type: "danger",
               title: m(o)("button.cancel", "取消"),
-              onClick: N
+              onClick: D
             }, null, 8, ["title"]),
-            q(m(pt), {
+            W(m(pt), {
               class: "group-announcement__save",
               icon: "check/single",
               size: "small",
               type: "success",
               disabled: h.value,
               title: m(o)("chat.info.save", "保存"),
-              onClick: G
+              onClick: H
             }, null, 8, ["disabled", "title"])
           ])
         ])) : (y(), w($e, { key: 0 }, [
           _("div", {
             ref_key: "contentRef",
-            ref: O,
+            ref: N,
             class: Te(["group-announcement__content", { "is-collapsed": T.value }])
           }, [
             n.loading ? (y(), w("span", YR, P(m(o)("common.loading")), 1)) : x.value ? (y(), w("span", QR, P(x.value), 1)) : (y(), w("span", ZR, P(m(o)("chat.info.groupAnnouncementPlaceholder")), 1))
@@ -31039,11 +31057,11 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             title: T.value ? m(o)("chat.announcementBanner.expand", "展开") : m(o)("chat.announcementBanner.collapse", "收起"),
             onClick: S[1] || (S[1] = (C) => T.value = !T.value)
           }, [
-            q(m(Oe), {
+            W(m(De), {
               name: T.value ? "chevron/down" : "chevron/up",
               size: 14
             }, null, 8, ["name"])
-          ], 8, eN)) : U("", !0)
+          ], 8, eN)) : F("", !0)
         ], 64))
       ])
     ]));
@@ -31054,7 +31072,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, lN = {
   key: 1,
   class: "chat-info-drawer__member-tag chat-info-drawer__member-tag--admin"
-}, cN = /* @__PURE__ */ Re({
+}, cN = /* @__PURE__ */ Le({
   __name: "chat-info-drawer-member-cell",
   props: {
     member: {}
@@ -31062,13 +31080,13 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   setup(n) {
     const e = n, { t } = qe(), { displayName: s, avatarUrl: o } = jt(() => e.member.userId);
     return (r, i) => (y(), w("div", rN, [
-      q(m($t), {
+      W(m($t), {
         name: m(s),
         src: m(o),
         size: 48
       }, null, 8, ["name", "src"]),
       _("span", iN, P(m(s)), 1),
-      e.member.role === m(ut).OWNER ? (y(), w("span", aN, P(m(t)("chat.info.groupOwner")), 1)) : e.member.role === m(ut).ADMIN ? (y(), w("span", lN, P(m(t)("chat.info.groupAdmin")), 1)) : U("", !0)
+      e.member.role === m(ut).OWNER ? (y(), w("span", aN, P(m(t)("chat.info.groupOwner")), 1)) : e.member.role === m(ut).ADMIN ? (y(), w("span", lN, P(m(t)("chat.info.groupAdmin")), 1)) : F("", !0)
     ]));
   }
 }), uN = /* @__PURE__ */ ze(cN, [["__scopeId", "data-v-8cff6316"]]), dN = {
@@ -31113,7 +31131,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }, VN = { class: "chat-info-drawer__section-label" }, jN = { class: "chat-info-drawer__section chat-info-drawer__section--management" }, KN = { class: "chat-info-drawer__section" }, WN = { class: "chat-info-drawer__member-detail" }, qN = { class: "chat-info-drawer__actions" }, JN = { class: "chat-info-drawer__confirm-body" }, XN = {
   key: 0,
   class: "chat-info-drawer__confirm-checkbox"
-}, YN = /* @__PURE__ */ Re({
+}, YN = /* @__PURE__ */ Le({
   __name: "chat-info-drawer",
   props: {
     show: { type: Boolean },
@@ -31131,7 +31149,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
   },
   emits: ["update:show", "leave-group", "destroy-group", "clear-history", "add-member", "group-operation", "chat-member", "remove-member", "set-admin", "remove-admin", "block-changed"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("UIKit:ChatInfoDrawer"), { t: i } = qe();
+    const s = n, o = t, r = Dt("UIKit:ChatInfoDrawer"), { t: i } = qe();
     function a(B, Y) {
       return i("common.charCount", "{current}/{max}").replace("{current}", String(B)).replace("{max}", String(Y));
     }
@@ -31144,40 +31162,40 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       changeGroupOwner: x,
       muteGroupMembers: T,
       unmuteGroupMembers: I,
-      blockGroupMembers: O,
+      blockGroupMembers: N,
       unblockGroupMembers: E
-    } = sn(), G = A(!1), N = A(), D = A(""), S = A(!1), C = A(!1), L = A(), J = A(""), te = A(!1), ve = A(!1), be = A(), W = A(""), re = A(!1), ue = k(
+    } = sn(), H = A(!1), D = A(), L = A(""), S = A(!1), C = A(!1), O = A(), q = A(""), te = A(!1), ye = A(!1), ke = A(), j = A(""), ie = A(!1), fe = k(
       () => {
         var B;
         return ((B = s.conversation) == null ? void 0 : B.type) === lt.SINGLECHAT ? s.conversation.id : void 0;
       }
-    ), { userInfo: j, avatarUrl: de, contact: se } = jt(ue);
+    ), { userInfo: V, avatarUrl: ue, contact: se } = jt(fe);
     Pe(
       () => {
         var B;
         return (B = se.value) == null ? void 0 : B.remark;
       },
       (B) => {
-        G.value || (D.value = B || "");
+        H.value || (L.value = B || "");
       },
       { immediate: !0 }
     );
     const Me = k(() => {
-      var B, Y, he, Le;
-      return ((B = s.conversation) == null ? void 0 : B.type) === lt.GROUPCHAT ? s.conversation.name || i("chat.info.unnamed") : ((Y = se.value) == null ? void 0 : Y.remark) || ((he = j.value) == null ? void 0 : he.nickname) || ((Le = s.conversation) == null ? void 0 : Le.name) || i("chat.info.unnamed");
+      var B, Y, me, Oe;
+      return ((B = s.conversation) == null ? void 0 : B.type) === lt.GROUPCHAT ? s.conversation.name || i("chat.info.unnamed") : ((Y = se.value) == null ? void 0 : Y.remark) || ((me = V.value) == null ? void 0 : me.nickname) || ((Oe = s.conversation) == null ? void 0 : Oe.name) || i("chat.info.unnamed");
     }), ge = k(() => {
       var B, Y;
-      return ((B = s.conversation) == null ? void 0 : B.type) === lt.GROUPCHAT ? s.conversation.avatar : de.value || ((Y = s.conversation) == null ? void 0 : Y.avatar);
+      return ((B = s.conversation) == null ? void 0 : B.type) === lt.GROUPCHAT ? s.conversation.avatar : ue.value || ((Y = s.conversation) == null ? void 0 : Y.avatar);
     });
     function Ie() {
-      o("update:show", !1), G.value = !1, C.value = !1, ve.value = !1;
+      o("update:show", !1), H.value = !1, C.value = !1, ye.value = !1;
     }
     async function Ke() {
-      const B = ue.value;
+      const B = fe.value;
       if (B) {
         S.value = !0;
         try {
-          await l(B, D.value), G.value = !1;
+          await l(B, L.value), H.value = !1;
         } catch (Y) {
           f(Y instanceof Error ? Y.message : String(Y) || i("chat.info.remarkSaveFailed", "备注设置失败"), "error");
         } finally {
@@ -31187,65 +31205,65 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     }
     function _e() {
       var B;
-      D.value = ((B = se.value) == null ? void 0 : B.remark) || "", G.value = !1;
+      L.value = ((B = se.value) == null ? void 0 : B.remark) || "", H.value = !1;
     }
     const He = k(() => g.client.currentUser), ee = k(
       () => s.isGroup && s.conversation ? s.conversation.id : ""
-    ), me = k(
+    ), ve = k(
       () => ee.value ? g.group.getGroupById(ee.value) : void 0
     ), Be = k(
       () => ee.value ? R(ee.value) : []
-    ), tt = k(() => {
+    ), st = k(() => {
       var B;
       if (He.value)
         return (B = Be.value.find((Y) => Y.userId === He.value)) == null ? void 0 : B.role;
-    }), nt = k(() => tt.value === ut.OWNER), dt = k(() => tt.value === ut.ADMIN);
+    }), nt = k(() => st.value === ut.OWNER), dt = k(() => st.value === ut.ADMIN);
     Pe(
       () => {
         var B;
         return (B = s.conversation) == null ? void 0 : B.name;
       },
       (B) => {
-        C.value || (J.value = B || "");
+        C.value || (q.value = B || "");
       },
       { immediate: !0 }
     ), Pe(
       () => {
         var B;
-        return (B = me.value) == null ? void 0 : B.description;
+        return (B = ve.value) == null ? void 0 : B.description;
       },
       (B) => {
-        ve.value || (W.value = B || "");
+        ye.value || (j.value = B || "");
       },
       { immediate: !0 }
-    ), Pe(G, async (B) => {
+    ), Pe(H, async (B) => {
       var Y;
-      B && (await Ye(), (Y = N.value) == null || Y.focus());
+      B && (await Ye(), (Y = D.value) == null || Y.focus());
     }), Pe(C, async (B) => {
       var Y;
-      B && (await Ye(), (Y = L.value) == null || Y.focus());
-    }), Pe(ve, async (B) => {
+      B && (await Ye(), (Y = O.value) == null || Y.focus());
+    }), Pe(ye, async (B) => {
       var Y;
-      B && (await Ye(), (Y = be.value) == null || Y.focus());
+      B && (await Ye(), (Y = ke.value) == null || Y.focus());
     });
-    async function vt() {
+    async function gt() {
       var Y;
       const B = ee.value;
       if (B) {
-        if (J.value.length > Nt.NAME_MAX_LENGTH) {
-          f(i("chat.info.groupNameTooLong").replace("{max}", String(Nt.NAME_MAX_LENGTH)), "error");
+        if (q.value.length > Lt.NAME_MAX_LENGTH) {
+          f(i("chat.info.groupNameTooLong").replace("{max}", String(Lt.NAME_MAX_LENGTH)), "error");
           return;
         }
         te.value = !0;
         try {
-          const he = (Y = g.group.getGroupById(B)) == null ? void 0 : Y.groupName;
-          await M(B, { name: J.value }), C.value = !1, he && he !== J.value && qn(g, B, lt.GROUPCHAT, {
+          const me = (Y = g.group.getGroupById(B)) == null ? void 0 : Y.groupName;
+          await M(B, { name: q.value }), C.value = !1, me && me !== q.value && qn(g, B, lt.GROUPCHAT, {
             eventType: Fn.GROUP_NAME_CHANGED,
-            params: { name: J.value },
-            defaultText: i("chat.notice.groupNameChanged").replace("{name}", J.value)
-          }), g.conversation.updateConversation(B, { name: J.value }), f(i("chat.info.groupInfoUpdated", "更新成功"), "success");
-        } catch (he) {
-          f(he instanceof Error ? he.message : String(he) || i("chat.info.groupInfoUpdateFailed", "更新失败"), "error");
+            params: { name: q.value },
+            defaultText: i("chat.notice.groupNameChanged").replace("{name}", q.value)
+          }), g.conversation.updateConversation(B, { name: q.value }), f(i("chat.info.groupInfoUpdated", "更新成功"), "success");
+        } catch (me) {
+          f(me instanceof Error ? me.message : String(me) || i("chat.info.groupInfoUpdateFailed", "更新失败"), "error");
         } finally {
           te.value = !1;
         }
@@ -31253,38 +31271,38 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     }
     function kt() {
       var B;
-      J.value = ((B = s.conversation) == null ? void 0 : B.name) || "", C.value = !1;
+      q.value = ((B = s.conversation) == null ? void 0 : B.name) || "", C.value = !1;
     }
-    async function fe() {
+    async function he() {
       const B = ee.value;
       if (B) {
-        if (W.value.length > Nt.DESCRIPTION_MAX_LENGTH) {
-          f(i("chat.info.groupDescriptionTooLong").replace("{max}", String(Nt.DESCRIPTION_MAX_LENGTH)), "error");
+        if (j.value.length > Lt.DESCRIPTION_MAX_LENGTH) {
+          f(i("chat.info.groupDescriptionTooLong").replace("{max}", String(Lt.DESCRIPTION_MAX_LENGTH)), "error");
           return;
         }
-        re.value = !0;
+        ie.value = !0;
         try {
-          await M(B, { description: W.value }), ve.value = !1, await v(B), f(i("chat.info.groupInfoUpdated", "更新成功"), "success");
+          await M(B, { description: j.value }), ye.value = !1, await v(B), f(i("chat.info.groupInfoUpdated", "更新成功"), "success");
         } catch (Y) {
           f(Y instanceof Error ? Y.message : String(Y) || i("chat.info.groupInfoUpdateFailed", "更新失败"), "error");
         } finally {
-          re.value = !1;
+          ie.value = !1;
         }
       }
     }
-    const Z = A(!1), ie = A(), ke = k(() => {
+    const Q = A(!1), ae = A(), we = k(() => {
       var B;
-      return He.value ? nt.value || dt.value ? !0 : ((B = me.value) == null ? void 0 : B.allowInvites) === !0 : !1;
-    }), Q = k(
+      return He.value ? nt.value || dt.value ? !0 : ((B = ve.value) == null ? void 0 : B.allowInvites) === !0 : !1;
+    }), X = k(
       () => {
         var B;
-        return ((B = me.value) == null ? void 0 : B.memberCount) ?? Be.value.length;
+        return ((B = ve.value) == null ? void 0 : B.memberCount) ?? Be.value.length;
       }
-    ), H = A(!1);
-    async function ae() {
+    ), U = A(!1);
+    async function le() {
       const B = ee.value;
       if (B) {
-        H.value = !0;
+        U.value = !0;
         try {
           await Promise.all([
             v(B),
@@ -31294,14 +31312,14 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         } catch (Y) {
           r.warn("[ChatInfoDrawer] load group data failed:", Je(Y)), f(i("chat.info.loadGroupInfoFailed", "群信息加载失败"), "error");
         } finally {
-          H.value = !1;
+          U.value = !1;
         }
       }
     }
     Pe(
       () => [s.show, s.isGroup, ee.value],
-      ([B, Y, he]) => {
-        B && Y && he && ae(), B || (Z.value = !1);
+      ([B, Y, me]) => {
+        B && Y && me && le(), B || (Q.value = !1);
       },
       { immediate: !0 }
     );
@@ -31313,8 +31331,8 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       deleteConversation: !1
     });
     function pe(B) {
-      var he;
-      (he = s.conversation) != null && he.id && (B === "leave" ? K.value = {
+      var me;
+      (me = s.conversation) != null && me.id && (B === "leave" ? K.value = {
         show: !0,
         title: i("chat.info.leaveGroup", "退出群聊"),
         content: i("chat.info.leaveGroupConfirm", "确定退出该群聊吗？"),
@@ -31354,12 +31372,12 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         f(Y instanceof Error ? Y.message : String(Y) || i("chat.info.deleteFriendFailed", "删除好友失败"), "error");
       }
     }
-    const Qe = k(() => !h.enableBlocklist || !ue.value ? !1 : u(ue.value));
-    function wt() {
-      ue.value && pe(Qe.value ? "unblock" : "block");
+    const Ze = k(() => !h.enableBlocklist || !fe.value ? !1 : u(fe.value));
+    function St() {
+      fe.value && pe(Ze.value ? "unblock" : "block");
     }
-    async function St(B) {
-      const Y = ue.value;
+    async function wt(B) {
+      const Y = fe.value;
       if (Y)
         try {
           B ? (await d({
@@ -31371,43 +31389,43 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           f(i("contact.detail.actionFailed", "操作失败"), "error");
         }
     }
-    async function on(B) {
+    async function hn(B) {
       const Y = ee.value;
       if (Y)
         try {
           await T(Y, [B.userId], -1), f(i("toast.success", "操作成功"), "success");
-        } catch (he) {
-          f(he instanceof Error ? he.message : String(he) || i("toast.error", "操作失败"), "error");
+        } catch (me) {
+          f(me instanceof Error ? me.message : String(me) || i("toast.error", "操作失败"), "error");
+        }
+    }
+    async function on(B) {
+      const Y = ee.value;
+      if (Y)
+        try {
+          await I(Y, [B.userId]), f(i("toast.success", "操作成功"), "success");
+        } catch (me) {
+          f(me instanceof Error ? me.message : String(me) || i("toast.error", "操作失败"), "error");
         }
     }
     async function Jt(B) {
       const Y = ee.value;
       if (Y)
         try {
-          await I(Y, [B.userId]), f(i("toast.success", "操作成功"), "success");
-        } catch (he) {
-          f(he instanceof Error ? he.message : String(he) || i("toast.error", "操作失败"), "error");
+          await N(Y, [B.userId]), f(i("toast.success", "操作成功"), "success");
+        } catch (me) {
+          f(me instanceof Error ? me.message : String(me) || i("toast.error", "操作失败"), "error");
         }
     }
-    async function Zt(B) {
-      const Y = ee.value;
-      if (Y)
-        try {
-          await O(Y, [B.userId]), f(i("toast.success", "操作成功"), "success");
-        } catch (he) {
-          f(he instanceof Error ? he.message : String(he) || i("toast.error", "操作失败"), "error");
-        }
-    }
-    async function rn(B) {
+    async function Xt(B) {
       const Y = ee.value;
       if (Y)
         try {
           await E(Y, [B.userId]), f(i("toast.success", "操作成功"), "success");
-        } catch (he) {
-          f(he instanceof Error ? he.message : String(he) || i("toast.error", "操作失败"), "error");
+        } catch (me) {
+          f(me instanceof Error ? me.message : String(me) || i("toast.error", "操作失败"), "error");
         }
     }
-    function ye(B) {
+    function be(B) {
       ee.value && (K.value = {
         show: !0,
         title: i("group.memberList.transferOwner", "转让群主"),
@@ -31417,67 +31435,67 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         targetUserName: B.nickname || B.userId
       });
     }
-    async function Ae(B, Y) {
-      const he = ee.value;
-      if (he) {
-        g.group.setPendingOwnerTransfer(he, B);
+    async function Re(B, Y) {
+      const me = ee.value;
+      if (me) {
+        g.group.setPendingOwnerTransfer(me, B);
         try {
-          await x(he, B);
-          const Le = { owner: B };
-          He.value && (Le.role = ut.MEMBER), g.group.updateGroup(he, Le), g.group.updateGroupMemberRole(he, B, ut.OWNER), He.value && g.group.updateGroupMemberRole(he, He.value, ut.MEMBER);
-          const ot = Y || B;
-          qn(g, he, lt.GROUPCHAT, {
+          await x(me, B);
+          const Oe = { owner: B };
+          He.value && (Oe.role = ut.MEMBER), g.group.updateGroup(me, Oe), g.group.updateGroupMemberRole(me, B, ut.OWNER), He.value && g.group.updateGroupMemberRole(me, He.value, ut.MEMBER);
+          const rt = Y || B;
+          qn(g, me, lt.GROUPCHAT, {
             eventType: Fn.OWNER_CHANGED,
-            params: { name: ot, ownerId: B },
-            defaultText: i("chat.notice.ownerChanged").replace("{name}", ot)
+            params: { name: rt, ownerId: B },
+            defaultText: i("chat.notice.ownerChanged").replace("{name}", rt)
           }), f(i("chat.info.transferOwnerSuccess", "群主已转让"), "success");
-        } catch (Le) {
-          g.group.clearPendingOwnerTransfer(he), f(Le instanceof Error ? Le.message : String(Le) || i("chat.info.transferOwnerFailed", "转让群主失败"), "error");
+        } catch (Oe) {
+          g.group.clearPendingOwnerTransfer(me), f(Oe instanceof Error ? Oe.message : String(Oe) || i("chat.info.transferOwnerFailed", "转让群主失败"), "error");
         }
       }
     }
-    function F() {
-      var Le, ot;
-      const B = K.value.action, Y = (Le = s.conversation) == null ? void 0 : Le.id, he = (ot = s.conversation) == null ? void 0 : ot.type;
-      if (!(!B || !Y || !he)) {
+    function oe() {
+      var Oe, rt;
+      const B = K.value.action, Y = (Oe = s.conversation) == null ? void 0 : Oe.id, me = (rt = s.conversation) == null ? void 0 : rt.type;
+      if (!(!B || !Y || !me)) {
         if (B === "leave")
           o("leave-group", Y);
         else if (B === "destroy")
           o("destroy-group", Y);
         else if (B === "clear")
-          o("clear-history", { id: Y, type: he, deleteConversation: K.value.deleteConversation });
+          o("clear-history", { id: Y, type: me, deleteConversation: K.value.deleteConversation });
         else if (B === "deleteFriend")
           Ne(Y);
         else if (B === "block")
-          St(!0);
+          wt(!0);
         else if (B === "unblock")
-          St(!1);
+          wt(!1);
         else if (B === "transferOwner") {
           const We = K.value.targetUserId;
-          We && Ae(We, K.value.targetUserName);
+          We && Re(We, K.value.targetUserName);
         }
         K.value.show = !1, K.value.action = null, K.value.targetUserId = void 0, K.value.targetUserName = void 0;
       }
     }
-    function le() {
+    function Z() {
       s.isGroup ? pe(nt.value ? "destroy" : "leave") : pe("deleteFriend");
     }
-    function oe() {
+    function ce() {
       pe("clear");
     }
-    function we() {
-      Z.value = !0;
+    function re() {
+      Q.value = !0;
     }
-    function De() {
-      Z.value = !0;
+    function Ee() {
+      Q.value = !0;
     }
-    function Ge() {
-      Z.value = !0;
+    function Ve() {
+      Q.value = !0;
     }
-    function it() {
-      Z.value = !1;
+    function Qe() {
+      Q.value = !1;
     }
-    function Pt(B) {
+    function Rt(B) {
       o("update:show", !1), o("chat-member", B);
     }
     const en = k(() => i("chat.info.groupMembers", "群成员"));
@@ -31485,65 +31503,65 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
       const B = ee.value;
       B && o("add-member", B);
     }
-    const tn = k(() => Be.value.slice(0, 6)), Bt = k(() => Be.value.length > tn.value.length);
+    const tn = k(() => Be.value.slice(0, 6)), Pt = k(() => Be.value.length > tn.value.length);
     e({
       /** 移除成员（更新 store 成员缓存） */
       removeMember: (B) => {
         var Y;
-        return (Y = ie.value) == null ? void 0 : Y.removeMember(B);
+        return (Y = ae.value) == null ? void 0 : Y.removeMember(B);
       },
       /** 设置成员角色（更新 store 成员缓存） */
       setMemberRole: (B, Y) => {
-        var he;
-        return (he = ie.value) == null ? void 0 : he.setMemberRole(B, Y);
+        var me;
+        return (me = ae.value) == null ? void 0 : me.setMemberRole(B, Y);
       },
       /** 刷新成员列表 */
       refreshMemberList: () => {
         var B;
-        return (B = ie.value) == null ? void 0 : B.refresh();
+        return (B = ae.value) == null ? void 0 : B.refresh();
       }
     });
-    const un = k(() => ({
+    const cn = k(() => ({
       conversation: s.conversation,
       isGroup: s.isGroup ?? !1,
       groupId: ee.value,
-      group: me.value,
+      group: ve.value,
       members: Be.value,
-      memberCount: Q.value,
+      memberCount: X.value,
       currentUserId: He.value ?? "",
       isOwner: nt.value,
       isAdmin: dt.value,
-      canAddMember: ke.value,
-      loadingGroup: H.value,
-      showMemberList: Z.value,
-      closeMemberList: it,
+      canAddMember: we.value,
+      loadingGroup: U.value,
+      showMemberList: Q.value,
+      closeMemberList: Qe,
       close: Ie
     }));
     return (B, Y) => (y(), w($e, null, [
-      q(ou, {
+      W(ou, {
         show: s.show,
         overlay: !1,
         "offset-top": s.offsetTop,
-        "onUpdate:show": Y[13] || (Y[13] = (he) => o("update:show", he)),
+        "onUpdate:show": Y[13] || (Y[13] = (me) => o("update:show", me)),
         onClose: Ie
       }, At({
-        header: X(() => [
-          V(B.$slots, "drawer-header", Fe(Ue(un.value)), () => [
-            Z.value ? (y(), w("div", pN, [
-              q(m(pt), {
+        header: J(() => [
+          G(B.$slots, "drawer-header", Fe(Ue(cn.value)), () => [
+            Q.value ? (y(), w("div", pN, [
+              W(m(pt), {
                 class: "chat-info-drawer__back",
                 icon: "chevron/left",
                 size: "small",
                 variant: "ghost",
                 title: m(i)("button.back", "返回"),
-                onClick: it
+                onClick: Qe
               }, null, 8, ["title"]),
               _("span", hN, P(en.value), 1),
               Y[17] || (Y[17] = _("span", { class: "chat-info-drawer__header-placeholder" }, null, -1))
             ])) : (y(), w("div", dN, [
               Y[16] || (Y[16] = _("span", { class: "chat-info-drawer__header-placeholder" }, null, -1)),
               _("span", fN, P(n.isGroup ? m(i)("chat.info.titleGroup") : m(i)("chat.info.titleFriend")), 1),
-              q(m(pt), {
+              W(m(pt), {
                 class: "chat-info-drawer__close",
                 icon: "xmark/light",
                 size: "small",
@@ -31554,38 +31572,38 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             ]))
           ], !0)
         ]),
-        default: X(() => [
+        default: J(() => [
           _("div", mN, [
-            Z.value ? V(B.$slots, "drawer-member-detail", Fe(Ue(un.value)), () => [
+            Q.value ? G(B.$slots, "drawer-member-detail", Fe(Ue(cn.value)), () => [
               _("div", WN, [
-                ee.value ? (y(), ce($g, {
+                ee.value ? (y(), de($g, {
                   key: 0,
                   ref_key: "memberListRef",
-                  ref: ie,
+                  ref: ae,
                   "group-id": ee.value,
                   "current-user-id": He.value,
                   "allow-chat": s.allowChat,
                   "show-header": !1,
                   closable: "",
-                  onClose: it,
-                  onChatMember: Pt,
-                  onRemoveMember: Y[10] || (Y[10] = (he) => o("remove-member", he)),
-                  onSetAdmin: Y[11] || (Y[11] = (he) => o("set-admin", he)),
-                  onRemoveAdmin: Y[12] || (Y[12] = (he) => o("remove-admin", he)),
-                  onMuteMember: on,
-                  onUnmuteMember: Jt,
-                  onBlockMember: Zt,
-                  onUnblockMember: rn,
-                  onTransferOwner: ye
-                }, null, 8, ["group-id", "current-user-id", "allow-chat"])) : U("", !0)
+                  onClose: Qe,
+                  onChatMember: Rt,
+                  onRemoveMember: Y[10] || (Y[10] = (me) => o("remove-member", me)),
+                  onSetAdmin: Y[11] || (Y[11] = (me) => o("set-admin", me)),
+                  onRemoveAdmin: Y[12] || (Y[12] = (me) => o("remove-admin", me)),
+                  onMuteMember: hn,
+                  onUnmuteMember: on,
+                  onBlockMember: Jt,
+                  onUnblockMember: Xt,
+                  onTransferOwner: be
+                }, null, 8, ["group-id", "current-user-id", "allow-chat"])) : F("", !0)
               ])
             ], !0, 1) : (y(), w($e, { key: 0 }, [
-              V(B.$slots, "drawer-profile", Fe(Ue(un.value)), () => {
-                var he, Le, ot, We;
+              G(B.$slots, "drawer-profile", Fe(Ue(cn.value)), () => {
+                var me, Oe, rt, We;
                 return [
                   _("div", gN, [
                     _("div", vN, [
-                      q(m($t), {
+                      W(m($t), {
                         name: Me.value,
                         src: ge.value,
                         size: 64
@@ -31594,102 +31612,102 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                         C.value ? (y(), w("div", kN, [
                           Dn(_("input", {
                             ref_key: "groupNameInputRef",
-                            ref: L,
-                            "onUpdate:modelValue": Y[1] || (Y[1] = (ct) => J.value = ct),
+                            ref: O,
+                            "onUpdate:modelValue": Y[1] || (Y[1] = (ct) => q.value = ct),
                             class: "chat-info-drawer__inline-input",
                             placeholder: Me.value,
-                            maxlength: m(Nt).NAME_MAX_LENGTH,
+                            maxlength: m(Lt).NAME_MAX_LENGTH,
                             onKeydown: [
-                              ms(vt, ["enter"]),
+                              ms(gt, ["enter"]),
                               ms(kt, ["esc"])
                             ]
                           }, null, 40, wN), [
-                            [ts, J.value]
+                            [ts, q.value]
                           ]),
                           _("div", {
-                            class: Te(["chat-info-drawer__char-count", { "is-near-limit": J.value.length > m(Nt).NAME_MAX_LENGTH * 0.9 }])
-                          }, P(a(J.value.length, m(Nt).NAME_MAX_LENGTH)), 3),
+                            class: Te(["chat-info-drawer__char-count", { "is-near-limit": q.value.length > m(Lt).NAME_MAX_LENGTH * 0.9 }])
+                          }, P(a(q.value.length, m(Lt).NAME_MAX_LENGTH)), 3),
                           _("div", _N, [
-                            q(m(pt), {
+                            W(m(pt), {
                               icon: "xmark/bold",
                               size: "small",
                               type: "danger",
                               title: m(i)("button.cancel", "取消"),
                               onClick: kt
                             }, null, 8, ["title"]),
-                            q(m(pt), {
+                            W(m(pt), {
                               class: "chat-info-drawer__inline-save",
                               icon: "check/single",
                               size: "small",
                               type: "success",
                               disabled: te.value,
                               title: m(i)("chat.info.save", "保存"),
-                              onClick: vt
+                              onClick: gt
                             }, null, 8, ["disabled", "title"])
                           ])
                         ])) : (y(), w($e, { key: 0 }, [
                           _("span", bN, P(Me.value), 1),
-                          nt.value ? (y(), ce(m(pt), {
+                          nt.value ? (y(), de(m(pt), {
                             key: 0,
                             icon: "rect/pencil",
                             size: "small",
                             type: "primary",
                             title: m(i)("chat.info.edit", "编辑"),
                             onClick: Y[0] || (Y[0] = (ct) => C.value = !0)
-                          }, null, 8, ["title"])) : U("", !0)
+                          }, null, 8, ["title"])) : F("", !0)
                         ], 64))
                       ])) : (y(), w("div", CN, P(Me.value), 1)),
-                      n.isGroup && ((he = me.value) != null && he.description || nt.value) ? (y(), w("div", MN, [
-                        ve.value ? (y(), w("div", SN, [
+                      n.isGroup && ((me = ve.value) != null && me.description || nt.value) ? (y(), w("div", MN, [
+                        ye.value ? (y(), w("div", SN, [
                           Dn(_("textarea", {
                             ref_key: "descriptionInputRef",
-                            ref: be,
-                            "onUpdate:modelValue": Y[3] || (Y[3] = (ct) => W.value = ct),
+                            ref: ke,
+                            "onUpdate:modelValue": Y[3] || (Y[3] = (ct) => j.value = ct),
                             class: "chat-info-drawer__inline-textarea",
                             placeholder: m(i)("chat.info.noGroupDescription", "暂无群介绍"),
                             rows: "2",
-                            maxlength: m(Nt).DESCRIPTION_MAX_LENGTH,
-                            onKeydown: Y[4] || (Y[4] = ms((ct) => ve.value = !1, ["esc"]))
+                            maxlength: m(Lt).DESCRIPTION_MAX_LENGTH,
+                            onKeydown: Y[4] || (Y[4] = ms((ct) => ye.value = !1, ["esc"]))
                           }, null, 40, IN), [
-                            [ts, W.value]
+                            [ts, j.value]
                           ]),
                           _("div", {
-                            class: Te(["chat-info-drawer__char-count", { "is-near-limit": W.value.length > m(Nt).DESCRIPTION_MAX_LENGTH * 0.9 }])
-                          }, P(a(W.value.length, m(Nt).DESCRIPTION_MAX_LENGTH)), 3),
+                            class: Te(["chat-info-drawer__char-count", { "is-near-limit": j.value.length > m(Lt).DESCRIPTION_MAX_LENGTH * 0.9 }])
+                          }, P(a(j.value.length, m(Lt).DESCRIPTION_MAX_LENGTH)), 3),
                           _("div", xN, [
-                            q(m(pt), {
+                            W(m(pt), {
                               icon: "xmark/bold",
                               size: "small",
                               type: "danger",
                               title: m(i)("button.cancel", "取消"),
-                              onClick: Y[5] || (Y[5] = (ct) => ve.value = !1)
+                              onClick: Y[5] || (Y[5] = (ct) => ye.value = !1)
                             }, null, 8, ["title"]),
-                            q(m(pt), {
+                            W(m(pt), {
                               class: "chat-info-drawer__inline-save",
                               icon: "check/single",
                               size: "small",
                               type: "success",
-                              disabled: re.value,
+                              disabled: ie.value,
                               title: m(i)("chat.info.save", "保存"),
-                              onClick: fe
+                              onClick: he
                             }, null, 8, ["disabled", "title"])
                           ])
                         ])) : (y(), w($e, { key: 0 }, [
                           _("span", {
-                            class: Te(["chat-info-drawer__description-text", { "is-placeholder": !((Le = me.value) != null && Le.description) }])
-                          }, P(((ot = me.value) == null ? void 0 : ot.description) || m(i)("chat.info.noGroupDescription", "暂无群介绍")), 3),
-                          nt.value ? (y(), ce(m(pt), {
+                            class: Te(["chat-info-drawer__description-text", { "is-placeholder": !((Oe = ve.value) != null && Oe.description) }])
+                          }, P(((rt = ve.value) == null ? void 0 : rt.description) || m(i)("chat.info.noGroupDescription", "暂无群介绍")), 3),
+                          nt.value ? (y(), de(m(pt), {
                             key: 0,
                             icon: "rect/pencil",
                             size: "small",
                             type: "primary",
                             title: m(i)("chat.info.edit", "编辑"),
-                            onClick: Y[2] || (Y[2] = ft((ct) => ve.value = !0, ["stop"]))
-                          }, null, 8, ["title"])) : U("", !0)
+                            onClick: Y[2] || (Y[2] = ft((ct) => ye.value = !0, ["stop"]))
+                          }, null, 8, ["title"])) : F("", !0)
                         ], 64))
-                      ])) : U("", !0),
+                      ])) : F("", !0),
                       _("div", TN, [
-                        q(m(di), {
+                        W(m(di), {
                           text: ((We = s.conversation) == null ? void 0 : We.id) || "",
                           label: "ID:"
                         }, null, 8, ["text"])
@@ -31698,15 +31716,15 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                   ])
                 ];
               }, !0),
-              n.isGroup ? U("", !0) : (y(), w("div", EN, [
+              n.isGroup ? F("", !0) : (y(), w("div", EN, [
                 _("div", AN, P(m(i)("chat.info.remark")), 1),
-                V(B.$slots, "drawer-remark", Fe(Ue(un.value)), () => [
+                G(B.$slots, "drawer-remark", Fe(Ue(cn.value)), () => [
                   _("div", $N, [
-                    G.value ? (y(), w("div", RN, [
+                    H.value ? (y(), w("div", RN, [
                       Dn(_("input", {
                         ref_key: "remarkInputRef",
-                        ref: N,
-                        "onUpdate:modelValue": Y[8] || (Y[8] = (he) => D.value = he),
+                        ref: D,
+                        "onUpdate:modelValue": Y[8] || (Y[8] = (me) => L.value = me),
                         class: "chat-info-drawer__remark-input",
                         placeholder: m(i)("chat.info.remarkInputPlaceholder"),
                         onKeydown: [
@@ -31714,16 +31732,16 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                           ms(_e, ["esc"])
                         ]
                       }, null, 40, NN), [
-                        [ts, D.value]
+                        [ts, L.value]
                       ]),
-                      q(m(pt), {
+                      W(m(pt), {
                         icon: "xmark/bold",
                         size: "small",
                         type: "danger",
                         title: m(i)("button.cancel", "取消"),
                         onClick: _e
                       }, null, 8, ["title"]),
-                      q(m(pt), {
+                      W(m(pt), {
                         class: "chat-info-drawer__remark-save",
                         icon: "check/single",
                         size: "small",
@@ -31735,90 +31753,90 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                     ])) : (y(), w("div", {
                       key: 0,
                       class: "chat-info-drawer__remark",
-                      onClick: Y[7] || (Y[7] = (he) => G.value = !0)
+                      onClick: Y[7] || (Y[7] = (me) => H.value = !0)
                     }, [
-                      _("span", null, P(D.value || m(i)("chat.info.remarkPlaceholder")), 1),
-                      q(m(pt), {
+                      _("span", null, P(L.value || m(i)("chat.info.remarkPlaceholder")), 1),
+                      W(m(pt), {
                         icon: "rect/pencil",
                         size: "small",
                         type: "primary",
                         title: m(i)("chat.info.edit", "编辑"),
-                        onClick: Y[6] || (Y[6] = ft((he) => G.value = !0, ["stop"]))
+                        onClick: Y[6] || (Y[6] = ft((me) => H.value = !0, ["stop"]))
                       }, null, 8, ["title"])
                     ]))
                   ])
                 ], !0)
               ])),
               n.isGroup ? (y(), w("div", LN, [
-                V(B.$slots, "drawer-announcement", Fe(Ue(un.value)), () => [
-                  q(Rg, {
+                G(B.$slots, "drawer-announcement", Fe(Ue(cn.value)), () => [
+                  W(Rg, {
                     "group-id": ee.value,
-                    loading: H.value
+                    loading: U.value
                   }, null, 8, ["group-id", "loading"])
                 ], !0)
-              ])) : U("", !0),
+              ])) : F("", !0),
               n.isGroup ? (y(), w("div", ON, [
                 _("div", DN, [
                   _("span", BN, [
                     mt(P(m(i)("chat.info.groupMembers")) + " ", 1),
-                    _("span", PN, "(" + P(Q.value) + ")", 1)
+                    _("span", PN, "(" + P(X.value) + ")", 1)
                   ])
                 ]),
-                V(B.$slots, "drawer-members", Fe(Ue(un.value)), () => [
+                G(B.$slots, "drawer-members", Fe(Ue(cn.value)), () => [
                   _("div", zN, [
                     _("div", {
                       class: "chat-info-drawer__member-grid",
-                      onClick: we
+                      onClick: re
                     }, [
-                      (y(!0), w($e, null, et(tn.value, (he) => (y(), ce(uN, {
-                        key: he.userId,
-                        member: he
+                      (y(!0), w($e, null, tt(tn.value, (me) => (y(), de(uN, {
+                        key: me.userId,
+                        member: me
                       }, null, 8, ["member"]))), 128)),
-                      ke.value ? (y(), w("div", {
+                      we.value ? (y(), w("div", {
                         key: 0,
                         class: "chat-info-drawer__member-cell chat-info-drawer__member-cell--add",
                         onClick: ft(kn, ["stop"])
                       }, [
-                        q(m(Oe), {
+                        W(m(De), {
                           name: "plus",
                           size: 48
                         })
-                      ])) : U("", !0)
+                      ])) : F("", !0)
                     ]),
-                    Bt.value || Be.value.length === 0 ? (y(), w("button", {
+                    Pt.value || Be.value.length === 0 ? (y(), w("button", {
                       key: 0,
                       class: "chat-info-drawer__view-all",
-                      onClick: ft(we, ["stop"])
-                    }, P(Be.value.length === 0 ? m(i)("chat.info.viewAllMembersEmpty") : m(i)("chat.info.viewAllMembers")), 1)) : U("", !0)
+                      onClick: ft(re, ["stop"])
+                    }, P(Be.value.length === 0 ? m(i)("chat.info.viewAllMembersEmpty") : m(i)("chat.info.viewAllMembers")), 1)) : F("", !0)
                   ])
                 ], !0)
-              ])) : U("", !0),
+              ])) : F("", !0),
               n.isGroup && nt.value ? (y(), w("div", FN, [
                 _("div", UN, P(m(i)("chat.info.groupAdminActions", "群主操作")), 1),
-                V(B.$slots, "drawer-admin-actions", Fe(Ue(un.value)), () => [
+                G(B.$slots, "drawer-admin-actions", Fe(Ue(cn.value)), () => [
                   _("div", HN, [
-                    q(m(Tt), {
+                    W(m(Tt), {
                       title: m(i)("chat.info.transferOwnerEntry", "转让群主"),
                       size: "compact",
                       "inset-hover": !1,
-                      onClick: De
+                      onClick: Ee
                     }, {
-                      leading: X(() => [
-                        q(m(Oe), {
+                      leading: J(() => [
+                        W(m(De), {
                           name: "crown",
                           size: 18
                         })
                       ]),
                       _: 1
                     }, 8, ["title"]),
-                    q(m(Tt), {
+                    W(m(Tt), {
                       title: m(i)("chat.info.setAdminEntry", "设置管理员"),
                       size: "compact",
                       "inset-hover": !1,
-                      onClick: Ge
+                      onClick: Ve
                     }, {
-                      leading: X(() => [
-                        q(m(Oe), {
+                      leading: J(() => [
+                        W(m(De), {
                           name: "shield/person",
                           size: 18
                         })
@@ -31827,12 +31845,12 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                     }, 8, ["title"])
                   ])
                 ], !0)
-              ])) : U("", !0),
+              ])) : F("", !0),
               n.isGroup ? (y(), w("div", GN, [
                 _("div", VN, P(m(i)("group.management.title", "群管理")), 1),
-                V(B.$slots, "drawer-management", Fe(Ue(un.value)), () => [
+                G(B.$slots, "drawer-management", Fe(Ue(cn.value)), () => [
                   _("div", jN, [
-                    q(Ag, {
+                    W(Ag, {
                       "group-id": ee.value,
                       "display-mode": s.groupManagementDisplayMode,
                       "show-mute-all": s.showMuteAll,
@@ -31841,35 +31859,35 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                       "show-allowlist": s.showAllowlist,
                       "show-shared-files": s.showSharedFiles,
                       "show-join-requests": s.showJoinRequests,
-                      onGroupOperation: Y[9] || (Y[9] = (he) => o("group-operation", he))
+                      onGroupOperation: Y[9] || (Y[9] = (me) => o("group-operation", me))
                     }, null, 8, ["group-id", "display-mode", "show-mute-all", "show-mute-list", "show-blocklist", "show-allowlist", "show-shared-files", "show-join-requests"])
                   ])
                 ], !0)
-              ])) : U("", !0),
-              V(B.$slots, "drawer-actions", Fe(Ue(un.value)), () => [
+              ])) : F("", !0),
+              G(B.$slots, "drawer-actions", Fe(Ue(cn.value)), () => [
                 _("div", KN, [
-                  !n.isGroup && m(h).enableBlocklist && ue.value ? (y(), ce(m(xn), {
+                  !n.isGroup && m(h).enableBlocklist && fe.value ? (y(), de(m(xn), {
                     key: 0,
                     type: "danger-outline",
                     block: "",
-                    onClick: wt
+                    onClick: St
                   }, {
-                    default: X(() => [
-                      q(m(Oe), {
-                        name: Qe.value ? "person/check" : "person/xmark",
+                    default: J(() => [
+                      W(m(De), {
+                        name: Ze.value ? "person/check" : "person/xmark",
                         size: 18
                       }, null, 8, ["name"]),
-                      mt(" " + P(Qe.value ? m(i)("contact.detail.unblock", "取消拉黑") : m(i)("contact.detail.block", "拉黑")), 1)
+                      mt(" " + P(Ze.value ? m(i)("contact.detail.unblock", "取消拉黑") : m(i)("contact.detail.block", "拉黑")), 1)
                     ]),
                     _: 1
-                  })) : U("", !0),
-                  q(m(xn), {
+                  })) : F("", !0),
+                  W(m(xn), {
                     type: "danger-outline",
                     block: "",
-                    onClick: oe
+                    onClick: ce
                   }, {
-                    default: X(() => [
-                      q(m(Oe), {
+                    default: J(() => [
+                      W(m(De), {
                         name: "trash",
                         size: 18
                       }),
@@ -31884,17 +31902,17 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
         ]),
         _: 2
       }, [
-        Z.value ? void 0 : {
+        Q.value ? void 0 : {
           name: "footer",
-          fn: X(() => [
-            V(B.$slots, "drawer-footer", Fe(Ue(un.value)), () => [
+          fn: J(() => [
+            G(B.$slots, "drawer-footer", Fe(Ue(cn.value)), () => [
               _("div", qN, [
-                q(m(xn), {
+                W(m(xn), {
                   type: "danger-outline",
                   block: "",
-                  onClick: le
+                  onClick: Z
                 }, {
-                  default: X(() => [
+                  default: J(() => [
                     mt(P(n.isGroup ? nt.value ? m(i)("chat.info.destroyGroup") : m(i)("chat.info.leaveGroup") : m(i)("chat.info.deleteFriend")), 1)
                   ]),
                   _: 1
@@ -31905,33 +31923,33 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           key: "0"
         }
       ]), 1032, ["show", "offset-top"]),
-      q(m(io), {
+      W(m(io), {
         show: K.value.show,
-        "onUpdate:show": Y[15] || (Y[15] = (he) => K.value.show = he),
+        "onUpdate:show": Y[15] || (Y[15] = (me) => K.value.show = me),
         title: K.value.title,
         "confirm-text": m(i)("button.confirm"),
         "cancel-text": m(i)("button.cancel"),
-        onConfirm: F
+        onConfirm: oe
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", JN, [
             _("p", null, P(K.value.content), 1),
             K.value.action === "clear" ? (y(), w("label", XN, [
               Dn(_("input", {
-                "onUpdate:modelValue": Y[14] || (Y[14] = (he) => K.value.deleteConversation = he),
+                "onUpdate:modelValue": Y[14] || (Y[14] = (me) => K.value.deleteConversation = me),
                 type: "checkbox"
               }, null, 512), [
                 [Rf, K.value.deleteConversation]
               ]),
               _("span", null, P(m(i)("chat.info.clearHistoryDeleteConversation", "同时删除会话")), 1)
-            ])) : U("", !0)
+            ])) : F("", !0)
           ])
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"])
     ], 64));
   }
-}), Ng = /* @__PURE__ */ ze(YN, [["__scopeId", "data-v-b0dda986"]]), QN = { class: "forward-modal__header" }, ZN = { class: "forward-modal__title" }, eL = { class: "forward-modal__search" }, tL = { class: "forward-modal__list" }, nL = /* @__PURE__ */ Re({
+}), Ng = /* @__PURE__ */ ze(YN, [["__scopeId", "data-v-b0dda986"]]), QN = { class: "forward-modal__header" }, ZN = { class: "forward-modal__title" }, eL = { class: "forward-modal__search" }, tL = { class: "forward-modal__list" }, nL = /* @__PURE__ */ Le({
   __name: "forward-modal",
   props: {
     show: { type: Boolean }
@@ -31953,14 +31971,14 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
     function d(p) {
       s("forward", p), u();
     }
-    return (p, f) => (y(), ce(m(Lt), {
+    return (p, f) => (y(), de(m(Ot), {
       show: t.show,
       position: m(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": f[1] || (f[1] = (h) => s("update:show", h)),
       onClose: u
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: Te(["forward-modal", { "forward-modal--mobile": m(i) }])
         }, [
@@ -31968,7 +31986,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             _("span", ZN, P(m(r)("message.action.forward")), 1)
           ]),
           _("div", eL, [
-            q(m(gn), {
+            W(m(gn), {
               modelValue: a.value,
               "onUpdate:modelValue": f[0] || (f[0] = (h) => a.value = h),
               variant: "search",
@@ -31979,15 +31997,15 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           _("div", tL, [
-            (y(!0), w($e, null, et(c.value, (h) => (y(), ce(m(Tt), {
+            (y(!0), w($e, null, tt(c.value, (h) => (y(), de(m(Tt), {
               key: h.id,
               title: h.name || h.id,
               subtitle: h.lastMessageText || void 0,
               "show-arrow": "",
               onClick: (g) => d(h)
             }, {
-              leading: X(() => [
-                q(m($t), {
+              leading: J(() => [
+                W(m($t), {
                   src: h.avatar,
                   name: h.name,
                   size: 40
@@ -31995,7 +32013,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               ]),
               _: 2
             }, 1032, ["title", "subtitle", "onClick"]))), 128)),
-            c.value.length ? U("", !0) : (y(), ce(m(Ht), {
+            c.value.length ? F("", !0) : (y(), de(m(Ht), {
               key: 0,
               icon: "bubble/rect/empty",
               description: m(r)("conversation.empty"),
@@ -32010,7 +32028,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
 }), Lg = /* @__PURE__ */ ze(nL, [["__scopeId", "data-v-e35f3c5b"]]), sL = { class: "multi-select-bar" }, oL = { class: "multi-select-bar__select-all-label" }, rL = {
   key: 0,
   class: "multi-select-bar__count"
-}, iL = { class: "multi-select-bar__actions" }, aL = { class: "multi-select-bar__icon" }, lL = { class: "multi-select-bar__icon" }, cL = { class: "multi-select-bar__modal-actions multi-select-bar__modal-actions--column" }, uL = { class: "multi-select-bar__modal-desc" }, dL = { class: "multi-select-bar__modal-actions" }, fL = /* @__PURE__ */ Re({
+}, iL = { class: "multi-select-bar__actions" }, aL = { class: "multi-select-bar__icon" }, lL = { class: "multi-select-bar__icon" }, cL = { class: "multi-select-bar__modal-actions multi-select-bar__modal-actions--column" }, uL = { class: "multi-select-bar__modal-desc" }, dL = { class: "multi-select-bar__modal-actions" }, fL = /* @__PURE__ */ Le({
   __name: "multi-select-bar",
   props: {
     selectedMessages: {},
@@ -32069,13 +32087,13 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           class: "multi-select-bar__select-all",
           onClick: d
         }, [
-          q(m(Oe), {
+          W(m(De), {
             name: u.value ? "circle/checked" : "circle/empty",
             size: 22,
             class: Te(["multi-select-bar__check-icon", { "multi-select-bar__check-icon--checked": u.value }])
           }, null, 8, ["name", "class"]),
           _("span", oL, P(u.value ? "取消全选" : "全选"), 1),
-          n.selectedMessages.length > 0 ? (y(), w("div", rL, P(n.selectedMessages.length) + "条 ", 1)) : U("", !0)
+          n.selectedMessages.length > 0 ? (y(), w("div", rL, P(n.selectedMessages.length) + "条 ", 1)) : F("", !0)
         ]),
         _("div", iL, [
           _("div", {
@@ -32083,7 +32101,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             onClick: h
           }, [
             _("div", aL, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "arrow/turn_right",
                 size: 22
               })
@@ -32095,7 +32113,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
             onClick: v
           }, [
             _("div", lL, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "trash",
                 size: 22,
                 type: "danger"
@@ -32109,7 +32127,7 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
           onClick: $
         }, " 取消 ")
       ]),
-      (y(), ce(Au, { to: "body" }, [
+      (y(), de(Au, { to: "body" }, [
         f.value ? (y(), w("div", {
           key: 0,
           class: "multi-select-bar__modal-overlay",
@@ -32130,16 +32148,16 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
                 key: 0,
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--option",
                 onClick: M[1] || (M[1] = (x) => g(m(hs).COMBINE))
-              }, " 合并转发 ")) : U("", !0),
+              }, " 合并转发 ")) : F("", !0),
               _("button", {
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel",
                 onClick: M[2] || (M[2] = (x) => f.value = !1)
               }, " 取消 ")
             ])
           ])
-        ])) : U("", !0)
+        ])) : F("", !0)
       ])),
-      (y(), ce(Au, { to: "body" }, [
+      (y(), de(Au, { to: "body" }, [
         p.value ? (y(), w("div", {
           key: 0,
           class: "multi-select-bar__modal-overlay",
@@ -32163,11 +32181,11 @@ const CA = { class: "rich-input__toolbar" }, MA = ["title"], SA = { class: "rich
               }, " 删除 ")
             ])
           ])
-        ])) : U("", !0)
+        ])) : F("", !0)
       ]))
     ], 64));
   }
-}), pL = /* @__PURE__ */ ze(fL, [["__scopeId", "data-v-4aa4b1c5"]]), bf = Ot("UIKit:UseMessageSearch"), hL = {
+}), pL = /* @__PURE__ */ ze(fL, [["__scopeId", "data-v-4aa4b1c5"]]), bf = Dt("UIKit:UseMessageSearch"), hL = {
   [Ce.TEXT]: "txt",
   [Ce.IMAGE]: "img",
   [Ce.VIDEO]: "video",
@@ -32199,12 +32217,12 @@ function gL(n = {}) {
     s.value = "", o.value = [], a.value = 1, l.value = !1, c.value = 0, i.value = "", u.value = "conversation", d.value = "", p.value = !1;
   }
   function v(T) {
-    const I = e.userInfo.getUserInfo(T.from), O = e.contact.getContact(T.from);
+    const I = e.userInfo.getUserInfo(T.from), N = e.contact.getContact(T.from);
     return {
       msgId: T.msgServerId || T.msgLocalId || "",
       conversationId: T.conversationId,
       senderId: T.from,
-      senderName: (O == null ? void 0 : O.remark) || (I == null ? void 0 : I.nickname) || T.from,
+      senderName: (N == null ? void 0 : N.remark) || (I == null ? void 0 : I.nickname) || T.from,
       avatar: I == null ? void 0 : I.avatarUrl,
       timestamp: T.timestamp,
       summary: kf(T)
@@ -32221,34 +32239,34 @@ function gL(n = {}) {
     return (T == null ? void 0 : T.code) === 505 || (T == null ? void 0 : T.name) === "service_not_enabled";
   }
   async function R() {
-    var C, L;
-    const I = Mt(n).pageSize ?? 20, O = u.value === "global", E = f.value;
-    if (!O && !(E != null && E.id))
+    var C, O;
+    const I = Mt(n).pageSize ?? 20, N = u.value === "global", E = f.value;
+    if (!N && !(E != null && E.id))
       return [];
-    const G = {
+    const H = {
       keywordList: [s.value.trim()],
       // 会话内搜索传会话 ID 与类型（必同传）；全局搜索两者都不传
-      ...!O && (E != null && E.id) ? {
+      ...!N && (E != null && E.id) ? {
         conversationId: E.id,
         conversationType: E.type === lt.GROUPCHAT ? lt.GROUPCHAT : lt.SINGLECHAT
       } : {},
       ...d.value ? { msgTypes: [hL[d.value]] } : {}
-    }, D = await ((L = (C = (t.value.client || {}).chatManager) == null ? void 0 : C.searchMessages) == null ? void 0 : L.call(C, {
-      option: G,
+    }, L = await ((O = (C = (t.value.client || {}).chatManager) == null ? void 0 : C.searchMessages) == null ? void 0 : O.call(C, {
+      option: H,
       pageNum: a.value,
       pageSize: I
     }));
-    return l.value = !(D != null && D.isLast), c.value = (D == null ? void 0 : D.totalPages) ?? -1, ((D == null ? void 0 : D.messages) || []).map((J) => {
-      const te = e.userInfo.getUserInfo(J.from), ve = e.contact.getContact(J.from);
+    return l.value = !(L != null && L.isLast), c.value = (L == null ? void 0 : L.totalPages) ?? -1, ((L == null ? void 0 : L.messages) || []).map((q) => {
+      const te = e.userInfo.getUserInfo(q.from), ye = e.contact.getContact(q.from);
       return {
-        msgId: J.id || J.msgId || J.msgServerId || J.msgLocalId || "",
-        conversationId: J.conversationId || (E == null ? void 0 : E.id) || "",
-        senderId: J.from,
-        senderName: (ve == null ? void 0 : ve.remark) || (te == null ? void 0 : te.nickname) || J.from,
+        msgId: q.id || q.msgId || q.msgServerId || q.msgLocalId || "",
+        conversationId: q.conversationId || (E == null ? void 0 : E.id) || "",
+        senderId: q.from,
+        senderName: (ye == null ? void 0 : ye.remark) || (te == null ? void 0 : te.nickname) || q.from,
         avatar: te == null ? void 0 : te.avatarUrl,
-        timestamp: J.time || J.timestamp,
-        summary: J.text || J.msg || kf(J),
-        highlighted: J.highlight
+        timestamp: q.time || q.timestamp,
+        summary: q.text || q.msg || kf(q),
+        highlighted: q.highlight
       };
     });
   }
@@ -32258,23 +32276,23 @@ function gL(n = {}) {
     T || (a.value = 1, o.value = []), r.value = !0, i.value = "";
     try {
       const E = u.value === "global" ? [] : b();
-      let G = [];
-      const N = Mt(n);
-      let D = !1;
-      if (N.enableServerSearch) {
+      let H = [];
+      const D = Mt(n);
+      let L = !1;
+      if (D.enableServerSearch) {
         T && (a.value += 1);
         try {
-          G = await R(), p.value = !1;
-        } catch (L) {
-          D = !0, T && (a.value = Math.max(1, a.value - 1)), $(L) && (p.value = !0), bf.warn("[useMessageSearch] server search failed:", L);
+          H = await R(), p.value = !1;
+        } catch (O) {
+          L = !0, T && (a.value = Math.max(1, a.value - 1)), $(O) && (p.value = !0), bf.warn("[useMessageSearch] server search failed:", O);
         }
       }
       const S = /* @__PURE__ */ new Set(), C = [];
-      for (const L of [...E, ...G])
-        !L.msgId || S.has(L.msgId) || (S.add(L.msgId), C.push(L));
-      return C.sort((L, J) => J.timestamp - L.timestamp), o.value = C, !D;
-    } catch (O) {
-      return i.value = (O == null ? void 0 : O.message) || String(O), bf.error("[useMessageSearch] search failed:", O), !1;
+      for (const O of [...E, ...H])
+        !O.msgId || S.has(O.msgId) || (S.add(O.msgId), C.push(O));
+      return C.sort((O, q) => q.timestamp - O.timestamp), o.value = C, !L;
+    } catch (N) {
+      return i.value = (N == null ? void 0 : N.message) || String(N), bf.error("[useMessageSearch] search failed:", N), !1;
     } finally {
       r.value = !1;
     }
@@ -32312,7 +32330,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }, NL = {
   key: 1,
   class: "message-search-modal__loading"
-}, LL = /* @__PURE__ */ Re({
+}, LL = /* @__PURE__ */ Le({
   __name: "message-search-modal",
   props: {
     show: { type: Boolean },
@@ -32321,9 +32339,9 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
   emits: ["update:show", "locate", "close"],
   setup(n, { emit: e }) {
     const t = n, s = e, { t: o } = qe(), { stores: r } = at(), i = k(() => {
-      var D, S;
+      var L, S;
       return {
-        enableServerSearch: ((D = t.config) == null ? void 0 : D.enableServerSearch) ?? !1,
+        enableServerSearch: ((L = t.config) == null ? void 0 : L.enableServerSearch) ?? !1,
         pageSize: ((S = t.config) == null ? void 0 : S.pageSize) ?? 20
       };
     }), {
@@ -32337,8 +32355,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       loadMore: h,
       reset: g
     } = gL(i), v = A(), b = k(() => {
-      var D;
-      return ((D = t.config) == null ? void 0 : D.enableServerSearch) === !0;
+      var L;
+      return ((L = t.config) == null ? void 0 : L.enableServerSearch) === !0;
     }), $ = [
       { value: "", labelKey: "message.search.typeAll", fallback: "全部" },
       { value: Ce.TEXT, labelKey: "message.search.typeText", fallback: "文本" },
@@ -32347,14 +32365,14 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       { value: Ce.FILE, labelKey: "message.search.typeFile", fallback: "文件" },
       { value: Ce.LOCATION, labelKey: "message.search.typeLocation", fallback: "位置" }
     ];
-    Pe(() => t.show, (D) => {
-      if (!D) {
+    Pe(() => t.show, (L) => {
+      if (!L) {
         g();
         return;
       }
       Ye(() => {
-        var S, C, L;
-        (L = (C = (S = v.value) == null ? void 0 : S.$el) == null ? void 0 : C.querySelector("input")) == null || L.focus();
+        var S, C, O;
+        (O = (C = (S = v.value) == null ? void 0 : S.$el) == null ? void 0 : C.querySelector("input")) == null || O.focus();
       });
     });
     const R = Uf(() => {
@@ -32371,66 +32389,66 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       a.value.trim() && f(!1);
     }
     Pe([u, d], M);
-    function x(D) {
-      u.value !== D && (u.value = D);
+    function x(L) {
+      u.value !== L && (u.value = L);
     }
-    function T(D) {
-      d.value !== D && (d.value = D);
+    function T(L) {
+      d.value !== L && (d.value = L);
     }
-    function I(D, S) {
-      s("locate", { msgId: D, conversationId: S }), s("update:show", !1), s("close");
+    function I(L, S) {
+      s("locate", { msgId: L, conversationId: S }), s("update:show", !1), s("close");
     }
-    function O(D) {
-      const S = D.target;
+    function N(L) {
+      const S = L.target;
       if (!S)
         return;
       S.scrollHeight - S.scrollTop - S.clientHeight <= 20 && h();
     }
-    function E(D) {
-      const S = r.conversation.conversationList.find((C) => C.id === D);
-      return (S == null ? void 0 : S.name) || D;
+    function E(L) {
+      const S = r.conversation.conversationList.find((C) => C.id === L);
+      return (S == null ? void 0 : S.name) || L;
     }
-    function G(D) {
-      const S = new Date(D), C = /* @__PURE__ */ new Date(), L = S.toDateString() === C.toDateString(), J = String(S.getHours()).padStart(2, "0"), te = String(S.getMinutes()).padStart(2, "0");
-      if (L)
-        return `${J}:${te}`;
-      const ve = String(S.getMonth() + 1).padStart(2, "0"), be = String(S.getDate()).padStart(2, "0");
-      return `${ve}-${be} ${J}:${te}`;
+    function H(L) {
+      const S = new Date(L), C = /* @__PURE__ */ new Date(), O = S.toDateString() === C.toDateString(), q = String(S.getHours()).padStart(2, "0"), te = String(S.getMinutes()).padStart(2, "0");
+      if (O)
+        return `${q}:${te}`;
+      const ye = String(S.getMonth() + 1).padStart(2, "0"), ke = String(S.getDate()).padStart(2, "0");
+      return `${ye}-${ke} ${q}:${te}`;
     }
-    function N(D) {
-      if (D.highlighted && D.highlighted.length > 0) {
-        const be = [];
-        return D.highlighted.forEach((W, re) => {
-          re > 0 && be.push({ text: " … ", hit: !1 });
-          const ue = /<em>([\s\S]*?)<\/em>/gi;
-          let j = 0;
+    function D(L) {
+      if (L.highlighted && L.highlighted.length > 0) {
+        const ke = [];
+        return L.highlighted.forEach((j, ie) => {
+          ie > 0 && ke.push({ text: " … ", hit: !1 });
+          const fe = /<em>([\s\S]*?)<\/em>/gi;
+          let V = 0;
           for (; ; ) {
-            const se = ue.exec(W);
+            const se = fe.exec(j);
             if (!se)
               break;
-            const Me = W.slice(j, se.index).replace(/<[^>]*>/g, "");
-            Me && be.push({ text: Me, hit: !1 });
+            const Me = j.slice(V, se.index).replace(/<[^>]*>/g, "");
+            Me && ke.push({ text: Me, hit: !1 });
             const ge = se[1].replace(/<[^>]*>/g, "");
-            ge && be.push({ text: ge, hit: !0 }), j = se.index + se[0].length;
+            ge && ke.push({ text: ge, hit: !0 }), V = se.index + se[0].length;
           }
-          const de = W.slice(j).replace(/<[^>]*>/g, "");
-          de && be.push({ text: de, hit: !1 });
-        }), be.length > 0 ? be : [{ text: D.summary || "", hit: !1 }];
+          const ue = j.slice(V).replace(/<[^>]*>/g, "");
+          ue && ke.push({ text: ue, hit: !1 });
+        }), ke.length > 0 ? ke : [{ text: L.summary || "", hit: !1 }];
       }
-      const S = D.summary || "", C = a.value.trim();
+      const S = L.summary || "", C = a.value.trim();
       if (!S || !C)
         return [{ text: S, hit: !1 }];
-      const L = S.toLowerCase(), J = C.toLowerCase(), te = [];
-      let ve = 0;
+      const O = S.toLowerCase(), q = C.toLowerCase(), te = [];
+      let ye = 0;
       for (; ; ) {
-        const be = L.indexOf(J, ve);
-        if (be === -1)
+        const ke = O.indexOf(q, ye);
+        if (ke === -1)
           break;
-        be > ve && te.push({ text: S.slice(ve, be), hit: !1 }), te.push({ text: S.slice(be, be + J.length), hit: !0 }), ve = be + J.length;
+        ke > ye && te.push({ text: S.slice(ye, ke), hit: !1 }), te.push({ text: S.slice(ke, ke + q.length), hit: !0 }), ye = ke + q.length;
       }
-      return ve < S.length && te.push({ text: S.slice(ve), hit: !1 }), te.length > 0 ? te : [{ text: S, hit: !1 }];
+      return ye < S.length && te.push({ text: S.slice(ye), hit: !1 }), te.length > 0 ? te : [{ text: S, hit: !1 }];
     }
-    return (D, S) => (y(), ce(m(Lt), {
+    return (L, S) => (y(), de(m(Ot), {
       show: t.show,
       position: "center",
       "show-close": !0,
@@ -32438,13 +32456,13 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       "onUpdate:show": S[3] || (S[3] = (C) => s("update:show", C)),
       onClose: S[4] || (S[4] = (C) => s("close"))
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", vL, [
           _("div", yL, [
             _("span", bL, P(m(o)("message.search.title", "搜索消息")), 1)
           ]),
           _("div", kL, [
-            q(m(gn), {
+            W(m(gn), {
               ref_key: "inputRef",
               ref: v,
               modelValue: m(a),
@@ -32464,25 +32482,25 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
               class: Te(["message-search-modal__scope", { "message-search-modal__scope--active": m(u) === "global" }]),
               onClick: S[2] || (S[2] = (C) => x("global"))
             }, P(m(o)("message.search.scopeGlobal", "全部会话")), 3)
-          ])) : U("", !0),
+          ])) : F("", !0),
           _("div", _L, [
-            (y(), w($e, null, et($, (C) => _("button", {
+            (y(), w($e, null, tt($, (C) => _("button", {
               key: C.value,
               class: Te(["message-search-modal__type", { "message-search-modal__type--active": m(d) === C.value }]),
-              onClick: (L) => T(C.value)
+              onClick: (O) => T(C.value)
             }, P(m(o)(C.labelKey, C.fallback)), 11, CL)), 64))
           ]),
-          m(p) ? (y(), w("div", ML, P(m(o)("message.search.serverUnavailable", "服务端搜索未开通，仅展示本地结果")), 1)) : U("", !0),
+          m(p) ? (y(), w("div", ML, P(m(o)("message.search.serverUnavailable", "服务端搜索未开通，仅展示本地结果")), 1)) : F("", !0),
           _("div", {
             class: "message-search-modal__results",
-            onScroll: O
+            onScroll: N
           }, [
-            m(l).length > 0 ? (y(!0), w($e, { key: 0 }, et(m(l), (C) => (y(), w("div", {
+            m(l).length > 0 ? (y(!0), w($e, { key: 0 }, tt(m(l), (C) => (y(), w("div", {
               key: C.msgId,
               class: "message-search-modal__item",
-              onClick: (L) => I(C.msgId, C.conversationId)
+              onClick: (O) => I(C.msgId, C.conversationId)
             }, [
-              q(m($t), {
+              W(m($t), {
                 src: C.avatar,
                 name: C.senderName,
                 size: 36
@@ -32490,30 +32508,30 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
               _("div", IL, [
                 _("div", xL, [
                   _("span", TL, P(C.senderName), 1),
-                  m(u) === "global" ? (y(), w("span", EL, P(E(C.conversationId)), 1)) : U("", !0),
-                  _("span", AL, P(G(C.timestamp)), 1)
+                  m(u) === "global" ? (y(), w("span", EL, P(E(C.conversationId)), 1)) : F("", !0),
+                  _("span", AL, P(H(C.timestamp)), 1)
                 ]),
                 _("div", $L, [
-                  (y(!0), w($e, null, et(N(C), (L, J) => (y(), w($e, { key: J }, [
-                    L.hit ? (y(), w("mark", RL, P(L.text), 1)) : (y(), w($e, { key: 1 }, [
-                      mt(P(L.text), 1)
+                  (y(!0), w($e, null, tt(D(C), (O, q) => (y(), w($e, { key: q }, [
+                    O.hit ? (y(), w("mark", RL, P(O.text), 1)) : (y(), w($e, { key: 1 }, [
+                      mt(P(O.text), 1)
                     ], 64))
                   ], 64))), 128))
                 ])
               ])
             ], 8, SL))), 128)) : m(c) ? (y(), w("div", NL, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "loading/arc/big",
                 size: 20,
                 anim: "spin"
               }),
               _("span", null, P(m(o)("message.search.loading", "搜索中...")), 1)
-            ])) : m(a).trim() ? (y(), ce(m(Ht), {
+            ])) : m(a).trim() ? (y(), de(m(Ht), {
               key: 2,
               icon: "search",
               description: m(o)("message.search.empty", "无搜索结果"),
               size: "small"
-            }, null, 8, ["description"])) : U("", !0)
+            }, null, 8, ["description"])) : F("", !0)
           ], 32)
         ])
       ]),
@@ -32541,7 +32559,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }, qL = {
   key: 4,
   class: "chat__watermark"
-}, JL = /* @__PURE__ */ Re({
+}, JL = /* @__PURE__ */ Le({
   __name: "chat",
   props: {
     config: {},
@@ -32551,7 +32569,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
   },
   emits: ["recall-failed", "at-me-click", "group-operation", "location-click", "custom-message-action"],
   setup(n, { expose: e, emit: t }) {
-    const s = n, o = t, r = Ot("UIKit:Chat"), i = A(), a = A();
+    const s = n, o = t, r = Dt("UIKit:Chat"), i = A(), a = A();
     e({
       setText: (z) => {
         var ne, Se;
@@ -32579,12 +32597,12 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       deselectAllMessages: x,
       sendTextMessage: T,
       sendCustomMessage: I,
-      sendImageMessage: O,
+      sendImageMessage: N,
       sendFileMessage: E,
-      sendAudioMessage: G,
-      sendVideoMessage: N,
-      sendLocationMessage: D
-    } = fa(), { stores: S, domains: C, h5: L, client: J, capabilities: te } = at(), { sendChannelAck: ve, saveDraft: be, loadDraft: W, clearDraft: re, clearChatHistory: ue, deleteConversation: j, selectConversation: de } = Cr(), { leaveGroup: se, destroyGroup: Me, addGroupAdmin: ge, removeGroupAdmin: Ie, removeGroupMembers: Ke, inviteUsersToGroup: _e, fetchGroupMembers: He, fetchGroupInfo: ee, fetchGroupAnnouncement: me } = sn(), { clearQuote: Be, requestLocate: tt } = pa(), nt = k(() => {
+      sendAudioMessage: H,
+      sendVideoMessage: D,
+      sendLocationMessage: L
+    } = fa(), { stores: S, domains: C, h5: O, client: q, capabilities: te } = at(), { sendChannelAck: ye, saveDraft: ke, loadDraft: j, clearDraft: ie, clearChatHistory: fe, deleteConversation: V, selectConversation: ue } = Cr(), { leaveGroup: se, destroyGroup: Me, addGroupAdmin: ge, removeGroupAdmin: Ie, removeGroupMembers: Ke, inviteUsersToGroup: _e, fetchGroupMembers: He, fetchGroupInfo: ee, fetchGroupAnnouncement: ve } = sn(), { clearQuote: Be, requestLocate: st } = pa(), nt = k(() => {
       var z;
       return te.groupReadReceipt === !1 || (z = s.config) == null ? void 0 : z.groupReadReceipt;
     });
@@ -32592,36 +32610,36 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       const ne = S.contact.getContact(z), Se = S.userInfo.getUserInfo(z);
       return (ne == null ? void 0 : ne.remark) || (Se == null ? void 0 : Se.nickname) || z;
     }
-    function vt(z) {
+    function gt(z) {
       const ne = S.contact.getContact(z), Se = S.userInfo.getUserInfo(z);
       return (Se == null ? void 0 : Se.avatarUrl) || (ne == null ? void 0 : ne.avatar);
     }
     rw({
       currentConversation: l,
-      currentUserId: k(() => J.value.currentUserId),
+      currentUserId: k(() => q.value.currentUserId),
       send: {
         sendTextMessage: (z, ne) => T(z, ne, nt.value),
         sendCustomMessage: I,
-        sendImageMessage: (z, ne) => O(z, nt.value, ne),
+        sendImageMessage: (z, ne) => N(z, nt.value, ne),
         sendFileMessage: (z, ne) => E(z, nt.value, ne),
-        sendAudioMessage: (z, ne, Se) => G(z, ne, nt.value, Se),
-        sendVideoMessage: (z, ne, Se) => N(z, ne, nt.value, Se),
-        sendLocationMessage: (z, ne) => D(z.latitude, z.longitude, z.address, ne)
+        sendAudioMessage: (z, ne, Se) => H(z, ne, nt.value, Se),
+        sendVideoMessage: (z, ne, Se) => D(z, ne, nt.value, Se),
+        sendLocationMessage: (z, ne) => L(z.latitude, z.longitude, z.address, ne)
       },
       getUserDisplayName: dt,
-      getUserAvatar: vt
+      getUserAvatar: gt
     });
     const kt = k(() => {
       var z;
       return (z = s.config) == null ? void 0 : z.lastMessageTextResolver;
-    }), { t: fe } = qe(), Z = k(() => {
+    }), { t: he } = qe(), Q = k(() => {
       const z = u.value[u.value.length - 1], ne = l.value;
       if (!z || !ne || z.conversationId !== ne.id)
         return null;
-      const Se = ne.type === lt.GROUPCHAT, Ze = z.from || "", Ve = Se ? rp(S, z) : void 0, yt = !Se || Ve !== Ze || !S.userInfo.isLoading(Ze);
+      const Se = ne.type === lt.GROUPCHAT, et = z.from || "", Ge = Se ? rp(S, z) : void 0, yt = !Se || Ge !== et || !S.userInfo.isLoading(et);
       return {
         id: z.msgServerId || z.msgLocalId,
-        text: Nf(z, kt.value, Ve, fe("message.recalledPreview"), gi),
+        text: Nf(z, kt.value, Ge, he("message.recalledPreview"), gi),
         timestamp: z.timestamp,
         senderReady: yt
       };
@@ -32633,48 +32651,48 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       const Se = z.from || "";
       Se && (S.userInfo.getUserInfo(Se) || S.userInfo.isLoading(Se) || S.userInfo.isFetchFailed(Se) || C.userInfo.fetchUserInfos([Se]));
     });
-    const ie = A("");
-    Pe(Z, (z) => {
+    const ae = A("");
+    Pe(Q, (z) => {
       if (!(z != null && z.id) || !z.senderReady)
         return;
       const ne = l.value;
       if (!ne)
         return;
       const Se = `${z.id}|${z.text}|${z.timestamp || ""}`;
-      if (Se === ie.value)
+      if (Se === ae.value)
         return;
-      ie.value = Se;
-      const Ze = {
+      ae.value = Se;
+      const et = {
         lastMessageText: z.text
       };
-      z.timestamp && (!ne.lastMessageTime || z.timestamp > ne.lastMessageTime) && (Ze.lastMessageTime = z.timestamp), S.conversation.updateConversation(ne.id, Ze);
+      z.timestamp && (!ne.lastMessageTime || z.timestamp > ne.lastMessageTime) && (et.lastMessageTime = z.timestamp), S.conversation.updateConversation(ne.id, et);
     }), Ds(() => {
       p(), g(), Be();
-    }), Pe(L.keyboardHeight, async () => {
+    }), Pe(O.keyboardHeight, async () => {
       var z, ne;
       await Ye(), (ne = (z = a.value) == null ? void 0 : z.scrollToBottom) == null || ne.call(z);
     });
-    const { show: ke } = Wt(), Q = A(null);
+    const { show: we } = Wt(), X = A(null);
     Vv((z, ne, Se) => {
-      var Ve;
-      const Ze = z instanceof Error ? z.message : String(z);
-      return Q.value = {
-        message: Ze,
-        component: ((Ve = ne == null ? void 0 : ne.$options) == null ? void 0 : Ve.name) || Se
+      var Ge;
+      const et = z instanceof Error ? z.message : String(z);
+      return X.value = {
+        message: et,
+        component: ((Ge = ne == null ? void 0 : ne.$options) == null ? void 0 : Ge.name) || Se
       }, r.error("[Chat] render error captured:", z, Se), !1;
     });
-    function H() {
-      Q.value = null;
+    function U() {
+      X.value = null;
     }
     wr(eo.TEXT_MESSAGE_CONFIG, k(() => {
       var z;
       return (z = s.config) == null ? void 0 : z.textMessage;
     }));
-    function ae(z) {
+    function le(z) {
       const ne = z.originalMsg;
       ne && (g(), Ye(() => {
-        var Se, Ze;
-        return (Ze = (Se = i.value) == null ? void 0 : Se.setText) == null ? void 0 : Ze.call(Se, ne);
+        var Se, et;
+        return (et = (Se = i.value) == null ? void 0 : Se.setText) == null ? void 0 : et.call(Se, ne);
       }));
     }
     function K(z) {
@@ -32683,8 +32701,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       h(z);
       const ne = z.body.content || "";
       Ye(() => {
-        var Se, Ze;
-        return (Ze = (Se = i.value) == null ? void 0 : Se.setText) == null ? void 0 : Ze.call(Se, ne);
+        var Se, et;
+        return (et = (Se = i.value) == null ? void 0 : Se.setText) == null ? void 0 : et.call(Se, ne);
       });
     }
     const pe = k(() => {
@@ -32694,74 +32712,74 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     function Ne(z) {
       if (!pe.value)
         return;
-      const ne = W(z);
+      const ne = j(z);
       Ye(() => {
-        var Se, Ze, Ve;
-        ((Se = l.value) == null ? void 0 : Se.id) === z && ((Ve = (Ze = i.value) == null ? void 0 : Ze.setText) == null || Ve.call(Ze, ne || ""));
+        var Se, et, Ge;
+        ((Se = l.value) == null ? void 0 : Se.id) === z && ((Ge = (et = i.value) == null ? void 0 : et.setText) == null || Ge.call(et, ne || ""));
       });
     }
-    function Qe(z) {
-      var Se, Ze;
+    function Ze(z) {
+      var Se, et;
       if (!pe.value)
         return;
-      const ne = ((Ze = (Se = i.value) == null ? void 0 : Se.getText) == null ? void 0 : Ze.call(Se)) || "";
-      ne.trim() ? be(z, ne) : re(z);
+      const ne = ((et = (Se = i.value) == null ? void 0 : Se.getText) == null ? void 0 : et.call(Se)) || "";
+      ne.trim() ? ke(z, ne) : ie(z);
     }
-    function wt() {
+    function St() {
       var ne;
       if (!pe.value)
         return;
       const z = (ne = l.value) == null ? void 0 : ne.id;
-      z && re(z);
+      z && ie(z);
     }
-    const St = k(() => {
+    const wt = k(() => {
       var z, ne;
       return (ne = (z = s.config) == null ? void 0 : z.messageList) == null ? void 0 : ne.pinnedBar;
+    }), hn = k(() => {
+      var z;
+      return ((z = wt.value) == null ? void 0 : z.visible) !== !1;
     }), on = k(() => {
       var z;
-      return ((z = St.value) == null ? void 0 : z.visible) !== !1;
-    }), Jt = k(() => {
-      var z;
-      return ((z = St.value) == null ? void 0 : z.maxPreviewLength) ?? 30;
+      return ((z = wt.value) == null ? void 0 : z.maxPreviewLength) ?? 30;
     });
-    function Zt(z) {
+    function Jt(z) {
       const ne = z.msgServerId || z.msgLocalId;
-      ne && tt(ne);
+      ne && st(ne);
     }
-    const rn = k(() => {
+    const Xt = k(() => {
       var z;
       return (z = s.config) == null ? void 0 : z.header;
-    }), ye = k(() => {
+    }), be = k(() => {
       var z;
-      return ((z = rn.value) == null ? void 0 : z.visible) !== !1;
-    }), Ae = k(() => {
+      return ((z = Xt.value) == null ? void 0 : z.visible) !== !1;
+    }), Re = k(() => {
       var z;
-      return ((z = rn.value) == null ? void 0 : z.align) ?? Fr.CENTER;
-    }), F = k(() => {
-      var z;
-      return ((z = rn.value) == null ? void 0 : z.showAvatar) ?? !1;
-    }), le = k(() => {
-      var z;
-      return ((z = rn.value) == null ? void 0 : z.showDrawerEntry) !== !1;
+      return ((z = Xt.value) == null ? void 0 : z.align) ?? Fr.CENTER;
     }), oe = k(() => {
+      var z;
+      return ((z = Xt.value) == null ? void 0 : z.showAvatar) ?? !1;
+    }), Z = k(() => {
+      var z;
+      return ((z = Xt.value) == null ? void 0 : z.showDrawerEntry) !== !1;
+    }), ce = k(() => {
       var z, ne, Se;
       return ((Se = (ne = (z = s.config) == null ? void 0 : z.messageList) == null ? void 0 : ne.search) == null ? void 0 : Se.enabled) === !0;
-    }), we = A(!1);
-    function De() {
-      we.value = !0;
+    }), re = A(!1);
+    function Ee() {
+      re.value = !0;
     }
-    function Ge() {
-      we.value = !1;
+    function Ve() {
+      re.value = !1;
     }
-    const it = rc();
-    function Pt() {
+    const Qe = rc();
+    function Rt() {
       const z = {};
-      for (const ne of Object.keys(it))
-        ne.startsWith("drawer-") && (z[ne] = it[ne]);
+      for (const ne of Object.keys(Qe))
+        ne.startsWith("drawer-") && (z[ne] = Qe[ne]);
       return z;
     }
-    const en = A(!1), kn = A(), tn = A(!1), Bt = A("");
-    function un() {
+    const en = A(!1), kn = A(), tn = A(!1), Pt = A("");
+    function cn() {
       tn.value = !1;
     }
     function B() {
@@ -32770,12 +32788,12 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     function Y() {
       en.value = !1;
     }
-    const he = A(!1), Le = A(null), ot = A(!1), We = A(""), ct = A(!1), bt = A("");
+    const me = A(!1), Oe = A(null), rt = A(!1), We = A(""), ct = A(!1), bt = A("");
     function Sn() {
-      ot.value = !0;
+      rt.value = !0;
     }
     function zt() {
-      ot.value = !1;
+      rt.value = !1;
     }
     function rs() {
       ct.value = !0;
@@ -32783,14 +32801,14 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     function au() {
       ct.value = !1;
     }
-    const lu = k(() => J.value.currentUserId ?? ""), Lr = A(), Or = A(0), Kg = k(
+    const lu = k(() => q.value.currentUserId ?? ""), Lr = A(), Or = A(0), Kg = k(
       () => {
         var z;
         return ((z = l.value) == null ? void 0 : z.type) === lt.SINGLECHAT ? l.value.id : void 0;
       }
     ), { userInfo: Wg, avatarUrl: qg, contact: Jg } = jt(Kg), cu = k(() => {
       var z, ne;
-      return l.value ? l.value.type === lt.GROUPCHAT ? l.value.name || fe("chat.title") : ((z = Jg.value) == null ? void 0 : z.remark) || ((ne = Wg.value) == null ? void 0 : ne.nickname) || l.value.name || l.value.id || fe("chat.title") : fe("chat.title");
+      return l.value ? l.value.type === lt.GROUPCHAT ? l.value.name || he("chat.title") : ((z = Jg.value) == null ? void 0 : z.remark) || ((ne = Wg.value) == null ? void 0 : ne.nickname) || l.value.name || l.value.id || he("chat.title") : he("chat.title");
     }), Xg = k(() => {
       var z;
       return (z = l.value) == null ? void 0 : z.type;
@@ -32802,9 +32820,9 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     qt(() => {
       Lr.value && (Or.value = Lr.value.offsetHeight, Bo = new ResizeObserver((z) => {
         var ne, Se;
-        for (const Ze of z) {
-          const Ve = ((Se = (ne = Ze.borderBoxSize) == null ? void 0 : ne[0]) == null ? void 0 : Se.blockSize) ?? Ze.contentRect.height;
-          Or.value = Ve;
+        for (const et of z) {
+          const Ge = ((Se = (ne = et.borderBoxSize) == null ? void 0 : ne[0]) == null ? void 0 : Se.blockSize) ?? et.contentRect.height;
+          Or.value = Ge;
         }
       }), Bo.observe(Lr.value));
     }), Ds(() => {
@@ -32812,7 +32830,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     });
     const Zg = k(() => {
       var z;
-      return ((z = rn.value) == null ? void 0 : z.showMemberCount) ?? !0;
+      return ((z = Xt.value) == null ? void 0 : z.showMemberCount) ?? !0;
     }), uu = k(() => {
       var z;
       if (!(!is.value || !l.value))
@@ -32826,10 +32844,10 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       const ne = z == null ? void 0 : z.role;
       return ne !== ut.OWNER && ne !== ut.ADMIN;
     }), tv = k(() => !is.value || !l.value ? [] : S.group.getGroupMembers(l.value.id).filter((z) => z.userId !== lu.value).map((z) => {
-      const ne = S.contact.getContact(z.userId), Se = S.userInfo.getUserInfo(z.userId), Ze = (ne == null ? void 0 : ne.remark) || (Se == null ? void 0 : Se.nickname) || z.nickname || z.userId;
+      const ne = S.contact.getContact(z.userId), Se = S.userInfo.getUserInfo(z.userId), et = (ne == null ? void 0 : ne.remark) || (Se == null ? void 0 : Se.nickname) || z.nickname || z.userId;
       return {
         userId: z.userId,
-        name: Ze,
+        name: et,
         avatar: (Se == null ? void 0 : Se.avatarUrl) || (ne == null ? void 0 : ne.avatar) || z.avatarUrl,
         remark: ne == null ? void 0 : ne.remark
       };
@@ -32843,20 +32861,20 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         if (!(ne != null && ne.memberCount))
           try {
             await ee(z.id);
-          } catch (Ve) {
-            r.warn("[Chat] preload group info failed:", Je(Ve));
+          } catch (Ge) {
+            r.warn("[Chat] preload group info failed:", Je(Ge));
           }
         if (S.group.getGroupMembers(z.id).length === 0)
           try {
             await He(z.id);
-          } catch (Ve) {
-            r.warn("[Chat] preload group members for mention failed:", Je(Ve));
+          } catch (Ge) {
+            r.warn("[Chat] preload group members for mention failed:", Je(Ge));
           }
         if (S.group.getGroupAnnouncement(z.id) === void 0)
           try {
-            await me(z.id);
-          } catch (Ve) {
-            r.warn("[Chat] preload group announcement failed:", Je(Ve));
+            await ve(z.id);
+          } catch (Ge) {
+            r.warn("[Chat] preload group announcement failed:", Je(Ge));
           }
       },
       { immediate: !0 }
@@ -32867,19 +32885,19 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         return;
       const Se = ne[0];
       S.message.getMessages(z).some((yt) => yt.msgServerId === Se || yt.msgLocalId === Se) ? Ye(() => {
-        tt(Se), S.message.clearAtMe(z);
+        st(Se), S.message.clearAtMe(z);
       }) : r.warn("[Chat] @me message not in loaded history, scroll up to load more:", Se);
     }
     Pe(l, async (z, ne) => {
-      var Ve, yt;
+      var Ge, yt;
       if (!z || z.id === (ne == null ? void 0 : ne.id))
         return;
-      S.message.touchConversation(z.id), p(), ne && Qe(ne.id), Be(), g(), ve(z.id);
+      S.message.touchConversation(z.id), p(), ne && Ze(ne.id), Be(), g(), ye(z.id);
       const Se = S.message.getMessages(z.id);
-      let Ze = !1;
-      Se.length === 0 && (await f(), Ze = !0), v().catch((nn) => {
+      let et = !1;
+      Se.length === 0 && (await f(), et = !0), v().catch((nn) => {
         r.warn("[Chat] fetchPinnedMessages failed:", Je(nn));
-      }), ((yt = (Ve = s.config) == null ? void 0 : Ve.messageList) == null ? void 0 : yt.autoLocateAtMe) !== !1 && (Ze ? Ye(() => {
+      }), ((yt = (Ge = s.config) == null ? void 0 : Ge.messageList) == null ? void 0 : yt.autoLocateAtMe) !== !1 && (et ? Ye(() => {
         du(z.id);
       }) : du(z.id)), Ne(z.id);
     }, { immediate: !0 });
@@ -32902,7 +32920,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
             await R(ne, z);
           Dr.value = [], p();
         } catch (Se) {
-          r.warn("[Chat] forward messages failed:", Je(Se)), ke(fe("message.forward.failed", "转发失败"), "error");
+          r.warn("[Chat] forward messages failed:", Je(Se)), we(he("message.forward.failed", "转发失败"), "error");
         }
     }
     function fu() {
@@ -32930,102 +32948,102 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       try {
         await se(z);
         const ne = l.value;
-        ne && (S.conversation.deleteConversation(ne.id), S.message.clearConversationMessages(ne.id)), ke(fe("chat.info.leaveGroupSuccess", "已退出群聊"), "success");
+        ne && (S.conversation.deleteConversation(ne.id), S.message.clearConversationMessages(ne.id)), we(he("chat.info.leaveGroupSuccess", "已退出群聊"), "success");
       } catch (ne) {
-        r.warn("[Chat] leave group failed:", Je(ne)), ke(fe("chat.info.leaveGroupFailed", "退出群聊失败"), "error");
+        r.warn("[Chat] leave group failed:", Je(ne)), we(he("chat.info.leaveGroupFailed", "退出群聊失败"), "error");
       }
     }
     async function rv(z) {
       try {
         await Me(z);
         const ne = l.value;
-        ne && (S.conversation.deleteConversation(ne.id), S.message.clearConversationMessages(ne.id)), ke(fe("chat.info.destroyGroupSuccess", "群聊已解散"), "success");
+        ne && (S.conversation.deleteConversation(ne.id), S.message.clearConversationMessages(ne.id)), we(he("chat.info.destroyGroupSuccess", "群聊已解散"), "success");
       } catch (ne) {
-        r.warn("[Chat] destroy group failed:", Je(ne)), ke(fe("chat.info.destroyGroupFailed", "解散群聊失败"), "error");
+        r.warn("[Chat] destroy group failed:", Je(ne)), we(he("chat.info.destroyGroupFailed", "解散群聊失败"), "error");
       }
     }
     async function iv(z) {
       try {
-        await ue(z.id, !0), S.message.clearConversationMessages(z.id), z.deleteConversation && (await j(z.id), de("")), ke(fe("chat.info.clearHistorySuccess", "聊天记录已清空"), "success");
+        await fe(z.id, !0), S.message.clearConversationMessages(z.id), z.deleteConversation && (await V(z.id), ue("")), we(he("chat.info.clearHistorySuccess", "聊天记录已清空"), "success");
       } catch (ne) {
-        r.warn("[Chat] clear history failed:", Je(ne)), ke(fe("chat.info.clearHistoryFailed", "清空聊天记录失败"), "error");
+        r.warn("[Chat] clear history failed:", Je(ne)), we(he("chat.info.clearHistoryFailed", "清空聊天记录失败"), "error");
       }
     }
     function mu(z) {
-      Bt.value = z, tn.value = !0;
+      Pt.value = z, tn.value = !0;
     }
     async function av(z) {
       var Se;
-      const ne = Bt.value;
+      const ne = Pt.value;
       if (!(!ne || z.length === 0))
         try {
-          await _e(ne, z), tn.value = !1, ke(fe("group.inviteMember.success", "邀请已发送"), "success"), (Se = kn.value) == null || Se.refreshMemberList();
-        } catch (Ze) {
-          r.warn("[Chat] invite members failed:", Je(Ze));
-          const Ve = String(Ze instanceof Error ? Ze.message : Ze), yt = Ve.toLowerCase().includes("forbidden") || Ve.toLowerCase().includes("access forbidden");
-          ke(
-            yt ? fe("group.inviteMember.forbidden", "当前群组不允许邀请成员") : fe("group.inviteMember.failed", "邀请失败"),
+          await _e(ne, z), tn.value = !1, we(he("group.inviteMember.success", "邀请已发送"), "success"), (Se = kn.value) == null || Se.refreshMemberList();
+        } catch (et) {
+          r.warn("[Chat] invite members failed:", Je(et));
+          const Ge = String(et instanceof Error ? et.message : et), yt = Ge.toLowerCase().includes("forbidden") || Ge.toLowerCase().includes("access forbidden");
+          we(
+            yt ? he("group.inviteMember.forbidden", "当前群组不允许邀请成员") : he("group.inviteMember.failed", "邀请失败"),
             "error"
           );
         }
     }
     function lv() {
       const z = l.value;
-      z != null && z.id && (z.type === lt.SINGLECHAT ? (We.value = z.id, ot.value = !0) : z.type === lt.GROUPCHAT && (bt.value = z.id, ct.value = !0));
+      z != null && z.id && (z.type === lt.SINGLECHAT ? (We.value = z.id, rt.value = !0) : z.type === lt.GROUPCHAT && (bt.value = z.id, ct.value = !0));
     }
     function cv(z) {
-      We.value = z, ot.value = !0;
+      We.value = z, rt.value = !0;
     }
     function uv(z) {
-      var Se, Ze;
+      var Se, et;
       const ne = {
         userId: z.userId,
         name: z.name
       };
-      (Ze = (Se = i.value) == null ? void 0 : Se.appendMention) == null || Ze.call(Se, ne);
+      (et = (Se = i.value) == null ? void 0 : Se.appendMention) == null || et.call(Se, ne);
     }
     function gu(z) {
       var yt;
       const { msgId: ne, conversationId: Se } = z;
       if (!Se || Se === ((yt = l.value) == null ? void 0 : yt.id)) {
-        tt(ne);
+        st(ne);
         return;
       }
       if (!S.conversation.conversationList.find((nn) => nn.id === Se)) {
-        ke(fe("message.search.cvsNotLoaded") ?? "会话不存在或未加载", "warning");
+        we(he("message.search.cvsNotLoaded") ?? "会话不存在或未加载", "warning");
         return;
       }
-      if (de(Se), S.message.getMessages(Se).length > 0) {
-        Ye(() => tt(ne));
+      if (ue(Se), S.message.getMessages(Se).length > 0) {
+        Ye(() => st(ne));
         return;
       }
-      const Ve = Pe(
+      const Ge = Pe(
         () => S.message.getMessages(Se).length,
         (nn) => {
-          nn > 0 && (Ve(), Ye(() => tt(ne)));
+          nn > 0 && (Ge(), Ye(() => st(ne)));
         }
       );
-      setTimeout(Ve, 3e3);
+      setTimeout(Ge, 3e3);
     }
     function dv(z) {
       var ne, Se;
       ((Se = (ne = s.config) == null ? void 0 : ne.textMessage) == null ? void 0 : Se.locateOnMentionClick) !== !1 && fv(z), o("at-me-click", z);
     }
     function fv(z) {
-      var Ve;
-      const ne = (Ve = l.value) == null ? void 0 : Ve.id;
+      var Ge;
+      const ne = (Ge = l.value) == null ? void 0 : Ge.id;
       if (!ne || !z)
         return;
-      const Se = S.message.getMessages(ne), Ze = hi(z);
+      const Se = S.message.getMessages(ne), et = hi(z);
       for (let yt = Se.length - 1; yt >= 0; yt--) {
         const nn = Se[yt];
-        if (hi(nn.from) !== Ze)
+        if (hi(nn.from) !== et)
           continue;
         const zo = nn.msgServerId || nn.msgLocalId;
-        zo && tt(zo);
+        zo && st(zo);
         return;
       }
-      ke(fe("message.mention.locatorNotFound") ?? "未找到该用户的消息", "warning");
+      we(he("message.mention.locatorNotFound") ?? "未找到该用户的消息", "warning");
     }
     function pv(z) {
       S.conversation.conversationList.find((Se) => Se.id === z) || S.conversation.addConversation({
@@ -33037,15 +33055,15 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         isPinned: !1,
         isMuted: !1,
         marks: []
-      }), de(z);
+      }), ue(z);
     }
     function hv(z) {
       const ne = S.group.getGroupById(z);
       if (!ne) {
-        ke(fe("chat.groupCardNotJoined"), "warning");
+        we(he("chat.groupCardNotJoined"), "warning");
         return;
       }
-      S.conversation.conversationList.find((Ze) => Ze.id === z) || S.conversation.addConversation({
+      S.conversation.conversationList.find((et) => et.id === z) || S.conversation.addConversation({
         id: z,
         name: ne.groupName || z,
         avatar: ne.avatar,
@@ -33055,7 +33073,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         isPinned: !1,
         isMuted: !1,
         marks: []
-      }), de(z);
+      }), ue(z);
     }
     function mv(z) {
       S.conversation.conversationList.find((Se) => Se.id === z.userId) || S.conversation.addConversation({
@@ -33068,113 +33086,113 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         isPinned: !1,
         isMuted: !1,
         marks: []
-      }), de(z.userId);
+      }), ue(z.userId);
     }
     function gv(z) {
-      Le.value = z, he.value = !0;
+      Oe.value = z, me.value = !0;
     }
     async function vv() {
-      var Se, Ze;
-      const z = Le.value, ne = ((Se = l.value) == null ? void 0 : Se.type) === lt.GROUPCHAT ? l.value.id : "";
+      var Se, et;
+      const z = Oe.value, ne = ((Se = l.value) == null ? void 0 : Se.type) === lt.GROUPCHAT ? l.value.id : "";
       if (!z || !ne) {
-        he.value = !1;
+        me.value = !1;
         return;
       }
-      Le.value = null, he.value = !1;
+      Oe.value = null, me.value = !1;
       try {
-        await Ke(ne, [z.userId]), ke(fe("chat.info.removeMemberSuccess", "成员已移除"), "success"), (Ze = kn.value) == null || Ze.removeMember(z.userId);
-      } catch (Ve) {
-        r.warn("[Chat] remove member failed:", Je(Ve)), ke(fe("chat.info.removeMemberFailed", "移除成员失败"), "error");
+        await Ke(ne, [z.userId]), we(he("chat.info.removeMemberSuccess", "成员已移除"), "success"), (et = kn.value) == null || et.removeMember(z.userId);
+      } catch (Ge) {
+        r.warn("[Chat] remove member failed:", Je(Ge)), we(he("chat.info.removeMemberFailed", "移除成员失败"), "error");
       }
     }
     function yv() {
-      Le.value = null, he.value = !1;
+      Oe.value = null, me.value = !1;
     }
     async function bv(z) {
-      var Se, Ze;
+      var Se, et;
       const ne = ((Se = l.value) == null ? void 0 : Se.type) === lt.GROUPCHAT ? l.value.id : "";
       if (ne)
         try {
-          await ge(ne, z.userId), (Ze = kn.value) == null || Ze.setMemberRole(z.userId, ut.ADMIN);
-          const Ve = z.nickname || z.userId;
+          await ge(ne, z.userId), (et = kn.value) == null || et.setMemberRole(z.userId, ut.ADMIN);
+          const Ge = z.nickname || z.userId;
           qn(S, ne, lt.GROUPCHAT, {
             eventType: Fn.ADMIN_ADDED,
-            params: { name: Ve, userId: z.userId },
-            defaultText: fe("chat.notice.adminAdded").replace("{name}", Ve)
-          }), ke(fe("chat.info.setAdminSuccess", "已设为管理员"), "success");
-        } catch (Ve) {
-          r.warn("[Chat] set admin failed:", Je(Ve)), ke(fe("chat.info.setAdminFailed", "设置管理员失败"), "error");
+            params: { name: Ge, userId: z.userId },
+            defaultText: he("chat.notice.adminAdded").replace("{name}", Ge)
+          }), we(he("chat.info.setAdminSuccess", "已设为管理员"), "success");
+        } catch (Ge) {
+          r.warn("[Chat] set admin failed:", Je(Ge)), we(he("chat.info.setAdminFailed", "设置管理员失败"), "error");
         }
     }
     async function kv(z) {
-      var Se, Ze;
+      var Se, et;
       const ne = ((Se = l.value) == null ? void 0 : Se.type) === lt.GROUPCHAT ? l.value.id : "";
       if (ne)
         try {
-          await Ie(ne, z.userId), (Ze = kn.value) == null || Ze.setMemberRole(z.userId, ut.MEMBER);
-          const Ve = z.nickname || z.userId;
+          await Ie(ne, z.userId), (et = kn.value) == null || et.setMemberRole(z.userId, ut.MEMBER);
+          const Ge = z.nickname || z.userId;
           qn(S, ne, lt.GROUPCHAT, {
             eventType: Fn.ADMIN_REMOVED,
-            params: { name: Ve, userId: z.userId },
-            defaultText: fe("chat.notice.adminRemoved").replace("{name}", Ve)
-          }), ke(fe("chat.info.removeAdminSuccess", "已取消管理员"), "success");
-        } catch (Ve) {
-          r.warn("[Chat] remove admin failed:", Je(Ve)), ke(fe("chat.info.removeAdminFailed", "取消管理员失败"), "error");
+            params: { name: Ge, userId: z.userId },
+            defaultText: he("chat.notice.adminRemoved").replace("{name}", Ge)
+          }), we(he("chat.info.removeAdminSuccess", "已取消管理员"), "success");
+        } catch (Ge) {
+          r.warn("[Chat] remove admin failed:", Je(Ge)), we(he("chat.info.removeAdminFailed", "取消管理员失败"), "error");
         }
     }
     return (z, ne) => {
-      var Se, Ze;
+      var Se, et;
       return y(), w("div", {
         class: Te(["chat", s.class]),
         style: Et(s.style)
       }, [
         s.loading ? (y(), w("div", DL, [
-          V(z.$slots, "loading", {}, () => [
-            _("span", BL, P(m(fe)("conversation.loadingMore", "加载中...")), 1)
+          G(z.$slots, "loading", {}, () => [
+            _("span", BL, P(m(he)("conversation.loadingMore", "加载中...")), 1)
           ], !0)
-        ])) : Q.value ? (y(), w("div", PL, [
-          V(z.$slots, "error", { error: Q.value }, () => [
+        ])) : X.value ? (y(), w("div", PL, [
+          G(z.$slots, "error", { error: X.value }, () => [
             _("div", zL, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "triangle/exclamation",
                 size: 48,
                 type: "warning",
                 class: "chat__error-icon"
               }),
-              _("span", FL, P(Q.value.message), 1),
+              _("span", FL, P(X.value.message), 1),
               _("button", {
                 class: "chat__error-retry",
-                onClick: H
-              }, P(m(fe)("button.confirm", "重试")), 1)
+                onClick: U
+              }, P(m(he)("button.confirm", "重试")), 1)
             ])
           ], !0)
         ])) : m(l) ? (y(), w($e, { key: 3 }, [
-          ye.value ? (y(), w("div", {
+          be.value ? (y(), w("div", {
             key: 0,
             ref_key: "headerRef",
             ref: Lr,
             class: Te(["chat__header", {
-              "chat__header--align-left": Ae.value === m(Fr).LEFT,
-              "chat__header--align-center": Ae.value === m(Fr).CENTER,
-              "chat__header--align-right": Ae.value === m(Fr).RIGHT
+              "chat__header--align-left": Re.value === m(Fr).LEFT,
+              "chat__header--align-center": Re.value === m(Fr).CENTER,
+              "chat__header--align-right": Re.value === m(Fr).RIGHT
             }])
           }, [
-            V(z.$slots, "header", { conversation: m(l) }, () => [
-              F.value && m(l) ? (y(), w("div", HL, [
-                V(z.$slots, "header-avatar", { conversation: m(l) }, () => [
-                  q(m($t), {
+            G(z.$slots, "header", { conversation: m(l) }, () => [
+              oe.value && m(l) ? (y(), w("div", HL, [
+                G(z.$slots, "header-avatar", { conversation: m(l) }, () => [
+                  W(m($t), {
                     src: Qg.value,
                     name: cu.value,
                     size: 36,
                     onClick: lv
                   }, null, 8, ["src", "name"])
                 ], !0)
-              ])) : U("", !0),
+              ])) : F("", !0),
               _("div", GL, [
                 _("div", VL, [
-                  V(z.$slots, "header-title", { conversation: m(l) }, () => [
+                  G(z.$slots, "header-title", { conversation: m(l) }, () => [
                     _("span", jL, P(cu.value), 1),
-                    is.value && Zg.value && uu.value != null ? (y(), w("span", KL, "(" + P(uu.value) + ")", 1)) : U("", !0)
+                    is.value && Zg.value && uu.value != null ? (y(), w("span", KL, "(" + P(uu.value) + ")", 1)) : F("", !0)
                   ], !0)
                 ]),
                 Yg.value ? (y(), w("div", WL, [
@@ -33186,55 +33204,55 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
                     _("span", { class: "typing-dots__dot" }),
                     _("span", { class: "typing-dots__dot" })
                   ], -1)),
-                  _("span", null, P(m(fe)("chat.typing", "对方正在输入...")), 1)
-                ])) : U("", !0),
-                V(z.$slots, "header-extra", { conversation: m(l) }, void 0, !0)
+                  _("span", null, P(m(he)("chat.typing", "对方正在输入...")), 1)
+                ])) : F("", !0),
+                G(z.$slots, "header-extra", { conversation: m(l) }, void 0, !0)
               ]),
-              oe.value ? (y(), ce(m(pt), {
+              ce.value ? (y(), de(m(pt), {
                 key: 1,
                 icon: "search",
                 "icon-size": 20,
-                onClick: ne[0] || (ne[0] = ft((Ve) => en.value = !0, ["stop"]))
-              })) : U("", !0),
-              le.value && m(l) ? (y(), ce(m(pt), {
+                onClick: ne[0] || (ne[0] = ft((Ge) => en.value = !0, ["stop"]))
+              })) : F("", !0),
+              Z.value && m(l) ? (y(), de(m(pt), {
                 key: 2,
                 icon: "vertical",
                 "icon-size": 20,
-                onClick: ft(De, ["stop"])
-              })) : U("", !0)
+                onClick: ft(Ee, ["stop"])
+              })) : F("", !0)
             ], !0)
-          ], 2)) : U("", !0),
-          on.value && m(l) ? (y(), ce(XA, {
+          ], 2)) : F("", !0),
+          hn.value && m(l) ? (y(), de(XA, {
             key: 1,
-            "max-preview-length": Jt.value,
-            onLocate: Zt
-          }, null, 8, ["max-preview-length"])) : U("", !0),
-          is.value && m(l) ? (y(), ce(n$, {
+            "max-preview-length": on.value,
+            onLocate: Jt
+          }, null, 8, ["max-preview-length"])) : F("", !0),
+          is.value && m(l) ? (y(), de(n$, {
             key: 2,
             "group-id": m(l).id
-          }, null, 8, ["group-id"])) : U("", !0),
-          q(kp, {
+          }, null, 8, ["group-id"])) : F("", !0),
+          W(kp, {
             ref_key: "messageListRef",
             ref: a,
             config: s.config,
-            onReedit: ae,
+            onReedit: le,
             onEdit: K,
             onForward: Br,
-            onRecallFailed: ne[1] || (ne[1] = (Ve, yt) => o("recall-failed", Ve, yt)),
+            onRecallFailed: ne[1] || (ne[1] = (Ge, yt) => o("recall-failed", Ge, yt)),
             onMentionClick: dv,
-            onLocationClick: ne[2] || (ne[2] = (Ve, yt) => o("location-click", Ve, yt)),
-            onCustomMessageAction: ne[3] || (ne[3] = (Ve, yt, nn) => o("custom-message-action", Ve, yt, nn)),
+            onLocationClick: ne[2] || (ne[2] = (Ge, yt) => o("location-click", Ge, yt)),
+            onCustomMessageAction: ne[3] || (ne[3] = (Ge, yt, nn) => o("custom-message-action", Ge, yt, nn)),
             onAvatarViewProfile: cv,
             onAvatarMention: uv
           }, At({ _: 2 }, [
-            et(z.$slots, (Ve, yt) => ({
+            tt(z.$slots, (Ge, yt) => ({
               name: yt,
-              fn: X((nn) => [
-                V(z.$slots, yt, Fe(Ue(nn)), void 0, !0)
+              fn: J((nn) => [
+                G(z.$slots, yt, Fe(Ue(nn)), void 0, !0)
               ])
             }))
           ]), 1032, ["config"]),
-          V(z.$slots, "multi-select-bar", {
+          G(z.$slots, "multi-select-bar", {
             visible: m(c),
             selectedMessages: m(d),
             totalMessages: m(u).length,
@@ -33245,60 +33263,60 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
             delete: hu,
             close: m(p)
           }, () => [
-            m(c) ? (y(), ce(pL, {
+            m(c) ? (y(), de(pL, {
               key: 0,
               "selected-messages": m(d),
               "total-messages": m(u).length,
               onForwardOneByOne: fu,
               onForwardCombine: pu,
               onDelete: hu,
-              onSelectAll: ne[4] || (ne[4] = (Ve) => m(M)(m(u))),
-              onDeselectAll: ne[5] || (ne[5] = (Ve) => m(x)()),
+              onSelectAll: ne[4] || (ne[4] = (Ge) => m(M)(m(u))),
+              onDeselectAll: ne[5] || (ne[5] = (Ge) => m(x)()),
               onClose: m(p)
-            }, null, 8, ["selected-messages", "total-messages", "onClose"])) : U("", !0)
+            }, null, 8, ["selected-messages", "total-messages", "onClose"])) : F("", !0)
           ], !0),
-          m(c) ? U("", !0) : (y(), ce(Eg, {
+          m(c) ? F("", !0) : (y(), de(Eg, {
             key: 3,
             ref_key: "messageInputRef",
             ref: i,
             config: s.config,
             "is-group": is.value,
             muted: ev.value,
-            "keyboard-height": m(L).keyboardHeight.value,
+            "keyboard-height": m(O).keyboardHeight.value,
             "mention-contacts": tv.value,
-            onSendSuccess: wt,
-            onFocus: ne[6] || (ne[6] = (Ve) => {
+            onSendSuccess: St,
+            onFocus: ne[6] || (ne[6] = (Ge) => {
               var yt;
               return (yt = a.value) == null ? void 0 : yt.scrollToBottom();
             })
           }, {
-            "toolbar-extra": X((Ve) => [
-              V(z.$slots, "toolbar-extra", Fe(Ue(Ve)), void 0, !0)
+            "toolbar-extra": J((Ge) => [
+              G(z.$slots, "toolbar-extra", Fe(Ue(Ge)), void 0, !0)
             ]),
-            "input-panel": X((Ve) => [
-              V(z.$slots, "input-panel", Fe(Ue(Ve)), void 0, !0)
+            "input-panel": J((Ge) => [
+              G(z.$slots, "input-panel", Fe(Ue(Ge)), void 0, !0)
             ]),
             _: 3
           }, 8, ["config", "is-group", "muted", "keyboard-height", "mention-contacts"])),
-          V(z.$slots, "drawer", {
+          G(z.$slots, "drawer", {
             conversation: m(l),
             isGroup: is.value,
-            show: we.value,
-            open: De,
-            close: Ge,
+            show: re.value,
+            open: Ee,
+            close: Ve,
             offsetTop: Or.value
           }, () => {
-            var Ve, yt, nn, zo, vu, yu, bu, ku, wu, _u, Cu, Mu, Su, Iu, xu, Tu;
+            var Ge, yt, nn, zo, vu, yu, bu, ku, wu, _u, Cu, Mu, Su, Iu, xu, Tu;
             return [
-              q(Ng, {
+              W(Ng, {
                 ref_key: "chatInfoDrawerRef",
                 ref: kn,
-                show: we.value,
-                "onUpdate:show": ne[7] || (ne[7] = (Pr) => we.value = Pr),
+                show: re.value,
+                "onUpdate:show": ne[7] || (ne[7] = (Pr) => re.value = Pr),
                 conversation: m(l),
                 "is-group": is.value,
                 "offset-top": Or.value,
-                "group-management-display-mode": (yt = (Ve = s.config) == null ? void 0 : Ve.groupManagement) == null ? void 0 : yt.displayMode,
+                "group-management-display-mode": (yt = (Ge = s.config) == null ? void 0 : Ge.groupManagement) == null ? void 0 : yt.displayMode,
                 "allow-chat": (zo = (nn = s.config) == null ? void 0 : nn.groupMember) == null ? void 0 : zo.allowChat,
                 "show-mute-all": (yu = (vu = s.config) == null ? void 0 : vu.groupManagement) == null ? void 0 : yu.showMuteAll,
                 "show-mute-list": (ku = (bu = s.config) == null ? void 0 : bu.groupManagement) == null ? void 0 : ku.showMuteList,
@@ -33316,125 +33334,125 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
                 onSetAdmin: bv,
                 onRemoveAdmin: kv
               }, At({ _: 2 }, [
-                et(Pt(), (Pr, Eu) => ({
+                tt(Rt(), (Pr, Eu) => ({
                   name: Eu,
-                  fn: X((wv) => [
-                    V(z.$slots, Eu, Fe(Ue(wv)), void 0, !0)
+                  fn: J((wv) => [
+                    G(z.$slots, Eu, Fe(Ue(wv)), void 0, !0)
                   ])
                 }))
               ]), 1032, ["show", "conversation", "is-group", "offset-top", "group-management-display-mode", "allow-chat", "show-mute-all", "show-mute-list", "show-blocklist", "show-allowlist", "show-shared-files", "show-join-requests"])
             ];
           }, !0),
-          V(z.$slots, "message-search", {
+          G(z.$slots, "message-search", {
             show: en.value,
-            config: (Ze = (Se = s.config) == null ? void 0 : Se.messageList) == null ? void 0 : Ze.search,
+            config: (et = (Se = s.config) == null ? void 0 : Se.messageList) == null ? void 0 : et.search,
             locate: gu,
             open: B,
             close: Y
           }, () => {
-            var Ve, yt;
+            var Ge, yt;
             return [
-              oe.value ? (y(), ce(OL, {
+              ce.value ? (y(), de(OL, {
                 key: 0,
                 show: en.value,
                 "onUpdate:show": ne[9] || (ne[9] = (nn) => en.value = nn),
-                config: (yt = (Ve = s.config) == null ? void 0 : Ve.messageList) == null ? void 0 : yt.search,
+                config: (yt = (Ge = s.config) == null ? void 0 : Ge.messageList) == null ? void 0 : yt.search,
                 onLocate: gu,
                 onClose: ne[10] || (ne[10] = (nn) => en.value = !1)
-              }, null, 8, ["show", "config"])) : U("", !0)
+              }, null, 8, ["show", "config"])) : F("", !0)
             ];
           }, !0),
-          q(m(io), {
-            show: he.value,
-            "onUpdate:show": ne[11] || (ne[11] = (Ve) => he.value = Ve),
-            title: m(fe)("group.memberList.removeConfirmTitle"),
-            "confirm-text": m(fe)("button.confirm"),
-            "cancel-text": m(fe)("button.cancel"),
+          W(m(io), {
+            show: me.value,
+            "onUpdate:show": ne[11] || (ne[11] = (Ge) => me.value = Ge),
+            title: m(he)("group.memberList.removeConfirmTitle"),
+            "confirm-text": m(he)("button.confirm"),
+            "cancel-text": m(he)("button.cancel"),
             onConfirm: vv,
             onCancel: yv
           }, {
-            default: X(() => [
-              Le.value ? (y(), w($e, { key: 0 }, [
-                mt(P(m(fe)("group.memberList.removeConfirmPrefix")) + " " + P(Le.value.nickname || Le.value.userId) + " " + P(m(fe)("group.memberList.removeConfirmSuffix")), 1)
-              ], 64)) : U("", !0)
+            default: J(() => [
+              Oe.value ? (y(), w($e, { key: 0 }, [
+                mt(P(m(he)("group.memberList.removeConfirmPrefix")) + " " + P(Oe.value.nickname || Oe.value.userId) + " " + P(m(he)("group.memberList.removeConfirmSuffix")), 1)
+              ], 64)) : F("", !0)
             ]),
             _: 1
           }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-          V(z.$slots, "invite-member", {
+          G(z.$slots, "invite-member", {
             show: tn.value,
-            groupId: Bt.value,
-            existingMemberIds: m(S).group.getGroupMembers(Bt.value).map((Ve) => Ve.userId),
+            groupId: Pt.value,
+            existingMemberIds: m(S).group.getGroupMembers(Pt.value).map((Ge) => Ge.userId),
             open: mu,
-            close: un
+            close: cn
           }, () => [
-            q(cp, {
+            W(cp, {
               show: tn.value,
-              "onUpdate:show": ne[12] || (ne[12] = (Ve) => tn.value = Ve),
-              "group-id": Bt.value,
-              "existing-member-ids": m(S).group.getGroupMembers(Bt.value).map((Ve) => Ve.userId),
+              "onUpdate:show": ne[12] || (ne[12] = (Ge) => tn.value = Ge),
+              "group-id": Pt.value,
+              "existing-member-ids": m(S).group.getGroupMembers(Pt.value).map((Ge) => Ge.userId),
               onInvited: av
             }, null, 8, ["show", "group-id", "existing-member-ids"])
           ], !0),
-          V(z.$slots, "forward", {
+          G(z.$slots, "forward", {
             show: Po.value,
             messages: Dr.value,
             mode: Aa.value,
             open: Br,
             close: nv
           }, () => [
-            q(Lg, {
+            W(Lg, {
               show: Po.value,
-              "onUpdate:show": ne[13] || (ne[13] = (Ve) => Po.value = Ve),
+              "onUpdate:show": ne[13] || (ne[13] = (Ge) => Po.value = Ge),
               onForward: sv
             }, null, 8, ["show"])
           ], !0),
-          V(z.$slots, "user-card", {
-            show: ot.value,
+          G(z.$slots, "user-card", {
+            show: rt.value,
             userId: We.value,
             open: Sn,
             close: zt
           }, () => [
-            q(Xf, {
-              show: ot.value,
-              "onUpdate:show": ne[14] || (ne[14] = (Ve) => ot.value = Ve),
+            W(Xf, {
+              show: rt.value,
+              "onUpdate:show": ne[14] || (ne[14] = (Ge) => rt.value = Ge),
               "user-id": We.value,
               onSendMessage: pv
             }, null, 8, ["show", "user-id"])
           ], !0),
-          V(z.$slots, "group-card", {
+          G(z.$slots, "group-card", {
             show: ct.value,
             groupId: bt.value,
             open: rs,
             close: au
           }, () => [
-            q(Yf, {
+            W(Yf, {
               show: ct.value,
-              "onUpdate:show": ne[15] || (ne[15] = (Ve) => ct.value = Ve),
+              "onUpdate:show": ne[15] || (ne[15] = (Ge) => ct.value = Ge),
               "group-id": bt.value,
               onSendMessage: hv
             }, null, 8, ["show", "group-id"])
           ], !0)
         ], 64)) : (y(), w("div", UL, [
-          q(m(Ht), {
+          W(m(Ht), {
             icon: "bubble/rect/2",
-            description: m(fe)("chat.empty", "选择一个会话"),
+            description: m(he)("chat.empty", "选择一个会话"),
             size: "large"
           }, {
-            description: X(() => [
-              V(z.$slots, "empty", {}, () => [
-                mt(P(m(fe)("chat.empty", "选择一个会话")), 1)
+            description: J(() => [
+              G(z.$slots, "empty", {}, () => [
+                mt(P(m(he)("chat.empty", "选择一个会话")), 1)
               ], !0)
             ]),
             _: 3
           }, 8, ["description"])
         ])),
         z.$slots.watermark ? (y(), w("div", qL, [
-          V(z.$slots, "watermark", { conversation: m(l) }, void 0, !0)
-        ])) : U("", !0)
+          G(z.$slots, "watermark", { conversation: m(l) }, void 0, !0)
+        ])) : F("", !0)
       ], 6);
     };
   }
-}), Og = /* @__PURE__ */ ze(JL, [["__scopeId", "data-v-fd52606a"]]), XL = { class: "contact-nav" }, YL = ["onClick"], QL = { class: "contact-nav__item-label" }, ZL = { class: "contact-nav__item-extra" }, eO = /* @__PURE__ */ Re({
+}), Og = /* @__PURE__ */ ze(JL, [["__scopeId", "data-v-fd52606a"]]), XL = { class: "contact-nav" }, YL = ["onClick"], QL = { class: "contact-nav__item-label" }, ZL = { class: "contact-nav__item-extra" }, eO = /* @__PURE__ */ Le({
   __name: "contact-nav",
   props: {
     entries: {},
@@ -33448,7 +33466,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       s("entry-click", r.key);
     }
     return (r, i) => (y(), w("div", XL, [
-      (y(!0), w($e, null, et(t.entries, (a) => (y(), w($e, {
+      (y(!0), w($e, null, tt(t.entries, (a) => (y(), w($e, {
         key: a.key
       }, [
         a.visible !== !1 ? (y(), w("div", {
@@ -33457,31 +33475,31 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
           style: Et(t.cardStyle),
           onClick: (l) => o(a)
         }, [
-          V(r.$slots, "entry", { entry: a }, () => [
+          G(r.$slots, "entry", { entry: a }, () => [
             _("span", QL, [
-              a.icon ? (y(), ce(m(Oe), {
+              a.icon ? (y(), de(m(De), {
                 key: 0,
                 name: a.icon,
                 size: 20,
                 class: "contact-nav__item-icon"
-              }, null, 8, ["name"])) : U("", !0),
+              }, null, 8, ["name"])) : F("", !0),
               _("span", null, P(a.label), 1)
             ]),
             _("span", ZL, [
-              V(r.$slots, "entry-extra", { entry: a }, () => [
+              G(r.$slots, "entry-extra", { entry: a }, () => [
                 a.count !== void 0 && a.count !== null && a.count > 0 ? (y(), w("span", {
                   key: 0,
                   class: Te(["contact-nav__item-count", { "contact-nav__item-count--hot": a.hot }])
-                }, P(a.count > 99 ? "99+" : a.count), 3)) : U("", !0)
+                }, P(a.count > 99 ? "99+" : a.count), 3)) : F("", !0)
               ], !0),
-              q(m(Oe), {
+              W(m(De), {
                 name: "chevron/right",
                 size: 14,
                 class: "contact-nav__item-arrow"
               })
             ])
           ], !0)
-        ], 14, YL)) : U("", !0)
+        ], 14, YL)) : F("", !0)
       ], 64))), 128))
     ]));
   }
@@ -33503,7 +33521,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }, mO = {
   key: 0,
   class: "contact-notice-list__time"
-}, gO = { class: "contact-notice-list__actions" }, vO = ["disabled", "onClick"], yO = ["disabled", "onClick"], bO = /* @__PURE__ */ Re({
+}, gO = { class: "contact-notice-list__actions" }, vO = ["disabled", "onClick"], yO = ["disabled", "onClick"], bO = /* @__PURE__ */ Le({
   __name: "contact-notice-list",
   props: {
     invites: { default: void 0 },
@@ -33512,7 +33530,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
   },
   emits: ["accept", "decline"],
   setup(n, { emit: e }) {
-    const t = n, s = e, o = Ot("UIKit:ContactNoticeList");
+    const t = n, s = e, o = Dt("UIKit:ContactNoticeList");
     qf(k(() => t.persist));
     const { t: r } = qe(), { show: i } = Wt(), { stores: a } = at(), { inviteList: l, acceptContactInvite: c, declineContactInvite: u } = Un(), { acceptGroupInvitation: d, declineGroupInvitation: p } = sn(), f = k(() => t.invites ?? l.value), h = A(/* @__PURE__ */ new Set());
     function g(E) {
@@ -33529,8 +33547,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         h.value.add(E.id);
         try {
           E.type === "group" && E.groupId ? await d(E.groupId) : E.userId && await c(E.userId), s("accept", E);
-        } catch (G) {
-          o.warn("[ContactNoticeList] accept invite failed:", Je(G)), i(r("contact.inviteAcceptFailed", "接受失败"), "error");
+        } catch (H) {
+          o.warn("[ContactNoticeList] accept invite failed:", Je(H)), i(r("contact.inviteAcceptFailed", "接受失败"), "error");
         } finally {
           h.value.delete(E.id);
         }
@@ -33541,8 +33559,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         h.value.add(E.id);
         try {
           E.type === "group" && E.groupId ? await p(E.groupId) : E.userId && await u(E.userId), s("decline", E);
-        } catch (G) {
-          o.warn("[ContactNoticeList] decline invite failed:", Je(G)), i(r("contact.inviteDeclineFailed", "拒绝失败"), "error");
+        } catch (H) {
+          o.warn("[ContactNoticeList] decline invite failed:", Je(H)), i(r("contact.inviteDeclineFailed", "拒绝失败"), "error");
         } finally {
           h.value.delete(E.id);
         }
@@ -33551,8 +33569,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     function M(E) {
       if (!E)
         return "";
-      const G = new Date(E);
-      return `${G.getMonth() + 1}/${G.getDate()} ${String(G.getHours()).padStart(2, "0")}:${String(G.getMinutes()).padStart(2, "0")}`;
+      const H = new Date(E);
+      return `${H.getMonth() + 1}/${H.getDate()} ${String(H.getHours()).padStart(2, "0")}:${String(H.getMinutes()).padStart(2, "0")}`;
     }
     function x(E) {
       return E === "accepted" ? r("contact.inviteAccepted", "已接受") : E === "declined" ? r("contact.inviteDeclined", "已拒绝") : "";
@@ -33562,63 +33580,63 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     }
     function I(E) {
       if (E.type === "group") {
-        const G = E.inviterName || E.inviterId;
-        return G ? `${r("contact.inviteInviter", "邀请人")}: ${G}` : `ID: ${E.groupId || ""}`;
+        const H = E.inviterName || E.inviterId;
+        return H ? `${r("contact.inviteInviter", "邀请人")}: ${H}` : `ID: ${E.groupId || ""}`;
       }
       return `ID: ${E.userId || ""}`;
     }
-    function O(E) {
+    function N(E) {
       return E.type === "group" ? E.groupName || E.groupId || "" : E.nickname || E.userId || "";
     }
-    return (E, G) => (y(), w("div", tO, [
+    return (E, H) => (y(), w("div", tO, [
       _("div", nO, [
         _("span", sO, P(m(r)("contact.inviteTitle", "好友申请")), 1),
-        f.value.length > 0 ? (y(), w("span", oO, P(f.value.length), 1)) : U("", !0)
+        f.value.length > 0 ? (y(), w("span", oO, P(f.value.length), 1)) : F("", !0)
       ]),
       n.loading && f.value.length === 0 ? (y(), w("div", rO, [
         _("span", iO, P(m(r)("common.loading")), 1)
-      ])) : f.value.length === 0 ? (y(), ce(m(Ht), {
+      ])) : f.value.length === 0 ? (y(), de(m(Ht), {
         key: 1,
         icon: "person/single",
         description: m(r)("contact.inviteEmpty", "暂无好友申请")
       }, null, 8, ["description"])) : (y(), w("div", aO, [
-        (y(!0), w($e, null, et(f.value, (N) => (y(), w("div", {
-          key: N.id,
+        (y(!0), w($e, null, tt(f.value, (D) => (y(), w("div", {
+          key: D.id,
           class: Te(["contact-notice-list__item", {
-            "contact-notice-list__item--accepted": b(N) === "accepted",
-            "contact-notice-list__item--declined": b(N) === "declined"
+            "contact-notice-list__item--accepted": b(D) === "accepted",
+            "contact-notice-list__item--declined": b(D) === "declined"
           }])
         }, [
-          q(m($t), {
+          W(m($t), {
             class: "contact-notice-list__avatar",
-            name: O(N),
-            src: N.avatarUrl,
+            name: N(D),
+            src: D.avatarUrl,
             size: 44
           }, null, 8, ["name", "src"]),
           _("div", lO, [
             _("div", cO, [
-              _("span", uO, P(T(N)), 1),
-              x(b(N)) ? (y(), w("span", dO, P(x(b(N))), 1)) : U("", !0)
+              _("span", uO, P(T(D)), 1),
+              x(b(D)) ? (y(), w("span", dO, P(x(b(D))), 1)) : F("", !0)
             ]),
             _("div", fO, [
-              _("span", pO, P(I(N)), 1),
-              N.reason ? (y(), w("span", hO, P(m(r)("contact.inviteReason", "附言")) + ": " + P(N.reason), 1)) : U("", !0)
+              _("span", pO, P(I(D)), 1),
+              D.reason ? (y(), w("span", hO, P(m(r)("contact.inviteReason", "附言")) + ": " + P(D.reason), 1)) : F("", !0)
             ]),
-            N.timestamp ? (y(), w("div", mO, P(M(N.timestamp)), 1)) : U("", !0)
+            D.timestamp ? (y(), w("div", mO, P(M(D.timestamp)), 1)) : F("", !0)
           ]),
           _("div", gO, [
-            b(N) === "pending" ? (y(), w($e, { key: 0 }, [
+            b(D) === "pending" ? (y(), w($e, { key: 0 }, [
               _("button", {
                 class: "contact-notice-list__btn contact-notice-list__btn--primary",
-                disabled: g(N),
-                onClick: (D) => $(N)
+                disabled: g(D),
+                onClick: (L) => $(D)
               }, P(m(r)("contact.inviteAccept", "接受")), 9, vO),
               _("button", {
                 class: "contact-notice-list__btn contact-notice-list__btn--default",
-                disabled: g(N),
-                onClick: (D) => R(N)
+                disabled: g(D),
+                onClick: (L) => R(D)
               }, P(m(r)("contact.inviteDecline", "拒绝")), 9, yO)
-            ], 64)) : U("", !0)
+            ], 64)) : F("", !0)
           ])
         ], 2))), 128))
       ]))
@@ -33639,7 +33657,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }, LO = { class: "contact-detail__label" }, OO = { class: "contact-detail__value" }, DO = {
   key: 3,
   class: "contact-detail__row"
-}, BO = { class: "contact-detail__label" }, PO = { class: "contact-detail__value" }, zO = /* @__PURE__ */ Re({
+}, BO = { class: "contact-detail__label" }, PO = { class: "contact-detail__value" }, zO = /* @__PURE__ */ Le({
   __name: "contact-detail",
   props: {
     userId: {},
@@ -33647,7 +33665,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
   },
   emits: ["send-message", "deleted", "block-changed", "remark-changed"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:ContactDetail"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { client: a, stores: l, features: c } = at(), { deleteContact: u, setContactRemark: d } = Un(), { isBlocked: p, addBlock: f, removeBlock: h, refresh: g } = Oo(), { fetchPresence: v } = ro(), b = [
+    const t = Dt("UIKit:ContactDetail"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { client: a, stores: l, features: c } = at(), { deleteContact: u, setContactRemark: d } = Un(), { isBlocked: p, addBlock: f, removeBlock: h, refresh: g } = Oo(), { fetchPresence: v } = ro(), b = [
       "nickname",
       "avatarUrl",
       "sign",
@@ -33656,34 +33674,34 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       "phone",
       "mail",
       "ext"
-    ], { userInfo: $, contact: R, avatarUrl: M, displayName: x } = jt(() => s.userId, b), T = A(void 0), I = A(!1), O = k(() => s.userId ? l.userInfo.getUserInfo(s.userId) ? I.value : l.userInfo.isLoading(s.userId) || I.value : !1), E = k(() => l.client.currentUser === s.userId), G = A(!1), N = A(""), D = A(), S = A();
+    ], { userInfo: $, contact: R, avatarUrl: M, displayName: x } = jt(() => s.userId, b), T = A(void 0), I = A(!1), N = k(() => s.userId ? l.userInfo.getUserInfo(s.userId) ? I.value : l.userInfo.isLoading(s.userId) || I.value : !1), E = k(() => l.client.currentUser === s.userId), H = A(!1), D = A(""), L = A(), S = A();
     let C = null;
-    const L = A({
+    const O = A({
       show: !1,
       title: "",
       content: "",
       action: null
-    }), J = k(() => $.value), te = k(
+    }), q = k(() => $.value), te = k(
       () => {
-        var ee, me;
-        return M.value || ((ee = s.contact) == null ? void 0 : ee.avatar) || ((me = J.value) == null ? void 0 : me.avatarUrl);
+        var ee, ve;
+        return M.value || ((ee = s.contact) == null ? void 0 : ee.avatar) || ((ve = q.value) == null ? void 0 : ve.avatarUrl);
       }
-    ), ve = k(
+    ), ye = k(
       () => {
         var ee;
         return x.value || ((ee = s.contact) == null ? void 0 : ee.name) || s.userId;
       }
-    ), be = k(
+    ), ke = k(
       () => {
-        var ee, me;
-        return ((ee = J.value) == null ? void 0 : ee.sign) || ((me = s.contact) == null ? void 0 : me.signature) || "";
+        var ee, ve;
+        return ((ee = q.value) == null ? void 0 : ee.sign) || ((ve = s.contact) == null ? void 0 : ve.signature) || "";
       }
-    ), W = k(
+    ), j = k(
       () => {
-        var ee, me;
-        return ((ee = R.value) == null ? void 0 : ee.remark) || ((me = s.contact) == null ? void 0 : me.remark) || "";
+        var ee, ve;
+        return ((ee = R.value) == null ? void 0 : ee.remark) || ((ve = s.contact) == null ? void 0 : ve.remark) || "";
       }
-    ), re = k(() => {
+    ), ie = k(() => {
       const ee = p(s.userId);
       return [
         {
@@ -33705,31 +33723,31 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
           type: "danger"
         }
       ];
-    }), ue = k(() => {
-      var me;
+    }), fe = k(() => {
+      var ve;
       const ee = [];
-      return be.value && ee.push({ key: "signature", label: r("contact.detail.signature", "个性签名"), value: be.value }), (me = J.value) != null && me.nickname && ee.push({ key: "nickname", label: r("contact.detail.nickname", "昵称"), value: J.value.nickname }), ee;
+      return ke.value && ee.push({ key: "signature", label: r("contact.detail.signature", "个性签名"), value: ke.value }), (ve = q.value) != null && ve.nickname && ee.push({ key: "nickname", label: r("contact.detail.nickname", "昵称"), value: q.value.nickname }), ee;
     });
     Pe(
       () => s.userId,
       () => {
-        j();
+        V();
       },
       { immediate: !0 }
     ), Pe(
-      () => W.value,
+      () => j.value,
       (ee) => {
-        G.value || (N.value = ee || "");
+        H.value || (D.value = ee || "");
       },
       { immediate: !0 }
     ), qt(() => {
       c.enableBlocklist && l.contact.blackList.length === 0 && g();
     }), Pe(
-      G,
+      H,
       (ee) => {
         ee ? Ye(() => {
-          var me;
-          (me = S.value) == null || me.focus(), C = Vf(D, () => {
+          var ve;
+          (ve = S.value) == null || ve.focus(), C = Vf(L, () => {
             Me();
           });
         }) : (C == null || C(), C = null);
@@ -33737,60 +33755,60 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     ), Ds(() => {
       C == null || C();
     });
-    async function j() {
+    async function V() {
       var ee;
       if (!(!s.userId || !a.value)) {
         I.value = !0;
         try {
           if (c.enablePresence)
             try {
-              const me = await v([s.userId]);
-              T.value = (ee = me[0]) == null ? void 0 : ee.status;
-            } catch (me) {
-              t.warn("[ContactDetail] fetch presence failed:", Je(me));
+              const ve = await v([s.userId]);
+              T.value = (ee = ve[0]) == null ? void 0 : ee.status;
+            } catch (ve) {
+              t.warn("[ContactDetail] fetch presence failed:", Je(ve));
             }
         } finally {
           I.value = !1;
         }
       }
     }
-    function de() {
-      N.value = W.value, G.value = !0;
+    function ue() {
+      D.value = j.value, H.value = !0;
     }
     async function se() {
       try {
-        await d(s.userId, N.value), G.value = !1, o("remark-changed", s.userId, N.value), i(r("contact.detail.remarkSaved", "备注已保存"), "success");
+        await d(s.userId, D.value), H.value = !1, o("remark-changed", s.userId, D.value), i(r("contact.detail.remarkSaved", "备注已保存"), "success");
       } catch (ee) {
         t.warn("[ContactDetail] save remark failed:", Je(ee)), i(r("contact.detail.remarkSaveFailed", "备注保存失败"), "error");
       }
     }
     function Me() {
-      N.value = W.value, G.value = !1;
+      D.value = j.value, H.value = !1;
     }
     function ge(ee) {
-      const me = {
+      const ve = {
         delete: r("contact.detail.deleteContactConfirm", "确定删除该联系人？"),
         block: r("contact.detail.blockConfirm", "确定拉黑该联系人？"),
         unblock: r("contact.detail.unblockConfirm", "确定取消拉黑？")
       };
-      L.value = {
+      O.value = {
         show: !0,
         title: "",
-        content: me[ee],
+        content: ve[ee],
         action: ee
       };
     }
     async function Ie() {
-      const ee = L.value.action;
-      if (L.value.show = !1, !!ee)
+      const ee = O.value.action;
+      if (O.value.show = !1, !!ee)
         try {
           ee === "delete" ? (await u(s.userId), i(r("contact.detail.deleteContactSuccess", "已删除联系人"), "success"), o("deleted", s.userId)) : ee === "block" ? (await f({
             userId: s.userId,
-            name: ve.value,
+            name: ye.value,
             avatar: te.value || ""
           }), i(r("contact.detail.blockSuccess", "已拉黑"), "success"), o("block-changed", s.userId, !0)) : ee === "unblock" && (await h(s.userId), i(r("contact.detail.unblockSuccess", "已取消拉黑"), "success"), o("block-changed", s.userId, !1));
-        } catch (me) {
-          t.warn("[ContactDetail] action failed:", Je(me)), i(r("contact.detail.actionFailed", "操作失败"), "error");
+        } catch (ve) {
+          t.warn("[ContactDetail] action failed:", Je(ve)), i(r("contact.detail.actionFailed", "操作失败"), "error");
         }
     }
     function Ke(ee) {
@@ -33799,39 +33817,39 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
     function _e(ee) {
     }
     function He() {
-      c.enablePresence && E.value && j();
+      c.enablePresence && E.value && V();
     }
-    return (ee, me) => (y(), w("div", kO, [
+    return (ee, ve) => (y(), w("div", kO, [
       _("div", wO, [
-        O.value ? (y(), w("div", _O, P(m(r)("common.loading", "加载中...")), 1)) : U("", !0),
-        q(m(Xl), {
+        N.value ? (y(), w("div", _O, P(m(r)("common.loading", "加载中...")), 1)) : F("", !0),
+        W(m(Xl), {
           "user-id": s.userId,
-          name: ve.value,
+          name: ye.value,
           avatar: te.value,
           status: T.value,
           editable: E.value,
-          actions: re.value,
-          "info-rows": ue.value,
+          actions: ie.value,
+          "info-rows": fe.value,
           onActionClick: Ke,
           onInfoClick: _e,
           onPresenceChanged: He
         }, {
-          default: X(() => {
-            var Be, tt, nt, dt;
+          default: J(() => {
+            var Be, st, nt, dt;
             return [
               _("div", CO, [
                 _("div", MO, [
                   _("span", SO, P(m(r)("contact.detail.remark", "备注")), 1),
-                  G.value ? (y(), w("div", {
+                  H.value ? (y(), w("div", {
                     key: 0,
                     ref_key: "remarkEditRef",
-                    ref: D,
+                    ref: L,
                     class: "contact-detail__remark-edit"
                   }, [
                     Dn(_("input", {
                       ref_key: "remarkInputRef",
                       ref: S,
-                      "onUpdate:modelValue": me[0] || (me[0] = (vt) => N.value = vt),
+                      "onUpdate:modelValue": ve[0] || (ve[0] = (gt) => D.value = gt),
                       class: "contact-detail__remark-input",
                       type: "text",
                       onKeyup: [
@@ -33839,16 +33857,16 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
                         ms(Me, ["esc"])
                       ]
                     }, null, 544), [
-                      [ts, N.value]
+                      [ts, D.value]
                     ]),
-                    q(m(pt), {
+                    W(m(pt), {
                       icon: "check/single",
                       size: "small",
                       type: "success",
                       title: m(r)("button.confirm", "确认"),
                       onClick: se
                     }, null, 8, ["title"]),
-                    q(m(pt), {
+                    W(m(pt), {
                       icon: "xmark/bold",
                       size: "small",
                       type: "danger",
@@ -33856,49 +33874,49 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
                       onClick: Me
                     }, null, 8, ["title"])
                   ], 512)) : (y(), w($e, { key: 1 }, [
-                    _("span", IO, P(W.value || "-"), 1),
-                    q(m(pt), {
+                    _("span", IO, P(j.value || "-"), 1),
+                    W(m(pt), {
                       icon: "rect/pencil",
                       size: "small",
                       type: "primary",
                       title: m(r)("contact.detail.edit", "编辑"),
-                      onClick: de
+                      onClick: ue
                     }, null, 8, ["title"])
                   ], 64))
                 ]),
-                (Be = J.value) != null && Be.gender ? (y(), w("div", xO, [
+                (Be = q.value) != null && Be.gender ? (y(), w("div", xO, [
                   _("span", TO, P(m(r)("contact.detail.gender", "性别")), 1),
-                  _("span", EO, P(J.value.gender), 1)
-                ])) : U("", !0),
-                (tt = J.value) != null && tt.birth ? (y(), w("div", AO, [
+                  _("span", EO, P(q.value.gender), 1)
+                ])) : F("", !0),
+                (st = q.value) != null && st.birth ? (y(), w("div", AO, [
                   _("span", $O, P(m(r)("contact.detail.birth", "生日")), 1),
-                  _("span", RO, P(J.value.birth), 1)
-                ])) : U("", !0),
-                (nt = J.value) != null && nt.phone ? (y(), w("div", NO, [
+                  _("span", RO, P(q.value.birth), 1)
+                ])) : F("", !0),
+                (nt = q.value) != null && nt.phone ? (y(), w("div", NO, [
                   _("span", LO, P(m(r)("contact.detail.phone", "电话")), 1),
-                  _("span", OO, P(J.value.phone), 1)
-                ])) : U("", !0),
-                (dt = J.value) != null && dt.mail ? (y(), w("div", DO, [
+                  _("span", OO, P(q.value.phone), 1)
+                ])) : F("", !0),
+                (dt = q.value) != null && dt.mail ? (y(), w("div", DO, [
                   _("span", BO, P(m(r)("contact.detail.mail", "邮箱")), 1),
-                  _("span", PO, P(J.value.mail), 1)
-                ])) : U("", !0)
+                  _("span", PO, P(q.value.mail), 1)
+                ])) : F("", !0)
               ])
             ];
           }),
           _: 1
         }, 8, ["user-id", "name", "avatar", "status", "editable", "actions", "info-rows"])
       ]),
-      q(m(io), {
-        show: L.value.show,
-        "onUpdate:show": me[1] || (me[1] = (Be) => L.value.show = Be),
-        title: L.value.title,
+      W(m(io), {
+        show: O.value.show,
+        "onUpdate:show": ve[1] || (ve[1] = (Be) => O.value.show = Be),
+        title: O.value.title,
         "confirm-text": m(r)("button.confirm", "确认"),
         "cancel-text": m(r)("button.cancel", "取消"),
         onConfirm: Ie,
-        onCancel: me[2] || (me[2] = (Be) => L.value.show = !1)
+        onCancel: ve[2] || (ve[2] = (Be) => O.value.show = !1)
       }, {
-        default: X(() => [
-          mt(P(L.value.content), 1)
+        default: J(() => [
+          mt(P(O.value.content), 1)
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"])
@@ -33907,7 +33925,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }), FO = /* @__PURE__ */ ze(zO, [["__scopeId", "data-v-eb17f489"]]), UO = { class: "block-list-add-modal__header" }, HO = { class: "block-list-add-modal__title" }, GO = { class: "block-list-add-modal__search" }, VO = { class: "block-list-add-modal__body" }, jO = {
   key: 0,
   class: "block-list-add-modal__empty"
-}, KO = { class: "block-list-add-modal__footer" }, WO = ["disabled"], qO = /* @__PURE__ */ Re({
+}, KO = { class: "block-list-add-modal__footer" }, WO = ["disabled"], qO = /* @__PURE__ */ Le({
   __name: "block-list-add-modal",
   props: {
     show: { type: Boolean }
@@ -33950,14 +33968,14 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         }
       T === 0 ? r(o("contact.blocklist.addSuccess", "添加成功"), "success") : r(o("contact.blocklist.addFailed", "添加失败"), "error"), T === 0 && s("added", x), $();
     }
-    return (M, x) => (y(), ce(m(Lt), {
+    return (M, x) => (y(), de(m(Ot), {
       show: t.show,
       position: "center",
       "close-on-click-overlay": !0,
       "onUpdate:show": x[3] || (x[3] = (T) => s("update:show", T)),
       onClose: $
     }, {
-      default: X(() => [
+      default: J(() => [
         _("div", {
           class: "block-list-add-modal",
           onPointerdown: x[1] || (x[1] = ft(() => {
@@ -33969,7 +33987,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
             _("span", HO, P(m(o)("contact.blocklist.add", "添加黑名单")), 1)
           ]),
           _("div", GO, [
-            q(m(gn), {
+            W(m(gn), {
               modelValue: u.value,
               "onUpdate:modelValue": x[0] || (x[0] = (T) => u.value = T),
               variant: "search",
@@ -33980,8 +33998,8 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           _("div", VO, [
-            h.value.length === 0 ? (y(), w("div", jO, P(m(o)("contact.blocklist.emptySelectable", "暂无可添加的联系人")), 1)) : U("", !0),
-            (y(!0), w($e, null, et(h.value, (T) => (y(), ce(m(Tt), {
+            h.value.length === 0 ? (y(), w("div", jO, P(m(o)("contact.blocklist.emptySelectable", "暂无可添加的联系人")), 1)) : F("", !0),
+            (y(!0), w($e, null, tt(h.value, (T) => (y(), de(m(Tt), {
               key: T.userId,
               class: "block-list-add-modal__item",
               size: "compact",
@@ -33989,15 +34007,15 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
               selected: d.value.has(T.userId),
               onClick: (I) => v(T)
             }, {
-              leading: X(() => [
-                q(m($t), {
+              leading: J(() => [
+                W(m($t), {
                   name: g(T),
                   src: T.avatar,
                   size: 36
                 }, null, 8, ["name", "src"])
               ]),
-              trailing: X(() => [
-                q(m(Oe), {
+              trailing: J(() => [
+                W(m(De), {
                   name: d.value.has(T.userId) ? "circle/checked" : "circle/empty",
                   size: 20,
                   class: Te(["block-list-add-modal__checkbox", { "block-list-add-modal__checkbox--checked": d.value.has(T.userId) }])
@@ -34037,7 +34055,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
 }, nD = {
   key: 1,
   class: "block-list-contact__watermark"
-}, sD = /* @__PURE__ */ Re({
+}, sD = /* @__PURE__ */ Le({
   __name: "block-list",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -34054,25 +34072,25 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
   emits: ["click", "contextmenu", "unblock"],
   setup(n, { expose: e, emit: t }) {
     const s = n, o = t, { t: r } = qe(), { features: i } = at(), { blockList: a, refresh: l, removeBlock: c } = Oo(), { show: u } = Wt(), d = A(!1), p = A(!1), f = k(() => a.value.length), h = A(!1), g = A(null), v = A();
-    function b(O, E) {
-      O.preventDefault(), O.stopPropagation(), v.value = O.currentTarget, g.value = E, h.value = !0, o("contextmenu", O, E);
+    function b(N, E) {
+      N.preventDefault(), N.stopPropagation(), v.value = N.currentTarget, g.value = E, h.value = !0, o("contextmenu", N, E);
     }
-    function $(O) {
-      o("click", O);
+    function $(N) {
+      o("click", N);
     }
     function R() {
       h.value = !1;
     }
     const M = A(!1);
     function x() {
-      const O = g.value;
-      R(), O && (M.value = !0);
+      const N = g.value;
+      R(), N && (M.value = !0);
     }
     async function T() {
-      const O = g.value;
-      if (M.value = !1, !!O)
+      const N = g.value;
+      if (M.value = !1, !!N)
         try {
-          await c(O.userId), u(r("contact.blocklist.removeSuccess", "已移出黑名单"), "success"), o("unblock", O);
+          await c(N.userId), u(r("contact.blocklist.removeSuccess", "已移出黑名单"), "success"), o("unblock", N);
         } catch {
           u(r("contact.blocklist.removeFailed", "移出失败"), "error");
         }
@@ -34092,35 +34110,35 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
       I();
     }), e({
       refresh: I
-    }), (O, E) => (y(), w("div", JO, [
+    }), (N, E) => (y(), w("div", JO, [
       s.showHeader ? (y(), w("div", XO, [
-        V(O.$slots, "header", {}, () => [
+        G(N.$slots, "header", {}, () => [
           _("span", YO, [
             mt(P(s.title || m(r)("contact.entryBlocklist", "黑名单")) + " ", 1),
-            s.showCount ? (y(), w("span", QO, "(" + P(f.value) + ")", 1)) : U("", !0)
+            s.showCount ? (y(), w("span", QO, "(" + P(f.value) + ")", 1)) : F("", !0)
           ])
         ], !0),
-        V(O.$slots, "header-extra", {}, () => [
-          q(m(pt), {
+        G(N.$slots, "header-extra", {}, () => [
+          W(m(pt), {
             icon: "circle/plus",
             size: "small",
             variant: "ghost",
             "icon-size": 22,
             title: m(r)("contact.blocklist.add", "添加黑名单"),
-            onClick: E[0] || (E[0] = (G) => p.value = !0)
+            onClick: E[0] || (E[0] = (H) => p.value = !0)
           }, null, 8, ["title"])
         ], !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
       _("div", ZO, [
-        d.value && m(a).length === 0 ? (y(), w("div", eD, P(m(r)("common.loading")), 1)) : m(a).length === 0 ? (y(), ce(m(Ht), {
+        d.value && m(a).length === 0 ? (y(), w("div", eD, P(m(r)("common.loading")), 1)) : m(a).length === 0 ? (y(), de(m(Ht), {
           key: 1,
           icon: "circle/slash",
           description: s.emptyText || m(r)("contact.blocklist.empty", "暂无黑名单"),
           size: "small"
         }, null, 8, ["description"])) : (y(), w("div", tD, [
-          (y(!0), w($e, null, et(m(a), (G) => (y(), ce(mc, {
-            key: G.userId,
-            contact: G,
+          (y(!0), w($e, null, tt(m(a), (H) => (y(), de(mc, {
+            key: H.userId,
+            contact: H,
             "show-avatar": s.showAvatar,
             "avatar-size": s.avatarSize,
             "avatar-shape": s.avatarShape,
@@ -34130,7 +34148,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
           }, null, 8, ["contact", "show-avatar", "avatar-size", "avatar-shape", "size"]))), 128))
         ]))
       ]),
-      q(m(Lt), {
+      W(m(Ot), {
         show: h.value,
         anchor: v.value,
         placement: "bottom",
@@ -34140,7 +34158,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         "onUpdate:show": R,
         onClose: R
       }, {
-        default: X(() => [
+        default: J(() => [
           _("div", {
             class: "block-list-contact__menu",
             onClick: E[1] || (E[1] = ft(() => {
@@ -34150,7 +34168,7 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
               class: "block-list-contact__menu-item block-list-contact__menu-item--danger",
               onClick: x
             }, [
-              q(m(Oe), {
+              W(m(De), {
                 name: "person/minus",
                 size: 16
               }),
@@ -34160,27 +34178,27 @@ const vL = { class: "message-search-modal" }, yL = { class: "message-search-moda
         ]),
         _: 1
       }, 8, ["show", "anchor"]),
-      q(m(io), {
+      W(m(io), {
         show: M.value,
-        "onUpdate:show": E[2] || (E[2] = (G) => M.value = G),
+        "onUpdate:show": E[2] || (E[2] = (H) => M.value = H),
         title: m(r)("contact.blocklist.removeConfirmTitle", "移出黑名单"),
         "confirm-text": m(r)("button.confirm", "确认"),
         "cancel-text": m(r)("button.cancel", "取消"),
         onConfirm: T,
-        onCancel: E[3] || (E[3] = (G) => M.value = !1)
+        onCancel: E[3] || (E[3] = (H) => M.value = !1)
       }, {
-        default: X(() => [
+        default: J(() => [
           mt(P(m(r)("contact.blocklist.removeConfirm", "确定将其移出黑名单吗？")), 1)
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      q(iu, {
+      W(iu, {
         show: p.value,
-        "onUpdate:show": E[4] || (E[4] = (G) => p.value = G)
+        "onUpdate:show": E[4] || (E[4] = (H) => p.value = H)
       }, null, 8, ["show"]),
-      O.$slots.watermark ? (y(), w("div", nD, [
-        V(O.$slots, "watermark", {}, void 0, !0)
-      ])) : U("", !0)
+      N.$slots.watermark ? (y(), w("div", nD, [
+        G(N.$slots, "watermark", {}, void 0, !0)
+      ])) : F("", !0)
     ]));
   }
 }), Bg = /* @__PURE__ */ ze(sD, [["__scopeId", "data-v-154b42fc"]]);
@@ -34208,14 +34226,14 @@ function rD(n, e) {
     }) : o;
   });
 }
-const Pg = /* @__PURE__ */ Re({
+const Pg = /* @__PURE__ */ Le({
   __name: "group-empty",
   props: {
     text: {}
   },
   setup(n) {
     const e = n, { t } = qe();
-    return (s, o) => (y(), ce(m(Ht), {
+    return (s, o) => (y(), de(m(Ht), {
       icon: "person/double",
       description: e.text || m(t)("group.empty")
     }, null, 8, ["description"]));
@@ -34223,7 +34241,7 @@ const Pg = /* @__PURE__ */ Re({
 }), iD = { class: "group-item-default__leading" }, aD = {
   key: 0,
   class: "group-item-default__check"
-}, lD = /* @__PURE__ */ Re({
+}, lD = /* @__PURE__ */ Le({
   __name: "group-item-default",
   props: {
     group: {},
@@ -34248,7 +34266,7 @@ const Pg = /* @__PURE__ */ Re({
       if (e.showMemberCount && !((e.group.memberCount ?? 0) <= 0))
         return String(e.group.memberCount);
     });
-    return (i, a) => (y(), ce(m(Tt), {
+    return (i, a) => (y(), de(m(Tt), {
       "auto-height": "",
       class: "group-item-default",
       title: t.value,
@@ -34259,45 +34277,45 @@ const Pg = /* @__PURE__ */ Re({
       selected: e.selected,
       disabled: e.disabled
     }, {
-      leading: X(() => [
+      leading: J(() => [
         _("span", iD, [
           e.showCheckbox ? (y(), w("span", aD, [
-            q(m(Oe), {
+            W(m(De), {
               name: e.selected ? "circle/checked" : "circle/empty",
               size: 20
             }, null, 8, ["name"])
-          ])) : U("", !0),
-          V(i.$slots, "avatar", {
+          ])) : F("", !0),
+          G(i.$slots, "avatar", {
             group: e.group,
             size: s.value
           }, () => [
-            e.showAvatar ? (y(), ce(m($t), {
+            e.showAvatar ? (y(), de(m($t), {
               key: 0,
               src: e.group.avatar,
               name: t.value,
               size: s.value,
               shape: o.value
-            }, null, 8, ["src", "name", "size", "shape"])) : U("", !0)
+            }, null, 8, ["src", "name", "size", "shape"])) : F("", !0)
           ], !0)
         ])
       ]),
-      trailing: X(() => [
+      trailing: J(() => [
         i.$slots.extra ? (y(), w("span", {
           key: 0,
           class: "group-item-default__extra",
           onClick: a[0] || (a[0] = ft(() => {
           }, ["stop"]))
         }, [
-          V(i.$slots, "extra", {
+          G(i.$slots, "extra", {
             group: e.group,
             disabled: e.disabled
           }, void 0, !0)
-        ])) : U("", !0)
+        ])) : F("", !0)
       ]),
       _: 3
     }, 8, ["title", "subtitle", "meta", "size", "active", "selected", "disabled"]));
   }
-}), zg = /* @__PURE__ */ ze(lD, [["__scopeId", "data-v-fdb4b9f8"]]), cD = ["data-groupid"], uD = /* @__PURE__ */ Re({
+}), zg = /* @__PURE__ */ ze(lD, [["__scopeId", "data-v-fdb4b9f8"]]), cD = ["data-groupid"], uD = /* @__PURE__ */ Le({
   __name: "group-item",
   props: {
     group: {},
@@ -34325,14 +34343,14 @@ const Pg = /* @__PURE__ */ Re({
       onClick: d,
       onContextmenu: p
     }, [
-      V(f.$slots, "default", {
+      G(f.$slots, "default", {
         group: t.group,
         active: l.value,
         selected: c.value,
         disabled: t.disabled,
         toggleSelect: () => m(a)(t.group.groupId)
       }, () => [
-        q(zg, {
+        W(zg, {
           group: t.group,
           active: l.value,
           selected: c.value,
@@ -34347,15 +34365,15 @@ const Pg = /* @__PURE__ */ Re({
         }, At({ _: 2 }, [
           f.$slots.avatar ? {
             name: "avatar",
-            fn: X((g) => [
-              V(f.$slots, "avatar", Fe(Ue(g)), void 0, !0)
+            fn: J((g) => [
+              G(f.$slots, "avatar", Fe(Ue(g)), void 0, !0)
             ]),
             key: "0"
           } : void 0,
           f.$slots.extra ? {
             name: "extra",
-            fn: X((g) => [
-              V(f.$slots, "extra", Fe(Ue(g)), void 0, !0)
+            fn: J((g) => [
+              G(f.$slots, "extra", Fe(Ue(g)), void 0, !0)
             ]),
             key: "1"
           } : void 0
@@ -34399,7 +34417,7 @@ const Pg = /* @__PURE__ */ Re({
 }, ED = {
   key: 6,
   class: "group-list__watermark"
-}, AD = /* @__PURE__ */ Re({
+}, AD = /* @__PURE__ */ Le({
   __name: "group-list",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -34442,18 +34460,18 @@ const Pg = /* @__PURE__ */ Re({
       setSelectedIds: a,
       setActiveId: l
     } = sn(), { t: c } = qe(), u = A(), d = A(!1), p = A("");
-    function f(j) {
-      p.value = j, o("search", j.trim());
+    function f(V) {
+      p.value = V, o("search", V.trim());
     }
     const h = k(() => p.value.trim()), g = k(() => s.sortBy), v = k(() => s.groupBy), b = oD(r, p, {
       filterFn: s.filterFn
     }), $ = rD(b, g), R = k(() => b.value.length);
-    function M(j, de) {
-      if (de === "none")
+    function M(V, ue) {
+      if (ue === "none")
         return "all";
-      if (typeof de == "function")
-        return de(j);
-      const se = (j.groupName || "").trim();
+      if (typeof ue == "function")
+        return ue(V);
+      const se = (V.groupName || "").trim();
       if (!se)
         return "#";
       const Me = se.charAt(0).toUpperCase();
@@ -34463,9 +34481,9 @@ const Pg = /* @__PURE__ */ Re({
       return ge && /^[A-Z]$/.test(ge.firstLetter) ? ge.firstLetter : "#";
     }
     const x = k(() => {
-      const j = $.value, de = v.value, se = /* @__PURE__ */ new Map(), Me = [];
-      for (const ge of j) {
-        const Ie = M(ge, de);
+      const V = $.value, ue = v.value, se = /* @__PURE__ */ new Map(), Me = [];
+      for (const ge of V) {
+        const Ie = M(ge, ue);
         se.has(Ie) || (se.set(Ie, []), Me.push(Ie)), se.get(Ie).push(ge);
       }
       return Me.map((ge) => ({
@@ -34473,85 +34491,85 @@ const Pg = /* @__PURE__ */ Re({
         title: ge,
         items: se.get(ge)
       }));
-    }), T = k(() => s.groupBy === "alphabet"), I = k(() => s.groupBy === "none"), O = A(!1), E = A([]);
+    }), T = k(() => s.groupBy === "alphabet"), I = k(() => s.groupBy === "none"), N = A(!1), E = A([]);
     Pe(
       () => s.selectedIds,
-      (j) => {
-        if (!j)
+      (V) => {
+        if (!V)
           return;
-        const de = Array.from(i.value).slice().sort().join(","), se = [...j].slice().sort().join(",");
-        de !== se && (O.value = !0, a(j), E.value = [...j], Ye(() => {
-          O.value = !1;
+        const ue = Array.from(i.value).slice().sort().join(","), se = [...V].slice().sort().join(",");
+        ue !== se && (N.value = !0, a(V), E.value = [...V], Ye(() => {
+          N.value = !1;
         }));
       },
       { immediate: !0 }
     ), Pe(
       () => Array.from(i.value),
-      (j) => {
-        if (!O.value) {
-          if (s.maxSelected && j.length > s.maxSelected) {
-            O.value = !0, a(E.value), Ye(() => {
-              O.value = !1;
+      (V) => {
+        if (!N.value) {
+          if (s.maxSelected && V.length > s.maxSelected) {
+            N.value = !0, a(E.value), Ye(() => {
+              N.value = !1;
             }), o("max-exceed", s.maxSelected);
             return;
           }
-          E.value = [...j], o("update:selectedIds", j);
+          E.value = [...V], o("update:selectedIds", V);
         }
       }
     );
-    function G() {
+    function H() {
       if (!s.enableLoadMore || s.loading || d.value || !s.hasMore)
         return;
-      const j = u.value;
-      if (!j)
+      const V = u.value;
+      if (!V)
         return;
-      j.scrollHeight - j.scrollTop - j.clientHeight <= s.loadMoreThreshold && (d.value = !0, o("load-more"));
+      V.scrollHeight - V.scrollTop - V.clientHeight <= s.loadMoreThreshold && (d.value = !0, o("load-more"));
     }
-    function N() {
+    function D() {
       d.value = !1;
     }
-    const D = A(null);
+    const L = A(null);
     qt(() => {
-      var j;
-      D.value = u.value ?? null, (j = D.value) == null || j.addEventListener("scroll", G, { passive: !0 });
+      var V;
+      L.value = u.value ?? null, (V = L.value) == null || V.addEventListener("scroll", H, { passive: !0 });
     }), Xn(() => {
-      D.value && D.value.removeEventListener("scroll", G), i.value.size > 0 && a([]);
+      L.value && L.value.removeEventListener("scroll", H), i.value.size > 0 && a([]);
     });
-    async function S(j) {
+    async function S(V) {
       await Ye();
-      const de = u.value;
-      if (!de)
+      const ue = u.value;
+      if (!ue)
         return;
-      const se = de.querySelector(`[data-group-key="${j}"]`);
-      se && se.scrollIntoView({ behavior: "smooth", block: "start" }), o("group-jump", j);
+      const se = ue.querySelector(`[data-group-key="${V}"]`);
+      se && se.scrollIntoView({ behavior: "smooth", block: "start" }), o("group-jump", V);
     }
-    const C = k(() => x.value.map((j) => j.key));
-    function L(j) {
-      o("click", j), s.clickBehavior !== "event-only" && o("select", j);
+    const C = k(() => x.value.map((V) => V.key));
+    function O(V) {
+      o("click", V), s.clickBehavior !== "event-only" && o("select", V);
     }
-    function J(j, de) {
-      o("contextmenu", j, de);
+    function q(V, ue) {
+      o("contextmenu", V, ue);
     }
     const te = A(!1);
-    function ve() {
+    function ye() {
       te.value = !0;
     }
-    function be() {
+    function ke() {
       te.value = !1;
     }
-    Ql(te, be);
-    const W = k(
-      () => x.value.flatMap((j) => j.items)
-    ), { activeIndex: re } = ia({
-      count: k(() => W.value.length),
+    Ql(te, ke);
+    const j = k(
+      () => x.value.flatMap((V) => V.items)
+    ), { activeIndex: ie } = ia({
+      count: k(() => j.value.length),
       wrap: !0,
       active: te,
       // 搜索框聚焦时方向键让位给输入光标
       ignoreWhenTyping: !0,
-      disabled: (j) => s.disabledFn ? s.disabledFn(W.value[j]) : !1,
-      onActiveChange: (j) => {
-        const de = W.value[j];
-        de && (l(de.groupId), ue(de.groupId), Ye(() => {
+      disabled: (V) => s.disabledFn ? s.disabledFn(j.value[V]) : !1,
+      onActiveChange: (V) => {
+        const ue = j.value[V];
+        ue && (l(ue.groupId), fe(ue.groupId), Ye(() => {
           var se;
           return (se = u.value) == null ? void 0 : se.focus();
         }));
@@ -34559,49 +34577,49 @@ const Pg = /* @__PURE__ */ Re({
     });
     aa({
       Enter: () => {
-        const j = W.value[re.value];
-        j && !(s.disabledFn && s.disabledFn(j)) && L(j);
+        const V = j.value[ie.value];
+        V && !(s.disabledFn && s.disabledFn(V)) && O(V);
       }
     }, {
       active: te,
       ignoreWhenTyping: !0
     });
-    function ue(j) {
+    function fe(V) {
       Ye(() => {
         var se;
-        const de = (se = u.value) == null ? void 0 : se.querySelector(`[data-groupid="${j}"]`);
-        de == null || de.scrollIntoView({ block: "nearest" });
+        const ue = (se = u.value) == null ? void 0 : se.querySelector(`[data-groupid="${V}"]`);
+        ue == null || ue.scrollIntoView({ block: "nearest" });
       });
     }
     return e({
       scrollToGroup: S,
       groupedGroups: x,
-      releaseLoadMoreLock: N
-    }), (j, de) => (y(), w("div", dD, [
+      releaseLoadMoreLock: D
+    }), (V, ue) => (y(), w("div", dD, [
       s.showHeader ? (y(), w("div", {
         key: 0,
         class: Te(["group-list__header", `group-list__header--${s.headerAlign}`])
       }, [
-        V(j.$slots, "header", {}, () => [
+        G(V.$slots, "header", {}, () => [
           _("span", fD, [
             mt(P(s.title || m(c)("group.title")) + " ", 1),
-            s.showCount ? (y(), w("span", pD, "(" + P(R.value) + ")", 1)) : U("", !0)
+            s.showCount ? (y(), w("span", pD, "(" + P(R.value) + ")", 1)) : F("", !0)
           ])
         ], !0)
-      ], 2)) : U("", !0),
-      j.$slots.search || s.searchComponent || s.showSearch ? (y(), w("div", hD, [
-        V(j.$slots, "search", {
+      ], 2)) : F("", !0),
+      V.$slots.search || s.searchComponent || s.showSearch ? (y(), w("div", hD, [
+        G(V.$slots, "search", {
           keyword: p.value,
           setKeyword: f
         }, () => [
-          s.searchComponent ? (y(), ce(oc(s.searchComponent), {
+          s.searchComponent ? (y(), de(oc(s.searchComponent), {
             key: 0,
             modelValue: p.value,
-            "onUpdate:modelValue": de[0] || (de[0] = (se) => p.value = se)
-          }, null, 8, ["modelValue"])) : (y(), ce(m(gn), {
+            "onUpdate:modelValue": ue[0] || (ue[0] = (se) => p.value = se)
+          }, null, 8, ["modelValue"])) : (y(), de(m(gn), {
             key: 1,
             modelValue: p.value,
-            "onUpdate:modelValue": de[1] || (de[1] = (se) => p.value = se),
+            "onUpdate:modelValue": ue[1] || (ue[1] = (se) => p.value = se),
             variant: "search",
             clearable: "",
             "clear-icon": "search/xmark",
@@ -34609,39 +34627,39 @@ const Pg = /* @__PURE__ */ Re({
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"]))
         ], !0)
-      ])) : U("", !0),
-      j.$slots.body && s.bodySticky ? (y(), w("div", mD, [
-        V(j.$slots, "body", {}, void 0, !0)
-      ])) : U("", !0),
+      ])) : F("", !0),
+      V.$slots.body && s.bodySticky ? (y(), w("div", mD, [
+        G(V.$slots, "body", {}, void 0, !0)
+      ])) : F("", !0),
       _("div", {
         ref_key: "itemsRef",
         ref: u,
         tabindex: "0",
         class: "group-list__items",
-        onMouseenter: ve,
-        onMouseleave: be,
-        onClick: ve
+        onMouseenter: ye,
+        onMouseleave: ke,
+        onClick: ye
       }, [
-        j.$slots.body && !s.bodySticky ? (y(), w("div", gD, [
-          V(j.$slots, "body", {}, void 0, !0)
-        ])) : U("", !0),
+        V.$slots.body && !s.bodySticky ? (y(), w("div", gD, [
+          G(V.$slots, "body", {}, void 0, !0)
+        ])) : F("", !0),
         s.loading && (x.value.length === 0 || x.value.every((se) => se.items.length === 0)) ? (y(), w("div", vD, [
-          V(j.$slots, "loading", {}, () => [
+          G(V.$slots, "loading", {}, () => [
             _("div", yD, [
-              (y(), w($e, null, et(8, (se) => _("div", {
+              (y(), w($e, null, tt(8, (se) => _("div", {
                 key: se,
                 class: "group-list__skeleton-item"
               }, [
-                q(m(es), {
+                W(m(es), {
                   variant: "avatar",
                   shape: "rounded"
                 }),
                 _("div", bD, [
-                  q(m(es), {
+                  W(m(es), {
                     variant: "text",
                     style: { width: "35%" }
                   }),
-                  q(m(es), {
+                  W(m(es), {
                     variant: "text",
                     style: { width: "65%" }
                   })
@@ -34650,23 +34668,23 @@ const Pg = /* @__PURE__ */ Re({
             ])
           ], !0)
         ])) : x.value.length === 0 || x.value.every((se) => se.items.length === 0) ? (y(), w("div", kD, [
-          V(j.$slots, "empty", { searchKeyword: h.value }, () => [
-            q(Pg, {
+          G(V.$slots, "empty", { searchKeyword: h.value }, () => [
+            W(Pg, {
               text: s.emptyText || (h.value ? m(c)("group.noSearchResult") : m(c)("group.empty"))
             }, null, 8, ["text"])
           ], !0)
         ])) : (y(), w($e, { key: 3 }, [
-          (y(!0), w($e, null, et(x.value, (se) => (y(), w("div", {
+          (y(!0), w($e, null, tt(x.value, (se) => (y(), w("div", {
             key: se.key,
             class: "group-list__group",
             "data-group-key": se.key
           }, [
             s.showGroupHeader && !I.value ? (y(), w("div", _D, [
-              V(j.$slots, "group-header", { group: se }, () => [
+              G(V.$slots, "group-header", { group: se }, () => [
                 _("span", null, P(se.title), 1)
               ], !0)
-            ])) : U("", !0),
-            (y(!0), w($e, null, et(se.items, (Me) => (y(), ce(Fg, {
+            ])) : F("", !0),
+            (y(!0), w($e, null, tt(se.items, (Me) => (y(), de(Fg, {
               key: Me.groupId,
               group: Me,
               "select-mode": s.selectMode,
@@ -34677,51 +34695,51 @@ const Pg = /* @__PURE__ */ Re({
               "avatar-shape": s.avatarShape,
               subtitle: s.subtitleFn ? s.subtitleFn(Me) : void 0,
               size: s.itemSize,
-              onClick: L,
-              onContextmenu: J
+              onClick: O,
+              onContextmenu: q
             }, At({ _: 2 }, [
-              j.$slots.item ? {
+              V.$slots.item ? {
                 name: "default",
-                fn: X((ge) => [
-                  V(j.$slots, "item", ao({ ref_for: !0 }, ge), void 0, !0)
+                fn: J((ge) => [
+                  G(V.$slots, "item", ao({ ref_for: !0 }, ge), void 0, !0)
                 ]),
                 key: "0"
               } : void 0
             ]), 1032, ["group", "select-mode", "disabled", "show-avatar", "show-member-count", "avatar-size", "avatar-shape", "subtitle", "size"]))), 128))
           ], 8, wD))), 128)),
           s.loading && x.value.length > 0 ? (y(), w("div", CD, [
-            V(j.$slots, "loading-more", {}, () => [
+            G(V.$slots, "loading-more", {}, () => [
               _("span", MD, P(m(c)("common.loading")), 1)
             ], !0)
-          ])) : U("", !0),
+          ])) : F("", !0),
           !s.loading && !s.hasMore && x.value.length > 0 ? (y(), w("div", SD, [
-            V(j.$slots, "no-more", {}, () => [
+            G(V.$slots, "no-more", {}, () => [
               _("span", ID, P(s.noMoreText || m(c)("common.noMore")), 1)
             ], !0)
-          ])) : U("", !0)
+          ])) : F("", !0)
         ], 64)),
-        j.$slots.footer && !s.footerSticky ? (y(), w("div", xD, [
-          V(j.$slots, "footer", {}, void 0, !0)
-        ])) : U("", !0)
+        V.$slots.footer && !s.footerSticky ? (y(), w("div", xD, [
+          G(V.$slots, "footer", {}, void 0, !0)
+        ])) : F("", !0)
       ], 544),
-      j.$slots.footer && s.footerSticky ? (y(), w("div", TD, [
-        V(j.$slots, "footer", {}, void 0, !0)
-      ])) : U("", !0),
-      T.value && s.showAlphabetNav && C.value.length > 0 ? (y(), ce(pc, {
+      V.$slots.footer && s.footerSticky ? (y(), w("div", TD, [
+        G(V.$slots, "footer", {}, void 0, !0)
+      ])) : F("", !0),
+      T.value && s.showAlphabetNav && C.value.length > 0 ? (y(), de(pc, {
         key: 4,
         keys: C.value,
         onJump: S
-      }, null, 8, ["keys"])) : U("", !0),
-      s.showScrollToTop ? (y(), ce(m(ra), {
+      }, null, 8, ["keys"])) : F("", !0),
+      s.showScrollToTop ? (y(), de(m(ra), {
         key: 5,
         target: u.value ?? void 0,
         "visibility-height": 200,
         bottom: 12,
         right: 12
-      }, null, 8, ["target"])) : U("", !0),
-      j.$slots.watermark ? (y(), w("div", ED, [
-        V(j.$slots, "watermark", {}, void 0, !0)
-      ])) : U("", !0)
+      }, null, 8, ["target"])) : F("", !0),
+      V.$slots.watermark ? (y(), w("div", ED, [
+        G(V.$slots, "watermark", {}, void 0, !0)
+      ])) : F("", !0)
     ]));
   }
 }), Ug = /* @__PURE__ */ ze(AD, [["__scopeId", "data-v-3ca281e2"]]), $D = { class: "group-detail" }, RD = { class: "group-detail__wrapper" }, ND = {
@@ -34730,7 +34748,7 @@ const Pg = /* @__PURE__ */ Re({
 }, LD = {
   key: 1,
   class: "group-detail__edit-row"
-}, OD = /* @__PURE__ */ Re({
+}, OD = /* @__PURE__ */ Le({
   __name: "group-detail",
   props: {
     groupId: {},
@@ -34738,9 +34756,9 @@ const Pg = /* @__PURE__ */ Re({
   },
   emits: ["send-message"],
   setup(n, { emit: e }) {
-    const t = Ot("UIKit:GroupDetail"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { stores: a } = at(), { fetchGroupInfo: l, updateGroupInfo: c } = sn(), u = A(!1), d = A(/* @__PURE__ */ new Set()), p = A(!1), f = A(), h = A(""), g = A(!1), v = k(() => a.group.getGroupById(s.groupId)), b = k(() => {
-      var D;
-      return ((D = v.value) == null ? void 0 : D.role) === ut.OWNER;
+    const t = Dt("UIKit:GroupDetail"), s = n, o = e, { t: r } = qe(), { show: i } = Wt(), { stores: a } = at(), { fetchGroupInfo: l, updateGroupInfo: c } = sn(), u = A(!1), d = A(/* @__PURE__ */ new Set()), p = A(!1), f = A(), h = A(""), g = A(!1), v = k(() => a.group.getGroupById(s.groupId)), b = k(() => {
+      var L;
+      return ((L = v.value) == null ? void 0 : L.role) === ut.OWNER;
     });
     Pe(
       () => s.groupId,
@@ -34750,8 +34768,8 @@ const Pg = /* @__PURE__ */ Re({
       { immediate: !0 }
     );
     async function $() {
-      var D, S;
-      if (s.groupId && !((D = v.value) != null && D.groupName && ((S = v.value) != null && S.role) || u.value || d.value.has(s.groupId))) {
+      var L, S;
+      if (s.groupId && !((L = v.value) != null && L.groupName && ((S = v.value) != null && S.role) || u.value || d.value.has(s.groupId))) {
         u.value = !0;
         try {
           const C = await l(s.groupId);
@@ -34764,14 +34782,14 @@ const Pg = /* @__PURE__ */ Re({
       }
     }
     const R = k(() => v.value || s.group || void 0), M = k(() => {
-      var D;
-      return (D = R.value) == null ? void 0 : D.avatar;
+      var L;
+      return (L = R.value) == null ? void 0 : L.avatar;
     }), x = k(() => {
-      var D;
-      return ((D = R.value) == null ? void 0 : D.groupName) || s.groupId;
+      var L;
+      return ((L = R.value) == null ? void 0 : L.groupName) || s.groupId;
     });
-    Pe(x, (D) => {
-      p.value || (h.value = D);
+    Pe(x, (L) => {
+      p.value || (h.value = L);
     }, { immediate: !0 });
     function T() {
       h.value = x.value, p.value = !0;
@@ -34779,16 +34797,16 @@ const Pg = /* @__PURE__ */ Re({
     function I() {
       h.value = x.value, p.value = !1;
     }
-    Pe(p, async (D) => {
+    Pe(p, async (L) => {
       var S;
-      D && (await Ye(), (S = f.value) == null || S.focus());
+      L && (await Ye(), (S = f.value) == null || S.focus());
     });
-    async function O() {
-      var D;
+    async function N() {
+      var L;
       if (s.groupId) {
         g.value = !0;
         try {
-          const S = (D = a.group.getGroupById(s.groupId)) == null ? void 0 : D.groupName;
+          const S = (L = a.group.getGroupById(s.groupId)) == null ? void 0 : L.groupName;
           await c(s.groupId, { name: h.value }), p.value = !1, S && S !== h.value && qn(a, s.groupId, lt.GROUPCHAT, {
             eventType: Fn.GROUP_NAME_CHANGED,
             params: { name: h.value },
@@ -34808,27 +34826,27 @@ const Pg = /* @__PURE__ */ Re({
         icon: "bubble/rect/empty",
         type: "primary"
       }
-    ]), G = k(() => {
-      const D = [], S = R.value;
-      return S != null && S.description && D.push({ key: "description", label: r("groupCard.description", "群介绍"), value: S.description, maxLines: 2 }), (S == null ? void 0 : S.memberCount) !== void 0 && D.push({ key: "memberCount", label: r("groupCard.memberCount", "成员数"), value: String(S.memberCount) }), D;
+    ]), H = k(() => {
+      const L = [], S = R.value;
+      return S != null && S.description && L.push({ key: "description", label: r("groupCard.description", "群介绍"), value: S.description, maxLines: 2 }), (S == null ? void 0 : S.memberCount) !== void 0 && L.push({ key: "memberCount", label: r("groupCard.memberCount", "成员数"), value: String(S.memberCount) }), L;
     });
-    function N(D) {
-      D === "message" && o("send-message", s.groupId);
+    function D(L) {
+      L === "message" && o("send-message", s.groupId);
     }
-    return (D, S) => (y(), w("div", $D, [
+    return (L, S) => (y(), w("div", $D, [
       _("div", RD, [
-        u.value ? (y(), w("div", ND, P(m(r)("common.loading", "加载中...")), 1)) : U("", !0),
-        q(dc, {
+        u.value ? (y(), w("div", ND, P(m(r)("common.loading", "加载中...")), 1)) : F("", !0),
+        W(dc, {
           "group-id": s.groupId,
           name: x.value,
           avatar: M.value,
           actions: E.value,
-          "info-rows": G.value,
-          onActionClick: N
+          "info-rows": H.value,
+          onActionClick: D
         }, At({ _: 2 }, [
           b.value ? {
             name: "name",
-            fn: X(() => [
+            fn: J(() => [
               p.value ? (y(), w("div", LD, [
                 Dn(_("input", {
                   ref_key: "nameInputRef",
@@ -34836,31 +34854,31 @@ const Pg = /* @__PURE__ */ Re({
                   "onUpdate:modelValue": S[0] || (S[0] = (C) => h.value = C),
                   class: "group-detail__edit-input",
                   onKeydown: [
-                    ms(O, ["enter"]),
+                    ms(N, ["enter"]),
                     ms(I, ["esc"])
                   ]
                 }, null, 544), [
                   [ts, h.value]
                 ]),
-                q(m(pt), {
+                W(m(pt), {
                   icon: "xmark/bold",
                   size: "small",
                   type: "danger",
                   title: m(r)("button.cancel", "取消"),
                   onClick: I
                 }, null, 8, ["title"]),
-                q(m(pt), {
+                W(m(pt), {
                   class: "group-detail__edit-save",
                   icon: "check/single",
                   size: "small",
                   type: "success",
                   disabled: g.value,
                   title: m(r)("chat.info.save", "保存"),
-                  onClick: O
+                  onClick: N
                 }, null, 8, ["disabled", "title"])
               ])) : (y(), w($e, { key: 0 }, [
                 _("span", null, P(x.value), 1),
-                q(m(pt), {
+                W(m(pt), {
                   icon: "rect/pencil",
                   size: "small",
                   type: "primary",
@@ -34931,7 +34949,7 @@ const Pg = /* @__PURE__ */ Re({
   EmTextMessage: up,
   EmVideoMessage: pp,
   EmVoiceMessage: fp
-}, Symbol.toStringTag, { value: "Module" })), PD = { class: "uikit-provider" }, zD = /* @__PURE__ */ Re({
+}, Symbol.toStringTag, { value: "Module" })), PD = { class: "uikit-provider" }, zD = /* @__PURE__ */ Le({
   __name: "uikit-provider",
   props: {
     appKey: {},
@@ -34962,7 +34980,7 @@ const Pg = /* @__PURE__ */ Re({
     logger: {}
   },
   setup(n) {
-    const e = n, t = Ot("UIKit:UikitProvider"), s = k(() => ({
+    const e = n, t = Dt("UIKit:UikitProvider"), s = k(() => ({
       appKey: e.appKey ?? "",
       ...e.sdkConfig
     })), o = k(() => ({
@@ -35040,17 +35058,17 @@ const Pg = /* @__PURE__ */ Re({
       },
       { immediate: !1 }
     ), (h, g) => (y(), w("div", PD, [
-      V(h.$slots, "default", {}, void 0, !0),
-      e.enableToast ? (y(), ce(m(If), Fe(ao({ key: 0 }, m(c))), null, 16)) : U("", !0),
-      m(u) ? (y(), ce(m(Mf), {
+      G(h.$slots, "default", {}, void 0, !0),
+      e.enableToast ? (y(), de(m(If), Fe(ao({ key: 0 }, m(c))), null, 16)) : F("", !0),
+      m(u) ? (y(), de(m(Mf), {
         key: 1,
         items: m(d).list,
         onClose: m(p),
         onClick: m(f)
-      }, null, 8, ["items", "onClose", "onClick"])) : U("", !0)
+      }, null, 8, ["items", "onClose", "onClick"])) : F("", !0)
     ]));
   }
-}), FD = /* @__PURE__ */ ze(zD, [["__scopeId", "data-v-8e4d40ac"]]), UD = /* @__PURE__ */ Re({
+}), FD = /* @__PURE__ */ ze(zD, [["__scopeId", "data-v-8e4d40ac"]]), UD = /* @__PURE__ */ Le({
   __name: "chat-container",
   props: {
     config: {},
@@ -35076,7 +35094,7 @@ const Pg = /* @__PURE__ */ Re({
     }), (c, u) => (y(), w("div", {
       class: Te(["chat-container", { "chat-container--keyboard-open": m(i).isKeyboardOpen.value }])
     }, [
-      q(Og, {
+      W(Og, {
         ref_key: "chatRef",
         ref: r,
         config: s.config,
@@ -35088,57 +35106,57 @@ const Pg = /* @__PURE__ */ Re({
         onLocationClick: u[2] || (u[2] = (d, p) => o("location-click", d, p)),
         onCustomMessageAction: u[3] || (u[3] = (d, p, f) => o("custom-message-action", d, p, f))
       }, At({
-        empty: X(() => [
-          V(c.$slots, "empty", {}, void 0, !0)
+        empty: J(() => [
+          G(c.$slots, "empty", {}, void 0, !0)
         ]),
-        loading: X(() => [
-          V(c.$slots, "loading", {}, void 0, !0)
+        loading: J(() => [
+          G(c.$slots, "loading", {}, void 0, !0)
         ]),
-        error: X((d) => [
-          V(c.$slots, "error", Fe(Ue(d)), void 0, !0)
+        error: J((d) => [
+          G(c.$slots, "error", Fe(Ue(d)), void 0, !0)
         ]),
-        header: X((d) => [
-          V(c.$slots, "header", Fe(Ue(d)), void 0, !0)
+        header: J((d) => [
+          G(c.$slots, "header", Fe(Ue(d)), void 0, !0)
         ]),
-        "header-avatar": X((d) => [
-          V(c.$slots, "header-avatar", Fe(Ue(d)), void 0, !0)
+        "header-avatar": J((d) => [
+          G(c.$slots, "header-avatar", Fe(Ue(d)), void 0, !0)
         ]),
-        "header-title": X((d) => [
-          V(c.$slots, "header-title", Fe(Ue(d)), void 0, !0)
+        "header-title": J((d) => [
+          G(c.$slots, "header-title", Fe(Ue(d)), void 0, !0)
         ]),
-        "header-extra": X((d) => [
-          V(c.$slots, "header-extra", Fe(Ue(d)), void 0, !0)
+        "header-extra": J((d) => [
+          G(c.$slots, "header-extra", Fe(Ue(d)), void 0, !0)
         ]),
-        drawer: X((d) => [
-          V(c.$slots, "drawer", Fe(Ue(d)), void 0, !0)
+        drawer: J((d) => [
+          G(c.$slots, "drawer", Fe(Ue(d)), void 0, !0)
         ]),
-        "user-card": X((d) => [
-          V(c.$slots, "user-card", Fe(Ue(d)), void 0, !0)
+        "user-card": J((d) => [
+          G(c.$slots, "user-card", Fe(Ue(d)), void 0, !0)
         ]),
-        "group-card": X((d) => [
-          V(c.$slots, "group-card", Fe(Ue(d)), void 0, !0)
+        "group-card": J((d) => [
+          G(c.$slots, "group-card", Fe(Ue(d)), void 0, !0)
         ]),
-        "invite-member": X((d) => [
-          V(c.$slots, "invite-member", Fe(Ue(d)), void 0, !0)
+        "invite-member": J((d) => [
+          G(c.$slots, "invite-member", Fe(Ue(d)), void 0, !0)
         ]),
-        forward: X((d) => [
-          V(c.$slots, "forward", Fe(Ue(d)), void 0, !0)
+        forward: J((d) => [
+          G(c.$slots, "forward", Fe(Ue(d)), void 0, !0)
         ]),
-        "message-search": X((d) => [
-          V(c.$slots, "message-search", Fe(Ue(d)), void 0, !0)
+        "message-search": J((d) => [
+          G(c.$slots, "message-search", Fe(Ue(d)), void 0, !0)
         ]),
-        "multi-select-bar": X((d) => [
-          V(c.$slots, "multi-select-bar", Fe(Ue(d)), void 0, !0)
+        "multi-select-bar": J((d) => [
+          G(c.$slots, "multi-select-bar", Fe(Ue(d)), void 0, !0)
         ]),
-        watermark: X((d) => [
-          V(c.$slots, "watermark", Fe(Ue(d)), void 0, !0)
+        watermark: J((d) => [
+          G(c.$slots, "watermark", Fe(Ue(d)), void 0, !0)
         ]),
         _: 2
       }, [
-        et(l(), (d) => ({
+        tt(l(), (d) => ({
           name: d,
-          fn: X((p) => [
-            V(c.$slots, d, Fe(Ue(p)), void 0, !0)
+          fn: J((p) => [
+            G(c.$slots, d, Fe(Ue(p)), void 0, !0)
           ])
         }))
       ]), 1032, ["config", "loading", "class", "style"])
@@ -35148,7 +35166,7 @@ const Pg = /* @__PURE__ */ Re({
 function GD(n) {
   return ds[Ce.IMAGE] = n("message.image"), ds[Ce.VOICE] = n("message.audio"), ds[Ce.VIDEO] = n("message.video"), ds[Ce.FILE] = n("message.file"), ds[Ce.CMD] = n("message.cmd"), ds[Ce.CUSTOM] = n("message.custom"), ds[Ce.LOCATION] = n("message.location"), (e, t) => t && t !== Ce.TEXT && ds[t] ? ds[t] : e;
 }
-const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
+const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Le({
   __name: "conversation-container",
   props: {
     showSearch: { type: Boolean, default: !0 },
@@ -35196,7 +35214,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       s("reconnect");
     }
     return (f, h) => (y(), w("div", VD, [
-      q(op, {
+      W(op, {
         "show-search": t.showSearch,
         "show-scroll-to-top": t.showScrollToTop,
         "custom-actions": t.customActions,
@@ -35230,92 +35248,92 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       }, At({ _: 2 }, [
         f.$slots.tabs ? {
           name: "tabs",
-          fn: X((g) => [
-            V(f.$slots, "tabs", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "tabs", Fe(Ue(g)), void 0, !0)
           ]),
           key: "0"
         } : void 0,
         f.$slots.header ? {
           name: "header",
-          fn: X(() => [
-            V(f.$slots, "header", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "header", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0,
         f.$slots.empty ? {
           name: "empty",
-          fn: X((g) => [
-            V(f.$slots, "empty", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "empty", Fe(Ue(g)), void 0, !0)
           ]),
           key: "2"
         } : void 0,
         f.$slots.statusBanner ? {
           name: "status-banner",
-          fn: X((g) => [
-            V(f.$slots, "status-banner", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "status-banner", Fe(Ue(g)), void 0, !0)
           ]),
           key: "3"
         } : void 0,
         f.$slots.body ? {
           name: "body",
-          fn: X(() => [
-            V(f.$slots, "body", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "body", {}, void 0, !0)
           ]),
           key: "4"
         } : void 0,
         f.$slots.footer ? {
           name: "footer",
-          fn: X(() => [
-            V(f.$slots, "footer", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "footer", {}, void 0, !0)
           ]),
           key: "5"
         } : void 0,
         f.$slots.item ? {
           name: "item",
-          fn: X((g) => [
-            V(f.$slots, "item", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "item", Fe(Ue(g)), void 0, !0)
           ]),
           key: "6"
         } : void 0,
         f.$slots.itemNameSuffix ? {
           name: "item-name-suffix",
-          fn: X((g) => [
-            V(f.$slots, "item-name-suffix", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "item-name-suffix", Fe(Ue(g)), void 0, !0)
           ]),
           key: "7"
         } : void 0,
         f.$slots.headerMenu ? {
           name: "header-menu",
-          fn: X((g) => [
-            V(f.$slots, "header-menu", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "header-menu", Fe(Ue(g)), void 0, !0)
           ]),
           key: "8"
         } : void 0,
         f.$slots.newChat ? {
           name: "new-chat",
-          fn: X((g) => [
-            V(f.$slots, "new-chat", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "new-chat", Fe(Ue(g)), void 0, !0)
           ]),
           key: "9"
         } : void 0,
         f.$slots.addContact ? {
           name: "add-contact",
-          fn: X((g) => [
-            V(f.$slots, "add-contact", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "add-contact", Fe(Ue(g)), void 0, !0)
           ]),
           key: "10"
         } : void 0,
         f.$slots.createGroup ? {
           name: "create-group",
-          fn: X((g) => [
-            V(f.$slots, "create-group", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "create-group", Fe(Ue(g)), void 0, !0)
           ]),
           key: "11"
         } : void 0
       ]), 1032, ["show-search", "show-scroll-to-top", "custom-actions", "time-formatter", "message-formatter", "show-sender-name", "empty-text", "unread-mode", "badge-placement", "variant", "show-avatar", "unread-placement", "show-header", "title", "header-align", "filter-fn", "body-sticky", "footer-sticky", "pull-refresh", "enable-presence", "tabs", "active-tab", "show-status-banner", "menu-items"])
     ]));
   }
-}), KD = /* @__PURE__ */ ze(jD, [["__scopeId", "data-v-7efacbe3"]]), WD = { class: "address-book-container__title" }, qD = {
+}), KD = /* @__PURE__ */ ze(jD, [["__scopeId", "data-v-1689a810"]]), WD = { class: "address-book-container__title" }, qD = {
   key: 0,
   class: "address-book-container__header-extra"
 }, JD = {
@@ -35333,7 +35351,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
 }, e2 = {
   key: 0,
   class: "address-book-container__subheader"
-}, t2 = { class: "address-book-container__back" }, n2 = { class: "address-book-container__subtitle" }, s2 = { class: "address-book-container__subheader-extra" }, o2 = { class: "address-book-container__subview" }, r2 = /* @__PURE__ */ Re({
+}, t2 = { class: "address-book-container__back" }, n2 = { class: "address-book-container__subtitle" }, s2 = { class: "address-book-container__subheader-extra" }, o2 = { class: "address-book-container__subview" }, r2 = /* @__PURE__ */ Le({
   __name: "address-book-container",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -35384,26 +35402,26 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       v.value === "home" && (s.showContact && b(), s.showGroup && $());
     });
     const R = k(() => {
-      const W = [s.showNotice, s.showGroup, s.showContact, g.value].filter(Boolean).length, re = (s.entries ?? []).filter((ue) => ue.visible !== !1).length;
-      return W + re;
+      const j = [s.showNotice, s.showGroup, s.showContact, g.value].filter(Boolean).length, ie = (s.entries ?? []).filter((fe) => fe.visible !== !1).length;
+      return j + ie;
     }), M = k(() => R.value > 1);
     function x() {
       if (s.initialView) return s.initialView;
-      const W = (s.entries ?? []).filter((re) => re.visible !== !1);
-      return W.length === 1 && !s.showContact && !s.showGroup && !s.showNotice && !s.showBlocklist ? W[0].key : s.showContact && !s.showGroup && !s.showNotice && !s.showBlocklist ? "contact" : s.showGroup && !s.showContact && !s.showNotice && !s.showBlocklist ? "group" : s.showNotice && !s.showContact && !s.showGroup && !s.showBlocklist ? "notice" : g.value && !s.showContact && !s.showGroup && !s.showNotice ? "blocklist" : "home";
+      const j = (s.entries ?? []).filter((ie) => ie.visible !== !1);
+      return j.length === 1 && !s.showContact && !s.showGroup && !s.showNotice && !s.showBlocklist ? j[0].key : s.showContact && !s.showGroup && !s.showNotice && !s.showBlocklist ? "contact" : s.showGroup && !s.showContact && !s.showNotice && !s.showBlocklist ? "group" : s.showNotice && !s.showContact && !s.showGroup && !s.showBlocklist ? "notice" : g.value && !s.showContact && !s.showGroup && !s.showNotice ? "blocklist" : "home";
     }
     Pe(
       () => [s.showContact, s.showGroup, s.showNotice, s.showBlocklist, s.initialView],
       () => {
         v.value = x();
       }
-    ), Pe(v, (W) => {
-      o("view-change", W);
+    ), Pe(v, (j) => {
+      o("view-change", j);
     });
     const T = A("");
-    Pe(T, (W) => o("home-search", W));
-    const I = k(() => s.groupCount !== void 0 ? s.groupCount : s.autoEntryCount ? v.value === "home" && u.value || c.value.length : 0), O = k(() => s.contactCount !== void 0 ? s.contactCount : s.autoEntryCount ? v.value === "home" && a.value || i.value.length : 0), E = k(() => s.noticeCount !== void 0 ? s.noticeCount : s.autoEntryCount ? f.contact.pendingCount : 0), G = k(() => s.autoEntryCount ? f.contact.blackList.length : 0), N = k(() => {
-      const W = s.entryOrder ?? ["notice", "group", "contact", "blocklist"], re = {
+    Pe(T, (j) => o("home-search", j));
+    const I = k(() => s.groupCount !== void 0 ? s.groupCount : s.autoEntryCount ? v.value === "home" && u.value || c.value.length : 0), N = k(() => s.contactCount !== void 0 ? s.contactCount : s.autoEntryCount ? v.value === "home" && a.value || i.value.length : 0), E = k(() => s.noticeCount !== void 0 ? s.noticeCount : s.autoEntryCount ? f.contact.pendingCount : 0), H = k(() => s.autoEntryCount ? f.contact.blackList.length : 0), D = k(() => {
+      const j = s.entryOrder ?? ["notice", "group", "contact", "blocklist"], ie = {
         notice: {
           key: "notice",
           label: s.noticeLabel || r("contact.entryNotice"),
@@ -35422,37 +35440,37 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
         contact: {
           key: "contact",
           label: s.contactLabel || r("contact.entryContact"),
-          count: O.value,
+          count: N.value,
           icon: s.contactIcon,
           visible: s.showContact
         },
         blocklist: {
           key: "blocklist",
           label: s.blocklistLabel || r("contact.entryBlocklist"),
-          count: G.value,
+          count: H.value,
           icon: s.blocklistIcon,
           visible: g.value
         }
-      }, ue = W.map((Ie) => re[Ie]).filter((Ie) => !!Ie), j = (s.entries ?? []).map((Ie) => ({
+      }, fe = j.map((Ie) => ie[Ie]).filter((Ie) => !!Ie), V = (s.entries ?? []).map((Ie) => ({
         key: Ie.key,
         label: Ie.label,
         count: Ie.count,
         icon: Ie.icon,
         visible: Ie.visible !== !1,
         sort: Ie.sort
-      })), de = [...ue, ...j], Me = de.some((Ie) => typeof Ie.sort == "number") ? [...de].sort((Ie, Ke) => {
+      })), ue = [...fe, ...V], Me = ue.some((Ie) => typeof Ie.sort == "number") ? [...ue].sort((Ie, Ke) => {
         const _e = typeof Ie.sort == "number" ? Ie.sort : 1 / 0, He = typeof Ke.sort == "number" ? Ke.sort : 1 / 0;
         return _e - He;
-      }) : de, ge = T.value.trim().toLowerCase();
+      }) : ue, ge = T.value.trim().toLowerCase();
       return ge ? Me.filter((Ie) => {
         const Ke = (Ie.label || "").toLowerCase(), _e = (Ie.key || "").toLowerCase();
         return Ke.includes(ge) || _e.includes(ge);
       }) : Me;
     });
-    function D(W) {
-      o("entry-click", W), W === "notice" && o("notice-click"), W === "blocklist" && o("blocklist-click");
-      const re = (s.entries ?? []).find((ue) => ue.key === W);
-      re && re.to === !1 || (v.value = W);
+    function L(j) {
+      o("entry-click", j), j === "notice" && o("notice-click"), j === "blocklist" && o("blocklist-click");
+      const ie = (s.entries ?? []).find((fe) => fe.key === j);
+      ie && ie.to === !1 || (v.value = j);
     }
     function S() {
       v.value = "home";
@@ -35460,44 +35478,44 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
     function C() {
       v.value = "contact";
     }
-    function L() {
+    function O() {
       v.value = "group";
     }
-    function J() {
+    function q() {
       v.value = "notice";
     }
     function te() {
       v.value = "blocklist";
     }
-    function ve(W) {
-      v.value = W;
+    function ye(j) {
+      v.value = j;
     }
     e({
       view: v,
       goHome: S,
       goContact: C,
-      goGroup: L,
-      goNotice: J,
+      goGroup: O,
+      goNotice: q,
       goBlocklist: te,
-      goTo: ve
+      goTo: ye
     });
-    const be = k(() => {
+    const ke = k(() => {
       if (v.value === "group") return s.groupLabel || r("contact.entryGroup");
       if (v.value === "contact") return s.contactLabel || r("contact.entryContact");
       if (v.value === "notice") return s.noticeLabel || r("contact.entryNotice");
       if (v.value === "blocklist") return s.blocklistLabel || r("contact.entryBlocklist");
-      const W = (s.entries ?? []).find((re) => re.key === v.value);
-      return W ? W.label : "";
+      const j = (s.entries ?? []).find((ie) => ie.key === v.value);
+      return j ? j.label : "";
     });
-    return (W, re) => (y(), w("div", {
+    return (j, ie) => (y(), w("div", {
       class: Te(["address-book-container", s.class]),
       style: Et(s.style)
     }, [
-      q(Io, {
+      W(Io, {
         name: `address-book-container-${s.transition}`,
         mode: "out-in"
       }, {
-        default: X(() => [
+        default: J(() => [
           (y(), w("div", {
             key: v.value,
             class: "address-book-container__view"
@@ -35507,64 +35525,64 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
                 key: 0,
                 class: Te(["address-book-container__header", `address-book-container__header--${s.headerAlign}`])
               }, [
-                V(W.$slots, "header", {}, () => [
+                G(j.$slots, "header", {}, () => [
                   _("span", WD, P(s.title || m(r)("contact.title")), 1)
                 ], !0),
-                W.$slots["header-extra"] ? (y(), w("span", qD, [
-                  V(W.$slots, "header-extra", {}, void 0, !0)
-                ])) : U("", !0)
-              ], 2)) : U("", !0),
+                j.$slots["header-extra"] ? (y(), w("span", qD, [
+                  G(j.$slots, "header-extra", {}, void 0, !0)
+                ])) : F("", !0)
+              ], 2)) : F("", !0),
               s.showSearch ? (y(), w("div", JD, [
-                q(m(gn), {
+                W(m(gn), {
                   modelValue: T.value,
-                  "onUpdate:modelValue": re[0] || (re[0] = (ue) => T.value = ue),
+                  "onUpdate:modelValue": ie[0] || (ie[0] = (fe) => T.value = fe),
                   variant: "search",
                   clearable: "",
                   "clear-icon": "search/xmark",
                   placeholder: m(r)("contact.homeSearchPlaceholder"),
                   "prefix-icon": "search"
                 }, null, 8, ["modelValue", "placeholder"])
-              ])) : U("", !0),
+              ])) : F("", !0),
               _("div", XD, [
-                V(W.$slots, "nav", {
-                  entries: N.value,
-                  onEntryClick: D
+                G(j.$slots, "nav", {
+                  entries: D.value,
+                  onEntryClick: L
                 }, () => [
-                  q(Dg, {
-                    entries: N.value,
-                    onEntryClick: D
+                  W(Dg, {
+                    entries: D.value,
+                    onEntryClick: L
                   }, At({ _: 2 }, [
-                    W.$slots["nav-entry"] ? {
+                    j.$slots["nav-entry"] ? {
                       name: "entry",
-                      fn: X((ue) => [
-                        V(W.$slots, "nav-entry", Fe(Ue(ue)), void 0, !0)
+                      fn: J((fe) => [
+                        G(j.$slots, "nav-entry", Fe(Ue(fe)), void 0, !0)
                       ]),
                       key: "0"
                     } : void 0,
-                    W.$slots["nav-entry-extra"] ? {
+                    j.$slots["nav-entry-extra"] ? {
                       name: "entry-extra",
-                      fn: X((ue) => [
-                        V(W.$slots, "nav-entry-extra", Fe(Ue(ue)), void 0, !0)
+                      fn: J((fe) => [
+                        G(j.$slots, "nav-entry-extra", Fe(Ue(fe)), void 0, !0)
                       ]),
                       key: "1"
                     } : void 0
                   ]), 1032, ["entries"])
                 ], !0),
-                W.$slots["home-body"] ? (y(), w("div", YD, [
-                  V(W.$slots, "home-body", {}, void 0, !0)
-                ])) : U("", !0)
+                j.$slots["home-body"] ? (y(), w("div", YD, [
+                  G(j.$slots, "home-body", {}, void 0, !0)
+                ])) : F("", !0)
               ]),
-              W.$slots["home-footer"] ? (y(), w("div", QD, [
-                V(W.$slots, "home-footer", {}, void 0, !0)
-              ])) : U("", !0),
-              W.$slots.watermark ? (y(), w("div", ZD, [
-                V(W.$slots, "watermark", {}, void 0, !0)
-              ])) : U("", !0)
+              j.$slots["home-footer"] ? (y(), w("div", QD, [
+                G(j.$slots, "home-footer", {}, void 0, !0)
+              ])) : F("", !0),
+              j.$slots.watermark ? (y(), w("div", ZD, [
+                G(j.$slots, "watermark", {}, void 0, !0)
+              ])) : F("", !0)
             ], 64)) : (y(), w($e, { key: 1 }, [
               M.value && s.showHeader ? (y(), w("div", e2, [
                 _("span", t2, [
-                  V(W.$slots, "back-icon", {}, () => [
-                    q(m(pt), {
+                  G(j.$slots, "back-icon", {}, () => [
+                    W(m(pt), {
                       icon: "chevron/left",
                       size: "small",
                       variant: "ghost",
@@ -35574,43 +35592,43 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
                     }, null, 8, ["title"])
                   ], !0)
                 ]),
-                _("span", n2, P(be.value), 1),
+                _("span", n2, P(ke.value), 1),
                 _("span", s2, [
-                  V(W.$slots, "subheader-extra", { view: v.value }, void 0, !0),
-                  !W.$slots["subheader-extra"] && v.value === "contact" && s.showContactAddButton ? (y(), ce(m(pt), {
+                  G(j.$slots, "subheader-extra", { view: v.value }, void 0, !0),
+                  !j.$slots["subheader-extra"] && v.value === "contact" && s.showContactAddButton ? (y(), de(m(pt), {
                     key: 0,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
                     title: m(r)("contact.addContact"),
-                    onClick: re[1] || (re[1] = (ue) => o("add-contact"))
-                  }, null, 8, ["title"])) : U("", !0),
-                  !W.$slots["subheader-extra"] && v.value === "group" && s.showGroupCreateButton ? (y(), ce(m(pt), {
+                    onClick: ie[1] || (ie[1] = (fe) => o("add-contact"))
+                  }, null, 8, ["title"])) : F("", !0),
+                  !j.$slots["subheader-extra"] && v.value === "group" && s.showGroupCreateButton ? (y(), de(m(pt), {
                     key: 1,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
                     title: m(r)("group.createGroup"),
-                    onClick: re[2] || (re[2] = (ue) => o("create-group"))
-                  }, null, 8, ["title"])) : U("", !0),
-                  !W.$slots["subheader-extra"] && v.value === "blocklist" && s.showBlocklistAddButton ? (y(), ce(m(pt), {
+                    onClick: ie[2] || (ie[2] = (fe) => o("create-group"))
+                  }, null, 8, ["title"])) : F("", !0),
+                  !j.$slots["subheader-extra"] && v.value === "blocklist" && s.showBlocklistAddButton ? (y(), de(m(pt), {
                     key: 2,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
                     title: m(r)("contact.blocklist.add", "添加黑名单"),
-                    onClick: re[3] || (re[3] = (ue) => o("blocklist-add"))
-                  }, null, 8, ["title"])) : U("", !0)
+                    onClick: ie[3] || (ie[3] = (fe) => o("blocklist-add"))
+                  }, null, 8, ["title"])) : F("", !0)
                 ])
-              ])) : U("", !0),
+              ])) : F("", !0),
               _("div", o2, [
                 v.value === "notice" ? (y(), w($e, { key: 0 }, [
-                  V(W.$slots, "notice", {}, void 0, !0),
-                  W.$slots.notice ? U("", !0) : (y(), ce(ru, { key: 0 }))
-                ], 64)) : V(W.$slots, "default", { view: v.value }, void 0, !0, 1)
+                  G(j.$slots, "notice", {}, void 0, !0),
+                  j.$slots.notice ? F("", !0) : (y(), de(ru, { key: 0 }))
+                ], 64)) : G(j.$slots, "default", { view: v.value }, void 0, !0, 1)
               ])
             ], 64))
           ]))
@@ -35619,7 +35637,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       }, 8, ["name"])
     ], 6));
   }
-}), Hg = /* @__PURE__ */ ze(r2, [["__scopeId", "data-v-ef4b70ff"]]), i2 = /* @__PURE__ */ Re({
+}), Hg = /* @__PURE__ */ ze(r2, [["__scopeId", "data-v-ef4b70ff"]]), i2 = /* @__PURE__ */ Le({
   __name: "contact-list-container",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -35685,7 +35703,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       class: Te(["contact-list-container", s.class]),
       style: Et(s.style)
     }, [
-      q(Ir, {
+      W(Ir, {
         ref_key: "contactListRef",
         ref: c,
         "show-header": s.showHeader,
@@ -35731,85 +35749,85 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       }, At({ _: 2 }, [
         h.$slots.header ? {
           name: "header",
-          fn: X(() => [
-            V(h.$slots, "header", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "header", {}, void 0, !0)
           ]),
           key: "0"
         } : void 0,
         h.$slots.body ? {
           name: "body",
-          fn: X(() => [
-            V(h.$slots, "body", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "body", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0,
         h.$slots.footer ? {
           name: "footer",
-          fn: X(() => [
-            V(h.$slots, "footer", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "footer", {}, void 0, !0)
           ]),
           key: "2"
         } : void 0,
         h.$slots.loading ? {
           name: "loading",
-          fn: X(() => [
-            V(h.$slots, "loading", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "loading", {}, void 0, !0)
           ]),
           key: "3"
         } : void 0,
         h.$slots["loading-more"] ? {
           name: "loading-more",
-          fn: X(() => [
-            V(h.$slots, "loading-more", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "loading-more", {}, void 0, !0)
           ]),
           key: "4"
         } : void 0,
         h.$slots["no-more"] ? {
           name: "no-more",
-          fn: X(() => [
-            V(h.$slots, "no-more", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "no-more", {}, void 0, !0)
           ]),
           key: "5"
         } : void 0,
         h.$slots.empty ? {
           name: "empty",
-          fn: X((v) => [
-            V(h.$slots, "empty", Fe(Ue(v)), void 0, !0)
+          fn: J((v) => [
+            G(h.$slots, "empty", Fe(Ue(v)), void 0, !0)
           ]),
           key: "6"
         } : void 0,
         h.$slots["group-header"] ? {
           name: "group-header",
-          fn: X((v) => [
-            V(h.$slots, "group-header", Fe(Ue(v)), void 0, !0)
+          fn: J((v) => [
+            G(h.$slots, "group-header", Fe(Ue(v)), void 0, !0)
           ]),
           key: "7"
         } : void 0,
         h.$slots.item ? {
           name: "item",
-          fn: X((v) => [
-            V(h.$slots, "item", Fe(Ue(v)), void 0, !0)
+          fn: J((v) => [
+            G(h.$slots, "item", Fe(Ue(v)), void 0, !0)
           ]),
           key: "8"
         } : void 0,
         h.$slots.search ? {
           name: "search",
-          fn: X((v) => [
-            V(h.$slots, "search", Fe(Ue(v)), void 0, !0)
+          fn: J((v) => [
+            G(h.$slots, "search", Fe(Ue(v)), void 0, !0)
           ]),
           key: "9"
         } : void 0,
         h.$slots.watermark ? {
           name: "watermark",
-          fn: X(() => [
-            V(h.$slots, "watermark", {}, void 0, !0)
+          fn: J(() => [
+            G(h.$slots, "watermark", {}, void 0, !0)
           ]),
           key: "10"
         } : void 0
       ]), 1032, ["show-header", "title", "header-align", "show-search", "show-scroll-to-top", "show-count", "empty-text", "filter-fn", "filter-blocked-contacts", "sort-by", "group-by", "show-group-header", "show-alphabet-nav", "select-mode", "selected-ids", "max-selected", "disabled-fn", "subtitle-fn", "online-status-fn", "show-avatar", "avatar-size", "avatar-shape", "item-size", "loading", "has-more", "enable-load-more", "load-more-threshold", "no-more-text", "body-sticky", "footer-sticky", "search-component", "click-behavior", "enable-presence"])
     ], 6));
   }
-}), Gg = /* @__PURE__ */ ze(i2, [["__scopeId", "data-v-7aa7d631"]]), a2 = /* @__PURE__ */ Re({
+}), Gg = /* @__PURE__ */ ze(i2, [["__scopeId", "data-v-7aa7d631"]]), a2 = /* @__PURE__ */ Le({
   __name: "group-list-container",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -35874,7 +35892,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       class: Te(["group-list-container", s.class]),
       style: Et(s.style)
     }, [
-      q(Ug, {
+      W(Ug, {
         ref_key: "groupListRef",
         ref: c,
         "show-header": s.showHeader,
@@ -35918,85 +35936,85 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       }, At({ _: 2 }, [
         f.$slots.header ? {
           name: "header",
-          fn: X(() => [
-            V(f.$slots, "header", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "header", {}, void 0, !0)
           ]),
           key: "0"
         } : void 0,
         f.$slots.body ? {
           name: "body",
-          fn: X(() => [
-            V(f.$slots, "body", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "body", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0,
         f.$slots.footer ? {
           name: "footer",
-          fn: X(() => [
-            V(f.$slots, "footer", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "footer", {}, void 0, !0)
           ]),
           key: "2"
         } : void 0,
         f.$slots.loading ? {
           name: "loading",
-          fn: X(() => [
-            V(f.$slots, "loading", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "loading", {}, void 0, !0)
           ]),
           key: "3"
         } : void 0,
         f.$slots["loading-more"] ? {
           name: "loading-more",
-          fn: X(() => [
-            V(f.$slots, "loading-more", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "loading-more", {}, void 0, !0)
           ]),
           key: "4"
         } : void 0,
         f.$slots["no-more"] ? {
           name: "no-more",
-          fn: X(() => [
-            V(f.$slots, "no-more", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "no-more", {}, void 0, !0)
           ]),
           key: "5"
         } : void 0,
         f.$slots.empty ? {
           name: "empty",
-          fn: X((g) => [
-            V(f.$slots, "empty", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "empty", Fe(Ue(g)), void 0, !0)
           ]),
           key: "6"
         } : void 0,
         f.$slots["group-header"] ? {
           name: "group-header",
-          fn: X((g) => [
-            V(f.$slots, "group-header", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "group-header", Fe(Ue(g)), void 0, !0)
           ]),
           key: "7"
         } : void 0,
         f.$slots.item ? {
           name: "item",
-          fn: X((g) => [
-            V(f.$slots, "item", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "item", Fe(Ue(g)), void 0, !0)
           ]),
           key: "8"
         } : void 0,
         f.$slots.search ? {
           name: "search",
-          fn: X((g) => [
-            V(f.$slots, "search", Fe(Ue(g)), void 0, !0)
+          fn: J((g) => [
+            G(f.$slots, "search", Fe(Ue(g)), void 0, !0)
           ]),
           key: "9"
         } : void 0,
         f.$slots.watermark ? {
           name: "watermark",
-          fn: X(() => [
-            V(f.$slots, "watermark", {}, void 0, !0)
+          fn: J(() => [
+            G(f.$slots, "watermark", {}, void 0, !0)
           ]),
           key: "10"
         } : void 0
       ]), 1032, ["show-header", "title", "header-align", "show-search", "show-scroll-to-top", "show-count", "empty-text", "filter-fn", "sort-by", "group-by", "show-group-header", "show-alphabet-nav", "select-mode", "selected-ids", "max-selected", "disabled-fn", "subtitle-fn", "show-avatar", "show-member-count", "avatar-size", "avatar-shape", "item-size", "loading", "has-more", "enable-load-more", "load-more-threshold", "no-more-text", "body-sticky", "footer-sticky", "search-component", "click-behavior"])
     ], 6));
   }
-}), Vg = /* @__PURE__ */ ze(a2, [["__scopeId", "data-v-f77dd675"]]), l2 = /* @__PURE__ */ Re({
+}), Vg = /* @__PURE__ */ ze(a2, [["__scopeId", "data-v-f77dd675"]]), l2 = /* @__PURE__ */ Le({
   __name: "block-list-container",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -36021,7 +36039,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       class: Te(["block-list-container", s.class]),
       style: Et(s.style)
     }, [
-      q(Bg, {
+      W(Bg, {
         ref_key: "blockListRef",
         ref: r,
         "show-header": s.showHeader,
@@ -36040,15 +36058,15 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       }, At({ _: 2 }, [
         i.$slots.header ? {
           name: "header",
-          fn: X(() => [
-            V(i.$slots, "header", {}, void 0, !0)
+          fn: J(() => [
+            G(i.$slots, "header", {}, void 0, !0)
           ]),
           key: "0"
         } : void 0,
         i.$slots.watermark ? {
           name: "watermark",
-          fn: X(() => [
-            V(i.$slots, "watermark", {}, void 0, !0)
+          fn: J(() => [
+            G(i.$slots, "watermark", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0
@@ -36058,7 +36076,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
 }), jg = /* @__PURE__ */ ze(l2, [["__scopeId", "data-v-79c8ee39"]]), c2 = {
   key: 2,
   class: "contact-container__notice-view"
-}, u2 = /* @__PURE__ */ Re({
+}, u2 = /* @__PURE__ */ Le({
   __name: "contact-container",
   props: {
     showHeader: { type: Boolean, default: !0 },
@@ -36184,8 +36202,8 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       (x = a.value) == null || x.goTo(M);
     }
     function R(M) {
-      var x, T, I, O;
-      (T = (x = l.value) == null ? void 0 : x.scrollToGroup) == null || T.call(x, M), (O = (I = c.value) == null ? void 0 : I.scrollToGroup) == null || O.call(I, M);
+      var x, T, I, N;
+      (T = (x = l.value) == null ? void 0 : x.scrollToGroup) == null || T.call(x, M), (N = (I = c.value) == null ? void 0 : I.scrollToGroup) == null || N.call(I, M);
     }
     return e({
       view: u,
@@ -36198,7 +36216,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
       setView: $,
       scrollToGroup: R
     }), (M, x) => (y(), w($e, null, [
-      q(Hg, {
+      W(Hg, {
         ref_key: "addressBookRef",
         ref: a,
         class: Te(s.class),
@@ -36241,32 +36259,32 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
         onBlocklistClick: x[23] || (x[23] = (T) => i("blocklist-click")),
         onBlocklistAdd: p
       }, At({
-        header: X(() => [
-          V(M.$slots, "header", {}, void 0, !0)
+        header: J(() => [
+          G(M.$slots, "header", {}, void 0, !0)
         ]),
-        "header-extra": X(() => [
-          V(M.$slots, "header-extra", {}, void 0, !0)
+        "header-extra": J(() => [
+          G(M.$slots, "header-extra", {}, void 0, !0)
         ]),
-        nav: X((T) => [
-          V(M.$slots, "nav", Fe(Ue(T)), void 0, !0)
+        nav: J((T) => [
+          G(M.$slots, "nav", Fe(Ue(T)), void 0, !0)
         ]),
-        "nav-entry": X((T) => [
-          V(M.$slots, "nav-entry", Fe(Ue(T)), void 0, !0)
+        "nav-entry": J((T) => [
+          G(M.$slots, "nav-entry", Fe(Ue(T)), void 0, !0)
         ]),
-        "nav-entry-extra": X((T) => [
-          V(M.$slots, "nav-entry-extra", Fe(Ue(T)), void 0, !0)
+        "nav-entry-extra": J((T) => [
+          G(M.$slots, "nav-entry-extra", Fe(Ue(T)), void 0, !0)
         ]),
-        "home-body": X(() => [
-          V(M.$slots, "home-body", {}, void 0, !0)
+        "home-body": J(() => [
+          G(M.$slots, "home-body", {}, void 0, !0)
         ]),
-        "home-footer": X(() => [
-          V(M.$slots, "home-footer", {}, void 0, !0)
+        "home-footer": J(() => [
+          G(M.$slots, "home-footer", {}, void 0, !0)
         ]),
-        "back-icon": X(() => [
-          V(M.$slots, "back-icon", {}, void 0, !0)
+        "back-icon": J(() => [
+          G(M.$slots, "back-icon", {}, void 0, !0)
         ]),
-        default: X(({ view: T }) => [
-          T === "contact" ? (y(), ce(Gg, {
+        default: J(({ view: T }) => [
+          T === "contact" ? (y(), de(Gg, {
             key: 0,
             ref_key: "contactListContainerRef",
             ref: l,
@@ -36301,7 +36319,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
             "enable-presence": s.enablePresence,
             onSelect: x[0] || (x[0] = (I) => i("contact-select", I)),
             onClick: x[1] || (x[1] = (I) => i("contact-click", I)),
-            onContextmenu: x[2] || (x[2] = (I, O) => i("contact-contextmenu", I, O)),
+            onContextmenu: x[2] || (x[2] = (I, N) => i("contact-contextmenu", I, N)),
             onLoadMore: x[3] || (x[3] = (I) => i("contact-load-more")),
             onMaxExceed: x[4] || (x[4] = (I) => i("contact-max-exceed", I)),
             "onUpdate:selectedIds": x[5] || (x[5] = (I) => i("update:selectedIds", I)),
@@ -36309,75 +36327,75 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
           }, At({ _: 2 }, [
             M.$slots.body ? {
               name: "body",
-              fn: X(() => [
-                V(M.$slots, "body", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "body", {}, void 0, !0)
               ]),
               key: "0"
             } : void 0,
             M.$slots.footer ? {
               name: "footer",
-              fn: X(() => [
-                V(M.$slots, "footer", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "footer", {}, void 0, !0)
               ]),
               key: "1"
             } : void 0,
             M.$slots.loading ? {
               name: "loading",
-              fn: X(() => [
-                V(M.$slots, "loading", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "loading", {}, void 0, !0)
               ]),
               key: "2"
             } : void 0,
             M.$slots["loading-more"] ? {
               name: "loading-more",
-              fn: X(() => [
-                V(M.$slots, "loading-more", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "loading-more", {}, void 0, !0)
               ]),
               key: "3"
             } : void 0,
             M.$slots["no-more"] ? {
               name: "no-more",
-              fn: X(() => [
-                V(M.$slots, "no-more", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "no-more", {}, void 0, !0)
               ]),
               key: "4"
             } : void 0,
             M.$slots.empty ? {
               name: "empty",
-              fn: X((I) => [
-                V(M.$slots, "empty", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "empty", Fe(Ue(I)), void 0, !0)
               ]),
               key: "5"
             } : void 0,
             M.$slots["group-header"] ? {
               name: "group-header",
-              fn: X((I) => [
-                V(M.$slots, "group-header", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "group-header", Fe(Ue(I)), void 0, !0)
               ]),
               key: "6"
             } : void 0,
             M.$slots.item ? {
               name: "item",
-              fn: X((I) => [
-                V(M.$slots, "item", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "item", Fe(Ue(I)), void 0, !0)
               ]),
               key: "7"
             } : void 0,
             M.$slots["contact-search"] ? {
               name: "search",
-              fn: X((I) => [
-                V(M.$slots, "contact-search", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "contact-search", Fe(Ue(I)), void 0, !0)
               ]),
               key: "8"
             } : void 0,
             M.$slots.watermark ? {
               name: "watermark",
-              fn: X(() => [
-                V(M.$slots, "watermark", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "watermark", {}, void 0, !0)
               ]),
               key: "9"
             } : void 0
-          ]), 1032, ["show-search", "show-scroll-to-top", "search-component", "show-count", "empty-text", "filter-fn", "sort-by", "group-by", "show-group-header", "show-alphabet-nav", "select-mode", "selected-ids", "max-selected", "disabled-fn", "subtitle-fn", "online-status-fn", "show-avatar", "avatar-size", "avatar-shape", "item-size", "loading", "enable-load-more", "load-more-threshold", "no-more-text", "body-sticky", "footer-sticky", "auto-fetch", "enable-presence"])) : T === "group" ? (y(), ce(Vg, {
+          ]), 1032, ["show-search", "show-scroll-to-top", "search-component", "show-count", "empty-text", "filter-fn", "sort-by", "group-by", "show-group-header", "show-alphabet-nav", "select-mode", "selected-ids", "max-selected", "disabled-fn", "subtitle-fn", "online-status-fn", "show-avatar", "avatar-size", "avatar-shape", "item-size", "loading", "enable-load-more", "load-more-threshold", "no-more-text", "body-sticky", "footer-sticky", "auto-fetch", "enable-presence"])) : T === "group" ? (y(), de(Vg, {
             key: 1,
             ref_key: "groupListContainerRef",
             ref: c,
@@ -36411,7 +36429,7 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
             "auto-fetch": s.autoFetchGroups,
             onSelect: x[7] || (x[7] = (I) => i("group-select", I)),
             onClick: x[8] || (x[8] = (I) => i("group-click", I)),
-            onContextmenu: x[9] || (x[9] = (I, O) => i("group-contextmenu", I, O)),
+            onContextmenu: x[9] || (x[9] = (I, N) => i("group-contextmenu", I, N)),
             onLoadMore: x[10] || (x[10] = (I) => i("group-load-more")),
             onMaxExceed: x[11] || (x[11] = (I) => i("group-max-exceed", I)),
             "onUpdate:selectedIds": x[12] || (x[12] = (I) => i("update:groupSelectedIds", I)),
@@ -36419,120 +36437,120 @@ const VD = { class: "conversation-container" }, jD = /* @__PURE__ */ Re({
           }, At({ _: 2 }, [
             M.$slots["group-body"] ? {
               name: "body",
-              fn: X(() => [
-                V(M.$slots, "group-body", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "group-body", {}, void 0, !0)
               ]),
               key: "0"
             } : void 0,
             M.$slots["group-footer"] ? {
               name: "footer",
-              fn: X(() => [
-                V(M.$slots, "group-footer", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "group-footer", {}, void 0, !0)
               ]),
               key: "1"
             } : void 0,
             M.$slots["group-loading"] ? {
               name: "loading",
-              fn: X(() => [
-                V(M.$slots, "group-loading", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "group-loading", {}, void 0, !0)
               ]),
               key: "2"
             } : void 0,
             M.$slots["group-loading-more"] ? {
               name: "loading-more",
-              fn: X(() => [
-                V(M.$slots, "group-loading-more", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "group-loading-more", {}, void 0, !0)
               ]),
               key: "3"
             } : void 0,
             M.$slots["group-no-more"] ? {
               name: "no-more",
-              fn: X(() => [
-                V(M.$slots, "group-no-more", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "group-no-more", {}, void 0, !0)
               ]),
               key: "4"
             } : void 0,
             M.$slots["group-empty"] ? {
               name: "empty",
-              fn: X((I) => [
-                V(M.$slots, "group-empty", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "group-empty", Fe(Ue(I)), void 0, !0)
               ]),
               key: "5"
             } : void 0,
             M.$slots["group-group-header"] ? {
               name: "group-header",
-              fn: X((I) => [
-                V(M.$slots, "group-group-header", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "group-group-header", Fe(Ue(I)), void 0, !0)
               ]),
               key: "6"
             } : void 0,
             M.$slots["group-item"] ? {
               name: "item",
-              fn: X((I) => [
-                V(M.$slots, "group-item", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "group-item", Fe(Ue(I)), void 0, !0)
               ]),
               key: "7"
             } : void 0,
             M.$slots["group-search"] ? {
               name: "search",
-              fn: X((I) => [
-                V(M.$slots, "group-search", Fe(Ue(I)), void 0, !0)
+              fn: J((I) => [
+                G(M.$slots, "group-search", Fe(Ue(I)), void 0, !0)
               ]),
               key: "8"
             } : void 0,
             M.$slots.watermark ? {
               name: "watermark",
-              fn: X(() => [
-                V(M.$slots, "watermark", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "watermark", {}, void 0, !0)
               ]),
               key: "9"
             } : void 0
           ]), 1032, ["show-search", "show-scroll-to-top", "search-component", "show-count", "empty-text", "filter-fn", "sort-by", "group-by", "show-group-header", "show-alphabet-nav", "select-mode", "selected-ids", "max-selected", "disabled-fn", "subtitle-fn", "show-avatar", "show-member-count", "avatar-size", "avatar-shape", "item-size", "loading", "enable-load-more", "load-more-threshold", "no-more-text", "body-sticky", "footer-sticky", "auto-fetch"])) : T === "notice" ? (y(), w("div", c2, [
-            V(M.$slots, "notice", {}, void 0, !0),
-            M.$slots.notice ? U("", !0) : (y(), ce(ru, { key: 0 }))
-          ])) : T === "blocklist" ? (y(), ce(jg, {
+            G(M.$slots, "notice", {}, void 0, !0),
+            M.$slots.notice ? F("", !0) : (y(), de(ru, { key: 0 }))
+          ])) : T === "blocklist" ? (y(), de(jg, {
             key: 3,
             class: "contact-container__blocklist-view",
             "show-header": !1,
             title: s.blocklistLabel,
             onClick: x[14] || (x[14] = (I) => i("blocklist-item-click", I)),
-            onContextmenu: x[15] || (x[15] = (I, O) => i("blocklist-item-contextmenu", I, O)),
+            onContextmenu: x[15] || (x[15] = (I, N) => i("blocklist-item-contextmenu", I, N)),
             onUnblock: x[16] || (x[16] = (I) => i("blocklist-unblock", I))
           }, At({ _: 2 }, [
             M.$slots["blocklist-header"] ? {
               name: "header",
-              fn: X(() => [
-                V(M.$slots, "blocklist-header", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "blocklist-header", {}, void 0, !0)
               ]),
               key: "0"
             } : void 0,
             M.$slots.watermark ? {
               name: "watermark",
-              fn: X(() => [
-                V(M.$slots, "watermark", {}, void 0, !0)
+              fn: J(() => [
+                G(M.$slots, "watermark", {}, void 0, !0)
               ]),
               key: "1"
             } : void 0
-          ]), 1032, ["title"])) : U("", !0)
+          ]), 1032, ["title"])) : F("", !0)
         ]),
         _: 2
       }, [
         M.$slots["subheader-extra"] ? {
           name: "subheader-extra",
-          fn: X((T) => [
-            V(M.$slots, "subheader-extra", Fe(Ue(T)), void 0, !0)
+          fn: J((T) => [
+            G(M.$slots, "subheader-extra", Fe(Ue(T)), void 0, !0)
           ]),
           key: "0"
         } : void 0,
         M.$slots.watermark ? {
           name: "watermark",
-          fn: X(() => [
-            V(M.$slots, "watermark", {}, void 0, !0)
+          fn: J(() => [
+            G(M.$slots, "watermark", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0
       ]), 1032, ["class", "style", "show-header", "title", "header-align", "show-search", "transition", "show-notice", "show-group", "show-contact", "show-blocklist", "notice-count", "group-count", "contact-count", "auto-entry-count", "entry-order", "notice-label", "group-label", "contact-label", "blocklist-label", "notice-icon", "group-icon", "contact-icon", "blocklist-icon", "entries", "initial-view", "show-contact-add-button", "show-group-create-button", "show-blocklist-add-button"]),
-      q(iu, {
+      W(iu, {
         show: d.value,
         "onUpdate:show": x[24] || (x[24] = (T) => d.value = T)
       }, null, 8, ["show"])

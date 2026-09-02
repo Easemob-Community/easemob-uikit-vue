@@ -1,5 +1,5 @@
 import type { ConnectionEventHandlerMap } from 'easemob-websdk'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { createLogger, isKickErrorCode } from '@easemob/uikit-sdk-contract'
 
 const connLog = createLogger('UIKit:ConnEvents')
 
@@ -13,6 +13,8 @@ export interface ConnectionEventStores {
     setConnected: (value: boolean) => void
     setConnecting: (value: boolean) => void
     setHasConnectedOnce: (value: boolean) => void
+    /** 标记账号被踢/失效（被踢类错误码见 sdk-contract KICK_ERROR_CODE） */
+    setKicked: (code?: number) => void
   }
   conversation: {
     conversationsLoaded: boolean
@@ -50,10 +52,14 @@ export function createConnectionHandlers(
       // 标记首次连接成功：此后再次 onConnecting 即为自动重连，横幅据此区分文案
       stores.client.setHasConnectedOnce(true)
     },
-    onDisconnected: () => {
-      connLog.info('onDisconnected')
+    onDisconnected: (payload) => {
+      connLog.info('onDisconnected', payload ? { reason: payload.reason, errorCode: payload.errorCode } : undefined)
       stores.client.setConnected(false)
       stores.client.setConnecting(false)
+      // 被踢/账号失效类断开（206/207/214/216/217）是账号态终态，SDK 不再自动重连，
+      // 标记 kicked 供 UI 展示被踢文案而非「网络异常」
+      if (isKickErrorCode(payload?.errorCode))
+        stores.client.setKicked(payload.errorCode)
       // 断线不清 currentUser：自动重连只触发 onConnected，
       // 若此处清空则重连后 currentUser 永不恢复；仅 logout 时才清除。
     },

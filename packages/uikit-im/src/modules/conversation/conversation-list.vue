@@ -152,10 +152,35 @@ const isSyncing = computed(() => stores.conversation.isSyncingConversations)
 /** 消息是否正在同步（离线消息同步阶段） */
 const isSyncingMessages = computed(() => stores.message.isSyncingMessages)
 
-/** 连接/同步状态横幅当前应展示的内容；按优先级：断网 > 连接中 > 会话同步 > 消息同步 */
+/** 被踢文案按错误码差异化（sdk-contract KICK_ERROR_CODE） */
+const kickedTitle = computed(() => {
+  switch (stores.client.kickCode) {
+    case 206:
+      return t('status.kickedAnotherDevice')
+    case 216:
+      return t('status.kickedPasswordChanged')
+    case 214:
+      return t('status.kickedDeviceLimit')
+    default:
+      return t('status.kickedOffline')
+  }
+})
+
+/** 连接/同步状态横幅当前应展示的内容；按优先级：被踢 > 断网 > 连接中 > 会话同步 > 消息同步 */
 const bannerState = computed(() => {
   const connected = stores.client.connected
   const connecting = stores.client.connecting
+  // 被踢/账号失效：账号态终态，SDK 不再自动重连，展示被踢文案且不可点击重连
+  if (stores.client.kicked) {
+    return {
+      visible: true,
+      type: 'error' as const,
+      loading: false,
+      title: kickedTitle.value,
+      description: '',
+      clickable: false,
+    }
+  }
   if (!connected && !connecting) {
     return {
       visible: true,
@@ -920,7 +945,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-item-hover-radius, 8px);
   transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
   display: flex;
   align-items: center;
@@ -929,7 +954,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 @media (hover: hover) {
   .context-menu__item:hover {
-    background-color: var(--uikit-bg-hover, #f3f4f6);
+    background-color: var(--uikit-bg-hover, #F5F5F5);
   }
 }
 
@@ -962,7 +987,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 /* 键盘方向键高亮：与当前激活会话区分开，提供导航视觉反馈 */
 .conversation-list__items :deep(.is-keyboard-focus) {
-  background-color: var(--uikit-bg-hover, #f3f4f6);
+  background-color: var(--uikit-bg-hover, #F5F5F5);
 }
 
 .conversation-list__loading {

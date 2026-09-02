@@ -68,6 +68,7 @@
 - 技术债与待修：[TECH-DEBT.md](TECH-DEBT.md)
 - Electron + 本地 DB 持久化预研：[ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）
 - 主题配置能力审查（字号/适老/密度）：[THEME-CAPABILITY-REVIEW.md](docs/THEME-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D86，关联 D3/D4/D12）
+- 设计稿 token 对照与落地口径（设计师 SCSS/Typography 方案 ↔ `--uikit-*` 映射、不引入项理由、规格校准清单、对接流程）：[DESIGN-TOKEN-MAPPING.md](docs/DESIGN-TOKEN-MAPPING.md)（关联 TECH-DEBT D127-D130）
 - Demo 开发者友好模式预研：[DEMO-DEV-MODE-RESEARCH.md](docs/DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：[ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：[STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）

@@ -1275,6 +1275,30 @@
 - **联动**：D122（SDK adapter 抽象）/ D125（微前端宿主兼容）/ D85（Electron 持久化注入点）。
 - **关联 skill**：`uikit-package-boundary` / `uikit-provider-config` / `uikit-chat-plugin-tabs`
 
+### [ ] D127. `EmText` 排版原子组件缺失（设计 Typography 方案唯一未落地项）
+
+- **背景**：2026-09 设计师整改意见提出 `BaseText`（`level/weight/color/ellipsis/tag` 五 props）。经评估其底层（字号/字重/行高 token、`--uikit-font-scale` 适老缩放）已全部具备，文档站 `theme#排版层级` 已有语义层级表，但层级仅停留在「文档约定」，没有组件级强制载体；单行截断 ellipsis 目前散在各组件里手写三件套。
+- **建议修法**：在 `packages/uikit-core/src/components/text/` 新增 `EmText`：props 对齐设计师接口（`level` 映射语义层级 → 现有 `--uikit-font-size-*` token，**不写死 px**；`weight` 走 `--uikit-font-weight-*`；`ellipsis` 单行截断；`tag` 默认 `span`）；新增后**不全库回改**，新代码用、老代码渐进迁移；按 `uikit-component-authoring` 规范补 story 并跑 `aux:gen`。
+- **关联 skill**：`uikit-component-authoring` / `uikit-styling-theming`
+
+### [ ] D128. `avatar-only` 72px 折叠会话栏（设计师 mode 三形态剩余一种）
+
+- **背景**：设计师会话列表规范含 `mode="avatar-only"`（72px 宽折叠侧边栏：只显头像列、未读挂头像角、隐藏搜索/信息区）。2026-09 已落地 `variant`（card/compact）与 `showAvatar=false`（info-only），唯独 avatar-only 未做——它是容器级布局能力（搜索栏隐藏、头像列居中、与展开态联动），不应糊在行/列表组件 props 上。
+- **建议修法**：单独立项评估：作为 `ConversationList` 的布局模式或独立窄栏容器；未读角标可直接复用 `unreadPlacement="avatar"` + `EmBadge placement/bordered`。
+- **关联 skill**：`uikit-component-authoring` / `uikit-cell-contract`
+
+### [ ] D129. Badge s/m 档字号（8/10px）与设计师 12px 的偏差待设计确认
+
+- **背景**：2026-09 Badge 六档落地时，设计师规范要求全档 caption 12px，但 s（10px 高）/ m（14px 高）档物理上塞不下 12px 字，实际用了 `--uikit-font-size-8` / `-10`。属务实偏差，需设计师确认：要么接受小档小字号，要么放大 s/m 档数字高度修订规格表。
+- **建议修法**：设计确认后二选一——维持现状关闭本条，或按修订后规格表调整 `--uikit-badge-size` 档位值。
+- **关联 skill**：`uikit-component-authoring`
+
+### [ ] D130. compact 密度档下 16px 用户名 + 6px 行距可能偏挤
+
+- **背景**：2026-09 会话项排版按设计规范调为「用户名 16px/600 + 预览 14px + 行 gap 6px」，在 normal 密度（64px 行高）下观感正常；但 compact 档行高 52px，两行 + 6px 间距会偏挤（当时已在变更说明中提示，未处理）。
+- **建议修法**：demo 切 compact 档实际过目；若偏挤，把会话项行 gap 纳入密度变量（跟随 `--uikit-list-gap` 或新增项级变量），而非回退字号。
+- **关联 skill**：`uikit-styling-theming` / `uikit-cell-contract`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

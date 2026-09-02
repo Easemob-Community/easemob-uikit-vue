@@ -6,7 +6,7 @@ import { useStorage, usePreferredColorScheme } from '@vueuse/core'
 export type AnimationLevel = 'subtle' | 'normal' | 'expressive'
 
 /** 列表项 hover 风格 */
-export type HoverStyle = 'default' | 'rounded'
+export type HoverStyle = 'default' | 'rounded' | 'square'
 
 /** 主题模式：light / dark / auto(跟随系统) */
 export type ThemeMode = 'light' | 'dark' | 'auto'
@@ -148,7 +148,7 @@ export const THEME_PRESETS: Record<ThemePreset, ThemePresetConfig> = {
     bubbleShape: 'ground',
     containerGap: 4,
     density: 'compact',
-    hoverStyle: 'default',
+    hoverStyle: 'square',
   },
   fresh: {
     primaryColor: 150,
@@ -368,12 +368,16 @@ export const useThemeStore = defineStore('theme', () => {
     applySemanticToken('--uikit-icon-muted', iconMutedColor.value)
   })
 
-  // Hover 风格 DOM 属性联动
+  // Hover 风格 DOM 属性联动（三档）：
+  // - default（内置默认）：圆角 8px 整行高亮，无左右缩进；
+  // - rounded：圆角 + 卡片式左右缩进（8px）与内容内缩；
+  // - square：直角整行高亮（方正风格，供 business 预设等场景）。
   watchEffect(() => {
     const isRounded = hoverStyle.value === 'rounded'
+    const isSquare = hoverStyle.value === 'square'
     document.documentElement.style.setProperty(
       '--uikit-item-hover-radius',
-      isRounded ? '8px' : '0px'
+      isSquare ? '0px' : '8px'
     )
     document.documentElement.style.setProperty(
       '--uikit-item-hover-margin-x',
@@ -385,7 +389,7 @@ export const useThemeStore = defineStore('theme', () => {
     )
     document.documentElement.style.setProperty(
       '--uikit-item-active-radius',
-      isRounded ? '8px' : '0px'
+      isSquare ? '0px' : '8px'
     )
   })
 

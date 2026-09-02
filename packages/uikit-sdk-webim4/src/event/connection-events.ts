@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { createLogger, isKickErrorCode } from '@easemob/uikit-sdk-contract'
 import { setSyncStatus } from '../use-sync-status'
 
 const connLog = createLogger('UIKit:Webim4ConnEvents')
@@ -12,6 +12,8 @@ export interface ConnectionEventStores {
     setConnected: (value: boolean) => void
     setConnecting: (value: boolean) => void
     setHasConnectedOnce: (value: boolean) => void
+    /** 标记账号被踢/失效（被踢类错误码见 sdk-contract KICK_ERROR_CODE，4.x 取 error.type） */
+    setKicked: (code?: number) => void
   }
   conversation: {
     conversationsLoaded: boolean
@@ -59,6 +61,10 @@ export function createConnectionHandlers(
       connLog.info('onDisconnected', error ? { error } : undefined)
       stores.client.setConnected(false)
       stores.client.setConnecting(false)
+      // 被踢/账号失效类断开（4.x error.type：206/207/214/216/217）是账号态终态，
+      // 标记 kicked 供 UI 展示被踢文案而非「网络异常」
+      if (isKickErrorCode(error?.type))
+        stores.client.setKicked(error?.type)
       // 断线不清 currentUser：自动重连只触发 onConnected，
       // 若此处清空则重连后 currentUser 永不恢复；仅 logout 时才清除。
     },

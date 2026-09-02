@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+
+
+### 修复
+
+- **被踢误报网络异常（与 websdk5 同口径）**：`onDisconnected` 按 `error.type` 识别被踢/账号失效并 `client.setKicked(code)`；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
+
+---
+
 ## @easemob/uikit-sdk-webim4 1.2.1 (2026-09-02)
 
 

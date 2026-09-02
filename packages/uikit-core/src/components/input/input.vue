@@ -40,6 +40,12 @@ export interface InputProps {
    * - 'underline': 无背景 + 仅底部一条线，最极简
    */
   variant?: 'default' | 'search' | 'filled' | 'ghost' | 'underline'
+  /**
+   * 椭圆（pill）档位：true 时输入框为全圆角胶囊形态（border-radius 9999px、
+   * 整体高度 36px、垂直内边距 8px），优先级高于主题 componentsShape；
+   * 默认 false（圆角矩形模式）
+   */
+  pill?: boolean
 }
 
 export interface InputEmits {
@@ -66,6 +72,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   errorMessage: '',
   errorIcon: 'circle/bang',
   readonly: false,
+  pill: false,
 })
 
 const emit = defineEmits<InputEmits>()
@@ -75,6 +82,9 @@ const themeStore = useThemeStore()
 const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'uikit-input__field--square' : '',
 )
+
+/** 椭圆档位类：优先级高于主题 shape（见 --pill 规则位置） */
+const pillClass = computed(() => (props.pill ? 'uikit-input__field--pill' : ''))
 
 const variantClass = computed(() => {
   if (props.variant === 'search')
@@ -138,7 +148,7 @@ defineExpose({
       <input
         ref="inputRef"
         class="uikit-input__field"
-        :class="[shapeClass, variantClass]"
+        :class="[shapeClass, variantClass, pillClass]"
         :value="props.modelValue"
         :type="props.type"
         :placeholder="props.placeholder"
@@ -249,7 +259,7 @@ defineExpose({
 .uikit-input__field {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color);
+  border: 1px solid var(--uikit-input-border-color, #F5F5F5);
   border-radius: var(--uikit-components-radius);
   font-size: var(--uikit-font-size-14);
   outline: none;
@@ -275,16 +285,27 @@ defineExpose({
 
 .uikit-input--search.uikit-input--with-prefix .uikit-input__field,
 .uikit-input--filled.uikit-input--with-prefix .uikit-input__field {
-  padding-left: 40px;
+  /* 设计规格：图标左缩进 8px + 图标 16px + 图标-文字间距 4px = 文字起点 28px */
+  padding-left: 28px;
 }
 
 .uikit-input--search .uikit-input__prefix-icon,
 .uikit-input--filled .uikit-input__prefix-icon {
-  left: 16px;
+  left: 8px;
 }
 
 .uikit-input__field--square {
   border-radius: 4px;
+}
+
+/* 椭圆（pill）档位：全圆角胶囊 + 整体高度 36px + 垂直内边距 8px；
+   排在 --square 之后，同优先级下覆盖主题形状档位（pill 是显式 prop，意图更强） */
+.uikit-input__field--pill {
+  border-radius: 9999px;
+  box-sizing: border-box;
+  height: 36px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .uikit-input__field:focus {
@@ -327,7 +348,6 @@ defineExpose({
 
 .uikit-input--search .uikit-input__prefix-icon {
   color: var(--uikit-text-secondary);
-  left: 4px;
 }
 
 /* Filled 风格：灰色背景 + 无边框 + 圆角 */
@@ -344,7 +364,6 @@ defineExpose({
 
 .uikit-input--filled .uikit-input__prefix-icon {
   color: var(--uikit-text-secondary);
-  left: 4px;
 }
 
 /* Ghost 风格：完全透明 + 聚焦时底部细线 */

@@ -1,3 +1,38 @@
+## @easemob/uikit-core 2.4.0 (2026-09-03)
+
+
+### 新增
+
+- **连接状态「被踢」账号态**：client store 新增 `kicked` / `kickCode` / `setKicked(code)`（`setConnected(true)` 与 `clearClient` 自动清除），供 UI 区分账号终态与网络异常。
+- **列表项 hover 风格第三档 `square`**：`HoverStyle` 扩为 `'default' | 'rounded' | 'square'`（直角整行高亮，radius 归零）；`business` 预设默认改为 `square`；`theme/index.css` `:root` 补齐 `--uikit-item-hover-radius` / `--uikit-item-active-radius` / `--uikit-item-hover-margin-x` / `--uikit-item-hover-padding-x` 静态默认（8px，与 `default` 档一致），未接 themeStore 的场景不再缺变量。
+- **Input `pill` 椭圆档**：显式 prop（border-radius 9999px、整体高度 36px、垂直 padding 8px），优先级高于主题 `componentsShape`；默认 `false` 保持圆角矩形。新增语义 token `--uikit-input-border-color`（default 变体边框，浅 `#F5F5F5` / 深 `#374151`）。
+- locale 新增 `status.kickedAnotherDevice` / `status.kickedPasswordChanged` / `status.kickedDeviceLimit` / `status.kickedOffline`（中英双语）。
+
+### 修复
+
+- **Input 带前缀图标比例校准**：search/filled 变体下前缀图标左缩进 8px、文字 `padding-left` 28px（图标 8 + 图标宽 16 + 间距 4 的设计规格），修复图标过于靠左的问题（删除两条老的 `left: 4px` 覆盖）。
+
+---
+
+## @easemob/uikit-core 2.3.0 (2026-09-02)
+
+
+### 新增
+
+- **Badge 档位体系**：尺寸扩为六档 `xs`（仅 8px 圆点）/ `s` / `m` / `l`（默认）/ `xl` / `xxl`（单位数正圆、多位数药丸按规格表）；新增 `placement`（`top-right` 默认 / `bottom-right`）与 `bordered`（2px 描边与头像分界，`box-shadow` 外环实现、随背景色自适应、不与 stroked 描边冲突）；新增导出类型 `BadgePlacement`。
+- **语义 token**：`--uikit-cell-bg`（Cell 项背景，默认透明，会话列表 card 变体覆写为浮层色）、`--uikit-conversation-list-bg`、`--uikit-empty-icon-color` / `--uikit-empty-text-color`、`--uikit-badge-bg`（徽标默认背景 `#FF7070`，独立于 danger 语义色）；新增图标 `list/bullet`，`filled/pin` 更换新版资源。
+
+### 变更
+
+- **token 默认值校准（对齐设计色板）**：`--uikit-bg-hover` 浅 `#e5e7eb` → `#F5F5F5`；`--uikit-bg-active` 浅色 alpha 0.08 → 0.12（≈ 主色 12% 叠白，视觉对齐 `#E5F5FF` 且保持跟随主色）；`--uikit-icon-muted` 浅 `#B6B8BF` → `#949A9E`。
+- locale 默认文案：`conversation.empty`「暂无会话」→「没有会话」，`chat.empty`「请选择会话」→「选择一个会话」（en 同步为 `Select a conversation`）。
+
+### 破坏性行为变更
+
+- **`BadgeSize` 枚举重定义**：`'normal' | 'small'` → `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`，`size` prop 默认值 `'l'`；Badge 默认色由 `--uikit-danger-color` 改为 `--uikit-badge-bg`（`#FF7070`）。
+
+---
+
 ## @easemob/uikit-core 2.2.0 (2026-09-02)
 
 

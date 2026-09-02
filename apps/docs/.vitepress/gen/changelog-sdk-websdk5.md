@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
+
+
+### 修复
+
+- **被踢误报网络异常**：`onDisconnected` 按错误码识别被踢/账号失效（取 `payload.errorCode`），命中 `KICK_ERROR_CODE` 时调用 `client.setKicked(code)` 标记账号终态，而非仅置 disconnected；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
+
+---
+
 ## @easemob/uikit-sdk-websdk5 1.2.1 (2026-09-02)
 
 

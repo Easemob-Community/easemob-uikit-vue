@@ -19,6 +19,9 @@ const underlineValue = ref('')
     <Variant title="Search">
       <Input v-model="searchValue" variant="search" prefix-icon="search" placeholder="搜索..." />
     </Variant>
+    <Variant title="Pill（椭圆档：36px 高 / 9999px 圆角）">
+      <Input v-model="searchValue" variant="search" pill prefix-icon="search" placeholder="椭圆搜索框..." />
+    </Variant>
     <Variant title="Filled">
       <Input v-model="filledValue" variant="filled" prefix-icon="search" placeholder="搜索..." />
     </Variant>

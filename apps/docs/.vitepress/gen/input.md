@@ -18,6 +18,7 @@
 | errorIcon    | `string`                                                      | `'circle/bang'` | 错误图标名称，默认 "circle/bang"                                                                                                                                                                      |
 | readonly     | `boolean`                                                     | `false`         | 是否只读；只读时背景置灰但文字仍可选中复制                                                                                                                                                                        |
 | variant      | `'default' \| 'search' \| 'filled' \| 'ghost' \| 'underline'` | `'default'`     | 输入框风格变体<br>- 'default': 白色背景 + 边框 + 圆角，适用于表单输入（默认）<br>- 'search': 白底 + 底部细线，适用于搜索框<br>- 'filled': 灰色背景 + 无边框 + 圆角，旧搜索风格<br>- 'ghost': 完全透明 + 聚焦时底部细线，极简风格<br>- 'underline': 无背景 + 仅底部一条线，最极简 |
+| pill         | `boolean`                                                     | `false`         | 椭圆（pill）档位：true 时输入框为全圆角胶囊形态（border-radius 9999px、<br>整体高度 36px、垂直内边距 8px），优先级高于主题 componentsShape；<br>默认 false（圆角矩形模式）                                                                      |
 
 ### Events
 

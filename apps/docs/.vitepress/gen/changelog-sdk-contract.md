@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
+
+
+### 新增
+
+- **被踢错误码契约**：`KICK_ERROR_CODE`（206 多端互踢 / 207 账号注销 / 214 设备数超限 / 216 修改密码 / 217 被其他设备踢下线，websdk 两代同码）与类型守卫 `isKickErrorCode()`。
+
+---
+
 ## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
 
 

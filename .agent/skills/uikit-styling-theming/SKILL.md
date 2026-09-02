@@ -174,6 +174,21 @@ const presenceColorMap = {
 - **入口**：`<UIKitProvider :theme="{ mode, primaryColor, gap, shape }" :animation>` 在
   `containers/uikit-provider/uikit-provider.vue` 的 `onMounted` 里把配置喂进 store。
 
+## 组件级风格变体与设计稿 hex 校准（2026-09 会话列表改版沉淀）
+
+**组件级风格变体 = 容器根作用域覆写变量**，不要为风格差异加 JS 分支或改全局 themeStore：
+会话列表 `variant="card" | "compact"` 的实现（`conversation-list.vue`）是范式——列表根挂修饰类
+（`conversation-list--card`），类内覆写 `--uikit-cell-bg` / `--uikit-cell-gap` / `--uikit-item-hover-radius`
+等 Cell 变量。themeStore 写的是 `documentElement`，容器根作用域天然局部覆盖、互不影响；
+Cell 侧只消费 `var(--uikit-cell-bg, transparent)` 这类带兜底的变量。今后「同一组件多风格」一律走这条路。
+
+**设计稿 hex → token 的校准方法**：设计师给的字面量先进 token，且优先表达为既有 token 的函数，
+而不是新增/写死字面量。实例：设计稿选中色 `#E5F5FF` ≈ 主色 `#33B1FF` 12% 叠白，落地方式是把
+`--uikit-bg-active` 浅色 alpha 从 0.08 调到 0.12——视觉命中稿值，且保留「换主色自动跟随」能力
+（写死 `#E5F5FF` 会在 `setPrimaryColor` 后出错）。同理 `#F5F5F5` 进 `--uikit-bg-hover`、
+`#FF7070` 进 `--uikit-badge-bg`、空态 `#E6E6E6`/`#BDBDBD` 进 `--uikit-empty-*`。
+校准类 token 变更必须同步：`:root` + 暗色段 + `fallback` 位置 + 文档站 `design-tokens.md` / `theme.md`。
+
 ## 硬规则（最该拦）vs 软约定
 
 **硬规则**

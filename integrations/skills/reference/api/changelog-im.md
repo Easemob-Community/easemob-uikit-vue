@@ -1,3 +1,36 @@
+## @easemob/uikit-im 3.3.0 (2026-09-03)
+
+
+### 新增
+
+- **被踢下线识别与差异化提示**：会话列表连接横幅新增「被踢」最高优先级分支（不可点击重连），按 SDK 错误码差异化文案（其他设备登录 / 密码已修改 / 设备数超限 / 被迫下线，新增 4 个 locale key `status.kicked*`，中英双语），修复账号被踢后误显示「网络异常/断开」的问题。
+
+### 变更
+
+- **菜单项圆角与 hover 档位联动**：消息操作菜单、会话右键菜单的菜单项圆角统一由 `--uikit-components-radius` 改为 `--uikit-item-hover-radius`，随 `hoverStyle` 三档联动（square 档为直角）。
+
+---
+
+## @easemob/uikit-im 3.2.0 (2026-09-02)
+
+
+### 新增
+
+- **会话列表风格变体**：`ConversationContainer` / `ConversationList` 新增 `variant`（`card` 默认：圆角白卡、无分割线、项间距 4px / `compact`：无圆角、无分割线、零间距，列表根作用域覆写 Cell 变量实现，不影响全局主题）、`showAvatar`（false = 仅会话信息模式）、`unreadPlacement`（`avatar` 时未读徽标带白描边挂在头像右上角）；`badgePlacement` 三层透传统一未读徽标位置。
+- **会话项扩展与事件**：新增 `#name-suffix` 插槽（名字后企业/官方 tag，list 层 `#item-name-suffix`、container 层 `#itemNameSuffix` 透传，scope 含会话数据）；新增 `search` 事件（去空格关键字，埋点/远程搜索用）。
+- **会话列表自带底色**：`--uikit-conversation-list-bg`（浅 `#FAFAFA` / 深 `#111827`），card 变体下头部/分栏/搜索与卡片项边界对齐、头部与项内容线对齐。
+- **空状态规格化**：会话列表空态启用新图标 `list/bullet`（100×100 占位色 + 16px 文案 + 垂直居中，规格走 `--uikit-empty-*` token）；聊天区无会话空态图标换 `bubble/rect/2`，默认文案「选择一个会话」。
+
+### 变更
+
+- **会话项排版对齐设计规范**：用户名 16px/600、时间 12px tertiary、消息预览 14px，两行行距 6px；置顶底色与 hover 同值（`--uikit-bg-hover`）；置顶/免打扰图标换面性图标（`filled/pin` / `filled/bell/slash`，`--uikit-icon-muted` 同色）且置顶补齐与免打扰一致的摇动动画；免打扰/dot 模式未读点校准为 8×8、`#FF7070`（去除免打扰染灰的历史行为）。
+
+### 破坏性行为变更
+
+- `EmBadge` 的 `size` 枚举由 `'normal' | 'small'` 改为 `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`（默认 `'l'`），旧值不再合法（见 core 2.3.0）。
+
+---
+
 ## @easemob/uikit-im 3.1.0 (2026-09-02)
 
 

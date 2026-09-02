@@ -1,5 +1,46 @@
 # Changelog
 
+## @easemob/uikit-im 3.3.0 (2026-09-03)
+
+### 新增
+
+- **被踢下线识别与差异化提示**：会话列表连接横幅新增「被踢」最高优先级分支（不可点击重连），按 SDK 错误码差异化文案（其他设备登录 / 密码已修改 / 设备数超限 / 被迫下线，新增 4 个 locale key `status.kicked*`，中英双语），修复账号被踢后误显示「网络异常/断开」的问题。
+
+### 变更
+
+- **菜单项圆角与 hover 档位联动**：消息操作菜单、会话右键菜单的菜单项圆角统一由 `--uikit-components-radius` 改为 `--uikit-item-hover-radius`，随 `hoverStyle` 三档联动（square 档为直角）。
+
+## @easemob/uikit-core 2.4.0 (2026-09-03)
+
+### 新增
+
+- **连接状态「被踢」账号态**：client store 新增 `kicked` / `kickCode` / `setKicked(code)`（`setConnected(true)` 与 `clearClient` 自动清除），供 UI 区分账号终态与网络异常。
+- **列表项 hover 风格第三档 `square`**：`HoverStyle` 扩为 `'default' | 'rounded' | 'square'`（直角整行高亮，radius 归零）；`business` 预设默认改为 `square`；`theme/index.css` `:root` 补齐 `--uikit-item-hover-radius` / `--uikit-item-active-radius` / `--uikit-item-hover-margin-x` / `--uikit-item-hover-padding-x` 静态默认（8px，与 `default` 档一致），未接 themeStore 的场景不再缺变量。
+- **Input `pill` 椭圆档**：显式 prop（border-radius 9999px、整体高度 36px、垂直 padding 8px），优先级高于主题 `componentsShape`；默认 `false` 保持圆角矩形。新增语义 token `--uikit-input-border-color`（default 变体边框，浅 `#F5F5F5` / 深 `#374151`）。
+- locale 新增 `status.kickedAnotherDevice` / `status.kickedPasswordChanged` / `status.kickedDeviceLimit` / `status.kickedOffline`（中英双语）。
+
+### 修复
+
+- **Input 带前缀图标比例校准**：search/filled 变体下前缀图标左缩进 8px、文字 `padding-left` 28px（图标 8 + 图标宽 16 + 间距 4 的设计规格），修复图标过于靠左的问题（删除两条老的 `left: 4px` 覆盖）。
+
+## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
+
+### 新增
+
+- **被踢错误码契约**：`KICK_ERROR_CODE`（206 多端互踢 / 207 账号注销 / 214 设备数超限 / 216 修改密码 / 217 被其他设备踢下线，websdk 两代同码）与类型守卫 `isKickErrorCode()`。
+
+## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
+
+### 修复
+
+- **被踢误报网络异常**：`onDisconnected` 按错误码识别被踢/账号失效（取 `payload.errorCode`），命中 `KICK_ERROR_CODE` 时调用 `client.setKicked(code)` 标记账号终态，而非仅置 disconnected；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
+
+## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+
+### 修复
+
+- **被踢误报网络异常（与 websdk5 同口径）**：`onDisconnected` 按 `error.type` 识别被踢/账号失效并 `client.setKicked(code)`；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
+
 ## @easemob/uikit-im 3.2.0 (2026-09-02)
 
 ### 新增

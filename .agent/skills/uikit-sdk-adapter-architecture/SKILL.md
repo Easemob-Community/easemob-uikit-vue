@@ -227,6 +227,23 @@ await adapter.init({
 - 凡是跨层通知或 token 相关，走 `subscribe` 中立事件。
 - 不要新发明第三种事件通道。
 
+### 7.1 快照合并：「本地维护字段」必须以本地为准
+
+SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `remindType` 恒 DEFAULT；4.x 回填项 `isMuted` 恒 false）。
+这些字段由本地权威通道维护（`setMuted` 回写 / `CONVERSATION_MUTE_INFO_CHANGED` / `patchConversationMuteStates` / `patchMuteStates`），
+因此在任何「SDK 快照 ↔ 现有列表」的 merge 里必须**显式保留本地值**，`...item` 展开会静默冲掉它们。
+
+当前保留清单（两 adapter 各自 merge 函数内维护，需保持同步）：
+
+| 字段 | 权威维护通道 |
+| --- | --- |
+| `draft` / `draftTime` | 本地草稿存储 |
+| `isMuted` / `remindType` | `setMuted` 回写 + 免打扰专项同步事件/批量查询 |
+
+- 落点：websdk5 `event/chat-events.ts` `mergeWithExistingConversations`；webim4 `domain/conversation-domain.ts` `mergeIncomingConversations`。
+- **新增本地维护字段时必须三件事同时做**：进两 adapter 的保留清单 + 补合并回归测试（参照 `chat-persistence.test.ts` / `persistence-hooks.test.ts` 的 `isMuted` 断言）+ 更新本表。
+- 反面案例（2026-09 真实 bug）：merge 只保留 `draft`/`remindType` 漏了 `isMuted`，用户设置免打扰后来一条新消息，快照合并即把状态冲回未免打扰（websdk5 1.2.1 / webim4 1.2.1 修复）。
+
 ## 8. 数据入口层（repository）与数据接入
 
 `SdkAdapter` 同时暴露：
@@ -287,6 +304,7 @@ await adapter.init({
 - 主入口（`@easemob/uikit-im`）必须保持零 adapter 静态引用；默认内置走子路径入口自注册。
 - 注入模式下 UIKit **不转发** `login` / `logout`；业务全权。
 - 新增能力若某 SDK 暂不支持，必须在 `SdkCapabilities` 显式声明为 `false`，uikit-im 按 capabilities 隐藏入口。
+- 会话快照/回填 merge 时「本地维护字段」必须显式以本地为准（清单与落点见 §7.1）；新增本地字段同步进两 adapter 保留清单 + 回归测试。
 
 **软约定：**
 

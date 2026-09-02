@@ -55,14 +55,15 @@ function onItemClick(action: MessageActionItem) {
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
   cursor: pointer;
-  border-radius: var(--uikit-components-radius, 8px);
+  /* 圆角走项级 hover 圆角 token（跟随主题形状档位，与 Cell 一致） */
+  border-radius: var(--uikit-item-hover-radius, 8px);
   transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
   white-space: nowrap;
 }
 
 @media (hover: hover) {
   .message-action-menu__item:hover {
-    background-color: var(--uikit-bg-hover, #f3f4f6);
+    background-color: var(--uikit-bg-hover, #F5F5F5);
   }
 }
 

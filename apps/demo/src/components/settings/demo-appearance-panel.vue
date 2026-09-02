@@ -474,10 +474,17 @@ const currentColorStyle = computed(() => ({
             >
               圆角
             </button>
+            <button
+              class="demo-segmented__item"
+              :class="{ 'demo-segmented__item--active': hoverStyle === 'square' }"
+              @click="setHoverStyle('square')"
+            >
+              直角
+            </button>
           </div>
         </div>
       </div>
-      <p class="demo-row__desc">列表项（会话 / 联系人等）的悬停样式：默认整行高亮；圆角卡片带圆角与左右缩进。</p>
+      <p class="demo-row__desc">列表项（会话 / 联系人等）的悬停样式：默认圆角整行高亮；圆角卡片带左右缩进；直角整行直角高亮。</p>
 
       <div class="demo-row demo-row--bordered">
         <span class="demo-row__label">气泡形状</span>

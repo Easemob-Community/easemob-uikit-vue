@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-sdk-contract",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Easemob UIKit SDK-neutral contract (wire types / repositories / capabilities / adapter interface)",
   "exports": {
     ".": {
