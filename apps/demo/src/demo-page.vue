@@ -30,6 +30,7 @@ import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
 import DemoQuickReplyPanel from './components/demo-quick-reply-panel.vue'
 import DemoMarkdownMessage from './components/ai/demo-markdown-message.vue'
+import DemoWatermark from './components/demo-watermark.vue'
 import {
   getMockAiReply,
   runMarkdownStreamDemo,
@@ -126,6 +127,7 @@ const {
   conversationItemTakeover,
   messageActionMenuTakeover,
   userCardTakeover,
+  watermarkEnabled,
   conversationActiveTab,
   statusBannerEnabled,
   sidebarWidth,
@@ -139,6 +141,9 @@ const {
   notificationSound,
   aiMockReplyEnabled,
 } = useDemoSettings()
+
+/** 水印文案：当前用户显示名 + userId（#watermark 插槽注入内容，聊天区与联系人列表共用） */
+const watermarkText = computed(() => `${ownDisplayName.value || ''} ${currentUser.value || ''}`.trim() || 'demo')
 
 /** 消息通知配置：面板改动实时同步到 useNotification 单例（Provider 已按 prop 接线） */
 const { configureNotification, setNotificationHandler } = useNotification()
@@ -650,7 +655,12 @@ watch(
           @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"
           @add-contact="showAddContactModal = true"
           @create-group="showCreateGroupModal = true"
-        />
+        >
+          <!-- 水印覆盖层注入（铺满联系人列表区，不响应交互） -->
+          <template v-if="watermarkEnabled" #watermark>
+            <DemoWatermark :text="watermarkText" />
+          </template>
+        </EmContactContainer>
       </EmResizable>
 
       <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
@@ -754,6 +764,10 @@ watch(
               </div>
             </div>
           </template>
+          <!-- 水印覆盖层注入（铺满聊天区，不响应交互） -->
+          <template v-if="watermarkEnabled" #watermark>
+            <DemoWatermark :text="watermarkText" />
+          </template>
         </EmChatContainer>
       </div>
     </template>
@@ -825,7 +839,12 @@ watch(
             @group-click="(g: UiGroup) => h5EnterDetail('group', g.groupId)"
             @add-contact="showAddContactModal = true"
             @create-group="showCreateGroupModal = true"
-          />
+          >
+            <!-- 水印覆盖层注入（铺满联系人列表区，不响应交互） -->
+            <template v-if="watermarkEnabled" #watermark>
+              <DemoWatermark :text="watermarkText" />
+            </template>
+          </EmContactContainer>
         </div>
         <!-- H5 底部 TabBar -->
         <nav class="h5-tabbar">
@@ -902,6 +921,10 @@ watch(
                 @card-click="openCardModal"
               />
               <EmCustomMessage v-else :message="message as UiMessage" />
+            </template>
+            <!-- 水印覆盖层注入（铺满聊天区，不响应交互） -->
+            <template v-if="watermarkEnabled" #watermark>
+              <DemoWatermark :text="watermarkText" />
             </template>
           </EmChatContainer>
         </div>

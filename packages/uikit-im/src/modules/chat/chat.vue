@@ -621,6 +621,9 @@ watch(currentConversation, async (cvs, oldCvs) => {
   if (!cvs || cvs.id === oldCvs?.id)
     return
 
+  // 会话级内存淘汰（opt-in）：标记当前会话为最近使用，保护其不被淘汰
+  stores.message.touchConversation(cvs.id)
+
   // 会话切换：退出多选模式，避免多选栏跨会话残留
   exitMultiSelectMode()
 
@@ -1379,6 +1382,11 @@ async function onRemoveAdmin(member: UiGroupMember) {
         />
       </slot>
     </template>
+
+    <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满整个聊天区，不响应交互） -->
+    <div v-if="$slots.watermark" class="chat__watermark">
+      <slot name="watermark" :conversation="currentConversation" />
+    </div>
   </div>
 </template>
 
@@ -1389,6 +1397,15 @@ async function onRemoveAdmin(member: UiGroupMember) {
   flex-direction: column;
   height: 100%;
   background: var(--uikit-chat-bg);
+}
+
+/* 水印覆盖层：铺满聊天区，穿透事件；层级低于抽屉(200)/弹窗 */
+.chat__watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 /* 空状态：上下左右居中 */

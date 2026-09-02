@@ -57,6 +57,28 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `forward`：接管转发弹窗渲染，作用域提供 `{ show, messages, mode, open, close }`；`open(messages, mode?)` 需传入待转发的消息数组（单条默认逐条转发，多条默认合并转发）
 - `message-search`：接管消息搜索弹窗渲染，作用域提供 `{ show, config, locate, open, close }`
 - `multi-select-bar`：接管多选操作栏渲染，作用域提供 `{ visible, selectedMessages, totalMessages, selectAll, deselectAll, forwardOneByOne, forwardCombine, delete, close }`
+- `watermark`：水印覆盖层，铺满整个聊天区（含空状态），`pointer-events: none` 不响应交互，作用域提供 `{ conversation }`；内容由用户注入（文字平铺 / canvas / 图片均可）
+
+水印注入示例（UIKit 只提供铺满、穿透的覆盖层壳，平铺与样式由业务实现）：
+
+```vue
+<EmChatContainer>
+  <template #watermark="{ conversation }">
+    <div class="my-watermark">
+      {{ userName }} {{ conversation?.conversationId }}
+    </div>
+  </template>
+</EmChatContainer>
+
+<style>
+.my-watermark {
+  width: 100%;
+  height: 100%;
+  /* 业务自行实现平铺：repeating background / canvas / flex 平铺均可 */
+  opacity: 0.08;
+}
+</style>
+```
 
 ## 消息操作菜单接管
 

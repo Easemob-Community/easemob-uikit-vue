@@ -264,6 +264,9 @@ defineExpose({
       <template v-if="$slots.search" #search="slotProps">
         <slot name="search" v-bind="slotProps" />
       </template>
+      <template v-if="$slots.watermark" #watermark>
+        <slot name="watermark" />
+      </template>
     </ContactList>
   </div>
 </template>

@@ -377,6 +377,8 @@ function createDemoSettings() {
   const messageActionMenuTakeover = ref(false)
   /** 是否用 #user-card / #group-card 插槽完全接管名片弹窗 */
   const userCardTakeover = ref(false)
+  /** 是否注入 #watermark 水印覆盖层（聊天区 + 通讯录联系人列表） */
+  const watermarkEnabled = ref(false)
   /** 当前激活的分栏 tab */
   const conversationActiveTab = ref<ConversationTabKey>('all')
 
@@ -569,6 +571,7 @@ function createDemoSettings() {
     conversationItemTakeover,
     messageActionMenuTakeover,
     userCardTakeover,
+    watermarkEnabled,
     conversationActiveTab,
     conversationTabLabels,
     toggleConversationTab,

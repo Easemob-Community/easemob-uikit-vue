@@ -88,9 +88,9 @@ const chatRef = ref<InstanceType<typeof Chat>>()
 const { h5 } = useUIKit()
 const slots = useSlots()
 
-/** 除 #drawer 外的其余插槽名（#drawer 单独显式透传以保留类型；useSlots 非响应式，无需 computed） */
+/** 除 #drawer / #watermark 外的其余插槽名（两者单独显式透传以保留类型；useSlots 非响应式，无需 computed） */
 function getOtherSlotNames() {
-  return Object.keys(slots).filter(name => name !== 'drawer')
+  return Object.keys(slots).filter(name => name !== 'drawer' && name !== 'watermark')
 }
 
 defineExpose({
@@ -162,6 +162,10 @@ defineExpose({
       </template>
       <template #multi-select-bar="slotProps">
         <slot name="multi-select-bar" v-bind="slotProps" />
+      </template>
+      <!-- 透传水印覆盖层插槽（显式声明以保留作用域类型提示） -->
+      <template #watermark="slotProps">
+        <slot name="watermark" v-bind="slotProps" />
       </template>
       <!-- 透传所有消息类型级插槽（如 #message-txt, #message-footer-txt 等） -->
       <template

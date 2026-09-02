@@ -32,6 +32,7 @@ const {
   chatMessageStatusStyle,
   messageActionMenuTakeover,
   userCardTakeover,
+  watermarkEnabled,
 } = useDemoSettings()
 </script>
 
@@ -335,6 +336,23 @@ const {
       </div>
       <div class="demo-info">
         点击聊天头部头像时不再打开内置名片弹窗，改为渲染业务自定义名片卡片。
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="水印（#watermark）"
+        tip="聊天区与通讯录联系人列表注入水印覆盖层"
+      />
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label class="demo-check">
+          <input v-model="watermarkEnabled" type="checkbox">
+          <span>注入当前用户水印（聊天 + 联系人列表）</span>
+        </label>
+      </div>
+      <div class="demo-info">
+        开启后聊天区与通讯录联系人列表铺满半透明当前用户水印（UIKit 提供
+        pointer-events:none 的覆盖层壳，内容平铺由业务注入）。
       </div>
     </div>
   </div>
