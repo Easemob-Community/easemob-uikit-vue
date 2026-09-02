@@ -1,5 +1,5 @@
 /**
- * 拆分根 CHANGELOG.md 为三个包独立的 changelog 文件
+ * 拆分根 CHANGELOG.md 为六个包独立的 changelog 文件
  *
  * 根 CHANGELOG.md 使用两种版本段格式：
  * - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 @easemob/uikit-im 历史段
@@ -9,6 +9,9 @@
  * - .vitepress/gen/changelog-im.md
  * - .vitepress/gen/changelog-core.md
  * - .vitepress/gen/changelog-chatroom.md
+ * - .vitepress/gen/changelog-sdk-contract.md
+ * - .vitepress/gen/changelog-sdk-websdk5.md
+ * - .vitepress/gen/changelog-sdk-webim4.md
  *
  * 生成的文件由 apps/docs/guide/changelog.md 通过 tabs 引入展示。
  */
@@ -31,6 +34,9 @@ const OUTPUT_MAP = {
   '@easemob/uikit-im': join(genDir, 'changelog-im.md'),
   '@easemob/uikit-core': join(genDir, 'changelog-core.md'),
   '@easemob/uikit-chatroom': join(genDir, 'changelog-chatroom.md'),
+  '@easemob/uikit-sdk-contract': join(genDir, 'changelog-sdk-contract.md'),
+  '@easemob/uikit-sdk-websdk5': join(genDir, 'changelog-sdk-websdk5.md'),
+  '@easemob/uikit-sdk-webim4': join(genDir, 'changelog-sdk-webim4.md'),
 }
 
 /** @type {Record<string, string[]>} */

@@ -1,6 +1,6 @@
 # 更新日志
 
-本页内容与仓库根 `CHANGELOG.md` 保持单一数据源，构建时由脚本自动拆分为三个包的更新日志；发版时只需更新根 CHANGELOG，本页无需手动修改版本段。
+本页内容与仓库根 `CHANGELOG.md` 保持单一数据源，构建时由脚本自动拆分为六个包的更新日志；发版时只需更新根 CHANGELOG，本页无需手动修改版本段。
 
 ::: tip 版本说明
 
@@ -24,6 +24,21 @@
 <template #chatroom>
 
 <!-- @include: ../.vitepress/gen/changelog-chatroom.md -->
+
+</template>
+<template #sdk-contract>
+
+<!-- @include: ../.vitepress/gen/changelog-sdk-contract.md -->
+
+</template>
+<template #sdk-websdk5>
+
+<!-- @include: ../.vitepress/gen/changelog-sdk-websdk5.md -->
+
+</template>
+<template #sdk-webim4>
+
+<!-- @include: ../.vitepress/gen/changelog-sdk-webim4.md -->
 
 </template>
 </ChangelogTabs>

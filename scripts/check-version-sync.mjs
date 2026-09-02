@@ -43,6 +43,9 @@ const PACKAGES = {
   '@easemob/uikit-im': 'packages/uikit-im/package.json',
   '@easemob/uikit-core': 'packages/uikit-core/package.json',
   '@easemob/uikit-chatroom': 'packages/uikit-chatroom/package.json',
+  '@easemob/uikit-sdk-contract': 'packages/uikit-sdk-contract/package.json',
+  '@easemob/uikit-sdk-websdk5': 'packages/uikit-sdk-websdk5/package.json',
+  '@easemob/uikit-sdk-webim4': 'packages/uikit-sdk-webim4/package.json',
 }
 
 // ---- 解析根 CHANGELOG 全部版本段并按包归类（保持文件出现顺序） ----

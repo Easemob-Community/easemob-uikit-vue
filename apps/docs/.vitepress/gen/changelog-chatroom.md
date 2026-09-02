@@ -1,3 +1,12 @@
+## @easemob/uikit-chatroom 2.0.0 (2026-09-02)
+
+
+### 破坏性行为变更
+
+- **SDK 解耦对齐双 adapter 架构**：公开导出 `resolveChatroomClientConfig` / `CHATROOM_SDK_MANAGERS` 移除，替换为 `resolveChatroomSdkConfig`；`onClientSetup` 改为 `onAdapterReady`；manager 注入改 adapter 预设 `managerPreset: 'chatroom'`；`ManagerHost` 改本包 `ChatroomSdkHost`（惰性代理解析 adapter.client）。本包不再直接依赖 `@easemob/uikit-sdk-websdk5`，adapter 由业务侧注入或经默认工厂注册。
+
+---
+
 ## @easemob/uikit-chatroom 1.0.0 (2026-08-15)
 
 

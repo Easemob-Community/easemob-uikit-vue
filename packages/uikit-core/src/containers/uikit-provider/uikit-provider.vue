@@ -70,7 +70,7 @@ export interface CoreProviderProps {
   enableTyping?: boolean
   /**
    * 业务接管数据源，不传走 SDK 默认
-   * @deprecated 统一迁移为 repository 数据入口层（D122 决策 11 / 风险 10），保留至 uikit-im 3.0.0 移除。
+   * @deprecated 统一迁移为 repository 数据入口层（D122 决策 11 / 风险 10），保留至 uikit-im 4.0.0 移除。
    */
   dataSource?: UIKitDataSource
   /**

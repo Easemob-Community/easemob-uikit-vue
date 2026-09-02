@@ -1,3 +1,18 @@
+## @easemob/uikit-core 2.0.0 (2026-09-02)
+
+
+### 破坏性行为变更
+
+- **SDK 装配改 adapter 驱动**：移除 `createClient` / `UIKitClient` / `ManagerHost` / `registerEventHandlers` 老路；`useCoreUIKitProvider` 重写为纯 adapter 驱动（init/login/logout/subscribe），业务 store 经 `adapterConfig.stores` 注入，事件依赖（i18n/通知）经 `adapterConfig.eventDeps` 注入；`onClientSetup` 替换为 `onAdapterReady`（logout/重初始化/卸载三处 dispose）。
+- **引擎层隔离门禁**：core 引擎层（sdk/constants/utils）禁止 vue/pinia/@vueuse 与 `easemob-websdk` 的值 + 类型依赖（`check-engine-isolation.mjs`，构建前置）。
+
+### 新增
+
+- **dataSource 薄别名收口**：新增 `composables/data-source-repositories.ts`，把 `dataSource` 逐项翻译为 `SdkRepositoryOverrides` 注入 adapter Domain（惰性 getter 保持运行时切换语义，显式 `repositories` 按域整体优先）。
+- `useSyncStatus` 下沉 core（onSyncStatus 桥接）；`formatSdkError` / `parsePresenceStatus` / `toUiMessage` 去 websdk5 依赖（鸭子类型判定）。
+
+---
+
 ## @easemob/uikit-core 1.5.2 (2026-08-28)
 
 

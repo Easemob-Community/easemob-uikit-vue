@@ -52,7 +52,7 @@ export interface UIKitContext {
   /**
    * 业务数据源接管（@deprecated 薄别名）：core 装配时已翻译为 repositories 注入
    * adapter Domain；本字段仅保留 searchUsers（无 repository 对应项）与
-   * 「是否配置自定义数据源」判定读取，uikit-im 3.0.0 移除。
+   * 「是否配置自定义数据源」判定读取，uikit-im 4.0.0 移除。
    */
   dataSource: UIKitDataSource
   /**

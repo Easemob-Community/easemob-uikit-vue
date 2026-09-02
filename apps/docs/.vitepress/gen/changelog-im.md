@@ -1,3 +1,25 @@
+## @easemob/uikit-im 3.0.0 (2026-09-02)
+
+
+### 新增
+
+- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob/uikit-sdk-contract` 与两个适配器包 `@easemob/uikit-sdk-websdk5`（5.x）/ `@easemob/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
+- **子路径入口**：新增 `@easemob/uikit-im/websdk5` 与 `@easemob/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
+- **Provider 新能力**：新增 `adapter` prop（注入模式：业务自带 adapter 实例，UIKit 不转发 login/logout）；`sdkConfig.repositories` 数据入口注入（message/conversation/contact/group/presence/userInfo 全域可接管）；`useUIKit()` 暴露 `capabilities`（adapter 上报的 SDK 客观能力矩阵，与 features 取交集决定能力入口）；core 新增模块级 `getUIKitAdapter()` 支持非 Vue 上下文访问。
+- **4.x 适配补齐**：登录后按 features 预取联系人/群组（对齐 5.x 同步体感）；漫游坏消息容错（单条解码失败跳过不拖垮整页）。
+
+### 修复
+
+- **群主转让状态校准**：4.x `changeOwner` 事件 payload 不携带新群主，经 pending 标记识别真正的 newOwner，同步校准群资料 owner、当前用户角色与新旧群主成员角色，避免角色闪回与权限残留。
+- **建群成员数偏差**：创建群后用本地已知的创建成员数兜底校准 `memberCount`，避免服务端/事件导致的短暂计数偏差。
+
+### 破坏性行为变更
+
+- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
+- **`UIKitDataSource` 维持 `@deprecated`（本版本不移除）**：已收口为 repository 注入的薄别名（core 装配时逐项翻译，显式 `repositories` 优先）；`searchUsers` 等无 repository 对应项的接管面迁移目标尚未设计，移除调整至 4.0.0。
+
+---
+
 ## @easemob/uikit-im 2.8.6 (2026-08-28)
 
 

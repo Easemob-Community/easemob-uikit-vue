@@ -142,7 +142,7 @@ export interface ProviderProps {
    * 业务接管数据源，不传走 SDK 默认
    * @deprecated 已收口为薄别名：装配时逐项翻译为 repository 覆盖项注入 adapter
    * （显式 repositories 优先），UI 层不再直接消费（searchUsers 除外——SDK 无搜索
-   * 能力，repository 契约无对应项）。本 prop 保留至 uikit-im 3.0.0 移除（D122 决策 11 / 风险 10）。
+   * 能力，repository 契约无对应项）。本 prop 保留至 uikit-im 4.0.0 移除（D122 决策 11 / 风险 10）。
    */
   dataSource?: UIKitDataSource
   /**

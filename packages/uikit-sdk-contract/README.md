@@ -131,7 +131,7 @@ export interface SdkCapabilities extends SdkCapabilityFlags {
 
 ## 废弃说明
 
-- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`：message / conversation / contact / group / presence / userInfo 全域的 repository 注入已落地（core `data-source-repositories.ts` 把 dataSource 逐项翻译为 `SdkRepositoryOverrides` 注入，显式 `repositories` 优先；`searchUsers` 无契约对应项保留 UI 层单点消费），`dataSource` 保留至 uikit-im 3.0.0 移除。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
+- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`：message / conversation / contact / group / presence / userInfo 全域的 repository 注入已落地（core `data-source-repositories.ts` 把 dataSource 逐项翻译为 `SdkRepositoryOverrides` 注入，显式 `repositories` 优先；`searchUsers` 无契约对应项保留 UI 层单点消费），`dataSource` 保留至 uikit-im 4.0.0 移除（3.0.0 未移除：`searchUsers` 等无 repository 对应项的接管面迁移目标尚未设计）。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
 
 ## 本地开发
 

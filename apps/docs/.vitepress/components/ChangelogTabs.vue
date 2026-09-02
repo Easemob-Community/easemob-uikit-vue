@@ -10,6 +10,9 @@ const tabs: Tab[] = [
   { id: 'im', label: '@easemob/uikit-im' },
   { id: 'core', label: '@easemob/uikit-core' },
   { id: 'chatroom', label: '@easemob/uikit-chatroom' },
+  { id: 'sdk-contract', label: 'sdk-contract' },
+  { id: 'sdk-websdk5', label: 'sdk-websdk5' },
+  { id: 'sdk-webim4', label: 'sdk-webim4' },
 ]
 
 const active = ref('im')
