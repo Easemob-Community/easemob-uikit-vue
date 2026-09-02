@@ -93,8 +93,7 @@ export { useChatroomPopupMode } from './composables/use-chatroom-popup-mode'
 export type { ChatroomPopupModeResolvedValue } from './composables/use-chatroom-popup-mode'
 export {
   useChatroomProvider,
-  resolveChatroomClientConfig,
-  CHATROOM_SDK_MANAGERS,
+  resolveChatroomSdkConfig,
 } from './composables/use-chatroom-provider'
 export type {
   ChatroomUIKitContext,

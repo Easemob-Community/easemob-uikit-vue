@@ -1,302 +1,66 @@
-import type {
-  GroupDetail,
-  JoinedGroupSummary,
-  Contact as SdkContact,
-  Message as SdkMessage,
-  UserInfo as SdkUserInfo,
-  StreamMessageMeta,
-} from 'easemob-websdk'
-import type { ConversationTypeValue, GroupMemberRoleValue, NoticeEventTypeValue } from '../constants'
-import type { MessageStatus } from './types/message'
-
-export type { GroupMemberEntry, GroupMuteEntry } from 'easemob-websdk'
-
-/**
- * UIKit 对 SDK Message 的扩展字段。
- * SDK Message 本身已包含：msgServerId / msgLocalId / sendStatus / isPeerRead /
- * timestamp / groupReadCount / modifiedInfo / body / ext 等。
- *
- * 注意：SDK 0.20.0 起 `Message.status` 重命名为 `Message.sendStatus`，
- * 且 `sent` 仅表示服务端已接受消息。UIKit 的 `status` 是 UI 展示层状态
- * （含 delivered/read 回执语义），由适配器从 sendStatus / isPeerRead 推导，
- * 与 SDK 字段完全解耦。
- */
-export interface UiMessageExtension {
-  /** 是否为自己发送的消息 */
-  isSelf: boolean
-  /** UI 展示层消息状态（sending/sent/delivered/read/failed），非 SDK 字段 */
-  status: MessageStatus
-  /** 本地消息 ID 别名，方便 UI 层引用 */
-  localId?: string
-  /** 该消息是否请求群已读回执 */
-  requireGroupAck?: boolean
-  /** 群成员总数（仅群消息展示用） */
-  groupMemberCount?: number
-  /** 消息是否已被撤回 */
-  recalled?: boolean
-  /** 撤回操作者 ID */
-  recalledBy?: string
-  /** 文本消息撤回后保留的原始内容，用于重新编辑 */
-  originalMsg?: string
-  /** 是否被置顶（仅用于置顶消息列表展示） */
-  pinned?: boolean
-  /** 置顶时间 */
-  pinTime?: number
-  /** 置顶操作人 ID */
-  pinOperatorId?: string
-  /** 翻译结果 */
-  translation?: { text: string, to: string }
-  /** 是否优先展示译文 */
-  showTranslation?: boolean
-  /** 是否正在翻译中 */
-  translating?: boolean
-  /** 语音转文字结果 */
-  voiceText?: { text: string }
-  /** 是否优先展示语音转文字结果 */
-  showVoiceText?: boolean
-  /** 是否正在语音转文字中 */
-  voiceTranscribing?: boolean
-  /** 发送失败原因 */
-  failReason?: string
-  /** 附件上传进度（0-100） */
-  progress?: number
-  /** 消息是否被编辑过 */
-  modified?: boolean
-  /**
-   * 流式消息状态（复用 SDK `StreamMessageMeta`，不本地复刻）。
-   * 仅 SDK `onStreamMessage` 派发的接收方向文本消息挂载；分片由事件层
-   * 按 `msgServerId` 幂等合并（`body.content = stream.fullText` 覆盖更新），
-   * 不产生新消息。`customType` 为业务自定义流类型（text / markdown 等），
-   * 内核仅处理纯文本流，markdown 等富类型由插件插槽接管。
-   */
-  stream?: StreamMessageMeta
-}
-
-/** 通知类型消息体（本地系统通知，非 SDK 消息类型） */
-export interface NoticeMessageBody {
-  /** 通知文案 */
-  content: string
-  /** 通知事件类型（结构化管线引入；旧消息无此字段，向后兼容） */
-  eventType?: NoticeEventTypeValue
-  /** 事件参数（成员名/群名/数量等），供自定义文案与过滤使用 */
-  params?: Record<string, string | number | boolean>
-}
-
-/**
- * UIKit 本地通知消息。
- * 不来自 SDK 消息流，用于在聊天页面展示中性灰色系统提示
- *（如好友关系变更、群成员变动、群主/管理员变更等）。
- */
-export interface UiNoticeMessage extends Omit<SdkMessage, 'type' | 'body'>, UiMessageExtension {
-  type: 'notice'
-  body: NoticeMessageBody
-}
-
-/** UIKit 层消息：SDK Message 加上 UI 扩展，或本地通知消息 */
-export type UiMessage = (SdkMessage & UiMessageExtension) | UiNoticeMessage
-
-/** UIKit 会话展示类型 */
-export interface UiConversation {
-  /** 会话 ID */
-  id: string
-  /** 展示名称 */
-  name: string
-  /** 头像 */
-  avatar?: string
-  /** 会话类型 */
-  type: ConversationTypeValue
-  /** 未读数 */
-  unreadCount: number
-  /** 最后一条消息摘要文本 */
-  lastMessageText: string
-  /** 最后一条消息发送者 userId（群聊场景用于异步资料就绪后重新解析昵称） */
-  lastMessageFrom?: string
-  /** 最后一条消息时间戳 */
-  lastMessageTime?: number
-  /** 是否置顶 */
-  isPinned: boolean
-  /** 置顶时间戳 */
-  pinnedTime?: number
-  /** 是否免打扰 */
-  isMuted: boolean
-  /** 会话标记列表 */
-  marks: number[]
-  /** 草稿内容 */
-  draft?: string
-  /** 草稿保存时间 */
-  draftTime?: number
-  /** 提醒类型 */
-  remindType?: string
-}
-
-/** UIKit 联系人展示类型 */
-export interface UiContact {
-  /** 用户 ID */
-  userId: string
-  /** 显示名（备注优先） */
-  name?: string
-  /** 头像 */
-  avatar?: string
-  /** 备注 */
-  remark?: string
-  /** 签名 */
-  signature?: string
-  /** 性别 */
-  gender?: string
-  /** 生日 */
-  birth?: string
-  /** 电话 */
-  phone?: string
-  /** 邮箱 */
-  mail?: string
-  /** 扩展 */
-  ext?: Record<string, unknown>
-}
-
-/** UIKit 群组展示类型 */
-export interface UiGroup {
-  /** 群 ID */
-  groupId: string
-  /** 群名称 */
-  groupName?: string
-  /** 群头像 */
-  avatar?: string
-  /** 群描述 */
-  description?: string
-  /** 群主 */
-  owner?: string
-  /** 当前用户在群内的角色 */
-  role?: GroupMemberRoleValue
-  /** 成员数 */
-  memberCount?: number
-  /** 最大成员数 */
-  maxUsers?: number
-  /** 是否公开群 */
-  public?: boolean
-  /** 是否允许成员邀请 */
-  allowInvites?: boolean
-  /** 入群是否需要审批 */
-  approval?: boolean
-  /** 是否全员禁言 */
-  mute?: boolean
-  /** 群是否被禁用 */
-  disabled?: boolean
-  /** 是否屏蔽群消息 */
-  shieldgroup?: boolean
-  /** 群公告 */
-  announcement?: string
-  /** 创建时间 */
-  created?: number
-}
-
-/** 创建群组参数（对齐 SDK groupManager.createGroup 契约，供业务接管时复用） */
-export interface CreateGroupParams {
-  /** 群名称 */
-  name: string
-  /** 群描述 */
-  description?: string
-  /** 初始成员（不含创建者） */
-  memberIds?: string[]
-  /** 是否公开群，默认 false */
-  public?: boolean
-  /** 入群是否需要管理员审批，默认 false */
-  joinApprovalRequired?: boolean
-  /** 是否允许普通成员邀请其他用户入群，默认 false */
-  allowInvites?: boolean
-  /** 被邀请人入群前是否需要确认邀请，默认 false */
-  inviteNeedConfirm?: boolean
-  /** 群组最大成员数 */
-  maxMembers?: number
-}
-
-/** UIKit 群成员展示类型 */
-export interface UiGroupMember {
-  /** 成员用户 ID */
-  userId: string
-  /** 成员昵称 */
-  nickname?: string
-  /** 成员头像 */
-  avatarUrl?: string
-  /** 成员角色 */
-  role?: GroupMemberRoleValue
-  /** 入群时间戳 */
-  joinedAt?: number
-  /** 禁言到期时间戳（毫秒），仅禁言列表场景有值 */
-  muteExpire?: number
-  /** 禁言时长（毫秒），仅禁言列表场景有值 */
-  muteDuration?: number
-}
-
-/** UIKit 好友申请 / 群组邀请展示类型 */
-export interface UiContactInvite {
-  /** 唯一标识（好友申请取 userId，群组邀请取 groupId） */
-  id: string
-  /** 通知类型：好友申请 / 群组邀请 */
-  type: 'contact' | 'group'
-  /** 申请人/被邀请人用户 ID（好友申请时为申请人） */
-  userId?: string
-  /** 申请人/对方昵称 */
-  nickname?: string
-  /** 申请人/对方头像 */
-  avatarUrl?: string
-  /** 申请/邀请附言 */
-  reason?: string
-  /** 群组 ID（仅群组邀请） */
-  groupId?: string
-  /** 群组名称（仅群组邀请） */
-  groupName?: string
-  /** 邀请人用户 ID（仅群组邀请） */
-  inviterId?: string
-  /** 邀请人昵称（仅群组邀请） */
-  inviterName?: string
-  /** 申请/邀请状态 */
-  status: 'pending' | 'accepted' | 'declined'
-  /** 申请/邀请时间戳 */
-  timestamp?: number
-}
-
-/** UIKit 在线状态展示类型 */
-export interface UiPresence {
-  userId: string
-  status: 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
-  ext?: string
-  lastTime?: number
-}
-
-/** SDK 联系人来源联合类型 */
-export type SdkContactSource = SdkContact | SdkUserInfo
-
-/** SDK 群组来源联合类型 */
-export type SdkGroupSource = JoinedGroupSummary | GroupDetail
-
-/** 简化后的本地发送消息标识 */
-export interface SendingMessageMeta {
-  localId: string
-  sdkMessage: SdkMessage
-  timestamp: number
-}
+// SDK 中立消息/会话/联系人/群组/presence/用户资料类型与结构型守卫已下沉
+// `@easemob/uikit-sdk-contract`，此处 re-export 保持 core 既有导入路径（'../sdk/types'）兼容。
+//
+// SDK5 专属类型（GroupMemberEntry / GroupMuteEntry / SdkContactSource / SdkGroupSource /
+// SendingMessageMeta）已随 SDK 集成下沉 `@easemob/uikit-sdk-websdk5`，不再从 core 暴露。
 
 export type {
-  TextMessageBody,
-  ImageMessageBody,
-  FileMessageBody,
-  VoiceMessageBody,
-  VideoMessageBody,
-  LocationMessageBody,
+  ChatConversationType,
+  ChatThreadMessageContext,
+  ChatThreadOverview,
   CmdMessageBody,
-  CustomMessageBody,
   CombineMessageBody,
+  CustomMessageBody,
+  FileMessageBody,
+  ImageMessageBody,
+  LocationMessageBody,
+  MessageBody,
+  MessageDirect,
+  MessageModifiedInfo,
+  MessagePriority,
+  MessageReaction,
   MessageStatus,
-} from './types/message'
+  MessageType,
+  NoticeMessageBody,
+  SdkMessage,
+  SdkSendStatus,
+  Sender,
+  SendingMessageMeta,
+  StreamMessageMeta,
+  TextMessageBody,
+  UiContact,
+  UiContactInvite,
+  UiConversation,
+  UiGroup,
+  UiGroupMember,
+  UiMessage,
+  UiMessageExtension,
+  UiNoticeMessage,
+  UiPresence,
+  UserInfo,
+  UserInfoAttribute,
+  UserInfoAttributeValue,
+  VideoMessageBody,
+  VoiceMessageBody,
+  CreateGroupParams,
+  GroupMemberPage,
+  PresenceInfo,
+  // 数据入口层与能力矩阵（D122）：repository 注入覆盖项 / adapter 能力上报
+  ContactPage,
+  GroupPage,
+  SdkCapabilities,
+  SdkCapabilityFlags,
+  SdkRepositoryOverrides,
+} from '@easemob/uikit-sdk-contract'
 
 export {
-  isTextBody,
-  isImageBody,
-  isFileBody,
-  isVoiceBody,
-  isVideoBody,
-  isLocationBody,
-  isCustomBody,
-  isCombineBody,
   isCmdBody,
-} from './types/message'
+  isCombineBody,
+  isCustomBody,
+  isFileBody,
+  isImageBody,
+  isLocationBody,
+  isTextBody,
+  isVideoBody,
+  isVoiceBody,
+} from '@easemob/uikit-sdk-contract'

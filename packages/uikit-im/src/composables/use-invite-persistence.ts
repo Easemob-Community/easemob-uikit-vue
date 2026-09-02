@@ -3,7 +3,7 @@ import { useStorage } from '@vueuse/core'
 import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
 import type { UiContactInvite } from '@easemob/uikit-core'
-import type { RootStores } from '../sdk/event/types'
+import type { RootStores } from '../sdk/types'
 
 export type InvitePersistType = boolean | UIKitStorageType
 

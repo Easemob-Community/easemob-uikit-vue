@@ -10,7 +10,9 @@
  * demo-page → app.vue 处理，清空本地登录缓存并回到登录页。
  */
 import { useClient, useUIKit } from '@easemob/uikit-im'
-import { demoPresetUsers, useDemoSettings } from '../../composables/use-demo-settings'
+import { demoPresetUsers, demoSdkVersion, sdkIsHttpDNS, setDemoSdkVersion, setSdkIsHttpDNS, useDemoSettings } from '../../composables/use-demo-settings'
+import type { DemoSdkVersion } from '../../composables/use-demo-settings'
+import { buildDemoSdkInitConfig, demoLogin, demoLogout, isWebim4Mode } from '../../composables/use-demo-sdk-adapter'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
@@ -18,17 +20,23 @@ const emit = defineEmits<{
   (e: 'logout'): void
 }>()
 
+/** SDK 版本选项（切换后 setDemoSdkVersion 内自动整页刷新） */
+const sdkVersionOptions: { value: DemoSdkVersion, label: string }[] = [
+  { value: 'websdk5', label: '5.x websdk5' },
+  { value: 'webim4', label: '4.x webim4' },
+]
+
 const { client, connected, isLoggedIn, currentUser, sdkClient, init, login } = useClient()
 // UIKit 层完整退出入口（区别于 useClient().logout 的 SDK 层断开）
 const { logout } = useUIKit()
 const { sdkAppKey, sdkApiUrl, sdkDebug, loginUser, loginPassword, loginToken, loginMode, applyPresetUser } = useDemoSettings()
 
 function handleInit() {
-  init({
+  init(buildDemoSdkInitConfig({
     appKey: sdkAppKey.value,
-    ...(sdkApiUrl.value ? { apiUrl: sdkApiUrl.value } : {}),
+    apiUrl: sdkApiUrl.value,
     debug: sdkDebug.value,
-  })
+  }))
 }
 
 async function handleLogin() {
@@ -45,7 +53,8 @@ async function handleLogin() {
     else if (loginMode.value === 'password' && loginPassword.value) {
       params.password = loginPassword.value
     }
-    await login(params)
+    // webim4 注入模式下 core 不转发 login，demoLogin 内部直连 webim4Adapter
+    await demoLogin(login, params)
   }
   catch (err) {
     console.warn('登录失败:', (err as Error).message)
@@ -54,7 +63,8 @@ async function handleLogin() {
 
 async function handleLogout() {
   try {
-    await logout?.()
+    // webim4 注入模式下 core 不转发 adapter.logout，demoLogout 内部先直连 webim4Adapter 断连
+    await demoLogout(logout)
   }
   catch (err) {
     console.warn('登出失败:', (err as Error).message)
@@ -67,6 +77,33 @@ async function handleLogout() {
 
 <template>
   <div class="demo-panel">
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="SDK 版本（4.x adapter 验证）"
+        tip="5.x 走自注册默认工厂（内置模式）；4.x 走 adapter prop 注入模式，登录/登出由 demo 直连 adapter。切换后自动刷新页面"
+      />
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <button
+          v-for="opt in sdkVersionOptions"
+          :key="opt.value"
+          class="demo-btn"
+          :class="{ 'demo-btn--active': demoSdkVersion === opt.value }"
+          :title="demoSdkVersion === opt.value ? '' : '切换后自动刷新页面'"
+          @click="setDemoSdkVersion(opt.value)"
+        >
+          {{ opt.label }}
+        </button>
+        <label v-if="isWebim4Mode()" class="demo-check" title="私有化部署验证时关闭，配合 apiUrl 透传给 4.x connection">
+          <input
+            :checked="sdkIsHttpDNS"
+            type="checkbox"
+            @change="setSdkIsHttpDNS(($event.target as HTMLInputElement).checked)"
+          >
+          <span>4.x isHttpDNS</span>
+        </label>
+      </div>
+    </div>
+
     <div class="demo-settings__group">
       <DemoSettingLabel
         title="SDK 初始化（延迟初始化验证）"

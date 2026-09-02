@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import type { UserInfo, UserInfoAttribute } from 'easemob-websdk'
+import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
 import { onClickOutside } from '@vueuse/core'
 import { formatSdkError } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'

@@ -12,6 +12,13 @@
  */
 export const EasemobUIKitCoreImports = {
   '@easemob/uikit-core': [
+    'getUIKitAdapter',
+    'mergeRepositoryOverrides',
+    'resetSyncState',
+    'setSyncState',
+    'toUiMessage',
+    'toUiMessages',
+    'translateDataSourceToRepositories',
     'useArrowNavigation',
     'useBottomSheet',
     'useClient',
@@ -27,6 +34,7 @@ export const EasemobUIKitCoreImports = {
     'usePresence',
     'usePullRefresh',
     'useResizable',
+    'useSyncStatus',
     'useTheme',
     'useToast',
     'useUserInfo',

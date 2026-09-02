@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob/uikit-core'
-import { customEventPreviewMap } from '../utils/resolve-last-message-text'
+import { chineseMessagePreviewLabels } from '../utils/resolve-last-message-text'
 import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '@easemob/uikit-core'
 
 /** 引用消息协议类型（ext.msgQuote） */
@@ -47,7 +47,7 @@ export function getQuotePreview(message: UiMessage): string {
     case MESSAGE_TYPE.CUSTOM: {
       // 按 event 查共享映射（与会话列表摘要一致，如名片 userCard → [名片]）
       const event = (message.body as CustomMessageBody).event || ''
-      return customEventPreviewMap[event] || '[自定义]'
+      return chineseMessagePreviewLabels.custom[event] || chineseMessagePreviewLabels.customFallback
     }
     case MESSAGE_TYPE.CMD:
       return '[指令]'

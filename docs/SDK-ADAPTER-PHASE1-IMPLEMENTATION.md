@@ -4,6 +4,7 @@
 > 关联：`docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（设计/决策），本文是它的 Phase 0/1 施工细化。
 > 目标：把 `easemob-websdk` 从 core 与 uikit-im 中剥离，收敛到「契约包 + websdk5 adapter」，**5.x 行为与 UI 不变**。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：中立消息 ID 沿用 `msgServerId`/`msgLocalId`（UI 零改名）；`SdkConfig` 加 `adapterConfig` 透传槽；`MessageRepository` 补操作面；Provider 保留 `appKey`/`sdkConfig` 快捷方式（非 breaking）；UMD 全局名修正（4.x=`WebIM`、5.x=`Easemob`）；新增 adapter 反依赖解耦、`UIKitDataSource` deprecated 过渡、core 隔离门禁扩展。
+> **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
 
 ---
 
@@ -314,7 +315,7 @@ export interface SdkAdapter {
 | `sdk/notification-engine.ts` | 【修改】`Message` → contract `SdkMessage` | |
 | `store/message.ts` / `store/group.ts` | 【修改】`Message`/`UserInfo` → contract | |
 | `composables/use-chat.ts` / `use-message-actions.ts` / `use-user-info.ts` / `use-blocklist.ts` | 【修改】`Message`/`UserInfoAttribute` → contract | |
-| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」） | 兼容存量业务方，非 breaking |
+| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」）⚠️ 快捷方式**禁止在主入口顶层静态 import `Websdk5Adapter`**（会破坏 4.x 下游的摇树隔离），默认构造逻辑放子路径入口（如 `@easemob/uikit-im/websdk5`），见主计划决策 22 | 兼容存量业务方，非 breaking |
 | `components/user-card/user-card-modal.vue` | 【修改】`UserInfoAttribute` → contract | |
 | `modules/chat/message-item/combine-message-modal.vue` | 【修改】`Message` → contract | |
 | `modules/chat/message-list/message-list.vue` | 【修改】`GroupMessageReadUsersResult` → contract（中立） | |

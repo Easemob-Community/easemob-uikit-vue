@@ -488,7 +488,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
       { name: 'chatManager.getGroupMessageReadReceipts()', note: '群历史消息已读数批量补全（单次最多 20 条，自动分批）' },
     ],
     implNotes: [
-      'fetchHistory 返回 { items, cursor, hasMore }，prependMessages 头插；H5 下拉刷新复用同路径',
+      'fetchHistory 返回 { list, cursor, hasMore }，prependMessages 头插；H5 下拉刷新复用同路径',
       '群聊历史消息不带已读数 → fillGroupReadCounts 按 20 条分批请求补全，异步不阻塞渲染',
     ],
     refs: [

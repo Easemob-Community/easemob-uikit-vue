@@ -1,24 +1,23 @@
 import { type ComputedRef, type InjectionKey, type Ref, computed, inject, provide } from 'vue'
-import { ChatManager, ContactManager, GroupManager, PresenceManager, PushManager, UserInfoManager } from 'easemob-websdk'
-import type { ClientConfig, ConnectionEventCallbacks, H5AdaptationConfig, ManagerHost, NoticeConfig, UIKitClient, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
-import { useCoreUIKitProvider } from '@easemob/uikit-core'
 import type {
-  PresenceDomain,
-  UserInfoDomain,
-} from '../sdk/domain'
+  SdkAdapter,
+  SdkCapabilities,
+  SdkContactDomain,
+  SdkConversationDomain,
+  SdkGroupDomain,
+  SdkMessageDomain,
+  SdkPresenceDomain,
+  SdkUserInfoDomain,
+} from '@easemob/uikit-sdk-contract'
+import type { CoreConnectionCallbacks, CoreUIKitInitConfig, H5AdaptationConfig, NoticeConfig, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
 import {
-  ContactDomain,
-  ConversationDomain,
-  GroupDomain,
-  MessageDomain,
-} from '../sdk/domain'
-import { registerEventHandlers } from '../sdk/event/registry'
+  useCoreUIKitProvider,
+} from '@easemob/uikit-core'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
 import { useGroupStore } from '../store/group'
-import type { RootStores } from '../sdk/event/types'
-import { resolveUserDisplayName } from '../utils/resolve-last-message-text'
+import type { RootStores } from '../sdk/types'
 import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
 import { useInvitePersistenceInternal } from './use-invite-persistence'
@@ -27,6 +26,7 @@ import { useInvitePersistenceInternal } from './use-invite-persistence'
 declare const __EASEMOB_UIKIT_VERSION__: string
 
 export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob/uikit-core'
+export type { SdkCapabilities, SdkCapabilityFlags, SdkRepositoryOverrides, ContactPage, GroupPage } from '@easemob/uikit-core'
 export type { H5AdaptationConfig } from '@easemob/uikit-core'
 
 /** UIKit 登录参数：支持 accessToken 或密码登录 */
@@ -37,26 +37,37 @@ export interface UIKitLoginParams {
 }
 
 export interface UIKitContext {
-  client: Ref<ManagerHost>
+  /** 中立 SDK 适配器实例（SdkAdapter） */
+  client: Ref<SdkAdapter>
   domains: {
-    message: MessageDomain
-    conversation: ConversationDomain
-    contact: ContactDomain
-    group: GroupDomain
-    presence: PresenceDomain
-    userInfo: UserInfoDomain
+    message: SdkMessageDomain
+    conversation: SdkConversationDomain
+    contact: SdkContactDomain
+    group: SdkGroupDomain
+    presence: SdkPresenceDomain
+    userInfo: SdkUserInfoDomain
   }
   stores: RootStores
   features: UIKitFeatures
+  /**
+   * 业务数据源接管（@deprecated 薄别名）：core 装配时已翻译为 repositories 注入
+   * adapter Domain；本字段仅保留 searchUsers（无 repository 对应项）与
+   * 「是否配置自定义数据源」判定读取，uikit-im 4.0.0 移除。
+   */
   dataSource: UIKitDataSource
+  /**
+   * SDK 客观能力矩阵（adapter 上报，缺省全 true）：与 features（业务开关）
+   * 取交集决定能力入口展示，见 message-interactive / multi-select-bar / 群已读回执。
+   */
+  capabilities: SdkCapabilities
   /** 系统通知自定义配置（惰性读取，支持运行时变更） */
   noticeConfig: NoticeConfig
   /** H5 适配状态（viewport / 安全区 / 键盘高度 / 下拉刷新开关） */
   h5: ReturnType<typeof useH5Adaptation>
   /** 主题 store（provider 与消费方共享同一实例） */
   theme: ReturnType<typeof useThemeStore>
-  /** 手动初始化 SDK 客户端（延迟初始化场景，auto-init=false 时使用） */
-  init: (config: ClientConfig) => UIKitClient
+  /** 手动初始化 SDK（延迟初始化场景，auto-init=false 时使用） */
+  init: (config: CoreUIKitInitConfig) => Promise<void>
   /** 登录（支持 accessToken 或密码） */
   login: (params: UIKitLoginParams) => Promise<void>
   /**
@@ -71,31 +82,19 @@ export interface UIKitContext {
 export const UIKIT_CONTEXT_KEY: InjectionKey<UIKitContext> = Symbol('uikit')
 
 /**
- * IM 场景的 SDK manager 注册列表。
- * core 不静态 import manager 类（tree-shaking 约束），由场景包在此注入；
- * 不含 ChatRoomManager——IM 场景不使用聊天室能力，不注入可让消费者摇掉
- * websdk 的 chatroom manager 代码（websdk 5.x 按 manager 分 subpath、sideEffects:false）。
+ * 注入 IM 场景默认配置：登录后自动同步会话/联系人/群。
+ * 业务方经 sdkConfig/adapterConfig 显式传入时以业务配置为准（覆盖默认）。
+ * managers 默认值由 adapter 内置（WEBSDK5_MANAGERS，不含 ChatRoomManager），此处不再注入。
  */
-const IM_SDK_MANAGERS: ClientConfig['managers'] = [
-  ChatManager,
-  ContactManager,
-  GroupManager,
-  PresenceManager,
-  PushManager,
-  UserInfoManager,
-]
-
-/**
- * 注入 IM 场景默认 ClientConfig：全量 managers + 登录同步会话/联系人/群。
- * 业务方经 sdkConfig 显式传入时以业务配置为准（覆盖默认）。
- */
-function resolveClientConfig(config: ClientConfig): ClientConfig {
+function resolveSdkConfig(config: CoreUIKitInitConfig): CoreUIKitInitConfig {
   return {
     ...config,
-    managers: config.managers ?? IM_SDK_MANAGERS,
-    // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
-    // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
-    enableSyncData: config.enableSyncData ?? ['conversation', 'contact', 'group'],
+    adapterConfig: {
+      // 登录后自动同步的数据类型；默认同步会话/联系人/群（SDK 默认仅 conversation）。
+      // 'contact' 依赖 UserInfoManager 的 userInfo:read 能力，'group' 依赖 GroupManager。
+      enableSyncData: ['conversation', 'contact', 'group'],
+      ...config.adapterConfig,
+    },
   }
 }
 
@@ -103,17 +102,25 @@ function resolveClientConfig(config: ClientConfig): ClientConfig {
  * 初始化 UIKit Provider。
  * 在 <UIKitProvider> 组件的 setup 中调用。
  *
- * 客户端生命周期 / core stores / presence & userInfo domain 由
- * `@easemob/uikit-core` 的 useCoreUIKitProvider 承接；本层只组合
- * 场景 stores/domains、场景事件注册与场景级登出清理。
+ * 架构（D122）：客户端生命周期 / core stores / presence & userInfo 域由
+ * `@easemob/uikit-core` 的 useCoreUIKitProvider 承接；SDK 访问统一走中立
+ * `SdkAdapter` 接口（init/login/logout/subscribe/domains），场景 stores
+ * （message/conversation/contact/group）经 adapterConfig.stores 注入 adapter，
+ * 事件层直写 Pinia store（行为与旧 registerEventHandlers 直连一致）。
  *
- * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey）时，setup 阶段不创建 SDK 客户端，
- * 待业务通过 `useClient().init(config)` 传入 appKey 后再创建。Domain 层通过 ManagerHost 代理
- * 在运行时读取当前客户端，因此可在初始化前构建、初始化后正常工作。
+ * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey）时，setup 阶段不初始化 SDK，
+ * 待业务通过 `useClient().init(config)` 传入 appKey 后再初始化。Domain 在初始化前调用
+ * 会抛错，初始化后正常工作（与旧 ManagerHost 代理语义一致）。
  */
 export function useUIKitProvider(
-  config: ClientConfig,
+  config: CoreUIKitInitConfig,
   options: {
+    /**
+     * 注入的中立 SDK 适配器（注入模式：业务全权管理其生命周期，决策 18）。
+     * 未传时走 core 注册表默认适配器（由 `@easemob/uikit-im/websdk5` 子路径入口
+     * import 时自注册，决策 22；未注册会在 Provider 装配时抛出明确错误）。
+     */
+    adapter?: SdkAdapter
     autoInit?: boolean
     /** 支持传入 computed：ctx.features 以 getter 形式在每次读取时解析最新值 */
     features?: Partial<UIKitFeatures> | ComputedRef<Partial<UIKitFeatures>>
@@ -130,7 +137,7 @@ export function useUIKitProvider(
      */
     onUserInfoSubscriptionPermissionError?: () => void
     /** 连接级事件回调（token 即将过期 / 已过期等） */
-    connectionCallbacks?: ConnectionEventCallbacks
+    connectionCallbacks?: CoreConnectionCallbacks
   } = {},
 ) {
   // 场景 stores（message / conversation / contact / group）；
@@ -142,20 +149,20 @@ export function useUIKitProvider(
     group: useGroupStore(),
   }
 
-  // core provider：承接 client 生命周期、core stores/domains、features/dataSource/noticeConfig/h5/theme。
-  // autoInit 一律置 false，立即初始化改在下方显式触发——
-  // 确保 onClientSetup 闭包在首次执行时已能拿到 coreCtx（features 代理）。
+  // core provider：承接 adapter 生命周期、core stores/domains、features/dataSource/noticeConfig/h5/theme。
+  // autoInit 一律置 false，立即初始化改在下方显式触发。
+  // 默认适配器由 core 注册表解析（子路径入口 @easemob/uikit-im/websdk5 自注册，决策 22）。
   // clientName/clientVersion：场景包版本注入，客户端版本日志输出 SDK + UIKit-IM + Core 三版本。
-  // resolveClientConfig：IM 默认 managers/enableSyncData 注入下沉到 core setupClient，
+  // resolveSdkConfig：IM 默认 enableSyncData 注入下沉到 core setupAdapter，
   // auto-init 与 useClient().init() 延迟初始化路径统一生效。
+  // sceneStores：场景 Pinia stores 注入 adapter（事件层/Domain 直写）。
   const coreCtx = useCoreUIKitProvider(config, {
     ...options,
     autoInit: false,
     clientName: 'UIKit-IM',
     clientVersion: __EASEMOB_UIKIT_VERSION__,
-    resolveClientConfig,
-    onClientSetup: (client, coreStores) =>
-      registerEventHandlers(client, { ...sceneStores, ...coreStores }, options.connectionCallbacks, coreCtx.features),
+    resolveSdkConfig,
+    sceneStores,
   })
 
   const stores: RootStores = {
@@ -165,27 +172,36 @@ export function useUIKitProvider(
     userInfo: coreCtx.stores.userInfo,
   }
 
-  const host = coreCtx.client.value
+  const adapter = coreCtx.client.value
 
+  // 场景域面：惰性委托 adapter.domains（getter 延迟到调用点取值，
+  // 未初始化时抛错，与旧 ManagerHost 代理语义一致）
   const domains = {
-    message: new MessageDomain(host, stores.message),
-    conversation: new ConversationDomain(host, stores.conversation, {
-      // 进入会话时批量补发未回执的接收消息（登录离线消息场景）
-      sendPendingReadReceipts: (id, type) => void domains.message.sendPendingReadReceipts(id, type),
-      // 会话列表群聊摘要优先使用 UIKit 已缓存的联系人备注 / 用户资料昵称
-      resolveSenderName: userId => resolveUserDisplayName(stores, userId),
-    }),
-    contact: new ContactDomain(host, stores.contact),
-    group: new GroupDomain(host, stores.group),
-    presence: coreCtx.domains.presence,
-    userInfo: coreCtx.domains.userInfo,
+    get message(): SdkMessageDomain {
+      return adapter.domains.message
+    },
+    get conversation(): SdkConversationDomain {
+      return adapter.domains.conversation
+    },
+    get contact(): SdkContactDomain {
+      return adapter.domains.contact
+    },
+    get group(): SdkGroupDomain {
+      return adapter.domains.group
+    },
+    get presence(): SdkPresenceDomain {
+      return coreCtx.domains.presence
+    },
+    get userInfo(): SdkUserInfoDomain {
+      return coreCtx.domains.userInfo
+    },
   }
 
   // 立即初始化：仅当 auto-init 未关闭且已提供 appKey（语义同 core 的 auto-init）。
-  // IM 默认 managers/enableSyncData 由 core setupClient 内的 resolveClientConfig 钩子补齐，
+  // IM 默认 enableSyncData 由 core setupAdapter 内的 resolveSdkConfig 钩子补齐，
   // 此处与延迟初始化（ctx.init）均传原始 config 即可。
   if (options.autoInit !== false && config.appKey) {
-    coreCtx.init(config)
+    void coreCtx.init(config)
   }
 
   async function logout(): Promise<void> {
@@ -207,6 +223,7 @@ export function useUIKitProvider(
     stores,
     features: coreCtx.features,
     dataSource: coreCtx.dataSource,
+    capabilities: coreCtx.capabilities,
     noticeConfig: coreCtx.noticeConfig,
     h5: coreCtx.h5,
     theme: coreCtx.theme,

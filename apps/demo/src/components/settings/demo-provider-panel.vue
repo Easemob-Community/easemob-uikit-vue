@@ -66,7 +66,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enableContact"
             @change="onEnableContact"
-          />
+          >
           <span>好友列表与好友事件（enableContact）</span>
         </label>
         <label class="demo-check">
@@ -74,7 +74,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enableBlocklist"
             @change="onEnableBlocklist"
-          />
+          >
           <span>黑名单与拉黑事件（enableBlocklist）</span>
         </label>
         <label class="demo-check">
@@ -82,7 +82,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enablePresence"
             @change="onEnablePresence"
-          />
+          >
           <span>在线状态订阅（enablePresence）</span>
         </label>
         <label class="demo-check">
@@ -90,7 +90,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enableDraft"
             @change="onEnableDraft"
-          />
+          >
           <span>会话列表草稿显示（enableDraft）</span>
         </label>
         <label class="demo-check">
@@ -98,7 +98,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enableAtMe"
             @change="onEnableAtMe"
-          />
+          >
           <span>@我 消息提醒（enableAtMe）</span>
         </label>
         <label class="demo-check">
@@ -106,7 +106,7 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.enableTyping"
             @change="onEnableTyping"
-          />
+          >
           <span>对方正在输入提示（enableTyping）</span>
         </label>
         <label class="demo-check">
@@ -114,14 +114,15 @@ function onUseCustomDataSource(e: Event) {
             type="checkbox"
             :checked="props.useCustomDataSource"
             @change="onUseCustomDataSource"
-          />
-          <span>自定义数据源：由业务接口接管拉取联系人（fetchContacts）</span>
+          >
+          <span>自定义数据源：由业务接口接管拉取联系人（repositories.contact.fetchContacts）</span>
         </label>
       </div>
       <div class="demo-info">
-        Provider 能力开关默认全部开启。关闭后对应功能不再拉取 / 渲染 / 发送。<br />
-        注意：开关在 Provider 挂载时读取，登录后修改需重新登录（或刷新页面）才能完整生效。<br />
-        启用自定义数据源后，拉取好友将走示例接口（返回 Alice / Bob）而非 SDK。
+        Provider 能力开关默认全部开启。关闭后对应功能不再拉取 / 渲染 / 发送。<br>
+        注意：开关在 Provider 挂载时读取，登录后修改需重新登录（或刷新页面）才能完整生效。<br>
+        启用自定义数据源后，拉取好友将走示例接口（返回 Alice / Bob）而非 SDK；
+        repositories 在 adapter init 时注入，切换后需重新登录生效。
       </div>
     </div>
   </div>

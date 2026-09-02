@@ -1,19 +1,32 @@
-import { isSDKError } from 'easemob-websdk'
+/**
+ * SDK 错误相关工具。
+ * 签名中立（error: unknown），不依赖具体 SDK 类型，便于 core / uikit-im 共享。
+ */
+
+/** 中立判断：是否像 SDK 错误对象（含 toJSON / code） */
+function isSDKErrorLike(error: unknown): error is { toJSON: () => unknown, code: number } {
+  return (
+    typeof error === 'object'
+    && error !== null
+    && 'toJSON' in error
+    && typeof (error as Record<string, unknown>).toJSON === 'function'
+    && 'code' in error
+  )
+}
 
 /**
  * 安全格式化 SDK 错误，便于日志/调试输出。
- * SDK 错误会调用其内置的 `toJSON()`，其他错误保持原样返回。
+ * 识别到 SDK 错误对象时调用其 toJSON()，其他错误保持原样返回。
  */
 export function formatSdkError(error: unknown): unknown {
-  if (isSDKError(error))
+  if (isSDKErrorLike(error))
     return error.toJSON()
   return error
 }
 
 /**
  * SDK error code 到 UIKit i18n key 的映射。
- * 数值来自 easemob-websdk/dist/utils/error-codes.generated，
- * 仅把业务方最常遇到的错误收敛成用户友好的 toast 文案。
+ * 数值来自 easemob-websdk 错误码，仅把业务方最常遇到的错误收敛成用户友好的 toast 文案。
  */
 const SDK_ERROR_CODE_I18N_MAP: Record<number, string> = {
   // 连接 / 网络
@@ -118,7 +131,7 @@ const SDK_ERROR_CODE_I18N_MAP: Record<number, string> = {
  * @returns 命中时返回 key，未命中返回 null
  */
 export function resolveSdkErrorCodeI18nKey(error: unknown): string | null {
-  if (!isSDKError(error))
+  if (!isSDKErrorLike(error))
     return null
   return SDK_ERROR_CODE_I18N_MAP[error.code] ?? null
 }
@@ -132,8 +145,8 @@ export function extractSdkErrorReason(error: unknown): string {
     return error.message
   if (typeof error === 'string')
     return error
-  if (error && typeof error === 'object' && 'reason' in error && typeof error.reason === 'string')
-    return error.reason
+  if (error && typeof error === 'object' && 'reason' in error && typeof (error as Record<string, unknown>).reason === 'string')
+    return (error as Record<string, unknown>).reason as string
   return String(error)
 }
 

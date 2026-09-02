@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import type { Message as SdkMessage } from 'easemob-websdk'
+import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { ConversationTypeValue } from '@easemob/uikit-core'
 import type { UiMessage } from '@easemob/uikit-core'

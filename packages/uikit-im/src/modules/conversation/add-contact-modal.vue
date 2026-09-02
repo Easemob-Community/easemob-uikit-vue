@@ -1,28 +1,23 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
-import { useUIKit } from '../../composables/use-uikit'
-import { useViewport } from '@easemob/uikit-core'
-import { useContact } from '../../composables/use-contact'
+import { EmAvatar as Avatar, EmButton as Button, EmCell as Cell, EmIcon as Icon, EmInput as Input, EmPopup as Popup, useLocale, useViewport } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { EmButton as Button } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { useUIKit } from '../../composables/use-uikit'
+import { useContact } from '../../composables/use-contact'
 
 export interface AddContactModalProps {
   show: boolean
   /**
    * 自定义搜索函数：关键字（手机号/邮箱/昵称等业务字段）→ 候选用户列表。
-   * 优先级高于 Provider 的 dataSource.searchUsers；未配置时退化为直接输入用户 ID 添加。
+   * 优先级高于 Provider 的 dataSource.searchUsers（无 repository 对应项，保留单点消费）；
+   * 未配置时退化为直接输入用户 ID 添加。
    * Custom search: map business fields (phone/email/...) to Easemob userId candidates.
    */
   searchFn?: (keyword: string) => Promise<UiContact[]>
   /**
    * 自定义添加函数：完全接管“添加好友”动作（可先登记自有业务系统，再调用 SDK 添加）。
-   * 优先级高于 dataSource.addContact；未配置时走 SDK 默认实现。
+   * 优先级高于 dataSource.addContact（已翻译为 contact.addContact repository 注入）；
+   * 未配置时走 SDK 默认实现。
    * Custom add: fully take over the add-contact action.
    */
   addFn?: (userId: string, message?: string) => Promise<void>

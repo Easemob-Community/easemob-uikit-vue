@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
-import type { UIKitClient } from '../sdk/client'
+
+/** client store 持有的连接配置快照（事件层读取 deleteConversationOnGroupDestroyed） */
+export interface ClientSnapshot {
+  deleteConversationOnGroupDestroyed?: boolean
+}
 
 export const useClientStore = defineStore('client', () => {
-  const client = shallowRef<UIKitClient | null>(null)
+  const client = shallowRef<ClientSnapshot | null>(null)
   const connected = shallowRef(false)
   const connecting = shallowRef(false)
   /** 是否已成功连接过：true 之后再次 onConnecting 即为自动重连，用于区分首连/重连文案 */
@@ -13,8 +17,8 @@ export const useClientStore = defineStore('client', () => {
 
   const isLoggedIn = computed(() => connected.value && !!currentUser.value)
 
-  function setClient(instance: UIKitClient) {
-    client.value = instance
+  function setClient(snapshot: ClientSnapshot) {
+    client.value = snapshot
   }
 
   function setConnected(value: boolean) {

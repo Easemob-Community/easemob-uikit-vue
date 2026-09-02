@@ -57,46 +57,41 @@ export function useContact() {
     return domains.contact.syncLocal()
   }
 
-  /** 拉取联系人列表（优先数据源适配器） */
+  /** 拉取联系人列表（自定义数据源已经 core 翻译为 contact.fetchContacts 注入，由 Domain 委托） */
   async function fetchContacts(params?: { cursor?: string, pageSize?: number }) {
-    if (dataSource.fetchContacts) {
-      loading.value = true
-      try {
-        const result = await dataSource.fetchContacts(params)
+    loading.value = true
+    try {
+      const result = await domains.contact.fetchContacts(params?.cursor, params?.pageSize)
+      // 注入的分页源不走 syncLocal，store 由本层按分页语义写入；
+      // 未注入时 domain 默认路径（syncLocal）已写 store，此处写入为同值幂等
+      if (params?.cursor) {
         // 带 cursor 视为分页追加，否则为首屏/刷新整体替换
-        if (params?.cursor) {
-          contactStore.appendContactList(result.list)
-        }
-        else {
-          contactStore.setContactList(result.list)
-        }
-        // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
-        contactStore.setHasMore(result.hasMore ?? false)
-        contactStore.setCursor(result.cursor)
-        return result
+        contactStore.appendContactList(result.list)
       }
-      finally {
-        loading.value = false
+      else {
+        contactStore.setContactList(result.list)
       }
+      // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
+      contactStore.setHasMore(result.hasMore ?? false)
+      contactStore.setCursor(result.cursor)
+      return result
     }
-    // 默认走 SDK 本地内存（全量内存态，无分页，hasMore 保持 false）
-    const list = domains.contact.syncLocal()
-    return { list, cursor: undefined, hasMore: false }
+    finally {
+      loading.value = false
+    }
   }
 
-  /** 拉取黑名单 */
+  /** 拉取黑名单（dataSource.fetchBlocklist 已翻译为 contact.fetchBlocklist 注入，由 Domain 委托并写 store） */
   async function fetchBlocklist() {
-    if (dataSource.fetchBlocklist) {
-      const list = await dataSource.fetchBlocklist()
-      contactStore.setBlackList(list)
-      return list
-    }
-    return domains.contact.syncBlocklist()
+    const list = await domains.contact.syncBlocklist()
+    contactStore.setBlackList(list)
+    return list
   }
 
   /**
-   * 搜索用户（手机号/邮箱/昵称等 → 环信 userId），优先数据源适配器。
-   * 未配置 searchUsers 适配器时返回空数组（SDK 无按关键字搜索能力）。
+   * 搜索用户（手机号/邮箱/昵称等 → 环信 userId）。
+   * 注意：searchUsers 无 repository 对应项（SDK 无搜索能力），仍单点消费
+   * ctx.dataSource（薄别名收口后的唯一保留项）；未配置时返回空数组。
    */
   async function searchUsers(keyword: string): Promise<UiContact[]> {
     if (dataSource.searchUsers)
@@ -104,12 +99,8 @@ export function useContact() {
     return []
   }
 
-  /** 添加好友（优先数据源适配器接管，回落 SDK 默认实现） */
+  /** 添加好友（dataSource.addContact 已翻译为 contact.addContact 注入，由 Domain 委托；未配置走 SDK 默认实现） */
   async function addContact(userId: string, message?: string) {
-    if (dataSource.addContact) {
-      await dataSource.addContact(userId, message)
-      return
-    }
     await domains.contact.addContact(userId, message)
   }
 
@@ -153,15 +144,13 @@ export function useContact() {
 
   /**
    * 加载更多联系人（分页数据源场景）。
-   * SDK 本地联系人为全量内存态，无分页；仅在配置了分页数据源时才有更多数据。
+   * SDK 本地联系人为全量内存态（hasMore 恒 false），仅在注入了分页数据源时才有更多数据。
    */
   async function loadMore() {
     if (!contactStore.hasMore)
       return
-    if (dataSource.fetchContacts) {
-      // 携带 store 中的游标请求下一页，fetchContacts 内部走 append 合并
-      await fetchContacts({ cursor: contactStore.cursor })
-    }
+    // 携带 store 中的游标请求下一页，fetchContacts 内部走 append 合并
+    await fetchContacts({ cursor: contactStore.cursor })
   }
 
   /** 轻量获取好友总数（只读计数：不写 store、不锁定 loaded；同步完成后徽标随列表自动更新） */

@@ -6,7 +6,7 @@ import { INJECTION_KEY, STREAM_CUSTOM_TYPE, STREAM_MESSAGE_STATUS } from '@easem
 import { useLocale } from '@easemob/uikit-core'
 import { linkify } from '@easemob/uikit-core'
 import type { LinkSegment } from '@easemob/uikit-core'
-import { isStreamActive } from '../../../utils/stream-message'
+import { isStreamActive } from '@easemob/uikit-sdk-contract'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import type { TextMessageType } from '../../../store/message'
 import type { BubbleShape, ChatConfig } from '../types'

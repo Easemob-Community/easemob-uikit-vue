@@ -1,9 +1,10 @@
 import { computed, watch } from 'vue'
-import type { Message as SdkMessage } from 'easemob-websdk'
+import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import type { UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_STATUS, extractSdkErrorReason, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import { CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter, toChatroomUiMessage } from '../sdk/adapter/chatroom-adapter'
+import { resolveChatroomSdkHost } from '../sdk/host'
 import { useChatroomMessageStore } from '../store/chatroom-message'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -27,7 +28,7 @@ export function useChatroomMessage(_options: UseChatroomMessageOptions = {}) {
   const messageStore = useChatroomMessageStore()
   const toast = useToast()
 
-  const adapter = new ChatroomAdapter(ctx.client.value)
+  const adapter = new ChatroomAdapter(resolveChatroomSdkHost(ctx.client.value))
 
   /** 活动房间 ID（未进房时为空串，各视图回落为空） */
   const activeRoomId = computed(() => chatroomStore.roomId)

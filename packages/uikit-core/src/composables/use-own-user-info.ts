@@ -1,6 +1,6 @@
 import { computed, watchEffect } from 'vue'
-import type { UserInfoAttribute } from 'easemob-websdk'
-import { ALL_USER_INFO_ATTRIBUTES } from '../sdk/domain/user-info-domain'
+import { ALL_USER_INFO_ATTRIBUTES } from '@easemob/uikit-sdk-contract'
+import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
 import { useCoreUIKit } from './use-uikit'
 
 /**

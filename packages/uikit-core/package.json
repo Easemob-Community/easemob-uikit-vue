@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-core",
   "type": "module",
-  "version": "1.5.2",
+  "version": "2.0.0",
   "description": "Easemob UIKit Vue3 shared core (sdk abstraction / theme / locale / atomic components / provider)",
   "exports": {
     ".": {
@@ -28,6 +28,9 @@
   "files": [
     "dist"
   ],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "build": "node scripts/check-core-isolation.mjs && node scripts/check-engine-isolation.mjs && node scripts/check-icon-refs.mjs . src/assets/icons src/assets/icons-v2 && node scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
@@ -37,14 +40,21 @@
     "story:build": "histoire build"
   },
   "peerDependencies": {
+    "@easemob/uikit-sdk-websdk5": "workspace:*",
     "pinia": "^2.1.0 || ^4.0.0",
     "vue": "^3.3.0"
   },
+  "peerDependenciesMeta": {
+    "@easemob/uikit-sdk-websdk5": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "@vueuse/core": "^14.4.0",
-    "easemob-websdk": "^5.0.0"
+    "@easemob/uikit-sdk-contract": "workspace:*",
+    "@vueuse/core": "^14.4.0"
   },
   "devDependencies": {
+    "@easemob/uikit-sdk-websdk5": "workspace:*",
     "@histoire/plugin-vue": "^0.17.17",
     "@vitejs/plugin-vue": "^4.6.2",
     "histoire": "^0.17.17",

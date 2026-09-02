@@ -3,6 +3,7 @@ import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
+import { resolveChatroomSdkHost } from '../sdk/host'
 import {
   dispatchSignalMessage,
   dispatchSignalStatus,
@@ -74,7 +75,7 @@ export function useChatroom(options: UseChatroomOptions = {}) {
   const toast = useToast()
 
   // ManagerHost 是 core provider 的稳定代理，运行时委托到当前 client（支持延迟/重新初始化）
-  const adapter = new ChatroomAdapter(ctx.client.value)
+  const adapter = new ChatroomAdapter(resolveChatroomSdkHost(ctx.client.value))
 
   const status = computed(() => chatroomStore.status)
   const roomId = computed(() => chatroomStore.roomId)

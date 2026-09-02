@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, GROUP_INFO_LIMIT } from '@easemob/uikit-core'
+import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmInput as Input, EmPopup as Popup, useLocale, useViewport } from '@easemob/uikit-core'
+import type { CreateGroupParams, UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { useViewport } from '@easemob/uikit-core'
 import { useGroup } from '../../composables/use-group'
 import { useContact } from '../../composables/use-contact'
 import { useConversation } from '../../composables/use-conversation'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { EmButton as Button } from '@easemob/uikit-core'
 import ContactList from '../contact/contact-list.vue'
 import ContactItemDefault from '../contact/contact-item-default.vue'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import type { CreateGroupParams, UiContact } from '@easemob/uikit-core'
 
 export interface CreateGroupModalConfig {
   /** 群名称；不传时自动生成 */
@@ -49,7 +42,8 @@ export interface CreateGroupModalProps {
   config?: CreateGroupModalConfig
   /**
    * 自定义创建群函数：完全接管创建动作（可先登记自有业务系统，再调用 SDK 创建）。
-   * 优先级高于 Provider 的 dataSource.createGroup；未配置时走 SDK 默认实现。
+   * 优先级高于 Provider 的 dataSource.createGroup（已翻译为 group.createGroup
+   * repository 注入）；未配置时走 SDK 默认实现。
    * Custom create: fully take over the create-group action.
    */
   createFn?: (params: CreateGroupParams) => Promise<{ groupId: string }>

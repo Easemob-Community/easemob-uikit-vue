@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
 import type { ChatroomAttrPrefixValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
+import { resolveChatroomSdkHost } from '../sdk/host'
 import type { ChatroomAttributeMutationResult, ChatroomAttributes } from '../sdk/domain/chatroom-domain'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -23,7 +24,7 @@ export function useChatroomAttributes() {
   const chatroomStore = useChatroomStore()
   const toast = useToast()
 
-  const adapter = new ChatroomAdapter(ctx.client.value)
+  const adapter = new ChatroomAdapter(resolveChatroomSdkHost(ctx.client.value))
 
   const attributes = computed(() => chatroomStore.attributes)
 

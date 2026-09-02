@@ -1,5 +1,7 @@
-import type { ChatEventHandlerMap, ChatRoomEventHandlerMap, UserInfo } from 'easemob-websdk'
-import type { ConversationTypeValue, ManagerHost, UiMessage } from '@easemob/uikit-core'
+import type { ChatEventHandlerMap, ChatRoomEventHandlerMap } from 'easemob-websdk'
+import type { UserInfo } from '@easemob/uikit-sdk-contract'
+import type { ChatroomSdkHost } from '../host'
+import type { ConversationTypeValue, UiMessage } from '@easemob/uikit-core'
 import { MESSAGE_TYPE, createLogger, createNoticeMessage, resolveNoticeUserName, t } from '@easemob/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import { toChatroom, toChatroomMuteItem } from '../domain/chatroom-domain'
@@ -134,7 +136,7 @@ function memberNames(users: readonly UserInfo[]): string {
  * 返回 dispose 函数（登出 / 重新初始化 / Provider 卸载时调用）。
  */
 export function registerChatroomEventHandlers(
-  host: ManagerHost,
+  host: ChatroomSdkHost,
   stores: ChatroomEventStores,
   callbacks: ChatroomEventCallbacks = {},
 ): () => void {

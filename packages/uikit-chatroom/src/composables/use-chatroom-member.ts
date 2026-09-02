@@ -9,6 +9,7 @@ import {
 import { CHATROOM_MEMBER_ROLE, CHATROOM_PERMISSION } from '../constants'
 import type { ChatroomPermissionValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
+import { resolveChatroomSdkHost } from '../sdk/host'
 import type { ChatroomMember } from '../sdk/domain/chatroom-domain'
 import { useChatroomStore } from '../store/chatroom'
 
@@ -30,7 +31,7 @@ export function useChatroomMember() {
   const chatroomStore = useChatroomStore()
   const toast = useToast()
 
-  const adapter = new ChatroomAdapter(ctx.client.value)
+  const adapter = new ChatroomAdapter(resolveChatroomSdkHost(ctx.client.value))
 
   const members = computed(() => chatroomStore.members)
   const membersHasMore = computed(() => chatroomStore.membersHasMore)

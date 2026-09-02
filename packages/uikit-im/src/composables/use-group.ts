@@ -1,12 +1,10 @@
 import { computed, ref } from 'vue'
-import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
-import type { CreateGroupParams, UiGroup, UiGroupMember } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { insertChatNotice } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, insertChatNotice, useLocale } from '@easemob/uikit-core'
+import type { CreateGroupParams, GroupMemberPage, UiGroup, UiGroupMember } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
 
 export function useGroup() {
-  const { domains, stores, dataSource } = useUIKit()
+  const { domains, stores } = useUIKit()
   const { t } = useLocale()
   const groupStore = stores.group
 
@@ -50,31 +48,26 @@ export function useGroup() {
     return list
   }
 
-  /** 拉取群组列表（优先数据源适配器） */
+  /** 拉取群组列表（自定义数据源已经 core 翻译为 group.fetchGroups 注入，由 Domain 委托） */
   async function fetchGroups(params?: { cursor?: string, pageSize?: number }) {
-    if (dataSource.fetchGroups) {
-      loading.value = true
-      try {
-        const result = await dataSource.fetchGroups(params || {})
-        // 带 cursor 视为分页追加，否则为首屏/刷新整体替换
-        if (params?.cursor) {
-          groupStore.appendGroupList(result.list)
-        }
-        else {
-          groupStore.setGroupList(result.list)
-        }
-        // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
-        groupStore.setHasMore(result.hasMore ?? false)
-        groupStore.setCursor(result.cursor)
-        return result
+    loading.value = true
+    try {
+      const result = await domains.group.fetchGroups(params?.cursor, params?.pageSize)
+      // 带 cursor 视为分页追加，否则为首屏/刷新整体替换
+      if (params?.cursor) {
+        groupStore.appendGroupList(result.list)
       }
-      finally {
-        loading.value = false
+      else {
+        groupStore.setGroupList(result.list)
       }
+      // 分页元数据落 store，供 loadMore 判断是否继续加载及传游标
+      groupStore.setHasMore(result.hasMore ?? false)
+      groupStore.setCursor(result.cursor)
+      return result
     }
-    // 默认走 SDK 本地内存（全量内存态，无分页，hasMore 保持 false）
-    const list = syncLocalGroups()
-    return { list, cursor: undefined, hasMore: false }
+    finally {
+      loading.value = false
+    }
   }
 
   /** 获取群详情 */
@@ -87,7 +80,7 @@ export function useGroup() {
     groupId: string,
     cursor?: string,
     pageSize = 20,
-  ): Promise<{ members: UiGroupMember[], cursor?: string, hasMore?: boolean }> {
+  ): Promise<GroupMemberPage> {
     return domains.group.fetchGroupMembers(groupId, cursor, pageSize)
   }
 
@@ -101,11 +94,9 @@ export function useGroup() {
     await domains.group.updateGroupAnnouncement(groupId, announcement)
   }
 
-  /** 创建群组（优先数据源适配器接管，回落 SDK 默认实现） */
+  /** 创建群组（dataSource.createGroup 已翻译为 group.createGroup 注入，由 Domain 整体委托；未配置走 SDK 默认实现） */
   async function createGroup(params: CreateGroupParams) {
-    const result = dataSource.createGroup
-      ? await dataSource.createGroup(params)
-      : await domains.group.createGroup(params)
+    const result = await domains.group.createGroup(params)
     // 创建成功后在本设备群聊插入“群聊已创建”本地通知
     insertChatNotice(stores, result.groupId, CONVERSATION_TYPE.GROUPCHAT, {
       eventType: NOTICE_EVENT_TYPE.GROUP_CREATED,
@@ -303,15 +294,13 @@ export function useGroup() {
 
   /**
    * 加载更多群组（分页数据源场景）。
-   * SDK 本地已加入群组为全量内存态，无分页；仅在配置了分页数据源时才有更多数据。
+   * SDK 本地已加入群组为全量内存态（hasMore 恒 false），仅在注入了分页数据源时才有更多数据。
    */
   async function loadMore() {
     if (!groupStore.hasMore)
       return
-    if (dataSource.fetchGroups) {
-      // 携带 store 中的游标请求下一页，fetchGroups 内部走 append 合并
-      await fetchGroups({ cursor: groupStore.cursor })
-    }
+    // 携带 store 中的游标请求下一页，fetchGroups 内部走 append 合并
+    await fetchGroups({ cursor: groupStore.cursor })
   }
 
   /** 轻量获取已加入群组总数（只读计数：不写 store、不锁定 loaded；同步完成后徽标随列表自动更新） */

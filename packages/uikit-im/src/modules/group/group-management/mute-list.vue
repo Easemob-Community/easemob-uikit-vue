@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
-import type { NoticeEventTypeValue } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmpty as Empty, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, EmPopup as Popup, createLogger, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
+import type { NoticeEventTypeValue, UiGroupMember } from '@easemob/uikit-core'
 import { useGroup } from '../../../composables/use-group'
-import { useToast } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
-import { insertChatNotice } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
-import type { UiGroupMember } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
 import MuteListItem from './mute-list-item.vue'
 import MuteListSelectItem from './mute-list-select-item.vue'
 
@@ -114,7 +107,7 @@ async function loadGroupMembers() {
     return
   loadingMembers.value = true
   try {
-    const { members: list } = await fetchGroupMembers(props.groupId, undefined, 200)
+    const { list } = await fetchGroupMembers(props.groupId, undefined, 200)
     groupMembers.value = list || []
   }
   catch (err) {
@@ -348,7 +341,6 @@ defineExpose({
   background-color: var(--uikit-primary-color);
   color: var(--uikit-text-inverse);
 }
-
 
 @media (hover: hover) {
   .mute-list__popup-btn--confirm:hover:not(:disabled) {

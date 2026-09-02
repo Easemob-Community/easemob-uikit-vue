@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import { useGroup } from '../../../composables/use-group'
-import { useToast } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmPopup as Popup, createLogger, formatSdkError, useLocale, useToast } from '@easemob/uikit-core'
 import type { UiGroupMember } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
+import { useGroup } from '../../../composables/use-group'
 import BlockListItem from './block-list-item.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
 
@@ -92,7 +86,7 @@ async function loadGroupMembers() {
     return
   loadingMembers.value = true
   try {
-    const { members: list } = await fetchGroupMembers(props.groupId, undefined, 200)
+    const { list } = await fetchGroupMembers(props.groupId, undefined, 200)
     groupMembers.value = list || []
   }
   catch (err) {

@@ -1,0 +1,29 @@
+{
+  "name": "@easemob/uikit-sdk-contract",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Easemob UIKit SDK-neutral contract (wire types / repositories / capabilities / adapter interface)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/easemob-uikit-sdk-contract.js",
+      "require": "./dist/easemob-uikit-sdk-contract.umd.cjs"
+    }
+  },
+  "main": "./dist/easemob-uikit-sdk-contract.umd.cjs",
+  "module": "./dist/easemob-uikit-sdk-contract.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && tsc --noEmit --project tsconfig.build.json",
+    "dev": "vite build --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-dts": "^3.9.1"
+  }
+}

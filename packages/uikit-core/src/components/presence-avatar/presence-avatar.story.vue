@@ -1,8 +1,38 @@
 <script setup lang="ts">
 import { computed, defineComponent } from 'vue'
+import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
 import { useCoreUIKitProvider } from '../../composables/use-uikit'
 import type { UIKitDataSource } from '../../composables/types'
 import PresenceAvatar from './presence-avatar.vue'
+
+/** story 专用 stub adapter：不连真实 SDK；Domain/repository 访问抛错（与未初始化语义一致） */
+function createStubAdapter(): SdkAdapter {
+  const notReady = (): never => {
+    throw new Error('[story] stub adapter 未初始化，Domain/repository 不可用')
+  }
+  return {
+    init: async () => {},
+    login: async () => {},
+    logout: async () => {},
+    subscribe: () => () => {},
+    currentUserId: '',
+    isConnected: false,
+    capabilities: {
+      combineMessage: false,
+      pinnedMessage: false,
+      streamingMessage: false,
+      groupReadReceipt: false,
+    },
+    get message() { return notReady() },
+    get conversation() { return notReady() },
+    get contact() { return notReady() },
+    get group() { return notReady() },
+    get presence() { return notReady() },
+    get userInfo() { return notReady() },
+    get domains() { return notReady() },
+    client: undefined,
+  }
+}
 
 /**
  * story 专用 Provider 包装：core 侧尚无 Provider 容器组件（P1 Step 6 才迁入），
@@ -16,6 +46,7 @@ const CoreProviderStub = defineComponent({
   setup(props, { slots }) {
     useCoreUIKitProvider({ appKey: '' }, {
       autoInit: false,
+      createDefaultAdapter: createStubAdapter,
       features: computed(() => ({ enablePresence: props.enablePresence })),
       dataSource: computed(() => props.dataSource as UIKitDataSource | undefined),
     })

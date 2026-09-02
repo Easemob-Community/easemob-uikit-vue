@@ -1,34 +1,16 @@
 /// <reference types="node" />
-import { existsSync, readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import { dirname, resolve } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import process from 'node:process'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-
-function getSdkVersion(): string {
-  const _require = createRequire(import.meta.url)
-  let dir = dirname(_require.resolve('easemob-websdk'))
-  // 向上查找 easemob-websdk 的 package.json（兼容旧版 dist 入口与新版根目录入口）
-  while (dir !== dirname(dir)) {
-    const sdkPackagePath = resolve(dir, 'package.json')
-    if (existsSync(sdkPackagePath)) {
-      const sdkPackage = JSON.parse(readFileSync(sdkPackagePath, 'utf-8')) as { name?: string, version?: string }
-      if (sdkPackage.name === 'easemob-websdk')
-        return sdkPackage.version ?? 'unknown'
-    }
-    dir = dirname(dir)
-  }
-  return 'unknown'
-}
 
 function getUIKitVersion(): string {
   const uikitPackage = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as { version?: string }
   return uikitPackage.version ?? 'unknown'
 }
 
-const sdkVersion = getSdkVersion()
 const uikitVersion = getUIKitVersion()
 
 // histoire（story:dev/story:build）会合并本配置；其虚拟入口 bundle-main/bundle-sandbox
@@ -37,7 +19,6 @@ const isHistoire = process.argv.some(arg => arg.includes('histoire'))
 
 export default defineConfig({
   define: {
-    __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
   },
   plugins: [
@@ -51,10 +32,14 @@ export default defineConfig({
         // （见 package.json exports ./theme 的 types 条件）；shims-vue.d.ts 属源码侧
         // 环境声明，对消费者无意义且可能与其自身 *.vue shim 合并冲突，故排除。
         copyDtsFiles: true,
-        // tsconfig paths 把 @easemob/uikit-core 映射到 core src，不做排除时
-        // d.ts 会把 re-export core 符号的模块说明符展开成 ../../uikit-core/src 相对路径，
-        // 发布给消费者后该路径不存在导致类型断裂；保持裸包名，类型经 core dist 的 d.ts 解析。
-        aliasesExclude: ['@easemob/uikit-core'],
+        // tsconfig paths 把 @easemob/uikit-core 等映射到各包 src，不做排除时
+        // d.ts 会把 re-export 符号的模块说明符展开成 ../../xxx/src 相对路径，
+        // 发布给消费者后该路径不存在导致类型断裂；保持裸包名，类型经各自 dist 的 d.ts 解析。
+        aliasesExclude: [
+          '@easemob/uikit-core',
+          '@easemob/uikit-sdk-contract',
+          '@easemob/uikit-sdk-websdk5',
+        ],
       })]
       : []),
   ],
@@ -66,7 +51,13 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit-im.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-core'],
+      external: [
+        'vue',
+        'pinia',
+        '@easemob/uikit-core',
+        '@easemob/uikit-sdk-contract',
+        '@easemob/uikit-sdk-websdk5',
+      ],
       output: {
         // 同时存在命名导出与 default 导出时，显式声明使用命名导出策略，
         // 避免 Rollup 警告 "Consumers will have to use `EasemobUIKit.default`"。
@@ -75,10 +66,10 @@ export default defineConfig({
         globals: {
           'vue': 'Vue',
           'pinia': 'Pinia',
-          'easemob-websdk': 'Easemob',
-          // core 的 UMD 全局名（core vite.config lib.name = 'EasemobUIKitCore'），
-          // 不声明时 rollup 会猜成 'uikitCore'，CDN 直引两个 UMD 产物会断链
+          // core / 契约 / adapter 的 UMD 全局名，CDN 直引多个 UMD 产物时按此断链
           '@easemob/uikit-core': 'EasemobUIKitCore',
+          '@easemob/uikit-sdk-contract': 'EasemobUIKitSdkContract',
+          '@easemob/uikit-sdk-websdk5': 'EasemobUIKitSdkWebsdk5',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css')

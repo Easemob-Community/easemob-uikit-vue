@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useSlots } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
-import { useLongPress, useToast, useViewport } from '@easemob/uikit-core'
+import { EmActionSheet as ActionSheet, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE, EmPopup as Popup, useLocale, useLongPress, useToast, useViewport } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useGroupStore } from '../../../store/group'
 import { resolveTranslateLang } from '../../../composables/use-message-actions'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmActionSheet as ActionSheet } from '@easemob/uikit-core'
 import MessageActionMenu from '../message-action-menu/message-action-menu.vue'
-import type { UiMessage } from '@easemob/uikit-core'
 import type { ChatConfig, MessageActionEvent, MessageActionItem, MessageActionType } from '../types'
 
 export interface MessageInteractiveProps {
@@ -28,7 +24,7 @@ const slots = useSlots()
 const { t } = useLocale()
 const { isMobile } = useViewport()
 const { show: showToast } = useToast()
-const { domains } = useUIKit()
+const { domains, capabilities } = useUIKit()
 const groupStore = useGroupStore()
 
 /** 触发元素引用 */
@@ -151,7 +147,8 @@ const actions = computed<MessageActionItem[]>(() => {
       add('voiceToText', t('message.action.voiceToText') ?? '转文字', 'rect/hanzi', false, transcribing, t('message.voiceToText.loading') ?? '转文字中…')
     }
   }
-  if (cfg?.enablePin !== false && !props.message.recalled) {
+  // 置顶：业务开关（enablePin）与 SDK 客观能力（capabilities.pinnedMessage）取交集
+  if (capabilities.pinnedMessage !== false && cfg?.enablePin !== false && !props.message.recalled) {
     if (props.message.pinned) {
       add('unpin', t('message.action.unpin') ?? '取消置顶', 'pin/slash')
     }

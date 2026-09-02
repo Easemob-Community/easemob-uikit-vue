@@ -41,10 +41,17 @@ function getUIKitChatroomVersion(): string {
   return chatroomPackage.version ?? 'unknown'
 }
 
+function getUIKitSdkWebsdk5Version(): string {
+  const pkgPath = resolve(__dirname, '../../packages/uikit-sdk-websdk5/package.json')
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version?: string }
+  return pkg.version ?? 'unknown'
+}
+
 const sdkVersion = getSdkVersion()
 const uikitVersion = getUIKitVersion()
 const uikitCoreVersion = getUIKitCoreVersion()
 const uikitChatroomVersion = getUIKitChatroomVersion()
+const uikitSdkWebsdk5Version = getUIKitSdkWebsdk5Version()
 
 export default defineConfig({
   define: {
@@ -52,6 +59,8 @@ export default defineConfig({
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
     __EASEMOB_UIKIT_CORE_VERSION__: JSON.stringify(uikitCoreVersion),
     __EASEMOB_UIKIT_CHATROOM_VERSION__: JSON.stringify(uikitChatroomVersion),
+    // websdk5 适配器源码直连时，adapter client.ts 的版本日志宏需在此定义
+    __EASEMOB_UIKIT_SDK_WEBSDK5_VERSION__: JSON.stringify(uikitSdkWebsdk5Version),
   },
   plugins: [
     vue(),
@@ -70,6 +79,12 @@ export default defineConfig({
       // core 主 alias 已指 src，theme 子路径同步指 src（改 CSS 变量无需先构建 core dist）
       { find: '@easemob/uikit-core/theme', replacement: resolve(__dirname, '../../packages/uikit-core/src/theme/index.css') },
       { find: '@easemob/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
+      // SDK 中立契约包 + 双 adapter 源码直连（D122 双 adapter 拆包）
+      // webim4 包自身即以 npm alias 声明 easemob-websdk-4（npm:easemob-websdk@4.24.2）依赖，
+      // 与 websdk5 的 easemob-websdk(5.x) 是两个独立 specifier，vite 预构建各自注册、互不劫持
+      { find: '@easemob/uikit-sdk-contract', replacement: resolve(__dirname, '../../packages/uikit-sdk-contract/src') },
+      { find: '@easemob/uikit-sdk-websdk5', replacement: resolve(__dirname, '../../packages/uikit-sdk-websdk5/src') },
+      { find: '@easemob/uikit-sdk-webim4', replacement: resolve(__dirname, '../../packages/uikit-sdk-webim4/src') },
       { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
       { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
       // chatroom 场景包源码直连（P2-2 demo 页使用；chatroom 无独立主题，theme 子路径经 exports 指 core）

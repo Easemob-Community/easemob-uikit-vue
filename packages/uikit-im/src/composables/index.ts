@@ -35,4 +35,6 @@ export * from './use-own-user-info'
 export * from './use-quote'
 export * from './use-blocklist'
 export * from './use-chat-plugin'
-export * from './use-sync-status'
+// 数据同步状态 hook 已随 Provider 适配器化下沉 @easemob/uikit-core，此处 re-export 保持对外 API 不变
+export { useSyncStatus } from '@easemob/uikit-core'
+export type { SyncPhase, SyncState } from '@easemob/uikit-core'

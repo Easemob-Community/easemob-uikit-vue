@@ -8,8 +8,14 @@
  */
 import { computed, onMounted } from 'vue'
 import { setChatroomPopupTarget, useChatroomProvider } from '@easemob/uikit-chatroom'
+import { registerDefaultSdkAdapterFactory } from '@easemob/uikit-core'
+import { Websdk5Adapter } from '@easemob/uikit-sdk-websdk5'
 import AppShell from './app-shell.vue'
 import { demoRoute, isDemoPcRoute } from './demo-route'
+
+// 注册 SDK5 默认适配器（决策 22：core 主入口零 adapter 静态引用，
+// 默认内置由使用方显式注册；chatroom 场景无子路径入口，业务侧自行注册）
+registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())
 
 /** 从 localStorage 读取登录配置（与 apps/demo 共用 uikit_demo_login_config） */
 function getLoginConfig() {

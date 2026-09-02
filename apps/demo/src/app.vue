@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue'
+import { h, onMounted, ref } from 'vue'
 import { EmUIKitProvider, useClient } from '@easemob/uikit-im'
-import type { UiContact } from '@easemob/uikit-im'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
 import ChatroomDemoPage from './chatroom-demo-page.vue'
-import { demoCollectSdkLog, demoSdkLogLevel, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
+import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
+import { buildDemoSdkInitConfig, demoLogin, demoUseCustomDataSource, webim4Adapter } from './composables/use-demo-sdk-adapter'
 
 /**
- * Provider 三开关 × dataSource 演示
+ * Provider 三开关 × 自定义数据源（repositories 注入）演示
  *
  * - enableContact / enableBlocklist / enablePresence
  *   默认 true。关闭后：
@@ -16,8 +16,9 @@ import { demoCollectSdkLog, demoSdkLogLevel, demoUikitLogLevel, noticeConfig } f
  *     2) 事件接收器不会挂载对应 SDK 事件
  *   3) Presence 关闭后，ContactItem 等位置不再展示在线状态指示器
  *
- * - dataSource：业务可提供自定义接口接管 SDK 默认实现。
- *   下面展示一个只覆盖 fetchContacts 的最小例子。
+ * - 自定义数据源：demo 经 `repositories.contact.fetchContacts` 注入业务联系人源
+ *   （use-demo-sdk-adapter.ts，D122 数据入口层）；在 adapter init 时注入，
+ *   设置面板切换开关后需重新登录生效。
  */
 const enableContact = ref(true)
 const enableBlocklist = ref(true)
@@ -26,30 +27,18 @@ const enableDraft = ref(true)
 const enableAtMe = ref(true)
 const enableTyping = ref(true)
 
-/** 是否启用 demo 提供的自定义 dataSource（演示业务接管拉好友逻辑） */
-const useCustomDataSource = ref(false)
-
-const customDataSource = {
-  /** 示例：业务从自己后端拉取联系人。 */
-  async fetchContacts(): Promise<{ list: UiContact[]; cursor?: string; hasMore?: boolean }> {
-    // 实际使用时请替换为业务 API
-    return {
-      list: [
-        { userId: 'biz_alice', name: 'Alice (业务接口)' },
-        { userId: 'biz_bob', name: 'Bob (业务接口)' },
-      ],
-      hasMore: false,
-    }
-  },
-}
+/** 设置面板开关绑定（实现见 use-demo-sdk-adapter.ts，切换后重新登录生效） */
+const useCustomDataSource = demoUseCustomDataSource
 
 /** 从 localStorage 读取登录配置 */
 function getLoginConfig() {
   try {
     const raw = localStorage.getItem('uikit_demo_login_config')
-    if (!raw) return null
+    if (!raw)
+      return null
     return JSON.parse(raw)
-  } catch {
+  }
+  catch {
     return null
   }
 }
@@ -66,35 +55,45 @@ const AppContent = {
 
     async function autoLogin() {
       const config = getLoginConfig()
-      if (!config || !config.user) return
+      if (!config || !config.user)
+        return
 
       autoLoggingIn.value = true
       autoLoginError.value = ''
       try {
-        init({
+        init(buildDemoSdkInitConfig({
           appKey: config.appKey,
-          ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
+          apiUrl: config.apiUrl,
           debug: config.debug,
-        })
+        }))
 
-        const params: { user: string; accessToken?: string; password?: string } = {
+        const params: { user: string, accessToken?: string, password?: string } = {
           user: config.user,
         }
         if (config.mode === 'token' && config.token) {
           params.accessToken = config.token
-        } else if (config.mode === 'password' && config.password) {
+        }
+        else if (config.mode === 'password' && config.password) {
           params.password = config.password
         }
 
-        await login(params)
+        // webim4 注入模式下 core 不转发 login，demoLogin 内部直连 webim4Adapter
+        await demoLogin(login, params)
         isLoggedIn.value = true
-      } catch (err) {
+      }
+      catch (err) {
         autoLoginError.value = (err as Error).message
         localStorage.removeItem('uikit_demo_login_config')
-      } finally {
+      }
+      finally {
         autoLoggingIn.value = false
       }
     }
+    const currentHash = ref('')
+    function onHashChange() {
+      currentHash.value = window.location.hash
+    }
+    const isChatroomPage = () => currentHash.value === '#/chatroom'
 
     onMounted(() => {
       const config = getLoginConfig()
@@ -105,12 +104,6 @@ const AppContent = {
       currentHash.value = window.location.hash
       window.addEventListener('hashchange', onHashChange)
     })
-
-    const currentHash = ref('')
-    function onHashChange() {
-      currentHash.value = window.location.hash
-    }
-    const isChatroomPage = () => currentHash.value === '#/chatroom'
 
     function onLoginSuccess() {
       isLoggedIn.value = true
@@ -170,13 +163,13 @@ const AppContent = {
 <template>
   <EmUIKitProvider
     :auto-init="false"
+    :adapter="demoSdkVersion === 'webim4' ? webim4Adapter : undefined"
     :enable-contact="enableContact"
     :enable-blocklist="enableBlocklist"
     :enable-presence="enablePresence"
     :enable-draft="enableDraft"
     :enable-at-me="enableAtMe"
     :enable-typing="enableTyping"
-    :data-source="useCustomDataSource ? customDataSource : undefined"
     :h5="{ safeArea: true, keyboardAdapt: true, pullRefresh: 'auto' }"
     :logger="{ collectSdkLog: demoCollectSdkLog, uikitLevel: demoUikitLogLevel, sdkLevel: demoSdkLogLevel }"
     :notice-config="noticeConfig"
@@ -186,7 +179,9 @@ const AppContent = {
 </template>
 
 <style>
-html, body, #app {
+html,
+body,
+#app {
   margin: 0;
   padding: 0;
   height: 100%;

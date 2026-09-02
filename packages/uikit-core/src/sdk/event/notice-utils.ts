@@ -1,4 +1,4 @@
-import type { UserInfo } from 'easemob-websdk'
+import type { UserInfo } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_STATUS, MESSAGE_TYPE } from '../../constants'
 import type { ConversationTypeValue, NoticeEventTypeValue } from '../../constants'
 // 引擎层禁 vue：locale 纯逻辑在 locale/messages.ts（零 vue），勿改回 '../../locale'

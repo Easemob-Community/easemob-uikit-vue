@@ -31,9 +31,14 @@ const extensions = ['.ts', '.vue', '.mjs', '.js']
 const importPatterns = [
   // vue 生态裸 specifier
   /(?:from\s+|import\s*\()\s*['"](?:vue|pinia|@vueuse(?:\/[^'"]*)?)['"]/,
+  // SDK 直接依赖（值 import 禁止）：core 引擎层不得碰 easemob-websdk
+  /(?:from\s+|import\s*\()\s*['"]easemob-websdk['"]/,
   // 相对路径进入 Vue 层模块（locale/messages 为纯 TS，放行）
   /(?:from\s+|import\s*\()\s*['"](?:\.\.\/)+(?:store|composables|components|containers|locale(?!\/messages)(?:\/[^'"]*)?)['"]/,
 ]
+
+// SDK 直接依赖（import type 也禁止）：在去掉 import type 之前单独检查，防止耦合回流
+const sdkTypeImportPattern = /import\s+type\s+[^;]*?from\s+['"]easemob-websdk['"]/
 
 function collectFiles(dir) {
   const files = []
@@ -57,6 +62,10 @@ for (const dir of scanDirs) {
     const src = readFileSync(file, 'utf8')
     // 去掉注释，避免注释里的 vue/pinia 提及误报
     let code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+    // SDK 直接依赖的 import type 也禁止（在擦除 import type 之前检查）
+    if (sdkTypeImportPattern.test(code)) {
+      violations.push(`${file.replace(pkgRoot + '/', '')}: easemob-websdk import type（禁用）`)
+    }
     // import type 整行运行时擦除，放行（类型级耦合见 TECH-DEBT.md D100）
     code = code.replace(/import\s+type\s+[^;]*?from\s+['"][^'"]+['"];?/g, '')
     for (const pattern of importPatterns) {

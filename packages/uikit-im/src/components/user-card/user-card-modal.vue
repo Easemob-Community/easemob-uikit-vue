@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { UserInfoAttribute } from 'easemob-websdk'
+import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
 import { formatSdkError } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'

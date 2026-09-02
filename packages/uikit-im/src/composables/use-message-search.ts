@@ -196,7 +196,8 @@ export function useMessageSearch(options: MaybeRef<UseMessageSearchOptions> = {}
       ...(activeType.value ? { msgTypes: [SEARCH_WIRE_TYPE_MAP[activeType.value]] } : {}),
     }
 
-    const res: any = await client.value.chatManager.searchMessages({
+    const sdkClient = (client.value.client || {}) as any
+    const res: any = await sdkClient.chatManager?.searchMessages?.({
       option,
       pageNum: pageNum.value,
       pageSize,

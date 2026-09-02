@@ -16,12 +16,7 @@
 import './theme/index.css'
 
 // SDK 基座层
-export * from './sdk/client'
 export * from './sdk/types'
-export { UserInfoDomain } from './sdk/domain/user-info-domain'
-export { PresenceDomain, parsePresenceStatus } from './sdk/domain/presence-domain'
-export type { PresenceStoreLike } from './sdk/domain/presence-domain'
-export * from './sdk/event/connection-events'
 export * from './sdk/event/notice-utils'
 
 // Pinia Stores（client / theme / user-info / presence）
@@ -33,9 +28,13 @@ export * from './store/presence'
 // Provider 契约类型（UIKitDataSource / UIKitFeatures / ContactFetchMode）
 export * from './composables/types'
 
-// core Provider 生命周期（client / core stores / presence & userInfo domain）
+// core Provider 生命周期（SDK 适配器生命周期 + core stores）
 export { useCoreUIKitProvider, useCoreUIKit, CORE_UIKIT_CONTEXT_KEY } from './composables/use-uikit'
-export type { CoreUIKitContext, CoreUIKitLoginParams, CoreStores, CoreUIKitProviderOptions } from './composables/use-uikit'
+export type { CoreUIKitContext, CoreUIKitLoginParams, CoreStores, CoreUIKitProviderOptions, CoreUIKitInitConfig, CoreConnectionCallbacks } from './composables/use-uikit'
+// 默认适配器注册表（决策 22 子路径入口自注册）+ 非 Vue 上下文访问口（决策 20）
+export { getUIKitAdapter, registerDefaultSdkAdapterFactory } from './composables/default-adapter'
+export { useSyncStatus } from './composables/use-sync-status'
+export type { SyncDataType, SyncPhase, SyncState } from './composables/use-sync-status'
 
 // Provider 场景无关共享副作用（P1 Step 6 新增，core 与场景 Provider 共用同一实现）
 export { useProviderSideEffects, createUserInfoSubscriptionErrorHandler } from './composables/use-provider-side-effects'
@@ -83,13 +82,22 @@ export * from './constants'
 // 多语言
 export * from './locale'
 
-// 通用工具（日志 / SDK 错误 / 下载 / z-index）
+// 通用工具（日志 / SDK 错误 / 下载 / z-index / 在线状态 / 消息映射）
 export * from './utils/logger'
 export * from './utils/log-store'
-export * from './utils/sdk-log-capture'
-export * from './utils/sdk-error'
 export * from './utils/download'
 export * from './utils/z-index'
 export * from './utils/format-time'
 export * from './utils/linkify'
 export * from './utils/normalize-user-id'
+export * from './utils/presence-status'
+export * from './composables/to-ui-message'
+
+// SDK 错误工具：签名中立（error: unknown），实现迁移到 core 本地。
+export {
+  extractSdkErrorReason,
+  formatSdkError,
+  resolveSdkErrorCodeI18nKey,
+  resolveSdkErrorI18nKey,
+  resolveSdkErrorMessage,
+} from './utils/sdk-error'

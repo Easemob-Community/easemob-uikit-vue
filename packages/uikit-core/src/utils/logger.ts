@@ -1,95 +1,17 @@
-/* eslint-disable no-console */
-
 /**
- * UIKit 统一日志工具。
- *
- * 设计目标：
- * - 屏蔽 eslint `no-console` 规则，避免业务代码直接使用原生 console。
- * - 提供级别控制（debug/info/warn/error）与命名空间，方便按模块过滤。
- * - 保留底层 `log` 用于需要自定义样式的场景（如版本号横幅）。
+ * 日志工具（单一真相源已下沉 `@easemob/uikit-sdk-contract`，core 侧 re-export 保持既有导入路径兼容）。
+ * 详情见契约包 `src/utils/logger.ts`。
  */
-
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
-
-const LOG_LEVELS: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
-}
-
-const LEVEL_STYLES: Record<LogLevel, string> = {
-  debug: 'color: #6b7280',
-  info: 'color: #3b82f6',
-  warn: 'color: #f59e0b',
-  error: 'color: #ef4444',
-}
-
-let _globalLevel: LogLevel = 'info'
-
-/**
- * 日志收集 sink：每条日志（无论是否达到 console 输出级别）都会回调，
- * 供日志持久化模块（utils/log-store.ts）全量落库。
- */
-export type LogCollector = (entry: {
-  level: LogLevel
-  ns: string
-  message: string
-  args: unknown[]
-}) => void
-
-let _collector: LogCollector | null = null
-
-/** 注册日志收集 sink（内部使用，由 log-store 模块注册）。 */
-export function setLogCollector(collector: LogCollector | null): void {
-  _collector = collector
-}
-
-/** 设置全局最低日志级别，低于该级别的日志不会输出。 */
-export function setLogLevel(level: LogLevel): void {
-  _globalLevel = level
-}
-
-/** 获取当前全局日志级别。 */
-export function getLogLevel(): LogLevel {
-  return _globalLevel
-}
-
-export interface Logger {
-  debug: (message: string, ...args: unknown[]) => void
-  info: (message: string, ...args: unknown[]) => void
-  warn: (message: string, ...args: unknown[]) => void
-  error: (message: string, ...args: unknown[]) => void
-}
-
-/** 创建一个带命名空间的日志器。 */
-export function createLogger(namespace: string): Logger {
-  function logWithLevel(level: LogLevel, message: string, ...args: unknown[]): void {
-    if (_collector) {
-      try {
-        _collector({ level, ns: namespace, message, args })
-      }
-      catch {
-        // sink 异常不影响正常日志输出
-      }
-    }
-    if (LOG_LEVELS[level] < LOG_LEVELS[_globalLevel])
-      return
-    console.log(`%c[${namespace}] ${level.toUpperCase()}: ${message}`, LEVEL_STYLES[level], ...args)
-  }
-
-  return {
-    debug: (message, ...args) => logWithLevel('debug', message, ...args),
-    info: (message, ...args) => logWithLevel('info', message, ...args),
-    warn: (message, ...args) => logWithLevel('warn', message, ...args),
-    error: (message, ...args) => logWithLevel('error', message, ...args),
-  }
-}
-
-/** 默认 UIKit 日志器。 */
-export const logger = createLogger('UIKit')
-
-/** 底层原始输出，用于需要自定义样式或特殊格式的场景。 */
-export function log(message?: unknown, ...optionalParams: unknown[]): void {
-  console.log(message, ...optionalParams)
-}
+export {
+  createLogger,
+  getLogLevel,
+  log,
+  logger,
+  setLogCollector,
+  setLogLevel,
+} from '@easemob/uikit-sdk-contract'
+export type {
+  LogCollector,
+  Logger,
+  LogLevel,
+} from '@easemob/uikit-sdk-contract'

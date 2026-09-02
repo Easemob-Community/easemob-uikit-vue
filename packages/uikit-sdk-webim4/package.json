@@ -1,0 +1,39 @@
+{
+  "name": "@easemob/uikit-sdk-webim4",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Easemob UIKit SDK adapter for easemob-websdk 4.x (webim4 / private deployment)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/easemob-uikit-sdk-webim4.js",
+      "require": "./dist/easemob-uikit-sdk-webim4.umd.cjs"
+    }
+  },
+  "main": "./dist/easemob-uikit-sdk-webim4.umd.cjs",
+  "module": "./dist/easemob-uikit-sdk-webim4.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node scripts/check-reverse-dependency.mjs && vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.0 || ^4.0.0",
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@easemob/uikit-sdk-contract": "workspace:*",
+    "easemob-websdk-4": "npm:easemob-websdk@4.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.5.41",
+    "vue-tsc": "^2.2.12"
+  }
+}

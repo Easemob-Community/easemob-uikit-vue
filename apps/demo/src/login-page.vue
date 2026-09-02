@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { EmIcon, useClient } from '@easemob/uikit-im'
-import { demoPresetUsers } from './composables/use-demo-settings'
-import type { DemoPresetUser } from './composables/use-demo-settings'
+import { demoPresetUsers, demoSdkVersion, sdkIsHttpDNS, setDemoSdkVersion, setSdkIsHttpDNS } from './composables/use-demo-settings'
+import type { DemoPresetUser, DemoSdkVersion } from './composables/use-demo-settings'
+import { buildDemoSdkInitConfig, demoLogin, isWebim4Mode } from './composables/use-demo-sdk-adapter'
 
 const emit = defineEmits<{
   (e: 'login-success'): void
 }>()
+
+/** SDK 版本选项（切换后 setDemoSdkVersion 内自动整页刷新） */
+const sdkVersionOptions: { value: DemoSdkVersion, label: string }[] = [
+  { value: 'websdk5', label: '5.x websdk5' },
+  { value: 'webim4', label: '4.x webim4' },
+]
 
 const { init, login } = useClient()
 
@@ -64,12 +71,12 @@ async function handleLogin() {
 
   loading.value = true
   try {
-    // 初始化 SDK
-    init({
+    // 初始化 SDK（webim4 模式附带 isHttpDNS 透传给 4.x connection）
+    init(buildDemoSdkInitConfig({
       appKey: sdkAppKey.value,
-      ...(sdkApiUrl.value ? { apiUrl: sdkApiUrl.value } : {}),
+      apiUrl: sdkApiUrl.value,
       debug: sdkDebug.value,
-    })
+    }))
 
     const params: { user: string, accessToken?: string, password?: string } = {
       user: loginUser.value,
@@ -81,7 +88,8 @@ async function handleLogin() {
       params.password = loginPassword.value
     }
 
-    await login(params)
+    // webim4 注入模式下 core 不转发 login，demoLogin 内部直连 webim4Adapter
+    await demoLogin(login, params)
 
     // 登录成功：保存配置到 localStorage
     const configToSave = {
@@ -116,6 +124,32 @@ async function handleLogin() {
       </h1>
 
       <div class="login-form">
+        <!-- SDK 版本（切换后自动刷新页面，adapter 实例随 Provider 重建） -->
+        <div class="login-field">
+          <label class="login-label">SDK 版本</label>
+          <div class="login-preset-list">
+            <button
+              v-for="opt in sdkVersionOptions"
+              :key="opt.value"
+              type="button"
+              class="demo-btn"
+              :class="{ 'demo-btn--active': demoSdkVersion === opt.value }"
+              :title="demoSdkVersion === opt.value ? '' : '切换后自动刷新页面'"
+              @click="setDemoSdkVersion(opt.value)"
+            >
+              {{ opt.label }}
+            </button>
+            <label v-if="isWebim4Mode()" class="demo-check" title="私有化部署验证时关闭，配合 ApiUrl 透传给 4.x connection">
+              <input
+                :checked="sdkIsHttpDNS"
+                type="checkbox"
+                @change="setSdkIsHttpDNS(($event.target as HTMLInputElement).checked)"
+              >
+              <span>isHttpDNS</span>
+            </label>
+          </div>
+        </div>
+
         <!-- AppKey -->
         <div class="login-field">
           <label class="login-label">AppKey</label>
