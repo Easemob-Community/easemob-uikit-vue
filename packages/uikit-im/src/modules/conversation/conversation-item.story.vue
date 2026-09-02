@@ -112,6 +112,46 @@ function log(event: string, id?: string) {
       </div>
     </Variant>
 
+    <Variant title="名字后标签（name-suffix 插槽）">
+      <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
+        <ConversationItem
+          :conversation="groupChat"
+          @select="(id: string) => log('select', id)"
+        >
+          <template #name-suffix>
+            <span style="flex-shrink: 0; padding: 0 4px; border-radius: 4px; font-size: var(--uikit-font-size-10); line-height: 16px; color: var(--uikit-primary); background: var(--uikit-primary-color-opacity);">
+              官方
+            </span>
+          </template>
+        </ConversationItem>
+      </div>
+    </Variant>
+
+    <Variant title="仅会话信息（无头像）">
+      <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
+        <ConversationItem
+          :conversation="groupChat"
+          :show-avatar="false"
+          @select="(id: string) => log('select', id)"
+        />
+      </div>
+    </Variant>
+
+    <Variant title="未读徽标在头像">
+      <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
+        <ConversationItem
+          :conversation="groupChat"
+          unread-placement="avatar"
+          @select="(id: string) => log('select', id)"
+        />
+        <ConversationItem
+          :conversation="mutedChat"
+          unread-placement="avatar"
+          @select="(id: string) => log('select', id)"
+        />
+      </div>
+    </Variant>
+
     <Variant title="事件日志">
       <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
         <ConversationItem

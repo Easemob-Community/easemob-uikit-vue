@@ -1,5 +1,5 @@
 import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
-import type { SdkAdapter, SdkCapabilities, SdkCapabilityFlags, SdkConfig, SdkPresenceDomain, SdkRepositoryOverrides, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter, SdkCapabilities, SdkCapabilityFlags, SdkConfig, SdkPersistenceHooks, SdkPresenceDomain, SdkRepositoryOverrides, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
 import { type NoticeConfig, getNoticeConfigResolver, setNoticeConfigResolver } from '../sdk/event/notice-utils'
 import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '../sdk/event/notice-utils'
 import { t } from '../locale/messages'
@@ -333,11 +333,15 @@ export function useCoreUIKitProvider(
     // 数据入口接管合并：显式 repositories（平铺字段已归一化下沉 adapterConfig）
     // 按域整体优先于 dataSource 翻译结果；合并后走 SdkConfig 顶层字段下发
     // （adapter 读取优先级 config.repositories > adapterConfig.repositories）
-    const { repositories: explicitRepositories, ...restAdapterConfig } = (resolved.adapterConfig ?? {}) as Record<string, unknown>
+    const { repositories: explicitRepositories, persistence: explicitPersistence, ...restAdapterConfig } = (resolved.adapterConfig ?? {}) as Record<string, unknown>
     const repositories = mergeRepositoryOverrides(
       translatedRepositories,
       (resolved.repositories ?? explicitRepositories) as SdkRepositoryOverrides | undefined,
     )
+    // 旁路持久化钩子：与 repositories 同路，原样下沉不改形态（无翻译/合并），
+    // 归一化后统一走 SdkConfig 顶层字段下发
+    // （adapter 读取优先级 config.persistence > adapterConfig.persistence）
+    const persistence = (resolved.persistence ?? explicitPersistence) as SdkPersistenceHooks | undefined
     logger.info('adapter 装配开始', {
       ownership: adapterOwnership,
       appKey: resolved.appKey,
@@ -347,6 +351,7 @@ export function useCoreUIKitProvider(
       await adapter.init({
         ...resolved,
         repositories,
+        persistence,
         adapterConfig: {
           ...restAdapterConfig,
           // 场景包版本日志注入：provider options 优先（覆盖两条初始化路径）

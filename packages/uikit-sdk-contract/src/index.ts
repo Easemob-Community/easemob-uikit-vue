@@ -14,11 +14,15 @@ export * from './events'
 // 中立纯工具
 export * from './utils/logger'
 export * from './utils/normalize-user-id'
+export * from './utils/record'
 export * from './message-preview'
 export * from './stream-message'
 
 // 数据入口（repository）
 export * from './repository'
+
+// 旁路持久化（persistence 钩子）
+export * from './persistence'
 
 // 业务域接口（Domain Port）
 export * from './domains'

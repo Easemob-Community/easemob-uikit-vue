@@ -64,3 +64,4 @@
 | `loading-more` | —  |
 | `no-more`      | —  |
 | `footer`       | —  |
+| `watermark`    | —  |

@@ -30,7 +30,8 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
   <div class="token-color" style="--token-bg: #f3f4f6;"><span class="token-color__name">bg-secondary</span><span class="token-color__value">#f3f4f6</span></div>
   <div class="token-color" style="--token-bg: #f0f0f0;"><span class="token-color__name">bg-tertiary</span><span class="token-color__value">#f0f0f0</span></div>
   <div class="token-color" style="--token-bg: #ffffff; border: 1px solid var(--vp-c-divider);"><span class="token-color__name" style="color: var(--vp-c-text-1);">bg-elevated</span><span class="token-color__value" style="color: var(--vp-c-text-2);">#ffffff</span></div>
-  <div class="token-color" style="--token-bg: #e5e7eb;"><span class="token-color__name">bg-hover</span><span class="token-color__value">#e5e7eb</span></div>
+  <div class="token-color" style="--token-bg: #F5F5F5;"><span class="token-color__name">bg-hover</span><span class="token-color__value">#F5F5F5</span></div>
+  <div class="token-color" style="--token-bg: #FAFAFA; border: 1px solid var(--vp-c-divider);"><span class="token-color__name" style="color: var(--vp-c-text-1);">conversation-list-bg</span><span class="token-color__value" style="color: var(--vp-c-text-2);">#FAFAFA</span></div>
 </div>
 
 > 暗色模式对应值见 [主题定制](./theme) 页暗色段，所有颜色 token 均已在 `[data-uikit-theme="dark"]` 下重写。

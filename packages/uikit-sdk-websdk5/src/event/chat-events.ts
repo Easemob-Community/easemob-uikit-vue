@@ -6,8 +6,10 @@ import {
   createLogger,
   formatConversationPreview,
   isStreamActive,
+  toConversationRecord,
+  toMessageRecord,
 } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue, UIKitFeatures } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
@@ -230,12 +232,28 @@ function patchConversationLastMessageOnRecall(
 }
 
 /**
- * 与会话列表中已有的 UI 数据合并，优先保留已补全的名称/头像，
- * 避免 SDK 把 conversationName 回退成 conversationId 导致闪烁。
+ * 旁路持久化统一调用：fire-and-forget，钩子同步抛错 / Promise 拒绝
+ * 只告警，不阻塞消息链路（契约语义见 SdkPersistenceHooks）。
+ */
+function firePersist(run: () => void | Promise<void>) {
+  void Promise.resolve()
+    .then(run)
+    .catch(err => chatLog.warn('persistence 钩子执行失败（已忽略）:', err))
+}
+
+/**
+ * 与会话列表中已有的 UI 数据合并（并集语义，防 SDK 快照覆盖竞争）：
+ * - 重叠会话：SDK 字段覆盖，优先保留已补全的名称/头像；
+ *   SDK 快照不携带的本地字段（draft / draftTime / remindType）保留；
+ * - 本地独有会话（现有列表有、SDK 快照未提及且未被显式删除，如 DB 预填）保留，
+ *   排在 SDK 快照会话之后（按 lastMessageTime 倒序）；
+ * - 删除通道不受影响：patch.removed / CONVERSATION_DELETED 由调用方另行剔除。
  */
 function mergeWithExistingConversations(stores: EventStores, incoming: ReturnType<typeof toUiConversations>) {
-  return incoming.map((item) => {
-    const existing = stores.conversation.conversationList.find(c => c.id === item.id)
+  const existingList = stores.conversation.conversationList
+  const incomingIds = new Set(incoming.map(item => item.id))
+  const merged = incoming.map((item) => {
+    const existing = existingList.find(c => c.id === item.id)
     if (!existing)
       return item
     const keepName = (!item.name || item.name === item.id) && existing.name && existing.name !== existing.id
@@ -244,8 +262,20 @@ function mergeWithExistingConversations(stores: EventStores, incoming: ReturnTyp
       ...item,
       name: keepName ? existing.name : item.name,
       avatar: keepAvatar ? existing.avatar : item.avatar,
+      // SDK 快照不携带的本地字段保留（草稿）
+      draft: item.draft ?? existing.draft,
+      draftTime: item.draftTime ?? existing.draftTime,
+      // 免打扰状态以本地为准：SDK 会话快照恒为 DEFAULT 不携带该状态（见文件头注释），
+      // 本地由 setMuted 回写 / CONVERSATION_MUTE_INFO_CHANGED / patchConversationMuteStates 权威维护
+      isMuted: existing.isMuted,
+      remindType: existing.remindType ?? item.remindType,
     }
   })
+  // 本地独有会话：排在 SDK 快照会话之后（按 lastMessageTime 倒序）
+  const localOnly = existingList
+    .filter(c => !incomingIds.has(c.id))
+    .sort((a, b) => (b.lastMessageTime ?? 0) - (a.lastMessageTime ?? 0))
+  return [...merged, ...localOnly]
 }
 
 /**
@@ -256,9 +286,21 @@ export function createChatHandlers(
   client: ManagerHost,
   stores: EventStores,
   features?: UIKitFeatures,
+  /** 旁路持久化钩子（只写不读，fire-and-forget）；未注入时全部同步跳过 */
+  persistence?: SdkPersistenceHooks,
 ): ChatEventHandlerMap {
   // 群聊会话摘要发送者显示名解析：优先联系人备注，其次用户资料昵称
   const resolveSenderName = (userId: string) => resolveUserDisplayName(stores, userId)
+
+  // 旁路持久化钩子解包（全部可选，未注入的同步点直接跳过）
+  const {
+    saveMessage: persistSaveMessage,
+    updateMessageStatus: persistUpdateStatus,
+    markMessageRecalled: persistMarkRecalled,
+    updateMessageContent: persistUpdateContent,
+    deleteMessages: persistDeleteMessages,
+  } = persistence?.message ?? {}
+  const persistSaveConversations = persistence?.conversation?.saveConversations
 
   return {
     onSyncDataStart: (payload) => {
@@ -317,6 +359,9 @@ export function createChatHandlers(
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
             chatLog.info('conversation 同步回填', { count: merged.length })
+            // 旁路持久化：会话快照整体落库（实现方按 id upsert）
+            if (persistSaveConversations)
+              firePersist(() => persistSaveConversations(merged.map(toConversationRecord)))
           }
           stores.conversation.setConversationsLoaded(true)
           void patchConversationNames(stores, client)
@@ -374,21 +419,29 @@ export function createChatHandlers(
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
       const incoming = toUiConversations(items, { resolveSenderName })
       const merged = mergeWithExistingConversations(stores, incoming)
+      // 显式删除通道不受并集保留影响：patch.removed 命中的会话必须从结果剔除
+      const removedIds = new Set(payload.patch.removed.map(r => r.conversationId))
+      const effective = removedIds.size > 0 ? merged.filter(c => !removedIds.has(c.id)) : merged
 
       if (payload.patch.reset || payload.patch.removed.length > 0) {
-        stores.conversation.setConversationList(merged)
+        stores.conversation.setConversationList(effective)
       }
       else {
-        for (const item of merged) {
+        for (const item of effective) {
           const existing = stores.conversation.conversationList.find(c => c.id === item.id)
           if (existing) {
-            stores.conversation.updateConversation(item.id, item)
+            // 并集保留的本地独有会话对象未变（引用相等），跳过重复写入
+            if (existing !== item)
+              stores.conversation.updateConversation(item.id, item)
           }
           else {
             stores.conversation.addConversation(item)
           }
         }
       }
+      // 旁路持久化：合并后的全量列表整体落库（实现方按 id upsert）
+      if (persistSaveConversations)
+        firePersist(() => persistSaveConversations(effective.map(toConversationRecord)))
       void patchConversationNames(stores, client)
     },
 
@@ -433,6 +486,10 @@ export function createChatHandlers(
       else {
         stores.message.addMessage(uiMsg)
       }
+
+      // 旁路持久化：接收消息落库（chatRoom / CMD 早退分支不触发；实现方按 msgServerId upsert）
+      if (persistSaveMessage)
+        firePersist(() => persistSaveMessage(toMessageRecord(sdkMsg)))
 
       // 当前会话收到新消息时自动标记已读，避免刷新/重新同步后服务端未读数再次浮现。
       // 仅在页面可见时标记已读；页面隐藏时用户实际未看到，保持未读。
@@ -501,6 +558,9 @@ export function createChatHandlers(
       if (!msgId)
         return
 
+      // 旁路持久化：流式分片不落库（高频增量会造成写库热点）；
+      // 完整消息经 onMessage 丢片补偿 / 漫游回流路径自然落库（与 webim4 对齐）。
+
       const exists = stores.message.getMessages(sdkMsg.conversationId).some(
         m =>
           m.msgServerId === sdkMsg.msgServerId
@@ -525,6 +585,9 @@ export function createChatHandlers(
         return
       chatLog.info('onMessageRecalled', { messageId: payload.messageId })
       stores.message.recallMessage(payload.messageId, stores.client.currentUser)
+      // 旁路持久化：撤回墓碑（不物理删除）
+      if (persistMarkRecalled)
+        firePersist(() => persistMarkRecalled(payload.messageId, stores.client.currentUser))
       // 同步刷新会话列表最后一条消息摘要（当前会话由 chat.vue watch 处理，
       // 非当前会话需在这里主动 patch，避免列表仍显示被撤回的原消息内容）。
       patchConversationLastMessageOnRecall(
@@ -538,6 +601,9 @@ export function createChatHandlers(
     onMessageDelivered: (payload) => {
       chatLog.info('onMessageDelivered', { messageId: payload.messageId })
       stores.message.updateMessageStatus(payload.messageId, MESSAGE_STATUS.DELIVERED)
+      // 旁路持久化：送达状态回流
+      if (persistUpdateStatus)
+        firePersist(() => persistUpdateStatus(payload.messageId, MESSAGE_STATUS.DELIVERED))
     },
 
     onMessageReadReceipts: (payload) => {
@@ -553,6 +619,9 @@ export function createChatHandlers(
         else {
           for (const messageId of receipt.messageIds) {
             stores.message.updateMessageStatus(messageId, MESSAGE_STATUS.READ)
+            // 旁路持久化：单聊已读状态回流（群已读数 groupReadCount 为展示态，不落库）
+            if (persistUpdateStatus)
+              firePersist(() => persistUpdateStatus(messageId, MESSAGE_STATUS.READ))
           }
         }
       }
@@ -571,6 +640,15 @@ export function createChatHandlers(
         modifiedInfo: payload.message.modifiedInfo,
         modified: true,
       })
+      // 旁路持久化：消息编辑内容回流（body / ext / modifiedInfo）
+      if (persistUpdateContent) {
+        firePersist(() => persistUpdateContent(
+          payload.messageId,
+          payload.message.body,
+          payload.message.ext,
+          payload.message.modifiedInfo,
+        ))
+      }
     },
 
     onPinnedMessageChanged: async (payload) => {
@@ -658,6 +736,9 @@ export function createChatHandlers(
 
       if (messageIds && messageIds.length > 0) {
         stores.message.deleteMessages([...messageIds])
+        // 旁路持久化：删除墓碑（不物理删除）
+        if (persistDeleteMessages)
+          firePersist(() => persistDeleteMessages([...messageIds]))
       }
       else if (beforeTimestamp) {
         const msgs = stores.message.getMessages(conversationId)
@@ -667,6 +748,9 @@ export function createChatHandlers(
           .filter((id: string | undefined): id is string => !!id)
         if (idsToDelete.length > 0) {
           stores.message.deleteMessages(idsToDelete)
+          // 旁路持久化：删除墓碑（不物理删除）
+          if (persistDeleteMessages)
+            firePersist(() => persistDeleteMessages(idsToDelete))
         }
       }
     },

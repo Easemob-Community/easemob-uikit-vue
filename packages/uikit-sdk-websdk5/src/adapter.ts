@@ -19,6 +19,7 @@ import type {
   SdkConfig,
   SdkEventHandlers,
   SdkMessage,
+  SdkPersistenceHooks,
   SdkRepositoryOverrides,
   UIKitDataSource,
   UIKitFeatures,
@@ -1041,6 +1042,8 @@ export class Websdk5Adapter implements SdkAdapter {
   private _eventsRegistered = false
   /** 是否注册 IM 事件套件（聊天室场景关闭，见 adapterConfig.registerImEvents） */
   private _registerImEvents = true
+  /** 旁路持久化钩子（init 记账，事件处理器登出重建时仍需透传） */
+  private _persistence?: SdkPersistenceHooks
 
   constructor(private injectedClient?: UIKitClient) {}
 
@@ -1106,6 +1109,11 @@ export class Websdk5Adapter implements SdkAdapter {
        * 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，两处都读。
        */
       repositories?: SdkRepositoryOverrides
+      /**
+       * 旁路持久化钩子注入（只写不读）：core 归一化会把 SdkConfig.persistence
+       * 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，两处都读。
+       */
+      persistence?: SdkPersistenceHooks
     }
     // clientCfg 仅保留 SDK 初始化字段，剥离 features/stores/eventDeps 等 adapter 装配字段
     const {
@@ -1117,10 +1125,14 @@ export class Websdk5Adapter implements SdkAdapter {
       registerImEvents,
       managerPreset,
       repositories: adapterRepositories,
+      persistence: adapterPersistence,
       ...clientCfg
     } = adapterCfg
     // 数据入口接管：SdkConfig 顶层字段优先（直连 adapter 场景），core 归一化下沉的 adapterConfig 次之
     const repositories = config.repositories ?? adapterRepositories
+    // 旁路持久化：同 repositories 读取方式（SdkConfig 顶层优先，adapterConfig 下沉次之）
+    const persistence = config.persistence ?? adapterPersistence
+    this._persistence = persistence
 
     this._client = this.injectedClient ?? createClient({
       appKey: config.appKey,
@@ -1170,6 +1182,7 @@ export class Websdk5Adapter implements SdkAdapter {
     this._domains = {
       message: new MessageDomain(this._client, stores.message, {
         messageRepository: repositories?.message,
+        persistence: persistence?.message,
       }),
       conversation: new ConversationDomain(this._client, stores.conversation, {
         sendPendingReadReceipts: (conversationId, conversationType) => {
@@ -1182,6 +1195,7 @@ export class Websdk5Adapter implements SdkAdapter {
           return stores.userInfo.getUserInfo(userId)?.nickname
         },
         conversationRepository: repositories?.conversation,
+        persistence: persistence?.conversation,
       }),
       contact: new ContactDomain(this._client, stores.contact, {
         contactRepository: repositories?.contact,
@@ -1296,6 +1310,7 @@ export class Websdk5Adapter implements SdkAdapter {
         onTokenExpired: () => this._getFanout().onTokenExpired?.(),
       },
       this._features,
+      this._persistence,
     )
     this._eventsRegistered = true
     adapterLog.debug('[Websdk5Adapter] SDK 事件处理器已注册')

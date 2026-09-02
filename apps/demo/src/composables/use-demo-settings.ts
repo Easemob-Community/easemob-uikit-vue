@@ -178,10 +178,11 @@ export interface DemoPresetUser {
   token: string
 }
 
-/** 预设账号列表：hfp / pfh */
+/** 预设账号列表：hfp / pfh / pfh2 */
 const demoPresetUsers: DemoPresetUser[] = [
   { label: 'hfp', user: 'hfp', token: 'YWMtt1uvsJFEEfGLvmUp95pHgyZVsAd-uUblpSk5yg-TZXCn3yKQOJ8R8ZT7kRZVZ2IzAwMAAAGf1Q9A-zeeSADeavDML9qKVDwwuZeVK-eWwyTBP3Q0xPpTFGHNjPYU_Q' },
   { label: 'pfh', user: 'pfh', token: 'YWMt2L0MEpFEEfGzYtkmnAOhAiZVsAd-uUblpSk5yg-TZXCAQPjQT0cR8Y8fKcyJ0N-CAwMAAAGf1RAbvjeeSABhTlXEQ9FIBlmX4W53N7YYv8MnL7GbUEMYJ1OD91tjtg' },
+  { label: 'pfh2', user: 'pfh2', token: 'YWMtHIsOpqavEfG4cb3Jv6mCtSZVsAd-uUblpSk5yg-TZXAZ6lAwpq8R8agqMzqiXyggAwMAAAGgYWit6zeeSAAGzZ5ebuEi-0IeTYpBQ61S3SQAOuxlTpEkA1OFJdd-aQ' },
 ]
 
 /** 示例表情包（GIF），用于验证 emoji picker 的 sticker/GIF 发送链路；实际业务请替换为自有 CDN 资源 */

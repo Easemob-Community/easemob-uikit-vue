@@ -1090,13 +1090,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
     <!-- 空状态：无当前会话 -->
     <div v-else-if="!currentConversation" class="chat__empty">
       <Empty
-        icon="bubble/rect/empty"
-        :description="t('chat.empty', '请选择会话')"
+        icon="bubble/rect/2"
+        :description="t('chat.empty', '选择一个会话')"
         size="large"
       >
         <template #description>
           <slot name="empty">
-            {{ t('chat.empty', '请选择会话') }}
+            {{ t('chat.empty', '选择一个会话') }}
           </slot>
         </template>
       </Empty>
@@ -1414,6 +1414,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 空状态图标与文案：占位色 token（浅 #E6E6E6 / 深 #4B5563），可被接入方覆盖 */
+.chat__empty :deep(.uikit-empty__icon),
+.chat__empty :deep(.uikit-empty__description) {
+  color: var(--uikit-empty-icon-color, #E6E6E6);
 }
 
 /* 全局加载状态 */

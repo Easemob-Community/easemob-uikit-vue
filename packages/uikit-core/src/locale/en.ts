@@ -70,7 +70,7 @@ const messages: LocaleMessages = {
   'emoji.recent': 'Recent',
   'emoji.full': 'Emoji',
   'chat.title': 'Chat',
-  'chat.empty': 'Please select a conversation',
+  'chat.empty': 'Select a conversation',
   'chat.placeholder': 'Type a message...',
   'chat.send': 'Send',
   'chat.groupCardNotJoined': 'You have not joined this group and cannot send messages',

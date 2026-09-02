@@ -41,6 +41,17 @@ interface ConversationListProps {
   emptyText?: string
   /** 未读数量展示模式：count 显示数字，dot 仅显示红点，默认 'count' */
   unreadMode?: 'count' | 'dot'
+  /** 未读 Badge 统一位置：top-right（默认）/ bottom-right */
+  badgePlacement?: 'top-right' | 'bottom-right'
+  /**
+   * 列表风格变体：card（默认；圆角白卡、无分割线、项间距 4px）/
+   * compact（无圆角、无分割线、零间距的平铺列表）
+   */
+  variant?: 'card' | 'compact'
+  /** 会话项是否展示头像（false = 仅会话信息模式），默认 true */
+  showAvatar?: boolean
+  /** 未读徽标归位：inline 信息区行尾（默认）/ avatar 头像右上角角标 */
+  unreadPlacement?: 'inline' | 'avatar'
   /** 是否展示头部区域，默认 true */
   showHeader?: boolean
   /** Header 标题文本，不传则使用 i18n 默认值 */
@@ -79,6 +90,9 @@ const props = withDefaults(defineProps<ConversationListProps>(), {
   showScrollToTop: true,
   showSenderName: true,
   unreadMode: 'count',
+  variant: 'card',
+  showAvatar: true,
+  unreadPlacement: 'inline',
   showHeader: true,
   headerAlign: 'left',
   bodySticky: false,
@@ -104,6 +118,8 @@ const emit = defineEmits<{
   (e: 'reconnect'): void
   /** 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key */
   (e: 'header-menu-action', key: string): void
+  /** 搜索关键字变化时触发（去空格后的值，清空时为 ''），可用于埋点或远程搜索 */
+  (e: 'search', keyword: string): void
 }>()
 
 const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
@@ -206,6 +222,9 @@ const itemsRef = ref<HTMLElement>()
 const searchKeyword = ref('')
 /** 规范化后的搜索关键字（去空格），用于过滤和空状态判断 */
 const normalizedSearchKeyword = computed(() => searchKeyword.value.trim())
+
+/** 关键字变化对外抛出（埋点 / 远程搜索用） */
+watch(normalizedSearchKeyword, keyword => emit('search', keyword))
 const showHeaderMenu = ref(false)
 const headerMenuTriggerRef = ref<HTMLElement>()
 const showHeaderActionSheet = ref(false)
@@ -530,7 +549,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 </script>
 
 <template>
-  <div class="conversation-list">
+  <div class="conversation-list" :class="`conversation-list--${props.variant}`">
     <div v-if="props.showHeader" class="conversation-list__header" :class="`conversation-list__header--${props.headerAlign}`">
       <slot name="header">
         <span class="conversation-list__title">{{ props.title || t('conversation.title') }}</span>
@@ -656,6 +675,9 @@ function handleCustomAction(key: string, conversation: Conversation) {
             :message-formatter="props.messageFormatter"
             :show-sender-name="props.showSenderName"
             :unread-mode="props.unreadMode"
+            :badge-placement="props.badgePlacement"
+            :show-avatar="props.showAvatar"
+            :unread-placement="props.unreadPlacement"
             :has-at-me="!!stores.conversation.atMeMap[item.id]"
             :is-typing="item.type === CONVERSATION_TYPE.SINGLECHAT && !!stores.conversation.typingMap[item.id]"
             @select="handleSelect"
@@ -664,7 +686,12 @@ function handleCustomAction(key: string, conversation: Conversation) {
             @delete="handleDelete"
             @read="sendChannelAck"
             @custom-action="handleCustomAction"
-          />
+          >
+            <!-- 转发名字后扩展位（企业/官方 tag 等），无需整项接管 #item -->
+            <template v-if="$slots['item-name-suffix']" #name-suffix="slotProps">
+              <slot name="item-name-suffix" v-bind="slotProps" />
+            </template>
+          </ConversationItem>
         </slot>
       </template>
       <!-- 会话列表同步中（WebSocket 首次同步）：骨架屏替代转圈 -->
@@ -680,17 +707,22 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <div v-if="loadingMore" class="conversation-list__loading">
         {{ t('conversation.loadingMore') }}
       </div>
-      <Empty
+      <div
         v-if="!filteredConversationList.length && !loadingMore && !isSyncing"
-        :icon="normalizedSearchKeyword ? 'search' : 'bubble/rect/empty'"
-        :description="emptyDescription"
+        class="conversation-list__empty-wrap"
       >
-        <template #description>
-          <slot name="empty" :search-keyword="normalizedSearchKeyword" :active-tab="effectiveActiveTab">
-            {{ emptyDescription }}
-          </slot>
-        </template>
-      </Empty>
+        <Empty
+          class="conversation-list__empty"
+          :icon="normalizedSearchKeyword ? 'search' : 'list/bullet'"
+          :description="emptyDescription"
+        >
+          <template #description>
+            <slot name="empty" :search-keyword="normalizedSearchKeyword" :active-tab="effectiveActiveTab">
+              {{ emptyDescription }}
+            </slot>
+          </template>
+        </Empty>
+      </div>
       <!-- footer slot - 非 sticky 模式放在滚动容器内部 -->
       <div v-if="$slots.footer && !props.footerSticky" class="conversation-list__footer">
         <slot name="footer" />
@@ -775,6 +807,54 @@ function handleCustomAction(key: string, conversation: Conversation) {
   position: relative;
   /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽，保证 tab 栏内部横向滚动成立 */
   min-width: 0;
+  /* 列表自带底色（默认 #FAFAFA，暗色 #111827）；接入方可覆盖 --uikit-conversation-list-bg 定制 */
+  background: var(--uikit-conversation-list-bg, #FAFAFA);
+}
+
+/* ===== 风格变体（列表根作用域覆写 Cell 变量，不影响全局主题） ===== */
+
+/* card（默认）：圆角白卡、无分割线、项间距 4px */
+.conversation-list--card {
+  --uikit-cell-bg: var(--uikit-bg-elevated);
+  --uikit-cell-gap: 4px;
+  --uikit-item-hover-radius: 8px;
+  --uikit-item-active-radius: 8px;
+}
+
+/* 卡片列表的可视区内边距 */
+.conversation-list--card .conversation-list__items {
+  padding: 4px;
+}
+
+/* 卡片模式下头部与项内容对齐：标题左缘对齐头像左缘、+ 按钮右缘对齐时间戳右缘
+   （= 列表内边距 4px + Cell 内容水平内边距，跟随 --uikit-item-hover-padding-x 主题配置） */
+.conversation-list--card .conversation-list__header {
+  padding-left: calc(4px + var(--uikit-item-hover-padding-x, 16px));
+  padding-right: calc(4px + var(--uikit-item-hover-padding-x, 16px));
+}
+
+/* 分栏 / 搜索的水平边界与卡片项左右对齐（均为 4px 内缩） */
+.conversation-list--card :deep(.conversation-tabs) {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.conversation-list--card .conversation-list__search {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* 卡片模式下 hover/active 背景顶满整卡（默认 is-inset-hover 会水平内缩，与卡片圆角不匹配） */
+.conversation-list--card :deep(.uikit-cell.is-inset-hover)::before {
+  inset: 0;
+}
+
+/* compact：无圆角、无分割线、零间距的平铺列表 */
+.conversation-list--compact {
+  --uikit-cell-bg: transparent;
+  --uikit-cell-gap: 0px;
+  --uikit-item-hover-radius: 0px;
+  --uikit-item-active-radius: 0px;
 }
 
 .conversation-list__header {
@@ -875,6 +955,9 @@ function handleCustomAction(key: string, conversation: Conversation) {
   overscroll-behavior-y: contain;
   /* 键盘导航时容器可获得焦点，但不显示默认轮廓 */
   outline: none;
+  /* flex 列布局：让空状态撑高层可以用 flex:1 占满剩余可视区（不依赖百分比高度，不产生溢出滚动条） */
+  display: flex;
+  flex-direction: column;
 }
 
 /* 键盘方向键高亮：与当前激活会话区分开，提供导航视觉反馈 */
@@ -887,6 +970,34 @@ function handleCustomAction(key: string, conversation: Conversation) {
   text-align: center;
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
+}
+
+/* 空状态撑高层：flex:1 占满列表剩余可视区；自身无 padding，不会产生溢出滚动条 */
+.conversation-list__empty-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 空状态占位规格：图标 100×100（占位色 token），文案 16px（占位文本色 token），间距 8px；
+   flex:1 填满撑高层，配合 EmEmpty 根节点自身的 justify-content: center 实现垂直居中 */
+.conversation-list__empty {
+  gap: 8px;
+  flex: 1;
+}
+
+.conversation-list__empty :deep(.uikit-empty__icon) {
+  color: var(--uikit-empty-icon-color, #E0E0E0);
+}
+
+.conversation-list__empty :deep(.uikit-empty__icon svg) {
+  width: 100px;
+  height: 100px;
+}
+
+.conversation-list__empty :deep(.uikit-empty__description) {
+  font-size: var(--uikit-font-size-16);
+  color: var(--uikit-empty-text-color, #BDBDBD);
 }
 
 .conversation-list__skeleton {

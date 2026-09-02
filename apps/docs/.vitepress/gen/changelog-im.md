@@ -1,3 +1,41 @@
+## @easemob/uikit-im 3.2.0 (2026-09-02)
+
+
+### 新增
+
+- **会话列表风格变体**：`ConversationContainer` / `ConversationList` 新增 `variant`（`card` 默认：圆角白卡、无分割线、项间距 4px / `compact`：无圆角、无分割线、零间距，列表根作用域覆写 Cell 变量实现，不影响全局主题）、`showAvatar`（false = 仅会话信息模式）、`unreadPlacement`（`avatar` 时未读徽标带白描边挂在头像右上角）；`badgePlacement` 三层透传统一未读徽标位置。
+- **会话项扩展与事件**：新增 `#name-suffix` 插槽（名字后企业/官方 tag，list 层 `#item-name-suffix`、container 层 `#itemNameSuffix` 透传，scope 含会话数据）；新增 `search` 事件（去空格关键字，埋点/远程搜索用）。
+- **会话列表自带底色**：`--uikit-conversation-list-bg`（浅 `#FAFAFA` / 深 `#111827`），card 变体下头部/分栏/搜索与卡片项边界对齐、头部与项内容线对齐。
+- **空状态规格化**：会话列表空态启用新图标 `list/bullet`（100×100 占位色 + 16px 文案 + 垂直居中，规格走 `--uikit-empty-*` token）；聊天区无会话空态图标换 `bubble/rect/2`，默认文案「选择一个会话」。
+
+### 变更
+
+- **会话项排版对齐设计规范**：用户名 16px/600、时间 12px tertiary、消息预览 14px，两行行距 6px；置顶底色与 hover 同值（`--uikit-bg-hover`）；置顶/免打扰图标换面性图标（`filled/pin` / `filled/bell/slash`，`--uikit-icon-muted` 同色）且置顶补齐与免打扰一致的摇动动画；免打扰/dot 模式未读点校准为 8×8、`#FF7070`（去除免打扰染灰的历史行为）。
+
+### 破坏性行为变更
+
+- `EmBadge` 的 `size` 枚举由 `'normal' | 'small'` 改为 `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`（默认 `'l'`），旧值不再合法（见 core 2.3.0）。
+
+---
+
+## @easemob/uikit-im 3.1.0 (2026-09-02)
+
+
+### 新增
+
+- **会话消息内存淘汰（opt-in）**：`MessageStoreOptions` 新增 `maxCachedConversations`，开启后按 LRU 淘汰超额会话的消息缓存（联动清理合并消息/已读成员/@我/发送中缓存，并重置历史翻页游标），最近活跃会话受保护；默认不开启，Web 行为完全不变。面向 Electron/桌面端长期挂机场景，为本地持久化专项预留衔接点（淘汰后回访经 fetchHistory 漫游回源，DB 阶段由 repository 本地回源无缝接管）。
+
+### 性能
+
+- **消息 store 热路径优化**：单条消息插入改「尾序快路径 + 二分插入」，去除每消息全量拷贝排序；`_findMessageById` 维护 msgId→会话索引（未命中回退全表扫描并自愈），回执/撤回/编辑/删除等按 ID 定位从「全会话全表扫描」降为单会话内定位。
+- **presence 全链路默认关闭**：`usePresence` composable 层增加开关硬门（见 websdk5/webim4 行为变更）；会话列表 presence 订阅改无条件 watch + 空数组源，修复运行时再开启不生效的问题。
+
+### 修复
+
+- 会话右键菜单锚点节点、消息定位高亮定时器补充卸载清理；消息气泡缩略图加 `loading="lazy"`。
+
+---
+
 ## @easemob/uikit-im 3.0.0 (2026-09-02)
 
 

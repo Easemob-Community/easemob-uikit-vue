@@ -1,6 +1,6 @@
 import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
-import type { ConversationTypeValue, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, MessagePersistenceHooks, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId, toMessageRecord } from '@easemob/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
 import { formatSdkError } from '../utils/sdk-error'
@@ -101,6 +101,21 @@ export interface MessageDomainOptions {
    * is consumed (fetchHistory delegation) for now.
    */
   messageRepository?: Partial<MessageRepository>
+  /**
+   * 旁路持久化钩子（只写不读）：发送成功 / SDK 漫游回流后 fire-and-forget
+   * 同步给本地库；注入 loadMessages 路径数据来自 DB，不写回。
+   */
+  persistence?: MessagePersistenceHooks
+}
+
+/**
+ * 旁路持久化统一调用：fire-and-forget，钩子同步抛错 / Promise 拒绝
+ * 只告警，不阻塞消息链路（契约语义见 SdkPersistenceHooks）。
+ */
+function firePersist(run: () => void | Promise<void>) {
+  void Promise.resolve()
+    .then(run)
+    .catch(err => messageLogger.warn('persistence 钩子执行失败（已忽略）:', err))
 }
 
 /**
@@ -356,6 +371,10 @@ export class MessageDomain {
       }
       const uiMsg = toUiMessage(sent, this.currentUserId)
       this.store.replaceWithSent(localId, uiMsg)
+      // 旁路持久化：发送成功落库；发送失败（markFailed 分支）不入库
+      const saveMessage = this.options.persistence?.saveMessage
+      if (saveMessage)
+        firePersist(() => saveMessage(toMessageRecord(sent)))
       return sent
     }
     catch (error) {
@@ -417,10 +436,14 @@ export class MessageDomain {
     })
 
     // CMD 消息为透传命令，不应上屏渲染；历史消息入口也主动过滤。
-    const uiMsgs = page.items
-      .filter(msg => msg.type !== MESSAGE_TYPE.CMD)
-      .map(msg => toUiMessage(msg, this.currentUserId))
+    const historyItems = page.items.filter(msg => msg.type !== MESSAGE_TYPE.CMD)
+    const uiMsgs = historyItems.map(msg => toUiMessage(msg, this.currentUserId))
     this.store.prependMessages(conversationId, uiMsgs)
+
+    // 旁路持久化：仅 SDK 漫游路径批量落库；注入 loadMessages 路径数据来自 DB，不写回
+    const saveMessages = this.options.persistence?.saveMessages
+    if (saveMessages && historyItems.length > 0)
+      firePersist(() => saveMessages(historyItems.map(msg => toMessageRecord(msg))))
 
     // 群聊历史消息（刷新首屏与上滑翻页共用此路径）：getHistoryMessages 返回的
     // 离线消息不带群已读数（groupReadCount），需调用 getGroupMessageReadReceipts
@@ -491,6 +514,11 @@ export class MessageDomain {
       conversationType,
       messageId,
     })
+    // 旁路持久化：本端主动撤回成功后立即落墓碑
+    // （SDK 的 onMessageRecalled 回推仅在线通道派发，回推路径在 chat-events 另有落库，upsert 幂等）
+    const markRecalled = this.options.persistence?.markMessageRecalled
+    if (markRecalled)
+      firePersist(() => markRecalled(messageId, this.currentUserId))
   }
 
   /** 批量发送消息已读回执（统一 API，支持单聊/群聊） */

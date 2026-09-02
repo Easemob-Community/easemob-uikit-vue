@@ -3,11 +3,16 @@
 
 ### Props
 
-| 属性            | 类型                   | 默认值        | 说明                                                                         |
+| 属性            | 类型                   | 默认值        | 说明                                                                                                                                     |
 | --- | --- | --- | --- |
-| show          | `boolean`            | —          | 是否显示面板，内部按 v-if 渲染；关闭时通过 update:show 通知父组件 / Whether to show the picker    |
-| stickerPacks  | `EmojiStickerPack[]` | `() => []` | 表情包（sticker pack）列表，默认 [] 不展示表情包 tab / Sticker packs to show as extra tabs |
-| closeOnSelect | `boolean`            | `false`    | 选择 emoji / sticker 后自动关闭，默认 false                                          |
+| show          | `boolean`            | —          | 是否显示面板，内部按 v-if 渲染；关闭时通过 update:show 通知父组件 / Whether to show the picker                                                                |
+| stickerPacks  | `EmojiStickerPack[]` | `() => []` | 表情包（sticker pack）列表，默认 [] 不展示表情包 tab / Sticker packs to show as extra tabs                                                             |
+| closeOnSelect | `boolean`            | `false`    | 选择 emoji / sticker 后自动关闭，默认 false                                                                                                      |
+| recent        | `boolean`            | `true`     | 是否启用「常用」最近使用区（置于表情视图顶部），默认 true；关闭后不展示常用区也不再记录 / Whether to enable the recent-emoji section at the top of the emoji view, default true |
+| recentCount   | `number`             | `5`        | 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5                                                                 |
+| tabsPosition  | `EmojiTabsPosition`  | `'bottom'` | tab 位置：顶部/底部/左侧/右侧，默认 'bottom' / Tabs position: top/bottom/left/right, default 'bottom'                                                |
+| stickerHover  | `boolean`            | `true`     | sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true                        |
+| emojiIcon     | `string`             | —          | 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text         |
 
 ### Events
 

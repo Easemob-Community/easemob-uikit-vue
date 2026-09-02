@@ -82,8 +82,8 @@ export interface FindLocaleKeyOptions {
  * 支持单个文案或批量文案查询。
  *
  * 示例：
- *   findLocaleKey('暂无会话')                   // ['conversation.empty']
- *   findLocaleKey(['暂无会话', '发送名片'])      // ['conversation.empty', 'demo.card.send']
+ *   findLocaleKey('没有会话')                   // ['conversation.empty']
+ *   findLocaleKey(['没有会话', '发送名片'])      // ['conversation.empty', 'demo.card.send']
  *   findLocaleKey('发送', { exact: true })
  *   findLocaleKey('No conversation', { locale: 'en' })
  */

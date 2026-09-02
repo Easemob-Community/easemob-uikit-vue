@@ -244,6 +244,7 @@ await adapter.init({
 
 - repository 接口在 Phase 1 已定义好，但**第一版 5.x adapter 仍以 domain port 为主**。
 - repository 是留给 Phase 3 Electron / 本地 DB 持久化的口子：业务只要实现 `MessageRepository` / `ConversationRepository`，即可把 SQLite / 本地库注入为数据来源。
+- **persistence 旁路写库槽（2026-09-02 落地，Phase 3.2/3.4 前置）**：`SdkConfig.persistence?: SdkPersistenceHooks`（契约包 `src/persistence.ts`）——与 repository 的「数据入口接管」语义分立，persistence 是**旁路写库**（SDK 行为不变，收发事件后旁路同步）。入库 DTO `MessageRecord`/`ConversationRecord`（墓碑字段 `recalled`/`deleted`/`tombstoneTime`）与清洗函数 `toMessageRecord`/`toConversationRecord` 在契约包（`types/message/record.ts`、`utils/record.ts`）；双 adapter 已在发送成功/漫游回流/收发事件/撤回/编辑/回执/多设备删除/会话回填逐点接线（fire-and-forget，失败仅告警；repository 注入路径不写回；流式分片不落库）。未注入时行为零变化。
 - 旧 `UIKitDataSource`（`uikit-provider.vue` 的 `dataSource` prop）已标记 `@deprecated`，统一迁移方向是 repository；保留至下个大版本移除。
 
 **加工本地数据源时：**

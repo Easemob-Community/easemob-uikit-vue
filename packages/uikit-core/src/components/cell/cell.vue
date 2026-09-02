@@ -128,6 +128,8 @@ function onContextmenu(e: MouseEvent) {
   padding: 0 var(--uikit-item-hover-padding-x, 16px);
   margin: 0 var(--uikit-item-hover-margin-x, 0px) var(--uikit-cell-gap, 3px);
   height: var(--uikit-cell-height, 64px);
+  /* 项背景（默认透明；hover/active 背景层 ::before 绘制在其上） */
+  background: var(--uikit-cell-bg, transparent);
   border-radius: var(--uikit-item-hover-radius, 0px);
   transition: opacity var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
   -webkit-touch-callout: none;
@@ -245,6 +247,7 @@ function onContextmenu(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: var(--uikit-text-secondary);
 }
 
 /* main */
@@ -295,6 +298,7 @@ function onContextmenu(e: MouseEvent) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  color: var(--uikit-text-secondary);
 }
 
 .uikit-cell__arrow {

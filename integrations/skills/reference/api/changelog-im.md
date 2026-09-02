@@ -1,5 +1,123 @@
+## @easemob/uikit-im 3.1.0 (2026-09-02)
+
+
+### 新增
+
+- **会话消息内存淘汰（opt-in）**：`MessageStoreOptions` 新增 `maxCachedConversations`，开启后按 LRU 淘汰超额会话的消息缓存（联动清理合并消息/已读成员/@我/发送中缓存，并重置历史翻页游标），最近活跃会话受保护；默认不开启，Web 行为完全不变。面向 Electron/桌面端长期挂机场景，为本地持久化专项预留衔接点（淘汰后回访经 fetchHistory 漫游回源，DB 阶段由 repository 本地回源无缝接管）。
+
+### 性能
+
+- **消息 store 热路径优化**：单条消息插入改「尾序快路径 + 二分插入」，去除每消息全量拷贝排序；`_findMessageById` 维护 msgId→会话索引（未命中回退全表扫描并自愈），回执/撤回/编辑/删除等按 ID 定位从「全会话全表扫描」降为单会话内定位。
+- **presence 全链路默认关闭**：`usePresence` composable 层增加开关硬门（见 websdk5/webim4 行为变更）；会话列表 presence 订阅改无条件 watch + 空数组源，修复运行时再开启不生效的问题。
+
+### 修复
+
+- 会话右键菜单锚点节点、消息定位高亮定时器补充卸载清理；消息气泡缩略图加 `loading="lazy"`。
+
+---
+
+## @easemob/uikit-im 3.0.0 (2026-09-02)
+
+
+### 新增
+
+- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob/uikit-sdk-contract` 与两个适配器包 `@easemob/uikit-sdk-websdk5`（5.x）/ `@easemob/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
+- **子路径入口**：新增 `@easemob/uikit-im/websdk5` 与 `@easemob/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
+- **Provider 新能力**：新增 `adapter` prop（注入模式：业务自带 adapter 实例，UIKit 不转发 login/logout）；`sdkConfig.repositories` 数据入口注入（message/conversation/contact/group/presence/userInfo 全域可接管）；`useUIKit()` 暴露 `capabilities`（adapter 上报的 SDK 客观能力矩阵，与 features 取交集决定能力入口）；core 新增模块级 `getUIKitAdapter()` 支持非 Vue 上下文访问。
+- **4.x 适配补齐**：登录后按 features 预取联系人/群组（对齐 5.x 同步体感）；漫游坏消息容错（单条解码失败跳过不拖垮整页）。
+
+### 修复
+
+- **群主转让状态校准**：4.x `changeOwner` 事件 payload 不携带新群主，经 pending 标记识别真正的 newOwner，同步校准群资料 owner、当前用户角色与新旧群主成员角色，避免角色闪回与权限残留。
+- **建群成员数偏差**：创建群后用本地已知的创建成员数兜底校准 `memberCount`，避免服务端/事件导致的短暂计数偏差。
+
+### 破坏性行为变更
+
+- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
+- **`UIKitDataSource` 维持 `@deprecated`（本版本不移除）**：已收口为 repository 注入的薄别名（core 装配时逐项翻译，显式 `repositories` 优先）；`searchUsers` 等无 repository 对应项的接管面迁移目标尚未设计，移除调整至 4.0.0。
+
+---
+
+## @easemob/uikit-im 2.8.6 (2026-08-28)
+
+
+### 修复
+
+- **数据同步「有数据但 UI 空」**：SDK 自动同步完成后好友/群组列表仍可能为空——通讯录计数、列表容器挂载等路径在同步完成前读 SDK 内存（尚未同步的空快照）并锁定 `loaded`，导致 `onSyncDataFinished` 的回填被 `if (!loaded)` 跳过（日志呈现 `contact 回填 {loaded: true, sdkCount: N, storeCount: 0}`）。修复三层配合：① 计数改为只读（`getLocalCount()` 不写 store 不锁定 loaded）；② 回填兜底（`loaded` 为真但列表为空时仍回填 SDK 数据）；③ 消费 `onSyncDataFinished` 的 `status` 字段——同步失败输出日志，conversation 失败且可重试时自动 `refreshSessionList()` 重试一次。
+- **新增 `useSyncStatus()` hook**：暴露 conversation / contact / group 三类数据的同步阶段（idle / syncing / success / failed）与 `isSyncing` / `allFinished`，业务方可感知同步进度并在失败后自行补偿（contact/group 无 SDK 主动同步接口，失败后只能等待下次连接/登录自动同步）。
+
+---
+
+## @easemob/uikit-im 2.8.5 (2026-08-28)
+
+
+### 修复
+
+- **GIF / 表情包发送后动图不播放（服务端返回静态图地址）**：`sendImage` 发送图片消息时未给 SDK 传 `createImageMessage` 的 `isGif` 标记，SDK 把 GIF 当普通图片上传，返回的 `chatfiles/*` 地址是静态图。现按 MIME（`image/gif`）或文件名/URL 后缀（`.gif`）自动判定并传 `isGif: true`，SDK 按 GIF 动图处理，配合 2.8.4 的渲染修复（`isGif` 消息展示动画原图）动图可正常播放。
+
+---
+
+## @easemob/uikit-im 2.8.4 (2026-08-28)
+
+
+### 修复
+
+- **GIF / 表情包消息展示为静态缩略图、不播放动图**：`image-message.vue` 的 `displayUrl` 对图片消息统一优先 `thumbnailUrl`（SDK 生成的静态缩略图），当消息体 `isGif` 为真（或 `ext.isSticker` 表情包）时改为优先展示动画原图（`originalImageUrl` / `bigImageUrl` / `localUrl`），恢复 gif 动图播放。
+
+---
+
+## @easemob/uikit-im 2.8.3 (2026-08-28)
+
+
+### 修复
+
+- **表情包（sticker）发送失败**：本地打包资源（如 demo 的 gif 资产路径）作为 sticker `url` 时，SDK 无法按 URL 上传（`Attachment file is required`）。现 `onStickerSelect` 先 `fetch` 该地址转成 `File` 再以图片消息发送；远程 URL 能 fetch 也走 File，跨域失败则回落为原 URL 字符串（保持按 URL 引用）。
+
+---
+
+## @easemob/uikit-im 2.8.2 (2026-08-28)
+
+
+### 调整
+
+- **表情面板「常用」区仅在有最近使用时显示**：从未选过表情不展示「常用」空态占位；`emoji.recentEmpty` 文案随之移除。
+- **移除内置 emoji 悬停放大预览**：删除 `ChatConfig.input.emoji.emojiPreview` 配置，表情视图不再弹放大预览小窗；sticker 的 hover 预览图 → gif 切换保留不变。
+
+---
+
+## @easemob/uikit-im 2.8.1 (2026-08-28)
+
+
+### 调整
+
+- **表情面板「常用」与「Emoji」合并为单一视图**：不再分「常用 / Emoji」两个 tab，改为在表情视图顶部展示「常用」最近使用区、下方为完整 Emoji 列表，同一滚动区（与设计稿对齐）；底部 tab 只区分表情视图与表情包。`recentIcon` 配置随之移除（无消费方）；`recent` / `recentCount` / `emojiIcon` / `emojiPreview` 等其余配置语义不变。
+
+---
+
+## @easemob/uikit-im 2.8.0 (2026-08-28)
+
+
+### 新增
+
+- **表情面板重构与配置化**（`EmEmojiPicker` / `ChatConfig.input.emoji`）：
+  - 「常用」改为**动态最近使用**：默认开启、localStorage 按 `appKey + userId` 隔离持久化、保留最近 5 个（`recentCount` 可配）；关闭 `recent` 后不展示常用 tab 也不再记录；
+  - 新增独立「Emoji」完整列表 tab；表情包（`stickerPacks`）注入的 tab **默认不自动选中**（打开时常用有内容优先常用，否则回落到 Emoji）；
+  - 新增配置：`recent` / `recentCount` / `tabsPosition`（`top | bottom | left | right`，**默认 `bottom`**）/ `stickerHover` / `recentIcon` / `emojiIcon` / `emojiPreview`；
+  - sticker 支持 `thumbUrl` 预览图 + `url` 动图 + `name` 标题：默认展示预览图，悬停切换 gif、移出恢复（触屏不启用）；内置 emoji 悬停放大预览（`emojiPreview` 可关）；
+  - 每个 tab 项均可配预览小图：表情包取 `iconUrl`（缺省自动回落包内第一个 sticker 预览图），内置「常用 / Emoji」tab 走 `recentIcon` / `emojiIcon`。
+
+### 修复
+
+- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob/uikit-core` 1.5.0）。
+
+---
+
 ## @easemob/uikit-im 2.7.0 (2026-08-27)
 
+
+### 破坏性变更
+
+- **输入框风格枚举更名**（`ChatConfig.input.style` / `InputStyle`）：`'feishu' | 'wechat'` 替换为 `'toolbar-top' | 'toolbar-bottom'`（脱离厂牌话术，改为工具栏方向语义），默认值由 `'wechat'` 变为 `'toolbar-top'`。迁移映射：`wechat`（工具栏在上）→ `toolbar-top`，`feishu`（工具栏在下）→ `toolbar-bottom`；旧值直接移除，下游调用方需同步替换。
 
 ### 新增
 

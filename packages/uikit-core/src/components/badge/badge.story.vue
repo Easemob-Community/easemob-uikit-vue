@@ -50,23 +50,40 @@ import Avatar from '../avatar/avatar.vue'
     </Variant>
     <Variant title="Digital Capsule Sizes">
       <div class="u-flex u-gap-4">
-        <Badge :count="8" size="normal">
-          <Avatar name="N1" />
+        <Badge dot size="xs">
+          <Avatar name="XS" />
         </Badge>
-        <Badge :count="88" size="normal">
-          <Avatar name="N2" />
+        <Badge :count="8" size="s">
+          <Avatar name="S" />
         </Badge>
-        <Badge :count="888" size="normal">
-          <Avatar name="N3" />
+        <Badge :count="8" size="m">
+          <Avatar name="M" />
         </Badge>
-        <Badge :count="8" size="small">
-          <Avatar name="S1" />
+        <Badge :count="8" size="l">
+          <Avatar name="L" />
         </Badge>
-        <Badge :count="88" size="small">
+        <Badge :count="8" size="xl">
+          <Avatar name="XL" />
+        </Badge>
+        <Badge :count="8" size="xxl">
+          <Avatar name="2L" />
+        </Badge>
+      </div>
+      <div class="u-flex u-gap-4">
+        <Badge :count="88" size="s">
           <Avatar name="S2" />
         </Badge>
-        <Badge :count="888" size="small">
-          <Avatar name="S3" />
+        <Badge :count="88" size="m">
+          <Avatar name="M2" />
+        </Badge>
+        <Badge :count="88" size="l">
+          <Avatar name="L2" />
+        </Badge>
+        <Badge :count="88" size="xl">
+          <Avatar name="X2" />
+        </Badge>
+        <Badge :count="888" size="xxl">
+          <Avatar name="23" />
         </Badge>
       </div>
     </Variant>
@@ -86,6 +103,22 @@ import Avatar from '../avatar/avatar.vue'
         </Badge>
         <Badge dot variant="stroked">
           <Avatar name="SD" />
+        </Badge>
+      </div>
+    </Variant>
+    <Variant title="Placement & Bordered">
+      <div class="u-flex u-gap-4">
+        <Badge :count="8" placement="top-right">
+          <Avatar name="TR" />
+        </Badge>
+        <Badge :count="8" placement="bottom-right">
+          <Avatar name="BR" />
+        </Badge>
+        <Badge :count="8" placement="bottom-right" bordered>
+          <Avatar name="BB" />
+        </Badge>
+        <Badge dot placement="bottom-right" bordered color="var(--uikit-presence-online-color, #6CE191)">
+          <Avatar name="ON" />
         </Badge>
       </div>
     </Variant>

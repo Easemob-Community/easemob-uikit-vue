@@ -1,3 +1,4 @@
+import type { SdkPersistenceHooks } from './persistence'
 import type { SdkRepositoryOverrides } from './repository'
 
 /** 中立初始化配置，只含 SDK 无关字段 */
@@ -17,6 +18,16 @@ export interface SdkConfig {
    * it as `config.repositories ?? adapterCfg.repositories`.
    */
   repositories?: SdkRepositoryOverrides
+  /**
+   * 旁路持久化钩子注入（Electron 本地库 SQLite 专项留口子）。
+   * 与 `repositories` 的区别：`repositories` 是数据入口接管（替换 SDK 读路径），
+   * `persistence` 是旁路写库（SDK 行为不变，收发事件后 fire-and-forget 同步给本地库）。
+   * 两套接口互斥语义、可同时注入（写库 + 读路径接管由实现方自行组合）。
+   * Bypass-persistence hook injection (Electron local SQLite). Unlike `repositories`
+   * (data-source takeover replacing SDK read paths), `persistence` is side-channel
+   * write-only: SDK behavior unchanged, fire-and-forget sync after events.
+   */
+  persistence?: SdkPersistenceHooks
   /**
    * SDK 特定配置透传槽：现有 `sdkConfig` 的 `enableSyncData`/`deviceId`/
    * `enableUserInfoSync`/`managers`（chatroom 的 ChatRoomManager 注入也走这里）等

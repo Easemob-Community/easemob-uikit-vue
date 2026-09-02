@@ -1,4 +1,4 @@
-import type { ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
@@ -90,6 +90,11 @@ export class ConversationDomain {
        * `fetchConversations` is consumed (refresh delegation) for now.
        */
       conversationRepository?: Partial<ConversationRepository>
+      /**
+       * 旁路持久化钩子（只写不读）：当前由 chat-events 会话同步分支消费
+       * （saveConversations），本域预留口子保持装配对称，暂不消费。
+       */
+      persistence?: ConversationPersistenceHooks
     } = {},
   ) {}
 

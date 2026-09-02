@@ -1,7 +1,7 @@
 import { createConnectionHandlers } from './connection-events'
 import type { ConnectionEventCallbacks } from './connection-events'
 import type { ManagerHost } from '../client'
-import type { UIKitFeatures } from '@easemob/uikit-sdk-contract'
+import type { SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import { resetSyncStatus } from '../use-sync-status'
 import type { EventStores } from './types'
 import { createChatHandlers, resetChatEventState } from './chat-events'
@@ -18,9 +18,11 @@ export function registerEventHandlers(
   stores: EventStores,
   connectionCallbacks: ConnectionEventCallbacks = {},
   features?: UIKitFeatures,
+  /** 旁路持久化钩子（只写不读，fire-and-forget），透传给 chat 事件套件 */
+  persistence?: SdkPersistenceHooks,
 ) {
   const connHandlers = createConnectionHandlers(stores, connectionCallbacks)
-  const chatHandlers = createChatHandlers(client, stores, features)
+  const chatHandlers = createChatHandlers(client, stores, features, persistence)
   const contactHandlers = createContactHandlers(stores)
   const groupHandlers = createGroupHandlers(stores)
   const presenceHandlers = createPresenceHandlers(stores)

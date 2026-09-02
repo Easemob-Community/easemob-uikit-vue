@@ -1,0 +1,15 @@
+## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
+
+
+### 新增
+
+- **旁路持久化契约（D122 Phase 3.2/3.4 前置）**：新增入库 DTO `MessageRecord`（`SdkMessage` + 墓碑字段 `recalled`/`deleted`/`tombstoneTime`）与 `ConversationRecord`；新增清洗函数 `toMessageRecord`/`toConversationRecord`（纯 TS，剥离 File/Blob/函数、combine `messageList` 递归、`ext` 限深防循环引用）；新增 `SdkPersistenceHooks`（`message`/`conversation` 两域钩子，全部可选、fire-and-forget 语义）；`SdkConfig` 新增 `persistence` 槽（旁路写库，与 `repositories` 数据入口接管语义分立）。
+
+---
+
+## @easemob/uikit-sdk-contract 1.0.0 (2026-09-02)
+
+
+### 新增
+
+- **首次发布**：SDK 中立契约包——中立 wire 类型（`SdkMessage` / `UiMessage` / `UiConversation` / `UiGroup` / `UserInfo` 等）、常量、事件集、repository 数据入口接口、domains 业务域接口（Domain Port）、`SdkCapabilities` 能力矩阵（boolean 能力位 + `contractVersion` / `meta.reason` / `minContractVersion` 协商机制）、`SdkAdapter` 组合接口与初始化配置，及少量中立纯工具（logger / normalizeUserId / message-preview / stream-message）。零 SDK、零 UI 框架依赖。

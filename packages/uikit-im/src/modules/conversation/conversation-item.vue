@@ -28,6 +28,12 @@ export interface ConversationItemProps {
   showSenderName?: boolean
   /** 未读数显示模式 */
   unreadMode?: 'count' | 'dot'
+  /** 未读 Badge 位置：top-right（默认）/ bottom-right */
+  badgePlacement?: 'top-right' | 'bottom-right'
+  /** 是否展示头像（false = 仅会话信息模式），默认 true */
+  showAvatar?: boolean
+  /** 未读徽标归位：inline 信息区行尾（默认）/ avatar 头像右上角角标 */
+  unreadPlacement?: 'inline' | 'avatar'
   /** 是否有人@我 */
   hasAtMe?: boolean
   /** 对方是否正在输入（仅单聊） */
@@ -40,6 +46,8 @@ const props = withDefaults(defineProps<ConversationItemProps>(), {
   unreadMode: 'count',
   hasAtMe: false,
   isTyping: false,
+  showAvatar: true,
+  unreadPlacement: 'inline',
 })
 
 const emit = defineEmits<{
@@ -108,6 +116,21 @@ watch(() => props.conversation.isMuted, (muted, prev) => {
 
 function onMuteBadgeAnimEnd() {
   muteShaking.value = false
+}
+
+/** 置顶开启时图钉摇摆动画（与免打扰摇铃同一机制：仅在状态由关闭变为开启时触发一次；全局动画关闭时跳过） */
+const pinShaking = ref(false)
+watch(() => props.conversation.isPinned, (pinned, prev) => {
+  if (pinned && !prev && theme.animationEnabled) {
+    pinShaking.value = false
+    requestAnimationFrame(() => {
+      pinShaking.value = true
+    })
+  }
+})
+
+function onPinBadgeAnimEnd() {
+  pinShaking.value = false
 }
 
 /** H5 长按 ActionSheet */
@@ -300,6 +323,9 @@ const displayDraft = computed(() => {
   return features.enableDraft !== false && !!props.conversation.draft
 })
 
+/** 未读是否强制圆点：全局 dot 模式或会话免打扰 */
+const unreadDot = computed(() => props.unreadMode === 'dot' || props.conversation.isMuted)
+
 /** 显示消息内容：正在输入 > 草稿 > 最后消息，并用 messageFormatter 格式化 */
 const displayMessage = computed(() => {
   if (props.isTyping) {
@@ -340,7 +366,7 @@ const displayMessage = computed(() => {
   <Cell
     v-bind="$attrs"
     auto-height
-    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': effectiveHasAtMe }]"
+    :class="[props.class, { 'is-pinned': conversation.isPinned, 'is-muted': conversation.isMuted, 'has-at-me': effectiveHasAtMe, 'conversation-item--no-avatar': !props.showAvatar }]"
     @click="onClick"
     @contextmenu="onContextMenu"
     @touchstart="longPress.start"
@@ -349,7 +375,24 @@ const displayMessage = computed(() => {
     @touchcancel="longPress.cancel"
   >
     <template #leading>
-      <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
+      <!-- 未读徽标归位头像时：角标包裹头像（白描边分界，mute/dot 模式为 8×8 小圆点） -->
+      <Badge
+        v-if="props.showAvatar && props.unreadPlacement === 'avatar' && props.conversation.unreadCount"
+        :count="props.conversation.unreadCount"
+        :dot="unreadDot"
+        :size="unreadDot ? 'xs' : 'l'"
+        placement="top-right"
+        bordered
+      >
+        <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
+      </Badge>
+      <Avatar
+        v-else-if="props.showAvatar"
+        :name="conversationName"
+        :src="conversationAvatar"
+        :size="48"
+        :presence="peerPresence"
+      />
       <slot name="item-prefix" />
     </template>
     <div class="conversation-item__info">
@@ -364,8 +407,14 @@ const displayMessage = computed(() => {
             />
             {{ conversationName }}
           </span>
-          <span v-if="props.conversation.isPinned" class="conversation-item__pin-badge">
-            <Icon name="pin/fill" :size="12" />
+          <!-- 名字后扩展位：企业/官方 tag、认证图标等，scope 透传会话数据 -->
+          <slot name="name-suffix" :conversation="props.conversation" />
+          <span
+            v-if="props.conversation.isPinned"
+            class="conversation-item__pin-badge"
+            @animationend="onPinBadgeAnimEnd"
+          >
+            <Icon name="filled/pin" :size="12" :anim="pinShaking ? 'shake' : undefined" />
           </span>
           <Transition name="uikit-mute-badge">
             <span
@@ -373,7 +422,7 @@ const displayMessage = computed(() => {
               class="conversation-item__mute-badge"
               @animationend="onMuteBadgeAnimEnd"
             >
-              <Icon name="bell/slash" :size="12" :anim="muteShaking ? 'shake' : undefined" />
+              <Icon name="filled/bell/slash" :size="12" :anim="muteShaking ? 'shake' : undefined" />
             </span>
           </Transition>
         </div>
@@ -402,12 +451,13 @@ const displayMessage = computed(() => {
             <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
           </template>
         </span>
+        <!-- 未读徽标：数字档 l；免打扰/全局 dot 模式为 8×8 圆点（xs），颜色保持默认 badge 红 -->
         <Badge
-          v-if="props.conversation.unreadCount"
+          v-if="props.conversation.unreadCount && props.unreadPlacement === 'inline'"
           :count="props.conversation.unreadCount"
-          :dot="props.unreadMode === 'dot' || props.conversation.isMuted"
-          :color="props.conversation.isMuted ? 'var(--uikit-text-secondary)' : undefined"
-          size="small"
+          :dot="unreadDot"
+          :size="unreadDot ? 'xs' : 'l'"
+          :placement="props.badgePlacement"
         />
       </div>
       <slot name="item-suffix" />
@@ -452,7 +502,8 @@ const displayMessage = computed(() => {
 <style scoped>
 /* 会话项状态覆盖 EmCell 根样式 */
 .uikit-cell.is-pinned {
-  background-color: rgba(var(--uikit-primary-rgb), 0.04);
+  /* 置顶底色与 hover 色值一致（--uikit-bg-hover），盖在 card 变体的项背景之上 */
+  background-color: var(--uikit-bg-hover);
   border-radius: var(--uikit-item-active-radius);
 }
 
@@ -465,12 +516,17 @@ const displayMessage = computed(() => {
   gap: 12px;
 }
 
+/* 无头像模式：leading 为空（未提供 item-prefix 插槽）时整体隐藏，避免残留间距 */
+.conversation-item--no-avatar :deep(.uikit-cell__leading):empty {
+  display: none;
+}
+
 .conversation-item__info {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .conversation-item__top,
@@ -488,8 +544,9 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__name {
-  font-size: var(--uikit-font-size-14);
-  font-weight: 500;
+  font-size: var(--uikit-font-size-16);
+  font-weight: var(--uikit-font-weight-semibold);
+  line-height: 20px;
   color: var(--uikit-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -498,7 +555,6 @@ const displayMessage = computed(() => {
 
 .conversation-item__name.is-at-me {
   color: var(--uikit-primary);
-  font-weight: 600;
 }
 
 .conversation-item__at-me-icon {
@@ -511,14 +567,16 @@ const displayMessage = computed(() => {
 .conversation-item__pin-badge {
   display: inline-flex;
   align-items: center;
-  color: var(--uikit-primary);
+  /* 置顶图标不跟随主题色，与免打扰图标同走弱化图标色 token */
+  color: var(--uikit-icon-muted, #949A9E);
   flex-shrink: 0;
+  transform-origin: top center;
 }
 
 .conversation-item__mute-badge {
   display: inline-flex;
   align-items: center;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-icon-muted, #949A9E);
   flex-shrink: 0;
   transform-origin: top center;
 }
@@ -538,13 +596,15 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__time {
-  font-size: var(--uikit-font-size-11);
-  color: var(--uikit-text-secondary);
+  font-size: var(--uikit-font-size-12);
+  line-height: 16px;
+  color: var(--uikit-text-tertiary);
   flex-shrink: 0;
 }
 
 .conversation-item__message {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-14);
+  line-height: 18px;
   color: var(--uikit-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;

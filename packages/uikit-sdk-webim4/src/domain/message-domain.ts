@@ -2,6 +2,7 @@ import WebIM from 'easemob-websdk-4'
 import type { EasemobChat } from 'easemob-websdk-4'
 import type {
   ConversationTypeValue,
+  MessagePersistenceHooks,
   MessageRepository,
   SdkMessage,
   UiMessage,
@@ -14,10 +15,12 @@ import {
   isTextBody,
   isVoiceBody,
   normalizeUserId,
+  toMessageRecord,
 } from '@easemob/uikit-sdk-contract'
 import { toUiMessage, toWebim4MessageBody } from '../adapter/message-adapter'
 import type { Webim4Client } from '../client'
 import type { MessageStoreLike } from '../event/types'
+import { firePersistenceHook } from '../persistence'
 
 const messageLogger = createLogger('UIKit:Webim4MessageDomain')
 const historyLogger = createLogger('UIKit:Webim4History')
@@ -80,6 +83,14 @@ export interface MessageDomainOptions {
    * is consumed (fetchHistory delegation) for now.
    */
   messageRepository?: Partial<MessageRepository>
+  /**
+   * 旁路持久化钩子（Electron 本地库 SQLite 留口子，对齐 websdk5）：
+   * - 发送成功后 `saveMessage`（发送失败不入库）；
+   * - 漫游历史回流（SDK 路径）批量 `saveMessages`；
+   *   注入 repository 路径（数据来自 DB）不写回；
+   * - 全部 fire-and-forget，钩子异常只告警不阻塞消息链路。
+   */
+  messagePersistence?: MessagePersistenceHooks
 }
 
 /**
@@ -355,6 +366,13 @@ export class MessageDomain {
       sent.msgLocalId = result.localMsgId || localId
       sent.msgServerId = result.serverMsgId || sent.msgServerId
       this.store.replaceWithSent(localId, sent)
+      // 旁路持久化：发送成功落库（发送失败 markFailed 分支不入库，对齐 websdk5）
+      firePersistenceHook(
+        messageLogger,
+        'saveMessage',
+        this.options.messagePersistence?.saveMessage,
+        toMessageRecord(sent as SdkMessage),
+      )
       return sent as SdkMessage
     }
     catch (error) {
@@ -415,6 +433,13 @@ export class MessageDomain {
       .filter(msg => msg.type !== 'cmd')
       .map(msg => toUiMessage(msg, this.currentUserId))
     this.store.prependMessages(conversationId, uiMsgs)
+    // 旁路持久化：漫游历史回流批量落库（仅 SDK 路径；注入 repository 路径数据来自 DB，不写回）
+    firePersistenceHook(
+      historyLogger,
+      'saveMessages',
+      this.options.messagePersistence?.saveMessages,
+      uiMsgs.map(msg => toMessageRecord(msg as SdkMessage)),
+    )
 
     return {
       list: uiMsgs,
@@ -431,6 +456,15 @@ export class MessageDomain {
       to: conversationId,
       chatType: conversationType,
     })
+    // 旁路持久化：本端主动撤回成功后立即落墓碑
+    // （4.x onRecallMessage 仅 msync 回推通道派发，回推路径在 chat-events 另有落库，upsert 幂等）
+    firePersistenceHook(
+      messageLogger,
+      'markMessageRecalled',
+      this.options.messagePersistence?.markMessageRecalled,
+      messageId,
+      this.currentUserId,
+    )
   }
 
   /** 发送单条消息已读回执（4.x：发 type:'read' 消息，群聊即群已读回执） */

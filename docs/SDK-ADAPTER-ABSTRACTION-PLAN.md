@@ -1,6 +1,6 @@
 # SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）设计执行计划
 
-> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 代码项全部落地——含 webim4 子路径入口、新消息通知引擎、注入 client 模式单测、摇树验收（2026-08-31 执行通过，结果见 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）——剩真实 4.x 环境手测矩阵 + 私有化端到端验收（人工项）；契约层残留债务已闭环（repository/domains 双线收敛、capabilities 协商机制、四域 repository 注入、`UIKitDataSource` 薄别名收口、im 侧 capabilities 消费接线）；Phase 3.2~3.5（DB/Electron 专项）未启动**（2026-08-31 更新，明细见 TECH-DEBT D122 进度备忘）
+> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 代码项全部落地——含 webim4 子路径入口、新消息通知引擎、注入 client 模式单测、摇树验收（2026-08-31 执行通过，结果见 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）——剩真实 4.x 环境手测矩阵 + 私有化端到端验收（人工项）；契约层残留债务已闭环（repository/domains 双线收敛、capabilities 协商机制、四域 repository 注入、`UIKitDataSource` 薄别名收口、im 侧 capabilities 消费接线）；Phase 3.2 前置（persistence 旁路写库钩子）/3.3（会话覆盖竞争并集合并）/3.4（DTO 序列化清洗）已于 2026-09-02 落地（明细见 TECH-DEBT D122 进度备忘），剩 Phase 3.5（Electron SQLite 实现包 + 登录 DB 预填时序）与搜索接口未启动**（2026-09-02 更新，明细见 TECH-DEBT D122 进度备忘）
 > 对应 TECH-DEBT D122（SDK 抽象），联动 D85（Electron 持久化预研，见 `docs/ELECTRON-PERSISTENCE-RESEARCH.md`）。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：会话列表 API 修正为 `getServerConversations`（游标分页）；补 4.x 消息体字段映射表（`msg`/`thumb`/`length`/`addr`/`customEvent` 等差异）与事件模型差异（`onMessage` 批量数组、回执独立回调）；`SdkAdapter` 补操作面；Provider 兼容策略明确为非 breaking；UMD 全局名决策修正；chatroom 本期暂缓接入 adapter。
 > **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
@@ -331,6 +331,56 @@ interface MessageRepository {
 | 3.5 | Electron 实现：SQLite 住主进程 + IPC 桥接 repository 实现 + Electron 环境适配点（麦克风/外链/下载/本地文件/SDK 平台适配） | 端到端持久化可用 |
 
 > 3.2~3.5 为后续 DB 接入时的扩展，**不影响第一版"无本地库"上线**；IPC 边界与一致性已定（见「五、已确认决策」第 12/13 条：DTO 分离 + 服务端权威 + 墓碑 + `msgServerId` 去重），冷启动"先读本地 vs 先连 SDK"的时序细节留待 DB 专项启动时确认。
+>
+> **状态速查**：3.1 已落地；3.2 的「本地优先读」由 repository 注入 + 3.6 的 SQLite 实现承载，UIKit 侧无需额外改动；3.3/3.4 及 3.2 所需的 persistence 旁路写库钩子已于 2026-09-02 落地；剩 3.5 实现包与 3.6 未决项。
+
+### Phase 3.6 后续 TODO（Electron 实现与验证清单）
+
+> 以下清单供 Electron 专项启动时逐项打勾验证；UI 侧已留好接口，实现包实现并注入即可。
+
+#### 一、SQLite 实现包（新建独立包，不进 UIKit 本体）
+
+- [ ] 包命名与目录：`@easemob/uikit-persist-sqlite`（参考），主进程 + 渲染进程双入口；`better-sqlite3` 声明为 peer/optional，不污染 Web 产物。
+- [ ] Schema 设计：
+  - `messages` 表：以 `msgServerId` + `conversationId` 为去重键，字段与 `MessageRecord` 一一对应；`recalled`/`deleted`/`tombstoneTime` 墓碑字段；索引 `(conversationId, timestamp)`。
+  - `conversations` 表：与 `ConversationRecord` 一一对应；索引 `(lastMessageTime DESC)`。
+  - `messages_fts` 虚表：消息全文搜索；`conversations_fts` 可选。
+  - 附件只存元数据，不存二进制。
+- [ ] 主进程 repository：实现 `MessagePersistenceHooks` + `ConversationPersistenceHooks`；`saveMessages` 批量事务、`saveConversations` 批量事务；按 `msgServerId` upsert；失败只 warn。
+- [ ] IPC 桥：渲染进程导出的 `IpcMessagePersistence`/`IpcConversationPersistence` 实现契约接口，DTO JSON 传输，分页不拉全量。
+- [ ] repository 读实现（可选放在同一包或分离）：实现 `MessageRepository.loadMessages`（本地优先，命中直接返回；未命中 `hasMore=false` 让 UIKit 走漫游）和 `ConversationRepository.fetchConversations`。
+
+#### 二、登录与冷启动时序（需与业务一起拍板）
+
+- [ ] 确定「先读本地还是先连 SDK」：
+  - 方案 A：login 成功后先读本地 DB → `setConversationList` + 最近 N 条 `prependMessages` → 再连 SDK；
+  - 方案 B：先连 SDK `onSyncDataStart('conversation')` 时读本地 → 与后续 `onSyncDataFinished` 并集合并（UIKit 侧 3.3 已支持）。
+- [ ] 离线登录：无网络时只读本地库，SDK 连接失败走现有断网态；网络恢复后 SDK 同步 + 并集合并。
+- [ ] 会话/消息本地无数据时，UIKit `chat.vue` 自动走 `fetchHistory` 漫游回源（已支持）。
+
+#### 三、UIKit 侧剩余小项
+
+- [ ] 搜索接口进契约：`MessageRepository.searchMessages` / `ConversationRepository.searchConversations`（返回 `{ list, cursor?, hasMore }`），Electron 侧用 FTS5 实现。
+- [ ] `maxCachedConversations` 透出：从 store options 接到 Provider / `ChatContainer` props，Electron 场景默认给一个值（如 30~50）。
+- [ ] UI 展示态入库（可选 v2）：翻译/语音转文字/置顶标记是否进 `MessageRecord`，以及转换链路是否保留；v1 不入库，重启后由功能链路自然重建。
+
+#### 四、Electron 环境适配点（D85 已列）
+
+- [ ] 麦克风权限：`webContents.setPermissionRequestHandler` 放行 `getUserMedia`。
+- [ ] 外链拦截：`window.open` / 消息气泡中的 URL 接管为系统浏览器打开。
+- [ ] 下载桌面化：`utils/download.ts` 注入「另存为 / 打开所在目录」策略。
+- [ ] 本地文件拖入/选择：主进程读文件转 `File`/`Blob`，`InitConfig.useCustomAttachmentUpload` 接主进程直传。
+- [ ] SDK 平台适配：`easemob-websdk/platform/` 通过 `InitConfig.platformAdapterOptions` 覆盖宿主能力。
+
+#### 五、验收矩阵
+
+- [ ] 冷启动离线出画面（会话列表 + 最近消息）。
+- [ ] 在线收发消息：store 即时更新 + SQLite 旁路写入，失败不阻塞。
+- [ ] 翻页本地优先：内存 300 条翻穿后读 SQLite，未命中再走漫游。
+- [ ] 撤回/编辑/删除多端同步：墓碑与 deleteMessages 在多端一致。
+- [ ] 搜索 P95：万级消息全文搜索耗时 / 不阻塞 UI。
+- [ ] 长挂机内存：启用 `maxCachedConversations` 后曲线不再线性增长；log-store 无空转（本轮已修）。
+- [ ] 大群压力：高频回执/已读不再触发全表扫描（本轮已修）。
 
 ---
 

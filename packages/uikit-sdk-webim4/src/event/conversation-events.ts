@@ -1,5 +1,7 @@
 import type { EasemobChat } from 'easemob-websdk-4'
+import type { SdkPersistenceHooks } from '@easemob/uikit-sdk-contract'
 import { createLogger } from '@easemob/uikit-sdk-contract'
+import { firePersistenceHook } from '../persistence'
 import type { EventStores } from './types'
 
 const conversationLog = createLogger('UIKit:Webim4ConversationEvents')
@@ -16,11 +18,15 @@ const conversationLog = createLogger('UIKit:Webim4ConversationEvents')
  *   `pinnedConversation` / `unpinnedConversation` / `deleteConversation` /
  *   `markConversation` / `unMarkConversation`（ConversationChangedInfo），
  *   `setSilentModeForConversation` / `removeSilentModeForConversation`（NotificationConMultiDeviceInfo），
- *   `deleteRoaming`（漫游消息删除，消息链路职责，此处不处理）。
+ *   `deleteRoaming`（漫游消息删除，消息链路职责：4.x 仅到会话粒度、不带 messageIds，
+ *   对齐 websdk5 onMultiDeviceMessageRemoved 的近似语义——清空该会话本地消息并落删除墓碑）。
  *   其余 operation（chatThread 系列 / memberAttributesUpdate / setSilentModeForUser）
  *   分属 thread/group/全局免打扰域，不在本文件处理。
  */
-export function createConversationHandlers(stores: EventStores): Partial<EasemobChat.EventHandlerType> {
+export function createConversationHandlers(
+  stores: EventStores,
+  persistence?: SdkPersistenceHooks,
+): Partial<EasemobChat.EventHandlerType> {
   return {
     onMultiDeviceEvent: (event) => {
       switch (event.operation) {
@@ -84,8 +90,25 @@ export function createConversationHandlers(stores: EventStores): Partial<Easemob
           })
           break
         }
+        case 'deleteRoaming': {
+          // 漫游消息多设备删除（消息链路职责）：4.x 事件仅到会话粒度
+          // （RoamingDeleteMultiDeviceInfo 不带 messageIds/beforeTimestamp），
+          // 对齐 websdk5 onMultiDeviceMessageRemoved 的近似语义——
+          // 该会话本地已加载消息全部删除，并旁路落删除墓碑。
+          const msgs = stores.message.getMessages(event.conversationId)
+          const ids = msgs
+            .map(m => m.msgServerId || m.msgLocalId)
+            .filter((id): id is string => !!id)
+          conversationLog.info('onMultiDeviceEvent deleteRoaming', { conversationId: event.conversationId, count: ids.length })
+          if (ids.length === 0)
+            break
+          stores.message.deleteMessages(ids)
+          // 旁路持久化：删除墓碑（deleted + tombstoneTime 由实现方置位）
+          firePersistenceHook(conversationLog, 'deleteMessages', persistence?.message?.deleteMessages, ids)
+          break
+        }
         default:
-          // deleteRoaming（消息链路）/ chatThread* / memberAttributesUpdate / setSilentModeForUser 不在此处理
+          // chatThread* / memberAttributesUpdate / setSilentModeForUser 不在此处理
           break
       }
     },

@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-sdk-websdk5",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "Easemob UIKit SDK adapter for easemob-websdk 5.x (client / domain / event / adapter implementation)",
   "exports": {
     ".": {

@@ -24,7 +24,7 @@ import {
   useUIKit,
   useViewport,
 } from '@easemob/uikit-im'
-import type { ConversationTabKey, CustomMessageBody, UiContact, UiConversation, UiGroup, UiMessage } from '@easemob/uikit-im'
+import type { ConversationTabKey, CustomMessageBody, UiContact, UiGroup, UiMessage } from '@easemob/uikit-im'
 import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
@@ -244,100 +244,6 @@ const sidebarTab = ref<'conversation' | 'contact'>('conversation')
 const h5Page = ref<'list' | 'chat' | 'detail'>('list')
 
 const showSettings = ref(false)
-
-/* ============== 会话分栏 Mock 演示数据 ============== */
-
-/**
- * 登录后若会话列表为空（账号无会话或 SDK 同步未完成），注入一组 mock 会话
- * 用于演示「全部 / 未读 / @我 / 单聊 / 群组」分栏效果；
- * 一旦见到真实列表（SDK 同步或业务创建）即停止兜底注入。
- */
-const sawRealConversationList = ref(false)
-let mockConversationsInjected = false
-
-function injectMockConversations() {
-  const now = Date.now()
-  const list: UiConversation[] = [
-    {
-      id: 'mock_alice',
-      name: 'Alice',
-      type: 'singleChat',
-      unreadCount: 2,
-      lastMessageText: '晚上一起吃饭吗？',
-      lastMessageTime: now - 5 * 60 * 1000,
-      isPinned: true,
-      isMuted: false,
-      marks: [],
-    },
-    {
-      id: 'mock_dev_group',
-      name: '产品技术交流群',
-      type: 'groupChat',
-      unreadCount: 5,
-      lastMessageText: 'Tom: 新版本已经发布，大家看下',
-      lastMessageTime: now - 12 * 60 * 1000,
-      isPinned: false,
-      isMuted: false,
-      marks: [],
-    },
-    {
-      id: 'mock_bob',
-      name: 'Bob',
-      type: 'singleChat',
-      unreadCount: 0,
-      lastMessageText: '文件已发送',
-      lastMessageTime: now - 30 * 60 * 1000,
-      isPinned: false,
-      isMuted: false,
-      marks: [],
-    },
-    {
-      id: 'mock_qa_group',
-      name: 'QA 测试组',
-      type: 'groupChat',
-      unreadCount: 3,
-      lastMessageText: 'Lily: 回归用例已更新',
-      lastMessageTime: now - 2 * 60 * 60 * 1000,
-      isPinned: false,
-      isMuted: true,
-      marks: [],
-    },
-    {
-      id: 'mock_carol',
-      name: 'Carol',
-      type: 'singleChat',
-      unreadCount: 0,
-      lastMessageText: '收到，谢谢！',
-      lastMessageTime: now - 24 * 60 * 60 * 1000,
-      isPinned: false,
-      isMuted: false,
-      marks: [],
-    },
-  ]
-  stores.conversation.setConversationList(list)
-  // @我 标记：与 chat-events 的 em_at_list 命中机制同源（store 层 atMeMap）
-  stores.conversation.setAtMe('mock_alice', true)
-  stores.conversation.setAtMe('mock_dev_group', true)
-  mockConversationsInjected = true
-}
-
-/** 会话列表为空且不在同步中时兜底注入 mock；见到真实数据后不再注入 */
-watch(
-  [
-    () => stores.conversation.conversationList.length,
-    () => stores.conversation.isSyncingConversations,
-  ],
-  ([len, syncing]) => {
-    if (len > 0) {
-      sawRealConversationList.value = true
-      mockConversationsInjected = false
-      return
-    }
-    if (!syncing && !sawRealConversationList.value && !mockConversationsInjected)
-      injectMockConversations()
-  },
-  { immediate: true },
-)
 
 /** 当前右侧主区域展示的联系人详情用户 ID */
 const detailUserId = ref<string | null>(null)

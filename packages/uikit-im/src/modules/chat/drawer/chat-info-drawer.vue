@@ -1093,7 +1093,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 /* 关闭按钮 hover 底色走 --uikit-bg-hover 语义 token：
-   跟随主题明暗默认值（浅 #e5e7eb / 深 #374151），也跟随 hoverColor 自定义配置；
+   跟随主题明暗默认值（浅 #F5F5F5 / 深 #374151），也跟随 hoverColor 自定义配置；
    相比旧硬编码 rgba 值视觉接近，且不再需要单独维护深色覆盖。 */
 
 @media (hover: hover) {

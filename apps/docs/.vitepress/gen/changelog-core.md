@@ -1,3 +1,44 @@
+## @easemob/uikit-core 2.3.0 (2026-09-02)
+
+
+### 新增
+
+- **Badge 档位体系**：尺寸扩为六档 `xs`（仅 8px 圆点）/ `s` / `m` / `l`（默认）/ `xl` / `xxl`（单位数正圆、多位数药丸按规格表）；新增 `placement`（`top-right` 默认 / `bottom-right`）与 `bordered`（2px 描边与头像分界，`box-shadow` 外环实现、随背景色自适应、不与 stroked 描边冲突）；新增导出类型 `BadgePlacement`。
+- **语义 token**：`--uikit-cell-bg`（Cell 项背景，默认透明，会话列表 card 变体覆写为浮层色）、`--uikit-conversation-list-bg`、`--uikit-empty-icon-color` / `--uikit-empty-text-color`、`--uikit-badge-bg`（徽标默认背景 `#FF7070`，独立于 danger 语义色）；新增图标 `list/bullet`，`filled/pin` 更换新版资源。
+
+### 变更
+
+- **token 默认值校准（对齐设计色板）**：`--uikit-bg-hover` 浅 `#e5e7eb` → `#F5F5F5`；`--uikit-bg-active` 浅色 alpha 0.08 → 0.12（≈ 主色 12% 叠白，视觉对齐 `#E5F5FF` 且保持跟随主色）；`--uikit-icon-muted` 浅 `#B6B8BF` → `#949A9E`。
+- locale 默认文案：`conversation.empty`「暂无会话」→「没有会话」，`chat.empty`「请选择会话」→「选择一个会话」（en 同步为 `Select a conversation`）。
+
+### 破坏性行为变更
+
+- **`BadgeSize` 枚举重定义**：`'normal' | 'small'` → `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`，`size` prop 默认值 `'l'`；Badge 默认色由 `--uikit-danger-color` 改为 `--uikit-badge-bg`（`#FF7070`）。
+
+---
+
+## @easemob/uikit-core 2.2.0 (2026-09-02)
+
+
+### 新增
+
+- **`SdkConfig.persistence` 透传槽**：旁路写库钩子（`SdkPersistenceHooks`）随 `repositories` 同路经 core 归一化下沉 `adapterConfig` 下发 adapter（`resolved.persistence ?? adapterConfig.persistence` 归一），未注入时行为零变化。
+
+---
+
+## @easemob/uikit-core 2.1.0 (2026-09-02)
+
+
+### 性能
+
+- **日志持久化空闲零唤醒**：log-store 落库定时器由常驻 `setInterval` 改为 `setTimeout` 链，缓冲清空即停表，消除 Electron/长会话场景每 2s 空转唤醒。
+
+### 行为变更
+
+- **`usePresence` 增加开关硬门**：`subscribePresence`/`unsubscribePresence`/`fetchPresence`/`publishPresence`/`watch` 在 `features.enablePresence === false` 时全部 no-op（fetch 返回空数组），不再依赖各调用点自觉 gate；开启时行为不变。
+
+---
+
 ## @easemob/uikit-core 2.0.0 (2026-09-02)
 
 

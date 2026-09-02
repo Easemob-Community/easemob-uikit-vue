@@ -25,6 +25,17 @@ export interface ConversationContainerProps {
   emptyText?: string
   /** 未读数显示模式：'count' 显示数字，'dot' 只显示红点，默认 'count' */
   unreadMode?: 'count' | 'dot'
+  /** 未读 Badge 统一位置：top-right（默认）/ bottom-right */
+  badgePlacement?: 'top-right' | 'bottom-right'
+  /**
+   * 列表风格变体：card（默认；圆角白卡、无分割线、项间距 4px）/
+   * compact（无圆角、无分割线、零间距的平铺列表）
+   */
+  variant?: 'card' | 'compact'
+  /** 会话项是否展示头像（false = 仅会话信息模式），默认 true */
+  showAvatar?: boolean
+  /** 未读徽标归位：inline 信息区行尾（默认）/ avatar 头像右上角角标 */
+  unreadPlacement?: 'inline' | 'avatar'
   /** 是否展示头部区域，默认 true */
   showHeader?: boolean
   /** Header 标题文本 */
@@ -70,6 +81,9 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   customActions: () => [],
   showSenderName: true,
   unreadMode: 'count',
+  variant: 'card',
+  showAvatar: true,
+  unreadPlacement: 'inline',
   showHeader: true,
   headerAlign: 'left',
   bodySticky: false,
@@ -90,6 +104,8 @@ const emit = defineEmits<{
   (e: 'reconnect'): void
   /** 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key */
   (e: 'header-menu-action', key: string): void
+  /** 搜索关键字变化时触发（去空格后的值，清空时为 ''），可用于埋点或远程搜索 */
+  (e: 'search', keyword: string): void
 }>()
 
 const { refreshConversations } = useConversation()
@@ -136,6 +152,10 @@ function handleReconnect() {
       :show-sender-name="props.showSenderName"
       :empty-text="props.emptyText"
       :unread-mode="props.unreadMode"
+      :badge-placement="props.badgePlacement"
+      :variant="props.variant"
+      :show-avatar="props.showAvatar"
+      :unread-placement="props.unreadPlacement"
       :show-header="props.showHeader"
       :title="props.title"
       :header-align="props.headerAlign"
@@ -153,6 +173,7 @@ function handleReconnect() {
       @conversation-click="handleConversationClick"
       @reconnect="handleReconnect"
       @header-menu-action="(key: string) => emit('header-menu-action', key)"
+      @search="(keyword: string) => emit('search', keyword)"
     >
       <template v-if="$slots['tabs']" #tabs="slotProps">
         <slot name="tabs" v-bind="slotProps" />
@@ -174,6 +195,9 @@ function handleReconnect() {
       </template>
       <template v-if="$slots['item']" #item="slotProps">
         <slot name="item" v-bind="slotProps" />
+      </template>
+      <template v-if="$slots['itemNameSuffix']" #item-name-suffix="slotProps">
+        <slot name="item-name-suffix" v-bind="slotProps" />
       </template>
       <template v-if="$slots['headerMenu']" #header-menu="slotProps">
         <slot name="header-menu" v-bind="slotProps" />

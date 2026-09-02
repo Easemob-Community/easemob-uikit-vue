@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { UIKitFeatures } from '@easemob/uikit-sdk-contract'
+import type { SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { resetSyncStatus } from '../use-sync-status'
 import { resetReadReceiptState } from '../domain/message-domain'
@@ -29,6 +29,7 @@ export function registerEventHandlers(
   stores: EventStores,
   connectionCallbacks: ConnectionEventCallbacks = {},
   features?: UIKitFeatures,
+  persistence?: SdkPersistenceHooks,
 ): () => void {
   const conn = client.connection
   if (!conn)
@@ -36,8 +37,8 @@ export function registerEventHandlers(
 
   const merged: EasemobChat.EventHandlerType = {
     ...createConnectionHandlers(stores, connectionCallbacks),
-    ...createChatHandlers(client, stores, features),
-    ...createConversationHandlers(stores),
+    ...createChatHandlers(client, stores, features, persistence),
+    ...createConversationHandlers(stores, persistence),
     ...createContactHandlers(stores),
     ...createGroupHandlers(stores),
     ...createPresenceHandlers(stores),

@@ -10,6 +10,7 @@ import type {
   SdkConfig,
   SdkEventHandlers,
   SdkMessage,
+  SdkPersistenceHooks,
   SdkRepositoryOverrides,
   UIKitDataSource,
   UIKitFeatures,
@@ -1004,6 +1005,8 @@ export class Webim4Adapter implements SdkAdapter {
   private _disposeSyncListener?: () => void
   /** SDK 事件处理器是否已注册（logout 后置 false，login 前重建） */
   private _eventsRegistered = false
+  /** 旁路持久化钩子（init 时从 SdkConfig/adapterConfig 读取，透传 domain 与事件层） */
+  private _persistence?: SdkPersistenceHooks
 
   constructor(private injectedClient?: Webim4Client) {}
 
@@ -1067,6 +1070,12 @@ export class Webim4Adapter implements SdkAdapter {
        * 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，两处都读。
        */
       repositories?: SdkRepositoryOverrides
+      /**
+       * 旁路持久化钩子（Electron 本地库 SQLite 留口子）：core 归一化会把
+       * SdkConfig.persistence 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，
+       * 两处都读（读取方式与 repositories 一致）。
+       */
+      persistence?: SdkPersistenceHooks
     }
     // 4.x 无 managers/managerPreset/registerImEvents 装配字段（能力挂单一 connection），
     // 剥离 features/dataSource/stores/eventDeps 等 adapter 装配字段后，
@@ -1081,12 +1090,15 @@ export class Webim4Adapter implements SdkAdapter {
       onUserInfoSubscriptionPermissionError,
       prefetchOnLogin,
       repositories: adapterRepositories,
+      persistence: adapterPersistence,
       ...clientCfg
     } = adapterCfg
 
     this._prefetchOnLogin = prefetchOnLogin ?? true
     // 数据入口接管：SdkConfig 顶层字段优先（直连 adapter 场景），core 归一化下沉的 adapterConfig 次之
     const repositories = config.repositories ?? adapterRepositories
+    // 旁路持久化：读取方式与 repositories 一致（顶层优先，adapterConfig 次之）
+    this._persistence = config.persistence ?? adapterPersistence
 
     this._client = this.injectedClient ?? createClient({ appKey: config.appKey, ...clientCfg })
 
@@ -1188,6 +1200,7 @@ export class Webim4Adapter implements SdkAdapter {
     this._domains = {
       message: new MessageDomain(this._client, stores.message, {
         messageRepository: repositories?.message,
+        messagePersistence: this._persistence?.message,
       }),
       conversation: new ConversationDomain(this._client, stores.conversation, {
         sendPendingReadReceipts: (conversationId, conversationType) => {
@@ -1205,6 +1218,7 @@ export class Webim4Adapter implements SdkAdapter {
           return list[list.length - 1]?.msgServerId
         },
         conversationRepository: repositories?.conversation,
+        conversationPersistence: this._persistence?.conversation,
       }),
       contact: new ContactDomain(this._client, stores.contact, {
         contactRepository: repositories?.contact,
@@ -1344,6 +1358,7 @@ export class Webim4Adapter implements SdkAdapter {
         onTokenExpired: () => this._getFanout().onTokenExpired?.(),
       },
       this._features,
+      this._persistence,
     )
     this._eventsRegistered = true
     adapterLog.debug('[Webim4Adapter] SDK 事件处理器已注册')

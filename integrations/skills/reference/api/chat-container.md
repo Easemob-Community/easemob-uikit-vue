@@ -169,22 +169,23 @@
 
 > 输入框配置
 
-| 属性               | 类型                                                                              | 默认值 | 说明                                                                                                                                   |
+| 属性               | 类型                                                                                                     | 默认值 | 说明                                                                                                                                   |
 | --- | --- | --- | --- |
-| mode             | `InputMode`                                                                     | —   | 输入框模式，默认 'simple'                                                                                                                    |
-| style            | `InputStyle`                                                                    | —   | 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上                                                                 |
-| features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>   | —   | 功能开关                                                                                                                                 |
-| autoFocus        | `boolean`                                                                       | —   | 是否自动聚焦输入框，默认 false                                                                                                                   |
-| focusBorderColor | `string`                                                                        | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                       |
-| caretColor       | `string`                                                                        | —   | 光标颜色，不设置则使用默认                                                                                                                        |
-| selectionColor   | `string`                                                                        | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                                      |
-| maxLength        | `number`                                                                        | —   | 最大输入长度，0 或不设置表示无限制                                                                                                                   |
-| mention          | <a class="config-ref" href="#config-input-mention"><strong>提及配置（@）</strong></a> | —   | 提及配置（@）                                                                                                                              |
-| enableTyping     | `boolean`                                                                       | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                                        |
-| showSendButton   | `boolean`                                                                       | —   | 是否显示发送按钮，默认 true                                                                                                                     |
-| resizable        | `boolean`                                                                       | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true                       |
-| expandable       | `boolean`                                                                       | —   | 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true          |
-| stickerPacks     | `EmojiStickerPack[]`                                                            | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker |
+| mode             | `InputMode`                                                                                            | —   | 输入框模式，默认 'simple'                                                                                                                    |
+| style            | `InputStyle`                                                                                           | —   | 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上                                                                 |
+| features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>                          | —   | 功能开关                                                                                                                                 |
+| autoFocus        | `boolean`                                                                                              | —   | 是否自动聚焦输入框，默认 false                                                                                                                   |
+| focusBorderColor | `string`                                                                                               | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                       |
+| caretColor       | `string`                                                                                               | —   | 光标颜色，不设置则使用默认                                                                                                                        |
+| selectionColor   | `string`                                                                                               | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                                      |
+| maxLength        | `number`                                                                                               | —   | 最大输入长度，0 或不设置表示无限制                                                                                                                   |
+| mention          | <a class="config-ref" href="#config-input-mention"><strong>提及配置（@）</strong></a>                        | —   | 提及配置（@）                                                                                                                              |
+| enableTyping     | `boolean`                                                                                              | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                                        |
+| showSendButton   | `boolean`                                                                                              | —   | 是否显示发送按钮，默认 true                                                                                                                     |
+| resizable        | `boolean`                                                                                              | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true                       |
+| expandable       | `boolean`                                                                                              | —   | 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true          |
+| stickerPacks     | `EmojiStickerPack[]`                                                                                   | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker |
+| emoji            | <a class="config-ref" href="#config-input-emoji"><strong>Emoji 面板配置 / Emoji picker config</strong></a> | —   | Emoji 面板配置 / Emoji picker config                                                                                                     |
 
 #### config.input.features {#config-input-features}
 
@@ -207,6 +208,18 @@
 | --- | --- | --- | --- |
 | contacts    | `MentionContact[]` | —   | 联系人列表（也可从外部通过 chat-container 灌入） |
 | onlyInGroup | `boolean`          | —   | 是否仅在群聊中启用，默认 true                |
+
+#### config.input.emoji {#config-input-emoji}
+
+> Emoji 面板配置 / Emoji picker config
+
+| 属性           | 类型                  | 默认值 | 说明                                                                                                                                     |
+| --- | --- | --- | --- |
+| recent       | `boolean`           | —   | 是否启用「常用」最近使用区（置于表情视图顶部），默认 true；关闭后不展示常用区也不再记录 / Whether to enable the recent-emoji section at the top of the emoji view, default true |
+| recentCount  | `number`            | —   | 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5                                                                 |
+| tabsPosition | `EmojiTabsPosition` | —   | tab 位置：顶部/底部/左侧/右侧，默认 'bottom' / Tabs position: top/bottom/left/right, default 'bottom'                                                |
+| stickerHover | `boolean`           | —   | sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true                        |
+| emojiIcon    | `string`            | —   | 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text                 |
 
 #### config.textMessage {#config-textmessage}
 
@@ -250,3 +263,4 @@
 | `forward`          | —  |
 | `user-card`        | —  |
 | `group-card`       | —  |
+| `watermark`        | —  |

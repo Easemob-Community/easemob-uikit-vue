@@ -161,7 +161,7 @@ const mergedCountText = computed(() => {
 
 @media (hover: hover) {
   .uikit-notification__close:hover {
-    background-color: var(--uikit-bg-hover, #e5e7eb);
+    background-color: var(--uikit-bg-hover, #F5F5F5);
     color: var(--uikit-text-primary, #111827);
   }
 }

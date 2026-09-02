@@ -1,9 +1,10 @@
 import WebIM from 'easemob-websdk-4'
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
+import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, createLogger, toConversationRecord } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { extractLastMessageId, toUiConversations } from '../adapter/conversation-adapter'
+import { firePersistenceHook } from '../persistence'
 
 const conversationLogger = createLogger('UIKit:Webim4ConversationDomain')
 
@@ -75,6 +76,13 @@ export interface ConversationDomainDeps {
    * `fetchConversations` is consumed (refresh delegation) for now.
    */
   conversationRepository?: Partial<ConversationRepository>
+  /**
+   * 旁路持久化钩子（Electron 本地库 SQLite 留口子，对齐 websdk5）：
+   * 会话列表回填（refresh/loadMore，含注入 repository 路径）后
+   * `saveConversations(merged.map(toConversationRecord))` 整体快照落库；
+   * fire-and-forget，钩子异常只告警不阻塞。
+   */
+  conversationPersistence?: ConversationPersistenceHooks
 }
 
 /**
@@ -128,6 +136,12 @@ export class ConversationDomain {
   private profileInflightIds = new Set<string>()
   /** 各会话资料补全的失败/空名次数（配合 MAX_PROFILE_ATTEMPTS 封顶重试） */
   private profileAttemptCounts = new Map<string, number>()
+  /**
+   * 显式删除的会话 ID（remove/removeLocal 记账）：
+   * merge 并集保留本地独有会话时跳过，防止已删会话被回填复活；
+   * 服务端快照再次带回该会话时以服务端为准并清除标记。
+   */
+  private removedConversationIds = new Set<string>()
 
   constructor(
     private client: Webim4Client,
@@ -191,27 +205,16 @@ export class ConversationDomain {
           items.push(...page.list)
           cursor = page.hasMore ? page.cursor : undefined
         } while (cursor)
-        // 去重 + 继承现有列表已补全的名称/头像（同 applyServerItems replace 语义）→ 稳定排序 → setList
-        const existing = this.store.conversationList ?? []
-        const prevById = new Map(existing.map(cvs => [cvs.id, cvs]))
-        const merged = new Map<string, UiConversation>()
-        for (const item of items) {
-          const prev = prevById.get(item.id)
-          merged.set(item.id, prev
-            ? {
-              ...item,
-              name: (!item.name || item.name === item.id) && prev.name && prev.name !== prev.id ? prev.name : item.name,
-              avatar: item.avatar || prev.avatar,
-            }
-            : item)
-        }
-        const list = sortConversations(Array.from(merged.values()))
+        // 去重 + 并集合并现有列表（继承已补全名称/头像与本地字段）→ 稳定排序 → setList
+        const list = this.mergeIncomingConversations(items, 'replace')
         this.store.setList(list)
         // 注入源一次性返回全量，SDK 分页游标状态复位（loadMore 不再追加）
         this.cursor = ''
         this.hasMoreInner = false
         this.store.setConversationsLoaded?.(true)
         conversationLogger.info('会话列表回填（注入 repository）', { count: list.length })
+        // 旁路持久化：会话快照整体落库（与 SDK 默认路径同语义）
+        this.persistConversations(list)
         // 资料/免打扰补全语义与默认路径对齐：注入项已带名称/头像时自动跳过
         void this.patchConversationProfiles(list)
         void this.patchMuteStates(list)
@@ -399,6 +402,8 @@ export class ConversationDomain {
     })
     this.store.delete(conversationId)
     this.lastMessageIds.delete(conversationId)
+    // 记账显式删除：后续回填的并集合并不再复活该会话（服务端快照带回时以服务端为准）
+    this.removedConversationIds.add(conversationId)
   }
 
   /** 删除会话但保留漫游消息（deleteRoam=false） */
@@ -410,6 +415,7 @@ export class ConversationDomain {
     })
     this.store.delete(conversationId)
     this.lastMessageIds.delete(conversationId)
+    this.removedConversationIds.add(conversationId)
   }
 
   /** 添加会话标记（mark 取值 0-19，对应 4.x MarkType.mark_0 ~ mark_19） */
@@ -474,10 +480,8 @@ export class ConversationDomain {
 
   /**
    * 应用一批服务端会话项：记录最后一条消息 ID → 映射中立类型 →
-   * 合并（append 保留现有成员；replace 成员以服务端快照为准，但两种模式都从现有项
-   * 继承已补全的名称/头像，避免 refresh 把群名冲回 ID，对齐 websdk5
-   * mergeWithExistingConversations）→ 稳定排序 → setList，
-   * 随后异步补全资料与免打扰状态。
+   * 并集合并（mergeIncomingConversations）→ 稳定排序 → setList，
+   * 随后旁路持久化快照 + 异步补全资料与免打扰状态。
    */
   private applyServerItems(
     items: readonly EasemobChat.ConversationItem[],
@@ -492,6 +496,28 @@ export class ConversationDomain {
       currentUserId: this.currentUserId,
       resolveSenderName: this.deps.resolveSenderName,
     })
+    const list = this.mergeIncomingConversations(incoming, mode)
+    this.store.setList(list)
+    conversationLogger.info('会话列表回填', { mode, count: list.length, hasMore: this.hasMoreInner })
+    // 旁路持久化：会话快照整体落库（含并集保留的本地独有会话）
+    this.persistConversations(list)
+    void this.patchConversationProfiles(list)
+    void this.patchMuteStates(list)
+  }
+
+  /**
+   * 合并回填会话项与现有列表（对齐 websdk5 mergeWithExistingConversations 升级版语义）：
+   * - **并集**：replace 模式下本地独有会话（如收消息浮现、服务端尚未带回）保留，
+   *   不再被服务端快照整体覆盖冲掉；
+   * - **本地字段保留**：共有项继承已补全的名称/头像（避免冲回 ID），
+   *   以及 draft/draftTime/remindType 等本地维护字段；
+   * - **显式 removed 不保留**：remove/removeLocal 记账的会话不并入；
+   *   服务端快照再次带回时以服务端为准并清除删除标记。
+   */
+  private mergeIncomingConversations(
+    incoming: readonly UiConversation[],
+    mode: 'replace' | 'append',
+  ): UiConversation[] {
     const existing = this.store.conversationList ?? []
     const prevById = new Map(existing.map(cvs => [cvs.id, cvs]))
     const merged = new Map<string, UiConversation>()
@@ -500,21 +526,42 @@ export class ConversationDomain {
         merged.set(cvs.id, cvs)
     }
     for (const item of incoming) {
+      // 服务端/注入源快照带回该会话：以服务端为准，清除显式删除标记
+      this.removedConversationIds.delete(item.id)
       const prev = prevById.get(item.id)
-      // 保留已补全的名称/头像，避免 refresh/loadMore 把已补全值冲回 ID（对齐 websdk5 mergeWithExistingConversations）
       merged.set(item.id, prev
         ? {
           ...item,
           name: (!item.name || item.name === item.id) && prev.name && prev.name !== prev.id ? prev.name : item.name,
           avatar: item.avatar || prev.avatar,
+          // 本地字段保留：草稿与提醒类型以本地为准（回填项不携带）
+          ...(prev.draft !== undefined ? { draft: prev.draft } : {}),
+          ...(prev.draftTime !== undefined ? { draftTime: prev.draftTime } : {}),
+          // 免打扰状态以本地为准：回填项恒 isMuted=false 不携带（见 conversation-adapter），
+          // 由 setMuted 回写与 patchMuteStates(getSilentModeForConversations) 权威维护
+          isMuted: prev.isMuted,
+          ...(prev.remindType !== undefined ? { remindType: prev.remindType } : {}),
         }
         : item)
     }
-    const list = sortConversations(Array.from(merged.values()))
-    this.store.setList(list)
-    conversationLogger.info('会话列表回填', { mode, count: list.length, hasMore: this.hasMoreInner })
-    void this.patchConversationProfiles(list)
-    void this.patchMuteStates(list)
+    if (mode === 'replace') {
+      // 并集：本地独有会话保留（显式删除的除外）
+      for (const cvs of existing) {
+        if (!merged.has(cvs.id) && !this.removedConversationIds.has(cvs.id))
+          merged.set(cvs.id, cvs)
+      }
+    }
+    return sortConversations(Array.from(merged.values()))
+  }
+
+  /** 旁路持久化：会话列表快照整体落库（fire-and-forget，未注入零调用） */
+  private persistConversations(list: readonly UiConversation[]): void {
+    firePersistenceHook(
+      conversationLogger,
+      'saveConversations',
+      this.deps.conversationPersistence?.saveConversations,
+      list.map(toConversationRecord),
+    )
   }
 
   /**

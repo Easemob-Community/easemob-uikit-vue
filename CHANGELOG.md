@@ -1,5 +1,82 @@
 # Changelog
 
+## @easemob/uikit-im 3.2.0 (2026-09-02)
+
+### 新增
+
+- **会话列表风格变体**：`ConversationContainer` / `ConversationList` 新增 `variant`（`card` 默认：圆角白卡、无分割线、项间距 4px / `compact`：无圆角、无分割线、零间距，列表根作用域覆写 Cell 变量实现，不影响全局主题）、`showAvatar`（false = 仅会话信息模式）、`unreadPlacement`（`avatar` 时未读徽标带白描边挂在头像右上角）；`badgePlacement` 三层透传统一未读徽标位置。
+- **会话项扩展与事件**：新增 `#name-suffix` 插槽（名字后企业/官方 tag，list 层 `#item-name-suffix`、container 层 `#itemNameSuffix` 透传，scope 含会话数据）；新增 `search` 事件（去空格关键字，埋点/远程搜索用）。
+- **会话列表自带底色**：`--uikit-conversation-list-bg`（浅 `#FAFAFA` / 深 `#111827`），card 变体下头部/分栏/搜索与卡片项边界对齐、头部与项内容线对齐。
+- **空状态规格化**：会话列表空态启用新图标 `list/bullet`（100×100 占位色 + 16px 文案 + 垂直居中，规格走 `--uikit-empty-*` token）；聊天区无会话空态图标换 `bubble/rect/2`，默认文案「选择一个会话」。
+
+### 变更
+
+- **会话项排版对齐设计规范**：用户名 16px/600、时间 12px tertiary、消息预览 14px，两行行距 6px；置顶底色与 hover 同值（`--uikit-bg-hover`）；置顶/免打扰图标换面性图标（`filled/pin` / `filled/bell/slash`，`--uikit-icon-muted` 同色）且置顶补齐与免打扰一致的摇动动画；免打扰/dot 模式未读点校准为 8×8、`#FF7070`（去除免打扰染灰的历史行为）。
+
+### 破坏性行为变更
+
+- `EmBadge` 的 `size` 枚举由 `'normal' | 'small'` 改为 `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`（默认 `'l'`），旧值不再合法（见 core 2.3.0）。
+
+## @easemob/uikit-core 2.3.0 (2026-09-02)
+
+### 新增
+
+- **Badge 档位体系**：尺寸扩为六档 `xs`（仅 8px 圆点）/ `s` / `m` / `l`（默认）/ `xl` / `xxl`（单位数正圆、多位数药丸按规格表）；新增 `placement`（`top-right` 默认 / `bottom-right`）与 `bordered`（2px 描边与头像分界，`box-shadow` 外环实现、随背景色自适应、不与 stroked 描边冲突）；新增导出类型 `BadgePlacement`。
+- **语义 token**：`--uikit-cell-bg`（Cell 项背景，默认透明，会话列表 card 变体覆写为浮层色）、`--uikit-conversation-list-bg`、`--uikit-empty-icon-color` / `--uikit-empty-text-color`、`--uikit-badge-bg`（徽标默认背景 `#FF7070`，独立于 danger 语义色）；新增图标 `list/bullet`，`filled/pin` 更换新版资源。
+
+### 变更
+
+- **token 默认值校准（对齐设计色板）**：`--uikit-bg-hover` 浅 `#e5e7eb` → `#F5F5F5`；`--uikit-bg-active` 浅色 alpha 0.08 → 0.12（≈ 主色 12% 叠白，视觉对齐 `#E5F5FF` 且保持跟随主色）；`--uikit-icon-muted` 浅 `#B6B8BF` → `#949A9E`。
+- locale 默认文案：`conversation.empty`「暂无会话」→「没有会话」，`chat.empty`「请选择会话」→「选择一个会话」（en 同步为 `Select a conversation`）。
+
+### 破坏性行为变更
+
+- **`BadgeSize` 枚举重定义**：`'normal' | 'small'` → `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`，`size` prop 默认值 `'l'`；Badge 默认色由 `--uikit-danger-color` 改为 `--uikit-badge-bg`（`#FF7070`）。
+
+## @easemob/uikit-sdk-websdk5 1.2.1 (2026-09-02)
+
+### 修复
+
+- **免打扰状态被会话快照冲掉**：`mergeWithExistingConversations` 合并重叠会话时 `isMuted` / `remindType` 以本地为准（SDK 会话快照恒 DEFAULT 不携带该状态），修复设置/解除免打扰后来新消息即被重置的问题；权威同步通道（`setMuted` 回写 / `CONVERSATION_MUTE_INFO_CHANGED` / `patchConversationMuteStates`）语义不变，合并回归测试补 `isMuted` 保留断言。
+
+## @easemob/uikit-sdk-webim4 1.2.1 (2026-09-02)
+
+### 修复
+
+- **免打扰状态被会话回填冲掉**：`mergeIncomingConversations` 同 websdk5 1.2.1 口径，共有项保留本地 `isMuted`（回填项恒 false 不携带）；权威同步通道（`setMuted` 回写 / `patchMuteStates`）语义不变，回归测试同步补断言。
+
+## @easemob/uikit-core 2.2.0 (2026-09-02)
+
+### 新增
+
+- **`SdkConfig.persistence` 透传槽**：旁路写库钩子（`SdkPersistenceHooks`）随 `repositories` 同路经 core 归一化下沉 `adapterConfig` 下发 adapter（`resolved.persistence ?? adapterConfig.persistence` 归一），未注入时行为零变化。
+
+## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
+
+### 新增
+
+- **旁路持久化契约（D122 Phase 3.2/3.4 前置）**：新增入库 DTO `MessageRecord`（`SdkMessage` + 墓碑字段 `recalled`/`deleted`/`tombstoneTime`）与 `ConversationRecord`；新增清洗函数 `toMessageRecord`/`toConversationRecord`（纯 TS，剥离 File/Blob/函数、combine `messageList` 递归、`ext` 限深防循环引用）；新增 `SdkPersistenceHooks`（`message`/`conversation` 两域钩子，全部可选、fire-and-forget 语义）；`SdkConfig` 新增 `persistence` 槽（旁路写库，与 `repositories` 数据入口接管语义分立）。
+
+## @easemob/uikit-sdk-websdk5 1.2.0 (2026-09-02)
+
+### 新增
+
+- **旁路写库钩子接线**：发送成功 / SDK 漫游回流 / 收消息 / 撤回（含本端主动撤回即落墓碑）/ 编辑 / 送达与单聊已读回执 / 多设备删除 / 会话列表回填，逐点触发 `persistence` 钩子（fire-and-forget，失败仅告警不阻塞）；repository 注入路径（数据来自本地库）不写回；流式分片不落库（完整消息经 onMessage/漫游路径落库）。
+
+### 修复
+
+- **会话覆盖竞争（D122 3.3）**：`mergeWithExistingConversations` 升级为并集合并——本地独有会话（如 DB 预填）不再被 SDK 快照冲掉，重叠会话保留本地 `draft`/`draftTime`/`remindType` 字段；`patch.removed` 显式删除通道不受影响。
+
+## @easemob/uikit-sdk-webim4 1.2.0 (2026-09-02)
+
+### 新增
+
+- **旁路写库钩子接线（与 websdk5 同构对齐）**：同一套 `persistence` 语义点按 4.x 事件模型接入（含 4.x 特有的 `onModifiedMessage` 编辑、`deleteRoaming` 多设备删除按会话粒度展开为消息 ID 集）。
+
+### 修复
+
+- **会话回填并集合并**：`applyServerItems`/注入路径 `refresh` 不再冲掉本地独有会话，共有项继承本地 `draft`/`draftTime`/`remindType`；顺带修复 4.x 收到 `deleteRoaming` 多设备删除事件时本地 store 未清理的问题。
+
 ## @easemob/uikit-im 3.1.0 (2026-09-02)
 
 ### 新增

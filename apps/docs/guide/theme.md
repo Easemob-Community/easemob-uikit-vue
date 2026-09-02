@@ -157,6 +157,9 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-bubble-text-self`：自己气泡文字（默认 `#fff`）
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，使用 `background` 简写，支持颜色/渐变/图片）
 - `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`）
+- `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#111827`）
+- `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#E6E6E6` / `#BDBDBD`）
+- `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）
 
 ## 主题演练场
 

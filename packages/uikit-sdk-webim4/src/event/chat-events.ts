@@ -7,13 +7,15 @@ import {
   formatConversationPreview,
   isStreamActive,
   normalizeUserId,
+  toMessageRecord,
 } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue, UIKitFeatures } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, SdkMessage, SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import { toUiMessage } from '../adapter/message-adapter'
 import { deriveConversationUpsertFromMessage } from '../adapter/conversation-adapter'
 import { markReadReceiptSent } from '../domain/message-domain'
 import { notifyOnNewMessage } from '../notification-engine'
 import type { Webim4Client } from '../client'
+import { firePersistenceHook } from '../persistence'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 
@@ -210,7 +212,9 @@ export function createChatHandlers(
   client: Webim4Client,
   stores: EventStores,
   features?: UIKitFeatures,
+  persistence?: SdkPersistenceHooks,
 ): Partial<EasemobChat.EventHandlerType> {
+  const messagePersistence = persistence?.message
   return {
     onMessage: (sdkMsgs) => {
       for (const sdkMsg of sdkMsgs) {
@@ -229,6 +233,8 @@ export function createChatHandlers(
         else {
           stores.message.addMessage(uiMsg)
         }
+        // 旁路持久化：收消息落库（含流式补偿的完整消息覆盖；upsert 由实现方负责）
+        firePersistenceHook(chatLog, 'saveMessage', messagePersistence?.saveMessage, toMessageRecord(uiMsg as SdkMessage))
 
         // 当前会话收到新消息时自动向对方发送已读回执（仅页面可见时；
         // 4.x 无 clearConversationUnreadMessageCount，会话清未读由 ConversationDomain 的 channel/read 回执负责）
@@ -356,12 +362,16 @@ export function createChatHandlers(
         body: uiMsg.body,
         stream: { ...meta },
       })
+      // 旁路持久化说明：流式分片为高频增量，不入库；
+      // 终态完整消息经 onMessage（流式丢片补偿路径）落库，对齐 websdk5「展示态不落库」口径
     },
 
     onRecallMessage: (msg) => {
       chatLog.info('onRecallMessage', { mid: msg.mid, from: msg.from })
       // 4.x RecallMsgBody：mid = 被撤回消息 ID，from = 撤回操作者（不存在时 SDK 兜底 'admin'）
       stores.message.recallMessage(msg.mid, msg.from)
+      // 旁路持久化：撤回墓碑（recalled + tombstoneTime 由实现方置位）
+      firePersistenceHook(chatLog, 'markMessageRecalled', messagePersistence?.markMessageRecalled, msg.mid, msg.from)
       // 同步刷新会话列表最后一条消息摘要（当前会话由 chat.vue watch 处理）
       const { conversationId, conversationType } = resolveRecallConversation(stores, msg, stores.client.currentUser)
       patchConversationLastMessageOnRecall(stores, conversationId, conversationType, msg.mid)
@@ -375,6 +385,7 @@ export function createChatHandlers(
         for (const [messageId, count] of Object.entries(msg.groupReadCount)) {
           stores.message.updateMessageById(messageId, { groupReadCount: count })
         }
+        // 群已读数为展示态，旁路持久化不落库（对齐 websdk5）
         return
       }
       const messageId = msg.mid || msg.ackId
@@ -383,6 +394,8 @@ export function createChatHandlers(
         return
       stores.message.updateMessageStatus(messageId, MESSAGE_STATUS.READ)
       stores.message.updateMessageById(messageId, { isPeerRead: true })
+      // 旁路持久化：单聊已读回执更新消息状态
+      firePersistenceHook(chatLog, 'updateMessageStatus', messagePersistence?.updateMessageStatus, messageId, MESSAGE_STATUS.READ)
     },
 
     onDeliveredMessage: (msg) => {
@@ -392,6 +405,8 @@ export function createChatHandlers(
         return
       stores.message.updateMessageStatus(messageId, MESSAGE_STATUS.DELIVERED)
       stores.message.updateMessageById(messageId, { isPeerDelivered: true })
+      // 旁路持久化：送达回执更新消息状态
+      firePersistenceHook(chatLog, 'updateMessageStatus', messagePersistence?.updateMessageStatus, messageId, MESSAGE_STATUS.DELIVERED)
     },
 
     onChannelMessage: (msg) => {
@@ -408,6 +423,8 @@ export function createChatHandlers(
           if (id) {
             stores.message.updateMessageStatus(id, MESSAGE_STATUS.READ)
             stores.message.updateMessageById(id, { isPeerRead: true })
+            // 旁路持久化：会话级已读等价于批量消息已读，逐条更新状态（对齐 websdk5 语义）
+            firePersistenceHook(chatLog, 'updateMessageStatus', messagePersistence?.updateMessageStatus, id, MESSAGE_STATUS.READ)
           }
         }
       }
@@ -426,6 +443,16 @@ export function createChatHandlers(
         modifiedInfo: uiMsg.modifiedInfo,
         modified: true,
       })
+      // 旁路持久化：消息编辑更新内容（4.x 具备该能力，与 websdk5 同钩子对齐）
+      firePersistenceHook(
+        chatLog,
+        'updateMessageContent',
+        messagePersistence?.updateMessageContent,
+        msg.id,
+        uiMsg.body,
+        uiMsg.ext ?? {},
+        uiMsg.modifiedInfo,
+      )
     },
 
     onMessagePinEvent: (eventData) => {

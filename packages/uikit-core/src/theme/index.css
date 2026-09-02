@@ -14,7 +14,7 @@
   --uikit-text-inverse: #ffffff;
 
   /* 弱化图标/占位图标色 */
-  --uikit-icon-muted: #B6B8BF;
+  --uikit-icon-muted: #949A9E;
 
   /* 背景层级 */
   --uikit-bg-base: #ffffff;
@@ -22,8 +22,8 @@
   --uikit-bg-tertiary: #f0f0f0;
   /* 弹层/抽屉/卡片等浮层背景：浅色与 base 一致，深色适当提亮以形成层级 */
   --uikit-bg-elevated: #ffffff;
-  --uikit-bg-hover: #e5e7eb;
-  --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.08);
+  --uikit-bg-hover: #F5F5F5;
+  --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
 
   /* 主色别名：由 store/theme.ts 运行时同步重写，确保始终跟随主题色 */
   --uikit-primary: var(--uikit-primary-color);
@@ -75,6 +75,8 @@
   /* 容器间距与组件圆角 */
   --uikit-container-gap: var(--uikit-spacing-2);
   --uikit-cell-gap: 3px;
+  /* Cell 项背景（默认透明；会话列表 card 变体在列表作用域覆写为浮层白卡） */
+  --uikit-cell-bg: transparent;
   /* 密度档变量（默认 normal）：Cell 高度、内边距、列表间距、Header 内边距、输入区、气泡、抽屉、按钮 */
   --uikit-cell-height: 64px;
   --uikit-cell-height-compact: 48px;
@@ -185,6 +187,16 @@
 
   /* 语义 token：输入区背景 */
   --uikit-input-bg: var(--uikit-bg-base);
+
+  /* 语义 token：会话列表容器背景（接入方可覆盖定制） */
+  --uikit-conversation-list-bg: #FAFAFA;
+
+  /* 语义 token：空状态占位（图标 / 文案） */
+  --uikit-empty-icon-color: #E6E6E6;
+  --uikit-empty-text-color: #BDBDBD;
+
+  /* 语义 token：徽标（未读数 / 红点）默认背景色，独立于 danger 语义色 */
+  --uikit-badge-bg: #FF7070;
 }
 
 [data-uikit-theme="dark"] {
@@ -238,6 +250,16 @@
 
   /* 语义 token：输入区背景 - 暗色 */
   --uikit-input-bg: var(--uikit-bg-base);
+
+  /* 语义 token：会话列表容器背景 - 暗色（与页面底色一致） */
+  --uikit-conversation-list-bg: #111827;
+
+  /* 语义 token：空状态占位 - 暗色 */
+  --uikit-empty-icon-color: #4B5563;
+  --uikit-empty-text-color: #6B7280;
+
+  /* 语义 token：徽标默认背景色 - 暗色（与浅色一致，保证未读可辨识） */
+  --uikit-badge-bg: #FF7070;
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
   --uikit-success-rgb: 22, 163, 74;

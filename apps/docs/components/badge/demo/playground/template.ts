@@ -25,8 +25,10 @@ const config = reactive({
   max: 99,
   dot: false,
   status: 'danger' as 'danger' | 'primary' | 'success' | 'warning',
-  size: 'normal' as 'normal' | 'small',
+  size: 'l' as 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl',
   variant: 'filled' as 'filled' | 'stroked',
+  placement: 'top-right' as 'top-right' | 'bottom-right',
+  bordered: false,
 })
 </script>
 
@@ -41,6 +43,8 @@ const config = reactive({
           :color="statusColors[config.status]"
           :size="config.size"
           :variant="config.variant"
+          :placement="config.placement"
+          :bordered="config.bordered"
         >
           <em-avatar name="张三" :size="48" />
         </em-badge>
@@ -51,6 +55,8 @@ const config = reactive({
           :color="statusColors[config.status]"
           :size="config.size"
           :variant="config.variant"
+          :placement="config.placement"
+          :bordered="config.bordered"
         >
           <em-avatar name="李雷" :size="48" />
         </em-badge>
@@ -61,6 +67,8 @@ const config = reactive({
           :color="statusColors[config.status]"
           :size="config.size"
           :variant="config.variant"
+          :placement="config.placement"
+          :bordered="config.bordered"
         >
           <em-avatar name="王五" :size="48" />
         </em-badge>

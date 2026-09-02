@@ -13,6 +13,10 @@
 | showSenderName   | `boolean`                                          | `true`                                 | 群聊会话摘要是否显示发送者名称前缀，默认 true                                                                 |
 | emptyText        | `string`                                           | —                                      | 空列表提示文案，优先于各分栏 tab 的默认空状态文案                                                               |
 | unreadMode       | `'count' \| 'dot'`                                 | `'count'`                              | 未读数量展示模式：count 显示数字，dot 仅显示红点，默认 'count'                                                  |
+| badgePlacement   | `'top-right' \| 'bottom-right'`                    | —                                      | 未读 Badge 统一位置：top-right（默认）/ bottom-right                                                 |
+| variant          | `'card' \| 'compact'`                              | `'card'`                               | 列表风格变体：card（默认；圆角白卡、无分割线、项间距 4px）/<br>compact（无圆角、无分割线、零间距的平铺列表）                          |
+| showAvatar       | `boolean`                                          | `true`                                 | 会话项是否展示头像（false = 仅会话信息模式），默认 true                                                        |
+| unreadPlacement  | `'inline' \| 'avatar'`                             | `'inline'`                             | 未读徽标归位：inline 信息区行尾（默认）/ avatar 头像右上角角标                                                   |
 | showHeader       | `boolean`                                          | `true`                                 | 是否展示头部区域，默认 true                                                                          |
 | title            | `string`                                           | —                                      | Header 标题文本，不传则使用 i18n 默认值                                                                |
 | headerAlign      | `'left' \| 'center' \| 'right'`                    | `'left'`                               | Header 内容对齐方式：left \| center \| right，默认 left                                             |
@@ -37,19 +41,21 @@
 | `update:active-tab`  | tab: ConversationTabKey                 | 切换分栏 tab 时触发（v-model:active-tab），负载为新的 tab key     |
 | `reconnect`          | —                                       | 断网/连接失败横幅被点击时触发，由业务方决定重连策略                         |
 | `header-menu-action` | key: string                             | 自定义 Header 菜单项未提供 handler 且非内置 key 时触发，负载为菜单 key   |
+| `search`             | keyword: string                         | 搜索关键字变化时触发（去空格后的值，清空时为 ''），可用于埋点或远程搜索              |
 
 ### Slots
 
-| 插槽名             | 说明 |
+| 插槽名                | 说明 |
 | --- | --- |
-| `header`        | —  |
-| `header-menu`   | —  |
-| `tabs`          | —  |
-| `status-banner` | —  |
-| `body`          | —  |
-| `item`          | —  |
-| `empty`         | —  |
-| `footer`        | —  |
-| `new-chat`      | —  |
-| `add-contact`   | —  |
-| `create-group`  | —  |
+| `header`           | —  |
+| `header-menu`      | —  |
+| `tabs`             | —  |
+| `status-banner`    | —  |
+| `body`             | —  |
+| `item`             | —  |
+| `item-name-suffix` | —  |
+| `empty`            | —  |
+| `footer`           | —  |
+| `new-chat`         | —  |
+| `add-contact`      | —  |
+| `create-group`     | —  |
