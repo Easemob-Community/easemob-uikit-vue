@@ -94,6 +94,9 @@ export interface GroupStoreLike {
   removeGroupMembers: (groupId: string, userIds: string[]) => void
   updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void
+  getPendingOwnerTransfer?: (groupId: string) => string | undefined
+  setPendingOwnerTransfer?: (groupId: string, newOwnerId: string) => void
+  clearPendingOwnerTransfer?: (groupId: string) => void
   isGroupAdminSynced?: (groupId: string) => boolean
   markGroupAdminSynced?: (groupId: string) => void
   setGroupMuteList: (groupId: string, members: UiGroupMember[]) => void

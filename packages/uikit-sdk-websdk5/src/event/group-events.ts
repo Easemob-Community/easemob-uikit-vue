@@ -25,7 +25,7 @@ import type {
   UserInfo,
 } from 'easemob-websdk'
 import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
-import type { UiContactInvite } from '@easemob/uikit-sdk-contract'
+import type { UiContactInvite, UiGroup } from '@easemob/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 
@@ -178,10 +178,26 @@ export function createGroupHandlers(stores: EventStores): GroupEventHandlerMap {
     },
     onOwnerChanged: (payload: GroupOwnerChangedEventPayload) => {
       groupLog.info('onOwnerChanged raw payload', payload)
-      const newOwnerId = payload.newOwner?.userId || ''
-      stores.group.updateGroup(payload.groupId, { owner: newOwnerId })
-      // 插入系统通知到群聊
+      const prevOwnerId = stores.group.getGroupById(payload.groupId)?.owner
+      const pendingNewOwner = stores.group.getPendingOwnerTransfer?.(payload.groupId)
+      const newOwnerId = pendingNewOwner || payload.newOwner?.userId || ''
+      const patch: Partial<UiGroup> = { owner: newOwnerId }
       const currentUser = stores.client.currentUser || ''
+      if (currentUser) {
+        if (currentUser === newOwnerId)
+          patch.role = GROUP_MEMBER_ROLE.OWNER
+        else if (currentUser === prevOwnerId)
+          patch.role = GROUP_MEMBER_ROLE.MEMBER
+      }
+      stores.group.updateGroup(payload.groupId, patch)
+      if (newOwnerId)
+        stores.group.updateGroupMemberRole(payload.groupId, newOwnerId, GROUP_MEMBER_ROLE.OWNER)
+      // 旧群主降级为普通成员，避免视图权限残留
+      if (prevOwnerId && prevOwnerId !== newOwnerId)
+        stores.group.updateGroupMemberRole(payload.groupId, prevOwnerId, GROUP_MEMBER_ROLE.MEMBER)
+      if (pendingNewOwner)
+        stores.group.clearPendingOwnerTransfer?.(payload.groupId)
+      // 插入系统通知到群聊
       const name = newOwnerId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(payload.newOwner)
       const noticeText = t('chat.notice.ownerChanged').replace('{name}', name)
       insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, {

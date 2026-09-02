@@ -18,7 +18,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import type { ConversationTypeValue } from '@easemob/uikit-core'
 import { insertChatNotice } from '@easemob/uikit-core'
-import type { UiConversation as Conversation, UiGroupMember } from '@easemob/uikit-core'
+import type { UiConversation as Conversation, UiGroup, UiGroupMember } from '@easemob/uikit-core'
 import type { ChatInfoDrawerSlotScope } from '../types'
 import GroupManagementSection from '../../group/group-management-section.vue'
 import GroupMemberList from '../../group/group-member-list.vue'
@@ -564,9 +564,16 @@ async function doTransferOwner(userId: string, userName?: string) {
   const id = groupId.value
   if (!id)
     return
+  // 4.x SDK 的 changeOwner 事件 payload.from 是旧群主而非新群主，
+  // 用 pending 标记飞行中的转让目标，供事件处理层识别真正的 newOwner。
+  stores.group.setPendingOwnerTransfer(id, userId)
   try {
     await changeGroupOwner(id, userId)
-    // 同步本地成员角色缓存：新群主置为 owner，自己降级为 member，避免角色闪回
+    // 同步本地群资料与成员角色缓存：群主字段、当前用户角色、新旧群主成员角色
+    const patch: Partial<UiGroup> = { owner: userId }
+    if (currentUserId.value)
+      patch.role = GROUP_MEMBER_ROLE.MEMBER
+    stores.group.updateGroup(id, patch)
     stores.group.updateGroupMemberRole(id, userId, GROUP_MEMBER_ROLE.OWNER)
     if (currentUserId.value)
       stores.group.updateGroupMemberRole(id, currentUserId.value, GROUP_MEMBER_ROLE.MEMBER)
@@ -580,6 +587,7 @@ async function doTransferOwner(userId: string, userName?: string) {
     showToast(t('chat.info.transferOwnerSuccess', '群主已转让'), 'success')
   }
   catch (err) {
+    stores.group.clearPendingOwnerTransfer(id)
     showToast(err instanceof Error ? err.message : String(err) || t('chat.info.transferOwnerFailed', '转让群主失败'), 'error')
   }
 }

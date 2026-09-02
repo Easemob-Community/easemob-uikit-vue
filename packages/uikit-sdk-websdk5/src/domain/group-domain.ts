@@ -23,6 +23,7 @@ export interface GroupStoreLike {
   addGroup: (group: UiGroup) => void
   removeGroup: (groupId: string) => void
   updateGroup: (groupId: string, patch: Partial<UiGroup>) => void
+  getGroupById: (groupId: string) => UiGroup | undefined
   setGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   appendGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   removeGroupMembers: (groupId: string, userIds: string[]) => void
@@ -153,6 +154,12 @@ export class GroupDomain {
     // 拉取权威详情（群主、角色、成员数等），失败不阻塞创建流程
     try {
       await this.fetchGroupInfo(result.groupId)
+      // 创建群后用本地已知的创建成员数兜底校准，避免服务端/事件导致的短暂计数偏差。
+      const expectedCount = (params.memberIds?.length ?? 0) + 1
+      const currentGroup = this.store.getGroupById(result.groupId)
+      if (currentGroup && (currentGroup.memberCount ?? 0) !== expectedCount) {
+        this.store.updateGroup(result.groupId, { memberCount: expectedCount })
+      }
     }
     catch {
       // 忽略：进入群聊后抽屉会按需重新拉取

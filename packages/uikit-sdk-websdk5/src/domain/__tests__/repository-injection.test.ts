@@ -229,9 +229,11 @@ function makeGroupStore() {
     setList: vi.fn(),
     addGroup: vi.fn(),
     updateGroup: vi.fn(),
+    getGroupById: vi.fn(),
   } as unknown as GroupStoreLike & {
     setList: ReturnType<typeof vi.fn>
     addGroup: ReturnType<typeof vi.fn>
+    getGroupById: ReturnType<typeof vi.fn>
   }
 }
 

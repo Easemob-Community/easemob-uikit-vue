@@ -31,6 +31,8 @@ export const useGroupStore = defineStore('group', () => {
   const groupAnnouncementMap = ref<Record<string, string | undefined>>({})
   /** 已同步过管理员列表的群 ID 集合，避免切换会话时重复拉取 */
   const groupAdminSyncedIds = ref<Set<string>>(new Set())
+  /** 飞行中的群主转让：groupId -> newOwnerId；用于 4.x SDK changeOwner 事件未携带新群主时做本地校准 */
+  const pendingOwnerTransfer = ref<Record<string, string>>({})
 
   /** 群成员禁言列表缓存：groupId -> members */
   const groupMuteListMap = ref<Record<string, UiGroupMember[]>>({})
@@ -143,6 +145,23 @@ export const useGroupStore = defineStore('group', () => {
     else {
       groupAdminSyncedIds.value = new Set()
     }
+  }
+
+  // ===== 群主转让 pending =====
+  function setPendingOwnerTransfer(groupId: string, newOwnerId: string) {
+    pendingOwnerTransfer.value = { ...pendingOwnerTransfer.value, [groupId]: newOwnerId }
+  }
+
+  function clearPendingOwnerTransfer(groupId: string) {
+    if (pendingOwnerTransfer.value[groupId] === undefined)
+      return
+    const next = { ...pendingOwnerTransfer.value }
+    delete next[groupId]
+    pendingOwnerTransfer.value = next
+  }
+
+  function getPendingOwnerTransfer(groupId: string): string | undefined {
+    return pendingOwnerTransfer.value[groupId]
   }
 
   /** 成员级禁言状态更新：同步更新 groupMuteListMap */
@@ -290,10 +309,20 @@ export const useGroupStore = defineStore('group', () => {
   function setGroupMembers(groupId: string, members: UiGroupMember[]) {
     const existing = groupMembersMap.value[groupId] || []
     const existingRoles = new Map(existing.map(m => [m.userId, m.role]))
+    const groupOwner = getGroupById(groupId)?.owner
     groupMembersMap.value[groupId] = members.map((m) => {
       const existingRole = existingRoles.get(m.userId)
-      // 保留已缓存的 admin/owner 角色，避免服务端延迟同步导致角色闪回
-      if (existingRole && (existingRole === GROUP_MEMBER_ROLE.ADMIN || existingRole === GROUP_MEMBER_ROLE.OWNER) && m.role === GROUP_MEMBER_ROLE.MEMBER) {
+      // 以 group.owner 为 owner 角色的唯一权威来源，修正服务端延迟同步导致的角色错乱
+      if (groupOwner) {
+        if (m.userId === groupOwner) {
+          return { ...m, role: GROUP_MEMBER_ROLE.OWNER }
+        }
+        else if (m.role === GROUP_MEMBER_ROLE.OWNER) {
+          return { ...m, role: GROUP_MEMBER_ROLE.MEMBER }
+        }
+      }
+      // 保留已缓存的 admin 角色，避免服务端延迟同步导致角色闪回
+      if (existingRole === GROUP_MEMBER_ROLE.ADMIN && m.role === GROUP_MEMBER_ROLE.MEMBER) {
         return { ...m, role: existingRole }
       }
       return m
@@ -400,6 +429,7 @@ export const useGroupStore = defineStore('group', () => {
     groupAllowlistMap.value = {}
     groupSharedFilesMap.value = {}
     groupJoinRequestsMap.value = {}
+    pendingOwnerTransfer.value = {}
   }
 
   // 别名方法：兼容 Domain 层 GroupStoreLike 接口
@@ -446,6 +476,9 @@ export const useGroupStore = defineStore('group', () => {
     isGroupAdminSynced,
     markGroupAdminSynced,
     clearGroupAdminSynced,
+    setPendingOwnerTransfer,
+    clearPendingOwnerTransfer,
+    getPendingOwnerTransfer,
     setGroupMuteList,
     addGroupMuteMembers,
     removeGroupMuteMembers,
