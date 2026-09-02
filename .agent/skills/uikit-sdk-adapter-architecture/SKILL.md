@@ -255,8 +255,9 @@ await adapter.init({
 
 ## 9. 4.x adapter 当前状态与二期 TODO
 
-- `packages/uikit-sdk-webim4/src/adapter.ts` 当前为骨架：`init` / `login` / `logout` 已实现，但 `message` / `conversation` / `contact` / `group` / `presence` / `userInfo` repository 暂为 `never = undefined as never`，`subscribe` 为空实现。
-- `packages/uikit-sdk-webim4/src/domain/message-domain.ts` 正在填充。
+- **Phase 2 已完成**（2026-09-02 状态）：`@easemob/uikit-sdk-webim4` 六域（message/conversation/contact/group/presence/userInfo）+ 事件层 + 注入模式 + 通知引擎全量落地，门禁全绿；`@easemob/uikit-im/webim4` 子路径入口可用。
+- **依赖形态**：webim4 经 npm alias `easemob-websdk-4`（= `easemob-websdk@4.24.2`）引入 4.x SDK——vite 预构建对裸说明符按名注册唯一产物，双 adapter 同图时同名 import 会被劫持到 5.x，独立 specifier 是根治手段（TECH-DEBT D122 2026-09-02 备忘）。改动 webim4 时 import 一律用 `easemob-websdk-4`。
+- **残留 TODO**：① 合并转发消息附件条目单向不兼容（5.x 条目 JSON、4.x 条目 Meta protobuf）——已推动 SDK 组，若结论是 4.x 不改则在 `downloadAndParseCombineMessage` 加 JSON 兜底；② 漫游 pb 容错补丁 `patch-pb-decode.ts`（SDK 修复根因后可移除）；③ Phase 3 DB/Electron 专项；④ 二期能力 Reaction/Thread/翻译/语音转文字。
 - 字段/API/事件映射表见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md` 第八、九节。
 - **加工 4.x 功能时**：先查该表，按「中立接口 → 4.x 实现」逐行落地；不确定时直接核对 4.x SDK 源码（`/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`），禁止凭记忆。
 
@@ -296,10 +297,9 @@ await adapter.init({
 
 ## 已知漂移（改到相关文件时注意）
 
-- `packages/uikit-sdk-webim4/src/adapter.ts` repository 字段暂为 `never`，Phase 2 填充中。
-- `packages/uikit-sdk-webim4/src/adapter.ts` `subscribe()` 为空实现，事件层待落地。
-- `UIKitDataSource`（`uikit-provider.vue` `dataSource` prop）已标 `@deprecated`，迁移目标为 repository 数据入口层，保留至下个大版本移除。
-- core `check-engine-isolation.mjs` 当前只禁 vue/pinia/@vueuse 值依赖；Phase 1 收尾应把 `easemob-websdk` 加入禁用列表（值 + 类型 import）。
+- `UIKitDataSource`（`uikit-provider.vue` `dataSource` prop）已标 `@deprecated`，迁移目标为 repository 数据入口层，保留至 uikit-im 3.0.0 移除。
+- 漫游容错补丁 `packages/uikit-sdk-webim4/src/patch-pb-decode.ts`：给 4.x SDK 的 pb Meta decode 包 try/catch（漫游坏消息跳过不拖垮整页），SDK 组修复根因后可移除；合并消息条目格式兼容结论出来后评估 `downloadAndParseCombineMessage` JSON 兜底。
+- 双 adapter 并行改动的同步约束即本文件第 3/4 节流程 + 「硬规则」；契约接口是编译期强制同步点（两 adapter `implements`，改契约不改齐两边 vue-tsc 必红）。
 - 关联 TECH-DEBT：D122（本架构落地）、D85（Electron 持久化）、D125（微前端 OA 基座兼容）。
 
 ## 反面清单
