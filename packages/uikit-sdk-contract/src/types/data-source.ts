@@ -13,7 +13,7 @@ import type { UiPresence } from './presence'
  * 本接口已收口为薄别名：core Provider 装配时把 dataSource 逐项翻译为
  * repositories 覆盖项（显式 repositories 优先），不再保留独立的 dataSource 消费链路；
  * `searchUsers` 无 repository 对应项（SDK 无搜索能力），仍由 UI 层单点消费。
- * Provider `dataSource` prop 保留至下个大版本移除。
+ * Provider `dataSource` prop 保留至 uikit-im 3.0.0 移除（当前主版本 2.x）。
  */
 export interface UIKitDataSource {
   fetchContacts?: (params?: { cursor?: string, pageSize?: number }) => Promise<{ list: UiContact[], cursor?: string, hasMore?: boolean }>

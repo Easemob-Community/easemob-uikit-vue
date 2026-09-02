@@ -30,14 +30,14 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit-sdk-webim4.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-sdk-contract'],
+      external: ['vue', 'pinia', 'easemob-websdk-4', '@easemob/uikit-sdk-contract'],
       output: {
         exports: 'named',
         globals: {
           'vue': 'Vue',
           'pinia': 'Pinia',
           // 4.x SDK 原生全局名为 window.WebIM（entry.ts 硬编码），与 5.x 的 Easemob 天然不冲突
-          'easemob-websdk': 'WebIM',
+          'easemob-websdk-4': 'WebIM',
           '@easemob/uikit-sdk-contract': 'EasemobUIKitSdkContract',
         },
       },

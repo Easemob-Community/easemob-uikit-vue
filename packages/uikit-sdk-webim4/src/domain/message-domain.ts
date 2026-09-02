@@ -1,5 +1,5 @@
-import WebIM from 'easemob-websdk'
-import type { EasemobChat } from 'easemob-websdk'
+import WebIM from 'easemob-websdk-4'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type {
   ConversationTypeValue,
   MessageRepository,

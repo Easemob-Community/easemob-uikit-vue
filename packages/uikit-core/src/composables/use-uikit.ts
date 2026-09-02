@@ -55,7 +55,7 @@ export interface CoreUIKitContext {
   /**
    * 业务数据源接管（@deprecated 薄别名）：已收口为 repositories 翻译注入
    * （见 data-source-repositories.ts），本字段仅保留给 searchUsers（无 repository
-   * 对应项）与「是否配置自定义数据源」的判定读取，下个大版本移除。
+   * 对应项）与「是否配置自定义数据源」的判定读取，uikit-im 3.0.0 移除。
    */
   dataSource: UIKitDataSource
   /**

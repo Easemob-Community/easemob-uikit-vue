@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup } from '@easemob/uikit-sdk-contract'
 import { GROUP_MEMBER_ROLE, createLogger } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
@@ -193,6 +193,13 @@ export class GroupDomain {
     // 拉取权威详情（群主、角色、成员数等），失败不阻塞创建流程
     try {
       await this.fetchGroupInfo(groupId)
+      // 4.x 创建群后服务端 affiliations_count 偶发多计（如把 owner 重复计入），
+      // 用本地已知的创建成员数兜底校准，避免 UI 显示多出一人。
+      const expectedCount = (params.memberIds?.length ?? 0) + 1
+      const currentGroup = this.store.getGroupById(groupId)
+      if (currentGroup && (currentGroup.memberCount ?? 0) !== expectedCount) {
+        this.store.updateGroup(groupId, { memberCount: expectedCount })
+      }
     }
     catch {
       // 忽略：进入群聊后抽屉会按需重新拉取

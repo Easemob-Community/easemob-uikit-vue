@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type { MessagePreviewLabels, UiConversation, UiMessage } from '@easemob/uikit-sdk-contract'
 import {
   CONVERSATION_TYPE,

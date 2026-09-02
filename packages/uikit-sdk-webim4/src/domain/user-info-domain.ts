@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type {
   UserInfo,
   UserInfoAttribute,

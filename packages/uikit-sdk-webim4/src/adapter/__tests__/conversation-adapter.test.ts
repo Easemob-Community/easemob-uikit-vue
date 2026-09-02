@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import { describe, expect, it } from 'vitest'
 import { deriveConversationUpsertFromMessage } from '../conversation-adapter'
 import { toUiMessage } from '../message-adapter'

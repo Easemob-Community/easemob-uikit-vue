@@ -1,5 +1,5 @@
-import type { EasemobChat } from 'easemob-websdk'
-import type { UiContactInvite, UserInfo } from '@easemob/uikit-sdk-contract'
+import type { EasemobChat } from 'easemob-websdk-4'
+import type { UiContactInvite, UiGroup, UserInfo } from '@easemob/uikit-sdk-contract'
 import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
@@ -269,17 +269,37 @@ export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.Ev
 
       // ===== 角色变更 =====
       case 'changeOwner': {
-        // 转让群主（新旧群主收）。4.x 载荷未声明新群主字段，
-        // 按源码 handleMucMsg 实际下发取 userId ?? from 作为新群主（存疑处见 TECH-DEBT 注记）
-        const newOwnerId = payload.userId || payload.from || ''
-        if (newOwnerId) {
-          stores.group.updateGroup(groupId, { owner: newOwnerId })
-          stores.group.updateGroupMemberRole(groupId, newOwnerId, GROUP_MEMBER_ROLE.OWNER)
+        // 4.x changeOwner 事件 payload.from 是旧群主（操作者），不是新群主。
+        // 真正的 newOwner 优先从 UIKit 飞行中的 pending 标记读取；若 pending 已清除但当前用户
+        // 是旧群主且本地 group.owner 已发生变化，说明是当前设备刚完成转让，沿用本地 owner。
+        const prevOwnerId = payload.from || ''
+        const pendingNewOwner = stores.group.getPendingOwnerTransfer?.(groupId)
+        const localOwner = stores.group.getGroupById(groupId)?.owner
+        let newOwnerId = pendingNewOwner
+        if (!newOwnerId && currentUser && currentUser === prevOwnerId && localOwner && localOwner !== currentUser) {
+          newOwnerId = localOwner
         }
-        const name = newOwnerId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(newOwnerId ? { userId: newOwnerId } as UserInfo : undefined)
+        if (newOwnerId) {
+          const patch: Partial<UiGroup> = { owner: newOwnerId }
+          if (currentUser) {
+            if (currentUser === newOwnerId)
+              patch.role = GROUP_MEMBER_ROLE.OWNER
+            else if (currentUser === prevOwnerId)
+              patch.role = GROUP_MEMBER_ROLE.MEMBER
+          }
+          stores.group.updateGroup(groupId, patch)
+          stores.group.updateGroupMemberRole(groupId, newOwnerId, GROUP_MEMBER_ROLE.OWNER)
+          // 旧群主降级为普通成员，避免视图权限残留
+          if (prevOwnerId && prevOwnerId !== newOwnerId)
+            stores.group.updateGroupMemberRole(groupId, prevOwnerId, GROUP_MEMBER_ROLE.MEMBER)
+          stores.group.clearPendingOwnerTransfer?.(groupId)
+        }
+        // 系统通知：展示名优先用新 owner；无法确定时回落到旧 owner
+        const noticeOwnerId = newOwnerId || prevOwnerId
+        const name = noticeOwnerId === currentUser ? t('chat.notice.you') : resolveNoticeUserName(noticeOwnerId ? { userId: noticeOwnerId } as UserInfo : undefined)
         insertChatNotice(stores, groupId, CONVERSATION_TYPE.GROUPCHAT, {
           eventType: NOTICE_EVENT_TYPE.OWNER_CHANGED,
-          params: { name, ownerId: newOwnerId },
+          params: { name, ownerId: noticeOwnerId },
           defaultText: t('chat.notice.ownerChanged').replace('{name}', name),
         })
         break

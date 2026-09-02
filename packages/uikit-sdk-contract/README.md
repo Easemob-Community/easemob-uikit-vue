@@ -10,6 +10,11 @@ Easemob UIKit 的 SDK 中立契约包。
 - **零 UI 框架依赖**：不依赖 Vue / Pinia / React，可在任意 UI 层消费。
 - **单一真相源**：常量、wire 类型、事件、repository 接口、adapter 接口只在此包定义一次。
 - **向后兼容**：公开 API 的变更遵循语义化版本，废弃项会标注 `@deprecated` 并给出迁移路径。
+- **少量中立纯工具驻留本包（2026-09-02 决策）**：`utils/logger.ts` / `utils/normalize-user-id.ts`
+  虽为运行时行为，但均为纯函数、零 SDK/框架依赖，且需被 core / 双 adapter / uikit-im 三方共享
+  同一实例（logger 持有模块级级别与收集 sink 状态）。迁往 `@easemob/uikit-core` 会迫使 adapter
+  反向依赖 UI 侧基座（违背「adapter 只依赖 contract + SDK」的依赖方向）；为两个文件单拆共享包
+  则增加发布矩阵成本而无行为收益。故维持在契约包，core 侧 `utils/logger.ts` 等仅做 re-export。
 
 ## 导出内容
 
@@ -126,7 +131,7 @@ export interface SdkCapabilities extends SdkCapabilityFlags {
 
 ## 废弃说明
 
-- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`：Phase 3.1 已落地 message / conversation 两域的 repository 注入；`dataSource` 覆盖的 contact / group / presence / userInfo 域待对应 repository 注入收口后，于下个大版本移除。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
+- `UIKitDataSource`（`types/data-source.ts`）已标记为 `@deprecated`：message / conversation / contact / group / presence / userInfo 全域的 repository 注入已落地（core `data-source-repositories.ts` 把 dataSource 逐项翻译为 `SdkRepositoryOverrides` 注入，显式 `repositories` 优先；`searchUsers` 无契约对应项保留 UI 层单点消费），`dataSource` 保留至 uikit-im 3.0.0 移除。新业务接入请优先实现 `SdkAdapter` 的 repository 层。
 
 ## 本地开发
 

@@ -53,9 +53,6 @@ importers:
       easemob-websdk:
         specifier: ^5.0.0
         version: 5.0.0
-      easemob-websdk-4:
-        specifier: npm:easemob-websdk@4.24.2
-        version: easemob-websdk@4.24.2
       markdown-it:
         specifier: ^15.0.0
         version: 15.0.0
@@ -333,9 +330,9 @@ importers:
       '@easemob/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
-      easemob-websdk:
-        specifier: 4.24.2
-        version: 4.24.2
+      easemob-websdk-4:
+        specifier: npm:easemob-websdk@4.24.2
+        version: easemob-websdk@4.24.2
       pinia:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))

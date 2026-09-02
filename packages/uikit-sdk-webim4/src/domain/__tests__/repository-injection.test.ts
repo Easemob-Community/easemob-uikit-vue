@@ -220,6 +220,52 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     expect(store.setList).toHaveBeenCalledWith([])
     expect(store.setConversationsLoaded).toHaveBeenCalledWith(true)
   })
+
+  it('未注入时 refresh 对置顶/全量接口重叠会话去重，置顶版本优先', async () => {
+    const client = makeConversationClient()
+    const pinnedCvs = {
+      conversationId: 'hfp',
+      conversationType: 'singleChat',
+      isPinned: true,
+      pinnedTime: 1786070722000,
+      unReadCount: 11,
+      lastMessage: null,
+    }
+    const regularCvs = {
+      conversationId: 'hfp',
+      conversationType: 'singleChat',
+      isPinned: true,
+      pinnedTime: 1786070722000,
+      unReadCount: 11,
+      lastMessage: null,
+    }
+    const otherCvs = {
+      conversationId: 'g1',
+      conversationType: 'groupChat',
+      isPinned: false,
+      pinnedTime: 0,
+      unReadCount: 0,
+      lastMessage: null,
+    }
+    connectionOf(client).getServerPinnedConversations.mockResolvedValue({
+      data: { conversations: [pinnedCvs], cursor: '' },
+    })
+    connectionOf(client).getServerConversations.mockResolvedValue({
+      data: { conversations: [otherCvs, regularCvs], cursor: '' },
+    })
+    const store = makeConversationStore()
+    const domain = new ConversationDomain(client, store)
+
+    await domain.refresh()
+
+    expect(store.setList).toHaveBeenCalledTimes(1)
+    const list = store.setList.mock.calls[0][0] as UiConversation[]
+    expect(list).toHaveLength(2)
+    const hfp = list.find(c => c.id === 'hfp')
+    expect(hfp).toBeDefined()
+    expect(hfp!.unreadCount).toBe(11)
+    expect(hfp!.isPinned).toBe(true)
+  })
 })
 
 // ===== 四域（contact / group / presence / userInfo）注入 =====

@@ -4,6 +4,10 @@
 > 本包负责把 `easemob-websdk@4.x`（`easemob-websdk@4.24.2`，`WebIM.connection`）翻译为
 > `@easemob/uikit-sdk-contract` 中立契约，使 UIKit 在 4.x / 私有化场景下零改动复用。
 >
+> 依赖说明：运行时依赖以 npm alias 声明为 `easemob-websdk-4`（`npm:easemob-websdk@4.24.2`），
+> 内容与 `easemob-websdk@4.24.2` 完全一致。使用独立 specifier 是为了与 websdk5 的
+> `easemob-websdk@5.x` 在 vite 预构建（按名字注册唯一产物）下共存，互不劫持。
+>
 > 编写/继续前必读：根目录 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（以下简称“主计划”）。
 
 ---
@@ -12,7 +16,7 @@
 
 | 模块 | 文件 | 状态 | 说明 |
 |---|---|---|---|
-| 包配置 | `package.json` / `vite.config.ts` / `tsconfig*.json` | ✅ 完成 | UMD 全局名 `EasemobUIKitSdkWebim4`，external `easemob-websdk` 全局 `WebIM` |
+| 包配置 | `package.json` / `vite.config.ts` / `tsconfig*.json` | ✅ 完成 | UMD 全局名 `EasemobUIKitSdkWebim4`，external `easemob-websdk-4` 全局 `WebIM` |
 | 4.x 类型别名 | `src/sdk-types.ts` | ✅ 完成 | re-export `EasemobChat.*` 关键类型 |
 | 客户端包装 | `src/client.ts` | ✅ 完成 | `Webim4Client` 封装 `new WebIM.connection({appKey})` + `open()` + `close()` |
 | **Adapter 组合根** | `src/adapter.ts` | ✅ 完成 | `Webim4Adapter implements SdkAdapter`：内置 store 工厂 + 域装配 + 事件注册 + repository  getters + 多方订阅扇出（镜像 websdk5 结构） |

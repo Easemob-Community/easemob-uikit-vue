@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type { UIKitFeatures } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { resetSyncStatus } from '../use-sync-status'

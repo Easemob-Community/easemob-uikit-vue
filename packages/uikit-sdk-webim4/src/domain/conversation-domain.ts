@@ -1,5 +1,5 @@
-import WebIM from 'easemob-websdk'
-import type { EasemobChat } from 'easemob-websdk'
+import WebIM from 'easemob-websdk-4'
+import type { EasemobChat } from 'easemob-websdk-4'
 import type { ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
 import { CONVERSATION_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
@@ -102,7 +102,8 @@ const MAX_PROFILE_ATTEMPTS = 3
  * - 会话列表：原生游标分页 `getServerConversations({pageSize: 1-50, cursor})`
  *   （置顶会话不在其内，需 `getServerPinnedConversations` 合并）；
  *   ⚠️ 不使用旧 REST `getConversationlist`（pageNum 分页、上限 20、无游标）。
- * - 清未读：无专用 API，发 read/channel 回执消息隐式清（channel 必须带 mid）。
+ * - 清未读：无专用 API，统一发 channel 回执消息隐式清（channel 必须带 mid）；
+ *   read 回执仅用于通知发送方消息已读，不会清本会话未读数。
  * - 免打扰：`setSilentModeForConversation` / `clearRemindTypeForConversation`；
  *   列表回读用 `getSilentModeForConversations` 批量查询。
  * - 无会话列表更新事件（无 onConversationListUpdate 等价物），
@@ -224,6 +225,8 @@ export class ConversationDomain {
     this.store.setSyncing(true)
     try {
       const pinnedItems = await this.fetchAllPinnedConversations()
+      // 4.x getServerConversations 返回全部会话（含置顶），提前按 ID 去重；置顶版本优先
+      const pinnedById = new Map(pinnedItems.map(c => [c.conversationId, c]))
       const res = await this.connection.getServerConversations({
         pageSize: CONVERSATION_PAGE_SIZE,
         cursor: '',
@@ -232,7 +235,8 @@ export class ConversationDomain {
       const data = res.data
       this.cursor = data?.cursor || ''
       this.hasMoreInner = !!this.cursor
-      this.applyServerItems([...pinnedItems, ...(data?.conversations || [])], 'replace')
+      const regularItems = (data?.conversations || []).filter(c => !pinnedById.has(c.conversationId))
+      this.applyServerItems([...pinnedItems, ...regularItems], 'replace')
       // 4.x 无 onSyncDataFinished 对等事件，首次刷新成功后置位（幂等，重复调用无副作用）
       this.store.setConversationsLoaded?.(true)
     }
@@ -303,35 +307,37 @@ export class ConversationDomain {
 
   /**
    * 清空会话未读数。
-   * 4.x 无清未读专用 API（源码已核），靠发回执消息隐式清（主计划 8.2）：
-   * - 单聊：发 `type:'read'` 消息（`id` = 最后一条已读消息 ID）；
-   * - 群聊：发 `type:'channel'` 消息（`mid` = 最后一条已读消息 ID，必带）。
+   * 4.x 无清未读专用 API（源码已核），统一发 `type:'channel'` 回执消息隐式清未读
+   *（主计划 8.2）：单聊/群聊均走 channel ack，`mid` 携带最后一条已读消息 ID。
+   * `read` 回执仅用于告知发送方“某条消息已读”，不会清本会话未读数。
    * 「每会话最后一条消息 ID」由内部映射 + 注入的 getLastMessageId 推导，接口不暴露。
    */
   async markRead(conversationId: string, conversationType: ConversationTypeValue) {
     const lastMsgId = this.deps.getLastMessageId?.(conversationId, conversationType)
       ?? this.lastMessageIds.get(conversationId)
+    conversationLogger.info('markRead 入参', {
+      conversationId,
+      conversationType,
+      lastMsgId,
+      lastMsgIdSource: this.deps.getLastMessageId?.(conversationId, conversationType) ? 'injected' : 'internal',
+    })
     if (!lastMsgId) {
       conversationLogger.warn('markRead 跳过：无法推导会话最后一条消息 ID', { conversationId })
       return
     }
-    if (conversationType === CONVERSATION_TYPE.SINGLECHAT) {
-      const body = WebIM.message.create({
-        type: 'read',
-        id: lastMsgId,
-        to: conversationId,
-        chatType: 'singleChat',
-      }) as EasemobChat.ReadMsgBody
-      await this.connection.send(body)
-    }
-    else {
+    try {
       const body = WebIM.message.create({
         type: 'channel',
         mid: lastMsgId,
         to: conversationId,
-        chatType: 'groupChat',
+        chatType: conversationType === CONVERSATION_TYPE.GROUPCHAT ? 'groupChat' : 'singleChat',
       }) as EasemobChat.ChannelMsgBody
+      conversationLogger.info('markRead 发送 channel 回执清未读', { conversationId, conversationType, lastMsgId, body })
       await this.connection.send(body)
+    }
+    catch (err) {
+      conversationLogger.error('markRead 发送 channel 回执失败', { conversationId, conversationType, lastMsgId, err })
+      throw err
     }
     // 4.x 清未读后无事件回推本端，立即本地清零
     this.store.update(conversationId, { unreadCount: 0 })
@@ -340,17 +346,22 @@ export class ConversationDomain {
   /**
    * 发送 channel ack（对齐 websdk5 的守卫与节流语义）：
    * 未读数为 0 时不发；同一会话 1s 节流窗口内不重复发送。
-   * 4.x 无独立 channel ack API，归一到 markRead（群聊即发 channel 回执消息）。
+   * 4.x 无独立 channel ack API，归一到 markRead（单聊/群聊均发 channel 回执消息清未读）。
    */
   async sendChannelAck(conversationId: string, conversationType: ConversationTypeValue) {
     // 未读数为 0 时无需发送（store 未暴露会话列表时退化为不守卫）
     const unread = this.store.conversationList?.find(c => c.id === conversationId)?.unreadCount
-    if (unread !== undefined && unread <= 0)
+    conversationLogger.info('sendChannelAck 入参', { conversationId, conversationType, unread })
+    if (unread !== undefined && unread <= 0) {
+      conversationLogger.info('sendChannelAck 跳过：未读数为 0', { conversationId })
       return
+    }
     const now = Date.now()
     const last = this.channelAckSentAt.get(conversationId) || 0
-    if (now - last < CHANNEL_ACK_THROTTLE_MS)
+    if (now - last < CHANNEL_ACK_THROTTLE_MS) {
+      conversationLogger.info('sendChannelAck 跳过：1s 节流窗口内', { conversationId, elapsed: now - last })
       return
+    }
     this.channelAckSentAt.set(conversationId, now)
     await this.markRead(conversationId, conversationType)
   }

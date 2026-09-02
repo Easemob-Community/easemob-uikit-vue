@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { SdkMessage } from '@easemob/uikit-sdk-contract'
 import {

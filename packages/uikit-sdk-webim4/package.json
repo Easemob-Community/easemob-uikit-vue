@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@easemob/uikit-sdk-contract": "workspace:*",
-    "easemob-websdk": "4.24.2"
+    "easemob-websdk-4": "npm:easemob-websdk@4.24.2"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

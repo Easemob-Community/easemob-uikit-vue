@@ -1,4 +1,4 @@
-import type { EasemobChat } from 'easemob-websdk'
+import type { EasemobChat } from 'easemob-websdk-4'
 
 // 4.x SDK 专属类型（经 EasemobChat 命名空间 re-export，供下游与其它 adapter 模块消费）。
 export type MessagesType = EasemobChat.MessagesType
