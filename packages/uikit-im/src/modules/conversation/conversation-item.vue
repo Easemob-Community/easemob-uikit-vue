@@ -28,7 +28,7 @@ export interface ConversationItemProps {
   showSenderName?: boolean
   /** 未读数显示模式 */
   unreadMode?: 'count' | 'dot'
-  /** 未读 Badge 位置：top-right（默认）/ bottom-right */
+  /** 未读 Badge 位置（仅 unreadPlacement=avatar 头像角标时生效）：top-right（默认）/ bottom-right */
   badgePlacement?: 'top-right' | 'bottom-right'
   /** 是否展示头像（false = 仅会话信息模式），默认 true */
   showAvatar?: boolean
@@ -375,13 +375,15 @@ const displayMessage = computed(() => {
     @touchcancel="longPress.cancel"
   >
     <template #leading>
-      <!-- 未读徽标归位头像时：角标包裹头像（白描边分界，mute/dot 模式为 8×8 小圆点） -->
+      <!-- 未读徽标归位头像时：角标包裹头像（白描边分界，mute/dot 模式为 8×8 小圆点）；
+           位置跟随 badgePlacement（top-right / bottom-right），覆盖量按设计规范压到头像上（见样式覆写） -->
       <Badge
         v-if="props.showAvatar && props.unreadPlacement === 'avatar' && props.conversation.unreadCount"
+        class="conversation-item__avatar-badge"
         :count="props.conversation.unreadCount"
         :dot="unreadDot"
         :size="unreadDot ? 'xs' : 'l'"
-        placement="top-right"
+        :placement="props.badgePlacement"
         bordered
       >
         <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
@@ -451,13 +453,13 @@ const displayMessage = computed(() => {
             <span v-if="displayDraft" class="conversation-item__draft">[{{ t('conversation.draft') }}]</span>{{ displayMessage }}
           </template>
         </span>
-        <!-- 未读徽标：数字档 l；免打扰/全局 dot 模式为 8×8 圆点（xs），颜色保持默认 badge 红 -->
+        <!-- 未读徽标（inline 行尾）：数字档 l；免打扰/全局 dot 模式为 8×8 圆点（xs），颜色保持默认 badge 红；
+             行尾徽标位置由行排版决定，badgePlacement 仅作用于头像角标 -->
         <Badge
           v-if="props.conversation.unreadCount && props.unreadPlacement === 'inline'"
           :count="props.conversation.unreadCount"
           :dot="unreadDot"
           :size="unreadDot ? 'xs' : 'l'"
-          :placement="props.badgePlacement"
         />
       </div>
       <slot name="item-suffix" />
@@ -519,6 +521,16 @@ const displayMessage = computed(() => {
 /* 无头像模式：leading 为空（未提供 item-prefix 插槽）时整体隐藏，避免残留间距 */
 .conversation-item--no-avatar :deep(.uikit-cell__leading):empty {
   display: none;
+}
+
+/* 头像角标覆盖量按设计规范：角标中心落在头像角内约 1/4 角标直径处（约 3/4 压在头像上），
+   而非 Badge 通用语义的贴角对半（translate 50%）；仅覆写会话项头像角标，不影响其他 Badge 用法 */
+.conversation-item__avatar-badge :deep(.uikit-badge__content--top-right) {
+  transform: translate(25%, -25%);
+}
+
+.conversation-item__avatar-badge :deep(.uikit-badge__content--bottom-right) {
+  transform: translate(25%, 25%);
 }
 
 .conversation-item__info {

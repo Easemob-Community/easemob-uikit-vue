@@ -41,7 +41,7 @@ interface ConversationListProps {
   emptyText?: string
   /** 未读数量展示模式：count 显示数字，dot 仅显示红点，默认 'count' */
   unreadMode?: 'count' | 'dot'
-  /** 未读 Badge 统一位置：top-right（默认）/ bottom-right */
+  /** 未读 Badge 位置（仅 unreadPlacement=avatar 头像角标时生效）：top-right（默认）/ bottom-right */
   badgePlacement?: 'top-right' | 'bottom-right'
   /**
    * 列表风格变体：card（默认；圆角白卡、无分割线、项间距 4px）/

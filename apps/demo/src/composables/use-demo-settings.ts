@@ -346,6 +346,18 @@ function createDemoSettings() {
   /** 是否展示 ConversationList 中的状态横幅 */
   const statusBannerEnabled = ref(true)
 
+  /* ===== 会话列表风格配置（EmConversationContainer 档位） ===== */
+  /** 列表风格变体：card（圆角白卡）/ compact（平铺列表） */
+  const conversationVariant = ref<'card' | 'compact'>('card')
+  /** 会话项是否展示头像 */
+  const conversationShowAvatar = ref(true)
+  /** 未读数量展示模式：count 数字 / dot 仅红点 */
+  const conversationUnreadMode = ref<'count' | 'dot'>('count')
+  /** 未读徽标归位：inline 信息区行尾 / avatar 头像右上角角标 */
+  const conversationUnreadPlacement = ref<'inline' | 'avatar'>('inline')
+  /** 未读 Badge 统一位置：top-right / bottom-right */
+  const conversationBadgePlacement = ref<'top-right' | 'bottom-right'>('top-right')
+
   /* ===== 消息通知配置（EmNotification） ===== */
   /** 总开关 */
   const notificationEnable = ref(true)
@@ -554,6 +566,12 @@ function createDemoSettings() {
     chatMessageStatusStyle,
     // 状态横幅
     statusBannerEnabled,
+    // 会话列表风格
+    conversationVariant,
+    conversationShowAvatar,
+    conversationUnreadMode,
+    conversationUnreadPlacement,
+    conversationBadgePlacement,
     // 消息通知
     notificationEnable,
     notificationBrowser,

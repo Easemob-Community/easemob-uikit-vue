@@ -3,6 +3,7 @@
  * 设置面板 - 会话分栏
  *
  * 包含：EmConversationContainer / EmConversationList 分栏 tab 能力配置：
+ * - 会话列表风格档位（variant / showAvatar / 未读徽标展示模式与位置）
  * - 显隐开关（置空 tabs 数组隐藏 tab 栏）
  * - 自定义展示的 tab 按钮（如仅单聊 / 仅群组，不区分更多类型）
  * - 调整 tab 选项优先级（顺序即渲染优先级）
@@ -21,6 +22,11 @@ const messageStore = useMessageStore()
 
 const {
   statusBannerEnabled,
+  conversationVariant,
+  conversationShowAvatar,
+  conversationUnreadMode,
+  conversationUnreadPlacement,
+  conversationBadgePlacement,
   conversationTabs,
   conversationTabsVisible,
   conversationTabsTakeover,
@@ -92,6 +98,112 @@ function restoreStatus() {
       </div>
       <div class="demo-info" style="color: var(--uikit-warning-color, #f59e0b);">
         注意：模拟按钮仅修改 UI 状态，不会真实断开 SDK 连接。
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="列表风格变体（variant）"
+        tip="card（默认）：圆角白卡、无分割线、项间距 4px；compact：无圆角、零间距的平铺列表"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationVariant === 'card' }"
+          @click="conversationVariant = 'card'"
+        >
+          卡片 card
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationVariant === 'compact' }"
+          @click="conversationVariant = 'compact'"
+        >
+          紧凑 compact
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="会话项头像"
+        tip="关闭后会话项不展示头像，仅保留会话信息模式"
+      />
+      <label class="demo-check">
+        <input v-model="conversationShowAvatar" type="checkbox">
+        <span>展示会话项头像</span>
+      </label>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="未读展示模式（unreadMode）"
+        tip="count 显示未读数字（默认）；dot 只显示红点"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationUnreadMode === 'count' }"
+          @click="conversationUnreadMode = 'count'"
+        >
+          数字 count
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationUnreadMode === 'dot' }"
+          @click="conversationUnreadMode = 'dot'"
+        >
+          红点 dot
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="未读徽标归位（unreadPlacement）"
+        tip="inline 信息区行尾（默认）；avatar 头像右上角角标（未读展示在头像上）"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationUnreadPlacement === 'inline' }"
+          @click="conversationUnreadPlacement = 'inline'"
+        >
+          行尾 inline
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationUnreadPlacement === 'avatar' }"
+          @click="conversationUnreadPlacement = 'avatar'"
+        >
+          头像 avatar
+        </button>
+      </div>
+      <div class="demo-info">
+        「头像」模式依赖会话项头像展示，若同时关闭头像开关则回落到行尾展示。
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="未读 Badge 位置（badgePlacement）"
+        tip="仅「未读徽标归位=头像」时生效：角标在头像上的位置 top-right（默认）/ bottom-right；行尾徽标位置由行排版决定"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationBadgePlacement === 'top-right' }"
+          @click="conversationBadgePlacement = 'top-right'"
+        >
+          右上角
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': conversationBadgePlacement === 'bottom-right' }"
+          @click="conversationBadgePlacement = 'bottom-right'"
+        >
+          右下角
+        </button>
       </div>
     </div>
 

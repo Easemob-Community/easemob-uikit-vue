@@ -130,6 +130,11 @@ const {
   watermarkEnabled,
   conversationActiveTab,
   statusBannerEnabled,
+  conversationVariant,
+  conversationShowAvatar,
+  conversationUnreadMode,
+  conversationUnreadPlacement,
+  conversationBadgePlacement,
   sidebarWidth,
   persistSidebarWidth,
   devHintsEnabled,
@@ -514,6 +519,11 @@ watch(
           :tabs="effectiveConversationTabs"
           :active-tab="effectiveConversationActiveTab"
           :show-status-banner="statusBannerEnabled"
+          :variant="conversationVariant"
+          :show-avatar="conversationShowAvatar"
+          :unread-mode="conversationUnreadMode"
+          :unread-placement="conversationUnreadPlacement"
+          :badge-placement="conversationBadgePlacement"
           @update:active-tab="onConversationActiveTabChange"
         >
           <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">
@@ -698,6 +708,11 @@ watch(
             :tabs="effectiveConversationTabs"
             :active-tab="effectiveConversationActiveTab"
             :show-status-banner="statusBannerEnabled"
+            :variant="conversationVariant"
+            :show-avatar="conversationShowAvatar"
+            :unread-mode="conversationUnreadMode"
+            :unread-placement="conversationUnreadPlacement"
+            :badge-placement="conversationBadgePlacement"
             @update:active-tab="onConversationActiveTabChange"
           >
             <template v-if="conversationTabsTakeover" #tabs="{ tabs, activeTab, selectTab }">
