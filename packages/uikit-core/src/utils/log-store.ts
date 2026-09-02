@@ -138,7 +138,7 @@ let _warned = false
 let _expiryPruned = false
 
 let _buffer: PersistedLogEntry[] = []
-let _flushTimer: ReturnType<typeof setInterval> | null = null
+let _flushTimer: ReturnType<typeof setTimeout> | null = null
 let _pageHooksBound = false
 
 function warnOnce(message: string, ...args: unknown[]): void {
@@ -289,6 +289,23 @@ function bindPageHooks(): void {
   }
 }
 
+/**
+ * 调度下一次定时落库（setTimeout 链替代常驻 setInterval）。
+ * 每次 flush 后仅当缓冲仍有新日志时才续期，空闲时计时器自然消亡，
+ * 避免 Electron 长期挂机场景下每 2s 空转唤醒。
+ */
+function scheduleFlush(): void {
+  if (_flushTimer)
+    return
+  _flushTimer = setTimeout(async () => {
+    _flushTimer = null
+    await flush()
+    // flush 期间可能有新日志入缓冲，续期直到缓冲清空
+    if (_buffer.length)
+      scheduleFlush()
+  }, FLUSH_INTERVAL)
+}
+
 /** 追加一条日志（所有来源适配器的统一入口），先进内存缓冲再批量落库 */
 export function appendLog(input: AppendLogInput): void {
   if (!_config.enabled || _disabled)
@@ -310,7 +327,7 @@ export function appendLog(input: AppendLogInput): void {
     void flush()
   }
   else if (!_flushTimer) {
-    _flushTimer = setInterval(() => void flush(), FLUSH_INTERVAL)
+    scheduleFlush()
   }
 }
 

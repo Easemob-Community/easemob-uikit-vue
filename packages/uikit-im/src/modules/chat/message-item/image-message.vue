@@ -160,6 +160,7 @@ function onPreviewError(index: number) {
         class="image-message__img"
         :class="isSticker ? 'image-message__img--sticker' : radiusClass"
         alt="image"
+        loading="lazy"
         @load="onLoad"
         @error="onError"
       >

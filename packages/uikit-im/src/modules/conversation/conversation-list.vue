@@ -391,10 +391,12 @@ const visibleUserIds = computed(() =>
     : [],
 )
 
-/** 启用 Presence 时，按可见联系人自动订阅/取消订阅在线状态 */
-if (effectiveEnablePresence.value) {
-  presence.watch(visibleUserIds)
-}
+/**
+ * 按可见联系人自动订阅/取消订阅在线状态。
+ * 不做 setup 期静态开关判断：visibleUserIds 已按 enablePresence 返回空数组，
+ * watch 的增量订阅/退订逻辑天然支持运行时切换（关闭时空数组 = 全量退订）。
+ */
+presence.watch(visibleUserIds)
 
 useInfiniteScroll(
   itemsRef,

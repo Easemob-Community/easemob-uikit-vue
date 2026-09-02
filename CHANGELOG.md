@@ -1,5 +1,50 @@
 # Changelog
 
+## @easemob/uikit-im 3.1.0 (2026-09-02)
+
+### 新增
+
+- **会话消息内存淘汰（opt-in）**：`MessageStoreOptions` 新增 `maxCachedConversations`，开启后按 LRU 淘汰超额会话的消息缓存（联动清理合并消息/已读成员/@我/发送中缓存，并重置历史翻页游标），最近活跃会话受保护；默认不开启，Web 行为完全不变。面向 Electron/桌面端长期挂机场景，为本地持久化专项预留衔接点（淘汰后回访经 fetchHistory 漫游回源，DB 阶段由 repository 本地回源无缝接管）。
+
+### 性能
+
+- **消息 store 热路径优化**：单条消息插入改「尾序快路径 + 二分插入」，去除每消息全量拷贝排序；`_findMessageById` 维护 msgId→会话索引（未命中回退全表扫描并自愈），回执/撤回/编辑/删除等按 ID 定位从「全会话全表扫描」降为单会话内定位。
+- **presence 全链路默认关闭**：`usePresence` composable 层增加开关硬门（见 websdk5/webim4 行为变更）；会话列表 presence 订阅改无条件 watch + 空数组源，修复运行时再开启不生效的问题。
+
+### 修复
+
+- 会话右键菜单锚点节点、消息定位高亮定时器补充卸载清理；消息气泡缩略图加 `loading="lazy"`。
+
+## @easemob/uikit-core 2.1.0 (2026-09-02)
+
+### 性能
+
+- **日志持久化空闲零唤醒**：log-store 落库定时器由常驻 `setInterval` 改为 `setTimeout` 链，缓冲清空即停表，消除 Electron/长会话场景每 2s 空转唤醒。
+
+### 行为变更
+
+- **`usePresence` 增加开关硬门**：`subscribePresence`/`unsubscribePresence`/`fetchPresence`/`publishPresence`/`watch` 在 `features.enablePresence === false` 时全部 no-op（fetch 返回空数组），不再依赖各调用点自觉 gate；开启时行为不变。
+
+## @easemob/uikit-sdk-websdk5 1.1.0 (2026-09-02)
+
+### 性能
+
+- **用户资料拉取合批**：`fetchUserInfos` 同 tick 多次调用经微任务合并为一次底层请求（userIds 去重、attributes 取并集），消除大列表首渲染 N+1；防重与失败标记语义不变。
+
+### 破坏性行为变更
+
+- **presence 独立运行默认关闭**：`getDefaultFeatures()` 的 `enablePresence` 由 `true` 改为 `false`——adapter 独立运行或未传 features 时不再默认启用在线状态，仅 Provider 显式 `enablePresence` 开启才启用（Provider 路径默认本为 false，无影响）。
+
+## @easemob/uikit-sdk-webim4 1.1.0 (2026-09-02)
+
+### 性能
+
+- **用户资料拉取合批**：同 websdk5 1.1.0，4.x 侧同构对齐（底层走 `fetchUserInfoById`，attributes 经 wire 映射）。
+
+### 破坏性行为变更
+
+- **presence 独立运行默认关闭**：同 websdk5 1.1.0。
+
 ## @easemob/uikit-im 3.0.0 (2026-09-02)
 
 ### 新增

@@ -43,12 +43,16 @@ import { setSyncStatus, setSyncStatusListener } from './use-sync-status'
 
 const adapterLog = createLogger('UIKit:Webim4Adapter')
 
-/** 默认 UIKit 能力开关：adapter 独立运行或未传 features 时全开 */
+/**
+ * 默认 UIKit 能力开关：adapter 独立运行或未传 features 时使用。
+ * presence 默认关闭：在线状态属可选能力，需 Provider 显式 `enablePresence` 才启用，
+ * 避免默认全链路订阅/查询带来额外请求。
+ */
 function getDefaultFeatures(): UIKitFeatures {
   return {
     enableContact: true,
     enableBlocklist: true,
-    enablePresence: true,
+    enablePresence: false,
     presenceStrangerMode: 'query-on-visible',
     fetchGroupMemberPresenceOnVisible: true,
     contactFetchMode: 'all',

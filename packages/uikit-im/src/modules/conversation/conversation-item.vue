@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useLongPress } from '@easemob/uikit-core'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
 import { EmBadge as Badge } from '@easemob/uikit-core'
@@ -156,6 +156,14 @@ function onContextMenuClose() {
     contextMenuAnchor.value = undefined
   }
 }
+
+/** 卸载兜底：菜单未关闭时组件被移除，清理挂在 body 上的临时锚点（与 onContextMenuClose 幂等） */
+onUnmounted(() => {
+  if (contextMenuAnchor.value) {
+    document.body.removeChild(contextMenuAnchor.value)
+    contextMenuAnchor.value = undefined
+  }
+})
 
 /** 点击选择 */
 function onClick() {

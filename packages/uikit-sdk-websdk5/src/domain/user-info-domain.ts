@@ -22,6 +22,13 @@ export const ALL_USER_INFO_ATTRIBUTES: UserInfoAttribute[] = [
   'ext',
 ]
 
+/** fetch 合批队列条目：一次原始调用携带的 userIds/attributes 与结果回调 */
+interface FetchQueueItem {
+  userIds: string[]
+  attributes: UserInfoAttribute[]
+  resolve: (infos: UserInfo[]) => void
+}
+
 /**
  * 用户资料业务域：封装 SDK UserInfoManager 的查询、订阅与缓存能力。
  */
@@ -29,6 +36,8 @@ export class UserInfoDomain {
   private handlerId = 'uikit-user-info'
   private subscribeQueue: string[] = []
   private subscribeFlushPromise: Promise<void> | null = null
+  private fetchQueue: FetchQueueItem[] = []
+  private fetchFlushPromise: Promise<void> | null = null
   private hasLoggedPermissionError = false
 
   constructor(
@@ -51,6 +60,9 @@ export class UserInfoDomain {
 
   /**
    * 批量获取用户资料；已缓存（且请求属性已覆盖）或正在加载中的 userId 会被跳过。
+   * 同一事件循环内的多次调用会合批为一次底层请求（微任务 flush，与 subscribe 合批同构）：
+   * flush 时合并所有调用的 userIds（去重）与 attributes（并集），只发一次请求，
+   * 每个原始调用各自 resolve 回「自己请求的 userIds 对应的 UserInfo[]」（从 store 缓存读回）。
    * @param userIds 目标用户 ID 列表
    * @param attributes 需要查询的属性，默认全量 8 个属性
    */
@@ -63,44 +75,78 @@ export class UserInfoDomain {
       return []
     }
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
-    const missingIds = uniqueIds.filter(
-      id => !this.store.areAttributesFetched(id, attributes)
-        && !this.store.isLoading(id)
-        && !this.store.isFetchFailed(id),
-    )
+    if (uniqueIds.length === 0)
+      return []
 
-    if (missingIds.length === 0) {
-      return uniqueIds.map(id => this.store.getUserInfo(id)).filter(Boolean) as UserInfo[]
-    }
+    return new Promise<UserInfo[]>((resolve) => {
+      this.fetchQueue.push({ userIds: uniqueIds, attributes, resolve })
+      this.scheduleFetchFlush()
+    })
+  }
 
-    this.store.markLoading(missingIds)
+  private scheduleFetchFlush(): void {
+    if (this.fetchFlushPromise)
+      return
+    this.fetchFlushPromise = Promise.resolve().then(() => this.flushFetchQueue())
+  }
+
+  private async flushFetchQueue(): Promise<void> {
+    const batch = this.fetchQueue
+    this.fetchQueue = []
     try {
-      const infos = this.userInfoRepository.fetchUserInfos
-        ? await this.fetchFromRepository(missingIds)
-        : await this.fetchFromSdk(missingIds, attributes)
+      // 合并前先按各调用自身的 attributes 过滤：已覆盖/加载中/已失败的 id 不再请求
+      const pending = batch.map(item => ({
+        ...item,
+        missingIds: item.userIds.filter(
+          id => !this.store.areAttributesFetched(id, item.attributes)
+            && !this.store.isLoading(id)
+            && !this.store.isFetchFailed(id),
+        ),
+      }))
+      const missingIds = Array.from(new Set(pending.flatMap(item => item.missingIds)))
+      // 各调用 attributes 取并集，一次请求覆盖各方所需字段
+      const attributes = Array.from(new Set(batch.flatMap(item => item.attributes)))
 
-      // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
-      const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
-      const failedIds = missingIds.filter(id => !fetchedIds.has(id))
-      if (failedIds.length > 0)
-        this.store.markFetchFailed(failedIds)
+      if (missingIds.length > 0) {
+        this.store.markLoading(missingIds)
+        try {
+          const infos = this.userInfoRepository.fetchUserInfos
+            ? await this.fetchFromRepository(missingIds)
+            : await this.fetchFromSdk(missingIds, attributes)
 
-      this.store.setUserInfos(infos)
-      // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
-      this.store.markFetchedAttributes(missingIds, attributes)
-      return uniqueIds
-        .map(id => this.store.getUserInfo(id))
-        .filter((info): info is UserInfo => Boolean(info))
-    }
-    catch (err) {
-      logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
-      this.store.markFetchFailed(missingIds)
-      return uniqueIds
-        .map(id => this.store.getUserInfo(id))
-        .filter((info): info is UserInfo => Boolean(info))
+          // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
+          const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+          const failedIds = missingIds.filter(id => !fetchedIds.has(id))
+          if (failedIds.length > 0)
+            this.store.markFetchFailed(failedIds)
+
+          this.store.setUserInfos(infos)
+          // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
+          this.store.markFetchedAttributes(missingIds, attributes)
+        }
+        catch (err) {
+          logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
+          this.store.markFetchFailed(missingIds)
+        }
+        finally {
+          this.store.markLoaded(missingIds)
+        }
+      }
+
+      // 每个原始调用各自 resolve：从 store 缓存读回自己请求的 userIds 子集
+      for (const item of pending) {
+        item.resolve(
+          item.userIds
+            .map(id => this.store.getUserInfo(id))
+            .filter((info): info is UserInfo => Boolean(info)),
+        )
+      }
     }
     finally {
-      this.store.markLoaded(missingIds)
+      this.fetchFlushPromise = null
+      // flush 进行中新 push 进队列的调用不会再触发后续 flush，这里补排一轮避免滞留
+      if (this.fetchQueue.length > 0)
+        this.scheduleFetchFlush()
     }
   }
 
@@ -301,6 +347,17 @@ export class UserInfoDomain {
     this.client.userInfoManager.removeEventHandler(this.handlerId)
     this.subscribeQueue = []
     this.subscribeFlushPromise = null
+    // 滞留队列条目 resolve 缓存子集后清空，避免调用方 Promise 悬挂
+    const pendingFetch = this.fetchQueue
+    this.fetchQueue = []
+    this.fetchFlushPromise = null
+    for (const item of pendingFetch) {
+      item.resolve(
+        item.userIds
+          .map(id => this.store.getUserInfo(id))
+          .filter((info): info is UserInfo => Boolean(info)),
+      )
+    }
     this.hasLoggedPermissionError = false
   }
 

@@ -5,6 +5,7 @@ import { MESSAGE_STATUS } from '@easemob/uikit-core'
 import type { MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { MessageStatus, TextMessageBody, UiMessage } from '@easemob/uikit-core'
 import { toUiMessage } from '@easemob/uikit-core'
+import { clearHistoryCursor } from '../composables/message-history-cursor'
 
 /** 按消息类型提取具体的 UiMessage 子类型（用于组件 props 精确类型） */
 export type TextMessageType = UiMessage & { type: typeof MESSAGE_TYPE.TEXT, body: { content: string } }
@@ -20,6 +21,8 @@ export type LocationMessageType = UiMessage & { type: typeof MESSAGE_TYPE.LOCATI
 export interface MessageStoreOptions {
   /** 单个会话最大消息存储数，默认 300 */
   maxMessageCount?: number
+  /** 会话消息缓存上限（opt-in）：超过时按 LRU 从最旧会话开始淘汰，默认 undefined = 不淘汰 */
+  maxCachedConversations?: number
 }
 
 export const useMessageStore = defineStore('message', () => {
@@ -34,6 +37,15 @@ export const useMessageStore = defineStore('message', () => {
   const isSyncingMessages = ref(false)
 
   let maxMessageCount = 300
+  /** 会话消息缓存上限（opt-in）：undefined = 不淘汰（Web 默认行为完全不变） */
+  let maxCachedConversations: number | undefined
+
+  /** 消息 ID → conversationId 索引（非响应式）：msgServerId / msgLocalId / localId 存在的都登记 */
+  const msgIdIndex = new Map<string, string>()
+  /** 会话 LRU 顺序（非响应式）：Map 键序即新旧顺序，最旧在前 */
+  const conversationLru = new Map<string, true>()
+  /** 最近一次 touch 的会话：淘汰时跳过，保护当前正在查看的会话 */
+  let lastTouchedConversationId: string | null = null
 
   /** 消息状态序号：状态只升不降（sending < sent < delivered < read），failed 与 sent 同级 */
   const STATUS_ORDER: Record<MessageStatus, number> = {
@@ -47,6 +59,9 @@ export const useMessageStore = defineStore('message', () => {
   function setOptions(options?: MessageStoreOptions) {
     if (options?.maxMessageCount !== undefined && options.maxMessageCount > 0) {
       maxMessageCount = options.maxMessageCount
+    }
+    if (options?.maxCachedConversations !== undefined && options.maxCachedConversations > 0) {
+      maxCachedConversations = options.maxCachedConversations
     }
   }
 
@@ -88,12 +103,75 @@ export const useMessageStore = defineStore('message', () => {
     return list.slice(-maxMessageCount)
   }
 
+  /** 登记消息 ID 索引（msgServerId / msgLocalId / localId 存在的都登记） */
+  function indexMessage(conversationId: string, msg: UiMessage) {
+    for (const id of [msg.msgServerId, msg.msgLocalId, msg.localId]) {
+      if (id)
+        msgIdIndex.set(id, conversationId)
+    }
+  }
+
+  /** 删除消息 ID 索引 */
+  function unindexMessage(msg: UiMessage) {
+    for (const id of [msg.msgServerId, msg.msgLocalId, msg.localId]) {
+      if (id)
+        msgIdIndex.delete(id)
+    }
+  }
+
+  /** trim 裁剪 + 同步删除被裁掉消息的 ID 索引（trim 保持纯函数，索引副作用收敛在调用侧） */
+  function trimWithIndexSync(list: UiMessage[]): UiMessage[] {
+    if (list.length > maxMessageCount) {
+      for (const m of list.slice(0, list.length - maxMessageCount))
+        unindexMessage(m)
+    }
+    return trim(list)
+  }
+
+  /** 二分查找插入位置：list 按 timestamp 升序，相同 timestamp 插到已有元素之后（与稳定排序语义一致） */
+  function findInsertIndex(list: UiMessage[], timestamp: number): number {
+    let lo = 0
+    let hi = list.length
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1
+      if (list[mid].timestamp <= timestamp)
+        lo = mid + 1
+      else
+        hi = mid
+    }
+    return lo
+  }
+
+  /** 按 timestamp 有序插入：空列表或不早于末条时尾部拼接（O(1) 快路径），否则二分定位后构造新数组 */
+  function insertSorted(list: UiMessage[], msg: UiMessage): UiMessage[] {
+    if (list.length === 0 || msg.timestamp >= list[list.length - 1].timestamp)
+      return [...list, msg]
+    const pos = findInsertIndex(list, msg.timestamp)
+    return [...list.slice(0, pos), msg, ...list.slice(pos)]
+  }
+
+  /** 在指定会话内按三种 ID 定位消息 */
+  function findIndexInConversation(conversationId: string, msgId: string): number {
+    return (messageMap.value[conversationId] || []).findIndex(
+      m => m.msgServerId === msgId || m.msgLocalId === msgId || m.localId === msgId,
+    )
+  }
+
   function _findMessageById(msgId: string): { conversationId: string, index: number } | null {
+    // 快路径：ID 索引命中 conversationId → 会话内定位
+    const indexed = msgIdIndex.get(msgId)
+    if (indexed !== undefined) {
+      const index = findIndexInConversation(indexed, msgId)
+      if (index > -1)
+        return { conversationId: indexed, index }
+      // 索引漂移（消息已删除/已不在该会话）：删索引后回退全表扫描，防假阴性
+      msgIdIndex.delete(msgId)
+    }
+    // 回退：全表扫描（防索引漂移产生假阴性），命中则补登索引
     for (const conversationId in messageMap.value) {
-      const index = messageMap.value[conversationId].findIndex(
-        m => m.msgServerId === msgId || m.msgLocalId === msgId || m.localId === msgId,
-      )
+      const index = findIndexInConversation(conversationId, msgId)
       if (index > -1) {
+        msgIdIndex.set(msgId, conversationId)
         return { conversationId, index }
       }
     }
@@ -123,9 +201,13 @@ export const useMessageStore = defineStore('message', () => {
         || (msg.msgLocalId && m.msgLocalId === msg.msgLocalId),
     )
     if (!exists) {
-      const newList = [...list, msg].sort((a, b) => a.timestamp - b.timestamp)
-      messageMap.value[msg.conversationId] = trim(newList)
+      const newList = trimWithIndexSync(insertSorted(list, msg))
+      messageMap.value[msg.conversationId] = newList
+      // 极端情况：乱序旧消息插入满列表时自身被 trim 裁掉，不登记索引
+      if (newList.includes(msg))
+        indexMessage(msg.conversationId, msg)
     }
+    touchConversation(msg.conversationId)
   }
 
   /** 发送前：将 SDK Message 以 sending 状态加入 store */
@@ -150,9 +232,12 @@ export const useMessageStore = defineStore('message', () => {
         || (uiMsg.msgLocalId && m.msgLocalId === uiMsg.msgLocalId),
     )
     if (!exists) {
-      const newList = [...list, uiMsg].sort((a, b) => a.timestamp - b.timestamp)
-      messageMap.value[uiMsg.conversationId] = trim(newList)
+      const newList = trimWithIndexSync(insertSorted(list, uiMsg))
+      messageMap.value[uiMsg.conversationId] = newList
+      if (newList.includes(uiMsg))
+        indexMessage(uiMsg.conversationId, uiMsg)
     }
+    touchConversation(uiMsg.conversationId)
   }
 
   /** 发送成功后替换本地 sending 消息 */
@@ -169,20 +254,23 @@ export const useMessageStore = defineStore('message', () => {
     const { conversationId, index } = found
     const list = messageMap.value[conversationId]
     const old = list[index]
+    const newMsg: UiMessage = {
+      ...msg,
+      isSelf: true,
+      localId,
+      translation: old.translation,
+      showTranslation: old.showTranslation,
+      voiceText: old.voiceText,
+      showVoiceText: old.showVoiceText,
+      requireGroupAck: old.requireGroupAck,
+    }
     messageMap.value[conversationId] = [
       ...list.slice(0, index),
-      {
-        ...msg,
-        isSelf: true,
-        localId,
-        translation: old.translation,
-        showTranslation: old.showTranslation,
-        voiceText: old.voiceText,
-        showVoiceText: old.showVoiceText,
-        requireGroupAck: old.requireGroupAck,
-      },
+      newMsg,
       ...list.slice(index + 1),
     ]
+    // 索引：localId 键保留（新消息仍携带该 localId），补登新消息的 serverId 等 ID
+    indexMessage(conversationId, newMsg)
   }
 
   /** 更新附件上传进度 */
@@ -211,7 +299,15 @@ export const useMessageStore = defineStore('message', () => {
     )
     const merged = [...newMsgs, ...existing]
     merged.sort((a, b) => a.timestamp - b.timestamp)
-    messageMap.value[conversationId] = trim(merged)
+    const trimmed = trimWithIndexSync(merged)
+    messageMap.value[conversationId] = trimmed
+    // 批量登记新插入消息的 ID 索引（被 trim 裁掉的不登记）
+    const keptSet = new Set(trimmed)
+    for (const m of newMsgs) {
+      if (keptSet.has(m))
+        indexMessage(conversationId, m)
+    }
+    touchConversation(conversationId)
   }
 
   /** 按消息 ID 局部更新 */
@@ -260,28 +356,36 @@ export const useMessageStore = defineStore('message', () => {
 
   /** 删除单条消息 */
   function deleteMessage(msgId: string) {
-    for (const conversationId in messageMap.value) {
-      const list = messageMap.value[conversationId]
-      const index = list.findIndex(
-        m => m.msgServerId === msgId || m.msgLocalId === msgId || m.localId === msgId,
-      )
-      if (index > -1) {
-        messageMap.value[conversationId] = [
-          ...list.slice(0, index),
-          ...list.slice(index + 1),
-        ]
-        break
-      }
-    }
+    const found = _findMessageById(msgId)
+    if (!found)
+      return
+    const { conversationId, index } = found
+    const list = messageMap.value[conversationId]
+    unindexMessage(list[index])
+    messageMap.value[conversationId] = [
+      ...list.slice(0, index),
+      ...list.slice(index + 1),
+    ]
   }
 
   /** 批量删除消息 */
   function deleteMessages(msgIds: string[]) {
     const idSet = new Set(msgIds)
     for (const conversationId in messageMap.value) {
-      messageMap.value[conversationId] = messageMap.value[conversationId].filter(
-        m => !idSet.has(m.msgServerId) && !idSet.has(m.msgLocalId) && !idSet.has(m.localId || ''),
-      )
+      const list = messageMap.value[conversationId]
+      const removed: UiMessage[] = []
+      const kept = list.filter((m) => {
+        const hit = idSet.has(m.msgServerId) || idSet.has(m.msgLocalId) || idSet.has(m.localId || '')
+        if (hit)
+          removed.push(m)
+        return !hit
+      })
+      // 无命中时不替换数组，避免无意义的响应式触发
+      if (removed.length === 0)
+        continue
+      for (const m of removed)
+        unindexMessage(m)
+      messageMap.value[conversationId] = kept
     }
   }
 
@@ -328,8 +432,10 @@ export const useMessageStore = defineStore('message', () => {
     const msgs = messageMap.value[conversationId] || []
     for (const m of msgs) {
       for (const id of [m.msgServerId, m.msgLocalId, m.localId]) {
-        if (id)
+        if (id) {
           delete parsedCombineMessageMap.value[id]
+          msgIdIndex.delete(id)
+        }
       }
     }
     delete messageMap.value[conversationId]
@@ -341,6 +447,41 @@ export const useMessageStore = defineStore('message', () => {
     for (const localId of relatedSending) {
       delete sendingMetaMap.value[localId]
     }
+    // 会话级 LRU：该会话退出缓存顺序与淘汰保护位
+    conversationLru.delete(conversationId)
+    if (lastTouchedConversationId === conversationId)
+      lastTouchedConversationId = null
+  }
+
+  /**
+   * 标记会话为最近使用（移到 LRU 最新）；超出 maxCachedConversations 时从最旧会话开始淘汰。
+   * 未配置 maxCachedConversations（默认）时为空操作，Web 行为完全不变。
+   */
+  function touchConversation(conversationId: string) {
+    if (!maxCachedConversations || maxCachedConversations <= 0)
+      return
+    conversationLru.delete(conversationId)
+    conversationLru.set(conversationId, true)
+    lastTouchedConversationId = conversationId
+    // 超限淘汰：从最旧开始；跳过最近一次 touch 的会话（保护当前正在查看的会话）
+    while (conversationLru.size > maxCachedConversations) {
+      const oldestEntry = conversationLru.keys().next()
+      if (oldestEntry.done || oldestEntry.value === lastTouchedConversationId)
+        break
+      conversationLru.delete(oldestEntry.value)
+      evictConversationMessages(oldestEntry.value)
+    }
+  }
+
+  /**
+   * 淘汰单个会话的消息缓存：复用 clearConversationMessages 的清理面
+   * （messageMap / pinnedMessageMap / atMeMessageMap / sendingMetaMap /
+   * parsedCombineMessageMap 关联条目 + ID 索引），并重置历史翻页游标，
+   * 回访该会话时由 chat 的「本地无消息才拉首屏」逻辑走 fetchHistory 漫游回源。
+   */
+  function evictConversationMessages(conversationId: string) {
+    clearConversationMessages(conversationId)
+    clearHistoryCursor(conversationId)
   }
 
   /** 设置翻译中状态 */
@@ -396,6 +537,9 @@ export const useMessageStore = defineStore('message', () => {
     groupMessageReadUsersMap.value = {}
     atMeMessageMap.value = {}
     isSyncingMessages.value = false
+    msgIdIndex.clear()
+    conversationLru.clear()
+    lastTouchedConversationId = null
   }
 
   return {
@@ -444,5 +588,6 @@ export const useMessageStore = defineStore('message', () => {
     toggleVoiceText,
     clearMessages,
     clearConversationMessages,
+    touchConversation,
   }
 })

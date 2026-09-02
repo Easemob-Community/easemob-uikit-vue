@@ -1,9 +1,9 @@
 import { computed, ref } from 'vue'
 import { MESSAGE_TYPE } from '@easemob/uikit-core'
 import { useUIKit } from './use-uikit'
-
-/** 历史消息游标（模块级单例，保证首屏拉取与上滑加载共享同一份游标） */
-const historyCursorMap = ref<Record<string, { cursor: string, isLast: boolean }>>({})
+// 游标存储抽为独立模块：message store 的会话淘汰需直接清游标，
+// 经 use-message-history 引用会形成 store → composable → use-uikit → store 循环
+import { clearHistoryCursor, getHistoryCursor, setHistoryCursor } from './message-history-cursor'
 
 export function useMessageHistory() {
   const { domains, stores } = useUIKit()
@@ -18,18 +18,6 @@ export function useMessageHistory() {
     // CMD 透传消息不做 UI 渲染，即使因异常进入 store 也在展示层兜底过滤
     return list.filter(msg => msg.type !== MESSAGE_TYPE.CMD)
   })
-
-  function getHistoryCursor(conversationId: string) {
-    return historyCursorMap.value[conversationId] || { cursor: '', isLast: false }
-  }
-
-  function setHistoryCursor(conversationId: string, cursor: string, isLast: boolean) {
-    historyCursorMap.value[conversationId] = { cursor, isLast }
-  }
-
-  function clearHistoryCursor(conversationId: string) {
-    delete historyCursorMap.value[conversationId]
-  }
 
   /** 拉取历史消息 */
   async function fetchHistoryMessages(cursor?: string) {

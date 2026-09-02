@@ -8,8 +8,17 @@ import { useCoreUIKit } from './use-uikit'
 
 const logger = createLogger('UIKit:UsePresence')
 
+/** presence 关闭时各操作仅告警一次（warnOnce），避免刷屏 */
+let warnedPresenceDisabled = false
+function warnPresenceDisabledOnce(action: string): void {
+  if (warnedPresenceDisabled)
+    return
+  warnedPresenceDisabled = true
+  logger.warn(`[usePresence] enablePresence 未开启，${action} 已跳过；如需在线状态请在 Provider 上显式 enablePresence`)
+}
+
 export function usePresence() {
-  const { domains, stores } = useCoreUIKit()
+  const { domains, stores, features } = useCoreUIKit()
   const presenceStore = stores.presence
 
   const presenceMap = computed(() => presenceStore.presenceMap)
@@ -24,11 +33,20 @@ export function usePresence() {
 
   /** 订阅在线状态（dataSource.subscribePresence 已经 core 翻译为 presence.subscribe 注入，由 Domain 委托） */
   async function subscribePresence(userIds: string[], expiry?: number) {
+    // 每次调用时读 features.enablePresence（响应式 getter），支持运行时切换
+    if (!features.enablePresence) {
+      warnPresenceDisabledOnce('subscribePresence')
+      return
+    }
     await domains.presence.subscribe(userIds, expiry)
   }
 
   /** 取消订阅 */
   async function unsubscribePresence(userIds: string[]) {
+    if (!features.enablePresence) {
+      warnPresenceDisabledOnce('unsubscribePresence')
+      return
+    }
     await domains.presence.unsubscribe(userIds)
   }
 
@@ -40,6 +58,8 @@ export function usePresence() {
    * 侧边栏等"自己的头像"正是依赖此能力拉取并展示自己的在线状态点。
    */
   async function fetchPresence(userIds: string[]): Promise<UiPresence[]> {
+    if (!features.enablePresence)
+      return []
     if (userIds.length === 0)
       return []
     await domains.presence.fetchStatus(userIds)
@@ -54,6 +74,10 @@ export function usePresence() {
    * 确保自己的头像指示器立即更新（无需等待服务端事件回传）。
    */
   async function publishPresence(description: string) {
+    if (!features.enablePresence) {
+      warnPresenceDisabledOnce('publishPresence')
+      return
+    }
     await domains.presence.publish(description)
     const userId = currentUserId.value
     if (userId) {
@@ -87,6 +111,12 @@ export function usePresence() {
     const stop = vueWatch(
       () => ({ ids: toValue(source), self: currentUserId.value }),
       ({ ids }) => {
+        // 关闭期：清空内部“已订阅”集合并跳过一切订阅/退订，
+        // 防止“关闭期标记已订阅、开启后漏订”的状态漂移
+        if (!features.enablePresence) {
+          current = []
+          return
+        }
         const next = (ids || []).filter(id => !isSelf(id))
         const toAdd = next.filter(id => !current.includes(id))
         const toRemove = current.filter(id => !next.includes(id))

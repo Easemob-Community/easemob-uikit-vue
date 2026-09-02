@@ -81,12 +81,16 @@ export const WEBSDK5_CHATROOM_MANAGERS: ClientConfig['managers'] = [
 /** manager 预设名（adapterConfig.managerPreset） */
 export type Websdk5ManagerPreset = 'im' | 'chatroom'
 
-/** 默认 UIKit 能力开关：adapter 独立运行或未传 features 时全开 */
+/**
+ * 默认 UIKit 能力开关：adapter 独立运行或未传 features 时使用。
+ * presence 默认关闭：在线状态属可选能力，需 Provider 显式 `enablePresence` 才启用，
+ * 避免默认全链路订阅/查询带来额外请求。
+ */
 function getDefaultFeatures(): UIKitFeatures {
   return {
     enableContact: true,
     enableBlocklist: true,
-    enablePresence: true,
+    enablePresence: false,
     presenceStrangerMode: 'query-on-visible',
     fetchGroupMemberPresenceOnVisible: true,
     contactFetchMode: 'all',

@@ -752,6 +752,14 @@ const messagesWithDividers = computed(() => {
 /** 闪烁高亮计时器，避免连续点击多个计时器堆积 */
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
+/** 卸载兜底：清除未触发的高亮计时器 */
+onUnmounted(() => {
+  if (highlightTimer) {
+    clearTimeout(highlightTimer)
+    highlightTimer = null
+  }
+})
+
 /** 定位并闪烁原消息；优先匹配 msgServerId，其次 msgLocalId；未找到返回 false */
 function locateAndFlash(targetMsgID: string): boolean {
   if (!targetMsgID)

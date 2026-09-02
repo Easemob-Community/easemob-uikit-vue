@@ -60,6 +60,7 @@ theme?: {
 ### 1.4 功能开关 enable 类开关（withDefaults 默认值）
 
 - `enableContact: false` / `enableBlocklist: false` / `enablePresence: false` — 默认关闭
+  - presence 是全链路默认关闭：`usePresence` composable 层有开关硬门（关闭时 subscribe/fetch/publish/watch 全 no-op）；adapter 独立运行（websdk5/webim4 `getDefaultFeatures()`）的 `enablePresence` 默认同样为 `false`（1.1.0 起），仅 Provider 显式开启才启用。
 - `enableGroup: true` / `enableUserInfo: true` / `enableUserInfoSubscription: true` — 默认开启
 - `enableDraft: true` / `enableAtMe: true` / `enableTyping: true` — 默认开启
 - `contactFetchMode: 'page'`（'page' 实际按全量返回处理；'all' 一次性全量拉取）
