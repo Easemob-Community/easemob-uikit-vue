@@ -371,6 +371,9 @@ defineExpose({
     <template v-if="$slots['subheader-extra']" #subheader-extra="subProps">
       <slot name="subheader-extra" v-bind="subProps" />
     </template>
+    <template v-if="$slots.watermark" #watermark>
+      <slot name="watermark" />
+    </template>
 
     <template #default="{ view }">
       <!-- Contact 子视图 -->
@@ -441,6 +444,9 @@ defineExpose({
         <template v-if="$slots['contact-search']" #search="slotProps">
           <slot name="contact-search" v-bind="slotProps" />
         </template>
+        <template v-if="$slots.watermark" #watermark>
+          <slot name="watermark" />
+        </template>
       </ContactListContainer>
 
       <!-- Group 子视图 -->
@@ -510,6 +516,9 @@ defineExpose({
         <template v-if="$slots['group-search']" #search="slotProps">
           <slot name="group-search" v-bind="slotProps" />
         </template>
+        <template v-if="$slots.watermark" #watermark>
+          <slot name="watermark" />
+        </template>
       </GroupListContainer>
 
       <!-- Notice 子视图：优先使用外部 #notice 插槽，否则默认渲染 ContactNoticeList -->
@@ -533,6 +542,9 @@ defineExpose({
       >
         <template v-if="$slots['blocklist-header']" #header>
           <slot name="blocklist-header" />
+        </template>
+        <template v-if="$slots.watermark" #watermark>
+          <slot name="watermark" />
         </template>
       </BlockListContainer>
     </template>

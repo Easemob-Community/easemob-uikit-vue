@@ -89,6 +89,9 @@ defineExpose({
       <template v-if="$slots.header" #header>
         <slot name="header" />
       </template>
+      <template v-if="$slots.watermark" #watermark>
+        <slot name="watermark" />
+      </template>
     </BlockList>
   </div>
 </template>

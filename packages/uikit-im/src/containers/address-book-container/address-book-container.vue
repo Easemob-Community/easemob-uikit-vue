@@ -411,6 +411,11 @@ const subviewTitle = computed(() => {
           <div v-if="$slots['home-footer']" class="address-book-container__home-footer">
             <slot name="home-footer" />
           </div>
+
+          <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满整个通讯录首页，不响应交互） -->
+          <div v-if="$slots.watermark" class="address-book-container__watermark">
+            <slot name="watermark" />
+          </div>
         </template>
 
         <!-- ===================== 子视图通用头部 ===================== -->
@@ -492,6 +497,16 @@ const subviewTitle = computed(() => {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 水印覆盖层：铺满首页，穿透事件；层级与内容浮层一致，低于弹窗 */
+.address-book-container__watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
   overflow: hidden;
 }
 

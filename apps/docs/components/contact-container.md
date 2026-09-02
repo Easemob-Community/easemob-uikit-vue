@@ -181,6 +181,7 @@ setPinyinAdapter((text) => {
 - `group-item` / `group-search`：群组列表项与搜索框自定义
 - `notice`：通知子视图内容（不传则默认渲染通知列表）
 - `body` / `footer` / `loading` / `empty` 等：列表通用插槽
+- `watermark`：通讯录水印覆盖层，铺满整个通讯录区域（首页入口 / 好友列表 / 群组列表 / 黑名单列表），`pointer-events: none` 不响应交互，内容由用户注入（`EmContactListContainer` / `EmContactList` / `EmGroupListContainer` / `EmGroupList` / `EmBlockListContainer` / `EmBlockList` 同样支持该插槽）
 
 ## 实例方法
 

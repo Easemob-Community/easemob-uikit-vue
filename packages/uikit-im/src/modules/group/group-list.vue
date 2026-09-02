@@ -550,6 +550,11 @@ defineExpose({
       :bottom="12"
       :right="12"
     />
+
+    <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满整个列表区，不响应交互） -->
+    <div v-if="$slots.watermark" class="group-list__watermark">
+      <slot name="watermark" />
+    </div>
   </div>
 </template>
 
@@ -560,6 +565,15 @@ defineExpose({
   height: 100%;
   position: relative;
   background-color: var(--uikit-bg-base);
+}
+
+/* 水印覆盖层：铺满列表区，穿透事件；层级与内容浮层一致，低于弹窗 */
+.group-list__watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .group-list__header {

@@ -222,6 +222,11 @@ defineExpose({
 
     <!-- 添加黑名单：选人弹窗 -->
     <BlockListAddModal v-model:show="showAddModal" />
+
+    <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满整个列表区，不响应交互） -->
+    <div v-if="$slots.watermark" class="block-list-contact__watermark">
+      <slot name="watermark" />
+    </div>
   </div>
 </template>
 
@@ -232,6 +237,16 @@ defineExpose({
   height: 100%;
   min-height: 0;
   background-color: var(--uikit-bg-base);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 水印覆盖层：铺满列表区，穿透事件；层级与内容浮层一致，低于弹窗 */
+.block-list-contact__watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
   overflow: hidden;
 }
 
