@@ -81,12 +81,14 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 - `--uikit-shadow-hover`：hover / 浮起阴影
 - `--uikit-shadow-sm`：轻量小阴影（卡片/抽屉内）
 
-### 字号
+### 字体与字号
+
+- `--uikit-font-family`：字体族栈。栈首 `'Inter'`（拉丁字形）/ `'Noto Sans SC'`（中文），本机未安装时回落 PingFang SC / 雅黑 / 思源黑体等系统字体；库不内置网络字体加载，需要精确字形时由接入方自行引入 webfont，或直接覆盖该变量。
 
 字号 token 与 `--uikit-font-scale` 联动，用于实现全局字号缩放（适老版）：
 
 - `--uikit-font-scale`：全局字号缩放倍数（默认 `1`）
-- `--uikit-font-size-10` ~ `--uikit-font-size-22`：按像素基准 × 缩放倍数计算
+- `--uikit-font-size-8` ~ `--uikit-font-size-34`：按像素基准 × 缩放倍数计算（含 28 / 34 大标题档）
 
 ### 字重与行高
 
@@ -100,18 +102,22 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 
 ### 排版层级
 
-| 层级 | Token（字号） | 行高 | 字重 | 颜色 | 用途 |
+层级由原子组件 `EmText` 承载（`level` prop），每档内置「字号 + 行高」配对与默认字重，底层走 `--uikit-font-size-*` token、行高按 `calc(Npx × --uikit-font-scale)` 等比缩放；命名对齐设计侧 Value.tokens.json：
+
+| 层级（`level`） | 字号 | 行高 | 默认字重 | 常用颜色 | 用途 |
 | --- | --- | --- | --- | --- | --- |
-| Display | `--uikit-font-size-22` | `--uikit-font-lineheight-tight` | 600 | `text-primary` | 页面大标题、空态主文案 |
-| H1 | `--uikit-font-size-20` | `--uikit-font-lineheight-tight` | 600 | `text-primary` | 弹窗标题、模块标题 |
-| H2 | `--uikit-font-size-18` | `--uikit-font-lineheight-tight` | 600 | `text-primary` | 卡片标题、抽屉标题 |
-| H3 | `--uikit-font-size-16` | `--uikit-font-lineheight-normal` | 600 | `text-primary` | 列表分组标题、小标题 |
-| H4 | `--uikit-font-size-15` | `--uikit-font-lineheight-normal` | 500 | `text-primary` | 单元格主标题 |
-| Body-L | `--uikit-font-size-16` | `--uikit-font-lineheight-normal` | 400 | `text-primary` | 正文大字号（H5 输入框规避 iOS 缩放） |
-| Body-M | `--uikit-font-size-14` | `--uikit-font-lineheight-normal` | 400 | `text-primary` | 默认正文 |
-| Body-S | `--uikit-font-size-13` | `--uikit-font-lineheight-normal` | 400 | `text-secondary` | 辅助说明、时间戳 |
-| Caption | `--uikit-font-size-12` | `--uikit-font-lineheight-relaxed` | 400 | `text-tertiary` | 标签、提示、错误文案 |
-| Overline | `--uikit-font-size-10` | `--uikit-font-lineheight-normal` | 500 | `text-tertiary` | 徽标数字、极小标签 |
+| h0 | 34 | 42 | 600 | `text-primary` | 页面大标题 |
+| h1 | 28 | 34 | 600 | `text-primary` | 模块大标题 |
+| h2 | 22 | 26 | 600 | `text-primary` | 弹窗标题、模块标题 |
+| h3 | 18 | 24 | 600 | `text-primary` | 卡片标题、抽屉标题 |
+| body-lg | 16 | 24 | 400 | `text-primary` | 正文大字号（H5 输入框规避 iOS 缩放） |
+| body | 14 | 22 | 400 | `text-primary` | 默认正文 |
+| body-sm | 13 | 20 | 400 | `text-secondary` | 辅助说明、时间戳 |
+| caption | 12 | 18 | 400 | `text-tertiary` | 标签、提示、错误文案 |
+| small | 10 | 14 | 500 | `text-tertiary` | 徽标数字、极小标签 |
+| mini | 8 | 12 | 500 | `text-tertiary` | 极小徽标数字 |
+
+> 旧命名对照：Display→h2、H2→h3、H3/Body-L→body-lg、Body-M→body、Body-S→body-sm、Caption→caption、Overline→small；旧 H1（20px）/ H4（15px）无对应新档，其 token 保留供组件内部使用。`EmText` 另提供 `weight`（覆盖默认字重）/ `ellipsis`（单行截断）/ `tag`（默认 `span`）props。
 
 ### 密度
 

@@ -10,7 +10,7 @@
 | --- | --- |
 | SCSS 变量（`$color-*`）+ `styles/` 目录 | 本库零 sass 依赖；SCSS 变量编译期固化，不支持暗色与运行时换肤。`--uikit-*` CSS 变量契约（`packages/uikit-core/src/theme/index.css`）是其超集。 |
 | 27 个 `.text-{level}-{weight}` 工具类 | 本库不用原子工具类（UnoCSS 为死配置，见 skill `uikit-styling-theming`）；组件样式走 `<style scoped>` + BEM。 |
-| Inter + Google Fonts（400/500/600） | 国内可达性差；库不应给接入方强加网络字体依赖。`--uikit-font-family` 系统字体栈（PingFang/雅黑/思源黑体）对中文 IM 是正确选择，接入方可覆盖。 |
+| Inter + Google Fonts 网络加载（400/500/600） | 国内可达性差；库不应给接入方强加网络字体依赖。**2026-09-03 修订**：字体名本身已落地——`--uikit-font-family` 栈首声明 `'Inter'`（拉丁）/ `'Noto Sans SC'`（中文，对齐设计师 Value.tokens.json），本机未装自动回落系统字体栈；webfont 加载仍由接入方/demo 自决。 |
 | `src/components/base|conversation` 目录结构 | 单包应用思路；本库是 monorepo：原子组件在 `uikit-core/src/components`，业务块在 `uikit-im/src/modules`，容器在 `uikit-im/src/containers`。 |
 
 ## 二、设计色板 ↔ token 对照表
@@ -32,10 +32,16 @@
 
 ## 三、Typography 对照
 
-设计「9 层级 × 3 字重」已覆盖：**文档站 `theme#排版层级`** 有 10 级语义表（Display / H1–H4 / Body-L/M/S / Caption / Overline），
-底层是 `--uikit-font-size-8~22` × `--uikit-font-scale`（适老缩放，设计师方案没有的能力）、
-`--uikit-font-weight-regular/medium/semibold/bold`、`--uikit-font-lineheight-*`。
-唯一缺口是层级没有组件载体 → 待 `EmText`（TECH-DEBT D127）。
+2026-09-03 第二轮：设计师输出 Figma 变量导出 `Value.tokens.json`（字体族 CHN=Noto Sans SC / alphabet=Inter，
+字重 400/500/600/700，字号 9 档 h0=34 / h1=28 / h2=22 / h3=18 / body-lg=16 / body=14 / caption=12 / small=10 / mini=8，
+行高逐档绝对值配对 42/34/26/24/24/22/18/14/12）。落地口径：
+
+- **字体族**：栈首声明制（见第一节修订行），不引网络字体。
+- **字重**：与 `--uikit-font-weight-regular/medium/semibold/bold` 完全一致，零改动。
+- **字号**：22/18/16/14/12/10/8 既有 `--uikit-font-size-*` 全覆盖；补 `--uikit-font-size-28` / `-34` 两档（明暗两段，× `--uikit-font-scale`）。
+- **行高**：稿值绝对 px 不照抄（与适老缩放冲突），换算为按档配对的 `calc(Npx × --uikit-font-scale)`。
+- **层级载体**：9 档 + 补 `body-sm`（13px，沿用旧 Body-S）落地为原子组件 `EmText`（`level/weight/color/ellipsis/tag`，
+  `packages/uikit-core/src/components/text/`），文档站 `theme#排版层级` 表同步改新命名（旧命名对照见表注）——TECH-DEBT D127 关闭。
 
 ## 四、已落地的规格校准（2026-09，im 3.2.0 / core 2.3.0）
 
@@ -49,7 +55,7 @@
 
 ## 五、未落地项（见 TECH-DEBT）
 
-- D127 `EmText` 排版组件；D128 avatar-only 72px 折叠会话栏；
+- D128 avatar-only 72px 折叠会话栏；
 - D129 Badge s/m 档字号偏差待设计确认；D130 compact 密度档排版偏挤待验证。
 
 ## 六、对接流程建议（下次设计给稿时）

@@ -47,8 +47,10 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 | `--uikit-font-size-15` | 15px | H4、单元格标题 |
 | `--uikit-font-size-16` | 16px | Body-L、H3 |
 | `--uikit-font-size-18` | 18px | H2、卡片标题 |
-| `--uikit-font-size-20` | 20px | H1、弹窗标题 |
-| `--uikit-font-size-22` | 22px | Display、页面大标题 |
+| `--uikit-font-size-20` | 20px | 弹窗标题（旧 H1 档） |
+| `--uikit-font-size-22` | 22px | h2、页面标题 |
+| `--uikit-font-size-28` | 28px | h1、模块大标题 |
+| `--uikit-font-size-34` | 34px | h0、页面大标题 |
 
 字号 token 均乘以 `--uikit-font-scale`（默认 1），用于适老版全局放大。
 

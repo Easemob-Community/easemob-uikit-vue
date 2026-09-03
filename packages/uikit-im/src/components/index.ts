@@ -26,6 +26,7 @@ export {
   EmScrollToTop,
   EmSkeleton,
   EmStatusBanner,
+  EmText,
   EmToast,
   EmUserCard,
 } from '@easemob/uikit-core'
@@ -47,6 +48,10 @@ export type {
   StatusBannerItem,
   StatusBannerProps,
   StatusBannerType,
+  TextColor,
+  TextLevel,
+  TextProps,
+  TextWeight,
 } from '@easemob/uikit-core'
 export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
 export { default as EmGroupCard } from './group-card/group-card.vue'
@@ -82,4 +87,5 @@ export const componentList = [
   'em-image-viewer',
   'em-resizable',
   'em-skeleton',
+  'em-text',
 ] as const

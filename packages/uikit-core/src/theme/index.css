@@ -151,8 +151,9 @@
   /* 交错动画间隔（Action-Sheet 项列） */
   --uikit-anim-stagger-delay: 30ms;
 
-  /* 字体族：优先使用系统字体与中文黑体，确保跨平台一致 */
-  --uikit-font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Source Han Sans SC', sans-serif;
+  /* 字体族：栈首声明设计规范字体（Inter 覆盖拉丁、Noto Sans SC 覆盖中文），本机未安装时回落系统字体栈；
+     库不内置网络字体加载，需要精确字形时由接入方/demo 自行引入 webfont */
+  --uikit-font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Source Han Sans SC', sans-serif;
   font-family: var(--uikit-font-family);
 
   /* 字体缩放：由 themeStore / useH5Adaptation 统一写入 */
@@ -182,6 +183,8 @@
   --uikit-font-size-18: calc(18px * var(--uikit-font-scale));
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
+  --uikit-font-size-28: calc(28px * var(--uikit-font-scale));
+  --uikit-font-size-34: calc(34px * var(--uikit-font-scale));
 
   /* 语义 token：气泡 */
   --uikit-bubble-bg-other: var(--uikit-bg-secondary);
@@ -248,6 +251,8 @@
   --uikit-font-size-18: calc(18px * var(--uikit-font-scale));
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
+  --uikit-font-size-28: calc(28px * var(--uikit-font-scale));
+  --uikit-font-size-34: calc(34px * var(--uikit-font-scale));
 
   /* 语义 token：气泡 - 暗色默认与浅色逻辑一致 */
   --uikit-bubble-bg-other: var(--uikit-bg-secondary);

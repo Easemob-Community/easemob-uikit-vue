@@ -1275,10 +1275,11 @@
 - **联动**：D122（SDK adapter 抽象）/ D125（微前端宿主兼容）/ D85（Electron 持久化注入点）。
 - **关联 skill**：`uikit-package-boundary` / `uikit-provider-config` / `uikit-chat-plugin-tabs`
 
-### [ ] D127. `EmText` 排版原子组件缺失（设计 Typography 方案唯一未落地项）
+### [x] D127. `EmText` 排版原子组件缺失（设计 Typography 方案唯一未落地项）
 
 - **背景**：2026-09 设计师整改意见提出 `BaseText`（`level/weight/color/ellipsis/tag` 五 props）。经评估其底层（字号/字重/行高 token、`--uikit-font-scale` 适老缩放）已全部具备，文档站 `theme#排版层级` 已有语义层级表，但层级仅停留在「文档约定」，没有组件级强制载体；单行截断 ellipsis 目前散在各组件里手写三件套。
 - **建议修法**：在 `packages/uikit-core/src/components/text/` 新增 `EmText`：props 对齐设计师接口（`level` 映射语义层级 → 现有 `--uikit-font-size-*` token，**不写死 px**；`weight` 走 `--uikit-font-weight-*`；`ellipsis` 单行截断；`tag` 默认 `span`）；新增后**不全库回改**，新代码用、老代码渐进迁移；按 `uikit-component-authoring` 规范补 story 并跑 `aux:gen`。
+- **修复**：已于 2026-09-03 修复。新增 `EmText`（core `components/text/text.vue` + story），`level` 对齐设计师 `Value.tokens.json` 9 档（h0/h1/h2/h3/body-lg/body/caption/small/mini）并补 `body-sm`（13px）；每档内置「字号 + 行高」配对（行高按稿值换算为 `calc(Npx × --uikit-font-scale)`），`weight`/`color` 走 `--uikit-font-weight-*` / `--uikit-text-*` token，`ellipsis` 单行截断（块级渲染），`tag` 默认 `span`；配套补 `--uikit-font-size-28` / `-34` 两档 token，`--uikit-font-family` 栈首声明 `'Inter'` / `'Noto Sans SC'`（不内置网络字体）；im 侧 barrel 同步 re-export。全库回改按「新代码用、老代码渐进迁移」执行。
 - **关联 skill**：`uikit-component-authoring` / `uikit-styling-theming`
 
 ### [ ] D128. `avatar-only` 72px 折叠会话栏（设计师 mode 三形态剩余一种）

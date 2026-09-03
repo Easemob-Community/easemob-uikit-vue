@@ -1,5 +1,19 @@
 # Changelog
 
+## @easemob/uikit-im 3.4.0 (2026-09-03)
+
+### 新增
+
+- **`EmText` 排版原子组件 re-export**：与 core 2.5.0 对齐，`@easemob/uikit-im` 侧同步导出 `EmText` 及 `TextProps` / `TextLevel` / `TextWeight` / `TextColor` 类型（见 core 2.5.0）。
+
+## @easemob/uikit-core 2.5.0 (2026-09-03)
+
+### 新增
+
+- **`EmText` 排版原子组件**（TECH-DEBT D127）：`level` 对齐设计师 Value.tokens.json 9 档（h0=34 / h1=28 / h2=22 / h3=18 / body-lg=16 / body=14 / caption=12 / small=10 / mini=8）并补 `body-sm`（13px）；每档内置「字号 + 行高」配对（行高按稿值换算为 `calc(Npx × --uikit-font-scale)`，跟随适老缩放）与默认字重；`weight`（regular / medium / semibold / bold）可覆盖默认字重，`color`（primary / secondary / tertiary / inverse）走语义 token，`ellipsis` 单行截断，`tag` 默认 `span`。新增后不全库回改，新代码用、老代码渐进迁移。
+- **字号 token 补两档大标题**：`--uikit-font-size-28` / `--uikit-font-size-34`（明暗两段，× `--uikit-font-scale`）。
+- **字体族栈首声明设计规范字体**：`--uikit-font-family` 栈首加 `'Inter'`（拉丁字形）/ `'Noto Sans SC'`（中文），本机未安装时自动回落 PingFang SC / 雅黑 / 思源黑体等系统字体栈；库不内置网络字体加载，需要精确字形时由接入方自行引入 webfont。
+
 ## @easemob/uikit-im 3.3.0 (2026-09-03)
 
 ### 新增
