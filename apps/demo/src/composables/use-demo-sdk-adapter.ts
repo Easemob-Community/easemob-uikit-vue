@@ -15,6 +15,7 @@
 import { ref } from 'vue'
 import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
 import type { SdkRepositoryOverrides } from '@easemob/uikit-im'
+import { getElectronPersistInjection } from './use-electron-persist'
 import { demoSdkVersion, sdkIsHttpDNS } from './use-demo-settings'
 
 /** 4.x adapter 单例（模块级持有，与 Provider 解耦；demo 全权管理其 login/logout） */
@@ -58,15 +59,24 @@ export interface DemoSdkInitInput {
  * 组装 init 配置：apiUrl 非空才传；webim4 模式追加 isHttpDNS（私有化部署验证时关闭）；
  * 开启自定义数据源开关时注入 repositories.contact（core 归一化会下沉 adapterConfig，
  * 并与 dataSource 翻译结果合并，显式 repositories 优先）。
+ * Electron 本地持久化开关开启时（demo-electron 壳内，登录前 prepareElectronPersist
+ * 已让主进程打开库），合并 IPC 代理注入产物：persistence 旁路写库 hooks +
+ * repositories.message/conversation 读路径接管（与 contact 自定义源按 key 合并）。
  * core 会把 appKey/debug 之外的平铺字段下沉 adapterConfig，
  * 4.x adapter 再将剩余字段原样透传给 `new WebIM.connection(params)`。
  */
 export function buildDemoSdkInitConfig(input: DemoSdkInitInput) {
+  const persistInjection = getElectronPersistInjection()
+  const repositories = {
+    ...persistInjection?.repositories,
+    ...(demoUseCustomDataSource.value ? { contact: demoContactRepository } : {}),
+  }
   return {
     appKey: input.appKey,
     ...(input.apiUrl ? { apiUrl: input.apiUrl } : {}),
     ...(isWebim4Mode() ? { isHttpDNS: sdkIsHttpDNS.value } : {}),
-    ...(demoUseCustomDataSource.value ? { repositories: { contact: demoContactRepository } } : {}),
+    ...(persistInjection ? { persistence: persistInjection.persistence } : {}),
+    ...(Object.keys(repositories).length > 0 ? { repositories } : {}),
     debug: input.debug,
   }
 }

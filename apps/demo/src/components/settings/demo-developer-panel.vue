@@ -22,6 +22,11 @@ import {
   toggleDemoCollectSdkLog,
   useDemoSettings,
 } from '../../composables/use-demo-settings'
+import {
+  electronPersistEnabled,
+  electronPersistSupported,
+  setElectronPersistEnabled,
+} from '../../composables/use-electron-persist'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
@@ -64,6 +69,25 @@ async function onClearLogs() {
         ② 悬停消息气泡 2 秒 → 气泡右上角出现 💡 角标，点击展开详情抽屉（接口对照 + 参考文件）；<br />
         ③ 官方 5.x 文档上线前，接口权威签名见 SDK 包内 types/*.d.ts，实现思路以 UIKit 源码为准。<br />
         仅桌面端生效，移动端自动隐藏。
+      </div>
+    </div>
+
+    <!-- Electron 本地持久化（demo-electron 验证工程）：仅壳内（preload 注入桥）显示 -->
+    <div v-if="electronPersistSupported" class="demo-settings__group">
+      <DemoSettingLabel
+        title="本地持久化（Electron）"
+        tip="开启后登录前经 IPC 让主进程打开 SQLite 库（userData/uikit_<appKey>_<userId>.db），persistence hooks 旁路写库 + repository 读路径接管；左下角出现测试面板。切换后自动刷新页面生效"
+      />
+      <button
+        class="demo-btn"
+        :class="{ 'demo-btn--active': electronPersistEnabled }"
+        @click="setElectronPersistEnabled(!electronPersistEnabled)"
+      >
+        {{ electronPersistEnabled ? '已开启' : '已关闭' }}
+      </button>
+      <div class="demo-info">
+        开启后：消息 / 会话旁路写入主进程 SQLite，历史与会话列表读自本地库；<br>
+        测试面板（左下角 DB 浮球）：库统计 / 灌测试消息 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
       </div>
     </div>
 

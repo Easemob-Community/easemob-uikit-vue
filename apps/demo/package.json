@@ -11,6 +11,7 @@
   "dependencies": {
     "@easemob/uikit-chatroom": "workspace:*",
     "@easemob/uikit-im": "workspace:*",
+    "@easemob/uikit-sdk-contract": "workspace:*",
     "@easemob/uikit-sdk-webim4": "workspace:*",
     "@easemob/uikit-sdk-websdk5": "workspace:*",
     "easemob-websdk": "^5.0.0",

@@ -6,6 +6,7 @@ import LoginPage from './login-page.vue'
 import ChatroomDemoPage from './chatroom-demo-page.vue'
 import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, demoUseCustomDataSource, webim4Adapter } from './composables/use-demo-sdk-adapter'
+import { prepareElectronPersist } from './composables/use-electron-persist'
 
 /**
  * Provider 三开关 × 自定义数据源（repositories 注入）演示
@@ -61,6 +62,9 @@ const AppContent = {
       autoLoggingIn.value = true
       autoLoginError.value = ''
       try {
+        // Electron 持久化开关开启时：登录前经 IPC 让主进程打开 uikit_<appKey>_<userId>.db
+        // （Web 模式 prepareElectronPersist 内部特性检测直接跳过，行为零变化）
+        await prepareElectronPersist(config.appKey, config.user)
         init(buildDemoSdkInitConfig({
           appKey: config.appKey,
           apiUrl: config.apiUrl,

@@ -4,6 +4,7 @@ import { EmIcon, useClient } from '@easemob/uikit-im'
 import { demoPresetUsers, demoSdkVersion, sdkIsHttpDNS, setDemoSdkVersion, setSdkIsHttpDNS } from './composables/use-demo-settings'
 import type { DemoPresetUser, DemoSdkVersion } from './composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, isWebim4Mode } from './composables/use-demo-sdk-adapter'
+import { prepareElectronPersist } from './composables/use-electron-persist'
 
 const emit = defineEmits<{
   (e: 'login-success'): void
@@ -71,6 +72,9 @@ async function handleLogin() {
 
   loading.value = true
   try {
+    // Electron 持久化开关开启时：登录前经 IPC 让主进程打开 uikit_<appKey>_<userId>.db
+    // （Web 模式 prepareElectronPersist 内部特性检测直接跳过，行为零变化）
+    await prepareElectronPersist(sdkAppKey.value, loginUser.value)
     // 初始化 SDK（webim4 模式附带 isHttpDNS 透传给 4.x connection）
     init(buildDemoSdkInitConfig({
       appKey: sdkAppKey.value,

@@ -1,0 +1,19 @@
+{
+  "name": "@easemob/demo-electron",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Easemob UIKit Electron persistence validation harness (shell + test panel, reuses apps/demo renderer)",
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "electron .",
+    "rebuild": "electron-rebuild -f -w better-sqlite3"
+  },
+  "dependencies": {
+    "@easemob/uikit-persist-sqlite": "workspace:*",
+    "better-sqlite3": "^11.10.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
+    "electron": "^33.4.11"
+  }
+}

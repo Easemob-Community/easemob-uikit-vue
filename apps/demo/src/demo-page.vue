@@ -37,8 +37,10 @@ import {
   simulateStreamMessage,
 } from './components/ai/use-stream-demo'
 import DemoSettingsDrawer from './components/settings/demo-settings-drawer.vue'
+import DemoElectronPersistPanel from './components/demo-electron-persist-panel.vue'
 import DemoDevHintCard from './dev-hints/demo-dev-hint-card.vue'
 import { useDevHints } from './dev-hints/use-dev-hints'
+import { electronPersistEnabled, electronPersistSupported } from './composables/use-electron-persist'
 import { demoStickerPacks, useDemoSettings } from './composables/use-demo-settings'
 
 /**
@@ -917,6 +919,9 @@ watch(
       :contacts="stores.contact.contactList"
       @select="sendCard"
     />
+
+    <!-- Electron 本地持久化测试面板（仅 demo-electron 壳内且开关开启时挂载；Web 模式零变化） -->
+    <DemoElectronPersistPanel v-if="electronPersistSupported && electronPersistEnabled" />
 
     <!-- Dev Hints 开发者友好模式覆盖层（仅 PC；移动端无 hover 不启用） -->
     <div v-if="!isMobile" class="demo-dev-hints-layer">
