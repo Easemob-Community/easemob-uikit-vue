@@ -119,11 +119,16 @@ async function trackedRead<T extends { list: unknown[] }>(
   const start = Date.now()
   try {
     const page = await fn()
-    recordRead(method, detail, page.list.length, Date.now() - start)
+    const ms = Date.now() - start
+    recordRead(method, detail, page.list.length, ms)
+    // harness 埋点日志（no-console 只允许 warn/error）
+    console.warn(`[persist] ${method} ${detail} → ${page.list.length} 条 · ${ms}ms`)
     return page
   }
   catch (error) {
-    recordRead(method, detail, -1, Date.now() - start)
+    const ms = Date.now() - start
+    recordRead(method, detail, -1, ms)
+    console.warn(`[persist] ${method} ${detail} → 异常 · ${ms}ms`, error)
     throw error
   }
 }
@@ -209,29 +214,63 @@ export function electronSetOffline(offline: boolean): Promise<void> {
   return window.demoShell?.setOffline(offline) ?? Promise.resolve()
 }
 
+/** 灌数中文样本（轮换拼接序号，灌完可直接验证中文 FTS 搜索） */
+const SEED_TEXT_SAMPLES = [
+  '明天下午开会讨论方案',
+  '这个项目的需求文档已经更新',
+  '周五之前把设计稿评审完',
+  '服务端的漫游接口需要联调',
+  '本地搜索的性能验收标准是五百毫秒',
+  '群公告记得同步给新成员',
+  '数据库迁移脚本今天跑一遍',
+  '客户反馈的问题已记录到工单',
+  '下周的版本计划排一下优先级',
+  '附件离线下载功能开始验收',
+]
+
+/** 灌数分批大小（避免单次巨型 IPC） */
+const SEED_BATCH_SIZE = 500
+
 /**
- * 灌测试消息：直接调 hooks.saveMessages 批量造数据（文本类型，时间戳递增）。
- * 用于「翻页穿内存」「中文搜索」等验收路径的数据准备。
+ * 灌测试消息：分批调 hooks.saveMessages 造数据（每批 500 条，批间让出事件循环）。
+ * 内容轮换中文样本 + 序号，用于「翻页穿内存」「中文 FTS 搜索」
+ * 「10 万级全局搜索 P95 < 500ms」等验收路径的数据准备。
+ * onProgress 回传（已写入, 总数）；返回总耗时 ms。
  */
 export async function electronPersistSeedMessages(
   conversationId: string,
   conversationType: 'singleChat' | 'groupChat',
   count: number,
-): Promise<void> {
-  const now = Date.now()
-  const records: MessageRecord[] = Array.from({ length: count }, (_, i) => ({
-    msgServerId: `seed-${now}-${i}`,
-    msgLocalId: `seed-local-${now}-${i}`,
-    from: 'seed-bot',
-    to: currentAccount?.userId ?? 'me',
-    sender: { userId: 'seed-bot', nickname: '灌数机器人' },
-    conversationId,
-    conversationType,
-    type: 'text',
-    sendStatus: 'sent',
-    ext: {},
-    timestamp: now - (count - i) * 1000,
-    body: { content: `灌数消息 ${i + 1}：明天下午开会讨论持久化方案` },
-  }))
-  await invoke('hooks.message.saveMessages', records)
+  onProgress?: (done: number, total: number) => void,
+): Promise<number> {
+  const start = Date.now()
+  let written = 0
+  while (written < count) {
+    const batchSize = Math.min(SEED_BATCH_SIZE, count - written)
+    const batchBase = written
+    const records: MessageRecord[] = Array.from({ length: batchSize }, (_, i) => {
+      const seq = batchBase + i
+      return {
+        msgServerId: `seed-${start}-${seq}`,
+        msgLocalId: `seed-local-${start}-${seq}`,
+        from: 'seed-bot',
+        to: currentAccount?.userId ?? 'me',
+        sender: { userId: 'seed-bot', nickname: '灌数机器人' },
+        conversationId,
+        conversationType,
+        type: 'text',
+        sendStatus: 'sent',
+        ext: {},
+        timestamp: start - (count - seq) * 1000,
+        body: { content: `${SEED_TEXT_SAMPLES[seq % SEED_TEXT_SAMPLES.length]}（第 ${seq + 1} 条）` },
+      }
+    })
+    await invoke('hooks.message.saveMessages', records)
+    written += batchSize
+    onProgress?.(written, count)
+    // 批间让出事件循环，避免长链路 IPC 阻塞渲染
+    if (written < count)
+      await new Promise(resolve => setTimeout(resolve, 0))
+  }
+  return Date.now() - start
 }

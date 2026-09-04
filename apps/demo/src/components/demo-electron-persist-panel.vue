@@ -22,6 +22,16 @@ import {
 /** 灌数参数 */
 const seedConversationId = ref('persist-test')
 const seedCount = ref(300)
+/** 灌数预设档位（10 万级用于全局搜索 P95 < 500ms 验收） */
+const seedPresets = [
+  { label: '1千', count: 1000 },
+  { label: '1万', count: 10000 },
+  { label: '10万', count: 100000 },
+] as const
+/** 灌数进度（空串 = 未在灌数） */
+const seedProgress = ref('')
+/** 灌数进行中（期间按钮禁用） */
+const seeding = ref(false)
 /** 断网状态（面板本地态） */
 const offline = ref(false)
 /** 面板收起态（默认收起为小球，点击展开） */
@@ -51,9 +61,29 @@ async function onStats() {
   tip.value = `库统计已输出到控制台（消息数: ${(stats as { messageCount?: number })?.messageCount ?? '-'}）`
 }
 
-async function onSeed() {
-  await electronPersistSeedMessages(seedConversationId.value, 'singleChat', seedCount.value)
-  tip.value = `已向 ${seedConversationId.value} 灌入 ${seedCount.value} 条测试消息`
+async function onSeed(count?: number) {
+  const total = count ?? seedCount.value
+  if (count !== undefined)
+    seedCount.value = count
+  seeding.value = true
+  seedProgress.value = `已写入 0 / ${total}`
+  tip.value = ''
+  try {
+    const elapsed = await electronPersistSeedMessages(
+      seedConversationId.value,
+      'singleChat',
+      total,
+      (done, t) => { seedProgress.value = `已写入 ${done} / ${t}` },
+    )
+    tip.value = `已向 ${seedConversationId.value} 灌入 ${total} 条测试消息，耗时 ${elapsed}ms`
+  }
+  catch (error) {
+    tip.value = `灌数失败: ${(error as Error).message}`
+  }
+  finally {
+    seeding.value = false
+    seedProgress.value = ''
+  }
 }
 
 async function onClearAll() {
@@ -87,17 +117,29 @@ async function onToggleOffline() {
       <p class="persist-panel__title">
         本地持久化测试面板
       </p>
-      <button class="persist-panel__btn" @click="onStats">
+      <button class="persist-panel__btn" :disabled="seeding" @click="onStats">
         库统计
       </button>
       <div class="persist-panel__seed">
-        <input v-model="seedConversationId" class="persist-panel__input" placeholder="conversationId">
-        <input v-model.number="seedCount" class="persist-panel__input persist-panel__input--num" type="number" min="1">
-        <button class="persist-panel__btn" @click="onSeed">
+        <input v-model="seedConversationId" class="persist-panel__input" placeholder="conversationId" :disabled="seeding">
+        <input v-model.number="seedCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="seeding">
+        <button class="persist-panel__btn" :disabled="seeding" @click="onSeed()">
           灌测试消息
         </button>
       </div>
-      <button class="persist-panel__btn" @click="onClearAll">
+      <div class="persist-panel__seed-presets">
+        <button
+          v-for="p in seedPresets"
+          :key="p.count"
+          class="persist-panel__btn persist-panel__btn--preset"
+          :disabled="seeding"
+          @click="onSeed(p.count)"
+        >
+          {{ p.label }}
+        </button>
+        <span v-if="seedProgress" class="persist-panel__seed-progress">{{ seedProgress }}</span>
+      </div>
+      <button class="persist-panel__btn" :disabled="seeding" @click="onClearAll">
         清空全部
       </button>
       <button class="persist-panel__btn persist-panel__btn--danger" @click="onDeleteDb">
@@ -165,7 +207,9 @@ async function onToggleOffline() {
   position: absolute;
   left: 0;
   bottom: 48px;
-  width: 260px;
+  width: 480px;
+  max-height: 70vh;
+  overflow-y: auto;
   padding: 12px;
   border-radius: 10px;
   background: var(--uikit-bg-base, #fff);
@@ -219,6 +263,26 @@ async function onToggleOffline() {
 .persist-panel__btn--danger {
   background: #fef2f2;
   color: #ef4444;
+}
+
+.persist-panel__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.persist-panel__seed-presets {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.persist-panel__btn--preset {
+  flex: 0 0 auto;
+}
+
+.persist-panel__seed-progress {
+  font-size: 12px;
+  color: var(--uikit-text-secondary, #6b7280);
 }
 
 .persist-panel__tip {
@@ -281,7 +345,7 @@ async function onToggleOffline() {
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 120px;
+  max-height: 240px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
