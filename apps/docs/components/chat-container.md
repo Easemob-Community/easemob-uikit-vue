@@ -40,6 +40,14 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 
 <!-- @include: ../.vitepress/gen/chat-container.md -->
 
+### 容器级 Props（仅 `EmChatContainer`）
+
+上表由 `EmChat` 模块生成；`EmChatContainer` 另提供容器外壳档位：
+
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| variant | `'compact' \| 'card'` | `'compact'` | 容器风格：`compact` 平铺无圆角（背景 `--uikit-chat-bg` 铺满，适合自行排版）；`card` 圆角卡片（圆角跟随 `--uikit-components-radius`，细边框 `--uikit-border-light`，灰底与间距由宿主布局提供），与 `EmConversationContainer` 的 `variant` 同口径 |
+
 ## 插槽说明
 
 - `empty`：无会话时展示的空状态

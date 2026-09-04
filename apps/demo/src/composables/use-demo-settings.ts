@@ -339,8 +339,12 @@ function createDemoSettings() {
   const chatMessageServerSearchEnabled = ref(false)
   const chatMessageStatusShowText = ref(false)
   const chatMessageStatusDirection = ref<'horizontal' | 'vertical'>('horizontal')
-  const chatMessageStatusPosition = ref<'below' | 'inline'>('below')
+  const chatMessageStatusPosition = ref<'below' | 'inline'>('inline')
   const chatMessageStatusStyle = ref<'classic' | 'capsule'>('classic')
+  /** 中性气泡（对方）样式：filled 带底色 / plain 无底色纯文字 */
+  const chatBubbleStyle = ref<'filled' | 'plain'>('filled')
+  /** 对方语音消息未播放红点（默认开；历史消息无播放状态不显示，刷新复位） */
+  const chatVoiceUnreadDot = ref(true)
 
   /* ===== 状态横幅配置（EmStatusBanner） ===== */
   /** 是否展示 ConversationList 中的状态横幅 */
@@ -357,6 +361,10 @@ function createDemoSettings() {
   const conversationUnreadPlacement = ref<'inline' | 'avatar'>('inline')
   /** 未读 Badge 统一位置：top-right / bottom-right */
   const conversationBadgePlacement = ref<'top-right' | 'bottom-right'>('top-right')
+
+  /* ===== 聊天容器风格配置（EmChatContainer 档位） ===== */
+  /** 容器风格变体：card（圆角卡片）/ compact（平铺） */
+  const chatVariant = ref<'card' | 'compact'>('card')
 
   /* ===== 消息通知配置（EmNotification） ===== */
   /** 总开关 */
@@ -564,6 +572,8 @@ function createDemoSettings() {
     chatMessageStatusDirection,
     chatMessageStatusPosition,
     chatMessageStatusStyle,
+    chatBubbleStyle,
+    chatVoiceUnreadDot,
     // 状态横幅
     statusBannerEnabled,
     // 会话列表风格
@@ -572,6 +582,8 @@ function createDemoSettings() {
     conversationUnreadMode,
     conversationUnreadPlacement,
     conversationBadgePlacement,
+    // 聊天容器风格
+    chatVariant,
     // 消息通知
     notificationEnable,
     notificationBrowser,

@@ -50,7 +50,9 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit-im'
 - `showAvatar`：`boolean`，默认 `true` —— 是否显示发送者头像（自己与对方的统一开关）
 - `showSelfAvatar`：`boolean`，默认 `true` —— 是否显示「自己」的头像；仅 `showAvatar` 开启时生效，设为 `false` 可隐藏自己的头像而对方照常显示（微信/QQ 式「隐藏我的头像」）
 - `showTime`：`boolean | 'always' | 'hover'`，默认 `false` —— 时间戳显示策略
-- `bubbleShape`：`'round' | 'square'`，默认 `'round'` —— 气泡圆角 / 直角
+- `bubbleShape`：`'round' | 'square'`，默认 `'round'` —— 气泡圆角档位（16px / 8px）
+- `bubbleStyle`：`'filled' | 'plain'`，默认 `'filled'` —— 中性气泡（对方）带底色 / 无底色纯文字
+- `voiceUnreadDot`：`boolean`，默认 `true` —— 对方语音消息未播放红点（仅本会话实时收到的语音显示，点击播放后消失；历史/漫游消息与刷新后不显示）
 - `avatarSize`：`number`，默认 `36` —— 头像尺寸（px）
 - `messageGap`：`number`，默认 `12` —— 消息间距（px）
 - `messagePadding`：`number`，默认 `16` —— 列表内边距（px）

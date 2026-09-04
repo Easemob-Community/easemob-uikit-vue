@@ -535,6 +535,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
     implNotes: [
       'chat.vue 按 conversationType 编排：单聊/群聊 header 差异、群管理入口（EmGroupDetail 等）',
       'config 透传：header/input/messageList/groupReadReceipt 等分组配置',
+      '容器外壳 variant：compact 平铺（默认）/ card 圆角卡片（.chat-container--card，圆角跟随 --uikit-components-radius，与会话列表 card 同口径）',
     ],
     refs: [
       { path: 'packages/uikit-im/src/modules/chat/chat.vue', desc: '聊天容器编排' },

@@ -373,7 +373,8 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
   content: '';
   position: absolute;
   inset: -4px;
-  border-radius: 12px;
+  /* 高亮光晕圆角跟随气泡圆角档位（round 档），避免与气泡圆角错位 */
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-primary-color);
   opacity: 0.06;
   pointer-events: none;

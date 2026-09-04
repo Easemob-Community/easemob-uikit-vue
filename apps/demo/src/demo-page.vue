@@ -118,6 +118,8 @@ const {
   chatMessageStatusDirection,
   chatMessageStatusPosition,
   chatMessageStatusStyle,
+  chatBubbleStyle,
+  chatVoiceUnreadDot,
   showHomeSearch,
   showContactSearch,
   showGroupSearch,
@@ -131,6 +133,7 @@ const {
   conversationActiveTab,
   statusBannerEnabled,
   conversationVariant,
+  chatVariant,
   conversationShowAvatar,
   conversationUnreadMode,
   conversationUnreadPlacement,
@@ -295,6 +298,8 @@ const chatConfig = computed(() => ({
   },
   messageList: {
     showTime: chatShowTime.value,
+    bubbleStyle: chatBubbleStyle.value,
+    voiceUnreadDot: chatVoiceUnreadDot.value,
     search: {
       enabled: chatMessageSearchEnabled.value,
       enableServerSearch: chatMessageServerSearchEnabled.value,
@@ -579,8 +584,12 @@ watch(
         </EmContactContainer>
       </EmResizable>
 
-      <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情 -->
-      <div class="demo-layout__main">
+      <!-- 右侧主体：聊天容器 / 联系人详情 / 群组详情；
+           聊天 card 档位下容器自绘卡片，宿主壳去除边框/圆角/底色避免双卡 -->
+      <div
+        class="demo-layout__main"
+        :class="{ 'demo-layout__main--bare': !detailUserId && !detailGroupId && chatVariant === 'card' }"
+      >
         <EmContactDetail
           v-if="detailUserId"
           :user-id="detailUserId"
@@ -596,6 +605,7 @@ watch(
           v-else
           ref="chatContainerRef"
           :config="chatConfig"
+          :variant="chatVariant"
         >
           <template #toolbar-extra="{ togglePanel: toggleQuickReplyPanel }">
             <button
@@ -975,6 +985,13 @@ watch(
   border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-bg-base, #ffffff);
+}
+
+/* 聊天 card 档位：卡片壳由 EmChatContainer 自绘，宿主壳退化为纯定位容器 */
+.demo-layout__main--bare {
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
 }
 
 /* ===== H5 单栏布局 ===== */

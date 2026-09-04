@@ -119,7 +119,7 @@ const messageListConfig = reactive({
   messageStatus: {
     style: 'classic',
     direction: 'horizontal',
-    position: 'below',
+    position: 'inline',
     showText: false,
   },
 })

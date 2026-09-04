@@ -147,6 +147,10 @@ const avatarSize = computed(() => props.config?.avatarSize ?? 36)
 const bubbleShape = computed(() => props.config?.bubbleShape)
 provide(INJECTION_KEY.BUBBLE_SHAPE, bubbleShape)
 
+/** 语音未读红点开关：config.messageList.voiceUnreadDot，voice-message inject 消费（undefined 回落默认 true） */
+const voiceUnreadDot = computed(() => props.config?.voiceUnreadDot)
+provide(INJECTION_KEY.VOICE_UNREAD_DOT, voiceUnreadDot)
+
 /** 格式化后的时间（HH:mm） */
 const formattedTime = computed(() => {
   const date = new Date(props.message.timestamp)
@@ -238,8 +242,8 @@ const showStatusText = computed(() => statusConfig.value.showText ?? false)
 /** 状态区域排列方向 */
 const statusDirection = computed(() => statusConfig.value.direction ?? 'horizontal')
 
-/** 状态相对气泡位置 */
-const statusPosition = computed(() => statusConfig.value.position ?? 'below')
+/** 状态相对气泡位置：默认 'inline'（气泡末尾、多行气泡时与底部对齐），设计规范默认 */
+const statusPosition = computed(() => statusConfig.value.position ?? 'inline')
 
 /** 气泡主体 ref（用于判断单行/多行） */
 const bodyRef = ref<HTMLElement>()
@@ -482,7 +486,7 @@ onBeforeUnmount(() => {
             </slot>
           </div>
 
-          <!-- ===== 状态在气泡下方（默认/历史行为） ===== -->
+          <!-- ===== 状态在气泡下方（position: 'below'，历史行为） ===== -->
           <template v-if="statusPosition === 'below' && !showGroupReadCount">
             <!-- 消息渲染器 -->
             <div class="message-bubble-wrapper__body">
@@ -587,9 +591,9 @@ onBeforeUnmount(() => {
             </div>
           </template>
 
-          <!-- ===== 状态与气泡同一行（群已读回执默认与气泡同行） ===== -->
+          <!-- ===== 状态与气泡同一行（默认 inline；群已读回执激活时强制同行） ===== -->
+          <template v-else>
           <div
-            v-else
             class="message-bubble-wrapper__message-row"
             :class="{
               'message-bubble-wrapper__message-row--self': isSelfConversation,
@@ -636,13 +640,6 @@ onBeforeUnmount(() => {
                   <slot name="message-action-extra" v-bind="slotProps" />
                 </template>
               </MessageInteractive>
-              <!-- 引用卡片（气泡下方） -->
-              <QuoteCard
-                v-if="quoteData"
-                :quote="quoteData"
-                :align-right="isSelfConversation"
-                @click="onQuoteClick"
-              />
             </div>
 
             <!-- 状态列（状态 + 群已读，默认位于己方气泡左侧） -->
@@ -722,6 +719,15 @@ onBeforeUnmount(() => {
               </button>
             </div>
           </div>
+
+          <!-- 引用卡片（气泡下方；独立于 message-row，inline 状态列只相对气泡对齐，避免落在引用卡上） -->
+          <QuoteCard
+            v-if="quoteData"
+            :quote="quoteData"
+            :align-right="isSelfConversation"
+            @click="onQuoteClick"
+          />
+          </template>
 
           <!-- 时间戳 -->
           <div v-if="shouldShowTime" class="message-bubble-wrapper__time">
@@ -843,6 +849,15 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 4px;
   width: 100%;
+}
+
+/* inline 分支：body 宽度随气泡内容收缩。
+   引用卡已移出 message-row 但仍在同一 content 列里，会把列宽撑到引用卡宽度；
+   body 若保持 width: 100%，气泡贴 body 边缘、状态列就会被顶到整行另一侧（跟着引用卡宽度走）。
+   fit-content 后状态列始终紧贴气泡本体。 */
+.message-bubble-wrapper__message-row .message-bubble-wrapper__body {
+  width: fit-content;
+  max-width: 100%;
 }
 
 /* 己方消息：状态列在气泡左侧 */

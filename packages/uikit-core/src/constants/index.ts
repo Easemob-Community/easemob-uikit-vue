@@ -43,6 +43,12 @@ export const INJECTION_KEY = {
   TEXT_MESSAGE_CONFIG: 'textMessageConfig',
   /** 气泡形状（config.messageList.bubbleShape），message-bubble-wrapper.vue provide / 气泡组件 inject */
   BUBBLE_SHAPE: 'bubbleShape',
+  /**
+   * 语音未读红点开关（config.messageList.voiceUnreadDot），message-bubble-wrapper.vue provide / voice-message.vue inject。
+   * 值为 ComputedRef<boolean | undefined>：undefined 回落默认 true；
+   * 在消息项级插槽（如 #message-voice）内对同一 key 深一层 provide 可实现单条消息覆盖。
+   */
+  VOICE_UNREAD_DOT: 'voiceUnreadDot',
 } as const
 
 /** 群组资料字段长度限制（与后端约束对齐） */

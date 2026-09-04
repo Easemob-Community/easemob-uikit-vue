@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
+import type { ComputedRef } from 'vue'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
+import { INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
 import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
+import type { BubbleShape } from '../types'
 
 export interface LocationMessageProps {
   message: UiMessage
@@ -16,6 +19,16 @@ const props = defineProps<LocationMessageProps>()
 const emit = defineEmits<LocationMessageEmits>()
 
 const { t } = useLocale()
+
+const themeStore = useThemeStore()
+
+/** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
+const bubbleClass = computed(() =>
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'location-message__bubble--square'
+    : '',
+)
 
 const body = computed(() => props.message.body as LocationMessageBody)
 
@@ -43,7 +56,7 @@ function onClick() {
     :class="{ 'location-message--self': props.message.isSelf }"
     @click="onClick"
   >
-    <div class="location-message__bubble">
+    <div class="location-message__bubble" :class="bubbleClass">
       <div class="location-message__icon">
         <Icon name="loc" :size="28" />
       </div>
@@ -74,7 +87,7 @@ function onClick() {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   cursor: pointer;
@@ -82,6 +95,10 @@ function onClick() {
   width: 240px;
   max-width: 240px;
   box-sizing: border-box;
+}
+
+.location-message__bubble--square {
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 .location-message--self .location-message__bubble {

@@ -3,6 +3,7 @@ import type { EasemobChat } from 'easemob-websdk-4'
 import {
   CONVERSATION_TYPE,
   MESSAGE_STATUS,
+  MESSAGE_TYPE,
   createLogger,
   formatConversationPreview,
   isStreamActive,
@@ -232,6 +233,10 @@ export function createChatHandlers(
         }
         else {
           stores.message.addMessage(uiMsg)
+        }
+        // 语音未读红点：本会话实时收到的对方语音打标（历史/漫游消息无播放状态，不打标）
+        if (uiMsg.type === MESSAGE_TYPE.VOICE && !uiMsg.isSelf) {
+          stores.message.markVoiceUnplayed?.(uiMsg.msgServerId || uiMsg.msgLocalId)
         }
         // 旁路持久化：收消息落库（含流式补偿的完整消息覆盖；upsert 由实现方负责）
         firePersistenceHook(chatLog, 'saveMessage', messagePersistence?.saveMessage, toMessageRecord(uiMsg as SdkMessage))

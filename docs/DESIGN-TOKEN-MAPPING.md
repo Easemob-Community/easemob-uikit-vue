@@ -52,6 +52,8 @@
 - **会话列表 variant**：`card`（默认，圆角白卡有间距）/ `compact`（无圆角无分割线零间距），
   容器根作用域覆写 Cell 变量实现（手法见 skill `uikit-styling-theming`）。
 - **空态**：会话列表 `list/bullet` 图标 100×100 占位色 + 16px 文案 + 垂直居中；聊天区 `bubble/rect/2` + 「选择一个会话」。
+- **ChatContainer 容器档位（2026-09-03）**：`variant`（`compact` 默认平铺 / `card` 圆角卡片）与会话列表同口径迁移——card 档容器自绘圆角（跟随 `--uikit-components-radius`）+ 细边框（`--uikit-border-light`）+ overflow 裁剪，灰底与间距由宿主布局提供；此前该卡片壳由 demo 宿主手搓（`demo-layout__main`），现已收回容器内，demo 在 card 档下退化为纯定位壳。chat 默认保持 `compact` 不破坏存量接入（会话列表默认 card 是列表内部样式变更，chat card 会新增可见边框/圆角，故保守默认）。
+- **消息气泡整改（2026-09-03，im 3.4.0 / core 2.5.0）**：① 圆角两档位 `bubbleShape` round=16px（默认）/ square=8px（原 12px/4px），token `--uikit-bubble-radius` / `--uikit-bubble-radius-square`，全类型气泡 + 引用卡片（0.75 倍：round 12px 更椭圆 / square 6px 保持原样）接入；② 气泡默认色：对方 `#E4E6E7`/`#171A1C`、己方 `#009EFF`/`#FFFFFF`（己方不再跟随主色，`setBubbleBg`/预设仍可覆盖）；③ 译文/语音转文字并入原气泡，1px 分割线分隔（`--uikit-bubble-divider-other/self`）；④ 中性气泡（对方）`bubbleStyle` 两模式：filled（默认带底色）/ plain（无底色纯文字，message-list 根作用域覆写 `--uikit-bubble-bg-other: transparent`）；⑤ 消息状态默认位置 `below` → `inline`（气泡末尾、与气泡底部对齐）。
 
 ## 五、未落地项（见 TECH-DEBT）
 

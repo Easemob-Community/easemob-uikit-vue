@@ -34,6 +34,8 @@ export interface MessageStoreLike {
   setTranslating: (msgId: string, translating: boolean) => void
   setVoiceText: (msgId: string, voiceText: { text: string }) => void
   setVoiceTranscribing: (msgId: string, transcribing: boolean) => void
+  /** 标记新收到的语音消息为未播放（红点；可选，chatroom 等场景 store 可缺省） */
+  markVoiceUnplayed?: (msgId: string) => void
   clearConversationMessages: (conversationId: string) => void
   updateMessageById: (msgId: string, patch: Partial<UiMessage>) => void
   replaceMessageById: (msgId: string, msg: UiMessage) => void

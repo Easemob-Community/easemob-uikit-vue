@@ -170,7 +170,7 @@ async function handleDownload(event: MouseEvent) {
 .video-message__container {
   position: relative;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   overflow: hidden;
 }
 
@@ -178,18 +178,18 @@ async function handleDownload(event: MouseEvent) {
   /* 尺寸由容器按消息体 width/height 预留（displaySize），视频填满容器 */
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   object-fit: cover;
   display: block;
 }
 
 .video-message__video--square {
-  border-radius: 4px;
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 .video-message__placeholder {
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-bubble-text-other);

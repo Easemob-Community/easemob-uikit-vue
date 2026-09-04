@@ -507,7 +507,7 @@ const currentColorStyle = computed(() => ({
           </div>
         </div>
       </div>
-      <p class="demo-row__desc">影响消息气泡的圆角大小：大圆角为默认样式，小圆角约 4px（接近直角但保留过渡）。</p>
+      <p class="demo-row__desc">影响消息气泡的圆角大小：大圆角 16px（默认），小圆角 8px（接近直角但保留过渡）。</p>
 
       <div class="demo-row demo-row--bordered">
         <span class="demo-row__label">容器间距</span>

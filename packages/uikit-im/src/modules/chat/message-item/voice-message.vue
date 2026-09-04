@@ -7,6 +7,7 @@ import { useLocale } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import type { UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
+import { useMessageStore } from '../../../store/message'
 import { createLogger } from '@easemob/uikit-core'
 
 const logger = createLogger('UIKit:VoiceMessage')
@@ -20,6 +21,8 @@ const props = defineProps<VoiceMessageProps>()
 const { t } = useLocale()
 
 const themeStore = useThemeStore()
+
+const messageStore = useMessageStore()
 
 /** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
 const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
@@ -109,6 +112,10 @@ function cleanupAudio() {
 }
 
 function onPlayClick() {
+  // 点击即视为已读：隐藏未播放红点
+  if (showUnreadDot.value)
+    messageStore.markVoicePlayed(voiceMsgId.value)
+
   // 如果正在播放，则停止
   if (isPlaying.value && currentAudio.value) {
     cleanupAudio()
@@ -156,35 +163,64 @@ const voiceTranscribing = computed(() => !!props.message.voiceTranscribing)
 
 /** 是否需要显示转文字卡片：转写中 / 已有结果且未隐藏（切换入口在右键菜单） */
 const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceText.value && showVoiceText.value))
+
+/** 未读红点开关：config.messageList.voiceUnreadDot（message-bubble-wrapper provide），支持消息项级深一层 provide 覆盖 */
+const injectedVoiceUnreadDot = inject<ComputedRef<boolean | undefined>>(INJECTION_KEY.VOICE_UNREAD_DOT, computed(() => undefined))
+
+const voiceMsgId = computed(() => props.message.msgServerId || props.message.msgLocalId)
+
+/**
+ * 未播放红点：仅对方语音 + 本会话实时收到（adapter onMessage 打标）+ 未点击过。
+ * 历史/漫游消息无播放状态不打标 → 刷新页面后默认无红点。
+ */
+const showUnreadDot = computed(() =>
+  (injectedVoiceUnreadDot.value ?? true)
+  && !props.message.isSelf
+  && messageStore.isVoiceUnplayed(voiceMsgId.value),
+)
 </script>
 
 <template>
   <div class="voice-message" :class="{ 'voice-message--self': props.message.isSelf }">
-    <div class="voice-message__bubble" :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying }]" :style="{ width: bubbleWidth }" @click="onPlayClick">
-      <span class="voice-message__icon">
-        <span v-if="isPlaying" class="voice-message__wave">
-          <span class="voice-message__wave-bar" />
-          <span class="voice-message__wave-bar" />
-          <span class="voice-message__wave-bar" />
+    <div
+      class="voice-message__bubble"
+      :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying, 'voice-message__bubble--with-text': showVoiceTextCard }]"
+      :style="showVoiceTextCard ? undefined : { width: bubbleWidth }"
+      @click="onPlayClick"
+    >
+      <div class="voice-message__main">
+        <span class="voice-message__icon">
+          <span v-if="isPlaying" class="voice-message__wave">
+            <span class="voice-message__wave-bar" />
+            <span class="voice-message__wave-bar" />
+            <span class="voice-message__wave-bar" />
+          </span>
+          <Icon v-else name="triangle" :size="14" />
         </span>
-        <Icon v-else name="triangle" :size="14" />
-      </span>
-      <span class="voice-message__duration">{{ durationText }}</span>
-    </div>
-    <!-- 转文字结果卡片（隐藏/显示文字入口在右键菜单） -->
-    <div v-if="showVoiceTextCard" class="voice-message__text-card">
-      <!-- 转写中 -->
-      <div v-if="voiceTranscribing" class="voice-message__text voice-message__text--loading">
-        <Icon name="loading/arc/normal" :size="14" anim="spin" />
-        <span>{{ t('message.voiceToText.loading') }}</span>
+        <span class="voice-message__duration">{{ durationText }}</span>
       </div>
-      <!-- 已有结果：展示转写文字 -->
-      <template v-else>
-        <div class="voice-message__text">
-          {{ props.message.voiceText?.text }}
+      <!-- 转文字结果：与语音同一气泡展示，分割线分隔（隐藏/显示文字入口在右键菜单） -->
+      <template v-if="showVoiceTextCard">
+        <div class="voice-message__text-divider" aria-hidden="true" />
+        <!-- 转写中 -->
+        <div v-if="voiceTranscribing" class="voice-message__text voice-message__text--loading">
+          <Icon name="loading/arc/normal" :size="14" anim="spin" />
+          <span>{{ t('message.voiceToText.loading') }}</span>
         </div>
+        <!-- 已有结果：展示转写文字 + 已转文字标签（与文本翻译同款，居右对齐） -->
+        <template v-else>
+          <div class="voice-message__text">
+            {{ props.message.voiceText?.text }}
+          </div>
+          <div class="voice-message__transcribed-tag">
+            <Icon name="rect/hanzi" :size="12" />
+            <span>{{ t('message.voiceToText.done') }}</span>
+          </div>
+        </template>
       </template>
     </div>
+    <!-- 未播放红点：气泡外侧（对方消息右侧）、相对气泡垂直居中，点击播放后消失 -->
+    <span v-if="showUnreadDot" class="voice-message__unread-dot" aria-hidden="true" />
   </div>
 </template>
 
@@ -192,6 +228,20 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
 .voice-message {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* 未播放红点：气泡外侧右侧、相对气泡整体垂直居中 */
+.voice-message__unread-dot {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--uikit-badge-bg, #FF7070);
+  pointer-events: none;
 }
 
 .voice-message--self {
@@ -200,10 +250,9 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
 
 .voice-message__bubble {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
@@ -216,8 +265,21 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
   white-space: nowrap;
 }
 
+/* 语音主行：图标 + 时长（转文字内容在同一气泡内位于其下） */
+.voice-message__main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 展示转写文字时：宽度由内容决定（按时长的固定宽度会让文字被挤窄），并允许折行 */
+.voice-message__bubble--with-text {
+  min-width: 0;
+  white-space: normal;
+}
+
 .voice-message__bubble--square {
-  border-radius: 4px;
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 .voice-message--self .voice-message__bubble {
@@ -292,18 +354,15 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
   }
 }
 
-/* 转文字结果卡片 */
-.voice-message__text-card {
-  max-width: 100%;
-  margin-top: 6px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background-color: var(--uikit-bubble-bg-other);
-  color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
-  overflow-wrap: break-word;
-  word-break: normal;
-  box-sizing: border-box;
+/* 转文字分割线：转写结果与语音同一气泡，以 1px 分割线分隔 */
+.voice-message__text-divider {
+  height: 1px;
+  margin: 8px 0;
+  background-color: var(--uikit-bubble-divider-other, rgba(23, 26, 28, 0.12));
+}
+
+.voice-message--self .voice-message__text-divider {
+  background-color: var(--uikit-bubble-divider-self, rgba(255, 255, 255, 0.35));
 }
 
 .voice-message__text {
@@ -319,5 +378,23 @@ const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceTex
   gap: 4px;
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
+}
+
+.voice-message--self .voice-message__text--loading {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.75;
+}
+
+/* 已转文字标签：icon + 文案，双方气泡均居右对齐，颜色跟随气泡文字 */
+.voice-message__transcribed-tag {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: var(--uikit-font-size-12);
+  line-height: 1;
+  opacity: 0.75;
+  user-select: none;
 }
 </style>

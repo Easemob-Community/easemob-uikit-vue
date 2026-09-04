@@ -487,6 +487,11 @@ export function createChatHandlers(
         stores.message.addMessage(uiMsg)
       }
 
+      // 语音未读红点：本会话实时收到的对方语音打标（历史/漫游消息无播放状态，不打标）
+      if (uiMsg.type === MESSAGE_TYPE.VOICE && !uiMsg.isSelf) {
+        stores.message.markVoiceUnplayed?.(uiMsg.msgServerId || uiMsg.msgLocalId)
+      }
+
       // 旁路持久化：接收消息落库（chatRoom / CMD 早退分支不触发；实现方按 msgServerId upsert）
       if (persistSaveMessage)
         firePersist(() => persistSaveMessage(toMessageRecord(sdkMsg)))

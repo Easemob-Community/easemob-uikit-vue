@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
+import type { ComputedRef } from 'vue'
 import { useLocale } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
+import { INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
 import type { CombineMessageBody, UiMessage } from '@easemob/uikit-core'
+import type { BubbleShape } from '../types'
 
 export interface CombineMessageProps {
   message: UiMessage
@@ -20,6 +23,16 @@ const props = withDefaults(defineProps<CombineMessageProps>(), {
 const emit = defineEmits<CombineMessageEmits>()
 const { t } = useLocale()
 
+const themeStore = useThemeStore()
+
+/** 圆角 class：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
+const bubbleClass = computed(() =>
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
+    ? 'combine-message--square'
+    : '',
+)
+
 const body = computed(() => props.message.body as CombineMessageBody)
 
 const title = computed(() => body.value.title || t('message.forward.combineTitle', '聊天记录'))
@@ -31,7 +44,7 @@ function handleClick() {
 </script>
 
 <template>
-  <div class="combine-message" :class="{ 'combine-message--self': props.isSelf }" @click="handleClick">
+  <div class="combine-message" :class="[{ 'combine-message--self': props.isSelf }, bubbleClass]" @click="handleClick">
     <!-- 标题 -->
     <div class="combine-message__header">
       <Icon name="folder" :size="16" class="combine-message__icon" />
@@ -53,12 +66,16 @@ function handleClick() {
   flex-direction: column;
   gap: 6px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   cursor: pointer;
   min-width: 200px;
   max-width: 300px;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.combine-message--square {
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 @media (hover: hover) {

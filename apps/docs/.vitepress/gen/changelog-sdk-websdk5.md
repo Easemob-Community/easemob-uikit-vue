@@ -1,6 +1,10 @@
 ## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
 
+### 新增
+
+- **语音未播放打标**：`onMessage` 实时收到对方语音消息时调用 `stores.message.markVoiceUnplayed?.(msgId)`（`MessageStoreLike` 新增可选方法，chatroom 等场景 store 可缺省），支撑 UI 层语音未读红点；历史/漫游路径不打标。
+
 ### 修复
 
 - **被踢误报网络异常**：`onDisconnected` 按错误码识别被踢/账号失效（取 `payload.errorCode`），命中 `KICK_ERROR_CODE` 时调用 `client.setKicked(code)` 标记账号终态，而非仅置 disconnected；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。

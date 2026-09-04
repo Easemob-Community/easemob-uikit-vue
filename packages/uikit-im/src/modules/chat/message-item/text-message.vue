@@ -264,34 +264,39 @@ function onMentionClick(userId: string, event: MouseEvent) {
             </span>
           </template>
         </div>
-      </div>
-      <!-- 译文卡片（气泡下方独立卡片，隐藏/显示译文入口在右键菜单） -->
-      <div v-if="showTranslationCard" class="text-message__translation-card">
-        <!-- 翻译中 -->
-        <div v-if="translating" class="text-message__translation-text text-message__translation-text--loading">
-          <Icon name="loading/arc/normal" :size="14" anim="spin" />
-          <span>{{ t('message.translate.loading') }}</span>
-        </div>
-        <!-- 已有译文：显示译文 -->
-        <template v-else>
-          <div class="text-message__translation-text">
-            <template v-if="translationHasLinks && translationSegments">
-              <template v-for="(seg, idx) in translationSegments" :key="idx">
-                <a
-                  v-if="seg.type === 'link'"
-                  class="text-message__link text-message__link--translation"
-                  :href="seg.href"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  @click="onLinkClick(seg.href!, $event)"
-                >{{ seg.value }}</a>
-                <span v-else>{{ seg.value }}</span>
-              </template>
-            </template>
-            <template v-else>
-              {{ props.message.translation?.text }}
-            </template>
+        <!-- 译文：与原文同一气泡展示，分割线分隔（隐藏/显示译文入口在右键菜单） -->
+        <template v-if="showTranslationCard">
+          <div class="text-message__translation-divider" aria-hidden="true" />
+          <!-- 翻译中 -->
+          <div v-if="translating" class="text-message__translation-text text-message__translation-text--loading">
+            <Icon name="loading/arc/normal" :size="14" anim="spin" />
+            <span>{{ t('message.translate.loading') }}</span>
           </div>
+          <!-- 已有译文：显示译文 + 已翻译标签（icon + 文案，双方气泡均居右对齐） -->
+          <template v-else>
+            <div class="text-message__translation-text">
+              <template v-if="translationHasLinks && translationSegments">
+                <template v-for="(seg, idx) in translationSegments" :key="idx">
+                  <a
+                    v-if="seg.type === 'link'"
+                    class="text-message__link text-message__link--translation"
+                    :href="seg.href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    @click="onLinkClick(seg.href!, $event)"
+                  >{{ seg.value }}</a>
+                  <span v-else>{{ seg.value }}</span>
+                </template>
+              </template>
+              <template v-else>
+                {{ props.message.translation?.text }}
+              </template>
+            </div>
+            <div class="text-message__translated-tag">
+              <Icon name="rect/hanzinalpha/slash" :size="12" />
+              <span>{{ t('message.translated') }}</span>
+            </div>
+          </template>
         </template>
       </div>
     </template>
@@ -312,7 +317,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__bubble {
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   font-size: var(--uikit-font-size-14);
@@ -321,7 +326,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message__bubble--square {
-  border-radius: 4px;
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 .text-message--self .text-message__bubble {
@@ -391,17 +396,15 @@ function onMentionClick(userId: string, event: MouseEvent) {
   opacity: 0.75;
 }
 
-/* 译文卡片：独立于气泡，吸顶气泡正下方 */
-.text-message__translation-card {
-  max-width: 100%;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background-color: var(--uikit-bubble-bg-other);
-  color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
-  overflow-wrap: break-word;
-  word-break: normal;
-  box-sizing: border-box;
+/* 译文分割线：译文与原文同一气泡，以 1px 分割线分隔 */
+.text-message__translation-divider {
+  height: 1px;
+  margin: 8px 0;
+  background-color: var(--uikit-bubble-divider-other, rgba(23, 26, 28, 0.12));
+}
+
+.text-message--self .text-message__translation-divider {
+  background-color: var(--uikit-bubble-divider-self, rgba(255, 255, 255, 0.35));
 }
 
 .text-message__translation-text {
@@ -417,6 +420,24 @@ function onMentionClick(userId: string, event: MouseEvent) {
   gap: 4px;
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
+}
+
+.text-message--self .text-message__translation-text--loading {
+  color: var(--uikit-bubble-text-self);
+  opacity: 0.75;
+}
+
+/* 已翻译标签：icon + 文案，双方气泡均居右对齐，颜色跟随气泡文字 */
+.text-message__translated-tag {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: var(--uikit-font-size-12);
+  line-height: 1;
+  opacity: 0.75;
+  user-select: none;
 }
 
 .text-message__reedit-btn {
@@ -480,5 +501,12 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__link--translation {
   color: var(--uikit-primary-color);
+}
+
+/* 译文并入己方气泡后，译文内链接保持与气泡文字同色 */
+.text-message--self .text-message__link--translation {
+  color: var(--uikit-bubble-text-self);
+  text-decoration-color: var(--uikit-bubble-text-self);
+  opacity: 0.9;
 }
 </style>

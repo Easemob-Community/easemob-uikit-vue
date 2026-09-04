@@ -2,7 +2,7 @@
 /**
  * 设置面板 - 聊天
  *
- * 包含：输入框模式 / 输入框风格 / 输入框功能 / 输入框扩展配置（自动聚焦、聚焦边框色、
+ * 包含：容器风格（卡片/平铺）/ 输入框模式 / 输入框风格 / 输入框功能 / 输入框扩展配置（自动聚焦、聚焦边框色、
  * 光标色、选中背景色、最大长度）/ 群已读回执（启用、人数上限）/ 消息列表（时间戳、发送状态）
  *
  * 说明：所有状态来自 useDemoSettings 单例，改动由 demo-page 的 chatConfig 汇总后
@@ -13,6 +13,7 @@ import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
 
 const {
+  chatVariant,
   chatInputMode,
   chatInputStyle,
   chatInputFeatures,
@@ -30,6 +31,8 @@ const {
   chatMessageStatusDirection,
   chatMessageStatusPosition,
   chatMessageStatusStyle,
+  chatBubbleStyle,
+  chatVoiceUnreadDot,
   messageActionMenuTakeover,
   userCardTakeover,
   watermarkEnabled,
@@ -38,6 +41,29 @@ const {
 
 <template>
   <div class="demo-panel">
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="容器风格"
+        tip="compact：平铺无圆角，背景铺满（默认，适合自行排版）；card：圆角卡片，圆角跟随主题 componentsShape，由宿主提供灰底与间距"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': chatVariant === 'card' }"
+          @click="chatVariant = 'card'"
+        >
+          卡片
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': chatVariant === 'compact' }"
+          @click="chatVariant = 'compact'"
+        >
+          平铺
+        </button>
+      </div>
+    </div>
+
     <div class="demo-settings__group">
       <DemoSettingLabel
         title="输入框模式"
@@ -208,7 +234,7 @@ const {
     <div class="demo-settings__group">
       <DemoSettingLabel
         title="消息列表"
-        tip="时间戳显示策略（关闭 / 始终 / 悬停）、消息搜索开关、发送状态样式（经典小字 / 数字胶囊）与排列方向"
+        tip="时间戳显示策略（关闭 / 始终 / 悬停）、消息搜索开关、中性气泡带底色/无底色、发送状态样式（经典小字 / 数字胶囊）与排列方向"
       />
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <label class="demo-check">
@@ -244,6 +270,49 @@ const {
               悬停显示
             </button>
           </div>
+        </div>
+
+        <div>
+          <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">中性气泡（对方）</span>
+          <div class="demo-settings__options">
+            <button
+              class="demo-option"
+              :class="{ 'demo-option--active': chatBubbleStyle === 'filled' }"
+              @click="chatBubbleStyle = 'filled'"
+            >
+              带底色（默认）
+            </button>
+            <button
+              class="demo-option"
+              :class="{ 'demo-option--active': chatBubbleStyle === 'plain' }"
+              @click="chatBubbleStyle = 'plain'"
+            >
+              无底色
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size: 13px; color: var(--uikit-text-secondary); display: block; margin-bottom: 6px;">语音未读红点（对方）</span>
+          <div class="demo-settings__options">
+            <button
+              class="demo-option"
+              :class="{ 'demo-option--active': chatVoiceUnreadDot }"
+              @click="chatVoiceUnreadDot = true"
+            >
+              显示（默认）
+            </button>
+            <button
+              class="demo-option"
+              :class="{ 'demo-option--active': !chatVoiceUnreadDot }"
+              @click="chatVoiceUnreadDot = false"
+            >
+              隐藏
+            </button>
+          </div>
+          <p style="font-size: 12px; color: var(--uikit-text-tertiary); margin-top: 6px;">
+            仅本会话实时收到的语音显示，点击播放后消失；历史消息与刷新后不显示
+          </p>
         </div>
 
         <div>

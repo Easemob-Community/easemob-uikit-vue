@@ -222,7 +222,7 @@ function onPreviewError(index: number) {
 .image-message__container {
   position: relative;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -239,11 +239,11 @@ function onPreviewError(index: number) {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 8px;
+  border-radius: var(--uikit-bubble-radius, 16px);
 }
 
 .image-message__img--square {
-  border-radius: 4px;
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 /* sticker 表情：透明底、不裁切、无圆角、无点击态 */
@@ -272,7 +272,7 @@ function onPreviewError(index: number) {
 
 .image-message__placeholder {
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-bubble-text-other);

@@ -43,7 +43,7 @@ export interface MessageStatusConfig {
   iconMap?: Partial<Record<MessageStatusValue, string>>
   /** 文本与图标的排列方向，默认 'horizontal' */
   direction?: 'horizontal' | 'vertical'
-  /** 状态相对消息气泡的位置，默认 'below'（气泡下方）/ Position relative to the bubble */
+  /** 状态相对消息气泡的位置，默认 'inline'（气泡末尾、与气泡底部对齐）；'below' 为气泡下方 / Position relative to the bubble, default 'inline' (at bubble end, bottom-aligned) */
   position?: 'below' | 'inline'
   /**
    * 消息状态图标风格。
@@ -97,8 +97,21 @@ export interface ChatConfig {
     showSelfAvatar?: boolean
     /** 时间显示策略，默认 false（不显示），可设置为 true / 'always' / 'hover' */
     showTime?: TimeDisplayStrategy
-    /** 气泡形状，默认 'round' */
+    /** 气泡形状（圆角档位：'round' = 16px / 'square' = 8px），默认 'round' / Bubble corner preset, default 'round' (16px); 'square' is 8px */
     bubbleShape?: BubbleShape
+    /**
+     * 中性气泡（对方）样式：'filled' 带底色（默认）/ 'plain' 无底色纯文字。
+     * Neutral bubble (peer side) style: 'filled' with background (default) or 'plain' text-only without background.
+     */
+    bubbleStyle?: 'filled' | 'plain'
+    /**
+     * 对方语音消息未播放红点：默认 true（本会话实时收到的语音未点击时，气泡外侧垂直居中显示红点，点击后隐藏；
+     * 历史/漫游消息无播放状态，永不显示，刷新页面即复位）。
+     * 单条消息级覆盖：在消息项插槽（如 #message-voice）内对 INJECTION_KEY.VOICE_UNREAD_DOT 深一层 provide。
+     * Whether to show an unread red dot on peer voice messages (default true; runtime-only, resets on refresh).
+     * Per-message override: provide INJECTION_KEY.VOICE_UNREAD_DOT one level deeper inside item slots.
+     */
+    voiceUnreadDot?: boolean
     /** 头像尺寸（px），默认 36 */
     avatarSize?: number
     /** 消息项之间的间距（px），默认 12 */

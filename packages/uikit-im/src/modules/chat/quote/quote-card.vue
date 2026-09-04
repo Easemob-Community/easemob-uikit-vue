@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { computed, inject } from 'vue'
+import type { ComputedRef } from 'vue'
+import { MESSAGE_TYPE, INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
+import type { BubbleShape } from '../types'
 
 export interface QuoteCardProps {
   quote: MsgQuotePayload
@@ -16,6 +18,14 @@ export interface QuoteCardEmits {
 
 const props = defineProps<QuoteCardProps>()
 const emit = defineEmits<QuoteCardEmits>()
+
+const themeStore = useThemeStore()
+
+/** 圆角档位：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
+const isSquare = computed(() =>
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square',
+)
 
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
 const { displayName } = useUserInfo(() => props.quote.msgSender)
@@ -42,10 +52,9 @@ function onClick() {
 <template>
   <div
     class="quote-card"
-    :class="{ 'quote-card--right': alignRight }"
+    :class="{ 'quote-card--right': alignRight, 'quote-card--square': isSquare }"
     @click.stop="onClick"
   >
-    <span class="quote-card__bar" aria-hidden="true" />
     <div class="quote-card__content">
       <span class="quote-card__sender">{{ senderName }}</span>
       <span class="quote-card__divider">：</span>
@@ -63,11 +72,11 @@ function onClick() {
 .quote-card {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   margin-top: 4px;
   padding: 6px 10px;
   max-width: 100%;
-  border-radius: 6px;
+  /* 圆角跟随气泡档位（0.75 倍）：round 档 12px 更椭圆，square 档 6px 保持原样 */
+  border-radius: calc(var(--uikit-bubble-radius, 16px) * 0.75);
   background-color: var(--uikit-bg-secondary, #f4f4f5);
   color: var(--uikit-text-secondary, #909399);
   font-size: var(--uikit-font-size-12);
@@ -76,6 +85,10 @@ function onClick() {
   user-select: none;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   box-sizing: border-box;
+}
+
+.quote-card--square {
+  border-radius: calc(var(--uikit-bubble-radius-square, 8px) * 0.75);
 }
 
 @media (hover: hover) {
@@ -91,14 +104,6 @@ function onClick() {
 /* 己方消息：右对齐 */
 .quote-card--right {
   align-self: flex-end;
-}
-
-.quote-card__bar {
-  flex-shrink: 0;
-  width: 2px;
-  align-self: stretch;
-  border-radius: 1px;
-  background-color: var(--uikit-text-tertiary, #c0c4cc);
 }
 
 .quote-card__content {

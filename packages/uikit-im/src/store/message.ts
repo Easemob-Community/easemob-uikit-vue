@@ -33,6 +33,11 @@ export const useMessageStore = defineStore('message', () => {
   /** 群消息已读成员缓存：key = `${groupId}:${messageId}` */
   const groupMessageReadUsersMap = ref<Record<string, string[]>>({})
   const atMeMessageMap = ref<Record<string, string[]>>({})
+  /**
+   * 本会话内新收到且尚未播放的语音消息 ID 集（运行时态，不落盘）。
+   * 仅由 adapter 的实时 onMessage 打标；历史/漫游消息无播放状态、不打标 → 刷新后默认无红点。
+   */
+  const unplayedVoiceIds = ref(new Set<string>())
   /** 离线消息同步中（登录后 SDK 拉取离线历史阶段） */
   const isSyncingMessages = ref(false)
 
@@ -528,6 +533,23 @@ export const useMessageStore = defineStore('message', () => {
     }))
   }
 
+  /** 标记一条新收到的语音消息为未播放（红点展示；adapter 实时 onMessage 调用） */
+  function markVoiceUnplayed(msgId: string) {
+    if (msgId)
+      unplayedVoiceIds.value.add(msgId)
+  }
+
+  /** 标记语音消息已播放（点击后隐藏红点） */
+  function markVoicePlayed(msgId: string) {
+    if (msgId)
+      unplayedVoiceIds.value.delete(msgId)
+  }
+
+  /** 语音消息是否处于「新收到未播放」态（响应式，供组件 computed 直接消费） */
+  function isVoiceUnplayed(msgId: string) {
+    return !!msgId && unplayedVoiceIds.value.has(msgId)
+  }
+
   /** 清空所有消息数据 */
   function clearMessages() {
     messageMap.value = {}
@@ -536,6 +558,7 @@ export const useMessageStore = defineStore('message', () => {
     parsedCombineMessageMap.value = {}
     groupMessageReadUsersMap.value = {}
     atMeMessageMap.value = {}
+    unplayedVoiceIds.value.clear()
     isSyncingMessages.value = false
     msgIdIndex.clear()
     conversationLru.clear()
@@ -586,6 +609,9 @@ export const useMessageStore = defineStore('message', () => {
     setVoiceTranscribing,
     setVoiceText,
     toggleVoiceText,
+    markVoiceUnplayed,
+    markVoicePlayed,
+    isVoiceUnplayed,
     clearMessages,
     clearConversationMessages,
     touchConversation,

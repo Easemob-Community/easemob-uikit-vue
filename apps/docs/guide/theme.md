@@ -157,10 +157,12 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 
 ### 聊天语义 token
 
-- `--uikit-bubble-bg-other`：对方气泡背景（默认 `--uikit-bg-secondary`）
-- `--uikit-bubble-bg-self`：自己气泡背景（默认 `--uikit-primary-color`）
-- `--uikit-bubble-text-other`：对方气泡文字（默认 `--uikit-text-primary`）
-- `--uikit-bubble-text-self`：自己气泡文字（默认 `#fff`）
+- `--uikit-bubble-bg-other`：对方气泡背景（默认 `#E4E6E7`，暗色 `--uikit-bg-secondary`）
+- `--uikit-bubble-bg-self`：自己气泡背景（默认 `#009EFF` 品牌蓝，明暗一致；不再跟随主色，可用 `setBubbleBg` / 主题预设覆盖）
+- `--uikit-bubble-text-other`：对方气泡文字（默认 `#171A1C`，暗色 `--uikit-text-primary`）
+- `--uikit-bubble-text-self`：自己气泡文字（默认 `#FFFFFF`）
+- `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`：气泡内分割线（译文 / 语音转文字与原文之间）
+- `--uikit-bubble-radius` / `--uikit-bubble-radius-square`：气泡圆角档位（`bubbleShape: 'round'` = 16px（默认）/ `'square'` = 8px）
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，使用 `background` 简写，支持颜色/渐变/图片）
 - `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`）
 - `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#111827`）

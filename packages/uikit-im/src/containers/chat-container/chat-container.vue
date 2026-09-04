@@ -71,6 +71,12 @@ export interface ChatContainerProps {
   class?: string
   /** 自定义根元素 style */
   style?: Record<string, string>
+  /**
+   * 容器风格变体（与 ConversationContainer 同口径）：
+   * compact（默认；平铺无圆角，背景 --uikit-chat-bg 铺满，适合接入方自行排版）/
+   * card（圆角卡片：圆角跟随 --uikit-components-radius，细分隔线边框，宿主提供灰底与间距即可成卡）
+   */
+  variant?: 'card' | 'compact'
 }
 
 export interface ChatContainerEmits {
@@ -80,7 +86,9 @@ export interface ChatContainerEmits {
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
 }
 
-const props = defineProps<ChatContainerProps>()
+const props = withDefaults(defineProps<ChatContainerProps>(), {
+  variant: 'compact',
+})
 const emit = defineEmits<ChatContainerEmits>()
 
 const chatRef = ref<InstanceType<typeof Chat>>()
@@ -102,7 +110,10 @@ defineExpose({
 <template>
   <div
     class="chat-container"
-    :class="{ 'chat-container--keyboard-open': h5.isKeyboardOpen.value }"
+    :class="{
+      'chat-container--keyboard-open': h5.isKeyboardOpen.value,
+      [`chat-container--${props.variant}`]: true,
+    }"
   >
     <Chat
       ref="chatRef"
@@ -184,9 +195,20 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* border-box：card 档 1px 边框与 H5 safe-bottom padding 不额外撑高容器，避免宿主出现滚动条 */
+  box-sizing: border-box;
   /* 使用 background 简写，支持颜色/渐变/图片 */
   background: var(--uikit-chat-bg);
   padding-bottom: var(--uikit-safe-bottom, 0px);
+}
+
+/* card 档位：容器自成圆角卡片（与 ConversationContainer card 同口径）。
+   圆角跟随主题 componentsShape；细边框取 --uikit-border-light（与灰底页面分界）；
+   overflow 裁剪内部 header/输入区直角。灰底与间距由宿主布局提供（参照 demo-layout） */
+.chat-container--card {
+  border: 1px solid var(--uikit-border-light, #f3f4f6);
+  border-radius: var(--uikit-components-radius, 8px);
+  overflow: hidden;
 }
 
 /* 键盘弹起时输入框已由 keyboardHeight padding 顶起，去掉容器这份 safe-bottom，避免双重叠加 */

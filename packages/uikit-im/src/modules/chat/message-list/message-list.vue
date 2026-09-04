@@ -820,7 +820,7 @@ watch(locateRequest, (req) => {
 </script>
 
 <template>
-  <div class="message-list">
+  <div class="message-list" :class="{ 'message-list--bubble-plain': messageListConfig?.bubbleStyle === 'plain' }">
     <!-- H5 下拉刷新指示器 -->
     <div
       v-if="historyMode === 'pull-down' && enableLoadHistory"
@@ -986,6 +986,11 @@ watch(locateRequest, (req) => {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+}
+
+/* 中性气泡 plain 模式：对方气泡去底色、仅保留文字（容器根作用域覆写变量，组件级变体范式） */
+.message-list--bubble-plain {
+  --uikit-bubble-bg-other: transparent;
 }
 
 .message-list__scroll {

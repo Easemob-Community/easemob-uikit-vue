@@ -1,3 +1,28 @@
+## @easemob/uikit-im 3.4.0 (2026-09-03)
+
+
+### 新增
+
+- **ChatContainer 容器风格档位 `variant`**：`compact`（默认；平铺无圆角，`--uikit-chat-bg` 铺满，保持现状不破坏存量接入）/ `card`（圆角卡片：圆角跟随 `--uikit-components-radius`，细边框 `--uikit-border-light`，overflow 裁剪内部直角；灰底与间距由宿主布局提供），与 `ConversationContainer` 的 card/compact 同口径——此前卡片壳需接入方在宿主布局手搓，现收回容器内。
+- **`EmText` 排版原子组件 re-export**：与 core 2.5.0 对齐，`@easemob/uikit-im` 侧同步导出 `EmText` 及 `TextProps` / `TextLevel` / `TextWeight` / `TextColor` 类型（见 core 2.5.0）。
+- **中性气泡样式档位 `config.messageList.bubbleStyle`**：`'filled'`（默认，对方气泡带底色）/ `'plain'`（对方气泡无底色纯文字，message-list 根作用域覆写 `--uikit-bubble-bg-other: transparent`，组件级变体范式，不影响全局主题）。
+- **对方语音消息未播放红点 `config.messageList.voiceUnreadDot`**：默认 `true`。本会话实时收到的对方语音未点击时，气泡外侧右侧、相对气泡垂直居中显示红点，点击播放后隐藏；历史/漫游消息无播放状态不打标，刷新页面即复位（运行时态，不落盘）。设为 `false` 全局关闭；单条消息级覆盖可在消息项插槽内对 `INJECTION_KEY.VOICE_UNREAD_DOT` 深一层 provide。
+
+### 变更
+
+- **消息气泡圆角档位校准（设计规范）**：`bubbleShape` 两档取值由 12px/4px 校准为 round=16px（默认）/ square=8px，新增 token `--uikit-bubble-radius` / `--uikit-bubble-radius-square`（见 core 2.5.0）；文本/语音/图片/视频气泡与引用卡片（0.75 倍圆角：round 档 12px 更椭圆、square 档 6px 保持原样）跟随档位，文件/位置/合并/自定义气泡补齐 `bubbleShape` 消费（此前未接线）。
+- **气泡默认色校准（设计规范）**：对方气泡 `#E4E6E7` / 文字 `#171A1C`，己方气泡 `#009EFF` / 文字 `#FFFFFF`；己方气泡背景不再跟随主色（运行时仍可用 `setBubbleBg` / 主题预设覆盖）。
+- **译文 / 语音转文字并入原气泡**：不再以独立卡片吸顶气泡下方，改为同一气泡内 1px 分割线分隔（新 token `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`）；语音气泡展示转写时宽度由按时长固定改为随内容自适应；己方气泡内译文链接与加载态配色同步修正。
+- **消息状态默认位置改为气泡末尾**：`messageStatus.position` 默认由 `'below'`（气泡下方）改为 `'inline'`（气泡末尾、多行气泡与底部对齐），`'below'` 仍可显式配置。
+
+### 修复
+
+- **ChatContainer card 档外侧出现滚动条**：`.chat-container` 补 `box-sizing: border-box`，card 档 1px 边框不再把 `height: 100%` 撑出 2px 导致宿主溢出（顺带消除 H5 safe-bottom padding 的同类撑高隐患）。
+- **inline 消息状态落在引用卡上 / 跟随引用卡宽度**：带引用的消息在 `statusPosition: 'inline'` 下，状态列此前相对「气泡 + 引用卡」整体居中/沉底，视觉上贴在引用卡左侧；现将引用卡移出 message-row，且 message-row 内 body 宽度由 `100%` 改为随气泡内容收缩（`fit-content`），状态列只相对气泡本体对齐（多行沉底检测同步只量气泡），不再被引用卡宽度顶到远处。
+- **译文 / 语音转写缺少完成态标签**：译文展示时气泡底部新增「已翻译 / Translated」标签（icon `rect/hanzinalpha/slash`），语音转写新增同款「已转文字 / Transcribed」标签（icon `rect/hanzi`），双方气泡均居右对齐；locale 新增 `message.translated` / `message.voiceToText.done`（中英双语）。引用卡片去掉左侧竖杠装饰。
+
+---
+
 ## @easemob/uikit-im 3.3.0 (2026-09-03)
 
 
