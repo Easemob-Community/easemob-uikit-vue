@@ -6,6 +6,7 @@
   "main": "main.cjs",
   "scripts": {
     "dev": "node scripts/dev.cjs",
+    "dev:console": "node scripts/dev.cjs --console",
     "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "dependencies": {

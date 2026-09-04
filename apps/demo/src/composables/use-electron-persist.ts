@@ -12,8 +12,10 @@
  * 注入时机与 demo 自定义数据源一致：init 时装配，切换开关后重新登录（刷新）生效。
  */
 import { ref } from 'vue'
+import type { UiMessage } from '@easemob/uikit-im'
 import type {
   ConversationPage,
+  ConversationTypeValue,
   MessagePage,
   MessageRecord,
   MessageSearchParams,
@@ -338,4 +340,187 @@ export async function electronPersistSeedConversations(
       await new Promise(resolve => setTimeout(resolve, 0))
   }
   return Date.now() - start
+}
+
+/* ==================== 数据风暴模拟器 ====================
+ * 复刻真实链路「SDK onMessage → 事件层写 store（视图跳动）+ 旁路 persistence
+ * 写库」：renderer 侧双写——store.addMessage 驱动视图（会话重排序 / 未读数 /
+ * lastMessage），hooks.message.saveMessage 经 IPC 落库。不碰网络。
+ * stores 由面板组件在 setup 内 useUIKit() 取得后传入（provide/inject 只能在
+ * 组件上下文调用，模块级 composable 不直接碰）。
+ */
+
+/** 风暴消息统一内容前缀（可识别可清理） */
+export const STORM_CONTENT_PREFIX = '[风暴]'
+
+/** 风暴模拟器需要的最小 store 接口（uikit-im stores 的结构子集） */
+export interface StormStoresLike {
+  message: {
+    addMessage: (msg: UiMessage) => void
+    deleteMessages: (msgIds: string[]) => void
+  }
+  conversation: {
+    conversationList: UiConversation[]
+    updateConversation: (id: string, patch: Partial<UiConversation>) => void
+  }
+}
+
+/** 持续风暴运行态（面板展示用） */
+export const stormRunning = ref(false)
+/** 启动爆发进行中（互斥禁用用） */
+export const stormBursting = ref(false)
+/** 本次风暴已发计数 */
+export const stormSentCount = ref(0)
+
+let stormTimer: ReturnType<typeof setInterval> | null = null
+let stormStopTimer: ReturnType<typeof setTimeout> | null = null
+let stormSeq = 0
+/** 本会话内已双写 DB 的风暴消息 msgLocalId（清理用；重开后不追踪，见 cleanup 注释） */
+const stormMsgLocalIds: string[] = []
+
+/** 构造一条风暴消息（UiMessage 写视图 + MessageRecord 落库共源） */
+function makeStormMessage(cvs: UiConversation): { uiMsg: UiMessage, record: MessageRecord } {
+  const seq = ++stormSeq
+  const now = Date.now()
+  const msgLocalId = `local_storm_${now}_${seq}`
+  const content = `${STORM_CONTENT_PREFIX}${SEED_TEXT_SAMPLES[seq % SEED_TEXT_SAMPLES.length]}（#${seq}）`
+  const base = {
+    msgServerId: '',
+    msgLocalId,
+    from: 'storm-bot',
+    to: currentAccount?.userId ?? 'me',
+    sender: { userId: 'storm-bot', nickname: '风暴机器人' },
+    conversationId: cvs.id,
+    conversationType: cvs.type as ConversationTypeValue,
+    type: 'text' as const,
+    sendStatus: 'sent' as const,
+    ext: {},
+    timestamp: now,
+    body: { content },
+  }
+  return {
+    uiMsg: { ...base, isSelf: false, status: 'sent' } as unknown as UiMessage,
+    record: base as unknown as MessageRecord,
+  }
+}
+
+/** 单条双写：store（视图）+ hooks（IPC 落库，fire-and-forget） */
+function stormWriteOne(stores: StormStoresLike, cvs: UiConversation): void {
+  const { uiMsg, record } = makeStormMessage(cvs)
+  // 视图侧：消息入 store + 会话摘要 / 未读数 / 时间戳更新（驱动列表重排序）
+  stores.message.addMessage(uiMsg)
+  stores.conversation.updateConversation(cvs.id, {
+    lastMessageText: (uiMsg.body as { content: string }).content,
+    lastMessageTime: uiMsg.timestamp,
+    unreadCount: (cvs.unreadCount ?? 0) + 1,
+  })
+  // 落库侧：msgLocalId 带 local_storm_ 前缀（isLocal 语义：本地构造、无服务端对应物）
+  stormMsgLocalIds.push(record.msgLocalId)
+  void invoke('hooks.message.saveMessage', record)
+}
+
+/** 从 store 会话列表随机取一个（列表为空返回 null） */
+function pickStormConversation(stores: StormStoresLike): UiConversation | null {
+  const list = stores.conversation.conversationList
+  if (!list || list.length === 0)
+    return null
+  return list[Math.floor(Math.random() * list.length)]
+}
+
+/**
+ * 持续风暴：每 intervalMs 往随机会话双写一条模拟消息，durationS 后自动停止。
+ * 会话列表为空时报错（提示先灌会话）。返回停止函数。
+ * 注：只写 store 里已有的会话；只存在于 DB 而未进内存的会话不选取——
+ * 那条链路「只写库、视图不跳」是符合预期的（视图变化本来就该由 store 驱动）。
+ */
+export function electronStormStart(
+  stores: StormStoresLike,
+  opts: { intervalMs?: number, durationS?: number } = {},
+): () => void {
+  if (stormRunning.value)
+    return electronStormStop
+  if (!stores.conversation.conversationList?.length)
+    throw new Error('会话列表为空，请先「灌会话」')
+
+  const intervalMs = opts.intervalMs ?? 200
+  const durationS = opts.durationS ?? 30
+  stormRunning.value = true
+  stormSentCount.value = 0
+  stormTimer = setInterval(() => {
+    const cvs = pickStormConversation(stores)
+    if (!cvs) {
+      electronStormStop()
+      return
+    }
+    stormWriteOne(stores, cvs)
+    stormSentCount.value += 1
+  }, intervalMs)
+  stormStopTimer = setTimeout(electronStormStop, durationS * 1000)
+  return electronStormStop
+}
+
+/** 手动停止持续风暴 */
+export function electronStormStop(): void {
+  if (stormTimer !== null) {
+    clearInterval(stormTimer)
+    stormTimer = null
+  }
+  if (stormStopTimer !== null) {
+    clearTimeout(stormStopTimer)
+    stormStopTimer = null
+  }
+  stormRunning.value = false
+}
+
+/**
+ * 启动爆发：tight loop 一次性双发 count 条（模拟离线重连后的同步风暴），
+ * 每 200 条让出一次事件循环（万级量级下渲染与 IPC 都不卡死）。
+ * onProgress 回传（已发, 总数）；返回 { count, elapsedMs }。
+ */
+export async function electronStormBurst(
+  stores: StormStoresLike,
+  count = 500,
+  onProgress?: (done: number, total: number) => void,
+): Promise<{ count: number, elapsedMs: number }> {
+  if (!stores.conversation.conversationList?.length)
+    throw new Error('会话列表为空，请先「灌会话」')
+  stormBursting.value = true
+  const start = Date.now()
+  let done = 0
+  try {
+    for (let i = 0; i < count; i++) {
+      const cvs = pickStormConversation(stores)
+      if (!cvs)
+        break
+      stormWriteOne(stores, cvs)
+      stormSentCount.value += 1
+      done += 1
+      if (done % 200 === 0) {
+        onProgress?.(done, count)
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
+    }
+    onProgress?.(done, count)
+    return { count: done, elapsedMs: Date.now() - start }
+  }
+  finally {
+    stormBursting.value = false
+  }
+}
+
+/**
+ * 清理风暴消息：store 侧删除 + DB 侧墓碑（hooks.deleteMessages 置 deleted +
+ * 撤 FTS 行，loadMessages 不再返回——视图与后续启动都不可见）。
+ * 选墓碑而非物理删：现有管理 API 的 clearMessages 只支持 before/type/conversationId
+ * 过滤，不支持按 ID 前缀物理删；墓碑语义对已双写进库的风暴数据足够且最简。
+ * 局限（注释在案）：只覆盖本会话内追踪到的 msgLocalId；重开后遗留的风暴行
+ * 由「清空全部」（clearAll）兜底物理清。
+ */
+export async function electronStormCleanup(stores: StormStoresLike): Promise<number> {
+  const ids = stormMsgLocalIds.splice(0)
+  if (ids.length === 0)
+    return 0
+  stores.message.deleteMessages(ids)
+  await invoke('hooks.message.deleteMessages', ids)
+  return ids.length
 }

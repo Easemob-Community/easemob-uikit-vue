@@ -17,9 +17,16 @@ const process = require('node:process')
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const { createPersistence } = require('@easemob/uikit-persist-sqlite')
 
-/** demo dev server 地址。默认 5273 是 demo-electron 专属端口（scripts/dev.mjs 会用
- * DEMO_PORT=5273 启动本仓库 demo），避免与本机其他项目默认的 5173 撞车加载错应用 */
+/**
+ * demo dev server 地址。默认 5273 是 demo-electron 专属端口（scripts/dev.mjs 会用
+ * DEMO_PORT=5273 启动本仓库 demo），避免与本机其他项目默认的 5173 撞车加载错应用
+ */
 const DEMO_DEV_URL = process.env.DEMO_URL || 'http://localhost:5273'
+
+// 冒烟 / 并行验收：DEMO_USER_DATA_DIR 指定独立 userData 目录
+// （独立的单实例锁与库文件目录，可与常驻实例并存，互不影响）
+if (process.env.DEMO_USER_DATA_DIR)
+  app.setPath('userData', process.env.DEMO_USER_DATA_DIR)
 
 /** 库文件名安全化：appKey 含 '#' 等路径不友好字符，统一替换为 '_' */
 function sanitizeFilePart(part) {
@@ -173,6 +180,16 @@ function createWindow() {
   })
 
   win.loadURL(DEMO_DEV_URL)
+
+  // 调试开关（`pnpm -F @easemob/demo-electron dev:console`）：自动打开 DevTools 控制台。
+  // detach 独立窗口模式，不遮挡页面；经 ELECTRON_OPEN_DEVTOOLS 环境变量传入，
+  // 直接 `electron .` 启动时也可自行设置该变量。
+  if (process.env.ELECTRON_OPEN_DEVTOOLS === '1') {
+    win.webContents.once('did-finish-load', () => {
+      win.webContents.openDevTools({ mode: 'detach' })
+    })
+  }
+
   win.webContents.on('did-finish-load', () => {
     console.warn(`[demo-electron] 页面加载完成: ${win.webContents.getURL()}（title: ${win.webContents.getTitle()}）`)
   })

@@ -22,6 +22,14 @@ pnpm -F @easemob/demo-electron dev
 
 `scripts/dev.cjs` 会用**专属端口 5273** 自动拉起本仓库 demo 的 dev server（`strictPort`，端口被占直接报错），就绪后再启动 Electron 壳；壳退出时连带回收 dev server。
 
+调试渲染层需要自动打开 DevTools 控制台（独立窗口，不遮挡页面）：
+
+```bash
+pnpm -F @easemob/demo-electron dev:console
+```
+
+（等效 `node scripts/dev.cjs --console`，仅多传一个 `ELECTRON_OPEN_DEVTOOLS=1` 给 Electron 主进程；直接 `electron .` 启动时也可手动设置该环境变量。）
+
 > 为什么不用默认 5173：本机其他项目的 dev server 常占 5173，若 vite 静默顺延端口，壳会加载到别的应用（已踩过）。因此 demo-electron 固定走 5273；`apps/demo` 已开 `strictPort`，任何端口冲突都会显式报错而非错载。
 > 需要换端口：`DEMO_PORT=5300 pnpm -F @easemob/demo-electron dev`。
 

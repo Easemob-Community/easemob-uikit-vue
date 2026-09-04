@@ -8,6 +8,7 @@
  * 按钮：库统计 / 灌测试消息 / 中文搜索自测 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
  */
 import { computed, ref } from 'vue'
+import { useUIKit } from '@easemob/uikit-im'
 import {
   electronPersistClearAll,
   electronPersistDeleteDbAndRelaunch,
@@ -15,9 +16,16 @@ import {
   electronPersistSeedMessages,
   electronPersistStats,
   electronSetOffline,
+  electronStormBurst,
+  electronStormCleanup,
+  electronStormStart,
+  electronStormStop,
   persistReadActivities,
   persistReadCounts,
   persistReadSeen,
+  stormBursting,
+  stormRunning,
+  stormSentCount,
 } from '../composables/use-electron-persist'
 
 /** 灌数参数 */
@@ -44,12 +52,81 @@ const seedConversationPresets = [
 const seedConversationProgress = ref('')
 /** 灌会话进行中 */
 const seedingConversations = ref(false)
+
 /** 断网状态（面板本地态） */
 const offline = ref(false)
 /** 面板收起态（默认收起为小球，点击展开） */
 const collapsed = ref(true)
 /** 最近一次动作结果反馈 */
 const tip = ref('')
+
+/* ===== 数据风暴模拟器 ===== */
+/** stores 在 setup 内取（provide/inject 约束），风暴函数以参数传入 */
+const { stores } = useUIKit()
+/** 风暴参数：频率 ms / 持续秒数 */
+const stormIntervalMs = ref(200)
+const stormDurationS = ref(30)
+/** 爆发结果反馈 */
+const stormBurstTip = ref('')
+/** 清理结果反馈 */
+const stormCleanupTip = ref('')
+/** 启动爆发数量与档位（万级模拟离线重连同步风暴） */
+const stormBurstCount = ref(500)
+const stormBurstPresets = [
+  { label: '500', count: 500 },
+  { label: '2000', count: 2000 },
+  { label: '5000', count: 5000 },
+  { label: '1万', count: 10000 },
+] as const
+/** 爆发进度（空串 = 未在爆发） */
+const stormBurstProgress = ref('')
+
+/** 灌数 / 灌会话 / 风暴（持续 + 爆发）互斥（任一进行中禁用其余入口） */
+const busy = computed(() => seeding.value || seedingConversations.value || stormRunning.value || stormBursting.value)
+
+function onStormToggle() {
+  if (stormRunning.value) {
+    electronStormStop()
+    return
+  }
+  stormCleanupTip.value = ''
+  try {
+    electronStormStart(stores, { intervalMs: stormIntervalMs.value, durationS: stormDurationS.value })
+  }
+  catch (error) {
+    tip.value = (error as Error).message
+  }
+}
+
+async function onStormBurst(count?: number) {
+  const total = count ?? stormBurstCount.value
+  if (count !== undefined)
+    stormBurstCount.value = count
+  stormCleanupTip.value = ''
+  stormBurstTip.value = ''
+  stormBurstProgress.value = `已双发 0 / ${total}`
+  try {
+    const { count: done, elapsedMs } = await electronStormBurst(
+      stores,
+      total,
+      (d, t) => { stormBurstProgress.value = `已双发 ${d} / ${t}` },
+    )
+    stormBurstTip.value = `爆发补发 ${done} 条，耗时 ${elapsedMs}ms`
+  }
+  catch (error) {
+    tip.value = (error as Error).message
+  }
+  finally {
+    stormBurstProgress.value = ''
+  }
+}
+
+async function onStormCleanup() {
+  const removed = await electronStormCleanup(stores)
+  stormCleanupTip.value = removed > 0
+    ? `已清理 ${removed} 条风暴消息（store 删除 + DB 墓碑）`
+    : '暂无可清理的风暴消息'
+}
 
 /** 本地读取活动：四个方法的展示顺序（方法名为契约 API 名，保持英文） */
 const readMethods = ['loadMessages', 'fetchConversations', 'searchMessages', 'searchConversations'] as const
@@ -152,13 +229,13 @@ async function onToggleOffline() {
       <p class="persist-panel__title">
         本地持久化测试面板
       </p>
-      <button class="persist-panel__btn" :disabled="seeding" @click="onStats">
+      <button class="persist-panel__btn" :disabled="busy" @click="onStats">
         库统计
       </button>
       <div class="persist-panel__seed">
-        <input v-model="seedConversationId" class="persist-panel__input" placeholder="conversationId" :disabled="seeding">
-        <input v-model.number="seedCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="seeding">
-        <button class="persist-panel__btn" :disabled="seeding" @click="onSeed()">
+        <input v-model="seedConversationId" class="persist-panel__input" placeholder="conversationId" :disabled="busy">
+        <input v-model.number="seedCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="busy">
+        <button class="persist-panel__btn" :disabled="busy" @click="onSeed()">
           灌测试消息
         </button>
       </div>
@@ -167,7 +244,7 @@ async function onToggleOffline() {
           v-for="p in seedPresets"
           :key="p.count"
           class="persist-panel__btn persist-panel__btn--preset"
-          :disabled="seeding"
+          :disabled="busy"
           @click="onSeed(p.count)"
         >
           {{ p.label }}
@@ -176,15 +253,15 @@ async function onToggleOffline() {
       </div>
       <!-- 灌会话（大会话量渲染压测）：lastMessage* 字段已够列表渲染，不灌消息体 -->
       <div class="persist-panel__seed">
-        <input v-model.number="seedConversationCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="seedingConversations">
-        <button class="persist-panel__btn" :disabled="seedingConversations" @click="onSeedConversations()">
+        <input v-model.number="seedConversationCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="busy">
+        <button class="persist-panel__btn" :disabled="busy" @click="onSeedConversations()">
           灌会话
         </button>
         <button
           v-for="p in seedConversationPresets"
           :key="p.count"
           class="persist-panel__btn persist-panel__btn--preset"
-          :disabled="seedingConversations"
+          :disabled="busy"
           @click="onSeedConversations(p.count)"
         >
           {{ p.label }}
@@ -193,7 +270,54 @@ async function onToggleOffline() {
       <p v-if="seedConversationProgress" class="persist-panel__seed-progress">
         {{ seedConversationProgress }}
       </p>
-      <button class="persist-panel__btn" :disabled="seeding || seedingConversations" @click="onClearAll">
+
+      <!-- 数据风暴（离线启动 / 高频事件模拟：store 写视图 + IPC 落库双写） -->
+      <div class="persist-panel__storm">
+        <p class="persist-panel__storm-title">
+          数据风暴
+        </p>
+        <div class="persist-panel__seed">
+          <input v-model.number="stormIntervalMs" class="persist-panel__input persist-panel__input--num" type="number" min="20" step="50" title="频率 ms" :disabled="busy">
+          <input v-model.number="stormDurationS" class="persist-panel__input persist-panel__input--num" type="number" min="1" title="持续秒数" :disabled="busy">
+          <button
+            class="persist-panel__btn"
+            :class="{ 'persist-panel__btn--danger': stormRunning }"
+            :disabled="!stormRunning && busy"
+            @click="onStormToggle"
+          >
+            {{ stormRunning ? `停止风暴（已发 ${stormSentCount}）` : '持续风暴' }}
+          </button>
+        </div>
+        <div class="persist-panel__seed">
+          <input v-model.number="stormBurstCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" title="爆发条数" :disabled="busy">
+          <button class="persist-panel__btn" :disabled="busy" @click="onStormBurst()">
+            启动爆发
+          </button>
+          <button
+            v-for="p in stormBurstPresets"
+            :key="p.count"
+            class="persist-panel__btn persist-panel__btn--preset"
+            :disabled="busy"
+            @click="onStormBurst(p.count)"
+          >
+            {{ p.label }}
+          </button>
+          <button class="persist-panel__btn" :disabled="busy" @click="onStormCleanup">
+            清理风暴消息
+          </button>
+        </div>
+        <p v-if="stormBurstProgress" class="persist-panel__seed-progress">
+          {{ stormBurstProgress }}
+        </p>
+        <p v-if="stormBurstTip" class="persist-panel__seed-progress">
+          {{ stormBurstTip }}
+        </p>
+        <p v-if="stormCleanupTip" class="persist-panel__seed-progress">
+          {{ stormCleanupTip }}
+        </p>
+      </div>
+
+      <button class="persist-panel__btn" :disabled="busy" @click="onClearAll">
         清空全部
       </button>
       <button class="persist-panel__btn persist-panel__btn--danger" @click="onDeleteDb">
@@ -237,8 +361,10 @@ async function onToggleOffline() {
 <style scoped>
 .persist-panel {
   position: fixed;
-  left: 16px;
-  bottom: 16px;
+  /* 右下角定位：bottom 64px 避开既有「聊天室 Demo」入口浮链（right:16px bottom:16px）；
+     任何展开状态都不覆盖左侧会话列表区域 */
+  right: 16px;
+  bottom: 64px;
   z-index: 1000;
   font-size: 13px;
 }
@@ -259,7 +385,8 @@ async function onToggleOffline() {
 
 .persist-panel__body {
   position: absolute;
-  left: 0;
+  /* 向上展开、右对齐（相对右下角浮球） */
+  right: 0;
   bottom: 48px;
   width: 480px;
   max-height: 70vh;
@@ -337,6 +464,23 @@ async function onToggleOffline() {
 .persist-panel__seed-progress {
   font-size: 12px;
   color: var(--uikit-text-secondary, #6b7280);
+  margin: 0;
+}
+
+/* 数据风暴区块 */
+.persist-panel__storm {
+  border-top: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.persist-panel__storm-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--uikit-text-primary, #111827);
 }
 
 .persist-panel__tip {

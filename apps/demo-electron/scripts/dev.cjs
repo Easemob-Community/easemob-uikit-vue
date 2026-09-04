@@ -5,6 +5,9 @@
  * 3. 启动 Electron 壳（DEMO_URL 指向该端口）；
  * 4. Electron 退出 / Ctrl+C 时连带杀掉 dev server 子进程。
  *
+ * 调试渲染层需要自动打开 DevTools 时追加 `--console`（即 npm run dev:console），
+ * 会以 ELECTRON_OPEN_DEVTOOLS=1 传给 Electron 主进程。
+ *
  * 专属端口的目的：本机可能有其他项目的 dev server 占用 5173，若静默顺延，
  * Electron 壳会加载到别的应用（已踩过）。5273 为 demo-electron 约定端口。
  */
@@ -13,6 +16,7 @@ const process = require('node:process')
 
 const PORT = process.env.DEMO_PORT || '5273'
 const DEMO_URL = `http://localhost:${PORT}`
+const OPEN_DEVTOOLS = process.argv.includes('--console')
 
 function run(command, args, env = {}) {
   return spawn(command, args, {
@@ -46,8 +50,12 @@ async function main() {
     if (!vite.killed)
       vite.kill()
   }
-  process.on('SIGINT', () => { cleanup(); process.exit(0) })
-  process.on('SIGTERM', () => { cleanup(); process.exit(0) })
+  const shutdown = () => {
+    cleanup()
+    process.exit(0)
+  }
+  process.on('SIGINT', shutdown)
+  process.on('SIGTERM', shutdown)
 
   vite.on('exit', (code) => {
     // dev server 先退出（如 strictPort 端口冲突），壳不必再等
@@ -58,8 +66,11 @@ async function main() {
   })
 
   await waitForServer(DEMO_URL)
-  electron = run('electron', ['.'], { DEMO_URL })
-  electron.on('exit', () => { cleanup(); process.exit(0) })
+  electron = run('electron', ['.'], {
+    DEMO_URL,
+    ...(OPEN_DEVTOOLS ? { ELECTRON_OPEN_DEVTOOLS: '1' } : {}),
+  })
+  electron.on('exit', shutdown)
 }
 
 main().catch((err) => {
