@@ -55,6 +55,8 @@ export interface ConversationStoreLike {
   update: (id: string, patch: Partial<UiConversation>) => void
   /** 会话列表快照（可选）：sendChannelAck 用它读取未读数做短路守卫 */
   conversationList?: UiConversation[]
+  /** 分页数据源场景回写「还有更多会话」（可选，SDK 全量加载场景缺省即可） */
+  setHasMoreConversations?: (value: boolean) => void
 }
 
 /**
@@ -67,6 +69,31 @@ const CHANNEL_ACK_THROTTLE_MS = 1000
 export class ConversationDomain {
   /** 各会话最近一次发送 channel ack 的时间戳 */
   private channelAckSentAt = new Map<string, number>()
+
+  /** 注入数据源的分页游标（refresh 拉首页时重置；loadMore 续页推进） */
+  private injectedCursor: string | undefined
+
+  /** 注入数据源是否还有下一页（无游标即到底） */
+  private injectedHasMore = false
+
+  /**
+   * 合并注入页与现有列表：继承现有列表已补全的名称/头像，
+   * 避免注入源缺资料时把已补全值冲回 ID（对齐 mergeWithExistingConversations 语义）。
+   */
+  private mergeWithExisting(items: UiConversation[]): UiConversation[] {
+    const existing = this.store.conversationList ?? []
+    const prevById = new Map(existing.map(cvs => [cvs.id, cvs]))
+    return items.map((item) => {
+      const prev = prevById.get(item.id)
+      return prev
+        ? {
+          ...item,
+          name: (!item.name || item.name === item.id) && prev.name && prev.name !== prev.id ? prev.name : item.name,
+          avatar: item.avatar || prev.avatar,
+        }
+        : item
+    })
+  }
 
   constructor(
     private client: ManagerHost,
@@ -84,10 +111,10 @@ export class ConversationDomain {
        */
       resolveSenderName?: (userId: string) => string | undefined
       /**
-       * 会话数据入口接管注入（Phase 3.1 留口子）：当前仅消费 `fetchConversations`
-       * （refresh 委托），其余方法为后续 DB 阶段预留。
-       * Conversation repository override (Phase 3.1 seam): only
-       * `fetchConversations` is consumed (refresh delegation) for now.
+       * 会话数据入口接管注入：消费 `fetchConversations`（refresh 拉首页 +
+       * loadMore 游标续页委托，大会话量懒加载不一次性灌全量）。
+       * Conversation repository override: `fetchConversations` is consumed
+       * (refresh first page + loadMore cursor continuation).
        */
       conversationRepository?: Partial<ConversationRepository>
       /**
@@ -124,35 +151,18 @@ export class ConversationDomain {
 
   /**
    * 主动刷新服务端会话列表，由 onConversationListUpdate 事件回填 store。
-   * 数据入口接管（Phase 3.1）：注入 fetchConversations 时改走注入实现
-   * （游标翻页至 hasMore=false 合并全量后直接 setList，不触 SDK 也无事件回填）。
+   * 数据入口接管：注入 fetchConversations 时改走注入实现——**只拉首页**并
+   * 记录游标（大会话量懒加载，不一次性灌全量），续页由 `loadMore` 推进；
+   * 不触 SDK 也无事件回填。
    */
   async refresh(includeEmpty = false) {
     const fetchConversations = this.hooks.conversationRepository?.fetchConversations
     if (fetchConversations) {
-      const items: UiConversation[] = []
-      let cursor: string | undefined
-      do {
-        const page = await fetchConversations(cursor, 50)
-        items.push(...page.list)
-        cursor = page.hasMore ? page.cursor : undefined
-      } while (cursor)
-      // 去重（同 id 后者覆盖前者），并继承现有列表已补全的名称/头像，
-      // 避免注入源缺资料时把已补全值冲回 ID（对齐 mergeWithExistingConversations 语义）
-      const existing = this.store.conversationList ?? []
-      const prevById = new Map(existing.map(cvs => [cvs.id, cvs]))
-      const merged = new Map<string, UiConversation>()
-      for (const item of items) {
-        const prev = prevById.get(item.id)
-        merged.set(item.id, prev
-          ? {
-            ...item,
-            name: (!item.name || item.name === item.id) && prev.name && prev.name !== prev.id ? prev.name : item.name,
-            avatar: item.avatar || prev.avatar,
-          }
-          : item)
-      }
-      this.store.setList(sortConversations(Array.from(merged.values())))
+      const page = await fetchConversations(undefined, 50)
+      this.injectedCursor = page.hasMore ? page.cursor : undefined
+      this.injectedHasMore = page.hasMore
+      this.store.setHasMoreConversations?.(page.hasMore)
+      this.store.setList(sortConversations(this.mergeWithExisting(page.list)))
       return
     }
     await this.client.chatManager.refreshSessionList({ includeEmpty })
@@ -286,8 +296,32 @@ export class ConversationDomain {
     await this.markRead(conversationId, conversationType)
   }
 
-  /** 加载更多会话：SDK5 当前无分页游标，直接返回本地列表 */
-  async loadMore(_pageSize?: number) {
+  /**
+   * 加载更多会话。
+   * 注入数据源路径：游标续页追加（去重 + 重排序 + 回写 hasMore），无更多时短路；
+   * SDK 默认路径：SDK5 当前无分页游标，直接返回本地列表。
+   * Load more conversations: with an injected repository, continues from the
+   * cursor and appends (dedupe + re-sort + hasMore write-back); otherwise falls
+   * back to the SDK local list (SDK5 has no pagination cursor).
+   */
+  async loadMore(pageSize = 50) {
+    const fetchConversations = this.hooks.conversationRepository?.fetchConversations
+    if (fetchConversations) {
+      if (!this.injectedHasMore || !this.injectedCursor)
+        return
+      const page = await fetchConversations(this.injectedCursor, pageSize)
+      this.injectedCursor = page.hasMore ? page.cursor : undefined
+      this.injectedHasMore = page.hasMore
+      this.store.setHasMoreConversations?.(page.hasMore)
+      const existing = this.store.conversationList ?? []
+      const existingIds = new Set(existing.map(cvs => cvs.id))
+      const appended = [
+        ...existing,
+        ...this.mergeWithExisting(page.list).filter(cvs => !existingIds.has(cvs.id)),
+      ]
+      this.store.setList(sortConversations(appended))
+      return
+    }
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (loadMore)', items)
     const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })

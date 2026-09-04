@@ -19,6 +19,7 @@ import type {
   MessageSearchParams,
   SdkPersistenceHooks,
   SdkRepositoryOverrides,
+  UiConversation,
 } from '@easemob/uikit-sdk-contract'
 
 /** 「本地持久化」开关的 localStorage 记忆 key：值 'on' 表示开启 */
@@ -266,6 +267,70 @@ export async function electronPersistSeedMessages(
       }
     })
     await invoke('hooks.message.saveMessages', records)
+    written += batchSize
+    onProgress?.(written, count)
+    // 批间让出事件循环，避免长链路 IPC 阻塞渲染
+    if (written < count)
+      await new Promise(resolve => setTimeout(resolve, 0))
+  }
+  return Date.now() - start
+}
+
+/** 灌会话中文名称样本（轮换 + 序号） */
+const SEED_CONVERSATION_NAMES = [
+  '产品讨论组',
+  '技术分享群',
+  '张三',
+  '李四',
+  '需求评审群',
+  '王五',
+  '客户支持群',
+  '前端周报群',
+  '赵六',
+  '版本发布群',
+]
+
+/** 灌会话分批大小（避免单次巨型 IPC） */
+const SEED_CONVERSATION_BATCH_SIZE = 200
+
+/**
+ * 灌测试会话：分批调 hooks.conversation.saveConversations 造数据（每批 200 条，
+ * 批间让出事件循环）。中文名称轮换、type 混合 singleChat/groupChat、
+ * lastMessageTime 递减保证排序分布真实；少量置顶（97 取 1）、少量未读（17 取 1）、
+ * 少量带草稿（31 取 1）。不灌消息体——lastMessage* 字段已够列表渲染。
+ * 用于大会话量场景的桌面端渲染压测。onProgress 回传（已写入, 总数）；返回总耗时 ms。
+ */
+export async function electronPersistSeedConversations(
+  count: number,
+  onProgress?: (done: number, total: number) => void,
+): Promise<number> {
+  const start = Date.now()
+  let written = 0
+  while (written < count) {
+    const batchSize = Math.min(SEED_CONVERSATION_BATCH_SIZE, count - written)
+    const batchBase = written
+    const records: UiConversation[] = Array.from({ length: batchSize }, (_, i) => {
+      const seq = batchBase + i
+      const isGroup = seq % 3 === 0
+      const pinned = seq % 97 === 0
+      const record: UiConversation = {
+        id: `seed-cvs-${start}-${seq}`,
+        name: `${SEED_CONVERSATION_NAMES[seq % SEED_CONVERSATION_NAMES.length]} ${seq + 1}`,
+        type: isGroup ? 'groupChat' : 'singleChat',
+        unreadCount: seq % 17 === 0 ? (seq % 9) + 1 : 0,
+        lastMessageText: `${SEED_TEXT_SAMPLES[seq % SEED_TEXT_SAMPLES.length]}（第 ${seq + 1} 条）`,
+        lastMessageFrom: 'seed-bot',
+        lastMessageTime: start - seq * 60000,
+        isPinned: pinned,
+        pinnedTime: pinned ? start - seq * 1000 : undefined,
+        isMuted: false,
+        marks: [],
+        draft: seq % 31 === 0 ? `草稿：待发送的内容 ${seq + 1}` : undefined,
+        draftTime: seq % 31 === 0 ? start - seq * 30000 : undefined,
+      }
+      return record
+    })
+    await invoke('hooks.conversation.saveConversations', records)
     written += batchSize
     onProgress?.(written, count)
     // 批间让出事件循环，避免长链路 IPC 阻塞渲染

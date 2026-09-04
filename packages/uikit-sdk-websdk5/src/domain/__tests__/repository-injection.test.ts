@@ -92,8 +92,12 @@ function makeConversationStore() {
     setSyncing: vi.fn(),
     delete: vi.fn(),
     update: vi.fn(),
+    setHasMoreConversations: vi.fn(),
     conversationList: [] as UiConversation[],
-  } as unknown as ConversationStoreLike & { setList: ReturnType<typeof vi.fn> }
+  } as unknown as ConversationStoreLike & {
+    setList: ReturnType<typeof vi.fn>
+    setHasMoreConversations: ReturnType<typeof vi.fn>
+  }
 }
 
 describe('messageDomain 数据入口注入（repositories）', () => {
@@ -153,7 +157,7 @@ describe('messageDomain 数据入口注入（repositories）', () => {
 })
 
 describe('conversationDomain 数据入口注入（repositories）', () => {
-  it('注入 fetchConversations 时 refresh 游标翻页合并后写 store', async () => {
+  it('注入 fetchConversations 时 refresh 只拉首页并回写 hasMore（大会话量懒加载）', async () => {
     const client = makeConversationClient()
     const store = makeConversationStore()
     const older = makeConversation('cvs-old', { lastMessageTime: 100 })
@@ -168,13 +172,50 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     await domain.refresh()
 
     expect(client.chatManager.refreshSessionList).not.toHaveBeenCalled()
-    expect(fetchConversations).toHaveBeenCalledTimes(2)
+    // 首页语义：只拉第一页，不循环灌全量（1 万会话场景的核心回归点）
+    expect(fetchConversations).toHaveBeenCalledTimes(1)
     expect(fetchConversations).toHaveBeenNthCalledWith(1, undefined, 50)
-    expect(fetchConversations).toHaveBeenNthCalledWith(2, 'p2', 50)
-    // 合并后按最后一条消息时间倒序写入 store
+    expect(store.setHasMoreConversations).toHaveBeenCalledWith(true)
+    // 首页排序后写入 store
     expect(store.setList).toHaveBeenCalledTimes(1)
     const list = store.setList.mock.calls[0][0] as UiConversation[]
-    expect(list.map(c => c.id)).toEqual(['cvs-new', 'cvs-old'])
+    expect(list.map(c => c.id)).toEqual(['cvs-old'])
+
+    // 续页：loadMore 按游标推进并追加（去重 + 重排序 + hasMore 回写）
+    store.conversationList = list
+    await domain.loadMore()
+
+    expect(fetchConversations).toHaveBeenCalledTimes(2)
+    expect(fetchConversations).toHaveBeenNthCalledWith(2, 'p2', 50)
+    expect(store.setHasMoreConversations).toHaveBeenLastCalledWith(false)
+    const appended = store.setList.mock.calls[1][0] as UiConversation[]
+    expect(appended.map(c => c.id)).toEqual(['cvs-new', 'cvs-old'])
+
+    // 到底后 loadMore 短路，不再请求
+    await domain.loadMore()
+    expect(fetchConversations).toHaveBeenCalledTimes(2)
+  })
+
+  it('注入路径 loadMore 续页与现有列表同 id 去重', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const first = makeConversation('cvs-1', { lastMessageTime: 300 })
+    const dupNewer = makeConversation('cvs-1', { lastMessageTime: 400, name: '已更新名称' })
+    const other = makeConversation('cvs-2', { lastMessageTime: 200 })
+    const fetchConversations = vi.fn()
+      .mockResolvedValueOnce({ list: [first], cursor: 'p2', hasMore: true })
+      .mockResolvedValueOnce({ list: [dupNewer, other], cursor: undefined, hasMore: false })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations },
+    })
+
+    await domain.refresh()
+    store.conversationList = store.setList.mock.calls[0][0] as UiConversation[]
+    await domain.loadMore()
+
+    const appended = store.setList.mock.calls[1][0] as UiConversation[]
+    // 同 id 会话不被续页重复追加（保留首页已补全资料的那条）
+    expect(appended.map(c => c.id)).toEqual(['cvs-1', 'cvs-2'])
   })
 
   it('未注入时 refresh 走 SDK 默认路径', async () => {

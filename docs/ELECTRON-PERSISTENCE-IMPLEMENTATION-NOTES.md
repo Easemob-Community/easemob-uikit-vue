@@ -173,6 +173,7 @@ setMessagePinned(msgId: string, pinned: boolean): Promise<void>       -- 纯本�
 9. **登出保留库文件**（企微语义，下次登录秒开）；显式清除走 `clearAll()`。
 10. **墓碑 TTL 归 v2**：撤回/删除墓碑行长期只增不减，v2 加保留期（如 180 天后物理清理），v1 不处理。
 11. **`maxMessageCount` 已透出（2026-09-04，Phase 3.6 遗留项）**：`EmUIKitProvider` 新增可选 prop `maxMessageCount`（uikit-provider.vue，有值即 `stores.message.setOptions({ maxMessageCount })`，immediate + watch 运行时调大生效）。默认 300 不变；Electron 本地持久化场景建议 10000（demo-electron 已接通：开关开启时传 10000）。该上限是**内存裁剪上限**（超出裁最旧），不是分页上限；滑动窗口式内存管理（无限翻页且内存恒定）为 v2 项。
+12. **会话分页链路接通（2026-09-04，大会话量压测前置修复）**：核查发现 UI 层懒加载骨架早已就绪（`conversation-list.vue` useInfiniteScroll 触底 → `useConversation().loadMoreConversations` → domain loadMore），但注入 repository 路径未接通——websdk5 `ConversationDomain.refresh` 原实现循环拉全页一次性灌 store，`loadMore` 不查注入源。已改为：refresh 注入路径只拉首页（50 条）并记录游标 + 回写 `hasMoreConversations`；loadMore 注入路径按游标续页追加（去重 + 重排序 + hasMore 回写），到底短路。非 breaking（SDK 默认路径不变；`ConversationStoreLike.setHasMoreConversations` 为可选新增）。webim4 同构旧逻辑未动（本专项验证走 websdk5，后续需要时同步）。**虚拟滚动未引入**——万级会话 DOM 节点随翻页持续累积，是已知的渲染性能边界（v2 项）。
 
 ## 决策 7：本地分页与冷启动加载量（禁止一把搂）
 

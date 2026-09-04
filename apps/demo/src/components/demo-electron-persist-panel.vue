@@ -11,6 +11,7 @@ import { computed, ref } from 'vue'
 import {
   electronPersistClearAll,
   electronPersistDeleteDbAndRelaunch,
+  electronPersistSeedConversations,
   electronPersistSeedMessages,
   electronPersistStats,
   electronSetOffline,
@@ -32,6 +33,17 @@ const seedPresets = [
 const seedProgress = ref('')
 /** 灌数进行中（期间按钮禁用） */
 const seeding = ref(false)
+/** 灌会话参数与档位（大会话量渲染压测） */
+const seedConversationCount = ref(500)
+const seedConversationPresets = [
+  { label: '500', count: 500 },
+  { label: '2000', count: 2000 },
+  { label: '1万', count: 10000 },
+] as const
+/** 灌会话进度（空串 = 未在灌） */
+const seedConversationProgress = ref('')
+/** 灌会话进行中 */
+const seedingConversations = ref(false)
 /** 断网状态（面板本地态） */
 const offline = ref(false)
 /** 面板收起态（默认收起为小球，点击展开） */
@@ -83,6 +95,29 @@ async function onSeed(count?: number) {
   finally {
     seeding.value = false
     seedProgress.value = ''
+  }
+}
+
+async function onSeedConversations(count?: number) {
+  const total = count ?? seedConversationCount.value
+  if (count !== undefined)
+    seedConversationCount.value = count
+  seedingConversations.value = true
+  seedConversationProgress.value = `已写入 0 / ${total}`
+  tip.value = ''
+  try {
+    const elapsed = await electronPersistSeedConversations(
+      total,
+      (done, t) => { seedConversationProgress.value = `已写入 ${done} / ${t}` },
+    )
+    tip.value = `已灌入 ${total} 个测试会话，耗时 ${elapsed}ms（刷新会话列表查看）`
+  }
+  catch (error) {
+    tip.value = `灌会话失败: ${(error as Error).message}`
+  }
+  finally {
+    seedingConversations.value = false
+    seedConversationProgress.value = ''
   }
 }
 
@@ -139,7 +174,26 @@ async function onToggleOffline() {
         </button>
         <span v-if="seedProgress" class="persist-panel__seed-progress">{{ seedProgress }}</span>
       </div>
-      <button class="persist-panel__btn" :disabled="seeding" @click="onClearAll">
+      <!-- 灌会话（大会话量渲染压测）：lastMessage* 字段已够列表渲染，不灌消息体 -->
+      <div class="persist-panel__seed">
+        <input v-model.number="seedConversationCount" class="persist-panel__input persist-panel__input--num" type="number" min="1" :disabled="seedingConversations">
+        <button class="persist-panel__btn" :disabled="seedingConversations" @click="onSeedConversations()">
+          灌会话
+        </button>
+        <button
+          v-for="p in seedConversationPresets"
+          :key="p.count"
+          class="persist-panel__btn persist-panel__btn--preset"
+          :disabled="seedingConversations"
+          @click="onSeedConversations(p.count)"
+        >
+          {{ p.label }}
+        </button>
+      </div>
+      <p v-if="seedConversationProgress" class="persist-panel__seed-progress">
+        {{ seedConversationProgress }}
+      </p>
+      <button class="persist-panel__btn" :disabled="seeding || seedingConversations" @click="onClearAll">
         清空全部
       </button>
       <button class="persist-panel__btn persist-panel__btn--danger" @click="onDeleteDb">
