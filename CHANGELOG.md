@@ -1,5 +1,12 @@
 # Changelog
 
+## @easemob/uikit-sdk-contract 1.3.0 (2026-09-04)
+
+### 新增
+
+- **persistence 钩子补项（Electron 持久化专项契约待补项）**：`MessagePersistenceHooks` 新增可选 `updateMessagePinned(msgId, pinnedTime | null)`（远端 pin/unpin 事件旁路 + 本地置顶操作，fire-and-forget）；`ConversationPersistenceHooks` 新增可选 `removeConversations(ids, opts?: { deleteMessages?: boolean })`（删会话旁路，`deleteMessages: true` 时级联物理删消息 + FTS 行 + 同步状态行，缺省只删会话行保留历史）。
+- **repository 搜索接口（可选实现）**：`MessageRepository` 新增可选 `searchMessages(params)`，`ConversationRepository` 新增可选 `searchConversations(params)`；新增参数类型 `MessageSearchParams` / `ConversationSearchParams`（keyword / conversationId 缩圈 / conversationType / cursor / pageSize），返回复用 `MessagePage` / `ConversationPage` 游标分页。实现方可选：本地库实现走 FTS / LIKE，SDK 漫游实现可不提供。全部新增项均为可选，现有 adapter 实现零改动兼容。
+
 ## @easemob/uikit-im 3.5.0 (2026-09-04)
 
 ### 变更

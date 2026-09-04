@@ -26,7 +26,9 @@
       "@easemob/uikit-im": ["./packages/uikit-im/src"],
       "@easemob/uikit-im/*": ["./packages/uikit-im/src/*"],
       "@easemob/uikit-chatroom": ["./packages/uikit-chatroom/src"],
-      "@easemob/uikit-chatroom/*": ["./packages/uikit-chatroom/src/*"]
+      "@easemob/uikit-chatroom/*": ["./packages/uikit-chatroom/src/*"],
+      "@easemob/uikit-persist-sqlite": ["./packages/uikit-persist-sqlite/src"],
+      "@easemob/uikit-persist-sqlite/*": ["./packages/uikit-persist-sqlite/src/*"]
     }
   },
   "include": ["packages/*/src", "apps/*/src"],

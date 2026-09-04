@@ -66,7 +66,7 @@
 
 - 依赖/规范体系：本文件「Skill 路由表」+ `.agent/skills/*`
 - 技术债与待修：[TECH-DEBT.md](TECH-DEBT.md)
-- Electron + 本地 DB 持久化预研：[ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）
+- Electron + 本地 DB 持久化预研：[ELECTRON-PERSISTENCE-RESEARCH.md](docs/ELECTRON-PERSISTENCE-RESEARCH.md)（对应 TECH-DEBT D85）；实施前决策备忘（外挂库形态/monorepo 归属/健壮性纪律/四层测试 + demo-electron 验证工程）：[ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md](docs/ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md)（2026-09-04，对应 D122 Phase 3.5/3.6，未实施）
 - 主题配置能力审查（字号/适老/密度）：[THEME-CAPABILITY-REVIEW.md](docs/THEME-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D86，关联 D3/D4/D12）
 - 设计稿 token 对照与落地口径（设计师 SCSS/Typography 方案 ↔ `--uikit-*` 映射、不引入项理由、规格校准清单、对接流程）：[DESIGN-TOKEN-MAPPING.md](docs/DESIGN-TOKEN-MAPPING.md)（关联 TECH-DEBT D127-D130）
 - Demo 开发者友好模式预研：[DEMO-DEV-MODE-RESEARCH.md](docs/DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
@@ -81,6 +81,7 @@
 - 微前端 OA 基座宿主兼容性预研（集成形态选择 + 单例作用域/主题作用域/window 副作用/SDK 单例与卸载 4 点风险清单 + 与 D122 决策 17–20 衔接）：[MICRO-FRONTEND-COMPATIBILITY.md](docs/MICRO-FRONTEND-COMPATIBILITY.md)（对应 TECH-DEBT D125）
 - IM 职责边界与 OA↔UIKIT 接入契约（五包封顶 + 扩展点复用 + 不做清单 + 接入契约 + 按触发点落地）：[IM-RESPONSIBILITY-BOUNDARY.md](docs/IM-RESPONSIBILITY-BOUNDARY.md)（对应 TECH-DEBT D126）
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
+- 本地持久化参考实现：`packages/uikit-persist-sqlite`（`@easemob/uikit-persist-sqlite`，private 0.1.0 暂不发布；契约 persistence hooks / repository 的 SQLite 实现，纯 TS Node 库零 vue/pinia/electron 依赖，better-sqlite3 为 optional peer + devDep，宿主可经驱动薄接口注入 SQLCipher/node:sqlite；规格见 docs/ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md）
 - 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）

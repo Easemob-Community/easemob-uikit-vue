@@ -72,6 +72,39 @@ export interface GroupReadReceiptPage {
 }
 
 /**
+ * 消息搜索参数（统一游标语义：cursor 空查第一页）。
+ * `conversationId` 提供时会话内搜索强制缩圈（性能口径，见分页设计）；
+ * Message search params: cursor empty = first page; `conversationId` narrows
+ * the search to a single conversation.
+ */
+export interface MessageSearchParams {
+  /** 搜索关键词 */
+  keyword: string
+  /** 会话内搜索缩圈（缺省为全局搜索） */
+  conversationId?: string
+  /** 会话类型过滤（通常与 conversationId 配套） */
+  conversationType?: ConversationTypeValue
+  /** 分页游标（上一页返回的 cursor） */
+  cursor?: string
+  /** 每页条数 */
+  pageSize?: number
+}
+
+/**
+ * 会话搜索参数（统一游标语义：cursor 空查第一页）。
+ */
+export interface ConversationSearchParams {
+  /** 搜索关键词（匹配会话名 / 用户昵称） */
+  keyword: string
+  /** 会话类型过滤 */
+  conversationType?: ConversationTypeValue
+  /** 分页游标（上一页返回的 cursor） */
+  cursor?: string
+  /** 每页条数 */
+  pageSize?: number
+}
+
+/**
  * 消息数据入口（读写一体）。
  */
 export interface MessageRepository {
@@ -191,11 +224,29 @@ export interface MessageRepository {
     cursor?: string,
     pageSize?: number,
   ) => Promise<GroupReadReceiptPage>
+
+  /**
+   * 消息全文搜索（可选实现）。
+   * 实现方可选：本地库实现走 FTS 全文索引；SDK 漫游实现可不提供
+   * （调用方需先判空再使用）。返回统一 `MessagePage` 游标分页，无实时 COUNT。
+   * Optional full-text message search. Local-store implementations use an FTS
+   * index; roaming-only implementations may omit it (callers must null-check).
+   */
+  searchMessages?: (params: MessageSearchParams) => Promise<MessagePage>
 }
 
 /** 会话数据入口（统一游标分页语义） */
 export interface ConversationRepository {
   fetchConversations: (cursor?: string, pageSize?: number) => Promise<ConversationPage>
+
+  /**
+   * 会话搜索（可选实现）：匹配会话名 / 用户昵称。
+   * 实现方可选：本地库实现走小表 LIKE（量级小无需 FTS）；
+   * SDK 漫游实现可不提供（调用方需先判空再使用）。
+   * Optional conversation search by name/nickname. Local-store implementations
+   * use LIKE over small tables; roaming-only implementations may omit it.
+   */
+  searchConversations?: (params: ConversationSearchParams) => Promise<ConversationPage>
 }
 
 /**

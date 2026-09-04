@@ -61,6 +61,15 @@ export interface MessagePersistenceHooks {
    * 本地删除 / 多选删除场景批量触发。
    */
   deleteMessages?: (msgIds: string[]) => void | Promise<void>
+
+  /**
+   * 消息置顶校准：远端 pin / unpin 事件旁路 + 本地置顶操作。
+   * `pinnedTime` 为置顶时间戳（毫秒），`null` 表示取消置顶；
+   * fire-and-forget，实现方按 msgId（`msgServerId` 优先，未回填期允许 `msgLocalId`）定位行。
+   * Pinned-state sync: driven by remote pin/unpin events and local pin actions;
+   * `pinnedTime = null` clears the pin. Fire-and-forget.
+   */
+  updateMessagePinned?: (msgId: string, pinnedTime: number | null) => void | Promise<void>
 }
 
 /**
@@ -72,6 +81,18 @@ export interface ConversationPersistenceHooks {
    * 实现方按 `record.id` upsert；增量同步的开销优化（diff / 防抖）由实现方负责。
    */
   saveConversations?: (records: ConversationRecord[]) => void | Promise<void>
+
+  /**
+   * 删除会话旁路：会话从列表移除后同步给本地库。
+   * 级联语义由 `opts.deleteMessages` 决定：
+   * - `true`：级联物理删除该会话消息（含 FTS 索引行）与同步状态行——
+   *   「删了就永远不再回来」（微信语义，与清除水位线一致）；
+   * - `false` / 缺省：只删会话行，消息保留，会话再次浮现时历史仍在。
+   * Cascade semantics of `opts.deleteMessages`: true = physically delete the
+   * conversation's messages (and FTS rows / sync state); false/absent = remove
+   * the conversation row only, keeping message history.
+   */
+  removeConversations?: (ids: string[], opts?: { deleteMessages?: boolean }) => void | Promise<void>
 }
 
 /**

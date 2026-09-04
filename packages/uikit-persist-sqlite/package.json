@@ -1,0 +1,44 @@
+{
+  "name": "@easemob/uikit-persist-sqlite",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Easemob UIKit local persistence reference implementation on SQLite (Electron / Node)",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/easemob-uikit-persist-sqlite.js",
+      "require": "./dist/easemob-uikit-persist-sqlite.cjs"
+    }
+  },
+  "main": "./dist/easemob-uikit-persist-sqlite.cjs",
+  "module": "./dist/easemob-uikit-persist-sqlite.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc --noEmit --project tsconfig.build.json",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "better-sqlite3": ">=11.0.0"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@easemob/uikit-sdk-contract": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20.19.43",
+    "better-sqlite3": "^11.10.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-dts": "^3.9.1"
+  }
+}
