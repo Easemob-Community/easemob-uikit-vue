@@ -1,10 +1,38 @@
 # Changelog
 
+## @easemob/uikit-im 3.5.0 (2026-09-04)
+
+### 变更
+
+- **文件消息气泡整改（设计规范）**：文件图标改为左侧固定展示的彩色底色块（双方气泡一致），按扩展名归类取图标——pdf / xls / doc / ppt / md 明确格式各用明确图标，图片 / 视频 / 音频按类别用 `file/img` / `file/video` / `file/audio`，未识别类型回落 `file/empty`；图标底色为类型品牌色 token（见 core 2.6.0），图标本体白色。文件标题改用 `EmText`（body 14px / medium / 单行 ellipsis），颜色跟随气泡文字色（对方 `#171A1C`、己方 `#FFFFFF`）。气泡圆角沿用 round 16px / square 8px 两档，但文件卡片默认 square（8px，设计约定），可经 `config.messageList.bubbleShape` 切 round。
+
+## @easemob/uikit-core 2.6.0 (2026-09-04)
+
+### 新增
+
+- **文件类型图标底色 token**：`--uikit-file-icon-{pdf,xls,doc,ppt,md,img,video,audio,file}` 品牌识别色（pdf `#E5252A` / xls `#1D7044` / doc `#2B5797` / ppt `#D24625` / md `#424242` / img `#00897B` / video `#E91E63` / audio `#7B1FA2` / 未识别普通文件 `#4CAF50`），明暗模式通用。
+
 ## @easemob/uikit-im 3.4.0 (2026-09-03)
 
 ### 新增
 
+- **ChatContainer 容器风格档位 `variant`**：`compact`（默认；平铺无圆角，`--uikit-chat-bg` 铺满，保持现状不破坏存量接入）/ `card`（圆角卡片：圆角跟随 `--uikit-components-radius`，细边框 `--uikit-border-light`，overflow 裁剪内部直角；灰底与间距由宿主布局提供），与 `ConversationContainer` 的 card/compact 同口径——此前卡片壳需接入方在宿主布局手搓，现收回容器内。
 - **`EmText` 排版原子组件 re-export**：与 core 2.5.0 对齐，`@easemob/uikit-im` 侧同步导出 `EmText` 及 `TextProps` / `TextLevel` / `TextWeight` / `TextColor` 类型（见 core 2.5.0）。
+- **中性气泡样式档位 `config.messageList.bubbleStyle`**：`'filled'`（默认，对方气泡带底色）/ `'plain'`（对方气泡无底色纯文字，message-list 根作用域覆写 `--uikit-bubble-bg-other: transparent`，组件级变体范式，不影响全局主题）。
+- **对方语音消息未播放红点 `config.messageList.voiceUnreadDot`**：默认 `true`。本会话实时收到的对方语音未点击时，气泡外侧右侧、相对气泡垂直居中显示红点，点击播放后隐藏；历史/漫游消息无播放状态不打标，刷新页面即复位（运行时态，不落盘）。设为 `false` 全局关闭；单条消息级覆盖可在消息项插槽内对 `INJECTION_KEY.VOICE_UNREAD_DOT` 深一层 provide。
+
+### 变更
+
+- **消息气泡圆角档位校准（设计规范）**：`bubbleShape` 两档取值由 12px/4px 校准为 round=16px（默认）/ square=8px，新增 token `--uikit-bubble-radius` / `--uikit-bubble-radius-square`（见 core 2.5.0）；文本/语音/图片/视频气泡与引用卡片（0.75 倍圆角：round 档 12px 更椭圆、square 档 6px 保持原样）跟随档位，文件/位置/合并/自定义气泡补齐 `bubbleShape` 消费（此前未接线）。
+- **气泡默认色校准（设计规范）**：对方气泡 `#E4E6E7` / 文字 `#171A1C`，己方气泡 `#009EFF` / 文字 `#FFFFFF`；己方气泡背景不再跟随主色（运行时仍可用 `setBubbleBg` / 主题预设覆盖）。
+- **译文 / 语音转文字并入原气泡**：不再以独立卡片吸顶气泡下方，改为同一气泡内 1px 分割线分隔（新 token `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`）；语音气泡展示转写时宽度由按时长固定改为随内容自适应；己方气泡内译文链接与加载态配色同步修正。
+- **消息状态默认位置改为气泡末尾**：`messageStatus.position` 默认由 `'below'`（气泡下方）改为 `'inline'`（气泡末尾、多行气泡与底部对齐），`'below'` 仍可显式配置。
+
+### 修复
+
+- **ChatContainer card 档外侧出现滚动条**：`.chat-container` 补 `box-sizing: border-box`，card 档 1px 边框不再把 `height: 100%` 撑出 2px 导致宿主溢出（顺带消除 H5 safe-bottom padding 的同类撑高隐患）。
+- **inline 消息状态落在引用卡上 / 跟随引用卡宽度**：带引用的消息在 `statusPosition: 'inline'` 下，状态列此前相对「气泡 + 引用卡」整体居中/沉底，视觉上贴在引用卡左侧；现将引用卡移出 message-row，且 message-row 内 body 宽度由 `100%` 改为随气泡内容收缩（`fit-content`），状态列只相对气泡本体对齐（多行沉底检测同步只量气泡），不再被引用卡宽度顶到远处。
+- **译文 / 语音转写缺少完成态标签**：译文展示时气泡底部新增「已翻译 / Translated」标签（icon `rect/hanzinalpha/slash`），语音转写新增同款「已转文字 / Transcribed」标签（icon `rect/hanzi`），双方气泡均居右对齐；locale 新增 `message.translated` / `message.voiceToText.done`（中英双语）。引用卡片去掉左侧竖杠装饰。
 
 ## @easemob/uikit-core 2.5.0 (2026-09-03)
 
@@ -13,6 +41,8 @@
 - **`EmText` 排版原子组件**（TECH-DEBT D127）：`level` 对齐设计师 Value.tokens.json 9 档（h0=34 / h1=28 / h2=22 / h3=18 / body-lg=16 / body=14 / caption=12 / small=10 / mini=8）并补 `body-sm`（13px）；每档内置「字号 + 行高」配对（行高按稿值换算为 `calc(Npx × --uikit-font-scale)`，跟随适老缩放）与默认字重；`weight`（regular / medium / semibold / bold）可覆盖默认字重，`color`（primary / secondary / tertiary / inverse）走语义 token，`ellipsis` 单行截断，`tag` 默认 `span`。新增后不全库回改，新代码用、老代码渐进迁移。
 - **字号 token 补两档大标题**：`--uikit-font-size-28` / `--uikit-font-size-34`（明暗两段，× `--uikit-font-scale`）。
 - **字体族栈首声明设计规范字体**：`--uikit-font-family` 栈首加 `'Inter'`（拉丁字形）/ `'Noto Sans SC'`（中文），本机未安装时自动回落 PingFang SC / 雅黑 / 思源黑体等系统字体栈；库不内置网络字体加载，需要精确字形时由接入方自行引入 webfont。
+- **气泡语义 token 扩展与默认值校准（设计规范）**：新增 `--uikit-bubble-radius`（round 档 16px，默认）/ `--uikit-bubble-radius-square`（square 档 8px）与气泡内分割线 `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`（明暗两段）；气泡默认色校准为对方 `#E4E6E7` / `#171A1C`、己方 `#009EFF` / `#FFFFFF`（暗色段：对方沿用表面色与文字色，己方保持品牌蓝 `#009EFF`）。
+- **`INJECTION_KEY.VOICE_UNREAD_DOT` 注入键**：语音未读红点开关的 provide/inject 通道（`ComputedRef<boolean | undefined>`，undefined 回落默认 true），支持消息项级深一层 provide 覆盖。
 
 ## @easemob/uikit-im 3.3.0 (2026-09-03)
 
@@ -45,11 +75,19 @@
 
 ## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
+### 新增
+
+- **语音未播放打标**：`onMessage` 实时收到对方语音消息时调用 `stores.message.markVoiceUnplayed?.(msgId)`（`MessageStoreLike` 新增可选方法，chatroom 等场景 store 可缺省），支撑 UI 层语音未读红点；历史/漫游路径不打标。
+
 ### 修复
 
 - **被踢误报网络异常**：`onDisconnected` 按错误码识别被踢/账号失效（取 `payload.errorCode`），命中 `KICK_ERROR_CODE` 时调用 `client.setKicked(code)` 标记账号终态，而非仅置 disconnected；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
 
 ## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+
+### 新增
+
+- **语音未播放打标（与 websdk5 同口径）**：`onMessage` 实时收到对方语音消息时调用 `stores.message.markVoiceUnplayed?.(msgId)`（`MessageStoreLike` 新增可选方法）。
 
 ### 修复
 

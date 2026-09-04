@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-core",
   "type": "module",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Easemob UIKit Vue3 shared core (sdk abstraction / theme / locale / atomic components / provider)",
   "exports": {
     ".": {

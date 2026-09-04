@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { computed, inject } from 'vue'
+import type { ComputedRef } from 'vue'
+import { EmIcon as Icon, EmText } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
 import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
+import { INJECTION_KEY } from '@easemob/uikit-core'
 import type { FileMessageBody, UiMessage } from '@easemob/uikit-core'
+import type { BubbleShape } from '../types'
 
 export interface FileMessageProps {
   message: UiMessage
@@ -13,6 +16,17 @@ export interface FileMessageProps {
 const props = defineProps<FileMessageProps>()
 const { t } = useLocale()
 const { show: showToast } = useToast()
+
+/**
+ * 圆角 class：config.messageList.bubbleShape（message-bubble-wrapper provide）优先；
+ * 未配置时文件卡片默认 square（8px），与设计约定一致，可配置切 round（16px）
+ */
+const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
+const bubbleClass = computed(() =>
+  (injectedBubbleShape.value ?? 'square') === 'square'
+    ? 'file-message__bubble--square'
+    : '',
+)
 
 const body = computed(() => props.message.body as FileMessageBody)
 
@@ -31,21 +45,30 @@ const fileSize = computed(() => {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 })
 
-/** 根据文件名推断文件类型图标 */
-const fileIcon = computed(() => {
-  const name = fileName.value.toLowerCase()
-  if (/\.(?:jpg|jpeg|png|gif|webp|svg)$/.test(name))
-    return 'rect/img'
-  if (/\.(?:mp4|mov|avi|mkv)$/.test(name))
-    return 'video'
-  if (/\.(?:mp3|wav|aac|flac|ogg|m4a)$/.test(name))
-    return 'speaker/wave_2'
-  if (/\.(?:pdf|doc|docx|xls|xlsx|ppt|pptx)$/.test(name))
-    return 'doc'
-  if (/\.(?:zip|rar|7z|tar|gz)$/.test(name))
-    return 'archive'
-  return 'file/empty'
-})
+/** 文件类型 key：与 --uikit-file-icon-{key} token 一一对应；'file' 为未识别兜底 */
+type FileTypeKey = 'pdf' | 'xls' | 'doc' | 'ppt' | 'md' | 'img' | 'video' | 'audio' | 'file'
+
+/** 按扩展名归类：音频/图片/视频按类别，明确格式按明确图标，其余回落 file/empty */
+const FILE_TYPE_RULES: Array<{ key: Exclude<FileTypeKey, 'file'>, icon: string, pattern: RegExp }> = [
+  { key: 'pdf', icon: 'file/pdf', pattern: /\.pdf$/ },
+  { key: 'xls', icon: 'file/xls', pattern: /\.(?:xls|xlsx|csv|et)$/ },
+  { key: 'doc', icon: 'doc', pattern: /\.(?:doc|docx|txt|rtf|wps)$/ },
+  { key: 'ppt', icon: 'file/ppt', pattern: /\.(?:ppt|pptx|dps)$/ },
+  { key: 'md', icon: 'file/md', pattern: /\.(?:md|markdown)$/ },
+  { key: 'img', icon: 'file/img', pattern: /\.(?:jpe?g|png|gif|webp|svg|bmp|ico|heic)$/ },
+  { key: 'video', icon: 'file/video', pattern: /\.(?:mp4|mov|avi|mkv|webm|flv|wmv)$/ },
+  { key: 'audio', icon: 'file/audio', pattern: /\.(?:mp3|wav|aac|flac|ogg|m4a|wma)$/ },
+]
+
+const fileTypeRule = computed(
+  () => FILE_TYPE_RULES.find(rule => rule.pattern.test(fileName.value.toLowerCase())),
+)
+
+/** 类型 key（驱动图标底色 token） */
+const fileType = computed<FileTypeKey>(() => fileTypeRule.value?.key ?? 'file')
+
+/** 类型图标（未识别回落 file/empty） */
+const fileIcon = computed(() => fileTypeRule.value?.icon ?? 'file/empty')
 
 async function handleDownload() {
   const url = body.value.url
@@ -86,17 +109,26 @@ async function handleDownload() {
     :class="{ 'file-message--self': props.message.isSelf }"
     @click="handleDownload"
   >
-    <div class="file-message__bubble">
+    <div class="file-message__bubble" :class="bubbleClass">
+      <div
+        class="file-message__icon"
+        :style="{ backgroundColor: `var(--uikit-file-icon-${fileType})` }"
+      >
+        <Icon :name="fileIcon" :size="20" />
+      </div>
       <div class="file-message__info">
-        <div class="file-message__name" :title="fileName">
+        <EmText
+          level="body"
+          weight="medium"
+          ellipsis
+          class="file-message__name"
+          :title="fileName"
+        >
           {{ fileName }}
-        </div>
+        </EmText>
         <div v-if="fileSize" class="file-message__size">
           {{ fileSize }}
         </div>
-      </div>
-      <div class="file-message__icon">
-        <Icon :name="fileIcon" :size="36" />
       </div>
     </div>
   </div>
@@ -117,7 +149,7 @@ async function handleDownload() {
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   cursor: pointer;
@@ -127,18 +159,27 @@ async function handleDownload() {
   box-sizing: border-box;
 }
 
+.file-message__bubble--square {
+  border-radius: var(--uikit-bubble-radius-square, 8px);
+}
+
 @media (hover: hover) {
   .file-message__bubble:hover {
     background-color: var(--uikit-bg-hover);
   }
 }
 
+/* 类型图标底色块：双方均固定在左侧，底色为类型品牌色 token，图标本体白色 */
 .file-message__icon {
   flex-shrink: 0;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--uikit-primary-color);
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-file-icon-file);
+  color: var(--uikit-text-inverse, #FFFFFF);
 }
 
 .file-message__info {
@@ -149,16 +190,9 @@ async function handleDownload() {
   flex: 1;
 }
 
-.file-message__name {
-  font-size: var(--uikit-font-size-14);
-  font-weight: 500;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  word-break: break-all;
+/* 标题跟随气泡文字色（覆盖 EmText 默认 primary，与设计稿 #171A1C / 己方白字一致） */
+.file-message__bubble .file-message__name {
+  color: var(--uikit-bubble-text-other);
 }
 
 .file-message__size {
@@ -180,9 +214,8 @@ async function handleDownload() {
   }
 }
 
-.file-message--self .file-message__icon {
+.file-message--self .file-message__bubble .file-message__name {
   color: var(--uikit-bubble-text-self);
-  opacity: 0.85;
 }
 
 .file-message--self .file-message__size {
