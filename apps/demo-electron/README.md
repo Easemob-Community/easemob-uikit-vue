@@ -12,19 +12,18 @@ apps/demo-electron/
   package.json
 ```
 
-## 怎么跑（两个终端）
+## 怎么跑（一条命令）
 
 前置：`@easemob/uikit-persist-sqlite` 已构建（`pnpm -F @easemob/uikit-persist-sqlite build`）。
 
 ```bash
-# 终端 1：demo dev server（5173）
-pnpm -F @easemob/demo dev
-
-# 终端 2：Electron 壳（loadURL 直连 5173，demo 热更新照常）
 pnpm -F @easemob/demo-electron dev
 ```
 
-自定义 demo 地址：`DEMO_URL=http://localhost:5174 pnpm -F @easemob/demo-electron dev`。
+`scripts/dev.cjs` 会用**专属端口 5273** 自动拉起本仓库 demo 的 dev server（`strictPort`，端口被占直接报错），就绪后再启动 Electron 壳；壳退出时连带回收 dev server。
+
+> 为什么不用默认 5173：本机其他项目的 dev server 常占 5173，若 vite 静默顺延端口，壳会加载到别的应用（已踩过）。因此 demo-electron 固定走 5273；`apps/demo` 已开 `strictPort`，任何端口冲突都会显式报错而非错载。
+> 需要换端口：`DEMO_PORT=5300 pnpm -F @easemob/demo-electron dev`。
 
 ## 使用
 

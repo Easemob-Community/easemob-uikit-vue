@@ -54,6 +54,12 @@ const uikitChatroomVersion = getUIKitChatroomVersion()
 const uikitSdkWebsdk5Version = getUIKitSdkWebsdk5Version()
 
 export default defineConfig({
+  server: {
+    // demo-electron 联调走专属端口（DEMO_PORT=5273，见 apps/demo-electron/scripts/dev.mjs）；
+    // strictPort：端口被占时直接报错而非静默顺延——防止 Electron 壳加载到别的项目 dev server
+    port: Number(process.env.DEMO_PORT) || 5173,
+    strictPort: true,
+  },
   define: {
     __EASEMOB_SDK_VERSION__: JSON.stringify(sdkVersion),
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),

@@ -17,8 +17,9 @@ const process = require('node:process')
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const { createPersistence } = require('@easemob/uikit-persist-sqlite')
 
-/** demo dev server 地址（先起 pnpm -F @easemob/demo dev） */
-const DEMO_DEV_URL = process.env.DEMO_URL || 'http://localhost:5173'
+/** demo dev server 地址。默认 5273 是 demo-electron 专属端口（scripts/dev.mjs 会用
+ * DEMO_PORT=5273 启动本仓库 demo），避免与本机其他项目默认的 5173 撞车加载错应用 */
+const DEMO_DEV_URL = process.env.DEMO_URL || 'http://localhost:5273'
 
 /** 库文件名安全化：appKey 含 '#' 等路径不友好字符，统一替换为 '_' */
 function sanitizeFilePart(part) {

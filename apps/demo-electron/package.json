@@ -5,7 +5,7 @@
   "description": "Easemob UIKit Electron persistence validation harness (shell + test panel, reuses apps/demo renderer)",
   "main": "main.cjs",
   "scripts": {
-    "dev": "electron .",
+    "dev": "node scripts/dev.cjs",
     "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "dependencies": {
