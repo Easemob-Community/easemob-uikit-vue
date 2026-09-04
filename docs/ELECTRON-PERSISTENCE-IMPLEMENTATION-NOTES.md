@@ -1,10 +1,11 @@
 # Electron SQLite 持久化专项：实施前决策备忘
 
-> 讨论日期：2026-09-04。状态：**决策已沉淀，未实施**。启动专项时以本文为入口，技术细节仍以下游两份文档为准：
+> 讨论日期：2026-09-04。状态：**第一步已实施**（2026-09-04，分支 `feat/electron-persist-sqlite`：persist-sqlite 包 + 契约 1.3.0 补项 + demo-electron 验证工程已落地，验收矩阵真实账号联调进行中）。技术细节仍以下游两份文档为准：
 > - 概念预研与现状挂点：[ELECTRON-PERSISTENCE-RESEARCH.md](ELECTRON-PERSISTENCE-RESEARCH.md)（D85）
 > - 契约/接口/验收矩阵：[SDK-ADAPTER-ABSTRACTION-PLAN.md](SDK-ADAPTER-ABSTRACTION-PLAN.md) Phase 3.5/3.6（D122，3.1~3.4 已落地）
 >
-> 本文只记录「讨论中新定的四个决策」，不重复上述文档已有的接口定义与验收清单。
+> 本文只记录「讨论中新定的决策」，不重复上述文档已有的接口定义与验收清单。
+> 实施侧操作契约（harness 用法 / 数据语义红线 / 排障入口）见 skill `.agent/skills/uikit-electron-persistence/SKILL.md`。
 
 ## 决策 1：形态——独立外挂库，但只外挂「实现」
 
@@ -182,10 +183,10 @@ setMessagePinned(msgId: string, pinned: boolean): Promise<void>       -- 纯本�
 - **冷启动加载量修正**（推翻此前「各会话预填最近 N 条」）：登录后只加载**会话列表第一页**（如 50 条）+ **当前会话**的最近 N 条（如 30 条）；其余会话点进去时再 `loadMessages` 第一页。预填总量与会话数解耦，大会话量账号冷启动耗时恒定。
 - **验收目标**：单账号 10 万条消息，全局搜索 P95 < 500ms（LIMIT + 游标分页、无实时 COUNT、会话内搜索强制 conversationId 缩圈）。
 
-## 下一步（启动专项时按序执行）
+## 下一步（实施进度，2026-09-04 更新）
 
-1. 建 `packages/uikit-persist-sqlite` 骨架：包名定稿、schema v1（按决策 6 六表 + FTS + `uikit_meta` 版本表 + 决策 8 细则）、驱动薄接口、契约待补项三项（`searchMessages`/`searchConversations`/`updateMessagePinned`/`removeConversations`）。
-2. 写 L1 契约套件 + 中文 FTS 用例，跑绿（纯 vitest，不开 Electron）。
-3. D126 文档补「五包封顶」例外说明；本包 README 写 rebuild 与「删库重建」运维口径。
-4. 搭 `apps/demo-electron` 壳 + 测试面板，走通注入链路。
-5. 按 Phase 3.6 验收矩阵逐项打勾；搜索接口进契约（`searchMessages`/`searchConversations`）与本专项同期做。
+1. ✅ 建 `packages/uikit-persist-sqlite`：schema v1（决策 6 六表 + FTS + `uikit_meta` 版本表 + 决策 8 细则）、驱动薄接口、契约待补项已落地（契约 1.3.0：`searchMessages`/`searchConversations`/`updateMessagePinned`/`removeConversations`）。
+2. ✅ L1 契约套件（19 例）+ L2 SQLite 实现测试（含中文 FTS、二字回落、水位线、sending 降级）+ 健壮性 6 例，43+ 全绿。
+3. ✅ D126 已补「五包封顶」例外说明；包 README 已写 rebuild 与「删库重建」运维口径；健壮性五项（自检自愈/busy_timeout/synchronous=NORMAL/backup/README）已落地。
+4. ✅ `apps/demo-electron` 验证工程已落地：壳（单实例锁/权限/外链/5273 专属端口一键启动/dev:console）+ 测试面板（灌消息至 10 万档/灌会话至 1 万档/数据风暴双模式/库统计/清空/删库重开/断网模拟/备份 + 本地读取活动观测）；注入链路（SdkConfig.persistence/repositories 经 demo 开关接入）已走通。联调实证修复两个真实 bug：message store 300 条内存裁剪截断深翻页（`maxMessageCount` 已透出 Provider，决策 8.11）、注入路径会话 refresh 全量拉取（改首页 + loadMore 游标续页，决策 8.12，webim4 同构待同步）。
+5. ⬜ 按 Phase 3.6 验收矩阵逐项真实账号打勾（冷启动离线出画面/翻页穿内存/中文搜索 P95/多端墓碑一致/库损坏自愈）；附件被动缓存回填 API + LRU（决策 8.5 剩余）；L3 历史库 fixture migration 测试；persist 包发布决策（去 private）。

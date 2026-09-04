@@ -1223,7 +1223,14 @@
   - 明细与下一步执行顺序见 [ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md](docs/ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md)。
   - **schema v1 已定稿（2026-09-04，决策 6/7）**：六表（meta/messages/messages_fts(trigram)/conversations/user_info/group_member/sync_state）+ ext 声明式索引键（UIKit 预置 `em_at_list`）+ 清除水位线 `clearedBefore` + keyset 分页（禁 OFFSET）+ 冷启动懒加载（仅会话首页 + 当前会话最近 N 条，推翻「各会话预填」）；展示态（翻译/语音转文字）确认不入库；本地插入消息（`local_` 前缀）与本地消息置顶确认支持；验收目标 10 万条全局搜索 P95 < 500ms；契约待补 `searchMessages/searchConversations` 与 `updateMessagePinned` hook；群名片更新时机留待实施细化；加密 v1 不内置（驱动薄接口允许宿主注入 SQLCipher 驱动）。
   - **细则补强（2026-09-04 第二轮，决策 8）**：chatRoom 消息不落库；删会话级联删消息可选（`removeConversations` hook 待补）；墓碑置位联动撤 FTS 行；重启时 sending 消息降级 fail；附件离线 v1 做（`localPath` 列 + 被动缓存 + LRU 淘汰，默认 2GB 上限）；首次安装回填深度跟随 SDK 漫游上限（专业版 7 天/旗舰版 90 天），不做本地时间截断；单实例强制（`requestSingleInstanceLock`）；persist↔contract 版本匹配启动 warn；登出保留库文件；墓碑 TTL 归 v2。
-- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
+- **进度备忘（2026-09-04，Phase 3.5 第一步实施完成，分支 `feat/electron-persist-sqlite`）**：
+  - **契约 1.3.0**：persistence hooks 增 `updateMessagePinned`/`removeConversations`（级联可选）；repository 增可选 `searchMessages`/`searchConversations`（含搜索参数类型）；adapters/core/im 零改动兼容。
+  - **新包 `packages/uikit-persist-sqlite`**（private 0.1.0，纯 TS Node 库，better-sqlite3 为 optional peer + 驱动薄接口可注入 SQLCipher/node:sqlite）：六表 schema + `uikit_meta` 版本化 migration runner + indexedExtKeys generated column（预置 `em_at_list`）+ hooks/repository/管理 API 全量实现 + 健壮性五项（integrity_check 自检自愈/backup(VACUUM INTO)/busy_timeout/synchronous=NORMAL/README 运维口径）；测试 L1 契约套件 19 例 + L2 实现与健壮性 24 例全绿。实证修正：trigram 二字中文词不命中，<3 字符 LIKE 回落；`clearAll` 全局水位线存 `uikit_meta.global_cleared_before`。
+  - **验证工程 `apps/demo-electron`**（壳 + 测试面板 + 复用 apps/demo 渲染层）：5273 专属端口一键启动（strictPort 防顺延错载）、dev:console、@electron/rebuild 链路跑通、IPC 白名单注册；面板含灌消息（10 万档）/灌会话（1 万档）/数据风暴（持续+爆发，store+库双写复刻 onMessage 链路）/断网模拟/备份 + 「本地读取活动」观测（IPC 代理埋点 + console `[persist]` 日志）。
+  - **联调实证修复两个真实 bug**：① message store `trim` 保留最新 300 条丢最旧导致深翻页视图被截断——`maxMessageCount` 透出 `EmUIKitProvider`（Electron 场景 demo 传 10000，决策 8.11）；② websdk5 adapter 注入路径会话 `refresh` 循环拉全量（万级会话一次性灌 store+DOM）——改首页 50 条 + `loadMore` 游标续页，接通 UI 既有 useInfiniteScroll（决策 8.12；**webim4 同构旧逻辑待同步**）。
+  - **D126 已补「五包封顶」例外说明**（persist-sqlite 属契约参考实现，非 IM 架构层）；新增 skill `uikit-electron-persistence`（数据语义红线/harness 用法/排障入口）。
+  - **残留**：Phase 3.6 验收矩阵真实账号逐项打勾；附件 `updateMessageLocalPath` 回填 + LRU 淘汰；L3 历史库 fixture migration 测试；persist 包发布决策；v2 项（会话列表虚拟滚动/消息滑动窗口/墓碑 TTL/展示态入库）。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config` / `uikit-electron-persistence`
 
 ### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）
 
