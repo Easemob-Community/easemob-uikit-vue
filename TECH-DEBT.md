@@ -1218,6 +1218,11 @@
   - **验证**：契约 7 例 + websdk5 20 例 + webim4 22 例新增单测；全仓 `vitest run packages/` 171 例全绿；四包 vue-tsc 0 错误、全量 build + demo vue-tsc 通过。
   - **版本**：contract 1.1.0 / core 2.2.0 / websdk5·webim4 1.2.0（im 3.1.0 本轮无改动未 bump）。
   - **残留**：Phase 3.5 Electron SQLite 实现包与登录 DB 预填时序拍板未启动；搜索接口（searchMessages/searchConversations）未进契约；`maxCachedConversations`（im 3.1.0 落地的会话 LRU 淘汰）未透出 Provider。
+- **进度备忘（2026-09-04，Phase 3.5 实施前决策沉淀，未实施）**：
+  - 决策已定：① 形态=独立外挂库 `@easemob/uikit-persist-sqlite`（参考名），只实现 contract 已有接口、不新增接口面，业务项目仅注入不写字库逻辑；② 仓库归属=当前 monorepo `packages/`（与 contract 共同演化是决定性理由；`better-sqlite3` 限 peer+devDep、驱动层抽薄接口可用 `node:sqlite` 跑单测），实施时需给 D126「五包封顶」补例外说明；③ 健壮性纪律=服务端权威（损坏即删库重建）/写库失败只 warn/版本号存 `uikit_meta` 表（不用 user_version，避免与宿主共享库互踩）/主进程单写者/中文 FTS 用 trigram（unicode61 不切中文，核心需求级坑）/`@electron/rebuild` 链路首验一次；④ 验证体系=L1 参数化契约行为套件 + L2 `:memory:` 单测 + L3 历史库文件 fixture migration 测试 + L4 专项验证工程 `apps/demo-electron`（Electron 壳 + 测试面板 + 复用 `apps/demo` 渲染层，private 不发布，不写成第三套 demo UI）；⑤ 库实例复用与表封闭=「实例可复用（`createPersistence({db})` 注入宿主实例 + 驱动薄接口兜底）、表封闭（`uikit_` 前缀、只走 API、损坏删库重建）」，存储范围含用户属性表，库文件按 `appKey+userId` 账号隔离。
+  - 明细与下一步执行顺序见 [ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md](docs/ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md)。
+  - **schema v1 已定稿（2026-09-04，决策 6/7）**：六表（meta/messages/messages_fts(trigram)/conversations/user_info/group_member/sync_state）+ ext 声明式索引键（UIKit 预置 `em_at_list`）+ 清除水位线 `clearedBefore` + keyset 分页（禁 OFFSET）+ 冷启动懒加载（仅会话首页 + 当前会话最近 N 条，推翻「各会话预填」）；展示态（翻译/语音转文字）确认不入库；本地插入消息（`local_` 前缀）与本地消息置顶确认支持；验收目标 10 万条全局搜索 P95 < 500ms；契约待补 `searchMessages/searchConversations` 与 `updateMessagePinned` hook；群名片更新时机留待实施细化；加密 v1 不内置（驱动薄接口允许宿主注入 SQLCipher 驱动）。
+  - **细则补强（2026-09-04 第二轮，决策 8）**：chatRoom 消息不落库；删会话级联删消息可选（`removeConversations` hook 待补）；墓碑置位联动撤 FTS 行；重启时 sending 消息降级 fail；附件离线 v1 做（`localPath` 列 + 被动缓存 + LRU 淘汰，默认 2GB 上限）；首次安装回填深度跟随 SDK 漫游上限（专业版 7 天/旗舰版 90 天），不做本地时间截断；单实例强制（`requestSingleInstanceLock`）；persist↔contract 版本匹配启动 warn；登出保留库文件；墓碑 TTL 归 v2。
 - **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-package-boundary` / `uikit-release-build` / `uikit-provider-config`
 
 ### [x] D123. 登出后再登录，会话列表误展示「网络异常」横幅（事件处理器登出时 dispose、登录未重建）
