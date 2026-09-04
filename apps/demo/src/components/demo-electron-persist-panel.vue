@@ -7,13 +7,16 @@
  *
  * 按钮：库统计 / 灌测试消息 / 中文搜索自测 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
  */
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
   electronPersistClearAll,
   electronPersistDeleteDbAndRelaunch,
   electronPersistSeedMessages,
   electronPersistStats,
   electronSetOffline,
+  persistReadActivities,
+  persistReadCounts,
+  persistReadSeen,
 } from '../composables/use-electron-persist'
 
 /** 灌数参数 */
@@ -25,6 +28,22 @@ const offline = ref(false)
 const collapsed = ref(true)
 /** 最近一次动作结果反馈 */
 const tip = ref('')
+
+/** 本地读取活动：四个方法的展示顺序（方法名为契约 API 名，保持英文） */
+const readMethods = ['loadMessages', 'fetchConversations', 'searchMessages', 'searchConversations'] as const
+
+/** 最近一次本地读取明细（如 `loadMessages c1 → 30 条 · 4ms`） */
+const lastReadText = computed(() => {
+  const last = persistReadActivities.value[0]
+  if (!last)
+    return ''
+  return `${last.method} ${last.detail} → ${last.rows < 0 ? '异常' : `${last.rows} 条`} · ${last.ms}ms`
+})
+
+/** 活动记录时间格式化（HH:mm:ss） */
+function formatActivityTime(at: number): string {
+  return new Date(at).toTimeString().slice(0, 8)
+}
 
 async function onStats() {
   const stats = await electronPersistStats()
@@ -62,6 +81,7 @@ async function onToggleOffline() {
       @click="collapsed = !collapsed"
     >
       DB
+      <span v-if="persistReadSeen" class="persist-panel__dot" title="已发生本地库读取" />
     </button>
     <div v-if="!collapsed" class="persist-panel__body">
       <p class="persist-panel__title">
@@ -86,6 +106,31 @@ async function onToggleOffline() {
       <button class="persist-panel__btn" :class="{ 'persist-panel__btn--danger': offline }" @click="onToggleOffline">
         {{ offline ? '恢复网络' : '断开 SDK（模拟断网）' }}
       </button>
+
+      <!-- 本地读取活动（repository IPC 代理埋点：数据来自本地库的证据） -->
+      <div class="persist-panel__reads">
+        <p class="persist-panel__reads-title">
+          本地读取活动
+        </p>
+        <div class="persist-panel__reads-counts">
+          <span v-for="m in readMethods" :key="m" class="persist-panel__reads-count">
+            {{ m }} × {{ persistReadCounts[m] }}
+          </span>
+        </div>
+        <p v-if="lastReadText" class="persist-panel__reads-last">
+          最近：{{ lastReadText }}
+        </p>
+        <p v-else class="persist-panel__reads-last persist-panel__reads-last--empty">
+          暂无本地读取（当前数据来自 SDK 网络加载）
+        </p>
+        <ul v-if="persistReadActivities.length > 0" class="persist-panel__reads-list">
+          <li v-for="(a, i) in persistReadActivities" :key="i" class="persist-panel__reads-item">
+            <span class="persist-panel__reads-time">{{ formatActivityTime(a.at) }}</span>
+            {{ a.method }} {{ a.detail }} → {{ a.rows < 0 ? '异常' : `${a.rows} 条` }} · {{ a.ms }}ms
+          </li>
+        </ul>
+      </div>
+
       <p v-if="tip" class="persist-panel__tip">
         {{ tip }}
       </p>
@@ -103,6 +148,7 @@ async function onToggleOffline() {
 }
 
 .persist-panel__fab {
+  position: relative;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -180,5 +226,76 @@ async function onToggleOffline() {
   font-size: 12px;
   color: var(--uikit-text-secondary, #6b7280);
   word-break: break-all;
+}
+
+/* 浮球绿点：发生过本地库读取后常亮（once 语义） */
+.persist-panel__dot {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #fff;
+}
+
+.persist-panel__reads {
+  border-top: 1px solid var(--uikit-bg-secondary, #e5e7eb);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.persist-panel__reads-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--uikit-text-primary, #111827);
+}
+
+.persist-panel__reads-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.persist-panel__reads-count {
+  font-size: 11px;
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+.persist-panel__reads-last {
+  margin: 0;
+  font-size: 12px;
+  color: var(--uikit-text-primary, #111827);
+  word-break: break-all;
+}
+
+.persist-panel__reads-last--empty {
+  color: var(--uikit-text-secondary, #6b7280);
+}
+
+.persist-panel__reads-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.persist-panel__reads-item {
+  font-size: 11px;
+  color: var(--uikit-text-secondary, #6b7280);
+  word-break: break-all;
+}
+
+.persist-panel__reads-time {
+  color: var(--uikit-text-primary, #111827);
+  margin-right: 4px;
 }
 </style>

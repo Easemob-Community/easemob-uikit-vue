@@ -63,6 +63,71 @@ function invoke<T>(method: string, ...args: unknown[]): Promise<T> {
   return window.uikitPersist?.invoke(method, ...args) as Promise<T>
 }
 
+/* ==================== 本地读取追踪器 ====================
+ * 所有本地库读取都经过下面的 repository IPC 代理（SDK 网络加载不经过），
+ * 在代理层埋点即可精确区分「数据是否来自本地库」。
+ */
+
+/** 本地库读取方法名（四个 repository 读方法） */
+export type PersistReadMethod = 'loadMessages' | 'fetchConversations' | 'searchMessages' | 'searchConversations'
+
+/** 一条本地读取活动记录（rows=-1 表示调用异常） */
+export interface PersistReadActivity {
+  method: PersistReadMethod
+  /** 发生时间（ms 时间戳） */
+  at: number
+  /** 返回 list 长度；异常记 -1 */
+  rows: number
+  /** 耗时 ms */
+  ms: number
+  /** 明细（conversationId / 关键词等，供面板展示） */
+  detail: string
+}
+
+/** 最近活动记录上限 */
+const READ_ACTIVITY_MAX = 20
+
+/** 按方法累计读取次数（响应式） */
+export const persistReadCounts = ref<Record<PersistReadMethod, number>>({
+  loadMessages: 0,
+  fetchConversations: 0,
+  searchMessages: 0,
+  searchConversations: 0,
+})
+
+/** 最近本地读取活动（新→旧，20 条封顶，响应式） */
+export const persistReadActivities = ref<PersistReadActivity[]>([])
+
+/** 是否发生过本地读取（浮球绿点标识，once 语义） */
+export const persistReadSeen = ref(false)
+
+function recordRead(method: PersistReadMethod, detail: string, rows: number, ms: number): void {
+  persistReadCounts.value[method] += 1
+  persistReadSeen.value = true
+  persistReadActivities.value = [
+    { method, at: Date.now(), rows, ms, detail },
+    ...persistReadActivities.value.slice(0, READ_ACTIVITY_MAX - 1),
+  ]
+}
+
+/** 包装 repository 读方法：记录 { method, at, rows, ms }，异常记 rows=-1 后原样上抛 */
+async function trackedRead<T extends { list: unknown[] }>(
+  method: PersistReadMethod,
+  detail: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const start = Date.now()
+  try {
+    const page = await fn()
+    recordRead(method, detail, page.list.length, Date.now() - start)
+    return page
+  }
+  catch (error) {
+    recordRead(method, detail, -1, Date.now() - start)
+    throw error
+  }
+}
+
 /** 构造 hooks / repository 的 IPC 代理对象（方法签名与契约一致，通道名见主进程 CHANNELS） */
 function buildInjection(): ElectronPersistInjection {
   const persistence: SdkPersistenceHooks = {
@@ -84,15 +149,19 @@ function buildInjection(): ElectronPersistInjection {
   const repositories: SdkRepositoryOverrides = {
     message: {
       loadMessages: (conversationId, conversationType, cursor, pageSize) =>
-        invoke<MessagePage>('repository.loadMessages', conversationId, conversationType, cursor, pageSize),
+        trackedRead('loadMessages', conversationId, () =>
+          invoke<MessagePage>('repository.loadMessages', conversationId, conversationType, cursor, pageSize)),
       searchMessages: (params: MessageSearchParams) =>
-        invoke<MessagePage>('repository.searchMessages', params),
+        trackedRead('searchMessages', `"${params.keyword}"${params.conversationId ? ` @ ${params.conversationId}` : ''}`, () =>
+          invoke<MessagePage>('repository.searchMessages', params)),
     },
     conversation: {
       fetchConversations: (cursor, pageSize) =>
-        invoke<ConversationPage>('repository.fetchConversations', cursor, pageSize),
+        trackedRead('fetchConversations', cursor ? '翻页' : '首页', () =>
+          invoke<ConversationPage>('repository.fetchConversations', cursor, pageSize)),
       searchConversations: params =>
-        invoke<ConversationPage>('repository.searchConversations', params),
+        trackedRead('searchConversations', `"${params.keyword}"`, () =>
+          invoke<ConversationPage>('repository.searchConversations', params)),
     },
   }
   return { persistence, repositories }
