@@ -190,6 +190,17 @@ export interface ProviderProps {
   /** Token 已过期回调，业务可在此重新登录或提示用户 */
   onTokenExpired?: () => void
   /**
+   * 单会话内存消息上限（默认 300）：超出时从最旧消息开始裁剪。
+   * 注意这是**内存裁剪上限，不是分页上限**——本地持久化（DB 数据源接管
+   * loadMessages）场景上拉翻页会持续 prepend 旧历史，建议调大（如 Electron
+   * 验证工程用 10000），否则翻页加载的最旧消息会被立即裁掉，视图停在最新 N 条。
+   * Max in-memory messages kept per conversation (default 300); oldest messages
+   * are trimmed beyond it. This is a memory-trim cap, NOT a pagination cap —
+   * with a local-persistence data source (loadMessages backed by DB), raising it
+   * (e.g. 10000) lets older pages accumulate instead of being trimmed away.
+   */
+  maxMessageCount?: number
+  /**
    * 日志持久化配置（IndexedDB 本地落库，用于问题排查）。
    * Log persistence config (IndexedDB, for troubleshooting).
    */
@@ -259,6 +270,17 @@ const ctx = useUIKitProvider(config.value, {
     onTokenExpired: props.onTokenExpired,
   },
 })
+
+// 单会话内存消息上限：prop 有值时下发 message store（默认 300 不变；
+// 运行时调大立即生效，已裁掉的历史不会回补，再次翻页会重新积累）
+watch(
+  () => props.maxMessageCount,
+  (value) => {
+    if (value !== undefined)
+      ctx.stores.message.setOptions({ maxMessageCount: value })
+  },
+  { immediate: true },
+)
 
 /**
  * 通知点击跳转对应会话（window.focus 与 navigateOnClick 判定由共享副作用统一处理）。

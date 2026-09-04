@@ -172,6 +172,7 @@ setMessagePinned(msgId: string, pinned: boolean): Promise<void>       -- 纯本�
 8. **版本匹配检查**：persist 包对 `@easemob/uikit-sdk-contract` 声明 peer 范围；启动时检查 DTO 契约版本，不匹配只 warn 不阻断（服务端权威兜底）。
 9. **登出保留库文件**（企微语义，下次登录秒开）；显式清除走 `clearAll()`。
 10. **墓碑 TTL 归 v2**：撤回/删除墓碑行长期只增不减，v2 加保留期（如 180 天后物理清理），v1 不处理。
+11. **`maxMessageCount` 已透出（2026-09-04，Phase 3.6 遗留项）**：`EmUIKitProvider` 新增可选 prop `maxMessageCount`（uikit-provider.vue，有值即 `stores.message.setOptions({ maxMessageCount })`，immediate + watch 运行时调大生效）。默认 300 不变；Electron 本地持久化场景建议 10000（demo-electron 已接通：开关开启时传 10000）。该上限是**内存裁剪上限**（超出裁最旧），不是分页上限；滑动窗口式内存管理（无限翻页且内存恒定）为 v2 项。
 
 ## 决策 7：本地分页与冷启动加载量（禁止一把搂）
 

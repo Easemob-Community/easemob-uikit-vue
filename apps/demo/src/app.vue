@@ -6,7 +6,7 @@ import LoginPage from './login-page.vue'
 import ChatroomDemoPage from './chatroom-demo-page.vue'
 import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, demoUseCustomDataSource, webim4Adapter } from './composables/use-demo-sdk-adapter'
-import { prepareElectronPersist } from './composables/use-electron-persist'
+import { electronPersistEnabled, prepareElectronPersist } from './composables/use-electron-persist'
 
 /**
  * Provider 三开关 × 自定义数据源（repositories 注入）演示
@@ -175,6 +175,7 @@ const AppContent = {
     :enable-at-me="enableAtMe"
     :enable-typing="enableTyping"
     :h5="{ safeArea: true, keyboardAdapt: true, pullRefresh: 'auto' }"
+    :max-message-count="electronPersistEnabled ? 10000 : undefined"
     :logger="{ collectSdkLog: demoCollectSdkLog, uikitLevel: demoUikitLogLevel, sdkLevel: demoSdkLogLevel }"
     :notice-config="noticeConfig"
   >

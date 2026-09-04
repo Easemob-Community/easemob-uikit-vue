@@ -145,6 +145,25 @@ describe('message store', () => {
       expect(store.getMessages('c1').map(m => m.msgServerId)).toEqual(['s2', 's3'])
     })
 
+    it('调大 maxMessageCount 后连续 prepend 多页旧消息全部保留（Electron 持久化翻页回归）', () => {
+      // 回归场景：单会话灌大量历史后上拉翻页，默认上限 300 会把刚加载的最旧页立即裁掉；
+      // Provider maxMessageCount prop 调高后（如 Electron 验证工程 10000），多页旧历史应全部可见
+      store.setOptions({ maxMessageCount: 2000 })
+      // 初始最新一页
+      store.prependMessages('c1', Array.from({ length: 300 }, (_, i) =>
+        makeMsg({ msgServerId: `s-p0-${i}`, timestamp: 1500000 + i * 1000 })))
+      // 连续上拉加载 5 页更旧历史（每页 300 条，时间戳递减）
+      for (let page = 1; page <= 5; page++) {
+        store.prependMessages('c1', Array.from({ length: 300 }, (_, i) =>
+          makeMsg({ msgServerId: `s-p${page}-${i}`, timestamp: 1500000 - page * 300000 + i * 1000 })))
+      }
+      const list = store.getMessages('c1')
+      expect(list).toHaveLength(1800)
+      // 最旧一页的首条仍在（未被 trim 裁掉），整体升序
+      expect(list[0].msgServerId).toBe('s-p5-0')
+      expect(list[list.length - 1].msgServerId).toBe('s-p0-299')
+    })
+
     it('deleteMessage 删除后同步删索引：再次更新为 no-op', () => {
       store.addMessage(makeMsg({ msgServerId: 's1', msgLocalId: 'l1', timestamp: 1000 }))
       store.deleteMessage('l1')
