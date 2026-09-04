@@ -144,8 +144,23 @@ export interface EnsureSchemaOptions {
   account?: { appKey: string, userId: string }
   /** SDK adapter 标识：检测到更换 → sync_state 游标清零重校准（数据不动） */
   adapterId?: string
+  /**
+   * `PRAGMA busy_timeout`（毫秒，默认 3000）：WAL 多窗口读场景下的锁等待上限。
+   * 经驱动 exec 下发；注入的自定义驱动若不支持 PRAGMA 语句则只 warn 不生效。
+   */
+  busyTimeoutMs?: number
   /** 告警通道 */
   logger?: { warn: (...args: unknown[]) => void }
+}
+
+/** busy_timeout 默认值（毫秒） */
+export const DEFAULT_BUSY_TIMEOUT_MS = 3000
+
+/** busy_timeout 入参收敛为非负整数（PRAGMA 只能文本拼接，整数化后无注入面） */
+function normalizeBusyTimeout(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value) || value < 0)
+    return DEFAULT_BUSY_TIMEOUT_MS
+  return Math.floor(value)
 }
 
 /**
@@ -156,6 +171,15 @@ export function ensureSchema(db: SqliteDriver, opts: EnsureSchemaOptions = {}): 
   const logger = opts.logger ?? console
   db.exec('PRAGMA journal_mode=WAL;')
   db.exec('PRAGMA auto_vacuum=INCREMENTAL;')
+  // synchronous=NORMAL 是 WAL 模式标准搭配（性能/安全平衡点）；busy_timeout 兜底锁等待。
+  // 两者为优化项：自定义驱动不支持 PRAGMA 时只 warn 不阻断（决策 3.2）。
+  try {
+    db.exec('PRAGMA synchronous=NORMAL;')
+    db.exec(`PRAGMA busy_timeout=${normalizeBusyTimeout(opts.busyTimeoutMs)};`)
+  }
+  catch (error) {
+    logger.warn('[uikit-persist-sqlite] synchronous / busy_timeout PRAGMA 设置失败（驱动不支持？）', error)
+  }
   // meta 表先于版本读取创建（幂等）
   db.exec('CREATE TABLE IF NOT EXISTS uikit_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);')
 

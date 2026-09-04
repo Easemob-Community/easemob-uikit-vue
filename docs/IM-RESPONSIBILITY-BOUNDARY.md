@@ -24,6 +24,8 @@ UIKIT 的架构方向已到位（port-adapter + 多包 + 中立契约），接�
 
 **不再新增**：portal 层 / integration 层 / 统一消息总线 / OA 适配层——那些是 OA 底座的职责，不是 IM 的职责。多一层就多一份维护成本。
 
+**例外（2026-09-04 确认）**：`@easemob/uikit-persist-sqlite`（Electron SQLite 持久化参考实现）不属于 IM 架构层，不在「五包封顶」约束内——它是契约 persistence hooks / repository 接口的一个可选实现 + 官方 Electron 载体，定位同 websdk5/webim4 adapter（「唯一碰 SQLite 的地方」），UIKit 各包不依赖它，业务项目不装则完全无感。规格见 `docs/ELECTRON-PERSISTENCE-IMPLEMENTATION-NOTES.md`（D122 Phase 3.5）。
+
 ---
 
 ## 三、扩展点：复用现有，不新造

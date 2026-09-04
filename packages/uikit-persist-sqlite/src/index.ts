@@ -12,6 +12,8 @@
  * 本包 `dbPath` 模式接受调用方给的完整路径。
  */
 
+import { renameSync, rmSync } from 'node:fs'
+
 import { MESSAGE_STATUS } from '@easemob/uikit-sdk-contract'
 import type { SdkPersistenceHooks } from '@easemob/uikit-sdk-contract'
 import type { PersistenceContext, PersistenceLogger } from './context'
@@ -43,6 +45,14 @@ export interface CreatePersistenceOptions {
   indexedExtKeys?: string[]
   /** chatRoom 消息是否落库（决策 8.1，默认 false 不落库） */
   persistChatRoom?: boolean
+  /**
+   * `PRAGMA busy_timeout`（毫秒，默认 3000，WAL 多窗口读场景的锁等待上限）。
+   * 经驱动 SQL 下发：dbPath 与注入驱动两种模式都会尽量设置；
+   * 注入的自定义驱动若不支持 PRAGMA 语句则只 warn 不生效（包内拿不到底层句柄）。
+   * `PRAGMA busy_timeout` in ms (default 3000). Applied via driver SQL in both
+   * dbPath and injected-driver modes; drivers without PRAGMA support only warn.
+   */
+  busyTimeoutMs?: number
   /** 告警通道（默认 console.warn；写库失败只 warn 不阻塞） */
   logger?: PersistenceLogger
 }
@@ -61,10 +71,65 @@ export interface UikitPersistence {
 export type UikitPersistenceHandle = UikitPersistence & PersistenceManagementApi
 
 /**
+ * integrity_check 探测：'ok' 正常；'not-ok' 明确损坏；'error' 为探测本身失败
+ * （文件头损坏时 better-sqlite3 打开即抛 / 首查抛 SQLITE_NOTADB，按损坏处理）。
+ * Integrity probe: 'ok' | 'not-ok' (explicit corruption) | 'error' (probe itself
+ * failed — e.g. unreadable file header; treated as corruption in dbPath mode).
+ */
+function probeIntegrity(db: SqliteDriver): 'ok' | 'not-ok' | 'error' {
+  try {
+    const row = db.prepare('PRAGMA integrity_check').get()
+    return row?.integrity_check === 'ok' ? 'ok' : 'not-ok'
+  }
+  catch {
+    return 'error'
+  }
+}
+
+/**
+ * dbPath 模式开库：integrity_check 自检 + 损坏自愈（决策 3.1 服务端权威兜底）。
+ * 损坏时把库文件改名备份为 `<原名>.corrupt-<时间戳>`（WAL 侧车一并清理）后新建空库，
+ * 事件经 logger 上报；`:memory:` 无文件语义，直接跳过自检。
+ */
+async function openWithIntegritySelfHeal(dbPath: string, logger: PersistenceLogger): Promise<SqliteDriver> {
+  if (dbPath === ':memory:')
+    return openBetterSqlite3Driver(dbPath)
+
+  let driver: SqliteDriver | undefined
+  let intact = false
+  try {
+    driver = await openBetterSqlite3Driver(dbPath)
+    intact = probeIntegrity(driver) === 'ok'
+  }
+  catch {
+    intact = false
+  }
+  if (intact)
+    return driver as SqliteDriver
+
+  // 关闭损坏句柄（close 可能抛错，忽略），改名备份 + 清理 WAL 侧车后重建
+  try {
+    driver?.close()
+  }
+  catch { /* 损坏库 close 抛错属预期，忽略 */ }
+  const backupPath = `${dbPath}.corrupt-${Date.now()}`
+  renameSync(dbPath, backupPath)
+  for (const sidecar of [`${dbPath}-wal`, `${dbPath}-shm`])
+    rmSync(sidecar, { force: true })
+  logger.warn(
+    `[uikit-persist-sqlite] 库文件损坏或无法打开，已备份为 ${backupPath} 并新建空库（服务端权威，本地只是缓存）`,
+  )
+  return openBetterSqlite3Driver(dbPath)
+}
+
+/**
  * 创建本地持久化实例：打开 / 升级库 → 启动降级 → 装配 hooks / repository / 管理 API。
  *
  * 启动降级（决策 8.4）：库加载后一次性把 `sending` 置为 `failed`——
  * 重启即发送链路已断，避免永远转圈，由用户手动重发。
+ *
+ * 开库自检：dbPath 模式 integrity_check 失败自动备份重建；宿主注入驱动模式
+ * 包内拿不到文件语义，只做探测、损坏时 warn 上报（删库重建由宿主决策）。
  */
 export async function createPersistence(options: CreatePersistenceOptions): Promise<UikitPersistenceHandle> {
   if (!options.db && !options.dbPath)
@@ -72,13 +137,27 @@ export async function createPersistence(options: CreatePersistenceOptions): Prom
 
   const logger = options.logger ?? console
   const ownDriver = !options.db
-  const db: SqliteDriver = options.db ?? await openBetterSqlite3Driver(options.dbPath as string)
+  let db: SqliteDriver
+  if (options.db) {
+    db = options.db
+    // 注入驱动模式：无法改名重建（文件归宿主所有），损坏只 warn 上报；
+    // 后续建库 / 读写失败会如实抛出，由宿主按「删库重建」处理
+    if (probeIntegrity(db) !== 'ok') {
+      logger.warn(
+        '[uikit-persist-sqlite] 注入驱动的库 integrity_check 未通过；包内无法自动重建（宿主持有文件），请按「删库重建」处理',
+      )
+    }
+  }
+  else {
+    db = await openWithIntegritySelfHeal(options.dbPath as string, logger)
+  }
 
   try {
     ensureSchema(db, {
       indexedExtKeys: options.indexedExtKeys,
       account: options.account,
       adapterId: options.adapterId,
+      busyTimeoutMs: options.busyTimeoutMs,
       logger,
     })
     // 重启「发送中」降级（sendStatus 取值走契约常量）

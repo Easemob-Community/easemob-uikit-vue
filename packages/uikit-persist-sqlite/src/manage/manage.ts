@@ -71,6 +71,17 @@ export interface PersistenceManagementApi {
   clearAll: () => Promise<void>
   /** INCREMENTAL 回收磁盘空间（清大量历史后调用） */
   vacuum: () => Promise<void>
+  /**
+   * 备份库文件到目标路径（`VACUUM INTO`，产物为压缩整理后的完整库）。
+   * `:memory:` 模式同样可用；目标文件必须不存在（SQLite 语义，防覆盖）。
+   * 备份前会先落盘 FTS 异步队列尾部，保证产物索引一致。
+   * 注入自定义驱动模式：VACUUM INTO 是标准 SQL，驱动不支持时抛错（warn 后原样上抛，
+   * 调用方需要明确感知备份失败，不适用「只 warn」纪律）。
+   * Backup the database to `targetPath` via `VACUUM INTO` (works for `:memory:`
+   * too). The target must not exist. The FTS queue is flushed first so the
+   * backup is index-consistent. Errors are warned and rethrown.
+   */
+  backup: (targetPath: string) => Promise<void>
   insertLocalMessage: (input: LocalMessageInput) => Promise<MessageRecord>
   setMessagePinned: (msgId: string, pinned: boolean) => Promise<void>
   upsertUserInfos: (infos: StoredUserInfo[]) => Promise<void>
@@ -198,6 +209,22 @@ export function createManagementApi(ctx: PersistenceContext): PersistenceManagem
       }
       catch (error) {
         logger.warn('[uikit-persist-sqlite] vacuum 失败', error)
+      }
+    },
+
+    async backup(targetPath) {
+      if (!targetPath)
+        throw new Error('[uikit-persist-sqlite] backup 需要非空 targetPath')
+      // 先落盘 FTS 异步队列尾部，保证备份产物索引一致
+      fts.flush()
+      try {
+        // VACUUM INTO 支持参数绑定（SQLite ≥3.27），保持全参数化纪律；
+        // 目标文件已存在时 SQLite 报错（防覆盖语义），warn 后原样上抛给调用方
+        db.prepare('VACUUM INTO ?').run(targetPath)
+      }
+      catch (error) {
+        logger.warn('[uikit-persist-sqlite] backup 失败', error)
+        throw error
       }
     },
 

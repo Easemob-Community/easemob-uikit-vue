@@ -28,6 +28,7 @@
 5. **单写者**：SQL 只在主进程执行，渲染进程一律 IPC；多窗口读开 WAL。
 6. **中文全文搜索用 FTS5 trigram tokenizer**：默认 `unicode61` 对中文不切词（「明天下午开会」搜「下午」不命中），trigram 零外部依赖、索引体积约 2~3 倍，为本包推荐项；结巴等外部分词扩展引入原生分发问题，与健壮性目标相悖，不采用。
 7. `@electron/rebuild` 链路在首次打包验收时跑通一次并写进包 README。
+8. **已落地（2026-09-04）**：开库 `integrity_check` 自检 + 损坏自动改名备份重建（`.corrupt-<时间戳>`，仅 dbPath 模式，注入驱动降级为 warn）、`PRAGMA busy_timeout`（默认 3000ms 可配）、`PRAGMA synchronous=NORMAL`、`backup(targetPath)` API（VACUUM INTO）、包 README 运维口径，五项补强已进 `packages/uikit-persist-sqlite`。
 
 ## 决策 5：库实例复用与表封闭（「实例可复用，表封闭」）
 

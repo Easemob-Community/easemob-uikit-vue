@@ -24,7 +24,7 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit-persist-sqlite.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['better-sqlite3', '@easemob/uikit-sdk-contract'],
+      external: ['better-sqlite3', '@easemob/uikit-sdk-contract', /^node:/],
       output: {
         exports: 'named',
       },
