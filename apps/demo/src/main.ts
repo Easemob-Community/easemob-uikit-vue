@@ -44,6 +44,12 @@ mergeLocaleMessages('en', {
   'demo.quickReply.item.goodbye': 'Goodbye',
 })
 
+// Electron 壳检测（demo-electron preload 无条件注入 demoShell 桥，不受持久化开关影响）：
+// 给 <html> 打标记 class，供 hiddenInset 无标题栏模式的拖拽区 / 红绿灯避让 CSS 使用；
+// Web 模式无此 class，行为零变化
+if (typeof window !== 'undefined' && !!window.demoShell)
+  document.documentElement.classList.add('electron-shell')
+
 const app = createApp(App)
 app.use(createPinia())
 app.use(UIKit)

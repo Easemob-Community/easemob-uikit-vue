@@ -5,10 +5,11 @@
  * 定位是验证工具 harness 的测试面板，不是产品 UI：仅 Electron 模式且
  * 「本地持久化」开关开启时挂载（demo-page.vue 特性检测），不引入 UI 库。
  *
- * 按钮：库统计 / 灌测试消息 / 中文搜索自测 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
+ * 按钮：库统计 / 灌测试消息 / 灌会话 / 数据风暴 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
  */
 import { computed, ref } from 'vue'
 import { useUIKit } from '@easemob/uikit-im'
+import { CONVERSATION_TYPE } from '@easemob/uikit-sdk-contract'
 import {
   electronPersistClearAll,
   electronPersistDeleteDbAndRelaunch,
@@ -145,9 +146,14 @@ function formatActivityTime(at: number): string {
 }
 
 async function onStats() {
-  const stats = await electronPersistStats()
-  console.warn('[electron-persist] getStorageStats', stats)
-  tip.value = `库统计已输出到控制台（消息数: ${(stats as { messageCount?: number })?.messageCount ?? '-'}）`
+  try {
+    const stats = await electronPersistStats()
+    console.warn('[electron-persist] getStorageStats', stats)
+    tip.value = `库统计已输出到控制台（消息数: ${(stats as { messageCount?: number })?.messageCount ?? '-'}）`
+  }
+  catch (error) {
+    tip.value = `库统计失败: ${(error as Error).message}`
+  }
 }
 
 async function onSeed(count?: number) {
@@ -160,7 +166,7 @@ async function onSeed(count?: number) {
   try {
     const elapsed = await electronPersistSeedMessages(
       seedConversationId.value,
-      'singleChat',
+      CONVERSATION_TYPE.SINGLECHAT,
       total,
       (done, t) => { seedProgress.value = `已写入 ${done} / ${t}` },
     )
@@ -199,19 +205,35 @@ async function onSeedConversations(count?: number) {
 }
 
 async function onClearAll() {
-  await electronPersistClearAll()
-  tip.value = '已清空全部本地数据（clearAll + 水位线）'
+  try {
+    await electronPersistClearAll()
+    tip.value = '已清空全部本地数据（clearAll + 水位线）'
+  }
+  catch (error) {
+    tip.value = `清空全部失败: ${(error as Error).message}`
+  }
 }
 
 async function onDeleteDb() {
-  tip.value = '已删除库文件，正在重启…'
-  await electronPersistDeleteDbAndRelaunch()
+  tip.value = '已删除库文件，正在重载页面…'
+  try {
+    await electronPersistDeleteDbAndRelaunch()
+  }
+  catch (error) {
+    tip.value = `删库重开失败: ${(error as Error).message}`
+  }
 }
 
 async function onToggleOffline() {
-  offline.value = !offline.value
-  await electronSetOffline(offline.value)
-  tip.value = offline.value ? '已断网（SDK 连接已切断）' : '已恢复网络（SDK 自动重连中）'
+  const next = !offline.value
+  try {
+    await electronSetOffline(next)
+    offline.value = next
+    tip.value = next ? '已断网（SDK 连接已切断）' : '已恢复网络（SDK 自动重连中）'
+  }
+  catch (error) {
+    tip.value = `断网模拟失败: ${(error as Error).message}`
+  }
 }
 </script>
 
@@ -320,7 +342,7 @@ async function onToggleOffline() {
       <button class="persist-panel__btn" :disabled="busy" @click="onClearAll">
         清空全部
       </button>
-      <button class="persist-panel__btn persist-panel__btn--danger" @click="onDeleteDb">
+      <button class="persist-panel__btn persist-panel__btn--danger" :disabled="busy" @click="onDeleteDb">
         删库重开
       </button>
       <button class="persist-panel__btn" :class="{ 'persist-panel__btn--danger': offline }" @click="onToggleOffline">

@@ -13,6 +13,7 @@
  */
 import { ref } from 'vue'
 import type { UiMessage } from '@easemob/uikit-im'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
 import type {
   ConversationPage,
   ConversationTypeValue,
@@ -43,12 +44,21 @@ export const electronPersistEnabled = ref(
  * 切换持久化开关：持久化后整页刷新。
  * 注入发生在 init（登录链路）时，运行时热切换无法回填已装配的 Provider，
  * 与 SDK 版本切换同口径：切完 reload 由新一轮挂载按记忆值装配。
+ * 关闭时桥存在先 close 库再刷新——避免 reload 把「仍打开」的库句柄留到壳退出才回收。
  */
-export function setElectronPersistEnabled(enabled: boolean) {
+export async function setElectronPersistEnabled(enabled: boolean): Promise<void> {
   if (electronPersistEnabled.value === enabled)
     return
   electronPersistEnabled.value = enabled
   localStorage.setItem(ELECTRON_PERSIST_STORAGE_KEY, enabled ? 'on' : 'off')
+  if (!enabled && window.uikitPersist) {
+    try {
+      await window.uikitPersist.close()
+    }
+    catch (error) {
+      console.warn('[persist] 关闭开关时 close 库失败', error)
+    }
+  }
   location.reload()
 }
 
@@ -64,6 +74,16 @@ let currentAccount: { appKey: string, userId: string } | null = null
 /** 通用 IPC 调用（fire-and-forget 场景由调用方决定是否 await） */
 function invoke<T>(method: string, ...args: unknown[]): Promise<T> {
   return window.uikitPersist?.invoke(method, ...args) as Promise<T>
+}
+
+/**
+ * hooks 旁路写库调用（fire-and-forget 语义）：库未打开 / 切账号窗口期的失败
+ * 只告警不上抛——写库是旁路，不阻塞消息主链路，也不制造 unhandled rejection。
+ */
+function invokeHook(method: string, ...args: unknown[]): Promise<void> {
+  return invoke<void>(method, ...args).catch((error) => {
+    console.warn('[persist] hook 调用失败', error)
+  })
 }
 
 /* ==================== 本地读取追踪器 ====================
@@ -140,18 +160,18 @@ async function trackedRead<T extends { list: unknown[] }>(
 function buildInjection(): ElectronPersistInjection {
   const persistence: SdkPersistenceHooks = {
     message: {
-      saveMessage: record => invoke('hooks.message.saveMessage', record),
-      saveMessages: records => invoke('hooks.message.saveMessages', records),
-      updateMessageStatus: (msgId, status) => invoke('hooks.message.updateMessageStatus', msgId, status),
-      markMessageRecalled: (msgId, operatorId) => invoke('hooks.message.markMessageRecalled', msgId, operatorId),
+      saveMessage: record => invokeHook('hooks.message.saveMessage', record),
+      saveMessages: records => invokeHook('hooks.message.saveMessages', records),
+      updateMessageStatus: (msgId, status) => invokeHook('hooks.message.updateMessageStatus', msgId, status),
+      markMessageRecalled: (msgId, operatorId) => invokeHook('hooks.message.markMessageRecalled', msgId, operatorId),
       updateMessageContent: (msgId, body, ext, modifiedInfo) =>
-        invoke('hooks.message.updateMessageContent', msgId, body, ext, modifiedInfo),
-      deleteMessages: msgIds => invoke('hooks.message.deleteMessages', msgIds),
-      updateMessagePinned: (msgId, pinnedTime) => invoke('hooks.message.updateMessagePinned', msgId, pinnedTime),
+        invokeHook('hooks.message.updateMessageContent', msgId, body, ext, modifiedInfo),
+      deleteMessages: msgIds => invokeHook('hooks.message.deleteMessages', msgIds),
+      updateMessagePinned: (msgId, pinnedTime) => invokeHook('hooks.message.updateMessagePinned', msgId, pinnedTime),
     },
     conversation: {
-      saveConversations: records => invoke('hooks.conversation.saveConversations', records),
-      removeConversations: (ids, opts) => invoke('hooks.conversation.removeConversations', ids, opts),
+      saveConversations: records => invokeHook('hooks.conversation.saveConversations', records),
+      removeConversations: (ids, opts) => invokeHook('hooks.conversation.removeConversations', ids, opts),
     },
   }
   const repositories: SdkRepositoryOverrides = {
@@ -207,7 +227,7 @@ export function electronPersistClearAll(): Promise<unknown> {
   return invoke('manage.clearAll')
 }
 
-/** 删库重开（删 userData 下库文件后 relaunch） */
+/** 删库重开（主进程删 userData 下库文件含 -wal/-shm 侧车后重载页面，登录页重新登录开库） */
 export function electronPersistDeleteDbAndRelaunch(): Promise<void> {
   return window.uikitPersist?.deleteDbAndRelaunch() ?? Promise.resolve()
 }
@@ -242,7 +262,7 @@ const SEED_BATCH_SIZE = 500
  */
 export async function electronPersistSeedMessages(
   conversationId: string,
-  conversationType: 'singleChat' | 'groupChat',
+  conversationType: ConversationTypeValue,
   count: number,
   onProgress?: (done: number, total: number) => void,
 ): Promise<number> {
@@ -261,8 +281,8 @@ export async function electronPersistSeedMessages(
         sender: { userId: 'seed-bot', nickname: '灌数机器人' },
         conversationId,
         conversationType,
-        type: 'text',
-        sendStatus: 'sent',
+        type: MESSAGE_TYPE.TEXT,
+        sendStatus: MESSAGE_STATUS.SENT,
         ext: {},
         timestamp: start - (count - seq) * 1000,
         body: { content: `${SEED_TEXT_SAMPLES[seq % SEED_TEXT_SAMPLES.length]}（第 ${seq + 1} 条）` },
@@ -318,7 +338,7 @@ export async function electronPersistSeedConversations(
       const record: UiConversation = {
         id: `seed-cvs-${start}-${seq}`,
         name: `${SEED_CONVERSATION_NAMES[seq % SEED_CONVERSATION_NAMES.length]} ${seq + 1}`,
-        type: isGroup ? 'groupChat' : 'singleChat',
+        type: isGroup ? CONVERSATION_TYPE.GROUPCHAT : CONVERSATION_TYPE.SINGLECHAT,
         unreadCount: seq % 17 === 0 ? (seq % 9) + 1 : 0,
         lastMessageText: `${SEED_TEXT_SAMPLES[seq % SEED_TEXT_SAMPLES.length]}（第 ${seq + 1} 条）`,
         lastMessageFrom: 'seed-bot',
@@ -392,14 +412,14 @@ function makeStormMessage(cvs: UiConversation): { uiMsg: UiMessage, record: Mess
     sender: { userId: 'storm-bot', nickname: '风暴机器人' },
     conversationId: cvs.id,
     conversationType: cvs.type as ConversationTypeValue,
-    type: 'text' as const,
-    sendStatus: 'sent' as const,
+    type: MESSAGE_TYPE.TEXT,
+    sendStatus: MESSAGE_STATUS.SENT,
     ext: {},
     timestamp: now,
     body: { content },
   }
   return {
-    uiMsg: { ...base, isSelf: false, status: 'sent' } as unknown as UiMessage,
+    uiMsg: { ...base, isSelf: false, status: MESSAGE_STATUS.SENT } as unknown as UiMessage,
     record: base as unknown as MessageRecord,
   }
 }
@@ -414,7 +434,8 @@ function stormWriteOne(stores: StormStoresLike, cvs: UiConversation): void {
     lastMessageTime: uiMsg.timestamp,
     unreadCount: (cvs.unreadCount ?? 0) + 1,
   })
-  // 落库侧：msgLocalId 带 local_storm_ 前缀（isLocal 语义：本地构造、无服务端对应物）
+  // 落库侧：msgLocalId 带 local_storm_ 前缀便于识别与清理；经 hooks.saveMessage
+  // 走普通接收消息的落库路径（isLocal=0，loadMessages 正常读回），不是本地插入语义
   stormMsgLocalIds.push(record.msgLocalId)
   void invoke('hooks.message.saveMessage', record)
 }

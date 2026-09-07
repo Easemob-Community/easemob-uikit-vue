@@ -109,10 +109,19 @@ export async function demoLogin(
  * 统一登出入口：
  * - webim4：先直连 `webim4Adapter.logout()` 断开 4.x 连接，
  *   再走 UIKit 层 logout（注入模式下 core 不转发 adapter.logout，但仍负责 stores 清理）；
- * - websdk5：仅 UIKit 层 logout（core 内部会先调 5.x adapter.logout）。
+ * - websdk5：仅 UIKit 层 logout（core 内部会先调 5.x adapter.logout）；
+ * - demo-electron 持久化：登出后关闭本地库（幂等，与 preload「登出 / 切账号前 close」口径对齐）。
  */
 export async function demoLogout(uikitLogout: (() => Promise<void>) | undefined): Promise<void> {
   if (isWebim4Mode())
     await webim4Adapter.logout()
   await uikitLogout?.()
+  if (window.uikitPersist) {
+    try {
+      await window.uikitPersist.close()
+    }
+    catch (error) {
+      console.warn('[persist] 登出 close 库失败', error)
+    }
+  }
 }

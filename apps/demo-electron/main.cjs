@@ -44,7 +44,10 @@ function dbPathOf(account) {
 let persist = null
 let persistAccount = null
 
-async function openPersistence(account) {
+/** init 并发互斥（模块级 in-flight 链）：并发 / 重复 init 串行执行，不双开同一库文件 */
+let openInFlight = Promise.resolve()
+
+async function doOpenPersistence(account) {
   // 切账号 / 重复登录：先 close 旧实例（close 内部会落盘 FTS 队列尾部）
   if (persist) {
     try {
@@ -63,6 +66,13 @@ async function openPersistence(account) {
   })
   persistAccount = account
   console.warn(`[demo-electron] 持久化库已打开: ${dbPathOf(account)}`)
+}
+
+function openPersistence(account) {
+  const next = openInFlight.then(() => doOpenPersistence(account))
+  // 链上挂吞错分支接力，避免一次开库失败毒化后续所有 init
+  openInFlight = next.catch(() => {})
+  return next
 }
 
 /**
@@ -100,11 +110,58 @@ const CHANNELS = {
   'manage.flushFts': p => p.flushFts,
 }
 
+/**
+ * 管理 API 首参浅层类型期望（'object' = 非 null 对象 / 数组负载；'string' = 字符串；
+ * 'none' = 无参；'path' = 路径字符串且必须落在 userData 目录内）。
+ * 校验失败直接 reject，防渲染进程把错乱类型直送 SQLite 层。
+ */
+const MANAGE_FIRST_ARG = {
+  'manage.getStorageStats': 'none',
+  'manage.clearMessages': 'object',
+  'manage.clearAll': 'none',
+  'manage.vacuum': 'none',
+  'manage.backup': 'path',
+  'manage.insertLocalMessage': 'object',
+  'manage.setMessagePinned': 'string',
+  'manage.upsertUserInfos': 'object',
+  'manage.getUserInfos': 'object',
+  'manage.upsertGroupMembers': 'object',
+  'manage.getGroupMembers': 'string',
+  'manage.flushFts': 'none',
+}
+
+/** 管理 API 参数浅层校验（在 CHANNELS 通用注册中被逐方法调用） */
+function validateManageArgs(name, args) {
+  const expect = MANAGE_FIRST_ARG[name]
+  if (expect === undefined)
+    return
+  const first = args[0]
+  if (expect === 'none')
+    return
+  if (expect === 'object') {
+    if (typeof first !== 'object' || first === null)
+      throw new Error(`[demo-electron] ${name} 需要对象参数`)
+    return
+  }
+  if (typeof first !== 'string' || first.length === 0)
+    throw new Error(`[demo-electron] ${name} 需要非空字符串参数`)
+  if (expect === 'path') {
+    // backup 落盘路径限制在 userData 之下：规范化后前缀校验，防 '..' 逃逸
+    const userData = app.getPath('userData')
+    const resolved = path.resolve(first)
+    if (resolved !== userData && !resolved.startsWith(`${userData}${path.sep}`))
+      throw new Error('[demo-electron] manage.backup 的 targetPath 必须位于 userData 目录之下')
+  }
+}
+
 function registerIpc() {
-  // 登录信息传递通道：登录后打开 / 切换库
+  // 登录信息传递通道：登录后打开 / 切换库（account 做 shape 校验：非空字符串）
   ipcMain.handle('uikit-persist:init', async (_event, account) => {
-    if (!account || !account.appKey || !account.userId)
-      throw new Error('uikit-persist:init 需要 { appKey, userId }')
+    if (!account || typeof account !== 'object'
+      || typeof account.appKey !== 'string' || account.appKey.length === 0
+      || typeof account.userId !== 'string' || account.userId.length === 0) {
+      throw new Error('uikit-persist:init 需要 { appKey, userId }（均为非空字符串）')
+    }
     await openPersistence(account)
   })
 
@@ -114,7 +171,10 @@ function registerIpc() {
     persistAccount = null
   })
 
-  // 删库重开（测试面板「全新安装路径」验收）：删 userData 下当前账号库文件后 relaunch
+  // 删库重开（测试面板「全新安装路径」验收）：close 后删 userData 下当前账号
+  // 库文件（含 -wal / -shm 侧车），再重载渲染层——回到登录页重新登录时经 init 重新
+  // 开库，与「全新安装」语义等价。不 app.relaunch()：scripts/dev.cjs 是「electron 退出
+  // 即杀 vite」联动，relaunch 的新实例会白屏或让 vite 变孤儿占死 5273。
   ipcMain.handle('uikit-persist:delete-db-and-relaunch', async () => {
     if (persistAccount) {
       const dbPath = dbPathOf(persistAccount)
@@ -123,12 +183,12 @@ function registerIpc() {
       }
       catch { /* 忽略 close 异常，删库重开本来就是破坏性测试 */ }
       persist = null
+      persistAccount = null
       for (const file of [dbPath, `${dbPath}-wal`, `${dbPath}-shm`])
         fs.rmSync(file, { force: true })
-      console.warn(`[demo-electron] 已删除库文件 ${dbPath}，即将重启`)
+      console.warn(`[demo-electron] 已删除库文件 ${dbPath}，重载页面后重新登录开库`)
     }
-    app.relaunch()
-    app.exit(0)
+    BrowserWindow.getAllWindows()[0]?.reload()
   })
 
   // 通用注册：遍历注册表逐方法挂 handle（登录前调用 reject「库未打开」）
@@ -139,6 +199,7 @@ function registerIpc() {
       const method = pick(persist)
       if (typeof method !== 'function')
         throw new Error(`[demo-electron] 方法不可用: ${name}`)
+      validateManageArgs(name, args)
       return method(...args)
     })
   }
@@ -161,6 +222,9 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1440,
     height: 900,
+    // macOS 去掉原生标题栏，红绿灯嵌入内容区左上角（企微风格）；
+    // 渲染层需配合 -webkit-app-region: drag 才能拖动窗口（仅 Electron 环境生效）
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -173,9 +237,15 @@ function createWindow() {
     callback(permission === 'media')
   })
 
-  // 外链适配点（D85）：window.open 一律拦截走系统浏览器
+  // 外链适配点（D85）：window.open 一律拦截，仅 http(s) 放行给系统浏览器；
+  // 其余协议（file:// 经 openExternal 可执行本地文件等）deny + warn
   win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
+    if (/^https?:\/\//i.test(url)) {
+      shell.openExternal(url)
+    }
+    else {
+      console.warn(`[demo-electron] 已拦截非 http(s) 外链: ${url}`)
+    }
     return { action: 'deny' }
   })
 

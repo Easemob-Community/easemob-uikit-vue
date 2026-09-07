@@ -44,14 +44,14 @@ pnpm -F @easemob/demo-electron dev:console
    - **库统计**：`getStorageStats`（结果打 console + 面板提示）；
    - **灌测试消息**：指定 conversationId + 条数，直接调 `hooks.saveMessages` 造数据（翻页穿内存 / 中文搜索用）；
    - **清空全部**：`clearAll`（全表清 + 水位线）；
-   - **删库重开**（破坏性）：删 userData 下当前账号库文件后 relaunch，验证「全新安装路径」；
+   - **删库重开**（破坏性）：close 后删 userData 下当前账号库文件（含 `-wal`/`-shm` 侧车），再重载页面——回到登录页重新登录即重新开库，验证「全新安装路径」。不 `app.relaunch()`：`scripts/dev.cjs` 是「壳退出即杀 vite」联动，relaunch 会白屏 / 让 vite 变孤儿占死 5273；
    - **断开 SDK（模拟断网）**：主进程 `session.closeAllConnections()` + offline 网络模拟，验证冷启动有数据 / 断网重开。
 
 ## IPC 通道
 
 白名单注册表在 `main.cjs` 的 `CHANNELS`（未登记的方法名一律 reject）：
 
-- 元通道：`uikit-persist:init`（登录后传 appKey/userId 开库）/ `uikit-persist:close` / `uikit-persist:delete-db-and-relaunch`；
+- 元通道：`uikit-persist:init`（登录后传 appKey/userId 开库）/ `uikit-persist:close` / `uikit-persist:delete-db-and-relaunch`（删库后重载渲染层，不重启壳）；
 - hooks：`uikit-persist:hooks.message.*`（saveMessage/saveMessages/updateMessageStatus/markMessageRecalled/updateMessageContent/deleteMessages/updateMessagePinned）、`uikit-persist:hooks.conversation.*`（saveConversations/removeConversations）；
 - repository：`uikit-persist:repository.*`（loadMessages/fetchConversations/searchMessages/searchConversations）；
 - 管理：`uikit-persist:manage.*`（getStorageStats/clearMessages/clearAll/vacuum/backup/insertLocalMessage/setMessagePinned/upsertUserInfos/getUserInfos/upsertGroupMembers/getGroupMembers/flushFts）；

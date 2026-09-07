@@ -241,4 +241,30 @@ body,
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
+
+/* ==================== Electron 壳（hiddenInset 无标题栏）适配 ====================
+ * 仅 html.electron-shell 生效（main.ts 检测 demoShell 桥打标；Web 模式无此类，零变化）：
+ * - 导航栏空白区作窗口拖拽区，按钮 / 头像豁免 no-drag
+ * - 顶部头像区加高 padding，避让左上角红绿灯（hiddenInset 嵌入内容区 ~44px）
+ * - 登录页空白区可拖拽，卡片表单豁免 */
+html.electron-shell .nav-sidebar {
+  -webkit-app-region: drag;
+}
+
+html.electron-shell .nav-sidebar button,
+html.electron-shell .nav-sidebar__top {
+  -webkit-app-region: no-drag;
+}
+
+html.electron-shell .nav-sidebar__top {
+  padding-top: 44px;
+}
+
+html.electron-shell .login-page {
+  -webkit-app-region: drag;
+}
+
+html.electron-shell .login-page .login-card {
+  -webkit-app-region: no-drag;
+}
 </style>

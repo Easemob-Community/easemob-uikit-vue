@@ -13,7 +13,7 @@ contextBridge.exposeInMainWorld('uikitPersist', {
   init: account => ipcRenderer.invoke('uikit-persist:init', account),
   /** 登出 / 切换账号前关闭当前库（库文件保留，企微语义） */
   close: () => ipcRenderer.invoke('uikit-persist:close'),
-  /** 删库重开（破坏性测试入口）：删 userData 下当前账号库文件后 relaunch */
+  /** 删库重开（破坏性测试入口）：删 userData 下当前账号库文件（含 -wal/-shm）后重载页面，登录页重新登录开库 */
   deleteDbAndRelaunch: () => ipcRenderer.invoke('uikit-persist:delete-db-and-relaunch'),
   /** 通用方法调用：method 为 CHANNELS 注册表键（如 'hooks.message.saveMessage'） */
   invoke: (method, ...args) => ipcRenderer.invoke(`uikit-persist:${method}`, ...args),

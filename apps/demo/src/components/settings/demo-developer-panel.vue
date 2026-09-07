@@ -76,7 +76,7 @@ async function onClearLogs() {
     <div v-if="electronPersistSupported" class="demo-settings__group">
       <DemoSettingLabel
         title="本地持久化（Electron）"
-        tip="开启后登录前经 IPC 让主进程打开 SQLite 库（userData/uikit_<appKey>_<userId>.db），persistence hooks 旁路写库 + repository 读路径接管；左下角出现测试面板。切换后自动刷新页面生效"
+        tip="开启后登录前经 IPC 让主进程打开 SQLite 库（userData/uikit_<appKey>_<userId>.db），persistence hooks 旁路写库 + repository 读路径接管；右下角出现测试面板。切换后自动刷新页面生效"
       />
       <button
         class="demo-btn"
@@ -87,7 +87,7 @@ async function onClearLogs() {
       </button>
       <div class="demo-info">
         开启后：消息 / 会话旁路写入主进程 SQLite，历史与会话列表读自本地库；<br>
-        测试面板（左下角 DB 浮球）：库统计 / 灌测试消息 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
+        测试面板（右下角 DB 浮球）：库统计 / 灌测试消息 / 清空全部 / 删库重开 / 断开 SDK（断网模拟）。
       </div>
     </div>
 
