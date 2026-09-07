@@ -114,4 +114,24 @@ pnpm vitest run packages/uikit-persist-sqlite
 ```
 
 L1 契约行为套件（`src/__tests__/contract-suite.ts`，实现可换）+ L2 SQLite 单测
-（`:memory:` + 临时文件库，含中文 FTS 语料与损坏自愈）。
+（`:memory:` + 临时文件库，含中文 FTS 语料与损坏自愈）+ 层 1 属性测试
+（`src/__tests__/property.test.ts`，fast-check 随机操作流 + 四类不变量，种子固定可复现）
+
+- 层 2 故障注入（`src/__tests__/fault-injection.test.ts`，随机抛错驱动 + 损坏 fuzz 二值化结局）。
+
+## 性能基准
+
+```bash
+pnpm -F @easemob/uikit-persist-sqlite bench   # 先 build 再跑 bench/bench.mjs（dist 产物）
+```
+
+数据规模：10 万消息（100 会话，含 1 个 6000 条热点会话）+ 1 万会话。门禁阈值（超标非零退出）：
+
+| 基准项                          | 阈值           | 口径                                                          |
+| ------------------------------- | -------------- | ------------------------------------------------------------- |
+| 全局三字中文搜索（FTS trigram） | P95 < 500ms    | 规格书验收口径，50 次取 P95                                   |
+| 二字 LIKE 回落搜索              | P95 < 1000ms   | 回落路径放宽值：全表扫 body JSON 不走索引，是二字中文词的兜底 |
+| 单会话深翻页（100 页）          | 均值 < 50ms/页 | keyset 走索引                                                 |
+| 会话列表首页 + 20 续页          | 均值 < 50ms/页 | 置顶段 + keyset 续页                                          |
+
+灌入吞吐与库文件大小仅打印参考（不做阈值断言）。

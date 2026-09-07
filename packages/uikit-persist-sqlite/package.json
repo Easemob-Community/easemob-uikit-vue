@@ -20,7 +20,8 @@
   ],
   "scripts": {
     "build": "vite build && tsc --noEmit --project tsconfig.build.json",
-    "dev": "vite build --watch"
+    "dev": "vite build --watch",
+    "bench": "pnpm build && node bench/bench.mjs"
   },
   "peerDependencies": {
     "better-sqlite3": ">=11.0.0"
@@ -37,6 +38,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.19.43",
     "better-sqlite3": "^11.10.0",
+    "fast-check": "^4.9.0",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-dts": "^3.9.1"
