@@ -215,6 +215,8 @@ function buildInjection(): ElectronPersistInjection {
       searchConversations: params =>
         trackedRead('searchConversations', `"${params.keyword}"`, () =>
           invoke<ConversationPage>('repository.searchConversations', params)),
+      // 总未读聚合：标量高频调用（300ms 防抖重查），不进读取活动追踪，避免刷屏
+      getTotalUnreadCount: () => invoke<number>('repository.getTotalUnreadCount'),
     },
   }
   return { persistence, repositories }

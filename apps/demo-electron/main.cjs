@@ -96,6 +96,7 @@ const CHANNELS = {
   'repository.fetchConversations': p => p.repository.fetchConversations,
   'repository.searchMessages': p => p.repository.searchMessages,
   'repository.searchConversations': p => p.repository.searchConversations,
+  'repository.getTotalUnreadCount': p => p.repository.getTotalUnreadCount,
   // 管理 API
   'manage.getStorageStats': p => p.getStorageStats,
   'manage.clearMessages': p => p.clearMessages,
@@ -122,6 +123,7 @@ const REPOSITORY_READ_CHANNELS = new Set([
   'repository.fetchConversations',
   'repository.searchMessages',
   'repository.searchConversations',
+  'repository.getTotalUnreadCount',
 ])
 
 /**
