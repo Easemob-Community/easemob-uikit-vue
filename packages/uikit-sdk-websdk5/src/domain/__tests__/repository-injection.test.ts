@@ -228,6 +228,62 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     expect(client.chatManager.refreshSessionList).toHaveBeenCalledWith({ includeEmpty: true })
     expect(store.setList).not.toHaveBeenCalled()
   })
+
+  it('注入路径 refresh 收到 hasMore=true 但 cursor 缺失的页时按到底处理（防触底空转）', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const fetchConversations = vi.fn()
+      // 契约违例页：hasMore=true 但不带 cursor
+      .mockResolvedValue({ list: [makeConversation('cvs-1')], cursor: undefined, hasMore: true })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations },
+    })
+
+    await domain.refresh()
+
+    // 违例页被归一化为到底（否则 UI 触底后 loadMore 原地空转假加载）
+    expect(store.setHasMoreConversations).toHaveBeenCalledWith(false)
+    await domain.loadMore()
+    expect(fetchConversations).toHaveBeenCalledTimes(1)
+  })
+
+  it('注入路径 loadMore 续页收到 hasMore=true 但 cursor 缺失的页时按到底处理', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const fetchConversations = vi.fn()
+      .mockResolvedValueOnce({ list: [makeConversation('cvs-1')], cursor: 'p2', hasMore: true })
+      // 续页契约违例：hasMore=true 但不带 cursor
+      .mockResolvedValueOnce({ list: [makeConversation('cvs-2')], cursor: undefined, hasMore: true })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations },
+    })
+
+    await domain.refresh()
+    store.conversationList = store.setList.mock.calls[0][0] as UiConversation[]
+    await domain.loadMore()
+
+    expect(store.setHasMoreConversations).toHaveBeenLastCalledWith(false)
+    // 归一化后游标被清空，再次 loadMore 短路不再请求
+    await domain.loadMore()
+    expect(fetchConversations).toHaveBeenCalledTimes(2)
+  })
+
+  it('dispose 重置注入分页游标（登出后 loadMore 不按旧游标续页）', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const fetchConversations = vi.fn()
+      .mockResolvedValue({ list: [makeConversation('cvs-1')], cursor: 'p2', hasMore: true })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations },
+    })
+
+    await domain.refresh()
+    domain.dispose()
+    await domain.loadMore()
+
+    // 游标已随 dispose 清空，loadMore 短路不再请求
+    expect(fetchConversations).toHaveBeenCalledTimes(1)
+  })
 })
 
 // ===== 四域（contact / group / presence / userInfo）注入 =====

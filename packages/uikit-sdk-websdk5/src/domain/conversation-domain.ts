@@ -1,4 +1,4 @@
-import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import type { ConversationPage, ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
@@ -9,6 +9,9 @@ const conversationLogger = createLogger('Conversation')
  * 会话排序：置顶优先（按 pinnedTime 倒序），其余按最后一条消息时间倒序。
  * 注入 repository 的 refresh 路径使用（SDK 默认路径由 refreshSessionList 事件回填，
  * 不经本函数）。稳定排序，时间相同项保持追加顺序（对齐 webim4 sortConversations）。
+ * 注意：此处展示排序键（置顶段 pinnedTime、非置顶段 lastMessageTime）与 DB 侧
+ * keyset 分页键（coalesce(lastMessageTime, draftTime, createdAt)）不一致是刻意的——
+ * 本函数只管「展示层口径」，分页键由注入实现（repository）内部保证，两者无需对齐。
  */
 function sortConversations(list: readonly UiConversation[]): UiConversation[] {
   return [...list].sort((a, b) => {
@@ -75,6 +78,19 @@ export class ConversationDomain {
 
   /** 注入数据源是否还有下一页（无游标即到底） */
   private injectedHasMore = false
+
+  /**
+   * 注入页归一化：实现方返回 hasMore=true 但 cursor 缺失属契约违例
+   * （ConversationPage 约定 hasMore=true 必带 cursor），按到底处理并 warn 一次——
+   * 否则 UI 触底后 loadMore 会持 undefined 游标原地空转假加载。
+   */
+  private normalizeInjectedPage(page: ConversationPage): ConversationPage {
+    if (page.hasMore && !page.cursor) {
+      conversationLogger.warn('[ConversationDomain] fetchConversations 契约违例：hasMore=true 但 cursor 缺失，按到底处理')
+      return { ...page, hasMore: false }
+    }
+    return page
+  }
 
   /**
    * 合并注入页与现有列表：继承现有列表已补全的名称/头像，
@@ -158,7 +174,7 @@ export class ConversationDomain {
   async refresh(includeEmpty = false) {
     const fetchConversations = this.hooks.conversationRepository?.fetchConversations
     if (fetchConversations) {
-      const page = await fetchConversations(undefined, 50)
+      const page = this.normalizeInjectedPage(await fetchConversations(undefined, 50))
       this.injectedCursor = page.hasMore ? page.cursor : undefined
       this.injectedHasMore = page.hasMore
       this.store.setHasMoreConversations?.(page.hasMore)
@@ -309,7 +325,7 @@ export class ConversationDomain {
     if (fetchConversations) {
       if (!this.injectedHasMore || !this.injectedCursor)
         return
-      const page = await fetchConversations(this.injectedCursor, pageSize)
+      const page = this.normalizeInjectedPage(await fetchConversations(this.injectedCursor, pageSize))
       this.injectedCursor = page.hasMore ? page.cursor : undefined
       this.injectedHasMore = page.hasMore
       this.store.setHasMoreConversations?.(page.hasMore)
@@ -326,5 +342,15 @@ export class ConversationDomain {
     conversationLogger.info('getConversationList raw (loadMore)', items)
     const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })
     this.store.setList(list)
+  }
+
+  /**
+   * 登出清理：重置注入数据源的分页游标/hasMore（避免跨 logout/login 存活，
+   * 换账号登录后 loadMore 仍按旧账号游标续页）。对齐 UserInfoDomain.dispose 惯例，
+   * 由 adapter logout 收口调用。
+   */
+  dispose() {
+    this.injectedCursor = undefined
+    this.injectedHasMore = false
   }
 }

@@ -42,6 +42,10 @@ export interface MessagePersistenceHooks {
   /**
    * 撤回墓碑：置 `recalled = true` + `tombstoneTime`，不物理删除。
    * `operatorId` 为撤回操作者（本人撤回 / 管理员撤回 / 对端撤回场景）。
+   * 红线：置墓碑时必须同步撤除该消息的搜索索引行（FTS），否则已撤回内容仍可被搜索命中
+   * （与 `removeConversations` 级联删除的 FTS 约定同源，政企场景是事故）。
+   * Red line: tombstoning MUST also remove the message's search-index (FTS) row,
+   * otherwise recalled content stays searchable.
    */
   markMessageRecalled?: (msgId: string, operatorId?: string) => void | Promise<void>
 
@@ -59,6 +63,9 @@ export interface MessagePersistenceHooks {
   /**
    * 删除墓碑：置 `deleted = true` + `tombstoneTime`，不物理删除。
    * 本地删除 / 多选删除场景批量触发。
+   * 红线：置墓碑时必须同步撤除这些消息的搜索索引行（FTS），否则已删除内容仍可被搜索命中。
+   * Red line: tombstoning MUST also remove these messages' search-index (FTS) rows,
+   * otherwise deleted content stays searchable.
    */
   deleteMessages?: (msgIds: string[]) => void | Promise<void>
 

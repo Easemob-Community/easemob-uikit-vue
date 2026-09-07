@@ -1265,6 +1265,8 @@ export class Websdk5Adapter implements SdkAdapter {
     this._disposeSyncListener?.()
     this._disposeSyncListener = undefined
     this._userInfoDomain?.dispose()
+    // 注入数据源分页游标随登出重置（否则跨账号存活，重新登录后按旧游标续页）
+    this._domains?.conversation.dispose()
     this._eventsRegistered = false
   }
 

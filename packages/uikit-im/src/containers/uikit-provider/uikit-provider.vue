@@ -198,6 +198,11 @@ export interface ProviderProps {
    * are trimmed beyond it. This is a memory-trim cap, NOT a pagination cap —
    * with a local-persistence data source (loadMessages backed by DB), raising it
    * (e.g. 10000) lets older pages accumulate instead of being trimmed away.
+   * 运行时调小不回溯裁剪存量，下次写入时惰性生效；改回 undefined 不恢复默认值 300
+   * （store 内保留上次下发的值）。
+   * Lowering it at runtime does NOT retroactively trim the backlog (it applies
+   * lazily on the next write); resetting to undefined does NOT restore the 300
+   * default — the store keeps the last value it received.
    */
   maxMessageCount?: number
   /**
