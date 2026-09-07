@@ -14,7 +14,10 @@
  *   自动回落 body LIKE 扫描（决策 3.6 的中文搜索验收语义优先）。
  *   两分支都加水位线过滤（会话作用域取 max(会话水位, 全局水位)；全局搜索按
  *   会话子查询水位线与全局水位线取大）。
- * - `searchConversations`：会话名 / 用户昵称小表 LIKE（量级小，无需 FTS）。
+ * - `searchConversations`：会话名 / 用户昵称两段匹配——LIKE 子串优先（排前），
+ *   不足一页时子序列兜底（关键词各字符按序出现即命中，「需求评审19」可命中
+ *   「需求评审群 195」），合并去重。消息搜索 searchMessages 刻意不跟进容错
+ *   匹配：消息内容长、误命中代价高，保持严格子串 / FTS 语义。
  */
 
 import type {
@@ -78,6 +81,26 @@ export interface PersistenceRepository {
   fetchConversations: (cursor?: string, pageSize?: number) => Promise<ConversationPage>
   searchMessages: (params: MessageSearchParams) => Promise<MessagePage>
   searchConversations: (params: ConversationSearchParams) => Promise<ConversationPage>
+}
+
+/**
+ * 子序列匹配：关键词各字符按顺序出现在目标串中即命中
+ * （「需求评审19」命中「需求评审群 195」；乱序「95需求」不中）。
+ * 大小写不敏感（对齐 LIKE 的 ASCII 语义）。
+ * 实现位置说明：子序列在 SQL 侧不好表达，会话 / 用户昵称是千级小表，
+ * 读候选列到内存做判定即可（量级前提；若会话量级上到十万再议 SQL 化）。
+ */
+function isSubsequenceMatch(keyword: string, target: string): boolean {
+  const kw = keyword.toLowerCase()
+  const tg = target.toLowerCase()
+  let i = 0
+  for (const ch of tg) {
+    if (ch === kw[i])
+      i++
+    if (i >= kw.length)
+      return true
+  }
+  return false
 }
 
 export function createPersistenceRepository(ctx: PersistenceContext): PersistenceRepository {
@@ -300,6 +323,7 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       cursorClause = 'AND c.id > ?'
       sqlParams.push(idCursor)
     }
+    // 第一段：LIKE 严格子串（现状语义）
     const rows = db.prepare(
       `SELECT DISTINCT c.* FROM uikit_conversations c
       LEFT JOIN uikit_user_info u ON u.userId = c.id
@@ -308,11 +332,60 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       ORDER BY c.id
       LIMIT ?`,
     ).all(...sqlParams, pageSize + 1)
-    const hasMore = rows.length > pageSize
+    let hasMore = rows.length > pageSize
     const kept = hasMore ? rows.slice(0, pageSize) : rows
-    const last = kept[kept.length - 1]
+    const hitIds = new Set(kept.map(r => r.id as string))
+
+    // 第二段：子序列兜底——子串命中不足一页时读候选列到内存补足
+    // （子串命中排前、按 id 合并去重；仅第一段没填满才触发，纯子串页零开销）
+    const tail: Array<Record<string, unknown>> = []
+    if (kept.length < pageSize) {
+      const candidateParams: unknown[] = []
+      let candidateTypeClause = ''
+      if (params.conversationType) {
+        candidateTypeClause = 'AND c.type = ?'
+        candidateParams.push(params.conversationType)
+      }
+      let candidateCursorClause = ''
+      if (idCursor !== undefined) {
+        candidateCursorClause = 'AND c.id > ?'
+        candidateParams.push(idCursor)
+      }
+      const candidates = db.prepare(
+        `SELECT c.*, u.nickname AS nickname FROM uikit_conversations c
+        LEFT JOIN uikit_user_info u ON u.userId = c.id
+        WHERE 1 = 1 ${candidateTypeClause} ${candidateCursorClause}
+        ORDER BY c.id`,
+      ).all(...candidateParams) as Array<Record<string, unknown>>
+      const remaining = pageSize - kept.length
+      for (const candidate of candidates) {
+        const id = candidate.id as string
+        if (hitIds.has(id))
+          continue
+        const name = (candidate.name as string | null) ?? ''
+        const nickname = (candidate.nickname as string | null) ?? ''
+        if (!isSubsequenceMatch(keyword, name) && !(nickname && isSubsequenceMatch(keyword, nickname)))
+          continue
+        tail.push(candidate)
+        hitIds.add(id)
+        if (tail.length >= remaining)
+          break
+      }
+      // 子序列段还有更多候选可命中时翻页继续（游标仍按 id 推进，两段同序）
+      if (tail.length >= remaining) {
+        const restHasMore = candidates.some(
+          c => !hitIds.has(c.id as string)
+            && (isSubsequenceMatch(keyword, (c.name as string | null) ?? '')
+              || (c.nickname ? isSubsequenceMatch(keyword, c.nickname as string) : false)),
+        )
+        hasMore = hasMore || restHasMore
+      }
+    }
+
+    const merged = [...kept, ...tail]
+    const last = merged[merged.length - 1]
     return {
-      list: kept.map(rowToConversation),
+      list: merged.map(rowToConversation),
       cursor: hasMore && last ? encodeCursor(last.id as string) : undefined,
       hasMore,
     }

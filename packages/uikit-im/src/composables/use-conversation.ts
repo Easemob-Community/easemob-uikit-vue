@@ -158,10 +158,13 @@ export function useConversation() {
    * fall back to in-memory filtering.
    */
   async function searchConversations(keyword: string, cursor?: string, pageSize = 50): Promise<ConversationPage | null> {
-    const search = domains.conversation.searchConversations
-    if (!search)
+    // 红线：必须保留接收者调用——domain 方法依赖 this.hooks（ConversationDomain 类实例），
+    // 解构后调用会丢 this 抛 TypeError（2026-09-07 实证：远程搜索曾因此静默回落内存过滤）。
+    // 同类约定：本文件所有 domains.* 调用一律保留接收者，禁止解构方法。
+    const domain = domains.conversation
+    if (!domain.searchConversations)
       return null
-    return search({ keyword, cursor, pageSize })
+    return domain.searchConversations({ keyword, cursor, pageSize })
   }
 
   /** 置顶/取消置顶 */

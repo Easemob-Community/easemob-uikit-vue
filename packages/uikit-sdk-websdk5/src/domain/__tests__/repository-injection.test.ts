@@ -305,6 +305,22 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     const plain = new ConversationDomain(client, store)
     await expect(plain.searchConversations({ keyword: '李四06' })).resolves.toBeNull()
   })
+
+  it('domain 方法依赖 this（防回归钉：UI 层禁止解构调用，2026-09-07 this 绑定丢失事故）', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const searchConversations = vi.fn().mockResolvedValue({ list: [], hasMore: false })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { searchConversations },
+    })
+
+    // 解构后调用丢 this → this.hooks 抛 TypeError。若未来改为不依赖 this 的实现，
+    // 本用例需同步删除（并通知 UI 层解除「禁止解构」约定）
+    const detached = domain.searchConversations
+    await expect(detached({ keyword: 'x' })).rejects.toThrow()
+    // 保留接收者的调用正常
+    await expect(domain.searchConversations({ keyword: 'x' })).resolves.toEqual({ list: [], hasMore: false })
+  })
 })
 
 // ===== 四域（contact / group / presence / userInfo）注入 =====

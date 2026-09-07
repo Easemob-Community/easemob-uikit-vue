@@ -511,4 +511,55 @@ describe('l2 SQLite 实现特有项', () => {
       expect(logger.warn).toHaveBeenCalled()
     })
   })
+
+  describe('会话搜索容错匹配（决策 8.16 子串优先 + 子序列兜底）', () => {
+    async function seedConversations() {
+      handle = await makeMemoryHandle()
+      await handle.hooks.conversation?.saveConversations?.([
+        makeConversation({ id: 'cv-1', name: '需求评审群 195' }),
+        makeConversation({ id: 'cv-2', name: '需求文档同步' }),
+        makeConversation({ id: 'cv-3', name: '产品讨论组' }),
+      ])
+    }
+
+    it('子串优先：严格子串命中排前，不触发兜底也能命中', async () => {
+      await seedConversations()
+      const page = await handle!.repository.searchConversations({ keyword: '需求' })
+      // 「需求评审群 195」「需求文档同步」均为子串命中
+      expect(page.list.map(c => c.id)).toEqual(['cv-1', 'cv-2'])
+    })
+
+    it('子序列兜底：「需求评审19」命中「需求评审群 195」', async () => {
+      await seedConversations()
+      const page = await handle!.repository.searchConversations({ keyword: '需求评审19' })
+      expect(page.list.map(c => c.id)).toEqual(['cv-1'])
+    })
+
+    it('乱序不命中：「95需求」不中任何会话', async () => {
+      await seedConversations()
+      const page = await handle!.repository.searchConversations({ keyword: '95需求' })
+      expect(page.list).toHaveLength(0)
+    })
+
+    it('两段合并去重排序：子串命中排前，子序列命中补足且不重复', async () => {
+      await seedConversations()
+      // 「需求」子串命中 cv-1 / cv-2；cv-1 同时子序列命中——去重后只出现一次
+      const page = await handle!.repository.searchConversations({ keyword: '需求' })
+      expect(page.list.map(c => c.id)).toEqual(['cv-1', 'cv-2'])
+      // 「产品19」：cv-1 子序列命中（产…1…9? 不——「产品讨论组」无 19），验证混合场景：
+      const mixed = await handle!.repository.searchConversations({ keyword: '产品' })
+      expect(mixed.list.map(c => c.id)).toEqual(['cv-3'])
+    })
+
+    it('昵称同样适用子序列兜底（uikit_user_info 小表）', async () => {
+      await seedConversations()
+      await handle!.upsertUserInfos([{ userId: 'cv-3', nickname: '产品老王 77' }])
+      // 子串路径：昵称 LIKE 命中
+      const byNick = await handle!.repository.searchConversations({ keyword: '老王' })
+      expect(byNick.list.map(c => c.id)).toEqual(['cv-3'])
+      // 子序列兜底路径：会话名不含、昵称子序列命中
+      const subseq = await handle!.repository.searchConversations({ keyword: '产品老7' })
+      expect(subseq.list.map(c => c.id)).toEqual(['cv-3'])
+    })
+  })
 })
