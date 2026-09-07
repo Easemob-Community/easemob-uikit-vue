@@ -362,6 +362,21 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
 
     expect(client.chatManager.refreshSessionList).toHaveBeenCalledWith({ includeEmpty: false })
   })
+
+  it('getTotalUnreadCount：注入时委托聚合查询，未注入返回 null', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const getTotalUnreadCount = vi.fn().mockResolvedValue(42)
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { getTotalUnreadCount },
+    })
+
+    await expect(domain.getTotalUnreadCount()).resolves.toBe(42)
+    expect(getTotalUnreadCount).toHaveBeenCalledTimes(1)
+
+    const plain = new ConversationDomain(client, store)
+    await expect(plain.getTotalUnreadCount()).resolves.toBeNull()
+  })
 })
 
 // ===== 四域（contact / group / presence / userInfo）注入 =====

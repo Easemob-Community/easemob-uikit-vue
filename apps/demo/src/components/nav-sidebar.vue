@@ -8,7 +8,7 @@
  * - 状态：tab 切换通过 v-model；主题切换/设置入口由本组件内部直接消费 useTheme + 通过 emit 暴露
  */
 import { computed } from 'vue'
-import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversationStore, useOwnUserInfo, usePresence, useContact } from '@easemob/uikit-im'
+import { EmIcon, EmBadge, EmPresenceAvatar, useTheme, useClient, useConversation, useConversationStore, useOwnUserInfo, usePresence, useContact } from '@easemob/uikit-im'
 
 interface Props {
   /** 当前激活 tab key */
@@ -25,6 +25,19 @@ const { mode, isDark, setMode } = useTheme()
 const { currentUser } = useClient()
 const { avatarUrl, displayName } = useOwnUserInfo()
 const conversationStore = useConversationStore()
+const { totalUnreadCount } = useConversation()
+
+/** 全部未读数聚合（忽略静音会话） */
+const totalUnread = computed(() => {
+  // 注入数据源（Electron 本地持久化）时分页只加载部分会话，内存求和偏低——
+  // 改读全量聚合权威值（决策 8.20）；未注入（Web 模式）为 null，回落内存求和
+  if (totalUnreadCount.value !== null)
+    return totalUnreadCount.value
+  return conversationStore.conversationList.reduce((sum, c) => {
+    if (c.isMuted) return sum
+    return sum + (c.unreadCount || 0)
+  }, 0)
+})
 const { inviteList } = useContact()
 const { fetchPresence } = usePresence()
 
@@ -37,14 +50,6 @@ function refreshOwnPresence() {
     return
   void fetchPresence([currentUser.value])
 }
-
-/** 全部未读数聚合（忽略静音会话） */
-const totalUnread = computed(() => {
-  return conversationStore.conversationList.reduce((sum, c) => {
-    if (c.isMuted) return sum
-    return sum + (c.unreadCount || 0)
-  }, 0)
-})
 
 const tabs = [
   { key: 'conversation' as const, icon: 'bubble/rect/empty', label: '消息' },

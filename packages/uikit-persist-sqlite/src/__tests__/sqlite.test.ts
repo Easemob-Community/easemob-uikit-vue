@@ -773,4 +773,25 @@ CREATE TABLE uikit_sync_state (
       expect(new Set(seen).size).toBe(60)
     })
   })
+
+  describe('getTotalUnreadCount 全量聚合（决策 8.20）', () => {
+    it('空库返回 0', async () => {
+      handle = await makeMemoryHandle()
+      expect(await handle!.repository.getTotalUnreadCount()).toBe(0)
+    })
+
+    it('聚合全量（含未分页加载的会话），排除免打扰（对齐内存求和口径）', async () => {
+      handle = await makeMemoryHandle()
+      await handle!.hooks.conversation?.saveConversations?.([
+        makeConversation({ id: 'cv-u1', unreadCount: 3 }),
+        makeConversation({ id: 'cv-u2', unreadCount: 5, isMuted: true }),
+        makeConversation({ id: 'cv-u3', unreadCount: 7 }),
+      ])
+      // 3 + 7 = 10（免打扰 cv-u2 不计入）
+      expect(await handle!.repository.getTotalUnreadCount()).toBe(10)
+      // 会话删除后聚合下降
+      await handle!.hooks.conversation?.removeConversations?.(['cv-u1'])
+      expect(await handle!.repository.getTotalUnreadCount()).toBe(7)
+    })
+  })
 })

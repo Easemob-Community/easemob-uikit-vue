@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-sdk-contract 1.3.3 (2026-09-07)
+
+### 新增
+
+- **全量总未读数聚合（可选）**：`ConversationRepository` 新增可选 `getTotalUnreadCount(): Promise<number>`（分页接管场景替代内存求和——内存求和只覆盖已加载页；口径排除免打扰会话，与 UIKit 既有内存求和一致）；`SdkConversationDomain` 新增可选 `getTotalUnreadCount(): Promise<number | null>`（未注入返回 null 供 UI 回落）。可选新增，零改动兼容。
+
 ## @easemob/uikit-sdk-contract 1.3.2 (2026-09-07)
 
 ### 新增

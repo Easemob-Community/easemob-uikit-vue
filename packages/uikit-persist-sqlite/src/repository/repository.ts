@@ -80,9 +80,11 @@ export interface PersistenceRepository {
     cursor?: string,
     pageSize?: number,
   ) => Promise<MessagePage>
-  fetchConversations: (cursor?: string, pageSize?: number) => Promise<ConversationPage>
+  fetchConversations: (cursor?: string, pageSize?: number, filter?: ConversationListFilter) => Promise<ConversationPage>
   searchMessages: (params: MessageSearchParams) => Promise<MessagePage>
   searchConversations: (params: ConversationSearchParams) => Promise<ConversationPage>
+  /** 全量总未读数聚合（排除免打扰会话，与 UIKit 内存求和口径一致） */
+  getTotalUnreadCount: () => Promise<number>
 }
 
 /**
@@ -437,5 +439,18 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
     }
   }
 
-  return { loadMessages, fetchConversations, searchMessages, searchConversations }
+  /**
+   * 全量总未读数：一行 SUM 聚合（管理/聚合语义，不受「搜索禁实时 COUNT」约束——
+   * 该约束针对搜索路径的实时计数；这里是单标量聚合，微秒级）。
+   * 口径：排除免打扰（isMuted）会话，与 UIKit 既有内存求和（demo 导航角标
+   * 「忽略静音会话」）一致。
+   */
+  async function getTotalUnreadCount(): Promise<number> {
+    const row = db.prepare(
+      'SELECT COALESCE(SUM(unreadCount), 0) AS total FROM uikit_conversations WHERE isMuted = 0',
+    ).get()
+    return Number(row?.total ?? 0)
+  }
+
+  return { loadMessages, fetchConversations, searchMessages, searchConversations, getTotalUnreadCount }
 }

@@ -83,6 +83,13 @@ export interface SdkConversationDomain {
    * Whether conversation-list filter push-down is supported (optional, default false).
    */
   readonly supportsConversationListFilter?: boolean
+  /**
+   * 全量总未读数（可选）：仅注入数据源时可用（委托 repository 聚合查询），
+   * 未注入返回 null，调用方回落内存求和。
+   * Total unread count across all conversations (optional): delegates to the
+   * injected repository; null when not injected (callers fall back to in-memory sum).
+   */
+  getTotalUnreadCount?: () => Promise<number | null>
   pin: (conversationId: string, conversationType: ConversationTypeValue, pinned: boolean) => Promise<void>
   setMuted: (conversationId: string, conversationType: ConversationTypeValue, muted: boolean) => Promise<void>
   /** 清空会话未读数 */

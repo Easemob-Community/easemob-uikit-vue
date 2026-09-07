@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { watchDebounced } from '@vueuse/core'
 import type { UiConversation } from '@easemob/uikit-core'
 import type { ConversationListFilter, ConversationPage } from '@easemob/uikit-sdk-contract'
 import { useUIKit } from './use-uikit'
@@ -35,6 +36,47 @@ export function useConversation() {
    * with domain capability); falls back to in-memory filtering when false.
    */
   const conversationFilterSupported = computed(() => !!domains.conversation.supportsConversationListFilter)
+
+  /* ===== 全量总未读数（分页接管场景，决策 8.20） ===== */
+  /**
+   * 注入数据源的全量总未读数（null = 未注入，调用方回落内存求和）。
+   * 权威值以聚合查询为准；事件驱动重查（下方 watchDebounced）。
+   * Authoritative total unread across ALL conversations from the injected data
+   * source (null = not injected; callers fall back to in-memory sum).
+   */
+  const remoteTotalUnread = ref<number | null>(null)
+
+  /** 重查全量总未读（单标量聚合，SQL 微秒级 / IPC 毫秒级，防抖合并高频事件） */
+  async function refreshTotalUnread(): Promise<void> {
+    const query = domains.conversation.getTotalUnreadCount
+    if (!query) {
+      remoteTotalUnread.value = null
+      return
+    }
+    remoteTotalUnread.value = await query()
+  }
+
+  // 事件后重查：会话列表的「未读签名」（未读和 + 会话数 + 免打扰数）变化即重查——
+  // 覆盖新消息 / 已读 / 删除会话 / 免打扰切换；防抖 300ms 尾部执行（高频消息流
+  // 下每事件一次 IPC 会放大抖动，聚合结果允许亚秒级滞后）
+  watchDebounced(
+    () => {
+      const list = conversationStore.conversationList
+      const unreadSum = list.reduce((sum, c) => sum + (c.unreadCount || 0), 0)
+      const mutedCount = list.reduce((sum, c) => sum + (c.isMuted ? 1 : 0), 0)
+      return `${unreadSum}:${list.length}:${mutedCount}`
+    },
+    () => {
+      void refreshTotalUnread()
+    },
+    { debounce: 300, maxWait: 2000 },
+  )
+
+  /**
+   * 总未读数（全量口径）：注入数据源时为聚合查询值（含未加载页会话）；
+   * 未注入（Web 模式）为 null——调用方回落内存求和，行为零变化。
+   */
+  const totalUnreadCount = computed<number | null>(() => remoteTotalUnread.value)
 
   const loadingMore = ref(false)
 
@@ -142,6 +184,8 @@ export function useConversation() {
   /** 下拉刷新：触发服务端同步；`filter` 为分类过滤下推（注入数据源场景，决策 8.19） */
   async function refreshConversations(includeEmpty = false, filter?: ConversationListFilter) {
     await domains.conversation.refresh(includeEmpty, filter)
+    // 刷新后同步全量总未读权威值（防抖 watcher 也会兜底，这里立即对齐一次）
+    void refreshTotalUnread()
   }
 
   /** 加载更多会话 */
@@ -256,6 +300,8 @@ export function useConversation() {
     isSyncing,
     hasMore,
     conversationFilterSupported,
+    totalUnreadCount,
+    refreshTotalUnread,
     loadingMore,
     selectConversation,
     leaveConversation,

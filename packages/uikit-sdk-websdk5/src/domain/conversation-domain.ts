@@ -364,6 +364,19 @@ export class ConversationDomain {
   }
 
   /**
+   * 全量总未读数（仅注入数据源时可用）：委托 repository 聚合查询；
+   * 未注入返回 null（调用方回落内存求和）。
+   * Total unread across all conversations (injected data source only);
+   * null when not injected.
+   */
+  async getTotalUnreadCount(): Promise<number | null> {
+    const query = this.hooks.conversationRepository?.getTotalUnreadCount
+    if (!query)
+      return null
+    return query()
+  }
+
+  /**
    * 是否支持会话列表过滤下推（决策 8.19）：注入数据源即视为支持
    * （persist 实现下推 SQL；其它注入源可在忽略 filter 时回落——UI 侧据此
    * 决定 tab 过滤走远程还是内存）。SDK 默认路径恒 false（SDK 本地列表无此能力）。

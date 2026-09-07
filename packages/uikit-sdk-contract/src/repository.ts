@@ -269,6 +269,16 @@ export interface ConversationRepository {
    * use LIKE over small tables; roaming-only implementations may omit it.
    */
   searchConversations?: (params: ConversationSearchParams) => Promise<ConversationPage>
+
+  /**
+   * 全量总未读数聚合（可选实现）：分页接管场景替代内存求和
+   * （内存求和只覆盖已加载页，分页场景下偏低）。
+   * 口径：排除免打扰（isMuted）会话，与 UIKit 既有内存求和口径一致。
+   * Total unread count across ALL conversations (optional): replaces in-memory
+   * summation under paginated data sources. Muted conversations are excluded,
+   * matching UIKit's existing in-memory semantics.
+   */
+  getTotalUnreadCount?: () => Promise<number>
 }
 
 /**
