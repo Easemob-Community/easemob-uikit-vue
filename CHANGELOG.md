@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-sdk-contract 1.3.2 (2026-09-07)
+
+### 新增
+
+- **会话列表过滤下推（可选）**：`ConversationRepository.fetchConversations` 增加第三个可选参数 `filter?: ConversationListFilter`（新类型 `{ type?, unreadOnly?, atMe? }`；实现方可选，无过滤能力的数据源可忽略，UI 维持内存过滤兜底；`atMe` = 存在 @当前用户消息的会话，依赖实现方对消息 ext 的索引能力）；`SdkConversationDomain.refresh` 增加可选第二参 `filter`，新增可选能力位 `supportsConversationListFilter`。全部可选新增，现有 adapter / 实现零改动兼容。
+
 ## @easemob/uikit-sdk-contract 1.3.1 (2026-09-07)
 
 ### 新增

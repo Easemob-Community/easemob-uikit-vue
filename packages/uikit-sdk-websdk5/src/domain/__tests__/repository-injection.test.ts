@@ -174,7 +174,7 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     expect(client.chatManager.refreshSessionList).not.toHaveBeenCalled()
     // 首页语义：只拉第一页，不循环灌全量（1 万会话场景的核心回归点）
     expect(fetchConversations).toHaveBeenCalledTimes(1)
-    expect(fetchConversations).toHaveBeenNthCalledWith(1, undefined, 50)
+    expect(fetchConversations).toHaveBeenNthCalledWith(1, undefined, 50, undefined)
     expect(store.setHasMoreConversations).toHaveBeenCalledWith(true)
     // 首页排序后写入 store
     expect(store.setList).toHaveBeenCalledTimes(1)
@@ -186,7 +186,7 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     await domain.loadMore()
 
     expect(fetchConversations).toHaveBeenCalledTimes(2)
-    expect(fetchConversations).toHaveBeenNthCalledWith(2, 'p2', 50)
+    expect(fetchConversations).toHaveBeenNthCalledWith(2, 'p2', 50, undefined)
     expect(store.setHasMoreConversations).toHaveBeenLastCalledWith(false)
     const appended = store.setList.mock.calls[1][0] as UiConversation[]
     expect(appended.map(c => c.id)).toEqual(['cvs-new', 'cvs-old'])
@@ -320,6 +320,47 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     await expect(detached({ keyword: 'x' })).rejects.toThrow()
     // 保留接收者的调用正常
     await expect(domain.searchConversations({ keyword: 'x' })).resolves.toEqual({ list: [], hasMore: false })
+  })
+
+  it('refresh 透传 filter，loadMore 续页沿用同 filter（游标按 filter 维度隔离）', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const fetchConversations = vi.fn()
+      .mockResolvedValue({ list: [makeConversation('cvs-1')], cursor: 'p2', hasMore: true })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations },
+    })
+
+    await domain.refresh(false, { unreadOnly: true })
+    expect(fetchConversations).toHaveBeenNthCalledWith(1, undefined, 50, { unreadOnly: true })
+
+    // 续页沿用 refresh 登记的 filter
+    await domain.loadMore()
+    expect(fetchConversations).toHaveBeenNthCalledWith(2, 'p2', 50, { unreadOnly: true })
+
+    // 切 filter：refresh 重新拉首页（游标重置，filter 更换）
+    await domain.refresh(false, { type: CONVERSATION_TYPE.GROUPCHAT })
+    expect(fetchConversations).toHaveBeenNthCalledWith(3, undefined, 50, { type: CONVERSATION_TYPE.GROUPCHAT })
+  })
+
+  it('supportsConversationListFilter 探测：注入为 true，未注入为 false', () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const injected = new ConversationDomain(client, store, {
+      conversationRepository: { fetchConversations: vi.fn() },
+    })
+    expect(injected.supportsConversationListFilter).toBe(true)
+    expect(new ConversationDomain(client, store).supportsConversationListFilter).toBe(false)
+  })
+
+  it('未注入时 refresh 带 filter 仍走 SDK 默认路径（忽略 filter）', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const domain = new ConversationDomain(client, store)
+
+    await domain.refresh(false, { unreadOnly: true })
+
+    expect(client.chatManager.refreshSessionList).toHaveBeenCalledWith({ includeEmpty: false })
   })
 })
 

@@ -85,7 +85,7 @@
 - TECH-DEBT D122 Phase 3.5 剩余项：附件被动缓存的 `updateMessageLocalPath` 回填 + LRU 淘汰（`localPath` 列已通）；L3 历史库 fixture migration 测试；webim4 会话分页同构同步；Phase 3.6 验收矩阵真实账号逐项打勾；persist 包发布决策（去 private）。
 - v2 项：会话列表虚拟滚动（万级会话 DOM 累积掉帧）、消息滑动窗口内存管理、墓碑 TTL（180 天物理清理）、展示态入库（翻译/语音转文字）。
 - trigram 对 emoji/混合符号的召回率未实测，验收时留意。
-- **better-sqlite3 ABI 互踩**（2026-09-07 实证）：`demo-electron` 的 rebuild 会把 monorepo 共享存储里的 better-sqlite3 重编为 Electron ABI，之后 Node 侧 vitest 全部 `ERR_DLOPEN_FAILED`（需 `prebuild-install` 恢复 Node ABI）；反之亦然。跑 demo-electron 前先 `pnpm -F @easemob/demo-electron run rebuild`，跑 Node 侧测试前若报错则恢复 Node ABI——两者互斥，以当前要跑的一侧为准。
+- **better-sqlite3 ABI 互踩**（2026-09-07 实证）：`demo-electron` 的 rebuild 会把 monorepo 共享存储里的 better-sqlite3 重编为 Electron ABI，之后 Node 侧 vitest 全部 `ERR_DLOPEN_FAILED`（需 `prebuild-install` 恢复 Node ABI）；反之亦然。跑 demo-electron 前先 `pnpm -F @easemob/demo-electron run rebuild`，跑 Node 侧测试前若报错则恢复 Node ABI——两者互斥，以当前要跑的一侧为准。**另一种更隐蔽的失败形态**：macOS 内核按 `cs_mtime != mtime` 拒绝加载（`CODE SIGNING: rejecting invalid page`，进程直接 SIGKILL 无 JS 异常）——tar 解包保留旧 mtime 而内核缓存了旧签名校验，`codesign --force --sign - <better_sqlite3.node 路径>` 重签即恢复。
 - 三层自动化验证（2026-09-07）：属性测试 `property.test.ts`（fast-check，种子 20260907 可复现）+ 故障注入 `fault-injection.test.ts` + 性能门禁 `bench/bench.mjs`（`pnpm -F @easemob/uikit-persist-sqlite bench`）；**改动写库语义（事务/upsert/水位线/墓碑/FTS）后必须同步跑属性测试**，撞出反例先定位再修，禁止静默放宽断言。
 - 会话搜索链路（2026-09-07）：注入 `searchConversations` 已有 UI 消费者——`conversation-list.vue` 搜索态走 300ms 防抖远程搜索（结果不写 store），未注入回落内存过滤；搜索态触底续页短路 + presence 订阅暂停。改会话搜索时别退回「纯内存过滤」。
 - review 待办（2026-09-07 登记，规格书决策 8.14）：conversation-domain 注入路径 refresh/loadMore 并发互斥、refresh 与旁路写库的最终一致瞬时差；websdk5 adapter.ts 既有 `'kicked' is assigned but never used` 死状态（HEAD 存量，非本专项引入）；trim 后 atMe/pinned 关联 map 残留（uikit-im 既有行为）。

@@ -28,6 +28,7 @@ import {
   stormRunning,
   stormSentCount,
 } from '../composables/use-electron-persist'
+import type { PersistReadActivity } from '../composables/use-electron-persist'
 
 /** 灌数参数 */
 const seedConversationId = ref('persist-test')
@@ -132,12 +133,20 @@ async function onStormCleanup() {
 /** 本地读取活动：四个方法的展示顺序（方法名为契约 API 名，保持英文） */
 const readMethods = ['loadMessages', 'fetchConversations', 'searchMessages', 'searchConversations'] as const
 
-/** 最近一次本地读取明细（如 `loadMessages c1 → 30 条 · 4ms`） */
+/**
+ * 读取计时文案：`墙钟 146ms / SQL 3ms`（墙钟含 IPC 往返，SQL 为主进程库耗时，
+ * 两者差值即渲染/排队开销）；旧壳未回 sqlMs 时降级只显墙钟。
+ */
+function formatReadTiming(a: PersistReadActivity): string {
+  return a.sqlMs !== undefined ? `墙钟 ${a.ms}ms / SQL ${a.sqlMs}ms` : `墙钟 ${a.ms}ms`
+}
+
+/** 最近一次本地读取明细（如 `loadMessages c1 → 30 条 · 墙钟 8ms / SQL 4ms`） */
 const lastReadText = computed(() => {
   const last = persistReadActivities.value[0]
   if (!last)
     return ''
-  return `${last.method} ${last.detail} → ${last.rows < 0 ? '异常' : `${last.rows} 条`} · ${last.ms}ms`
+  return `${last.method} ${last.detail} → ${last.rows < 0 ? '异常' : `${last.rows} 条`} · ${formatReadTiming(last)}`
 })
 
 /** 活动记录时间格式化（HH:mm:ss） */
@@ -368,7 +377,7 @@ async function onToggleOffline() {
         <ul v-if="persistReadActivities.length > 0" class="persist-panel__reads-list">
           <li v-for="(a, i) in persistReadActivities" :key="i" class="persist-panel__reads-item">
             <span class="persist-panel__reads-time">{{ formatActivityTime(a.at) }}</span>
-            {{ a.method }} {{ a.detail }} → {{ a.rows < 0 ? '异常' : `${a.rows} 条` }} · {{ a.ms }}ms
+            {{ a.method }} {{ a.detail }} → {{ a.rows < 0 ? '异常' : `${a.rows} 条` }} · {{ formatReadTiming(a) }}
           </li>
         </ul>
       </div>

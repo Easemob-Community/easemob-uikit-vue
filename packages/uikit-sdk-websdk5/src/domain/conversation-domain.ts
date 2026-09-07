@@ -1,4 +1,4 @@
-import type { ConversationPage, ConversationPersistenceHooks, ConversationRepository, ConversationSearchParams, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import type { ConversationListFilter, ConversationPage, ConversationPersistenceHooks, ConversationRepository, ConversationSearchParams, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
@@ -78,6 +78,9 @@ export class ConversationDomain {
 
   /** 注入数据源是否还有下一页（无游标即到底） */
   private injectedHasMore = false
+
+  /** 注入数据源的当前过滤条件（决策 8.19：refresh 登记，loadMore 续页沿用；refresh 重置游标即 filter 维度隔离） */
+  private injectedFilter: ConversationListFilter | undefined
 
   /**
    * 注入页归一化：实现方返回 hasMore=true 但 cursor 缺失属契约违例
@@ -170,11 +173,15 @@ export class ConversationDomain {
    * 数据入口接管：注入 fetchConversations 时改走注入实现——**只拉首页**并
    * 记录游标（大会话量懒加载，不一次性灌全量），续页由 `loadMore` 推进；
    * 不触 SDK 也无事件回填。
+   * `filter`（决策 8.19）：分类过滤下推注入源，游标按 filter 维度隔离——
+   * 与上次 refresh 的 filter 不同即重置游标重新拉首页；SDK 默认路径忽略 filter。
    */
-  async refresh(includeEmpty = false) {
+  async refresh(includeEmpty = false, filter?: ConversationListFilter) {
     const fetchConversations = this.hooks.conversationRepository?.fetchConversations
     if (fetchConversations) {
-      const page = this.normalizeInjectedPage(await fetchConversations(undefined, 50))
+      // 登记过滤条件供 loadMore 沿用（refresh 拉首页即游标重置，天然按 filter 维度隔离）
+      this.injectedFilter = filter
+      const page = this.normalizeInjectedPage(await fetchConversations(undefined, 50, filter))
       this.injectedCursor = page.hasMore ? page.cursor : undefined
       this.injectedHasMore = page.hasMore
       this.store.setHasMoreConversations?.(page.hasMore)
@@ -325,7 +332,8 @@ export class ConversationDomain {
     if (fetchConversations) {
       if (!this.injectedHasMore || !this.injectedCursor)
         return
-      const page = this.normalizeInjectedPage(await fetchConversations(this.injectedCursor, pageSize))
+      // 续页沿用 refresh 登记的过滤条件（游标按 filter 维度隔离）
+      const page = this.normalizeInjectedPage(await fetchConversations(this.injectedCursor, pageSize, this.injectedFilter))
       this.injectedCursor = page.hasMore ? page.cursor : undefined
       this.injectedHasMore = page.hasMore
       this.store.setHasMoreConversations?.(page.hasMore)
@@ -352,6 +360,16 @@ export class ConversationDomain {
   dispose() {
     this.injectedCursor = undefined
     this.injectedHasMore = false
+    this.injectedFilter = undefined
+  }
+
+  /**
+   * 是否支持会话列表过滤下推（决策 8.19）：注入数据源即视为支持
+   * （persist 实现下推 SQL；其它注入源可在忽略 filter 时回落——UI 侧据此
+   * 决定 tab 过滤走远程还是内存）。SDK 默认路径恒 false（SDK 本地列表无此能力）。
+   */
+  get supportsConversationListFilter(): boolean {
+    return !!this.hooks.conversationRepository?.fetchConversations
   }
 
   /**

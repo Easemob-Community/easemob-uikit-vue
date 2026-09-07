@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import type { UiConversation } from '@easemob/uikit-core'
-import type { ConversationPage } from '@easemob/uikit-sdk-contract'
+import type { ConversationListFilter, ConversationPage } from '@easemob/uikit-sdk-contract'
 import { useUIKit } from './use-uikit'
 import { type UIKitStorageType, createUIKitStorageKey, getStorageBackend } from '@easemob/uikit-core'
 
@@ -27,6 +27,14 @@ export function useConversation() {
   const currentConversation = computed(() => conversationStore.currentConversation)
   const isSyncing = computed(() => conversationStore.isSyncingConversations)
   const hasMore = computed(() => conversationStore.hasMoreConversations)
+
+  /**
+   * 会话列表过滤下推是否可用（注入数据源且 domain 上报支持，决策 8.19）；
+   * false 时 tab 过滤维持内存过滤兜底。
+   * Whether conversation-list filter push-down is available (injected data source
+   * with domain capability); falls back to in-memory filtering when false.
+   */
+  const conversationFilterSupported = computed(() => !!domains.conversation.supportsConversationListFilter)
 
   const loadingMore = ref(false)
 
@@ -131,9 +139,9 @@ export function useConversation() {
     return domains.conversation.syncLocal()
   }
 
-  /** 下拉刷新：触发服务端同步 */
-  async function refreshConversations(includeEmpty = false) {
-    await domains.conversation.refresh(includeEmpty)
+  /** 下拉刷新：触发服务端同步；`filter` 为分类过滤下推（注入数据源场景，决策 8.19） */
+  async function refreshConversations(includeEmpty = false, filter?: ConversationListFilter) {
+    await domains.conversation.refresh(includeEmpty, filter)
   }
 
   /** 加载更多会话 */
@@ -247,6 +255,7 @@ export function useConversation() {
     currentConversation,
     isSyncing,
     hasMore,
+    conversationFilterSupported,
     loadingMore,
     selectConversation,
     leaveConversation,

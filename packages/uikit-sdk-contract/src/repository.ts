@@ -105,6 +105,23 @@ export interface ConversationSearchParams {
 }
 
 /**
+ * 会话列表过滤条件（fetchConversations 第三参，可选下推）。
+ * 实现方可选：本地库实现下推 SQL；无过滤能力的数据源可忽略该参数
+ * （UI 侧维持内存过滤兜底）。
+ * Conversation list filter (optional push-down). Implementations may ignore it;
+ * `atMe` = conversations containing messages @-mentioning the current user,
+ * which requires the implementation to index message ext (`em_at_list`).
+ */
+export interface ConversationListFilter {
+  /** 会话类型过滤 */
+  type?: ConversationTypeValue
+  /** 仅未读（unreadCount > 0） */
+  unreadOnly?: boolean
+  /** 仅含 @当前用户消息的会话（依赖实现方对消息 ext 的索引能力） */
+  atMe?: boolean
+}
+
+/**
  * 消息数据入口（读写一体）。
  */
 export interface MessageRepository {
@@ -237,7 +254,12 @@ export interface MessageRepository {
 
 /** 会话数据入口（统一游标分页语义） */
 export interface ConversationRepository {
-  fetchConversations: (cursor?: string, pageSize?: number) => Promise<ConversationPage>
+  /**
+   * 会话分页拉取。`filter` 为可选下推过滤（实现方可选；无过滤能力的数据源
+   * 可忽略该参数，调用方需有内存过滤兜底）。
+   * `filter` is an optional push-down (implementations may ignore it).
+   */
+  fetchConversations: (cursor?: string, pageSize?: number, filter?: ConversationListFilter) => Promise<ConversationPage>
 
   /**
    * 会话搜索（可选实现）：匹配会话名 / 用户昵称。

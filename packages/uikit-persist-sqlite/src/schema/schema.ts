@@ -12,10 +12,75 @@
 import type { SqliteDriver } from '../driver/driver'
 
 /** 当前 schema 版本（新增 migration 时 +1 并在 MIGRATIONS 追加） */
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
+
+/**
+ * 会话列表分页排序键表达式索引名（v2 新增；repository fetchConversations 的
+ * `WHERE isPinned = ? ORDER BY COALESCE(lastMessageTime, draftTime, createdAt) DESC, id`
+ * 命中该索引，避免每页全表扫描+排序）。导出供迁移测试断言。
+ */
+export const CONVERSATION_SORT_INDEX_NAME = 'idx_cvs_sort'
 
 /** UIKit 预置的 ext 索引键（@提及列表，见 uikit-im/src/utils/mention.ts） */
 export const DEFAULT_INDEXED_EXT_KEYS: readonly string[] = ['em_at_list']
+
+/**
+ * 核心表结构探针列面（开库自检用，index.ts probeIntegrity 消费）：
+ * integrity_check 只校验 b-tree 结构，比特翻转可能把 sqlite_master 里的 DDL
+ * 文本改成「仍合法但语义破损」（如列改名后完整性检查照样 ok），这里给出包
+ * 依赖的完整列面做兜底比对。v2 只新增索引未动列，v1 库同样满足。
+ * ext_<key> generated 列由 indexedExtKeys 动态生成，不列入探针。
+ */
+export const SCHEMA_SANITY_COLUMNS: Readonly<Record<string, readonly string[]>> = {
+  uikit_meta: ['key', 'value'],
+  uikit_messages: [
+    'msgServerId',
+    'msgLocalId',
+    'conversationId',
+    'conversationType',
+    'fromUid',
+    'toUid',
+    'type',
+    'sendStatus',
+    'timestamp',
+    'isPeerRead',
+    'isPeerDelivered',
+    'recalled',
+    'deleted',
+    'tombstoneTime',
+    'recallOperator',
+    'pinnedTime',
+    'isLocal',
+    'body',
+    'ext',
+    'sender',
+    'modifiedInfo',
+    'extra',
+    'localPath',
+  ],
+  uikit_messages_fts: ['content'],
+  uikit_conversations: [
+    'id',
+    'type',
+    'name',
+    'avatar',
+    'unreadCount',
+    'lastMessageText',
+    'lastMessageFrom',
+    'lastMessageTime',
+    'isPinned',
+    'pinnedTime',
+    'isMuted',
+    'marks',
+    'draft',
+    'draftTime',
+    'remindType',
+    'createdAt',
+  ],
+  uikit_user_info: ['userId', 'nickname', 'avatar', 'ext', 'updatedAt'],
+  uikit_group_member: ['groupId', 'userId', 'nickname', 'avatar', 'role', 'updatedAt'],
+  uikit_sync_state: ['conversationId', 'roamCursor', 'lastSyncedTs', 'clearedBefore'],
+}
 
 /** ext 索引键合法性（作为列名/索引名片段，防 SQL 注入与非法标识符） */
 const EXT_KEY_PATTERN = /^[a-z_]\w{0,63}$/i
@@ -122,6 +187,18 @@ const MIGRATIONS: readonly Migration[] = [
     up: (db, ctx) => {
       db.exec(V1_DDL)
       createExtIndexes(db, ctx.indexedExtKeys)
+    },
+  },
+  {
+    // v2：会话排序键表达式索引。表达式索引要求 SQLite 3.9+；DDL 里表达式须
+    // 双层括号（内层是表达式本身的括号，外层是「表达式而非列名」的语法要求）。
+    // IF NOT EXISTS：宿主注入驱动已手工建过同名索引时幂等跳过。
+    version: 2,
+    up: (db) => {
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS ${CONVERSATION_SORT_INDEX_NAME}
+         ON uikit_conversations(isPinned, (COALESCE(lastMessageTime, draftTime, createdAt)) DESC, id);`,
+      )
     },
   },
 ]

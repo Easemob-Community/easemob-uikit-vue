@@ -14,6 +14,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const process = require('node:process')
+const { performance } = require('node:perf_hooks')
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const { createPersistence } = require('@easemob/uikit-persist-sqlite')
 
@@ -111,6 +112,19 @@ const CHANNELS = {
 }
 
 /**
+ * repository 读通道集合：这四个 handler 的返回值包装为 `{ result, sqlMs }`——
+ * sqlMs 是主进程内实际调用耗时（performance.now 包裹），与渲染侧墙钟对比即可
+ * 区分「库慢」与「渲染/IPC 排队慢」。hooks 与管理 API 不包装（写路径不关心分段）。
+ * 向后兼容：旧壳未包装时渲染侧按原结果直接消费（见 use-electron-persist.ts）。
+ */
+const REPOSITORY_READ_CHANNELS = new Set([
+  'repository.loadMessages',
+  'repository.fetchConversations',
+  'repository.searchMessages',
+  'repository.searchConversations',
+])
+
+/**
  * 管理 API 首参浅层类型期望（'object' = 非 null 对象 / 数组负载；'string' = 字符串；
  * 'none' = 无参；'path' = 路径字符串且必须落在 userData 目录内）。
  * 校验失败直接 reject，防渲染进程把错乱类型直送 SQLite 层。
@@ -200,6 +214,13 @@ function registerIpc() {
       if (typeof method !== 'function')
         throw new Error(`[demo-electron] 方法不可用: ${name}`)
       validateManageArgs(name, args)
+      if (REPOSITORY_READ_CHANNELS.has(name)) {
+        // 分段计时：只包实际调用，不含 IPC 往返与参数校验
+        const started = performance.now()
+        const result = await method(...args)
+        const sqlMs = Math.round((performance.now() - started) * 10) / 10
+        return { result, sqlMs }
+      }
       return method(...args)
     })
   }

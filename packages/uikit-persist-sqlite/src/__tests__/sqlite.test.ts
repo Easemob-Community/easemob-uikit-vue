@@ -16,7 +16,7 @@ import type { SqliteDriver } from '../driver/driver'
 import { wrapBetterSqlite3 } from '../driver/driver'
 import type { UikitPersistenceHandle } from '../index'
 import { createPersistence } from '../index'
-import { SCHEMA_VERSION } from '../schema/schema'
+import { CONVERSATION_SORT_INDEX_NAME, SCHEMA_VERSION, ensureSchema } from '../schema/schema'
 import { runPersistenceContractSuite } from './contract-suite'
 import { makeConversation, makeRecord } from './helpers'
 
@@ -276,6 +276,141 @@ describe('l2 SQLite 实现特有项', () => {
       finally {
         rmSync(dir, { recursive: true, force: true })
       }
+    })
+  })
+
+  describe('v2 会话排序键表达式索引', () => {
+    /**
+     * v1 fixture DDL（冻结拷贝：schema 继续演进时本夹具不变，模拟线上旧库）。
+     * 必须含全部 v1 表——createPersistence 装配 hooks/repository/管理 API 时
+     * 会 prepare 依赖各表的语句，缺表即抛；核心表结构探针也会校验列面。
+     */
+    const V1_FIXTURE_DDL = `
+CREATE TABLE uikit_messages (
+  msgServerId      TEXT UNIQUE,
+  msgLocalId       TEXT NOT NULL UNIQUE,
+  conversationId   TEXT NOT NULL,
+  conversationType TEXT NOT NULL,
+  fromUid          TEXT NOT NULL,
+  toUid            TEXT NOT NULL,
+  type             TEXT NOT NULL,
+  sendStatus       TEXT NOT NULL,
+  timestamp        INTEGER NOT NULL,
+  isPeerRead       INTEGER,
+  isPeerDelivered  INTEGER,
+  recalled         INTEGER NOT NULL DEFAULT 0,
+  deleted          INTEGER NOT NULL DEFAULT 0,
+  tombstoneTime    INTEGER,
+  recallOperator   TEXT,
+  pinnedTime       INTEGER,
+  isLocal          INTEGER NOT NULL DEFAULT 0,
+  body             TEXT NOT NULL,
+  ext              TEXT,
+  sender           TEXT,
+  modifiedInfo     TEXT,
+  extra            TEXT,
+  localPath        TEXT
+);
+CREATE INDEX idx_msg_cv_ts ON uikit_messages(conversationId, timestamp DESC);
+
+CREATE VIRTUAL TABLE uikit_messages_fts USING fts5(
+  content, content='uikit_messages', tokenize='trigram'
+);
+
+CREATE TABLE uikit_conversations (
+  id TEXT PRIMARY KEY, type TEXT NOT NULL,
+  name TEXT NOT NULL, avatar TEXT,
+  unreadCount INTEGER NOT NULL DEFAULT 0,
+  lastMessageText TEXT, lastMessageFrom TEXT, lastMessageTime INTEGER,
+  isPinned INTEGER NOT NULL DEFAULT 0, pinnedTime INTEGER,
+  isMuted INTEGER NOT NULL DEFAULT 0,
+  marks TEXT,
+  draft TEXT, draftTime INTEGER, remindType TEXT,
+  createdAt INTEGER NOT NULL
+);
+
+CREATE TABLE uikit_user_info (
+  userId TEXT PRIMARY KEY, nickname TEXT, avatar TEXT,
+  ext TEXT, updatedAt INTEGER NOT NULL
+);
+
+CREATE TABLE uikit_group_member (
+  groupId TEXT NOT NULL, userId TEXT NOT NULL,
+  nickname TEXT, avatar TEXT, role TEXT, updatedAt INTEGER NOT NULL,
+  PRIMARY KEY (groupId, userId)
+);
+
+CREATE TABLE uikit_sync_state (
+  conversationId TEXT PRIMARY KEY,
+  roamCursor TEXT, lastSyncedTs INTEGER, clearedBefore INTEGER
+);
+`
+
+    it('v1 fixture 库升级到 v2：表达式索引存在、schema_version=2、数据不动', async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'uikit-persist-'))
+      const dbPath = join(dir, 'test.db')
+      try {
+        // 造 v1 旧库：冻结 DDL + schema_version=1 + 一条存量会话
+        const fixture = new Database(dbPath)
+        fixture.exec(V1_FIXTURE_DDL)
+        fixture.exec('CREATE TABLE uikit_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);')
+        fixture.prepare('INSERT INTO uikit_meta (key, value) VALUES (?, ?)').run('schema_version', '1')
+        fixture.prepare(
+          'INSERT INTO uikit_conversations (id, type, name, lastMessageTime, createdAt) VALUES (?, ?, ?, ?, ?)',
+        ).run('cv-old', 'singleChat', '旧会话', 123, 100)
+        fixture.close()
+
+        const driver = wrapBetterSqlite3(new Database(dbPath))
+        handle = await createPersistence({ db: driver, account: ACCOUNT, logger: silentLogger })
+
+        const idx = driver.prepare(
+          'SELECT name FROM sqlite_master WHERE type = ? AND name = ?',
+        ).get('index', CONVERSATION_SORT_INDEX_NAME)
+        expect(idx?.name).toBe(CONVERSATION_SORT_INDEX_NAME)
+        const version = driver.prepare('SELECT value FROM uikit_meta WHERE key = ?').get('schema_version')
+        expect(version?.value).toBe('2')
+        // 升级不动存量数据
+        const row = driver.prepare('SELECT name, lastMessageTime FROM uikit_conversations WHERE id = ?').get('cv-old')
+        expect(row?.name).toBe('旧会话')
+        expect(row?.lastMessageTime).toBe(123)
+      }
+      finally {
+        rmSync(dir, { recursive: true, force: true })
+      }
+    })
+
+    it('新库直建到 v2 且 ensureSchema 重跑幂等（IF NOT EXISTS）', async () => {
+      const driver = wrapBetterSqlite3(new Database(':memory:'))
+      handle = await createPersistence({ db: driver, account: ACCOUNT, logger: silentLogger })
+      const version = driver.prepare('SELECT value FROM uikit_meta WHERE key = ?').get('schema_version')
+      expect(version?.value).toBe(String(SCHEMA_VERSION))
+      // 重开路径（migration.version <= current 跳过）：索引已存在不报错
+      ensureSchema(driver, { account: ACCOUNT, logger: silentLogger })
+      const idx = driver.prepare(
+        'SELECT name FROM sqlite_master WHERE type = ? AND name = ?',
+      ).get('index', CONVERSATION_SORT_INDEX_NAME)
+      expect(idx?.name).toBe(CONVERSATION_SORT_INDEX_NAME)
+    })
+
+    it('eXPLAIN QUERY PLAN：会话分页查询命中表达式索引（不再全表扫+排序）', async () => {
+      const driver = wrapBetterSqlite3(new Database(':memory:'))
+      handle = await createPersistence({ db: driver, account: ACCOUNT, logger: silentLogger })
+      // 灌少量会话（含置顶）让 planner 面对真实数据分布
+      await handle.hooks.conversation?.saveConversations?.([
+        makeConversation({ isPinned: true, pinnedTime: 1 }),
+        makeConversation({}),
+        makeConversation({ lastMessageTime: undefined, draft: 'd', draftTime: 5 }),
+      ])
+
+      // 与 repository.fetchConversations 非置顶段分页查询同形的语句
+      const plan = driver.prepare(
+        `EXPLAIN QUERY PLAN SELECT * FROM uikit_conversations WHERE isPinned = 0
+         ORDER BY COALESCE(lastMessageTime, draftTime, createdAt) DESC, id LIMIT ?`,
+      ).all(20)
+      const details = plan.map(row => String(row.detail)).join('\n')
+      expect(details).toContain(CONVERSATION_SORT_INDEX_NAME)
+      // 命中索引即无临时排序树
+      expect(details).not.toMatch(/TEMP B-TREE/i)
     })
   })
 
@@ -560,6 +695,82 @@ describe('l2 SQLite 实现特有项', () => {
       // 子序列兜底路径：会话名不含、昵称子序列命中
       const subseq = await handle!.repository.searchConversations({ keyword: '产品老7' })
       expect(subseq.list.map(c => c.id)).toEqual(['cv-3'])
+    })
+
+    it('匹配列含 lastMessageText：子串与子序列两段都适用（对齐内存过滤口径）', async () => {
+      handle = await makeMemoryHandle()
+      await handle!.hooks.conversation?.saveConversations?.([
+        makeConversation({ id: 'cv-t1', name: '张三', lastMessageText: '周末去爬山吗' }),
+        makeConversation({ id: 'cv-t2', name: '李四', lastMessageText: '好的没问题' }),
+      ])
+      // 子串：摘要 LIKE 命中（会话名 / 昵称均不含关键词）
+      const sub = await handle!.repository.searchConversations({ keyword: '爬山' })
+      expect(sub.list.map(c => c.id)).toEqual(['cv-t1'])
+      // 子序列兜底：「周去爬」按序出现在「周末去爬山吗」
+      const subseq = await handle!.repository.searchConversations({ keyword: '周去爬' })
+      expect(subseq.list.map(c => c.id)).toEqual(['cv-t1'])
+      // 对照：另一会话摘要不命中
+      expect(subseq.list.map(c => c.id)).not.toContain('cv-t2')
+    })
+  })
+
+  describe('fetchConversations 过滤下推（决策 8.19）', () => {
+    async function seedFilterFixture() {
+      handle = await makeMemoryHandle()
+      await handle!.hooks.conversation?.saveConversations?.([
+        makeConversation({ id: 'cv-g1', type: CONVERSATION_TYPE.GROUPCHAT, unreadCount: 0, lastMessageTime: 400 }),
+        makeConversation({ id: 'cv-g2', type: CONVERSATION_TYPE.GROUPCHAT, unreadCount: 3, lastMessageTime: 300 }),
+        makeConversation({ id: 'cv-s1', type: CONVERSATION_TYPE.SINGLECHAT, unreadCount: 0, lastMessageTime: 200 }),
+        makeConversation({ id: 'cv-s2', type: CONVERSATION_TYPE.SINGLECHAT, unreadCount: 5, lastMessageTime: 100 }),
+      ])
+      // @我 消息：cv-g2 与 cv-s1 各一条（ext.em_at_list 含当前账号 user-1）
+      await handle!.hooks.message?.saveMessages?.([
+        makeRecord({ msgServerId: 'srv-at-1', conversationId: 'cv-g2', conversationType: CONVERSATION_TYPE.GROUPCHAT, ext: { em_at_list: ['user-1'] } }),
+        makeRecord({ msgServerId: 'srv-at-2', conversationId: 'cv-s1', ext: { em_at_list: ['user-1'] } }),
+        // 对照：@别人不算
+        makeRecord({ msgServerId: 'srv-at-3', conversationId: 'cv-s2', ext: { em_at_list: ['someone-else'] } }),
+      ])
+    }
+
+    it('type 过滤直查列', async () => {
+      await seedFilterFixture()
+      const page = await handle!.repository.fetchConversations(undefined, 50, { type: CONVERSATION_TYPE.GROUPCHAT })
+      expect(page.list.map(c => c.id).sort()).toEqual(['cv-g1', 'cv-g2'])
+    })
+
+    it('unreadOnly 过滤', async () => {
+      await seedFilterFixture()
+      const page = await handle!.repository.fetchConversations(undefined, 50, { unreadOnly: true })
+      expect(page.list.map(c => c.id).sort()).toEqual(['cv-g2', 'cv-s2'])
+    })
+
+    it('atMe 过滤：存在 @当前用户消息的会话（墓碑行不算）', async () => {
+      await seedFilterFixture()
+      const page = await handle!.repository.fetchConversations(undefined, 50, { atMe: true })
+      expect(page.list.map(c => c.id).sort()).toEqual(['cv-g2', 'cv-s1'])
+      // 撤回 @我 消息后不再命中
+      await handle!.hooks.message?.markMessageRecalled?.('srv-at-2')
+      const after = await handle!.repository.fetchConversations(undefined, 50, { atMe: true })
+      expect(after.list.map(c => c.id)).toEqual(['cv-g2'])
+    })
+
+    it('过滤 + keyset 分页：不重不漏', async () => {
+      handle = await makeMemoryHandle()
+      await handle!.hooks.conversation?.saveConversations?.(
+        Array.from({ length: 60 }, (_, i) =>
+          makeConversation({ id: `cv-u${String(i).padStart(3, '0')}`, unreadCount: 1, lastMessageTime: 1000 + i })),
+      )
+      const seen: string[] = []
+      let cursor: string | undefined
+      for (let round = 0; round < 10; round++) {
+        const page = await handle!.repository.fetchConversations(cursor, 50, { unreadOnly: true })
+        seen.push(...page.list.map(c => c.id))
+        if (!page.hasMore)
+          break
+        cursor = page.cursor
+      }
+      expect(seen).toHaveLength(60)
+      expect(new Set(seen).size).toBe(60)
     })
   })
 })

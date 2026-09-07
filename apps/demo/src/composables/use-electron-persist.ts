@@ -101,10 +101,32 @@ export interface PersistReadActivity {
   at: number
   /** 返回 list 长度；异常记 -1 */
   rows: number
-  /** 耗时 ms */
+  /** 渲染侧墙钟耗时 ms（含 IPC 往返与回调排队） */
   ms: number
+  /** 主进程内 SQL 耗时 ms；旧壳未回包时为 undefined（降级只显墙钟） */
+  sqlMs?: number
   /** 明细（conversationId / 关键词等，供面板展示） */
   detail: string
+}
+
+/** 主进程分段计时回包（repository 读方法，见 main.cjs REPOSITORY_READ_CHANNELS） */
+interface TimedReadEnvelope<T> {
+  result: T
+  sqlMs: number
+}
+
+/**
+ * 解包分段计时回包：新壳返回 `{ result, sqlMs }`，旧壳直返原结果。
+ * 判定看 `sqlMs` 为 number 的 `result` 键——MessagePage / ConversationPage
+ * 自身不含这两个键，不会误判。
+ */
+function unwrapTimedRead<T>(raw: T | TimedReadEnvelope<T>): { page: T, sqlMs?: number } {
+  if (raw && typeof raw === 'object' && 'result' in raw && 'sqlMs' in raw) {
+    const envelope = raw as TimedReadEnvelope<T>
+    if (typeof envelope.sqlMs === 'number')
+      return { page: envelope.result, sqlMs: envelope.sqlMs }
+  }
+  return { page: raw as T }
 }
 
 /** 最近活动记录上限 */
@@ -124,34 +146,37 @@ export const persistReadActivities = ref<PersistReadActivity[]>([])
 /** 是否发生过本地读取（浮球绿点标识，once 语义） */
 export const persistReadSeen = ref(false)
 
-function recordRead(method: PersistReadMethod, detail: string, rows: number, ms: number): void {
+function recordRead(method: PersistReadMethod, detail: string, rows: number, ms: number, sqlMs?: number): void {
   persistReadCounts.value[method] += 1
   persistReadSeen.value = true
   persistReadActivities.value = [
-    { method, at: Date.now(), rows, ms, detail },
+    { method, at: Date.now(), rows, ms, sqlMs, detail },
     ...persistReadActivities.value.slice(0, READ_ACTIVITY_MAX - 1),
   ]
 }
 
-/** 包装 repository 读方法：记录 { method, at, rows, ms }，异常记 rows=-1 后原样上抛 */
+/**
+ * 包装 repository 读方法：记录 { method, at, rows, ms, sqlMs }，异常记 rows=-1 后原样上抛。
+ * ms 为渲染侧墙钟（含 IPC 往返），sqlMs 为主进程 SQL 耗时（旧壳未回包时缺省）。
+ */
 async function trackedRead<T extends { list: unknown[] }>(
   method: PersistReadMethod,
   detail: string,
-  fn: () => Promise<T>,
+  fn: () => Promise<T | TimedReadEnvelope<T>>,
 ): Promise<T> {
   const start = Date.now()
   try {
-    const page = await fn()
+    const { page, sqlMs } = unwrapTimedRead(await fn())
     const ms = Date.now() - start
-    recordRead(method, detail, page.list.length, ms)
+    recordRead(method, detail, page.list.length, ms, sqlMs)
     // harness 埋点日志（no-console 只允许 warn/error）
-    console.warn(`[persist] ${method} ${detail} → ${page.list.length} 条 · ${ms}ms`)
+    console.warn(`[persist] ${method} ${detail} → ${page.list.length} 条 · 墙钟 ${ms}ms${sqlMs !== undefined ? ` / SQL ${sqlMs}ms` : ''}`)
     return page
   }
   catch (error) {
     const ms = Date.now() - start
     recordRead(method, detail, -1, ms)
-    console.warn(`[persist] ${method} ${detail} → 异常 · ${ms}ms`, error)
+    console.warn(`[persist] ${method} ${detail} → 异常 · 墙钟 ${ms}ms`, error)
     throw error
   }
 }
@@ -184,9 +209,9 @@ function buildInjection(): ElectronPersistInjection {
           invoke<MessagePage>('repository.searchMessages', params)),
     },
     conversation: {
-      fetchConversations: (cursor, pageSize) =>
+      fetchConversations: (cursor, pageSize, filter) =>
         trackedRead('fetchConversations', cursor ? '翻页' : '首页', () =>
-          invoke<ConversationPage>('repository.fetchConversations', cursor, pageSize)),
+          invoke<ConversationPage>('repository.fetchConversations', cursor, pageSize, filter)),
       searchConversations: params =>
         trackedRead('searchConversations', `"${params.keyword}"`, () =>
           invoke<ConversationPage>('repository.searchConversations', params)),

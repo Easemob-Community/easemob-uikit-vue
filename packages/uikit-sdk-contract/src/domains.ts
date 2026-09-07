@@ -1,5 +1,5 @@
 import type { ConversationTypeValue } from './constants'
-import type { ContactPage, ConversationPage, ConversationSearchParams, GroupMemberPage, GroupPage } from './repository'
+import type { ContactPage, ConversationListFilter, ConversationPage, ConversationSearchParams, GroupMemberPage, GroupPage } from './repository'
 import type {
   CreateGroupParams,
   SdkMessage,
@@ -63,8 +63,12 @@ export interface SdkConversationDomain {
   leave: () => void
   /** 从本地缓存读取会话列表并写入 store */
   syncLocal: () => UiConversation[]
-  /** 主动刷新服务端会话列表，由事件回填 store */
-  refresh: (includeEmpty?: boolean) => Promise<void>
+  /**
+   * 主动刷新服务端会话列表，由事件回填 store。
+   * `filter` 为可选下推过滤（注入数据源场景）：支持的数据源按过滤条件拉首页并
+   * 重置续页游标；SDK 默认路径忽略（SDK 本地列表无此能力，UI 维持内存过滤）。
+   */
+  refresh: (includeEmpty?: boolean, filter?: ConversationListFilter) => Promise<void>
   /** 加载更多会话（无分页能力的 SDK 退化为本地全量） */
   loadMore: (pageSize?: number) => Promise<void>
   /**
@@ -74,6 +78,11 @@ export interface SdkConversationDomain {
    * null when not injected so callers fall back to in-memory filtering.
    */
   searchConversations?: (params: ConversationSearchParams) => Promise<ConversationPage | null>
+  /**
+   * 是否支持会话列表过滤下推（可选，缺省视为 false）。
+   * Whether conversation-list filter push-down is supported (optional, default false).
+   */
+  readonly supportsConversationListFilter?: boolean
   pin: (conversationId: string, conversationType: ConversationTypeValue, pinned: boolean) => Promise<void>
   setMuted: (conversationId: string, conversationType: ConversationTypeValue, muted: boolean) => Promise<void>
   /** 清空会话未读数 */

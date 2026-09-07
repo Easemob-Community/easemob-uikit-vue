@@ -14,13 +14,15 @@
  *   自动回落 body LIKE 扫描（决策 3.6 的中文搜索验收语义优先）。
  *   两分支都加水位线过滤（会话作用域取 max(会话水位, 全局水位)；全局搜索按
  *   会话子查询水位线与全局水位线取大）。
- * - `searchConversations`：会话名 / 用户昵称两段匹配——LIKE 子串优先（排前），
- *   不足一页时子序列兜底（关键词各字符按序出现即命中，「需求评审19」可命中
- *   「需求评审群 195」），合并去重。消息搜索 searchMessages 刻意不跟进容错
- *   匹配：消息内容长、误命中代价高，保持严格子串 / FTS 语义。
+ * - `searchConversations`：会话名 / 用户昵称 / 最后一条消息摘要两段匹配——LIKE
+ *   子串优先（排前），不足一页时子序列兜底（关键词各字符按序出现即命中，
+ *   「需求评审19」可命中「需求评审群 195」），合并去重。匹配列与 uikit-im 内存
+ *   过滤口径（getConversationSearchFields）对齐。消息搜索 searchMessages 刻意
+ *   不跟进容错匹配：消息内容长、误命中代价高，保持严格子串 / FTS 语义。
  */
 
 import type {
+  ConversationListFilter,
   ConversationPage,
   ConversationSearchParams,
   MessagePage,
@@ -183,20 +185,58 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
 
   const SORT_TS_EXPR = 'COALESCE(lastMessageTime, draftTime, createdAt)'
 
-  async function fetchConversations(cursor?: string, pageSize: number = DEFAULT_PAGE_SIZE): Promise<ConversationPage> {
+  /**
+   * em_at_list 匹配表达式：建库声明了 em_at_list 索引键时走 generated column
+   * （与索引语义对齐），否则回落 json_extract 原文（宿主自定义 indexedExtKeys
+   * 未含 em_at_list 时保证可用；LIKE 前缀通配本就走不上索引，两者性能同阶）。
+   */
+  const atListExpr = ctx.indexedExtKeys.includes('em_at_list')
+    ? 'm.ext_em_at_list'
+    : 'json_extract(m.ext, \'$.em_at_list\')'
+
+  /**
+   * 过滤条件下推（决策 8.19）：type / unreadOnly 直查列；atMe = 存在 @当前用户
+   * 消息（墓碑行不算）。口径差异说明：这里是「存在过 @我消息」的持久语义，
+   * 与 UI atMeMap「进入会话即清除高亮」的运行时态不同——过滤 tab 展示的是
+   * 历史含 @我 的会话，进入会话清除高亮不影响本过滤结果。
+   */
+  function filterClauseOf(filter?: ConversationListFilter): { clause: string, params: unknown[] } {
+    if (!filter)
+      return { clause: '', params: [] }
+    const clauses: string[] = []
+    const params: unknown[] = []
+    if (filter.type !== undefined) {
+      clauses.push('c.type = ?')
+      params.push(filter.type)
+    }
+    if (filter.unreadOnly)
+      clauses.push('c.unreadCount > 0')
+    if (filter.atMe) {
+      clauses.push(
+        `EXISTS (SELECT 1 FROM uikit_messages m
+        WHERE m.conversationId = c.id AND m.deleted = 0 AND m.recalled = 0
+          AND ${atListExpr} LIKE '%"' || ? || '"%')`,
+      )
+      params.push(ctx.accountUserId)
+    }
+    return { clause: clauses.length > 0 ? `AND ${clauses.join(' AND ')}` : '', params }
+  }
+
+  async function fetchConversations(cursor?: string, pageSize: number = DEFAULT_PAGE_SIZE, filter?: ConversationListFilter): Promise<ConversationPage> {
+    const { clause: filterClause, params: filterParams } = filterClauseOf(filter)
     const keyset = decodeCursor<[number | null, string | null]>(cursor)
     if (!keyset) {
       // 首页：固定含全部置顶（置顶集合小，按置顶时间倒序）+ 非置顶 keyset 填满剩余
       const pinnedRows = db.prepare(
-        'SELECT * FROM uikit_conversations WHERE isPinned = 1 ORDER BY pinnedTime DESC, id',
-      ).all()
+        `SELECT c.* FROM uikit_conversations c WHERE c.isPinned = 1 ${filterClause} ORDER BY c.pinnedTime DESC, c.id`,
+      ).all(...filterParams)
       const remaining = pageSize - pinnedRows.length
       const normalRows = remaining > 0
         ? db.prepare(
-          `SELECT * FROM uikit_conversations WHERE isPinned = 0
-            ORDER BY ${SORT_TS_EXPR} DESC, id LIMIT ?`,
-        ).all(remaining + 1)
-        : db.prepare('SELECT * FROM uikit_conversations WHERE isPinned = 0 LIMIT 1').all()
+          `SELECT c.* FROM uikit_conversations c WHERE c.isPinned = 0 ${filterClause}
+            ORDER BY ${SORT_TS_EXPR} DESC, c.id LIMIT ?`,
+        ).all(...filterParams, remaining + 1)
+        : db.prepare(`SELECT c.* FROM uikit_conversations c WHERE c.isPinned = 0 ${filterClause} LIMIT 1`).all(...filterParams)
       const hasMore = remaining > 0 ? normalRows.length > remaining : normalRows.length > 0
       const keptNormal = remaining > 0 ? normalRows.slice(0, remaining) : []
       const list = [...pinnedRows, ...keptNormal].map(rowToConversation)
@@ -209,16 +249,16 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       return { list, cursor: nextCursor, hasMore }
     }
 
-    // 续页：只翻非置顶段 keyset（置顶已固定在首页）
-    const params: unknown[] = []
+    // 续页：只翻非置顶段 keyset（置顶已固定在首页）；过滤条件同维度参与分页
+    const params: unknown[] = [...filterParams]
     let keysetClause = ''
     if (keyset[0] !== null && keyset[0] !== undefined) {
-      keysetClause = `AND (${SORT_TS_EXPR} < ? OR (${SORT_TS_EXPR} = ? AND id > ?))`
+      keysetClause = `AND (${SORT_TS_EXPR} < ? OR (${SORT_TS_EXPR} = ? AND c.id > ?))`
       params.push(keyset[0], keyset[0], keyset[1])
     }
     const rows = db.prepare(
-      `SELECT * FROM uikit_conversations WHERE isPinned = 0 ${keysetClause}
-      ORDER BY ${SORT_TS_EXPR} DESC, id LIMIT ?`,
+      `SELECT c.* FROM uikit_conversations c WHERE c.isPinned = 0 ${filterClause} ${keysetClause}
+      ORDER BY ${SORT_TS_EXPR} DESC, c.id LIMIT ?`,
     ).all(...params, pageSize + 1)
     const hasMore = rows.length > pageSize
     const kept = hasMore ? rows.slice(0, pageSize) : rows
@@ -312,7 +352,9 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       return { list: [], hasMore: false }
 
     const idCursor = decodeCursor<string>(params.cursor)
-    const sqlParams: unknown[] = [`%${escapeLike(keyword)}%`, `%${escapeLike(keyword)}%`]
+    // LIKE 三段匹配列各一份参数（name / nickname / lastMessageText）
+    const likePattern = `%${escapeLike(keyword)}%`
+    const sqlParams: unknown[] = [likePattern, likePattern, likePattern]
     let typeClause = ''
     if (params.conversationType) {
       typeClause = 'AND c.type = ?'
@@ -323,11 +365,12 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       cursorClause = 'AND c.id > ?'
       sqlParams.push(idCursor)
     }
-    // 第一段：LIKE 严格子串（现状语义）
+    // 第一段：LIKE 严格子串（匹配列：会话名 / 用户昵称 / 最后一条消息摘要——
+    // 与 uikit-im 内存过滤 getConversationSearchFields 口径对齐）
     const rows = db.prepare(
       `SELECT DISTINCT c.* FROM uikit_conversations c
       LEFT JOIN uikit_user_info u ON u.userId = c.id
-      WHERE (c.name LIKE ? ESCAPE '\\' OR u.nickname LIKE ? ESCAPE '\\')
+      WHERE (c.name LIKE ? ESCAPE '\\' OR u.nickname LIKE ? ESCAPE '\\' OR c.lastMessageText LIKE ? ESCAPE '\\')
         ${typeClause} ${cursorClause}
       ORDER BY c.id
       LIMIT ?`,
@@ -358,13 +401,20 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
         ORDER BY c.id`,
       ).all(...candidateParams) as Array<Record<string, unknown>>
       const remaining = pageSize - kept.length
+      /** 子序列兜底命中判定：会话名 / 用户昵称 / 最后一条消息摘要三列 */
+      const matchCandidate = (candidate: Record<string, unknown>): boolean => {
+        const name = (candidate.name as string | null) ?? ''
+        const nickname = (candidate.nickname as string | null) ?? ''
+        const lastMessageText = (candidate.lastMessageText as string | null) ?? ''
+        return isSubsequenceMatch(keyword, name)
+          || (nickname !== '' && isSubsequenceMatch(keyword, nickname))
+          || (lastMessageText !== '' && isSubsequenceMatch(keyword, lastMessageText))
+      }
       for (const candidate of candidates) {
         const id = candidate.id as string
         if (hitIds.has(id))
           continue
-        const name = (candidate.name as string | null) ?? ''
-        const nickname = (candidate.nickname as string | null) ?? ''
-        if (!isSubsequenceMatch(keyword, name) && !(nickname && isSubsequenceMatch(keyword, nickname)))
+        if (!matchCandidate(candidate))
           continue
         tail.push(candidate)
         hitIds.add(id)
@@ -373,11 +423,7 @@ export function createPersistenceRepository(ctx: PersistenceContext): Persistenc
       }
       // 子序列段还有更多候选可命中时翻页继续（游标仍按 id 推进，两段同序）
       if (tail.length >= remaining) {
-        const restHasMore = candidates.some(
-          c => !hitIds.has(c.id as string)
-            && (isSubsequenceMatch(keyword, (c.name as string | null) ?? '')
-              || (c.nickname ? isSubsequenceMatch(keyword, c.nickname as string) : false)),
-        )
+        const restHasMore = candidates.some(c => !hitIds.has(c.id as string) && matchCandidate(c))
         hasMore = hasMore || restHasMore
       }
     }

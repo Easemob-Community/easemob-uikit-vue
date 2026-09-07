@@ -16,6 +16,10 @@ export interface PersistenceContext {
   logger: PersistenceLogger
   /** chatRoom 消息是否落库（决策 8.1：弹幕高频无持久化价值，默认关） */
   persistChatRoom: boolean
+  /** 当前账号 userId（@我 过滤等「当前用户」语义判定用） */
+  accountUserId: string
+  /** 建库期声明的 ext 索引键（em_at_list generated column 探测用） */
+  indexedExtKeys: readonly string[]
 }
 
 /**

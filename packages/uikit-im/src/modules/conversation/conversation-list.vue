@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useInfiniteScroll, watchDebounced } from '@vueuse/core'
+import { useEventListener, useInfiniteScroll, watchDebounced } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
 import { useArrowNavigation, useEscToClose, useKeyBindings, usePresence, usePullRefresh, useViewport } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
@@ -16,6 +16,7 @@ import { EmEmpty as Empty } from '@easemob/uikit-core'
 import { EmStatusBanner as StatusBanner } from '@easemob/uikit-core'
 import { EmSkeleton as Skeleton } from '@easemob/uikit-core'
 import type { UiConversation as Conversation } from '@easemob/uikit-core'
+import type { ConversationListFilter } from '@easemob/uikit-sdk-contract'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from './types'
 import ConversationItem from './conversation-item.vue'
@@ -122,7 +123,7 @@ const emit = defineEmits<{
   (e: 'search', keyword: string): void
 }>()
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft, searchConversations } = useConversation()
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft, searchConversations, conversationFilterSupported } = useConversation()
 const { stores, h5, features } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -377,12 +378,39 @@ const tabEmptyTexts: Record<ConversationTabKey, string> = {
   group: t('conversation.emptyGroup'),
 }
 
+/**
+ * tab → 远程过滤条件映射（决策 8.19）。
+ * atMe 口径差异：远程 = 「存在过 @当前用户消息」的持久语义（persist SQL 下推），
+ * 与内存 atMeMap「进入会话即清除高亮」的运行时态不同——进入会话清除高亮不影响
+ * 远程过滤结果（既有行为不变）。
+ */
+const REMOTE_TAB_FILTERS: Partial<Record<ConversationTabKey, ConversationListFilter>> = {
+  unread: { unreadOnly: true },
+  atMe: { atMe: true },
+  single: { type: CONVERSATION_TYPE.SINGLECHAT },
+  group: { type: CONVERSATION_TYPE.GROUPCHAT },
+}
+
+/** 远程过滤态：tab 非 all 且数据源支持过滤下推（store 列表已被数据源按 tab 过滤） */
+const remoteTabFilterActive = computed(() =>
+  conversationFilterSupported.value
+  && effectiveActiveTab.value !== 'all'
+  && !!REMOTE_TAB_FILTERS[effectiveActiveTab.value],
+)
+
 /** 切换分栏 tab */
 function selectTab(tab: ConversationTabKey) {
   if (tab === effectiveActiveTab.value)
     return
+  const wasRemote = remoteTabFilterActive.value
   internalActiveTab.value = tab
   emit('update:active-tab', tab)
+  // 远程过滤下推：切到过滤 tab 拉过滤首页（游标重置）；退回 all 拉回未过滤首页
+  const filter = REMOTE_TAB_FILTERS[tab]
+  if (conversationFilterSupported.value && tab !== 'all' && filter)
+    void refreshConversations(false, filter)
+  else if (wasRemote)
+    void refreshConversations(false)
 }
 
 /**
@@ -391,10 +419,13 @@ function selectTab(tab: ConversationTabKey) {
  * - unread：unreadCount > 0
  * - atMe：本地 atMeMap 命中（@我 消息进入会话后清除）
  * - single / group：按会话类型过滤
+ * 远程过滤态下 store 列表已被数据源按 tab 过滤，不再叠加内存过滤。
  */
 const tabFilteredList = computed(() => {
   const tab = effectiveActiveTab.value
   if (tab === 'all' || !tab)
+    return conversationList.value
+  if (remoteTabFilterActive.value)
     return conversationList.value
   if (tab === 'unread')
     return conversationList.value.filter(item => (item.unreadCount ?? 0) > 0)
@@ -483,19 +514,68 @@ const visibleUserIds = computed(() => {
  */
 presence.watch(visibleUserIds)
 
+/* ===== 触底续页止血 guard（决策 8.19，tab 过滤连锁实证修复） =====
+ * 机制：内存过滤态（搜索无注入 / tab 非 all 无远程过滤）下，过滤后列表很短 →
+ * scrollTop 钳位触发 scroll → 触底判定 → loadMore 灌一页 → 仍不满足过滤 → 再灌……
+ * 直到全量会话进内存（万级会话下骨架屏频闪 + 内存爬升）。
+ * guard：连续两页 loadMore 后过滤可见数零增长 → 暂停自动续页；用户真实滚动意图
+ * （wheel / touchmove 手势，不含程序性 scrollTop 钳位）或过滤条件变化时恢复。
+ */
+const autoPagingSuspended = ref(false)
+let zeroGrowthPages = 0
+
+/** 内存过滤态（guard 作用域）：搜索关键词非空且未走远程，或 tab 非 all 且未走远程过滤 */
+const localFilterActive = computed(() =>
+  (normalizedSearchKeyword.value !== '' && remoteSearchResults.value === null)
+  || (effectiveActiveTab.value !== 'all' && !remoteTabFilterActive.value),
+)
+
+/** 真实滚动意图恢复自动续页（手势事件，程序性 scrollTop 钳位不触发） */
+useEventListener(itemsRef, 'wheel', () => {
+  if (autoPagingSuspended.value) {
+    autoPagingSuspended.value = false
+    zeroGrowthPages = 0
+  }
+}, { passive: true })
+useEventListener(itemsRef, 'touchmove', () => {
+  if (autoPagingSuspended.value) {
+    autoPagingSuspended.value = false
+    zeroGrowthPages = 0
+  }
+}, { passive: true })
+
+/** 过滤条件变化时复位 guard（新条件重新允许自动续页） */
+watch([normalizedSearchKeyword, effectiveActiveTab], () => {
+  autoPagingSuspended.value = false
+  zeroGrowthPages = 0
+})
+
+/** 带止血守卫的续页：内存过滤态下统计过滤可见数增长，连续两页零增长即暂停 */
+async function loadMoreWithGuard() {
+  if (!hasMore.value || loadingMore.value)
+    return
+  if (!localFilterActive.value) {
+    await loadMoreConversations()
+    return
+  }
+  const visibleBefore = displayList.value.length
+  await loadMoreConversations()
+  // loadMore 后 displayList 同步重算（computed 即时）；零增长计数
+  zeroGrowthPages = displayList.value.length > visibleBefore ? 0 : zeroGrowthPages + 1
+  if (zeroGrowthPages >= 2)
+    autoPagingSuspended.value = true
+}
+
 useInfiniteScroll(
   itemsRef,
   () => {
-    // 搜索态禁用触底续页：远程搜索有自己的游标（v1 搜索态直接禁用翻页，
-    // 避免内存页与搜索页混排）；同时切断「过滤列表变短 → 钳位触发 scroll →
-    // loadMore 再灌一页 → 列表又变长」的逐键连锁反应
-    if (normalizedSearchKeyword.value)
+    // 搜索态（远程搜索激活）禁用触底续页：远程搜索有自己的游标（v1 搜索态直接
+    // 禁用翻页，避免内存页与搜索页混排）
+    if (normalizedSearchKeyword.value && remoteSearchResults.value !== null)
       return
-    if (hasMore.value && !loadingMore.value) {
-      loadMoreConversations()
-    }
+    void loadMoreWithGuard()
   },
-  { distance: 50 },
+  { distance: 50, canLoadMore: () => !autoPagingSuspended.value },
 )
 
 function handleSelect(id: string) {

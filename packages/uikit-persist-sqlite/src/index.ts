@@ -25,7 +25,7 @@ import { createManagementApi } from './manage/manage'
 import type { PersistenceManagementApi } from './manage/manage'
 import { createPersistenceRepository } from './repository/repository'
 import type { PersistenceRepository } from './repository/repository'
-import { ensureSchema } from './schema/schema'
+import { DEFAULT_INDEXED_EXT_KEYS, SCHEMA_SANITY_COLUMNS, ensureSchema } from './schema/schema'
 
 export interface CreatePersistenceOptions {
   /**
@@ -71,15 +71,42 @@ export interface UikitPersistence {
 export type UikitPersistenceHandle = UikitPersistence & PersistenceManagementApi
 
 /**
- * integrity_check 探测：'ok' 正常；'not-ok' 明确损坏；'error' 为探测本身失败
- * （文件头损坏时 better-sqlite3 打开即抛 / 首查抛 SQLITE_NOTADB，按损坏处理）。
+ * 核心表结构探针（列面定义在 schema.ts 的 SCHEMA_SANITY_COLUMNS）：
+ * integrity_check 只校验 b-tree 结构，比特翻转可能把 sqlite_master 里的 DDL
+ * 文本改成「仍合法但语义破损」（如列改名后完整性检查照样 ok），这里按包依赖
+ * 的完整列面兜底比对。全新空库（无 uikit_meta）直接视为正常——建表是
+ * ensureSchema 的职责。
+ */
+function probeSchemaSanity(db: SqliteDriver): boolean {
+  const hasMeta = db.prepare(
+    'SELECT 1 AS x FROM sqlite_master WHERE type = ? AND name = ?',
+  ).get('table', 'uikit_meta')
+  if (!hasMeta)
+    return true
+  for (const [table, columns] of Object.entries(SCHEMA_SANITY_COLUMNS)) {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all()
+    if (cols.length === 0)
+      return false
+    const names = new Set(cols.map(c => String(c.name)))
+    if (!columns.every(c => names.has(c)))
+      return false
+  }
+  return true
+}
+
+/**
+ * integrity_check + 核心表结构探测：'ok' 正常；'not-ok' 明确损坏（含完整性通过
+ * 但 DDL 语义破损，如比特翻转改了 sqlite_master 里的列定义）；'error' 为探测
+ * 本身失败（文件头损坏时 better-sqlite3 打开即抛 / 首查抛 SQLITE_NOTADB，按损坏处理）。
  * Integrity probe: 'ok' | 'not-ok' (explicit corruption) | 'error' (probe itself
  * failed — e.g. unreadable file header; treated as corruption in dbPath mode).
  */
 function probeIntegrity(db: SqliteDriver): 'ok' | 'not-ok' | 'error' {
   try {
     const row = db.prepare('PRAGMA integrity_check').get()
-    return row?.integrity_check === 'ok' ? 'ok' : 'not-ok'
+    if (row?.integrity_check !== 'ok')
+      return 'not-ok'
+    return probeSchemaSanity(db) ? 'ok' : 'not-ok'
   }
   catch {
     return 'error'
@@ -176,6 +203,8 @@ export async function createPersistence(options: CreatePersistenceOptions): Prom
     fts: new FtsIndexQueue(db, logger),
     logger,
     persistChatRoom: options.persistChatRoom ?? false,
+    accountUserId: options.account.userId,
+    indexedExtKeys: options.indexedExtKeys ?? [...DEFAULT_INDEXED_EXT_KEYS],
   }
 
   return {
@@ -199,7 +228,7 @@ export { wrapBetterSqlite3 } from './driver/driver'
 export type { BetterSqlite3DatabaseLike, SqliteDriver, SqliteStatement } from './driver/driver'
 
 // schema 常量（migration 测试 / 排障用）
-export { DEFAULT_INDEXED_EXT_KEYS, SCHEMA_VERSION } from './schema/schema'
+export { CONVERSATION_SORT_INDEX_NAME, DEFAULT_INDEXED_EXT_KEYS, SCHEMA_VERSION } from './schema/schema'
 
 // DTO 行映射类型（读回形状含本地库专属列）
 export type { LocalStoredMessage } from './records/records'
