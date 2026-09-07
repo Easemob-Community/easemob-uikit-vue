@@ -48,12 +48,13 @@ export function useConversation() {
 
   /** 重查全量总未读（单标量聚合，SQL 微秒级 / IPC 毫秒级，防抖合并高频事件） */
   async function refreshTotalUnread(): Promise<void> {
-    const query = domains.conversation.getTotalUnreadCount
-    if (!query) {
+    // 红线：domain 方法依赖 this，禁止解构后调用（决策 8.17 事故教训）
+    const domain = domains.conversation
+    if (!domain.getTotalUnreadCount) {
       remoteTotalUnread.value = null
       return
     }
-    remoteTotalUnread.value = await query()
+    remoteTotalUnread.value = await domain.getTotalUnreadCount()
   }
 
   // 事件后重查：会话列表的「未读签名」（未读和 + 会话数 + 免打扰数）变化即重查——
