@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useInfiniteScroll } from '@vueuse/core'
+import { useInfiniteScroll, watchDebounced } from '@vueuse/core'
 import { useConversation } from '../../composables/use-conversation'
 import { useArrowNavigation, useEscToClose, useKeyBindings, usePresence, usePullRefresh, useViewport } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
@@ -122,7 +122,7 @@ const emit = defineEmits<{
   (e: 'search', keyword: string): void
 }>()
 
-const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft } = useConversation()
+const { conversationList, currentConversation, hasMore, loadingMore, selectConversation, pinConversation, muteConversation, sendChannelAck, deleteConversation, loadMoreConversations, refreshConversations, loadDraft, clearDraft, searchConversations } = useConversation()
 const { stores, h5, features } = useUIKit()
 const { t } = useLocale()
 const { isMobile } = useViewport()
@@ -419,6 +419,43 @@ const filteredConversationList = computed(() => {
   })
 })
 
+/* ===== 远程搜索（注入数据源场景：本地库全量搜索替代内存过滤） ===== */
+/** 远程搜索结果渲染态（本地持有，不写 conversation store）；null = 非远程搜索态 */
+const remoteSearchResults = ref<Conversation[] | null>(null)
+const remoteSearchLoading = ref(false)
+
+watchDebounced(
+  normalizedSearchKeyword,
+  async (kw) => {
+    if (!kw) {
+      remoteSearchResults.value = null
+      return
+    }
+    remoteSearchLoading.value = true
+    try {
+      const page = await searchConversations(kw)
+      // 防抖窗口内关键词又变了 / 已清空：丢弃过期响应
+      if (kw !== normalizedSearchKeyword.value)
+        return
+      // 未注入数据源（page 为 null）维持内存过滤路径
+      remoteSearchResults.value = page ? page.list : null
+    }
+    catch (error) {
+      // 搜索失败回落内存过滤（服务端权威口径：本地库只是缓存）
+      if (kw === normalizedSearchKeyword.value)
+        remoteSearchResults.value = null
+      console.warn('[conversation-list] 远程会话搜索失败，回落内存过滤', error)
+    }
+    finally {
+      remoteSearchLoading.value = false
+    }
+  },
+  { debounce: 300, maxWait: 1000 },
+)
+
+/** 实际渲染列表：远程搜索态用搜索结果（本地库全量语义），否则走内存过滤 */
+const displayList = computed(() => remoteSearchResults.value ?? filteredConversationList.value)
+
 /** 空状态描述：搜索中优先显示无搜索结果，其次按当前 tab 区分文案 */
 const emptyDescription = computed(() => {
   if (normalizedSearchKeyword.value)
@@ -427,13 +464,17 @@ const emptyDescription = computed(() => {
 })
 
 /** 当前会话列表中可见的单聊对方用户 ID，用于 Presence 兜底拉取 */
-const visibleUserIds = computed(() =>
-  effectiveEnablePresence.value
-    ? filteredConversationList.value
-      .filter(item => item.type === CONVERSATION_TYPE.SINGLECHAT)
-      .map(item => item.id)
-    : [],
-)
+const visibleUserIds = computed(() => {
+  if (!effectiveEnablePresence.value)
+    return []
+  // 搜索态暂停 presence 增量订阅（搜索结果行不订阅在线状态，退出搜索恢复）：
+  // 逐键过滤会每键触发 subscribe/unsubscribe 抖动（10 万级会话下是回退卡顿主因之一）
+  if (normalizedSearchKeyword.value)
+    return []
+  return displayList.value
+    .filter(item => item.type === CONVERSATION_TYPE.SINGLECHAT)
+    .map(item => item.id)
+})
 
 /**
  * 按可见联系人自动订阅/取消订阅在线状态。
@@ -445,6 +486,11 @@ presence.watch(visibleUserIds)
 useInfiniteScroll(
   itemsRef,
   () => {
+    // 搜索态禁用触底续页：远程搜索有自己的游标（v1 搜索态直接禁用翻页，
+    // 避免内存页与搜索页混排）；同时切断「过滤列表变短 → 钳位触发 scroll →
+    // loadMore 再灌一页 → 列表又变长」的逐键连锁反应
+    if (normalizedSearchKeyword.value)
+      return
     if (hasMore.value && !loadingMore.value) {
       loadMoreConversations()
     }
@@ -453,7 +499,16 @@ useInfiniteScroll(
 )
 
 function handleSelect(id: string) {
-  const cvs = conversationList.value.find((c: Conversation) => c.id === id)
+  let cvs = conversationList.value.find((c: Conversation) => c.id === id)
+  // 远程搜索结果可能不在已加载的 store 列表里（本地库全量搜索语义）：
+  // 点击选中时先把该会话物化进 store，保证 enter / 回执 / 草稿链路可用
+  if (!cvs && remoteSearchResults.value) {
+    const remote = remoteSearchResults.value.find(c => c.id === id)
+    if (remote) {
+      stores.conversation.addConversation(remote)
+      cvs = remote
+    }
+  }
   const hadAtMe = !!stores.conversation.atMeMap[id]
 
   // 先向外抛点击事件，供 H5 等业务做页面栈导航（在 selection 逻辑之前）
@@ -500,7 +555,7 @@ function disableKeyboardNav() {
 useEscToClose(keyboardNavActive, disableKeyboardNav)
 
 const { activeIndex } = useArrowNavigation({
-  count: computed(() => filteredConversationList.value.length),
+  count: computed(() => displayList.value.length),
   wrap: true,
   active: keyboardNavActive,
   // 搜索框聚焦时方向键让位给输入光标
@@ -509,7 +564,7 @@ const { activeIndex } = useArrowNavigation({
     // 方向键真正移动后，键盘高亮才可见
     keyboardFocusVisible.value = true
     // 方向键只移动高亮，不切换会话；Enter 才确认
-    const item = filteredConversationList.value[index]
+    const item = displayList.value[index]
     if (item) {
       scrollConversationIntoView(item.id)
       // 移动后把焦点保留在列表容器，避免后续方向键被输入态豁免拦截
@@ -521,7 +576,7 @@ const { activeIndex } = useArrowNavigation({
 /** Enter 选中当前键盘高亮的会话 */
 useKeyBindings({
   Enter: () => {
-    const item = filteredConversationList.value[activeIndex.value]
+    const item = displayList.value[activeIndex.value]
     if (item)
       handleSelect(item.id)
   },
@@ -534,7 +589,7 @@ useKeyBindings({
 watch(currentConversation, (cvs) => {
   if (!cvs)
     return
-  const idx = filteredConversationList.value.findIndex(c => c.id === cvs.id)
+  const idx = displayList.value.findIndex(c => c.id === cvs.id)
   if (idx >= 0)
     activeIndex.value = idx
 }, { immediate: true })
@@ -675,7 +730,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       </div>
       <!-- #item：完全接管会话项渲染（对齐 contact/group 列表的 #item 惯例），
            scope 提供会话数据、选中/高亮态与内置动作句柄；不传时默认渲染 ConversationItem -->
-      <template v-for="(item, index) in filteredConversationList" :key="item.id">
+      <template v-for="(item, index) in displayList" :key="item.id">
         <slot
           name="item"
           :conversation="item"
@@ -720,7 +775,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         </slot>
       </template>
       <!-- 会话列表同步中（WebSocket 首次同步）：骨架屏替代转圈 -->
-      <div v-if="isSyncing && !filteredConversationList.length" class="conversation-list__skeleton">
+      <div v-if="isSyncing && !displayList.length" class="conversation-list__skeleton">
         <div v-for="i in 6" :key="i" class="conversation-list__skeleton-item">
           <Skeleton variant="avatar" shape="rounded" />
           <div class="conversation-list__skeleton-lines">
@@ -733,7 +788,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
         {{ t('conversation.loadingMore') }}
       </div>
       <div
-        v-if="!filteredConversationList.length && !loadingMore && !isSyncing"
+        v-if="!displayList.length && !loadingMore && !isSyncing && !remoteSearchLoading"
         class="conversation-list__empty-wrap"
       >
         <Empty

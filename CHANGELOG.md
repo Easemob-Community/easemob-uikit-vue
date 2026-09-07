@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-sdk-contract 1.3.1 (2026-09-07)
+
+### 新增
+
+- **`SdkConversationDomain` 可选 `searchConversations(params)`**：会话搜索域委托（仅注入数据源时可用，未注入返回 null 供 UI 回落内存过滤；结果不写入会话 store）。可选新增，现有 adapter 零改动兼容（webim4 暂未实现该委托）。
+
 ## @easemob/uikit-sdk-contract 1.3.0 (2026-09-04)
 
 ### 新增

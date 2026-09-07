@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import type { UiConversation } from '@easemob/uikit-core'
+import type { ConversationPage } from '@easemob/uikit-sdk-contract'
 import { useUIKit } from './use-uikit'
 import { type UIKitStorageType, createUIKitStorageKey, getStorageBackend } from '@easemob/uikit-core'
 
@@ -148,6 +149,21 @@ export function useConversation() {
     }
   }
 
+  /**
+   * 会话搜索：有注入数据源（本地库 / 业务源）时委托 domain 搜索
+   * （结果不写入 conversation store，调用方本地持有渲染态）；
+   * 未注入返回 null，调用方回落内存过滤。
+   * Conversation search: delegates to the domain when a data source is injected
+   * (results are NOT written to the store); returns null otherwise so callers
+   * fall back to in-memory filtering.
+   */
+  async function searchConversations(keyword: string, cursor?: string, pageSize = 50): Promise<ConversationPage | null> {
+    const search = domains.conversation.searchConversations
+    if (!search)
+      return null
+    return search({ keyword, cursor, pageSize })
+  }
+
   /** 置顶/取消置顶 */
   async function pinConversation(id: string, isPinned: boolean) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
@@ -234,6 +250,7 @@ export function useConversation() {
     syncLocalConversations,
     refreshConversations,
     loadMoreConversations,
+    searchConversations,
     pinConversation,
     muteConversation,
     markConversationRead,

@@ -284,6 +284,27 @@ describe('conversationDomain 数据入口注入（repositories）', () => {
     // 游标已随 dispose 清空，loadMore 短路不再请求
     expect(fetchConversations).toHaveBeenCalledTimes(1)
   })
+
+  it('注入 searchConversations 时 domain 委托且不写 store；未注入返回 null', async () => {
+    const client = makeConversationClient()
+    const store = makeConversationStore()
+    const hit = makeConversation('cvs-hit', { name: '李四 06' })
+    const searchConversations = vi.fn().mockResolvedValue({ list: [hit], cursor: undefined, hasMore: false })
+    const domain = new ConversationDomain(client, store, {
+      conversationRepository: { searchConversations },
+    })
+
+    const page = await domain.searchConversations({ keyword: '李四06' })
+
+    expect(searchConversations).toHaveBeenCalledWith({ keyword: '李四06' })
+    expect(page?.list.map(c => c.id)).toEqual(['cvs-hit'])
+    // 搜索结果不写入会话 store（渲染态由调用方本地持有）
+    expect(store.setList).not.toHaveBeenCalled()
+
+    // 未注入：返回 null，UI 回落内存过滤
+    const plain = new ConversationDomain(client, store)
+    await expect(plain.searchConversations({ keyword: '李四06' })).resolves.toBeNull()
+  })
 })
 
 // ===== 四域（contact / group / presence / userInfo）注入 =====

@@ -1,5 +1,5 @@
 import type { ConversationTypeValue } from './constants'
-import type { ContactPage, GroupMemberPage, GroupPage } from './repository'
+import type { ContactPage, ConversationPage, ConversationSearchParams, GroupMemberPage, GroupPage } from './repository'
 import type {
   CreateGroupParams,
   SdkMessage,
@@ -67,6 +67,13 @@ export interface SdkConversationDomain {
   refresh: (includeEmpty?: boolean) => Promise<void>
   /** 加载更多会话（无分页能力的 SDK 退化为本地全量） */
   loadMore: (pageSize?: number) => Promise<void>
+  /**
+   * 会话搜索（可选）：仅注入数据源（本地库 / 业务源）时可用；
+   * 未注入返回 null，调用方回落内存过滤。结果不写入会话 store（调用方本地持有）。
+   * Conversation search (optional): only with an injected data source; returns
+   * null when not injected so callers fall back to in-memory filtering.
+   */
+  searchConversations?: (params: ConversationSearchParams) => Promise<ConversationPage | null>
   pin: (conversationId: string, conversationType: ConversationTypeValue, pinned: boolean) => Promise<void>
   setMuted: (conversationId: string, conversationType: ConversationTypeValue, muted: boolean) => Promise<void>
   /** 清空会话未读数 */

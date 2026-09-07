@@ -1,4 +1,4 @@
-import type { ConversationPage, ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
+import type { ConversationPage, ConversationPersistenceHooks, ConversationRepository, ConversationSearchParams, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
@@ -352,5 +352,20 @@ export class ConversationDomain {
   dispose() {
     this.injectedCursor = undefined
     this.injectedHasMore = false
+  }
+
+  /**
+   * 会话搜索（仅注入数据源时可用）：委托 conversationRepository.searchConversations，
+   * 结果原样返回、不写入会话 store（搜索渲染态由调用方本地持有）。
+   * 未注入返回 null，UI 回落内存过滤。
+   * Conversation search (injected data source only): delegates to the repository
+   * override; results are NOT written to the conversation store. Returns null
+   * when not injected so the UI falls back to in-memory filtering.
+   */
+  async searchConversations(params: ConversationSearchParams): Promise<ConversationPage | null> {
+    const search = this.hooks.conversationRepository?.searchConversations
+    if (!search)
+      return null
+    return search(params)
   }
 }
