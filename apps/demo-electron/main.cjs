@@ -123,7 +123,7 @@ const REPOSITORY_READ_CHANNELS = new Set([
   'repository.fetchConversations',
   'repository.searchMessages',
   'repository.searchConversations',
-  'repository.getTotalUnreadCount',
+  // getTotalUnreadCount 不在此列：标量高频调用，计时包装会破坏裸 number 返回契约
 ])
 
 /**
