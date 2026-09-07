@@ -63,13 +63,20 @@ export interface MessageRowParams {
   localPath: string | null
 }
 
-function safeJsonParse(text: unknown): unknown {
+/** 解析失败观测口（可选）：坏 JSON 行不该静默吞掉——warn 一次便于排障 */
+export interface JsonParseLogger {
+  warn: (...args: unknown[]) => void
+}
+
+function safeJsonParse(text: unknown, logger?: JsonParseLogger, column?: string): unknown {
   if (typeof text !== 'string' || text === '')
     return undefined
   try {
     return JSON.parse(text)
   }
-  catch {
+  catch (error) {
+    // 坏行进 warn 观测（服务端权威兜底：该字段按缺失处理，不阻断读路径）
+    logger?.warn(`[uikit-persist-sqlite] 消息行 JSON 解析失败（${column ?? 'unknown'} 列，按缺失处理）`, error)
     return undefined
   }
 }
@@ -115,9 +122,9 @@ export function recordToRow(record: MessageRecord, opts: { isLocal?: boolean, lo
   }
 }
 
-/** 行 → DTO（墓碑字段 / extra 杂项 / 本地库专属列合并回顶层） */
-export function rowToRecord(row: Record<string, unknown>): LocalStoredMessage {
-  const extra = (safeJsonParse(row.extra) ?? {}) as Record<string, unknown>
+/** 行 → DTO（墓碑字段 / extra 杂项 / 本地库专属列合并回顶层；logger 传入时坏 JSON 行 warn 观测） */
+export function rowToRecord(row: Record<string, unknown>, logger?: JsonParseLogger): LocalStoredMessage {
+  const extra = (safeJsonParse(row.extra, logger, 'extra') ?? {}) as Record<string, unknown>
   const record: Record<string, unknown> = {
     ...extra,
     msgServerId: (row.msgServerId as string | null) ?? '',
@@ -129,9 +136,9 @@ export function rowToRecord(row: Record<string, unknown>): LocalStoredMessage {
     type: row.type,
     sendStatus: row.sendStatus,
     timestamp: row.timestamp,
-    body: safeJsonParse(row.body) ?? {},
-    ext: safeJsonParse(row.ext) ?? {},
-    sender: (safeJsonParse(row.sender) ?? { userId: row.fromUid }) as Sender,
+    body: safeJsonParse(row.body, logger, 'body') ?? {},
+    ext: safeJsonParse(row.ext, logger, 'ext') ?? {},
+    sender: (safeJsonParse(row.sender, logger, 'sender') ?? { userId: row.fromUid }) as Sender,
   }
   if (row.isPeerRead !== null && row.isPeerRead !== undefined)
     record.isPeerRead = Boolean(row.isPeerRead)
@@ -143,7 +150,10 @@ export function rowToRecord(row: Record<string, unknown>): LocalStoredMessage {
     record.deleted = true
   if (row.tombstoneTime !== null && row.tombstoneTime !== undefined)
     record.tombstoneTime = row.tombstoneTime
-  const modifiedInfo = safeJsonParse(row.modifiedInfo)
+  // 撤回操作者读回（扩展字段；UIKit v1 不消费，仅排障 / 审计观测用）
+  if (row.recallOperator !== null && row.recallOperator !== undefined)
+    record.recallOperator = row.recallOperator
+  const modifiedInfo = safeJsonParse(row.modifiedInfo, logger, 'modifiedInfo')
   if (modifiedInfo !== undefined)
     record.modifiedInfo = modifiedInfo
   if (row.localPath)

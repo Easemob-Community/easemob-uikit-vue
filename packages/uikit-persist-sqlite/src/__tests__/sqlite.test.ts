@@ -332,4 +332,183 @@ describe('l2 SQLite 实现特有项', () => {
       await expect(handle.vacuum()).resolves.toBeUndefined()
     })
   })
+
+  describe('决策 8.13 补强（2026-09-07 四域 review 修复）', () => {
+    it('升格撞 UNIQUE：漫游先行 + ACK 后到乱序，以 serverId 行为准合并并物理删 pending 行', async () => {
+      handle = await makeMemoryHandle()
+      // 1. 本地发送 pending（msgServerId 空，loc-p 定位）
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: '', msgLocalId: 'loc-p', body: { content: '乱序升格样本' } }),
+      )
+      // 2. 漫游先行到达（同一逻辑消息，serverId srv-A，但 localId 不同源）
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: 'srv-a', msgLocalId: 'loc-roam', body: { content: '乱序升格样本' } }),
+      )
+      // 此刻两行分居（pedding 行 + 漫游行）
+      let page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list).toHaveLength(2)
+
+      // 3. ACK 后到：sendStatus 回流（serverId=srv-a + localId=loc-p）触发升格冲突
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: 'srv-a', msgLocalId: 'loc-p', sendStatus: MESSAGE_STATUS.DELIVERED, body: { content: '乱序升格样本' } }),
+      )
+
+      // 合并为一行：serverId 行为准，pending 行物理删
+      page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list).toHaveLength(1)
+      expect(page.list[0].msgServerId).toBe('srv-a')
+      expect(page.list[0].sendStatus).toBe(MESSAGE_STATUS.DELIVERED)
+      // FTS 无幽灵：pending 行已物理删且撤索引，搜索只命中一次
+      handle.flushFts()
+      const found = await handle.repository.searchMessages({ keyword: '乱序升格' })
+      expect(found.list).toHaveLength(1)
+    })
+
+    it('sendStatus 单调：read 后迟到的 delivered 不回退，isPeerRead 保持一致', async () => {
+      handle = await makeMemoryHandle()
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-mono' }))
+      await handle.hooks.message?.updateMessageStatus?.('srv-mono', MESSAGE_STATUS.READ)
+      await handle.hooks.message?.updateMessageStatus?.('srv-mono', MESSAGE_STATUS.DELIVERED)
+      let page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list[0].sendStatus).toBe(MESSAGE_STATUS.READ)
+      expect(page.list[0].isPeerRead).toBe(true)
+      expect(page.list[0].isPeerDelivered).toBe(true)
+
+      // upsert 的 UPDATE 分支同守：回流旧状态（sent）不回退已 read 的行
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: 'srv-mono', sendStatus: MESSAGE_STATUS.SENT }),
+      )
+      page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list[0].sendStatus).toBe(MESSAGE_STATUS.READ)
+    })
+
+    it('批量回滚后 FTS 队列无幽灵操作（搜索不命中未入库内容）', async () => {
+      const logger = { warn: vi.fn() }
+      handle = await createPersistence({ dbPath: ':memory:', account: ACCOUNT, logger })
+      // 构造必然整批回滚的批量：第二条 conversationType 为 null 触发 NOT NULL 约束
+      const bad = { ...makeRecord({ msgServerId: 'srv-ghost-bad' }), conversationType: null } as never
+      await handle.hooks.message?.saveMessages?.([
+        makeRecord({ msgServerId: 'srv-ghost-good', body: { content: '幽灵索引观测样本' } }),
+        bad,
+      ])
+      expect(logger.warn).toHaveBeenCalled()
+      handle.flushFts()
+
+      // 整批回滚：主表无行，FTS 也无残留（修复前队列里的幽灵 op 会索引未提交的 rowid）
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list).toHaveLength(0)
+      const found = await handle.repository.searchMessages({ keyword: '幽灵索引' })
+      expect(found.list).toHaveLength(0)
+    })
+
+    it('clearMessages 带 type 过滤不写水位线：同类型回流消息可读回', async () => {
+      handle = await makeMemoryHandle()
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: 'srv-ty1', timestamp: 100, type: MESSAGE_TYPE.IMAGE, body: { localUrl: '', filename: '照片.png' } }),
+      )
+      // 按类型清除（不写水位线）
+      const removed = await handle.clearMessages({ conversationId: 'c1', type: MESSAGE_TYPE.IMAGE })
+      expect(removed).toBe(1)
+
+      // 漫游回流更早的同类消息：无水位线拦截，正常入库可读
+      await handle.hooks.message?.saveMessage?.(
+        makeRecord({ msgServerId: 'srv-ty0', timestamp: 50, type: MESSAGE_TYPE.IMAGE, body: { localUrl: '', filename: '旧照片.png' } }),
+      )
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list.map(m => m.msgServerId)).toEqual(['srv-ty0'])
+    })
+
+    it('clearMessages 的 before 命中 0 行仍写水位线', async () => {
+      handle = await makeMemoryHandle()
+      // 空会话上按 before 清除：0 命中，但水位线应落
+      const removed = await handle.clearMessages({ conversationId: 'c1', before: 1000 })
+      expect(removed).toBe(0)
+      // 水位线以下回流被写侧拦截
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-early', timestamp: 500 }))
+      // 水位线以上正常
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-late', timestamp: 1500 }))
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list.map(m => m.msgServerId)).toEqual(['srv-late'])
+    })
+
+    it('全局搜索按会话水位线过滤（FTS 与 LIKE 两分支）', async () => {
+      const driver = wrapBetterSqlite3(new Database(':memory:'))
+      handle = await createPersistence({ db: driver, account: ACCOUNT, logger: silentLogger })
+      await handle.hooks.message?.saveMessages?.([
+        makeRecord({ msgServerId: 'srv-g1', conversationId: 'c1', timestamp: 100, body: { content: '全局水位观测甲' } }),
+        makeRecord({ msgServerId: 'srv-g2', conversationId: 'c2', timestamp: 200, body: { content: '全局水位观测乙' } }),
+      ])
+      handle.flushFts()
+      // 直接写水位线（不删行）：c1 的老消息行仍在库中，读侧过滤必须生效
+      driver.prepare(
+        'INSERT INTO uikit_sync_state (conversationId, clearedBefore) VALUES (?, ?)',
+      ).run('c1', 150)
+      const ftsHits = await handle.repository.searchMessages({ keyword: '全局水位观测' })
+      expect(ftsHits.list.map(m => m.msgServerId)).toEqual(['srv-g2'])
+      // LIKE 回落分支（二字词）同样过滤
+      const likeHits = await handle.repository.searchMessages({ keyword: '观测' })
+      expect(likeHits.list.map(m => m.msgServerId)).toEqual(['srv-g2'])
+      // 会话作用域搜索同样过滤
+      const scopedHits = await handle.repository.searchMessages({ keyword: '全局水位观测', conversationId: 'c1' })
+      expect(scopedHits.list).toHaveLength(0)
+    })
+
+    it('account 不一致 warn 不阻断', async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'uikit-persist-'))
+      const dbPath = join(dir, 'test.db')
+      try {
+        handle = await createPersistence({ dbPath, account: ACCOUNT, logger: silentLogger })
+        await handle.close()
+        handle = undefined
+
+        const logger = { warn: vi.fn() }
+        handle = await createPersistence({
+          dbPath,
+          account: { appKey: 'app-key', userId: 'another-user' },
+          logger,
+        })
+        expect(logger.warn).toHaveBeenCalled()
+        // 不阻断：库仍可用
+        await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-acc' }))
+        const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+        expect(page.list).toHaveLength(1)
+      }
+      finally {
+        rmSync(dir, { recursive: true, force: true })
+      }
+    })
+
+    it('注入驱动模式 close 不关闭宿主 Database', async () => {
+      const driver = wrapBetterSqlite3(new Database(':memory:'))
+      handle = await createPersistence({ db: driver, account: ACCOUNT, logger: silentLogger })
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-host' }))
+      handle.close()
+      handle = undefined
+      // 宿主实例仍可用（未被 close）
+      const row = driver.prepare('SELECT msgServerId FROM uikit_messages WHERE msgServerId = ?').get('srv-host')
+      expect(row?.msgServerId).toBe('srv-host')
+    })
+
+    it('recallOperator 读回（扩展字段，UIKit v1 不消费）', async () => {
+      handle = await makeMemoryHandle()
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-op' }))
+      await handle.hooks.message?.markMessageRecalled?.('srv-op', 'admin-9')
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect((page.list[0] as { recallOperator?: string }).recallOperator).toBe('admin-9')
+    })
+
+    it('坏 JSON 行进 warn 观测且读路径不阻断', async () => {
+      const logger = { warn: vi.fn() }
+      const driver = wrapBetterSqlite3(new Database(':memory:'))
+      handle = await createPersistence({ db: driver, account: ACCOUNT, logger })
+      await handle.hooks.message?.saveMessage?.(makeRecord({ msgServerId: 'srv-bad-json' }))
+      // 人为写坏 body 列
+      driver.prepare('UPDATE uikit_messages SET body = ? WHERE msgServerId = ?').run('{not-json', 'srv-bad-json')
+
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      // 行仍返回（body 按缺失回落 {}），且 warn 已观测
+      expect(page.list).toHaveLength(1)
+      expect(logger.warn).toHaveBeenCalled()
+    })
+  })
 })

@@ -186,7 +186,10 @@ export async function createPersistence(options: CreatePersistenceOptions): Prom
     close: () => {
       // 关闭前落盘 FTS 队列尾部，避免尾部消息索引丢失
       ctx.fts.flush()
-      db.close()
+      // 注入驱动模式不关宿主的 Database（实例归宿主所有，可能还被其它模块复用）；
+      // 仅 dbPath 模式（包内自开）由包负责关闭
+      if (ownDriver)
+        db.close()
     },
   }
 }

@@ -13,8 +13,8 @@
 import type { ConversationTypeValue, MessageRecord, MessageTypeValue } from '@easemob/uikit-sdk-contract'
 import { MESSAGE_STATUS } from '@easemob/uikit-sdk-contract'
 import type { PersistenceContext } from '../context'
-import { extractFtsContent } from '../fts/fts'
-import { recordToRow, rowToFtsSource } from '../records/records'
+import { extractFtsContent, ftsOldContentOf } from '../fts/fts'
+import { recordToRow } from '../records/records'
 
 /** 本地插入消息入参（其余字段由实现方生成 / 固定） */
 export interface LocalMessageInput {
@@ -61,6 +61,12 @@ export interface StorageStats {
 /** clearMessages 过滤器 */
 export interface ClearMessagesFilter {
   before?: number
+  /**
+   * 按类型清除。**注意：带 type 的清除不写 clearedBefore 水位线**——
+   * 漫游 / 同步路径不保证该类型消息不回流（水位线是时间语义，无法表达类型维度）。
+   * Clear-by-type does NOT write the clearedBefore waterline: roaming may bring
+   * these messages back (the waterline is time-based and cannot express types).
+   */
   type?: string
   conversationId?: string
 }
@@ -144,40 +150,61 @@ export function createManagementApi(ctx: PersistenceContext): PersistenceManagem
         params.push(filter.before)
       }
       const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : ''
+
+      /** 写 clearedBefore 水位线（会话级 upsert / 全局 meta 取大，决策 6：含显式全量漫游也不再回来） */
+      const writeWaterline = (value: number): void => {
+        if (filter.conversationId !== undefined) {
+          db.prepare(
+            `INSERT INTO uikit_sync_state (conversationId, clearedBefore) VALUES (?, ?)
+            ON CONFLICT(conversationId) DO UPDATE SET clearedBefore = MAX(COALESCE(clearedBefore, 0), excluded.clearedBefore)`,
+          ).run(filter.conversationId, value)
+        }
+        else {
+          const prev = Number(getMeta('global_cleared_before') ?? 0)
+          setMeta('global_cleared_before', String(Math.max(prev, value)))
+        }
+      }
+
       try {
-        const rows = db.prepare(
-          `SELECT rowid, type, body, recalled, deleted, conversationId, timestamp FROM uikit_messages ${where}`,
-        ).all(...params)
-        if (rows.length === 0)
-          return 0
-        const maxTs = Math.max(...rows.map(r => Number(r.timestamp)))
-        db.transaction(() => {
-          for (const row of rows) {
-            // 撤 FTS 行（external content 表须自带旧内容）
-            const source = rowToFtsSource(row)
-            const oldContent = source && !Number(row.recalled) && !Number(row.deleted)
-              ? extractFtsContent(source)
-              : null
-            if (oldContent !== null)
-              fts.enqueue(Number(row.rowid), oldContent, null)
-          }
-          db.prepare(`DELETE FROM uikit_messages ${where}`).run(...params)
-          // 写 clearedBefore 水位线（决策 6：含显式全量漫游也不再回来）
-          const waterline = filter.before ?? maxTs
-          if (filter.conversationId !== undefined) {
-            db.prepare(
-              `INSERT INTO uikit_sync_state (conversationId, clearedBefore) VALUES (?, ?)
-              ON CONFLICT(conversationId) DO UPDATE SET clearedBefore = MAX(COALESCE(clearedBefore, 0), excluded.clearedBefore)`,
-            ).run(filter.conversationId, waterline)
-          }
-          else {
-            const prev = Number(getMeta('global_cleared_before') ?? 0)
-            setMeta('global_cleared_before', String(Math.max(prev, waterline)))
-          }
-        })
-        // 管理操作同步落 FTS（不走异步队列时序，保证返回后搜索立即一致）
-        fts.flush()
-        return rows.length
+        // 聚合取数（COUNT + MAX）：避免大结果集 spread 取 maxTs（10 万行 RangeError 风险）
+        const agg = db.prepare(
+          `SELECT COUNT(*) AS c, MAX(timestamp) AS maxTs FROM uikit_messages ${where}`,
+        ).get(...params)
+        const hitCount = Number(agg?.c ?? 0)
+        const maxTs = agg?.maxTs !== null && agg?.maxTs !== undefined ? Number(agg.maxTs) : null
+        // 水位线与清除解耦（决策 8.13）：
+        // - type 过滤不写水位线（按类型清除不保证漫游不回流，语义注释在 API 声明）；
+        // - before 给定即写（与命中行数无关）；否则有命中时按命中最大时间写。
+        const shouldWriteWaterline = filter.type === undefined && (filter.before !== undefined || hitCount > 0)
+        const waterline = filter.before ?? maxTs
+
+        if (hitCount > 0) {
+          // 事务内只收集撤索引 ops，提交成功后统一入队（回滚不留幽灵索引）
+          const ops: Array<{ rowid: number, oldContent: string }> = []
+          db.transaction(() => {
+            const rows = db.prepare(
+              `SELECT rowid, type, body, recalled, deleted FROM uikit_messages ${where}`,
+            ).all(...params)
+            for (const row of rows) {
+              const oldContent = ftsOldContentOf(row)
+              if (oldContent !== null)
+                ops.push({ rowid: Number(row.rowid), oldContent })
+            }
+            db.prepare(`DELETE FROM uikit_messages ${where}`).run(...params)
+            if (shouldWriteWaterline && waterline !== null)
+              writeWaterline(waterline)
+          })
+          for (const op of ops)
+            fts.enqueue(op.rowid, op.oldContent, null)
+          // 管理操作同步落 FTS（不走异步队列时序，保证返回后搜索立即一致）
+          fts.flush()
+          return hitCount
+        }
+
+        // 命中 0 行但 before 给定：仍写水位线（水位线与命中行数无关）
+        if (shouldWriteWaterline && waterline !== null)
+          writeWaterline(waterline)
+        return 0
       }
       catch (error) {
         logger.warn('[uikit-persist-sqlite] clearMessages 失败', error)

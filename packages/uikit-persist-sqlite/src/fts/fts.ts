@@ -20,6 +20,15 @@
 
 import type { SqliteDriver } from '../driver/driver'
 import type { FtsSourceShape } from '../records/records'
+import { rowToFtsSource } from '../records/records'
+
+/** 既有消息行的 FTS 旧内容（墓碑 / 已删除行视为无索引内容；撤索引 op 用） */
+export function ftsOldContentOf(row: Record<string, unknown>): string | null {
+  const source = rowToFtsSource(row)
+  return source && !Number(row.recalled) && !Number(row.deleted)
+    ? extractFtsContent(source)
+    : null
+}
 
 interface CombineBodyLike {
   messageList?: ReadonlyArray<{ type?: string, body?: unknown }>

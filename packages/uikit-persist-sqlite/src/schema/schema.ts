@@ -169,16 +169,17 @@ function normalizeBusyTimeout(value: number | undefined): number {
  */
 export function ensureSchema(db: SqliteDriver, opts: EnsureSchemaOptions = {}): void {
   const logger = opts.logger ?? console
-  db.exec('PRAGMA journal_mode=WAL;')
-  db.exec('PRAGMA auto_vacuum=INCREMENTAL;')
-  // synchronous=NORMAL 是 WAL 模式标准搭配（性能/安全平衡点）；busy_timeout 兜底锁等待。
-  // 两者为优化项：自定义驱动不支持 PRAGMA 时只 warn 不阻断（决策 3.2）。
+  // 四条 PRAGMA 全部收进 try/warn（决策 3.2）：journal_mode=WAL（多窗口读）、
+  // auto_vacuum=INCREMENTAL、synchronous=NORMAL（WAL 标准搭配）、busy_timeout（锁等待兜底）。
+  // 自定义驱动不支持 PRAGMA 语句时只 warn 不阻断（WAL 退化为默认 journal 仍可用）。
   try {
+    db.exec('PRAGMA journal_mode=WAL;')
+    db.exec('PRAGMA auto_vacuum=INCREMENTAL;')
     db.exec('PRAGMA synchronous=NORMAL;')
     db.exec(`PRAGMA busy_timeout=${normalizeBusyTimeout(opts.busyTimeoutMs)};`)
   }
   catch (error) {
-    logger.warn('[uikit-persist-sqlite] synchronous / busy_timeout PRAGMA 设置失败（驱动不支持？）', error)
+    logger.warn('[uikit-persist-sqlite] PRAGMA 设置失败（驱动不支持？按默认参数继续）', error)
   }
   // meta 表先于版本读取创建（幂等）
   db.exec('CREATE TABLE IF NOT EXISTS uikit_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);')
@@ -195,10 +196,20 @@ export function ensureSchema(db: SqliteDriver, opts: EnsureSchemaOptions = {}): 
     })
   }
 
-  // 账号与创建时间：仅首次写入，复用实例切账号时用于比对（不串数据由调用方按文件隔离保证）
-  if (opts.account && getMetaValue(db, 'account') === undefined) {
-    setMetaValue(db, 'account', `${opts.account.appKey}:${opts.account.userId}`)
-    setMetaValue(db, 'created_at', String(Date.now()))
+  // 账号：仅首次写入；复用库文件时比对——不一致 warn 不阻断（不串数据由调用方
+  // 按文件隔离保证，warn 用于发现「库文件被另一个账号复用」的装配错误）
+  if (opts.account) {
+    const expected = `${opts.account.appKey}:${opts.account.userId}`
+    const existing = getMetaValue(db, 'account')
+    if (existing === undefined) {
+      setMetaValue(db, 'account', expected)
+      setMetaValue(db, 'created_at', String(Date.now()))
+    }
+    else if (existing !== expected) {
+      logger.warn(
+        `[uikit-persist-sqlite] 库文件账号不一致（库内 ${existing}，传入 ${expected}）——请确认库文件按 appKey+userId 隔离`,
+      )
+    }
   }
 
   // adapter 更换检测：sync_state 游标清零重校准（消息/会话数据不动，服务端权威兜底）

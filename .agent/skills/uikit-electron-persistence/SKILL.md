@@ -53,7 +53,7 @@
 - 启动：`pnpm -F @easemob/demo-electron dev`（一条命令，自动用专属端口 **5273** 拉起本仓 demo 再起壳）；带 DevTools 用 `dev:console`。**不要**手动另起 `pnpm -F @easemob/demo dev` 配 5173——本机其他项目常占 5173，vite 顺延会错载别的应用（已踩过，demo 已开 strictPort 防顺延）。
 - 原生模块：better-sqlite3 必须按 Electron ABI 重编——`pnpm -F @easemob/demo-electron rebuild`（装依赖后或版本变化后一次）；报错 `compiled against a different Node.js version` 即此问题。
 - 持久化开关：demo 设置抽屉 → 开发者 →「本地持久化（Electron）」（localStorage 记忆，切换自动刷新；仅壳内可见，Web 模式零影响）。
-- 测试面板（右下角 DB 浮球）：库统计 / 灌消息（至 10 万档，中文样本）/ 灌会话（至 1 万档）/ 数据风暴（持续 + 爆发双模式，store + 库双写复刻 onMessage 链路）/ 清空全部 / 删库重开 / 断开 SDK（真断网）/ 备份；「本地读取活动」区块 + console 的 `[persist]` 日志是判断「数据来自本地库还是 SDK 网络」的精确依据（所有本地读取必经 IPC 代理埋点）。
+- 测试面板（右下角 DB 浮球）：库统计 / 灌消息（至 10 万档，中文样本）/ 灌会话（至 1 万档）/ 数据风暴（持续 + 爆发双模式，store + 库双写复刻 onMessage 链路）/ 清空全部 / 删库重开 / 断开 SDK（真断网）；「本地读取活动」区块 + console 的 `[persist]` 日志是判断「数据来自本地库还是 SDK 网络」的精确依据（所有本地读取必经 IPC 代理埋点）。
 - 库文件位置：`~/Library/Application Support/@easemob/demo-electron/uikit_<appKey>_<userId>.db`（并行冒烟可用 `DEMO_USER_DATA_DIR` 隔离 userData）；查看用 TablePlus / DB Browser / `sqlite3` CLI，运行中的库是 WAL 模式，数据可能略滞后于 `-wal`。
 - 杀进程要杀干净：shell wrapper 被杀不会带走 electron 子进程（`pkill -f "electron/dist/Electron.app"`），残留进程会触发单实例锁让新实例直接退出。
 
@@ -85,6 +85,8 @@
 - TECH-DEBT D122 Phase 3.5 剩余项：附件被动缓存的 `updateMessageLocalPath` 回填 + LRU 淘汰（`localPath` 列已通）；L3 历史库 fixture migration 测试；webim4 会话分页同构同步；Phase 3.6 验收矩阵真实账号逐项打勾；persist 包发布决策（去 private）。
 - v2 项：会话列表虚拟滚动（万级会话 DOM 累积掉帧）、消息滑动窗口内存管理、墓碑 TTL（180 天物理清理）、展示态入库（翻译/语音转文字）。
 - trigram 对 emoji/混合符号的召回率未实测，验收时留意。
+- **better-sqlite3 ABI 互踩**（2026-09-07 实证）：`demo-electron` 的 rebuild 会把 monorepo 共享存储里的 better-sqlite3 重编为 Electron ABI，之后 Node 侧 vitest 全部 `ERR_DLOPEN_FAILED`（需 `prebuild-install` 恢复 Node ABI）；反之亦然。跑 demo-electron 前先 `pnpm -F @easemob/demo-electron run rebuild`，跑 Node 侧测试前若报错则恢复 Node ABI——两者互斥，以当前要跑的一侧为准。
+- review 待办（2026-09-07 登记，规格书决策 8.14）：conversation-domain 注入路径 refresh/loadMore 并发互斥、refresh 与旁路写库的最终一致瞬时差；websdk5 adapter.ts 既有 `'kicked' is assigned but never used` 死状态（HEAD 存量，非本专项引入）；trim 后 atMe/pinned 关联 map 残留（uikit-im 既有行为）。
 
 ## 反面清单
 

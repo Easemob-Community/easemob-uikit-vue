@@ -257,6 +257,51 @@ export function runPersistenceContractSuite(name: string, factory: PersistenceCo
       expect(ids).toEqual(['srv-tc', 'srv-tb', 'srv-ta'])
     })
 
+    it('loadMessages 同毫秒多条 pending（msgServerId 为 NULL）由第三决胜键稳定分页', async () => {
+      // pending 期 msgServerId 为 NULL，同毫秒多条时两键 keyset 无决胜会丢页/重复；
+      // 三键 (timestamp, msgServerId, rowid) 下应无重复无遗漏
+      await handle.hooks.message?.saveMessages?.(
+        Array.from({ length: 5 }, (_, i) =>
+          makeRecord({ msgServerId: '', msgLocalId: `loc-tie-${i}`, timestamp: 8000 })),
+      )
+
+      const ids: string[] = []
+      let cursor: string | undefined
+      for (let round = 0; round < 10; round++) {
+        const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT, cursor, 2)
+        ids.push(...page.list.map(m => m.msgLocalId))
+        if (!page.hasMore)
+          break
+        cursor = page.cursor
+      }
+      expect(ids).toHaveLength(5)
+      expect(new Set(ids).size).toBe(5)
+    })
+
+    it('clearMessages 水位线贯通：回流老消息写侧拦截，loadMessages / searchMessages 均不可见', async () => {
+      if (!handle.clearMessages)
+        return
+      await handle.hooks.message?.saveMessages?.([
+        makeRecord({ msgServerId: 'srv-wl1', timestamp: 100, body: { content: 'waterline alpha bravo' } }),
+        makeRecord({ msgServerId: 'srv-wl2', timestamp: 200, body: { content: 'waterline charlie delta' } }),
+      ])
+      await handle.clearMessages({ conversationId: 'c1', before: 250 })
+
+      // 漫游回流老消息（早于水位线）：写侧直接跳过（而非入库后读侧过滤）
+      await handle.hooks.message?.saveMessages?.([
+        makeRecord({ msgServerId: 'srv-wl0', timestamp: 150, body: { content: 'waterline alpha bravo' } }),
+      ])
+      const page = await handle.repository.loadMessages('c1', CONVERSATION_TYPE.SINGLECHAT)
+      expect(page.list).toHaveLength(0)
+
+      // 搜索读侧同样不可见（FTS 分支水位线过滤）
+      if (handle.repository.searchMessages) {
+        await flushFts(handle)
+        const found = await handle.repository.searchMessages({ keyword: 'waterline' })
+        expect(found.list).toHaveLength(0)
+      }
+    })
+
     it('fetchConversations：置顶段固定在首页且优先，非置顶按 COALESCE(lastMessageTime, draftTime, createdAt) 倒序', async () => {
       await handle.hooks.conversation?.saveConversations?.([
         makeConversation({ id: 'cv-old', lastMessageTime: 100 }),
