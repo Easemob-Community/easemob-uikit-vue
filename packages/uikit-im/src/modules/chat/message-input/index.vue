@@ -409,6 +409,9 @@ const simpleExpanded = ref(false)
 /** simple 输入框自定义高度态（拖拽/展开后卡片退出固定 132px，改为内容自适应，min-height 兜底） */
 const simpleDragged = ref(false)
 
+/** simple 输入框 PC 录音模式（录音面板覆盖输入区时，隐藏卡片右上角展开角标） */
+const simpleVoiceMode = ref(false)
+
 /** 引用条位置：simple 模式工具栏在上时引用条置于输入框下方（设计稿），其余情况保持输入框上方 */
 const quoteBelowInput = computed(() => !isMobile.value && inputMode.value === 'simple' && inputConfig.value?.style !== 'toolbar-bottom')
 
@@ -444,8 +447,8 @@ function onSimpleHeightChange(height: number | null) {
   }
 }
 
-/** 是否显示展开/收起角标（simple 模式 PC 且未通过 config 关闭；角标渲染在卡片层右上角） */
-const showSimpleExpandBtn = computed(() => !isMobile.value && inputMode.value === 'simple' && inputConfig.value?.expandable !== false)
+/** 是否显示展开/收起角标（simple 模式 PC 且未通过 config 关闭、未处于录音模式；角标渲染在卡片层右上角） */
+const showSimpleExpandBtn = computed(() => !isMobile.value && inputMode.value === 'simple' && inputConfig.value?.expandable !== false && !simpleVoiceMode.value)
 
 /** 点击卡片层角标：转发给 simple-input 切换展开/收起 */
 function onExpandBtnClick() {
@@ -569,6 +572,13 @@ async function handleVoiceStart() {
   shouldCancelVoice = false
   try {
     voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    // 等待权限/设备期间已被取消（如过短录音立即走 cancel 链路，或启动期间被要求停止）：
+    // 必须在此释放刚拿到的流并直接返回，否则会创建一个无人停止的 MediaRecorder，麦克风占用常亮
+    if (isVoiceCancelled || shouldCancelVoice) {
+      voiceStream.getTracks().forEach(track => track.stop())
+      voiceStream = null
+      return
+    }
     mediaRecorder = new MediaRecorder(voiceStream)
     audioChunks = []
 
@@ -579,11 +589,6 @@ async function handleVoiceStart() {
 
     mediaRecorder.start()
     recordingStartTime = Date.now()
-
-    // 如果启动期间被要求停止，立即取消
-    if (shouldCancelVoice) {
-      handleVoiceCancel()
-    }
   }
   catch (err) {
     logger.error('录音启动失败:', formatSdkError(err))
@@ -832,6 +837,7 @@ defineExpose({
       @mention-close="onMentionClose"
       @expand-change="onExpandChange"
       @height-change="onSimpleHeightChange"
+      @voice-mode-change="simpleVoiceMode = $event"
       @focus="emit('focus')"
       @typing="handleTyping"
     >

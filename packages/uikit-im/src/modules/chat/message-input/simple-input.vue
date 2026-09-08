@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useLocale } from '@easemob/uikit-core'
 import { useResizable, useViewport } from '@easemob/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
@@ -34,6 +34,8 @@ const emit = defineEmits<{
   (e: 'expand-change', expanded: boolean): void
   /** 生效高度变化（null 表示恢复默认 132px 卡片；供上层切换卡片固定/自适应高度） */
   (e: 'height-change', height: number | null): void
+  /** PC 录音模式开关变化（供上层隐藏卡片右上角展开角标等不相容 UI） */
+  (e: 'voice-mode-change', active: boolean): void
 }>()
 
 const { t } = useLocale()
@@ -146,6 +148,9 @@ const isMobileRecording = ref(false)
 
 /** 是否处于录音模式（PC 端点击麦克风后进入） */
 const isVoiceMode = ref(false)
+
+// 录音模式变化同步给上层（卡片层右上角展开角标需随之隐藏/恢复）
+watch(isVoiceMode, val => emit('voice-mode-change', val))
 
 /** 已插入的 @提及列表 */
 const mentionList = ref<MentionContact[]>([])

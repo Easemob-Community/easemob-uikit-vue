@@ -30,6 +30,11 @@
   --uikit-primary-hover: hsl(203, 100%, 50%);
   --uikit-primary-rgb: 51, 177, 255;
 
+  /* 主色派生浅色阶：color-mix 由 --uikit-primary-color 在使用时实时派生，
+     自动跟随运行时主题色与明暗模式，无需暗色覆写、无需 store 同步。
+     用于光晕/弱强调底等「主色 + 低透明度」场景 */
+  --uikit-primary-soft: color-mix(in srgb, var(--uikit-primary-color) 15%, transparent);
+
   /* 文本选中背景色（输入框 ::selection），跟随主题色 */
   --uikit-selection-bg: var(--uikit-primary-color-opacity);
 

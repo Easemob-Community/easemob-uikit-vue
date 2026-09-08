@@ -28,6 +28,7 @@ UIKit 设计系统遵循以下核心原则，作为模糊场景下的决策依�
 - `--uikit-primary-color`：主品牌色，默认 `hsl(203, 100%, 60%)` 环信蓝；运行时由 `primaryColor + primaryColorSaturation/Lightness` 重算（`hsl(h, s%, l%)`）
 - `--uikit-primary-hover`：主色 hover 态（随主色饱和度/亮度联动）
 - `--uikit-primary-rgb`：主色 RGB 三元组（用于 `rgba()` 半透明背景）
+- `--uikit-primary-soft`：主色 15% 透明派生色（`color-mix` 实时派生，用于光晕/弱强调底，自动跟随主色与明暗模式）
 - `--uikit-success-color`：成功色
 - `--uikit-warning-color`：警告色
 - `--uikit-danger-color`：危险色

@@ -34,10 +34,13 @@ const isSpacePressed = ref(false)
 /** 鼠标是否被按下（防止重复触发） */
 const isMousePressed = ref(false)
 
-/** 格式化录音时长 */
+/** 格式化录音时长：1 分钟内显示秒数（如 12″），超过 1 分钟显示 m:ss */
 const formattedDuration = computed(() => {
-  const mins = Math.floor(duration.value / 60)
-  const secs = duration.value % 60
+  const total = duration.value
+  if (total < 60)
+    return `${total}″`
+  const mins = Math.floor(total / 60)
+  const secs = total % 60
   return `${mins}:${secs.toString().padStart(2, '0')}`
 })
 
@@ -53,13 +56,18 @@ function startRecording() {
   emit('start')
 }
 
-/** 停止录音并发送 */
+/** 停止录音并发送（时长 ≤0 秒视为过短：不发送，按取消处理以释放上层麦克风资源，回到就绪态） */
 function stopRecording() {
   if (!isRecording.value)
     return
   isRecording.value = false
   const d = duration.value
   stopTimer()
+  if (d <= 0) {
+    // 过短不发送，但必须通知上层走取消链路——否则 getUserMedia 流/MediaRecorder 不会被释放（浏览器标签页麦克风占用指示常亮）
+    emit('cancel')
+    return
+  }
   emit('end', d)
   // 发送后回到就绪状态，面板保持打开
 }
@@ -185,8 +193,12 @@ onBeforeUnmount(() => {
     <!-- 录音就绪状态 -->
     <template v-if="!isRecording">
       <div class="voice-panel__ready">
+        <!-- 计时占位：与录音态计时同尺寸但不可见，预留空间防止开始录音时按钮下移 -->
+        <div class="voice-panel__timer voice-panel__timer--placeholder" aria-hidden="true">
+          0″
+        </div>
         <div class="voice-panel__mic-wrapper">
-          <Icon name="mic" :size="32" color="white" />
+          <Icon name="mic/fill" :size="32" color="white" />
         </div>
         <div class="voice-panel__hint">
           {{ t('chat.voice.holdSpace') }}<span class="voice-panel__link" @mousedown.stop @click="deactivate">{{ t('chat.voice.exit') }}</span>
@@ -201,9 +213,11 @@ onBeforeUnmount(() => {
           {{ formattedDuration }}
         </div>
         <div class="voice-panel__mic-wrapper voice-panel__mic-wrapper--recording">
-          <Icon name="mic" :size="32" color="white" />
-          <div class="voice-panel__ripple" />
-          <div class="voice-panel__ripple" />
+          <!-- 水波背景：三层超大不规则圆角块在圆内旋转，边缘形成自然起伏的水面 -->
+          <span class="voice-panel__wave" />
+          <span class="voice-panel__wave" />
+          <span class="voice-panel__wave" />
+          <Icon name="mic/fill" :size="32" color="white" />
         </div>
         <div class="voice-panel__hint">
           {{ t('chat.voice.releaseSend') }}<span class="voice-panel__link" @mousedown.stop @click="cancelRecording">{{ t('chat.voice.cancelSend') }}</span>
@@ -245,8 +259,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background-color: var(--uikit-primary-color, #3b82f6);
   color: var(--uikit-text-inverse);
@@ -255,39 +269,79 @@ onBeforeUnmount(() => {
 
 .voice-panel__mic-wrapper--recording {
   position: relative;
-  transform: scale(1.05);
+  overflow: hidden;
+  background-color: var(--uikit-primary-hover, #2563eb);
+  /* 静态浅蓝光晕（设计稿外圈浅蓝环，无扩散动画），跟随主题主色 */
+  box-shadow: 0 0 0 6px var(--uikit-primary-soft, rgba(59, 130, 246, 0.15));
 }
 
-/* 波纹动画 */
-.voice-panel__ripple {
+/* 录音态：水波背景。经典 CSS water wave 技法——width/height 250% 的不规则圆角块
+   以圆心下方为轴持续旋转，非对称 border-radius 使其上缘呈现自然波浪起伏；
+   三层不同透明度/速度/转向叠加模拟水的流动感，overflow:hidden 收敛在圆形背景内 */
+.voice-panel__wave {
   position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-primary-color, #3b82f6);
-  opacity: 0.4;
-  animation: voice-ripple 1.2s ease-out infinite;
+  top: 42%;
+  left: 50%;
+  width: 250%;
+  height: 250%;
+  margin-left: -125%;
+  border-radius: 43% 45% 42% 46%;
+  background-color: rgb(255 255 255 / 0.14);
+  z-index: 1;
+  pointer-events: none;
+  animation:
+    voice-wave-rotate 5s linear infinite,
+    voice-wave-breathe 3.6s ease-in-out infinite alternate;
 }
 
-.voice-panel__ripple:nth-child(2) {
-  animation-delay: 0.4s;
+.voice-panel__wave:nth-of-type(2) {
+  top: 45%;
+  border-radius: 46% 42% 45% 43%;
+  background-color: rgb(255 255 255 / 0.2);
+  animation-duration: 7s, 4.2s;
+  animation-direction: reverse, alternate;
 }
 
-@keyframes voice-ripple {
-  0% {
-    transform: scale(1);
-    opacity: 0.4;
+.voice-panel__wave:nth-of-type(3) {
+  top: 48%;
+  border-radius: 44% 46% 43% 45%;
+  background-color: rgb(255 255 255 / 0.1);
+  animation-duration: 9s, 5s;
+}
+
+.voice-panel__mic-wrapper--recording .uikit-icon {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes voice-wave-rotate {
+  to {
+    transform: rotate(360deg);
   }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
+}
+
+/* 水位缓慢起伏（translate 独立于 transform，两者可叠加；百分比相对波浪自身尺寸） */
+@keyframes voice-wave-breathe {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -5%;
   }
 }
 
 .voice-panel__timer {
-  font-size: var(--uikit-font-size-16);
+  /* 固定行高，保证就绪态占位与录音态计时同高，切换时不发生布局位移 */
+  line-height: 18px;
+  white-space: nowrap;
+  font-size: var(--uikit-font-size-13);
   font-weight: 500;
-  color: var(--uikit-text-primary);
+  color: var(--uikit-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.voice-panel__timer--placeholder {
+  visibility: hidden;
 }
 
 .voice-panel__hint {

@@ -189,6 +189,12 @@ Cell 侧只消费 `var(--uikit-cell-bg, transparent)` 这类带兜底的变量�
 `#FF7070` 进 `--uikit-badge-bg`、空态 `#E6E6E6`/`#BDBDBD` 进 `--uikit-empty-*`。
 校准类 token 变更必须同步：`:root` + 暗色段 + `fallback` 位置 + 文档站 `design-tokens.md` / `theme.md`。
 
+**主色 + 透明度场景优先用 color-mix 派生 token**：`--uikit-primary-soft`
+（`color-mix(in srgb, var(--uikit-primary-color) 15%, transparent)`，用于光晕/弱强调底）。
+color-mix 在使用时实时求值，自动跟随 `setPrimaryColor` 与明暗模式，无需暗色覆写、无需 store
+同步——比「独立 span + opacity」hack 或写死 `rgba(主色rgb, α)` 更省且不会漂移。
+既有 `--uikit-primary-color-opacity` / `--uikit-primary-rgb` 保留给 store 运行时重算的老链路。
+
 ## 硬规则（最该拦）vs 软约定
 
 **硬规则**
