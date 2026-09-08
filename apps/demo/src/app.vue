@@ -3,7 +3,6 @@ import { h, onMounted, ref } from 'vue'
 import { EmUIKitProvider, useClient } from '@easemob/uikit-im'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
-import ChatroomDemoPage from './chatroom-demo-page.vue'
 import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, demoUseCustomDataSource, webim4Adapter } from './composables/use-demo-sdk-adapter'
 
@@ -89,20 +88,11 @@ const AppContent = {
         autoLoggingIn.value = false
       }
     }
-    const currentHash = ref('')
-    function onHashChange() {
-      currentHash.value = window.location.hash
-    }
-    const isChatroomPage = () => currentHash.value === '#/chatroom'
-
     onMounted(() => {
       const config = getLoginConfig()
       if (config?.user) {
         autoLogin()
       }
-      // hash 路由：'#/chatroom' 进入聊天室 Demo 页（P2 验证页），其余渲染 IM 主界面
-      currentHash.value = window.location.hash
-      window.addEventListener('hashchange', onHashChange)
     })
 
     function onLoginSuccess() {
@@ -125,18 +115,7 @@ const AppContent = {
       if (autoLoginError.value || !isLoggedIn.value) {
         return h(LoginPage, { onLoginSuccess })
       }
-      // 聊天室 Demo 页（独立场景包，嵌套在本 Provider 内验证两包同装）
-      if (isChatroomPage()) {
-        return h('div', { class: 'chatroom-demo-shell' }, [
-          h(ChatroomDemoPage),
-        ])
-      }
       return h('div', { class: 'im-demo-shell' }, [
-        h('a', {
-          class: 'chatroom-entry-link',
-          href: '#/chatroom',
-          title: '聊天室 Demo（P2 验证页，独立场景包 @easemob/uikit-chatroom）',
-        }, '聊天室 Demo'),
         h(DemoPage, {
           'enableContact': enableContact.value,
           'onUpdate:enableContact': (v: boolean) => { enableContact.value = v },
@@ -216,24 +195,8 @@ body,
   }
 }
 
-.im-demo-shell,
-.chatroom-demo-shell {
+.im-demo-shell {
   height: 100%;
   width: 100%;
-}
-
-/* 聊天室 Demo 入口（固定右下角悬浮，不打扰 IM 主界面） */
-.chatroom-entry-link {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 999;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--uikit-primary-color, hsl(203, 100%, 60%));
-  color: #fff;
-  font-size: 13px;
-  text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 </style>

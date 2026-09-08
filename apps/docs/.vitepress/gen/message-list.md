@@ -38,13 +38,14 @@
 
 > Header 配置
 
-| 属性              | 类型            | 默认值 | 说明                            |
+| 属性              | 类型                                         | 默认值 | 说明                                                                                                                                                                                                                                          |
 | --- | --- | --- | --- |
-| visible         | `boolean`     | —   | 是否显示 header，默认 true           |
-| align           | `HeaderAlign` | —   | 标题对齐方式，默认 'center'；对单聊/群聊同时生效 |
-| showAvatar      | `boolean`     | —   | 是否显示头像，默认 false               |
-| showMemberCount | `boolean`     | —   | 是否显示群成员数后缀，默认 true；仅群聊生效      |
-| showDrawerEntry | `boolean`     | —   | 是否显示抽屉入口按钮（聊天信息），默认 true      |
+| visible         | `boolean`                                  | —   | 是否显示 header，默认 true                                                                                                                                                                                                                         |
+| align           | `HeaderAlign`                              | —   | 标题对齐方式，默认 'center'；对单聊/群聊同时生效                                                                                                                                                                                                               |
+| showAvatar      | `boolean`                                  | —   | 是否显示头像，默认 false                                                                                                                                                                                                                             |
+| showMemberCount | `boolean`                                  | —   | 是否显示群成员数后缀，默认 true；仅群聊生效                                                                                                                                                                                                                    |
+| showDrawerEntry | `boolean`                                  | —   | 是否显示抽屉入口按钮（聊天信息），默认 true                                                                                                                                                                                                                    |
+| subtitle        | `'auto' \| 'presence' \| 'sign' \| 'none'` | —   | 单聊副标题档位（标题下方区域），默认 'auto'；仅单聊生效：<br>auto（在线状态 + 个性签名，缺哪个显示哪个）/ presence（仅在线状态）/ sign（仅签名）/<br>none（整个副标题区连同「正在输入」提示一起关闭）。<br>对方正在输入时优先占据此区域；可被 #header-subtitle 插槽整体接管。<br>Subtitle level under the title for single chats. Default 'auto'. |
 
 #### config.messageList {#config-messagelist}
 
@@ -70,6 +71,7 @@
 | search                 | <a class="config-ref" href="#config-messagelist-search"><strong>消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）</strong></a> | —   | 消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选）                                                                                                                                                                                                                                                                                                                                                       |
 | autoLocateAtMe         | `boolean`                                                                                                       | —   | 切换会话时是否自动定位到首条@我的消息，默认 true                                                                                                                                                                                                                                                                                                                                                              |
 | messageStatus          | `MessageStatusConfig`                                                                                           | —   | 消息发送状态展示配置                                                                                                                                                                                                                                                                                                                                                                               |
+| quote                  | <a class="config-ref" href="#config-messagelist-quote"><strong>引用展示配置</strong></a>                              | —   | 引用展示配置                                                                                                                                                                                                                                                                                                                                                                                   |
 
 #### config.messageList.loadHistory {#config-messagelist-loadhistory}
 
@@ -103,14 +105,23 @@
 
 > 消息状态展示配置
 
-| 属性        | 类型                                            | 默认值 | 说明                                                                                                                                      |
+| 属性              | 类型                                            | 默认值 | 说明                                                                                                                                                                                                      |
 | --- | --- | --- | --- |
-| showText  | `boolean`                                     | —   | 是否显示状态文本，默认 false（仅展示 icon）                                                                                                             |
-| textMap   | `Partial<Record<MessageStatusValue, string>>` | —   | 状态文本映射，未指定时从 locale 读取默认文案                                                                                                              |
-| iconMap   | `Partial<Record<MessageStatusValue, string>>` | —   | 状态图标映射，未指定时使用默认图标                                                                                                                       |
-| direction | `'horizontal' \| 'vertical'`                  | —   | 文本与图标的排列方向，默认 'horizontal'                                                                                                              |
-| position  | `'below' \| 'inline'`                         | —   | 状态相对消息气泡的位置，默认 'inline'（气泡末尾、与气泡底部对齐）；'below' 为气泡下方 / Position relative to the bubble, default 'inline' (at bubble end, bottom-aligned) |
-| style     | `MessageStatusStyle`                          | —   | 消息状态图标风格。<br>- classic（默认）：沿用 check / doneAll 经典双勾映射；<br>- capsule：数字胶囊风格，未读=空心圆/实心圆点，已读=圆+对勾。                                          |
+| showText        | `boolean`                                     | —   | 是否显示状态文本，默认 false（仅展示 icon）                                                                                                                                                                             |
+| textMap         | `Partial<Record<MessageStatusValue, string>>` | —   | 状态文本映射，未指定时从 locale 读取默认文案                                                                                                                                                                              |
+| iconMap         | `Partial<Record<MessageStatusValue, string>>` | —   | 状态图标映射，未指定时使用默认图标                                                                                                                                                                                       |
+| direction       | `'horizontal' \| 'vertical'`                  | —   | 文本与图标的排列方向，默认 'horizontal'                                                                                                                                                                              |
+| position        | `'below' \| 'inline'`                         | —   | 状态相对消息气泡的位置，默认 'inline'（气泡末尾、与气泡底部对齐）；'below' 为气泡下方 / Position relative to the bubble, default 'inline' (at bubble end, bottom-aligned)                                                                 |
+| style           | `MessageStatusStyle`                          | —   | 消息状态图标风格。<br>- classic（默认）：沿用 check / doneAll 经典双勾映射；<br>- capsule：数字胶囊风格，未读=空心圆/实心圆点，已读=圆+对勾。                                                                                                          |
+| readIconDisplay | `'latest' \| 'all'`                           | —   | 单聊己方「已读」状态图标的展示策略，默认 'latest'；仅单聊生效。<br>- latest：连续已读只在最新一条已读消息上展示已读 icon（仿抖音移动端）；<br>- all：每条已读消息都展示已读 icon。<br>Display strategy for the read icon on self messages in single chats. Default 'latest'. |
+
+#### config.messageList.quote {#config-messagelist-quote}
+
+> 引用展示配置
+
+| 属性         | 类型        | 默认值 | 说明                                                                                                      |
+| --- | --- | --- | --- |
+| showAvatar | `boolean` | —   | 引用卡片是否展示原消息发送人头像，默认 false。<br>Whether the quote card shows the original sender's avatar. Default false. |
 
 #### config.messageAction {#config-messageaction}
 
@@ -168,23 +179,23 @@
 
 > 输入框配置
 
-| 属性               | 类型                                                                                                     | 默认值 | 说明                                                                                                                                   |
+| 属性               | 类型                                                                                                     | 默认值 | 说明                                                                                                                                                             |
 | --- | --- | --- | --- |
-| mode             | `InputMode`                                                                                            | —   | 输入框模式，默认 'simple'                                                                                                                    |
-| style            | `InputStyle`                                                                                           | —   | 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上                                                                 |
-| features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>                          | —   | 功能开关                                                                                                                                 |
-| autoFocus        | `boolean`                                                                                              | —   | 是否自动聚焦输入框，默认 false                                                                                                                   |
-| focusBorderColor | `string`                                                                                               | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                       |
-| caretColor       | `string`                                                                                               | —   | 光标颜色，不设置则使用默认                                                                                                                        |
-| selectionColor   | `string`                                                                                               | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                                      |
-| maxLength        | `number`                                                                                               | —   | 最大输入长度，0 或不设置表示无限制                                                                                                                   |
-| mention          | <a class="config-ref" href="#config-input-mention"><strong>提及配置（@）</strong></a>                        | —   | 提及配置（@）                                                                                                                              |
-| enableTyping     | `boolean`                                                                                              | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                                        |
-| showSendButton   | `boolean`                                                                                              | —   | 是否显示发送按钮，默认 true                                                                                                                     |
-| resizable        | `boolean`                                                                                              | —   | 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true                       |
-| expandable       | `boolean`                                                                                              | —   | 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true          |
-| stickerPacks     | `EmojiStickerPack[]`                                                                                   | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker |
-| emoji            | <a class="config-ref" href="#config-input-emoji"><strong>Emoji 面板配置 / Emoji picker config</strong></a> | —   | Emoji 面板配置 / Emoji picker config                                                                                                     |
+| mode             | `InputMode`                                                                                            | —   | 输入框模式，默认 'simple'                                                                                                                                              |
+| style            | `InputStyle`                                                                                           | —   | 输入框工具栏位置，默认 'toolbar-top'（工具栏在上、输入框在下）；'toolbar-bottom' 为工具栏在下、输入框在上                                                                                           |
+| features         | <a class="config-ref" href="#config-input-features"><strong>功能开关</strong></a>                          | —   | 功能开关                                                                                                                                                           |
+| autoFocus        | `boolean`                                                                                              | —   | 是否自动聚焦输入框，默认 false                                                                                                                                             |
+| focusBorderColor | `string`                                                                                               | —   | 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色                                                                                                                 |
+| caretColor       | `string`                                                                                               | —   | 光标颜色，不设置则跟随主题色（--uikit-primary） / Caret color, defaults to the theme primary color                                                                             |
+| selectionColor   | `string`                                                                                               | —   | 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色）                                                                                                                |
+| maxLength        | `number`                                                                                               | —   | 最大输入长度，0 或不设置表示无限制                                                                                                                                             |
+| mention          | <a class="config-ref" href="#config-input-mention"><strong>提及配置（@）</strong></a>                        | —   | 提及配置（@）                                                                                                                                                        |
+| enableTyping     | `boolean`                                                                                              | —   | 是否启用输入状态提示（对方正在输入...），默认 true                                                                                                                                  |
+| showSendButton   | `boolean`                                                                                              | —   | 是否显示发送按钮，默认 true                                                                                                                                               |
+| resizable        | `boolean`                                                                                              | —   | 是否允许拖拽调整输入区高度（仅 PC，手柄在输入卡片上缘；simple 模式默认高 132px），默认 true / Whether the input area height can be resized by dragging (PC only), default true                    |
+| expandable       | `boolean`                                                                                              | —   | 是否显示「展开输入框」角标（仅 PC，卡片右上角；点击后输入区升至 212px，再次点击或 Esc 恢复默认；拖拽超过 212px 时角标自动呈现恢复态），默认 true / Whether to show the expand-input corner toggle (PC only), default true |
+| stickerPacks     | `EmojiStickerPack[]`                                                                                   | —   | 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker                           |
+| emoji            | <a class="config-ref" href="#config-input-emoji"><strong>Emoji 面板配置 / Emoji picker config</strong></a> | —   | Emoji 面板配置 / Emoji picker config                                                                                                                               |
 
 #### config.input.features {#config-input-features}
 

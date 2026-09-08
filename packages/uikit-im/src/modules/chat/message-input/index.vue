@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
 import type { EmojiStickerItem, UiMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
@@ -403,10 +403,53 @@ function onMentionClose() {
   cleanupMentionAnchor()
 }
 
-/** 展开/收起输入区：布局变化会让锚点弹层错位，主动关闭 emoji/mention 弹层 */
-function onExpandChange() {
+/** simple 输入框展开视觉态（高度达到 212px，含拖拽超过；驱动角标 spread/singularity 切换） */
+const simpleExpanded = ref(false)
+
+/** simple 输入框自定义高度态（拖拽/展开后卡片退出固定 132px，改为内容自适应，min-height 兜底） */
+const simpleDragged = ref(false)
+
+/** 引用条位置：simple 模式工具栏在上时引用条置于输入框下方（设计稿），其余情况保持输入框上方 */
+const quoteBelowInput = computed(() => !isMobile.value && inputMode.value === 'simple' && inputConfig.value?.style !== 'toolbar-bottom')
+
+/** 展开视觉态变化：布局变化会让锚点弹层错位，主动关闭 emoji/mention 弹层 */
+function onExpandChange(expanded: boolean) {
+  simpleExpanded.value = expanded
   showEmojiPicker.value = false
   onMentionClose()
+}
+
+/** 收起动画（max-height 过渡）时长，需与 --uikit-anim-duration（0.2s）一致 */
+const COLLAPSE_ANIM_MS = 200
+let collapseTimer: ReturnType<typeof setTimeout> | null = null
+
+/**
+ * simple 输入框生效高度同步：
+ * - 非 null（拖拽/展开）：立即切内容自适应，root max-height 过渡驱动卡片跟随增高；
+ * - null（收起）：动画期间保持自适应让卡片跟随收缩，动画结束再回落固定 132px，避免边框跳变。
+ */
+function onSimpleHeightChange(height: number | null) {
+  if (collapseTimer) {
+    clearTimeout(collapseTimer)
+    collapseTimer = null
+  }
+  if (height !== null) {
+    simpleDragged.value = true
+  }
+  else {
+    collapseTimer = setTimeout(() => {
+      simpleDragged.value = false
+      collapseTimer = null
+    }, COLLAPSE_ANIM_MS)
+  }
+}
+
+/** 是否显示展开/收起角标（simple 模式 PC 且未通过 config 关闭；角标渲染在卡片层右上角） */
+const showSimpleExpandBtn = computed(() => !isMobile.value && inputMode.value === 'simple' && inputConfig.value?.expandable !== false)
+
+/** 点击卡片层角标：转发给 simple-input 切换展开/收起 */
+function onExpandBtnClick() {
+  simpleInputRef.value?.toggleExpand?.()
 }
 
 /** 选择 @提及联系人 */
@@ -637,6 +680,11 @@ onBeforeUnmount(() => {
   pendingBlobUrls.clear()
   // 清理录音资源
   handleVoiceCancel()
+  // 清理收起动画定时器
+  if (collapseTimer) {
+    clearTimeout(collapseTimer)
+    collapseTimer = null
+  }
 })
 
 /** 设置输入文本（用于重新编辑等场景） */
@@ -708,11 +756,16 @@ defineExpose({
 </script>
 
 <template>
+  <!-- 键盘顶起 padding 仅 PC 且键盘高度非 0 时注入；0 时不要覆盖卡片默认 padding（修复 PC 底部 padding 被 0px 内联覆盖） -->
   <div
     ref="messageInputRef"
     class="message-input"
-    :class="{ 'message-input--mobile': isMobile }"
-    :style="isMobile ? undefined : { paddingBottom: `${props.keyboardHeight || 0}px` }"
+    :class="{
+      'message-input--mobile': isMobile,
+      'message-input--simple-pc': !isMobile && inputMode === 'simple',
+      'message-input--simple-dragged': !isMobile && inputMode === 'simple' && simpleDragged,
+    }"
+    :style="!isMobile && props.keyboardHeight ? { paddingBottom: `${props.keyboardHeight}px` } : undefined"
   >
     <!-- 全员禁言遮罩 -->
     <div v-if="props.muted" class="message-input__muted-overlay">
@@ -726,9 +779,11 @@ defineExpose({
       @close="handleCancelEdit"
     />
 
-    <!-- 引用条 -->
+    <!-- 引用条（simple 模式工具栏在上时移到输入框下方，见底部 QuoteBar；
+         顶部展示且展开角标在场时右侧预留 28px，避免关闭 × 与角标重叠） -->
     <QuoteBar
-      v-if="!editingMessage && quotedMessage"
+      v-if="!editingMessage && quotedMessage && !quoteBelowInput"
+      :class="{ 'message-input__quote--corner': showSimpleExpandBtn }"
       :message="quotedMessage"
       @close="clearQuote"
     />
@@ -776,6 +831,7 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @expand-change="onExpandChange"
+      @height-change="onSimpleHeightChange"
       @focus="emit('focus')"
       @typing="handleTyping"
     >
@@ -810,6 +866,26 @@ defineExpose({
         <slot name="input-panel" v-bind="slotProps" />
       </template>
     </RichInput>
+
+    <!-- 引用条（simple 模式工具栏在上时置于输入框下方，贴卡片底缘；
+         必须放在 v-if/v-else-if/v-else 链之后，避免 v-else 挂到本元素上导致两个输入框同显） -->
+    <QuoteBar
+      v-if="!editingMessage && quotedMessage && quoteBelowInput"
+      :message="quotedMessage"
+      @close="clearQuote"
+    />
+
+    <!-- 展开/收起角标：定位在卡片层右上角（相对 simple-input 根定位会被顶部引用条顶偏），
+         24×24 默认 topright，hover 按状态显示 spread/singularity -->
+    <div
+      v-if="showSimpleExpandBtn"
+      class="message-input__expand-btn"
+      :title="simpleExpanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
+      @click="onExpandBtnClick"
+    >
+      <Icon class="message-input__expand-icon message-input__expand-icon--default" name="polyline/topright" :size="24" />
+      <Icon class="message-input__expand-icon message-input__expand-icon--hover" :name="simpleExpanded ? 'polyline/singularity' : 'polyline/spread'" :size="24" />
+    </div>
 
     <!-- PC 端 Emoji Popup -->
     <Popup
@@ -872,6 +948,71 @@ defineExpose({
 
 .message-input:focus-within {
   border-color: v-bind(focusBorderColorVar);
+}
+
+/* simple 模式（PC）：卡片固定 132px，flex 列布局让输入框撑满（引用条/编辑条在场时挤压输入区，不改变卡片总高）；
+   展开/收起动画由 simple-input root 的 height 过渡驱动（卡片 auto 高度逐帧跟随） */
+.message-input--simple-pc {
+  display: flex;
+  flex-direction: column;
+  height: 132px;
+  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+/* simple 模式自定义高度态（拖拽/展开）：退出固定高度，内容自适应（min-height 兜底） */
+.message-input--simple-dragged {
+  height: auto;
+  min-height: 132px;
+}
+
+/* 展开/收起角标：卡片层右上角（相对卡片定位，不受引用条位置影响），24×24，默认 #C9CDCF（设计稿固定值） */
+.message-input__expand-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--uikit-components-radius, 6px);
+  cursor: pointer;
+  color: #c9cdcf;
+  transition:
+    color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.message-input__expand-icon {
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.message-input__expand-icon--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+/* 顶部引用条为右上角展开角标预留位置（关闭 × 落在角标左侧，对齐设计稿）；双类选择器压过 quote-bar 自身 padding 简写 */
+.message-input .message-input__quote--corner {
+  padding-right: 28px;
+}
+
+@media (hover: hover) {
+  /* hover：角标退为灰底圆角瓷砖，内部显示 spread/singularity 图标 */
+  .message-input__expand-btn:hover {
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-secondary);
+  }
+
+  .message-input__expand-btn:hover .message-input__expand-icon--default {
+    opacity: 0;
+  }
+
+  .message-input__expand-btn:hover .message-input__expand-icon--hover {
+    opacity: 1;
+  }
 }
 
 /* 移动端：去掉桌面卡片样式（margin/border/radius/shadow），改为全宽工具条容器 */

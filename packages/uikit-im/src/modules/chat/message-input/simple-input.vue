@@ -30,8 +30,10 @@ const emit = defineEmits<{
   (e: 'mention-close'): void
   (e: 'typing'): void
   (e: 'focus'): void
-  /** 展开/收起输入区（供上层关闭 emoji/mention 等锚点弹层） */
+  /** 展开视觉态变化（高度达到/低于 212px；供上层切换角标图标、关闭锚点弹层） */
   (e: 'expand-change', expanded: boolean): void
+  /** 生效高度变化（null 表示恢复默认 132px 卡片；供上层切换卡片固定/自适应高度） */
+  (e: 'height-change', height: number | null): void
 }>()
 
 const { t } = useLocale()
@@ -55,73 +57,80 @@ const features = computed(() => ({
 /** 是否显示发送按钮 */
 const showSendButton = computed(() => props.config?.showSendButton !== false)
 
-/** 组件根元素 ref（展开态测量聊天容器高度用） */
+/** 组件根元素 ref（拖拽尺寸同步用） */
 const rootRef = ref<HTMLElement>()
 
-/** 是否处于展开态（原地撑高输入区，仅 PC） */
-const expanded = ref(false)
+/**
+ * 卡片 chrome 高度换算：root 内容高度 → 卡片总高度
+ * （卡片 padding 上下各 var(--uikit-input-wrapper-spacing, 12px) + 1px border × 2）
+ */
+const CARD_CHROME_PX = 26
 
-/** 展开前的输入区高度（含用户拖拽值），收起时恢复 */
-let preExpandHeight: number | null = null
+/** 展开态卡片目标高度（设计稿固定 212px） */
+const EXPAND_CARD_HEIGHT = 212
 
-/** 是否显示展开/收起按钮（PC 且未通过 config 关闭） */
-const showExpandBtn = computed(() => !isMobile.value && props.config?.expandable !== false)
+/** 是否显示拖拽手柄（PC 且未通过 config 关闭；展开态也可拖拽，高度语义见 expandedVisual） */
+const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
 
-/** 是否显示拖拽手柄（PC 且未通过 config 关闭；展开态下隐藏，避免拖拽 clamp 与展开高度冲突） */
-const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false && !expanded.value)
+/** 输入区内容总高度（拖拽/展开后设置，null 表示默认 132px 卡片自适应） */
+const customHeight = ref<number | null>(null)
 
-/** 输入区高度（拖拽后设置，null 表示自适应） */
-const fieldAreaHeight = ref<number | null>(null)
+/** 默认内容高度（卡片 132px 时的 root 高度初值 106 = 132 - 26 chrome，挂载后按实际测量值校准） */
+const defaultContentHeight = ref(106)
+
+/** 当前生效的 root 内容高度（统一高度语义：默认/拖拽/展开都是它） */
+const effectiveHeight = computed(() => customHeight.value ?? defaultContentHeight.value)
+
+/**
+ * 展开视觉态（融合拖拽与展开）：当前高度达到展开高度即视为「已展开」，
+ * 角标据此切换 topright/spread（可放大）与 topright/singularity（可恢复）。
+ */
+const expandedVisual = computed(() => effectiveHeight.value + CARD_CHROME_PX >= EXPAND_CARD_HEIGHT)
 
 /** 拖拽手柄 ref */
 const resizeHandleRef = ref<HTMLElement>()
 
-useResizable(resizeHandleRef, {
+const { size: resizeSize, isResizing } = useResizable(resizeHandleRef, {
   axis: 'vertical',
-  min: 76,
-  max: 240,
-  // 手柄在输入区上缘：向上拖动增高（反向增量）
+  min: 96,
+  max: 480,
+  // 手柄在输入卡片上缘：向上拖动增高（反向增量）
   invert: true,
   disabled: () => !showResizeHandle.value,
   onChange: (h) => {
-    fieldAreaHeight.value = h
+    customHeight.value = h
+    emit('height-change', h)
+    emit('expand-change', expandedVisual.value)
   },
 })
 
-/** 输入区域样式：拖拽后固定高度，textarea flex:1 自动跟随 */
-const fieldAreaStyle = computed<Record<string, string> | null>(() => {
-  if (fieldAreaHeight.value === null)
-    return null
-  return { height: `${fieldAreaHeight.value}px` }
-})
+/** 根元素样式：内联 height 作为 flex-basis（flex: 1 1 auto 保留收缩能力，引用条在场时输入区可被挤压；过渡动画作用于 height） */
+const rootStyle = computed<Record<string, string>>(() => ({
+  height: `${effectiveHeight.value}px`,
+}))
 
-/** 展开态目标高度：聊天容器高度的 50%，clamp 在 240~600px */
-function getExpandedHeight(): number {
-  const container = rootRef.value?.closest('.chat') as HTMLElement | null
-  const base = container?.clientHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 600)
-  return Math.min(Math.max(Math.round(base * 0.5), 240), 600)
+/** 同步拖拽起始尺寸为当前根元素实际高度（避免首次拖拽从 initial 跳变；过渡动画中调用取到中间值，恰好是继续拖拽的正确起点） */
+function syncResizeSize() {
+  nextTick(() => {
+    if (rootRef.value)
+      resizeSize.value = rootRef.value.clientHeight
+  })
 }
 
-/** 切换展开/收起：只改高度，不重建输入元素，内容与光标保留 */
+/** 角标点击：未展开 → 升到 212px；已展开（含拖拽超过 212）→ 恢复默认 132px。内容与光标保留 */
 function toggleExpand() {
-  if (expanded.value) {
-    fieldAreaHeight.value = preExpandHeight
-    expanded.value = false
-  }
-  else {
-    preExpandHeight = fieldAreaHeight.value
-    fieldAreaHeight.value = getExpandedHeight()
-    expanded.value = true
-  }
-  emit('expand-change', expanded.value)
+  customHeight.value = expandedVisual.value ? null : EXPAND_CARD_HEIGHT - CARD_CHROME_PX
+  emit('height-change', customHeight.value)
+  emit('expand-change', expandedVisual.value)
+  syncResizeSize()
   getInputEl()?.focus()
 }
 
 /** 是否使用多行文本 */
 const isMultiline = computed(() => !isMobile.value)
 
-/** 光标颜色 */
-const caretColorVar = computed(() => props.config?.caretColor || 'auto')
+/** 光标颜色：默认跟随主题色 */
+const caretColorVar = computed(() => props.config?.caretColor || 'var(--uikit-primary)')
 
 /** 文本选中背景色：未配置时使用主题选中色 token，跟随主题色 */
 const selectionColorVar = computed(() => props.config?.selectionColor || 'var(--uikit-selection-bg)')
@@ -180,8 +189,8 @@ function onInput() {
 
 /** 键盘事件 */
 function onKeydown(e: KeyboardEvent) {
-  // 展开态下 Esc 收起输入区（mention 弹层打开时让弹层先处理 Esc）
-  if (e.key === 'Escape' && expanded.value && !props.mentionOpen) {
+  // 展开视觉态（含拖拽超过 212px）下 Esc 恢复默认高度（mention 弹层打开时让弹层先处理 Esc）
+  if (e.key === 'Escape' && expandedVisual.value && !props.mentionOpen) {
     e.preventDefault()
     toggleExpand()
     return
@@ -232,13 +241,6 @@ function onMicClick() {
   }
 }
 
-/** 麦克风图标高亮状态 */
-const showMicOn = computed(() => {
-  if (isMobile.value)
-    return isMobileRecording.value
-  return isVoiceMode.value
-})
-
 /** 表情按钮 ref */
 const emojiBtnRef = ref<HTMLElement>()
 
@@ -283,7 +285,7 @@ function getCaretCoordinates(el: HTMLInputElement | HTMLTextAreaElement, positio
   div.style.pointerEvents = 'none'
   div.textContent = el.value.substring(0, position)
   const span = document.createElement('span')
-  span.textContent = el.value.substring(position) || '\u200B'
+  span.textContent = el.value.substring(position) || '​'
   div.appendChild(span)
   document.body.appendChild(div)
   const rect = span.getBoundingClientRect()
@@ -418,8 +420,14 @@ function insertEmoji(emoji: string) {
   })
 }
 
-/** 自动聚焦 */
+/** 自动聚焦 + 拖拽起始尺寸同步 */
 onMounted(() => {
+  syncResizeSize()
+  // 默认内容高度仅在挂载时校准一次（过渡动画中测量会拿到中间值，污染默认高度）
+  nextTick(() => {
+    if (rootRef.value && customHeight.value === null)
+      defaultContentHeight.value = rootRef.value.clientHeight
+  })
   if (props.config?.autoFocus) {
     const el = getInputEl()
     el?.focus()
@@ -446,13 +454,15 @@ function getText(): string {
   return text.value
 }
 
-/** 暴露方法 */
+/** 暴露方法（toggleExpand/expanded 供上层在卡片层渲染右上角展开角标） */
 defineExpose({
   insertMention,
   appendMention,
   insertEmoji,
   setText,
   getText,
+  toggleExpand,
+  expanded: expandedVisual,
 })
 </script>
 
@@ -463,13 +473,20 @@ defineExpose({
     :class="{
       'simple-input--toolbar-bottom': style === 'toolbar-bottom',
       'simple-input--toolbar-top': style === 'toolbar-top',
-      'simple-input--expanded': expanded,
+      'simple-input--resizing': isResizing,
     }"
+    :style="rootStyle"
   >
-    <!-- 工具栏 -->
+    <!-- 工具栏：emoji / 语音 / 文件 / 图片 / 视频，间距 16px -->
     <div class="simple-input__toolbar">
       <div v-if="features.emoji" ref="emojiBtnRef" class="simple-input__tool-btn" @click="onEmojiClick">
         <Icon name="circle/face" :size="22" />
+      </div>
+      <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
+        <Icon name="mic/dot" :size="22" />
+      </div>
+      <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
+        <Icon name="folder" :size="22" />
       </div>
       <div v-if="features.image" class="simple-input__tool-btn" @click="triggerFileInput('image')">
         <Icon name="rect/img" :size="22" />
@@ -477,28 +494,13 @@ defineExpose({
       <div v-if="features.video" class="simple-input__tool-btn" @click="triggerFileInput('video')">
         <Icon name="rect/triangle" :size="22" />
       </div>
-      <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
-        <Icon name="file/empty" :size="22" />
-      </div>
-      <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
-        <Icon :name="showMicOn ? 'mic' : 'mic'" :size="22" />
-      </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
-      <!-- 展开/收起输入区（仅 PC，工具栏右端） -->
-      <div
-        v-if="showExpandBtn"
-        class="simple-input__tool-btn simple-input__expand-btn"
-        :title="expanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
-        @click="toggleExpand"
-      >
-        <Icon :name="expanded ? 'chevron/up' : 'chevron/down'" :size="22" />
-      </div>
     </div>
 
     <!-- 输入区域 -->
-    <div class="simple-input__field-area" :style="fieldAreaStyle">
-      <!-- 正常输入（PC 端非录音模式，或移动端非录音模式） -->
-      <template v-if="!isVoiceMode && !isMobileRecording">
+    <div class="simple-input__field-area">
+      <!-- 正常输入（PC 端或移动端非录音模式） -->
+      <template v-if="!isMobileRecording">
         <Input
           v-if="!isMultiline"
           ref="inputComponentRef"
@@ -517,36 +519,28 @@ defineExpose({
           class="simple-input__textarea"
           :placeholder="t('chat.placeholder')"
           :maxlength="maxLengthValue"
-          rows="3"
           @keydown="onKeydown"
           @input="onInput"
           @focus="emit('focus')"
         />
       </template>
 
-      <!-- PC 端录音面板 -->
-      <template v-else-if="isVoiceMode && !isMobile">
-        <VoicePanel
-          :active="isVoiceMode"
-          @update:active="isVoiceMode = $event"
-          @start="emit('voice-start')"
-          @end="(d) => emit('voice-end', d)"
-          @cancel="emit('voice-cancel')"
-        />
-      </template>
-
       <!-- 移动端语音录制按钮 -->
-      <div v-else-if="isMobileRecording" class="simple-input__voice-btn-mobile">
+      <div v-else class="simple-input__voice-btn-mobile">
         {{ t('chat.voice.releaseEnd') }}
       </div>
-
-      <!-- 拖拽手柄：输入区上缘拖动调整高度（仅 PC） -->
-      <div
-        v-if="showResizeHandle"
-        ref="resizeHandleRef"
-        class="simple-input__resize-handle"
-      />
     </div>
+
+    <!-- PC 端录音面板：覆盖整个输入区（含功能栏），与输入框等高 -->
+    <VoicePanel
+      v-if="isVoiceMode && !isMobile"
+      class="simple-input__voice-overlay"
+      :active="isVoiceMode"
+      @update:active="isVoiceMode = $event"
+      @start="emit('voice-start')"
+      @end="(d) => emit('voice-end', d)"
+      @cancel="emit('voice-cancel')"
+    />
 
     <!-- 自定义面板：由 #input-panel 插槽填充 -->
     <div v-if="showPanel" class="simple-input__panel">
@@ -564,6 +558,13 @@ defineExpose({
         {{ t('chat.send') }}
       </Button>
     </div>
+
+    <!-- 拖拽手柄：输入卡片上缘拖动调整整体高度（仅 PC） -->
+    <div
+      v-if="showResizeHandle"
+      ref="resizeHandleRef"
+      class="simple-input__resize-handle"
+    />
 
     <!-- 隐藏的文件输入 -->
     <input
@@ -591,10 +592,20 @@ defineExpose({
 
 <style scoped>
 .simple-input {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--uikit-container-gap, 8px);
   background-color: transparent;
+  /* basis 取内联 height（默认 106 / 展开 186 / 拖拽值），shrink 保留：引用条在场时输入区可被挤压 */
+  flex: 1 1 auto;
+  min-height: 0;
+  /* 展开/收起（角标点击、Esc）平滑过渡；拖拽跟手时经 --resizing 关闭 */
+  transition: height var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.simple-input--resizing {
+  transition: none;
 }
 
 /* 工具栏在下：输入框在上 */
@@ -610,12 +621,8 @@ defineExpose({
 .simple-input__toolbar {
   display: flex;
   align-items: center;
-  gap: calc(var(--uikit-container-gap, 8px) * 1.5);
-}
-
-/* 展开/收起按钮：固定在工具栏右端 */
-.simple-input__expand-btn {
-  margin-left: auto;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .simple-input__tool-btn {
@@ -641,20 +648,22 @@ defineExpose({
 }
 
 .simple-input__field-area {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   gap: var(--uikit-container-gap, 8px);
   position: relative;
 }
 
-/* 拖拽手柄：顶部边缘命中区（仅光标提示，不画视觉线） */
+/* 拖拽手柄：输入卡片上边缘命中区（仅光标提示，不画视觉线） */
 .simple-input__resize-handle {
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
-  height: 6px;
-  z-index: 1;
+  top: calc(-1 * var(--uikit-input-wrapper-spacing, 12px) - 1px);
+  height: 8px;
+  z-index: 2;
   cursor: row-resize;
   touch-action: none;
 }
@@ -665,8 +674,7 @@ defineExpose({
 
 .simple-input__textarea {
   flex: 1;
-  /* 拖拽固定 field-area 高度时沿交叉轴撑满（默认内容高度会因 align-items: flex-end 不拉伸） */
-  align-self: stretch;
+  min-height: 0;
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
@@ -706,6 +714,15 @@ defineExpose({
   background-color: v-bind(selectionColorVar);
 }
 
+/* PC 录音面板：绝对覆盖整个输入区（含功能栏），与输入框等高 */
+.simple-input__voice-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  min-height: 0;
+  border: none;
+}
+
 .simple-input__voice-btn-mobile {
   flex: 1;
   padding: 10px 16px;
@@ -728,6 +745,7 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   padding: 8px 4px 4px 0;
+  flex-shrink: 0;
 }
 
 .simple-input__panel {

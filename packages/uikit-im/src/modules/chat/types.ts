@@ -260,7 +260,7 @@ export interface ChatConfig {
     autoFocus?: boolean
     /** 聚焦时边框颜色。默认聚焦高亮关闭（边框保持默认色，无"聚焦光环"）；显式传入才启用对应边框色 */
     focusBorderColor?: string
-    /** 光标颜色，不设置则使用默认 */
+    /** 光标颜色，不设置则跟随主题色（--uikit-primary） / Caret color, defaults to the theme primary color */
     caretColor?: string
     /** 文本选中背景色，不设置则使用主题选中色（--uikit-selection-bg，跟随主题色） */
     selectionColor?: string
@@ -277,9 +277,9 @@ export interface ChatConfig {
     enableTyping?: boolean
     /** 是否显示发送按钮，默认 true */
     showSendButton?: boolean
-    /** 是否允许拖拽调整输入区高度（仅 PC），默认 true / Whether the input area height can be resized by dragging (PC only), default true */
+    /** 是否允许拖拽调整输入区高度（仅 PC，手柄在输入卡片上缘；simple 模式默认高 132px），默认 true / Whether the input area height can be resized by dragging (PC only), default true */
     resizable?: boolean
-    /** 是否显示「展开输入框」按钮（仅 PC，点击后输入区原地撑高，Esc 或再次点击收起），默认 true / Whether to show the expand-input toggle button (PC only), default true */
+    /** 是否显示「展开输入框」角标（仅 PC，卡片右上角；点击后输入区升至 212px，再次点击或 Esc 恢复默认；拖拽超过 212px 时角标自动呈现恢复态），默认 true / Whether to show the expand-input corner toggle (PC only), default true */
     expandable?: boolean
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]

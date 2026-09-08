@@ -217,8 +217,8 @@
   /* 语义 token：输入区背景 */
   --uikit-input-bg: var(--uikit-bg-base);
 
-  /* 语义 token：会话列表容器背景（接入方可覆盖定制） */
-  --uikit-conversation-list-bg: #FAFAFA;
+  /* 语义 token：会话列表容器背景（默认与聊天背景一致为白色，接入方可覆盖定制） */
+  --uikit-conversation-list-bg: var(--uikit-bg-base);
 
   /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框） */
   --uikit-input-border-color: #F5F5F5;
@@ -288,8 +288,8 @@
   /* 语义 token：输入区背景 - 暗色 */
   --uikit-input-bg: var(--uikit-bg-base);
 
-  /* 语义 token：会话列表容器背景 - 暗色（与页面底色一致） */
-  --uikit-conversation-list-bg: #111827;
+  /* 语义 token：会话列表容器背景 - 暗色（与聊天背景一致，即页面底色） */
+  --uikit-conversation-list-bg: var(--uikit-bg-base);
 
   /* 语义 token：输入框默认边框 - 暗色（与边框色一致） */
   --uikit-input-border-color: #374151;

@@ -832,8 +832,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
   position: relative;
   /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽，保证 tab 栏内部横向滚动成立 */
   min-width: 0;
-  /* 列表自带底色（默认 #FAFAFA，暗色 #111827）；接入方可覆盖 --uikit-conversation-list-bg 定制 */
-  background: var(--uikit-conversation-list-bg, #FAFAFA);
+  /* 列表自带底色（默认与聊天背景一致：亮色白/暗色页面底色）；接入方可覆盖 --uikit-conversation-list-bg 定制 */
+  background: var(--uikit-conversation-list-bg, var(--uikit-bg-base));
 }
 
 /* ===== 风格变体（列表根作用域覆写 Cell 变量，不影响全局主题） ===== */

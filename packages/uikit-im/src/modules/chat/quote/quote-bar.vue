@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmIcon as Icon, MESSAGE_TYPE, useLocale } from '@easemob/uikit-core'
 import type { ImageMessageBody, UiMessage, VideoMessageBody } from '@easemob/uikit-core'
 import { getQuotePreview } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
@@ -95,31 +95,30 @@ function onClose() {
       <span class="quote-bar__sender">{{ sender }}：</span>
       <span class="quote-bar__preview">{{ preview }}</span>
     </div>
-    <IconButton
+    <button
+      type="button"
       class="quote-bar__close"
-      icon="xmark/light"
-      size="small"
-      variant="ghost"
       :title="t('quote.cancel', '取消引用')"
       @click.stop="onClose"
-    />
+    >
+      <Icon name="circle/xmark" :size="18" />
+    </button>
   </div>
 </template>
 
 <style scoped>
+/* 设计稿：无边框无底色，竖杠 + 类型 icon + 昵称 + 内容 + 18×18 关闭 */
 .quote-bar {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  margin: 0 12px 4px;
-  border-radius: 6px;
-  background-color: var(--uikit-bg-base);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  padding: 2px 0;
+  /* 左缩进 5px：竖杠与工具栏图标（32px 按钮内 22px 图标）左边缘对齐 */
+  margin: 4px 0 4px 5px;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-13);
   line-height: 1.4;
-  min-height: 32px;
+  min-height: 24px;
 }
 
 /* 竖杠：与气泡下方引用卡片同规格 */
@@ -172,7 +171,25 @@ function onClose() {
   white-space: nowrap;
 }
 
+/* 关闭按钮：18×18 纯图标，无底色，hover 加深 */
 .quote-bar__close {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--uikit-text-secondary);
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+@media (hover: hover) {
+  .quote-bar__close:hover {
+    color: var(--uikit-text-primary);
+  }
 }
 </style>

@@ -1605,7 +1605,8 @@ async function onRemoveAdmin(member: UiGroupMember) {
   align-items: center;
   gap: 4px;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-primary);
+  /* 设计师稿：正在输入低调展示，固定灰色不跟随主题色 */
+  color: var(--uikit-text-secondary);
 }
 
 /* 单聊副标题区：在线状态 + 个性签名（正在输入时整行被 typing 占据） */
