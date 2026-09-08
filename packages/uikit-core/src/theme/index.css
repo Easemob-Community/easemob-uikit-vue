@@ -234,6 +234,18 @@
 
   /* 语义 token：徽标（未读数 / 红点）默认背景色，独立于 danger 语义色 */
   --uikit-badge-bg: #FF7070;
+
+  /* 语义 token：Switch 关闭态轨道色（设计稿灰）；hover 由 color-mix 实时派生（混入文字色），
+     自动跟随明暗模式，无需暗色覆写 */
+  --uikit-switch-off-bg: #C9CDCF;
+  --uikit-switch-off-hover-bg: color-mix(in srgb, var(--uikit-switch-off-bg) 88%, var(--uikit-text-primary));
+
+  /* 语义 token：Switch 轨道尺寸（medium 36×20 / small 28×16，手柄由轨道高自动派生）；
+     明暗共用，接入方可全局覆盖以自定义宽高 */
+  --uikit-switch-track-w: 36px;
+  --uikit-switch-track-h: 20px;
+  --uikit-switch-small-track-w: 28px;
+  --uikit-switch-small-track-h: 16px;
 }
 
 [data-uikit-theme="dark"] {
@@ -305,6 +317,9 @@
 
   /* 语义 token：徽标默认背景色 - 暗色（与浅色一致，保证未读可辨识） */
   --uikit-badge-bg: #FF7070;
+
+  /* 语义 token：Switch 关闭态轨道色 - 暗色 */
+  --uikit-switch-off-bg: #4B5563;
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
   --uikit-success-rgb: 22, 163, 74;

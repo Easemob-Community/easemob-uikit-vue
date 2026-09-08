@@ -1,3 +1,12 @@
+## @easemob/uikit-core 2.6.0 (2026-09-04)
+
+
+### 新增
+
+- **文件类型图标底色 token**：`--uikit-file-icon-{pdf,xls,doc,ppt,md,img,video,audio,file}` 品牌识别色（pdf `#E5252A` / xls `#1D7044` / doc `#2B5797` / ppt `#D24625` / md `#424242` / img `#00897B` / video `#E91E63` / audio `#7B1FA2` / 未识别普通文件 `#4CAF50`），明暗模式通用。
+
+---
+
 ## @easemob/uikit-core 2.5.0 (2026-09-03)
 
 

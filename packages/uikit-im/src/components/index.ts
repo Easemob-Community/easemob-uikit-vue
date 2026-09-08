@@ -26,6 +26,7 @@ export {
   EmScrollToTop,
   EmSkeleton,
   EmStatusBanner,
+  EmSwitch,
   EmText,
   EmToast,
   EmUserCard,
@@ -48,6 +49,8 @@ export type {
   StatusBannerItem,
   StatusBannerProps,
   StatusBannerType,
+  SwitchEmits,
+  SwitchProps,
   TextColor,
   TextLevel,
   TextProps,
@@ -87,5 +90,6 @@ export const componentList = [
   'em-image-viewer',
   'em-resizable',
   'em-skeleton',
+  'em-switch',
   'em-text',
 ] as const

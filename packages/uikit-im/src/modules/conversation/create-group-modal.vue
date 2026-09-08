@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmInput as Input, EmPopup as Popup, useLocale, useViewport } from '@easemob/uikit-core'
+import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob/uikit-core'
 import type { CreateGroupParams, UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -284,7 +284,7 @@ watch(
                 {{ t('group.createPublic', '公开群') }}
               </template>
               <template #trailing>
-                <span class="create-group-modal__switch" :class="{ 'is-on': settings.public }"><i /></span>
+                <Switch v-model="settings.public" @click.stop />
               </template>
             </Cell>
             <Cell size="compact" :border="false" @click="settings.joinApprovalRequired = !settings.joinApprovalRequired">
@@ -292,7 +292,7 @@ watch(
                 {{ t('group.createApproval', '入群需审批') }}
               </template>
               <template #trailing>
-                <span class="create-group-modal__switch" :class="{ 'is-on': settings.joinApprovalRequired }"><i /></span>
+                <Switch v-model="settings.joinApprovalRequired" @click.stop />
               </template>
             </Cell>
             <Cell size="compact" :border="false" @click="settings.allowInvites = !settings.allowInvites">
@@ -300,7 +300,7 @@ watch(
                 {{ t('group.createAllowInvites', '允许成员邀请') }}
               </template>
               <template #trailing>
-                <span class="create-group-modal__switch" :class="{ 'is-on': settings.allowInvites }"><i /></span>
+                <Switch v-model="settings.allowInvites" @click.stop />
               </template>
             </Cell>
             <Cell size="compact" :border="false" @click="settings.inviteNeedConfirm = !settings.inviteNeedConfirm">
@@ -308,7 +308,7 @@ watch(
                 {{ t('group.createInviteNeedConfirm', '被邀请人需确认') }}
               </template>
               <template #trailing>
-                <span class="create-group-modal__switch" :class="{ 'is-on': settings.inviteNeedConfirm }"><i /></span>
+                <Switch v-model="settings.inviteNeedConfirm" @click.stop />
               </template>
             </Cell>
             <div class="create-group-modal__field create-group-modal__field--max-members">
@@ -544,36 +544,6 @@ watch(
 
 .create-group-modal__field--max-members {
   margin-top: 10px;
-}
-
-.create-group-modal__switch {
-  width: 36px;
-  height: 20px;
-  border-radius: 10px;
-  background-color: var(--uikit-bg-strong, #e5e7eb);
-  position: relative;
-  transition: background-color var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.create-group-modal__switch i {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: var(--uikit-text-inverse);
-  transition: transform var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
-}
-
-.create-group-modal__switch.is-on {
-  background-color: var(--uikit-primary-color);
-}
-
-.create-group-modal__switch.is-on i {
-  transform: translateX(16px);
 }
 
 .create-group-modal__footer {

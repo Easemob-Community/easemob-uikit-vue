@@ -1,3 +1,12 @@
+## @easemob/uikit-im 3.5.0 (2026-09-04)
+
+
+### 变更
+
+- **文件消息气泡整改（设计规范）**：文件图标改为左侧固定展示的彩色底色块（双方气泡一致），按扩展名归类取图标——pdf / xls / doc / ppt / md 明确格式各用明确图标，图片 / 视频 / 音频按类别用 `file/img` / `file/video` / `file/audio`，未识别类型回落 `file/empty`；图标底色为类型品牌色 token（见 core 2.6.0），图标本体白色。文件标题改用 `EmText`（body 14px / medium / 单行 ellipsis），颜色跟随气泡文字色（对方 `#171A1C`、己方 `#FFFFFF`）。气泡圆角沿用 round 16px / square 8px 两档，但文件卡片默认 square（8px，设计约定），可经 `config.messageList.bubbleShape` 切 round。
+
+---
+
 ## @easemob/uikit-im 3.4.0 (2026-09-03)
 
 

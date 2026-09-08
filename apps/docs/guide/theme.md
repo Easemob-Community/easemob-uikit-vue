@@ -170,6 +170,8 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-input-border-color`：输入框默认边框色（默认 `#F5F5F5`，暗色 `#374151`；search/filled 变体无边框不受其影响）
 - `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#E6E6E6` / `#BDBDBD`）
 - `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）
+- `--uikit-switch-off-bg`：Switch 关闭态轨道色（默认 `#C9CDCF`，暗色 `#4B5563`）；hover 态由 `--uikit-switch-off-hover-bg`（`color-mix` 派生）自动跟随
+- `--uikit-switch-track-w` / `--uikit-switch-track-h`：Switch medium 轨道宽高（默认 `36px` / `20px`）；`--uikit-switch-small-track-w` / `--uikit-switch-small-track-h` 为 small 档（默认 `28px` / `16px`），手柄尺寸由轨道高自动派生，覆盖即可全局自定义开关宽高
 
 ## 主题演练场
 

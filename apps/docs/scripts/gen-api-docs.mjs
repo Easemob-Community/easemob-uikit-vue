@@ -35,7 +35,7 @@ const PACKAGES = [
     containersRoot: join(__dirname, '../../../packages/uikit-im/src/containers'),
     outputDir: join(__dirname, '../.vitepress/gen'),
     /**
-     * 22 个原子组件（P1 抽核后大部分位于 core 包，uikit-im 全量 re-export，
+     * 23 个原子组件（P1 抽核后大部分位于 core 包，uikit-im 全量 re-export，
      * 文档页归属不变）：字符串 = 当前包 componentsRoot 下；对象 = 显式指定根目录
      */
     components: [
@@ -61,6 +61,7 @@ const PACKAGES = [
       'scroll-to-top',
       'skeleton',
       'status-banner',
+      'switch',
       'toast',
       'user-card',
     ],

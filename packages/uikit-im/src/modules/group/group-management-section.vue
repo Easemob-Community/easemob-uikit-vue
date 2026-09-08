@@ -5,6 +5,7 @@ import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmSwitch as Switch } from '@easemob/uikit-core'
 
 import { useLocale } from '@easemob/uikit-core'
 import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
@@ -234,15 +235,7 @@ function closePanel() {
           <Icon name="bubble/slash" :size="18" />
         </template>
         <template #trailing>
-          <label class="group-management-section__toggle" @click.stop>
-            <input
-              type="checkbox"
-              :checked="isMuteAll"
-              class="group-management-section__toggle-input"
-              @change="toggleMuteAll"
-            >
-            <span class="group-management-section__toggle-slider" />
-          </label>
+          <Switch :model-value="isMuteAll" @change="toggleMuteAll" @click.stop />
         </template>
       </Cell>
 
@@ -530,51 +523,6 @@ function closePanel() {
   /* 卡片内操作项：紧凑 padding + hover 背景顶满 */
   --uikit-item-hover-padding-x: 12px;
   --uikit-cell-height-compact: 40px;
-}
-
-/* 全员禁言开关 */
-.group-management-section__toggle {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.group-management-section__toggle-input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-.group-management-section__toggle-slider {
-  position: absolute;
-  inset: 0;
-  background-color: var(--uikit-border-color);
-  border-radius: 24px;
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.group-management-section__toggle-slider::before {
-  content: '';
-  position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--uikit-text-inverse);
-  border-radius: 50%;
-  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.group-management-section__toggle-input:checked + .group-management-section__toggle-slider {
-  background-color: var(--uikit-primary-color, hsl(203, 100%, 60%));
-}
-
-.group-management-section__toggle-input:checked + .group-management-section__toggle-slider::before {
-  transform: translateX(20px);
 }
 
 /* 抽屉头部 */

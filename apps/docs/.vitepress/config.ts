@@ -109,6 +109,7 @@ export default defineConfig({
                 { text: 'IconButton 图标按钮', link: '/components/icon-button' },
                 { text: 'ScrollToTop 回到顶部', link: '/components/scroll-to-top' },
                 { text: 'Skeleton 骨架屏', link: '/components/skeleton' },
+                { text: 'Switch 开关', link: '/components/switch' },
                 { text: 'Resizable 拖拽尺寸', link: '/components/resizable' },
               ],
             },
