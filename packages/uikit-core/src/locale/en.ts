@@ -389,6 +389,8 @@ const messages: LocaleMessages = {
   'message.copyFailed': 'Copy failed',
   'message.quote.prefix': 'Reply to',
   'message.quote.notFound': 'Original message deleted or not loaded',
+  'quote.cancel': 'Cancel quote',
+  'quote.thumbUnavailable': '[Thumbnail unavailable]',
   'message.mention.locatorNotFound': 'No messages found from this user',
   'message.edited': 'edited',
   'message.stream.error': 'Content generation failed',

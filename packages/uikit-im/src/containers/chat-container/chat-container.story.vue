@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useConversationStore } from '../../store/conversation'
 import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, usePresenceStore, useUserInfoStore } from '@easemob/uikit-core'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import ChatContainer from './chat-container.vue'
 
@@ -58,11 +58,60 @@ function injectMockData() {
   msgStore.messageMap[mockConversation.id] = mockMessages as any
 }
 
+/** 单聊会话 mock（header 副标题区演示） */
+const singleChatConversation = {
+  id: 'user_002',
+  name: '',
+  type: CONVERSATION_TYPE.SINGLECHAT,
+  avatar: '',
+  unreadCount: 0,
+  lastMessageText: '周末一起去打球吗？',
+  marks: [],
+  lastMessageTime: Date.now(),
+  timestamp: Date.now(),
+  isPinned: false,
+  isMuted: false,
+}
+
+/**
+ * 注入单聊 mock：会话 + 对方资料（含签名）+ 在线状态。
+ * 经 @vue:mounted 挂在具体 Variant 上，避免覆盖其它 Variant 的群聊会话。
+ */
+function injectSingleChatMockData(typing = false) {
+  const cvsStore = useConversationStore()
+  const presenceStore = usePresenceStore()
+  const userInfoStore = useUserInfoStore()
+
+  cvsStore.setConversationList([singleChatConversation])
+  cvsStore.setCurrentConversationId(singleChatConversation.id)
+
+  userInfoStore.setUserInfo({ userId: 'user_002', nickname: '小环', sign: '保持热爱，奔赴山海' })
+  userInfoStore.markFetchedAttributes(['user_002'], ['nickname', 'avatarUrl', 'sign'])
+  presenceStore.update({ userId: 'user_002', status: 'online', lastTime: Date.now() })
+
+  if (typing)
+    cvsStore.setTyping(singleChatConversation.id, 'user_002')
+  else
+    cvsStore.clearTyping(singleChatConversation.id)
+}
+
 /** 基础配置 */
 const baseConfig: ChatConfig = {
   header: { visible: true, align: 'center' },
   messageList: { layout: 'conversation', showAvatar: true, showTime: true },
   input: { mode: 'simple', style: 'toolbar-top', features: { emoji: true, image: true, file: true, voice: true } },
+}
+
+/** 单聊 header 配置（设计师稿：左对齐、不展示头像） */
+const singleChatConfig: ChatConfig = {
+  ...baseConfig,
+  header: { visible: true, align: 'left' },
+}
+
+/** 单聊副标题：仅在线状态档 */
+const subtitlePresenceConfig: ChatConfig = {
+  ...baseConfig,
+  header: { visible: true, align: 'left', subtitle: 'presence' },
 }
 
 /** 各种变体配置 */
@@ -214,7 +263,7 @@ injectMockData()
     <Variant title="Default">
       <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <UIKitProvider :auto-init="false">
-          <ChatContainer :config="baseConfig" />
+          <ChatContainer :config="baseConfig" @vue:mounted="injectMockData" />
         </UIKitProvider>
       </div>
     </Variant>
@@ -468,6 +517,57 @@ injectMockData()
                   <button type="button" @click="close">关闭</button>
                 </div>
               </div>
+            </template>
+          </ChatContainer>
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Single Chat Subtitle (Presence + Sign)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="singleChatConfig"
+            @vue:mounted="injectSingleChatMockData()"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Single Chat Subtitle (Typing)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="singleChatConfig"
+            @vue:mounted="injectSingleChatMockData(true)"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Single Chat Subtitle (Presence Only)">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="subtitlePresenceConfig"
+            @vue:mounted="injectSingleChatMockData()"
+          />
+        </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="#header-subtitle 插槽接管">
+      <div style="height: 600px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <UIKitProvider :auto-init="false">
+          <ChatContainer
+            :config="singleChatConfig"
+            @vue:mounted="injectSingleChatMockData()"
+          >
+            <!-- 接管单聊副标题区：scope 提供 conversation / typing / presence / sign -->
+            <template #header-subtitle="{ typing, presence, sign }">
+              <span style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
+                {{ typing ? '对方正在输入（自定义渲染）' : `自定义副标题：${presence?.status ?? 'unknown'} · ${sign}` }}
+              </span>
             </template>
           </ChatContainer>
         </UIKitProvider>

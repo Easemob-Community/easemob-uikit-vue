@@ -389,6 +389,8 @@ const messages: LocaleMessages = {
   'message.copyFailed': '复制失败',
   'message.quote.prefix': '引用',
   'message.quote.notFound': '原消息已删除或未加载',
+  'quote.cancel': '取消引用',
+  'quote.thumbUnavailable': '[缩略图未获取]',
   'message.mention.locatorNotFound': '未找到该用户的消息',
   'message.edited': '已编辑',
   'message.stream.error': '内容生成异常',

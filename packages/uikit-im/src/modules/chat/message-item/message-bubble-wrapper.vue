@@ -25,6 +25,11 @@ export interface MessageBubbleWrapperProps {
   isMultiSelectMode?: boolean
   /** 当前消息是否被选中 */
   isSelected?: boolean
+  /**
+   * 是否为单聊中最新一条己方已读消息（由消息列表计算传入）。
+   * 缺省 true：独立场景（合并转发弹窗/搜索结果等）保持每条都展示已读 icon 的旧行为。
+   */
+  isLatestReadSelf?: boolean
 }
 
 export interface MessageBubbleWrapperEmits {
@@ -193,12 +198,32 @@ const showStatus = computed(() => isSelf.value && !isGroupReadReceiptActive.valu
 /** 消息状态展示配置 */
 const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageStatus || {})
 
+/**
+ * 单聊已读 icon 收敛（仿抖音）：readIconDisplay 默认 'latest' 时，
+ * 连续已读只在最新一条已读消息上展示已读状态，其余已读消息隐藏。
+ * 仅影响 READ 状态；未读（sent/delivered）/发送中/失败照常逐条展示。
+ */
+const hideReadStatus = computed(() => {
+  if (props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT)
+    return false
+  if (messageStatus.value !== MESSAGE_STATUS.READ)
+    return false
+  if ((statusConfig.value.readIconDisplay ?? 'latest') !== 'latest')
+    return false
+  return props.isLatestReadSelf === false
+})
+
+/** 实际展示状态：showStatus 减去「单聊已读收敛」隐藏的情形 */
+const showStatusEffective = computed(() => showStatus.value && !hideReadStatus.value)
+
 /** 经典状态图标映射（默认） */
 const classicStatusIconMap: Record<MessageStatusValue, string> = {
   // 发送中：小尺寸（14px）使用小弧 loading 图标，避免大弧在小尺寸下拥挤
   [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
-  [MESSAGE_STATUS.SENT]: 'circle/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
+  // 未读（已发送/已送达）：主题色空心圆
+  [MESSAGE_STATUS.SENT]: 'circle/empty-1',
+  [MESSAGE_STATUS.DELIVERED]: 'circle/empty-1',
+  // 已读：灰色打勾圆
   [MESSAGE_STATUS.READ]: 'circle/checked',
   // 发送失败：圆圈内感叹号提示可点击重发
   [MESSAGE_STATUS.FAILED]: 'circle/bang',
@@ -210,8 +235,8 @@ const classicStatusIconMap: Record<MessageStatusValue, string> = {
  */
 const capsuleStatusIconMap: Record<MessageStatusValue, string> = {
   [MESSAGE_STATUS.SENDING]: 'loading/arc/normal',
-  [MESSAGE_STATUS.SENT]: 'circle/empty',
-  [MESSAGE_STATUS.DELIVERED]: 'circle/empty',
+  [MESSAGE_STATUS.SENT]: 'circle/empty-1',
+  [MESSAGE_STATUS.DELIVERED]: 'circle/empty-1',
   [MESSAGE_STATUS.READ]: 'circle/checked',
   [MESSAGE_STATUS.FAILED]: 'circle/bang',
 }
@@ -293,6 +318,11 @@ const groupMemberCount = computed(() => {
 /** 群已读人数 */
 const groupReadCount = computed(() => props.message.groupReadCount || 0)
 
+/** 群已读人数展示文本：超过 999 显示 999+（设计师稿三位数上限） */
+const groupReadCountText = computed(() =>
+  groupReadCount.value > 999 ? '999+' : String(groupReadCount.value),
+)
+
 /** 群未读人数 */
 const groupUnreadCount = computed(() =>
   groupMemberCount.value > 0 ? groupMemberCount.value - groupReadCount.value : 0,
@@ -326,6 +356,9 @@ const quoteData = computed(() => {
     msgThumbUrl: String(q.msgThumbUrl || ''),
   } as MsgQuotePayload
 })
+
+/** 引用卡片是否展示原消息发送人头像（config.messageList.quote.showAvatar，默认 false） */
+const quoteShowAvatar = computed(() => props.config?.quote?.showAvatar ?? false)
 
 /** 点击引用卡片：触发定位/闪烁，列表端 watch locateRequest 处理 */
 function onQuoteClick() {
@@ -533,13 +566,14 @@ onBeforeUnmount(() => {
                 v-if="quoteData"
                 :quote="quoteData"
                 :align-right="isSelfConversation"
+                :show-avatar="quoteShowAvatar"
                 @click="onQuoteClick"
               />
             </div>
 
             <!-- 消息状态指示器（仅己方消息） -->
             <div
-              v-if="showStatus"
+              v-if="showStatusEffective"
               class="message-bubble-wrapper__status"
               :class="{
                 'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
@@ -568,8 +602,7 @@ onBeforeUnmount(() => {
                       :size="14"
                       class="message-bubble-wrapper__status-icon"
                       :class="{
-                        'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
-                        'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                        'message-bubble-wrapper__status-icon--unread': messageStatus === MESSAGE_STATUS.SENT || messageStatus === MESSAGE_STATUS.DELIVERED,
                       }"
                       :anim="messageStatus === MESSAGE_STATUS.SENDING ? 'spin' : undefined"
                     />
@@ -644,7 +677,7 @@ onBeforeUnmount(() => {
 
             <!-- 状态列（状态 + 群已读，默认位于己方气泡左侧） -->
             <div
-              v-if="showStatus || showGroupReadCount"
+              v-if="showStatusEffective || showGroupReadCount"
               ref="statusColumnRef"
               class="message-bubble-wrapper__status-column"
               :class="{
@@ -652,7 +685,7 @@ onBeforeUnmount(() => {
               }"
             >
               <div
-                v-if="showStatus"
+                v-if="showStatusEffective"
                 class="message-bubble-wrapper__status"
                 :class="{
                   'message-bubble-wrapper__status--vertical': statusDirection === 'vertical',
@@ -680,8 +713,7 @@ onBeforeUnmount(() => {
                       class="message-bubble-wrapper__status-icon"
                       :class="{
                         'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
-                        'message-bubble-wrapper__status-icon--delivered': messageStatus === MESSAGE_STATUS.DELIVERED,
-                        'message-bubble-wrapper__status-icon--read': messageStatus === MESSAGE_STATUS.READ,
+                        'message-bubble-wrapper__status-icon--unread': messageStatus === MESSAGE_STATUS.SENT || messageStatus === MESSAGE_STATUS.DELIVERED,
                       }"
                     />
                     <Icon
@@ -713,8 +745,9 @@ onBeforeUnmount(() => {
                 @click.stop="onGroupReadClick"
               >
                 <Icon v-if="isGroupReadAll" name="circle/checked" :size="14" />
-                <template v-else-if="groupReadCount > 0">
-                  {{ groupReadCount }}
+                <Icon v-else-if="groupReadCount === 0" name="circle/empty-1" :size="14" />
+                <template v-else>
+                  {{ groupReadCountText }}
                 </template>
               </button>
             </div>
@@ -725,6 +758,7 @@ onBeforeUnmount(() => {
             v-if="quoteData"
             :quote="quoteData"
             :align-right="isSelfConversation"
+            :show-avatar="quoteShowAvatar"
             @click="onQuoteClick"
           />
           </template>
@@ -971,7 +1005,8 @@ onBeforeUnmount(() => {
     transform var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.message-bubble-wrapper__status-icon--read {
+/* 未读（已发送/已送达）：主题色空心圆；已读回落基色灰 */
+.message-bubble-wrapper__status-icon--unread {
   color: var(--uikit-primary-color);
 }
 
@@ -1012,49 +1047,52 @@ onBeforeUnmount(() => {
   margin-top: 2px;
 }
 
-/* 群已读人数标注（企业微信风格圆圈） */
+/* 群已读人数标注（设计师稿：主题色空心圆/胶囊，1 位圆、2~3 位胶囊，999+ 封顶） */
 .message-bubble-wrapper__group-read {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
+  box-sizing: border-box;
+  min-width: 14px;
   height: 14px;
-  border-radius: 50%;
-  border: 1px solid var(--uikit-text-secondary);
+  border-radius: 999px;
+  border: 1px solid var(--uikit-primary);
   background: transparent;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-primary);
   font-size: var(--uikit-font-size-8);
   line-height: 1;
-  padding: 0;
+  padding: 0 3px;
   margin-top: 2px;
-  padding-left: 2px;
   cursor: pointer;
-  transition:
-    color var(--uikit-anim-duration) var(--uikit-anim-easing),
-    border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
 
 @media (hover: hover) {
   .message-bubble-wrapper__group-read:hover {
-    color: var(--uikit-primary-color);
-    border-color: var(--uikit-primary-color);
+    opacity: 0.8;
   }
 }
 
+/* 全部已读：灰色打勾圆（无边框，icon 自带圆形） */
 .message-bubble-wrapper__group-read--all {
+  min-width: 0;
+  padding: 0;
   border: none;
   background: transparent;
-  color: var(--uikit-primary-color);
+  color: var(--uikit-text-secondary);
 }
 
+/* 无人已读：主题色空心圆 icon（无边框，icon 自带圆形） */
 .message-bubble-wrapper__group-read--zero {
-  border-color: var(--uikit-primary-color);
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .message-bubble-wrapper__message-row .message-bubble-wrapper__group-read {
   margin-top: 0;
-  padding-left: 0;
 }
 
 /* 消息状态图标切换过渡（发送中 → 已读等状态图标交替时的淡入淡出） */

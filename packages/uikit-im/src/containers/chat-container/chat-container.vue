@@ -148,6 +148,9 @@ defineExpose({
       <template #header-title="slotProps">
         <slot name="header-title" v-bind="slotProps" />
       </template>
+      <template #header-subtitle="slotProps">
+        <slot name="header-subtitle" v-bind="slotProps" />
+      </template>
       <template #header-extra="slotProps">
         <slot name="header-extra" v-bind="slotProps" />
       </template>

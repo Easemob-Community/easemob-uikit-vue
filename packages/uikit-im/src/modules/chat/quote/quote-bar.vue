@@ -1,39 +1,72 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, useLocale } from '@easemob/uikit-core'
+import type { ImageMessageBody, UiMessage, VideoMessageBody } from '@easemob/uikit-core'
 import { getQuotePreview } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
 
 export interface QuoteBarProps {
   message: UiMessage
+  /** 是否展示原消息发送人头像，默认 false */
+  showAvatar?: boolean
 }
 
 export interface QuoteBarEmits {
   (e: 'close'): void
 }
 
-const props = defineProps<QuoteBarProps>()
+const props = withDefaults(defineProps<QuoteBarProps>(), {
+  showAvatar: false,
+})
 const emit = defineEmits<QuoteBarEmits>()
 const { t } = useLocale()
 
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
-const { displayName } = useUserInfo(() => props.message.from)
+const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
 const sender = computed(() => displayName.value || props.message.from || '')
 
-/** 预览文本 */
-const preview = computed(() => getQuotePreview(props.message))
+/** 是否为图片/视频（有缩略图时直接展示缩略图） */
+const isMedia = computed(() => props.message.type === MESSAGE_TYPE.IMAGE || props.message.type === MESSAGE_TYPE.VIDEO)
 
-/** 是否为图片（展示缩略图） */
-const isImage = computed(() => props.message.type === MESSAGE_TYPE.IMAGE)
-
-/** 图片缩略图 URL */
+/** 图片/视频缩略图 URL */
 const thumbUrl = computed(() => {
-  const body = props.message.body as ImageMessageBody
-  return body.thumbnailUrl || body.localUrl || body.originalImageUrl || ''
+  if (props.message.type === MESSAGE_TYPE.IMAGE) {
+    const body = props.message.body as ImageMessageBody
+    return body.thumbnailUrl || body.localUrl || body.originalImageUrl || ''
+  }
+  if (props.message.type === MESSAGE_TYPE.VIDEO) {
+    const body = props.message.body as VideoMessageBody
+    return body.thumbnailUrl || ''
+  }
+  return ''
+})
+
+/** 分类型前置图标（有缩略图的媒体类型不占 icon 位） */
+const typeIcon = computed(() => {
+  if (isMedia.value && thumbUrl.value)
+    return ''
+  switch (props.message.type) {
+    case MESSAGE_TYPE.IMAGE:
+      return 'file/img'
+    case MESSAGE_TYPE.VIDEO:
+      return 'file/video'
+    case MESSAGE_TYPE.VOICE:
+      return 'mic'
+    case MESSAGE_TYPE.FILE:
+      return 'doc'
+    default:
+      return 'circle/quote'
+  }
+})
+
+/**
+ * 预览文本：语音带时长、文件带文件名（getQuotePreview 已组装）；
+ * 图片/视频无缩略图时按设计师稿提示「缩略图未获取」。
+ */
+const preview = computed(() => {
+  if (isMedia.value && !thumbUrl.value)
+    return t('quote.thumbUnavailable', '[缩略图未获取]')
+  return getQuotePreview(props.message)
 })
 
 function onClose() {
@@ -43,13 +76,21 @@ function onClose() {
 
 <template>
   <div class="quote-bar">
-    <Icon class="quote-bar__icon" name="circle/quote" :size="14" />
+    <span class="quote-bar__bar" aria-hidden="true" />
     <img
-      v-if="isImage && thumbUrl"
+      v-if="isMedia && thumbUrl"
       class="quote-bar__thumb"
       :src="thumbUrl"
       alt="quote-thumb"
     >
+    <Icon v-else-if="typeIcon" class="quote-bar__icon" :name="typeIcon" :size="14" />
+    <Avatar
+      v-if="showAvatar"
+      class="quote-bar__avatar"
+      :src="avatarUrl"
+      :name="sender"
+      :size="20"
+    />
     <div class="quote-bar__text">
       <span class="quote-bar__sender">{{ sender }}：</span>
       <span class="quote-bar__preview">{{ preview }}</span>
@@ -81,9 +122,22 @@ function onClose() {
   min-height: 32px;
 }
 
+/* 竖杠：与气泡下方引用卡片同规格 */
+.quote-bar__bar {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 3px;
+  border-radius: 2px;
+  background-color: var(--uikit-border-color, #e5e7eb);
+}
+
 .quote-bar__icon {
   flex-shrink: 0;
   color: var(--uikit-text-secondary);
+}
+
+.quote-bar__avatar {
+  flex-shrink: 0;
 }
 
 .quote-bar__thumb {

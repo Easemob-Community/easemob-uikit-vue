@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, useSlots, watch, watchEffect } from 'vue'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, usePresence, useToast } from '@easemob/uikit-core'
 import type { UiConversation as Conversation, ConversationTypeValue, ForwardModeValue, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '@easemob/uikit-sdk-contract'
 import { useChat } from '../../composables/use-chat'
@@ -444,7 +444,7 @@ const headerHeight = ref(0)
 const peerUserId = computed(() =>
   currentConversation.value?.type === CONVERSATION_TYPE.SINGLECHAT ? currentConversation.value.id : undefined,
 )
-const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
+const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId, ['nickname', 'avatarUrl', 'sign'])
 
 /** 顶部标题：群聊用会话名；单聊按 备注 > 资料昵称 > 会话名 > ID */
 const headerTitle = computed(() => {
@@ -473,6 +473,50 @@ const isPeerTyping = computed(() => {
     return false
   return !!stores.conversation.typingMap[currentConversation.value.id]
 })
+
+/** 单聊副标题档位（默认 'auto'；仅单聊生效） */
+const subtitleMode = computed(() => headerConfig.value?.subtitle ?? 'auto')
+
+/** 是否展示副标题区（none 档连「正在输入」一起关闭；群聊无副标题区） */
+const showSubtitleArea = computed(() => !!peerUserId.value && subtitleMode.value !== 'none')
+
+/** 当前档位是否需要在线状态数据（auto / presence） */
+const subtitleNeedsPresence = computed(() =>
+  showSubtitleArea.value && (subtitleMode.value === 'auto' || subtitleMode.value === 'presence'),
+)
+
+const presence = usePresence()
+
+/** 订阅/退订对方在线状态（跟随会话切换与档位变化；组件销毁时自动退订） */
+presence.watch(computed(() =>
+  subtitleNeedsPresence.value && peerUserId.value ? [peerUserId.value] : [],
+))
+
+/** 对方在线状态（响应式） */
+const peerPresence = computed(() =>
+  subtitleNeedsPresence.value && peerUserId.value ? presence.get(peerUserId.value).value : undefined,
+)
+
+/** 在线状态展示文本：custom 状态优先展示自定义描述 */
+const presenceText = computed(() => {
+  const p = peerPresence.value
+  if (!p)
+    return ''
+  if (p.status === 'custom')
+    return p.ext || t('presence.custom', '自定义')
+  return t(`presence.${p.status}`)
+})
+
+/** 对方个性签名 */
+const peerSign = computed(() => userInfo.value?.sign || '')
+
+/** 是否展示在线状态段 */
+const showPresenceText = computed(() => subtitleNeedsPresence.value && !!presenceText.value)
+
+/** 是否展示签名段（auto / sign 档且有签名） */
+const showSignText = computed(() =>
+  showSubtitleArea.value && (subtitleMode.value === 'auto' || subtitleMode.value === 'sign') && !!peerSign.value,
+)
 
 /** 顶部头像：单聊优先取用户资料头像 */
 const headerAvatar = computed(() => {
@@ -1136,14 +1180,33 @@ async function onRemoveAdmin(member: UiGroupMember) {
                 >({{ groupMemberCount }})</span>
               </slot>
             </div>
-            <div v-if="isPeerTyping" class="chat__typing">
-              <span class="typing-dots" aria-hidden="true">
-                <span class="typing-dots__dot" />
-                <span class="typing-dots__dot" />
-                <span class="typing-dots__dot" />
-              </span>
-              <span>{{ t('chat.typing', '对方正在输入...') }}</span>
-            </div>
+            <!-- 副标题区（仅单聊）：正在输入 > 在线状态 + 个性签名；可被 #header-subtitle 整体接管 -->
+            <slot
+              name="header-subtitle"
+              :conversation="currentConversation"
+              :typing="isPeerTyping"
+              :presence="peerPresence"
+              :sign="peerSign"
+            >
+              <div
+                v-if="showSubtitleArea && (isPeerTyping || showPresenceText || showSignText)"
+                class="chat__header-subtitle"
+              >
+                <span v-if="isPeerTyping" class="chat__typing">
+                  <span class="typing-dots" aria-hidden="true">
+                    <span class="typing-dots__dot" />
+                    <span class="typing-dots__dot" />
+                    <span class="typing-dots__dot" />
+                  </span>
+                  <span>{{ t('chat.typing', '对方正在输入...') }}</span>
+                </span>
+                <template v-else>
+                  <span v-if="showPresenceText" class="chat__header-subtitle-presence">{{ presenceText }}</span>
+                  <span v-if="showPresenceText && showSignText" class="chat__header-subtitle-sep">·</span>
+                  <span v-if="showSignText" class="chat__header-subtitle-sign">{{ peerSign }}</span>
+                </template>
+              </div>
+            </slot>
             <slot name="header-extra" :conversation="currentConversation" />
           </div>
           <IconButton
@@ -1543,6 +1606,32 @@ async function onRemoveAdmin(member: UiGroupMember) {
   gap: 4px;
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-primary);
+}
+
+/* 单聊副标题区：在线状态 + 个性签名（正在输入时整行被 typing 占据） */
+.chat__header-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-secondary);
+  white-space: nowrap;
+}
+
+.chat__header-subtitle-presence {
+  flex-shrink: 0;
+}
+
+.chat__header-subtitle-sep {
+  flex-shrink: 0;
+}
+
+.chat__header-subtitle-sign {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .typing-dots {

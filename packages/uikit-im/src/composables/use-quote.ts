@@ -1,7 +1,17 @@
 import { ref } from 'vue'
 import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
 import { chineseMessagePreviewLabels } from '../utils/resolve-last-message-text'
-import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage } from '@easemob/uikit-core'
+
+/** 语音时长格式化：12'28''（分'秒''），与设计师引用样式稿一致 */
+function formatVoiceQuoteDuration(seconds: number | undefined): string {
+  if (!seconds || !Number.isFinite(seconds) || seconds <= 0)
+    return ''
+  const total = Math.round(seconds)
+  const m = Math.floor(total / 60)
+  const s = String(total % 60).padStart(2, '0')
+  return `${m}'${s}''`
+}
 
 /** 引用消息协议类型（ext.msgQuote） */
 export interface MsgQuotePayload {
@@ -34,13 +44,16 @@ export function getQuotePreview(message: UiMessage): string {
     case MESSAGE_TYPE.IMAGE:
       // 表情包（sticker/GIF，ext.isSticker 标记）按表情预览，与普通图片区分
       return message.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true ? '[表情]' : '[图片]'
-    case MESSAGE_TYPE.VOICE:
-      return '[语音]'
+    case MESSAGE_TYPE.VOICE: {
+      // 带上时长：[语音]12'28''；时长缺失时退化为 [语音]
+      const duration = formatVoiceQuoteDuration((message.body as VoiceMessageBody).duration)
+      return duration ? `[语音]${duration}` : '[语音]'
+    }
     case MESSAGE_TYPE.VIDEO:
       return '[视频]'
     case MESSAGE_TYPE.FILE: {
       const filename = (message.body as FileMessageBody).filename
-      return filename || '[文件]'
+      return filename ? `[文件]${filename}` : '[文件]'
     }
     case MESSAGE_TYPE.LOCATION:
       return '[位置]'

@@ -56,13 +56,62 @@ const isNotice = computed(() => (props.message.type as string) === MESSAGE_TYPE.
 
 /** CMD 透传消息不做任何 UI 渲染 */
 const isCmd = computed(() => (props.message.type as string) === MESSAGE_TYPE.CMD)
+
+/** 通知文本 */
+const noticeText = computed(() => (props.message.body as any).content || (props.message as any).content || '')
+
+/** params 中作为「名称」参与高亮的 key（排除 userId/count/announcement 等非名称字段） */
+const NOTICE_HIGHLIGHT_KEYS = ['name', 'names', 'fileName']
+
+/** 转义正则特殊字符 */
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * 通知高亮词表：取 params 里名称类字段的字符串值；`names` 为顿号/逗号拼接，拆成独立名称逐个高亮。
+ * 仅高亮在通知文本中实际出现的词，按长度降序避免短词遮蔽长词。
+ */
+const noticeHighlightTerms = computed(() => {
+  const params = (props.message.body as any).params as Record<string, string | number | boolean> | undefined
+  if (!params)
+    return []
+  const terms: string[] = []
+  for (const key of NOTICE_HIGHLIGHT_KEYS) {
+    const value = params[key]
+    if (typeof value !== 'string' || !value.trim())
+      continue
+    if (key === 'names')
+      terms.push(...value.split(/[、,，]/).map(s => s.trim()).filter(Boolean))
+    else
+      terms.push(value.trim())
+  }
+  return [...new Set(terms)].filter(t => noticeText.value.includes(t)).sort((a, b) => b.length - a.length)
+})
+
+/** 通知文本分段：名称段高亮（蓝色），其余保持中性灰 */
+const noticeSegments = computed(() => {
+  const text = noticeText.value
+  const terms = noticeHighlightTerms.value
+  if (!text || terms.length === 0)
+    return [{ text, highlight: false }]
+  const pattern = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'g')
+  return (text.split(pattern) as string[]).filter(Boolean).map(part => ({
+    text: part,
+    highlight: terms.includes(part),
+  }))
+})
 </script>
 
 <template>
   <div v-if="!isCmd" class="message-renderer">
-    <!-- 通知类型消息：居中灰色小字（可通过 #message-notice 插槽完全接管渲染） -->
+    <!-- 通知类型消息：居中灰色小字，名称类字段高亮（可通过 #message-notice 插槽完全接管渲染） -->
     <div v-if="isNotice && !$slots[slotName]" class="message-renderer__notice">
-      {{ (message.body as any).content || (message as any).content || '' }}
+      <span
+        v-for="(segment, index) in noticeSegments"
+        :key="index"
+        :class="{ 'message-renderer__notice-name': segment.highlight }"
+      >{{ segment.text }}</span>
     </div>
 
     <!-- 类型级插槽覆盖：用户可通过 #message-txt 等完全替换某一类型的渲染 -->
@@ -112,6 +161,11 @@ const isCmd = computed(() => (props.message.type as string) === MESSAGE_TYPE.CMD
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-12);
   text-align: center;
+}
+
+/* 通知中的名称（操作者/成员/文件名等）按设计稿高亮为主题色 */
+.message-renderer__notice-name {
+  color: var(--uikit-primary);
 }
 
 .message-renderer__slot {

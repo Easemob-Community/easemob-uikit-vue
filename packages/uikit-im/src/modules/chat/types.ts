@@ -51,6 +51,13 @@ export interface MessageStatusConfig {
    * - capsule：数字胶囊风格，未读=空心圆/实心圆点，已读=圆+对勾。
    */
   style?: MessageStatusStyle
+  /**
+   * 单聊己方「已读」状态图标的展示策略，默认 'latest'；仅单聊生效。
+   * - latest：连续已读只在最新一条已读消息上展示已读 icon（仿抖音移动端）；
+   * - all：每条已读消息都展示已读 icon。
+   * Display strategy for the read icon on self messages in single chats. Default 'latest'.
+   */
+  readIconDisplay?: 'latest' | 'all'
 }
 
 /**
@@ -83,6 +90,14 @@ export interface ChatConfig {
     showMemberCount?: boolean
     /** 是否显示抽屉入口按钮（聊天信息），默认 true */
     showDrawerEntry?: boolean
+    /**
+     * 单聊副标题档位（标题下方区域），默认 'auto'；仅单聊生效：
+     * auto（在线状态 + 个性签名，缺哪个显示哪个）/ presence（仅在线状态）/ sign（仅签名）/
+     * none（整个副标题区连同「正在输入」提示一起关闭）。
+     * 对方正在输入时优先占据此区域；可被 #header-subtitle 插槽整体接管。
+     * Subtitle level under the title for single chats. Default 'auto'.
+     */
+    subtitle?: 'auto' | 'presence' | 'sign' | 'none'
   }
   /** 消息列表配置 */
   messageList?: {
@@ -151,6 +166,14 @@ export interface ChatConfig {
     autoLocateAtMe?: boolean
     /** 消息发送状态展示配置 */
     messageStatus?: MessageStatusConfig
+    /** 引用展示配置 */
+    quote?: {
+      /**
+       * 引用卡片是否展示原消息发送人头像，默认 false。
+       * Whether the quote card shows the original sender's avatar. Default false.
+       */
+      showAvatar?: boolean
+    }
   }
   /** 消息操作配置 */
   messageAction?: {

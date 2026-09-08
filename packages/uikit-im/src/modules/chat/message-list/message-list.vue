@@ -9,7 +9,7 @@ import { useUIKit } from '../../../composables/use-uikit'
 import { useViewport } from '@easemob/uikit-core'
 import { usePullRefresh } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
 import MessageBubbleWrapper from '../message-item/message-bubble-wrapper.vue'
 import GroupReadReceiptModal from '../group-read-receipt-modal/group-read-receipt-modal.vue'
 import { EmModal as Modal } from '@easemob/uikit-core'
@@ -749,6 +749,21 @@ const messagesWithDividers = computed(() => {
   return result
 })
 
+/**
+ * 单聊最新一条己方已读消息的 key（msgServerId 或 msgLocalId）。
+ * 供气泡包装器实现「连续已读只在最新一条展示已读 icon」（readIconDisplay: 'latest'）。
+ */
+const latestReadSelfMsgKey = computed(() => {
+  if (currentConversation.value?.type !== CONVERSATION_TYPE.SINGLECHAT)
+    return ''
+  for (let i = messages.value.length - 1; i >= 0; i--) {
+    const msg = messages.value[i]
+    if (msg.isSelf && msg.status === MESSAGE_STATUS.READ)
+      return msg.msgServerId || msg.msgLocalId
+  }
+  return ''
+})
+
 /** 闪烁高亮计时器，避免连续点击多个计时器堆积 */
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -869,6 +884,7 @@ watch(locateRequest, (req) => {
           :group-read-receipt-config="config?.groupReadReceipt"
           :is-multi-select-mode="isMultiSelectMode"
           :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
+          :is-latest-read-self="((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId) === latestReadSelfMsgKey"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
@@ -924,6 +940,7 @@ watch(locateRequest, (req) => {
             :group-read-receipt-config="config?.groupReadReceipt"
             :is-multi-select-mode="isMultiSelectMode"
             :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
+            :is-latest-read-self="((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId) === latestReadSelfMsgKey"
             @toggle-select="onToggleSelect"
             @action="onMessageAction"
             @group-read-click="onGroupReadClick"

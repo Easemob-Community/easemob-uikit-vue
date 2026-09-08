@@ -1,45 +1,51 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
-import type { ComputedRef } from 'vue'
-import { MESSAGE_TYPE, INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
+import { computed } from 'vue'
+import { EmAvatar as Avatar, EmIcon as Icon, MESSAGE_TYPE } from '@easemob/uikit-core'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { BubbleShape } from '../types'
 
 export interface QuoteCardProps {
   quote: MsgQuotePayload
   /** 是否对齐到右侧（己方消息） */
   alignRight?: boolean
+  /** 是否展示原消息发送人头像，默认 false */
+  showAvatar?: boolean
 }
 
 export interface QuoteCardEmits {
   (e: 'click', quote: MsgQuotePayload): void
 }
 
-const props = defineProps<QuoteCardProps>()
+const props = withDefaults(defineProps<QuoteCardProps>(), {
+  showAvatar: false,
+})
 const emit = defineEmits<QuoteCardEmits>()
 
-const themeStore = useThemeStore()
-
-/** 圆角档位：config.messageList.bubbleShape 优先，未配置回落主题全局 bubbleShape（message-bubble-wrapper provide） */
-const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
-const isSquare = computed(() =>
-  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square',
-)
-
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
-const { displayName } = useUserInfo(() => props.quote.msgSender)
+const { displayName, avatarUrl } = useUserInfo(() => props.quote.msgSender)
 const senderName = computed(() => displayName.value || props.quote.msgSender)
 
-/** 是否展示图片/视频缩略图 */
-const isMedia = computed(() => props.quote.msgType === MESSAGE_TYPE.IMAGE || props.quote.msgType === MESSAGE_TYPE.VIDEO)
-/** 缩略图地址 */
-const thumbUrl = computed(() => props.quote.msgThumbUrl || '')
-/** 非媒体类型或没有缩略图时展示的兜底文案 */
-const fallbackPreview = computed(() => {
-  if (props.quote.msgType === MESSAGE_TYPE.IMAGE)
+/** 非文本类型的前置图标（设计师稿：图片/视频/语音/文件带类型 icon，文本不带） */
+const typeIcon = computed(() => {
+  switch (props.quote.msgType) {
+    case MESSAGE_TYPE.IMAGE:
+      return 'file/img'
+    case MESSAGE_TYPE.VIDEO:
+      return 'file/video'
+    case MESSAGE_TYPE.VOICE:
+      return 'mic'
+    case MESSAGE_TYPE.FILE:
+      return 'doc'
+    default:
+      return ''
+  }
+})
+
+/** 预览文本（语音含时长、文件含文件名，发送时已由 getQuotePreview 组装进 msgPreview） */
+const previewText = computed(() => {
+  if (props.quote.msgType === MESSAGE_TYPE.IMAGE && !props.quote.msgPreview)
     return '[图片]'
-  if (props.quote.msgType === MESSAGE_TYPE.VIDEO)
+  if (props.quote.msgType === MESSAGE_TYPE.VIDEO && !props.quote.msgPreview)
     return '[视频]'
   return props.quote.msgPreview
 })
@@ -52,98 +58,90 @@ function onClick() {
 <template>
   <div
     class="quote-card"
-    :class="{ 'quote-card--right': alignRight, 'quote-card--square': isSquare }"
+    :class="{ 'quote-card--right': alignRight }"
     @click.stop="onClick"
   >
+    <!-- 竖杠：接收方在左，己方经 row-reverse 落到右侧 -->
+    <span class="quote-card__bar" aria-hidden="true" />
+    <Avatar
+      v-if="showAvatar"
+      class="quote-card__avatar"
+      :src="avatarUrl"
+      :name="senderName"
+      :size="20"
+    />
     <div class="quote-card__content">
+      <Icon v-if="typeIcon" class="quote-card__type-icon" :name="typeIcon" :size="14" />
       <span class="quote-card__sender">{{ senderName }}</span>
       <span class="quote-card__divider">：</span>
-      <template v-if="isMedia && thumbUrl">
-        <img class="quote-card__thumb" :src="thumbUrl" alt="quote-thumb">
-      </template>
-      <template v-else>
-        <span class="quote-card__preview">{{ fallbackPreview }}</span>
-      </template>
+      <span class="quote-card__preview">{{ previewText }}</span>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* 设计师稿：无背景卡片，竖杠 + 最多两行 */
 .quote-card {
   display: inline-flex;
-  align-items: center;
+  align-items: stretch;
+  gap: 6px;
   margin-top: 4px;
-  padding: 6px 10px;
   max-width: 100%;
-  /* 圆角跟随气泡档位（0.75 倍）：round 档 12px 更椭圆，square 档 6px 保持原样 */
-  border-radius: calc(var(--uikit-bubble-radius, 16px) * 0.75);
-  background-color: var(--uikit-bg-secondary, #f4f4f5);
   color: var(--uikit-text-secondary, #909399);
   font-size: var(--uikit-font-size-12);
   line-height: 1.5;
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   box-sizing: border-box;
 }
 
-.quote-card--square {
-  border-radius: calc(var(--uikit-bubble-radius-square, 8px) * 0.75);
-}
-
-@media (hover: hover) {
-  .quote-card:hover {
-    background-color: var(--uikit-bg-hover);
-  }
-}
-
-.quote-card:active {
-  background-color: var(--uikit-bg-active, #e4e4e7);
-}
-
-/* 己方消息：右对齐 */
+/* 己方消息：右对齐，竖杠落到右侧 */
 .quote-card--right {
   align-self: flex-end;
+  flex-direction: row-reverse;
+  text-align: right;
 }
 
+.quote-card__bar {
+  flex-shrink: 0;
+  width: 3px;
+  border-radius: 2px;
+  background-color: var(--uikit-border-color, #e5e7eb);
+}
+
+/* 头像与第一行（昵称行）顶对齐，两行内容时不落到行间 */
+.quote-card__avatar {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* 类型 icon 位于第一行文本流开头（icon + 昵称 + ：+ 内容），与文本基线对齐 */
+.quote-card__type-icon {
+  margin-right: 4px;
+  vertical-align: -2px;
+  color: var(--uikit-text-secondary, #909399);
+}
+
+/* 两行折叠：inline 段（发送人/分隔/预览）整体参与 -webkit-box 裁剪 */
 .quote-card__content {
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-all;
 }
 
 .quote-card__sender {
-  color: var(--uikit-text-primary, #303133);
-  font-weight: 500;
-  flex-shrink: 0;
-  max-width: 40%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--uikit-text-secondary, #909399);
 }
 
 .quote-card__divider {
   color: var(--uikit-text-secondary, #909399);
-  flex-shrink: 0;
-}
-
-.quote-card__thumb {
-  flex-shrink: 0;
-  max-width: 80px;
-  max-height: 48px;
-  border-radius: 4px;
-  object-fit: cover;
-  background-color: var(--uikit-bg-base);
 }
 
 .quote-card__preview {
   color: var(--uikit-text-secondary, #909399);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>
