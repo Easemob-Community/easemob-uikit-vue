@@ -36,6 +36,8 @@ const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
   showAllowlist: false,
   showSharedFiles: true,
   showJoinRequests: false,
+  mode: 'push',
+  fullscreen: false,
 })
 
 const emit = defineEmits<{
@@ -77,6 +79,12 @@ export interface ChatInfoDrawerProps {
   showSharedFiles?: boolean
   /** 是否展示入群申请入口 */
   showJoinRequests?: boolean
+  /** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡 */
+  mode?: 'overlay' | 'push'
+  /** 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头 */
+  fullscreen?: boolean
+  /** 抽屉宽度（px），默认 320；全屏模式忽略 */
+  width?: number
 }
 
 const { t } = useLocale()
@@ -708,6 +716,9 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     :show="props.show"
     :overlay="false"
     :offset-top="props.offsetTop"
+    :mode="props.mode"
+    :width="props.width ?? 320"
+    :fullscreen="props.fullscreen"
     @update:show="emit('update:show', $event)"
     @close="onClose"
   >
@@ -715,11 +726,22 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     <template #header>
       <slot name="drawer-header" v-bind="drawerSlotScope">
         <div v-if="!showMemberList" class="chat-info-drawer__header">
-          <span class="chat-info-drawer__header-placeholder" />
+          <!-- 全屏模式（移动端独立页面）：左侧返回箭头替代右上角关闭 -->
+          <IconButton
+            v-if="props.fullscreen"
+            class="chat-info-drawer__back"
+            icon="chevron/left"
+            size="small"
+            variant="ghost"
+            :title="t('button.back', '返回')"
+            @click="onClose"
+          />
+          <span v-else class="chat-info-drawer__header-placeholder" />
           <span class="chat-info-drawer__title">
             {{ isGroup ? t('chat.info.titleGroup') : t('chat.info.titleFriend') }}
           </span>
           <IconButton
+            v-if="!props.fullscreen"
             class="chat-info-drawer__close"
             icon="xmark/light"
             size="small"
@@ -727,6 +749,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             :title="t('button.close', '关闭')"
             @click="onClose"
           />
+          <span v-else class="chat-info-drawer__header-placeholder" />
         </div>
         <div v-else class="chat-info-drawer__header">
           <IconButton
@@ -1083,7 +1106,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   display: flex;
   align-items: center;
   padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
-  background-color: var(--uikit-bg-secondary);
   gap: 12px;
 }
 
@@ -1121,7 +1143,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-direction: column;
   overflow-y: auto;
   min-height: 0;
-  background-color: var(--uikit-bg-secondary);
   padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   gap: 12px;
 }
@@ -1148,12 +1169,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__section {
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius);
   padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   flex-shrink: 0;
-  box-shadow: var(--uikit-shadow-sm);
-  border: 1px solid var(--uikit-border-light);
 }
 
 .chat-info-drawer__section--profile {
@@ -1374,17 +1391,12 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 .chat-info-drawer__actions {
   padding: var(--uikit-drawer-padding, 16px);
-  background-color: var(--uikit-bg-secondary);
 }
 
 .chat-info-drawer__member-detail {
   flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius);
-  box-shadow: var(--uikit-shadow-sm);
-  border: 1px solid var(--uikit-border-light);
 }
 
 /* 内容少时卡片高度由成员列表决定，不强制撑满抽屉；成员多时由外层 body 滚动 */

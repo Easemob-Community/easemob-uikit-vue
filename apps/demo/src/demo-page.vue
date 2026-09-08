@@ -134,6 +134,7 @@ const {
   statusBannerEnabled,
   conversationVariant,
   chatVariant,
+  chatDrawerMode,
   conversationShowAvatar,
   conversationUnreadMode,
   conversationUnreadPlacement,
@@ -272,6 +273,7 @@ const chatContainerRef = ref<{ setText?: (text: string) => void }>()
 /** EmChatContainer 配置（由设置面板状态实时组装） */
 const chatConfig = computed(() => ({
   header: { showAvatar: false, align: 'left' as const },
+  drawer: { mode: chatDrawerMode.value },
   groupReadReceipt: {
     enabled: groupReadReceiptEnabled.value,
     maxGroupSize: groupReadReceiptMaxSize.value,

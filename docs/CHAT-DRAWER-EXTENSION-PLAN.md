@@ -1,6 +1,7 @@
 # Chat 抽屉三种接管能力（整块 / 部分 / 自绘壳）设计执行计划
 
-> 状态：**规划中，待实现**（2026-08-20）。
+> 状态：**已落地**（2026-08-20 规划，D119 已实施完毕：三种接管 + `EmChatDrawer` 导出 + `showDrawerEntry`）。
+> 2026-09-08 追加：抽屉展示模式重构（push 挤压 / overlay 遮挡 + 移动端全屏），见「八、抽屉展示模式（push/overlay + 移动端全屏）」。
 > 对应 TECH-DEBT [D119](#d119)。
 > 关联 skill：`uikit-chat-plugin-tabs` / `uikit-component-authoring` / `uikit-docs-authoring` / `uikit-release-build`。
 > 本计划属公开 API 变更（新增插槽 + 导出 + 类型），实施前先确认「六、关键决策点」，确认后再编码。
@@ -214,3 +215,19 @@ export interface ChatInfoDrawerSlotScope {
 | `apps/demo` | 三种接管示例 |
 | `apps/docs` | 组件页插槽说明 + gen:api 类型 |
 | `packages/uikit-im/src/**/*.story.vue` | 抽屉接管 story |
+
+---
+
+## 八、抽屉展示模式（push/overlay + 移动端全屏）（2026-09-08 落地）
+
+在三种接管能力之上，补充**展示模式**维度（纯增量，默认行为不变）：
+
+| 决策点 | 结论 | 理由 |
+| --- | --- | --- |
+| 1. 模式入口 | `ChatConfig.drawer.mode: 'overlay' \| 'push'`（**默认 push**，2026-09-08 调整）+ `drawer.width`（默认 320） | 与 `header`/`messageList` 等配置平级；push 为设计主推形态 |
+| 2. push 实现 | `chat.vue` 主区包 `.chat__body`(flex row) > `.chat__main`(flex column) 两层静态包裹；push 时抽屉壳渲染为静态 flex 项，`width 0 → drawerW` 过渡挤压主区 | overlay 模式下包裹层无定位无 gap，absolute 包含块仍是 `.chat`，视觉逐像素不变 |
+| 3. push 视觉 | 与主区平级的平面区域：背景与聊天容器统一 `--uikit-chat-bg`（header/body/section/actions 全拉平，无分层色块/描边/卡片阴影），圆角 `--uikit-components-radius`（与 ChatContainer 边角一致）；与主区间隔 `--uikit-container-gap` 透出宿主底色；内层固定宽度 wrapper 保证过渡期间内容不挤压换行 | 设计师稿「平级区域 + gap 透底色」，非描边卡片 |
+| 4. push 语义 | 布局占位而非弹层：无遮罩、无 click-layer、`onClickOutside` 不关闭、`offsetTop` 忽略（抽屉全高） | 与 overlay 的「临时弹层」语义区分 |
+| 5. 移动端 | `h5.isMobile`（viewport < 768）时两种模式一律回落**满铺全屏**：盖住 header、圆角归零、宽度 100%、右滑进入画，header 主档以返回箭头（chevron/left）替代右上角关闭 | 窄屏上 320px 抽屉没有并存空间，独立页面观感更符合移动端习惯 |
+| 6. 壳 API | `ChatDrawerProps` 新增 `mode` / `fullscreen`（optional）；`#drawer` slot scope 新增 `mode` / `fullscreen` | additive，自绘壳接管方同样受益 |
+| 7. 二级抽屉 | 群管理五页（禁言/黑名单/白名单/共享文件/入群申请）相对一级 panel absolute 定位，两种模式 + 全屏下均无需改动 | 现状结构天然兼容 |

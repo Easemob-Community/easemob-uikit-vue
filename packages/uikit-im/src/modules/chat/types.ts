@@ -99,6 +99,19 @@ export interface ChatConfig {
      */
     subtitle?: 'auto' | 'presence' | 'sign' | 'none'
   }
+  /** 抽屉配置 / Drawer configuration */
+  drawer?: {
+    /**
+     * 展示模式，默认 'push'：'push' 占位挤压聊天区，抽屉以独立平面区域参与布局
+     *（圆角跟随 --uikit-components-radius）；'overlay' 完全遮挡聊天区。
+     * 移动端（viewport < 768）两种模式一律回落为满铺全屏（独立页面观感）。
+     * Display mode. Default 'push' (takes layout space and squeezes the chat area as an
+     * independent flat region); 'overlay' covers the chat area. On mobile (<768px) both fall back to fullscreen.
+     */
+    mode?: 'overlay' | 'push'
+    /** 抽屉宽度（px），默认 320；push 与 overlay 模式均生效，全屏模式忽略 / Drawer width in px. Default 320; ignored in fullscreen */
+    width?: number
+  }
   /** 消息列表配置 */
   messageList?: {
     /** 消息布局模式，默认 'conversation' */
@@ -392,8 +405,21 @@ export interface ChatDrawerProps {
   closeOnClickOverlay?: boolean
   /** 抽屉宽度，默认 320（数字表示 px，字符串透传 CSS 值） */
   width?: string | number
-  /** 抽屉顶部偏移，默认 0（数字表示 px，字符串透传 CSS 值） */
+  /** 抽屉顶部偏移，默认 0（数字表示 px，字符串透传 CSS 值）；push 与全屏模式下忽略 */
   offsetTop?: string | number
+  /**
+   * 展示模式，默认 'push'：'push' 作为静态 flex 项占位挤压聊天区（无遮罩、点击外部不关闭）/
+   * 'overlay' 绝对定位覆盖聊天区。
+   * Display mode. Default 'push' (static flex item that squeezes the chat area, no mask,
+   * no click-outside-to-close); 'overlay' is an absolute overlay.
+   */
+  mode?: 'overlay' | 'push'
+  /**
+   * 全屏模式（移动端独立页面），默认 false：忽略 offsetTop 与宽度，满铺整个聊天容器且圆角归零。
+   * Fullscreen mode (mobile standalone page). Default false. Ignores offsetTop/width and
+   * covers the whole chat container with no border radius.
+   */
+  fullscreen?: boolean
 }
 
 /** 整块接管 `#drawer` 插槽的 scope / Slot scope for the whole-drawer takeover */
@@ -410,6 +436,10 @@ export interface ChatDrawerSlotScope {
   close: () => void
   /** 抽屉顶部偏移（header 实际高度，单位 px） */
   offsetTop: number
+  /** 抽屉展示模式（'overlay' / 'push'） */
+  mode: 'overlay' | 'push'
+  /** 是否全屏模式（移动端独立页面） */
+  fullscreen: boolean
 }
 
 /** 部分接管 `ChatInfoDrawer` section 插槽的 scope / Slot scope for ChatInfoDrawer section takeovers */

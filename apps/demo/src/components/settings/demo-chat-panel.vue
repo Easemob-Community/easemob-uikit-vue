@@ -14,6 +14,7 @@ import './demo-settings-common.css'
 
 const {
   chatVariant,
+  chatDrawerMode,
   chatInputMode,
   chatInputStyle,
   chatInputFeatures,
@@ -60,6 +61,29 @@ const {
           @click="chatVariant = 'compact'"
         >
           平铺
+        </button>
+      </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="抽屉模式"
+        tip="聊天信息抽屉展示方式：push 占位挤压聊天区（默认，与聊天区平级的独立区域）；overlay 完全遮挡聊天区；移动端窄屏两种模式一律回落满铺全屏"
+      />
+      <div class="demo-settings__options">
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': chatDrawerMode === 'push' }"
+          @click="chatDrawerMode = 'push'"
+        >
+          挤压（默认）
+        </button>
+        <button
+          class="demo-option"
+          :class="{ 'demo-option--active': chatDrawerMode === 'overlay' }"
+          @click="chatDrawerMode = 'overlay'"
+        >
+          遮挡
         </button>
       </div>
     </div>

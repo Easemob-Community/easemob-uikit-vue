@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useSlots } from 'vue'
+import { computed, ref, useSlots } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
@@ -97,6 +97,12 @@ const { h5 } = useUIKit()
 const slots = useSlots()
 
 /** 除 #drawer / #watermark 外的其余插槽名（两者单独显式透传以保留类型；useSlots 非响应式，无需 computed） */
+/**
+ * push 抽屉模式：容器不再自绘卡片（背景/边框/圆角/裁剪），
+ * 改由 Chat 模块的 .chat__main 与抽屉面板各自成卡，间隙透出宿主底色
+ */
+const drawerPush = computed(() => props.config?.drawer?.mode === 'push')
+
 function getOtherSlotNames() {
   return Object.keys(slots).filter(name => name !== 'drawer' && name !== 'watermark')
 }
@@ -112,6 +118,7 @@ defineExpose({
     class="chat-container"
     :class="{
       'chat-container--keyboard-open': h5.isKeyboardOpen.value,
+      'chat-container--drawer-push': drawerPush,
       [`chat-container--${props.variant}`]: true,
     }"
   >
@@ -217,5 +224,15 @@ defineExpose({
 /* 键盘弹起时输入框已由 keyboardHeight padding 顶起，去掉容器这份 safe-bottom，避免双重叠加 */
 .chat-container--keyboard-open {
   padding-bottom: 0;
+}
+
+/* push 抽屉模式：容器退化为透明定位壳，卡片视觉由 .chat__main 与抽屉面板各自承担，
+   主区与抽屉之间的 gap 透出宿主底色（与会话列表/聊天容器卡片间距同口径 --uikit-container-gap） */
+.chat-container--drawer-push,
+.chat-container--card.chat-container--drawer-push {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 </style>

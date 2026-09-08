@@ -140,6 +140,25 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 </template>
 ```
 
+## 抽屉展示模式
+
+通过 `config.drawer` 控制聊天信息抽屉的展示方式：
+
+```vue
+<EmChatContainer :config="{ drawer: { mode: 'push', width: 320 } }" />
+```
+
+| 配置项         | 类型                    | 默认值    | 说明                                                                                       |
+| -------------- | ----------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `drawer.mode`  | `'overlay' \| 'push'`   | `'push'`  | `push` 占位挤压聊天区，抽屉为与聊天区平级的独立平面区域（带动画）；`overlay` 完全遮挡聊天区 |
+| `drawer.width` | `number`                | `320`     | 抽屉宽度（px），两种模式均生效                                                             |
+
+说明：
+
+- `push` 模式下抽屉圆角跟随 `--uikit-components-radius`（与 ChatContainer 边角一致），与主区间隔 `--uikit-container-gap` 透出宿主底色；抽屉整页背景与聊天容器统一为 `--uikit-chat-bg`（header/body/各 section 均拉平，无分层色块）；此模式无遮罩、点击外部不关闭，`offsetTop` 语义失效（抽屉全高）。
+- 移动端（viewport < 768px）两种模式一律回落为满铺全屏（盖住 header、圆角归零、返回箭头替代关闭按钮），呈独立页面观感。
+- 自绘壳 `EmChatDrawer` 同样支持 `mode` / `fullscreen` props（见下方抽屉接管）。
+
 ## 抽屉接管
 
 `EmChatContainer` / `EmChat` 提供三种抽屉接管能力，满足从「整体替换」到「局部定制」的不同需求。
@@ -179,7 +198,9 @@ import { EmChatContainer, EmChatDrawer } from '@easemob/uikit-im'
 | `show`         | `boolean`                             | 抽屉是否打开                        |
 | `open`         | `() => void`                          | 打开抽屉                            |
 | `close`        | `() => void`                          | 关闭抽屉                            |
-| `offsetTop`    | `number`                              | 抽屉顶部偏移（header 实际高度，px） |
+| `offsetTop`    | `number`                              | 抽屉顶部偏移（header 实际高度，px；push/全屏模式忽略） |
+| `mode`         | `'overlay' \| 'push'`                 | 抽屉展示模式（来自 `config.drawer.mode`）              |
+| `fullscreen`   | `boolean`                             | 是否全屏模式（移动端窄屏自动为 true）                  |
 
 ### 2. 部分接管 `drawer-*`
 

@@ -365,6 +365,8 @@ function createDemoSettings() {
   /* ===== 聊天容器风格配置（EmChatContainer 档位） ===== */
   /** 容器风格变体：card（圆角卡片）/ compact（平铺） */
   const chatVariant = ref<'card' | 'compact'>('card')
+  /** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡（移动端一律回落全屏） */
+  const chatDrawerMode = ref<'overlay' | 'push'>('push')
 
   /* ===== 消息通知配置（EmNotification） ===== */
   /** 总开关 */
@@ -584,6 +586,7 @@ function createDemoSettings() {
     conversationBadgePlacement,
     // 聊天容器风格
     chatVariant,
+    chatDrawerMode,
     // 消息通知
     notificationEnable,
     notificationBrowser,

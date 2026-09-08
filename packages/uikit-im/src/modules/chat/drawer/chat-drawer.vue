@@ -9,6 +9,8 @@ const props = withDefaults(defineProps<ChatDrawerProps>(), {
   closeOnClickOverlay: true,
   width: 320,
   offsetTop: 0,
+  mode: 'push',
+  fullscreen: false,
 })
 
 const emit = defineEmits<{
@@ -21,6 +23,9 @@ const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'chat-drawer__panel--square' : '',
 )
 
+/** 是否按覆盖模式渲染：全屏强制走覆盖结构（满铺），push 才走占位挤压结构 */
+const isOverlayMode = computed(() => props.fullscreen || props.mode === 'overlay')
+
 const panelRef = ref<HTMLElement>()
 
 const offsetTopStyle = computed(() => {
@@ -28,6 +33,11 @@ const offsetTopStyle = computed(() => {
     return `${props.offsetTop}px`
   return props.offsetTop
 })
+
+/** 抽屉宽度统一为 CSS 值（供 overlay 行内样式与 push 模式 CSS 变量使用） */
+const widthStyle = computed(() =>
+  typeof props.width === 'number' ? `${props.width}px` : props.width,
+)
 
 function close() {
   emit('update:show', false)
@@ -53,6 +63,8 @@ function onOverlayClick() {
  */
 onClickOutside(panelRef, (event) => {
   if (!props.show || !props.closeOnClickOverlay) return
+  // push 是布局占位而非弹层，全屏无外部可点——两者都不响应点击外部关闭
+  if (!isOverlayMode.value || props.fullscreen) return
   const target = event.target as HTMLElement | null
   if (target?.closest('.uikit-popup')) return
   close()
@@ -60,19 +72,20 @@ onClickOutside(panelRef, (event) => {
 </script>
 
 <template>
+  <!-- 覆盖 / 全屏模式：absolute 满铺壳 + 遮罩或点击层 + 右侧滑入面板 -->
   <Transition name="chat-drawer-fade">
-    <div v-if="show" class="chat-drawer">
+    <div v-if="show && isOverlayMode" class="chat-drawer">
       <!-- 遮罩层（visible overlay） -->
       <div v-if="overlay" class="chat-drawer__overlay" @click="onOverlayClick" />
       <!-- 透明点击层（overlay=false 时覆盖外部区域，支持点击关闭） -->
-      <div v-else class="chat-drawer__click-layer" @click="onOverlayClick" />
+      <div v-else-if="!fullscreen" class="chat-drawer__click-layer" @click="onOverlayClick" />
       <Transition name="chat-drawer-slide">
         <div
           v-if="show"
           ref="panelRef"
           class="chat-drawer__panel"
-          :class="shapeClass"
-          :style="{ width: typeof width === 'number' ? `${width}px` : width }"
+          :class="[shapeClass, { 'chat-drawer__panel--fullscreen': fullscreen }]"
+          :style="fullscreen ? undefined : { width: widthStyle }"
         >
           <div v-if="$slots.header" class="chat-drawer__header">
             <slot name="header" />
@@ -85,6 +98,29 @@ onClickOutside(panelRef, (event) => {
           </div>
         </div>
       </Transition>
+    </div>
+  </Transition>
+
+  <!-- push 模式：静态 flex 项占位挤压聊天区，宽度过渡展开/收起 -->
+  <Transition name="chat-drawer-push">
+    <div
+      v-if="show && !isOverlayMode"
+      ref="panelRef"
+      class="chat-drawer__push-panel"
+      :class="shapeClass"
+    >
+      <!-- 内层固定宽度：宽度过渡期间内容不挤压换行 -->
+      <div class="chat-drawer__push-inner">
+        <div v-if="$slots.header" class="chat-drawer__header">
+          <slot name="header" />
+        </div>
+        <div class="chat-drawer__body">
+          <slot />
+        </div>
+        <div v-if="$slots.footer" class="chat-drawer__footer">
+          <slot name="footer" />
+        </div>
+      </div>
     </div>
   </Transition>
 </template>
@@ -125,7 +161,8 @@ onClickOutside(panelRef, (event) => {
   top: v-bind(offsetTopStyle);
   right: 0;
   height: calc(100% - v-bind(offsetTopStyle));
-  background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
+  /* 面板底色与聊天容器统一（--uikit-chat-bg），全页面默认颜色一致 */
+  background: var(--uikit-chat-bg, var(--uikit-bg-elevated, var(--uikit-bg-base)));
   display: flex;
   flex-direction: column;
   pointer-events: auto;
@@ -137,6 +174,35 @@ onClickOutside(panelRef, (event) => {
 
 .chat-drawer__panel--square {
   border-radius: 0;
+}
+
+/* 全屏模式（移动端独立页面）：忽略 offsetTop 与宽度，满铺且圆角归零 */
+.chat-drawer__panel--fullscreen {
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-left: none;
+  border-radius: 0;
+}
+
+/* push 模式：静态 flex 项占位挤压聊天区，与主区平级的平面区域（背景与聊天容器一致，无描边） */
+.chat-drawer__push-panel {
+  flex-shrink: 0;
+  height: 100%;
+  width: v-bind(widthStyle);
+  /* border-box：与主区（stretch 对齐）上下边缘严格齐平 */
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--uikit-chat-bg, var(--uikit-bg-elevated, var(--uikit-bg-base)));
+  border-radius: var(--uikit-components-radius, 12px);
+}
+
+/* 内层固定宽度：宽度过渡期间内容保持排版不挤压换行 */
+.chat-drawer__push-inner {
+  width: v-bind(widthStyle);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-drawer__header {
@@ -176,5 +242,19 @@ onClickOutside(panelRef, (event) => {
 .chat-drawer-slide-enter-from,
 .chat-drawer-slide-leave-to {
   transform: translateX(100%);
+}
+
+/* push 模式：宽度从 0 展开，挤压聊天区；节奏与 overlay 滑入一致 */
+.chat-drawer-push-enter-active {
+  transition: width var(--uikit-anim-duration-enter) var(--uikit-anim-easing-decel);
+}
+
+.chat-drawer-push-leave-active {
+  transition: width var(--uikit-anim-duration-leave) var(--uikit-anim-easing-accel);
+}
+
+.chat-drawer-push-enter-from,
+.chat-drawer-push-leave-to {
+  width: 0;
 }
 </style>

@@ -11,19 +11,20 @@
 
 > 聊天页面全局配置
 
-| 属性                      | 类型                                                                                 | 默认值 | 说明                                      |
+| 属性                      | 类型                                                                                           | 默认值 | 说明                                      |
 | --- | --- | --- | --- |
-| enableDraft             | `boolean`                                                                          | —   | 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true      |
-| hooks                   | `ChatSendHooks`                                                                    | —   | 消息发送拦截钩子                                |
-| header                  | <a class="config-ref" href="#config-header"><strong>Header 配置</strong></a>         | —   | Header 配置                               |
-| messageList             | <a class="config-ref" href="#config-messagelist"><strong>消息列表配置</strong></a>       | —   | 消息列表配置                                  |
-| messageAction           | <a class="config-ref" href="#config-messageaction"><strong>消息操作配置</strong></a>     | —   | 消息操作配置                                  |
-| groupReadReceipt        | <a class="config-ref" href="#config-groupreadreceipt"><strong>群已读回执配置</strong></a> | —   | 群已读回执配置                                 |
-| groupMember             | <a class="config-ref" href="#config-groupmember"><strong>群成员列表配置</strong></a>      | —   | 群成员列表配置                                 |
-| groupManagement         | <a class="config-ref" href="#config-groupmanagement"><strong>群管理功能配置</strong></a>  | —   | 群管理功能配置                                 |
-| input                   | <a class="config-ref" href="#config-input"><strong>输入框配置</strong></a>              | —   | 输入框配置                                   |
-| lastMessageTextResolver | `LastMessageTextResolver`                                                          | —   | 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 |
-| textMessage             | <a class="config-ref" href="#config-textmessage"><strong>文本消息配置</strong></a>       | —   | 文本消息配置                                  |
+| enableDraft             | `boolean`                                                                                    | —   | 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true      |
+| hooks                   | `ChatSendHooks`                                                                              | —   | 消息发送拦截钩子                                |
+| header                  | <a class="config-ref" href="#config-header"><strong>Header 配置</strong></a>                   | —   | Header 配置                               |
+| drawer                  | <a class="config-ref" href="#config-drawer"><strong>抽屉配置 / Drawer configuration</strong></a> | —   | 抽屉配置 / Drawer configuration             |
+| messageList             | <a class="config-ref" href="#config-messagelist"><strong>消息列表配置</strong></a>                 | —   | 消息列表配置                                  |
+| messageAction           | <a class="config-ref" href="#config-messageaction"><strong>消息操作配置</strong></a>               | —   | 消息操作配置                                  |
+| groupReadReceipt        | <a class="config-ref" href="#config-groupreadreceipt"><strong>群已读回执配置</strong></a>           | —   | 群已读回执配置                                 |
+| groupMember             | <a class="config-ref" href="#config-groupmember"><strong>群成员列表配置</strong></a>                | —   | 群成员列表配置                                 |
+| groupManagement         | <a class="config-ref" href="#config-groupmanagement"><strong>群管理功能配置</strong></a>            | —   | 群管理功能配置                                 |
+| input                   | <a class="config-ref" href="#config-input"><strong>输入框配置</strong></a>                        | —   | 输入框配置                                   |
+| lastMessageTextResolver | `LastMessageTextResolver`                                                                    | —   | 会话列表最新一条消息文案解析器；custom 消息等场景可由业务自定义预览内容 |
+| textMessage             | <a class="config-ref" href="#config-textmessage"><strong>文本消息配置</strong></a>                 | —   | 文本消息配置                                  |
 
 #### config.hooks {#config-hooks}
 
@@ -46,6 +47,15 @@
 | showMemberCount | `boolean`                                  | —   | 是否显示群成员数后缀，默认 true；仅群聊生效                                                                                                                                                                                                                    |
 | showDrawerEntry | `boolean`                                  | —   | 是否显示抽屉入口按钮（聊天信息），默认 true                                                                                                                                                                                                                    |
 | subtitle        | `'auto' \| 'presence' \| 'sign' \| 'none'` | —   | 单聊副标题档位（标题下方区域），默认 'auto'；仅单聊生效：<br>auto（在线状态 + 个性签名，缺哪个显示哪个）/ presence（仅在线状态）/ sign（仅签名）/<br>none（整个副标题区连同「正在输入」提示一起关闭）。<br>对方正在输入时优先占据此区域；可被 #header-subtitle 插槽整体接管。<br>Subtitle level under the title for single chats. Default 'auto'. |
+
+#### config.drawer {#config-drawer}
+
+> 抽屉配置 / Drawer configuration
+
+| 属性    | 类型                    | 默认值 | 说明                                                                                                                                                                                                                                                                                                                                                       |
+| --- | --- | --- | --- |
+| mode  | `'overlay' \| 'push'` | —   | 展示模式，默认 'push'：'push' 占位挤压聊天区，抽屉以独立平面区域参与布局<br>（圆角跟随 --uikit-components-radius）；'overlay' 完全遮挡聊天区。<br>移动端（viewport &lt; 768）两种模式一律回落为满铺全屏（独立页面观感）。<br>Display mode. Default 'push' (takes layout space and squeezes the chat area as an<br>independent flat region); 'overlay' covers the chat area. On mobile (&lt;768px) both fall back to fullscreen. |
+| width | `number`              | —   | 抽屉宽度（px），默认 320；push 与 overlay 模式均生效，全屏模式忽略 / Drawer width in px. Default 320; ignored in fullscreen                                                                                                                                                                                                                                                     |
 
 #### config.messageList {#config-messagelist}
 

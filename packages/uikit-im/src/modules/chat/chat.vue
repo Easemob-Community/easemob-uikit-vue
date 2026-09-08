@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, useSlots, watch, watchEffect } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, usePresence, useToast } from '@easemob/uikit-core'
 import type { UiConversation as Conversation, ConversationTypeValue, ForwardModeValue, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '@easemob/uikit-sdk-contract'
@@ -348,6 +349,15 @@ const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 /** 是否显示 header 抽屉入口按钮，默认 true */
 const showDrawerEntry = computed(() => headerConfig.value?.showDrawerEntry !== false)
 
+/** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡 */
+const drawerMode = computed(() => props.config?.drawer?.mode ?? 'push')
+
+/** 抽屉宽度（px），默认 320 */
+const drawerWidth = computed(() => props.config?.drawer?.width ?? 320)
+
+/** 移动端窄屏（viewport < 768）：抽屉一律回落满铺全屏（独立页面观感） */
+const isMobileView = h5.isMobile
+
 /** 是否启用消息搜索入口 */
 const searchEnabled = computed(() => props.config?.messageList?.search?.enabled === true)
 
@@ -525,23 +535,13 @@ const headerAvatar = computed(() => {
   return avatarUrl.value || currentConversation.value?.avatar
 })
 
-let resizeObserver: ResizeObserver | null = null
-
-onMounted(() => {
-  if (headerRef.value) {
-    headerHeight.value = headerRef.value.offsetHeight
-    resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
-        headerHeight.value = h
-      }
-    })
-    resizeObserver.observe(headerRef.value)
+// useResizeObserver 内部 watch ref：header 在未选会话时不渲染（v-if），
+// 元素后续挂载也会自动接上观测，避免 onMounted 一次性绑定导致 headerHeight 恒为 0
+useResizeObserver(headerRef, (entries) => {
+  for (const entry of entries) {
+    const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+    headerHeight.value = h
   }
-})
-
-onUnmounted(() => {
-  resizeObserver?.disconnect()
 })
 
 /** 是否显示群成员数后缀 */
@@ -1110,7 +1110,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
 </script>
 
 <template>
-  <div class="chat" :class="props.class" :style="props.style">
+  <div class="chat" :class="[props.class, { 'chat--drawer-push': drawerMode === 'push' }]" :style="props.style">
     <!-- 全局加载状态 -->
     <div v-if="props.loading" class="chat__loading">
       <slot name="loading">
@@ -1147,209 +1147,219 @@ async function onRemoveAdmin(member: UiGroupMember) {
     </div>
 
     <template v-else>
-      <!-- Header -->
-      <div
-        v-if="showHeader"
-        ref="headerRef"
-        class="chat__header"
-        :class="{
-          'chat__header--align-left': headerAlign === HEADER_ALIGN.LEFT,
-          'chat__header--align-center': headerAlign === HEADER_ALIGN.CENTER,
-          'chat__header--align-right': headerAlign === HEADER_ALIGN.RIGHT,
-        }"
-      >
-        <slot name="header" :conversation="currentConversation">
-          <!-- 头像区域 -->
-          <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
-            <slot name="header-avatar" :conversation="currentConversation">
-              <Avatar
-                :src="headerAvatar"
-                :name="headerTitle"
-                :size="36"
-                @click="onHeaderAvatarClick"
+      <!-- 主区 + 抽屉位：push 抽屉模式下为横向 flex，抽屉占位挤压主区 -->
+      <div class="chat__body" :class="{ 'chat__body--drawer-push': drawerMode === 'push' }">
+        <div class="chat__main">
+          <!-- Header -->
+          <div
+            v-if="showHeader"
+            ref="headerRef"
+            class="chat__header"
+            :class="{
+              'chat__header--align-left': headerAlign === HEADER_ALIGN.LEFT,
+              'chat__header--align-center': headerAlign === HEADER_ALIGN.CENTER,
+              'chat__header--align-right': headerAlign === HEADER_ALIGN.RIGHT,
+            }"
+          >
+            <slot name="header" :conversation="currentConversation">
+              <!-- 头像区域 -->
+              <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
+                <slot name="header-avatar" :conversation="currentConversation">
+                  <Avatar
+                    :src="headerAvatar"
+                    :name="headerTitle"
+                    :size="36"
+                    @click="onHeaderAvatarClick"
+                  />
+                </slot>
+              </div>
+              <div class="chat__header-main">
+                <div class="chat__header-title-row">
+                  <slot name="header-title" :conversation="currentConversation">
+                    <span class="chat__title">{{ headerTitle }}</span>
+                    <span
+                      v-if="isGroupChat && showHeaderMemberCount && groupMemberCount != null"
+                      class="chat__header-member-count"
+                    >({{ groupMemberCount }})</span>
+                  </slot>
+                </div>
+                <!-- 副标题区（仅单聊）：正在输入 > 在线状态 + 个性签名；可被 #header-subtitle 整体接管 -->
+                <slot
+                  name="header-subtitle"
+                  :conversation="currentConversation"
+                  :typing="isPeerTyping"
+                  :presence="peerPresence"
+                  :sign="peerSign"
+                >
+                  <div
+                    v-if="showSubtitleArea && (isPeerTyping || showPresenceText || showSignText)"
+                    class="chat__header-subtitle"
+                  >
+                    <span v-if="isPeerTyping" class="chat__typing">
+                      <span class="typing-dots" aria-hidden="true">
+                        <span class="typing-dots__dot" />
+                        <span class="typing-dots__dot" />
+                        <span class="typing-dots__dot" />
+                      </span>
+                      <span>{{ t('chat.typing', '对方正在输入...') }}</span>
+                    </span>
+                    <template v-else>
+                      <span v-if="showPresenceText" class="chat__header-subtitle-presence">{{ presenceText }}</span>
+                      <span v-if="showPresenceText && showSignText" class="chat__header-subtitle-sep">·</span>
+                      <span v-if="showSignText" class="chat__header-subtitle-sign">{{ peerSign }}</span>
+                    </template>
+                  </div>
+                </slot>
+                <slot name="header-extra" :conversation="currentConversation" />
+              </div>
+              <IconButton
+                v-if="searchEnabled"
+                icon="search"
+                :icon-size="20"
+                @click.stop="showSearchPanel = true"
+              />
+              <IconButton
+                v-if="showDrawerEntry && currentConversation"
+                icon="vertical"
+                :icon-size="20"
+                @click.stop="openDrawer"
               />
             </slot>
           </div>
-          <div class="chat__header-main">
-            <div class="chat__header-title-row">
-              <slot name="header-title" :conversation="currentConversation">
-                <span class="chat__title">{{ headerTitle }}</span>
-                <span
-                  v-if="isGroupChat && showHeaderMemberCount && groupMemberCount != null"
-                  class="chat__header-member-count"
-                >({{ groupMemberCount }})</span>
-              </slot>
-            </div>
-            <!-- 副标题区（仅单聊）：正在输入 > 在线状态 + 个性签名；可被 #header-subtitle 整体接管 -->
-            <slot
-              name="header-subtitle"
-              :conversation="currentConversation"
-              :typing="isPeerTyping"
-              :presence="peerPresence"
-              :sign="peerSign"
+
+          <!-- 置顶横幅 -->
+          <PinnedBar
+            v-if="showPinnedBar && currentConversation"
+            :max-preview-length="pinnedBarMaxLength"
+            @locate="onPinnedLocate"
+          />
+
+          <!-- 群公告横幅 -->
+          <GroupAnnouncementBanner
+            v-if="isGroupChat && currentConversation"
+            :group-id="currentConversation.id"
+          />
+
+          <!-- 消息列表 -->
+          <MessageList
+            ref="messageListRef"
+            :config="props.config"
+            @reedit="onReedit"
+            @edit="onEdit"
+            @forward="openForwardModal"
+            @recall-failed="(err, msg) => emit('recall-failed', err, msg)"
+            @mention-click="onMentionClick"
+            @location-click="(body, msg) => emit('location-click', body, msg)"
+            @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
+            @avatar-view-profile="onAvatarViewProfile"
+            @avatar-mention="onAvatarMention"
+          >
+            <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
+            <template
+              v-for="(_, name) in $slots"
+              :key="name"
+              #[name]="slotProps"
             >
-              <div
-                v-if="showSubtitleArea && (isPeerTyping || showPresenceText || showSignText)"
-                class="chat__header-subtitle"
-              >
-                <span v-if="isPeerTyping" class="chat__typing">
-                  <span class="typing-dots" aria-hidden="true">
-                    <span class="typing-dots__dot" />
-                    <span class="typing-dots__dot" />
-                    <span class="typing-dots__dot" />
-                  </span>
-                  <span>{{ t('chat.typing', '对方正在输入...') }}</span>
-                </span>
-                <template v-else>
-                  <span v-if="showPresenceText" class="chat__header-subtitle-presence">{{ presenceText }}</span>
-                  <span v-if="showPresenceText && showSignText" class="chat__header-subtitle-sep">·</span>
-                  <span v-if="showSignText" class="chat__header-subtitle-sign">{{ peerSign }}</span>
-                </template>
-              </div>
-            </slot>
-            <slot name="header-extra" :conversation="currentConversation" />
-          </div>
-          <IconButton
-            v-if="searchEnabled"
-            icon="search"
-            :icon-size="20"
-            @click.stop="showSearchPanel = true"
-          />
-          <IconButton
-            v-if="showDrawerEntry && currentConversation"
-            icon="vertical"
-            :icon-size="20"
-            @click.stop="openDrawer"
-          />
-        </slot>
-      </div>
+              <slot :name="name" v-bind="slotProps" />
+            </template>
+          </MessageList>
 
-      <!-- 置顶横幅 -->
-      <PinnedBar
-        v-if="showPinnedBar && currentConversation"
-        :max-preview-length="pinnedBarMaxLength"
-        @locate="onPinnedLocate"
-      />
+          <!-- 多选模式底部操作栏（#multi-select-bar：完全接管多选操作栏渲染） -->
+          <slot
+            name="multi-select-bar"
+            :visible="isMultiSelectMode"
+            :selected-messages="selectedMessages"
+            :total-messages="messages.length"
+            :select-all="() => selectAllMessages(messages)"
+            :deselect-all="deselectAllMessages"
+            :forward-one-by-one="onMultiSelectForwardOneByOne"
+            :forward-combine="onMultiSelectForwardCombine"
+            :delete="onMultiSelectDelete"
+            :close="exitMultiSelectMode"
+          >
+            <MultiSelectBar
+              v-if="isMultiSelectMode"
+              :selected-messages="selectedMessages"
+              :total-messages="messages.length"
+              @forward-one-by-one="onMultiSelectForwardOneByOne"
+              @forward-combine="onMultiSelectForwardCombine"
+              @delete="onMultiSelectDelete"
+              @select-all="selectAllMessages(messages)"
+              @deselect-all="deselectAllMessages()"
+              @close="exitMultiSelectMode"
+            />
+          </slot>
 
-      <!-- 群公告横幅 -->
-      <GroupAnnouncementBanner
-        v-if="isGroupChat && currentConversation"
-        :group-id="currentConversation.id"
-      />
+          <!-- 输入框 -->
+          <MessageInput
+            v-if="!isMultiSelectMode"
+            ref="messageInputRef"
+            :config="props.config"
+            :is-group="isGroupChat"
+            :muted="isMutedAll"
+            :keyboard-height="h5.keyboardHeight.value"
+            :mention-contacts="mentionContacts"
+            @send-success="handleSendSuccess"
+            @focus="messageListRef?.scrollToBottom()"
+          >
+            <template #toolbar-extra="slotProps">
+              <slot name="toolbar-extra" v-bind="slotProps" />
+            </template>
+            <template #input-panel="slotProps">
+              <slot name="input-panel" v-bind="slotProps" />
+            </template>
+          </MessageInput>
+        </div>
 
-      <!-- 消息列表 -->
-      <MessageList
-        ref="messageListRef"
-        :config="props.config"
-        @reedit="onReedit"
-        @edit="onEdit"
-        @forward="openForwardModal"
-        @recall-failed="(err, msg) => emit('recall-failed', err, msg)"
-        @mention-click="onMentionClick"
-        @location-click="(body, msg) => emit('location-click', body, msg)"
-        @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
-        @avatar-view-profile="onAvatarViewProfile"
-        @avatar-mention="onAvatarMention"
-      >
-        <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
-        <template
-          v-for="(_, name) in $slots"
-          :key="name"
-          #[name]="slotProps"
-        >
-          <slot :name="name" v-bind="slotProps" />
-        </template>
-      </MessageList>
-
-      <!-- 多选模式底部操作栏（#multi-select-bar：完全接管多选操作栏渲染） -->
-      <slot
-        name="multi-select-bar"
-        :visible="isMultiSelectMode"
-        :selected-messages="selectedMessages"
-        :total-messages="messages.length"
-        :select-all="() => selectAllMessages(messages)"
-        :deselect-all="deselectAllMessages"
-        :forward-one-by-one="onMultiSelectForwardOneByOne"
-        :forward-combine="onMultiSelectForwardCombine"
-        :delete="onMultiSelectDelete"
-        :close="exitMultiSelectMode"
-      >
-        <MultiSelectBar
-          v-if="isMultiSelectMode"
-          :selected-messages="selectedMessages"
-          :total-messages="messages.length"
-          @forward-one-by-one="onMultiSelectForwardOneByOne"
-          @forward-combine="onMultiSelectForwardCombine"
-          @delete="onMultiSelectDelete"
-          @select-all="selectAllMessages(messages)"
-          @deselect-all="deselectAllMessages()"
-          @close="exitMultiSelectMode"
-        />
-      </slot>
-
-      <!-- 输入框 -->
-      <MessageInput
-        v-if="!isMultiSelectMode"
-        ref="messageInputRef"
-        :config="props.config"
-        :is-group="isGroupChat"
-        :muted="isMutedAll"
-        :keyboard-height="h5.keyboardHeight.value"
-        :mention-contacts="mentionContacts"
-        @send-success="handleSendSuccess"
-        @focus="messageListRef?.scrollToBottom()"
-      >
-        <template #toolbar-extra="slotProps">
-          <slot name="toolbar-extra" v-bind="slotProps" />
-        </template>
-        <template #input-panel="slotProps">
-          <slot name="input-panel" v-bind="slotProps" />
-        </template>
-      </MessageInput>
-
-      <!-- 聊天信息抽屉 -->
-      <slot
-        name="drawer"
-        :conversation="currentConversation"
-        :is-group="isGroupChat"
-        :show="showDrawer"
-        :open="openDrawer"
-        :close="closeDrawer"
-        :offset-top="headerHeight"
-      >
-        <ChatInfoDrawer
-          ref="chatInfoDrawerRef"
-          v-model:show="showDrawer"
+        <!-- 聊天信息抽屉 -->
+        <slot
+          name="drawer"
           :conversation="currentConversation"
           :is-group="isGroupChat"
+          :show="showDrawer"
+          :open="openDrawer"
+          :close="closeDrawer"
           :offset-top="headerHeight"
-          :group-management-display-mode="props.config?.groupManagement?.displayMode"
-          :allow-chat="props.config?.groupMember?.allowChat"
-          :show-mute-all="props.config?.groupManagement?.showMuteAll"
-          :show-mute-list="props.config?.groupManagement?.showMuteList"
-          :show-blocklist="props.config?.groupManagement?.showBlocklist"
-          :show-allowlist="props.config?.groupManagement?.showAllowlist"
-          :show-shared-files="props.config?.groupManagement?.showSharedFiles"
-          :show-join-requests="props.config?.groupManagement?.showJoinRequests"
-          @leave-group="onLeaveGroup"
-          @destroy-group="onDestroyGroup"
-          @clear-history="onClearHistory"
-          @add-member="onAddMember"
-          @group-operation="emit('group-operation', $event)"
-          @chat-member="onChatMember"
-          @remove-member="onRemoveMember"
-          @set-admin="onSetAdmin"
-          @remove-admin="onRemoveAdmin"
+          :mode="drawerMode"
+          :fullscreen="isMobileView"
         >
-          <template
-            v-for="(_, name) in getDrawerSectionSlots()"
-            :key="name"
-            #[name]="slotProps"
+          <ChatInfoDrawer
+            ref="chatInfoDrawerRef"
+            v-model:show="showDrawer"
+            :conversation="currentConversation"
+            :is-group="isGroupChat"
+            :offset-top="headerHeight"
+            :mode="drawerMode"
+            :width="drawerWidth"
+            :fullscreen="isMobileView"
+            :group-management-display-mode="props.config?.groupManagement?.displayMode"
+            :allow-chat="props.config?.groupMember?.allowChat"
+            :show-mute-all="props.config?.groupManagement?.showMuteAll"
+            :show-mute-list="props.config?.groupManagement?.showMuteList"
+            :show-blocklist="props.config?.groupManagement?.showBlocklist"
+            :show-allowlist="props.config?.groupManagement?.showAllowlist"
+            :show-shared-files="props.config?.groupManagement?.showSharedFiles"
+            :show-join-requests="props.config?.groupManagement?.showJoinRequests"
+            @leave-group="onLeaveGroup"
+            @destroy-group="onDestroyGroup"
+            @clear-history="onClearHistory"
+            @add-member="onAddMember"
+            @group-operation="emit('group-operation', $event)"
+            @chat-member="onChatMember"
+            @remove-member="onRemoveMember"
+            @set-admin="onSetAdmin"
+            @remove-admin="onRemoveAdmin"
           >
-            <slot :name="name" v-bind="slotProps" />
-          </template>
-        </ChatInfoDrawer>
-      </slot>
+            <template
+              v-for="(_, name) in getDrawerSectionSlots()"
+              :key="name"
+              #[name]="slotProps"
+            >
+              <slot :name="name" v-bind="slotProps" />
+            </template>
+          </ChatInfoDrawer>
+        </slot>
+      </div>
 
       <!-- 消息搜索弹窗（居中 Modal，自带 Popup 壳；#message-search：完全接管搜索弹窗渲染） -->
       <slot
@@ -1460,6 +1470,38 @@ async function onRemoveAdmin(member: UiGroupMember) {
   flex-direction: column;
   height: 100%;
   background: var(--uikit-chat-bg);
+}
+
+/* 主区 + 抽屉位：overlay 模式下为普通静态包裹（抽屉 absolute 相对 .chat 定位，视觉与历史一致）；
+   push 模式下为横向 flex，抽屉作为第二 flex 项占位挤压主区 */
+.chat__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat__body--drawer-push {
+  gap: var(--uikit-container-gap, 8px);
+}
+
+.chat__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* push 抽屉模式：容器壳透明（见 chat-container--drawer-push），主区与抽屉为平级平面区域，
+   无描边卡片边线，间隙（--uikit-container-gap）透出宿主底色 */
+.chat--drawer-push {
+  background: transparent;
+}
+
+.chat--drawer-push .chat__main {
+  background: var(--uikit-chat-bg);
+  border-radius: var(--uikit-components-radius, 8px);
+  overflow: hidden;
 }
 
 /* 水印覆盖层：铺满聊天区，穿透事件；层级低于抽屉(200)/弹窗 */
