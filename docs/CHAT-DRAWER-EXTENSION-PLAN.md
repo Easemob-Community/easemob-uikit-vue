@@ -119,14 +119,14 @@ export interface ChatInfoDrawerSlotScope {
 | 插槽名 | 覆盖区块 | 显示条件 |
 | --- | --- | --- |
 | `drawer-header` | 标题栏（返回/关闭） | 恒显示 |
-| `drawer-profile` | 头像/名称/群名群描述编辑/ID | 恒显示 |
-| `drawer-remark` | 单聊备注 | 仅单聊 |
+| `drawer-profile` | 单聊成员条（头像+添加）/群资料卡（群名群描述编辑/ID） | 恒显示 |
+| `drawer-settings` | 消息搜索/免打扰/置顶设置行 | 恒显示 |
 | `drawer-announcement` | 群公告 | 仅群聊 |
 | `drawer-members` | 群成员九宫格 + 查看全部 | 仅群聊 |
 | `drawer-admin-actions` | 转让群主/设置管理员 | 仅群聊 + 群主 |
 | `drawer-management` | 群管理 section | 仅群聊 |
-| `drawer-actions` | 清空聊天记录等通用操作 | 恒显示 |
-| `drawer-footer` | 退出/解散/删除好友 | 恒显示（非成员列表页） |
+| `drawer-actions` | 清空聊天记录等通用操作 | 默认内容仅群聊（单聊清空/删除入口在 footer） |
+| `drawer-footer` | 单聊：清空聊天记录/删除会话；群聊：退出/解散 | 恒显示（非成员列表页） |
 | `drawer-member-detail` | 群成员列表二级页 | 二级页打开时 |
 
 约定：
@@ -188,7 +188,7 @@ export interface ChatInfoDrawerSlotScope {
 | 1. 插槽命名 | 接受 `drawer-*` 前缀 | 避免与 `#header` / `#message-*` 冲突，语义清晰 |
 | 2. `ChatDrawerProps` 位置 | 迁到 `modules/chat/types.ts` | 便于 gen:api 自动生成与对外类型引用，统一公开类型出口 |
 | 3. 入口开关 | 增加 `config.header.showDrawerEntry?: boolean`（默认 true），并清理 dead 字段 `header.customSlot` | 业务方可关闭默认抽屉入口；`customSlot` 当前代码未读取，属历史残留 |
-| 4. 部分接管粒度 | 保持 10 个 section 插槽 | 覆盖资料卡 / 备注 / 公告 / 成员 / 群主操作 / 群管理 / 通用操作 / footer / 成员二级页，满足常见定制需求 |
+| 4. 部分接管粒度 | 保持 10 个 section 插槽（好友抽屉改版后 `drawer-remark` 移除、`drawer-actions` 默认内容仅群聊） | 覆盖资料卡 / 会话设置 / 公告 / 成员 / 群主操作 / 群管理 / 通用操作 / footer / 成员二级页，满足常见定制需求 |
 | 5. 推进节奏 | 按四阶段推进 | 阶段 0→1→2→3→4，每阶段可独立验证 |
 
 ---

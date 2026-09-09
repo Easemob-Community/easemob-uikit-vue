@@ -221,14 +221,14 @@ import { EmChatContainer, EmChatDrawer } from '@easemob/uikit-im'
 | 插槽名                 | 覆盖区块                    | 显示条件               |
 | ---------------------- | --------------------------- | ---------------------- |
 | `drawer-header`        | 标题栏（返回/关闭）         | 恒显示                 |
-| `drawer-profile`       | 头像/名称/群名群描述编辑/ID | 恒显示                 |
-| `drawer-remark`        | 单聊备注                    | 仅单聊                 |
+| `drawer-profile`       | 单聊成员条/群资料卡（群名群描述编辑/ID） | 恒显示                 |
+| `drawer-settings`      | 消息搜索/免打扰/置顶设置行  | 恒显示                 |
 | `drawer-announcement`  | 群公告                      | 仅群聊                 |
 | `drawer-members`       | 群成员九宫格 + 查看全部     | 仅群聊                 |
 | `drawer-admin-actions` | 转让群主/设置管理员         | 仅群聊 + 群主          |
 | `drawer-management`    | 群管理 section              | 仅群聊                 |
-| `drawer-actions`       | 清空聊天记录等通用操作      | 恒显示                 |
-| `drawer-footer`        | 退出/解散/删除好友          | 恒显示（非成员列表页） |
+| `drawer-actions`       | 清空聊天记录等通用操作      | 默认内容仅群聊（单聊清空/删除入口在 footer） |
+| `drawer-footer`        | 单聊：清空聊天记录/删除会话；群聊：退出/解散 | 恒显示（非成员列表页） |
 | `drawer-member-detail` | 群成员列表二级页            | 二级页打开时           |
 
 Section 插槽统一作用域：

@@ -147,6 +147,7 @@ const dataSource = {
   - `showNameInput` / `showDescriptionInput`：显示群名 / 描述输入框，默认 `false`
   - `autoName`：自动生成群名（取前 3 个成员昵称），默认 `true`
   - `showSettings`：显示弹窗内群设置区（开关 + 人数输入），默认 `false`
+  - `initialSelectedIds`：打开弹窗时预选的成员 ID 列表（如单聊抽屉「添加」入口预选对方），默认 `[]`
 - `createFn`：自定义创建函数 `(params: CreateGroupParams) => Promise<{ groupId: string }>`；优先级高于 `dataSource.createGroup`，完全接管创建动作
 
 ## 事件

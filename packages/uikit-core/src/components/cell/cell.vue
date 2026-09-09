@@ -21,7 +21,11 @@ export interface CellProps {
   meta?: string
   /** 是否显示右侧箭头（导航项常用） */
   showArrow?: boolean
-  /** 分隔线：true=bottom / false=none / 'top' / 'bottom' */
+  /**
+   * 分隔线：true=bottom / false=none / 'top' / 'bottom'。
+   * 分割线模式的默认风格：内容左右内收 12px（--uikit-cell-border-padding-x）、cell 间距归零，
+   * 底部发丝线左侧跟随内收（--uikit-cell-border-inset 可独立覆盖，0 = 通栏）、右侧顶满。
+   */
   border?: boolean | 'top' | 'bottom'
   /** 内容驱动高度（而非固定高度） */
   autoHeight?: boolean
@@ -147,6 +151,17 @@ function onContextmenu(e: MouseEvent) {
   padding: var(--uikit-cell-padding-y, 12px) var(--uikit-item-hover-padding-x, 16px);
 }
 
+/* 分割线模式（border="top"/"bottom"）的默认风格：
+   内容左右内收 12px、cell 间 3px 间距归零（保证分隔线连续）；
+   底部发丝线左侧默认跟随该内收值（--uikit-cell-border-inset 可独立覆盖）、右侧顶满。
+   如需旧的通栏线 + 16px 内容边距，可显式设置 --uikit-cell-border-padding-x / --uikit-cell-border-inset。 */
+.uikit-cell.has-border-top,
+.uikit-cell.has-border-bottom {
+  padding-left: var(--uikit-cell-border-padding-x, 12px);
+  padding-right: var(--uikit-cell-border-padding-x, 12px);
+  margin-bottom: 0;
+}
+
 /* 尺寸变体 */
 .uikit-cell.size-compact {
   height: var(--uikit-cell-height-compact, 48px);
@@ -163,8 +178,27 @@ function onContextmenu(e: MouseEvent) {
   border-top: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
 }
 
-.uikit-cell.has-border-bottom {
-  border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+/* 底部发丝线用 ::after 绘制：右侧始终顶满 cell 边缘，
+   左侧默认跟随分割线模式的内容内收（--uikit-cell-border-padding-x），
+   可用 --uikit-cell-border-inset 独立覆盖（如 0 = 通栏） */
+.uikit-cell.has-border-bottom::after {
+  content: '';
+  position: absolute;
+  left: var(--uikit-cell-border-inset, var(--uikit-cell-border-padding-x, 12px));
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
+}
+
+/* 分割线模式强制直角：全局 --uikit-item-hover-radius（默认 8px）会让 1px 分隔线两端随圆角上翘，
+   且分段列表中相邻行的 hover 背景也不应带圆角 */
+.uikit-cell.has-border-top,
+.uikit-cell.has-border-bottom,
+.uikit-cell.has-border-top::before,
+.uikit-cell.has-border-bottom::before {
+  border-radius: 0;
 }
 
 /* hover / active 背景层 */

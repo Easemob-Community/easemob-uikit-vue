@@ -35,6 +35,8 @@ export interface CreateGroupModalConfig {
   autoName?: boolean
   /** 是否在弹窗内显示“群设置”区（公开/审批/邀请开关、最大成员数），默认 false */
   showSettings?: boolean
+  /** 打开弹窗时预选的成员 ID 列表（如单聊抽屉「添加」入口预选对方） */
+  initialSelectedIds?: string[]
 }
 
 export interface CreateGroupModalProps {
@@ -94,7 +96,11 @@ const settings = reactive({
 const selectedContacts = computed(() => {
   const ids = [...selectedIds.value]
   const map = new Map(contactList.value.map(c => [c.userId, c]))
-  return ids.map(id => map.get(id)).filter((c): c is UiContact => !!c && c.userId !== currentUserId.value)
+  // 不在联系人列表中的预选 ID（如单聊抽屉「添加」入口的对方）以最小信息兜底展示，
+  // 保证 initialSelectedIds 始终生效（与非好友也可发起群聊的语义一致）
+  return ids
+    .map(id => map.get(id) ?? ({ userId: id, name: id } as UiContact))
+    .filter(c => c.userId !== currentUserId.value)
 })
 
 const selectedCount = computed(() => selectedContacts.value.length)
@@ -126,7 +132,7 @@ function reset() {
   settings.allowInvites = props.config.allowInvites ?? false
   settings.inviteNeedConfirm = props.config.inviteNeedConfirm ?? false
   settings.maxMembers = props.config.maxMembers ? String(props.config.maxMembers) : ''
-  setSelectedIds([])
+  setSelectedIds(props.config.initialSelectedIds ?? [])
 }
 
 function removeSelected(userId: string) {

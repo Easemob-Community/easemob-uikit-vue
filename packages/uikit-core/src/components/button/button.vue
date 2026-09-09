@@ -152,6 +152,34 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-text-primary);
 }
 
+/* 各类型 hover 反馈（可点击按钮必须有 hover 态）：
+   default 走通用 --uikit-bg-hover；primary 走独立 token；
+   success/warning/danger 无独立 token，参照 Switch 的 color-mix 派生模式
+   （混入文字色：浅色主题变暗、深色主题变亮） */
+@media (hover: hover) {
+  .uikit-button--default:hover:not(:disabled) {
+    /* bg-secondary 与 --uikit-bg-hover 色值过近（#F3F4F6/#F5F5F5）反馈不可见，
+       改用 color-mix 派生（混入文字色：浅主题变暗、深主题变亮），与 Switch 派生模式一致 */
+    background-color: color-mix(in srgb, var(--uikit-bg-secondary) 90%, var(--uikit-text-primary));
+  }
+
+  .uikit-button--primary:hover:not(:disabled) {
+    background-color: var(--uikit-primary-hover);
+  }
+
+  .uikit-button--success:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--uikit-success-color) 88%, var(--uikit-text-primary));
+  }
+
+  .uikit-button--warning:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--uikit-warning-color) 88%, var(--uikit-text-primary));
+  }
+
+  .uikit-button--danger:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--uikit-danger-color) 88%, var(--uikit-text-primary));
+  }
+}
+
 .uikit-button--block {
   display: flex;
   width: 100%;

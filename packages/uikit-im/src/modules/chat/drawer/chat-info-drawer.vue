@@ -6,14 +6,14 @@ import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'
 import { EmModal as Modal } from '@easemob/uikit-core'
 import { EmButton as Button } from '@easemob/uikit-core'
+import { EmSwitch as Switch } from '@easemob/uikit-core'
 import { EmCopyableText as CopyableText } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
-import { useContact } from '../../../composables/use-contact'
-import { useBlocklist } from '../../../composables/use-blocklist'
 import { useToast } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 import { useGroup } from '../../../composables/use-group'
+import { useConversation } from '../../../composables/use-conversation'
 import { useUIKit } from '../../../composables/use-uikit'
 import { CONVERSATION_TYPE, GROUP_INFO_LIMIT, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob/uikit-core'
 import type { ConversationTypeValue } from '@easemob/uikit-core'
@@ -44,7 +44,7 @@ const emit = defineEmits<{
   (e: 'update:show', value: boolean): void
   (e: 'leave-group', groupId: string): void
   (e: 'destroy-group', groupId: string): void
-  (e: 'clear-history', payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }): void
+  (e: 'clear-history', payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean, deleteRoaming?: boolean }): void
   (e: 'add-member', groupId: string): void
   (e: 'group-operation', payload: { type: string, groupId: string, userId?: string }): void
   // 群成员列表事件
@@ -52,8 +52,15 @@ const emit = defineEmits<{
   (e: 'remove-member', member: UiGroupMember): void
   (e: 'set-admin', member: UiGroupMember): void
   (e: 'remove-admin', member: UiGroupMember): void
-  /** 单聊拉黑/取消拉黑状态变更 */
+  /**
+   * 单聊拉黑/取消拉黑状态变更。
+   * 默认 UI 已按新设计稿移除拉黑入口；保留事件声明供 drawer-actions 等插槽接管时触发。
+   */
   (e: 'block-changed', userId: string, blocked: boolean): void
+  /** 打开消息搜索（由宿主 chat 容器接管搜索弹窗） */
+  (e: 'search-message'): void
+  /** 单聊「添加」：以对方为初始成员发起群聊 */
+  (e: 'create-group', userId: string): void
 }>()
 
 const logger = createLogger('UIKit:ChatInfoDrawer')
@@ -85,6 +92,8 @@ export interface ChatInfoDrawerProps {
   fullscreen?: boolean
   /** 抽屉宽度（px），默认 320；全屏模式忽略 */
   width?: number
+  /** 是否展示「消息搜索」入口行（由宿主按 messageList.search 配置下发） */
+  showMessageSearch?: boolean
 }
 
 const { t } = useLocale()
@@ -93,10 +102,9 @@ function formatCharCount(current: number, max: number): string {
   return t('common.charCount', '{current}/{max}').replace('{current}', String(current)).replace('{max}', String(max))
 }
 
-const { setContactRemark, deleteContact } = useContact()
-const { isBlocked: isUserBlocked, addBlock, removeBlock } = useBlocklist()
 const { show: showToast } = useToast()
-const { features, stores } = useUIKit()
+const { pinConversation, muteConversation } = useConversation()
+const { stores } = useUIKit()
 const {
   fetchGroupInfo,
   fetchGroupMembers,
@@ -110,11 +118,7 @@ const {
   unblockGroupMembers,
 } = useGroup()
 
-/** 备注编辑状态 */
-const isEditingRemark = ref(false)
-const remarkInputRef = ref<HTMLInputElement>()
-const remarkInput = ref('')
-const savingRemark = ref(false)
+/** 备注编辑状态已随好友抽屉改版移除（设计稿不再包含备注/拉黑入口） */
 
 // ===== 群信息编辑状态 =====
 /** 群名称编辑 */
@@ -132,15 +136,6 @@ const peerUserId = computed(() =>
   props.conversation?.type === CONVERSATION_TYPE.SINGLECHAT ? props.conversation.id : undefined,
 )
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
-
-watch(
-  () => contact.value?.remark,
-  (remark) => {
-    if (!isEditingRemark.value)
-      remarkInput.value = remark || ''
-  },
-  { immediate: true },
-)
 
 /** 当前名称/备注：单聊按 备注 > 资料昵称 > 会话名 > unnamed */
 const displayName = computed(() => {
@@ -164,34 +159,8 @@ const displayAvatar = computed(() => {
 /** 关闭抽屉 */
 function onClose() {
   emit('update:show', false)
-  isEditingRemark.value = false
   isEditingGroupName.value = false
   isEditingDescription.value = false
-}
-
-/** 保存备注 */
-async function saveRemark() {
-  const userId = peerUserId.value
-  if (!userId)
-    return
-
-  savingRemark.value = true
-  try {
-    await setContactRemark(userId, remarkInput.value)
-    isEditingRemark.value = false
-  }
-  catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.remarkSaveFailed', '备注设置失败'), 'error')
-  }
-  finally {
-    savingRemark.value = false
-  }
-}
-
-/** 取消备注编辑 */
-function cancelEditRemark() {
-  remarkInput.value = contact.value?.remark || ''
-  isEditingRemark.value = false
 }
 
 // ===== 群聊相关 =====
@@ -233,12 +202,6 @@ watch(
 )
 
 // 自动聚焦编辑输入框
-watch(isEditingRemark, async (editing) => {
-  if (editing) {
-    await nextTick()
-    remarkInputRef.value?.focus()
-  }
-})
 watch(isEditingGroupName, async (editing) => {
   if (editing) {
     await nextTick()
@@ -378,22 +341,22 @@ const confirmModal = ref<{
   show: boolean
   title: string
   content: string
-  action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'transferOwner' | 'block' | 'unblock' | null
+  action: 'leave' | 'destroy' | 'clear' | 'deleteConversation' | 'transferOwner' | null
   /** transferOwner 专用：新群主用户 ID */
   targetUserId?: string
   /** transferOwner 专用：新群主展示名（发布方本地通知用） */
   targetUserName?: string
-  /** clear 专用：是否同时删除会话 */
-  deleteConversation?: boolean
+  /** deleteConversation 专用：是否同时删除服务器漫游历史消息 */
+  deleteRoaming?: boolean
 }>({
   show: false,
   title: '',
   content: '',
   action: null,
-  deleteConversation: false,
+  deleteRoaming: false,
 })
 
-function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'block' | 'unblock') {
+function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteConversation') {
   const id = props.conversation?.id
   if (!id)
     return
@@ -413,28 +376,13 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'b
       action,
     }
   }
-  else if (action === 'deleteFriend') {
+  else if (action === 'deleteConversation') {
     confirmModal.value = {
       show: true,
-      title: t('chat.info.deleteFriend', '删除好友'),
-      content: t('chat.info.deleteFriendConfirm', '确定删除该好友吗？'),
+      title: t('chat.info.deleteConversation', '删除会话'),
+      content: t('chat.info.deleteConversationConfirm', '确定删除该会话吗？'),
       action,
-    }
-  }
-  else if (action === 'block') {
-    confirmModal.value = {
-      show: true,
-      title: t('contact.detail.block', '拉黑'),
-      content: t('contact.detail.blockConfirm', '确定拉黑该联系人吗？'),
-      action,
-    }
-  }
-  else if (action === 'unblock') {
-    confirmModal.value = {
-      show: true,
-      title: t('contact.detail.unblock', '取消拉黑'),
-      content: t('contact.detail.unblockConfirm', '确定取消拉黑吗？'),
-      action,
+      deleteRoaming: false,
     }
   }
   else {
@@ -443,59 +391,7 @@ function openConfirm(action: 'leave' | 'destroy' | 'clear' | 'deleteFriend' | 'b
       title: t('chat.info.clearHistory', '清空聊天记录'),
       content: t('chat.info.clearHistoryConfirm', '确定清空当前会话的聊天记录吗？'),
       action,
-      deleteConversation: false,
     }
-  }
-}
-
-/** 单聊：删除好友 */
-async function doDeleteFriend(userId: string) {
-  try {
-    await deleteContact(userId)
-    showToast(t('chat.info.deleteFriendSuccess', '好友已删除'), 'success')
-    onClose()
-  }
-  catch (err) {
-    showToast(err instanceof Error ? err.message : String(err) || t('chat.info.deleteFriendFailed', '删除好友失败'), 'error')
-  }
-}
-
-/** 单聊是否已拉黑（黑名单功能关闭时恒为 false） */
-const isPeerBlocked = computed(() => {
-  if (!features.enableBlocklist || !peerUserId.value)
-    return false
-  return isUserBlocked(peerUserId.value)
-})
-
-/** 单聊：打开拉黑 / 取消拉黑确认弹窗 */
-function onToggleBlock() {
-  if (!peerUserId.value)
-    return
-  openConfirm(isPeerBlocked.value ? 'unblock' : 'block')
-}
-
-/** 单聊：执行拉黑 / 取消拉黑 */
-async function doToggleBlock(blocked: boolean) {
-  const userId = peerUserId.value
-  if (!userId)
-    return
-  try {
-    if (blocked) {
-      await addBlock({
-        userId,
-        name: displayName.value,
-        avatar: displayAvatar.value || '',
-      })
-      showToast(t('contact.detail.blockSuccess', '已拉黑'), 'success')
-    }
-    else {
-      await removeBlock(userId)
-      showToast(t('contact.detail.unblockSuccess', '已取消拉黑'), 'success')
-    }
-    emit('block-changed', userId, blocked)
-  }
-  catch {
-    showToast(t('contact.detail.actionFailed', '操作失败'), 'error')
   }
 }
 
@@ -614,16 +510,10 @@ function onModalConfirm() {
     emit('destroy-group', id)
   }
   else if (action === 'clear') {
-    emit('clear-history', { id, type, deleteConversation: confirmModal.value.deleteConversation })
+    emit('clear-history', { id, type, deleteConversation: false })
   }
-  else if (action === 'deleteFriend') {
-    void doDeleteFriend(id)
-  }
-  else if (action === 'block') {
-    void doToggleBlock(true)
-  }
-  else if (action === 'unblock') {
-    void doToggleBlock(false)
+  else if (action === 'deleteConversation') {
+    emit('clear-history', { id, type, deleteConversation: true, deleteRoaming: confirmModal.value.deleteRoaming })
   }
   else if (action === 'transferOwner') {
     const targetUserId = confirmModal.value.targetUserId
@@ -636,18 +526,69 @@ function onModalConfirm() {
   confirmModal.value.targetUserName = undefined
 }
 
+/** 群聊 footer：退出/解散 */
 function onLeaveOrDelete() {
-  if (props.isGroup) {
-    openConfirm(isOwner.value ? 'destroy' : 'leave')
-  }
-  else {
-    // 单聊：删除好友（二次确认后调用 deleteContact）
-    openConfirm('deleteFriend')
-  }
+  openConfirm(isOwner.value ? 'destroy' : 'leave')
 }
 
 function onClearHistory() {
   openConfirm('clear')
+}
+
+/** 单聊 footer：删除会话（清空记录并删除会话本身） */
+function onDeleteConversation() {
+  openConfirm('deleteConversation')
+}
+
+// ===== 会话级设置：消息搜索 / 免打扰 / 置顶（单群通用） =====
+const conversationMuted = computed(() => props.conversation?.isMuted ?? false)
+const conversationPinned = computed(() => props.conversation?.isPinned ?? false)
+/** 免打扰/置顶请求的 in-flight 守卫：防止重复点击并发请求（不再用于禁用开关） */
+const updatingConversationSetting = ref(false)
+
+/** 切换会话免打扰 */
+async function onToggleMute(muted: boolean) {
+  const id = props.conversation?.id
+  if (!id || updatingConversationSetting.value)
+    return
+  updatingConversationSetting.value = true
+  try {
+    await muteConversation(id, muted)
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
+  }
+  finally {
+    updatingConversationSetting.value = false
+  }
+}
+
+/** 切换会话置顶 */
+async function onTogglePin(pinned: boolean) {
+  const id = props.conversation?.id
+  if (!id || updatingConversationSetting.value)
+    return
+  updatingConversationSetting.value = true
+  try {
+    await pinConversation(id, pinned)
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
+  }
+  finally {
+    updatingConversationSetting.value = false
+  }
+}
+
+/** 打开消息搜索（由宿主容器接管） */
+function onOpenMessageSearch() {
+  emit('search-message')
+}
+
+/** 单聊「添加」：以对方为初始成员发起群聊 */
+function onCreateGroupFromPeer() {
+  if (peerUserId.value)
+    emit('create-group', peerUserId.value)
 }
 
 function onViewAllMembers() {
@@ -736,14 +677,16 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             :title="t('button.back', '返回')"
             @click="onClose"
           />
-          <span v-else class="chat-info-drawer__header-placeholder" />
-          <span class="chat-info-drawer__title">
+          <!-- 单聊标题左对齐（设计稿），群聊保持居中：居中需要左侧占位平衡关闭按钮 -->
+          <span v-else-if="isGroup" class="chat-info-drawer__header-placeholder" />
+          <span class="chat-info-drawer__title" :class="{ 'chat-info-drawer__title--left': !isGroup && !props.fullscreen }">
             {{ isGroup ? t('chat.info.titleGroup') : t('chat.info.titleFriend') }}
           </span>
           <IconButton
             v-if="!props.fullscreen"
             class="chat-info-drawer__close"
-            icon="xmark/light"
+            icon="xmark/bold"
+            :icon-size="14"
             size="small"
             variant="ghost"
             :title="t('button.close', '关闭')"
@@ -770,7 +713,21 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     <div class="chat-info-drawer__body">
       <template v-if="!showMemberList">
         <slot name="drawer-profile" v-bind="drawerSlotScope">
-          <div class="chat-info-drawer__section chat-info-drawer__section--profile">
+          <!-- 单聊：成员条（对方头像 + 添加单元格，添加 = 以对方为初始成员发起群聊） -->
+          <div v-if="!isGroup" class="chat-info-drawer__member-strip">
+            <div class="chat-info-drawer__strip-cell">
+              <Avatar :name="displayName" :src="displayAvatar" :size="48" />
+              <span class="chat-info-drawer__strip-name">{{ displayName }}</span>
+            </div>
+            <div class="chat-info-drawer__strip-cell chat-info-drawer__strip-cell--add" @click="onCreateGroupFromPeer">
+              <span class="chat-info-drawer__strip-add-circle">
+                <Icon name="plus" :size="20" />
+              </span>
+              <span class="chat-info-drawer__strip-name">{{ t('chat.info.add', '添加') }}</span>
+            </div>
+          </div>
+          <!-- 群聊：资料卡（群名/群描述可编辑） -->
+          <div v-else class="chat-info-drawer__section chat-info-drawer__section--profile">
             <div class="chat-info-drawer__profile">
               <Avatar :name="displayName" :src="displayAvatar" :size="64" />
               <!-- 群聊：群名称可编辑 -->
@@ -821,10 +778,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                     />
                   </div>
                 </div>
-              </div>
-              <!-- 单聊：仅展示名称 -->
-              <div v-else class="chat-info-drawer__name">
-                {{ displayName }}
               </div>
               <!-- 群聊：群描述（弱化，合并为普通说明文字） -->
               <div v-if="isGroup && (group?.description || isOwner)" class="chat-info-drawer__description-row">
@@ -884,52 +837,38 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
           </div>
         </slot>
 
-        <!-- 单聊：备注编辑 -->
-        <div v-if="!isGroup" class="chat-info-drawer__section-group">
-          <div class="chat-info-drawer__section-label">
-            {{ t('chat.info.remark') }}
+        <!-- 会话设置：消息搜索 / 免打扰 / 置顶（单群通用，conversation 级状态） -->
+        <slot name="drawer-settings" v-bind="drawerSlotScope">
+          <div class="chat-info-drawer__settings">
+            <Cell
+              v-if="props.showMessageSearch"
+              :title="t('message.search.title')"
+              size="compact"
+              show-arrow
+              border="bottom"
+              :inset-hover="false"
+              @click="onOpenMessageSearch"
+            />
+            <Cell :title="t('chat.info.conversationMute')" size="compact" border="bottom" :clickable="false" :inset-hover="false">
+              <template #trailing>
+                <!-- 不在请求中禁用开关（避免鼠标悬停时闪现 not-allowed 光标）；
+                     重复点击由 onToggleMute 内的 in-flight 守卫拦截，失败时状态自然回弹 -->
+                <Switch
+                  :model-value="conversationMuted"
+                  @change="onToggleMute"
+                />
+              </template>
+            </Cell>
+            <Cell :title="t('chat.info.conversationPin')" size="compact" border="bottom" :clickable="false" :inset-hover="false">
+              <template #trailing>
+                <Switch
+                  :model-value="conversationPinned"
+                  @change="onTogglePin"
+                />
+              </template>
+            </Cell>
           </div>
-          <slot name="drawer-remark" v-bind="drawerSlotScope">
-            <div class="chat-info-drawer__section">
-              <div v-if="!isEditingRemark" class="chat-info-drawer__remark" @click="isEditingRemark = true">
-                <span>{{ remarkInput || t('chat.info.remarkPlaceholder') }}</span>
-                <IconButton
-                  icon="rect/pencil"
-                  size="small"
-                  type="primary"
-                  :title="t('chat.info.edit', '编辑')"
-                  @click.stop="isEditingRemark = true"
-                />
-              </div>
-              <div v-else class="chat-info-drawer__remark-edit">
-                <input
-                  ref="remarkInputRef"
-                  v-model="remarkInput"
-                  class="chat-info-drawer__remark-input"
-                  :placeholder="t('chat.info.remarkInputPlaceholder')"
-                  @keydown.enter="saveRemark"
-                  @keydown.esc="cancelEditRemark"
-                >
-                <IconButton
-                  icon="xmark/bold"
-                  size="small"
-                  type="danger"
-                  :title="t('button.cancel', '取消')"
-                  @click="cancelEditRemark"
-                />
-                <IconButton
-                  class="chat-info-drawer__remark-save"
-                  icon="check/single"
-                  size="small"
-                  type="success"
-                  :disabled="savingRemark"
-                  :title="t('chat.info.save', '保存')"
-                  @click="saveRemark"
-                />
-              </div>
-            </div>
-          </slot>
-        </div>
+        </slot>
 
         <!-- 群聊：群公告 -->
         <div v-if="isGroup" class="chat-info-drawer__section-group">
@@ -1019,19 +958,9 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
           </slot>
         </div>
 
-        <!-- 通用操作 -->
+        <!-- 通用操作（默认内容仅群聊：单聊的清空/删除入口已移至 footer 圆角按钮组） -->
         <slot name="drawer-actions" v-bind="drawerSlotScope">
-          <div class="chat-info-drawer__section">
-            <!-- 单聊：拉黑 / 取消拉黑（黑名单功能关闭时隐藏） -->
-            <Button
-              v-if="!isGroup && features.enableBlocklist && peerUserId"
-              type="danger-outline"
-              block
-              @click="onToggleBlock"
-            >
-              <Icon :name="isPeerBlocked ? 'person/check' : 'person/xmark'" :size="18" />
-              {{ isPeerBlocked ? t('contact.detail.unblock', '取消拉黑') : t('contact.detail.block', '拉黑') }}
-            </Button>
+          <div v-if="isGroup" class="chat-info-drawer__section">
             <Button type="danger-outline" block @click="onClearHistory">
               <Icon name="trash" :size="18" />
               {{ t('chat.info.clearHistory') }}
@@ -1070,8 +999,18 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     <template v-if="!showMemberList" #footer>
       <slot name="drawer-footer" v-bind="drawerSlotScope">
         <div class="chat-info-drawer__actions">
-          <Button type="danger-outline" block @click="onLeaveOrDelete">
-            {{ isGroup ? (isOwner ? t('chat.info.destroyGroup') : t('chat.info.leaveGroup')) : t('chat.info.deleteFriend') }}
+          <!-- 单聊：清空聊天记录 + 删除会话（圆角胶囊按钮，设计稿） -->
+          <template v-if="!isGroup">
+            <Button type="default" block class="chat-info-drawer__pill-btn" @click="onClearHistory">
+              {{ t('chat.info.clearHistory') }}
+            </Button>
+            <Button type="default" block class="chat-info-drawer__pill-btn chat-info-drawer__pill-btn--danger" @click="onDeleteConversation">
+              {{ t('chat.info.deleteConversation', '删除会话') }}
+            </Button>
+          </template>
+          <!-- 群聊：退出/解散 -->
+          <Button v-else type="danger-outline" block @click="onLeaveOrDelete">
+            {{ isOwner ? t('chat.info.destroyGroup') : t('chat.info.leaveGroup') }}
           </Button>
         </div>
       </slot>
@@ -1088,14 +1027,14 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     <div class="chat-info-drawer__confirm-body">
       <p>{{ confirmModal.content }}</p>
       <label
-        v-if="confirmModal.action === 'clear'"
+        v-if="confirmModal.action === 'deleteConversation'"
         class="chat-info-drawer__confirm-checkbox"
       >
         <input
-          v-model="confirmModal.deleteConversation"
+          v-model="confirmModal.deleteRoaming"
           type="checkbox"
         >
-        <span>{{ t('chat.info.clearHistoryDeleteConversation', '同时删除会话') }}</span>
+        <span>{{ t('chat.info.deleteRoamingMessages', '同时删除历史消息') }}</span>
       </label>
     </div>
   </Modal>
@@ -1105,13 +1044,21 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 .chat-info-drawer__header {
   display: flex;
   align-items: center;
-  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
-  gap: 12px;
+  /* 与聊天表头（.chat__header）严格对齐：12px/16px 内边距、48px 最小高度、8px 间距 */
+  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px
+    var(--uikit-header-padding-y, 12px);
+  min-height: 48px;
+  gap: 8px;
 }
 
 .chat-info-drawer__close,
 .chat-info-drawer__back {
   flex-shrink: 0;
+}
+
+/* 关闭图标颜色按设计稿为纯黑（可用 --uikit-drawer-close-color 主题化覆盖，如深色主题） */
+.chat-info-drawer__header .chat-info-drawer__close {
+  color: var(--uikit-drawer-close-color, #000000);
 }
 
 /* 关闭按钮 hover 底色走 --uikit-bg-hover 语义 token：
@@ -1137,13 +1084,19 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   text-align: center;
 }
 
+/* 单聊（好友详情）标题左对齐（设计稿）；群聊保持居中 */
+.chat-info-drawer__title--left {
+  text-align: left;
+}
+
 .chat-info-drawer__body {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   min-height: 0;
-  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
+  /* body 默认无内边距：分隔线/列表行通栏满铺，内容由各区块自行内收 */
+  padding: 0;
   gap: 12px;
 }
 
@@ -1158,14 +1111,14 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   font-size: var(--uikit-font-size-13);
   font-weight: 500;
   color: var(--uikit-text-secondary);
-  padding: 0 4px;
+  padding: 0 16px;
 }
 
 .chat-info-drawer__section-label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
+  padding: 0 16px;
 }
 
 .chat-info-drawer__section {
@@ -1199,35 +1152,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 .chat-info-drawer__count {
   font-weight: 400;
   color: var(--uikit-text-secondary);
-}
-
-.chat-info-drawer__remark {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
-  cursor: pointer;
-}
-
-.chat-info-drawer__remark-edit {
-  display: flex;
-  gap: 8px;
-}
-
-.chat-info-drawer__remark-input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--uikit-border-color);
-  border-radius: var(--uikit-components-radius);
-  font-size: var(--uikit-font-size-14);
-  outline: none;
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-}
-
-.chat-info-drawer__remark-input:focus {
-  border-color: var(--uikit-primary-color);
 }
 
 /* 群信息内联编辑 */
@@ -1336,6 +1260,66 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   color: var(--uikit-text-secondary);
 }
 
+/* 单聊成员条：对方头像 + 添加单元格（实线圆），单元格间距 20px（设计稿） */
+.chat-info-drawer__member-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  /* body 无内边距，成员条自行内收，与表头标题左边距对齐 */
+  padding: 4px 16px;
+  flex-shrink: 0;
+}
+
+.chat-info-drawer__strip-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 56px;
+}
+
+.chat-info-drawer__strip-name {
+  max-width: 100%;
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-info-drawer__strip-cell--add {
+  cursor: pointer;
+  border-radius: var(--uikit-components-radius, 8px);
+}
+
+.chat-info-drawer__strip-add-circle {
+  /* border-box：1px 边框计入 48px 总尺寸，与 Avatar（48px 无边框）等高，保证两者下方文字同一基线 */
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--uikit-border-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uikit-icon-muted);
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+@media (hover: hover) {
+  .chat-info-drawer__strip-cell--add:hover .chat-info-drawer__strip-add-circle {
+    background-color: var(--uikit-bg-hover);
+  }
+}
+
+/* 会话设置行组：行间 1px 分隔线、内容 12px 内收均为 Cell 分割线模式（border="bottom"）的默认风格，
+   此处无需覆盖，详见 uikit-core cell.vue「分割线模式」注释 */
+.chat-info-drawer__settings {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
 .chat-info-drawer__member-grid {
   display: flex;
   flex-wrap: wrap;
@@ -1391,12 +1375,29 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 .chat-info-drawer__actions {
   padding: var(--uikit-drawer-padding, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* footer 圆角胶囊按钮（设计稿：灰底通栏胶囊，高 42px、内 padding 上下 12px 左右 4px；
+   删除会话为灰底红字） */
+.chat-info-drawer__actions .chat-info-drawer__pill-btn {
+  height: 42px;
+  padding: 12px 4px;
+  border-radius: 999px;
+}
+
+.chat-info-drawer__actions .chat-info-drawer__pill-btn--danger {
+  color: var(--uikit-danger-color);
 }
 
 .chat-info-drawer__member-detail {
   flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
+  /* body 无内边距，成员二级页内容自行内收 */
+  padding: 0 16px;
 }
 
 /* 内容少时卡片高度由成员列表决定，不强制撑满抽屉；成员多时由外层 body 滚动 */

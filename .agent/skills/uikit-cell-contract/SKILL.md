@@ -131,7 +131,12 @@ export interface CellProps {
   meta?: string
   /** 是否显示右侧箭头（导航项常用） */
   showArrow?: boolean
-  /** 分隔线：true=bottom / false=none / 'top' / 'bottom' */
+  /**
+   * 分隔线：true=bottom / false=none / 'top' / 'bottom'。
+   * 分割线模式默认风格（iOS 分段列表）：内容左右内收 12px、cell 间距归零，
+   * 底部发丝线左侧跟随内收、右侧顶满。
+   * 覆盖变量：--uikit-cell-border-padding-x（内容内收）/ --uikit-cell-border-inset（分隔线左内收，0 = 通栏）。
+   */
   border?: boolean | 'top' | 'bottom'
   /** 内容驱动高度（而非固定高度） */
   autoHeight?: boolean

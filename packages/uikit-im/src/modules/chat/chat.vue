@@ -13,6 +13,7 @@ import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
 import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
 import InviteMemberModal from '../group/invite-member-modal.vue'
+import CreateGroupModal from '../conversation/create-group-modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
 import GroupCardModal from '../../components/group-card/group-card-modal.vue'
 import MessageList from './message-list/message-list.vue'
@@ -395,6 +396,15 @@ const chatInfoDrawerRef = ref<InstanceType<typeof ChatInfoDrawer>>()
 
 /** 是否显示添加成员弹窗 */
 const showInviteModal = ref(false)
+
+/** 单聊抽屉「添加」：发起群聊弹窗（预选对方为初始成员） */
+const showCreateGroupModal = ref(false)
+const createGroupInitialIds = ref<string[]>([])
+
+function onDrawerCreateGroup(userId: string) {
+  createGroupInitialIds.value = userId ? [userId] : []
+  showCreateGroupModal.value = true
+}
 
 /** 当前添加成员对应的群 ID */
 const inviteGroupId = ref('')
@@ -828,12 +838,14 @@ async function onDestroyGroup(groupId: string) {
 }
 
 /** 清空聊天记录 */
-async function onClearHistory(payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean }) {
+async function onClearHistory(payload: { id: string, type: ConversationTypeValue, deleteConversation?: boolean, deleteRoaming?: boolean }) {
   try {
-    await clearChatHistory(payload.id, true)
+    // deleteRoaming 仅在「删除会话」链路由用户勾选决定；纯清空保持原行为（删除漫游消息）
+    const deleteRoaming = payload.deleteRoaming ?? true
+    await clearChatHistory(payload.id, deleteRoaming)
     stores.message.clearConversationMessages(payload.id)
     if (payload.deleteConversation) {
-      await deleteConversation(payload.id)
+      await deleteConversation(payload.id, deleteRoaming)
       // 删除会话后清空当前选中，避免右侧继续展示已删除会话
       selectConversation('')
     }
@@ -1340,10 +1352,13 @@ async function onRemoveAdmin(member: UiGroupMember) {
             :show-allowlist="props.config?.groupManagement?.showAllowlist"
             :show-shared-files="props.config?.groupManagement?.showSharedFiles"
             :show-join-requests="props.config?.groupManagement?.showJoinRequests"
+            :show-message-search="searchEnabled"
             @leave-group="onLeaveGroup"
             @destroy-group="onDestroyGroup"
             @clear-history="onClearHistory"
             @add-member="onAddMember"
+            @search-message="openSearchPanel"
+            @create-group="onDrawerCreateGroup"
             @group-operation="emit('group-operation', $event)"
             @chat-member="onChatMember"
             @remove-member="onRemoveMember"
@@ -1409,6 +1424,12 @@ async function onRemoveAdmin(member: UiGroupMember) {
           @invited="onInviteMembers"
         />
       </slot>
+
+      <!-- 发起群聊弹窗（单聊抽屉「添加」入口，预选对方为初始成员） -->
+      <CreateGroupModal
+        v-model:show="showCreateGroupModal"
+        :config="{ initialSelectedIds: createGroupInitialIds }"
+      />
 
       <!-- 转发弹窗（#forward：完全接管转发弹窗渲染） -->
       <slot
