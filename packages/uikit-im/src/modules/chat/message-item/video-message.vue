@@ -2,7 +2,7 @@
 import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '@easemob/uikit-core'
-import { INJECTION_KEY } from '@easemob/uikit-core'
+import { INJECTION_KEY, MESSAGE_STATUS } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
@@ -28,6 +28,9 @@ const videoClass = computed(() =>
 )
 
 const body = computed(() => props.message.body as VideoMessageBody)
+
+/** 发送中（status=sending）：播放按钮替换为居中 loading，蒙层保留压暗 */
+const isSending = computed(() => props.message.status === MESSAGE_STATUS.SENDING)
 
 /** 视频展示最大约束（与图片消息对齐） */
 const MAX_WIDTH = 240
@@ -116,9 +119,10 @@ async function handleDownload(event: MouseEvent) {
       <div v-else class="video-message__placeholder" :class="videoClass">
         {{ t('message.video', '[视频]') }}
       </div>
-      <!-- 播放按钮覆盖层 -->
+      <!-- 播放按钮覆盖层（发送中替换为居中 loading） -->
       <div class="video-message__overlay">
-        <div class="video-message__play-btn">
+        <Icon v-if="isSending" name="loading/arc/big" :size="24" color="#fff" anim="spin" />
+        <div v-else class="video-message__play-btn">
           <Icon name="triangle" :size="20" color="#fff" />
         </div>
       </div>
@@ -175,11 +179,14 @@ async function handleDownload(event: MouseEvent) {
 }
 
 .video-message__video {
-  /* 尺寸由容器按消息体 width/height 预留（displaySize），视频填满容器 */
+  /* 尺寸由容器按消息体 width/height 预留（displaySize），视频填满容器。
+     固定过扫描放大：首帧缩略图（vframe）常带烤入画面的边缘黑边，整体放大裁掉；
+     不需要可用 --uikit-video-overscan: 1 关闭 */
   width: 100%;
   height: 100%;
   border-radius: var(--uikit-bubble-radius, 16px);
   object-fit: cover;
+  transform: scale(var(--uikit-video-overscan, 1.08));
   display: block;
 }
 

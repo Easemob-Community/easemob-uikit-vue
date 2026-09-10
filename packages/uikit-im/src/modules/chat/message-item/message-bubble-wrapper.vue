@@ -192,6 +192,15 @@ const isGroupReadReceiptActive = computed(() => {
 /** 是否显示群已读人数标注 */
 const showGroupReadCount = computed(() => isGroupReadReceiptActive.value)
 
+/**
+ * 图片/视频发送中：loading 已由气泡内蒙层居中展示（image-message / video-message），
+ * 抑制气泡旁的小状态 loading，避免双 spinner；失败/已读等其他状态不受影响。
+ */
+const isMediaSending = computed(() =>
+  messageStatus.value === MESSAGE_STATUS.SENDING
+  && (props.message.type === MESSAGE_TYPE.IMAGE || props.message.type === MESSAGE_TYPE.VIDEO),
+)
+
 /** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
 const showStatus = computed(() => isSelf.value && !isGroupReadReceiptActive.value)
 
@@ -214,7 +223,7 @@ const hideReadStatus = computed(() => {
 })
 
 /** 实际展示状态：showStatus 减去「单聊已读收敛」隐藏的情形 */
-const showStatusEffective = computed(() => showStatus.value && !hideReadStatus.value)
+const showStatusEffective = computed(() => showStatus.value && !hideReadStatus.value && !isMediaSending.value)
 
 /** 经典状态图标映射（默认） */
 const classicStatusIconMap: Record<MessageStatusValue, string> = {
@@ -707,9 +716,9 @@ onBeforeUnmount(() => {
                       :size="14"
                       class="message-bubble-wrapper__status-icon"
                       :class="{
-                        'message-bubble-wrapper__status-icon--loading': messageStatus === MESSAGE_STATUS.SENDING,
                         'message-bubble-wrapper__status-icon--unread': messageStatus === MESSAGE_STATUS.SENT || messageStatus === MESSAGE_STATUS.DELIVERED,
                       }"
+                      :anim="messageStatus === MESSAGE_STATUS.SENDING ? 'spin' : undefined"
                     />
                     <Icon
                       v-if="messageStatus === MESSAGE_STATUS.FAILED"

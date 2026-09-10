@@ -3,9 +3,9 @@ import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '@easemob/uikit-core'
 import { INJECTION_KEY } from '@easemob/uikit-core'
-import { MESSAGE_EXT_KEY } from '@easemob/uikit-core'
+import { MESSAGE_EXT_KEY, MESSAGE_STATUS } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
-import { EmImageViewer as ImageViewer } from '@easemob/uikit-core'
+import { EmIcon as Icon, EmImageViewer as ImageViewer } from '@easemob/uikit-core'
 import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
 
@@ -79,6 +79,9 @@ const radiusClass = computed(() =>
 /** 图片加载状态 */
 const isLoaded = ref(false)
 const isError = ref(false)
+
+/** 发送中（status=sending）：气泡上叠蒙层 + 居中 loading，表情包除外（透明底小图不盖蒙层） */
+const isSending = computed(() => props.message.status === MESSAGE_STATUS.SENDING && !isSticker.value)
 
 function onLoad() {
   isLoaded.value = true
@@ -167,6 +170,10 @@ function onPreviewError(index: number) {
       <!-- 加载失败 -->
       <div v-if="isError" class="image-message__error" :class="isSticker ? '' : radiusClass">
         {{ t('message.image.loadFailed', '[图片加载失败]') }}
+      </div>
+      <!-- 发送中：蒙层 + 居中 loading -->
+      <div v-if="isSending" class="image-message__sending" :class="radiusClass">
+        <Icon name="loading/arc/big" :size="24" color="#fff" anim="spin" />
       </div>
     </div>
 
@@ -268,6 +275,21 @@ function onPreviewError(index: number) {
   background-color: var(--uikit-bubble-bg-other);
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-bubble-text-other);
+}
+
+/* 发送中蒙层：压暗图片 + 居中 loading（发送完成随 status 翻转自动消失） */
+.image-message__sending {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: var(--uikit-bubble-radius, 16px);
+}
+
+.image-message__sending.image-message__img--square {
+  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 .image-message__placeholder {
