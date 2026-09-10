@@ -42,7 +42,7 @@ export interface PersistedLogEntry {
   ns?: string
   /** 日志主消息 */
   message: string
-  /** 附加参数的安全序列化结果（深度/循环兜底 + 单条截断 2KB） */
+  /** 附加参数的安全序列化结果（深度/循环兜底 + 逐字段截断 + 单条截断 2KB） */
   data?: string
 }
 
@@ -103,6 +103,10 @@ const TS_INDEX = 'by_ts'
 const MAX_DATA_LENGTH = 2048
 /** 参数序列化的最大嵌套深度，压平 stringify 的最坏成本 */
 const MAX_SERIALIZE_DEPTH = 3
+/** 数组透传的最大层数：数组本身不占对象深度预算，但纯数组嵌套仍需封顶防栈溢出 */
+const MAX_ARRAY_DEPTH = 3
+/** 单个字符串字段的最大长度（对齐 Sentry maxValueLength 思路），保结构优先于保全文 */
+const MAX_FIELD_LENGTH = 200
 /** 内存缓冲达到该条数即触发落库 */
 const FLUSH_THRESHOLD = 20
 /** 定时落库间隔（ms） */
@@ -150,27 +154,40 @@ function warnOnce(message: string, ...args: unknown[]): void {
 
 /**
  * 深度受限的结构克隆：Error 提取 name/message，循环/重复引用兜底，
- * 超过 MAX_SERIALIZE_DEPTH 的层级压平为 '[Deep]'，避免 stringify 巨型对象。
+ * 超过 MAX_SERIALIZE_DEPTH 的对象层级压平为 '[Deep]'，避免 stringify 巨型对象。
+ *
+ * 数组特殊处理：数组本身不占对象深度预算（透传给元素当前深度），
+ * 让「数组套同质对象」（消息列表/会话列表等最常见日志形态）能露出元素顶层标量字段；
+ * 纯数组嵌套用独立的 MAX_ARRAY_DEPTH 封顶防栈溢出，超限压平为 `[Array(n)]`。
+ * 字符串字段超 MAX_FIELD_LENGTH 逐字段截断（对齐 Sentry maxValueLength），
+ * 保住整体结构而不是让个别长字段（url/secret/base64）吃掉整条日志预算。
  */
-function limitDepth(value: unknown, depth: number, seen: WeakSet<object>): unknown {
+function limitDepth(value: unknown, depth: number, arrayDepth: number, seen: WeakSet<object>): unknown {
   if (value instanceof Error)
     return { name: value.name, message: value.message }
   if (typeof value === 'bigint')
     return String(value)
   if (typeof value === 'function')
     return '[Function]'
+  if (typeof value === 'string')
+    return value.length > MAX_FIELD_LENGTH ? `${value.slice(0, MAX_FIELD_LENGTH)}…` : value
   if (!value || typeof value !== 'object')
     return value
   if (seen.has(value))
     return '[Circular]'
+  if (Array.isArray(value)) {
+    if (arrayDepth >= MAX_ARRAY_DEPTH)
+      return `[Array(${value.length})]`
+    seen.add(value)
+    // 数组透传：元素按当前对象深度递归，数组层数走独立计数
+    return value.map(item => limitDepth(item, depth, arrayDepth + 1, seen))
+  }
   if (depth >= MAX_SERIALIZE_DEPTH)
-    return Array.isArray(value) ? '[Array]' : '[Deep]'
+    return '[Deep]'
   seen.add(value)
-  if (Array.isArray(value))
-    return value.map(item => limitDepth(item, depth + 1, seen))
   const out: Record<string, unknown> = {}
   for (const [key, val] of Object.entries(value))
-    out[key] = limitDepth(val, depth + 1, seen)
+    out[key] = limitDepth(val, depth + 1, arrayDepth, seen)
   return out
 }
 
@@ -180,7 +197,7 @@ export function safeSerializeLogArgs(args: unknown[]): string | undefined {
     return undefined
   try {
     const seen = new WeakSet<object>()
-    const text = JSON.stringify(args.map(arg => limitDepth(arg, 0, seen)))
+    const text = JSON.stringify(args.map(arg => limitDepth(arg, 0, 0, seen)))
     if (text.length > MAX_DATA_LENGTH)
       return `${text.slice(0, MAX_DATA_LENGTH)}…(truncated)`
     return text

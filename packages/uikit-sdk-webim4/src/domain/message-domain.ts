@@ -418,13 +418,17 @@ export class MessageDomain {
       searchDirection: 'up',
     })
 
-    historyLogger.info('fetchHistory raw response', {
+    // 调试：历史消息摘要（与 websdk5 对齐：逐条压缩为 id|type|from->to|time）
+    // page.messages 声明为 MessageBody[]（含 ReadMsgBody），与下方 list 同样收窄为 ExcludeAckMessageBody
+    const historyMsgs = (page.messages || []) as MessagesType[]
+    historyLogger.info('fetchHistory response', {
       conversationId,
       conversationType,
       cursor,
       pageSize,
-      count: page.messages?.length,
+      count: historyMsgs.length,
       isLast: page.isLast,
+      items: historyMsgs.map(m => `${m.id}|${m.type}|${m.from}->${m.to}|${m.time}`),
     })
 
     // CMD 为透传命令不上屏；历史入口主动过滤（与 websdk5 对齐）

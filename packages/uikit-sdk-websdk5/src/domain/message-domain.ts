@@ -426,13 +426,16 @@ export class MessageDomain {
       searchDirection: 'up',
     })
 
-    // 调试：打印获取历史消息接口的原始返回数据
-    historyLogger.info('fetchHistory raw response', {
+    // 调试：打印历史消息摘要（逐条压缩为 id|type|from->to|timestamp，避免序列化整个消息体）
+    historyLogger.info('fetchHistory response', {
       conversationId,
       conversationType,
       cursor,
       pageSize,
-      raw: page,
+      count: page.items.length,
+      cursorReturned: page.cursor,
+      hasMore: page.hasMore,
+      items: page.items.map(m => `${m.msgServerId || m.msgLocalId}|${m.type}|${m.from}->${m.to}|${m.timestamp}`),
     })
 
     // CMD 消息为透传命令，不应上屏渲染；历史消息入口也主动过滤。
