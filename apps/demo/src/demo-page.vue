@@ -602,6 +602,8 @@ watch(
           v-else-if="detailGroupId"
           :group-id="detailGroupId"
           @send-message="enterChatWithGroup"
+          @leaved="detailGroupId = null"
+          @destroyed="detailGroupId = null"
         />
         <EmChatContainer
           v-else
@@ -883,6 +885,8 @@ watch(
             v-else-if="detailGroupId"
             :group-id="detailGroupId"
             @send-message="enterChatWithGroup"
+            @leaved="detailGroupId = null; h5Page = 'list'"
+            @destroyed="detailGroupId = null; h5Page = 'list'"
           />
         </div>
       </div>

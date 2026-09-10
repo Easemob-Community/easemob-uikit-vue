@@ -37,12 +37,16 @@ const mockMembers: UiGroupMember[] = [
   { userId: 'member_002', nickname: '阿强' },
   { userId: 'member_003', nickname: 'Bob' },
   { userId: 'member_004', nickname: 'Alice' },
+  { userId: 'member_005', nickname: 'Carol' },
+  { userId: 'member_006', nickname: 'David' },
+  { userId: 'member_007', nickname: 'Eve' },
+  { userId: 'member_008', nickname: 'Frank' },
 ]
 
 const showGroup = ref(false)
 const showSingle = ref(false)
 
-// 为群管理区块提供群主角色与计数
+// 为群聊一级页/二级页提供群主角色、成员缓存、公告与计数
 const groupStore = useGroupStore()
 groupStore.addGroup({
   groupId: 'g_story_001',
@@ -50,6 +54,8 @@ groupStore.addGroup({
   role: GROUP_MEMBER_ROLE.OWNER,
   memberCount: mockMembers.length,
 })
+groupStore.setGroupMembers('g_story_001', mockMembers)
+groupStore.setGroupAnnouncement('g_story_001', '欢迎来到 Vue 技术交流群，请文明发言～')
 groupStore.groupJoinRequestsMap.g_story_001 = [
   { applicant: { userId: 'req_001', nickname: '申请加入的人' }, status: 'pending', reason: '想学习 Vue' },
 ]
@@ -71,6 +77,7 @@ function onEvent(name: string, payload?: unknown) {
             v-model:show="showGroup"
             :conversation="groupConversation"
             :is-group="true"
+            show-message-search
             @leave-group="(id) => onEvent('leave-group', id)"
             @destroy-group="(id) => onEvent('destroy-group', id)"
             @clear-history="(p) => onEvent('clear-history', p)"

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import type { UiGroup } from '@easemob/uikit-core'
+import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
 import GroupDetail from './group-detail.vue'
 
@@ -69,6 +69,31 @@ function log(event: string, payload?: string) {
       </UIKitProvider>
     </Variant>
 
+    <Variant title="自定义插槽（#extra + #footer 接管）">
+      <UIKitProvider :auto-init="false">
+        <div style="height: 520px; overflow: hidden;">
+          <GroupDetail
+            group-id="g_design"
+            @vue:mounted="injectMemberGroup"
+          >
+            <template #extra="{ group }">
+              <div style="margin-top: 16px; padding: 12px; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 13px; color: #64748b; text-align: center;">
+                自定义扩展区：{{ group?.description || '群介绍' }} · {{ group?.memberCount ?? '-' }} 名成员
+              </div>
+            </template>
+            <template #footer="{ groupId }">
+              <button
+                style="margin-top: 64px; width: 100%; height: 44px; border: none; border-radius: 999px; background: #fee2e2; color: #dc2626; cursor: pointer;"
+                @click="() => log('custom-footer', groupId)"
+              >
+                自定义底部操作
+              </button>
+            </template>
+          </GroupDetail>
+        </div>
+      </UIKitProvider>
+    </Variant>
+
     <Variant title="事件日志">
       <UIKitProvider :auto-init="false">
         <div style="height: 520px; overflow: hidden;">
@@ -76,6 +101,8 @@ function log(event: string, payload?: string) {
             group-id="g_design"
             @vue:mounted="injectOwnerGroup"
             @send-message="(id: string) => log('send-message', id)"
+            @leaved="(id: string) => log('leaved', id)"
+            @destroyed="(id: string) => log('destroyed', id)"
           />
         </div>
       </UIKitProvider>

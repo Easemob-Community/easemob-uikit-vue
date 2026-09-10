@@ -1300,6 +1300,20 @@
 - **建议修法**：demo 切 compact 档实际过目；若偏挤，把会话项行 gap 纳入密度变量（跟随 `--uikit-list-gap` 或新增项级变量），而非回退字号。
 - **关联 skill**：`uikit-styling-theming` / `uikit-cell-contract`
 
+### [ ] D131. 群聊会话详情抽屉改版（2026-09）遗留：发版 CHANGELOG breaking 待补录 + 三项能力入口从默认 UI 移除
+
+- **背景**：2026-09-09 群抽屉按新设计稿整改（一级页：成员网格+假搜索框+字段行+导航行+开关+胶囊按钮；二级页：Members Search / Group Files / Group Management 新版；加减成员与字段编辑统一 modal）。遗留两项：
+  1. **发版时 CHANGELOG 需记 breaking**：移除 `drawer-profile` / `drawer-announcement` / `drawer-admin-actions` / `drawer-management` 四个插槽；`drawerSlotScope.showMemberList` → `activePage`；`groupManagementDisplayMode` / `showMuteAll` / `showMuteList` / `showBlocklist` / `showAllowlist` / `showJoinRequests` props 保留声明（已标 `@deprecated`）但默认 UI 不再消费——全员禁言/禁言列表/黑名单/白名单/入群申请入口从抽屉默认 UI 移除（黑名单/禁言/白名单能力改由成员列表页 tabs 承载），`group-management-section.vue` 组件本体保留。当日后续迭代：群管理二级页已按产品要求从抽屉拿掉（`chat-info-drawer-group-management.vue` 等已删），退出/解散群聊入口落在一级页 footer 文字按钮；成员行 ⋮ 菜单默认无 icon（`menuWithIcon` prop 可开启）；聊天 header 搜索消息按钮默认隐藏（搜索归口抽屉 Message Search 行），新增 `chatConfig.header.showSearchEntry`（默认 `false`）显式开启才恢复 header 按钮，搜索总开关 `messageList.search.enabled` 语义不变。
+  2. **「我的群昵称（My group alias）」能力暂缓**：设计稿有此字段行，实现链路已预研（两代 SDK 无专门 API，走群成员自定义属性 key `nickname`，contract→双 adapter→composable 路径已验证可行，约半天工作量），2026-09-09 按产品决定取消；如需恢复，照预研链路落地并在抽屉加第三个字段行（复用 `chat-info-drawer-field-edit-modal.vue`）。
+- **建议修法**：发版时补 CHANGELOG 条目；群别名按上述链路实施。
+- **关联 skill**：`uikit-contact-group-capabilities` / `uikit-sdk-adapter-architecture`
+
+### [ ] D132. 双 adapter `GroupDomain` 未实现契约 `SdkGroupDomain.fetchMyGroupAlias/updateMyGroupAlias`，两 adapter 包构建被类型检查阻断
+
+- **背景**：2026-09-10 发现（改 fetchHistory 日志时跑构建门禁暴露，非本次改动引入）：contract `SdkGroupDomain` 已声明 `fetchMyGroupAlias` / `updateMyGroupAlias`（D131 群别名能力预研时加的契约？），但 `uikit-sdk-websdk5` 与 `uikit-sdk-webim4` 的 `GroupDomain` 均未实现，导致两包 `pnpm build`（`vite build && vue-tsc --emitDeclarationOnly`）在 `adapter.ts` 报 `TS2416: Property 'domains' ... GroupDomain is missing fetchMyGroupAlias, updateMyGroupAlias` 失败。`vue-tsc --noEmit` 同样不过。属契约与实现漂移。
+- **建议修法**：确认群别名能力是否落地：落地则按 D131 预研链路（群成员自定义属性 key `nickname`）补齐双 adapter 实现；暂缓则在 contract 去掉或降级这两个方法声明，恢复构建门禁。
+- **关联 skill**：`uikit-sdk-adapter-architecture`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

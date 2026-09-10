@@ -277,9 +277,10 @@ function closePanel() {
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
+            class="group-management-section__drawer-upload"
             icon="arrow/up_tray"
             size="small"
-            type="primary"
+            variant="ghost"
             :title="t('group.sharedFile.uploadText', '上传')"
             @click="sharedFileListRef?.triggerUpload()"
           />
@@ -403,9 +404,10 @@ function closePanel() {
           <span class="group-management-section__drawer-title">{{ drawerTitle }}</span>
           <IconButton
             v-if="activeDrawerKey === 'files'"
+            class="group-management-section__drawer-upload"
             icon="arrow/up_tray"
             size="small"
-            type="primary"
+            variant="ghost"
             :title="t('group.sharedFile.uploadText', '上传')"
             @click="sharedFileListRef?.triggerUpload()"
           />
@@ -534,6 +536,12 @@ function closePanel() {
 }
 
 .group-management-section__drawer-close {
+  flex-shrink: 0;
+}
+
+/* files 页 header 上传按钮：与返回箭头完全同款——仅布局防压缩，
+   颜色/hover 全部走 IconButton default+ghost 的中性默认样式，无任何 override */
+.group-management-section__drawer-upload {
   flex-shrink: 0;
 }
 

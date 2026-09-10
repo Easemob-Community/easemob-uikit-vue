@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmpty as Empty, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, EmPopup as Popup, createLogger, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, NOTICE_EVENT_TYPE, EmPopup as Popup, createLogger, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
 import type { NoticeEventTypeValue, UiGroupMember } from '@easemob/uikit-core'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
@@ -9,9 +9,15 @@ import MuteListSelectItem from './mute-list-select-item.vue'
 
 export interface MuteListProps {
   groupId: string
+  /** 是否显示顶部计数操作栏，默认 true；会话详情抽屉分栏页传 false（tabs 页不显示计数栏） */
+  showHeader?: boolean
+  /** 行分隔线（透传 EmCell border 能力），默认无；会话详情抽屉分栏页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
 }
 
-const props = defineProps<MuteListProps>()
+const props = withDefaults(defineProps<MuteListProps>(), {
+  showHeader: true,
+})
 
 const emit = defineEmits<{
   (e: 'unmute', member: UiGroupMember): void
@@ -30,7 +36,9 @@ const {
 } = useGroup()
 
 const loading = ref(false)
-const members = ref<any[]>([])
+// 列表数据源直接读 store 禁言缓存：domain 的禁言/解除禁言/事件回推都会同步 store，
+// 保证「全部」分栏 ⋮ 禁言后本分栏响应式更新（v-show 分栏切换不会重新挂载组件）
+const members = computed<any[]>(() => stores.group.getGroupMuteList(props.groupId))
 
 // 添加禁言成员 Popup 状态
 const showAddPopup = ref(false)
@@ -48,9 +56,8 @@ async function loadData() {
     return
   loading.value = true
   try {
-    const result = await fetchMuteList(props.groupId)
-    logger.info('loadData succeeded', { result })
-    members.value = Array.isArray(result) ? result : []
+    // domain 内部会把结果写入 store 禁言缓存（getGroupMuteList），members 计算属性自动更新
+    await fetchMuteList(props.groupId)
   }
   catch (err) {
     logger.warn('load failed:', err)
@@ -62,22 +69,38 @@ async function loadData() {
 
 watch(() => props.groupId, loadData, { immediate: true })
 
-async function onUnmute(item: any) {
+/** 取消禁言：二次确认 */
+const showUnmuteConfirm = ref(false)
+const pendingUnmuteItem = ref<any>(null)
+
+function onUnmute(item: any) {
+  pendingUnmuteItem.value = item
+  showUnmuteConfirm.value = true
+}
+
+async function confirmUnmute() {
+  const item = pendingUnmuteItem.value
+  pendingUnmuteItem.value = null
+  showUnmuteConfirm.value = false
+  if (!item)
+    return
   const user = item.user || item
   const uid = user?.userId || ''
   const name = user?.nickname || uid
   try {
+    // domain 内部已同步 store 禁言缓存（removeGroupMuteMembers），members 计算属性自动更新
     await unmuteGroupMembers(props.groupId, [uid])
-    members.value = members.value.filter((m: any) => {
-      const u = m.user || m
-      return (u?.userId || '') !== uid
-    })
     emit('unmute', { userId: uid })
     addNoticeToChat(NOTICE_EVENT_TYPE.MUTE_REMOVED, name, t('group.mutelist.unmuteNotice', '{name} 被解除禁言').replace('{name}', name))
   }
   catch (err) {
     logger.warn('unmute failed:', err)
   }
+}
+
+function cancelUnmute() {
+  pendingUnmuteItem.value = null
+  showUnmuteConfirm.value = false
 }
 
 // 通知消息：插入聊天中的灰色系统通知（统一走 insertChatNotice 管线，支持 noticeConfig 定制）
@@ -179,7 +202,7 @@ defineExpose({
 <template>
   <div class="mute-list">
     <!-- 顶部操作栏 -->
-    <div class="mute-list__header">
+    <div v-if="props.showHeader" class="mute-list__header">
       <span class="mute-list__header-count">
         {{ members.length }} {{ t('group.mutelist.memberCount', '名禁言成员') }}
       </span>
@@ -190,7 +213,7 @@ defineExpose({
     </div>
     <Empty
       v-else-if="members.length === 0"
-      icon="bell/slash"
+      icon="person/double"
       :description="t('group.memberList.empty', '暂无禁言成员')"
       size="small"
     />
@@ -198,8 +221,21 @@ defineExpose({
       v-for="item in members"
       :key="(item.user || item)?.userId || ''"
       :item="item"
+      :border="props.border"
       @unmute="onUnmute(item)"
     />
+
+    <!-- 取消禁言二次确认 -->
+    <Modal
+      v-model:show="showUnmuteConfirm"
+      :title="t('chat.info.unmuteMemberConfirmTitle')"
+      :confirm-text="t('button.confirm')"
+      :cancel-text="t('button.cancel')"
+      @confirm="confirmUnmute"
+      @cancel="cancelUnmute"
+    >
+      {{ t('chat.info.unmuteMemberConfirmContent').replace('{name}', (pendingUnmuteItem?.user || pendingUnmuteItem)?.nickname || (pendingUnmuteItem?.user || pendingUnmuteItem)?.userId || '') }}
+    </Modal>
 
     <!-- 添加禁言成员 Popup -->
     <Popup
@@ -218,7 +254,7 @@ defineExpose({
           </div>
           <Empty
             v-else-if="selectableMembers.length === 0"
-            icon="bell/slash"
+            icon="person/double"
             :description="t('group.mutelist.emptySelectable', '暂无可添加的成员')"
             size="small"
           />

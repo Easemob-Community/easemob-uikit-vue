@@ -350,6 +350,9 @@ const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 /** 是否显示 header 抽屉入口按钮，默认 true */
 const showDrawerEntry = computed(() => headerConfig.value?.showDrawerEntry !== false)
 
+/** 是否显示 header 搜索消息按钮，默认 false（搜索入口归口会话详情抽屉，可选开启） */
+const showHeaderSearchEntry = computed(() => headerConfig.value?.showSearchEntry === true)
+
 /** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡 */
 const drawerMode = computed(() => props.config?.drawer?.mode ?? 'push')
 
@@ -1089,8 +1092,40 @@ function cancelRemoveMember() {
   showRemoveConfirmModal.value = false
 }
 
+/** 设为/取消管理员：二次确认 */
+const showAdminConfirmModal = ref(false)
+const pendingAdminAction = ref<{ member: UiGroupMember, action: 'set' | 'remove' } | null>(null)
+
 /** 设为管理员 */
-async function onSetAdmin(member: UiGroupMember) {
+function onSetAdmin(member: UiGroupMember) {
+  pendingAdminAction.value = { member, action: 'set' }
+  showAdminConfirmModal.value = true
+}
+
+/** 取消管理员 */
+function onRemoveAdmin(member: UiGroupMember) {
+  pendingAdminAction.value = { member, action: 'remove' }
+  showAdminConfirmModal.value = true
+}
+
+async function confirmAdminAction() {
+  const pending = pendingAdminAction.value
+  pendingAdminAction.value = null
+  showAdminConfirmModal.value = false
+  if (!pending)
+    return
+  if (pending.action === 'set')
+    await doSetAdmin(pending.member)
+  else
+    await doRemoveAdmin(pending.member)
+}
+
+function cancelAdminAction() {
+  pendingAdminAction.value = null
+  showAdminConfirmModal.value = false
+}
+
+async function doSetAdmin(member: UiGroupMember) {
   const groupId = currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT ? currentConversation.value.id : ''
   if (!groupId)
     return
@@ -1113,7 +1148,7 @@ async function onSetAdmin(member: UiGroupMember) {
 }
 
 /** 取消管理员 */
-async function onRemoveAdmin(member: UiGroupMember) {
+async function doRemoveAdmin(member: UiGroupMember) {
   const groupId = currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT ? currentConversation.value.id : ''
   if (!groupId)
     return
@@ -1240,7 +1275,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
                 <slot name="header-extra" :conversation="currentConversation" />
               </div>
               <IconButton
-                v-if="searchEnabled"
+                v-if="searchEnabled && showHeaderSearchEntry"
                 icon="search"
                 :icon-size="20"
                 @click.stop="showSearchPanel = true"
@@ -1421,6 +1456,22 @@ async function onRemoveAdmin(member: UiGroupMember) {
       >
         <template v-if="pendingRemoveMember">
           {{ t('group.memberList.removeConfirmPrefix') }} {{ pendingRemoveMember.nickname || pendingRemoveMember.userId }} {{ t('group.memberList.removeConfirmSuffix') }}
+        </template>
+      </Modal>
+
+      <!-- 设为/取消管理员二次确认 -->
+      <Modal
+        v-model:show="showAdminConfirmModal"
+        :title="pendingAdminAction?.action === 'remove' ? t('chat.info.removeAdminConfirmTitle') : t('chat.info.setAdminConfirmTitle')"
+        :confirm-text="t('button.confirm')"
+        :cancel-text="t('button.cancel')"
+        @confirm="confirmAdminAction"
+        @cancel="cancelAdminAction"
+      >
+        <template v-if="pendingAdminAction">
+          {{ pendingAdminAction.action === 'remove'
+            ? t('chat.info.removeAdminConfirmContent').replace('{name}', pendingAdminAction.member.nickname || pendingAdminAction.member.userId)
+            : t('chat.info.setAdminConfirmContent').replace('{name}', pendingAdminAction.member.nickname || pendingAdminAction.member.userId) }}
         </template>
       </Modal>
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmCell as Cell, EmIconButton as IconButton, useLocale } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface BlockListItemProps {
   item: any
+  /** 分隔线（透传 EmCell border 能力），默认无；会话详情抽屉分栏页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
 }
 
 const props = defineProps<BlockListItemProps>()
@@ -28,17 +28,21 @@ const { displayName, avatarUrl } = useUserInfo(userId)
 <template>
   <Cell
     class="block-list__item"
-    size="compact"
     :title="displayName"
     :clickable="false"
+    :border="props.border"
   >
     <template #leading>
-      <Avatar :name="displayName" :src="avatarUrl" :size="36" />
+      <!-- 头像尺寸与「全部/管理员」分栏成员行一致（40） -->
+      <Avatar :name="displayName" :src="avatarUrl" :size="40" />
     </template>
     <template #trailing>
-      <button class="block-list__action-btn" @click.stop="emit('unblock')">
-        {{ t('group.memberList.unblock', '移出黑名单') }}
-      </button>
+      <IconButton
+        icon="person/minus"
+        variant="ghost"
+        :title="t('group.memberList.unblock', '移出黑名单')"
+        @click.stop="emit('unblock')"
+      />
     </template>
   </Cell>
 </template>
@@ -46,20 +50,5 @@ const { displayName, avatarUrl } = useUserInfo(userId)
 <style scoped>
 .block-list__item {
   --uikit-item-hover-padding-x: 16px;
-}
-.block-list__action-btn {
-  padding: 4px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-12);
-  cursor: pointer;
-  transition: all var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-@media (hover: hover) {
-  .block-list__action-btn:hover {
-    background-color: var(--uikit-bg-secondary);
-  }
 }
 </style>

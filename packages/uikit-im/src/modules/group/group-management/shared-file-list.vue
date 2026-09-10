@@ -20,6 +20,8 @@ const logger = createLogger('UIKit:SharedFileList')
 
 export interface SharedFileListProps {
   groupId: string
+  /** 行分隔线（透传 EmCell border 能力），默认无；会话详情抽屉群文件页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
 }
 
 const { t } = useLocale()
@@ -326,6 +328,7 @@ async function onDownload(file: any) {
       v-for="file in files"
       :key="file.fileId"
       :file="file"
+      :border="props.border"
       @more="(file, event) => openActionSheet(file, event as MouseEvent)"
     />
 

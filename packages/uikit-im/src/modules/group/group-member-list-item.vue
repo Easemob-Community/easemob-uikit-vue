@@ -5,10 +5,12 @@ import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
+import { useToast } from '@easemob/uikit-core'
 import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
 import type { GroupMemberRoleValue } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
+import { useContact } from '../../composables/use-contact'
 import type { UiGroupMember } from '@easemob/uikit-core'
 import type { PresenceDisplayStatus } from '@easemob/uikit-core'
 
@@ -24,6 +26,17 @@ interface Props {
   showChatAction: boolean
   allowChat: 'all' | 'contact' | 'none'
   presence?: PresenceDisplayStatus
+  /** 显示名命中高亮子串（搜索场景传入关键词，命中部分以主色高亮） */
+  highlight?: string
+  /** 是否显示第二行 ID，默认 true；会话详情抽屉成员页传 false（设计稿无 ID 行） */
+  showId?: boolean
+  /**
+   * 分隔线（透传 EmCell 的 border 能力）：true/'bottom' = 底部发丝线，'top' = 顶部分隔线，false/缺省 = 无。
+   * 默认无（不影响群管理等其他消费方）；会话详情抽屉成员页传 'bottom'。
+   */
+  border?: boolean | 'top' | 'bottom'
+  /** ⋮ 菜单项是否显示图标，默认 false（设计稿菜单为纯文字项） */
+  menuWithIcon?: boolean
 }
 
 const props = defineProps<Props>()
@@ -42,10 +55,30 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { show: showToast } = useToast()
 const { stores } = useUIKit()
+const { addContact } = useContact()
 
 // ✅ 使用 useUserInfo 解析显示名和头像（优先级：备注 > 昵称 > userId）
 const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
+
+/** 显示名命中高亮分段：keyword 为空或未命中时仅一段原文 */
+const nameSegments = computed(() => {
+  const name = displayName.value
+  const keyword = props.highlight?.trim()
+  if (!keyword)
+    return [{ text: name, hit: false }]
+  const index = name.toLowerCase().indexOf(keyword.toLowerCase())
+  if (index < 0)
+    return [{ text: name, hit: false }]
+  const segments: { text: string, hit: boolean }[] = []
+  if (index > 0)
+    segments.push({ text: name.slice(0, index), hit: false })
+  segments.push({ text: name.slice(index, index + keyword.length), hit: true })
+  if (index + keyword.length < name.length)
+    segments.push({ text: name.slice(index + keyword.length), hit: false })
+  return segments
+})
 
 const isOwner = computed(() => props.currentUserRole === GROUP_MEMBER_ROLE.OWNER)
 const isAdmin = computed(() => props.currentUserRole === GROUP_MEMBER_ROLE.ADMIN)
@@ -168,6 +201,22 @@ function canTransferOwner(member: UiGroupMember): boolean {
   return isOwner.value && member.userId !== props.currentUserId
 }
 
+/** 是否本人联系人（决定 ⋮ 菜单首项为「私聊」还是「添加为联系人」） */
+function isContact(userId: string): boolean {
+  return !!stores.contact.getContact(userId)
+}
+
+/** 添加为联系人（contact domain，与添加联系人弹窗同一链路） */
+async function onAddContact(member: UiGroupMember) {
+  try {
+    await addContact(member.userId)
+    showToast(t('toast.success', '操作成功'), 'success')
+  }
+  catch (err) {
+    showToast(err instanceof Error ? err.message : String(err) || t('contact.addFailed', '添加失败'), 'error')
+  }
+}
+
 // ===== 更多操作菜单 =====
 const activeMoreMenu = ref(false)
 const moreMenuTriggerRef = ref<HTMLElement | undefined>()
@@ -188,6 +237,21 @@ export interface GroupMemberMoreAction extends MoreAction {}
 
 function getMoreActions(member: UiGroupMember): GroupMemberMoreAction[] {
   const actions: MoreAction[] = []
+  // 首项按好友关系差异化（设计稿）：是好友 → 私聊（仍受 showChatAction/allowChat 约束）；
+  // 非好友 → 添加为联系人
+  if (member.userId !== props.currentUserId) {
+    if (isContact(member.userId)) {
+      if (canChat(member))
+        actions.push({ key: 'chat', icon: 'bubble', label: t('group.memberList.chat', '私聊') })
+    }
+    else {
+      actions.push({ key: 'addContact', icon: 'person/plus', label: t('group.memberList.addContact', '添加为联系人') })
+    }
+  }
+  if (props.showAdminAction && canSetAdmin(member))
+    actions.push({ key: 'setAdmin', icon: 'shield/person', label: t('group.memberList.setAdmin', '设管理员') })
+  if (props.showAdminAction && canRemoveAdmin(member))
+    actions.push({ key: 'removeAdmin', icon: 'shield/person', label: t('group.memberList.removeAdmin', '取消管理员') })
   if (canMute(member))
     actions.push({ key: 'mute', icon: 'person/clock', label: t('group.memberList.mute', '禁言') })
   if (canUnmute(member))
@@ -196,10 +260,7 @@ function getMoreActions(member: UiGroupMember): GroupMemberMoreAction[] {
     actions.push({ key: 'block', icon: 'person/xmark', label: t('group.memberList.block', '拉黑') })
   if (canUnblock(member))
     actions.push({ key: 'unblock', icon: 'person/check', label: t('group.memberList.unblock', '取消拉黑') })
-  if (props.showAdminAction && canSetAdmin(member))
-    actions.push({ key: 'setAdmin', icon: 'shield/person', label: t('group.memberList.setAdmin', '设管理员') })
-  if (props.showAdminAction && canRemoveAdmin(member))
-    actions.push({ key: 'removeAdmin', icon: 'shield/person', label: t('group.memberList.removeAdmin', '取消管理员') })
+  // 转让群主严格仅群主可见（canTransferOwner 已限定 isOwner）
   if (canTransferOwner(member))
     actions.push({ key: 'transferOwner', icon: 'crown', label: t('group.memberList.transferOwner', '转让群主'), danger: true })
   if (props.showRemoveAction && canRemove(member))
@@ -210,6 +271,12 @@ function getMoreActions(member: UiGroupMember): GroupMemberMoreAction[] {
 function onMoreActionClick(member: UiGroupMember, actionKey: string) {
   activeMoreMenu.value = false
   switch (actionKey) {
+    case 'chat':
+      emit('chat-member', member)
+      break
+    case 'addContact':
+      void onAddContact(member)
+      break
     case 'mute':
       emit('mute-member', member)
       break
@@ -248,6 +315,7 @@ function closeMoreMenu() {
     class="group-member-list__item"
     auto-height
     :clickable="false"
+    :border="props.border"
     :data-member-id="props.member.userId"
     @click="emit('click-member', props.member)"
   >
@@ -263,7 +331,7 @@ function closeMoreMenu() {
     <template #default>
       <div class="group-member-list__info">
         <div class="group-member-list__name-row">
-          <span class="group-member-list__name">{{ displayName }}</span>
+          <span class="group-member-list__name"><template v-for="(seg, i) in nameSegments" :key="i"><span v-if="seg.hit" class="group-member-list__name-highlight">{{ seg.text }}</span><template v-else>{{ seg.text }}</template></template></span>
           <span
             v-if="props.member.role !== GROUP_MEMBER_ROLE.MEMBER"
             class="group-member-list__role"
@@ -290,29 +358,22 @@ function closeMoreMenu() {
             {{ t('group.memberList.inAllowlist', '白名单') }}
           </span>
         </div>
-        <div class="group-member-list__id">
+        <div v-if="props.showId !== false" class="group-member-list__id">
           ID: {{ props.member.userId }}
         </div>
       </div>
     </template>
 
     <template #trailing>
+      <!-- 行尾操作区仅 ⋮ 菜单按钮（纯净 icon 无底色）；「私聊/添加为联系人」在 ⋮ 菜单首项 -->
       <div class="group-member-list__actions" @click.stop>
-        <button
-          v-if="canChat(props.member)"
-          class="group-member-list__action-btn"
-          @click="emit('chat-member', props.member)"
-        >
-          {{ t('group.memberList.chat', '发消息') }}
-        </button>
-
         <div
           v-if="getMoreActions(props.member).length > 0"
           :ref="(el) => setMoreTriggerRef(el as HTMLElement)"
           class="group-member-list__more"
         >
           <button
-            class="group-member-list__action-btn group-member-list__action-btn--icon"
+            class="group-member-list__more-btn"
             @click.stop="activeMoreMenu = true"
           >
             <Icon name="vertical" :size="16" />
@@ -345,7 +406,8 @@ function closeMoreMenu() {
                   :title="action.label"
                   @click.stop="onMoreActionClick(props.member, action.key)"
                 >
-                  <template #leading>
+                  <!-- 菜单项图标默认不展示（menu-with-icon 开启时才渲染） -->
+                  <template v-if="props.menuWithIcon" #leading>
                     <Icon :name="action.icon" :size="18" />
                   </template>
                 </Cell>
@@ -359,13 +421,6 @@ function closeMoreMenu() {
 </template>
 
 <style scoped>
-
-@media (hover: hover) {
-  .group-member-list__item:hover .group-member-list__actions {
-    opacity: 1;
-  }
-}
-
 .group-member-list__info {
   flex: 1;
   min-width: 0;
@@ -380,13 +435,18 @@ function closeMoreMenu() {
   gap: 8px;
 }
 
+/* 成员名：设计稿纯黑 #000（群组场景主文案） */
 .group-member-list__name {
   font-size: var(--uikit-font-size-15);
   font-weight: 500;
-  color: var(--uikit-text-primary);
+  color: var(--uikit-member-name-color, #000000);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.group-member-list__name-highlight {
+  color: var(--uikit-primary-color);
 }
 
 .group-member-list__role {
@@ -397,14 +457,15 @@ function closeMoreMenu() {
   flex-shrink: 0;
 }
 
+/* 角色 tag 配色（设计稿）：Owner = 主色蓝、Admin = warning 橙 */
 .group-member-list__role--owner {
-  background-color: rgba(var(--uikit-warning-rgb), 0.12);
-  color: var(--uikit-warning-color);
+  background-color: rgba(var(--uikit-primary-rgb), 0.12);
+  color: var(--uikit-primary-color);
 }
 
 .group-member-list__role--admin {
-  background-color: rgba(var(--uikit-info-rgb), 0.12);
-  color: var(--uikit-info-color);
+  background-color: rgba(var(--uikit-warning-rgb), 0.12);
+  color: var(--uikit-warning-color);
 }
 
 .group-member-list__status-tag {
@@ -415,14 +476,15 @@ function closeMoreMenu() {
   flex-shrink: 0;
 }
 
+/* 状态标签配色（设计稿指定值）：禁言 = #A9AEB2、黑名单 = #484D51（同系 12% 底色） */
 .group-member-list__status-tag--muted {
-  background-color: rgba(var(--uikit-danger-rgb), 0.12);
-  color: var(--uikit-danger-color);
+  background-color: rgba(169, 174, 178, 0.12);
+  color: #a9aeb2;
 }
 
 .group-member-list__status-tag--blocked {
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-secondary);
+  background-color: rgba(72, 77, 81, 0.12);
+  color: #484d51;
 }
 
 .group-member-list__status-tag--allowlist {
@@ -435,60 +497,39 @@ function closeMoreMenu() {
   color: var(--uikit-text-secondary);
 }
 
+/* 行内操作区：仅 ⋮ 菜单按钮常驻（纯净 icon 无底色无边框） */
 .group-member-list__actions {
   display: flex;
   gap: 6px;
   flex-shrink: 0;
-  opacity: 0;
-  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.group-member-list__action-btn {
-  padding: 5px 10px;
-  border-radius: var(--uikit-components-radius, 5px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-12);
-  cursor: pointer;
-  transition: all var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-@media (hover: hover) {
-  .group-member-list__action-btn:hover {
-    background-color: var(--uikit-bg-secondary);
-  }
-}
-
-.group-member-list__action-btn--danger {
-  border-color: rgba(var(--uikit-danger-rgb), 0.25);
-  color: var(--uikit-danger-color);
-}
-
-@media (hover: hover) {
-  .group-member-list__action-btn--danger:hover {
-    background-color: rgba(var(--uikit-danger-rgb), 0.08);
-  }
-}
-
-.group-member-list__action-btn--icon {
+/* ⋮ 按钮：图标本身展示（平时无底色），padding 撑出可点击热区；
+   hover 对齐抽屉 header X 按钮语义：--uikit-bg-hover 圆角底色 + 图标色加深，过渡走 --uikit-anim-* */
+.group-member-list__more-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
+  padding: 6px;
+  border: none;
+  background: none;
+  border-radius: var(--uikit-components-radius);
+  color: var(--uikit-text-secondary);
+  cursor: pointer;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+@media (hover: hover) {
+  .group-member-list__more-btn:hover {
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-primary);
+  }
 }
 
 .group-member-list__more {
   position: relative;
   display: inline-flex;
-}
-
-@media (max-width: 480px) {
-  .group-member-list__actions {
-    opacity: 1;
-  }
 }
 
 .group-member-list__context-menu {

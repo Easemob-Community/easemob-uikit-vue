@@ -21,6 +21,8 @@ const props = withDefaults(defineProps<GroupMemberListProps>(), {
   showAdminAction: true,
   showRemoveAction: true,
   showChatAction: true,
+  showId: true,
+  showNoMore: true,
 })
 
 const emit = defineEmits<{
@@ -64,6 +66,16 @@ export interface GroupMemberListProps {
   showRemoveAction?: boolean
   /** 是否展示发消息操作 */
   showChatAction?: boolean
+  /** 成员行是否显示第二行 ID，默认 true；会话详情抽屉成员页传 false（设计稿无 ID 行） */
+  showId?: boolean
+  /** 列表末尾是否显示「没有更多了」，默认 true；会话详情抽屉成员页传 false（设计稿无结尾文字） */
+  showNoMore?: boolean
+  /** 成员行分隔线（透传 EmCell border 能力），默认无；会话详情抽屉成员页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
+  /** ⋮ 菜单项是否显示图标，默认 false（设计稿菜单为纯文字项） */
+  menuWithIcon?: boolean
+  /** 搜索框是否使用椭圆（pill）形态，默认 false；会话详情抽屉成员页传 true */
+  searchPill?: boolean
 }
 
 const { t } = useLocale()
@@ -258,6 +270,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <Input
         v-model="searchKeyword"
         variant="search"
+        :pill="props.searchPill"
         clearable
         clear-icon="search/xmark"
         :placeholder="t('group.memberList.searchPlaceholder', '搜索群成员')"
@@ -293,6 +306,9 @@ defineExpose({ refresh, removeMember, setMemberRole })
           :show-chat-action="props.showChatAction"
           :allow-chat="props.allowChat"
           :presence="getMemberPresence(member.userId)"
+          :show-id="props.showId"
+          :border="props.border"
+          :menu-with-icon="props.menuWithIcon"
           @click-member="emit('click-member', $event)"
           @chat-member="emit('chat-member', $event)"
           @remove-member="emit('remove-member', $event)"
@@ -322,7 +338,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           <span v-else class="group-member-list__load-more-text">{{ t('common.loading') }}</span>
         </div>
 
-        <div v-else-if="!localHasMore && filteredMembers.length > 0" class="group-member-list__no-more">
+        <div v-else-if="props.showNoMore && !localHasMore && filteredMembers.length > 0" class="group-member-list__no-more">
           <span>{{ t('group.memberList.noMore', '没有更多了') }}</span>
         </div>
       </template>

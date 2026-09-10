@@ -29,6 +29,7 @@ export type {
   ChatConfig,
   ChatDrawerProps,
   ChatDrawerSlotScope,
+  ChatInfoDrawerPage,
   ChatInfoDrawerSlotScope,
   MessageActionItem,
   MessageActionEvent,

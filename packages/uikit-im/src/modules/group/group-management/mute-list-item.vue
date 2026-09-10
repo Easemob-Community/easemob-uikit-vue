@@ -7,6 +7,8 @@ import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface MuteListItemProps {
   item: any
+  /** 分隔线（透传 EmCell border 能力），默认无；会话详情抽屉分栏页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
 }
 
 const props = defineProps<MuteListItemProps>()
@@ -49,9 +51,11 @@ const { displayName, avatarUrl } = useUserInfo(userId)
     :title="displayName"
     :subtitle="muteText"
     :clickable="false"
+    :border="props.border"
   >
     <template #leading>
-      <Avatar :name="displayName" :src="avatarUrl" :size="36" />
+      <!-- 头像尺寸与「全部/管理员」分栏成员行一致（40） -->
+      <Avatar :name="displayName" :src="avatarUrl" :size="40" />
     </template>
     <template #trailing>
       <button class="mute-list__action-btn" @click.stop="emit('unmute')">

@@ -1,30 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
-import { onClickOutside } from '@vueuse/core'
-import { formatSdkError } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { EmModal as Modal } from '@easemob/uikit-core'
-import { EmUserCard as UserCard } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, EmModal as Modal, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
+import type { PresenceDisplayStatus, UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useContact } from '../../composables/use-contact'
 import { useBlocklist } from '../../composables/use-blocklist'
-import { usePresence, useToast } from '@easemob/uikit-core'
-import type { UiContact } from '@easemob/uikit-core'
-import type { PresenceDisplayStatus } from '@easemob/uikit-core'
-import type { UserCardAction } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
-
-const logger = createLogger('UIKit:ContactDetail')
-
-export interface ContactDetailProps {
-  /** 联系人用户 ID */
-  userId: string
-  /** 外部已缓存的联系人摘要（可选，用于首屏快速展示） */
-  contact?: UiContact | null
-}
 
 const props = withDefaults(defineProps<ContactDetailProps>(), {
   contact: null,
@@ -36,6 +18,15 @@ const emit = defineEmits<{
   (e: 'block-changed', userId: string, blocked: boolean): void
   (e: 'remark-changed', userId: string, remark: string): void
 }>()
+
+const logger = createLogger('UIKit:ContactDetail')
+
+export interface ContactDetailProps {
+  /** 联系人用户 ID */
+  userId: string
+  /** 外部已缓存的联系人摘要（可选，用于首屏快速展示） */
+  contact?: UiContact | null
+}
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
@@ -68,12 +59,9 @@ const loading = computed(() => {
     return presenceLoading.value
   return stores.userInfo.isLoading(props.userId) || presenceLoading.value
 })
-const isSelf = computed(() => stores.client.currentUser === props.userId)
-const isEditingRemark = ref(false)
+const remarkModalShow = ref(false)
 const remarkInput = ref('')
-const remarkEditRef = ref<HTMLElement>()
 const remarkInputRef = ref<HTMLInputElement>()
-let stopClickOutside: (() => void) | null = null
 
 const confirmModal = ref<{
   show: boolean
@@ -97,49 +85,11 @@ const displayNameValue = computed(() =>
   displayName.value || props.contact?.name || props.userId,
 )
 
-const signature = computed(() =>
-  detailUserInfo.value?.sign || props.contact?.signature || '',
-)
+const blocked = computed(() => isBlocked(props.userId))
 
 const remark = computed(() =>
   contactFromStore.value?.remark || props.contact?.remark || '',
 )
-
-const cardActions = computed<UserCardAction[]>(() => {
-  const blocked = isBlocked(props.userId)
-  return [
-    {
-      key: 'message',
-      label: t('contact.detail.sendMessage', '发消息'),
-      icon: 'bubble/rect/empty',
-      type: 'primary',
-    },
-    {
-      key: blocked ? 'unblock' : 'block',
-      label: blocked
-        ? (t('contact.detail.unblock', '取消拉黑'))
-        : (t('contact.detail.block', '拉黑')),
-      icon: 'circle/slash',
-      type: blocked ? 'danger' : 'primary',
-    },
-    {
-      key: 'delete',
-      label: t('contact.detail.deleteContact', '删除好友'),
-      icon: 'trash',
-      type: 'danger',
-    },
-  ]
-})
-
-const cardInfoRows = computed(() => {
-  const rows: { key: string, label: string, value: string }[] = []
-  if (signature.value)
-    rows.push({ key: 'signature', label: t('contact.detail.signature', '个性签名'), value: signature.value })
-  if (detailUserInfo.value?.nickname)
-    rows.push({ key: 'nickname', label: t('contact.detail.nickname', '昵称'), value: detailUserInfo.value.nickname })
-  // 用户 ID 已在 UserCard 顶部固定展示并支持复制，infoRows 中不再重复
-  return rows
-})
 
 watch(
   () => props.userId,
@@ -152,7 +102,7 @@ watch(
 watch(
   () => remark.value,
   (r) => {
-    if (!isEditingRemark.value)
+    if (!remarkModalShow.value)
       remarkInput.value = r || ''
   },
   { immediate: true },
@@ -163,26 +113,12 @@ onMounted(() => {
     void refreshBlocklist()
 })
 
-watch(
-  isEditingRemark,
-  (editing) => {
-    if (editing) {
-      void nextTick(() => {
-        remarkInputRef.value?.focus()
-        stopClickOutside = onClickOutside(remarkEditRef, () => {
-          cancelEditRemark()
-        })
-      })
-    }
-    else {
-      stopClickOutside?.()
-      stopClickOutside = null
-    }
-  },
-)
-
-onUnmounted(() => {
-  stopClickOutside?.()
+// 备注编辑弹窗打开后自动聚焦输入框
+watch(remarkModalShow, async (show) => {
+  if (show) {
+    await nextTick()
+    remarkInputRef.value?.focus()
+  }
 })
 
 async function loadData() {
@@ -207,13 +143,13 @@ async function loadData() {
 
 function startEditRemark() {
   remarkInput.value = remark.value
-  isEditingRemark.value = true
+  remarkModalShow.value = true
 }
 
 async function saveRemark() {
   try {
     await setContactRemark(props.userId, remarkInput.value)
-    isEditingRemark.value = false
+    remarkModalShow.value = false
     emit('remark-changed', props.userId, remarkInput.value)
     showToast(t('contact.detail.remarkSaved', '备注已保存'), 'success')
   }
@@ -225,7 +161,7 @@ async function saveRemark() {
 
 function cancelEditRemark() {
   remarkInput.value = remark.value
-  isEditingRemark.value = false
+  remarkModalShow.value = false
 }
 
 function openConfirm(action: 'delete' | 'block' | 'unblock') {
@@ -273,26 +209,6 @@ async function onConfirmAction() {
     showToast(t('contact.detail.actionFailed', '操作失败'), 'error')
   }
 }
-
-function onCardAction(key: string) {
-  if (key === 'message')
-    emit('send-message', props.userId)
-  else if (key === 'block')
-    openConfirm('block')
-  else if (key === 'unblock')
-    openConfirm('unblock')
-  else if (key === 'delete')
-    openConfirm('delete')
-}
-
-function onCardInfoClick(_key: string) {
-  // 信息行暂无跳转
-}
-
-function onPresenceChanged() {
-  if (features.enablePresence && isSelf.value)
-    void loadData()
-}
 </script>
 
 <template>
@@ -302,78 +218,77 @@ function onPresenceChanged() {
         {{ t('common.loading', '加载中...') }}
       </div>
 
-      <UserCard
-        :user-id="props.userId"
-        :name="displayNameValue"
-        :avatar="displayAvatar"
-        :status="presenceStatus"
-        :editable="isSelf"
-        :actions="cardActions"
-        :info-rows="cardInfoRows"
-        @action-click="onCardAction"
-        @info-click="onCardInfoClick"
-        @presence-changed="onPresenceChanged"
-      >
-        <div class="contact-detail__extra">
-          <div class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.remark', '备注') }}</span>
-            <div v-if="isEditingRemark" ref="remarkEditRef" class="contact-detail__remark-edit">
-              <input
-                ref="remarkInputRef"
-                v-model="remarkInput"
-                class="contact-detail__remark-input"
-                type="text"
-                @keyup.enter="saveRemark"
-                @keyup.esc="cancelEditRemark"
-              >
-              <IconButton
-                icon="check/single"
-                size="small"
-                type="success"
-                :title="t('button.confirm', '确认')"
-                @click="saveRemark"
-              />
-              <IconButton
-                icon="xmark/bold"
-                size="small"
-                type="danger"
-                :title="t('button.cancel', '取消')"
-                @click="cancelEditRemark"
-              />
-            </div>
-            <template v-else>
-              <span class="contact-detail__value">{{ remark || '-' }}</span>
-              <IconButton
-                icon="rect/pencil"
-                size="small"
-                type="primary"
-                :title="t('contact.detail.edit', '编辑')"
-                @click="startEditRemark"
-              />
-            </template>
+      <div class="contact-detail__header">
+        <!-- 插槽 #avatar：接管头像区 / Slot #avatar: override the avatar block -->
+        <slot name="avatar" :user-id="props.userId" :avatar="displayAvatar" :display-name="displayNameValue" :presence="presenceStatus">
+          <Avatar
+            :src="displayAvatar"
+            :name="displayNameValue"
+            :size="96"
+            :presence="presenceStatus"
+          />
+        </slot>
+        <!-- 插槽 #header：接管名称与 Username/UserID 信息区 / Slot #header: override name & meta lines -->
+        <slot name="header" :user-id="props.userId" :display-name="displayNameValue" :nickname="detailUserInfo?.nickname" :presence="presenceStatus">
+          <div class="contact-detail__name">
+            {{ displayNameValue }}
           </div>
+          <div class="contact-detail__meta">
+            {{ t('userCard.username', '用户名') }}: {{ detailUserInfo?.nickname || '-' }}
+          </div>
+          <div class="contact-detail__meta">
+            {{ t('contact.detail.userId', '用户 ID') }}: {{ props.userId }}
+          </div>
+        </slot>
+      </div>
 
-          <div v-if="detailUserInfo?.gender" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.gender', '性别') }}</span>
-            <span class="contact-detail__value">{{ detailUserInfo.gender }}</span>
+      <!-- 插槽 #alias：接管 User Alias（备注）行；接管后内置备注编辑入口不再渲染 / Slot #alias: override the remark row -->
+      <slot name="alias" :user-id="props.userId" :remark="remark">
+        <div class="contact-detail__alias">
+          <div class="contact-detail__alias-main">
+            <span class="contact-detail__alias-label">{{ t('userCard.alias', '备注') }}</span>
+            <span class="contact-detail__alias-value">{{ remark || displayNameValue }}</span>
           </div>
-
-          <div v-if="detailUserInfo?.birth" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.birth', '生日') }}</span>
-            <span class="contact-detail__value">{{ detailUserInfo.birth }}</span>
-          </div>
-
-          <div v-if="detailUserInfo?.phone" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.phone', '电话') }}</span>
-            <span class="contact-detail__value">{{ detailUserInfo.phone }}</span>
-          </div>
-
-          <div v-if="detailUserInfo?.mail" class="contact-detail__row">
-            <span class="contact-detail__label">{{ t('contact.detail.mail', '邮箱') }}</span>
-            <span class="contact-detail__value">{{ detailUserInfo.mail }}</span>
-          </div>
+          <IconButton
+            icon="rect_notched/pen"
+            :icon-size="22"
+            :style="{ color: '#C9CDCF' }"
+            :title="t('contact.detail.edit', '编辑')"
+            @click="startEditRemark"
+          />
         </div>
-      </UserCard>
+      </slot>
+
+      <!-- 插槽 #extra：在备注行与操作按钮之间插入自定义内容 / Slot #extra: insert custom content between alias row and actions -->
+      <slot name="extra" :user-id="props.userId" :user-info="detailUserInfo" :contact="contactFromStore" />
+
+      <!-- 插槽 #actions：接管 Chat 胶囊按钮区 / Slot #actions: override the chat action -->
+      <slot name="actions" :user-id="props.userId">
+        <button class="contact-detail__pill" type="button" @click="emit('send-message', props.userId)">
+          <Icon name="bubble/empty" :size="22" />
+          <span>{{ t('userCard.chat', '发消息') }}</span>
+        </button>
+      </slot>
+
+      <!-- 插槽 #footer：接管拉黑/删除按钮区 / Slot #footer: override block/delete buttons -->
+      <slot name="footer" :user-id="props.userId" :blocked="blocked">
+        <div class="contact-detail__footer">
+          <button
+            class="contact-detail__action"
+            type="button"
+            @click="openConfirm(blocked ? 'unblock' : 'block')"
+          >
+            {{ blocked ? t('contact.detail.unblock', '取消拉黑') : t('userCard.blockedContact', '拉黑联系人') }}
+          </button>
+          <button
+            class="contact-detail__action contact-detail__action--danger"
+            type="button"
+            @click="openConfirm('delete')"
+          >
+            {{ t('userCard.deleteContact', '删除联系人') }}
+          </button>
+        </div>
+      </slot>
     </div>
 
     <Modal
@@ -385,6 +300,25 @@ function onPresenceChanged() {
       @cancel="confirmModal.show = false"
     >
       {{ confirmModal.content }}
+    </Modal>
+
+    <!-- 备注编辑弹窗 -->
+    <Modal
+      v-model:show="remarkModalShow"
+      :title="t('userCard.alias', '备注')"
+      :confirm-text="t('button.confirm', '确认')"
+      :cancel-text="t('button.cancel', '取消')"
+      @confirm="saveRemark"
+      @cancel="cancelEditRemark"
+    >
+      <input
+        ref="remarkInputRef"
+        v-model="remarkInput"
+        class="contact-detail__remark-input"
+        type="text"
+        :placeholder="t('userCard.alias', '备注')"
+        @keyup.enter="saveRemark"
+      >
     </Modal>
   </div>
 </template>
@@ -405,6 +339,8 @@ function onPresenceChanged() {
   position: relative;
   width: 100%;
   max-width: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-detail__loading {
@@ -417,70 +353,61 @@ function onPresenceChanged() {
   color: var(--uikit-text-tertiary);
   font-size: var(--uikit-font-size-14);
   z-index: 1;
-  border-radius: var(--uikit-components-radius, 12px);
 }
 
-.contact-detail__extra {
-  margin-top: 4px;
-  padding: 0 0 20px;
-  background-color: var(--uikit-bg-base);
-  border-radius: 0 0 var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px);
-}
-
-.contact-detail__row {
+.contact-detail__header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  min-height: 52px;
-  padding: 0;
-  gap: 16px;
-  border-bottom: 1px solid var(--uikit-border-color, rgba(0, 0, 0, 0.06));
-  overflow: hidden;
+  text-align: center;
 }
 
-.contact-detail__row:last-child {
-  border-bottom: none;
-}
-
-.contact-detail__label {
-  flex: 0 0 80px;
-  font-size: var(--uikit-font-size-14);
-  color: var(--uikit-text-secondary);
-}
-
-.contact-detail__value {
-  flex: 1;
-  font-size: var(--uikit-font-size-14);
+.contact-detail__name {
+  margin-top: 16px;
+  font-size: var(--uikit-font-size-20);
+  font-weight: 600;
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
 
-.contact-detail__remark-edit {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
+.contact-detail__meta {
+  margin-top: 4px;
+  font-size: var(--uikit-font-size-14);
+  color: var(--uikit-text-secondary);
+  word-break: break-all;
 }
 
-@media (max-width: 360px) {
-  .contact-detail__remark-edit {
-    flex-wrap: wrap;
-  }
+.contact-detail__alias {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+}
 
-  .contact-detail__remark-edit .contact-detail__remark-input {
-    flex: 1 1 100%;
-  }
+.contact-detail__alias-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  .contact-detail__remark-edit :deep(.uikit-icon-button) {
-    flex-shrink: 0;
-  }
+.contact-detail__alias-label {
+  font-size: var(--uikit-font-size-14);
+  color: var(--uikit-text-secondary);
+}
+
+.contact-detail__alias-value {
+  font-size: var(--uikit-font-size-16);
+  font-weight: 600;
+  color: var(--uikit-text-primary);
+  word-break: break-all;
 }
 
 .contact-detail__remark-input {
-  flex: 1;
-  min-width: 0;
-  height: 32px;
+  width: 100%;
+  box-sizing: border-box;
+  height: 36px;
   padding: 0 10px;
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   border-radius: var(--uikit-components-radius, 6px);
@@ -494,9 +421,59 @@ function onPresenceChanged() {
   border-color: var(--uikit-primary-color, #3b82f6);
 }
 
+.contact-detail__pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 44px;
+  margin-top: 32px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-primary-color);
+  font-size: var(--uikit-font-size-14);
+  cursor: pointer;
+}
+
+.contact-detail__pill:hover {
+  opacity: 0.85;
+}
+
+.contact-detail__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 64px;
+}
+
+.contact-detail__action {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--uikit-bg-secondary);
+  color: var(--uikit-text-primary);
+  font-size: var(--uikit-font-size-14);
+  cursor: pointer;
+}
+
+.contact-detail__action:hover {
+  opacity: 0.85;
+}
+
+.contact-detail__action--danger {
+  color: var(--uikit-danger-color);
+}
+
 @media (max-width: 640px) {
   .contact-detail {
     padding: 24px 16px;
+  }
+
+  .contact-detail__footer {
+    margin-top: 32px;
   }
 }
 </style>

@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCell as Cell } from '@easemob/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface SharedFileListItemProps {
   file: any
   maxFileNameLength?: number
+  /**
+   * 分隔线（透传 EmCell 的 border 能力）：true/'bottom' = 底部发丝线，'top' = 顶部分隔线，false/缺省 = 无。
+   * 默认无（不影响群管理 section 等其他消费方）；会话详情抽屉群文件页传 'bottom'。
+   */
+  border?: boolean | 'top' | 'bottom'
 }
 
 const props = defineProps<SharedFileListItemProps>()
@@ -17,39 +23,6 @@ const emit = defineEmits<{
 const ownerUserId = computed(() => props.file.fileOwner?.userId || '')
 
 const { displayName: ownerDisplayName } = useUserInfo(ownerUserId)
-
-/** 文件扩展名 → 类型图标（无匹配时回落通用文件图标） */
-const FILE_TYPE_ICONS: Record<string, string> = {
-  pdf: 'file/pdf',
-  xls: 'file/xls',
-  xlsx: 'file/xls',
-  ppt: 'file/ppt',
-  pptx: 'file/ppt',
-  jpg: 'file/img',
-  jpeg: 'file/img',
-  png: 'file/img',
-  gif: 'file/img',
-  webp: 'file/img',
-  bmp: 'file/img',
-  svg: 'file/img',
-  mp3: 'file/audio',
-  wav: 'file/audio',
-  m4a: 'file/audio',
-  aac: 'file/audio',
-  ogg: 'file/audio',
-  mp4: 'file/video',
-  mov: 'file/video',
-  avi: 'file/video',
-  mkv: 'file/video',
-  webm: 'file/video',
-}
-
-/** 当前文件类型图标 */
-const fileIcon = computed(() => {
-  const fileName = props.file.fileName || ''
-  const ext = fileName.includes('.') ? fileName.split('.').pop()?.toLowerCase() : ''
-  return (ext && FILE_TYPE_ICONS[ext]) || 'file/empty'
-})
 
 function formatSize(bytes?: number): string {
   if (!bytes || bytes <= 0)
@@ -88,8 +61,20 @@ function onMoreClick(event: MouseEvent) {
 </script>
 
 <template>
-  <div class="shared-file-list__item" @click="onMoreClick">
-    <Icon :name="fileIcon" :size="20" class="shared-file-list__icon" />
+  <!-- EmCell 行（与群成员行同体系）：auto-height + 可选 border 发丝线；
+       clickable=false 保证 hover 无行背景块（仅 ⋮ 按钮自身 hover 出背景） -->
+  <Cell
+    class="shared-file-list__item"
+    auto-height
+    :clickable="false"
+    :border="props.border"
+    @click="onMoreClick"
+  >
+    <template #leading>
+      <!-- 文件图标：与群管理入口列表「共享文件」行同款 doc 中性灰图标 -->
+      <Icon name="doc" :size="18" class="shared-file-list__icon" />
+    </template>
+
     <div class="shared-file-list__info">
       <span class="shared-file-list__name" :title="props.file.fileName">{{ formatFileName(props.file.fileName) }}</span>
       <span class="shared-file-list__meta">
@@ -99,26 +84,29 @@ function onMoreClick(event: MouseEvent) {
         </template>
       </span>
     </div>
-    <button
-      class="shared-file-list__more-btn"
-      @click.stop="onMoreClick"
-    >
-      <Icon name="vertical" :size="20" />
-    </button>
-  </div>
+
+    <template #trailing>
+      <button
+        class="shared-file-list__more-btn"
+        @click.stop="onMoreClick"
+      >
+        <Icon name="vertical" :size="20" />
+      </button>
+    </template>
+  </Cell>
 </template>
 
 <style scoped>
+/* 行垂直内边距与改造前一致（8px）；横向内收在 border 模式下由 --uikit-cell-border-padding-x 控制 */
 .shared-file-list__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
+  --uikit-cell-padding-y: 8px;
 }
+
 .shared-file-list__icon {
   flex-shrink: 0;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-icon-muted);
 }
+
 .shared-file-list__info {
   flex: 1;
   min-width: 0;
@@ -126,43 +114,44 @@ function onMoreClick(event: MouseEvent) {
   flex-direction: column;
   gap: 2px;
 }
+
+/* 名字 16px/500（与成员行名字字号一致），超长省略 */
 .shared-file-list__name {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   font-weight: 500;
   color: var(--uikit-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* 副信息（大小/上传者）：次要文本，字号比名字小一档（同列表行 subtitle 做法） */
 .shared-file-list__meta {
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
-@media (hover: hover) {
-  .shared-file-list__item:hover .shared-file-list__name {
-    color: var(--uikit-primary-color);
-  }
-}
+/* ⋮ 按钮：与成员列表 .group-member-list__more-btn 同规格——纯净 icon（无边框无底色、
+   --uikit-text-secondary），hover 出 --uikit-bg-hover 圆角背景 + 字色加深 */
 .shared-file-list__more-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
+  padding: 5px;
   border: none;
-  border-radius: 50%;
-  background-color: transparent;
+  border-radius: var(--uikit-components-radius);
+  background: none;
   color: var(--uikit-text-secondary);
   cursor: pointer;
-  transition: all var(--uikit-anim-duration, 150ms) var(--uikit-anim-easing, ease);
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
 }
+
 @media (hover: hover) {
   .shared-file-list__more-btn:hover {
-    background-color: var(--uikit-bg-secondary);
-    color: var(--uikit-primary-color);
+    background-color: var(--uikit-bg-hover);
+    color: var(--uikit-text-primary);
   }
 }
 </style>

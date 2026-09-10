@@ -91,6 +91,13 @@ export interface ChatConfig {
     /** 是否显示抽屉入口按钮（聊天信息），默认 true */
     showDrawerEntry?: boolean
     /**
+     * 是否显示 header 搜索消息按钮，默认 false（搜索入口归口会话详情抽屉的 Message Search 行；
+     * 仅在 messageList.search.enabled 为 true 时生效，开启后 header 恢复显示搜索按钮）。
+     * Whether to show the message-search button in the header. Default false — the search entry
+     * lives in the conversation-details drawer; takes effect only when message search is enabled.
+     */
+    showSearchEntry?: boolean
+    /**
      * 单聊副标题档位（标题下方区域），默认 'auto'；仅单聊生效：
      * auto（在线状态 + 个性签名，缺哪个显示哪个）/ presence（仅在线状态）/ sign（仅签名）/
      * none（整个副标题区连同「正在输入」提示一起关闭）。
@@ -444,6 +451,9 @@ export interface ChatDrawerSlotScope {
   fullscreen: boolean
 }
 
+/** 会话详情抽屉二级页标识 / ChatInfoDrawer secondary page key */
+export type ChatInfoDrawerPage = 'members' | 'member-search' | 'files' | null
+
 /** 部分接管 `ChatInfoDrawer` section 插槽的 scope / Slot scope for ChatInfoDrawer section takeovers */
 export interface ChatInfoDrawerSlotScope {
   /** 当前会话 */
@@ -468,9 +478,9 @@ export interface ChatInfoDrawerSlotScope {
   canAddMember: boolean
   /** 群信息加载中 */
   loadingGroup: boolean
-  /** 是否处于群成员列表二级页 */
-  showMemberList: boolean
-  /** 关闭成员列表二级页（返回一级页） */
+  /** 当前激活的二级页（null 为一级页） */
+  activePage: ChatInfoDrawerPage
+  /** 关闭当前二级页（返回一级页） */
   closeMemberList: () => void
   /** 关闭抽屉 */
   close: () => void

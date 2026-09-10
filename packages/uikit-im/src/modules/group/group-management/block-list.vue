@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmPopup as Popup, createLogger, formatSdkError, useLocale, useToast } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, useLocale, useToast } from '@easemob/uikit-core'
 import type { UiGroupMember } from '@easemob/uikit-core'
 import { useGroup } from '../../../composables/use-group'
+import { useUIKit } from '../../../composables/use-uikit'
 import BlockListItem from './block-list-item.vue'
 import BlockListSelectItem from './block-list-select-item.vue'
 
@@ -17,10 +18,13 @@ const logger = createLogger('UIKit:BlockList')
 
 export interface BlockListProps {
   groupId: string
+  /** 行分隔线（透传 EmCell border 能力），默认无；会话详情抽屉分栏页传 'bottom' */
+  border?: boolean | 'top' | 'bottom'
 }
 
 const { t } = useLocale()
 const { show: showToast } = useToast()
+const { stores } = useUIKit()
 const {
   getGroupBlocklist: fetchBlocklist,
   unblockGroupMembers,
@@ -29,7 +33,9 @@ const {
 } = useGroup()
 
 const loading = ref(false)
-const members = ref<any[]>([])
+// 列表数据源直接读 store 黑名单缓存：domain 的拉黑/移出/事件回推都会同步 store，
+// 保证其他分栏操作后本分栏响应式更新（v-show 分栏切换不会重新挂载组件）
+const members = computed<any[]>(() => stores.group.getGroupBlocklist(props.groupId))
 
 const showAddPopup = ref(false)
 const loadingMembers = ref(false)
@@ -46,8 +52,8 @@ async function loadData() {
     return
   loading.value = true
   try {
-    const result = await fetchBlocklist(props.groupId)
-    members.value = Array.isArray(result) ? result : []
+    // domain 内部会把结果写入 store 黑名单缓存（getGroupBlocklist），members 计算属性自动更新
+    await fetchBlocklist(props.groupId)
   }
   catch (err) {
     logger.warn('[BlockList] load failed:', formatSdkError(err))
@@ -59,20 +65,36 @@ async function loadData() {
 
 watch(() => props.groupId, loadData, { immediate: true })
 
-async function onUnblock(item: any) {
+/** 移出黑名单：二次确认 */
+const showUnblockConfirm = ref(false)
+const pendingUnblockItem = ref<any>(null)
+
+function onUnblock(item: any) {
+  pendingUnblockItem.value = item
+  showUnblockConfirm.value = true
+}
+
+async function confirmUnblock() {
+  const item = pendingUnblockItem.value
+  pendingUnblockItem.value = null
+  showUnblockConfirm.value = false
+  if (!item)
+    return
   const user = item.user || item
   const uid = user?.userId || ''
   try {
+    // domain 内部已同步 store 黑名单缓存（removeGroupBlocklistMembers），members 计算属性自动更新
     await unblockGroupMembers(props.groupId, [uid])
-    members.value = members.value.filter((m: any) => {
-      const u = m.user || m
-      return (u?.userId || '') !== uid
-    })
     emit('unblock', { userId: uid })
   }
   catch (err) {
     logger.warn('[BlockList] unblock failed:', formatSdkError(err))
   }
+}
+
+function cancelUnblock() {
+  pendingUnblockItem.value = null
+  showUnblockConfirm.value = false
 }
 
 function openAddMember() {
@@ -145,7 +167,7 @@ defineExpose({
     </div>
     <Empty
       v-else-if="members.length === 0"
-      icon="circle/slash"
+      icon="person/double"
       :description="t('group.memberList.empty', '暂无黑名单成员')"
       size="small"
     />
@@ -153,8 +175,21 @@ defineExpose({
       v-for="item in members"
       :key="(item.user || item)?.userId || ''"
       :item="item"
+      :border="props.border"
       @unblock="onUnblock(item)"
     />
+
+    <!-- 移出黑名单二次确认 -->
+    <Modal
+      v-model:show="showUnblockConfirm"
+      :title="t('chat.info.unblockMemberConfirmTitle')"
+      :confirm-text="t('button.confirm')"
+      :cancel-text="t('button.cancel')"
+      @confirm="confirmUnblock"
+      @cancel="cancelUnblock"
+    >
+      {{ t('chat.info.unblockMemberConfirmContent').replace('{name}', (pendingUnblockItem?.user || pendingUnblockItem)?.nickname || (pendingUnblockItem?.user || pendingUnblockItem)?.userId || '') }}
+    </Modal>
 
     <Popup
       v-model:show="showAddPopup"
@@ -172,7 +207,7 @@ defineExpose({
           </div>
           <Empty
             v-else-if="selectableMembers.length === 0"
-            icon="circle/slash"
+            icon="person/double"
             :description="t('group.blocklist.emptySelectable', '暂无可添加的成员')"
             size="small"
           />
