@@ -223,11 +223,13 @@ export const useThemeStore = defineStore('theme', () => {
     return mode.value
   })
   const avatarShape = computed({
-    get: () => storage.value.avatarShape,
+    // 兼容旧 localStorage：旧缓存无该字段时回落到圆形（全局默认）
+    get: () => storage.value.avatarShape ?? 'circle',
     set: (v: 'circle' | 'square') => { storage.value.avatarShape = v },
   })
   const bubbleShape = computed({
-    get: () => storage.value.bubbleShape,
+    // 兼容旧 localStorage：旧缓存无该字段时回落到 round 档（16px 圆角）
+    get: () => storage.value.bubbleShape ?? 'ground',
     set: (v: 'ground' | 'square') => { storage.value.bubbleShape = v },
   })
   const componentsShape = computed({

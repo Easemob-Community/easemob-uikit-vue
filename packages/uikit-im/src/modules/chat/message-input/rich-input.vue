@@ -633,7 +633,7 @@ onBeforeUnmount(() => {
 .rich-input__voice-btn {
   flex: 1;
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-input-radius, 999px);
   background-color: var(--uikit-input-bg);
   border: 1px solid var(--uikit-border-color);
   text-align: center;

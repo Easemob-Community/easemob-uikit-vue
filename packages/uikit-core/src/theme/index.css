@@ -99,6 +99,8 @@
   --uikit-input-wrapper-spacing: var(--uikit-spacing-3);
   --uikit-input-padding-y: var(--uikit-spacing-2);
   --uikit-input-padding-x: var(--uikit-spacing-3);
+  /* 输入框圆角：默认纯椭圆（胶囊），消息输入区各输入面消费 */
+  --uikit-input-radius: 999px;
   --uikit-bubble-gap: var(--uikit-spacing-2);
   --uikit-message-gap: var(--uikit-spacing-3);
   --uikit-message-padding: var(--uikit-spacing-4);

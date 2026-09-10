@@ -4,13 +4,16 @@ import EmIcon from '../icon/icon.vue'
 export interface IconButtonProps {
   /** 图标名称，格式 "category/icon-name" */
   icon: string
-  /** 图标尺寸（px）；不传时按按钮 size 回退：small 14 / medium 16 */
+  /** 图标尺寸（px），默认 22 */
   iconSize?: number
   /** 按钮语义类型 */
   type?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
   /** 视觉变体：solid 实心填充 / outline 描边 / ghost 透明 */
   variant?: 'solid' | 'outline' | 'ghost'
-  /** 按钮尺寸：small 28×28 / medium 32×32，默认 'medium'；未传 iconSize 时同时决定图标默认大小 */
+  /**
+   * 按钮尺寸档位（已废弃，仅为兼容保留）：全局统一为 icon 22 + padding 4 = 30×30，
+   * 传入 'small' / 'medium' 不再影响尺寸；如需特殊图标大小请用 iconSize
+   */
   size?: 'small' | 'medium'
   /** 是否禁用；禁用后点击不触发 click，并应用半透明/不可点击样式 */
   disabled?: boolean
@@ -45,13 +48,12 @@ function handleClick(event: MouseEvent) {
     :class="[
       `uikit-icon-button--${props.type}`,
       `uikit-icon-button--${props.variant}`,
-      `uikit-icon-button--${props.size}`,
     ]"
     :disabled="props.disabled"
     :title="props.title"
     @click="handleClick"
   >
-    <EmIcon :name="props.icon" :size="props.iconSize ?? (props.size === 'small' ? 14 : 16)" />
+    <EmIcon :name="props.icon" :size="props.iconSize ?? 22" />
   </button>
 </template>
 
@@ -72,6 +74,8 @@ function handleClick(event: MouseEvent) {
               box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
   flex-shrink: 0;
   box-sizing: border-box;
+  /* 全局规格：内部图标 22×22 + 上下左右 padding 4 = 30×30 可点击功能按钮 */
+  padding: 4px;
   /* 为 ::after 热区扩展提供定位上下文 */
   position: relative;
 }
@@ -83,16 +87,6 @@ function handleClick(event: MouseEvent) {
 .uikit-icon-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.uikit-icon-button--small {
-  width: 28px;
-  height: 28px;
-}
-
-.uikit-icon-button--medium {
-  width: 32px;
-  height: 32px;
 }
 
 /* 触屏设备扩展最小触摸热区至 44×44px，保持视觉尺寸不变 */

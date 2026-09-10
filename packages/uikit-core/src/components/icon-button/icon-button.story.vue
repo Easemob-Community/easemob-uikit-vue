@@ -22,10 +22,11 @@ import IconButton from './icon-button.vue'
       </div>
     </Variant>
 
-    <Variant title="尺寸 Size">
+    <Variant title="规格（icon 22 + padding 4 = 30×30）">
       <div class="u-flex u-gap-2 u-items-center u-p-4" style="background: var(--uikit-bg-base); border-radius: 8px;">
-        <IconButton icon="rect/pencil" size="small" />
-        <IconButton icon="rect/pencil" size="medium" />
+        <IconButton icon="rect/pencil" />
+        <IconButton icon="rect/pencil" variant="solid" />
+        <IconButton icon="rect/pencil" disabled />
       </div>
     </Variant>
 

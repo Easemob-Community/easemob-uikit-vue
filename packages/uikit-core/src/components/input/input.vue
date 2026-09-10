@@ -41,9 +41,9 @@ export interface InputProps {
    */
   variant?: 'default' | 'search' | 'filled' | 'ghost' | 'underline'
   /**
-   * 椭圆（pill）档位：true 时输入框为全圆角胶囊形态（border-radius 9999px、
+   * 椭圆（pill）档位：true 时输入框锁定胶囊形态规格（border-radius 9999px、
    * 整体高度 36px、垂直内边距 8px），优先级高于主题 componentsShape；
-   * 默认 false（圆角矩形模式）
+   * 默认 false（圆角走主题 --uikit-input-radius，纯椭圆）
    */
   pill?: boolean
 }
@@ -260,7 +260,7 @@ defineExpose({
   flex: 1;
   padding: 8px 12px;
   border: 1px solid var(--uikit-input-border-color, #F5F5F5);
-  border-radius: var(--uikit-components-radius);
+  border-radius: var(--uikit-input-radius, 999px);
   font-size: var(--uikit-font-size-14);
   outline: none;
   background-color: var(--uikit-bg-base);
@@ -298,7 +298,7 @@ defineExpose({
   border-radius: 4px;
 }
 
-/* 椭圆（pill）档位：全圆角胶囊 + 整体高度 36px + 垂直内边距 8px；
+/* 椭圆（pill）档位：锁定整体高度 36px + 垂直内边距 8px（圆角默认已是纯椭圆）；
    排在 --square 之后，同优先级下覆盖主题形状档位（pill 是显式 prop，意图更强） */
 .uikit-input__field--pill {
   border-radius: 9999px;

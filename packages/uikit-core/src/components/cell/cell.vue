@@ -115,7 +115,7 @@ function onContextmenu(e: MouseEvent) {
       <Icon
         v-if="props.showArrow && !$slots.trailing"
         name="chevron/right"
-        :size="16"
+        :size="22"
         class="uikit-cell__arrow"
       />
     </span>
@@ -335,7 +335,12 @@ function onContextmenu(e: MouseEvent) {
   color: var(--uikit-text-secondary);
 }
 
+/* 导航箭头：与 IconButton 同尺寸逻辑（内部图标 22 + 上下左右 padding 4 = 30×30），
+   负 margin 抵消 padding，不改变 cell 行内布局占位 */
 .uikit-cell__arrow {
+  padding: 4px;
+  margin: -4px;
+  flex-shrink: 0;
   color: var(--uikit-text-secondary);
 }
 </style>

@@ -735,7 +735,7 @@ defineExpose({
   min-width: 0;
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
   border: none;
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-input-radius, 999px);
   outline: none;
   /* font-size ≥ 16px，防止 iOS focus 自动缩放 */
   font-size: var(--uikit-font-size-16);
@@ -763,7 +763,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
-  border-radius: var(--uikit-components-radius, 8px);
+  border-radius: var(--uikit-input-radius, 999px);
   background-color: var(--uikit-bg-secondary);
   font-size: var(--uikit-font-size-16);
   line-height: 1.4;

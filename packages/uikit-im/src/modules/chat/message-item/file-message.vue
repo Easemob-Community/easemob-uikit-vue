@@ -4,6 +4,7 @@ import type { ComputedRef } from 'vue'
 import { EmIcon as Icon, EmText } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
+import { useThemeStore } from '@easemob/uikit-core'
 import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
 import { INJECTION_KEY } from '@easemob/uikit-core'
 import type { FileMessageBody, UiMessage } from '@easemob/uikit-core'
@@ -19,11 +20,12 @@ const { show: showToast } = useToast()
 
 /**
  * 圆角 class：config.messageList.bubbleShape（message-bubble-wrapper provide）优先；
- * 未配置时文件卡片默认 square（8px），与设计约定一致，可配置切 round（16px）
+ * 未配置时回落主题全局 bubbleShape（默认 round 16px，与其他类型气泡同一配置链）
  */
 const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
+const themeStore = useThemeStore()
 const bubbleClass = computed(() =>
-  (injectedBubbleShape.value ?? 'square') === 'square'
+  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
     ? 'file-message__bubble--square'
     : '',
 )
