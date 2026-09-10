@@ -41,7 +41,8 @@ export interface MessageBubbleWrapperEmits {
   (e: 'mention-click', userId: string): void
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
-  (e: 'avatar-view-profile', userId: string): void
+  (e: 'avatar-view-profile', userId: string, anchor?: HTMLElement): void
+  (e: 'avatar-click', userId: string, anchor?: HTMLElement): void
   (e: 'avatar-mention', payload: { userId: string, name: string }): void
 }
 
@@ -388,6 +389,8 @@ const isHighlighted = computed(() => {
 const showAvatarMenu = ref(false)
 /** 头像右键菜单锚点元素 */
 const avatarMenuAnchor = ref<HTMLElement>()
+/** 头像容器元素（左键点击/查看资料时作为名片弹层的锚点） */
+const avatarContainerRef = ref<HTMLElement>()
 
 /** 是否在群聊中（@提及仅群聊展示） */
 const isGroupChat = computed(() => props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT)
@@ -427,7 +430,17 @@ function closeAvatarMenu() {
 /** 查看资料 */
 function onViewProfileFromAvatar() {
   closeAvatarMenu()
-  emit('avatar-view-profile', props.message.from)
+  emit('avatar-view-profile', props.message.from, avatarContainerRef.value)
+}
+
+/** 左键点击头像：查看资料（多选模式下不拦截，保持整行点击切换选中） */
+function onAvatarLeftClick(event: MouseEvent) {
+  if (props.isMultiSelectMode)
+    return
+  if (props.config?.avatarClickViewProfile === false)
+    return
+  event.stopPropagation()
+  emit('avatar-click', props.message.from, avatarContainerRef.value)
 }
 
 /** @ 该用户 */
@@ -508,7 +521,7 @@ onBeforeUnmount(() => {
         }"
       >
         <!-- 头像区域 -->
-        <div v-if="showAvatar" class="message-bubble-wrapper__avatar" @contextmenu.stop="onAvatarContextMenu">
+        <div v-if="showAvatar" ref="avatarContainerRef" class="message-bubble-wrapper__avatar" @click="onAvatarLeftClick" @contextmenu.stop="onAvatarContextMenu">
           <slot name="avatar" :message="message">
             <Avatar :name="displayName" :src="avatarUrl" :size="avatarSize" :presence="senderPresence" />
           </slot>

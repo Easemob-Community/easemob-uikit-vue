@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Avatar from '../avatar/avatar.vue'
 import Icon from '../icon/icon.vue'
 import PresenceSelectorPopup from '../presence-selector/presence-selector-popup.vue'
@@ -11,6 +11,8 @@ export interface UserCardAction {
   label: string
   icon?: string
   type?: 'primary' | 'default' | 'danger'
+  /** 是否整宽胶囊独占一行（纵向堆叠在横向操作组下方），默认 false 横向一排 */
+  block?: boolean
 }
 
 export interface UserCardInfoRow {
@@ -29,7 +31,15 @@ export interface UserCardProps {
   name: string
   /** 头像 URL */
   avatar?: string
-  /** 顶部背景图 URL，不传时使用默认渐变 */
+  /** 布局：banner（顶部横幅+大头像，默认）/ plain（无横幅，头像与文字水平排列） */
+  layout?: 'banner' | 'plain'
+  /** 名称下方的副标题行（如 Username），有值才渲染 */
+  subtitle?: string
+  /** 用户 ID 行前置标签（如 UserID），有值才渲染 */
+  userIdLabel?: string
+  /** 用户 ID 是否支持点击复制（展示复制图标），默认 true */
+  userIdCopyable?: boolean
+  /** 顶部背景图 URL，不传时使用默认渐变（仅 banner 布局生效） */
   banner?: string
   /** 在线状态 */
   status?: PresenceDisplayStatus
@@ -47,6 +57,8 @@ const props = withDefaults(defineProps<UserCardProps>(), {
   actions: () => [],
   infoRows: () => [],
   editable: false,
+  layout: 'banner',
+  userIdCopyable: true,
 })
 
 const emit = defineEmits<{
@@ -64,6 +76,11 @@ const emit = defineEmits<{
 
 const avatarRef = ref<InstanceType<typeof Avatar>>()
 const showSelector = ref(false)
+
+/** 横向一排的小胶囊操作 */
+const inlineActions = computed(() => props.actions.filter(a => !a.block))
+/** 整宽胶囊操作，纵向堆叠在横向操作组下方 */
+const blockActions = computed(() => props.actions.filter(a => a.block))
 
 function onActionClick(key: string) {
   emit('action-click', key)
@@ -92,8 +109,9 @@ function onSelectorChanged() {
 </script>
 
 <template>
-  <div class="user-card">
+  <div class="user-card" :class="`user-card--${props.layout}`">
     <div
+      v-if="props.layout === 'banner'"
       class="user-card__banner"
       :class="{ 'user-card__banner--default': !props.banner }"
       :style="props.banner ? { backgroundImage: `url(${props.banner})` } : undefined"
@@ -109,7 +127,7 @@ function onSelectorChanged() {
           :class="{ 'is-editable': props.editable }"
           :src="props.avatar"
           :name="props.name"
-          :size="90"
+          :size="props.layout === 'plain' ? 56 : 90"
           :presence="props.status"
           :editable="props.editable"
           @presence-click="onPresenceClick"
@@ -119,15 +137,23 @@ function onSelectorChanged() {
           <div class="user-card__name-row">
             <span class="user-card__name">{{ props.name }}</span>
           </div>
+          <div v-if="props.subtitle" class="user-card__subtitle">
+            {{ props.subtitle }}
+          </div>
           <div class="user-card__user-id">
-            <CopyableText :text="props.userId" />
+            <span v-if="props.userIdLabel" class="user-card__user-id-label">{{ props.userIdLabel }}: </span>
+            <CopyableText v-if="props.userIdCopyable" :text="props.userId" />
+            <span v-else>{{ props.userId }}</span>
           </div>
         </div>
       </div>
 
-      <div v-if="props.actions.length" class="user-card__actions">
+      <!-- #meta-extra：位于 profile 之后、actions 之前，用于注入备注编辑等业务区块 -->
+      <slot name="meta-extra" />
+
+      <div v-if="inlineActions.length" class="user-card__actions">
         <div
-          v-for="action in props.actions"
+          v-for="action in inlineActions"
           :key="action.key"
           class="user-card__action"
           :class="`user-card__action--${action.type || 'default'}`"
@@ -137,6 +163,24 @@ function onSelectorChanged() {
             v-if="action.icon"
             :name="action.icon"
             :size="22"
+            class="user-card__action-icon"
+          />
+          <span class="user-card__action-label">{{ action.label }}</span>
+        </div>
+      </div>
+
+      <div v-if="blockActions.length" class="user-card__block-actions">
+        <div
+          v-for="action in blockActions"
+          :key="action.key"
+          class="user-card__action user-card__action--block"
+          :class="`user-card__action--${action.type || 'default'}`"
+          @click="onActionClick(action.key)"
+        >
+          <Icon
+            v-if="action.icon"
+            :name="action.icon"
+            :size="20"
             class="user-card__action-icon"
           />
           <span class="user-card__action-label">{{ action.label }}</span>
@@ -199,6 +243,28 @@ function onSelectorChanged() {
   padding: 0 20px 20px;
 }
 
+/* plain 布局：无 banner，头像与文字水平排列 */
+.user-card--plain .user-card__body {
+  padding-top: 20px;
+}
+
+.user-card--plain .user-card__profile {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.user-card--plain .user-card__avatar {
+  margin-bottom: 0;
+}
+
+.user-card--plain .user-card__meta {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 0;
+}
+
 .user-card__profile {
   display: flex;
   flex-direction: column;
@@ -233,6 +299,13 @@ function onSelectorChanged() {
   font-size: var(--uikit-font-size-22);
   font-weight: 600;
   color: var(--uikit-text-primary);
+  word-break: break-all;
+}
+
+.user-card__subtitle {
+  font-size: var(--uikit-font-size-13);
+  color: var(--uikit-text-secondary);
+  margin-top: 4px;
   word-break: break-all;
 }
 
@@ -290,6 +363,23 @@ function onSelectorChanged() {
   font-size: var(--uikit-font-size-13);
   text-align: center;
   line-height: 1.2;
+}
+
+.user-card__block-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.user-card__action--block {
+  flex: none;
+  padding: 12px 16px;
+  border-radius: 999px;
+}
+
+.user-card__action--block .user-card__action-label {
+  font-size: var(--uikit-font-size-14);
 }
 
 .user-card__info {

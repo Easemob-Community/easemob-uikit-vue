@@ -34,6 +34,11 @@ export interface PopupProps {
   /** 互斥分组：同一 group 内同时只能有一个 popup 打开，打开新的会自动关闭其他的 */
   group?: string
   /**
+   * 内容外壳（背景/边框/圆角/阴影），默认 true。
+   * 设为 false 时弹层外壳透明，由内部组件自行承担视觉外壳（如名片卡片的圆角与阴影）。
+   */
+  shell?: boolean
+  /**
    * Teleport 目标（默认 'body'）。嵌套弹层容器（如 demo 手机壳）场景传入
    * 壳内元素选择器/元素，弹层随壳定位（配合壳的 transform 包含块）。
    */
@@ -61,6 +66,7 @@ const props = withDefaults(defineProps<PopupProps>(), {
   placement: 'bottom',
   align: 'center',
   offset: 8,
+  shell: true,
 })
 
 const emit = defineEmits<PopupEmits>()
@@ -301,7 +307,10 @@ onUnmounted(() => {
             v-if="props.show"
             ref="contentRef"
             class="uikit-popup__content"
-            :class="isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`"
+            :class="[
+              isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`,
+              { 'uikit-popup__content--no-shell': !props.shell },
+            ]"
             :style="isAnchored ? contentStyle : undefined"
             role="dialog"
             :aria-modal="props.overlay"
@@ -426,6 +435,15 @@ onUnmounted(() => {
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-height: 100%;
   overflow: auto;
+}
+
+/* 关闭内容外壳：背景/边框/圆角/阴影全部交给内部组件 */
+.uikit-popup__content--no-shell {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .uikit-popup__close {

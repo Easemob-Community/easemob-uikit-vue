@@ -433,6 +433,12 @@ const showUserCardModal = ref(false)
 /** 用户名片弹窗展示的用户 ID */
 const userCardUserId = ref('')
 
+/** 用户名片弹层的锚定触发元素（头像等），为空时居中弹窗 */
+const userCardAnchor = ref<HTMLElement>()
+
+/** header 头像容器元素（单聊时作为名片弹层锚点） */
+const headerAvatarRef = ref<HTMLElement>()
+
 /** 是否显示群名片弹窗 */
 const showGroupCardModal = ref(false)
 /** 群名片弹窗展示的群 ID */
@@ -894,8 +900,7 @@ function onHeaderAvatarClick() {
   if (!conversation?.id)
     return
   if (conversation.type === CONVERSATION_TYPE.SINGLECHAT) {
-    userCardUserId.value = conversation.id
-    showUserCardModal.value = true
+    toggleUserCardModal(conversation.id, headerAvatarRef.value)
   }
   else if (conversation.type === CONVERSATION_TYPE.GROUPCHAT) {
     groupCardGroupId.value = conversation.id
@@ -903,10 +908,20 @@ function onHeaderAvatarClick() {
   }
 }
 
-/** 右键头像：查看资料 */
-function onAvatarViewProfile(userId: string) {
+/** 打开用户名片；同一用户重复点击时 toggle 关闭（锚定弹层下点头像不触发外部关闭，需在此处理） */
+function toggleUserCardModal(userId: string, anchor?: HTMLElement) {
+  if (showUserCardModal.value && userCardUserId.value === userId) {
+    showUserCardModal.value = false
+    return
+  }
   userCardUserId.value = userId
+  userCardAnchor.value = anchor
   showUserCardModal.value = true
+}
+
+/** 消息头像左键点击 / 右键菜单「查看资料」 */
+function onAvatarViewProfile(userId: string, anchor?: HTMLElement) {
+  toggleUserCardModal(userId, anchor)
 }
 
 /** 右键头像：@ 提及 */
@@ -1175,7 +1190,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
           >
             <slot name="header" :conversation="currentConversation">
               <!-- 头像区域 -->
-              <div v-if="showHeaderAvatar && currentConversation" class="chat__header-avatar">
+              <div v-if="showHeaderAvatar && currentConversation" ref="headerAvatarRef" class="chat__header-avatar">
                 <slot name="header-avatar" :conversation="currentConversation">
                   <Avatar
                     :src="headerAvatar"
@@ -1264,6 +1279,7 @@ async function onRemoveAdmin(member: UiGroupMember) {
             @location-click="(body, msg) => emit('location-click', body, msg)"
             @custom-message-action="(action, payload, msg) => emit('custom-message-action', action, payload, msg)"
             @avatar-view-profile="onAvatarViewProfile"
+            @avatar-click="onAvatarViewProfile"
             @avatar-mention="onAvatarMention"
           >
             <!-- 透传消息类型级插槽（如 #message-custom）到消息渲染链 -->
@@ -1451,12 +1467,14 @@ async function onRemoveAdmin(member: UiGroupMember) {
         name="user-card"
         :show="showUserCardModal"
         :user-id="userCardUserId"
+        :anchor="userCardAnchor"
         :open="openUserCardModal"
         :close="closeUserCardModal"
       >
         <UserCardModal
           v-model:show="showUserCardModal"
           :user-id="userCardUserId"
+          :anchor="userCardAnchor"
           @send-message="onUserCardSendMessage"
         />
       </slot>

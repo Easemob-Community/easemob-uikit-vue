@@ -10,6 +10,8 @@ import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
 export interface ChatContainerUserCardSlotScope {
   show: boolean
   userId: string
+  /** 名片弹层的锚定触发元素（头像等），可能为空（此时居中弹窗） */
+  anchor?: HTMLElement
   open: () => void
   close: () => void
 }

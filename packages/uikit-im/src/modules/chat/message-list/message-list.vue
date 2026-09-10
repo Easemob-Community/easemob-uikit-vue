@@ -48,8 +48,10 @@ export interface MessageListEmits {
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
   /** 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message */
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
-  /** 右键消息头像选择"查看资料"时触发，参数为消息发送者 ID / Emitted when "View profile" is chosen from the avatar context menu, with the sender ID */
-  (e: 'avatar-view-profile', userId: string): void
+  /** 右键消息头像选择"查看资料"时触发，参数为消息发送者 ID 与头像锚点元素 / Emitted when "View profile" is chosen from the avatar context menu, with the sender ID and avatar anchor element */
+  (e: 'avatar-view-profile', userId: string, anchor?: HTMLElement): void
+  /** 左键点击消息头像时触发，参数为消息发送者 ID 与头像锚点元素 / Emitted when a message avatar is left-clicked, with the sender ID and avatar anchor element */
+  (e: 'avatar-click', userId: string, anchor?: HTMLElement): void
   /** 右键消息头像选择"@提及"时触发，参数为发送者 ID 与展示名 / Emitted when "@mention" is chosen from the avatar context menu, with the sender ID and display name */
   (e: 'avatar-mention', payload: { userId: string, name: string }): void
 }
@@ -893,7 +895,8 @@ watch(locateRequest, (req) => {
           @mention-click="emit('mention-click', $event)"
           @location-click="emit('location-click', $event, item.data as UiMessage)"
           @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
-          @avatar-view-profile="emit('avatar-view-profile', $event)"
+          @avatar-view-profile="(userId, anchor) => emit('avatar-view-profile', userId, anchor)"
+          @avatar-click="(userId, anchor) => emit('avatar-click', userId, anchor)"
           @avatar-mention="emit('avatar-mention', $event)"
         >
           <!-- 透传消息类型级插槽到气泡包装器 -->
@@ -949,7 +952,8 @@ watch(locateRequest, (req) => {
             @mention-click="emit('mention-click', $event)"
             @location-click="emit('location-click', $event, item.data as UiMessage)"
             @custom-message-action="(action, payload) => emit('custom-message-action', action, payload, item.data as UiMessage)"
-            @avatar-view-profile="emit('avatar-view-profile', $event)"
+            @avatar-view-profile="(userId, anchor) => emit('avatar-view-profile', userId, anchor)"
+            @avatar-click="(userId, anchor) => emit('avatar-click', userId, anchor)"
             @avatar-mention="emit('avatar-mention', $event)"
           >
             <!-- 透传消息类型级插槽到气泡包装器 -->

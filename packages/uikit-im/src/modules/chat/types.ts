@@ -142,6 +142,8 @@ export interface ChatConfig {
     voiceUnreadDot?: boolean
     /** 头像尺寸（px），默认 36 */
     avatarSize?: number
+    /** 左键点击消息头像是否打开用户名片，默认 true；右键菜单（查看资料/@提及）不受此开关影响 */
+    avatarClickViewProfile?: boolean
     /** 消息项之间的间距（px），默认 12 */
     messageGap?: number
     /** 消息列表内边距（px），默认 16 */
