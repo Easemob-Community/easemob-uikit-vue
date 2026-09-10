@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import { useUserInfo } from '../../composables/use-user-info'
 import type { UiContact as Contact } from '@easemob/uikit-core'
@@ -87,12 +87,7 @@ const resolvedAvatarShape = computed(() => {
   >
     <template #leading>
       <span class="contact-item-default__leading">
-        <span v-if="props.showCheckbox" class="contact-item-default__check">
-          <Icon
-            :name="props.selected ? 'circle/checked' : 'circle/empty'"
-            :size="20"
-          />
-        </span>
+        <Checkbox v-if="props.showCheckbox" :checked="props.selected" />
         <slot name="avatar" :contact="props.contact" :size="resolvedAvatarSize">
           <Avatar
             v-if="props.showAvatar"
@@ -119,17 +114,6 @@ const resolvedAvatarShape = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-}
-
-.contact-item-default__check {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--uikit-text-secondary);
-}
-
-.contact-item-default.is-selected .contact-item-default__check {
-  color: var(--uikit-primary, #155eef);
 }
 
 .contact-item-default__extra {

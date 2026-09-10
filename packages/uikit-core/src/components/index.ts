@@ -22,6 +22,8 @@ export { default as EmPresenceSelectorPopup } from './presence-selector/presence
 export { default as EmPresenceAvatar } from './presence-avatar/presence-avatar.vue'
 export { default as EmCell } from './cell/cell.vue'
 export type { CellProps } from './cell/cell.vue'
+export { default as EmCheckbox } from './checkbox/checkbox.vue'
+export type { CheckboxProps } from './checkbox/checkbox.vue'
 export { default as EmCopyableText } from './copyable-text/copyable-text.vue'
 export type { CopyableTextProps } from './copyable-text/copyable-text.vue'
 export { default as EmEmpty } from './empty/empty.vue'

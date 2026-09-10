@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref } from 'vue'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, EmCheckbox as Checkbox, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob/uikit-core'
 import type { LocationMessageBody, MessageStatusValue, PresenceDisplayStatus, UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '@easemob/uikit-sdk-contract'
 import QuoteCard from '../quote/quote-card.vue'
@@ -487,12 +487,7 @@ onBeforeUnmount(() => {
     <template v-else>
       <!-- 多选 Checkbox：微信风格，所有消息统一放在最左侧（独立于内层 row-reverse 之外） -->
       <div v-if="props.isMultiSelectMode" class="message-bubble-wrapper__checkbox">
-        <Icon
-          :name="props.isSelected ? 'circle/checked' : 'circle/empty'"
-          :size="18"
-          class="message-bubble-wrapper__check-icon"
-          :class="{ 'message-bubble-wrapper__check-icon--checked': props.isSelected }"
-        />
+        <Checkbox :checked="props.isSelected" :size="18" />
       </div>
 
       <!-- 主体区域：处理己方/对方头像+内容布局 -->
@@ -956,16 +951,6 @@ onBeforeUnmount(() => {
   width: 24px;
   height: 24px;
   margin-top: 8px;
-}
-
-.message-bubble-wrapper__check-icon {
-  color: var(--uikit-text-tertiary);
-  flex-shrink: 0;
-  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.message-bubble-wrapper__check-icon--checked {
-  color: var(--uikit-primary-color);
 }
 
 .message-bubble-wrapper--selected {

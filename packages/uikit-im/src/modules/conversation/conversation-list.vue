@@ -8,6 +8,7 @@ import { CONVERSATION_TYPE } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { EmModal as Modal } from '@easemob/uikit-core'
 import { EmInput as Input } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmActionSheet as ActionSheet } from '@easemob/uikit-core'
@@ -778,10 +779,10 @@ function handleCustomAction(key: string, conversation: Conversation) {
     >
       <div class="conversation-list__delete-body">
         <div>{{ t('conversation.deleteConfirm') }}</div>
-        <label class="conversation-list__delete-option">
-          <input v-model="deleteWithHistory" type="checkbox">
+        <div class="conversation-list__delete-option" @click="deleteWithHistory = !deleteWithHistory">
+          <Checkbox :checked="deleteWithHistory" :size="16" />
           <span>{{ t('conversation.deleteWithHistory', '同时删除聊天记录') }}</span>
-        </label>
+        </div>
       </div>
     </Modal>
 
@@ -1082,13 +1083,5 @@ function handleCustomAction(key: string, conversation: Conversation) {
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   cursor: pointer;
-}
-
-.conversation-list__delete-option input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--uikit-primary-color);
-  cursor: pointer;
-  flex-shrink: 0;
 }
 </style>

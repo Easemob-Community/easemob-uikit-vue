@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import type { UiGroup as Group } from '@easemob/uikit-core'
 import type { AvatarShape, GroupItemSize } from './types'
@@ -84,12 +84,7 @@ const memberCountMeta = computed(() => {
   >
     <template #leading>
       <span class="group-item-default__leading">
-        <span v-if="props.showCheckbox" class="group-item-default__check">
-          <Icon
-            :name="props.selected ? 'circle/checked' : 'circle/empty'"
-            :size="20"
-          />
-        </span>
+        <Checkbox v-if="props.showCheckbox" :checked="props.selected" />
         <slot name="avatar" :group="props.group" :size="resolvedAvatarSize">
           <Avatar
             v-if="props.showAvatar"
@@ -115,17 +110,6 @@ const memberCountMeta = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-}
-
-.group-item-default__check {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--uikit-text-secondary);
-}
-
-.group-item-default.is-selected .group-item-default__check {
-  color: var(--uikit-primary, #155eef);
 }
 
 .group-item-default__extra {

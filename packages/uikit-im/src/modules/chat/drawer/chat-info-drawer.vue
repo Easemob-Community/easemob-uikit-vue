@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { formatSdkError } from '@easemob/uikit-core'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'
 import { EmModal as Modal } from '@easemob/uikit-core'
@@ -1026,16 +1027,14 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   >
     <div class="chat-info-drawer__confirm-body">
       <p>{{ confirmModal.content }}</p>
-      <label
+      <div
         v-if="confirmModal.action === 'deleteConversation'"
         class="chat-info-drawer__confirm-checkbox"
+        @click="confirmModal.deleteRoaming = !confirmModal.deleteRoaming"
       >
-        <input
-          v-model="confirmModal.deleteRoaming"
-          type="checkbox"
-        >
+        <Checkbox :checked="confirmModal.deleteRoaming" :size="16" />
         <span>{{ t('chat.info.deleteRoamingMessages', '同时删除历史消息') }}</span>
-      </label>
+      </div>
     </div>
   </Modal>
 </template>
@@ -1438,10 +1437,4 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   color: var(--uikit-text-primary);
 }
 
-.chat-info-drawer__confirm-checkbox input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--uikit-primary-color);
-  cursor: pointer;
-}
 </style>

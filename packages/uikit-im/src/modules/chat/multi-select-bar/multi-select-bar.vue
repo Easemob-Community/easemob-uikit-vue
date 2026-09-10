@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { FORWARD_MODE, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, useToast } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox, FORWARD_MODE, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, useToast } from '@easemob/uikit-core'
 import type { ForwardModeValue, UiMessage } from '@easemob/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 
@@ -119,12 +119,7 @@ function onCancel() {
   <div class="multi-select-bar">
     <!-- 全选按钮 -->
     <div class="multi-select-bar__select-all" @click="onToggleSelectAll">
-      <Icon
-        :name="isAllSelected ? 'circle/checked' : 'circle/empty'"
-        :size="22"
-        class="multi-select-bar__check-icon"
-        :class="{ 'multi-select-bar__check-icon--checked': isAllSelected }"
-      />
+      <Checkbox :checked="isAllSelected" :size="22" />
       <span class="multi-select-bar__select-all-label">{{ isAllSelected ? '取消全选' : '全选' }}</span>
       <!-- 选中条数：放在全选按钮下方同一纵列 -->
       <div v-if="selectedMessages.length > 0" class="multi-select-bar__count">
@@ -224,16 +219,6 @@ function onCancel() {
   gap: 6px;
   cursor: pointer;
   user-select: none;
-}
-
-.multi-select-bar__check-icon {
-  color: var(--uikit-text-tertiary);
-  flex-shrink: 0;
-  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.multi-select-bar__check-icon--checked {
-  color: var(--uikit-primary-color);
 }
 
 .multi-select-bar__select-all-label {

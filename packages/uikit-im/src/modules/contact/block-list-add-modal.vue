@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
 import { EmInput as Input } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
@@ -147,12 +147,7 @@ async function onConfirm() {
             <Avatar :name="displayName(contact)" :src="contact.avatar" :size="36" />
           </template>
           <template #trailing>
-            <Icon
-              :name="selectedIds.has(contact.userId) ? 'circle/checked' : 'circle/empty'"
-              :size="20"
-              class="block-list-add-modal__checkbox"
-              :class="{ 'block-list-add-modal__checkbox--checked': selectedIds.has(contact.userId) }"
-            />
+            <Checkbox :checked="selectedIds.has(contact.userId)" />
           </template>
         </Cell>
       </div>
@@ -218,16 +213,6 @@ async function onConfirm() {
   padding: 32px 16px;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
-}
-
-.block-list-add-modal__checkbox {
-  color: var(--uikit-text-tertiary, #94a3b8);
-  flex-shrink: 0;
-  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.block-list-add-modal__checkbox--checked {
-  color: var(--uikit-primary-color);
 }
 
 .block-list-add-modal__footer {
