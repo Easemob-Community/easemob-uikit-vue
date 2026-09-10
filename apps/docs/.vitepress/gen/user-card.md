@@ -3,17 +3,21 @@
 
 ### Props
 
-| 属性                | 类型                                       | 默认值        | 说明                             |
+| 属性                | 类型                                       | 默认值        | 说明                                           |
 | --- | --- | --- | --- |
-| userId            | `string`                                 | —          | 用户 ID                          |
-| name              | `string`                                 | —          | 展示名称                           |
-| avatar            | `string`                                 | —          | 头像 URL                         |
-| banner            | `string`                                 | —          | 顶部背景图 URL，不传时使用默认渐变            |
-| status            | `PresenceDisplayStatus`                  | —          | 在线状态                           |
-| editable          | `boolean`                                | `false`    | 头像是否可编辑（用于当前用户变更在线状态），默认 false |
-| selectorPlacement | `'bottom' \| 'top' \| 'left' \| 'right'` | —          | 弹层相对头像的位置，默认 'bottom'          |
-| actions           | `UserCardAction[]`                       | `() => []` | 底部操作按钮                         |
-| infoRows          | `UserCardInfoRow[]`                      | `() => []` | 信息行                            |
+| userId            | `string`                                 | —          | 用户 ID                                        |
+| name              | `string`                                 | —          | 展示名称                                         |
+| avatar            | `string`                                 | —          | 头像 URL                                       |
+| layout            | `'banner' \| 'plain'`                    | `'banner'` | 布局：banner（顶部横幅+大头像，默认）/ plain（无横幅，头像与文字水平排列） |
+| subtitle          | `string`                                 | —          | 名称下方的副标题行（如 Username），有值才渲染                  |
+| userIdLabel       | `string`                                 | —          | 用户 ID 行前置标签（如 UserID），有值才渲染                  |
+| userIdCopyable    | `boolean`                                | `true`     | 用户 ID 是否支持点击复制（展示复制图标），默认 true               |
+| banner            | `string`                                 | —          | 顶部背景图 URL，不传时使用默认渐变（仅 banner 布局生效）           |
+| status            | `PresenceDisplayStatus`                  | —          | 在线状态                                         |
+| editable          | `boolean`                                | `false`    | 头像是否可编辑（用于当前用户变更在线状态），默认 false               |
+| selectorPlacement | `'bottom' \| 'top' \| 'left' \| 'right'` | —          | 弹层相对头像的位置，默认 'bottom'                        |
+| actions           | `UserCardAction[]`                       | `() => []` | 底部操作按钮                                       |
+| infoRows          | `UserCardInfoRow[]`                      | `() => []` | 信息行                                          |
 
 ### Events
 
@@ -24,3 +28,9 @@
 | `avatar-click`     | —           | 点击头像时触发（不含在线状态指示器点击，避免与 presence-click 重复）               |
 | `presence-click`   | —           | 点击头像上的在线状态指示器时触发（由 Avatar 内部转发）；editable 时同时弹出在线状态选择器    |
 | `presence-changed` | —           | 在线状态选择器中成功变更状态后触发（转发 PresenceSelectorPopup 的 changed 事件） |
+
+### Slots
+
+| 插槽名          | 说明 |
+| --- | --- |
+| `meta-extra` | —  |

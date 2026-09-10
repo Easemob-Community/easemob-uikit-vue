@@ -88,6 +88,7 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 | `--uikit-components-radius-hover` | 14px | hover / 展开态圆角 |
 | `--uikit-bubble-radius` | 16px | 消息气泡圆角（round 档，默认） |
 | `--uikit-bubble-radius-square` | 8px | 消息气泡圆角（square 档） |
+| `--uikit-input-radius` | 999px | 输入框圆角（默认纯椭圆/胶囊，消息输入区消费） |
 
 ## 阴影
 
