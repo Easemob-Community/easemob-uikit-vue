@@ -1308,17 +1308,16 @@
 - **建议修法**：发版时补 CHANGELOG 条目；群别名按上述链路实施。
 - **关联 skill**：`uikit-contact-group-capabilities` / `uikit-sdk-adapter-architecture`
 
-### [ ] D132. 双 adapter `GroupDomain` 未实现契约 `SdkGroupDomain.fetchMyGroupAlias/updateMyGroupAlias`，两 adapter 包构建被类型检查阻断
-
-- **背景**：2026-09-10 发现（改 fetchHistory 日志时跑构建门禁暴露，非本次改动引入）：contract `SdkGroupDomain` 已声明 `fetchMyGroupAlias` / `updateMyGroupAlias`（D131 群别名能力预研时加的契约？），但 `uikit-sdk-websdk5` 与 `uikit-sdk-webim4` 的 `GroupDomain` 均未实现，导致两包 `pnpm build`（`vite build && vue-tsc --emitDeclarationOnly`）在 `adapter.ts` 报 `TS2416: Property 'domains' ... GroupDomain is missing fetchMyGroupAlias, updateMyGroupAlias` 失败。`vue-tsc --noEmit` 同样不过。属契约与实现漂移。
-- **建议修法**：确认群别名能力是否落地：落地则按 D131 预研链路（群成员自定义属性 key `nickname`）补齐双 adapter 实现；暂缓则在 contract 去掉或降级这两个方法声明，恢复构建门禁。
-- **关联 skill**：`uikit-sdk-adapter-architecture`
-
 ### [ ] D98（已归档，见「已修复」区）
 
 ---
 
 ## 已修复（归档）
+
+- [x] **D132. 双 adapter `GroupDomain` 未实现契约 `SdkGroupDomain.fetchMyGroupAlias/updateMyGroupAlias`，两 adapter 包构建被类型检查阻断**
+  - 已于 2026-09-11 核销：按「暂缓则在 contract 去掉声明」路径修复——群别名能力 2026-09-09 按产品决定暂缓（见 D131），契约中的 `fetchMyGroupAlias` / `updateMyGroupAlias` 声明已移除（该声明系预研期工作区临时加入，未进入任何 commit 历史，全仓已 grep 无残留）。
+  - 验证：`pnpm -F @easemob/uikit-sdk-websdk5 build` 与 `pnpm -F @easemob/uikit-sdk-webim4 build`（含 `vue-tsc --emitDeclarationOnly`）均通过，两包 `vue-tsc --noEmit` 0 错误，TS2416 漂移消除。
+  - 后续若恢复群别名能力：按 D131 预研链路（群成员自定义属性 key `nickname`，contract→双 adapter→composable）补齐契约声明与双 adapter 实现。
 
 - [x] **D98. `use-user-info` / `use-own-user-info` 依赖场景 contact store，进 core 前需解耦**
   - 已于 2026-08-15 按方向①修复（P1 收尾清理项）。
