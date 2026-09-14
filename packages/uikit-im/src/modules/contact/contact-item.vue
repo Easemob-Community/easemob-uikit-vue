@@ -10,6 +10,8 @@ interface ContactItemProps {
   selectMode?: ContactSelectMode
   /** 是否禁用 */
   disabled?: boolean
+  /** 多选选择框位置：left（默认）/ right（行尾） */
+  checkboxPosition?: 'left' | 'right'
   /** 是否展示头像，默认 true */
   showAvatar?: boolean
   /** 头像尺寸 */
@@ -27,6 +29,7 @@ interface ContactItemProps {
 const props = withDefaults(defineProps<ContactItemProps>(), {
   selectMode: 'none',
   disabled: false,
+  checkboxPosition: 'left',
   showAvatar: true,
   avatarShape: undefined,
   size: 'normal',
@@ -85,6 +88,7 @@ function onContextmenu(e: MouseEvent) {
         :active="active"
         :selected="selected"
         :show-checkbox="showCheckbox"
+        :checkbox-position="props.checkboxPosition"
         :show-avatar="props.showAvatar"
         :avatar-size="props.avatarSize"
         :avatar-shape="props.avatarShape"

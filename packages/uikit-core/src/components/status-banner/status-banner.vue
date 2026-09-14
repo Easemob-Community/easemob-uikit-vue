@@ -100,7 +100,7 @@ function handleClick(event: MouseEvent) {
           :aria-label="t('button.close')"
           @click.stop="handleClose"
         >
-          <Icon name="xmark/light" :size="14" />
+          <Icon name="xmark/bold" :size="14" />
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob/uikit-core'
+import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmIcon as Icon, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob/uikit-core'
 import type { CreateGroupParams, UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -105,6 +105,17 @@ const selectedContacts = computed(() => {
 
 const selectedCount = computed(() => selectedContacts.value.length)
 
+/** 右栏已选列表搜索关键词（本地过滤，不写入 store） */
+const selectedSearchKeyword = ref('')
+const filteredSelectedContacts = computed(() => {
+  const kw = selectedSearchKeyword.value.trim().toLowerCase()
+  if (!kw)
+    return selectedContacts.value
+  return selectedContacts.value.filter(c =>
+    (c.remark || c.name || c.userId).toLowerCase().includes(kw),
+  )
+})
+
 const generatedName = computed(() => {
   if (props.config.name)
     return props.config.name
@@ -127,6 +138,7 @@ function reset() {
   errorMsg.value = ''
   groupNameInput.value = ''
   groupDescriptionInput.value = ''
+  selectedSearchKeyword.value = ''
   settings.public = props.config.public ?? false
   settings.joinApprovalRequired = props.config.joinApprovalRequired ?? false
   settings.allowInvites = props.config.allowInvites ?? false
@@ -229,22 +241,24 @@ watch(
           <ContactList
             :show-header="false"
             :show-scroll-to-top="false"
-            :show-alphabet-nav="false"
             group-by="alphabet"
             select-mode="multiple"
+            checkbox-position="right"
             :disabled-fn="(contact) => contact.userId === currentUserId"
           />
         </div>
 
         <!-- 右侧：已选 + 群信息 -->
         <div class="create-group-modal__right">
-          <div class="create-group-modal__right-header">
-            <span class="create-group-modal__right-title">
-              {{ t('group.createSelectedTitle', '已选择的联系人') }}
-            </span>
-            <span class="create-group-modal__right-count">
-              {{ t('group.createSelectedPrefix', '已选择') }} {{ selectedCount }} {{ t('group.createSelectedUnit', '人') }}
-            </span>
+          <div class="create-group-modal__right-search">
+            <Input
+              v-model="selectedSearchKeyword"
+              variant="search"
+              clearable
+              clear-icon="search/xmark"
+              :placeholder="t('contact.searchPlaceholder')"
+              prefix-icon="search"
+            />
           </div>
 
           <div v-if="showNameInput || showDescriptionInput" class="create-group-modal__form">
@@ -330,7 +344,7 @@ watch(
 
           <div class="create-group-modal__selected-list">
             <ContactItemDefault
-              v-for="contact in selectedContacts"
+              v-for="contact in filteredSelectedContacts"
               :key="contact.userId"
               class="create-group-modal__selected-item"
               :contact="contact"
@@ -343,7 +357,7 @@ watch(
                   class="create-group-modal__selected-remove"
                   @click="removeSelected(contact.userId)"
                 >
-                  <span>×</span>
+                  <Icon name="filled/circle/xmark" :size="20" />
                 </button>
               </template>
             </ContactItemDefault>
@@ -351,6 +365,12 @@ watch(
               v-if="selectedCount === 0"
               icon="person/single"
               :description="t('group.createSelectedEmpty', '请选择联系人')"
+              size="small"
+            />
+            <Empty
+              v-else-if="filteredSelectedContacts.length === 0"
+              icon="person/single"
+              :description="t('contact.noSearchResult')"
               size="small"
             />
           </div>
@@ -366,16 +386,18 @@ watch(
         <slot name="footer" />
       </div>
       <div v-else class="create-group-modal__footer">
-        <Button type="default" @click="onClose">
-          {{ t('button.cancel', '取消') }}
-        </Button>
         <Button
+          class="create-group-modal__footer-btn"
           type="primary"
+          pill
           :disabled="selectedCount === 0"
           :loading="loading"
           @click="onCreate"
         >
           {{ t('group.createSubmit', '完成') }}
+        </Button>
+        <Button class="create-group-modal__footer-btn" type="outline" pill @click="onClose">
+          {{ t('button.cancel', '取消') }}
         </Button>
       </div>
     </div>
@@ -406,9 +428,10 @@ watch(
 .create-group-modal__header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 16px;
   flex-shrink: 0;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
 }
 
 .create-group-modal__title {
@@ -431,31 +454,45 @@ watch(
   overflow: hidden;
 }
 
+/* 左栏列表对齐设计稿：分组头无底色、行间发丝线、行尾选择框避开字母导航 */
+.create-group-modal__left :deep(.contact-list__search) {
+  padding: 12px 16px 8px;
+}
+.create-group-modal__left :deep(.contact-list__group-header) {
+  background-color: transparent;
+}
+
+.create-group-modal__left :deep(.contact-item) {
+  margin-bottom: 0;
+}
+
+.create-group-modal__left :deep(.contact-item-default) {
+  padding-right: 32px;
+}
+
+/* 行间发丝线左内收：从名字起点开始（避开头像列），与设计稿一致 */
+.create-group-modal__left :deep(.contact-item-default)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--uikit-item-hover-padding-x, 16px) + 48px + var(--uikit-spacing-3, 12px));
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
+}
+
 .create-group-modal__right {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--uikit-bg-secondary, #f9fafb);
+  background-color: var(--uikit-bg-base);
 }
 
-.create-group-modal__right-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
+.create-group-modal__right-search {
+  padding: 12px 16px 8px;
   flex-shrink: 0;
-}
-
-.create-group-modal__right-title {
-  font-size: var(--uikit-font-size-14);
-  font-weight: 600;
-  color: var(--uikit-text-primary);
-}
-
-.create-group-modal__right-count {
-  font-size: var(--uikit-font-size-13);
-  color: var(--uikit-text-secondary);
 }
 
 .create-group-modal__form {
@@ -500,6 +537,18 @@ watch(
   --uikit-item-hover-padding-x: 8px;
 }
 
+/* 已选行发丝线同样左内收避开头像列 */
+.create-group-modal__selected-item::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--uikit-item-hover-padding-x, 8px) + 48px + var(--uikit-spacing-3, 12px));
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
+}
+
 .create-group-modal__selected-remove {
   width: 20px;
   height: 20px;
@@ -508,19 +557,16 @@ watch(
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background-color: var(--uikit-bg-secondary, #e5e7eb);
-  color: var(--uikit-text-secondary);
+  background: none;
+  color: var(--uikit-text-tertiary);
   cursor: pointer;
-  font-size: var(--uikit-font-size-14);
-  line-height: 1;
   padding: 0;
   flex-shrink: 0;
 }
 
 @media (hover: hover) {
   .create-group-modal__selected-remove:hover {
-    background-color: var(--uikit-danger-color);
-    color: var(--uikit-text-inverse);
+    color: var(--uikit-danger-color);
   }
 }
 
@@ -560,6 +606,10 @@ watch(
   padding: 12px 16px;
   flex-shrink: 0;
   background-color: var(--uikit-bg-base);
+}
+
+.create-group-modal__footer-btn {
+  min-width: 110px;
 }
 
 @media (max-width: 640px) {

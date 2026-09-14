@@ -11,8 +11,10 @@ interface ContactItemDefaultProps {
   contact: Contact
   active?: boolean
   selected?: boolean
-  /** 是否处于多选模式（左侧展示选择框） */
+  /** 是否处于多选模式（展示选择框） */
   showCheckbox?: boolean
+  /** 选择框位置：left（默认，头像前）/ right（行尾） */
+  checkboxPosition?: 'left' | 'right'
   /** 是否禁用（半透明 + 不响应 hover/click 视觉） */
   disabled?: boolean
   /** 是否展示头像，默认 true */
@@ -35,6 +37,7 @@ const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   active: false,
   selected: false,
   showCheckbox: false,
+  checkboxPosition: 'left',
   disabled: false,
   showAvatar: true,
   avatarShape: undefined,
@@ -87,7 +90,7 @@ const resolvedAvatarShape = computed(() => {
   >
     <template #leading>
       <span class="contact-item-default__leading">
-        <Checkbox v-if="props.showCheckbox" :checked="props.selected" />
+        <Checkbox v-if="props.showCheckbox && props.checkboxPosition === 'left'" :checked="props.selected" />
         <slot name="avatar" :contact="props.contact" :size="resolvedAvatarSize">
           <Avatar
             v-if="props.showAvatar"
@@ -102,6 +105,9 @@ const resolvedAvatarShape = computed(() => {
     </template>
 
     <template #trailing>
+      <span v-if="props.showCheckbox && props.checkboxPosition === 'right'" class="contact-item-default__checkbox-right">
+        <Checkbox :checked="props.selected" />
+      </span>
       <span v-if="$slots.extra" class="contact-item-default__extra" @click.stop>
         <slot name="extra" :contact="props.contact" :disabled="props.disabled" />
       </span>
@@ -117,6 +123,11 @@ const resolvedAvatarShape = computed(() => {
 }
 
 .contact-item-default__extra {
+  display: inline-flex;
+  align-items: center;
+}
+
+.contact-item-default__checkbox-right {
   display: inline-flex;
   align-items: center;
 }

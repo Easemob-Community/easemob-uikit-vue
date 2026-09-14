@@ -188,7 +188,7 @@ function scrollActiveIntoView() {
           <span class="mention-picker__header-title">{{ displayTitle }}</span>
           <IconButton
             class="mention-picker__header-close"
-            icon="xmark/light"
+            icon="xmark/bold"
             size="small"
             variant="ghost"
             :title="t('button.close', '关闭')"

@@ -1308,6 +1308,12 @@
 - **建议修法**：发版时补 CHANGELOG 条目；群别名按上述链路实施。
 - **关联 skill**：`uikit-contact-group-capabilities` / `uikit-sdk-adapter-architecture`
 
+### [ ] D134. `filled/pin.svg` 设计源与 icons-v2 现行版本不一致
+
+- **现象**：2026-09-14 将 `filled/circle/checked` / `filled/circle/xmark` 两个面性图标经 `prepare-icons-v2.mjs`（`面性/icon/filled → packages/uikit-core/src/assets/icons-v2/filled`）正式生成进 icons-v2 时，全量 regenerate 会把 `filled/pin.svg` 的 path 改写为设计源版本（定位柱尖端坐标不同：源版 `16.8359/18H` vs 现行 `17.8359/19H`），其余 8 个面性图标 regenerate 后与现行完全一致。已将 `icons-v2/filled/pin.svg` 恢复为现行版本，未跟随设计源。当日起根目录设计源暂存目录（`线性/`、`面性/`、`icon/`）已删除，icons-v2 为唯一在库版本。
+- **建议修法**：与设计师确认 pin 图标准绳；若设计源新版为准，请设计师重新提供素材后跑 `prepare-icons-v2` 规范化覆盖。
+- **关联 skill**：`uikit-release-build`
+
 ### [ ] D98（已归档，见「已修复」区）
 
 ---

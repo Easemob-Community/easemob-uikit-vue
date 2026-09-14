@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<CheckboxProps>(), {
   disabled: false,
 })
 
-const iconName = computed(() => (props.checked ? 'circle/checked' : 'circle/empty'))
+const iconName = computed(() => (props.checked ? 'filled/circle/checked' : 'circle/empty'))
 </script>
 
 <template>

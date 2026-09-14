@@ -257,7 +257,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
       <IconButton
         v-if="props.closable"
         class="group-member-list__close"
-        icon="xmark/light"
+        icon="xmark/bold"
         size="small"
         variant="ghost"
         :title="t('button.close', '关闭')"

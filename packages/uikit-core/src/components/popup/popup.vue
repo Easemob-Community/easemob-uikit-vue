@@ -318,7 +318,7 @@ onUnmounted(() => {
             <IconButton
               v-if="props.showClose"
               class="uikit-popup__close"
-              icon="xmark/light"
+              icon="xmark/bold"
               size="small"
               variant="ghost"
               :title="t('button.close', '关闭')"

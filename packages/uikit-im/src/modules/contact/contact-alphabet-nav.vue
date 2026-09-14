@@ -54,48 +54,61 @@ function onTap(key: string) {
 </template>
 
 <style scoped>
+/* 撑满列表区高度：字母按可用空间等比分配行高（单项封顶 20px），
+   空间不足时自动压缩，避免索引栏整体超高被上下裁剪 */
 .contact-alphabet-nav {
   position: absolute;
-  top: 50%;
+  top: 0;
+  bottom: 0;
   right: 4px;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 4px;
-  border-radius: 12px;
-  background-color: transparent;
+  justify-content: center;
+  padding: 4px 0;
   user-select: none;
   z-index: 10;
 }
 
 .contact-alphabet-nav__item {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 20px;
+  width: 18px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: var(--uikit-font-size-11);
   line-height: 1;
-  padding: 2px 4px;
   color: var(--uikit-primary-color);
   cursor: pointer;
-  transition:
-    color var(--uikit-anim-duration) var(--uikit-anim-easing),
-    background-color 0.15s;
-  border-radius: 4px;
+  transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
   .contact-alphabet-nav__item:hover {
     color: var(--uikit-primary-hover);
-    background-color: var(--uikit-bg-secondary);
   }
 }
 
+/* 当前分组高亮：设计稿为蓝底白字实心圆点；
+   圆盘用伪元素固定在字母背后，行高被压缩时仍保持正圆 */
 .contact-alphabet-nav__item.is-active {
-  color: var(--uikit-primary-hover);
-  background-color: var(--uikit-primary-color-opacity);
-  font-weight: 700;
+  color: var(--uikit-text-inverse);
+  font-weight: 600;
 }
 
-.contact-alphabet-nav__item.is-active:active {
+.contact-alphabet-nav__item.is-active::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--uikit-primary-color);
+  z-index: -1;
+}
+
+.contact-alphabet-nav__item.is-active:active::before {
   filter: brightness(0.85);
 }
 
@@ -106,7 +119,6 @@ function onTap(key: string) {
 
 @media (hover: hover) {
   .contact-alphabet-nav__item.is-empty:hover {
-    background-color: transparent;
     color: var(--uikit-text-tertiary, #c0c4cc);
   }
 }

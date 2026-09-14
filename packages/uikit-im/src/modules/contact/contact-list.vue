@@ -62,6 +62,8 @@ export interface ContactListProps {
   showAlphabetNav?: boolean
   /** 选择模式 */
   selectMode?: ContactSelectMode
+  /** 多选选择框位置：left（默认，头像前）/ right（行尾） */
+  checkboxPosition?: 'left' | 'right'
   /** 已选中 id 列表（受控，配合 update:selectedIds 实现 v-model） */
   selectedIds?: string[]
   /** 最大可选数量（multiple 模式生效），超过会被回滚并 emit max-exceed */
@@ -113,6 +115,7 @@ const props = withDefaults(defineProps<ContactListProps>(), {
   showGroupHeader: true,
   showAlphabetNav: true,
   selectMode: 'none',
+  checkboxPosition: 'left',
   showAvatar: true,
   avatarShape: undefined,
   itemSize: 'normal',
@@ -300,6 +303,19 @@ function releaseLoadMoreLock() {
   isLoadingMore.value = false
 }
 
+// 分组数据变化时初始化当前分组高亮：短列表不会触发滚动事件，
+// activeGroupKey 需要在这里兜底（否则字母导航的选中高亮始终不显示）
+watch(
+  () => groupedContacts.value,
+  (groups) => {
+    if (isAlphabet.value && props.showAlphabetNav && groups.length > 0)
+      activeGroupKey.value = groups[0].key
+    else
+      activeGroupKey.value = ''
+  },
+  { immediate: true },
+)
+
 const scrollEl = ref<HTMLElement | null>(null)
 
 onMounted(() => {
@@ -326,6 +342,8 @@ async function scrollToGroup(key: string) {
   if (target) {
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+  // 短列表不触发滚动事件，高亮需在此处同步
+  activeGroupKey.value = key
   emit('group-jump', key)
 }
 
@@ -449,14 +467,16 @@ defineExpose({
       <slot name="body" />
     </div>
 
-    <div
-      ref="itemsRef"
-      tabindex="0"
-      class="contact-list__items"
-      @mouseenter="enableKeyboardNav"
-      @mouseleave="disableKeyboardNav"
-      @click="enableKeyboardNav"
-    >
+    <!-- 列表滚动区：字母导航相对本区域垂直居中，避免上探与搜索框重合 -->
+    <div class="contact-list__items-area">
+      <div
+        ref="itemsRef"
+        tabindex="0"
+        class="contact-list__items"
+        @mouseenter="enableKeyboardNav"
+        @mouseleave="disableKeyboardNav"
+        @click="enableKeyboardNav"
+      >
       <!-- body slot - 非 sticky 模式 -->
       <div v-if="$slots.body && !props.bodySticky" class="contact-list__body">
         <slot name="body" />
@@ -513,6 +533,7 @@ defineExpose({
             :key="contact.userId"
             :contact="contact"
             :select-mode="props.selectMode"
+            :checkbox-position="props.checkboxPosition"
             :disabled="props.disabledFn ? props.disabledFn(contact) : false"
             :show-avatar="props.showAvatar"
             :avatar-size="props.avatarSize"
@@ -554,6 +575,15 @@ defineExpose({
       <div v-if="$slots.footer && !props.footerSticky" class="contact-list__footer">
         <slot name="footer" />
       </div>
+      </div>
+
+      <!-- 字母导航 -->
+      <ContactAlphabetNav
+        v-if="isAlphabet && props.showAlphabetNav && groupedContacts.length > 0"
+        :groups="(groupedContacts as ContactGroupItem[])"
+        :active-key="activeGroupKey"
+        @jump="scrollToGroup"
+      />
     </div>
 
     <!-- footer slot - sticky 模式 -->
@@ -563,14 +593,6 @@ defineExpose({
     >
       <slot name="footer" />
     </div>
-
-    <!-- 字母导航 -->
-    <ContactAlphabetNav
-      v-if="isAlphabet && props.showAlphabetNav && groupedContacts.length > 0"
-      :groups="(groupedContacts as ContactGroupItem[])"
-      :active-key="activeGroupKey"
-      @jump="scrollToGroup"
-    />
 
     <!-- 滚动置顶 -->
     <ScrollToTop
@@ -637,6 +659,16 @@ defineExpose({
 
 .contact-list__search {
   padding: 2px 16px 8px;
+}
+
+.contact-list__items-area {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 字母导航等比压缩的兜底：超高时裁剪在列表区内，不侵入搜索区 */
+  overflow: hidden;
 }
 
 .contact-list__items {

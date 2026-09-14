@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // 图标资源规范化脚本（支持多源目录）
 // 用法：
-//   node prepare-icons-v2.mjs                          # 默认处理线性/icon/stroked → assets/icons-v2
-//   node prepare-icons-v2.mjs <src> <dst> [src dst ...] # 自定义源/目标目录对
+//   node prepare-icons-v2.mjs                          # 默认处理 <repo>/线性/icon/stroked → assets/icons-v2
+//   node prepare-icons-v2.mjs <src> <dst> [src dst ...] # 自定义源/目标目录对（如 面性/icon/filled → src/assets/icons-v2/filled）
+// 注意：设计源目录（线性/面性）为设计师本地产物、不入库（gitignore），默认 pair 仅在源目录存在时可用；
+//       icons-v2 是唯一权威图标库，新素材经本脚本规范化后提交进包内。
 import { readFile, writeFile, readdir, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, relative, resolve, join } from 'node:path'

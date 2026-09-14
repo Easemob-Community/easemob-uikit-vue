@@ -89,7 +89,7 @@ onBeforeUnmount(clearTimer)
             aria-label="close"
             @click="emit('update:show', false)"
           >
-            <Icon name="xmark/light" :size="14" />
+            <Icon name="xmark/bold" :size="14" />
           </button>
         </div>
       </div>

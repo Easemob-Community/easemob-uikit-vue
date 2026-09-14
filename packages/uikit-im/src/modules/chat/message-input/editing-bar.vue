@@ -40,7 +40,7 @@ function onClose() {
     </div>
     <IconButton
       class="editing-bar__close"
-      icon="xmark/light"
+      icon="xmark/bold"
       size="small"
       variant="ghost"
       :title="t('message.editing.cancel')"

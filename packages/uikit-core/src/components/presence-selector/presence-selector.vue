@@ -140,7 +140,7 @@ function onCancel() {
       <span class="presence-selector__title">{{ t('presence.setStatus', '设置在线状态') }}</span>
       <IconButton
         class="presence-selector__close"
-        icon="xmark/light"
+        icon="xmark/bold"
         size="small"
         variant="ghost"
         :title="t('button.close', '关闭')"
