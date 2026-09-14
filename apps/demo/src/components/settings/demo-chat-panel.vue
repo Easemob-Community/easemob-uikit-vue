@@ -15,6 +15,7 @@ import './demo-settings-common.css'
 const {
   chatVariant,
   chatDrawerMode,
+  chatDrawerCloseOnClickOutside,
   chatInputMode,
   chatInputStyle,
   chatInputFeatures,
@@ -86,6 +87,10 @@ const {
           遮挡
         </button>
       </div>
+      <label class="demo-check" style="margin-top: 12px;">
+        <input v-model="chatDrawerCloseOnClickOutside" type="checkbox" :disabled="chatDrawerMode !== 'push'" />
+        <span>点击抽屉外部（聊天区 / 空白处）自动关闭（仅 push 模式生效）</span>
+      </label>
     </div>
 
     <div class="demo-settings__group">

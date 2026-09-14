@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<ChatDrawerProps>(), {
   offsetTop: 0,
   mode: 'push',
   fullscreen: false,
+  closeOnClickOutside: true,
 })
 
 const emit = defineEmits<{
@@ -50,7 +51,7 @@ function onOverlayClick() {
   }
 }
 
-/** 点击 panel 外部关闭（无论是否有 overlay） */
+/** 点击 panel 外部关闭（overlay 模式 = 遮罩点击语义，push 模式需开启 closeOnClickOutside） */
 /**
  * 使用 capture: false 确保 bubble 阶段的 event.stopPropagation()（如内层
  * Teleport Popup 上的 @click.stop/@pointerdown.stop）能够阻止此监听器触发，
@@ -62,11 +63,19 @@ function onOverlayClick() {
  * Drawer 中打开 Modal 时不会误关 Drawer。
  */
 onClickOutside(panelRef, (event) => {
-  if (!props.show || !props.closeOnClickOverlay) return
-  // push 是布局占位而非弹层，全屏无外部可点——两者都不响应点击外部关闭
-  if (!isOverlayMode.value || props.fullscreen) return
+  if (!props.show) return
+  // 全屏满铺无外部可点，不响应点击外部关闭
+  if (props.fullscreen) return
   const target = event.target as HTMLElement | null
   if (target?.closest('.uikit-popup')) return
+  if (isOverlayMode.value) {
+    // overlay 模式：外部点击即遮罩点击，沿用 closeOnClickOverlay 语义
+    if (!props.closeOnClickOverlay) return
+  }
+  else if (!props.closeOnClickOutside) {
+    // push 模式为布局占位、无遮罩，需显式开启「点击外部（聊天区/空白处）关闭」
+    return
+  }
   close()
 }, { capture: false })
 </script>

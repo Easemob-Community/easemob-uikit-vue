@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
   showJoinRequests: false,
   mode: 'push',
   fullscreen: false,
+  closeOnClickOutside: true,
 })
 
 const emit = defineEmits<{
@@ -112,6 +113,8 @@ export interface ChatInfoDrawerProps {
   showJoinRequests?: boolean
   /** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡 */
   mode?: 'overlay' | 'push'
+  /** 点击抽屉外部（聊天区 / 空白处）是否关闭，默认 true；透传 ChatDrawer 的 closeOnClickOutside，仅 push 模式生效 */
+  closeOnClickOutside?: boolean
   /** 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头 */
   fullscreen?: boolean
   /** 抽屉宽度（px），默认 320；全屏模式忽略 */
@@ -766,6 +769,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
     :mode="props.mode"
     :width="props.width ?? 320"
     :fullscreen="props.fullscreen"
+    :close-on-click-outside="props.closeOnClickOutside"
     @update:show="emit('update:show', $event)"
     @close="onClose"
   >
@@ -1179,12 +1183,12 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-shrink: 0;
 }
 
-/* 成员区顶部 label（Members (N)）：18px/500、颜色与 header 标题同色（设计稿）；
-   横向内边距由外层 section-label-row 统一提供（16px，与 header 标题左边缘对齐），自身不再重复 padding */
+/* 成员区顶部 label（Members (N)）：与下方可编辑字段行 label（群名称/群公告）完全一致
+   的字体风格——12px 灰字（设计稿），横向内边距由外层 section-label-row 统一提供
+   （16px，与 header 标题左边缘对齐），自身不再重复 padding */
 .chat-info-drawer__section-label {
-  font-size: var(--uikit-font-size-18);
-  font-weight: 500;
-  color: var(--uikit-text-primary);
+  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-secondary);
 }
 
 .chat-info-drawer__section-label-row {
@@ -1462,11 +1466,17 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 /* footer 圆角胶囊按钮（设计稿：灰底通栏胶囊，高 42px、内 padding 上下 12px 左右 4px；
+   文字按 body/large/medium：Inter 16px/500/行高 normal，默认色 #000（可经变量主题化）；
    删除会话为灰底红字） */
 .chat-info-drawer__actions .chat-info-drawer__pill-btn {
   height: 42px;
   padding: 12px 4px;
   border-radius: 999px;
+  font-family: var(--uikit-font-family);
+  font-size: var(--uikit-font-size-16);
+  font-weight: var(--uikit-font-weight-medium);
+  line-height: normal;
+  color: var(--uikit-drawer-action-btn-color, #000000);
 }
 
 .chat-info-drawer__actions .chat-info-drawer__pill-btn--danger {

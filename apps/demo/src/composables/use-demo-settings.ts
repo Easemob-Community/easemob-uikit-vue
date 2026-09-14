@@ -367,6 +367,8 @@ function createDemoSettings() {
   const chatVariant = ref<'card' | 'compact'>('card')
   /** 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡（移动端一律回落全屏） */
   const chatDrawerMode = ref<'overlay' | 'push'>('push')
+  /** 点击抽屉外部（聊天区 / 空白处）自动关闭抽屉（仅 push 模式生效，默认 true，与库默认一致） */
+  const chatDrawerCloseOnClickOutside = ref(true)
 
   /* ===== 消息通知配置（EmNotification） ===== */
   /** 总开关 */
@@ -587,6 +589,7 @@ function createDemoSettings() {
     // 聊天容器风格
     chatVariant,
     chatDrawerMode,
+    chatDrawerCloseOnClickOutside,
     // 消息通知
     notificationEnable,
     notificationBrowser,

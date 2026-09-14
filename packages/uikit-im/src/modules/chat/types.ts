@@ -118,6 +118,13 @@ export interface ChatConfig {
     mode?: 'overlay' | 'push'
     /** 抽屉宽度（px），默认 320；push 与 overlay 模式均生效，全屏模式忽略 / Drawer width in px. Default 320; ignored in fullscreen */
     width?: number
+    /**
+     * 是否点击抽屉外部（聊天区 / 其他空白处）自动关闭，默认 true；仅 push 模式生效
+     *（overlay 模式由遮罩点击关闭，语义归口 closeOnClickOverlay），全屏模式忽略。
+     * Whether clicking outside the drawer (chat area / blank areas) closes it. Default true;
+     * only applies in 'push' mode (overlay mode closes via the mask click), ignored in fullscreen.
+     */
+    closeOnClickOutside?: boolean
   }
   /** 消息列表配置 */
   messageList?: {
@@ -417,10 +424,10 @@ export interface ChatDrawerProps {
   /** 抽屉顶部偏移，默认 0（数字表示 px，字符串透传 CSS 值）；push 与全屏模式下忽略 */
   offsetTop?: string | number
   /**
-   * 展示模式，默认 'push'：'push' 作为静态 flex 项占位挤压聊天区（无遮罩、点击外部不关闭）/
-   * 'overlay' 绝对定位覆盖聊天区。
-   * Display mode. Default 'push' (static flex item that squeezes the chat area, no mask,
-   * no click-outside-to-close); 'overlay' is an absolute overlay.
+   * 展示模式，默认 'push'：'push' 作为静态 flex 项占位挤压聊天区（无遮罩，点击外部关闭需开启
+   * closeOnClickOutside）/ 'overlay' 绝对定位覆盖聊天区（点击遮罩关闭由 closeOnClickOverlay 控制）。
+   * Display mode. Default 'push' (static flex item that squeezes the chat area, no mask — outside-click
+   * closing requires closeOnClickOutside); 'overlay' is an absolute overlay (mask-click closing via closeOnClickOverlay).
    */
   mode?: 'overlay' | 'push'
   /**
@@ -429,6 +436,13 @@ export interface ChatDrawerProps {
    * covers the whole chat container with no border radius.
    */
   fullscreen?: boolean
+  /**
+   * 点击抽屉外部（如聊天区、其他空白处）是否关闭，默认 true；仅 push 模式生效
+   *（overlay 模式由 closeOnClickOverlay 控制遮罩点击关闭），全屏模式忽略。
+   * Whether clicking outside the drawer (chat area / blank areas) closes it. Default true;
+   * only applies in 'push' mode (overlay mode relies on closeOnClickOverlay), ignored in fullscreen.
+   */
+  closeOnClickOutside?: boolean
 }
 
 /** 整块接管 `#drawer` 插槽的 scope / Slot scope for the whole-drawer takeover */

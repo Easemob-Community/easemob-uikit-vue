@@ -359,6 +359,9 @@ const drawerMode = computed(() => props.config?.drawer?.mode ?? 'push')
 /** 抽屉宽度（px），默认 320 */
 const drawerWidth = computed(() => props.config?.drawer?.width ?? 320)
 
+/** 点击抽屉外部（聊天区 / 空白处）是否自动关闭抽屉，默认 true；仅 push 模式生效 */
+const drawerCloseOnClickOutside = computed(() => props.config?.drawer?.closeOnClickOutside ?? true)
+
 /** 移动端窄屏（viewport < 768）：抽屉一律回落满铺全屏（独立页面观感） */
 const isMobileView = h5.isMobile
 
@@ -1395,6 +1398,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
             :mode="drawerMode"
             :width="drawerWidth"
             :fullscreen="isMobileView"
+            :close-on-click-outside="drawerCloseOnClickOutside"
             :group-management-display-mode="props.config?.groupManagement?.displayMode"
             :allow-chat="props.config?.groupMember?.allowChat"
             :show-mute-all="props.config?.groupManagement?.showMuteAll"
