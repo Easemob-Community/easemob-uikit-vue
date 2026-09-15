@@ -1086,8 +1086,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   <Modal
     v-model:show="confirmModal.show"
     :title="confirmModal.title"
+    :width="540"
     type="warning"
-    content-align="center"
     :confirm-text="t('button.confirm')"
     :cancel-text="t('button.cancel')"
     @confirm="onModalConfirm"
@@ -1122,8 +1122,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-shrink: 0;
 }
 
-/* header 内 icon 统一纯黑（设计稿 #000000，不随主题色）：
-   关闭 X 走 --uikit-drawer-close-color（可主题化覆盖，默认 #000），返回/上传与 X 同规格 */
+/* header 内 icon 统一走 --uikit-drawer-close-color（浅色默认 #000，暗色覆写为主文字色，可主题化覆盖）：
+   关闭 X、返回/上传同规格 */
 .chat-info-drawer__header .chat-info-drawer__close {
   color: var(--uikit-drawer-close-color, #000000);
 }
@@ -1468,7 +1468,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 /* footer 圆角胶囊按钮（设计稿：灰底通栏胶囊，高 42px、内 padding 上下 12px 左右 4px；
-   文字按 body/large/medium：Inter 16px/500/行高 normal，默认色 #000（可经变量主题化）；
+   文字按 body/large/medium：Inter 16px/500/行高 normal，浅色默认 #000、暗色经 token 覆写为主文字色）；
    删除会话为灰底红字） */
 .chat-info-drawer__actions .chat-info-drawer__pill-btn {
   height: 42px;

@@ -183,8 +183,8 @@ defineExpose({
     <Modal
       v-model:show="showUnblockConfirm"
       :title="t('chat.info.unblockMemberConfirmTitle')"
+      :width="540"
       type="warning"
-      content-align="center"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
       @confirm="confirmUnblock"

@@ -1453,8 +1453,8 @@ async function doRemoveAdmin(member: UiGroupMember) {
       <Modal
         v-model:show="showRemoveConfirmModal"
         :title="t('group.memberList.removeConfirmTitle')"
+        :width="540"
         type="warning"
-        content-align="center"
         :confirm-text="t('button.confirm')"
         :cancel-text="t('button.cancel')"
         @confirm="confirmRemoveMember"
@@ -1469,8 +1469,8 @@ async function doRemoveAdmin(member: UiGroupMember) {
       <Modal
         v-model:show="showAdminConfirmModal"
         :title="pendingAdminAction?.action === 'remove' ? t('chat.info.removeAdminConfirmTitle') : t('chat.info.setAdminConfirmTitle')"
+        :width="540"
         type="warning"
-        content-align="center"
         :confirm-text="t('button.confirm')"
         :cancel-text="t('button.cancel')"
         @confirm="confirmAdminAction"

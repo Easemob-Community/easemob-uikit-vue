@@ -214,7 +214,7 @@ async function onConfirmAction() {
               v-if="isOwner"
               icon="rect_notched/pen"
               :icon-size="22"
-              :style="{ color: '#C9CDCF' }"
+              :style="{ color: 'var(--uikit-drawer-field-action-color, #C9CDCF)' }"
               :title="t('chat.info.edit', '编辑')"
               @click="startEditName"
             />
@@ -241,7 +241,7 @@ async function onConfirmAction() {
         <div class="group-detail__footer">
           <button
             v-if="isOwner"
-            class="group-detail__action group-detail__action--danger"
+            class="group-detail__action"
             type="button"
             @click="openConfirm('destroy')"
           >
@@ -261,8 +261,9 @@ async function onConfirmAction() {
 
     <Modal
       v-model:show="confirmModal.show"
+      :title="confirmModal.action === 'destroy' ? t('chat.info.destroyGroup', '解散群聊') : t('chat.info.leaveGroup', '退出群聊')"
+      :width="540"
       type="warning"
-      content-align="center"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"
       @confirm="onConfirmAction"
@@ -391,10 +392,6 @@ async function onConfirmAction() {
 
 .group-detail__action:hover {
   opacity: 0.85;
-}
-
-.group-detail__action--danger {
-  color: var(--uikit-danger-color);
 }
 
 /* 群名称编辑弹窗输入框 */

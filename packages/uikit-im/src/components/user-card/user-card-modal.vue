@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
 import type { PresenceDisplayStatus, UserCardAction, UserCardInfoRow } from '@easemob/uikit-core'
-import { EmIcon as Icon, EmIconButton as IconButton, EmModal as Modal, EmPopup as Popup, EmUserCard as UserCard, createLogger, formatSdkError, useLocale, usePresence, useToast, useViewport } from '@easemob/uikit-core'
-import { onClickOutside, useEventListener } from '@vueuse/core'
+import { EmIcon as Icon, EmModal as Modal, EmPopup as Popup, EmUserCard as UserCard, createLogger, formatSdkError, useLocale, usePresence, useToast, useViewport } from '@easemob/uikit-core'
+import { useEventListener } from '@vueuse/core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useContact } from '../../composables/use-contact'
@@ -109,11 +109,9 @@ const confirmModal = ref<{
   action: null,
 })
 
-const isEditingRemark = ref(false)
+const remarkModalShow = ref(false)
 const remarkInput = ref('')
-const remarkEditRef = ref<HTMLElement>()
 const remarkInputRef = ref<HTMLInputElement>()
-let stopClickOutside: (() => void) | null = null
 
 watch(
   () => props.show,
@@ -126,26 +124,12 @@ watch(
   { immediate: true },
 )
 
-watch(
-  isEditingRemark,
-  (editing) => {
-    if (editing) {
-      void nextTick(() => {
-        remarkInputRef.value?.focus()
-        stopClickOutside = onClickOutside(remarkEditRef, () => {
-          cancelEditRemark()
-        })
-      })
-    }
-    else {
-      stopClickOutside?.()
-      stopClickOutside = null
-    }
-  },
-)
-
-onUnmounted(() => {
-  stopClickOutside?.()
+// 备注编辑弹窗打开后自动聚焦输入框
+watch(remarkModalShow, async (show) => {
+  if (show) {
+    await nextTick()
+    remarkInputRef.value?.focus()
+  }
 })
 
 async function loadData() {
@@ -227,7 +211,7 @@ const cardActions = computed<UserCardAction[]>(() => {
       actions.push({
         key: 'delete',
         label: t('userCard.deleteContact', '删除联系人'),
-        type: 'danger',
+        type: 'default',
         block: true,
       })
     }
@@ -313,13 +297,13 @@ useEventListener(window, 'scroll', (event: Event) => {
 
 function startEditRemark() {
   remarkInput.value = remark.value
-  isEditingRemark.value = true
+  remarkModalShow.value = true
 }
 
 async function saveRemark() {
   try {
     await setContactRemark(props.userId, remarkInput.value)
-    isEditingRemark.value = false
+    remarkModalShow.value = false
     emit('remark-changed', props.userId, remarkInput.value)
     showToast(t('contact.detail.remarkSaved', '备注已保存'), 'success')
   }
@@ -330,10 +314,10 @@ async function saveRemark() {
 }
 
 function cancelEditRemark() {
-  if (!isEditingRemark.value)
+  if (!remarkModalShow.value)
     return
   remarkInput.value = remark.value
-  isEditingRemark.value = false
+  remarkModalShow.value = false
 }
 
 function openConfirm(action: 'delete' | 'block' | 'unblock') {
@@ -398,7 +382,8 @@ async function onAddContact() {
 function onActionClick(key: string) {
   if (key === 'message') {
     emit('send-message', props.userId)
-    onClose()
+    // 主动关闭需走 closeModal（emit update:show(false)）；onClose 只适用于 Popup 自身触发的关闭
+    closeModal()
   }
   else if (key === 'audio') {
     emit('audio-call', props.userId)
@@ -464,43 +449,17 @@ function onPresenceChanged() {
         @info-click="onInfoClick"
         @presence-changed="onPresenceChanged"
       >
-        <!-- User Alias（备注）编辑区，注入 UserCard 的 #meta-extra（profile 之后、actions 之前） -->
+        <!-- User Alias（备注）区，注入 UserCard 的 #meta-extra（profile 之后、actions 之前）；编辑统一走 modal -->
         <template #meta-extra>
           <div v-if="showAliasSection" class="user-card-modal__alias">
             <div class="user-card-modal__alias-main">
               <span class="user-card-modal__alias-label">{{ t('userCard.alias', '备注') }}</span>
-              <div v-if="isEditingRemark" ref="remarkEditRef" class="user-card-modal__alias-edit">
-                <input
-                  ref="remarkInputRef"
-                  v-model="remarkInput"
-                  class="user-card-modal__alias-input"
-                  type="text"
-                  @keyup.enter="saveRemark"
-                  @keyup.esc="cancelEditRemark"
-                >
-                <IconButton
-                  icon="check/single"
-                  size="small"
-                  type="success"
-                  :title="t('button.confirm', '确认')"
-                  @click="saveRemark"
-                />
-                <IconButton
-                  icon="xmark/bold"
-                  size="small"
-                  type="danger"
-                  :title="t('button.cancel', '取消')"
-                  @click="cancelEditRemark"
-                />
-              </div>
               <span
-                v-else
                 class="user-card-modal__alias-value"
                 :class="{ 'is-empty': !remark }"
               >{{ remark || t('userCard.noValue', '暂无') }}</span>
             </div>
             <button
-              v-if="!isEditingRemark"
               type="button"
               class="user-card-modal__alias-edit-btn"
               :title="t('contact.detail.edit', '编辑')"
@@ -519,14 +478,33 @@ function onPresenceChanged() {
       <Modal
         v-model:show="confirmModal.show"
         :title="confirmModal.title"
+        :width="540"
         type="warning"
-        content-align="center"
         :confirm-text="t('button.confirm', '确认')"
         :cancel-text="t('button.cancel', '取消')"
         @confirm="onConfirmAction"
         @cancel="confirmModal.show = false"
       >
         {{ confirmModal.content }}
+      </Modal>
+
+      <!-- 备注编辑弹窗（与 contact-detail 同款：行内编辑已移除，统一 modal 编辑） -->
+      <Modal
+        v-model:show="remarkModalShow"
+        :title="t('userCard.alias', '备注')"
+        :confirm-text="t('button.confirm', '确认')"
+        :cancel-text="t('button.cancel', '取消')"
+        @confirm="saveRemark"
+        @cancel="cancelEditRemark"
+      >
+        <input
+          ref="remarkInputRef"
+          v-model="remarkInput"
+          class="user-card-modal__remark-input"
+          type="text"
+          :placeholder="t('userCard.alias', '备注')"
+          @keyup.enter="saveRemark"
+        >
       </Modal>
     </div>
   </Popup>
@@ -619,19 +597,10 @@ function onPresenceChanged() {
   cursor: pointer;
 }
 
-.user-card-modal__alias-edit {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.user-card-modal__alias-input {
-  flex: 1;
-  min-width: 0;
-  height: 32px;
+.user-card-modal__remark-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 36px;
   padding: 0 10px;
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   border-radius: var(--uikit-components-radius, 6px);
@@ -641,7 +610,7 @@ function onPresenceChanged() {
   outline: none;
 }
 
-.user-card-modal__alias-input:focus {
+.user-card-modal__remark-input:focus {
   border-color: var(--uikit-primary-color, #3b82f6);
 }
 </style>

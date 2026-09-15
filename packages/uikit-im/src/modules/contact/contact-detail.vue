@@ -281,7 +281,7 @@ async function onConfirmAction() {
             {{ blocked ? t('contact.detail.unblock', '取消拉黑') : t('userCard.blockedContact', '拉黑联系人') }}
           </button>
           <button
-            class="contact-detail__action contact-detail__action--danger"
+            class="contact-detail__action"
             type="button"
             @click="openConfirm('delete')"
           >
@@ -294,8 +294,8 @@ async function onConfirmAction() {
     <Modal
       v-model:show="confirmModal.show"
       :title="confirmModal.title"
+      :width="540"
       type="warning"
-      content-align="center"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"
       @confirm="onConfirmAction"
@@ -463,10 +463,6 @@ async function onConfirmAction() {
 
 .contact-detail__action:hover {
   opacity: 0.85;
-}
-
-.contact-detail__action--danger {
-  color: var(--uikit-danger-color);
 }
 
 @media (max-width: 640px) {
