@@ -46,6 +46,25 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [ ] D133. 存量业务弹窗（14 个）自绘壳未收敛到升级后的 `EmModal` / `EmContactTransferModal`
+
+- **现象**：2026-09-14 前基础 `EmModal`（core）能力太薄（居中标题、无 ×、无分割线、无 footer slot、等宽铺满按钮），导致 14 个业务弹窗全部基于 `EmPopup` 自绘壳，header/footer/关闭按钮/移动端 bottom 回落 CSS 在 6+ 文件逐字重复，4 处（`block-list-add-modal`、`mute-list`、`block-list`、`presence-selector`）甚至用原生 `<button>` 手写按钮样式绕开 `EmButton`。
+- **现状**：`EmModal` 已按设计稿升级（左对齐标题 + 右上 × + header 分割线 + 右对齐 pill 按钮[确认左/取消右] + `footerAlign="stretch"` 兼容旧布局 + 内置移动端 bottom 回落 + `title/icon/footer` 插槽 + `width`）；`EmButton` 新增 `type="outline"` 与 `pill`；新增穿梭框弹窗 `EmContactTransferModal`（`modules/contact/contact-transfer-modal.vue`）收编左右双栏 + 字母索引条 + 已选 × 移除结构。
+- **待收敛清单**：
+  - 二次确认类（10 处 EmModal 旧用法）：视觉自动跟随新默认，需逐个目视回归确认；
+  - 自绘壳弹窗：`forward-modal` / `message-search-modal` / `group-read-receipt-modal` / `combine-message-modal` / `new-chat-modal` / `block-list-add-modal` / `chat-info-drawer-field-edit-modal` / `chat-info-drawer-member-remove-modal` / `group-management-section` 二级面板 / `presence-selector-modal` 迁到 `EmModal`（`show-footer=false` + 自绘内容或标准 footer）；
+  - 穿梭结构：`create-group-modal` / `invite-member-modal` 迁到 `EmContactTransferModal`（或复用其双栏结构）；
+  - 原生 `<button>` 手写按钮 4 处全部换 `EmButton`。
+- **进度（2026-09-14）**：`new-chat-modal` / `block-list-add-modal` / `add-contact-modal` 已迁 `EmModal`；`EmModal` 新增 `confirmDisabled` / `confirmLoading` / `confirmAutoClose` / `bodyFlush` props 承接异步表单与列表贴边场景，`block-list-add-modal` 原生 button 已清除。
+- **关联**：`uikit-component-authoring` / `uikit-styling-theming`；设计稿 Modal 五形态（Shuttle/Form/Text/Text-Icon 左/Text-Icon 居中）已落到 `modal.story.vue` 与 `contact-transfer-modal.story.vue`。
+
+### [ ] D134. `chat.vue` 单聊抽屉「添加 → 发起群聊」弹窗硬编码，宿主无法接管（D120 同类缺口）
+
+- **现象**：`modules/chat/chat.vue` 硬编码渲染 `<CreateGroupModal v-model:show :config="{ initialSelectedIds }" />`（约 L1504），未像 `#invite-member` / `#forward` 那样包插槽，也不透传 `createFn`。宿主只能通过两条旁路接管创建动作：会话列表 `#create-group` 插槽（ConversationList → ConversationContainer 已透传）或 `EmContactContainer` 的 `@create-group` 事件自绘弹窗；单聊抽屉这条入口无任何 demo/业务层接管点。demo 为实现「群名 = 群组 + 创建日期时间」在 `demo-page.vue` 用 `create-fn` 委托 `useGroup().createGroup` 覆盖了会话列表/通讯录入口，抽屉入口仍走默认自动群名。
+- **建议修法**：`chat.vue` 该弹窗补 `#create-group` 插槽（scope 提供 `show` / `initialSelectedIds` / `close`，仿 `#invite-member`），`EmChatContainer` 透传；或把 `createFn` 下沉为 Provider/chat 级配置一次性覆盖所有入口。
+- **附带观察**：`create-group-modal.vue` 的 `createFn` 接管后，弹窗仍用 `finalName`（自动群名）写本地会话（`stores.conversation.addConversation`），与服务端实际群名不一致，需等会话同步纠正；若 `createFn` 成为公开推荐路径，弹窗应改用 `params.name` 或回调结果回填。
+- **关联**：D120（插槽/Props 可控性矩阵）/ D133（`create-group-modal` 壳收敛）；demo 侧实现见 `apps/demo/src/demo-page.vue` `demoCreateGroup`。
+
 ### [x] D20. `Avatar` shape 在卡片与列表项中被硬编码，未遵循主题 `avatarShape`
 
 - **现象**：`UserCard` 硬编码 `shape="circle"`、`GroupCard` 硬编码 `shape="square"`，`ContactItem*` / `GroupItem*` / `ContactList` / `GroupList` 的 `avatarShape` 默认值也硬编码为 `'circle'` / `'rounded'`。当用户通过主题设置把头像改成方形/圆角时，名片和列表项不会跟随变化。
@@ -78,6 +97,7 @@
   - 2026-07-28 复核：`--uikit-text-tertiary` / `--uikit-bg-tertiary` 已在 `theme/index.css:11,16` 定义（本条部分描述已过时）；`--uikit-primary-rgb` 已在 `theme/index.css:23` 定义但固定 `59, 130, 246`（蓝），既不等于默认 primary `hsl(203,100%,60%)`，且 `store/theme.ts:111` 改主题色时不同步重算 → cell 契约 pinned 态 `rgba(var(--uikit-primary-rgb), 0.04)` 永远是错误的蓝。
 - **建议修法**：确定这些语义 token 是否该存在——该存在的补进 `theme/index.css`（含暗色），不该存在的替换为既有 token；统一 fallback。
 - **修复**：2026-08-05 主题 Phase 1 完成：`theme/index.css` 已统一定义上述变量（含暗色）；`store/theme.ts` 新增 `--uikit-primary-hover` 运行时同步，确保改主题色后别名与 `rgba(var(--uikit-primary-rgb), α)` 同步；worst offenders 中的不一致 fallback 已统一或移除。
+- **追记**：2026-09-14 核销同类复发——`--uikit-drawer-close-color` / `--uikit-drawer-action-btn-color` / `--uikit-drawer-field-action-color` / `--uikit-member-name-color` 四个变量只在组件侧引用、从未定义，暗色下抽屉图标与群成员名恒黑不可读；已补进 core `theme/index.css`（`:root` + 暗色段），并将成员状态标签硬编码色（禁言 `#A9AEB2` / 拉黑 `#484D51`）一并 token 化（`--uikit-member-tag-muted/blocked-color`，底色改 color-mix 派生）。
 - **关联 skill**：`uikit-styling-theming`
 
 ### [x] D5. `loaded + explicitCount` 计数模式只落地了一半
@@ -1394,3 +1414,24 @@
   - 修复：`packages/uikit-im/vite.config.ts` 的 `@easemob/uikit-core/theme` alias 由 `../uikit-core/src/theme/index.css` 改为 `../uikit-core/dist/theme/index.css`；同步更新 `src/theme/index.css` 注释说明"内联 core dist（变量+组件样式）"与新构建顺序要求（core 先构建，`pnpm -r build` 按拓扑序自动满足）。重建后 `dist/theme/index.css` 由 149KB 增至 201KB，已确认内联 `.uikit-avatar` / `.uikit-popup` / `.uikit-icon-button` 等 core 组件 scoped 样式；重新 `pnpm pack` 生成的 tgz 已替换进复现工程并 `pnpm install`，`node_modules/@easemob/uikit-im/dist/theme/index.css` 现含 core 组件样式（`uikit-avatar[data-v-c6ed0614]`、`uikit-popup[data-v-45fed6cb]`）。
   - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）+ `pnpm -F @easemob/uikit-im build`（成功）+ `cd apps/demo && pnpm exec vue-tsc --noEmit`（0 错误）均通过。
   - 关联 skill：`uikit-release-build` / `uikit-styling-theming` / `uikit-chat-interactions`。
+
+- [x] **D135. 单群聊对外能力文档覆盖缺口走查与补齐（2026-09-15 全量盘点 + 当日修复完毕）**
+  - 进度（2026-09-15 当日已补大部分，`cd apps/docs && pnpm build` 通过）：
+    - 已修：theme.md `setHoverStyle` 过期错误（顺带修 business 预设 hover 列与 4 个 hover token）；chat-container.md 幽灵抽屉插槽（表收敛为源码实际 6 个 outlet + 2.2.0 合并说明，顺带修 footer 默认内容描述、补 ChatInfoDrawerSlotScope 缺失字段）；gen-api-docs.mjs JSDoc「@我」截断缺陷（非标准 tag 一律拼回，6 处说明恢复完整；gen:api 44/44）。
+    - 已补指南：quickstart 全局注册补 `import '@easemob/uikit-im/websdk5'`；advanced 新增「SDK 适配器」章 + 3.0 迁移段；provider.md 补 adapter 注入 / repositories / capabilities 三小节；stores.md 补 useSyncStatus / setOptions(maxCachedConversations) / kicked·kickCode；conversation-container.md 状态横幅补被踢分支（含 206/214/216 差异化文案）；design-tokens.md 补 file-icon 9 token + badge-bg。
+    - 已补组件页：新建 group-management.md（群管理整组：EmGroupManagementSection + 5 接管插槽 + 5 管理子组件 + GroupAnnouncement + GroupMemberList + GroupDetail）、block-list.md（黑名单整组 + ContactListContainer + 容器级黑名单配置）、text/checkbox/copyable-text.md（含真实 demo，进 gen 白名单）；既有页补节：chat-container（ChatInfoDrawer 独立 props 表 + GroupReadReceiptModal + InviteMemberModal）、user-card/group-card（弹窗形态）、modal（ContactTransferModal）、presence-selector（Modal/Popup 变体）、contact-container（ContactDetail / ContactNoticeList persist）、address-book-container（黑名单 props/事件/方法）。sidebar 已登记 5 个新页（基础 13 / 业务模块 10）。
+    - 走查中发现的额外事实已按实际口径写入文档：ChatInfoDrawer 默认 UI 已无拉黑入口（block-changed 仅事件声明）；drawer-footer 为单群一致的「清空聊天记录 + 删除会话」；GroupManagement 部分管理子组件 emits 实际回传 `{ userId }` 而非声明的 `UiGroupMember`。
+    - 顺带收敛：gen:api 重跑补齐 button/icon-button/input/modal 四张表的源码先行陈旧漂移。
+  - 收尾（2026-09-15 当晚完成，`pnpm build` 通过）：
+    - `sdkConfig.persistence` 指南已补：advanced.md「SDK 适配器」章新增「旁路持久化（sdkConfig.persistence）」小节（两域七钩子签名 + 触发时机表 + Electron/SQLite 示意接入 + 与 repositories 的读写边界），provider.md 互链；触发时机按双 adapter 实际行为写（如发送成功走 saveMessage 不走 updateMessageStatus、注入 repositories 后漫游不 write-back），类型从 `@easemob/uikit-sdk-contract` 导入；
+    - 模块组件 API 表已转 gen 自动生成：白名单新增 25 项（components +4 / modules +18 / containers +3），gen:api 68/68 0 warn，24 个新产物，既有产物零漂移；group-management / block-list / chat-container（ChatInfoDrawer·InviteMemberModal·GroupReadReceiptModal）/ user-card / group-card / modal / presence-selector / contact-container（detail·notice-list 段）/ address-book-container 的手写表换为 `@include`，手写核实的语义注记（如「实际回传 { userId }」、deprecated 分组、默认 UI 已移除拉黑入口）保留为 prose；EmContactContainer 聚合容器因成员无 JSDoc + 废弃别名依赖 @deprecated 语义，评估后保留手写；
+    - 顺带更新 `.agent/skills/uikit-docs-authoring/SKILL.md` §6 已知漂移（组件计数 基础 15 / 业务模块 10、contact-container「尚未实现」过时描述）。
+  - 原始缺口清单（走查记录，供回溯）：
+    - 背景：按 CHANGELOG 版本段 + 源码公开出口双路走查「已发布但 apps/docs 未覆盖」的单群聊能力，以下为确认缺口（均已 grep/read 核实）：
+    - **接入指南类（优先级最高）**：
+      - 3.0 adapter 架构对外接入未写进指南：子路径入口 `import '@easemob/uikit-im/websdk5'`（4.x 用 `/webim4`）、Provider `adapter` prop 注入模式、`sdkConfig.repositories`、`useUIKit().capabilities`、`getUIKitAdapter()`；quickstart.md 全局注册示例缺子路径 import；advanced.md 迁移指南停留在旧三条；
+      - `guide/theme.md:312` `setHoverStyle('lift') // 'none' | 'light' | 'lift'` 与源码 `HoverStyle = 'default' | 'rounded' | 'square'`（core store/theme.ts:9）完全对不上，过期错误文档。
+    - **组件页缺失（有独立配置面，无页无 API 表）**：`EmText` / `EmCheckbox` / `EmCopyableText`（core 原子）；`EmGroupMemberList`（allowChat 等）/ `EmGroupDetail` / `EmGroupManagementSection`（含 #mute-list/#block-list/#allow-list/#shared-files/#join-requests 五个接管插槽与 `GroupManagementSectionSlotScope`）/ `EmGroupAnnouncement` / `EmGroupMuteList` / `EmGroupBlocklist` / `EmGroupAllowlist` / `EmGroupSharedFileList` / `EmGroupJoinRequestList`（群管理五子页整组）；`EmContactDetail` / `EmContactNoticeList`（persist prop）/ `EmBlockList` / `EmBlockListAddModal` / `EmContactTransferModal`；`EmInviteMemberModal`；`EmPresenceSelectorModal`（+ Popup 变体）；`EmChatInfoDrawer` 组件本体 props（20+ 项）；`EmUserCardModal` / `EmGroupCardModal` 弹窗形态；`EmGroupReadReceiptModal`；容器 `EmContactListContainer` / `EmBlockListContainer`。黑名单系（2.4/2.5）`showBlocklist`/`blocklistLabel`/`goBlocklist()`/`block-changed` 等在 contact-container.md / address-book-container.md 也无记载。
+    - **指南/状态类**：`useSyncStatus()`（2.8.6）未进 stores.md / advanced.md 组合式清单；`MessageStoreOptions.maxCachedConversations`（3.1.0）stores.md 未写；被踢下线 `kicked`/`kickCode`（core 2.4）未进 stores.md，`conversation-container.md` 状态横幅节无被踢分支；`--uikit-file-icon-*` 9 个 token（core 2.6）与 `--uikit-badge-bg`（core 2.3）未进 design-tokens.md；`sdkConfig.persistence`（Electron 持久化钩子）无指南。
+    - **文档与源码不符（反向漂移，需先对齐实现对错边）**：chat-container.md:223-232 手写抽屉插槽表列了 `drawer-profile` / `drawer-announcement` / `drawer-admin-actions` / `drawer-management` 4 个源码不存在的插槽（chat-info-drawer.vue 实际仅 6 个 outlet：drawer-header/members/settings/actions/member-detail/footer；CHANGELOG 2.2.0 还声称 drawer-remark，亦不存在）；gen 脚本 JSDoc 解析把「@我」误判为 tag 导致 enableAtMe / enableMentionHighlight / locateOnMentionClick / at-me-click 等说明被截断（gen/uikit-provider.md:24、gen/chat-container.md:258/260/267、gen/conversation-container.md:39）。
+    - 修复路径建议：先修 theme.md 错误与 chat-container.md 幽灵插槽（低成本高收益）；接入指南（3.0 adapter）补 quickstart/advanced/provider；组件页按「容器页补节 vs 独立页 + gen 白名单」逐个评估；gen 脚本 JSDoc 截断问题在 gen-api-docs.mjs 侧修。

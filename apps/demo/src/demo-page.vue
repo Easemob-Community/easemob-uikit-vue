@@ -17,6 +17,7 @@ import {
   useContactStore,
   useConversation,
   useConversationTabs,
+  useGroup,
   useLocale,
   useMessageSend,
   useNotification,
@@ -24,7 +25,7 @@ import {
   useUIKit,
   useViewport,
 } from '@easemob/uikit-im'
-import type { ConversationTabKey, CustomMessageBody, UiContact, UiGroup, UiMessage } from '@easemob/uikit-im'
+import type { ConversationTabKey, CreateGroupParams, CustomMessageBody, UiContact, UiGroup, UiMessage } from '@easemob/uikit-im'
 import NavSidebar from './components/nav-sidebar.vue'
 import DemoCardMessage from './components/demo-card-message.vue'
 import DemoCardPickerModal from './components/demo-card-picker-modal.vue'
@@ -263,6 +264,28 @@ const detailGroupId = ref<string | null>(null)
 // 通讯录操作弹窗
 const showAddContactModal = ref(false)
 const showCreateGroupModal = ref(false)
+
+const { createGroup } = useGroup()
+
+/** demo 造数：群名称格式化为「群组 + 创建日期时间」，便于区分多次创建的群 */
+function formatDemoGroupName() {
+  const d = new Date()
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `群组 ${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+}
+
+/**
+ * 接管创建群组动作（EmCreateGroupModal create-fn）：
+ * 改名为「群组 + 创建日期时间」后委托 useGroup().createGroup 走 SDK 默认创建；
+ * 弹窗创建成功后仍会用自动生成的旧名字写入本地会话，这里在宏任务补一次改名，
+ * 避免会话列表短暂显示旧名（下次会话同步后同样会纠正为服务端群名）。
+ */
+async function demoCreateGroup(params: CreateGroupParams) {
+  const name = formatDemoGroupName()
+  const result = await createGroup({ ...params, name })
+  setTimeout(() => stores.conversation.updateConversation(result.groupId, { name }), 0)
+  return result
+}
 
 // 名片消息演示：用户名片弹窗
 const showCardUserId = ref('')
@@ -568,6 +591,10 @@ watch(
               </span>
             </div>
           </template>
+          <!-- 创建群组接管：群名改为「群组 + 创建日期时间」（区分造数） -->
+          <template #create-group="{ show, close }">
+            <EmCreateGroupModal :show="show" :create-fn="demoCreateGroup" @update:show="close" />
+          </template>
         </EmConversationContainer>
         <EmContactContainer
           v-else
@@ -764,6 +791,10 @@ watch(
                 </span>
               </div>
             </template>
+            <!-- 创建群组接管：群名改为「群组 + 创建日期时间」（区分造数） -->
+            <template #create-group="{ show, close }">
+              <EmCreateGroupModal :show="show" :create-fn="demoCreateGroup" @update:show="close" />
+            </template>
           </EmConversationContainer>
           <EmContactContainer
             v-else
@@ -916,7 +947,7 @@ watch(
 
     <!-- 添加好友 / 创建群组 / 名片弹窗 -->
     <EmAddContactModal v-model:show="showAddContactModal" />
-    <EmCreateGroupModal v-model:show="showCreateGroupModal" />
+    <EmCreateGroupModal v-model:show="showCreateGroupModal" :create-fn="demoCreateGroup" />
     <EmUserCardModal v-model:show="showCardModal" :user-id="showCardUserId" @send-message="enterChatWithUser" />
     <DemoCardPickerModal
       v-model:show="showCardPickerModal"
