@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmModal as Modal } from '@easemob/uikit-core'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
 import { EmCell as Cell } from '@easemob/uikit-core'
 import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
@@ -107,105 +107,79 @@ async function onConfirm() {
 </script>
 
 <template>
-  <Popup
+  <Modal
     :show="props.show"
-    position="center"
-    :close-on-click-overlay="true"
+    :title="t('contact.blocklist.add', '添加黑名单')"
+    :width="360"
+    :confirm-text="t('button.confirm', '确定')"
+    :confirm-disabled="selectedIds.size === 0"
+    :confirm-auto-close="false"
+    body-flush
     @update:show="(v: boolean) => emit('update:show', v)"
-    @close="close"
+    @confirm="onConfirm"
+    @cancel="close"
   >
-    <div class="block-list-add-modal" @pointerdown.stop @click.stop>
-      <div class="block-list-add-modal__header">
-        <span class="block-list-add-modal__title">{{ t('contact.blocklist.add', '添加黑名单') }}</span>
-      </div>
-
-      <div class="block-list-add-modal__search">
-        <Input
-          v-model="keyword"
-          variant="search"
-          clearable
-          clear-icon="search/xmark"
-          :placeholder="t('contact.searchPlaceholder', '搜索联系人...')"
-          prefix-icon="search"
-        />
-      </div>
-
-      <div class="block-list-add-modal__body">
-        <div v-if="filteredContacts.length === 0" class="block-list-add-modal__empty">
-          {{ t('contact.blocklist.emptySelectable', '暂无可添加的联系人') }}
-        </div>
-        <Cell
-          v-for="contact in filteredContacts"
-          :key="contact.userId"
-          class="block-list-add-modal__item"
-          size="compact"
-          :title="displayName(contact)"
-          :selected="selectedIds.has(contact.userId)"
-          @click="toggleSelect(contact)"
-        >
-          <template #leading>
-            <Avatar :name="displayName(contact)" :src="contact.avatar" :size="36" />
-          </template>
-          <template #trailing>
-            <Checkbox :checked="selectedIds.has(contact.userId)" />
-          </template>
-        </Cell>
-      </div>
-
-      <div class="block-list-add-modal__footer">
-        <button class="block-list-add-modal__btn block-list-add-modal__btn--cancel" @click="close">
-          {{ t('button.cancel', '取消') }}
-        </button>
-        <button
-          class="block-list-add-modal__btn block-list-add-modal__btn--confirm"
-          :disabled="selectedIds.size === 0"
-          @click="onConfirm"
-        >
-          {{ t('button.confirm', '确定') }}
-        </button>
-      </div>
+    <div class="block-list-add-modal__search">
+      <Input
+        v-model="keyword"
+        variant="search"
+        clearable
+        clear-icon="search/xmark"
+        :placeholder="t('contact.searchPlaceholder', '搜索联系人...')"
+        prefix-icon="search"
+      />
     </div>
-  </Popup>
+
+    <div class="block-list-add-modal__body">
+      <div v-if="filteredContacts.length === 0" class="block-list-add-modal__empty">
+        {{ t('contact.blocklist.emptySelectable', '暂无可添加的联系人') }}
+      </div>
+      <Cell
+        v-for="contact in filteredContacts"
+        :key="contact.userId"
+        class="block-list-add-modal__item"
+        size="compact"
+        :title="displayName(contact)"
+        :selected="selectedIds.has(contact.userId)"
+        @click="toggleSelect(contact)"
+      >
+        <template #leading>
+          <Avatar :name="displayName(contact)" :src="contact.avatar" :size="36" />
+        </template>
+        <template #trailing>
+          <Checkbox :checked="selectedIds.has(contact.userId)" />
+        </template>
+      </Cell>
+    </div>
+  </Modal>
 </template>
 
 <style scoped>
-.block-list-add-modal {
-  width: 360px;
-  max-width: 90vw;
-  max-height: 70vh;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 8px);
-  overflow: hidden;
-}
-
-.block-list-add-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 16px;
-}
-
-.block-list-add-modal__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
-  color: var(--uikit-text-primary);
-}
-
 .block-list-add-modal__search {
-  padding: 0 16px 8px;
+  padding: 16px 24px 8px;
+  flex-shrink: 0;
 }
 
 .block-list-add-modal__body {
-  flex: 1;
-  min-height: 0;
+  height: min(50vh, 400px);
   overflow-y: auto;
-  padding: 4px 8px;
 }
 
+/* 行对齐 Shuttle 范式：通栏无间距，行间发丝线左内收（避开头像列，从名字起点开始） */
 .block-list-add-modal__item {
-  --uikit-item-hover-padding-x: 8px;
+  --uikit-item-hover-padding-x: 24px;
+  margin-bottom: 0;
+}
+
+.block-list-add-modal__item::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--uikit-item-hover-padding-x, 24px) + 36px + 10px);
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
 }
 
 .block-list-add-modal__empty {
@@ -213,47 +187,5 @@ async function onConfirm() {
   padding: 32px 16px;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-secondary);
-}
-
-.block-list-add-modal__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 12px 16px;
-}
-
-.block-list-add-modal__btn {
-  padding: 6px 16px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
-  cursor: pointer;
-  transition: all var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-@media (hover: hover) {
-  .block-list-add-modal__btn:hover {
-    background-color: var(--uikit-bg-secondary);
-  }
-}
-
-.block-list-add-modal__btn--confirm {
-  border-color: var(--uikit-primary-color);
-  background-color: var(--uikit-primary-color);
-  color: var(--uikit-text-inverse);
-}
-
-@media (hover: hover) {
-  .block-list-add-modal__btn--confirm:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-}
-
-.block-list-add-modal__btn--confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmAvatar as Avatar, EmButton as Button, EmCell as Cell, EmIcon as Icon, EmInput as Input, EmPopup as Popup, useLocale, useViewport } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmButton as Button, EmCell as Cell, EmIcon as Icon, EmInput as Input, EmModal as Modal, useLocale } from '@easemob/uikit-core'
 import type { UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useContact } from '../../composables/use-contact'
@@ -34,7 +34,6 @@ const props = defineProps<AddContactModalProps>()
 const emit = defineEmits<AddContactModalEmits>()
 
 const { t } = useLocale()
-const { isMobile } = useViewport()
 const { stores, dataSource } = useUIKit()
 const { addContact, searchUsers } = useContact()
 
@@ -140,140 +139,103 @@ watch(
 </script>
 
 <template>
-  <Popup
+  <Modal
     :show="props.show"
-    :position="isMobile ? 'bottom' : 'center'"
-    :show-close="true"
+    :title="t('conversation.addContact', '添加联系人')"
+    :width="400"
+    :confirm-text="t('button.confirm', '确认')"
+    :confirm-disabled="!canSubmit"
+    :confirm-loading="loading"
+    :confirm-auto-close="false"
     @update:show="emit('update:show', $event)"
-    @close="onClose"
+    @confirm="onConfirm"
+    @cancel="onClose"
   >
-    <div class="add-contact-modal" :class="{ 'add-contact-modal--mobile': isMobile }">
-      <div class="add-contact-modal__header">
-        <span class="add-contact-modal__title">{{ t('conversation.addContact', '添加联系人') }}</span>
-      </div>
-      <!-- #body 插槽：完全接管弹窗主体 -->
-      <div v-if="$slots.body" class="add-contact-modal__body">
-        <slot name="body" />
-      </div>
-      <div v-else class="add-contact-modal__body">
-        <!-- 搜索模式：关键字搜索 + 候选结果 -->
-        <template v-if="searchable">
-          <div class="add-contact-modal__field">
-            <label class="add-contact-modal__label">{{ t('contact.searchUser', '搜索用户') }}</label>
-            <div class="add-contact-modal__search-row">
-              <Input
-                v-model="keyword"
-                variant="default"
-                :placeholder="t('contact.searchUserPlaceholder', '输入手机号 / 邮箱 / 用户 ID')"
-                @submit="onSearch"
-              />
-              <Button
-                type="primary"
-                size="small"
-                :disabled="!keyword.trim()"
-                :loading="searching"
-                @click="onSearch"
-              >
-                {{ t('contact.search', '搜索') }}
-              </Button>
-            </div>
-          </div>
-          <div v-if="searched" class="add-contact-modal__search-results">
-            <Cell
-              v-for="item in searchResults"
-              :key="item.userId"
-              :title="item.name || item.userId"
-              :subtitle="item.userId"
-              :active="selectedUserId === item.userId"
-              size="normal"
-              :border="false"
-              :auto-height="true"
-              @click="onSelectResult(item)"
+    <!-- #body 插槽：完全接管弹窗主体 -->
+    <div v-if="$slots.body" class="add-contact-modal__body">
+      <slot name="body" />
+    </div>
+    <div v-else class="add-contact-modal__body">
+      <!-- 搜索模式：关键字搜索 + 候选结果 -->
+      <template v-if="searchable">
+        <div class="add-contact-modal__field">
+          <label class="add-contact-modal__label">{{ t('contact.searchUser', '搜索用户') }}</label>
+          <div class="add-contact-modal__search-row">
+            <Input
+              v-model="keyword"
+              variant="default"
+              :placeholder="t('contact.searchUserPlaceholder', '输入手机号 / 邮箱 / 用户 ID')"
+              @submit="onSearch"
+            />
+            <Button
+              type="primary"
+              size="small"
+              :disabled="!keyword.trim()"
+              :loading="searching"
+              @click="onSearch"
             >
-              <template #leading>
-                <Avatar :src="item.avatar" :name="item.name" :size="36" />
-              </template>
-              <!-- #search-result 插槽：自定义结果项渲染（默认勾选图标） -->
-              <template #trailing>
-                <slot name="search-result" :item="item">
-                  <Icon v-if="selectedUserId === item.userId" name="check" :size="16" class="add-contact-modal__result-check" />
-                </slot>
-              </template>
-            </Cell>
-            <div v-if="searchResults.length === 0" class="add-contact-modal__search-empty">
-              {{ errorMsg || t('contact.searchEmpty', '未找到匹配的用户') }}
-            </div>
+              {{ t('contact.search', '搜索') }}
+            </Button>
           </div>
-        </template>
-        <div class="add-contact-modal__field">
-          <label class="add-contact-modal__label">{{ t('contact.userId', '用户 ID') }}</label>
-          <Input
-            v-model="userId"
-            variant="default"
-            :placeholder="t('contact.addContactPlaceholder', '输入用户 ID')
-            "
-            @submit="onConfirm"
-          />
         </div>
-        <div class="add-contact-modal__field">
-          <label class="add-contact-modal__label">{{ t('contact.inviteReason', '附言') }}</label>
-          <Input
-            v-model="reason"
-            variant="default"
-            :placeholder="t('contact.addContactReasonPlaceholder', '输入验证信息（可选）')
-            "
-          />
+        <div v-if="searched" class="add-contact-modal__search-results">
+          <Cell
+            v-for="item in searchResults"
+            :key="item.userId"
+            :title="item.name || item.userId"
+            :subtitle="item.userId"
+            :active="selectedUserId === item.userId"
+            size="normal"
+            :border="false"
+            :auto-height="true"
+            @click="onSelectResult(item)"
+          >
+            <template #leading>
+              <Avatar :src="item.avatar" :name="item.name" :size="36" />
+            </template>
+            <!-- #search-result 插槽：自定义结果项渲染（默认勾选图标） -->
+            <template #trailing>
+              <slot name="search-result" :item="item">
+                <Icon v-if="selectedUserId === item.userId" name="check" :size="16" class="add-contact-modal__result-check" />
+              </slot>
+            </template>
+          </Cell>
+          <div v-if="searchResults.length === 0" class="add-contact-modal__search-empty">
+            {{ errorMsg || t('contact.searchEmpty', '未找到匹配的用户') }}
+          </div>
         </div>
-        <div v-if="errorMsg && !(searchable && searched && searchResults.length === 0)" class="add-contact-modal__error">
-          {{ errorMsg }}
-        </div>
+      </template>
+      <div class="add-contact-modal__field">
+        <label class="add-contact-modal__label">{{ t('contact.userId', '用户 ID') }}</label>
+        <Input
+          v-model="userId"
+          variant="default"
+          :placeholder="t('contact.addContactPlaceholder', '输入用户 ID')
+          "
+          @submit="onConfirm"
+        />
       </div>
-      <!-- #footer 插槽：接管操作区 -->
-      <div v-if="$slots.footer" class="add-contact-modal__footer">
-        <slot name="footer" />
+      <div class="add-contact-modal__field">
+        <label class="add-contact-modal__label">{{ t('contact.inviteReason', '附言') }}</label>
+        <Input
+          v-model="reason"
+          variant="default"
+          :placeholder="t('contact.addContactReasonPlaceholder', '输入验证信息（可选）')
+          "
+        />
       </div>
-      <div v-else class="add-contact-modal__footer">
-        <Button type="default" @click="onClose">
-          {{ t('button.cancel', '取消') }}
-        </Button>
-        <Button type="primary" :disabled="!canSubmit" :loading="loading" @click="onConfirm">
-          {{ t('button.confirm', '确认') }}
-        </Button>
+      <div v-if="errorMsg && !(searchable && searched && searchResults.length === 0)" class="add-contact-modal__error">
+        {{ errorMsg }}
       </div>
     </div>
-  </Popup>
+    <!-- #footer 插槽：接管操作区 -->
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+  </Modal>
 </template>
 
 <style scoped>
-.add-contact-modal {
-  width: 360px;
-  max-width: 90vw;
-  padding: 20px;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.add-contact-modal--mobile {
-  width: 100vw;
-  max-width: 100vw;
-  border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
-}
-
-.add-contact-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-contact-modal__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
-  color: var(--uikit-text-primary);
-}
-
 .add-contact-modal__body {
   display: flex;
   flex-direction: column;
@@ -294,13 +256,6 @@ watch(
 .add-contact-modal__error {
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-danger-color);
-}
-
-.add-contact-modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
 }
 
 .add-contact-modal__search-row {

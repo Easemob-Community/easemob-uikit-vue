@@ -389,6 +389,7 @@ watch(
         <Button
           class="create-group-modal__footer-btn"
           type="primary"
+          size="large"
           pill
           :disabled="selectedCount === 0"
           :loading="loading"
@@ -396,7 +397,7 @@ watch(
         >
           {{ t('group.createSubmit', '完成') }}
         </Button>
-        <Button class="create-group-modal__footer-btn" type="outline" pill @click="onClose">
+        <Button class="create-group-modal__footer-btn" type="outline" size="large" pill @click="onClose">
           {{ t('button.cancel', '取消') }}
         </Button>
       </div>
@@ -609,7 +610,7 @@ watch(
 }
 
 .create-group-modal__footer-btn {
-  min-width: 110px;
+  min-width: 104px;
 }
 
 @media (max-width: 640px) {

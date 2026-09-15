@@ -990,6 +990,8 @@ watch(locateRequest, (req) => {
     <Modal
       v-model:show="showDeleteConfirm"
       :title="t('message.action.delete')"
+      type="warning"
+      content-align="center"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
       @confirm="pendingDeleteMessage && deleteMessage(pendingDeleteMessage.msgServerId || pendingDeleteMessage.msgLocalId); pendingDeleteMessage = null"

@@ -229,6 +229,8 @@ defineExpose({
     <Modal
       v-model:show="showUnmuteConfirm"
       :title="t('chat.info.unmuteMemberConfirmTitle')"
+      type="warning"
+      content-align="center"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
       @confirm="confirmUnmute"

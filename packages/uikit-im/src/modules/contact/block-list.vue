@@ -212,6 +212,8 @@ defineExpose({
     <Modal
       v-model:show="confirmShow"
       :title="t('contact.blocklist.removeConfirmTitle', '移出黑名单')"
+      type="warning"
+      content-align="center"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"
       @confirm="onConfirmRemove"

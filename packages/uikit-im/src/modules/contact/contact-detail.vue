@@ -294,6 +294,8 @@ async function onConfirmAction() {
     <Modal
       v-model:show="confirmModal.show"
       :title="confirmModal.title"
+      type="warning"
+      content-align="center"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"
       @confirm="onConfirmAction"

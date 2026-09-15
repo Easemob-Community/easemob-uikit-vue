@@ -3,10 +3,9 @@ import { ref, watch } from 'vue'
 import { useLocale } from '@easemob/uikit-core'
 import { CONVERSATION_TYPE } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
-import { useViewport } from '@easemob/uikit-core'
 import { useConversation } from '../../composables/use-conversation'
 import { useContact } from '../../composables/use-contact'
-import { EmPopup as Popup } from '@easemob/uikit-core'
+import { EmModal as Modal } from '@easemob/uikit-core'
 import ContactList from '../contact/contact-list.vue'
 import type { UiContact } from '@easemob/uikit-core'
 
@@ -23,7 +22,6 @@ const props = defineProps<NewChatModalProps>()
 const emit = defineEmits<NewChatModalEmits>()
 
 const { t } = useLocale()
-const { isMobile } = useViewport()
 const { stores } = useUIKit()
 const { selectConversation } = useConversation()
 const { fetchContacts } = useContact()
@@ -90,75 +88,54 @@ watch(
 </script>
 
 <template>
-  <Popup
+  <Modal
     :show="props.show"
-    :position="isMobile ? 'bottom' : 'center'"
-    :show-close="true"
+    :title="t('conversation.newChat', '新会话')"
+    :width="360"
+    :show-footer="false"
+    body-flush
     @update:show="emit('update:show', $event)"
-    @close="onClose"
+    @cancel="onClose"
   >
-    <div class="new-chat-modal" :class="{ 'new-chat-modal--mobile': isMobile }">
-      <div class="new-chat-modal__header">
-        <span class="new-chat-modal__title">{{ t('conversation.newChat', '新会话') }}</span>
-      </div>
-      <div class="new-chat-modal__body">
-        <ContactList
-          :show-header="false"
-          :show-scroll-to-top="false"
-          :show-alphabet-nav="false"
-          group-by="none"
-          select-mode="single"
-          :loading="loading"
-          @select="onSelectContact"
-        />
-        <div v-if="errorMsg" class="new-chat-modal__error">
-          {{ errorMsg }}
-        </div>
+    <div class="new-chat-modal__list">
+      <ContactList
+        :show-header="false"
+        :show-scroll-to-top="false"
+        :show-alphabet-nav="false"
+        group-by="none"
+        select-mode="single"
+        :loading="loading"
+        @select="onSelectContact"
+      />
+      <div v-if="errorMsg" class="new-chat-modal__error">
+        {{ errorMsg }}
       </div>
     </div>
-  </Popup>
+  </Modal>
 </template>
 
 <style scoped>
-.new-chat-modal {
-  width: 360px;
-  max-width: 90vw;
-  height: 60vh;
-  max-height: 520px;
+.new-chat-modal__list {
+  height: min(60vh, 460px);
   display: flex;
   flex-direction: column;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
-  overflow: hidden;
-}
-
-.new-chat-modal--mobile {
-  width: 100vw;
-  max-width: 100vw;
-  height: 80vh;
-  max-height: 80vh;
-  border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
-}
-
-.new-chat-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  flex-shrink: 0;
-}
-
-.new-chat-modal__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
-  color: var(--uikit-text-primary);
-}
-
-.new-chat-modal__body {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
   position: relative;
+}
+
+/* 列表行对齐 Shuttle 范式：行间发丝线左内收，从名字起点开始 */
+.new-chat-modal__list :deep(.contact-item) {
+  margin-bottom: 0;
+}
+
+.new-chat-modal__list :deep(.contact-item-default)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--uikit-item-hover-padding-x, 16px) + 48px + var(--uikit-spacing-3, 12px));
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  pointer-events: none;
 }
 
 .new-chat-modal__error {
