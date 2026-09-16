@@ -83,6 +83,7 @@ function onEvent(name: string, payload?: unknown) {
             @clear-history="(p) => onEvent('clear-history', p)"
             @add-member="(id) => onEvent('add-member', id)"
             @chat-member="(m) => onEvent('chat-member', m)"
+            @view-profile="(userId) => onEvent('view-profile', userId)"
             @remove-member="(m) => onEvent('remove-member', m)"
             @set-admin="(m) => onEvent('set-admin', m)"
             @remove-admin="(m) => onEvent('remove-admin', m)"
@@ -102,6 +103,7 @@ function onEvent(name: string, payload?: unknown) {
             :conversation="singleConversation"
             :is-group="false"
             @clear-history="(p) => onEvent('clear-history', p)"
+            @view-profile="(userId) => onEvent('view-profile', userId)"
           />
         </div>
       </UIKitProvider>
