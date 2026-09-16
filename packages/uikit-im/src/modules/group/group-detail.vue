@@ -262,7 +262,7 @@ async function onConfirmAction() {
     <Modal
       v-model:show="confirmModal.show"
       :title="confirmModal.action === 'destroy' ? t('chat.info.destroyGroup', '解散群聊') : t('chat.info.leaveGroup', '退出群聊')"
-      :width="540"
+      :width="719"
       type="warning"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"

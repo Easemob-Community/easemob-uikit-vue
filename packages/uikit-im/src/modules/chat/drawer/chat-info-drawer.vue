@@ -1086,7 +1086,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   <Modal
     v-model:show="confirmModal.show"
     :title="confirmModal.title"
-    :width="540"
+    :width="719"
     type="warning"
     :confirm-text="t('button.confirm')"
     :cancel-text="t('button.cancel')"

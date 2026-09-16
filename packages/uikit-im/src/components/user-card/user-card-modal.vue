@@ -478,7 +478,7 @@ function onPresenceChanged() {
       <Modal
         v-model:show="confirmModal.show"
         :title="confirmModal.title"
-        :width="540"
+        :width="719"
         type="warning"
         :confirm-text="t('button.confirm', '确认')"
         :cancel-text="t('button.cancel', '取消')"

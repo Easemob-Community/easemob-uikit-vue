@@ -212,7 +212,7 @@ defineExpose({
     <Modal
       v-model:show="confirmShow"
       :title="t('contact.blocklist.removeConfirmTitle', '移出黑名单')"
-      :width="540"
+      :width="719"
       type="warning"
       :confirm-text="t('button.confirm', '确认')"
       :cancel-text="t('button.cancel', '取消')"

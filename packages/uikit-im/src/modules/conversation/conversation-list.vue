@@ -774,7 +774,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
     <Modal
       v-model:show="showDeleteModal"
       :title="t('conversation.delete')"
-      :width="540"
+      :width="719"
       type="warning"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"

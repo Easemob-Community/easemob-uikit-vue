@@ -990,7 +990,7 @@ watch(locateRequest, (req) => {
     <Modal
       v-model:show="showDeleteConfirm"
       :title="t('message.action.delete')"
-      :width="540"
+      :width="719"
       type="warning"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
