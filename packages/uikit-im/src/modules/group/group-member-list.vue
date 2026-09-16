@@ -76,6 +76,11 @@ export interface GroupMemberListProps {
   menuWithIcon?: boolean
   /** 搜索框是否使用椭圆（pill）形态，默认 false；会话详情抽屉成员页传 true */
   searchPill?: boolean
+  /**
+   * 受控搜索关键词：传入时优先于内部搜索框输入（会话详情抽屉成员页的共享搜索框走该入口），
+   * 此时通常配合 show-search=false 隐藏自带搜索框
+   */
+  keyword?: string
 }
 
 const { t } = useLocale()
@@ -171,8 +176,11 @@ const currentUserRole = computed<GroupMemberRoleValue>(() => {
   return (member?.role as GroupMemberRoleValue | undefined) || GROUP_MEMBER_ROLE.MEMBER
 })
 
+/** 生效关键词：受控 keyword 优先，未传入时用内部搜索框输入 */
+const effectiveKeyword = computed(() => props.keyword ?? searchKeyword.value)
+
 const filteredMembers = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase()
+  const keyword = effectiveKeyword.value.trim().toLowerCase()
   if (!keyword)
     return displayMembers.value
   return displayMembers.value.filter((m) => {
@@ -286,8 +294,8 @@ defineExpose({ refresh, removeMember, setMemberRole })
 
       <Empty
         v-else-if="filteredMembers.length === 0"
-        :icon="searchKeyword ? 'search' : 'person/double'"
-        :description="searchKeyword ? (t('group.memberList.noSearchResult', '未找到相关成员')) : (t('group.memberList.empty', '暂无成员'))"
+        :icon="effectiveKeyword.trim() ? 'search' : 'person/double'"
+        :description="effectiveKeyword.trim() ? (t('group.memberList.noSearchResult', '未找到相关成员')) : (t('group.memberList.empty', '暂无成员'))"
         size="small"
       />
 
@@ -306,6 +314,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           :show-chat-action="props.showChatAction"
           :allow-chat="props.allowChat"
           :presence="getMemberPresence(member.userId)"
+          :highlight="effectiveKeyword.trim()"
           :show-id="props.showId"
           :border="props.border"
           :menu-with-icon="props.menuWithIcon"

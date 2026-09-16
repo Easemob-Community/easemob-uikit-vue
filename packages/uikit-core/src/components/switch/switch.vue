@@ -6,6 +6,8 @@ export interface SwitchProps {
   size?: 'medium' | 'small'
   /** 是否禁用；禁用时不可点击且不触发事件 / Disabled: not clickable and no events fired */
   disabled?: boolean
+  /** 是否加载中；显示手柄内转圈并禁止点击（行为同 disabled，但不套用禁用样式）/ Loading: spinner inside handle, clicks blocked (visual style unchanged) */
+  loading?: boolean
 }
 
 export interface SwitchEmits {
@@ -19,12 +21,13 @@ const props = withDefaults(defineProps<SwitchProps>(), {
   modelValue: false,
   size: 'medium',
   disabled: false,
+  loading: false,
 })
 
 const emit = defineEmits<SwitchEmits>()
 
 function toggle() {
-  if (props.disabled)
+  if (props.disabled || props.loading)
     return
   const next = !props.modelValue
   emit('update:modelValue', next)
@@ -39,13 +42,16 @@ function toggle() {
     class="uikit-switch"
     :class="[
       `uikit-switch--${props.size}`,
-      { 'uikit-switch--checked': props.modelValue },
+      { 'uikit-switch--checked': props.modelValue, 'uikit-switch--loading': props.loading },
     ]"
     :aria-checked="props.modelValue"
+    :aria-busy="props.loading || undefined"
     :disabled="props.disabled"
     @click="toggle"
   >
-    <span class="uikit-switch__handle" />
+    <span class="uikit-switch__handle">
+      <span v-if="props.loading" class="uikit-switch__spinner" />
+    </span>
   </button>
 </template>
 
@@ -93,12 +99,12 @@ function toggle() {
 
 /* Hover / Pressed 轨道反馈：轨道色不变，叠内阴影（设计稿 inner shadow） */
 @media (hover: hover) {
-  .uikit-switch:hover:not(:disabled) {
+  .uikit-switch:hover:not(:disabled):not(.uikit-switch--loading) {
     box-shadow: var(--uikit-switch-track-inner-shadow, inset 0 4px 2px rgba(0, 0, 0, 0.1));
   }
 }
 
-.uikit-switch:active:not(:disabled) {
+.uikit-switch:active:not(:disabled):not(.uikit-switch--loading) {
   box-shadow: var(--uikit-switch-track-inner-shadow, inset 0 4px 2px rgba(0, 0, 0, 0.1));
 }
 
@@ -150,7 +156,7 @@ function toggle() {
 /* hover/pressed 手柄放大 + 状态层光圈：off 态为中性灰光圈，on 态为主色浅蓝光晕。
    放大围绕手柄中心进行（left 同步内收一档），pressed 的伸长朝向轨道空余侧 */
 @media (hover: hover) {
-  .uikit-switch:hover:not(:disabled) .uikit-switch__handle {
+  .uikit-switch:hover:not(:disabled):not(.uikit-switch--loading) .uikit-switch__handle {
     left: var(--switch-handle-inset-active);
     width: var(--switch-handle-size-active);
     height: var(--switch-handle-size-active);
@@ -160,7 +166,7 @@ function toggle() {
       0 0 0 var(--switch-halo) var(--uikit-switch-halo-off, rgba(0, 0, 0, 0.05));
   }
 
-  .uikit-switch--checked:hover:not(:disabled) .uikit-switch__handle {
+  .uikit-switch--checked:hover:not(:disabled):not(.uikit-switch--loading) .uikit-switch__handle {
     left: calc(100% - var(--switch-handle-size-active) - var(--switch-handle-inset-active));
     box-shadow:
       var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
@@ -169,7 +175,7 @@ function toggle() {
   }
 }
 
-.uikit-switch:active:not(:disabled) .uikit-switch__handle {
+.uikit-switch:active:not(:disabled):not(.uikit-switch--loading) .uikit-switch__handle {
   left: var(--switch-handle-inset-active);
   width: calc(var(--switch-handle-size-active) + var(--switch-handle-grow));
   height: var(--switch-handle-size-active);
@@ -179,12 +185,35 @@ function toggle() {
     0 0 0 var(--switch-halo) var(--uikit-switch-halo-off, rgba(0, 0, 0, 0.05));
 }
 
-.uikit-switch--checked:active:not(:disabled) .uikit-switch__handle {
+.uikit-switch--checked:active:not(:disabled):not(.uikit-switch--loading) .uikit-switch__handle {
   left: calc(100% - var(--switch-handle-size-active) - var(--switch-handle-grow) - var(--switch-handle-inset-active));
   box-shadow:
     var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
     inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
     0 0 0 var(--switch-halo) var(--uikit-switch-halo-on);
+}
+
+/* Loading：轨道/手柄配色不变，仅手柄内转圈 + 禁点；转圈颜色走 token（明暗主题分别给值） */
+.uikit-switch--loading {
+  cursor: not-allowed;
+}
+
+.uikit-switch__spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 62%;
+  height: 62%;
+  border: 2px solid var(--uikit-switch-loading-track, rgba(0, 0, 0, 0.12));
+  border-top-color: var(--uikit-switch-loading-color, var(--uikit-primary-color));
+  border-radius: 50%;
+  animation: uikit-switch-spin 0.8s linear infinite;
+}
+
+@keyframes uikit-switch-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Disabled 手柄：off 灰 / on 白，去掉落影、描边与光圈 */

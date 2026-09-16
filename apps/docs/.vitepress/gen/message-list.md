@@ -46,6 +46,7 @@
 | showAvatar      | `boolean`                                  | —   | 是否显示头像，默认 false                                                                                                                                                                                                                                                                                                           |
 | showMemberCount | `boolean`                                  | —   | 是否显示群成员数后缀，默认 true；仅群聊生效                                                                                                                                                                                                                                                                                                  |
 | showDrawerEntry | `boolean`                                  | —   | 是否显示抽屉入口按钮（聊天信息），默认 true                                                                                                                                                                                                                                                                                                  |
+| clickOpenDrawer | `boolean`                                  | —   | 点击 header（标题/副标题区域）是否展开会话详情抽屉，默认 true；<br>头像（名片弹窗）与右侧按钮（搜索/抽屉入口）的点击不受影响。<br>Whether clicking the header (title/subtitle area) opens the conversation-details<br>drawer. Default true. Avatar (profile card) and action buttons are not affected.                                                                          |
 | showSearchEntry | `boolean`                                  | —   | 是否显示 header 搜索消息按钮，默认 false（搜索入口归口会话详情抽屉的 Message Search 行；<br>仅在 messageList.search.enabled 为 true 时生效，开启后 header 恢复显示搜索按钮）。<br>Whether to show the message-search button in the header. Default false — the search entry<br>lives in the conversation-details drawer; takes effect only when message search is enabled. |
 | subtitle        | `'auto' \| 'presence' \| 'sign' \| 'none'` | —   | 单聊副标题档位（标题下方区域），默认 'auto'；仅单聊生效：<br>auto（在线状态 + 个性签名，缺哪个显示哪个）/ presence（仅在线状态）/ sign（仅签名）/<br>none（整个副标题区连同「正在输入」提示一起关闭）。<br>对方正在输入时优先占据此区域；可被 #header-subtitle 插槽整体接管。<br>Subtitle level under the title for single chats. Default 'auto'.                                                                               |
 
@@ -53,11 +54,12 @@
 
 > 抽屉配置 / Drawer configuration
 
-| 属性                  | 类型                    | 默认值 | 说明                                                                                                                                                                                                                                                                                                                                                       |
+| 属性                     | 类型                    | 默认值 | 说明                                                                                                                                                                                                                                                                                                                                                       |
 | --- | --- | --- | --- |
-| mode                | `'overlay' \| 'push'` | —   | 展示模式，默认 'push'：'push' 占位挤压聊天区，抽屉以独立平面区域参与布局<br>（圆角跟随 --uikit-components-radius）；'overlay' 完全遮挡聊天区。<br>移动端（viewport &lt; 768）两种模式一律回落为满铺全屏（独立页面观感）。<br>Display mode. Default 'push' (takes layout space and squeezes the chat area as an<br>independent flat region); 'overlay' covers the chat area. On mobile (&lt;768px) both fall back to fullscreen. |
-| width               | `number`              | —   | 抽屉宽度（px），默认 320；push 与 overlay 模式均生效，全屏模式忽略 / Drawer width in px. Default 320; ignored in fullscreen                                                                                                                                                                                                                                                     |
-| closeOnClickOutside | `boolean`             | —   | 是否点击抽屉外部（聊天区 / 其他空白处）自动关闭，默认 true；仅 push 模式生效<br>（overlay 模式由遮罩点击关闭，语义归口 closeOnClickOverlay），全屏模式忽略。<br>Whether clicking outside the drawer (chat area / blank areas) closes it. Default true;<br>only applies in 'push' mode (overlay mode closes via the mask click), ignored in fullscreen.                                                          |
+| mode                   | `'overlay' \| 'push'` | —   | 展示模式，默认 'push'：'push' 占位挤压聊天区，抽屉以独立平面区域参与布局<br>（圆角跟随 --uikit-components-radius）；'overlay' 完全遮挡聊天区。<br>移动端（viewport &lt; 768）两种模式一律回落为满铺全屏（独立页面观感）。<br>Display mode. Default 'push' (takes layout space and squeezes the chat area as an<br>independent flat region); 'overlay' covers the chat area. On mobile (&lt;768px) both fall back to fullscreen. |
+| width                  | `number`              | —   | 抽屉宽度（px），默认 320；push 与 overlay 模式均生效，全屏模式忽略 / Drawer width in px. Default 320; ignored in fullscreen                                                                                                                                                                                                                                                     |
+| closeOnClickOutside    | `boolean`             | —   | 是否点击抽屉外部（聊天区 / 其他空白处）自动关闭，默认 true；仅 push 模式生效<br>（overlay 模式由遮罩点击关闭，语义归口 closeOnClickOverlay），全屏模式忽略。<br>Whether clicking outside the drawer (chat area / blank areas) closes it. Default true;<br>only applies in 'push' mode (overlay mode closes via the mask click), ignored in fullscreen.                                                          |
+| avatarClickViewProfile | `boolean`             | —   | 抽屉预览区点击头像是否打开用户名片（单聊对方头像 / 群聊成员宫格头像），默认 true；<br>关闭后群聊宫格头像点击回落为「查看全部成员」。<br>Whether clicking an avatar in the drawer preview area (peer avatar in single chats,<br>member grid avatars in group chats) opens the user profile card. Default true;<br>when false, group grid avatar clicks fall back to "view all members".                               |
 
 #### config.messageList {#config-messagelist}
 
@@ -214,14 +216,16 @@
 
 > 功能开关
 
-| 属性      | 类型        | 默认值 | 说明              |
+| 属性          | 类型        | 默认值 | 说明                                                                                                                                                                                                |
 | --- | --- | --- | --- |
-| emoji   | `boolean` | —   | Emoji，默认 true   |
-| image   | `boolean` | —   | 图片，默认 true      |
-| file    | `boolean` | —   | 文件，默认 true      |
-| voice   | `boolean` | —   | 语音，默认 true      |
-| video   | `boolean` | —   | 视频，默认 true      |
-| mention | `boolean` | —   | 提及功能（@），默认 true |
+| emoji       | `boolean` | —   | Emoji，默认 true                                                                                                                                                                                     |
+| image       | `boolean` | —   | 图片，默认 true                                                                                                                                                                                        |
+| file        | `boolean` | —   | 文件，默认 true                                                                                                                                                                                        |
+| voice       | `boolean` | —   | 语音，默认 true                                                                                                                                                                                        |
+| video       | `boolean` | —   | 视频，默认 true                                                                                                                                                                                        |
+| translation | `boolean` | —   | 翻译入口，默认 false；仅渲染按钮，点击经 `translation-click` 事件交由宿主接入 / Translation entry, default false; only renders the button, click is surfaced via the `translation-click` event for the host to handle      |
+| contactCard | `boolean` | —   | 名片发送入口，默认 false；仅渲染按钮，点击经 `contact-card-click` 事件交由宿主接入 / Contact card entry, default false; only renders the button, click is surfaced via the `contact-card-click` event for the host to handle |
+| mention     | `boolean` | —   | 提及功能（@），默认 true                                                                                                                                                                                   |
 
 #### config.input.mention {#config-input-mention}
 
@@ -270,3 +274,9 @@
 | `avatar-view-profile`   | userId: string, anchor: HTMLElement              | 右键消息头像选择"查看资料"时触发，参数为消息发送者 ID 与头像锚点元素 / Emitted when "View profile" is chosen from the avatar context menu, with the sender ID and avatar anchor element   |
 | `avatar-click`          | userId: string, anchor: HTMLElement              | 左键点击消息头像时触发，参数为消息发送者 ID 与头像锚点元素 / Emitted when a message avatar is left-clicked, with the sender ID and avatar anchor element                              |
 | `avatar-mention`        | `payload: { userId: string, name: string }`      | 右键消息头像选择"@提及"时触发，参数为发送者 ID 与展示名 / Emitted when "@mention" is chosen from the avatar context menu, with the sender ID and display name                      |
+
+### Slots
+
+| 插槽名           | 说明 |
+| --- | --- |
+| `history-tip` | —  |

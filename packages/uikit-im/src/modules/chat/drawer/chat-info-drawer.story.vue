@@ -59,6 +59,14 @@ groupStore.setGroupAnnouncement('g_story_001', '欢迎来到 Vue 技术交流群
 groupStore.groupJoinRequestsMap.g_story_001 = [
   { applicant: { userId: 'req_001', nickname: '申请加入的人' }, status: 'pending', reason: '想学习 Vue' },
 ]
+// 成员页 tabs（All/Admin/Muted/Blocked）+ 行内徽标演示：注入禁言/拉黑缓存
+// （story 未初始化 SDK，members 页挂载时对禁言/拉黑列表的拉取会失败并静默 warn，展示以本地缓存为准）
+groupStore.setGroupMuteList('g_story_001', [
+  { userId: 'member_002', nickname: '阿强' },
+])
+groupStore.setGroupBlocklist('g_story_001', [
+  { userId: 'member_007', nickname: 'Eve' },
+])
 
 function onEvent(name: string, payload?: unknown) {
   console.log(`[ChatInfoDrawer Story] ${name}`, payload)
@@ -73,6 +81,9 @@ function onEvent(name: string, payload?: unknown) {
           <Button @click="showGroup = true">
             打开群信息抽屉
           </Button>
+          <p style="margin-top: 8px; color: var(--uikit-text-secondary); font-size: 13px;">
+            进入后点击「查看全部」或假搜索框进入成员页：tabs（All/Admin/禁言/拉黑）+ 共享搜索（命中高亮）+ 实底徽标 + ⋮ 菜单（带图标）
+          </p>
           <ChatInfoDrawer
             v-model:show="showGroup"
             :conversation="groupConversation"

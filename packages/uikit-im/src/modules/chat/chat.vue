@@ -910,17 +910,13 @@ async function onInviteMembers(userIds: string[]) {
   }
 }
 
-/** 点击聊天 header 头像打开名片 */
+/** 点击聊天 header 头像打开名片（仅单聊；群聊头像点击不弹群名片） */
 function onHeaderAvatarClick() {
   const conversation = currentConversation.value
   if (!conversation?.id)
     return
   if (conversation.type === CONVERSATION_TYPE.SINGLECHAT) {
     toggleUserCardModal(conversation.id, headerAvatarRef.value)
-  }
-  else if (conversation.type === CONVERSATION_TYPE.GROUPCHAT) {
-    groupCardGroupId.value = conversation.id
-    showGroupCardModal.value = true
   }
 }
 
@@ -1026,6 +1022,9 @@ function locateLatestMessageByUser(userId: string) {
 
 /** 从用户名片进入单聊 */
 function onUserCardSendMessage(userId: string) {
+  // 防御：自己不能给自己发消息（名片自身已隐藏该入口，此处拦截插槽接管方直发的 send-message）
+  if (!userId || normalizeUserId(userId) === normalizeUserId(stores.client.currentUser ?? ''))
+    return
   const existing = stores.conversation.conversationList.find(c => c.id === userId)
   if (!existing) {
     stores.conversation.addConversation({
@@ -1068,6 +1067,9 @@ function onGroupCardSendMessage(groupId: string) {
 
 /** 与成员发起单聊 */
 function onChatMember(member: UiGroupMember) {
+  // 防御：自己不能给自己发消息（成员列表已对自己隐藏私聊入口，此处拦截插槽接管方直发）
+  if (normalizeUserId(member.userId) === normalizeUserId(stores.client.currentUser ?? ''))
+    return
   const existing = stores.conversation.conversationList.find(c => c.id === member.userId)
   if (!existing) {
     stores.conversation.addConversation({
@@ -1260,10 +1262,6 @@ async function doRemoveAdmin(member: UiGroupMember) {
                     :size="40"
                     @click="onHeaderAvatarClick"
                   />
-                  <!-- 群聊会话：头像右下角群组标识（设计稿 Group Status 角标） -->
-                  <span v-if="isGroupChat" class="chat__header-avatar-group-badge" aria-hidden="true">
-                    <Icon name="filled/shield" :size="8" />
-                  </span>
                 </slot>
               </div>
               <div class="chat__header-main">
@@ -1718,7 +1716,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
   position: relative;
   z-index: 101;
   /* border-box + 固定高度：总高恒 56px，不随副标题（在线状态/签名/typing）有无而变化，
-     与会话列表 header 的分隔线严格对齐 */
+     与会话列表 header 严格对齐；底部分隔线宽度随全局 headerBorder 开关（默认 0 关闭） */
   box-sizing: border-box;
   height: calc(56px + var(--uikit-safe-top, 0px));
   padding: calc(var(--uikit-header-padding-y, 8px) + var(--uikit-safe-top, 0px)) 12px
@@ -1726,7 +1724,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-border-color, #e5e7eb);
   /* 头部图标按钮圆角 4px（IconButton 消费 --uikit-components-radius，局部覆写不影响全局） */
   --uikit-components-radius: 4px;
 }
@@ -1753,24 +1751,6 @@ async function doRemoveAdmin(member: UiGroupMember) {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-}
-
-/* 群聊头像右下角群组角标：16px 橙底白边圆（含 2px 白环），内嵌 8px 白色盾牌图标 */
-.chat__header-avatar-group-badge {
-  position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 16px;
-  height: 16px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 2px solid var(--uikit-bg-base);
-  background-color: var(--uikit-warning-color, #FFAB00);
-  color: var(--uikit-text-inverse);
-  pointer-events: none;
 }
 
 .chat__header-main {

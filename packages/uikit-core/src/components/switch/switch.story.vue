@@ -31,6 +31,14 @@ const lastChange = ref('')
         <Switch :model-value="true" size="small" disabled />
       </div>
     </Variant>
+    <Variant title="Loading">
+      <div class="u-flex u-gap-4 u-items-center">
+        <Switch :model-value="false" loading />
+        <Switch :model-value="true" loading />
+        <Switch :model-value="false" size="small" loading />
+        <Switch :model-value="true" size="small" loading />
+      </div>
+    </Variant>
     <Variant title="Change Event">
       <div class="u-flex u-gap-4 u-items-center">
         <Switch @change="lastChange = `change: ${$event}`" />

@@ -30,6 +30,7 @@ const {
   containerGap,
   fontSizeScale,
   density,
+  headerBorder,
   bubbleBgOther,
   bubbleBgSelf,
   chatBg,
@@ -46,6 +47,7 @@ const {
   setContainerGap,
   setFontSize,
   setDensity,
+  setHeaderBorder,
   setAnimationEnabled,
   setAnimationLevel,
   setBubbleBg,
@@ -191,6 +193,7 @@ function resetAll() {
   setContainerGap(8)
   setFontSize('normal')
   setDensity('normal')
+  setHeaderBorder(false)
   setAnimationEnabled(true)
   setAnimationLevel('normal')
   setBubbleBg(null, null)
@@ -584,6 +587,20 @@ const currentColorStyle = computed(() => ({
         </div>
       </div>
       <p class="demo-row__desc">列表项与容器的高度、内边距、间距档位：紧凑 / 标准 / 宽松</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">Header 分隔线</span>
+        <div class="demo-row__right">
+          <button
+            class="demo-switch"
+            :class="{ 'demo-switch--active': headerBorder }"
+            @click="setHeaderBorder(!headerBorder)"
+          >
+            <span class="demo-switch__thumb" />
+          </button>
+        </div>
+      </div>
+      <p class="demo-row__desc">会话 / 通讯录 / 聊天 / 抽屉 / 弹窗 header 底部的 1px 分隔线，默认关闭</p>
 
       <div class="demo-row demo-row--bordered">
         <span class="demo-row__label">动画开关</span>

@@ -148,20 +148,34 @@ export function useConversation() {
     }
   }
 
-  /** 置顶/取消置顶 */
+  /** 置顶/取消置顶（乐观更新：先写 store 立即反馈，失败回滚原值并抛错） */
   async function pinConversation(id: string, isPinned: boolean) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
     if (!cvs)
       return
-    await domains.conversation.pin(id, cvs.type, isPinned)
+    conversationStore.togglePin(id, isPinned)
+    try {
+      await domains.conversation.pin(id, cvs.type, isPinned)
+    }
+    catch (err) {
+      conversationStore.updateConversation(id, { isPinned: cvs.isPinned, pinnedTime: cvs.pinnedTime })
+      throw err
+    }
   }
 
-  /** 设置/取消免打扰 */
+  /** 设置/取消免打扰（乐观更新：先写 store 立即反馈，失败回滚原值并抛错） */
   async function muteConversation(id: string, muted: boolean) {
     const cvs = conversationStore.conversationList.find(c => c.id === id)
     if (!cvs)
       return
-    await domains.conversation.setMuted(id, cvs.type, muted)
+    conversationStore.updateConversation(id, { isMuted: muted })
+    try {
+      await domains.conversation.setMuted(id, cvs.type, muted)
+    }
+    catch (err) {
+      conversationStore.updateConversation(id, { isMuted: cvs.isMuted })
+      throw err
+    }
   }
 
   /** 标记会话已读 */

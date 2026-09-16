@@ -98,6 +98,8 @@ interface ThemeStorageState {
   activeColor?: string
   /** 自定义弱化/占位图标色（可选；不配置时走内置浅/深默认 --uikit-icon-muted） */
   iconMutedColor?: string
+  /** 全局 header 底部分隔线开关，默认 false（关闭） */
+  headerBorder: boolean
 }
 
 const defaultState: ThemeStorageState = {
@@ -123,6 +125,7 @@ const defaultState: ThemeStorageState = {
   hoverColor: undefined,
   activeColor: undefined,
   iconMutedColor: undefined,
+  headerBorder: false,
 }
 
 /** 字号档位 → scale 映射 */
@@ -299,6 +302,11 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.iconMutedColor,
     set: (v: string | undefined) => { storage.value.iconMutedColor = v },
   })
+  const headerBorder = computed({
+    // 兼容旧 localStorage：旧缓存无该字段时回落到关闭（全局默认）
+    get: () => storage.value.headerBorder ?? false,
+    set: (v: boolean) => { storage.value.headerBorder = v },
+  })
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
@@ -413,6 +421,14 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.setProperty(
       '--uikit-container-gap',
       `${Math.max(0, containerGap.value)}px`
+    )
+  })
+
+  // Header 底部分隔线开关：驱动 --uikit-header-border-width（0px 关闭 / 1px 开启）
+  watchEffect(() => {
+    document.documentElement.style.setProperty(
+      '--uikit-header-border-width',
+      headerBorder.value ? '1px' : '0px'
     )
   })
 
@@ -556,6 +572,11 @@ export const useThemeStore = defineStore('theme', () => {
     iconMutedColor.value = value
   }
 
+  /** 设置全局 header 底部分隔线开关（true 显示 1px 线，false 关闭） */
+  function setHeaderBorder(value: boolean) {
+    headerBorder.value = value
+  }
+
   /**
    * 批量应用动画配置
    */
@@ -590,6 +611,7 @@ export const useThemeStore = defineStore('theme', () => {
     hoverColor,
     activeColor,
     iconMutedColor,
+    headerBorder,
     setPrimaryColor,
     setPrimaryColorSat,
     setPrimaryColorLum,
@@ -612,6 +634,7 @@ export const useThemeStore = defineStore('theme', () => {
     setHoverColor,
     setActiveColor,
     setIconMutedColor,
+    setHeaderBorder,
     applyAnimationConfig,
   }
 })

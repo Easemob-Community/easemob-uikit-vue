@@ -479,7 +479,7 @@ export const DEV_HINT_REGISTRY: DevHintEntry[] = [
 
   {
     id: 'history-load',
-    selectors: ['.message-list__top-loading', '.message-list__scroll'],
+    selectors: ['.message-list__history-tip', '.message-list__scroll'],
     scope: 'container',
     title: '历史消息加载',
     summary: 'getHistoryMessages 游标分页 + 群已读数批量补全',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useClipboard, useScroll } from '@vueuse/core'
 import { formatSdkError, resolveSdkErrorMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
@@ -737,9 +737,28 @@ function formatDividerTime(timestamp: number): string {
   return `${dateStr} ${timeStr}`
 }
 
+/**
+ * 历史加载状态（作为列表首项随消息流滚动）：'loading' 加载中 / 'failed' 失败可重试 / 'no-more' 没有更多；空串不显示。
+ * 下拉刷新模式下加载中由下拉指示器呈现，首项不再重复显示 loading。
+ */
+const historyTipState = computed<'loading' | 'failed' | 'no-more' | ''>(() => {
+  if (!enableLoadHistory.value || messages.value.length === 0)
+    return ''
+  if (historyLoadFailed.value)
+    return 'failed'
+  if (loadingHistory.value)
+    return pullRefreshEnabled.value ? '' : 'loading'
+  if (!hasMoreHistory.value)
+    return 'no-more'
+  return ''
+})
+
 /** 带时间分割线的消息列表 */
 const messagesWithDividers = computed(() => {
-  const result: Array<{ key: string, type: 'message' | 'divider', data: UiMessage | string, index: number }> = []
+  const result: Array<{ key: string, type: 'message' | 'divider' | 'history-tip', data: UiMessage | string | null, index: number }> = []
+  if (historyTipState.value) {
+    result.push({ key: '__history-tip__', type: 'history-tip', data: null, index: -1 })
+  }
   let lastMsg: UiMessage | null = null
   messages.value.forEach((msg, index) => {
     if (shouldShowTimeDivider(msg, lastMsg)) {
@@ -750,6 +769,10 @@ const messagesWithDividers = computed(() => {
   })
   return result
 })
+
+const slots = useSlots()
+/** 透传给气泡包装器的类型级插槽名（排除列表级插槽 history-tip，避免透传到每条消息气泡） */
+const bubbleSlotNames = computed(() => Object.keys(slots).filter(name => name !== 'history-tip'))
 
 /**
  * 单聊最新一条己方已读消息的 key（msgServerId 或 msgLocalId）。
@@ -848,18 +871,6 @@ watch(locateRequest, (req) => {
       <span v-else-if="isPulling">{{ t('conversation.pullRefresh') }}</span>
     </div>
 
-    <!-- 顶部加载/失败重试/无更多指示器（scroll-top 模式常驻逻辑；失败态两种模式都显示） -->
-    <div
-      v-if="messages.length > 0 && (loadingHistory || historyLoadFailed || (historyMode === 'scroll-top' && !hasMoreHistory))"
-      class="message-list__top-loading"
-    >
-      <span v-if="loadingHistory">{{ t('conversation.loadingMore') }}</span>
-      <span v-else-if="historyLoadFailed" class="message-list__top-retry" @click="retryLoadHistory">
-        {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
-      </span>
-      <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
-    </div>
-
     <!-- 虚拟滚动模式 -->
     <MessageVirtualList
       v-if="enableVirtual"
@@ -873,8 +884,18 @@ watch(locateRequest, (req) => {
       @scroll="onVirtualScroll"
     >
       <template #default="{ item }">
+        <!-- 历史加载状态（列表首项，随消息流滚动；可通过 #history-tip 插槽接管） -->
+        <div v-if="item.type === 'history-tip'" class="message-list__history-tip">
+          <slot name="history-tip" :state="historyTipState" :retry="retryLoadHistory">
+            <span v-if="historyTipState === 'loading'">{{ t('conversation.loadingMore') }}</span>
+            <span v-else-if="historyTipState === 'failed'" class="message-list__history-retry" @click="retryLoadHistory">
+              {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
+            </span>
+            <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
+          </slot>
+        </div>
         <!-- 时间分割线 -->
-        <div v-if="item.type === 'divider'" class="message-list__divider">
+        <div v-else-if="item.type === 'divider'" class="message-list__divider">
           <span>{{ item.data }}</span>
         </div>
         <!-- 消息气泡 -->
@@ -899,9 +920,9 @@ watch(locateRequest, (req) => {
           @avatar-click="(userId, anchor) => emit('avatar-click', userId, anchor)"
           @avatar-mention="emit('avatar-mention', $event)"
         >
-          <!-- 透传消息类型级插槽到气泡包装器 -->
+          <!-- 透传消息类型级插槽到气泡包装器（排除列表级 history-tip） -->
           <template
-            v-for="(_, name) in $slots"
+            v-for="name in bubbleSlotNames"
             :key="name"
             #[name]="slotProps"
           >
@@ -930,8 +951,18 @@ watch(locateRequest, (req) => {
           :key="item.key"
           class="message-list__item"
         >
+          <!-- 历史加载状态（列表首项，随消息流滚动；可通过 #history-tip 插槽接管） -->
+          <div v-if="item.type === 'history-tip'" class="message-list__history-tip">
+            <slot name="history-tip" :state="historyTipState" :retry="retryLoadHistory">
+              <span v-if="historyTipState === 'loading'">{{ t('conversation.loadingMore') }}</span>
+              <span v-else-if="historyTipState === 'failed'" class="message-list__history-retry" @click="retryLoadHistory">
+                {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
+              </span>
+              <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
+            </slot>
+          </div>
           <!-- 时间分割线 -->
-          <div v-if="item.type === 'divider'" class="message-list__divider">
+          <div v-else-if="item.type === 'divider'" class="message-list__divider">
             <span>{{ item.data }}</span>
           </div>
           <!-- 消息气泡 -->
@@ -956,9 +987,9 @@ watch(locateRequest, (req) => {
             @avatar-click="(userId, anchor) => emit('avatar-click', userId, anchor)"
             @avatar-mention="emit('avatar-mention', $event)"
           >
-            <!-- 透传消息类型级插槽到气泡包装器 -->
+            <!-- 透传消息类型级插槽到气泡包装器（排除列表级 history-tip） -->
             <template
-              v-for="(_, name) in $slots"
+              v-for="name in bubbleSlotNames"
               :key="name"
               #[name]="slotProps"
             >
@@ -1066,8 +1097,8 @@ watch(locateRequest, (req) => {
   font-size: var(--uikit-font-size-13);
 }
 
-/* 顶部加载指示器 */
-.message-list__top-loading {
+/* 历史加载状态提示：作为列表首项随消息流滚动，仅上翻到顶/下拉到底时可见 */
+.message-list__history-tip {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1077,7 +1108,7 @@ watch(locateRequest, (req) => {
 }
 
 /* 历史加载失败重试入口 */
-.message-list__top-retry {
+.message-list__history-retry {
   color: var(--uikit-primary-color);
   cursor: pointer;
 }

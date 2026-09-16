@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
-import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, EmModal as Modal, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
 import type { PresenceDisplayStatus, UiContact } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -61,7 +61,7 @@ const loading = computed(() => {
 })
 const remarkModalShow = ref(false)
 const remarkInput = ref('')
-const remarkInputRef = ref<HTMLInputElement>()
+const remarkInputRef = ref<InstanceType<typeof Input>>()
 
 const confirmModal = ref<{
   show: boolean
@@ -117,7 +117,7 @@ onMounted(() => {
 watch(remarkModalShow, async (show) => {
   if (show) {
     await nextTick()
-    remarkInputRef.value?.focus()
+    remarkInputRef.value?.inputRef?.focus()
   }
 })
 
@@ -313,14 +313,12 @@ async function onConfirmAction() {
       @confirm="saveRemark"
       @cancel="cancelEditRemark"
     >
-      <input
+      <Input
         ref="remarkInputRef"
         v-model="remarkInput"
-        class="contact-detail__remark-input"
-        type="text"
         :placeholder="t('userCard.alias', '备注')"
-        @keyup.enter="saveRemark"
-      >
+        @submit="saveRemark"
+      />
     </Modal>
   </div>
 </template>
@@ -404,23 +402,6 @@ async function onConfirmAction() {
   font-weight: 600;
   color: var(--uikit-text-primary);
   word-break: break-all;
-}
-
-.contact-detail__remark-input {
-  width: 100%;
-  box-sizing: border-box;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
-  outline: none;
-}
-
-.contact-detail__remark-input:focus {
-  border-color: var(--uikit-primary-color, #3b82f6);
 }
 
 .contact-detail__pill {

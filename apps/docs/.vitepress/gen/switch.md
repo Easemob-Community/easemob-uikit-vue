@@ -3,11 +3,12 @@
 
 ### Props
 
-| 属性         | 类型                    | 默认值        | 说明                                                               |
+| 属性         | 类型                    | 默认值        | 说明                                                                                                                 |
 | --- | --- | --- | --- |
-| modelValue | `boolean`             | `false`    | 开关状态（v-model）/ Switch state, used with v-model                   |
-| size       | `'medium' \| 'small'` | `'medium'` | 尺寸：medium（默认）/ small / Size: medium (default) or small           |
-| disabled   | `boolean`             | `false`    | 是否禁用；禁用时不可点击且不触发事件 / Disabled: not clickable and no events fired |
+| modelValue | `boolean`             | `false`    | 开关状态（v-model）/ Switch state, used with v-model                                                                     |
+| size       | `'medium' \| 'small'` | `'medium'` | 尺寸：medium（默认）/ small / Size: medium (default) or small                                                             |
+| disabled   | `boolean`             | `false`    | 是否禁用；禁用时不可点击且不触发事件 / Disabled: not clickable and no events fired                                                   |
+| loading    | `boolean`             | `false`    | 是否加载中；显示手柄内转圈并禁止点击（行为同 disabled，但不套用禁用样式）/ Loading: spinner inside handle, clicks blocked (visual style unchanged) |
 
 ### Events
 

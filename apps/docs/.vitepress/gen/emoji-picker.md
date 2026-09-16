@@ -12,7 +12,7 @@
 | recentCount   | `number`             | `5`        | 常用列表长度（保留最近使用个数），默认 5 / Number of recently-used emojis kept, default 5                                                                 |
 | tabsPosition  | `EmojiTabsPosition`  | `'bottom'` | tab 位置：顶部/底部/左侧/右侧，默认 'bottom' / Tabs position: top/bottom/left/right, default 'bottom'                                                |
 | stickerHover  | `boolean`            | `true`     | sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true                        |
-| emojiIcon     | `string`             | —          | 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text         |
+| emojiIcon     | `string`             | —          | 「Emoji」视图 tab 预览小图 URL（可选，展示图片；不设时显示 😀 字形）/ Optional icon for the "Emoji" view tab, shown as an image instead of the default 😀 glyph |
 
 ### Events
 

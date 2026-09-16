@@ -7,6 +7,7 @@ import type { IconProps } from '../icon/icon.vue'
 import IconButton from '../icon-button/icon-button.vue'
 import { t } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
+import { useThemeStore } from '../../store/theme'
 
 export interface ModalProps {
   /** 是否显示弹窗（v-model:show 受控） */
@@ -17,7 +18,7 @@ export interface ModalProps {
   titleAlign?: 'left' | 'center'
   /** 是否显示右上角关闭按钮，默认 true */
   showClose?: boolean
-  /** 是否显示 header 下分割线，默认 true */
+  /** 是否显示 header 下分割线；不传时跟随全局 theme.headerBorder 开关（默认关闭），显式传入优先 */
   showHeaderDivider?: boolean
   /** 弹窗宽度（px），默认 420；弹层整体仍受 90vw 上限约束 */
   width?: number
@@ -69,7 +70,6 @@ const props = withDefaults(defineProps<ModalProps>(), {
   title: '',
   titleAlign: 'left',
   showClose: true,
-  showHeaderDivider: true,
   width: 420,
   height: 0,
   contentAlign: 'left',
@@ -92,6 +92,10 @@ const emit = defineEmits<ModalEmits>()
 
 const { isMobile } = useViewport()
 const popupPosition = computed(() => (isMobile.value ? 'bottom' : 'center'))
+
+const themeStore = useThemeStore()
+/** header 分割线显隐：prop 显式传入优先，未传时跟随全局 headerBorder 开关（默认关闭） */
+const headerDividerVisible = computed(() => props.showHeaderDivider ?? themeStore.headerBorder)
 
 /** 语义类型 → 内置图标（参考 Toast 实现）；自定义 icon / #icon 插槽优先 */
 const TYPE_ICON_MAP: Partial<Record<NonNullable<ModalProps['type']>, { name: string, type: IconProps['type'] }>> = {
@@ -140,7 +144,7 @@ function onCancel() {
         class="uikit-modal__header"
         :class="[
           `uikit-modal__header--${props.titleAlign}`,
-          { 'uikit-modal__header--divider': props.showHeaderDivider },
+          { 'uikit-modal__header--divider': headerDividerVisible },
         ]"
       >
         <div class="uikit-modal__title">

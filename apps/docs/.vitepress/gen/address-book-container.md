@@ -8,7 +8,8 @@
 | showHeader             | `boolean`                         | `true`                                                       | 是否展示头部，默认 true                                            |
 | title                  | `string`                          | —                                                            | Header 标题                                                 |
 | headerAlign            | `'left' \| 'center' \| 'right'`   | `'left'`                                                     | Header 对齐方式，默认 left                                       |
-| showSearch             | `boolean`                         | `true`                                                       | 是否展示搜索框（home 生效），默认 true                                  |
+| showHomeAddButton      | `boolean`                         | `true`                                                       | 是否在 home 头部展示「添加好友」按钮，默认 true                             |
+| showSearch             | `boolean`                         | `false`                                                      | 是否展示搜索框（home 生效），默认 false                                 |
 | class                  | `string`                          | —                                                            | 自定义根元素 class                                              |
 | style                  | `Record<string, string>`          | —                                                            | 自定义根元素 style                                              |
 | transition             | `AddressBookContainerTransition`  | `'slide'`                                                    | 视图切换过场，默认 'slide'                                         |
@@ -21,7 +22,7 @@
 | groupCount             | `number`                          | —                                                            | 「群组」入口右侧数量，不传默认取 store 实际数量；传 0 则不展示                      |
 | contactCount           | `number`                          | —                                                            | 「联系人」入口右侧数量，不传默认取 store 实际数量；传 0 则不展示                     |
 | autoEntryCount         | `boolean`                         | `true`                                                       | 是否自动从 store 推断 groupCount/contactCount（仅未显式传入时生效），默认 true |
-| entryOrder             | `AddressBookContainerEntryKey[]`  | `() => ['notice', 'group', 'contact', 'blocklist'] as const` | 入口顺序，默认 ['notice', 'group', 'contact', 'blocklist']       |
+| entryOrder             | `AddressBookContainerEntryKey[]`  | `() => ['contact', 'group', 'notice', 'blocklist'] as const` | 入口顺序，默认 ['contact', 'group', 'notice', 'blocklist']       |
 | noticeLabel            | `string`                          | —                                                            | 自定义入口标签，不传则走 i18n                                         |
 | groupLabel             | `string`                          | —                                                            | —                                                         |
 | contactLabel           | `string`                          | —                                                            | —                                                         |

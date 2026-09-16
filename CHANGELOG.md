@@ -1,5 +1,18 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.0 (2026-09-16)
+
+### 变更
+
+- **新增全局 header 底部分隔线开关（默认关闭，视觉变更）**：`theme.headerBorder`（Provider prop）/ `useTheme().setHeaderBorder()` 一键控制会话列表、通讯录、聊天、会话抽屉、EmModal 及建群弹窗 header 底部的 1px 分隔线，默认 `false` 不再显示分隔线（此前整改后默认显示）；宽度经新 token `--uikit-header-border-width`（`0px`/`1px`）下发，各 header 颜色 token 不变。header 总高由 border-box + 固定高保证，开关不影响布局高度。配套 core 2.8.0。
+
+## @easemob/uikit-core 2.8.0 (2026-09-16)
+
+### 变更
+
+- **新增全局 header 底部分隔线开关 `headerBorder`**：`themeStore.headerBorder`（持久化，默认 `false`）驱动新 token `--uikit-header-border-width`（`0px`/`1px`）；`ProviderThemeConfig` 新增 `headerBorder?: boolean`，`useTheme()` 新增 `headerBorder` / `setHeaderBorder()`。
+- **EmModal `showHeaderDivider` 默认行为变化**：默认值由 `true` 改为「不传时跟随全局 `headerBorder` 开关（默认关闭）」，显式传 `true`/`false` 仍优先（沿用 Avatar `shape` 回落主题的惯例）。此前依赖默认显示 header 分割线的弹窗，需开启全局开关或显式 `:show-header-divider="true"`。
+
 ## @easemob/uikit-im 3.6.1 (2026-09-16)
 
 ### 变更
@@ -7,6 +20,7 @@
 - **二次确认弹窗宽度对齐设计稿**：11 处 `type="warning"` 确认弹窗（删除会话/消息、解散/退出群、移除成员、设置/移除管理员、移出黑名单、取消禁言、名片操作等）宽度由 540 校准为 **719**，与设计稿 pop 组件统一宽度一致；视觉跟随 core 2.7.1 的 EmModal 新度量（header 60px / 标题 18px·500 / body 48·56 / footer 80px）。
 - **会话容器对齐「新-Demo」设计稿（视觉变更，无 API 变更）**：header 加底部 1px 分隔线、总高 48 → **65px**（上下 12.5px），标题 16px/600 → **18px/500**；搜索框改 **36px 胶囊**（`pill`），搜索槽/分栏/标题水平边界统一 **12px**；card 变体会话项总高 72 → **64px**（项内容水平内边距 12px、垂直 8px），两行摘要间距 6 → **4px**。
 - **修复会话项无最后一条消息时标题下移**：会话项两行高度固定（20 + 4 + 18 = 42px），消息摘要为空时信息区不再塌陷，标题位置恒定。
+- **「没有更多历史消息」改为随消息流滚动（行为变更 + 新插槽）**：历史加载状态提示（加载中 / 失败重试 / 没有更多）由常驻顶部条改为消息列表首项，仅上翻到顶（或下拉到底）时可见，随消息一起滚动；下拉刷新模式历史加载完后同样显示「没有更多历史消息」。新增 `#history-tip` 插槽整块接管该提示，scope `{ state: 'loading' | 'failed' | 'no-more', retry }`，链路 `EmChatContainer → EmChat → EmMessageList` 插槽自动透传，文案仍可用 locale key `conversation.noMoreHistory` 覆盖。
 
 ## @easemob/uikit-core 2.7.1 (2026-09-16)
 

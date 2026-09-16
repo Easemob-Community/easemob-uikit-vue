@@ -48,7 +48,7 @@ function onTap(key: string) {
       }"
       @click="onTap(key)"
     >
-      <span class="contact-alphabet-nav__label">{{ key }}</span>
+      {{ key }}
     </span>
   </div>
 </template>
@@ -92,34 +92,12 @@ function onTap(key: string) {
   }
 }
 
-/* 大写字母无下伸部（descender），line-height: 1 居中的是 em 框，
-   字形在框内光学上偏高；给文本层一个固定的向下补偿，保证在激活圆盘内视觉居中 */
-.contact-alphabet-nav__label {
-  transform: translateY(0.5px);
-}
-
-/* 当前分组高亮：设计稿（新 Demo 联系人页）为蓝底白字 16×16 圆角方块（radius 8）；
-   色块用伪元素显式居中，行高被压缩时仍保持形状 */
+/* 当前分组高亮：不加背景色块（10px 字母在小色块内难以垂直居中），
+   改为大一号字号 + 加粗 + 主题主色，跟随 setPrimaryColor 换肤 */
 .contact-alphabet-nav__item.is-active {
-  color: var(--uikit-text-inverse);
-  font-weight: 500;
-}
-
-.contact-alphabet-nav__item.is-active::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
-  border-radius: 8px;
-  background-color: var(--uikit-primary-color);
-  z-index: -1;
-}
-
-.contact-alphabet-nav__item.is-active:active::before {
-  filter: brightness(0.85);
+  color: var(--uikit-primary-color);
+  font-size: var(--uikit-font-size-12);
+  font-weight: 700;
 }
 
 .contact-alphabet-nav__item.is-empty {

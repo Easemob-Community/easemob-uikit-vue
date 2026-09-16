@@ -557,9 +557,9 @@ const subviewTitle = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* 含 padding/border 的总高（border-box）：12.5 + 30 内容 + 12.5 + 1 分割线 = 56px */
+  /* 总高由 border-box + min-height 保证为 56px；底部分隔线宽度随全局 headerBorder 开关（默认 0 关闭） */
   min-height: 56px;
-  border-bottom: 1px solid var(--uikit-divider-color);
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-divider-color);
 }
 
 .address-book-container__header--center {
@@ -605,9 +605,9 @@ const subviewTitle = computed(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  /* 含 padding/border 的总高（border-box）：与首页 header 同为 56px */
+  /* 总高由 border-box + min-height 保证，与首页 header 同为 56px；分隔线宽度随全局 headerBorder 开关 */
   min-height: 56px;
-  border-bottom: 1px solid var(--uikit-divider-color);
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-divider-color);
 }
 
 .address-book-container__back {

@@ -10,6 +10,7 @@
 | avatar            | `string`                                 | —          | 头像 URL                                       |
 | layout            | `'banner' \| 'plain'`                    | `'banner'` | 布局：banner（顶部横幅+大头像，默认）/ plain（无横幅，头像与文字水平排列） |
 | subtitle          | `string`                                 | —          | 名称下方的副标题行（如 Username），有值才渲染                  |
+| subtitleLabel     | `string`                                 | —          | 副标题行前置标签（如 Username），仅 subtitle 有值时随其渲染      |
 | userIdLabel       | `string`                                 | —          | 用户 ID 行前置标签（如 UserID），有值才渲染                  |
 | userIdCopyable    | `boolean`                                | `true`     | 用户 ID 是否支持点击复制（展示复制图标），默认 true               |
 | banner            | `string`                                 | —          | 顶部背景图 URL，不传时使用默认渐变（仅 banner 布局生效）           |

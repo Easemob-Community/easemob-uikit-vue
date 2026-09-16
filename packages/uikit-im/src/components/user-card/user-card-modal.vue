@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
 import type { PresenceDisplayStatus, UserCardAction, UserCardInfoRow } from '@easemob/uikit-core'
-import { EmIcon as Icon, EmModal as Modal, EmPopup as Popup, EmUserCard as UserCard, createLogger, formatSdkError, useLocale, usePresence, useToast, useViewport } from '@easemob/uikit-core'
+import { EmIcon as Icon, EmInput as Input, EmModal as Modal, EmPopup as Popup, EmUserCard as UserCard, createLogger, formatSdkError, useLocale, usePresence, useToast, useViewport } from '@easemob/uikit-core'
 import { useEventListener } from '@vueuse/core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
@@ -111,15 +111,19 @@ const confirmModal = ref<{
 
 const remarkModalShow = ref(false)
 const remarkInput = ref('')
-const remarkInputRef = ref<HTMLInputElement>()
+const remarkInputRef = ref<InstanceType<typeof Input>>()
 
 watch(
   () => props.show,
   (show) => {
-    if (show)
+    if (show) {
       void loadData()
-    else
+    }
+    else {
       cancelEditRemark()
+      // 兜底复位二级确认：名片经未拦截路径（如外部滚动）关闭时，避免重开残留确认框
+      confirmModal.value.show = false
+    }
   },
   { immediate: true },
 )
@@ -128,7 +132,7 @@ watch(
 watch(remarkModalShow, async (show) => {
   if (show) {
     await nextTick()
-    remarkInputRef.value?.focus()
+    remarkInputRef.value?.inputRef?.focus()
   }
 })
 
@@ -162,13 +166,7 @@ const cardActions = computed<UserCardAction[]>(() => {
   const actions: UserCardAction[] = []
 
   if (isSelf.value) {
-    actions.push({
-      key: 'message',
-      label: t('userCard.message', '消息'),
-      icon: 'bubble/rect/empty',
-      type: 'primary',
-      block: true,
-    })
+    // 自己的名片不展示任何操作：自己不能给自己发消息（无语音/视频/拉黑/删除自己的语义）
     return actions
   }
 
@@ -280,6 +278,26 @@ function onClose() {
   emit('close')
 }
 
+/** 二级弹窗（删除/拉黑确认、备注编辑）是否处于打开状态 */
+const hasChildModalOpen = computed(() => confirmModal.value.show || remarkModalShow.value)
+
+/**
+ * 二级弹窗打开期间屏蔽名片的关闭（外部点击/ESC/互斥分组）：
+ * 确认框 Modal 自身 teleport 到 body，其上的点击对名片 Popup 而言是「外部点击」，
+ * 不拦截会把名片关掉而确认框状态残留，重开名片时确认框莫名弹出。
+ */
+function onPopupUpdateShow(value: boolean) {
+  if (!value && hasChildModalOpen.value)
+    return
+  emit('update:show', value)
+}
+
+function onPopupClose() {
+  if (hasChildModalOpen.value)
+    return
+  onClose()
+}
+
 function closeModal() {
   emit('update:show', false)
   onClose()
@@ -288,7 +306,7 @@ function closeModal() {
 // 锚定模式下，名片外部任何滚动都关闭名片：锚点被虚拟滚动回收后继续跟随定位已无意义。
 // 名片自身内部滚动（event.target 在 rootRef 内）不关闭。
 useEventListener(window, 'scroll', (event: Event) => {
-  if (!props.show || !useAnchored.value)
+  if (!props.show || !useAnchored.value || hasChildModalOpen.value)
     return
   if (rootRef.value?.contains(event.target as Node))
     return
@@ -425,8 +443,8 @@ function onPresenceChanged() {
     :shell="isMobile"
     group="user-card"
     :close-on-click-overlay="true"
-    @update:show="(v: boolean) => emit('update:show', v)"
-    @close="onClose"
+    @update:show="onPopupUpdateShow"
+    @close="onPopupClose"
   >
     <div
       ref="rootRef"
@@ -498,14 +516,12 @@ function onPresenceChanged() {
         @confirm="saveRemark"
         @cancel="cancelEditRemark"
       >
-        <input
+        <Input
           ref="remarkInputRef"
           v-model="remarkInput"
-          class="user-card-modal__remark-input"
-          type="text"
           :placeholder="t('userCard.alias', '备注')"
-          @keyup.enter="saveRemark"
-        >
+          @submit="saveRemark"
+        />
       </Modal>
     </div>
   </Popup>
@@ -592,22 +608,5 @@ function onPresenceChanged() {
   border: none;
   background: none;
   cursor: pointer;
-}
-
-.user-card-modal__remark-input {
-  width: 100%;
-  box-sizing: border-box;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
-  outline: none;
-}
-
-.user-card-modal__remark-input:focus {
-  border-color: var(--uikit-primary-color, #3b82f6);
 }
 </style>

@@ -157,7 +157,8 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
   'auto' 时 PC 触摸设备→pull-down、PC 非触摸→scroll-top、移动端→pull-down）、
   `maxMessageCount`（默认 300 裁剪）、`pinnedBar`、`search`、`autoLocateAtMe`、`messageStatus`。
 - 历史加载三态：`loadingHistory / hasMoreHistory / historyLoadFailed`（失败保留 hasMoreHistory，
-  顶部显示重试入口）。
+  显示「点击重试」入口）；状态提示（加载中/失败/没有更多）是**列表首项随消息流滚动**（非常驻顶部条），
+  两种加载模式通用，可用 `#history-tip` 插槽接管（scope `{ state, retry }`）。
 - 滚动底部判定：虚拟滚动模式由虚拟列表上报，普通模式用 `useScroll` 的 `arrivedState.bottom`。
 
 ## 硬规则 vs 软约定

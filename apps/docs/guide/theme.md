@@ -54,6 +54,7 @@ UIKit 设计系统遵循以下核心原则，作为模糊场景下的决策依�
 - `--uikit-border-color`：常规边框
 - `--uikit-border-light`：浅边框
 - `--uikit-divider-color`：分割线
+- `--uikit-header-border-width`：header 底部分隔线宽度（默认 `0px` 关闭；由全局开关 `headerBorder` / `setHeaderBorder()` 覆写为 `1px`）
 
 ### 间距阶梯
 
@@ -278,6 +279,7 @@ const {
   animationLevel,
   fontSizeScale,
   density,
+  headerBorder,
   preset,
   setPrimaryColor,
   setPrimaryColorSat,
@@ -292,6 +294,7 @@ const {
   setFontSize,
   setFontSizeScale,
   setDensity,
+  setHeaderBorder,
   setBubbleBg,
   setChatBg,
   setInputBg,
@@ -331,6 +334,9 @@ setFontSizeScale(1.25)
 
 // 密度：紧凑 / 标准 / 宽松（信息密度控制）
 setDensity('compact') // 'compact' | 'normal' | 'comfortable'
+
+// Header 底部分隔线：会话 / 通讯录 / 聊天 / 抽屉 / 弹窗 header 的 1px 底线，默认关闭
+setHeaderBorder(true)
 
 // 预设主题：一键切换整套风格（'default' | 'business' | 'fresh'）
 setPreset('business')
@@ -396,6 +402,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
       shape: 'square',
       fontSize: 'xlarge', // 'normal' | 'large' | 'xlarge' 或具体倍数
       density: 'compact', // 'compact' | 'normal' | 'comfortable'
+      headerBorder: true, // header 底部分隔线总开关（默认 false 关闭）
       bubbleColor: { other: '#f3f4f6', self: '#7c3aed' },
       chatBg: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       inputBg: '#ffffff',

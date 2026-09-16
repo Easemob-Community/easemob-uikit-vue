@@ -873,7 +873,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
   --uikit-item-active-radius: 0px;
 }
 
-/* 设计稿 header：底部 1px 分隔线，上下 12.5px、左右 12px；border-box 总高统一 56px */
+/* 设计稿 header：上下 12.5px、左右 12px；border-box 总高统一 56px；
+   底部分隔线宽度随全局 headerBorder 开关（--uikit-header-border-width，默认 0 关闭） */
 .conversation-list__header {
   box-sizing: border-box;
   padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px;
@@ -881,7 +882,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
   align-items: center;
   justify-content: space-between;
   min-height: 56px;
-  border-bottom: 1px solid var(--uikit-border-color);
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-border-color);
 }
 
 .conversation-list__header--center {

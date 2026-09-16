@@ -2,6 +2,7 @@
 import { nextTick, ref, watch } from 'vue'
 import { EmPopup as Popup } from '@easemob/uikit-core'
 import { EmButton as Button } from '@easemob/uikit-core'
+import { EmInput as Input } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 
 export interface ChatInfoDrawerFieldEditModalProps {
@@ -34,7 +35,7 @@ const emit = defineEmits<{
 const { t } = useLocale()
 
 const input = ref('')
-const inputRef = ref<HTMLInputElement>()
+const inputRef = ref<InstanceType<typeof Input>>()
 const textareaRef = ref<HTMLTextAreaElement>()
 
 function formatCharCount(current: number, max: number): string {
@@ -47,7 +48,10 @@ watch(
     if (show) {
       input.value = props.value
       await nextTick()
-      ;(props.multiline ? textareaRef.value : inputRef.value)?.focus()
+      if (props.multiline)
+        textareaRef.value?.focus()
+      else
+        inputRef.value?.inputRef?.focus()
     }
   },
 )
@@ -85,15 +89,14 @@ function onSave() {
           :maxlength="props.maxLength"
           @keydown.esc="onCancel"
         />
-        <input
+        <Input
           v-else
           ref="inputRef"
           v-model="input"
-          class="chat-info-drawer-field-edit__input"
           :maxlength="props.maxLength"
-          @keydown.enter="onSave"
+          @submit="onSave"
           @keydown.esc="onCancel"
-        >
+        />
         <div
           class="chat-info-drawer-field-edit__char-count"
           :class="{ 'is-near-limit': input.length > props.maxLength * 0.9 }"
@@ -139,13 +142,12 @@ function onSave() {
   padding: 8px 16px;
 }
 
-.chat-info-drawer-field-edit__input,
 .chat-info-drawer-field-edit__textarea {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--uikit-border-color);
-  /* 椭圆（pill）档位：与 EmInput pill 同规格（9999px 全圆角） */
-  border-radius: 9999px;
+  /* 多行输入圆角跟随主题组件档位（themeStore 写 --uikit-components-radius：ground 8px / square 4px） */
+  border-radius: var(--uikit-components-radius, 8px);
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
@@ -153,13 +155,9 @@ function onSave() {
   line-height: 1.5;
   font-family: inherit;
   box-sizing: border-box;
-}
-
-.chat-info-drawer-field-edit__textarea {
   resize: vertical;
 }
 
-.chat-info-drawer-field-edit__input:focus,
 .chat-info-drawer-field-edit__textarea:focus {
   border-color: var(--uikit-primary-color);
 }

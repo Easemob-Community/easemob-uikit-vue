@@ -93,6 +93,13 @@ export function useTheme() {
     themeStore.setDensity(value)
   }
 
+  // ===== Header 底部分隔线开关 =====
+  const headerBorder = computed(() => themeStore.headerBorder)
+
+  function setHeaderBorder(value: boolean) {
+    themeStore.setHeaderBorder(value)
+  }
+
   // ===== 预设主题 =====
   const preset = computed(() => themeStore.preset)
 
@@ -156,6 +163,7 @@ export function useTheme() {
     hoverStyle: computed(() => themeStore.hoverStyle),
     fontSizeScale,
     density,
+    headerBorder,
     preset,
     bubbleBgOther,
     bubbleBgSelf,
@@ -176,6 +184,7 @@ export function useTheme() {
     setFontSizeScale,
     setFontSize,
     setDensity,
+    setHeaderBorder,
     setPreset,
     setBubbleBg,
     setChatBg,

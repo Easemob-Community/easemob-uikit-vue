@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { formatSdkError } from '@easemob/uikit-core'
 import { EmAvatar as Avatar } from '@easemob/uikit-core'
 import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
@@ -25,7 +25,6 @@ import SharedFileList from '../../group/group-management/shared-file-list.vue'
 import { createLogger } from '@easemob/uikit-core'
 import ChatInfoDrawerMemberCell from './chat-info-drawer-member-cell.vue'
 import ChatInfoDrawerMembers from './chat-info-drawer-members.vue'
-import ChatInfoDrawerMemberSearch from './chat-info-drawer-member-search.vue'
 import ChatInfoDrawerFieldEditModal from './chat-info-drawer-field-edit-modal.vue'
 import ChatInfoDrawerMemberRemoveModal from './chat-info-drawer-member-remove-modal.vue'
 import ChatDrawer from './chat-drawer.vue'
@@ -487,6 +486,7 @@ async function doMuteMember(userId: string) {
     // SDK 5.0.0+ muteDuration 单位为毫秒，-1 表示永久禁言，与群管理-禁言列表添加操作保持一致
     await muteGroupMembers(id, [userId], -1)
     showToast(t('toast.success', '操作成功'), 'success')
+    emit('group-operation', { type: 'mute-member', groupId: id, userId })
   }
   catch (err) {
     showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
@@ -500,6 +500,7 @@ async function doUnmuteMember(userId: string) {
   try {
     await unmuteGroupMembers(id, [userId])
     showToast(t('toast.success', '操作成功'), 'success')
+    emit('group-operation', { type: 'unmute-member', groupId: id, userId })
   }
   catch (err) {
     showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
@@ -517,6 +518,7 @@ async function doBlockMember(userId: string) {
     stores.group.removeGroupMembers(id, [userId])
     stores.group.decrementMemberCount(id, 1)
     showToast(t('toast.success', '操作成功'), 'success')
+    emit('group-operation', { type: 'block-member', groupId: id, userId })
   }
   catch (err) {
     showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
@@ -530,6 +532,7 @@ async function doUnblockMember(userId: string) {
   try {
     await unblockGroupMembers(id, [userId])
     showToast(t('toast.success', '操作成功'), 'success')
+    emit('group-operation', { type: 'unblock-member', groupId: id, userId })
   }
   catch (err) {
     showToast(err instanceof Error ? err.message : String(err) || t('toast.error', '操作失败'), 'error')
@@ -713,8 +716,11 @@ function onViewAllMembers() {
   activePage.value = 'members'
 }
 
-function onOpenMemberSearch() {
-  activePage.value = 'member-search'
+/** 一级页假搜索框：进入 members 二级页并聚焦共享搜索框（成员列表/搜索已合并为一页） */
+function onOpenMembersSearch() {
+  activePage.value = 'members'
+  // members 二级页下一拍才挂载，需等 ref 就绪后再触发聚焦（focusSearch 内部还会再 nextTick 等输入框渲染）
+  nextTick(() => memberListRef.value?.focusSearch())
 }
 
 function closeMemberList() {
@@ -731,8 +737,6 @@ const activePageTitle = computed(() => {
   switch (activePage.value) {
     case 'members':
       return t('chat.info.groupMembers', '群成员')
-    case 'member-search':
-      return t('chat.info.searchMembers', '搜索成员')
     case 'files':
       return t('group.management.sharedFiles', '群文件')
     default:
@@ -877,8 +881,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             <div class="chat-info-drawer__section-label-row">
               <span class="chat-info-drawer__section-label">{{ t('chat.info.groupMembers') }} <span class="chat-info-drawer__count">({{ memberCount }})</span></span>
             </div>
-            <!-- 假搜索框：readonly 视觉同搜索输入框，点击进入 Members Search 二级页 -->
-            <div class="chat-info-drawer__fake-search" @click="onOpenMemberSearch">
+            <!-- 假搜索框：readonly 视觉同搜索输入框，点击进入 members 二级页并聚焦共享搜索框 -->
+            <div class="chat-info-drawer__fake-search" @click="onOpenMembersSearch">
               <Icon name="search" :size="20" />
               <span class="chat-info-drawer__fake-search-placeholder">{{ t('group.memberList.searchPlaceholder', '搜索群成员') }}</span>
             </div>
@@ -1004,7 +1008,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
         <slot name="drawer-actions" v-bind="drawerSlotScope" />
       </template>
 
-      <!-- 二级页：群成员列表（分栏：All / Admin / Allowed / Blocked / Muted） -->
+      <!-- 二级页：群成员列表（分栏：All / Admin / Muted / Blocked + 共享搜索框） -->
       <slot v-if="activePage === 'members'" name="drawer-member-detail" v-bind="drawerSlotScope">
         <div class="chat-info-drawer__member-detail">
           <ChatInfoDrawerMembers
@@ -1025,30 +1029,9 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             @block-member="onBlockMember"
             @unblock-member="onUnblockMember"
             @transfer-owner="onTransferOwner"
-            @group-operation="emit('group-operation', $event)"
           />
         </div>
       </slot>
-
-      <!-- 二级页：成员搜索 -->
-      <div v-else-if="activePage === 'member-search'" class="chat-info-drawer__subpage">
-        <ChatInfoDrawerMemberSearch
-          v-if="groupId"
-          :group-id="groupId"
-          :members="members"
-          :current-user-id="currentUserId ?? ''"
-          :allow-chat="props.allowChat"
-          @chat-member="onChatMember"
-          @remove-member="emit('remove-member', $event)"
-          @set-admin="emit('set-admin', $event)"
-          @remove-admin="emit('remove-admin', $event)"
-          @mute-member="onMuteMember"
-          @unmute-member="onUnmuteMember"
-          @block-member="onBlockMember"
-          @unblock-member="onUnblockMember"
-          @transfer-owner="onTransferOwner"
-        />
-      </div>
 
       <!-- 二级页：群文件（header 右侧上传按钮调 triggerUpload；行 EmCell 发丝线，容器通栏） -->
       <div v-else-if="activePage === 'files'" class="chat-info-drawer__subpage chat-info-drawer__subpage--files">
@@ -1137,11 +1120,12 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   /* border-box + 固定高度：总高恒 56px，与聊天/会话列表 header 严格对齐 */
   box-sizing: border-box;
   height: calc(56px + var(--uikit-safe-top, 0px));
-  /* 设计稿：高 56px、水平内边距 12px、垂直 13px（safe-top 叠加）、底部 1px 分隔线 */
+  /* 设计稿：高 56px、水平内边距 12px、垂直 13px（safe-top 叠加）；
+     底部分隔线宽度随全局 headerBorder 开关（--uikit-header-border-width，默认 0 关闭） */
   padding: calc(var(--uikit-header-padding-y, 13px) + var(--uikit-safe-top, 0px)) 12px
     var(--uikit-header-padding-y, 13px);
   gap: 8px;
-  border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
 }
 
 .chat-info-drawer__close,
@@ -1214,8 +1198,9 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 /* 成员区顶部 label（Members (N)）：18px/500 主文字色（设计稿），横向内边距由外层
    section-label-row 统一提供（8px 12px），自身不再重复 padding */
+/* 字号对齐下方字段 label（群名称/群公告，12px），视觉层级一致 */
 .chat-info-drawer__section-label {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-12);
   font-weight: 500;
   color: var(--uikit-text-primary);
 }

@@ -188,14 +188,30 @@ export function useGroup() {
     await domains.group.updateGroupConfigs(groupId, input)
   }
 
-  /** 开启全员禁言 */
+  /** 开启全员禁言（乐观更新：先写 store 立即反馈，失败回滚原值并抛错） */
   async function muteAllGroupMembers(groupId: string) {
-    await domains.group.muteAllGroupMembers(groupId)
+    const prevMuted = groupStore.getGroupById(groupId)?.mute === true
+    groupStore.updateGroup(groupId, { mute: true })
+    try {
+      await domains.group.muteAllGroupMembers(groupId)
+    }
+    catch (err) {
+      groupStore.updateGroup(groupId, { mute: prevMuted })
+      throw err
+    }
   }
 
-  /** 关闭全员禁言 */
+  /** 关闭全员禁言（乐观更新：先写 store 立即反馈，失败回滚原值并抛错） */
   async function unmuteAllGroupMembers(groupId: string) {
-    await domains.group.unmuteAllGroupMembers(groupId)
+    const prevMuted = groupStore.getGroupById(groupId)?.mute === true
+    groupStore.updateGroup(groupId, { mute: false })
+    try {
+      await domains.group.unmuteAllGroupMembers(groupId)
+    }
+    catch (err) {
+      groupStore.updateGroup(groupId, { mute: prevMuted })
+      throw err
+    }
   }
 
   /**

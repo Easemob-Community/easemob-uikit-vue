@@ -488,7 +488,7 @@ export interface ChatDrawerSlotScope {
 }
 
 /** 会话详情抽屉二级页标识 / ChatInfoDrawer secondary page key */
-export type ChatInfoDrawerPage = 'members' | 'member-search' | 'files' | null
+export type ChatInfoDrawerPage = 'members' | 'files' | null
 
 /** 部分接管 `ChatInfoDrawer` section 插槽的 scope / Slot scope for ChatInfoDrawer section takeovers */
 export interface ChatInfoDrawerSlotScope {

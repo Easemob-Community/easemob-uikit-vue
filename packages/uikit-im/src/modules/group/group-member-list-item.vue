@@ -35,7 +35,7 @@ interface Props {
    * 默认无（不影响群管理等其他消费方）；会话详情抽屉成员页传 'bottom'。
    */
   border?: boolean | 'top' | 'bottom'
-  /** ⋮ 菜单项是否显示图标，默认 false（设计稿菜单为纯文字项） */
+  /** ⋮ 菜单项是否显示图标，默认 false；会话详情抽屉成员页传 true（新设计稿菜单项带 18px 图标） */
   menuWithIcon?: boolean
 }
 
@@ -242,29 +242,30 @@ function getMoreActions(member: UiGroupMember): GroupMemberMoreAction[] {
   if (member.userId !== props.currentUserId) {
     if (isContact(member.userId)) {
       if (canChat(member))
-        actions.push({ key: 'chat', icon: 'bubble', label: t('group.memberList.chat', '私聊') })
+        actions.push({ key: 'chat', icon: 'bubble/circle', label: t('group.memberList.chat', '私聊') })
     }
     else {
       actions.push({ key: 'addContact', icon: 'person/plus', label: t('group.memberList.addContact', '添加为联系人') })
     }
   }
   if (props.showAdminAction && canSetAdmin(member))
-    actions.push({ key: 'setAdmin', icon: 'shield/person', label: t('group.memberList.setAdmin', '设管理员') })
+    actions.push({ key: 'setAdmin', icon: 'shield/person', label: t('group.memberList.setAdmin', '设为管理员') })
   if (props.showAdminAction && canRemoveAdmin(member))
-    actions.push({ key: 'removeAdmin', icon: 'shield/person', label: t('group.memberList.removeAdmin', '取消管理员') })
+    actions.push({ key: 'removeAdmin', icon: 'shield/person', label: t('group.memberList.removeAdmin', '移除管理员') })
   if (canMute(member))
-    actions.push({ key: 'mute', icon: 'person/clock', label: t('group.memberList.mute', '禁言') })
+    actions.push({ key: 'mute', icon: 'bubble/slash', label: t('group.memberList.mute', '禁言') })
   if (canUnmute(member))
-    actions.push({ key: 'unmute', icon: 'person/clock', label: t('group.memberList.unmute', '取消禁言') })
+    actions.push({ key: 'unmute', icon: 'bubble/slash', label: t('group.memberList.unmute', '解除禁言') })
   if (canBlock(member))
-    actions.push({ key: 'block', icon: 'person/xmark', label: t('group.memberList.block', '拉黑') })
+    actions.push({ key: 'block', icon: 'person/ban', label: t('group.memberList.block', '拉黑') })
   if (canUnblock(member))
-    actions.push({ key: 'unblock', icon: 'person/check', label: t('group.memberList.unblock', '取消拉黑') })
-  // 转让群主严格仅群主可见（canTransferOwner 已限定 isOwner）
+    actions.push({ key: 'unblock', icon: 'person/ban', label: t('group.memberList.unblock', '移除拉黑') })
+  // 转让群主严格仅群主可见（canTransferOwner 已限定 isOwner）；
+  // 转让/移除不标 danger（设计稿菜单全项普通文字色，红色警示色从严使用）
   if (canTransferOwner(member))
-    actions.push({ key: 'transferOwner', icon: 'crown', label: t('group.memberList.transferOwner', '转让群主'), danger: true })
+    actions.push({ key: 'transferOwner', icon: 'person/arrows', label: t('group.memberList.transferOwner', '转让群主') })
   if (props.showRemoveAction && canRemove(member))
-    actions.push({ key: 'remove', icon: 'person/minus', label: t('group.memberList.remove', '移除'), danger: true })
+    actions.push({ key: 'remove', icon: 'person/minus', label: t('group.memberList.remove', '从群组移除') })
   return actions
 }
 
@@ -421,6 +422,12 @@ function closeMoreMenu() {
 </template>
 
 <style scoped>
+/* 底部分隔线内收（设计稿：发丝线只画在头像右侧内容区底部，左侧从名字起始、右侧顶满）：
+   左侧内收 = cell 分割线模式左内边距（--uikit-cell-border-padding-x，默认 12）+ 头像 40 + leading 间距（--uikit-spacing-3，12） */
+.group-member-list__item {
+  --uikit-cell-border-inset: calc(var(--uikit-cell-border-padding-x, 12px) + 40px + var(--uikit-spacing-3, 12px));
+}
+
 .group-member-list__info {
   flex: 1;
   min-width: 0;
@@ -449,43 +456,45 @@ function closeMoreMenu() {
   color: var(--uikit-primary-color);
 }
 
+/* 角色/状态徽标统一实底白字（设计稿）：8px/600、padding 2px 4px、radius 4px */
 .group-member-list__role {
-  font-size: var(--uikit-font-size-10);
-  padding: 1px 5px;
+  font-size: var(--uikit-font-size-8);
+  font-weight: 600;
+  padding: 2px 4px;
   border-radius: 4px;
   line-height: 1.2;
   flex-shrink: 0;
+  color: var(--uikit-text-inverse);
 }
 
-/* 角色 tag 配色（设计稿）：Owner = 主色蓝、Admin = warning 橙 */
+/* 角色 tag 配色（设计稿）：Owner = 主色蓝实底、Admin = warning 橙实底 */
 .group-member-list__role--owner {
-  background-color: rgba(var(--uikit-primary-rgb), 0.12);
-  color: var(--uikit-primary-color);
+  background-color: var(--uikit-primary-color);
 }
 
 .group-member-list__role--admin {
-  background-color: rgba(var(--uikit-warning-rgb), 0.12);
-  color: var(--uikit-warning-color);
+  background-color: var(--uikit-warning-color);
 }
 
 .group-member-list__status-tag {
-  font-size: var(--uikit-font-size-10);
-  padding: 1px 5px;
+  font-size: var(--uikit-font-size-8);
+  font-weight: 600;
+  padding: 2px 4px;
   border-radius: 4px;
   line-height: 1.2;
   flex-shrink: 0;
 }
 
-/* 状态标签配色（设计稿指定值入 token）：禁言 = #A9AEB2、黑名单 = #484D51（暗色提亮为次级文字色），
-   同系 12% 底色由 color-mix 实时派生，自动跟随明暗与覆写 */
+/* 状态标签配色（设计稿指定值入 token）：禁言 = --uikit-member-tag-muted-color、
+   拉黑 = --uikit-member-tag-blocked-color，实底白字（暗色下 blocked token 已提亮为次级文字色） */
 .group-member-list__status-tag--muted {
-  background-color: color-mix(in srgb, var(--uikit-member-tag-muted-color, #a9aeb2) 12%, transparent);
-  color: var(--uikit-member-tag-muted-color, #a9aeb2);
+  background-color: var(--uikit-member-tag-muted-color, #a9aeb2);
+  color: var(--uikit-text-inverse);
 }
 
 .group-member-list__status-tag--blocked {
-  background-color: color-mix(in srgb, var(--uikit-member-tag-blocked-color, #484d51) 12%, transparent);
-  color: var(--uikit-member-tag-blocked-color, #484d51);
+  background-color: var(--uikit-member-tag-blocked-color, #484d51);
+  color: var(--uikit-text-inverse);
 }
 
 .group-member-list__status-tag--allowlist {
@@ -533,13 +542,18 @@ function closeMoreMenu() {
   display: inline-flex;
 }
 
+/* ⋮ 弹出菜单（设计稿 212px 卡）：容器 padding 4px + 项间距 4px；
+   菜单项紧凑高度约 34px、hover 顶满走 --uikit-bg-hover（Cell 默认），文案 14px/500 同为 Cell 默认 */
 .group-member-list__context-menu {
   display: flex;
   flex-direction: column;
-  min-width: 140px;
+  gap: 4px;
+  min-width: 212px;
   padding: 4px;
-  /* 卡片内操作项：紧凑 padding + hover 背景顶满 */
+  /* 卡片内操作项：紧凑 padding + hover 背景顶满 + 圆角跟随卡片 */
   --uikit-item-hover-padding-x: 12px;
-  --uikit-cell-height-compact: 40px;
+  --uikit-cell-height-compact: 34px;
+  --uikit-cell-gap: 0px;
+  --uikit-item-hover-radius: 4px;
 }
 </style>

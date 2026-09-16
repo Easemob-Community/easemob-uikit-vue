@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, EmIcon as Icon, EmIconButton as IconButton, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
 import type { UiGroup } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
@@ -37,7 +37,7 @@ const fetchFailedIds = ref<Set<string>>(new Set())
 
 // 群名称编辑状态（modal 模式）
 const nameModalShow = ref(false)
-const nameInputRef = ref<HTMLInputElement>()
+const nameInputRef = ref<InstanceType<typeof Input>>()
 const nameInput = ref('')
 const savingName = ref(false)
 
@@ -112,7 +112,7 @@ function cancelEditName() {
 watch(nameModalShow, async (show) => {
   if (show) {
     await nextTick()
-    nameInputRef.value?.focus()
+    nameInputRef.value?.inputRef?.focus()
   }
 })
 
@@ -281,15 +281,13 @@ async function onConfirmAction() {
       @confirm="saveName"
       @cancel="cancelEditName"
     >
-      <input
+      <Input
         ref="nameInputRef"
         v-model="nameInput"
-        class="group-detail__name-input"
-        type="text"
         :disabled="savingName"
         :placeholder="t('chat.info.groupName', '群名称')"
-        @keyup.enter="saveName"
-      >
+        @submit="saveName"
+      />
     </Modal>
   </div>
 </template>
@@ -392,24 +390,6 @@ async function onConfirmAction() {
 
 .group-detail__action:hover {
   opacity: 0.85;
-}
-
-/* 群名称编辑弹窗输入框 */
-.group-detail__name-input {
-  width: 100%;
-  box-sizing: border-box;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--uikit-border-color, #e5e7eb);
-  border-radius: var(--uikit-components-radius, 6px);
-  background-color: var(--uikit-bg-base);
-  color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
-  outline: none;
-}
-
-.group-detail__name-input:focus {
-  border-color: var(--uikit-primary-color, #3b82f6);
 }
 
 @media (max-width: 640px) {

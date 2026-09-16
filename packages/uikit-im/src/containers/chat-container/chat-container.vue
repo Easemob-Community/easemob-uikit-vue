@@ -243,4 +243,13 @@ defineExpose({
   border-radius: 0;
   overflow: visible;
 }
+
+/* card + push 组合下容器壳的 1px 描边被上方规则移除，而 .chat__main 自成平面不再补边，
+   导致聊天区内容比带 1px 边框的会话列表卡片高 1px，两侧 header 分隔线错位。
+   此处用 1px 透明边框补位（背景默认 border-box 铺满至外缘，视觉无变化），保持
+   「card 变体内容距卡片外缘 1px」口径在 overlay/push 两种抽屉模式下一致。 */
+.chat-container--card.chat-container--drawer-push :deep(.chat__main) {
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
 </style>

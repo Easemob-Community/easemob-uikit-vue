@@ -142,7 +142,8 @@ watch(
   <Modal
     :show="props.show"
     :title="t('conversation.addContact', '添加联系人')"
-    :width="400"
+    :width="719"
+    body-flush
     :confirm-text="t('button.confirm', '确认')"
     :confirm-disabled="!canSubmit"
     :confirm-loading="loading"
@@ -160,22 +161,24 @@ watch(
       <template v-if="searchable">
         <div class="add-contact-modal__field">
           <label class="add-contact-modal__label">{{ t('contact.searchUser', '搜索用户') }}</label>
-          <div class="add-contact-modal__search-row">
-            <Input
-              v-model="keyword"
-              variant="default"
-              :placeholder="t('contact.searchUserPlaceholder', '输入手机号 / 邮箱 / 用户 ID')"
-              @submit="onSearch"
-            />
-            <Button
-              type="primary"
-              size="small"
-              :disabled="!keyword.trim()"
-              :loading="searching"
-              @click="onSearch"
-            >
-              {{ t('contact.search', '搜索') }}
-            </Button>
+          <div class="add-contact-modal__control">
+            <div class="add-contact-modal__search-row">
+              <Input
+                v-model="keyword"
+                variant="default"
+                :placeholder="t('contact.searchUserPlaceholder', '输入手机号 / 邮箱 / 用户 ID')"
+                @submit="onSearch"
+              />
+              <Button
+                type="primary"
+                size="small"
+                :disabled="!keyword.trim()"
+                :loading="searching"
+                @click="onSearch"
+              >
+                {{ t('contact.search', '搜索') }}
+              </Button>
+            </div>
           </div>
         </div>
         <div v-if="searched" class="add-contact-modal__search-results">
@@ -207,22 +210,26 @@ watch(
       </template>
       <div class="add-contact-modal__field">
         <label class="add-contact-modal__label">{{ t('contact.userId', '用户 ID') }}</label>
-        <Input
-          v-model="userId"
-          variant="default"
-          :placeholder="t('contact.addContactPlaceholder', '输入用户 ID')
-          "
-          @submit="onConfirm"
-        />
+        <div class="add-contact-modal__control">
+          <Input
+            v-model="userId"
+            variant="default"
+            :placeholder="t('contact.addContactPlaceholder', '输入用户 ID')
+            "
+            @submit="onConfirm"
+          />
+        </div>
       </div>
       <div class="add-contact-modal__field">
         <label class="add-contact-modal__label">{{ t('contact.inviteReason', '附言') }}</label>
-        <Input
-          v-model="reason"
-          variant="default"
-          :placeholder="t('contact.addContactReasonPlaceholder', '输入验证信息（可选）')
-          "
-        />
+        <div class="add-contact-modal__control">
+          <Input
+            v-model="reason"
+            variant="default"
+            :placeholder="t('contact.addContactReasonPlaceholder', '输入验证信息（可选）')
+            "
+          />
+        </div>
       </div>
       <div v-if="errorMsg && !(searchable && searched && searchResults.length === 0)" class="add-contact-modal__error">
         {{ errorMsg }}
@@ -236,24 +243,33 @@ watch(
 </template>
 
 <style scoped>
+/* 对齐设计稿 pop Form 形态：body py-12 贴边（Modal body-flush），表单项 label 28px 行 + 输入区 px-20 py-8 */
 .add-contact-modal__body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  padding: 12px 0;
 }
 
 .add-contact-modal__field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
 .add-contact-modal__label {
-  font-size: var(--uikit-font-size-13);
+  height: 28px;
+  line-height: 28px;
+  padding: 0 20px;
+  font-size: var(--uikit-font-size-12);
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
 }
 
+.add-contact-modal__control {
+  padding: 8px 20px;
+}
+
 .add-contact-modal__error {
+  padding: 4px 20px 0;
   font-size: var(--uikit-font-size-12);
   color: var(--uikit-danger-color);
 }
@@ -272,7 +288,7 @@ watch(
 .add-contact-modal__search-results {
   max-height: 220px;
   overflow-y: auto;
-  margin: 0 -8px;
+  margin: 0 12px;
 }
 
 .add-contact-modal__search-empty {

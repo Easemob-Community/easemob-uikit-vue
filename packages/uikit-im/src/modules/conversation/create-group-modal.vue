@@ -432,7 +432,8 @@ watch(
   justify-content: flex-start;
   padding: 16px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  /* 底部分隔线宽度随全局 headerBorder 开关（默认 0 关闭） */
+  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-border-color, #e5e7eb);
 }
 
 .create-group-modal__title {

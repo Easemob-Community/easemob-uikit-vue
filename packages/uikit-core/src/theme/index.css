@@ -64,6 +64,8 @@
   --uikit-border-color: #e5e7eb;
   --uikit-border-light: #f3f4f6;
   --uikit-divider-color: rgba(0, 0, 0, 0.06);
+  /* Header 底部分隔线宽度：默认 0（关闭），由 themeStore.headerBorder 运行时覆写为 1px */
+  --uikit-header-border-width: 0px;
 
   /* 滚动条 */
   --uikit-scrollbar-width: 6px;
@@ -272,6 +274,9 @@
   --uikit-switch-handle-bg: #FFFFFF;
   --uikit-switch-handle-ring: #f1f2f3;
   --uikit-switch-handle-shadow: 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1);
+  /* loading 手柄内转圈：浅色手柄上 12% 黑轨迹 + 主色弧段 */
+  --uikit-switch-loading-track: rgba(0, 0, 0, 0.12);
+  --uikit-switch-loading-color: var(--uikit-primary-color);
 
   /* 语义 token：Switch 轨道尺寸（medium 36×20 / small 28×16，手柄由轨道高自动派生）；
      明暗共用，接入方可全局覆盖以自定义宽高 */
@@ -398,6 +403,8 @@
   --uikit-switch-track-inner-shadow: inset 0 4px 2px rgba(0, 0, 0, 0.3);
   /* 手柄落影：对齐设计稿 shadow_onlight/small */
   --uikit-switch-handle-shadow: 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.10);
+  /* loading 手柄内转圈 - 暗色：深色手柄上 20% 白轨迹 + 主色弧段 */
+  --uikit-switch-loading-track: rgba(255, 255, 255, 0.2);
 
   /* 会话详情抽屉图标/按钮文字、群成员名与状态标签 - 暗色（跟随文字色 token 保证可读） */
   --uikit-drawer-close-color: var(--uikit-text-primary);

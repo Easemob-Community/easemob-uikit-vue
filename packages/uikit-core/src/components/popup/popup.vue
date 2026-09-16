@@ -237,6 +237,10 @@ onClickOutside(contentRef, (event) => {
   // 锚定模式下点击 anchor 本身不关闭 popup
   if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node))
     return
+  // 点击落在其它弹层（如从本弹层内打开的 Modal，自身 teleport 到 body）内时不视为外部点击，
+  // 避免下层弹层被误关而上层弹窗状态残留（与 ChatDrawer 的 .uikit-popup 豁免同一口径）
+  if (event.target instanceof Element && event.target.closest('.uikit-popup'))
+    return
   if (props.closeOnClickOverlay && props.show) {
     emit('update:show', false)
     emit('close')

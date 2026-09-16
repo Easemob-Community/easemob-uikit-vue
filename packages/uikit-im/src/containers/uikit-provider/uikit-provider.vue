@@ -89,6 +89,11 @@ export interface ProviderProps {
      * Custom muted icon color; applies to both light and dark modes.
      */
     iconMutedColor?: string
+    /**
+     * 全局 header 底部分隔线开关（会话/通讯录/聊天/抽屉/弹窗 header 的 1px 底线），默认 false 关闭。
+     * Global header bottom divider toggle (conversation/contact/chat/drawer/modal headers). Default false.
+     */
+    headerBorder?: boolean
   }
   /** 界面语言：zh-CN 中文（默认） / en 英文 */
   locale?: 'zh-CN' | 'en'
