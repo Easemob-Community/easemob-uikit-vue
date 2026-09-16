@@ -269,7 +269,7 @@ const displayNameValue = computed(() => displayName.value || userInfo.value?.nic
 const subtitle = computed(() => {
   if (!remark.value || !userInfo.value?.nickname)
     return undefined
-  return `${t('userCard.username', '用户名')}: ${userInfo.value.nickname}`
+  return userInfo.value.nickname
 })
 const showAliasSection = computed(() =>
   props.showAlias && isContact.value && !isSelf.value && features.enableContact,
@@ -439,6 +439,7 @@ function onPresenceChanged() {
         :avatar="displayAvatar"
         layout="plain"
         :subtitle="subtitle"
+        :subtitle-label="t('userCard.username', '用户名')"
         :user-id-label="t('contact.detail.userId', '用户 ID')"
         :user-id-copyable="false"
         :status="presenceStatus"
@@ -465,7 +466,7 @@ function onPresenceChanged() {
               :title="t('contact.detail.edit', '编辑')"
               @click="startEditRemark"
             >
-              <Icon name="rect_notched/pen" :size="22" :style="{ color: '#C9CDCF' }" />
+              <Icon name="rect_notched/pen" :size="22" :style="{ color: 'var(--uikit-drawer-field-action-color, #C9CDCF)' }" />
             </button>
           </div>
         </template>
@@ -520,15 +521,7 @@ function onPresenceChanged() {
   overflow-y: auto;
 }
 
-/* 设计稿外壳：16px 圆角 + 指定投影（Popup 外壳已通过 shell=false 关闭，视觉由卡片承担） */
-.user-card-modal :deep(.user-card) {
-  border-radius: 16px;
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
-}
-
-.user-card-modal :deep(.user-card__body) {
-  padding: 24px;
-}
+/* 设计稿外壳（16px 圆角 + 投影、24px 内边距）已下沉到 core UserCard 的 plain 布局，此处不再覆盖 */
 
 /* 移动端底部抽屉模式：通栏宽度，卡片视觉交还 Popup 外壳 */
 .user-card-modal--sheet {
@@ -547,17 +540,21 @@ function onPresenceChanged() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.7);
+  /*  loading 遮罩：浮层底色 70% 透明，明暗自适应（暗色下不再盖白幕） */
+  background-color: color-mix(in srgb, var(--uikit-bg-elevated, #ffffff) 70%, transparent);
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-14);
   border-radius: var(--uikit-components-radius, 12px);
 }
 
+/* User Alias（备注）区：对齐设计稿 header——高 60、上下 8、底对齐 */
 .user-card-modal__alias {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
-  margin: 8px 0 20px;
+  min-height: 60px;
+  box-sizing: border-box;
+  padding: 8px 0;
 }
 
 .user-card-modal__alias-main {
@@ -565,25 +562,25 @@ function onPresenceChanged() {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .user-card-modal__alias-label {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
+  line-height: 16px;
   color: var(--uikit-text-secondary);
 }
 
 .user-card-modal__alias-value {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
 
+/* 空备注占位「No Value」：设计稿 #C9CDCF（弱化色，与抽屉字段动作图标同色 token） */
 .user-card-modal__alias-value.is-empty {
-  font-size: var(--uikit-font-size-14);
-  font-weight: 400;
-  color: var(--uikit-text-tertiary);
+  color: var(--uikit-drawer-field-action-color, #C9CDCF);
 }
 
 .user-card-modal__alias-edit-btn {

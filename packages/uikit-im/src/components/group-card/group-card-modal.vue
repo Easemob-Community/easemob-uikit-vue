@@ -152,7 +152,8 @@ function onActionClick(key: string) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.7);
+  /* loading 遮罩：浮层底色 70% 透明，明暗自适应（暗色下不再盖白幕） */
+  background-color: color-mix(in srgb, var(--uikit-bg-elevated, #ffffff) 70%, transparent);
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-14);
   border-radius: var(--uikit-components-radius, 12px);

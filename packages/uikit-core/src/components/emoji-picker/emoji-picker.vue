@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, type Ref } from 'vue'
 import { t } from '../../locale'
-import IconButton from '../icon-button/icon-button.vue'
 import { useUIKitStorage } from '../../composables/use-uikit-storage'
 import { EMOJI_ALL } from './emojis'
 import type { EmojiStickerItem, EmojiStickerPack, EmojiTabsPosition } from './types'
@@ -21,7 +20,7 @@ export interface EmojiPickerProps {
   tabsPosition?: EmojiTabsPosition
   /** sticker 悬停时切换展示 gif（需提供 thumbUrl 预览图），默认 true / Swap to the gif on hover when thumbUrl is present, default true */
   stickerHover?: boolean
-  /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片而非文字；不设时显示文字）/ Optional icon for the "Emoji" view tab, shown as an image preview instead of text */
+  /** 「Emoji」视图 tab 预览小图 URL（可选，展示图片；不设时显示 😀 字形）/ Optional icon for the "Emoji" view tab, shown as an image instead of the default 😀 glyph */
   emojiIcon?: string
 }
 
@@ -71,10 +70,10 @@ interface TabItem {
 
 /** tab 列表：「Emoji」综合视图（常用 + 完整列表合并）+ 注入的表情包；
  *  表情包 tab 尽量带一张预览小图：取 pack.iconUrl，缺省回落到包内第一个 sticker 的预览图；
- *  「Emoji」视图 tab 通过 emojiIcon 配置，未配置时显示文字 */
+ *  「Emoji」视图 tab 通过 emojiIcon 配置图片，未配置时显示 😀 字形 */
 const tabItems = computed<TabItem[]>(() => {
   const tabs: TabItem[] = []
-  tabs.push({ key: 'emoji', name: t('emoji.full', '表情'), iconUrl: props.emojiIcon })
+  tabs.push({ key: 'emoji', name: t('emoji.full', 'Emoji'), iconUrl: props.emojiIcon })
   for (const pack of props.stickerPacks) {
     const firstSticker = pack.stickers[0]
     tabs.push({
@@ -168,50 +167,51 @@ function onClose() {
     class="emoji-picker"
     :class="`emoji-picker--tabs-${props.tabsPosition}`"
   >
-    <div class="emoji-picker__tabs-bar">
-      <div
-        v-if="props.stickerPacks.length > 0"
-        class="emoji-picker__tabs"
-        role="tablist"
+    <!-- 仅注入了表情包时才需要 tab 栏（单 Emoji 视图无切换意义） -->
+    <div
+      v-if="props.stickerPacks.length > 0"
+      class="emoji-picker__tabs-bar"
+      role="tablist"
+    >
+      <button
+        v-for="(tab, index) in tabItems"
+        :key="tab.key"
+        type="button"
+        role="tab"
+        class="emoji-picker__tab"
+        :class="{ 'emoji-picker__tab--active': activeTab === index }"
+        :aria-selected="activeTab === index"
+        :title="tab.name"
+        @click="onTabClick(index)"
       >
-        <button
-          v-for="(tab, index) in tabItems"
-          :key="tab.key"
-          type="button"
-          role="tab"
-          class="emoji-picker__tab"
-          :class="{ 'emoji-picker__tab--active': activeTab === index }"
-          :aria-selected="activeTab === index"
-          @click="onTabClick(index)"
+        <img
+          v-if="tab.iconUrl"
+          class="emoji-picker__tab-icon"
+          :src="tab.iconUrl"
+          :alt="tab.name"
         >
-          <img
-            v-if="tab.iconUrl"
-            class="emoji-picker__tab-icon"
-            :src="tab.iconUrl"
-            :alt="tab.name"
-          >
-          <template v-else>
-            {{ tab.name }}
-          </template>
-        </button>
-      </div>
-      <IconButton
-        class="emoji-picker__close"
-        icon="xmark/bold"
-        size="small"
-        variant="ghost"
-        :title="t('button.close', '关闭')"
-        @click="onClose"
-      />
+        <span
+          v-else-if="tab.key === 'emoji'"
+          class="emoji-picker__tab-emoji"
+          aria-hidden="true"
+        >😀</span>
+        <template v-else>
+          {{ tab.name }}
+        </template>
+      </button>
     </div>
 
     <div class="emoji-picker__body" role="tabpanel">
-      <template v-if="activeStickerPack">
+      <!-- 表情包视图：4 列网格（宽屏 auto-fill 自适应），图 + 名称标签 -->
+      <div
+        v-if="activeStickerPack"
+        class="emoji-picker__sticker-grid"
+      >
         <button
           v-for="sticker in activeStickerPack.stickers"
           :key="sticker.key"
           type="button"
-          class="emoji-picker__item emoji-picker__item--sticker"
+          class="emoji-picker__sticker"
           :title="sticker.name"
           @mouseenter="onStickerEnter(sticker)"
           @mouseleave="onStickerLeave"
@@ -223,34 +223,51 @@ function onClose() {
             :alt="sticker.name || ''"
             loading="lazy"
           >
+          <span
+            v-if="sticker.name"
+            class="emoji-picker__sticker-name"
+          >{{ sticker.name }}</span>
         </button>
-      </template>
+      </div>
 
-      <!-- 「Emoji」综合视图：常用（有内容才显示）在上、完整列表在下，单一滚动区 -->
+      <!-- 「Emoji」综合视图：常用（有内容才显示）+ 完整列表两个分区，单一滚动区 -->
       <template v-else>
-        <template v-if="props.recent && recentList.length > 0">
-          <div class="emoji-picker__section-title">{{ t('emoji.recent', '常用') }}</div>
-          <button
-            v-for="emoji in recentList"
-            :key="`recent-${emoji}`"
-            type="button"
-            class="emoji-picker__item"
-            @click="onSelect(emoji)"
-          >
-            {{ emoji }}
-          </button>
-        </template>
-
-        <div class="emoji-picker__section-title">{{ t('emoji.full', '表情') }}</div>
-        <button
-          v-for="emoji in EMOJI_ALL"
-          :key="emoji"
-          type="button"
-          class="emoji-picker__item"
-          @click="onSelect(emoji)"
+        <section
+          v-if="props.recent && recentList.length > 0"
+          class="emoji-picker__section"
         >
-          {{ emoji }}
-        </button>
+          <div class="emoji-picker__section-title">
+            {{ t('emoji.recent', '常用') }}
+          </div>
+          <div class="emoji-picker__emoji-grid">
+            <button
+              v-for="emoji in recentList"
+              :key="`recent-${emoji}`"
+              type="button"
+              class="emoji-picker__item"
+              @click="onSelect(emoji)"
+            >
+              {{ emoji }}
+            </button>
+          </div>
+        </section>
+
+        <section class="emoji-picker__section">
+          <div class="emoji-picker__section-title">
+            {{ t('emoji.full', 'Emoji') }}
+          </div>
+          <div class="emoji-picker__emoji-grid">
+            <button
+              v-for="emoji in EMOJI_ALL"
+              :key="emoji"
+              type="button"
+              class="emoji-picker__item"
+              @click="onSelect(emoji)"
+            >
+              {{ emoji }}
+            </button>
+          </div>
+        </section>
       </template>
     </div>
   </div>
@@ -280,22 +297,21 @@ function onClose() {
   flex-direction: row-reverse;
 }
 
-/* tabs 栏：默认横条（top/bottom） */
+/* tabs 栏：默认横条（top/bottom），40×40 图标 tab */
 .emoji-picker__tabs-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 4px 8px;
   flex-shrink: 0;
 }
 
 .emoji-picker--tabs-top .emoji-picker__tabs-bar {
-  border-bottom: 1px solid var(--uikit-border-light);
+  border-bottom: 1px solid var(--uikit-border-color);
 }
 
 .emoji-picker--tabs-bottom .emoji-picker__tabs-bar {
-  border-top: 1px solid var(--uikit-border-light);
+  border-top: 1px solid var(--uikit-border-color);
 }
 
 /* 竖排（left/right）：tabs 栏变为侧栏 */
@@ -303,107 +319,107 @@ function onClose() {
 .emoji-picker--tabs-right .emoji-picker__tabs-bar {
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-start;
-  padding: 8px;
-  max-height: 200px;
+  padding: 8px 4px;
+  max-height: 212px;
   overflow-y: auto;
 }
 
 .emoji-picker--tabs-left .emoji-picker__tabs-bar {
-  border-right: 1px solid var(--uikit-border-light);
+  border-right: 1px solid var(--uikit-border-color);
 }
 
 .emoji-picker--tabs-right .emoji-picker__tabs-bar {
-  border-left: 1px solid var(--uikit-border-light);
-}
-
-.emoji-picker--tabs-left .emoji-picker__close,
-.emoji-picker--tabs-right .emoji-picker__close {
-  margin-top: auto;
-  align-self: center;
-}
-
-.emoji-picker__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  min-width: 0;
-}
-
-.emoji-picker--tabs-left .emoji-picker__tabs,
-.emoji-picker--tabs-right .emoji-picker__tabs {
-  flex-direction: column;
-  align-items: stretch;
+  border-left: 1px solid var(--uikit-border-color);
 }
 
 .emoji-picker__tab {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 8px;
   border: none;
   background: none;
-  border-radius: var(--uikit-components-radius);
+  border-radius: calc(var(--uikit-components-radius, 8px) - 2px);
   white-space: nowrap;
   transition:
     color var(--uikit-anim-duration) var(--uikit-anim-easing),
     background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
-.emoji-picker--tabs-left .emoji-picker__tab,
-.emoji-picker--tabs-right .emoji-picker__tab {
-  justify-content: center;
-}
-
 @media (hover: hover) {
   .emoji-picker__tab:hover {
-    color: var(--uikit-text-primary);
+    background-color: var(--uikit-bg-secondary);
   }
 }
 
-.emoji-picker__tab--active {
+.emoji-picker__tab--active,
+.emoji-picker__tab--active:hover {
   color: var(--uikit-primary-color);
-  background-color: var(--uikit-bg-secondary);
-  font-weight: 500;
+  background-color: var(--uikit-bg-active);
 }
 
 .emoji-picker__tab-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   display: block;
+  border-radius: 4px;
 }
 
-.emoji-picker__close {
-  flex-shrink: 0;
+/* Emoji tab 未配 emojiIcon 时的默认字形 */
+.emoji-picker__tab-emoji {
+  font-size: 24px;
+  line-height: 24px;
+  display: block;
 }
 
 .emoji-picker__body {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 4px;
   padding: 8px;
-  max-height: 200px;
+  /* 固定高度（对稿 212px）：tab 切换时面板尺寸不随内容多少伸缩，超出滚动；
+     必须 flex:none——flex:1 的 flex-basis:0% 会覆盖 height，auto 高度容器里被内容撑开 */
+  height: 212px;
   overflow-y: auto;
-  flex: 1;
+  flex: none;
   min-width: 0;
 }
 
+/* Emoji 综合视图：分区（label + 网格） */
+.emoji-picker__section + .emoji-picker__section {
+  margin-top: 8px;
+}
+
+.emoji-picker__section-title {
+  padding: 0 4px;
+  font-size: var(--uikit-font-size-10);
+  font-weight: var(--uikit-font-weight-medium, 500);
+  color: var(--uikit-text-tertiary);
+  line-height: 1.4;
+}
+
+.emoji-picker__emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
 .emoji-picker__item {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
+  padding: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--uikit-font-size-20);
+  font-size: 24px;
+  line-height: 28px;
   background: none;
   border: none;
-  border-radius: var(--uikit-components-radius);
+  border-radius: calc(var(--uikit-components-radius, 8px) / 2);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
@@ -414,23 +430,50 @@ function onClose() {
   }
 }
 
-.emoji-picker__item--sticker {
-  width: 56px;
-  height: 56px;
-  padding: 4px;
+/* 表情包视图：62px 项 4 列网格（宽屏 auto-fill 自适应列数），图 + 名称 */
+.emoji-picker__sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 62px);
+  justify-content: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.emoji-picker__sticker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 62px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: calc(var(--uikit-components-radius, 8px) / 2);
+  cursor: pointer;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+@media (hover: hover) {
+  .emoji-picker__sticker:hover {
+    background-color: var(--uikit-bg-secondary);
+  }
 }
 
 .emoji-picker__sticker-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 62px;
+  height: 62px;
   object-fit: contain;
+  display: block;
 }
 
-.emoji-picker__section-title {
+.emoji-picker__sticker-name {
   width: 100%;
-  padding: 4px 4px 2px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
-  line-height: 1.4;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

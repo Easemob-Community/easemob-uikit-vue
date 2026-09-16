@@ -35,7 +35,7 @@ const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
 .chat-info-drawer__member-name {
   font-size: var(--uikit-font-size-12);
   font-weight: 400;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-primary);
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

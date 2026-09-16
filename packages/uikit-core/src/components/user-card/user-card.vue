@@ -35,6 +35,8 @@ export interface UserCardProps {
   layout?: 'banner' | 'plain'
   /** 名称下方的副标题行（如 Username），有值才渲染 */
   subtitle?: string
+  /** 副标题行前置标签（如 Username），仅 subtitle 有值时随其渲染 */
+  subtitleLabel?: string
   /** 用户 ID 行前置标签（如 UserID），有值才渲染 */
   userIdLabel?: string
   /** 用户 ID 是否支持点击复制（展示复制图标），默认 true */
@@ -120,38 +122,45 @@ function onSelectorChanged() {
     </div>
 
     <div class="user-card__body">
-      <div class="user-card__profile">
-        <Avatar
-          ref="avatarRef"
-          class="user-card__avatar"
-          :class="{ 'is-editable': props.editable }"
-          :src="props.avatar"
-          :name="props.name"
-          :size="props.layout === 'plain' ? 56 : 90"
-          :presence="props.status"
-          :editable="props.editable"
-          @presence-click="onPresenceClick"
-          @click="onAvatarClick"
-        />
-        <div class="user-card__meta">
-          <div class="user-card__name-row">
-            <span class="user-card__name">{{ props.name }}</span>
-          </div>
-          <div v-if="props.subtitle" class="user-card__subtitle">
-            {{ props.subtitle }}
-          </div>
-          <div class="user-card__user-id">
-            <span v-if="props.userIdLabel" class="user-card__user-id-label">{{ props.userIdLabel }}: </span>
-            <CopyableText v-if="props.userIdCopyable" :text="props.userId" />
-            <span v-else>{{ props.userId }}</span>
+      <div class="user-card__head">
+        <div class="user-card__profile">
+          <Avatar
+            ref="avatarRef"
+            class="user-card__avatar"
+            :class="{ 'is-editable': props.editable }"
+            :src="props.avatar"
+            :name="props.name"
+            :size="props.layout === 'plain' ? 40 : 90"
+            :presence="props.status"
+            :editable="props.editable"
+            @presence-click="onPresenceClick"
+            @click="onAvatarClick"
+          />
+          <div class="user-card__meta">
+            <div class="user-card__name-row">
+              <span class="user-card__name">{{ props.name }}</span>
+            </div>
+            <div v-if="props.subtitle" class="user-card__subtitle">
+              <span v-if="props.subtitleLabel" class="user-card__subtitle-label">{{ props.subtitleLabel }}: </span>
+              <span class="user-card__subtitle-value">{{ props.subtitle }}</span>
+            </div>
+            <div class="user-card__user-id">
+              <span v-if="props.userIdLabel" class="user-card__user-id-label">{{ props.userIdLabel }}: </span>
+              <CopyableText v-if="props.userIdCopyable" :text="props.userId" />
+              <span v-else>{{ props.userId }}</span>
+            </div>
           </div>
         </div>
+
+        <!-- #meta-extra：位于 profile 之后、actions 之前，用于注入备注编辑等业务区块 -->
+        <slot name="meta-extra" />
       </div>
 
-      <!-- #meta-extra：位于 profile 之后、actions 之前，用于注入备注编辑等业务区块 -->
-      <slot name="meta-extra" />
-
-      <div v-if="inlineActions.length" class="user-card__actions">
+      <div
+        v-if="inlineActions.length"
+        class="user-card__actions"
+        :class="{ 'user-card__actions--multi': inlineActions.length > 1 }"
+      >
         <div
           v-for="action in inlineActions"
           :key="action.key"
@@ -243,26 +252,66 @@ function onSelectorChanged() {
   padding: 0 20px 20px;
 }
 
-/* plain 布局：无 banner，头像与文字水平排列 */
+/* plain 布局（设计稿 User Card）：无 banner，16px 圆角卡片 + 指定投影 */
+.user-card--plain {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+}
+
 .user-card--plain .user-card__body {
-  padding-top: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 头部组：profile 与 #meta-extra（备注区）连续堆叠，区间距由 body gap 承担 */
+.user-card--plain .user-card__head {
+  display: flex;
+  flex-direction: column;
 }
 
 .user-card--plain .user-card__profile {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  margin-top: 0;
+  margin: 0;
 }
 
 .user-card--plain .user-card__avatar {
   margin-bottom: 0;
+  box-shadow: none;
 }
 
 .user-card--plain .user-card__meta {
   flex: 1;
   min-width: 0;
-  padding-bottom: 0;
+  padding-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-card--plain .user-card__name {
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
+}
+
+.user-card--plain .user-card__subtitle,
+.user-card--plain .user-card__user-id {
+  margin-top: 0;
+  font-size: var(--uikit-font-size-12);
+  line-height: 16px;
+}
+
+.user-card--plain .user-card__subtitle-label,
+.user-card--plain .user-card__user-id-label {
+  font-weight: 500;
+}
+
+.user-card--plain .user-card__actions,
+.user-card--plain .user-card__block-actions {
+  margin-bottom: 0;
 }
 
 .user-card__profile {
@@ -318,10 +367,11 @@ function onSelectorChanged() {
 
 .user-card__actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
+/* 设计稿：胶囊按钮（radius/full），灰底 + 图标 22 + 文字 medium */
 .user-card__action {
   flex: 1 1 0;
   min-width: 0;
@@ -330,8 +380,10 @@ function onSelectorChanged() {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 10px 4px;
-  border-radius: var(--uikit-components-radius);
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: 999px;
   background-color: var(--uikit-bg-secondary);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -360,26 +412,31 @@ function onSelectorChanged() {
 }
 
 .user-card__action-label {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-16);
+  font-weight: 500;
   text-align: center;
   line-height: 1.2;
+}
+
+/* 多个小胶囊并排时（Chat/Audio/Video）文字降为 14px（设计稿多变体） */
+.user-card__actions--multi .user-card__action-label {
+  font-size: var(--uikit-font-size-14);
 }
 
 .user-card__block-actions {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .user-card__action--block {
   flex: none;
-  padding: 12px 16px;
-  border-radius: 999px;
+  padding: 12px 4px;
 }
 
 .user-card__action--block .user-card__action-label {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
 }
 
 .user-card__info {

@@ -795,9 +795,12 @@ defineExpose({
   border-radius: 0;
 }
 
+/* body 高度交给 flex:1 填满固定高度面板（core 默认 flex:none + 固定 212px，此处还原为自适应） */
 .h5-input__emoji-picker :deep(.emoji-picker__body) {
+  flex: 1;
+  height: auto;
+  min-height: 0;
   max-height: none;
-  height: calc(100% - 41px);
 }
 
 /* 更多面板网格 */

@@ -42,6 +42,7 @@ const props = withDefaults(defineProps<ChatInfoDrawerProps>(), {
   mode: 'push',
   fullscreen: false,
   closeOnClickOutside: true,
+  avatarClickViewProfile: true,
 })
 
 const emit = defineEmits<{
@@ -65,6 +66,8 @@ const emit = defineEmits<{
   (e: 'search-message'): void
   /** 单聊「添加」：以对方为初始成员发起群聊 */
   (e: 'create-group', userId: string): void
+  /** 预览区头像点击：查看用户名片（由宿主 chat 容器接管名片弹窗，anchor 为头像所在元素） */
+  (e: 'view-profile', userId: string, anchor?: HTMLElement): void
 }>()
 
 const logger = createLogger('UIKit:ChatInfoDrawer')
@@ -121,6 +124,11 @@ export interface ChatInfoDrawerProps {
   width?: number
   /** 是否展示「消息搜索」入口行（由宿主按 messageList.search 配置下发） */
   showMessageSearch?: boolean
+  /**
+   * 预览区点击头像是否打开用户名片（单聊对方头像 / 群聊成员宫格头像），默认 true；
+   * 由宿主按 ChatConfig.drawer.avatarClickViewProfile 下发；名片弹层由宿主经 view-profile 事件接管
+   */
+  avatarClickViewProfile?: boolean
 }
 
 const { t } = useLocale()
@@ -686,6 +694,21 @@ function onCreateGroupFromPeer() {
     emit('create-group', peerUserId.value)
 }
 
+/** 单聊：点击对方头像查看名片（开关关闭时不响应） */
+function onPeerAvatarClick(event: MouseEvent) {
+  if (!props.avatarClickViewProfile || !peerUserId.value)
+    return
+  emit('view-profile', peerUserId.value, event.currentTarget as HTMLElement)
+}
+
+/** 群聊宫格：点击成员头像查看名片；开关关闭时不拦截，冒泡回落为宫格容器的「查看全部成员」 */
+function onMemberAvatarClick(member: UiGroupMember, event: MouseEvent) {
+  if (!props.avatarClickViewProfile)
+    return
+  event.stopPropagation()
+  emit('view-profile', member.userId, event.currentTarget as HTMLElement)
+}
+
 function onViewAllMembers() {
   activePage.value = 'members'
 }
@@ -836,7 +859,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
       <template v-if="!activePage">
         <!-- 单聊：成员条（对方头像 + 添加单元格，添加 = 以对方为初始成员发起群聊） -->
         <div v-if="!isGroup" class="chat-info-drawer__member-strip">
-          <div class="chat-info-drawer__strip-cell">
+          <div class="chat-info-drawer__strip-cell" @click="onPeerAvatarClick">
             <Avatar :name="displayName" :src="displayAvatar" :size="48" />
             <span class="chat-info-drawer__strip-name">{{ displayName }}</span>
           </div>
@@ -856,7 +879,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             </div>
             <!-- 假搜索框：readonly 视觉同搜索输入框，点击进入 Members Search 二级页 -->
             <div class="chat-info-drawer__fake-search" @click="onOpenMemberSearch">
-              <Icon name="search" :size="16" />
+              <Icon name="search" :size="20" />
               <span class="chat-info-drawer__fake-search-placeholder">{{ t('group.memberList.searchPlaceholder', '搜索群成员') }}</span>
             </div>
             <slot name="drawer-members" v-bind="drawerSlotScope">
@@ -866,6 +889,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                     v-for="member in displayedMembers"
                     :key="member.userId"
                     :member="member"
+                    @click="onMemberAvatarClick(member, $event)"
                   />
                   <div
                     v-if="canAddMember"
@@ -890,7 +914,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                 </div>
                 <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
                   {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.checkAll', '查看全部') }}
-                  <Icon name="chevron/down" :size="14" />
+                  <Icon name="chevron/down" :size="16" />
                 </button>
               </div>
             </slot>
@@ -936,7 +960,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
         <!-- 会话设置：消息搜索 / 群文件 / 免打扰 / 置顶（单群通用，conversation 级状态） -->
         <slot name="drawer-settings" v-bind="drawerSlotScope">
-          <div class="chat-info-drawer__settings" :class="{ 'chat-info-drawer__settings--group': isGroup }">
+          <div class="chat-info-drawer__settings">
             <Cell
               v-if="props.showMessageSearch"
               :title="t('message.search.title')"
@@ -1110,11 +1134,14 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 .chat-info-drawer__header {
   display: flex;
   align-items: center;
-  /* 与聊天表头（.chat__header）严格对齐：12px/16px 内边距、48px 最小高度、8px 间距 */
-  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px
-    var(--uikit-header-padding-y, 12px);
-  min-height: 48px;
+  /* border-box + 固定高度：总高恒 56px，与聊天/会话列表 header 严格对齐 */
+  box-sizing: border-box;
+  height: calc(56px + var(--uikit-safe-top, 0px));
+  /* 设计稿：高 56px、水平内边距 12px、垂直 13px（safe-top 叠加）、底部 1px 分隔线 */
+  padding: calc(var(--uikit-header-padding-y, 13px) + var(--uikit-safe-top, 0px)) 12px
+    var(--uikit-header-padding-y, 13px);
   gap: 8px;
+  border-bottom: 1px solid var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
 }
 
 .chat-info-drawer__close,
@@ -1156,7 +1183,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 .chat-info-drawer__title {
   font-size: var(--uikit-font-size-18);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--uikit-text-primary);
   flex: 1;
   text-align: center;
@@ -1173,9 +1200,9 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-direction: column;
   overflow-y: auto;
   min-height: 0;
-  /* body 默认无内边距：分隔线/列表行通栏满铺，内容由各区块自行内收 */
+  /* body 默认无内边距、区块间无额外间距：分隔线/列表行通栏满铺，内容由各区块自行内收 */
   padding: 0;
-  gap: 12px;
+  gap: 0;
 }
 
 .chat-info-drawer__section-group {
@@ -1185,50 +1212,46 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-shrink: 0;
 }
 
-/* 成员区顶部 label（Members (N)）：与下方可编辑字段行 label（群名称/群公告）完全一致
-   的字体风格——12px 灰字（设计稿），横向内边距由外层 section-label-row 统一提供
-   （16px，与 header 标题左边缘对齐），自身不再重复 padding */
+/* 成员区顶部 label（Members (N)）：18px/500 主文字色（设计稿），横向内边距由外层
+   section-label-row 统一提供（8px 12px），自身不再重复 padding */
 .chat-info-drawer__section-label {
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
+  color: var(--uikit-text-primary);
 }
 
 .chat-info-drawer__section-label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 8px 12px;
 }
 
 .chat-info-drawer__section {
-  padding: var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
+  padding: 0 var(--uikit-drawer-padding, 16px) var(--uikit-drawer-padding, 16px);
   flex-shrink: 0;
 }
 
-.chat-info-drawer__count {
-  font-weight: 400;
-  color: var(--uikit-text-secondary);
-}
-
-/* 假搜索框：readonly 视觉同搜索输入框，点击进入 Members Search 二级页 */
+/* 假搜索框：readonly 视觉同搜索输入框，点击进入 Members Search 二级页（设计稿：
+   高 36px、margin 0 12px、14px 字号；底色 #F5F5F5 走 --uikit-bg-hover token 映射） */
 .chat-info-drawer__fake-search {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0 16px;
+  margin: 0 12px;
   padding: 0 12px;
-  height: 32px;
+  height: 36px;
   border-radius: 999px;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-bg-hover, #f5f5f5);
   color: var(--uikit-text-tertiary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-14);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
   .chat-info-drawer__fake-search:hover {
-    background-color: var(--uikit-bg-hover);
+    background-color: var(--uikit-bg-tertiary, #f0f0f0);
   }
 }
 
@@ -1238,8 +1261,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   white-space: nowrap;
 }
 
-/* 可编辑字段行：label 小灰 + 值粗体 + 右侧编辑按钮 + 底部发丝线（EmCell border 契约同款规格：
-   行通栏、内容 16px 内收、发丝线 ::after 左内收 16px 右顶满，与下方 EmCell 导航行分割线端点完全一致） */
+/* 可编辑字段行：label 小灰 + 值粗体 + 右侧编辑按钮 + 底部发丝线（设计稿：
+   行通栏、内容 12px 内收、发丝线 ::after 左内收 12px 右顶满） */
 .chat-info-drawer__fields {
   display: flex;
   flex-direction: column;
@@ -1251,13 +1274,13 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 8px 16px;
+  padding: 8px 12px;
 }
 
 .chat-info-drawer__field::after {
   content: '';
   position: absolute;
-  left: 16px;
+  left: 12px;
   right: 0;
   bottom: 0;
   height: 1px;
@@ -1308,8 +1331,8 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  /* body 无内边距，成员条自行内收，与表头标题左边距对齐 */
-  padding: 4px 16px;
+  /* body 无内边距，成员条自行内收 */
+  padding: 16px;
   flex-shrink: 0;
 }
 
@@ -1318,13 +1341,14 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 56px;
+  width: 48px;
+  cursor: pointer;
 }
 
 .chat-info-drawer__strip-name {
   max-width: 100%;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1340,7 +1364,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   box-sizing: border-box;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--uikit-border-color);
+  border: 1px solid var(--uikit-drawer-grid-action-border, #c9cdcf);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1355,21 +1379,17 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   }
 }
 
-/* 会话设置行组：行间 1px 分隔线、内容内收均为 Cell 分割线模式（border="bottom"）的默认风格，
-   单聊保持默认（12px 内收、14px 标题），群聊按设计稿覆盖（见下） */
+/* 会话设置行组：行间 1px 分隔线、内容内收均为 Cell 分割线模式（border="bottom"）的默认风格
+   （12px 内收），单/群统一按设计稿覆盖：行高 52px（--uikit-cell-height-compact 容器作用域覆写）、
+   标题字号 16px（与字段行值字号一致） */
 .chat-info-drawer__settings {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  --uikit-cell-height-compact: 52px;
 }
 
-/* 群聊：内收值覆盖为 16px（--uikit-cell-border-padding-x，cell 契约变量），与可编辑字段行左侧对齐 */
-.chat-info-drawer__settings--group {
-  --uikit-cell-border-padding-x: 16px;
-}
-
-/* 群聊：导航/开关行标题字号统一 16px（设计稿，与字段行值字号一致） */
-.chat-info-drawer__settings--group :deep(.uikit-cell__title) {
+.chat-info-drawer__settings :deep(.uikit-cell__title) {
   font-size: var(--uikit-font-size-16);
 }
 
@@ -1413,7 +1433,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   box-sizing: border-box;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--uikit-border-color);
+  border: 1px solid var(--uikit-drawer-grid-action-border, #c9cdcf);
   /* 圆角跟随主题头像形状（grid 容器注入 --uikit-drawer-grid-action-radius，缺省正圆） */
   border-radius: var(--uikit-drawer-grid-action-radius, 50%);
   display: flex;
@@ -1426,7 +1446,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 .chat-info-drawer__grid-action-name {
   max-width: 100%;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1445,11 +1465,11 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   gap: 4px;
   width: 100%;
   margin-top: 12px;
-  padding: 8px;
+  padding: 4px 8px;
   border: none;
   background: none;
-  color: var(--uikit-primary-color);
-  font-size: var(--uikit-font-size-14);
+  color: var(--uikit-text-secondary);
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   border-radius: var(--uikit-components-radius);
 }
@@ -1461,7 +1481,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__actions {
-  padding: var(--uikit-drawer-padding, 16px);
+  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
