@@ -159,7 +159,7 @@ function onCancel() {
       <div class="uikit-modal__body" :class="[`uikit-modal__body--${props.contentAlign}`, { 'uikit-modal__body--flush': props.bodyFlush }]">
         <div v-if="resolvedIcon || $slots.icon" class="uikit-modal__icon">
           <slot name="icon">
-            <Icon v-if="resolvedIcon" :name="resolvedIcon.name" :size="56" :type="resolvedIcon.type" />
+            <Icon v-if="resolvedIcon" :name="resolvedIcon.name" :size="72" :type="resolvedIcon.type" />
           </slot>
         </div>
         <slot />
@@ -191,7 +191,7 @@ function onCancel() {
 
 <style scoped>
 /* 桌面端外壳由 Modal 自绘（Popup shell=false）：
-   白卡 + 阴影，圆角跟随全局大容器约束 --uikit-components-radius（全局 8 则 8、16 则 16） */
+   白卡 + 阴影，无描边（设计稿形态）；圆角跟随全局大容器约束 --uikit-components-radius */
 .uikit-modal {
   min-width: 280px;
   max-width: calc(90vw - 40px);
@@ -201,9 +201,8 @@ function onCancel() {
   flex-direction: column;
   box-sizing: border-box;
   background-color: var(--uikit-bg-elevated, var(--uikit-bg-base));
-  border: 1px solid var(--uikit-border-color);
   border-radius: var(--uikit-components-radius, 8px);
-  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.12));
   overflow: hidden;
 }
 
@@ -218,11 +217,12 @@ function onCancel() {
   box-shadow: none;
 }
 
+/* 设计稿 header 规格：高 60（padding 13/16/13/12 + 30 关闭热区 + 1px 底分割线），标题 18px/500 */
 .uikit-modal__header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 4px;
+  padding: 13px 12px 13px 16px;
   flex-shrink: 0;
 }
 
@@ -237,8 +237,8 @@ function onCancel() {
 .uikit-modal__title {
   flex: 1;
   min-width: 0;
-  font-size: var(--uikit-font-size-20);
-  font-weight: 600;
+  font-size: var(--uikit-font-size-18);
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
@@ -246,9 +246,11 @@ function onCancel() {
   flex-shrink: 0;
 }
 
+/* 设计稿文本类 body 规格：px-48 py-56，正文 18px/400；
+   表单/列表/穿梭类用 bodyFlush 贴边后由内容自带 padding */
 .uikit-modal__body {
-  padding: 24px;
-  font-size: var(--uikit-font-size-14);
+  padding: 56px 48px;
+  font-size: var(--uikit-font-size-18);
   color: var(--uikit-text-primary);
   overflow-y: auto;
   word-break: break-word;
@@ -276,10 +278,11 @@ function onCancel() {
   color: var(--uikit-text-primary);
 }
 
+/* 设计稿 footer 规格：高 80（48 按钮 + 上下 16），按钮右对齐、右缘 22、间距 12 */
 .uikit-modal__footer {
   display: flex;
-  gap: 16px;
-  padding: 0 24px 24px;
+  gap: 12px;
+  padding: 16px 22px;
   flex-shrink: 0;
 }
 
@@ -299,7 +302,13 @@ function onCancel() {
   flex: 1;
 }
 
+/* 移动端 bottom sheet 保持原有紧凑度量，桌面新规格（48/56、80 高 footer）不套用 */
+.uikit-modal--mobile .uikit-modal__body {
+  padding: 24px;
+  font-size: var(--uikit-font-size-14);
+}
+
 .uikit-modal--mobile .uikit-modal__footer {
-  padding-bottom: calc(24px + var(--uikit-safe-bottom, 0px));
+  padding: 0 24px calc(24px + var(--uikit-safe-bottom, 0px));
 }
 </style>

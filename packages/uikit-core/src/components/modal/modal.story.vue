@@ -22,7 +22,7 @@ const formTextarea = ref('')
   <Story title="Modal">
     <Variant title="Text（文本通知）">
       <Button @click="show1 = true">打开 Text Modal</Button>
-      <Modal v-model:show="show1" title="Text" :width="920" confirm-text="Action1" cancel-text="Action2">
+      <Modal v-model:show="show1" title="Text" :width="719" confirm-text="Action1" cancel-text="Action2">
         Shall I compare thee to a summer's day? Thou art more lovely and more
         temperate. Rough winds do shake the darling buds of May, And summer's
         lease hath all too short a date. Sometime too hot the eye of heaven
@@ -37,7 +37,7 @@ const formTextarea = ref('')
         v-model:show="show2"
         title="Text-Icon"
         icon="circle/bang"
-        :width="920"
+        :width="719"
         confirm-text="Action1"
         cancel-text="Action2"
       >
@@ -54,7 +54,7 @@ const formTextarea = ref('')
         title="Text-Icon"
         icon="circle/bang"
         content-align="center"
-        :width="920"
+        :width="719"
         confirm-text="Action1"
         cancel-text="Action2"
       >
@@ -64,18 +64,31 @@ const formTextarea = ref('')
 
     <Variant title="Form（表单）">
       <Button @click="show4 = true">打开 Form Modal</Button>
-      <Modal v-model:show="show4" title="Form" :width="920" confirm-text="Action1" cancel-text="Action2">
+      <Modal v-model:show="show4" title="Form" :width="719" body-flush confirm-text="Action1" cancel-text="Action2">
+        <!-- 设计稿 Form 形态：body py-12 贴边，表单项 label 28px + 输入区 px-20 py-8 -->
         <div class="modal-form">
-          <label class="modal-form__label">Input</label>
-          <Input v-model="formInput" placeholder="Input" />
-          <label class="modal-form__label">Dropdown</label>
-          <!-- 设计稿下拉框静态模拟：通用 Select 组件尚未提供 -->
-          <div class="modal-form__select">
-            <span>Select Item 1</span>
-            <Icon name="chevron/down" :size="16" />
+          <div class="modal-form__item">
+            <label class="modal-form__label">Input</label>
+            <div class="modal-form__control">
+              <Input v-model="formInput" placeholder="Input" />
+            </div>
           </div>
-          <label class="modal-form__label">Input Area</label>
-          <textarea v-model="formTextarea" class="modal-form__textarea" placeholder="Input" rows="5" />
+          <div class="modal-form__item">
+            <label class="modal-form__label">Dropdown</label>
+            <div class="modal-form__control">
+              <!-- 设计稿下拉框静态模拟：通用 Select 组件尚未提供 -->
+              <div class="modal-form__select">
+                <span>Select Item 1</span>
+                <Icon name="chevron/down" :size="16" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-form__item">
+            <label class="modal-form__label">Input Area</label>
+            <div class="modal-form__control">
+              <textarea v-model="formTextarea" class="modal-form__textarea" placeholder="Input" rows="3" />
+            </div>
+          </div>
         </div>
       </Modal>
     </Variant>
@@ -131,31 +144,44 @@ const formTextarea = ref('')
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  padding: 12px 0;
 }
 
 .modal-form__label {
-  font-size: var(--uikit-font-size-14);
+  display: block;
+  padding: 0 20px;
+  height: 28px;
+  line-height: 28px;
+  font-size: var(--uikit-font-size-12);
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
+}
+
+.modal-form__control {
+  padding: 8px 20px;
 }
 
 .modal-form__select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 16px;
   border: 1px solid var(--uikit-border-color);
-  border-radius: var(--uikit-components-radius, 8px);
-  font-size: var(--uikit-font-size-14);
+  border-radius: 16px;
+  font-size: var(--uikit-font-size-16);
   color: var(--uikit-text-primary);
   cursor: pointer;
 }
 
 .modal-form__textarea {
+  box-sizing: border-box;
+  width: 100%;
   padding: 12px 16px;
   border: 1px solid var(--uikit-border-color);
-  border-radius: var(--uikit-components-radius, 8px);
-  font-size: var(--uikit-font-size-14);
+  border-radius: 16px;
+  font-size: var(--uikit-font-size-16);
   color: var(--uikit-text-primary);
   background-color: var(--uikit-bg-base);
   resize: vertical;
