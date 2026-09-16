@@ -253,11 +253,12 @@ defineExpose({
 }
 
 .block-list-contact__header {
+  box-sizing: border-box;
   padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
+  min-height: 56px;
 }
 
 .block-list-contact__title {

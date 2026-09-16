@@ -385,7 +385,7 @@ function createDemoSettings() {
   const notificationSound = ref(false)
 
   /* ===== 联系人容器搜索控制 ===== */
-  const showHomeSearch = ref(true)
+  const showHomeSearch = ref(false)
   const showContactSearch = ref(true)
   const showGroupSearch = ref(true)
 

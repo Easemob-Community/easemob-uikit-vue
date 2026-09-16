@@ -49,7 +49,7 @@ export interface ContactContainerProps {
   headerAlign?: 'left' | 'center' | 'right'
   /** 是否展示搜索框（向后兼容的统一开关，默认 true） */
   showSearch?: boolean
-  /** 是否展示 home 视图搜索框，默认 true */
+  /** 是否展示 home 视图搜索框，默认 false */
   showHomeSearch?: boolean
   /** 是否展示联系人子视图搜索框，默认 undefined（回退到 showSearch） */
   showContactSearch?: boolean
@@ -94,6 +94,8 @@ export interface ContactContainerProps {
   entries?: AddressBookContainerEntry[]
   /** 是否在联系人子视图头部展示添加好友按钮，默认 true */
   showContactAddButton?: boolean
+  /** 是否在 home 头部展示「添加好友」按钮，默认 true */
+  showHomeAddButton?: boolean
   /** 是否在群组子视图头部展示创建群组按钮，默认 true */
   showGroupCreateButton?: boolean
   /** 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true */
@@ -165,7 +167,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showHeader: true,
   headerAlign: 'left',
   showSearch: true,
-  showHomeSearch: true,
+  showHomeSearch: false,
   showScrollToTop: true,
   transition: 'slide',
   // showNotice/noticeCount 默认值说明：
@@ -207,6 +209,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   autoFetchGroups: true,
   enablePresence: undefined,
   showContactAddButton: true,
+  showHomeAddButton: true,
   showGroupCreateButton: true,
   showBlocklistAddButton: true,
 })
@@ -333,6 +336,7 @@ defineExpose({
     :entries="props.entries"
     :initial-view="props.initialView as AddressBookContainerView"
     :show-contact-add-button="props.showContactAddButton"
+    :show-home-add-button="props.showHomeAddButton"
     :show-group-create-button="props.showGroupCreateButton"
     :show-blocklist-add-button="props.showBlocklistAddButton"
     @view-change="(v) => emit('view-change', v as ContactContainerView)"
@@ -347,7 +351,7 @@ defineExpose({
     <template #header>
       <slot name="header" />
     </template>
-    <template #header-extra>
+    <template v-if="$slots['header-extra']" #header-extra>
       <slot name="header-extra" />
     </template>
     <template #nav="navProps">

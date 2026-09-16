@@ -235,7 +235,10 @@ function avatarName(invite: UiContactInvite): string {
   display: flex;
   align-items: center;
   gap: 8px;
+  box-sizing: border-box;
   padding: 12px 16px;
+  /* border-box 总高统一 56px（与通讯录/会话列表 header 一致） */
+  min-height: 56px;
   flex-shrink: 0;
 }
 

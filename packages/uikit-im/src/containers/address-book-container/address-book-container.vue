@@ -22,7 +22,7 @@ export interface AddressBookContainerEntry {
   key: string
   /** 入口标签文本 */
   label: string
-  /** 右侧数量徽标，0 时不展示 */
+  /** 入口数量，内联展示在标题后，0 时不展示 */
   count?: number
   /** 入口图标名（icon-map 中的 name） */
   icon?: string
@@ -48,7 +48,9 @@ export interface AddressBookContainerProps {
   title?: string
   /** Header 对齐方式，默认 left */
   headerAlign?: 'left' | 'center' | 'right'
-  /** 是否展示搜索框（home 生效），默认 true */
+  /** 是否在 home 头部展示「添加好友」按钮，默认 true */
+  showHomeAddButton?: boolean
+  /** 是否展示搜索框（home 生效），默认 false */
   showSearch?: boolean
   /** 自定义根元素 class */
   class?: string
@@ -76,7 +78,7 @@ export interface AddressBookContainerProps {
   contactCount?: number
   /** 是否自动从 store 推断 groupCount/contactCount（仅未显式传入时生效），默认 true */
   autoEntryCount?: boolean
-  /** 入口顺序，默认 ['notice', 'group', 'contact', 'blocklist'] */
+  /** 入口顺序，默认 ['contact', 'group', 'notice', 'blocklist'] */
   entryOrder?: AddressBookContainerEntryKey[]
   /** 自定义入口标签，不传则走 i18n */
   noticeLabel?: string
@@ -103,7 +105,8 @@ export interface AddressBookContainerProps {
 const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   showHeader: true,
   headerAlign: 'left',
-  showSearch: true,
+  showHomeAddButton: true,
+  showSearch: false,
   transition: 'slide',
   showNotice: true,
   showGroup: true,
@@ -111,7 +114,7 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   showBlocklist: true,
   noticeCount: undefined,
   autoEntryCount: true,
-  entryOrder: () => ['notice', 'group', 'contact', 'blocklist'] as const,
+  entryOrder: () => ['contact', 'group', 'notice', 'blocklist'] as const,
   noticePersistInvites: false,
   showContactAddButton: true,
   showGroupCreateButton: true,
@@ -237,7 +240,7 @@ const resolvedBlocklistCount = computed(() => {
 type NavEntryWithSort = ContactNavEntry & { sort?: number }
 
 const navEntries = computed<ContactNavEntry[]>(() => {
-  const order = props.entryOrder ?? (['notice', 'group', 'contact', 'blocklist'] as const)
+  const order = props.entryOrder ?? (['contact', 'group', 'notice', 'blocklist'] as const)
   const map: Record<string, ContactNavEntry> = {
     notice: {
       key: 'notice',
@@ -376,8 +379,18 @@ const subviewTitle = computed(() => {
                 {{ props.title || t('contact.title') }}
               </span>
             </slot>
-            <span v-if="$slots['header-extra']" class="address-book-container__header-extra">
-              <slot name="header-extra" />
+            <span class="address-book-container__header-extra">
+              <slot name="header-extra">
+                <IconButton
+                  v-if="props.showHomeAddButton"
+                  icon="person/plus"
+                  size="small"
+                  variant="ghost"
+                  :icon-size="22"
+                  :title="t('contact.addContact')"
+                  @click="emit('add-contact')"
+                />
+              </slot>
             </span>
           </div>
 
@@ -430,7 +443,7 @@ const subviewTitle = computed(() => {
                   icon="chevron/left"
                   size="small"
                   variant="ghost"
-                  :icon-size="20"
+                  :icon-size="22"
                   :title="t('button.back', '返回')"
                   @click="goHome"
                 />
@@ -441,7 +454,7 @@ const subviewTitle = computed(() => {
               <slot name="subheader-extra" :view="view" />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
-                icon="circle/plus"
+                icon="person/plus"
                 size="small"
                 variant="ghost"
                 :icon-size="22"
@@ -539,11 +552,14 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__header {
-  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
+  box-sizing: border-box;
+  padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
+  /* 含 padding/border 的总高（border-box）：12.5 + 30 内容 + 12.5 + 1 分割线 = 56px */
+  min-height: 56px;
+  border-bottom: 1px solid var(--uikit-divider-color);
 }
 
 .address-book-container__header--center {
@@ -555,8 +571,8 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
   color: var(--uikit-text-primary);
 }
 
@@ -584,35 +600,36 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__subheader {
-  position: relative;
-  padding: calc(12px + var(--uikit-safe-top, 0px)) 48px 12px;
+  box-sizing: border-box;
+  padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 48px;
+  gap: 8px;
+  /* 含 padding/border 的总高（border-box）：与首页 header 同为 56px */
+  min-height: 56px;
+  border-bottom: 1px solid var(--uikit-divider-color);
 }
 
 .address-book-container__back {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .address-book-container__subtitle {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
   color: var(--uikit-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .address-book-container__subheader-extra {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;

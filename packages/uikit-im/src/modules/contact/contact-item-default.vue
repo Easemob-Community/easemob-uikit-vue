@@ -116,6 +116,12 @@ const resolvedAvatarShape = computed(() => {
 </template>
 
 <style scoped>
+/* 设计稿（新 Demo 联系人页）：联系人名称 16px/600，与会话项用户名同一排版 */
+.contact-item-default :deep(.uikit-cell__title) {
+  font-size: var(--uikit-font-size-16);
+  font-weight: 600;
+}
+
 .contact-item-default__leading {
   display: inline-flex;
   align-items: center;

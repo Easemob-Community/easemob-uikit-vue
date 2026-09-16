@@ -91,7 +91,7 @@ export interface ContactNavEntry {
   key: string
   /** 入口标签文本 */
   label: string
-  /** 右侧数量徽标，0 时不展示 */
+  /** 入口数量，内联展示在标题后（如「联系人 (332)」），0 时不展示 */
   count?: number
   /** 是否为 hot/未读红点样式（仅 count > 0 时生效） */
   hot?: boolean

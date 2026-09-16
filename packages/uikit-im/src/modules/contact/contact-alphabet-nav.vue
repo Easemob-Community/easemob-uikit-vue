@@ -73,21 +73,22 @@ function onTap(key: string) {
   flex: 1 1 0;
   min-height: 0;
   max-height: 20px;
-  width: 18px;
+  width: 16px;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
+  font-weight: 500;
   line-height: 1;
-  color: var(--uikit-primary-color);
+  color: var(--uikit-text-tertiary);
   cursor: pointer;
   transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 @media (hover: hover) {
   .contact-alphabet-nav__item:hover {
-    color: var(--uikit-primary-hover);
+    color: var(--uikit-text-secondary);
   }
 }
 
@@ -97,11 +98,11 @@ function onTap(key: string) {
   transform: translateY(0.5px);
 }
 
-/* 当前分组高亮：设计稿为蓝底白字实心圆点（16×16）；
-   圆盘用伪元素显式居中，行高被压缩时仍保持正圆 */
+/* 当前分组高亮：设计稿（新 Demo 联系人页）为蓝底白字 16×16 圆角方块（radius 8）；
+   色块用伪元素显式居中，行高被压缩时仍保持形状 */
 .contact-alphabet-nav__item.is-active {
   color: var(--uikit-text-inverse);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .contact-alphabet-nav__item.is-active::before {
@@ -112,7 +113,7 @@ function onTap(key: string) {
   transform: translate(-50%, -50%);
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: 8px;
   background-color: var(--uikit-primary-color);
   z-index: -1;
 }
@@ -122,13 +123,13 @@ function onTap(key: string) {
 }
 
 .contact-alphabet-nav__item.is-empty {
-  color: var(--uikit-text-tertiary, #c0c4cc);
+  opacity: 0.45;
   cursor: default;
 }
 
 @media (hover: hover) {
   .contact-alphabet-nav__item.is-empty:hover {
-    color: var(--uikit-text-tertiary, #c0c4cc);
+    color: var(--uikit-text-tertiary);
   }
 }
 </style>

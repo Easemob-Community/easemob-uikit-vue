@@ -106,6 +106,12 @@ const memberCountMeta = computed(() => {
 </template>
 
 <style scoped>
+/* 与联系人列表项同一排版：群名称 16px/600 */
+.group-item-default :deep(.uikit-cell__title) {
+  font-size: var(--uikit-font-size-16);
+  font-weight: 600;
+}
+
 .group-item-default__leading {
   display: inline-flex;
   align-items: center;

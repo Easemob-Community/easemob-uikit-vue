@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCell as Cell, EmIcon as Icon } from '@easemob/uikit-core'
 import type { ContactNavEntry } from './types'
 
 export type { ContactNavEntry }
@@ -22,6 +22,15 @@ const emit = defineEmits<{
 function onEntryClick(entry: ContactNavEntry) {
   emit('entry-click', entry.key)
 }
+
+function hasCount(entry: ContactNavEntry) {
+  return entry.count !== undefined && entry.count !== null && entry.count > 0
+}
+
+/** 标题文本：计数内联，如「联系人 (332)」 */
+function entryTitle(entry: ContactNavEntry) {
+  return hasCount(entry) ? `${entry.label} (${entry.count})` : entry.label
+}
 </script>
 
 <template>
@@ -35,31 +44,32 @@ function onEntryClick(entry: ContactNavEntry) {
         @click="onEntryClick(entry)"
       >
         <slot name="entry" :entry="entry">
-          <span class="contact-nav__item-label">
-            <Icon
-              v-if="entry.icon"
-              :name="entry.icon"
-              :size="20"
-              class="contact-nav__item-icon"
-            />
-            <span>{{ entry.label }}</span>
-          </span>
-          <span class="contact-nav__item-extra">
-            <slot name="entry-extra" :entry="entry">
-              <span
-                v-if="entry.count !== undefined && entry.count !== null && entry.count > 0"
-                class="contact-nav__item-count"
-                :class="{ 'contact-nav__item-count--hot': entry.hot }"
-              >
-                {{ entry.count > 99 ? '99+' : entry.count }}
+          <Cell class="contact-nav__cell" :inset-hover="false">
+            <template v-if="entry.icon" #leading>
+              <Icon
+                :name="entry.icon"
+                :size="20"
+                class="contact-nav__item-icon"
+              />
+            </template>
+            <template #title>
+              <span class="contact-nav__item-title">
+                <span class="contact-nav__item-label">{{ entryTitle(entry) }}</span>
+                <span
+                  v-if="entry.hot && hasCount(entry)"
+                  class="contact-nav__item-dot"
+                />
               </span>
-            </slot>
-            <Icon
-              name="chevron/right"
-              :size="14"
-              class="contact-nav__item-arrow"
-            />
-          </span>
+            </template>
+            <template #trailing>
+              <slot name="entry-extra" :entry="entry" />
+              <Icon
+                name="chevron/right"
+                :size="22"
+                class="contact-nav__item-arrow"
+              />
+            </template>
+          </Cell>
         </slot>
       </div>
     </template>
@@ -67,48 +77,36 @@ function onEntryClick(entry: ContactNavEntry) {
 </template>
 
 <style scoped>
+/* 与会话列表 card 变体同一口径：圆角白卡、行间距 4px、容器内边距 4px */
 .contact-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 4px;
+  --uikit-cell-gap: 0px;
+  --uikit-item-hover-radius: 8px;
+  --uikit-item-active-radius: 8px;
 }
 
 .contact-nav__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 14px;
-  height: 56px;
-  border-radius: 12px;
-  background-color: var(--uikit-bg-secondary, #f3f4f6);
+  min-width: 0;
   cursor: pointer;
-  transition:
-    background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-    transform 0.15s;
-  user-select: none;
 }
 
-@media (hover: hover) {
-  .contact-nav__item:hover {
-    background-color: var(--uikit-bg-hover);
-  }
-}
-
-.contact-nav__item:active {
-  transform: scale(0.99);
+.contact-nav__item-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
+  color: var(--uikit-text-primary);
 }
 
 .contact-nav__item-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--uikit-font-size-15);
-  font-weight: 500;
-  color: var(--uikit-text-primary);
-  flex: 1;
-  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .contact-nav__item-icon {
@@ -116,35 +114,20 @@ function onEntryClick(entry: ContactNavEntry) {
   flex-shrink: 0;
 }
 
-.contact-nav__item-extra {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+/* 未读红点：8×8，规格见 docs/DESIGN-TOKEN-MAPPING.md */
+.contact-nav__item-dot {
   flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: var(--uikit-badge-bg);
 }
 
-.contact-nav__item-count {
-  font-size: var(--uikit-font-size-13);
-  color: var(--uikit-text-secondary);
-}
-
-.contact-nav__item-count--hot {
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--uikit-font-size-11);
-  font-weight: 600;
-  color: var(--uikit-text-inverse);
-  background-color: var(--uikit-danger-color);
-  border-radius: 9px;
-}
-
+/* 与 Cell 自带箭头同规格：22px 图标 + 4px padding，负 margin 抵消占位 */
 .contact-nav__item-arrow {
-  color: var(--uikit-text-tertiary, var(--uikit-text-secondary));
+  padding: 4px;
+  margin: -4px;
+  flex-shrink: 0;
+  color: var(--uikit-icon-muted);
 }
 </style>

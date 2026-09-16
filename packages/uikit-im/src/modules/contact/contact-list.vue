@@ -628,13 +628,15 @@ defineExpose({
   overflow: hidden;
 }
 
-/* 与会话列表 card 变体同一口径：头部左缘对齐项 hover 背景边缘（rounded 档）/ 项内容左缘（default 档） */
+/* 与会话列表 card 变体同一口径：头部左缘对齐项 hover 背景边缘（rounded 档）/ 项内容左缘（default 档）；
+   border-box 总高统一 56px */
 .contact-list__header {
+  box-sizing: border-box;
   padding: 12px calc(4px + var(--uikit-item-hover-padding-x, 16px));
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
+  min-height: 56px;
 }
 
 .contact-list__header--center {
@@ -646,8 +648,8 @@ defineExpose({
 }
 
 .contact-list__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
   color: var(--uikit-text-primary);
 }
 
@@ -658,9 +660,9 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 
-/* 与会话列表 card 变体同一口径：搜索框与列表可视区同一边界（4px） */
+/* 设计稿（新 Demo 联系人页）：搜索栏容器 px-12 py-8 */
 .contact-list__search {
-  padding: 2px 4px 8px;
+  padding: 8px 12px;
 }
 
 .contact-list__items-area {
@@ -678,8 +680,12 @@ defineExpose({
   overflow-y: auto;
   position: relative;
   outline: none;
-  /* 与会话列表 card 变体一致的可视区内边距（4px），不再叠加 rounded 档的大内缩 */
+  /* 与会话列表 card 变体一致的可视区内边距（4px）；
+     设计稿（新 Demo 联系人页）：项内容水平内边距 12px、64px 行高 = 48 头像 + 8px 上下 padding */
   padding: 4px;
+  --uikit-item-hover-padding-x: 12px;
+  --uikit-cell-padding-y: 8px;
+  --uikit-cell-gap: 4px;
 }
 
 /* 与会话列表 card 变体一致：hover/active 背景顶满整个 cell，不再二次内缩 */
@@ -688,14 +694,18 @@ defineExpose({
 }
 
 /* 分组标题顶满列表可视区（负 margin 抵消 items 容器 4px 内边距），
-   文字与列表项内容左缘对齐（= 4px 容器内边距 + cell margin-x + cell padding-x） */
+   文字与列表项内容左缘对齐（= 4px 容器内边距 + cell margin-x + cell padding-x）。
+   设计稿：28px 高、12px/500、弱化灰；sticky 需不透明底色避免滚动穿透 */
 .contact-list__group-header {
   margin: 0 -4px;
-  padding: 6px calc(4px + var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
+  padding: 0 calc(4px + var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
+  height: 28px;
+  display: flex;
+  align-items: center;
   font-size: var(--uikit-font-size-12);
-  font-weight: 600;
-  color: var(--uikit-text-secondary);
-  background-color: var(--uikit-bg-secondary);
+  font-weight: 500;
+  color: var(--uikit-text-tertiary);
+  background-color: var(--uikit-bg-base);
   position: sticky;
   top: 0;
   z-index: 1;
