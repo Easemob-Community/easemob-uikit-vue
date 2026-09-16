@@ -321,7 +321,7 @@ defineExpose({ refresh, removeMember, setMemberRole })
           @transfer-owner="emit('transfer-owner', $event)"
         >
           <!-- 透传成员操作菜单接管插槽到列表项 -->
-          <template v-if="$slots.memberMenu" #member-menu="slotProps">
+          <template v-if="$slots['member-menu']" #member-menu="slotProps">
             <slot name="member-menu" v-bind="slotProps" />
           </template>
         </GroupMemberListItem>

@@ -190,7 +190,7 @@ function handleReconnect() {
       <template v-if="$slots['empty']" #empty="slotProps">
         <slot name="empty" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['statusBanner']" #status-banner="slotProps">
+      <template v-if="$slots['status-banner']" #status-banner="slotProps">
         <slot name="status-banner" v-bind="slotProps" />
       </template>
       <template v-if="$slots['body']" #body>
@@ -202,19 +202,19 @@ function handleReconnect() {
       <template v-if="$slots['item']" #item="slotProps">
         <slot name="item" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['itemNameSuffix']" #item-name-suffix="slotProps">
+      <template v-if="$slots['item-name-suffix']" #item-name-suffix="slotProps">
         <slot name="item-name-suffix" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['headerMenu']" #header-menu="slotProps">
+      <template v-if="$slots['header-menu']" #header-menu="slotProps">
         <slot name="header-menu" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['newChat']" #new-chat="slotProps">
+      <template v-if="$slots['new-chat']" #new-chat="slotProps">
         <slot name="new-chat" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['addContact']" #add-contact="slotProps">
+      <template v-if="$slots['add-contact']" #add-contact="slotProps">
         <slot name="add-contact" v-bind="slotProps" />
       </template>
-      <template v-if="$slots['createGroup']" #create-group="slotProps">
+      <template v-if="$slots['create-group']" #create-group="slotProps">
         <slot name="create-group" v-bind="slotProps" />
       </template>
     </ConversationList>
