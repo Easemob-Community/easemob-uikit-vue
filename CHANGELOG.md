@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.1 (2026-09-16)
+
+### 修复
+
+- **修复会话列表 card 变体屏蔽全局 hover 风格开关**：`.conversation-list--card` 不再硬编码 `--uikit-item-hover-radius` / `--uikit-item-active-radius`（原固定 8px），改由全局 `hoverStyle` 主题开关驱动；默认档同为 8px，card 设计视觉不变，「方正」档直角、「圆角」档左右缩进在 PC 默认 card 会话列表上恢复生效（联系人 / 群组列表此前已生效）。
+
 ## @easemob/uikit-im 3.7.0 (2026-09-16)
 
 ### 变更

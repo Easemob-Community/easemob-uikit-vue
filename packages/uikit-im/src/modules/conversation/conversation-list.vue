@@ -843,12 +843,12 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 /* ===== 风格变体（列表根作用域覆写 Cell 变量，不影响全局主题） ===== */
 
-/* card（默认）：圆角白卡、无分割线、项间距 4px */
+/* card（默认）：圆角白卡、无分割线、项间距 4px。
+   hover/active 圆角不在此固定，交由全局 hoverStyle 主题开关（--uikit-item-hover-radius /
+   --uikit-item-active-radius）驱动：默认档同为 8px，与 card 设计一致；方正档直角、圆角档保留左右缩进 */
 .conversation-list--card {
   --uikit-cell-bg: var(--uikit-bg-elevated);
   --uikit-cell-gap: 4px;
-  --uikit-item-hover-radius: 8px;
-  --uikit-item-active-radius: 8px;
   /* 设计稿：项内容水平内边距 12px（头像左缘 = 列表 4px + 12px = 16px） */
   --uikit-item-hover-padding-x: 12px;
   /* 设计稿会话项总高 64px：autoHeight 上下各 8px + 内容 48px（头像） */
