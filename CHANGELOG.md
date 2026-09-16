@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-core 2.8.1 (2026-09-16)
+
+### 变更
+
+- **`componentsShape` 方正档改为真直角（视觉变更）**：`square` 档 `--uikit-components-radius` 由 4px 改为 **0px**（`--uikit-components-radius-hover` 同步 10px → 0px）。原 4px 与圆润档 8px 在卡片 / 弹窗 / 按钮上肉眼几乎无差别，实测用户感知为开关失效；方正档现在呈现明确的直角风格（business 预设同步受影响）。同时清理 EmButton 中无人设置 `data-uikit-components-radius` 属性的失效 legacy 选择器（pill 按钮保持胶囊不受开关影响）。
+
 ## @easemob/uikit-im 3.7.1 (2026-09-16)
 
 ### 修复

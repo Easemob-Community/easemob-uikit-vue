@@ -100,15 +100,9 @@ function handleClick(event: MouseEvent) {
   border-radius: 4px;
 }
 
-/* pill 全圆角：优先级高于全局 square 修饰与 components-radius 覆写 */
-.uikit-button--pill,
-[data-uikit-components-radius='4px'] .uikit-button--pill {
+/* pill 全圆角：不受全局 componentsShape（--uikit-components-radius）影响 */
+.uikit-button--pill {
   border-radius: 9999px;
-}
-
-/* 当全局为 square 时，保持按钮的 square 样式 */
-[data-uikit-components-radius='4px'] .uikit-button:not(.uikit-button--square) {
-  border-radius: var(--uikit-components-radius, 8px);
 }
 
 .uikit-button--small {

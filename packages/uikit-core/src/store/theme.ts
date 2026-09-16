@@ -404,15 +404,17 @@ export const useThemeStore = defineStore('theme', () => {
   })
 
   // 组件形状 / 圆角 DOM 属性联动
+  // ground（圆润）：8px 大圆角；square（方正）：0px 直角——两档需要有肉眼可辨的差异，
+  // 4px 小圆角在卡片 / 弹窗 / 按钮上与 8px 几乎无差别（实测用户感知为「开关失效」）
   watchEffect(() => {
     const isRounded = componentsShape.value === 'ground'
     document.documentElement.style.setProperty(
       '--uikit-components-radius',
-      isRounded ? '8px' : '4px'
+      isRounded ? '8px' : '0px'
     )
     document.documentElement.style.setProperty(
       '--uikit-components-radius-hover',
-      isRounded ? '14px' : '10px'
+      isRounded ? '14px' : '0px'
     )
   })
 
