@@ -1,3 +1,21 @@
+## @easemob/uikit-core 2.7.1 (2026-09-16)
+
+
+### 变更
+
+- **EmModal 度量对齐设计稿（视觉变更，无 API 变更）**：header 高 60px（`padding 13px 12px 13px 16px`，标题 18px/Medium）；body 默认 padding 24px → **56px 48px**、默认字号 14 → **18px**（`bodyFlush` 贴边形态不变，承接表单/穿梭/列表场景）；正文语义图标 56 → **72px**；footer 高 80px（`padding 16px 22px`，按钮间距 16 → 12）；外壳移除 1px 描边（设计稿仅阴影），圆角仍跟随 `--uikit-components-radius`、阴影走 `--uikit-shadow`。移动端 bottom-sheet 分支保持原有紧凑度量不受影响。
+
+---
+
+## @easemob/uikit-core 2.7.0 (2026-09-16)
+
+
+### 变更
+
+- **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，私有化或低频场景显式关闭。
+
+---
+
 ## @easemob/uikit-core 2.6.0 (2026-09-04)
 
 

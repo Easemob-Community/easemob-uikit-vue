@@ -1,3 +1,35 @@
+## @easemob/uikit-im 3.6.1 (2026-09-16)
+
+
+### 变更
+
+- **二次确认弹窗宽度对齐设计稿**：11 处 `type="warning"` 确认弹窗（删除会话/消息、解散/退出群、移除成员、设置/移除管理员、移出黑名单、取消禁言、名片操作等）宽度由 540 校准为 **719**，与设计稿 pop 组件统一宽度一致；视觉跟随 core 2.7.1 的 EmModal 新度量（header 60px / 标题 18px·500 / body 48·56 / footer 80px）。
+- **会话容器对齐「新-Demo」设计稿（视觉变更，无 API 变更）**：header 加底部 1px 分隔线、总高 48 → **65px**（上下 12.5px），标题 16px/600 → **18px/500**；搜索框改 **36px 胶囊**（`pill`），搜索槽/分栏/标题水平边界统一 **12px**；card 变体会话项总高 72 → **64px**（项内容水平内边距 12px、垂直 8px），两行摘要间距 6 → **4px**。
+- **修复会话项无最后一条消息时标题下移**：会话项两行高度固定（20 + 4 + 18 = 42px），消息摘要为空时信息区不再塌陷，标题位置恒定。
+
+---
+
+## @easemob/uikit-im 3.6.0 (2026-09-16)
+
+
+### 变更
+
+- **Provider 能力开关默认对齐产品化形态（行为变更）**：`enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（双 Demo 共识配置下沉）。好友/黑名单/在线状态开箱即用；presence 订阅会带来额外查询/订阅请求，私有化或低频场景请显式 `:enable-presence="false"`。
+- **输入框发送按钮条件默认（行为变更）**：`config.input.showSendButton` 未配置时由「一律显示」改为按端型取默认——PC 隐藏（回车发送，对齐桌面 IM 形态）、移动端显示（触屏无回车键）；显式 true/false 仍优先。此前 PC 上依赖默认发送按钮的接入方需显式 `showSendButton: true`。
+- **会话列表下拉刷新增回落链（能力补齐）**：`EmConversationContainer` 的 `pull-refresh` 未配置（undefined）时回落 Provider `h5.pullRefresh`（默认 `'auto'`：触屏设备自动开启），不再写死 `false`；显式 true/false 仍优先。
+- **ChatContainer 容器风格条件默认（行为变更）**：`variant` 未配置时由一律 `'compact'` 改为按端型取默认——PC `'card'`（圆角卡片壳由容器自绘）、移动端 `'compact'`（平铺全屏形态）；显式传入仍优先。此前 PC 上未传 variant 的接入方视觉会变为卡片壳，如需平铺请显式 `variant="compact"`。
+
+---
+
+## @easemob/uikit-im 3.5.1 (2026-09-15)
+
+
+### 变更
+
+- **「新会话」弹窗宽度调宽**：`new-chat-modal` 弹窗宽度由 360px 调整为 480px（PC 端内联 `width`），移动端（<768px）全屏分支不受影响。
+
+---
+
 ## @easemob/uikit-im 3.5.0 (2026-09-04)
 
 

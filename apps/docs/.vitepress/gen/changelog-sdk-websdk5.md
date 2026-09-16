@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-websdk5 1.3.0 (2026-09-16)
+
+
+### 变更
+
+- **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
+
+---
+
 ## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
 

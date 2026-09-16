@@ -1,6 +1,6 @@
 import { MESSAGE_STATUS as $t, toUiMessage as Yf, GROUP_MEMBER_ROLE as dt, getStorageBackend as hi, createUIKitStorageKey as Qf, useLocale as et, useToast as Kt, MESSAGE_TYPE as ve, isVoiceBody as ty, formatSdkError as nt, isTextBody as ny, createLogger as Vt, useCoreUIKitProvider as oy, useUserInfo as sy, usePresence as Xo, useViewport as En, EmPopup as Wt, EmUserCard as Zf, EmIcon as De, EmModal as rn, EmAvatar as Dt, EmCopyableText as Rl, insertChatNotice as zn, CONVERSATION_TYPE as ut, NOTICE_EVENT_TYPE as Nn, EmActionSheet as Nr, EmBadge as Nl, EmButton as pn, EmCell as Bt, EmEmojiPicker as vc, EmEmpty as Ht, EmIconButton as At, EmImageViewer as ep, EmInput as dn, EmNotification as ry, EmNotificationContainer as tp, EmPresenceAvatar as iy, EmPresenceSelector as ay, EmPresenceSelectorModal as ly, EmPresenceSelectorPopup as cy, EmResizable as uy, EmScrollToTop as va, EmSkeleton as fo, EmStatusBanner as np, EmSwitch as Uo, EmText as op, EmToast as sp, useLongPress as rp, EmCheckbox as ho, useEscToClose as yc, useArrowNavigation as ya, useKeyBindings as ba, GROUP_INFO_LIMIT as Qt, usePullRefresh as ip, MESSAGE_EXT_KEY as bc, useThemeStore as vo, INJECTION_KEY as Fn, linkify as qr, STREAM_CUSTOM_TYPE as dy, STREAM_MESSAGE_STATUS as fy, detectEnvironment as kc, downloadFile as wc, useClientStore as py, resolveSdkErrorMessage as xs, useResizable as ap, buildAnnouncementNoticeText as lp, FORWARD_MODE as Io, HEADER_ALIGN as Jr, createUserInfoSubscriptionErrorHandler as hy, useProviderSideEffects as my, createConversationTimeFormatter as gy, useOwnUserInfo as vy } from "@easemob/uikit-core";
 import { ACK_TYPE as LB, CONVERSATION_TYPE as OB, EmActionSheet as DB, EmAvatar as BB, EmBadge as PB, EmButton as zB, EmCell as UB, EmCopyableText as FB, EmEmojiPicker as HB, EmEmpty as GB, EmIcon as VB, EmIconButton as jB, EmImageViewer as WB, EmInput as KB, EmModal as qB, EmNotification as JB, EmNotificationContainer as XB, EmPopup as YB, EmPresenceAvatar as QB, EmPresenceSelector as ZB, EmPresenceSelectorModal as eP, EmPresenceSelectorPopup as tP, EmResizable as nP, EmScrollToTop as oP, EmSkeleton as sP, EmStatusBanner as rP, EmSwitch as iP, EmText as aP, EmToast as lP, EmUserCard as cP, FORWARD_MODE as uP, GROUP_INFO_LIMIT as dP, GROUP_MEMBER_ROLE as fP, HEADER_ALIGN as pP, INJECTION_KEY as hP, MESSAGE_STATUS as mP, MESSAGE_TYPE as gP, NOTICE_EVENT_TYPE as vP, PRESENCE_STATUS as yP, STREAM_CUSTOM_TYPE as bP, STREAM_MESSAGE_STATUS as kP, buildAnnouncementNoticeText as wP, clearPersistedLogs as _P, configureLogPersistence as CP, createLocale as MP, createNoticeMessage as SP, createUIKitStorageKey as IP, emitNotificationDelivered as xP, exportPersistedLogs as TP, findLocaleKey as EP, formatPersistedLogs as AP, formatSdkError as $P, getPersistedLogs as RP, getStorageBackend as NP, insertChatNotice as LP, isKeyboardShortcutsEnabled as OP, isNoticeMessage as DP, mergeLocaleMessages as BP, resolveNoticeUserName as PP, setKeyboardShortcutsEnabled as zP, t as UP, toUiMessage as FP, toUiMessages as HP, useArrowNavigation as GP, useBottomSheet as VP, useClient as jP, useClientStore as WP, useEscToClose as KP, useH5Adaptation as qP, useKeyBindings as JP, useKeyboard as XP, useLocale as YP, useLongPress as QP, useNotification as ZP, usePresence as ez, usePresenceStore as tz, usePullRefresh as nz, useResizable as oz, useRipple as sz, useSyncStatus as rz, useTheme as iz, useThemeStore as az, useToast as lz, useUIKitStorage as cz, useViewport as uz } from "@easemob/uikit-core";
-import { shallowRef as wn, shallowReadonly as Ds, getCurrentScope as yy, onScopeDispose as by, onMounted as nn, nextTick as st, watch as Ue, onUnmounted as zs, toValue as Ot, getCurrentInstance as _c, toRef as ky, readonly as wy, customRef as cp, ref as x, isRef as Cc, computed as k, reactive as wi, unref as h, toRaw as _i, markRaw as up, inject as Ln, provide as Us, defineComponent as Ne, openBlock as y, createBlock as re, withCtx as J, createElementVNode as _, normalizeClass as $e, createVNode as j, createElementBlock as C, toDisplayString as D, createCommentVNode as U, createTextVNode as ht, withDirectives as Rn, withKeys as Bs, vModelText as mo, normalizeStyle as Pt, renderSlot as W, Fragment as Ae, renderList as ot, mergeProps as ys, Transition as ls, withModifiers as Ct, normalizeProps as je, guardReactiveProps as Ke, createSlots as Ft, onBeforeUnmount as io, resolveDynamicComponent as Mc, useSlots as Sc, watchEffect as Ic, useCssVars as ka, h as wa, vShow as Xr, Teleport as nd, onErrorCaptured as _y } from "vue";
+import { shallowRef as wn, shallowReadonly as Ds, getCurrentScope as yy, onScopeDispose as by, onMounted as nn, nextTick as st, watch as Ue, onUnmounted as zs, toValue as Ot, getCurrentInstance as _c, toRef as ky, readonly as wy, customRef as cp, ref as x, isRef as Cc, computed as k, reactive as wi, unref as p, toRaw as _i, markRaw as up, inject as Ln, provide as Us, defineComponent as Ne, openBlock as y, createBlock as re, withCtx as J, createElementVNode as _, normalizeClass as $e, createVNode as j, createElementBlock as C, toDisplayString as D, createCommentVNode as U, createTextVNode as ht, withDirectives as Rn, withKeys as Bs, vModelText as mo, normalizeStyle as Pt, renderSlot as W, Fragment as Ae, renderList as ot, mergeProps as ys, Transition as ls, withModifiers as Ct, normalizeProps as je, guardReactiveProps as Ke, createSlots as Ft, onBeforeUnmount as io, resolveDynamicComponent as Mc, useSlots as Sc, watchEffect as Ic, useCssVars as ka, h as wa, vShow as Xr, Teleport as nd, onErrorCaptured as _y } from "vue";
 import { defineStore as _a } from "pinia";
 import { resolveLastMessageText as dp, isStreamActive as Cy, normalizeUserId as Ci } from "@easemob/uikit-sdk-contract";
 import { customEventPreviewMap as fz, defaultLastMessageTextResolver as pz, defaultMessagePreviewLabels as hz, formatConversationPreview as mz, isCmdBody as gz, isCombineBody as vz, isCustomBody as yz, isFileBody as bz, isImageBody as kz, isLocationBody as wz, isTextBody as _z, isVideoBody as Cz, isVoiceBody as Mz, mergeMessagePreviewLabels as Sz, resolveLastMessageText as Iz } from "@easemob/uikit-sdk-contract";
@@ -47,11 +47,11 @@ function Ey(n, e = {}) {
   };
   let l;
   return Object.assign((u) => {
-    const d = Ot(n), p = Ot(e.maxWait);
-    return t && a(t), d <= 0 || p !== void 0 && p <= 0 ? (o && (a(o), o = void 0), i.value = !1, Promise.resolve(u())) : (i.value = !0, new Promise((f, m) => {
-      s = e.rejectOnCancel ? m : f, r = f, l = u, p && !o && (o = setTimeout(() => {
+    const d = Ot(n), h = Ot(e.maxWait);
+    return t && a(t), d <= 0 || h !== void 0 && h <= 0 ? (o && (a(o), o = void 0), i.value = !1, Promise.resolve(u())) : (i.value = !0, new Promise((f, m) => {
+      s = e.rejectOnCancel ? m : f, r = f, l = u, h && !o && (o = setTimeout(() => {
         t && a(t), o = void 0, i.value = !1, f(l());
-      }, p)), t = setTimeout(() => {
+      }, h)), t = setTimeout(() => {
         o && a(o), o = void 0, i.value = !1, f(u());
       }, d);
     }));
@@ -75,8 +75,8 @@ function Ay(...n) {
   const u = () => {
     t && (clearTimeout(t), t = void 0, s(), s = on);
   };
-  return (p) => {
-    const f = Ot(i), m = Date.now() - e, g = () => r = p();
+  return (h) => {
+    const f = Ot(i), m = Date.now() - e, g = () => r = h();
     return u(), f <= 0 ? (e = Date.now(), g()) : (m > f ? (e = Date.now(), (l || !o) && g()) : a && (r = new Promise((v, b) => {
       s = c ? b : v, t = setTimeout(() => {
         e = Date.now(), o = !0, v(g()), u();
@@ -195,12 +195,12 @@ function Xn(...n) {
     return [
       (o = (s = t.value) === null || s === void 0 ? void 0 : s.map((r) => Jn(r))) !== null && o !== void 0 ? o : [no].filter((r) => r != null),
       cr(Ot(t.value ? n[1] : n[0])),
-      cr(h(t.value ? n[2] : n[1])),
+      cr(p(t.value ? n[2] : n[1])),
       Ot(t.value ? n[3] : n[2])
     ];
   }, ([o, s, r, i], a, l) => {
     if (!(o != null && o.length) || !(s != null && s.length) || !(r != null && r.length)) return;
-    const c = Sy(i) ? { ...i } : i, u = o.flatMap((d) => s.flatMap((p) => r.map((f) => e(d, p, f, c))));
+    const c = Sy(i) ? { ...i } : i, u = o.flatMap((d) => s.flatMap((h) => r.map((f) => e(d, h, f, c))));
     l(() => {
       u.forEach((d) => d());
     });
@@ -235,7 +235,7 @@ function Uy(n, e, t = {}) {
     const M = Ot(v), S = M.$.subTree && M.$.subTree.children;
     return S == null || !Array.isArray(S) ? !1 : S.some((w) => w.el === b.target || b.composedPath().includes(w.el));
   }
-  const p = (v) => {
+  const h = (v) => {
     const b = Jn(n);
     if (v.target != null && !(!(b instanceof Element) && u(n) && d(n, v)) && !(!b || b === v.target || v.composedPath().includes(b))) {
       if ("detail" in v && v.detail === 0 && (l = !c(v)), !l) {
@@ -250,7 +250,7 @@ function Uy(n, e, t = {}) {
     Xn(o, "click", (v) => {
       f || (f = !0, setTimeout(() => {
         f = !1;
-      }, 0), p(v));
+      }, 0), h(v));
     }, {
       passive: !0,
       capture: r
@@ -274,7 +274,7 @@ function Uy(n, e, t = {}) {
       l = !1;
     },
     trigger: (v) => {
-      l = !0, p(v), l = !1;
+      l = !0, h(v), l = !1;
     }
   } : g;
 }
@@ -299,7 +299,7 @@ function Hy(n, e, t = {}) {
     const d = cr(Ot(n)).map(Jn).filter(fp);
     return new Set(d);
   }), (d) => {
-    a(), i.value && d.size && (r = new MutationObserver(e), d.forEach((p) => r.observe(p, s)));
+    a(), i.value && d.size && (r = new MutationObserver(e), d.forEach((h) => r.observe(h, s)));
   }, {
     immediate: !0,
     flush: "post"
@@ -338,7 +338,7 @@ function sd(n, e = {}) {
   } : a;
 }
 function Gy(n = {}) {
-  const { navigator: e = vp, read: t = !1, source: o, copiedDuring: s = 1500, legacy: r = !1 } = n, i = /* @__PURE__ */ Lr(() => e && "clipboard" in e), a = /* @__PURE__ */ sd("clipboard-read"), l = /* @__PURE__ */ sd("clipboard-write"), c = k(() => i.value || r), u = wn(""), d = wn(!1), p = wn(!1), f = By(() => d.value = !1, s, { immediate: !1 });
+  const { navigator: e = vp, read: t = !1, source: o, copiedDuring: s = 1500, legacy: r = !1 } = n, i = /* @__PURE__ */ Lr(() => e && "clipboard" in e), a = /* @__PURE__ */ sd("clipboard-read"), l = /* @__PURE__ */ sd("clipboard-write"), c = k(() => i.value || r), u = wn(""), d = wn(!1), h = wn(!1), f = By(() => d.value = !1, s, { immediate: !1 });
   let m = 0;
   async function g() {
     let I = !(i.value && w(a.value));
@@ -353,7 +353,7 @@ function Gy(n = {}) {
   async function v(I) {
     const T = I ?? Ot(o);
     if (c.value && T != null) {
-      p.value = !0;
+      h.value = !0;
       let R = !(i.value && w(l.value));
       if (!R) try {
         const $ = b(T);
@@ -367,7 +367,7 @@ function Gy(n = {}) {
         const $ = ++m, E = await T();
         E != null && $ === m && (u.value = E, M(E));
       }
-      d.value = !0, f.start(), p.value = !1;
+      d.value = !0, f.start(), h.value = !1;
     }
   }
   function b(I) {
@@ -385,7 +385,7 @@ function Gy(n = {}) {
     return I === "granted" || I === "prompt";
   }
   return {
-    copyPending: Ds(p),
+    copyPending: Ds(h),
     isSupported: c,
     text: Ds(u),
     copied: Ds(d),
@@ -438,7 +438,7 @@ const qy = {
 }, rd = "vueuse-storage";
 function Jy(n, e, t, o = {}) {
   var s;
-  const { flush: r = "pre", deep: i = !0, listenToStorageChanges: a = !0, writeDefaults: l = !0, mergeDefaults: c = !1, shallow: u, window: d = no, eventFilter: p, onError: f = (N) => {
+  const { flush: r = "pre", deep: i = !0, listenToStorageChanges: a = !0, writeDefaults: l = !0, mergeDefaults: c = !1, shallow: u, window: d = no, eventFilter: h, onError: f = (N) => {
     console.error(N);
   }, initOnMounted: m } = o, g = (u ? wn : x)(typeof e == "function" ? e() : e), v = k(() => Ot(n));
   if (!t) try {
@@ -450,7 +450,7 @@ function Jy(n, e, t, o = {}) {
   const b = Ot(e), M = Ky(b), S = (s = o.serializer) !== null && s !== void 0 ? s : qy[M], { pause: w, resume: I } = Oy(g, (N) => z(N), {
     flush: r,
     deep: i,
-    eventFilter: p
+    eventFilter: h
   });
   Ue(v, () => F(), { flush: r });
   let T = !1;
@@ -549,7 +549,7 @@ function Sa(n, e, t = {}) {
 function Xy(n, e, t = {}) {
   const { root: o, rootMargin: s, threshold: r = 0, window: i = no, immediate: a = !0 } = t, l = /* @__PURE__ */ Lr(() => i && "IntersectionObserver" in i), c = k(() => cr(Ot(n)).map(Jn).filter(fp));
   let u = on;
-  const d = wn(a), p = l.value ? Ue(() => [
+  const d = wn(a), h = l.value ? Ue(() => [
     c.value,
     Jn(o),
     Ot(s),
@@ -568,7 +568,7 @@ function Xy(n, e, t = {}) {
     immediate: a,
     flush: "post"
   }) : on, f = () => {
-    u(), p(), d.value = !1;
+    u(), h(), d.value = !1;
   };
   return Ca(f), {
     isSupported: l,
@@ -584,8 +584,8 @@ function Xy(n, e, t = {}) {
 }
 function Yy(n, e = {}) {
   const { window: t = no, scrollTarget: o, threshold: s = 0, rootMargin: r, once: i = !1, initialValue: a = !1 } = e, l = wn(a), c = Xy(n, (u) => {
-    let d = l.value, p = 0;
-    for (const f of u) f.time >= p && (p = f.time, d = f.isIntersecting);
+    let d = l.value, h = 0;
+    for (const f of u) f.time >= h && (h = f.time, d = f.isIntersecting);
     l.value = d, i && zy(l, () => {
       c.stop();
     });
@@ -615,7 +615,7 @@ function yp(n, e = {}) {
     passive: !0
   }, behavior: c = "auto", window: u = no, onError: d = (E) => {
     console.error(E);
-  } } = e, p = typeof a == "boolean" ? { mutation: a } : a, f = wn(0), m = wn(0), g = k({
+  } } = e, h = typeof a == "boolean" ? { mutation: a } : a, f = wn(0), m = wn(0), g = k({
     get() {
       return f.value;
     },
@@ -680,7 +680,7 @@ function yp(n, e = {}) {
     } catch (E) {
       d(E);
     }
-  }), p != null && p.mutation && n != null && n !== u && n !== document && Hy(n, () => {
+  }), h != null && h.mutation && n != null && n !== u && n !== document && Hy(n, () => {
     const E = Ot(n);
     E && R(E);
   }, {
@@ -707,9 +707,9 @@ function Zy(n, e, t = {}) {
       [s]: (o = t.distance) !== null && o !== void 0 ? o : 0,
       ...t.offset
     }
-  })), l = wn(), c = k(() => !!l.value), u = k(() => Qy(Ot(n))), d = Yy(u), p = k(() => u.value ? i(u.value) : !1);
+  })), l = wn(), c = k(() => !!l.value), u = k(() => Qy(Ot(n))), d = Yy(u), h = k(() => u.value ? i(u.value) : !1);
   function f() {
-    if (a.measure(), !u.value || !d.value || !p.value || l.value) return;
+    if (a.measure(), !u.value || !d.value || !h.value || l.value) return;
     const { scrollHeight: m, clientHeight: g, scrollWidth: v, clientWidth: b } = u.value, M = s === "bottom" || s === "top" ? m <= g : v <= b;
     (a.arrivedState[s] || M) && (l.value = Promise.all([e(a), new Promise((S) => setTimeout(S, r))]).finally(() => {
       l.value = null, st(() => f());
@@ -718,7 +718,7 @@ function Zy(n, e, t = {}) {
   return Dy(Ue(() => [
     a.arrivedState[s],
     d.value,
-    p.value
+    h.value
   ], f, {
     immediate: !0,
     flush: "post"
@@ -743,7 +743,7 @@ const Ec = _a("message", () => {
   const n = x({}), e = x({}), t = x({}), o = x({}), s = x({}), r = x({}), i = x(/* @__PURE__ */ new Set()), a = x(!1);
   let l = 300, c;
   const u = /* @__PURE__ */ new Map(), d = /* @__PURE__ */ new Map();
-  let p = null;
+  let h = null;
   const f = {
     sending: 0,
     sent: 1,
@@ -994,13 +994,13 @@ const Ec = _a("message", () => {
     const Fe = Object.entries(e.value).filter(([, Je]) => Je.sdkMsg.conversationId === Q).map(([Je]) => Je);
     for (const Je of Fe)
       delete e.value[Je];
-    d.delete(Q), p === Q && (p = null);
+    d.delete(Q), h === Q && (h = null);
   }
   function ct(Q) {
     if (!(!c || c <= 0))
-      for (d.delete(Q), d.set(Q, !0), p = Q; d.size > c; ) {
+      for (d.delete(Q), d.set(Q, !0), h = Q; d.size > c; ) {
         const be = d.keys().next();
-        if (be.done || be.value === p)
+        if (be.done || be.value === h)
           break;
         d.delete(be.value), Mt(be.value);
       }
@@ -1050,7 +1050,7 @@ const Ec = _a("message", () => {
     return !!Q && i.value.has(Q);
   }
   function Ge() {
-    n.value = {}, e.value = {}, t.value = {}, o.value = {}, s.value = {}, r.value = {}, i.value.clear(), a.value = !1, u.clear(), d.clear(), p = null;
+    n.value = {}, e.value = {}, t.value = {}, o.value = {}, s.value = {}, r.value = {}, i.value.clear(), a.value = !1, u.clear(), d.clear(), h = null;
   }
   return {
     messageMap: k(() => n.value),
@@ -1113,7 +1113,7 @@ const Ec = _a("message", () => {
       return 1;
     const ie = A.pinnedTime || A.lastMessageTime || 0;
     return (G.pinnedTime || G.lastMessageTime || 0) - ie;
-  })), p = x(!1);
+  })), h = x(!1);
   function f(A) {
     const G = n.value.findIndex((ie) => ie.id === A.id);
     G > -1 ? n.value[G] = { ...n.value[G], ...A } : n.value.unshift(A);
@@ -1174,17 +1174,17 @@ const Ec = _a("message", () => {
     G && (clearTimeout(G), l.delete(A)), i.value[A] && delete i.value[A];
   }
   function F(A) {
-    p.value = A;
+    h.value = A;
   }
   function B() {
-    n.value = [], e.value = null, t.value = !1, o.value = !1, p.value = !1, s.value = {}, r.value = {}, l.forEach((A) => clearTimeout(A)), l.clear(), i.value = {};
+    n.value = [], e.value = null, t.value = !1, o.value = !1, h.value = !1, s.value = {}, r.value = {}, l.forEach((A) => clearTimeout(A)), l.clear(), i.value = {};
   }
   return {
     conversationList: n,
     sortedConversationList: d,
     currentConversation: u,
     currentConversationId: e,
-    hasMoreConversations: p,
+    hasMoreConversations: h,
     conversationsLoaded: t,
     isSyncingConversations: o,
     groupMemberCountMap: s,
@@ -1218,7 +1218,7 @@ const Ec = _a("message", () => {
 }), Ac = _a("contact", () => {
   const n = x([]), e = x([]), t = x([]), o = x(!1), s = x(!1), r = x(""), i = x(""), a = x(/* @__PURE__ */ new Set()), l = x(!1), c = x(void 0), u = x(0), d = k(
     () => o.value ? n.value.length : u.value
-  ), p = k(() => new Set(e.value.map((Y) => Y.userId)));
+  ), h = k(() => new Set(e.value.map((Y) => Y.userId)));
   function f(Y) {
     n.value = Y, o.value = !0;
   }
@@ -1257,7 +1257,7 @@ const Ec = _a("message", () => {
     e.value = e.value.filter((Me) => Me.userId !== Y);
   }
   function T(Y) {
-    return p.value.has(Y);
+    return h.value.has(Y);
   }
   const R = k(() => t.value.filter((Y) => Y.status === "pending").length);
   function $(Y) {
@@ -1312,7 +1312,7 @@ const Ec = _a("message", () => {
     pendingCount: R,
     loaded: o,
     blockListLoaded: s,
-    blackIdSet: p,
+    blackIdSet: h,
     filterText: r,
     activeId: i,
     selectedIds: a,
@@ -1350,7 +1350,7 @@ const Ec = _a("message", () => {
 }), Or = _a("group", () => {
   const n = x([]), e = x(null), t = x(!1), o = x(0), s = k(
     () => t.value ? n.value.length : o.value
-  ), r = x({}), i = x({}), a = x(/* @__PURE__ */ new Set()), l = x({}), c = x({}), u = x({}), d = x({}), p = x({}), f = x({}), m = x(""), g = x(""), v = x(/* @__PURE__ */ new Set()), b = x(!1), M = x(void 0);
+  ), r = x({}), i = x({}), a = x(/* @__PURE__ */ new Set()), l = x({}), c = x({}), u = x({}), d = x({}), h = x({}), f = x({}), m = x(""), g = x(""), v = x(/* @__PURE__ */ new Set()), b = x(!1), M = x(void 0);
   function S(oe) {
     n.value = oe, t.value = !0;
   }
@@ -1475,17 +1475,17 @@ const Ec = _a("message", () => {
     return d.value[oe] || [];
   }
   function Ie(oe, _e) {
-    p.value[oe] = _e;
+    h.value[oe] = _e;
   }
   function He(oe, _e) {
-    const Ve = p.value[oe] || [];
-    p.value[oe] = [...Ve, _e];
+    const Ve = h.value[oe] || [];
+    h.value[oe] = [...Ve, _e];
   }
   function gt(oe, _e) {
-    p.value[oe] = (p.value[oe] || []).filter((Ve) => Ve.fileId !== _e && Ve.id !== _e);
+    h.value[oe] = (h.value[oe] || []).filter((Ve) => Ve.fileId !== _e && Ve.id !== _e);
   }
   function ct(oe) {
-    return p.value[oe] || [];
+    return h.value[oe] || [];
   }
   function Mt(oe, _e) {
     f.value[oe] = _e;
@@ -1571,7 +1571,7 @@ const Ec = _a("message", () => {
     M.value = oe;
   }
   function ye() {
-    n.value = [], e.value = null, t.value = !1, o.value = 0, m.value = "", g.value = "", v.value = /* @__PURE__ */ new Set(), b.value = !1, M.value = void 0, r.value = {}, i.value = {}, a.value = /* @__PURE__ */ new Set(), c.value = {}, u.value = {}, d.value = {}, p.value = {}, f.value = {}, l.value = {};
+    n.value = [], e.value = null, t.value = !1, o.value = 0, m.value = "", g.value = "", v.value = /* @__PURE__ */ new Set(), b.value = !1, M.value = void 0, r.value = {}, i.value = {}, a.value = /* @__PURE__ */ new Set(), c.value = {}, u.value = {}, d.value = {}, h.value = {}, f.value = {}, l.value = {};
   }
   const we = S;
   return {
@@ -1584,7 +1584,7 @@ const Ec = _a("message", () => {
     groupMuteListMap: k(() => c.value),
     groupBlocklistMap: k(() => u.value),
     groupAllowlistMap: k(() => d.value),
-    groupSharedFilesMap: k(() => p.value),
+    groupSharedFilesMap: k(() => h.value),
     groupJoinRequestsMap: k(() => f.value),
     filterText: m,
     activeId: g,
@@ -1683,7 +1683,7 @@ function Js() {
       } catch {
       }
   }
-  function p(P) {
+  function h(P) {
     if (t.enableDraft === !1)
       return f(P), "";
     const F = u(P), B = or.get(F);
@@ -1791,7 +1791,7 @@ function Js() {
       o.setConversationList(P);
     },
     saveDraft: d,
-    loadDraft: p,
+    loadDraft: h,
     clearDraft: f
   };
 }
@@ -1820,7 +1820,7 @@ function kp() {
     const R = T.filter(($) => $.status === $t.SENT && !$.recalled).map(($) => $.msgServerId || $.msgLocalId);
     eo.value = new Set(R);
   }
-  function p() {
+  function h() {
     eo.value.clear();
   }
   async function f(T) {
@@ -1916,7 +1916,7 @@ function kp() {
     toggleMessageSelection: c,
     isMessageSelected: u,
     selectAllMessages: d,
-    deselectAllMessages: p,
+    deselectAllMessages: h,
     recallMessage: f,
     deleteMessage: m,
     deleteMessages: g,
@@ -2027,7 +2027,7 @@ function cb(n, e = {}) {
     ...e,
     autoInit: !1,
     clientName: "UIKit-IM",
-    clientVersion: "3.5.0",
+    clientVersion: "3.6.0",
     resolveSdkConfig: lb,
     sceneStores: t
   }), s = {
@@ -2102,7 +2102,7 @@ function en(n, e = ["nickname", "avatarUrl"]) {
 function Dn() {
   const { domains: n, stores: e, dataSource: t, features: o } = pt(), s = e.contact, r = k(() => s.contactList), i = k(() => s.blackList), a = k(() => s.inviteList), l = k(() => s.loaded), c = k(() => o.filterBlockedContacts === !1 ? s.contactList : s.contactList.filter((A) => !s.isBlocked(A.userId))), u = k(
     () => s.loaded ? c.value.length : s.contactCount
-  ), d = k(() => s.filterText), p = k(() => s.activeId), f = k(() => s.selectedIds), m = k(() => s.hasMore), g = k(() => s.contactCount), v = x(!1);
+  ), d = k(() => s.filterText), h = k(() => s.activeId), f = k(() => s.selectedIds), m = k(() => s.hasMore), g = k(() => s.contactCount), v = x(!1);
   function b(A) {
     s.setFilterText(A);
   }
@@ -2178,7 +2178,7 @@ function Dn() {
     loaded: l,
     loading: v,
     filterText: d,
-    activeId: p,
+    activeId: h,
     selectedIds: f,
     hasMore: m,
     setFilterText: b,
@@ -2260,7 +2260,7 @@ const ub = {
   },
   emits: ["update:show", "send-message", "contact-added", "deleted", "block-changed", "remark-changed", "audio-call", "video-call", "close"],
   setup(n, { emit: e }) {
-    const t = n, o = e, s = Vt("UIKit:UserCardModal"), { t: r } = et(), { show: i } = Kt(), { client: a, stores: l, features: c } = pt(), { fetchPresence: u } = Xo(), { addContact: d, deleteContact: p, setContactRemark: f } = Dn(), { isBlocked: m, addBlock: g, removeBlock: v, refresh: b } = Dr(), { isMobile: M } = En(), S = k(() => !!t.anchor && !M.value), w = x(), I = [
+    const t = n, o = e, s = Vt("UIKit:UserCardModal"), { t: r } = et(), { show: i } = Kt(), { client: a, stores: l, features: c } = pt(), { fetchPresence: u } = Xo(), { addContact: d, deleteContact: h, setContactRemark: f } = Dn(), { isBlocked: m, addBlock: g, removeBlock: v, refresh: b } = Dr(), { isMobile: M } = En(), S = k(() => !!t.anchor && !M.value), w = x(), I = [
       "nickname",
       "avatarUrl",
       "sign",
@@ -2426,7 +2426,7 @@ const ub = {
       const Le = K.value.action;
       if (K.value.show = !1, !!Le)
         try {
-          Le === "delete" ? (await p(t.userId), i(r("contact.detail.deleteContactSuccess", "已删除联系人"), "success"), o("deleted", t.userId), Ze()) : Le === "block" ? (await g({
+          Le === "delete" ? (await h(t.userId), i(r("contact.detail.deleteContactSuccess", "已删除联系人"), "success"), o("deleted", t.userId), Ze()) : Le === "block" ? (await g({
             userId: t.userId,
             name: Y.value,
             avatar: ne.value || ""
@@ -2451,15 +2451,15 @@ const ub = {
     function Tt() {
       c.enablePresence && B.value && A();
     }
-    return (Le, pe) => (y(), re(h(Wt), {
+    return (Le, pe) => (y(), re(p(Wt), {
       show: t.show,
-      position: h(M) ? "bottom" : "center",
+      position: p(M) ? "bottom" : "center",
       anchor: S.value ? t.anchor : void 0,
       placement: t.placement,
       align: t.align,
       offset: t.offset,
       overlay: !S.value,
-      shell: h(M),
+      shell: p(M),
       group: "user-card",
       "close-on-click-overlay": !0,
       "onUpdate:show": pe[4] || (pe[4] = (ee) => o("update:show", ee)),
@@ -2469,15 +2469,15 @@ const ub = {
         _("div", {
           ref_key: "rootRef",
           ref: w,
-          class: $e(["user-card-modal", { "user-card-modal--sheet": h(M) }])
+          class: $e(["user-card-modal", { "user-card-modal--sheet": p(M) }])
         }, [
-          j(h(Zf), {
+          j(p(Zf), {
             "user-id": t.userId,
             name: Y.value,
             avatar: ne.value,
             layout: "plain",
             subtitle: Me.value,
-            "user-id-label": h(r)("contact.detail.userId", "用户 ID"),
+            "user-id-label": p(r)("contact.detail.userId", "用户 ID"),
             "user-id-copyable": !1,
             status: F.value,
             editable: B.value,
@@ -2490,18 +2490,18 @@ const ub = {
             "meta-extra": J(() => [
               ce.value ? (y(), C("div", ub, [
                 _("div", db, [
-                  _("span", fb, D(h(r)("userCard.alias", "备注")), 1),
+                  _("span", fb, D(p(r)("userCard.alias", "备注")), 1),
                   _("span", {
                     class: $e(["user-card-modal__alias-value", { "is-empty": !L.value }])
-                  }, D(L.value || h(r)("userCard.noValue", "暂无")), 3)
+                  }, D(L.value || p(r)("userCard.noValue", "暂无")), 3)
                 ]),
                 _("button", {
                   type: "button",
                   class: "user-card-modal__alias-edit-btn",
-                  title: h(r)("contact.detail.edit", "编辑"),
+                  title: p(r)("contact.detail.edit", "编辑"),
                   onClick: ke
                 }, [
-                  j(h(De), {
+                  j(p(De), {
                     name: "rect_notched/pen",
                     size: 22,
                     style: { color: "#C9CDCF" }
@@ -2511,15 +2511,15 @@ const ub = {
             ]),
             _: 1
           }, 8, ["user-id", "name", "avatar", "subtitle", "user-id-label", "status", "editable", "actions", "info-rows"]),
-          P.value ? (y(), C("div", hb, D(h(r)("common.loading", "加载中...")), 1)) : U("", !0),
-          j(h(rn), {
+          P.value ? (y(), C("div", hb, D(p(r)("common.loading", "加载中...")), 1)) : U("", !0),
+          j(p(rn), {
             show: K.value.show,
             "onUpdate:show": pe[0] || (pe[0] = (ee) => K.value.show = ee),
             title: K.value.title,
             width: 540,
             type: "warning",
-            "confirm-text": h(r)("button.confirm", "确认"),
-            "cancel-text": h(r)("button.cancel", "取消"),
+            "confirm-text": p(r)("button.confirm", "确认"),
+            "cancel-text": p(r)("button.cancel", "取消"),
             onConfirm: He,
             onCancel: pe[1] || (pe[1] = (ee) => K.value.show = !1)
           }, {
@@ -2528,12 +2528,12 @@ const ub = {
             ]),
             _: 1
           }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-          j(h(rn), {
+          j(p(rn), {
             show: X.value,
             "onUpdate:show": pe[3] || (pe[3] = (ee) => X.value = ee),
-            title: h(r)("userCard.alias", "备注"),
-            "confirm-text": h(r)("button.confirm", "确认"),
-            "cancel-text": h(r)("button.cancel", "取消"),
+            title: p(r)("userCard.alias", "备注"),
+            "confirm-text": p(r)("button.confirm", "确认"),
+            "cancel-text": p(r)("button.cancel", "取消"),
             onConfirm: tt,
             onCancel: he
           }, {
@@ -2544,7 +2544,7 @@ const ub = {
                 "onUpdate:modelValue": pe[2] || (pe[2] = (ee) => fe.value = ee),
                 class: "user-card-modal__remark-input",
                 type: "text",
-                placeholder: h(r)("userCard.alias", "备注"),
+                placeholder: p(r)("userCard.alias", "备注"),
                 onKeyup: Bs(tt, ["enter"])
               }, null, 40, mb), [
                 [mo, fe.value]
@@ -2591,7 +2591,7 @@ const ub = {
       }, "   ", 6),
       _("div", yb, [
         _("div", bb, [
-          j(h(Dt), {
+          j(p(Dt), {
             class: "group-card__avatar",
             src: t.avatar,
             name: t.name,
@@ -2604,7 +2604,7 @@ const ub = {
               ], !0)
             ]),
             _("div", _b, [
-              j(h(Rl), {
+              j(p(Rl), {
                 text: t.groupId
               }, null, 8, ["text"])
             ])
@@ -2616,7 +2616,7 @@ const ub = {
             class: $e(["group-card__action", `group-card__action--${a.type || "default"}`]),
             onClick: (l) => s(a.key)
           }, [
-            a.icon ? (y(), re(h(De), {
+            a.icon ? (y(), re(p(De), {
               key: 0,
               name: a.icon,
               size: 22,
@@ -2631,7 +2631,7 @@ const ub = {
             class: "group-card__row"
           }, [
             _("span", xb, D(a.label), 1),
-            a.copyable ? (y(), re(h(Rl), {
+            a.copyable ? (y(), re(p(Rl), {
               key: 0,
               class: "group-card__value",
               text: a.value
@@ -2648,7 +2648,7 @@ const ub = {
   }
 }), Ip = /* @__PURE__ */ Pe(Tb, [["__scopeId", "data-v-d8740aba"]]);
 function ln() {
-  const { domains: n, stores: e } = pt(), { t } = et(), o = e.group, s = k(() => o.groupList), r = k(() => o.currentGroup), i = k(() => o.loaded), a = k(() => o.joinedGroupCount), l = k(() => o.filterText), c = k(() => o.activeId), u = k(() => o.selectedIds), d = k(() => o.hasMore), p = x(!1);
+  const { domains: n, stores: e } = pt(), { t } = et(), o = e.group, s = k(() => o.groupList), r = k(() => o.currentGroup), i = k(() => o.loaded), a = k(() => o.joinedGroupCount), l = k(() => o.filterText), c = k(() => o.activeId), u = k(() => o.selectedIds), d = k(() => o.hasMore), h = x(!1);
   function f(de) {
     o.setFilterText(de);
   }
@@ -2669,12 +2669,12 @@ function ln() {
     return o.setJoinedGroupCount(de.length), de;
   }
   async function S(de) {
-    p.value = !0;
+    h.value = !0;
     try {
       const Te = await n.group.fetchGroups(de == null ? void 0 : de.cursor, de == null ? void 0 : de.pageSize);
       return de != null && de.cursor ? o.appendGroupList(Te.list) : o.setGroupList(Te.list), o.setHasMore(Te.hasMore ?? !1), o.setCursor(Te.cursor), Te;
     } finally {
-      p.value = !1;
+      h.value = !1;
     }
   }
   async function w(de) {
@@ -2811,7 +2811,7 @@ function ln() {
     currentGroup: r,
     loaded: i,
     joinedGroupCount: a,
-    loading: p,
+    loading: h,
     filterText: l,
     activeId: c,
     selectedIds: u,
@@ -2899,7 +2899,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
         }
       }
     }
-    const p = k(() => [
+    const h = k(() => [
       {
         key: "message",
         label: r("groupCard.message", "消息"),
@@ -2925,7 +2925,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
     function M(S) {
       S === "message" && (s("send-message", o.groupId), b());
     }
-    return (S, w) => (y(), re(h(Wt), {
+    return (S, w) => (y(), re(p(Wt), {
       show: o.show,
       position: "center",
       "close-on-click-overlay": !0,
@@ -2938,11 +2938,11 @@ const Eb = { class: "group-card-modal" }, Ab = {
             "group-id": o.groupId,
             name: g.value,
             avatar: m.value,
-            actions: p.value,
+            actions: h.value,
             "info-rows": f.value,
             onActionClick: M
           }, null, 8, ["group-id", "name", "avatar", "actions", "info-rows"]),
-          l.value ? (y(), C("div", Ab, D(h(r)("common.loading", "加载中...")), 1)) : U("", !0)
+          l.value ? (y(), C("div", Ab, D(p(r)("common.loading", "加载中...")), 1)) : U("", !0)
         ])
       ]),
       _: 1
@@ -3052,7 +3052,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
     ), d = k(() => {
       if (c.value && !u.value)
         return t.conversation.id;
-    }), { userInfo: p, avatarUrl: f, contact: m } = en(d), g = k(() => {
+    }), { userInfo: h, avatarUrl: f, contact: m } = en(d), g = k(() => {
       if (!c.value)
         return t.conversation.lastMessageFrom;
     }), { displayName: v } = en(g), { get: b } = Xo(), M = k(() => {
@@ -3062,7 +3062,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
     }), S = k(
       () => {
         var ce, xe;
-        return ((ce = m.value) == null ? void 0 : ce.remark) || ((xe = p.value) == null ? void 0 : xe.nickname) || t.conversation.name || t.conversation.id;
+        return ((ce = m.value) == null ? void 0 : ce.remark) || ((xe = h.value) == null ? void 0 : xe.nickname) || t.conversation.name || t.conversation.id;
       }
     ), w = k(() => f.value || t.conversation.avatar), I = k(() => t.hasAtMe && i.enableAtMe !== !1), T = x(!1);
     Ue(() => t.conversation.isMuted, (ce, xe) => {
@@ -3183,18 +3183,18 @@ const Eb = { class: "group-card-modal" }, Ab = {
       return t.messageFormatter ? t.messageFormatter(ce, ve.TEXT) : ce;
     });
     return (ce, xe) => (y(), C(Ae, null, [
-      j(h(Bt), ys(ce.$attrs, {
+      j(p(Bt), ys(ce.$attrs, {
         "auto-height": "",
         class: [t.class, { "is-pinned": n.conversation.isPinned, "is-muted": n.conversation.isMuted, "has-at-me": I.value, "conversation-item--no-avatar": !t.showAvatar }],
         onClick: X,
         onContextmenu: L,
-        onTouchstart: h(F).start,
-        onTouchmove: h(F).move,
-        onTouchend: h(F).end,
-        onTouchcancel: h(F).cancel
+        onTouchstart: p(F).start,
+        onTouchmove: p(F).move,
+        onTouchend: p(F).end,
+        onTouchcancel: p(F).cancel
       }), {
         leading: J(() => [
-          t.showAvatar && t.unreadPlacement === "avatar" && t.conversation.unreadCount ? (y(), re(h(Nl), {
+          t.showAvatar && t.unreadPlacement === "avatar" && t.conversation.unreadCount ? (y(), re(p(Nl), {
             key: 0,
             class: "conversation-item__avatar-badge",
             count: t.conversation.unreadCount,
@@ -3204,7 +3204,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
             bordered: ""
           }, {
             default: J(() => [
-              j(h(Dt), {
+              j(p(Dt), {
                 name: S.value,
                 src: w.value,
                 size: 48,
@@ -3212,7 +3212,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
               }, null, 8, ["name", "src", "presence"])
             ]),
             _: 1
-          }, 8, ["count", "dot", "size", "placement"])) : t.showAvatar ? (y(), re(h(Dt), {
+          }, 8, ["count", "dot", "size", "placement"])) : t.showAvatar ? (y(), re(p(Dt), {
             key: 1,
             name: S.value,
             src: w.value,
@@ -3228,7 +3228,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
                 _("span", {
                   class: $e(["conversation-item__name", { "is-at-me": I.value }])
                 }, [
-                  I.value ? (y(), re(h(De), {
+                  I.value ? (y(), re(p(De), {
                     key: 0,
                     name: "at",
                     size: 14,
@@ -3244,7 +3244,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
                   class: "conversation-item__pin-badge",
                   onAnimationend: E
                 }, [
-                  j(h(De), {
+                  j(p(De), {
                     name: "filled/pin",
                     size: 12,
                     anim: $.value ? "shake" : void 0
@@ -3257,7 +3257,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
                       class: "conversation-item__mute-badge",
                       onAnimationend: R
                     }, [
-                      j(h(De), {
+                      j(p(De), {
                         name: "filled/bell/slash",
                         size: 12,
                         anim: T.value ? "shake" : void 0
@@ -3282,18 +3282,18 @@ const Eb = { class: "group-card-modal" }, Ab = {
                   ], -1)),
                   _("span", Ub, D(Me.value), 1)
                 ], 64)) : (y(), C(Ae, { key: 1 }, [
-                  I.value ? (y(), C("span", Fb, D(h(s)("conversation.atMeInMessage", "@我的")), 1)) : U("", !0),
-                  ne.value ? (y(), re(h(De), {
+                  I.value ? (y(), C("span", Fb, D(p(s)("conversation.atMeInMessage", "@我的")), 1)) : U("", !0),
+                  ne.value ? (y(), re(p(De), {
                     key: 1,
                     name: "rect/pencil",
                     size: 14,
                     class: "conversation-item__draft-icon"
                   })) : U("", !0),
-                  ne.value ? (y(), C("span", Hb, "[" + D(h(s)("conversation.draft")) + "]", 1)) : U("", !0),
+                  ne.value ? (y(), C("span", Hb, "[" + D(p(s)("conversation.draft")) + "]", 1)) : U("", !0),
                   ht(D(Me.value), 1)
                 ], 64))
               ]),
-              t.conversation.unreadCount && t.unreadPlacement === "inline" ? (y(), re(h(Nl), {
+              t.conversation.unreadCount && t.unreadPlacement === "inline" ? (y(), re(p(Nl), {
                 key: 0,
                 count: t.conversation.unreadCount,
                 dot: Y.value,
@@ -3305,7 +3305,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
         ]),
         _: 3
       }, 16, ["class", "onTouchstart", "onTouchmove", "onTouchend", "onTouchcancel"]),
-      j(h(Wt), {
+      j(p(Wt), {
         show: B.value,
         anchor: N.value,
         placement: "bottom",
@@ -3327,7 +3327,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
                 mode: "out-in"
               }, {
                 default: J(() => [
-                  Ze.icon ? (y(), re(h(De), {
+                  Ze.icon ? (y(), re(p(De), {
                     key: Ze.icon,
                     name: Ze.icon,
                     size: Ze.size ?? 14
@@ -3341,7 +3341,7 @@ const Eb = { class: "group-card-modal" }, Ab = {
         ]),
         _: 1
       }, 8, ["show", "anchor"]),
-      j(h(Nr), {
+      j(p(Nr), {
         show: z.value,
         "onUpdate:show": xe[0] || (xe[0] = (Ze) => z.value = Ze),
         actions: q.value,
@@ -3383,13 +3383,13 @@ const Eb = { class: "group-card-modal" }, Ab = {
             key: d,
             type: "button",
             class: $e(["conversation-tabs__tab", { "is-active": t.activeTab === d }]),
-            onClick: (p) => i(d)
+            onClick: (h) => i(d)
           }, D(r.value[d]), 11, Kb))), 128))
         ], !0)
       ])) : U("", !0);
     };
   }
-}), Ep = /* @__PURE__ */ Pe(qb, [["__scopeId", "data-v-5656ce38"]]);
+}), Ep = /* @__PURE__ */ Pe(qb, [["__scopeId", "data-v-dce7c737"]]);
 let Mi = null;
 function Jb(n) {
   Mi = n;
@@ -3501,8 +3501,8 @@ function tk(n, e) {
       return t;
     const s = [...t];
     return typeof o == "function" ? s.sort(o) : o === "pinyin" ? s.sort((r, i) => {
-      const a = r.remark || r.name || "", l = i.remark || i.name || "", c = ro(a), u = ro(l), d = (c == null ? void 0 : c.pinyin) || a.toLowerCase(), p = (u == null ? void 0 : u.pinyin) || l.toLowerCase();
-      return d.localeCompare(p);
+      const a = r.remark || r.name || "", l = i.remark || i.name || "", c = ro(a), u = ro(l), d = (c == null ? void 0 : c.pinyin) || a.toLowerCase(), h = (u == null ? void 0 : u.pinyin) || l.toLowerCase();
+      return d.localeCompare(h);
     }) : s;
   });
 }
@@ -3521,7 +3521,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       t.dimEmpty && !s.value.has(i) || o("jump", i);
     }
     return (i, a) => (y(), C("div", nk, [
-      (y(!0), C(Ae, null, ot(h($c), (l) => (y(), C("span", {
+      (y(!0), C(Ae, null, ot(p($c), (l) => (y(), C("span", {
         key: l,
         class: $e(["contact-alphabet-nav__item", {
           "is-active": t.activeKey === l,
@@ -3540,9 +3540,9 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
   },
   setup(n) {
     const e = n, { t } = et();
-    return (o, s) => (y(), re(h(Ht), {
+    return (o, s) => (y(), re(p(Ht), {
       icon: "person/single",
-      description: e.text || h(t)("contact.empty")
+      description: e.text || p(t)("contact.empty")
     }, null, 8, ["description"]));
   }
 }), ik = { class: "contact-item-default__leading" }, ak = {
@@ -3579,7 +3579,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       if (e.avatarShape === "rounded" || e.avatarShape === "square")
         return "square";
     });
-    return (c, u) => (y(), re(h(Bt), {
+    return (c, u) => (y(), re(p(Bt), {
       "auto-height": "",
       class: "contact-item-default",
       title: r.value,
@@ -3592,7 +3592,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
     }, {
       leading: J(() => [
         _("span", ik, [
-          e.showCheckbox && e.checkboxPosition === "left" ? (y(), re(h(ho), {
+          e.showCheckbox && e.checkboxPosition === "left" ? (y(), re(p(ho), {
             key: 0,
             checked: e.selected
           }, null, 8, ["checked"])) : U("", !0),
@@ -3600,7 +3600,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             contact: e.contact,
             size: a.value
           }, () => [
-            e.showAvatar ? (y(), re(h(Dt), {
+            e.showAvatar ? (y(), re(p(Dt), {
               key: 0,
               src: i.value,
               name: r.value,
@@ -3613,7 +3613,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       ]),
       trailing: J(() => [
         e.showCheckbox && e.checkboxPosition === "right" ? (y(), C("span", ak, [
-          j(h(ho), {
+          j(p(ho), {
             checked: e.selected
           }, null, 8, ["checked"])
         ])) : U("", !0),
@@ -3652,21 +3652,21 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
     function d() {
       t.disabled || (t.selectMode === "multiple" ? a(t.contact.userId) : (t.selectMode, i(t.contact.userId)), o("click", t.contact));
     }
-    function p(f) {
+    function h(f) {
       t.disabled || o("contextmenu", f, t.contact);
     }
     return (f, m) => (y(), C("div", {
       class: $e(["contact-item", { "is-disabled": t.disabled }]),
       "data-userid": t.contact.userId,
       onClick: d,
-      onContextmenu: p
+      onContextmenu: h
     }, [
       W(f.$slots, "default", {
         contact: t.contact,
         active: l.value,
         selected: c.value,
         disabled: t.disabled,
-        toggleSelect: () => h(a)(t.contact.userId)
+        toggleSelect: () => p(a)(t.contact.userId)
       }, () => [
         j(Ia, {
           contact: t.contact,
@@ -3781,8 +3781,8 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       selectedIds: i,
       setSelectedIds: a,
       setActiveId: l
-    } = Dn(), { t: c } = et(), { isBlocked: u } = Dr(), { isMobile: d } = En(), { features: p } = pt(), f = k(
-      () => (o.enablePresence ?? p.enablePresence) && !o.onlineStatusFn
+    } = Dn(), { t: c } = et(), { isBlocked: u } = Dr(), { isMobile: d } = En(), { features: h } = pt(), f = k(
+      () => (o.enablePresence ?? h.enablePresence) && !o.onlineStatusFn
     ), m = Xo(), g = x(), v = x(!1), b = x(""), M = x("");
     function S(ke) {
       M.value = ke, s("search", ke.trim());
@@ -3796,7 +3796,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
     function L(ke) {
       if (o.onlineStatusFn)
         return o.onlineStatusFn(ke);
-      if (!(o.enablePresence ?? p.enablePresence))
+      if (!(o.enablePresence ?? h.enablePresence))
         return;
       const tt = m.get(ke.userId).value;
       if (tt)
@@ -3926,7 +3926,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       }, [
         W(ke.$slots, "header", {}, () => [
           _("span", fk, [
-            ht(D(o.title || h(c)("contact.title")) + " ", 1),
+            ht(D(o.title || p(c)("contact.title")) + " ", 1),
             o.showCount ? (y(), C("span", pk, "(" + D(B.value) + ")", 1)) : U("", !0)
           ])
         ], !0)
@@ -3940,14 +3940,14 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             key: 0,
             modelValue: M.value,
             "onUpdate:modelValue": tt[0] || (tt[0] = (he) => M.value = he)
-          }, null, 8, ["modelValue"])) : (y(), re(h(dn), {
+          }, null, 8, ["modelValue"])) : (y(), re(p(dn), {
             key: 1,
             modelValue: M.value,
             "onUpdate:modelValue": tt[1] || (tt[1] = (he) => M.value = he),
             variant: "search",
             clearable: "",
             "clear-icon": "search/xmark",
-            placeholder: h(c)("contact.searchPlaceholder"),
+            placeholder: p(c)("contact.searchPlaceholder"),
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"]))
         ], !0)
@@ -3968,23 +3968,23 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
           ke.$slots.body && !o.bodySticky ? (y(), C("div", vk, [
             W(ke.$slots, "body", {}, void 0, !0)
           ])) : U("", !0),
-          o.loading && h(z).length === 0 ? (y(), C("div", yk, [
+          o.loading && p(z).length === 0 ? (y(), C("div", yk, [
             W(ke.$slots, "loading", {}, () => [
               _("div", bk, [
                 (y(), C(Ae, null, ot(8, (he) => _("div", {
                   key: he,
                   class: "contact-list__skeleton-item"
                 }, [
-                  j(h(fo), {
+                  j(p(fo), {
                     variant: "avatar",
                     shape: "rounded"
                   }),
                   _("div", kk, [
-                    j(h(fo), {
+                    j(p(fo), {
                       variant: "text",
                       style: { width: "35%" }
                     }),
-                    j(h(fo), {
+                    j(p(fo), {
                       variant: "text",
                       style: { width: "65%" }
                     })
@@ -3992,14 +3992,14 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 ])), 64))
               ])
             ], !0)
-          ])) : h(z).length === 0 ? (y(), C("div", wk, [
+          ])) : p(z).length === 0 ? (y(), C("div", wk, [
             W(ke.$slots, "empty", { searchKeyword: w.value }, () => [
               j(Ap, {
-                text: o.emptyText || (w.value ? h(c)("contact.noSearchResult") : h(c)("contact.empty"))
+                text: o.emptyText || (w.value ? p(c)("contact.noSearchResult") : p(c)("contact.empty"))
               }, null, 8, ["text"])
             ], !0)
           ])) : (y(), C(Ae, { key: 3 }, [
-            (y(!0), C(Ae, null, ot(h(z), (he) => (y(), C("div", {
+            (y(!0), C(Ae, null, ot(p(z), (he) => (y(), C("div", {
               key: he.key,
               class: "contact-list__group",
               "data-group-key": he.key
@@ -4033,14 +4033,14 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 } : void 0
               ]), 1032, ["contact", "select-mode", "checkbox-position", "disabled", "show-avatar", "avatar-size", "avatar-shape", "subtitle", "online-status", "size"]))), 128))
             ], 8, _k))), 128)),
-            o.loading && h(z).length > 0 ? (y(), C("div", Mk, [
+            o.loading && p(z).length > 0 ? (y(), C("div", Mk, [
               W(ke.$slots, "loading-more", {}, () => [
-                _("span", Sk, D(h(c)("common.loading")), 1)
+                _("span", Sk, D(p(c)("common.loading")), 1)
               ], !0)
             ])) : U("", !0),
-            !o.loading && !o.hasMore && h(z).length > 0 ? (y(), C("div", Ik, [
+            !o.loading && !o.hasMore && p(z).length > 0 ? (y(), C("div", Ik, [
               W(ke.$slots, "no-more", {}, () => [
-                _("span", xk, D(o.noMoreText || h(c)("common.noMore")), 1)
+                _("span", xk, D(o.noMoreText || p(c)("common.noMore")), 1)
               ], !0)
             ])) : U("", !0)
           ], 64)),
@@ -4048,9 +4048,9 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             W(ke.$slots, "footer", {}, void 0, !0)
           ])) : U("", !0)
         ], 544),
-        P.value && o.showAlphabetNav && h(z).length > 0 ? (y(), re(Rc, {
+        P.value && o.showAlphabetNav && p(z).length > 0 ? (y(), re(Rc, {
           key: 0,
-          groups: h(z),
+          groups: p(z),
           "active-key": b.value,
           onJump: G
         }, null, 8, ["groups", "active-key"])) : U("", !0)
@@ -4058,7 +4058,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       ke.$slots.footer && o.footerSticky ? (y(), C("div", Ek, [
         W(ke.$slots, "footer", {}, void 0, !0)
       ])) : U("", !0),
-      o.showScrollToTop ? (y(), re(h(va), {
+      o.showScrollToTop ? (y(), re(p(va), {
         key: 4,
         target: g.value ?? void 0,
         "visibility-height": 200,
@@ -4087,7 +4087,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
     function d() {
       l.value = !1, c.value = "";
     }
-    async function p(f) {
+    async function h(f) {
       const m = f.userId;
       if (m) {
         if (m === r.client.currentUser) {
@@ -4119,10 +4119,10 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       async (f) => {
         f && (d(), await a());
       }
-    ), (f, m) => (y(), re(h(rn), {
+    ), (f, m) => (y(), re(p(rn), {
       show: t.show,
-      title: h(s)("conversation.newChat", "新会话"),
-      width: 360,
+      title: p(s)("conversation.newChat", "新会话"),
+      width: 480,
       "show-footer": !1,
       "body-flush": "",
       "onUpdate:show": m[0] || (m[0] = (g) => o("update:show", g)),
@@ -4137,7 +4137,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             "group-by": "none",
             "select-mode": "single",
             loading: l.value,
-            onSelect: p
+            onSelect: h
           }, null, 8, ["loading"]),
           c.value ? (y(), C("div", Nk, D(c.value), 1)) : U("", !0)
         ])
@@ -4145,7 +4145,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       _: 1
     }, 8, ["show", "title"]));
   }
-}), $p = /* @__PURE__ */ Pe(Lk, [["__scopeId", "data-v-d2993a12"]]), Ok = {
+}), $p = /* @__PURE__ */ Pe(Lk, [["__scopeId", "data-v-64ae0264"]]), Ok = {
   key: 0,
   class: "add-contact-modal__body"
 }, Dk = {
@@ -4169,12 +4169,12 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
   },
   emits: ["update:show", "added", "search"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { t: s } = et(), { stores: r, dataSource: i } = pt(), { addContact: a, searchUsers: l } = Dn(), c = x(""), u = x(""), d = x(""), p = x(!1), f = x(!1), m = x([]), g = x(!1), v = x(""), b = x(""), M = k(() => r.client.currentUser), S = k(() => u.value.trim() && !p.value), w = k(() => !!t.searchFn || !!i.searchUsers);
+    const t = n, o = e, { t: s } = et(), { stores: r, dataSource: i } = pt(), { addContact: a, searchUsers: l } = Dn(), c = x(""), u = x(""), d = x(""), h = x(!1), f = x(!1), m = x([]), g = x(!1), v = x(""), b = x(""), M = k(() => r.client.currentUser), S = k(() => u.value.trim() && !h.value), w = k(() => !!t.searchFn || !!i.searchUsers);
     function I() {
       o("update:show", !1);
     }
     function T() {
-      c.value = "", u.value = "", d.value = "", b.value = "", p.value = !1, f.value = !1, m.value = [], g.value = !1, v.value = "";
+      c.value = "", u.value = "", d.value = "", b.value = "", h.value = !1, f.value = !1, m.value = [], g.value = !1, v.value = "";
     }
     async function R() {
       const z = c.value.trim();
@@ -4199,13 +4199,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
           b.value = s("contact.addSelfError", "不能添加自己为好友");
           return;
         }
-        p.value = !0, b.value = "";
+        h.value = !0, b.value = "";
         try {
           t.addFn ? await t.addFn(z, d.value.trim()) : await a(z, d.value.trim()), o("added", z), I();
         } catch (P) {
           b.value = P.message || s("contact.addFailed", "添加失败");
         } finally {
-          p.value = !1;
+          h.value = !1;
         }
       }
     }
@@ -4214,13 +4214,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       (z) => {
         z && T();
       }
-    ), (z, P) => (y(), re(h(rn), {
+    ), (z, P) => (y(), re(p(rn), {
       show: t.show,
-      title: h(s)("conversation.addContact", "添加联系人"),
+      title: p(s)("conversation.addContact", "添加联系人"),
       width: 400,
-      "confirm-text": h(s)("button.confirm", "确认"),
+      "confirm-text": p(s)("button.confirm", "确认"),
       "confirm-disabled": !S.value,
-      "confirm-loading": p.value,
+      "confirm-loading": h.value,
       "confirm-auto-close": !1,
       "onUpdate:show": P[3] || (P[3] = (F) => o("update:show", F)),
       onConfirm: E,
@@ -4232,16 +4232,16 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
         ])) : (y(), C("div", Dk, [
           w.value ? (y(), C(Ae, { key: 0 }, [
             _("div", Bk, [
-              _("label", Pk, D(h(s)("contact.searchUser", "搜索用户")), 1),
+              _("label", Pk, D(p(s)("contact.searchUser", "搜索用户")), 1),
               _("div", zk, [
-                j(h(dn), {
+                j(p(dn), {
                   modelValue: c.value,
                   "onUpdate:modelValue": P[0] || (P[0] = (F) => c.value = F),
                   variant: "default",
-                  placeholder: h(s)("contact.searchUserPlaceholder", "输入手机号 / 邮箱 / 用户 ID"),
+                  placeholder: p(s)("contact.searchUserPlaceholder", "输入手机号 / 邮箱 / 用户 ID"),
                   onSubmit: R
                 }, null, 8, ["modelValue", "placeholder"]),
-                j(h(pn), {
+                j(p(pn), {
                   type: "primary",
                   size: "small",
                   disabled: !c.value.trim(),
@@ -4249,14 +4249,14 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   onClick: R
                 }, {
                   default: J(() => [
-                    ht(D(h(s)("contact.search", "搜索")), 1)
+                    ht(D(p(s)("contact.search", "搜索")), 1)
                   ]),
                   _: 1
                 }, 8, ["disabled", "loading"])
               ])
             ]),
             g.value ? (y(), C("div", Uk, [
-              (y(!0), C(Ae, null, ot(m.value, (F) => (y(), re(h(Bt), {
+              (y(!0), C(Ae, null, ot(m.value, (F) => (y(), re(p(Bt), {
                 key: F.userId,
                 title: F.name || F.userId,
                 subtitle: F.userId,
@@ -4267,7 +4267,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 onClick: (B) => $(F)
               }, {
                 leading: J(() => [
-                  j(h(Dt), {
+                  j(p(Dt), {
                     src: F.avatar,
                     name: F.name,
                     size: 36
@@ -4275,7 +4275,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 ]),
                 trailing: J(() => [
                   W(z.$slots, "search-result", { item: F }, () => [
-                    v.value === F.userId ? (y(), re(h(De), {
+                    v.value === F.userId ? (y(), re(p(De), {
                       key: 0,
                       name: "check",
                       size: 16,
@@ -4285,26 +4285,26 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 ]),
                 _: 2
               }, 1032, ["title", "subtitle", "active", "onClick"]))), 128)),
-              m.value.length === 0 ? (y(), C("div", Fk, D(b.value || h(s)("contact.searchEmpty", "未找到匹配的用户")), 1)) : U("", !0)
+              m.value.length === 0 ? (y(), C("div", Fk, D(b.value || p(s)("contact.searchEmpty", "未找到匹配的用户")), 1)) : U("", !0)
             ])) : U("", !0)
           ], 64)) : U("", !0),
           _("div", Hk, [
-            _("label", Gk, D(h(s)("contact.userId", "用户 ID")), 1),
-            j(h(dn), {
+            _("label", Gk, D(p(s)("contact.userId", "用户 ID")), 1),
+            j(p(dn), {
               modelValue: u.value,
               "onUpdate:modelValue": P[1] || (P[1] = (F) => u.value = F),
               variant: "default",
-              placeholder: h(s)("contact.addContactPlaceholder", "输入用户 ID"),
+              placeholder: p(s)("contact.addContactPlaceholder", "输入用户 ID"),
               onSubmit: E
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           _("div", Vk, [
-            _("label", jk, D(h(s)("contact.inviteReason", "附言")), 1),
-            j(h(dn), {
+            _("label", jk, D(p(s)("contact.inviteReason", "附言")), 1),
+            j(p(dn), {
               modelValue: d.value,
               "onUpdate:modelValue": P[2] || (P[2] = (F) => d.value = F),
               variant: "default",
-              placeholder: h(s)("contact.addContactReasonPlaceholder", "输入验证信息（可选）")
+              placeholder: p(s)("contact.addContactReasonPlaceholder", "输入验证信息（可选）")
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           b.value && !(w.value && g.value && m.value.length === 0) ? (y(), C("div", Wk, D(b.value), 1)) : U("", !0)
@@ -4361,7 +4361,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
     function r(q, A) {
       return s("common.charCount", "{current}/{max}").replace("{current}", String(q)).replace("{max}", String(A));
     }
-    const { isMobile: i } = En(), { stores: a } = pt(), { createGroup: l } = ln(), { contactList: c, selectedIds: u, setSelectedIds: d, toggleSelect: p, fetchContacts: f } = Dn(), { selectConversation: m } = Js(), g = x(!1), v = x(""), b = x(""), M = x(""), S = k(() => a.client.currentUser), w = k(() => t.config.showNameInput === !0), I = k(() => t.config.showDescriptionInput === !0), T = k(() => t.config.autoName !== !1), R = k(() => t.config.showSettings === !0), $ = wi({
+    const { isMobile: i } = En(), { stores: a } = pt(), { createGroup: l } = ln(), { contactList: c, selectedIds: u, setSelectedIds: d, toggleSelect: h, fetchContacts: f } = Dn(), { selectConversation: m } = Js(), g = x(!1), v = x(""), b = x(""), M = x(""), S = k(() => a.client.currentUser), w = k(() => t.config.showNameInput === !0), I = k(() => t.config.showDescriptionInput === !0), T = k(() => t.config.autoName !== !1), R = k(() => t.config.showSettings === !0), $ = wi({
       public: !1,
       joinApprovalRequired: !1,
       allowInvites: !1,
@@ -4390,7 +4390,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       g.value = !1, v.value = "", b.value = "", M.value = "", P.value = "", $.public = t.config.public ?? !1, $.joinApprovalRequired = t.config.joinApprovalRequired ?? !1, $.allowInvites = t.config.allowInvites ?? !1, $.inviteNeedConfirm = t.config.inviteNeedConfirm ?? !1, $.maxMembers = t.config.maxMembers ? String(t.config.maxMembers) : "", d(t.config.initialSelectedIds ?? []);
     }
     function X(q) {
-      p(q);
+      h(q);
     }
     async function fe() {
       if (z.value === 0) {
@@ -4439,19 +4439,19 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       async (q) => {
         q && (K(), await f());
       }
-    ), (q, A) => (y(), re(h(Wt), {
+    ), (q, A) => (y(), re(p(Wt), {
       show: t.show,
-      position: h(i) ? "bottom" : "center",
+      position: p(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": A[16] || (A[16] = (G) => o("update:show", G)),
       onClose: L
     }, {
       default: J(() => [
         _("div", {
-          class: $e(["create-group-modal", { "create-group-modal--mobile": h(i) }])
+          class: $e(["create-group-modal", { "create-group-modal--mobile": p(i) }])
         }, [
           _("div", qk, [
-            _("span", Jk, D(h(s)("conversation.createGroup", "创建群组")), 1)
+            _("span", Jk, D(p(s)("conversation.createGroup", "创建群组")), 1)
           ]),
           q.$slots.body ? (y(), C("div", Xk, [
             W(q.$slots, "body", {}, void 0, !0)
@@ -4468,56 +4468,56 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             ]),
             _("div", Zk, [
               _("div", ew, [
-                j(h(dn), {
+                j(p(dn), {
                   modelValue: P.value,
                   "onUpdate:modelValue": A[0] || (A[0] = (G) => P.value = G),
                   variant: "search",
                   clearable: "",
                   "clear-icon": "search/xmark",
-                  placeholder: h(s)("contact.searchPlaceholder"),
+                  placeholder: p(s)("contact.searchPlaceholder"),
                   "prefix-icon": "search"
                 }, null, 8, ["modelValue", "placeholder"])
               ]),
               w.value || I.value ? (y(), C("div", tw, [
                 w.value ? (y(), C("div", nw, [
-                  _("label", ow, D(h(s)("group.createName", "群名称")), 1),
-                  j(h(dn), {
+                  _("label", ow, D(p(s)("group.createName", "群名称")), 1),
+                  j(p(dn), {
                     modelValue: b.value,
                     "onUpdate:modelValue": A[1] || (A[1] = (G) => b.value = G),
                     variant: "default",
-                    placeholder: B.value || h(s)("group.createNamePlaceholder", "输入群名称"),
-                    maxlength: h(Qt).NAME_MAX_LENGTH
+                    placeholder: B.value || p(s)("group.createNamePlaceholder", "输入群名称"),
+                    maxlength: p(Qt).NAME_MAX_LENGTH
                   }, null, 8, ["modelValue", "placeholder", "maxlength"]),
                   _("div", {
-                    class: $e(["create-group-modal__char-count", { "is-near-limit": b.value.length > h(Qt).NAME_MAX_LENGTH * 0.9 }])
-                  }, D(r(b.value.length, h(Qt).NAME_MAX_LENGTH)), 3)
+                    class: $e(["create-group-modal__char-count", { "is-near-limit": b.value.length > p(Qt).NAME_MAX_LENGTH * 0.9 }])
+                  }, D(r(b.value.length, p(Qt).NAME_MAX_LENGTH)), 3)
                 ])) : U("", !0),
                 I.value ? (y(), C("div", sw, [
-                  _("label", rw, D(h(s)("group.createDescription", "群介绍")), 1),
-                  j(h(dn), {
+                  _("label", rw, D(p(s)("group.createDescription", "群介绍")), 1),
+                  j(p(dn), {
                     modelValue: M.value,
                     "onUpdate:modelValue": A[2] || (A[2] = (G) => M.value = G),
                     variant: "default",
-                    placeholder: h(s)("group.createDescriptionPlaceholder", "输入群介绍（可选）"),
-                    maxlength: h(Qt).DESCRIPTION_MAX_LENGTH
+                    placeholder: p(s)("group.createDescriptionPlaceholder", "输入群介绍（可选）"),
+                    maxlength: p(Qt).DESCRIPTION_MAX_LENGTH
                   }, null, 8, ["modelValue", "placeholder", "maxlength"]),
                   _("div", {
-                    class: $e(["create-group-modal__char-count", { "is-near-limit": M.value.length > h(Qt).DESCRIPTION_MAX_LENGTH * 0.9 }])
-                  }, D(r(M.value.length, h(Qt).DESCRIPTION_MAX_LENGTH)), 3)
+                    class: $e(["create-group-modal__char-count", { "is-near-limit": M.value.length > p(Qt).DESCRIPTION_MAX_LENGTH * 0.9 }])
+                  }, D(r(M.value.length, p(Qt).DESCRIPTION_MAX_LENGTH)), 3)
                 ])) : U("", !0)
               ])) : U("", !0),
               R.value ? (y(), C("div", iw, [
-                _("div", aw, D(h(s)("group.createSettings", "群设置")), 1),
-                j(h(Bt), {
+                _("div", aw, D(p(s)("group.createSettings", "群设置")), 1),
+                j(p(Bt), {
                   size: "compact",
                   border: !1,
                   onClick: A[5] || (A[5] = (G) => $.public = !$.public)
                 }, {
                   default: J(() => [
-                    ht(D(h(s)("group.createPublic", "公开群")), 1)
+                    ht(D(p(s)("group.createPublic", "公开群")), 1)
                   ]),
                   trailing: J(() => [
-                    j(h(Uo), {
+                    j(p(Uo), {
                       modelValue: $.public,
                       "onUpdate:modelValue": A[3] || (A[3] = (G) => $.public = G),
                       onClick: A[4] || (A[4] = Ct(() => {
@@ -4526,16 +4526,16 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   ]),
                   _: 1
                 }),
-                j(h(Bt), {
+                j(p(Bt), {
                   size: "compact",
                   border: !1,
                   onClick: A[8] || (A[8] = (G) => $.joinApprovalRequired = !$.joinApprovalRequired)
                 }, {
                   default: J(() => [
-                    ht(D(h(s)("group.createApproval", "入群需审批")), 1)
+                    ht(D(p(s)("group.createApproval", "入群需审批")), 1)
                   ]),
                   trailing: J(() => [
-                    j(h(Uo), {
+                    j(p(Uo), {
                       modelValue: $.joinApprovalRequired,
                       "onUpdate:modelValue": A[6] || (A[6] = (G) => $.joinApprovalRequired = G),
                       onClick: A[7] || (A[7] = Ct(() => {
@@ -4544,16 +4544,16 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   ]),
                   _: 1
                 }),
-                j(h(Bt), {
+                j(p(Bt), {
                   size: "compact",
                   border: !1,
                   onClick: A[11] || (A[11] = (G) => $.allowInvites = !$.allowInvites)
                 }, {
                   default: J(() => [
-                    ht(D(h(s)("group.createAllowInvites", "允许成员邀请")), 1)
+                    ht(D(p(s)("group.createAllowInvites", "允许成员邀请")), 1)
                   ]),
                   trailing: J(() => [
-                    j(h(Uo), {
+                    j(p(Uo), {
                       modelValue: $.allowInvites,
                       "onUpdate:modelValue": A[9] || (A[9] = (G) => $.allowInvites = G),
                       onClick: A[10] || (A[10] = Ct(() => {
@@ -4562,16 +4562,16 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   ]),
                   _: 1
                 }),
-                j(h(Bt), {
+                j(p(Bt), {
                   size: "compact",
                   border: !1,
                   onClick: A[14] || (A[14] = (G) => $.inviteNeedConfirm = !$.inviteNeedConfirm)
                 }, {
                   default: J(() => [
-                    ht(D(h(s)("group.createInviteNeedConfirm", "被邀请人需确认")), 1)
+                    ht(D(p(s)("group.createInviteNeedConfirm", "被邀请人需确认")), 1)
                   ]),
                   trailing: J(() => [
-                    j(h(Uo), {
+                    j(p(Uo), {
                       modelValue: $.inviteNeedConfirm,
                       "onUpdate:modelValue": A[12] || (A[12] = (G) => $.inviteNeedConfirm = G),
                       onClick: A[13] || (A[13] = Ct(() => {
@@ -4581,13 +4581,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   _: 1
                 }),
                 _("div", lw, [
-                  _("label", cw, D(h(s)("group.createMaxMembers", "最大成员数")), 1),
-                  j(h(dn), {
+                  _("label", cw, D(p(s)("group.createMaxMembers", "最大成员数")), 1),
+                  j(p(dn), {
                     modelValue: $.maxMembers,
                     "onUpdate:modelValue": A[15] || (A[15] = (G) => $.maxMembers = G),
                     type: "number",
                     variant: "default",
-                    placeholder: h(s)("group.createMaxMembersPlaceholder", "不填则使用默认上限")
+                    placeholder: p(s)("group.createMaxMembersPlaceholder", "不填则使用默认上限")
                   }, null, 8, ["modelValue", "placeholder"])
                 ])
               ])) : U("", !0),
@@ -4605,7 +4605,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                       class: "create-group-modal__selected-remove",
                       onClick: (ie) => X(G.userId)
                     }, [
-                      j(h(De), {
+                      j(p(De), {
                         name: "filled/circle/xmark",
                         size: 20
                       })
@@ -4613,15 +4613,15 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                   ]),
                   _: 2
                 }, 1032, ["contact"]))), 128)),
-                z.value === 0 ? (y(), re(h(Ht), {
+                z.value === 0 ? (y(), re(p(Ht), {
                   key: 0,
                   icon: "person/single",
-                  description: h(s)("group.createSelectedEmpty", "请选择联系人"),
+                  description: p(s)("group.createSelectedEmpty", "请选择联系人"),
                   size: "small"
-                }, null, 8, ["description"])) : F.value.length === 0 ? (y(), re(h(Ht), {
+                }, null, 8, ["description"])) : F.value.length === 0 ? (y(), re(p(Ht), {
                   key: 1,
                   icon: "person/single",
-                  description: h(s)("contact.noSearchResult"),
+                  description: p(s)("contact.noSearchResult"),
                   size: "small"
                 }, null, 8, ["description"])) : U("", !0)
               ])
@@ -4631,7 +4631,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
           q.$slots.footer ? (y(), C("div", pw, [
             W(q.$slots, "footer", {}, void 0, !0)
           ])) : (y(), C("div", hw, [
-            j(h(pn), {
+            j(p(pn), {
               class: "create-group-modal__footer-btn",
               type: "primary",
               size: "large",
@@ -4641,11 +4641,11 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
               onClick: fe
             }, {
               default: J(() => [
-                ht(D(h(s)("group.createSubmit", "完成")), 1)
+                ht(D(p(s)("group.createSubmit", "完成")), 1)
               ]),
               _: 1
             }, 8, ["disabled", "loading"]),
-            j(h(pn), {
+            j(p(pn), {
               class: "create-group-modal__footer-btn",
               type: "outline",
               size: "large",
@@ -4653,7 +4653,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
               onClick: L
             }, {
               default: J(() => [
-                ht(D(h(s)("button.cancel", "取消")), 1)
+                ht(D(p(s)("button.cancel", "取消")), 1)
               ]),
               _: 1
             })
@@ -4663,7 +4663,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       _: 3
     }, 8, ["show", "position"]));
   }
-}), Lc = /* @__PURE__ */ Pe(mw, [["__scopeId", "data-v-9599b960"]]), gw = { class: "conversation-list__title" }, vw = { class: "conversation-list__menu-wrapper" }, yw = { class: "context-menu" }, bw = ["onClick"], kw = {
+}), Lc = /* @__PURE__ */ Pe(mw, [["__scopeId", "data-v-e686e960"]]), gw = { class: "conversation-list__title" }, vw = { class: "conversation-list__menu-wrapper" }, yw = { class: "context-menu" }, bw = ["onClick"], kw = {
   key: 1,
   class: "conversation-list__search"
 }, ww = {
@@ -4723,7 +4723,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
   },
   emits: ["select", "conversation-click", "at-me-click", "custom-action", "update:active-tab", "reconnect", "header-menu-action", "search"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { conversationList: s, currentConversation: r, hasMore: i, loadingMore: a, selectConversation: l, pinConversation: c, muteConversation: u, sendChannelAck: d, deleteConversation: p, loadMoreConversations: f, refreshConversations: m, loadDraft: g, clearDraft: v } = Js(), { stores: b, h5: M, features: S } = pt(), { t: w } = et(), { isMobile: I } = En(), T = Xo(), R = x(t.activeTab ?? "all");
+    const t = n, o = e, { conversationList: s, currentConversation: r, hasMore: i, loadingMore: a, selectConversation: l, pinConversation: c, muteConversation: u, sendChannelAck: d, deleteConversation: h, loadMoreConversations: f, refreshConversations: m, loadDraft: g, clearDraft: v } = Js(), { stores: b, h5: M, features: S } = pt(), { t: w } = et(), { isMobile: I } = En(), T = Xo(), R = x(t.activeTab ?? "all");
     Ue(() => t.activeTab, (ge) => {
       ge != null && (R.value = ge);
     });
@@ -4936,7 +4936,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       ye.value = ge, we.value = !1, _t.value = !0;
     }
     function _e() {
-      ye.value && (v(ye.value), p(ye.value, we.value), ye.value = "");
+      ye.value && (v(ye.value), h(ye.value, we.value), ye.value = "");
     }
     function Ve(ge, Be) {
       o("custom-action", ge, Be);
@@ -4949,7 +4949,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
         class: $e(["conversation-list__header", `conversation-list__header--${t.headerAlign}`])
       }, [
         W(ge.$slots, "header", {}, () => [
-          _("span", gw, D(t.title || h(w)("conversation.title")), 1)
+          _("span", gw, D(t.title || p(w)("conversation.title")), 1)
         ], !0),
         _("div", vw, [
           W(ge.$slots, "header-menu", {
@@ -4964,13 +4964,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 class: "conversation-list__menu-trigger",
                 onClick: ke
               }, [
-                j(h(De), {
+                j(p(De), {
                   name: "circle/plus",
                   size: 22
                 })
               ], 512),
-              j(h(Wt), {
-                show: q.value && !h(I),
+              j(p(Wt), {
+                show: q.value && !p(I),
                 anchor: A.value ?? void 0,
                 placement: "bottom",
                 overlay: !1,
@@ -4986,7 +4986,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                       class: "context-menu__item",
                       onClick: Ct((vt) => he(Ce), ["stop"])
                     }, [
-                      Ce.icon ? (y(), re(h(De), {
+                      Ce.icon ? (y(), re(p(De), {
                         key: 0,
                         name: Ce.icon,
                         size: 18
@@ -5015,19 +5015,19 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
         } : void 0
       ]), 1032, ["tabs", "active-tab"]),
       t.showSearch ? (y(), C("div", kw, [
-        j(h(dn), {
+        j(p(dn), {
           modelValue: X.value,
           "onUpdate:modelValue": Be[0] || (Be[0] = (Ce) => X.value = Ce),
           variant: "search",
           clearable: "",
           "clear-icon": "search/xmark",
-          placeholder: h(w)("conversation.searchPlaceholder"),
+          placeholder: p(w)("conversation.searchPlaceholder"),
           "prefix-icon": "search"
         }, null, 8, ["modelValue", "placeholder"])
       ])) : U("", !0),
       t.showStatusBanner && F.value.visible ? (y(), C("div", ww, [
         W(ge.$slots, "status-banner", je(Ke(F.value)), () => [
-          j(h(np), {
+          j(p(np), {
             type: F.value.type,
             loading: F.value.loading,
             title: F.value.title,
@@ -5048,7 +5048,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
         onMouseleave: Je,
         onClick: Fe
       }, [
-        N.value && h(Y) ? (y(), C("div", Cw, D(h(w)("conversation.pullRefresh")), 1)) : U("", !0),
+        N.value && p(Y) ? (y(), C("div", Cw, D(p(w)("conversation.pullRefresh")), 1)) : U("", !0),
         ge.$slots.body && !t.bodySticky ? (y(), C("div", Mw, [
           W(ge.$slots, "body", {}, void 0, !0)
         ])) : U("", !0),
@@ -5056,13 +5056,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
           var Mn;
           return W(ge.$slots, "item", {
             conversation: Ce,
-            active: ((Mn = h(r)) == null ? void 0 : Mn.id) === Ce.id,
-            keyboardFocus: be.value && Q.value && h(wt) === vt,
+            active: ((Mn = p(r)) == null ? void 0 : Mn.id) === Ce.id,
+            keyboardFocus: be.value && Q.value && p(wt) === vt,
             select: () => Ge(Ce.id),
-            pin: (un) => h(c)(Ce.id, un),
-            mute: (un) => h(u)(Ce.id, un),
+            pin: (un) => p(c)(Ce.id, un),
+            mute: (un) => p(u)(Ce.id, un),
             delete: () => oe(Ce.id),
-            read: () => h(d)(Ce.id),
+            read: () => p(d)(Ce.id),
             customAction: (un) => Ve(un, Ce)
           }, () => {
             var un;
@@ -5071,8 +5071,8 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 "data-conv-id": Ce.id,
                 conversation: Ce,
                 class: $e({
-                  "is-active": ((un = h(r)) == null ? void 0 : un.id) === Ce.id,
-                  "is-keyboard-focus": be.value && Q.value && h(wt) === vt
+                  "is-active": ((un = p(r)) == null ? void 0 : un.id) === Ce.id,
+                  "is-keyboard-focus": be.value && Q.value && p(wt) === vt
                 }),
                 "custom-actions": t.customActions,
                 "time-formatter": t.timeFormatter,
@@ -5082,13 +5082,13 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
                 "badge-placement": t.badgePlacement,
                 "show-avatar": t.showAvatar,
                 "unread-placement": t.unreadPlacement,
-                "has-at-me": !!h(b).conversation.atMeMap[Ce.id],
-                "is-typing": Ce.type === h(ut).SINGLECHAT && !!h(b).conversation.typingMap[Ce.id],
+                "has-at-me": !!p(b).conversation.atMeMap[Ce.id],
+                "is-typing": Ce.type === p(ut).SINGLECHAT && !!p(b).conversation.typingMap[Ce.id],
                 onSelect: Ge,
-                onPin: h(c),
-                onMute: h(u),
+                onPin: p(c),
+                onMute: p(u),
                 onDelete: oe,
-                onRead: h(d),
+                onRead: p(d),
                 onCustomAction: Ve
               }, Ft({ _: 2 }, [
                 ge.$slots["item-name-suffix"] ? {
@@ -5107,25 +5107,25 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
             key: Ce,
             class: "conversation-list__skeleton-item"
           }, [
-            j(h(fo), {
+            j(p(fo), {
               variant: "avatar",
               shape: "rounded"
             }),
             _("div", Iw, [
-              j(h(fo), {
+              j(p(fo), {
                 variant: "text",
                 style: { width: "40%" }
               }),
-              j(h(fo), {
+              j(p(fo), {
                 variant: "text",
                 style: { width: "70%" }
               })
             ])
           ])), 64))
         ])) : U("", !0),
-        h(a) ? (y(), C("div", xw, D(h(w)("conversation.loadingMore")), 1)) : U("", !0),
-        !We.value.length && !h(a) && !E.value ? (y(), C("div", Tw, [
-          j(h(Ht), {
+        p(a) ? (y(), C("div", xw, D(p(w)("conversation.loadingMore")), 1)) : U("", !0),
+        !We.value.length && !p(a) && !E.value ? (y(), C("div", Tw, [
+          j(p(Ht), {
             class: "conversation-list__empty",
             icon: fe.value ? "search" : "list/bullet",
             description: de.value
@@ -5148,41 +5148,41 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       ge.$slots.footer && t.footerSticky ? (y(), C("div", Aw, [
         W(ge.$slots, "footer", {}, void 0, !0)
       ])) : U("", !0),
-      t.showScrollToTop ? (y(), re(h(va), {
+      t.showScrollToTop ? (y(), re(p(va), {
         key: 5,
         target: K.value ?? void 0,
         "visibility-height": 200,
         bottom: 12,
         right: 12
       }, null, 8, ["target"])) : U("", !0),
-      j(h(rn), {
+      j(p(rn), {
         show: _t.value,
         "onUpdate:show": Be[2] || (Be[2] = (Ce) => _t.value = Ce),
-        title: h(w)("conversation.delete"),
+        title: p(w)("conversation.delete"),
         width: 540,
         type: "warning",
-        "confirm-text": h(w)("button.confirm"),
-        "cancel-text": h(w)("button.cancel"),
+        "confirm-text": p(w)("button.confirm"),
+        "cancel-text": p(w)("button.cancel"),
         onConfirm: _e
       }, {
         default: J(() => [
           _("div", $w, [
-            _("div", null, D(h(w)("conversation.deleteConfirm")), 1),
+            _("div", null, D(p(w)("conversation.deleteConfirm")), 1),
             _("div", {
               class: "conversation-list__delete-option",
               onClick: Be[1] || (Be[1] = (Ce) => we.value = !we.value)
             }, [
-              j(h(ho), {
+              j(p(ho), {
                 checked: we.value,
                 size: 16
               }, null, 8, ["checked"]),
-              _("span", null, D(h(w)("conversation.deleteWithHistory", "同时删除聊天记录")), 1)
+              _("span", null, D(p(w)("conversation.deleteWithHistory", "同时删除聊天记录")), 1)
             ])
           ])
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      j(h(Nr), {
+      j(p(Nr), {
         show: G.value,
         "onUpdate:show": Be[3] || (Be[3] = (Ce) => G.value = Ce),
         actions: Ze.value,
@@ -5220,7 +5220,7 @@ const nk = { class: "contact-alphabet-nav" }, ok = ["onClick"], sk = { class: "c
       ], !0)
     ], 2));
   }
-}), Np = /* @__PURE__ */ Pe(Rw, [["__scopeId", "data-v-9f5f3d40"]]), Si = {
+}), Np = /* @__PURE__ */ Pe(Rw, [["__scopeId", "data-v-17c005fd"]]), Si = {
   image: "[图片]",
   sticker: "[表情]",
   voice: "[语音]",
@@ -5341,7 +5341,7 @@ function Nw() {
     const b = s();
     b && await n.message.sendCustom(b.id, b.type, m, g, v);
   }
-  async function p(m, g) {
+  async function h(m, g) {
     const v = s();
     v && await n.message.sendCmd(v.id, v.type, m, g);
   }
@@ -5376,7 +5376,7 @@ function Nw() {
     sendVideoMessage: c,
     sendLocationMessage: u,
     sendCustomMessage: d,
-    sendCmdMessage: p,
+    sendCmdMessage: h,
     resendMessage: f
   };
 }
@@ -5392,10 +5392,10 @@ function Op() {
     const c = ad(l.id), u = a ?? c.cursor;
     s.value = !0;
     try {
-      const d = await n.message.fetchHistory(l.id, l.type, u), p = d.cursor || "", f = !d.hasMore;
-      return ld(l.id, p, f), {
+      const d = await n.message.fetchHistory(l.id, l.type, u), h = d.cursor || "", f = !d.hasMore;
+      return ld(l.id, h, f), {
         messages: d.list,
-        cursor: p,
+        cursor: h,
         isLast: f
       };
     } finally {
@@ -5424,7 +5424,7 @@ function Ow(n) {
     originalMsg: c,
     pinned: u,
     pinTime: d,
-    pinOperatorId: p,
+    pinOperatorId: h,
     translation: f,
     showTranslation: m,
     translating: g,
@@ -5469,7 +5469,7 @@ function xa() {
     const b = a.value;
     b && await e.message.markRead(b.id, b.type, v.msgServerId || v.msgLocalId);
   }
-  async function p(v, b) {
+  async function h(v, b) {
     return e.message.fetchGroupReadDetail(b, v);
   }
   async function f(v, b) {
@@ -5599,7 +5599,7 @@ function xa() {
     exitEditMode: c,
     modifyTextMessage: u,
     sendReadAckForMessage: d,
-    fetchGroupReadDetail: p,
+    fetchGroupReadDetail: h,
     forwardMessage: f,
     forwardCombineMessages: g,
     // 来自 useMessageActions
@@ -5739,7 +5739,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
   emits: ["update:show", "invited"],
   setup(n, { emit: e }) {
     const t = n, o = e, { t: s } = et(), { stores: r } = pt(), { isMobile: i } = En(), { selectedIds: a, setSelectedIds: l, fetchContacts: c } = Dn(), u = x(!1), d = k(() => r.client.currentUser);
-    function p(v) {
+    function h(v) {
       var M;
       const b = v.userId;
       return b === d.value ? !0 : ((M = t.existingMemberIds) == null ? void 0 : M.includes(b)) ?? !1;
@@ -5766,20 +5766,20 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       async (v) => {
         v && (l([]), await c());
       }
-    ), (v, b) => (y(), re(h(Wt), {
+    ), (v, b) => (y(), re(p(Wt), {
       show: t.show,
-      position: h(i) ? "bottom" : "center",
+      position: p(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": b[0] || (b[0] = (M) => o("update:show", M)),
       onClose: f
     }, {
       default: J(() => [
         _("div", {
-          class: $e(["invite-member-modal", { "invite-member-modal--mobile": h(i) }])
+          class: $e(["invite-member-modal", { "invite-member-modal--mobile": p(i) }])
         }, [
           _("div", Uw, [
-            _("span", Fw, D(h(s)("group.inviteMember.title", "添加成员")), 1),
-            h(a).size > 0 ? (y(), C("span", Hw, "(" + D(h(a).size) + ")", 1)) : U("", !0)
+            _("span", Fw, D(p(s)("group.inviteMember.title", "添加成员")), 1),
+            p(a).size > 0 ? (y(), C("span", Hw, "(" + D(p(a).size) + ")", 1)) : U("", !0)
           ]),
           _("div", Gw, [
             j(Xs, {
@@ -5788,27 +5788,27 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               "show-alphabet-nav": !1,
               "group-by": "none",
               "select-mode": "multiple",
-              "disabled-fn": p
+              "disabled-fn": h
             })
           ]),
           _("div", Vw, [
-            j(h(pn), {
+            j(p(pn), {
               type: "default",
               onClick: m
             }, {
               default: J(() => [
-                ht(D(h(s)("button.cancel", "取消")), 1)
+                ht(D(p(s)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            j(h(pn), {
+            j(p(pn), {
               type: "primary",
-              disabled: h(a).size === 0,
+              disabled: p(a).size === 0,
               loading: u.value,
               onClick: g
             }, {
               default: J(() => [
-                ht(D(h(s)("group.inviteMember.invite", "邀请")), 1)
+                ht(D(p(s)("group.inviteMember.invite", "邀请")), 1)
               ]),
               _: 1
             }, 8, ["disabled", "loading"])
@@ -5852,15 +5852,15 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         class: "quote-card__bar",
         "aria-hidden": "true"
       }, null, -1)),
-      n.showAvatar ? (y(), re(h(Dt), {
+      n.showAvatar ? (y(), re(p(Dt), {
         key: 0,
         class: "quote-card__avatar",
-        src: h(r),
+        src: p(r),
         name: i.value,
         size: 20
       }, null, 8, ["src", "name"])) : U("", !0),
       _("div", Ww, [
-        a.value ? (y(), re(h(De), {
+        a.value ? (y(), re(p(De), {
           key: 0,
           class: "quote-card__type-icon",
           name: a.value,
@@ -5902,7 +5902,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }), d = k(() => {
       var N;
       return ((N = l.value) == null ? void 0 : N.enableMentionHighlight) !== !1;
-    }), p = k(() => {
+    }), h = k(() => {
       var N;
       return (N = l.value) == null ? void 0 : N.onMentionClick;
     }), f = k(() => {
@@ -5977,7 +5977,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }
     function B(N, L) {
       L.preventDefault(), L.stopPropagation();
-      const K = p.value;
+      const K = h.value;
       if (K) {
         K(N);
         return;
@@ -5994,7 +5994,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
             key: 0,
             class: "text-message__reedit-btn",
             onClick: Ct(P, ["stop"])
-          }, D(h(a)("message.reedit") ?? "重新编辑"), 1)) : U("", !0)
+          }, D(p(a)("message.reedit") ?? "重新编辑"), 1)) : U("", !0)
         ], 64)) : (y(), C("div", {
           key: 1,
           class: $e(["text-message__bubble", i.value])
@@ -6002,7 +6002,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           _("div", Xw, [
             S.value && (w.value || I.value) ? (y(), C(Ae, { key: 0 }, [
               _("span", Yw, D(t.message.body.content), 1),
-              w.value ? (y(), C("span", Qw)) : I.value ? (y(), C("span", Zw, D(h(a)("message.stream.error")), 1)) : U("", !0)
+              w.value ? (y(), C("span", Qw)) : I.value ? (y(), C("span", Zw, D(p(a)("message.stream.error")), 1)) : U("", !0)
             ], 64)) : (y(), C(Ae, { key: 1 }, [
               m.value.length > 0 ? (y(!0), C(Ae, { key: 0 }, ot(m.value, (X, fe) => (y(), C(Ae, { key: fe }, [
                 X.type === "link" ? (y(), C("a", {
@@ -6023,8 +6023,8 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               T.value ? (y(), C("span", {
                 key: 2,
                 class: "text-message__edited",
-                title: t.message.modifiedInfo ? `${h(a)("message.edited")} ×${t.message.modifiedInfo.operationCount}` : ""
-              }, D(h(a)("message.edited")), 9, o0)) : U("", !0)
+                title: t.message.modifiedInfo ? `${p(a)("message.edited")} ×${t.message.modifiedInfo.operationCount}` : ""
+              }, D(p(a)("message.edited")), 9, o0)) : U("", !0)
             ], 64))
           ]),
           z.value ? (y(), C(Ae, { key: 0 }, [
@@ -6033,12 +6033,12 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               "aria-hidden": "true"
             }, null, -1)),
             E.value ? (y(), C("div", s0, [
-              j(h(De), {
+              j(p(De), {
                 name: "loading/arc/normal",
                 size: 14,
                 anim: "spin"
               }),
-              _("span", null, D(h(a)("message.translate.loading")), 1)
+              _("span", null, D(p(a)("message.translate.loading")), 1)
             ])) : (y(), C(Ae, { key: 1 }, [
               _("div", r0, [
                 v.value && g.value ? (y(!0), C(Ae, { key: 0 }, ot(g.value, (X, fe) => (y(), C(Ae, { key: fe }, [
@@ -6055,11 +6055,11 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                 ], 64))
               ]),
               _("div", l0, [
-                j(h(De), {
+                j(p(De), {
                   name: "rect/hanzinalpha/slash",
                   size: 12
                 }),
-                _("span", null, D(h(a)("message.translated")), 1)
+                _("span", null, D(p(a)("message.translated")), 1)
               ])
             ], 64))
           ], 64)) : U("", !0)
@@ -6097,12 +6097,12 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }), l = k(() => e.message.body.localUrl || e.message.body.originalImageUrl || ""), c = Ln(Fn.BUBBLE_SHAPE, k(() => {
     })), u = k(
       () => (c.value ?? t.bubbleShape) === "square" ? "image-message__img--square" : ""
-    ), d = x(!1), p = x(!1), f = k(() => e.message.status === $t.SENDING && !s.value);
+    ), d = x(!1), h = x(!1), f = k(() => e.message.status === $t.SENDING && !s.value);
     function m() {
       d.value = !0;
     }
     function g() {
-      p.value = !0;
+      h.value = !0;
     }
     const v = x(!1), b = x(0), M = k(() => {
       const $ = [a.value, l.value].filter(Boolean);
@@ -6129,7 +6129,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         style: Pt({ width: `${r.value.width}px`, height: `${r.value.height}px` }),
         onClick: w
       }, [
-        !d.value && !p.value && !s.value ? (y(), C("div", {
+        !d.value && !h.value && !s.value ? (y(), C("div", {
           key: 0,
           class: $e(["image-message__loading", u.value])
         }, null, 2)) : U("", !0),
@@ -6141,15 +6141,15 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           onLoad: m,
           onError: g
         }, null, 42, u0),
-        p.value ? (y(), C("div", {
+        h.value ? (y(), C("div", {
           key: 1,
           class: $e(["image-message__error", s.value ? "" : u.value])
-        }, D(h(o)("message.image.loadFailed", "[图片加载失败]")), 3)) : U("", !0),
+        }, D(p(o)("message.image.loadFailed", "[图片加载失败]")), 3)) : U("", !0),
         f.value ? (y(), C("div", {
           key: 2,
           class: $e(["image-message__sending", u.value])
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "loading/arc/big",
             size: 24,
             color: "#fff",
@@ -6159,8 +6159,8 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       ], 6)) : (y(), C("div", {
         key: 1,
         class: $e(["image-message__placeholder", u.value])
-      }, D(h(o)("message.image", "[图片]")), 3)),
-      s.value ? U("", !0) : (y(), re(h(ep), {
+      }, D(p(o)("message.image", "[图片]")), 3)),
+      s.value ? U("", !0) : (y(), re(p(ep), {
         key: 2,
         show: v.value,
         "onUpdate:show": E[0] || (E[0] = (z) => v.value = z),
@@ -6175,11 +6175,11 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
             key: 0,
             class: "image-message__preview-toggle",
             onClick: I
-          }, D(h(o)("message.image.viewOriginal", "查看原图")), 1)) : z === 1 && P ? (y(), C("div", d0, D(h(o)("message.image.loadingOriginal", "加载原图中…")), 1)) : z === 1 && !P ? (y(), C("button", {
+          }, D(p(o)("message.image.viewOriginal", "查看原图")), 1)) : z === 1 && P ? (y(), C("div", d0, D(p(o)("message.image.loadingOriginal", "加载原图中…")), 1)) : z === 1 && !P ? (y(), C("button", {
             key: 2,
             class: "image-message__preview-toggle",
             onClick: T
-          }, D(h(o)("message.image.viewBig", "查看大图")), 1)) : U("", !0)
+          }, D(p(o)("message.image.viewBig", "查看大图")), 1)) : U("", !0)
         ]),
         _: 1
       }, 8, ["show", "index", "srcs"]))
@@ -6207,7 +6207,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     ), l = k(() => t.message.body), c = k(() => {
       const z = Number(l.value.duration);
       return Number.isFinite(z) ? Math.max(0, Math.round(z)) : 0;
-    }), u = k(() => `${Math.min(M0, Math.max(C0, c.value * S0))}px`), d = k(() => `${c.value}"`), p = Symbol("voice-audio-controller");
+    }), u = k(() => `${Math.min(M0, Math.max(C0, c.value * S0))}px`), d = k(() => `${c.value}"`), h = Symbol("voice-audio-controller");
     function f() {
       let z = null, P = "";
       return {
@@ -6222,7 +6222,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         }
       };
     }
-    const m = Ln(p, f(), !0), g = x(!1), v = x(null);
+    const m = Ln(h, f(), !0), g = x(!1), v = x(null);
     function b() {
       v.value && (v.value.pause(), v.value.currentTime = 0, m.stop(t.message.msgServerId || t.message.msgLocalId), v.value = null), g.value = !1;
     }
@@ -6273,7 +6273,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                 _("span", { class: "voice-message__wave-bar" }, null, -1),
                 _("span", { class: "voice-message__wave-bar" }, null, -1),
                 _("span", { class: "voice-message__wave-bar" }, null, -1)
-              ])])) : (y(), re(h(De), {
+              ])])) : (y(), re(p(De), {
                 key: 1,
                 name: "triangle",
                 size: 14
@@ -6287,20 +6287,20 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               "aria-hidden": "true"
             }, null, -1)),
             I.value ? (y(), C("div", b0, [
-              j(h(De), {
+              j(p(De), {
                 name: "loading/arc/normal",
                 size: 14,
                 anim: "spin"
               }),
-              _("span", null, D(h(o)("message.voiceToText.loading")), 1)
+              _("span", null, D(p(o)("message.voiceToText.loading")), 1)
             ])) : (y(), C(Ae, { key: 1 }, [
               _("div", k0, D((F = t.message.voiceText) == null ? void 0 : F.text), 1),
               _("div", w0, [
-                j(h(De), {
+                j(p(De), {
                   name: "rect/hanzi",
                   size: 12
                 }),
-                _("span", null, D(h(o)("message.voiceToText.done")), 1)
+                _("span", null, D(p(o)("message.voiceToText.done")), 1)
               ])
             ], 64))
           ], 64)) : U("", !0)
@@ -6337,7 +6337,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     function d() {
       u.value = !0;
     }
-    function p() {
+    function h() {
       u.value = !1;
     }
     async function f(m) {
@@ -6380,16 +6380,16 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         }, null, 10, x0)) : (y(), C("div", {
           key: 1,
           class: $e(["video-message__placeholder", i.value])
-        }, D(h(o)("message.video", "[视频]")), 3)),
+        }, D(p(o)("message.video", "[视频]")), 3)),
         _("div", T0, [
-          l.value ? (y(), re(h(De), {
+          l.value ? (y(), re(p(De), {
             key: 0,
             name: "loading/arc/big",
             size: 24,
             color: "#fff",
             anim: "spin"
           })) : (y(), C("div", E0, [
-            j(h(De), {
+            j(p(De), {
               name: "triangle",
               size: 20,
               color: "#fff"
@@ -6401,7 +6401,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       u.value && a.value.url ? (y(), C("div", {
         key: 0,
         class: "video-message__preview",
-        onClick: p
+        onClick: h
       }, [
         _("video", {
           src: a.value.url,
@@ -6413,10 +6413,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         }, null, 8, $0),
         _("button", {
           class: "video-message__download-btn",
-          title: h(o)("message.download.success", "下载"),
+          title: p(o)("message.download.success", "下载"),
           onClick: Ct(f, ["stop"])
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "arrow/down_tray",
             size: 20
           })
@@ -6450,7 +6450,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       { key: "audio", icon: "file/audio", pattern: /\.(?:mp3|wav|aac|flac|ogg|m4a|wma)$/ }
     ], d = k(
       () => u.find((g) => g.pattern.test(l.value.toLowerCase()))
-    ), p = k(() => {
+    ), h = k(() => {
       var g;
       return ((g = d.value) == null ? void 0 : g.key) ?? "file";
     }), f = k(() => {
@@ -6488,15 +6488,15 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       }, [
         _("div", {
           class: "file-message__icon",
-          style: Pt({ backgroundColor: `var(--uikit-file-icon-${p.value})` })
+          style: Pt({ backgroundColor: `var(--uikit-file-icon-${h.value})` })
         }, [
-          j(h(De), {
+          j(p(De), {
             name: f.value,
             size: 20
           }, null, 8, ["name"])
         ], 4),
         _("div", O0, [
-          j(h(op), {
+          j(p(op), {
             level: "body",
             weight: "medium",
             ellipsis: "",
@@ -6531,12 +6531,12 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     function d() {
       o("view", t.message);
     }
-    return (p, f) => (y(), C("div", {
+    return (h, f) => (y(), C("div", {
       class: $e(["combine-message", [{ "combine-message--self": t.isSelf }, a.value]]),
       onClick: d
     }, [
       _("div", P0, [
-        j(h(De), {
+        j(p(De), {
           name: "folder",
           size: 16,
           class: "combine-message__icon"
@@ -6588,13 +6588,13 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     ), l = k(() => t.message.body), c = k(
       () => l.value.address || l.value.buildingName || s("message.location")
     ), u = k(() => {
-      const { latitude: p, longitude: f } = l.value;
-      return typeof p != "number" || typeof f != "number" ? "" : `${p.toFixed(6)}, ${f.toFixed(6)}`;
+      const { latitude: h, longitude: f } = l.value;
+      return typeof h != "number" || typeof f != "number" ? "" : `${h.toFixed(6)}, ${f.toFixed(6)}`;
     });
     function d() {
       o("location-click", l.value, t.message);
     }
-    return (p, f) => (y(), C("div", {
+    return (h, f) => (y(), C("div", {
       class: $e(["location-message", { "location-message--self": t.message.isSelf }]),
       onClick: d
     }, [
@@ -6602,7 +6602,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         class: $e(["location-message__bubble", a.value])
       }, [
         _("div", j0, [
-          j(h(De), {
+          j(p(De), {
             name: "loc",
             size: 28
           })
@@ -6652,7 +6652,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       const g = t.message.type;
       return s[g] || null;
     }), i = k(() => `message-${t.message.type}`), a = k(() => `message-footer-${t.message.type}`), l = k(() => t.message.type === ve.NOTICE), c = k(() => t.message.type === ve.CMD), u = k(() => t.message.body.content || t.message.content || ""), d = ["name", "names", "fileName"];
-    function p(g) {
+    function h(g) {
       return g.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
     const f = k(() => {
@@ -6669,7 +6669,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       const g = u.value, v = f.value;
       if (!g || v.length === 0)
         return [{ text: g, highlight: !1 }];
-      const b = new RegExp(`(${v.map(p).join("|")})`, "g");
+      const b = new RegExp(`(${v.map(h).join("|")})`, "g");
       return g.split(b).filter(Boolean).map((M) => ({
         text: M,
         highlight: v.includes(M)
@@ -6713,21 +6713,21 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       return s.value || u || t.message.from || "Unknown";
     });
     function a(c) {
-      const u = new Date(c), d = String(u.getHours()).padStart(2, "0"), p = String(u.getMinutes()).padStart(2, "0");
-      return `${d}:${p}`;
+      const u = new Date(c), d = String(u.getHours()).padStart(2, "0"), h = String(u.getMinutes()).padStart(2, "0");
+      return `${d}:${h}`;
     }
     function l(c) {
       o("view-combine", c);
     }
-    return (c, u) => (y(), re(h(Bt), {
+    return (c, u) => (y(), re(p(Bt), {
       class: "combine-message-modal-item",
       "auto-height": "",
       clickable: !1
     }, {
       leading: J(() => [
-        j(h(Dt), {
+        j(p(Dt), {
           name: i.value,
-          src: h(r),
+          src: p(r),
           size: 32
         }, null, 8, ["name", "src"])
       ]),
@@ -6765,7 +6765,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
   },
   emits: ["update:show", "view-combine"],
   setup(n, { emit: e }) {
-    const t = Vt("UIKit:CombineMessageModal"), o = n, s = e, { t: r } = et(), { domains: i, stores: a } = pt(), l = Ec(), c = x(!1), u = x([]), d = x(""), p = k(() => o.message.body), f = k(() => p.value.title || r("message.forward.combineTitle", "聊天记录"));
+    const t = Vt("UIKit:CombineMessageModal"), o = n, s = e, { t: r } = et(), { domains: i, stores: a } = pt(), l = Ec(), c = x(!1), u = x([]), d = x(""), h = k(() => o.message.body), f = k(() => h.value.title || r("message.forward.combineTitle", "聊天记录"));
     function m(S) {
       const w = a.client.currentUser || "";
       return Yf(S, w);
@@ -6784,7 +6784,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           return;
         }
       }
-      const w = p.value.url, I = p.value.secret;
+      const w = h.value.url, I = h.value.secret;
       if (!w || !I) {
         d.value = r("message.forward.parseFailed", "解析失败");
         return;
@@ -6806,7 +6806,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }
     return Ue(() => o.show, (S) => {
       S && (u.value = [], d.value = "", b());
-    }, { immediate: !0 }), (S, w) => (y(), re(h(Wt), {
+    }, { immediate: !0 }), (S, w) => (y(), re(p(Wt), {
       show: o.show,
       position: "center",
       "show-close": !0,
@@ -6817,7 +6817,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       default: J(() => [
         _("div", c_, [
           _("div", u_, [
-            j(h(De), {
+            j(p(De), {
               name: "folder",
               size: 18,
               class: "combine-message-modal__header-icon"
@@ -6826,22 +6826,22 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           ]),
           _("div", f_, [
             c.value ? (y(), C("div", p_, [
-              j(h(De), {
+              j(p(De), {
                 name: "loading/arc/big",
                 size: 20,
                 anim: "spin"
               }),
-              _("span", null, D(h(r)("message.forward.parsing", "解析中...")), 1)
+              _("span", null, D(p(r)("message.forward.parsing", "解析中...")), 1)
             ])) : d.value ? (y(), C("div", h_, D(d.value), 1)) : g.value.length > 0 ? (y(), C("div", m_, [
               (y(!0), C(Ae, null, ot(g.value, (I, T) => (y(), re(l_, {
                 key: I.msgServerId || I.msgLocalId || T,
                 message: I,
                 onViewCombine: v
               }, null, 8, ["message"]))), 128))
-            ])) : (y(), re(h(Ht), {
+            ])) : (y(), re(p(Ht), {
               key: 3,
               icon: "bubble/rect/empty",
-              description: h(r)("message.forward.combineEmpty", "暂无消息"),
+              description: p(r)("message.forward.combineEmpty", "暂无消息"),
               size: "small"
             }, null, 8, ["description"]))
           ])
@@ -6870,7 +6870,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         }]),
         onClick: (l) => s(a)
       }, [
-        a.icon ? (y(), re(h(De), {
+        a.icon ? (y(), re(p(De), {
           key: 0,
           name: a.icon,
           size: 16
@@ -6888,7 +6888,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
   },
   emits: ["action"],
   setup(n, { emit: e }) {
-    const t = n, o = e, s = Sc(), { t: r } = et(), { isMobile: i } = En(), { show: a } = Kt(), { domains: l, capabilities: c } = pt(), u = Or(), d = x(), p = x(), f = x(!1), m = x(!1), g = x(!1), v = k(() => {
+    const t = n, o = e, s = Sc(), { t: r } = et(), { isMobile: i } = En(), { show: a } = Kt(), { domains: l, capabilities: c } = pt(), u = Or(), d = x(), h = x(), f = x(!1), m = x(!1), g = x(!1), v = k(() => {
       var fe;
       const L = ((fe = t.config) == null ? void 0 : fe.recallDisableDuration) ?? gd, K = Date.now(), X = t.message.timestamp || K;
       return K - X > L;
@@ -6973,16 +6973,16 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         return;
       L.preventDefault(), g.value = !0;
       const K = document.createElement("div");
-      K.style.position = "fixed", K.style.left = `${L.clientX}px`, K.style.top = `${L.clientY}px`, K.style.width = "1px", K.style.height = "1px", document.body.appendChild(K), p.value = K, f.value = !0;
+      K.style.position = "fixed", K.style.left = `${L.clientX}px`, K.style.top = `${L.clientY}px`, K.style.width = "1px", K.style.height = "1px", document.body.appendChild(K), h.value = K, f.value = !0;
     }
     function $() {
       E();
     }
     function E() {
-      f.value && (f.value = !1, g.value = !1, p.value && (document.body.removeChild(p.value), p.value = void 0));
+      f.value && (f.value = !1, g.value = !1, h.value && (document.body.removeChild(h.value), h.value = void 0));
     }
     function z() {
-      f.value = !1, m.value = !1, g.value = !1, p.value && (document.body.removeChild(p.value), p.value = void 0);
+      f.value = !1, m.value = !1, g.value = !1, h.value && (document.body.removeChild(h.value), h.value = void 0);
     }
     const P = rp(() => {
       i.value && (m.value = !0);
@@ -7009,19 +7009,19 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         class: $e(["message-interactive", { "message-interactive--active": g.value }]),
         onContextmenu: R,
         onTouchstart: K[0] || (K[0] = //@ts-ignore
-        (...X) => h(P).start && h(P).start(...X)),
+        (...X) => p(P).start && p(P).start(...X)),
         onTouchmove: K[1] || (K[1] = //@ts-ignore
-        (...X) => h(P).move && h(P).move(...X)),
+        (...X) => p(P).move && p(P).move(...X)),
         onTouchend: K[2] || (K[2] = //@ts-ignore
-        (...X) => h(P).end && h(P).end(...X)),
+        (...X) => p(P).end && p(P).end(...X)),
         onTouchcancel: K[3] || (K[3] = //@ts-ignore
-        (...X) => h(P).cancel && h(P).cancel(...X))
+        (...X) => p(P).cancel && p(P).cancel(...X))
       }, [
         W(L.$slots, "default", {}, void 0, !0)
       ], 34),
-      j(h(Wt), {
+      j(p(Wt), {
         show: f.value,
-        anchor: p.value,
+        anchor: h.value,
         placement: "bottom",
         overlay: !1,
         "close-on-click-overlay": !0,
@@ -7051,7 +7051,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         ]),
         _: 3
       }, 8, ["show", "anchor"]),
-      j(h(Nr), {
+      j(p(Nr), {
         show: m.value,
         actions: T.value,
         "onUpdate:show": K[4] || (K[4] = (X) => m.value = X),
@@ -7119,7 +7119,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     function a(ye) {
       r(ye);
     }
-    const { t: l } = et(), c = py(), { capabilities: u } = pt(), { displayName: d, avatarUrl: p } = en(() => t.message.from), { get: f } = Xo(), m = k(() => {
+    const { t: l } = et(), c = py(), { capabilities: u } = pt(), { displayName: d, avatarUrl: h } = en(() => t.message.from), { get: f } = Xo(), m = k(() => {
       const ye = t.message.from, we = c.currentUser;
       return ye && we ? Ci(ye) === Ci(we) : t.message.isSelf;
     }), g = k(() => {
@@ -7278,14 +7278,14 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         ]), 1032, ["message"])) : (y(), C("div", C_, D(n.message.body.content || n.message.content || ""), 1))
       ], 64)) : b.value ? (y(), C("div", M_, [
         _("span", S_, D(M.value), 1),
-        n.message.type === h(ve).TEXT && m.value && n.message.originalMsg ? (y(), re(Os, {
+        n.message.type === p(ve).TEXT && m.value && n.message.originalMsg ? (y(), re(Os, {
           key: 0,
           message: n.message,
           onReedit: we[0] || (we[0] = (oe) => o("reedit", oe))
         }, null, 8, ["message"])) : U("", !0)
       ])) : (y(), C(Ae, { key: 2 }, [
         t.isMultiSelectMode ? (y(), C("div", I_, [
-          j(h(ho), {
+          j(p(ho), {
             checked: t.isSelected,
             size: 18
           }, null, 8, ["checked"])
@@ -7305,9 +7305,9 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
             onContextmenu: Ct(Fe, ["stop"])
           }, [
             W(ye.$slots, "avatar", { message: n.message }, () => [
-              j(h(Dt), {
-                name: h(d),
-                src: h(p),
+              j(p(Dt), {
+                name: p(d),
+                src: p(h),
                 size: z.value,
                 presence: g.value
               }, null, 8, ["name", "src", "size", "presence"])
@@ -7316,7 +7316,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           _("div", x_, [
             m.value ? U("", !0) : (y(), C("div", T_, [
               W(ye.$slots, "nickname", { message: n.message }, () => [
-                ht(D(h(d)), 1)
+                ht(D(p(d)), 1)
               ], !0)
             ])),
             Ze.value === "below" && !X.value ? (y(), C(Ae, { key: 1 }, [
@@ -7324,13 +7324,13 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                 n.message.pinned ? (y(), C("div", {
                   key: 0,
                   class: "message-bubble-wrapper__pin-badge",
-                  title: h(l)("message.action.pin")
+                  title: p(l)("message.action.pin")
                 }, [
-                  j(h(De), {
+                  j(p(De), {
                     name: "pin",
                     size: 12
                   }),
-                  _("span", null, D(h(l)("message.action.pin")), 1)
+                  _("span", null, D(p(l)("message.action.pin")), 1)
                 ], 8, A_)) : U("", !0),
                 j(Ll, {
                   message: n.message,
@@ -7384,7 +7384,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                 }, () => [
                   _("span", {
                     class: $e(["message-bubble-wrapper__status-item", {
-                      "message-bubble-wrapper__status-item--failed": L.value === h($t).FAILED
+                      "message-bubble-wrapper__status-item--failed": L.value === p($t).FAILED
                     }]),
                     title: Me.value,
                     onClick: Ct(gt, ["stop"])
@@ -7394,19 +7394,19 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                       mode: "out-in"
                     }, {
                       default: J(() => [
-                        Y.value ? (y(), re(h(De), {
+                        Y.value ? (y(), re(p(De), {
                           key: Y.value,
                           name: Y.value,
                           size: 14,
                           class: $e(["message-bubble-wrapper__status-icon", {
-                            "message-bubble-wrapper__status-icon--unread": L.value === h($t).SENT || L.value === h($t).DELIVERED
+                            "message-bubble-wrapper__status-icon--unread": L.value === p($t).SENT || L.value === p($t).DELIVERED
                           }]),
-                          anim: L.value === h($t).SENDING ? "spin" : void 0
+                          anim: L.value === p($t).SENDING ? "spin" : void 0
                         }, null, 8, ["name", "class", "anim"])) : U("", !0)
                       ]),
                       _: 1
                     }),
-                    L.value === h($t).FAILED ? (y(), re(h(De), {
+                    L.value === p($t).FAILED ? (y(), re(p(De), {
                       key: 0,
                       name: vd,
                       size: 14,
@@ -7431,13 +7431,13 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                   n.message.pinned ? (y(), C("div", {
                     key: 0,
                     class: "message-bubble-wrapper__pin-badge",
-                    title: h(l)("message.action.pin")
+                    title: p(l)("message.action.pin")
                   }, [
-                    j(h(De), {
+                    j(p(De), {
                       name: "pin",
                       size: 12
                     }),
-                    _("span", null, D(h(l)("message.action.pin")), 1)
+                    _("span", null, D(p(l)("message.action.pin")), 1)
                   ], 8, N_)) : U("", !0),
                   j(Ll, {
                     message: n.message,
@@ -7492,21 +7492,21 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                     }, () => [
                       _("span", {
                         class: $e(["message-bubble-wrapper__status-item", {
-                          "message-bubble-wrapper__status-item--failed": L.value === h($t).FAILED
+                          "message-bubble-wrapper__status-item--failed": L.value === p($t).FAILED
                         }]),
                         title: Me.value,
                         onClick: Ct(gt, ["stop"])
                       }, [
-                        Y.value ? (y(), re(h(De), {
+                        Y.value ? (y(), re(p(De), {
                           key: 0,
                           name: Y.value,
                           size: 14,
                           class: $e(["message-bubble-wrapper__status-icon", {
-                            "message-bubble-wrapper__status-icon--unread": L.value === h($t).SENT || L.value === h($t).DELIVERED
+                            "message-bubble-wrapper__status-icon--unread": L.value === p($t).SENT || L.value === p($t).DELIVERED
                           }]),
-                          anim: L.value === h($t).SENDING ? "spin" : void 0
+                          anim: L.value === p($t).SENDING ? "spin" : void 0
                         }, null, 8, ["name", "class", "anim"])) : U("", !0),
-                        L.value === h($t).FAILED ? (y(), re(h(De), {
+                        L.value === p($t).FAILED ? (y(), re(p(De), {
                           key: 1,
                           name: vd,
                           size: 14,
@@ -7526,11 +7526,11 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                     title: `${Mt.value}人已读${Le.value > 0 ? `/${ct.value}人` : ""}`,
                     onClick: Ct(ee, ["stop"])
                   }, [
-                    pe.value ? (y(), re(h(De), {
+                    pe.value ? (y(), re(p(De), {
                       key: 0,
                       name: "circle/checked",
                       size: 14
-                    })) : Mt.value === 0 ? (y(), re(h(De), {
+                    })) : Mt.value === 0 ? (y(), re(p(De), {
                       key: 1,
                       name: "circle/empty-1",
                       size: 14
@@ -7568,7 +7568,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           onViewCombine: a
         }, null, 8, ["show", "message", "onUpdate:show"]);
       }), 128)),
-      j(h(Wt), {
+      j(p(Wt), {
         show: Te.value,
         anchor: Ge.value,
         placement: "right",
@@ -7590,22 +7590,22 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               class: "avatar-context-menu__item",
               onClick: wt
             }, [
-              j(h(De), {
+              j(p(De), {
                 name: "person/single",
                 size: 16
               }),
-              _("span", null, D(h(l)("message.avatar.viewProfile")), 1)
+              _("span", null, D(p(l)("message.avatar.viewProfile")), 1)
             ]),
             be.value ? (y(), C("div", {
               key: 0,
               class: "avatar-context-menu__item",
               onClick: _t
             }, [
-              j(h(De), {
+              j(p(De), {
                 name: "at",
                 size: 16
               }),
-              _("span", null, D(h(l)("message.avatar.mention")), 1)
+              _("span", null, D(p(l)("message.avatar.mention")), 1)
             ])) : U("", !0)
           ])
         ]),
@@ -7639,11 +7639,11 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       var v;
       return (v = r.userInfo.getUserInfo(g)) == null ? void 0 : v.avatarUrl;
     }
-    const d = k(() => t.readList.length), p = k(() => t.unreadList.length), f = k(() => l.value === "read" ? t.readList : t.unreadList);
+    const d = k(() => t.readList.length), h = k(() => t.unreadList.length), f = k(() => l.value === "read" ? t.readList : t.unreadList);
     function m() {
       o("update:show", !1);
     }
-    return (g, v) => (y(), re(h(Wt), {
+    return (g, v) => (y(), re(p(Wt), {
       show: t.show,
       position: "center",
       "close-on-click-overlay": !0,
@@ -7653,12 +7653,12 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       default: J(() => [
         _("div", z_, [
           _("div", U_, [
-            _("span", F_, D(h(s)("groupReadReceipt.title")), 1),
-            j(h(At), {
+            _("span", F_, D(p(s)("groupReadReceipt.title")), 1),
+            j(p(At), {
               icon: "xmark/bold",
               size: "small",
               variant: "ghost",
-              title: h(s)("button.close", "关闭"),
+              title: p(s)("button.close", "关闭"),
               onClick: m
             }, null, 8, ["title"])
           ]),
@@ -7668,25 +7668,25 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               onClick: v[0] || (v[0] = (b) => l.value = "read")
             }, [
               _("span", G_, D(d.value), 1),
-              _("span", V_, D(h(s)("groupReadReceipt.read")), 1)
+              _("span", V_, D(p(s)("groupReadReceipt.read")), 1)
             ], 2),
             _("div", {
               class: $e(["group-read-modal__tab", { "group-read-modal__tab--active": l.value === "unread" }]),
               onClick: v[1] || (v[1] = (b) => l.value = "unread")
             }, [
-              _("span", j_, D(p.value), 1),
-              _("span", W_, D(h(s)("groupReadReceipt.unread")), 1)
+              _("span", j_, D(h.value), 1),
+              _("span", W_, D(p(s)("groupReadReceipt.unread")), 1)
             ], 2)
           ]),
           _("div", K_, [
-            (y(!0), C(Ae, null, ot(f.value, (b) => (y(), re(h(Bt), {
+            (y(!0), C(Ae, null, ot(f.value, (b) => (y(), re(p(Bt), {
               key: b,
               title: c(b),
               clickable: !1,
               size: "compact"
             }, {
               leading: J(() => [
-                j(h(Dt), {
+                j(p(Dt), {
                   name: c(b),
                   src: u(b),
                   size: 36
@@ -7694,10 +7694,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["title"]))), 128)),
-            f.value.length === 0 ? (y(), re(h(Ht), {
+            f.value.length === 0 ? (y(), re(p(Ht), {
               key: 0,
               icon: "person/double",
-              description: h(s)("groupReadReceipt.empty"),
+              description: p(s)("groupReadReceipt.empty"),
               size: "small"
             }, null, 8, ["description"])) : U("", !0)
           ])
@@ -7771,7 +7771,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         item: I,
         index: S + T
       }));
-    }), p = k(() => u.value.paddingTop), f = k(() => u.value.paddingBottom);
+    }), h = k(() => u.value.paddingTop), f = k(() => u.value.paddingBottom);
     Ue(() => l.value.top, (S) => {
       S && s("reach-top");
     }), Ue(() => l.value.bottom, (S) => {
@@ -7845,7 +7845,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }, [
       _("div", {
         class: "message-virtual-list__spacer",
-        style: Pt({ paddingTop: `${p.value}px`, paddingBottom: `${f.value}px` })
+        style: Pt({ paddingTop: `${h.value}px`, paddingBottom: `${f.value}px` })
       }, [
         (y(!0), C(Ae, null, ot(d.value, ({ item: I, index: T }) => (y(), C("div", {
           key: String(I[n.keyField]),
@@ -7876,7 +7876,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
   },
   emits: ["reedit", "recall-failed", "edit", "forward", "mention-click", "location-click", "custom-message-action", "avatar-view-profile", "avatar-click", "avatar-mention"],
   setup(n, { expose: e, emit: t }) {
-    const o = n, s = t, r = Vt("UIKit:MessageList"), { messages: i, currentConversation: a, isMultiSelectMode: l, toggleMessageSelection: c, isMessageSelected: u, enterMultiSelectMode: d, fetchHistoryMessages: p, fetchGroupReadDetail: f, recallMessage: m, deleteMessage: g, pinMessage: v, unpinMessage: b, translateTextMessage: M, transcribeVoiceMessage: S, resendMessage: w, getHistoryCursor: I } = xa(), { setQuote: T, locateRequest: R, setHighlight: $ } = Ta(), { isMobile: E } = En(), { h5: z, stores: P } = pt(), { fetchGroupMembers: F } = ln(), { t: B } = et(), { show: N } = Kt(), { copy: L, isSupported: K } = Gy({ legacy: !0 }), X = x(), fe = x(), q = x(), A = k(() => {
+    const o = n, s = t, r = Vt("UIKit:MessageList"), { messages: i, currentConversation: a, isMultiSelectMode: l, toggleMessageSelection: c, isMessageSelected: u, enterMultiSelectMode: d, fetchHistoryMessages: h, fetchGroupReadDetail: f, recallMessage: m, deleteMessage: g, pinMessage: v, unpinMessage: b, translateTextMessage: M, transcribeVoiceMessage: S, resendMessage: w, getHistoryCursor: I } = xa(), { setQuote: T, locateRequest: R, setHighlight: $ } = Ta(), { isMobile: E } = En(), { h5: z, stores: P } = pt(), { fetchGroupMembers: F } = ln(), { t: B } = et(), { show: N } = Kt(), { copy: L, isSupported: K } = Gy({ legacy: !0 }), X = x(), fe = x(), q = x(), A = k(() => {
       var te;
       return (te = o.config) == null ? void 0 : te.messageList;
     }), G = k(() => {
@@ -7987,7 +7987,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       he.value = !0;
       const te = ie.value, H = te ? (Ye = q.value) == null ? void 0 : Ye.listRef : X.value, le = (H == null ? void 0 : H.scrollHeight) ?? 0, ae = (H == null ? void 0 : H.scrollTop) ?? 0;
       try {
-        const kt = await p();
+        const kt = await h();
         He.value = !1, kt ? (tt.value = kt.cursor, (kt.isLast || kt.messages.length === 0) && (Ie.value = !1)) : Ie.value = !1;
       } catch (kt) {
         r.error("[MessageList] loadMoreHistory failed:", nt(kt)), He.value = !0;
@@ -8273,16 +8273,16 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         ke.value === "pull-down" && Ze.value ? (y(), C("div", {
           key: 0,
           class: "message-list__pull-indicator",
-          style: Pt({ height: `${h(wt)}px` })
+          style: Pt({ height: `${p(wt)}px` })
         }, [
-          h(Je) ? (y(), C("span", Y_, D(h(B)("conversation.loadingMore")), 1)) : h(Fe) ? (y(), C("span", Q_, D(h(B)("conversation.pullRefresh")), 1)) : U("", !0)
+          p(Je) ? (y(), C("span", Y_, D(p(B)("conversation.loadingMore")), 1)) : p(Fe) ? (y(), C("span", Q_, D(p(B)("conversation.pullRefresh")), 1)) : U("", !0)
         ], 4)) : U("", !0),
-        h(i).length > 0 && (he.value || He.value || ke.value === "scroll-top" && !Ie.value) ? (y(), C("div", Z_, [
-          he.value ? (y(), C("span", eC, D(h(B)("conversation.loadingMore")), 1)) : He.value ? (y(), C("span", {
+        p(i).length > 0 && (he.value || He.value || ke.value === "scroll-top" && !Ie.value) ? (y(), C("div", Z_, [
+          he.value ? (y(), C("span", eC, D(p(B)("conversation.loadingMore")), 1)) : He.value ? (y(), C("span", {
             key: 1,
             class: "message-list__top-retry",
             onClick: It
-          }, D(h(B)("conversation.loadHistoryFailed", "加载失败，点击重试")), 1)) : (y(), C("span", tC, D(h(B)("conversation.noMoreHistory", "没有更多历史消息")), 1))
+          }, D(p(B)("conversation.loadHistoryFailed", "加载失败，点击重试")), 1)) : (y(), C("span", tC, D(p(B)("conversation.noMoreHistory", "没有更多历史消息")), 1))
         ])) : U("", !0),
         ie.value ? (y(), re(qp, {
           key: 2,
@@ -8307,8 +8307,8 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                 config: A.value,
                 "action-config": (Ye = n.config) == null ? void 0 : Ye.messageAction,
                 "group-read-receipt-config": (bt = n.config) == null ? void 0 : bt.groupReadReceipt,
-                "is-multi-select-mode": h(l),
-                "is-selected": h(u)(ae.data.msgServerId || ae.data.msgLocalId),
+                "is-multi-select-mode": p(l),
+                "is-selected": p(u)(ae.data.msgServerId || ae.data.msgLocalId),
                 "is-latest-read-self": (ae.data.msgServerId || ae.data.msgLocalId) === qe.value,
                 onToggleSelect: An,
                 onAction: Ve,
@@ -8360,8 +8360,8 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
                   config: A.value,
                   "action-config": (Ye = n.config) == null ? void 0 : Ye.messageAction,
                   "group-read-receipt-config": (bt = n.config) == null ? void 0 : bt.groupReadReceipt,
-                  "is-multi-select-mode": h(l),
-                  "is-selected": h(u)(ae.data.msgServerId || ae.data.msgLocalId),
+                  "is-multi-select-mode": p(l),
+                  "is-selected": p(u)(ae.data.msgServerId || ae.data.msgLocalId),
                   "is-latest-read-self": (ae.data.msgServerId || ae.data.msgLocalId) === qe.value,
                   onToggleSelect: An,
                   onAction: Ve,
@@ -8392,7 +8392,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           onClick: de
         }, [
           _("span", null, D(Tt.value) + " 条新消息", 1),
-          j(h(De), {
+          j(p(De), {
             name: "arrow/down",
             size: 12,
             class: "message-list__new-tip-arrow"
@@ -8404,21 +8404,21 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           "read-list": ye.value,
           "unread-list": we.value
         }, null, 8, ["show", "read-list", "unread-list"]),
-        j(h(rn), {
+        j(p(rn), {
           show: oe.value,
           "onUpdate:show": H[9] || (H[9] = (ae) => oe.value = ae),
-          title: h(B)("message.action.delete"),
+          title: p(B)("message.action.delete"),
           width: 540,
           type: "warning",
-          "confirm-text": h(B)("button.confirm"),
-          "cancel-text": h(B)("button.cancel"),
+          "confirm-text": p(B)("button.confirm"),
+          "cancel-text": p(B)("button.cancel"),
           onConfirm: H[10] || (H[10] = (ae) => {
-            _e.value && h(g)(_e.value.msgServerId || _e.value.msgLocalId), _e.value = null;
+            _e.value && p(g)(_e.value.msgServerId || _e.value.msgLocalId), _e.value = null;
           }),
           onCancel: H[11] || (H[11] = (ae) => _e.value = null)
         }, {
           default: J(() => [
-            ht(D(h(B)("message.delete.confirm")), 1)
+            ht(D(p(B)("message.delete.confirm")), 1)
           ]),
           _: 1
         }, 8, ["show", "title", "confirm-text", "cancel-text"])
@@ -8455,11 +8455,11 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     }
     const d = x();
     Ue(() => t.show, (m) => {
-      m && (p.value = 0);
+      m && (h.value = 0);
     }), Ue(a, (m) => {
-      p.value >= m.length && (p.value = (m.length > 0, 0));
+      h.value >= m.length && (h.value = (m.length > 0, 0));
     });
-    const { activeIndex: p } = ya({
+    const { activeIndex: h } = ya({
       count: k(() => a.value.length),
       wrap: !0,
       active: k(() => t.show && a.value.length > 0),
@@ -8472,7 +8472,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
     });
     ba({
       Enter: () => {
-        const m = a.value[p.value];
+        const m = a.value[h.value];
         m && c(m);
       }
     }, {
@@ -8487,7 +8487,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         m == null || m.scrollIntoView({ block: "nearest" });
       });
     }
-    return (m, g) => h(s) ? (y(), re(h(Wt), {
+    return (m, g) => p(s) ? (y(), re(p(Wt), {
       key: 1,
       show: t.show,
       position: "bottom",
@@ -8500,17 +8500,17 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         _("div", lC, [
           _("div", cC, [
             _("span", uC, D(l.value), 1),
-            j(h(At), {
+            j(p(At), {
               class: "mention-picker__header-close",
               icon: "xmark/bold",
               size: "small",
               variant: "ghost",
-              title: h(r)("button.close", "关闭"),
+              title: p(r)("button.close", "关闭"),
               onClick: u
             }, null, 8, ["title"])
           ]),
           _("div", dC, [
-            j(h(De), {
+            j(p(De), {
               name: "search",
               size: 16,
               class: "mention-picker__search-icon"
@@ -8519,7 +8519,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               "onUpdate:modelValue": g[1] || (g[1] = (v) => i.value = v),
               type: "text",
               class: "mention-picker__search-input",
-              placeholder: h(r)("mention.searchPlaceholder", "搜索联系人...")
+              placeholder: p(r)("mention.searchPlaceholder", "搜索联系人...")
             }, null, 8, fC), [
               [mo, i.value]
             ])
@@ -8529,10 +8529,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
             ref: d,
             class: "mention-picker__list mention-picker__list--scrollable"
           }, [
-            (y(!0), C(Ae, null, ot(a.value, (v, b) => (y(), re(h(Bt), {
+            (y(!0), C(Ae, null, ot(a.value, (v, b) => (y(), re(p(Bt), {
               key: v.userId,
               class: "mention-picker__cell",
-              active: h(p) === b,
+              active: p(h) === b,
               title: v.remark || v.name,
               subtitle: v.remark && v.remark !== v.name ? v.name : void 0,
               size: "large",
@@ -8541,7 +8541,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               onClick: (M) => c(v)
             }, {
               leading: J(() => [
-                j(h(Dt), {
+                j(p(Dt), {
                   src: v.avatar,
                   name: v.name,
                   size: 40
@@ -8549,17 +8549,17 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["active", "title", "subtitle", "onClick"]))), 128)),
-            a.value.length === 0 ? (y(), re(h(Ht), {
+            a.value.length === 0 ? (y(), re(p(Ht), {
               key: 0,
               icon: "at",
-              description: h(r)("mention.noResult", "未找到联系人"),
+              description: p(r)("mention.noResult", "未找到联系人"),
               size: "small"
             }, null, 8, ["description"])) : U("", !0)
           ], 512)
         ])
       ]),
       _: 1
-    }, 8, ["show"])) : (y(), re(h(Wt), {
+    }, 8, ["show"])) : (y(), re(p(Wt), {
       key: 0,
       show: t.show,
       anchor: t.anchor,
@@ -8572,7 +8572,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       default: J(() => [
         _("div", rC, [
           _("div", iC, [
-            j(h(De), {
+            j(p(De), {
               name: "search",
               size: 16,
               class: "mention-picker__search-icon"
@@ -8581,7 +8581,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               "onUpdate:modelValue": g[0] || (g[0] = (v) => i.value = v),
               type: "text",
               class: "mention-picker__search-input",
-              placeholder: h(r)("mention.searchPlaceholder", "搜索联系人...")
+              placeholder: p(r)("mention.searchPlaceholder", "搜索联系人...")
             }, null, 8, aC), [
               [mo, i.value]
             ])
@@ -8591,10 +8591,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
             ref: d,
             class: "mention-picker__list"
           }, [
-            (y(!0), C(Ae, null, ot(a.value, (v, b) => (y(), re(h(Bt), {
+            (y(!0), C(Ae, null, ot(a.value, (v, b) => (y(), re(p(Bt), {
               key: v.userId,
               class: "mention-picker__cell",
-              active: h(p) === b,
+              active: p(h) === b,
               title: v.remark || v.name,
               subtitle: v.remark && v.remark !== v.name ? v.name : void 0,
               size: "normal",
@@ -8603,7 +8603,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               onClick: (M) => c(v)
             }, {
               leading: J(() => [
-                j(h(Dt), {
+                j(p(Dt), {
                   src: v.avatar,
                   name: v.name,
                   size: 36
@@ -8611,10 +8611,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
               ]),
               _: 2
             }, 1032, ["active", "title", "subtitle", "onClick"]))), 128)),
-            a.value.length === 0 ? (y(), re(h(Ht), {
+            a.value.length === 0 ? (y(), re(p(Ht), {
               key: 0,
               icon: "at",
-              description: h(r)("mention.noResult", "未找到联系人"),
+              description: p(r)("mention.noResult", "未找到联系人"),
               size: "small"
             }, null, 8, ["description"])) : U("", !0)
           ], 512)
@@ -8653,7 +8653,7 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
           return "circle/quote";
       }
     }), d = k(() => l.value && !c.value ? s("quote.thumbUnavailable", "[缩略图未获取]") : Oc(t.message));
-    function p() {
+    function h() {
       o("close");
     }
     return (f, m) => (y(), C("div", hC, [
@@ -8666,16 +8666,16 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
         class: "quote-bar__thumb",
         src: c.value,
         alt: "quote-thumb"
-      }, null, 8, mC)) : u.value ? (y(), re(h(De), {
+      }, null, 8, mC)) : u.value ? (y(), re(p(De), {
         key: 1,
         class: "quote-bar__icon",
         name: u.value,
         size: 14
       }, null, 8, ["name"])) : U("", !0),
-      n.showAvatar ? (y(), re(h(Dt), {
+      n.showAvatar ? (y(), re(p(Dt), {
         key: 2,
         class: "quote-bar__avatar",
-        src: h(i),
+        src: p(i),
         name: a.value,
         size: 20
       }, null, 8, ["src", "name"])) : U("", !0),
@@ -8686,10 +8686,10 @@ const Uw = { class: "invite-member-modal__header" }, Fw = { class: "invite-membe
       _("button", {
         type: "button",
         class: "quote-bar__close",
-        title: h(s)("quote.cancel", "取消引用"),
-        onClick: Ct(p, ["stop"])
+        title: p(s)("quote.cancel", "取消引用"),
+        onClick: Ct(h, ["stop"])
       }, [
-        j(h(De), {
+        j(p(De), {
           name: "circle/xmark",
           size: 18
         })
@@ -8724,7 +8724,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
   setup(n, { expose: e, emit: t }) {
     ka((ee) => ({
       v08d85eaa: d.value,
-      v21137633: p.value
+      v21137633: h.value
     }));
     const o = n, s = t, { t: r } = et(), i = x(""), a = k(() => {
       var ee;
@@ -8748,7 +8748,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
     }), d = k(() => {
       var ee;
       return ((ee = o.config) == null ? void 0 : ee.caretColor) || "auto";
-    }), p = k(() => {
+    }), h = k(() => {
       var ee;
       return ((ee = o.config) == null ? void 0 : ee.selectionColor) || "var(--uikit-selection-bg)";
     }), f = x("none");
@@ -8979,7 +8979,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: $e(["h5-input__icon-btn", { "h5-input__icon-btn--active": N.value }]),
           onClick: ie
         }, [
-          j(h(De), {
+          j(p(De), {
             name: (N.value, "mic"),
             size: 24
           }, null, 8, ["name"])
@@ -8995,13 +8995,13 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           onPointercancel: se[2] || (se[2] = (ue) => Me(!0)),
           onContextmenu: se[3] || (se[3] = Ct(() => {
           }, ["prevent"]))
-        }, D(L.value ? h(r)("chat.voice.releaseEnd") : h(r)("chat.voice.holdTalk")), 35)) : Rn((y(), C("textarea", {
+        }, D(L.value ? p(r)("chat.voice.releaseEnd") : p(r)("chat.voice.holdTalk")), 35)) : Rn((y(), C("textarea", {
           key: 1,
           ref_key: "textareaRef",
           ref: S,
           "onUpdate:modelValue": se[0] || (se[0] = (ue) => i.value = ue),
           class: "h5-input__textarea",
-          placeholder: h(r)("chat.placeholder"),
+          placeholder: p(r)("chat.placeholder"),
           maxlength: u.value,
           rows: "1",
           onKeydown: $,
@@ -9016,12 +9016,12 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: $e(["h5-input__icon-btn", { "h5-input__icon-btn--active": f.value === "emoji" }]),
           onClick: se[4] || (se[4] = (ue) => w("emoji"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "circle/face",
             size: 24
           })
         ], 2)) : U("", !0),
-        i.value.trim() ? (y(), re(h(pn), {
+        i.value.trim() ? (y(), re(p(pn), {
           key: 4,
           type: "primary",
           size: "small",
@@ -9029,7 +9029,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           onClick: R
         }, {
           default: J(() => [
-            ht(D(h(r)("chat.send")), 1)
+            ht(D(p(r)("chat.send")), 1)
           ]),
           _: 1
         })) : (y(), C("button", {
@@ -9038,7 +9038,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: $e(["h5-input__icon-btn", { "h5-input__icon-btn--active": f.value === "more" }]),
           onClick: se[5] || (se[5] = (ue) => w("more"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "circle/plus",
             size: 24
           })
@@ -9049,7 +9049,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
         class: "h5-input__panel",
         style: Pt({ height: b.value })
       }, [
-        j(h(vc), {
+        j(p(vc), {
           class: "h5-input__emoji-picker",
           show: !0,
           "sticker-packs": a.value,
@@ -9074,7 +9074,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
             onClick: ue.action
           }, [
             _("div", IC, [
-              j(h(De), {
+              j(p(De), {
                 name: ue.icon,
                 size: 26
               }, null, 8, ["name"])
@@ -9101,12 +9101,12 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
         key: 3,
         class: $e(["h5-input__record-overlay", { "h5-input__record-overlay--cancel": K.value }])
       }, [
-        j(h(De), {
+        j(p(De), {
           name: "mic",
           size: 32
         }),
         _("span", TC, D(X.value) + "s", 1),
-        _("span", EC, D(K.value ? h(r)("chat.voice.releaseToCancel") : h(r)("chat.voice.slideUpCancel")), 1)
+        _("span", EC, D(K.value ? p(r)("chat.voice.releaseToCancel") : p(r)("chat.voice.slideUpCancel")), 1)
       ], 2)) : U("", !0),
       _("input", {
         ref_key: "albumInputRef",
@@ -9170,7 +9170,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
         i.value++;
       }, 1e3), o("start"));
     }
-    function p() {
+    function h() {
       if (!r.value)
         return;
       r.value = !1;
@@ -9194,13 +9194,13 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
       R.key === " " && !l.value && !R.repeat && (R.preventDefault(), l.value = !0, d()), R.key === "Escape" && (R.preventDefault(), r.value ? (l.value = !1, f()) : g());
     }
     function b(R) {
-      R.key === " " && l.value && (R.preventDefault(), l.value = !1, p());
+      R.key === " " && l.value && (R.preventDefault(), l.value = !1, h());
     }
     function M() {
       r.value || (c.value = !0, d());
     }
     function S() {
-      c.value && (c.value = !1, p());
+      c.value && (c.value = !1, h());
     }
     function w() {
       c.value && (c.value = !1, f());
@@ -9226,20 +9226,20 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           $[3] || ($[3] = _("span", { class: "voice-panel__wave" }, null, -1)),
           $[4] || ($[4] = _("span", { class: "voice-panel__wave" }, null, -1)),
           $[5] || ($[5] = _("span", { class: "voice-panel__wave" }, null, -1)),
-          j(h(De), {
+          j(p(De), {
             name: "mic/fill",
             size: 32,
             color: "white"
           })
         ]),
         _("div", zC, [
-          ht(D(h(s)("chat.voice.releaseSend")), 1),
+          ht(D(p(s)("chat.voice.releaseSend")), 1),
           _("span", {
             class: "voice-panel__link",
             onMousedown: $[1] || ($[1] = Ct(() => {
             }, ["stop"])),
             onClick: f
-          }, D(h(s)("chat.voice.cancelSend")), 33)
+          }, D(p(s)("chat.voice.cancelSend")), 33)
         ])
       ])) : (y(), C("div", NC, [
         $[2] || ($[2] = _("div", {
@@ -9247,20 +9247,20 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           "aria-hidden": "true"
         }, " 0″ ", -1)),
         _("div", LC, [
-          j(h(De), {
+          j(p(De), {
             name: "mic/fill",
             size: 32,
             color: "white"
           })
         ]),
         _("div", OC, [
-          ht(D(h(s)("chat.voice.holdSpace")), 1),
+          ht(D(p(s)("chat.voice.holdSpace")), 1),
           _("span", {
             class: "voice-panel__link",
             onMousedown: $[0] || ($[0] = Ct(() => {
             }, ["stop"])),
             onClick: g
-          }, D(h(s)("chat.voice.exit")), 33)
+          }, D(p(s)("chat.voice.exit")), 33)
         ])
       ]))
     ], 32));
@@ -9284,8 +9284,8 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
   emits: ["send", "send-file", "emoji-click", "voice-start", "voice-end", "voice-cancel", "mention-trigger", "mention-close", "typing", "focus", "expand-change", "height-change", "voice-mode-change"],
   setup(n, { expose: e, emit: t }) {
     ka((ee) => ({
-      v5658c354: $.value,
-      v391d75dd: E.value
+      v65ab28f8: $.value,
+      v30872cfe: E.value
     }));
     const o = n, s = t, { t: r } = et(), { isMobile: i } = En(), a = x(""), l = k(() => {
       var ee;
@@ -9301,8 +9301,8 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
       };
     }), u = k(() => {
       var ee;
-      return ((ee = o.config) == null ? void 0 : ee.showSendButton) !== !1;
-    }), d = x(), p = k(() => {
+      return ((ee = o.config) == null ? void 0 : ee.showSendButton) ?? !i.value;
+    }), d = x(), h = k(() => {
       var ee;
       return !i.value && ((ee = o.config) == null ? void 0 : ee.resizable) !== !1;
     }), f = x(null), m = x(106), g = k(() => f.value ?? m.value), v = k(() => g.value + bd >= kd), b = x(), { size: M, isResizing: S } = ap(b, {
@@ -9311,7 +9311,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
       max: 480,
       // 手柄在输入卡片上缘：向上拖动增高（反向增量）
       invert: !0,
-      disabled: () => !p.value,
+      disabled: () => !h.value,
       onChange: (ee) => {
         f.value = ee, s("height-change", ee), s("expand-change", v.value);
       }
@@ -9500,7 +9500,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
       class: $e(["simple-input", {
         "simple-input--toolbar-bottom": l.value === "toolbar-bottom",
         "simple-input--toolbar-top": l.value === "toolbar-top",
-        "simple-input--resizing": h(S)
+        "simple-input--resizing": p(S)
       }]),
       style: Pt(w.value)
     }, [
@@ -9512,7 +9512,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: "simple-input__tool-btn",
           onClick: Mt
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "circle/face",
             size: 22
           })
@@ -9522,7 +9522,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: "simple-input__tool-btn",
           onClick: Y
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "mic/dot",
             size: 22
           })
@@ -9532,7 +9532,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: "simple-input__tool-btn",
           onClick: se[0] || (se[0] = (ue) => ie("file"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "folder",
             size: 22
           })
@@ -9542,7 +9542,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: "simple-input__tool-btn",
           onClick: se[1] || (se[1] = (ue) => ie("image"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "rect/img",
             size: 22
           })
@@ -9552,7 +9552,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           class: "simple-input__tool-btn",
           onClick: se[2] || (se[2] = (ue) => ie("video"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "rect/triangle",
             size: 22
           })
@@ -9564,27 +9564,27 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
         }, void 0, !0)
       ]),
       _("div", GC, [
-        P.value ? (y(), C("div", jC, D(h(r)("chat.voice.releaseEnd")), 1)) : (y(), C(Ae, { key: 0 }, [
+        P.value ? (y(), C("div", jC, D(p(r)("chat.voice.releaseEnd")), 1)) : (y(), C(Ae, { key: 0 }, [
           R.value ? Rn((y(), C("textarea", {
             key: 1,
             ref_key: "textareaRef",
             ref: ke,
             "onUpdate:modelValue": se[5] || (se[5] = (ue) => a.value = ue),
             class: "simple-input__textarea",
-            placeholder: h(r)("chat.placeholder"),
+            placeholder: p(r)("chat.placeholder"),
             maxlength: z.value,
             onKeydown: fe,
             onInput: X,
             onFocus: se[6] || (se[6] = (ue) => s("focus"))
           }, null, 40, VC)), [
             [mo, a.value]
-          ]) : (y(), re(h(dn), {
+          ]) : (y(), re(p(dn), {
             key: 0,
             ref_key: "inputComponentRef",
             ref: tt,
             modelValue: a.value,
             "onUpdate:modelValue": se[3] || (se[3] = (ue) => a.value = ue),
-            placeholder: h(r)("chat.placeholder"),
+            placeholder: p(r)("chat.placeholder"),
             maxlength: z.value,
             class: "simple-input__field",
             onSubmit: N,
@@ -9593,7 +9593,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
           }, null, 8, ["modelValue", "placeholder", "maxlength"]))
         ], 64))
       ]),
-      F.value && !h(i) ? (y(), re(FC, {
+      F.value && !p(i) ? (y(), re(FC, {
         key: 0,
         class: "simple-input__voice-overlay",
         active: F.value,
@@ -9609,19 +9609,19 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
         }, void 0, !0)
       ])) : U("", !0),
       u.value ? (y(), C("div", KC, [
-        j(h(pn), {
+        j(p(pn), {
           type: "primary",
           size: "small",
           disabled: !a.value.trim(),
           onClick: N
         }, {
           default: J(() => [
-            ht(D(h(r)("chat.send")), 1)
+            ht(D(p(r)("chat.send")), 1)
           ]),
           _: 1
         }, 8, ["disabled"])
       ])) : U("", !0),
-      p.value ? (y(), C("div", {
+      h.value ? (y(), C("div", {
         key: 3,
         ref_key: "resizeHandleRef",
         ref: b,
@@ -9652,7 +9652,7 @@ const _C = { class: "h5-input__toolbar" }, CC = ["placeholder", "maxlength"], MC
       }, null, 544)
     ], 6));
   }
-}), Yp = /* @__PURE__ */ Pe(qC, [["__scopeId", "data-v-672e4849"]]);
+}), Yp = /* @__PURE__ */ Pe(qC, [["__scopeId", "data-v-360cb66e"]]);
 function gn(n) {
   this.content = n;
 }
@@ -9790,10 +9790,10 @@ function Zp(n, e, t, o) {
     if (!i.sameMarkup(a))
       return { a: t, b: o };
     if (i.isText && i.text != a.text) {
-      let c = i.text, u = a.text, d = c.length, p = u.length;
-      for (; d > 0 && p > 0 && c[d - 1] == u[p - 1]; )
-        d--, p--, t--, o--;
-      return d && p && d < c.length && th(c.charCodeAt(d - 1)) && eh(c.charCodeAt(d)) && (t++, o++), { a: t, b: o };
+      let c = i.text, u = a.text, d = c.length, h = u.length;
+      for (; d > 0 && h > 0 && c[d - 1] == u[h - 1]; )
+        d--, h--, t--, o--;
+      return d && h && d < c.length && th(c.charCodeAt(d - 1)) && eh(c.charCodeAt(d)) && (t++, o++), { a: t, b: o };
     }
     if (i.content.size || a.content.size) {
       let c = Zp(i.content, a.content, t - 1, o - 1);
@@ -11157,9 +11157,9 @@ class hs {
         let { type: u, next: d } = i.next[c];
         if (!(u.isText || u.hasRequiredAttrs()) && s.indexOf(d) == -1) {
           s.push(d);
-          let p = r(d, a.concat(u));
-          if (p)
-            return p;
+          let h = r(d, a.concat(u));
+          if (h)
+            return h;
         }
       }
       return null;
@@ -12458,20 +12458,20 @@ function gi(n, e, t, o) {
     u = 2;
     for (let d in c)
       if (c[d] != null) {
-        let p = d.indexOf(" ");
-        p > 0 ? l.setAttributeNS(d.slice(0, p), d.slice(p + 1), c[d]) : d == "style" && l.style ? l.style.cssText = c[d] : l.setAttribute(d, c[d]);
+        let h = d.indexOf(" ");
+        h > 0 ? l.setAttributeNS(d.slice(0, h), d.slice(h + 1), c[d]) : d == "style" && l.style ? l.style.cssText = c[d] : l.setAttribute(d, c[d]);
       }
   }
   for (let d = u; d < e.length; d++) {
-    let p = e[d];
-    if (p === 0) {
+    let h = e[d];
+    if (h === 0) {
       if (d < e.length - 1 || d > u)
         throw new RangeError("Content hole must be the only child of its parent node");
       return { dom: l, contentDOM: l };
-    } else if (typeof p == "string")
-      l.appendChild(n.createTextNode(p));
+    } else if (typeof h == "string")
+      l.appendChild(n.createTextNode(h));
     else {
-      let { dom: f, contentDOM: m } = gi(n, p, t, o);
+      let { dom: f, contentDOM: m } = gi(n, h, t, o);
       if (l.appendChild(f), m) {
         if (a)
           throw new RangeError("Multiple content holes");
@@ -12565,7 +12565,7 @@ class Pn {
         break;
       let c = this.ranges[a + r], u = this.ranges[a + i], d = l + c;
       if (e <= d) {
-        let p = c ? e == l ? -1 : e == d ? 1 : t : t, f = l + s + (p < 0 ? 0 : u);
+        let h = c ? e == l ? -1 : e == d ? 1 : t : t, f = l + s + (h < 0 ? 0 : u);
         if (o)
           return f;
         let m = e == (t < 0 ? l : d) ? null : y1(a / 3, e - l), g = e == l ? wh : e == d ? kh : vi;
@@ -13105,10 +13105,10 @@ function k1(n, e, t, o) {
       return;
     let d = l.marks;
     if (!o.isInSet(d) && u.type.allowsMarkType(o.type)) {
-      let p = Math.max(c, e), f = Math.min(c + l.nodeSize, t), m = o.addToSet(d);
+      let h = Math.max(c, e), f = Math.min(c + l.nodeSize, t), m = o.addToSet(d);
       for (let g = 0; g < d.length; g++)
-        d[g].isInSet(m) || (i && i.to == p && i.mark.eq(d[g]) ? i.to = f : s.push(i = new oo(p, f, d[g])));
-      a && a.to == p ? a.to = f : r.push(a = new Fo(p, f, o));
+        d[g].isInSet(m) || (i && i.to == h && i.mark.eq(d[g]) ? i.to = f : s.push(i = new oo(h, f, d[g])));
+      a && a.to == h ? a.to = f : r.push(a = new Fo(h, f, o));
     }
   }), s.forEach((l) => n.step(l)), r.forEach((l) => n.step(l));
 }
@@ -13127,12 +13127,12 @@ function w1(n, e, t, o) {
     if (l && l.length) {
       let c = Math.min(a + i.nodeSize, t);
       for (let u = 0; u < l.length; u++) {
-        let d = l[u], p;
+        let d = l[u], h;
         for (let f = 0; f < s.length; f++) {
           let m = s[f];
-          m.step == r - 1 && d.eq(s[f].style) && (p = m);
+          m.step == r - 1 && d.eq(s[f].style) && (h = m);
         }
-        p ? (p.to = c, p.step = r) : s.push({ style: d, from: Math.max(a, e), to: c, step: r });
+        h ? (h.to = c, h.step = r) : s.push({ style: d, from: Math.max(a, e), to: c, step: r });
       }
     }
   }), s.forEach((i) => n.step(new oo(i.from, i.to, i.style)));
@@ -13145,12 +13145,12 @@ function Pc(n, e, t, o = t.contentMatch, s = !0) {
       i.push(new Zt(a, u, Qe.empty));
     else {
       o = d;
-      for (let p = 0; p < c.marks.length; p++)
-        t.allowsMarkType(c.marks[p].type) || n.step(new oo(a, u, c.marks[p]));
+      for (let h = 0; h < c.marks.length; h++)
+        t.allowsMarkType(c.marks[h].type) || n.step(new oo(a, u, c.marks[h]));
       if (s && c.isText && t.whitespace != "pre") {
-        let p, f = /\r?\n|\r/g, m;
-        for (; p = f.exec(c.text); )
-          m || (m = new Qe(Ee.from(t.schema.text(" ", t.allowedMarks(c.marks))), 0, 0)), i.push(new Zt(a + p.index, a + p.index + p[0].length, m));
+        let h, f = /\r?\n|\r/g, m;
+        for (; h = f.exec(c.text); )
+          m || (m = new Qe(Ee.from(t.schema.text(" ", t.allowedMarks(c.marks))), 0, 0)), i.push(new Zt(a + h.index, a + h.index + h[0].length, m));
       }
     }
     a = u;
@@ -13181,10 +13181,10 @@ function C1(n, e, t) {
   let { $from: o, $to: s, depth: r } = e, i = o.before(r + 1), a = s.after(r + 1), l = i, c = a, u = Ee.empty, d = 0;
   for (let m = r, g = !1; m > t; m--)
     g || o.index(m) > 0 ? (g = !0, u = Ee.from(o.node(m).copy(u)), d++) : l--;
-  let p = Ee.empty, f = 0;
+  let h = Ee.empty, f = 0;
   for (let m = r, g = !1; m > t; m--)
-    g || s.after(m + 1) < s.end(m) ? (g = !0, p = Ee.from(s.node(m).copy(p)), f++) : c++;
-  n.step(new hn(l, c, i, a, new Qe(u.append(p), d, f), u.size - d, !0));
+    g || s.after(m + 1) < s.end(m) ? (g = !0, h = Ee.from(s.node(m).copy(h)), f++) : c++;
+  n.step(new hn(l, c, i, a, new Qe(u.append(h), d, f), u.size - d, !0));
 }
 function zc(n, e, t = null, o = n) {
   let s = M1(n, e), r = s && S1(o, e);
@@ -13235,8 +13235,8 @@ function x1(n, e, t, o, s) {
         f && !m ? c = !1 : !f && m && (c = !0);
       }
       c === !1 && Mh(n, i, a, r), Pc(n, n.mapping.slice(r).map(a, 1), o, void 0, c === null);
-      let u = n.mapping.slice(r), d = u.map(a, 1), p = u.map(a + i.nodeSize, 1);
-      return n.step(new hn(d, p, d + 1, p - 1, new Qe(Ee.from(o.create(l, null, i.marks)), 0, 0), 1, !0)), c === !0 && Ch(n, i, a, r), !1;
+      let u = n.mapping.slice(r), d = u.map(a, 1), h = u.map(a + i.nodeSize, 1);
+      return n.step(new hn(d, h, d + 1, h - 1, new Qe(Ee.from(o.create(l, null, i.marks)), 0, 0), 1, !0)), c === !0 && Ch(n, i, a, r), !1;
     }
   });
 }
@@ -13281,13 +13281,13 @@ function Eo(n, e, t = 1, o) {
   if (r < 0 || s.parent.type.spec.isolating || !s.parent.canReplace(s.index(), s.parent.childCount) || !i.type.validContent(s.parent.content.cutByIndex(s.index(), s.parent.childCount)))
     return !1;
   for (let c = s.depth - 1, u = t - 2; c > r; c--, u--) {
-    let d = s.node(c), p = s.index(c);
+    let d = s.node(c), h = s.index(c);
     if (d.type.spec.isolating)
       return !1;
-    let f = d.content.cutByIndex(p, d.childCount), m = o && o[u + 1];
+    let f = d.content.cutByIndex(h, d.childCount), m = o && o[u + 1];
     m && (f = f.replaceChild(0, m.type.create(m.attrs)));
     let g = o && o[u] || d;
-    if (!d.canReplace(p + 1, d.childCount) || !g.type.validContent(f))
+    if (!d.canReplace(h + 1, d.childCount) || !g.type.validContent(f))
       return !1;
   }
   let a = s.indexAfter(r), l = o && o[0];
@@ -13481,7 +13481,7 @@ class L1 {
     if (r)
       for (let g = 0; g < r.length; g++)
         this.openFrontierNode(r[g]);
-    let i = this.unplaced, a = o ? o.content : i.content, l = i.openStart - e, c = 0, u = [], { match: d, type: p } = this.frontier[t];
+    let i = this.unplaced, a = o ? o.content : i.content, l = i.openStart - e, c = 0, u = [], { match: d, type: h } = this.frontier[t];
     if (s) {
       for (let g = 0; g < s.childCount; g++)
         u.push(s.child(g));
@@ -13492,7 +13492,7 @@ class L1 {
       let g = a.child(c), v = d.matchType(g.type);
       if (!v)
         break;
-      c++, (c > 1 || l == 0 || g.content.size) && (d = v, u.push(Th(g.mark(p.allowedMarks(g.marks)), c == 1 ? l : 0, c == a.childCount ? f : -1)));
+      c++, (c > 1 || l == 0 || g.content.size) && (d = v, u.push(Th(g.mark(h.allowedMarks(g.marks)), c == 1 ? l : 0, c == a.childCount ? f : -1)));
     }
     let m = c == a.childCount;
     m || (f = -1), this.placed = rr(this.placed, t, Ee.from(u)), this.frontier[t].match = d, m && f < 0 && o && o.type == this.frontier[this.depth].type && this.frontier.length > 1 && this.closeFrontierNode();
@@ -13591,28 +13591,28 @@ function B1(n, e, t, o) {
   i[i.length - 1] == 0 && i.pop();
   let a = -(s.depth + 1);
   i.unshift(a);
-  for (let p = s.depth, f = s.pos - 1; p > 0; p--, f--) {
-    let m = s.node(p).type.spec;
+  for (let h = s.depth, f = s.pos - 1; h > 0; h--, f--) {
+    let m = s.node(h).type.spec;
     if (m.defining || m.definingAsContext || m.isolating)
       break;
-    i.indexOf(p) > -1 ? a = p : s.before(p) == f && i.splice(1, 0, -p);
+    i.indexOf(h) > -1 ? a = h : s.before(h) == f && i.splice(1, 0, -h);
   }
   let l = i.indexOf(a), c = [], u = o.openStart;
-  for (let p = o.content, f = 0; ; f++) {
-    let m = p.firstChild;
+  for (let h = o.content, f = 0; ; f++) {
+    let m = h.firstChild;
     if (c.push(m), f == o.openStart)
       break;
-    p = m.content;
+    h = m.content;
   }
-  for (let p = u - 1; p >= 0; p--) {
-    let f = c[p], m = D1(f.type);
+  for (let h = u - 1; h >= 0; h--) {
+    let f = c[h], m = D1(f.type);
     if (m && !f.sameMarkup(s.node(Math.abs(a) - 1)))
-      u = p;
+      u = h;
     else if (m || !f.type.isTextblock)
       break;
   }
-  for (let p = o.openStart; p >= 0; p--) {
-    let f = (p + u + 1) % (o.openStart + 1), m = c[f];
+  for (let h = o.openStart; h >= 0; h--) {
+    let f = (h + u + 1) % (o.openStart + 1), m = c[f];
     if (m)
       for (let g = 0; g < i.length; g++) {
         let v = i[(g + l) % i.length], b = !0;
@@ -13623,8 +13623,8 @@ function B1(n, e, t, o) {
       }
   }
   let d = n.steps.length;
-  for (let p = i.length - 1; p >= 0 && (n.replace(e, t, o), !(n.steps.length > d)); p--) {
-    let f = i[p];
+  for (let h = i.length - 1; h >= 0 && (n.replace(e, t, o), !(n.steps.length > d)); h--) {
+    let f = i[h];
     f < 0 || (e = s.before(f), t = r.after(f));
   }
 }
@@ -15061,8 +15061,8 @@ function X1(n) {
           return !1;
         i.unshift(null);
       }
-    let d = s.pos, p = Eo(o.doc, d, i.length, i);
-    if (p || (i[0] = l ? { type: l } : null, p = Eo(o.doc, d, i.length, i)), !p)
+    let d = s.pos, h = Eo(o.doc, d, i.length, i);
+    if (h || (i[0] = l ? { type: l } : null, h = Eo(o.doc, d, i.length, i)), !h)
       return !1;
     if (o.split(d, i.length, i), !c && u && s.node(a).type != l) {
       let f = o.mapping.slice(r), m = f.map(s.before(a)), g = o.doc.resolve(m);
@@ -15095,9 +15095,9 @@ function jh(n, e, t, o) {
     }
     return !0;
   }
-  let u = r.type.spec.isolating || o > 0 && l ? null : xt.findFrom(e, 1), d = u && u.$from.blockRange(u.$to), p = d && Ys(d);
-  if (p != null && p >= e.depth)
-    return t && t(n.tr.lift(d, p).scrollIntoView()), !0;
+  let u = r.type.spec.isolating || o > 0 && l ? null : xt.findFrom(e, 1), d = u && u.$from.blockRange(u.$to), h = d && Ys(d);
+  if (h != null && h >= e.depth)
+    return t && t(n.tr.lift(d, h).scrollIntoView()), !0;
   if (c && Hs(r, "start", !0) && Hs(s, "end")) {
     let f = s, m = [];
     for (; m.push(f), !f.isTextblock; )
@@ -15207,8 +15207,8 @@ function rM(n, e, t, o, s) {
   for (let u = 0; u < t.length; u++)
     t[u].type == s && (i = u + 1);
   let a = t.length - i, l = e.start + t.length - (o ? 2 : 0), c = e.parent;
-  for (let u = e.startIndex, d = e.endIndex, p = !0; u < d; u++, p = !1)
-    !p && Eo(n.doc, l, a) && (n.split(l, a), l += 2 * a), l += c.child(u).nodeSize;
+  for (let u = e.startIndex, d = e.endIndex, h = !0; u < d; u++, h = !1)
+    !h && Eo(n.doc, l, a) && (n.split(l, a), l += 2 * a), l += c.child(u).nodeSize;
   return n;
 }
 function iM(n) {
@@ -15237,8 +15237,8 @@ function lM(n, e, t) {
   let a = t.startIndex == 0, l = t.endIndex == s.childCount, c = r.node(-1), u = r.index(-1);
   if (!c.canReplace(u + (a ? 0 : 1), u + 1, i.content.append(l ? Ee.empty : Ee.from(s))))
     return !1;
-  let d = r.pos, p = d + i.nodeSize;
-  return o.step(new hn(d - (a ? 1 : 0), p + (l ? 1 : 0), d + 1, p - 1, new Qe((a ? Ee.empty : Ee.from(s.copy(Ee.empty))).append(l ? Ee.empty : Ee.from(s.copy(Ee.empty))), a ? 0 : 1, l ? 0 : 1), a ? 0 : 1)), e(o.scrollIntoView()), !0;
+  let d = r.pos, h = d + i.nodeSize;
+  return o.step(new hn(d - (a ? 1 : 0), h + (l ? 1 : 0), d + 1, h - 1, new Qe((a ? Ee.empty : Ee.from(s.copy(Ee.empty))).append(l ? Ee.empty : Ee.from(s.copy(Ee.empty))), a ? 0 : 1, l ? 0 : 1), a ? 0 : 1)), e(o.scrollIntoView()), !0;
 }
 function cM(n) {
   return function(e, t) {
@@ -15252,8 +15252,8 @@ function cM(n) {
     if (l.type != n)
       return !1;
     if (t) {
-      let c = l.lastChild && l.lastChild.type == a.type, u = Ee.from(c ? n.create() : null), d = new Qe(Ee.from(n.create(null, Ee.from(a.type.create(null, u)))), c ? 3 : 1, 0), p = r.start, f = r.end;
-      t(e.tr.step(new hn(p - (c ? 3 : 1), f, p, f, d, 1, !0)).scrollIntoView());
+      let c = l.lastChild && l.lastChild.type == a.type, u = Ee.from(c ? n.create() : null), d = new Qe(Ee.from(n.create(null, Ee.from(a.type.create(null, u)))), c ? 3 : 1, 0), h = r.start, f = r.end;
+      t(e.tr.step(new hn(h - (c ? 3 : 1), f, h, f, d, 1, !0)).scrollIntoView());
     }
     return !0;
   };
@@ -15419,10 +15419,10 @@ function Gd(n, e, t) {
         let g = a.scrollLeft - f, v = a.scrollTop - m;
         e = { left: e.left - g, top: e.top - v, right: e.right - g, bottom: e.bottom - v };
       }
-    let p = l ? "fixed" : getComputedStyle(i).position;
-    if (/^(fixed|sticky)$/.test(p))
+    let h = l ? "fixed" : getComputedStyle(i).position;
+    if (/^(fixed|sticky)$/.test(h))
       break;
-    i = p == "absolute" ? i.offsetParent : Gs(i);
+    i = h == "absolute" ? i.offsetParent : Gs(i);
   }
 }
 function kM(n) {
@@ -15471,15 +15471,15 @@ function _M(n) {
 function Qh(n, e) {
   let t, o = 2e8, s, r = 0, i = e.top, a = e.top, l, c;
   for (let u = n.firstChild, d = 0; u; u = u.nextSibling, d++) {
-    let p;
+    let h;
     if (u.nodeType == 1)
-      p = u.getClientRects();
+      h = u.getClientRects();
     else if (u.nodeType == 3)
-      p = So(u).getClientRects();
+      h = So(u).getClientRects();
     else
       continue;
-    for (let f = 0; f < p.length; f++) {
-      let m = p[f];
+    for (let f = 0; f < h.length; f++) {
+      let m = h[f];
       if (m.top <= i && m.bottom >= a) {
         i = Math.max(m.bottom, i), a = Math.min(m.top, a);
         let g = m.left > e.left ? m.left - e.left : m.right < e.left ? e.left - m.right : 0;
@@ -15697,14 +15697,14 @@ function $M(n, e, t) {
     return !1;
   let s = o.parentOffset, r = !s, i = s == o.parent.content.size, a = n.domSelection();
   return a ? !AM.test(o.parent.textContent) || !a.modify ? t == "left" || t == "backward" ? r : i : tm(n, e, () => {
-    let { focusNode: l, focusOffset: c, anchorNode: u, anchorOffset: d } = n.domSelectionRange(), p = a.caretBidiLevel;
+    let { focusNode: l, focusOffset: c, anchorNode: u, anchorOffset: d } = n.domSelectionRange(), h = a.caretBidiLevel;
     a.modify("move", t, "character");
     let f = o.depth ? n.docView.domAfterPos(o.before()) : n.dom, { focusNode: m, focusOffset: g } = n.domSelectionRange(), v = m && !f.contains(m.nodeType == 1 ? m : m.parentNode) || l == m && c == g;
     try {
       a.collapse(u, d), l && (l != u || c != d) && a.extend && a.extend(l, c);
     } catch {
     }
-    return p != null && (a.caretBidiLevel = p), v;
+    return h != null && (a.caretBidiLevel = h), v;
   }) : o.pos == o.start() || o.pos == o.end();
 }
 let Vd = null, jd = null, Wd = !1;
@@ -15919,12 +15919,12 @@ class Ur {
           return l.parseRange(e, t, u);
         e = i;
         for (let d = a; d > 0; d--) {
-          let p = this.children[d - 1];
-          if (p.size && p.dom.parentNode == this.contentDOM && !p.emptyChildAt(1)) {
-            s = vn(p.dom) + 1;
+          let h = this.children[d - 1];
+          if (h.size && h.dom.parentNode == this.contentDOM && !h.emptyChildAt(1)) {
+            s = vn(h.dom) + 1;
             break;
           }
-          e -= p.size;
+          e -= h.size;
         }
         s == -1 && (s = 0);
       }
@@ -15996,15 +15996,15 @@ class Ur {
     }
     if (!(s || d && _n) && gs(a.node, a.offset, u.anchorNode, u.anchorOffset) && gs(l.node, l.offset, u.focusNode, u.focusOffset))
       return;
-    let p = !1;
+    let h = !1;
     if ((c.extend || e == t) && !(d && Yn)) {
       c.collapse(a.node, a.offset);
       try {
-        e != t && c.extend(l.node, l.offset), p = !0;
+        e != t && c.extend(l.node, l.offset), h = !0;
       } catch {
       }
     }
-    if (!p) {
+    if (!h) {
       if (e > t) {
         let m = a;
         a = l, l = m;
@@ -16179,8 +16179,8 @@ class Wo extends Ur {
         throw new RangeError("Text must be rendered as a DOM text node");
     } else u || ({ dom: u, contentDOM: d } = bs.renderSpec(document, t.type.spec.toDOM(t), null, t.attrs));
     !d && !t.isText && u.nodeName != "BR" && (u.hasAttribute("contenteditable") || (u.contentEditable = "false"), t.type.spec.draggable && (u.draggable = !0));
-    let p = u;
-    return u = im(u, o, t), c ? l = new LM(e, t, o, s, u, d || null, p, c) : t.isText ? new La(e, t, o, s, u, p) : new Wo(e, t, o, s, u, d || null, p);
+    let h = u;
+    return u = im(u, o, t), c ? l = new LM(e, t, o, s, u, d || null, h, c) : t.isText ? new La(e, t, o, s, u, h) : new Wo(e, t, o, s, u, d || null, h);
   }
   parseRule(e) {
     if (this.node.type.spec.reparseInView)
@@ -16222,10 +16222,10 @@ class Wo extends Ur {
     let o = this.node.inlineContent, s = t, r = e.composing ? this.localCompositionInfo(e, t) : null, i = r && r.pos > -1 ? r : null, a = r && r.pos < 0, l = new DM(this, i && i.node, e);
     zM(this.node, this.innerDeco, (c, u, d) => {
       c.spec.marks ? l.syncToMarks(c.spec.marks, o, e, u) : c.type.side >= 0 && !d && l.syncToMarks(u == this.node.childCount ? Ut.none : this.node.child(u).marks, o, e, u), l.placeWidget(c, e, s);
-    }, (c, u, d, p) => {
-      l.syncToMarks(c.marks, o, e, p);
+    }, (c, u, d, h) => {
+      l.syncToMarks(c.marks, o, e, h);
       let f;
-      l.findNodeMatch(c, u, d, p) || a && e.state.selection.from > s && e.state.selection.to < s + c.nodeSize && (f = l.findIndexWithChild(r.node)) > -1 && l.updateNodeAt(c, u, d, f, e) || l.updateNextNode(c, u, d, e, p, s) || l.addNode(c, u, d, e, s), s += c.nodeSize;
+      l.findNodeMatch(c, u, d, h) || a && e.state.selection.from > s && e.state.selection.to < s + c.nodeSize && (f = l.findIndexWithChild(r.node)) > -1 && l.updateNodeAt(c, u, d, f, e) || l.updateNextNode(c, u, d, e, h, s) || l.addNode(c, u, d, e, s), s += c.nodeSize;
     }), l.syncToMarks([], o, e, 0), this.node.isTextblock && l.addTextblockHacks(), l.destroyRest(), (l.changed || this.dirty == ns) && (i && this.protectLocalComposition(e, i), sm(this.contentDOM, this.children, e), Vs && UM(this.dom));
   }
   localCompositionInfo(e, t) {
@@ -16563,10 +16563,10 @@ class DM {
         let c = this.preMatch.matched.get(l);
         if (c != null && c != r)
           return !1;
-        let u = l.dom, d, p = this.isLocked(u) && !(e.isText && l.node && l.node.isText && l.nodeDOM.nodeValue == e.text && l.dirty != so && Ai(t, l.outerDeco));
-        if (!p && l.update(e, t, o, s))
+        let u = l.dom, d, h = this.isLocked(u) && !(e.isText && l.node && l.node.isText && l.nodeDOM.nodeValue == e.text && l.dirty != so && Ai(t, l.outerDeco));
+        if (!h && l.update(e, t, o, s))
           return this.destroyBetween(this.index, a), l.dom != u && (this.changed = !0), this.index++, !0;
-        if (!p && (d = this.recreateWrapper(l, e, t, o, s, i)))
+        if (!h && (d = this.recreateWrapper(l, e, t, o, s, i)))
           return this.destroyBetween(this.index, a), this.top.children[this.index] = d, d.contentDOM && (d.dirty = ns, d.updateChildren(s, i + 1), d.dirty = Qn), this.changed = !0, this.index++, !0;
         break;
       }
@@ -16676,29 +16676,29 @@ function zM(n, e, t, o) {
           t(d[v], c, !!l);
       } else
         t(u, c, !!l);
-    let p, f;
+    let h, f;
     if (l)
-      f = -1, p = l, l = null;
+      f = -1, h = l, l = null;
     else if (c < n.childCount)
-      f = c, p = n.child(c++);
+      f = c, h = n.child(c++);
     else
       break;
     for (let v = 0; v < a.length; v++)
       a[v].to <= r && a.splice(v--, 1);
     for (; i < s.length && s[i].from <= r && s[i].to > r; )
       a.push(s[i++]);
-    let m = r + p.nodeSize;
-    if (p.isText) {
+    let m = r + h.nodeSize;
+    if (h.isText) {
       let v = m;
       i < s.length && s[i].from < v && (v = s[i].from);
       for (let b = 0; b < a.length; b++)
         a[b].to < v && (v = a[b].to);
-      v < m && (l = p.cut(v - r), p = p.cut(0, v - r), m = v, f = -1);
+      v < m && (l = h.cut(v - r), h = h.cut(0, v - r), m = v, f = -1);
     } else
       for (; i < s.length && s[i].to < m; )
         i++;
-    let g = p.isInline && !p.isLeaf ? a.filter((v) => !v.inline) : a.slice();
-    o(p, g, e.forChild(r, p), f), r = m;
+    let g = h.isInline && !h.isLeaf ? a.filter((v) => !v.inline) : a.slice();
+    o(h, g, e.forChild(r, h), f), r = m;
   }
 }
 function UM(n) {
@@ -16752,19 +16752,19 @@ function Wc(n, e = null) {
       s = s.parent;
     let d = s.node;
     if (s && d.isAtom && ft.isSelectable(d) && s.parent && !(d.isInline && hM(t.focusNode, t.focusOffset, s.dom))) {
-      let p = s.posBefore;
-      c = new ft(i == p ? a : o.resolve(p));
+      let h = s.posBefore;
+      c = new ft(i == h ? a : o.resolve(h));
     }
   } else {
     if (t instanceof n.dom.ownerDocument.defaultView.Selection && t.rangeCount > 1) {
-      let d = i, p = i;
+      let d = i, h = i;
       for (let f = 0; f < t.rangeCount; f++) {
         let m = t.getRangeAt(f);
-        d = Math.min(d, n.docView.posFromDOM(m.startContainer, m.startOffset, 1)), p = Math.max(p, n.docView.posFromDOM(m.endContainer, m.endOffset, -1));
+        d = Math.min(d, n.docView.posFromDOM(m.startContainer, m.startOffset, 1)), h = Math.max(h, n.docView.posFromDOM(m.endContainer, m.endOffset, -1));
       }
       if (d < 0)
         return null;
-      [l, i] = p == n.state.selection.anchor ? [p, d] : [d, p], a = o.resolve(i);
+      [l, i] = h == n.state.selection.anchor ? [h, d] : [d, h], a = o.resolve(i);
     } else
       l = n.docView.posFromDOM(t.anchorNode, t.anchorOffset, 1);
     if (l < 0)
@@ -17140,10 +17140,10 @@ function qc(n, e) {
     c = l.firstChild;
   }
   c && c.nodeType == 1 && c.setAttribute("data-pm-slice", `${s} ${r}${d ? ` -${d}` : ""} ${JSON.stringify(t)}`);
-  let p = n.someProp("clipboardTextSerializer", (f) => f(e, n)) || e.content.textBetween(0, e.content.size, `
+  let h = n.someProp("clipboardTextSerializer", (f) => f(e, n)) || e.content.textBetween(0, e.content.size, `
 
 `);
-  return { dom: l, text: p, slice: e };
+  return { dom: l, text: h, slice: e };
 }
 function dm(n, e, t, o, s) {
   let r = s.parent.type.spec.code, i, a;
@@ -17151,21 +17151,21 @@ function dm(n, e, t, o, s) {
     return null;
   let l = !!e && (o || r || !t);
   if (l) {
-    if (n.someProp("transformPastedText", (p) => {
-      e = p(e, r || o, n);
+    if (n.someProp("transformPastedText", (h) => {
+      e = h(e, r || o, n);
     }), r)
       return a = new Qe(Ee.from(n.state.schema.text(e.replace(/\r\n?/g, `
-`))), 0, 0), n.someProp("transformPasted", (p) => {
-        a = p(a, n, !0);
+`))), 0, 0), n.someProp("transformPasted", (h) => {
+        a = h(a, n, !0);
       }), a;
-    let d = n.someProp("clipboardTextParser", (p) => p(e, s, o, n));
+    let d = n.someProp("clipboardTextParser", (h) => h(e, s, o, n));
     if (d)
       a = d;
     else {
-      let p = s.marks(), { schema: f } = n.state, m = bs.fromSchema(f);
+      let h = s.marks(), { schema: f } = n.state, m = bs.fromSchema(f);
       i = document.createElement("div"), e.split(/(?:\r\n?|\n)+/).forEach((g) => {
         let v = i.appendChild(document.createElement("p"));
-        g && v.appendChild(m.serializeNode(f.text(g, p)));
+        g && v.appendChild(m.serializeNode(f.text(g, h)));
       });
     }
   } else
@@ -17175,28 +17175,28 @@ function dm(n, e, t, o, s) {
   let c = i && i.querySelector("[data-pm-slice]"), u = c && /^(\d+) (\d+)(?: -(\d+))? (.*)/.exec(c.getAttribute("data-pm-slice") || "");
   if (u && u[3])
     for (let d = +u[3]; d > 0; d--) {
-      let p = i.firstChild;
-      for (; p && p.nodeType != 1; )
-        p = p.nextSibling;
-      if (!p)
+      let h = i.firstChild;
+      for (; h && h.nodeType != 1; )
+        h = h.nextSibling;
+      if (!h)
         break;
-      i = p;
+      i = h;
     }
   if (a || (a = (n.someProp("clipboardParser") || n.someProp("domParser") || Go.fromSchema(n.state.schema)).parseSlice(i, {
     preserveWhitespace: !!(l || u),
     context: s,
-    ruleFromNode(p) {
-      return p.nodeName == "BR" && !p.nextSibling && p.parentNode && !QM.test(p.parentNode.nodeName) ? { ignore: !0 } : null;
+    ruleFromNode(h) {
+      return h.nodeName == "BR" && !h.nextSibling && h.parentNode && !QM.test(h.parentNode.nodeName) ? { ignore: !0 } : null;
     }
   })), u)
     a = oS(af(a, +u[1], +u[2]), u[4]);
   else if (a = Qe.maxOpen(ZM(a.content, s), !0), a.openStart || a.openEnd) {
-    let d = 0, p = 0;
+    let d = 0, h = 0;
     for (let f = a.content.firstChild; d < a.openStart && !f.type.spec.isolating; d++, f = f.firstChild)
       ;
-    for (let f = a.content.lastChild; p < a.openEnd && !f.type.spec.isolating; p++, f = f.lastChild)
+    for (let f = a.content.lastChild; h < a.openEnd && !f.type.spec.isolating; h++, f = f.lastChild)
       ;
-    a = af(a, d, p);
+    a = af(a, d, h);
   }
   return n.someProp("transformPasted", (d) => {
     a = d(a, n, l);
@@ -17766,12 +17766,12 @@ function IS(n, e, t) {
   let c = l.mapping.map(a), u = r.openStart == 0 && r.openEnd == 0 && r.content.childCount == 1, d = l.doc;
   if (u ? l.replaceRangeWith(c, c, r.content.firstChild) : l.replaceRange(c, c, r), l.doc.eq(d))
     return;
-  let p = l.doc.resolve(c);
-  if (u && ft.isSelectable(r.content.firstChild) && p.nodeAfter && p.nodeAfter.sameMarkup(r.content.firstChild))
-    l.setSelection(new ft(p));
+  let h = l.doc.resolve(c);
+  if (u && ft.isSelectable(r.content.firstChild) && h.nodeAfter && h.nodeAfter.sameMarkup(r.content.firstChild))
+    l.setSelection(new ft(h));
   else {
     let f = l.mapping.map(a);
-    l.mapping.maps[l.mapping.maps.length - 1].forEach((m, g, v, b) => f = b), l.setSelection(Kc(n, p, l.doc.resolve(f)));
+    l.mapping.maps[l.mapping.maps.length - 1].forEach((m, g, v, b) => f = b), l.setSelection(Kc(n, h, l.doc.resolve(f)));
   }
   n.focus(), n.dispatch(l.setMeta("uiEvent", "drop"));
 }
@@ -18176,14 +18176,14 @@ function xS(n, e, t, o, s, r, i) {
   let a = n.slice();
   for (let c = 0, u = r; c < t.maps.length; c++) {
     let d = 0;
-    t.maps[c].forEach((p, f, m, g) => {
-      let v = g - m - (f - p);
+    t.maps[c].forEach((h, f, m, g) => {
+      let v = g - m - (f - h);
       for (let b = 0; b < a.length; b += 3) {
         let M = a[b + 1];
-        if (M < 0 || p > M + u - d)
+        if (M < 0 || h > M + u - d)
           continue;
         let S = a[b] + u - d;
-        f >= S ? a[b + 1] = p <= S ? -2 : -1 : p >= u && v && (a[b] += v, a[b + 1] += v);
+        f >= S ? a[b + 1] = h <= S ? -2 : -1 : h >= u && v && (a[b] += v, a[b + 1] += v);
       }
       d += v;
     }), u = t.maps[c].map(u, -1);
@@ -18200,7 +18200,7 @@ function xS(n, e, t, o, s, r, i) {
         l = !0;
         continue;
       }
-      let p = t.map(n[c + 1] + r, -1), f = p - s, { index: m, offset: g } = o.content.findIndex(d), v = o.maybeChild(m);
+      let h = t.map(n[c + 1] + r, -1), f = h - s, { index: m, offset: g } = o.content.findIndex(d), v = o.maybeChild(m);
       if (v && g == d && g + v.nodeSize == f) {
         let b = a[c + 2].mapInner(t, v, u + 1, n[c] + r + 1, i);
         b != kn ? (a[c] = d, a[c + 1] = f, a[c + 2] = b) : (a[c + 1] = -2, l = !0);
@@ -18212,11 +18212,11 @@ function xS(n, e, t, o, s, r, i) {
     e = u.local;
     for (let d = 0; d < a.length; d += 3)
       a[d + 1] < 0 && (a.splice(d, 3), d -= 3);
-    for (let d = 0, p = 0; d < u.children.length; d += 3) {
+    for (let d = 0, h = 0; d < u.children.length; d += 3) {
       let f = u.children[d];
-      for (; p < a.length && a[p] < f; )
-        p += 3;
-      a.splice(p, 0, u.children[d], u.children[d + 1], u.children[d + 2]);
+      for (; h < a.length && a[h] < f; )
+        h += 3;
+      a.splice(h, 0, u.children[d], u.children[d + 1], u.children[d + 2]);
     }
   }
   return new Rt(e.sort(fs), a);
@@ -18436,13 +18436,13 @@ class RS {
     } else if (Yn && l.length) {
       let u = l.filter((d) => d.nodeName == "BR");
       if (u.length == 2) {
-        let [d, p] = u;
-        d.parentNode && d.parentNode.parentNode == p.parentNode ? p.remove() : d.remove();
+        let [d, h] = u;
+        d.parentNode && d.parentNode.parentNode == h.parentNode ? h.remove() : d.remove();
       } else {
         let { focusNode: d } = this.currentSelection;
-        for (let p of u) {
-          let f = p.parentNode;
-          f && f.nodeName == "LI" && (!d || OS(e, d) != f) && p.remove();
+        for (let h of u) {
+          let f = h.parentNode;
+          f && f.nodeName == "LI" && (!d || OS(e, d) != f) && h.remove();
         }
       }
     }
@@ -18466,8 +18466,8 @@ class RS {
       let s = e.previousSibling, r = e.nextSibling;
       if (On && Vo <= 11 && e.addedNodes.length)
         for (let u = 0; u < e.addedNodes.length; u++) {
-          let { previousSibling: d, nextSibling: p } = e.addedNodes[u];
-          (!d || Array.prototype.indexOf.call(e.addedNodes, d) < 0) && (s = d), (!p || Array.prototype.indexOf.call(e.addedNodes, p) < 0) && (r = p);
+          let { previousSibling: d, nextSibling: h } = e.addedNodes[u];
+          (!d || Array.prototype.indexOf.call(e.addedNodes, d) < 0) && (s = d), (!h || Array.prototype.indexOf.call(e.addedNodes, h) < 0) && (r = h);
         }
       let i = s && s.parentNode == e.target ? vn(s) + 1 : 0, a = o.localPosFromDOM(e.target, i, -1), l = r && r.parentNode == e.target ? vn(r) : e.target.childNodes.length, c = o.localPosFromDOM(e.target, l, 1);
       return { from: a, to: c };
@@ -18547,7 +18547,7 @@ function BS(n, e, t, o) {
       if (!S || S.size)
         break;
     }
-  let p = n.state.doc, f = n.someProp("domParser") || Go.fromSchema(n.state.schema), m = p.resolve(a), g = null, v = f.parse(s, {
+  let h = n.state.doc, f = n.someProp("domParser") || Go.fromSchema(n.state.schema), m = h.resolve(a), g = null, v = f.parse(s, {
     topNode: m.parent,
     topMatch: m.parent.contentMatchAt(m.index()),
     topOpen: !0,
@@ -18592,9 +18592,9 @@ function US(n, e, t, o, s) {
   }
   let i = n.state.doc.resolve(e), a = i.sharedDepth(t);
   e = i.before(a + 1), t = n.state.doc.resolve(t).after(a + 1);
-  let l = n.state.selection, c = BS(n, e, t, s), u = n.state.doc, d = u.slice(c.from, c.to), p, f;
-  n.input.lastKeyCode === 8 && Date.now() - 100 < n.input.lastKeyCodeTime ? (p = n.state.selection.to, f = "end") : (p = n.state.selection.from, f = "start"), n.input.lastKeyCode = null;
-  let m = GS(d.content, c.doc.content, c.from, p, f);
+  let l = n.state.selection, c = BS(n, e, t, s), u = n.state.doc, d = u.slice(c.from, c.to), h, f;
+  n.input.lastKeyCode === 8 && Date.now() - 100 < n.input.lastKeyCodeTime ? (h = n.state.selection.to, f = "end") : (h = n.state.selection.from, f = "start"), n.input.lastKeyCode = null;
+  let m = GS(d.content, c.doc.content, c.from, h, f);
   if (m && n.input.domChangeCount++, (Vs && n.input.lastIOSEnter > Date.now() - 225 || xo) && s.some((R) => R.nodeType == 1 && !zS.test(R.nodeName)) && (!m || m.endA >= m.endB) && n.someProp("handleKeyDown", (R) => R(n, es(13, "Enter")))) {
     n.input.lastIOSEnter = 0;
     return;
@@ -18795,7 +18795,7 @@ class Em {
     (a || t.handleDOMEvents != this._props.handleDOMEvents) && Yl(this), this.editable = mf(this), hf(this);
     let l = ml(this), c = pf(this), u = s.plugins != e.plugins && !s.doc.eq(e.doc) ? "reset" : e.scrollToSelection > s.scrollToSelection ? "to selection" : "preserve", d = r || !this.docView.matchesNode(e.doc, c, l);
     (d || !e.selection.eq(s.selection)) && (i = !0);
-    let p = u == "preserve" && i && this.dom.style.overflowAnchor == null && kM(this);
+    let h = u == "preserve" && i && this.dom.style.overflowAnchor == null && kM(this);
     if (i) {
       this.domObserver.stop();
       let f = d && (On || bn) && !this.composing && !s.selection.empty && !e.selection.empty && VS(s.selection, e.selection);
@@ -18806,7 +18806,7 @@ class Em {
       let m = this.input.mouseDown;
       f || !(m && this.domObserver.currentSelection.eq(this.domSelectionRange()) && VM(this) && m.delaySelUpdate()) ? Ao(this, f) : (lm(this, e.selection), this.domObserver.setCurSelection()), this.domObserver.start();
     }
-    this.updatePluginViews(s), !((o = this.dragging) === null || o === void 0) && o.node && !s.doc.eq(e.doc) && this.updateDraggedNode(this.dragging, s), u == "reset" ? this.dom.scrollTop = 0 : u == "to selection" ? this.scrollToSelection() : p && wM(p);
+    this.updatePluginViews(s), !((o = this.dragging) === null || o === void 0) && o.node && !s.doc.eq(e.doc) && this.updateDraggedNode(this.dragging, s), u == "reset" ? this.dom.scrollTop = 0 : u == "to selection" ? this.scrollToSelection() : h && wM(h);
   }
   /**
   @internal
@@ -19304,8 +19304,8 @@ var Da = class {
   createChain(n, e = !0) {
     const { rawCommands: t, editor: o, state: s } = this, { view: r } = o, i = [], a = !!n, l = n || s.tr, c = () => (!a && e && !l.getMeta("preventDispatch") && !this.hasCustomState && r.dispatch(l), i.every((d) => d === !0)), u = {
       ...Object.fromEntries(
-        Object.entries(t).map(([d, p]) => [d, (...m) => {
-          const g = this.buildProps(l, e), v = p(...m)(g);
+        Object.entries(t).map(([d, h]) => [d, (...m) => {
+          const g = this.buildProps(l, e), v = h(...m)(g);
           return i.push(v), u;
         }])
       ),
@@ -19417,7 +19417,7 @@ var tI = () => ({ editor: n, view: e }) => (requestAnimationFrame(() => {
     n.doc.nodesBetween(r.pos, i.pos, (a, l) => {
       if (a.type.isText)
         return;
-      const { doc: c, mapping: u } = e, d = c.resolve(u.map(l)), p = c.resolve(u.map(l + a.nodeSize)), f = d.blockRange(p);
+      const { doc: c, mapping: u } = e, d = c.resolve(u.map(l)), h = c.resolve(u.map(l + a.nodeSize)), f = d.blockRange(h);
       if (!f)
         return;
       const m = Ys(f);
@@ -19546,8 +19546,8 @@ var mI = (n, e) => ({ tr: t, state: o, dispatch: s }) => {
   if (s) {
     const d = nu(l, r, e);
     if (d && d.from <= c && d.to >= u) {
-      const p = mt.create(i, d.from, d.to);
-      t.setSelection(p);
+      const h = mt.create(i, d.from, d.to);
+      t.setSelection(h);
     }
   }
   return !0;
@@ -19752,16 +19752,16 @@ var wI = (n, e, t) => ({ tr: o, dispatch: s, editor: r }) => {
     } catch (v) {
       return l(v), !1;
     }
-    let { from: u, to: d } = typeof n == "number" ? { from: n, to: n } : { from: n.from, to: n.to }, p = !0, f = !0;
+    let { from: u, to: d } = typeof n == "number" ? { from: n, to: n } : { from: n.from, to: n.to }, h = !0, f = !0;
     const m = Dm(a) ? a.content : [a];
     if (m.forEach((v) => {
-      v.check(), p = p ? v.isText && v.marks.length === 0 : !1, f = f ? v.isBlock : !1;
+      v.check(), h = h ? v.isText && v.marks.length === 0 : !1, f = f ? v.isBlock : !1;
     }), u === d && f) {
       const { parent: v } = o.doc.resolve(u);
       v.isTextblock && !v.type.spec.code && !v.childCount && (u -= 1, d += 1);
     }
     let g;
-    if (p)
+    if (h)
       Array.isArray(e) ? g = e.map((v) => v.text || "").join("") : Om(e) ? g = m.map((v) => {
         var b;
         return (b = v.text) != null ? b : "";
@@ -19791,13 +19791,13 @@ var _I = (n = {}) => ({ tr: e, dispatch: t, editor: o }) => {
   if (!c)
     return !1;
   const u = Object.keys(c.spec.attrs || {}), d = r ? Object.fromEntries(Object.entries(r).filter(([f]) => u.includes(f))) : {};
-  let p;
+  let h;
   if (i) {
     const f = js(i, o.schema);
-    p = c.createAndFill(d, f);
+    h = c.createAndFill(d, f);
   } else
-    p = c.createAndFill(d);
-  return p ? (t && (e.insert(l.pos, p), a && Bm(e, e.steps.length - 1, -1)), !0) : !1;
+    h = c.createAndFill(d);
+  return h ? (t && (e.insert(l.pos, h), a && Bm(e, e.steps.length - 1, -1)), !0) : !1;
 }, CI = () => ({ state: n, dispatch: e }) => W1(n, e), MI = () => ({ state: n, dispatch: e }) => K1(n, e), SI = () => ({ state: n, dispatch: e }) => Dh(n, e), II = () => ({ state: n, dispatch: e }) => Uh(n, e), xI = () => ({ state: n, dispatch: e, tr: t }) => {
   try {
     const o = Aa(n.doc, n.selection.$from.pos, -1);
@@ -19857,10 +19857,10 @@ var RI = (n) => ({ editor: e, view: t, tr: o, dispatch: s }) => {
 };
 function $o(n, e, t = {}) {
   const { from: o, to: s, empty: r } = n.selection, i = e ? an(e, n.schema) : null, a = [];
-  n.doc.nodesBetween(o, s, (d, p) => {
+  n.doc.nodesBetween(o, s, (d, h) => {
     if (d.isText)
       return;
-    const f = Math.max(o, p), m = Math.min(s, p + d.nodeSize);
+    const f = Math.max(o, h), m = Math.min(s, h + d.nodeSize);
     a.push({
       node: d,
       from: f,
@@ -19868,7 +19868,7 @@ function $o(n, e, t = {}) {
     });
   });
   const l = s - o, c = a.filter((d) => i ? i.name === d.node.type.name : !0).filter((d) => Di(d.node.attrs, t, { strict: !1 }));
-  return r ? !!c.length : c.reduce((d, p) => d + p.to - p.from, 0) >= l;
+  return r ? !!c.length : c.reduce((d, h) => d + h.to - h.from, 0) >= l;
 }
 var NI = (n, e = {}) => ({ state: t, dispatch: o }) => {
   const s = an(n, t.schema);
@@ -19896,11 +19896,11 @@ var BI = (n, e) => ({ tr: t, state: o, dispatch: s }) => {
   let l = !1;
   return t.selection.ranges.forEach((c) => {
     o.doc.nodesBetween(c.$from.pos, c.$to.pos, (u, d) => {
-      r && r === u.type && (l = !0, s && t.setNodeMarkup(d, void 0, wf(u.attrs, e))), i && u.marks.length && u.marks.forEach((p) => {
-        i === p.type && (l = !0, s && t.addMark(
+      r && r === u.type && (l = !0, s && t.setNodeMarkup(d, void 0, wf(u.attrs, e))), i && u.marks.length && u.marks.forEach((h) => {
+        i === h.type && (l = !0, s && t.addMark(
           d,
           d + u.nodeSize,
-          i.create(wf(p.attrs, e))
+          i.create(wf(h.attrs, e))
         ));
       });
     });
@@ -20065,8 +20065,8 @@ function Gm(n) {
     }, d = it(c, "addAttributes", u);
     if (!d)
       return;
-    const p = d();
-    Object.entries(p).forEach(([f, m]) => {
+    const h = d();
+    Object.entries(h).forEach(([f, m]) => {
       const g = {
         ...r,
         ...m
@@ -20194,7 +20194,7 @@ function YI(n, e) {
         options: c.options,
         storage: c.storage,
         editor: e
-      }, p = n.reduce((b, M) => {
+      }, h = n.reduce((b, M) => {
         const S = it(
           M,
           "extendNodeSchema",
@@ -20205,7 +20205,7 @@ function YI(n, e) {
           ...S ? S(c) : {}
         };
       }, {}), f = Mf({
-        ...p,
+        ...h,
         content: Lt(
           it(c, "content", d)
         ),
@@ -20268,7 +20268,7 @@ function YI(n, e) {
         options: c.options,
         storage: c.storage,
         editor: e
-      }, p = n.reduce((v, b) => {
+      }, h = n.reduce((v, b) => {
         const M = it(
           b,
           "extendMarkSchema",
@@ -20279,7 +20279,7 @@ function YI(n, e) {
           ...M ? M(c) : {}
         };
       }, {}), f = Mf({
-        ...p,
+        ...h,
         inclusive: Lt(
           it(c, "inclusive", d)
         ),
@@ -20337,7 +20337,7 @@ function jm(n, e, t) {
 `, textSerializers: i = {} } = t || {};
   let a = "";
   return n.nodesBetween(o, s, (l, c, u, d) => {
-    var p;
+    var h;
     l.isBlock && c > o && (a += r);
     const f = i == null ? void 0 : i[l.type.name];
     if (f)
@@ -20348,7 +20348,7 @@ function jm(n, e, t) {
         index: d,
         range: e
       })), !1;
-    l.isText && (a += (p = l == null ? void 0 : l.text) == null ? void 0 : p.slice(Math.max(o, c) - c, s - c));
+    l.isText && (a += (h = l == null ? void 0 : l.text) == null ? void 0 : h.slice(Math.max(o, c) - c, s - c));
   }), a;
 }
 function ZI(n, e) {
@@ -20404,11 +20404,11 @@ function za(n) {
       i.push({ from: a, to: l });
     }
     i.forEach(({ from: a, to: l }) => {
-      const c = e.slice(r).map(a, -1), u = e.slice(r).map(l), d = e.invert().map(c, -1), p = e.invert().map(u);
+      const c = e.slice(r).map(a, -1), u = e.slice(r).map(l), d = e.invert().map(c, -1), h = e.invert().map(u);
       o.push({
         oldRange: {
           from: d,
-          to: p
+          to: h
         },
         newRange: {
           from: c,
@@ -20485,8 +20485,8 @@ function ec(n, e, t = {}) {
     return !!(n.storedMarks || n.selection.$from.marks()).filter((d) => r ? r.name === d.type.name : !0).find((d) => Di(d.attrs, t, { strict: !1 }));
   let i = 0;
   const a = [];
-  if (s.forEach(({ $from: d, $to: p }) => {
-    const f = d.pos, m = p.pos;
+  if (s.forEach(({ $from: d, $to: h }) => {
+    const f = d.pos, m = h.pos;
     n.doc.nodesBetween(f, m, (g, v) => {
       if (r && g.inlineContent && !g.type.allowsMarkType(r))
         return !1;
@@ -20503,7 +20503,7 @@ function ec(n, e, t = {}) {
     });
   }), i === 0)
     return !1;
-  const l = a.filter((d) => r ? r.name === d.mark.type.name : !0).filter((d) => Di(d.mark.attrs, t, { strict: !1 })).reduce((d, p) => d + p.to - p.from, 0), c = a.filter((d) => r ? d.mark.type !== r && d.mark.type.excludes(r) : !0).reduce((d, p) => d + p.to - p.from, 0);
+  const l = a.filter((d) => r ? r.name === d.mark.type.name : !0).filter((d) => Di(d.mark.attrs, t, { strict: !1 })).reduce((d, h) => d + h.to - h.from, 0), c = a.filter((d) => r ? d.mark.type !== r && d.mark.type.excludes(r) : !0).reduce((d, h) => d + h.to - h.from, 0);
   return (l > 0 ? l + c : l) >= i;
 }
 function ix(n, e, t = {}) {
@@ -20608,11 +20608,11 @@ function dx(n, e, t) {
   const { ranges: i } = s;
   return i.some(({ $from: a, $to: l }) => {
     let c = a.depth === 0 ? n.doc.inlineContent && n.doc.type.allowsMarkType(t) : !1;
-    return n.doc.nodesBetween(a.pos, l.pos, (u, d, p) => {
+    return n.doc.nodesBetween(a.pos, l.pos, (u, d, h) => {
       if (c)
         return !1;
       if (u.isInline) {
-        const f = !p || p.type.allowsMarkType(t), m = !!t.isInSet(u.marks) || !u.marks.some((g) => g.type.excludes(t));
+        const f = !h || h.type.allowsMarkType(t), m = !!t.isInSet(u.marks) || !u.marks.some((g) => g.type.excludes(t));
         c = f && m;
       }
       return !c;
@@ -20633,9 +20633,9 @@ var fx = (n, e = {}) => ({ tr: t, state: o, dispatch: s }) => {
     } else
       a.forEach((c) => {
         const u = c.$from.pos, d = c.$to.pos;
-        o.doc.nodesBetween(u, d, (p, f) => {
-          const m = Math.max(f, u), g = Math.min(f + p.nodeSize, d);
-          p.marks.find((b) => b.type === l) ? p.marks.forEach((b) => {
+        o.doc.nodesBetween(u, d, (h, f) => {
+          const m = Math.max(f, u), g = Math.min(f + h.nodeSize, d);
+          h.marks.find((b) => b.type === l) ? h.marks.forEach((b) => {
             l === b.type && t.addMark(
               m,
               g,
@@ -20694,22 +20694,22 @@ var bx = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: o, editor
     return !a.parentOffset || !Eo(i, a.pos) ? !1 : (o && (n && xf(t, s.extensionManager.splittableMarks), e.split(a.pos).scrollIntoView()), !0);
   if (!a.parent.isBlock)
     return !1;
-  const d = l.parentOffset === l.parent.content.size, p = a.depth === 0 ? void 0 : Pm(a.node(-1).contentMatchAt(a.indexAfter(-1)));
-  let f = d && p ? [
+  const d = l.parentOffset === l.parent.content.size, h = a.depth === 0 ? void 0 : Pm(a.node(-1).contentMatchAt(a.indexAfter(-1)));
+  let f = d && h ? [
     {
-      type: p,
+      type: h,
       attrs: u
     }
   ] : void 0, m = Eo(e.doc, e.mapping.map(a.pos), 1, f);
-  if (!f && !m && Eo(e.doc, e.mapping.map(a.pos), 1, p ? [{ type: p }] : void 0) && (m = !0, f = p ? [
+  if (!f && !m && Eo(e.doc, e.mapping.map(a.pos), 1, h ? [{ type: h }] : void 0) && (m = !0, f = h ? [
     {
-      type: p,
+      type: h,
       attrs: u
     }
   ] : void 0), o) {
-    if (m && (r instanceof mt && e.deleteSelection(), e.split(e.mapping.map(a.pos), 1, f), p && !d && !a.parentOffset && a.parent.type !== p)) {
+    if (m && (r instanceof mt && e.deleteSelection(), e.split(e.mapping.map(a.pos), 1, f), h && !d && !a.parentOffset && a.parent.type !== h)) {
       const g = e.mapping.map(a.before()), v = e.doc.resolve(g);
-      a.node(-1).canReplaceWith(v.index(), v.index() + 1, p) && e.setNodeMarkup(e.mapping.map(a.before()), p);
+      a.node(-1).canReplaceWith(v.index(), v.index() + 1, h) && e.setNodeMarkup(e.mapping.map(a.before()), h);
     }
     n && xf(t, s.extensionManager.splittableMarks), e.scrollIntoView();
   }
@@ -20722,7 +20722,7 @@ var bx = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: o, editor
   const d = l.node(-1);
   if (d.type !== a)
     return !1;
-  const p = r.extensionManager.attributes;
+  const h = r.extensionManager.attributes;
   if (l.parent.content.size === 0 && l.node(-1).childCount === l.indexAfter(-1)) {
     if (l.depth === 2 || l.node(-3).type !== a || l.index(-2) !== l.node(-2).childCount - 1)
       return !1;
@@ -20735,7 +20735,7 @@ var bx = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: o, editor
         // oxlint-disable-next-line no-nested-ternary
         l.indexAfter(-1) < l.node(-2).childCount ? 1 : l.indexAfter(-2) < l.node(-3).childCount ? 2 : 3
       ), w = {
-        ...yi(p, l.node().type.name, l.node().attrs),
+        ...yi(h, l.node().type.name, l.node().attrs),
         ...e
       }, I = ((i = a.contentMatch.defaultType) == null ? void 0 : i.createAndFill(w)) || void 0;
       b = b.append(Ee.from(a.createAndFill(null, I) || void 0));
@@ -20751,10 +20751,10 @@ var bx = ({ keepMarks: n = !0 } = {}) => ({ tr: e, state: t, dispatch: o, editor
     return !0;
   }
   const f = c.pos === l.end() ? d.contentMatchAt(0).defaultType : null, m = {
-    ...yi(p, d.type.name, d.attrs),
+    ...yi(h, d.type.name, d.attrs),
     ...e
   }, g = {
-    ...yi(p, l.node().type.name, l.node().attrs),
+    ...yi(h, l.node().type.name, l.node().attrs),
     ...e
   };
   t.delete(l.pos, c.pos);
@@ -20806,7 +20806,7 @@ function wx(n) {
   return mt.between(o, s);
 }
 var _x = (n, e, t, o = {}) => ({ editor: s, tr: r, state: i, dispatch: a, chain: l, commands: c, can: u }) => {
-  const { extensions: d, splittableMarks: p } = s.extensionManager, f = an(n, i.schema), m = an(e, i.schema), { selection: g, storedMarks: v } = i, { $from: b, $to: M } = g, S = b.blockRange(M), w = v || g.$to.parentOffset && g.$from.marks();
+  const { extensions: d, splittableMarks: h } = s.extensionManager, f = an(n, i.schema), m = an(e, i.schema), { selection: g, storedMarks: v } = i, { $from: b, $to: M } = g, S = b.blockRange(M), w = v || g.$to.parentOffset && g.$from.marks();
   if (!S)
     return !1;
   const I = Pa((B) => bl(B.type.name, d))(g), T = g.from === 0 && g.to === i.doc.content.size, R = i.doc.content.content, $ = R.length === 1 ? R[0] : null, E = T && $ && bl($.type.name, d) ? {
@@ -20823,7 +20823,7 @@ var _x = (n, e, t, o = {}) => ({ editor: s, tr: r, state: i, dispatch: a, chain:
       return l().command(() => (r.setNodeMarkup(z.pos, f), !0)).command(() => kl(r, f)).command(() => wl(r, f)).run();
   }
   return !t || !w || !a ? l().command(() => u().wrapInList(f, o) ? !0 : c.clearNodes()).wrapInList(f, o).command(() => kl(r, f)).command(() => wl(r, f)).run() : l().command(() => {
-    const B = u().wrapInList(f, o), N = w.filter((L) => p.includes(L.type.name));
+    const B = u().wrapInList(f, o), N = w.filter((L) => h.includes(L.type.name));
     return r.ensureMarks(N), B ? !0 : c.clearNodes();
   }).wrapInList(f, o).command(() => kl(r, f)).command(() => wl(r, f)).run();
 }, Cx = (n, e = {}, t = {}) => ({ state: o, commands: s }) => {
@@ -20877,12 +20877,12 @@ var _x = (n, e, t, o = {}) => ({ editor: s, tr: r, state: i, dispatch: a, chain:
   if (!s)
     return !0;
   if (u && i) {
-    let { from: p, to: f } = a;
+    let { from: h, to: f } = a;
     const m = (r = c.marks().find((v) => v.type === l)) == null ? void 0 : r.attrs, g = nu(c, l, m);
-    g && (p = g.from, f = g.to), t.removeMark(p, f, l);
+    g && (h = g.from, f = g.to), t.removeMark(h, f, l);
   } else
-    d.forEach((p) => {
-      t.removeMark(p.$from.pos, p.$to.pos, l);
+    d.forEach((h) => {
+      t.removeMark(h.$from.pos, h.$to.pos, l);
     });
   return t.removeStoredMark(l), !0;
 }, Ex = (n) => ({ tr: e, state: t, dispatch: o }) => {
@@ -20906,11 +20906,11 @@ var _x = (n, e, t, o = {}) => ({ editor: s, tr: r, state: i, dispatch: a, chain:
   let l = !1;
   return t.selection.ranges.forEach((c) => {
     const u = c.$from.pos, d = c.$to.pos;
-    let p, f, m, g;
+    let h, f, m, g;
     t.selection.empty ? o.doc.nodesBetween(u, d, (v, b) => {
-      r && r === v.type && (l = !0, m = Math.max(b, u), g = Math.min(b + v.nodeSize, d), p = b, f = v);
+      r && r === v.type && (l = !0, m = Math.max(b, u), g = Math.min(b + v.nodeSize, d), h = b, f = v);
     }) : o.doc.nodesBetween(u, d, (v, b) => {
-      b < u && r && r === v.type && (l = !0, m = Math.max(b, u), g = Math.min(b + v.nodeSize, d), p = b, f = v), b >= u && b <= d && (r && r === v.type && (l = !0, s && t.setNodeMarkup(b, void 0, {
+      b < u && r && r === v.type && (l = !0, m = Math.max(b, u), g = Math.min(b + v.nodeSize, d), h = b, f = v), b >= u && b <= d && (r && r === v.type && (l = !0, s && t.setNodeMarkup(b, void 0, {
         ...v.attrs,
         ...e
       })), i && v.marks.length && v.marks.forEach((M) => {
@@ -20926,7 +20926,7 @@ var _x = (n, e, t, o = {}) => ({ editor: s, tr: r, state: i, dispatch: a, chain:
           );
         }
       }));
-    }), f && (p !== void 0 && s && t.setNodeMarkup(p, void 0, {
+    }), f && (h !== void 0 && s && t.setNodeMarkup(h, void 0, {
       ...f.attrs,
       ...e
     }), i && f.marks.length && f.marks.forEach((v) => {
@@ -21232,7 +21232,7 @@ var qx = /* @__PURE__ */ new Set(), Jx = class {
             }
           }), d.size === 0 && !t.docChanged)
             return o;
-          const p = this.mergeAfterApply({
+          const h = this.mergeAfterApply({
             entries: e,
             previous: o,
             tr: t,
@@ -21242,7 +21242,7 @@ var qx = /* @__PURE__ */ new Set(), Jx = class {
           return {
             decorationSetsByExtension: c,
             widgetKeysByExtension: u,
-            mergedDecorationSet: p,
+            mergedDecorationSet: h,
             widgetKeys: Af(u)
           };
         }
@@ -21285,8 +21285,8 @@ var qx = /* @__PURE__ */ new Set(), Jx = class {
     const l = (i = t.decorationSetsByExtension[n]) != null ? i : Rt.empty, c = new Set((a = t.widgetKeysByExtension[n]) != null ? a : []);
     let u = og(l, o.mapping, o.doc, c);
     const d = s.doc.content.size;
-    for (const { from: p, to: f } of r) {
-      const m = u.find(p, f).filter((M) => eg({ position: M.from, from: p, to: f, docSize: d }));
+    for (const { from: h, to: f } of r) {
+      const m = u.find(h, f).filter((M) => eg({ position: M.from, from: h, to: f, docSize: d }));
       for (const M of m) {
         const S = tg(M);
         S && c.delete(S);
@@ -21300,11 +21300,11 @@ var qx = /* @__PURE__ */ new Set(), Jx = class {
             editor: this.editor,
             state: s,
             view: this.mountedView,
-            from: p,
+            from: h,
             to: f
           })
         ),
-        from: p,
+        from: h,
         to: f,
         docSize: d,
         extensionName: n,
@@ -21454,7 +21454,7 @@ function iu(n) {
   const i = /([a-zA-Z][\w-]*)\s*=\s*(__QUOTED_\d+__)/g;
   Array.from(o.matchAll(i)).forEach(([, c, u]) => {
     var d;
-    const p = parseInt(((d = u.match(/__QUOTED_(\d+)__/)) == null ? void 0 : d[1]) || "0", 10), f = t[p];
+    const h = parseInt(((d = u.match(/__QUOTED_(\d+)__/)) == null ? void 0 : d[1]) || "0", 10), f = t[h];
     f && (e[c] = f.slice(1, -1));
   });
   const l = o.replace(/(?:^|\s)\.([\w-]+)/g, "").replace(/(?:^|\s)#([\w-]+)/g, "").replace(/([a-zA-Z][\w-]*)\s*=\s*__QUOTED_\d+__/g, "").trim();
@@ -21483,24 +21483,24 @@ function tT(n) {
     if (!a)
       return u;
     const d = {};
-    return a.forEach((p) => {
-      p in u && (d[p] = u[p]);
+    return a.forEach((h) => {
+      h in u && (d[h] = u[h]);
     }), d;
   };
   return {
     parseMarkdown: (u, d) => {
-      const p = { ...r, ...u.attributes };
-      return d.createNode(e, p, []);
+      const h = { ...r, ...u.attributes };
+      return d.createNode(e, h, []);
     },
     markdownTokenizer: {
       name: e,
       level: "block",
       start(u) {
         var d;
-        const p = new RegExp(`^:::${l}(?:\\s|$)`, "m"), f = (d = u.match(p)) == null ? void 0 : d.index;
+        const h = new RegExp(`^:::${l}(?:\\s|$)`, "m"), f = (d = u.match(h)) == null ? void 0 : d.index;
         return f !== void 0 ? f : -1;
       },
-      tokenize(u, d, p) {
+      tokenize(u, d, h) {
         const f = new RegExp(`^:::${l}(?:\\s+\\{([^}]*)\\})?\\s*:::(?:\\n|$)`), m = u.match(f);
         if (!m)
           return;
@@ -21514,7 +21514,7 @@ function tT(n) {
       }
     },
     renderMarkdown: (u) => {
-      const d = c(u.attrs || {}), p = s(d), f = p ? ` {${p}}` : "";
+      const d = c(u.attrs || {}), h = s(d), f = h ? ` {${h}}` : "";
       return `:::${l}${f} :::`;
     }
   };
@@ -21532,30 +21532,30 @@ function nT(n) {
   } = n, c = t || e, u = (d) => {
     if (!l)
       return d;
-    const p = {};
+    const h = {};
     return l.forEach((f) => {
-      f in d && (p[f] = d[f]);
-    }), p;
+      f in d && (h[f] = d[f]);
+    }), h;
   };
   return {
-    parseMarkdown: (d, p) => {
+    parseMarkdown: (d, h) => {
       let f;
       if (o) {
         const g = o(d);
         f = typeof g == "string" ? [{ type: "text", text: g }] : g;
-      } else a === "block" ? f = p.parseChildren(d.tokens || []) : f = p.parseInline(d.tokens || []);
+      } else a === "block" ? f = h.parseChildren(d.tokens || []) : f = h.parseInline(d.tokens || []);
       const m = { ...i, ...d.attributes };
-      return p.createNode(e, m, f);
+      return h.createNode(e, m, f);
     },
     markdownTokenizer: {
       name: e,
       level: "block",
       start(d) {
-        var p;
-        const f = new RegExp(`^:::${c}`, "m"), m = (p = d.match(f)) == null ? void 0 : p.index;
+        var h;
+        const f = new RegExp(`^:::${c}`, "m"), m = (h = d.match(f)) == null ? void 0 : h.index;
         return m !== void 0 ? m : -1;
       },
-      tokenize(d, p, f) {
+      tokenize(d, h, f) {
         var m;
         const g = new RegExp(`^:::${c}(?:\\s+\\{([^}]*)\\})?\\s*\\n`), v = d.match(g);
         if (!v)
@@ -21603,8 +21603,8 @@ function nT(n) {
         }
       }
     },
-    renderMarkdown: (d, p) => {
-      const f = u(d.attrs || {}), m = r(f), g = m ? ` {${m}}` : "", v = p.renderChildren(d.content || [], `
+    renderMarkdown: (d, h) => {
+      const f = u(d.attrs || {}), m = r(f), g = m ? ` {${m}}` : "", v = h.renderChildren(d.content || [], `
 
 `);
       return `:::${c}${g}
@@ -21639,14 +21639,14 @@ function rT(n) {
     defaultAttributes: i = {},
     selfClosing: a = !1,
     allowedAttributes: l
-  } = n, c = t || e, u = (p) => {
+  } = n, c = t || e, u = (h) => {
     if (!l)
-      return p;
+      return h;
     const f = {};
     return l.forEach((m) => {
       const g = typeof m == "string" ? m : m.name, v = typeof m == "string" ? void 0 : m.skipIfDefault;
-      if (g in p) {
-        const b = p[g];
+      if (g in h) {
+        const b = h[g];
         if (v !== void 0 && b === v)
           return;
         f[g] = b;
@@ -21654,24 +21654,24 @@ function rT(n) {
     }), f;
   }, d = c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return {
-    parseMarkdown: (p, f) => {
-      const m = { ...i, ...p.attributes };
+    parseMarkdown: (h, f) => {
+      const m = { ...i, ...h.attributes };
       if (a)
         return f.createNode(e, m);
-      const g = o ? o(p) : p.content || "";
+      const g = o ? o(h) : h.content || "";
       return g ? f.createNode(e, m, [f.createTextNode(g)]) : f.createNode(e, m, []);
     },
     markdownTokenizer: {
       name: e,
       level: "inline",
-      start(p) {
-        const f = a ? new RegExp(`\\[${d}\\s*[^\\]]*\\]`) : new RegExp(`\\[${d}\\s*[^\\]]*\\][\\s\\S]*?\\[\\/${d}\\]`), m = p.match(f), g = m == null ? void 0 : m.index;
+      start(h) {
+        const f = a ? new RegExp(`\\[${d}\\s*[^\\]]*\\]`) : new RegExp(`\\[${d}\\s*[^\\]]*\\][\\s\\S]*?\\[\\/${d}\\]`), m = h.match(f), g = m == null ? void 0 : m.index;
         return g !== void 0 ? g : -1;
       },
-      tokenize(p, f, m) {
+      tokenize(h, f, m) {
         const g = a ? new RegExp(`^\\[${d}\\s*([^\\]]*)\\]`) : new RegExp(
           `^\\[${d}\\s*([^\\]]*)\\]([\\s\\S]*?)\\[\\/${d}\\]`
-        ), v = p.match(g);
+        ), v = h.match(g);
         if (!v)
           return;
         let b = "", M = "";
@@ -21691,10 +21691,10 @@ function rT(n) {
         };
       }
     },
-    renderMarkdown: (p) => {
+    renderMarkdown: (h) => {
       let f = "";
-      o ? f = o(p) : p.content && p.content.length > 0 && (f = p.content.filter((b) => b.type === "text").map((b) => b.text).join(""));
-      const m = u(p.attrs || {}), g = r(m), v = g ? ` ${g}` : "";
+      o ? f = o(h) : h.content && h.content.length > 0 && (f = h.content.filter((b) => b.type === "text").map((b) => b.text).join(""));
+      const m = u(h.attrs || {}), g = r(m), v = g ? ` ${g}` : "";
       return a ? `[${c}${v}]` : `[${c}${v}]${f}[/${c}]`;
     }
   };
@@ -21706,19 +21706,19 @@ function tc(n, e, t) {
   let c = "", u = 0;
   const d = e.baseIndentSize || 2;
   for (; u < a.length; ) {
-    const p = a[u], f = p.match(e.itemPattern);
+    const h = a[u], f = h.match(e.itemPattern);
     if (!f) {
       if (l.length > 0)
         break;
-      if (p.trim() === "") {
-        u += 1, c = `${c}${p}
+      if (h.trim() === "") {
+        u += 1, c = `${c}${h}
 `;
         continue;
       } else
         return;
     }
     const m = e.extractItemData(f), { indentLevel: g, mainContent: v } = m;
-    c = `${c}${p}
+    c = `${c}${h}
 `;
     const b = [v];
     for (u += 1; u < a.length; ) {
@@ -21762,8 +21762,8 @@ function lu(n, e, t, o) {
   const s = typeof t == "function" ? t(o) : t, [r, ...i] = n.content, a = e.renderChildren([r]);
   let l = `${s}${a}`;
   return i && i.length > 0 && i.forEach((c, u) => {
-    var d, p;
-    const f = (p = (d = e.renderChild) == null ? void 0 : d.call(e, c, u + 1)) != null ? p : e.renderChildren([c]);
+    var d, h;
+    const f = (h = (d = e.renderChild) == null ? void 0 : d.call(e, c, u + 1)) != null ? h : e.renderChildren([c]);
     if (f != null) {
       const m = f.split(`
 `).map((g) => g ? e.indent(g) : e.indent("")).join(`
@@ -21792,10 +21792,10 @@ function iT(n, e, t = {}) {
       d = f;
     }), !d)
       return;
-    let p = !1;
+    let h = !1;
     if (Object.keys(t).forEach((f) => {
-      t[f] !== d.attrs[f] && (p = !0);
-    }), p) {
+      t[f] !== d.attrs[f] && (h = !0);
+    }), h) {
       const f = n.type.create({
         ...n.attrs,
         ...t
@@ -21828,15 +21828,15 @@ function ii(n) {
   const c = l.state.doc.resolve(o);
   if (
     // check for code node
-    c.parent.type.spec.code || (e = c.nodeBefore || c.nodeAfter) != null && e.marks.find((p) => p.type.spec.code)
+    c.parent.type.spec.code || (e = c.nodeBefore || c.nodeAfter) != null && e.marks.find((h) => h.type.spec.code)
   )
     return !1;
   let u = !1;
   const d = rx(c) + r;
-  return i.forEach((p) => {
+  return i.forEach((h) => {
     if (u)
       return;
-    const f = aT(d, p.find);
+    const f = aT(d, h.find);
     if (!f)
       return;
     const m = f[0].length - r.length;
@@ -21855,14 +21855,14 @@ function ii(n) {
       editor: t,
       state: v
     });
-    p.handler({
+    h.handler({
       state: v,
       range: b,
       match: f,
       commands: M,
       chain: S,
       can: w
-    }) === null || !g.steps.length || (p.undoable && g.setMeta(a, {
+    }) === null || !g.steps.length || (h.undoable && g.setMeta(a, {
       transform: g,
       from: o,
       to: s,
@@ -21884,11 +21884,11 @@ function lT(n) {
         return !!l && setTimeout(() => {
           let { text: u } = l;
           typeof u == "string" ? u = u : u = su(Ee.from(u), i.schema);
-          const { from: d } = l, p = d + u.length;
+          const { from: d } = l, h = d + u.length;
           ii({
             editor: e,
             from: d,
-            to: p,
+            to: h,
             text: u,
             rules: t,
             plugin: o
@@ -22077,7 +22077,7 @@ function fT(n) {
   const l = ({
     state: u,
     from: d,
-    to: p,
+    to: h,
     rule: f,
     pasteEvt: m
   }) => {
@@ -22089,7 +22089,7 @@ function fT(n) {
       editor: e,
       state: v,
       from: Math.max(d - 1, 0),
-      to: p.b - 1,
+      to: h.b - 1,
       rule: f,
       pasteEvent: m,
       dropEvent: a
@@ -22105,22 +22105,22 @@ function fT(n) {
   return t.map((u) => new jt({
     // we register a global drag handler to track the current drag source element
     view(d) {
-      const p = (m) => {
+      const h = (m) => {
         var g;
         o = (g = d.dom.parentElement) != null && g.contains(m.target) ? d.dom.parentElement : null, o && (ai = e);
       }, f = () => {
         ai && (ai = null);
       };
-      return window.addEventListener("dragstart", p), window.addEventListener("dragend", f), {
+      return window.addEventListener("dragstart", h), window.addEventListener("dragend", f), {
         destroy() {
-          window.removeEventListener("dragstart", p), window.removeEventListener("dragend", f);
+          window.removeEventListener("dragstart", h), window.removeEventListener("dragend", f);
         }
       };
     },
     props: {
       handleDOMEvents: {
-        drop: (d, p) => {
-          if (r = o === d.dom.parentElement, a = p, !r) {
+        drop: (d, h) => {
+          if (r = o === d.dom.parentElement, a = h, !r) {
             const f = ai;
             f != null && f.isEditable && setTimeout(() => {
               const m = f.state.selection;
@@ -22132,14 +22132,14 @@ function fT(n) {
           }
           return !1;
         },
-        paste: (d, p) => {
+        paste: (d, h) => {
           var f;
-          const m = (f = p.clipboardData) == null ? void 0 : f.getData("text/html");
-          return i = p, s = !!(m != null && m.includes("data-pm-slice")), !1;
+          const m = (f = h.clipboardData) == null ? void 0 : f.getData("text/html");
+          return i = h, s = !!(m != null && m.includes("data-pm-slice")), !1;
         }
       }
     },
-    appendTransaction: (d, p, f) => {
+    appendTransaction: (d, h, f) => {
       const m = d[0], g = m.getMeta("uiEvent") === "paste" && !s, v = m.getMeta("uiEvent") === "drop" && !r, b = m.getMeta("applyPasteRules"), M = !!b;
       if (!g && !v && !M)
         return;
@@ -22155,7 +22155,7 @@ function fT(n) {
           pasteEvt: $
         });
       }
-      const S = p.doc.content.findDiffStart(f.doc.content), w = p.doc.content.findDiffEnd(f.doc.content);
+      const S = h.doc.content.findDiffStart(f.doc.content), w = h.doc.content.findDiffEnd(f.doc.content);
       if (!(!Qx(S) || !w || S === w.b))
         return l({
           rule: u,
@@ -22247,13 +22247,13 @@ var Ua = class {
           i.push(...m);
         }
       }
-      const p = it(
+      const h = it(
         s,
         "addProseMirrorPlugins",
         r
       );
-      if (p) {
-        const f = p();
+      if (h) {
+        const f = h();
         i.push(...f);
       }
       return i;
@@ -22320,7 +22320,7 @@ var Ua = class {
         const i = r();
         if (!i)
           return [];
-        const a = (l, c, u, d, p) => {
+        const a = (l, c, u, d, h) => {
           const f = Ks(l, o);
           return i({
             // pass-through
@@ -22328,7 +22328,7 @@ var Ua = class {
             view: c,
             getPos: u,
             decorations: d,
-            innerDecorations: p,
+            innerDecorations: h,
             // tiptap-specific
             editor: n,
             extension: t,
@@ -22486,8 +22486,8 @@ var Ua = class {
         e,
         "onTransaction",
         s
-      ), u = it(e, "onFocus", s), d = it(e, "onBlur", s), p = it(e, "onDestroy", s);
-      r && this.editor.on("beforeCreate", r), i && this.editor.on("create", i), a && this.editor.on("update", a), l && this.editor.on("selectionUpdate", l), c && this.editor.on("transaction", c), u && this.editor.on("focus", u), d && this.editor.on("blur", d), p && this.editor.on("destroy", p);
+      ), u = it(e, "onFocus", s), d = it(e, "onBlur", s), h = it(e, "onDestroy", s);
+      r && this.editor.on("beforeCreate", r), i && this.editor.on("create", i), a && this.editor.on("update", a), l && this.editor.on("selectionUpdate", l), c && this.editor.on("transaction", c), u && this.editor.on("focus", u), d && this.editor.on("blur", d), h && this.editor.on("destroy", h);
     });
   }
 };
@@ -22596,11 +22596,11 @@ var Xt = class ag extends cu {
           }
         );
       });
-      const p = u.mapping;
+      const h = u.mapping;
       u.steps.forEach((f, m) => {
         var g, v;
         if (f instanceof oo) {
-          const b = p.slice(m).map(f.from, -1), M = p.slice(m).map(f.to), S = p.invert().map(b, -1), w = p.invert().map(M), I = b > 0 ? (g = u.doc.nodeAt(b - 1)) == null ? void 0 : g.marks.some((R) => R.eq(f.mark)) : !1, T = (v = u.doc.nodeAt(M)) == null ? void 0 : v.marks.some((R) => R.eq(f.mark));
+          const b = h.slice(m).map(f.from, -1), M = h.slice(m).map(f.to), S = h.invert().map(b, -1), w = h.invert().map(M), I = b > 0 ? (g = u.doc.nodeAt(b - 1)) == null ? void 0 : g.marks.some((R) => R.eq(f.mark)) : !1, T = (v = u.doc.nodeAt(M)) == null ? void 0 : v.marks.some((R) => R.eq(f.mark));
           this.editor.emit("delete", {
             type: "mark",
             mark: f.mark,
@@ -22686,7 +22686,7 @@ var Xt = class ag extends cu {
       () => i.undoInputRule(),
       // maybe convert first text block node to default node
       () => i.command(({ tr: a }) => {
-        const { selection: l, doc: c } = a, { empty: u, $anchor: d } = l, { pos: p, parent: f } = d, m = d.parent.isTextblock && p > 0 ? a.doc.resolve(p - 1) : d, g = m.parent.type.spec.isolating, v = d.pos - d.parentOffset, b = g && m.parent.childCount === 1 ? v === d.pos : xt.atStart(c).from === p;
+        const { selection: l, doc: c } = a, { empty: u, $anchor: d } = l, { pos: h, parent: f } = d, m = d.parent.isTextblock && h > 0 ? a.doc.resolve(h - 1) : d, g = m.parent.type.spec.isolating, v = d.pos - d.parentOffset, b = g && m.parent.childCount === 1 ? v === d.pos : xt.atStart(c).from === h;
         return !u || !f.type.isTextblock || f.textContent.length || !b || b && d.parent.type.name === "paragraph" ? !1 : i.clearNodes();
       }),
       () => i.deleteSelection(),
@@ -22746,15 +22746,15 @@ var Xt = class ag extends cu {
           const { empty: r, from: i, to: a } = e.selection, l = xt.atStart(e.doc).from, c = xt.atEnd(e.doc).to;
           if (r || !(i === l && a === c) || !Gr(t.doc))
             return;
-          const p = t.tr, f = Oa({
+          const h = t.tr, f = Oa({
             state: t,
-            transaction: p
+            transaction: h
           }), { commands: m } = new Da({
             editor: this.editor,
             state: f
           });
-          if (m.clearNodes(), !!p.steps.length)
-            return p;
+          if (m.clearNodes(), !!h.steps.length)
+            return h;
         }
       })
     ];
@@ -23525,8 +23525,8 @@ function vs(n) {
         if (ru(t.from, t.to, e.doc).filter((f) => f.mark.type.excluded.find((g) => g === n.type && g !== f.mark.type)).filter((f) => f.to > c).length)
           return null;
         u < t.to && r.delete(u, t.to), c > t.from && r.delete(t.from + l, c);
-        const p = t.from + l + i.length;
-        r.addMark(t.from + l, p, n.type.create(s || {})), r.removeStoredMark(n.type);
+        const h = t.from + l + i.length;
+        r.addMark(t.from + l, h, n.type.create(s || {})), r.removeStoredMark(n.type);
       }
     },
     undoable: n.undoable
@@ -23577,7 +23577,7 @@ function qs(n) {
       if (!c)
         return null;
       if (i.wrap(l, c), n.keepMarks && n.editor) {
-        const { selection: d, storedMarks: p } = e, { splittableMarks: f } = n.editor.extensionManager, m = p || d.$to.parentOffset && d.$from.marks();
+        const { selection: d, storedMarks: h } = e, { splittableMarks: f } = n.editor.extensionManager, m = h || d.$to.parentOffset && d.$from.marks();
         if (m) {
           const g = m.filter((v) => f.includes(v.type.name));
           i.ensureMarks(g);
@@ -23898,10 +23898,10 @@ function Jo(n) {
       const { tr: i } = e, a = o[o.length - 1], l = o[0];
       let c = t.to;
       if (a) {
-        const u = l.search(/\S/), d = t.from + l.indexOf(a), p = d + a.length;
+        const u = l.search(/\S/), d = t.from + l.indexOf(a), h = d + a.length;
         if (ru(t.from, t.to, e.doc).filter((g) => g.mark.type.excluded.find((b) => b === n.type && b !== g.mark.type)).filter((g) => g.to > d).length)
           return null;
-        p < t.to && i.delete(p, t.to), d > t.from && i.delete(t.from + u, d), c = t.from + u + a.length, i.addMark(t.from + u, c, n.type.create(r || {})), o.index !== void 0 && o.input !== void 0 && o.index + o[0].length >= o.input.length || i.removeStoredMark(n.type);
+        h < t.to && i.delete(h, t.to), d > t.from && i.delete(t.from + u, d), c = t.from + u + a.length, i.addMark(t.from + u, c, n.type.create(r || {})), o.index !== void 0 && o.input !== void 0 && o.index + o[0].length >= o.input.length || i.removeStoredMark(n.type);
       }
     }
   });
@@ -23962,7 +23962,7 @@ var kT = class extends vT {
         var s;
         if (!e.value || !((s = o.view.dom) != null && s.parentNode))
           return;
-        const r = h(e.value);
+        const r = p(e.value);
         e.value.append(...o.view.dom.parentNode.childNodes), o.contentComponent = t.ctx._, t && (o.appContext = {
           ...t.appContext,
           // Vue internally uses prototype chain to forward/shadow injects across the entire component chain
@@ -24093,12 +24093,12 @@ var Pi = (n, e) => {
   const c = a.child(l - 1);
   if (c.type !== e || !((t = c.lastChild) != null && t.isTextblock))
     return !1;
-  const p = r.before() - 1 - 1;
+  const h = r.before() - 1 - 1;
   return n.commands.command(({ tr: f, dispatch: m }) => {
     if (!m)
       return !0;
     const g = r.parent.content, v = new Qe(g, 0, 0);
-    return f.replace(p, r.after(), v), f.setSelection(mt.create(f.doc, p + g.size)), f.scrollIntoView(), m(f), !0;
+    return f.replace(h, r.after(), v), f.setSelection(mt.create(f.doc, h + g.size)), f.scrollIntoView(), m(f), !0;
   });
 }, MT = /^\s*>\s$/, ST = Bn.create({
   name: "blockquote",
@@ -24430,7 +24430,7 @@ ${t}
             w += f[T].length + 1;
           return a.delete(w, w + S), c - w <= S && a.setSelection(mt.create(a.doc, w)), !0;
         }) : n.commands.command(({ tr: a }) => {
-          const { from: l, to: c } = s, p = o.doc.textBetween(l, c, `
+          const { from: l, to: c } = s, h = o.doc.textBetween(l, c, `
 `, `
 `).split(`
 `).map((f) => {
@@ -24439,7 +24439,7 @@ ${t}
             return f.slice(v);
           }).join(`
 `);
-          return a.replaceWith(l, c, o.schema.text(p)), !0;
+          return a.replaceWith(l, c, o.schema.text(h)), !0;
         });
       },
       // exit node on triple enter
@@ -24564,7 +24564,7 @@ ${t}
           return e().insertContent({ type: this.name }).command(({ tr: c, dispatch: u }) => {
             if (u && l && i) {
               const d = l.filter(
-                (p) => a.includes(p.type.name)
+                (h) => a.includes(h.type.name)
               );
               c.ensureMarks(d);
             }
@@ -25003,8 +25003,8 @@ function eE(n = []) {
     [wg]: !0
   });
   Oe(d, "#"), qt(d, Ml, d), Oe(d, QT, d);
-  const p = Oe(d, ZT);
-  Oe(p, "#"), qt(p, Ml, d);
+  const h = Oe(d, ZT);
+  Oe(h, "#"), qt(h, Ml, d);
   const f = [[ko, i], [wo, s]], m = [[ko, null], [nr, a], [wo, r]];
   for (let g = 0; g < li.length; g++)
     Lo(t, li[g], lc, Mo, f);
@@ -25044,10 +25044,10 @@ function xg(n, e) {
   const t = tE(e.replace(/[A-Z]/g, (a) => a.toLowerCase())), o = t.length, s = [];
   let r = 0, i = 0;
   for (; i < o; ) {
-    let a = n, l = null, c = 0, u = null, d = -1, p = -1;
+    let a = n, l = null, c = 0, u = null, d = -1, h = -1;
     for (; i < o && (l = a.go(t[i])); )
-      a = l, a.accepts() ? (d = 0, p = 0, u = a) : d >= 0 && (d += t[i].length, p++), c += t[i].length, r += t[i].length, i++;
-    r -= d, i -= p, c -= d, s.push({
+      a = l, a.accepts() ? (d = 0, h = 0, u = a) : d >= 0 && (d += t[i].length, h++), c += t[i].length, r += t[i].length, i++;
+    r -= d, i -= h, c -= d, s.push({
       t: u.t,
       // token type/name
       v: e.slice(r - c, r),
@@ -25340,12 +25340,12 @@ function sE({
   Et(u, o, r), Et(u, n.domain, r);
   const d = jn();
   Et(c, n.domain, d), Et(d, n.domain, d);
-  const p = Oe(d, lo);
-  Et(p, n.domain, d);
+  const h = Oe(d, lo);
+  Et(h, n.domain, d);
   const f = jn(nE);
-  Et(p, n.tld, f), Et(p, n.utld, f), Oe(c, $r, f);
+  Et(h, n.tld, f), Et(h, n.utld, f), Oe(c, $r, f);
   const m = Oe(d, Wn);
-  Oe(m, Wn, m), Et(m, n.domain, d), Et(f, n.domain, d), Oe(f, lo, p), Oe(f, Wn, m);
+  Oe(m, Wn, m), Et(m, n.domain, d), Et(f, n.domain, d), Oe(f, lo, h), Oe(f, Wn, m);
   const g = Oe(i, Wn), v = Oe(i, lo);
   Oe(g, Wn, g), Et(g, n.domain, i), Et(v, o, r), Et(v, n.domain, i);
   const b = jn(ui);
@@ -25390,15 +25390,15 @@ function sE({
 function rE(n, e, t) {
   let o = t.length, s = 0, r = [], i = [];
   for (; s < o; ) {
-    let a = n, l = null, c = null, u = 0, d = null, p = -1;
+    let a = n, l = null, c = null, u = 0, d = null, h = -1;
     for (; s < o && !(l = a.go(t[s].t)); )
       i.push(t[s++]);
     for (; s < o && (c = l || a.go(t[s].t)); )
-      l = null, a = c, a.accepts() ? (p = 0, d = a) : p >= 0 && p++, s++, u++;
-    if (p < 0)
+      l = null, a = c, a.accepts() ? (h = 0, d = a) : h >= 0 && h++, s++, u++;
+    if (h < 0)
       s -= u, s < o && (i.push(t[s]), s++);
     else {
-      i.length > 0 && (r.push(Tl(Bf, e, i)), i = []), s -= p, u -= p;
+      i.length > 0 && (r.push(Tl(Bf, e, i)), i = []), s -= h, u -= h;
       const f = d.t, m = t.slice(s - u, s);
       r.push(Tl(f, e, m));
     }
@@ -25480,9 +25480,9 @@ function hE(n) {
           c,
           (f) => f.isTextblock
         );
-        let d, p;
+        let d, h;
         if (u.length > 1)
-          d = u[0], p = o.doc.textBetween(
+          d = u[0], h = o.doc.textBetween(
             d.pos,
             d.pos + d.node.nodeSize,
             void 0,
@@ -25492,18 +25492,18 @@ function hE(n) {
           const f = o.doc.textBetween(c.from, c.to, " ", " ");
           if (!dE.test(f))
             return;
-          d = u[0], p = o.doc.textBetween(
+          d = u[0], h = o.doc.textBetween(
             d.pos,
             c.to,
             void 0,
             " "
           );
         }
-        if (d && p) {
-          const f = p.split(uE).filter(Boolean);
+        if (d && h) {
+          const f = h.split(uE).filter(Boolean);
           if (f.length <= 0)
             return !1;
-          const m = f[f.length - 1], g = d.pos + p.lastIndexOf(m);
+          const m = f[f.length - 1], g = d.pos + h.lastIndexOf(m);
           if (!m)
             return !1;
           const v = vu(m).map(
@@ -26004,15 +26004,15 @@ var CE = ks.create({
   const d = n.doc.resolve(s.after()).nodeAfter;
   if (!d || !t.includes(d.type.name))
     return null;
-  const p = [];
+  const h = [];
   return d.forEach((f) => {
-    p.push(f);
-  }), p.length === 0 ? null : {
+    h.push(f);
+  }), h.length === 0 ? null : {
     listItemDepth: r,
     nestedList: d,
     nestedListPos: s.after(),
     insertPos: s.after(r),
-    items: p
+    items: h
   };
 }, TE = (n, e, t, o) => {
   const s = xE(n, t, o);
@@ -26358,7 +26358,7 @@ var Va = (n, e) => {
   if (!a.canReplace(a.childCount, a.childCount, Ee.from(l)))
     return !1;
   const c = r.before(), u = r.after(), d = c - 2;
-  return n.commands.command(({ tr: p, dispatch: f }) => (f && (p.delete(c, u).insert(d, Ee.from(l)), p.setSelection(mt.create(p.doc, d + 1)), p.scrollIntoView()), !0));
+  return n.commands.command(({ tr: h, dispatch: f }) => (f && (h.delete(c, u).insert(d, Ee.from(l)), h.setSelection(mt.create(h.doc, d + 1)), h.scrollIntoView()), !0));
 }, FE = (n, e) => {
   var t;
   const { $anchor: o } = e.selection, s = e.doc.resolve(o.pos - o.parentOffset - 2);
@@ -26476,7 +26476,7 @@ function JE(n) {
     const s = n[t], r = s.match(pc);
     if (!r)
       break;
-    const [, i, a, l, c] = r, u = i.length, d = parseInt(a, 10), p = isNaN(d) ? Ga(a) : void 0, f = isNaN(d) ? ku(a) : d, m = [c];
+    const [, i, a, l, c] = r, u = i.length, d = parseInt(a, 10), h = isNaN(d) ? Ga(a) : void 0, f = isNaN(d) ? ku(a) : d, m = [c];
     let g = t + 1;
     const v = [s];
     let b = !1;
@@ -26498,7 +26498,7 @@ function JE(n) {
     e.push({
       indent: u,
       number: f,
-      type: p,
+      type: h,
       content: m.join(`
 `).trim(),
       contentLines: m,
@@ -26561,18 +26561,18 @@ function jg(n, e, t) {
         c.push(...f);
       }
       let d = s + 1;
-      const p = [];
+      const h = [];
       for (; d < n.length && n[d].indent > e; )
-        p.push(n[d]), d += 1;
-      if (p.length > 0) {
-        const f = Math.min(...p.map((g) => g.indent)), m = jg(p, f, t);
+        h.push(n[d]), d += 1;
+      if (h.length > 0) {
+        const f = Math.min(...h.map((g) => g.indent)), m = jg(h, f, t);
         c.push({
           type: "list",
           ordered: !0,
-          start: p[0].number,
-          typeMarker: p[0].type,
+          start: h[0].number,
+          typeMarker: h[0].type,
           items: m,
-          raw: p.map((g) => g.raw).join(`
+          raw: h.map((g) => g.raw).join(`
 `)
         });
       }
@@ -26885,15 +26885,15 @@ var Wg = Bn.create({
       const s = document.createElement("li"), r = document.createElement("label"), i = document.createElement("span"), a = document.createElement("input"), l = document.createElement("div");
       i.style.cssText = tA;
       const c = (d) => {
-        const p = nA(d, d.attrs.checked, this.options.a11y);
-        a.setAttribute("aria-label", p), i.textContent = p;
+        const h = nA(d, d.attrs.checked, this.options.a11y);
+        a.setAttribute("aria-label", h), i.textContent = h;
       };
       c(n), r.contentEditable = "false", a.type = "checkbox", a.addEventListener("mousedown", (d) => d.preventDefault()), a.addEventListener("change", (d) => {
         if (!o.isEditable && !this.options.onReadOnlyChecked) {
           a.checked = !a.checked;
           return;
         }
-        const { checked: p } = d.target;
+        const { checked: h } = d.target;
         o.isEditable && typeof t == "function" && o.chain().focus(void 0, { scrollIntoView: !1 }).command(({ tr: f }) => {
           const m = t();
           if (typeof m != "number")
@@ -26901,13 +26901,13 @@ var Wg = Bn.create({
           const g = f.doc.nodeAt(m);
           return f.setNodeMarkup(m, void 0, {
             ...g == null ? void 0 : g.attrs,
-            checked: p
+            checked: h
           }), !0;
-        }).run(), !o.isEditable && this.options.onReadOnlyChecked && (this.options.onReadOnlyChecked(n, p) || (a.checked = !a.checked));
-      }), Object.entries(this.options.HTMLAttributes).forEach(([d, p]) => {
-        s.setAttribute(d, p);
-      }), s.dataset.checked = n.attrs.checked, a.checked = n.attrs.checked, r.append(a, i), s.append(r, l), Object.entries(e).forEach(([d, p]) => {
-        s.setAttribute(d, p);
+        }).run(), !o.isEditable && this.options.onReadOnlyChecked && (this.options.onReadOnlyChecked(n, h) || (a.checked = !a.checked));
+      }), Object.entries(this.options.HTMLAttributes).forEach(([d, h]) => {
+        s.setAttribute(d, h);
+      }), s.dataset.checked = n.attrs.checked, a.checked = n.attrs.checked, r.append(a, i), s.append(r, l), Object.entries(e).forEach(([d, h]) => {
+        s.setAttribute(d, h);
       });
       let u = new Set(Object.keys(e));
       return {
@@ -26917,7 +26917,7 @@ var Wg = Bn.create({
           if (d.type !== this.type)
             return !1;
           s.dataset.checked = d.attrs.checked, a.checked = d.attrs.checked, c(d);
-          const p = o.extensionManager.attributes, f = Ks(d, p), m = new Set(Object.keys(f)), g = this.options.HTMLAttributes;
+          const h = o.extensionManager.attributes, f = Ks(d, h), m = new Set(Object.keys(f)), g = this.options.HTMLAttributes;
           return u.forEach((v) => {
             m.has(v) || (v in g ? s.setAttribute(v, g[v]) : s.removeAttribute(v));
           }), Object.entries(f).forEach(([v, b]) => {
@@ -27270,20 +27270,20 @@ class fA {
   updateOverlay() {
     let e = this.editorView.state.doc.resolve(this.cursorPos), t = !e.parent.inlineContent, o, s = this.editorView.dom, r = s.getBoundingClientRect(), i = r.width / s.offsetWidth, a = r.height / s.offsetHeight;
     if (t) {
-      let d = e.nodeBefore, p = e.nodeAfter;
-      if (d || p) {
+      let d = e.nodeBefore, h = e.nodeAfter;
+      if (d || h) {
         let f = this.editorView.nodeDOM(this.cursorPos - (d ? d.nodeSize : 0));
         if (f) {
           let m = f.getBoundingClientRect(), g = d ? m.bottom : m.top;
-          d && p && (g = (g + this.editorView.nodeDOM(this.cursorPos).getBoundingClientRect().top) / 2);
+          d && h && (g = (g + this.editorView.nodeDOM(this.cursorPos).getBoundingClientRect().top) / 2);
           let v = this.width / 2 * a;
           o = { left: m.left, right: m.right, top: g - v, bottom: g + v };
         }
       }
     }
     if (!o) {
-      let d = this.editorView.coordsAtPos(this.cursorPos), p = this.width / 2 * i;
-      o = { left: d.left - p, right: d.left + p, top: d.top, bottom: d.bottom };
+      let d = this.editorView.coordsAtPos(this.cursorPos), h = this.width / 2 * i;
+      o = { left: d.left - h, right: d.left + h, top: d.top, bottom: d.bottom };
     }
     let l = this.editorView.dom.offsetParent;
     this.element || (this.element = l.appendChild(document.createElement("div")), this.class && (this.element.className = this.class), this.element.style.cssText = "position: absolute; z-index: 50; pointer-events: none;", this.color && (this.element.style.backgroundColor = this.color)), this.element.classList.toggle("prosemirror-dropcursor-block", t), this.element.classList.toggle("prosemirror-dropcursor-inline", !t);
@@ -27291,8 +27291,8 @@ class fA {
     if (!l || l == document.body && getComputedStyle(l).position == "static")
       c = -pageXOffset, u = -pageYOffset;
     else {
-      let d = l.getBoundingClientRect(), p = d.width / l.offsetWidth, f = d.height / l.offsetHeight;
-      c = d.left - l.scrollLeft * p, u = d.top - l.scrollTop * f;
+      let d = l.getBoundingClientRect(), h = d.width / l.offsetWidth, f = d.height / l.offsetHeight;
+      c = d.left - l.scrollLeft * h, u = d.top - l.scrollTop * f;
     }
     this.element.style.left = (o.left - c) / i + "px", this.element.style.top = (o.top - u) / a + "px", this.element.style.width = (o.right - o.left) / i + "px", this.element.style.height = (o.bottom - o.top) / a + "px";
   }
@@ -27639,9 +27639,9 @@ class to {
     let s, r;
     t && (s = this.remapping(o, this.items.length), r = s.maps.length);
     let i = e.tr, a, l, c = [], u = [];
-    return this.items.forEach((d, p) => {
+    return this.items.forEach((d, h) => {
       if (!d.step) {
-        s || (s = this.remapping(o, p + 1), r = s.maps.length), r--, u.push(d);
+        s || (s = this.remapping(o, h + 1), r = s.maps.length), r--, u.push(d);
         return;
       }
       if (s) {
@@ -27658,8 +27658,8 @@ class to {
   addTransform(e, t, o, s) {
     let r = [], i = this.eventCount, a = this.items, l = !s && a.length ? a.get(a.length - 1) : null;
     for (let u = 0; u < e.steps.length; u++) {
-      let d = e.steps[u].invert(e.docs[u]), p = new uo(e.mapping.maps[u], d, t), f;
-      (f = l && l.merge(p)) && (p = f, u ? r.pop() : a = a.slice(0, a.length - 1)), r.push(p), t && (i++, t = void 0), s || (l = p);
+      let d = e.steps[u].invert(e.docs[u]), h = new uo(e.mapping.maps[u], d, t), f;
+      (f = l && l.merge(h)) && (h = f, u ? r.pop() : a = a.slice(0, a.length - 1)), r.push(h), t && (i++, t = void 0), s || (l = h);
     }
     let c = i - o.depth;
     return c > CA && (a = _A(a, c), i -= c), new to(a.append(r), i);
@@ -27682,25 +27682,25 @@ class to {
     if (!this.eventCount)
       return this;
     let o = [], s = Math.max(0, this.items.length - t), r = e.mapping, i = e.steps.length, a = this.eventCount;
-    this.items.forEach((p) => {
-      p.selection && a--;
+    this.items.forEach((h) => {
+      h.selection && a--;
     }, s);
     let l = t;
-    this.items.forEach((p) => {
+    this.items.forEach((h) => {
       let f = r.getMirror(--l);
       if (f == null)
         return;
       i = Math.min(i, f);
       let m = r.maps[f];
-      if (p.step) {
-        let g = e.steps[f].invert(e.docs[f]), v = p.selection && p.selection.map(r.slice(l + 1, f));
+      if (h.step) {
+        let g = e.steps[f].invert(e.docs[f]), v = h.selection && h.selection.map(r.slice(l + 1, f));
         v && a++, o.push(new uo(m, g, v));
       } else
         o.push(new uo(m));
     }, s);
     let c = [];
-    for (let p = t; p < i; p++)
-      c.push(new uo(r.maps[p]));
+    for (let h = t; h < i; h++)
+      c.push(new uo(r.maps[h]));
     let u = this.items.slice(0, s).append(c).append(o), d = new to(u, a);
     return d.emptyItemCount() > wA && (d = d.compress(this.items.length - o.length)), d;
   }
@@ -27726,8 +27726,8 @@ class to {
         if (o--, c && t.appendMap(c, o), l) {
           let u = i.selection && i.selection.map(t.slice(o));
           u && r++;
-          let d = new uo(c.invert(), l, u), p, f = s.length - 1;
-          (p = s.length && s[f].merge(d)) ? s[f] = p : s.push(d);
+          let d = new uo(c.invert(), l, u), h, f = s.length - 1;
+          (h = s.length && s[f].merge(d)) ? s[f] = h : s.push(d);
         }
       } else i.map && o--;
     }, this.items.length, 0), new to(mn.from(s.reverse()), r);
@@ -28038,13 +28038,13 @@ function tv({
 }) {
   const { anchor: a } = s, l = [], c = n.isEmpty;
   return o.nodesBetween(r, i, (u, d) => {
-    const p = a >= d && a <= d + u.nodeSize, f = !u.isLeaf && Gr(u);
-    return u.type.isTextblock && (p || !e.showOnlyCurrent) && f && l.push(
+    const h = a >= d && a <= d + u.nodeSize, f = !u.isLeaf && Gr(u);
+    return u.type.isTextblock && (h || !e.showOnlyCurrent) && f && l.push(
       Zg({
         editor: n,
         isEmptyDoc: c,
         dataAttribute: t,
-        hasAnchor: p,
+        hasAnchor: h,
         placeholder: e.placeholder,
         classes: {
           emptyEditor: e.emptyEditorClass,
@@ -28052,7 +28052,7 @@ function tv({
             editor: n,
             node: u,
             pos: d,
-            hasAnchor: p
+            hasAnchor: h
           })
         },
         node: u,
@@ -28072,9 +28072,9 @@ function nv({
     return null;
   const { anchor: i } = s, a = [], l = n.isEmpty;
   if (e.showOnlyCurrent && !e.includeChildren) {
-    const u = o.resolve(i), d = u.depth > 0 ? u.node(1) : u.nodeAfter, p = u.depth > 0 ? u.before(1) : i;
+    const u = o.resolve(i), d = u.depth > 0 ? u.node(1) : u.nodeAfter, h = u.depth > 0 ? u.before(1) : i;
     if (d && d.type.isTextblock && Gr(d)) {
-      const f = i >= p && i <= p + d.nodeSize;
+      const f = i >= h && i <= h + d.nodeSize;
       a.push(
         Zg({
           editor: n,
@@ -28087,12 +28087,12 @@ function nv({
             emptyNode: ev(e.emptyNodeClass, {
               editor: n,
               node: d,
-              pos: p,
+              pos: h,
               hasAnchor: f
             })
           },
           node: d,
-          pos: p
+          pos: h
         })
       );
     }
@@ -28196,7 +28196,7 @@ function DA({
   for (const l of e) {
     const { from: c, to: u } = OA(l.from, l.to, r), d = a.find(c, u).filter((f) => f.from >= c && f.to <= u);
     d.length && (a = a.remove(d));
-    const p = tv({
+    const h = tv({
       editor: t,
       options: o,
       dataAttribute: s,
@@ -28205,7 +28205,7 @@ function DA({
       from: c,
       to: u
     });
-    p.length && (a = a.add(r, p));
+    h.length && (a = a.add(r, h));
   }
   return a;
 }
@@ -28346,9 +28346,9 @@ var VA = Xt.create({
       new jt({
         key: e,
         appendTransaction: (s, r, i) => {
-          const { doc: a, tr: l, schema: c } = i, u = e.getState(i), d = a.content.size, p = c.nodes[t];
+          const { doc: a, tr: l, schema: c } = i, u = e.getState(i), d = a.content.size, h = c.nodes[t];
           if (!s.some((f) => f.getMeta(GA)) && u)
-            return l.insert(d, p.create());
+            return l.insert(d, h.create());
         },
         state: {
           init: (s, r) => {
@@ -28476,14 +28476,14 @@ var VA = Xt.create({
           }
       }), u.src !== null && (c.src = u.src);
       let d = { ...a };
-      const p = (v) => {
+      const h = (v) => {
         if (typeof v == "string" && v !== "") {
           c.getAttribute("src") !== v && (c.src = v);
           return;
         }
         c.hasAttribute("src") && c.removeAttribute("src"), c.src !== "" && (c.src = "");
       };
-      p(a.src);
+      h(a.src);
       const f = (v) => {
         if (v.type !== r.type)
           return !1;
@@ -28494,7 +28494,7 @@ var VA = Xt.create({
           !s.has(S) && !(S in M) && c.removeAttribute(S);
         }), Object.entries(M).forEach(([S, w]) => {
           s.has(S) || (w != null ? c.setAttribute(S, w) : c.removeAttribute(S));
-        }), p(M.src), d = M, !0;
+        }), h(M.src), d = M, !0;
       }, m = new bT({
         element: c,
         editor: l,
@@ -28574,7 +28574,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       var he;
       return ((he = o.config) == null ? void 0 : he.style) ?? "toolbar-top";
     }), l = x(null), c = x(), u = x(), d = x(!1);
-    let p = null;
+    let h = null;
     const f = k(() => {
       var he;
       return !i.value && ((he = o.config) == null ? void 0 : he.expandable) !== !1;
@@ -28618,7 +28618,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       };
     }), M = k(() => {
       var he;
-      return ((he = o.config) == null ? void 0 : he.showSendButton) !== !1;
+      return ((he = o.config) == null ? void 0 : he.showSendButton) ?? !i.value;
     }), S = x(!1), w = x(-1), I = x([]);
     let T = null, R = !1;
     function $() {
@@ -28677,7 +28677,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     }
     function P() {
       var he;
-      d.value ? (l.value = p, d.value = !1) : (p = l.value, l.value = z(), d.value = !0), s("expand-change", d.value), (he = E.value) == null || he.commands.focus();
+      d.value ? (l.value = h, d.value = !1) : (h = l.value, l.value = z(), d.value = !0), s("expand-change", d.value), (he = E.value) == null || he.commands.focus();
     }
     const F = x(!1);
     function B(he) {
@@ -28767,7 +28767,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "rich-input__tool-btn",
           onClick: Me
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "circle/face",
             size: 22
           })
@@ -28777,7 +28777,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "rich-input__tool-btn",
           onClick: Ie[0] || (Ie[0] = (He) => V("image"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "rect/img",
             size: 22
           })
@@ -28787,7 +28787,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "rich-input__tool-btn",
           onClick: Ie[1] || (Ie[1] = (He) => V("video"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "rect/triangle",
             size: 22
           })
@@ -28797,7 +28797,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "rich-input__tool-btn",
           onClick: Ie[2] || (Ie[2] = (He) => V("file"))
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "file/empty",
             size: 22
           })
@@ -28807,7 +28807,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "rich-input__tool-btn",
           onClick: Y
         }, [
-          j(h(De), {
+          j(p(De), {
             name: (S.value, "mic"),
             size: 22
           }, null, 8, ["name"])
@@ -28820,19 +28820,19 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         f.value ? (y(), C("div", {
           key: 5,
           class: "rich-input__tool-btn rich-input__expand-btn",
-          title: d.value ? h(r)("chat.input.collapse", "收起输入框") : h(r)("chat.input.expand", "展开输入框"),
+          title: d.value ? p(r)("chat.input.collapse", "收起输入框") : p(r)("chat.input.expand", "展开输入框"),
           onClick: P
         }, [
-          j(h(De), {
+          j(p(De), {
             name: d.value ? "chevron/up" : "chevron/down",
             size: 22
           }, null, 8, ["name"])
         ], 8, QA)) : U("", !0)
       ]),
       _("div", ZA, [
-        S.value ? (y(), C("div", n$, D(S.value ? h(r)("chat.voice.releaseEnd") : h(r)("chat.voice.holdTalk")), 1)) : (y(), C("div", e$, [
-          j(h(wT), { editor: h(E) }, null, 8, ["editor"]),
-          F.value ? U("", !0) : (y(), C("div", t$, D(h(r)("chat.placeholder")), 1)),
+        S.value ? (y(), C("div", n$, D(S.value ? p(r)("chat.voice.releaseEnd") : p(r)("chat.voice.holdTalk")), 1)) : (y(), C("div", e$, [
+          j(p(wT), { editor: p(E) }, null, 8, ["editor"]),
+          F.value ? U("", !0) : (y(), C("div", t$, D(p(r)("chat.placeholder")), 1)),
           m.value ? (y(), C("div", {
             key: 1,
             ref_key: "resizeHandleRef",
@@ -28848,14 +28848,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         }, void 0, !0)
       ])) : U("", !0),
       M.value ? (y(), C("div", s$, [
-        j(h(pn), {
+        j(p(pn), {
           type: "primary",
           size: "small",
           disabled: !F.value,
           onClick: L
         }, {
           default: J(() => [
-            ht(D(h(r)("chat.send")), 1)
+            ht(D(p(r)("chat.send")), 1)
           ]),
           _: 1
         }, 8, ["disabled"])
@@ -28885,7 +28885,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       }, null, 544)
     ], 6));
   }
-}), ov = /* @__PURE__ */ Pe(r$, [["__scopeId", "data-v-465c05b1"]]), i$ = { class: "editing-bar" }, a$ = { class: "editing-bar__text" }, l$ = { class: "editing-bar__title" }, c$ = { class: "editing-bar__preview" }, u$ = /* @__PURE__ */ Ne({
+}), ov = /* @__PURE__ */ Pe(r$, [["__scopeId", "data-v-0de9dd5c"]]), i$ = { class: "editing-bar" }, a$ = { class: "editing-bar__text" }, l$ = { class: "editing-bar__title" }, c$ = { class: "editing-bar__preview" }, u$ = /* @__PURE__ */ Ne({
   __name: "editing-bar",
   props: {
     message: {}
@@ -28897,21 +28897,21 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       o("close");
     }
     return (a, l) => (y(), C("div", i$, [
-      j(h(De), {
+      j(p(De), {
         class: "editing-bar__icon",
         name: "rect/pencil",
         size: 14
       }),
       _("div", a$, [
-        _("span", l$, D(h(s)("message.editing")), 1),
+        _("span", l$, D(p(s)("message.editing")), 1),
         _("span", c$, D(r.value), 1)
       ]),
-      j(h(At), {
+      j(p(At), {
         class: "editing-bar__close",
         icon: "xmark/bold",
         size: "small",
         variant: "ghost",
-        title: h(s)("message.editing.cancel"),
+        title: p(s)("message.editing.cancel"),
         onClick: Ct(i, ["stop"])
       }, null, 8, ["title"])
     ]));
@@ -28933,7 +28933,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     ka((me) => ({
       v04b063f3: E.value
     }));
-    const o = n, s = t, r = Vt("UIKit:Index"), { sendTextMessage: i, sendImageMessage: a, sendFileMessage: l, sendAudioMessage: c, sendVideoMessage: u, sendCmdMessage: d, currentConversation: p, editingMessage: f, exitEditMode: m, modifyTextMessage: g } = xa(), { features: v, capabilities: b } = pt(), { quotedMessage: M, clearQuote: S, buildQuoteExt: w } = Ta(), { isMobile: I } = En(), { show: T } = Kt(), { t: R } = et(), $ = k(() => {
+    const o = n, s = t, r = Vt("UIKit:Index"), { sendTextMessage: i, sendImageMessage: a, sendFileMessage: l, sendAudioMessage: c, sendVideoMessage: u, sendCmdMessage: d, currentConversation: h, editingMessage: f, exitEditMode: m, modifyTextMessage: g } = xa(), { features: v, capabilities: b } = pt(), { quotedMessage: M, clearQuote: S, buildQuoteExt: w } = Ta(), { isMobile: I } = En(), { show: T } = Kt(), { t: R } = et(), $ = k(() => {
       var me;
       return (me = o.config) == null ? void 0 : me.input;
     }), E = k(() => {
@@ -28943,7 +28943,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     function z() {
       if (v.enableTyping === !1)
         return;
-      const me = p.value;
+      const me = h.value;
       !me || me.type !== ut.SINGLECHAT || d("TypingBegin");
     }
     const P = k(() => {
@@ -29243,27 +29243,27 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       ref_key: "messageInputRef",
       ref: Me,
       class: $e(["message-input", {
-        "message-input--mobile": h(I),
-        "message-input--simple-pc": !h(I) && N.value === "simple",
-        "message-input--simple-dragged": !h(I) && N.value === "simple" && We.value
+        "message-input--mobile": p(I),
+        "message-input--simple-pc": !p(I) && N.value === "simple",
+        "message-input--simple-dragged": !p(I) && N.value === "simple" && We.value
       }]),
-      style: Pt(!h(I) && o.keyboardHeight ? { paddingBottom: `${o.keyboardHeight}px` } : void 0)
+      style: Pt(!p(I) && o.keyboardHeight ? { paddingBottom: `${o.keyboardHeight}px` } : void 0)
     }, [
       o.muted ? (y(), C("div", f$, [
-        _("span", p$, D(h(R)("chat.input.mutedAll", "全员禁言中")), 1)
+        _("span", p$, D(p(R)("chat.input.mutedAll", "全员禁言中")), 1)
       ])) : U("", !0),
-      h(f) ? (y(), re(d$, {
+      p(f) ? (y(), re(d$, {
         key: 1,
-        message: h(f),
+        message: p(f),
         onClose: ke
       }, null, 8, ["message"])) : U("", !0),
-      !h(f) && h(M) && !Te.value ? (y(), re(yd, {
+      !p(f) && p(M) && !Te.value ? (y(), re(yd, {
         key: 2,
         class: $e({ "message-input__quote--corner": Fe.value }),
-        message: h(M),
-        onClose: h(S)
+        message: p(M),
+        onClose: p(S)
       }, null, 8, ["class", "message", "onClose"])) : U("", !0),
-      h(I) ? (y(), re(RC, {
+      p(I) ? (y(), re(RC, {
         key: 3,
         ref_key: "h5InputRef",
         ref: Y,
@@ -29341,29 +29341,29 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         ]),
         _: 3
       }, 8, ["config", "enable-mention", "mention-open"])),
-      !h(f) && h(M) && Te.value ? (y(), re(yd, {
+      !p(f) && p(M) && Te.value ? (y(), re(yd, {
         key: 6,
-        message: h(M),
-        onClose: h(S)
+        message: p(M),
+        onClose: p(S)
       }, null, 8, ["message", "onClose"])) : U("", !0),
       Fe.value ? (y(), C("div", {
         key: 7,
         class: "message-input__expand-btn",
-        title: ue.value ? h(R)("chat.input.collapse", "收起输入框") : h(R)("chat.input.expand", "展开输入框"),
+        title: ue.value ? p(R)("chat.input.collapse", "收起输入框") : p(R)("chat.input.expand", "展开输入框"),
         onClick: Je
       }, [
-        j(h(De), {
+        j(p(De), {
           class: "message-input__expand-icon message-input__expand-icon--default",
           name: "polyline/topright",
           size: 24
         }),
-        j(h(De), {
+        j(p(De), {
           class: "message-input__expand-icon message-input__expand-icon--hover",
           name: ue.value ? "polyline/singularity" : "polyline/spread",
           size: 24
         }, null, 8, ["name"])
       ], 8, h$)) : U("", !0),
-      h(I) ? U("", !0) : (y(), re(h(Wt), {
+      p(I) ? U("", !0) : (y(), re(p(Wt), {
         key: 8,
         show: L.value,
         anchor: fe.value,
@@ -29374,7 +29374,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       }, {
         default: J(() => [
           _("div", m$, [
-            j(h(vc), {
+            j(p(vc), {
               show: !0,
               "sticker-packs": K.value,
               recent: X.value.recent,
@@ -29439,7 +29439,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       const g = (v = r.value) == null ? void 0 : v.id;
       return g ? s.message.getPinnedMessages(g) || [] : [];
     }), c = x(!1), u = x(0), d = k(() => l.value[u.value] || l.value[0]);
-    function p(g) {
+    function h(g) {
       o("locate", g);
     }
     async function f(g, v) {
@@ -29458,23 +29458,23 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "pinned-bar__list-header",
           onClick: m
         }, [
-          j(h(De), {
+          j(p(De), {
             class: "pinned-bar__icon",
             name: "pin",
             size: 14
           }),
-          _("span", null, D(h(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1),
-          j(h(De), {
+          _("span", null, D(p(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1),
+          j(p(De), {
             name: "chevron/up",
             size: 12
           })
         ]),
-        (y(!0), C(Ae, null, ot(l.value, (b) => (y(), re(h(Bt), {
+        (y(!0), C(Ae, null, ot(l.value, (b) => (y(), re(p(Bt), {
           key: b.msgServerId || b.msgLocalId,
           class: "pinned-bar__item",
           "auto-height": "",
           border: "bottom",
-          onClick: (M) => p(b)
+          onClick: (M) => h(b)
         }, {
           default: J(() => [
             _("div", M$, [
@@ -29485,12 +29485,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             ])
           ]),
           trailing: J(() => [
-            j(h(At), {
+            j(p(At), {
               class: "pinned-bar__action",
               icon: "xmark/light",
               size: "small",
               variant: "ghost",
-              title: h(a)("message.action.unpin"),
+              title: p(a)("message.action.unpin"),
               onClick: (M) => f(b, M)
             }, null, 8, ["title", "onClick"])
           ]),
@@ -29499,9 +29499,9 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       ])) : (y(), C("div", {
         key: 0,
         class: "pinned-bar__row",
-        onClick: v[1] || (v[1] = (b) => d.value && p(d.value))
+        onClick: v[1] || (v[1] = (b) => d.value && h(d.value))
       }, [
-        j(h(De), {
+        j(p(De), {
           class: "pinned-bar__icon",
           name: "pin",
           size: 14
@@ -29517,14 +29517,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           key: 0,
           class: "pinned-bar__count",
           onClick: Ct(m, ["stop"])
-        }, D(h(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1)) : U("", !0),
-        d.value ? (y(), re(h(At), {
+        }, D(p(a)("chat.pinnedBar.count").replace("{count}", String(l.value.length))), 1)) : U("", !0),
+        d.value ? (y(), re(p(At), {
           key: 1,
           class: "pinned-bar__action",
           icon: "xmark/light",
           size: "small",
           variant: "ghost",
-          title: h(a)("message.action.unpin"),
+          title: p(a)("message.action.unpin"),
           onClick: v[0] || (v[0] = (b) => f(d.value, b))
         }, null, 8, ["title"])) : U("", !0)
       ]))
@@ -29554,13 +29554,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       class: $e(["group-announcement-banner", { "is-collapsed": r.value }])
     }, [
       _("div", x$, [
-        j(h(De), {
+        j(p(De), {
           class: "group-announcement-banner__icon",
           name: "board",
           size: 14
         }),
         _("div", T$, [
-          _("div", E$, D(h(t)("chat.announcementBanner.title", "群公告")), 1),
+          _("div", E$, D(p(t)("chat.announcementBanner.title", "群公告")), 1),
           _("div", {
             ref_key: "textRef",
             ref: a,
@@ -29571,10 +29571,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       i.value ? (y(), C("button", {
         key: 0,
         class: "group-announcement-banner__toggle",
-        title: r.value ? h(t)("chat.announcementBanner.expand", "展开") : h(t)("chat.announcementBanner.collapse", "收起"),
-        onClick: d[0] || (d[0] = (p) => r.value = !r.value)
+        title: r.value ? p(t)("chat.announcementBanner.expand", "展开") : p(t)("chat.announcementBanner.collapse", "收起"),
+        onClick: d[0] || (d[0] = (h) => r.value = !r.value)
       }, [
-        j(h(De), {
+        j(p(De), {
           name: r.value ? "chevron/down" : "chevron/up",
           size: 14
         }, null, 8, ["name"])
@@ -29602,19 +29602,19 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       if (c.length <= u)
         return c;
       const d = c.lastIndexOf(".");
-      let p = c, f = "";
-      if (d > 0 && d < c.length - 1 && (f = c.slice(d), p = c.slice(0, d)), p.length + f.length <= u)
+      let h = c, f = "";
+      if (d > 0 && d < c.length - 1 && (f = c.slice(d), h = c.slice(0, d)), h.length + f.length <= u)
         return c;
       const m = "...", g = u - f.length - m.length;
       if (g <= 0)
         return `${c.slice(0, u - m.length)}${m}`;
       const v = Math.max(1, Math.floor(g / 2));
-      return `${p.slice(0, v)}${m}${p.slice(-v)}${f}`;
+      return `${h.slice(0, v)}${m}${h.slice(-v)}${f}`;
     }
     function l(c) {
       o("more", t.file, c);
     }
-    return (c, u) => (y(), re(h(Bt), {
+    return (c, u) => (y(), re(p(Bt), {
       class: "shared-file-list__item",
       "auto-height": "",
       clickable: !1,
@@ -29622,7 +29622,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       onClick: l
     }, {
       leading: J(() => [
-        j(h(De), {
+        j(p(De), {
           name: "doc",
           size: 18,
           class: "shared-file-list__icon"
@@ -29633,7 +29633,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "shared-file-list__more-btn",
           onClick: Ct(l, ["stop"])
         }, [
-          j(h(De), {
+          j(p(De), {
             name: "vertical",
             size: 20
           })
@@ -29652,7 +29652,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                 ht(D(i(t.file.fileSize)), 1)
               ], 64)) : U("", !0),
               t.file.fileOwner ? (y(), C(Ae, { key: 1 }, [
-                ht(D(h(r) || ((d = t.file.fileOwner) == null ? void 0 : d.userId)), 1)
+                ht(D(p(r) || ((d = t.file.fileOwner) == null ? void 0 : d.userId)), 1)
               ], 64)) : U("", !0)
             ])
           ])
@@ -29676,7 +29676,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       uploadGroupSharedFile: c,
       deleteGroupSharedFile: u,
       downloadGroupSharedFile: d
-    } = ln(), p = x(!1), f = x(!1), m = x([]), g = x(null), v = x(!1), b = x(!1), M = x(), S = x(null), w = k(() => {
+    } = ln(), h = x(!1), f = x(!1), m = x([]), g = x(null), v = x(!1), b = x(!1), M = x(), S = x(null), w = k(() => {
       if (!S.value)
         return [];
       const V = [
@@ -29693,7 +29693,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     });
     async function $() {
       if (t.groupId) {
-        p.value = !0;
+        h.value = !0;
         try {
           const V = await l(t.groupId);
           o.warn("[SharedFileList] load result:", V);
@@ -29702,7 +29702,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         } catch (V) {
           o.warn("[SharedFileList] load failed:", nt(V));
         } finally {
-          p.value = !1;
+          h.value = !1;
         }
       }
     }
@@ -29840,10 +29840,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         class: "shared-file-list__file-input",
         onChange: P
       }, null, 544),
-      p.value ? (y(), C("div", z$, D(h(s)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(h(Ht), {
+      h.value ? (y(), C("div", z$, D(p(s)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(p(Ht), {
         key: 1,
         icon: "folder",
-        description: h(s)("group.sharedFile.empty", "暂无群文件"),
+        description: p(s)("group.sharedFile.empty", "暂无群文件"),
         size: "small"
       }, null, 8, ["description"])) : U("", !0),
       (y(!0), C(Ae, null, ot(m.value, (Y) => (y(), re(B$, {
@@ -29852,13 +29852,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         border: t.border,
         onMore: (Me, ce) => fe(Me, ce)
       }, null, 8, ["file", "border", "onMore"]))), 128)),
-      j(h(Nr), {
+      j(p(Nr), {
         show: v.value,
         "onUpdate:show": ne[0] || (ne[0] = (Y) => v.value = Y),
         actions: w.value,
         onSelect: G
       }, null, 8, ["show", "actions"]),
-      j(h(Wt), {
+      j(p(Wt), {
         show: b.value,
         anchor: M.value,
         placement: "bottom",
@@ -29873,12 +29873,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             _("div", {
               class: "shared-file-list__context-menu-item",
               onClick: ne[1] || (ne[1] = Ct((Y) => A("download"), ["stop"]))
-            }, D(h(s)("group.sharedFile.download", "下载")), 1),
+            }, D(p(s)("group.sharedFile.download", "下载")), 1),
             S.value && K(S.value) ? (y(), C("div", {
               key: 0,
               class: "shared-file-list__context-menu-item is-danger",
               onClick: ne[2] || (ne[2] = Ct((Y) => A("delete"), ["stop"]))
-            }, D(h(s)("group.sharedFile.delete", "删除")), 1)) : U("", !0)
+            }, D(p(s)("group.sharedFile.delete", "删除")), 1)) : U("", !0)
           ])
         ]),
         _: 1
@@ -29893,12 +29893,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   setup(n) {
     const e = n, { displayName: t, avatarUrl: o } = en(() => e.member.userId);
     return (s, r) => (y(), C("div", H$, [
-      j(h(Dt), {
-        name: h(t),
-        src: h(o),
+      j(p(Dt), {
+        name: p(t),
+        src: p(o),
         size: 48
       }, null, 8, ["name", "src"]),
-      _("span", G$, D(h(t)), 1)
+      _("span", G$, D(p(t)), 1)
     ]));
   }
 }), j$ = /* @__PURE__ */ Pe(V$, [["__scopeId", "data-v-ee01ef9e"]]), W$ = { class: "group-member-list__info" }, K$ = { class: "group-member-list__name-row" }, q$ = { class: "group-member-list__name" }, J$ = {
@@ -29947,7 +29947,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         return [{ text: q, hit: !1 }];
       const ie = [];
       return G > 0 && ie.push({ text: q.slice(0, G), hit: !1 }), ie.push({ text: q.slice(G, G + A.length), hit: !0 }), G + A.length < q.length && ie.push({ text: q.slice(G + A.length), hit: !1 }), ie;
-    }), d = k(() => t.currentUserRole === dt.OWNER), p = k(() => t.currentUserRole === dt.ADMIN);
+    }), d = k(() => t.currentUserRole === dt.OWNER), h = k(() => t.currentUserRole === dt.ADMIN);
     function f(q) {
       return q === dt.OWNER ? "group-member-list__role--owner" : q === dt.ADMIN ? "group-member-list__role--admin" : "";
     }
@@ -29964,7 +29964,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       return (i.group.groupAllowlistMap[q] || []).some((ie) => ie.userId === A);
     }
     function M(q) {
-      return q.userId === t.currentUserId ? !1 : !!(d.value || p.value && q.role === dt.MEMBER);
+      return q.userId === t.currentUserId ? !1 : !!(d.value || h.value && q.role === dt.MEMBER);
     }
     function S(q) {
       return d.value && q.userId !== t.currentUserId && q.role !== dt.ADMIN;
@@ -29976,16 +29976,16 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       return !t.showChatAction || q.userId === t.currentUserId || t.allowChat === "none" ? !1 : t.allowChat === "contact" ? !!i.contact.getContact(q.userId) : !0;
     }
     function T(q) {
-      return !t.showMuteAction || q.userId === t.currentUserId || g(t.groupId, q.userId) ? !1 : !!(d.value || p.value && q.role === dt.MEMBER);
+      return !t.showMuteAction || q.userId === t.currentUserId || g(t.groupId, q.userId) ? !1 : !!(d.value || h.value && q.role === dt.MEMBER);
     }
     function R(q) {
-      return !t.showMuteAction || q.userId === t.currentUserId || !g(t.groupId, q.userId) ? !1 : !!(d.value || p.value && q.role === dt.MEMBER);
+      return !t.showMuteAction || q.userId === t.currentUserId || !g(t.groupId, q.userId) ? !1 : !!(d.value || h.value && q.role === dt.MEMBER);
     }
     function $(q) {
-      return !t.showBlockAction || q.userId === t.currentUserId || v(t.groupId, q.userId) ? !1 : !!(d.value || p.value);
+      return !t.showBlockAction || q.userId === t.currentUserId || v(t.groupId, q.userId) ? !1 : !!(d.value || h.value);
     }
     function E(q) {
-      return !t.showBlockAction || !v(t.groupId, q.userId) ? !1 : !!(d.value || p.value);
+      return !t.showBlockAction || !v(t.groupId, q.userId) ? !1 : !!(d.value || h.value);
     }
     function z(q) {
       return d.value && q.userId !== t.currentUserId;
@@ -30045,7 +30045,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     function fe() {
       B.value = !1;
     }
-    return (q, A) => (y(), re(h(Bt), {
+    return (q, A) => (y(), re(p(Bt), {
       class: "group-member-list__item",
       "auto-height": "",
       clickable: !1,
@@ -30054,9 +30054,9 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       onClick: A[4] || (A[4] = (G) => o("click-member", t.member))
     }, {
       leading: J(() => [
-        j(h(Dt), {
-          name: h(l),
-          src: h(c),
+        j(p(Dt), {
+          name: p(l),
+          src: p(c),
           size: 40,
           presence: t.presence
         }, null, 8, ["name", "src", "presence"])
@@ -30071,13 +30071,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                 ], 64))
               ], 64))), 128))
             ]),
-            t.member.role !== h(dt).MEMBER ? (y(), C("span", {
+            t.member.role !== p(dt).MEMBER ? (y(), C("span", {
               key: 0,
               class: $e(["group-member-list__role", f(t.member.role)])
             }, D(m(t.member.role)), 3)) : U("", !0),
-            g(t.groupId, t.member.userId) ? (y(), C("span", X$, D(h(s)("group.memberList.muted", "禁言中")), 1)) : U("", !0),
-            v(t.groupId, t.member.userId) ? (y(), C("span", Y$, D(h(s)("group.memberList.blocked", "已拉黑")), 1)) : U("", !0),
-            b(t.groupId, t.member.userId) ? (y(), C("span", Q$, D(h(s)("group.memberList.inAllowlist", "白名单")), 1)) : U("", !0)
+            g(t.groupId, t.member.userId) ? (y(), C("span", X$, D(p(s)("group.memberList.muted", "禁言中")), 1)) : U("", !0),
+            v(t.groupId, t.member.userId) ? (y(), C("span", Y$, D(p(s)("group.memberList.blocked", "已拉黑")), 1)) : U("", !0),
+            b(t.groupId, t.member.userId) ? (y(), C("span", Q$, D(p(s)("group.memberList.inAllowlist", "白名单")), 1)) : U("", !0)
           ]),
           t.showId !== !1 ? (y(), C("div", Z$, " ID: " + D(t.member.userId), 1)) : U("", !0)
         ])
@@ -30097,12 +30097,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               class: "group-member-list__more-btn",
               onClick: A[0] || (A[0] = Ct((G) => B.value = !0, ["stop"]))
             }, [
-              j(h(De), {
+              j(p(De), {
                 name: "vertical",
                 size: 16
               })
             ]),
-            j(h(Wt), {
+            j(p(Wt), {
               show: B.value,
               anchor: N.value,
               placement: "bottom",
@@ -30120,7 +30120,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                   close: fe
                 }, () => [
                   _("div", eR, [
-                    (y(!0), C(Ae, null, ot(K(t.member), (G) => (y(), re(h(Bt), {
+                    (y(!0), C(Ae, null, ot(K(t.member), (G) => (y(), re(p(Bt), {
                       key: G.key,
                       size: "compact",
                       "inset-hover": !1,
@@ -30131,7 +30131,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                       t.menuWithIcon ? {
                         name: "leading",
                         fn: J(() => [
-                          j(h(De), {
+                          j(p(De), {
                             name: G.icon,
                             size: 18
                           }, null, 8, ["name"])
@@ -30194,7 +30194,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   },
   emits: ["click-member", "chat-member", "remove-member", "set-admin", "remove-admin", "mute-member", "unmute-member", "block-member", "unblock-member", "transfer-owner", "load-more", "close"],
   setup(n, { expose: e, emit: t }) {
-    const o = n, s = t, r = Vt("UIKit:GroupMemberList"), { t: i } = et(), { show: a } = Kt(), { stores: l, features: c } = pt(), { fetchGroupMembers: u } = ln(), { fetchPresence: d, getPresence: p } = Xo(), f = x(""), m = x(!1), g = x(void 0), v = x(o.hasMore), b = x(!1), M = k(() => l.group.getGroupMembers(o.groupId)), S = k(
+    const o = n, s = t, r = Vt("UIKit:GroupMemberList"), { t: i } = et(), { show: a } = Kt(), { stores: l, features: c } = pt(), { fetchGroupMembers: u } = ln(), { fetchPresence: d, getPresence: h } = Xo(), f = x(""), m = x(!1), g = x(void 0), v = x(o.hasMore), b = x(!1), M = k(() => l.group.getGroupMembers(o.groupId)), S = k(
       () => b.value || M.value.length > 0 ? M.value : o.members
     ), w = x(), I = x(/* @__PURE__ */ new Set()), T = x(/* @__PURE__ */ new Set());
     let R = null, $ = null;
@@ -30219,13 +30219,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       $ && clearTimeout($), $ = setTimeout(() => {
         if (!c.enablePresence)
           return;
-        const G = Array.from(I.value).filter((ie) => !p(ie));
+        const G = Array.from(I.value).filter((ie) => !h(ie));
         G.length > 0 && d(G);
       }, 200);
     }
     function F(G) {
       var ie;
-      return (ie = p(G)) == null ? void 0 : ie.status;
+      return (ie = h(G)) == null ? void 0 : ie.status;
     }
     io(() => {
       R && (R.disconnect(), R = null), $ && (clearTimeout($), $ = null);
@@ -30284,28 +30284,28 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       return y(), C("div", nR, [
         o.showHeader ? (y(), C("div", oR, [
           _("div", sR, [
-            _("span", rR, D(h(i)("group.memberList.title", "群成员")), 1),
+            _("span", rR, D(p(i)("group.memberList.title", "群成员")), 1),
             _("span", iR, D(((V = B.value) == null ? void 0 : V.memberCount) ?? S.value.length), 1)
           ]),
-          o.closable ? (y(), re(h(At), {
+          o.closable ? (y(), re(p(At), {
             key: 0,
             class: "group-member-list__close",
             icon: "xmark/bold",
             size: "small",
             variant: "ghost",
-            title: h(i)("button.close", "关闭"),
+            title: p(i)("button.close", "关闭"),
             onClick: ie[0] || (ie[0] = (ne) => s("close"))
           }, null, 8, ["title"])) : U("", !0)
         ])) : U("", !0),
         o.showSearch ? (y(), C("div", aR, [
-          j(h(dn), {
+          j(p(dn), {
             modelValue: f.value,
             "onUpdate:modelValue": ie[1] || (ie[1] = (ne) => f.value = ne),
             variant: "search",
             pill: o.searchPill,
             clearable: "",
             "clear-icon": "search/xmark",
-            placeholder: h(i)("group.memberList.searchPlaceholder", "搜索群成员"),
+            placeholder: p(i)("group.memberList.searchPlaceholder", "搜索群成员"),
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "pill", "placeholder"])
         ])) : U("", !0),
@@ -30315,11 +30315,11 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "group-member-list__items"
         }, [
           o.loading && L.value.length === 0 ? (y(), C("div", lR, [
-            _("span", cR, D(h(i)("common.loading")), 1)
-          ])) : L.value.length === 0 ? (y(), re(h(Ht), {
+            _("span", cR, D(p(i)("common.loading")), 1)
+          ])) : L.value.length === 0 ? (y(), re(p(Ht), {
             key: 1,
             icon: f.value ? "search" : "person/double",
-            description: f.value ? h(i)("group.memberList.noSearchResult", "未找到相关成员") : h(i)("group.memberList.empty", "暂无成员"),
+            description: f.value ? p(i)("group.memberList.noSearchResult", "未找到相关成员") : p(i)("group.memberList.empty", "暂无成员"),
             size: "small"
           }, null, 8, ["icon", "description"])) : (y(), C(Ae, { key: 2 }, [
             (y(!0), C(Ae, null, ot(L.value, (ne) => (y(), re(Cu, {
@@ -30358,13 +30358,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               } : void 0
             ]), 1032, ["member", "group-id", "current-user-id", "current-user-role", "show-mute-action", "show-block-action", "show-admin-action", "show-remove-action", "show-chat-action", "allow-chat", "presence", "show-id", "border", "menu-with-icon"]))), 128)),
             v.value || m.value ? (y(), C("div", uR, [
-              m.value ? (y(), C("span", dR, D(h(i)("common.loading")), 1)) : (y(), C("button", {
+              m.value ? (y(), C("span", dR, D(p(i)("common.loading")), 1)) : (y(), C("button", {
                 key: 0,
                 class: "group-member-list__load-more-btn",
                 onClick: X
-              }, D(h(i)("group.memberList.loadMore", "加载更多")), 1))
+              }, D(p(i)("group.memberList.loadMore", "加载更多")), 1))
             ])) : o.showNoMore && !v.value && L.value.length > 0 ? (y(), C("div", fR, [
-              _("span", null, D(h(i)("group.memberList.noMore", "没有更多了")), 1)
+              _("span", null, D(p(i)("group.memberList.noMore", "没有更多了")), 1)
             ])) : U("", !0)
           ], 64))
         ], 512)
@@ -30383,24 +30383,24 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       const l = t.item.user || t.item;
       return (l == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = en(r);
-    return (l, c) => (y(), re(h(Bt), {
+    return (l, c) => (y(), re(p(Bt), {
       class: "block-list__item",
-      title: h(i),
+      title: p(i),
       clickable: !1,
       border: t.border
     }, {
       leading: J(() => [
-        j(h(Dt), {
-          name: h(i),
-          src: h(a),
+        j(p(Dt), {
+          name: p(i),
+          src: p(a),
           size: 40
         }, null, 8, ["name", "src"])
       ]),
       trailing: J(() => [
-        j(h(At), {
+        j(p(At), {
           icon: "person/minus",
           variant: "ghost",
-          title: h(s)("group.memberList.unblock", "移出黑名单"),
+          title: p(s)("group.memberList.unblock", "移出黑名单"),
           onClick: c[0] || (c[0] = Ct((u) => o("unblock"), ["stop"]))
         }, null, 8, ["title"])
       ]),
@@ -30416,22 +30416,22 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   emits: ["toggle"],
   setup(n, { emit: e }) {
     const t = n, o = e, { displayName: s, avatarUrl: r } = en(() => t.member.userId);
-    return (i, a) => (y(), re(h(Bt), {
+    return (i, a) => (y(), re(p(Bt), {
       class: "block-list__popup-item",
       size: "compact",
-      title: h(s),
+      title: p(s),
       selected: t.selected,
       onClick: a[0] || (a[0] = (l) => o("toggle"))
     }, {
       leading: J(() => [
-        j(h(Dt), {
-          name: h(s),
-          src: h(r),
+        j(p(Dt), {
+          name: p(s),
+          src: p(r),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
       trailing: J(() => [
-        j(h(ho), {
+        j(p(ho), {
           checked: t.selected
         }, null, 8, ["checked"])
       ]),
@@ -30456,7 +30456,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       getGroupBlocklist: c,
       unblockGroupMembers: u,
       blockGroupMembers: d,
-      fetchGroupMembers: p
+      fetchGroupMembers: h
     } = ln(), f = x(!1), m = k(() => l.group.getGroupBlocklist(o.groupId)), g = x(!1), v = x(!1), b = x([]), M = x(/* @__PURE__ */ new Set()), S = k(() => new Set(m.value.map((K) => {
       const X = K.user || K;
       return (X == null ? void 0 : X.userId) || "";
@@ -30499,7 +30499,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       if (o.groupId) {
         v.value = !0;
         try {
-          const { list: K } = await p(o.groupId, void 0, 200);
+          const { list: K } = await h(o.groupId, void 0, 200);
           b.value = K || [];
         } catch (K) {
           r.warn("[BlockList] load group members failed:", nt(K));
@@ -30528,10 +30528,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     return e({
       openAddMember: z
     }), (K, X) => (y(), C("div", yR, [
-      f.value ? (y(), C("div", bR, D(h(i)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(h(Ht), {
+      f.value ? (y(), C("div", bR, D(p(i)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(p(Ht), {
         key: 1,
         icon: "person/double",
-        description: h(i)("group.memberList.empty", "暂无黑名单成员"),
+        description: p(i)("group.memberList.empty", "暂无黑名单成员"),
         size: "small"
       }, null, 8, ["description"])) : U("", !0),
       (y(!0), C(Ae, null, ot(m.value, (fe) => {
@@ -30543,26 +30543,26 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           onUnblock: (A) => R(fe)
         }, null, 8, ["item", "border", "onUnblock"]);
       }), 128)),
-      j(h(rn), {
+      j(p(rn), {
         show: I.value,
         "onUpdate:show": X[0] || (X[0] = (fe) => I.value = fe),
-        title: h(i)("chat.info.unblockMemberConfirmTitle"),
+        title: p(i)("chat.info.unblockMemberConfirmTitle"),
         width: 540,
         type: "warning",
-        "confirm-text": h(i)("button.confirm"),
-        "cancel-text": h(i)("button.cancel"),
+        "confirm-text": p(i)("button.confirm"),
+        "cancel-text": p(i)("button.cancel"),
         onConfirm: $,
         onCancel: E
       }, {
         default: J(() => {
           var fe, q, A, G;
           return [
-            ht(D(h(i)("chat.info.unblockMemberConfirmContent").replace("{name}", ((q = ((fe = T.value) == null ? void 0 : fe.user) || T.value) == null ? void 0 : q.nickname) || ((G = ((A = T.value) == null ? void 0 : A.user) || T.value) == null ? void 0 : G.userId) || "")), 1)
+            ht(D(p(i)("chat.info.unblockMemberConfirmContent").replace("{name}", ((q = ((fe = T.value) == null ? void 0 : fe.user) || T.value) == null ? void 0 : q.nickname) || ((G = ((A = T.value) == null ? void 0 : A.user) || T.value) == null ? void 0 : G.userId) || "")), 1)
           ];
         }),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      j(h(Wt), {
+      j(p(Wt), {
         show: g.value,
         "onUpdate:show": X[3] || (X[3] = (fe) => g.value = fe),
         position: "center",
@@ -30578,13 +30578,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             }, ["stop"]))
           }, [
             _("div", kR, [
-              _("span", wR, D(h(i)("group.blocklist.addTitle", "添加黑名单成员")), 1)
+              _("span", wR, D(p(i)("group.blocklist.addTitle", "添加黑名单成员")), 1)
             ]),
             _("div", _R, [
-              v.value ? (y(), C("div", CR, D(h(i)("common.loading")), 1)) : F.value.length === 0 ? (y(), re(h(Ht), {
+              v.value ? (y(), C("div", CR, D(p(i)("common.loading")), 1)) : F.value.length === 0 ? (y(), re(p(Ht), {
                 key: 1,
                 icon: "person/double",
-                description: h(i)("group.blocklist.emptySelectable", "暂无可添加的成员"),
+                description: p(i)("group.blocklist.emptySelectable", "暂无可添加的成员"),
                 size: "small"
               }, null, 8, ["description"])) : U("", !0),
               (y(!0), C(Ae, null, ot(F.value, (fe) => (y(), re(vR, {
@@ -30598,12 +30598,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               _("button", {
                 class: "block-list__popup-btn block-list__popup-btn--cancel",
                 onClick: L
-              }, D(h(i)("group.blocklist.cancel", "取消")), 1),
+              }, D(p(i)("group.blocklist.cancel", "取消")), 1),
               _("button", {
                 class: "block-list__popup-btn block-list__popup-btn--confirm",
                 disabled: M.value.size === 0,
                 onClick: N
-              }, D(h(i)("group.blocklist.confirm", "确定")), 9, SR)
+              }, D(p(i)("group.blocklist.confirm", "确定")), 9, SR)
             ])
           ], 32)
         ]),
@@ -30627,18 +30627,18 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       const c = (u = t.item) == null ? void 0 : u.muteExpire;
       return c == null || c <= 0 || c - Date.now() > xR ? s("group.mutelist.permanent", "永久禁言") : c <= Date.now() ? s("group.mutelist.expired", "禁言已到期") : `${s("group.mutelist.expireAt", "禁言至")} ${new Date(c).toLocaleString()}`;
     }), { displayName: a, avatarUrl: l } = en(r);
-    return (c, u) => (y(), re(h(Bt), {
+    return (c, u) => (y(), re(p(Bt), {
       class: "mute-list__item",
       size: "compact",
-      title: h(a),
+      title: p(a),
       subtitle: i.value,
       clickable: !1,
       border: t.border
     }, {
       leading: J(() => [
-        j(h(Dt), {
-          name: h(a),
-          src: h(l),
+        j(p(Dt), {
+          name: p(a),
+          src: p(l),
           size: 40
         }, null, 8, ["name", "src"])
       ]),
@@ -30646,7 +30646,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         _("button", {
           class: "mute-list__action-btn",
           onClick: u[0] || (u[0] = Ct((d) => o("unmute"), ["stop"]))
-        }, D(h(s)("group.memberList.unmute", "取消禁言")), 1)
+        }, D(p(s)("group.memberList.unmute", "取消禁言")), 1)
       ]),
       _: 1
     }, 8, ["title", "subtitle", "border"]));
@@ -30660,22 +30660,22 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   emits: ["toggle"],
   setup(n, { emit: e }) {
     const t = n, o = e, { displayName: s, avatarUrl: r } = en(() => t.member.userId);
-    return (i, a) => (y(), re(h(Bt), {
+    return (i, a) => (y(), re(p(Bt), {
       class: "mute-list__popup-item",
       size: "compact",
-      title: h(s),
+      title: p(s),
       selected: t.selected,
       onClick: a[0] || (a[0] = (l) => o("toggle"))
     }, {
       leading: J(() => [
-        j(h(Dt), {
-          name: h(s),
-          src: h(r),
+        j(p(Dt), {
+          name: p(s),
+          src: p(r),
           size: 36
         }, null, 8, ["name", "src"])
       ]),
       trailing: J(() => [
-        j(h(ho), {
+        j(p(ho), {
           checked: t.selected
         }, null, 8, ["checked"])
       ]),
@@ -30704,7 +30704,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       getGroupMuteList: c,
       unmuteGroupMembers: u,
       muteGroupMembers: d,
-      fetchGroupMembers: p
+      fetchGroupMembers: h
     } = ln(), f = x(!1), m = k(() => l.group.getGroupMuteList(o.groupId)), g = x(!1), v = x(!1), b = x([]), M = x(/* @__PURE__ */ new Set()), S = k(() => new Set(m.value.map((X) => {
       const fe = X.user || X;
       return (fe == null ? void 0 : fe.userId) || "";
@@ -30755,7 +30755,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       if (o.groupId) {
         v.value = !0;
         try {
-          const { list: X } = await p(o.groupId, void 0, 200);
+          const { list: X } = await h(o.groupId, void 0, 200);
           b.value = X || [];
         } catch (X) {
           r.warn("load group members failed:", X);
@@ -30793,12 +30793,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       openAddMember: P
     }), (X, fe) => (y(), C("div", $R, [
       o.showHeader ? (y(), C("div", RR, [
-        _("span", NR, D(m.value.length) + " " + D(h(i)("group.mutelist.memberCount", "名禁言成员")), 1)
+        _("span", NR, D(m.value.length) + " " + D(p(i)("group.mutelist.memberCount", "名禁言成员")), 1)
       ])) : U("", !0),
-      f.value ? (y(), C("div", LR, D(h(i)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(h(Ht), {
+      f.value ? (y(), C("div", LR, D(p(i)("common.loading")), 1)) : m.value.length === 0 ? (y(), re(p(Ht), {
         key: 2,
         icon: "person/double",
-        description: h(i)("group.memberList.empty", "暂无禁言成员"),
+        description: p(i)("group.memberList.empty", "暂无禁言成员"),
         size: "small"
       }, null, 8, ["description"])) : U("", !0),
       (y(!0), C(Ae, null, ot(m.value, (q) => {
@@ -30810,26 +30810,26 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           onUnmute: (G) => R(q)
         }, null, 8, ["item", "border", "onUnmute"]);
       }), 128)),
-      j(h(rn), {
+      j(p(rn), {
         show: I.value,
         "onUpdate:show": fe[0] || (fe[0] = (q) => I.value = q),
-        title: h(i)("chat.info.unmuteMemberConfirmTitle"),
+        title: p(i)("chat.info.unmuteMemberConfirmTitle"),
         width: 540,
         type: "warning",
-        "confirm-text": h(i)("button.confirm"),
-        "cancel-text": h(i)("button.cancel"),
+        "confirm-text": p(i)("button.confirm"),
+        "cancel-text": p(i)("button.cancel"),
         onConfirm: $,
         onCancel: E
       }, {
         default: J(() => {
           var q, A, G, ie;
           return [
-            ht(D(h(i)("chat.info.unmuteMemberConfirmContent").replace("{name}", ((A = ((q = T.value) == null ? void 0 : q.user) || T.value) == null ? void 0 : A.nickname) || ((ie = ((G = T.value) == null ? void 0 : G.user) || T.value) == null ? void 0 : ie.userId) || "")), 1)
+            ht(D(p(i)("chat.info.unmuteMemberConfirmContent").replace("{name}", ((A = ((q = T.value) == null ? void 0 : q.user) || T.value) == null ? void 0 : A.nickname) || ((ie = ((G = T.value) == null ? void 0 : G.user) || T.value) == null ? void 0 : ie.userId) || "")), 1)
           ];
         }),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      j(h(Wt), {
+      j(p(Wt), {
         show: g.value,
         "onUpdate:show": fe[3] || (fe[3] = (q) => g.value = q),
         position: "center",
@@ -30845,13 +30845,13 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             }, ["stop"]))
           }, [
             _("div", OR, [
-              _("span", DR, D(h(i)("group.mutelist.addTitle", "添加禁言成员")), 1)
+              _("span", DR, D(p(i)("group.mutelist.addTitle", "添加禁言成员")), 1)
             ]),
             _("div", BR, [
-              v.value ? (y(), C("div", PR, D(h(i)("common.loading")), 1)) : B.value.length === 0 ? (y(), re(h(Ht), {
+              v.value ? (y(), C("div", PR, D(p(i)("common.loading")), 1)) : B.value.length === 0 ? (y(), re(p(Ht), {
                 key: 1,
                 icon: "person/double",
-                description: h(i)("group.mutelist.emptySelectable", "暂无可添加的成员"),
+                description: p(i)("group.mutelist.emptySelectable", "暂无可添加的成员"),
                 size: "small"
               }, null, 8, ["description"])) : U("", !0),
               (y(!0), C(Ae, null, ot(B.value, (q) => (y(), re(iv, {
@@ -30865,12 +30865,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               _("button", {
                 class: "mute-list__popup-btn mute-list__popup-btn--cancel",
                 onClick: K
-              }, D(h(i)("group.blocklist.cancel", "取消")), 1),
+              }, D(p(i)("group.blocklist.cancel", "取消")), 1),
               _("button", {
                 class: "mute-list__popup-btn mute-list__popup-btn--confirm",
                 disabled: M.value.size === 0,
                 onClick: L
-              }, D(h(i)("group.blocklist.confirm", "确定")), 9, UR)
+              }, D(p(i)("group.blocklist.confirm", "确定")), 9, UR)
             ])
           ], 32)
         ]),
@@ -30903,12 +30903,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       b.includes(i.value) || (i.value = "all");
     });
     const c = x(), u = x(!1), d = x(!1);
-    function p() {
+    function h() {
       const b = c.value;
       b && (u.value = b.scrollLeft > 1, d.value = b.scrollLeft + b.clientWidth < b.scrollWidth - 1);
     }
-    Sa(c, p), Ue(a, async () => {
-      await st(), p();
+    Sa(c, h), Ue(a, async () => {
+      await st(), h();
     }, { immediate: !0 });
     function f(b) {
       const M = c.value;
@@ -30932,7 +30932,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       }
     }), (b, M) => (y(), C("div", HR, [
       _("div", GR, [
-        u.value ? (y(), re(h(At), {
+        u.value ? (y(), re(p(At), {
           key: 0,
           class: "chat-info-drawer-members__tabs-arrow",
           icon: "chevron/left",
@@ -30944,7 +30944,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           ref_key: "tabsScrollRef",
           ref: c,
           class: "chat-info-drawer-members__tabs-scroll",
-          onScroll: p
+          onScroll: h
         }, [
           (y(!0), C(Ae, null, ot(a.value, (S) => (y(), C("button", {
             key: S,
@@ -30952,7 +30952,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             onClick: (w) => i.value = S
           }, D(l.value[S]), 11, VR))), 128))
         ], 544),
-        d.value ? (y(), re(h(At), {
+        d.value ? (y(), re(p(At), {
           key: 1,
           class: "chat-info-drawer-members__tabs-arrow",
           icon: "chevron/right",
@@ -30987,10 +30987,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         [Xr, i.value === "all"]
       ]),
       Rn(_("div", WR, [
-        v.value.length === 0 ? (y(), re(h(Ht), {
+        v.value.length === 0 ? (y(), re(p(Ht), {
           key: 0,
           icon: "person/double",
-          description: h(r)("group.memberList.empty", "暂无成员"),
+          description: p(r)("group.memberList.empty", "暂无成员"),
           size: "small"
         }, null, 8, ["description"])) : (y(!0), C(Ae, { key: 1 }, ot(v.value, (S) => (y(), re(Cu, {
           key: S.userId,
@@ -31070,7 +31070,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
       await st(), (u = (c = i.value) == null ? void 0 : c.inputRef) == null || u.focus();
     }), (c, u) => (y(), C("div", YR, [
       _("div", QR, [
-        j(h(dn), {
+        j(p(dn), {
           ref_key: "searchInputRef",
           ref: i,
           modelValue: r.value,
@@ -31079,15 +31079,15 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           pill: "",
           clearable: "",
           "clear-icon": "search/xmark",
-          placeholder: h(s)("group.memberList.searchPlaceholder", "搜索群成员"),
+          placeholder: p(s)("group.memberList.searchPlaceholder", "搜索群成员"),
           "prefix-icon": "search"
         }, null, 8, ["modelValue", "placeholder"])
       ]),
       _("div", ZR, [
-        l.value.length === 0 ? (y(), re(h(Ht), {
+        l.value.length === 0 ? (y(), re(p(Ht), {
           key: 0,
           icon: "search",
-          description: h(s)("chat.info.noSearchResult", "暂无结果"),
+          description: p(s)("chat.info.noSearchResult", "暂无结果"),
           size: "small"
         }, null, 8, ["description"])) : U("", !0),
         (y(!0), C(Ae, null, ot(l.value, (d) => (y(), re(Cu, {
@@ -31105,15 +31105,15 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           "show-remove-action": !0,
           "show-chat-action": !0,
           "allow-chat": t.allowChat,
-          onChatMember: u[1] || (u[1] = (p) => o("chat-member", p)),
-          onRemoveMember: u[2] || (u[2] = (p) => o("remove-member", p)),
-          onSetAdmin: u[3] || (u[3] = (p) => o("set-admin", p)),
-          onRemoveAdmin: u[4] || (u[4] = (p) => o("remove-admin", p)),
-          onMuteMember: u[5] || (u[5] = (p) => o("mute-member", p)),
-          onUnmuteMember: u[6] || (u[6] = (p) => o("unmute-member", p)),
-          onBlockMember: u[7] || (u[7] = (p) => o("block-member", p)),
-          onUnblockMember: u[8] || (u[8] = (p) => o("unblock-member", p)),
-          onTransferOwner: u[9] || (u[9] = (p) => o("transfer-owner", p))
+          onChatMember: u[1] || (u[1] = (h) => o("chat-member", h)),
+          onRemoveMember: u[2] || (u[2] = (h) => o("remove-member", h)),
+          onSetAdmin: u[3] || (u[3] = (h) => o("set-admin", h)),
+          onRemoveAdmin: u[4] || (u[4] = (h) => o("remove-admin", h)),
+          onMuteMember: u[5] || (u[5] = (h) => o("mute-member", h)),
+          onUnmuteMember: u[6] || (u[6] = (h) => o("unmute-member", h)),
+          onBlockMember: u[7] || (u[7] = (h) => o("block-member", h)),
+          onUnblockMember: u[8] || (u[8] = (h) => o("unblock-member", h)),
+          onTransferOwner: u[9] || (u[9] = (h) => o("transfer-owner", h))
         }, null, 8, ["member", "group-id", "current-user-id", "current-user-role", "highlight", "allow-chat"]))), 128))
       ])
     ]));
@@ -31131,14 +31131,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   emits: ["update:show", "save", "cancel"],
   setup(n, { emit: e }) {
     const t = n, o = e, { t: s } = et(), r = x(""), i = x(), a = x();
-    function l(d, p) {
-      return s("common.charCount", "{current}/{max}").replace("{current}", String(d)).replace("{max}", String(p));
+    function l(d, h) {
+      return s("common.charCount", "{current}/{max}").replace("{current}", String(d)).replace("{max}", String(h));
     }
     Ue(
       () => t.show,
       async (d) => {
-        var p;
-        d && (r.value = t.value, await st(), (p = t.multiline ? a.value : i.value) == null || p.focus());
+        var h;
+        d && (r.value = t.value, await st(), (h = t.multiline ? a.value : i.value) == null || h.focus());
       }
     );
     function c() {
@@ -31147,10 +31147,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     function u() {
       t.saving || o("save", r.value);
     }
-    return (d, p) => (y(), re(h(Wt), {
+    return (d, h) => (y(), re(p(Wt), {
       show: t.show,
       position: "center",
-      "onUpdate:show": p[2] || (p[2] = (f) => o("update:show", f)),
+      "onUpdate:show": h[2] || (h[2] = (f) => o("update:show", f)),
       onClose: c
     }, {
       default: J(() => [
@@ -31161,7 +31161,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               key: 0,
               ref_key: "textareaRef",
               ref: a,
-              "onUpdate:modelValue": p[0] || (p[0] = (f) => r.value = f),
+              "onUpdate:modelValue": h[0] || (h[0] = (f) => r.value = f),
               class: "chat-info-drawer-field-edit__textarea",
               rows: "3",
               maxlength: t.maxLength,
@@ -31172,7 +31172,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               key: 1,
               ref_key: "inputRef",
               ref: i,
-              "onUpdate:modelValue": p[1] || (p[1] = (f) => r.value = f),
+              "onUpdate:modelValue": h[1] || (h[1] = (f) => r.value = f),
               class: "chat-info-drawer-field-edit__input",
               maxlength: t.maxLength,
               onKeydown: [
@@ -31187,23 +31187,23 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             }, D(l(r.value.length, t.maxLength)), 3)
           ]),
           _("div", aN, [
-            j(h(pn), {
+            j(p(pn), {
               type: "default",
               onClick: c
             }, {
               default: J(() => [
-                ht(D(h(s)("button.cancel", "取消")), 1)
+                ht(D(p(s)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            j(h(pn), {
+            j(p(pn), {
               type: "primary",
               loading: t.saving,
               disabled: t.saving,
               onClick: u
             }, {
               default: J(() => [
-                ht(D(h(s)("chat.info.save", "保存")), 1)
+                ht(D(p(s)("chat.info.save", "保存")), 1)
               ]),
               _: 1
             }, 8, ["loading", "disabled"])
@@ -31227,8 +31227,8 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   },
   emits: ["update:show", "removed"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { t: s } = et(), { show: r } = Kt(), { isMobile: i } = En(), { stores: a } = pt(), { removeGroupMembers: l } = ln(), c = x(/* @__PURE__ */ new Set()), u = x(!1), d = k(() => t.currentUserRole === dt.OWNER), p = k(() => t.currentUserRole === dt.ADMIN), f = k(
-      () => t.members.filter((b) => b.userId === t.currentUserId ? !1 : !!(d.value || p.value && b.role === dt.MEMBER))
+    const t = n, o = e, { t: s } = et(), { show: r } = Kt(), { isMobile: i } = En(), { stores: a } = pt(), { removeGroupMembers: l } = ln(), c = x(/* @__PURE__ */ new Set()), u = x(!1), d = k(() => t.currentUserRole === dt.OWNER), h = k(() => t.currentUserRole === dt.ADMIN), f = k(
+      () => t.members.filter((b) => b.userId === t.currentUserId ? !1 : !!(d.value || h.value && b.role === dt.MEMBER))
     );
     Ue(
       () => t.show,
@@ -31265,26 +31265,26 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         }
       }
     }
-    return (b, M) => (y(), re(h(Wt), {
+    return (b, M) => (y(), re(p(Wt), {
       show: t.show,
-      position: h(i) ? "bottom" : "center",
+      position: p(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": M[0] || (M[0] = (S) => o("update:show", S)),
       onClose: g
     }, {
       default: J(() => [
         _("div", {
-          class: $e(["chat-info-drawer-member-remove", { "chat-info-drawer-member-remove--mobile": h(i) }])
+          class: $e(["chat-info-drawer-member-remove", { "chat-info-drawer-member-remove--mobile": p(i) }])
         }, [
           _("div", uN, [
-            _("span", dN, D(h(s)("group.memberList.removeConfirmTitle", "移除成员")), 1),
+            _("span", dN, D(p(s)("group.memberList.removeConfirmTitle", "移除成员")), 1),
             c.value.size > 0 ? (y(), C("span", fN, "(" + D(c.value.size) + ")", 1)) : U("", !0)
           ]),
           _("div", pN, [
-            f.value.length === 0 ? (y(), re(h(Ht), {
+            f.value.length === 0 ? (y(), re(p(Ht), {
               key: 0,
               icon: "person/double",
-              description: h(s)("group.memberList.empty", "暂无成员"),
+              description: p(s)("group.memberList.empty", "暂无成员"),
               size: "small"
             }, null, 8, ["description"])) : U("", !0),
             (y(!0), C(Ae, null, ot(f.value, (S) => (y(), re(iv, {
@@ -31295,23 +31295,23 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             }, null, 8, ["member", "selected", "onToggle"]))), 128))
           ]),
           _("div", hN, [
-            j(h(pn), {
+            j(p(pn), {
               type: "default",
               onClick: g
             }, {
               default: J(() => [
-                ht(D(h(s)("button.cancel", "取消")), 1)
+                ht(D(p(s)("button.cancel", "取消")), 1)
               ]),
               _: 1
             }),
-            j(h(pn), {
+            j(p(pn), {
               type: "danger",
               disabled: c.value.size === 0,
               loading: u.value,
               onClick: v
             }, {
               default: J(() => [
-                ht(D(h(s)("chat.info.removeSelectedMembers", "移除（{count}）").replace("{count}", String(c.value.size))), 1)
+                ht(D(p(s)("chat.info.removeSelectedMembers", "移除（{count}）").replace("{count}", String(c.value.size))), 1)
               ]),
               _: 1
             }, 8, ["disabled", "loading"])
@@ -31350,7 +31350,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   },
   emits: ["update:show", "close"],
   setup(n, { emit: e }) {
-    ka((p) => ({
+    ka((h) => ({
       v6962ed25: l.value,
       v11ead6be: c.value
     }));
@@ -31365,9 +31365,9 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     function d() {
       t.closeOnClickOverlay && u();
     }
-    return Uy(a, (p) => {
+    return Uy(a, (h) => {
       if (!t.show || t.fullscreen) return;
-      const f = p.target;
+      const f = h.target;
       if (!(f != null && f.closest(".uikit-popup"))) {
         if (i.value) {
           if (!t.closeOnClickOverlay) return;
@@ -31375,7 +31375,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           return;
         u();
       }
-    }, { capture: !1 }), (p, f) => (y(), C(Ae, null, [
+    }, { capture: !1 }), (h, f) => (y(), C(Ae, null, [
       j(ls, { name: "chat-drawer-fade" }, {
         default: J(() => [
           n.show && i.value ? (y(), C("div", vN, [
@@ -31397,14 +31397,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                   class: $e(["chat-drawer__panel", [r.value, { "chat-drawer__panel--fullscreen": n.fullscreen }]]),
                   style: Pt(n.fullscreen ? void 0 : { width: c.value })
                 }, [
-                  p.$slots.header ? (y(), C("div", yN, [
-                    W(p.$slots, "header", {}, void 0, !0)
+                  h.$slots.header ? (y(), C("div", yN, [
+                    W(h.$slots, "header", {}, void 0, !0)
                   ])) : U("", !0),
                   _("div", bN, [
-                    W(p.$slots, "default", {}, void 0, !0)
+                    W(h.$slots, "default", {}, void 0, !0)
                   ]),
-                  p.$slots.footer ? (y(), C("div", kN, [
-                    W(p.$slots, "footer", {}, void 0, !0)
+                  h.$slots.footer ? (y(), C("div", kN, [
+                    W(h.$slots, "footer", {}, void 0, !0)
                   ])) : U("", !0)
                 ], 6)) : U("", !0)
               ]),
@@ -31423,14 +31423,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             class: $e(["chat-drawer__push-panel", r.value])
           }, [
             _("div", wN, [
-              p.$slots.header ? (y(), C("div", _N, [
-                W(p.$slots, "header", {}, void 0, !0)
+              h.$slots.header ? (y(), C("div", _N, [
+                W(h.$slots, "header", {}, void 0, !0)
               ])) : U("", !0),
               _("div", CN, [
-                W(p.$slots, "default", {}, void 0, !0)
+                W(h.$slots, "default", {}, void 0, !0)
               ]),
-              p.$slots.footer ? (y(), C("div", MN, [
-                W(p.$slots, "footer", {}, void 0, !0)
+              h.$slots.footer ? (y(), C("div", MN, [
+                W(h.$slots, "footer", {}, void 0, !0)
               ])) : U("", !0)
             ])
           ], 2)) : U("", !0)
@@ -31485,7 +31485,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   setup(n, { expose: e, emit: t }) {
     const o = n, s = t, r = Vt("UIKit:ChatInfoDrawer"), { t: i } = et(), { show: a } = Kt(), { pinConversation: l, muteConversation: c } = Js(), { stores: u } = pt(), {
       fetchGroupInfo: d,
-      fetchGroupMembers: p,
+      fetchGroupMembers: h,
       fetchGroupAnnouncement: f,
       getGroupMembers: m,
       getGroupAnnouncement: g,
@@ -31601,7 +31601,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         try {
           await Promise.all([
             d(H),
-            p(H),
+            h(H),
             f(H)
           ]);
         } catch (le) {
@@ -31903,51 +31903,51 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         header: J(() => [
           W(H.$slots, "drawer-header", je(Ke(te.value)), () => [
             B.value ? (y(), C("div", TN, [
-              j(h(At), {
+              j(p(At), {
                 class: "chat-info-drawer__back",
                 icon: "chevron/left",
                 "icon-size": 22,
                 size: "small",
                 variant: "ghost",
-                title: h(i)("button.back", "返回"),
+                title: p(i)("button.back", "返回"),
                 onClick: un
               }, null, 8, ["title"]),
               _("span", EN, D(me.value), 1),
-              B.value === "files" ? (y(), re(h(At), {
+              B.value === "files" ? (y(), re(p(At), {
                 key: 0,
                 class: "chat-info-drawer__upload",
                 icon: "arrow/up_tray",
                 "icon-size": 22,
                 size: "small",
                 variant: "ghost",
-                title: h(i)("group.sharedFile.uploadText", "上传"),
+                title: p(i)("group.sharedFile.uploadText", "上传"),
                 onClick: le[0] || (le[0] = (ae) => {
                   var Ye;
                   return (Ye = L.value) == null ? void 0 : Ye.triggerUpload();
                 })
               }, null, 8, ["title"])) : (y(), C("span", AN))
             ])) : (y(), C("div", IN, [
-              o.fullscreen ? (y(), re(h(At), {
+              o.fullscreen ? (y(), re(p(At), {
                 key: 0,
                 class: "chat-info-drawer__back",
                 icon: "chevron/left",
                 "icon-size": 22,
                 size: "small",
                 variant: "ghost",
-                title: h(i)("button.back", "返回"),
+                title: p(i)("button.back", "返回"),
                 onClick: q
               }, null, 8, ["title"])) : U("", !0),
               _("span", {
                 class: $e(["chat-info-drawer__title", { "chat-info-drawer__title--left": !o.fullscreen }])
-              }, D(n.isGroup ? h(i)("chat.info.titleGroup") : h(i)("chat.info.titleFriend")), 3),
-              o.fullscreen ? (y(), C("span", xN)) : (y(), re(h(At), {
+              }, D(n.isGroup ? p(i)("chat.info.titleGroup") : p(i)("chat.info.titleFriend")), 3),
+              o.fullscreen ? (y(), C("span", xN)) : (y(), re(p(At), {
                 key: 1,
                 class: "chat-info-drawer__close",
                 icon: "xmark/bold",
                 "icon-size": 22,
                 size: "small",
                 variant: "ghost",
-                title: h(i)("button.close", "关闭"),
+                title: p(i)("button.close", "关闭"),
                 onClick: q
               }, null, 8, ["title"]))
             ]))
@@ -31960,7 +31960,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                 _("div", BN, [
                   _("div", PN, [
                     _("span", zN, [
-                      ht(D(h(i)("chat.info.groupMembers")) + " ", 1),
+                      ht(D(p(i)("chat.info.groupMembers")) + " ", 1),
                       _("span", UN, "(" + D(Mt.value) + ")", 1)
                     ])
                   ]),
@@ -31968,11 +31968,11 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                     class: "chat-info-drawer__fake-search",
                     onClick: Mn
                   }, [
-                    j(h(De), {
+                    j(p(De), {
                       name: "search",
                       size: 16
                     }),
-                    _("span", FN, D(h(i)("group.memberList.searchPlaceholder", "搜索群成员")), 1)
+                    _("span", FN, D(p(i)("group.memberList.searchPlaceholder", "搜索群成员")), 1)
                   ]),
                   W(H.$slots, "drawer-members", je(Ke(te.value)), () => [
                     _("div", HN, [
@@ -31991,12 +31991,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                           onClick: Ct(ze, ["stop"])
                         }, [
                           _("span", GN, [
-                            j(h(De), {
+                            j(p(De), {
                               name: "plus",
                               size: 20
                             })
                           ]),
-                          _("span", VN, D(h(i)("chat.info.add", "添加")), 1)
+                          _("span", VN, D(p(i)("chat.info.add", "添加")), 1)
                         ])) : U("", !0),
                         ct.value ? (y(), C("div", {
                           key: 1,
@@ -32004,12 +32004,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                           onClick: le[1] || (le[1] = Ct((ae) => fe.value = !0, ["stop"]))
                         }, [
                           _("span", jN, [
-                            j(h(De), {
+                            j(p(De), {
                               name: "minus",
                               size: 20
                             })
                           ]),
-                          _("span", WN, D(h(i)("group.memberList.remove", "移除")), 1)
+                          _("span", WN, D(p(i)("group.memberList.remove", "移除")), 1)
                         ])) : U("", !0)
                       ], 4),
                       Xe.value || V.value.length === 0 ? (y(), C("button", {
@@ -32017,8 +32017,8 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                         class: "chat-info-drawer__view-all",
                         onClick: Ct(vt, ["stop"])
                       }, [
-                        ht(D(V.value.length === 0 ? h(i)("chat.info.viewAllMembersEmpty") : h(i)("chat.info.checkAll", "查看全部")) + " ", 1),
-                        j(h(De), {
+                        ht(D(V.value.length === 0 ? p(i)("chat.info.viewAllMembersEmpty") : p(i)("chat.info.checkAll", "查看全部")) + " ", 1),
+                        j(p(De), {
                           name: "chevron/down",
                           size: 14
                         })
@@ -32028,33 +32028,33 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                 ]),
                 _("div", KN, [
                   _("div", qN, [
-                    _("span", JN, D(h(i)("chat.info.groupName", "群名称")), 1),
+                    _("span", JN, D(p(i)("chat.info.groupName", "群名称")), 1),
                     _("div", XN, [
                       _("span", YN, D(P.value), 1),
-                      Y.value ? (y(), re(h(At), {
+                      Y.value ? (y(), re(p(At), {
                         key: 0,
                         class: "chat-info-drawer__field-edit-btn",
                         icon: "rect_notched/pen",
                         "icon-size": 22,
                         variant: "ghost",
-                        title: h(i)("chat.info.edit", "编辑"),
+                        title: p(i)("chat.info.edit", "编辑"),
                         onClick: le[2] || (le[2] = (ae) => Ie("name"))
                       }, null, 8, ["title"])) : U("", !0)
                     ])
                   ]),
                   _("div", QN, [
-                    _("span", ZN, D(h(i)("chat.info.groupNotice", "群公告")), 1),
+                    _("span", ZN, D(p(i)("chat.info.groupNotice", "群公告")), 1),
                     _("div", eL, [
                       _("span", {
                         class: $e(["chat-info-drawer__field-value chat-info-drawer__field-value--ellipsis", { "is-placeholder": !ce.value }])
-                      }, D(ce.value || h(i)("chat.info.groupAnnouncementPlaceholder")), 3),
-                      Y.value || Me.value ? (y(), re(h(At), {
+                      }, D(ce.value || p(i)("chat.info.groupAnnouncementPlaceholder")), 3),
+                      Y.value || Me.value ? (y(), re(p(At), {
                         key: 0,
                         class: "chat-info-drawer__field-edit-btn",
                         icon: "rect_notched/pen",
                         "icon-size": 22,
                         variant: "ghost",
-                        title: h(i)("chat.info.edit", "编辑"),
+                        title: p(i)("chat.info.edit", "编辑"),
                         onClick: le[3] || (le[3] = (ae) => Ie("notice"))
                       }, null, 8, ["title"])) : U("", !0)
                     ])
@@ -32062,7 +32062,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                 ])
               ], 64)) : (y(), C("div", RN, [
                 _("div", NN, [
-                  j(h(Dt), {
+                  j(p(Dt), {
                     name: P.value,
                     src: F.value,
                     size: 48
@@ -32074,60 +32074,60 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                   onClick: Ce
                 }, [
                   _("span", ON, [
-                    j(h(De), {
+                    j(p(De), {
                       name: "plus",
                       size: 20
                     })
                   ]),
-                  _("span", DN, D(h(i)("chat.info.add", "添加")), 1)
+                  _("span", DN, D(p(i)("chat.info.add", "添加")), 1)
                 ])
               ])),
               W(H.$slots, "drawer-settings", je(Ke(te.value)), () => [
                 _("div", {
                   class: $e(["chat-info-drawer__settings", { "chat-info-drawer__settings--group": n.isGroup }])
                 }, [
-                  o.showMessageSearch ? (y(), re(h(Bt), {
+                  o.showMessageSearch ? (y(), re(p(Bt), {
                     key: 0,
-                    title: h(i)("message.search.title"),
+                    title: p(i)("message.search.title"),
                     size: "compact",
                     "show-arrow": "",
                     border: "bottom",
                     "inset-hover": !1,
                     onClick: Be
                   }, null, 8, ["title"])) : U("", !0),
-                  n.isGroup ? (y(), re(h(Bt), {
+                  n.isGroup ? (y(), re(p(Bt), {
                     key: 1,
-                    title: h(i)("group.management.sharedFiles", "群文件"),
+                    title: p(i)("group.management.sharedFiles", "群文件"),
                     size: "compact",
                     "show-arrow": "",
                     border: "bottom",
                     "inset-hover": !1,
                     onClick: le[4] || (le[4] = (ae) => B.value = "files")
                   }, null, 8, ["title"])) : U("", !0),
-                  j(h(Bt), {
-                    title: h(i)("chat.info.conversationMute"),
+                  j(p(Bt), {
+                    title: p(i)("chat.info.conversationMute"),
                     size: "compact",
                     border: "bottom",
                     clickable: !1,
                     "inset-hover": !1
                   }, {
                     trailing: J(() => [
-                      j(h(Uo), {
+                      j(p(Uo), {
                         "model-value": we.value,
                         onChange: Ve
                       }, null, 8, ["model-value"])
                     ]),
                     _: 1
                   }, 8, ["title"]),
-                  j(h(Bt), {
-                    title: h(i)("chat.info.conversationPin"),
+                  j(p(Bt), {
+                    title: p(i)("chat.info.conversationPin"),
                     size: "compact",
                     border: "bottom",
                     clickable: !1,
                     "inset-hover": !1
                   }, {
                     trailing: J(() => [
-                      j(h(Uo), {
+                      j(p(Uo), {
                         "model-value": oe.value,
                         onChange: ge
                       }, null, 8, ["model-value"])
@@ -32197,29 +32197,29 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           fn: J(() => [
             W(H.$slots, "drawer-footer", je(Ke(te.value)), () => [
               _("div", sL, [
-                j(h(pn), {
+                j(p(pn), {
                   type: "default",
                   block: "",
                   class: "chat-info-drawer__pill-btn",
                   onClick: _t
                 }, {
                   default: J(() => [
-                    ht(D(h(i)("chat.info.clearHistory")), 1)
+                    ht(D(p(i)("chat.info.clearHistory")), 1)
                   ]),
                   _: 1
                 }),
-                j(h(pn), {
+                j(p(pn), {
                   type: "default",
                   block: "",
                   class: "chat-info-drawer__pill-btn chat-info-drawer__pill-btn--danger",
                   onClick: ye
                 }, {
                   default: J(() => [
-                    ht(D(h(i)("chat.info.deleteConversation", "删除会话")), 1)
+                    ht(D(p(i)("chat.info.deleteConversation", "删除会话")), 1)
                   ]),
                   _: 1
                 }),
-                n.isGroup ? (y(), re(h(pn), {
+                n.isGroup ? (y(), re(p(pn), {
                   key: 0,
                   type: "default",
                   block: "",
@@ -32227,7 +32227,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
                   onClick: It
                 }, {
                   default: J(() => [
-                    ht(D(Y.value ? h(i)("chat.info.destroyGroup", "解散群聊") : h(i)("chat.info.leaveGroup", "退出群聊")), 1)
+                    ht(D(Y.value ? p(i)("chat.info.destroyGroup", "解散群聊") : p(i)("chat.info.leaveGroup", "退出群聊")), 1)
                   ]),
                   _: 1
                 })) : U("", !0)
@@ -32255,14 +32255,14 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         "current-user-id": A.value ?? "",
         "current-user-role": ne.value
       }, null, 8, ["show", "group-id", "members", "current-user-id", "current-user-role"]),
-      j(h(rn), {
+      j(p(rn), {
         show: pe.value.show,
         "onUpdate:show": le[16] || (le[16] = (ae) => pe.value.show = ae),
         title: pe.value.title,
         width: 540,
         type: "warning",
-        "confirm-text": h(i)("button.confirm"),
-        "cancel-text": h(i)("button.cancel"),
+        "confirm-text": p(i)("button.confirm"),
+        "cancel-text": p(i)("button.cancel"),
         onConfirm: wt
       }, {
         default: J(() => [
@@ -32273,11 +32273,11 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               class: "chat-info-drawer__confirm-checkbox",
               onClick: le[15] || (le[15] = (ae) => pe.value.deleteRoaming = !pe.value.deleteRoaming)
             }, [
-              j(h(ho), {
+              j(p(ho), {
                 checked: pe.value.deleteRoaming,
                 size: 16
               }, null, 8, ["checked"]),
-              _("span", null, D(h(i)("chat.info.deleteRoamingMessages", "同时删除历史消息")), 1)
+              _("span", null, D(p(i)("chat.info.deleteRoamingMessages", "同时删除历史消息")), 1)
             ])) : U("", !0)
           ])
         ]),
@@ -32293,47 +32293,47 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
   emits: ["update:show", "forward"],
   setup(n, { emit: e }) {
     const t = n, o = e, { stores: s } = pt(), { t: r } = et(), { isMobile: i } = En(), a = x(""), l = s.conversation, c = k(() => {
-      const p = l.sortedConversationList;
+      const h = l.sortedConversationList;
       if (!a.value.trim())
-        return p;
+        return h;
       const f = a.value.trim().toLowerCase();
-      return p.filter(
+      return h.filter(
         (m) => m.name.toLowerCase().includes(f) || m.id.toLowerCase().includes(f)
       );
     });
     function u() {
       o("update:show", !1), a.value = "";
     }
-    function d(p) {
-      o("forward", p), u();
+    function d(h) {
+      o("forward", h), u();
     }
-    return (p, f) => (y(), re(h(Wt), {
+    return (h, f) => (y(), re(p(Wt), {
       show: t.show,
-      position: h(i) ? "bottom" : "center",
+      position: p(i) ? "bottom" : "center",
       "show-close": !0,
       "onUpdate:show": f[1] || (f[1] = (m) => o("update:show", m)),
       onClose: u
     }, {
       default: J(() => [
         _("div", {
-          class: $e(["forward-modal", { "forward-modal--mobile": h(i) }])
+          class: $e(["forward-modal", { "forward-modal--mobile": p(i) }])
         }, [
           _("div", aL, [
-            _("span", lL, D(h(r)("message.action.forward")), 1)
+            _("span", lL, D(p(r)("message.action.forward")), 1)
           ]),
           _("div", cL, [
-            j(h(dn), {
+            j(p(dn), {
               modelValue: a.value,
               "onUpdate:modelValue": f[0] || (f[0] = (m) => a.value = m),
               variant: "search",
               clearable: "",
               "clear-icon": "search/xmark",
-              placeholder: h(r)("conversation.searchPlaceholder"),
+              placeholder: p(r)("conversation.searchPlaceholder"),
               "prefix-icon": "search"
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           _("div", uL, [
-            (y(!0), C(Ae, null, ot(c.value, (m) => (y(), re(h(Bt), {
+            (y(!0), C(Ae, null, ot(c.value, (m) => (y(), re(p(Bt), {
               key: m.id,
               title: m.name || m.id,
               subtitle: m.lastMessageText || void 0,
@@ -32341,7 +32341,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               onClick: (g) => d(m)
             }, {
               leading: J(() => [
-                j(h(Dt), {
+                j(p(Dt), {
                   src: m.avatar,
                   name: m.name,
                   size: 40
@@ -32349,10 +32349,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
               ]),
               _: 2
             }, 1032, ["title", "subtitle", "onClick"]))), 128)),
-            c.value.length ? U("", !0) : (y(), re(h(Ht), {
+            c.value.length ? U("", !0) : (y(), re(p(Ht), {
               key: 0,
               icon: "bubble/rect/empty",
-              description: h(r)("conversation.empty"),
+              description: p(r)("conversation.empty"),
               size: "small"
             }, null, 8, ["description"]))
           ])
@@ -32389,7 +32389,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
     function d() {
       u.value ? o("deselect-all") : o("select-all");
     }
-    const p = x(!1), f = x(!1);
+    const h = x(!1), f = x(!1);
     function m() {
       if (t.selectedMessages.length === 0) {
         o("close");
@@ -32409,10 +32409,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         o("close");
         return;
       }
-      p.value = !0;
+      h.value = !0;
     }
     function b() {
-      o("delete", t.selectedMessages), p.value = !1;
+      o("delete", t.selectedMessages), h.value = !1;
     }
     function M() {
       o("close");
@@ -32423,7 +32423,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
           class: "multi-select-bar__select-all",
           onClick: d
         }, [
-          j(h(ho), {
+          j(p(ho), {
             checked: u.value,
             size: 22
           }, null, 8, ["checked"]),
@@ -32436,7 +32436,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             onClick: m
           }, [
             _("div", gL, [
-              j(h(De), {
+              j(p(De), {
                 name: "arrow/turn_right",
                 size: 22
               })
@@ -32448,7 +32448,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             onClick: v
           }, [
             _("div", vL, [
-              j(h(De), {
+              j(p(De), {
                 name: "trash",
                 size: 22,
                 type: "danger"
@@ -32477,12 +32477,12 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             _("div", yL, [
               _("button", {
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--option",
-                onClick: w[0] || (w[0] = (I) => g(h(Io).ONE_BY_ONE))
+                onClick: w[0] || (w[0] = (I) => g(p(Io).ONE_BY_ONE))
               }, " 逐条转发 "),
               i.value ? (y(), C("button", {
                 key: 0,
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--option",
-                onClick: w[1] || (w[1] = (I) => g(h(Io).COMBINE))
+                onClick: w[1] || (w[1] = (I) => g(p(Io).COMBINE))
               }, " 合并转发 ")) : U("", !0),
               _("button", {
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel",
@@ -32493,10 +32493,10 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
         ])) : U("", !0)
       ])),
       (y(), re(nd, { to: "body" }, [
-        p.value ? (y(), C("div", {
+        h.value ? (y(), C("div", {
           key: 0,
           class: "multi-select-bar__modal-overlay",
-          onClick: w[7] || (w[7] = (I) => p.value = !1)
+          onClick: w[7] || (w[7] = (I) => h.value = !1)
         }, [
           _("div", {
             class: "multi-select-bar__modal",
@@ -32508,7 +32508,7 @@ const YA = { class: "rich-input__toolbar" }, QA = ["title"], ZA = { class: "rich
             _("div", kL, [
               _("button", {
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--cancel",
-                onClick: w[5] || (w[5] = (I) => p.value = !1)
+                onClick: w[5] || (w[5] = (I) => h.value = !1)
               }, " 取消 "),
               _("button", {
                 class: "multi-select-bar__modal-btn multi-select-bar__modal-btn--confirm",
@@ -32547,9 +32547,9 @@ function Xf(n) {
   return n.type === ve.TEXT ? n.body.content || "" : n.type === ve.IMAGE ? "[图片]" : n.type === ve.VOICE ? "[语音]" : n.type === ve.VIDEO ? "[视频]" : n.type === ve.FILE ? `[文件] ${n.body.filename || ""}` : n.type === ve.LOCATION ? `[位置] ${n.body.address || ""}` : n.type === ve.COMBINE ? n.body.title || "[聊天记录]" : n.type === ve.CUSTOM ? n.body.event || "[自定义消息]" : "[未知消息]";
 }
 function SL(n = {}) {
-  const { stores: e, client: t } = pt(), o = x(""), s = x([]), r = x(!1), i = x(""), a = x(1), l = x(!1), c = x(0), u = x("conversation"), d = x(""), p = x(!1), f = k(() => e.conversation.currentConversation), m = k(() => e.conversation.currentConversationId);
+  const { stores: e, client: t } = pt(), o = x(""), s = x([]), r = x(!1), i = x(""), a = x(1), l = x(!1), c = x(0), u = x("conversation"), d = x(""), h = x(!1), f = k(() => e.conversation.currentConversation), m = k(() => e.conversation.currentConversationId);
   function g() {
-    o.value = "", s.value = [], a.value = 1, l.value = !1, c.value = 0, i.value = "", u.value = "conversation", d.value = "", p.value = !1;
+    o.value = "", s.value = [], a.value = 1, l.value = !1, c.value = 0, i.value = "", u.value = "conversation", d.value = "", h.value = !1;
   }
   function v(T) {
     const R = e.userInfo.getUserInfo(T.from), $ = e.contact.getContact(T.from);
@@ -32617,9 +32617,9 @@ function SL(n = {}) {
       if (P.enableServerSearch) {
         T && (a.value += 1);
         try {
-          z = await S(), p.value = !1;
+          z = await S(), h.value = !1;
         } catch (L) {
-          F = !0, T && (a.value = Math.max(1, a.value - 1)), M(L) && (p.value = !0), Jf.warn("[useMessageSearch] server search failed:", L);
+          F = !0, T && (a.value = Math.max(1, a.value - 1)), M(L) && (h.value = !0), Jf.warn("[useMessageSearch] server search failed:", L);
         }
       }
       const B = /* @__PURE__ */ new Set(), N = [];
@@ -32644,7 +32644,7 @@ function SL(n = {}) {
     totalPages: c,
     scope: u,
     activeType: d,
-    serverUnavailable: p,
+    serverUnavailable: h,
     search: w,
     loadMore: I,
     reset: g
@@ -32685,7 +32685,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       loading: c,
       scope: u,
       activeType: d,
-      serverUnavailable: p,
+      serverUnavailable: h,
       search: f,
       loadMore: m,
       reset: g
@@ -32783,7 +32783,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       }
       return fe < B.length && X.push({ text: B.slice(fe), hit: !1 }), X.length > 0 ? X : [{ text: B, hit: !1 }];
     }
-    return (F, B) => (y(), re(h(Wt), {
+    return (F, B) => (y(), re(p(Wt), {
       show: t.show,
       position: "center",
       "show-close": !0,
@@ -32794,48 +32794,48 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       default: J(() => [
         _("div", IL, [
           _("div", xL, [
-            _("span", TL, D(h(s)("message.search.title", "搜索消息")), 1)
+            _("span", TL, D(p(s)("message.search.title", "搜索消息")), 1)
           ]),
           _("div", EL, [
-            j(h(dn), {
+            j(p(dn), {
               ref_key: "inputRef",
               ref: v,
-              modelValue: h(a),
+              modelValue: p(a),
               "onUpdate:modelValue": B[0] || (B[0] = (N) => Cc(a) ? a.value = N : null),
               variant: "search",
               clearable: "",
               "clear-icon": "search/xmark",
-              placeholder: h(s)("message.search.placeholder", "搜索关键词...")
+              placeholder: p(s)("message.search.placeholder", "搜索关键词...")
             }, null, 8, ["modelValue", "placeholder"])
           ]),
           b.value ? (y(), C("div", AL, [
             _("button", {
-              class: $e(["message-search-modal__scope", { "message-search-modal__scope--active": h(u) === "conversation" }]),
+              class: $e(["message-search-modal__scope", { "message-search-modal__scope--active": p(u) === "conversation" }]),
               onClick: B[1] || (B[1] = (N) => I("conversation"))
-            }, D(h(s)("message.search.scopeConversation", "当前会话")), 3),
+            }, D(p(s)("message.search.scopeConversation", "当前会话")), 3),
             _("button", {
-              class: $e(["message-search-modal__scope", { "message-search-modal__scope--active": h(u) === "global" }]),
+              class: $e(["message-search-modal__scope", { "message-search-modal__scope--active": p(u) === "global" }]),
               onClick: B[2] || (B[2] = (N) => I("global"))
-            }, D(h(s)("message.search.scopeGlobal", "全部会话")), 3)
+            }, D(p(s)("message.search.scopeGlobal", "全部会话")), 3)
           ])) : U("", !0),
           _("div", $L, [
             (y(), C(Ae, null, ot(M, (N) => _("button", {
               key: N.value,
-              class: $e(["message-search-modal__type", { "message-search-modal__type--active": h(d) === N.value }]),
+              class: $e(["message-search-modal__type", { "message-search-modal__type--active": p(d) === N.value }]),
               onClick: (L) => T(N.value)
-            }, D(h(s)(N.labelKey, N.fallback)), 11, RL)), 64))
+            }, D(p(s)(N.labelKey, N.fallback)), 11, RL)), 64))
           ]),
-          h(p) ? (y(), C("div", NL, D(h(s)("message.search.serverUnavailable", "服务端搜索未开通，仅展示本地结果")), 1)) : U("", !0),
+          p(h) ? (y(), C("div", NL, D(p(s)("message.search.serverUnavailable", "服务端搜索未开通，仅展示本地结果")), 1)) : U("", !0),
           _("div", {
             class: "message-search-modal__results",
             onScroll: $
           }, [
-            h(l).length > 0 ? (y(!0), C(Ae, { key: 0 }, ot(h(l), (N) => (y(), C("div", {
+            p(l).length > 0 ? (y(!0), C(Ae, { key: 0 }, ot(p(l), (N) => (y(), C("div", {
               key: N.msgId,
               class: "message-search-modal__item",
               onClick: (L) => R(N.msgId, N.conversationId)
             }, [
-              j(h(Dt), {
+              j(p(Dt), {
                 src: N.avatar,
                 name: N.senderName,
                 size: 36
@@ -32843,7 +32843,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               _("div", OL, [
                 _("div", DL, [
                   _("span", BL, D(N.senderName), 1),
-                  h(u) === "global" ? (y(), C("span", PL, D(E(N.conversationId)), 1)) : U("", !0),
+                  p(u) === "global" ? (y(), C("span", PL, D(E(N.conversationId)), 1)) : U("", !0),
                   _("span", zL, D(z(N.timestamp)), 1)
                 ]),
                 _("div", UL, [
@@ -32854,17 +32854,17 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                   ], 64))), 128))
                 ])
               ])
-            ], 8, LL))), 128)) : h(c) ? (y(), C("div", HL, [
-              j(h(De), {
+            ], 8, LL))), 128)) : p(c) ? (y(), C("div", HL, [
+              j(p(De), {
                 name: "loading/arc/big",
                 size: 20,
                 anim: "spin"
               }),
-              _("span", null, D(h(s)("message.search.loading", "搜索中...")), 1)
-            ])) : h(a).trim() ? (y(), re(h(Ht), {
+              _("span", null, D(p(s)("message.search.loading", "搜索中...")), 1)
+            ])) : p(a).trim() ? (y(), re(p(Ht), {
               key: 2,
               icon: "search",
-              description: h(s)("message.search.empty", "无搜索结果"),
+              description: p(s)("message.search.empty", "无搜索结果"),
               size: "small"
             }, null, 8, ["description"])) : U("", !0)
           ], 32)
@@ -32929,7 +32929,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       isMultiSelectMode: c,
       messages: u,
       selectedMessages: d,
-      exitMultiSelectMode: p,
+      exitMultiSelectMode: h,
       fetchHistoryMessages: f,
       enterEditMode: m,
       exitEditMode: g,
@@ -33011,7 +33011,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       };
       O.timestamp && (!Z.lastMessageTime || O.timestamp > Z.lastMessageTime) && (at.lastMessageTime = O.timestamp), B.conversation.updateConversation(Z.id, at);
     }), zs(() => {
-      p(), g(), He();
+      h(), g(), He();
     }), Ue(L.keyboardHeight, async () => {
       var O, Z;
       await st(), (Z = (O = a.value) == null ? void 0 : O.scrollToBottom) == null || Z.call(O);
@@ -33266,7 +33266,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       var St, lt;
       if (!O || O.id === (Z == null ? void 0 : Z.id))
         return;
-      B.message.touchConversation(O.id), p(), Z && Fe(Z.id), He(), g(), fe(O.id);
+      B.message.touchConversation(O.id), h(), Z && Fe(Z.id), He(), g(), fe(O.id);
       const Se = B.message.getMessages(O.id);
       let at = !1;
       Se.length === 0 && (await f(), at = !0), v().catch((zt) => {
@@ -33292,31 +33292,31 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               await M(Se, O);
           else
             await S(Z, O);
-          jr.value = [], p();
+          jr.value = [], h();
         } catch (Se) {
           r.warn("[Chat] forward messages failed:", nt(Se)), ue(pe("message.forward.failed", "转发失败"), "error");
         }
     }
     function Ou() {
       if (d.value.length === 0) {
-        p();
+        h();
         return;
       }
       Wr(d.value, Io.ONE_BY_ONE);
     }
     function Du() {
       if (d.value.length === 0) {
-        p();
+        h();
         return;
       }
       Wr(d.value, Io.COMBINE);
     }
     function Bu(O) {
       if (O.length === 0) {
-        p();
+        h();
         return;
       }
-      b(O.map((Z) => Z.msgServerId || Z.msgLocalId)), p();
+      b(O.map((Z) => Z.msgServerId || Z.msgLocalId)), h();
     }
     async function Lv(O) {
       try {
@@ -33544,12 +33544,12 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       }, [
         o.loading ? (y(), C("div", jL, [
           W(O.$slots, "loading", {}, () => [
-            _("span", WL, D(h(pe)("conversation.loadingMore", "加载中...")), 1)
+            _("span", WL, D(p(pe)("conversation.loadingMore", "加载中...")), 1)
           ], !0)
         ])) : We.value ? (y(), C("div", KL, [
           W(O.$slots, "error", { error: We.value }, () => [
             _("div", qL, [
-              j(h(De), {
+              j(p(De), {
                 name: "triangle/exclamation",
                 size: 48,
                 type: "warning",
@@ -33559,10 +33559,10 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               _("button", {
                 class: "chat__error-retry",
                 onClick: de
-              }, D(h(pe)("button.confirm", "重试")), 1)
+              }, D(p(pe)("button.confirm", "重试")), 1)
             ])
           ], !0)
-        ])) : h(l) ? (y(), C(Ae, { key: 3 }, [
+        ])) : p(l) ? (y(), C(Ae, { key: 3 }, [
           _("div", {
             class: $e(["chat__body", { "chat__body--drawer-push": Ce.value === "push" }])
           }, [
@@ -33572,20 +33572,20 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 ref_key: "headerRef",
                 ref: xu,
                 class: $e(["chat__header", {
-                  "chat__header--align-left": _e.value === h(Jr).LEFT,
-                  "chat__header--align-center": _e.value === h(Jr).CENTER,
-                  "chat__header--align-right": _e.value === h(Jr).RIGHT
+                  "chat__header--align-left": _e.value === p(Jr).LEFT,
+                  "chat__header--align-center": _e.value === p(Jr).CENTER,
+                  "chat__header--align-right": _e.value === p(Jr).RIGHT
                 }])
               }, [
-                W(O.$slots, "header", { conversation: h(l) }, () => [
-                  Ve.value && h(l) ? (y(), C("div", {
+                W(O.$slots, "header", { conversation: p(l) }, () => [
+                  Ve.value && p(l) ? (y(), C("div", {
                     key: 0,
                     ref_key: "headerAvatarRef",
                     ref: Zn,
                     class: "chat__header-avatar"
                   }, [
-                    W(O.$slots, "header-avatar", { conversation: h(l) }, () => [
-                      j(h(Dt), {
+                    W(O.$slots, "header-avatar", { conversation: p(l) }, () => [
+                      j(p(Dt), {
                         src: Tv.value,
                         name: Eu.value,
                         size: 36,
@@ -33595,13 +33595,13 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                   ], 512)) : U("", !0),
                   _("div", QL, [
                     _("div", ZL, [
-                      W(O.$slots, "header-title", { conversation: h(l) }, () => [
+                      W(O.$slots, "header-title", { conversation: p(l) }, () => [
                         _("span", eO, D(Eu.value), 1),
                         yo.value && Ev.value && Nu.value != null ? (y(), C("span", tO, "(" + D(Nu.value) + ")", 1)) : U("", !0)
                       ], !0)
                     ]),
                     W(O.$slots, "header-subtitle", {
-                      conversation: h(l),
+                      conversation: p(l),
                       typing: Ka.value,
                       presence: $u.value,
                       sign: Xa.value
@@ -33616,7 +33616,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                             _("span", { class: "typing-dots__dot" }),
                             _("span", { class: "typing-dots__dot" })
                           ], -1)),
-                          _("span", null, D(h(pe)("chat.typing", "对方正在输入...")), 1)
+                          _("span", null, D(p(pe)("chat.typing", "对方正在输入...")), 1)
                         ])) : (y(), C(Ae, { key: 1 }, [
                           Ya.value ? (y(), C("span", sO, D(Ru.value), 1)) : U("", !0),
                           Ya.value && Qa.value ? (y(), C("span", rO, "·")) : U("", !0),
@@ -33624,15 +33624,15 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                         ], 64))
                       ])) : U("", !0)
                     ], !0),
-                    W(O.$slots, "header-extra", { conversation: h(l) }, void 0, !0)
+                    W(O.$slots, "header-extra", { conversation: p(l) }, void 0, !0)
                   ]),
-                  An.value && Be.value ? (y(), re(h(At), {
+                  An.value && Be.value ? (y(), re(p(At), {
                     key: 1,
                     icon: "search",
                     "icon-size": 20,
                     onClick: Z[0] || (Z[0] = Ct((lt) => Xe.value = !0, ["stop"]))
                   })) : U("", !0),
-                  ge.value && h(l) ? (y(), re(h(At), {
+                  ge.value && p(l) ? (y(), re(p(At), {
                     key: 2,
                     icon: "vertical",
                     "icon-size": 20,
@@ -33640,14 +33640,14 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                   })) : U("", !0)
                 ], !0)
               ], 2)) : U("", !0),
-              It.value && h(l) ? (y(), re(I$, {
+              It.value && p(l) ? (y(), re(I$, {
                 key: 1,
                 "max-preview-length": _t.value,
                 onLocate: ye
               }, null, 8, ["max-preview-length"])) : U("", !0),
-              yo.value && h(l) ? (y(), re(R$, {
+              yo.value && p(l) ? (y(), re(R$, {
                 key: 2,
-                "group-id": h(l).id
+                "group-id": p(l).id
               }, null, 8, ["group-id"])) : U("", !0),
               j(Jp, {
                 ref_key: "messageListRef",
@@ -33672,36 +33672,36 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 }))
               ]), 1032, ["config"]),
               W(O.$slots, "multi-select-bar", {
-                visible: h(c),
-                selectedMessages: h(d),
-                totalMessages: h(u).length,
-                selectAll: () => h(w)(h(u)),
-                deselectAll: h(I),
+                visible: p(c),
+                selectedMessages: p(d),
+                totalMessages: p(u).length,
+                selectAll: () => p(w)(p(u)),
+                deselectAll: p(I),
                 forwardOneByOne: Ou,
                 forwardCombine: Du,
                 delete: Bu,
-                close: h(p)
+                close: p(h)
               }, () => [
-                h(c) ? (y(), re(_L, {
+                p(c) ? (y(), re(_L, {
                   key: 0,
-                  "selected-messages": h(d),
-                  "total-messages": h(u).length,
+                  "selected-messages": p(d),
+                  "total-messages": p(u).length,
                   onForwardOneByOne: Ou,
                   onForwardCombine: Du,
                   onDelete: Bu,
-                  onSelectAll: Z[4] || (Z[4] = (lt) => h(w)(h(u))),
-                  onDeselectAll: Z[5] || (Z[5] = (lt) => h(I)()),
-                  onClose: h(p)
+                  onSelectAll: Z[4] || (Z[4] = (lt) => p(w)(p(u))),
+                  onDeselectAll: Z[5] || (Z[5] = (lt) => p(I)()),
+                  onClose: p(h)
                 }, null, 8, ["selected-messages", "total-messages", "onClose"])) : U("", !0)
               ], !0),
-              h(c) ? U("", !0) : (y(), re(sv, {
+              p(c) ? U("", !0) : (y(), re(sv, {
                 key: 3,
                 ref_key: "messageInputRef",
                 ref: i,
                 config: o.config,
                 "is-group": yo.value,
                 muted: Av.value,
-                "keyboard-height": h(L).keyboardHeight.value,
+                "keyboard-height": p(L).keyboardHeight.value,
                 "mention-contacts": $v.value,
                 onSendSuccess: Je,
                 onFocus: Z[6] || (Z[6] = (lt) => {
@@ -33719,14 +33719,14 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               }, 8, ["config", "is-group", "muted", "keyboard-height", "mention-contacts"]))
             ]),
             W(O.$slots, "drawer", {
-              conversation: h(l),
+              conversation: p(l),
               isGroup: yo.value,
               show: me.value,
               open: ze,
               close: Re,
               offsetTop: Wa.value,
               mode: Ce.value,
-              fullscreen: h(un)
+              fullscreen: p(un)
             }, () => {
               var lt, zt, Vn, Hu, Gu, Vu, ju, Wu, Ku, qu, Ju, Xu, Yu, Qu, Zu, ed;
               return [
@@ -33735,12 +33735,12 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                   ref: te,
                   show: me.value,
                   "onUpdate:show": Z[7] || (Z[7] = (Kr) => me.value = Kr),
-                  conversation: h(l),
+                  conversation: p(l),
                   "is-group": yo.value,
                   "offset-top": Wa.value,
                   mode: Ce.value,
                   width: vt.value,
-                  fullscreen: h(un),
+                  fullscreen: p(un),
                   "close-on-click-outside": Mn.value,
                   "group-management-display-mode": (zt = (lt = o.config) == null ? void 0 : lt.groupManagement) == null ? void 0 : zt.displayMode,
                   "allow-chat": (Hu = (Vn = o.config) == null ? void 0 : Vn.groupMember) == null ? void 0 : Hu.allowChat,
@@ -33792,38 +33792,38 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               }, null, 8, ["show", "config"])) : U("", !0)
             ];
           }, !0),
-          j(h(rn), {
+          j(p(rn), {
             show: Nt.value,
             "onUpdate:show": Z[11] || (Z[11] = (lt) => Nt.value = lt),
-            title: h(pe)("group.memberList.removeConfirmTitle"),
+            title: p(pe)("group.memberList.removeConfirmTitle"),
             width: 540,
             type: "warning",
-            "confirm-text": h(pe)("button.confirm"),
-            "cancel-text": h(pe)("button.cancel"),
+            "confirm-text": p(pe)("button.confirm"),
+            "cancel-text": p(pe)("button.cancel"),
             onConfirm: Wv,
             onCancel: Kv
           }, {
             default: J(() => [
               fn.value ? (y(), C(Ae, { key: 0 }, [
-                ht(D(h(pe)("group.memberList.removeConfirmPrefix")) + " " + D(fn.value.nickname || fn.value.userId) + " " + D(h(pe)("group.memberList.removeConfirmSuffix")), 1)
+                ht(D(p(pe)("group.memberList.removeConfirmPrefix")) + " " + D(fn.value.nickname || fn.value.userId) + " " + D(p(pe)("group.memberList.removeConfirmSuffix")), 1)
               ], 64)) : U("", !0)
             ]),
             _: 1
           }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-          j(h(rn), {
+          j(p(rn), {
             show: _s.value,
             "onUpdate:show": Z[12] || (Z[12] = (lt) => _s.value = lt),
-            title: ((St = Gn.value) == null ? void 0 : St.action) === "remove" ? h(pe)("chat.info.removeAdminConfirmTitle") : h(pe)("chat.info.setAdminConfirmTitle"),
+            title: ((St = Gn.value) == null ? void 0 : St.action) === "remove" ? p(pe)("chat.info.removeAdminConfirmTitle") : p(pe)("chat.info.setAdminConfirmTitle"),
             width: 540,
             type: "warning",
-            "confirm-text": h(pe)("button.confirm"),
-            "cancel-text": h(pe)("button.cancel"),
+            "confirm-text": p(pe)("button.confirm"),
+            "cancel-text": p(pe)("button.cancel"),
             onConfirm: Xv,
             onCancel: Yv
           }, {
             default: J(() => [
               Gn.value ? (y(), C(Ae, { key: 0 }, [
-                ht(D(Gn.value.action === "remove" ? h(pe)("chat.info.removeAdminConfirmContent").replace("{name}", Gn.value.member.nickname || Gn.value.member.userId) : h(pe)("chat.info.setAdminConfirmContent").replace("{name}", Gn.value.member.nickname || Gn.value.member.userId)), 1)
+                ht(D(Gn.value.action === "remove" ? p(pe)("chat.info.removeAdminConfirmContent").replace("{name}", Gn.value.member.nickname || Gn.value.member.userId) : p(pe)("chat.info.setAdminConfirmContent").replace("{name}", Gn.value.member.nickname || Gn.value.member.userId)), 1)
               ], 64)) : U("", !0)
             ]),
             _: 1
@@ -33831,7 +33831,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           W(O.$slots, "invite-member", {
             show: H.value,
             groupId: bt.value,
-            existingMemberIds: h(B).group.getGroupMembers(bt.value).map((lt) => lt.userId),
+            existingMemberIds: p(B).group.getGroupMembers(bt.value).map((lt) => lt.userId),
             open: Pu,
             close: yt
           }, () => [
@@ -33839,7 +33839,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               show: H.value,
               "onUpdate:show": Z[13] || (Z[13] = (lt) => H.value = lt),
               "group-id": bt.value,
-              "existing-member-ids": h(B).group.getGroupMembers(bt.value).map((lt) => lt.userId),
+              "existing-member-ids": p(B).group.getGroupMembers(bt.value).map((lt) => lt.userId),
               onInvited: Bv
             }, null, 8, ["show", "group-id", "existing-member-ids"])
           ], !0),
@@ -33890,21 +33890,21 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
             }, null, 8, ["show", "group-id"])
           ], !0)
         ], 64)) : (y(), C("div", XL, [
-          j(h(Ht), {
+          j(p(Ht), {
             icon: "bubble/rect/2",
-            description: h(pe)("chat.empty", "选择一个会话"),
+            description: p(pe)("chat.empty", "选择一个会话"),
             size: "large"
           }, {
             description: J(() => [
               W(O.$slots, "empty", {}, () => [
-                ht(D(h(pe)("chat.empty", "选择一个会话")), 1)
+                ht(D(p(pe)("chat.empty", "选择一个会话")), 1)
               ], !0)
             ]),
             _: 3
           }, 8, ["description"])
         ])),
         O.$slots.watermark ? (y(), C("div", aO, [
-          W(O.$slots, "watermark", { conversation: h(l) }, void 0, !0)
+          W(O.$slots, "watermark", { conversation: p(l) }, void 0, !0)
         ])) : U("", !0)
       ], 6);
     };
@@ -33934,7 +33934,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
         }, [
           W(r.$slots, "entry", { entry: a }, () => [
             _("span", dO, [
-              a.icon ? (y(), re(h(De), {
+              a.icon ? (y(), re(p(De), {
                 key: 0,
                 name: a.icon,
                 size: 20,
@@ -33949,7 +33949,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                   class: $e(["contact-nav__item-count", { "contact-nav__item-count--hot": a.hot }])
                 }, D(a.count > 99 ? "99+" : a.count), 3)) : U("", !0)
               ], !0),
-              j(h(De), {
+              j(p(De), {
                 name: "chevron/right",
                 size: 14,
                 class: "contact-nav__item-arrow"
@@ -33989,7 +33989,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
   setup(n, { emit: e }) {
     const t = n, o = e, s = Vt("UIKit:ContactNoticeList");
     Cp(k(() => t.persist));
-    const { t: r } = et(), { show: i } = Kt(), { stores: a } = pt(), { inviteList: l, acceptContactInvite: c, declineContactInvite: u } = Dn(), { acceptGroupInvitation: d, declineGroupInvitation: p } = ln(), f = k(() => t.invites ?? l.value), m = x(/* @__PURE__ */ new Set());
+    const { t: r } = et(), { show: i } = Kt(), { stores: a } = pt(), { inviteList: l, acceptContactInvite: c, declineContactInvite: u } = Dn(), { acceptGroupInvitation: d, declineGroupInvitation: h } = ln(), f = k(() => t.invites ?? l.value), m = x(/* @__PURE__ */ new Set());
     function g(E) {
       return m.value.has(E.id);
     }
@@ -34015,7 +34015,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       if (!m.value.has(E.id)) {
         m.value.add(E.id);
         try {
-          E.type === "group" && E.groupId ? await p(E.groupId) : E.userId && await u(E.userId), o("decline", E);
+          E.type === "group" && E.groupId ? await h(E.groupId) : E.userId && await u(E.userId), o("decline", E);
         } catch (z) {
           s.warn("[ContactNoticeList] decline invite failed:", nt(z)), i(r("contact.inviteDeclineFailed", "拒绝失败"), "error");
         } finally {
@@ -34047,15 +34047,15 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
     }
     return (E, z) => (y(), C("div", hO, [
       _("div", mO, [
-        _("span", gO, D(h(r)("contact.inviteTitle", "好友申请")), 1),
+        _("span", gO, D(p(r)("contact.inviteTitle", "好友申请")), 1),
         f.value.length > 0 ? (y(), C("span", vO, D(f.value.length), 1)) : U("", !0)
       ]),
       n.loading && f.value.length === 0 ? (y(), C("div", yO, [
-        _("span", bO, D(h(r)("common.loading")), 1)
-      ])) : f.value.length === 0 ? (y(), re(h(Ht), {
+        _("span", bO, D(p(r)("common.loading")), 1)
+      ])) : f.value.length === 0 ? (y(), re(p(Ht), {
         key: 1,
         icon: "person/single",
-        description: h(r)("contact.inviteEmpty", "暂无好友申请")
+        description: p(r)("contact.inviteEmpty", "暂无好友申请")
       }, null, 8, ["description"])) : (y(), C("div", kO, [
         (y(!0), C(Ae, null, ot(f.value, (P) => (y(), C("div", {
           key: P.id,
@@ -34064,7 +34064,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
             "contact-notice-list__item--declined": b(P) === "declined"
           }])
         }, [
-          j(h(Dt), {
+          j(p(Dt), {
             class: "contact-notice-list__avatar",
             name: $(P),
             src: P.avatarUrl,
@@ -34077,7 +34077,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
             ]),
             _("div", SO, [
               _("span", IO, D(R(P)), 1),
-              P.reason ? (y(), C("span", xO, D(h(r)("contact.inviteReason", "附言")) + ": " + D(P.reason), 1)) : U("", !0)
+              P.reason ? (y(), C("span", xO, D(p(r)("contact.inviteReason", "附言")) + ": " + D(P.reason), 1)) : U("", !0)
             ]),
             P.timestamp ? (y(), C("div", TO, D(w(P.timestamp)), 1)) : U("", !0)
           ]),
@@ -34087,12 +34087,12 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 class: "contact-notice-list__btn contact-notice-list__btn--primary",
                 disabled: g(P),
                 onClick: (F) => M(P)
-              }, D(h(r)("contact.inviteAccept", "接受")), 9, AO),
+              }, D(p(r)("contact.inviteAccept", "接受")), 9, AO),
               _("button", {
                 class: "contact-notice-list__btn contact-notice-list__btn--default",
                 disabled: g(P),
                 onClick: (F) => S(P)
-              }, D(h(r)("contact.inviteDecline", "拒绝")), 9, $O)
+              }, D(p(r)("contact.inviteDecline", "拒绝")), 9, $O)
             ], 64)) : U("", !0)
           ])
         ], 2))), 128))
@@ -34110,7 +34110,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
   },
   emits: ["send-message", "deleted", "block-changed", "remark-changed"],
   setup(n, { emit: e }) {
-    const t = n, o = e, s = Vt("UIKit:ContactDetail"), { t: r } = et(), { show: i } = Kt(), { client: a, stores: l, features: c } = pt(), { deleteContact: u, setContactRemark: d } = Dn(), { isBlocked: p, addBlock: f, removeBlock: m, refresh: g } = Dr(), { fetchPresence: v } = Xo(), b = [
+    const t = n, o = e, s = Vt("UIKit:ContactDetail"), { t: r } = et(), { show: i } = Kt(), { client: a, stores: l, features: c } = pt(), { deleteContact: u, setContactRemark: d } = Dn(), { isBlocked: h, addBlock: f, removeBlock: m, refresh: g } = Dr(), { fetchPresence: v } = Xo(), b = [
       "nickname",
       "avatarUrl",
       "sign",
@@ -34134,7 +34134,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
         var ne;
         return I.value || ((ne = t.contact) == null ? void 0 : ne.name) || t.userId;
       }
-    ), K = k(() => p(t.userId)), X = k(
+    ), K = k(() => h(t.userId)), X = k(
       () => {
         var ne, Y;
         return ((ne = S.value) == null ? void 0 : ne.remark) || ((Y = t.contact) == null ? void 0 : Y.remark) || "";
@@ -34218,7 +34218,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       var Me;
       return y(), C("div", NO, [
         _("div", LO, [
-          $.value ? (y(), C("div", OO, D(h(r)("common.loading", "加载中...")), 1)) : U("", !0),
+          $.value ? (y(), C("div", OO, D(p(r)("common.loading", "加载中...")), 1)) : U("", !0),
           _("div", DO, [
             W(ne.$slots, "avatar", {
               userId: t.userId,
@@ -34226,7 +34226,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               displayName: L.value,
               presence: T.value
             }, () => [
-              j(h(Dt), {
+              j(p(Dt), {
                 src: N.value,
                 name: L.value,
                 size: 96,
@@ -34242,8 +34242,8 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               var ce;
               return [
                 _("div", BO, D(L.value), 1),
-                _("div", PO, D(h(r)("userCard.username", "用户名")) + ": " + D(((ce = B.value) == null ? void 0 : ce.nickname) || "-"), 1),
-                _("div", zO, D(h(r)("contact.detail.userId", "用户 ID")) + ": " + D(t.userId), 1)
+                _("div", PO, D(p(r)("userCard.username", "用户名")) + ": " + D(((ce = B.value) == null ? void 0 : ce.nickname) || "-"), 1),
+                _("div", zO, D(p(r)("contact.detail.userId", "用户 ID")) + ": " + D(t.userId), 1)
               ];
             }, !0)
           ]),
@@ -34253,14 +34253,14 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           }, () => [
             _("div", UO, [
               _("div", FO, [
-                _("span", HO, D(h(r)("userCard.alias", "备注")), 1),
+                _("span", HO, D(p(r)("userCard.alias", "备注")), 1),
                 _("span", GO, D(X.value || L.value), 1)
               ]),
-              j(h(At), {
+              j(p(At), {
                 icon: "rect_notched/pen",
                 "icon-size": 22,
                 style: { color: "#C9CDCF" },
-                title: h(r)("contact.detail.edit", "编辑"),
+                title: p(r)("contact.detail.edit", "编辑"),
                 onClick: q
               }, null, 8, ["title"])
             ])
@@ -34268,7 +34268,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           W(ne.$slots, "extra", {
             userId: t.userId,
             userInfo: B.value,
-            contact: h(S)
+            contact: p(S)
           }, void 0, !0),
           W(ne.$slots, "actions", {
             userId: t.userId
@@ -34278,11 +34278,11 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               type: "button",
               onClick: Y[0] || (Y[0] = (ce) => o("send-message", t.userId))
             }, [
-              j(h(De), {
+              j(p(De), {
                 name: "bubble/empty",
                 size: 22
               }),
-              _("span", null, D(h(r)("userCard.chat", "发消息")), 1)
+              _("span", null, D(p(r)("userCard.chat", "发消息")), 1)
             ])
           ], !0),
           W(ne.$slots, "footer", {
@@ -34294,23 +34294,23 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 class: "contact-detail__action",
                 type: "button",
                 onClick: Y[1] || (Y[1] = (ce) => ie(K.value ? "unblock" : "block"))
-              }, D(K.value ? h(r)("contact.detail.unblock", "取消拉黑") : h(r)("userCard.blockedContact", "拉黑联系人")), 1),
+              }, D(K.value ? p(r)("contact.detail.unblock", "取消拉黑") : p(r)("userCard.blockedContact", "拉黑联系人")), 1),
               _("button", {
                 class: "contact-detail__action",
                 type: "button",
                 onClick: Y[2] || (Y[2] = (ce) => ie("delete"))
-              }, D(h(r)("userCard.deleteContact", "删除联系人")), 1)
+              }, D(p(r)("userCard.deleteContact", "删除联系人")), 1)
             ])
           ], !0)
         ]),
-        j(h(rn), {
+        j(p(rn), {
           show: F.value.show,
           "onUpdate:show": Y[3] || (Y[3] = (ce) => F.value.show = ce),
           title: F.value.title,
           width: 540,
           type: "warning",
-          "confirm-text": h(r)("button.confirm", "确认"),
-          "cancel-text": h(r)("button.cancel", "取消"),
+          "confirm-text": p(r)("button.confirm", "确认"),
+          "cancel-text": p(r)("button.cancel", "取消"),
           onConfirm: V,
           onCancel: Y[4] || (Y[4] = (ce) => F.value.show = !1)
         }, {
@@ -34319,12 +34319,12 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           ]),
           _: 1
         }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-        j(h(rn), {
+        j(p(rn), {
           show: E.value,
           "onUpdate:show": Y[6] || (Y[6] = (ce) => E.value = ce),
-          title: h(r)("userCard.alias", "备注"),
-          "confirm-text": h(r)("button.confirm", "确认"),
-          "cancel-text": h(r)("button.cancel", "取消"),
+          title: p(r)("userCard.alias", "备注"),
+          "confirm-text": p(r)("button.confirm", "确认"),
+          "cancel-text": p(r)("button.cancel", "取消"),
           onConfirm: A,
           onCancel: G
         }, {
@@ -34335,7 +34335,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               "onUpdate:modelValue": Y[5] || (Y[5] = (ce) => z.value = ce),
               class: "contact-detail__remark-input",
               type: "text",
-              placeholder: h(r)("userCard.alias", "备注"),
+              placeholder: p(r)("userCard.alias", "备注"),
               onKeyup: Bs(A, ["enter"])
             }, null, 40, jO), [
               [mo, z.value]
@@ -34356,9 +34356,9 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
   },
   emits: ["update:show", "added"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { t: s } = et(), { show: r } = Kt(), { stores: i } = pt(), { contactList: a } = Dn(), { blockList: l, addBlock: c } = Dr(), u = x(""), d = x(/* @__PURE__ */ new Set()), p = k(() => new Set(l.value.map((w) => w.userId))), f = k(() => i.client.currentUser), m = k(() => {
+    const t = n, o = e, { t: s } = et(), { show: r } = Kt(), { stores: i } = pt(), { contactList: a } = Dn(), { blockList: l, addBlock: c } = Dr(), u = x(""), d = x(/* @__PURE__ */ new Set()), h = k(() => new Set(l.value.map((w) => w.userId))), f = k(() => i.client.currentUser), m = k(() => {
       const w = u.value.trim().toLowerCase();
-      return a.value.filter((I) => I.userId === f.value || p.value.has(I.userId) ? !1 : w ? (I.remark || I.name || I.userId).toLowerCase().includes(w) || I.userId.toLowerCase().includes(w) : !0);
+      return a.value.filter((I) => I.userId === f.value || h.value.has(I.userId) ? !1 : w ? (I.remark || I.name || I.userId).toLowerCase().includes(w) || I.userId.toLowerCase().includes(w) : !0);
     });
     function g(w) {
       return w.remark || w.name || w.userId;
@@ -34392,11 +34392,11 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
         }
       T === 0 ? r(s("contact.blocklist.addSuccess", "添加成功"), "success") : r(s("contact.blocklist.addFailed", "添加失败"), "error"), T === 0 && o("added", I), M();
     }
-    return (w, I) => (y(), re(h(rn), {
+    return (w, I) => (y(), re(p(rn), {
       show: t.show,
-      title: h(s)("contact.blocklist.add", "添加黑名单"),
+      title: p(s)("contact.blocklist.add", "添加黑名单"),
       width: 360,
-      "confirm-text": h(s)("button.confirm", "确定"),
+      "confirm-text": p(s)("button.confirm", "确定"),
       "confirm-disabled": d.value.size === 0,
       "confirm-auto-close": !1,
       "body-flush": "",
@@ -34406,19 +34406,19 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
     }, {
       default: J(() => [
         _("div", qO, [
-          j(h(dn), {
+          j(p(dn), {
             modelValue: u.value,
             "onUpdate:modelValue": I[0] || (I[0] = (T) => u.value = T),
             variant: "search",
             clearable: "",
             "clear-icon": "search/xmark",
-            placeholder: h(s)("contact.searchPlaceholder", "搜索联系人..."),
+            placeholder: p(s)("contact.searchPlaceholder", "搜索联系人..."),
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"])
         ]),
         _("div", JO, [
-          m.value.length === 0 ? (y(), C("div", XO, D(h(s)("contact.blocklist.emptySelectable", "暂无可添加的联系人")), 1)) : U("", !0),
-          (y(!0), C(Ae, null, ot(m.value, (T) => (y(), re(h(Bt), {
+          m.value.length === 0 ? (y(), C("div", XO, D(p(s)("contact.blocklist.emptySelectable", "暂无可添加的联系人")), 1)) : U("", !0),
+          (y(!0), C(Ae, null, ot(m.value, (T) => (y(), re(p(Bt), {
             key: T.userId,
             class: "block-list-add-modal__item",
             size: "compact",
@@ -34427,14 +34427,14 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
             onClick: (R) => v(T)
           }, {
             leading: J(() => [
-              j(h(Dt), {
+              j(p(Dt), {
                 name: g(T),
                 src: T.avatar,
                 size: 36
               }, null, 8, ["name", "src"])
             ]),
             trailing: J(() => [
-              j(h(ho), {
+              j(p(ho), {
                 checked: d.value.has(T.userId)
               }, null, 8, ["checked"])
             ]),
@@ -34476,7 +34476,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
   },
   emits: ["click", "contextmenu", "unblock"],
   setup(n, { expose: e, emit: t }) {
-    const o = n, s = t, { t: r } = et(), { features: i } = pt(), { blockList: a, refresh: l, removeBlock: c } = Dr(), { show: u } = Kt(), d = x(!1), p = x(!1), f = k(() => a.value.length), m = x(!1), g = x(null), v = x();
+    const o = n, s = t, { t: r } = et(), { features: i } = pt(), { blockList: a, refresh: l, removeBlock: c } = Dr(), { show: u } = Kt(), d = x(!1), h = x(!1), f = k(() => a.value.length), m = x(!1), g = x(null), v = x();
     function b($, E) {
       $.preventDefault(), $.stopPropagation(), v.value = $.currentTarget, g.value = E, m.value = !0, s("contextmenu", $, E);
     }
@@ -34519,29 +34519,29 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       o.showHeader ? (y(), C("div", ZO, [
         W($.$slots, "header", {}, () => [
           _("span", e2, [
-            ht(D(o.title || h(r)("contact.entryBlocklist", "黑名单")) + " ", 1),
+            ht(D(o.title || p(r)("contact.entryBlocklist", "黑名单")) + " ", 1),
             o.showCount ? (y(), C("span", t2, "(" + D(f.value) + ")", 1)) : U("", !0)
           ])
         ], !0),
         W($.$slots, "header-extra", {}, () => [
-          j(h(At), {
+          j(p(At), {
             icon: "circle/plus",
             size: "small",
             variant: "ghost",
             "icon-size": 22,
-            title: h(r)("contact.blocklist.add", "添加黑名单"),
-            onClick: E[0] || (E[0] = (z) => p.value = !0)
+            title: p(r)("contact.blocklist.add", "添加黑名单"),
+            onClick: E[0] || (E[0] = (z) => h.value = !0)
           }, null, 8, ["title"])
         ], !0)
       ])) : U("", !0),
       _("div", n2, [
-        d.value && h(a).length === 0 ? (y(), C("div", o2, D(h(r)("common.loading")), 1)) : h(a).length === 0 ? (y(), re(h(Ht), {
+        d.value && p(a).length === 0 ? (y(), C("div", o2, D(p(r)("common.loading")), 1)) : p(a).length === 0 ? (y(), re(p(Ht), {
           key: 1,
           icon: "circle/slash",
-          description: o.emptyText || h(r)("contact.blocklist.empty", "暂无黑名单"),
+          description: o.emptyText || p(r)("contact.blocklist.empty", "暂无黑名单"),
           size: "small"
         }, null, 8, ["description"])) : (y(), C("div", s2, [
-          (y(!0), C(Ae, null, ot(h(a), (z) => (y(), re(Nc, {
+          (y(!0), C(Ae, null, ot(p(a), (z) => (y(), re(Nc, {
             key: z.userId,
             contact: z,
             "show-avatar": o.showAvatar,
@@ -34553,7 +34553,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           }, null, 8, ["contact", "show-avatar", "avatar-size", "avatar-shape", "size"]))), 128))
         ]))
       ]),
-      j(h(Wt), {
+      j(p(Wt), {
         show: m.value,
         anchor: v.value,
         placement: "bottom",
@@ -34573,35 +34573,35 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
               class: "block-list-contact__menu-item block-list-contact__menu-item--danger",
               onClick: I
             }, [
-              j(h(De), {
+              j(p(De), {
                 name: "person/minus",
                 size: 16
               }),
-              _("span", null, D(h(r)("contact.blocklist.remove", "移出黑名单")), 1)
+              _("span", null, D(p(r)("contact.blocklist.remove", "移出黑名单")), 1)
             ])
           ])
         ]),
         _: 1
       }, 8, ["show", "anchor"]),
-      j(h(rn), {
+      j(p(rn), {
         show: w.value,
         "onUpdate:show": E[2] || (E[2] = (z) => w.value = z),
-        title: h(r)("contact.blocklist.removeConfirmTitle", "移出黑名单"),
+        title: p(r)("contact.blocklist.removeConfirmTitle", "移出黑名单"),
         width: 540,
         type: "warning",
-        "confirm-text": h(r)("button.confirm", "确认"),
-        "cancel-text": h(r)("button.cancel", "取消"),
+        "confirm-text": p(r)("button.confirm", "确认"),
+        "cancel-text": p(r)("button.cancel", "取消"),
         onConfirm: T,
         onCancel: E[3] || (E[3] = (z) => w.value = !1)
       }, {
         default: J(() => [
-          ht(D(h(r)("contact.blocklist.removeConfirm", "确定将其移出黑名单吗？")), 1)
+          ht(D(p(r)("contact.blocklist.removeConfirm", "确定将其移出黑名单吗？")), 1)
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
       j(Iu, {
-        show: p.value,
-        "onUpdate:show": E[4] || (E[4] = (z) => p.value = z)
+        show: h.value,
+        "onUpdate:show": E[4] || (E[4] = (z) => h.value = z)
       }, null, 8, ["show"]),
       $.$slots.watermark ? (y(), C("div", r2, [
         W($.$slots, "watermark", {}, void 0, !0)
@@ -34622,11 +34622,11 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
   },
   emits: ["update:show", "update:selectedIds", "confirm", "cancel", "max-exceed"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { t: s } = et(), { contactList: r, fetchContacts: i, setSelectedIds: a } = Dn(), l = k(() => t.title || s("contact.transfer.title", "选择成员")), c = k(() => t.confirmText || s("button.confirm", "确认")), u = k(() => t.cancelText || s("button.cancel", "取消")), d = x([...t.selectedIds]), p = x("");
+    const t = n, o = e, { t: s } = et(), { contactList: r, fetchContacts: i, setSelectedIds: a } = Dn(), l = k(() => t.title || s("contact.transfer.title", "选择成员")), c = k(() => t.confirmText || s("button.confirm", "确认")), u = k(() => t.cancelText || s("button.cancel", "取消")), d = x([...t.selectedIds]), h = x("");
     Ue(
       () => t.show,
       async (S) => {
-        S && (d.value = [...t.selectedIds], p.value = "", await i());
+        S && (d.value = [...t.selectedIds], h.value = "", await i());
       }
     );
     function f(S) {
@@ -34636,7 +34636,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       const S = new Map(r.value.map((w) => [w.userId, w]));
       return d.value.map((w) => S.get(w) ?? { userId: w, name: w });
     }), g = k(() => {
-      const S = p.value.trim().toLowerCase();
+      const S = h.value.trim().toLowerCase();
       return S ? m.value.filter(
         (w) => (w.name || "").toLowerCase().includes(S) || w.userId.toLowerCase().includes(S)
       ) : m.value;
@@ -34650,7 +34650,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
     function M() {
       o("cancel"), o("update:show", !1);
     }
-    return (S, w) => (y(), re(h(rn), {
+    return (S, w) => (y(), re(p(rn), {
       show: t.show,
       title: l.value,
       width: 960,
@@ -34676,13 +34676,13 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
           ]),
           _("div", c2, [
             _("div", u2, [
-              j(h(dn), {
-                modelValue: p.value,
-                "onUpdate:modelValue": w[1] || (w[1] = (I) => p.value = I),
+              j(p(dn), {
+                modelValue: h.value,
+                "onUpdate:modelValue": w[1] || (w[1] = (I) => h.value = I),
                 variant: "filled",
                 "prefix-icon": "search",
                 clearable: "",
-                placeholder: h(s)("contact.transfer.searchSelected", "搜索已选成员")
+                placeholder: p(s)("contact.transfer.searchSelected", "搜索已选成员")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
             _("div", d2, [
@@ -34697,7 +34697,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 extra: J(() => [
                   _("button", {
                     class: "contact-transfer-modal__selected-remove",
-                    title: h(s)("button.remove", "移除"),
+                    title: p(s)("button.remove", "移除"),
                     onClick: (T) => v(I.userId)
                   }, [...w[3] || (w[3] = [
                     _("span", null, "×", -1)
@@ -34705,15 +34705,15 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 ]),
                 _: 2
               }, 1032, ["contact"]))), 128)),
-              g.value.length === 0 ? (y(), re(h(Ht), {
+              g.value.length === 0 ? (y(), re(p(Ht), {
                 key: 0,
                 icon: "person/single",
-                description: h(s)("group.createSelectedEmpty", "请选择联系人"),
+                description: p(s)("group.createSelectedEmpty", "请选择联系人"),
                 size: "small"
               }, null, 8, ["description"])) : U("", !0)
             ]),
             _("div", p2, [
-              j(h(pn), {
+              j(p(pn), {
                 pill: "",
                 size: "large",
                 type: "primary",
@@ -34725,7 +34725,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
                 ]),
                 _: 1
               }, 8, ["loading"]),
-              j(h(pn), {
+              j(p(pn), {
                 pill: "",
                 size: "large",
                 type: "outline",
@@ -34743,7 +34743,7 @@ const IL = { class: "message-search-modal" }, xL = { class: "message-search-moda
       _: 1
     }, 8, ["show", "title"]));
   }
-}), m2 = /* @__PURE__ */ Pe(h2, [["__scopeId", "data-v-ec2bdd01"]]);
+}), m2 = /* @__PURE__ */ Pe(h2, [["__scopeId", "data-v-941c5f3f"]]);
 function g2(n, e, t = {}) {
   return k(() => {
     const o = e.value.trim().toLowerCase();
@@ -34763,8 +34763,8 @@ function v2(n, e) {
       return t;
     const s = [...t];
     return typeof o == "function" ? s.sort(o) : o === "memberCount" ? s.sort((r, i) => (i.memberCount ?? 0) - (r.memberCount ?? 0)) : o === "pinyin" ? s.sort((r, i) => {
-      const a = r.groupName || "", l = i.groupName || "", c = ro(a), u = ro(l), d = (c == null ? void 0 : c.pinyin) || a.toLowerCase(), p = (u == null ? void 0 : u.pinyin) || l.toLowerCase();
-      return d.localeCompare(p);
+      const a = r.groupName || "", l = i.groupName || "", c = ro(a), u = ro(l), d = (c == null ? void 0 : c.pinyin) || a.toLowerCase(), h = (u == null ? void 0 : u.pinyin) || l.toLowerCase();
+      return d.localeCompare(h);
     }) : s;
   });
 }
@@ -34775,9 +34775,9 @@ const fv = /* @__PURE__ */ Ne({
   },
   setup(n) {
     const e = n, { t } = et();
-    return (o, s) => (y(), re(h(Ht), {
+    return (o, s) => (y(), re(p(Ht), {
       icon: "person/double",
-      description: e.text || h(t)("group.empty")
+      description: e.text || p(t)("group.empty")
     }, null, 8, ["description"]));
   }
 }), y2 = { class: "group-item-default__leading" }, b2 = /* @__PURE__ */ Ne({
@@ -34805,7 +34805,7 @@ const fv = /* @__PURE__ */ Ne({
       if (e.showMemberCount && !((e.group.memberCount ?? 0) <= 0))
         return String(e.group.memberCount);
     });
-    return (i, a) => (y(), re(h(Bt), {
+    return (i, a) => (y(), re(p(Bt), {
       "auto-height": "",
       class: "group-item-default",
       title: t.value,
@@ -34818,7 +34818,7 @@ const fv = /* @__PURE__ */ Ne({
     }, {
       leading: J(() => [
         _("span", y2, [
-          e.showCheckbox ? (y(), re(h(ho), {
+          e.showCheckbox ? (y(), re(p(ho), {
             key: 0,
             checked: e.selected
           }, null, 8, ["checked"])) : U("", !0),
@@ -34826,7 +34826,7 @@ const fv = /* @__PURE__ */ Ne({
             group: e.group,
             size: o.value
           }, () => [
-            e.showAvatar ? (y(), re(h(Dt), {
+            e.showAvatar ? (y(), re(p(Dt), {
               key: 0,
               src: e.group.avatar,
               name: t.value,
@@ -34871,21 +34871,21 @@ const fv = /* @__PURE__ */ Ne({
     function d() {
       t.disabled || (t.selectMode === "multiple" ? a(t.group.groupId) : i(t.group.groupId), o("click", t.group));
     }
-    function p(f) {
+    function h(f) {
       t.disabled || o("contextmenu", f, t.group);
     }
     return (f, m) => (y(), C("div", {
       class: $e(["group-item", { "is-disabled": t.disabled }]),
       "data-groupid": t.group.groupId,
       onClick: d,
-      onContextmenu: p
+      onContextmenu: h
     }, [
       W(f.$slots, "default", {
         group: t.group,
         active: l.value,
         selected: c.value,
         disabled: t.disabled,
-        toggleSelect: () => h(a)(t.group.groupId)
+        toggleSelect: () => p(a)(t.group.groupId)
       }, () => [
         j(pv, {
           group: t.group,
@@ -34996,11 +34996,11 @@ const fv = /* @__PURE__ */ Ne({
       selectedIds: i,
       setSelectedIds: a,
       setActiveId: l
-    } = ln(), { t: c } = et(), u = x(), d = x(!1), p = x("");
+    } = ln(), { t: c } = et(), u = x(), d = x(!1), h = x("");
     function f(V) {
-      p.value = V, s("search", V.trim());
+      h.value = V, s("search", V.trim());
     }
-    const m = k(() => p.value.trim()), g = k(() => o.sortBy), v = k(() => o.groupBy), b = g2(r, p, {
+    const m = k(() => h.value.trim()), g = k(() => o.sortBy), v = k(() => o.groupBy), b = g2(r, h, {
       filterFn: o.filterFn
     }), M = v2(b, g), S = k(() => b.value.length);
     function w(V, ne) {
@@ -35139,28 +35139,28 @@ const fv = /* @__PURE__ */ Ne({
       }, [
         W(V.$slots, "header", {}, () => [
           _("span", C2, [
-            ht(D(o.title || h(c)("group.title")) + " ", 1),
+            ht(D(o.title || p(c)("group.title")) + " ", 1),
             o.showCount ? (y(), C("span", M2, "(" + D(S.value) + ")", 1)) : U("", !0)
           ])
         ], !0)
       ], 2)) : U("", !0),
       V.$slots.search || o.searchComponent || o.showSearch ? (y(), C("div", S2, [
         W(V.$slots, "search", {
-          keyword: p.value,
+          keyword: h.value,
           setKeyword: f
         }, () => [
           o.searchComponent ? (y(), re(Mc(o.searchComponent), {
             key: 0,
-            modelValue: p.value,
-            "onUpdate:modelValue": ne[0] || (ne[0] = (Y) => p.value = Y)
-          }, null, 8, ["modelValue"])) : (y(), re(h(dn), {
+            modelValue: h.value,
+            "onUpdate:modelValue": ne[0] || (ne[0] = (Y) => h.value = Y)
+          }, null, 8, ["modelValue"])) : (y(), re(p(dn), {
             key: 1,
-            modelValue: p.value,
-            "onUpdate:modelValue": ne[1] || (ne[1] = (Y) => p.value = Y),
+            modelValue: h.value,
+            "onUpdate:modelValue": ne[1] || (ne[1] = (Y) => h.value = Y),
             variant: "search",
             clearable: "",
             "clear-icon": "search/xmark",
-            placeholder: h(c)("group.searchPlaceholder"),
+            placeholder: p(c)("group.searchPlaceholder"),
             "prefix-icon": "search"
           }, null, 8, ["modelValue", "placeholder"]))
         ], !0)
@@ -35187,16 +35187,16 @@ const fv = /* @__PURE__ */ Ne({
                 key: Y,
                 class: "group-list__skeleton-item"
               }, [
-                j(h(fo), {
+                j(p(fo), {
                   variant: "avatar",
                   shape: "rounded"
                 }),
                 _("div", A2, [
-                  j(h(fo), {
+                  j(p(fo), {
                     variant: "text",
                     style: { width: "35%" }
                   }),
-                  j(h(fo), {
+                  j(p(fo), {
                     variant: "text",
                     style: { width: "65%" }
                   })
@@ -35207,7 +35207,7 @@ const fv = /* @__PURE__ */ Ne({
         ])) : I.value.length === 0 || I.value.every((Y) => Y.items.length === 0) ? (y(), C("div", $2, [
           W(V.$slots, "empty", { searchKeyword: m.value }, () => [
             j(fv, {
-              text: o.emptyText || (m.value ? h(c)("group.noSearchResult") : h(c)("group.empty"))
+              text: o.emptyText || (m.value ? p(c)("group.noSearchResult") : p(c)("group.empty"))
             }, null, 8, ["text"])
           ], !0)
         ])) : (y(), C(Ae, { key: 3 }, [
@@ -35246,12 +35246,12 @@ const fv = /* @__PURE__ */ Ne({
           ], 8, R2))), 128)),
           o.loading && I.value.length > 0 ? (y(), C("div", L2, [
             W(V.$slots, "loading-more", {}, () => [
-              _("span", O2, D(h(c)("common.loading")), 1)
+              _("span", O2, D(p(c)("common.loading")), 1)
             ], !0)
           ])) : U("", !0),
           !o.loading && !o.hasMore && I.value.length > 0 ? (y(), C("div", D2, [
             W(V.$slots, "no-more", {}, () => [
-              _("span", B2, D(o.noMoreText || h(c)("common.noMore")), 1)
+              _("span", B2, D(o.noMoreText || p(c)("common.noMore")), 1)
             ], !0)
           ])) : U("", !0)
         ], 64)),
@@ -35267,7 +35267,7 @@ const fv = /* @__PURE__ */ Ne({
         keys: N.value,
         onJump: B
       }, null, 8, ["keys"])) : U("", !0),
-      o.showScrollToTop ? (y(), re(h(va), {
+      o.showScrollToTop ? (y(), re(p(va), {
         key: 5,
         target: u.value ?? void 0,
         "visibility-height": 200,
@@ -35290,7 +35290,7 @@ const fv = /* @__PURE__ */ Ne({
   },
   emits: ["send-message", "leaved", "destroyed"],
   setup(n, { emit: e }) {
-    const t = n, o = e, s = Vt("UIKit:GroupDetail"), { t: r } = et(), { show: i } = Kt(), { stores: a } = pt(), { fetchGroupInfo: l, updateGroupInfo: c, leaveGroup: u, destroyGroup: d } = ln(), p = x(!1), f = x(/* @__PURE__ */ new Set()), m = x(!1), g = x(), v = x(""), b = x(!1), M = x({
+    const t = n, o = e, s = Vt("UIKit:GroupDetail"), { t: r } = et(), { show: i } = Kt(), { stores: a } = pt(), { fetchGroupInfo: l, updateGroupInfo: c, leaveGroup: u, destroyGroup: d } = ln(), h = x(!1), f = x(/* @__PURE__ */ new Set()), m = x(!1), g = x(), v = x(""), b = x(!1), M = x({
       show: !1,
       content: "",
       action: null
@@ -35307,15 +35307,15 @@ const fv = /* @__PURE__ */ Ne({
     );
     async function I() {
       var N, L;
-      if (t.groupId && !((N = S.value) != null && N.groupName && ((L = S.value) != null && L.role) || p.value || f.value.has(t.groupId))) {
-        p.value = !0;
+      if (t.groupId && !((N = S.value) != null && N.groupName && ((L = S.value) != null && L.role) || h.value || f.value.has(t.groupId))) {
+        h.value = !0;
         try {
           const K = await l(t.groupId);
           (!K || !K.groupId) && f.value.add(t.groupId);
         } catch (K) {
           s.warn("[GroupDetail] fetchGroupInfo failed:", nt(K)), f.value.add(t.groupId);
         } finally {
-          p.value = !1;
+          h.value = !1;
         }
       }
     }
@@ -35378,14 +35378,14 @@ const fv = /* @__PURE__ */ Ne({
     }
     return (N, L) => (y(), C("div", H2, [
       _("div", G2, [
-        p.value ? (y(), C("div", V2, D(h(r)("common.loading", "加载中...")), 1)) : U("", !0),
+        h.value ? (y(), C("div", V2, D(p(r)("common.loading", "加载中...")), 1)) : U("", !0),
         _("div", j2, [
           W(N.$slots, "avatar", {
             groupId: t.groupId,
             avatar: R.value,
             displayName: $.value
           }, () => [
-            j(h(Dt), {
+            j(p(Dt), {
               src: R.value,
               name: $.value,
               size: 96
@@ -35399,16 +35399,16 @@ const fv = /* @__PURE__ */ Ne({
           }, () => [
             _("div", W2, [
               _("span", null, D($.value), 1),
-              w.value ? (y(), re(h(At), {
+              w.value ? (y(), re(p(At), {
                 key: 0,
                 icon: "rect_notched/pen",
                 "icon-size": 22,
                 style: { color: "var(--uikit-drawer-field-action-color, #C9CDCF)" },
-                title: h(r)("chat.info.edit", "编辑"),
+                title: p(r)("chat.info.edit", "编辑"),
                 onClick: E
               }, null, 8, ["title"])) : U("", !0)
             ]),
-            _("div", K2, D(h(r)("groupCard.groupId", "群 ID")) + ": " + D(t.groupId), 1)
+            _("div", K2, D(p(r)("groupCard.groupId", "群 ID")) + ": " + D(t.groupId), 1)
           ], !0)
         ]),
         W(N.$slots, "extra", {
@@ -35423,11 +35423,11 @@ const fv = /* @__PURE__ */ Ne({
             type: "button",
             onClick: L[0] || (L[0] = (K) => o("send-message", t.groupId))
           }, [
-            j(h(De), {
+            j(p(De), {
               name: "bubble/empty",
               size: 22
             }),
-            _("span", null, D(h(r)("userCard.chat", "发消息")), 1)
+            _("span", null, D(p(r)("userCard.chat", "发消息")), 1)
           ])
         ], !0),
         W(N.$slots, "footer", {
@@ -35441,23 +35441,23 @@ const fv = /* @__PURE__ */ Ne({
               class: "group-detail__action",
               type: "button",
               onClick: L[1] || (L[1] = (K) => F("destroy"))
-            }, D(h(r)("group.detail.destroyGroup", "解散该群")), 1)) : (y(), C("button", {
+            }, D(p(r)("group.detail.destroyGroup", "解散该群")), 1)) : (y(), C("button", {
               key: 1,
               class: "group-detail__action",
               type: "button",
               onClick: L[2] || (L[2] = (K) => F("leave"))
-            }, D(h(r)("group.detail.leaveGroup", "退出该群")), 1))
+            }, D(p(r)("group.detail.leaveGroup", "退出该群")), 1))
           ])
         ], !0)
       ]),
-      j(h(rn), {
+      j(p(rn), {
         show: M.value.show,
         "onUpdate:show": L[3] || (L[3] = (K) => M.value.show = K),
-        title: M.value.action === "destroy" ? h(r)("chat.info.destroyGroup", "解散群聊") : h(r)("chat.info.leaveGroup", "退出群聊"),
+        title: M.value.action === "destroy" ? p(r)("chat.info.destroyGroup", "解散群聊") : p(r)("chat.info.leaveGroup", "退出群聊"),
         width: 540,
         type: "warning",
-        "confirm-text": h(r)("button.confirm", "确认"),
-        "cancel-text": h(r)("button.cancel", "取消"),
+        "confirm-text": p(r)("button.confirm", "确认"),
+        "cancel-text": p(r)("button.cancel", "取消"),
         onConfirm: B,
         onCancel: L[4] || (L[4] = (K) => M.value.show = !1)
       }, {
@@ -35466,12 +35466,12 @@ const fv = /* @__PURE__ */ Ne({
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"]),
-      j(h(rn), {
+      j(p(rn), {
         show: m.value,
         "onUpdate:show": L[6] || (L[6] = (K) => m.value = K),
-        title: h(r)("chat.info.groupName", "群名称"),
-        "confirm-text": h(r)("button.confirm", "确认"),
-        "cancel-text": h(r)("button.cancel", "取消"),
+        title: p(r)("chat.info.groupName", "群名称"),
+        "confirm-text": p(r)("button.confirm", "确认"),
+        "cancel-text": p(r)("button.cancel", "取消"),
         onConfirm: P,
         onCancel: z
       }, {
@@ -35483,7 +35483,7 @@ const fv = /* @__PURE__ */ Ne({
             class: "group-detail__name-input",
             type: "text",
             disabled: b.value,
-            placeholder: h(r)("chat.info.groupName", "群名称"),
+            placeholder: p(r)("chat.info.groupName", "群名称"),
             onKeyup: Bs(P, ["enter"])
           }, null, 40, J2), [
             [mo, v.value]
@@ -35505,19 +35505,19 @@ const fv = /* @__PURE__ */ Ne({
       return (l == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = en(r);
     return (l, c) => (y(), C("div", Q2, [
-      j(h(Dt), {
+      j(p(Dt), {
         class: "allow-list__avatar",
-        name: h(i),
-        src: h(a),
+        name: p(i),
+        src: p(a),
         size: 36
       }, null, 8, ["name", "src"]),
       _("div", Z2, [
-        _("span", eD, D(h(i)), 1)
+        _("span", eD, D(p(i)), 1)
       ]),
       _("button", {
         class: "allow-list__action-btn allow-list__action-btn--danger",
         onClick: c[0] || (c[0] = (u) => o("remove"))
-      }, D(h(s)("group.memberList.remove", "移出白名单")), 1)
+      }, D(p(s)("group.memberList.remove", "移出白名单")), 1)
     ]));
   }
 }), nD = /* @__PURE__ */ Pe(tD, [["__scopeId", "data-v-2840b4c0"]]), oD = { class: "allow-list" }, sD = {
@@ -35535,18 +35535,18 @@ const fv = /* @__PURE__ */ Ne({
       if (t.groupId) {
         l.value = !0;
         try {
-          const p = await i(t.groupId);
-          c.value = Array.isArray(p) ? p : [];
-        } catch (p) {
-          s.warn("load failed:", p);
+          const h = await i(t.groupId);
+          c.value = Array.isArray(h) ? h : [];
+        } catch (h) {
+          s.warn("load failed:", h);
         } finally {
           l.value = !1;
         }
       }
     }
     Ue(() => t.groupId, u, { immediate: !0 });
-    async function d(p) {
-      const f = p.user || p, m = (f == null ? void 0 : f.userId) || "";
+    async function d(h) {
+      const f = h.user || h, m = (f == null ? void 0 : f.userId) || "";
       try {
         await a(t.groupId, [m]), c.value = c.value.filter((g) => {
           const v = g.user || g;
@@ -35556,11 +35556,11 @@ const fv = /* @__PURE__ */ Ne({
         s.warn("remove failed:", g);
       }
     }
-    return (p, f) => (y(), C("div", oD, [
-      l.value ? (y(), C("div", sD, D(h(r)("common.loading")), 1)) : c.value.length === 0 ? (y(), re(h(Ht), {
+    return (h, f) => (y(), C("div", oD, [
+      l.value ? (y(), C("div", sD, D(p(r)("common.loading")), 1)) : c.value.length === 0 ? (y(), re(p(Ht), {
         key: 1,
         icon: "person/double",
-        description: h(r)("group.memberList.empty", "暂无白名单成员"),
+        description: p(r)("group.memberList.empty", "暂无白名单成员"),
         size: "small"
       }, null, 8, ["description"])) : U("", !0),
       (y(!0), C(Ae, null, ot(c.value, (m) => {
@@ -35597,26 +35597,26 @@ const fv = /* @__PURE__ */ Ne({
       return ((l = t.item.applicant) == null ? void 0 : l.userId) || "";
     }), { displayName: i, avatarUrl: a } = en(r);
     return (l, c) => (y(), C("div", iD, [
-      j(h(Dt), {
+      j(p(Dt), {
         class: "join-request-list__avatar",
-        name: h(i),
-        src: h(a),
+        name: p(i),
+        src: p(a),
         size: 36
       }, null, 8, ["name", "src"]),
       _("div", aD, [
-        _("span", lD, D(h(i)), 1),
+        _("span", lD, D(p(i)), 1),
         t.item.reason ? (y(), C("span", cD, D(t.item.reason), 1)) : U("", !0),
-        t.item.status === "declined" ? (y(), C("span", uD, D(h(s)("contact.inviteDeclined", "已拒绝")), 1)) : t.item.status === "accepted" ? (y(), C("span", dD, D(h(s)("contact.inviteAccepted", "已接受")), 1)) : U("", !0)
+        t.item.status === "declined" ? (y(), C("span", uD, D(p(s)("contact.inviteDeclined", "已拒绝")), 1)) : t.item.status === "accepted" ? (y(), C("span", dD, D(p(s)("contact.inviteAccepted", "已接受")), 1)) : U("", !0)
       ]),
       t.item.status === "pending" ? (y(), C("div", fD, [
         _("button", {
           class: "join-request-list__action-btn join-request-list__action-btn--accept",
           onClick: c[0] || (c[0] = (u) => o("accept"))
-        }, D(h(s)("group.joinRequest.accept", "同意")), 1),
+        }, D(p(s)("group.joinRequest.accept", "同意")), 1),
         _("button", {
           class: "join-request-list__action-btn join-request-list__action-btn--reject",
           onClick: c[1] || (c[1] = (u) => o("reject"))
-        }, D(h(s)("group.joinRequest.reject", "拒绝")), 1)
+        }, D(p(s)("group.joinRequest.reject", "拒绝")), 1)
       ])) : U("", !0)
     ]));
   }
@@ -35652,7 +35652,7 @@ const fv = /* @__PURE__ */ Ne({
         t.warn("[JoinRequestList] accept failed:", nt(v));
       }
     }
-    async function p(f) {
+    async function h(f) {
       var g;
       const m = ((g = f.applicant) == null ? void 0 : g.userId) || "";
       try {
@@ -35665,10 +35665,10 @@ const fv = /* @__PURE__ */ Ne({
       }
     }
     return (f, m) => (y(), C("div", mD, [
-      c.value ? (y(), C("div", gD, D(h(r)("common.loading")), 1)) : u.value.length === 0 ? (y(), re(h(Ht), {
+      c.value ? (y(), C("div", gD, D(p(r)("common.loading")), 1)) : u.value.length === 0 ? (y(), re(p(Ht), {
         key: 1,
         icon: "person/double",
-        description: h(r)("group.memberList.empty", "暂无入群申请"),
+        description: p(r)("group.memberList.empty", "暂无入群申请"),
         size: "small"
       }, null, 8, ["description"])) : U("", !0),
       (y(!0), C(Ae, null, ot(u.value, (g) => {
@@ -35677,7 +35677,7 @@ const fv = /* @__PURE__ */ Ne({
           key: ((v = g.applicant) == null ? void 0 : v.userId) || "" || g.timestamp,
           item: g,
           onAccept: (b) => d(g),
-          onReject: (b) => p(g)
+          onReject: (b) => h(g)
         }, null, 8, ["item", "onAccept", "onReject"]);
       }), 128))
     ]));
@@ -35711,7 +35711,7 @@ const fv = /* @__PURE__ */ Ne({
     }), d = k(() => {
       var E;
       return ((E = c.value) == null ? void 0 : E.role) || dt.MEMBER;
-    }), p = k(() => d.value === dt.OWNER), f = k(() => d.value === dt.OWNER || d.value === dt.ADMIN);
+    }), h = k(() => d.value === dt.OWNER), f = k(() => d.value === dt.OWNER || d.value === dt.ADMIN);
     async function m() {
       if (t.groupId)
         try {
@@ -35742,7 +35742,7 @@ const fv = /* @__PURE__ */ Ne({
         show: !0,
         icon: "person/xmark",
         count: (i.group.groupBlocklistMap[z] || []).length
-      }), t.showAllowlist && p.value && E.push({
+      }), t.showAllowlist && h.value && E.push({
         key: "allow",
         label: r("group.management.allowlist", "白名单"),
         show: !0,
@@ -35784,21 +35784,21 @@ const fv = /* @__PURE__ */ Ne({
     }
     return (E, z) => v.value ? (y(), C("div", yD, [
       _("div", bD, [
-        t.showMuteAll && f.value ? (y(), re(h(Bt), {
+        t.showMuteAll && f.value ? (y(), re(p(Bt), {
           key: 0,
           clickable: !1,
           size: "compact",
-          title: h(r)("group.management.muteAll", "全员禁言"),
+          title: p(r)("group.management.muteAll", "全员禁言"),
           "inset-hover": !1
         }, {
           leading: J(() => [
-            j(h(De), {
+            j(p(De), {
               name: "bubble/slash",
               size: 18
             })
           ]),
           trailing: J(() => [
-            j(h(Uo), {
+            j(p(Uo), {
               "model-value": u.value,
               onChange: m,
               onClick: z[0] || (z[0] = Ct(() => {
@@ -35807,7 +35807,7 @@ const fv = /* @__PURE__ */ Ne({
           ]),
           _: 1
         }, 8, ["title"])) : U("", !0),
-        (y(!0), C(Ae, null, ot(g.value, (P) => (y(), re(h(Bt), {
+        (y(!0), C(Ae, null, ot(g.value, (P) => (y(), re(p(Bt), {
           key: P.key,
           title: P.label,
           meta: P.count ? String(P.count) : void 0,
@@ -35817,7 +35817,7 @@ const fv = /* @__PURE__ */ Ne({
           onClick: (F) => R(P.key)
         }, {
           leading: J(() => [
-            j(h(De), {
+            j(p(De), {
               name: P.icon,
               size: 18
             }, null, 8, ["name"])
@@ -35835,42 +35835,42 @@ const fv = /* @__PURE__ */ Ne({
       }, {
         header: J(() => [
           _("div", kD, [
-            j(h(At), {
+            j(p(At), {
               class: "group-management-section__drawer-close",
               icon: "chevron/left",
               size: "small",
               variant: "ghost",
-              title: h(r)("button.back", "返回"),
+              title: p(r)("button.back", "返回"),
               onClick: $
             }, null, 8, ["title"]),
             _("span", wD, D(T.value), 1),
-            b.value === "files" ? (y(), re(h(At), {
+            b.value === "files" ? (y(), re(p(At), {
               key: 0,
               class: "group-management-section__drawer-upload",
               icon: "arrow/up_tray",
               size: "small",
               variant: "ghost",
-              title: h(r)("group.sharedFile.uploadText", "上传"),
+              title: p(r)("group.sharedFile.uploadText", "上传"),
               onClick: z[1] || (z[1] = (P) => {
                 var F;
                 return (F = M.value) == null ? void 0 : F.triggerUpload();
               })
-            }, null, 8, ["title"])) : b.value === "block" ? (y(), re(h(At), {
+            }, null, 8, ["title"])) : b.value === "block" ? (y(), re(p(At), {
               key: 1,
               icon: "plus",
               size: "small",
               type: "primary",
-              title: h(r)("group.blocklist.add", "添加"),
+              title: p(r)("group.blocklist.add", "添加"),
               onClick: z[2] || (z[2] = (P) => {
                 var F;
                 return (F = S.value) == null ? void 0 : F.openAddMember();
               })
-            }, null, 8, ["title"])) : b.value === "mute" ? (y(), re(h(At), {
+            }, null, 8, ["title"])) : b.value === "mute" ? (y(), re(p(At), {
               key: 2,
               icon: "plus",
               size: "small",
               type: "primary",
-              title: h(r)("group.mutelist.add", "添加禁言"),
+              title: p(r)("group.mutelist.add", "添加禁言"),
               onClick: z[3] || (z[3] = (P) => {
                 var F;
                 return (F = w.value) == null ? void 0 : F.openAddMember();
@@ -35957,7 +35957,7 @@ const fv = /* @__PURE__ */ Ne({
           ])
         ]),
         _: 3
-      }, 8, ["show"])) : (y(), re(h(Wt), {
+      }, 8, ["show"])) : (y(), re(p(Wt), {
         key: 1,
         show: I.value,
         "onUpdate:show": z[22] || (z[22] = (P) => I.value = P),
@@ -35968,42 +35968,42 @@ const fv = /* @__PURE__ */ Ne({
         default: J(() => [
           _("div", MD, [
             _("div", SD, [
-              j(h(At), {
+              j(p(At), {
                 class: "group-management-section__drawer-close",
                 icon: "chevron/left",
                 size: "small",
                 variant: "ghost",
-                title: h(r)("button.back", "返回"),
+                title: p(r)("button.back", "返回"),
                 onClick: $
               }, null, 8, ["title"]),
               _("span", ID, D(T.value), 1),
-              b.value === "files" ? (y(), re(h(At), {
+              b.value === "files" ? (y(), re(p(At), {
                 key: 0,
                 class: "group-management-section__drawer-upload",
                 icon: "arrow/up_tray",
                 size: "small",
                 variant: "ghost",
-                title: h(r)("group.sharedFile.uploadText", "上传"),
+                title: p(r)("group.sharedFile.uploadText", "上传"),
                 onClick: z[12] || (z[12] = (P) => {
                   var F;
                   return (F = M.value) == null ? void 0 : F.triggerUpload();
                 })
-              }, null, 8, ["title"])) : b.value === "block" ? (y(), re(h(At), {
+              }, null, 8, ["title"])) : b.value === "block" ? (y(), re(p(At), {
                 key: 1,
                 icon: "plus",
                 size: "small",
                 type: "primary",
-                title: h(r)("group.blocklist.add", "添加"),
+                title: p(r)("group.blocklist.add", "添加"),
                 onClick: z[13] || (z[13] = (P) => {
                   var F;
                   return (F = S.value) == null ? void 0 : F.openAddMember();
                 })
-              }, null, 8, ["title"])) : b.value === "mute" ? (y(), re(h(At), {
+              }, null, 8, ["title"])) : b.value === "mute" ? (y(), re(p(At), {
                 key: 2,
                 icon: "plus",
                 size: "small",
                 type: "primary",
-                title: h(r)("group.mutelist.add", "添加禁言"),
+                title: p(r)("group.mutelist.add", "添加禁言"),
                 onClick: z[14] || (z[14] = (P) => {
                   var F;
                   return (F = w.value) == null ? void 0 : F.openAddMember();
@@ -36110,7 +36110,7 @@ const fv = /* @__PURE__ */ Ne({
     function r(B, N) {
       return s("common.charCount", "{current}/{max}").replace("{current}", String(B)).replace("{max}", String(N));
     }
-    const { show: i } = Kt(), { stores: a } = pt(), { getGroupAnnouncement: l, updateGroupAnnouncement: c, getGroupMembers: u } = ln(), d = x(!1), p = x(), f = x(""), m = x(!1), g = k(() => a.client.currentUser), v = k(() => u(t.groupId)), b = k(() => {
+    const { show: i } = Kt(), { stores: a } = pt(), { getGroupAnnouncement: l, updateGroupAnnouncement: c, getGroupMembers: u } = ln(), d = x(!1), h = x(), f = x(""), m = x(!1), g = k(() => a.client.currentUser), v = k(() => u(t.groupId)), b = k(() => {
       var B;
       if (g.value)
         return (B = v.value.find((N) => N.userId === g.value)) == null ? void 0 : B.role;
@@ -36135,7 +36135,7 @@ const fv = /* @__PURE__ */ Ne({
       { immediate: !0 }
     ), Ue(d, async (B) => {
       var N;
-      B && (await st(), (N = p.value) == null || N.focus());
+      B && (await st(), (N = h.value) == null || N.focus());
     });
     function z() {
       f.value = I.value || "", d.value = !0;
@@ -36166,18 +36166,18 @@ const fv = /* @__PURE__ */ Ne({
     return (B, N) => (y(), C("div", $D, [
       _("div", RD, [
         _("div", ND, [
-          j(h(De), {
+          j(p(De), {
             name: "board",
             size: 16
           }),
-          _("span", null, D(h(s)("chat.info.groupAnnouncement")), 1)
+          _("span", null, D(p(s)("chat.info.groupAnnouncement")), 1)
         ]),
-        w.value ? (y(), re(h(At), {
+        w.value ? (y(), re(p(At), {
           key: 0,
           icon: "rect/pencil",
           size: "small",
           type: "primary",
-          title: h(s)("chat.info.edit", "编辑"),
+          title: p(s)("chat.info.edit", "编辑"),
           onClick: z
         }, null, 8, ["title"])) : U("", !0)
       ]),
@@ -36187,44 +36187,44 @@ const fv = /* @__PURE__ */ Ne({
           ref: $,
           class: $e(["group-announcement__content", { "is-collapsed": T.value }])
         }, [
-          n.loading ? (y(), C("span", OD, D(h(s)("common.loading")), 1)) : I.value ? (y(), C("span", DD, D(I.value), 1)) : (y(), C("span", BD, D(h(s)("chat.info.groupAnnouncementPlaceholder")), 1))
+          n.loading ? (y(), C("span", OD, D(p(s)("common.loading")), 1)) : I.value ? (y(), C("span", DD, D(I.value), 1)) : (y(), C("span", BD, D(p(s)("chat.info.groupAnnouncementPlaceholder")), 1))
         ], 2),
         R.value && I.value ? (y(), C("button", {
           key: 0,
           class: "group-announcement__toggle",
-          title: T.value ? h(s)("chat.announcementBanner.expand", "展开") : h(s)("chat.announcementBanner.collapse", "收起"),
+          title: T.value ? p(s)("chat.announcementBanner.expand", "展开") : p(s)("chat.announcementBanner.collapse", "收起"),
           onClick: N[0] || (N[0] = (L) => T.value = !T.value)
         }, [
-          j(h(De), {
+          j(p(De), {
             name: T.value ? "chevron/down" : "chevron/up",
             size: 14
           }, null, 8, ["name"])
         ], 8, PD)) : U("", !0)
       ]),
-      j(h(rn), {
+      j(p(rn), {
         show: d.value,
         "onUpdate:show": N[2] || (N[2] = (L) => d.value = L),
-        title: h(s)("chat.info.groupAnnouncement"),
-        "confirm-text": h(s)("chat.info.save", "保存"),
-        "cancel-text": h(s)("button.cancel", "取消"),
+        title: p(s)("chat.info.groupAnnouncement"),
+        "confirm-text": p(s)("chat.info.save", "保存"),
+        "cancel-text": p(s)("button.cancel", "取消"),
         onConfirm: P,
         onCancel: F
       }, {
         default: J(() => [
           Rn(_("textarea", {
             ref_key: "announcementInputRef",
-            ref: p,
+            ref: h,
             "onUpdate:modelValue": N[1] || (N[1] = (L) => f.value = L),
             class: "group-announcement__textarea",
-            placeholder: h(s)("chat.info.groupAnnouncementPlaceholder"),
+            placeholder: p(s)("chat.info.groupAnnouncementPlaceholder"),
             rows: "3",
-            maxlength: h(Qt).ANNOUNCEMENT_MAX_LENGTH
+            maxlength: p(Qt).ANNOUNCEMENT_MAX_LENGTH
           }, null, 8, zD), [
             [mo, f.value]
           ]),
           _("div", {
-            class: $e(["group-announcement__char-count", { "is-near-limit": f.value.length > h(Qt).ANNOUNCEMENT_MAX_LENGTH * 0.9 }])
-          }, D(r(f.value.length, h(Qt).ANNOUNCEMENT_MAX_LENGTH)), 3)
+            class: $e(["group-announcement__char-count", { "is-near-limit": f.value.length > p(Qt).ANNOUNCEMENT_MAX_LENGTH * 0.9 }])
+          }, D(r(f.value.length, p(Qt).ANNOUNCEMENT_MAX_LENGTH)), 3)
         ]),
         _: 1
       }, 8, ["show", "title", "confirm-text", "cancel-text"])
@@ -36298,10 +36298,10 @@ const fv = /* @__PURE__ */ Ne({
     locale: { default: "zh-CN" },
     animation: {},
     h5: {},
-    enableContact: { type: Boolean, default: !1 },
+    enableContact: { type: Boolean, default: !0 },
     contactFetchMode: { default: "page" },
-    enableBlocklist: { type: Boolean, default: !1 },
-    enablePresence: { type: Boolean, default: !1 },
+    enableBlocklist: { type: Boolean, default: !0 },
+    enablePresence: { type: Boolean, default: !0 },
     enableGroup: { type: Boolean, default: !0 },
     enableUserInfo: { type: Boolean, default: !0 },
     enableUserInfoSubscription: { type: Boolean, default: !0 },
@@ -36354,7 +36354,7 @@ const fv = /* @__PURE__ */ Ne({
       toastProps: c,
       enableNotification: u,
       notificationState: d,
-      closeNotification: p,
+      closeNotification: h,
       handleNotificationClick: f
     } = my({
       theme: () => e.theme,
@@ -36397,47 +36397,47 @@ const fv = /* @__PURE__ */ Ne({
       { immediate: !1 }
     ), (m, g) => (y(), C("div", GD, [
       W(m.$slots, "default", {}, void 0, !0),
-      e.enableToast ? (y(), re(h(sp), je(ys({ key: 0 }, h(c))), null, 16)) : U("", !0),
-      h(u) ? (y(), re(h(tp), {
+      e.enableToast ? (y(), re(p(sp), je(ys({ key: 0 }, p(c))), null, 16)) : U("", !0),
+      p(u) ? (y(), re(p(tp), {
         key: 1,
-        items: h(d).list,
-        onClose: h(p),
-        onClick: h(f)
+        items: p(d).list,
+        onClose: p(h),
+        onClick: p(f)
       }, null, 8, ["items", "onClose", "onClick"])) : U("", !0)
     ]));
   }
-}), jD = /* @__PURE__ */ Pe(VD, [["__scopeId", "data-v-8e4d40ac"]]), WD = /* @__PURE__ */ Ne({
+}), jD = /* @__PURE__ */ Pe(VD, [["__scopeId", "data-v-df53a6ef"]]), WD = /* @__PURE__ */ Ne({
   __name: "chat-container",
   props: {
     config: {},
     loading: { type: Boolean },
     class: {},
     style: {},
-    variant: { default: "compact" }
+    variant: { default: void 0 }
   },
   emits: ["recall-failed", "at-me-click", "location-click", "custom-message-action"],
   setup(n, { expose: e, emit: t }) {
-    const o = n, s = t, r = x(), { h5: i } = pt(), a = Sc(), l = k(() => {
-      var u, d;
-      return ((d = (u = o.config) == null ? void 0 : u.drawer) == null ? void 0 : d.mode) === "push";
+    const o = n, s = t, r = x(), { h5: i } = pt(), a = Sc(), l = k(() => o.variant ?? (i.isMobile.value ? "compact" : "card")), c = k(() => {
+      var d, h;
+      return ((h = (d = o.config) == null ? void 0 : d.drawer) == null ? void 0 : h.mode) === "push";
     });
-    function c() {
-      return Object.keys(a).filter((u) => u !== "drawer" && u !== "watermark");
+    function u() {
+      return Object.keys(a).filter((d) => d !== "drawer" && d !== "watermark");
     }
     return e({
-      setText: (u) => {
-        var d, p;
-        return (p = (d = r.value) == null ? void 0 : d.setText) == null ? void 0 : p.call(d, u);
+      setText: (d) => {
+        var h, f;
+        return (f = (h = r.value) == null ? void 0 : h.setText) == null ? void 0 : f.call(h, d);
       },
       getText: () => {
-        var u, d;
-        return ((d = (u = r.value) == null ? void 0 : u.getText) == null ? void 0 : d.call(u)) || "";
+        var d, h;
+        return ((h = (d = r.value) == null ? void 0 : d.getText) == null ? void 0 : h.call(d)) || "";
       }
-    }), (u, d) => (y(), C("div", {
+    }), (d, h) => (y(), C("div", {
       class: $e(["chat-container", {
-        "chat-container--keyboard-open": h(i).isKeyboardOpen.value,
-        "chat-container--drawer-push": l.value,
-        [`chat-container--${o.variant}`]: !0
+        "chat-container--keyboard-open": p(i).isKeyboardOpen.value,
+        "chat-container--drawer-push": c.value,
+        [`chat-container--${l.value}`]: !0
       }])
     }, [
       j(cv, {
@@ -36447,71 +36447,71 @@ const fv = /* @__PURE__ */ Ne({
         loading: o.loading,
         class: $e(o.class),
         style: Pt(o.style),
-        onRecallFailed: d[0] || (d[0] = (p, f) => s("recall-failed", p, f)),
-        onAtMeClick: d[1] || (d[1] = (p) => s("at-me-click", p)),
-        onLocationClick: d[2] || (d[2] = (p, f) => s("location-click", p, f)),
-        onCustomMessageAction: d[3] || (d[3] = (p, f, m) => s("custom-message-action", p, f, m))
+        onRecallFailed: h[0] || (h[0] = (f, m) => s("recall-failed", f, m)),
+        onAtMeClick: h[1] || (h[1] = (f) => s("at-me-click", f)),
+        onLocationClick: h[2] || (h[2] = (f, m) => s("location-click", f, m)),
+        onCustomMessageAction: h[3] || (h[3] = (f, m, g) => s("custom-message-action", f, m, g))
       }, Ft({
         empty: J(() => [
-          W(u.$slots, "empty", {}, void 0, !0)
+          W(d.$slots, "empty", {}, void 0, !0)
         ]),
         loading: J(() => [
-          W(u.$slots, "loading", {}, void 0, !0)
+          W(d.$slots, "loading", {}, void 0, !0)
         ]),
-        error: J((p) => [
-          W(u.$slots, "error", je(Ke(p)), void 0, !0)
+        error: J((f) => [
+          W(d.$slots, "error", je(Ke(f)), void 0, !0)
         ]),
-        header: J((p) => [
-          W(u.$slots, "header", je(Ke(p)), void 0, !0)
+        header: J((f) => [
+          W(d.$slots, "header", je(Ke(f)), void 0, !0)
         ]),
-        "header-avatar": J((p) => [
-          W(u.$slots, "header-avatar", je(Ke(p)), void 0, !0)
+        "header-avatar": J((f) => [
+          W(d.$slots, "header-avatar", je(Ke(f)), void 0, !0)
         ]),
-        "header-title": J((p) => [
-          W(u.$slots, "header-title", je(Ke(p)), void 0, !0)
+        "header-title": J((f) => [
+          W(d.$slots, "header-title", je(Ke(f)), void 0, !0)
         ]),
-        "header-subtitle": J((p) => [
-          W(u.$slots, "header-subtitle", je(Ke(p)), void 0, !0)
+        "header-subtitle": J((f) => [
+          W(d.$slots, "header-subtitle", je(Ke(f)), void 0, !0)
         ]),
-        "header-extra": J((p) => [
-          W(u.$slots, "header-extra", je(Ke(p)), void 0, !0)
+        "header-extra": J((f) => [
+          W(d.$slots, "header-extra", je(Ke(f)), void 0, !0)
         ]),
-        drawer: J((p) => [
-          W(u.$slots, "drawer", je(Ke(p)), void 0, !0)
+        drawer: J((f) => [
+          W(d.$slots, "drawer", je(Ke(f)), void 0, !0)
         ]),
-        "user-card": J((p) => [
-          W(u.$slots, "user-card", je(Ke(p)), void 0, !0)
+        "user-card": J((f) => [
+          W(d.$slots, "user-card", je(Ke(f)), void 0, !0)
         ]),
-        "group-card": J((p) => [
-          W(u.$slots, "group-card", je(Ke(p)), void 0, !0)
+        "group-card": J((f) => [
+          W(d.$slots, "group-card", je(Ke(f)), void 0, !0)
         ]),
-        "invite-member": J((p) => [
-          W(u.$slots, "invite-member", je(Ke(p)), void 0, !0)
+        "invite-member": J((f) => [
+          W(d.$slots, "invite-member", je(Ke(f)), void 0, !0)
         ]),
-        forward: J((p) => [
-          W(u.$slots, "forward", je(Ke(p)), void 0, !0)
+        forward: J((f) => [
+          W(d.$slots, "forward", je(Ke(f)), void 0, !0)
         ]),
-        "message-search": J((p) => [
-          W(u.$slots, "message-search", je(Ke(p)), void 0, !0)
+        "message-search": J((f) => [
+          W(d.$slots, "message-search", je(Ke(f)), void 0, !0)
         ]),
-        "multi-select-bar": J((p) => [
-          W(u.$slots, "multi-select-bar", je(Ke(p)), void 0, !0)
+        "multi-select-bar": J((f) => [
+          W(d.$slots, "multi-select-bar", je(Ke(f)), void 0, !0)
         ]),
-        watermark: J((p) => [
-          W(u.$slots, "watermark", je(Ke(p)), void 0, !0)
+        watermark: J((f) => [
+          W(d.$slots, "watermark", je(Ke(f)), void 0, !0)
         ]),
         _: 2
       }, [
-        ot(c(), (p) => ({
-          name: p,
-          fn: J((f) => [
-            W(u.$slots, p, je(Ke(f)), void 0, !0)
+        ot(u(), (f) => ({
+          name: f,
+          fn: J((m) => [
+            W(d.$slots, f, je(Ke(m)), void 0, !0)
           ])
         }))
       ]), 1032, ["config", "loading", "class", "style"])
     ], 2));
   }
-}), KD = /* @__PURE__ */ Pe(WD, [["__scopeId", "data-v-91a65a47"]]), Co = {};
+}), KD = /* @__PURE__ */ Pe(WD, [["__scopeId", "data-v-2479b1e1"]]), Co = {};
 function qD(n) {
   return Co[ve.IMAGE] = n("message.image"), Co[ve.VOICE] = n("message.audio"), Co[ve.VIDEO] = n("message.video"), Co[ve.FILE] = n("message.file"), Co[ve.CMD] = n("message.cmd"), Co[ve.CUSTOM] = n("message.custom"), Co[ve.LOCATION] = n("message.location"), (e, t) => t && t !== ve.TEXT && Co[t] ? Co[t] : e;
 }
@@ -36536,7 +36536,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
     filterFn: {},
     bodySticky: { type: Boolean, default: !1 },
     footerSticky: { type: Boolean, default: !1 },
-    pullRefresh: { type: Boolean, default: !1 },
+    pullRefresh: { type: Boolean, default: void 0 },
     enablePresence: { type: Boolean, default: void 0 },
     tabs: { default: () => [...Br] },
     activeTab: { default: "all" },
@@ -36546,29 +36546,29 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
   },
   emits: ["conversation-select", "conversation-click", "update:active-tab", "reconnect", "header-menu-action", "search"],
   setup(n, { emit: e }) {
-    const t = n, o = e, { refreshConversations: s } = Js(), { t: r, locale: i } = et(), a = k(() => gy(r)), l = qD(r);
+    const t = n, o = e, { refreshConversations: s } = Js(), { t: r, locale: i } = et(), { h5: a } = pt(), l = k(() => t.pullRefresh ?? a.enablePullRefresh.value), c = k(() => gy(r)), u = qD(r);
     nn(() => {
       tb(t.draftStorage ?? "none"), s();
     });
-    function c(f, m) {
-      o("conversation-select", m);
+    function d(g, v) {
+      o("conversation-select", v);
     }
-    function u(f, m) {
-      o("conversation-click", m);
+    function h(g, v) {
+      o("conversation-click", v);
     }
-    function d(f) {
-      o("update:active-tab", f);
+    function f(g) {
+      o("update:active-tab", g);
     }
-    function p() {
+    function m() {
       o("reconnect");
     }
-    return (f, m) => (y(), C("div", JD, [
+    return (g, v) => (y(), C("div", JD, [
       j(Np, {
         "show-search": t.showSearch,
         "show-scroll-to-top": t.showScrollToTop,
         "custom-actions": t.customActions,
-        "time-formatter": t.timeFormatter ?? a.value,
-        "message-formatter": t.messageFormatter ?? h(l),
+        "time-formatter": t.timeFormatter ?? c.value,
+        "message-formatter": t.messageFormatter ?? p(u),
         "show-sender-name": t.showSenderName,
         "empty-text": t.emptyText,
         "unread-mode": t.unreadMode,
@@ -36582,107 +36582,107 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         "filter-fn": t.filterFn,
         "body-sticky": t.bodySticky,
         "footer-sticky": t.footerSticky,
-        "pull-refresh": t.pullRefresh,
+        "pull-refresh": l.value,
         "enable-presence": t.enablePresence,
         tabs: t.tabs,
         "active-tab": t.activeTab,
         "show-status-banner": t.showStatusBanner,
         "menu-items": t.menuItems,
-        "onUpdate:activeTab": d,
-        onSelect: c,
-        onConversationClick: u,
-        onReconnect: p,
-        onHeaderMenuAction: m[0] || (m[0] = (g) => o("header-menu-action", g)),
-        onSearch: m[1] || (m[1] = (g) => o("search", g))
+        "onUpdate:activeTab": f,
+        onSelect: d,
+        onConversationClick: h,
+        onReconnect: m,
+        onHeaderMenuAction: v[0] || (v[0] = (b) => o("header-menu-action", b)),
+        onSearch: v[1] || (v[1] = (b) => o("search", b))
       }, Ft({ _: 2 }, [
-        f.$slots.tabs ? {
+        g.$slots.tabs ? {
           name: "tabs",
-          fn: J((g) => [
-            W(f.$slots, "tabs", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "tabs", je(Ke(b)), void 0, !0)
           ]),
           key: "0"
         } : void 0,
-        f.$slots.header ? {
+        g.$slots.header ? {
           name: "header",
           fn: J(() => [
-            W(f.$slots, "header", {}, void 0, !0)
+            W(g.$slots, "header", {}, void 0, !0)
           ]),
           key: "1"
         } : void 0,
-        f.$slots.empty ? {
+        g.$slots.empty ? {
           name: "empty",
-          fn: J((g) => [
-            W(f.$slots, "empty", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "empty", je(Ke(b)), void 0, !0)
           ]),
           key: "2"
         } : void 0,
-        f.$slots.statusBanner ? {
+        g.$slots.statusBanner ? {
           name: "status-banner",
-          fn: J((g) => [
-            W(f.$slots, "status-banner", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "status-banner", je(Ke(b)), void 0, !0)
           ]),
           key: "3"
         } : void 0,
-        f.$slots.body ? {
+        g.$slots.body ? {
           name: "body",
           fn: J(() => [
-            W(f.$slots, "body", {}, void 0, !0)
+            W(g.$slots, "body", {}, void 0, !0)
           ]),
           key: "4"
         } : void 0,
-        f.$slots.footer ? {
+        g.$slots.footer ? {
           name: "footer",
           fn: J(() => [
-            W(f.$slots, "footer", {}, void 0, !0)
+            W(g.$slots, "footer", {}, void 0, !0)
           ]),
           key: "5"
         } : void 0,
-        f.$slots.item ? {
+        g.$slots.item ? {
           name: "item",
-          fn: J((g) => [
-            W(f.$slots, "item", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "item", je(Ke(b)), void 0, !0)
           ]),
           key: "6"
         } : void 0,
-        f.$slots.itemNameSuffix ? {
+        g.$slots.itemNameSuffix ? {
           name: "item-name-suffix",
-          fn: J((g) => [
-            W(f.$slots, "item-name-suffix", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "item-name-suffix", je(Ke(b)), void 0, !0)
           ]),
           key: "7"
         } : void 0,
-        f.$slots.headerMenu ? {
+        g.$slots.headerMenu ? {
           name: "header-menu",
-          fn: J((g) => [
-            W(f.$slots, "header-menu", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "header-menu", je(Ke(b)), void 0, !0)
           ]),
           key: "8"
         } : void 0,
-        f.$slots.newChat ? {
+        g.$slots.newChat ? {
           name: "new-chat",
-          fn: J((g) => [
-            W(f.$slots, "new-chat", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "new-chat", je(Ke(b)), void 0, !0)
           ]),
           key: "9"
         } : void 0,
-        f.$slots.addContact ? {
+        g.$slots.addContact ? {
           name: "add-contact",
-          fn: J((g) => [
-            W(f.$slots, "add-contact", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "add-contact", je(Ke(b)), void 0, !0)
           ]),
           key: "10"
         } : void 0,
-        f.$slots.createGroup ? {
+        g.$slots.createGroup ? {
           name: "create-group",
-          fn: J((g) => [
-            W(f.$slots, "create-group", je(Ke(g)), void 0, !0)
+          fn: J((b) => [
+            W(g.$slots, "create-group", je(Ke(b)), void 0, !0)
           ]),
           key: "11"
         } : void 0
       ]), 1032, ["show-search", "show-scroll-to-top", "custom-actions", "time-formatter", "message-formatter", "show-sender-name", "empty-text", "unread-mode", "badge-placement", "variant", "show-avatar", "unread-placement", "show-header", "title", "header-align", "filter-fn", "body-sticky", "footer-sticky", "pull-refresh", "enable-presence", "tabs", "active-tab", "show-status-banner", "menu-items"])
     ]));
   }
-}), YD = /* @__PURE__ */ Pe(XD, [["__scopeId", "data-v-1689a810"]]), QD = { class: "address-book-container__title" }, ZD = {
+}), YD = /* @__PURE__ */ Pe(XD, [["__scopeId", "data-v-c512ba21"]]), QD = { class: "address-book-container__title" }, ZD = {
   key: 0,
   class: "address-book-container__header-extra"
 }, eB = {
@@ -36738,9 +36738,9 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
   setup(n, { expose: e, emit: t }) {
     const o = n, s = t, { t: r } = et();
     Cp(k(() => o.noticePersistInvites));
-    const { visibleContactList: i, visibleContactCount: a, fetchContactCount: l } = Dn(), { groupList: c, joinedGroupCount: u, fetchJoinedGroupCount: d } = ln(), { features: p, stores: f } = pt();
+    const { visibleContactList: i, visibleContactCount: a, fetchContactCount: l } = Dn(), { groupList: c, joinedGroupCount: u, fetchJoinedGroupCount: d } = ln(), { features: h, stores: f } = pt();
     Ac(), Or();
-    const m = k(() => p.enableGroup !== !1), g = k(() => o.showBlocklist && p.enableBlocklist !== !1), v = x(I());
+    const m = k(() => h.enableGroup !== !1), g = k(() => o.showBlocklist && h.enableBlocklist !== !1), v = x(I());
     function b() {
       l();
     }
@@ -36875,20 +36875,20 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
                 class: $e(["address-book-container__header", `address-book-container__header--${o.headerAlign}`])
               }, [
                 W(A.$slots, "header", {}, () => [
-                  _("span", QD, D(o.title || h(r)("contact.title")), 1)
+                  _("span", QD, D(o.title || p(r)("contact.title")), 1)
                 ], !0),
                 A.$slots["header-extra"] ? (y(), C("span", ZD, [
                   W(A.$slots, "header-extra", {}, void 0, !0)
                 ])) : U("", !0)
               ], 2)) : U("", !0),
               o.showSearch ? (y(), C("div", eB, [
-                j(h(dn), {
+                j(p(dn), {
                   modelValue: T.value,
                   "onUpdate:modelValue": G[0] || (G[0] = (ie) => T.value = ie),
                   variant: "search",
                   clearable: "",
                   "clear-icon": "search/xmark",
-                  placeholder: h(r)("contact.homeSearchPlaceholder"),
+                  placeholder: p(r)("contact.homeSearchPlaceholder"),
                   "prefix-icon": "search"
                 }, null, 8, ["modelValue", "placeholder"])
               ])) : U("", !0),
@@ -36931,12 +36931,12 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
               w.value && o.showHeader ? (y(), C("div", rB, [
                 _("span", iB, [
                   W(A.$slots, "back-icon", {}, () => [
-                    j(h(At), {
+                    j(p(At), {
                       icon: "chevron/left",
                       size: "small",
                       variant: "ghost",
                       "icon-size": 20,
-                      title: h(r)("button.back", "返回"),
+                      title: p(r)("button.back", "返回"),
                       onClick: B
                     }, null, 8, ["title"])
                   ], !0)
@@ -36944,31 +36944,31 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
                 _("span", aB, D(q.value), 1),
                 _("span", lB, [
                   W(A.$slots, "subheader-extra", { view: v.value }, void 0, !0),
-                  !A.$slots["subheader-extra"] && v.value === "contact" && o.showContactAddButton ? (y(), re(h(At), {
+                  !A.$slots["subheader-extra"] && v.value === "contact" && o.showContactAddButton ? (y(), re(p(At), {
                     key: 0,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
-                    title: h(r)("contact.addContact"),
+                    title: p(r)("contact.addContact"),
                     onClick: G[1] || (G[1] = (ie) => s("add-contact"))
                   }, null, 8, ["title"])) : U("", !0),
-                  !A.$slots["subheader-extra"] && v.value === "group" && o.showGroupCreateButton ? (y(), re(h(At), {
+                  !A.$slots["subheader-extra"] && v.value === "group" && o.showGroupCreateButton ? (y(), re(p(At), {
                     key: 1,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
-                    title: h(r)("group.createGroup"),
+                    title: p(r)("group.createGroup"),
                     onClick: G[2] || (G[2] = (ie) => s("create-group"))
                   }, null, 8, ["title"])) : U("", !0),
-                  !A.$slots["subheader-extra"] && v.value === "blocklist" && o.showBlocklistAddButton ? (y(), re(h(At), {
+                  !A.$slots["subheader-extra"] && v.value === "blocklist" && o.showBlocklistAddButton ? (y(), re(p(At), {
                     key: 2,
                     icon: "circle/plus",
                     size: "small",
                     variant: "ghost",
                     "icon-size": 22,
-                    title: h(r)("contact.blocklist.add", "添加黑名单"),
+                    title: p(r)("contact.blocklist.add", "添加黑名单"),
                     onClick: G[3] || (G[3] = (ie) => s("blocklist-add"))
                   }, null, 8, ["title"])) : U("", !0)
                 ])
@@ -37033,7 +37033,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
     nn(() => {
       d();
     });
-    async function p() {
+    async function h() {
       var m, g;
       try {
         await i();
@@ -37079,7 +37079,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         "avatar-shape": o.avatarShape,
         "item-size": o.itemSize,
         loading: o.loading,
-        "has-more": h(l).hasMore,
+        "has-more": p(l).hasMore,
         "enable-load-more": o.enableLoadMore,
         "load-more-threshold": o.loadMoreThreshold,
         "no-more-text": o.noMoreText,
@@ -37091,7 +37091,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         onSelect: g[0] || (g[0] = (v) => s("select", v)),
         onClick: g[1] || (g[1] = (v) => s("click", v)),
         onContextmenu: g[2] || (g[2] = (v, b) => s("contextmenu", v, b)),
-        onLoadMore: p,
+        onLoadMore: h,
         onMaxExceed: g[3] || (g[3] = (v) => s("max-exceed", v)),
         "onUpdate:selectedIds": g[4] || (g[4] = (v) => s("update:selectedIds", v)),
         onSearch: g[5] || (g[5] = (v) => s("search", v))
@@ -37230,12 +37230,12 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         (m = (f = c.value) == null ? void 0 : f.releaseLoadMoreLock) == null || m.call(f);
       }
     }
-    function p(f) {
+    function h(f) {
       var m, g;
       (g = (m = c.value) == null ? void 0 : m.scrollToGroup) == null || g.call(m, f);
     }
     return e({
-      scrollToGroup: p,
+      scrollToGroup: h,
       groupListRef: c
     }), (f, m) => (y(), C("div", {
       class: $e(["group-list-container", o.class]),
@@ -37267,7 +37267,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         "avatar-shape": o.avatarShape,
         "item-size": o.itemSize,
         loading: o.loading,
-        "has-more": h(l).hasMore,
+        "has-more": p(l).hasMore,
         "enable-load-more": o.enableLoadMore,
         "load-more-threshold": o.loadMoreThreshold,
         "no-more-text": o.noMoreText,
@@ -37520,7 +37520,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
       var w;
       return (w = a.value) == null ? void 0 : w.view;
     }), d = x(!1);
-    function p() {
+    function h() {
       d.value = !0, i("blocklist-add");
     }
     Ue(u, (w) => {
@@ -37606,7 +37606,7 @@ const JD = { class: "conversation-container" }, XD = /* @__PURE__ */ Ne({
         onAddContact: I[21] || (I[21] = (T) => i("add-contact")),
         onCreateGroup: I[22] || (I[22] = (T) => i("create-group")),
         onBlocklistClick: I[23] || (I[23] = (T) => i("blocklist-click")),
-        onBlocklistAdd: p
+        onBlocklistAdd: h
       }, Ft({
         header: J(() => [
           W(w.$slots, "header", {}, void 0, !0)
@@ -37940,7 +37940,7 @@ function EB(n = {}) {
   return { tabs: e, activeTab: t, selectTab: o, isActive: s };
 }
 function AB() {
-  const n = vy(), { client: e, stores: t } = pt(), o = k(() => e.value.currentUserId), s = k(() => {
+  const n = vy(), { client: e, stores: t } = pt(), o = k(() => e.value.currentUserId || t.client.currentUser || ""), s = k(() => {
     const a = o.value;
     return a ? t.contact.getContact(a) : void 0;
   }), r = k(() => {

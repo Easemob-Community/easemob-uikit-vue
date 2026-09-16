@@ -56,6 +56,7 @@
   - 穿梭结构：`create-group-modal` / `invite-member-modal` 迁到 `EmContactTransferModal`（或复用其双栏结构）；
   - 原生 `<button>` 手写按钮 4 处全部换 `EmButton`。
 - **进度（2026-09-14）**：`new-chat-modal` / `block-list-add-modal` / `add-contact-modal` 已迁 `EmModal`；`EmModal` 新增 `confirmDisabled` / `confirmLoading` / `confirmAutoClose` / `bodyFlush` props 承接异步表单与列表贴边场景，`block-list-add-modal` 原生 button 已清除。
+- **进度（2026-09-16）**：`EmModal` 外壳/header/body/footer 度量按「新-Demo」Figma pop 组件（6 节点、统一宽 719）精确校准——header 60px/标题 18·500、body 56·48+18px、图标 72、footer 80·右 22·gap 12、去外壳描边；story 四设计变体宽度 920→719，Form 变体改 `bodyFlush` + 自绘表单项 padding；11 处二次确认弹窗宽度 540→719（core 2.7.1 / im 3.6.1）。
 - **关联**：`uikit-component-authoring` / `uikit-styling-theming`；设计稿 Modal 五形态（Shuttle/Form/Text/Text-Icon 左/Text-Icon 居中）已落到 `modal.story.vue` 与 `contact-transfer-modal.story.vue`。
 
 ### [ ] D134. `chat.vue` 单聊抽屉「添加 → 发起群聊」弹窗硬编码，宿主无法接管（D120 同类缺口）

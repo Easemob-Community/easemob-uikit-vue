@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-webim4 1.3.0 (2026-09-16)
+
+
+### 变更
+
+- **同 websdk5 1.3.0**：`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`。
+
+---
+
 ## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
 
 
