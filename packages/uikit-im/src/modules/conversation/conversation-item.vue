@@ -549,6 +549,18 @@ const displayMessage = computed(() => {
   justify-content: space-between;
 }
 
+/* 两行高度固定（20 + 4 + 18 = 42px），保证无最后一条消息/无时间时
+   信息区总高不变、标题位置不下移（消息摘要为空时 flex 项高度会塌成 0） */
+.conversation-item__top {
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.conversation-item__bottom {
+  min-height: 18px;
+  flex-shrink: 0;
+}
+
 .conversation-item__name-wrap {
   display: flex;
   align-items: center;

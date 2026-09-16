@@ -52,6 +52,17 @@ const dotMode: Conversation = {
   marks: [],
 }
 
+const noMessage: Conversation = {
+  id: 'u_dave',
+  name: 'Dave（无消息）',
+  type: CONVERSATION_TYPE.SINGLECHAT,
+  unreadCount: 0,
+  lastMessageText: '',
+  isPinned: false,
+  isMuted: false,
+  marks: [],
+}
+
 const logs = ref<string[]>([])
 
 function log(event: string, id?: string) {
@@ -147,6 +158,19 @@ function log(event: string, id?: string) {
         <ConversationItem
           :conversation="mutedChat"
           unread-placement="avatar"
+          @select="(id: string) => log('select', id)"
+        />
+      </div>
+    </Variant>
+
+    <Variant title="无最后一条消息（标题位置固定）">
+      <div style="width: 320px; background: var(--uikit-bg-base); border-radius: 8px; overflow: hidden;">
+        <ConversationItem
+          :conversation="singleChat"
+          @select="(id: string) => log('select', id)"
+        />
+        <ConversationItem
+          :conversation="noMessage"
           @select="(id: string) => log('select', id)"
         />
       </div>
