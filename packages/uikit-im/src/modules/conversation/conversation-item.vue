@@ -538,7 +538,8 @@ const displayMessage = computed(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  /* 设计稿两行间距 4px（1st line 11+20 → 2ed line 35） */
+  gap: 4px;
 }
 
 .conversation-item__top,

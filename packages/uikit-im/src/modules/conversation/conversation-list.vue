@@ -634,6 +634,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
       <Input
         v-model="searchKeyword"
         variant="search"
+        pill
         clearable
         clear-icon="search/xmark"
         :placeholder="t('conversation.searchPlaceholder')"
@@ -848,29 +849,15 @@ function handleCustomAction(key: string, conversation: Conversation) {
   --uikit-cell-gap: 4px;
   --uikit-item-hover-radius: 8px;
   --uikit-item-active-radius: 8px;
+  /* 设计稿：项内容水平内边距 12px（头像左缘 = 列表 4px + 12px = 16px） */
+  --uikit-item-hover-padding-x: 12px;
+  /* 设计稿会话项总高 64px：autoHeight 上下各 8px + 内容 48px（头像） */
+  --uikit-cell-padding-y: 8px;
 }
 
 /* 卡片列表的可视区内边距 */
 .conversation-list--card .conversation-list__items {
   padding: 4px;
-}
-
-/* 卡片模式下头部与项内容对齐：标题左缘对齐头像左缘、+ 按钮右缘对齐时间戳右缘
-   （= 列表内边距 4px + Cell 内容水平内边距，跟随 --uikit-item-hover-padding-x 主题配置） */
-.conversation-list--card .conversation-list__header {
-  padding-left: calc(4px + var(--uikit-item-hover-padding-x, 16px));
-  padding-right: calc(4px + var(--uikit-item-hover-padding-x, 16px));
-}
-
-/* 分栏 / 搜索的水平边界与卡片项左右对齐（均为 4px 内缩） */
-.conversation-list--card :deep(.conversation-tabs) {
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-.conversation-list--card .conversation-list__search {
-  padding-left: 4px;
-  padding-right: 4px;
 }
 
 /* 卡片模式下 hover/active 背景顶满整卡（默认 is-inset-hover 会水平内缩，与卡片圆角不匹配） */
@@ -886,12 +873,15 @@ function handleCustomAction(key: string, conversation: Conversation) {
   --uikit-item-active-radius: 0px;
 }
 
+/* 设计稿 header：底部 1px 分隔线，上下 12.5px、左右 12px；border-box 总高统一 56px */
 .conversation-list__header {
-  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
+  box-sizing: border-box;
+  padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--uikit-border-color);
 }
 
 .conversation-list__header--center {
@@ -901,7 +891,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 .conversation-list__header--center .conversation-list__menu-wrapper {
   position: absolute;
-  right: 16px;
+  right: 12px;
 }
 
 .conversation-list__header--right {
@@ -923,7 +913,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  /* 设计稿：22px 图标 + 4px 内边距 = 30×30 触发盒 */
+  padding: 4px;
   border-radius: var(--uikit-components-radius, 8px);
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
@@ -962,18 +953,21 @@ function handleCustomAction(key: string, conversation: Conversation) {
   }
 }
 
+/* 设计稿搜索槽：上下 8px、左右 12px（与 header 标题、分栏 tab 左缘对齐） */
 .conversation-list__search {
-  padding: 2px 16px 8px;
+  padding: 8px 12px;
 }
 
 .conversation-list__status-banner {
-  padding: 0 16px 8px;
+  padding: 0 12px 8px;
   flex-shrink: 0;
 }
 
+/* 设计稿标题：18px Medium（500）/ 行高 22px */
 .conversation-list__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-size: var(--uikit-font-size-18);
+  font-weight: 500;
+  line-height: 22px;
   color: var(--uikit-text-primary);
 }
 
