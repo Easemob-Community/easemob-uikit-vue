@@ -32,10 +32,14 @@ const emit = defineEmits<{
   (e: 'focus'): void
   /** 展开视觉态变化（高度达到/低于 212px；供上层切换角标图标、关闭锚点弹层） */
   (e: 'expand-change', expanded: boolean): void
-  /** 生效高度变化（null 表示恢复默认 132px 卡片；供上层切换卡片固定/自适应高度） */
+  /** 生效高度变化（null 表示恢复默认 126px 卡片；供上层切换卡片固定/自适应高度） */
   (e: 'height-change', height: number | null): void
   /** PC 录音模式开关变化（供上层隐藏卡片右上角展开角标等不相容 UI） */
   (e: 'voice-mode-change', active: boolean): void
+  /** 点击工具栏翻译按钮（业务链路交由宿主接入） */
+  (e: 'translation-click'): void
+  /** 点击工具栏名片按钮（业务链路交由宿主接入） */
+  (e: 'contact-card-click'): void
 }>()
 
 const { t } = useLocale()
@@ -47,13 +51,15 @@ const text = ref('')
 /** 输入框风格 */
 const style = computed(() => props.config?.style ?? 'toolbar-top')
 
-/** 功能开关 */
+/** 功能开关（translation/contactCard 默认关闭：仅渲染按钮，业务链路交由宿主接入） */
 const features = computed(() => ({
   emoji: props.config?.features?.emoji !== false,
   image: props.config?.features?.image !== false,
   file: props.config?.features?.file !== false,
   voice: props.config?.features?.voice !== false,
   video: props.config?.features?.video !== false,
+  translation: props.config?.features?.translation === true,
+  contactCard: props.config?.features?.contactCard === true,
 }))
 
 /** 是否显示发送按钮：显式配置优先；未配置时 PC 隐藏（回车发送）、移动端显示 */
@@ -64,21 +70,21 @@ const rootRef = ref<HTMLElement>()
 
 /**
  * 卡片 chrome 高度换算：root 内容高度 → 卡片总高度
- * （卡片 padding 上下各 var(--uikit-input-wrapper-spacing, 12px) + 1px border × 2）
+ * （卡片 padding 上下各 var(--uikit-input-padding-y, 8px) + 1px border × 2，按 normal 密度档取值）
  */
-const CARD_CHROME_PX = 26
+const CARD_CHROME_PX = 18
 
-/** 展开态卡片目标高度（设计稿固定 212px） */
+/** 展开态卡片目标高度（设计稿 msg_input action=none 展开态 220px 框高 − 外层间距 8 = 212px） */
 const EXPAND_CARD_HEIGHT = 212
 
 /** 是否显示拖拽手柄（PC 且未通过 config 关闭；展开态也可拖拽，高度语义见 expandedVisual） */
 const showResizeHandle = computed(() => !isMobile.value && props.config?.resizable !== false)
 
-/** 输入区内容总高度（拖拽/展开后设置，null 表示默认 132px 卡片自适应） */
+/** 输入区内容总高度（拖拽/展开后设置，null 表示默认 126px 卡片自适应） */
 const customHeight = ref<number | null>(null)
 
-/** 默认内容高度（卡片 132px 时的 root 高度初值 106 = 132 - 26 chrome，挂载后按实际测量值校准） */
-const defaultContentHeight = ref(106)
+/** 默认内容高度（卡片 126px 时的 root 高度初值 108 = 126 - 18 chrome：工具栏 28 + 间距 8 + 三行文本区 72，挂载后按实际测量值校准） */
+const defaultContentHeight = ref(108)
 
 /** 当前生效的 root 内容高度（统一高度语义：默认/拖拽/展开都是它） */
 const effectiveHeight = computed(() => customHeight.value ?? defaultContentHeight.value)
@@ -94,7 +100,7 @@ const resizeHandleRef = ref<HTMLElement>()
 
 const { size: resizeSize, isResizing } = useResizable(resizeHandleRef, {
   axis: 'vertical',
-  min: 96,
+  min: 72,
   max: 480,
   // 手柄在输入卡片上缘：向上拖动增高（反向增量）
   invert: true,
@@ -119,7 +125,7 @@ function syncResizeSize() {
   })
 }
 
-/** 角标点击：未展开 → 升到 212px；已展开（含拖拽超过 212）→ 恢复默认 132px。内容与光标保留 */
+/** 角标点击：未展开 → 升到 212px；已展开（含拖拽超过 212）→ 恢复默认 126px。内容与光标保留 */
 function toggleExpand() {
   customHeight.value = expandedVisual.value ? null : EXPAND_CARD_HEIGHT - CARD_CHROME_PX
   emit('height-change', customHeight.value)
@@ -482,22 +488,28 @@ defineExpose({
     }"
     :style="rootStyle"
   >
-    <!-- 工具栏：emoji / 语音 / 文件 / 图片 / 视频，间距 16px -->
+    <!-- 工具栏：表情 / 图片 / 视频 / 文件 / 翻译 / 名片 / 语音（设计稿 msg_input 顺序），图标视觉间距 16px -->
     <div class="simple-input__toolbar">
       <div v-if="features.emoji" ref="emojiBtnRef" class="simple-input__tool-btn" @click="onEmojiClick">
-        <Icon name="circle/face" :size="22" />
-      </div>
-      <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
-        <Icon name="mic/dot" :size="22" />
-      </div>
-      <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
-        <Icon name="folder" :size="22" />
+        <Icon name="circle/face" :size="20" />
       </div>
       <div v-if="features.image" class="simple-input__tool-btn" @click="triggerFileInput('image')">
-        <Icon name="rect/img" :size="22" />
+        <Icon name="rect/img" :size="20" />
       </div>
       <div v-if="features.video" class="simple-input__tool-btn" @click="triggerFileInput('video')">
-        <Icon name="rect/triangle" :size="22" />
+        <Icon name="rect/triangle" :size="20" />
+      </div>
+      <div v-if="features.file" class="simple-input__tool-btn" @click="triggerFileInput('file')">
+        <Icon name="folder" :size="20" />
+      </div>
+      <div v-if="features.translation" class="simple-input__tool-btn" :title="t('chat.input.translate', '翻译')" @click="emit('translation-click')">
+        <Icon name="dict" :size="20" />
+      </div>
+      <div v-if="features.contactCard" class="simple-input__tool-btn" :title="t('chat.input.contactCard', '发送名片')" @click="emit('contact-card-click')">
+        <Icon name="person/card" :size="20" />
+      </div>
+      <div v-if="features.voice" class="simple-input__tool-btn" @click="onMicClick">
+        <Icon name="mic/dot" :size="20" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
     </div>
@@ -602,7 +614,7 @@ defineExpose({
   flex-direction: column;
   gap: var(--uikit-container-gap, 8px);
   background-color: transparent;
-  /* basis 取内联 height（默认 106 / 展开 186 / 拖拽值），shrink 保留：引用条在场时输入区可被挤压 */
+  /* basis 取内联 height（默认 108 / 展开 194 / 拖拽值），shrink 保留：引用条在场时输入区可被挤压 */
   flex: 1 1 auto;
   min-height: 0;
   /* 展开/收起（角标点击、Esc）平滑过渡；拖拽跟手时经 --resizing 关闭 */
@@ -626,7 +638,8 @@ defineExpose({
 .simple-input__toolbar {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /* 28px 热区 + 8px 间距 = 图标视觉间距 16px（设计稿 msg_input actions 行：20px 图标 + 16px 间距） */
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -634,8 +647,8 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
@@ -661,12 +674,12 @@ defineExpose({
   position: relative;
 }
 
-/* 拖拽手柄：输入卡片上边缘命中区（仅光标提示，不画视觉线） */
+/* 拖拽手柄：输入卡片上边缘命中区（仅光标提示，不画视觉线）；上探过卡片 padding-top 与 1px border */
 .simple-input__resize-handle {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(-1 * var(--uikit-input-wrapper-spacing, 12px) - 1px);
+  top: calc(-1 * var(--uikit-input-padding-y, 8px) - 1px);
   height: 8px;
   z-index: 2;
   cursor: row-resize;
@@ -680,10 +693,11 @@ defineExpose({
 .simple-input__textarea {
   flex: 1;
   min-height: 0;
-  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
+  /* 内边距由卡片层提供（--uikit-input-padding-y/x），文本与工具栏图标共用卡片左缘（设计稿 px-12 py-8） */
+  padding: 0;
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   outline: none;
   background-color: transparent;
   color: var(--uikit-text-primary);
@@ -693,7 +707,7 @@ defineExpose({
 }
 
 .simple-input__textarea::placeholder {
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-tertiary, #919BA1);
 }
 
 .simple-input__textarea {

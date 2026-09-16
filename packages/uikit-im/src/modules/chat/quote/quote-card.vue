@@ -71,7 +71,7 @@ function onClick() {
       :size="20"
     />
     <div class="quote-card__content">
-      <Icon v-if="typeIcon" class="quote-card__type-icon" :name="typeIcon" :size="14" />
+      <Icon v-if="typeIcon" class="quote-card__type-icon" :name="typeIcon" :size="20" />
       <span class="quote-card__sender">{{ senderName }}</span>
       <span class="quote-card__divider">：</span>
       <span class="quote-card__preview">{{ previewText }}</span>
@@ -84,11 +84,11 @@ function onClick() {
 .quote-card {
   display: inline-flex;
   align-items: stretch;
-  gap: 6px;
+  gap: 8px;
   margin-top: 4px;
   max-width: 100%;
-  color: var(--uikit-text-secondary, #909399);
-  font-size: var(--uikit-font-size-12);
+  color: var(--uikit-text-secondary, #5E686E);
+  font-size: var(--uikit-font-size-14);
   line-height: 1.5;
   cursor: pointer;
   user-select: none;
@@ -104,9 +104,9 @@ function onClick() {
 
 .quote-card__bar {
   flex-shrink: 0;
-  width: 3px;
+  width: 2px;
   border-radius: 2px;
-  background-color: var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-quote-line-color, #C9CDCF);
 }
 
 /* 头像与第一行（昵称行）顶对齐，两行内容时不落到行间 */
@@ -119,7 +119,7 @@ function onClick() {
 .quote-card__type-icon {
   margin-right: 4px;
   vertical-align: -2px;
-  color: var(--uikit-text-secondary, #909399);
+  color: var(--uikit-text-secondary, #5E686E);
 }
 
 /* 两行折叠：inline 段（发送人/分隔/预览）整体参与 -webkit-box 裁剪 */
@@ -134,14 +134,15 @@ function onClick() {
 }
 
 .quote-card__sender {
-  color: var(--uikit-text-secondary, #909399);
+  color: var(--uikit-text-secondary, #5E686E);
+  font-weight: var(--uikit-font-weight-medium, 500);
 }
 
 .quote-card__divider {
-  color: var(--uikit-text-secondary, #909399);
+  color: var(--uikit-text-secondary, #5E686E);
 }
 
 .quote-card__preview {
-  color: var(--uikit-text-secondary, #909399);
+  color: var(--uikit-text-secondary, #5E686E);
 }
 </style>

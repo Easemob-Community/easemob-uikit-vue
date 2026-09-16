@@ -147,7 +147,7 @@ const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? f
 const isSelfConversation = computed(() => layout.value === 'conversation' && isSelf.value)
 
 /** 头像尺寸 */
-const avatarSize = computed(() => props.config?.avatarSize ?? 36)
+const avatarSize = computed(() => props.config?.avatarSize ?? 32)
 
 /** 气泡形状：config.messageList.bubbleShape 优先于主题全局 bubbleShape，气泡组件 inject 消费 */
 const bubbleShape = computed(() => props.config?.bubbleShape)
@@ -870,7 +870,6 @@ onBeforeUnmount(() => {
 
 .message-bubble-wrapper__avatar {
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .message-bubble-wrapper__content {
@@ -882,10 +881,10 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__nickname {
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
-  margin-bottom: 2px;
-  padding-left: 2px;
+  font-size: var(--uikit-font-size-10);
+  font-weight: var(--uikit-font-weight-medium, 500);
+  color: var(--uikit-text-primary, #171A1C);
+  padding: 2px 4px;
 }
 
 .message-bubble-wrapper__body {
@@ -1054,7 +1053,7 @@ onBeforeUnmount(() => {
   margin-top: 2px;
 }
 
-/* 群已读人数标注（设计师稿：主题色空心圆/胶囊，1 位圆、2~3 位胶囊，999+ 封顶） */
+/* 群已读人数标注（设计师稿：状态徽章色空心圆/胶囊，1 位圆、2~3 位胶囊，999+ 封顶） */
 .message-bubble-wrapper__group-read {
   display: inline-flex;
   align-items: center;
@@ -1063,9 +1062,9 @@ onBeforeUnmount(() => {
   min-width: 14px;
   height: 14px;
   border-radius: 999px;
-  border: 1px solid var(--uikit-primary);
+  border: 1px solid var(--uikit-msg-status-badge-color, #47ADEB);
   background: transparent;
-  color: var(--uikit-primary);
+  color: var(--uikit-msg-status-badge-color, #47ADEB);
   font-size: var(--uikit-font-size-8);
   line-height: 1;
   padding: 0 3px;
@@ -1087,7 +1086,7 @@ onBeforeUnmount(() => {
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-tertiary, #919BA1);
 }
 
 /* 无人已读：主题色空心圆 icon（无边框，icon 自带圆形） */
@@ -1120,14 +1119,17 @@ onBeforeUnmount(() => {
   transform: scale(0.5);
 }
 
-/* 通知类型消息：居中灰色小字，无背景 */
+/* 通知类型消息：居中 chip（气泡底，对齐设计稿 SystemMessage） */
 .message-bubble-wrapper__notice {
   align-self: center;
   max-width: 70%;
   margin: 0 auto;
-  padding: 8px 12px;
-  color: var(--uikit-text-secondary);
+  padding: 2px 8px;
+  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
+  border-radius: var(--uikit-components-radius, 8px);
+  color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-12);
+  line-height: 16px;
   text-align: center;
   /* 公告等长内容通知：保留换行并允许长单词折行 */
   white-space: pre-wrap;

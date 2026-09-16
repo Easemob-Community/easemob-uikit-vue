@@ -36,6 +36,10 @@ export interface MessageInputEmits {
   (e: 'send-success'): void
   /** 输入框聚焦时触发（H5 键盘弹起后需滚动消息列表） */
   (e: 'focus'): void
+  /** 点击工具栏翻译按钮（业务链路交由宿主接入） */
+  (e: 'translation-click'): void
+  /** 点击工具栏名片按钮（业务链路交由宿主接入） */
+  (e: 'contact-card-click'): void
 }
 
 const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
@@ -49,8 +53,8 @@ const { t } = useLocale()
 const inputConfig = computed(() => props.config?.input)
 
 /**
- * 聚焦时边框颜色：默认关闭聚焦高亮（与容器默认边框一致，不产生"内圈聚焦光环"），
- *  仅当显式传入 input.focusBorderColor 时才启用对应边框色。
+ * 聚焦时边框颜色：默认保持容器边框色（聚焦高亮由 --uikit-input-focus-ring 外环承担，见设计稿 msg_input focus 态），
+ *  仅当显式传入 input.focusBorderColor 时才覆盖边框色。
  */
 const focusBorderColorVar = computed(() => inputConfig.value?.focusBorderColor || 'var(--uikit-border-color)')
 
@@ -406,7 +410,7 @@ function onMentionClose() {
 /** simple 输入框展开视觉态（高度达到 212px，含拖拽超过；驱动角标 spread/singularity 切换） */
 const simpleExpanded = ref(false)
 
-/** simple 输入框自定义高度态（拖拽/展开后卡片退出固定 132px，改为内容自适应，min-height 兜底） */
+/** simple 输入框自定义高度态（拖拽/展开后卡片退出固定 126px，改为内容自适应，min-height 兜底） */
 const simpleDragged = ref(false)
 
 /** simple 输入框 PC 录音模式（录音面板覆盖输入区时，隐藏卡片右上角展开角标） */
@@ -429,7 +433,7 @@ let collapseTimer: ReturnType<typeof setTimeout> | null = null
 /**
  * simple 输入框生效高度同步：
  * - 非 null（拖拽/展开）：立即切内容自适应，root max-height 过渡驱动卡片跟随增高；
- * - null（收起）：动画期间保持自适应让卡片跟随收缩，动画结束再回落固定 132px，避免边框跳变。
+ * - null（收起）：动画期间保持自适应让卡片跟随收缩，动画结束再回落固定 126px，避免边框跳变。
  */
 function onSimpleHeightChange(height: number | null) {
   if (collapseTimer) {
@@ -838,6 +842,8 @@ defineExpose({
       @expand-change="onExpandChange"
       @height-change="onSimpleHeightChange"
       @voice-mode-change="simpleVoiceMode = $event"
+      @translation-click="emit('translation-click')"
+      @contact-card-click="emit('contact-card-click')"
       @focus="emit('focus')"
       @typing="handleTyping"
     >
@@ -862,6 +868,8 @@ defineExpose({
       @mention-trigger="onMentionTrigger"
       @mention-close="onMentionClose"
       @expand-change="onExpandChange"
+      @translation-click="emit('translation-click')"
+      @contact-card-click="emit('contact-card-click')"
       @focus="emit('focus')"
       @typing="handleTyping"
     >
@@ -944,38 +952,45 @@ defineExpose({
 .message-input {
   position: relative;
   background-color: var(--uikit-input-bg);
-  border: 1px solid var(--uikit-border-color);
-  border-radius: var(--uikit-components-radius, 12px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin: var(--uikit-input-wrapper-spacing, 12px);
-  padding: var(--uikit-input-wrapper-spacing, 12px);
-  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  border: 1px solid var(--uikit-input-border-color, #C9CDCF);
+  border-radius: var(--uikit-components-radius, 8px);
+  box-shadow: var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
+  /* 设计稿 msg_input：外层间距 4px（margin），卡片内边距 8px/12px（input-padding token，随密度档缩放） */
+  margin: var(--uikit-input-wrapper-spacing, 4px);
+  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
+  transition:
+    border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
+    box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .message-input:focus-within {
   border-color: v-bind(focusBorderColorVar);
+  /* 设计稿 focus 态：border 不变，叠加主色 20% 外环（保留基础投影） */
+  box-shadow:
+    var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04)),
+    var(--uikit-input-focus-ring, 0 0 0 2px rgba(51, 177, 255, 0.2));
 }
 
-/* simple 模式（PC）：卡片固定 132px，flex 列布局让输入框撑满（引用条/编辑条在场时挤压输入区，不改变卡片总高）；
+/* simple 模式（PC）：卡片默认 126px（root 内容 108：工具栏 28 + 间距 8 + 三行文本区 72，加 chrome 18：上下 padding 8 + 1px border × 2；对齐设计稿 msg_input 默认态 124px），flex 列布局让输入框撑满（引用条/编辑条在场时挤压输入区，不改变卡片总高）；
    展开/收起动画由 simple-input root 的 height 过渡驱动（卡片 auto 高度逐帧跟随） */
 .message-input--simple-pc {
   display: flex;
   flex-direction: column;
-  height: 132px;
+  height: 126px;
   transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 /* simple 模式自定义高度态（拖拽/展开）：退出固定高度，内容自适应（min-height 兜底） */
 .message-input--simple-dragged {
   height: auto;
-  min-height: 132px;
+  min-height: 126px;
 }
 
-/* 展开/收起角标：卡片层右上角（相对卡片定位，不受引用条位置影响），24×24，默认 #C9CDCF（设计稿固定值） */
+/* 展开/收起角标：压在卡片右上角边框角点上（设计稿 right/top -1px，相对 1px border 的 padding box 即贴合外缘），24×24，默认弱化图标色 */
 .message-input__expand-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: -1px;
+  right: -1px;
   z-index: 3;
   display: flex;
   align-items: center;
@@ -984,7 +999,7 @@ defineExpose({
   height: 24px;
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
-  color: #c9cdcf;
+  color: var(--uikit-input-border-color, #C9CDCF);
   transition:
     color var(--uikit-anim-duration) var(--uikit-anim-easing),
     background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -1032,6 +1047,8 @@ defineExpose({
 
 .message-input--mobile:focus-within {
   border-color: transparent;
+  /* 移动端无卡片边框，聚焦光环一并关闭 */
+  box-shadow: none;
 }
 
 .message-input--mobile .message-input__muted-overlay {
@@ -1047,7 +1064,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   background-color: var(--uikit-input-bg);
-  border-radius: var(--uikit-components-radius, 12px);
+  border-radius: var(--uikit-components-radius, 8px);
   opacity: 0.95;
 }
 

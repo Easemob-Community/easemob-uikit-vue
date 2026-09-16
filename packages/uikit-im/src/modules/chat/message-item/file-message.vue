@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
-import type { ComputedRef } from 'vue'
+import { computed } from 'vue'
 import { EmIcon as Icon, EmText } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
-import { useThemeStore } from '@easemob/uikit-core'
 import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
-import { INJECTION_KEY } from '@easemob/uikit-core'
 import type { FileMessageBody, UiMessage } from '@easemob/uikit-core'
-import type { BubbleShape } from '../types'
 
 export interface FileMessageProps {
   message: UiMessage
@@ -17,18 +13,6 @@ export interface FileMessageProps {
 const props = defineProps<FileMessageProps>()
 const { t } = useLocale()
 const { show: showToast } = useToast()
-
-/**
- * 圆角 class：config.messageList.bubbleShape（message-bubble-wrapper provide）优先；
- * 未配置时回落主题全局 bubbleShape（默认 round 16px，与其他类型气泡同一配置链）
- */
-const injectedBubbleShape = inject<ComputedRef<BubbleShape | undefined>>(INJECTION_KEY.BUBBLE_SHAPE, computed(() => undefined))
-const themeStore = useThemeStore()
-const bubbleClass = computed(() =>
-  (injectedBubbleShape.value ?? themeStore.bubbleShape) === 'square'
-    ? 'file-message__bubble--square'
-    : '',
-)
 
 const body = computed(() => props.message.body as FileMessageBody)
 
@@ -111,7 +95,7 @@ async function handleDownload() {
     :class="{ 'file-message--self': props.message.isSelf }"
     @click="handleDownload"
   >
-    <div class="file-message__bubble" :class="bubbleClass">
+    <div class="file-message__bubble">
       <div
         class="file-message__icon"
         :style="{ backgroundColor: `var(--uikit-file-icon-${fileType})` }"
@@ -150,19 +134,15 @@ async function handleDownload() {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  border-radius: var(--uikit-bubble-radius, 16px);
+  padding: 10px 12px;
+  border-radius: var(--uikit-file-card-radius, 12px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-  width: 240px;
+  min-width: 166px;
   max-width: 240px;
   box-sizing: border-box;
-}
-
-.file-message__bubble--square {
-  border-radius: var(--uikit-bubble-radius-square, 8px);
 }
 
 @media (hover: hover) {
@@ -195,11 +175,13 @@ async function handleDownload() {
 /* 标题跟随气泡文字色（覆盖 EmText 默认 primary，与设计稿 #171A1C / 己方白字一致） */
 .file-message__bubble .file-message__name {
   color: var(--uikit-bubble-text-other);
+  font-size: var(--uikit-font-size-16);
+  font-weight: var(--uikit-font-weight-medium, 500);
 }
 
 .file-message__size {
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-text-tertiary, #919BA1);
 }
 
 /* 己方气泡保持主色调 */
@@ -221,7 +203,6 @@ async function handleDownload() {
 }
 
 .file-message--self .file-message__size {
-  color: var(--uikit-bubble-text-self);
-  opacity: 0.7;
+  color: var(--uikit-bubble-text-self-secondary, #EFEFEF);
 }
 </style>

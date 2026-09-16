@@ -91,6 +91,13 @@ export interface ChatConfig {
     /** 是否显示抽屉入口按钮（聊天信息），默认 true */
     showDrawerEntry?: boolean
     /**
+     * 点击 header（标题/副标题区域）是否展开会话详情抽屉，默认 true；
+     * 头像（名片弹窗）与右侧按钮（搜索/抽屉入口）的点击不受影响。
+     * Whether clicking the header (title/subtitle area) opens the conversation-details
+     * drawer. Default true. Avatar (profile card) and action buttons are not affected.
+     */
+    clickOpenDrawer?: boolean
+    /**
      * 是否显示 header 搜索消息按钮，默认 false（搜索入口归口会话详情抽屉的 Message Search 行；
      * 仅在 messageList.search.enabled 为 true 时生效，开启后 header 恢复显示搜索按钮）。
      * Whether to show the message-search button in the header. Default false — the search entry
@@ -125,6 +132,14 @@ export interface ChatConfig {
      * only applies in 'push' mode (overlay mode closes via the mask click), ignored in fullscreen.
      */
     closeOnClickOutside?: boolean
+    /**
+     * 抽屉预览区点击头像是否打开用户名片（单聊对方头像 / 群聊成员宫格头像），默认 true；
+     * 关闭后群聊宫格头像点击回落为「查看全部成员」。
+     * Whether clicking an avatar in the drawer preview area (peer avatar in single chats,
+     * member grid avatars in group chats) opens the user profile card. Default true;
+     * when false, group grid avatar clicks fall back to "view all members".
+     */
+    avatarClickViewProfile?: boolean
   }
   /** 消息列表配置 */
   messageList?: {
@@ -282,6 +297,10 @@ export interface ChatConfig {
       voice?: boolean
       /** 视频，默认 true */
       video?: boolean
+      /** 翻译入口，默认 false；仅渲染按钮，点击经 `translation-click` 事件交由宿主接入 / Translation entry, default false; only renders the button, click is surfaced via the `translation-click` event for the host to handle */
+      translation?: boolean
+      /** 名片发送入口，默认 false；仅渲染按钮，点击经 `contact-card-click` 事件交由宿主接入 / Contact card entry, default false; only renders the button, click is surfaced via the `contact-card-click` event for the host to handle */
+      contactCard?: boolean
       /** 提及功能（@），默认 true */
       mention?: boolean
     }

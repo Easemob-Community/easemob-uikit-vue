@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
           0″
         </div>
         <div class="voice-panel__mic-wrapper">
-          <Icon name="mic/fill" :size="32" color="white" />
+          <Icon name="mic/fill" :size="24" color="white" />
         </div>
         <div class="voice-panel__hint">
           {{ t('chat.voice.holdSpace') }}<span class="voice-panel__link" @mousedown.stop @click="deactivate">{{ t('chat.voice.exit') }}</span>
@@ -217,7 +217,7 @@ onBeforeUnmount(() => {
           <span class="voice-panel__wave" />
           <span class="voice-panel__wave" />
           <span class="voice-panel__wave" />
-          <Icon name="mic/fill" :size="32" color="white" />
+          <Icon name="mic/fill" :size="24" color="white" />
         </div>
         <div class="voice-panel__hint">
           {{ t('chat.voice.releaseSend') }}<span class="voice-panel__link" @mousedown.stop @click="cancelRecording">{{ t('chat.voice.cancelSend') }}</span>
@@ -252,15 +252,17 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--uikit-container-gap, 8px) * 1.5);
+  /* 设计稿 msg_input cta 态：麦克风圆与提示文案间距 8px */
+  gap: var(--uikit-container-gap, 8px);
 }
 
 .voice-panel__mic-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  /* 设计稿 cta 态：48px 主色圆 + 24px 麦克风图标 */
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: var(--uikit-primary-color, #3b82f6);
   color: var(--uikit-text-inverse);
@@ -345,14 +347,17 @@ onBeforeUnmount(() => {
 }
 
 .voice-panel__hint {
-  font-size: var(--uikit-font-size-13);
-  color: var(--uikit-text-secondary);
+  /* 设计稿 cta 态：caption 10px 弱提示色 */
+  font-size: var(--uikit-font-size-10);
+  color: var(--uikit-text-tertiary, #919BA1);
   text-align: center;
   line-height: 1.5;
 }
 
 .voice-panel__link {
   color: var(--uikit-primary-color, #3b82f6);
+  /* 设计稿：Esc 高亮为 Medium */
+  font-weight: 500;
   cursor: pointer;
   margin: 0 2px;
 }

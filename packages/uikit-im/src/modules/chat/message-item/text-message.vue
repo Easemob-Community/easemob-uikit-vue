@@ -293,7 +293,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
               </template>
             </div>
             <div class="text-message__translated-tag">
-              <Icon name="rect/hanzinalpha/slash" :size="12" />
+              <Icon name="rect/hanzinalpha/slash" :size="17" />
               <span>{{ t('message.translated') }}</span>
             </div>
           </template>
@@ -316,11 +316,11 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message__bubble {
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   overflow-wrap: break-word;
   word-break: normal;
 }
@@ -408,7 +408,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message__translation-text {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-12);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
@@ -434,7 +434,8 @@ function onMentionClick(userId: string, event: MouseEvent) {
   justify-content: flex-end;
   gap: 4px;
   margin-top: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-10);
+  font-weight: var(--uikit-font-weight-medium, 500);
   line-height: 1;
   opacity: 0.75;
   user-select: none;

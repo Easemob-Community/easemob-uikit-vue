@@ -184,8 +184,8 @@ const showUnreadDot = computed(() =>
   <div class="voice-message" :class="{ 'voice-message--self': props.message.isSelf }">
     <div
       class="voice-message__bubble"
-      :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying, 'voice-message__bubble--with-text': showVoiceTextCard }]"
-      :style="showVoiceTextCard ? undefined : { width: bubbleWidth }"
+      :class="[bubbleClass, { 'voice-message__bubble--playing': isPlaying }]"
+      :style="{ width: bubbleWidth }"
       @click="onPlayClick"
     >
       <div class="voice-message__main">
@@ -195,30 +195,29 @@ const showUnreadDot = computed(() =>
             <span class="voice-message__wave-bar" />
             <span class="voice-message__wave-bar" />
           </span>
-          <Icon v-else name="triangle" :size="14" />
+          <Icon v-else name="triangle" :size="22" />
         </span>
         <span class="voice-message__duration">{{ durationText }}</span>
       </div>
-      <!-- 转文字结果：与语音同一气泡展示，分割线分隔（隐藏/显示文字入口在右键菜单） -->
-      <template v-if="showVoiceTextCard">
-        <div class="voice-message__text-divider" aria-hidden="true" />
-        <!-- 转写中 -->
-        <div v-if="voiceTranscribing" class="voice-message__text voice-message__text--loading">
-          <Icon name="loading/arc/normal" :size="14" anim="spin" />
-          <span>{{ t('message.voiceToText.loading') }}</span>
-        </div>
-        <!-- 已有结果：展示转写文字 + 已转文字标签（与文本翻译同款，居右对齐） -->
-        <template v-else>
-          <div class="voice-message__text">
-            {{ props.message.voiceText?.text }}
-          </div>
-          <div class="voice-message__transcribed-tag">
-            <Icon name="rect/hanzi" :size="12" />
-            <span>{{ t('message.voiceToText.done') }}</span>
-          </div>
-        </template>
-      </template>
     </div>
+    <!-- 转文字结果：气泡外独立胶囊（sub-body），与气泡垂直间距 2px（隐藏/显示文字入口在右键菜单） -->
+    <template v-if="showVoiceTextCard">
+      <!-- 转写中 -->
+      <div v-if="voiceTranscribing" class="voice-message__transcript voice-message__transcript--loading">
+        <Icon name="loading/arc/normal" :size="14" anim="spin" />
+        <span>{{ t('message.voiceToText.loading') }}</span>
+      </div>
+      <!-- 已有结果：展示转写文字胶囊 + 已转文字标签 -->
+      <template v-else>
+        <div class="voice-message__transcript">
+          {{ props.message.voiceText?.text }}
+        </div>
+        <div class="voice-message__transcribed-tag">
+          <Icon name="rect/hanzi" :size="12" />
+          <span>{{ t('message.voiceToText.done') }}</span>
+        </div>
+      </template>
+    </template>
     <!-- 未播放红点：气泡外侧（对方消息右侧）、相对气泡垂直居中，点击播放后消失 -->
     <span v-if="showUnreadDot" class="voice-message__unread-dot" aria-hidden="true" />
   </div>
@@ -228,6 +227,7 @@ const showUnreadDot = computed(() =>
 .voice-message {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   position: relative;
 }
 
@@ -255,7 +255,7 @@ const showUnreadDot = computed(() =>
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   /* 宽度由 JS 按时长计算（:style width），这里兜底： */
   box-sizing: border-box;
   /* min-width: fit-content 保证内容（图标+时长文本+内边距）永不窄于内容 → 不溢出气泡 */
@@ -265,17 +265,11 @@ const showUnreadDot = computed(() =>
   white-space: nowrap;
 }
 
-/* 语音主行：图标 + 时长（转文字内容在同一气泡内位于其下） */
+/* 语音主行：图标 + 时长（转文字内容在气泡外独立胶囊） */
 .voice-message__main {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-/* 展示转写文字时：宽度由内容决定（按时长的固定宽度会让文字被挤窄），并允许折行 */
-.voice-message__bubble--with-text {
-  min-width: 0;
-  white-space: normal;
 }
 
 .voice-message__bubble--square {
@@ -291,8 +285,8 @@ const showUnreadDot = computed(() =>
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
 }
 
 /* 播放动画 */
@@ -354,47 +348,43 @@ const showUnreadDot = computed(() =>
   }
 }
 
-/* 转文字分割线：转写结果与语音同一气泡，以 1px 分割线分隔 */
-.voice-message__text-divider {
-  height: 1px;
-  margin: 8px 0;
-  background-color: var(--uikit-bubble-divider-other, rgba(23, 26, 28, 0.12));
-}
-
-.voice-message--self .voice-message__text-divider {
-  background-color: var(--uikit-bubble-divider-self, rgba(255, 255, 255, 0.35));
-}
-
-.voice-message__text {
+/* 转文字胶囊：气泡外独立 sub-body，与气泡垂直间距 2px，双方统一灰底次级文字 */
+.voice-message__transcript {
+  margin-top: 2px;
+  padding: 4px 14px;
+  border-radius: 12px;
+  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
+  color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-14);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.voice-message__text--loading {
+.voice-message__transcript--loading {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
 }
 
-.voice-message--self .voice-message__text--loading {
-  color: var(--uikit-bubble-text-self);
-  opacity: 0.75;
-}
-
-/* 已转文字标签：icon + 文案，双方气泡均居右对齐，颜色跟随气泡文字 */
+/* 已转文字标签：icon + 文案，接收侧左对齐、发送侧右对齐，胶囊外次级文字色 */
 .voice-message__transcribed-tag {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 4px;
-  margin-top: 4px;
+  margin-top: 2px;
   font-size: var(--uikit-font-size-12);
   line-height: 1;
+  color: var(--uikit-text-secondary, #5E686E);
   opacity: 0.75;
   user-select: none;
+}
+
+.voice-message--self .voice-message__transcribed-tag {
+  justify-content: flex-end;
 }
 </style>

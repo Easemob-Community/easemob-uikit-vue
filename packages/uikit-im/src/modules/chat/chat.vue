@@ -60,6 +60,10 @@ export interface ChatEmits {
   (e: 'location-click', body: LocationMessageBody, message: UiMessage): void
   /** 点击自定义消息（custom）上的操作按钮时触发，参数为操作标识、载荷与对应消息 / Emitted when an action button on a custom message is clicked, with the action key, payload and the message */
   (e: 'custom-message-action', action: string, payload: any, message: UiMessage): void
+  /** 点击输入框工具栏翻译按钮时触发（需在 config.input.features.translation 开启后展示，翻译业务交由宿主接入） / Emitted when the translation button in the input toolbar is clicked (shown when config.input.features.translation is enabled; translation logic is left to the host) */
+  (e: 'translation-click'): void
+  /** 点击输入框工具栏名片按钮时触发（需在 config.input.features.contactCard 开启后展示，名片发送业务交由宿主接入） / Emitted when the contact card button in the input toolbar is clicked (shown when config.input.features.contactCard is enabled; contact card sending is left to the host) */
+  (e: 'contact-card-click'): void
 }
 
 /** 输入框组件引用 */
@@ -350,6 +354,9 @@ const showHeaderAvatar = computed(() => headerConfig.value?.showAvatar ?? false)
 /** 是否显示 header 抽屉入口按钮，默认 true */
 const showDrawerEntry = computed(() => headerConfig.value?.showDrawerEntry !== false)
 
+/** 点击 header（标题/副标题区域）是否展开会话详情抽屉，默认 true */
+const headerClickOpenDrawer = computed(() => headerConfig.value?.clickOpenDrawer !== false)
+
 /** 是否显示 header 搜索消息按钮，默认 false（搜索入口归口会话详情抽屉，可选开启） */
 const showHeaderSearchEntry = computed(() => headerConfig.value?.showSearchEntry === true)
 
@@ -361,6 +368,9 @@ const drawerWidth = computed(() => props.config?.drawer?.width ?? 320)
 
 /** 点击抽屉外部（聊天区 / 空白处）是否自动关闭抽屉，默认 true；仅 push 模式生效 */
 const drawerCloseOnClickOutside = computed(() => props.config?.drawer?.closeOnClickOutside ?? true)
+
+/** 抽屉预览区点击头像是否打开用户名片，默认 true */
+const drawerAvatarClickViewProfile = computed(() => props.config?.drawer?.avatarClickViewProfile !== false)
 
 /** 移动端窄屏（viewport < 768）：抽屉一律回落满铺全屏（独立页面观感） */
 const isMobileView = h5.isMobile
@@ -914,6 +924,18 @@ function onHeaderAvatarClick() {
   }
 }
 
+/** 点击 header（标题/副标题区域）展开会话详情抽屉；头像与右侧按钮已各自拦截，不受影响 */
+function onHeaderClick() {
+  if (!headerClickOpenDrawer.value || !currentConversation.value)
+    return
+  openDrawer()
+}
+
+/** 抽屉预览区头像点击：打开用户名片（抽屉保持打开，名片为 body 级弹层） */
+function onDrawerViewProfile(userId: string, anchor?: HTMLElement) {
+  toggleUserCardModal(userId, anchor)
+}
+
 /** 打开用户名片；同一用户重复点击时 toggle 关闭（锚定弹层下点头像不触发外部关闭，需在此处理） */
 function toggleUserCardModal(userId: string, anchor?: HTMLElement) {
   if (showUserCardModal.value && userCardUserId.value === userId) {
@@ -1224,18 +1246,24 @@ async function doRemoveAdmin(member: UiGroupMember) {
               'chat__header--align-left': headerAlign === HEADER_ALIGN.LEFT,
               'chat__header--align-center': headerAlign === HEADER_ALIGN.CENTER,
               'chat__header--align-right': headerAlign === HEADER_ALIGN.RIGHT,
+              'chat__header--clickable': headerClickOpenDrawer && currentConversation,
             }"
+            @click="onHeaderClick"
           >
             <slot name="header" :conversation="currentConversation">
-              <!-- 头像区域 -->
-              <div v-if="showHeaderAvatar && currentConversation" ref="headerAvatarRef" class="chat__header-avatar">
+              <!-- 头像区域（点击打开名片，阻止冒泡避免触发 header 展开抽屉） -->
+              <div v-if="showHeaderAvatar && currentConversation" ref="headerAvatarRef" class="chat__header-avatar" @click.stop>
                 <slot name="header-avatar" :conversation="currentConversation">
                   <Avatar
                     :src="headerAvatar"
                     :name="headerTitle"
-                    :size="36"
+                    :size="40"
                     @click="onHeaderAvatarClick"
                   />
+                  <!-- 群聊会话：头像右下角群组标识（设计稿 Group Status 角标） -->
+                  <span v-if="isGroupChat" class="chat__header-avatar-group-badge" aria-hidden="true">
+                    <Icon name="filled/shield" :size="8" />
+                  </span>
                 </slot>
               </div>
               <div class="chat__header-main">
@@ -1280,13 +1308,13 @@ async function doRemoveAdmin(member: UiGroupMember) {
               <IconButton
                 v-if="searchEnabled && showHeaderSearchEntry"
                 icon="search"
-                :icon-size="20"
+                :icon-size="22"
                 @click.stop="showSearchPanel = true"
               />
               <IconButton
                 v-if="showDrawerEntry && currentConversation"
                 icon="vertical"
-                :icon-size="20"
+                :icon-size="22"
                 @click.stop="openDrawer"
               />
             </slot>
@@ -1367,6 +1395,8 @@ async function doRemoveAdmin(member: UiGroupMember) {
             :mention-contacts="mentionContacts"
             @send-success="handleSendSuccess"
             @focus="messageListRef?.scrollToBottom()"
+            @translation-click="emit('translation-click')"
+            @contact-card-click="emit('contact-card-click')"
           >
             <template #toolbar-extra="slotProps">
               <slot name="toolbar-extra" v-bind="slotProps" />
@@ -1408,12 +1438,14 @@ async function doRemoveAdmin(member: UiGroupMember) {
             :show-shared-files="props.config?.groupManagement?.showSharedFiles"
             :show-join-requests="props.config?.groupManagement?.showJoinRequests"
             :show-message-search="searchEnabled"
+            :avatar-click-view-profile="drawerAvatarClickViewProfile"
             @leave-group="onLeaveGroup"
             @destroy-group="onDestroyGroup"
             @clear-history="onClearHistory"
             @add-member="onAddMember"
             @search-message="openSearchPanel"
             @create-group="onDrawerCreateGroup"
+            @view-profile="onDrawerViewProfile"
             @group-operation="emit('group-operation', $event)"
             @chat-member="onChatMember"
             @remove-member="onRemoveMember"
@@ -1685,16 +1717,27 @@ async function doRemoveAdmin(member: UiGroupMember) {
 .chat__header {
   position: relative;
   z-index: 101;
-  padding: calc(var(--uikit-header-padding-y, 12px) + var(--uikit-safe-top, 0px)) 16px
-    var(--uikit-header-padding-y, 12px);
+  /* border-box + 固定高度：总高恒 56px，不随副标题（在线状态/签名/typing）有无而变化，
+     与会话列表 header 的分隔线严格对齐 */
+  box-sizing: border-box;
+  height: calc(56px + var(--uikit-safe-top, 0px));
+  padding: calc(var(--uikit-header-padding-y, 8px) + var(--uikit-safe-top, 0px)) 12px
+    var(--uikit-header-padding-y, 8px);
   display: flex;
   align-items: center;
-  min-height: 48px;
   gap: 8px;
+  border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
+  /* 头部图标按钮圆角 4px（IconButton 消费 --uikit-components-radius，局部覆写不影响全局） */
+  --uikit-components-radius: 4px;
 }
 
 .chat__header--align-left .chat__header-main {
   justify-content: flex-start;
+}
+
+/* 点击 header 展开抽屉开启时给出可点击提示（头像/按钮区域已各自拦截） */
+.chat__header--clickable {
+  cursor: pointer;
 }
 
 .chat__header--align-center .chat__header-main {
@@ -1706,9 +1749,28 @@ async function doRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__header-avatar {
+  position: relative;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+/* 群聊头像右下角群组角标：16px 橙底白边圆（含 2px 白环），内嵌 8px 白色盾牌图标 */
+.chat__header-avatar-group-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--uikit-bg-base);
+  background-color: var(--uikit-warning-color, #FFAB00);
+  color: var(--uikit-text-inverse);
+  pointer-events: none;
 }
 
 .chat__header-main {
@@ -1716,8 +1778,11 @@ async function doRemoveAdmin(member: UiGroupMember) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  /* 设计稿：标题行 22px + 副标题行 18px 无间距堆叠，合计 40px 与 40px 头像等高 */
+  gap: 0;
   min-width: 0;
+  /* header 固定 56px：主区内容超高（如大字号缩放）时裁剪而非撑破 header */
+  overflow: hidden;
 }
 
 .chat__header-title-row {
@@ -1728,9 +1793,10 @@ async function doRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__title {
-  font-size: var(--uikit-font-size-16);
-  font-weight: 600;
-  color: var(--uikit-text-primary);
+  font-size: var(--uikit-font-size-18);
+  font-weight: var(--uikit-font-weight-medium, 500);
+  line-height: 22px;
+  color: var(--uikit-text-primary, #171A1C);
 }
 
 .chat__header-member-count {
@@ -1756,8 +1822,9 @@ async function doRemoveAdmin(member: UiGroupMember) {
   gap: 4px;
   min-width: 0;
   max-width: 100%;
-  font-size: var(--uikit-font-size-12);
-  color: var(--uikit-text-secondary);
+  font-size: var(--uikit-font-size-14);
+  line-height: 18px;
+  color: var(--uikit-text-secondary, #5E686E);
   white-space: nowrap;
 }
 

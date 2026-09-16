@@ -32,6 +32,10 @@ const emit = defineEmits<{
   (e: 'typing'): void
   /** 展开/收起输入区（供上层关闭 emoji/mention 等锚点弹层） */
   (e: 'expand-change', expanded: boolean): void
+  /** 点击工具栏翻译按钮（业务链路交由宿主接入） */
+  (e: 'translation-click'): void
+  /** 点击工具栏名片按钮（业务链路交由宿主接入） */
+  (e: 'contact-card-click'): void
 }>()
 
 const { t } = useLocale()
@@ -89,13 +93,15 @@ const cssVars = computed(() => ({
 /** 最大输入长度 */
 const maxLength = computed(() => props.config?.maxLength ?? 0)
 
-/** 功能开关 */
+/** 功能开关（translation/contactCard 默认关闭：仅渲染按钮，业务链路交由宿主接入） */
 const features = computed(() => ({
   emoji: props.config?.features?.emoji !== false,
   image: props.config?.features?.image !== false,
   file: props.config?.features?.file !== false,
   voice: props.config?.features?.voice !== false,
   video: props.config?.features?.video !== false,
+  translation: props.config?.features?.translation === true,
+  contactCard: props.config?.features?.contactCard === true,
 }))
 
 /** 是否显示发送按钮：显式配置优先；未配置时 PC 隐藏（回车发送）、移动端显示 */
@@ -417,19 +423,25 @@ onBeforeUnmount(() => {
     <!-- 工具栏 -->
     <div class="rich-input__toolbar">
       <div v-if="features.emoji" ref="emojiBtnRef" class="rich-input__tool-btn" @click="onEmojiClick">
-        <Icon name="circle/face" :size="22" />
+        <Icon name="circle/face" :size="20" />
       </div>
       <div v-if="features.image" class="rich-input__tool-btn" @click="triggerFileInput('image')">
-        <Icon name="rect/img" :size="22" />
+        <Icon name="rect/img" :size="20" />
       </div>
       <div v-if="features.video" class="rich-input__tool-btn" @click="triggerFileInput('video')">
-        <Icon name="rect/triangle" :size="22" />
+        <Icon name="rect/triangle" :size="20" />
       </div>
       <div v-if="features.file" class="rich-input__tool-btn" @click="triggerFileInput('file')">
-        <Icon name="file/empty" :size="22" />
+        <Icon name="file/empty" :size="20" />
+      </div>
+      <div v-if="features.translation" class="rich-input__tool-btn" :title="t('chat.input.translate', '翻译')" @click="emit('translation-click')">
+        <Icon name="dict" :size="20" />
+      </div>
+      <div v-if="features.contactCard" class="rich-input__tool-btn" :title="t('chat.input.contactCard', '发送名片')" @click="emit('contact-card-click')">
+        <Icon name="person/card" :size="20" />
       </div>
       <div v-if="features.voice" class="rich-input__tool-btn" @click="toggleVoice">
-        <Icon :name="isRecording ? 'mic' : 'mic'" :size="22" />
+        <Icon :name="isRecording ? 'mic' : 'mic'" :size="20" />
       </div>
       <slot name="toolbar-extra" :toggle-panel="togglePanel" :show-panel="showPanel" :close-panel="closePanel" />
       <!-- 展开/收起输入区（仅 PC，工具栏右端） -->
@@ -439,7 +451,7 @@ onBeforeUnmount(() => {
         :title="expanded ? t('chat.input.collapse', '收起输入框') : t('chat.input.expand', '展开输入框')"
         @click="toggleExpand"
       >
-        <Icon :name="expanded ? 'chevron/up' : 'chevron/down'" :size="22" />
+        <Icon :name="expanded ? 'chevron/up' : 'chevron/down'" :size="20" />
       </div>
     </div>
 
@@ -511,9 +523,10 @@ onBeforeUnmount(() => {
   min-height: 60px;
   height: var(--rich-input-editor-height, auto);
   max-height: var(--rich-input-editor-max-height, 150px);
-  padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
+  /* 内边距由卡片层提供（--uikit-input-padding-y/x），文本与工具栏图标共用卡片左缘 */
+  padding: 0;
   outline: none;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   overflow-y: auto;
@@ -564,7 +577,8 @@ onBeforeUnmount(() => {
 .rich-input__toolbar {
   display: flex;
   align-items: center;
-  gap: calc(var(--uikit-container-gap, 8px) * 1.5);
+  /* 28px 热区 + 8px 间距 = 图标视觉间距 16px（设计稿 msg_input actions 行） */
+  gap: var(--uikit-container-gap, 8px);
 }
 
 /* 展开/收起按钮：固定在工具栏右端 */
@@ -576,8 +590,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--uikit-components-radius, 6px);
   cursor: pointer;
   color: var(--uikit-text-secondary);
@@ -622,11 +636,11 @@ onBeforeUnmount(() => {
 
 .rich-input__placeholder {
   position: absolute;
-  top: var(--uikit-input-padding-y, 8px);
-  left: var(--uikit-input-padding-x, 12px);
-  color: var(--uikit-text-secondary);
+  top: 0;
+  left: 0;
+  color: var(--uikit-text-tertiary, #919BA1);
   pointer-events: none;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-16);
   line-height: 1.5;
 }
 

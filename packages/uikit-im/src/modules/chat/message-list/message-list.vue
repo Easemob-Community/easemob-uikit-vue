@@ -94,7 +94,7 @@ const nativeScrollStyle = computed(() => {
   if (messagePadding.value !== undefined) {
     return { padding: `${messagePadding.value}px` }
   }
-  return { padding: 'var(--uikit-message-padding, 16px)' }
+  return { padding: 'var(--uikit-message-padding, 12px)' }
 })
 
 /** 内容层样式（gap 挂内容层，padding 留滚动容器，内容层尺寸即列表内容高度，供 ResizeObserver 观测） */
@@ -102,7 +102,7 @@ const nativeContentStyle = computed(() => {
   if (messageGap.value !== undefined) {
     return { gap: `${messageGap.value}px` }
   }
-  return { gap: 'var(--uikit-message-gap, 12px)' }
+  return { gap: 'var(--uikit-message-gap, 16px)' }
 })
 
 /** 时间分组间隔 */
@@ -867,8 +867,8 @@ watch(locateRequest, (req) => {
       :items="messagesWithDividers"
       key-field="key"
       :estimate-height="80"
-      :gap="messageGap ?? 12"
-      :padding="messagePadding ?? 16"
+      :gap="messageGap ?? 16"
+      :padding="messagePadding ?? 12"
       @reach-top="loadMoreHistory"
       @scroll="onVirtualScroll"
     >
@@ -1046,11 +1046,13 @@ watch(locateRequest, (req) => {
 }
 
 .message-list__divider span {
-  padding: 2px 10px;
-  border-radius: var(--uikit-components-radius, 4px);
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-secondary);
+  padding: 2px 8px;
+  border-radius: var(--uikit-components-radius, 8px);
+  /* 时间分割线 chip：气泡底（他人气泡同色 #E4E6E7，对齐设计稿 SystemMessage） */
+  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
+  color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-12);
+  line-height: 16px;
 }
 
 /* 下拉刷新指示器 */

@@ -111,23 +111,25 @@ function onClose() {
 .quote-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  /* 设计稿 msg_input quotes 态：sndtext 行内容间距 8px */
+  gap: 8px;
   padding: 2px 0;
-  /* 左缩进 5px：竖杠与工具栏图标（32px 按钮内 22px 图标）左边缘对齐 */
-  margin: 4px 0 4px 5px;
+  /* 竖杠与卡片 padding 左缘对齐（设计稿 sndtext border-l 起始于卡片 px-12 处） */
+  margin: 4px 0;
   color: var(--uikit-text-secondary);
   font-size: var(--uikit-font-size-13);
-  line-height: 1.4;
+  /* 设计稿：正文 Regular 14px / 行高 18px */
+  line-height: 18px;
   min-height: 24px;
 }
 
-/* 竖杠：与气泡下方引用卡片同规格 */
+/* 竖杠：设计稿 msg_input 引用预览条 2px 左竖条 */
 .quote-bar__bar {
   flex-shrink: 0;
   align-self: stretch;
-  width: 3px;
+  width: 2px;
   border-radius: 2px;
-  background-color: var(--uikit-border-color, #e5e7eb);
+  background-color: var(--uikit-quote-line-color, #C9CDCF);
 }
 
 .quote-bar__icon {
@@ -141,8 +143,8 @@ function onClose() {
 
 .quote-bar__thumb {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 4px;
   object-fit: cover;
 }
@@ -157,15 +159,20 @@ function onClose() {
   text-overflow: ellipsis;
 }
 
+/* 用户名：设计稿 Medium 14px */
 .quote-bar__sender {
-  color: var(--uikit-text-primary);
+  color: var(--uikit-text-secondary, #5E686E);
+  font-size: var(--uikit-font-size-14);
+  font-weight: 500;
   flex-shrink: 0;
   max-width: 30%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* 摘录：设计稿 Regular 14px，单行省略 */
 .quote-bar__preview {
+  font-size: var(--uikit-font-size-14);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
