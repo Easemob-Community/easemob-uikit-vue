@@ -28,7 +28,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
 <template>
   <Story title="GroupListContainer">
     <Variant title="默认">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             title="我的群组"
@@ -40,7 +40,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
     </Variant>
 
     <Variant title="按成员数排序">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             title="群组"
@@ -53,7 +53,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
     </Variant>
 
     <Variant title="选择模式">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             title="选择群组"
@@ -66,7 +66,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
     </Variant>
 
     <Variant title="紧凑模式">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             title="紧凑列表"
@@ -79,7 +79,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
     </Variant>
 
     <Variant title="隐藏头部与搜索">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             :show-header="false"
@@ -91,7 +91,7 @@ const subtitleFn: GroupSubtitleFn = g => `${g.memberCount ?? 0} 人`
     </Variant>
 
     <Variant title="空列表">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <GroupListContainer
             title="我的群组"

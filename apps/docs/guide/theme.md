@@ -74,6 +74,7 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 ### 尺寸与圆角
 
 - `--uikit-container-gap`：容器间距（默认 `--uikit-spacing-2`）
+- `--uikit-sidebar-width`：侧栏列表容器（会话 / 联系人 / 群组 / 通讯录 / 黑名单）默认宽度（默认 360px；宿主可在容器作用域覆写，如 H5 全宽设为 `100%`）
 - `--uikit-components-radius`：组件圆角（默认 8px）
 - `--uikit-components-radius-hover`：hover 圆角（默认 14px）
 - `--uikit-popup-padding`：弹出层内边距（默认 4px，hover/展开态 8px），用于 Popup / 菜单 / 表情面板等浮层内容与边界的留白

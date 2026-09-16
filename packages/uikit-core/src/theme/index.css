@@ -90,6 +90,8 @@
 
   /* 容器间距与组件圆角 */
   --uikit-container-gap: var(--uikit-spacing-2);
+  /* 侧栏列表容器（会话/联系人/群组/通讯录/黑名单）默认宽度；宿主可在容器作用域覆写（如 H5 全宽设为 100%） */
+  --uikit-sidebar-width: 360px;
   --uikit-cell-gap: 3px;
   /* Cell 项背景（默认透明；会话列表 card 变体在列表作用域覆写为浮层白卡） */
   --uikit-cell-bg: transparent;

@@ -74,7 +74,7 @@ function injectMock() {
 <template>
   <Story title="AddressBookContainer">
     <Variant title="Default Aggregate Home">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="3"
@@ -95,7 +95,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Auto Notice Badge">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             @vue:mounted="() => { injectMock(); injectMockInvites() }"
@@ -115,7 +115,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Persisted Notice Badge">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             notice-persist-invites
@@ -136,7 +136,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Hide Notice">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer :show-notice="false" @vue:mounted="injectMock">
             <template #default="{ view }">
@@ -149,7 +149,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Hide Group (Flat Contact)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :show-notice="false"
@@ -165,7 +165,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Hide Contact (Flat Group)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :show-notice="false"
@@ -181,7 +181,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Custom Nav Entry Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer :notice-count="5" @vue:mounted="injectMock">
             <template #nav-entry="{ entry }">
@@ -210,7 +210,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Custom Back Icon">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer initial-view="group" @vue:mounted="injectMock">
             <template #back-icon>
@@ -226,7 +226,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Hide Header">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer :show-header="false" @vue:mounted="injectMock">
             <template #default="{ view }">
@@ -239,7 +239,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Custom Title">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer title="通讯录" header-align="center" @vue:mounted="injectMock">
             <template #default="{ view }">
@@ -252,7 +252,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Empty State">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer>
             <template #default="{ view }">
@@ -265,7 +265,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Transition: fade">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="3"
@@ -282,7 +282,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Transition: none (无动画)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="3"
@@ -299,7 +299,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Auto Entry Count (从 store 推断数量)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="5"
@@ -316,7 +316,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Manual Entry Count">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="5"
@@ -334,7 +334,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="#home-footer Slot (首页底部插槽)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer :notice-count="2" @vue:mounted="injectMock">
             <template #home-footer>
@@ -360,7 +360,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="#header-extra Slot (右上角操作区)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer :notice-count="2" @vue:mounted="injectMock">
             <template #header-extra>
@@ -379,7 +379,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Custom Entries (自定义入口)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="2"
@@ -410,7 +410,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Custom Entries with Sort (自定义排序)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <AddressBookContainer
             :notice-count="2"
@@ -443,7 +443,7 @@ function injectMock() {
     </Variant>
 
     <Variant title="Disable Group (Provider 关闭群组能力)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false" :enable-group="false">
           <AddressBookContainer
             :notice-count="3"

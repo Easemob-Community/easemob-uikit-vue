@@ -488,6 +488,8 @@ const subviewTitle = computed(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: var(--uikit-sidebar-width, 360px);
+  max-width: 100%;
   background-color: var(--uikit-bg-base);
   overflow: hidden;
 }

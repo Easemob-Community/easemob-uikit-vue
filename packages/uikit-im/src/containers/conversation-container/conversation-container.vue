@@ -226,6 +226,8 @@ function handleReconnect() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: var(--uikit-sidebar-width, 360px);
+  max-width: 100%;
   /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽 */
   min-width: 0;
   background-color: var(--uikit-bg-base);

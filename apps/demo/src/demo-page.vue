@@ -1008,6 +1008,8 @@ watch(
 
 .demo-layout__sidebar {
   flex-shrink: 0;
+  /* 拖拽宽度由 EmResizable 控制，容器跟随宿主宽度而非 UIKIT 默认 360px */
+  --uikit-sidebar-width: 100%;
   border: 1px solid var(--uikit-bg-secondary, #e5e7eb);
   border-radius: var(--uikit-components-radius, 8px);
   overflow: auto;
@@ -1086,6 +1088,8 @@ watch(
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  /* H5 列表页全宽，覆写 UIKIT 容器默认 360px */
+  --uikit-sidebar-width: 100%;
 }
 
 /* H5 底部 TabBar */

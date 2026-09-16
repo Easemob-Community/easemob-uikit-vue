@@ -44,7 +44,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
 <template>
   <Story title="ContactListContainer">
     <Variant title="默认">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             title="通讯录"
@@ -56,7 +56,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
     </Variant>
 
     <Variant title="副标题">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             title="通讯录"
@@ -68,7 +68,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
     </Variant>
 
     <Variant title="选择模式">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             title="选择联系人"
@@ -81,7 +81,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
     </Variant>
 
     <Variant title="紧凑模式">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             title="紧凑列表"
@@ -93,7 +93,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
     </Variant>
 
     <Variant title="隐藏头部与搜索">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             :show-header="false"
@@ -105,7 +105,7 @@ const subtitleFn: ContactSubtitleFn = c => `ID: ${c.userId}`
     </Variant>
 
     <Variant title="空列表">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactListContainer
             title="通讯录"

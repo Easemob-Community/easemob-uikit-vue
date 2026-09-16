@@ -99,7 +99,7 @@ function groupSubtitleFn(g: Group): string | undefined {
 <template>
   <Story title="ContactContainer">
     <Variant title="Default Aggregate Home">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="3"
@@ -112,7 +112,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Hide NewRequest">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :show-notice="false" @vue:mounted="injectMock" />
         </UIKitProvider>
@@ -120,7 +120,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Hide Group (Flat Contact)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -132,7 +132,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Hide Contact (Flat Group)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -144,7 +144,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group SortBy: Pinyin">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -157,7 +157,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group SortBy: MemberCount">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -170,7 +170,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group SortBy: Custom">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -183,7 +183,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group GroupBy: Alphabet">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -197,7 +197,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Custom Nav Entry Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :notice-count="5" @vue:mounted="injectMock">
             <template #nav-entry="{ entry }">
@@ -219,7 +219,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Custom Back Icon">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer initial-view="group" @vue:mounted="injectMock">
             <template #back-icon>
@@ -231,7 +231,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Hide Header">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :show-header="false" @vue:mounted="injectMock" />
         </UIKitProvider>
@@ -239,7 +239,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Custom Title">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer title="通讯录" header-align="center" @vue:mounted="injectMock" />
         </UIKitProvider>
@@ -247,7 +247,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Custom Header">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer @vue:mounted="injectMock">
             <template #header>
@@ -262,7 +262,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: No Group (Flat List)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -275,7 +275,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Custom GroupBy (Vowel)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -289,7 +289,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Single Select Mode">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -303,7 +303,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Multiple Select Mode">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -316,7 +316,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Custom Filter (userId only)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -329,7 +329,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Custom Empty Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :show-notice="false" :show-group="false">
             <template #empty="{ searchKeyword }">
@@ -351,7 +351,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Custom Item Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -384,7 +384,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Empty State">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer />
         </UIKitProvider>
@@ -392,7 +392,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Transition: fade">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="3"
@@ -404,7 +404,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Transition: none (无动画)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="3"
@@ -416,7 +416,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Auto Entry Count (从 store 推断数量)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="5"
@@ -430,7 +430,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Manual Entry Count">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="5"
@@ -443,7 +443,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="#home-footer Slot (首页底部插槽)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #home-footer>
@@ -465,7 +465,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="#header-extra Slot (右上角操作区)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer :notice-count="2" @vue:mounted="injectMock">
             <template #header-extra>
@@ -480,7 +480,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact ItemSize: Compact">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -493,7 +493,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact ItemSize: Large + Subtitle">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -507,7 +507,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group ItemSize + Subtitle">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -521,7 +521,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Avatar Shape: Square / Rounded">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="2"
@@ -534,7 +534,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Hide Avatars (Contact + Group)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="2"
@@ -547,7 +547,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Controlled selectedIds (multiple)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -567,7 +567,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group: Controlled groupSelectedIds (multiple)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -587,7 +587,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact Loading State">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -600,7 +600,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group Loading State">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -613,7 +613,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group GroupBy: Custom Sort + Alphabet">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -628,7 +628,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Disable LoadMore">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -641,7 +641,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Custom noMoreText">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -654,7 +654,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Contact: Body Sticky + Footer Sticky">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -679,7 +679,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group: Disable LoadMore">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -692,7 +692,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Group: Custom noMoreText">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -705,7 +705,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Disable Group (Provider 关闭群组能力)">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false" :enable-group="false">
           <ContactContainer
             :notice-count="3"
@@ -716,7 +716,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Hide Home Search">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="3"
@@ -728,7 +728,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Hide Contact Search">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -741,7 +741,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Hide Group Search">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -754,7 +754,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Hide All Search">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :notice-count="3"
@@ -768,7 +768,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Custom Contact Search Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"
@@ -789,7 +789,7 @@ function groupSubtitleFn(g: Group): string | undefined {
     </Variant>
 
     <Variant title="Search: Custom Group Search Slot">
-      <div style="height: 600px; width: 320px;">
+      <div style="height: 600px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ContactContainer
             :show-notice="false"

@@ -161,8 +161,8 @@ export const noticeConfig = computed<NoticeConfig>(() => {
   return {}
 })
 
-/** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，保证首屏宽度舒适 */
-const SIDEBAR_DEFAULT_WIDTH = 400
+/** 会话列表侧边栏默认宽度（px）：无记忆时的初始值，与 UIKIT 容器默认宽度 --uikit-sidebar-width 保持一致 */
+const SIDEBAR_DEFAULT_WIDTH = 360
 
 /** 会话列表侧边栏宽度可调范围 */
 const SIDEBAR_MIN_WIDTH = 240
