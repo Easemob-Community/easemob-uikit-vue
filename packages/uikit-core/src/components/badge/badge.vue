@@ -170,7 +170,7 @@ const digitCount = computed(() => {
 
 .uikit-badge__content--filled {
   background-color: var(--uikit-badge-color);
-  color: var(--uikit-text-inverse);
+  color: var(--uikit-badge-text, #FFFFFF);
   border: none;
 }
 

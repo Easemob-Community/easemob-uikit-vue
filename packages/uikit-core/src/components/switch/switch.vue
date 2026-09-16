@@ -51,15 +51,19 @@ function toggle() {
 
 <style scoped>
 /* 尺寸走全局 token（接入方可覆盖 --uikit-switch-track-* 全局定制宽高）：
-   medium 36×20 / small 28×16，边距 2px，手柄尺寸由轨道高自动派生（track-h - 4px） */
+   medium 36×20 / small 28×16；手柄直径 = 轨道高 - 2×内边距（设计稿 medium 14 / small 12），
+   hover/pressed 手柄放大一档（medium 16 / small 14），pressed 再沿滑动方向伸长 */
 .uikit-switch {
-  --switch-track-w: var(--uikit-switch-track-w, 36px);
-  --switch-track-h: var(--uikit-switch-track-h, 20px);
-  --switch-handle-size: calc(var(--switch-track-h) - 4px);
+  --switch-handle-inset: 3px;
+  --switch-handle-inset-active: 2px;
   /* 按压态手柄沿滑动方向伸长量（设计稿 Pressed 态） */
   --switch-handle-grow: 6px;
-  /* hover/pressed 态手柄外圈状态层光圈宽度 */
-  --switch-halo: 5px;
+  /* hover/pressed 态手柄外圈状态层光圈宽度（设计稿光圈外径 28 / 放大后手柄 16） */
+  --switch-halo: 6px;
+  --switch-track-w: var(--uikit-switch-track-w, 36px);
+  --switch-track-h: var(--uikit-switch-track-h, 20px);
+  --switch-handle-size: calc(var(--switch-track-h) - 2 * var(--switch-handle-inset));
+  --switch-handle-size-active: calc(var(--switch-track-h) - 2 * var(--switch-handle-inset-active));
 
   position: relative;
   width: var(--switch-track-w);
@@ -67,41 +71,35 @@ function toggle() {
   padding: 0;
   border: none;
   border-radius: calc(var(--switch-track-h) / 2);
-  background-color: var(--uikit-switch-off-bg, #C9CDCF);
+  background-color: var(--uikit-switch-off-bg, #e3e6e8);
   cursor: pointer;
   transition:
     background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-    opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
+    box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .uikit-switch--small {
-  --switch-track-w: var(--uikit-switch-small-track-w, 28px);
-  --switch-track-h: var(--uikit-switch-small-track-h, 16px);
+  --switch-handle-inset: 2px;
+  --switch-handle-inset-active: 1px;
   --switch-handle-grow: 4px;
   --switch-halo: 4px;
+  --switch-track-w: var(--uikit-switch-small-track-w, 28px);
+  --switch-track-h: var(--uikit-switch-small-track-h, 16px);
 }
 
 .uikit-switch--checked {
-  background-color: var(--uikit-primary-color);
+  background-color: var(--uikit-switch-on-bg, #009eff);
 }
 
-/* Hover / Pressed 轨道反馈：off 态加深灰（派生 token），on 态走 primary-hover */
+/* Hover / Pressed 轨道反馈：轨道色不变，叠内阴影（设计稿 inner shadow） */
 @media (hover: hover) {
   .uikit-switch:hover:not(:disabled) {
-    background-color: var(--uikit-switch-off-hover-bg, #B4BABF);
-  }
-
-  .uikit-switch--checked:hover:not(:disabled) {
-    background-color: var(--uikit-primary-hover);
+    box-shadow: var(--uikit-switch-track-inner-shadow, inset 0 4px 2px rgba(0, 0, 0, 0.1));
   }
 }
 
 .uikit-switch:active:not(:disabled) {
-  background-color: var(--uikit-switch-off-hover-bg, #B4BABF);
-}
-
-.uikit-switch--checked:active:not(:disabled) {
-  background-color: var(--uikit-primary-hover);
+  box-shadow: var(--uikit-switch-track-inner-shadow, inset 0 4px 2px rgba(0, 0, 0, 0.1));
 }
 
 .uikit-switch:focus-visible {
@@ -109,62 +107,93 @@ function toggle() {
   outline-offset: 2px;
 }
 
+/* Disabled：off 为描边空轨 + 灰色手柄；on 为品牌蓝浅轨 + 白手柄（均无落影，设计稿） */
 .uikit-switch:disabled {
-  opacity: 0.5;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--uikit-switch-off-bg, #e3e6e8);
   cursor: not-allowed;
 }
 
-/* 手柄：白色圆形，按压时沿滑动方向伸长（Pressed 态）。
-   off 锚定左侧、on 锚定右侧（用 left 计算值保证伸长方向朝向轨道空余侧） */
+.uikit-switch--checked:disabled {
+  background-color: var(--uikit-switch-on-disabled-bg, #ccecff);
+  box-shadow: none;
+}
+
+/* 手柄：圆形手柄 + 1px 描边 + 双层落影（颜色走 --uikit-switch-handle-bg token，浅白暗深）；
+   hover/pressed 放大，pressed 沿滑动方向伸长。
+   off 锚定左侧、on 锚定右侧（用 left 计算值保证放大/伸长方向朝向轨道空余侧） */
 .uikit-switch__handle {
   position: absolute;
   top: 50%;
-  left: 2px;
+  left: var(--switch-handle-inset);
   translate: 0 -50%;
   width: var(--switch-handle-size);
   height: var(--switch-handle-size);
-  border-radius: calc(var(--switch-handle-size) / 2);
-  background-color: var(--uikit-text-inverse);
-  /* 双层阴影：贴近手柄的落影 + 状态层光圈（默认 0 宽度，hover/pressed 展开） */
+  border-radius: calc(var(--switch-track-h) / 2);
+  background-color: var(--uikit-switch-handle-bg, var(--uikit-text-inverse));
+  /* 双层落影 + 1px 描边 + 状态层光圈（默认 0 宽度，hover/pressed 展开） */
   box-shadow:
-    var(--uikit-shadow-sm),
-    0 0 0 0 var(--uikit-primary-soft, transparent);
+    var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
+    inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
+    0 0 0 0 var(--uikit-switch-halo-off, rgba(0, 0, 0, 0.05));
   transition:
     left var(--uikit-anim-duration) var(--uikit-anim-easing),
     width var(--uikit-anim-duration) var(--uikit-anim-easing),
+    height var(--uikit-anim-duration) var(--uikit-anim-easing),
     box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .uikit-switch--checked .uikit-switch__handle {
-  left: calc(100% - var(--switch-handle-size) - 2px);
+  left: calc(100% - var(--switch-handle-size) - var(--switch-handle-inset));
 }
 
-/* hover/pressed 状态层光圈：off 态为灰色光晕（由关闭态轨道色派生），on 态为主色浅蓝光晕 */
+/* hover/pressed 手柄放大 + 状态层光圈：off 态为中性灰光圈，on 态为主色浅蓝光晕。
+   放大围绕手柄中心进行（left 同步内收一档），pressed 的伸长朝向轨道空余侧 */
 @media (hover: hover) {
   .uikit-switch:hover:not(:disabled) .uikit-switch__handle {
+    left: var(--switch-handle-inset-active);
+    width: var(--switch-handle-size-active);
+    height: var(--switch-handle-size-active);
     box-shadow:
-      var(--uikit-shadow-sm),
-      0 0 0 var(--switch-halo) color-mix(in srgb, var(--uikit-switch-off-bg, #C9CDCF) 40%, transparent);
+      var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
+      inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
+      0 0 0 var(--switch-halo) var(--uikit-switch-halo-off, rgba(0, 0, 0, 0.05));
   }
 
   .uikit-switch--checked:hover:not(:disabled) .uikit-switch__handle {
+    left: calc(100% - var(--switch-handle-size-active) - var(--switch-handle-inset-active));
     box-shadow:
-      var(--uikit-shadow-sm),
-      0 0 0 var(--switch-halo) var(--uikit-primary-soft);
+      var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
+      inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
+      0 0 0 var(--switch-halo) var(--uikit-switch-halo-on);
   }
 }
 
 .uikit-switch:active:not(:disabled) .uikit-switch__handle {
-  width: calc(var(--switch-handle-size) + var(--switch-handle-grow));
+  left: var(--switch-handle-inset-active);
+  width: calc(var(--switch-handle-size-active) + var(--switch-handle-grow));
+  height: var(--switch-handle-size-active);
   box-shadow:
-    var(--uikit-shadow-sm),
-    0 0 0 var(--switch-halo) color-mix(in srgb, var(--uikit-switch-off-bg, #C9CDCF) 40%, transparent);
+    var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
+    inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
+    0 0 0 var(--switch-halo) var(--uikit-switch-halo-off, rgba(0, 0, 0, 0.05));
 }
 
 .uikit-switch--checked:active:not(:disabled) .uikit-switch__handle {
-  left: calc(100% - var(--switch-handle-size) - var(--switch-handle-grow) - 2px);
+  left: calc(100% - var(--switch-handle-size-active) - var(--switch-handle-grow) - var(--switch-handle-inset-active));
   box-shadow:
-    var(--uikit-shadow-sm),
-    0 0 0 var(--switch-halo) var(--uikit-primary-soft);
+    var(--uikit-switch-handle-shadow, 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1)),
+    inset 0 0 0 1px var(--uikit-switch-handle-ring, #f1f2f3),
+    0 0 0 var(--switch-halo) var(--uikit-switch-halo-on);
+}
+
+/* Disabled 手柄：off 灰 / on 白，去掉落影、描边与光圈 */
+.uikit-switch:disabled .uikit-switch__handle {
+  background-color: var(--uikit-switch-off-bg, #e3e6e8);
+  box-shadow: none;
+}
+
+.uikit-switch--checked:disabled .uikit-switch__handle {
+  background-color: var(--uikit-text-inverse);
 }
 </style>

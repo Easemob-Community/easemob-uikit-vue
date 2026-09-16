@@ -6,10 +6,10 @@
   --uikit-danger-color: hsl(350, 100%, 60%);
   --uikit-info-color: hsl(203, 100%, 60%);
 
-  /* 文字层级 */
-  --uikit-text-primary: #111827;
-  --uikit-text-secondary: #6b7280;
-  --uikit-text-tertiary: #9ca3af;
+  /* 文字层级（浅色值按 DESIGN-TOKEN-MAPPING 对照表校准为设计稿 neutral 色板） */
+  --uikit-text-primary: #171A1C;
+  --uikit-text-secondary: #5E686E;
+  --uikit-text-tertiary: #919BA1;
   /* 强调色/彩色背景上的文字（按钮、badge、toast、播放按钮等）：恒白 */
   --uikit-text-inverse: #ffffff;
 
@@ -24,6 +24,10 @@
   --uikit-bg-elevated: #ffffff;
   --uikit-bg-hover: #F5F5F5;
   --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
+
+  /* 控件底（按钮 default、暗色对方气泡、系统消息 pill、引用块等凸起控件填充）：
+     浅色与 bg-secondary 同值，暗色独立为 #333537 */
+  --uikit-control-bg: #F3F4F6;
 
   /* 主色别名：由 store/theme.ts 运行时同步重写，确保始终跟随主题色 */
   --uikit-primary: var(--uikit-primary-color);
@@ -101,6 +105,8 @@
   --uikit-input-padding-x: var(--uikit-spacing-3);
   /* 输入框圆角：默认纯椭圆（胶囊），消息输入区各输入面消费 */
   --uikit-input-radius: 999px;
+  /* 消息输入卡片聚焦光环（设计稿 msg_input focus 态：主色 20% 外环；color-mix 实时求值，跟随 setPrimaryColor 与明暗模式，无需暗色覆写） */
+  --uikit-input-focus-ring: 0 0 0 2px color-mix(in srgb, var(--uikit-primary-color) 20%, transparent);
   --uikit-bubble-gap: var(--uikit-spacing-2);
   --uikit-message-gap: var(--uikit-spacing-3);
   --uikit-message-padding: var(--uikit-spacing-4);
@@ -205,9 +211,17 @@
   /* 气泡圆角档位：round（默认）16px / square 8px，由 bubbleShape 消费 */
   --uikit-bubble-radius: 16px;
   --uikit-bubble-radius-square: 8px;
+  /* 己方气泡内次级文字（文件大小等弱化信息，白字弱一档） */
+  --uikit-bubble-text-self-secondary: #EFEFEF;
+  /* 消息状态徽章（群已读/未读数胶囊）边框与文字色，独立于主色 */
+  --uikit-msg-status-badge-color: #47ADEB;
+  /* 引用/回复竖线（气泡下引用卡与输入框引用条共用） */
+  --uikit-quote-line-color: #C9CDCF;
+  /* 文件消息卡片圆角（设计稿 radius/md=12，独立于气泡圆角两档 bubbleShape） */
+  --uikit-file-card-radius: 12px;
 
   /* 文件消息类型图标底色（品牌识别色，明暗模式通用；图标本体固定白色） */
-  --uikit-file-icon-pdf: #E5252A;
+  --uikit-file-icon-pdf: #DA3034;
   --uikit-file-icon-xls: #1D7044;
   --uikit-file-icon-doc: #2B5797;
   --uikit-file-icon-ppt: #D24625;
@@ -227,8 +241,8 @@
   /* 语义 token：会话列表容器背景（默认与聊天背景一致为白色，接入方可覆盖定制） */
   --uikit-conversation-list-bg: var(--uikit-bg-base);
 
-  /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框） */
-  --uikit-input-border-color: #F5F5F5;
+  /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框；按设计稿校准为 #C9CDCF） */
+  --uikit-input-border-color: #C9CDCF;
 
   /* 语义 token：空状态占位（图标 / 文案） */
   --uikit-empty-icon-color: #E6E6E6;
@@ -236,11 +250,26 @@
 
   /* 语义 token：徽标（未读数 / 红点）默认背景色，独立于 danger 语义色 */
   --uikit-badge-bg: #FF7070;
+  /* 徽标文字色：浅色白字；暗色反转为深色（设计稿亮红底配深字） */
+  --uikit-badge-text: #FFFFFF;
 
-  /* 语义 token：Switch 关闭态轨道色（设计稿灰）；hover 由 color-mix 实时派生（混入文字色），
-     自动跟随明暗模式，无需暗色覆写 */
-  --uikit-switch-off-bg: #C9CDCF;
-  --uikit-switch-off-hover-bg: color-mix(in srgb, var(--uikit-switch-off-bg) 88%, var(--uikit-text-primary));
+  /* 语义 token：Switch（按设计稿 Switches 组件校准）：
+     - off 轨道 #E3E6E8（neutral/9）；on 轨道品牌蓝 #009EFF（primary/5，与己方气泡同惯例，不跟随主题色）；
+       on-disabled 轨道 = 品牌蓝 20% 叠页面底（浅色下即设计稿 #CCECFF），color-mix 实时派生、明暗自适应
+     - hover/pressed 轨道色不变，状态差异由「手柄放大/伸长 + 状态层光圈 + 轨道内阴影」表达 */
+  --uikit-switch-off-bg: #e3e6e8;
+  --uikit-switch-on-bg: #009eff;
+  --uikit-switch-on-disabled-bg: color-mix(in srgb, var(--uikit-switch-on-bg) 20%, var(--uikit-bg-base));
+  /* hover/pressed 状态层光圈：off 为 5% 黑（设计稿），on 为品牌蓝 10% */
+  --uikit-switch-halo-off: rgba(0, 0, 0, 0.05);
+  --uikit-switch-halo-on: color-mix(in srgb, var(--uikit-switch-on-bg) 10%, transparent);
+  /* hover/pressed 轨道内阴影（设计稿 inner shadow：offset (0,4) / blur 2 / 10% 黑） */
+  --uikit-switch-track-inner-shadow: inset 0 4px 2px rgba(0, 0, 0, 0.1);
+  /* 手柄：1px 浅色描边（neutral/95 #F1F2F3）+ 双层落影（设计稿 shadow_onlight/small）；
+     手柄底色浅色恒白，暗色按设计稿反转为深手柄 */
+  --uikit-switch-handle-bg: #FFFFFF;
+  --uikit-switch-handle-ring: #f1f2f3;
+  --uikit-switch-handle-shadow: 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.1);
 
   /* 语义 token：Switch 轨道尺寸（medium 36×20 / small 28×16，手柄由轨道高自动派生）；
      明暗共用，接入方可全局覆盖以自定义宽高 */
@@ -264,27 +293,39 @@
 }
 
 [data-uikit-theme="dark"] {
-  --uikit-bg-base: #111827;
-  --uikit-bg-secondary: #1f2937;
-  --uikit-bg-tertiary: #0a101f;
-  /* 弹层/抽屉/卡片等浮层背景：深色下比 base 提亮，与页面背景形成叠层 */
-  --uikit-bg-elevated: #1f2937;
-  --uikit-bg-hover: #374151;
-  --uikit-bg-active: rgba(var(--uikit-primary-rgb), 0.12);
-  --uikit-text-primary: #f9fafb;
-  --uikit-text-secondary: #9ca3af;
-  /* 暗色下三级文字适度提亮，保证在 secondary/elevated 背景上达到 WCAG AA 4.5:1 */
-  --uikit-text-tertiary: #8a92a0;
+  /* 背景层级 - 暗色（对齐 Figma dark mode 设计稿：面板/卡片 #1E2123，内陷填充 #2A2A30，
+     控件/pill #333537，选中底 #0D2840；聊天区单独走 --uikit-chat-bg #1E1E23） */
+  --uikit-bg-base: #1E2123;
+  --uikit-bg-secondary: #2A2A30;
+  --uikit-bg-tertiary: #333537;
+  /* 弹层/抽屉/卡片等浮层背景：与面板同色，靠阴影形成叠层 */
+  --uikit-bg-elevated: #1E2123;
+  --uikit-bg-hover: #2A2A30;
+  /* 设计稿暗色选中底为固定藏青 #0D2840（比底色更暗，无法由主色 rgba 派生），
+     写固定值：不跟随 setPrimaryColor */
+  --uikit-bg-active: #0D2840;
+  /* 控件底 - 暗色（按钮 default、对方气泡、系统消息 pill、引用块） */
+  --uikit-control-bg: #333537;
+  --uikit-text-primary: #E8EAED;
+  --uikit-text-secondary: #9AA0A6;
+  /* 暗色下三级文字（时间戳/占位符），设计稿 #737B82 */
+  --uikit-text-tertiary: #737B82;
   /* 强调色/彩色背景上的文字：暗色下同样恒白 */
   --uikit-text-inverse: #ffffff;
 
-  /* 弱化图标/占位图标色 */
-  --uikit-icon-muted: #6b7280;
+  /* 弱化图标/占位图标色（设计稿 header action / 输入区工具栏图标 ≈ #9AA0A6） */
+  --uikit-icon-muted: #9AA0A6;
 
   /* 主色别名：由 store/theme.ts 运行时同步重写 */
   --uikit-primary: var(--uikit-primary-color);
-  --uikit-primary-hover: hsl(203, 100%, 45%);
+  /* hover/按下：设计稿 primary/4 #007ECC */
+  --uikit-primary-hover: #007ECC;
   --uikit-primary-rgb: 51, 177, 255;
+
+  /* 语义色 - 暗色（对齐设计稿 Alert Color：Success/Warning/Danger） */
+  --uikit-success-color: #09C26F;
+  --uikit-warning-color: #FFAB00;
+  --uikit-danger-color: #FF3333;
 
   /* 文本选中背景色：暗底上提高透明度保证可见，跟随主题色 */
   --uikit-selection-bg: rgba(var(--uikit-primary-rgb), 0.4);
@@ -305,36 +346,56 @@
   --uikit-font-size-28: calc(28px * var(--uikit-font-scale));
   --uikit-font-size-34: calc(34px * var(--uikit-font-scale));
 
-  /* 语义 token：气泡 - 暗色（对方气泡沿用表面色/文字色，己方保持品牌蓝 #009EFF） */
-  --uikit-bubble-bg-other: var(--uikit-bg-secondary);
-  --uikit-bubble-bg-self: #009EFF;
+  /* 语义 token：气泡 - 暗色（对方气泡走控件底 #333537，己方品牌蓝 #33B1FF + 深色文字，
+     对齐设计稿亮蓝底文字反转） */
+  --uikit-bubble-bg-other: var(--uikit-control-bg);
+  --uikit-bubble-bg-self: #33B1FF;
   --uikit-bubble-text-other: var(--uikit-text-primary);
-  --uikit-bubble-text-self: #FFFFFF;
-  /* 气泡内分割线 - 暗色 */
-  --uikit-bubble-divider-other: rgba(255, 255, 255, 0.12);
-  --uikit-bubble-divider-self: rgba(255, 255, 255, 0.35);
+  --uikit-bubble-text-self: #1E2123;
+  /* 气泡内分割线 - 暗色（设计稿统一 #3C3F42） */
+  --uikit-bubble-divider-other: #3C3F42;
+  --uikit-bubble-divider-self: #3C3F42;
+  /* 己方气泡内次级文字 - 暗色（己方气泡暗色为深字，次级同步弱化） */
+  --uikit-bubble-text-self-secondary: rgba(30, 33, 35, 0.72);
+  /* 消息状态徽章 - 暗色（亮蓝在暗底上可辨识，不覆写色值） */
+  --uikit-msg-status-badge-color: #47ADEB;
+  /* 引用/回复竖线 - 暗色（对齐暗色描边族 #3C3F42） */
+  --uikit-quote-line-color: #3C3F42;
+  /* 文件消息卡片圆角 - 暗色（与浅色一致，不随 bubbleShape） */
+  --uikit-file-card-radius: 12px;
 
-  /* 语义 token：聊天背景 - 暗色（使用 background 简写，支持颜色/渐变/图片） */
-  --uikit-chat-bg: var(--uikit-bg-base);
+  /* 语义 token：聊天背景 - 暗色（设计稿聊天区底 #1E1E23，比面板深一档；
+     使用 background 简写，支持颜色/渐变/图片） */
+  --uikit-chat-bg: #1E1E23;
 
-  /* 语义 token：输入区背景 - 暗色 */
-  --uikit-input-bg: var(--uikit-bg-base);
+  /* 语义 token：输入区背景 - 暗色（设计稿输入框体 #1E2123） */
+  --uikit-input-bg: #1E2123;
 
-  /* 语义 token：会话列表容器背景 - 暗色（与聊天背景一致，即页面底色） */
+  /* 语义 token：会话列表容器背景 - 暗色（与面板一致 #1E2123） */
   --uikit-conversation-list-bg: var(--uikit-bg-base);
 
-  /* 语义 token：输入框默认边框 - 暗色（与边框色一致） */
-  --uikit-input-border-color: #374151;
+  /* 语义 token：输入框默认边框 - 暗色（设计稿独立描边 #3C3F42） */
+  --uikit-input-border-color: #3C3F42;
 
   /* 语义 token：空状态占位 - 暗色 */
-  --uikit-empty-icon-color: #4B5563;
-  --uikit-empty-text-color: #6B7280;
+  --uikit-empty-icon-color: #464E53;
+  --uikit-empty-text-color: #737B82;
 
-  /* 语义 token：徽标默认背景色 - 暗色（与浅色一致，保证未读可辨识） */
+  /* 语义 token：徽标默认背景色 - 暗色（与浅色一致，保证未读可辨识）；
+     文字色按设计稿反转为深色 */
   --uikit-badge-bg: #FF7070;
+  --uikit-badge-text: #1E1E23;
 
-  /* 语义 token：Switch 关闭态轨道色 - 暗色 */
-  --uikit-switch-off-bg: #4B5563;
+  /* 语义 token：Switch - 暗色（off 轨道 #3A3D40；on 轨道设计稿 primary/6 #33B1FF；
+     手柄按设计稿反转为深色 #1E2123 + 描边 #333538；on-disabled 由 color-mix 叠暗底自动派生） */
+  --uikit-switch-off-bg: #3A3D40;
+  --uikit-switch-on-bg: #33B1FF;
+  --uikit-switch-handle-bg: #1E2123;
+  --uikit-switch-handle-ring: #333538;
+  --uikit-switch-halo-off: rgba(255, 255, 255, 0.08);
+  --uikit-switch-track-inner-shadow: inset 0 4px 2px rgba(0, 0, 0, 0.3);
+  /* 手柄落影：对齐设计稿 shadow_onlight/small */
+  --uikit-switch-handle-shadow: 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.10);
 
   /* 会话详情抽屉图标/按钮文字、群成员名与状态标签 - 暗色（跟随文字色 token 保证可读） */
   --uikit-drawer-close-color: var(--uikit-text-primary);
@@ -344,26 +405,35 @@
   /* 禁言灰 #A9AEB2 在暗底上对比足够，不覆写；拉黑深灰提亮为次级文字色 */
   --uikit-member-tag-blocked-color: var(--uikit-text-secondary);
 
-  /* 语义色 RGB（用于 rgba() 半透明背景） */
-  --uikit-success-rgb: 22, 163, 74;
-  --uikit-warning-rgb: 255, 178, 51;
-  --uikit-danger-rgb: 255, 51, 68;
+  /* 语义色 RGB（用于 rgba() 半透明背景）- 与上方暗色语义色一致 */
+  --uikit-success-rgb: 9, 194, 111;
+  --uikit-warning-rgb: 255, 171, 0;
+  --uikit-danger-rgb: 255, 51, 51;
   --uikit-info-rgb: 51, 177, 255;
 
-  /* 小阴影：深色下提高不透明度 */
-  --uikit-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
+  /* 小阴影：对齐设计稿 shadow_onlight/small */
+  --uikit-shadow-sm: 0 1px 3px rgba(70, 78, 83, 0.15), 0 1px 2px rgba(23, 26, 28, 0.10);
+
+  /* 文件消息类型图标底色 - 暗色（设计稿 dark 档单独调色；md/ppt/xls 与浅色一致不覆写。
+     注意：设计稿 video 与 pdf 同为 #DA3034，疑似笔误，按稿落地、待与设计确认） */
+  --uikit-file-icon-pdf: #DA3034;
+  --uikit-file-icon-audio: #4930DA;
+  --uikit-file-icon-doc: #3049DA;
+  --uikit-file-icon-img: #252529;
+  --uikit-file-icon-video: #DA3034;
+  --uikit-file-icon-file: #252529;
 
   /* 边框别名 */
   --uikit-border: var(--uikit-border-color);
 
-  /* 边框与分隔线 - 暗色 */
-  --uikit-border-color: #374151;
-  --uikit-border-light: #1f2937;
-  --uikit-divider-color: rgba(255, 255, 255, 0.06);
+  /* 边框与分隔线 - 暗色（独立描边/输入框边框 #3C3F42，行间分隔 #333537） */
+  --uikit-border-color: #3C3F42;
+  --uikit-border-light: #333537;
+  --uikit-divider-color: #333537;
 
   /* 滚动条 - 暗色 */
-  --uikit-scrollbar-thumb: #4b5563;
-  --uikit-scrollbar-thumb-hover: #6b7280;
+  --uikit-scrollbar-thumb: #3C3F42;
+  --uikit-scrollbar-thumb-hover: #464E53;
 
   /* 阴影系统 - 暗色（提高不透明度避免深色背景看不出阴影） */
   --uikit-shadow: 0 6px 16px rgba(0, 0, 0, 0.40), 0 12px 32px rgba(0, 0, 0, 0.45);
@@ -398,13 +468,13 @@
   --uikit-cell-padding-y: 12px;
   --uikit-cell-gap: 3px;
   --uikit-list-gap: 8px;
-  --uikit-header-padding-y: 12px;
-  --uikit-input-wrapper-spacing: 12px;
+  --uikit-header-padding-y: 8px;
+  --uikit-input-wrapper-spacing: 4px;
   --uikit-input-padding-y: 8px;
   --uikit-input-padding-x: 12px;
   --uikit-bubble-gap: 8px;
-  --uikit-message-gap: 12px;
-  --uikit-message-padding: 16px;
+  --uikit-message-gap: 16px;
+  --uikit-message-padding: 12px;
   --uikit-drawer-padding: 16px;
   --uikit-button-padding-y: 8px;
   --uikit-banner-padding-y: 8px;

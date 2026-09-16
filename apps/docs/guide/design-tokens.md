@@ -20,9 +20,9 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 ### 文字色（浅色模式）
 
 <div class="token-grid">
-  <div class="token-color token-color--light" style="--token-bg: #111827; color: #fff;"><span class="token-color__name">text-primary</span><span class="token-color__value">#111827</span></div>
-  <div class="token-color token-color--light" style="--token-bg: #6b7280; color: #fff;"><span class="token-color__name">text-secondary</span><span class="token-color__value">#6b7280</span></div>
-  <div class="token-color token-color--light" style="--token-bg: #9ca3af; color: #fff;"><span class="token-color__name">text-tertiary</span><span class="token-color__value">#9ca3af</span></div>
+  <div class="token-color token-color--light" style="--token-bg: #171A1C; color: #fff;"><span class="token-color__name">text-primary</span><span class="token-color__value">#171A1C</span></div>
+  <div class="token-color token-color--light" style="--token-bg: #5E686E; color: #fff;"><span class="token-color__name">text-secondary</span><span class="token-color__value">#5E686E</span></div>
+  <div class="token-color token-color--light" style="--token-bg: #919BA1; color: #fff;"><span class="token-color__name">text-tertiary</span><span class="token-color__value">#919BA1</span></div>
   <div class="token-color" style="--token-bg: #ffffff; border: 1px solid var(--vp-c-divider);"><span class="token-color__name" style="color: var(--vp-c-text-1);">text-inverse</span><span class="token-color__value" style="color: var(--vp-c-text-2);">#ffffff</span></div>
 </div>
 
@@ -44,7 +44,7 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 文件消息气泡左侧固定展示彩色底色块（双方气泡一致），图标本体固定白色，底色按扩展名 / 类别取对应品牌识别色，明暗模式通用：
 
 <div class="token-grid">
-  <div class="token-color" style="--token-bg: #E5252A;"><span class="token-color__name">file-icon-pdf</span><span class="token-color__value">#E5252A</span></div>
+  <div class="token-color" style="--token-bg: #DA3034;"><span class="token-color__name">file-icon-pdf</span><span class="token-color__value">#DA3034</span></div>
   <div class="token-color" style="--token-bg: #1D7044;"><span class="token-color__name">file-icon-xls</span><span class="token-color__value">#1D7044</span></div>
   <div class="token-color" style="--token-bg: #2B5797;"><span class="token-color__name">file-icon-doc</span><span class="token-color__value">#2B5797</span></div>
   <div class="token-color" style="--token-bg: #D24625;"><span class="token-color__name">file-icon-ppt</span><span class="token-color__value">#D24625</span></div>
@@ -118,6 +118,7 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 | `--uikit-shadow-sm` | `0 1px 2px rgba(0,0,0,0.04)` |
 | `--uikit-shadow` | `0 6px 16px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.10)` |
 | `--uikit-shadow-hover` | `0 10px 24px rgba(0,0,0,0.12), 0 18px 48px rgba(0,0,0,0.14)` |
+| `--uikit-input-focus-ring` | `0 0 0 2px color-mix(in srgb, var(--uikit-primary-color) 20%, transparent)`（消息输入卡片聚焦光环，跟随主色） |
 
 ## 动效
 

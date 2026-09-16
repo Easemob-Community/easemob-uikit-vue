@@ -164,7 +164,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-button--default {
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-control-bg, #f3f4f6);
   color: var(--uikit-text-primary);
 }
 
@@ -174,9 +174,9 @@ function handleClick(event: MouseEvent) {
    （混入文字色：浅色主题变暗、深色主题变亮） */
 @media (hover: hover) {
   .uikit-button--default:hover:not(:disabled) {
-    /* bg-secondary 与 --uikit-bg-hover 色值过近（#F3F4F6/#F5F5F5）反馈不可见，
+    /* control-bg 与 --uikit-bg-hover 色值过近时反馈不可见，
        改用 color-mix 派生（混入文字色：浅主题变暗、深主题变亮），与 Switch 派生模式一致 */
-    background-color: color-mix(in srgb, var(--uikit-bg-secondary) 90%, var(--uikit-text-primary));
+    background-color: color-mix(in srgb, var(--uikit-control-bg, #f3f4f6) 90%, var(--uikit-text-primary));
   }
 
   .uikit-button--outline:hover:not(:disabled) {

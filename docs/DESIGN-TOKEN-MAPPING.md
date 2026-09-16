@@ -17,18 +17,18 @@
 
 | 设计稿 | 落地 token | 说明 |
 | --- | --- | --- |
-| `#171A1C` 主文字 | `--uikit-text-primary` | 含暗色覆盖 |
-| `#5E686E` 次要文字 | `--uikit-text-secondary` | |
-| `#919BA1` 辅助文字 | `--uikit-text-tertiary` | |
+| `#171A1C` 主文字 | `--uikit-text-primary` | 含暗色覆盖；**2026-09-16 已校准**（原 `#111827`） |
+| `#5E686E` 次要文字 | `--uikit-text-secondary` | **2026-09-16 已校准**（原 `#6b7280`） |
+| `#919BA1` 辅助文字 | `--uikit-text-tertiary` | **2026-09-16 已校准**（原 `#9ca3af`） |
 | `#FFFFFF` 反白文字 | `--uikit-text-inverse` | 恒白（badge/按钮等） |
-| `#FAFAFA` 页面/列表底 | `--uikit-conversation-list-bg` | 2026-09 新增，暗色 `#111827` |
+| `#FAFAFA` 页面/列表底 | `--uikit-conversation-list-bg` | 2026-09 新增，暗色 `#1E2123` |
 | `#F5F5F5` 列表项 hover | `--uikit-bg-hover` | 由 `#e5e7eb` 校准 |
 | `#E5F5FF` 列表项选中 | `--uikit-bg-active`（主色 12% 叠白） | **不写死 hex**：调 alpha 命中稿值，保留跟随主色能力 |
 | `#F0F0F0` 分割线 | `--uikit-border-light` / `--uikit-divider-color` | |
 | `#FF7070` 未读红点 | `--uikit-badge-bg` | 2026-09 新增，独立于 danger 语义色 |
 | `#949A9E` 弱化图标 | `--uikit-icon-muted` | 由 `#B6B8BF` 校准 |
 | `#AA9EE8` 文字头像底 | Avatar 组件内生成逻辑 | 非 token，实现方式不同 |
-| `#E6E6E6` / `#BDBDBD` 空态占位 | `--uikit-empty-icon-color` / `--uikit-empty-text-color` | 2026-09 新增，暗色 `#4B5563` / `#6B7280` |
+| `#E6E6E6` / `#BDBDBD` 空态占位 | `--uikit-empty-icon-color` / `--uikit-empty-text-color` | 2026-09 新增，暗色 `#464E53` / `#737B82` |
 
 ## 三、Typography 对照
 

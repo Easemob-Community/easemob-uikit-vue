@@ -38,14 +38,16 @@ UIKit 设计系统遵循以下核心原则，作为模糊场景下的决策依�
 
 ### 文字与背景层级
 
-- `--uikit-text-primary`：主要文字（浅色 `#111827` / 暗色 `#f9fafb`）
-- `--uikit-text-secondary`：次要文字
-- `--uikit-text-tertiary`：三级文字（占位符等）
-- `--uikit-bg-base`：页面基础背景
-- `--uikit-bg-secondary`：次级背景（列表、卡片）
-- `--uikit-bg-elevated`：浮层背景（弹窗、抽屉）
-- `--uikit-bg-hover`：hover 背景
-- `--uikit-bg-active`：按下 / 选中背景
+- `--uikit-text-primary`：主要文字（浅色 `#171A1C` / 暗色 `#E8EAED`）
+- `--uikit-text-secondary`：次要文字（浅色 `#5E686E` / 暗色 `#9AA0A6`）
+- `--uikit-text-tertiary`：三级文字（占位符、时间戳等，浅色 `#919BA1` / 暗色 `#737B82`）
+- `--uikit-bg-base`：页面/面板基础背景（暗色 `#1E2123`）
+- `--uikit-bg-secondary`：次级背景（搜索框、过滤项等内陷填充，暗色 `#2A2A30`）
+- `--uikit-bg-tertiary`：三级背景（暗色 `#333537`）
+- `--uikit-bg-elevated`：浮层背景（弹窗、抽屉，暗色 `#1E2123`）
+- `--uikit-bg-hover`：hover 背景（暗色 `#2A2A30`）
+- `--uikit-bg-active`：按下 / 选中背景（暗色为固定藏青 `#0D2840`，不跟随主色）
+- `--uikit-control-bg`：控件填充底（按钮 default、暗色对方气泡、系统消息 pill 等；浅色 `#F3F4F6` 与 bg-secondary 同值，暗色 `#333537`）
 
 ### 边框与分割线
 
@@ -160,19 +162,24 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 
 ### 聊天语义 token
 
-- `--uikit-bubble-bg-other`：对方气泡背景（默认 `#E4E6E7`，暗色 `--uikit-bg-secondary`）
-- `--uikit-bubble-bg-self`：自己气泡背景（默认 `#009EFF` 品牌蓝，明暗一致；不再跟随主色，可用 `setBubbleBg` / 主题预设覆盖）
+- `--uikit-bubble-bg-other`：对方气泡背景（默认 `#E4E6E7`，暗色 `--uikit-control-bg` `#333537`）
+- `--uikit-bubble-bg-self`：自己气泡背景（默认 `#009EFF` 品牌蓝，暗色 `#33B1FF`；不跟随主色，可用 `setBubbleBg` / 主题预设覆盖）
 - `--uikit-bubble-text-other`：对方气泡文字（默认 `#171A1C`，暗色 `--uikit-text-primary`）
-- `--uikit-bubble-text-self`：自己气泡文字（默认 `#FFFFFF`）
-- `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`：气泡内分割线（译文 / 语音转文字与原文之间）
+- `--uikit-bubble-text-self`：自己气泡文字（默认 `#FFFFFF`，暗色按设计稿反转为 `#1E2123`）
+- `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`：气泡内分割线（译文 / 语音转文字与原文之间；暗色统一 `#3C3F42`）
 - `--uikit-bubble-radius` / `--uikit-bubble-radius-square`：气泡圆角档位（`bubbleShape: 'round'` = 16px（默认）/ `'square'` = 8px）
-- `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，使用 `background` 简写，支持颜色/渐变/图片）
-- `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`）
-- `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#111827`）
-- `--uikit-input-border-color`：输入框默认边框色（默认 `#F5F5F5`，暗色 `#374151`；search/filled 变体无边框不受其影响）
-- `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#E6E6E6` / `#BDBDBD`）
-- `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）
-- `--uikit-switch-off-bg`：Switch 关闭态轨道色（默认 `#C9CDCF`，暗色 `#4B5563`）；hover 态由 `--uikit-switch-off-hover-bg`（`color-mix` 派生）自动跟随
+- `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，暗色 `#1E1E23` 比面板深一档；使用 `background` 简写，支持颜色/渐变/图片）
+- `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`，暗色 `#1E2123`）
+- `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#1E2123`）
+- `--uikit-input-border-color`：输入框默认边框色（默认 `#C9CDCF`，暗色 `#3C3F42`；search/filled 变体无边框不受其影响）
+- `--uikit-quote-line-color`：引用/回复竖线色（默认 `#C9CDCF`，暗色 `#3C3F42`；气泡下引用卡与输入框引用条共用）
+- `--uikit-msg-status-badge-color`：消息状态徽章（群已读/未读数胶囊）边框与文字色（默认 `#47ADEB`，明暗一致，独立于主色）
+- `--uikit-bubble-text-self-secondary`：己方气泡内次级文字（文件大小等弱化信息，默认 `#EFEFEF`，暗色 `rgba(30, 33, 35, 0.72)`）
+- `--uikit-file-card-radius`：文件消息卡片圆角（默认 `12px`，独立于气泡圆角两档 `bubbleShape`）
+- `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#E6E6E6` / `#BDBDBD`，暗色 `#464E53` / `#737B82`）
+- `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，明暗一致，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）；`--uikit-badge-text` 为徽标文字色（默认 `#FFFFFF`，暗色按设计稿反转为 `#1E1E23`）
+- `--uikit-switch-off-bg`：Switch 关闭态轨道色（默认 `#E3E6E8`，暗色 `#3A3D40`）；`--uikit-switch-on-bg` 为开启态轨道色（品牌蓝 `#009EFF`，暗色 `#33B1FF`，不跟随主题色）；`--uikit-switch-on-disabled-bg` 为开启禁用态轨道色（品牌蓝 20% 叠页面底 `color-mix` 派生，浅色下即 `#CCECFF`）
+- `--uikit-switch-halo-off` / `--uikit-switch-halo-on`：Switch hover/pressed 手柄外圈状态层光圈色（off 默认 5% 黑、暗色 8% 白；on 为品牌蓝 10% `color-mix` 派生）；`--uikit-switch-track-inner-shadow` 为 hover/pressed 轨道内阴影；`--uikit-switch-handle-bg` / `--uikit-switch-handle-ring` / `--uikit-switch-handle-shadow` 为手柄底色（浅色恒白，暗色按设计稿 `#1E2123`）、1px 描边（`#F1F2F3`，暗色 `#333538`）与双层落影
 - `--uikit-switch-track-w` / `--uikit-switch-track-h`：Switch medium 轨道宽高（默认 `36px` / `20px`）；`--uikit-switch-small-track-w` / `--uikit-switch-small-track-h` 为 small 档（默认 `28px` / `16px`），手柄尺寸由轨道高自动派生，覆盖即可全局自定义开关宽高
 - `--uikit-drawer-close-color`：会话详情抽屉头部图标色（关闭 / 返回 / 上传，默认 `#000000`，暗色 `--uikit-text-primary`）
 - `--uikit-drawer-action-btn-color`：会话详情抽屉底部胶囊按钮文字色（默认 `#000000`，暗色 `--uikit-text-primary`）
@@ -227,15 +234,15 @@ UIKit 暗色主题通过 `[data-uikit-theme="dark"]` 属性驱动，所有组件
 
 ### 对比度验证
 
-暗色模式文字与背景组合已按 WCAG 2.1 AA 标准验证（正文 ≥4.5:1，大文字 ≥3:1）：
+暗色模式文字与背景组合已按 WCAG 2.1 标准验证（正文 AA ≥4.5:1，大文字/辅助文本 ≥3:1）：
 
-| 文字色 \ 背景 | `bg-base` (#111827) | `bg-secondary` (#1f2937) | `bg-elevated` (#1f2937) | 结果 |
+| 文字色 \ 背景 | `bg-base` (#1E2123) | `bg-secondary` (#2A2A30) | `chat-bg` (#1E1E23) | 结果 |
 | --- | --- | --- | --- | --- |
-| `text-primary` (#f9fafb) | 16.98:1 | 14.05:1 | 14.05:1 | PASS AA |
-| `text-secondary` (#9ca3af) | 6.99:1 | 5.78:1 | 5.78:1 | PASS AA |
-| `text-tertiary` (#8a92a0) | 5.66:1 | 4.68:1 | 4.68:1 | PASS AA |
+| `text-primary` (#E8EAED) | 13.44:1 | 11.84:1 | 13.78:1 | PASS AA |
+| `text-secondary` (#9AA0A6) | 6.13:1 | 5.40:1 | 6.29:1 | PASS AA |
+| `text-tertiary` (#737B82) | 3.77:1 | 3.32:1 | 3.86:1 | 大文字/辅助文本 PASS（正文 AA 不达标） |
 
-> 三级文字在暗色下已由 `#6b7280` 提亮为 `#8a92a0`，确保在次级/浮层背景上达到正文可读标准。
+> 三级文字 `#737B82` 为设计稿暗色时间戳/占位符色值，仅用于辅助性短文本（时间、占位提示等 WCAG 豁免的 incidental 场景），达到大文字 ≥3:1 标准；正文场景请使用 `text-secondary` 及以上层级。
 
 ### 跟随系统
 
