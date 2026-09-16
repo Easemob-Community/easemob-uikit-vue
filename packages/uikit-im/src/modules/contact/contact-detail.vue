@@ -252,7 +252,7 @@ async function onConfirmAction() {
           <IconButton
             icon="rect_notched/pen"
             :icon-size="22"
-            :style="{ color: '#C9CDCF' }"
+            :style="{ color: 'var(--uikit-drawer-field-action-color, #C9CDCF)' }"
             :title="t('contact.detail.edit', '编辑')"
             @click="startEditRemark"
           />
