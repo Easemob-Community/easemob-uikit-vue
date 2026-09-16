@@ -55,7 +55,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `error`：错误边界，接收插槽属性 `{ error, retry }`
 - `header` / `header-avatar` / `header-title` / `header-extra`：会话头部区域自定义
 - `drawer`：整块接管聊天信息抽屉，作用域见下方「抽屉接管」
-- `drawer-*`：部分接管 `ChatInfoDrawer` 内部区块，如 `#drawer-profile`、`#drawer-members`、`#drawer-footer` 等，作用域见下方「抽屉接管」
+- `drawer-*`：部分接管 `ChatInfoDrawer` 内部区块，如 `#drawer-header`、`#drawer-members`、`#drawer-footer` 等，作用域见下方「抽屉接管」
 - `message-*`：消息类型级插槽，如 `#message-txt`、`#message-footer-txt`，可自定义各类消息的渲染
 - `toolbar-extra` / `input-panel`：输入区扩展（AI 助手入口、快捷回复面板等，作用域见 `useChatPlugin`）
 - `message-action-extra`：消息操作菜单底部扩展
@@ -140,6 +140,34 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 </template>
 ```
 
+### 入群邀请弹窗独立使用 `EmInviteMemberModal`
+
+`#invite-member` 插槽的默认内容即内置的 `EmInviteMemberModal`（已导出）。若需在容器外自行触发邀请（如群管理页），可独立引用：
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { EmInviteMemberModal, useGroup } from '@easemob/uikit-im'
+
+const show = ref(false)
+const groupId = 'your-group-id'
+const { inviteUsersToGroup } = useGroup()
+
+async function onInvited(userIds: string[]) {
+  await inviteUsersToGroup(groupId, userIds)
+  show.value = false
+}
+</script>
+
+<template>
+  <EmInviteMemberModal v-model:show="show" :group-id="groupId" :existing-member-ids="[]" @invited="onInvited" />
+</template>
+```
+
+<!-- @include: ../.vitepress/gen/invite-member-modal.md -->
+
+> `invited` 在确认邀请时触发（负载 `userIds: string[]`），实际入群调用由业务侧完成（如 `useGroup().inviteUsersToGroup`）。
+
 ## 抽屉展示模式
 
 通过 `config.drawer` 控制聊天信息抽屉的展示方式：
@@ -220,16 +248,14 @@ import { EmChatContainer, EmChatDrawer } from '@easemob/uikit-im'
 
 | 插槽名                 | 覆盖区块                    | 显示条件               |
 | ---------------------- | --------------------------- | ---------------------- |
-| `drawer-header`        | 标题栏（返回/关闭）         | 恒显示                 |
-| `drawer-profile`       | 单聊成员条/群资料卡（群名群描述编辑/ID） | 恒显示                 |
-| `drawer-settings`      | 消息搜索/免打扰/置顶设置行  | 恒显示                 |
-| `drawer-announcement`  | 群公告                      | 仅群聊                 |
+| `drawer-header`        | 标题栏（返回/关闭）         | 一级页（非成员列表等二级页） |
 | `drawer-members`       | 群成员九宫格 + 查看全部     | 仅群聊                 |
-| `drawer-admin-actions` | 转让群主/设置管理员         | 仅群聊 + 群主          |
-| `drawer-management`    | 群管理 section              | 仅群聊                 |
-| `drawer-actions`       | 清空聊天记录等通用操作      | 默认内容仅群聊（单聊清空/删除入口在 footer） |
-| `drawer-footer`        | 单聊：清空聊天记录/删除会话；群聊：退出/解散 | 恒显示（非成员列表页） |
+| `drawer-settings`      | 消息搜索/免打扰/置顶/群文件等设置行  | 恒显示                 |
+| `drawer-actions`       | 通用操作接管位（默认无内容；群聊清空/删除已移至 footer 胶囊按钮组） | 恒显示 |
 | `drawer-member-detail` | 群成员列表二级页            | 二级页打开时           |
+| `drawer-footer`        | 清空聊天记录/删除会话（单群一致，胶囊按钮组） | 一级页 |
+
+> 说明：2.2.0 曾声明的 `drawer-profile` / `drawer-remark` / `drawer-announcement` / `drawer-admin-actions` / `drawer-management` 区块已合并进默认 UI（群资料卡、公告、群主/管理员操作、群管理入口均不再单独暴露插槽），实际可接管区块以上表为准。
 
 Section 插槽统一作用域：
 
@@ -246,6 +272,8 @@ Section 插槽统一作用域：
 | `isAdmin`       | `boolean`                             | 当前用户是否为管理员        |
 | `canAddMember`  | `boolean`                             | 当前用户是否可添加成员      |
 | `loadingGroup`  | `boolean`                             | 群信息加载中                |
+| `activePage`    | `'members' \| 'member-search' \| 'files' \| null` | 当前激活的二级页（`null` 为一级页） |
+| `closeMemberList` | `() => void`                        | 关闭当前二级页（返回一级页） |
 | `close`         | `() => void`                          | 关闭抽屉                    |
 
 ### 3. 自绘壳 `EmChatDrawer`
@@ -271,6 +299,62 @@ import { EmChatDrawer } from '@easemob/uikit-im'
 ```
 
 > 注意：section 插槽被接管后，对应内置交互不再触发（如接管 `drawer-members` 后，成员事件需由用户自行处理）。
+
+### 4. 独立使用 `EmChatInfoDrawer`
+
+不需要接管容器插槽、想在自己的布局里直接挂载完整聊天信息抽屉时，可单独引入 `EmChatInfoDrawer`（依赖 `EmUIKitProvider` 上下文，会话 / 群 / 用户资料数据均走 store）：
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { EmChatInfoDrawer, useConversation } from '@easemob/uikit-im'
+
+const show = ref(false)
+const { currentConversation } = useConversation()
+</script>
+
+<template>
+  <EmChatInfoDrawer
+    v-model:show="show"
+    :conversation="currentConversation"
+    :is-group="currentConversation?.type === 'groupChat'"
+    mode="overlay"
+    :width="360"
+    @leave-group="onLeaveGroup"
+  />
+</template>
+```
+
+**Props（`ChatInfoDrawerProps` 全量）：**
+
+<!-- @include: ../.vitepress/gen/chat-info-drawer.md -->
+
+> 七项 deprecated props：`groupManagementDisplayMode` / `showMuteAll` / `showMuteList` / `showBlocklist` / `showAllowlist` / `showSharedFiles` / `showJoinRequests` 已废弃（源码标注 `@deprecated`），默认 UI 不再消费，仅为兼容保留。
+
+**Events 说明：** `clear-history`（清空聊天记录，含删除会话漫游选项）/ `block-changed`（单聊拉黑状态变更，默认 UI 无入口，供 `drawer-actions` 接管使用）/ `search-message`（打开消息搜索，需宿主接管搜索弹窗）；其余成员操作类（`chat-member` / `remove-member` / `set-admin` / `remove-admin`）与群管理类（`leave-group` / `destroy-group` / `add-member` / `group-operation` / `create-group`）事件负载见上表。
+
+## 群已读回执
+
+通过 `config.groupReadReceipt` 启用（`enabled` 默认 `false`，`maxGroupSize` 默认 `200`，超过该人数的群不发已读回执）。启用后群聊消息支持查看已读 / 未读成员，点击已读入口时弹出内置的已读详情弹窗。
+
+如需在业务页面独立展示已读详情（如自建的消息统计页），可直接引用已导出的 `EmGroupReadReceiptModal`：
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { EmGroupReadReceiptModal } from '@easemob/uikit-im'
+
+const show = ref(false)
+const readList = ref(['userA', 'userB'])
+const unreadList = ref(['userC'])
+</script>
+
+<template>
+  <EmGroupReadReceiptModal v-model:show="show" :read-list="readList" :unread-list="unreadList" />
+</template>
+```
+
+<!-- @include: ../.vitepress/gen/group-read-receipt-modal.md -->
 
 ## 流式消息（AI）
 

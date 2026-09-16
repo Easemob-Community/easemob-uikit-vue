@@ -8,6 +8,7 @@ export type ContactFetchMode = 'page' | 'all'
 export interface UIKitFeatures {
   enableContact: boolean
   enableBlocklist: boolean
+  /** 是否启用在线状态；默认 true（私有化或低频场景可显式关闭） */
   enablePresence: boolean
   /** 陌生人 Presence 策略：'none' 不获取；'query-on-visible' 可见时查询 */
   presenceStrangerMode?: 'none' | 'query-on-visible'

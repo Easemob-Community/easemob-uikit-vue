@@ -74,9 +74,12 @@ export interface ChatContainerProps {
   /** 自定义根元素 style */
   style?: Record<string, string>
   /**
-   * 容器风格变体（与 ConversationContainer 同口径）：
-   * compact（默认；平铺无圆角，背景 --uikit-chat-bg 铺满，适合接入方自行排版）/
-   * card（圆角卡片：圆角跟随 --uikit-components-radius，细分隔线边框，宿主提供灰底与间距即可成卡）
+   * 容器风格变体（与 ConversationContainer 同口径）。显式传入优先；
+   * 未配置（undefined）时按端型取默认：PC 'card'（圆角卡片：圆角跟随
+   * --uikit-components-radius，细分隔线边框，宿主提供灰底与间距即可成卡）/
+   * 移动端 'compact'（平铺无圆角，背景 --uikit-chat-bg 铺满，适合全屏页面形态）。
+   * Container visual variant. Explicit value wins; when unset, defaults by
+   * device type — 'card' on PC, 'compact' on mobile.
    */
   variant?: 'card' | 'compact'
 }
@@ -89,7 +92,7 @@ export interface ChatContainerEmits {
 }
 
 const props = withDefaults(defineProps<ChatContainerProps>(), {
-  variant: 'compact',
+  variant: undefined,
 })
 const emit = defineEmits<ChatContainerEmits>()
 
@@ -97,6 +100,9 @@ const chatRef = ref<InstanceType<typeof Chat>>()
 
 const { h5 } = useUIKit()
 const slots = useSlots()
+
+/** 容器风格生效值：prop 显式配置优先，未配置时 PC 'card' / 移动端 'compact' */
+const effectiveVariant = computed(() => props.variant ?? (h5.isMobile.value ? 'compact' : 'card'))
 
 /** 除 #drawer / #watermark 外的其余插槽名（两者单独显式透传以保留类型；useSlots 非响应式，无需 computed） */
 /**
@@ -121,7 +127,7 @@ defineExpose({
     :class="{
       'chat-container--keyboard-open': h5.isKeyboardOpen.value,
       'chat-container--drawer-push': drawerPush,
-      [`chat-container--${props.variant}`]: true,
+      [`chat-container--${effectiveVariant}`]: true,
     }"
   >
     <Chat

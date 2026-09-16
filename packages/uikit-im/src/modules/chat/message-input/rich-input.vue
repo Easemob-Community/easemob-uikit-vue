@@ -98,8 +98,8 @@ const features = computed(() => ({
   video: props.config?.features?.video !== false,
 }))
 
-/** 是否显示发送按钮 */
-const showSendButton = computed(() => props.config?.showSendButton !== false)
+/** 是否显示发送按钮：显式配置优先；未配置时 PC 隐藏（回车发送）、移动端显示 */
+const showSendButton = computed(() => props.config?.showSendButton ?? !isMobile.value)
 
 /** 是否正在录音 */
 const isRecording = ref(false)

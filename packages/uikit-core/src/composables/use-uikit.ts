@@ -82,7 +82,7 @@ export const CORE_UIKIT_CONTEXT_KEY: InjectionKey<CoreUIKitContext> = Symbol('ui
 const defaultFeatures: UIKitFeatures = {
   enableContact: true,
   enableBlocklist: true,
-  enablePresence: false,
+  enablePresence: true,
   presenceStrangerMode: 'none',
   fetchGroupMemberPresenceOnVisible: true,
   contactFetchMode: 'page',

@@ -12,7 +12,10 @@ export function useOwnUserInfo() {
   const { client, stores, domains, features } = useCoreUIKit()
   const enabled = features.enableUserInfo !== false
 
-  const currentUserId = computed(() => client.value.currentUserId)
+  // client.currentUserId 来自 adapter 内部状态，登录完成前为空且不含响应式依赖，
+  // 组件若先于登录完成挂载（如刷新后路由立即渲染、SDK 自动登录异步进行），首次求值会永久缓存空串；
+  // stores.client.currentUser 由 core login 响应式写入，作为兜底使首次求值后仍能触发资料拉取
+  const currentUserId = computed(() => client.value.currentUserId || stores.client.currentUser || '')
 
   watchEffect(() => {
     if (!enabled)

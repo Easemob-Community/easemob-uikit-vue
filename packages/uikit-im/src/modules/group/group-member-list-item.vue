@@ -435,7 +435,7 @@ function closeMoreMenu() {
   gap: 8px;
 }
 
-/* 成员名：设计稿纯黑 #000（群组场景主文案） */
+/* 成员名：群组场景主文案，浅色默认纯黑（设计稿），暗色经 token 覆写为主文字色 */
 .group-member-list__name {
   font-size: var(--uikit-font-size-15);
   font-weight: 500;
@@ -476,15 +476,16 @@ function closeMoreMenu() {
   flex-shrink: 0;
 }
 
-/* 状态标签配色（设计稿指定值）：禁言 = #A9AEB2、黑名单 = #484D51（同系 12% 底色） */
+/* 状态标签配色（设计稿指定值入 token）：禁言 = #A9AEB2、黑名单 = #484D51（暗色提亮为次级文字色），
+   同系 12% 底色由 color-mix 实时派生，自动跟随明暗与覆写 */
 .group-member-list__status-tag--muted {
-  background-color: rgba(169, 174, 178, 0.12);
-  color: #a9aeb2;
+  background-color: color-mix(in srgb, var(--uikit-member-tag-muted-color, #a9aeb2) 12%, transparent);
+  color: var(--uikit-member-tag-muted-color, #a9aeb2);
 }
 
 .group-member-list__status-tag--blocked {
-  background-color: rgba(72, 77, 81, 0.12);
-  color: #484d51;
+  background-color: color-mix(in srgb, var(--uikit-member-tag-blocked-color, #484d51) 12%, transparent);
+  color: var(--uikit-member-tag-blocked-color, #484d51);
 }
 
 .group-member-list__status-tag--allowlist {

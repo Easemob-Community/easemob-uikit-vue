@@ -35,8 +35,10 @@ const PACKAGES = [
     containersRoot: join(__dirname, '../../../packages/uikit-im/src/containers'),
     outputDir: join(__dirname, '../.vitepress/gen'),
     /**
-     * 23 个原子组件（P1 抽核后大部分位于 core 包，uikit-im 全量 re-export，
+     * 27 个原子组件（P1 抽核后大部分位于 core 包，uikit-im 全量 re-export，
      * 文档页归属不变）：字符串 = 当前包 componentsRoot 下；对象 = 显式指定根目录
+     * （root）与文件路径（file，当 .vue 文件名与组件名不一致时，如 xxx-modal
+     * 形态与基础组件同目录）。
      */
     components: [
       'action-sheet',
@@ -44,10 +46,14 @@ const PACKAGES = [
       'badge',
       'button',
       'cell',
+      'checkbox',
+      'copyable-text',
       'empty',
       'emoji-picker',
       // group-card 仍在 uikit-im 包内（未迁 core），显式指向本包组件根
       { name: 'group-card', root: join(__dirname, '../../../packages/uikit-im/src/components') },
+      // 弹窗形态与基础卡片同目录（group-card/group-card-modal.vue），用 file 显式指定
+      { name: 'group-card-modal', root: join(__dirname, '../../../packages/uikit-im/src/components'), file: 'group-card/group-card-modal.vue' },
       'icon',
       'icon-button',
       'image-viewer',
@@ -57,13 +63,20 @@ const PACKAGES = [
       'popup',
       'presence-avatar',
       'presence-selector',
+      // 业务封装形态（实现在 core，经 uikit-im re-export，文档页归属不变；
+      // 与 presence-selector.vue 同目录，用 file 显式指定）
+      { name: 'presence-selector-modal', file: 'presence-selector/presence-selector-modal.vue' },
+      { name: 'presence-selector-popup', file: 'presence-selector/presence-selector-popup.vue' },
       'resizable',
       'scroll-to-top',
       'skeleton',
       'status-banner',
       'switch',
+      'text',
       'toast',
       'user-card',
+      // 同 group-card-modal：弹窗形态与 user-card.vue 同目录
+      { name: 'user-card-modal', root: join(__dirname, '../../../packages/uikit-im/src/components'), file: 'user-card/user-card-modal.vue' },
     ],
     /**
      * 业务模块容器白名单：输出名 → 组件相对 modules 的文件路径。
@@ -74,13 +87,38 @@ const PACKAGES = [
     modules: [
       { name: 'chat-container', file: 'chat/chat.vue' },
       { name: 'conversation-container', file: 'conversation/conversation-list.vue' },
-      // 注意：contact-container.md 页面描述的是 EmContactContainer（通讯录聚合容器），
-      // 该组件尚未实现（无对应 .vue 文件），待 props 接口补齐后按同样方式追加；
-      // 不要错接 contact-list.vue（联系人列表，与页面内容不符）
+      // contact-container（containers/contact-container.vue）虽有 Props 接口，但大量成员
+      // 缺 JSDoc（Contact/Group 子列表配置段），gen 表会大片空白，页面维持手写不接入；
+      // 同理不要错接 contact-list.vue（联系人列表，与页面内容不符）
       { name: 'group-container', file: 'group/group-list.vue' },
       // message-list：config 为完整 ChatConfig，本组件只消费 messageList 子树；
       // 但为保持与 chat-container 一致的配置全景展示，仍全量展开（父表每项均可锚点跳转）
       { name: 'message-list', file: 'chat/message-list/message-list.vue' },
+      // ---- 群管理模块（group-management.md / chat-container.md）----
+      { name: 'group-management-section', file: 'group/group-management-section.vue' },
+      { name: 'group-announcement', file: 'group/group-announcement.vue' },
+      { name: 'group-member-list', file: 'group/group-member-list.vue' },
+      { name: 'group-detail', file: 'group/group-detail.vue' },
+      // 群管理二级页（group-management/ 子组件）；输出名加 group- 前缀避免与
+      // contact 模块 block-list 撞名，Props 按宽松 *Props 后缀匹配（如 MuteListProps）
+      { name: 'group-mute-list', file: 'group/group-management/mute-list.vue' },
+      { name: 'group-blocklist', file: 'group/group-management/block-list.vue' },
+      { name: 'group-allowlist', file: 'group/group-management/allow-list.vue' },
+      { name: 'group-shared-file-list', file: 'group/group-management/shared-file-list.vue' },
+      { name: 'group-join-request-list', file: 'group/group-management/join-request-list.vue' },
+      // 入群邀请弹窗（chat-container.md「弹窗接管」独立使用小节）
+      { name: 'invite-member-modal', file: 'group/invite-member-modal.vue' },
+      // ---- 黑名单模块（block-list.md）----
+      { name: 'block-list', file: 'contact/block-list.vue' },
+      { name: 'block-list-add-modal', file: 'contact/block-list-add-modal.vue' },
+      // ---- 通讯录模块（contact-container.md）----
+      { name: 'contact-detail', file: 'contact/contact-detail.vue' },
+      { name: 'contact-notice-list', file: 'contact/contact-notice-list.vue' },
+      // 穿梭框（modal.md）
+      { name: 'contact-transfer-modal', file: 'contact/contact-transfer-modal.vue' },
+      // ---- 聊天模块（chat-container.md）----
+      { name: 'group-read-receipt-modal', file: 'chat/group-read-receipt-modal/group-read-receipt-modal.vue' },
+      { name: 'chat-info-drawer', file: 'chat/drawer/chat-info-drawer.vue' },
     ],
     /**
      * 顶级容器白名单：相对 containers 的 .vue 路径，复用 MODULES 的生成逻辑
@@ -94,6 +132,12 @@ const PACKAGES = [
         file: 'uikit-provider/uikit-provider.vue',
         nestedOnly: ['theme', 'notification', 'logger'],
       },
+      // 黑名单 / 联系人列表独立容器（block-list.md），无嵌套配置类型
+      { name: 'block-list-container', file: 'block-list-container/block-list-container.vue' },
+      { name: 'contact-list-container', file: 'contact-list-container/contact-list-container.vue' },
+      // 地址簿聚合容器（address-book-container.md）；entries 为数组类型不展开，
+      // AddressBookContainerEntry 字段说明保留在页面 prose 注记
+      { name: 'address-book-container', file: 'address-book-container/address-book-container.vue' },
     ],
   },
   {
@@ -159,25 +203,28 @@ function getDocLines(node) {
       ? comment.map(part => part.text ?? '').join('')
       : comment.text ?? String(comment)
   }
-  else if (jsDoc.tags && jsDoc.tags.length > 0) {
-    // `/** @提及，默认 true */` 这类以 @ 开头的注释会被 TS 解析为 tag（comment 为空），
-    // 说明实际在 tag.comment：回退拼接非标准 tag 的说明，避免 API 表格说明列空
-    const STANDARD_TAGS = new Set(['param', 'returns', 'return', 'example', 'deprecated', 'throws', 'see', 'type', 'default', 'throws'])
-    text = jsDoc.tags
-      .map((tag) => {
-        const name = tag.tagName.getText()
-        if (STANDARD_TAGS.has(name)) {
-          return ''
-        }
-        const tagComment = tag.comment
-        const c = Array.isArray(tagComment)
-          ? tagComment.map(part => part.text ?? '').join('')
-          : tagComment ?? ''
-        // comment 为空（如 `/** @提及配置 */` 整串被当作 tag 名）时回退用 tag 名
-        return c || name
-      })
-      .filter(Boolean)
-      .join(' ')
+  if (jsDoc.tags && jsDoc.tags.length > 0) {
+    // 说明文字中含「@我」「@提及（@mention）」等会被 TS 误判为 JSDoc tag
+    // （以空格分隔的 @ 起头即解析为 tag，tag 名/说明吞掉原文），导致 @ 之后说明截断；
+    // 非标准 tag 一律按原文拼回（@ + tag 名 + tag 说明），标准 tag（param/deprecated 等）跳过
+    const STANDARD_TAGS = new Set(['param', 'returns', 'return', 'example', 'deprecated', 'throws', 'see', 'type', 'default'])
+    const parts = []
+    if (text) {
+      parts.push(text)
+    }
+    for (const tag of jsDoc.tags) {
+      const name = tag.tagName.getText()
+      if (STANDARD_TAGS.has(name)) {
+        continue
+      }
+      const tagComment = tag.comment
+      const c = Array.isArray(tagComment)
+        ? tagComment.map(part => part.text ?? '').join('')
+        : tagComment ?? ''
+      // tag 说明以英文/数字起头时补回 tag 名后的分隔空格（原文空格被 TS 当作 tag 名终止符吞掉）
+      parts.push(c && /^[a-z0-9]/i.test(c) ? `@${name} ${c}` : `@${name}${c}`)
+    }
+    text = parts.join(' ')
   }
   return text
     .split('\n')
@@ -719,8 +766,9 @@ function buildModuleMarkdown(entry, root) {
   return lines.join('\n')
 }
 
-function buildMarkdown(componentName, pascal, root) {
-  const filePath = join(root, componentName, `${componentName}.vue`)
+function buildMarkdown(componentName, pascal, root, file) {
+  // 组件 .vue 路径：显式 file（对象形态，如 xxx-modal 与基础组件同目录）或 <name>/<name>.vue
+  const filePath = file ? join(root, file) : join(root, componentName, `${componentName}.vue`)
   const source = readFileSync(filePath, 'utf-8')
   const { descriptor, errors } = parse(source, { filename: filePath })
   if (errors.length > 0) {
@@ -788,9 +836,9 @@ for (const pkg of PACKAGES) {
     total++
     // 字符串 = 当前包 componentsRoot；对象 = 显式根目录（跨包组件，如 group-card）
     const componentName = typeof item === 'string' ? item : item.name
-    const root = typeof item === 'string' ? pkg.componentsRoot : item.root
+    const root = typeof item === 'string' ? pkg.componentsRoot : (item.root ?? pkg.componentsRoot)
     const pascal = kebabToPascal(componentName)
-    const markdown = buildMarkdown(componentName, pascal, root)
+    const markdown = buildMarkdown(componentName, pascal, root, typeof item === 'string' ? undefined : item.file)
     if (!markdown) {
       continue
     }

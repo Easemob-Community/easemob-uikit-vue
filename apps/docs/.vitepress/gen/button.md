@@ -3,13 +3,14 @@
 
 ### Props
 
-| 属性       | 类型                                                                                 | 默认值         | 说明                                                                       |
+| 属性       | 类型                                                                                              | 默认值         | 说明                                                                                      |
 | --- | --- | --- | --- |
-| type     | `'primary' \| 'success' \| 'warning' \| 'danger' \| 'danger-outline' \| 'default'` | `'default'` | 语义类型：primary / success / warning / danger / danger-outline / default（默认） |
-| size     | `'small' \| 'medium' \| 'large'`                                                   | `'medium'`  | 尺寸：small / medium（默认）/ large                                             |
-| disabled | `boolean`                                                                          | `false`     | 是否禁用；禁用时按钮不可点击且不触发 click                                                 |
-| loading  | `boolean`                                                                          | `false`     | 是否加载中；显示加载动画并禁止点击（行为同 disabled）                                          |
-| block    | `boolean`                                                                          | `false`     | 是否块级展示，占满父容器整行宽度                                                         |
+| type     | `'primary' \| 'success' \| 'warning' \| 'danger' \| 'danger-outline' \| 'outline' \| 'default'` | `'default'` | 语义类型：primary / success / warning / danger / danger-outline / outline（中性描边）/ default（默认） |
+| size     | `'small' \| 'medium' \| 'large'`                                                                | `'medium'`  | 尺寸：small / medium（默认）/ large                                                            |
+| disabled | `boolean`                                                                                       | `false`     | 是否禁用；禁用时按钮不可点击且不触发 click                                                                |
+| loading  | `boolean`                                                                                       | `false`     | 是否加载中；显示加载动画并禁止点击（行为同 disabled）                                                         |
+| block    | `boolean`                                                                                       | `false`     | 是否块级展示，占满父容器整行宽度                                                                        |
+| pill     | `boolean`                                                                                       | `false`     | 是否全圆角（pill）形态，默认 false；优先级高于全局 componentsShape 的 square 修饰                              |
 
 ### Events
 

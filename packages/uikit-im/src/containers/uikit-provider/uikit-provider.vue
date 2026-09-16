@@ -15,9 +15,9 @@ import {
 const props = withDefaults(defineProps<ProviderProps>(), {
   locale: 'zh-CN',
   autoInit: true,
-  enableContact: false,
-  enableBlocklist: false,
-  enablePresence: false,
+  enableContact: true,
+  enableBlocklist: true,
+  enablePresence: true,
   enableGroup: true,
   enableUserInfo: true,
   enableUserInfoSubscription: true,
@@ -100,7 +100,7 @@ export interface ProviderProps {
    */
   h5?: H5AdaptationConfig
   /**
-   * 是否启用好友体系（默认 false）
+   * 是否启用好友体系（默认 true）
    */
   enableContact?: boolean
   /**
@@ -110,11 +110,12 @@ export interface ProviderProps {
    */
   contactFetchMode?: ContactFetchMode
   /**
-   * 是否启用黑名单（默认 false）
+   * 是否启用黑名单（默认 true）
    */
   enableBlocklist?: boolean
   /**
-   * 是否启用在线状态（默认 false）
+   * 是否启用在线状态（默认 true；presence 订阅会带来额外查询/订阅请求，
+   * 私有化或低频场景可显式关闭）
    */
   enablePresence?: boolean
   /**

@@ -41,7 +41,7 @@ export interface CoreProviderProps {
    */
   h5?: H5AdaptationConfig
   // —— features 相关开关（UIKitFeatures 为 core 契约）：core Provider 接受并原样透传入 context，不解释语义 ——
-  /** 是否启用好友体系（默认 false） */
+  /** 是否启用好友体系（默认 true） */
   enableContact?: boolean
   /**
    * 联系人拉取模式（默认 'page'）
@@ -49,9 +49,9 @@ export interface CoreProviderProps {
    * - 'all':  一次性全量拉取
    */
   contactFetchMode?: ContactFetchMode
-  /** 是否启用黑名单（默认 false） */
+  /** 是否启用黑名单（默认 true） */
   enableBlocklist?: boolean
-  /** 是否启用在线状态（默认 false） */
+  /** 是否启用在线状态（默认 true；presence 订阅会带来额外查询/订阅请求，私有化或低频场景可显式关闭） */
   enablePresence?: boolean
   /** 是否启用群组体系（默认 true） */
   enableGroup?: boolean
@@ -111,9 +111,9 @@ export interface CoreProviderProps {
 const props = withDefaults(defineProps<CoreProviderProps>(), {
   locale: 'zh-CN',
   autoInit: true,
-  enableContact: false,
-  enableBlocklist: false,
-  enablePresence: false,
+  enableContact: true,
+  enableBlocklist: true,
+  enablePresence: true,
   enableGroup: true,
   enableUserInfo: true,
   enableUserInfoSubscription: true,

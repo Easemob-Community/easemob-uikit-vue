@@ -628,8 +628,9 @@ defineExpose({
   overflow: hidden;
 }
 
+/* 与会话列表 card 变体同一口径：头部左缘对齐项 hover 背景边缘（rounded 档）/ 项内容左缘（default 档） */
 .contact-list__header {
-  padding: 12px 16px;
+  padding: 12px calc(4px + var(--uikit-item-hover-padding-x, 16px));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -657,8 +658,9 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 
+/* 与会话列表 card 变体同一口径：搜索框与列表可视区同一边界（4px） */
 .contact-list__search {
-  padding: 2px 16px 8px;
+  padding: 2px 4px 8px;
 }
 
 .contact-list__items-area {
@@ -676,10 +678,20 @@ defineExpose({
   overflow-y: auto;
   position: relative;
   outline: none;
+  /* 与会话列表 card 变体一致的可视区内边距（4px），不再叠加 rounded 档的大内缩 */
+  padding: 4px;
 }
 
+/* 与会话列表 card 变体一致：hover/active 背景顶满整个 cell，不再二次内缩 */
+.contact-list__items :deep(.uikit-cell.is-inset-hover)::before {
+  inset: 0;
+}
+
+/* 分组标题顶满列表可视区（负 margin 抵消 items 容器 4px 内边距），
+   文字与列表项内容左缘对齐（= 4px 容器内边距 + cell margin-x + cell padding-x） */
 .contact-list__group-header {
-  padding: 6px 16px;
+  margin: 0 -4px;
+  padding: 6px calc(4px + var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
   font-size: var(--uikit-font-size-12);
   font-weight: 600;
   color: var(--uikit-text-secondary);
@@ -690,7 +702,7 @@ defineExpose({
 }
 
 .contact-list__body {
-  padding: 0 16px;
+  padding: 0 calc(4px + var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
 }
 
 .contact-list__body--sticky {
@@ -698,7 +710,7 @@ defineExpose({
 }
 
 .contact-list__footer {
-  padding: 8px 16px;
+  padding: 8px calc(4px + var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
 }
 
 .contact-list__footer--sticky {
@@ -723,7 +735,8 @@ defineExpose({
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 8px 0;
+  /* 骨架头像与真实列表项内容左缘对齐（items 容器已有 4px 内边距） */
+  padding: 8px calc(var(--uikit-item-hover-margin-x, 0px) + var(--uikit-item-hover-padding-x, 16px));
 }
 
 .contact-list__skeleton-item {

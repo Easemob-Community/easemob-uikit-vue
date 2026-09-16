@@ -24,6 +24,35 @@
 
 <demo src="./demo/slots.vue" title="插槽自定义" desc="name 插槽自定义群名称展示；默认插槽插入自定义内容。" />
 
+## 弹窗形态 EmGroupCardModal
+
+`EmGroupCardModal` 是群组卡片的弹窗形态：居中弹窗（320px），打开时自动拉取群详情，渲染群简介与成员数信息行，内置「消息」操作入口。依赖登录态，需在 `EmUIKitProvider` 内使用。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const show = ref(false)
+const groupId = 'group_001'
+
+function onSendMessage(id: string) {
+  // 跳转到该群会话
+}
+</script>
+
+<template>
+  <em-group-card-modal
+    v-model:show="show"
+    :group-id="groupId"
+    @send-message="onSendMessage"
+  />
+</template>
+```
+
+<!-- @include: ../.vitepress/gen/group-card-modal.md -->
+
+> `send-message` 触发后会自动关闭弹窗。
+
 ## API
 
 <!-- @include: ../.vitepress/gen/group-card.md -->

@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
+import { useUIKit } from '../../composables/use-uikit'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
 import { useLocale } from '@easemob/uikit-core'
 import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from '../../modules/conversation/types'
@@ -48,7 +49,8 @@ export interface ConversationContainerProps {
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动 */
   footerSticky?: boolean
-  /** 是否启用下拉刷新（H5），默认 false */
+  /** 是否启用下拉刷新（H5）。显式 true/false 优先；未配置（undefined）时回落 Provider
+   * h5.pullRefresh（默认 'auto'：触屏设备自动开启，见 core useH5Adaptation） */
   pullRefresh?: boolean
   /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean
@@ -88,7 +90,7 @@ const props = withDefaults(defineProps<ConversationContainerProps>(), {
   headerAlign: 'left',
   bodySticky: false,
   footerSticky: false,
-  pullRefresh: false,
+  pullRefresh: undefined,
   enablePresence: undefined,
   draftStorage: 'none',
   tabs: () => [...DEFAULT_CONVERSATION_TABS],
@@ -110,6 +112,10 @@ const emit = defineEmits<{
 
 const { refreshConversations } = useConversation()
 const { t, locale } = useLocale()
+const { h5 } = useUIKit()
+
+/** 下拉刷新生效值：prop 显式配置优先，未配置时回落 Provider h5.pullRefresh（auto 按触屏判定） */
+const effectivePullRefresh = computed(() => props.pullRefresh ?? h5.enablePullRefresh.value)
 
 /** 默认时间格式化函数：包一层 computed，locale 切换时函数引用变化，prop 透传链能感知更新 */
 const defaultTimeFormatter = computed<(timestamp: number) => string>(() => createConversationTimeFormatter(t))
@@ -162,7 +168,7 @@ function handleReconnect() {
       :filter-fn="props.filterFn"
       :body-sticky="props.bodySticky"
       :footer-sticky="props.footerSticky"
-      :pull-refresh="props.pullRefresh"
+      :pull-refresh="effectivePullRefresh"
       :enable-presence="props.enablePresence"
       :tabs="props.tabs"
       :active-tab="props.activeTab"

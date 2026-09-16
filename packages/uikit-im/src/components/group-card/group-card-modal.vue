@@ -97,10 +97,16 @@ function onClose() {
   emit('close')
 }
 
+function closeModal() {
+  emit('update:show', false)
+  onClose()
+}
+
 function onActionClick(key: string) {
   if (key === 'message') {
     emit('send-message', props.groupId)
-    onClose()
+    // 主动关闭需走 closeModal（emit update:show(false)）；onClose 只适用于 Popup 自身触发的关闭
+    closeModal()
   }
 }
 </script>

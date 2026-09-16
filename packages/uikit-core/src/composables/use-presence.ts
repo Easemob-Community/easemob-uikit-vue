@@ -14,7 +14,7 @@ function warnPresenceDisabledOnce(action: string): void {
   if (warnedPresenceDisabled)
     return
   warnedPresenceDisabled = true
-  logger.warn(`[usePresence] enablePresence 未开启，${action} 已跳过；如需在线状态请在 Provider 上显式 enablePresence`)
+  logger.warn(`[usePresence] enablePresence 未开启（默认开启，当前被显式关闭），${action} 已跳过；如需在线状态请移除 enablePresence=false 或显式开启`)
 }
 
 export function usePresence() {

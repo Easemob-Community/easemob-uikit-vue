@@ -41,37 +41,17 @@ const customEntries = [
 
 > 默认插槽接收 `{ view }`，按当前视图渲染对应子视图内容；「通知」视图不传 `#notice` 插槽时会渲染内置通知列表。
 
-## Props
+## API
 
-### 容器外观
+<!-- @include: ../.vitepress/gen/address-book-container.md -->
 
-- `showHeader`：是否展示头部，默认 `true`
-- `title`：Header 标题文本
-- `headerAlign`：Header 对齐方式，默认 `'left'`
-- `showSearch`：首页搜索框开关，默认 `true`
-- `transition`：视图切换过场，`'none' | 'slide' | 'fade'`，默认 `'slide'`
-
-### 聚合入口
-
-- `entries`：自定义入口列表，类型 `AddressBookContainerEntry[]`（`key` / `label` / `count` / `icon` / `visible` / `to` / `sort`）
-- `showNotice` / `showGroup` / `showContact`：内置入口开关，默认 `true`
-- `noticeCount` / `groupCount` / `contactCount`：入口右侧数量；群组列表 / 好友列表数量不传默认取 store 实际数量
-- `autoEntryCount`：是否自动推断入口数量，默认 `true`
-- `entryOrder`：入口顺序，默认 `['notice', 'group', 'contact', 'blocklist']`
-- `noticeLabel` / `groupLabel` / `contactLabel`：自定义入口文案
-- `noticeIcon` / `groupIcon` / `contactIcon`：自定义入口图标
-- `noticePersistInvites`：是否持久化未处理通知（好友申请 + 群邀请），支持 `boolean | 'local' | 'session'`，默认 `false`
-- `initialView`：初始视图，默认 `'home'`；单入口时自动降级为该入口视图
-- `showContactAddButton` / `showGroupCreateButton`：子视图头部操作按钮，默认 `true`
-
-## 事件
-
-- `view-change`：视图切换，参数 `view: string`
-- `entry-click`：点击入口，参数 `key: string`；声明 `to: false` 的入口不会自动切换视图
-- `notice-click`：点击「通知」入口
-- `home-search`：首页搜索，参数 `keyword: string`
-- `add-contact`：点击「添加好友」按钮
-- `create-group`：点击「创建群组」按钮
+> 语义注记：
+>
+> - `showBlocklist`：仅黑名单一个入口启用时自动降级为黑名单子视图。
+> - `initialView`：单入口时自动降级为该入口视图。
+> - `entries` 元素类型 `AddressBookContainerEntry`：`key` / `label` / `count`（0 时不展示）/ `icon` / `visible`（false 不渲染）/ `to`（false 时仅触发 `entry-click`，不自动切换视图）/ `sort`（排序权重，越小越靠前）。
+> - `noticeCount` 不给默认值（外部注入）；`groupCount` / `contactCount` 不传默认取 store 实际数量。
+> - `blocklist-add`：点击黑名单子视图头部的「添加黑名单」按钮（通讯录聚合容器内默认打开添加黑名单选人弹窗）。
 
 ## 插槽
 
@@ -86,5 +66,5 @@ const customEntries = [
 
 ## 实例方法
 
-- `goHome()` / `goContact()` / `goGroup()` / `goNotice()` / `goTo(key)`：命令式切换视图
+- `goHome()` / `goContact()` / `goGroup()` / `goNotice()` / `goBlocklist()` / `goTo(key)`：命令式切换视图
 - `view`：只读当前视图 ref

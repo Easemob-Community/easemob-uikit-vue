@@ -98,6 +98,98 @@ setPinyinAdapter((text) => {
 - **清理缓存**：`resolvePinyin` 内部按文本缓存（上限 1000）。联系人备注 / 名称更新后可调用 `clearPinyinCache()`（同样从 `@easemob/uikit-im` 导出）刷新结果。
 - **群组列表**：群组子列表走同一机制，`group-sort-by="pinyin"` / `group-group-by="alphabet"`。
 
+## 联系人详情 EmContactDetail
+
+`EmContactDetail` 联系人详情模块：头像（含在线状态）、昵称 / 用户名 / 用户 ID、备注编辑（行内弹窗）、发消息胶囊按钮，底部提供「拉黑 / 取消拉黑」「删除联系人」操作（带确认弹窗），SDK 调用与结果 toast 由组件内部完成。
+
+```vue
+<script setup lang="ts">
+import { EmUIKitProvider, EmContactDetail } from '@easemob/uikit-im'
+
+function onSendMessage(userId: string) {
+  // 跳转到与该联系人的单聊
+}
+
+function onBlockChanged(userId: string, blocked: boolean) {
+  // 拉黑 / 取消拉黑成功
+}
+
+function onDeleted(userId: string) {
+  // 删除联系人成功，返回列表
+}
+
+function onRemarkChanged(userId: string, remark: string) {
+  // 备注保存成功
+}
+</script>
+
+<template>
+  <EmUIKitProvider
+    app-key="your-app-key"
+    :auto-init="true"
+    enable-contact
+    enable-blocklist
+    enable-presence
+  >
+    <div style="height: 100vh; width: 360px;">
+      <em-contact-detail
+        user-id="user-id-to-show"
+        @send-message="onSendMessage"
+        @block-changed="onBlockChanged"
+        @deleted="onDeleted"
+        @remark-changed="onRemarkChanged"
+      />
+    </div>
+  </EmUIKitProvider>
+</template>
+```
+
+> 底部「拉黑 / 取消拉黑」操作需开启 `enable-blocklist`（默认开启）；头像在线状态需开启 `enable-presence`。
+
+<!-- @include: ../.vitepress/gen/contact-detail.md -->
+
+### 插槽
+
+| 名称 | 作用域 | 说明 |
+| ---- | ---- | ---- |
+| `avatar` | `{ userId, avatar, displayName, presence }` | 接管头像区（默认渲染头像 + 在线状态点） |
+| `header` | `{ userId, displayName, nickname, presence }` | 接管名称与 Username / UserID 信息区 |
+| `alias` | `{ userId, remark }` | 接管备注行；接管后内置备注编辑入口不再渲染 |
+| `extra` | `{ userId, userInfo, contact }` | 在备注行与操作按钮之间插入自定义内容 |
+| `actions` | `{ userId }` | 接管「发消息」胶囊按钮区 |
+| `footer` | `{ userId, blocked }` | 接管拉黑 / 删除按钮区 |
+
+## 通知列表 EmContactNoticeList
+
+`EmContactNoticeList` 通知列表模块：聚合展示好友申请与群邀请（头像、附言、时间、接受 / 拒绝按钮），已处理项展示状态标签，store 中已是好友 / 已入群的 pending 申请会自动显示为「已接受」。通常无需单独引入——通讯录容器的「通知」子视图默认渲染的就是该组件；单独引入适合自绘通知页场景。
+
+```vue
+<script setup lang="ts">
+import { EmUIKitProvider, EmContactNoticeList } from '@easemob/uikit-im'
+import type { UiContactInvite } from '@easemob/uikit-im'
+
+function onAccept(invite: UiContactInvite) {
+  // 接受成功（SDK 调用由组件内部完成）
+}
+
+function onDecline(invite: UiContactInvite) {
+  // 拒绝成功
+}
+</script>
+
+<template>
+  <EmUIKitProvider app-key="your-app-key" :auto-init="true" enable-contact>
+    <div style="height: 100vh; width: 360px;">
+      <em-contact-notice-list persist="local" @accept="onAccept" @decline="onDecline" />
+    </div>
+  </EmUIKitProvider>
+</template>
+```
+
+<!-- @include: ../.vitepress/gen/contact-notice-list.md -->
+
+> `persist` 传 `true` 等价于 `'local'`（localStorage），`'session'` 仅存于会话级存储；开启后通讯录首页徽标在刷新后也能立即显示红点。
+
 ## Props
 
 ### 容器外观

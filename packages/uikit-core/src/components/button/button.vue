@@ -4,8 +4,8 @@ import { useThemeStore } from '../../store/theme'
 import { useRipple } from '../../composables/use-ripple'
 
 export interface ButtonProps {
-  /** 语义类型：primary / success / warning / danger / danger-outline / default（默认） */
-  type?: 'primary' | 'success' | 'warning' | 'danger' | 'danger-outline' | 'default'
+  /** 语义类型：primary / success / warning / danger / danger-outline / outline（中性描边）/ default（默认） */
+  type?: 'primary' | 'success' | 'warning' | 'danger' | 'danger-outline' | 'outline' | 'default'
   /** 尺寸：small / medium（默认）/ large */
   size?: 'small' | 'medium' | 'large'
   /** 是否禁用；禁用时按钮不可点击且不触发 click */
@@ -14,6 +14,8 @@ export interface ButtonProps {
   loading?: boolean
   /** 是否块级展示，占满父容器整行宽度 */
   block?: boolean
+  /** 是否全圆角（pill）形态，默认 false；优先级高于全局 componentsShape 的 square 修饰 */
+  pill?: boolean
 }
 
 export interface ButtonEmits {
@@ -27,6 +29,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   disabled: false,
   loading: false,
   block: false,
+  pill: false,
 })
 
 const emit = defineEmits<ButtonEmits>()
@@ -60,7 +63,7 @@ function handleClick(event: MouseEvent) {
       `uikit-button--${props.type}`,
       `uikit-button--${props.size}`,
       shapeClass,
-      { 'uikit-button--block': props.block, 'uikit-button--loading': props.loading },
+      { 'uikit-button--block': props.block, 'uikit-button--loading': props.loading, 'uikit-button--pill': props.pill },
     ]"
     :disabled="props.disabled || props.loading"
     @click="handleClick"
@@ -95,6 +98,12 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--square {
   border-radius: 4px;
+}
+
+/* pill 全圆角：优先级高于全局 square 修饰与 components-radius 覆写 */
+.uikit-button--pill,
+[data-uikit-components-radius='4px'] .uikit-button--pill {
+  border-radius: 9999px;
 }
 
 /* 当全局为 square 时，保持按钮的 square 样式 */
@@ -141,6 +150,13 @@ function handleClick(event: MouseEvent) {
   color: var(--uikit-danger-color);
 }
 
+/* outline 中性描边：白底 + 边框 + 主文字色（设计稿次按钮 Action2 形态） */
+.uikit-button--outline {
+  background-color: var(--uikit-bg-base);
+  color: var(--uikit-text-primary);
+  border: 1px solid var(--uikit-border-color);
+}
+
 @media (hover: hover) {
   .uikit-button--danger-outline:hover {
     background-color: rgba(var(--uikit-danger-rgb), 0.08);
@@ -161,6 +177,10 @@ function handleClick(event: MouseEvent) {
     /* bg-secondary 与 --uikit-bg-hover 色值过近（#F3F4F6/#F5F5F5）反馈不可见，
        改用 color-mix 派生（混入文字色：浅主题变暗、深主题变亮），与 Switch 派生模式一致 */
     background-color: color-mix(in srgb, var(--uikit-bg-secondary) 90%, var(--uikit-text-primary));
+  }
+
+  .uikit-button--outline:hover:not(:disabled) {
+    background-color: var(--uikit-bg-hover);
   }
 
   .uikit-button--primary:hover:not(:disabled) {
@@ -201,6 +221,7 @@ function handleClick(event: MouseEvent) {
 
 /* 浅色背景按钮上的 loading 使用深色轨迹 */
 .uikit-button--default .uikit-button__loading,
+.uikit-button--outline .uikit-button__loading,
 .uikit-button--danger-outline .uikit-button__loading {
   border-color: rgba(0, 0, 0, 0.1);
   border-top-color: var(--uikit-text-primary);

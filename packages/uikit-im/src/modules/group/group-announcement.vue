@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
 import { EmIcon as Icon } from '@easemob/uikit-core'
 import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { EmModal as Modal } from '@easemob/uikit-core'
 import { useLocale } from '@easemob/uikit-core'
 import { useToast } from '@easemob/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
@@ -32,7 +33,7 @@ const { show: showToast } = useToast()
 const { stores } = useUIKit()
 const { getGroupAnnouncement, updateGroupAnnouncement, getGroupMembers } = useGroup()
 
-const isEditing = ref(false)
+const editModalShow = ref(false)
 const announcementInputRef = ref<HTMLTextAreaElement>()
 const announcementInput = ref('')
 const saving = ref(false)
@@ -84,20 +85,28 @@ useResizeObserver(contentRef, measureOverflow)
 watch(
   () => announcement.value,
   (val) => {
-    if (!isEditing.value)
+    if (!editModalShow.value)
       announcementInput.value = val || ''
   },
   { immediate: true },
 )
 
-watch(isEditing, async (editing) => {
-  if (editing) {
+// 公告编辑弹窗打开后自动聚焦输入框
+watch(editModalShow, async (show) => {
+  if (show) {
     await nextTick()
     announcementInputRef.value?.focus()
   }
 })
 
+function startEdit() {
+  announcementInput.value = announcement.value || ''
+  editModalShow.value = true
+}
+
 async function save() {
+  if (saving.value)
+    return
   if (announcementInput.value.length > GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH) {
     showToast(t('chat.info.groupAnnouncementTooLong').replace('{max}', String(GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH)), 'error')
     return
@@ -105,7 +114,7 @@ async function save() {
   saving.value = true
   try {
     await updateGroupAnnouncement(props.groupId, announcementInput.value)
-    isEditing.value = false
+    editModalShow.value = false
     emit('updated', announcementInput.value)
     // 发布方本地插入灰色通知：SDK 的 onAnnouncementChanged 事件不回推操作者本人，
     // 需自行插入，与接收方文案保持一致（带最新公告内容）
@@ -125,7 +134,7 @@ async function save() {
 }
 
 function cancel() {
-  isEditing.value = false
+  editModalShow.value = false
   announcementInput.value = announcement.value || ''
 }
 </script>
@@ -138,69 +147,58 @@ function cancel() {
         <span>{{ t('chat.info.groupAnnouncement') }}</span>
       </div>
       <IconButton
-        v-if="isAdminOrOwner && !isEditing"
+        v-if="isAdminOrOwner"
         icon="rect/pencil"
         size="small"
         type="primary"
         :title="t('chat.info.edit', '编辑')"
-        @click="isEditing = true"
+        @click="startEdit"
       />
     </div>
     <div class="group-announcement__section">
-      <template v-if="!isEditing">
-        <div
-          ref="contentRef"
-          class="group-announcement__content"
-          :class="{ 'is-collapsed': collapsed }"
-        >
-          <span v-if="loading" class="group-announcement__placeholder">{{ t('common.loading') }}</span>
-          <span v-else-if="announcement">{{ announcement }}</span>
-          <span v-else class="group-announcement__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
-        </div>
-        <button
-          v-if="canExpand && announcement"
-          class="group-announcement__toggle"
-          :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
-          @click="collapsed = !collapsed"
-        >
-          <Icon :name="collapsed ? 'chevron/down' : 'chevron/up'" :size="14" />
-        </button>
-      </template>
-      <div v-else class="group-announcement__edit">
-        <textarea
-          ref="announcementInputRef"
-          v-model="announcementInput"
-          class="group-announcement__textarea"
-          :placeholder="t('chat.info.groupAnnouncementPlaceholder')"
-          rows="3"
-          :maxlength="GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH"
-        />
-        <div
-          class="group-announcement__char-count"
-          :class="{ 'is-near-limit': announcementInput.length > GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH * 0.9 }"
-        >
-          {{ formatCharCount(announcementInput.length, GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH) }}
-        </div>
-        <div class="group-announcement__edit-actions">
-          <IconButton
-            icon="xmark/bold"
-            size="small"
-            type="danger"
-            :title="t('button.cancel', '取消')"
-            @click="cancel"
-          />
-          <IconButton
-            class="group-announcement__save"
-            icon="check/single"
-            size="small"
-            type="success"
-            :disabled="saving"
-            :title="t('chat.info.save', '保存')"
-            @click="save"
-          />
-        </div>
+      <div
+        ref="contentRef"
+        class="group-announcement__content"
+        :class="{ 'is-collapsed': collapsed }"
+      >
+        <span v-if="loading" class="group-announcement__placeholder">{{ t('common.loading') }}</span>
+        <span v-else-if="announcement">{{ announcement }}</span>
+        <span v-else class="group-announcement__placeholder">{{ t('chat.info.groupAnnouncementPlaceholder') }}</span>
       </div>
+      <button
+        v-if="canExpand && announcement"
+        class="group-announcement__toggle"
+        :title="collapsed ? (t('chat.announcementBanner.expand', '展开')) : (t('chat.announcementBanner.collapse', '收起'))"
+        @click="collapsed = !collapsed"
+      >
+        <Icon :name="collapsed ? 'chevron/down' : 'chevron/up'" :size="14" />
+      </button>
     </div>
+
+    <!-- 公告编辑弹窗（行内编辑已移除，统一 modal 编辑，与抽屉字段编辑 modal 同范式） -->
+    <Modal
+      v-model:show="editModalShow"
+      :title="t('chat.info.groupAnnouncement')"
+      :confirm-text="t('chat.info.save', '保存')"
+      :cancel-text="t('button.cancel', '取消')"
+      @confirm="save"
+      @cancel="cancel"
+    >
+      <textarea
+        ref="announcementInputRef"
+        v-model="announcementInput"
+        class="group-announcement__textarea"
+        :placeholder="t('chat.info.groupAnnouncementPlaceholder')"
+        rows="3"
+        :maxlength="GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH"
+      />
+      <div
+        class="group-announcement__char-count"
+        :class="{ 'is-near-limit': announcementInput.length > GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH * 0.9 }"
+      >
+        {{ formatCharCount(announcementInput.length, GROUP_INFO_LIMIT.ANNOUNCEMENT_MAX_LENGTH) }}
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -277,12 +275,6 @@ function cancel() {
   color: var(--uikit-text-secondary);
 }
 
-.group-announcement__edit {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .group-announcement__textarea {
   width: 100%;
   padding: 8px 10px;
@@ -299,13 +291,6 @@ function cancel() {
 
 .group-announcement__textarea:focus {
   border-color: var(--uikit-primary-color);
-}
-
-.group-announcement__edit-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
 }
 
 .group-announcement__char-count {

@@ -91,7 +91,7 @@ watch(
   <Modal
     :show="props.show"
     :title="t('conversation.newChat', '新会话')"
-    :width="360"
+    :width="480"
     :show-footer="false"
     body-flush
     @update:show="emit('update:show', $event)"

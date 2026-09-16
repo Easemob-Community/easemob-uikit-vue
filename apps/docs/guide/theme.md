@@ -75,6 +75,8 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 - `--uikit-components-radius`：组件圆角（默认 8px）
 - `--uikit-components-radius-hover`：hover 圆角（默认 14px）
 - `--uikit-popup-padding`：弹出层内边距（默认 4px，hover/展开态 8px），用于 Popup / 菜单 / 表情面板等浮层内容与边界的留白
+- `--uikit-item-hover-radius` / `--uikit-item-active-radius`：列表项 hover / 选中态圆角（随 `hoverStyle` 联动，`square` 档归零为 0px，core 2.4.0 新增）
+- `--uikit-item-hover-margin-x` / `--uikit-item-hover-padding-x`：`hoverStyle: 'rounded'` 卡片式缩进的左右外边距与内容内边距（`default` / `square` 档为 `0px` / `16px`，core 2.4.0 新增）
 
 ### 阴影
 
@@ -172,6 +174,11 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）
 - `--uikit-switch-off-bg`：Switch 关闭态轨道色（默认 `#C9CDCF`，暗色 `#4B5563`）；hover 态由 `--uikit-switch-off-hover-bg`（`color-mix` 派生）自动跟随
 - `--uikit-switch-track-w` / `--uikit-switch-track-h`：Switch medium 轨道宽高（默认 `36px` / `20px`）；`--uikit-switch-small-track-w` / `--uikit-switch-small-track-h` 为 small 档（默认 `28px` / `16px`），手柄尺寸由轨道高自动派生，覆盖即可全局自定义开关宽高
+- `--uikit-drawer-close-color`：会话详情抽屉头部图标色（关闭 / 返回 / 上传，默认 `#000000`，暗色 `--uikit-text-primary`）
+- `--uikit-drawer-action-btn-color`：会话详情抽屉底部胶囊按钮文字色（默认 `#000000`，暗色 `--uikit-text-primary`）
+- `--uikit-drawer-field-action-color`：抽屉字段编辑按钮弱化图标色（默认 `#C9CDCF`，暗色 `--uikit-icon-muted`）
+- `--uikit-member-name-color`：群成员名颜色（默认 `#000000`，暗色 `--uikit-text-primary`）
+- `--uikit-member-tag-muted-color` / `--uikit-member-tag-blocked-color`：群成员状态标签色（禁言默认 `#A9AEB2` 明暗通用；拉黑默认 `#484D51`，暗色 `--uikit-text-secondary`），同系 12% 底色由 `color-mix` 派生
 
 ## 主题演练场
 
@@ -276,6 +283,7 @@ const {
   setAnimationLevel,
   setFontSize,
   setFontSizeScale,
+  setDensity,
   setBubbleBg,
   setChatBg,
   setInputBg,
@@ -304,7 +312,9 @@ setComponentsShape('square')
 
 // 容器间距与 hover 风格
 setContainerGap(12)
-setHoverStyle('lift') // 'none' | 'light' | 'lift'
+// 列表项 hover 风格：'default' 整行高亮（8px 圆角，无缩进）/
+// 'rounded' 卡片式（8px 圆角 + 左右 8px 缩进）/'square' 直角整行高亮
+setHoverStyle('rounded') // 'default' | 'rounded' | 'square'
 
 // 字号：标准 / 大 / 特大（适老版）
 setFontSize('xlarge')
@@ -345,7 +355,7 @@ UIKit 内置 3 套预设主题档位，`setPreset()` 一键切换整套风格（
 | 预设 | 主色相 | 圆角 | 间距 | 密度 | hover |
 | --- | --- | --- | --- | --- | --- |
 | `default` | 203（品牌蓝） | ground 圆角 | 8px | normal | default |
-| `business` | 217（深蓝商务） | square 直角 | 4px | compact | default |
+| `business` | 217（深蓝商务） | square 直角 | 4px | compact | square |
 | `fresh` | 150（清新绿） | ground 圆角 | 12px | comfortable | rounded |
 
 ```ts

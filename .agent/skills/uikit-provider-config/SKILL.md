@@ -59,8 +59,10 @@ theme?: {
 
 ### 1.4 功能开关 enable 类开关（withDefaults 默认值）
 
-- `enableContact: false` / `enableBlocklist: false` / `enablePresence: false` — 默认关闭
-  - presence 是全链路默认关闭：`usePresence` composable 层有开关硬门（关闭时 subscribe/fetch/publish/watch 全 no-op）；adapter 独立运行（websdk5/webim4 `getDefaultFeatures()`）的 `enablePresence` 默认同样为 `false`（1.1.0 起），仅 Provider 显式开启才启用。
+- `enableContact: true` / `enableBlocklist: true` / `enablePresence: true` — 默认开启（3.x 起；presence 订阅
+  有额外查询/订阅请求，私有化或低频场景显式 `:enable-presence="false"`）
+  - presence 全链路默认开启：`usePresence` composable 层的开关硬门仍保留（显式关闭时 subscribe/fetch/publish/watch
+    全 no-op）；adapter 独立运行（websdk5/webim4 `getDefaultFeatures()`）的 `enablePresence` 默认同步为 `true`。
 - `enableGroup: true` / `enableUserInfo: true` / `enableUserInfoSubscription: true` — 默认开启
 - `enableDraft: true` / `enableAtMe: true` / `enableTyping: true` — 默认开启
 - `contactFetchMode: 'page'`（'page' 实际按全量返回处理；'all' 一次性全量拉取）
@@ -91,14 +93,13 @@ theme?: {
 - `useUIKitProvider` 收到 computed 后，用 `Object.defineProperty` 给 `ctx.features` 每个 key 挂
   **getter 惰性解析**（`{ ...defaultFeatures, ...options.features.value }`），每次读取都是最新值；
 - 因此**运行时切换 enableContact / enablePresence 等 prop 即刻生效**，初始化行为不变；
-- `defaultFeatures` 完整值（`composables/use-uikit.ts`）：`enableContact/enableBlocklist true`、
-  `enablePresence false`、`presenceStrangerMode 'none'`、`fetchGroupMemberPresenceOnVisible true`、
+- `defaultFeatures` 完整值（`composables/use-uikit.ts`）：`enableContact/enableBlocklist/enablePresence true`、
+  `presenceStrangerMode 'none'`、`fetchGroupMemberPresenceOnVisible true`、
   `contactFetchMode 'page'`、`enableGroup/enableUserInfo/enableUserInfoSubscription true`、
   `enableInvitePersistence true`、`enableDraft/enableAtMe/enableTyping true`。
 
-注意：Provider `withDefaults` 与 `defaultFeatures` 的值**故意不一致**（如 enableContact：
-Provider 默认 `false` 保守，defaultFeatures 默认 `true` 供直接 `useUIKitProvider` 且未显式传参时
-兜底）。Provider 传入的 computed 始终覆盖 defaultFeatures，实际生效以 Provider props 为准。
+注意：3.x 起 Provider `withDefaults` 与 `defaultFeatures` 已对齐（历史版本曾故意不一致——Provider
+默认保守关闭好友/黑名单/在线状态，`defaultFeatures` 默认开启兜底直接 `useUIKitProvider` 未传参场景）。
 
 ## 3. dataSource：薄别名 → repository 注入（D122 风险 10 收口，2026-08-31）
 

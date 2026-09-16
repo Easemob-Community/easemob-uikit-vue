@@ -467,8 +467,14 @@ watch(
   margin-bottom: 0;
 }
 
+/* 行尾选择框右缘到分割线之间预留字母索引条通道（40px），
+   索引条居中于通道内（right: 11px ≈ (40-18)/2），与选择框、分割线两侧都留出间距 */
 .create-group-modal__left :deep(.contact-item-default) {
-  padding-right: 32px;
+  padding-right: 40px;
+}
+
+.create-group-modal__left :deep(.contact-alphabet-nav) {
+  right: 11px;
 }
 
 /* 行间发丝线左内收：从名字起点开始（避开头像列），与设计稿一致 */

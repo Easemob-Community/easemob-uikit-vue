@@ -306,15 +306,18 @@
 
 ## 已知漂移（改到相关文件时注意）
 
-- sidebar 组件数量（基础 10 / 反馈 8 / 数据展示 4 / 业务模块 8）与首页 features
-  「18 个原子组件」是静态文案，随组件增减同步更新；message-list 属业务模块
+- sidebar 组件数量（基础 15 / 反馈 8 / 数据展示 4 / 业务模块 10）与首页 features
+  「30+ 组件页」是静态文案，随组件增减同步更新；message-list 属业务模块
   （非原子组件），登记时不影响 features 数字。
-- gen-api-docs.mjs 白名单已覆盖原子组件（COMPONENTS）与业务容器（MODULES）；
-  chat-container / conversation-container / group-container / message-list 的
-  API 段落由生成器维护（`@include`），改动容器 props 后重跑 gen:api 即可，不再手写。
-  未接入的容器（contact-container / address-book-container / add-contact-modal /
-  create-group-modal）仍是手写段落；注意 contact-container.md 描述的是尚未实现的
-  EmContactContainer（通讯录聚合容器），不要错接 contact-list.vue 生成。
+- gen-api-docs.mjs 白名单已覆盖原子组件（COMPONENTS 27）与业务模块/容器（MODULES
+  22 / CONTAINERS 4）；chat-container / conversation-container / group-container /
+  message-list / group-management / block-list 等页面的 API 段落由生成器维护
+  （`@include`），改动 props 后重跑 gen:api 即可，不再手写（模块组件的手写注记
+  如「实际回传 { userId }」保留为 prose，不随表转换丢失）。仍是手写 API 的：
+  add-contact-modal / create-group-modal（JSDoc 完好的 detail/notice-list 段已转
+  gen）与 contact-container 聚合容器（成员多无 JSDoc，gen 说明列会大片空白，
+  且废弃别名说明依赖 @deprecated 语义，gen 会丢）——contact-container.vue 已存在，
+  描述的就是它，不要错接 contact-list.vue 生成。
 - 文档站 alias 没有 `@easemob/uikit-im/theme` 子路径（与 demo 应用不同），demo 里
   不要 import theme 子路径。
 

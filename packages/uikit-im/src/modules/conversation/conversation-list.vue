@@ -65,7 +65,8 @@ interface ConversationListProps {
   bodySticky?: boolean
   /** #footer slot 是否固定不随列表滚动，默认 false */
   footerSticky?: boolean
-  /** 是否启用下拉刷新（H5），默认 false */
+  /** 是否启用下拉刷新（H5）。true 强制开启；false 或未配置时回落 Provider h5.pullRefresh
+   *（默认 'auto'：触屏设备自动开启，见 core useH5Adaptation） */
   pullRefresh?: boolean
   /** 是否展示单聊头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
   enablePresence?: boolean

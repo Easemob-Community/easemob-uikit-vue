@@ -111,7 +111,10 @@ const slotScope = computed<ConversationTabsSlotScope>(() => ({
 }
 
 .conversation-tabs__tab {
-  flex-shrink: 0;
+  /* 等分容器剩余空间，面板拉宽时各 tab 等比例自动撑满；
+     min-width 兜底保证不被压缩到小于文字宽度，超窄时维持横向滚动 */
+  flex: 1 1 0;
+  min-width: fit-content;
   padding: 5px 14px;
   font-size: var(--uikit-font-size-13);
   line-height: 1.4;

@@ -12,7 +12,8 @@ export function useOwnUserInfo() {
   const base = useCoreOwnUserInfo()
   const { client, stores } = useUIKit()
 
-  const currentUserId = computed(() => client.value.currentUserId)
+  // 同 core 版 useOwnUserInfo：client.currentUserId 无响应式，stores.client.currentUser 作兜底
+  const currentUserId = computed(() => client.value.currentUserId || stores.client.currentUser || '')
   const contact = computed(() => {
     const userId = currentUserId.value
     return userId ? stores.contact.getContact(userId) : undefined

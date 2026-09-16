@@ -14,7 +14,7 @@
 
 ## 语义类型
 
-<demo src="./demo/types.vue" title="语义类型" desc="通过 type 属性切换 primary / success / warning / danger / danger-outline / default 六种语义。" />
+<demo src="./demo/types.vue" title="语义类型" desc="通过 type 属性切换 primary / success / warning / danger / danger-outline / outline / default 七种语义；`pill` 可叠加全圆角形态。" />
 
 ## 尺寸
 

@@ -46,14 +46,14 @@ const adapterLog = createLogger('UIKit:Webim4Adapter')
 
 /**
  * 默认 UIKit 能力开关：adapter 独立运行或未传 features 时使用。
- * presence 默认关闭：在线状态属可选能力，需 Provider 显式 `enablePresence` 才启用，
- * 避免默认全链路订阅/查询带来额外请求。
+ * presence 默认开启（对齐 UIKit Provider 3.x 默认）：在线状态为产品化默认形态；
+ * 注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
  */
 function getDefaultFeatures(): UIKitFeatures {
   return {
     enableContact: true,
     enableBlocklist: true,
-    enablePresence: false,
+    enablePresence: true,
     presenceStrangerMode: 'query-on-visible',
     fetchGroupMemberPresenceOnVisible: true,
     contactFetchMode: 'all',

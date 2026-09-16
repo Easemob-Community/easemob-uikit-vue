@@ -312,6 +312,148 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 2. 组件内通过 `useLocale().t(key)` 读取；
 3. 时间、数字、状态等同样需要通过 locale 配置渲染，确保切换语言后实时刷新。
 
+## SDK 适配器
+
+3.0 起 SDK 层收敛为「中立契约 + 双 adapter」架构：UI 产物不直接依赖某一版 SDK，而是面向 `@easemob/uikit-sdk-contract` 的中立 `SdkAdapter` 接口，由 adapter 包完成与具体 SDK（5.x / 4.x）的对接。
+
+### 两个子路径入口
+
+主入口 `@easemob/uikit-im` 保持零 adapter 静态引用（4.x / 5.x 产物互不含对方符号，摇树隔离）；「默认内置」通过子路径入口的 import 副作用完成注册：
+
+| 入口 | 适配 SDK | 适用场景 |
+| --- | --- | --- |
+| `import '@easemob/uikit-im/websdk5'` | `easemob-websdk` 5.x（公开版默认） | 绝大多数接入方 |
+| `import '@easemob/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`，4.x 私有化） | 私有化部署 |
+
+两个入口都会把对应 adapter 注册为默认适配器（重复 import 以最后一次注册为准并告警），`<EmUIKitProvider>` 不传 `adapter` prop 时由 UIKit 全权管理其生命周期（init / login / logout）。入口同时 re-export adapter 包的全量 API，原先从主入口导入的 SDK 值级符号（3.0 已从主入口移除）改从对应子路径入口导入：
+
+```ts
+// 3.0 起：SDK 值级导出只存在于子路径入口
+import '@easemob/uikit-im/websdk5'
+import { Websdk5Adapter } from '@easemob/uikit-im/websdk5'
+```
+
+### 注入模式（adapter prop）
+
+业务需要全权管理 SDK 连接生命周期时（如 OA 基座统一保管登录态、多应用共享连接），不要 import 子路径入口，改为从 adapter 包取出实例显式传入 `adapter` prop：
+
+```ts
+import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
+
+// 业务持有 adapter 实例，登录 / 登出由业务全权调用
+const adapter = new Webim4Adapter()
+```
+
+```vue
+<template>
+  <EmUIKitProvider :adapter="adapter" app-key="your-app-key">
+    <em-conversation-container />
+  </EmUIKitProvider>
+</template>
+```
+
+注入模式下 **login / logout 归业务全权负责**：`useClient().login()` / `useClient().logout()` 不会转发到 adapter（调用会打告警日志），UIKit 只做 init 接线、事件订阅与自身 store 清理。业务直接调用自己持有的 `adapter.login(user, token)` / `adapter.logout()`。
+
+### 数据入口接管（sdkConfig.repositories）
+
+`dataSource` prop 已收口为 repository 注入的薄别名（装配时逐项翻译，保留至 4.0.0 移除）。新接入推荐直接经 `sdkConfig.repositories` 按域整体接管数据读路径，`message` / `conversation` / `contact` / `group` / `presence` / `userInfo` 六域均可选覆盖，显式 `repositories` 优先于 `dataSource` 翻译结果：
+
+```vue
+<template>
+  <EmUIKitProvider
+    app-key="your-app-key"
+    :sdk-config="{
+      repositories: {
+        conversation: { fetchConversations: myFetchConversations },
+        contact: { fetchContacts: myFetchContacts },
+        userInfo: { fetchUserInfos: myFetchUserInfos },
+      },
+    }"
+  >
+    <em-conversation-container />
+  </EmUIKitProvider>
+</template>
+```
+
+### 旁路持久化（sdkConfig.persistence）
+
+自 `@easemob/uikit-im` 3.2.0（`@easemob/uikit-sdk-contract` 1.1.0 / `@easemob/uikit-core` 2.2.0）起，`sdkConfig.persistence` 提供旁路持久化钩子（`SdkPersistenceHooks`），用于 Electron 本地库（SQLite）等「写路径」落库场景。
+
+**语义**：SDK 行为完全不变，收发 / 状态变更事件发生后旁路把数据同步给本地库，只写不读。所有钩子均为 fire-and-forget——调用方不 await，钩子的同步抛错 / Promise 拒绝只打告警日志，**不阻塞消息收发主链路**；未注入的钩子直接跳过对应同步点。与 `repositories` 的分界：`repositories` 是读路径数据接管（数据源改由注入方提供），`persistence` 是写路径旁路落库，两套接口语义互斥、可同时注入。
+
+钩子按 `message` / `conversation` 两域分组注入，全部可选：
+
+| 域 | 钩子 | 签名 | 触发时机 |
+| --- | --- | --- | --- |
+| message | `saveMessage` | `(record: MessageRecord) => void \| Promise<void>` | 发送成功、收到新消息、漫游逐条回流时逐条触发 |
+| message | `saveMessages` | `(records: MessageRecord[]) => void \| Promise<void>` | 漫游历史大批量回流时批量触发（减少逐条 IPC / 事务开销） |
+| message | `updateMessageStatus` | `(msgId: string, status: MessageStatusValue) => void \| Promise<void>` | 送达 / 单聊已读回执回流时触发（发送成功走 `saveMessage` 落库；群已读数为展示态，不落库） |
+| message | `markMessageRecalled` | `(msgId: string, operatorId?: string) => void \| Promise<void>` | 撤回置墓碑（含本端主动撤回即落库；`operatorId` 为撤回操作者） |
+| message | `updateMessageContent` | `(msgId, body, ext, modifiedInfo?) => void \| Promise<void>` | 消息编辑内容回流（body / ext / 修改信息） |
+| message | `deleteMessages` | `(msgIds: string[]) => void \| Promise<void>` | 删除置墓碑（本地删除 / 多选删除 / 多设备删除场景批量触发） |
+| conversation | `saveConversations` | `(records: ConversationRecord[]) => void \| Promise<void>` | 会话列表刷新 / 单项变更后整体快照同步（含未读数 / 置顶 / 免打扰） |
+
+入库 DTO 已由 contract 的 `toMessageRecord` / `toConversationRecord` 清洗为 JSON 安全纯数据（附件只留 url / secret 等元数据，二进制不入库），可直接经 Electron IPC 序列化。两个 adapter（websdk5 / webim4）消费同一套钩子，触发点对齐；注入 `repositories.message.loadMessages` 后漫游数据来自本地库，不再写回（避免回声）。
+
+Electron + SQLite 最小接入示例（实现细节为示意，请按实际本地库封装调整）：
+
+```ts
+import type { SdkPersistenceHooks } from '@easemob/uikit-sdk-contract'
+
+// 示意：经 IPC 转发到主进程写 SQLite，主进程内部自行排队 / 事务
+const persistence: SdkPersistenceHooks = {
+  message: {
+    // 按 msgServerId upsert；服务端 ID 未回填前可先用 msgLocalId 暂存后合并
+    saveMessage: record => window.imDb.saveMessage(record),
+    saveMessages: records => window.imDb.saveMessages(records),
+    updateMessageStatus: (msgId, status) => window.imDb.updateMessageStatus(msgId, status),
+    // 墓碑：置 recalled = true + tombstoneTime，不物理删除
+    markMessageRecalled: msgId => window.imDb.markRecalled(msgId),
+    updateMessageContent: (msgId, body, ext, modifiedInfo) =>
+      window.imDb.updateContent(msgId, body, ext, modifiedInfo),
+    // 墓碑：置 deleted = true + tombstoneTime，不物理删除
+    deleteMessages: msgIds => window.imDb.markDeleted(msgIds),
+  },
+  conversation: {
+    // 会话快照按 id upsert；diff / 防抖开销由实现方负责
+    saveConversations: records => window.imDb.saveConversations(records),
+  },
+}
+```
+
+```vue
+<template>
+  <EmUIKitProvider
+    app-key="your-app-key"
+    :sdk-config="{ persistence }"
+  >
+    <em-conversation-container />
+  </EmUIKitProvider>
+</template>
+```
+
+注意事项：
+
+- **幂等 upsert 是实现方责任**：重复投递 / 状态回流会重放，`saveMessage` 需按 `msgServerId`（本地未回填期允许 `msgLocalId`）upsert，撤回 / 删除只置墓碑字段（`recalled` / `deleted` + `tombstoneTime`）不物理删行。
+- **钩子异常不影响主链路**：实现方如需保证落库可靠性（IPC 排队、批量、事务），需在钩子内部自行完成。
+- **发送失败不入库**：消息发送失败（标记 failed）的分支不会触发 `saveMessage`；流式消息分片不落库，完整消息经收消息 / 漫游路径落库。
+- **只写不读**：persistence 不提供任何读路径，本地库数据如需回到 UI，请另行经 `repositories` 接管读路径。
+
+### 能力查询（useUIKit().capabilities）
+
+不同 SDK 版本的客观能力差异（合并消息 / 置顶消息 / 流式消息 / 群已读回执）由 adapter 如实上报到 `useUIKit().capabilities`（adapter 未上报时缺省全 `true`），与 features（业务开关）取交集决定能力入口的展示：
+
+```ts
+import { useUIKit } from '@easemob/uikit-im'
+
+const { capabilities } = useUIKit()
+if (capabilities.groupReadReceipt) {
+  // 当前 adapter 背后的 SDK 支持群已读回执
+}
+```
+
+非 Vue 上下文（定时任务、主进程等 provide/inject 覆盖不到的场景）可通过 core 模块级函数 `getUIKitAdapter()`（`@easemob/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
+
 ## H5 与多端适配
 
 移动端场景请阅读 [H5 适配](./h5-adaptation)，覆盖安全区、键盘避让、下拉刷新与手势优化。
@@ -323,3 +465,11 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 - `UIKitProvider` 取代旧的初始化写法，`appKey` 为必填
 - 组件统一 `Em` 前缀，旧版非前缀组件名不再注册
 - 主题变量名统一为 `--uikit-*`，旧 `--em-*` 变量已废弃
+
+### 3.0（双 SDK 适配架构）
+
+- **SDK 值级导出迁至子路径入口**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等从主入口移除，迁至 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件补 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入
+- **Provider 新增 `adapter` prop（注入模式）**：业务自带 adapter 实例并全权管理 login / logout，UIKit 不转发连接生命周期（详见上文 [SDK 适配器](#sdk-适配器)）
+- **`sdkConfig.repositories` 数据入口**：六域（message / conversation / contact / group / presence / userInfo）可接管数据读路径，推荐替代 `dataSource` prop（后者已 @deprecated，4.0.0 移除）
+- **`useUIKit().capabilities`**：adapter 上报的 SDK 客观能力矩阵（合并消息 / 置顶消息 / 流式消息 / 群已读回执），与 features 取交集决定能力入口
+- **core `getUIKitAdapter()`**：非 Vue 上下文读取当前适配器实例（Provider 未挂载返回 `null`）

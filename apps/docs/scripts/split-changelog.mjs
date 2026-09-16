@@ -8,10 +8,10 @@
  * 本脚本按包名提取版本段，生成：
  * - .vitepress/gen/changelog-im.md
  * - .vitepress/gen/changelog-core.md
- * - .vitepress/gen/changelog-chatroom.md
  * - .vitepress/gen/changelog-sdk-contract.md
  * - .vitepress/gen/changelog-sdk-websdk5.md
  * - .vitepress/gen/changelog-sdk-webim4.md
+ * （【一期临时】chatroom 条目已注释，恢复时见 OUTPUT_MAP；changelog-chatroom.md 暂不重新生成）
  *
  * 生成的文件由 apps/docs/guide/changelog.md 通过 tabs 引入展示。
  */
@@ -33,7 +33,8 @@ const BARE_SECTION_PKG = '@easemob/uikit-im'
 const OUTPUT_MAP = {
   '@easemob/uikit-im': join(genDir, 'changelog-im.md'),
   '@easemob/uikit-core': join(genDir, 'changelog-core.md'),
-  '@easemob/uikit-chatroom': join(genDir, 'changelog-chatroom.md'),
+  // 【一期临时】下线聊天室文档树，恢复时取消注释
+  // '@easemob/uikit-chatroom': join(genDir, 'changelog-chatroom.md'),
   '@easemob/uikit-sdk-contract': join(genDir, 'changelog-sdk-contract.md'),
   '@easemob/uikit-sdk-websdk5': join(genDir, 'changelog-sdk-websdk5.md'),
   '@easemob/uikit-sdk-webim4': join(genDir, 'changelog-sdk-webim4.md'),

@@ -9,7 +9,8 @@ interface Tab {
 const tabs: Tab[] = [
   { id: 'im', label: '@easemob/uikit-im' },
   { id: 'core', label: '@easemob/uikit-core' },
-  { id: 'chatroom', label: '@easemob/uikit-chatroom' },
+  // 【一期临时】下线聊天室更新日志 tab，恢复时取消注释（需同步恢复 guide/changelog.md 的 #chatroom 插槽）
+  // { id: 'chatroom', label: '@easemob/uikit-chatroom' },
   { id: 'sdk-contract', label: 'sdk-contract' },
   { id: 'sdk-websdk5', label: 'sdk-websdk5' },
   { id: 'sdk-webim4', label: 'sdk-webim4' },

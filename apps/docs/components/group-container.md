@@ -63,6 +63,10 @@ function onGroupClick() {
 
 - `scrollToGroup(key)`：滚动到指定分组
 
+## 相关链接
+
+- [群管理](./group-management)：群管理入口、禁言 / 黑白名单 / 共享文件 / 入群申请、群公告、群成员列表与群详情卡片
+
 <script setup>
 import { groupPlaygroundFiles } from './group-container/demo/playground/template'
 </script>

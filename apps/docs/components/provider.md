@@ -12,12 +12,13 @@
 
 | 能力域 | 相关配置 |
 | --- | --- |
-| 连接与登录 | `appKey`、`sdkConfig`、`autoInit`、`onTokenWillExpire`、`onTokenExpired` |
+| 连接与登录 | `appKey`、`sdkConfig`、`autoInit`、`adapter`（注入模式）、`onTokenWillExpire`、`onTokenExpired` |
 | 功能开关 | `enableContact`、`contactFetchMode`、`enableBlocklist`、`enablePresence`、`enableGroup`、`enableUserInfo`、`enableUserInfoSubscription`、`enableDraft`、`enableAtMe`、`enableTyping`、`filterBlockedContacts`、`enableToast` |
 | 主题 | `theme`（模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色） |
 | 国际化 | `locale`（zh-CN / en） |
 | 动画与 H5 | `animation`（开关 / 强度 / 波纹）、`h5`（安全区 / 键盘 / 下拉刷新） |
-| 数据源接管 | `dataSource`（联系人 / 黑名单 / 群组 / 在线状态 / 用户资料 / 搜索 / 加好友 / 建群） |
+| 数据源接管 | `dataSource`（薄别名，4.0.0 移除）、`sdkConfig.repositories`（推荐，六域数据入口） |
+| 能力查询 | `useUIKit().capabilities`（SDK 客观能力矩阵） |
 | 通知 | `notification`（页内弹窗 / 浏览器通知 / 触发模式 / 权限）、`noticeConfig`（系统通知文案与过滤） |
 | 日志 | `logger`（IndexedDB 落库 / SDK 日志收集 / 级别 / 保留策略） |
 
@@ -93,6 +94,63 @@ const dataSource = {
   <EmChatContainer />
 </EmUIKitProvider>
 ```
+
+### SDK 适配器注入（adapter）
+
+Provider 需要一个 SDK 适配器（`SdkAdapter`，对接具体版本的环信 SDK）才能工作，两种装配方式二选一：
+
+- **内置模式（默认，推荐）**：入口文件 `import '@easemob/uikit-im/websdk5'`（4.x 私有化用 `@easemob/uikit-im/webim4`），import 副作用把对应 adapter 注册为默认适配器，Provider 不传 `adapter` 时自动使用，UIKit 全权管理连接生命周期（init / login / logout）
+- **注入模式**：业务从 adapter 包取出实例显式传入 `adapter` prop，连接生命周期（login / logout）归业务全权负责——`useClient().login()` / `useClient().logout()` 不会转发到 adapter，业务直接调用自己持有的 `adapter.login(user, token)` / `adapter.logout()`
+
+```ts
+import { Websdk5Adapter } from '@easemob/uikit-sdk-websdk5'
+
+const adapter = new Websdk5Adapter()
+// 业务侧自行登录：await adapter.login(userId, token)
+```
+
+```vue
+<EmUIKitProvider :adapter="adapter" app-key="your-app-key">
+  <EmChatContainer />
+</EmUIKitProvider>
+```
+
+### 数据入口接管（sdkConfig.repositories）
+
+`dataSource` prop 已收口为 repository 注入的薄别名（装配时逐项翻译，保留至 4.0.0 移除）。新接入推荐经 `sdkConfig.repositories` 按域整体接管数据读路径——`message` / `conversation` / `contact` / `group` / `presence` / `userInfo` 六域均为可选的部分方法覆盖，显式 `repositories` 优先于 `dataSource` 翻译结果：
+
+```vue
+<EmUIKitProvider
+  app-key="your-app-key"
+  :sdk-config="{
+    repositories: {
+      conversation: { fetchConversations: myFetchConversations },
+      contact: { fetchContacts: myFetchContacts, fetchBlocklist: myFetchBlocklist },
+      userInfo: { fetchUserInfos: myFetchUserInfos },
+    },
+  }"
+>
+  <EmChatContainer />
+</EmUIKitProvider>
+```
+
+写路径旁路落库（Electron 本地库 SQLite 场景）另见 `sdkConfig.persistence` 钩子，详见 [进阶指南 - 旁路持久化](../guide/advanced#旁路持久化sdkconfigpersistence)。
+
+### 能力查询（capabilities）
+
+不同 SDK 版本的能力差异由 adapter 如实上报到 `useUIKit().capabilities`（`combineMessage` / `pinnedMessage` / `streamingMessage` / `groupReadReceipt` 四个能力位，adapter 未上报时缺省全 `true`），与 features（业务开关）取交集决定能力入口的展示：
+
+```ts
+import { useUIKit } from '@easemob/uikit-im'
+
+const { capabilities } = useUIKit()
+
+if (capabilities.combineMessage) {
+  // 当前 adapter 背后的 SDK 支持合并消息，可展示合并转发入口
+}
+```
+
+非 Vue 上下文（定时任务、主进程等）可用 core 的模块级 `getUIKitAdapter()`（`@easemob/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
 
 ### 通知与日志
 

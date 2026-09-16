@@ -304,7 +304,10 @@ export interface ChatConfig {
     }
     /** 是否启用输入状态提示（对方正在输入...），默认 true */
     enableTyping?: boolean
-    /** 是否显示发送按钮，默认 true */
+    /** 是否显示发送按钮。显式 true/false 优先；未配置（undefined）时按端型取默认：
+     * PC 隐藏（回车发送，对齐桌面 IM 形态），移动端显示（触屏无回车键）。
+     * Whether to show the send button. Explicit true/false wins; when unset,
+     * defaults by device type — hidden on PC (Enter to send), shown on mobile. */
     showSendButton?: boolean
     /** 是否允许拖拽调整输入区高度（仅 PC，手柄在输入卡片上缘；simple 模式默认高 132px），默认 true / Whether the input area height can be resized by dragging (PC only), default true */
     resizable?: boolean

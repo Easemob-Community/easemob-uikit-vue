@@ -12,7 +12,7 @@ UIKit 基于 **Pinia** 管理全局状态：所有组件（会话列表、聊天
 
 | Store | 职责 | 核心 state | 常用读取 |
 | --- | --- | --- | --- |
-| `useClientStore` | SDK 连接与登录态 | `client` / `connected` / `connecting` / `currentUser` / `appKey` | `isLoggedIn`（computed） |
+| `useClientStore` | SDK 连接与登录态 | `client` / `connected` / `connecting` / `kicked` / `kickCode` / `currentUser` / `appKey` | `isLoggedIn`（computed） |
 | `useConversationStore` | 会话列表与当前会话 | `conversationList` / `currentConversationId` / `atMeMap` / `typingMap` | `currentConversation` / `sortedConversationList` |
 | `useMessageStore` | 消息列表与发送状态 | `messageMap`（会话 ID → `UiMessage[]`）/ `pinnedMessageMap` / `atMeMessageMap` | 按会话读消息数组 |
 | `useContactStore` | 联系人 / 黑名单 / 邀请 | `contactList` / `blackList` / `inviteList` / `selectedIds` | `contactCount` |
@@ -37,6 +37,10 @@ import { useClientStore } from '@easemob/uikit-im'
 const { connected, currentUser, isLoggedIn, setCurrentUser } = useClientStore()
 ```
 
+- `kicked`：账号被踢 / 失效终态标记（多端互踢 206 / 注销 207 / 设备超限 214 / 改密 216 / 被踢 217，见 `@easemob/uikit-sdk-contract` 的 `KICK_ERROR_CODE`）。此类断开 SDK 不再自动重连，UI 应展示被踢文案而非网络异常；重新连接成功（`onConnected`）或 `clearClient()` 时清除。
+- `kickCode`：被踢的 SDK 错误码，用于差异化文案（会话列表状态横幅按错误码区分展示）。
+- `setKicked(code?)`：标记账号被踢（连接事件层在 `onDisconnected` 按错误码调用，业务侧一般无需手动触发）。
+
 ### useConversationStore（会话）
 
 ```ts
@@ -60,6 +64,31 @@ store.addMessage(msg)                      // 追加一条消息
 store.updateMessageStatus(msgId, 'read')   // 更新消息状态
 store.markFailed(localId, reason)          // 发送失败标记
 ```
+
+- `setOptions({ maxMessageCount, maxCachedConversations })`：配置缓存上限。
+  `maxMessageCount`（默认 300）限制单个会话保留的最大消息数；`maxCachedConversations`
+  是 opt-in 的会话缓存上限——超过后按 LRU 从最旧的会话开始整体淘汰内存消息
+  （会跳过当前正在查看的会话），低内存场景（如 Electron 嵌入）可用它兜底，
+  默认 `undefined` = 不淘汰。
+
+### useSyncStatus（数据同步状态）
+
+来自 `@easemob/uikit-core` 的 composable（经 `@easemob/uikit-im` 重导出），观察登录后
+conversation / contact / group 三类数据的自动同步进度（由 SDK 的 `onSyncDataStart` /
+`onSyncDataFinished` 事件驱动，登出时自动重置）：
+
+```ts
+import { useSyncStatus } from '@easemob/uikit-im'
+
+const { status, isSyncing, allFinished } = useSyncStatus()
+status.value.conversation.status // 'idle' | 'syncing' | 'success' | 'failed'
+isSyncing.value                  // 任一类数据仍在同步中
+allFinished.value                // 三类均已终结（success 或 failed）
+```
+
+- `status`：按数据类型的同步状态 `{ status, finishedAt?, error? }`，终结态会附带
+  `finishedAt` 时间戳，失败时附 `error`（含 `stage` / `retryable` / `message`）。
+- 消息（离线漫游）同步不在这里跟踪，走 `useMessageStore().isSyncingMessages`。
 
 ### useContactStore / useGroupStore / usePresenceStore（通讯录 / 群 / 在线状态）
 

@@ -248,6 +248,19 @@
   --uikit-switch-track-h: 20px;
   --uikit-switch-small-track-w: 28px;
   --uikit-switch-small-track-h: 16px;
+
+  /* 语义 token：会话详情抽屉 - 头部图标（关闭/返回/上传）默认纯黑（设计稿），暗色覆写为主文字色 */
+  --uikit-drawer-close-color: #000000;
+  /* 语义 token：会话详情抽屉 - 底部胶囊按钮文字色（默认黑，暗色覆写为主文字色） */
+  --uikit-drawer-action-btn-color: #000000;
+  /* 语义 token：抽屉字段编辑按钮弱化图标色（设计稿 #C9CDCF） */
+  --uikit-drawer-field-action-color: #C9CDCF;
+
+  /* 语义 token：群成员名（群组场景主文案，设计稿纯黑；暗色覆写为主文字色） */
+  --uikit-member-name-color: #000000;
+  /* 语义 token：群成员状态标签（禁言/拉黑，设计稿灰系；12% 底色由 color-mix 实时派生） */
+  --uikit-member-tag-muted-color: #A9AEB2;
+  --uikit-member-tag-blocked-color: #484D51;
 }
 
 [data-uikit-theme="dark"] {
@@ -322,6 +335,14 @@
 
   /* 语义 token：Switch 关闭态轨道色 - 暗色 */
   --uikit-switch-off-bg: #4B5563;
+
+  /* 会话详情抽屉图标/按钮文字、群成员名与状态标签 - 暗色（跟随文字色 token 保证可读） */
+  --uikit-drawer-close-color: var(--uikit-text-primary);
+  --uikit-drawer-action-btn-color: var(--uikit-text-primary);
+  --uikit-drawer-field-action-color: var(--uikit-icon-muted);
+  --uikit-member-name-color: var(--uikit-text-primary);
+  /* 禁言灰 #A9AEB2 在暗底上对比足够，不覆写；拉黑深灰提亮为次级文字色 */
+  --uikit-member-tag-blocked-color: var(--uikit-text-secondary);
 
   /* 语义色 RGB（用于 rgba() 半透明背景） */
   --uikit-success-rgb: 22, 163, 74;

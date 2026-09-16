@@ -17,6 +17,9 @@ export default defineConfig({
   // icons.md 引用了 packages/uikit-im 下的仓内文件（docs/UI_CONVENTIONS.md 等），属于仓库内文档链接，跳过校验
   ignoreDeadLinks: [/packages\/uikit/],
 
+  // 【一期临时】下线聊天室文档树：页面不参与构建（恢复时删除本行 + 取消下方 chatroom locale 注释）
+  srcExclude: ['chatroom/**'],
+
   head: [
     ['link', { rel: 'icon', href: '/favicon.png', type: 'image/png' }],
   ],
@@ -34,6 +37,8 @@ export default defineConfig({
    * - root      → 单群聊 UIKit（@easemob/uikit-im）文档（既有文档，URL 无前缀）
    * - chatroom  → 聊天室 UIKit（@easemob/uikit-chatroom）文档（URL 前缀 /chatroom/，
    *               指南 + 组件页 + 自动生成 API 表格，1.0.0 起完整落地）
+   *               ⚠️ 一期临时下线（2026-09-15）：chatroom locale 与 chatroom/**
+   *               页面均已注释/排除，恢复时取消下方注释并删除 srcExclude。
    *
    * 顶部标题旁的自定义切换器（.vitepress/theme/components/UiKitDocsSwitcher.vue）负责两树切换；
    * 桌面端默认的「语言」下拉已隐藏（theme/style.css），移动端菜单内的切换入口保留。
@@ -78,13 +83,6 @@ export default defineConfig({
               ],
             },
             {
-              text: 'Demo 规划',
-              items: [
-                { text: 'Demo 第一期规划', link: '/guide/demo-phase1-plan' },
-                { text: 'Demo 第二期规划（演练场）', link: '/guide/demo-phase2-plan' },
-              ],
-            },
-            {
               text: '更新日志',
               items: [
                 { text: '查看更新日志', link: '/guide/changelog' },
@@ -104,6 +102,8 @@ export default defineConfig({
                 { text: 'Avatar 头像', link: '/components/avatar' },
                 { text: 'Badge 徽标', link: '/components/badge' },
                 { text: 'Cell 单元格', link: '/components/cell' },
+                { text: 'Checkbox 多选指示', link: '/components/checkbox' },
+                { text: 'CopyableText 可复制文本', link: '/components/copyable-text' },
                 { text: 'Empty 空状态', link: '/components/empty' },
                 { text: 'Input 输入框', link: '/components/input' },
                 { text: 'IconButton 图标按钮', link: '/components/icon-button' },
@@ -111,6 +111,7 @@ export default defineConfig({
                 { text: 'Skeleton 骨架屏', link: '/components/skeleton' },
                 { text: 'Switch 开关', link: '/components/switch' },
                 { text: 'Resizable 拖拽尺寸', link: '/components/resizable' },
+                { text: 'Text 排版文本', link: '/components/text' },
               ],
             },
             {
@@ -147,6 +148,8 @@ export default defineConfig({
                 { text: '通讯录模块', link: '/components/contact-container' },
                 { text: '地址簿容器', link: '/components/address-book-container' },
                 { text: '群组模块', link: '/components/group-container' },
+                { text: '群管理模块', link: '/components/group-management' },
+                { text: '黑名单模块', link: '/components/block-list' },
                 { text: '添加联系人弹窗', link: '/components/add-contact-modal' },
                 { text: '创建群组弹窗', link: '/components/create-group-modal' },
               ],
@@ -156,6 +159,11 @@ export default defineConfig({
       },
     },
 
+    /*
+     * 【一期临时下线聊天室文档树】恢复时取消注释即可（配套：删除顶部 srcExclude、
+     * 恢复 UiKitDocsSwitcher 选项 / changelog 页 chatroom tab / split-changelog 映射）
+     */
+    /*
     chatroom: {
       label: '聊天室 UIKit',
       themeConfig: {
@@ -217,6 +225,7 @@ export default defineConfig({
         },
       },
     },
+    */
   },
 
   themeConfig: {

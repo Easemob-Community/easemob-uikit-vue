@@ -1,5 +1,38 @@
 # Changelog
 
+## @easemob/uikit-im 3.6.0 (2026-09-16)
+
+### 变更
+
+- **Provider 能力开关默认对齐产品化形态（行为变更）**：`enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（双 Demo 共识配置下沉）。好友/黑名单/在线状态开箱即用；presence 订阅会带来额外查询/订阅请求，私有化或低频场景请显式 `:enable-presence="false"`。
+- **输入框发送按钮条件默认（行为变更）**：`config.input.showSendButton` 未配置时由「一律显示」改为按端型取默认——PC 隐藏（回车发送，对齐桌面 IM 形态）、移动端显示（触屏无回车键）；显式 true/false 仍优先。此前 PC 上依赖默认发送按钮的接入方需显式 `showSendButton: true`。
+- **会话列表下拉刷新增回落链（能力补齐）**：`EmConversationContainer` 的 `pull-refresh` 未配置（undefined）时回落 Provider `h5.pullRefresh`（默认 `'auto'`：触屏设备自动开启），不再写死 `false`；显式 true/false 仍优先。
+- **ChatContainer 容器风格条件默认（行为变更）**：`variant` 未配置时由一律 `'compact'` 改为按端型取默认——PC `'card'`（圆角卡片壳由容器自绘）、移动端 `'compact'`（平铺全屏形态）；显式传入仍优先。此前 PC 上未传 variant 的接入方视觉会变为卡片壳，如需平铺请显式 `variant="compact"`。
+
+## @easemob/uikit-core 2.7.0 (2026-09-16)
+
+### 变更
+
+- **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，私有化或低频场景显式关闭。
+
+## @easemob/uikit-sdk-websdk5 1.3.0 (2026-09-16)
+
+### 变更
+
+- **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
+
+## @easemob/uikit-sdk-webim4 1.3.0 (2026-09-16)
+
+### 变更
+
+- **同 websdk5 1.3.0**：`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`。
+
+## @easemob/uikit-im 3.5.1 (2026-09-15)
+
+### 变更
+
+- **「新会话」弹窗宽度调宽**：`new-chat-modal` 弹窗宽度由 360px 调整为 480px（PC 端内联 `width`），移动端（<768px）全屏分支不受影响。
+
 ## @easemob/uikit-im 3.5.0 (2026-09-04)
 
 ### 变更

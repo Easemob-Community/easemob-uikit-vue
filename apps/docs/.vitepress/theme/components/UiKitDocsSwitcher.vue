@@ -13,10 +13,12 @@ const { page } = useData()
 
 const options = [
   { key: 'im', label: '单群聊 UIKit', link: '/' },
-  { key: 'chatroom', label: '聊天室 UIKit', link: '/chatroom/' },
+  // 【一期临时】下线聊天室文档树，恢复时取消注释（需同步恢复 config.ts 的 chatroom locale）
+  // { key: 'chatroom', label: '聊天室 UIKit', link: '/chatroom/' },
 ] as const
 
-type OptionKey = (typeof options)[number]['key']
+// key 联合类型保持显式声明（而非从 options 推导），保证上方注释掉 chatroom 项后类型仍成立
+type OptionKey = 'im' | 'chatroom'
 
 const currentKey = computed<OptionKey>(() =>
   page.value.relativePath.startsWith('chatroom') ? 'chatroom' : 'im',

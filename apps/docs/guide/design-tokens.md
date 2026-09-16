@@ -12,7 +12,10 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
   <div class="token-color" style="--token-bg: hsl(38, 100%, 60%);"><span class="token-color__name">warning-color</span><span class="token-color__value">hsl(38, 100%, 60%)</span></div>
   <div class="token-color" style="--token-bg: hsl(350, 100%, 60%);"><span class="token-color__name">danger-color</span><span class="token-color__value">hsl(350, 100%, 60%)</span></div>
   <div class="token-color" style="--token-bg: hsl(203, 100%, 60%);"><span class="token-color__name">info-color</span><span class="token-color__value">hsl(203, 100%, 60%)</span></div>
+  <div class="token-color" style="--token-bg: #FF7070;"><span class="token-color__name">badge-bg</span><span class="token-color__value">#FF7070</span></div>
 </div>
+
+> `--uikit-badge-bg`（core 2.3.0）：徽标（未读数 / 红点）默认背景色，独立于 danger 语义色，明暗模式同值；`Badge` 的 `color` prop 可单项覆盖。
 
 ### 文字色（浅色模式）
 
@@ -35,6 +38,24 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 </div>
 
 > 暗色模式对应值见 [主题定制](./theme) 页暗色段，所有颜色 token 均已在 `[data-uikit-theme="dark"]` 下重写。
+
+### 文件消息图标底色（core 2.6.0）
+
+文件消息气泡左侧固定展示彩色底色块（双方气泡一致），图标本体固定白色，底色按扩展名 / 类别取对应品牌识别色，明暗模式通用：
+
+<div class="token-grid">
+  <div class="token-color" style="--token-bg: #E5252A;"><span class="token-color__name">file-icon-pdf</span><span class="token-color__value">#E5252A</span></div>
+  <div class="token-color" style="--token-bg: #1D7044;"><span class="token-color__name">file-icon-xls</span><span class="token-color__value">#1D7044</span></div>
+  <div class="token-color" style="--token-bg: #2B5797;"><span class="token-color__name">file-icon-doc</span><span class="token-color__value">#2B5797</span></div>
+  <div class="token-color" style="--token-bg: #D24625;"><span class="token-color__name">file-icon-ppt</span><span class="token-color__value">#D24625</span></div>
+  <div class="token-color" style="--token-bg: #424242;"><span class="token-color__name">file-icon-md</span><span class="token-color__value">#424242</span></div>
+  <div class="token-color" style="--token-bg: #00897B;"><span class="token-color__name">file-icon-img</span><span class="token-color__value">#00897B</span></div>
+  <div class="token-color" style="--token-bg: #E91E63;"><span class="token-color__name">file-icon-video</span><span class="token-color__value">#E91E63</span></div>
+  <div class="token-color" style="--token-bg: #7B1FA2;"><span class="token-color__name">file-icon-audio</span><span class="token-color__value">#7B1FA2</span></div>
+  <div class="token-color" style="--token-bg: #4CAF50;"><span class="token-color__name">file-icon-file</span><span class="token-color__value">#4CAF50</span></div>
+</div>
+
+> 上表 token 全名带 `--uikit-` 前缀（如 `--uikit-file-icon-pdf`）；`file-icon-file` 为未识别类型的普通文件回落色。
 
 ## 字号
 

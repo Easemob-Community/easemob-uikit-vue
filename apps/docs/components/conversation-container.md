@@ -185,10 +185,15 @@ const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })
 
 ## 状态横幅
 
-断网、连接中或同步中时，搜索栏下方会展示内置状态横幅（默认开启，`show-status-banner` 可关闭）：
+断网、连接中或同步中时，搜索栏下方会展示内置状态横幅（默认开启，`show-status-banner` 可关闭），优先级从高到低为：**被踢下线 > 断网 > 连接中 > 会话同步 > 消息同步**：
 
+- 被踢下线：error 样式，**不可点击重连**——账号被踢 / 失效是账号态终态（SDK 不再自动重连），点击不会触发 `reconnect` 事件；文案按被踢错误码差异化（`@easemob/uikit-sdk-contract` 的 `KICK_ERROR_CODE`）：
+  - `206` 多端互踢：「当前账号已在其他设备登录」
+  - `214` 设备超限：「登录设备数超过限制，当前设备已下线」
+  - `216` 修改密码：「账号密码已修改，请重新登录」
+  - 其他（如 `207` 注销 / `217` 被踢）：「当前账号已被迫下线，请重新登录」
 - 断网：error 样式，可点击，点击触发 `reconnect` 事件，由业务方决定重连策略
-- 连接中：warning 样式 + loading 图标
+- 连接中：warning 样式 + loading 图标（曾连接过则展示「重连中」）
 - 会话/消息同步中：info 样式
 
 需要自定义横幅时使用 `#status-banner` 插槽，接收当前状态（`visible` / `type` / `loading` / `title` / `description` / `clickable`）自行渲染；内置横幅基于 [StatusBanner 组件](./status-banner) 实现。
