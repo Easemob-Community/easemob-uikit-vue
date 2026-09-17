@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
-import { useLocale } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIcon as Icon, useLocale } from '@easemob/uikit-core'
 
 export interface VoicePanelProps {
   active: boolean
@@ -190,45 +189,56 @@ onBeforeUnmount(() => {
     @mouseup="onMouseup"
     @mouseleave="onMouseleave"
   >
-    <!-- 录音就绪状态 -->
-    <template v-if="!isRecording">
-      <div class="voice-panel__ready">
-        <!-- 计时占位：与录音态计时同尺寸但不可见，预留空间防止开始录音时按钮下移 -->
-        <div class="voice-panel__timer voice-panel__timer--placeholder" aria-hidden="true">
-          0″
-        </div>
-        <div class="voice-panel__mic-wrapper">
-          <Icon name="mic/fill" :size="24" color="white" />
-        </div>
-        <div class="voice-panel__hint">
-          {{ t('chat.voice.holdSpace') }}<span class="voice-panel__link" @mousedown.stop @click="deactivate">{{ t('chat.voice.exit') }}</span>
-        </div>
+    <div class="voice-panel__inner">
+      <!-- 计时：就绪态透明但占位（预留高度，防止开始录音时按钮跳动），录音态淡入 -->
+      <div class="voice-panel__timer" :class="{ 'voice-panel__timer--idle': !isRecording }" aria-hidden="true">
+        {{ formattedDuration }}
       </div>
-    </template>
 
-    <!-- 录音中状态 -->
-    <template v-else>
-      <div class="voice-panel__recording">
-        <div class="voice-panel__timer">
-          {{ formattedDuration }}
-        </div>
-        <div class="voice-panel__mic-wrapper voice-panel__mic-wrapper--recording">
-          <!-- 水波背景：三层超大不规则圆角块在圆内旋转，边缘形成自然起伏的水面 -->
-          <span class="voice-panel__wave" />
-          <span class="voice-panel__wave" />
-          <span class="voice-panel__wave" />
-          <Icon name="mic/fill" :size="24" color="white" />
-        </div>
-        <div class="voice-panel__hint">
-          {{ t('chat.voice.releaseSend') }}<span class="voice-panel__link" @mousedown.stop @click="cancelRecording">{{ t('chat.voice.cancelSend') }}</span>
-        </div>
+      <!-- 麦克风按钮：就绪态浅蓝渐变，录音态深蓝弥散渐变 + 呼吸缩放（豆包风格流体 blob） -->
+      <div
+        class="voice-panel__mic"
+        :class="{ 'voice-panel__mic--recording': isRecording }"
+      >
+        <span class="voice-panel__fluid" aria-hidden="true">
+          <span class="voice-panel__blob voice-panel__blob--1" />
+          <span class="voice-panel__blob voice-panel__blob--2" />
+          <span class="voice-panel__blob voice-panel__blob--3" />
+        </span>
+        <Icon name="mic/fill" :size="24" color="white" class="voice-panel__mic-icon" />
       </div>
-    </template>
+
+      <!-- 提示文案 -->
+      <div v-if="!isRecording" class="voice-panel__hint">
+        {{ t('chat.voice.holdSpace') }}<span class="voice-panel__link" @mousedown.stop @click="deactivate">{{ t('chat.voice.exit') }}</span>
+      </div>
+      <div v-else class="voice-panel__hint">
+        {{ t('chat.voice.releaseSend') }}<span class="voice-panel__link" @mousedown.stop @click="cancelRecording">{{ t('chat.voice.cancelSend') }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .voice-panel {
+  /* 录音 CTA 品牌色（设计稿定值）：组件级作用域变量，外部需要定制时可覆写 */
+  --voice-cta-idle-from: #6ec8ff;
+  --voice-cta-idle-to: #3ae8ff;
+  --voice-cta-recording-from: #0024ed;
+  --voice-cta-recording-to: #3a96ff;
+  --voice-cta-ring-idle: rgb(255 255 255 / 55%);
+  --voice-cta-ring-recording: rgb(255 255 255 / 45%);
+  --voice-cta-glow-ring: rgb(0 158 255 / 8%);
+  --voice-cta-shadow: rgb(0 122 189 / 25%);
+  --voice-cta-shadow-recording: rgb(0 122 189 / 16%);
+  --voice-blob-light: #bbf9ff;
+  --voice-blob-light-transparent: rgb(82 255 229 / 0%);
+  --voice-blob-mid: #52ffe5;
+  --voice-blob-mid-transparent: rgb(82 255 229 / 0%);
+  --voice-blob-deep: #0a5cff;
+  --voice-blob-deep-transparent: rgb(0 123 189 / 0%);
+  --voice-icon-shadow: rgb(0 60 120 / 25%);
+
   flex: 1;
   display: flex;
   align-items: center;
@@ -246,8 +256,7 @@ onBeforeUnmount(() => {
   background-color: var(--uikit-bg-hover);
 }
 
-.voice-panel__ready,
-.voice-panel__recording {
+.voice-panel__inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -256,100 +265,194 @@ onBeforeUnmount(() => {
   gap: var(--uikit-container-gap, 8px);
 }
 
-.voice-panel__mic-wrapper {
+/* ===== 麦克风按钮：就绪态浅蓝渐变 ===== */
+.voice-panel__mic {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 设计稿 cta 态：48px 主色圆 + 24px 麦克风图标 */
+  /* 设计稿 cta 态：48px 圆 + 24px 麦克风图标 */
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: var(--uikit-primary-color, #3b82f6);
-  color: var(--uikit-text-inverse);
-  transition: transform var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-.voice-panel__mic-wrapper--recording {
-  position: relative;
   overflow: hidden;
-  background-color: var(--uikit-primary-hover, #2563eb);
-  /* 静态浅蓝光晕（设计稿外圈浅蓝环，无扩散动画），跟随主题主色 */
-  box-shadow: 0 0 0 6px var(--uikit-primary-soft, rgba(59, 130, 246, 0.15));
+  isolation: isolate;
+  /* 就绪态浅蓝渐变（设计稿 paint0：#6EC8FF -> #3AE8FF） */
+  background: linear-gradient(160deg, var(--voice-cta-idle-from) 0%, var(--voice-cta-idle-to) 100%);
+  box-shadow:
+    inset 0 0 0 1px var(--voice-cta-ring-idle),
+    0 1px 3px var(--voice-cta-shadow);
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.45s ease,
+    background 0.5s ease;
 }
 
-/* 录音态：水波背景。经典 CSS water wave 技法——width/height 250% 的不规则圆角块
-   以圆心下方为轴持续旋转，非对称 border-radius 使其上缘呈现自然波浪起伏；
-   三层不同透明度/速度/转向叠加模拟水的流动感，overflow:hidden 收敛在圆形背景内 */
-.voice-panel__wave {
+/* 弥散流体层：裁剪在圆内，就绪态半透明显示静态 blob，录音态全亮并流动 */
+.voice-panel__fluid {
   position: absolute;
-  top: 42%;
-  left: 50%;
-  width: 250%;
-  height: 250%;
-  margin-left: -125%;
-  border-radius: 43% 45% 42% 46%;
-  background-color: rgb(255 255 255 / 0.14);
-  z-index: 1;
-  pointer-events: none;
-  animation:
-    voice-wave-rotate 5s linear infinite,
-    voice-wave-breathe 3.6s ease-in-out infinite alternate;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: 0.55;
+  transition: opacity 0.5s ease;
 }
 
-.voice-panel__wave:nth-of-type(2) {
-  top: 45%;
-  border-radius: 46% 42% 45% 43%;
-  background-color: rgb(255 255 255 / 0.2);
-  animation-duration: 7s, 4.2s;
-  animation-direction: reverse, alternate;
+.voice-panel__blob {
+  position: absolute;
+  width: 130%;
+  height: 130%;
+  border-radius: 50%;
+  /* blur 随按钮字号等比缩放（还原设计稿弥散感） */
+  filter: blur(0.19em);
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.voice-panel__wave:nth-of-type(3) {
-  top: 48%;
-  border-radius: 44% 46% 43% 45%;
-  background-color: rgb(255 255 255 / 0.1);
-  animation-duration: 9s, 5s;
+.voice-panel__blob--1 {
+  top: -35%;
+  left: -30%;
+  background: radial-gradient(circle at 50% 50%, var(--voice-blob-light) 0%, var(--voice-blob-light-transparent) 65%);
 }
 
-.voice-panel__mic-wrapper--recording .uikit-icon {
+.voice-panel__blob--2 {
+  right: -32%;
+  bottom: -38%;
+  background: radial-gradient(circle at 50% 50%, var(--voice-blob-deep) 0%, var(--voice-blob-deep-transparent) 68%);
+}
+
+.voice-panel__blob--3 {
+  top: 10%;
+  right: -30%;
+  width: 110%;
+  height: 110%;
+  background: radial-gradient(circle at 50% 50%, var(--voice-blob-mid) 0%, var(--voice-blob-mid-transparent) 60%);
+}
+
+.voice-panel__mic-icon {
   position: relative;
   z-index: 2;
+  filter: drop-shadow(0 1px 1px var(--voice-icon-shadow));
 }
 
-@keyframes voice-wave-rotate {
-  to {
-    transform: rotate(360deg);
+/* ===== 录音态：深蓝渐变 + 呼吸缩放 + blob 流动 ===== */
+.voice-panel__mic--recording {
+  background: linear-gradient(160deg, var(--voice-cta-recording-from) 0%, var(--voice-cta-recording-to) 100%);
+  box-shadow:
+    inset 0 0 0 1px var(--voice-cta-ring-recording),
+    0 0 0 5px var(--voice-cta-glow-ring),
+    0 6px 18px var(--voice-cta-shadow-recording);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .voice-panel__mic--recording {
+    transform: scale(1.1);
+    animation: voice-mic-breathe 3s ease-in-out infinite;
+  }
+
+  .voice-panel__mic--recording .voice-panel__fluid {
+    opacity: 1;
+  }
+
+  .voice-panel__mic--recording .voice-panel__blob {
+    /* 仅在动画期间提升为独立合成层 */
+    will-change: transform;
+  }
+
+  .voice-panel__mic--recording .voice-panel__blob--1 {
+    animation: voice-blob-float-1 6s ease-in-out infinite;
+  }
+
+  .voice-panel__mic--recording .voice-panel__blob--2 {
+    animation: voice-blob-float-2 7.5s ease-in-out infinite;
+  }
+
+  .voice-panel__mic--recording .voice-panel__blob--3 {
+    animation: voice-blob-float-3 5.5s ease-in-out infinite;
   }
 }
 
-/* 水位缓慢起伏（translate 独立于 transform，两者可叠加；百分比相对波浪自身尺寸） */
-@keyframes voice-wave-breathe {
-  from {
-    translate: 0 0;
+/* keyframes 全部 translate3d/scale3d，纯合成层变换，任意 DPI/缩放下不掉帧 */
+@keyframes voice-mic-breathe {
+  0%,
+  100% {
+    transform: scale3d(1.08, 1.08, 1);
   }
-  to {
-    translate: 0 -5%;
+  50% {
+    transform: scale3d(1.14, 1.14, 1);
   }
+}
+
+@keyframes voice-blob-float-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  33% {
+    transform: translate3d(35%, 30%, 0) scale3d(1.2, 1.2, 1);
+  }
+  66% {
+    transform: translate3d(20%, 55%, 0) scale3d(0.85, 0.85, 1);
+  }
+}
+
+@keyframes voice-blob-float-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  33% {
+    transform: translate3d(-30%, -35%, 0) scale3d(0.9, 0.9, 1);
+  }
+  66% {
+    transform: translate3d(-45%, -15%, 0) scale3d(1.25, 1.25, 1);
+  }
+}
+
+@keyframes voice-blob-float-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(0.95, 0.95, 1);
+  }
+  50% {
+    transform: translate3d(-40%, 25%, 0) scale3d(1.15, 1.15, 1);
+  }
+}
+
+/* 全局动画开关关闭时归零（html 根属性） */
+[data-uikit-anim-enabled='false'] .voice-panel__mic--recording,
+[data-uikit-anim-enabled='false'] .voice-panel__mic--recording .voice-panel__blob {
+  animation: none;
+}
+
+[data-uikit-anim-enabled='false'] .voice-panel__mic--recording {
+  transform: scale(1.08);
+}
+
+[data-uikit-anim-enabled='false'] .voice-panel__mic--recording .voice-panel__fluid {
+  opacity: 1;
 }
 
 .voice-panel__timer {
   /* 固定行高，保证就绪态占位与录音态计时同高，切换时不发生布局位移 */
   line-height: 18px;
   white-space: nowrap;
-  font-size: var(--uikit-font-size-13);
-  font-weight: 500;
-  color: var(--uikit-text-secondary);
+  font-size: var(--uikit-font-size-10);
+  font-weight: var(--uikit-font-weight-medium);
+  color: var(--uikit-text-tertiary, #919ba1);
   font-variant-numeric: tabular-nums;
+  transition: opacity 0.2s ease;
 }
 
-.voice-panel__timer--placeholder {
-  visibility: hidden;
+.voice-panel__timer--idle {
+  opacity: 0;
 }
 
 .voice-panel__hint {
   /* 设计稿 cta 态：caption 10px 弱提示色 */
   font-size: var(--uikit-font-size-10);
-  color: var(--uikit-text-tertiary, #919BA1);
+  color: var(--uikit-text-tertiary, #919ba1);
   text-align: center;
   line-height: 1.5;
 }
@@ -357,7 +460,7 @@ onBeforeUnmount(() => {
 .voice-panel__link {
   color: var(--uikit-primary-color, #3b82f6);
   /* 设计稿：Esc 高亮为 Medium */
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   cursor: pointer;
   margin: 0 2px;
 }
