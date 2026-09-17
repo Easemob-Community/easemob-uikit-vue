@@ -40,6 +40,25 @@ import Avatar from './avatar.vue'
         <Avatar name="CustomDot" :size="40" presence="online" :presence-size="16" />
       </div>
     </Variant>
+    <Variant title="Badge">
+      <div class="u-flex u-gap-2 u-items-center">
+        <Avatar name="A" :size="48" :badge="8" />
+        <Avatar name="B" :size="48" :badge="128" />
+        <Avatar name="C" :size="48" badge-dot />
+        <Avatar name="D" :size="48" :badge="8" badge-placement="bottom-right" />
+        <Avatar name="E" :size="48" :badge="8" presence="online" />
+      </div>
+    </Variant>
+    <Variant title="Badge Sizes & Shapes">
+      <div class="u-flex u-gap-2 u-items-center">
+        <Avatar name="A" :size="32" :badge="8" shape="circle" />
+        <Avatar name="B" :size="48" :badge="8" shape="circle" />
+        <Avatar name="C" :size="80" :badge="8" shape="circle" />
+        <Avatar name="D" :size="32" badge-dot shape="square" />
+        <Avatar name="E" :size="48" :badge="8" shape="square" />
+        <Avatar name="F" :size="80" :badge="8" shape="square" />
+      </div>
+    </Variant>
     <Variant title="Editable">
       <Avatar name="Me" presence="online" editable @presence-click="console.log('presence-click')" />
     </Variant>

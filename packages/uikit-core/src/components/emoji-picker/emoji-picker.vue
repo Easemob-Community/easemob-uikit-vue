@@ -202,7 +202,7 @@ function onClose() {
     </div>
 
     <div class="emoji-picker__body" role="tabpanel">
-      <!-- 表情包视图：4 列网格（宽屏 auto-fill 自适应），图 + 名称标签 -->
+      <!-- 表情包视图：4 列网格（minmax 弹性列宽，滚动条占位/宽屏下列数自适应），图 + 名称标签 -->
       <div
         v-if="activeStickerPack"
         class="emoji-picker__sticker-grid"
@@ -430,11 +430,12 @@ function onClose() {
   }
 }
 
-/* 表情包视图：62px 项 4 列网格（宽屏 auto-fill 自适应列数），图 + 名称 */
+/* 表情包视图：4 列网格（对稿 62px 项 + 12px 间距），图 + 名称。
+   用 minmax(56px, 1fr) 弹性列而非固定 62px 列：经典（非悬浮）滚动条会吃掉 body 约 15px 宽度，
+   固定列宽会退化成 3 列；弹性列在默认 320px 面板上稳定 4 列，宽屏（H5 全宽）auto-fill 自动加列 */
 .emoji-picker__sticker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 62px);
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   gap: 12px;
   padding: 8px;
 }
@@ -444,7 +445,7 @@ function onClose() {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  width: 62px;
+  width: 100%;
   padding: 0;
   background: none;
   border: none;
@@ -460,8 +461,8 @@ function onClose() {
 }
 
 .emoji-picker__sticker-img {
-  width: 62px;
-  height: 62px;
+  width: 100%;
+  aspect-ratio: 1;
   object-fit: contain;
   display: block;
 }

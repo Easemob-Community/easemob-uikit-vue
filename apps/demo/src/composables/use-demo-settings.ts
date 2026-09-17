@@ -185,17 +185,39 @@ const demoPresetUsers: DemoPresetUser[] = [
   { label: 'pfh2', user: 'pfh2', token: 'YWMtHIsOpqavEfG4cb3Jv6mCtSZVsAd-uUblpSk5yg-TZXAZ6lAwpq8R8agqMzqiXyggAwMAAAGgYWit6zeeSAAGzZ5ebuEi-0IeTYpBQ61S3SQAOuxlTpEkA1OFJdd-aQ' },
 ]
 
-/** 示例表情包（GIF），用于验证 emoji picker 的 sticker/GIF 发送链路；实际业务请替换为自有 CDN 资源 */
+/** 环信表情资源（本地 GIF + JPG 封面），来自 assets/emojis/huanxin，随构建内联为静态资源 */
+const huanxinGifs = import.meta.glob('../assets/emojis/huanxin/*.gif', { eager: true, query: '?url', import: 'default' })
+const huanxinCovers = import.meta.glob('../assets/emojis/huanxin/*-封面.jpg', { eager: true, query: '?url', import: 'default' })
+
+/** 贴纸 key → 中文名映射（与设计稿表情面板一致） */
+const HUANXIN_STICKER_META: { key: string, name: string }[] = [
+  { key: 'biubiu', name: '亮个相吧' },
+  { key: 'caffe', name: '辛苦啦' },
+  { key: 'debug', name: 'Bug 终结者' },
+  { key: 'dont_wanna', name: '你说神嘛' },
+  { key: 'error', name: '报错了' },
+  { key: 'like', name: '真棒' },
+  { key: 'insane', name: '厉害' },
+  { key: 'jajaja', name: '笑死' },
+  { key: 'success', name: '成功啦' },
+  { key: 'likes', name: '真棒棒' },
+  { key: 'OKDK', name: '好的收到' },
+  { key: 'roll_out', name: '上线成功' },
+  { key: 'thanks', name: '谢谢老板' },
+]
+
+/** 示例表情包（本地 GIF），用于验证 emoji picker 的 sticker/GIF 发送链路；实际业务请替换为自有 CDN 资源 */
 const demoStickerPacks: EmojiStickerPack[] = [
   {
-    id: 'demo-gifs',
-    name: '动图',
-    iconUrl: 'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif',
-    stickers: [
-      { key: 'celebrate', name: '庆祝', url: 'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif' },
-      { key: 'dance', name: '跳舞', url: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif' },
-      { key: 'thumbs-up', name: '点赞', url: 'https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif' },
-    ],
+    id: 'huanxin',
+    name: '环信表情',
+    iconUrl: huanxinCovers['../assets/emojis/huanxin/biubiu-封面.jpg'] as string,
+    stickers: HUANXIN_STICKER_META.map(({ key, name }) => ({
+      key,
+      name,
+      thumbUrl: huanxinCovers[`../assets/emojis/huanxin/${key}-封面.jpg`] as string,
+      url: huanxinGifs[`../assets/emojis/huanxin/${key}.gif`] as string,
+    })),
   },
 ]
 
