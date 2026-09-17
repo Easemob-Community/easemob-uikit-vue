@@ -89,7 +89,7 @@ function onClick() {
   max-width: 100%;
   color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-14);
-  line-height: 1.5;
+  line-height: calc(18px * var(--uikit-font-scale));
   cursor: pointer;
   user-select: none;
   box-sizing: border-box;

@@ -445,7 +445,7 @@ function closeMoreMenu() {
 /* 成员名：群组场景主文案，浅色默认纯黑（设计稿），暗色经 token 覆写为主文字色 */
 .group-member-list__name {
   font-size: var(--uikit-font-size-15);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-member-name-color, #000000);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -459,7 +459,7 @@ function closeMoreMenu() {
 /* 角色/状态徽标统一实底白字（设计稿）：8px/600、padding 2px 4px、radius 4px */
 .group-member-list__role {
   font-size: var(--uikit-font-size-8);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   padding: 2px 4px;
   border-radius: 4px;
   line-height: 1.2;
@@ -478,7 +478,7 @@ function closeMoreMenu() {
 
 .group-member-list__status-tag {
   font-size: var(--uikit-font-size-8);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   padding: 2px 4px;
   border-radius: 4px;
   line-height: 1.2;

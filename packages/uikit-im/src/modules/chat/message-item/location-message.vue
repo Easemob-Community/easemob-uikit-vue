@@ -143,7 +143,7 @@ function onClick() {
 
 .location-message__address {
   font-size: var(--uikit-font-size-14);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;

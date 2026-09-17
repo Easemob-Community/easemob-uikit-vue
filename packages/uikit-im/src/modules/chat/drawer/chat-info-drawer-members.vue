@@ -347,7 +347,7 @@ defineExpose({
   background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
   font-size: var(--uikit-font-size-14);
-  font-weight: 400;
+  font-weight: var(--uikit-font-weight-regular);
   cursor: pointer;
   white-space: nowrap;
   transition:
@@ -358,7 +358,7 @@ defineExpose({
 .chat-info-drawer-members__tab--active {
   background-color: var(--uikit-bg-active);
   color: var(--uikit-primary-color);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 /* 共享搜索框容器（设计稿：padding 8px 12px） */

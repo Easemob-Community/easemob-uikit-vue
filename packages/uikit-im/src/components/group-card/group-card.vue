@@ -178,7 +178,7 @@ function onActionClick(key: string) {
 
 .group-card__name {
   font-size: var(--uikit-font-size-22);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }

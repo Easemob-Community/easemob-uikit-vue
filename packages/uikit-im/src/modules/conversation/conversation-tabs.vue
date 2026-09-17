@@ -175,7 +175,7 @@ function scrollTabs(direction: 'left' | 'right') {
 
 /* 激活态：浅主色底 + 主色字（跟随主题色） */
 .conversation-tabs__tab.is-active {
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-primary);
   background-color: var(--uikit-bg-active);
 }

@@ -230,7 +230,7 @@ function onCancel() {
 .multi-select-bar__count {
   font-size: var(--uikit-font-size-11);
   color: var(--uikit-primary-color);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   margin-top: 2px;
 }
 
@@ -348,7 +348,7 @@ function onCancel() {
 
 .multi-select-bar__modal-title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   margin-bottom: 8px;
 }

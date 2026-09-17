@@ -107,7 +107,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--small {
   padding: calc(var(--uikit-button-padding-y, 8px) - 2px) 12px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-10);
 }
 
 .uikit-button--medium {
@@ -171,10 +171,13 @@ function handleClick(event: MouseEvent) {
     /* control-bg 与 --uikit-bg-hover 色值过近时反馈不可见，
        改用 color-mix 派生（混入文字色：浅主题变暗、深主题变亮），与 Switch 派生模式一致 */
     background-color: color-mix(in srgb, var(--uikit-control-bg, #f3f4f6) 90%, var(--uikit-text-primary));
+    /* 设计稿：default/outline hover 文字转品牌色 */
+    color: var(--uikit-primary-color);
   }
 
   .uikit-button--outline:hover:not(:disabled) {
     background-color: var(--uikit-bg-hover);
+    color: var(--uikit-primary-color);
   }
 
   .uikit-button--primary:hover:not(:disabled) {

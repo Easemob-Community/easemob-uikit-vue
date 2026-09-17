@@ -460,7 +460,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 /* @提及高亮样式 */
 .text-message__mention {
   color: var(--uikit-primary-color);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

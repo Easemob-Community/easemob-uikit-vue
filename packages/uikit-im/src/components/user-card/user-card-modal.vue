@@ -589,7 +589,7 @@ function onPresenceChanged() {
 
 .user-card-modal__alias-value {
   font-size: var(--uikit-font-size-16);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }

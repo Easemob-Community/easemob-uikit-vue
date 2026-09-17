@@ -91,7 +91,7 @@ function onViewCombine(msg: UiMessage) {
 
 .combine-message-modal-item__sender {
   font-size: var(--uikit-font-size-13);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 

@@ -113,7 +113,7 @@ const mergedCountText = computed(() => {
 .uikit-notification__title {
   overflow: hidden;
   font-size: var(--uikit-font-size-14, 14px);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary, #111827);
   text-overflow: ellipsis;
   white-space: nowrap;

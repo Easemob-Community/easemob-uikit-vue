@@ -82,7 +82,7 @@ function onClose() {
 .editing-bar__title {
   flex-shrink: 0;
   color: var(--uikit-primary-color, #5f6df3);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .editing-bar__preview {

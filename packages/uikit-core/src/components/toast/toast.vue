@@ -156,7 +156,7 @@ onBeforeUnmount(clearTimer)
 
 .uikit-toast__action {
   margin-top: 4px;
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

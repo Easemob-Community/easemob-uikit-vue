@@ -399,13 +399,13 @@ defineExpose({ refresh, removeMember, setMemberRole })
 
 .group-member-list__title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
 .group-member-list__count {
   font-size: var(--uikit-font-size-12);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-inverse);
   background-color: var(--uikit-text-secondary);
   padding: 1px 7px;

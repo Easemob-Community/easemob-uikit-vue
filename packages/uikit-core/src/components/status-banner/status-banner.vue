@@ -167,7 +167,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .uikit-status-banner__title {
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: currentColor;
 }
 

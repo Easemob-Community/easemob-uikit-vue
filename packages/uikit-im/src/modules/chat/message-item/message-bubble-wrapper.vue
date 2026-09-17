@@ -1066,6 +1066,7 @@ onBeforeUnmount(() => {
   background: transparent;
   color: var(--uikit-msg-status-badge-color, #47ADEB);
   font-size: var(--uikit-font-size-8);
+  font-weight: var(--uikit-font-weight-medium);
   line-height: 1;
   padding: 0 3px;
   margin-top: 2px;

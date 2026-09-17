@@ -375,19 +375,18 @@ const displayMessage = computed(() => {
     @touchcancel="longPress.cancel"
   >
     <template #leading>
-      <!-- 未读徽标归位头像时：角标包裹头像（白描边分界，mute/dot 模式为 8×8 小圆点）；
-           位置跟随 badgePlacement（top-right / bottom-right），覆盖量按设计规范压到头像上（见样式覆写） -->
-      <Badge
+      <!-- 未读徽标归位头像时走 Avatar 内置徽标（标准尺寸比例，随头像尺寸换算，2px 分界描边）；
+           位置跟随 badgePlacement（top-right / bottom-right） -->
+      <Avatar
         v-if="props.showAvatar && props.unreadPlacement === 'avatar' && props.conversation.unreadCount"
-        class="conversation-item__avatar-badge"
-        :count="props.conversation.unreadCount"
-        :dot="unreadDot"
-        :size="unreadDot ? 'xs' : 'l'"
-        :placement="props.badgePlacement"
-        bordered
-      >
-        <Avatar :name="conversationName" :src="conversationAvatar" :size="48" :presence="peerPresence" />
-      </Badge>
+        :name="conversationName"
+        :src="conversationAvatar"
+        :size="48"
+        :presence="peerPresence"
+        :badge="props.conversation.unreadCount"
+        :badge-dot="unreadDot"
+        :badge-placement="props.badgePlacement"
+      />
       <Avatar
         v-else-if="props.showAvatar"
         :name="conversationName"
@@ -523,16 +522,6 @@ const displayMessage = computed(() => {
   display: none;
 }
 
-/* 头像角标覆盖量按设计规范：角标中心落在头像角内约 1/4 角标直径处（约 3/4 压在头像上），
-   而非 Badge 通用语义的贴角对半（translate 50%）；仅覆写会话项头像角标，不影响其他 Badge 用法 */
-.conversation-item__avatar-badge :deep(.uikit-badge__content--top-right) {
-  transform: translate(25%, -25%);
-}
-
-.conversation-item__avatar-badge :deep(.uikit-badge__content--bottom-right) {
-  transform: translate(25%, 25%);
-}
-
 .conversation-item__info {
   flex: 1;
   min-width: 0;
@@ -652,7 +641,7 @@ const displayMessage = computed(() => {
 
 .conversation-item__typing-text {
   color: var(--uikit-primary);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .typing-dots {
@@ -705,7 +694,7 @@ const displayMessage = computed(() => {
 
 .conversation-item__at-me-prefix {
   color: var(--uikit-primary);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   margin-right: 2px;
 }
 

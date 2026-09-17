@@ -438,7 +438,7 @@ watch(
 
 .create-group-modal__title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
@@ -598,7 +598,7 @@ watch(
 .create-group-modal__settings-title {
   padding: 8px 0 4px;
   font-size: var(--uikit-font-size-13);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-secondary);
 }
 

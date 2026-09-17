@@ -305,7 +305,7 @@ function onContextmenu(e: MouseEvent) {
 .uikit-cell__title {
   flex: 1;
   font-size: var(--uikit-font-size-14);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;

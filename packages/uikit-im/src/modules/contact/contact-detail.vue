@@ -365,7 +365,7 @@ async function onConfirmAction() {
 .contact-detail__name {
   margin-top: 16px;
   font-size: var(--uikit-font-size-20);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
@@ -399,7 +399,7 @@ async function onConfirmAction() {
 
 .contact-detail__alias-value {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }

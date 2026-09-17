@@ -294,7 +294,7 @@ function onSelectorChanged() {
 
 .user-card--plain .user-card__name {
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .user-card--plain .user-card__subtitle,
@@ -306,7 +306,7 @@ function onSelectorChanged() {
 
 .user-card--plain .user-card__subtitle-label,
 .user-card--plain .user-card__user-id-label {
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .user-card--plain .user-card__actions,
@@ -346,7 +346,7 @@ function onSelectorChanged() {
 
 .user-card__name {
   font-size: var(--uikit-font-size-22);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
@@ -413,7 +413,7 @@ function onSelectorChanged() {
 
 .user-card__action-label {
   font-size: var(--uikit-font-size-16);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   text-align: center;
   line-height: 1.2;
 }

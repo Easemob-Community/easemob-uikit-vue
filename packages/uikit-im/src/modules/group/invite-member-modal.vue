@@ -140,14 +140,14 @@ watch(
 
 .invite-member-modal__title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
 .invite-member-modal__count {
   margin-left: 6px;
   font-size: var(--uikit-font-size-14);
-  font-weight: 400;
+  font-weight: var(--uikit-font-weight-regular);
   color: var(--uikit-text-secondary);
 }
 

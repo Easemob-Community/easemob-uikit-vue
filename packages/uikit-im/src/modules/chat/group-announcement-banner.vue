@@ -111,7 +111,7 @@ useResizeObserver(textRef, measureOverflow)
 
 .group-announcement-banner__title {
   font-size: var(--uikit-font-size-12);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
 }
 

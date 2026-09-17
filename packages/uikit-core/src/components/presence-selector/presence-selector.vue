@@ -272,7 +272,7 @@ function onCancel() {
 
 .presence-selector__title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 

@@ -1781,7 +1781,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
 
 .chat__header-member-count {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-secondary);
   white-space: nowrap;
 }

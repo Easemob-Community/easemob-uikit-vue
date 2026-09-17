@@ -99,7 +99,7 @@ function entryTitle(entry: ContactNavEntry) {
   gap: 8px;
   min-width: 0;
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 

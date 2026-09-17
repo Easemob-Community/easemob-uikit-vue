@@ -356,7 +356,7 @@ const showUnreadDot = computed(() =>
   background-color: var(--uikit-bubble-bg-other, #E4E6E7);
   color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-14);
-  line-height: 1.45;
+  line-height: calc(18px * var(--uikit-font-scale));
   white-space: pre-wrap;
   word-break: break-word;
   max-width: 100%;

@@ -338,7 +338,7 @@ async function onConfirmAction() {
   gap: 8px;
   margin-top: 16px;
   font-size: var(--uikit-font-size-20);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }

@@ -46,6 +46,7 @@
 ## 四、已落地的规格校准（2026-09，im 3.2.0 / core 2.3.0）
 
 - **Badge 六档**：xs（仅 8px 圆点）/ s / m / l（默认）/ xl / xxl；`placement` + `bordered`；`BadgeSize` 枚举破坏性变更。
+- **Avatar 徽标模式标准比例（2026-09-17，按 Figma「新-Demo」AvatarWithBadge 稿）**：徽标内置于 Avatar（`badge` / `badgeDot` / `badgeMax` / `badgePlacement` / `badgeColor`），尺寸随头像按比例换算（基准 48px）：数字徽标直径 = 头像 × 20/48（48→20）、红点 = × 9/48（48→9）、字号 = 徽标 × 12/20、多位数水平 padding = 徽标 × 4/20；2px 分界描边含在直径内（border-box，颜色走 `--uikit-bg-base`）；徽标中心内缩按形状分档（圆形 8/6px、方形 5/3px，均随头像尺寸等比）；会话项头像角标由「Badge 包裹 + ad-hoc transform 覆写」迁移至内置徽标。**presence 在线状态指示器按 Figma 1994:26192 校准**：Avatar Status 为**固定尺寸组件、无大小变体、不随头像缩放**——彩色核心 8px + 分界环 1.5px（总 11px），核心边缘距角 2px（整体收在角内不压边）；**分界环不涂刷颜色，而是对头像内容（图片/文字层）做 radial-gradient mask 镂空，环色 = 当地背景色**，选中/hover/暗色等任何背景下自动融合（覆盖原 `var(--uikit-bg-base)` 涂刷方案）；状态图标（`filled/circle/*`，24 模板圆盘占 20）上探 1.2 倍使圆盘填满核心；`presenceSize` 传入值为含环总直径。
 - **会话项排版**：用户名 16px/600、时间 12px tertiary、预览 14px、行距 6px；置顶底色 = hover 色；
   置顶/免打扰面性图标（`filled/pin` / `filled/bell/slash`）+ 摇动动画 + `--uikit-icon-muted` 同色。
 - **未读点规格**：数字 → 16px 红色胶囊；免打扰/dot → 8×8 `#FF7070`（去除历史「免打扰染灰」）。

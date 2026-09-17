@@ -329,7 +329,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 
 .message-search-modal__title {
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
@@ -387,7 +387,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 .message-search-modal__type--active {
   color: var(--uikit-primary-color);
   border-bottom-color: var(--uikit-primary-color);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .message-search-modal__notice {
@@ -439,7 +439,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 .message-search-modal__name {
   font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -472,7 +472,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 .message-search-modal__mark {
   background: transparent;
   color: var(--uikit-primary-color);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .message-search-modal__loading {

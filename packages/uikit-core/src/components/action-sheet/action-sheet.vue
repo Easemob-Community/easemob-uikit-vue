@@ -138,7 +138,7 @@ function onCancel() {
   color: var(--uikit-text-primary);
   cursor: pointer;
   background-color: var(--uikit-bg-secondary);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
 }
 
 .uikit-action-sheet__cancel:active {

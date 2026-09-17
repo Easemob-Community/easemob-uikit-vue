@@ -118,7 +118,7 @@ function onMoreClick(event: MouseEvent) {
 /* 名字 16px/500（与成员行名字字号一致），超长省略 */
 .shared-file-list__name {
   font-size: var(--uikit-font-size-16);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;

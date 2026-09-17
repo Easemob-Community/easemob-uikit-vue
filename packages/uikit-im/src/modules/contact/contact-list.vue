@@ -649,14 +649,14 @@ defineExpose({
 
 .contact-list__title {
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
 .contact-list__count {
   margin-left: 6px;
   font-size: var(--uikit-font-size-12);
-  font-weight: 400;
+  font-weight: var(--uikit-font-weight-regular);
   color: var(--uikit-text-secondary);
 }
 
@@ -703,7 +703,7 @@ defineExpose({
   display: flex;
   align-items: center;
   font-size: var(--uikit-font-size-12);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-tertiary);
   background-color: var(--uikit-bg-base);
   position: sticky;

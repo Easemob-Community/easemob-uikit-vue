@@ -163,7 +163,7 @@ function onClose() {
 .quote-bar__sender {
   color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-14);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   flex-shrink: 0;
   max-width: 30%;
   overflow: hidden;

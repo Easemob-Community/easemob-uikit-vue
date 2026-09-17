@@ -220,7 +220,7 @@ function cancel() {
   align-items: center;
   gap: 6px;
   font-size: var(--uikit-font-size-14);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 

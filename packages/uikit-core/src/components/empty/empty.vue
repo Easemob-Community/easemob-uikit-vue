@@ -90,14 +90,14 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty__title {
-  font-size: var(--uikit-font-size-14);
-  font-weight: 500;
-  color: var(--uikit-text-primary);
+  font-size: var(--uikit-font-size-16);
+  font-weight: var(--uikit-font-weight-regular);
+  color: var(--uikit-empty-text-color, #BDBDBD);
 }
 
 .uikit-empty__description {
   font-size: var(--uikit-font-size-13);
-  color: var(--uikit-text-secondary);
+  color: var(--uikit-empty-text-color, #BDBDBD);
 }
 
 .uikit-empty__illustration {

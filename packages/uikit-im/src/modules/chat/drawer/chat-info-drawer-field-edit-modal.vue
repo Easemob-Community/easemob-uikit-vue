@@ -130,7 +130,7 @@ function onSave() {
 .chat-info-drawer-field-edit__title {
   padding: 16px 16px 8px;
   font-size: var(--uikit-font-size-16);
-  font-weight: 600;
+  font-weight: var(--uikit-font-weight-semibold);
   text-align: center;
   color: var(--uikit-text-primary);
 }

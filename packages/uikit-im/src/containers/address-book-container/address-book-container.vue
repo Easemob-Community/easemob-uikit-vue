@@ -572,7 +572,7 @@ const subviewTitle = computed(() => {
 
 .address-book-container__title {
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
@@ -621,7 +621,7 @@ const subviewTitle = computed(() => {
   flex: 1;
   min-width: 0;
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;

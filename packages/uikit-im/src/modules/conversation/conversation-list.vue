@@ -967,7 +967,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 /* 设计稿标题：18px Medium（500）/ 行高 22px */
 .conversation-list__title {
   font-size: var(--uikit-font-size-18);
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   line-height: 22px;
   color: var(--uikit-text-primary);
 }

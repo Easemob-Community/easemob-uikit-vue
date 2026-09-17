@@ -52,7 +52,7 @@ const preview = computed(() => {
 <style scoped>
 .pinned-bar__sender {
   flex-shrink: 0;
-  font-weight: 500;
+  font-weight: var(--uikit-font-weight-medium);
   max-width: 30%;
   overflow: hidden;
   text-overflow: ellipsis;
