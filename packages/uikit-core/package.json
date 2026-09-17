@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-core",
   "type": "module",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Easemob UIKit Vue3 shared core (sdk abstraction / theme / locale / atomic components / provider)",
   "exports": {
     ".": {
@@ -32,7 +32,7 @@
     "*.css"
   ],
   "scripts": {
-    "build": "node scripts/check-core-isolation.mjs && node scripts/check-engine-isolation.mjs && node scripts/check-icon-refs.mjs . src/assets/icons src/assets/icons-v2 && node scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node scripts/check-core-isolation.mjs && node scripts/check-engine-isolation.mjs && node scripts/check-icon-refs.mjs . src/assets/icons src/assets/icons-v2 && node scripts/gen-aux-entries.mjs . --check && vite build && node scripts/check-theme-scope-ids.mjs . && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
     "icons:check": "node scripts/check-icon-refs.mjs . src/assets/icons src/assets/icons-v2",
     "aux:gen": "node scripts/gen-aux-entries.mjs .",
@@ -56,7 +56,7 @@
   "devDependencies": {
     "@easemob/uikit-sdk-websdk5": "workspace:*",
     "@histoire/plugin-vue": "^0.17.17",
-    "@vitejs/plugin-vue": "^4.6.2",
+    "@vitejs/plugin-vue": "^5.2.4",
     "histoire": "^0.17.17",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",

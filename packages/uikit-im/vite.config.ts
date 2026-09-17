@@ -22,7 +22,12 @@ export default defineConfig({
     __EASEMOB_UIKIT_VERSION__: JSON.stringify(uikitVersion),
   },
   plugins: [
-    vue(),
+    // componentIdGenerator: 'filepath' —— scoped data-v hash 仅由文件路径决定，与源码内容无关。
+    // plugin-vue 4.x 生产构建的 hash = hash(路径 + 源码)，任何 SFC 改动都会改变 scopeId，
+    // 而本包 theme 内联的是 core dist 的 scoped 样式（hash 固化在 core 构建期）；
+    // core 后续单独重构建（改了任意 SFC）会使本包 theme 里的 data-v 选择器失配、组件失去样式。
+    // 必须保持 filepath 模式（core/im 两侧一致），否则跨包主题内联会再次断裂。
+    vue({ features: { componentIdGenerator: 'filepath' } }),
     ...(!isHistoire
       ? [dts({
         insertTypesEntry: true,

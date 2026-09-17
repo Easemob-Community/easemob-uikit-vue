@@ -26,7 +26,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+    "build": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check && vite build && node ../uikit-core/scripts/check-theme-scope-ids.mjs . && vite build --config vite.aux.config.ts && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
     "dev": "vite build --watch",
     "auto-imports:check": "node ../uikit-core/scripts/gen-aux-entries.mjs . --check",
     "aux:gen": "node ../uikit-core/scripts/gen-aux-entries.mjs ."
@@ -41,7 +41,7 @@
     "easemob-websdk": "^5.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.6.2",
+    "@vitejs/plugin-vue": "^5.2.4",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-dts": "^3.9.1",

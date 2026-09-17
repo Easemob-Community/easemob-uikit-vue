@@ -1,5 +1,17 @@
 # Changelog
 
+## @easemob/uikit-core 2.8.2 (2026-09-17)
+
+### 修复
+
+- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
+
+## @easemob/uikit-im 3.7.2 (2026-09-17)
+
+### 修复
+
+- **修复生产构建中 core 组件（按钮等）失去全部样式的问题（严重）**：配套 core 2.8.2 的 scopeId 稳定性修复——theme 内联的 core dist scoped 样式 hash 与 core 运行时 scopeId 重新对齐；同时构建接入 `check-theme-scope-ids.mjs` 守卫，core dist 过期导致的 theme 失配会在构建期直接报错。修复前典型症状：消费者仅 `import '@easemob/uikit-im/theme'` 时，页面中所有 EmButton 渲染为无样式原生按钮。
+
 ## @easemob/uikit-core 2.8.1 (2026-09-16)
 
 ### 变更

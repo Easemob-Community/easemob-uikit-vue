@@ -41,7 +41,9 @@ export default defineConfig({
     __EASEMOB_UIKIT_CHATROOM_VERSION__: JSON.stringify(chatroomVersion),
   },
   plugins: [
-    vue(),
+    // componentIdGenerator: 'filepath' —— scoped data-v hash 仅由文件路径决定，与源码内容无关，
+    // 与 core/uikit-im 保持一致，避免跨包主题内联的 scopeId 失配（详见 uikit-core vite.config 注释）。
+    vue({ features: { componentIdGenerator: 'filepath' } }),
     ...(!isHistoire
       ? [dts({
         insertTypesEntry: true,
@@ -85,8 +87,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // theme @import 直指 core 源文件，chatroom 构建不依赖 core dist 先产出
-      '@easemob/uikit-core/theme': resolve(__dirname, '../uikit-core/src/theme/index.css'),
+      // theme @import 必须内联 core 的 dist 产物（与 uikit-im 同一约定，理由见其 vite.config）：
+      // core src/theme/index.css 只有变量表，内联它会让 chatroom theme 缺 core 组件 scoped 样式。
+      // 注意：这要求 core 先构建（core 为 chatroom 的 workspace:^ 依赖，pnpm -r build 已自动排序）。
+      '@easemob/uikit-core/theme': resolve(__dirname, '../uikit-core/dist/theme/index.css'),
       '@': resolve(__dirname, 'src'),
     },
   },
