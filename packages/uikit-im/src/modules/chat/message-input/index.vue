@@ -53,10 +53,15 @@ const { t } = useLocale()
 const inputConfig = computed(() => props.config?.input)
 
 /**
- * 聚焦时边框颜色：默认保持容器边框色（聚焦高亮由 --uikit-input-focus-ring 外环承担，见设计稿 msg_input focus 态），
- *  仅当显式传入 input.focusBorderColor 时才覆盖边框色。
+ * 聚焦内发光：默认 --uikit-input-focus-glow（主色 12% 内发光，见设计稿 msg_input focus 态）；
+ * 显式传入 input.focusBorderColor 时以该色 12% 浓度生成同规格内发光（实色面无描边设计，替代原聚焦边框/外环）。
  */
-const focusBorderColorVar = computed(() => inputConfig.value?.focusBorderColor || 'var(--uikit-border-color)')
+const focusGlowVar = computed(() => {
+  const color = inputConfig.value?.focusBorderColor
+  return color
+    ? `inset 0 0 12px color-mix(in srgb, ${color} 12%, transparent)`
+    : 'var(--uikit-input-focus-glow)'
+})
 
 /** 发送 typing cmd（仅单聊且全局 enableTyping 开启，5s 节流由输入框子组件保证） */
 function handleTyping() {
@@ -951,33 +956,30 @@ defineExpose({
 <style scoped>
 .message-input {
   position: relative;
-  background-color: var(--uikit-input-bg);
-  border: 1px solid var(--uikit-input-border-color, #C9CDCF);
+  /* 设计稿 msg_input：卡片面默认透明融入聊天背景（--uikit-input-surface-bg 可覆写），仅顶部内阴影光晕；无描边无投影 */
+  background-color: var(--uikit-input-surface-bg, var(--uikit-input-bg));
   border-radius: var(--uikit-components-radius, 8px);
-  box-shadow: var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
+  box-shadow: var(--uikit-input-surface-sheen, inset 0 30px 40px 16px rgba(136, 168, 188, 0.08));
   /* 设计稿 msg_input：外层间距 4px（margin），卡片内边距 8px/12px（input-padding token，随密度档缩放） */
   margin: var(--uikit-input-wrapper-spacing, 4px);
   padding: var(--uikit-input-padding-y, 8px) var(--uikit-input-padding-x, 12px);
-  transition:
-    border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
-    box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition: box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 .message-input:focus-within {
-  border-color: v-bind(focusBorderColorVar);
-  /* 设计稿 focus 态：border 不变，叠加主色 20% 外环（保留基础投影） */
+  /* 设计稿 focus 态：叠加主色 12% 内发光（保留顶部光晕） */
   box-shadow:
-    var(--uikit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04)),
-    var(--uikit-input-focus-ring, 0 0 0 2px rgba(51, 177, 255, 0.2));
+    var(--uikit-input-surface-sheen, inset 0 30px 40px 16px rgba(136, 168, 188, 0.08)),
+    v-bind(focusGlowVar);
 }
 
-/* simple 模式（PC）：卡片默认 126px（root 内容 108：工具栏 28 + 间距 8 + 三行文本区 72，加 chrome 18：上下 padding 8 + 1px border × 2；对齐设计稿 msg_input 默认态 124px），flex 列布局让输入框撑满（引用条/编辑条在场时挤压输入区，不改变卡片总高）；
+/* simple 模式（PC）：卡片默认 126px（root 内容 108：工具栏 28 + 间距 8 + 三行文本区 72，加 chrome 18：上下 padding 8；对齐设计稿 msg_input 默认态 124px），flex 列布局让输入框撑满（引用条/编辑条在场时挤压输入区，不改变卡片总高）；
    展开/收起动画由 simple-input root 的 height 过渡驱动（卡片 auto 高度逐帧跟随） */
 .message-input--simple-pc {
   display: flex;
   flex-direction: column;
   height: 126px;
-  transition: border-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+  transition: box-shadow var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
 
 /* simple 模式自定义高度态（拖拽/展开）：退出固定高度，内容自适应（min-height 兜底） */
@@ -986,11 +988,11 @@ defineExpose({
   min-height: 126px;
 }
 
-/* 展开/收起角标：压在卡片右上角边框角点上（设计稿 right/top -1px，相对 1px border 的 padding box 即贴合外缘），24×24，默认弱化图标色 */
+/* 展开/收起角标：压在卡片右上角（无描边设计直接贴外缘），24×24，默认弱化图标色 */
 .message-input__expand-btn {
   position: absolute;
-  top: -1px;
-  right: -1px;
+  top: 0;
+  right: 0;
   z-index: 3;
   display: flex;
   align-items: center;

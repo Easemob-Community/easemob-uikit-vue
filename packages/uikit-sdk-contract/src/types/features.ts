@@ -30,4 +30,8 @@ export interface UIKitFeatures {
   enableTyping?: boolean
   /** 好友列表是否过滤掉已拉黑用户，默认 true（仅联系人子视图/好友列表生效，选人弹窗不受影响） */
   filterBlockedContacts?: boolean
+  /** 单聊消息列表是否展示对方昵称，默认 false（微信风格默认隐藏，可显式开启） */
+  showNicknameInSingleChat?: boolean
+  /** 群聊消息列表是否展示发送者昵称，默认 true（可显式关闭） */
+  showNicknameInGroupChat?: boolean
 }

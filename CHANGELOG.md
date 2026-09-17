@@ -1,5 +1,23 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.3 (2026-09-17)
+
+### 新增
+
+- **新增聊天页消息昵称展示特性开关 `showNicknameInSingleChat` / `showNicknameInGroupChat`**：单聊消息列表默认不展示对方昵称（微信风格），`<UIKitProvider :show-nickname-in-single-chat="true">` 可打开；群聊默认展示发送者昵称，`:show-nickname-in-group-chat="false"` 可关闭。消息气泡外壳按消息自身的 `conversationType` 判定（合并转发弹窗、搜索结果等独立场景同样生效），运行时切换即刻生效。
+
+## @easemob/uikit-core 2.8.3 (2026-09-17)
+
+### 新增
+
+- **defaultFeatures 补齐昵称展示开关默认值**：`showNicknameInSingleChat` 默认 false、`showNicknameInGroupChat` 默认 true（契约字段定义见 uikit-sdk-contract 1.2.1）。
+
+## @easemob/uikit-sdk-contract 1.2.1 (2026-09-17)
+
+### 新增
+
+- **`UIKitFeatures` 新增两个可选开关**：`showNicknameInSingleChat`（单聊消息列表是否展示对方昵称，默认 false）、`showNicknameInGroupChat`（群聊消息列表是否展示发送者昵称，默认 true）。
+
 ## @easemob/uikit-core 2.8.2 (2026-09-17)
 
 ### 修复

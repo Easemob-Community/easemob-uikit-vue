@@ -109,7 +109,7 @@ const mockDataSource = {
 <template>
   <Story title="ConversationContainer">
     <Variant title="Default">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer />
         </UIKitProvider>
@@ -117,7 +117,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Hide Search">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :show-search="false" />
         </UIKitProvider>
@@ -125,7 +125,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Actions">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :custom-actions="customActions" />
         </UIKitProvider>
@@ -133,7 +133,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Hide Header">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :show-header="false" />
         </UIKitProvider>
@@ -141,7 +141,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Header">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer>
             <template #header>
@@ -156,7 +156,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Center Title">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer title="消息" header-align="center" />
         </UIKitProvider>
@@ -164,7 +164,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Title Prop">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer title="消息" />
         </UIKitProvider>
@@ -172,7 +172,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Time Formatter">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :time-formatter="customTimeFormatter" />
         </UIKitProvider>
@@ -180,7 +180,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Message Formatter">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :message-formatter="customMessageFormatter" />
         </UIKitProvider>
@@ -188,7 +188,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Search Filter">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :filter-fn="customFilterFn" />
         </UIKitProvider>
@@ -196,7 +196,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Dot Unread Mode">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer unread-mode="dot" />
         </UIKitProvider>
@@ -204,7 +204,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Hide Sender Name">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :show-sender-name="false" />
         </UIKitProvider>
@@ -212,7 +212,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Empty Text">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer empty-text="还没有聊天记录哦~" />
         </UIKitProvider>
@@ -220,7 +220,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Body & Footer Slots">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer>
             <template #body>
@@ -239,7 +239,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Sticky Body & Footer">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer body-sticky footer-sticky>
             <template #body>
@@ -258,7 +258,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Hide ScrollToTop">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer :show-scroll-to-top="false" />
         </UIKitProvider>
@@ -266,7 +266,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Draft Storage (Session)">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer draft-storage="session" />
         </UIKitProvider>
@@ -274,7 +274,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Draft Storage (Local)">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer draft-storage="local" />
         </UIKitProvider>
@@ -282,7 +282,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Custom Empty Slot">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false">
           <ConversationContainer>
             <template #empty="{ searchKeyword }">
@@ -302,7 +302,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Presence Enabled (mocked SDK)">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false" :data-source="mockDataSource">
           <ConversationContainer
             enable-presence
@@ -316,7 +316,7 @@ const mockDataSource = {
     </Variant>
 
     <Variant title="Presence Disabled (enablePresence=false)">
-      <div style="height: 500px;">
+      <div style="height: 500px; width: 360px;">
         <UIKitProvider :auto-init="false" :enable-presence="true" :data-source="mockDataSource">
           <ConversationContainer
             :enable-presence="false"

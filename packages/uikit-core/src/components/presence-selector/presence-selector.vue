@@ -67,6 +67,14 @@ const fixedStatusValues = [
   PRESENCE_STATUS.DO_NOT_DISTURB.toLowerCase(),
 ]
 
+/** 自定义项展示文本：已设置自定义状态时直接展示该文本，未设置时展示「自定义」 */
+const customLabel = computed(() => {
+  const value = (props.value || '').trim()
+  if (value && !fixedStatusValues.includes(value.toLowerCase()))
+    return value
+  return t('presence.custom', '自定义')
+})
+
 const options = computed<PresenceOption[]>(() => {
   const list: PresenceOption[] = [
     { key: 'online', label: t('presence.online', '在线'), ext: PRESENCE_STATUS.ONLINE, color: 'var(--uikit-presence-online-color, #6CE191)', icon: statusIconMap.online },
@@ -78,7 +86,7 @@ const options = computed<PresenceOption[]>(() => {
   if (props.showCustom) {
     list.push({
       key: 'custom',
-      label: t('presence.custom', '自定义'),
+      label: customLabel.value,
       ext: props.value || '',
       color: 'var(--uikit-presence-custom-color, #F3C850)',
       icon: statusIconMap.custom,
@@ -293,6 +301,10 @@ function onCancel() {
 
 .presence-selector__label {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--uikit-font-size-14);
   color: var(--uikit-text-primary);
 }

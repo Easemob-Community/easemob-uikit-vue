@@ -1641,18 +1641,13 @@ async function doRemoveAdmin(member: UiGroupMember) {
   overflow: hidden;
 }
 
-/* 空状态：上下左右居中 */
+/* 空状态：上下左右居中；图标 / 文案颜色统一由 core Empty 消费
+   --uikit-empty-icon-color / --uikit-empty-text-color，此处不再覆写 */
 .chat__empty {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* 空状态图标与文案：占位色 token（浅 #E6E6E6 / 深 #4B5563），可被接入方覆盖 */
-.chat__empty :deep(.uikit-empty__icon),
-.chat__empty :deep(.uikit-empty__description) {
-  color: var(--uikit-empty-icon-color, #E6E6E6);
 }
 
 /* 全局加载状态 */

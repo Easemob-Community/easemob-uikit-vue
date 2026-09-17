@@ -100,6 +100,11 @@ interface ThemeStorageState {
   iconMutedColor?: string
   /** 全局 header 底部分隔线开关，默认 false（关闭） */
   headerBorder: boolean
+  /**
+   * 消息辅助信息胶囊背景开关（时间分割线 / 通知事件 / 没有更多历史消息的气泡底胶囊），
+   * 默认 true（开启）；关闭后三类提示仅保留文字
+   */
+  messageChipBg: boolean
 }
 
 const defaultState: ThemeStorageState = {
@@ -126,6 +131,7 @@ const defaultState: ThemeStorageState = {
   activeColor: undefined,
   iconMutedColor: undefined,
   headerBorder: false,
+  messageChipBg: true,
 }
 
 /** 字号档位 → scale 映射 */
@@ -307,6 +313,11 @@ export const useThemeStore = defineStore('theme', () => {
     get: () => storage.value.headerBorder ?? false,
     set: (v: boolean) => { storage.value.headerBorder = v },
   })
+  const messageChipBg = computed({
+    // 兼容旧 localStorage：旧缓存无该字段时回落到开启（胶囊背景为默认视觉）
+    get: () => storage.value.messageChipBg ?? true,
+    set: (v: boolean) => { storage.value.messageChipBg = v },
+  })
 
   // watchEffect 首次会同步执行一遍，初始值与后续变更统一由这里写入 DOM，不再单独直写
   watchEffect(() => {
@@ -431,6 +442,15 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.style.setProperty(
       '--uikit-header-border-width',
       headerBorder.value ? '1px' : '0px'
+    )
+  })
+
+  // 消息辅助信息胶囊背景开关：关闭时覆写 --uikit-message-chip-bg 为 transparent，
+  // 开启时移除 inline 覆写，让主题 CSS 默认（跟随对方气泡底、随明暗切换）生效
+  watchEffect(() => {
+    applySemanticToken(
+      '--uikit-message-chip-bg',
+      messageChipBg.value ? undefined : 'transparent'
     )
   })
 
@@ -579,6 +599,11 @@ export const useThemeStore = defineStore('theme', () => {
     headerBorder.value = value
   }
 
+  /** 设置消息辅助信息胶囊背景开关（true 开启气泡底胶囊，false 仅保留文字） */
+  function setMessageChipBg(value: boolean) {
+    messageChipBg.value = value
+  }
+
   /**
    * 批量应用动画配置
    */
@@ -614,6 +639,7 @@ export const useThemeStore = defineStore('theme', () => {
     activeColor,
     iconMutedColor,
     headerBorder,
+    messageChipBg,
     setPrimaryColor,
     setPrimaryColorSat,
     setPrimaryColorLum,
@@ -637,6 +663,7 @@ export const useThemeStore = defineStore('theme', () => {
     setActiveColor,
     setIconMutedColor,
     setHeaderBorder,
+    setMessageChipBg,
     applyAnimationConfig,
   }
 })

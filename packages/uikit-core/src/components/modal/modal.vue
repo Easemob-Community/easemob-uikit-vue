@@ -20,11 +20,13 @@ export interface ModalProps {
   showClose?: boolean
   /** 是否显示 header 下分割线；不传时跟随全局 theme.headerBorder 开关（默认关闭），显式传入优先 */
   showHeaderDivider?: boolean
-  /** 弹窗宽度（px），默认 420；弹层整体仍受 90vw 上限约束 */
+  /** 弹窗宽度（px），默认 420；桌面端实际宽度 = min(width, 视口宽 × --uikit-modal-width-ratio)，
+   *  随屏幕宽度按比例自适应（ratio 默认 0.5，宿主可覆写该 CSS 变量调整占屏比），最小不小于 280px */
   width?: number
   /** 弹窗高度（px），不传时由内容撑开；受 90vh 上限约束 */
   height?: number
-  /** 正文对齐方式：left（默认）/ center（Text-Icon 居中变体） */
+  /** 正文对齐方式：left / center（Text-Icon 居中变体）；不传时按 type 自动判定——
+   *  通知类（type 非 default，带语义图标）居中，其余左对齐；显式传入优先 */
   contentAlign?: 'left' | 'center'
   /** 正文图标名（Text-Icon 模式），格式 "category/icon-name"，如 "circle/bang"；也可用 #icon 插槽接管。
    *  不传时按 type 内置语义图标（参考 Toast：danger/warning/info → 感叹号圆，success → 对勾圆） */
@@ -72,7 +74,6 @@ const props = withDefaults(defineProps<ModalProps>(), {
   showClose: true,
   width: 420,
   height: 0,
-  contentAlign: 'left',
   icon: '',
   showFooter: true,
   footerAlign: 'right',
@@ -96,6 +97,9 @@ const popupPosition = computed(() => (isMobile.value ? 'bottom' : 'center'))
 const themeStore = useThemeStore()
 /** header 分割线显隐：prop 显式传入优先，未传时跟随全局 headerBorder 开关（默认关闭） */
 const headerDividerVisible = computed(() => props.showHeaderDivider ?? themeStore.headerBorder)
+
+/** 正文对齐：显式 contentAlign 优先；未传时通知类（type 非 default）居中，其余左对齐 */
+const resolvedContentAlign = computed<'left' | 'center'>(() => props.contentAlign ?? (props.type === 'default' ? 'left' : 'center'))
 
 /** 语义类型 → 内置图标（参考 Toast 实现）；自定义 icon / #icon 插槽优先 */
 const TYPE_ICON_MAP: Partial<Record<NonNullable<ModalProps['type']>, { name: string, type: IconProps['type'] }>> = {
@@ -137,7 +141,7 @@ function onCancel() {
     <div
       class="uikit-modal"
       :class="{ 'uikit-modal--mobile': isMobile }"
-      :style="isMobile ? undefined : { width: `${props.width}px`, ...(props.height > 0 ? { height: `${props.height}px` } : {}) }"
+      :style="isMobile ? undefined : { '--uikit-modal-design-width': `${props.width}px`, ...(props.height > 0 ? { height: `${props.height}px` } : {}) }"
     >
       <div
         v-if="props.title || $slots.title || props.showClose"
@@ -160,7 +164,7 @@ function onCancel() {
           @click="onCancel"
         />
       </div>
-      <div class="uikit-modal__body" :class="[`uikit-modal__body--${props.contentAlign}`, { 'uikit-modal__body--flush': props.bodyFlush }]">
+      <div class="uikit-modal__body" :class="[`uikit-modal__body--${resolvedContentAlign}`, { 'uikit-modal__body--flush': props.bodyFlush }]">
         <div v-if="resolvedIcon || $slots.icon" class="uikit-modal__icon">
           <slot name="icon">
             <Icon v-if="resolvedIcon" :name="resolvedIcon.name" :size="72" :type="resolvedIcon.type" />
@@ -195,9 +199,11 @@ function onCancel() {
 
 <style scoped>
 /* 桌面端外壳由 Modal 自绘（Popup shell=false）：
-   白卡 + 阴影，无描边（设计稿形态）；圆角跟随全局大容器约束 --uikit-components-radius */
+   白卡 + 阴影，无描边（设计稿形态）；圆角跟随全局大容器约束 --uikit-components-radius。
+   宽度自适应：min(设计稿宽度, 视口宽 × --uikit-modal-width-ratio)，ratio 默认 0.5 可在主题层覆写 */
 .uikit-modal {
   min-width: 280px;
+  width: min(var(--uikit-modal-design-width, 420px), calc(100vw * var(--uikit-modal-width-ratio, 0.5)));
   max-width: calc(90vw - 40px);
   max-height: calc(90vh - 40px);
   max-height: calc(90dvh - 40px);

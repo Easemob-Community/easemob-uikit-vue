@@ -26,6 +26,8 @@ const props = withDefaults(defineProps<ProviderProps>(), {
   enableAtMe: true,
   enableTyping: true,
   filterBlockedContacts: true,
+  showNicknameInSingleChat: false,
+  showNicknameInGroupChat: true,
   enableToast: true,
 })
 
@@ -94,6 +96,11 @@ export interface ProviderProps {
      * Global header bottom divider toggle (conversation/contact/chat/drawer/modal headers). Default false.
      */
     headerBorder?: boolean
+    /**
+     * 消息辅助信息胶囊背景开关（时间分割线 / 通知事件 / 没有更多历史消息的气泡底胶囊），默认 true 开启。
+     * Toggle for the capsule background of auxiliary message tips (time dividers / notice events / no-more-history). Default true.
+     */
+    messageChipBg?: boolean
   }
   /** 界面语言：zh-CN 中文（默认） / en 英文 */
   locale?: 'zh-CN' | 'en'
@@ -144,6 +151,10 @@ export interface ProviderProps {
   enableTyping?: boolean
   /** 好友列表是否过滤掉已拉黑用户（默认 true；仅联系人子视图/好友列表生效，选人弹窗不受影响） */
   filterBlockedContacts?: boolean
+  /** 单聊消息列表是否展示对方昵称（默认 false，微信风格默认隐藏） */
+  showNicknameInSingleChat?: boolean
+  /** 群聊消息列表是否展示发送者昵称（默认 true） */
+  showNicknameInGroupChat?: boolean
   /**
    * 业务接管数据源，不传走 SDK 默认
    * @deprecated 已收口为薄别名：装配时逐项翻译为 repository 覆盖项注入 adapter
@@ -242,6 +253,8 @@ const features = computed<Partial<UIKitFeatures>>(() => ({
   enableAtMe: props.enableAtMe,
   enableTyping: props.enableTyping,
   filterBlockedContacts: props.filterBlockedContacts,
+  showNicknameInSingleChat: props.showNicknameInSingleChat,
+  showNicknameInGroupChat: props.showNicknameInGroupChat,
 }))
 
 const dataSource = computed(() => props.dataSource ?? {})

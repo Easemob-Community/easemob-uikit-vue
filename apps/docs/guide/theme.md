@@ -75,7 +75,7 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 ### 尺寸与圆角
 
 - `--uikit-container-gap`：容器间距（默认 `--uikit-spacing-2`）
-- `--uikit-sidebar-width`：侧栏列表容器（会话 / 联系人 / 群组 / 通讯录 / 黑名单）默认宽度（默认 360px；宿主可在容器作用域覆写，如 H5 全宽设为 `100%`）
+- `--uikit-sidebar-width`：侧栏列表容器（会话 / 联系人 / 群组 / 通讯录 / 黑名单）宽度 token（默认 360px）。容器**独占宿主槽位**（父级只有容器一个子元素）时默认填满宿主分配的宽度，自适应槽位宽窄；**与兄弟组件并排**（如 flex 行内的「会话列表 + 聊天区」布局，`EmResizable` 拖拽手柄也算兄弟节点）时回落为该 token 指定的固定侧栏宽，宿主可在容器作用域覆写（如 H5 全宽 / 拖拽侧栏设为 `100%`，或指定 `480px` 等具体值）
 - `--uikit-components-radius`：组件圆角（默认 8px）
 - `--uikit-components-radius-hover`：hover 圆角（默认 14px）
 - `--uikit-popup-padding`：弹出层内边距（默认 4px，hover/展开态 8px），用于 Popup / 菜单 / 表情面板等浮层内容与边界的留白
@@ -172,13 +172,15 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-bubble-radius` / `--uikit-bubble-radius-square`：气泡圆角档位（`bubbleShape: 'round'` = 16px（默认）/ `'square'` = 8px）
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，暗色 `#1E1E23` 比面板深一档；使用 `background` 简写，支持颜色/渐变/图片）
 - `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`，暗色 `#1E2123`）
+- `--uikit-input-surface-bg` / `--uikit-input-surface-sheen` / `--uikit-input-focus-glow`：消息输入卡片面（设计稿 msg_input；`--uikit-input-surface-bg` 默认 `transparent` 融入聊天背景，宿主可覆写为实色面）+ 顶部蓝色内阴影光晕，focus 叠主色 12% 内发光（发光色 color-mix 派生跟随主题色，暗色光晕略强）
+- `--uikit-input-field-glass-bg` / `--uikit-input-field-glass-border` / `--uikit-input-glass-blur`：全局输入框 `EmInput`（default/search/filled 变体，设计稿 inputs/onlight）毛玻璃面——填充（默认 `#F5F5F5` 20%，暗色 `rgba(30, 33, 35, 0.55)`）、同色细描边（默认 `#F5F5F5`，暗色 `#3C3F42`）、backdrop blur（`8px`）
 - `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#1E2123`）
 - `--uikit-input-border-color`：输入框默认边框色（默认 `#C9CDCF`，暗色 `#3C3F42`；search/filled 变体无边框不受其影响）
 - `--uikit-quote-line-color`：引用/回复竖线色（默认 `#C9CDCF`，暗色 `#3C3F42`；气泡下引用卡与输入框引用条共用）
 - `--uikit-msg-status-badge-color`：消息状态徽章（群已读/未读数胶囊）边框与文字色（默认 `#47ADEB`，明暗一致，独立于主色）
 - `--uikit-bubble-text-self-secondary`：己方气泡内次级文字（文件大小等弱化信息，默认 `#EFEFEF`，暗色 `rgba(30, 33, 35, 0.72)`）
 - `--uikit-file-card-radius`：文件消息卡片圆角（默认 `12px`，独立于气泡圆角两档 `bubbleShape`）
-- `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#E6E6E6` / `#BDBDBD`，暗色 `#464E53` / `#737B82`）
+- `--uikit-empty-icon-color` / `--uikit-empty-text-color`：空状态占位图标 / 文案颜色（默认 `#C9CDCF` / `#919BA1`，暗色 `#464E53` / `#737B82`）
 - `--uikit-badge-bg`：徽标（未读数 / 红点）默认背景色（默认 `#FF7070`，明暗一致，独立于 danger 语义色，`Badge` 的 `color` prop 可覆盖）；`--uikit-badge-text` 为徽标文字色（默认 `#FFFFFF`，暗色按设计稿反转为 `#1E1E23`）
 - `--uikit-switch-off-bg`：Switch 关闭态轨道色（默认 `#E3E6E8`，暗色 `#3A3D40`）；`--uikit-switch-on-bg` 为开启态轨道色（品牌蓝 `#009EFF`，暗色 `#33B1FF`，不跟随主题色）；`--uikit-switch-on-disabled-bg` 为开启禁用态轨道色（品牌蓝 20% 叠页面底 `color-mix` 派生，浅色下即 `#CCECFF`）
 - `--uikit-switch-halo-off` / `--uikit-switch-halo-on`：Switch hover/pressed 手柄外圈状态层光圈色（off 默认 5% 黑、暗色 8% 白；on 为品牌蓝 10% `color-mix` 派生）；`--uikit-switch-track-inner-shadow` 为 hover/pressed 轨道内阴影；`--uikit-switch-handle-bg` / `--uikit-switch-handle-ring` / `--uikit-switch-handle-shadow` 为手柄底色（浅色恒白，暗色按设计稿 `#1E2123`）、1px 描边（`#F1F2F3`，暗色 `#333538`）与双层落影

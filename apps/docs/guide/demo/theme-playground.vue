@@ -195,6 +195,9 @@ const items: ConfigItem[] = [
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* 固定预览舞台内的列表宽度（容器独占槽位时默认填满宿主宽度，这里显式给槽位定宽保持 360px 预览效果） */
+  width: 360px;
+  margin: 0 auto;
 }
 
 .playground__stage-inner :deep(> *) {

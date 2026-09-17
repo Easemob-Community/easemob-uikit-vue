@@ -891,7 +891,7 @@ watch(locateRequest, (req) => {
             <span v-else-if="historyTipState === 'failed'" class="message-list__history-retry" @click="retryLoadHistory">
               {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
             </span>
-            <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
+            <span v-else class="message-list__history-tip-chip">{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
           </slot>
         </div>
         <!-- 时间分割线 -->
@@ -958,7 +958,7 @@ watch(locateRequest, (req) => {
               <span v-else-if="historyTipState === 'failed'" class="message-list__history-retry" @click="retryLoadHistory">
                 {{ t('conversation.loadHistoryFailed', '加载失败，点击重试') }}
               </span>
-              <span v-else>{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
+              <span v-else class="message-list__history-tip-chip">{{ t('conversation.noMoreHistory', '没有更多历史消息') }}</span>
             </slot>
           </div>
           <!-- 时间分割线 -->
@@ -1079,8 +1079,8 @@ watch(locateRequest, (req) => {
 .message-list__divider span {
   padding: 2px 8px;
   border-radius: var(--uikit-components-radius, 8px);
-  /* 时间分割线 chip：气泡底（他人气泡同色 #E4E6E7，对齐设计稿 SystemMessage） */
-  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
+  /* 时间分割线 chip：气泡底（默认跟随 --uikit-message-chip-bg，可由 themeStore.messageChipBg 一键关闭） */
+  background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
   color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-12);
   line-height: 16px;
@@ -1111,6 +1111,16 @@ watch(locateRequest, (req) => {
 .message-list__history-retry {
   color: var(--uikit-primary-color);
   cursor: pointer;
+}
+
+/* 「没有更多历史消息」chip：与时间分割线同规格（气泡底 + 圆角胶囊） */
+.message-list__history-tip-chip {
+  padding: 2px 8px;
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
+  color: var(--uikit-text-secondary, #5E686E);
+  font-size: var(--uikit-font-size-12);
+  line-height: 16px;
 }
 
 /* 新消息提示 */

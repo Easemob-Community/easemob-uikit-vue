@@ -94,6 +94,8 @@ const defaultFeatures: UIKitFeatures = {
   enableAtMe: true,
   enableTyping: true,
   filterBlockedContacts: true,
+  showNicknameInSingleChat: false,
+  showNicknameInGroupChat: true,
 }
 
 /** capabilities 缺省值：adapter 未上报时全 true（行为零变化） */

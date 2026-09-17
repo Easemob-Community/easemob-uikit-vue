@@ -83,7 +83,7 @@ const { t } = useLocale()
 
 const clientStore = useClientStore()
 
-const { capabilities } = useUIKit()
+const { capabilities, features } = useUIKit()
 
 const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
 const { get: getPresence } = usePresence()
@@ -145,6 +145,20 @@ const showTime = computed<TimeDisplayStrategy>(() => props.config?.showTime ?? f
 
 /** 是否为对话模式且是己方消息 */
 const isSelfConversation = computed(() => layout.value === 'conversation' && isSelf.value)
+
+/**
+ * 是否展示发送者昵称。
+ * 己方消息永远不展示；对方消息按会话类型走 features 开关（运行时切换即刻生效）：
+ * 群聊默认展示（showNicknameInGroupChat，默认 true），单聊默认隐藏（showNicknameInSingleChat，默认 false）。
+ * 以消息自身的 conversationType 判定，合并转发弹窗 / 搜索结果等独立场景同样适用。
+ */
+const showNickname = computed(() => {
+  if (isSelf.value)
+    return false
+  if (props.message.conversationType === CONVERSATION_TYPE.GROUPCHAT)
+    return features.showNicknameInGroupChat ?? true
+  return features.showNicknameInSingleChat ?? false
+})
 
 /** 头像尺寸 */
 const avatarSize = computed(() => props.config?.avatarSize ?? 32)
@@ -530,7 +544,7 @@ onBeforeUnmount(() => {
         <!-- 内容区域 -->
         <div class="message-bubble-wrapper__content">
           <!-- 昵称 -->
-          <div v-if="!isSelf" class="message-bubble-wrapper__nickname">
+          <div v-if="showNickname" class="message-bubble-wrapper__nickname">
             <slot name="nickname" :message="message">
               {{ displayName }}
             </slot>
@@ -1126,7 +1140,7 @@ onBeforeUnmount(() => {
   max-width: 70%;
   margin: 0 auto;
   padding: 2px 8px;
-  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
+  background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
   border-radius: var(--uikit-components-radius, 8px);
   color: var(--uikit-text-secondary, #5E686E);
   font-size: var(--uikit-font-size-12);

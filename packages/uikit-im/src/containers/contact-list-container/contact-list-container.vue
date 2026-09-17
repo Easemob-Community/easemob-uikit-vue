@@ -276,8 +276,15 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: var(--uikit-sidebar-width, 360px);
+  /* 独占宿主槽位时填满宿主分配的宽度；与兄弟组件并排时回落侧栏固定宽（见下方 :not(:only-child)） */
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
+}
+
+/* 与兄弟组件并排（如 flex 行内的「列表 + 聊天区」布局）时保持侧栏默认宽；
+   注意 EmResizable 等包裹组件的拖拽手柄也算兄弟节点，槽位场景仍建议显式覆写 token */
+.contact-list-container:not(:only-child) {
+  width: var(--uikit-sidebar-width, 360px);
 }
 </style>

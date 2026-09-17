@@ -100,6 +100,13 @@ export function useTheme() {
     themeStore.setHeaderBorder(value)
   }
 
+  // ===== 消息辅助信息胶囊背景开关 =====
+  const messageChipBg = computed(() => themeStore.messageChipBg)
+
+  function setMessageChipBg(value: boolean) {
+    themeStore.setMessageChipBg(value)
+  }
+
   // ===== 预设主题 =====
   const preset = computed(() => themeStore.preset)
 
@@ -164,6 +171,7 @@ export function useTheme() {
     fontSizeScale,
     density,
     headerBorder,
+    messageChipBg,
     preset,
     bubbleBgOther,
     bubbleBgSelf,
@@ -185,6 +193,7 @@ export function useTheme() {
     setFontSize,
     setDensity,
     setHeaderBorder,
+    setMessageChipBg,
     setPreset,
     setBubbleBg,
     setChatBg,

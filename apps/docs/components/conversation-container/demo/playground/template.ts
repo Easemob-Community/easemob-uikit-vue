@@ -56,24 +56,27 @@ watch(
     :auto-init="false"
     :enable-presence="config.enablePresence"
   >
-    <EmConversationContainer
-      title="消息"
-      :show-sender-name="config.showSenderName"
-      :unread-mode="config.unreadMode"
-      :show-header="config.showHeader"
-      :header-align="config.headerAlign"
-      :tabs="config.tabs"
-      v-model:active-tab="activeTab.value"
-      :show-status-banner="config.showStatusBanner"
-      :show-search="config.showSearch"
-      :show-scroll-to-top="config.showScrollToTop"
-      :enable-presence="config.enablePresence"
-      :body-sticky="config.bodySticky"
-    >
-      <template #body>
-        <div class="notice">公告：本周五 15:00 全员大会（body 插槽内容）</div>
-      </template>
-    </EmConversationContainer>
+    <!-- 宽度槽位：容器独占槽位时填满 360px 宽；宿主也可以通过调整该 div 宽度验证自适应 -->
+    <div style="width: 360px; height: 100%;">
+      <EmConversationContainer
+        title="消息"
+        :show-sender-name="config.showSenderName"
+        :unread-mode="config.unreadMode"
+        :show-header="config.showHeader"
+        :header-align="config.headerAlign"
+        :tabs="config.tabs"
+        v-model:active-tab="activeTab.value"
+        :show-status-banner="config.showStatusBanner"
+        :show-search="config.showSearch"
+        :show-scroll-to-top="config.showScrollToTop"
+        :enable-presence="config.enablePresence"
+        :body-sticky="config.bodySticky"
+      >
+        <template #body>
+          <div class="notice">公告：本周五 15:00 全员大会（body 插槽内容）</div>
+        </template>
+      </EmConversationContainer>
+    </div>
   </EmUIKitProvider>
 </template>
 

@@ -1003,15 +1003,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
   flex-direction: column;
 }
 
-/* 空状态占位规格：图标 100×100（占位色 token），文案 16px（占位文本色 token），间距 8px；
-   flex:1 填满撑高层，配合 EmEmpty 根节点自身的 justify-content: center 实现垂直居中 */
+/* 空状态占位规格：图标 100×100，文案 16px，间距 8px；颜色统一由 core Empty 消费
+   --uikit-empty-icon-color / --uikit-empty-text-color，此处不再覆写 */
 .conversation-list__empty {
   gap: 8px;
   flex: 1;
-}
-
-.conversation-list__empty :deep(.uikit-empty__icon) {
-  color: var(--uikit-empty-icon-color, #E0E0E0);
 }
 
 .conversation-list__empty :deep(.uikit-empty__icon svg) {
@@ -1021,7 +1017,6 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 .conversation-list__empty :deep(.uikit-empty__description) {
   font-size: var(--uikit-font-size-16);
-  color: var(--uikit-empty-text-color, #BDBDBD);
 }
 
 .conversation-list__skeleton {
@@ -1070,8 +1065,8 @@ function handleCustomAction(key: string, conversation: Conversation) {
 .conversation-list__delete-body {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
-  text-align: left;
 }
 
 .conversation-list__delete-option {

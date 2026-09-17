@@ -120,6 +120,8 @@
   --uikit-banner-padding-x: 12px;
   --uikit-components-radius: 8px;
   --uikit-components-radius-hover: 14px;
+  /* 桌面端弹窗（EmModal）最大宽度占视口宽度比例（0~1）：实际宽度 = min(设计稿宽度, 视口宽 × ratio)，最小不小于 280px */
+  --uikit-modal-width-ratio: 0.5;
 
   /* Popup 内边距 */
   --uikit-popup-padding: 4px;
@@ -212,6 +214,9 @@
   /* 气泡内分割线（译文 / 语音转文字与原文之间，与原文同一气泡展示） */
   --uikit-bubble-divider-other: rgba(23, 26, 28, 0.12);
   --uikit-bubble-divider-self: rgba(255, 255, 255, 0.35);
+  /* 消息辅助信息胶囊底（时间分割线 / 通知事件 / 没有更多历史消息），默认跟随对方气泡底；
+     themeStore.messageChipBg 关闭时运行时覆写为 transparent */
+  --uikit-message-chip-bg: var(--uikit-bubble-bg-other);
   /* 气泡圆角档位：round（默认）16px / square 8px，由 bubbleShape 消费 */
   --uikit-bubble-radius: 16px;
   --uikit-bubble-radius-square: 8px;
@@ -248,9 +253,18 @@
   /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框；按设计稿校准为 #C9CDCF） */
   --uikit-input-border-color: #C9CDCF;
 
-  /* 语义 token：空状态占位（图标 / 文案） */
-  --uikit-empty-icon-color: #E6E6E6;
-  --uikit-empty-text-color: #BDBDBD;
+  /* 语义 token：消息输入卡片面（设计稿 msg_input）：默认透明融入聊天背景，仅保留顶部内阴影光晕；focus 态叠主色内发光 */
+  --uikit-input-surface-bg: transparent;
+  --uikit-input-surface-sheen: inset 0 30px 40px 16px rgba(136, 168, 188, 0.08);
+  --uikit-input-focus-glow: inset 0 0 12px color-mix(in srgb, var(--uikit-primary-color) 12%, transparent);
+  /* 语义 token：全局输入框 EmInput（设计稿 inputs/onlight）：#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur */
+  --uikit-input-field-glass-bg: rgba(245, 245, 245, 0.2);
+  --uikit-input-field-glass-border: #F5F5F5;
+  --uikit-input-glass-blur: 8px;
+
+  /* 语义 token：空状态占位（图标 / 文案）；亮色按设计稿弱化色系校准加重视觉（#C9CDCF / #919BA1，同档于 text-tertiary） */
+  --uikit-empty-icon-color: #C9CDCF;
+  --uikit-empty-text-color: #919BA1;
 
   /* 语义 token：徽标（未读数 / 红点）默认背景色，独立于 danger 语义色 */
   --uikit-badge-bg: #FF7070;
@@ -362,6 +376,8 @@
   /* 气泡内分割线 - 暗色（设计稿统一 #3C3F42） */
   --uikit-bubble-divider-other: #3C3F42;
   --uikit-bubble-divider-self: #3C3F42;
+  /* 消息辅助信息胶囊底 - 暗色（默认跟随对方气泡底） */
+  --uikit-message-chip-bg: var(--uikit-bubble-bg-other);
   /* 己方气泡内次级文字 - 暗色（己方气泡暗色为深字，次级同步弱化） */
   --uikit-bubble-text-self-secondary: rgba(30, 33, 35, 0.72);
   /* 消息状态徽章 - 暗色（亮蓝在暗底上可辨识，不覆写色值） */
@@ -383,6 +399,13 @@
 
   /* 语义 token：输入框默认边框 - 暗色（设计稿独立描边 #3C3F42） */
   --uikit-input-border-color: #3C3F42;
+
+  /* 语义 token：消息输入卡片面 - 暗色（同亮色默认透明融入聊天底，光晕略强；focus 内发光由 color-mix 明暗自适应） */
+  --uikit-input-surface-bg: transparent;
+  --uikit-input-surface-sheen: inset 0 30px 40px 16px rgba(136, 168, 188, 0.12);
+  /* 语义 token：全局输入框 EmInput - 暗色 */
+  --uikit-input-field-glass-bg: rgba(30, 33, 35, 0.55);
+  --uikit-input-field-glass-border: #3C3F42;
 
   /* 语义 token：空状态占位 - 暗色 */
   --uikit-empty-icon-color: #464E53;

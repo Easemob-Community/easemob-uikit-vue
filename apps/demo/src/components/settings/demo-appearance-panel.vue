@@ -31,6 +31,7 @@ const {
   fontSizeScale,
   density,
   headerBorder,
+  messageChipBg,
   bubbleBgOther,
   bubbleBgSelf,
   chatBg,
@@ -48,6 +49,7 @@ const {
   setFontSize,
   setDensity,
   setHeaderBorder,
+  setMessageChipBg,
   setAnimationEnabled,
   setAnimationLevel,
   setBubbleBg,
@@ -194,6 +196,7 @@ function resetAll() {
   setFontSize('normal')
   setDensity('normal')
   setHeaderBorder(false)
+  setMessageChipBg(true)
   setAnimationEnabled(true)
   setAnimationLevel('normal')
   setBubbleBg(null, null)
@@ -601,6 +604,20 @@ const currentColorStyle = computed(() => ({
         </div>
       </div>
       <p class="demo-row__desc">会话 / 通讯录 / 聊天 / 抽屉 / 弹窗 header 底部的 1px 分隔线，默认关闭</p>
+
+      <div class="demo-row demo-row--bordered">
+        <span class="demo-row__label">提示胶囊背景</span>
+        <div class="demo-row__right">
+          <button
+            class="demo-switch"
+            :class="{ 'demo-switch--active': messageChipBg }"
+            @click="setMessageChipBg(!messageChipBg)"
+          >
+            <span class="demo-switch__thumb" />
+          </button>
+        </div>
+      </div>
+      <p class="demo-row__desc">时间分割线 / 通知事件 / 没有更多历史消息的气泡底胶囊，默认开启</p>
 
       <div class="demo-row demo-row--bordered">
         <span class="demo-row__label">动画开关</span>

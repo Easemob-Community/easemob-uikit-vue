@@ -59,6 +59,11 @@ export interface ProviderThemeConfig {
    * Global header bottom divider toggle (conversation/contact/chat/drawer/modal headers). Default false.
    */
   headerBorder?: boolean
+  /**
+   * 消息辅助信息胶囊背景开关（时间分割线 / 通知事件 / 没有更多历史消息的气泡底胶囊），默认 true 开启。
+   * Toggle for the capsule background of auxiliary message tips (time dividers / notice events / no-more-history). Default true.
+   */
+  messageChipBg?: boolean
 }
 
 /** Provider 消息通知配置（notification prop，默认全开，触发模式 background） */
@@ -290,6 +295,9 @@ export function useProviderSideEffects(options: ProviderSideEffectsOptions) {
     }
     if (theme.headerBorder !== undefined) {
       themeStore.setHeaderBorder(theme.headerBorder)
+    }
+    if (theme.messageChipBg !== undefined) {
+      themeStore.setMessageChipBg(theme.messageChipBg)
     }
   }
 

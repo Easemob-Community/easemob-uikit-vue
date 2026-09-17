@@ -78,8 +78,7 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty__icon {
-  color: var(--uikit-text-secondary);
-  opacity: 0.5;
+  color: var(--uikit-empty-icon-color, #C9CDCF);
 }
 
 .uikit-empty__content {
@@ -92,19 +91,18 @@ const iconSize = computed(() => {
 .uikit-empty__title {
   font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-regular);
-  color: var(--uikit-empty-text-color, #BDBDBD);
+  color: var(--uikit-empty-text-color, #919BA1);
 }
 
 .uikit-empty__description {
   font-size: var(--uikit-font-size-13);
-  color: var(--uikit-empty-text-color, #BDBDBD);
+  color: var(--uikit-empty-text-color, #919BA1);
 }
 
 .uikit-empty__illustration {
   width: 96px;
   height: 96px;
-  color: var(--uikit-text-secondary);
-  opacity: 0.7;
+  color: var(--uikit-empty-icon-color, #C9CDCF);
 }
 
 .uikit-empty__action {

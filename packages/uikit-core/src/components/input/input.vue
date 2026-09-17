@@ -33,9 +33,9 @@ export interface InputProps {
   readonly?: boolean
   /**
    * 输入框风格变体
-   * - 'default': 白色背景 + 边框 + 圆角，适用于表单输入（默认）
-   * - 'search': 白底 + 底部细线，适用于搜索框
-   * - 'filled': 灰色背景 + 无边框 + 圆角，旧搜索风格
+   * - 'default': 毛玻璃面（#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur，设计稿 inputs/onlight）+ 胶囊圆角，适用于表单输入（默认）
+   * - 'search': 毛玻璃面 + 聚焦光环，适用于搜索框
+   * - 'filled': 毛玻璃面（旧搜索风格）
    * - 'ghost': 完全透明 + 聚焦时底部细线，极简风格
    * - 'underline': 无背景 + 仅底部一条线，最极简
    */
@@ -259,13 +259,16 @@ defineExpose({
 .uikit-input__field {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--uikit-input-border-color, #F5F5F5);
+  /* 设计稿 inputs/onlight 毛玻璃面：#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur */
+  border: 1px solid var(--uikit-input-field-glass-border, var(--uikit-input-border-color, #F5F5F5));
   border-radius: var(--uikit-input-radius, 999px);
   font-size: var(--uikit-font-size-16);
   line-height: calc(24px * var(--uikit-font-scale));
   outline: none;
-  background-color: var(--uikit-bg-base);
+  background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-base));
   color: var(--uikit-text-primary);
+  backdrop-filter: blur(var(--uikit-input-glass-blur, 8px));
+  -webkit-backdrop-filter: blur(var(--uikit-input-glass-blur, 8px));
   transition:
     border-color var(--uikit-anim-duration) var(--uikit-anim-easing),
     background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -328,15 +331,15 @@ defineExpose({
   line-height: 1.4;
 }
 
-/* Search 风格：灰色背景 + 无边框 + 圆角 + 聚焦光环（飞书风格） */
+/* Search 风格：毛玻璃面 + 细描边 + 聚焦光环（飞书风格） */
 .uikit-input__field--search {
-  background-color: var(--uikit-bg-secondary);
-  border-color: transparent;
+  background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-secondary));
+  border-color: var(--uikit-input-field-glass-border, #F5F5F5);
 }
 
 .uikit-input__field--search:focus {
   border-color: transparent;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-secondary));
   box-shadow: 0 0 0 2px var(--uikit-primary-color-opacity);
 }
 
@@ -344,15 +347,15 @@ defineExpose({
   color: var(--uikit-text-secondary);
 }
 
-/* Filled 风格：灰色背景 + 无边框 + 圆角 */
+/* Filled 风格：毛玻璃面 + 细描边 + 圆角 */
 .uikit-input__field--filled {
-  background-color: var(--uikit-bg-secondary);
-  border-color: transparent;
+  background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-secondary));
+  border-color: var(--uikit-input-field-glass-border, #F5F5F5);
 }
 
 .uikit-input__field--filled:focus {
   border-color: transparent;
-  background-color: var(--uikit-bg-secondary);
+  background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-secondary));
   box-shadow: none;
 }
 

@@ -1521,10 +1521,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   padding: 0;
 }
 
-.chat-info-drawer__confirm-body {
-  text-align: center;
-}
-
 .chat-info-drawer__confirm-body > p {
   margin: 0 0 12px;
   color: var(--uikit-text-secondary);

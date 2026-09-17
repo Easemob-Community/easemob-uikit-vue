@@ -430,13 +430,18 @@ function onSelectorChanged() {
   margin-bottom: 20px;
 }
 
+/* 整宽胶囊：与抽屉 footer 胶囊按钮（chat-info-drawer pill-btn）及设计稿 btn 组件
+   （1994:25152，py-12/16px/500/行高 100%）严格同规格——固定 42px 高，
+   避免 label line-height 1.2 把实际高度撑到 43.2px */
 .user-card__action--block {
   flex: none;
+  height: 42px;
   padding: 12px 4px;
 }
 
 .user-card__action--block .user-card__action-label {
   font-size: var(--uikit-font-size-16);
+  line-height: normal;
 }
 
 .user-card__info {
