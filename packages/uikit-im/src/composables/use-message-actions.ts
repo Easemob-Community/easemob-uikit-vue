@@ -88,14 +88,52 @@ export function useMessageActions() {
     }
   }
 
-  /** 删除本地消息 */
-  function deleteMessage(msgId: string) {
-    messageStore.deleteMessage(msgId)
+  /** 删除消息：先删服务端漫游历史，成功后移除本地；未送达的纯本地消息仅本地移除 */
+  async function deleteMessage(msgId: string) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs)
+      return
+    await removeMessagesWithSdk(cvs.id, cvs.type, [msgId])
   }
 
-  /** 批量删除本地消息 */
-  function deleteMessages(msgIds: string[]) {
-    messageStore.deleteMessages(msgIds)
+  /** 批量删除消息（语义同 deleteMessage） */
+  async function deleteMessages(msgIds: string[]) {
+    const cvs = conversationStore.currentConversation
+    if (!cvs)
+      return
+    await removeMessagesWithSdk(cvs.id, cvs.type, msgIds)
+  }
+
+  /**
+   * 删除消息统一入口：
+   * - 有服务端 ID 的消息先调 SDK 删漫游历史，成功后才从本地 store 移除（失败 toast 并保留本地）；
+   * - 仅本地 ID 的消息（未送达/发送中）不做 SDK 调用，直接本地移除。
+   */
+  async function removeMessagesWithSdk(
+    conversationId: string,
+    conversationType: ConversationTypeValue,
+    msgIds: string[],
+  ) {
+    const msgs = messageStore.getMessages(conversationId)
+    const serverIds: string[] = []
+    const localOnlyIds: string[] = []
+    for (const id of msgIds) {
+      const matched = msgs.find(m => (m.msgServerId || m.msgLocalId) === id)
+      if (matched?.msgServerId)
+        serverIds.push(matched.msgServerId)
+      else
+        localOnlyIds.push(id)
+    }
+    if (serverIds.length > 0) {
+      try {
+        await domains.message.removeMessages(conversationId, conversationType, serverIds)
+      }
+      catch (error) {
+        toast.error(t('message.delete.failed'))
+        throw error
+      }
+    }
+    messageStore.deleteMessages([...serverIds, ...localOnlyIds])
   }
 
   /** 翻译文本消息 */

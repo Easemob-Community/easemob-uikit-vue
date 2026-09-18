@@ -250,6 +250,37 @@ describe('messageDomain 旁路持久化钩子（persistence）', () => {
     expect(store.replaceWithSent).toHaveBeenCalledTimes(1)
     expect(persistence.saveMessage).toHaveBeenCalledTimes(1)
   })
+
+  it('removeMessages（4.x 无服务端删除 API）仅落删除墓碑，不触碰 SDK', async () => {
+    const client = makeMessageClient()
+    const store = makeMessageStore()
+    const deleteMessages = vi.fn()
+    const domain = new MessageDomain(client, store, {
+      messagePersistence: { deleteMessages },
+    })
+
+    await domain.removeMessages('c1', CONVERSATION_TYPE.SINGLECHAT, ['srv-1', 'srv-2'])
+    await flushHooks()
+
+    expect(deleteMessages).toHaveBeenCalledTimes(1)
+    expect(deleteMessages).toHaveBeenCalledWith(['srv-1', 'srv-2'])
+    // 4.x connection 无任何删除调用（无该方法）
+    expect(client.connection?.send).not.toHaveBeenCalled()
+  })
+
+  it('removeMessages 空列表直接返回，零调用', async () => {
+    const client = makeMessageClient()
+    const store = makeMessageStore()
+    const deleteMessages = vi.fn()
+    const domain = new MessageDomain(client, store, {
+      messagePersistence: { deleteMessages },
+    })
+
+    await domain.removeMessages('c1', CONVERSATION_TYPE.SINGLECHAT, [])
+    await flushHooks()
+
+    expect(deleteMessages).not.toHaveBeenCalled()
+  })
 })
 
 describe('conversationDomain 旁路持久化钩子（persistence）', () => {

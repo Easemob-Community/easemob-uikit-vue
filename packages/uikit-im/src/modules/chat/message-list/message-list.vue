@@ -460,6 +460,20 @@ const modalUnreadList = ref<string[]>([])
 const showDeleteConfirm = ref(false)
 const pendingDeleteMessage = ref<UiMessage | null>(null)
 
+/** 确认删除：失败时 toast 已由 useMessageActions 给出，这里仅吞掉 rejection */
+async function onConfirmDeleteMessage() {
+  const msg = pendingDeleteMessage.value
+  pendingDeleteMessage.value = null
+  if (!msg)
+    return
+  try {
+    await deleteMessage(msg.msgServerId || msg.msgLocalId)
+  }
+  catch {
+    // 删除失败：消息保留在列表，错误提示见 toast
+  }
+}
+
 /** 处理消息操作 */
 async function onMessageAction(event: MessageActionEvent) {
   if (event.action === 'multiSelect') {
@@ -1025,7 +1039,7 @@ watch(locateRequest, (req) => {
       type="warning"
       :confirm-text="t('button.confirm')"
       :cancel-text="t('button.cancel')"
-      @confirm="pendingDeleteMessage && deleteMessage(pendingDeleteMessage.msgServerId || pendingDeleteMessage.msgLocalId); pendingDeleteMessage = null"
+      @confirm="onConfirmDeleteMessage"
       @cancel="pendingDeleteMessage = null"
     >
       {{ t('message.delete.confirm') }}

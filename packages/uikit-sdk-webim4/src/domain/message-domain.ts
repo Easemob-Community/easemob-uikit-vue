@@ -471,6 +471,26 @@ export class MessageDomain {
     )
   }
 
+  /**
+   * 删除消息：4.x 无单条删除服务端漫游历史的公开 API，降级为本地删除语义——
+   * 仅落删除墓碑（注入持久化时），UI 侧本地移除；刷新后服务端漫游仍会拉回，
+   * 与旧版行为一致。
+   */
+  async removeMessages(
+    _conversationId: string,
+    _conversationType: ConversationTypeValue,
+    messageIds: string[],
+  ) {
+    if (messageIds.length === 0)
+      return
+    firePersistenceHook(
+      messageLogger,
+      'deleteMessages',
+      this.options.messagePersistence?.deleteMessages,
+      [...messageIds],
+    )
+  }
+
   /** 发送单条消息已读回执（4.x：发 type:'read' 消息，群聊即群已读回执） */
   async markRead(
     conversationId: string,

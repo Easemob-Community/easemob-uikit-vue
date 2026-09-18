@@ -178,6 +178,62 @@ describe('messageDomain 旁路持久化（persistence）', () => {
     expect(persistence.saveMessages).toHaveBeenCalledTimes(1)
   })
 
+  it('removeMessages 调 SDK 删漫游历史，成功后落删除墓碑', async () => {
+    const removeHistoryMessages = vi.fn().mockResolvedValue(undefined)
+    const client = {
+      currentUserId: SELF,
+      chatManager: { removeHistoryMessages },
+    } as unknown as ManagerHost
+    const store = makeStore()
+    const persistence = makePersistence()
+    const domain = new MessageDomain(client, store, { persistence })
+
+    await domain.removeMessages('c1', CONVERSATION_TYPE.SINGLECHAT, ['srv-1', 'srv-2'])
+    await flushPersist()
+
+    expect(removeHistoryMessages).toHaveBeenCalledTimes(1)
+    expect(removeHistoryMessages).toHaveBeenCalledWith({
+      conversationId: 'c1',
+      conversationType: CONVERSATION_TYPE.SINGLECHAT,
+      messageIds: ['srv-1', 'srv-2'],
+    })
+    expect(persistence.deleteMessages).toHaveBeenCalledTimes(1)
+    expect(persistence.deleteMessages).toHaveBeenCalledWith(['srv-1', 'srv-2'])
+  })
+
+  it('removeMessages SDK 删除失败：错误向上抛且不落墓碑', async () => {
+    const removeHistoryMessages = vi.fn().mockRejectedValue(new Error('network down'))
+    const client = {
+      currentUserId: SELF,
+      chatManager: { removeHistoryMessages },
+    } as unknown as ManagerHost
+    const store = makeStore()
+    const persistence = makePersistence()
+    const domain = new MessageDomain(client, store, { persistence })
+
+    await expect(domain.removeMessages('c1', CONVERSATION_TYPE.SINGLECHAT, ['srv-1'])).rejects.toThrow('network down')
+    await flushPersist()
+
+    expect(persistence.deleteMessages).not.toHaveBeenCalled()
+  })
+
+  it('removeMessages 空列表直接返回，零调用', async () => {
+    const removeHistoryMessages = vi.fn()
+    const client = {
+      currentUserId: SELF,
+      chatManager: { removeHistoryMessages },
+    } as unknown as ManagerHost
+    const store = makeStore()
+    const persistence = makePersistence()
+    const domain = new MessageDomain(client, store, { persistence })
+
+    await domain.removeMessages('c1', CONVERSATION_TYPE.SINGLECHAT, [])
+    await flushPersist()
+
+    expect(removeHistoryMessages).not.toHaveBeenCalled()
+    expect(persistence.deleteMessages).not.toHaveBeenCalled()
+  })
+
   it('未注入 persistence 时零调用零报错', async () => {
     const client = makeSendClient()
     const store = makeStore()

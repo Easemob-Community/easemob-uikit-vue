@@ -524,6 +524,28 @@ export class MessageDomain {
       firePersist(() => markRecalled(messageId, this.currentUserId))
   }
 
+  /**
+   * 删除消息：移除当前用户的服务端漫游历史（SDK5 `removeHistoryMessages`）。
+   * 成功后本端立即落删除墓碑；多端移除事件（onMultiDeviceMessageRemoved）路径
+   * 在 chat-events 另有处理。
+   */
+  async removeMessages(
+    conversationId: string,
+    conversationType: ConversationTypeValue,
+    messageIds: string[],
+  ) {
+    if (messageIds.length === 0)
+      return
+    await this.client.chatManager.removeHistoryMessages({
+      conversationId,
+      conversationType,
+      messageIds,
+    })
+    const deleteMessages = this.options.persistence?.deleteMessages
+    if (deleteMessages)
+      firePersist(() => deleteMessages([...messageIds]))
+  }
+
   /** 批量发送消息已读回执（统一 API，支持单聊/群聊） */
   async markMessagesRead(
     conversationId: string,

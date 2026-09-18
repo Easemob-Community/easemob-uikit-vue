@@ -161,30 +161,44 @@ export function useMessageSend() {
     if (!cvs)
       return
 
-    switch (message.type) {
-      case MESSAGE_TYPE.TEXT:
-        // 文本/自定义消息：确认能重发后再删除本地失败消息，避免删完发不出去导致丢消息
-        messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
-        return domains.message.sendText(cvs.id, cvs.type, (message.body as TextMessageBody).content || '', message.ext)
-      case MESSAGE_TYPE.CUSTOM:
-        messageStore.deleteMessage(message.msgServerId || message.msgLocalId)
-        return domains.message.sendCustom(
-          cvs.id,
-          cvs.type,
-          (message.body as CustomMessageBody).event || '',
-          (message.body as CustomMessageBody).params,
-          message.ext,
-        )
-      case MESSAGE_TYPE.IMAGE:
-      case MESSAGE_TYPE.VOICE:
-      case MESSAGE_TYPE.VIDEO:
-      case MESSAGE_TYPE.FILE:
-        // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
-        // 抛标识错误由调用方（message-list onResend）转为 toast，避免静默无反馈
-        logger.warn('[useMessageSend] resendMessage: media resend requires original File')
-        throw new Error('MEDIA_RESEND_UNSUPPORTED')
-      default:
-        logger.warn('[useMessageSend] resendMessage: unsupported message type', message.type)
+    // 媒体/未知类型不进入删旧逻辑（下方 switch 单独处理）
+    const resendId = message.msgServerId || message.msgLocalId
+    const isTextLike = message.type === MESSAGE_TYPE.TEXT || message.type === MESSAGE_TYPE.CUSTOM
+    // 先发后删的补偿式实现：_send 被调用时同步插入新 sending 气泡，
+    // 若先删旧消息再发，发送前同步抛错会导致该条消息静默丢失；
+    // 故先删旧消息（避免双气泡），失败时回补旧消息并上抛。
+    if (isTextLike)
+      messageStore.deleteMessage(resendId)
+
+    try {
+      switch (message.type) {
+        case MESSAGE_TYPE.TEXT:
+          return await domains.message.sendText(cvs.id, cvs.type, (message.body as TextMessageBody).content || '', message.ext)
+        case MESSAGE_TYPE.CUSTOM:
+          return await domains.message.sendCustom(
+            cvs.id,
+            cvs.type,
+            (message.body as CustomMessageBody).event || '',
+            (message.body as CustomMessageBody).params,
+            message.ext,
+          )
+        case MESSAGE_TYPE.IMAGE:
+        case MESSAGE_TYPE.VOICE:
+        case MESSAGE_TYPE.VIDEO:
+        case MESSAGE_TYPE.FILE:
+          // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
+          // 抛标识错误由调用方（message-list onResend）转为 toast，避免静默无反馈
+          logger.warn('[useMessageSend] resendMessage: media resend requires original File')
+          throw new Error('MEDIA_RESEND_UNSUPPORTED')
+        default:
+          logger.warn('[useMessageSend] resendMessage: unsupported message type', message.type)
+      }
+    }
+    catch (error) {
+      // 发送未成功：回补旧失败消息，避免从列表静默消失
+      if (isTextLike)
+        messageStore.addMessage(message)
+      throw error
     }
   }
 

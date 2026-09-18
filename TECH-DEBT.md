@@ -1344,6 +1344,18 @@
 - **建议修法**：两容器给默认渲染的 `ContactNoticeList` 绑定 `@accept` / `@decline` 并以 kebab-case 事件 re-emit（如 `notice-accept` / `notice-decline`），纯增量向后兼容；默认行为（置灰/移除）不变，是否跳转会话由业务决定。
 - **关联 skill**：`uikit-component-authoring` / `uikit-contact-group-capabilities`
 
+### [ ] D136. `sendReadAckForMessage` 死导出：已读回执 UI 契约面冗余
+
+- **现象**：`use-chat.ts` 导出的 `sendReadAckForMessage`（调 `domains.message.markRead`）在 uikit-im 全仓无调用方；契约 `SdkMessageDomain.markMessagesRead`（`packages/uikit-sdk-contract/src/domains.ts`）同样无 UI 层调用。已读回执实际链路在 adapter 事件层：websdk5 `chat-events.ts` 的 `queueMessageReadReceipt`（microtask 合并 50 条/批调 `sendMessageReadReceipts`）+ 进会话补发 `sendPendingReadReceipts`（conversation-domain enter hook），功能无断档，属冗余代码面。
+- **建议修法**：评估后删除 `sendReadAckForMessage` 导出（或降级为不导出的内部辅助）；契约 `markRead` / `markMessagesRead` 保留（adapter 事件层内部消费）。删除时注意 use-chat 的公开导出面对外可见性（dist 类型），属潜在 breaking，需 changelog 说明。
+- **关联 skill**：`uikit-chat-interactions` / `uikit-sdk-adapter-architecture`
+
+### [ ] D137. 消息搜索绕过 domains 直调 SDK，webim4 下静默降级
+
+- **现象**：`packages/uikit-im/src/composables/use-message-search.ts` 直接 `sdkClient.chatManager?.searchMessages(...)`，未经 domain 契约。webim4 adapter（4.x SDK 无 `searchMessages` API）下靠可选链静默降级为搜索不可用，且无日志无提示。读路径无状态断档，但违反「UI 只经 domains」分层约定，与 D122 adapter 抽象方向相悖。
+- **建议修法**：把消息搜索收进 `SdkMessageDomain` 契约（如 `searchMessages(keyword, options)`），双 adapter 实现：websdk5 透传 `chatManager.searchMessages`；webim4 明确抛不支持错误（或经 capabilities 声明降级），UI 层按 capabilities 隐藏搜索入口。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-chat-interactions`
+
 ---
 
 ## 已修复（归档）

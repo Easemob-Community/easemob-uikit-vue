@@ -816,12 +816,17 @@ function onMultiSelectForwardCombine() {
 }
 
 /** 多选：删除 */
-function onMultiSelectDelete(messages: UiMessage[]) {
+async function onMultiSelectDelete(messages: UiMessage[]) {
   if (messages.length === 0) {
     exitMultiSelectMode()
     return
   }
-  deleteMessages(messages.map(m => m.msgServerId || m.msgLocalId))
+  try {
+    await deleteMessages(messages.map(m => m.msgServerId || m.msgLocalId))
+  }
+  catch {
+    // 删除失败：消息保留在列表，错误提示见 toast
+  }
   exitMultiSelectMode()
 }
 

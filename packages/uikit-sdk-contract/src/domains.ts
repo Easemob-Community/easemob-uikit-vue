@@ -39,6 +39,12 @@ export interface SdkMessageDomain {
   sendCombine: (conversationId: string, conversationType: ConversationTypeValue, title: string, summary: string, compatibleText: string, messageList: readonly SdkMessage[], ext?: Record<string, unknown>) => Promise<SdkMessage>
   fetchHistory: (conversationId: string, conversationType: ConversationTypeValue, cursor?: string, pageSize?: number) => Promise<{ list: UiMessage[], cursor?: string, hasMore: boolean }>
   recall: (conversationId: string, conversationType: ConversationTypeValue, messageId: string) => Promise<void>
+  /**
+   * 删除消息：移除当前用户的服务端漫游历史，本账号各端同步生效。
+   * Remove messages: deletes the current user's server-side roaming history,
+   * synced across all devices of the same account.
+   */
+  removeMessages: (conversationId: string, conversationType: ConversationTypeValue, messageIds: string[]) => Promise<void>
   /** 发送单条消息已读回执 */
   markRead: (conversationId: string, conversationType: ConversationTypeValue, messageId: string) => Promise<void>
   /** 批量发送消息已读回执 */
