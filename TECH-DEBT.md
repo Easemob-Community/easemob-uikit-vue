@@ -1338,6 +1338,12 @@
 
 ### [ ] D98（已归档，见「已修复」区）
 
+### [ ] D135. 好友申请/群邀请「通过、拒绝」事件未从容器向上透传，业务只能整槽接管 `#notice`
+
+- **现象**：`EmContactNoticeList` 已声明并触发 `accept` / `decline` 事件（`modules/contact/contact-notice-list.vue`），但 `EmContactContainer`（`containers/contact-container/contact-container.vue`）与 `EmAddressBookContainer` 默认渲染处只写 `<ContactNoticeList v-if="!$slots.notice" />`，未绑定也未 re-emit。业务方想感知「谁被通过了」（如通过后跳入单聊）只能整体接管 `#notice` 插槽重渲染列表，接入成本高。对外 demo（easemob-demo-vue3 通讯录页）2026-09-18 即以 `#notice` 插槽 + `@accept` 实现「好友申请通过后直接进入会话」，属绕过而非正路。
+- **建议修法**：两容器给默认渲染的 `ContactNoticeList` 绑定 `@accept` / `@decline` 并以 kebab-case 事件 re-emit（如 `notice-accept` / `notice-decline`），纯增量向后兼容；默认行为（置灰/移除）不变，是否跳转会话由业务决定。
+- **关联 skill**：`uikit-component-authoring` / `uikit-contact-group-capabilities`
+
 ---
 
 ## 已修复（归档）
