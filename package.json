@@ -9,9 +9,9 @@
   },
   "pnpm": {
     "overrides": {
-      "@easemob/uikit-im>@easemob/uikit-core": "file:./easemob-uikit-core-2.8.4.tgz",
-      "@easemob/uikit-im>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.2.1.tgz",
-      "@easemob/uikit-core>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.2.1.tgz"
+      "@easemob/uikit-im>@easemob/uikit-core": "file:./easemob-uikit-core-2.8.5.tgz",
+      "@easemob/uikit-im>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.3.0.tgz",
+      "@easemob/uikit-core>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.3.0.tgz"
     }
   },
   "scripts": {

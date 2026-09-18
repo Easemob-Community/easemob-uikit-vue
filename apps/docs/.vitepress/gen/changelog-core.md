@@ -1,3 +1,18 @@
+## @easemob/uikit-core 2.8.5 (2026-09-18)
+
+
+### 变更
+
+- **输入占位文字字号统一为 13px**（`EmInput` 及聊天输入框），比正文（15px）小一档，对齐抽屉搜索框观感。
+- **群成员移除文案收敛**：`group.memberList.remove` 由「从群组移除」改为「移除」。
+
+### 新增
+
+- **icons-v2 新增 `dspntd`（失望）图标**：好友申请被对端拒绝的通知条目使用。
+- **locale 新增 `contact.inviteRequestReceived` / `contact.inviteDeclinedByPeer`**：好友申请副文案与「拒绝了你的好友申请」通知文案。
+
+---
+
 ## @easemob/uikit-core 2.8.4 (2026-09-18)
 
 

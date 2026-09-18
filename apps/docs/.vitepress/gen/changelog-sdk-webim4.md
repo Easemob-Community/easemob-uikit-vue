@@ -1,3 +1,16 @@
+## @easemob/uikit-sdk-webim4 1.3.1 (2026-09-18)
+
+
+### 新增
+
+- **实现契约 `removeMessages`**：4.x SDK 无单条删除服务端漫游历史的公开 API，降级为本地删除语义（仅落删除墓碑），UI 本地移除行为与旧版一致。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：与 websdk5 1.3.1 对齐。
+
+---
+
 ## @easemob/uikit-sdk-webim4 1.3.0 (2026-09-16)
 
 

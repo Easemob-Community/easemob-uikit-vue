@@ -1,3 +1,16 @@
+## @easemob/uikit-sdk-websdk5 1.3.1 (2026-09-18)
+
+
+### 新增
+
+- **实现契约 `removeMessages`**：透传 SDK `chatManager.removeHistoryMessages` 删除服务端漫游历史，成功后触发 `persistence.message.deleteMessages` 删除墓碑（多端移除事件路径另有落库）。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：无本地 pending 申请时落一条 `outgoing: true` 的拒绝通知，UI 展示「拒绝了你的好友申请」。
+
+---
+
 ## @easemob/uikit-sdk-websdk5 1.3.0 (2026-09-16)
 
 

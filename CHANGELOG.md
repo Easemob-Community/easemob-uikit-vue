@@ -1,5 +1,61 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.5 (2026-09-18)
+
+### 修复
+
+- **修复删除消息后刷新页面消息「复活」的问题（严重）**：消息删除原先只移除前端内存列表、未调用 SDK，刷新后历史消息从服务端漫游重新拉取导致被删消息重新出现。现删除 / 批量删除会先调用 SDK 删除当前用户的服务端漫游历史（本账号各端经多端事件同步移除），成功后才移除本地消息，删除失败保留消息并 toast 提示；仅本地未送达消息（无服务端 ID）只本地移除（sdk-contract 1.3.0 / websdk5 1.3.1 / webim4 1.3.1）。
+- **修复重发失败消息时窄窗口丢消息**：原实现「先删旧消息再发送」，发送前校验同步抛错会导致该条消息从列表静默消失；改为发送失败时回补旧失败消息。
+- **图片消息防闪烁**：己方发送成功 body 回填远程地址时先预载新图再切换 src，避免气泡白屏重载「闪一下」；发送中气泡用已加载图片自然尺寸撑住容器，避免回填真实尺寸时跳动；消息列表 :key 稳定性修复（本地 ID 优先），发送成功替换气泡不再整树销毁重建（含已加载图片）。
+
+### 变更
+
+- **好友申请通知列表改版**（对齐 Figma「新-Demo」）：新增「对方拒绝了你的好友申请」通知（粉色失望图标头像），列表去除头部 / 时间 / 附言独立行，副文案按场景展示附言 / 群名 / 设计稿固定文案；接受 / 拒绝操作补成功 toast（sdk-contract 1.3.0）。
+- **输入占位文字统一 13px**（core 2.8.5）；会话列表 header / 搜索槽 / 状态横幅 / 分栏 tab 左缘统一 16px 对齐（列表项头像左缘同口径）；群成员移除菜单文案收敛为「移除」。
+
+### 新增
+
+- **`EmAddressBookContainer` / `EmContactContainer` 新增 `showNoticeAddButton`**：「新请求」子视图头部展示添加好友按钮，默认 `false`。
+
+## @easemob/uikit-core 2.8.5 (2026-09-18)
+
+### 变更
+
+- **输入占位文字字号统一为 13px**（`EmInput` 及聊天输入框），比正文（15px）小一档，对齐抽屉搜索框观感。
+- **群成员移除文案收敛**：`group.memberList.remove` 由「从群组移除」改为「移除」。
+
+### 新增
+
+- **icons-v2 新增 `dspntd`（失望）图标**：好友申请被对端拒绝的通知条目使用。
+- **locale 新增 `contact.inviteRequestReceived` / `contact.inviteDeclinedByPeer`**：好友申请副文案与「拒绝了你的好友申请」通知文案。
+
+## @easemob/uikit-sdk-contract 1.3.0 (2026-09-18)
+
+### 新增
+
+- **`SdkMessageDomain` 新增 `removeMessages`**：删除当前用户的服务端漫游历史（本账号各端同步生效），补齐消息删除的契约面（双 adapter 实现见 websdk5 1.3.1 / webim4 1.3.1）。
+- **`UiContactInvite` 新增 `outgoing` 字段**：标记「我发出的申请被对方拒绝」的通知方向，用于通知列表展示。
+
+## @easemob/uikit-sdk-websdk5 1.3.1 (2026-09-18)
+
+### 新增
+
+- **实现契约 `removeMessages`**：透传 SDK `chatManager.removeHistoryMessages` 删除服务端漫游历史，成功后触发 `persistence.message.deleteMessages` 删除墓碑（多端移除事件路径另有落库）。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：无本地 pending 申请时落一条 `outgoing: true` 的拒绝通知，UI 展示「拒绝了你的好友申请」。
+
+## @easemob/uikit-sdk-webim4 1.3.1 (2026-09-18)
+
+### 新增
+
+- **实现契约 `removeMessages`**：4.x SDK 无单条删除服务端漫游历史的公开 API，降级为本地删除语义（仅落删除墓碑），UI 本地移除行为与旧版一致。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：与 websdk5 1.3.1 对齐。
+
 ## @easemob/uikit-im 3.7.4 (2026-09-18)
 
 ### 变更
