@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
+import {
+  EmAvatar as Avatar,
+  EmEmpty as Empty,
+  EmIcon as Icon,
+  type UiContactInvite,
+  createLogger,
+  formatSdkError,
+  useLocale,
+  useToast,
+} from '@easemob/uikit-core'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'
 import { type InvitePersistType, useInvitePersistence } from '../../composables/use-invite-persistence'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import type { UiContactInvite } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
 
 const props = withDefaults(defineProps<ContactNoticeListProps>(), {
   invites: undefined,
@@ -48,6 +51,11 @@ function isProcessing(invite: UiContactInvite): boolean {
   return processingIds.value.has(invite.id)
 }
 
+/** 我发出的申请被对方拒绝（Figma「新-Demo」2772:28346：粉色失望头像 + 「拒绝了你的好友申请」） */
+function isDeclinedByPeer(invite: UiContactInvite): boolean {
+  return invite.outgoing === true && invite.status === 'declined'
+}
+
 function isAlreadyAccepted(invite: UiContactInvite): boolean {
   if (invite.status !== 'pending')
     return false
@@ -77,6 +85,7 @@ async function onAccept(invite: UiContactInvite) {
     else if (invite.userId) {
       await acceptContactInvite(invite.userId)
     }
+    showToast(t('contact.inviteAccepted', '已接受'), 'success')
     emit('accept', invite)
   }
   catch (err) {
@@ -99,6 +108,7 @@ async function onDecline(invite: UiContactInvite) {
     else if (invite.userId) {
       await declineContactInvite(invite.userId)
     }
+    showToast(t('contact.inviteDeclined', '已拒绝'), 'success')
     emit('decline', invite)
   }
   catch (err) {
@@ -108,13 +118,6 @@ async function onDecline(invite: UiContactInvite) {
   finally {
     processingIds.value.delete(invite.id)
   }
-}
-
-function formatTime(timestamp?: number): string {
-  if (!timestamp)
-    return ''
-  const date = new Date(timestamp)
-  return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
 function statusLabel(status: UiContactInvite['status']): string {
@@ -136,9 +139,10 @@ function displaySubtitle(invite: UiContactInvite): string {
     const inviter = invite.inviterName || invite.inviterId
     if (inviter)
       return `${t('contact.inviteInviter', '邀请人')}: ${inviter}`
-    return `ID: ${invite.groupId || ''}`
+    return invite.groupName || `ID: ${invite.groupId || ''}`
   }
-  return `ID: ${invite.userId || ''}`
+  // 好友申请：有附言展示附言，否则展示设计稿固定文案「向你发送了好友申请」
+  return invite.reason || t('contact.inviteRequestReceived', '向你发送了好友申请')
 }
 
 function avatarName(invite: UiContactInvite): string {
@@ -150,12 +154,6 @@ function avatarName(invite: UiContactInvite): string {
 
 <template>
   <div class="contact-notice-list">
-    <!-- Header -->
-    <div class="contact-notice-list__header">
-      <span class="contact-notice-list__title">{{ t('contact.inviteTitle', '好友申请') }}</span>
-      <span v-if="displayInvites.length > 0" class="contact-notice-list__count">{{ displayInvites.length }}</span>
-    </div>
-
     <!-- Loading -->
     <div v-if="loading && displayInvites.length === 0" class="contact-notice-list__empty">
       <span class="contact-notice-list__empty-text">{{ t('common.loading') }}</span>
@@ -174,34 +172,34 @@ function avatarName(invite: UiContactInvite): string {
         v-for="invite in displayInvites"
         :key="invite.id"
         class="contact-notice-list__item"
-        :class="{
-          'contact-notice-list__item--accepted': effectiveStatus(invite) === 'accepted',
-          'contact-notice-list__item--declined': effectiveStatus(invite) === 'declined',
-        }"
+        :class="{ 'contact-notice-list__item--actionable': !isDeclinedByPeer(invite) }"
       >
+        <!-- 对方拒绝通知：粉色失望图标头像（Figma「新-Demo」2772:28346） -->
+        <span
+          v-if="isDeclinedByPeer(invite)"
+          class="contact-notice-list__decline-avatar"
+        >
+          <Icon name="dspntd" :size="20" />
+        </span>
         <Avatar
+          v-else
           class="contact-notice-list__avatar"
           :name="avatarName(invite)"
           :src="invite.avatarUrl"
-          :size="44"
+          :size="48"
         />
 
         <div class="contact-notice-list__info">
-          <div class="contact-notice-list__name-row">
+          <div class="contact-notice-list__text">
             <span class="contact-notice-list__name">{{ displayTitle(invite) }}</span>
-            <span v-if="statusLabel(effectiveStatus(invite))" class="contact-notice-list__status">{{ statusLabel(effectiveStatus(invite)) }}</span>
+            <span class="contact-notice-list__subtitle">
+              {{ isDeclinedByPeer(invite) ? t('contact.inviteDeclinedByPeer', '拒绝了你的好友申请') : displaySubtitle(invite) }}
+            </span>
           </div>
-          <div class="contact-notice-list__meta">
-            <span class="contact-notice-list__subtitle">{{ displaySubtitle(invite) }}</span>
-            <span v-if="invite.reason" class="contact-notice-list__reason">{{ t('contact.inviteReason', '附言') }}: {{ invite.reason }}</span>
-          </div>
-          <div v-if="invite.timestamp" class="contact-notice-list__time">
-            {{ formatTime(invite.timestamp) }}
-          </div>
-        </div>
-
-        <div class="contact-notice-list__actions">
-          <template v-if="effectiveStatus(invite) === 'pending'">
+          <div
+            v-if="effectiveStatus(invite) === 'pending'"
+            class="contact-notice-list__actions"
+          >
             <button
               class="contact-notice-list__btn contact-notice-list__btn--primary"
               :disabled="isProcessing(invite)"
@@ -210,13 +208,19 @@ function avatarName(invite: UiContactInvite): string {
               {{ t('contact.inviteAccept', '接受') }}
             </button>
             <button
-              class="contact-notice-list__btn contact-notice-list__btn--default"
+              class="contact-notice-list__btn"
               :disabled="isProcessing(invite)"
               @click="onDecline(invite)"
             >
               {{ t('contact.inviteDecline', '拒绝') }}
             </button>
-          </template>
+          </div>
+          <span
+            v-else-if="!isDeclinedByPeer(invite) && statusLabel(effectiveStatus(invite))"
+            class="contact-notice-list__status"
+          >
+            {{ statusLabel(effectiveStatus(invite)) }}
+          </span>
         </div>
       </div>
     </div>
@@ -231,60 +235,55 @@ function avatarName(invite: UiContactInvite): string {
   background-color: var(--uikit-bg-base);
 }
 
-.contact-notice-list__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-sizing: border-box;
-  padding: 12px 16px;
-  /* border-box 总高统一 56px（与通讯录/会话列表 header 一致） */
-  min-height: 56px;
-  flex-shrink: 0;
-}
-
-.contact-notice-list__title {
-  font-size: var(--uikit-font-size-15);
-  font-weight: var(--uikit-font-weight-semibold);
-  color: var(--uikit-text-primary);
-}
-
-.contact-notice-list__count {
-  font-size: var(--uikit-font-size-11);
-  font-weight: var(--uikit-font-weight-medium);
-  color: var(--uikit-text-inverse);
-  background-color: var(--uikit-danger-color);
-  padding: 1px 7px;
-  border-radius: 10px;
-}
+/* 页面 header（返回 + 标题 + 操作）由 AddressBookContainer 子视图头部提供，模块内不再自绘 */
 
 .contact-notice-list__items {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
 }
 
 .contact-notice-list__item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--uikit-border-color, #f3f4f6);
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-bg-base);
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+/* 有待处理操作或状态标签的条目固定 96px；「对方拒绝」纯文案条目 64px */
+.contact-notice-list__item--actionable {
+  min-height: 96px;
 }
 
 @media (hover: hover) {
   .contact-notice-list__item:hover {
-    background-color: var(--uikit-bg-secondary);
+    background-color: var(--uikit-bg-hover);
   }
 }
 
-.contact-notice-list__item--accepted,
-.contact-notice-list__item--declined {
-  opacity: 0.7;
+.contact-notice-list__avatar,
+.contact-notice-list__decline-avatar {
+  flex-shrink: 0;
 }
 
-.contact-notice-list__avatar {
-  flex-shrink: 0;
+.contact-notice-list__decline-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--uikit-danger-color, #ff4d6d) 40%, var(--uikit-bg-base));
+  color: var(--uikit-text-inverse);
 }
 
 .contact-notice-list__info {
@@ -292,40 +291,30 @@ function avatarName(invite: UiContactInvite): string {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.contact-notice-list__name-row {
-  display: flex;
-  align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
-.contact-notice-list__name {
-  font-size: var(--uikit-font-size-14);
-  font-weight: var(--uikit-font-weight-medium);
-  color: var(--uikit-text-primary);
-}
-
-.contact-notice-list__status {
-  font-size: var(--uikit-font-size-10);
-  padding: 1px 6px;
-  border-radius: 4px;
-  background-color: var(--uikit-bg-secondary);
-  color: var(--uikit-text-secondary);
-}
-
-.contact-notice-list__meta {
+.contact-notice-list__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 0;
 }
 
-.contact-notice-list__subtitle,
-.contact-notice-list__reason,
-.contact-notice-list__time {
-  font-size: var(--uikit-font-size-11);
+.contact-notice-list__name {
+  font-size: var(--uikit-font-size-15);
+  font-weight: var(--uikit-font-weight-semibold);
+  color: var(--uikit-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-notice-list__subtitle {
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
+  line-height: calc(18px * var(--uikit-font-scale, 1));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -334,19 +323,29 @@ function avatarName(invite: UiContactInvite): string {
 .contact-notice-list__actions {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
+  align-self: flex-end;
 }
 
 .contact-notice-list__btn {
-  padding: 6px 14px;
-  border-radius: var(--uikit-components-radius, 6px);
-  border: 1px solid transparent;
-  font-size: var(--uikit-font-size-12);
+  box-sizing: border-box;
+  padding: 4px 16px;
+  border-radius: var(--uikit-input-radius, 999px);
+  border: 1px solid var(--uikit-border-color, #e5e7eb);
+  background-color: transparent;
+  color: var(--uikit-text-primary);
+  font-size: var(--uikit-font-size-14);
+  font-weight: var(--uikit-font-weight-medium);
+  line-height: calc(20px * var(--uikit-font-scale, 1));
   cursor: pointer;
   transition:
     opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
-    border-color 0.15s,
-    background-color 0.15s;
+    background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.contact-notice-list__btn--primary {
+  background-color: var(--uikit-primary-color);
+  border-color: transparent;
+  color: var(--uikit-text-inverse);
 }
 
 .contact-notice-list__btn:disabled {
@@ -354,38 +353,18 @@ function avatarName(invite: UiContactInvite): string {
   cursor: not-allowed;
 }
 
-.contact-notice-list__btn--primary {
-  background-color: var(--uikit-primary-color);
-  color: var(--uikit-text-inverse);
-  border-color: var(--uikit-primary-color);
-}
-
-
 @media (hover: hover) {
-  .contact-notice-list__btn--primary:hover:not(:disabled) {
+  .contact-notice-list__btn:hover:not(:disabled) {
     opacity: 0.9;
   }
 }
 
-.contact-notice-list__btn--default {
-  background-color: var(--uikit-text-inverse);
-  color: var(--uikit-text-primary);
-  border-color: var(--uikit-border-color, #e5e7eb);
-}
-
-
-@media (hover: hover) {
-  .contact-notice-list__item:hover .contact-notice-list__btn--default {
-    background-color: var(--uikit-text-inverse);
-    border-color: var(--uikit-border-color, #d1d5db);
-  }
-}
-
-
-@media (hover: hover) {
-  .contact-notice-list__btn--default:hover:not(:disabled) {
-    background-color: var(--uikit-bg-secondary);
-  }
+.contact-notice-list__status {
+  align-self: flex-end;
+  font-size: var(--uikit-font-size-14);
+  font-weight: var(--uikit-font-weight-medium);
+  line-height: calc(20px * var(--uikit-font-scale, 1));
+  color: var(--uikit-text-tertiary);
 }
 
 .contact-notice-list__empty {

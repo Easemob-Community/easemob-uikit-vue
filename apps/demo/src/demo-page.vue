@@ -601,6 +601,7 @@ watch(
           :show-home-search="showHomeSearch"
           :show-contact-search="showContactSearch"
           :show-group-search="showGroupSearch"
+          :show-notice-add-button="true"
           @view-change="() => { detailUserId = null; detailGroupId = null }"
           @contact-click="(c: UiContact) => { detailUserId = c.userId; detailGroupId = null }"
           @group-click="(g: UiGroup) => { detailGroupId = g.groupId; detailUserId = null }"

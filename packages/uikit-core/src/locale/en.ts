@@ -201,6 +201,8 @@ const messages: LocaleMessages = {
   'contact.inviteDeclined': 'Declined',
   'contact.inviteAcceptFailed': 'Accept failed',
   'contact.inviteDeclineFailed': 'Decline failed',
+  'contact.inviteRequestReceived': 'sent you a contact request.',
+  'contact.inviteDeclinedByPeer': 'has declined your contact request.',
   'contact.entryNotice': 'New Contacts',
   'contact.entryGroup': 'Groups',
   'contact.entryContact': 'Contacts',

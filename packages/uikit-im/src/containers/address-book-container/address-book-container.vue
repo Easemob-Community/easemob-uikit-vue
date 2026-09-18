@@ -96,6 +96,8 @@ export interface AddressBookContainerProps {
   initialView?: AddressBookContainerView
   /** 是否在联系人子视图头部展示添加好友按钮，默认 true */
   showContactAddButton?: boolean
+  /** 是否在「新请求」子视图头部展示添加好友按钮，默认 false（Figma「新-Demo」2772:28346） */
+  showNoticeAddButton?: boolean
   /** 是否在群组子视图头部展示创建群组按钮，默认 true */
   showGroupCreateButton?: boolean
   /** 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true */
@@ -117,6 +119,7 @@ const props = withDefaults(defineProps<AddressBookContainerProps>(), {
   entryOrder: () => ['contact', 'group', 'notice', 'blocklist'] as const,
   noticePersistInvites: false,
   showContactAddButton: true,
+  showNoticeAddButton: false,
   showGroupCreateButton: true,
   showBlocklistAddButton: true,
 })
@@ -454,6 +457,15 @@ const subviewTitle = computed(() => {
               <slot name="subheader-extra" :view="view" />
               <IconButton
                 v-if="!$slots['subheader-extra'] && view === 'contact' && props.showContactAddButton"
+                icon="person/plus"
+                size="small"
+                variant="ghost"
+                :icon-size="22"
+                :title="t('contact.addContact')"
+                @click="emit('add-contact')"
+              />
+              <IconButton
+                v-if="view === 'notice' && props.showNoticeAddButton"
                 icon="person/plus"
                 size="small"
                 variant="ghost"

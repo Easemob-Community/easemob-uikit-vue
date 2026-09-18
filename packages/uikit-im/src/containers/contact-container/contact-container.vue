@@ -100,6 +100,8 @@ export interface ContactContainerProps {
   showGroupCreateButton?: boolean
   /** 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true */
   showBlocklistAddButton?: boolean
+  /** 是否在「新请求」子视图头部展示添加好友按钮，默认 false */
+  showNoticeAddButton?: boolean
 
   // ---------- Contact 子列表配置 ----------
   emptyText?: string
@@ -212,6 +214,7 @@ const props = withDefaults(defineProps<ContactContainerProps>(), {
   showHomeAddButton: true,
   showGroupCreateButton: true,
   showBlocklistAddButton: true,
+  showNoticeAddButton: false,
 })
 
 /** showNotice 缺省视为 true，兼容废弃 prop showNewRequest */
@@ -339,6 +342,7 @@ defineExpose({
     :show-home-add-button="props.showHomeAddButton"
     :show-group-create-button="props.showGroupCreateButton"
     :show-blocklist-add-button="props.showBlocklistAddButton"
+    :show-notice-add-button="props.showNoticeAddButton"
     @view-change="(v) => emit('view-change', v as ContactContainerView)"
     @entry-click="(k) => emit('entry-click', k)"
     @notice-click="() => { emit('notice-click'); emit('new-request-click') }"
