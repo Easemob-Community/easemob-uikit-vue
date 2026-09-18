@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import type { ComputedRef } from 'vue'
 import { useThemeStore } from '@easemob/uikit-core'
 import { INJECTION_KEY } from '@easemob/uikit-core'
@@ -27,10 +27,13 @@ const STICKER_MAX_SIZE = 120
 /** 表情包消息：发送侧经 ext.isSticker 标记，按表情渲染，不启用图片三级预览 */
 const isSticker = computed(() => props.message.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true)
 
+/** 本地已加载图片的自然尺寸：body.width/height 未回填期间（己方发送中→刚发送成功）用它撑住容器，避免 SDK 回填真实尺寸时气泡跳变 */
+const naturalSize = ref<{ width: number, height: number } | null>(null)
+
 /** 根据消息体 width/height 等比计算展示尺寸 */
 const displaySize = computed(() => {
-  const w = (props.message.body as ImageMessageBody).width
-  const h = (props.message.body as ImageMessageBody).height
+  const w = (props.message.body as ImageMessageBody).width || naturalSize.value?.width
+  const h = (props.message.body as ImageMessageBody).height || naturalSize.value?.height
   const maxW = isSticker.value ? STICKER_MAX_SIZE : MAX_WIDTH
   const maxH = isSticker.value ? STICKER_MAX_SIZE : MAX_HEIGHT
   if (!w || !h || w <= 0 || h <= 0) {
@@ -80,11 +83,39 @@ const radiusClass = computed(() =>
 const isLoaded = ref(false)
 const isError = ref(false)
 
+/**
+ * 实际渲染的 src。displayUrl 变化（典型：己方发送成功后 body 回写远程 thumbnailUrl/originalImageUrl，
+ * 优先级超过 blob localUrl）时不直接切换，先预载新图、加载成功再替换，
+ * 避免 <img> 直接换 src 白屏重载造成「闪一下」；预载失败则直接切换走错误兜底。
+ */
+const renderedUrl = ref(displayUrl.value)
+watch(displayUrl, (next, prev) => {
+  if (!next || next === renderedUrl.value)
+    return
+  if (!prev || !renderedUrl.value) {
+    renderedUrl.value = next
+    return
+  }
+  const probe = new Image()
+  probe.onload = () => {
+    if (displayUrl.value === next)
+      renderedUrl.value = next
+  }
+  probe.onerror = () => {
+    renderedUrl.value = next
+  }
+  probe.src = next
+})
+
 /** 发送中（status=sending）：气泡上叠蒙层 + 居中 loading，表情包除外（透明底小图不盖蒙层） */
 const isSending = computed(() => props.message.status === MESSAGE_STATUS.SENDING && !isSticker.value)
 
-function onLoad() {
+function onLoad(event: Event) {
   isLoaded.value = true
+  const img = event.target as HTMLImageElement
+  if (img?.naturalWidth && img?.naturalHeight) {
+    naturalSize.value = { width: img.naturalWidth, height: img.naturalHeight }
+  }
 }
 
 function onError() {
@@ -159,7 +190,7 @@ function onPreviewError(index: number) {
       <div v-if="!isLoaded && !isError && !isSticker" class="image-message__loading" :class="radiusClass" />
       <!-- 图片 -->
       <img
-        :src="displayUrl"
+        :src="renderedUrl"
         class="image-message__img"
         :class="isSticker ? 'image-message__img--sticker' : radiusClass"
         alt="image"

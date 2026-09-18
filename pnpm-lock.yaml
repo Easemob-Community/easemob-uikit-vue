@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@easemob/uikit-im>@easemob/uikit-core': file:./easemob-uikit-core-2.8.3.tgz
+  '@easemob/uikit-im>@easemob/uikit-core': file:./easemob-uikit-core-2.8.4.tgz
   '@easemob/uikit-im>@easemob/uikit-sdk-contract': file:./easemob-uikit-sdk-contract-1.2.1.tgz
   '@easemob/uikit-core>@easemob/uikit-sdk-contract': file:./easemob-uikit-sdk-contract-1.2.1.tgz
 
@@ -266,8 +266,8 @@ importers:
   packages/uikit-im:
     dependencies:
       '@easemob/uikit-core':
-        specifier: file:../../easemob-uikit-core-2.8.3.tgz
-        version: file:easemob-uikit-core-2.8.3.tgz(@easemob/uikit-sdk-websdk5@packages+uikit-sdk-websdk5)(pinia@2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
+        specifier: file:../../easemob-uikit-core-2.8.4.tgz
+        version: file:easemob-uikit-core-2.8.4.tgz(@easemob/uikit-sdk-websdk5@packages+uikit-sdk-websdk5)(pinia@2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
       '@easemob/uikit-sdk-contract':
         specifier: file:../../easemob-uikit-sdk-contract-1.2.1.tgz
         version: file:easemob-uikit-sdk-contract-1.2.1.tgz
@@ -609,9 +609,9 @@ packages:
   '@dprint/toml@0.7.0':
     resolution: {integrity: sha512-eFaQTcfxKHB+YyTh83x7GEv+gDPuj9q5NFOTaoj5rZmQTbj6OgjjMxUicmS1R8zYcx8YAq5oA9J3YFa5U6x2gA==}
 
-  '@easemob/uikit-core@file:easemob-uikit-core-2.8.3.tgz':
-    resolution: {integrity: sha512-22Q7O1WBWIuLcss+mY1tyQIPr7YVLUarcDKSOIjBHy7tC0fIgumO8oUkZxb0aFKvngzmc27zsFfK4iisf4mpWQ==, tarball: file:easemob-uikit-core-2.8.3.tgz}
-    version: 2.8.3
+  '@easemob/uikit-core@file:easemob-uikit-core-2.8.4.tgz':
+    resolution: {integrity: sha512-Vv7/jgdeEawtFPG+4pioRFDhssCNEdOTZJSX9SHkC8wEpqQ0by+txzZPvXEqG/QT2fycE5mLQo6JzMKQsrpiEA==, tarball: file:easemob-uikit-core-2.8.4.tgz}
+    version: 2.8.4
     peerDependencies:
       '@easemob/uikit-sdk-websdk5': 1.3.0
       pinia: ^2.1.0 || ^4.0.0
@@ -621,7 +621,7 @@ packages:
         optional: true
 
   '@easemob/uikit-sdk-contract@file:easemob-uikit-sdk-contract-1.2.1.tgz':
-    resolution: {integrity: sha512-j7tuB/A/VvYZx2DfZypksbvnlwjSoYSu+nH+WqRVesBUltTSY0zXZhB5WYQQUfdgQX8pcuYD8nrO9nFF9CN74A==, tarball: file:easemob-uikit-sdk-contract-1.2.1.tgz}
+    resolution: {integrity: sha512-j93xBJMp+a3s50lVWEW4qIcx5xoyJvJM+wz2Pvbi6/rrDyW3EQnsUlk+hXBL8qk6XjPLsUwHIRC/h+t10hvsBw==, tarball: file:easemob-uikit-sdk-contract-1.2.1.tgz}
     version: 1.2.1
 
   '@emnapi/core@1.10.0':
@@ -4762,7 +4762,7 @@ snapshots:
 
   '@dprint/toml@0.7.0': {}
 
-  '@easemob/uikit-core@file:easemob-uikit-core-2.8.3.tgz(@easemob/uikit-sdk-websdk5@packages+uikit-sdk-websdk5)(pinia@2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
+  '@easemob/uikit-core@file:easemob-uikit-core-2.8.4.tgz(@easemob/uikit-sdk-websdk5@packages+uikit-sdk-websdk5)(pinia@2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
     dependencies:
       '@easemob/uikit-sdk-contract': file:easemob-uikit-sdk-contract-1.2.1.tgz
       '@vueuse/core': 14.4.0(vue@3.5.41(typescript@5.9.3))

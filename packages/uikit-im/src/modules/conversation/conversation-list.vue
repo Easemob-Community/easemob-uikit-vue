@@ -873,11 +873,11 @@ function handleCustomAction(key: string, conversation: Conversation) {
   --uikit-item-active-radius: 0px;
 }
 
-/* 设计稿 header：上下 12.5px、左右 12px；border-box 总高统一 56px；
-   底部分隔线宽度随全局 headerBorder 开关（--uikit-header-border-width，默认 0 关闭） */
+/* 设计稿 header：上下 12.5px、左 16px（与列表项头像左缘 4+12 对齐，同通讯录页口径）、右 12px；
+   border-box 总高统一 56px；底部分隔线宽度随全局 headerBorder 开关（--uikit-header-border-width，默认 0 关闭） */
 .conversation-list__header {
   box-sizing: border-box;
-  padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px;
+  padding: calc(12.5px + var(--uikit-safe-top, 0px)) 12px 12.5px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -954,13 +954,13 @@ function handleCustomAction(key: string, conversation: Conversation) {
   }
 }
 
-/* 设计稿搜索槽：上下 8px、左右 12px（与 header 标题、分栏 tab 左缘对齐） */
+/* 设计稿搜索槽：上下 8px、左 16px、右 12px（与 header 标题、分栏 tab、列表项头像左缘对齐） */
 .conversation-list__search {
-  padding: 8px 12px;
+  padding: 8px 12px 8px 16px;
 }
 
 .conversation-list__status-banner {
-  padding: 0 12px 8px;
+  padding: 0 12px 8px 16px;
   flex-shrink: 0;
 }
 

@@ -767,6 +767,16 @@ const historyTipState = computed<'loading' | 'failed' | 'no-more' | ''>(() => {
   return ''
 })
 
+/**
+ * 消息渲染身份：优先本地 ID（发送前生成、replaceWithSent 后保持不变），
+ * 无本地 ID（历史/接收消息）再用服务端 ID。
+ * 保证乐观插入的 sending 消息在发送成功被整体替换后 :key 不翻转，
+ * 避免整条气泡子树（含已加载的 <img>）被销毁重建造成闪烁。
+ */
+function messageIdentity(msg: UiMessage): string {
+  return msg.msgLocalId || msg.msgServerId
+}
+
 /** 带时间分割线的消息列表 */
 const messagesWithDividers = computed(() => {
   const result: Array<{ key: string, type: 'message' | 'divider' | 'history-tip', data: UiMessage | string | null, index: number }> = []
@@ -778,7 +788,7 @@ const messagesWithDividers = computed(() => {
     if (shouldShowTimeDivider(msg, lastMsg)) {
       result.push({ key: `divider-${msg.timestamp}`, type: 'divider', data: formatDividerTime(msg.timestamp), index: -1 })
     }
-    result.push({ key: msg.msgServerId || msg.msgLocalId, type: 'message', data: msg, index })
+    result.push({ key: messageIdentity(msg), type: 'message', data: msg, index })
     lastMsg = msg
   })
   return result
@@ -789,7 +799,7 @@ const slots = useSlots()
 const bubbleSlotNames = computed(() => Object.keys(slots).filter(name => name !== 'history-tip'))
 
 /**
- * 单聊最新一条己方已读消息的 key（msgServerId 或 msgLocalId）。
+ * 单聊最新一条己方已读消息的 key（与列表 :key 同源 messageIdentity）。
  * 供气泡包装器实现「连续已读只在最新一条展示已读 icon」（readIconDisplay: 'latest'）。
  */
 const latestReadSelfMsgKey = computed(() => {
@@ -798,7 +808,7 @@ const latestReadSelfMsgKey = computed(() => {
   for (let i = messages.value.length - 1; i >= 0; i--) {
     const msg = messages.value[i]
     if (msg.isSelf && msg.status === MESSAGE_STATUS.READ)
-      return msg.msgServerId || msg.msgLocalId
+      return messageIdentity(msg)
   }
   return ''
 })
@@ -921,7 +931,7 @@ watch(locateRequest, (req) => {
           :group-read-receipt-config="config?.groupReadReceipt"
           :is-multi-select-mode="isMultiSelectMode"
           :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
-          :is-latest-read-self="((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId) === latestReadSelfMsgKey"
+          :is-latest-read-self="messageIdentity(item.data as UiMessage) === latestReadSelfMsgKey"
           @toggle-select="onToggleSelect"
           @action="onMessageAction"
           @group-read-click="onGroupReadClick"
@@ -988,7 +998,7 @@ watch(locateRequest, (req) => {
             :group-read-receipt-config="config?.groupReadReceipt"
             :is-multi-select-mode="isMultiSelectMode"
             :is-selected="isMessageSelected((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId)"
-            :is-latest-read-self="((item.data as UiMessage).msgServerId || (item.data as UiMessage).msgLocalId) === latestReadSelfMsgKey"
+            :is-latest-read-self="messageIdentity(item.data as UiMessage) === latestReadSelfMsgKey"
             @toggle-select="onToggleSelect"
             @action="onMessageAction"
             @group-read-click="onGroupReadClick"

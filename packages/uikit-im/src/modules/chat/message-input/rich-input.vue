@@ -640,7 +640,8 @@ onBeforeUnmount(() => {
   left: 0;
   color: var(--uikit-text-tertiary, #919BA1);
   pointer-events: none;
-  font-size: var(--uikit-font-size-15);
+  /* 占位文字比正文（15px）小一档，对齐抽屉假搜索框 13px 的观感 */
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
 }
 

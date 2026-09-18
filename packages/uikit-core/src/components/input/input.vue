@@ -421,6 +421,8 @@ defineExpose({
 }
 
 .uikit-input__field::placeholder {
+  /* 占位文字比正文（15px）小一档，对齐抽屉假搜索框 13px 的观感 */
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-tertiary);
 }
 

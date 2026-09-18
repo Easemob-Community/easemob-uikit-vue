@@ -124,12 +124,13 @@ function scrollTabs(direction: 'left' | 'right') {
 </template>
 
 <style scoped>
-/* 分栏 tab 栏：左为胶囊滚动区，右为翻页箭头（溢出时出现） */
+/* 分栏 tab 栏：左为胶囊滚动区，右为翻页箭头（溢出时出现）；
+   左 16px 与 header 标题 / 搜索框 / 列表项头像左缘对齐 */
 .conversation-tabs {
   display: flex;
   align-items: center;
   gap: var(--uikit-spacing-2, 8px);
-  padding: var(--uikit-spacing-3, 12px) var(--uikit-spacing-3, 12px) var(--uikit-spacing-2, 8px);
+  padding: var(--uikit-spacing-3, 12px) var(--uikit-spacing-3, 12px) var(--uikit-spacing-2, 8px) 16px;
 }
 
 /* 胶囊滚动区：隐藏滚动条，翻页走右侧箭头（触屏直接滑动） */
