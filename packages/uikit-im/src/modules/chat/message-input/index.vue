@@ -53,8 +53,8 @@ const { t } = useLocale()
 const inputConfig = computed(() => props.config?.input)
 
 /**
- * 聚焦内发光：默认 --uikit-input-focus-glow（主色 12% 内发光，见设计稿 msg_input focus 态）；
- * 显式传入 input.focusBorderColor 时以该色 12% 浓度生成同规格内发光（实色面无描边设计，替代原聚焦边框/外环）。
+ * 聚焦发光：默认 --uikit-input-focus-glow（亮色主色 12% 内发光、暗色主色 20% 外环，见设计稿 msg_input focus 态）；
+ * 显式传入 input.focusBorderColor 时以该色 12% 浓度生成亮色同款内发光（实色面无描边设计，替代原聚焦边框/外环）。
  */
 const focusGlowVar = computed(() => {
   const color = inputConfig.value?.focusBorderColor
@@ -956,8 +956,12 @@ defineExpose({
 <style scoped>
 .message-input {
   position: relative;
-  /* 设计稿 msg_input：卡片面默认透明融入聊天背景（--uikit-input-surface-bg 可覆写），仅顶部内阴影光晕；无描边无投影 */
+  /* 卡片总高含 padding/border（simple-pc 固定 126 = 内容 108 + chrome 18，与 simple-input 的 CARD_CHROME_PX 换算一致） */
+  box-sizing: border-box;
+  /* 设计稿 msg_input：亮色卡片面透明融入聊天背景（--uikit-input-surface-bg 可覆写），仅顶部内阴影光晕、无描边；
+     暗色为实底（--uikit-input-bg #1E2123）+ 1px #3C3F42 描边（--uikit-input-surface-border-color，亮色 transparent、宽度恒定避免布局抖动） */
   background-color: var(--uikit-input-surface-bg, var(--uikit-input-bg));
+  border: 1px solid var(--uikit-input-surface-border-color, transparent);
   border-radius: var(--uikit-components-radius, 8px);
   box-shadow: var(--uikit-input-surface-sheen, inset 0 30px 40px 16px rgba(136, 168, 188, 0.08));
   /* 设计稿 msg_input：外层间距 4px（margin），卡片内边距 8px/12px（input-padding token，随密度档缩放） */
@@ -967,7 +971,7 @@ defineExpose({
 }
 
 .message-input:focus-within {
-  /* 设计稿 focus 态：叠加主色 12% 内发光（保留顶部光晕） */
+  /* 设计稿 focus 态：亮色叠主色 12% 内发光（保留顶部光晕）；暗色改主色 20% 外环（token 明暗规格不同，见 theme/index.css） */
   box-shadow:
     var(--uikit-input-surface-sheen, inset 0 30px 40px 16px rgba(136, 168, 188, 0.08)),
     v-bind(focusGlowVar);

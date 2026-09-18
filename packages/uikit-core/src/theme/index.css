@@ -257,6 +257,8 @@
   --uikit-input-surface-bg: transparent;
   --uikit-input-surface-sheen: inset 0 30px 40px 16px rgba(136, 168, 188, 0.08);
   --uikit-input-focus-glow: inset 0 0 12px color-mix(in srgb, var(--uikit-primary-color) 12%, transparent);
+  /* 语义 token：消息输入卡片面描边（亮色无描边为 transparent；暗色 1px #3C3F42，见设计稿 msg_input dark；宽度恒定避免布局抖动） */
+  --uikit-input-surface-border-color: transparent;
   /* 语义 token：全局输入框 EmInput（设计稿 inputs/onlight）：#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur */
   --uikit-input-field-glass-bg: rgba(245, 245, 245, 0.2);
   --uikit-input-field-glass-border: #F5F5F5;
@@ -400,9 +402,13 @@
   /* 语义 token：输入框默认边框 - 暗色（设计稿独立描边 #3C3F42） */
   --uikit-input-border-color: #3C3F42;
 
-  /* 语义 token：消息输入卡片面 - 暗色（同亮色默认透明融入聊天底，光晕略强；focus 内发光由 color-mix 明暗自适应） */
-  --uikit-input-surface-bg: transparent;
-  --uikit-input-surface-sheen: inset 0 30px 40px 16px rgba(136, 168, 188, 0.12);
+  /* 语义 token：消息输入卡片面 - 暗色（设计稿 msg_input dark：实底 #1E2123 + 1px 描边 #3C3F42、无顶部光晕；
+     focus 改主色 20% 外环，设计稿 literal rgba(0,158,255,0.2)，按 color-mix 派生跟随主题色与明暗） */
+  --uikit-input-surface-bg: var(--uikit-input-bg);
+  /* 无顶部光晕，但 focus 态组件会将 sheen 与 focus-glow 逗号叠加，这里用零阴影占位保持列表合法 */
+  --uikit-input-surface-sheen: 0 0 0 0 transparent;
+  --uikit-input-surface-border-color: #3C3F42;
+  --uikit-input-focus-glow: 0 0 0 2px color-mix(in srgb, var(--uikit-primary-color) 20%, transparent);
   /* 语义 token：全局输入框 EmInput - 暗色 */
   --uikit-input-field-glass-bg: rgba(30, 33, 35, 0.55);
   --uikit-input-field-glass-border: #3C3F42;

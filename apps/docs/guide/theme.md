@@ -172,7 +172,7 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-bubble-radius` / `--uikit-bubble-radius-square`：气泡圆角档位（`bubbleShape: 'round'` = 16px（默认）/ `'square'` = 8px）
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，暗色 `#1E1E23` 比面板深一档；使用 `background` 简写，支持颜色/渐变/图片）
 - `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`，暗色 `#1E2123`）
-- `--uikit-input-surface-bg` / `--uikit-input-surface-sheen` / `--uikit-input-focus-glow`：消息输入卡片面（设计稿 msg_input；`--uikit-input-surface-bg` 默认 `transparent` 融入聊天背景，宿主可覆写为实色面）+ 顶部蓝色内阴影光晕，focus 叠主色 12% 内发光（发光色 color-mix 派生跟随主题色，暗色光晕略强）
+- `--uikit-input-surface-bg` / `--uikit-input-surface-sheen` / `--uikit-input-surface-border-color` / `--uikit-input-focus-glow`：消息输入卡片面（设计稿 msg_input）。亮色：面 `transparent` 融入聊天背景（可覆写为实色），顶部蓝色内阴影光晕，无描边（`--uikit-input-surface-border-color: transparent`），focus 叠主色 12% 内发光（color-mix 派生跟随主题色）；暗色：实底 `--uikit-input-bg`（#1E2123）+ 1px `#3C3F42` 描边，无顶部光晕，focus 改主色 20% 外环（`0 0 0 2px`，设计稿 rgba(0,158,255,0.2)，color-mix 派生）
 - `--uikit-input-field-glass-bg` / `--uikit-input-field-glass-border` / `--uikit-input-glass-blur`：全局输入框 `EmInput`（default/search/filled 变体，设计稿 inputs/onlight）毛玻璃面——填充（默认 `#F5F5F5` 20%，暗色 `rgba(30, 33, 35, 0.55)`）、同色细描边（默认 `#F5F5F5`，暗色 `#3C3F42`）、backdrop blur（`8px`）
 - `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#1E2123`）
 - `--uikit-input-border-color`：输入框默认边框色（默认 `#C9CDCF`，暗色 `#3C3F42`；search/filled 变体无边框不受其影响）
