@@ -112,7 +112,7 @@ const mergedCountText = computed(() => {
 
 .uikit-notification__title {
   overflow: hidden;
-  font-size: var(--uikit-font-size-14, 14px);
+  font-size: var(--uikit-font-size-13, 14px);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary, #111827);
   text-overflow: ellipsis;
@@ -121,14 +121,14 @@ const mergedCountText = computed(() => {
 
 .uikit-notification__time {
   flex-shrink: 0;
-  font-size: var(--uikit-font-size-12, 12px);
+  font-size: var(--uikit-font-size-11, 12px);
   color: var(--uikit-text-tertiary, #9ca3af);
 }
 
 .uikit-notification__body {
   margin-top: 4px;
   overflow: hidden;
-  font-size: var(--uikit-font-size-13, 13px);
+  font-size: var(--uikit-font-size-12, 13px);
   line-height: 1.4;
   color: var(--uikit-text-secondary, #6b7280);
   text-overflow: ellipsis;
@@ -137,7 +137,7 @@ const mergedCountText = computed(() => {
 
 .uikit-notification__merged {
   margin-top: 4px;
-  font-size: var(--uikit-font-size-12, 12px);
+  font-size: var(--uikit-font-size-11, 12px);
   color: var(--uikit-primary-color, #3b82f6);
 }
 

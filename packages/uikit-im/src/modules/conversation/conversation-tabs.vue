@@ -154,7 +154,7 @@ function scrollTabs(direction: 'left' | 'right') {
 .conversation-tabs__tab {
   flex: 0 0 auto;
   padding: 4px 12px;
-  font-size: var(--uikit-font-size-14, 14px);
+  font-size: var(--uikit-font-size-13, 14px);
   line-height: 18px;
   white-space: nowrap;
   color: var(--uikit-text-primary);

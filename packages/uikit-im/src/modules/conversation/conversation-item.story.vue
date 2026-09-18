@@ -130,7 +130,7 @@ function log(event: string, id?: string) {
           @select="(id: string) => log('select', id)"
         >
           <template #name-suffix>
-            <span style="flex-shrink: 0; padding: 0 4px; border-radius: 4px; font-size: var(--uikit-font-size-10); line-height: 16px; color: var(--uikit-primary); background: var(--uikit-primary-color-opacity);">
+            <span style="flex-shrink: 0; padding: 0 4px; border-radius: 4px; font-size: var(--uikit-font-size-9); line-height: 16px; color: var(--uikit-primary); background: var(--uikit-primary-color-opacity);">
               官方
             </span>
           </template>
@@ -185,7 +185,7 @@ function log(event: string, id?: string) {
           @mute="(id: string, muted: boolean) => log('mute', `${id} ${muted}`)"
           @delete="(id: string) => log('delete', id)"
         />
-        <div style="padding: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="padding: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           事件（右键/长按操作触发）：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 8)" :key="i">

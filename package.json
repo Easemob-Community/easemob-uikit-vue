@@ -7,6 +7,13 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "pnpm": {
+    "overrides": {
+      "@easemob/uikit-im>@easemob/uikit-core": "file:./easemob-uikit-core-2.8.3.tgz",
+      "@easemob/uikit-im>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.2.1.tgz",
+      "@easemob/uikit-core>@easemob/uikit-sdk-contract": "file:./easemob-uikit-sdk-contract-1.2.1.tgz"
+    }
+  },
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -F @easemob/uikit-im story:dev",

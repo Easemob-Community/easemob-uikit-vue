@@ -144,7 +144,7 @@ watch(
   left: 16px;
   right: 16px;
   padding: 8px 12px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-danger-color);
   background-color: var(--uikit-bg-secondary, #f3f4f6);
   border-radius: var(--uikit-components-radius, 8px);

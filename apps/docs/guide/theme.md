@@ -75,7 +75,7 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 ### 尺寸与圆角
 
 - `--uikit-container-gap`：容器间距（默认 `--uikit-spacing-2`）
-- `--uikit-sidebar-width`：侧栏列表容器（会话 / 联系人 / 群组 / 通讯录 / 黑名单）宽度 token（默认 360px）。容器**独占宿主槽位**（父级只有容器一个子元素）时默认填满宿主分配的宽度，自适应槽位宽窄；**与兄弟组件并排**（如 flex 行内的「会话列表 + 聊天区」布局，`EmResizable` 拖拽手柄也算兄弟节点）时回落为该 token 指定的固定侧栏宽，宿主可在容器作用域覆写（如 H5 全宽 / 拖拽侧栏设为 `100%`，或指定 `480px` 等具体值）
+- `--uikit-sidebar-width`：侧栏列表容器（会话 / 联系人 / 群组 / 通讯录 / 黑名单）宽度 token（默认 `clamp(240px, 25%, 480px)`，宿主容器约 1440px 处为 360px，上下限由 `--uikit-sidebar-min-width` / `--uikit-sidebar-max-width` 控制）。容器**独占宿主槽位**（父级只有容器一个子元素）时默认填满宿主分配的宽度，自适应槽位宽窄；**与兄弟组件并排**（如 flex 行内的「会话列表 + 聊天区」布局，`EmResizable` 拖拽手柄也算兄弟节点）时取该 token 计算的侧栏宽，随宿主容器变宽 / 变窄弹性伸缩；宿主可在容器作用域覆写（如 H5 全宽 / 拖拽侧栏设为 `100%`，或指定 `480px` 等固定值）。配合 `EmResizable` 的 `fluid` 模式可实现「默认弹性、拖拽定宽」的侧栏
 - `--uikit-components-radius`：组件圆角（默认 8px）
 - `--uikit-components-radius-hover`：hover 圆角（默认 14px）
 - `--uikit-popup-padding`：弹出层内边距（默认 4px，hover/展开态 8px），用于 Popup / 菜单 / 表情面板等浮层内容与边界的留白
@@ -95,7 +95,7 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 字号 token 与 `--uikit-font-scale` 联动，用于实现全局字号缩放（适老版）：
 
 - `--uikit-font-scale`：全局字号缩放倍数（默认 `1`）
-- `--uikit-font-size-8` ~ `--uikit-font-size-34`：按像素基准 × 缩放倍数计算（含 28 / 34 大标题档）
+- `--uikit-font-size-7` ~ `--uikit-font-size-28`：按像素基准 × 缩放倍数计算（含 22 / 28 大标题档；2026-09-18 起整体降一档，原 34px 最大档不再保留、新增 7px 最小档）
 
 ### 字重与行高
 
@@ -113,16 +113,16 @@ UIKit 使用 7 级间距 token，覆盖从图标级紧凑留白到页面级大�
 
 | 层级（`level`） | 字号 | 行高 | 默认字重 | 常用颜色 | 用途 |
 | --- | --- | --- | --- | --- | --- |
-| h0 | 34 | 42 | 600 | `text-primary` | 页面大标题 |
-| h1 | 28 | 34 | 600 | `text-primary` | 模块大标题 |
-| h2 | 22 | 26 | 600 | `text-primary` | 弹窗标题、模块标题 |
-| h3 | 18 | 24 | 600 | `text-primary` | 卡片标题、抽屉标题 |
-| body-lg | 16 | 24 | 400 | `text-primary` | 正文大字号（H5 输入框规避 iOS 缩放） |
-| body | 14 | 22 | 400 | `text-primary` | 默认正文 |
-| body-sm | 13 | 20 | 400 | `text-secondary` | 辅助说明、时间戳 |
-| caption | 12 | 18 | 400 | `text-tertiary` | 标签、提示、错误文案 |
-| small | 10 | 14 | 500 | `text-tertiary` | 徽标数字、极小标签 |
-| mini | 8 | 12 | 500 | `text-tertiary` | 极小徽标数字 |
+| h0 | 28 | 42 | 600 | `text-primary` | 页面大标题 |
+| h1 | 22 | 34 | 600 | `text-primary` | 模块大标题 |
+| h2 | 20 | 26 | 600 | `text-primary` | 弹窗标题、模块标题 |
+| h3 | 16 | 24 | 600 | `text-primary` | 卡片标题、抽屉标题 |
+| body-lg | 15 | 24 | 400 | `text-primary` | 正文大字号（H5 输入框规避 iOS 缩放） |
+| body | 13 | 22 | 400 | `text-primary` | 默认正文 |
+| body-sm | 12 | 20 | 400 | `text-secondary` | 辅助说明、时间戳 |
+| caption | 11 | 18 | 400 | `text-tertiary` | 标签、提示、错误文案 |
+| small | 9 | 14 | 500 | `text-tertiary` | 徽标数字、极小标签 |
+| mini | 7 | 12 | 500 | `text-tertiary` | 极小徽标数字 |
 
 > 旧命名对照：Display→h2、H2→h3、H3/Body-L→body-lg、Body-M→body、Body-S→body-sm、Caption→caption、Overline→small；旧 H1（20px）/ H4（15px）无对应新档，其 token 保留供组件内部使用。`EmText` 另提供 `weight`（覆盖默认字重）/ `ellipsis`（单行截断）/ `tag`（默认 `span`）props。
 
@@ -171,8 +171,8 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 - `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`：气泡内分割线（译文 / 语音转文字与原文之间；暗色统一 `#3C3F42`）
 - `--uikit-bubble-radius` / `--uikit-bubble-radius-square`：气泡圆角档位（`bubbleShape: 'round'` = 16px（默认）/ `'square'` = 8px）
 - `--uikit-chat-bg`：聊天背景（默认 `--uikit-bg-base`，暗色 `#1E1E23` 比面板深一档；使用 `background` 简写，支持颜色/渐变/图片）
-- `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`，暗色 `#1E2123`）
-- `--uikit-input-surface-bg` / `--uikit-input-surface-sheen` / `--uikit-input-surface-border-color` / `--uikit-input-focus-glow`：消息输入卡片面（设计稿 msg_input）。亮色：面 `transparent` 融入聊天背景（可覆写为实色），顶部蓝色内阴影光晕，无描边（`--uikit-input-surface-border-color: transparent`），focus 叠主色 12% 内发光（color-mix 派生跟随主题色）；暗色：实底 `--uikit-input-bg`（#1E2123）+ 1px `#3C3F42` 描边，无顶部光晕，focus 改主色 20% 外环（`0 0 0 2px`，设计稿 rgba(0,158,255,0.2)，color-mix 派生）
+- `--uikit-input-bg`：输入区背景（默认 `--uikit-bg-base`，暗色 `#1E2123`）；消息输入卡片即默认样式：`--uikit-input-bg` 实底 + `--uikit-input-border-color` 1px 描边 + `--uikit-shadow-sm` 基础投影，focus 叠 `--uikit-input-focus-ring` 主色 20% 外环
+- `--uikit-input-focus-ring`：消息输入卡片聚焦光环（默认 `0 0 0 2px` 主色 20% color-mix 派生，跟随主题色）
 - `--uikit-input-field-glass-bg` / `--uikit-input-field-glass-border` / `--uikit-input-glass-blur`：全局输入框 `EmInput`（default/search/filled 变体，设计稿 inputs/onlight）毛玻璃面——填充（默认 `#F5F5F5` 20%，暗色 `rgba(30, 33, 35, 0.55)`）、同色细描边（默认 `#F5F5F5`，暗色 `#3C3F42`）、backdrop blur（`8px`）
 - `--uikit-conversation-list-bg`：会话列表容器背景（默认 `#FAFAFA`，暗色 `#1E2123`）
 - `--uikit-input-border-color`：输入框默认边框色（默认 `#C9CDCF`，暗色 `#3C3F42`；search/filled 变体无边框不受其影响）

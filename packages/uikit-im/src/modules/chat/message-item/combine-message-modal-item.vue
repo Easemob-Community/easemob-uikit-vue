@@ -90,13 +90,13 @@ function onViewCombine(msg: UiMessage) {
 }
 
 .combine-message-modal-item__sender {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
 .combine-message-modal-item__time {
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
 }
 

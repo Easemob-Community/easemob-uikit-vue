@@ -128,7 +128,7 @@ onBeforeUnmount(clearTimer)
   border-radius: var(--uikit-components-radius, 12px);
   background-color: rgba(0, 0, 0, 0.75);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   min-width: 120px;
   position: relative;
   pointer-events: auto;

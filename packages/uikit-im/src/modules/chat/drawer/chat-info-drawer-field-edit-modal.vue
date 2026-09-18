@@ -129,7 +129,7 @@ function onSave() {
 
 .chat-info-drawer-field-edit__title {
   padding: 16px 16px 8px;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   text-align: center;
   color: var(--uikit-text-primary);
@@ -151,7 +151,7 @@ function onSave() {
   outline: none;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
   font-family: inherit;
   box-sizing: border-box;
@@ -164,7 +164,7 @@ function onSave() {
 
 .chat-info-drawer-field-edit__char-count {
   align-self: flex-end;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-tertiary);
   line-height: 1;
 }

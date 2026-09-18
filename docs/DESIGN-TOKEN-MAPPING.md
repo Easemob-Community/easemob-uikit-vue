@@ -38,7 +38,7 @@
 
 - **字体族**：栈首声明制（见第一节修订行），不引网络字体。
 - **字重**：与 `--uikit-font-weight-regular/medium/semibold/bold` 完全一致，零改动。
-- **字号**：22/18/16/14/12/10/8 既有 `--uikit-font-size-*` 全覆盖；补 `--uikit-font-size-28` / `-34` 两档（明暗两段，× `--uikit-font-scale`）。
+- **字号**（2026-09-18 起整体降一档，原 16px 档→15px，其余依次顺延）：28/22/20/18/16/15/14/13/12/11/10/9/8/7 全档 `--uikit-font-size-*` 覆盖（明暗两段，× `--uikit-font-scale`）；原 34px 最大档不再保留，新增 7px 最小档。
 - **行高**：稿值绝对 px 不照抄（与适老缩放冲突），换算为按档配对的 `calc(Npx × --uikit-font-scale)`。
 - **层级载体**：9 档 + 补 `body-sm`（13px，沿用旧 Body-S）落地为原子组件 `EmText`（`level/weight/color/ellipsis/tag`，
   `packages/uikit-core/src/components/text/`），文档站 `theme#排版层级` 表同步改新命名（旧命名对照见表注）——TECH-DEBT D127 关闭。
@@ -57,6 +57,7 @@
 - **消息气泡整改（2026-09-03，im 3.4.0 / core 2.5.0）**：① 圆角两档位 `bubbleShape` round=16px（默认）/ square=8px（原 12px/4px），token `--uikit-bubble-radius` / `--uikit-bubble-radius-square`，全类型气泡 + 引用卡片（0.75 倍：round 12px 更椭圆 / square 6px 保持原样）接入；② 气泡默认色：对方 `#E4E6E7`/`#171A1C`、己方 `#009EFF`/`#FFFFFF`（己方不再跟随主色，`setBubbleBg`/预设仍可覆盖）；③ 译文/语音转文字并入原气泡，1px 分割线分隔（`--uikit-bubble-divider-other/self`）；④ 中性气泡（对方）`bubbleStyle` 两模式：filled（默认带底色）/ plain（无底色纯文字，message-list 根作用域覆写 `--uikit-bubble-bg-other: transparent`）；⑤ 消息状态默认位置 `below` → `inline`（气泡末尾、与气泡底部对齐）。
 - **聊天容器整改（2026-09-16，按 Figma「新-Demo」message-preview 稿）**：① 文字三色 token 校准为设计 neutral 色板（见第二节）；② header 加底部分隔线 + 8/12 padding、头像 40、标题 18/Medium、签名 14/lh18；③ 消息列表 normal 密度档改为 padding 12 / gap 16，消息行头像 32、气泡上昵称 10px Medium；④ 文本气泡 padding 12/14 + 正文 16px、译文 12px、已翻译 tag 10px/17px 图标；⑤ **语音转文字改回气泡外独立胶囊**（bg `--uikit-bubble-bg-other`、radius 12、padding 4/14、14px secondary）——覆盖 2026-09-03 决策③中语音部分（文本消息译文仍走气泡内分割线）；⑥ 文件卡片固定圆角 12（新 token `--uikit-file-card-radius`，不再随 bubbleShape）、宽 166–240 自适应、pdf 图标底色校准 `#DA3034`、大小文字接收侧 tertiary/发送侧新 token `--uikit-bubble-text-self-secondary: #EFEFEF`；⑦ 引用竖线 2px 新 token `--uikit-quote-line-color: #C9CDCF`、引用卡整行 14px 发送人 Medium；⑧ 系统消息/时间分割线 chip 化（`#E4E6E7`、radius 8、padding 2/8、12px lh16）；⑨ 群已读徽章色独立新 token `--uikit-msg-status-badge-color: #47ADEB`（不再跟随主色）、已读态 ✓ 用 tertiary；⑩ 输入框外层间距 4px、边框消费 `--uikit-input-border-color`（校准为 `#C9CDCF`）、工具栏图标 20/按钮 28、输入区 16px、初始内容高 78（卡片 88）、placeholder 走 tertiary。
 - **消息输入卡片面暗色整改（2026-09-18，按 Figma「新-Demo」msg_input dark 稿 node 2008:4468）**：暗色与亮色规格不同——亮色维持「透明面 + 顶部光晕 + 主色 12% 内发光 focus」；暗色改为**实底 `--uikit-input-bg`（#1E2123）+ 1px #3C3F42 描边（新 token `--uikit-input-surface-border-color`，亮色 transparent、宽度恒定防布局抖动）+ 无顶部光晕（`--uikit-input-surface-sheen` 置零阴影占位，保 focus 逗号叠加合法）+ focus 改主色 20% 外环**（设计稿 literal `rgba(0,158,255,0.2)`，落地按 color-mix 派生 `--uikit-primary-color` 20%，与暗色强调惯例 #33B1FF 一致且跟随 `setPrimaryColor`）。卡片补 `box-sizing: border-box`，与 simple-input `CARD_CHROME_PX=18`（padding 16 + border 2）换算口径对齐。
+- **消息输入卡片面恢复默认样式（2026-09-18，回退上述玻璃光晕方案）**：去掉「透明面 + 顶部蓝色内阴影光晕（sheen）+ focus 主色内发光/外环 + 独立 surface 描边 token」整套花活，恢复朴素默认样式——`--uikit-input-bg` 实底 + `--uikit-input-border-color` 1px 描边 + `--uikit-shadow-sm` 基础投影，focus 叠既有 `--uikit-input-focus-ring`（主色 20% 外环，token 保留在 theme/index.css:121）。`--uikit-input-surface-bg` / `-sheen` / `-border-color` / `--uikit-input-focus-glow` 四个 token 已从明暗两段移除；`input.focusBorderColor` 配置恢复「覆盖聚焦边框色」语义（原为生成同色内发光）。`box-sizing: border-box` 保留（simple-pc 126px 固定总高口径不变）。
 
 ## 五、未落地项（见 TECH-DEBT）
 

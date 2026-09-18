@@ -148,9 +148,13 @@ alias: [
 
 ## 已知漂移（改到相关文件时注意）
 
-- demo 依赖声明当前是 `file:../../easemob-uikit-im-1.3.1.tgz`（2026-08-12 tgz 临时验证
-  模式，vite.config.ts 有注释说明）；验证完成后应恢复源码 alias 模式并将依赖改回
-  `workspace:*`（或 `^1.x`）并 `pnpm install`。
+- demo 依赖声明已恢复 `@easemob/uikit-im: workspace:*` 源码直连模式（2026-09-18 结束 3.7.3
+  tgz 验证后恢复，vite.config.ts 两条 alias 已恢复）；后续如需临时 tgz 验证，注释 uikit-im
+  两条 alias（theme 在前）并把依赖改为 `file:../../easemob-uikit-im-<version>.tgz` 后
+  `pnpm install`。**切勿只注释 uikit-im alias 而保留 `@easemob/uikit-core` 指 src**——混合
+  解析会让预构建把 core 源码编进 deps chunk 又把 core 的 .vue 外置成绝对路径，SFC 经 dev
+  server 加载出第二份 core 模块实例，注入 Symbol 不一致，报
+  `useCoreUIKit() must be used within <UIKitProvider>`。
 - demo 自带 `pinyin-pro` 依赖仅用于拼音 adapter 演示，业务侧可自选实现。
 - `chatConfig` 的字段随 `EmChatContainer` props 演进，组装处与容器类型要同步更新
   （以 `packages/uikit-im/src/modules/chat/chat.vue` 的类型契约为准）。

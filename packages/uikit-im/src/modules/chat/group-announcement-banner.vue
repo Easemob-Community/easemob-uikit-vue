@@ -110,13 +110,13 @@ useResizeObserver(textRef, measureOverflow)
 }
 
 .group-announcement-banner__title {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
 }
 
 .group-announcement-banner__text {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   word-break: break-word;

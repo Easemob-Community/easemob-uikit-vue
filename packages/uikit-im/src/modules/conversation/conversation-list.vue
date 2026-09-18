@@ -937,7 +937,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 .context-menu__item {
   padding: 10px 12px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;
@@ -966,7 +966,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 
 /* 设计稿标题：18px Medium（500）/ 行高 22px */
 .conversation-list__title {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   line-height: 22px;
   color: var(--uikit-text-primary);
@@ -992,7 +992,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 .conversation-list__loading {
   padding: 12px 16px;
   text-align: center;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -1016,7 +1016,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 }
 
 .conversation-list__empty :deep(.uikit-empty__description) {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
 }
 
 .conversation-list__skeleton {
@@ -1058,7 +1058,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
 .conversation-list__pull-refresh {
   padding: 12px 16px;
   text-align: center;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -1073,7 +1073,7 @@ function handleCustomAction(key: string, conversation: Conversation) {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   cursor: pointer;
 }

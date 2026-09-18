@@ -255,7 +255,7 @@ const showUnreadDot = computed(() =>
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   /* 宽度由 JS 按时长计算（:style width），这里兜底： */
   box-sizing: border-box;
   /* min-width: fit-content 保证内容（图标+时长文本+内边距）永不窄于内容 → 不溢出气泡 */
@@ -355,7 +355,7 @@ const showUnreadDot = computed(() =>
   border-radius: 12px;
   background-color: var(--uikit-bubble-bg-other, #E4E6E7);
   color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: calc(18px * var(--uikit-font-scale));
   white-space: pre-wrap;
   word-break: break-word;
@@ -367,7 +367,7 @@ const showUnreadDot = computed(() =>
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
 }
 
 /* 已转文字标签：icon + 文案，接收侧左对齐、发送侧右对齐，胶囊外次级文字色 */
@@ -377,7 +377,7 @@ const showUnreadDot = computed(() =>
   justify-content: flex-start;
   gap: 4px;
   margin-top: 2px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 1;
   color: var(--uikit-text-secondary, #5E686E);
   opacity: 0.75;

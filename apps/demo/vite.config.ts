@@ -85,6 +85,7 @@ export default defineConfig({
       { find: '@easemob/uikit-sdk-contract', replacement: resolve(__dirname, '../../packages/uikit-sdk-contract/src') },
       { find: '@easemob/uikit-sdk-websdk5', replacement: resolve(__dirname, '../../packages/uikit-sdk-websdk5/src') },
       { find: '@easemob/uikit-sdk-webim4', replacement: resolve(__dirname, '../../packages/uikit-sdk-webim4/src') },
+      // 源码直连模式（默认）：theme 子路径必须排在主 alias 之前（tgz 联调验证时注释这两条并同步切换 package.json 依赖）
       { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
       { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
       // chatroom 场景包源码直连（P2-2 demo 页使用；chatroom 无独立主题，theme 子路径经 exports 指 core）

@@ -306,7 +306,7 @@ export interface ChatConfig {
     }
     /** 是否自动聚焦输入框，默认 false */
     autoFocus?: boolean
-    /** 聚焦发光色。默认聚焦发光为 --uikit-input-focus-glow（亮色主色 12% 内发光、暗色主色 20% 外环）；显式传入时以该色 12% 浓度生成亮色同款内发光（实色面无描边设计，替代原聚焦边框/外环） */
+    /** 聚焦边框色。默认保持容器边框色（聚焦高亮由主色 20% 外环 --uikit-input-focus-ring 承担）；显式传入时聚焦态边框改用该色 */
     focusBorderColor?: string
     /** 光标颜色，不设置则跟随主题色（--uikit-primary） / Caret color, defaults to the theme primary color */
     caretColor?: string

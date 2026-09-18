@@ -240,7 +240,7 @@ function onCancel() {
   background-color: var(--uikit-bg-secondary, #e5e7eb);
   color: var(--uikit-text-secondary);
   cursor: pointer;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: 1;
   padding: 0;
   flex-shrink: 0;

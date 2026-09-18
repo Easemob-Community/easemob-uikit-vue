@@ -1,3 +1,52 @@
+## @easemob/uikit-im 3.7.4 (2026-09-18)
+
+
+### 变更
+
+- **侧栏列表容器宽度默认随宿主容器弹性伸缩**：会话 / 联系人 / 群组 / 通讯录 / 黑名单列表容器与聊天区等兄弟组件并排时，宽度由固定 `360px` 改为按 `--uikit-sidebar-width` 基准弹性取值（`clamp(240px, 25%, 480px)`，宿主容器约 1440px 处为 360px），窗口变宽 / 变窄时列表随之伸缩；宿主覆写该 token 为 `100%` 或固定 px 的行为不变（core 2.8.4）。
+
+### 新增
+
+- **`EmResizable` 新增 `fluid` 弹性模式**：开启后未拖拽过且无受控值时不写内联尺寸，宽度交由 CSS（如侧栏基准 token）决定；首次拖拽以当前实际渲染尺寸为起点，拖拽后内联 px 接管，适合「默认弹性 + 可拖拽定宽」的侧栏（core 2.8.4）。
+
+---
+
+## @easemob/uikit-im 3.7.3 (2026-09-17)
+
+
+### 新增
+
+- **新增聊天页消息昵称展示特性开关 `showNicknameInSingleChat` / `showNicknameInGroupChat`**：单聊消息列表默认不展示对方昵称（微信风格），`<UIKitProvider :show-nickname-in-single-chat="true">` 可打开；群聊默认展示发送者昵称，`:show-nickname-in-group-chat="false"` 可关闭。消息气泡外壳按消息自身的 `conversationType` 判定（合并转发弹窗、搜索结果等独立场景同样生效），运行时切换即刻生效。
+
+---
+
+## @easemob/uikit-im 3.7.2 (2026-09-17)
+
+
+### 修复
+
+- **修复生产构建中 core 组件（按钮等）失去全部样式的问题（严重）**：配套 core 2.8.2 的 scopeId 稳定性修复——theme 内联的 core dist scoped 样式 hash 与 core 运行时 scopeId 重新对齐；同时构建接入 `check-theme-scope-ids.mjs` 守卫，core dist 过期导致的 theme 失配会在构建期直接报错。修复前典型症状：消费者仅 `import '@easemob/uikit-im/theme'` 时，页面中所有 EmButton 渲染为无样式原生按钮。
+
+---
+
+## @easemob/uikit-im 3.7.1 (2026-09-16)
+
+
+### 修复
+
+- **修复会话列表 card 变体屏蔽全局 hover 风格开关**：`.conversation-list--card` 不再硬编码 `--uikit-item-hover-radius` / `--uikit-item-active-radius`（原固定 8px），改由全局 `hoverStyle` 主题开关驱动；默认档同为 8px，card 设计视觉不变，「方正」档直角、「圆角」档左右缩进在 PC 默认 card 会话列表上恢复生效（联系人 / 群组列表此前已生效）。
+
+---
+
+## @easemob/uikit-im 3.7.0 (2026-09-16)
+
+
+### 变更
+
+- **新增全局 header 底部分隔线开关（默认关闭，视觉变更）**：`theme.headerBorder`（Provider prop）/ `useTheme().setHeaderBorder()` 一键控制会话列表、通讯录、聊天、会话抽屉、EmModal 及建群弹窗 header 底部的 1px 分隔线，默认 `false` 不再显示分隔线（此前整改后默认显示）；宽度经新 token `--uikit-header-border-width`（`0px`/`1px`）下发，各 header 颜色 token 不变。header 总高由 border-box + 固定高保证，开关不影响布局高度。配套 core 2.8.0。
+
+---
+
 ## @easemob/uikit-im 3.6.1 (2026-09-16)
 
 
@@ -6,6 +55,7 @@
 - **二次确认弹窗宽度对齐设计稿**：11 处 `type="warning"` 确认弹窗（删除会话/消息、解散/退出群、移除成员、设置/移除管理员、移出黑名单、取消禁言、名片操作等）宽度由 540 校准为 **719**，与设计稿 pop 组件统一宽度一致；视觉跟随 core 2.7.1 的 EmModal 新度量（header 60px / 标题 18px·500 / body 48·56 / footer 80px）。
 - **会话容器对齐「新-Demo」设计稿（视觉变更，无 API 变更）**：header 加底部 1px 分隔线、总高 48 → **65px**（上下 12.5px），标题 16px/600 → **18px/500**；搜索框改 **36px 胶囊**（`pill`），搜索槽/分栏/标题水平边界统一 **12px**；card 变体会话项总高 72 → **64px**（项内容水平内边距 12px、垂直 8px），两行摘要间距 6 → **4px**。
 - **修复会话项无最后一条消息时标题下移**：会话项两行高度固定（20 + 4 + 18 = 42px），消息摘要为空时信息区不再塌陷，标题位置恒定。
+- **「没有更多历史消息」改为随消息流滚动（行为变更 + 新插槽）**：历史加载状态提示（加载中 / 失败重试 / 没有更多）由常驻顶部条改为消息列表首项，仅上翻到顶（或下拉到底）时可见，随消息一起滚动；下拉刷新模式历史加载完后同样显示「没有更多历史消息」。新增 `#history-tip` 插槽整块接管该提示，scope `{ state: 'loading' | 'failed' | 'no-more', retry }`，链路 `EmChatContainer → EmChat → EmMessageList` 插槽自动透传，文案仍可用 locale key `conversation.noMoreHistory` 覆盖。
 
 ---
 

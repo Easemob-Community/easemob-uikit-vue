@@ -155,7 +155,7 @@ function onActionClick(key: string) {
   /* loading 遮罩：浮层底色 70% 透明，明暗自适应（暗色下不再盖白幕） */
   background-color: color-mix(in srgb, var(--uikit-bg-elevated, #ffffff) 70%, transparent);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   border-radius: var(--uikit-components-radius, 12px);
 }
 </style>

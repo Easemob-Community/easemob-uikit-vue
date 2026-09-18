@@ -123,7 +123,7 @@ function onSelect(conversation: Conversation) {
 }
 
 .forward-modal__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }

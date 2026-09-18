@@ -243,13 +243,13 @@ function avatarName(invite: UiContactInvite): string {
 }
 
 .contact-notice-list__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
 .contact-notice-list__count {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-inverse);
   background-color: var(--uikit-danger-color);
@@ -302,13 +302,13 @@ function avatarName(invite: UiContactInvite): string {
 }
 
 .contact-notice-list__name {
-  font-size: var(--uikit-font-size-15);
+  font-size: var(--uikit-font-size-14);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
 .contact-notice-list__status {
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   padding: 1px 6px;
   border-radius: 4px;
   background-color: var(--uikit-bg-secondary);
@@ -324,7 +324,7 @@ function avatarName(invite: UiContactInvite): string {
 .contact-notice-list__subtitle,
 .contact-notice-list__reason,
 .contact-notice-list__time {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -341,7 +341,7 @@ function avatarName(invite: UiContactInvite): string {
   padding: 6px 14px;
   border-radius: var(--uikit-components-radius, 6px);
   border: 1px solid transparent;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   transition:
     opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
@@ -399,7 +399,7 @@ function avatarName(invite: UiContactInvite): string {
 }
 
 .contact-notice-list__empty-text {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 </style>

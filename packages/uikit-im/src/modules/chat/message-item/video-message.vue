@@ -198,7 +198,7 @@ async function handleDownload(event: MouseEvent) {
   padding: 10px 14px;
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-bubble-text-other);
 }
 
@@ -238,7 +238,7 @@ async function handleDownload(event: MouseEvent) {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.6);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
 }
 
 /* 全屏预览 */

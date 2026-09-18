@@ -175,12 +175,12 @@ async function handleDownload() {
 /* 标题跟随气泡文字色（覆盖 EmText 默认 primary，与设计稿 #171A1C / 己方白字一致） */
 .file-message__bubble .file-message__name {
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium, 500);
 }
 
 .file-message__size {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-tertiary, #919BA1);
 }
 

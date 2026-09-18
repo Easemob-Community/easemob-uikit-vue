@@ -61,7 +61,7 @@ const multiSrcs = [
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background: var(--uikit-bg-base, #fff);
   color: var(--uikit-text-primary, #1f2937);
-  font-size: var(--uikit-font-size-14, 14px);
+  font-size: var(--uikit-font-size-13, 14px);
   cursor: pointer;
 }
 
@@ -77,6 +77,6 @@ const multiSrcs = [
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: var(--uikit-font-size-12, 12px);
+  font-size: var(--uikit-font-size-11, 12px);
 }
 </style>

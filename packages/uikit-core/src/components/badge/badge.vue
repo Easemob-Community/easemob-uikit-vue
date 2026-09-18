@@ -124,33 +124,33 @@ const digitCount = computed(() => {
 .uikit-badge__content--s {
   --uikit-badge-size: 10px;
   --uikit-badge-pad: 2px;
-  font-size: var(--uikit-font-size-8);
+  font-size: var(--uikit-font-size-7);
 }
 
 .uikit-badge__content--m {
   --uikit-badge-size: 14px;
   --uikit-badge-pad: 3px;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
 }
 
 .uikit-badge__content--l {
   --uikit-badge-size: 16px;
   --uikit-badge-pad: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 
 .uikit-badge__content--xl {
   --uikit-badge-size: 20px;
   --uikit-badge-pad: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 
 .uikit-badge__content--xxl {
   --uikit-badge-size: 24px;
   --uikit-badge-pad: 6px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 

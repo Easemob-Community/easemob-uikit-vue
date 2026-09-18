@@ -114,7 +114,7 @@ function handleClick(event: MouseEvent) {
   gap: 8px;
   padding: var(--uikit-banner-padding-y, 8px) var(--uikit-banner-padding-x, 12px);
   border-radius: var(--uikit-components-radius, 8px);
-  font-size: var(--uikit-font-size-13, 13px);
+  font-size: var(--uikit-font-size-12, 13px);
   line-height: 1.4;
   cursor: default;
   transition:

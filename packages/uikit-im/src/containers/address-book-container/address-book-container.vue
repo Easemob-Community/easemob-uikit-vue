@@ -501,17 +501,18 @@ const subviewTitle = computed(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* 独占宿主槽位时填满宿主分配的宽度；与兄弟组件并排时回落侧栏固定宽（见下方 :not(:only-child)） */
+  /* 独占宿主槽位时填满宿主分配的宽度；与兄弟组件并排时回落侧栏基准宽（见下方 :not(:only-child)） */
   width: 100%;
   max-width: 100%;
   background-color: var(--uikit-bg-base);
   overflow: hidden;
 }
 
-/* 与兄弟组件并排（如 flex 行内的「列表 + 聊天区」布局）时保持侧栏默认宽；
+/* 与兄弟组件并排（如 flex 行内的「列表 + 聊天区」布局）时取侧栏宽度基准 token：
+   默认随宿主容器弹性伸缩（约 1440px 处为 360px，限 240~480），宿主可覆写为固定值；
    注意 EmResizable 等包裹组件的拖拽手柄也算兄弟节点，槽位场景仍建议显式覆写 token */
 .address-book-container:not(:only-child) {
-  width: var(--uikit-sidebar-width, 360px);
+  width: var(--uikit-sidebar-width, clamp(240px, 25%, 480px));
 }
 
 .address-book-container__view {
@@ -578,7 +579,7 @@ const subviewTitle = computed(() => {
 }
 
 .address-book-container__title {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
@@ -627,7 +628,7 @@ const subviewTitle = computed(() => {
 .address-book-container__subtitle {
   flex: 1;
   min-width: 0;
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   white-space: nowrap;

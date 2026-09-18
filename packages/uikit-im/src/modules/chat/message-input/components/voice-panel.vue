@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
   /* 固定行高，保证就绪态占位与录音态计时同高，切换时不发生布局位移 */
   line-height: 18px;
   white-space: nowrap;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-tertiary, #919ba1);
   font-variant-numeric: tabular-nums;
@@ -451,7 +451,7 @@ onBeforeUnmount(() => {
 
 .voice-panel__hint {
   /* 设计稿 cta 态：caption 10px 弱提示色 */
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   color: var(--uikit-text-tertiary, #919ba1);
   text-align: center;
   line-height: 1.5;

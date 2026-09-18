@@ -219,7 +219,7 @@ function cancel() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
@@ -234,7 +234,7 @@ function cancel() {
 }
 
 .group-announcement__content {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   word-break: break-all;
@@ -282,7 +282,7 @@ function cancel() {
   border-radius: 6px;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   line-height: 1.5;
   resize: vertical;
   outline: none;
@@ -295,7 +295,7 @@ function cancel() {
 
 .group-announcement__char-count {
   align-self: flex-end;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-tertiary);
   line-height: 1;
 }

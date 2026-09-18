@@ -346,7 +346,7 @@ defineExpose({
   border-radius: 999px;
   background-color: var(--uikit-bg-hover);
   color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   font-weight: var(--uikit-font-weight-regular);
   cursor: pointer;
   white-space: nowrap;

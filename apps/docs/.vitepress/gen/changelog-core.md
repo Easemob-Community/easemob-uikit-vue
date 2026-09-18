@@ -1,3 +1,53 @@
+## @easemob/uikit-core 2.8.4 (2026-09-18)
+
+
+### 变更
+
+- **`--uikit-sidebar-width` 默认值由固定 `360px` 改为弹性 `clamp(240px, 25%, 480px)`**：新增边界 token `--uikit-sidebar-min-width`（默认 240px）/ `--uikit-sidebar-max-width`（默认 480px），侧栏列表容器随宿主容器宽度伸缩；宿主覆写为 `100%` 或固定 px 的用法不受影响。
+
+### 新增
+
+- **`EmResizable` 新增 `fluid` prop**：fluid 且未拖拽过、无受控值时不写内联尺寸（由 CSS 决定），首次拖拽时测量根元素当前实际尺寸作为拖拽起点，拖拽后经 `update:model-value` / 内联 px 接管。
+
+---
+
+## @easemob/uikit-core 2.8.3 (2026-09-17)
+
+
+### 新增
+
+- **defaultFeatures 补齐昵称展示开关默认值**：`showNicknameInSingleChat` 默认 false、`showNicknameInGroupChat` 默认 true（契约字段定义见 uikit-sdk-contract 1.2.1）。
+
+---
+
+## @easemob/uikit-core 2.8.2 (2026-09-17)
+
+
+### 修复
+
+- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
+
+---
+
+## @easemob/uikit-core 2.8.1 (2026-09-16)
+
+
+### 变更
+
+- **`componentsShape` 方正档改为真直角（视觉变更）**：`square` 档 `--uikit-components-radius` 由 4px 改为 **0px**（`--uikit-components-radius-hover` 同步 10px → 0px）。原 4px 与圆润档 8px 在卡片 / 弹窗 / 按钮上肉眼几乎无差别，实测用户感知为开关失效；方正档现在呈现明确的直角风格（business 预设同步受影响）。同时清理 EmButton 中无人设置 `data-uikit-components-radius` 属性的失效 legacy 选择器（pill 按钮保持胶囊不受开关影响）。
+
+---
+
+## @easemob/uikit-core 2.8.0 (2026-09-16)
+
+
+### 变更
+
+- **新增全局 header 底部分隔线开关 `headerBorder`**：`themeStore.headerBorder`（持久化，默认 `false`）驱动新 token `--uikit-header-border-width`（`0px`/`1px`）；`ProviderThemeConfig` 新增 `headerBorder?: boolean`，`useTheme()` 新增 `headerBorder` / `setHeaderBorder()`。
+- **EmModal `showHeaderDivider` 默认行为变化**：默认值由 `true` 改为「不传时跟随全局 `headerBorder` 开关（默认关闭）」，显式传 `true`/`false` 仍优先（沿用 Avatar `shape` 回落主题的惯例）。此前依赖默认显示 header 分割线的弹窗，需开启全局开关或显式 `:show-header-divider="true"`。
+
+---
+
 ## @easemob/uikit-core 2.7.1 (2026-09-16)
 
 

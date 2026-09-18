@@ -89,13 +89,13 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-regular);
   color: var(--uikit-empty-text-color, #919BA1);
 }
 
 .uikit-empty__description {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-empty-text-color, #919BA1);
 }
 
@@ -121,11 +121,11 @@ const iconSize = computed(() => {
 }
 
 .uikit-empty.size-small .uikit-empty__title {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 .uikit-empty.size-small .uikit-empty__description {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
 }
 
 .uikit-empty.size-large .uikit-empty__illustration {

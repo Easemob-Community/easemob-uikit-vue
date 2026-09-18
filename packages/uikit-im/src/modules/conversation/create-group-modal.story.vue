@@ -76,7 +76,7 @@ async function mockCreate(params: CreateGroupParams) {
         <UIKitProvider :auto-init="false">
           <CreateGroupModal v-model:show="show" @vue:mounted="injectMock" @created="(id: string) => log('created', id)" />
         </UIKitProvider>
-        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">
@@ -103,7 +103,7 @@ async function mockCreate(params: CreateGroupParams) {
             @created="(id: string) => log('created', id)"
           />
         </UIKitProvider>
-        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           弹窗内显示公开群 / 入群审批 / 成员邀请 / 邀请确认开关与最大成员数，组合后随创建参数提交。
         </div>
       </div>
@@ -124,7 +124,7 @@ async function mockCreate(params: CreateGroupParams) {
             @created="(id: string) => log('created', id)"
           >
             <template #body>
-              <div style="padding: 24px; font-size: var(--uikit-font-size-13); color: #6b7280; line-height: 1.6;">
+              <div style="padding: 24px; font-size: var(--uikit-font-size-12); color: #6b7280; line-height: 1.6;">
                 弹窗主体由外层完全接管：成员选择、群信息、公开 / 私有等组合配置全部由业务方实现，
                 例如展示业务侧的成员导入界面，最终通过 createFn 提交创建。
               </div>

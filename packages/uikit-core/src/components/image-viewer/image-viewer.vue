@@ -525,7 +525,7 @@ async function handleDownload() {
   justify-content: center;
   gap: 8px;
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   pointer-events: none;
 }
 
@@ -576,7 +576,7 @@ async function handleDownload() {
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   pointer-events: none;
 }
 

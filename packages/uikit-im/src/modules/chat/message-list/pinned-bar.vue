@@ -143,7 +143,7 @@ function toggle() {
   z-index: 5;
   background-color: var(--uikit-bg-base);
   border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
 }
 
@@ -193,7 +193,7 @@ function toggle() {
 
 .pinned-bar__count {
   flex-shrink: 0;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   cursor: pointer;
   padding: 0 4px;
@@ -222,7 +222,7 @@ function toggle() {
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   background-color: var(--uikit-bg-base);
   border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);

@@ -9,6 +9,8 @@ export interface ResizableProps {
   modelValue?: number
   /** 初始尺寸（px），默认 200 / Initial size in px, default 200 */
   initial?: number
+  /** fluid 弹性模式：未拖拽过且无受控值时不写内联尺寸，宽度交由 CSS（如侧栏基准 token）决定；首次拖拽以当前实际尺寸为起点，拖拽后内联 px 接管 / Fluid mode: no inline size until first drag (or controlled value), letting CSS (e.g. sidebar width token) decide; first drag starts from the current rendered size, inline px takes over afterwards */
+  fluid?: boolean
   /** 最小尺寸（px），默认 160 / Minimum size in px, default 160 */
   min?: number
   /** 最大尺寸（px），默认不限制 / Maximum size in px, no limit by default */
@@ -25,6 +27,7 @@ const props = withDefaults(defineProps<ResizableProps>(), {
   axis: 'horizontal',
   initial: 200,
   min: 160,
+  fluid: false,
   disabled: false,
   handleSize: 6,
   showLine: false,
@@ -40,15 +43,18 @@ const emit = defineEmits<{
 }>()
 
 const handleRef = ref<HTMLElement>()
+const rootRef = ref<HTMLElement>()
 
 /** 手柄命中区尺寸（带单位），供 CSS v-bind 使用 */
 const handleSizeVar = computed(() => `${props.handleSize}px`)
 
-const { size, isResizing } = useResizable(handleRef, {
+const { size, isResizing, touched } = useResizable(handleRef, {
   axis: props.axis,
   min: props.min,
   max: props.max,
   initial: props.modelValue ?? props.initial,
+  fluid: props.fluid,
+  measureTarget: () => rootRef.value,
   disabled: () => props.disabled,
   onChange: (s) => {
     emit('update:model-value', s)
@@ -72,6 +78,9 @@ watch(isResizing, (v) => {
 
 /** 根元素尺寸：horizontal 控制宽度，vertical 控制高度 */
 const rootStyle = computed<Record<string, string>>(() => {
+  // fluid 且尚未拖拽（也无受控值）时不写内联尺寸，宽度交由 CSS（如侧栏基准 token）决定
+  if (props.fluid && props.modelValue === undefined && !touched.value)
+    return {}
   const style: Record<string, string> = {}
   if (props.axis === 'horizontal') {
     style.width = `${size.value}px`
@@ -84,7 +93,7 @@ const rootStyle = computed<Record<string, string>>(() => {
 </script>
 
 <template>
-  <div class="resizable" :class="{ 'is-resizing': isResizing }" :style="rootStyle">
+  <div ref="rootRef" class="resizable" :class="{ 'is-resizing': isResizing }" :style="rootStyle">
     <slot />
     <div
       v-if="!props.disabled"

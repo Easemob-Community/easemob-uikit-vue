@@ -337,7 +337,7 @@ function onClose() {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   cursor: pointer;
   padding: 8px;
@@ -395,7 +395,7 @@ function onClose() {
 
 .emoji-picker__section-title {
   padding: 0 4px;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium, 500);
   color: var(--uikit-text-tertiary);
   line-height: 1.4;
@@ -469,7 +469,7 @@ function onClose() {
 
 .emoji-picker__sticker-name {
   width: 100%;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   color: var(--uikit-text-secondary);
   text-align: center;
   line-height: 1.2;

@@ -259,7 +259,7 @@ function scrollActiveIntoView() {
   flex: 1;
   border: none;
   outline: none;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   background: transparent;
   color: var(--uikit-text-primary);
 }
@@ -313,7 +313,7 @@ function scrollActiveIntoView() {
 }
 
 .mention-picker__header-title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
 }
 

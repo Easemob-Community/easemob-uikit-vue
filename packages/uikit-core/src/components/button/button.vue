@@ -86,7 +86,7 @@ function handleClick(event: MouseEvent) {
     opacity var(--uikit-anim-duration) var(--uikit-anim-easing),
     transform var(--uikit-anim-duration) var(--uikit-anim-easing),
     background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   /* 为 Ripple 波纹提供定位上下文 */
   position: relative;
   overflow: hidden;
@@ -107,7 +107,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--small {
   padding: calc(var(--uikit-button-padding-y, 8px) - 2px) 12px;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
 }
 
 .uikit-button--medium {
@@ -116,7 +116,7 @@ function handleClick(event: MouseEvent) {
 
 .uikit-button--large {
   padding: calc(var(--uikit-button-padding-y, 8px) + 4px) 24px;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
 }
 
 .uikit-button--primary {

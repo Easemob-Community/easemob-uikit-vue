@@ -259,7 +259,7 @@ watch(
   height: 28px;
   line-height: 28px;
   padding: 0 20px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
 }
@@ -270,7 +270,7 @@ watch(
 
 .add-contact-modal__error {
   padding: 4px 20px 0;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-danger-color);
 }
 
@@ -294,7 +294,7 @@ watch(
 .add-contact-modal__search-empty {
   padding: 20px 8px;
   text-align: center;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-tertiary, #9ca3af);
 }
 

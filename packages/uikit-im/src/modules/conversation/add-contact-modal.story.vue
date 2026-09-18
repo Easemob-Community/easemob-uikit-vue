@@ -63,7 +63,7 @@ async function mockAdd(userId: string, message?: string) {
         <UIKitProvider :auto-init="false">
           <AddContactModal v-model:show="show" @added="(id: string) => log('added', id)" />
         </UIKitProvider>
-        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">
@@ -90,7 +90,7 @@ async function mockAdd(userId: string, message?: string) {
             @added="(id: string) => log('added', id)"
           />
         </UIKitProvider>
-        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           业务侧通过 searchFn 接管“手机号 / 邮箱 → 环信 userId”解析，选择结果后自动填充用户 ID。
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">
@@ -116,7 +116,7 @@ async function mockAdd(userId: string, message?: string) {
             @added="(id: string) => log('added', id)"
           >
             <template #body>
-              <div style="padding: 8px 0; font-size: var(--uikit-font-size-13); color: #6b7280; line-height: 1.6;">
+              <div style="padding: 8px 0; font-size: var(--uikit-font-size-12); color: #6b7280; line-height: 1.6;">
                 弹窗主体由外层完全接管：这里的搜索 / 输入表单全部由业务方实现，
                 例如展示手机号输入框，通过自有接口解析为环信 userId 后再调用添加能力。
               </div>

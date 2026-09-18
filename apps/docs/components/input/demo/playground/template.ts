@@ -85,7 +85,7 @@ const underlineValue = ref('')
 
 .field__label {
   margin-bottom: 6px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
 }
 

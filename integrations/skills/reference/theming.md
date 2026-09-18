@@ -35,7 +35,7 @@ UIKit 提供「CSS 变量 + ThemeStore」双层主题体系，支持品牌色、
 - 边框：`--uikit-border-color`、`--uikit-border-light`、`--uikit-divider-color`
 - 尺寸/圆角：`--uikit-container-gap`、`--uikit-components-radius`、`--uikit-components-radius-hover`
 - 阴影：`--uikit-shadow`、`--uikit-shadow-hover`、`--uikit-shadow-sm`
-- 字号：`--uikit-font-scale` + `--uikit-font-size-10` ~ `-22`
+- 字号：`--uikit-font-scale` + `--uikit-font-size-7` ~ `-28`
 - 密度：`[data-uikit-density="compact" | "normal" | "comfortable"]`
 - 动画：`--uikit-anim-enabled`、`--uikit-anim-duration*`、`--uikit-anim-easing*`
 - 聊天语义：`--uikit-bubble-bg-other/self`、`--uikit-bubble-text-other/self`、`--uikit-chat-bg`、`--uikit-input-bg`

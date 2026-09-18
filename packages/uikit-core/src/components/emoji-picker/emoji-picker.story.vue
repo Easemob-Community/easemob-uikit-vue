@@ -87,7 +87,7 @@ function onTabIconSelect(emoji: string) {
           <Button size="small" @click="show = !show">
             {{ show ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="selected" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
+          <span v-if="selected" style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
             已选择：{{ selected }}
           </span>
         </div>
@@ -101,7 +101,7 @@ function onTabIconSelect(emoji: string) {
           <Button size="small" @click="showRecent = !showRecent">
             {{ showRecent ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="recentInfo" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
+          <span v-if="recentInfo" style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
             {{ recentInfo }}
           </span>
         </div>
@@ -111,7 +111,7 @@ function onTabIconSelect(emoji: string) {
           :recent-count="5"
           @select="recentInfo = `已选择：${$event}（已记录到「常用」区，保留最近 5 个）`"
         />
-        <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
+        <p style="font-size: var(--uikit-font-size-11); color: var(--uikit-text-tertiary); margin-top: 8px;">
           点选若干 emoji 后，「常用」区（视图顶部）会实时记录最近 5 个。
         </p>
       </div>
@@ -123,7 +123,7 @@ function onTabIconSelect(emoji: string) {
           <Button size="small" @click="showSticker = !showSticker">
             {{ showSticker ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="selectedSticker" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
+          <span v-if="selectedSticker" style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
             已选择表情包：{{ selectedSticker }}
           </span>
         </div>
@@ -133,7 +133,7 @@ function onTabIconSelect(emoji: string) {
           @select="onSelect"
           @select-sticker="onSelectSticker"
         />
-        <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
+        <p style="font-size: var(--uikit-font-size-11); color: var(--uikit-text-tertiary); margin-top: 8px;">
           底部 tab：表情视图（😀）+ 表情包。sticker 默认展示预览图（「预」），悬停切换动图（「GIF」），移出恢复。
         </p>
       </div>
@@ -163,7 +163,7 @@ function onTabIconSelect(emoji: string) {
           <Button size="small" @click="showTabIcons = !showTabIcons">
             {{ showTabIcons ? '关闭' : '打开' }}表情
           </Button>
-          <span v-if="tabIconInfo" style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">
+          <span v-if="tabIconInfo" style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
             {{ tabIconInfo }}
           </span>
         </div>
@@ -173,7 +173,7 @@ function onTabIconSelect(emoji: string) {
           :emoji-icon="placeholder('#0ea5e9', 'E')"
           @select="onTabIconSelect"
         />
-        <p style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-tertiary); margin-top: 8px;">
+        <p style="font-size: var(--uikit-font-size-11); color: var(--uikit-text-tertiary); margin-top: 8px;">
           表情视图 tab 可配预览小图（emojiIcon），表情包取 iconUrl 或自动回落包内第一个 sticker 预览图。
         </p>
       </div>

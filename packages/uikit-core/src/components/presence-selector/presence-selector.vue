@@ -226,7 +226,7 @@ function onCancel() {
 }
 
 .presence-selector--compact .presence-selector__title {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
 }
 
 .presence-selector--compact .presence-selector__options {
@@ -268,7 +268,7 @@ function onCancel() {
 
 .presence-selector--compact .presence-selector__confirm {
   padding: 6px 12px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 .presence-selector__header {
@@ -279,7 +279,7 @@ function onCancel() {
 }
 
 .presence-selector__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
@@ -305,7 +305,7 @@ function onCancel() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
 }
 
@@ -329,7 +329,7 @@ function onCancel() {
   border-radius: var(--uikit-components-radius);
   background-color: var(--uikit-primary-color);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

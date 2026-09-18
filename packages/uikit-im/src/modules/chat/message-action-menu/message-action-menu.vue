@@ -52,7 +52,7 @@ function onItemClick(action: MessageActionItem) {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   cursor: pointer;
   /* 圆角走项级 hover 圆角 token（跟随主题形状档位，与 Cell 一致） */

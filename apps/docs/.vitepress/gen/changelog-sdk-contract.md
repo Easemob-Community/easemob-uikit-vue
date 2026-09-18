@@ -1,3 +1,12 @@
+## @easemob/uikit-sdk-contract 1.2.1 (2026-09-17)
+
+
+### 新增
+
+- **`UIKitFeatures` 新增两个可选开关**：`showNicknameInSingleChat`（单聊消息列表是否展示对方昵称，默认 false）、`showNicknameInGroupChat`（群聊消息列表是否展示发送者昵称，默认 true）。
+
+---
+
 ## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
 
 

@@ -262,7 +262,7 @@ defineExpose({
   /* 设计稿 inputs/onlight 毛玻璃面：#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur */
   border: 1px solid var(--uikit-input-field-glass-border, var(--uikit-input-border-color, #F5F5F5));
   border-radius: var(--uikit-input-radius, 999px);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   line-height: calc(24px * var(--uikit-font-scale));
   outline: none;
   background-color: var(--uikit-input-field-glass-bg, var(--uikit-bg-base));
@@ -326,7 +326,7 @@ defineExpose({
 
 .uikit-input__error-message {
   margin-top: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-danger-color);
   line-height: 1.4;
 }

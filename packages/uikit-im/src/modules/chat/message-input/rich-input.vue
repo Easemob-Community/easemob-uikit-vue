@@ -526,7 +526,7 @@ onBeforeUnmount(() => {
   /* 内边距由卡片层提供（--uikit-input-padding-y/x），文本与工具栏图标共用卡片左缘 */
   padding: 0;
   outline: none;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   line-height: 1.5;
   color: var(--uikit-text-primary);
   overflow-y: auto;
@@ -640,7 +640,7 @@ onBeforeUnmount(() => {
   left: 0;
   color: var(--uikit-text-tertiary, #919BA1);
   pointer-events: none;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   line-height: 1.5;
 }
 
@@ -651,7 +651,7 @@ onBeforeUnmount(() => {
   background-color: var(--uikit-input-bg);
   border: 1px solid var(--uikit-border-color);
   text-align: center;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   cursor: pointer;
   user-select: none;

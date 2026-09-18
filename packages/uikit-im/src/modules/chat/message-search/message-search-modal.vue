@@ -328,7 +328,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 }
 
 .message-search-modal__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
@@ -351,7 +351,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
   border-radius: 14px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing),
     color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -377,7 +377,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
   border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   white-space: nowrap;
   transition: color var(--uikit-anim-duration) var(--uikit-anim-easing),
@@ -392,7 +392,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 
 .message-search-modal__notice {
   padding: 8px 20px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   background-color: var(--uikit-bg-secondary);
   flex-shrink: 0;
@@ -437,7 +437,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 }
 
 .message-search-modal__name {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
   font-weight: var(--uikit-font-weight-medium);
   white-space: nowrap;
@@ -446,7 +446,7 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 }
 
 .message-search-modal__cvs {
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -455,13 +455,13 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
 
 .message-search-modal__time {
   margin-left: auto;
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
   flex-shrink: 0;
 }
 
 .message-search-modal__summary {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   line-height: 1.4;
   white-space: nowrap;
@@ -482,6 +482,6 @@ function getSummarySegments(item: { summary: string, highlighted?: string[] }): 
   gap: 8px;
   padding: 24px;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 </style>

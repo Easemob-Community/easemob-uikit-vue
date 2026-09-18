@@ -1659,7 +1659,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__loading-text {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -1684,7 +1684,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__error-text {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   text-align: center;
   word-break: break-word;
@@ -1696,7 +1696,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
   border: none;
   background-color: var(--uikit-primary-color);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
   transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
@@ -1768,14 +1768,14 @@ async function doRemoveAdmin(member: UiGroupMember) {
 }
 
 .chat__title {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium, 500);
   line-height: 22px;
   color: var(--uikit-text-primary, #171A1C);
 }
 
 .chat__header-member-count {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-secondary);
   white-space: nowrap;
@@ -1785,7 +1785,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   /* 设计师稿：正在输入低调展示，固定灰色不跟随主题色 */
   color: var(--uikit-text-secondary);
 }
@@ -1797,7 +1797,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
   gap: 4px;
   min-width: 0;
   max-width: 100%;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: 18px;
   color: var(--uikit-text-secondary, #5E686E);
   white-space: nowrap;

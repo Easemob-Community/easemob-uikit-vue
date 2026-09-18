@@ -1,5 +1,25 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.4 (2026-09-18)
+
+### 变更
+
+- **侧栏列表容器宽度默认随宿主容器弹性伸缩**：会话 / 联系人 / 群组 / 通讯录 / 黑名单列表容器与聊天区等兄弟组件并排时，宽度由固定 `360px` 改为按 `--uikit-sidebar-width` 基准弹性取值（`clamp(240px, 25%, 480px)`，宿主容器约 1440px 处为 360px），窗口变宽 / 变窄时列表随之伸缩；宿主覆写该 token 为 `100%` 或固定 px 的行为不变（core 2.8.4）。
+
+### 新增
+
+- **`EmResizable` 新增 `fluid` 弹性模式**：开启后未拖拽过且无受控值时不写内联尺寸，宽度交由 CSS（如侧栏基准 token）决定；首次拖拽以当前实际渲染尺寸为起点，拖拽后内联 px 接管，适合「默认弹性 + 可拖拽定宽」的侧栏（core 2.8.4）。
+
+## @easemob/uikit-core 2.8.4 (2026-09-18)
+
+### 变更
+
+- **`--uikit-sidebar-width` 默认值由固定 `360px` 改为弹性 `clamp(240px, 25%, 480px)`**：新增边界 token `--uikit-sidebar-min-width`（默认 240px）/ `--uikit-sidebar-max-width`（默认 480px），侧栏列表容器随宿主容器宽度伸缩；宿主覆写为 `100%` 或固定 px 的用法不受影响。
+
+### 新增
+
+- **`EmResizable` 新增 `fluid` prop**：fluid 且未拖拽过、无受控值时不写内联尺寸（由 CSS 决定），首次拖拽时测量根元素当前实际尺寸作为拖拽起点，拖拽后经 `update:model-value` / 内联 px 接管。
+
 ## @easemob/uikit-im 3.7.3 (2026-09-17)
 
 ### 新增

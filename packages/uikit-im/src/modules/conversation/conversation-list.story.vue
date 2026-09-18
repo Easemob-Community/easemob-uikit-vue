@@ -162,7 +162,7 @@ function log(event: string, payload?: string) {
                   v-for="tab in tabs"
                   :key="tab"
                   type="button"
-                  style="flex: 1; padding: 6px 0; font-size: var(--uikit-font-size-13); border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; color: #6b7280;"
+                  style="flex: 1; padding: 6px 0; font-size: var(--uikit-font-size-12); border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; color: #6b7280;"
                   :style="{ borderBottomColor: activeTab === tab ? '#3b82f6' : 'transparent', color: activeTab === tab ? '#3b82f6' : '#6b7280', fontWeight: activeTab === tab ? 600 : 400 }"
                   @click="selectTab(tab)"
                 >
@@ -187,7 +187,7 @@ function log(event: string, payload?: string) {
             />
           </UIKitProvider>
         </div>
-        <div style="width: 240px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="width: 240px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 8)" :key="i">
@@ -212,10 +212,10 @@ function log(event: string, payload?: string) {
                 :style="{ backgroundColor: (active || keyboardFocus) ? 'rgba(59, 130, 246, 0.06)' : 'transparent' }"
                 @click="select"
               >
-                <span style="font-size: var(--uikit-font-size-14); font-weight: 500;">
+                <span style="font-size: var(--uikit-font-size-13); font-weight: 500;">
                   {{ conversation.name }}
                 </span>
-                <span v-if="conversation.unreadCount" style="min-width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 9px; background: var(--uikit-danger-color); color: #fff; font-size: var(--uikit-font-size-12);">
+                <span v-if="conversation.unreadCount" style="min-width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 9px; background: var(--uikit-danger-color); color: #fff; font-size: var(--uikit-font-size-11);">
                   {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
                 </span>
               </div>

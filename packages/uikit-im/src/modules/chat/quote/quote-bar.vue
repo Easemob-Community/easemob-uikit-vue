@@ -117,7 +117,7 @@ function onClose() {
   /* 竖杠与卡片 padding 左缘对齐（设计稿 sndtext border-l 起始于卡片 px-12 处） */
   margin: 4px 0;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   /* 设计稿：正文 Regular 14px / 行高 18px */
   line-height: 18px;
   min-height: 24px;
@@ -162,7 +162,7 @@ function onClose() {
 /* 用户名：设计稿 Medium 14px */
 .quote-bar__sender {
   color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   font-weight: var(--uikit-font-weight-medium);
   flex-shrink: 0;
   max-width: 30%;
@@ -172,7 +172,7 @@ function onClose() {
 
 /* 摘录：设计稿 Regular 14px，单行省略 */
 .quote-bar__preview {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

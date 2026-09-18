@@ -61,17 +61,20 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 
 | Token | 默认值 | 用途 |
 | --- | --- | --- |
-| `--uikit-font-size-10` | 10px | Overline、徽标数字 |
-| `--uikit-font-size-12` | 12px | Caption、标签 |
-| `--uikit-font-size-13` | 13px | Body-S、辅助说明 |
-| `--uikit-font-size-14` | 14px | Body-M、默认正文 |
-| `--uikit-font-size-15` | 15px | H4、单元格标题 |
-| `--uikit-font-size-16` | 16px | Body-L、H3 |
-| `--uikit-font-size-18` | 18px | H2、卡片标题 |
-| `--uikit-font-size-20` | 20px | 弹窗标题（旧 H1 档） |
-| `--uikit-font-size-22` | 22px | h2、页面标题 |
-| `--uikit-font-size-28` | 28px | h1、模块大标题 |
-| `--uikit-font-size-34` | 34px | h0、页面大标题 |
+| `--uikit-font-size-7` | 7px | 极小徽标数字（原 8px 档顺延） |
+| `--uikit-font-size-9` | 9px | Overline、徽标数字 |
+| `--uikit-font-size-11` | 11px | Caption、标签 |
+| `--uikit-font-size-12` | 12px | Body-S、辅助说明 |
+| `--uikit-font-size-13` | 13px | Body-M、默认正文 |
+| `--uikit-font-size-14` | 14px | H4、单元格标题 |
+| `--uikit-font-size-15` | 15px | Body-L、H3 |
+| `--uikit-font-size-16` | 16px | H2、卡片标题 |
+| `--uikit-font-size-18` | 18px | 弹窗标题 |
+| `--uikit-font-size-20` | 20px | h2、页面标题 |
+| `--uikit-font-size-22` | 22px | h1、模块大标题 |
+| `--uikit-font-size-28` | 28px | h0、页面大标题 |
+
+> 2026-09-18 起字号档位整体降一档：原 16px 档降为 15px，其余档位依次顺延（原 34px 最大档不再保留，新增 7px 最小档）。
 
 字号 token 均乘以 `--uikit-font-scale`（默认 1），用于适老版全局放大。
 

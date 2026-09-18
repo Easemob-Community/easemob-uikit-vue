@@ -152,7 +152,7 @@ const formTextarea = ref('')
   padding: 0 20px;
   height: 28px;
   line-height: 28px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-secondary);
 }
@@ -170,7 +170,7 @@ const formTextarea = ref('')
   padding: 0 16px;
   border: 1px solid var(--uikit-border-color);
   border-radius: 16px;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   color: var(--uikit-text-primary);
   cursor: pointer;
 }
@@ -181,7 +181,7 @@ const formTextarea = ref('')
   padding: 12px 16px;
   border: 1px solid var(--uikit-border-color);
   border-radius: 16px;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   color: var(--uikit-text-primary);
   background-color: var(--uikit-bg-base);
   resize: vertical;

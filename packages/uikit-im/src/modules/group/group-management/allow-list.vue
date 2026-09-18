@@ -86,7 +86,7 @@ async function onRemove(item: any) {
 .allow-list__loading {
   text-align: center;
   padding: 16px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 </style>

@@ -57,7 +57,7 @@ const displayContent = computed(() => {
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   word-break: break-all;
 }
 
@@ -72,6 +72,6 @@ const displayContent = computed(() => {
 
 .custom-message__label {
   font-family: monospace;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 </style>

@@ -56,7 +56,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   min-width: 0;
 }
 .allow-list__name {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
@@ -66,7 +66,7 @@ const { displayName, avatarUrl } = useUserInfo(userId)
   border: 1px solid var(--uikit-border-color, #e5e7eb);
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   cursor: pointer;
   transition: all var(--uikit-anim-duration) var(--uikit-anim-easing);
 }

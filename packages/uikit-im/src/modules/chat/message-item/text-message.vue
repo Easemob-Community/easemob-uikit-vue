@@ -320,7 +320,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   overflow-wrap: break-word;
   word-break: normal;
 }
@@ -371,7 +371,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 /* 流式消息：异常提示（保留已生成的部分内容，尾部追加提示） */
 .text-message__stream-error {
   margin-left: 6px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   opacity: 0.75;
   user-select: none;
@@ -384,7 +384,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__edited {
   margin-left: 6px;
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
   opacity: 0.75;
   user-select: none;
@@ -408,7 +408,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 }
 
 .text-message__translation-text {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
@@ -418,7 +418,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
 }
 
@@ -434,7 +434,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
   justify-content: flex-end;
   gap: 4px;
   margin-top: 4px;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium, 500);
   line-height: 1;
   opacity: 0.75;
@@ -443,7 +443,7 @@ function onMentionClick(userId: string, event: MouseEvent) {
 
 .text-message__reedit-btn {
   padding: 2px 8px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-primary-color);
   background: none;
   border: none;

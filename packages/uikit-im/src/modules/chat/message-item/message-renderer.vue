@@ -159,7 +159,7 @@ const noticeSegments = computed(() => {
   border-radius: 4px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   text-align: center;
 }
 
@@ -178,7 +178,7 @@ const noticeSegments = computed(() => {
   border-radius: 8px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 .message-renderer__footer {

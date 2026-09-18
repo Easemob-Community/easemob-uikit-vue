@@ -78,7 +78,7 @@ function onTap(key: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium);
   line-height: 1;
   color: var(--uikit-text-tertiary);
@@ -95,7 +95,7 @@ function onTap(key: string) {
 /* 当前分组高亮：主色圆角块 + 白字（设计稿：10px/500，与默认档同字号字重） */
 .contact-alphabet-nav__item.is-active {
   color: var(--uikit-text-inverse, #fff);
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium);
   background-color: var(--uikit-primary-color);
   border-radius: var(--uikit-components-radius, 8px);

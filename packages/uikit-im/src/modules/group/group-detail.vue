@@ -320,7 +320,7 @@ async function onConfirmAction() {
   justify-content: center;
   background-color: var(--uikit-bg-base);
   color: var(--uikit-text-tertiary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   z-index: 1;
 }
 
@@ -337,7 +337,7 @@ async function onConfirmAction() {
   justify-content: center;
   gap: 8px;
   margin-top: 16px;
-  font-size: var(--uikit-font-size-20);
+  font-size: var(--uikit-font-size-18);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
@@ -345,7 +345,7 @@ async function onConfirmAction() {
 
 .group-detail__meta {
   margin-top: 4px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   word-break: break-all;
 }
@@ -362,7 +362,7 @@ async function onConfirmAction() {
   border-radius: 999px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-primary-color);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
 }
 
@@ -384,7 +384,7 @@ async function onConfirmAction() {
   border-radius: 999px;
   background-color: var(--uikit-bg-secondary);
   color: var(--uikit-text-primary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
 }
 

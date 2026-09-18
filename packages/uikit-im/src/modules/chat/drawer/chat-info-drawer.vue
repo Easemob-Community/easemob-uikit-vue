@@ -1166,7 +1166,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__title {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   flex: 1;
@@ -1200,7 +1200,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   （群名称/群公告，12px/500）保持视觉层级一致，故用 12px；横向内边距由外层
    section-label-row 统一提供（8px 12px），自身不再重复 padding */
 .chat-info-drawer__section-label {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
@@ -1229,7 +1229,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   border-radius: 999px;
   background-color: var(--uikit-bg-hover, #f5f5f5);
   color: var(--uikit-text-tertiary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
 }
@@ -1274,7 +1274,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__field-label {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
 }
 
@@ -1287,7 +1287,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__field-value {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   min-width: 0;
@@ -1332,7 +1332,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 .chat-info-drawer__strip-name {
   max-width: 100%;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -1375,7 +1375,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 .chat-info-drawer__settings :deep(.uikit-cell__title) {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
 }
 
 /* 成员二级页行样式（设计稿 Members Search）：名字 18px/500；
@@ -1383,7 +1383,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
    ID 行与「没有更多了」由 showId/showNoMore prop 关闭 */
 .chat-info-drawer__member-detail :deep(.group-member-list__name),
 .chat-info-drawer__subpage :deep(.group-member-list__name) {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
 }
 
 /* 成员网格：严格 5 列等宽（CSS grid 按轨道均分，不受单元格 padding/box-sizing 影响），
@@ -1430,7 +1430,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 
 .chat-info-drawer__grid-action-name {
   max-width: 100%;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -1454,7 +1454,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   border: none;
   background: none;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   cursor: pointer;
   border-radius: var(--uikit-components-radius);
 }
@@ -1480,7 +1480,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   padding: 12px 4px;
   border-radius: 999px;
   font-family: var(--uikit-font-family);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium);
   line-height: normal;
   color: var(--uikit-drawer-action-btn-color, #000000);
@@ -1524,7 +1524,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 .chat-info-drawer__confirm-body > p {
   margin: 0 0 12px;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: 1.5;
 }
 
@@ -1533,7 +1533,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
 }
 </style>

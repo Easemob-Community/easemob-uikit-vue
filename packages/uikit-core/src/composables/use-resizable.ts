@@ -9,6 +9,10 @@ export interface UseResizableOptions {
   max?: number
   /** 初始尺寸（px），默认 200 */
   initial?: number
+  /** fluid 模式：未拖拽过（且无受控值）时不写内联尺寸、由 CSS 决定渲染宽度；首次拖拽以测量目标当前实际尺寸为起点 */
+  fluid?: boolean
+  /** 测量目标（fluid 首拖时读取其当前实际尺寸），通常传被调整容器的根元素 */
+  measureTarget?: () => HTMLElement | undefined
   /** 动态禁用 getter（响应式）：返回 true 时不绑定拖拽 */
   disabled?: () => boolean
   /** 反向增量：handle 位于左缘/上缘时拖拽方向与尺寸增加方向相反，默认 false */
@@ -40,6 +44,8 @@ export function useResizable(
     min = 0,
     max = Number.POSITIVE_INFINITY,
     initial = 200,
+    fluid = false,
+    measureTarget,
     invert = false,
     disabled,
     onChange,
@@ -48,6 +54,8 @@ export function useResizable(
 
   const size = ref(clampSize(initial))
   const isResizing = ref(false)
+  /** 是否已经拖拽过（fluid 模式下区分「CSS 决定宽度」与「内联 px 接管」） */
+  const touched = ref(false)
 
   let startSize = 0
   let startClientX = 0
@@ -83,6 +91,14 @@ export function useResizable(
     if (!el)
       return
     el.setPointerCapture(e.pointerId)
+    // fluid 首拖：以测量目标当前实际尺寸为起点（此前宽度由 CSS 决定，initial 仅是占位值）
+    if (fluid && !touched.value) {
+      const rect = measureTarget?.()?.getBoundingClientRect()
+      const measured = axis === 'horizontal' ? rect?.width : rect?.height
+      if (measured)
+        size.value = clampSize(measured)
+    }
+    touched.value = true
     startSize = size.value
     startClientX = e.clientX
     startClientY = e.clientY
@@ -179,5 +195,6 @@ export function useResizable(
   return {
     size,
     isResizing,
+    touched,
   }
 }

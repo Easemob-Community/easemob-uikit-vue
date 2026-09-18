@@ -1082,7 +1082,7 @@ watch(locateRequest, (req) => {
   /* 时间分割线 chip：气泡底（默认跟随 --uikit-message-chip-bg，可由 themeStore.messageChipBg 一键关闭） */
   background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
   color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 
@@ -1094,7 +1094,7 @@ watch(locateRequest, (req) => {
   overflow: hidden;
   transition: height var(--uikit-anim-duration) var(--uikit-anim-easing);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 /* 历史加载状态提示：作为列表首项随消息流滚动，仅上翻到顶/下拉到底时可见 */
@@ -1104,7 +1104,7 @@ watch(locateRequest, (req) => {
   justify-content: center;
   padding: 12px;
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 /* 历史加载失败重试入口 */
@@ -1119,7 +1119,7 @@ watch(locateRequest, (req) => {
   border-radius: var(--uikit-components-radius, 8px);
   background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
   color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 
@@ -1133,7 +1133,7 @@ watch(locateRequest, (req) => {
   border-radius: 20px;
   background-color: var(--uikit-primary-color);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   cursor: pointer;
   display: flex;
   align-items: center;

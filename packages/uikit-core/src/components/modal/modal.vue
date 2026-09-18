@@ -247,7 +247,7 @@ function onCancel() {
 .uikit-modal__title {
   flex: 1;
   min-width: 0;
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
@@ -260,7 +260,7 @@ function onCancel() {
    表单/列表/穿梭类用 bodyFlush 贴边后由内容自带 padding */
 .uikit-modal__body {
   padding: 56px 48px;
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   color: var(--uikit-text-primary);
   overflow-y: auto;
   word-break: break-word;
@@ -315,7 +315,7 @@ function onCancel() {
 /* 移动端 bottom sheet 保持原有紧凑度量，桌面新规格（48/56、80 高 footer）不套用 */
 .uikit-modal--mobile .uikit-modal__body {
   padding: 24px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
 }
 
 .uikit-modal--mobile .uikit-modal__footer {

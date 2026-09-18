@@ -648,14 +648,14 @@ defineExpose({
 }
 
 .contact-list__title {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
 }
 
 .contact-list__count {
   margin-left: 6px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-regular);
   color: var(--uikit-text-secondary);
 }
@@ -702,7 +702,7 @@ defineExpose({
   height: 28px;
   display: flex;
   align-items: center;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-tertiary);
   background-color: var(--uikit-bg-base);
@@ -736,7 +736,7 @@ defineExpose({
 }
 
 .contact-list__loading-text {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -777,7 +777,7 @@ defineExpose({
 }
 
 .contact-list__no-more-text {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
 }
 </style>

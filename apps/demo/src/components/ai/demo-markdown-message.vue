@@ -93,7 +93,7 @@ const renderedHtml = computed(() => {
   border-radius: 12px;
   background-color: var(--uikit-bubble-bg-other);
   color: var(--uikit-bubble-text-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   overflow-wrap: break-word;
   word-break: normal;
 }
@@ -134,7 +134,7 @@ const renderedHtml = computed(() => {
 }
 
 .demo-md-msg__error {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
   opacity: 0.75;
   user-select: none;
@@ -205,7 +205,7 @@ const renderedHtml = computed(() => {
   overflow-x: auto;
   background-color: #282c34;
   color: #abb2bf;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   line-height: 1.5;
 }
 
@@ -218,7 +218,7 @@ const renderedHtml = computed(() => {
 .demo-md-msg__body :deep(table) {
   margin: 6px 0;
   border-collapse: collapse;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 .demo-md-msg__body :deep(th),

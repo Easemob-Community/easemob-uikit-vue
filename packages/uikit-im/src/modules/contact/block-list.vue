@@ -262,14 +262,14 @@ defineExpose({
 }
 
 .block-list-contact__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
 
 .block-list-contact__count {
   margin-left: 6px;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-regular);
   color: var(--uikit-text-secondary);
 }
@@ -286,7 +286,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   padding: 40px 16px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
@@ -311,7 +311,7 @@ defineExpose({
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   border-radius: 6px;
   cursor: pointer;

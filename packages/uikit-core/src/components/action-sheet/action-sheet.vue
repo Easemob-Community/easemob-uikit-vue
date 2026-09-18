@@ -90,7 +90,7 @@ function onCancel() {
 .uikit-action-sheet__title {
   text-align: center;
   padding: 16px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   border-bottom: 1px solid var(--uikit-border-light);
 }
@@ -103,7 +103,7 @@ function onCancel() {
 .uikit-action-sheet__item {
   padding: 16px;
   text-align: center;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   color: var(--uikit-text-primary);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -134,7 +134,7 @@ function onCancel() {
   margin-top: 8px;
   padding: 16px;
   text-align: center;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   color: var(--uikit-text-primary);
   cursor: pointer;
   background-color: var(--uikit-bg-secondary);

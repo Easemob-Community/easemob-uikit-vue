@@ -1194,13 +1194,13 @@ watch(
 }
 
 .demo-conv-item__name {
-  font-size: var(--uikit-font-size-15);
+  font-size: var(--uikit-font-size-14);
   font-weight: 500;
   color: var(--uikit-text-primary, #111827);
 }
 
 .demo-conv-item__text {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary, #6b7280);
   white-space: nowrap;
   overflow: hidden;
@@ -1217,7 +1217,7 @@ watch(
   border-radius: 9px;
   background: var(--uikit-danger-color, #ef4444);
   color: #fff;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
 }
 
 /* ===== 消息操作菜单 #message-action-menu 插槽完全接管 ===== */
@@ -1239,7 +1239,7 @@ watch(
   border-radius: var(--uikit-components-radius, 8px);
   background: none;
   cursor: pointer;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary, #111827);
   white-space: nowrap;
   transition: background-color var(--uikit-anim-duration, 0.15s) var(--uikit-anim-easing, ease);
@@ -1281,14 +1281,14 @@ watch(
 
 .demo-card-popup__title {
   margin: 0 0 8px;
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: 600;
   color: var(--uikit-text-primary, #111827);
 }
 
 .demo-card-popup__id {
   margin: 0 0 16px;
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary, #6b7280);
   word-break: break-all;
 }
@@ -1300,6 +1300,6 @@ watch(
   background: var(--uikit-primary-color, #3b82f6);
   color: #fff;
   cursor: pointer;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
 }
 </style>

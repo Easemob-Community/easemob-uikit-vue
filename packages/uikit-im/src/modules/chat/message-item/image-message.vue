@@ -273,7 +273,7 @@ function onPreviewError(index: number) {
   align-items: center;
   justify-content: center;
   background-color: var(--uikit-bubble-bg-other);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-bubble-text-other);
 }
 
@@ -296,7 +296,7 @@ function onPreviewError(index: number) {
   padding: 10px 14px;
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-bubble-text-other);
 }
 
@@ -306,7 +306,7 @@ function onPreviewError(index: number) {
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   border: none;
   cursor: pointer;
   white-space: nowrap;
@@ -324,7 +324,7 @@ function onPreviewError(index: number) {
   border-radius: 16px;
   background-color: rgba(0, 0, 0, 0.55);
   color: var(--uikit-text-inverse);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   pointer-events: none;
 }
 

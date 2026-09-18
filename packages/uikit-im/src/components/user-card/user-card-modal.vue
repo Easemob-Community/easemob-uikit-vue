@@ -559,7 +559,7 @@ function onPresenceChanged() {
   /*  loading 遮罩：浮层底色 70% 透明，明暗自适应（暗色下不再盖白幕） */
   background-color: color-mix(in srgb, var(--uikit-bg-elevated, #ffffff) 70%, transparent);
   color: var(--uikit-text-secondary);
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   border-radius: var(--uikit-components-radius, 12px);
 }
 
@@ -582,13 +582,13 @@ function onPresenceChanged() {
 }
 
 .user-card-modal__alias-label {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
   color: var(--uikit-text-secondary);
 }
 
 .user-card-modal__alias-value {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   word-break: break-all;

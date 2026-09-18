@@ -151,7 +151,7 @@ function onClose() {
 }
 
 .group-read-modal__title {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
 }
@@ -171,7 +171,7 @@ function onClose() {
   gap: 4px;
   padding: 10px 0;
   cursor: pointer;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
   transition: color var(--uikit-anim-duration) var(--uikit-anim-easing);
   position: relative;
@@ -204,7 +204,7 @@ function onClose() {
 }
 
 .group-read-modal__tab-label {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
 }
 
 /* 列表 */

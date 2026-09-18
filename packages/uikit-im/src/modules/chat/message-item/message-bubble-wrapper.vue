@@ -895,7 +895,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__nickname {
-  font-size: var(--uikit-font-size-10);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-medium, 500);
   color: var(--uikit-text-primary, #171A1C);
   padding: 2px 4px;
@@ -959,7 +959,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__time {
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
   margin-top: 2px;
   padding-left: 2px;
@@ -1055,7 +1055,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__status-text {
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-text-secondary);
   line-height: 1;
   margin-left: 4px;
@@ -1079,7 +1079,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--uikit-msg-status-badge-color, #47ADEB);
   background: transparent;
   color: var(--uikit-msg-status-badge-color, #47ADEB);
-  font-size: var(--uikit-font-size-8);
+  font-size: var(--uikit-font-size-7);
   font-weight: var(--uikit-font-weight-medium);
   line-height: 1;
   padding: 0 3px;
@@ -1143,7 +1143,7 @@ onBeforeUnmount(() => {
   background-color: var(--uikit-message-chip-bg, var(--uikit-bubble-bg-other, #E4E6E7));
   border-radius: var(--uikit-components-radius, 8px);
   color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
   text-align: center;
   /* 公告等长内容通知：保留换行并允许长单词折行 */
@@ -1165,7 +1165,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__recalled-text {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
 }
 
@@ -1197,7 +1197,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   padding: 8px 12px;
   border-radius: var(--uikit-components-radius);
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-primary);
   cursor: pointer;
   transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
@@ -1217,7 +1217,7 @@ onBeforeUnmount(() => {
   align-self: flex-start;
   margin-bottom: 2px;
   padding: 1px 6px;
-  font-size: var(--uikit-font-size-11);
+  font-size: var(--uikit-font-size-10);
   color: var(--uikit-primary-color);
   background-color: rgba(var(--uikit-primary-rgb), 0.1);
   border-radius: var(--uikit-components-radius, 8px);

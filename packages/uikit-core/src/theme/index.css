@@ -92,8 +92,16 @@
 
   /* 容器间距与组件圆角 */
   --uikit-container-gap: var(--uikit-spacing-2);
-  /* 侧栏列表容器（会话/联系人/群组/通讯录/黑名单）默认宽度；宿主可在容器作用域覆写（如 H5 全宽设为 100%） */
-  --uikit-sidebar-width: 360px;
+  /* 侧栏列表容器（会话/联系人/群组/通讯录/黑名单）宽度基准：
+     默认随宿主容器弹性伸缩（宿主约 1440px 处等于 360px，上下限见 min/max token），
+     宿主可在容器作用域覆写为任意值（如 H5 全宽 100%、固定 480px） */
+  --uikit-sidebar-min-width: 240px;
+  --uikit-sidebar-max-width: 480px;
+  --uikit-sidebar-width: clamp(
+    var(--uikit-sidebar-min-width, 240px),
+    25%,
+    var(--uikit-sidebar-max-width, 480px)
+  );
   --uikit-cell-gap: 3px;
   /* Cell 项背景（默认透明；会话列表 card 变体在列表作用域覆写为浮层白卡） */
   --uikit-cell-bg: transparent;
@@ -190,6 +198,7 @@
   --uikit-font-lineheight-relaxed: 1.75;
 
   /* 字号 token：与 --uikit-font-scale 联动，实现全局字号缩放（适老版） */
+  --uikit-font-size-7: calc(7px * var(--uikit-font-scale));
   --uikit-font-size-8: calc(8px * var(--uikit-font-scale));
   --uikit-font-size-9: calc(9px * var(--uikit-font-scale));
   --uikit-font-size-10: calc(10px * var(--uikit-font-scale));
@@ -203,7 +212,6 @@
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
   --uikit-font-size-28: calc(28px * var(--uikit-font-scale));
-  --uikit-font-size-34: calc(34px * var(--uikit-font-scale));
 
   /* 语义 token：气泡（默认值按设计规范校准：对方灰底 #E4E6E7/文字 #171A1C，己方品牌蓝 #009EFF/白字；
      己方气泡不再跟随主色，运行时可用 setBubbleBg / 主题预设覆盖） */
@@ -253,12 +261,6 @@
   /* 语义 token：输入框默认边框（default 变体；search/filled 变体无边框；按设计稿校准为 #C9CDCF） */
   --uikit-input-border-color: #C9CDCF;
 
-  /* 语义 token：消息输入卡片面（设计稿 msg_input）：默认透明融入聊天背景，仅保留顶部内阴影光晕；focus 态叠主色内发光 */
-  --uikit-input-surface-bg: transparent;
-  --uikit-input-surface-sheen: inset 0 30px 40px 16px rgba(136, 168, 188, 0.08);
-  --uikit-input-focus-glow: inset 0 0 12px color-mix(in srgb, var(--uikit-primary-color) 12%, transparent);
-  /* 语义 token：消息输入卡片面描边（亮色无描边为 transparent；暗色 1px #3C3F42，见设计稿 msg_input dark；宽度恒定避免布局抖动） */
-  --uikit-input-surface-border-color: transparent;
   /* 语义 token：全局输入框 EmInput（设计稿 inputs/onlight）：#F5F5F5 20% 半透明填充 + 同色细描边 + backdrop blur */
   --uikit-input-field-glass-bg: rgba(245, 245, 245, 0.2);
   --uikit-input-field-glass-border: #F5F5F5;
@@ -354,6 +356,7 @@
   --uikit-selection-bg: rgba(var(--uikit-primary-rgb), 0.4);
 
   /* 字号 token：暗色下与浅色共用同一套缩放逻辑 */
+  --uikit-font-size-7: calc(7px * var(--uikit-font-scale));
   --uikit-font-size-8: calc(8px * var(--uikit-font-scale));
   --uikit-font-size-9: calc(9px * var(--uikit-font-scale));
   --uikit-font-size-10: calc(10px * var(--uikit-font-scale));
@@ -367,7 +370,6 @@
   --uikit-font-size-20: calc(20px * var(--uikit-font-scale));
   --uikit-font-size-22: calc(22px * var(--uikit-font-scale));
   --uikit-font-size-28: calc(28px * var(--uikit-font-scale));
-  --uikit-font-size-34: calc(34px * var(--uikit-font-scale));
 
   /* 语义 token：气泡 - 暗色（对方气泡走控件底 #333537，己方品牌蓝 #33B1FF + 深色文字，
      对齐设计稿亮蓝底文字反转） */
@@ -402,13 +404,6 @@
   /* 语义 token：输入框默认边框 - 暗色（设计稿独立描边 #3C3F42） */
   --uikit-input-border-color: #3C3F42;
 
-  /* 语义 token：消息输入卡片面 - 暗色（设计稿 msg_input dark：实底 #1E2123 + 1px 描边 #3C3F42、无顶部光晕；
-     focus 改主色 20% 外环，设计稿 literal rgba(0,158,255,0.2)，按 color-mix 派生跟随主题色与明暗） */
-  --uikit-input-surface-bg: var(--uikit-input-bg);
-  /* 无顶部光晕，但 focus 态组件会将 sheen 与 focus-glow 逗号叠加，这里用零阴影占位保持列表合法 */
-  --uikit-input-surface-sheen: 0 0 0 0 transparent;
-  --uikit-input-surface-border-color: #3C3F42;
-  --uikit-input-focus-glow: 0 0 0 2px color-mix(in srgb, var(--uikit-primary-color) 20%, transparent);
   /* 语义 token：全局输入框 EmInput - 暗色 */
   --uikit-input-field-glass-bg: rgba(30, 33, 35, 0.55);
   --uikit-input-field-glass-border: #3C3F42;

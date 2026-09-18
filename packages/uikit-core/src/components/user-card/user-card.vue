@@ -293,14 +293,14 @@ function onSelectorChanged() {
 }
 
 .user-card--plain .user-card__name {
-  font-size: var(--uikit-font-size-18);
+  font-size: var(--uikit-font-size-16);
   font-weight: var(--uikit-font-weight-medium);
 }
 
 .user-card--plain .user-card__subtitle,
 .user-card--plain .user-card__user-id {
   margin-top: 0;
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
 }
 
@@ -345,21 +345,21 @@ function onSelectorChanged() {
 }
 
 .user-card__name {
-  font-size: var(--uikit-font-size-22);
+  font-size: var(--uikit-font-size-20);
   font-weight: var(--uikit-font-weight-semibold);
   color: var(--uikit-text-primary);
   word-break: break-all;
 }
 
 .user-card__subtitle {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   margin-top: 4px;
   word-break: break-all;
 }
 
 .user-card__user-id {
-  font-size: var(--uikit-font-size-13);
+  font-size: var(--uikit-font-size-12);
   color: var(--uikit-text-secondary);
   margin-top: 4px;
   word-break: break-all;
@@ -412,7 +412,7 @@ function onSelectorChanged() {
 }
 
 .user-card__action-label {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium);
   text-align: center;
   line-height: 1.2;
@@ -420,7 +420,7 @@ function onSelectorChanged() {
 
 /* 多个小胶囊并排时（Chat/Audio/Video）文字降为 14px（设计稿多变体） */
 .user-card__actions--multi .user-card__action-label {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
 }
 
 .user-card__block-actions {
@@ -440,7 +440,7 @@ function onSelectorChanged() {
 }
 
 .user-card__action--block .user-card__action-label {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   line-height: normal;
 }
 
@@ -463,13 +463,13 @@ function onSelectorChanged() {
 
 .user-card__label {
   flex: 0 0 80px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-secondary);
 }
 
 .user-card__value {
   flex: 1;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-primary-color, #3b82f6);
   word-break: break-all;
 }

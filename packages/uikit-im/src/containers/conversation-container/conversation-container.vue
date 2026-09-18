@@ -226,7 +226,7 @@ function handleReconnect() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* 独占宿主槽位时填满宿主分配的宽度；与兄弟组件并排时回落侧栏固定宽（见下方 :not(:only-child)） */
+  /* 独占宿主槽位时填满宿主分配的宽度；与兄弟组件并排时回落侧栏基准宽（见下方 :not(:only-child)） */
   width: 100%;
   max-width: 100%;
   /* 防止宿主 flex 布局（row 方向无 min-width: 0）时被内部内容撑宽 */
@@ -234,9 +234,10 @@ function handleReconnect() {
   background-color: var(--uikit-bg-base);
 }
 
-/* 与兄弟组件并排（如 flex 行内的「会话列表 + 聊天区」布局）时保持侧栏默认宽；
+/* 与兄弟组件并排（如 flex 行内的「会话列表 + 聊天区」布局）时取侧栏宽度基准 token：
+   默认随宿主容器弹性伸缩（约 1440px 处为 360px，限 240~480），宿主可覆写为固定值；
    注意 EmResizable 等包裹组件的拖拽手柄也算兄弟节点，槽位场景仍建议显式覆写 token */
 .conversation-container:not(:only-child) {
-  width: var(--uikit-sidebar-width, 360px);
+  width: var(--uikit-sidebar-width, clamp(240px, 25%, 480px));
 }
 </style>

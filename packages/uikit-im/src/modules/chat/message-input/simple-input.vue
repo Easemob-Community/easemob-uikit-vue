@@ -697,7 +697,7 @@ defineExpose({
   padding: 0;
   border: none;
   border-radius: var(--uikit-components-radius, 8px);
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   outline: none;
   background-color: transparent;
   color: var(--uikit-text-primary);
@@ -749,7 +749,7 @@ defineExpose({
   background-color: var(--uikit-input-bg);
   border: 1px solid var(--uikit-border-color);
   text-align: center;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   cursor: pointer;
   user-select: none;

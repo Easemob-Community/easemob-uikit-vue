@@ -558,7 +558,7 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__name {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-semibold);
   line-height: 20px;
   color: var(--uikit-text-primary);
@@ -610,14 +610,14 @@ const displayMessage = computed(() => {
 }
 
 .conversation-item__time {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   line-height: 16px;
   color: var(--uikit-text-tertiary);
   flex-shrink: 0;
 }
 
 .conversation-item__message {
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   line-height: 18px;
   color: var(--uikit-text-secondary);
   overflow: hidden;
@@ -710,7 +710,7 @@ const displayMessage = computed(() => {
    圆角走项级 hover 圆角 token（跟随主题形状档位，与 Cell 一致） */
 .context-menu__item {
   padding: 10px 12px;
-  font-size: var(--uikit-font-size-14);
+  font-size: var(--uikit-font-size-13);
   color: var(--uikit-text-primary);
   cursor: pointer;
   white-space: nowrap;

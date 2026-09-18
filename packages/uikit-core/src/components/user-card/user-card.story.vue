@@ -110,8 +110,8 @@ const plainActions: UserCardAction[] = [
         >
           <template #meta-extra>
             <div style="display: flex; align-items: center; gap: 16px; min-height: 44px; margin-bottom: 12px;">
-              <span style="flex: 0 0 80px; font-size: var(--uikit-font-size-14); color: var(--uikit-text-secondary);">备注</span>
-              <span style="flex: 1; font-size: var(--uikit-font-size-14); font-weight: 600;">人间野草莓</span>
+              <span style="flex: 0 0 80px; font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">备注</span>
+              <span style="flex: 1; font-size: var(--uikit-font-size-13); font-weight: 600;">人间野草莓</span>
             </div>
           </template>
         </UserCard>
@@ -126,7 +126,7 @@ const plainActions: UserCardAction[] = [
           :actions="actions"
           @action-click="(key: string) => log('action-click', key)"
         />
-        <div style="margin-top: 12px; font-size: var(--uikit-font-size-12); color: #6b7280;">
+        <div style="margin-top: 12px; font-size: var(--uikit-font-size-11); color: #6b7280;">
           事件：
           <ul style="margin: 4px 0; padding-left: 16px;">
             <li v-for="(logItem, i) in logs.slice(0, 5)" :key="i">

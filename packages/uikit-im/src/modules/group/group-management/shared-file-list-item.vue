@@ -117,7 +117,7 @@ function onMoreClick(event: MouseEvent) {
 
 /* 名字 16px/500（与成员行名字字号一致），超长省略 */
 .shared-file-list__name {
-  font-size: var(--uikit-font-size-16);
+  font-size: var(--uikit-font-size-15);
   font-weight: var(--uikit-font-weight-medium);
   color: var(--uikit-text-primary);
   overflow: hidden;
@@ -127,7 +127,7 @@ function onMoreClick(event: MouseEvent) {
 
 /* 副信息（大小/上传者）：次要文本，字号比名字小一档（同列表行 subtitle 做法） */
 .shared-file-list__meta {
-  font-size: var(--uikit-font-size-12);
+  font-size: var(--uikit-font-size-11);
   color: var(--uikit-text-secondary);
 }
 

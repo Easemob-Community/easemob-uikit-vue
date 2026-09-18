@@ -324,7 +324,7 @@ injectMockData()
               <span style="font-weight: 700; color: #3b82f6;">{{ customSlotTitle }}</span>
             </template>
             <template #header-extra>
-              <span style="font-size: var(--uikit-font-size-12); color: #6b7280;">v2.0</span>
+              <span style="font-size: var(--uikit-font-size-11); color: #6b7280;">v2.0</span>
             </template>
           </ChatContainer>
         </UIKitProvider>
@@ -336,7 +336,7 @@ injectMockData()
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="baseConfig">
             <template #message-txt="{ message }">
-              <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: var(--uikit-font-size-14);">
+              <div style="padding: 10px 14px; background: #fef3c7; border-radius: 12px; color: #92400e; font-size: var(--uikit-font-size-13);">
                 [自定义文本] {{ 'content' in message ? message.content : '' }}
               </div>
             </template>
@@ -360,7 +360,7 @@ injectMockData()
             <template #empty>
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                 <span style="font-size: 48px;">&#128172;</span>
-                <span style="font-size: var(--uikit-font-size-16); color: var(--uikit-text-secondary);">选择一个会话开始聊天吧</span>
+                <span style="font-size: var(--uikit-font-size-15); color: var(--uikit-text-secondary);">选择一个会话开始聊天吧</span>
               </div>
             </template>
           </ChatContainer>
@@ -383,7 +383,7 @@ injectMockData()
             <template #loading>
               <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                 <span style="font-size: 32px; animation: spin 1s linear infinite;">&#128260;</span>
-                <span style="font-size: var(--uikit-font-size-14); color: var(--uikit-text-secondary);">正在加载会话...</span>
+                <span style="font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">正在加载会话...</span>
               </div>
             </template>
           </ChatContainer>
@@ -481,7 +481,7 @@ injectMockData()
                   v-for="action in actions"
                   :key="action.type"
                   type="button"
-                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-14); color: var(--uikit-text-primary);"
+                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-13); color: var(--uikit-text-primary);"
                   :disabled="action.disabled"
                   @click="select(action.type, action)"
                 >
@@ -489,7 +489,7 @@ injectMockData()
                 </button>
                 <button
                   type="button"
-                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-14); color: var(--uikit-danger-color);"
+                  style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: none; border-radius: 8px; background: none; cursor: pointer; font-size: var(--uikit-font-size-13); color: var(--uikit-danger-color);"
                   @click="close"
                 >
                   举报（示例：关闭菜单，业务在此处理举报逻辑）
@@ -513,7 +513,7 @@ injectMockData()
               <div v-if="show" style="position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4);" @click.self="close">
                 <div style="width: 280px; padding: 20px; border-radius: 12px; background: var(--uikit-bg-elevated);">
                   <p style="margin: 0 0 8px; font-weight: 600;">业务自定义群名片</p>
-                  <p style="margin: 0 0 16px; font-size: var(--uikit-font-size-13); color: var(--uikit-text-secondary);">groupId: {{ groupId }}</p>
+                  <p style="margin: 0 0 16px; font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">groupId: {{ groupId }}</p>
                   <button type="button" @click="close">关闭</button>
                 </div>
               </div>
@@ -565,7 +565,7 @@ injectMockData()
           >
             <!-- 接管单聊副标题区：scope 提供 conversation / typing / presence / sign -->
             <template #header-subtitle="{ typing, presence, sign }">
-              <span style="font-size: var(--uikit-font-size-12); color: var(--uikit-text-secondary);">
+              <span style="font-size: var(--uikit-font-size-11); color: var(--uikit-text-secondary);">
                 {{ typing ? '对方正在输入（自定义渲染）' : `自定义副标题：${presence?.status ?? 'unknown'} · ${sign}` }}
               </span>
             </template>

@@ -84,7 +84,7 @@
 2. **CSS 尺寸规范**：
    - normal：一位数 24×24，两位数 32×24，三位数 42×24；高度统一 24px。
    - small：按 normal 等比缩放（建议 0.75x）。
-   - 使用 `font-size: var(--uikit-font-size-10)`，并通过 `min-width`/`padding` 控制位数宽度，不要写死 path。
+   - 使用 `font-size: var(--uikit-font-size-9)`，并通过 `min-width`/`padding` 控制位数宽度，不要写死 path。
 
 3. **风格样式**：
    - `filled`：背景 `color`，文字 `#fff`。
