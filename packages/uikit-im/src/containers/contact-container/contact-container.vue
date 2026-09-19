@@ -5,7 +5,6 @@ import AddressBookContainer from '../address-book-container/address-book-contain
 import ContactListContainer from '../contact-list-container/contact-list-container.vue'
 import GroupListContainer from '../group-list-container/group-list-container.vue'
 import BlockListContainer from '../block-list-container/block-list-container.vue'
-import ContactNoticeList from '../../modules/contact/contact-notice-list.vue'
 import BlockListAddModal from '../../modules/contact/block-list-add-modal.vue'
 import type {
   AddressBookContainerEntry,
@@ -382,6 +381,11 @@ defineExpose({
     <template v-if="$slots.watermark" #watermark>
       <slot name="watermark" />
     </template>
+    <!-- notice 子视图转发给 AddressBookContainer：AddressBookContainer 在 notice 视图只渲染
+         自己的 #notice 插槽（无则默认列表），默认插槽仅在非 notice 视图渲染，此处不转发会被静默吞掉 -->
+    <template v-if="$slots.notice" #notice>
+      <slot name="notice" />
+    </template>
 
     <template #default="{ view }">
       <!-- Contact 子视图 -->
@@ -529,15 +533,6 @@ defineExpose({
         </template>
       </GroupListContainer>
 
-      <!-- Notice 子视图：优先使用外部 #notice 插槽，否则默认渲染 ContactNoticeList -->
-      <div
-        v-else-if="view === 'notice'"
-        class="contact-container__notice-view"
-      >
-        <slot name="notice" />
-        <ContactNoticeList v-if="!$slots.notice" />
-      </div>
-
       <!-- Blocklist 子视图 -->
       <BlockListContainer
         v-else-if="view === 'blocklist'"
@@ -563,12 +558,6 @@ defineExpose({
 </template>
 
 <style scoped>
-.contact-container__notice-view {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
 .contact-container__blocklist-view {
   flex: 1;
   min-height: 0;

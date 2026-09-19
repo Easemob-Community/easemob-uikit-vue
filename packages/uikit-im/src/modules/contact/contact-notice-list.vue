@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   EmAvatar as Avatar,
   EmEmpty as Empty,
@@ -45,13 +45,25 @@ const { acceptGroupInvitation, declineGroupInvitation } = useGroup()
 
 const displayInvites = computed(() => props.invites ?? inviteList.value)
 
+// 「对方拒绝我的申请」通知：列表展示即视为已查看，清除未读标记消除通知入口红点
+watch(
+  displayInvites,
+  (list) => {
+    for (const invite of list) {
+      if (isDeclinedByPeer(invite) && invite.unread)
+        stores.contact.markInviteRead(invite.id)
+    }
+  },
+  { immediate: true, deep: true },
+)
+
 const processingIds = ref<Set<string>>(new Set())
 
 function isProcessing(invite: UiContactInvite): boolean {
   return processingIds.value.has(invite.id)
 }
 
-/** 我发出的申请被对方拒绝（Figma「新-Demo」2772:28346：粉色失望头像 + 「拒绝了你的好友申请」） */
+/** 我发出的申请被对方拒绝（Figma「新-Demo」2772:28346：白底「人 + 双 X」图标头像 + 「拒绝了你的好友申请」） */
 function isDeclinedByPeer(invite: UiContactInvite): boolean {
   return invite.outgoing === true && invite.status === 'declined'
 }
@@ -174,13 +186,13 @@ function avatarName(invite: UiContactInvite): string {
         class="contact-notice-list__item"
         :class="{ 'contact-notice-list__item--actionable': !isDeclinedByPeer(invite) }"
       >
-        <!-- 对方拒绝通知：粉色失望图标头像（Figma「新-Demo」2772:28346） -->
-        <span
+        <!-- 对方拒绝通知：白底圆形「人 + 双 X」自拼色图标（dspntd，圆角由列表样式裁切），不随主题变色 -->
+        <Icon
           v-if="isDeclinedByPeer(invite)"
           class="contact-notice-list__decline-avatar"
-        >
-          <Icon name="dspntd" :size="20" />
-        </span>
+          name="dspntd"
+          :size="48"
+        />
         <Avatar
           v-else
           class="contact-notice-list__avatar"
@@ -277,13 +289,7 @@ function avatarName(invite: UiContactInvite): string {
 
 .contact-notice-list__decline-avatar {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
   border-radius: 50%;
-  background-color: color-mix(in srgb, var(--uikit-danger-color, #ff4d6d) 40%, var(--uikit-bg-base));
-  color: var(--uikit-text-inverse);
 }
 
 .contact-notice-list__info {

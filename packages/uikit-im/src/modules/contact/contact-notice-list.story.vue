@@ -24,9 +24,9 @@ const declinedInvites: UiContactInvite[] = [
   { id: 'u_eve', type: 'contact', userId: 'u_eve', nickname: 'Eve', reason: 'Sorry', status: 'declined', timestamp: Date.now() - 259200_000 },
 ]
 
-/** 我发出的申请被对方拒绝（outgoing declined）：粉色失望头像 + 「拒绝了你的好友申请」 */
+/** 我发出的申请被对方拒绝（outgoing declined）：白底「人 + 双 X」图标头像 + 「拒绝了你的好友申请」 */
 const declinedByPeerInvites: UiContactInvite[] = [
-  { id: 'u_frank', type: 'contact', userId: 'u_frank', nickname: 'Frank', status: 'declined', outgoing: true, timestamp: Date.now() - 3600_000 },
+  { id: 'u_frank', type: 'contact', userId: 'u_frank', nickname: 'Frank', status: 'declined', outgoing: true, unread: true, timestamp: Date.now() - 3600_000 },
 ]
 
 const emptyInvites = ref<UiContactInvite[]>([])
@@ -72,7 +72,7 @@ function onDecline(invite: UiContactInvite) {
         </UIKitProvider>
       </div>
       <div style="margin-top: 8px; font-size: var(--uikit-font-size-11); color: #6b7280;">
-        已接受 / 已拒绝 的条目展示右侧状态标签；对方拒绝我的申请（outgoing）展示粉色失望头像与「拒绝了你的好友申请」，无操作按钮。
+        已接受 / 已拒绝 的条目展示右侧状态标签；对方拒绝我的申请（outgoing）展示白底「人 + 双 X」图标头像与「拒绝了你的好友申请」，无操作按钮。
       </div>
     </Variant>
 
@@ -83,7 +83,7 @@ function onDecline(invite: UiContactInvite) {
         </UIKitProvider>
       </div>
       <div style="margin-top: 8px; font-size: var(--uikit-font-size-11); color: #6b7280;">
-        我发出的好友申请被对方拒绝（Figma「新-Demo」2772:28346）：粉色失望图标头像 + 固定文案，无操作区。
+        我发出的好友申请被对方拒绝：白底圆形「人 + 双 X」自拼色图标头像 + 固定文案，无操作区。
       </div>
     </Variant>
 

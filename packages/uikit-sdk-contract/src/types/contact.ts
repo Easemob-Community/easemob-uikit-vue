@@ -48,6 +48,8 @@ export interface UiContactInvite {
   status: 'pending' | 'accepted' | 'declined'
   /** 申请方向：true 表示我发出的申请（当前仅「对方拒绝我的申请」会生成该通知），用于「拒绝了你的好友申请」展示 */
   outgoing?: boolean
+  /** 未读标记：当前仅「对方拒绝我的申请」通知（outgoing + declined）使用，用户查看通知列表后由 UI 清除 */
+  unread?: boolean
   /** 申请/邀请时间戳 */
   timestamp?: number
 }

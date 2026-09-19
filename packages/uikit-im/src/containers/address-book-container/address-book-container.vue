@@ -232,7 +232,7 @@ const resolvedContactCount = computed(() => {
 const resolvedNoticeCount = computed(() => {
   if (props.noticeCount !== undefined) return props.noticeCount
   if (!props.autoEntryCount) return 0
-  return stores.contact.pendingCount
+  return stores.contact.noticeCount
 })
 
 const resolvedBlocklistCount = computed(() => {

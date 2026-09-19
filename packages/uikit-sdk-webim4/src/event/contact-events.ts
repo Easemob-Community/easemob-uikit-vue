@@ -63,8 +63,8 @@ export function createContactHandlers(stores: EventStores): Partial<EasemobChat.
         stores.contact.updateInviteStatus(userId, 'declined')
       }
       else {
-        // 我发出的好友申请被对方拒绝：落一条 outgoing 拒绝通知，UI 展示「拒绝了你的好友申请」
-        stores.contact.addInvite({ ...toUiInvite(msg, 'declined'), outgoing: true })
+        // 我发出的好友申请被对方拒绝：落一条 outgoing 拒绝通知，UI 展示「拒绝了你的好友申请」；unread 驱动通知入口红点
+        stores.contact.addInvite({ ...toUiInvite(msg, 'declined'), outgoing: true, unread: true })
       }
     },
     onContactDeleted: (msg) => {

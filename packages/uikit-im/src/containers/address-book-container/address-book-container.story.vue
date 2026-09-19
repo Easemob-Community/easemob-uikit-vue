@@ -63,6 +63,7 @@ function injectMockInvites() {
   contactStore.addInvite({ id: 'u_alice', type: 'contact', userId: 'u_alice', nickname: 'Alice', status: 'pending', timestamp: Date.now() })
   contactStore.addInvite({ id: 'g_team', type: 'group', groupId: 'g_team', groupName: '产品设计组', inviterId: 'u_bob', status: 'pending', timestamp: Date.now() })
   contactStore.addInvite({ id: 'u_old', type: 'contact', userId: 'u_old', nickname: 'Old Friend', status: 'accepted', timestamp: Date.now() - 86400_000 })
+  contactStore.addInvite({ id: 'u_coco', type: 'contact', userId: 'u_coco', nickname: 'Coco', status: 'declined', outgoing: true, unread: true, timestamp: Date.now() - 3600_000 })
 }
 
 function injectMock() {

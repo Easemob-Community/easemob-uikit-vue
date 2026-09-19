@@ -91,6 +91,12 @@ export const useContactStore = defineStore('contact', () => {
 
   // ===== 好友申请/群组邀请列表 =====
   const pendingCount = computed(() => inviteList.value.filter(i => i.status === 'pending').length)
+  /** 「对方拒绝我的申请」且未读的通知数，驱动通知入口红点 */
+  const declinedUnreadCount = computed(() =>
+    inviteList.value.filter(i => i.outgoing === true && i.status === 'declined' && i.unread === true).length,
+  )
+  /** 通知入口红点计数：待处理申请/邀请 + 未读的被对方拒绝通知 */
+  const noticeCount = computed(() => pendingCount.value + declinedUnreadCount.value)
 
   function addInvite(invite: UiContactInvite) {
     const index = inviteList.value.findIndex(i => i.id === invite.id)
@@ -110,6 +116,14 @@ export const useContactStore = defineStore('contact', () => {
     const index = inviteList.value.findIndex(i => i.id === id)
     if (index >= 0) {
       inviteList.value[index] = { ...inviteList.value[index], status }
+    }
+  }
+
+  /** 用户已查看该通知，清除未读标记（当前用于「对方拒绝我的申请」红点的消除） */
+  function markInviteRead(id: string) {
+    const index = inviteList.value.findIndex(i => i.id === id)
+    if (index >= 0 && inviteList.value[index].unread) {
+      inviteList.value[index] = { ...inviteList.value[index], unread: false }
     }
   }
 
@@ -182,6 +196,8 @@ export const useContactStore = defineStore('contact', () => {
     blackList,
     inviteList,
     pendingCount,
+    declinedUnreadCount,
+    noticeCount,
     loaded,
     blockListLoaded,
     blackIdSet,
@@ -207,6 +223,7 @@ export const useContactStore = defineStore('contact', () => {
     addInvite,
     removeInvite,
     updateInviteStatus,
+    markInviteRead,
     getInvite,
     clearInvites,
     setFilterText,
