@@ -469,8 +469,11 @@ watch(
 }
 
 /* 行尾选择框右缘到分割线之间预留字母索引条通道（40px），
-   索引条居中于通道内（right: 11px ≈ (40-18)/2），与选择框、分割线两侧都留出间距 */
-.create-group-modal__left :deep(.contact-item-default) {
+   索引条居中于通道内（right: 11px ≈ (40-18)/2），与选择框、分割线两侧都留出间距。
+   选择器需带上 .uikit-cell：scoped CSS 属性选择器计特异性，单类 deep 覆盖与
+   EmCell 的 .uikit-cell.is-auto-height padding 简写同为 (0,3,0)，构建产物中
+   core 样式注入靠后会回写 padding-right 导致通道失效（索引条与选择框重叠） */
+.create-group-modal__left :deep(.uikit-cell.contact-item-default) {
   padding-right: 40px;
 }
 
