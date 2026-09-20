@@ -26,6 +26,12 @@ export interface UserCardModalProps {
   align?: 'start' | 'center' | 'end'
   /** 与锚点的间距（px），默认 8（仅锚定模式生效） */
   offset?: number
+  /**
+   * 是否展示在线状态，默认跟随 Provider 全局 enablePresence 配置；
+   * 主动查看场景（名片）默认展示，传 false 可单独关闭。
+   * Whether to show presence. Defaults to the global enablePresence feature; pass false to opt out.
+   */
+  enablePresence?: boolean
 }
 
 const props = withDefaults(defineProps<UserCardModalProps>(), {
@@ -141,7 +147,7 @@ async function loadData() {
     return
   presenceLoading.value = true
   try {
-    if (features.enablePresence) {
+    if (props.enablePresence ?? features.enablePresence) {
       try {
         const presences = await fetchPresence([props.userId])
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined

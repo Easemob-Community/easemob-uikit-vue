@@ -34,6 +34,7 @@
 | noticePersistInvites   | `boolean \| 'local' \| 'session'` | `false`                                                      | 是否持久化未处理通知（好友申请 + 群邀请），开启后首页徽标在刷新后也能立即显示红点                |
 | initialView            | `AddressBookContainerView`        | —                                                            | 初始视图（默认 home）                                             |
 | showContactAddButton   | `boolean`                         | `true`                                                       | 是否在联系人子视图头部展示添加好友按钮，默认 true                               |
+| showNoticeAddButton    | `boolean`                         | `false`                                                      | 是否在「新请求」子视图头部展示添加好友按钮，默认 false（Figma「新-Demo」2772:28346）   |
 | showGroupCreateButton  | `boolean`                         | `true`                                                       | 是否在群组子视图头部展示创建群组按钮，默认 true                                |
 | showBlocklistAddButton | `boolean`                         | `true`                                                       | 是否在黑名单子视图头部展示「添加黑名单」按钮，默认 true                            |
 

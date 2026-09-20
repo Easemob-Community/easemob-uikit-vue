@@ -77,6 +77,12 @@ export interface GroupMemberListProps {
   /** 搜索框是否使用椭圆（pill）形态，默认 false；会话详情抽屉成员页传 true */
   searchPill?: boolean
   /**
+   * 是否展示成员头像在线状态，默认跟随 Provider 全局 enablePresence 配置；
+   * 可视区懒查询策略仍由全局 fetchGroupMemberPresenceOnVisible 控制。
+   * Whether to show presence dots on member avatars. Defaults to the global enablePresence feature.
+   */
+  enablePresence?: boolean
+  /**
    * 受控搜索关键词：传入时优先于内部搜索框输入（会话详情抽屉成员页的共享搜索框走该入口），
    * 此时通常配合 show-search=false 隐藏自带搜索框
    */
@@ -88,6 +94,9 @@ const { show: showToast } = useToast()
 const { stores, features } = useUIKit()
 const { fetchGroupMembers } = useGroup()
 const { fetchPresence, getPresence } = usePresence()
+
+/** 成员在线状态展示开关：默认跟随 Provider 全局 enablePresence，可组件级覆盖 */
+const presenceEnabled = computed(() => props.enablePresence ?? features.enablePresence)
 
 const searchKeyword = ref('')
 const loadingMore = ref(false)
@@ -108,7 +117,7 @@ let presenceObserver: IntersectionObserver | null = null
 let presenceFetchTimer: ReturnType<typeof setTimeout> | null = null
 
 function ensurePresenceObserver() {
-  if (presenceObserver || !itemsRef.value || !features.fetchGroupMemberPresenceOnVisible)
+  if (presenceObserver || !itemsRef.value || !presenceEnabled.value || !features.fetchGroupMemberPresenceOnVisible)
     return
   presenceObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -142,7 +151,7 @@ function scheduleFetchPresence() {
   if (presenceFetchTimer)
     clearTimeout(presenceFetchTimer)
   presenceFetchTimer = setTimeout(() => {
-    if (!features.enablePresence)
+    if (!presenceEnabled.value)
       return
     const ids = Array.from(visibleUserIds.value).filter(id => !getPresence(id))
     if (ids.length > 0)
@@ -151,6 +160,8 @@ function scheduleFetchPresence() {
 }
 
 function getMemberPresence(userId: string): PresenceDisplayStatus | undefined {
+  if (!presenceEnabled.value)
+    return undefined
   return getPresence(userId)?.status as PresenceDisplayStatus | undefined
 }
 

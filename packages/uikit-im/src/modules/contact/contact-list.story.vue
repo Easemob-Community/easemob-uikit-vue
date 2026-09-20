@@ -201,7 +201,7 @@ function onLoadMore() {
         </UIKitProvider>
       </div>
       <div style="margin-top: 8px; font-size: var(--uikit-font-size-11); color: #6b7280;">
-        通过 :enable-presence="true" 开启组件级 Presence；Provider 全局可关闭，仅当前组件生效。
+        好友列表 Presence 默认关闭，需显式传 :enable-presence="true" 开启；与 Provider 全局 enablePresence 无关。
       </div>
     </Variant>
 
@@ -215,7 +215,7 @@ function onLoadMore() {
         </UIKitProvider>
       </div>
       <div style="margin-top: 8px; font-size: var(--uikit-font-size-11); color: #6b7280;">
-        Provider 全局开启，但当前组件通过 :enable-presence="false" 独立关闭。
+        Provider 全局开启，组件默认也不展示；显式 :enable-presence="false" 仅为显式声明关闭。
       </div>
     </Variant>
 

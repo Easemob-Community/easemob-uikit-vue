@@ -1,5 +1,16 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.6 (2026-09-20)
+
+### 变更
+
+- **好友列表在线状态默认关闭**：`EmContactList`（含通讯录容器好友子视图与 `EmContactListContainer`）即使 Provider 全局开启 `enablePresence`，默认也不再展示联系人在线状态点，也不再为列表发起 presence 订阅；需要展示时显式传 `:enable-presence="true"`。
+- **消息气泡头像在线状态点默认关闭**：`config.messageList` 新增 `presence` 开关（默认 `false`，微信/QQ 式消息流不带状态点）；开启后仅对方头像展示状态点，且需全局 `enablePresence` 链路可用。原先「store 有数据即被动显示」的默认行为移除，恢复方式：`:chat-config="{ messageList: { presence: true } }"`。
+
+### 新增
+
+- **`EmContactDetail` / `EmUserCardModal` / `EmGroupMemberList` 新增 `enablePresence` prop**：名片、联系人详情、群成员列表（主动查看场景）默认仍跟随 Provider 全局 `enablePresence` 展示在线状态，现可组件级覆盖（传 `false` 单独关闭）。
+
 ## @easemob/uikit-sdk-websdk5 1.3.2 (2026-09-20)
 
 ### 新增

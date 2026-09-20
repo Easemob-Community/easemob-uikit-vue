@@ -171,6 +171,13 @@ export interface ChatConfig {
     voiceUnreadDot?: boolean
     /** 头像尺寸（px），默认 36 */
     avatarSize?: number
+    /**
+     * 消息头像在线状态点：默认 false（不展示；微信/QQ 式消息流头像不带状态点）。
+     * 开启后仅对方头像展示状态点，且需 Provider 全局 enablePresence 链路可用。
+     * Whether to show presence dots on message avatars. Default false; only peer
+     * avatars show the dot, gated by the global enablePresence feature.
+     */
+    presence?: boolean
     /** 左键点击消息头像是否打开用户名片，默认 true；右键菜单（查看资料/@提及）不受此开关影响 */
     avatarClickViewProfile?: boolean
     /** 消息项之间的间距（px），默认 12 */

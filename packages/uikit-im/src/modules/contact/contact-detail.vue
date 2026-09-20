@@ -26,6 +26,12 @@ export interface ContactDetailProps {
   userId: string
   /** 外部已缓存的联系人摘要（可选，用于首屏快速展示） */
   contact?: UiContact | null
+  /**
+   * 是否展示在线状态，默认跟随 Provider 全局 enablePresence 配置；
+   * 主动查看场景（详情页）默认展示，传 false 可单独关闭。
+   * Whether to show presence. Defaults to the global enablePresence feature; pass false to opt out.
+   */
+  enablePresence?: boolean
 }
 
 const { t } = useLocale()
@@ -126,7 +132,7 @@ async function loadData() {
     return
   presenceLoading.value = true
   try {
-    if (features.enablePresence) {
+    if (props.enablePresence ?? features.enablePresence) {
       try {
         const presences = await fetchPresence([props.userId])
         presenceStatus.value = presences[0]?.status as PresenceDisplayStatus | undefined

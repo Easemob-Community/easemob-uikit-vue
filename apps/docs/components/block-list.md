@@ -133,7 +133,7 @@ Props 类型 `BlockListContainerProps` 从 `@easemob/uikit-im` 具名导出。
 
 ## EmContactListContainer 联系人列表容器
 
-好友列表独立容器（通讯录容器联系人子视图同款）：内置搜索、排序 / 拼音分组、字母导航、选择模式（单选 / 多选）、触底加载与在线状态，点击行为可完全交给外部接管。mount 时自动拉取好友列表（需 `Provider.enableContact=true`）。
+好友列表独立容器（通讯录容器联系人子视图同款）：内置搜索、排序 / 拼音分组、字母导航、选择模式（单选 / 多选）、触底加载与在线状态（默认关闭，`enable-presence` 开启），点击行为可完全交给外部接管。mount 时自动拉取好友列表（需 `Provider.enableContact=true`）。
 
 ```vue
 <script setup lang="ts">

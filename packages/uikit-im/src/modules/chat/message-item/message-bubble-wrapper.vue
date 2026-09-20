@@ -103,8 +103,14 @@ const isSelf = computed(() => {
   return props.message.isSelf
 })
 
-/** 发送者在线状态：己方消息不展示（自己的在线状态对自己没有信息量） */
+/**
+ * 发送者在线状态：默认不展示（消息流头像不带状态点，见 config.messageList.presence，
+ * 默认 false）；显式开启且全局 enablePresence 链路可用时，对方头像展示状态点
+ * （自己的在线状态对自己没有信息量，己方消息永不展示）。
+ */
 const senderPresence = computed<PresenceDisplayStatus | undefined>(() => {
+  if (!props.config?.presence || !features.enablePresence)
+    return undefined
   if (isSelf.value)
     return undefined
   return getPresence(props.message.from).value?.status as PresenceDisplayStatus | undefined

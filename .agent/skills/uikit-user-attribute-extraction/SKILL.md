@@ -87,7 +87,7 @@ export function usePresence() {
 }
 ```
 
-用于：消息气泡头像右下角在线指示器、联系人列表在线状态。
+用于：消息气泡头像右下角在线指示器（默认关，见 3.3）、联系人列表在线状态（默认关，显式 opt-in）、名片/详情/群成员（默认跟随全局）。
 
 ### 1.4 底层 store：`useUserInfoStore()`
 
@@ -228,6 +228,18 @@ const senderPresence = computed(() =>
 
 参考：`modules/chat/message-item/message-bubble-wrapper.vue`。
 
+**按场景默认口径（presence 展示不是「开了全局就全开」）**：`features.enablePresence` 只是数据链路总开关，
+各展示面有自己的默认值与开关，业务新增带头像的组件时不要默认挂状态点：
+
+| 场景 | 默认 | 开关 |
+| --- | --- | --- |
+| 会话列表单聊头像 | 开 | `ConversationList.enablePresence` |
+| 通讯录/好友列表 | **关** | `ContactList.enablePresence`（显式 opt-in） |
+| 消息气泡头像 | **关** | `chatConfig.messageList.presence` |
+| 联系人详情 / 用户名片 | 跟随全局 | 组件 `enablePresence` prop 可覆盖 |
+| 群成员列表 | 跟随全局 | 组件 `enablePresence` prop 可覆盖 |
+| 聊天页单聊 header 副标题 | 开（'auto' 档） | `chatConfig.header.subtitle` |
+
 ---
 
 ## 4. 功能开关
@@ -273,7 +285,7 @@ Provider 层暴露两个功能开关（`uikit-provider.vue`）：
 ## 软约定
 
 - 消息 `ext.ease_chat_uikit_user_info` 作为**兜底补充**而非主源；`useUserInfo` 无结果时才回退到 ext。
-- 在线状态（Presence）按需消费——仅消息气泡、联系人列表等需要展示在线指示器的场景才引入 `usePresence`。
+- 在线状态（Presence）按场景消费——消息气泡与好友列表默认**不展示**（显式开启除外），名片/详情/群成员跟随全局；`features.enablePresence` 是数据链路总开关，不等于「所有头像都显示状态点」。
 - **属性拉取范围**：`fetchUserInfos` / `fetchOwnInfo` / `useOwnUserInfo` 默认拉取**全量 8 个属性**（`nickname/avatarUrl/mail/phone/gender/sign/birth/ext`），保证登录后签名等资料可回显；`useUserInfo` 的 `attributes` 参数默认 `['nickname', 'avatarUrl']`（列表类轻量消费省带宽），需要更多字段（如 `sign`/`mail`/`phone`）时按需传（参考 `contact-detail.vue` / `user-card-modal.vue` 显式传全量）。
 - **缓存按属性补拉**：store 会记录每个 userId 已成功拉取的属性集合；先以部分属性（昵称/头像）拉过缓存后，再请求更大属性集（如全量）会自动补拉剩余属性，不会因"缓存非空"而跳过。
 

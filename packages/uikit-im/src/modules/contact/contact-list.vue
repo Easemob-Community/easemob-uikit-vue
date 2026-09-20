@@ -100,7 +100,12 @@ export interface ContactListProps {
   searchComponent?: Component
   /** 列表项点击行为模式，默认 'default' */
   clickBehavior?: ContactListClickBehavior
-  /** 是否展示联系人头像在线状态；不传则使用 Provider 全局 enablePresence 配置 */
+  /**
+   * 是否展示联系人头像在线状态，默认 false（即使 Provider 全局开启在线状态链路，好友列表也默认不展示，
+   * 需显式传 true 开启；数据订阅随之启用）。传 onlineStatusFn 时本开关不生效。
+   * Whether to show presence dots on contact avatars. Default false — the contact list stays
+   * presence-free unless explicitly enabled, regardless of the global enablePresence feature.
+   */
   enablePresence?: boolean
 }
 
@@ -152,11 +157,12 @@ const { isMobile } = useViewport()
 void isMobile
 
 // ================== Presence 默认兑底 ==================
-// 当外部未传 onlineStatusFn 且（组件 prop 或 Provider 全局）enablePresence===true 时，
-// 内部使用 usePresence 提供在线状态，并按过滤后的可见联系人 ID 自动订阅。
+// 默认关闭：好友列表属于扫读场景，即使 Provider 全局开启在线状态链路也不展示状态点，
+// 需组件显式传 enablePresence=true（或传 onlineStatusFn 完全接管）才启用；
+// 启用时内部使用 usePresence 提供在线状态，并按过滤后的可见联系人 ID 自动订阅。
 const { features, stores, domains } = useUIKit()
 const presenceEnabled = computed(
-  () => (props.enablePresence ?? features.enablePresence) && !props.onlineStatusFn,
+  () => (props.enablePresence ?? false) && !props.onlineStatusFn,
 )
 const presence = usePresence()
 
@@ -227,7 +233,7 @@ if (presenceEnabled.value) {
 function resolveOnlineStatus(c: Contact): OnlineStatus | undefined {
   if (props.onlineStatusFn)
     return props.onlineStatusFn(c)
-  if (!(props.enablePresence ?? features.enablePresence))
+  if (!presenceEnabled.value)
     return undefined
   const info = presence.get(c.userId).value
   if (!info)

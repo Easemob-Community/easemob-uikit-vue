@@ -54,6 +54,7 @@ import { EmMessageList, EmUIKitProvider } from '@easemob/uikit-im'
 - `bubbleStyle`：`'filled' | 'plain'`，默认 `'filled'` —— 中性气泡（对方）带底色 / 无底色纯文字
 - `voiceUnreadDot`：`boolean`，默认 `true` —— 对方语音消息未播放红点（仅本会话实时收到的语音显示，点击播放后消失；历史/漫游消息与刷新后不显示）
 - `avatarSize`：`number`，默认 `36` —— 头像尺寸（px）
+- `presence`：`boolean`，默认 `false` —— 消息头像在线状态点（微信/QQ 式消息流默认不带状态点；开启后仅对方头像展示，且需 Provider 全局 `enablePresence` 链路可用）
 - `messageGap`：`number`，默认 `12` —— 消息间距（px）
 - `messagePadding`：`number`，默认 `16` —— 列表内边距（px）
 - `messageStatus`：`MessageStatusConfig` —— 状态风格 / 排列 / 位置 / 文本
