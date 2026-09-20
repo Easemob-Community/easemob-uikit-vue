@@ -511,6 +511,7 @@ export class MessageDomain {
   ) {
     if (messageIds.length === 0)
       return
+    messageLogger.info('[MessageDomain.markMessagesRead] 批量发送已读回执', { conversationId, conversationType, count: messageIds.length, messageIds: messageIds.slice(0, 5) })
     for (const id of messageIds) {
       const body = WebIM.message.create({
         type: 'read',

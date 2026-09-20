@@ -79,9 +79,10 @@ function queueMessageReadReceipt(
             await conn.send(body)
             // 发送成功记录去重，进入会话时不再重复补发该批消息
             markReadReceiptSent([messageId])
+            chatLog.info('[queueMessageReadReceipt] read 回执消息发送成功', { conversationType, conversationId, messageId })
           }
           catch (err) {
-            chatLog.warn('send read receipt failed:', err)
+            chatLog.warn('send read receipt failed:', { conversationType, conversationId, messageId, err })
           }
         }
       }
@@ -386,7 +387,7 @@ export function createChatHandlers(
       // 4.x ReadMsgBody：mid/ackId = 被读消息 ID；
       // 群聊已读回执携带 groupReadCount（{ [messageId]: 已读人数 }），单聊不带
       if (msg.groupReadCount) {
-        chatLog.info('onReadMessage(group)', { groupReadCount: msg.groupReadCount })
+        chatLog.info('onReadMessage(group)', { messageIds: Object.keys(msg.groupReadCount), groupReadCount: msg.groupReadCount })
         for (const [messageId, count] of Object.entries(msg.groupReadCount)) {
           stores.message.updateMessageById(messageId, { groupReadCount: count })
         }

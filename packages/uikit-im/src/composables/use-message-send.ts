@@ -20,11 +20,15 @@ function shouldEnableGroupAck(
   maxGroupSize?: number,
   stores?: any,
 ): boolean {
-  if (!enabled || chatType !== CONVERSATION_TYPE.GROUPCHAT)
+  if (!enabled || chatType !== CONVERSATION_TYPE.GROUPCHAT) {
+    logger.info('[GroupAck] shouldEnableGroupAck 判定', { chatType, groupId, enabled, result: false })
     return false
+  }
   const memberCount = stores?.group?.getGroupById?.(groupId)?.memberCount || 0
   const limit = maxGroupSize && maxGroupSize > 0 ? maxGroupSize : 200
-  return memberCount > 0 && memberCount <= limit
+  const result = memberCount > 0 && memberCount <= limit
+  logger.info('[GroupAck] shouldEnableGroupAck 判定', { chatType, groupId, enabled, memberCount, limit, result })
+  return result
 }
 
 export function useMessageSend() {

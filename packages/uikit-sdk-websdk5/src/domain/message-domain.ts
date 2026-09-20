@@ -342,6 +342,15 @@ export class MessageDomain {
       return this.client.chatManager.sendMessage(sdkMsg)
     }
 
+    // 群已读回执诊断：发出的消息是否携带 needReadReceipt（发送方侧验证回执开关是否生效）
+    if ((sdkMsg as { requireGroupAck?: boolean }).requireGroupAck) {
+      messageLogger.info('[GroupAck] 发送消息携带 needReadReceipt', {
+        conversationId: sdkMsg.conversationId,
+        conversationType: sdkMsg.conversationType,
+        msgLocalId: sdkMsg.msgLocalId,
+      })
+    }
+
     this.store.addSendingMessage(localId, sdkMsg)
 
     // 进度回调统计与节流：XHR progress 事件可能高频触发，
@@ -586,6 +595,7 @@ export class MessageDomain {
       .filter((id): id is string => !!id)
     if (pendingIds.length === 0)
       return
+    messageLogger.info('[MessageDomain.sendPendingReadReceipts] 补发已读回执', { conversationId, conversationType, pendingCount: pendingIds.length, messageIds: pendingIds.slice(0, 5) })
     // 先标记再发送：并发进入会话不会重复请求
     for (const id of pendingIds)
       sentReadReceiptIds.add(id)
@@ -702,11 +712,19 @@ export class MessageDomain {
     conversationType: ConversationTypeValue,
     messageId: string,
   ) {
-    await this.client.chatManager.sendMessageReadReceipts({
-      conversationId,
-      conversationType,
-      messageIds: [messageId],
-    })
+    messageLogger.info('[MessageDomain.markRead] 发送单条已读回执', { conversationId, conversationType, messageId })
+    try {
+      await this.client.chatManager.sendMessageReadReceipts({
+        conversationId,
+        conversationType,
+        messageIds: [messageId],
+      })
+      messageLogger.info('[MessageDomain.markRead] 已读回执发送成功', { conversationId, conversationType, messageId })
+    }
+    catch (error) {
+      messageLogger.warn('[MessageDomain.markRead] 已读回执发送失败', { conversationId, conversationType, messageId, error: formatSdkError(error) })
+      throw error
+    }
   }
 
   /** 获取群消息已读详情（自动翻页聚合全部已读成员） */

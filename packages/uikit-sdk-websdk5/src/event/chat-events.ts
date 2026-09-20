@@ -73,6 +73,7 @@ function queueMessageReadReceipt(
         const [conversationType, conversationId] = queueKey.split(':') as [ConversationTypeValue, string]
         for (let i = 0; i < messageIds.length; i += 50) {
           const batch = messageIds.slice(i, i + 50)
+          chatLog.info('[queueMessageReadReceipt] 批量发送已读回执', { conversationType, conversationId, batchSize: batch.length, messageIds: batch })
           try {
             await client.chatManager.sendMessageReadReceipts({
               conversationId,
@@ -81,9 +82,10 @@ function queueMessageReadReceipt(
             })
             // 发送成功记录去重，进入会话时不再重复补发该批消息
             markReadReceiptSent(batch)
+            chatLog.info('[queueMessageReadReceipt] 已读回执发送成功', { conversationType, conversationId, messageIds: batch })
           }
           catch (err) {
-            chatLog.warn('sendMessageReadReceipts failed:', err)
+            chatLog.warn('[queueMessageReadReceipt] sendMessageReadReceipts failed:', { conversationType, conversationId, messageIds: batch, err })
           }
         }
       }
@@ -612,16 +614,24 @@ export function createChatHandlers(
     },
 
     onMessageReadReceipts: (payload) => {
-      chatLog.info('onMessageReadReceipts', { count: payload.length })
       // 0.14.243 起事件更名为 onMessageReadReceipts；payload 按 conversationType 判别。
       // 单聊：messageIds 逐条标记已读；群聊：receiptDetails 携带按消息 ID 的累计已读人数。
       for (const receipt of payload) {
         if (receipt.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
+          chatLog.info('onMessageReadReceipts(group)', {
+            conversationId: receipt.conversationId,
+            details: receipt.receiptDetails.map(d => ({ messageId: d.messageId, count: d.count })),
+          })
           for (const detail of receipt.receiptDetails) {
             stores.message.updateMessageById(detail.messageId, { groupReadCount: detail.count })
           }
         }
         else {
+          chatLog.info('onMessageReadReceipts(single)', {
+            conversationId: receipt.conversationId,
+            total: receipt.messageIds.length,
+            messageIds: receipt.messageIds.slice(0, 5),
+          })
           for (const messageId of receipt.messageIds) {
             stores.message.updateMessageStatus(messageId, MESSAGE_STATUS.READ)
             // 旁路持久化：单聊已读状态回流（群已读数 groupReadCount 为展示态，不落库）
