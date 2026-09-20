@@ -361,6 +361,34 @@ export const useGroupStore = defineStore('group', () => {
     return groupMembersMap.value[groupId] || []
   }
 
+  /** 群成员排序角色权重：群主 > 管理员 > 普通成员 */
+  const GROUP_MEMBER_ROLE_WEIGHT: Record<string, number> = {
+    [GROUP_MEMBER_ROLE.OWNER]: 0,
+    [GROUP_MEMBER_ROLE.ADMIN]: 1,
+    [GROUP_MEMBER_ROLE.MEMBER]: 2,
+  }
+
+  /**
+   * 群成员排序：按角色（群主→管理员→普通成员）优先，同角色按进群时间升序；
+   * joinedAt 缺失（老服务端不返回该字段）时排同角色末尾，保持服务端原相对顺序。
+   * 返回新数组，不改动 store 缓存的原始顺序（分页 append 依赖原顺序）。
+   */
+  function sortGroupMembers(members: UiGroupMember[]): UiGroupMember[] {
+    const weightOf = (role?: UiGroupMember['role']) =>
+      (role ? GROUP_MEMBER_ROLE_WEIGHT[role] : undefined) ?? GROUP_MEMBER_ROLE_WEIGHT[GROUP_MEMBER_ROLE.MEMBER]
+    return [...members].sort((a, b) => {
+      const roleDiff = weightOf(a.role) - weightOf(b.role)
+      if (roleDiff !== 0)
+        return roleDiff
+      return (a.joinedAt ?? Number.MAX_SAFE_INTEGER) - (b.joinedAt ?? Number.MAX_SAFE_INTEGER)
+    })
+  }
+
+  /** 获取已缓存的群成员（排序后）：群主 → 管理员 → 普通成员按进群顺序 */
+  function getSortedGroupMembers(groupId: string): UiGroupMember[] {
+    return sortGroupMembers(getGroupMembers(groupId))
+  }
+
   function clearGroupMembers(groupId?: string) {
     if (groupId) {
       delete groupMembersMap.value[groupId]
@@ -470,6 +498,7 @@ export const useGroupStore = defineStore('group', () => {
     removeGroupMembers,
     updateGroupMemberRole,
     getGroupMembers,
+    getSortedGroupMembers,
     clearGroupMembers,
     setGroupAnnouncement,
     getGroupAnnouncement,

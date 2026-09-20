@@ -161,6 +161,11 @@ export function useGroup() {
     return groupStore.getGroupMembers(groupId)
   }
 
+  /** 获取已缓存的群成员（排序后）：群主 → 管理员 → 普通成员按进群顺序 */
+  function getSortedGroupMembers(groupId: string): UiGroupMember[] {
+    return groupStore.getSortedGroupMembers(groupId)
+  }
+
   /** 获取已缓存的群公告；未获取过返回 undefined，已获取但为空返回 '' */
   function getGroupAnnouncement(groupId: string): string | undefined {
     return groupStore.getGroupAnnouncement(groupId)
@@ -361,6 +366,7 @@ export function useGroup() {
     acceptGroupInvitation,
     declineGroupInvitation,
     getGroupMembers,
+    getSortedGroupMembers,
     getGroupAnnouncement,
     updateGroupInfo,
     updateGroupConfigs,

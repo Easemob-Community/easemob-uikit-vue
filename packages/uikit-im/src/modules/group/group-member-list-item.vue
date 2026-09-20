@@ -456,13 +456,13 @@ function closeMoreMenu() {
   color: var(--uikit-primary-color);
 }
 
-/* 角色/状态徽标统一实底白字（设计稿）：8px/600、padding 2px 4px、radius 4px */
+/* 角色徽标实底白字（设计稿 caption/small/bold）：9px/600、padding 2px 4px、radius 4px、line-height normal */
 .group-member-list__role {
-  font-size: var(--uikit-font-size-7);
+  font-size: var(--uikit-font-size-9);
   font-weight: var(--uikit-font-weight-semibold);
   padding: 2px 4px;
   border-radius: 4px;
-  line-height: 1.2;
+  line-height: normal;
   flex-shrink: 0;
   color: var(--uikit-text-inverse);
 }

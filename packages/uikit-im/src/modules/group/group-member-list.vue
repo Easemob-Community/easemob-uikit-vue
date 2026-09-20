@@ -95,7 +95,7 @@ const cursor = ref<string | undefined>(undefined)
 const localHasMore = ref(props.hasMore)
 /** 首次拉取成功后以 store 为唯一数据源；拉取前/失败时回退到 props.members（独立使用场景） */
 const hasFetched = ref(false)
-const storeMembers = computed(() => stores.group.getGroupMembers(props.groupId))
+const storeMembers = computed(() => stores.group.getSortedGroupMembers(props.groupId))
 const displayMembers = computed<UiGroupMember[]>(() =>
   hasFetched.value || storeMembers.value.length > 0 ? storeMembers.value : props.members,
 )

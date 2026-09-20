@@ -139,7 +139,7 @@ const {
   fetchGroupInfo,
   fetchGroupMembers,
   fetchGroupAnnouncement,
-  getGroupMembers,
+  getSortedGroupMembers,
   getGroupAnnouncement,
   updateGroupInfo,
   updateGroupAnnouncement,
@@ -207,7 +207,7 @@ const group = computed(() =>
   groupId.value ? stores.group.getGroupById(groupId.value) : undefined,
 )
 const members = computed<UiGroupMember[]>(() =>
-  groupId.value ? getGroupMembers(groupId.value) : [],
+  groupId.value ? getSortedGroupMembers(groupId.value) : [],
 )
 const currentUserRole = computed(() => {
   if (!currentUserId.value)
@@ -888,7 +888,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
             </div>
             <slot name="drawer-members" v-bind="drawerSlotScope">
               <div class="chat-info-drawer__section">
-                <div class="chat-info-drawer__member-grid" :style="gridActionShapeStyle" @click="onViewAllMembers">
+                <div class="chat-info-drawer__member-grid" :style="gridActionShapeStyle">
                   <ChatInfoDrawerMemberCell
                     v-for="member in displayedMembers"
                     :key="member.userId"
@@ -898,7 +898,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                   <div
                     v-if="canAddMember"
                     class="chat-info-drawer__grid-action"
-                    @click.stop="onAddMember"
+                    @click="onAddMember"
                   >
                     <span class="chat-info-drawer__grid-action-circle">
                       <Icon name="plus" :size="20" />
@@ -908,7 +908,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                   <div
                     v-if="canRemoveMembers"
                     class="chat-info-drawer__grid-action"
-                    @click.stop="showMemberRemoveModal = true"
+                    @click="showMemberRemoveModal = true"
                   >
                     <span class="chat-info-drawer__grid-action-circle">
                       <Icon name="minus" :size="20" />
@@ -916,7 +916,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
                     <span class="chat-info-drawer__grid-action-name">{{ t('group.memberList.remove', '移除') }}</span>
                   </div>
                 </div>
-                <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click.stop="onViewAllMembers">
+                <button v-if="hasMoreMembers || members.length === 0" class="chat-info-drawer__view-all" @click="onViewAllMembers">
                   {{ members.length === 0 ? t('chat.info.viewAllMembersEmpty') : t('chat.info.checkAll', '查看全部') }}
                   <Icon name="chevron/down" :size="16" />
                 </button>
@@ -1052,15 +1052,15 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
           <Button type="default" block class="chat-info-drawer__pill-btn" @click="onClearHistory">
             {{ t('chat.info.clearHistory') }}
           </Button>
-          <Button type="default" block class="chat-info-drawer__pill-btn chat-info-drawer__pill-btn--danger" @click="onDeleteConversation">
+          <Button type="default" block class="chat-info-drawer__pill-btn" @click="onDeleteConversation">
             {{ t('chat.info.deleteConversation', '删除会话') }}
           </Button>
-          <!-- 群聊：退出/解散（与清空/删除同款灰底胶囊，破坏性操作灰底红字，走现有 confirm Modal） -->
+          <!-- 群聊：退出/解散（与清空/删除同款灰底胶囊，破坏性操作灰底默认文字色，走现有 confirm Modal） -->
           <Button
             v-if="isGroup"
             type="default"
             block
-            class="chat-info-drawer__pill-btn chat-info-drawer__pill-btn--danger"
+            class="chat-info-drawer__pill-btn"
             @click="onLeaveOrDelete"
           >
             {{ isOwner ? t('chat.info.destroyGroup', '解散群聊') : t('chat.info.leaveGroup', '退出群聊') }}
@@ -1473,8 +1473,7 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
 }
 
 /* footer 圆角胶囊按钮（设计稿：灰底通栏胶囊，高 42px、内 padding 上下 12px 左右 4px；
-   文字按 body/large/medium：Inter 16px/500/行高 normal，浅色默认 #000、暗色经 token 覆写为主文字色）；
-   删除会话为灰底红字） */
+   文字按 body/large/medium：Inter 16px/500/行高 normal，浅色默认 #000、暗色经 token 覆写为主文字色） */
 .chat-info-drawer__actions .chat-info-drawer__pill-btn {
   height: 42px;
   padding: 12px 4px;
@@ -1484,10 +1483,6 @@ const drawerSlotScope = computed<ChatInfoDrawerSlotScope>(() => ({
   font-weight: var(--uikit-font-weight-medium);
   line-height: normal;
   color: var(--uikit-drawer-action-btn-color, #000000);
-}
-
-.chat-info-drawer__actions .chat-info-drawer__pill-btn--danger {
-  color: var(--uikit-danger-color);
 }
 
 .chat-info-drawer__member-detail {
