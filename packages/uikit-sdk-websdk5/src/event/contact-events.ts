@@ -3,6 +3,7 @@ import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uik
 import type { UiContactInvite } from '@easemob/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
+import { notifyContactEvent } from '../notification-engine'
 
 const contactLog = createLogger('UIKit:ContactEvents')
 
@@ -57,6 +58,8 @@ export function createContactHandlers(stores: EventStores): ContactEventHandlerM
         // 我发出的好友申请被对方拒绝：落一条 outgoing 拒绝通知，UI 展示「拒绝了你的好友申请」；unread 驱动通知入口红点
         stores.contact.addInvite({ ...toUiInvite(payload, 'declined'), outgoing: true, unread: true })
       }
+      // 全局通知：低频高优事件，前台也需可见
+      notifyContactEvent(stores, userId, 'declined')
     },
     onContactDeleted: (payload) => {
       contactLog.info('onContactDeleted', { from: payload.from })
@@ -70,6 +73,8 @@ export function createContactHandlers(stores: EventStores): ContactEventHandlerM
           params: {},
           defaultText: t('chat.notice.contactDeleted'),
         })
+        // 全局通知：会话内通知仅打开该会话可见，此处保证用户即时感知
+        notifyContactEvent(stores, userId, 'deleted')
       }
     },
     onContactAdded: (payload) => {

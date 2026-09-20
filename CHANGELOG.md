@@ -1,5 +1,17 @@
 # Changelog
 
+## @easemob/uikit-sdk-websdk5 1.3.2 (2026-09-20)
+
+### 新增
+
+- **联系人关系变更全局通知**：通知引擎新增 `notifyContactEvent`，`onContactRefuse`（我发出的好友申请被对方拒绝）与 `onContactDeleted`（被好友删除）除既有 store 写入 / 会话内通知外，同时投递全局通知（页内右上角弹窗 / 页面隐藏时浏览器系统通知优先、失败降级页内）。好友关系变更属低频高优事件，跳过免打扰 / 当前会话 / triggerMode 判定，仅尊重通知总开关；送达回调通道语义与消息通知一致。
+
+## @easemob/uikit-sdk-webim4 1.3.2 (2026-09-20)
+
+### 新增
+
+- **联系人关系变更全局通知**：与 websdk5 1.3.2 对齐，`onContactRefuse` / `onContactDeleted` 同步投递全局通知。
+
 ## @easemob/uikit-im 3.7.5 (2026-09-18)
 
 ### 修复

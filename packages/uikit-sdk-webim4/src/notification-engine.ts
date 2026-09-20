@@ -106,3 +106,59 @@ export function notifyOnNewMessage(stores: EventStores, uiMsg: UiMessage) {
     notifyLog.warn('notifyOnNewMessage failed:', err)
   }
 }
+
+/** 联系人关系变更事件类型：'declined' 我发出的好友申请被对方拒绝 | 'deleted' 被好友删除 */
+export type ContactEventKind = 'declined' | 'deleted'
+
+/**
+ * 联系人关系变更通知（好友申请被拒 / 被好友删除）。
+ * 在 contact-events 的 onContactRefuse / onContactDeleted 中调用，不阻塞主流程。
+ *
+ * 与 notifyOnNewMessage 的差异：好友关系变更是低频高优事件，跳过免打扰 /
+ * 当前会话 / triggerMode 判定（前台使用中也必须可见），仅尊重总开关；
+ * 通道选择（隐藏→浏览器优先、失败降级页内 / 可见→页内弹窗）与送达回调语义保持一致。
+ */
+export function notifyContactEvent(stores: EventStores, userId: string, kind: ContactEventKind) {
+  try {
+    const { t, useNotification, emitNotificationDelivered, resolveNoticeUserName } = getEventHandlerDeps()
+    const { state, notify, notifyBrowser } = useNotification()
+
+    if (!state.value.enabled)
+      return
+
+    const userInfo = stores.userInfo.getUserInfo(userId)
+    const item = {
+      title: resolveNoticeUserName(userInfo) || userId,
+      body: t(kind === 'declined' ? 'contact.inviteDeclinedByPeer' : 'chat.notice.contactDeleted'),
+      avatar: userInfo?.avatarUrl,
+      timestamp: Date.now(),
+      conversationId: userId,
+      conversationType: CONVERSATION_TYPE.SINGLECHAT,
+    }
+
+    const isHidden = typeof document === 'undefined' || document.visibilityState === 'hidden'
+    if (isHidden && state.value.browserEnabled) {
+      void notifyBrowser(item).then((sent) => {
+        if (sent) {
+          // 浏览器系统通知实际发出后触发送达回调（channel: 'browser'）
+          emitNotificationDelivered(item, 'browser')
+        }
+        else if (state.value.inAppEnabled) {
+          // 浏览器通知失败（权限被拒/不支持/异常）时降级为页内弹窗
+          notify(item)
+          emitNotificationDelivered(item, 'in-app')
+        }
+      }).catch((err: unknown) => {
+        notifyLog.warn('notifyBrowser failed:', err)
+      })
+    }
+    else if (state.value.inAppEnabled) {
+      notify(item)
+      emitNotificationDelivered(item, 'in-app')
+    }
+  }
+  catch (err) {
+    // 通知失败不影响联系人事件主流程
+    notifyLog.warn('notifyContactEvent failed:', err)
+  }
+}

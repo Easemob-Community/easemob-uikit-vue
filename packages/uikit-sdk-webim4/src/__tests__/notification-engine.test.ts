@@ -3,7 +3,7 @@
 import type { UiConversation, UiMessage } from '@easemob/uikit-sdk-contract'
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { notifyOnNewMessage } from '../notification-engine'
+import { notifyContactEvent, notifyOnNewMessage } from '../notification-engine'
 import { setEventHandlerDeps } from '../event/deps'
 import type { EventHandlerDeps, NotificationApis, NotificationItemInput, NotificationStateSnapshot } from '../event/deps'
 import type { EventStores } from '../event/types'
@@ -193,5 +193,58 @@ describe('notifyOnNewMessage 判定链', () => {
     const item = mock.notify.mock.calls[0][0]
     expect(item.title).toBe('测试群')
     expect(item.body).toBe(`${PEER}: hello`)
+  })
+})
+
+describe('notifyContactEvent（联系人关系变更通知）', () => {
+  beforeEach(() => {
+    setVisibility('visible')
+  })
+
+  it('总开关关闭时不通知', () => {
+    const mock = setupDeps({ enabled: false })
+    notifyContactEvent(makeStores(), PEER, 'declined')
+    expect(mock.notify).not.toHaveBeenCalled()
+    expect(mock.notifyBrowser).not.toHaveBeenCalled()
+    expect(mock.emitNotificationDelivered).not.toHaveBeenCalled()
+  })
+
+  it('页面可见时仍走页内弹窗（跳过 triggerMode 判定）', () => {
+    const mock = setupDeps({ triggerMode: 'background' })
+    notifyContactEvent(makeStores(), PEER, 'declined')
+    expect(mock.notify).toHaveBeenCalledTimes(1)
+    const item = mock.notify.mock.calls[0][0]
+    expect(item.body).toBe('contact.inviteDeclinedByPeer')
+    expect(item.conversationId).toBe(PEER)
+    expect(item.conversationType).toBe(CONVERSATION_TYPE.SINGLECHAT)
+    expect(mock.notifyBrowser).not.toHaveBeenCalled()
+    expect(mock.emitNotificationDelivered).toHaveBeenCalledWith(item, 'in-app')
+  })
+
+  it('被好友删除使用 contactDeleted 文案', () => {
+    const mock = setupDeps()
+    notifyContactEvent(makeStores(), PEER, 'deleted')
+    const item = mock.notify.mock.calls[0][0]
+    expect(item.body).toBe('chat.notice.contactDeleted')
+  })
+
+  it('页面隐藏走浏览器通知，送达回调 channel 为 browser', async () => {
+    const mock = setupDeps()
+    setVisibility('hidden')
+    notifyContactEvent(makeStores(), PEER, 'declined')
+    await flushMicrotasks()
+    expect(mock.notifyBrowser).toHaveBeenCalledTimes(1)
+    expect(mock.notify).not.toHaveBeenCalled()
+    expect(mock.emitNotificationDelivered).toHaveBeenCalledWith(expect.objectContaining({ conversationId: PEER }), 'browser')
+  })
+
+  it('页面隐藏且浏览器通知失败时降级页内弹窗', async () => {
+    const mock = setupDeps()
+    mock.notifyBrowser.mockResolvedValue(false)
+    setVisibility('hidden')
+    notifyContactEvent(makeStores(), PEER, 'deleted')
+    await flushMicrotasks()
+    expect(mock.notify).toHaveBeenCalledTimes(1)
+    expect(mock.emitNotificationDelivered).toHaveBeenCalledWith(expect.objectContaining({ conversationId: PEER }), 'in-app')
   })
 })
