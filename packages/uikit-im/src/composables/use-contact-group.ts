@@ -1,30 +1,32 @@
 import { type ComputedRef, type Ref, computed } from 'vue'
 import type { UiContact as Contact } from '@easemob/uikit-core'
+import { useUserInfoStore } from '@easemob/uikit-core'
 import {
   type ContactGroupBy,
   type ContactGroupItem,
   DEFAULT_ALPHABET_KEYS,
 } from '../modules/contact/types'
 import { resolvePinyin } from './use-pinyin'
+import { resolveContactDisplayName } from './contact-display'
 
 /**
  * 提取联系人的分组 key
  *
  * - groupBy === 'none'：返回单一 'all' 分组
  * - groupBy === 'alphabet'：
- *     1) 取 remark/name 首字符大写，A-Z 直接归类
+ *     1) 取展示名（备注 > userInfo 昵称 > name）首字符大写，A-Z 直接归类
  *     2) 否则若已注入拼音 adapter，使用 firstLetter 归类
  *     3) 否则归到 '#' 兜底
  * - groupBy 为函数：调用并使用其返回值
  */
-function resolveGroupKey(contact: Contact, groupBy: ContactGroupBy): string {
+function resolveGroupKey(contact: Contact, groupBy: ContactGroupBy, nickname?: string): string {
   if (groupBy === 'none')
     return 'all'
   if (typeof groupBy === 'function')
     return groupBy(contact)
 
   // alphabet 模式
-  const raw = (contact.remark || contact.name || '').trim()
+  const raw = resolveContactDisplayName(contact, nickname).trim()
   if (!raw)
     return '#'
   const first = raw.charAt(0).toUpperCase()
@@ -50,16 +52,20 @@ export interface UseContactGroupOptions {
  * 输出始终按 A-Z + # 顺序排列；当 groupBy 为函数时按出现顺序保留。
  * 空分组会被剔除，不会出现 items.length === 0 的项。
  *
- * 组内排序：若已注入拼音 adapter，自动按完整拼音字典序排列；否则按原文 localeCompare。
+ * 分组与组内排序基于展示名统一口径（备注 > userInfo 昵称 > name），
+ * 昵称异步拉取回填后自动重算；若已注入拼音 adapter，自动按完整拼音字典序排列；
+ * 否则按原文 localeCompare。
  */
 export function useContactGroup(
   contacts: Ref<Contact[]> | ComputedRef<Contact[]>,
   groupBy: Ref<ContactGroupBy>,
   options: UseContactGroupOptions = {},
 ): ComputedRef<ContactGroupItem[]> {
+  const userInfoStore = useUserInfoStore()
   const defaultSort = (a: Contact, b: Contact) => {
-    const aRaw = a.remark || a.name || ''
-    const bRaw = b.remark || b.name || ''
+    const userInfoMap = userInfoStore.userInfoMap
+    const aRaw = resolveContactDisplayName(a, userInfoMap[a.userId]?.nickname)
+    const bRaw = resolveContactDisplayName(b, userInfoMap[b.userId]?.nickname)
     const aPy = resolvePinyin(aRaw)
     const bPy = resolvePinyin(bRaw)
     const an = aPy?.pinyin || aRaw.toLowerCase()
@@ -71,11 +77,12 @@ export function useContactGroup(
     const list = contacts.value
     const mode = groupBy.value
     const sort = options.sort ?? defaultSort
+    const userInfoMap = userInfoStore.userInfoMap
     const map = new Map<string, Contact[]>()
     const orderedKeys: string[] = []
 
     for (const item of list) {
-      const key = resolveGroupKey(item, mode)
+      const key = resolveGroupKey(item, mode, userInfoMap[item.userId]?.nickname)
       if (!map.has(key)) {
         map.set(key, [])
         orderedKeys.push(key)

@@ -1360,6 +1360,13 @@
 
 ## 已修复（归档）
 
+- [x] **D138. 好友列表搜索/字母分组不识别 userInfo 昵称（中文昵称搜不到、分组错位）**
+  - 已于 2026-09-20 修复。
+  - 根因：列表项展示名口径 `remark || userInfo昵称 || name || userId`，而搜索（`use-contact-filter`）与分组/排序（`use-contact-group` / `use-contact-sort`）只消费 `remark || name`；SDK5 好友列表只有 userId、昵称异步拉取在 userInfo store，按显示的中文昵称搜索永远落空。
+  - 改动：新增 `packages/uikit-im/src/composables/contact-display.ts`（`resolveContactDisplayName(contact, nickname)`，备注 > userInfo 昵称 > name，纯函数）；三个 composable 改经 `useUserInfoStore` 消费同一口径（响应式，昵称回填自动重算）；`contact-list.vue` 增加可见联系人昵称批量预取（`domains.userInfo.fetchUserInfos`，含 loading/failed 去重）。
+  - 验证：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）+ `pnpm -F @easemob/uikit-im build`（顺带重建 `@easemob/uikit-sdk-contract` 消除其 dist 类型陈旧导致的存量 `unread` 报错）均通过；demo 实机回归：中文昵称「李四」可搜到、userId（wyq6）搜索无回归、拼音（lisi）/ 首字母（ls）命中、李四正确归入 L 组。
+  - 关联 skill：`uikit-contact-group-capabilities` / `uikit-user-attribute-extraction`
+
 - [x] **D132. 双 adapter `GroupDomain` 未实现契约 `SdkGroupDomain.fetchMyGroupAlias/updateMyGroupAlias`，两 adapter 包构建被类型检查阻断**
   - 已于 2026-09-11 核销：按「暂缓则在 contract 去掉声明」路径修复——群别名能力 2026-09-09 按产品决定暂缓（见 D131），契约中的 `fetchMyGroupAlias` / `updateMyGroupAlias` 声明已移除（该声明系预研期工作区临时加入，未进入任何 commit 历史，全仓已 grep 无残留）。
   - 验证：`pnpm -F @easemob/uikit-sdk-websdk5 build` 与 `pnpm -F @easemob/uikit-sdk-webim4 build`（含 `vue-tsc --emitDeclarationOnly`）均通过，两包 `vue-tsc --noEmit` 0 错误，TS2416 漂移消除。

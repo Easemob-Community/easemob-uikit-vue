@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 import type { Component } from 'vue'
 import { useContact } from '../../composables/use-contact'
 import { useBlocklist } from '../../composables/use-blocklist'
@@ -154,7 +154,7 @@ void isMobile
 // ================== Presence 默认兑底 ==================
 // 当外部未传 onlineStatusFn 且（组件 prop 或 Provider 全局）enablePresence===true 时，
 // 内部使用 usePresence 提供在线状态，并按过滤后的可见联系人 ID 自动订阅。
-const { features } = useUIKit()
+const { features, stores, domains } = useUIKit()
 const presenceEnabled = computed(
   () => (props.enablePresence ?? features.enablePresence) && !props.onlineStatusFn,
 )
@@ -190,6 +190,23 @@ const filteredContacts = useContactFilter(sortedContacts, searchKeyword, {
   filterFn: props.filterFn,
 })
 const groupedContacts = useContactGroup(filteredContacts, groupByRef)
+
+// 批量预取可见联系人的用户资料昵称：列表项展示、搜索过滤、字母分组都消费 userInfo 昵称，
+// 行级 useUserInfo 是单条拉取，进入页面立即搜索时数据可能未回，这里对整页批量补拉
+watchEffect(() => {
+  if (features.enableUserInfo === false)
+    return
+  const missing = baseContactList.value
+    .map(c => c.userId)
+    .filter(id =>
+      id
+      && !stores.userInfo.getUserInfo(id)
+      && !stores.userInfo.isLoading(id)
+      && !stores.userInfo.isFetchFailed(id),
+    )
+  if (missing.length > 0)
+    void domains.userInfo.fetchUserInfos(missing)
+})
 
 const isAlphabet = computed(() => props.groupBy === 'alphabet')
 const isFlatNoGroup = computed(() => props.groupBy === 'none')
