@@ -105,15 +105,27 @@ export function usePresence() {
    * 列表变化时增量订阅新增用户、取消已移出用户；作用域销毁时释放全部订阅。
    * Presence 服务不支持订阅自己，因此当前登录用户 ID 会被自动排除；
    * 自己的状态通过 fetchPresence 主动查询或 publishPresence 发布后写入 store。
+   *
+   * 健壮性约定：
+   * - 未连接（stores.client.connected=false）时不发起订阅也不记账——Domain 在未连接时
+   *   静默返回空（不抛错），照常记账会形成“假订阅”导致永久漏订；保持待订状态，
+   *   连接恢复后本 watch 自动重放补订。
+   * - 订阅是首屏状态来源之一，但可能失败/返回空；settle 后对仍无状态的 id 用
+   *   fetchPresence（getPresenceStatus 查询，不需要订阅关系）兜底补齐首屏。
    */
   function watch(source: MaybeRefOrGetter<string[]>): void {
     let current: string[] = []
     const stop = vueWatch(
-      () => ({ ids: toValue(source), self: currentUserId.value }),
-      ({ ids }) => {
+      () => ({ ids: toValue(source), self: currentUserId.value, connected: stores.client.connected }),
+      ({ ids, connected }) => {
         // 关闭期：清空内部“已订阅”集合并跳过一切订阅/退订，
         // 防止“关闭期标记已订阅、开启后漏订”的状态漂移
         if (!features.enablePresence) {
+          current = []
+          return
+        }
+        // 未连接：不订阅不记账，等 connected 变 true 后重放（见上注释）
+        if (!connected) {
           current = []
           return
         }
@@ -122,11 +134,30 @@ export function usePresence() {
         const toRemove = current.filter(id => !next.includes(id))
         current = [...next]
         if (toAdd.length) {
-          void subscribePresence(toAdd).catch((err: unknown) => {
-            logger.warn('[usePresence] subscribePresence failed:', formatSdkError(err))
-            // 订阅失败的 id 从“已订阅”集合移除，后续列表变化时可重新补订
-            current = current.filter(id => !toAdd.includes(id))
-          })
+          void (async () => {
+            let subscribeFailed = false
+            try {
+              await subscribePresence(toAdd)
+            }
+            catch (err: unknown) {
+              subscribeFailed = true
+              logger.warn('[usePresence] subscribePresence failed:', formatSdkError(err), '；回退主动查询补齐首屏，后续列表变化时重新补订')
+              // 订阅失败的 id 从“已订阅”集合移除，后续列表变化时可重新补订
+              current = current.filter(id => !toAdd.includes(id))
+            }
+            // 首屏兜底：订阅 settle 后仍无状态的 id（订阅失败/服务端未返回条目），
+            // 主动查询补齐；订阅成功路径 store 已写入，missing 为空，零额外请求
+            const missing = toAdd.filter(id => !presenceStore.get(id))
+            if (missing.length) {
+              try {
+                await fetchPresence(missing)
+              }
+              catch (err: unknown) {
+                if (!subscribeFailed)
+                  logger.warn('[usePresence] fetchPresence fallback failed:', formatSdkError(err))
+              }
+            }
+          })()
         }
         if (toRemove.length)
           void unsubscribePresence(toRemove)
