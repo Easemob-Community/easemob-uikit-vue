@@ -57,6 +57,7 @@
 | `uikit-lint-governance`            | 处理 eslint、lint 治理、非代码改动层决策、收尾提交                                                    | `跑 lint`、`清 lint`、`改 eslint 配置`、`提交前检查`                                                                                 | [.agent/skills/uikit-lint-governance/SKILL.md](.agent/skills/uikit-lint-governance/SKILL.md)                       |
 | `uikit-cell-contract`              | Cell 类组件统一约束：列表项/导航项/操作行/信息行的视觉一致性 + EmCell 基础组件                        | `cell`、`cell 组件`、`cell 规范`、`列表项`、`list item`、`视觉统一`、`导航项`、`操作行`、`信息行`                                    | [.agent/skills/uikit-cell-contract/SKILL.md](.agent/skills/uikit-cell-contract/SKILL.md)                           |
 | uikit-skill-authoring              | 新增/补录 skill：判定时机/结构/命名/格式约束/路由表登记/验证                                          | `新增 skill`、`加 skill`、`skill 规范`、`技能编写`、`什么时候加`、`路由表`、`SKILL.md`                                               | [.agent/skills/uikit-skill-authoring/SKILL.md](.agent/skills/uikit-skill-authoring/SKILL.md)                       |
+| `uikit-log-analysis`               | 日志分析约定：log-store 导出格式 / ns 规律 / 链路对账 / 双环境 diff                                   | `日志分析`、`下载日志`、`.log`、`troubleshooting`、`环境问题对比`、`collectSdkLog`                                                   | [.agent/skills/uikit-log-analysis/SKILL.md](.agent/skills/uikit-log-analysis/SKILL.md)                             |
 
 路由规则：
 

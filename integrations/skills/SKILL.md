@@ -1,6 +1,6 @@
 ---
 name: easemob-uikit-integration
-description: 在 Vue3 项目中集成环信 Easemob UIKit（npm 包 @easemob/uikit-im）时使用。覆盖安装与全局注册、Em 前缀组件、按需引入 resolver、EmUIKitProvider 配置（appKey / features 功能开关 / dataSource 数据源接管 / theme / h5 / notification / logger / token 过期回调）、组合式函数（useClient / useChat / useConversation / useTheme / useUserInfo 等）、主题定制（CSS 变量与暗色模式）、H5 适配与常见坑。当用户提到「接入 UIKit」「集成环信 IM」「@easemob/uikit-im」「UIKitProvider」「Em 前缀组件」「会话列表/聊天/通讯录/群组容器」「主题定制」「H5 适配」「useClient 登录」等时加载本技能。
+description: 在 Vue3 项目中集成环信 Easemob UIKit（npm 包 @easemob/uikit-im）时使用。覆盖安装与全局注册、Em 前缀组件、按需引入 resolver、EmUIKitProvider 配置（appKey / features 功能开关 / dataSource 数据源接管 / theme / h5 / notification / logger / token 过期回调）、组合式函数（useClient / useChat / useConversation / useTheme / useUserInfo 等）、主题定制（CSS 变量与暗色模式）、H5 适配与常见坑。当用户提到「接入 UIKit」「集成环信 IM」「@easemob/uikit-im」「UIKitProvider」「Em 前缀组件」「会话列表/聊天/通讯录/群组容器」「主题定制」「H5 适配」「useClient 登录」「日志排查」「下载日志分析」等时加载本技能。
 ---
 
 # 环信 Easemob UIKit 集成指南（@easemob/uikit-im / EmUIKitProvider / Em 前缀组件）
@@ -35,6 +35,7 @@ description: 在 Vue3 项目中集成环信 Easemob UIKit（npm 包 @easemob/uik
 | `reference/theming.md` | CSS 变量 / useTheme / 暗色 / 密度 / 字号 | 定制主题时读 |
 | `reference/h5.md` | 安全区 / 键盘 / 下拉刷新 / 长按 / 页面栈 | 移动端适配时读 |
 | `reference/gotchas.md` | 高频集成坑与硬规则 | 排查问题、收尾自查时读 |
+| `reference/troubleshooting.md` | 日志开启 / 导出 / 格式约定 / AI 排查路径 | 排查问题、日志分析时读 |
 | `reference/api/*.md` | 组件 props / emits / slots 明细（由 `scripts/gen-skill.mjs` 同步，勿手改） | 查具体组件 API 时读 |
 
 ## 关键契约速查（最常被问到的硬规则）

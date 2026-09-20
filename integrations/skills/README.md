@@ -19,7 +19,7 @@
 ```
 integrations/skills/
   SKILL.md                  # [IM] 入口：何时使用 + 核心链路 + 子文件索引 + 关键契约
-  reference/                # [IM] 集成参考（quickstart / provider / components / theming / h5 / gotchas）
+  reference/                # [IM] 集成参考（quickstart / provider / components / theming / h5 / gotchas / troubleshooting）
     api/*.md                # [IM] 组件 API 明细（自动同步，勿手改）
   chatroom/
     SKILL.md                # [聊天室] 入口（场景预设 / 弹幕流 / PC 分栏 / 信令房 / headless）
