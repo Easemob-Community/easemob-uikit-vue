@@ -49,6 +49,13 @@ export const INJECTION_KEY = {
    * 在消息项级插槽（如 #message-voice）内对同一 key 深一层 provide 可实现单条消息覆盖。
    */
   VOICE_UNREAD_DOT: 'voiceUnreadDot',
+  /**
+   * 语音转文字胶囊外置开关（message-bubble-wrapper.vue provide / voice-message.vue inject）。
+   * 值为 ComputedRef<boolean | undefined>：true 时 voice-message 不自渲染转文字胶囊，
+   * 由 wrapper 在 message-row 外（与 QuoteCard 同层）渲染，避免状态列对齐被胶囊撑高干扰；
+   * undefined/false（如单独使用 EmVoiceMessage）时胶囊仍在 voice-message 内部渲染。
+   */
+  VOICE_TRANSCRIPT_EXTERNAL: 'voiceTranscriptExternal',
 } as const
 
 /** 群组资料字段长度限制（与后端约束对齐） */

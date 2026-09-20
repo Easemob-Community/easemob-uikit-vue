@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import { type ComputedRef, type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
-import { formatSdkError } from '@easemob/uikit-core'
-import { useThemeStore } from '@easemob/uikit-core'
-import { INJECTION_KEY } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { INJECTION_KEY, EmIcon as Icon, createLogger, formatSdkError, useThemeStore } from '@easemob/uikit-core'
 import type { UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
 import type { BubbleShape } from '../types'
 import { useMessageStore } from '../../../store/message'
-import { createLogger } from '@easemob/uikit-core'
+import VoiceTranscript from './voice-transcript.vue'
+
+const props = defineProps<VoiceMessageProps>()
 
 const logger = createLogger('UIKit:VoiceMessage')
 
 export interface VoiceMessageProps {
   message: UiMessage
 }
-
-const props = defineProps<VoiceMessageProps>()
-
-const { t } = useLocale()
 
 const themeStore = useThemeStore()
 
@@ -152,17 +146,12 @@ onUnmounted(() => {
   cleanupAudio()
 })
 
-/** 是否存在转写结果 */
-const hasVoiceText = computed(() => !!props.message.voiceText?.text)
-
-/** 是否优先展示转写结果 */
-const showVoiceText = computed(() => hasVoiceText.value && props.message.showVoiceText !== false)
-
-/** 是否正在转写中 */
-const voiceTranscribing = computed(() => !!props.message.voiceTranscribing)
-
-/** 是否需要显示转文字卡片：转写中 / 已有结果且未隐藏（切换入口在右键菜单） */
-const showVoiceTextCard = computed(() => voiceTranscribing.value || (hasVoiceText.value && showVoiceText.value))
+/**
+ * 转文字胶囊是否外置渲染（message-bubble-wrapper provide）。
+ * true：胶囊由 wrapper 在 message-row 外渲染（对齐状态列只相对气泡）；
+ * undefined/false（单独使用 EmVoiceMessage）：胶囊在本组件内部渲染。
+ */
+const transcriptExternal = inject<ComputedRef<boolean | undefined>>(INJECTION_KEY.VOICE_TRANSCRIPT_EXTERNAL, computed(() => undefined))
 
 /** 未读红点开关：config.messageList.voiceUnreadDot（message-bubble-wrapper provide），支持消息项级深一层 provide 覆盖 */
 const injectedVoiceUnreadDot = inject<ComputedRef<boolean | undefined>>(INJECTION_KEY.VOICE_UNREAD_DOT, computed(() => undefined))
@@ -199,27 +188,11 @@ const showUnreadDot = computed(() =>
         </span>
         <span class="voice-message__duration">{{ durationText }}</span>
       </div>
+      <!-- 未播放红点：气泡末尾外侧（对方消息右侧）、相对气泡垂直居中，点击播放后消失 -->
+      <span v-if="showUnreadDot" class="voice-message__unread-dot" aria-hidden="true" />
     </div>
-    <!-- 转文字结果：气泡外独立胶囊（sub-body），与气泡垂直间距 2px（隐藏/显示文字入口在右键菜单） -->
-    <template v-if="showVoiceTextCard">
-      <!-- 转写中 -->
-      <div v-if="voiceTranscribing" class="voice-message__transcript voice-message__transcript--loading">
-        <Icon name="loading/arc/normal" :size="14" anim="spin" />
-        <span>{{ t('message.voiceToText.loading') }}</span>
-      </div>
-      <!-- 已有结果：展示转写文字胶囊 + 已转文字标签 -->
-      <template v-else>
-        <div class="voice-message__transcript">
-          {{ props.message.voiceText?.text }}
-        </div>
-        <div class="voice-message__transcribed-tag">
-          <Icon name="rect/hanzi" :size="12" />
-          <span>{{ t('message.voiceToText.done') }}</span>
-        </div>
-      </template>
-    </template>
-    <!-- 未播放红点：气泡外侧（对方消息右侧）、相对气泡垂直居中，点击播放后消失 -->
-    <span v-if="showUnreadDot" class="voice-message__unread-dot" aria-hidden="true" />
+    <!-- 转文字胶囊：未外置时在本组件内渲染（standalone EmVoiceMessage 行为不变）；外置时由 message-bubble-wrapper 在 message-row 外渲染 -->
+    <VoiceTranscript v-if="!transcriptExternal" :message="message" />
   </div>
 </template>
 
@@ -231,7 +204,7 @@ const showUnreadDot = computed(() =>
   position: relative;
 }
 
-/* 未播放红点：气泡外侧右侧、相对气泡整体垂直居中 */
+/* 未播放红点：气泡末尾外侧右侧、相对气泡垂直居中 */
 .voice-message__unread-dot {
   position: absolute;
   right: -12px;
@@ -240,7 +213,7 @@ const showUnreadDot = computed(() =>
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--uikit-badge-bg, #FF7070);
+  background-color: var(--uikit-badge-bg, #ff7070);
   pointer-events: none;
 }
 
@@ -251,6 +224,8 @@ const showUnreadDot = computed(() =>
 .voice-message__bubble {
   display: flex;
   flex-direction: column;
+  /* 红点等绝对定位元素的锚点 */
+  position: relative;
   padding: 10px 14px;
   border-radius: var(--uikit-bubble-radius, 16px);
   background-color: var(--uikit-bubble-bg-other);
@@ -346,45 +321,5 @@ const showUnreadDot = computed(() =>
   .voice-message__bubble:hover {
     opacity: 0.85;
   }
-}
-
-/* 转文字胶囊：气泡外独立 sub-body，与气泡垂直间距 2px，双方统一灰底次级文字 */
-.voice-message__transcript {
-  margin-top: 2px;
-  padding: 4px 14px;
-  border-radius: 12px;
-  background-color: var(--uikit-bubble-bg-other, #E4E6E7);
-  color: var(--uikit-text-secondary, #5E686E);
-  font-size: var(--uikit-font-size-13);
-  line-height: calc(18px * var(--uikit-font-scale));
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.voice-message__transcript--loading {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--uikit-font-size-11);
-}
-
-/* 已转文字标签：icon + 文案，接收侧左对齐、发送侧右对齐，胶囊外次级文字色 */
-.voice-message__transcribed-tag {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
-  margin-top: 2px;
-  font-size: var(--uikit-font-size-11);
-  line-height: 1;
-  color: var(--uikit-text-secondary, #5E686E);
-  opacity: 0.75;
-  user-select: none;
-}
-
-.voice-message--self .voice-message__transcribed-tag {
-  justify-content: flex-end;
 }
 </style>

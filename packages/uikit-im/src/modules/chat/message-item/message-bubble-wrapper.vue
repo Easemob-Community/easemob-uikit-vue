@@ -12,6 +12,7 @@ import { useUserInfo } from '../../../composables/use-user-info'
 import CombineMessageModal from './combine-message-modal.vue'
 import MessageInteractive from './message-interactive.vue'
 import MessageRenderer from './message-renderer.vue'
+import VoiceTranscript from './voice-transcript.vue'
 
 export interface MessageBubbleWrapperProps {
   message: UiMessage
@@ -293,6 +294,20 @@ const statusDirection = computed(() => statusConfig.value.direction ?? 'horizont
 
 /** 状态相对气泡位置：默认 'inline'（气泡末尾、多行气泡时与底部对齐），设计规范默认 */
 const statusPosition = computed(() => statusConfig.value.position ?? 'inline')
+
+/** 是否为语音消息 */
+const isVoiceMessage = computed(() => props.message.type === MESSAGE_TYPE.VOICE)
+
+/**
+ * 语音转文字胶囊外置渲染：状态与气泡同行（inline / 群已读回执强制同行）时，
+ * 胶囊由本组件在 message-row 外渲染（与 QuoteCard 同理），voice-message 内部不再渲染，
+ * 状态列只相对气泡本体对齐，避免落在胶囊/「已转文字」标签区域。
+ * 'below' 分支状态本就在最下方，胶囊留在 voice-message 内部渲染。
+ */
+const voiceTranscriptExternal = computed(() =>
+  isVoiceMessage.value && (statusPosition.value !== 'below' || showGroupReadCount.value),
+)
+provide(INJECTION_KEY.VOICE_TRANSCRIPT_EXTERNAL, voiceTranscriptExternal)
 
 /** 气泡主体 ref（用于判断单行/多行） */
 const bodyRef = ref<HTMLElement>()
@@ -784,6 +799,11 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
+          <!-- 语音转文字胶囊（气泡下方；独立于 message-row，inline 状态列只相对气泡对齐，避免落在胶囊区域） -->
+          <VoiceTranscript
+            v-if="voiceTranscriptExternal"
+            :message="message"
+          />
           <!-- 引用卡片（气泡下方；独立于 message-row，inline 状态列只相对气泡对齐，避免落在引用卡上） -->
           <QuoteCard
             v-if="quoteData"
