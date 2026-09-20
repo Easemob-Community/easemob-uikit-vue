@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 import { EmAvatar as Avatar, CONVERSATION_TYPE, EmCheckbox as Checkbox, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob/uikit-core'
 import type { LocationMessageBody, MessageStatusValue, PresenceDisplayStatus, UiMessage } from '@easemob/uikit-core'
 import { normalizeUserId } from '@easemob/uikit-sdk-contract'
@@ -197,6 +197,10 @@ const isGroupReadReceiptActive = computed(() => {
   // 发送失败时强制展示经典失败状态，避免已读圆圈为空导致用户看不到发送结果
   if (messageStatus.value === MESSAGE_STATUS.FAILED)
     return false
+  // 配置显式关闭时不展示已读回执，优先于消息自身回执数据，保证开关关闭即时生效
+  // （enabled 为 undefined 的调用方保持旧行为：已带 requireGroupAck / groupReadCount 的消息仍激活）
+  if (props.groupReadReceiptConfig?.enabled === false)
+    return false
   // 消息本身已请求回执或已有回执数据，直接激活
   if (props.message.requireGroupAck || (props.message.groupReadCount ?? 0) > 0)
     return true
@@ -320,25 +324,38 @@ const isBodyMultiLine = ref(false)
 function checkMultiLine() {
   const body = bodyRef.value
   const statusColumn = statusColumnRef.value
-  if (!body || !statusColumn)
+  if (!body || !statusColumn) {
+    isBodyMultiLine.value = false
     return
+  }
   // 气泡明显高于状态列时视为多行，此时状态列沉底对齐
   isBodyMultiLine.value = body.clientHeight > statusColumn.clientHeight + 8
 }
 
-let bodyResizeObserver: ResizeObserver | null = null
+let alignmentObserver: ResizeObserver | null = null
 
-onMounted(() => {
-  // 状态列与气泡同行的两种场景：配置 inline，或群已读回执激活（此时无论
-  // statusPosition 如何都走 message-row 分支）。二者都需要多行检测来沉底。
-  if (statusPosition.value === 'inline' || showGroupReadCount.value) {
-    checkMultiLine()
-    if (bodyRef.value && typeof ResizeObserver !== 'undefined') {
-      bodyResizeObserver = new ResizeObserver(checkMultiLine)
-      bodyResizeObserver.observe(bodyRef.value)
-    }
-  }
-})
+/**
+ * 重建对齐观察：同步先算一次多行，再观察气泡主体与状态列两者。
+ * 状态列是 v-if 按需渲染的（发送中媒体消息/单聊已读收敛等场景挂载时不存在），
+ * 若只观察 body，列出现而 body 尺寸不变（图片显式 px 尺寸）时多行检测不会重算，
+ * 状态列会停在 align-self: center 垂直居中——必须随 ref 出现/消失重建观察。
+ */
+function observeAlignment() {
+  alignmentObserver?.disconnect()
+  alignmentObserver = null
+  const body = bodyRef.value
+  if (!body || typeof ResizeObserver === 'undefined')
+    return
+  checkMultiLine()
+  alignmentObserver = new ResizeObserver(checkMultiLine)
+  alignmentObserver.observe(body)
+  if (statusColumnRef.value)
+    alignmentObserver.observe(statusColumnRef.value)
+}
+
+watch([bodyRef, statusColumnRef], () => {
+  nextTick(observeAlignment)
+}, { flush: 'post' })
 
 /** 点击状态：失败时触发重发 */
 function onStatusClick() {
@@ -479,7 +496,7 @@ function onMentionFromAvatar() {
 }
 
 onBeforeUnmount(() => {
-  bodyResizeObserver?.disconnect()
+  alignmentObserver?.disconnect()
   if (avatarMenuAnchor.value?.parentNode) {
     avatarMenuAnchor.value.parentNode.removeChild(avatarMenuAnchor.value)
   }
@@ -915,7 +932,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bubble-wrapper__nickname {
-  font-size: var(--uikit-font-size-9);
+  font-size: var(--uikit-font-size-11);
   font-weight: var(--uikit-font-weight-medium, 500);
   color: var(--uikit-text-primary, #171A1C);
   padding: 2px 4px;
