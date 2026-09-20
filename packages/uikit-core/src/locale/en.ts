@@ -464,6 +464,7 @@ const messages: LocaleMessages = {
   'message.voiceToText.fileTooLarge': 'Voice file is too large',
   'message.voiceToText.fileInvalid': 'Voice file is invalid or expired',
   'message.voiceToText.uploadFailed': 'Voice file upload failed',
+  'message.voiceToText.empty': 'No recognizable text detected',
   'message.search.title': 'Search Messages',
   'message.search.placeholder': 'Search keywords...',
   'message.search.empty': 'No results',

@@ -464,6 +464,7 @@ const messages: LocaleMessages = {
   'message.voiceToText.fileTooLarge': '语音文件过大',
   'message.voiceToText.fileInvalid': '语音文件无效或已过期',
   'message.voiceToText.uploadFailed': '语音文件上传失败',
+  'message.voiceToText.empty': '未识别到可转换的文本',
   'message.search.title': '搜索消息',
   'message.search.placeholder': '搜索关键词...',
   'message.search.empty': '无搜索结果',

@@ -196,11 +196,15 @@ export function useMessageActions() {
       // 已排除 UiNoticeMessage，窄化为 SDK 语音消息
       const result = await domains.message.transcribeVoiceMessage(message as SdkMessage)
       const text = result?.text
-      if (typeof text === 'string' && text.length > 0) {
+      if (typeof text === 'string' && text.trim().length > 0) {
         messageStore.setVoiceText(msgId, { text })
+        // 转写成功并展开文字后视为已读：消除未播放红点
+        messageStore.markVoicePlayed(msgId)
       }
       else {
+        // 服务端未识别出文本：收起转写中状态并给出友好提示
         messageStore.setVoiceTranscribing(msgId, false)
+        toast.warning(t('message.voiceToText.empty', '未识别到可转换的文本'))
       }
     }
     catch (e) {
