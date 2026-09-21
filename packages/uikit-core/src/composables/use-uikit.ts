@@ -419,12 +419,21 @@ export function useCoreUIKitProvider(
         '[UIKit] SDK 尚未初始化：请先调用 init(config)，或在 Provider 上提供 appKey 且保持 auto-init 开启',
       )
     }
-    await adapter.login(params.user, params.accessToken ?? params.password ?? '')
+    // 提前记账 currentUser：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的
+    // 欢迎语在 login resolve 前经 onMessage 到达），事件层 toUiMessage / 清未读 / @我 /
+    // 通知过滤均依赖 currentUser，等到 login resolve 再记账会留下空串竞态窗口；失败时回滚清空。
+    stores.client.setCurrentUser(params.user)
+    try {
+      await adapter.login(params.user, params.accessToken ?? params.password ?? '')
+    }
+    catch (err) {
+      stores.client.setCurrentUser('')
+      throw err
+    }
     // 登出后再登录：场景层挂钩已在登出时 dispose，需重新执行（同旧 registerClientSetup 语义）
     if (!disposeAdapterReady) {
       disposeAdapterReady = options.onAdapterReady?.(adapter) || null
     }
-    stores.client.setCurrentUser(params.user)
     stores.client.setAppKey(currentAppKey)
   }
 

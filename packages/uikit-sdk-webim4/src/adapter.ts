@@ -1255,16 +1255,19 @@ export class Webim4Adapter implements SdkAdapter {
       this._setupEventHandlers()
     }
     adapterLog.info('[Webim4Adapter] login 开始', { user })
+    // 提前记账 currentUser：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的
+    // 欢迎语在 login resolve 前经 onMessage 到达），事件层 toUiMessage / 清未读 / @我 /
+    // 通知过滤均依赖 currentUser，等到 login resolve 再记账会留下空串竞态窗口；
+    // 失败时在 catch 中回滚清空。内置 store 的 currentUser 派生自 adapter.currentUserId（可选方法）。
+    this._stores?.client.setCurrentUser?.(user)
     try {
       await this._client.login(user, token)
     }
     catch (err) {
+      this._stores?.client.setCurrentUser?.('')
       adapterLog.error('[Webim4Adapter] login 失败:', err)
       throw err
     }
-    // 登录成功即记账 currentUser（注入模式下业务直连本方法、不经 core login，见决策 18）；
-    // 内置 store 的 currentUser 派生自 adapter.currentUserId，无需显式 set（可选方法）
-    this._stores?.client.setCurrentUser?.(user)
     adapterLog.info('[Webim4Adapter] login 成功', { user })
     // 4.x 无 5.x 的 roster 自动同步通道（无 onSyncDataFinished），登录后由 adapter 代偿预取
     if (this._prefetchOnLogin)

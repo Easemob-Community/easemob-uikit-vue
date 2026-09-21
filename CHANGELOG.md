@@ -1,5 +1,23 @@
 # Changelog
 
+## @easemob/uikit-sdk-websdk5 1.3.4 (2026-09-21)
+
+### 修复
+
+- **`currentUser` 记账提前到 login 发起前**：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的欢迎语在 login resolve 前经 `onMessage` 到达），此前 `setCurrentUser` 在 `await login()` resolve 后才执行，窗口期内 `toUiMessage` 打 `currentUserId is empty` 告警且 `isSelf` / 自动清未读 / @我 / 通知过滤不可靠；现同步提前记账、失败回滚清空。
+
+## @easemob/uikit-core 2.8.7 (2026-09-21)
+
+### 修复
+
+- **core `login()` 同步提前记账 `currentUser`**：同 websdk5 1.3.4，消除「REST 消息先于 login resolve 到达」的空 `currentUserId` 竞态窗口，登录失败回滚清空。
+
+## @easemob/uikit-sdk-webim4 1.3.3 (2026-09-21)
+
+### 修复
+
+- **`currentUser` 记账提前到 login 发起前**：同 websdk5 1.3.4，4.x 线对称修复。
+
 ## @easemob/uikit-im 3.7.9 (2026-09-21)
 
 ### 新增
