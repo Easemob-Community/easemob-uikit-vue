@@ -28,6 +28,15 @@ export interface UIKitFeatures {
   enableAtMe?: boolean
   /** 是否启用对方正在输入提示（typing CMD），默认 true */
   enableTyping?: boolean
+  /**
+   * 是否启用消息已读回执，默认 true。
+   * 关闭后接收方不再发送消息级已读回执（单聊/群聊均不发送），
+   * UIKit 也不展示已读状态（单聊已读 icon、群已读数/已读详情）；
+   * 不影响本机未读数同步（clearConversationUnreadMessageCount）。
+   * 群聊发送方的回执请求仍由 ChatConfig.groupReadReceipt 独立控制。
+   * Whether to enable message read receipts, default true.
+   */
+  enableReadReceipt?: boolean
   /** 好友列表是否过滤掉已拉黑用户，默认 true（仅联系人子视图/好友列表生效，选人弹窗不受影响） */
   filterBlockedContacts?: boolean
   /** 单聊消息列表是否展示对方昵称，默认 false（微信风格默认隐藏，可显式开启） */

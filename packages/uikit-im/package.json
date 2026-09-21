@@ -1,7 +1,7 @@
 {
   "name": "@easemob/uikit-im",
   "type": "module",
-  "version": "3.7.6",
+  "version": "3.7.9",
   "description": "Easemob UIKit Vue3 Components",
   "exports": {
     ".": {

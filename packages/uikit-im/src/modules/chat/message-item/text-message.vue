@@ -457,27 +457,18 @@ function onMentionClick(userId: string, event: MouseEvent) {
   }
 }
 
-/* @提及高亮样式 */
+/* @提及高亮：仅用颜色区分（可点击定位），不加下划线/悬停淡出等超链视觉 */
 .text-message__mention {
   color: var(--uikit-primary-color);
   font-weight: var(--uikit-font-weight-medium);
   cursor: pointer;
-  transition: opacity var(--uikit-anim-duration) var(--uikit-anim-easing);
-}
-
-@media (hover: hover) {
-  .text-message__mention:hover {
-    opacity: 0.8;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
 }
 
 .text-message--self .text-message__mention {
   color: var(--uikit-bubble-text-self);
-  text-decoration-color: var(--uikit-bubble-text-self);
   opacity: 0.9;
 }
+
 .text-message__link {
   color: var(--uikit-primary-color);
   text-decoration: underline;

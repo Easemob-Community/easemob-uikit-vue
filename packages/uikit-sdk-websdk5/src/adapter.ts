@@ -102,6 +102,7 @@ function getDefaultFeatures(): UIKitFeatures {
     enableDraft: true,
     enableAtMe: true,
     enableTyping: true,
+    enableReadReceipt: true,
     filterBlockedContacts: true,
   }
 }
@@ -1195,6 +1196,9 @@ export class Websdk5Adapter implements SdkAdapter {
       }),
       conversation: new ConversationDomain(this._client, stores.conversation, {
         sendPendingReadReceipts: (conversationId, conversationType) => {
+          // enableReadReceipt 关闭时不补发已读回执（Prod 集群已读回执问题临时止血开关）
+          if (this._features?.enableReadReceipt === false)
+            return
           void this._domains?.message.sendPendingReadReceipts(conversationId, conversationType)
         },
         resolveSenderName: (userId) => {

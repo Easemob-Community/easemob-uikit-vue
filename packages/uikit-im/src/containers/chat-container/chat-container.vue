@@ -169,6 +169,10 @@ defineExpose({
       <template #header-extra="slotProps">
         <slot name="header-extra" v-bind="slotProps" />
       </template>
+      <!-- 透传聊天区通知条插槽（header 与消息列表之间的自定义通知区域） -->
+      <template #notice="slotProps">
+        <slot name="notice" v-bind="slotProps" />
+      </template>
       <!-- 透传 drawer 插槽（显式声明以保留 ChatDrawerSlotScope 类型提示） -->
       <template #drawer="slotProps">
         <slot name="drawer" v-bind="slotProps" />

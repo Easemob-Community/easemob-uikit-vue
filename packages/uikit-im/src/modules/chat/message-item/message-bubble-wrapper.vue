@@ -203,6 +203,9 @@ const isGroupReadReceiptActive = computed(() => {
   // 发送失败时强制展示经典失败状态，避免已读圆圈为空导致用户看不到发送结果
   if (messageStatus.value === MESSAGE_STATUS.FAILED)
     return false
+  // 全局已读回执开关关闭时不展示（Prod 集群已读回执问题临时止血开关）
+  if (features.enableReadReceipt === false)
+    return false
   // 配置显式关闭时不展示已读回执，优先于消息自身回执数据，保证开关关闭即时生效
   // （enabled 为 undefined 的调用方保持旧行为：已带 requireGroupAck / groupReadCount 的消息仍激活）
   if (props.groupReadReceiptConfig?.enabled === false)
@@ -227,8 +230,23 @@ const isMediaSending = computed(() =>
   && (props.message.type === MESSAGE_TYPE.IMAGE || props.message.type === MESSAGE_TYPE.VIDEO),
 )
 
+/**
+ * 已读回执全局开关关闭时，投递/已读类状态（SENT/DELIVERED/READ）整体隐藏：
+ * 这些状态的 UI 载体（空心圆/已读对勾/群已读数）即「已读未读」展示层，
+ * 关闭已读回执后不应再残留任何状态指示（Prod 集群已读回执问题临时止血开关）。
+ * 发送中 spinner / 失败重试属本地操作反馈，不受影响。
+ */
+const hideStatusByReceiptSwitch = computed(() =>
+  features.enableReadReceipt === false
+  && (messageStatus.value === MESSAGE_STATUS.SENT
+    || messageStatus.value === MESSAGE_STATUS.DELIVERED
+    || messageStatus.value === MESSAGE_STATUS.READ),
+)
+
 /** 是否显示发送状态（仅自己的消息；群聊已读回执激活时用圆圈替代） */
-const showStatus = computed(() => isSelf.value && !isGroupReadReceiptActive.value)
+const showStatus = computed(() =>
+  isSelf.value && !isGroupReadReceiptActive.value && !hideStatusByReceiptSwitch.value,
+)
 
 /** 消息状态展示配置 */
 const statusConfig = computed<MessageStatusConfig>(() => props.config?.messageStatus || {})
@@ -243,6 +261,9 @@ const hideReadStatus = computed(() => {
     return false
   if (messageStatus.value !== MESSAGE_STATUS.READ)
     return false
+  // 全局已读回执开关关闭时隐藏单聊已读 icon（Prod 集群已读回执问题临时止血开关）
+  if (features.enableReadReceipt === false)
+    return true
   if ((statusConfig.value.readIconDisplay ?? 'latest') !== 'latest')
     return false
   return props.isLatestReadSelf === false

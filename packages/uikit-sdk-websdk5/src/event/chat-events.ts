@@ -515,8 +515,12 @@ export function createChatHandlers(
           chatLog.warn('[UIKit] auto clearConversationUnreadMessageCount failed:', formatSdkError(err))
         })
         // 单聊/群聊还需向对方发送消息已读回执（clearConversationUnreadMessageCount 仅同步自己多设备）；
-        // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送
-        if (sdkMsg.conversationType === CONVERSATION_TYPE.SINGLECHAT || sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT) {
+        // 与清未读共用“当前会话”判定，回执按 microtask 合并批量发送；
+        // enableReadReceipt 关闭时整体跳过（Prod 集群已读回执问题临时止血开关）
+        if (
+          features?.enableReadReceipt !== false
+          && (sdkMsg.conversationType === CONVERSATION_TYPE.SINGLECHAT || sdkMsg.conversationType === CONVERSATION_TYPE.GROUPCHAT)
+        ) {
           queueMessageReadReceipt(client, sdkMsg.conversationType, sdkMsg.conversationId, sdkMsg.msgServerId)
         }
       }

@@ -1,5 +1,41 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.9 (2026-09-21)
+
+### 新增
+
+- **`EmChatContainer` 新增 `#notice` 聊天区通知条插槽**：位于聊天 header 与消息列表之间（置顶横幅、群公告横幅之上），作用域为 `{ conversation }`，供业务注入自定义通知内容（如防诈骗提示条）。
+
+## @easemob/uikit-im 3.7.8 (2026-09-21)
+
+### 变更
+
+- **`enableReadReceipt` 关闭时隐藏全部「已读未读」状态指示**：此前仅隐藏单聊已读 icon 与群已读数，己方消息的 SENT / DELIVERED / READ 状态图标（空心圆 / 已读对勾等已读未读状态的 UI 载体）仍会残留展示；现开关关闭时这三类状态图标整体不渲染，气泡旁不再出现任何状态指示。发送中 spinner 与失败重试属本地操作反馈，不受影响。
+
+## @easemob/uikit-im 3.7.7 (2026-09-21)
+
+### 新增
+
+- **全局已读回执开关 `enableReadReceipt`（Provider prop，默认 true）**：关闭后接收方不再发送消息级已读回执，且 UIKit 不展示已读状态——单聊己方消息隐藏「已读」icon、群聊不显示已读数 / 已读详情入口；不影响本机未读数同步（`clearConversationUnreadMessageCount` 保留）。群聊发送方的回执请求仍由 `ChatConfig.groupReadReceipt` 独立控制（sdk-contract 1.3.1 / core 2.8.6 / websdk5 1.3.3）。
+
+## @easemob/uikit-sdk-websdk5 1.3.3 (2026-09-21)
+
+### 新增
+
+- **`enableReadReceipt` 能力开关落地**：`onMessage` 实时回执（`queueMessageReadReceipt`）与进入会话补发（`sendPendingReadReceipts` 钩子）在开关关闭时整体跳过，不再调用 `sendMessageReadReceipts`。
+
+## @easemob/uikit-core 2.8.6 (2026-09-21)
+
+### 新增
+
+- **defaultFeatures 新增 `enableReadReceipt: true`**：全局已读回执开关默认值，经 features 响应式链路下发 adapter 与 UIKit（sdk-contract 1.3.1）。
+
+## @easemob/uikit-sdk-contract 1.3.1 (2026-09-21)
+
+### 新增
+
+- **`UIKitFeatures` 新增 `enableReadReceipt?: boolean`**：是否启用消息已读回执，默认 true；类型面供 core / adapter / uikit-im 共享。
+
 ## @easemob/uikit-im 3.7.6 (2026-09-20)
 
 ### 变更

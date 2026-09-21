@@ -93,6 +93,7 @@ const defaultFeatures: UIKitFeatures = {
   enableDraft: true,
   enableAtMe: true,
   enableTyping: true,
+  enableReadReceipt: true,
   filterBlockedContacts: true,
   showNicknameInSingleChat: false,
   showNicknameInGroupChat: true,

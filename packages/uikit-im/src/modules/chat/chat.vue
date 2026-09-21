@@ -1323,6 +1323,9 @@ async function doRemoveAdmin(member: UiGroupMember) {
             </slot>
           </div>
 
+          <!-- 聊天区通知条（#notice：header 与消息列表之间的自定义通知区域，如防诈骗提示） -->
+          <slot name="notice" :conversation="currentConversation" />
+
           <!-- 置顶横幅 -->
           <PinnedBar
             v-if="showPinnedBar && currentConversation"

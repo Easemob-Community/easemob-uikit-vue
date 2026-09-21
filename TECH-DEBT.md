@@ -1356,6 +1356,13 @@
 - **建议修法**：把消息搜索收进 `SdkMessageDomain` 契约（如 `searchMessages(keyword, options)`），双 adapter 实现：websdk5 透传 `chatManager.searchMessages`；webim4 明确抛不支持错误（或经 capabilities 声明降级），UI 层按 capabilities 隐藏搜索入口。
 - **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-chat-interactions`
 
+- [ ] **D139. `enableReadReceipt` 全局开关仅在 websdk5 adapter 落地发送侧拦截，webim4 未实现**
+  - **现象**：`UIKitFeatures.enableReadReceipt`（contract 1.3.1 / core 2.8.6 / websdk5 1.3.3 / uikit-im 3.7.8，2026-09-21）关闭后，websdk5 不再发送消息级已读回执（实时 `queueMessageReadReceipt` + 进入会话补发 `sendPendingReadReceipts`），UIKit 也不渲染任何已读未读状态指示（SENT / DELIVERED / READ 图标、群已读数）；但 webim4 adapter 两条发送路径均无门控，webim4 接入方设置 `enableReadReceipt: false` 只会隐藏 UI 已读状态，回执仍会发出。
+  - **证据**：`packages/uikit-sdk-websdk5/src/event/chat-events.ts`（onMessage 回执分支有 `features?.enableReadReceipt !== false` 守卫）、`packages/uikit-sdk-websdk5/src/adapter.ts`（sendPendingReadReceipts 钩子守卫）；`packages/uikit-sdk-webim4/src` 对应路径无守卫。
+  - **建议修法**：webim4 对齐 websdk5：chat-events onMessage 回执分支 + 补发钩子各加 `enableReadReceipt !== false` 守卫（默认值 true 行为零变化）。
+  - **关联 skill**：`uikit-sdk-adapter-architecture`
+
+
 ---
 
 ## 已修复（归档）
