@@ -6,6 +6,10 @@
 
 - **`EmChatContainer` 新增 `#notice` 聊天区通知条插槽**：位于聊天 header 与消息列表之间（置顶横幅、群公告横幅之上），作用域为 `{ conversation }`，供业务注入自定义通知内容（如防诈骗提示条）。
 
+### 修复
+
+- **会话列表行尾未读徽标对齐**：`EmBadge` 行尾（`unreadPlacement="inline"`）用法此前按头像角标绝对定位渲染，徽标右边缘比时间右边缘右移约半个徽标宽；现 `EmBadge` 新增 `inline` 模式按文档流渲染，徽标右边缘与时间右边缘对齐、垂直居中于消息摘要行（对齐 Figma 设计稿 `unraedarea right 0 / top 1 / h 16`）。
+
 ## @easemob/uikit-im 3.7.8 (2026-09-21)
 
 ### 变更
@@ -28,6 +32,7 @@
 
 ### 新增
 
+- **`EmBadge` 新增 `inline` prop**：徽标不占位覆盖、按文档流渲染（如会话列表行尾未读数），默认 `false` 行为不变；开启后 `placement` 不生效。
 - **defaultFeatures 新增 `enableReadReceipt: true`**：全局已读回执开关默认值，经 features 响应式链路下发 adapter 与 UIKit（sdk-contract 1.3.1）。
 
 ## @easemob/uikit-sdk-contract 1.3.1 (2026-09-21)

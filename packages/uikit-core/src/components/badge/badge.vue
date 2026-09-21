@@ -24,6 +24,8 @@ export interface BadgeProps {
   placement?: BadgePlacement
   /** 是否给徽标加 2px 描边与底层内容（如头像）分界；颜色跟随 --uikit-bg-base，暗色自适应 */
   bordered?: boolean
+  /** 内联模式：徽标不占位覆盖，按文档流渲染（如会话列表行尾未读数），默认 false；开启后 placement 不生效 */
+  inline?: boolean
 }
 
 const props = withDefaults(defineProps<BadgeProps>(), {
@@ -34,6 +36,7 @@ const props = withDefaults(defineProps<BadgeProps>(), {
   variant: 'filled',
   placement: 'top-right',
   bordered: false,
+  inline: false,
 })
 
 /** xs 档仅支持圆点：忽略 count，强制按 dot 渲染 */
@@ -64,6 +67,7 @@ const digitCount = computed(() => {
         `uikit-badge__content--${props.variant}`,
         `uikit-badge__content--${props.placement}`,
         { 'uikit-badge__content--bordered': props.bordered },
+        { 'uikit-badge__content--inline': props.inline },
       ]"
       :style="{ '--uikit-badge-color': props.color }"
     >
@@ -107,6 +111,12 @@ const digitCount = computed(() => {
   bottom: 0;
   right: 0;
   transform: translate(50%, 50%);
+}
+
+/* 内联模式：按文档流渲染（行尾未读数等场景），不再绝对定位覆盖宿主 */
+.uikit-badge__content--inline {
+  position: static;
+  transform: none;
 }
 
 /* 描边：与头像等底层内容分界；用 box-shadow 外环实现，避免与 stroked variant 的 border 冲突；

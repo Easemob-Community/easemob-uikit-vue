@@ -1362,6 +1362,10 @@
   - **建议修法**：webim4 对齐 websdk5：chat-events onMessage 回执分支 + 补发钩子各加 `enableReadReceipt !== false` 守卫（默认值 true 行为零变化）。
   - **关联 skill**：`uikit-sdk-adapter-architecture`
 
+- [ ] **D140. `conversation-item.story.vue` 缺 `<UIKitProvider>` 包裹，histoire 全部变体渲染崩溃**
+  - **现象**：`conversation-item.vue` setup 中调用 `useUIKit()`（取 `features`/`theme`），而 `conversation-item.story.vue` 未用 `<UIKitProvider>` 包裹，sandbox 抛 `useUIKit() must be used within <UIKitProvider>`，10 个变体全部停在 Loading。同类依赖 `useUIKit`/`usePresence` 等注入的模块 story（如 `conversation-list.story.vue`）大概率同样崩溃（2026-09-21 排查会话列表行尾徽标对齐时发现）。
+  - **建议修法**：story 侧统一包一层 `<UIKitProvider :auto-init="false">`（或在其 histoire-setup 提供 app 级 stub context），让模块级 story 不依赖真实 SDK 连接即可渲染。
+  - **关联 skill**：`uikit-component-authoring` / `uikit-demo-development`
 
 ---
 

@@ -453,12 +453,14 @@ const displayMessage = computed(() => {
           </template>
         </span>
         <!-- 未读徽标（inline 行尾）：数字档 l；免打扰/全局 dot 模式为 8×8 圆点（xs），颜色保持默认 badge 红；
+             inline 模式按文档流渲染，右边缘与时间右边缘对齐，垂直居中于 18px 行（= 设计稿 2edline top+1px）；
              行尾徽标位置由行排版决定，badgePlacement 仅作用于头像角标 -->
         <Badge
           v-if="props.conversation.unreadCount && props.unreadPlacement === 'inline'"
           :count="props.conversation.unreadCount"
           :dot="unreadDot"
           :size="unreadDot ? 'xs' : 'l'"
+          inline
         />
       </div>
       <slot name="item-suffix" />
