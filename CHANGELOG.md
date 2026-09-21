@@ -4,6 +4,8 @@
 
 ### 新增
 
+- **simple 输入框粘贴图片预览发送（PC）**：截图/复制的图片 Cmd/Ctrl+V 粘贴时弹出 `EmModal` 预览确认框（单图按宽高比等比缩放居中，复用消息气泡 displaySize 算法；多图双列网格），确认后逐张走既有 `handleSendFile` 链路发送（beforeSend 钩子、引用 ext、群已读回执配置自动继承），取消/ESC/遮罩关闭自动回收 Blob URL；新增 `input.pasteImagePreview` 配置（默认 `true`，传 `false` 关闭后粘贴图片静默丢弃）；新增文案 `chat.input.pasteImageTitle`（core locale）。
+
 - **`EmChatContainer` 新增 `#notice` 聊天区通知条插槽**：位于聊天 header 与消息列表之间（置顶横幅、群公告横幅之上），作用域为 `{ conversation }`，供业务注入自定义通知内容（如防诈骗提示条）。
 
 ### 修复

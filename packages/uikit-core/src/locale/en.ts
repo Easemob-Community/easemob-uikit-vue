@@ -74,6 +74,7 @@ const messages: LocaleMessages = {
   'chat.empty': 'Select a conversation',
   'chat.placeholder': 'Type a message...',
   'chat.send': 'Send',
+  'chat.input.pasteImageTitle': 'Send Image',
   'chat.groupCardNotJoined': 'You have not joined this group and cannot send messages',
   'chat.input.mutedAll': 'All members are muted',
   'conversation.title': 'Conversations',

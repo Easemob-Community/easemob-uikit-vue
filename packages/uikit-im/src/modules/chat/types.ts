@@ -339,6 +339,8 @@ export interface ChatConfig {
     resizable?: boolean
     /** 是否显示「展开输入框」角标（仅 PC，卡片右上角；点击后输入区升至 212px，再次点击或 Esc 恢复默认；拖拽超过 212px 时角标自动呈现恢复态），默认 true / Whether to show the expand-input corner toggle (PC only), default true */
     expandable?: boolean
+    /** 粘贴剪贴板图片时是否弹出预览确认弹窗（截图/复制的图片预览后发送；simple 模式 PC 生效），默认 true；关闭后粘贴图片不弹窗也不发送 / Whether pasting an image from the clipboard opens a preview-confirm modal before sending (simple mode on PC), default true; when false, pasted images are discarded */
+    pasteImagePreview?: boolean
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
     /** Emoji 面板配置 / Emoji picker config */

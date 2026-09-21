@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
 import type { EmojiStickerItem, UiMessage } from '@easemob/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
@@ -262,8 +262,8 @@ async function handleSendRich(_html: string, text: string, mentionList?: Mention
 const pendingBlobUrls = new Set<string>()
 
 /** 发送文件消息 */
-async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList) {
-  const file = files[0]
+async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList | File[]) {
+  const file = Array.from(files)[0]
   if (!file)
     return
 
@@ -293,6 +293,89 @@ async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList)
     showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
   })
   clearQuote()
+}
+
+// ===== 粘贴图片预览弹窗（simple 模式） =====
+
+/** 预览弹窗显隐 */
+const showPastePreview = ref(false)
+
+/** 待发送的粘贴图片文件 */
+const pastePreviewFiles = ref<File[]>([])
+
+/** 预览用 Blob URL（与 pastePreviewFiles 一一对应） */
+const pastePreviewUrls = ref<string[]>([])
+
+/** 剪贴板图片粘贴：生成预览 URL 并打开确认弹窗 */
+function onImagePaste(files: File[]) {
+  if (!files.length)
+    return
+  pastePreviewFiles.value = files
+  pastePreviewUrls.value = files.map((file) => {
+    const url = URL.createObjectURL(file)
+    pendingBlobUrls.add(url)
+    return url
+  })
+  showPastePreview.value = true
+}
+
+/** 关闭预览弹窗并回收本次预览的 Blob URL（从待回收集合移除后 revoke） */
+function closePastePreview() {
+  pastePreviewUrls.value.forEach((url) => {
+    pendingBlobUrls.delete(url)
+    URL.revokeObjectURL(url)
+  })
+  pastePreviewFiles.value = []
+  pastePreviewUrls.value = []
+  pastePreviewNaturalSizes.value = {}
+}
+
+/** 确认发送：逐张走既有 handleSendFile 链路（beforeSend 钩子/引用 ext/群已读配置自动继承） */
+async function confirmPastePreview() {
+  const files = [...pastePreviewFiles.value]
+  closePastePreview()
+  for (const file of files) {
+    await handleSendFile(MESSAGE_TYPE.IMAGE, [file])
+  }
+}
+
+/** 粘贴图片大小展示（B/KB/MB） */
+function formatPasteSize(bytes: number): string {
+  if (bytes < 1024)
+    return `${bytes} B`
+  if (bytes < 1024 * 1024)
+    return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
+/** 预览图自然尺寸（img 加载后回填，key 为 Blob URL，用于按宽高比等比缩放展示） */
+const pastePreviewNaturalSizes = ref<Record<string, { width: number, height: number }>>({})
+
+/** 单图预览展示尺寸上限（弹窗宽 480，内容区约 400px） */
+const PASTE_PREVIEW_MAX_W = 400
+const PASTE_PREVIEW_MAX_H = 320
+
+/** 记录预览图自然尺寸 */
+function onPastePreviewLoad(url: string, event: Event) {
+  const img = event.target as HTMLImageElement
+  if (img?.naturalWidth && img?.naturalHeight) {
+    pastePreviewNaturalSizes.value[url] = { width: img.naturalWidth, height: img.naturalHeight }
+  }
+}
+
+/**
+ * 单图预览尺寸：等比缩放进上限框（与消息气泡 displaySize 同一算法）——
+ * 16:9 等横图受宽限、9:16 等竖图受高限，其余比例同一算法自动适配；未加载完成时给占位框。
+ */
+function pastePreviewImgStyle(url: string): Record<string, string> {
+  const natural = pastePreviewNaturalSizes.value[url]
+  if (!natural)
+    return { width: '320px', height: '240px' }
+  const ratio = Math.min(PASTE_PREVIEW_MAX_W / natural.width, PASTE_PREVIEW_MAX_H / natural.height, 1)
+  return {
+    width: `${Math.round(natural.width * ratio)}px`,
+    height: `${Math.round(natural.height * ratio)}px`,
+  }
 }
 
 /** 读取本地视频时长（秒），失败或无法读取时兜底返回 1 */
@@ -833,6 +916,7 @@ defineExpose({
       :mention-open="showMentionPicker"
       @send="handleSendText"
       @send-file="handleSendFile"
+      @image-paste="onImagePaste"
       @emoji-click="onEmojiClick"
       @voice-start="handleVoiceStart"
       @voice-end="handleVoiceEnd"
@@ -937,6 +1021,34 @@ defineExpose({
       @update:show="showMentionPicker = $event"
       @select="onMentionSelect"
     />
+
+    <!-- 粘贴图片预览确认弹窗（simple 模式；ESC/取消/遮罩关闭均走 cancel 回收 Blob URL） -->
+    <Modal
+      v-model:show="showPastePreview"
+      :title="t('chat.input.pasteImageTitle', '发送图片')"
+      :confirm-text="t('chat.send')"
+      :width="480"
+      @confirm="confirmPastePreview"
+      @cancel="closePastePreview"
+    >
+      <div
+        class="paste-image-preview"
+        :class="{ 'paste-image-preview--grid': pastePreviewUrls.length > 1 }"
+      >
+        <figure v-for="(url, i) in pastePreviewUrls" :key="url" class="paste-image-preview__item">
+          <img
+            class="paste-image-preview__img"
+            :src="url"
+            :alt="pastePreviewFiles[i]?.name"
+            :style="pastePreviewUrls.length > 1 ? undefined : pastePreviewImgStyle(url)"
+            @load="onPastePreviewLoad(url, $event)"
+          >
+          <figcaption class="paste-image-preview__caption">
+            {{ pastePreviewFiles[i]?.name }}（{{ formatPasteSize(pastePreviewFiles[i]?.size ?? 0) }}）
+          </figcaption>
+        </figure>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -945,6 +1057,52 @@ defineExpose({
 .emoji-picker-wrapper {
   width: 320px;
   max-width: calc(100vw - 24px);
+}
+
+/* 粘贴图片预览：单图按宽高比等比缩放居中，多图双列网格（非 scoped，Modal 经 Teleport 挂载） */
+.paste-image-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.paste-image-preview--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.paste-image-preview__item {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.paste-image-preview__img {
+  display: block;
+  border-radius: var(--uikit-components-radius, 8px);
+  background-color: var(--uikit-bg-hover);
+}
+
+/* 多图网格：统一单元格尺寸，cover 裁切（缩略图场景一致性优先）；单图尺寸由内联 style 按宽高比精确给出 */
+.paste-image-preview--grid .paste-image-preview__img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.paste-image-preview__caption {
+  font-size: var(--uikit-font-size-13);
+  color: var(--uikit-text-secondary);
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
 

@@ -22,6 +22,8 @@ const props = defineProps<SimpleInputProps>()
 const emit = defineEmits<{
   (e: 'send', text: string, mentionList?: MentionContact[]): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
+  /** 粘贴剪贴板图片（截图/复制的图片），交由上层弹窗预览后发送 */
+  (e: 'image-paste', files: File[]): void
   (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
   (e: 'voice-end', duration: number): void
@@ -228,6 +230,35 @@ function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
     emit('send-file', type, files)
     ;(event.target as HTMLInputElement).value = ''
   }
+}
+
+/**
+ * 粘贴事件（挂在根元素，textarea/EmInput 的 paste 均冒泡至此）：
+ * 剪贴板含图片时拦截默认行为，提取 image/* 文件交给上层弹窗预览后发送；
+ * 纯文本粘贴不受影响。
+ */
+function onPaste(e: ClipboardEvent) {
+  const data = e.clipboardData
+  if (!data)
+    return
+  const files: File[] = []
+  for (const item of Array.from(data.items)) {
+    if (item.kind === 'file' && item.type.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (file)
+        files.push(file)
+    }
+  }
+  if (files.length === 0)
+    return
+  // image 功能或粘贴预览特性关闭：剪贴板同时带文本时放行文本粘贴，纯图则拦截丢弃
+  if (!features.value.image || props.config?.pasteImagePreview === false) {
+    if (!data.getData('text/plain'))
+      e.preventDefault()
+    return
+  }
+  e.preventDefault()
+  emit('image-paste', files)
 }
 
 /** 移动端语音录制（保持原有点击切换行为） */
@@ -487,6 +518,7 @@ defineExpose({
       'simple-input--resizing': isResizing,
     }"
     :style="rootStyle"
+    @paste="onPaste"
   >
     <!-- 工具栏：表情 / 图片 / 视频 / 文件 / 翻译 / 名片 / 语音（设计稿 msg_input 顺序），图标视觉间距 16px -->
     <div class="simple-input__toolbar">
