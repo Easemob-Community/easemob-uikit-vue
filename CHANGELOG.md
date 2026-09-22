@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.7.11 (2026-09-22)
+
+### 新增
+
+- **主入口透出基座核心符号**：重新导出 `useUserInfoStore` / `isKeyboardShortcutsEnabled` / `setKeyboardShortcutsEnabled` 与类型 `UiContact` / `UiContactInvite` / `UiGroup` / `UiPresence` / `UserInfoStore`（均来自 `@easemob-community/uikit-core`），消费者无需再直接依赖 core 包。
+
 ## @easemob-community/uikit-im 3.7.10 (2026-09-22)
 
 ### 修复

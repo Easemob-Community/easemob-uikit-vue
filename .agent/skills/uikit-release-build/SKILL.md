@@ -132,6 +132,12 @@ d.ts 对 core 的引用保持裸包名 `@easemob-community/uikit-core`（vite-pl
   脚本所有 npm 调用（whoami / view / publish）都显式带 `--registry`，登录也要对准官方源。
 - 首次发布 scoped 包必须 `--access public`（脚本已内置）；发布后建议在 npm 网页端把包级
   Publishing access 设为「Require two-factor authentication and disallow tokens」。
+- **真实发布必须在用户自己的终端（TTY）里跑 `pnpm release:publish`**：npm 的 2FA 交互
+  （passkey 浏览器挑战 / TOTP 动态码提示）需要真实终端，在 agent 后台/非 TTY 环境会直接
+  报 `EOTP` 失败（2026-09 首发实测）。演练（dry-run）无此限制，可在 agent 内跑。
+- 账号 2FA 形态决定交互方式：TOTP（验证器 App）→ 终端提示 `Enter one-time password:`；
+  passkey → 自动弹浏览器。npm 正在淘汰 TOTP，建议换 passkey。
+- 单包补发：`pnpm release:publish --only <短名>`（如 `--only im`；pnpm run 会自动透传参数）。
 
 ## 6. 根 workspace 与常用脚本（pnpm 9 / pnpm-workspace.yaml）
 

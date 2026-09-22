@@ -54,6 +54,21 @@ export type {
   StreamMessageStatusValue,
 } from '@easemob-community/uikit-core'
 
+// 基座核心符号透出（已迁入 @easemob-community/uikit-core，此处显式具名 re-export，
+// 让消费者只依赖 uikit-im 即可使用；显式具名同时消除 ./sdk 全量 re-export 的同名歧义）
+export {
+  isKeyboardShortcutsEnabled,
+  setKeyboardShortcutsEnabled,
+  useUserInfoStore,
+} from '@easemob-community/uikit-core'
+export type {
+  UiContact,
+  UiContactInvite,
+  UiGroup,
+  UiPresence,
+  UserInfoStore,
+} from '@easemob-community/uikit-core'
+
 // Utils
 export * from './utils/resolve-last-message-text'
 // 消歧：./sdk 全量 re-export（adapter 包）与本模块本地实现同名，显式以本地实现为准
