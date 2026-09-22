@@ -20,7 +20,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 </script>
 
 <template>
@@ -51,7 +51,7 @@ UIKit 为列表类交互提供了一套声明式键盘导航 hooks，默认已�
 业务侧如需给自定义列表增加同样的键盘导航，可直接复用 `useArrowNavigation` 与 `useKeyBindings`：
 
 ```ts
-import { useArrowNavigation, useKeyBindings } from '@easemob/uikit-im'
+import { useArrowNavigation, useKeyBindings } from '@easemob-community/uikit-im'
 
 const items = ref([...])
 const keyboardNavActive = ref(false)
@@ -76,7 +76,7 @@ useKeyBindings({
 可通过 `setKeyboardShortcutsEnabled(false)` 一键禁用所有 `useKeyBindings` 绑定（包括 ESC 关闭、方向键导航等）：
 
 ```ts
-import { setKeyboardShortcutsEnabled, isKeyboardShortcutsEnabled } from '@easemob/uikit-im'
+import { setKeyboardShortcutsEnabled, isKeyboardShortcutsEnabled } from '@easemob-community/uikit-im'
 
 setKeyboardShortcutsEnabled(false)
 console.log(isKeyboardShortcutsEnabled()) // false
@@ -128,7 +128,7 @@ UIKit 内置单聊「对方正在输入」提示，基于环信 CMD（透传）�
 UIKit 允许业务完全接管数据层，通过 `dataSource` prop 传入自定义拉取函数：
 
 ```ts
-import type { UIKitDataSource } from '@easemob/uikit-im'
+import type { UIKitDataSource } from '@easemob-community/uikit-im'
 
 const dataSource: UIKitDataSource = {
   // 会话列表
@@ -158,7 +158,7 @@ const dataSource: UIKitDataSource = {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 import { dataSource } from './data-source'
 </script>
 
@@ -187,7 +187,7 @@ UIKit 暴露一组与组件同构的组合式函数，业务可直接复用状�
 例如在业务代码中监听会话切换：
 
 ```ts
-import { useConversation } from '@easemob/uikit-im'
+import { useConversation } from '@easemob-community/uikit-im'
 
 const { currentConversation, switchConversation } = useConversation()
 
@@ -207,7 +207,7 @@ function onConversationClick(id: string) {
 业务可通过 `useUserInfo()` 手动获取或更新：
 
 ```ts
-import { useUserInfo } from '@easemob/uikit-im'
+import { useUserInfo } from '@easemob-community/uikit-im'
 
 const { getUserInfo, updateOwnUserInfo } = useUserInfo()
 
@@ -227,7 +227,7 @@ UIKit 内置中英文双语言包，组件文案自动跟随 `useLocale().setLoc
 增量注入自定义翻译 key。业务初始化或插件注册时调用，不会覆盖 UIKit 内置 key（同名 key 会被业务值覆盖）。
 
 ```ts
-import { mergeLocaleMessages } from '@easemob/uikit-im'
+import { mergeLocaleMessages } from '@easemob-community/uikit-im'
 
 // 向中文包注入自定义文案
 mergeLocaleMessages('zh-CN', {
@@ -249,7 +249,7 @@ mergeLocaleMessages('en', {
 当你看到界面上某个文案想要覆盖、却不知道对应哪个 key 时，用 `findLocaleKey` 直接将文案反查为 key 列表。支持单个 / 批量查询、模糊 / 精确匹配、指定语言包。
 
 ```ts
-import { findLocaleKey } from '@easemob/uikit-im'
+import { findLocaleKey } from '@easemob-community/uikit-im'
 
 // 单个查询（默认模糊匹配）
 findLocaleKey('暂无会话')
@@ -269,7 +269,7 @@ findLocaleKey('No conversation', { locale: 'en' })
 `findLocaleKey` 返回的 key 数组可直接配合 `mergeLocaleMessages` 覆盖内置文案：
 
 ```ts
-import { findLocaleKey, mergeLocaleMessages } from '@easemob/uikit-im'
+import { findLocaleKey, mergeLocaleMessages } from '@easemob-community/uikit-im'
 
 function overrideLocale(text: string, newText: string, locale = 'zh-CN') {
   const keys = findLocaleKey(text, { locale })
@@ -314,23 +314,23 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 
 ## SDK 适配器
 
-3.0 起 SDK 层收敛为「中立契约 + 双 adapter」架构：UI 产物不直接依赖某一版 SDK，而是面向 `@easemob/uikit-sdk-contract` 的中立 `SdkAdapter` 接口，由 adapter 包完成与具体 SDK（5.x / 4.x）的对接。
+3.0 起 SDK 层收敛为「中立契约 + 双 adapter」架构：UI 产物不直接依赖某一版 SDK，而是面向 `@easemob-community/uikit-sdk-contract` 的中立 `SdkAdapter` 接口，由 adapter 包完成与具体 SDK（5.x / 4.x）的对接。
 
 ### 两个子路径入口
 
-主入口 `@easemob/uikit-im` 保持零 adapter 静态引用（4.x / 5.x 产物互不含对方符号，摇树隔离）；「默认内置」通过子路径入口的 import 副作用完成注册：
+主入口 `@easemob-community/uikit-im` 保持零 adapter 静态引用（4.x / 5.x 产物互不含对方符号，摇树隔离）；「默认内置」通过子路径入口的 import 副作用完成注册：
 
 | 入口 | 适配 SDK | 适用场景 |
 | --- | --- | --- |
-| `import '@easemob/uikit-im/websdk5'` | `easemob-websdk` 5.x（公开版默认） | 绝大多数接入方 |
-| `import '@easemob/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`，4.x 私有化） | 私有化部署 |
+| `import '@easemob-community/uikit-im/websdk5'` | `easemob-websdk` 5.x（公开版默认） | 绝大多数接入方 |
+| `import '@easemob-community/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`，4.x 私有化） | 私有化部署 |
 
 两个入口都会把对应 adapter 注册为默认适配器（重复 import 以最后一次注册为准并告警），`<EmUIKitProvider>` 不传 `adapter` prop 时由 UIKit 全权管理其生命周期（init / login / logout）。入口同时 re-export adapter 包的全量 API，原先从主入口导入的 SDK 值级符号（3.0 已从主入口移除）改从对应子路径入口导入：
 
 ```ts
 // 3.0 起：SDK 值级导出只存在于子路径入口
-import '@easemob/uikit-im/websdk5'
-import { Websdk5Adapter } from '@easemob/uikit-im/websdk5'
+import '@easemob-community/uikit-im/websdk5'
+import { Websdk5Adapter } from '@easemob-community/uikit-im/websdk5'
 ```
 
 ### 注入模式（adapter prop）
@@ -338,7 +338,7 @@ import { Websdk5Adapter } from '@easemob/uikit-im/websdk5'
 业务需要全权管理 SDK 连接生命周期时（如 OA 基座统一保管登录态、多应用共享连接），不要 import 子路径入口，改为从 adapter 包取出实例显式传入 `adapter` prop：
 
 ```ts
-import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
+import { Webim4Adapter } from '@easemob-community/uikit-sdk-webim4'
 
 // 业务持有 adapter 实例，登录 / 登出由业务全权调用
 const adapter = new Webim4Adapter()
@@ -377,7 +377,7 @@ const adapter = new Webim4Adapter()
 
 ### 旁路持久化（sdkConfig.persistence）
 
-自 `@easemob/uikit-im` 3.2.0（`@easemob/uikit-sdk-contract` 1.1.0 / `@easemob/uikit-core` 2.2.0）起，`sdkConfig.persistence` 提供旁路持久化钩子（`SdkPersistenceHooks`），用于 Electron 本地库（SQLite）等「写路径」落库场景。
+自 `@easemob-community/uikit-im` 3.2.0（`@easemob-community/uikit-sdk-contract` 1.1.0 / `@easemob-community/uikit-core` 2.2.0）起，`sdkConfig.persistence` 提供旁路持久化钩子（`SdkPersistenceHooks`），用于 Electron 本地库（SQLite）等「写路径」落库场景。
 
 **语义**：SDK 行为完全不变，收发 / 状态变更事件发生后旁路把数据同步给本地库，只写不读。所有钩子均为 fire-and-forget——调用方不 await，钩子的同步抛错 / Promise 拒绝只打告警日志，**不阻塞消息收发主链路**；未注入的钩子直接跳过对应同步点。与 `repositories` 的分界：`repositories` 是读路径数据接管（数据源改由注入方提供），`persistence` 是写路径旁路落库，两套接口语义互斥、可同时注入。
 
@@ -398,7 +398,7 @@ const adapter = new Webim4Adapter()
 Electron + SQLite 最小接入示例（实现细节为示意，请按实际本地库封装调整）：
 
 ```ts
-import type { SdkPersistenceHooks } from '@easemob/uikit-sdk-contract'
+import type { SdkPersistenceHooks } from '@easemob-community/uikit-sdk-contract'
 
 // 示意：经 IPC 转发到主进程写 SQLite，主进程内部自行排队 / 事务
 const persistence: SdkPersistenceHooks = {
@@ -444,7 +444,7 @@ const persistence: SdkPersistenceHooks = {
 不同 SDK 版本的客观能力差异（合并消息 / 置顶消息 / 流式消息 / 群已读回执）由 adapter 如实上报到 `useUIKit().capabilities`（adapter 未上报时缺省全 `true`），与 features（业务开关）取交集决定能力入口的展示：
 
 ```ts
-import { useUIKit } from '@easemob/uikit-im'
+import { useUIKit } from '@easemob-community/uikit-im'
 
 const { capabilities } = useUIKit()
 if (capabilities.groupReadReceipt) {
@@ -452,7 +452,7 @@ if (capabilities.groupReadReceipt) {
 }
 ```
 
-非 Vue 上下文（定时任务、主进程等 provide/inject 覆盖不到的场景）可通过 core 模块级函数 `getUIKitAdapter()`（`@easemob/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
+非 Vue 上下文（定时任务、主进程等 provide/inject 覆盖不到的场景）可通过 core 模块级函数 `getUIKitAdapter()`（`@easemob-community/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
 
 ## H5 与多端适配
 
@@ -468,7 +468,7 @@ if (capabilities.groupReadReceipt) {
 
 ### 3.0（双 SDK 适配架构）
 
-- **SDK 值级导出迁至子路径入口**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等从主入口移除，迁至 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件补 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入
+- **SDK 值级导出迁至子路径入口**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等从主入口移除，迁至 `@easemob-community/uikit-im/websdk5`（4.x 场景用 `@easemob-community/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件补 `import '@easemob-community/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入
 - **Provider 新增 `adapter` prop（注入模式）**：业务自带 adapter 实例并全权管理 login / logout，UIKit 不转发连接生命周期（详见上文 [SDK 适配器](#sdk-适配器)）
 - **`sdkConfig.repositories` 数据入口**：六域（message / conversation / contact / group / presence / userInfo）可接管数据读路径，推荐替代 `dataSource` prop（后者已 @deprecated，4.0.0 移除）
 - **`useUIKit().capabilities`**：adapter 上报的 SDK 客观能力矩阵（合并消息 / 置顶消息 / 流式消息 / 群已读回执），与 features 取交集决定能力入口

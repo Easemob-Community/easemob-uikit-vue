@@ -11,7 +11,7 @@ split 布局下的常驻成员列（与 H5 底部弹层面板并列的 PC 原生
 
 ```vue
 <script setup lang="ts">
-import { ChatroomMemberSidebar } from '@easemob/uikit-chatroom'
+import { ChatroomMemberSidebar } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>

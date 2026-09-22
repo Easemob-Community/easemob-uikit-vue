@@ -1,6 +1,6 @@
 /**
  * ⚠️ 本文件由 packages/uikit-core/scripts/gen-aux-entries.mjs 参数化生成，勿手改。
- * 配置见包根 aux-entries.config.mjs；composables 导出变更后执行 pnpm -F @easemob/uikit-chatroom aux:gen 重新生成，
+ * 配置见包根 aux-entries.config.mjs；composables 导出变更后执行 pnpm -F @easemob-community/uikit-chatroom aux:gen 重新生成，
  * build 前置 --check 会校验漂移。
  */
 
@@ -12,7 +12,7 @@ export interface ComponentResolver {
 export interface EasemobUIKitChatroomResolverOptions {
   /**
    * 组件名前缀，必须与 PascalCase 名称的开头一致。
-   * 默认 'Em'，例如模板中写 <EmChatroomContainer /> 会被解析到 @easemob/uikit-chatroom 的 EmChatroomContainer 导出。
+   * 默认 'Em'，例如模板中写 <EmChatroomContainer /> 会被解析到 @easemob-community/uikit-chatroom 的 EmChatroomContainer 导出。
    */
   prefix?: string
 }
@@ -23,7 +23,7 @@ export interface EasemobUIKitChatroomResolverOptions {
  * 使用示例：
  * ```ts
  * import Components from 'unplugin-vue-components/vite'
- * import { EasemobUIKitChatroomResolver } from '@easemob/uikit-chatroom/resolver'
+ * import { EasemobUIKitChatroomResolver } from '@easemob-community/uikit-chatroom/resolver'
  *
  * export default {
  *   plugins: [Components({ resolvers: [EasemobUIKitChatroomResolver()] })],
@@ -39,11 +39,11 @@ export function EasemobUIKitChatroomResolver(
     resolve: (name: string) => {
       if (!name.startsWith(prefix))
         return
-      // 直接返回 PascalCase 名称，对应 @easemob/uikit-chatroom 的命名导出
-      // 例如 <EmChatroomContainer /> -> import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+      // 直接返回 PascalCase 名称，对应 @easemob-community/uikit-chatroom 的命名导出
+      // 例如 <EmChatroomContainer /> -> import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
       return {
         name,
-        from: '@easemob/uikit-chatroom',
+        from: '@easemob-community/uikit-chatroom',
       }
     },
   }

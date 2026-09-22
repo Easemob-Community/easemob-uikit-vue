@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import { EmIconButton as IconButton } from '@easemob-community/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useUIKit } from '../../../composables/use-uikit'
-import { useLocale } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import PinnedBarItem from './pinned-bar-item.vue'
 
 export interface PinnedBarProps {

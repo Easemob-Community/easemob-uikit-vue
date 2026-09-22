@@ -13,8 +13,8 @@
  *   登录/登出必须直连本文件持有的 `webim4Adapter`。
  */
 import { ref } from 'vue'
-import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
-import type { SdkRepositoryOverrides } from '@easemob/uikit-im'
+import { Webim4Adapter } from '@easemob-community/uikit-sdk-webim4'
+import type { SdkRepositoryOverrides } from '@easemob-community/uikit-im'
 import { demoSdkVersion, sdkIsHttpDNS } from './use-demo-settings'
 
 /** 4.x adapter 单例（模块级持有，与 Provider 解耦；demo 全权管理其 login/logout） */

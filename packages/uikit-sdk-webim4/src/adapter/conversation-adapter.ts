@@ -1,12 +1,12 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { MessagePreviewLabels, UiConversation, UiMessage } from '@easemob/uikit-sdk-contract'
+import type { MessagePreviewLabels, UiConversation, UiMessage } from '@easemob-community/uikit-sdk-contract'
 import {
   CONVERSATION_TYPE,
   customEventPreviewMap,
   defaultLastMessageTextResolver,
   formatConversationPreview,
   normalizeUserId,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 import { toUiMessage } from './message-adapter'
 
 /** 4.x adapter 默认中文摘要标签（与历史 UI 行为保持一致）；notification-engine 复用。 */

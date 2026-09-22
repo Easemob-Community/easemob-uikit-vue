@@ -1,8 +1,8 @@
 // SDK 中立消息/会话/联系人/群组/presence/用户资料类型与结构型守卫已下沉
-// `@easemob/uikit-sdk-contract`，此处 re-export 保持 core 既有导入路径（'../sdk/types'）兼容。
+// `@easemob-community/uikit-sdk-contract`，此处 re-export 保持 core 既有导入路径（'../sdk/types'）兼容。
 //
 // SDK5 专属类型（GroupMemberEntry / GroupMuteEntry / SdkContactSource / SdkGroupSource /
-// SendingMessageMeta）已随 SDK 集成下沉 `@easemob/uikit-sdk-websdk5`，不再从 core 暴露。
+// SendingMessageMeta）已随 SDK 集成下沉 `@easemob-community/uikit-sdk-websdk5`，不再从 core 暴露。
 
 export type {
   ChatConversationType,
@@ -51,7 +51,7 @@ export type {
   SdkCapabilities,
   SdkCapabilityFlags,
   SdkRepositoryOverrides,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 
 export {
   isCmdBody,
@@ -63,4 +63,4 @@ export {
   isTextBody,
   isVideoBody,
   isVoiceBody,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'

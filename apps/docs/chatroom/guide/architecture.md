@@ -5,9 +5,9 @@
 
 | 包 | 场景 | 职责 |
 | --- | --- | --- |
-| `@easemob/uikit-core` | 共享基座 | sdk 抽象层、主题、i18n、常量、原子组件、Provider 生命周期 |
-| `@easemob/uikit-im` | 单群聊 | 会话 / 通讯录 / 群组 / 聊天场景层（现有文档） |
-| `@easemob/uikit-chatroom` | 聊天室 | 房间 / 消息流 / 成员 / 禁言 / 公告 / 房间属性 + 场景预设 |
+| `@easemob-community/uikit-core` | 共享基座 | sdk 抽象层、主题、i18n、常量、原子组件、Provider 生命周期 |
+| `@easemob-community/uikit-im` | 单群聊 | 会话 / 通讯录 / 群组 / 聊天场景层（现有文档） |
+| `@easemob-community/uikit-chatroom` | 聊天室 | 房间 / 消息流 / 成员 / 禁言 / 公告 / 房间属性 + 场景预设 |
 
 ## 为什么拆成两个包
 
@@ -17,7 +17,7 @@
 
 ## 共享什么、不共享什么
 
-- **共享**（进 `@easemob/uikit-core`）：client / ManagerHost 抽象、连接级事件、notification
+- **共享**（进 `@easemob-community/uikit-core`）：client / ManagerHost 抽象、连接级事件、notification
   引擎、user-info / presence domain、主题与 i18n、常量与工具、通用原子组件、`EmUIKitProvider`
   生命周期、domain 无关的 H5 composables。
 - **不共享**（各自场景包内）：单群聊的会话 / 通讯录 / 群组 / 消息 store 与模块；聊天室的房间
@@ -26,7 +26,7 @@
 ## 聊天室包内部架构
 
 ```
-@easemob/uikit-chatroom
+@easemob-community/uikit-chatroom
 ├── sdk/          domain（Chatroom/Member/MuteItem/Announcement/Attributes）
 │                 adapter（ChatroomAdapter / normalizeUserId / toChatroomUiMessage）
 │                 event（registerChatroomEventHandlers，按 manager + chatType 过滤互不污染）

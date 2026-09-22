@@ -6,7 +6,7 @@
  * 业务可整体覆盖容器 gift-bar 插槽接入自有礼物面板。
  */
 import { inject, ref } from 'vue'
-import { CORE_UIKIT_CONTEXT_KEY, EmPopup, t } from '@easemob/uikit-core'
+import { CORE_UIKIT_CONTEXT_KEY, EmPopup, t } from '@easemob-community/uikit-core'
 import { CHATROOM_GIFT_EVENT, CHATROOM_GIFT_ITEMS } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'

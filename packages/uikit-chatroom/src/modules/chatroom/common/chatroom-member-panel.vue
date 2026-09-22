@@ -6,8 +6,8 @@
  *   （设/移除管理员）；成员不可管理房主与自己。
  */
 import { computed, ref, watch } from 'vue'
-import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob/uikit-core'
-import type { ActionSheetItem } from '@easemob/uikit-core'
+import { EmActionSheet, EmPopup, normalizeUserId, t, useClient } from '@easemob-community/uikit-core'
+import type { ActionSheetItem } from '@easemob-community/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'

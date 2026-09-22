@@ -1,4 +1,4 @@
-## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+## @easemob-community/uikit-sdk-webim4 1.2.2 (2026-09-03)
 
 
 ### 修复
@@ -7,7 +7,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.2.1 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.1 (2026-09-02)
 
 
 ### 修复
@@ -16,7 +16,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.2.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.0 (2026-09-02)
 
 
 ### 新增
@@ -29,7 +29,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.1.0 (2026-09-02)
 
 
 ### 性能
@@ -42,7 +42,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.0.0 (2026-09-02)
 
 
 ### 新增

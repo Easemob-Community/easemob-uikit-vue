@@ -1,8 +1,8 @@
 import { computed, ref, watch, nextTick, isRef, type Ref } from 'vue'
 import { useStorage } from '@vueuse/core'
-import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from '@easemob/uikit-core'
+import { createUIKitStorageKey, getStorageBackend, type UIKitStorageType } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
-import type { UiContactInvite } from '@easemob/uikit-core'
+import type { UiContactInvite } from '@easemob-community/uikit-core'
 import type { RootStores } from '../sdk/types'
 
 export type InvitePersistType = boolean | UIKitStorageType

@@ -11,7 +11,7 @@ export default defineConfig({
       alias: {
         '@': resolve(__dirname, 'src'),
         // story 内允许直接写包名引用（与 uikit-im 侧别名策略一致）
-        '@easemob/uikit-core': resolve(__dirname, 'src'),
+        '@easemob-community/uikit-core': resolve(__dirname, 'src'),
       },
     },
   },

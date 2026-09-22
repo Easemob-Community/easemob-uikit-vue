@@ -1,8 +1,8 @@
-# @easemob/uikit-sdk-contract
+# @easemob-community/uikit-sdk-contract
 
 Easemob UIKit 的 SDK 中立契约包。
 
-本包定义 UIKit 与底层 SDK 之间的中立接口、wire 类型、事件集与能力矩阵，是 `@easemob/uikit-core`、`@easemob/uikit-im` 与两个 adapter 包（`@easemob/uikit-sdk-websdk5`、`@easemob/uikit-sdk-webim4`）三方共享的单一真相源。
+本包定义 UIKit 与底层 SDK 之间的中立接口、wire 类型、事件集与能力矩阵，是 `@easemob-community/uikit-core`、`@easemob-community/uikit-im` 与两个 adapter 包（`@easemob-community/uikit-sdk-websdk5`、`@easemob-community/uikit-sdk-webim4`）三方共享的单一真相源。
 
 ## 设计原则
 
@@ -12,7 +12,7 @@ Easemob UIKit 的 SDK 中立契约包。
 - **向后兼容**：公开 API 的变更遵循语义化版本，废弃项会标注 `@deprecated` 并给出迁移路径。
 - **少量中立纯工具驻留本包（2026-09-02 决策）**：`utils/logger.ts` / `utils/normalize-user-id.ts`
   虽为运行时行为，但均为纯函数、零 SDK/框架依赖，且需被 core / 双 adapter / uikit-im 三方共享
-  同一实例（logger 持有模块级级别与收集 sink 状态）。迁往 `@easemob/uikit-core` 会迫使 adapter
+  同一实例（logger 持有模块级级别与收集 sink 状态）。迁往 `@easemob-community/uikit-core` 会迫使 adapter
   反向依赖 UI 侧基座（违背「adapter 只依赖 contract + SDK」的依赖方向）；为两个文件单拆共享包
   则增加发布矩阵成本而无行为收益。故维持在契约包，core 侧 `utils/logger.ts` 等仅做 re-export。
 
@@ -54,17 +54,17 @@ export * from './stream-message'
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     @easemob/uikit-im                        │
+│                     @easemob-community/uikit-im                        │
 │  UI 组件 / composables / store（依赖契约，不依赖具体 SDK）      │
 └──────────────────────────┬──────────────────────────────────┘
                            │ imports contract types/interfaces
 ┌──────────────────────────▼──────────────────────────────────┐
-│            @easemob/uikit-sdk-contract                       │
+│            @easemob-community/uikit-sdk-contract                       │
 │  中立契约：types / events / repository / domains / adapter    │
 └────────────┬───────────────────────────────┬────────────────┘
              │ implements                    │ implements
 ┌────────────▼──────────────┐  ┌─────────────▼───────────────┐
-│ @easemob/uikit-sdk-websdk5│  │ @easemob/uikit-sdk-webim4   │
+│ @easemob-community/uikit-sdk-websdk5│  │ @easemob-community/uikit-sdk-webim4   │
 │      SDK 5.x adapter       │  │      SDK 4.x adapter        │
 └────────────────────────────┘  └─────────────────────────────┘
 ```
@@ -74,7 +74,7 @@ export * from './stream-message'
 任何 adapter 都需要实现 `SdkAdapter` 接口。推荐按子接口拆分实现与测试：
 
 ```ts
-import type { SdkAdapter, SdkLifecycle, SdkRepositories } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter, SdkLifecycle, SdkRepositories } from '@easemob-community/uikit-sdk-contract'
 
 export class MyAdapter implements SdkAdapter {
   // SdkLifecycle
@@ -137,8 +137,8 @@ export interface SdkCapabilities extends SdkCapabilityFlags {
 
 ```bash
 # 类型检查
-pnpm -F @easemob/uikit-sdk-contract exec vue-tsc --noEmit
+pnpm -F @easemob-community/uikit-sdk-contract exec vue-tsc --noEmit
 
 # 构建
-pnpm -F @easemob/uikit-sdk-contract build
+pnpm -F @easemob-community/uikit-sdk-contract build
 ```

@@ -1,5 +1,5 @@
 import { type MaybeRefOrGetter, computed, toValue } from 'vue'
-import { useViewport } from '@easemob/uikit-core'
+import { useViewport } from '@easemob-community/uikit-core'
 import type { ChatroomPopupModeValue } from './use-chatroom-scene'
 
 /** 解析后的弹层形态：sheet 底部弹层 / dialog 居中弹窗 */

@@ -1,5 +1,5 @@
-import type { SdkConfig } from '@easemob/uikit-sdk-contract'
-import { SDK_CONTRACT_VERSION } from '@easemob/uikit-sdk-contract'
+import type { SdkConfig } from '@easemob-community/uikit-sdk-contract'
+import { SDK_CONTRACT_VERSION } from '@easemob-community/uikit-sdk-contract'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { WEBSDK5_MANAGERS, Websdk5Adapter } from '../adapter'
 import type { UIKitClient } from '../client'

@@ -10,7 +10,7 @@
  *   UIKit 不感知业务角色（主播/老师等由业务层自行映射到权限）。
  */
 import { computed, onMounted, ref } from 'vue'
-import { EmPopup, normalizeUserId, t } from '@easemob/uikit-core'
+import { EmPopup, normalizeUserId, t } from '@easemob-community/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../../constants'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 import { useChatroom } from '../../../composables/use-chatroom'

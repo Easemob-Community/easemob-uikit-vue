@@ -1,4 +1,4 @@
-import type { LocaleMessages } from '@easemob/uikit-core'
+import type { LocaleMessages } from '@easemob-community/uikit-core'
 
 /** 聊天室场景英文文案（chatroom.* 前缀段，经 core mergeLocaleMessages 并入，不复制 core locale） */
 const en: LocaleMessages = {

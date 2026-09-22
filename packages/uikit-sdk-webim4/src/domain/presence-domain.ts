@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { PresenceRepository, UiPresence } from '@easemob/uikit-sdk-contract'
-import { PRESENCE_STATUS, createLogger } from '@easemob/uikit-sdk-contract'
+import type { PresenceRepository, UiPresence } from '@easemob-community/uikit-sdk-contract'
+import { PRESENCE_STATUS, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import type { PresenceStoreLike } from '../event/types'
 

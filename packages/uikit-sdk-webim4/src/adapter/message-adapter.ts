@@ -8,7 +8,7 @@ import {
   createLogger,
   isStreamTerminal,
   normalizeUserId,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 import type {
   CombineMessageBody,
   ConversationTypeValue,
@@ -18,7 +18,7 @@ import type {
   StreamMessageMeta,
   StreamMessageStatusValue,
   UiMessage,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 
 const adapterLog = createLogger('UIKit:Webim4MessageAdapter')
 
@@ -63,7 +63,7 @@ const STREAM_STATUS_MAP: Record<number, StreamMessageStatusValue> = {
  */
 const streamStateMap = new Map<string, { seq: number, fullText: string }>()
 
-export { normalizeUserId } from '@easemob/uikit-sdk-contract'
+export { normalizeUserId } from '@easemob-community/uikit-sdk-contract'
 
 /** 判断 4.x 消息体是否携带流式分片信息（StreamMsgBody） */
 function isStreamMsgBody(msg: MessagesType): msg is EasemobChat.StreamMsgBody {

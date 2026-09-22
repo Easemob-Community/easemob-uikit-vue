@@ -10,7 +10,7 @@ import type {
   UiPresence,
   UserInfo,
   UserInfoAttribute,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 
 /**
  * 事件处理器可访问的 store 最小接口集合（结构类型）。

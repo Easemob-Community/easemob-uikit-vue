@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UiContact, UiContactInvite } from '@easemob/uikit-core'
+import type { UiContact, UiContactInvite } from '@easemob-community/uikit-core'
 
 export const useContactStore = defineStore('contact', () => {
   const contactList = ref<UiContact[]>([])

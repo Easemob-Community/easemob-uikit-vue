@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmIconButton as IconButton, EmInput as Input, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
-import type { GroupMemberRoleValue, PresenceDisplayStatus, UiGroup, UiGroupMember } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmIconButton as IconButton, EmInput as Input, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob-community/uikit-core'
+import type { GroupMemberRoleValue, PresenceDisplayStatus, UiGroup, UiGroupMember } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import GroupMemberListItem from './group-member-list-item.vue'

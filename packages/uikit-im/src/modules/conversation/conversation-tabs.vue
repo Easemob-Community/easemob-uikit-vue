@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import { EmIcon as Icon, useLocale } from '@easemob/uikit-core'
+import { EmIcon as Icon, useLocale } from '@easemob-community/uikit-core'
 import { DEFAULT_CONVERSATION_TABS } from './types'
 import type { ConversationTabKey, ConversationTabsSlotScope } from './types'
 

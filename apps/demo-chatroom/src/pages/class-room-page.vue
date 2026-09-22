@@ -5,7 +5,7 @@
  * 学生端同一页面自动降级（无管理入口）。
  */
 import { ref } from 'vue'
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 
 const DEFAULT_ROOM_ID = '315874547400706'

@@ -9,7 +9,7 @@
  * 用 member 账号登录切到「老师」视角管理位不出现（容器按 canManage 门控）。
  */
 import { computed, ref } from 'vue'
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 import { CLASS_ROLES, useDemoRole } from '../demo-role'
 import type { DemoPlayerRole } from '../demo-role'

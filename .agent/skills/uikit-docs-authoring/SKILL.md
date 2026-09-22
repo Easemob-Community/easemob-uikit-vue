@@ -75,7 +75,7 @@
 - `package.json`：`dev` / `build` 前置 `pnpm sync:vendor`（node
   scripts/sync-vendor.mjs，同步 Playground vendor 静态资源）+ `preview`（vitepress
   原生）+ `gen:api`（node scripts/gen-api-docs.mjs）；依赖 vitepress ^1.6.4、  vite-plugin-vitepress-demo ^2.2.1、`@vue/repl` ^4.7.2（在线演练场）、
-  `@vue/compiler-sfc` + typescript（gen 脚本的解析引擎）；`@easemob/uikit-im` 为
+  `@vue/compiler-sfc` + typescript（gen 脚本的解析引擎）；`@easemob-community/uikit-im` 为
   `workspace:*`；
 - `index.md`：home 布局（hero + features），hero actions 指向快速开始与组件预览；
 - `guide/`：quickstart / theme / icons / h5-adaptation / advanced / demo-phase1-plan /
@@ -109,7 +109,7 @@
   插槽），按路由前缀判定上下文；桌面端默认「语言」下拉已被 style.css 隐藏（
   `.VPNavBar .VPNavBarTranslations`），移动端菜单内切换入口保留；
 - 聊天室版本宏 `__EASEMOB_UIKIT_CHATROOM_VERSION__` 由 vite.config.ts 注入，包未落地时为空串，
-  hero 徽章降级为仅产品名；`@easemob/uikit-chatroom` alias 已预置（包落地后 demo 可直接引用）。
+  hero 徽章降级为仅产品名；`@easemob-community/uikit-chatroom` alias 已预置（包落地后 demo 可直接引用）。
 - 新增聊天室文档页 = 在 `chatroom/` 下建页 + 在 `locales.chatroom.themeConfig.sidebar`
   登记；gen:api 白名单待聊天室组件落地后接入。
 
@@ -160,10 +160,10 @@
   多个演练场必须区分，不传回落到 title）；SSR 安全（onMounted 后动态 import
   repl，SSR 构建不炸），无需 ClientOnly 包装；
 - **模板自包含约束**：预览 iframe 只认 import map 覆盖的模块——只能 import
-  `@easemob/uikit-im` / `vue` / `pinia` / `easemob-websdk`（及 vue/server-renderer、
+  `@easemob-community/uikit-im` / `vue` / `pinia` / `easemob-websdk`（及 vue/server-renderer、
   @vue/compiler-sfc 等基础设施），import 其他包会模块解析失败白屏；
 - 预览基于 **uikit dist 产物**（`public/vendor/easemob-uikit-im.js` + `uikit-theme.css`）
-  而非源码——改 uikit 源码后需 `pnpm -F @easemob/uikit-im build` 再跑 `pnpm sync:vendor`
+  而非源码——改 uikit 源码后需 `pnpm -F @easemob-community/uikit-im build` 再跑 `pnpm sync:vendor`
   （dev/build 已自动前置执行），playground 预览才会同步；`uikit-theme.css` 必须取
   `dist/theme/index.css`（含 :root 变量 + 全部组件样式），误用 `src/theme/index.css`
   会导致预览 iframe 组件无样式（docs 页面本体经 alias 直连 src 不受影响）；
@@ -241,9 +241,9 @@
   `components/demo/x.vue`，与真实位置 `components/button/demo/` 对不上。该插件
   `enforce: 'pre'` 且注册在 vitepressDemo **之前**（数组顺序即执行顺序），把
   `src="./demo/` 重写为 `src="./<name>/demo/`（仅当目标目录真实存在）；
-- **alias**：`@easemob/uikit-im` → `packages/uikit-im/src`（文档站 demo 直接编译源码，
+- **alias**：`@easemob-community/uikit-im` → `packages/uikit-im/src`（文档站 demo 直接编译源码，
   与 demo 应用源码模式同思路；注意这里没有 theme 子路径 alias，demo 内不要
-  import `@easemob/uikit-im/theme`，组件样式由 `.vue` 自带）；
+  import `@easemob-community/uikit-im/theme`，组件样式由 `.vue` 自带）；
 - **版本注入（双轨 define，勿删任一轨）**：
   - 裸宏 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__` / `__EASEMOB_UIKIT_CORE_VERSION__` /
     `__EASEMOB_UIKIT_CHATROOM_VERSION__`：三包源码经 alias 直连，docs demo 挂载 Provider 时包内会
@@ -293,14 +293,14 @@
   业务容器 MODULES）。
 - 新页面必须登记到 `.vitepress/config.ts` 的 sidebar（组件按分类、指南按分组）。
 - demo 源文件必须能独立编译运行（docs build 会真实渲染）。
-- 演练场模板只能 import import map 已覆盖的模块（@easemob/uikit-im / vue / pinia /
+- 演练场模板只能 import import map 已覆盖的模块（@easemob-community/uikit-im / vue / pinia /
   easemob-websdk），否则 iframe 模块解析失败白屏。
 
 **软约定：**
 
 - `<demo>` 块 title / desc 必填，一个 demo 只演示一个主题。
 - 组件页结构固定：简介 → 使用方式 → 功能小节（demo 块）→ API（@include）。
-- 改 uikit 源码后必须 `pnpm -F @easemob/uikit-im build` + `pnpm sync:vendor`，
+- 改 uikit 源码后必须 `pnpm -F @easemob-community/uikit-im build` + `pnpm sync:vendor`，
   演练场预览才会同步到新产物。
 - 文档站只写中文；组件注释中英双语由组件侧负责。
 
@@ -318,7 +318,7 @@
   gen）与 contact-container 聚合容器（成员多无 JSDoc，gen 说明列会大片空白，
   且废弃别名说明依赖 @deprecated 语义，gen 会丢）——contact-container.vue 已存在，
   描述的就是它，不要错接 contact-list.vue 生成。
-- 文档站 alias 没有 `@easemob/uikit-im/theme` 子路径（与 demo 应用不同），demo 里
+- 文档站 alias 没有 `@easemob-community/uikit-im/theme` 子路径（与 demo 应用不同），demo 里
   不要 import theme 子路径。
 
 ## 反面清单
@@ -328,7 +328,7 @@
 - ❌ 改 props/emits 后不跑 gen:api——API 表格与真实类型脱节。
 - ❌ 手改 `.vitepress/gen/*.md`——下次 gen:api 被覆盖，且 diff 污染。
 - ❌ 新组件只写 md 不登记 sidebar——页面 404 或导航缺失。
-- ❌ demo 里 import `@easemob/uikit-im/theme`——文档站 alias 无此子路径，构建失败。
+- ❌ demo 里 import `@easemob-community/uikit-im/theme`——文档站 alias 无此子路径，构建失败。
 - ❌ 新组件不加入 gen-api-docs 白名单——API 表格永远缺失。
 - ❌ 只 `pnpm dev` 不 `pnpm build`——demo 编译错误（如类型/引用）在 dev 下可能
   被吞掉，build 才是文档站门禁。

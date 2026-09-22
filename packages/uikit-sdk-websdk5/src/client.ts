@@ -11,7 +11,7 @@ import type {
   PushManager,
   UserInfoManager,
 } from 'easemob-websdk'
-import { log } from '@easemob/uikit-sdk-contract'
+import { log } from '@easemob-community/uikit-sdk-contract'
 import { setSdkDebugGuard } from './utils/sdk-log-capture'
 
 declare const __EASEMOB_SDK_VERSION__: string

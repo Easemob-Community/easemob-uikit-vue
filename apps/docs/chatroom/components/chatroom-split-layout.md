@@ -10,7 +10,7 @@ PC / 开播端三栏布局壳子：[舞台区 `#stage` | 消息主栏 | 成员�
 
 ```vue
 <script setup lang="ts">
-import { ChatroomSplitLayout, ChatroomMemberSidebar } from '@easemob/uikit-chatroom'
+import { ChatroomSplitLayout, ChatroomMemberSidebar } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>

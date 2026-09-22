@@ -1,4 +1,4 @@
-## @easemob/uikit-core 2.4.0 (2026-09-03)
+## @easemob-community/uikit-core 2.4.0 (2026-09-03)
 
 
 ### 新增
@@ -14,7 +14,7 @@
 
 ---
 
-## @easemob/uikit-core 2.3.0 (2026-09-02)
+## @easemob-community/uikit-core 2.3.0 (2026-09-02)
 
 
 ### 新增
@@ -33,7 +33,7 @@
 
 ---
 
-## @easemob/uikit-core 2.2.0 (2026-09-02)
+## @easemob-community/uikit-core 2.2.0 (2026-09-02)
 
 
 ### 新增
@@ -42,7 +42,7 @@
 
 ---
 
-## @easemob/uikit-core 2.1.0 (2026-09-02)
+## @easemob-community/uikit-core 2.1.0 (2026-09-02)
 
 
 ### 性能
@@ -55,7 +55,7 @@
 
 ---
 
-## @easemob/uikit-core 2.0.0 (2026-09-02)
+## @easemob-community/uikit-core 2.0.0 (2026-09-02)
 
 
 ### 破坏性行为变更
@@ -70,7 +70,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.2 (2026-08-28)
+## @easemob-community/uikit-core 1.5.2 (2026-08-28)
 
 
 ### 调整
@@ -80,7 +80,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.1 (2026-08-28)
+## @easemob-community/uikit-core 1.5.1 (2026-08-28)
 
 
 ### 调整
@@ -89,7 +89,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.0 (2026-08-28)
+## @easemob-community/uikit-core 1.5.0 (2026-08-28)
 
 
 ### 新增
@@ -106,7 +106,7 @@
 
 ---
 
-## @easemob/uikit-core 1.4.0 (2026-08-26)
+## @easemob-community/uikit-core 1.4.0 (2026-08-26)
 
 
 ### 破坏性变更
@@ -120,7 +120,7 @@
 
 ---
 
-## @easemob/uikit-core 1.3.0 (2026-08-25)
+## @easemob-community/uikit-core 1.3.0 (2026-08-25)
 
 
 ### 新增
@@ -129,7 +129,7 @@
 
 ---
 
-## @easemob/uikit-core 1.2.0 (2026-08-25)
+## @easemob-community/uikit-core 1.2.0 (2026-08-25)
 
 
 ### 新增
@@ -138,7 +138,7 @@
 
 ---
 
-## @easemob/uikit-core 1.1.0 (2026-08-19)
+## @easemob-community/uikit-core 1.1.0 (2026-08-19)
 
 
 ### 新增
@@ -164,17 +164,17 @@
 
 ---
 
-## @easemob/uikit-core 1.0.0 (2026-08-15)
+## @easemob-community/uikit-core 1.0.0 (2026-08-15)
 
 
 ### 新增
 
 - **图标体系**：`EmIcon` 支持多注册表（`assets/icons` + `assets/icons-v2` + `assets/icons-filled`），`icon-map.ts` 新增 `getV2IconNames()` / `getFilledIconNames()`，为线性/面性图标库提供自动索引；`color` prop 对 `fill="currentColor"` 的填充式图标同样生效。
-- **共享基座首版（P1 抽核自 `@easemob/uikit-im` 迁出）**：
+- **共享基座首版（P1 抽核自 `@easemob-community/uikit-im` 迁出）**：
   - SDK 基座层：`UIKitClient` / `ManagerHost`（**含 `ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
   - Pinia stores：`useClientStore` / `useThemeStore` / `useUserInfoStore` / `usePresenceStore`
   - 共享 composables：`useClient` / `useTheme` / `useUserInfo` / `useOwnUserInfo` / `usePresence` / `useToast` / `useNotification` / H5 通用（`useH5Adaptation` / `useKeyboard` / `useLongPress` / `usePullRefresh` / `useViewport` / `useBottomSheet` / `useRipple`）/ 通用交互（`useKeyBindings` / `useResizable` / `useUIKitStorage`）/ Provider 装配（`useCoreUIKitProvider` / `useCoreUIKit` / `useProviderSideEffects`）
   - 24 个原子组件（Em* 基础组件集，含 story）+ theme CSS 变量（539 行）+ locale（含 `mergeLocaleMessages`，供场景包合并 i18n keys）+ constants + 通用 utils（logger / log-store / sdk-error / download / z-index / format-time / linkify）
   - core 版 `EmUIKitProvider` 容器（props 子集 + 场景无关共享副作用）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`）：`EasemobUIKitCoreResolver` / `EasemobUIKitCoreImports`
-- 对外 API 零回归：`@easemob/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。
+- 对外 API 零回归：`@easemob-community/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。

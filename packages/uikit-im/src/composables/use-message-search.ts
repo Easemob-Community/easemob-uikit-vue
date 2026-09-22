@@ -1,8 +1,8 @@
 import { type MaybeRef, computed, ref, toValue } from 'vue'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
-import { createLogger } from '@easemob/uikit-core'
+import { createLogger } from '@easemob-community/uikit-core'
 
 const logger = createLogger('UIKit:UseMessageSearch')
 

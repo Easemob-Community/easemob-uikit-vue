@@ -2,7 +2,7 @@
 
 > 如果你正在用 Vue 3 开发一个需要聊天能力的应用——不管是客服系统、社交产品、企业 OA 还是直播互动——这篇文章想告诉你一件事：**IM 界面这层，你真的不用自己写。**
 >
-> 环信 Vue3 UIKit（`@easemob/uikit-im`）是基于 `easemob-websdk`（SDK5）构建的 Vue 3 UI 组件库。它把「会话列表、聊天页、通讯录、群管理、消息收发、已读回执、主题、H5 适配」这些每个 IM 产品都要重做一遍的东西，做成了一套开箱即用的组件。本文所有截图都来自仓库自带 demo 的真实运行画面，没有任何 PS。
+> 环信 Vue3 UIKit（`@easemob-community/uikit-im`）是基于 `easemob-websdk`（SDK5）构建的 Vue 3 UI 组件库。它把「会话列表、聊天页、通讯录、群管理、消息收发、已读回执、主题、H5 适配」这些每个 IM 产品都要重做一遍的东西，做成了一套开箱即用的组件。本文所有截图都来自仓库自带 demo 的真实运行画面，没有任何 PS。
 
 ![PC 三栏整体效果](assets/promotion/01-overview-pc.png)
 
@@ -14,9 +14,9 @@
 // main.ts
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import UIKit from '@easemob/uikit-im'
-import '@easemob/uikit-im/websdk5' // 注册 SDK 适配器
-import '@easemob/uikit-im/theme'   // 引入主题样式
+import UIKit from '@easemob-community/uikit-im'
+import '@easemob-community/uikit-im/websdk5' // 注册 SDK 适配器
+import '@easemob-community/uikit-im/theme'   // 引入主题样式
 
 const app = createApp(App)
 app.use(createPinia())
@@ -139,7 +139,7 @@ demo 里就有现成的玩法示例：自定义名片消息、快捷回复面板
 ## 六、工程素质：给认真的人看的部分
 
 - **TypeScript strict 全量覆盖**，所有组件 props/emits 有完整类型与 API 文档（文档站由源码自动生成）。
-- **双 SDK 适配器架构**：`import '@easemob/uikit-im/websdk5'` 走 5.x；私有化部署换成 `import '@easemob/uikit-im/webim4'` 即可接 4.x——**UI 代码一行不改，产物物理隔离**（4.x 工程的 bundle 里搜不到任何 5.x 符号，已通过摇树验收）。
+- **双 SDK 适配器架构**：`import '@easemob-community/uikit-im/websdk5'` 走 5.x；私有化部署换成 `import '@easemob-community/uikit-im/webim4'` 即可接 4.x——**UI 代码一行不改，产物物理隔离**（4.x 工程的 bundle 里搜不到任何 5.x 符号，已通过摇树验收）。
 - **按需引入**：`unplugin-vue-components` + 官方 `EasemobUIKitResolver`，用哪个组件打包哪个。
 - **功能开关化**：联系人、黑名单、在线状态、草稿、@我、正在输入、已读回执……每个能力都有 `features` 开关，运行时切换即时生效。
 - **数据可插拔**：`dataSource` 允许业务方接管好友/黑名单/用户搜索等数据源，UIKit 的 UI 照跑。
@@ -150,7 +150,7 @@ demo 里就有现成的玩法示例：自定义名片消息、快捷回复面板
 ## 七、现在开始
 
 ```bash
-pnpm add @easemob/uikit-im pinia vue
+pnpm add @easemob-community/uikit-im pinia vue
 ```
 
 - 文档站（本地）：`pnpm -F @easemob/docs dev`

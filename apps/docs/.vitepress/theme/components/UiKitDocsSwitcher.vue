@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * 双 UIKit 文档切换器（顶部标题旁）：
- * 在「单群聊 UIKit」（@easemob/uikit-im）与「聊天室 UIKit」（@easemob/uikit-chatroom）
+ * 在「单群聊 UIKit」（@easemob-community/uikit-im）与「聊天室 UIKit」（@easemob-community/uikit-chatroom）
  * 两套文档之间切换。当前上下文由路由前缀判定：`/` 为单群聊，`/chatroom/` 为聊天室。
  * 小屏（≤960px）隐藏，此时切换入口由移动端菜单内的「语言」下拉承担。
  */

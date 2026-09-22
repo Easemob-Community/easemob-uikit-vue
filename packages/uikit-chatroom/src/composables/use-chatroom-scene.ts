@@ -1,6 +1,6 @@
 import { type MaybeRefOrGetter, computed, toValue, watch } from 'vue'
-import type { UiMessage } from '@easemob/uikit-core'
-import { MESSAGE_TYPE, getLocale, mergeLocaleMessages } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE, getLocale, mergeLocaleMessages } from '@easemob-community/uikit-core'
 import { CHATROOM_SCENE_NAME } from '../constants'
 import type { ChatroomSceneNameValue } from '../constants'
 

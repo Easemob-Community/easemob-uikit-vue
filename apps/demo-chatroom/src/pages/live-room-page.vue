@@ -24,7 +24,7 @@ import {
   useChatroom,
   useChatroomAttributes,
   useChatroomMessage,
-} from '@easemob/uikit-chatroom'
+} from '@easemob-community/uikit-chatroom'
 import type {
   LiveDanmakuItem,
   LiveDanmakuStreamProps,
@@ -33,8 +33,8 @@ import type {
   MemberJoinedPayload,
   SignalMessagePayload,
   SignalStatusPayload,
-} from '@easemob/uikit-chatroom'
-import { EmPopup, MESSAGE_TYPE, t, useToast } from '@easemob/uikit-core'
+} from '@easemob-community/uikit-chatroom'
+import { EmPopup, MESSAGE_TYPE, t, useToast } from '@easemob-community/uikit-core'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 
 const DEFAULT_ROOM_ID = '315874547400706'

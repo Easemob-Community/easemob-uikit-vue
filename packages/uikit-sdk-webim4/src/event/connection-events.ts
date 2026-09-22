@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import { createLogger, isKickErrorCode } from '@easemob/uikit-sdk-contract'
+import { createLogger, isKickErrorCode } from '@easemob-community/uikit-sdk-contract'
 import { setSyncStatus } from '../use-sync-status'
 
 const connLog = createLogger('UIKit:Webim4ConnEvents')

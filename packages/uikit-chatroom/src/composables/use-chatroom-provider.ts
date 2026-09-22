@@ -1,5 +1,5 @@
-import type { CoreStores, CoreUIKitContext, CoreUIKitInitConfig, CoreUIKitProviderOptions } from '@easemob/uikit-core'
-import { useCoreUIKitProvider } from '@easemob/uikit-core'
+import type { CoreStores, CoreUIKitContext, CoreUIKitInitConfig, CoreUIKitProviderOptions } from '@easemob-community/uikit-core'
+import { useCoreUIKitProvider } from '@easemob-community/uikit-core'
 import { registerChatroomEventHandlers } from '../sdk/event/chatroom-events'
 import type { ChatroomEventCallbacks } from '../sdk/event/chatroom-events'
 import { resolveChatroomSdkHost } from '../sdk/host'
@@ -8,7 +8,7 @@ import { useChatroomStore } from '../store/chatroom'
 import { setChatroomMessageUserInfoConfig } from '../config/message-user-info'
 import type { MessageUserInfoConfig } from '../config/message-user-info'
 
-// 构建期注入：@easemob/uikit-chatroom 包版本（vite define，见 vite.config.ts）
+// 构建期注入：@easemob-community/uikit-chatroom 包版本（vite define，见 vite.config.ts）
 declare const __EASEMOB_UIKIT_CHATROOM_VERSION__: string
 
 /**

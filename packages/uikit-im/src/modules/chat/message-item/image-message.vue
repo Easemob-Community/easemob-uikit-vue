@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
 import type { ComputedRef } from 'vue'
-import { useThemeStore } from '@easemob/uikit-core'
-import { INJECTION_KEY } from '@easemob/uikit-core'
-import { MESSAGE_EXT_KEY, MESSAGE_STATUS } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { EmIcon as Icon, EmImageViewer as ImageViewer } from '@easemob/uikit-core'
-import type { ImageMessageBody, UiMessage } from '@easemob/uikit-core'
+import { useThemeStore } from '@easemob-community/uikit-core'
+import { INJECTION_KEY } from '@easemob-community/uikit-core'
+import { MESSAGE_EXT_KEY, MESSAGE_STATUS } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { EmIcon as Icon, EmImageViewer as ImageViewer } from '@easemob-community/uikit-core'
+import type { ImageMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface ImageMessageProps {

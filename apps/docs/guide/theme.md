@@ -253,7 +253,7 @@ UIKit 暗色主题通过 `[data-uikit-theme="dark"]` 属性驱动，所有组件
 ThemeStore 支持 `light / dark / auto` 三种模式，`auto` 跟随系统 `prefers-color-scheme`：
 
 ```ts
-import { useTheme } from '@easemob/uikit-im'
+import { useTheme } from '@easemob-community/uikit-im'
 
 const { setMode, isDark } = useTheme()
 
@@ -266,7 +266,7 @@ setMode('auto')
 通过 `useTheme()` 组合式函数可以在运行时动态调整主题：
 
 ```ts
-import { useTheme } from '@easemob/uikit-im'
+import { useTheme } from '@easemob-community/uikit-im'
 
 const {
   primaryColor,
@@ -375,7 +375,7 @@ UIKit 内置 3 套预设主题档位，`setPreset()` 一键切换整套风格（
 | `fresh` | 150（清新绿） | ground 圆角 | 12px | comfortable | rounded |
 
 ```ts
-import { useTheme } from '@easemob/uikit-im'
+import { useTheme } from '@easemob-community/uikit-im'
 
 const { setPreset, preset } = useTheme()
 
@@ -390,7 +390,7 @@ setPrimaryColor(262)
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 </script>
 
 <template>

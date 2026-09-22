@@ -11,8 +11,8 @@ UIKIT 只负责全屏 overlay、入场 / 退场动画、自动移除与队列消
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveFullscreenEffect } from '@easemob/uikit-chatroom'
-import type { LiveFullscreenEffectItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveFullscreenEffect } from '@easemob-community/uikit-chatroom'
+import type { LiveFullscreenEffectItem } from '@easemob-community/uikit-chatroom'
 
 const effects = ref<LiveFullscreenEffectItem[]>([])
 // 收到礼物消息时 push：effects.value = [...effects.value, { id, kind: 'rocket', ... }]

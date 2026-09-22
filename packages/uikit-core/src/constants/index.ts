@@ -1,4 +1,4 @@
-// SDK-wire 中立常量已下沉 `@easemob/uikit-sdk-contract`（单一真相源），
+// SDK-wire 中立常量已下沉 `@easemob-community/uikit-sdk-contract`（单一真相源），
 // 此处 re-export 保持 core 既有导入路径与公开 API 兼容；UIKit 专属常量留在本文件。
 export {
   ACK_TYPE,
@@ -12,7 +12,7 @@ export {
   PRESENCE_STATUS,
   STREAM_CUSTOM_TYPE,
   STREAM_MESSAGE_STATUS,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 export type {
   AckTypeValue,
   ConversationTypeValue,
@@ -25,7 +25,7 @@ export type {
   PresenceStatusValue,
   StreamCustomTypeValue,
   StreamMessageStatusValue,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 
 /** Header 对齐方式常量 */
 export const HEADER_ALIGN = {

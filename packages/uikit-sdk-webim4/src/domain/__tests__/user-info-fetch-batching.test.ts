@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // 4.x SDK（easemob-websdk@4.x）入口在模块加载时访问 `self`，node 环境需在 jsdom 下运行
-import type { UserInfo } from '@easemob/uikit-sdk-contract'
+import type { UserInfo } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { Webim4Client } from '../../client'
 import type { UserInfoStoreLike } from '../../event/types'

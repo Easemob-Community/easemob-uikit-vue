@@ -4,8 +4,8 @@
  * 纯弹幕 headless）。每个入口说明「该页验证的 UIKit 能力」，演示变种哲学：
  * 场景 = 内置 preset config + 容器插槽，不 fork 内核。
  */
-import { useClient, useTheme } from '@easemob/uikit-core'
-import type { ThemeMode } from '@easemob/uikit-core'
+import { useClient, useTheme } from '@easemob-community/uikit-core'
+import type { ThemeMode } from '@easemob-community/uikit-core'
 
 const { currentUser, logout } = useClient()
 /** 主题切换（浅色 / 深色 / 跟随系统）——验证深色模式下各页面的变量适配 */

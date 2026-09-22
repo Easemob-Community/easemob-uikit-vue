@@ -5,7 +5,7 @@
  * 页面形态 = 正常聊天室 App：导航头 / 公告 / 消息流 / 输入条 / 成员面板。
  */
 import { ref } from 'vue'
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 
 /** 默认联调聊天室（用户提供）；可改 */

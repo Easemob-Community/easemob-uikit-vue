@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import type { UiGroup } from '@easemob/uikit-core'
+import { GROUP_MEMBER_ROLE } from '@easemob-community/uikit-core'
+import type { UiGroup } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
 import GroupDetail from './group-detail.vue'

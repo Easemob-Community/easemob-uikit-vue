@@ -8,8 +8,8 @@ import {
   isStreamActive,
   toConversationRecord,
   toMessageRecord,
-} from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue, SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import type { ConversationTypeValue, SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
@@ -448,7 +448,7 @@ export function createChatHandlers(
     },
 
     onMessage: (sdkMsg) => {
-      // 聊天室广播消息由 @easemob/uikit-chatroom 场景包处理（两包同装隔离，TECH-DEBT D97）：
+      // 聊天室广播消息由 @easemob-community/uikit-chatroom 场景包处理（两包同装隔离，TECH-DEBT D97）：
       // SDK ChatManager 不按 chatType 分流，若不在此忽略，聊天室消息会流入 IM 的
       // 会话/消息 store（按 conversationId 落库）与已读回执逻辑。
       // （wire 值经 core CONVERSATION_TYPE.CHATROOM 统一，P2 review 消除两包字面量漂移）

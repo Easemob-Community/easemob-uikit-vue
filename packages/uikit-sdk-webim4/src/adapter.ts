@@ -25,8 +25,8 @@ import type {
   UserInfoAttribute,
   UserInfoAttributeValue,
   UserInfoRepository,
-} from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, SDK_CONTRACT_VERSION, createLogger } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, SDK_CONTRACT_VERSION, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client, Webim4ConnectionParameters } from './client'
 import { createClient, setSdkLogLevel } from './client'
 import { MessageDomain } from './domain/message-domain'
@@ -147,7 +147,7 @@ function createClientStore(
   let hasConnectedOnce = false
   let kicked = false
 
-  function getConnectState(): import('@easemob/uikit-sdk-contract').ConnectState {
+  function getConnectState(): import('@easemob-community/uikit-sdk-contract').ConnectState {
     if (connecting)
       return 'connecting'
     if (connected)

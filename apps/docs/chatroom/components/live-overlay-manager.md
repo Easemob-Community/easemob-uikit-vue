@@ -11,8 +11,8 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveOverlayManager } from '@easemob/uikit-chatroom'
-import type { LiveOverlayItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveOverlayManager } from '@easemob-community/uikit-chatroom'
+import type { LiveOverlayItem } from '@easemob-community/uikit-chatroom'
 
 const overlayItems = ref<LiveOverlayItem[]>([])
 </script>

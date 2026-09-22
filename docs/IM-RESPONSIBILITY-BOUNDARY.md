@@ -15,11 +15,11 @@ UIKIT 的架构方向已到位（port-adapter + 多包 + 中立契约），接�
 ## 二、架构：五个包封顶，不再新增
 
 ```text
-@easemob/uikit-core          SDK 无关底座（theme/locale/原子组件/composable）
-@easemob/uikit-sdk-contract  中立契约（类型 + repository + SdkAdapter 接口）
-@easemob/uikit-im            IM 场景（会话/消息/联系人/群 UI + store + 交互）
-@easemob/uikit-sdk-websdk5   5.x adapter（唯一碰 SDK5 的地方）
-@easemob/uikit-sdk-webim4    4.x adapter（唯一碰 SDK4 的地方）
+@easemob-community/uikit-core          SDK 无关底座（theme/locale/原子组件/composable）
+@easemob-community/uikit-sdk-contract  中立契约（类型 + repository + SdkAdapter 接口）
+@easemob-community/uikit-im            IM 场景（会话/消息/联系人/群 UI + store + 交互）
+@easemob-community/uikit-sdk-websdk5   5.x adapter（唯一碰 SDK5 的地方）
+@easemob-community/uikit-sdk-webim4    4.x adapter（唯一碰 SDK4 的地方）
 ```
 
 **不再新增**：portal 层 / integration 层 / 统一消息总线 / OA 适配层——那些是 OA 底座的职责，不是 IM 的职责。多一层就多一份维护成本。

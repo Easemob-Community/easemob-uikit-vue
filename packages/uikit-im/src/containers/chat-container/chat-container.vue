@@ -3,8 +3,8 @@ import { computed, ref, useSlots } from 'vue'
 import Chat from '../../modules/chat/chat.vue'
 import { useUIKit } from '../../composables/use-uikit'
 import type { ChatConfig } from '../../modules/chat/types'
-import type { ForwardModeValue } from '@easemob/uikit-core'
-import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
+import type { ForwardModeValue } from '@easemob-community/uikit-core'
+import type { LocationMessageBody, UiMessage } from '@easemob-community/uikit-core'
 
 /** #user-card 插槽作用域 */
 export interface ChatContainerUserCardSlotScope {

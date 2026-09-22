@@ -1,5 +1,5 @@
 {
-  "name": "@easemob/uikit-im",
+  "name": "@easemob-community/uikit-im",
   "type": "module",
   "version": "3.7.10",
   "description": "Easemob UIKit Vue3 Components",
@@ -51,30 +51,30 @@
     "story:build": "histoire build"
   },
   "peerDependencies": {
-    "@easemob/uikit-sdk-webim4": "workspace:^",
-    "@easemob/uikit-sdk-websdk5": "workspace:^",
+    "@easemob-community/uikit-sdk-webim4": "workspace:^",
+    "@easemob-community/uikit-sdk-websdk5": "workspace:^",
     "pinia": "^2.1.0 || ^4.0.0",
     "vue": "^3.3.0"
   },
   "peerDependenciesMeta": {
-    "@easemob/uikit-sdk-webim4": {
+    "@easemob-community/uikit-sdk-webim4": {
       "optional": true
     },
-    "@easemob/uikit-sdk-websdk5": {
+    "@easemob-community/uikit-sdk-websdk5": {
       "optional": true
     }
   },
   "dependencies": {
-    "@easemob/uikit-core": "workspace:^",
-    "@easemob/uikit-sdk-contract": "workspace:^",
+    "@easemob-community/uikit-core": "workspace:^",
+    "@easemob-community/uikit-sdk-contract": "workspace:^",
     "@tiptap/extension-image": "^3.30.0",
     "@tiptap/starter-kit": "^3.30.0",
     "@tiptap/vue-3": "^3.30.0",
     "@vueuse/core": "^14.4.0"
   },
   "devDependencies": {
-    "@easemob/uikit-sdk-webim4": "workspace:^",
-    "@easemob/uikit-sdk-websdk5": "workspace:^",
+    "@easemob-community/uikit-sdk-webim4": "workspace:^",
+    "@easemob-community/uikit-sdk-websdk5": "workspace:^",
     "@histoire/plugin-vue": "^0.17.17",
     "@vitejs/plugin-vue": "^5.2.4",
     "histoire": "^0.17.17",

@@ -1,5 +1,5 @@
 import type { ChatManager, ChatRoomManager } from 'easemob-websdk'
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter } from '@easemob-community/uikit-sdk-contract'
 
 /**
  * 聊天室场景依赖的最小 SDK host 接口（本包本地定义，不依赖具体 adapter 包）。

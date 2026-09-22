@@ -4,8 +4,8 @@ import dts from 'vite-plugin-dts'
 
 /**
  * 辅助入口构建配置：为按需引入工具单独打包。
- * - @easemob/uikit-chatroom/resolver     -> EasemobUIKitChatroomResolver（unplugin-vue-components）
- * - @easemob/uikit-chatroom/auto-imports -> EasemobUIKitChatroomImports（unplugin-auto-import）
+ * - @easemob-community/uikit-chatroom/resolver     -> EasemobUIKitChatroomResolver（unplugin-vue-components）
+ * - @easemob-community/uikit-chatroom/auto-imports -> EasemobUIKitChatroomImports（unplugin-auto-import）
  *
  * 主构建（vite.config.ts）已输出完整组件库，这里只补充两个轻量子包，
  * 避免把它们合并进全量 bundle 导致 tree-shaking 不友好。

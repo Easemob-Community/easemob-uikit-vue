@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 
 function goDetail() {
   // 跳转联系人详情页
@@ -70,7 +70,7 @@ type PinyinAdapter = (text: string) => {
 
 ```ts
 import { pinyin } from 'pinyin-pro'
-import { setPinyinAdapter } from '@easemob/uikit-im'
+import { setPinyinAdapter } from '@easemob-community/uikit-im'
 
 setPinyinAdapter((text) => {
   const full = pinyin(text, { toneType: 'none', type: 'string', nonZh: 'consecutive' })
@@ -95,7 +95,7 @@ setPinyinAdapter((text) => {
 ### 配套能力
 
 - **拼音搜索**：注入 adapter 后，搜索框同时按完整拼音 / 首字母缩写匹配（`useContactFilter` / `useGroupFilter`）。
-- **清理缓存**：`resolvePinyin` 内部按文本缓存（上限 1000）。联系人备注 / 名称更新后可调用 `clearPinyinCache()`（同样从 `@easemob/uikit-im` 导出）刷新结果。
+- **清理缓存**：`resolvePinyin` 内部按文本缓存（上限 1000）。联系人备注 / 名称更新后可调用 `clearPinyinCache()`（同样从 `@easemob-community/uikit-im` 导出）刷新结果。
 - **群组列表**：群组子列表走同一机制，`group-sort-by="pinyin"` / `group-group-by="alphabet"`。
 
 ## 联系人详情 EmContactDetail
@@ -104,7 +104,7 @@ setPinyinAdapter((text) => {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider, EmContactDetail } from '@easemob/uikit-im'
+import { EmUIKitProvider, EmContactDetail } from '@easemob-community/uikit-im'
 
 function onSendMessage(userId: string) {
   // 跳转到与该联系人的单聊
@@ -165,8 +165,8 @@ function onRemarkChanged(userId: string, remark: string) {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider, EmContactNoticeList } from '@easemob/uikit-im'
-import type { UiContactInvite } from '@easemob/uikit-im'
+import { EmUIKitProvider, EmContactNoticeList } from '@easemob-community/uikit-im'
+import type { UiContactInvite } from '@easemob-community/uikit-im'
 
 function onAccept(invite: UiContactInvite) {
   // 接受成功（SDK 调用由组件内部完成）

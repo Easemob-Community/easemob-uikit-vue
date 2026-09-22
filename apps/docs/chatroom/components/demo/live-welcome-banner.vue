@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveWelcomeBanner } from '@easemob/uikit-chatroom'
+import { ChatroomLiveWelcomeBanner } from '@easemob-community/uikit-chatroom'
 
 const show = ref(false)
 const name = ref('E***')

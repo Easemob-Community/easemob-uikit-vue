@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
-import { EmButton as Button } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmEmojiPicker as EmojiPicker } from '@easemob/uikit-core'
-import type { EmojiStickerItem } from '@easemob/uikit-core'
+import { EmButton as Button } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmEmojiPicker as EmojiPicker } from '@easemob-community/uikit-core'
+import type { EmojiStickerItem } from '@easemob-community/uikit-core'
 import type { ChatConfig, MentionContact } from '../types'
 
 export interface H5InputProps {

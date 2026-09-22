@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
 import type { ComputedRef } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
-import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { INJECTION_KEY, useThemeStore } from '@easemob-community/uikit-core'
+import type { LocationMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface LocationMessageProps {

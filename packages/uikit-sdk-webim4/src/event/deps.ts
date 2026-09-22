@@ -1,4 +1,4 @@
-import type { ConversationTypeValue, NoticeEventTypeValue, UserInfo } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, NoticeEventTypeValue, UserInfo } from '@easemob-community/uikit-sdk-contract'
 import type { EventStores } from './types'
 
 /**

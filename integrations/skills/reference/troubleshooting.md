@@ -22,10 +22,10 @@
 
 ### 2. 提供下载入口
 
-`@easemob/uikit-im` 导出了 `exportPersistedLogs()`（返回导出的条数），业务方自行接一个按钮/调试面板：
+`@easemob-community/uikit-im` 导出了 `exportPersistedLogs()`（返回导出的条数），业务方自行接一个按钮/调试面板：
 
 ```ts
-import { exportPersistedLogs } from '@easemob/uikit-im'
+import { exportPersistedLogs } from '@easemob-community/uikit-im'
 
 async function downloadLogs() {
   const count = await exportPersistedLogs()

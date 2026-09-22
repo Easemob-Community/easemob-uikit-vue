@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { EmCheckbox as Checkbox, FORWARD_MODE, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, useToast } from '@easemob/uikit-core'
-import type { ForwardModeValue, UiMessage } from '@easemob/uikit-core'
+import { EmCheckbox as Checkbox, FORWARD_MODE, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, useToast } from '@easemob-community/uikit-core'
+import type { ForwardModeValue, UiMessage } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 
 export interface MultiSelectBarEmits {

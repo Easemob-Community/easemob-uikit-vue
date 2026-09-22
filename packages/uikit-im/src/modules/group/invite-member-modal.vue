@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useContact } from '../../composables/use-contact'
-import { useViewport } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmButton as Button } from '@easemob/uikit-core'
+import { useViewport } from '@easemob-community/uikit-core'
+import { EmPopup as Popup } from '@easemob-community/uikit-core'
+import { EmButton as Button } from '@easemob-community/uikit-core'
 import ContactList from '../contact/contact-list.vue'
-import type { UiContact } from '@easemob/uikit-core'
+import type { UiContact } from '@easemob-community/uikit-core'
 
 export interface InviteMemberModalProps {
   show: boolean

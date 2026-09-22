@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmButton as Button, EmEmpty as Empty, EmInput as Input, EmModal as Modal, useLocale } from '@easemob/uikit-core'
-import type { UiContact } from '@easemob/uikit-core'
+import { EmButton as Button, EmEmpty as Empty, EmInput as Input, EmModal as Modal, useLocale } from '@easemob-community/uikit-core'
+import type { UiContact } from '@easemob-community/uikit-core'
 import { useContact } from '../../composables/use-contact'
 import ContactList from './contact-list.vue'
 import ContactItemDefault from './contact-item-default.vue'

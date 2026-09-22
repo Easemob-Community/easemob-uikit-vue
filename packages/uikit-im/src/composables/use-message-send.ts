@@ -1,7 +1,7 @@
-import type { CustomMessageBody, TextMessageBody, UiMessage } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { ConversationTypeValue } from '@easemob/uikit-core'
-import { createLogger } from '@easemob/uikit-core'
+import type { CustomMessageBody, TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { ConversationTypeValue } from '@easemob-community/uikit-core'
+import { createLogger } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 
 const logger = createLogger('UIKit:UseMessageSend')

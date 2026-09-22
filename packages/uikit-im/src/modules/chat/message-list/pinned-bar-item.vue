@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { TextMessageBody, UiMessage } from '@easemob/uikit-core'
+import type { TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
 
 export interface PinnedBarItemProps {
   /** 置顶消息 */

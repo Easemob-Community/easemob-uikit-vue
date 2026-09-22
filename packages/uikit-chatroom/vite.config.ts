@@ -49,10 +49,10 @@ export default defineConfig({
         insertTypesEntry: true,
         outDir: 'dist',
         exclude: ['*.config.ts'],
-        // tsconfig paths 把 @easemob/uikit-core 映射到 core src，不做排除时
+        // tsconfig paths 把 @easemob-community/uikit-core 映射到 core src，不做排除时
         // d.ts 会把 core 符号的模块说明符展开成 ../../uikit-core/src 相对路径，
         // 发布给消费者后该路径不存在导致类型断裂；保持裸包名，类型经 core dist 的 d.ts 解析。
-        aliasesExclude: ['@easemob/uikit-core'],
+        aliasesExclude: ['@easemob-community/uikit-core'],
       })]
       : []),
   ],
@@ -65,7 +65,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // 四件套 external：消费端永远只有一份 websdk / core 实例（连接与事件总线不分裂）
-      external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-core'],
+      external: ['vue', 'pinia', 'easemob-websdk', '@easemob-community/uikit-core'],
       output: {
         exports: 'named',
         globals: {
@@ -73,7 +73,7 @@ export default defineConfig({
           'pinia': 'Pinia',
           'easemob-websdk': 'Easemob',
           // core 的 UMD 全局名（core vite.config lib.name = 'EasemobUIKitCore'）
-          '@easemob/uikit-core': 'EasemobUIKitCore',
+          '@easemob-community/uikit-core': 'EasemobUIKitCore',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css')
@@ -90,7 +90,7 @@ export default defineConfig({
       // theme @import 必须内联 core 的 dist 产物（与 uikit-im 同一约定，理由见其 vite.config）：
       // core src/theme/index.css 只有变量表，内联它会让 chatroom theme 缺 core 组件 scoped 样式。
       // 注意：这要求 core 先构建（core 为 chatroom 的 workspace:^ 依赖，pnpm -r build 已自动排序）。
-      '@easemob/uikit-core/theme': resolve(__dirname, '../uikit-core/dist/theme/index.css'),
+      '@easemob-community/uikit-core/theme': resolve(__dirname, '../uikit-core/dist/theme/index.css'),
       '@': resolve(__dirname, 'src'),
     },
   },

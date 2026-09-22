@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UIKitProvider from './uikit-provider.vue'
-import { useToast } from '@easemob/uikit-core'
+import { useToast } from '@easemob-community/uikit-core'
 
 /**
  * uikit-im Provider 冒烟 story：场景版完整能力覆盖已随迁 core

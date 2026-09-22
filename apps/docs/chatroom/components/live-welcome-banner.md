@@ -10,7 +10,7 @@ VIP 用户带皇冠图标 + 用户名高亮；入场从左侧滑入（400ms）�
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveWelcomeBanner } from '@easemob/uikit-chatroom'
+import { ChatroomLiveWelcomeBanner } from '@easemob-community/uikit-chatroom'
 
 // 收到成员加入事件（容器 member-joined / useChatroomMember 订阅）时触发
 const show = ref(false)

@@ -1,4 +1,4 @@
-// @easemob/uikit-core 共享基座入口
+// @easemob-community/uikit-core 共享基座入口
 // P1 Step 1 已迁入：sdk 基座层（client / wire 类型 / user-info & presence domain /
 // 连接级事件 / notice 工具）、store（client/theme/user-info/presence）、
 // composables/types（Provider 契约）、constants、locale、通用 utils（logger/log-store/

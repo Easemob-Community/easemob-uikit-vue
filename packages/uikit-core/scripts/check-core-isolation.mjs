@@ -1,5 +1,5 @@
 /**
- * 校验 @easemob/uikit-core 的包隔离：core 内禁止依赖任何场景包。
+ * 校验 @easemob-community/uikit-core 的包隔离：core 内禁止依赖任何场景包。
  *
  * 背景：三包架构（docs/CHATROOM-UIKIT-DESIGN.md / TECH-DEBT D97）约定依赖方向
  * 只能是 场景包 → core；core 一旦反向依赖场景包（uikit-im / uikit-chatroom），
@@ -8,8 +8,8 @@
  *
  * 校验范围：core 的 src/scripts 下全部 .ts/.vue/.mjs/.js 文件。
  * 违规模式：
- *   1. import ... from '@easemob/uikit-im' / '@easemob/uikit-chatroom'
- *   2. import('@easemob/uikit-im') 等动态 import
+ *   1. import ... from '@easemob-community/uikit-im' / '@easemob-community/uikit-chatroom'
+ *   2. import('@easemob-community/uikit-im') 等动态 import
  *   3. 相对路径越界引用（../uikit-im、../../uikit-im 等）
  * 注释/文档字符串里的包名提及不算违规（如「场景包（uikit-im 等）」说明文字）。
  *

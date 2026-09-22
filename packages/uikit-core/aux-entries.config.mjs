@@ -4,7 +4,7 @@
  * chatroom 等后续场景包按同一模式配置即可）。
  */
 export default {
-  pkgName: '@easemob/uikit-core',
+  pkgName: '@easemob-community/uikit-core',
   resolverName: 'EasemobUIKitCoreResolver',
   importsName: 'EasemobUIKitCoreImports',
   prefix: 'Em',

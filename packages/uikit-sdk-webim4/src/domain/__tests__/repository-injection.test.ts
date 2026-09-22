@@ -7,8 +7,8 @@ import type {
   UiGroup,
   UiPresence,
   UserInfo,
-} from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { Webim4Client } from '../../client'
 import type { ConversationStoreLike } from '../conversation-domain'

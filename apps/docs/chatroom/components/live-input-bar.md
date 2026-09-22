@@ -9,7 +9,7 @@
 
 ```vue
 <script setup lang="ts">
-import { ChatroomLiveInputBar } from '@easemob/uikit-chatroom'
+import { ChatroomLiveInputBar } from '@easemob-community/uikit-chatroom'
 
 function sendText(text: string) { /* 发送（useChatroomMessage().sendText） */ }
 </script>

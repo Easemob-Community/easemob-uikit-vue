@@ -3,7 +3,7 @@
  * 直播评论抽奖入口（右侧顶部偏下，P4 review UI 规范）：
  * 黄色方形按钮，对话气泡 + 礼物图标，文字「评论抽奖」白色。
  */
-import { t } from '@easemob/uikit-core'
+import { t } from '@easemob-community/uikit-core'
 
 const emit = defineEmits<{
   /** 点击抽奖入口 */

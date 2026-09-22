@@ -15,9 +15,9 @@ import {
   isVideoBody as isVideoMessageBody,
   isVoiceBody as isVoiceMessageBody,
   normalizeUserId,
-} from '@easemob/uikit-sdk-contract'
-import type { CombineMessageBody, ConversationTypeValue, MessagePreviewLabels, UiMessage } from '@easemob/uikit-sdk-contract'
-import { customEventPreviewMap, mergeMessagePreviewLabels } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import type { CombineMessageBody, ConversationTypeValue, MessagePreviewLabels, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import { customEventPreviewMap, mergeMessagePreviewLabels } from '@easemob-community/uikit-sdk-contract'
 
 const adapterLog = createLogger('UIKit:MessageAdapter')
 
@@ -43,7 +43,7 @@ export const defaultAdapterPreviewLabels: MessagePreviewLabels = {
  * P2 review 上提至 core（uikit-im / uikit-chatroom 共用），此处 re-export
  * 保持既有导入路径兼容（本包 6 处使用点无需改动）。
  */
-export { normalizeUserId } from '@easemob/uikit-sdk-contract'
+export { normalizeUserId } from '@easemob-community/uikit-sdk-contract'
 
 /**
  * 从 custom 消息 body 中提取 event 字段。

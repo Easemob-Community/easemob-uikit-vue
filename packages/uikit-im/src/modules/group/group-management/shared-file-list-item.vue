@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface SharedFileListItemProps {

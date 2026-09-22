@@ -4,11 +4,11 @@ import dts from 'vite-plugin-dts'
 
 /**
  * 辅助入口构建配置：为按需引入工具单独打包。
- * - @easemob/uikit-im/resolver     -> EasemobUIKitResolver（unplugin-vue-components）
- * - @easemob/uikit-im/auto-imports -> EasemobUIKitImports（unplugin-auto-import）
- * - @easemob/uikit-im/websdk5      -> SDK5 默认适配器注册入口（D122 决策 22 子路径入口，
+ * - @easemob-community/uikit-im/resolver     -> EasemobUIKitResolver（unplugin-vue-components）
+ * - @easemob-community/uikit-im/auto-imports -> EasemobUIKitImports（unplugin-auto-import）
+ * - @easemob-community/uikit-im/websdk5      -> SDK5 默认适配器注册入口（D122 决策 22 子路径入口，
  *   import 即注册默认 adapter；主入口保持零 adapter 静态引用以保 4.x 下游摇树隔离）
- * - @easemob/uikit-im/webim4       -> webim4（SDK 4.x）默认适配器注册入口（镜像 websdk5，
+ * - @easemob-community/uikit-im/webim4       -> webim4（SDK 4.x）默认适配器注册入口（镜像 websdk5，
  *   反向同理：5.x 下游不会带进 4.x adapter 与 easemob-websdk@4.x）
  *
  * 主构建（vite.config.ts）已输出完整组件库，这里只补充轻量子包，
@@ -37,7 +37,7 @@ export default defineConfig({
     rollupOptions: {
       // resolver/auto-imports 是纯工具函数；websdk5/webim4 入口仅做注册转发，
       // adapter 与 core 均为外置依赖（optional peer / workspace dep），不打进本产物
-      external: ['@easemob/uikit-sdk-websdk5', '@easemob/uikit-sdk-webim4', '@easemob/uikit-core'],
+      external: ['@easemob-community/uikit-sdk-websdk5', '@easemob-community/uikit-sdk-webim4', '@easemob-community/uikit-core'],
     },
     outDir: 'dist',
     // 必须保留主构建产物，不能清空 dist

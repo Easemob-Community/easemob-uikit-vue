@@ -6,7 +6,7 @@
  *
  * sink 无条件触发（不跟随 console 输出级别），保证 debug 日志也能落库。
  */
-import { appendLog, setLogCollector, setLogFilePrefix } from '@easemob/uikit-core'
+import { appendLog, setLogCollector, setLogFilePrefix } from '@easemob-community/uikit-core'
 
 // 保持既有下载日志文件名语义（easemob-uikit-im-logs-<时间戳>.log）
 setLogFilePrefix('easemob-uikit-im')

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, defineComponent } from 'vue'
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter } from '@easemob-community/uikit-sdk-contract'
 import { useCoreUIKitProvider } from '../../composables/use-uikit'
 import type { UIKitDataSource } from '../../composables/types'
 import PresenceAvatar from './presence-avatar.vue'

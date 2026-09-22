@@ -2,7 +2,7 @@ import type { useMessageStore } from '../store/message'
 import type { useConversationStore } from '../store/conversation'
 import type { useContactStore } from '../store/contact'
 import type { useGroupStore } from '../store/group'
-import type { useClientStore, usePresenceStore, useUserInfoStore } from '@easemob/uikit-core'
+import type { useClientStore, usePresenceStore, useUserInfoStore } from '@easemob-community/uikit-core'
 
 /**
  * UIKit 事件/域可访问的 Pinia Store 集合（场景层完整类型）。

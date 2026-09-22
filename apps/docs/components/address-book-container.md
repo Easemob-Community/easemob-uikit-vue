@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 
 const customEntries = [
   { key: 'blacklist', label: '黑名单', icon: 'people/person_remove', count: 2 },

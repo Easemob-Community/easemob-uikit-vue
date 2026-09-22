@@ -40,7 +40,7 @@ const off = subscribe((messages) => {
 ## 完整示例：自绘弹幕轨道
 
 ```ts
-import { useChatroom, useChatroomMessage } from '@easemob/uikit-chatroom'
+import { useChatroom, useChatroomMessage } from '@easemob-community/uikit-chatroom'
 
 // 1) 初始化（App 级一次）
 useChatroomProvider({ appKey: 'orgName#appName' })

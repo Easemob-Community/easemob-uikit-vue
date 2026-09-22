@@ -1,13 +1,13 @@
 # AGENTS 规则（easemob-uikit-vue）
 
-本文件是仓库协作规则与 skill 路由入口。`easemob-uikit-vue` 是基于 `easemob-websdk`(websdk2 / SDK5) 的 Vue3 UIKit（pnpm workspace，核心包 `@easemob/uikit-im`）。
+本文件是仓库协作规则与 skill 路由入口。`easemob-uikit-vue` 是基于 `easemob-websdk`(websdk2 / SDK5) 的 Vue3 UIKit（pnpm workspace，核心包 `@easemob-community/uikit-im`）。
 
 ## 高优先级规则
 
 - 协作沟通、计划、变更说明默认**中文**；对外组件 API / props / emits 的注释与文档尽量中英双语。
 - 修改后**必须先验证再提交**：验证门禁是**类型检查 + 构建**，不是 lint 全绿。
-  - 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）
-  - 构建：`pnpm -F @easemob/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
+  - 类型检查：`pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误）
+  - 构建：`pnpm -F @easemob-community/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
   - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`
 - **版本号同步**：`packages/uikit-im/package.json` 的 `version` 必须与根 `CHANGELOG.md` 最新版本段一致；发版/改版本号后提交前跑 `pnpm changelog:check`（唯一版本数据源是根 CHANGELOG，文档站 changelog 页通过 tabs 引入按包自动拆分的生成文件，禁止手写版本段）。
 - 每次 `git commit` 的 message 用**中文**；**不主动 `git push`**，不做其它 git 变更（reset/rebase/force 等），除非用户明确要求，且每次都需再确认。
@@ -25,7 +25,7 @@
 - eslint 是 `@antfu/eslint-config` **flat config**（根 `eslint.config.js`）：**`--ext` 无效**，直接传文件/目录路径。
 - `no-console` 允许 `warn`/`error`，只禁 `log/info/debug`；`**/*.story.vue` 已放开 console/alert。
 - 公开事件统一 **kebab-case**，由 `vue/custom-event-name-casing: ['error','kebab-case']` 强制。
-- **demo 运行时走 vite alias `@easemob/uikit-im` → `packages/uikit-im/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。demo 当前为 workspace 源码直连模式（tgz 验证模式已于 1.9.0 收回，切换细节见 skill `uikit-demo-development`）。
+- **demo 运行时走 vite alias `@easemob-community/uikit-im` → `packages/uikit-im/src`**（源码），改 src 刷新即生效，无需重建 dist；但 demo 的 `vue-tsc` 解析的是已构建 dist 类型，改公开 API 后要重建 dist 才能让 demo 类型检查一致。demo 当前为 workspace 源码直连模式（tgz 验证模式已于 1.9.0 收回，切换细节见 skill `uikit-demo-development`）。
 - **SDK 双引入模式**：`easemob-websdk` 子包依赖声明恒为 `^5.0.0`（生产/发布，跟随 5.x 正式版与 beta 线）；本地 tgz 联调用 `pnpm sdk:use-tgz` / `pnpm sdk:use-npm` 切换（根 `package.json` 的 `pnpm.overrides` 指向根目录 `easemob-websdk-5.0.0.tgz`，切换后需 `pnpm install`）；`pnpm sdk:up` 更新到 range 内最新 SDK，`pnpm sdk:status` 查看当前模式。详见根 README「SDK 引入模式」与 skill `uikit-release-build`。
 - **resolver/auto-imports 参数化生成**：core 与 uikit-im 的 `src/resolver.ts` / `src/auto-imports.ts` 均由 `packages/uikit-core/scripts/gen-aux-entries.mjs` 按包根 `aux-entries.config.mjs` 生成，**勿手改**；改动 composables 导出后跑 `pnpm -F <pkg> aux:gen`，build 前置 `--check` 卡漂移。
 - macOS 自带 bash 3.2 无 `mapfile`。
@@ -75,16 +75,16 @@
 - Demo 开发者友好模式预研：[DEMO-DEV-MODE-RESEARCH.md](docs/DEMO-DEV-MODE-RESEARCH.md)（对应 TECH-DEBT D87）
 - 面性图标集接入方案预研（iconStyle 主题切换 + 选中态配对）：[ICON-STYLE-SYSTEM-RESEARCH.md](docs/ICON-STYLE-SYSTEM-RESEARCH.md)（对应 TECH-DEBT D90）
 - 流式消息接入设计执行计划（内核薄 + 插件厚，AI/markdown 走插件）：[STREAMING-MESSAGE-PLAN.md](docs/STREAMING-MESSAGE-PLAN.md)（对应 TECH-DEBT D95）
-- 聊天室 UIKit 设计规划（独立场景包 `@easemob/uikit-chatroom` + 抽共享基座 `@easemob/uikit-core` + 场景预设变种，H5-first）：[CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob/uikit-im` 1.x 开发完后启动）
+- 聊天室 UIKit 设计规划（独立场景包 `@easemob-community/uikit-chatroom` + 抽共享基座 `@easemob-community/uikit-core` + 场景预设变种，H5-first）：[CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob-community/uikit-im` 1.x 开发完后启动）
 - Chat 抽屉三种接管能力设计执行计划（整块 `#drawer` + 部分 `drawer-*` + 自绘壳 `EmChatDrawer`）：[CHAT-DRAWER-EXTENSION-PLAN.md](docs/CHAT-DRAWER-EXTENSION-PLAN.md)（对应 TECH-DEBT D119）
 - uikit-im 组件插槽/Props 可控性反向评估（会话列表弹窗、名片弹窗、消息操作菜单等缺口矩阵）：[UIIM-CAPABILITY-REVIEW.md](docs/UIIM-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D120）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：[CONSUMER-VALIDATION-CHECKLIST.md](docs/CONSUMER-VALIDATION-CHECKLIST.md)
-- SDK 适配层 + 数据入口层抽象设计执行计划（双 adapter `websdk5`/`webim4` + 中立契约 `@easemob/uikit-sdk-contract` + repository 数据入口 + 能力映射/语义归一化，一套 UI 产物切 SDK 不重来、数据来源可插拔，对应 4.x 私有化低成本切换 + Electron 持久化）：[SDK-ADAPTER-ABSTRACTION-PLAN.md](docs/SDK-ADAPTER-ABSTRACTION-PLAN.md)（对应 TECH-DEBT D122，联动 D85）
+- SDK 适配层 + 数据入口层抽象设计执行计划（双 adapter `websdk5`/`webim4` + 中立契约 `@easemob-community/uikit-sdk-contract` + repository 数据入口 + 能力映射/语义归一化，一套 UI 产物切 SDK 不重来、数据来源可插拔，对应 4.x 私有化低成本切换 + Electron 持久化）：[SDK-ADAPTER-ABSTRACTION-PLAN.md](docs/SDK-ADAPTER-ABSTRACTION-PLAN.md)（对应 TECH-DEBT D122，联动 D85）
 - **SDK 源码参考（D122 双 adapter 专用，只读）**：4.x `easemob-websdk@4.24.2` 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（入口 `src/entry.ts`）；5.x 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。仓库内软链锚点 `tmp/sdk-ref/websdk4|websdk5`（`tmp/` 已 gitignore，仅本机有效；rg/Grep 默认不跟随软链，搜索请直接用绝对路径）。核对两代 SDK 的 API/wire/事件行为时直接进对应源码核实，禁止凭记忆
 - 微前端 OA 基座宿主兼容性预研（集成形态选择 + 单例作用域/主题作用域/window 副作用/SDK 单例与卸载 4 点风险清单 + 与 D122 决策 17–20 衔接）：[MICRO-FRONTEND-COMPATIBILITY.md](docs/MICRO-FRONTEND-COMPATIBILITY.md)（对应 TECH-DEBT D125）
 - IM 职责边界与 OA↔UIKIT 接入契约（五包封顶 + 扩展点复用 + 不做清单 + 接入契约 + 按触发点落地）：[IM-RESPONSIBILITY-BOUNDARY.md](docs/IM-RESPONSIBILITY-BOUNDARY.md)（对应 TECH-DEBT D126）
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
-- 共享基座包源码：`packages/uikit-core/src`（`@easemob/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
+- 共享基座包源码：`packages/uikit-core/src`（`@easemob-community/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob-community/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
 - 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
 - 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）
-- 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）
+- 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob-community/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）

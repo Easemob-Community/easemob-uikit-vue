@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
-import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
-import type { GroupMemberRoleValue } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmPopup as Popup } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { useToast } from '@easemob-community/uikit-core'
+import { GROUP_MEMBER_ROLE } from '@easemob-community/uikit-core'
+import type { GroupMemberRoleValue } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useContact } from '../../composables/use-contact'
-import type { UiGroupMember } from '@easemob/uikit-core'
-import type { PresenceDisplayStatus } from '@easemob/uikit-core'
+import type { UiGroupMember } from '@easemob-community/uikit-core'
+import type { PresenceDisplayStatus } from '@easemob-community/uikit-core'
 
 interface Props {
   member: UiGroupMember

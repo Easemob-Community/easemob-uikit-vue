@@ -46,7 +46,7 @@
 
 - 绑定胶水：`packages/uikit-im/src/utils/logger-binding.ts`（side-effect 引入，`source: 'uikit'`，前缀 `easemob-uikit-im`）。
 - Provider 配置入口：`packages/uikit-core/src/composables/use-provider-side-effects.ts`，`logger` prop 键：`enabled / collectSdkLog / uikitLevel / sdkLevel / maxEntries / retentionDays`。
-- 导出：`exportPersistedLogs` 从 `@easemob/uikit-im` 导出（`packages/uikit-im/src/index.ts`），浏览器触发下载，文件名 `easemob-uikit-im-logs-<时间戳>.log`。
+- 导出：`exportPersistedLogs` 从 `@easemob-community/uikit-im` 导出（`packages/uikit-im/src/index.ts`），浏览器触发下载，文件名 `easemob-uikit-im-logs-<时间戳>.log`。
 - SDK 日志捕获：`packages/uikit-sdk-websdk5/src/utils/sdk-log-capture.ts`——注入 `setLogger` 优先、console 拦截兜底，开启时把 SDK 级别提升到 DEBUG。
 - **webim4 缺口**：`packages/uikit-sdk-webim4/src/client.ts` 仅有 `setSdkLogLevel`；官方钩子 `WebIM.logger.onLog` 尚未接入（源码附注明确「后续直接用，勿再包一层拦截」）→ 4.x 适配下导出文件**没有 sdk 源**，不是配置失效。
 

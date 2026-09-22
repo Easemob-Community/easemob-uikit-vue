@@ -5,7 +5,7 @@ import {
   t,
   useCoreUIKit,
   useToast,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 import { CHATROOM_MEMBER_ROLE, CHATROOM_PERMISSION } from '../constants'
 import type { ChatroomPermissionValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'

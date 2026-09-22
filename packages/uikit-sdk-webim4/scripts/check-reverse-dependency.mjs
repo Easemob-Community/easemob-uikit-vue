@@ -1,12 +1,12 @@
 /**
- * 校验 @easemob/uikit-sdk-webim4 的反向依赖隔离。
+ * 校验 @easemob-community/uikit-sdk-webim4 的反向依赖隔离。
  *
- * 背景：adapter 是中立契约的实现层，必须只依赖契约（@easemob/uikit-sdk-contract）
+ * 背景：adapter 是中立契约的实现层，必须只依赖契约（@easemob-community/uikit-sdk-contract）
  * 和具体 SDK（easemob-websdk），禁止反向依赖上层 UI 包（uikit-im / uikit-core / uikit-chatroom）。
  * 否则切 SDK 时 UI 产物会被 adapter 反向拉回来，摇树失效，违背 D122 架构。
  *
  * 规则：
- *   1. 禁止 import ... from '@easemob/uikit-im' / '@easemob/uikit-core' / '@easemob/uikit-chatroom'（值 + 类型）
+ *   1. 禁止 import ... from '@easemob-community/uikit-im' / '@easemob-community/uikit-core' / '@easemob-community/uikit-chatroom'（值 + 类型）
  *   2. 禁止动态 import 上述包
  *   3. 禁止相对路径越界引用到 uikit-im / uikit-core / uikit-chatroom 源码
  *
@@ -22,9 +22,9 @@ const extensions = ['.ts', '.vue', '.mjs', '.js']
 
 // 禁止反向依赖的场景包说明符（含子路径）
 const forbiddenSpecifiers = [
-  '@easemob/uikit-im',
-  '@easemob/uikit-core',
-  '@easemob/uikit-chatroom',
+  '@easemob-community/uikit-im',
+  '@easemob-community/uikit-core',
+  '@easemob-community/uikit-chatroom',
 ]
 
 const importTypePatterns = forbiddenSpecifiers.map(specifier => ({
@@ -90,7 +90,7 @@ for (const dir of scanDirs) {
 if (violations.length > 0) {
   console.error(`\n[check-reverse-dependency] adapter 反向依赖违规 ${violations.length} 处：禁止依赖 uikit-im / uikit-core / uikit-chatroom：`)
   violations.forEach(v => console.error(`  - ${v}`))
-  console.error('\nadapter 只应依赖 @easemob/uikit-sdk-contract 与具体 SDK；UI 层由下游注入。\n')
+  console.error('\nadapter 只应依赖 @easemob-community/uikit-sdk-contract 与具体 SDK；UI 层由下游注入。\n')
   process.exit(1)
 }
 console.log('✓ adapter 反向依赖校验通过（无 UI 层反向依赖）')

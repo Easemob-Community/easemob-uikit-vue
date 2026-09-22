@@ -1,5 +1,5 @@
-import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob/uikit-sdk-contract'
-import { MESSAGE_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
+import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob-community/uikit-sdk-contract'
+import { MESSAGE_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
 

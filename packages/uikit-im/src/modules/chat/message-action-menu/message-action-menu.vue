@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import type { MessageActionItem } from '../types'
 
 export interface MessageActionMenuProps {

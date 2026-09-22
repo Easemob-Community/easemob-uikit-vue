@@ -3,7 +3,7 @@
  * 聊天室顶部栏（H5-first）：返回 + 房间名 + 在线人数（点击开成员面板）+ 退出。
  * 全部区域可经容器命名插槽覆盖（header / header-title / header-extra）。
  */
-import { EmIconButton, t } from '@easemob/uikit-core'
+import { EmIconButton, t } from '@easemob-community/uikit-core'
 
 export interface ChatroomHeaderProps {
   /** 房间名称（未进房时展示 roomId 或空态） */

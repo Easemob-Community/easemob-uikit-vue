@@ -6,7 +6,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider, EmGroupManagementSection } from '@easemob/uikit-im'
+import { EmUIKitProvider, EmGroupManagementSection } from '@easemob-community/uikit-im'
 </script>
 
 <template>

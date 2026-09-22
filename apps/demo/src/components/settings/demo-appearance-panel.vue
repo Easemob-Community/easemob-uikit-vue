@@ -17,7 +17,7 @@ import {
   useLocale,
   useTheme,
   useUIKit,
-} from '@easemob/uikit-im'
+} from '@easemob-community/uikit-im'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import './demo-settings-common.css'
 

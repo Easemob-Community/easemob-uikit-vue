@@ -8,7 +8,7 @@
  *   麦位变更对全房间实时可见（直播间卖点：无需自建服务端）。
  */
 import { computed } from 'vue'
-import { normalizeUserId, t, useClient, useToast } from '@easemob/uikit-core'
+import { normalizeUserId, t, useClient, useToast } from '@easemob-community/uikit-core'
 import { CHATROOM_ATTR_PREFIX, CHATROOM_MIC_QUEUE_SEAT_COUNT } from '../../../constants'
 import { useChatroomAttributes } from '../../../composables/use-chatroom-attributes'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'

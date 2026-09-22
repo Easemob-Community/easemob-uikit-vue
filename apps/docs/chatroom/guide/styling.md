@@ -1,6 +1,6 @@
 # 样式定制
 
-聊天室 UIKit 复用 `@easemob/uikit-core` 的**主题体系**（CSS 变量 + 暗色模式），
+聊天室 UIKit 复用 `@easemob-community/uikit-core` 的**主题体系**（CSS 变量 + 暗色模式），
 并在弹幕流等组件上额外开放了**组件级 CSS 变量 token**。定制方式分四层，
 按优先级从低到高：
 

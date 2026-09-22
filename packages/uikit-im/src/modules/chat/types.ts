@@ -6,7 +6,7 @@ import type {
   UiGroup,
   UiGroupMember,
   UiMessage,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 import type { LastMessageTextResolver } from '../../utils/resolve-last-message-text'
 
 /** 消息气泡布局模式 */

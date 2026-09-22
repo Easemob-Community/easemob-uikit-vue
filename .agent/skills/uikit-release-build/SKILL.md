@@ -24,8 +24,8 @@
 
 ## 1. 验证门禁（提交前必做，AGENTS 规则）
 
-- 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）；
-- 构建：`pnpm -F @easemob/uikit-im build`（约 9s，链路见 §2）；
+- 类型检查：`pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误）；
+- 构建：`pnpm -F @easemob-community/uikit-im build`（约 9s，链路见 §2）；
 - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`；
 - **demo 运行时走 vite alias 直连 `packages/uikit-im/src` 源码**（改 src 刷新即生效），
   但 demo 的 `vue-tsc` 解析的是**已构建的 dist 类型**——改公开 API（props/emits/导出）后
@@ -47,20 +47,20 @@
 `src/auto-imports.ts` 产物，--check 校验漂移；改动 composables 导出后跑 `aux:gen` 重新生成）→
 `vite build`（主库）→ `vite build --config vite.aux.config.ts`
 （轻量子包）→ `vue-tsc --emitDeclarationOnly --project tsconfig.build.json`（类型产物）。
-d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `aliasesExclude`，
+d.ts 对 core 的引用保持裸包名 `@easemob-community/uikit-core`（vite-plugin-dts `aliasesExclude`，
 防止 tsconfig paths 把它展开成 `../../uikit-core/src` 相对路径）。
 
 ### 2.2 主构建（vite.config.ts）
 
 - lib entry `src/index.ts`，formats `['es', 'umd']`，fileName `easemob-uikit-im.js` /
   `easemob-uikit-im.umd.cjs`，全局名 `EasemobUIKit`；
-- `external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-core']`（配合 peerDependencies /
+- `external: ['vue', 'pinia', 'easemob-websdk', '@easemob-community/uikit-core']`（配合 peerDependencies /
   core 基座外置，P1 Step 4 起原子组件/theme/图标库均在 core）；
 - `output.exports: 'named'`（同时有命名导出与 default 导出时显式声明，避免 Rollup 警告
   "Consumers will have to use EasemobUIKit.default"；`install` 是命名导出，UMD 用户可直接
   `app.use(EasemobUIKit)`）；globals：`Vue` / `Pinia` / `Easemob`（SDK）；
 - `cssCodeSplit: false` + `assetFileNames`：`style.css` 重命名为 `theme/index.css`（导出路径
-  `@easemob/uikit-im/theme` 指向它）；
+  `@easemob-community/uikit-im/theme` 指向它）；
 - 版本注入：`define` 注入 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__`
   （构建期读 sdk 与 uikit 的 package.json，向上查找兼容 SDK 新旧入口）；
 - `vite-plugin-dts`：`insertTypesEntry: true` 生成 `dist/index.d.ts`，
@@ -68,10 +68,10 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
 
 ### 2.3 轻量子包（vite.aux.config.ts）
 
-- `@easemob/uikit-im/resolver`（EasemobUIKitResolver，unplugin-vue-components）与
-  `@easemob/uikit-im/auto-imports`（EasemobUIKitImports，unplugin-auto-import）单独打包，
+- `@easemob-community/uikit-im/resolver`（EasemobUIKitResolver，unplugin-vue-components）与
+  `@easemob-community/uikit-im/auto-imports`（EasemobUIKitImports，unplugin-auto-import）单独打包，
   避免混进全量 bundle 导致 tree-shaking 不友好；
-- P1 Step 7 起 `@easemob/uikit-core` 有平行入口 `./resolver`（EasemobUIKitCoreResolver）/
+- P1 Step 7 起 `@easemob-community/uikit-core` 有平行入口 `./resolver`（EasemobUIKitCoreResolver）/
   `./auto-imports`（EasemobUIKitCoreImports，17 个 core 共享 hook），chatroom 等场景包直接复用；
   两包的 `src/resolver.ts` / `src/auto-imports.ts` 均由
   `packages/uikit-core/scripts/gen-aux-entries.mjs` 按各包 `aux-entries.config.mjs` 参数化生成，
@@ -89,7 +89,7 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
 
 ## 3. 构建期图标引用校验（`packages/uikit-core/scripts/check-icon-refs.mjs`）
 
-- P1 Step 4 起：图标库（`src/assets/icons`）与 EmIcon 组件迁入 `@easemob/uikit-core`，
+- P1 Step 4 起：图标库（`src/assets/icons`）与 EmIcon 组件迁入 `@easemob-community/uikit-core`，
   校验脚本随迁 core 并参数化为 `node check-icon-refs.mjs [scanPkgRoot] [iconsDir]`；
   core 构建前置默认校验自身；uikit-im 构建前置以
   `node ../uikit-core/scripts/check-icon-refs.mjs . ../uikit-core/src/assets/icons`
@@ -102,7 +102,7 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
   存在的目录（不会误报 `'text/plain'` 等无关字符串）；
 - **已知局限**：动态拼接的 name（如 `icon: 'actions/' + type`）无法静态扫描，依赖 code
   review 与运行期 EmIcon 的 miss warn 兜底；
-- 独立运行：`pnpm -F @easemob/uikit-core icons:check` 或 `pnpm -F @easemob/uikit-im icons:check`。
+- 独立运行：`pnpm -F @easemob-community/uikit-core icons:check` 或 `pnpm -F @easemob-community/uikit-im icons:check`。
 
 ## 4. SDK 双引入模式（根 `scripts/switch-sdk.mjs`）
 
@@ -135,8 +135,8 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
 
 ## 6. 根 workspace 与常用脚本（pnpm 9 / pnpm-workspace.yaml）
 
-- workspace：`packages/*`（@easemob/uikit-im）+ `apps/*`（demo / docs）；
-- 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob/uikit-im story:dev`（Histoire）；
+- workspace：`packages/*`（@easemob-community/uikit-im）+ `apps/*`（demo / docs）；
+- 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob-community/uikit-im story:dev`（Histoire）；
   `test` = vitest；`lint` = `eslint .`；`format` = `prettier --write .`；
   `release` = 发布演练（dry-run）、`release:publish` = 真实发布（见 §5）；
 - `packageManager: pnpm@9.12.3`；`engines.node >= 18`；
@@ -149,7 +149,7 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
 
 - 验证门禁是**类型检查 + 构建**（0 错误），不是 lint 全绿。
 - 改公开 API 后必须重建 dist（demo 类型检查解析 dist 类型）；改 src 内部实现无需重建。
-- 发布前必须 `pnpm -F @easemob/uikit-im build`，发布包只含 `dist`（files 白名单）。
+- 发布前必须 `pnpm -F @easemob-community/uikit-im build`，发布包只含 `dist`（files 白名单）。
 - 构建失败（含图标引用缺失）不允许绕过/注释校验强行发布。
 - 本地 tgz 联调后切回 npm 模式并 `pnpm install` 验证，禁止把 `pnpm.overrides` 提交上去。
 

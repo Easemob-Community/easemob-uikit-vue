@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
-import { useResizable, useViewport } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { useResizable, useViewport } from '@easemob-community/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { EmButton as Button } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
+import { EmInput as Input } from '@easemob-community/uikit-core'
+import { EmButton as Button } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import type { ChatConfig, MentionContact } from '../types'
 import VoicePanel from './components/voice-panel.vue'
 

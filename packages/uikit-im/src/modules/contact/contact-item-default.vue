@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../composables/use-user-info'
-import type { UiContact as Contact } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
 import type { AvatarShape, ContactItemSize, OnlineStatus } from './types'
 
 interface ContactItemDefaultProps {

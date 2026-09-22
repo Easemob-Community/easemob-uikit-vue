@@ -7,7 +7,7 @@
  * 在消息列表可见）。
  */
 import { ref } from 'vue'
-import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob/uikit-core'
+import { EmEmojiPicker, EmIconButton, EmPopup, t } from '@easemob-community/uikit-core'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 import type { ChatroomPopupModeResolvedValue } from '../../../composables/use-chatroom-popup-mode'
 

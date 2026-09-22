@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
-import type { UiContactInvite } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
+import type { UiContactInvite } from '@easemob-community/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 import { notifyContactEvent } from '../notification-engine'

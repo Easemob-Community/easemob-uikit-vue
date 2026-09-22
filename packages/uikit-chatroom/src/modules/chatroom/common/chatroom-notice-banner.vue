@@ -5,7 +5,7 @@
  * editable（P3：owner/admin）时展示编辑按钮，点击触发 edit 事件（容器弹编辑框）。
  */
 import { ref, watch } from 'vue'
-import { EmIconButton, t } from '@easemob/uikit-core'
+import { EmIconButton, t } from '@easemob-community/uikit-core'
 
 export interface ChatroomNoticeBannerProps {
   /** 公告内容（空串不渲染） */

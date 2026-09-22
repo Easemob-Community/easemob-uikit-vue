@@ -1,6 +1,6 @@
 import type { Message as SdkMessage } from 'easemob-websdk'
-import { CONVERSATION_TYPE, resolveLastMessageText } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, resolveLastMessageText } from '@easemob-community/uikit-sdk-contract'
+import type { ConversationTypeValue } from '@easemob-community/uikit-sdk-contract'
 import { defaultAdapterPreviewLabels, normalizeUserId, toUiMessage } from './adapter/message-adapter'
 import { getEventHandlerDeps } from './event/deps'
 import { resolveSenderDisplayName } from './event/resolve-display-name'

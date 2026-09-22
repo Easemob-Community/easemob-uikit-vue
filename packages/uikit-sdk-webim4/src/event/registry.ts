@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
+import type { SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { resetSyncStatus } from '../use-sync-status'
 import { resetReadReceiptState } from '../domain/message-domain'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveTopBar } from '@easemob/uikit-chatroom'
+import { ChatroomLiveTopBar } from '@easemob-community/uikit-chatroom'
 
 const shared = ref(false)
 </script>

@@ -13,7 +13,7 @@
 
 新增/修改功能时避免四类翻车：
 
-1. **core 反向依赖场景包**——把 `@easemob/uikit-im` 的 store/domain import 进 core，
+1. **core 反向依赖场景包**——把 `@easemob-community/uikit-im` 的 store/domain import 进 core，
    聊天室场景 bundle 会把单群聊代码全链进来，抽核失效（门禁：`scripts/check-core-isolation.mjs`）；
 2. **core 膨胀成杂货铺**——core 是 1.0.0 公共包，往里加导出 = 扩公共 API 面
    （semver 义务），单场景独享的东西进 core 只会让两个场景包都背着它；
@@ -31,7 +31,7 @@ uikit-chatroom（聊天室）───┘
 
 - **依赖方向只有一条**：场景包 → core；core 不得依赖任何场景包（含注释级自觉，
   门禁脚本拦截 import）；场景包之间互不依赖。
-- core 被场景包经裸 specifier（`@easemob/uikit-core`）引用；core 内禁止 `../uikit-im` 这类相对越界。
+- core 被场景包经裸 specifier（`@easemob-community/uikit-core`）引用；core 内禁止 `../uikit-im` 这类相对越界。
 - 场景包通过 **core 提供的注入点**拿场景能力（先例：im 经 `useCoreUIKitProvider` 的
   `onClientSetup` 注册场景事件、`clientName`/`clientVersion` 注入版本日志）。
 
@@ -125,7 +125,7 @@ uikit-chatroom（聊天室）───┘
 
 **硬规则：**
 
-- core 禁止 import 任何场景包（`@easemob/uikit-im` / `@easemob/uikit-chatroom` /
+- core 禁止 import 任何场景包（`@easemob-community/uikit-im` / `@easemob-community/uikit-chatroom` /
   相对越界），门禁 `packages/uikit-core/scripts/check-core-isolation.mjs` 挂在 core build 前置；
 - **core 引擎层（`sdk/`、`constants/`、`utils/`）保持纯 TS**：禁止值 import
   `vue`/`pinia`/`@vueuse/*` 及相对路径进入 Vue 层模块（store/composables/components/
@@ -136,7 +136,7 @@ uikit-chatroom（聊天室）───┘
   引擎层是未来跨端 uikit（uniapp/小程序等）可复用的部分，勿把 vue 依赖长进去；
 - 场景包之间禁止互相依赖（chatroom 只允许依赖 core）；
 - core 的公共导出一旦发布（1.0.0 起）删改视为 breaking，需 major 版本；
-- im 侧引用 core 一律经 `@easemob/uikit-core` 裸 specifier，禁止相对路径进 core src。
+- im 侧引用 core 一律经 `@easemob-community/uikit-core` 裸 specifier，禁止相对路径进 core src。
 
 **软约定：**
 
@@ -157,7 +157,7 @@ uikit-chatroom（聊天室）───┘
 
 ## 反面清单
 
-- ❌ 在 core 里 `import { useConversationStore } from '@easemob/uikit-im'`——core build 门禁直接失败，聊天室 bundle 被单群聊污染；
+- ❌ 在 core 里 `import { useConversationStore } from '@easemob-community/uikit-im'`——core build 门禁直接失败，聊天室 bundle 被单群聊污染；
 - ❌ 把 im 独享的 composable 放进 core「反正早晚用得上」——core 公共面膨胀，且 im 内部函数混进公共 API；
 - ❌ chatroom 包 import im 的消息气泡组件「省得重写」——聊天室必须背 tiptap/通讯录；
 - ❌ 新场景文案直接写进 core zh-CN.ts——场景包拆不掉，两包文案互相踩 key；

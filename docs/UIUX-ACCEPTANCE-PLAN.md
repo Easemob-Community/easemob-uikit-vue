@@ -194,7 +194,7 @@
 ## 六、实施约定
 
 - **包边界**：组件/Token 改动按三包归属（core 基础组件与 theme、im 业务模块），遵循 `uikit-package-boundary` skill；core 引擎层保持纯 TS 门禁。
-- **验证门禁**：每项完成跑 `pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`；docs 改动跑 docs build；新增组件记得 `aux:gen`（resolver/auto-imports）。
+- **验证门禁**：每项完成跑 `pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob-community/uikit-im build`；docs 改动跑 docs build；新增组件记得 `aux:gen`（resolver/auto-imports）。
 - **登记**：实施时逐项登记 TECH-DEBT（建议 D10x 区间），完成后勾选并在条目补「已于 <commit> 修复」；`TECH-DEBT.md` 其余条目不受影响。
 - **对外 API**：Phase 2/3 涉及组件 props 新增，均为**向后兼容扩展**（新增可选 prop），不破坏既有 API；改前按 `uikit-component-authoring` 先说明影响面。
 - **文档同步**：docs 组件页 API 表格经 `gen:api` 自动生成，组件改完需重跑；新增文档页登记 sidebar。

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, useLocale, useToast } from '@easemob/uikit-core'
-import type { UiGroupMember } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, useLocale, useToast } from '@easemob-community/uikit-core'
+import type { UiGroupMember } from '@easemob-community/uikit-core'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import BlockListItem from './block-list-item.vue'

@@ -1,5 +1,5 @@
 import { type ComputedRef, type InjectionKey, type Ref, inject, isRef, onScopeDispose, provide, shallowRef } from 'vue'
-import type { SdkAdapter, SdkCapabilities, SdkCapabilityFlags, SdkConfig, SdkPersistenceHooks, SdkPresenceDomain, SdkRepositoryOverrides, SdkUserInfoDomain } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter, SdkCapabilities, SdkCapabilityFlags, SdkConfig, SdkPersistenceHooks, SdkPresenceDomain, SdkRepositoryOverrides, SdkUserInfoDomain } from '@easemob-community/uikit-sdk-contract'
 import { type NoticeConfig, getNoticeConfigResolver, setNoticeConfigResolver } from '../sdk/event/notice-utils'
 import { buildAnnouncementNoticeText, insertChatNotice, resolveNoticeUserName } from '../sdk/event/notice-utils'
 import { t } from '../locale/messages'
@@ -259,7 +259,7 @@ export function useCoreUIKitProvider(
   setNoticeConfigResolver(resolveNoticeConfig)
 
   // 适配器实例：注入模式用业务传入的；内置模式优先 createDefaultAdapter 显式工厂，
-  // 其次注册表默认工厂（由场景包子路径入口 import 时自注册，如 @easemob/uikit-im/websdk5）
+  // 其次注册表默认工厂（由场景包子路径入口 import 时自注册，如 @easemob-community/uikit-im/websdk5）
   const adapterSource = options.adapter
     ? 'adapter prop（注入模式）'
     : options.createDefaultAdapter
@@ -271,7 +271,7 @@ export function useCoreUIKitProvider(
   if (!adapterMaybe) {
     throw new Error(
       '[UIKit] 缺少 SDK 适配器：请传入 adapter prop（注入模式），'
-      + '或 import 对应 SDK 的子路径入口完成默认注册（如 import \'@easemob/uikit-im/websdk5\'）',
+      + '或 import 对应 SDK 的子路径入口完成默认注册（如 import \'@easemob-community/uikit-im/websdk5\'）',
     )
   }
   const adapter: SdkAdapter = adapterMaybe

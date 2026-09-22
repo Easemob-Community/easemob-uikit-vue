@@ -1,13 +1,13 @@
 ---
 name: easemob-uikit-chatroom-integration
-description: 在 Vue3 项目中集成环信聊天室 UIKit（npm 包 @easemob/uikit-chatroom）时使用。覆盖安装与接入（useChatroomProvider / EmChatroomContainer）、场景预设（live / voice / class / custom）、命名插槽（header / message-list / gift-bar / member-panel 等 19 个）、直播弹幕流与自定义插槽（DanmakuStream / #prefix / #badge / #item）、PC 分栏与权限模型（split 布局 / manage-actions / 成员侧栏 / 业务角色抽象）、信令房多房间订阅与 headless 无头接入、常见坑（join 竞态 / 发送限流 / 弹层目标）。当用户提到「接入聊天室」「聊天室 UIKit」「@easemob/uikit-chatroom」「EmChatroomContainer」「直播间」「语聊房」「弹幕」「场景预设」「scene 配置」「信令房」「麦位」等时加载本技能。
+description: 在 Vue3 项目中集成环信聊天室 UIKit（npm 包 @easemob-community/uikit-chatroom）时使用。覆盖安装与接入（useChatroomProvider / EmChatroomContainer）、场景预设（live / voice / class / custom）、命名插槽（header / message-list / gift-bar / member-panel 等 19 个）、直播弹幕流与自定义插槽（DanmakuStream / #prefix / #badge / #item）、PC 分栏与权限模型（split 布局 / manage-actions / 成员侧栏 / 业务角色抽象）、信令房多房间订阅与 headless 无头接入、常见坑（join 竞态 / 发送限流 / 弹层目标）。当用户提到「接入聊天室」「聊天室 UIKit」「@easemob-community/uikit-chatroom」「EmChatroomContainer」「直播间」「语聊房」「弹幕」「场景预设」「scene 配置」「信令房」「麦位」等时加载本技能。
 ---
 
-# 环信聊天室 UIKit 集成指南（@easemob/uikit-chatroom / EmChatroomContainer / 场景预设）
+# 环信聊天室 UIKit 集成指南（@easemob-community/uikit-chatroom / EmChatroomContainer / 场景预设）
 
 > 命中本技能时，先说一句：**本次命中 skill: easemob-uikit-chatroom-integration**。
 
-本技能面向**把 `@easemob/uikit-chatroom` 接入自己 Vue3 项目的下游开发者**（由 AI 协助写集成代码时使用）。
+本技能面向**把 `@easemob-community/uikit-chatroom` 接入自己 Vue3 项目的下游开发者**（由 AI 协助写集成代码时使用）。
 它只描述**发布包的对外契约**，不含 UIKit 仓库内部实现细节。
 
 ## 何时使用
@@ -21,7 +21,7 @@ description: 在 Vue3 项目中集成环信聊天室 UIKit（npm 包 @easemob/ui
 
 最小可运行接入，详见 `reference/quickstart.md`：
 
-1. `pnpm add @easemob/uikit-chatroom pinia vue`（`pinia`、`vue` 是 peerDependencies，**必须显式安装**）；
+1. `pnpm add @easemob-community/uikit-chatroom pinia vue`（`pinia`、`vue` 是 peerDependencies，**必须显式安装**）；
 2. 根组件里 `useChatroomProvider({ appKey, ... })`（自带 pinia 注入，无 Provider 组件概念）；
 3. 页面里用 `<EmChatroomContainer room-id="room123" scene="live" auto-join />`。
 
@@ -39,19 +39,19 @@ description: 在 Vue3 项目中集成环信聊天室 UIKit（npm 包 @easemob/ui
 
 ## 关键契约速查（最常被问到的硬规则）
 
-- **无 Provider 组件**：聊天室复用 `@easemob/uikit-core` 基座，`useChatroomProvider()` 是组合式入口（内部注入 pinia 并初始化 client），**不引入新的 Provider 组件**。
+- **无 Provider 组件**：聊天室复用 `@easemob-community/uikit-core` 基座，`useChatroomProvider()` 是组合式入口（内部注入 pinia 并初始化 client），**不引入新的 Provider 组件**。
 - **容器驱动进出房**：`EmChatroomContainer` 负责 join/leave/历史/消息收发/成员面板；`roomId` 变化自动换房。
 - **场景 = 纯配置**：`scene` 传内置名（`'live'` / `'voice'` / `'class'`）或部分配置对象（与 preset 合并）；变种优先插槽、其次 config、最后才考虑 fork。
 - **组件前缀**：聊天室组件具名导出（`EmChatroomContainer`、`ChatroomLiveDanmakuStream`、`ChatroomSplitLayout`…），**不注册全局**，按需 import 使用。
 - **权限天花板 = SDK 原生权限**（owner/admin/member/none）：管理 UI 按 `canManage` 门控，**业务角色（主播/场控/老师）由应用层抽象**，UIKit 不感知。
 - **事件统一 kebab-case**：如 `@kicked`、`@signal-message`、`@member-joined`。
-- **入口已内置样式**：`@easemob/uikit-chatroom` 无需再单独 `import '...css'`；主题走 core CSS 变量 + `themeOverrides`。
+- **入口已内置样式**：`@easemob-community/uikit-chatroom` 无需再单独 `import '...css'`；主题走 core CSS 变量 + `themeOverrides`。
 
 ## 硬规则 vs 软约定
 
 **硬规则：**
 
-- 集成侧只描述 `@easemob/uikit-chatroom` 发布包的对外契约，不写仓库内部实现（build/lint/TECH-DEBT 等）。
+- 集成侧只描述 `@easemob-community/uikit-chatroom` 发布包的对外契约，不写仓库内部实现（build/lint/TECH-DEBT 等）。
 - `pinia`、`vue` 是 peerDependencies，接入方必须显式安装。
 - 聊天室消息有**发送频率限制**（SDK 侧节流），触发时输入框必须给出明确反馈，不能静默失败。
 - 弹幕流一旦提供 `#item` 插槽，**所有 kind** 的条目内容都由插槽渲染（无内置回退），需在插槽内自行分支。

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GROUP_MEMBER_ROLE } from '@easemob/uikit-core'
+import { GROUP_MEMBER_ROLE } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useGroupStore } from '../../store/group'
 import GroupManagementSection from './group-management-section.vue'

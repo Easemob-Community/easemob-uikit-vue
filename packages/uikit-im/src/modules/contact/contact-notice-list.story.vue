@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { UiContactInvite } from '@easemob/uikit-core'
+import type { UiContactInvite } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import ContactNoticeList from './contact-notice-list.vue'
 

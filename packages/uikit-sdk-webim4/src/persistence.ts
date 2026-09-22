@@ -1,7 +1,7 @@
 /**
  * 旁路持久化钩子统一调用入口（fire-and-forget）。
  *
- * 契约约定（见 `@easemob/uikit-sdk-contract` persistence.ts）：
+ * 契约约定（见 `@easemob-community/uikit-sdk-contract` persistence.ts）：
  * - 调用方不 await；实现方内部排队 / 批量 / 事务 / IPC 自行负责；
  * - 钩子同步抛错 / reject 只告警（logger），不阻塞消息链路；
  * - 未注入（undefined）直接跳过，零调用零报错。

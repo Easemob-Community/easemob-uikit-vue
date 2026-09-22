@@ -13,7 +13,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `@easemob/uikit-im`，源码 `packages/uikit-im/src`）里写或改样式时，
+在 `easemob-uikit-vue`（核心包 `@easemob-community/uikit-im`，源码 `packages/uikit-im/src`）里写或改样式时，
 **用对本库真实的样式约定，别被仓库里的「死配置」带偏**：
 
 1. 组件样式 = `<style scoped>` + BEM 类名 + `var(--uikit-*)` CSS 变量；
@@ -72,9 +72,9 @@
 
 ## CSS 变量契约（唯一真相源：`packages/uikit-core/src/theme/index.css`）
 
-P1 Step 4 起变量表迁入 `@easemob/uikit-core`（`src/theme/index.css`），由 core `src/index.ts`
+P1 Step 4 起变量表迁入 `@easemob-community/uikit-core`（`src/theme/index.css`），由 core `src/index.ts`
 引入并产出 core `dist/theme/index.css`；uikit-im 的 `src/theme/index.css` 仅 `@import
-'@easemob/uikit-core/theme'` 内联展开，保持 `@easemob/uikit-im/theme` 产物不变。
+'@easemob-community/uikit-core/theme'` 内联展开，保持 `@easemob-community/uikit-im/theme` 产物不变。
 `:root` 里定义了全部第一类 `--uikit-*` 变量，命名空间大致是：
 
 - **品牌 / 语义色**：`--uikit-primary-color` / `-opacity`、`--uikit-success-color` / `-warning-color` / `-danger-color`

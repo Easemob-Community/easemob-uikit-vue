@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmCell as Cell, EmIcon as Icon } from '@easemob/uikit-core'
+import { EmCell as Cell, EmIcon as Icon } from '@easemob-community/uikit-core'
 import type { ContactNavEntry } from './types'
 
 export type { ContactNavEntry }

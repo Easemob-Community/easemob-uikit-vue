@@ -1,9 +1,9 @@
 // message store 热路径与会话级内存淘汰的单元测试
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
-import type { SdkMessage } from '@easemob/uikit-sdk-contract'
-import type { UiMessage } from '@easemob/uikit-core'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { SdkMessage } from '@easemob-community/uikit-sdk-contract'
+import type { UiMessage } from '@easemob-community/uikit-core'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import { getHistoryCursor, setHistoryCursor } from '../../composables/message-history-cursor'
 import { useMessageStore } from '../message'
 

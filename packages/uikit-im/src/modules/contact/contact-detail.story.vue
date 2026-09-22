@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUserInfoStore } from '@easemob/uikit-core'
+import { useUserInfoStore } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
 import ContactDetail from './contact-detail.vue'

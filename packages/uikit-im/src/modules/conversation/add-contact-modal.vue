@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmAvatar as Avatar, EmButton as Button, EmCell as Cell, EmIcon as Icon, EmInput as Input, EmModal as Modal, useLocale } from '@easemob/uikit-core'
-import type { UiContact } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmButton as Button, EmCell as Cell, EmIcon as Icon, EmInput as Input, EmModal as Modal, useLocale } from '@easemob-community/uikit-core'
+import type { UiContact } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useContact } from '../../composables/use-contact'
 

@@ -1,5 +1,5 @@
-import { createLogger } from '@easemob/uikit-sdk-contract'
-import type { UserInfo, UserInfoAttribute, UserInfoRepository } from '@easemob/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
+import type { UserInfo, UserInfoAttribute, UserInfoRepository } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import type { UserInfoStoreLike } from '../event/types'
 import { formatSdkError } from '../utils/sdk-error'

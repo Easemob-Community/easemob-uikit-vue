@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveInteractiveCard, ChatroomLiveOverlayManager } from '@easemob/uikit-chatroom'
-import type { LiveOverlayItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveInteractiveCard, ChatroomLiveOverlayManager } from '@easemob-community/uikit-chatroom'
+import type { LiveOverlayItem } from '@easemob-community/uikit-chatroom'
 
 const items = ref<LiveOverlayItem[]>([])
 let seq = 0

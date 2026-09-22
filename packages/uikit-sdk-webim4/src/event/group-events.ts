@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { UiContactInvite, UiGroup, UserInfo } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
+import type { UiContactInvite, UiGroup, UserInfo } from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 

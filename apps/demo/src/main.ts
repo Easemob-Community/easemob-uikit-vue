@@ -1,10 +1,10 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import UIKit, { mergeLocaleMessages } from '@easemob/uikit-im'
+import UIKit, { mergeLocaleMessages } from '@easemob-community/uikit-im'
 // SDK5 默认适配器注册入口（D122 决策 22）：import 即注册，Provider 不传 adapter 时使用
-import '@easemob/uikit-im/websdk5'
+import '@easemob-community/uikit-im/websdk5'
 // uikit 产物模式下组件样式集中在主题 css（源码 alias 模式下由 .vue <style> 提供，两模式均需引入）
-import '@easemob/uikit-im/theme'
+import '@easemob-community/uikit-im/theme'
 import App from './app.vue'
 
 // 业务方 / plugin 通过 mergeLocaleMessages 扩展自己的多语言 key

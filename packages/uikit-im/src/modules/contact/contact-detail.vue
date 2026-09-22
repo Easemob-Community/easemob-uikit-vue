@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
-import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob/uikit-core'
-import type { PresenceDisplayStatus, UiContact } from '@easemob/uikit-core'
+import type { UserInfo, UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
+import { EmAvatar as Avatar, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, createLogger, formatSdkError, useLocale, usePresence, useToast } from '@easemob-community/uikit-core'
+import type { PresenceDisplayStatus, UiContact } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useContact } from '../../composables/use-contact'

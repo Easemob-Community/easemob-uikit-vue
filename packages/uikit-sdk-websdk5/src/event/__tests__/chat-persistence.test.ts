@@ -5,8 +5,8 @@ import type {
   SdkMessage,
   UiConversation,
   UiMessage,
-} from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, STREAM_MESSAGE_STATUS } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, STREAM_MESSAGE_STATUS } from '@easemob-community/uikit-sdk-contract'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import type { ManagerHost } from '../../client'
 import { setEventHandlerDeps } from '../deps'

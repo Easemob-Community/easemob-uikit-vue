@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CONVERSATION_TYPE } from '@easemob/uikit-core'
-import type { UiConversation as Conversation } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE } from '@easemob-community/uikit-core'
+import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 import ConversationItem from './conversation-item.vue'
 
 const singleChat: Conversation = {

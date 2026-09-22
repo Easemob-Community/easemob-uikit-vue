@@ -37,13 +37,13 @@ export default defineConfig({
         // （见 package.json exports ./theme 的 types 条件）；shims-vue.d.ts 属源码侧
         // 环境声明，对消费者无意义且可能与其自身 *.vue shim 合并冲突，故排除。
         copyDtsFiles: true,
-        // tsconfig paths 把 @easemob/uikit-core 等映射到各包 src，不做排除时
+        // tsconfig paths 把 @easemob-community/uikit-core 等映射到各包 src，不做排除时
         // d.ts 会把 re-export 符号的模块说明符展开成 ../../xxx/src 相对路径，
         // 发布给消费者后该路径不存在导致类型断裂；保持裸包名，类型经各自 dist 的 d.ts 解析。
         aliasesExclude: [
-          '@easemob/uikit-core',
-          '@easemob/uikit-sdk-contract',
-          '@easemob/uikit-sdk-websdk5',
+          '@easemob-community/uikit-core',
+          '@easemob-community/uikit-sdk-contract',
+          '@easemob-community/uikit-sdk-websdk5',
         ],
       })]
       : []),
@@ -59,9 +59,9 @@ export default defineConfig({
       external: [
         'vue',
         'pinia',
-        '@easemob/uikit-core',
-        '@easemob/uikit-sdk-contract',
-        '@easemob/uikit-sdk-websdk5',
+        '@easemob-community/uikit-core',
+        '@easemob-community/uikit-sdk-contract',
+        '@easemob-community/uikit-sdk-websdk5',
       ],
       output: {
         // 同时存在命名导出与 default 导出时，显式声明使用命名导出策略，
@@ -72,9 +72,9 @@ export default defineConfig({
           'vue': 'Vue',
           'pinia': 'Pinia',
           // core / 契约 / adapter 的 UMD 全局名，CDN 直引多个 UMD 产物时按此断链
-          '@easemob/uikit-core': 'EasemobUIKitCore',
-          '@easemob/uikit-sdk-contract': 'EasemobUIKitSdkContract',
-          '@easemob/uikit-sdk-websdk5': 'EasemobUIKitSdkWebsdk5',
+          '@easemob-community/uikit-core': 'EasemobUIKitCore',
+          '@easemob-community/uikit-sdk-contract': 'EasemobUIKitSdkContract',
+          '@easemob-community/uikit-sdk-websdk5': 'EasemobUIKitSdkWebsdk5',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css')
@@ -91,10 +91,10 @@ export default defineConfig({
       // theme @import 必须内联 **core 的 dist 产物**（而非 core src 的变量表）。
       // core 是外置依赖，其原子组件（Avatar/Icon/Popup/IconButton…）的 scoped 样式
       // 只在 core 的 dist/theme/index.css 里；若指向 core src（仅 :root 变量表），
-      // 则 @easemob/uikit-im/theme 产物只含变量、缺 core 组件样式，外部消费者
-      // 只 import '@easemob/uikit-im/theme' 时 core 组件（头像/右键菜单等）会全部失去样式。
+      // 则 @easemob-community/uikit-im/theme 产物只含变量、缺 core 组件样式，外部消费者
+      // 只 import '@easemob-community/uikit-im/theme' 时 core 组件（头像/右键菜单等）会全部失去样式。
       // 注意：这要求 core 先构建（core 为 im 的 workspace:^ 依赖，pnpm -r build 已自动排序）。
-      '@easemob/uikit-core/theme': resolve(__dirname, '../uikit-core/dist/theme/index.css'),
+      '@easemob-community/uikit-core/theme': resolve(__dirname, '../uikit-core/dist/theme/index.css'),
       '@': resolve(__dirname, 'src'),
     },
   },

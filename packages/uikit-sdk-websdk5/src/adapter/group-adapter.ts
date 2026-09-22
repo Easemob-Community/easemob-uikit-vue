@@ -1,5 +1,5 @@
 import type { GroupDetail, GroupMemberEntry, GroupMuteEntry, JoinedGroupSummary } from 'easemob-websdk'
-import type { UiGroup, UiGroupMember } from '@easemob/uikit-sdk-contract'
+import type { UiGroup, UiGroupMember } from '@easemob-community/uikit-sdk-contract'
 type SdkGroupSource = JoinedGroupSummary | GroupDetail
 
 /**

@@ -11,7 +11,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（pnpm workspace，`@easemob/uikit-im` 为核心包）里处理 eslint 时，
+在 `easemob-uikit-vue`（pnpm workspace，`@easemob-community/uikit-im` 为核心包）里处理 eslint 时，
 **快速区分「该修的代码问题」「该改的配置约定」「不该动的既有债」**，避免两种典型错误：
 
 1. 把仓库既有的全局风格债当成本次改动引入的问题，无谓 `--fix` 上百个未改动文件、制造巨大 diff；
@@ -33,8 +33,8 @@
 - 空函数体只要**含注释**就不触发 `no-empty-function`：`onFoo: () => { /* 说明为何空实现 */ }`。
 - macOS 自带 **bash 3.2 没有 `mapfile`**，用 `while read` 或命令替换词分割代替。
 - 验收命令：
-  - 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误为准）
-  - 构建：`pnpm -F @easemob/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`）
+  - 类型检查：`pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误为准）
+  - 构建：`pnpm -F @easemob-community/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`）
 
 ## 精确圈定改动范围（含一个真实盲区）
 

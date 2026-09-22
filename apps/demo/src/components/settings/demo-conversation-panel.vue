@@ -11,7 +11,7 @@
  *
  * 状态来自 useDemoSettings，由 demo-page 绑定到 EmConversationContainer。
  */
-import { useClientStore, useConversationStore, useMessageStore } from '@easemob/uikit-im'
+import { useClientStore, useConversationStore, useMessageStore } from '@easemob-community/uikit-im'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'

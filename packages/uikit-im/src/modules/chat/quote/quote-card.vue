@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar, EmIcon as Icon, MESSAGE_TYPE } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmIcon as Icon, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import type { MsgQuotePayload } from '../../../composables/use-quote'
 import { useUserInfo } from '../../../composables/use-user-info'
 

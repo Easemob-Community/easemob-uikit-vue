@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
 import { beforeEach, describe, expect, it } from 'vitest'
-import type { SdkMessage } from '@easemob/uikit-sdk-contract'
+import type { SdkMessage } from '@easemob-community/uikit-sdk-contract'
 import {
   MESSAGE_TYPE,
   STREAM_MESSAGE_STATUS,
@@ -13,7 +13,7 @@ import {
   isTextBody,
   isVideoBody,
   isVoiceBody,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 import {
   resetStreamState,
   toUiMessage,

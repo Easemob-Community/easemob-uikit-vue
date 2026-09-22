@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomSplitLayout } from '@easemob/uikit-chatroom'
+import { ChatroomSplitLayout } from '@easemob-community/uikit-chatroom'
 
 const memberWidth = ref(180)
 </script>

@@ -11,8 +11,8 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmUIKitProvider, EmBlockListContainer } from '@easemob/uikit-im'
-import type { UiContact } from '@easemob/uikit-im'
+import { EmUIKitProvider, EmBlockListContainer } from '@easemob-community/uikit-im'
+import type { UiContact } from '@easemob-community/uikit-im'
 
 const blocklistRef = ref<InstanceType<typeof EmBlockListContainer>>()
 
@@ -51,7 +51,7 @@ function onUnblock(contact: UiContact) {
 
 ```vue
 <script setup lang="ts">
-import { EmBlockList } from '@easemob/uikit-im'
+import { EmBlockList } from '@easemob-community/uikit-im'
 </script>
 
 <template>
@@ -80,8 +80,8 @@ import { EmBlockList } from '@easemob/uikit-im'
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmBlockListAddModal } from '@easemob/uikit-im'
-import type { UiContact } from '@easemob/uikit-im'
+import { EmBlockListAddModal } from '@easemob-community/uikit-im'
+import type { UiContact } from '@easemob-community/uikit-im'
 
 const show = ref(false)
 
@@ -129,7 +129,7 @@ function onAdded(contacts: UiContact[]) {
 
 - `blockListRef`：内部 `EmBlockList` 组件实例引用，可调用其 `refresh()` 等方法
 
-Props 类型 `BlockListContainerProps` 从 `@easemob/uikit-im` 具名导出。
+Props 类型 `BlockListContainerProps` 从 `@easemob-community/uikit-im` 具名导出。
 
 ## EmContactListContainer 联系人列表容器
 
@@ -138,8 +138,8 @@ Props 类型 `BlockListContainerProps` 从 `@easemob/uikit-im` 具名导出。
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmUIKitProvider, EmContactListContainer } from '@easemob/uikit-im'
-import type { UiContact } from '@easemob/uikit-im'
+import { EmUIKitProvider, EmContactListContainer } from '@easemob-community/uikit-im'
+import type { UiContact } from '@easemob-community/uikit-im'
 
 const listRef = ref<InstanceType<typeof EmContactListContainer>>()
 
@@ -186,7 +186,7 @@ function onClick(contact: UiContact) {
 - `scrollToGroup(key)`：滚动到指定分组
 - `contactListRef`：内部 `EmContactList` 组件实例引用
 
-Props 类型 `ContactListContainerProps` 与 `ContactListClickBehavior` 从 `@easemob/uikit-im` 具名导出。
+Props 类型 `ContactListContainerProps` 与 `ContactListClickBehavior` 从 `@easemob-community/uikit-im` 具名导出。
 
 ## 通讯录容器中的黑名单
 

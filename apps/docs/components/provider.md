@@ -99,11 +99,11 @@ const dataSource = {
 
 Provider 需要一个 SDK 适配器（`SdkAdapter`，对接具体版本的环信 SDK）才能工作，两种装配方式二选一：
 
-- **内置模式（默认，推荐）**：入口文件 `import '@easemob/uikit-im/websdk5'`（4.x 私有化用 `@easemob/uikit-im/webim4`），import 副作用把对应 adapter 注册为默认适配器，Provider 不传 `adapter` 时自动使用，UIKit 全权管理连接生命周期（init / login / logout）
+- **内置模式（默认，推荐）**：入口文件 `import '@easemob-community/uikit-im/websdk5'`（4.x 私有化用 `@easemob-community/uikit-im/webim4`），import 副作用把对应 adapter 注册为默认适配器，Provider 不传 `adapter` 时自动使用，UIKit 全权管理连接生命周期（init / login / logout）
 - **注入模式**：业务从 adapter 包取出实例显式传入 `adapter` prop，连接生命周期（login / logout）归业务全权负责——`useClient().login()` / `useClient().logout()` 不会转发到 adapter，业务直接调用自己持有的 `adapter.login(user, token)` / `adapter.logout()`
 
 ```ts
-import { Websdk5Adapter } from '@easemob/uikit-sdk-websdk5'
+import { Websdk5Adapter } from '@easemob-community/uikit-sdk-websdk5'
 
 const adapter = new Websdk5Adapter()
 // 业务侧自行登录：await adapter.login(userId, token)
@@ -141,7 +141,7 @@ const adapter = new Websdk5Adapter()
 不同 SDK 版本的能力差异由 adapter 如实上报到 `useUIKit().capabilities`（`combineMessage` / `pinnedMessage` / `streamingMessage` / `groupReadReceipt` 四个能力位，adapter 未上报时缺省全 `true`），与 features（业务开关）取交集决定能力入口的展示：
 
 ```ts
-import { useUIKit } from '@easemob/uikit-im'
+import { useUIKit } from '@easemob-community/uikit-im'
 
 const { capabilities } = useUIKit()
 
@@ -150,7 +150,7 @@ if (capabilities.combineMessage) {
 }
 ```
 
-非 Vue 上下文（定时任务、主进程等）可用 core 的模块级 `getUIKitAdapter()`（`@easemob/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
+非 Vue 上下文（定时任务、主进程等）可用 core 的模块级 `getUIKitAdapter()`（`@easemob-community/uikit-core`）读取当前装配的适配器实例，Provider 未挂载或已卸载时返回 `null`。
 
 ### 通知与日志
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { h, onMounted, ref } from 'vue'
-import { EmUIKitProvider, useClient } from '@easemob/uikit-im'
+import { EmUIKitProvider, useClient } from '@easemob-community/uikit-im'
 import DemoPage from './demo-page.vue'
 import LoginPage from './login-page.vue'
 import { demoCollectSdkLog, demoSdkLogLevel, demoSdkVersion, demoUikitLogLevel, noticeConfig } from './composables/use-demo-settings'

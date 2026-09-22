@@ -55,7 +55,7 @@ useChatroomProvider({
   messageUserInfo: { nicknameKey: 'nick', avatarKey: 'avatar' },
 })
 // 或运行时动态配置
-import { setChatroomMessageUserInfoConfig } from '@easemob/uikit-chatroom'
+import { setChatroomMessageUserInfoConfig } from '@easemob-community/uikit-chatroom'
 setChatroomMessageUserInfoConfig({ nicknameKey: 'nick', avatarKey: 'avatar' })
 ```
 
@@ -64,7 +64,7 @@ setChatroomMessageUserInfoConfig({ nicknameKey: 'nick', avatarKey: 'avatar' })
 嵌套容器场景（如 demo 手机壳）弹层默认挂 body，可全局改目标：
 
 ```ts
-import { setChatroomPopupTarget } from '@easemob/uikit-chatroom'
+import { setChatroomPopupTarget } from '@easemob-community/uikit-chatroom'
 setChatroomPopupTarget('#my-shell')
 ```
 

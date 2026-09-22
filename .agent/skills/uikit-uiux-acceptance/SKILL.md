@@ -88,13 +88,13 @@
 任何涉及 UI/UX 的改动完成后必须跑：
 
 ```bash
-pnpm -F @easemob/uikit-im exec vue-tsc --noEmit
-pnpm -F @easemob/uikit-im build
-pnpm -F @easemob/uikit-core build
+pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit
+pnpm -F @easemob-community/uikit-im build
+pnpm -F @easemob-community/uikit-core build
 cd apps/docs && pnpm gen:api && pnpm build
 ```
 
-新增/修改组件 props 后，必须跑 `pnpm -F @easemob/uikit-im aux:gen` 同步 resolver/auto-imports。
+新增/修改组件 props 后，必须跑 `pnpm -F @easemob-community/uikit-im aux:gen` 同步 resolver/auto-imports。
 
 ## 硬规则 vs 软约定
 

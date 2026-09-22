@@ -1,4 +1,4 @@
-import { mergeLocaleMessages } from '@easemob/uikit-core'
+import { mergeLocaleMessages } from '@easemob-community/uikit-core'
 import zhCN from './zh-CN'
 import en from './en'
 

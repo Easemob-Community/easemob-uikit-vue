@@ -1,6 +1,6 @@
 import { type ComputedRef, type Ref, computed } from 'vue'
-import type { UiContact as Contact } from '@easemob/uikit-core'
-import { useUserInfoStore } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
+import { useUserInfoStore } from '@easemob-community/uikit-core'
 import {
   type ContactGroupBy,
   type ContactGroupItem,

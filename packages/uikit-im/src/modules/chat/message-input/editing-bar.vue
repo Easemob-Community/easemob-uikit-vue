@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { TextMessageBody, UiMessage } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmIconButton as IconButton } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
 
 export interface EditingBarProps {
   message: UiMessage

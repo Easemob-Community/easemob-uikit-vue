@@ -1,23 +1,23 @@
 // Utility Functions
 export * from './format-message'
-// sdk-error / download / z-index / format-time / linkify 已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变
-export { createConversationTimeFormatter, hasUrl, linkify } from '@easemob/uikit-core'
-export type { LinkSegment } from '@easemob/uikit-core'
+// sdk-error / download / z-index / format-time / linkify 已迁入 @easemob-community/uikit-core，此处显式具名 re-export 保持对外 API 不变
+export { createConversationTimeFormatter, hasUrl, linkify } from '@easemob-community/uikit-core'
+export type { LinkSegment } from '@easemob-community/uikit-core'
 export {
   extractSdkErrorReason,
   formatSdkError,
   resolveSdkErrorCodeI18nKey,
   resolveSdkErrorI18nKey,
   resolveSdkErrorMessage,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 export {
   detectEnvironment,
   downloadFile,
   getDownloadStrategy,
   isCrossOrigin,
-} from '@easemob/uikit-core'
-export type { DownloadEnvironment, DownloadOptions } from '@easemob/uikit-core'
-export { nextZIndex, resetZIndex } from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
+export type { DownloadEnvironment, DownloadOptions } from '@easemob-community/uikit-core'
+export { nextZIndex, resetZIndex } from '@easemob-community/uikit-core'
 export * from './resolve-last-message-text'
 export * from './mention'
 

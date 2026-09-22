@@ -140,14 +140,14 @@ const emit = defineEmits<{
 ## 6. resolver / 插件契约：barrel 别名名就是公开 API
 
 `src/resolver.ts` 的 `EasemobUIKitResolver`（默认 prefix `Em`）把模板里 `<EmXxx/>`
-直接解析到 `@easemob/uikit-im` 的**同名命名导出**——所以别名名 = 用户可写的标签名 = 公开 API，
+直接解析到 `@easemob-community/uikit-im` 的**同名命名导出**——所以别名名 = 用户可写的标签名 = 公开 API，
 这正是不需要 `defineOptions` 的根因：
 
 ```ts
 // src/resolver.ts
 const prefix = options.prefix ?? 'Em'
 if (!name.startsWith(prefix)) return
-return { name, from: '@easemob/uikit-im' } // <EmChatContainer/> → import { EmChatContainer }
+return { name, from: '@easemob-community/uikit-im' } // <EmChatContainer/> → import { EmChatContainer }
 ```
 
 全量注册（`app.use(UIKit)`）走 `src/index.ts` 的 `install`：**只注册以 `Em` 开头且是组件的具名导出**，支持自定义 prefix：

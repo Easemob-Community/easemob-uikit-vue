@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import type { UiMessage } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import { CHATROOM_MESSAGE_DEFAULTS } from '../constants'
 
 /**

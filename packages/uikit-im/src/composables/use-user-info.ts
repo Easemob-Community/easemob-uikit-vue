@@ -1,7 +1,7 @@
 import { computed, toValue } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
-import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
-import { useUserInfo as useCoreUserInfo } from '@easemob/uikit-core'
+import type { UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
+import { useUserInfo as useCoreUserInfo } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 
 /**

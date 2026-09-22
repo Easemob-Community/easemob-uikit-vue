@@ -2,12 +2,12 @@
 
 ## 集成类
 
-- **必须显式安装 peer 依赖**：`pnpm add @easemob/uikit-chatroom pinia vue`；
+- **必须显式安装 peer 依赖**：`pnpm add @easemob-community/uikit-chatroom pinia vue`；
   `useChatroomProvider()` 内部注入 pinia，不要求 `app.use(createPinia())` 顺序（已自带）。
 - **无 Provider 组件**：不要找 `<EmChatroomProvider>`——入口是 `useChatroomProvider()` 组合式函数。
 - **组件不注册全局**：具名导出按需 import（`EmChatroomContainer` 等），
   若要用模板 kebab 形式需自行局部注册。
-- **样式已内置**：无需再 `import '@easemob/uikit-chatroom/...css'`；
+- **样式已内置**：无需再 `import '@easemob-community/uikit-chatroom/...css'`；
   主题定制走 core CSS 变量或 `scene.themeOverrides`。
 
 ## 进房 / 换房

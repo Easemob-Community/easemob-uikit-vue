@@ -1,5 +1,5 @@
-import type { PresenceInfo, PresenceRepository, UiPresence } from '@easemob/uikit-sdk-contract'
-import { PRESENCE_STATUS } from '@easemob/uikit-sdk-contract'
+import type { PresenceInfo, PresenceRepository, UiPresence } from '@easemob-community/uikit-sdk-contract'
+import { PRESENCE_STATUS } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 
 /**

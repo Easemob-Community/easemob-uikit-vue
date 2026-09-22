@@ -2,8 +2,8 @@
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
-import { usePresenceStore } from '@easemob/uikit-core'
-import type { UiContact as Contact, UiPresence } from '@easemob/uikit-core'
+import { usePresenceStore } from '@easemob-community/uikit-core'
+import type { UiContact as Contact, UiPresence } from '@easemob-community/uikit-core'
 import ContactList from './contact-list.vue'
 
 /** 注入 mock 联系人数据，覆盖多字母分组 + # 兜底 */

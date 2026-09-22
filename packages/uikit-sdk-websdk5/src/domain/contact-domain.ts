@@ -1,4 +1,4 @@
-import type { ContactPage, ContactRepository, UiContact, UiContactInvite } from '@easemob/uikit-sdk-contract'
+import type { ContactPage, ContactRepository, UiContact, UiContactInvite } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import { toUiContacts } from '../adapter/contact-adapter'
 

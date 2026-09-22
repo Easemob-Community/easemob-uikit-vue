@@ -4,8 +4,8 @@ import type {
   UserInfoAttribute,
   UserInfoAttributeValue,
   UserInfoRepository,
-} from '@easemob/uikit-sdk-contract'
-import { ALL_USER_INFO_ATTRIBUTES, createLogger } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import { ALL_USER_INFO_ATTRIBUTES, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import type { UserInfoStoreLike } from '../event/types'
 

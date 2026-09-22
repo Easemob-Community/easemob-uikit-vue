@@ -33,15 +33,15 @@
 └───────────────────────┬────────────────────────┘
                         │ 依赖（只用契约里的类型/接口）
 ┌───────────────────────▼────────────────────────┐
-│  契约层 @easemob/uikit-sdk-contract              │
+│  契约层 @easemob-community/uikit-sdk-contract              │
 │  SdkAdapter / SdkDomainSet / *Repository         │
 │  UiMessage / UiConversation / SdkMessage         │
 └───────────────────────┬────────────────────────┘
                         │ 实现（implements 契约）
 ┌───────────────────────▼────────────────────────┐
 │  适配层                                            │
-│  @easemob/uikit-sdk-websdk5  → 翻译 5.x          │
-│  @easemob/uikit-sdk-webim4   → 翻译 4.x          │
+│  @easemob-community/uikit-sdk-websdk5  → 翻译 5.x          │
+│  @easemob-community/uikit-sdk-webim4   → 翻译 4.x          │
 └───────────────────────┬────────────────────────┘
                         │ 真正 import SDK（只有这里碰 SDK）
              ┌──────────┴──────────┐
@@ -56,19 +56,19 @@
 
 **关键澄清：**
 
-- **core 不碰 SDK**：`@easemob/uikit-core` 只剩 theme / locale / 原子组件 / Provider 壳 / 通用 composables / 中立 `getUIKitAdapter()` 访问口；不再 `import 'easemob-websdk'`。
-- **uikit-im 不碰 SDK**：`packages/uikit-im/package.json` 不再把 `easemob-websdk` 作为依赖；`vite.config.ts` 不再 external / globals `easemob-websdk`；所有 SDK 类型经 `@easemob/uikit-sdk-contract` 引入。
+- **core 不碰 SDK**：`@easemob-community/uikit-core` 只剩 theme / locale / 原子组件 / Provider 壳 / 通用 composables / 中立 `getUIKitAdapter()` 访问口；不再 `import 'easemob-websdk'`。
+- **uikit-im 不碰 SDK**：`packages/uikit-im/package.json` 不再把 `easemob-websdk` 作为依赖；`vite.config.ts` 不再 external / globals `easemob-websdk`；所有 SDK 类型经 `@easemob-community/uikit-sdk-contract` 引入。
 - **adapter 是 SDK 集成唯一位置**：初始化、登录、事件注册、消息体字段映射、分页收敛、头像昵称补全，全部且只发生在 adapter。
 
 ## 2. 包边界：新功能先问放哪
 
 | 包 | SDK 相关性 | 能放什么 | 不能放什么 |
 | --- | --- | --- | --- |
-| `@easemob/uikit-core` | 无关 | theme / locale / 原子组件 / 通用 composables / Provider 壳 / `getUIKitAdapter()` / `default-adapter.ts` 注册表 | 任何 SDK 类型或值；adapter 具体实现 |
-| `@easemob/uikit-sdk-contract` | 无关 | `SdkAdapter` / `SdkDomainSet` / `*Repository` / `SdkMessage` / `UiMessage` / `UiConversation` / body 类型守卫 / `SdkCapabilities` / `SdkConfig` | SDK 专属实现；Vue / Pinia 响应式逻辑 |
-| `@easemob/uikit-sdk-websdk5` | 5.x 相关 | 5.x 的 `client.ts` / `adapter/` / `domain/` / `event/` / `utils/sdk-error` / 子路径入口 | uikit-im 或 uikit-core 的值级依赖 |
-| `@easemob/uikit-sdk-webim4` | 4.x 相关 | 4.x 的 `client.ts` / `adapter/` / `domain/` / `event/` / 字段映射 | uikit-im 或 uikit-core 的值级依赖 |
-| `@easemob/uikit-im` | 无关 | UI 组件 / store / 业务 composables / containers | 直接 import SDK；直接构造 SDK manager |
+| `@easemob-community/uikit-core` | 无关 | theme / locale / 原子组件 / 通用 composables / Provider 壳 / `getUIKitAdapter()` / `default-adapter.ts` 注册表 | 任何 SDK 类型或值；adapter 具体实现 |
+| `@easemob-community/uikit-sdk-contract` | 无关 | `SdkAdapter` / `SdkDomainSet` / `*Repository` / `SdkMessage` / `UiMessage` / `UiConversation` / body 类型守卫 / `SdkCapabilities` / `SdkConfig` | SDK 专属实现；Vue / Pinia 响应式逻辑 |
+| `@easemob-community/uikit-sdk-websdk5` | 5.x 相关 | 5.x 的 `client.ts` / `adapter/` / `domain/` / `event/` / `utils/sdk-error` / 子路径入口 | uikit-im 或 uikit-core 的值级依赖 |
+| `@easemob-community/uikit-sdk-webim4` | 4.x 相关 | 4.x 的 `client.ts` / `adapter/` / `domain/` / `event/` / 字段映射 | uikit-im 或 uikit-core 的值级依赖 |
+| `@easemob-community/uikit-im` | 无关 | UI 组件 / store / 业务 composables / containers | 直接 import SDK；直接构造 SDK manager |
 
 **判定流程（加工功能前先走一遍）：**
 
@@ -145,11 +145,11 @@ interface SdkAdapter {
 业务入口：
 
 ```ts
-import '@easemob/uikit-im/websdk5'
-import { UIKitProvider } from '@easemob/uikit-im'
+import '@easemob-community/uikit-im/websdk5'
+import { UIKitProvider } from '@easemob-community/uikit-im'
 ```
 
-- `import '@easemob/uikit-im/websdk5'` 会调用 `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())`。
+- `import '@easemob-community/uikit-im/websdk5'` 会调用 `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())`。
 - `<UIKitProvider appKey="...">` 不传 `adapter` prop 时，core 从注册表取默认工厂创建实例。
 - UIKit 负责 `init` / `login` / `logout` / 事件订阅。
 
@@ -158,7 +158,7 @@ import { UIKitProvider } from '@easemob/uikit-im'
 业务入口：
 
 ```ts
-import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'
+import { Webim4Adapter } from '@easemob-community/uikit-sdk-webim4'
 
 const adapter = new Webim4Adapter()
 await adapter.init({ appKey })
@@ -181,10 +181,10 @@ await adapter.login(user, token)
 
 **硬规则：**
 
-- `@easemob/uikit-im` 主入口**不**静态 import 任何 adapter 包或 `easemob-websdk`。
-- 默认内置快捷方式由**子路径入口**承担：`import '@easemob/uikit-im/websdk5'`。
+- `@easemob-community/uikit-im` 主入口**不**静态 import 任何 adapter 包或 `easemob-websdk`。
+- 默认内置快捷方式由**子路径入口**承担：`import '@easemob-community/uikit-im/websdk5'`。
 - 禁止在主入口 `export { Websdk5Adapter }` 等值级导出；值级导出只能由子路径入口或 adapter 包自身承担。
-- `uikit-im` 的 `package.json` 应把 `@easemob/uikit-sdk-websdk5` / `@easemob/uikit-sdk-webim4` 声明为 **optional peer + devDependency（workspace）**，不作为普通 dependency。
+- `uikit-im` 的 `package.json` 应把 `@easemob-community/uikit-sdk-websdk5` / `@easemob-community/uikit-sdk-webim4` 声明为 **optional peer + devDependency（workspace）**，不作为普通 dependency。
 
 **效果：**
 
@@ -273,7 +273,7 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 
 ## 9. 4.x adapter 当前状态与二期 TODO
 
-- **Phase 2 已完成**（2026-09-02 状态）：`@easemob/uikit-sdk-webim4` 六域（message/conversation/contact/group/presence/userInfo）+ 事件层 + 注入模式 + 通知引擎全量落地，门禁全绿；`@easemob/uikit-im/webim4` 子路径入口可用。
+- **Phase 2 已完成**（2026-09-02 状态）：`@easemob-community/uikit-sdk-webim4` 六域（message/conversation/contact/group/presence/userInfo）+ 事件层 + 注入模式 + 通知引擎全量落地，门禁全绿；`@easemob-community/uikit-im/webim4` 子路径入口可用。
 - **依赖形态**：webim4 经 npm alias `easemob-websdk-4`（= `easemob-websdk@4.24.2`）引入 4.x SDK——vite 预构建对裸说明符按名注册唯一产物，双 adapter 同图时同名 import 会被劫持到 5.x，独立 specifier 是根治手段（TECH-DEBT D122 2026-09-02 备忘）。改动 webim4 时 import 一律用 `easemob-websdk-4`。
 - **残留 TODO**：① 合并转发消息附件条目单向不兼容（5.x 条目 JSON、4.x 条目 Meta protobuf）——已推动 SDK 组，若结论是 4.x 不改则在 `downloadAndParseCombineMessage` 加 JSON 兜底；② 漫游 pb 容错补丁 `patch-pb-decode.ts`（SDK 修复根因后可移除）；③ Phase 3 DB/Electron 专项；④ 二期能力 Reaction/Thread/翻译/语音转文字。
 - 字段/API/事件映射表见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md` 第八、九节。
@@ -301,7 +301,7 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 - `uikit-im` 和 `uikit-core`**禁止**直接 import `easemob-websdk` 的值或类型。
 - 新增 / 修改 SDK 相关功能，**必须先改 `uikit-sdk-contract`**，再改两 adapter，最后改 UI。
 - adapter 包**禁止**值级依赖 `uikit-im` / `uikit-core`（工具函数应下沉到 contract 或通过注入传递）。
-- 主入口（`@easemob/uikit-im`）必须保持零 adapter 静态引用；默认内置走子路径入口自注册。
+- 主入口（`@easemob-community/uikit-im`）必须保持零 adapter 静态引用；默认内置走子路径入口自注册。
 - 注入模式下 UIKit **不转发** `login` / `logout`；业务全权。
 - 新增能力若某 SDK 暂不支持，必须在 `SdkCapabilities` 显式声明为 `false`，uikit-im 按 capabilities 隐藏入口。
 - 会话快照/回填 merge 时「本地维护字段」必须显式以本地为准（清单与落点见 §7.1）；新增本地字段同步进两 adapter 保留清单 + 回归测试。
@@ -326,7 +326,7 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 - ❌ 在 `uikit-im` 里 `import { ChatManager } from 'easemob-websdk'` —— 破坏切 SDK 能力。
 - ❌ 只改 `uikit-sdk-contract` 不改 `websdk5` / `webim4` adapter —— 类型编译过，运行时缺实现。
 - ❌ adapter 包 import `uikit-im` 内部工具函数 —— 反向依赖，摇树失败。
-- ❌ 在主入口 `export * from '@easemob/uikit-sdk-websdk5'` —— 4.x 下游会打包 5.x 符号。
+- ❌ 在主入口 `export * from '@easemob-community/uikit-sdk-websdk5'` —— 4.x 下游会打包 5.x 符号。
 - ❌ 注入 adapter 后还指望 `useClient().login()` 自动登录 —— 不会转发，业务要自己登录。
 - ❌ 4.x adapter 输出中立 body 时携带 `body.msg` / `body.thumb` 等原始字段 —— 守卫误判。
 - ❌ 凭记忆写 4.x API 映射 —— 必须核对 `easemob-websdk@4.24.2` 源码。

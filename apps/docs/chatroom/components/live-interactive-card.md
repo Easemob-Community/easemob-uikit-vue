@@ -10,7 +10,7 @@
 
 ```vue
 <script setup lang="ts">
-import { ChatroomLiveInteractiveCard } from '@easemob/uikit-chatroom'
+import { ChatroomLiveInteractiveCard } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>

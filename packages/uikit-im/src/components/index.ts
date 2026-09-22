@@ -1,6 +1,6 @@
 // Base UI Components
 // 对外统一使用 Em 前缀，避免与业务方组件命名冲突
-// P1 Step 4：原子组件已迁入 @easemob/uikit-core，此处显式具名 re-export 保持对外 API 不变
+// P1 Step 4：原子组件已迁入 @easemob-community/uikit-core，此处显式具名 re-export 保持对外 API 不变
 export {
   EmActionSheet,
   EmAvatar,
@@ -30,7 +30,7 @@ export {
   EmText,
   EmToast,
   EmUserCard,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 export type {
   CellProps,
   CopyableTextProps,
@@ -55,7 +55,7 @@ export type {
   TextLevel,
   TextProps,
   TextWeight,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 export { default as EmUserCardModal } from './user-card/user-card-modal.vue'
 export { default as EmGroupCard } from './group-card/group-card.vue'
 export { default as EmGroupCardModal } from './group-card/group-card-modal.vue'

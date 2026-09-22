@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
-import { EmIcon as Icon, useLocale } from '@easemob/uikit-core'
+import { EmIcon as Icon, useLocale } from '@easemob-community/uikit-core'
 
 export interface VoicePanelProps {
   active: boolean

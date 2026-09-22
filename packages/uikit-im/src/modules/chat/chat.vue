@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onErrorCaptured, onMounted, onUnmounted, provide, ref, useSlots, watch, watchEffect } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, usePresence, useToast } from '@easemob/uikit-core'
-import type { UiConversation as Conversation, ConversationTypeValue, ForwardModeValue, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob/uikit-core'
-import { normalizeUserId } from '@easemob/uikit-sdk-contract'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, EmEmpty as Empty, FORWARD_MODE, GROUP_MEMBER_ROLE, HEADER_ALIGN, INJECTION_KEY, EmIcon as Icon, EmIconButton as IconButton, MESSAGE_TYPE, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, usePresence, useToast } from '@easemob-community/uikit-core'
+import type { UiConversation as Conversation, ConversationTypeValue, ForwardModeValue, LocationMessageBody, TextMessageBody, UiGroupMember, UiMessage } from '@easemob-community/uikit-core'
+import { normalizeUserId } from '@easemob-community/uikit-sdk-contract'
 import { useChat } from '../../composables/use-chat'
 import { useUIKit } from '../../composables/use-uikit'
 import { useConversation } from '../../composables/use-conversation'

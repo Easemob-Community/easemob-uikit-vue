@@ -1,4 +1,23 @@
-## @easemob/uikit-core 2.8.5 (2026-09-18)
+## @easemob-community/uikit-core 2.8.7 (2026-09-21)
+
+
+### 修复
+
+- **core `login()` 同步提前记账 `currentUser`**：同 websdk5 1.3.4，消除「REST 消息先于 login resolve 到达」的空 `currentUserId` 竞态窗口，登录失败回滚清空。
+
+---
+
+## @easemob-community/uikit-core 2.8.6 (2026-09-21)
+
+
+### 新增
+
+- **`EmBadge` 新增 `inline` prop**：徽标不占位覆盖、按文档流渲染（如会话列表行尾未读数），默认 `false` 行为不变；开启后 `placement` 不生效。
+- **defaultFeatures 新增 `enableReadReceipt: true`**：全局已读回执开关默认值，经 features 响应式链路下发 adapter 与 UIKit（sdk-contract 1.3.1）。
+
+---
+
+## @easemob-community/uikit-core 2.8.5 (2026-09-18)
 
 
 ### 变更
@@ -13,7 +32,7 @@
 
 ---
 
-## @easemob/uikit-core 2.8.4 (2026-09-18)
+## @easemob-community/uikit-core 2.8.4 (2026-09-18)
 
 
 ### 变更
@@ -26,7 +45,7 @@
 
 ---
 
-## @easemob/uikit-core 2.8.3 (2026-09-17)
+## @easemob-community/uikit-core 2.8.3 (2026-09-17)
 
 
 ### 新增
@@ -35,16 +54,16 @@
 
 ---
 
-## @easemob/uikit-core 2.8.2 (2026-09-17)
+## @easemob-community/uikit-core 2.8.2 (2026-09-17)
 
 
 ### 修复
 
-- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
+- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob-community/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
 
 ---
 
-## @easemob/uikit-core 2.8.1 (2026-09-16)
+## @easemob-community/uikit-core 2.8.1 (2026-09-16)
 
 
 ### 变更
@@ -53,7 +72,7 @@
 
 ---
 
-## @easemob/uikit-core 2.8.0 (2026-09-16)
+## @easemob-community/uikit-core 2.8.0 (2026-09-16)
 
 
 ### 变更
@@ -63,7 +82,7 @@
 
 ---
 
-## @easemob/uikit-core 2.7.1 (2026-09-16)
+## @easemob-community/uikit-core 2.7.1 (2026-09-16)
 
 
 ### 变更
@@ -72,7 +91,7 @@
 
 ---
 
-## @easemob/uikit-core 2.7.0 (2026-09-16)
+## @easemob-community/uikit-core 2.7.0 (2026-09-16)
 
 
 ### 变更
@@ -81,7 +100,7 @@
 
 ---
 
-## @easemob/uikit-core 2.6.0 (2026-09-04)
+## @easemob-community/uikit-core 2.6.0 (2026-09-04)
 
 
 ### 新增
@@ -90,7 +109,7 @@
 
 ---
 
-## @easemob/uikit-core 2.5.0 (2026-09-03)
+## @easemob-community/uikit-core 2.5.0 (2026-09-03)
 
 
 ### 新增
@@ -103,7 +122,7 @@
 
 ---
 
-## @easemob/uikit-core 2.4.0 (2026-09-03)
+## @easemob-community/uikit-core 2.4.0 (2026-09-03)
 
 
 ### 新增
@@ -119,7 +138,7 @@
 
 ---
 
-## @easemob/uikit-core 2.3.0 (2026-09-02)
+## @easemob-community/uikit-core 2.3.0 (2026-09-02)
 
 
 ### 新增
@@ -138,7 +157,7 @@
 
 ---
 
-## @easemob/uikit-core 2.2.0 (2026-09-02)
+## @easemob-community/uikit-core 2.2.0 (2026-09-02)
 
 
 ### 新增
@@ -147,7 +166,7 @@
 
 ---
 
-## @easemob/uikit-core 2.1.0 (2026-09-02)
+## @easemob-community/uikit-core 2.1.0 (2026-09-02)
 
 
 ### 性能
@@ -160,7 +179,7 @@
 
 ---
 
-## @easemob/uikit-core 2.0.0 (2026-09-02)
+## @easemob-community/uikit-core 2.0.0 (2026-09-02)
 
 
 ### 破坏性行为变更
@@ -175,7 +194,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.2 (2026-08-28)
+## @easemob-community/uikit-core 1.5.2 (2026-08-28)
 
 
 ### 调整
@@ -185,7 +204,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.1 (2026-08-28)
+## @easemob-community/uikit-core 1.5.1 (2026-08-28)
 
 
 ### 调整
@@ -194,7 +213,7 @@
 
 ---
 
-## @easemob/uikit-core 1.5.0 (2026-08-28)
+## @easemob-community/uikit-core 1.5.0 (2026-08-28)
 
 
 ### 新增
@@ -211,7 +230,7 @@
 
 ---
 
-## @easemob/uikit-core 1.4.0 (2026-08-26)
+## @easemob-community/uikit-core 1.4.0 (2026-08-26)
 
 
 ### 破坏性变更
@@ -225,7 +244,7 @@
 
 ---
 
-## @easemob/uikit-core 1.3.0 (2026-08-25)
+## @easemob-community/uikit-core 1.3.0 (2026-08-25)
 
 
 ### 新增
@@ -234,7 +253,7 @@
 
 ---
 
-## @easemob/uikit-core 1.2.0 (2026-08-25)
+## @easemob-community/uikit-core 1.2.0 (2026-08-25)
 
 
 ### 新增
@@ -243,7 +262,7 @@
 
 ---
 
-## @easemob/uikit-core 1.1.0 (2026-08-19)
+## @easemob-community/uikit-core 1.1.0 (2026-08-19)
 
 
 ### 新增
@@ -269,17 +288,17 @@
 
 ---
 
-## @easemob/uikit-core 1.0.0 (2026-08-15)
+## @easemob-community/uikit-core 1.0.0 (2026-08-15)
 
 
 ### 新增
 
 - **图标体系**：`EmIcon` 支持多注册表（`assets/icons` + `assets/icons-v2` + `assets/icons-filled`），`icon-map.ts` 新增 `getV2IconNames()` / `getFilledIconNames()`，为线性/面性图标库提供自动索引；`color` prop 对 `fill="currentColor"` 的填充式图标同样生效。
-- **共享基座首版（P1 抽核自 `@easemob/uikit-im` 迁出）**：
+- **共享基座首版（P1 抽核自 `@easemob-community/uikit-im` 迁出）**：
   - SDK 基座层：`UIKitClient` / `ManagerHost`（**含 `ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
   - Pinia stores：`useClientStore` / `useThemeStore` / `useUserInfoStore` / `usePresenceStore`
   - 共享 composables：`useClient` / `useTheme` / `useUserInfo` / `useOwnUserInfo` / `usePresence` / `useToast` / `useNotification` / H5 通用（`useH5Adaptation` / `useKeyboard` / `useLongPress` / `usePullRefresh` / `useViewport` / `useBottomSheet` / `useRipple`）/ 通用交互（`useKeyBindings` / `useResizable` / `useUIKitStorage`）/ Provider 装配（`useCoreUIKitProvider` / `useCoreUIKit` / `useProviderSideEffects`）
   - 24 个原子组件（Em* 基础组件集，含 story）+ theme CSS 变量（539 行）+ locale（含 `mergeLocaleMessages`，供场景包合并 i18n keys）+ constants + 通用 utils（logger / log-store / sdk-error / download / z-index / format-time / linkify）
   - core 版 `EmUIKitProvider` 容器（props 子集 + 场景无关共享副作用）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`）：`EasemobUIKitCoreResolver` / `EasemobUIKitCoreImports`
-- 对外 API 零回归：`@easemob/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。
+- 对外 API 零回归：`@easemob-community/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。

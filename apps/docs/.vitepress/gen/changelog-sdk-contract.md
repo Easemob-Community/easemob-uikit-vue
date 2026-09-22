@@ -1,4 +1,13 @@
-## @easemob/uikit-sdk-contract 1.3.0 (2026-09-18)
+## @easemob-community/uikit-sdk-contract 1.3.1 (2026-09-21)
+
+
+### 新增
+
+- **`UIKitFeatures` 新增 `enableReadReceipt?: boolean`**：是否启用消息已读回执，默认 true；类型面供 core / adapter / uikit-im 共享。
+
+---
+
+## @easemob-community/uikit-sdk-contract 1.3.0 (2026-09-18)
 
 
 ### 新增
@@ -8,7 +17,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.2.1 (2026-09-17)
+## @easemob-community/uikit-sdk-contract 1.2.1 (2026-09-17)
 
 
 ### 新增
@@ -17,7 +26,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
+## @easemob-community/uikit-sdk-contract 1.2.0 (2026-09-03)
 
 
 ### 新增
@@ -26,7 +35,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.1.0 (2026-09-02)
 
 
 ### 新增
@@ -35,7 +44,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.0.0 (2026-09-02)
 
 
 ### 新增

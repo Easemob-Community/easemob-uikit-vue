@@ -9,7 +9,7 @@
 
 ## 目标
 
-在 `@easemob/uikit-chatroom` 场景包里做直播/语聊房/教室等变种时，
+在 `@easemob-community/uikit-chatroom` 场景包里做直播/语聊房/教室等变种时，
 **把「通用容器/壳子」和「业务形态」分开**，避免为每一种业务卡片（商品卡、红包、优惠券、PK 条）单独预埋组件。
 
 ## 1. 核心原则：UIKIT 只提供「壳子」，业务提供「内容」
@@ -53,7 +53,7 @@ packages/uikit-chatroom/src
 聊天室房间属性（attributes）是变种间共享的 KV 空间，必须使用场景前缀防冲突：
 
 ```ts
-import { CHATROOM_ATTR_PREFIX, useChatroomAttributes } from '@easemob/uikit-chatroom'
+import { CHATROOM_ATTR_PREFIX, useChatroomAttributes } from '@easemob-community/uikit-chatroom'
 
 const { prefixedKey, setAttributes, removeAttributes } = useChatroomAttributes()
 
@@ -81,7 +81,7 @@ type LiveDanmakuKind = 'normal' | 'checkin' | 'purchase' | 'gift' | 'welcome'
 视觉分区由常量决定，业务方 push 时只决定语义 kind：
 
 ```ts
-import { NOTIFICATION_KINDS, CHAT_KINDS } from '@easemob/uikit-chatroom'
+import { NOTIFICATION_KINDS, CHAT_KINDS } from '@easemob-community/uikit-chatroom'
 ```
 
 - `NOTIFICATION_KINDS`：固定在上部通知区（商品上架、购买提示、欢迎进入）

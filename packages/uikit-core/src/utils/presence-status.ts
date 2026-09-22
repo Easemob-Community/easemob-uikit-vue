@@ -1,4 +1,4 @@
-import { PRESENCE_STATUS } from '@easemob/uikit-sdk-contract'
+import { PRESENCE_STATUS } from '@easemob-community/uikit-sdk-contract'
 
 type PresenceDisplayStatus = 'online' | 'offline' | 'away' | 'busy' | 'doNotDisturb' | 'custom'
 

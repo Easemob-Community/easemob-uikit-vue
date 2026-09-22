@@ -1,13 +1,13 @@
 /**
- * 校验 @easemob/uikit-im 的 SDK 隔离：场景 UI 包禁止直接依赖任何 SDK 或具体 adapter。
+ * 校验 @easemob-community/uikit-im 的 SDK 隔离：场景 UI 包禁止直接依赖任何 SDK 或具体 adapter。
  *
- * 背景：D122 端口-适配器架构要求 uikit-im 只面向中立契约（@easemob/uikit-sdk-contract），
+ * 背景：D122 端口-适配器架构要求 uikit-im 只面向中立契约（@easemob-community/uikit-sdk-contract），
  * 不能 import SDK 本体（easemob-websdk）也不能静态绑定某个 adapter（websdk5/webim4）。
  * 切 SDK 时只换注入的 adapter，uikit-im dist 不重发。
  *
  * 规则：
  *   1. 禁止 import ... from 'easemob-websdk'（值 + 类型）
- *   2. 禁止 import ... from '@easemob/uikit-sdk-websdk5' / '@easemob/uikit-sdk-webim4'（值 + 类型）
+ *   2. 禁止 import ... from '@easemob-community/uikit-sdk-websdk5' / '@easemob-community/uikit-sdk-webim4'（值 + 类型）
  *   3. 仅以下白名单文件例外：
  *        - src/websdk5.ts     子路径入口，负责默认 adapter 自注册
  *        - src/webim4.ts      子路径入口，负责默认 adapter 自注册（镜像 websdk5.ts）
@@ -34,8 +34,8 @@ const allowlist = new Set([
 // 禁止的裸模块说明符
 const forbiddenSpecifiers = [
   'easemob-websdk',
-  '@easemob/uikit-sdk-websdk5',
-  '@easemob/uikit-sdk-webim4',
+  '@easemob-community/uikit-sdk-websdk5',
+  '@easemob-community/uikit-sdk-webim4',
 ]
 
 // import type / 静态 import / 动态 import 三种形态
@@ -94,7 +94,7 @@ for (const dir of scanDirs) {
 if (violations.length > 0) {
   console.error(`\n[check-sdk-isolation] uikit-im SDK 隔离违规 ${violations.length} 处（禁止直接依赖 SDK 或具体 adapter）：`)
   violations.forEach(v => console.error(`  - ${v}`))
-  console.error('\nuikit-im 只应依赖 @easemob/uikit-sdk-contract；具体 adapter 由下游注入或经白名单子路径入口注册。\n')
+  console.error('\nuikit-im 只应依赖 @easemob-community/uikit-sdk-contract；具体 adapter 由下游注入或经白名单子路径入口注册。\n')
   process.exit(1)
 }
 console.log('✓ uikit-im SDK 隔离校验通过（无 SDK / adapter 直接依赖）')

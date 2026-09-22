@@ -22,13 +22,13 @@
 ## 快速开始
 
 ```bash
-pnpm install @easemob/uikit-im
+pnpm install @easemob-community/uikit-im
 ```
 
 ```ts
 import { createApp } from 'vue'
-import UIKit from '@easemob/uikit-im'
-import '@easemob/uikit-im/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
+import UIKit from '@easemob-community/uikit-im'
+import '@easemob-community/uikit-im/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
 import App from './App.vue'
 
 const app = createApp(App)
@@ -77,10 +77,10 @@ pnpm -F @easemob/docs dev
 
 ```bash
 # 类型检查
-pnpm -F @easemob/uikit-im exec vue-tsc --noEmit
+pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit
 
 # 构建
-pnpm -F @easemob/uikit-im build
+pnpm -F @easemob-community/uikit-im build
 
 # demo 类型检查
 cd apps/demo && pnpm exec vue-tsc --noEmit

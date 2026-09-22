@@ -38,16 +38,16 @@ importers:
 
   apps/demo:
     dependencies:
-      '@easemob/uikit-chatroom':
+      '@easemob-community/uikit-chatroom':
         specifier: workspace:*
         version: link:../../packages/uikit-chatroom
-      '@easemob/uikit-im':
+      '@easemob-community/uikit-im':
         specifier: workspace:*
         version: link:../../packages/uikit-im
-      '@easemob/uikit-sdk-webim4':
+      '@easemob-community/uikit-sdk-webim4':
         specifier: workspace:*
         version: link:../../packages/uikit-sdk-webim4
-      '@easemob/uikit-sdk-websdk5':
+      '@easemob-community/uikit-sdk-websdk5':
         specifier: workspace:*
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
@@ -90,13 +90,13 @@ importers:
 
   apps/demo-chatroom:
     dependencies:
-      '@easemob/uikit-chatroom':
+      '@easemob-community/uikit-chatroom':
         specifier: workspace:*
         version: link:../../packages/uikit-chatroom
-      '@easemob/uikit-core':
+      '@easemob-community/uikit-core':
         specifier: workspace:*
         version: link:../../packages/uikit-core
-      '@easemob/uikit-sdk-websdk5':
+      '@easemob-community/uikit-sdk-websdk5':
         specifier: workspace:*
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
@@ -130,10 +130,10 @@ importers:
 
   apps/docs:
     dependencies:
-      '@easemob/uikit-chatroom':
+      '@easemob-community/uikit-chatroom':
         specifier: workspace:*
         version: link:../../packages/uikit-chatroom
-      '@easemob/uikit-im':
+      '@easemob-community/uikit-im':
         specifier: workspace:*
         version: link:../../packages/uikit-im
       '@vue/repl':
@@ -186,10 +186,10 @@ importers:
 
   packages/uikit-chatroom:
     dependencies:
-      '@easemob/uikit-core':
+      '@easemob-community/uikit-core':
         specifier: workspace:*
         version: link:../uikit-core
-      '@easemob/uikit-sdk-contract':
+      '@easemob-community/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
       easemob-websdk:
@@ -220,7 +220,7 @@ importers:
 
   packages/uikit-core:
     dependencies:
-      '@easemob/uikit-sdk-contract':
+      '@easemob-community/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
       '@vueuse/core':
@@ -230,7 +230,7 @@ importers:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
     devDependencies:
-      '@easemob/uikit-sdk-websdk5':
+      '@easemob-community/uikit-sdk-websdk5':
         specifier: workspace:*
         version: link:../uikit-sdk-websdk5
       '@histoire/plugin-vue':
@@ -260,10 +260,10 @@ importers:
 
   packages/uikit-im:
     dependencies:
-      '@easemob/uikit-core':
+      '@easemob-community/uikit-core':
         specifier: workspace:^
         version: link:../uikit-core
-      '@easemob/uikit-sdk-contract':
+      '@easemob-community/uikit-sdk-contract':
         specifier: workspace:^
         version: link:../uikit-sdk-contract
       '@tiptap/extension-image':
@@ -282,10 +282,10 @@ importers:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
     devDependencies:
-      '@easemob/uikit-sdk-webim4':
+      '@easemob-community/uikit-sdk-webim4':
         specifier: workspace:^
         version: link:../uikit-sdk-webim4
-      '@easemob/uikit-sdk-websdk5':
+      '@easemob-community/uikit-sdk-websdk5':
         specifier: workspace:^
         version: link:../uikit-sdk-websdk5
       '@histoire/plugin-vue':
@@ -327,7 +327,7 @@ importers:
 
   packages/uikit-sdk-webim4:
     dependencies:
-      '@easemob/uikit-sdk-contract':
+      '@easemob-community/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
       easemob-websdk-4:
@@ -355,7 +355,7 @@ importers:
 
   packages/uikit-sdk-websdk5:
     dependencies:
-      '@easemob/uikit-sdk-contract':
+      '@easemob-community/uikit-sdk-contract':
         specifier: workspace:*
         version: link:../uikit-sdk-contract
       easemob-websdk:

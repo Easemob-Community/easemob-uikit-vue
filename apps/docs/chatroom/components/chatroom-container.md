@@ -11,7 +11,7 @@
 
 ```vue
 <script setup lang="ts">
-import { useChatroomProvider, EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { useChatroomProvider, EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 useChatroomProvider({ appKey: 'orgName#appName' })
 </script>
 

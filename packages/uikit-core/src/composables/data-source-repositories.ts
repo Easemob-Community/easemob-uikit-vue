@@ -5,7 +5,7 @@ import type {
   SdkRepositoryOverrides,
   UIKitDataSource,
   UserInfoRepository,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 
 /**
  * dataSource → repository 薄别名翻译（D122 风险 10 收口）。

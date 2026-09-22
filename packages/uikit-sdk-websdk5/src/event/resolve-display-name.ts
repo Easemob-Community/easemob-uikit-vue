@@ -1,4 +1,4 @@
-import type { UiMessage } from '@easemob/uikit-sdk-contract'
+import type { UiMessage } from '@easemob-community/uikit-sdk-contract'
 import type { EventStores } from './types'
 
 /**

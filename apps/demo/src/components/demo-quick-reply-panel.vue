@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useChatPlugin, useLocale } from '@easemob/uikit-im'
+import { useChatPlugin, useLocale } from '@easemob-community/uikit-im'
 
 export interface DemoQuickReplyPanelEmits {
   (e: 'select', text: string): void

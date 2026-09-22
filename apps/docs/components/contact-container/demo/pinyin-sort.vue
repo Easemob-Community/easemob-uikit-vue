@@ -5,8 +5,8 @@ import {
   EmUIKitProvider,
   setPinyinAdapter,
   useContactStore,
-} from '@easemob/uikit-im'
-import type { UiContact as Contact } from '@easemob/uikit-im'
+} from '@easemob-community/uikit-im'
+import type { UiContact as Contact } from '@easemob-community/uikit-im'
 
 /** mock 联系人：姓氏首字母覆盖 C/F/L/W/Y/Z 等，混入英文名，用于演示拼音分组与排序 */
 const contacts: Contact[] = [

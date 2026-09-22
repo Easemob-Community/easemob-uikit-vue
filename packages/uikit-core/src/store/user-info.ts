@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { UserInfo, UserInfoAttribute } from '@easemob/uikit-sdk-contract'
+import type { UserInfo, UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
 
 export interface UserInfoState {
   userInfoMap: Record<string, UserInfo>

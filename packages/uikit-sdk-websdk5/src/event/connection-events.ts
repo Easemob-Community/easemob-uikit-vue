@@ -1,5 +1,5 @@
 import type { ConnectionEventHandlerMap } from 'easemob-websdk'
-import { createLogger, isKickErrorCode } from '@easemob/uikit-sdk-contract'
+import { createLogger, isKickErrorCode } from '@easemob-community/uikit-sdk-contract'
 
 const connLog = createLogger('UIKit:ConnEvents')
 

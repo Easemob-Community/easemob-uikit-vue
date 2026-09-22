@@ -13,9 +13,9 @@ import {
   CHATROOM_GIFT_ITEMS,
   useChatroom,
   useChatroomMessage,
-} from '@easemob/uikit-chatroom'
-import { MESSAGE_TYPE, useClient } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+} from '@easemob-community/uikit-chatroom'
+import { MESSAGE_TYPE, useClient } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 import DemoDanmakuStage from '../components/demo-danmaku-stage.vue'
 import type { DanmakuItem } from '../components/demo-danmaku-stage.vue'

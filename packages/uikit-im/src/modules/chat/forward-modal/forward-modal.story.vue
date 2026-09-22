@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CONVERSATION_TYPE } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../../containers/uikit-provider/uikit-provider.vue'
-import type { UiConversation } from '@easemob/uikit-core'
+import type { UiConversation } from '@easemob-community/uikit-core'
 import { useConversationStore } from '../../../store/conversation'
 import ForwardModal from './forward-modal.vue'
 

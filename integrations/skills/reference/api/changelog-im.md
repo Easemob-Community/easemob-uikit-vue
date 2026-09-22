@@ -1,4 +1,4 @@
-## @easemob/uikit-im 3.3.0 (2026-09-03)
+## @easemob-community/uikit-im 3.3.0 (2026-09-03)
 
 
 ### 新增
@@ -11,7 +11,7 @@
 
 ---
 
-## @easemob/uikit-im 3.2.0 (2026-09-02)
+## @easemob-community/uikit-im 3.2.0 (2026-09-02)
 
 
 ### 新增
@@ -31,7 +31,7 @@
 
 ---
 
-## @easemob/uikit-im 3.1.0 (2026-09-02)
+## @easemob-community/uikit-im 3.1.0 (2026-09-02)
 
 
 ### 新增
@@ -49,13 +49,13 @@
 
 ---
 
-## @easemob/uikit-im 3.0.0 (2026-09-02)
+## @easemob-community/uikit-im 3.0.0 (2026-09-02)
 
 
 ### 新增
 
-- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob/uikit-sdk-contract` 与两个适配器包 `@easemob/uikit-sdk-websdk5`（5.x）/ `@easemob/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
-- **子路径入口**：新增 `@easemob/uikit-im/websdk5` 与 `@easemob/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
+- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob-community/uikit-sdk-contract` 与两个适配器包 `@easemob-community/uikit-sdk-websdk5`（5.x）/ `@easemob-community/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
+- **子路径入口**：新增 `@easemob-community/uikit-im/websdk5` 与 `@easemob-community/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
 - **Provider 新能力**：新增 `adapter` prop（注入模式：业务自带 adapter 实例，UIKit 不转发 login/logout）；`sdkConfig.repositories` 数据入口注入（message/conversation/contact/group/presence/userInfo 全域可接管）；`useUIKit()` 暴露 `capabilities`（adapter 上报的 SDK 客观能力矩阵，与 features 取交集决定能力入口）；core 新增模块级 `getUIKitAdapter()` 支持非 Vue 上下文访问。
 - **4.x 适配补齐**：登录后按 features 预取联系人/群组（对齐 5.x 同步体感）；漫游坏消息容错（单条解码失败跳过不拖垮整页）。
 
@@ -66,12 +66,12 @@
 
 ### 破坏性行为变更
 
-- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
+- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob-community/uikit-im/websdk5`（4.x 场景用 `@easemob-community/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob-community/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
 - **`UIKitDataSource` 维持 `@deprecated`（本版本不移除）**：已收口为 repository 注入的薄别名（core 装配时逐项翻译，显式 `repositories` 优先）；`searchUsers` 等无 repository 对应项的接管面迁移目标尚未设计，移除调整至 4.0.0。
 
 ---
 
-## @easemob/uikit-im 2.8.6 (2026-08-28)
+## @easemob-community/uikit-im 2.8.6 (2026-08-28)
 
 
 ### 修复
@@ -81,7 +81,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.5 (2026-08-28)
+## @easemob-community/uikit-im 2.8.5 (2026-08-28)
 
 
 ### 修复
@@ -90,7 +90,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.4 (2026-08-28)
+## @easemob-community/uikit-im 2.8.4 (2026-08-28)
 
 
 ### 修复
@@ -99,7 +99,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.3 (2026-08-28)
+## @easemob-community/uikit-im 2.8.3 (2026-08-28)
 
 
 ### 修复
@@ -108,7 +108,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.2 (2026-08-28)
+## @easemob-community/uikit-im 2.8.2 (2026-08-28)
 
 
 ### 调整
@@ -118,7 +118,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.1 (2026-08-28)
+## @easemob-community/uikit-im 2.8.1 (2026-08-28)
 
 
 ### 调整
@@ -127,7 +127,7 @@
 
 ---
 
-## @easemob/uikit-im 2.8.0 (2026-08-28)
+## @easemob-community/uikit-im 2.8.0 (2026-08-28)
 
 
 ### 新增
@@ -141,11 +141,11 @@
 
 ### 修复
 
-- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob/uikit-core` 1.5.0）。
+- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob-community/uikit-core` 1.5.0）。
 
 ---
 
-## @easemob/uikit-im 2.7.0 (2026-08-27)
+## @easemob-community/uikit-im 2.7.0 (2026-08-27)
 
 
 ### 破坏性变更
@@ -158,7 +158,7 @@
 
 ---
 
-## @easemob/uikit-im 2.6.0 (2026-08-26)
+## @easemob-community/uikit-im 2.6.0 (2026-08-26)
 
 
 ### 破坏性变更
@@ -172,7 +172,7 @@
 
 ---
 
-## @easemob/uikit-im 2.5.0 (2026-08-25)
+## @easemob-community/uikit-im 2.5.0 (2026-08-25)
 
 
 ### 新增
@@ -186,7 +186,7 @@
 
 ---
 
-## @easemob/uikit-im 2.4.0 (2026-08-25)
+## @easemob-community/uikit-im 2.4.0 (2026-08-25)
 
 
 ### 新增
@@ -240,7 +240,7 @@
 
 ### 新增
 
-- **Skeleton 骨架屏组件**：`@easemob/uikit-core` 新增 `EmSkeleton`，支持头像 + 文字行变体；会话/联系人/群组列表首次加载接入骨架屏，减少空白等待感。
+- **Skeleton 骨架屏组件**：`@easemob-community/uikit-core` 新增 `EmSkeleton`，支持头像 + 文字行变体；会话/联系人/群组列表首次加载接入骨架屏，减少空白等待感。
 - **Modal danger 变体**：`EmModal` 新增 `type?: 'default' | 'danger'`，危险操作确认按钮自动切换为 danger 语义；同步限制最大宽度与正文溢出滚动。
 - **Toast 能力补全**：`EmToast` / `useToast` 新增 `closable`、`position`、`actionText`、 `#action` 插槽与 `duration=0` 不自动关闭；`show` 方法通过重载兼容旧签名与新签名。
 - **Input error / readonly 态**：`EmInput` 新增 `error` / `error-message` / `readonly` props，支持表单校验失败视觉反馈与只读可复制状态。
@@ -264,7 +264,7 @@
 - **组件使用建议**：Button/Input/IconButton/Cell/Modal 文档新增 Do/Don't 对比表。
 - **设计原则**：`guide/theme.md` 提炼 5 条核心设计原则（变量优先、层级清晰、无障碍默认、移动端优先、一致优于花哨）。
 - **图标与时间戳规范**：`guide/icons.md` 补充图标设计规范；`components/message-list.md` 补充时间戳策略建议。
-- **更新日志三包拆分**：`guide/changelog.md` 改用自定义 `ChangelogTabs` 组件，按 `@easemob/uikit-im` / `@easemob/uikit-core` / `@easemob/uikit-chatroom` 三 tab 展示各包更新日志；构建时由根 `CHANGELOG.md` 自动拆分生成。
+- **更新日志三包拆分**：`guide/changelog.md` 改用自定义 `ChangelogTabs` 组件，按 `@easemob-community/uikit-im` / `@easemob-community/uikit-core` / `@easemob-community/uikit-chatroom` 三 tab 展示各包更新日志；构建时由根 `CHANGELOG.md` 自动拆分生成。
 - **文档站导航重构**：顶部导航收敛为「首页 / 指南 / 组件 / GitHub」；左侧边栏按「开始 / 功能指南 / 设计系统 / H5 适配 / Demo 规划 / 更新日志」板块聚合，同一板块内只展示当前板块导航，消除 mix 感。
 - **图标总览默认展开**：`IconGallery` 分类默认展开，进入图标/Design Tokens 页即可直接浏览全部图标。
 
@@ -286,19 +286,19 @@
 ### 重构
 
 - **三包架构落地（P0.5 改名 + P1 抽核，里程碑级内部重构）**：
-  - 包改名：`@easemob/uikit` → `@easemob/uikit-im`（纯改名，安装命令同步更新，为聊天室场景包让位命名空间）
-  - 新增共享基座 `@easemob/uikit-core`（1.0.0，独立版本线）：
+  - 包改名：`@easemob/uikit` → `@easemob-community/uikit-im`（纯改名，安装命令同步更新，为聊天室场景包让位命名空间）
+  - 新增共享基座 `@easemob-community/uikit-core`（1.0.0，独立版本线）：
     - SDK 基座层：`UIKitClient` / `ManagerHost`（含 **`ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
     - Pinia stores：client / theme / user-info / presence
     - 共享 composables：`useClient` / `useTheme` / `useUserInfo` / `useOwnUserInfo` / `usePresence` / `useToast` / `useNotification` / H5 通用（`useH5Adaptation` / `useKeyboard` / `useLongPress` / `usePullRefresh` / `useViewport` / `useBottomSheet` / `useRipple`）/ 通用交互（`useKeyBindings` / `useResizable` / `useUIKitStorage`）
     - 24 个原子组件（Em* 基础组件集，含 story）+ theme CSS 变量（539 行）+ locale（含 `mergeLocaleMessages`，供场景包合并 i18n keys）+ constants + 通用 utils（logger / log-store / sdk-error / download / z-index / format-time / linkify）
     - core 版 `EmUIKitProvider` + `useCoreUIKitProvider` / `useProviderSideEffects`（场景无关共享副作用）
-  - `@easemob/uikit-im` 全量 re-export core 符号：**对外 API 零回归**（原 416 个公共导出名全部保留，组件 props/emits、主题、文案、行为不变）
+  - `@easemob-community/uikit-im` 全量 re-export core 符号：**对外 API 零回归**（原 416 个公共导出名全部保留，组件 props/emits、主题、文案、行为不变）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`，各包一份产物，build 前置 `--check` 卡漂移）
   - 构建规则固化：所有包 external `vue`/`pinia`/`easemob-websdk`，场景包再 external core（消费端单 SDK 实例）；im UMD 产物补 core 全局映射（CDN 直引可用）
   - 版本同步：`changelog:check` 升级为 im / core 双版本校验（根 CHANGELOG 单一数据源不变）；im 依赖 core 采用 `workspace:^`（发布转 `^1.0.0`）
   - 日志导出文件名前缀参数化（`setLogFilePrefix`），im 既有 `easemob-uikit-im-logs-*` 语义不变
-- **面向下游**：安装包名由 `@easemob/uikit` 变更为 `@easemob/uikit-im`；除此之外无任何 API / 行为变更，可直接替换依赖名升级。
+- **面向下游**：安装包名由 `@easemob/uikit` 变更为 `@easemob-community/uikit-im`；除此之外无任何 API / 行为变更，可直接替换依赖名升级。
 
 ---
 

@@ -1,13 +1,13 @@
-## @easemob/uikit-chatroom 2.0.0 (2026-09-02)
+## @easemob-community/uikit-chatroom 2.0.0 (2026-09-02)
 
 
 ### 破坏性行为变更
 
-- **SDK 解耦对齐双 adapter 架构**：公开导出 `resolveChatroomClientConfig` / `CHATROOM_SDK_MANAGERS` 移除，替换为 `resolveChatroomSdkConfig`；`onClientSetup` 改为 `onAdapterReady`；manager 注入改 adapter 预设 `managerPreset: 'chatroom'`；`ManagerHost` 改本包 `ChatroomSdkHost`（惰性代理解析 adapter.client）。本包不再直接依赖 `@easemob/uikit-sdk-websdk5`，adapter 由业务侧注入或经默认工厂注册。
+- **SDK 解耦对齐双 adapter 架构**：公开导出 `resolveChatroomClientConfig` / `CHATROOM_SDK_MANAGERS` 移除，替换为 `resolveChatroomSdkConfig`；`onClientSetup` 改为 `onAdapterReady`；manager 注入改 adapter 预设 `managerPreset: 'chatroom'`；`ManagerHost` 改本包 `ChatroomSdkHost`（惰性代理解析 adapter.client）。本包不再直接依赖 `@easemob-community/uikit-sdk-websdk5`，adapter 由业务侧注入或经默认工厂注册。
 
 ---
 
-## @easemob/uikit-chatroom 1.0.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 1.0.0 (2026-08-15)
 
 
 ### 里程碑
@@ -30,7 +30,7 @@
   - MCP 数据纳入聊天室：guide + 组件 API + manifest `chatroom` 段（独立 version），
     `search_docs` 搜索覆盖两包、`get_component_api` 兼容聊天室组件名。
 - **工具链修正（P1 抽核遗留）**：`gen:api` 原子组件根目录跟随抽核迁移到
-  `@easemob/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
+  `@easemob-community/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
   插槽提取增强——`name` 属性不在 `<slot` 首位的多行写法不再漏提取，
   容器 19 个命名插槽全量落表（此前仅 10 个）。
 - **组件公开导出补全（文档整改自查）**：`ChatroomGiftBar`（礼物入口）与
@@ -51,7 +51,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.3.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.3.0 (2026-08-15)
 
 
 ### 新增
@@ -90,7 +90,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.2.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.2.0 (2026-08-15)
 
 
 ### 新增
@@ -129,7 +129,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.1.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.1.0 (2026-08-15)
 
 
 ### 新增

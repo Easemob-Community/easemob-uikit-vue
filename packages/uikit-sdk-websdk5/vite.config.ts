@@ -48,14 +48,14 @@ export default defineConfig({
       fileName: (format: string) => `easemob-uikit-sdk-websdk5.${format === 'es' ? 'js' : 'umd.cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', 'pinia', 'easemob-websdk', '@easemob/uikit-sdk-contract'],
+      external: ['vue', 'pinia', 'easemob-websdk', '@easemob-community/uikit-sdk-contract'],
       output: {
         exports: 'named',
         globals: {
           'vue': 'Vue',
           'pinia': 'Pinia',
           'easemob-websdk': 'Easemob',
-          '@easemob/uikit-sdk-contract': 'EasemobUIKitSdkContract',
+          '@easemob-community/uikit-sdk-contract': 'EasemobUIKitSdkContract',
         },
       },
     },

@@ -9,7 +9,7 @@
  * - 窄视口坍缩由容器层决定（成员侧栏收起为弹层），本组件只负责分栏。
  */
 import { computed, ref, watch } from 'vue'
-import { useResizable } from '@easemob/uikit-core'
+import { useResizable } from '@easemob-community/uikit-core'
 
 export interface ChatroomSplitLayoutProps {
   /** 成员栏宽度（px 数字或 CSS 长度，缺省 280px；可拖拽调整） */

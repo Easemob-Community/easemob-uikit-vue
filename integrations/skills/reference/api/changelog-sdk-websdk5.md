@@ -1,4 +1,4 @@
-## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
+## @easemob-community/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
 
 ### 修复
@@ -7,7 +7,7 @@
 
 ---
 
-## @easemob/uikit-sdk-websdk5 1.2.1 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.2.1 (2026-09-02)
 
 
 ### 修复
@@ -16,7 +16,7 @@
 
 ---
 
-## @easemob/uikit-sdk-websdk5 1.2.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.2.0 (2026-09-02)
 
 
 ### 新增
@@ -29,7 +29,7 @@
 
 ---
 
-## @easemob/uikit-sdk-websdk5 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.1.0 (2026-09-02)
 
 
 ### 性能
@@ -42,9 +42,9 @@
 
 ---
 
-## @easemob/uikit-sdk-websdk5 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.0.0 (2026-09-02)
 
 
 ### 新增
 
-- **首次发布**：easemob-websdk 5.x 适配器——`Websdk5Adapter`（内置 / 注入双模式）+ 六域 Domain（message/conversation/contact/group/presence/userInfo）+ 事件层 + 中立字段映射 + 六 repository 代理 + 新消息通知引擎，实现 `@easemob/uikit-sdk-contract` 全部接口；`SdkRepositoryOverrides` 全域可注入。
+- **首次发布**：easemob-websdk 5.x 适配器——`Websdk5Adapter`（内置 / 注入双模式）+ 六域 Domain（message/conversation/contact/group/presence/userInfo）+ 事件层 + 中立字段映射 + 六 repository 代理 + 新消息通知引擎，实现 `@easemob-community/uikit-sdk-contract` 全部接口；`SdkRepositoryOverrides` 全域可注入。

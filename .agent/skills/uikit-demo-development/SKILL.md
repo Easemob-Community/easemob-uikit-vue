@@ -29,16 +29,16 @@ demo 是 UIKit 的「演示 + 联调 + 业务接入参考」三合一工程。�
 
 ```
 alias: [
-  { find: '@easemob/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
-  { find: '@easemob/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
+  { find: '@easemob-community/uikit-im/theme', replacement: resolve(__dirname, '../../packages/uikit-im/dist/theme/index.css') },
+  { find: '@easemob-community/uikit-im', replacement: resolve(__dirname, '../../packages/uikit-im/src') },
 ],
 ```
 
 - 源码模式下改 `packages/uikit-im/src` 刷新即生效，无需重建 dist；组件样式由 `.vue`
-  `<style>` 提供（产物模式由主题 css 提供，main.ts 两模式均引入 `@easemob/uikit-im/theme`）；
-- **tgz 临时验证模式（2026-08-12 起）**：alias 被注释，`@easemob/uikit-im` 从 node_modules
+  `<style>` 提供（产物模式由主题 css 提供，main.ts 两模式均引入 `@easemob-community/uikit-im/theme`）；
+- **tgz 临时验证模式（2026-08-12 起）**：alias 被注释，`@easemob-community/uikit-im` 从 node_modules
   解析 `file:../../easemob-uikit-im-1.3.1.tgz` 安装产物。此模式下**改 src 不生效**，需
-  `pnpm -F @easemob/uikit-im build` 重新打包并重新安装 tgz 依赖（或直接恢复源码模式）；
+  `pnpm -F @easemob-community/uikit-im build` 重新打包并重新安装 tgz 依赖（或直接恢复源码模式）；
 - **demo 的 `vue-tsc` 始终解析 dist 类型**（非源码）：改公开 API（props/emits/导出）
   后必须重建 dist，否则 demo 类型检查与运行时不一致；
 - `define` 注入 `__EASEMOB_SDK_VERSION__` / `__EASEMOB_UIKIT_VERSION__`（构建期读
@@ -105,7 +105,7 @@ alias: [
   - `setPinyinAdapter(adapter)` / `setPinyinAdapter(null)`——拼音搜索适配器开关
     （pinyin-pro 实现：pinyin + initials + firstLetter，非 A-Z 首字母回落 `'#'`）；
   - `setKeyboardShortcutsEnabled(bool)`——UIKIT 全局快捷键开关（ESC 关弹层等）；
-- `DEFAULT_CONVERSATION_TABS` 从 `@easemob/uikit-im` 导入，tabs 增删/排序/预设（仅单聊 /
+- `DEFAULT_CONVERSATION_TABS` 从 `@easemob-community/uikit-im` 导入，tabs 增删/排序/预设（仅单聊 /
   仅群组 / 恢复默认）都有对应动作函数；
 - `demoStickerPacks`：GIF 表情包示例（EmojiStickerPack[]），验证 sticker 发送链路。
 
@@ -125,14 +125,14 @@ alias: [
 
 - 启动：`cd apps/demo && pnpm dev`（源码模式改 src 热更；tgz 模式需先 build + 重装）；
 - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`（解析 dist 类型）；
-- 联调闭环：改 src → `pnpm -F @easemob/uikit-im build` → 重新安装 tgz 依赖 → dev；
+- 联调闭环：改 src → `pnpm -F @easemob-community/uikit-im build` → 重新安装 tgz 依赖 → dev；
   长期开发建议直接恢复源码 alias 模式（见 §1），不要停留在 tgz 模式。
 
 ## 硬规则 vs 软约定
 
 **硬规则：**
 
-- 恢复源码模式必须配**两条** alias，`@easemob/uikit-im/theme` 排前面（顺序错误会导致
+- 恢复源码模式必须配**两条** alias，`@easemob-community/uikit-im/theme` 排前面（顺序错误会导致
   theme 子路径被主 alias 吞掉）。
 - 业务多语言 key 必须 zh-CN / en 成对补齐（mergeLocaleMessages）。
 - 新设置状态必须放进 `useDemoSettings` 单例，禁止面板里另起 ref。
@@ -148,10 +148,10 @@ alias: [
 
 ## 已知漂移（改到相关文件时注意）
 
-- demo 依赖声明已恢复 `@easemob/uikit-im: workspace:*` 源码直连模式（2026-09-18 结束 3.7.3
+- demo 依赖声明已恢复 `@easemob-community/uikit-im: workspace:*` 源码直连模式（2026-09-18 结束 3.7.3
   tgz 验证后恢复，vite.config.ts 两条 alias 已恢复）；后续如需临时 tgz 验证，注释 uikit-im
   两条 alias（theme 在前）并把依赖改为 `file:../../easemob-uikit-im-<version>.tgz` 后
-  `pnpm install`。**切勿只注释 uikit-im alias 而保留 `@easemob/uikit-core` 指 src**——混合
+  `pnpm install`。**切勿只注释 uikit-im alias 而保留 `@easemob-community/uikit-core` 指 src**——混合
   解析会让预构建把 core 源码编进 deps chunk 又把 core 的 .vue 外置成绝对路径，SFC 经 dev
   server 加载出第二份 core 模块实例，注入 Symbol 不一致，报
   `useCoreUIKit() must be used within <UIKitProvider>`。

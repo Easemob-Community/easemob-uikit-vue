@@ -1,4 +1,4 @@
-import type { UiGroup as Group } from '@easemob/uikit-core'
+import type { UiGroup as Group } from '@easemob-community/uikit-core'
 import type { AvatarShape } from '../contact/types'
 
 export type { AvatarShape }

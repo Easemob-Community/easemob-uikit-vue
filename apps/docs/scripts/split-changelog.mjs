@@ -2,7 +2,7 @@
  * 拆分根 CHANGELOG.md 为六个包独立的 changelog 文件
  *
  * 根 CHANGELOG.md 使用两种版本段格式：
- * - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 @easemob/uikit-im 历史段
+ * - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 @easemob-community/uikit-im 历史段
  * - 带包名前缀 `## @easemob/<pkg> x.y.z (yyyy-mm-dd)`：对应包段
  *
  * 本脚本按包名提取版本段，生成：
@@ -29,15 +29,15 @@ const changelog = readFileSync(changelogPath, 'utf8')
 // 版本段分隔线后的第一个标题视为新段开始；段内可能包含 ---
 const SECTION_RE = /^## (?:(@[\w./-]+) )?(\d+\.\d+\.\d+) \((\d{4}-\d{2}-\d{2})\)$/gm
 
-const BARE_SECTION_PKG = '@easemob/uikit-im'
+const BARE_SECTION_PKG = '@easemob-community/uikit-im'
 const OUTPUT_MAP = {
-  '@easemob/uikit-im': join(genDir, 'changelog-im.md'),
-  '@easemob/uikit-core': join(genDir, 'changelog-core.md'),
+  '@easemob-community/uikit-im': join(genDir, 'changelog-im.md'),
+  '@easemob-community/uikit-core': join(genDir, 'changelog-core.md'),
   // 【一期临时】下线聊天室文档树，恢复时取消注释
-  // '@easemob/uikit-chatroom': join(genDir, 'changelog-chatroom.md'),
-  '@easemob/uikit-sdk-contract': join(genDir, 'changelog-sdk-contract.md'),
-  '@easemob/uikit-sdk-websdk5': join(genDir, 'changelog-sdk-websdk5.md'),
-  '@easemob/uikit-sdk-webim4': join(genDir, 'changelog-sdk-webim4.md'),
+  // '@easemob-community/uikit-chatroom': join(genDir, 'changelog-chatroom.md'),
+  '@easemob-community/uikit-sdk-contract': join(genDir, 'changelog-sdk-contract.md'),
+  '@easemob-community/uikit-sdk-websdk5': join(genDir, 'changelog-sdk-websdk5.md'),
+  '@easemob-community/uikit-sdk-webim4': join(genDir, 'changelog-sdk-webim4.md'),
 }
 
 /** @type {Record<string, string[]>} */

@@ -1,5 +1,5 @@
-import { CONVERSATION_TYPE, createLogger, normalizeUserId, resolveLastMessageText } from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue, UiMessage } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, createLogger, normalizeUserId, resolveLastMessageText } from '@easemob-community/uikit-sdk-contract'
+import type { ConversationTypeValue, UiMessage } from '@easemob-community/uikit-sdk-contract'
 import { adapterPreviewLabels } from './adapter/conversation-adapter'
 import { getEventHandlerDeps } from './event/deps'
 import type { EventStores } from './event/types'

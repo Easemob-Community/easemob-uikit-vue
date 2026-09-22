@@ -1,6 +1,6 @@
 import { computed } from 'vue'
-import type { UiContact as Contact } from '@easemob/uikit-core'
-import { createLogger, formatSdkError } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
+import { createLogger, formatSdkError } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 
 const logger = createLogger('UIKit:UseBlocklist')

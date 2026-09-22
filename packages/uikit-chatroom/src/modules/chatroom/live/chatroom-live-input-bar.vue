@@ -7,7 +7,7 @@
  * - 这样直播、语聊房、教室等场景可复用同一份输入条，只换动作组合。
  */
 import { computed, ref } from 'vue'
-import { t } from '@easemob/uikit-core'
+import { t } from '@easemob-community/uikit-core'
 
 export interface ChatroomLiveInputBarProps {
   /** 占位文案 */

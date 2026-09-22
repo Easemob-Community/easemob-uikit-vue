@@ -1,5 +1,5 @@
 import { type MaybeRefOrGetter, computed, toValue } from 'vue'
-import { useViewport } from '@easemob/uikit-core'
+import { useViewport } from '@easemob-community/uikit-core'
 
 /** 布局形态：fullscreen 全屏房间（H5）/ split 三栏分栏（PC） */
 export type ChatroomLayoutValue = 'fullscreen' | 'split'

@@ -1,6 +1,6 @@
 import { computed, reactive } from 'vue'
-import { createLogger } from '@easemob/uikit-sdk-contract'
-import type { SyncStatusPayload } from '@easemob/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
+import type { SyncStatusPayload } from '@easemob-community/uikit-sdk-contract'
 
 const syncLog = createLogger('UIKit:Webim4SyncStatus')
 

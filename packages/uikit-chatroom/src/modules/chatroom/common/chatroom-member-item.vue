@@ -8,7 +8,7 @@
  * （@media (hover: hover) 包裹，移动端 tap 不粘住）。
  */
 import { computed } from 'vue'
-import { EmAvatar, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
+import { EmAvatar, normalizeUserId, t, useUserInfo } from '@easemob-community/uikit-core'
 import { CHATROOM_MEMBER_ROLE } from '../../../constants'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'
 import type { ChatroomMember } from '../../../sdk/domain/chatroom-domain'

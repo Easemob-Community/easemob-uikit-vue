@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue'
-import { ChatroomLiveFullscreenEffect } from '@easemob/uikit-chatroom'
-import type { LiveFullscreenEffectItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveFullscreenEffect } from '@easemob-community/uikit-chatroom'
+import type { LiveFullscreenEffectItem } from '@easemob-community/uikit-chatroom'
 
 const effects = ref<LiveFullscreenEffectItem[]>([])
 let seq = 0

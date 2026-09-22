@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { CreateGroupParams } from '@easemob/uikit-core'
+import type { CreateGroupParams } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useContactStore } from '../../store/contact'
 import CreateGroupModal from './create-group-modal.vue'

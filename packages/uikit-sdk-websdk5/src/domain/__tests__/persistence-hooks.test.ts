@@ -1,5 +1,5 @@
-import type { MessagePersistenceHooks, SdkMessage } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
+import type { MessagePersistenceHooks, SdkMessage } from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { ManagerHost } from '../../client'
 import type { MessageStoreLike } from '../message-domain'

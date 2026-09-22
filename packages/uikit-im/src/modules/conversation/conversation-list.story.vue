@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CONVERSATION_TYPE } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE } from '@easemob-community/uikit-core'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
 import { useConversationStore } from '../../store/conversation'
-import type { UiConversation as Conversation } from '@easemob/uikit-core'
+import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 import ConversationList from './conversation-list.vue'
 
 const logs = ref<string[]>([])

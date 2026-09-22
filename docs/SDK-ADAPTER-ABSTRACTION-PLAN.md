@@ -12,7 +12,7 @@
 
 ### 1.1 需求背景
 
-1. **5.x 是战略方向**：公有云推荐，当前 UIKit（`@easemob/uikit-im` + `@easemob/uikit-core`）已按 5.x 开发接近尾声，UI 逻辑产物（消息气泡 / 会话列表 / 联系人 / 群管理 / 输入框 / 主题 / 文案）不愿舍弃重来。
+1. **5.x 是战略方向**：公有云推荐，当前 UIKit（`@easemob-community/uikit-im` + `@easemob-community/uikit-core`）已按 5.x 开发接近尾声，UI 逻辑产物（消息气泡 / 会话列表 / 联系人 / 群管理 / 输入框 / 主题 / 文案）不愿舍弃重来。
 2. **4.x 是真实存量 + 硬需求**：4.x 仍是主要存量用户在用的 SDK；且有一个**私有化项目仅支持 4.x**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合，非更老的全局 `WebIM`/`msg.bodies` 形态）。
 3. **两代长期并存**：4.x 与 5.x 会长期双轨，不是"短期迁到 5.x 就完"。
 4. **私有化项目还是 Electron 环境**：聊天消息 / 会话可能需外接本地库（如 SQLite）注入，或新增数据入口层——登录后从本地库回流渲染（冷启动不依赖网络）、新消息收发时同步写库、翻页优先读本地。这一诉求与"SDK 切换"是**同一个端口-适配器问题**：SDK 是一个数据来源，本地库是另一个数据来源，应统一收敛到同一中立契约。
@@ -28,7 +28,7 @@
 - ✅ 可做到：下游业务方接入 API 稳定；uikit-im 的 UI 产物零重写；4.x 与 5.x 的**能力对齐**（合并消息 / 置顶消息 / 流式消息 / 已读回执等 4.x 均支持，见「八、4.x 能力映射」）。
 - ❌ 做不到：让两代 SDK 的 **API/事件/wire 形状**天然一致——差异是客观存在的，必须靠 adapter 做字段映射 + 语义归一化（这正是本计划的 Phase 2 工作量）。
 - ❌ 非目标：同一个运行时实例同时连两个 SDK（不做）；UI 组件重写（不做）。
-- ⏸️ 本期暂缓：`@easemob/uikit-chatroom` 暂不接入 adapter 体系，维持现状直连 `easemob-websdk@5.x`（其 `ClientConfig.managers` 注入 ChatRoomManager 的机制不受影响——中立化后 `managers` 字段保留在 adapter 专属配置透传槽中，chatroom 经 5.x adapter 初始化路径继续可用）。chatroom 的 adapter 化待 Phase 1/2 稳定后单独评估。
+- ⏸️ 本期暂缓：`@easemob-community/uikit-chatroom` 暂不接入 adapter 体系，维持现状直连 `easemob-websdk@5.x`（其 `ClientConfig.managers` 注入 ChatRoomManager 的机制不受影响——中立化后 `managers` 字段保留在 adapter 专属配置透传槽中，chatroom 经 5.x adapter 初始化路径继续可用）。chatroom 的 adapter 化待 Phase 1/2 稳定后单独评估。
 
 ---
 
@@ -65,8 +65,8 @@
 
 三个关键澄清：
 
-1. **契约不放在 uikit-im，放中立层**：语义上"数据需求"由 uikit-im 的诉求驱动，但定义/发布在中立包（`@easemob/uikit-sdk-contract`）。若契约写进 uikit-im，适配层就不得不 `import uikit-im`——方向反了（适配层是更底层，不能依赖上层 UI 包）。
-2. **core 不碰 SDK**：当前 `@easemob/uikit-core` 的 `sdk/client.ts` / `sdk/types.ts` 里仍残留 `import ... from 'easemob-websdk'`——这正是 D122 要收口的点；目标状态下 core 只剩"SDK 无关底座（theme/locale/原子组件/composable/Provider 壳）+ 契约"，SDK 相关实现全部下沉适配层。
+1. **契约不放在 uikit-im，放中立层**：语义上"数据需求"由 uikit-im 的诉求驱动，但定义/发布在中立包（`@easemob-community/uikit-sdk-contract`）。若契约写进 uikit-im，适配层就不得不 `import uikit-im`——方向反了（适配层是更底层，不能依赖上层 UI 包）。
+2. **core 不碰 SDK**：当前 `@easemob-community/uikit-core` 的 `sdk/client.ts` / `sdk/types.ts` 里仍残留 `import ... from 'easemob-websdk'`——这正是 D122 要收口的点；目标状态下 core 只剩"SDK 无关底座（theme/locale/原子组件/composable/Provider 壳）+ 契约"，SDK 相关实现全部下沉适配层。
 3. **适配层才是 SDK 集成**：初始化/登录、事件注册、消息体字段映射、分页收敛、头像昵称补全，全部且只发生在 adapter。
 
 依赖方向（单向向下，禁止反向）：
@@ -81,12 +81,12 @@ core 里 theme / locale / constants / 原子组件（Avatar / Icon / Popup / But
 
 | 包 | SDK 相关性 | 版本数 | 职责 |
 | --- | --- | --- | --- |
-| `@easemob/uikit-core` | 无关 | 1 份 | theme / locale / constants / 原子组件 / UI composables / Provider 壳 |
-| `@easemob/uikit-sdk-contract`（契约包） | 无关 | 1 份 | 中立 wire 类型 + 接口 + `SdkCapabilities` |
-| `@easemob/uikit-sdk-websdk5`（adapter） | 相关 | 各自独立发版 | SDK5 的 client / domain / event / adapter 实现 |
-| `@easemob/uikit-sdk-webim4`（adapter） | 相关 | 各自独立发版 | IM4.x 的 client / domain / event / adapter 实现 |
+| `@easemob-community/uikit-core` | 无关 | 1 份 | theme / locale / constants / 原子组件 / UI composables / Provider 壳 |
+| `@easemob-community/uikit-sdk-contract`（契约包） | 无关 | 1 份 | 中立 wire 类型 + 接口 + `SdkCapabilities` |
+| `@easemob-community/uikit-sdk-websdk5`（adapter） | 相关 | 各自独立发版 | SDK5 的 client / domain / event / adapter 实现 |
+| `@easemob-community/uikit-sdk-webim4`（adapter） | 相关 | 各自独立发版 | IM4.x 的 client / domain / event / adapter 实现 |
 
-- `@easemob/uikit-im` 只依赖前两个（core + contract），**不再直接依赖任何 SDK 包**；SDK adapter 作为 peer dep / 注入，**下游 app 装哪个就接哪个**，uikit-im 的 dist 不用重发。
+- `@easemob-community/uikit-im` 只依赖前两个（core + contract），**不再直接依赖任何 SDK 包**；SDK adapter 作为 peer dep / 注入，**下游 app 装哪个就接哪个**，uikit-im 的 dist 不用重发。
 - 契约包必须**单一真相源、只有一个版本**：若把 core 复制成两套各写各的类型，TS 结构类型来源变了，uikit-im 换依赖时会大面积红，漂移后"无感知切换"名存实亡。
 
 ### 2.2 中立契约设计要点（关键：以 5.x 字段命名为基准）
@@ -121,7 +121,7 @@ interface SdkCapabilities {
 
 SDK 是一个数据来源，Electron 本地库（SQLite）是另一个数据来源；两者都应接到同一个中立数据契约上，因此 repository 接口应**与 SDK adapter 接口共用同一套中立 `UiMessage` / `UiConversation` 契约**，而非另起一套。
 
-- 契约包（`@easemob/uikit-sdk-contract`）除中立 wire 类型外，**同时定义数据入口接口**：
+- 契约包（`@easemob-community/uikit-sdk-contract`）除中立 wire 类型外，**同时定义数据入口接口**：
 
 ```ts
 interface MessageRepository {
@@ -240,8 +240,8 @@ interface MessageRepository {
 >
 > 注意：4.x 群聊"标已读"的 channel 消息需要 `mid`（最后一条已读消息 ID），单聊 read 消息需要 `id`（已读消息 ID）+ `to`——4.x adapter 内部需维护"每会话最后一条已读消息 ID"状态，`markConversationRead` 接口不暴露该细节。
 
-- **装配（Provider 直接传入）**：下游 `import { Webim4Adapter } from '@easemob/uikit-sdk-webim4'`，`<UIKitProvider :adapter="new Webim4Adapter()">`（或 `adapter={Webim4Adapter}` 传构造器）。Provider 的 `sdkConfig` 只保留 SDK 无关字段（`appKey`/`userId`/`token`/`debug`），透传给 adapter。
-- **Provider props 兼容策略（向下兼容，非 breaking）**：`appKey`/`sdkConfig` 旧 props **保留不删**，语义定义为"websdk5 快捷方式"——未传 `adapter` 时使用**注册表默认适配器**（由 `import '@easemob/uikit-im/websdk5'` 子路径入口自注册，决策 22 落地口径；5.x 下游在应用入口加一行 import 即可，存量业务方仅多这一行）并用 `appKey`+`sdkConfig` 初始化；显式传 `adapter` 时 `adapter` 优先、`appKey`/`sdkConfig` 仅作 adapter 的中立 `SdkConfig` 入参。共存规则：`adapter` 传入则忽略注册表默认（注入模式，决策 18 生命周期归业务）。这样存量业务方零改动（仅补一行入口 import）、新接入方才需要 import adapter 包。
+- **装配（Provider 直接传入）**：下游 `import { Webim4Adapter } from '@easemob-community/uikit-sdk-webim4'`，`<UIKitProvider :adapter="new Webim4Adapter()">`（或 `adapter={Webim4Adapter}` 传构造器）。Provider 的 `sdkConfig` 只保留 SDK 无关字段（`appKey`/`userId`/`token`/`debug`），透传给 adapter。
+- **Provider props 兼容策略（向下兼容，非 breaking）**：`appKey`/`sdkConfig` 旧 props **保留不删**，语义定义为"websdk5 快捷方式"——未传 `adapter` 时使用**注册表默认适配器**（由 `import '@easemob-community/uikit-im/websdk5'` 子路径入口自注册，决策 22 落地口径；5.x 下游在应用入口加一行 import 即可，存量业务方仅多这一行）并用 `appKey`+`sdkConfig` 初始化；显式传 `adapter` 时 `adapter` 优先、`appKey`/`sdkConfig` 仅作 adapter 的中立 `SdkConfig` 入参。共存规则：`adapter` 传入则忽略注册表默认（注入模式，决策 18 生命周期归业务）。这样存量业务方零改动（仅补一行入口 import）、新接入方才需要 import adapter 包。
 - **core Provider 职责重构**：core `useCoreUIKitProvider` 当前承担 SDK 客户端生命周期（`createClient` / `ManagerHost` 代理 / `init`/`login`/`logout` / `PresenceDomain`/`UserInfoDomain` 创建）。收口后 core 不再 `createClient`，改为：**adapter 实例由场景包 Provider 注入 core**（或经注册表默认工厂创建），core 负责 adapter 生命周期编排（调用 `adapter.init` 接线 / 内置模式下 `login`/`logout`、把 `adapter.subscribe` 的中立事件桥接到 core stores）、并保留 `ManagerHost` 形态的**中立化接口**（不再是 SDK manager 集合，而是"adapter 操作门面"）供 Domain 消费。`PresenceDomain`/`UserInfoDomain` 改为面向 `adapter.presence` / `adapter.contact`（或注入的用户资料源）实现，不下沉 adapter。装配图：
 
 ```text
@@ -340,7 +340,7 @@ interface MessageRepository {
 
 #### 一、SQLite 实现包（新建独立包，不进 UIKit 本体）
 
-- [ ] 包命名与目录：`@easemob/uikit-persist-sqlite`（参考），主进程 + 渲染进程双入口；`better-sqlite3` 声明为 peer/optional，不污染 Web 产物。
+- [ ] 包命名与目录：`@easemob-community/uikit-persist-sqlite`（参考），主进程 + 渲染进程双入口；`better-sqlite3` 声明为 peer/optional，不污染 Web 产物。
 - [ ] Schema 设计：
   - `messages` 表：以 `msgServerId` + `conversationId` 为去重键，字段与 `MessageRecord` 一一对应；`recalled`/`deleted`/`tombstoneTime` 墓碑字段；索引 `(conversationId, timestamp)`。
   - `conversations` 表：与 `ConversationRecord` 一一对应；索引 `(lastMessageTime DESC)`。
@@ -399,7 +399,7 @@ interface MessageRepository {
 
 ### 已确认决策（数据入口层与验收，本轮定）
 
-9. **契约独立包**：`@easemob/uikit-sdk-contract` 独立包（单一真相源 + 两 adapter 与 im 三方可共享）。
+9. **契约独立包**：`@easemob-community/uikit-sdk-contract` 独立包（单一真相源 + 两 adapter 与 im 三方可共享）。
 10. **repository 并入契约包**：`MessageRepository`/`ConversationRepository`/`ContactRepository`/`GroupRepository`/`PresenceRepository` 统一放契约包，与中立类型同源。
 11. **`UIKitDataSource` 规划为最新形式**：生产环境无使用（demo 有演示使用，见 2.5 节复核注），**不保留旧双线**，统一迁移为 repository 数据入口层，旧 `dataSource` 废弃或薄别名过渡。
 12. **Electron IPC 序列化边界**：IPC/落库只传**纯数据 DTO**（`MessageRecord`/`ConversationRecord`，JSON 安全、无 `File`/`Blob`/`markRaw`）；分页游标传输不拉全量；附件二进制不进 IPC/SQLite，只存元数据（`url`/`secret`/`filename`/`size`/`duration`）。
@@ -416,7 +416,7 @@ interface MessageRepository {
 20. **非 Vue 上下文的独立调用入口**：`useClient()` 是 `provide/inject` 绑定、只能在 Provider 子树内用；OA 基座里"SDK 对外独立调用"往往意味着非 Vue 上下文（别的子应用 / 主进程 IPC / 定时任务）。除 `useClient()` 外，需提供非 context 访问口（如 `login()` 返回实例，或 adapter 实例挂在确定位置 / 模块级 getter）。**已落地（2026-08-29）**：core 新增模块级 `getUIKitAdapter(): SdkAdapter | null`（`composables/default-adapter.ts`，主入口导出），Provider 装配时登记、scope dispose 时（仅当仍指向本实例）清空。
 21. **UIKit 层门面生命周期（launch/disposer + 单实例，借鉴声网灵动课堂）**：SDK 生命周期（决策 18）之外，UIKit 自身还有一层"门面 + 生命周期"语义需要显式化——IM 作为 OA 的常驻全局能力，对外只有一个门面（`UIKitProvider` + `useUIKit()`，已是雏形），需补齐「挂载 → 卸载」的 disposer 语义 + 单实例约束（同一 OA 窗口内 IM 单实例）。借鉴声网 `AgoraEduSDK.launch(dom, option) → disposer` + `lock()/unlock()` 模式：对外最小化门面、内部复杂度全隐藏、启动返回可完整卸载的 disposer、`lock/unlock` 保证单实例。落地牵引：Phase 1 收口时把 `useUIKit()` 的 logout/重置语义补齐为**对称的 mount/unmount 生命周期**（与 D123 生命周期对称原则一致）；D125 微前端专项时验证子应用卸载能经 disposer 干净回收（store/事件/监听全清）。
 22. **按注入隔离天然摇树，默认内置快捷方式走子路径入口**：uikit-im 不依赖任何 adapter/SDK（adapter 由下游装并注入），因此**下游用 4.x 时 5.x adapter 与 `easemob-websdk@5.x` 不进其依赖图、物理不进包，反之亦然**——不需要「打 4.x 版 / 5.x 版两套 uikit」，uikit-im 只发一份。唯一会破坏此性质的点是决策 17 的「未传 adapter 时内部 `new Websdk5Adapter()`」：若该引用以**顶层静态 import** 写在主入口，运行时分支会导致摇树器无法剔除，4.x 下游的包也会带进 5.x adapter。因此落地约束：**默认内置快捷方式必须放子路径入口**，主入口保持零 adapter 静态引用；不用动态 import 或 optional peer 作为主手段（产物仍含 chunk / 对下游构建器假设更多）。配套：各包 `package.json` 标 `"sideEffects"`；**禁止搞同时导出两个 adapter 的聚合 barrel**；若需 script 标签直引的预打包单文件，由 adapter 包侧出两份 UMD（各自 external 对方 SDK），属构建矩阵而非 fork uikit。
-    - **落地口径（2026-08-29 Phase 1 收口敲定）**：子路径入口为 `@easemob/uikit-im/websdk5`（`src/websdk5.ts`，经 `vite.aux.config.ts` 独立 ES 产物），import 即调 core `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())` **自注册**；core `useCoreUIKitProvider` 未收到 `adapter`/`createDefaultAdapter` 时从该注册表取默认工厂，都未注册则抛明确错误。主入口 `sdk/index.ts` 对 adapter 包只做 `export type *`（编译期擦除）；SDK5 值级导出（`Websdk5Adapter`/Domain 类等）由子路径入口 `export *` 承接。`@easemob/uikit-sdk-websdk5` 在 core/im 均为 **optional peer + devDependency（workspace）**（依赖声明层面不进 4.x 下游依赖图；此处的 optional peer 是「子路径入口的宿主依赖声明」，与被否定的「optional peer 当默认快捷方式主手段」不是一回事）。`sideEffects`：core `["*.css"]`，im `["*.css", "./dist/websdk5.js"]`（注册副作用必须豁免摇树）。动态 import 仅保留一处于 core `utils/log-store.ts` 的 SDK 日志捕获（增强能力，带 `.catch` 降级，未安装 websdk5 时静默跳过）。
+    - **落地口径（2026-08-29 Phase 1 收口敲定）**：子路径入口为 `@easemob-community/uikit-im/websdk5`（`src/websdk5.ts`，经 `vite.aux.config.ts` 独立 ES 产物），import 即调 core `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())` **自注册**；core `useCoreUIKitProvider` 未收到 `adapter`/`createDefaultAdapter` 时从该注册表取默认工厂，都未注册则抛明确错误。主入口 `sdk/index.ts` 对 adapter 包只做 `export type *`（编译期擦除）；SDK5 值级导出（`Websdk5Adapter`/Domain 类等）由子路径入口 `export *` 承接。`@easemob-community/uikit-sdk-websdk5` 在 core/im 均为 **optional peer + devDependency（workspace）**（依赖声明层面不进 4.x 下游依赖图；此处的 optional peer 是「子路径入口的宿主依赖声明」，与被否定的「optional peer 当默认快捷方式主手段」不是一回事）。`sideEffects`：core `["*.css"]`，im `["*.css", "./dist/websdk5.js"]`（注册副作用必须豁免摇树）。动态 import 仅保留一处于 core `utils/log-store.ts` 的 SDK 日志捕获（增强能力，带 `.catch` 降级，未安装 websdk5 时静默跳过）。
 
 > 微前端 OA 基座宿主兼容性（单例作用域 / 主题作用域 / window 副作用 / SDK 卸载）是**独立维度**，与本节 SDK 适配正交，见 [`docs/MICRO-FRONTEND-COMPATIBILITY.md`](MICRO-FRONTEND-COMPATIBILITY.md)（TECH-DEBT D125）。
 
@@ -428,8 +428,8 @@ interface MessageRepository {
 
 > **验证顺序原则（必须遵守）**：先 5.x 后 4.x。Phase 1 收口后**必须先验证 5.x 行为不变**（回归隔离），通过后才进入 Phase 2 写 4.x adapter——4.x adapter 建立在中立契约之上，契约的正确性靠 5.x 验证兜底，禁止用未验证的契约去写 4.x。
 
-- `pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）
-- `pnpm -F @easemob/uikit-im build`（= vite build + vue-tsc --emitDeclarationOnly）
+- `pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误）
+- `pnpm -F @easemob-community/uikit-im build`（= vite build + vue-tsc --emitDeclarationOnly）
 - `cd apps/demo && pnpm exec vue-tsc --noEmit`
 - 5.x 全功能回归（Phase 1 后必须"行为不变"）
 - 4.x 手测可用（Phase 2 第一版：核心 IM 逐项手测，对照 5.x 行为）
@@ -535,7 +535,7 @@ interface MessageRepository {
 
 ### 10.1 先记住五句话
 
-1. **uikit-im 是需求方**：它通过 `@easemob/uikit-sdk-contract` 声明「我要什么事件、什么查询、什么操作」。
+1. **uikit-im 是需求方**：它通过 `@easemob-community/uikit-sdk-contract` 声明「我要什么事件、什么查询、什么操作」。
 2. **adapter 是翻译官**：`uikit-sdk-websdk5` 把 5.x API 翻译成中立契约；`uikit-sdk-webim4` 把 4.x API 翻译成中立契约。
 3. **core 是底座**：管 theme / locale / 原子组件 / Provider 壳 / 默认 adapter 注册表；不碰 SDK。
 4. **切 SDK = 换 adapter**：UI 产物不重来，只换注入的 adapter 或子路径入口。
@@ -612,9 +612,9 @@ interface MessageRepository {
 
 ```text
 1. 业务代码当前是哪一种入口？
-   ├─ 内置模式（import '@easemob/uikit-im/websdk5' + 不传 adapter prop）
-   │   → 改为 import '@easemob/uikit-im/webim4'（子路径入口已于 2026-08-31 落地）
-   │   → 或显式 import { Webim4Adapter } from '@easemob/uikit-sdk-webim4' 并传 adapter prop
+   ├─ 内置模式（import '@easemob-community/uikit-im/websdk5' + 不传 adapter prop）
+   │   → 改为 import '@easemob-community/uikit-im/webim4'（子路径入口已于 2026-08-31 落地）
+   │   → 或显式 import { Webim4Adapter } from '@easemob-community/uikit-sdk-webim4' 并传 adapter prop
    └─ 注入模式（已传 adapter prop）
       → 把 new Websdk5Adapter() 换成 new Webim4Adapter()
 2. 重新跑类型检查与构建
@@ -632,9 +632,9 @@ interface MessageRepository {
 3. **读 4.x 状态**：打开 `packages/uikit-sdk-webim4/src/` 下对应文件，确认 4.x 是已实现、TODO 占位，还是未开始；不要假设 4.x 与 5.x 同名方法。
 4. **先改契约**：只有新增/变更接口签名时才改 contract；纯实现改动不改 contract。
 5. **两 adapter 同步**：5.x 先跑通，4.x 按映射表后补；4.x 暂不能实现时显式 TODO 并在 capabilities 中声明。
-6. **不反向依赖**：adapter 包内不要出现 `import ... from '@easemob/uikit-im'` 或 `import ... from '@easemob/uikit-core'` 的值级依赖。
+6. **不反向依赖**：adapter 包内不要出现 `import ... from '@easemob-community/uikit-im'` 或 `import ... from '@easemob-community/uikit-core'` 的值级依赖。
 7. **不破坏摇树**：不要在 `uikit-im` 主入口静态 import adapter 包。
-8. **验证**：改完后跑 `pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` 和 `pnpm -F @easemob/uikit-im build`。
+8. **验证**：改完后跑 `pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit` 和 `pnpm -F @easemob-community/uikit-im build`。
 
 ### 10.4 常见反模式速查
 

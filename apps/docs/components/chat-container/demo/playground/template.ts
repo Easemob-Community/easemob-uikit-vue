@@ -13,8 +13,8 @@ import {
   EmMessageInput,
   EmMessageList,
   EmUIKitProvider,
-} from '@easemob/uikit-im'
-import type { ChatConfig } from '@easemob/uikit-im'
+} from '@easemob-community/uikit-im'
+import type { ChatConfig } from '@easemob-community/uikit-im'
 import {
   appendMockSentMessage,
   injectMockContext,
@@ -140,8 +140,8 @@ import {
   MESSAGE_TYPE,
   useConversationStore,
   useMessageStore,
-} from '@easemob/uikit-im'
-import type { UiConversation, UiMessage } from '@easemob/uikit-im'
+} from '@easemob-community/uikit-im'
+import type { UiConversation, UiMessage } from '@easemob-community/uikit-im'
 
 /** mock 会话 ID（多次注入时复用同一会话，避免列表残留） */
 export const MOCK_CONVERSATION_ID = 'mock_chat_playground_001'

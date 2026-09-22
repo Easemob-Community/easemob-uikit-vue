@@ -4,14 +4,14 @@
  * 必须与 Provider（app.vue）分属两个组件：inject 只解析父链，
  * 本组件才能拿到 useChatroomProvider provide 的 core context。
  *
- * 本应用是**纯 chatroom 单包形态**（不依赖 @easemob/uikit-im），验证聊天室
+ * 本应用是**纯 chatroom 单包形态**（不依赖 @easemob-community/uikit-im），验证聊天室
  * 场景包独立可用的接入路径（P2 review 遗留项 d 的补证）。
  *
  * P5 PC 模式：新增 #/pc-live（PC 私域直播开播端）、#/pc-class（PC 小班课双端）
  * 两个宽屏路由——app.vue 据此去掉 375px 手机壳、全窗口渲染 split 布局。
  */
 import { computed, onMounted, onUnmounted } from 'vue'
-import { useClient } from '@easemob/uikit-core'
+import { useClient } from '@easemob-community/uikit-core'
 import DemoLoginPage from './demo-login-page.vue'
 import DemoHomePage from './pages/demo-home-page.vue'
 import BasicChatroomPage from './pages/basic-chatroom-page.vue'

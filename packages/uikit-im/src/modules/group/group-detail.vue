@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
-import type { UiGroup } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob-community/uikit-core'
+import type { UiGroup } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 

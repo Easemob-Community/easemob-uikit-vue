@@ -1,4 +1,4 @@
-import type { UserInfo } from '@easemob/uikit-sdk-contract'
+import type { UserInfo } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { ManagerHost } from '../../client'
 import type { UserInfoStoreLike } from '../../event/types'

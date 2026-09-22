@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, NOTICE_EVENT_TYPE, EmPopup as Popup, createLogger, insertChatNotice, useLocale, useToast } from '@easemob/uikit-core'
-import type { NoticeEventTypeValue, UiGroupMember } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmpty as Empty, GROUP_MEMBER_ROLE, EmModal as Modal, NOTICE_EVENT_TYPE, EmPopup as Popup, createLogger, insertChatNotice, useLocale, useToast } from '@easemob-community/uikit-core'
+import type { NoticeEventTypeValue, UiGroupMember } from '@easemob-community/uikit-core'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import MuteListItem from './mute-list-item.vue'

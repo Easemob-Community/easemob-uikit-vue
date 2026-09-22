@@ -6,7 +6,7 @@ import type {
   MessageRepository,
   SdkMessage,
   UiMessage,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 import {
   MESSAGE_STATUS,
   MESSAGE_TYPE,
@@ -16,7 +16,7 @@ import {
   isVoiceBody,
   normalizeUserId,
   toMessageRecord,
-} from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
 import { toUiMessage, toWebim4MessageBody } from '../adapter/message-adapter'
 import type { Webim4Client } from '../client'
 import type { MessageStoreLike } from '../event/types'

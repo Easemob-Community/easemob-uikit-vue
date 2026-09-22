@@ -1,30 +1,30 @@
 # Changelog
 
-## @easemob/uikit-im 3.7.10 (2026-09-22)
+## @easemob-community/uikit-im 3.7.10 (2026-09-22)
 
 ### 修复
 
 - **`EmChatContainer` `#watermark` 水印覆盖层收窄到聊天内容区**：覆盖层由挂在 `.chat` 根级（`inset: 0` 铺满整个聊天区、连同输入框一起覆盖）改为挂在新划出的 `.chat__content` 内容区容器（header / 通知条 / 置顶与群公告横幅 / 消息列表），输入框与多选操作栏区域不再被水印覆盖；插槽名与 `:conversation` 作用域不变。行为变化：无会话空状态（`.chat__empty` 分支）下不再渲染水印。
 
-## @easemob/uikit-sdk-websdk5 1.3.4 (2026-09-21)
+## @easemob-community/uikit-sdk-websdk5 1.3.4 (2026-09-21)
 
 ### 修复
 
 - **`currentUser` 记账提前到 login 发起前**：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的欢迎语在 login resolve 前经 `onMessage` 到达），此前 `setCurrentUser` 在 `await login()` resolve 后才执行，窗口期内 `toUiMessage` 打 `currentUserId is empty` 告警且 `isSelf` / 自动清未读 / @我 / 通知过滤不可靠；现同步提前记账、失败回滚清空。
 
-## @easemob/uikit-core 2.8.7 (2026-09-21)
+## @easemob-community/uikit-core 2.8.7 (2026-09-21)
 
 ### 修复
 
 - **core `login()` 同步提前记账 `currentUser`**：同 websdk5 1.3.4，消除「REST 消息先于 login resolve 到达」的空 `currentUserId` 竞态窗口，登录失败回滚清空。
 
-## @easemob/uikit-sdk-webim4 1.3.3 (2026-09-21)
+## @easemob-community/uikit-sdk-webim4 1.3.3 (2026-09-21)
 
 ### 修复
 
 - **`currentUser` 记账提前到 login 发起前**：同 websdk5 1.3.4，4.x 线对称修复。
 
-## @easemob/uikit-im 3.7.9 (2026-09-21)
+## @easemob-community/uikit-im 3.7.9 (2026-09-21)
 
 ### 新增
 
@@ -36,38 +36,38 @@
 
 - **会话列表行尾未读徽标对齐**：`EmBadge` 行尾（`unreadPlacement="inline"`）用法此前按头像角标绝对定位渲染，徽标右边缘比时间右边缘右移约半个徽标宽；现 `EmBadge` 新增 `inline` 模式按文档流渲染，徽标右边缘与时间右边缘对齐、垂直居中于消息摘要行（对齐 Figma 设计稿 `unraedarea right 0 / top 1 / h 16`）。
 
-## @easemob/uikit-im 3.7.8 (2026-09-21)
+## @easemob-community/uikit-im 3.7.8 (2026-09-21)
 
 ### 变更
 
 - **`enableReadReceipt` 关闭时隐藏全部「已读未读」状态指示**：此前仅隐藏单聊已读 icon 与群已读数，己方消息的 SENT / DELIVERED / READ 状态图标（空心圆 / 已读对勾等已读未读状态的 UI 载体）仍会残留展示；现开关关闭时这三类状态图标整体不渲染，气泡旁不再出现任何状态指示。发送中 spinner 与失败重试属本地操作反馈，不受影响。
 
-## @easemob/uikit-im 3.7.7 (2026-09-21)
+## @easemob-community/uikit-im 3.7.7 (2026-09-21)
 
 ### 新增
 
 - **全局已读回执开关 `enableReadReceipt`（Provider prop，默认 true）**：关闭后接收方不再发送消息级已读回执，且 UIKit 不展示已读状态——单聊己方消息隐藏「已读」icon、群聊不显示已读数 / 已读详情入口；不影响本机未读数同步（`clearConversationUnreadMessageCount` 保留）。群聊发送方的回执请求仍由 `ChatConfig.groupReadReceipt` 独立控制（sdk-contract 1.3.1 / core 2.8.6 / websdk5 1.3.3）。
 
-## @easemob/uikit-sdk-websdk5 1.3.3 (2026-09-21)
+## @easemob-community/uikit-sdk-websdk5 1.3.3 (2026-09-21)
 
 ### 新增
 
 - **`enableReadReceipt` 能力开关落地**：`onMessage` 实时回执（`queueMessageReadReceipt`）与进入会话补发（`sendPendingReadReceipts` 钩子）在开关关闭时整体跳过，不再调用 `sendMessageReadReceipts`。
 
-## @easemob/uikit-core 2.8.6 (2026-09-21)
+## @easemob-community/uikit-core 2.8.6 (2026-09-21)
 
 ### 新增
 
 - **`EmBadge` 新增 `inline` prop**：徽标不占位覆盖、按文档流渲染（如会话列表行尾未读数），默认 `false` 行为不变；开启后 `placement` 不生效。
 - **defaultFeatures 新增 `enableReadReceipt: true`**：全局已读回执开关默认值，经 features 响应式链路下发 adapter 与 UIKit（sdk-contract 1.3.1）。
 
-## @easemob/uikit-sdk-contract 1.3.1 (2026-09-21)
+## @easemob-community/uikit-sdk-contract 1.3.1 (2026-09-21)
 
 ### 新增
 
 - **`UIKitFeatures` 新增 `enableReadReceipt?: boolean`**：是否启用消息已读回执，默认 true；类型面供 core / adapter / uikit-im 共享。
 
-## @easemob/uikit-im 3.7.6 (2026-09-20)
+## @easemob-community/uikit-im 3.7.6 (2026-09-20)
 
 ### 变更
 
@@ -78,19 +78,19 @@
 
 - **`EmContactDetail` / `EmUserCardModal` / `EmGroupMemberList` 新增 `enablePresence` prop**：名片、联系人详情、群成员列表（主动查看场景）默认仍跟随 Provider 全局 `enablePresence` 展示在线状态，现可组件级覆盖（传 `false` 单独关闭）。
 
-## @easemob/uikit-sdk-websdk5 1.3.2 (2026-09-20)
+## @easemob-community/uikit-sdk-websdk5 1.3.2 (2026-09-20)
 
 ### 新增
 
 - **联系人关系变更全局通知**：通知引擎新增 `notifyContactEvent`，`onContactRefuse`（我发出的好友申请被对方拒绝）与 `onContactDeleted`（被好友删除）除既有 store 写入 / 会话内通知外，同时投递全局通知（页内右上角弹窗 / 页面隐藏时浏览器系统通知优先、失败降级页内）。好友关系变更属低频高优事件，跳过免打扰 / 当前会话 / triggerMode 判定，仅尊重通知总开关；送达回调通道语义与消息通知一致。
 
-## @easemob/uikit-sdk-webim4 1.3.2 (2026-09-20)
+## @easemob-community/uikit-sdk-webim4 1.3.2 (2026-09-20)
 
 ### 新增
 
 - **联系人关系变更全局通知**：与 websdk5 1.3.2 对齐，`onContactRefuse` / `onContactDeleted` 同步投递全局通知。
 
-## @easemob/uikit-im 3.7.5 (2026-09-18)
+## @easemob-community/uikit-im 3.7.5 (2026-09-18)
 
 ### 修复
 
@@ -107,7 +107,7 @@
 
 - **`EmAddressBookContainer` / `EmContactContainer` 新增 `showNoticeAddButton`**：「新请求」子视图头部展示添加好友按钮，默认 `false`。
 
-## @easemob/uikit-core 2.8.5 (2026-09-18)
+## @easemob-community/uikit-core 2.8.5 (2026-09-18)
 
 ### 变更
 
@@ -119,14 +119,14 @@
 - **icons-v2 新增 `dspntd`（失望）图标**：好友申请被对端拒绝的通知条目使用。
 - **locale 新增 `contact.inviteRequestReceived` / `contact.inviteDeclinedByPeer`**：好友申请副文案与「拒绝了你的好友申请」通知文案。
 
-## @easemob/uikit-sdk-contract 1.3.0 (2026-09-18)
+## @easemob-community/uikit-sdk-contract 1.3.0 (2026-09-18)
 
 ### 新增
 
 - **`SdkMessageDomain` 新增 `removeMessages`**：删除当前用户的服务端漫游历史（本账号各端同步生效），补齐消息删除的契约面（双 adapter 实现见 websdk5 1.3.1 / webim4 1.3.1）。
 - **`UiContactInvite` 新增 `outgoing` 字段**：标记「我发出的申请被对方拒绝」的通知方向，用于通知列表展示。
 
-## @easemob/uikit-sdk-websdk5 1.3.1 (2026-09-18)
+## @easemob-community/uikit-sdk-websdk5 1.3.1 (2026-09-18)
 
 ### 新增
 
@@ -136,7 +136,7 @@
 
 - **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：无本地 pending 申请时落一条 `outgoing: true` 的拒绝通知，UI 展示「拒绝了你的好友申请」。
 
-## @easemob/uikit-sdk-webim4 1.3.1 (2026-09-18)
+## @easemob-community/uikit-sdk-webim4 1.3.1 (2026-09-18)
 
 ### 新增
 
@@ -146,7 +146,7 @@
 
 - **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：与 websdk5 1.3.1 对齐。
 
-## @easemob/uikit-im 3.7.4 (2026-09-18)
+## @easemob-community/uikit-im 3.7.4 (2026-09-18)
 
 ### 变更
 
@@ -156,7 +156,7 @@
 
 - **`EmResizable` 新增 `fluid` 弹性模式**：开启后未拖拽过且无受控值时不写内联尺寸，宽度交由 CSS（如侧栏基准 token）决定；首次拖拽以当前实际渲染尺寸为起点，拖拽后内联 px 接管，适合「默认弹性 + 可拖拽定宽」的侧栏（core 2.8.4）。
 
-## @easemob/uikit-core 2.8.4 (2026-09-18)
+## @easemob-community/uikit-core 2.8.4 (2026-09-18)
 
 ### 变更
 
@@ -166,62 +166,62 @@
 
 - **`EmResizable` 新增 `fluid` prop**：fluid 且未拖拽过、无受控值时不写内联尺寸（由 CSS 决定），首次拖拽时测量根元素当前实际尺寸作为拖拽起点，拖拽后经 `update:model-value` / 内联 px 接管。
 
-## @easemob/uikit-im 3.7.3 (2026-09-17)
+## @easemob-community/uikit-im 3.7.3 (2026-09-17)
 
 ### 新增
 
 - **新增聊天页消息昵称展示特性开关 `showNicknameInSingleChat` / `showNicknameInGroupChat`**：单聊消息列表默认不展示对方昵称（微信风格），`<UIKitProvider :show-nickname-in-single-chat="true">` 可打开；群聊默认展示发送者昵称，`:show-nickname-in-group-chat="false"` 可关闭。消息气泡外壳按消息自身的 `conversationType` 判定（合并转发弹窗、搜索结果等独立场景同样生效），运行时切换即刻生效。
 
-## @easemob/uikit-core 2.8.3 (2026-09-17)
+## @easemob-community/uikit-core 2.8.3 (2026-09-17)
 
 ### 新增
 
 - **defaultFeatures 补齐昵称展示开关默认值**：`showNicknameInSingleChat` 默认 false、`showNicknameInGroupChat` 默认 true（契约字段定义见 uikit-sdk-contract 1.2.1）。
 
-## @easemob/uikit-sdk-contract 1.2.1 (2026-09-17)
+## @easemob-community/uikit-sdk-contract 1.2.1 (2026-09-17)
 
 ### 新增
 
 - **`UIKitFeatures` 新增两个可选开关**：`showNicknameInSingleChat`（单聊消息列表是否展示对方昵称，默认 false）、`showNicknameInGroupChat`（群聊消息列表是否展示发送者昵称，默认 true）。
 
-## @easemob/uikit-core 2.8.2 (2026-09-17)
+## @easemob-community/uikit-core 2.8.2 (2026-09-17)
 
 ### 修复
 
-- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
+- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob-community/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
 
-## @easemob/uikit-im 3.7.2 (2026-09-17)
+## @easemob-community/uikit-im 3.7.2 (2026-09-17)
 
 ### 修复
 
-- **修复生产构建中 core 组件（按钮等）失去全部样式的问题（严重）**：配套 core 2.8.2 的 scopeId 稳定性修复——theme 内联的 core dist scoped 样式 hash 与 core 运行时 scopeId 重新对齐；同时构建接入 `check-theme-scope-ids.mjs` 守卫，core dist 过期导致的 theme 失配会在构建期直接报错。修复前典型症状：消费者仅 `import '@easemob/uikit-im/theme'` 时，页面中所有 EmButton 渲染为无样式原生按钮。
+- **修复生产构建中 core 组件（按钮等）失去全部样式的问题（严重）**：配套 core 2.8.2 的 scopeId 稳定性修复——theme 内联的 core dist scoped 样式 hash 与 core 运行时 scopeId 重新对齐；同时构建接入 `check-theme-scope-ids.mjs` 守卫，core dist 过期导致的 theme 失配会在构建期直接报错。修复前典型症状：消费者仅 `import '@easemob-community/uikit-im/theme'` 时，页面中所有 EmButton 渲染为无样式原生按钮。
 
-## @easemob/uikit-core 2.8.1 (2026-09-16)
+## @easemob-community/uikit-core 2.8.1 (2026-09-16)
 
 ### 变更
 
 - **`componentsShape` 方正档改为真直角（视觉变更）**：`square` 档 `--uikit-components-radius` 由 4px 改为 **0px**（`--uikit-components-radius-hover` 同步 10px → 0px）。原 4px 与圆润档 8px 在卡片 / 弹窗 / 按钮上肉眼几乎无差别，实测用户感知为开关失效；方正档现在呈现明确的直角风格（business 预设同步受影响）。同时清理 EmButton 中无人设置 `data-uikit-components-radius` 属性的失效 legacy 选择器（pill 按钮保持胶囊不受开关影响）。
 
-## @easemob/uikit-im 3.7.1 (2026-09-16)
+## @easemob-community/uikit-im 3.7.1 (2026-09-16)
 
 ### 修复
 
 - **修复会话列表 card 变体屏蔽全局 hover 风格开关**：`.conversation-list--card` 不再硬编码 `--uikit-item-hover-radius` / `--uikit-item-active-radius`（原固定 8px），改由全局 `hoverStyle` 主题开关驱动；默认档同为 8px，card 设计视觉不变，「方正」档直角、「圆角」档左右缩进在 PC 默认 card 会话列表上恢复生效（联系人 / 群组列表此前已生效）。
 
-## @easemob/uikit-im 3.7.0 (2026-09-16)
+## @easemob-community/uikit-im 3.7.0 (2026-09-16)
 
 ### 变更
 
 - **新增全局 header 底部分隔线开关（默认关闭，视觉变更）**：`theme.headerBorder`（Provider prop）/ `useTheme().setHeaderBorder()` 一键控制会话列表、通讯录、聊天、会话抽屉、EmModal 及建群弹窗 header 底部的 1px 分隔线，默认 `false` 不再显示分隔线（此前整改后默认显示）；宽度经新 token `--uikit-header-border-width`（`0px`/`1px`）下发，各 header 颜色 token 不变。header 总高由 border-box + 固定高保证，开关不影响布局高度。配套 core 2.8.0。
 
-## @easemob/uikit-core 2.8.0 (2026-09-16)
+## @easemob-community/uikit-core 2.8.0 (2026-09-16)
 
 ### 变更
 
 - **新增全局 header 底部分隔线开关 `headerBorder`**：`themeStore.headerBorder`（持久化，默认 `false`）驱动新 token `--uikit-header-border-width`（`0px`/`1px`）；`ProviderThemeConfig` 新增 `headerBorder?: boolean`，`useTheme()` 新增 `headerBorder` / `setHeaderBorder()`。
 - **EmModal `showHeaderDivider` 默认行为变化**：默认值由 `true` 改为「不传时跟随全局 `headerBorder` 开关（默认关闭）」，显式传 `true`/`false` 仍优先（沿用 Avatar `shape` 回落主题的惯例）。此前依赖默认显示 header 分割线的弹窗，需开启全局开关或显式 `:show-header-divider="true"`。
 
-## @easemob/uikit-im 3.6.1 (2026-09-16)
+## @easemob-community/uikit-im 3.6.1 (2026-09-16)
 
 ### 变更
 
@@ -230,13 +230,13 @@
 - **修复会话项无最后一条消息时标题下移**：会话项两行高度固定（20 + 4 + 18 = 42px），消息摘要为空时信息区不再塌陷，标题位置恒定。
 - **「没有更多历史消息」改为随消息流滚动（行为变更 + 新插槽）**：历史加载状态提示（加载中 / 失败重试 / 没有更多）由常驻顶部条改为消息列表首项，仅上翻到顶（或下拉到底）时可见，随消息一起滚动；下拉刷新模式历史加载完后同样显示「没有更多历史消息」。新增 `#history-tip` 插槽整块接管该提示，scope `{ state: 'loading' | 'failed' | 'no-more', retry }`，链路 `EmChatContainer → EmChat → EmMessageList` 插槽自动透传，文案仍可用 locale key `conversation.noMoreHistory` 覆盖。
 
-## @easemob/uikit-core 2.7.1 (2026-09-16)
+## @easemob-community/uikit-core 2.7.1 (2026-09-16)
 
 ### 变更
 
 - **EmModal 度量对齐设计稿（视觉变更，无 API 变更）**：header 高 60px（`padding 13px 12px 13px 16px`，标题 18px/Medium）；body 默认 padding 24px → **56px 48px**、默认字号 14 → **18px**（`bodyFlush` 贴边形态不变，承接表单/穿梭/列表场景）；正文语义图标 56 → **72px**；footer 高 80px（`padding 16px 22px`，按钮间距 16 → 12）；外壳移除 1px 描边（设计稿仅阴影），圆角仍跟随 `--uikit-components-radius`、阴影走 `--uikit-shadow`。移动端 bottom-sheet 分支保持原有紧凑度量不受影响。
 
-## @easemob/uikit-im 3.6.0 (2026-09-16)
+## @easemob-community/uikit-im 3.6.0 (2026-09-16)
 
 ### 变更
 
@@ -245,48 +245,48 @@
 - **会话列表下拉刷新增回落链（能力补齐）**：`EmConversationContainer` 的 `pull-refresh` 未配置（undefined）时回落 Provider `h5.pullRefresh`（默认 `'auto'`：触屏设备自动开启），不再写死 `false`；显式 true/false 仍优先。
 - **ChatContainer 容器风格条件默认（行为变更）**：`variant` 未配置时由一律 `'compact'` 改为按端型取默认——PC `'card'`（圆角卡片壳由容器自绘）、移动端 `'compact'`（平铺全屏形态）；显式传入仍优先。此前 PC 上未传 variant 的接入方视觉会变为卡片壳，如需平铺请显式 `variant="compact"`。
 
-## @easemob/uikit-core 2.7.0 (2026-09-16)
+## @easemob-community/uikit-core 2.7.0 (2026-09-16)
 
 ### 变更
 
 - **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，私有化或低频场景显式关闭。
 
-## @easemob/uikit-sdk-websdk5 1.3.0 (2026-09-16)
+## @easemob-community/uikit-sdk-websdk5 1.3.0 (2026-09-16)
 
 ### 变更
 
 - **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
 
-## @easemob/uikit-sdk-webim4 1.3.0 (2026-09-16)
+## @easemob-community/uikit-sdk-webim4 1.3.0 (2026-09-16)
 
 ### 变更
 
 - **同 websdk5 1.3.0**：`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`。
 
-## @easemob/uikit-im 3.5.1 (2026-09-15)
+## @easemob-community/uikit-im 3.5.1 (2026-09-15)
 
 ### 变更
 
 - **「新会话」弹窗宽度调宽**：`new-chat-modal` 弹窗宽度由 360px 调整为 480px（PC 端内联 `width`），移动端（<768px）全屏分支不受影响。
 
-## @easemob/uikit-im 3.5.0 (2026-09-04)
+## @easemob-community/uikit-im 3.5.0 (2026-09-04)
 
 ### 变更
 
 - **文件消息气泡整改（设计规范）**：文件图标改为左侧固定展示的彩色底色块（双方气泡一致），按扩展名归类取图标——pdf / xls / doc / ppt / md 明确格式各用明确图标，图片 / 视频 / 音频按类别用 `file/img` / `file/video` / `file/audio`，未识别类型回落 `file/empty`；图标底色为类型品牌色 token（见 core 2.6.0），图标本体白色。文件标题改用 `EmText`（body 14px / medium / 单行 ellipsis），颜色跟随气泡文字色（对方 `#171A1C`、己方 `#FFFFFF`）。气泡圆角沿用 round 16px / square 8px 两档，但文件卡片默认 square（8px，设计约定），可经 `config.messageList.bubbleShape` 切 round。
 
-## @easemob/uikit-core 2.6.0 (2026-09-04)
+## @easemob-community/uikit-core 2.6.0 (2026-09-04)
 
 ### 新增
 
 - **文件类型图标底色 token**：`--uikit-file-icon-{pdf,xls,doc,ppt,md,img,video,audio,file}` 品牌识别色（pdf `#E5252A` / xls `#1D7044` / doc `#2B5797` / ppt `#D24625` / md `#424242` / img `#00897B` / video `#E91E63` / audio `#7B1FA2` / 未识别普通文件 `#4CAF50`），明暗模式通用。
 
-## @easemob/uikit-im 3.4.0 (2026-09-03)
+## @easemob-community/uikit-im 3.4.0 (2026-09-03)
 
 ### 新增
 
 - **ChatContainer 容器风格档位 `variant`**：`compact`（默认；平铺无圆角，`--uikit-chat-bg` 铺满，保持现状不破坏存量接入）/ `card`（圆角卡片：圆角跟随 `--uikit-components-radius`，细边框 `--uikit-border-light`，overflow 裁剪内部直角；灰底与间距由宿主布局提供），与 `ConversationContainer` 的 card/compact 同口径——此前卡片壳需接入方在宿主布局手搓，现收回容器内。
-- **`EmText` 排版原子组件 re-export**：与 core 2.5.0 对齐，`@easemob/uikit-im` 侧同步导出 `EmText` 及 `TextProps` / `TextLevel` / `TextWeight` / `TextColor` 类型（见 core 2.5.0）。
+- **`EmText` 排版原子组件 re-export**：与 core 2.5.0 对齐，`@easemob-community/uikit-im` 侧同步导出 `EmText` 及 `TextProps` / `TextLevel` / `TextWeight` / `TextColor` 类型（见 core 2.5.0）。
 - **中性气泡样式档位 `config.messageList.bubbleStyle`**：`'filled'`（默认，对方气泡带底色）/ `'plain'`（对方气泡无底色纯文字，message-list 根作用域覆写 `--uikit-bubble-bg-other: transparent`，组件级变体范式，不影响全局主题）。
 - **对方语音消息未播放红点 `config.messageList.voiceUnreadDot`**：默认 `true`。本会话实时收到的对方语音未点击时，气泡外侧右侧、相对气泡垂直居中显示红点，点击播放后隐藏；历史/漫游消息无播放状态不打标，刷新页面即复位（运行时态，不落盘）。设为 `false` 全局关闭；单条消息级覆盖可在消息项插槽内对 `INJECTION_KEY.VOICE_UNREAD_DOT` 深一层 provide。
 
@@ -303,7 +303,7 @@
 - **inline 消息状态落在引用卡上 / 跟随引用卡宽度**：带引用的消息在 `statusPosition: 'inline'` 下，状态列此前相对「气泡 + 引用卡」整体居中/沉底，视觉上贴在引用卡左侧；现将引用卡移出 message-row，且 message-row 内 body 宽度由 `100%` 改为随气泡内容收缩（`fit-content`），状态列只相对气泡本体对齐（多行沉底检测同步只量气泡），不再被引用卡宽度顶到远处。
 - **译文 / 语音转写缺少完成态标签**：译文展示时气泡底部新增「已翻译 / Translated」标签（icon `rect/hanzinalpha/slash`），语音转写新增同款「已转文字 / Transcribed」标签（icon `rect/hanzi`），双方气泡均居右对齐；locale 新增 `message.translated` / `message.voiceToText.done`（中英双语）。引用卡片去掉左侧竖杠装饰。
 
-## @easemob/uikit-core 2.5.0 (2026-09-03)
+## @easemob-community/uikit-core 2.5.0 (2026-09-03)
 
 ### 新增
 
@@ -313,7 +313,7 @@
 - **气泡语义 token 扩展与默认值校准（设计规范）**：新增 `--uikit-bubble-radius`（round 档 16px，默认）/ `--uikit-bubble-radius-square`（square 档 8px）与气泡内分割线 `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`（明暗两段）；气泡默认色校准为对方 `#E4E6E7` / `#171A1C`、己方 `#009EFF` / `#FFFFFF`（暗色段：对方沿用表面色与文字色，己方保持品牌蓝 `#009EFF`）。
 - **`INJECTION_KEY.VOICE_UNREAD_DOT` 注入键**：语音未读红点开关的 provide/inject 通道（`ComputedRef<boolean | undefined>`，undefined 回落默认 true），支持消息项级深一层 provide 覆盖。
 
-## @easemob/uikit-im 3.3.0 (2026-09-03)
+## @easemob-community/uikit-im 3.3.0 (2026-09-03)
 
 ### 新增
 
@@ -323,7 +323,7 @@
 
 - **菜单项圆角与 hover 档位联动**：消息操作菜单、会话右键菜单的菜单项圆角统一由 `--uikit-components-radius` 改为 `--uikit-item-hover-radius`，随 `hoverStyle` 三档联动（square 档为直角）。
 
-## @easemob/uikit-core 2.4.0 (2026-09-03)
+## @easemob-community/uikit-core 2.4.0 (2026-09-03)
 
 ### 新增
 
@@ -336,13 +336,13 @@
 
 - **Input 带前缀图标比例校准**：search/filled 变体下前缀图标左缩进 8px、文字 `padding-left` 28px（图标 8 + 图标宽 16 + 间距 4 的设计规格），修复图标过于靠左的问题（删除两条老的 `left: 4px` 覆盖）。
 
-## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
+## @easemob-community/uikit-sdk-contract 1.2.0 (2026-09-03)
 
 ### 新增
 
 - **被踢错误码契约**：`KICK_ERROR_CODE`（206 多端互踢 / 207 账号注销 / 214 设备数超限 / 216 修改密码 / 217 被其他设备踢下线，websdk 两代同码）与类型守卫 `isKickErrorCode()`。
 
-## @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03)
+## @easemob-community/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
 ### 新增
 
@@ -352,7 +352,7 @@
 
 - **被踢误报网络异常**：`onDisconnected` 按错误码识别被踢/账号失效（取 `payload.errorCode`），命中 `KICK_ERROR_CODE` 时调用 `client.setKicked(code)` 标记账号终态，而非仅置 disconnected；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
 
-## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+## @easemob-community/uikit-sdk-webim4 1.2.2 (2026-09-03)
 
 ### 新增
 
@@ -362,7 +362,7 @@
 
 - **被踢误报网络异常（与 websdk5 同口径）**：`onDisconnected` 按 `error.type` 识别被踢/账号失效并 `client.setKicked(code)`；内置 client store 的 `EventStores` 结构补 `setKicked`；新增 `connection-events` 回归测试。
 
-## @easemob/uikit-im 3.2.0 (2026-09-02)
+## @easemob-community/uikit-im 3.2.0 (2026-09-02)
 
 ### 新增
 
@@ -379,7 +379,7 @@
 
 - `EmBadge` 的 `size` 枚举由 `'normal' | 'small'` 改为 `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`（默认 `'l'`），旧值不再合法（见 core 2.3.0）。
 
-## @easemob/uikit-core 2.3.0 (2026-09-02)
+## @easemob-community/uikit-core 2.3.0 (2026-09-02)
 
 ### 新增
 
@@ -395,31 +395,31 @@
 
 - **`BadgeSize` 枚举重定义**：`'normal' | 'small'` → `'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'`，`size` prop 默认值 `'l'`；Badge 默认色由 `--uikit-danger-color` 改为 `--uikit-badge-bg`（`#FF7070`）。
 
-## @easemob/uikit-sdk-websdk5 1.2.1 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.2.1 (2026-09-02)
 
 ### 修复
 
 - **免打扰状态被会话快照冲掉**：`mergeWithExistingConversations` 合并重叠会话时 `isMuted` / `remindType` 以本地为准（SDK 会话快照恒 DEFAULT 不携带该状态），修复设置/解除免打扰后来新消息即被重置的问题；权威同步通道（`setMuted` 回写 / `CONVERSATION_MUTE_INFO_CHANGED` / `patchConversationMuteStates`）语义不变，合并回归测试补 `isMuted` 保留断言。
 
-## @easemob/uikit-sdk-webim4 1.2.1 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.1 (2026-09-02)
 
 ### 修复
 
 - **免打扰状态被会话回填冲掉**：`mergeIncomingConversations` 同 websdk5 1.2.1 口径，共有项保留本地 `isMuted`（回填项恒 false 不携带）；权威同步通道（`setMuted` 回写 / `patchMuteStates`）语义不变，回归测试同步补断言。
 
-## @easemob/uikit-core 2.2.0 (2026-09-02)
+## @easemob-community/uikit-core 2.2.0 (2026-09-02)
 
 ### 新增
 
 - **`SdkConfig.persistence` 透传槽**：旁路写库钩子（`SdkPersistenceHooks`）随 `repositories` 同路经 core 归一化下沉 `adapterConfig` 下发 adapter（`resolved.persistence ?? adapterConfig.persistence` 归一），未注入时行为零变化。
 
-## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.1.0 (2026-09-02)
 
 ### 新增
 
 - **旁路持久化契约（D122 Phase 3.2/3.4 前置）**：新增入库 DTO `MessageRecord`（`SdkMessage` + 墓碑字段 `recalled`/`deleted`/`tombstoneTime`）与 `ConversationRecord`；新增清洗函数 `toMessageRecord`/`toConversationRecord`（纯 TS，剥离 File/Blob/函数、combine `messageList` 递归、`ext` 限深防循环引用）；新增 `SdkPersistenceHooks`（`message`/`conversation` 两域钩子，全部可选、fire-and-forget 语义）；`SdkConfig` 新增 `persistence` 槽（旁路写库，与 `repositories` 数据入口接管语义分立）。
 
-## @easemob/uikit-sdk-websdk5 1.2.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.2.0 (2026-09-02)
 
 ### 新增
 
@@ -429,7 +429,7 @@
 
 - **会话覆盖竞争（D122 3.3）**：`mergeWithExistingConversations` 升级为并集合并——本地独有会话（如 DB 预填）不再被 SDK 快照冲掉，重叠会话保留本地 `draft`/`draftTime`/`remindType` 字段；`patch.removed` 显式删除通道不受影响。
 
-## @easemob/uikit-sdk-webim4 1.2.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.0 (2026-09-02)
 
 ### 新增
 
@@ -439,7 +439,7 @@
 
 - **会话回填并集合并**：`applyServerItems`/注入路径 `refresh` 不再冲掉本地独有会话，共有项继承本地 `draft`/`draftTime`/`remindType`；顺带修复 4.x 收到 `deleteRoaming` 多设备删除事件时本地 store 未清理的问题。
 
-## @easemob/uikit-im 3.1.0 (2026-09-02)
+## @easemob-community/uikit-im 3.1.0 (2026-09-02)
 
 ### 新增
 
@@ -454,7 +454,7 @@
 
 - 会话右键菜单锚点节点、消息定位高亮定时器补充卸载清理；消息气泡缩略图加 `loading="lazy"`。
 
-## @easemob/uikit-core 2.1.0 (2026-09-02)
+## @easemob-community/uikit-core 2.1.0 (2026-09-02)
 
 ### 性能
 
@@ -464,7 +464,7 @@
 
 - **`usePresence` 增加开关硬门**：`subscribePresence`/`unsubscribePresence`/`fetchPresence`/`publishPresence`/`watch` 在 `features.enablePresence === false` 时全部 no-op（fetch 返回空数组），不再依赖各调用点自觉 gate；开启时行为不变。
 
-## @easemob/uikit-sdk-websdk5 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.1.0 (2026-09-02)
 
 ### 性能
 
@@ -474,7 +474,7 @@
 
 - **presence 独立运行默认关闭**：`getDefaultFeatures()` 的 `enablePresence` 由 `true` 改为 `false`——adapter 独立运行或未传 features 时不再默认启用在线状态，仅 Provider 显式 `enablePresence` 开启才启用（Provider 路径默认本为 false，无影响）。
 
-## @easemob/uikit-sdk-webim4 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.1.0 (2026-09-02)
 
 ### 性能
 
@@ -484,12 +484,12 @@
 
 - **presence 独立运行默认关闭**：同 websdk5 1.1.0。
 
-## @easemob/uikit-im 3.0.0 (2026-09-02)
+## @easemob-community/uikit-im 3.0.0 (2026-09-02)
 
 ### 新增
 
-- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob/uikit-sdk-contract` 与两个适配器包 `@easemob/uikit-sdk-websdk5`（5.x）/ `@easemob/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
-- **子路径入口**：新增 `@easemob/uikit-im/websdk5` 与 `@easemob/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
+- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob-community/uikit-sdk-contract` 与两个适配器包 `@easemob-community/uikit-sdk-websdk5`（5.x）/ `@easemob-community/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
+- **子路径入口**：新增 `@easemob-community/uikit-im/websdk5` 与 `@easemob-community/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
 - **Provider 新能力**：新增 `adapter` prop（注入模式：业务自带 adapter 实例，UIKit 不转发 login/logout）；`sdkConfig.repositories` 数据入口注入（message/conversation/contact/group/presence/userInfo 全域可接管）；`useUIKit()` 暴露 `capabilities`（adapter 上报的 SDK 客观能力矩阵，与 features 取交集决定能力入口）；core 新增模块级 `getUIKitAdapter()` 支持非 Vue 上下文访问。
 - **4.x 适配补齐**：登录后按 features 预取联系人/群组（对齐 5.x 同步体感）；漫游坏消息容错（单条解码失败跳过不拖垮整页）。
 
@@ -500,10 +500,10 @@
 
 ### 破坏性行为变更
 
-- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob/uikit-im/websdk5`（4.x 场景用 `@easemob/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
+- **SDK 层值级导出迁移**：`UIKitClient` / `createClient` / adapter / domain / `registerEventHandlers` 等值级导出从主入口移除，迁至子路径入口 `@easemob-community/uikit-im/websdk5`（4.x 场景用 `@easemob-community/uikit-im/webim4`）；主入口仅保留 type-only re-export。迁移方式：入口文件 `import '@easemob-community/uikit-im/websdk5'`（import 即注册默认 adapter），原先从主入口导入的 SDK 值级符号改从子路径入口导入。
 - **`UIKitDataSource` 维持 `@deprecated`（本版本不移除）**：已收口为 repository 注入的薄别名（core 装配时逐项翻译，显式 `repositories` 优先）；`searchUsers` 等无 repository 对应项的接管面迁移目标尚未设计，移除调整至 4.0.0。
 
-## @easemob/uikit-core 2.0.0 (2026-09-02)
+## @easemob-community/uikit-core 2.0.0 (2026-09-02)
 
 ### 破坏性行为变更
 
@@ -515,82 +515,82 @@
 - **dataSource 薄别名收口**：新增 `composables/data-source-repositories.ts`，把 `dataSource` 逐项翻译为 `SdkRepositoryOverrides` 注入 adapter Domain（惰性 getter 保持运行时切换语义，显式 `repositories` 按域整体优先）。
 - `useSyncStatus` 下沉 core（onSyncStatus 桥接）；`formatSdkError` / `parsePresenceStatus` / `toUiMessage` 去 websdk5 依赖（鸭子类型判定）。
 
-## @easemob/uikit-chatroom 2.0.0 (2026-09-02)
+## @easemob-community/uikit-chatroom 2.0.0 (2026-09-02)
 
 ### 破坏性行为变更
 
-- **SDK 解耦对齐双 adapter 架构**：公开导出 `resolveChatroomClientConfig` / `CHATROOM_SDK_MANAGERS` 移除，替换为 `resolveChatroomSdkConfig`；`onClientSetup` 改为 `onAdapterReady`；manager 注入改 adapter 预设 `managerPreset: 'chatroom'`；`ManagerHost` 改本包 `ChatroomSdkHost`（惰性代理解析 adapter.client）。本包不再直接依赖 `@easemob/uikit-sdk-websdk5`，adapter 由业务侧注入或经默认工厂注册。
+- **SDK 解耦对齐双 adapter 架构**：公开导出 `resolveChatroomClientConfig` / `CHATROOM_SDK_MANAGERS` 移除，替换为 `resolveChatroomSdkConfig`；`onClientSetup` 改为 `onAdapterReady`；manager 注入改 adapter 预设 `managerPreset: 'chatroom'`；`ManagerHost` 改本包 `ChatroomSdkHost`（惰性代理解析 adapter.client）。本包不再直接依赖 `@easemob-community/uikit-sdk-websdk5`，adapter 由业务侧注入或经默认工厂注册。
 
-## @easemob/uikit-sdk-contract 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.0.0 (2026-09-02)
 
 ### 新增
 
 - **首次发布**：SDK 中立契约包——中立 wire 类型（`SdkMessage` / `UiMessage` / `UiConversation` / `UiGroup` / `UserInfo` 等）、常量、事件集、repository 数据入口接口、domains 业务域接口（Domain Port）、`SdkCapabilities` 能力矩阵（boolean 能力位 + `contractVersion` / `meta.reason` / `minContractVersion` 协商机制）、`SdkAdapter` 组合接口与初始化配置，及少量中立纯工具（logger / normalizeUserId / message-preview / stream-message）。零 SDK、零 UI 框架依赖。
 
-## @easemob/uikit-sdk-websdk5 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-websdk5 1.0.0 (2026-09-02)
 
 ### 新增
 
-- **首次发布**：easemob-websdk 5.x 适配器——`Websdk5Adapter`（内置 / 注入双模式）+ 六域 Domain（message/conversation/contact/group/presence/userInfo）+ 事件层 + 中立字段映射 + 六 repository 代理 + 新消息通知引擎，实现 `@easemob/uikit-sdk-contract` 全部接口；`SdkRepositoryOverrides` 全域可注入。
+- **首次发布**：easemob-websdk 5.x 适配器——`Websdk5Adapter`（内置 / 注入双模式）+ 六域 Domain（message/conversation/contact/group/presence/userInfo）+ 事件层 + 中立字段映射 + 六 repository 代理 + 新消息通知引擎，实现 `@easemob-community/uikit-sdk-contract` 全部接口；`SdkRepositoryOverrides` 全域可注入。
 
-## @easemob/uikit-sdk-webim4 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.0.0 (2026-09-02)
 
 ### 新增
 
 - **首次发布**：easemob-websdk 4.x（4.24.2，私有化）适配器——`Webim4Adapter`（内置 / 注入双模式）+ 六域 Domain + 单 `addEventHandler` 事件层归一化（批量 onMessage 逐条展开、read/delivery/channel 回执归一、流式增量、群事件 operation 分发）+ 字段/API 映射（合并/置顶/流式/已读回执全支持）+ 登录预取（对齐 5.x 同步体感）+ 漫游 pb 容错（坏消息跳过不拖垮整页）。4.x SDK 经 npm alias `easemob-websdk-4` 引入，与 5.x 同工程共存互不干扰。
 
-## @easemob/uikit-im 2.8.6 (2026-08-28)
+## @easemob-community/uikit-im 2.8.6 (2026-08-28)
 
 ### 修复
 
 - **数据同步「有数据但 UI 空」**：SDK 自动同步完成后好友/群组列表仍可能为空——通讯录计数、列表容器挂载等路径在同步完成前读 SDK 内存（尚未同步的空快照）并锁定 `loaded`，导致 `onSyncDataFinished` 的回填被 `if (!loaded)` 跳过（日志呈现 `contact 回填 {loaded: true, sdkCount: N, storeCount: 0}`）。修复三层配合：① 计数改为只读（`getLocalCount()` 不写 store 不锁定 loaded）；② 回填兜底（`loaded` 为真但列表为空时仍回填 SDK 数据）；③ 消费 `onSyncDataFinished` 的 `status` 字段——同步失败输出日志，conversation 失败且可重试时自动 `refreshSessionList()` 重试一次。
 - **新增 `useSyncStatus()` hook**：暴露 conversation / contact / group 三类数据的同步阶段（idle / syncing / success / failed）与 `isSyncing` / `allFinished`，业务方可感知同步进度并在失败后自行补偿（contact/group 无 SDK 主动同步接口，失败后只能等待下次连接/登录自动同步）。
 
-## @easemob/uikit-im 2.8.5 (2026-08-28)
+## @easemob-community/uikit-im 2.8.5 (2026-08-28)
 
 ### 修复
 
 - **GIF / 表情包发送后动图不播放（服务端返回静态图地址）**：`sendImage` 发送图片消息时未给 SDK 传 `createImageMessage` 的 `isGif` 标记，SDK 把 GIF 当普通图片上传，返回的 `chatfiles/*` 地址是静态图。现按 MIME（`image/gif`）或文件名/URL 后缀（`.gif`）自动判定并传 `isGif: true`，SDK 按 GIF 动图处理，配合 2.8.4 的渲染修复（`isGif` 消息展示动画原图）动图可正常播放。
 
-## @easemob/uikit-im 2.8.4 (2026-08-28)
+## @easemob-community/uikit-im 2.8.4 (2026-08-28)
 
 ### 修复
 
 - **GIF / 表情包消息展示为静态缩略图、不播放动图**：`image-message.vue` 的 `displayUrl` 对图片消息统一优先 `thumbnailUrl`（SDK 生成的静态缩略图），当消息体 `isGif` 为真（或 `ext.isSticker` 表情包）时改为优先展示动画原图（`originalImageUrl` / `bigImageUrl` / `localUrl`），恢复 gif 动图播放。
 
-## @easemob/uikit-im 2.8.3 (2026-08-28)
+## @easemob-community/uikit-im 2.8.3 (2026-08-28)
 
 ### 修复
 
 - **表情包（sticker）发送失败**：本地打包资源（如 demo 的 gif 资产路径）作为 sticker `url` 时，SDK 无法按 URL 上传（`Attachment file is required`）。现 `onStickerSelect` 先 `fetch` 该地址转成 `File` 再以图片消息发送；远程 URL 能 fetch 也走 File，跨域失败则回落为原 URL 字符串（保持按 URL 引用）。
 
-## @easemob/uikit-im 2.8.2 (2026-08-28)
+## @easemob-community/uikit-im 2.8.2 (2026-08-28)
 
 ### 调整
 
 - **表情面板「常用」区仅在有最近使用时显示**：从未选过表情不展示「常用」空态占位；`emoji.recentEmpty` 文案随之移除。
 - **移除内置 emoji 悬停放大预览**：删除 `ChatConfig.input.emoji.emojiPreview` 配置，表情视图不再弹放大预览小窗；sticker 的 hover 预览图 → gif 切换保留不变。
 
-## @easemob/uikit-core 1.5.2 (2026-08-28)
+## @easemob-community/uikit-core 1.5.2 (2026-08-28)
 
 ### 调整
 
 - **EmojiPicker「常用」区空时隐藏**：仅当有最近使用 emoji 时展示「常用」区；移除 `emoji.recentEmpty` i18n key。
 - **移除 `emojiPreview` prop**：删除内置 emoji 悬停放大预览气泡（逻辑 + 样式）；sticker 的 `stickerHover` 预览切换不受影响。
 
-## @easemob/uikit-im 2.8.1 (2026-08-28)
+## @easemob-community/uikit-im 2.8.1 (2026-08-28)
 
 ### 调整
 
 - **表情面板「常用」与「Emoji」合并为单一视图**：不再分「常用 / Emoji」两个 tab，改为在表情视图顶部展示「常用」最近使用区、下方为完整 Emoji 列表，同一滚动区（与设计稿对齐）；底部 tab 只区分表情视图与表情包。`recentIcon` 配置随之移除（无消费方）；`recent` / `recentCount` / `emojiIcon` / `emojiPreview` 等其余配置语义不变。
 
-## @easemob/uikit-core 1.5.1 (2026-08-28)
+## @easemob-community/uikit-core 1.5.1 (2026-08-28)
 
 ### 调整
 
 - **EmojiPicker「常用」与「Emoji」合并为单一视图**：常用最近使用区置于视图顶部、完整 Emoji 列表在下，同一滚动区；移除已无用的 `recentIcon` prop（`emojiIcon` 改为表情视图 tab 图标），其余 props（`recent` / `recentCount` / `tabsPosition` / `stickerHover` / `emojiPreview`）语义不变。
 
-## @easemob/uikit-im 2.8.0 (2026-08-28)
+## @easemob-community/uikit-im 2.8.0 (2026-08-28)
 
 ### 新增
 
@@ -603,9 +603,9 @@
 
 ### 修复
 
-- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob/uikit-core` 1.5.0）。
+- **登出后重新登录，会话列表误展示「网络异常」横幅**（D123）：登出时 dispose 的事件处理器（连接级 + 各 manager + user-info 监听）在重新登录时未重建，导致 `stores.client.connected` 恒为 false、会话列表误命中网络异常分支；现 `login()` 在登出后先恢复注册再连接（根因修复见 `@easemob-community/uikit-core` 1.5.0）。
 
-## @easemob/uikit-core 1.5.0 (2026-08-28)
+## @easemob-community/uikit-core 1.5.0 (2026-08-28)
 
 ### 新增
 
@@ -619,7 +619,7 @@
 
 - **重登后事件处理器未恢复注册**（D123）：`useCoreUIKitProvider` 抽取 `registerClientSetup()`（幂等重建 `onClientSetup` 场景挂钩 + user-info 监听），`setupClient` 与 `login()` 共用；登出后重新登录先恢复注册再连接，连接事件不再无人消费；`client` 新增 `isConnected` 访问器。
 
-## @easemob/uikit-im 2.7.0 (2026-08-27)
+## @easemob-community/uikit-im 2.7.0 (2026-08-27)
 
 ### 破坏性变更
 
@@ -629,7 +629,7 @@
 
 - **消息列表隐藏自己头像**（`ChatConfig.messageList.showSelfAvatar`）：新增 `showSelfAvatar` 配置（默认 `true`），设为 `false` 时隐藏己方消息头像、对方头像照常显示（微信/QQ 式「隐藏我的头像」）；`showAvatar: false` 仍作为总开关同时隐藏双方头像。
 
-## @easemob/uikit-im 2.6.0 (2026-08-26)
+## @easemob-community/uikit-im 2.6.0 (2026-08-26)
 
 ### 破坏性变更
 
@@ -640,7 +640,7 @@
 
 - `check-icon-refs.mjs` 扩展为同时校验旧库与 V2 目录，旧库删除后仅校验 `assets/icons-v2/`；构建期缺失图标引用会硬失败。
 
-## @easemob/uikit-core 1.4.0 (2026-08-26)
+## @easemob-community/uikit-core 1.4.0 (2026-08-26)
 
 ### 破坏性变更
 
@@ -651,7 +651,7 @@
 
 - `icons:check` 脚本覆盖 `assets/icons-v2/`（含 `filled/`）与 `assets/icons/`，旧库删除后自动仅校验 V2；支持无 `src/` 目录的包扫描。
 
-## @easemob/uikit-im 2.5.0 (2026-08-25)
+## @easemob-community/uikit-im 2.5.0 (2026-08-25)
 
 ### 新增
 
@@ -662,7 +662,7 @@
 
 - 新增 `BlockListAddModalProps` 公开类型。
 
-## @easemob/uikit-im 2.4.0 (2026-08-25)
+## @easemob-community/uikit-im 2.4.0 (2026-08-25)
 
 ### 新增
 
@@ -706,7 +706,7 @@
 
 ### 新增
 
-- **Skeleton 骨架屏组件**：`@easemob/uikit-core` 新增 `EmSkeleton`，支持头像 + 文字行变体；会话/联系人/群组列表首次加载接入骨架屏，减少空白等待感。
+- **Skeleton 骨架屏组件**：`@easemob-community/uikit-core` 新增 `EmSkeleton`，支持头像 + 文字行变体；会话/联系人/群组列表首次加载接入骨架屏，减少空白等待感。
 - **Modal danger 变体**：`EmModal` 新增 `type?: 'default' | 'danger'`，危险操作确认按钮自动切换为 danger 语义；同步限制最大宽度与正文溢出滚动。
 - **Toast 能力补全**：`EmToast` / `useToast` 新增 `closable`、`position`、`actionText`、 `#action` 插槽与 `duration=0` 不自动关闭；`show` 方法通过重载兼容旧签名与新签名。
 - **Input error / readonly 态**：`EmInput` 新增 `error` / `error-message` / `readonly` props，支持表单校验失败视觉反馈与只读可复制状态。
@@ -730,7 +730,7 @@
 - **组件使用建议**：Button/Input/IconButton/Cell/Modal 文档新增 Do/Don't 对比表。
 - **设计原则**：`guide/theme.md` 提炼 5 条核心设计原则（变量优先、层级清晰、无障碍默认、移动端优先、一致优于花哨）。
 - **图标与时间戳规范**：`guide/icons.md` 补充图标设计规范；`components/message-list.md` 补充时间戳策略建议。
-- **更新日志三包拆分**：`guide/changelog.md` 改用自定义 `ChangelogTabs` 组件，按 `@easemob/uikit-im` / `@easemob/uikit-core` / `@easemob/uikit-chatroom` 三 tab 展示各包更新日志；构建时由根 `CHANGELOG.md` 自动拆分生成。
+- **更新日志三包拆分**：`guide/changelog.md` 改用自定义 `ChangelogTabs` 组件，按 `@easemob-community/uikit-im` / `@easemob-community/uikit-core` / `@easemob-community/uikit-chatroom` 三 tab 展示各包更新日志；构建时由根 `CHANGELOG.md` 自动拆分生成。
 - **文档站导航重构**：顶部导航收敛为「首页 / 指南 / 组件 / GitHub」；左侧边栏按「开始 / 功能指南 / 设计系统 / H5 适配 / Demo 规划 / 更新日志」板块聚合，同一板块内只展示当前板块导航，消除 mix 感。
 - **图标总览默认展开**：`IconGallery` 分类默认展开，进入图标/Design Tokens 页即可直接浏览全部图标。
 
@@ -749,19 +749,19 @@
 ### 重构
 
 - **三包架构落地（P0.5 改名 + P1 抽核，里程碑级内部重构）**：
-  - 包改名：`@easemob/uikit` → `@easemob/uikit-im`（纯改名，安装命令同步更新，为聊天室场景包让位命名空间）
-  - 新增共享基座 `@easemob/uikit-core`（1.0.0，独立版本线）：
+  - 包改名：`@easemob/uikit` → `@easemob-community/uikit-im`（纯改名，安装命令同步更新，为聊天室场景包让位命名空间）
+  - 新增共享基座 `@easemob-community/uikit-core`（1.0.0，独立版本线）：
     - SDK 基座层：`UIKitClient` / `ManagerHost`（含 **`ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
     - Pinia stores：client / theme / user-info / presence
     - 共享 composables：`useClient` / `useTheme` / `useUserInfo` / `useOwnUserInfo` / `usePresence` / `useToast` / `useNotification` / H5 通用（`useH5Adaptation` / `useKeyboard` / `useLongPress` / `usePullRefresh` / `useViewport` / `useBottomSheet` / `useRipple`）/ 通用交互（`useKeyBindings` / `useResizable` / `useUIKitStorage`）
     - 24 个原子组件（Em* 基础组件集，含 story）+ theme CSS 变量（539 行）+ locale（含 `mergeLocaleMessages`，供场景包合并 i18n keys）+ constants + 通用 utils（logger / log-store / sdk-error / download / z-index / format-time / linkify）
     - core 版 `EmUIKitProvider` + `useCoreUIKitProvider` / `useProviderSideEffects`（场景无关共享副作用）
-  - `@easemob/uikit-im` 全量 re-export core 符号：**对外 API 零回归**（原 416 个公共导出名全部保留，组件 props/emits、主题、文案、行为不变）
+  - `@easemob-community/uikit-im` 全量 re-export core 符号：**对外 API 零回归**（原 416 个公共导出名全部保留，组件 props/emits、主题、文案、行为不变）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`，各包一份产物，build 前置 `--check` 卡漂移）
   - 构建规则固化：所有包 external `vue`/`pinia`/`easemob-websdk`，场景包再 external core（消费端单 SDK 实例）；im UMD 产物补 core 全局映射（CDN 直引可用）
   - 版本同步：`changelog:check` 升级为 im / core 双版本校验（根 CHANGELOG 单一数据源不变）；im 依赖 core 采用 `workspace:^`（发布转 `^1.0.0`）
   - 日志导出文件名前缀参数化（`setLogFilePrefix`），im 既有 `easemob-uikit-im-logs-*` 语义不变
-- **面向下游**：安装包名由 `@easemob/uikit` 变更为 `@easemob/uikit-im`；除此之外无任何 API / 行为变更，可直接替换依赖名升级。
+- **面向下游**：安装包名由 `@easemob/uikit` 变更为 `@easemob-community/uikit-im`；除此之外无任何 API / 行为变更，可直接替换依赖名升级。
 
 ## 1.9.0 (2026-08-14)
 
@@ -1237,19 +1237,19 @@
 
 ---
 
-## @easemob/uikit-core 1.3.0 (2026-08-25)
+## @easemob-community/uikit-core 1.3.0 (2026-08-25)
 
 ### 新增
 
 - **黑名单选人 i18n 文案**：新增 `contact.blocklist.add` / `contact.blocklist.emptySelectable` / `contact.blocklist.addSuccess` / `contact.blocklist.addFailed`（zh-CN / en），供黑名单「添加」选人弹窗使用。
 
-## @easemob/uikit-core 1.2.0 (2026-08-25)
+## @easemob-community/uikit-core 1.2.0 (2026-08-25)
 
 ### 新增
 
 - **通讯录黑名单 i18n 文案**：新增 `contact.entryBlocklist` 与 `contact.blocklist.empty` / `contact.blocklist.remove` / `contact.blocklist.removeConfirmTitle` / `contact.blocklist.removeConfirm` / `contact.blocklist.removeSuccess` / `contact.blocklist.removeFailed`（zh-CN / en），供 uikit-im 黑名单列表使用。
 
-## @easemob/uikit-core 1.1.0 (2026-08-19)
+## @easemob-community/uikit-core 1.1.0 (2026-08-19)
 
 ### 新增
 
@@ -1274,24 +1274,24 @@
 
 ---
 
-## @easemob/uikit-core 1.0.0 (2026-08-15)
+## @easemob-community/uikit-core 1.0.0 (2026-08-15)
 
 ### 新增
 
 - **图标体系**：`EmIcon` 支持多注册表（`assets/icons` + `assets/icons-v2` + `assets/icons-filled`），`icon-map.ts` 新增 `getV2IconNames()` / `getFilledIconNames()`，为线性/面性图标库提供自动索引；`color` prop 对 `fill="currentColor"` 的填充式图标同样生效。
-- **共享基座首版（P1 抽核自 `@easemob/uikit-im` 迁出）**：
+- **共享基座首版（P1 抽核自 `@easemob-community/uikit-im` 迁出）**：
   - SDK 基座层：`UIKitClient` / `ManagerHost`（**含 `ChatRoomManager` 注册**，为聊天室场景包预留）/ wire 类型 / user-info & presence domain / 连接级事件 / notice 工具
   - Pinia stores：`useClientStore` / `useThemeStore` / `useUserInfoStore` / `usePresenceStore`
   - 共享 composables：`useClient` / `useTheme` / `useUserInfo` / `useOwnUserInfo` / `usePresence` / `useToast` / `useNotification` / H5 通用（`useH5Adaptation` / `useKeyboard` / `useLongPress` / `usePullRefresh` / `useViewport` / `useBottomSheet` / `useRipple`）/ 通用交互（`useKeyBindings` / `useResizable` / `useUIKitStorage`）/ Provider 装配（`useCoreUIKitProvider` / `useCoreUIKit` / `useProviderSideEffects`）
   - 24 个原子组件（Em* 基础组件集，含 story）+ theme CSS 变量（539 行）+ locale（含 `mergeLocaleMessages`，供场景包合并 i18n keys）+ constants + 通用 utils（logger / log-store / sdk-error / download / z-index / format-time / linkify）
   - core 版 `EmUIKitProvider` 容器（props 子集 + 场景无关共享副作用）
   - resolver / auto-imports 参数化生成（`gen-aux-entries.mjs`）：`EasemobUIKitCoreResolver` / `EasemobUIKitCoreImports`
-- 对外 API 零回归：`@easemob/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。
+- 对外 API 零回归：`@easemob-community/uikit-im` 全量 re-export core 符号，原 416 个公共导出名全部保留。
 
 
 ---
 
-## @easemob/uikit-chatroom 1.0.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 1.0.0 (2026-08-15)
 
 ### 里程碑
 
@@ -1313,7 +1313,7 @@
   - MCP 数据纳入聊天室：guide + 组件 API + manifest `chatroom` 段（独立 version），
     `search_docs` 搜索覆盖两包、`get_component_api` 兼容聊天室组件名。
 - **工具链修正（P1 抽核遗留）**：`gen:api` 原子组件根目录跟随抽核迁移到
-  `@easemob/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
+  `@easemob-community/uikit-core`（此前指向 `uikit-im/src/components` 会 ENOENT）；
   插槽提取增强——`name` 属性不在 `<slot` 首位的多行写法不再漏提取，
   容器 19 个命名插槽全量落表（此前仅 10 个）。
 - **组件公开导出补全（文档整改自查）**：`ChatroomGiftBar`（礼物入口）与
@@ -1334,7 +1334,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.3.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.3.0 (2026-08-15)
 
 ### 新增
 
@@ -1372,7 +1372,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.2.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.2.0 (2026-08-15)
 
 ### 新增
 
@@ -1410,7 +1410,7 @@
 
 ---
 
-## @easemob/uikit-chatroom 0.1.0 (2026-08-15)
+## @easemob-community/uikit-chatroom 0.1.0 (2026-08-15)
 
 ### 新增
 

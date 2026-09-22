@@ -6,7 +6,7 @@
  * - 右：更多（...）+ 投诉按钮 + `#extra` 插槽（业务注入分享/关注/在线数等自定义动作，
  *   渲染在 more/report 之后；docs/CHATROOM-CAPABILITY-REVIEW.md §五 P6-3）。
  */
-import { t } from '@easemob/uikit-core'
+import { t } from '@easemob-community/uikit-core'
 
 withDefaults(defineProps<{
   /** 直播间标题（如「会员年中福利」） */

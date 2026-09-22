@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { UiGroupMember } from '@easemob/uikit-core'
+import type { UiGroupMember } from '@easemob-community/uikit-core'
 
 export interface BlockListSelectItemProps {
   member: UiGroupMember

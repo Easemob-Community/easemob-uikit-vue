@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
-import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, insertChatNotice, useLocale } from '@easemob/uikit-core'
-import type { CreateGroupParams, GroupMemberPage, UiGroup, UiGroupMember } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, NOTICE_EVENT_TYPE, insertChatNotice, useLocale } from '@easemob-community/uikit-core'
+import type { CreateGroupParams, GroupMemberPage, UiGroup, UiGroupMember } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 
 export function useGroup() {

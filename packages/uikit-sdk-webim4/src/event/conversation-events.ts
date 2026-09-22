@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { SdkPersistenceHooks } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { SdkPersistenceHooks } from '@easemob-community/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 import { firePersistenceHook } from '../persistence'
 import type { EventStores } from './types'
 

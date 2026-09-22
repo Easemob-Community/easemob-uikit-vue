@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 // 游标存储抽为独立模块：message store 的会话淘汰需直接清游标，
 // 经 use-message-history 引用会形成 store → composable → use-uikit → store 循环

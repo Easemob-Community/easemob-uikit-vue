@@ -1,5 +1,5 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { UiContact } from '@easemob/uikit-sdk-contract'
+import type { UiContact } from '@easemob-community/uikit-sdk-contract'
 
 /**
  * 将 4.x ContactItem（getAllContacts / getContactsWithCursor 返回，含 userId + remark）

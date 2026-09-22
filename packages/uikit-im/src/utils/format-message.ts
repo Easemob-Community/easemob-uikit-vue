@@ -1,5 +1,5 @@
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { MessageTypeValue } from '@easemob/uikit-core'
+import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { MessageTypeValue } from '@easemob-community/uikit-core'
 
 /** 消息类型 → 摘要文本 的默认映射 */
 const MESSAGE_SUMMARY_MAP: Record<string, string> = {}

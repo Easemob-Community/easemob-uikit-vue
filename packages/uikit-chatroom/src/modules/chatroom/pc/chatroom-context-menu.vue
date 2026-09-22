@@ -15,7 +15,7 @@
  * 与「壳子 vs 内容」哲学一致，UIKit 不预埋具体管理项。
  */
 import { nextTick, onUnmounted, ref, watch } from 'vue'
-import { useEscToClose } from '@easemob/uikit-core'
+import { useEscToClose } from '@easemob-community/uikit-core'
 import { getChatroomPopupTarget } from '../../../config/popup-target'
 
 export interface ChatroomContextMenuItem {

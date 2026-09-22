@@ -368,7 +368,7 @@ export function configureLogPersistence(config: LogPersistenceConfig): void {
   if (_config.collectSdkLog !== prev.collectSdkLog || _config.enabled !== prev.enabled) {
     // 动态引入避免与 sdk-log-capture 形成静态循环依赖；
     // websdk5 为 optional peer（决策 22），4.x 下游未安装时静默降级为「不捕获 SDK 日志」
-    void import('@easemob/uikit-sdk-websdk5').then(({ disableSdkLogCapture, enableSdkLogCapture, setSdkLogAppender }) => {
+    void import('@easemob-community/uikit-sdk-websdk5').then(({ disableSdkLogCapture, enableSdkLogCapture, setSdkLogAppender }) => {
       // 注入日志落库实现：adapter 只负责捕获，持久化由 core 提供
       setSdkLogAppender(appendLog)
       if (_config.enabled && _config.collectSdkLog)
@@ -376,7 +376,7 @@ export function configureLogPersistence(config: LogPersistenceConfig): void {
       else
         disableSdkLogCapture()
     }).catch(() => {
-      warnOnce('SDK log capture unavailable: @easemob/uikit-sdk-websdk5 not installed, skipping SDK log capture')
+      warnOnce('SDK log capture unavailable: @easemob-community/uikit-sdk-websdk5 not installed, skipping SDK log capture')
     })
   }
 }

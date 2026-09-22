@@ -1,11 +1,11 @@
-# 快速开始（@easemob/uikit-chatroom）
+# 快速开始（@easemob-community/uikit-chatroom）
 
 ## 安装
 
 ```bash
-pnpm add @easemob/uikit-chatroom pinia vue
+pnpm add @easemob-community/uikit-chatroom pinia vue
 # 或 npm / yarn
-npm i @easemob/uikit-chatroom pinia vue
+npm i @easemob-community/uikit-chatroom pinia vue
 ```
 
 `pinia`、`vue` 是 peerDependencies，**必须显式安装**（聊天室包不自带）。
@@ -14,7 +14,7 @@ npm i @easemob/uikit-chatroom pinia vue
 
 ```ts
 // main.ts / App.vue —— 初始化（自带 pinia 注入，无 Provider 组件概念）
-import { useChatroomProvider } from '@easemob/uikit-chatroom'
+import { useChatroomProvider } from '@easemob-community/uikit-chatroom'
 
 useChatroomProvider({ appKey: 'orgName#appName' })
 ```
@@ -22,7 +22,7 @@ useChatroomProvider({ appKey: 'orgName#appName' })
 ```vue
 <!-- 页面：容器驱动进出房 -->
 <script setup lang="ts">
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>
@@ -70,8 +70,8 @@ PC 下成员侧栏悬停快捷操作、宽视口弹层自动居中弹窗、输�
 
 ```vue
 <script setup lang="ts">
-import { ChatroomLiveDanmakuStream } from '@easemob/uikit-chatroom'
-import type { LiveDanmakuItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveDanmakuStream } from '@easemob-community/uikit-chatroom'
+import type { LiveDanmakuItem } from '@easemob-community/uikit-chatroom'
 
 const items = ref<LiveDanmakuItem[]>([])
 </script>
@@ -87,7 +87,7 @@ const items = ref<LiveDanmakuItem[]>([])
 手动登录走 core 的 `useClient()`：
 
 ```ts
-import { useClient } from '@easemob/uikit-chatroom' // re-export core
+import { useClient } from '@easemob-community/uikit-chatroom' // re-export core
 
 const { login } = useClient()
 await login({ userId, token })

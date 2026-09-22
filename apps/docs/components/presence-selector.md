@@ -28,7 +28,7 @@ function onSelect(status: 'online' | 'busy' | 'away' | 'custom', ext: string) {
 
 ## 弹窗 / 弹出层形态
 
-`EmPresenceSelector` 还有两个业务封装形态（实现于 `@easemob/uikit-core`，经 `@easemob/uikit-im` 具名 re-export，`app.use(UIKit)` 全局注册后可直接使用；均依赖登录态，自动向 SDK 发布状态变更）：
+`EmPresenceSelector` 还有两个业务封装形态（实现于 `@easemob-community/uikit-core`，经 `@easemob-community/uikit-im` 具名 re-export，`app.use(UIKit)` 全局注册后可直接使用；均依赖登录态，自动向 SDK 发布状态变更）：
 
 ```vue
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 /**
- * 聊天室场景包常量（风格对齐 @easemob/uikit-core constants）。
+ * 聊天室场景包常量（风格对齐 @easemob-community/uikit-core constants）。
  * 枚举字符串统一收敛于此，业务代码（sdk/store/composables）禁止硬编码字面量。
  */
 

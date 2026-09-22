@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmIconButton as IconButton, EmInput as Input, createLogger, formatSdkError, useLocale } from '@easemob/uikit-core'
-import type { GroupMemberRoleValue, UiGroupMember } from '@easemob/uikit-core'
+import { EmEmpty as Empty, GROUP_MEMBER_ROLE, EmIconButton as IconButton, EmInput as Input, createLogger, formatSdkError, useLocale } from '@easemob-community/uikit-core'
+import type { GroupMemberRoleValue, UiGroupMember } from '@easemob-community/uikit-core'
 import { useGroup } from '../../../composables/use-group'
 import { useUIKit } from '../../../composables/use-uikit'
 import GroupMemberList from '../../group/group-member-list.vue'

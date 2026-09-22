@@ -9,12 +9,12 @@
 | Badge API | [badge.md](./badge.md) |
 | Button API | [button.md](./button.md) |
 | Cell API | [cell.md](./cell.md) |
-| @easemob/uikit-chatroom 2.0.0 (2026-09-02) | [changelog-chatroom.md](./changelog-chatroom.md) |
-| @easemob/uikit-core 2.4.0 (2026-09-03) | [changelog-core.md](./changelog-core.md) |
-| @easemob/uikit-im 3.3.0 (2026-09-03) | [changelog-im.md](./changelog-im.md) |
-| @easemob/uikit-sdk-contract 1.2.0 (2026-09-03) | [changelog-sdk-contract.md](./changelog-sdk-contract.md) |
-| @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03) | [changelog-sdk-webim4.md](./changelog-sdk-webim4.md) |
-| @easemob/uikit-sdk-websdk5 1.2.2 (2026-09-03) | [changelog-sdk-websdk5.md](./changelog-sdk-websdk5.md) |
+| @easemob-community/uikit-chatroom 2.0.0 (2026-09-02) | [changelog-chatroom.md](./changelog-chatroom.md) |
+| @easemob-community/uikit-core 2.4.0 (2026-09-03) | [changelog-core.md](./changelog-core.md) |
+| @easemob-community/uikit-im 3.3.0 (2026-09-03) | [changelog-im.md](./changelog-im.md) |
+| @easemob-community/uikit-sdk-contract 1.2.0 (2026-09-03) | [changelog-sdk-contract.md](./changelog-sdk-contract.md) |
+| @easemob-community/uikit-sdk-webim4 1.2.2 (2026-09-03) | [changelog-sdk-webim4.md](./changelog-sdk-webim4.md) |
+| @easemob-community/uikit-sdk-websdk5 1.2.2 (2026-09-03) | [changelog-sdk-websdk5.md](./changelog-sdk-websdk5.md) |
 | ChatContainer API | [chat-container.md](./chat-container.md) |
 | ConversationContainer API | [conversation-container.md](./conversation-container.md) |
 | EmojiPicker API | [emoji-picker.md](./emoji-picker.md) |

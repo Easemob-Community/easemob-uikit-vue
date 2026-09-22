@@ -11,7 +11,7 @@
  * @example
  * ```ts
  * import { pinyin } from 'pinyin-pro'
- * import { setPinyinAdapter } from '@easemob/uikit-im'
+ * import { setPinyinAdapter } from '@easemob-community/uikit-im'
  *
  * setPinyinAdapter((text) => {
  *   const full = pinyin(text, { toneType: 'none', type: 'string', nonZh: 'consecutive' })

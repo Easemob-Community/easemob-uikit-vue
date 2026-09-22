@@ -1,5 +1,5 @@
 {
-  "name": "@easemob/uikit-mcp",
+  "name": "@easemob-community/uikit-mcp",
   "version": "0.1.0",
   "type": "module",
   "description": "Easemob UIKit 集成侧 MCP 服务：查接入指南 / 组件 API / 最新版本 / 校验 Provider 配置",

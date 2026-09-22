@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter } from '@easemob-community/uikit-sdk-contract'
 import type { NoticeConfig } from '../../sdk/event/notice-utils'
 import type { AnimationConfig } from '../../store/theme'
 import type { NotificationItem } from '../../components/notification/types'
@@ -151,7 +151,7 @@ const noticeConfig = computed(() => props.noticeConfig ?? {})
 /**
  * 初始化 core UIKit 上下文：SDK 适配器生命周期 + core stores。
  * adapter prop 注入时业务全权管理其生命周期；未注入时走注册表默认适配器
- * （由场景包子路径入口自注册，如 @easemob/uikit-im/websdk5，决策 22）。
+ * （由场景包子路径入口自注册，如 @easemob-community/uikit-im/websdk5，决策 22）。
  */
 useCoreUIKitProvider(config.value, {
   adapter: props.adapter,

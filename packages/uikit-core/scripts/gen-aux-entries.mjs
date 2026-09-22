@@ -21,7 +21,7 @@
  *
  * 包根需有 aux-entries.config.mjs（default export）：
  *   {
- *     pkgName: '@easemob/uikit-im',        // 必填，resolver 的 from 与 auto-imports 的 key
+ *     pkgName: '@easemob-community/uikit-im',        // 必填，resolver 的 from 与 auto-imports 的 key
  *     resolverName: 'EasemobUIKitResolver',// 必填
  *     importsName: 'EasemobUIKitImports',  // 必填
  *     prefix: 'Em',                        // 可选，默认 'Em'

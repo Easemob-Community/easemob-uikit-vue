@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useUserInfo } from '../../../composables/use-user-info'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import MessageRenderer from './message-renderer.vue'
 
 export interface CombineMessageModalItemProps {

@@ -195,8 +195,8 @@ export interface ChatInfoDrawerSlotScope {
 
 ## 七、验证门禁
 
-- 类型检查：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）；
-- 构建：`pnpm -F @easemob/uikit-im build`；
+- 类型检查：`pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误）；
+- 构建：`pnpm -F @easemob-community/uikit-im build`；
 - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`；
 - 版本号同步：`packages/uikit-im/package.json` 与根 `CHANGELOG.md` 最新版本段一致，`pnpm changelog:check` 通过；
 - 产物/依赖无混入：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'` 为空。

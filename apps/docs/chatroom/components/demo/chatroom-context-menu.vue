@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { ChatroomContextMenu } from '@easemob/uikit-chatroom'
+import { ChatroomContextMenu } from '@easemob-community/uikit-chatroom'
 
 const menu = reactive({ show: false, x: 0, y: 0 })
 const log = ref('')

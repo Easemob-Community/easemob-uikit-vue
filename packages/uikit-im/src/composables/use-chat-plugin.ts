@@ -1,7 +1,7 @@
 import { inject, provide, type InjectionKey, type ComputedRef } from 'vue'
-import type { LocationMessageBody, UiConversation, UiMessage } from '@easemob/uikit-core'
+import type { LocationMessageBody, UiConversation, UiMessage } from '@easemob-community/uikit-core'
 import type { MentionContact } from '../modules/chat/types'
-import { createLogger } from '@easemob/uikit-core'
+import { createLogger } from '@easemob-community/uikit-core'
 
 const logger = createLogger('UIKit:UseChatPlugin')
 

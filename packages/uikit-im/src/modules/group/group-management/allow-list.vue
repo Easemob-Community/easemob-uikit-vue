@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useLocale } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { useGroup } from '../../../composables/use-group'
-import { createLogger } from '@easemob/uikit-core'
-import type { UiGroupMember } from '@easemob/uikit-core'
+import { createLogger } from '@easemob-community/uikit-core'
+import type { UiGroupMember } from '@easemob-community/uikit-core'
 import AllowListItem from './allow-list-item.vue'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
+import { EmEmpty as Empty } from '@easemob-community/uikit-core'
 
 export interface AllowListProps {
   groupId: string

@@ -9,9 +9,9 @@ import type {
   UserInfo,
 } from 'easemob-websdk'
 import type { ChatroomSdkHost } from '../host'
-import type { UiMessage } from '@easemob/uikit-core'
-import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, normalizeUserId } from '@easemob/uikit-core'
-import { formatSdkError } from '@easemob/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
+import { MESSAGE_STATUS, MESSAGE_TYPE, createLogger, normalizeUserId } from '@easemob-community/uikit-core'
+import { formatSdkError } from '@easemob-community/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MEMBER_ROLE } from '../../constants'
 import type {
   Chatroom,

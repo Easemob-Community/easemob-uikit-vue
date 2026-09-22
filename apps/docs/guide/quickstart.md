@@ -1,6 +1,6 @@
 # 快速开始
 
-本节介绍如何在项目中安装并接入 `@easemob/uikit-im`。
+本节介绍如何在项目中安装并接入 `@easemob-community/uikit-im`。
 
 ## 环境要求
 
@@ -11,11 +11,11 @@
 ## 安装
 
 ```bash
-pnpm add @easemob/uikit-im pinia vue
+pnpm add @easemob-community/uikit-im pinia vue
 ```
 
 > 组件库将 `pinia` 与 `vue` 声明为 peerDependencies，需要在使用方项目中显式安装。
-> **主题样式需要单独引入**：构建产物将 CSS 提取为独立文件（子路径 `@easemob/uikit-im/theme`），入口 JS 不会自动注入样式，请在入口处加一行 `import '@easemob/uikit-im/theme'`（见下方示例）。
+> **主题样式需要单独引入**：构建产物将 CSS 提取为独立文件（子路径 `@easemob-community/uikit-im/theme`），入口 JS 不会自动注入样式，请在入口处加一行 `import '@easemob-community/uikit-im/theme'`（见下方示例）。
 
 ## 全局注册
 
@@ -25,9 +25,9 @@ pnpm add @easemob/uikit-im pinia vue
 // main.ts
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import UIKit from '@easemob/uikit-im'
-import '@easemob/uikit-im/websdk5' // 注册 websdk5 为默认 SDK 适配器（3.0 起必需，见下方说明）
-import '@easemob/uikit-im/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
+import UIKit from '@easemob-community/uikit-im'
+import '@easemob-community/uikit-im/websdk5' // 注册 websdk5 为默认 SDK 适配器（3.0 起必需，见下方说明）
+import '@easemob-community/uikit-im/theme' // 引入主题样式（构建产物 CSS 提取为独立文件，需手动引入）
 import App from './App.vue'
 
 const app = createApp(App)
@@ -36,7 +36,7 @@ app.use(UIKit)
 app.mount('#app')
 ```
 
-> **3.0 起必须显式 import SDK 子路径入口**：主入口 `@easemob/uikit-im` 不再包含任何 SDK adapter 的静态引用（保证 4.x / 5.x 产物摇树隔离），`import '@easemob/uikit-im/websdk5'` 通过副作用把 websdk5 注册为默认适配器，Provider 不传 `adapter` prop 时自动使用。4.x 私有化部署请改用 `import '@easemob/uikit-im/webim4'`。两种入口的差异见 [进阶指南 - SDK 适配器](./advanced#sdk-适配器)。
+> **3.0 起必须显式 import SDK 子路径入口**：主入口 `@easemob-community/uikit-im` 不再包含任何 SDK adapter 的静态引用（保证 4.x / 5.x 产物摇树隔离），`import '@easemob-community/uikit-im/websdk5'` 通过副作用把 websdk5 注册为默认适配器，Provider 不传 `adapter` prop 时自动使用。4.x 私有化部署请改用 `import '@easemob-community/uikit-im/webim4'`。两种入口的差异见 [进阶指南 - SDK 适配器](./advanced#sdk-适配器)。
 
 注册后，所有组件以 `Em` 前缀全局可用：
 
@@ -56,7 +56,7 @@ app.mount('#app')
 ```ts
 // vite.config.ts
 import Components from 'unplugin-vue-components/vite'
-import { EasemobUIKitResolver } from '@easemob/uikit-im/resolver'
+import { EasemobUIKitResolver } from '@easemob-community/uikit-im/resolver'
 
 export default {
   plugins: [
@@ -76,7 +76,7 @@ export default {
 </template>
 ```
 
-> 按需引入只解决组件注册，**默认 SDK 适配器仍需单独注册**：入口处保留 `import '@easemob/uikit-im/websdk5'`（4.x 私有化用 `webim4`）。
+> 按需引入只解决组件注册，**默认 SDK 适配器仍需单独注册**：入口处保留 `import '@easemob-community/uikit-im/websdk5'`（4.x 私有化用 `webim4`）。
 
 ## 初始化与登录
 
@@ -86,7 +86,7 @@ export default {
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 </script>
 
 <template>
@@ -106,7 +106,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 不依赖容器组件时，可通过 `useClient()` 手动初始化与登录：
 
 ```ts
-import { useClient } from '@easemob/uikit-im'
+import { useClient } from '@easemob-community/uikit-im'
 
 const { init, login, logout, isLoggedIn, currentUser } = useClient()
 

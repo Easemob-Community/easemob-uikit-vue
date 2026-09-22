@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type ComputedRef, type InjectionKey, computed, inject, onUnmounted, ref } from 'vue'
-import { INJECTION_KEY, EmIcon as Icon, createLogger, formatSdkError, useThemeStore } from '@easemob/uikit-core'
-import type { UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
+import { INJECTION_KEY, EmIcon as Icon, createLogger, formatSdkError, useThemeStore } from '@easemob-community/uikit-core'
+import type { UiMessage, VoiceMessageBody } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
 import { useMessageStore } from '../../../store/message'
 import VoiceTranscript from './voice-transcript.vue'

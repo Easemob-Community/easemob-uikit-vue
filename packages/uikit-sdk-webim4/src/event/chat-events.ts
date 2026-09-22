@@ -9,8 +9,8 @@ import {
   isStreamActive,
   normalizeUserId,
   toMessageRecord,
-} from '@easemob/uikit-sdk-contract'
-import type { ConversationTypeValue, SdkMessage, SdkPersistenceHooks, UIKitFeatures } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import type { ConversationTypeValue, SdkMessage, SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
 import { toUiMessage } from '../adapter/message-adapter'
 import { deriveConversationUpsertFromMessage } from '../adapter/conversation-adapter'
 import { markReadReceiptSent } from '../domain/message-domain'

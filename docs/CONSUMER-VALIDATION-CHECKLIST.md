@@ -1,6 +1,6 @@
 # 消费者验证清单（Consumer Validation Checklist）
 
-> 创建日期：2026-08-15。目标：在**独立 Vue3 工程**中以「下游接入者」身份验证 `@easemob/uikit-im` 是否够好用。
+> 创建日期：2026-08-15。目标：在**独立 Vue3 工程**中以「下游接入者」身份验证 `@easemob-community/uikit-im` 是否够好用。
 > 背景：仓库内 `apps/demo` 走 vite alias 直连源码（`packages/uikit-im/src`），验证的是**功能对不对**；本清单在**只消费发布产物（tgz / npm）**的干净工程中逐项打勾，验证的是**接入顺不顺**。
 > 记录方式：每项勾选后写「结果 / 卡点 / 建议」；发现的卡点回灌根 [TECH-DEBT.md](../TECH-DEBT.md)，文档缺口回灌 `apps/docs`。
 > 关联：构建/发布事实见 skill `uikit-release-build`；Demo 工程模式见 skill `uikit-demo-development`。
@@ -11,7 +11,7 @@
 
 ### A1. 包内容自检
 
-- [ ] `pnpm -F @easemob/uikit-im pack --dry-run`：确认包内只有 `dist/`，无 `.map` / `node_modules` / 多余文件（`files: ["dist"]` 白名单生效）。
+- [ ] `pnpm -F @easemob-community/uikit-im pack --dry-run`：确认包内只有 `dist/`，无 `.map` / `node_modules` / 多余文件（`files: ["dist"]` 白名单生效）。
 - [ ] `exports` 四条子路径全部可 resolve：`.` / `./resolver` / `./auto-imports` / `./theme`。
 - [ ] `dist/theme/index.css` 在包内，且是构建产物（非 src 拷贝）。
 
@@ -20,9 +20,9 @@
 仓库外新建最小 Vue3 工程（create-vue 默认模板），只依赖发布产物：
 
 - [ ] `npm i <uikit-tgz>`（或 registry 安装）后 `vite dev` 可启动、首屏无报错。
-- [ ] 全量引入：`import UIKit from '@easemob/uikit-im'` + `app.use(UIKit)` 后组件渲染**有样式**。
+- [ ] 全量引入：`import UIKit from '@easemob-community/uikit-im'` + `app.use(UIKit)` 后组件渲染**有样式**。
 - [ ] ⚠️ **主题样式引入方式**：验证 `quickstart.md:18` 的声明「入口已内置主题样式，接入后无需单独引入 CSS」是否成立。
-  - 现状证据（2026-08-15 核查）：lib 构建 `cssCodeSplit: false` 把 CSS 提取为独立 `theme/index.css`，`dist/easemob-uikit-im.js` 内**无任何 CSS 导入**；demo 自身也是靠 `apps/demo/src/main.ts:5` 的 `import '@easemob/uikit-im/theme'` 引入的。→ **大概率消费者必须手动引 `@easemob/uikit-im/theme`**，若属实需修 quickstart 文档与 README。
+  - 现状证据（2026-08-15 核查）：lib 构建 `cssCodeSplit: false` 把 CSS 提取为独立 `theme/index.css`，`dist/easemob-uikit-im.js` 内**无任何 CSS 导入**；demo 自身也是靠 `apps/demo/src/main.ts:5` 的 `import '@easemob-community/uikit-im/theme'` 引入的。→ **大概率消费者必须手动引 `@easemob-community/uikit-im/theme`**，若属实需修 quickstart 文档与 README。
   - 记录：不引 theme.css 时组件是否无样式？引了之后是否正常？
 - [ ] 按需引入：`unplugin-vue-components` + `EasemobUIKitResolver` 组合下 `Em*` 组件可用、样式仍生效。
 - [ ] `vite build` 成功，无 peer 依赖版本冲突告警（vue `^3.3.0` / pinia `^2.1.0` 与宿主项目实际版本组合）。
@@ -91,7 +91,7 @@
 **方法**：
 
 - 五个包（`uikit-sdk-contract` → `uikit-sdk-websdk5` / `uikit-sdk-webim4` → `uikit-core` → `uikit-im`）全部重新 `pnpm -F <pkg> build` 后 `pnpm pack` 成 tgz（`workspace:*` 协议在包外不可解析，必须用 pack 产物而非 file: 直链）。
-- 独立工程放 `tmp/tree-shaking-check/consumer5/` 与 `tmp/tree-shaking-check/consumer4/`（vite vanilla-ts 模板，只 import 不渲染）：entry 为 `import { EmUIKitProvider } from '@easemob/uikit-im'` + 对应子路径入口（`@easemob/uikit-im/websdk5` 或 `/webim4`）；consumer5 装 `file:` 引用根目录 `easemob-websdk-5.0.0.tgz`，consumer4 装 npm 公网 `easemob-websdk@4.24.2`。两侧 `npm install` 与 `vite build` 均一次成功；`npm ls` 确认 consumer4 仅装 4.24.2 + webim4 adapter，consumer5 仅装 5.0.0 + websdk5 adapter（**依赖级隔离已成立**——另一侧 SDK/adapter 物理上不在 node_modules 里）。
+- 独立工程放 `tmp/tree-shaking-check/consumer5/` 与 `tmp/tree-shaking-check/consumer4/`（vite vanilla-ts 模板，只 import 不渲染）：entry 为 `import { EmUIKitProvider } from '@easemob-community/uikit-im'` + 对应子路径入口（`@easemob-community/uikit-im/websdk5` 或 `/webim4`）；consumer5 装 `file:` 引用根目录 `easemob-websdk-5.0.0.tgz`，consumer4 装 npm 公网 `easemob-websdk@4.24.2`。两侧 `npm install` 与 `vite build` 均一次成功；`npm ls` 确认 consumer4 仅装 4.24.2 + webim4 adapter，consumer5 仅装 5.0.0 + websdk5 adapter（**依赖级隔离已成立**——另一侧 SDK/adapter 物理上不在 node_modules 里）。
 - 产物检查用 `grep -o <symbol> | wc -l` 统计命中数并逐个看上下文（minify 会重命名标识符，代码符号主要靠保留的字符串字面量/全局名/属性名判定）。
 
 **结果**：
@@ -101,7 +101,7 @@
 | `ChatClient`（5.x 类名） | **0** ✓ | 25（5.x SDK 错误消息字符串，如 `"ChatClient already initialized..."`） | 反向确认 5.x 已进包 ✓，4.x 侧无泄漏 ✓ |
 | `WebIM`（4.x 全局名） | 1（`window.WebIM=` 挂全局代码，4.x SDK 自有） | **0** ✓ | 反向确认 4.x 已进包 ✓，5.x 侧无泄漏 ✓ |
 | `Websdk5Adapter` / `Webim4Adapter`（adapter 类名） | 0 / 23 | 22 / 0 | 各自只打进了自己注入的 adapter ✓ |
-| `uikit-sdk-websdk5`（包名字符串） | 2 命中，均为**文案字符串**：core sdk-log-capture 兜底警告 `"SDK log capture unavailable: @easemob/uikit-sdk-websdk5 not installed..."` + 适配器解析错误提示中的子路径示例 ``import '@easemob/uikit-im/websdk5'``，非代码引用 | 1（同款自有警告文案） | 仅提示文案，无 5.x 代码 ✓ |
+| `uikit-sdk-websdk5`（包名字符串） | 2 命中，均为**文案字符串**：core sdk-log-capture 兜底警告 `"SDK log capture unavailable: @easemob-community/uikit-sdk-websdk5 not installed..."` + 适配器解析错误提示中的子路径示例 ``import '@easemob-community/uikit-im/websdk5'``，非代码引用 | 1（同款自有警告文案） | 仅提示文案，无 5.x 代码 ✓ |
 | `uikit-sdk-webim4`（包名字符串） | 0 | **0** ✓ | ✓ |
 | `Easemob` | 6，均为 4.x SDK 自有 webpack UMD 包装变量（`EasemobChat`）与 license 注释 | 2，均为 5.x 自有日志格式串 `"[Easemob] SDK version: ..."` | 各自 SDK 的自有内容，无交叉 ✓ |
 

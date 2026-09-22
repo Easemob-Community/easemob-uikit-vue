@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BlockList from '../../modules/contact/block-list.vue'
-import type { UiContact as Contact } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
 import type { AvatarShape, ContactItemSize } from '../../modules/contact/types'
 
 export interface BlockListContainerProps {

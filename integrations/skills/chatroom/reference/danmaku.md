@@ -9,8 +9,8 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveDanmakuStream } from '@easemob/uikit-chatroom'
-import type { LiveDanmakuItem } from '@easemob/uikit-chatroom'
+import { ChatroomLiveDanmakuStream } from '@easemob-community/uikit-chatroom'
+import type { LiveDanmakuItem } from '@easemob-community/uikit-chatroom'
 
 const items = ref<LiveDanmakuItem[]>([])
 let seq = 0

@@ -51,7 +51,7 @@ const show = ref(false)
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmContactTransferModal, EmUIKitProvider } from '@easemob/uikit-im'
+import { EmContactTransferModal, EmUIKitProvider } from '@easemob-community/uikit-im'
 
 const show = ref(false)
 const loading = ref(false)

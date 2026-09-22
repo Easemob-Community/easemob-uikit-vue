@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveInputBar } from '@easemob/uikit-chatroom'
+import { ChatroomLiveInputBar } from '@easemob-community/uikit-chatroom'
 
 const sent = ref<string[]>([])
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useLocale } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { EmEmpty as Empty } from '@easemob-community/uikit-core'
 
 interface GroupEmptyProps {
   text?: string

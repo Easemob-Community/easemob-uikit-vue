@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { createLogger, createUserInfoSubscriptionErrorHandler, formatSdkError, useProviderSideEffects } from '@easemob/uikit-core'
-import type { AnimationConfig, CoreUIKitInitConfig, Density, FontSizePreset, NoticeConfig, NotificationChannel, NotificationItem, NotificationTriggerMode, PrimaryColorInput, ThemePreset, UiContact } from '@easemob/uikit-core'
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import { createLogger, createUserInfoSubscriptionErrorHandler, formatSdkError, useProviderSideEffects } from '@easemob-community/uikit-core'
+import type { AnimationConfig, CoreUIKitInitConfig, Density, FontSizePreset, NoticeConfig, NotificationChannel, NotificationItem, NotificationTriggerMode, PrimaryColorInput, ThemePreset, UiContact } from '@easemob-community/uikit-core'
+import type { SdkAdapter } from '@easemob-community/uikit-sdk-contract'
 import { EmNotificationContainer, EmToast } from '../../components'
 import {
   type ContactFetchMode,
@@ -42,7 +42,7 @@ export interface ProviderProps {
   appKey?: string
   /**
    * 注入的中立 SDK 适配器（SdkAdapter）。传入后业务全权管理其生命周期（D122 注入模式）；
-   * 不传时使用注册表默认适配器——由 `import '@easemob/uikit-im/websdk5'` 子路径入口
+   * 不传时使用注册表默认适配器——由 `import '@easemob-community/uikit-im/websdk5'` 子路径入口
    * 自注册（UIKit 全权管理）；4.x 接入方改为 import webim4 adapter 并显式传本 prop。
    */
   adapter?: SdkAdapter

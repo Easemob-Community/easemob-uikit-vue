@@ -1,6 +1,6 @@
 # uikit-im 组件插槽与 Props 可控性反向评估（UIIM-CAPABILITY-REVIEW）
 
-> 评估日期：2026-08-20。评估对象：`@easemob/uikit-im` 2.3.0（`packages/uikit-im/src`）。
+> 评估日期：2026-08-20。评估对象：`@easemob-community/uikit-im` 2.3.0（`packages/uikit-im/src`）。
 > 方法：消费者视角反向推演——「接入方想做什么 → 当前 API 能否做到 → 卡在哪」，
 > 覆盖容器层 / 会话模块 / 聊天模块 / 群组模块四层。
 > 状态：**评估完成，待按优先级排期实施**。关联 TECH-DEBT：D120。
@@ -130,7 +130,7 @@ template 里出现 `<XxxModal v-model:show=... />`、`<Popup>`、`<ActionSheet>`
 ## 四、验收口径
 
 - 每个新插槽：不传 = 与当前行为一致；传 = 完全接管对应子界面；
-- 门禁全绿：`pnpm -F @easemob/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob/uikit-im build`
+- 门禁全绿：`pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit` + `pnpm -F @easemob-community/uikit-im build`
   + `cd apps/demo && pnpm exec vue-tsc --noEmit` + `pnpm changelog:check`；
 - docs 插槽清单与实现一致；story 补接管示例；demo 补高频场景（自定义会话项 / 自定义名片弹窗 /
   自定义消息操作菜单）；

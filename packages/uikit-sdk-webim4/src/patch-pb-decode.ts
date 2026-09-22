@@ -1,4 +1,4 @@
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 
 const log = createLogger('UIKit:Webim4Client')
 

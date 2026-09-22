@@ -7,7 +7,7 @@
  *
  * 运行时机：docs 的 dev / build 前置执行（见 package.json scripts）。
  * 注意：easemob-uikit-im.js 来自 uikit 构建产物，改 uikit 源码后需先
- * `pnpm -F @easemob/uikit-im build` 再运行本脚本，playground 预览才会同步。
+ * `pnpm -F @easemob-community/uikit-im build` 再运行本脚本，playground 预览才会同步。
  */
 import { copyFileSync, existsSync, mkdirSync, realpathSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -56,7 +56,7 @@ const entries = [
     src: join(docsRoot, '..', '..', 'packages', 'uikit-im', 'dist', 'easemob-uikit-im.js'),
     dest: 'easemob-uikit-im.js',
     required: true,
-    hint: '请先执行 pnpm -F @easemob/uikit-im build',
+    hint: '请先执行 pnpm -F @easemob-community/uikit-im build',
   },
   {
     // uikit 构建产物 CSS（dist/theme/index.css = :root 主题变量 + 全部组件样式，

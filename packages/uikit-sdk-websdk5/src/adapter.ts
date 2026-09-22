@@ -34,8 +34,8 @@ import type {
   UserInfoAttribute,
   UserInfoAttributeValue,
   UserInfoRepository,
-} from '@easemob/uikit-sdk-contract'
-import { SDK_CONTRACT_VERSION, createLogger } from '@easemob/uikit-sdk-contract'
+} from '@easemob-community/uikit-sdk-contract'
+import { SDK_CONTRACT_VERSION, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { ClientConfig, UIKitClient } from './client'
 import { createClient } from './client'
 import { MessageDomain } from './domain/message-domain'
@@ -186,7 +186,7 @@ function createClientStore(
   let hasConnectedOnce = false
   let kicked = false
 
-  function getConnectState(): import('@easemob/uikit-sdk-contract').ConnectState {
+  function getConnectState(): import('@easemob-community/uikit-sdk-contract').ConnectState {
     if (connecting)
       return 'connecting'
     if (connected)

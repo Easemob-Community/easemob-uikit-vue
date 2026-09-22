@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
-import type { UiGroupMember } from '@easemob/uikit-core'
+import type { UiGroupMember } from '@easemob-community/uikit-core'
 
 export interface ChatInfoDrawerMemberCellProps {
   member: UiGroupMember

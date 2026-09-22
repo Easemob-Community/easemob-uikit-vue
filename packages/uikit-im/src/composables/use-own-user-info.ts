@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { useOwnUserInfo as useCoreOwnUserInfo } from '@easemob/uikit-core'
+import { useOwnUserInfo as useCoreOwnUserInfo } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 
 /**

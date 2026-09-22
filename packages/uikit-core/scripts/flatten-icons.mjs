@@ -322,8 +322,8 @@ if (apply) {
     errorExit('图标引用校验失败，请检查上述缺失项。')
   }
   console.log('\n迁移完成。建议继续执行：')
-  console.log('  pnpm -F @easemob/uikit-core exec vue-tsc --noEmit')
-  console.log('  pnpm -F @easemob/uikit-core build')
+  console.log('  pnpm -F @easemob-community/uikit-core exec vue-tsc --noEmit')
+  console.log('  pnpm -F @easemob-community/uikit-core build')
 } else {
   console.log('\n本次为 dry-run，未修改任何文件。加 --apply 执行真实迁移。')
 }

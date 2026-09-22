@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@easemob/uikit-chatroom": "workspace:*",
-    "@easemob/uikit-core": "workspace:*",
-    "@easemob/uikit-sdk-websdk5": "workspace:*",
+    "@easemob-community/uikit-chatroom": "workspace:*",
+    "@easemob-community/uikit-core": "workspace:*",
+    "@easemob-community/uikit-sdk-websdk5": "workspace:*",
     "easemob-websdk": "^5.0.0",
     "pinia": "^2.3.1",
     "vue": "^3.5.41"

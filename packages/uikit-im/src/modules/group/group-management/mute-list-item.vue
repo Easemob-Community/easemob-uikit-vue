@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface MuteListItemProps {

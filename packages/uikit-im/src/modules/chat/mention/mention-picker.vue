@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useViewport } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { useArrowNavigation, useKeyBindings } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmIconButton as IconButton } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
+import { useViewport } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { useArrowNavigation, useKeyBindings } from '@easemob-community/uikit-core'
+import { EmPopup as Popup } from '@easemob-community/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmIconButton as IconButton } from '@easemob-community/uikit-core'
+import { EmEmpty as Empty } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
 import type { MentionContact } from '../types'
 
 export interface MentionPickerProps {

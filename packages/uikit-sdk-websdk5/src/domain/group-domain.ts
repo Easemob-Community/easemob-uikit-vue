@@ -1,6 +1,6 @@
 import type { GroupUserInfo } from 'easemob-websdk'
-import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup, UiGroupMember } from '@easemob/uikit-sdk-contract'
-import { GROUP_MEMBER_ROLE, createLogger } from '@easemob/uikit-sdk-contract'
+import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup, UiGroupMember } from '@easemob-community/uikit-sdk-contract'
+import { GROUP_MEMBER_ROLE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import { toUiGroup, toUiGroupMembers, toUiGroups } from '../adapter/group-adapter'
 import type { ManagerHost } from '../client'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useGroup } from '../../composables/use-group'
-import type { UiGroup as Group } from '@easemob/uikit-core'
+import type { UiGroup as Group } from '@easemob-community/uikit-core'
 import GroupItemDefault from './group-item-default.vue'
 import type { AvatarShape, GroupItemSize, GroupSelectMode } from './types'
 

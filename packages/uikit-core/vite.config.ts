@@ -50,16 +50,16 @@ export default defineConfig({
       external: [
         'vue',
         'pinia',
-        '@easemob/uikit-sdk-contract',
-        '@easemob/uikit-sdk-websdk5',
+        '@easemob-community/uikit-sdk-contract',
+        '@easemob-community/uikit-sdk-websdk5',
       ],
       output: {
         exports: 'named',
         globals: {
           'vue': 'Vue',
           'pinia': 'Pinia',
-          '@easemob/uikit-sdk-contract': 'EasemobUIKitSdkContract',
-          '@easemob/uikit-sdk-websdk5': 'EasemobUIKitSdkWebsdk5',
+          '@easemob-community/uikit-sdk-contract': 'EasemobUIKitSdkContract',
+          '@easemob-community/uikit-sdk-websdk5': 'EasemobUIKitSdkWebsdk5',
         },
         assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === 'style.css')

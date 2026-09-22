@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmIcon as Icon, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob/uikit-core'
-import type { CreateGroupParams, UiContact } from '@easemob/uikit-core'
+import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmIcon as Icon, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob-community/uikit-core'
+import type { CreateGroupParams, UiContact } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { useContact } from '../../composables/use-contact'

@@ -5,8 +5,8 @@
  * 接收侧渲染节流在 store 层（缓冲队列按 150ms 窗口批量合并），本组件只负责单条渲染。
  */
 import { computed, onUnmounted } from 'vue'
-import { EmAvatar, MESSAGE_TYPE, normalizeUserId, t, useUserInfo } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { EmAvatar, MESSAGE_TYPE, normalizeUserId, t, useUserInfo } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import { CHATROOM_GIFT_EVENT } from '../../../constants'
 import { readAvatarFromMessageExt, readNicknameFromMessageExt } from '../../../config/message-user-info'
 import { useChatroomMember } from '../../../composables/use-chatroom-member'

@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { UiGroup, UiGroupMember } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { UiGroup, UiGroupMember } from '@easemob-community/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 
 const groupAdapterLog = createLogger('UIKit:Webim4GroupAdapter')
 

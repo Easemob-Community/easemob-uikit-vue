@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmModal as Modal } from '@easemob/uikit-core'
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmCell as Cell } from '@easemob/uikit-core'
-import { EmCheckbox as Checkbox } from '@easemob/uikit-core'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
+import { EmModal as Modal } from '@easemob-community/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmCell as Cell } from '@easemob-community/uikit-core'
+import { EmCheckbox as Checkbox } from '@easemob-community/uikit-core'
+import { EmInput as Input } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { useToast } from '@easemob-community/uikit-core'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useContact } from '../../composables/use-contact'
 import { useUIKit } from '../../composables/use-uikit'
-import type { UiContact as Contact } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
 
 export interface BlockListAddModalProps {
   /** 是否展示 */

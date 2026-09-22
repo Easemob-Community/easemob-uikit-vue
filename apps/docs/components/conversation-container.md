@@ -8,7 +8,7 @@
 
 ```vue
 <script setup lang="ts">
-import { EmUIKitProvider } from '@easemob/uikit-im'
+import { EmUIKitProvider } from '@easemob-community/uikit-im'
 
 function onSelect() {
   // 切换到聊天页，例如把 conversation.id 写入路由
@@ -89,7 +89,7 @@ Header `+` 菜单默认提供「新建会话 / 添加联系人 / 创建群组」
 
 ```vue
 <script setup lang="ts">
-import type { ConversationHeaderMenuItem } from '@easemob/uikit-im'
+import type { ConversationHeaderMenuItem } from '@easemob-community/uikit-im'
 
 // 自定义菜单项：未提供 handler 的项点击触发 header-menu-action 事件
 const menuItems: ConversationHeaderMenuItem[] = [
@@ -135,7 +135,7 @@ const menuItems: ConversationHeaderMenuItem[] = [
 
 ```vue
 <script setup lang="ts">
-import { useConversationTabs } from '@easemob/uikit-im'
+import { useConversationTabs } from '@easemob-community/uikit-im'
 
 // 业务只有单聊/群聊，不区分更多类型
 const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })
@@ -187,7 +187,7 @@ const { tabs, activeTab } = useConversationTabs({ tabs: ['single', 'group'] })
 
 断网、连接中或同步中时，搜索栏下方会展示内置状态横幅（默认开启，`show-status-banner` 可关闭），优先级从高到低为：**被踢下线 > 断网 > 连接中 > 会话同步 > 消息同步**：
 
-- 被踢下线：error 样式，**不可点击重连**——账号被踢 / 失效是账号态终态（SDK 不再自动重连），点击不会触发 `reconnect` 事件；文案按被踢错误码差异化（`@easemob/uikit-sdk-contract` 的 `KICK_ERROR_CODE`）：
+- 被踢下线：error 样式，**不可点击重连**——账号被踢 / 失效是账号态终态（SDK 不再自动重连），点击不会触发 `reconnect` 事件；文案按被踢错误码差异化（`@easemob-community/uikit-sdk-contract` 的 `KICK_ERROR_CODE`）：
   - `206` 多端互踢：「当前账号已在其他设备登录」
   - `214` 设备超限：「登录设备数超过限制，当前设备已下线」
   - `216` 修改密码：「账号密码已修改，请重新登录」

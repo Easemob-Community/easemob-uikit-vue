@@ -68,10 +68,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@easemob/uikit-core': fileURLToPath(new URL('../../packages/uikit-core/src', import.meta.url)),
-      '@easemob/uikit-im': fileURLToPath(new URL('../../packages/uikit-im/src', import.meta.url)),
-      // 聊天室包落地后，其组件 demo 可直接 import '@easemob/uikit-chatroom' 直连源码
-      '@easemob/uikit-chatroom': fileURLToPath(new URL('../../packages/uikit-chatroom/src', import.meta.url)),
+      '@easemob-community/uikit-core': fileURLToPath(new URL('../../packages/uikit-core/src', import.meta.url)),
+      '@easemob-community/uikit-im': fileURLToPath(new URL('../../packages/uikit-im/src', import.meta.url)),
+      // 聊天室包落地后，其组件 demo 可直接 import '@easemob-community/uikit-chatroom' 直连源码
+      '@easemob-community/uikit-chatroom': fileURLToPath(new URL('../../packages/uikit-chatroom/src', import.meta.url)),
     },
   },
   define: {

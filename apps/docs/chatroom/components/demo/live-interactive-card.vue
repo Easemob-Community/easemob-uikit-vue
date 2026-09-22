@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChatroomLiveInteractiveCard } from '@easemob/uikit-chatroom'
+import { ChatroomLiveInteractiveCard } from '@easemob-community/uikit-chatroom'
 
 const soldOut = ref(false)
 const closed = ref(false)

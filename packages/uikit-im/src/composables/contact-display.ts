@@ -1,4 +1,4 @@
-import type { UiContact } from '@easemob/uikit-core'
+import type { UiContact } from '@easemob-community/uikit-core'
 
 /**
  * 联系人展示名统一口径：备注 > 用户资料昵称 > 联系人 name。

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
-import { useThemeStore } from '@easemob/uikit-core'
+import { useThemeStore } from '@easemob-community/uikit-core'
 import type { ChatDrawerProps } from '../types'
 
 const props = withDefaults(defineProps<ChatDrawerProps>(), {

@@ -1,6 +1,6 @@
 import WebIM from 'easemob-websdk-4'
 import type { EasemobChat } from 'easemob-websdk-4'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 import { patchPbMetaDecode } from './patch-pb-decode'
 import type { PbPatchableConnection } from './patch-pb-decode'
 

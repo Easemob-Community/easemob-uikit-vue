@@ -104,7 +104,7 @@ PC 端发送失败图标 hover 时会放大 `1.2` 倍并切换为 `ringarrow/cw`
 构建时会自动执行 `icons:check` 校验：扫描源码中所有图标 `name` 引用并与图标库文件比对，引用不存在的图标会导致构建失败并列出缺失清单，避免图标静默不渲染。也可单独执行：
 
 ```bash
-pnpm -F @easemob/uikit-im run icons:check
+pnpm -F @easemob-community/uikit-im run icons:check
 ```
 
 ## 许可与免责声明

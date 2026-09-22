@@ -1,5 +1,5 @@
 {
-  "name": "@easemob/uikit-chatroom",
+  "name": "@easemob-community/uikit-chatroom",
   "type": "module",
   "version": "2.0.0",
   "description": "Easemob UIKit Vue3 chatroom scenario package (room lifecycle / broadcast message stream / members / mute / announcement / room attributes)",
@@ -36,8 +36,8 @@
     "vue": "^3.3.0"
   },
   "dependencies": {
-    "@easemob/uikit-core": "workspace:*",
-    "@easemob/uikit-sdk-contract": "workspace:*",
+    "@easemob-community/uikit-core": "workspace:*",
+    "@easemob-community/uikit-sdk-contract": "workspace:*",
     "easemob-websdk": "^5.0.0"
   },
   "devDependencies": {

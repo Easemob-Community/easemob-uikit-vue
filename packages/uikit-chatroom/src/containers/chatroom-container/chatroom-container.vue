@@ -7,7 +7,7 @@
  * 三步接入（与 Provider 组合使用，见 demo 与 docs quickstart）：
  * ```vue
  * script setup:
- *   import { useChatroomProvider, EmChatroomContainer } from '@easemob/uikit-chatroom'
+ *   import { useChatroomProvider, EmChatroomContainer } from '@easemob-community/uikit-chatroom'
  *   useChatroomProvider({ appKey })   // 业务侧组合 core provider + 场景 manager 注入
  * template:
  *   <EmChatroomContainer room-id="room123" scene="live" auto-join />
@@ -32,8 +32,8 @@
  * - 被踢/解散终态：watch store 状态 → emit 事件 + 终态提示视图。
  */
 import { computed, onUnmounted, ref, useSlots, watch } from 'vue'
-import { EmPopup, MESSAGE_TYPE, t, useClient, useEscToClose, useViewport } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { EmPopup, MESSAGE_TYPE, t, useClient, useEscToClose, useViewport } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import { CHATROOM_STATUS } from '../../constants'
 import { getChatroomPopupTarget } from '../../config/popup-target'
 import { normalizeUserId } from '../../sdk/adapter/chatroom-adapter'

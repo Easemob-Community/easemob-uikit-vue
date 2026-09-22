@@ -1,6 +1,6 @@
 import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
-import type { ConversationTypeValue, MessagePersistenceHooks, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId, toMessageRecord } from '@easemob/uikit-sdk-contract'
+import type { ConversationTypeValue, MessagePersistenceHooks, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId, toMessageRecord } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
 import { formatSdkError } from '../utils/sdk-error'

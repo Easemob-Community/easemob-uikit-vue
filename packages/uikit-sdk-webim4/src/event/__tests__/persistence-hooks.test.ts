@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 // 4.x SDK（easemob-websdk@4.x）入口在模块加载时访问 `self`，node 环境需在 jsdom 下运行
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { SdkMessage, SdkPersistenceHooks, UiConversation, UiMessage } from '@easemob/uikit-sdk-contract'
-import { MESSAGE_STATUS } from '@easemob/uikit-sdk-contract'
+import type { SdkMessage, SdkPersistenceHooks, UiConversation, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import { MESSAGE_STATUS } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { Webim4Client } from '../../client'
 import { createChatHandlers } from '../chat-events'

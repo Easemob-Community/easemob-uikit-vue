@@ -21,8 +21,8 @@ import {
   useContactStore,
   useConversation,
   useUIKit,
-} from '@easemob/uikit-im'
-import type { ConversationTabKey, EmojiStickerPack, NoticeConfig, UiContact, UiConversation } from '@easemob/uikit-im'
+} from '@easemob-community/uikit-im'
+import type { ConversationTabKey, EmojiStickerPack, NoticeConfig, UiContact, UiConversation } from '@easemob-community/uikit-im'
 
 /** Dev Hints 开关的 localStorage 记忆 key：值 'off' 表示用户手动关闭 */
 const DEV_HINTS_STORAGE_KEY = 'demo-dev-hints-enabled'

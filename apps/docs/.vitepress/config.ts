@@ -34,8 +34,8 @@ export default defineConfig({
    * 若写成带斜杠的 '/' / '/chatroom/'，会拼出 '//' / '//chatroom//' 永不匹配，
    * 所有页面回退 'root' 而 locales['root'] 不存在 → 两套文档 nav/sidebar 全部丢失。
    *
-   * - root      → 单群聊 UIKit（@easemob/uikit-im）文档（既有文档，URL 无前缀）
-   * - chatroom  → 聊天室 UIKit（@easemob/uikit-chatroom）文档（URL 前缀 /chatroom/，
+   * - root      → 单群聊 UIKit（@easemob-community/uikit-im）文档（既有文档，URL 无前缀）
+   * - chatroom  → 聊天室 UIKit（@easemob-community/uikit-chatroom）文档（URL 前缀 /chatroom/，
    *               指南 + 组件页 + 自动生成 API 表格，1.0.0 起完整落地）
    *               ⚠️ 一期临时下线（2026-09-15）：chatroom locale 与 chatroom/**
    *               页面均已注释/排除，恢复时取消下方注释并删除 srcExclude。

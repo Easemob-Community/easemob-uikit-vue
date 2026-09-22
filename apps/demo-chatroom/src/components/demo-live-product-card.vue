@@ -6,7 +6,7 @@
  * 链路演示：信令房（低量高可达指令）与 UI 房（弹幕/礼物）分工，符合 §5.9。
  */
 import { computed } from 'vue'
-import { useToast } from '@easemob/uikit-core'
+import { useToast } from '@easemob-community/uikit-core'
 
 export interface LiveProduct {
   /** 商品名 */

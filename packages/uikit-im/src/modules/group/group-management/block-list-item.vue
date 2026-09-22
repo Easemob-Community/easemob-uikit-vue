@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmAvatar as Avatar, EmCell as Cell, EmIconButton as IconButton, useLocale } from '@easemob/uikit-core'
+import { EmAvatar as Avatar, EmCell as Cell, EmIconButton as IconButton, useLocale } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 
 export interface BlockListItemProps {

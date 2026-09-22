@@ -1,5 +1,5 @@
-import type { ContactPage, ContactRepository, UiContact, UiContactInvite } from '@easemob/uikit-sdk-contract'
-import { createLogger } from '@easemob/uikit-sdk-contract'
+import type { ContactPage, ContactRepository, UiContact, UiContactInvite } from '@easemob-community/uikit-sdk-contract'
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import { blocklistIdsToUiContacts, toUiContacts } from '../adapter/contact-adapter'
 

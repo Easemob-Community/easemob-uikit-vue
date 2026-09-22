@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EmIcon as Icon, useLocale } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { EmIcon as Icon, useLocale } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 
 export interface VoiceTranscriptProps {
   message: UiMessage

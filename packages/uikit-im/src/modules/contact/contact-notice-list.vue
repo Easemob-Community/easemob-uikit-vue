@@ -9,7 +9,7 @@ import {
   formatSdkError,
   useLocale,
   useToast,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 import { useContact } from '../../composables/use-contact'
 import { useGroup } from '../../composables/use-group'
 import { useUIKit } from '../../composables/use-uikit'

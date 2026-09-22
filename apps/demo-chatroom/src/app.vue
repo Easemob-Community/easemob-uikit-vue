@@ -7,9 +7,9 @@
  * 消费侧逻辑在 app-shell.vue（子组件）。
  */
 import { computed, onMounted } from 'vue'
-import { setChatroomPopupTarget, useChatroomProvider } from '@easemob/uikit-chatroom'
-import { registerDefaultSdkAdapterFactory } from '@easemob/uikit-core'
-import { Websdk5Adapter } from '@easemob/uikit-sdk-websdk5'
+import { setChatroomPopupTarget, useChatroomProvider } from '@easemob-community/uikit-chatroom'
+import { registerDefaultSdkAdapterFactory } from '@easemob-community/uikit-core'
+import { Websdk5Adapter } from '@easemob-community/uikit-sdk-websdk5'
 import AppShell from './app-shell.vue'
 import { demoRoute, isDemoPcRoute } from './demo-route'
 

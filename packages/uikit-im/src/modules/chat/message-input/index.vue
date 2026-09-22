@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob/uikit-core'
-import type { EmojiStickerItem, UiMessage } from '@easemob/uikit-core'
+import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob-community/uikit-core'
+import type { EmojiStickerItem, UiMessage } from '@easemob-community/uikit-core'
 import { useChat } from '../../../composables/use-chat'
 import { useQuote } from '../../../composables/use-quote'
 import { useUIKit } from '../../../composables/use-uikit'

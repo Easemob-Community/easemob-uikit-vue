@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmButton as Button } from '@easemob/uikit-core'
-import { EmInput as Input } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import { EmPopup as Popup } from '@easemob-community/uikit-core'
+import { EmButton as Button } from '@easemob-community/uikit-core'
+import { EmInput as Input } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 
 export interface ChatInfoDrawerFieldEditModalProps {
   /** 是否显示（v-model:show 受控） */

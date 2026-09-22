@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { getIconNames, getV2IconNames, getFilledIconNames } from '@easemob/uikit-core/components/icon/icon-map'
-import EmIcon from '@easemob/uikit-core/components/icon/icon.vue'
+import { getIconNames, getV2IconNames, getFilledIconNames } from '@easemob-community/uikit-core/components/icon/icon-map'
+import EmIcon from '@easemob-community/uikit-core/components/icon/icon.vue'
 
 const allNames = getIconNames()
 const v2Names = getV2IconNames()

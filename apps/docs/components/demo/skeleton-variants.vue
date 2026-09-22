@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EmSkeleton } from '@easemob/uikit-im'
+import { EmSkeleton } from '@easemob-community/uikit-im'
 </script>
 
 <template>

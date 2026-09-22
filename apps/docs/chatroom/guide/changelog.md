@@ -10,6 +10,6 @@
 
 :::
 
-> 聊天室 UIKit（`@easemob/uikit-chatroom`）的版本段见下方「@easemob/uikit-chatroom」小节。
+> 聊天室 UIKit（`@easemob-community/uikit-chatroom`）的版本段见下方「@easemob-community/uikit-chatroom」小节。
 
 <!-- @include: ../../../../CHANGELOG.md -->

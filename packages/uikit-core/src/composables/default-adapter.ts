@@ -1,4 +1,4 @@
-import type { SdkAdapter } from '@easemob/uikit-sdk-contract'
+import type { SdkAdapter } from '@easemob-community/uikit-sdk-contract'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('UIKit:DefaultAdapter')
@@ -9,7 +9,7 @@ const logger = createLogger('UIKit:DefaultAdapter')
  * 主入口（core / uikit-im）保持零 adapter 静态引用以保证摇树隔离：
  * 4.x 下游的依赖图与产物中不应出现 5.x adapter 符号，反之亦然。
  * 「未传 adapter 时内置默认」的快捷方式由场景包子路径入口承担——
- * 例如 `import '@easemob/uikit-im/websdk5'` 会在 import 时调用
+ * 例如 `import '@easemob-community/uikit-im/websdk5'` 会在 import 时调用
  * `registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())` 完成自注册。
  */
 let defaultAdapterFactory: (() => SdkAdapter) | null = null

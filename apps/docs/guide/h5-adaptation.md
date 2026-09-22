@@ -6,7 +6,7 @@
 
 ```vue
 <script setup lang="ts">
-import { UIKitProvider } from '@easemob/uikit-im'
+import { UIKitProvider } from '@easemob-community/uikit-im'
 </script>
 
 <template>
@@ -144,7 +144,7 @@ UIKit 采用移动端优先的断点定义，业务组件与 demo 共用同一�
 - 如果你需要更细粒度的控制，可以直接读取 `useUIKit().h5`：
 
 ```ts
-import { useUIKit } from '@easemob/uikit-im'
+import { useUIKit } from '@easemob-community/uikit-im'
 
 const { h5 } = useUIKit()
 

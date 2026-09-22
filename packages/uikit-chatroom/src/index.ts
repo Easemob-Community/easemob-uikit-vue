@@ -1,4 +1,4 @@
-// @easemob/uikit-chatroom 聊天室场景包入口（P2 完整落地：P2-1 无头内核 +
+// @easemob-community/uikit-chatroom 聊天室场景包入口（P2 完整落地：P2-1 无头内核 +
 // P2-2 容器/UI/demo）。显式具名导出，不用 export * 跨包 re-export core 符号
 // （normalizeUserId 等共享工具由 core 定义，本包 re-export 保持 API 兼容）。
 

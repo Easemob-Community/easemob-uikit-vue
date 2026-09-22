@@ -1,6 +1,6 @@
 # 组件与插槽清单
 
-聊天室组件**具名导出、不注册全局**，按需 `import`（`@easemob/uikit-chatroom`）。
+聊天室组件**具名导出、不注册全局**，按需 `import`（`@easemob-community/uikit-chatroom`）。
 
 ## 容器
 

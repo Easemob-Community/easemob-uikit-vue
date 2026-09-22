@@ -3,7 +3,7 @@
 环信 UIKit 除提供 Vue 3 组件与文档站外，还面向下游接入者提供两类 AI 辅助能力，让 AI 助手（Claude Code、Cursor 等）能更准确地帮你完成接入与二次开发：
 
 - **Agent Skills**：一套静态知识包（Markdown），教 AI「怎么写 UIKit 集成代码」——安装、`EmUIKitProvider` 配置、组件用法、主题与 H5 适配、常见坑。
-- **MCP 服务**：一个运行时服务（`@easemob/uikit-mcp`），让 AI 能实时「查文档 / 查组件 API / 查版本 / 校验配置」。
+- **MCP 服务**：一个运行时服务（`@easemob-community/uikit-mcp`），让 AI 能实时「查文档 / 查组件 API / 查版本 / 校验配置」。
 
 两者共用同一份数据源（本文档站与根 `CHANGELOG.md`），随 UIKit 版本同步更新。
 
@@ -42,7 +42,7 @@ integrations/skills/
   "mcpServers": {
     "easemob-uikit-im": {
       "command": "npx",
-      "args": ["-y", "@easemob/uikit-mcp"]
+      "args": ["-y", "@easemob-community/uikit-mcp"]
     }
   }
 }

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, EmIcon as Icon, EmIconButton as IconButton, useLocale, useToast } from '@easemob/uikit-core'
+import { EmPopup as Popup, EmModal as Modal, EmEmpty as Empty, EmIcon as Icon, EmIconButton as IconButton, useLocale, useToast } from '@easemob-community/uikit-core'
 import { useBlocklist } from '../../composables/use-blocklist'
 import { useUIKit } from '../../composables/use-uikit'
-import type { UiContact as Contact } from '@easemob/uikit-core'
+import type { UiContact as Contact } from '@easemob-community/uikit-core'
 import type { AvatarShape, ContactItemSize } from './types'
 import ContactItem from './contact-item.vue'
 import BlockListAddModal from './block-list-add-modal.vue'

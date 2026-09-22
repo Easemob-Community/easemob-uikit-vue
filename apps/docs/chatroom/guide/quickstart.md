@@ -1,17 +1,17 @@
 # 快速开始
 
-聊天室与单群聊共用同一套基座（`@easemob/uikit-core`），**不引入新的 Provider 组件**：
+聊天室与单群聊共用同一套基座（`@easemob-community/uikit-core`），**不引入新的 Provider 组件**：
 `useChatroomProvider()` 初始化，`EmChatroomContainer` 容器驱动进出房。
 
 ## 三步接入
 
 ```bash
-pnpm add @easemob/uikit-chatroom pinia vue
+pnpm add @easemob-community/uikit-chatroom pinia vue
 ```
 
 ```ts
 // App.vue / main.ts —— 初始化（自带 pinia 注入）
-import { useChatroomProvider } from '@easemob/uikit-chatroom'
+import { useChatroomProvider } from '@easemob-community/uikit-chatroom'
 
 useChatroomProvider({ appKey: 'orgName#appName' })
 ```
@@ -19,7 +19,7 @@ useChatroomProvider({ appKey: 'orgName#appName' })
 ```vue
 <!-- 页面：容器驱动进出房 -->
 <script setup lang="ts">
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>
@@ -113,7 +113,7 @@ PC / Electron 开播端、小班课双端等场景，用 `layout: 'split'` 三�
 自绘弹幕轨道 / 礼物飘屏时，不渲染容器，直接用组合式函数：
 
 ```ts
-import { useChatroom, useChatroomMessage } from '@easemob/uikit-chatroom'
+import { useChatroom, useChatroomMessage } from '@easemob-community/uikit-chatroom'
 
 const { join } = useChatroom()
 const { subscribe, sendText } = useChatroomMessage()

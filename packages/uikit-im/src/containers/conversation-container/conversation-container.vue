@@ -4,10 +4,10 @@ import ConversationList from '../../modules/conversation/conversation-list.vue'
 import { initDraftStorage, useConversation } from '../../composables/use-conversation'
 import { useUIKit } from '../../composables/use-uikit'
 import { createConversationTimeFormatter, createMessageFormatter } from '../../utils'
-import { useLocale } from '@easemob/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from '../../modules/conversation/types'
 import { DEFAULT_CONVERSATION_TABS } from '../../modules/conversation/types'
-import type { UiConversation as Conversation } from '@easemob/uikit-core'
+import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 
 export interface ConversationContainerProps {
   /** 是否展示搜索框，默认 true */

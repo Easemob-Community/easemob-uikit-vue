@@ -1,4 +1,22 @@
-## @easemob/uikit-sdk-webim4 1.3.1 (2026-09-18)
+## @easemob-community/uikit-sdk-webim4 1.3.3 (2026-09-21)
+
+
+### 修复
+
+- **`currentUser` 记账提前到 login 发起前**：同 websdk5 1.3.4，4.x 线对称修复。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.2 (2026-09-20)
+
+
+### 新增
+
+- **联系人关系变更全局通知**：与 websdk5 1.3.2 对齐，`onContactRefuse` / `onContactDeleted` 同步投递全局通知。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.1 (2026-09-18)
 
 
 ### 新增
@@ -11,7 +29,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.3.0 (2026-09-16)
+## @easemob-community/uikit-sdk-webim4 1.3.0 (2026-09-16)
 
 
 ### 变更
@@ -20,7 +38,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.2.2 (2026-09-03)
+## @easemob-community/uikit-sdk-webim4 1.2.2 (2026-09-03)
 
 
 ### 新增
@@ -33,7 +51,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.2.1 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.1 (2026-09-02)
 
 
 ### 修复
@@ -42,7 +60,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.2.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.2.0 (2026-09-02)
 
 
 ### 新增
@@ -55,7 +73,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.1.0 (2026-09-02)
 
 
 ### 性能
@@ -68,7 +86,7 @@
 
 ---
 
-## @easemob/uikit-sdk-webim4 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-webim4 1.0.0 (2026-09-02)
 
 
 ### 新增

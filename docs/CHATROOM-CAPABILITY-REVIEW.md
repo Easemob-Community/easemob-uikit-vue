@@ -1,6 +1,6 @@
 # Chatroom 组件插槽与 Props 可控性反向评估（CHATROOM-CAPABILITY-REVIEW）
 
-> 评估日期：2026-08-15。评估对象：`@easemob/uikit-chatroom` 0.2.0（`packages/uikit-chatroom/src`）。
+> 评估日期：2026-08-15。评估对象：`@easemob-community/uikit-chatroom` 0.2.0（`packages/uikit-chatroom/src`）。
 > 方法：消费者视角反向推演——「接入方想做什么 → 当前 API 能否做到 → 卡在哪」，
 > 覆盖容器层 / 直播组件集 / 通用消息成员模块 / headless 契约与文档 四层。
 > 状态：**评估完成，P6 增强已批准实施**。关联 TECH-DEBT：D101。

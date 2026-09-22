@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useSlots } from 'vue'
-import { EmActionSheet as ActionSheet, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE, EmPopup as Popup, useLocale, useLongPress, useToast, useViewport } from '@easemob/uikit-core'
-import type { UiMessage } from '@easemob/uikit-core'
+import { EmActionSheet as ActionSheet, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, MESSAGE_TYPE, EmPopup as Popup, useLocale, useLongPress, useToast, useViewport } from '@easemob-community/uikit-core'
+import type { UiMessage } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
 import { useGroupStore } from '../../../store/group'
 import { resolveTranslateLang } from '../../../composables/use-message-actions'

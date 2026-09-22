@@ -1,5 +1,5 @@
 /**
- * 校验 @easemob/uikit-core 的引擎层隔离：sdk/constants/utils 禁止值依赖 vue 生态。
+ * 校验 @easemob-community/uikit-core 的引擎层隔离：sdk/constants/utils 禁止值依赖 vue 生态。
  *
  * 背景：core 内部分层——引擎层（sdk/、constants/、utils/）保持纯 TS 运行时（零
  * vue/pinia/@vueuse），供未来跨端 uikit（uniapp / 微信小程序等）复用；Vue 适配层

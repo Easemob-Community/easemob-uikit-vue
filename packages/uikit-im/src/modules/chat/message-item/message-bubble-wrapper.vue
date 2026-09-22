@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
-import { EmAvatar as Avatar, CONVERSATION_TYPE, EmCheckbox as Checkbox, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob/uikit-core'
-import type { LocationMessageBody, MessageStatusValue, PresenceDisplayStatus, UiMessage } from '@easemob/uikit-core'
-import { normalizeUserId } from '@easemob/uikit-sdk-contract'
+import { EmAvatar as Avatar, CONVERSATION_TYPE, EmCheckbox as Checkbox, INJECTION_KEY, EmIcon as Icon, MESSAGE_STATUS, MESSAGE_TYPE, EmPopup as Popup, useClientStore, useLocale, usePresence } from '@easemob-community/uikit-core'
+import type { LocationMessageBody, MessageStatusValue, PresenceDisplayStatus, UiMessage } from '@easemob-community/uikit-core'
+import { normalizeUserId } from '@easemob-community/uikit-sdk-contract'
 import QuoteCard from '../quote/quote-card.vue'
 import type { ChatConfig, MessageActionEvent, MessageLayout, MessageStatusConfig, TimeDisplayStrategy } from '../types'
 import { useGroupStore } from '../../../store/group'

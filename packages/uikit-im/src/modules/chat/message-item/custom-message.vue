@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
 import type { ComputedRef } from 'vue'
-import { INJECTION_KEY, useThemeStore } from '@easemob/uikit-core'
-import type { CustomMessageBody, UiMessage } from '@easemob/uikit-core'
+import { INJECTION_KEY, useThemeStore } from '@easemob-community/uikit-core'
+import type { CustomMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface CustomMessageProps {

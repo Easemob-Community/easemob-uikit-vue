@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { EmAvatar as Avatar } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmCopyableText as CopyableText } from '@easemob/uikit-core'
+import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmCopyableText as CopyableText } from '@easemob-community/uikit-core'
 
 export interface GroupCardAction {
   /** 操作唯一标识，点击时作为 action-click 负载回传 */

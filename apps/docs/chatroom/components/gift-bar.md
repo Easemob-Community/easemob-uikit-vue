@@ -9,7 +9,7 @@
 
 ```vue
 <script setup lang="ts">
-import { ChatroomGiftBar } from '@easemob/uikit-chatroom'
+import { ChatroomGiftBar } from '@easemob-community/uikit-chatroom'
 </script>
 
 <template>

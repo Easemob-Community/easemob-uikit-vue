@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, markRaw, ref } from 'vue'
-import type { SdkMessage } from '@easemob/uikit-sdk-contract'
-import { MESSAGE_STATUS } from '@easemob/uikit-core'
-import type { MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { MessageStatus, TextMessageBody, UiMessage } from '@easemob/uikit-core'
-import { toUiMessage } from '@easemob/uikit-core'
+import type { SdkMessage } from '@easemob-community/uikit-sdk-contract'
+import { MESSAGE_STATUS } from '@easemob-community/uikit-core'
+import type { MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { MessageStatus, TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import { toUiMessage } from '@easemob-community/uikit-core'
 import { clearHistoryCursor } from '../composables/message-history-cursor'
 
 /** 按消息类型提取具体的 UiMessage 子类型（用于组件 props 精确类型） */

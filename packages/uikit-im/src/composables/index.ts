@@ -15,26 +15,26 @@ export * from './use-pinyin'
 export * from './use-group'
 export * from './use-group-filter'
 export * from './use-group-sort'
-// use-h5-adaptation / use-keyboard 已迁至 @easemob/uikit-core（P1 Step 2），此处显式具名 re-export 保持对外 API 不变
-export { useH5Adaptation, useKeyboard } from '@easemob/uikit-core'
-export type { H5AdaptationConfig } from '@easemob/uikit-core'
-// 共享 composables 已迁至 @easemob/uikit-core（P1 Step 3），此处显式具名 re-export 保持对外 API 不变。
+// use-h5-adaptation / use-keyboard 已迁至 @easemob-community/uikit-core（P1 Step 2），此处显式具名 re-export 保持对外 API 不变
+export { useH5Adaptation, useKeyboard } from '@easemob-community/uikit-core'
+export type { H5AdaptationConfig } from '@easemob-community/uikit-core'
+// 共享 composables 已迁至 @easemob-community/uikit-core（P1 Step 3），此处显式具名 re-export 保持对外 API 不变。
 // 语义分层：useClient（SDK client 句柄）的 logout 仅断开 SDK 连接；
 // UIKit 内部状态完整重置请用 useUIKit().logout()（见 use-uikit.ts）
-export { useClient, useTheme, usePresence, useToast, useViewport } from '@easemob/uikit-core'
-export { useNotification, emitNotificationDelivered } from '@easemob/uikit-core'
-export type { NotificationChannel, NotificationConfig, NotificationHandler, NotificationTriggerMode } from '@easemob/uikit-core'
-export { useLongPress, usePullRefresh, useBottomSheet, useRipple, useResizable } from '@easemob/uikit-core'
-export type { UseLongPressOptions, UsePullRefreshOptions, UseBottomSheetOptions, RippleOptions, UseResizableOptions } from '@easemob/uikit-core'
-export { useArrowNavigation, useEscToClose, useKeyBindings, isKeyboardShortcutsEnabled, setKeyboardShortcutsEnabled } from '@easemob/uikit-core'
-export type { KeyBindingsMap, UseArrowNavigationOptions, UseEscToCloseOptions, UseKeyBindingsOptions } from '@easemob/uikit-core'
-export { createUIKitStorageKey, getStorageBackend, useUIKitStorage } from '@easemob/uikit-core'
-export type { UIKitStorageType } from '@easemob/uikit-core'
+export { useClient, useTheme, usePresence, useToast, useViewport } from '@easemob-community/uikit-core'
+export { useNotification, emitNotificationDelivered } from '@easemob-community/uikit-core'
+export type { NotificationChannel, NotificationConfig, NotificationHandler, NotificationTriggerMode } from '@easemob-community/uikit-core'
+export { useLongPress, usePullRefresh, useBottomSheet, useRipple, useResizable } from '@easemob-community/uikit-core'
+export type { UseLongPressOptions, UsePullRefreshOptions, UseBottomSheetOptions, RippleOptions, UseResizableOptions } from '@easemob-community/uikit-core'
+export { useArrowNavigation, useEscToClose, useKeyBindings, isKeyboardShortcutsEnabled, setKeyboardShortcutsEnabled } from '@easemob-community/uikit-core'
+export type { KeyBindingsMap, UseArrowNavigationOptions, UseEscToCloseOptions, UseKeyBindingsOptions } from '@easemob-community/uikit-core'
+export { createUIKitStorageKey, getStorageBackend, useUIKitStorage } from '@easemob-community/uikit-core'
+export type { UIKitStorageType } from '@easemob-community/uikit-core'
 export * from './use-user-info'
 export * from './use-own-user-info'
 export * from './use-quote'
 export * from './use-blocklist'
 export * from './use-chat-plugin'
-// 数据同步状态 hook 已随 Provider 适配器化下沉 @easemob/uikit-core，此处 re-export 保持对外 API 不变
-export { useSyncStatus } from '@easemob/uikit-core'
-export type { SyncPhase, SyncState } from '@easemob/uikit-core'
+// 数据同步状态 hook 已随 Provider 适配器化下沉 @easemob-community/uikit-core，此处 re-export 保持对外 API 不变
+export { useSyncStatus } from '@easemob-community/uikit-core'
+export type { SyncPhase, SyncState } from '@easemob-community/uikit-core'

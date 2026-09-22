@@ -1,6 +1,6 @@
 import { computed, toValue, watchEffect } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
-import type { UserInfoAttribute } from '@easemob/uikit-sdk-contract'
+import type { UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
 import { useCoreUIKit } from './use-uikit'
 
 /**

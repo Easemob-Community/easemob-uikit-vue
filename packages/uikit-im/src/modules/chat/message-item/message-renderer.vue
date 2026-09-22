@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
-import type { LocationMessageBody, UiMessage } from '@easemob/uikit-core'
-import { MESSAGE_TYPE } from '@easemob/uikit-core'
+import type { LocationMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import TextMessage from './text-message.vue'
 import ImageMessage from './image-message.vue'
 import VoiceMessage from './voice-message.vue'

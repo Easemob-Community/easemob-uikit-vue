@@ -7,7 +7,7 @@
  * - 全员禁言入口随 features.muteAll 出现在成员面板（owner/admin 可用）。
  */
 import { ref } from 'vue'
-import { EmChatroomContainer } from '@easemob/uikit-chatroom'
+import { EmChatroomContainer } from '@easemob-community/uikit-chatroom'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 
 const DEFAULT_ROOM_ID = '315874547400706'

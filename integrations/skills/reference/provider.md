@@ -75,7 +75,7 @@
 业务自有后端时，通过 `dataSource` 完全接管数据获取（不传走 SDK 默认实现）：
 
 ```ts
-import type { UIKitDataSource } from '@easemob/uikit-im'
+import type { UIKitDataSource } from '@easemob-community/uikit-im'
 
 const dataSource: UIKitDataSource = {
   async fetchConversations() { /* ... */ },

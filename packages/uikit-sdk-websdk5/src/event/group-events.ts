@@ -24,8 +24,8 @@ import type {
   GroupUserRemovedEventPayload,
   UserInfo,
 } from 'easemob-websdk'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob/uikit-sdk-contract'
-import type { UiContactInvite, UiGroup } from '@easemob/uikit-sdk-contract'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
+import type { UiContactInvite, UiGroup } from '@easemob-community/uikit-sdk-contract'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 

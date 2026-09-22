@@ -1,6 +1,6 @@
 import { computed, watch } from 'vue'
-import type { ConversationTypeValue } from '@easemob/uikit-core'
-import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
+import type { ConversationTypeValue } from '@easemob-community/uikit-core'
+import { createNoticeMessage, resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob-community/uikit-core'
 import { CHATROOM_CONVERSATION_TYPE, CHATROOM_MESSAGE_DEFAULTS, CHATROOM_STATUS } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
 import { resolveChatroomSdkHost } from '../sdk/host'

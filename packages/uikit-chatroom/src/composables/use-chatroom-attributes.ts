@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob/uikit-core'
+import { resolveSdkErrorMessage, t, useCoreUIKit, useToast } from '@easemob-community/uikit-core'
 import type { ChatroomAttrPrefixValue } from '../constants'
 import { ChatroomAdapter } from '../sdk/adapter/chatroom-adapter'
 import { resolveChatroomSdkHost } from '../sdk/host'

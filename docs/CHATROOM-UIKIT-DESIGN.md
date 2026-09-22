@@ -1,7 +1,7 @@
-# 聊天室 UIKit（`@easemob/uikit-chatroom`）设计规划
+# 聊天室 UIKit（`@easemob-community/uikit-chatroom`）设计规划
 
 > 状态：**设计已评审、待实施**（2026-08-15 落盘）。按用户时序，`@easemob/uikit` 1.x 开发完成后启动实施。
-> 评审记录：一轮评审 → 「复审修正记录」6 条（见第六节）；二轮评审补强（同日）——P1 迁移判定清单前置、core 版本纪律、`extendLocale` 复杂度重估、接收侧渲染节流与发送侧限流分层、大房间成员分页、发送节流 UI 反馈、CHANGELOG 双版本工具前移至 P2（均已并入正文）；三轮决策（同日）——**`@easemob/uikit` 改名为 `@easemob/uikit-im`**（已核实 npm 公网 registry 无此包，从未发布，改名窗口在正式发布前；三包命名 `uikit-core` / `uikit-im` / `uikit-chatroom`），新增 P0.5 纯改名阶段。
+> 评审记录：一轮评审 → 「复审修正记录」6 条（见第六节）；二轮评审补强（同日）——P1 迁移判定清单前置、core 版本纪律、`extendLocale` 复杂度重估、接收侧渲染节流与发送侧限流分层、大房间成员分页、发送节流 UI 反馈、CHANGELOG 双版本工具前移至 P2（均已并入正文）；三轮决策（同日）——**`@easemob/uikit` 改名为 `@easemob-community/uikit-im`**（已核实 npm 公网 registry 无此包，从未发布，改名窗口在正式发布前；三包命名 `uikit-core` / `uikit-im` / `uikit-chatroom`），新增 P0.5 纯改名阶段。
 > 对应 TECH-DEBT [D97](#d97)。
 > 范围：架构决策、三包边界、聊天室包内部设计、场景预设系统、H5 要点、构建/版本规则、P0→P5 分阶段计划。
 > 本文档只做决策沉淀，不含实施代码；实施时以当时 `easemob-websdk` 实际 API 为准复核（见「明确假设」）。
@@ -12,7 +12,7 @@
 
 环信 IM 的**聊天室（Chatroom）**与单聊/群聊场景几乎不重合：聊天室典型场景为中大型直播间、语聊房、小班课、私域直播/带货直播（H5 居多），无离线消息、无未读/回执、无会话列表概念，消息是广播流；而单群聊 UIKIT 围绕会话/联系人/群组/回执体系构建。两者**极少同时被同一接入方需要**。
 
-**核心结论**：不在 `@easemob/uikit` 内追加聊天室功能，也不复制一套共享代码，而是抽取共享基座 `@easemob/uikit-core`，聊天室作为独立场景包 `@easemob/uikit-chatroom` 与单群聊包并列。**现有单群聊包趁正式发布前改名为 `@easemob/uikit-im`**（已核实 npm registry 从未发布，改名零外部成本；正式发布后此窗口永久关闭）：
+**核心结论**：不在 `@easemob/uikit` 内追加聊天室功能，也不复制一套共享代码，而是抽取共享基座 `@easemob-community/uikit-core`，聊天室作为独立场景包 `@easemob-community/uikit-chatroom` 与单群聊包并列。**现有单群聊包趁正式发布前改名为 `@easemob-community/uikit-im`**（已核实 npm registry 从未发布，改名零外部成本；正式发布后此窗口永久关闭）：
 
 ```
 packages/
@@ -42,7 +42,7 @@ packages/
 |---|---|---|
 | A. 同一包加 chatroom | 零抽取成本 | ① 单包是单 rollup bundle，聊天室 H5 页面被迫加载 tiptap、通讯录、群组代码；② 聊天室无会话列表/未读/回执/离线消息，与单群聊消息模型完全相反，全包到处要 `if (chatroom)`；③ 发布会互相绑架；④ API/文档/Resolver/MCP 面混在一起 |
 | B. 独立包、复制共享代码 | 隔离彻底 | 主题/i18n/sdk 抽象/原子组件双份维护 → 必然漂移（本仓库已有 Avatar 走主题、枚举统一等强约束，复制即违约） |
-| **C. 独立包 + `@easemob/uikit-core`（推荐）** | 场景隔离 + 基座单一维护；单群聊包组件/composable 对外签名零变化（仅包名随 P0.5 改为 `uikit-im`）；聊天室 H5 bundle 不含 1v1 场景代码 | 需要一次纯改名（P0.5）+ 一次机械性抽核重构（见 P1，风险可控，逐层迁移 + 每步门禁） |
+| **C. 独立包 + `@easemob-community/uikit-core`（推荐）** | 场景隔离 + 基座单一维护；单群聊包组件/composable 对外签名零变化（仅包名随 P0.5 改为 `uikit-im`）；聊天室 H5 bundle 不含 1v1 场景代码 | 需要一次纯改名（P0.5）+ 一次机械性抽核重构（见 P1，风险可控，逐层迁移 + 每步门禁） |
 
 **原则：按场景分包、按基座共享。** 包按场景分，**不按子场景分**——不做 `uikit-live`/`uikit-voice` 子包；若未来某个变种被证明有独立复用的需求再拆。
 
@@ -217,7 +217,7 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 
 1. **事件注册边界（架构修正）**：core 的 `registerEventHandlers` 硬编码单群聊全部 handler 与 stores（`sdk/event/registry.ts` 已核实）。修正：core 只保留连接级事件 + notice 工具 + 注册原语；场景级 handler 工厂留在各场景包 —— uikit 的 `registerEventHandlers` 对外签名原样保留；chatroom 包自建 `registerChatroomEventHandlers`。
 2. **ManagerHost 缺 `chatRoomManager`（增量缺口）**：`client.ts` 的 `SdkChatClient.init({ managers: [...] })` 未注册 ChatRoomManager（已核实）。P1 抽核时 core 注册列表加入 `ChatRoomManager`，`ManagerHost` 增加 `chatRoomManager` 字段 —— 纯增量，不破坏现有 API。**P2 前置修正（2026-08-15 已落地）**：注册方式从「core 静态 import 全量 manager」改为「**场景包依赖注入**」——core 的 `ClientConfig.managers` 必填（未注入构造抛错），core 不再静态 import 任何 manager 类。原因：websdk 5.x 是 `sideEffects:false` + 按 manager 分 subpath 的 ESM，core 静态 import 会让所有场景的消费者都无法 tree-shake 无关 manager 代码。现状：uikit-im 注入 6 个 manager（不含 ChatRoomManager，IM 消费者可摇掉 websdk chatroom 代码）+ `enableSyncData: ['conversation','contact','group']`（原 core 默认值随迁，行为不变，延迟初始化路径同样补齐）；chatroom 包（P2）将只注入 `[ChatManager, ChatRoomManager, UserInfoManager]` 且不做场景化同步。**注入机制**：core provider options 新增 `resolveClientConfig?: (config: ClientConfig) => ClientConfig` 钩子，在 core `setupClient`（auto-init 与 `useClient().init()` 延迟初始化的唯一漏斗）统一应用——场景包只需传钩子，业务侧任何初始化路径都自动获得场景默认值（曾出现 uikit-im 只在自身 ctx.init 包装导致 `useClient().init()` 绕过默认注入的缺陷，由此修正）。
-3. **websdk 单实例规则（确认）**：现有 vite.config 已把 `easemob-websdk` 放进 `rollupOptions.external`（已核实）。规则固化：**所有包一律 external `vue`/`pinia`/`easemob-websdk`，场景包再 external `@easemob/uikit-core`**，消费端永远只有一份 websdk 实例（连接/事件总线不分裂）。chatroom 包声明 `easemob-websdk` 同 range 依赖（适配层引用类型），构建时 external。
+3. **websdk 单实例规则（确认）**：现有 vite.config 已把 `easemob-websdk` 放进 `rollupOptions.external`（已核实）。规则固化：**所有包一律 external `vue`/`pinia`/`easemob-websdk`，场景包再 external `@easemob-community/uikit-core`**，消费端永远只有一份 websdk 实例（连接/事件总线不分裂）。chatroom 包声明 `easemob-websdk` 同 range 依赖（适配层引用类型），构建时 external。
 4. **i18n 合并机制缺失（core 小增量）**：locale 是模块级 messages 对象 + `useLocale`，无合并 API（`locale/index.ts` 已核实）。P1 给 core 加 `extendLocale(locale, keys)`（向后兼容），chatroom 安装时把自己的 keys（`chatroom.*` 前缀段）并入，不复制整个 locale 文件。**注意这不是「约 10 行」能收尾的事**，实施时需处理三个点：① 键冲突策略（同 key 后注册覆盖 or 报错，需定死）；② 合并后切换语言的响应式更新（已渲染组件须跟着变）；③ messages 若带 TS 类型约束，扩展 key 不能破坏现有类型推导。P1 任务清单中单独列项。
 5. **房间属性实时性（表述修正）**：SDK 存在 `ATTRIBUTES_UPDATE`/`ATTRIBUTES_REMOVED` 等事件类型，具备实时通知能力；`useChatroomAttributes` 按 5.6 四层同步设计，确切事件名以实施时 SDK 实际 API 为准。
 6. **双版本 changelog 工具（确认）**：`scripts/check-version-sync.mjs` 需升级为分别校验两包 version 与根 CHANGELOG 各自版本段一致（单一数据源原则不变），docs 站 changelog `@include` 同步适配。
@@ -242,7 +242,7 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 
 ## 八、构建、版本与发布规则
 
-- **构建**：沿用现有 vite 链路（lib 模式主 bundle + `vite.aux.config.ts` aux 入口：resolver / auto-imports）。core 按可树摇的 ESM 产物构建；场景包 vite 配置把 `@easemob/uikit-core` 加入 `rollupOptions.external`（连同 `vue`/`pinia`/`easemob-websdk`，见复审修正 3）。resolver / auto-imports / `./theme` 子路径导出按现有模式复制（`exports` 字段：`.` / `./resolver` / `./auto-imports` / `./theme`）。
+- **构建**：沿用现有 vite 链路（lib 模式主 bundle + `vite.aux.config.ts` aux 入口：resolver / auto-imports）。core 按可树摇的 ESM 产物构建；场景包 vite 配置把 `@easemob-community/uikit-core` 加入 `rollupOptions.external`（连同 `vue`/`pinia`/`easemob-websdk`，见复审修正 3）。resolver / auto-imports / `./theme` 子路径导出按现有模式复制（`exports` 字段：`.` / `./resolver` / `./auto-imports` / `./theme`）。
 - **版本**：两场景包独立版本，共用 core 用 range 约束（`^x.y.z`）；`pnpm changelog:check` 与根 CHANGELOG 扩展为**双版本段**结构（唯一数据源原则不变，见复审修正 6）。
 - **core 版本纪律（防绑架转移）**：场景包之间互不绑架，但两包都 range 依赖 core——「发布绑架」只是从包内转移到了 core 上。纪律固化：**core 对外 API（导出、CSS 变量名、event 注册原语签名、locale key 结构）只增不改**；确需 breaking 变更时必须显式决策（评估两场景包同步升级成本并记入 CHANGELOG），禁止顺手重构。若 core 频繁被迫 breaking，重新评估「core 是否应独立版本」这一前提。
 - **demo 模式**：`apps/demo` 当前为 workspace 源码直连模式（vite alias → `packages/uikit-im/src`，P0.5 实施时已确认）。若后续切回 tgz 验证模式，注意产物文件名已改为 `easemob-uikit-im-<version>.tgz`。
@@ -253,8 +253,8 @@ export const LIVE_ROOM_SCENE / VOICE_ROOM_SCENE / CLASS_ROOM_SCENE
 > 时序说明：P0.5 与 P1 不依赖聊天室业务，可在 `@easemob/uikit` 1.x 收尾期提前启动；P2 起才正式进入聊天室开发。
 
 - **P0 决策与基座准备**：确认设计（包名、共享边界清单、场景预设接口）。产出：本文档 + TECH-DEBT D97 登记。（已完成，2026-08-15）
-- **P0.5 纯改名 `@easemob/uikit` → `@easemob/uikit-im`**（**已完成，2026-08-15**）：**零代码结构变化，只改包名与全仓引用**——目录 `packages/uikit` → `packages/uikit-im`、`package.json` name、demo alias 与依赖声明（实施时 demo 已恢复 workspace 源码模式，无 tgz 产物名需处理）、docs 站（vitepress 配置/gen:api/组件页包名）、`packages/mcp` 数据源与 `scripts/sync-docs.mjs`、`integrations/skills` reference、`scripts/check-version-sync.mjs` 与 CHANGELOG 版本段约定、resolver/auto-imports 包名常量、README/AGENTS.md/skill 路由表。**改名与抽核必须分离**，同阶段混入则回归无法定位。验收：门禁全绿 + 全仓 grep 无 `@easemob/uikit`（非 `-im`/`-core`/`-chatroom` 后缀）残留。**豁免项（伞形产物保留原名）**：`@easemob/uikit-mcp`（MCP 服务，未来覆盖三包文档数据）与 `easemob-uikit-integration`（集成侧 skill 名，面向全部场景包的接入者），二者不随单群聊包改名。
-- **P1 抽核 `@easemob/uikit-core`**：**第一个产出物是「逐组件/逐模块迁移判定清单」**——每个原子组件/composable/store 先判定「进 core / 留 uikit-im / 视依赖待定」（UserCard 等待定项在此全部定论），评审通过后再动手迁移，禁止边迁边判。迁移顺序：「sdk 层（含 ChatRoomManager 注册 + ManagerHost 增量）→ 原子组件 → theme/locale/constants/utils（含 `extendLocale`）→ client/theme store → Provider → 共享 composables」逐层迁移，`@easemob/uikit-im` 全量 re-export core 保持组件/composable 对外签名不变；**每移一层跑一次门禁**；恢复 demo alias 模式回归。验收：现有 demo/docs/MCP 数据全部照常，`@easemob/uikit-im` 类型与构建 0 回归，core 包独立可构建。
+- **P0.5 纯改名 `@easemob/uikit` → `@easemob-community/uikit-im`**（**已完成，2026-08-15**）：**零代码结构变化，只改包名与全仓引用**——目录 `packages/uikit` → `packages/uikit-im`、`package.json` name、demo alias 与依赖声明（实施时 demo 已恢复 workspace 源码模式，无 tgz 产物名需处理）、docs 站（vitepress 配置/gen:api/组件页包名）、`packages/mcp` 数据源与 `scripts/sync-docs.mjs`、`integrations/skills` reference、`scripts/check-version-sync.mjs` 与 CHANGELOG 版本段约定、resolver/auto-imports 包名常量、README/AGENTS.md/skill 路由表。**改名与抽核必须分离**，同阶段混入则回归无法定位。验收：门禁全绿 + 全仓 grep 无 `@easemob/uikit`（非 `-im`/`-core`/`-chatroom` 后缀）残留。**豁免项（伞形产物保留原名）**：`@easemob-community/uikit-mcp`（MCP 服务，未来覆盖三包文档数据）与 `easemob-uikit-integration`（集成侧 skill 名，面向全部场景包的接入者），二者不随单群聊包改名。
+- **P1 抽核 `@easemob-community/uikit-core`**：**第一个产出物是「逐组件/逐模块迁移判定清单」**——每个原子组件/composable/store 先判定「进 core / 留 uikit-im / 视依赖待定」（UserCard 等待定项在此全部定论），评审通过后再动手迁移，禁止边迁边判。迁移顺序：「sdk 层（含 ChatRoomManager 注册 + ManagerHost 增量）→ 原子组件 → theme/locale/constants/utils（含 `extendLocale`）→ client/theme store → Provider → 共享 composables」逐层迁移，`@easemob-community/uikit-im` 全量 re-export core 保持组件/composable 对外签名不变；**每移一层跑一次门禁**；恢复 demo alias 模式回归。验收：现有 demo/docs/MCP 数据全部照常，`@easemob-community/uikit-im` 类型与构建 0 回归，core 包独立可构建。
 - **P2 聊天室包骨架**（**已完成，2026-08-15**）：package 脚手架（含 resolver/auto-imports/theme/locale 扩展）、**CHANGELOG 双版本工具升级（从 P5 前移至此——包骨架一落地 version 就需要被 `changelog:check` 校验）**、chatroom domain/adapter/event、chatroom store（**按 5.9「房间注册表 Map + activeRoomId」两层建模，单房为其特例**）、`EmChatroomContainer` 外壳（加入/退出/历史/消息收发/成员面板/系统通知/基础插槽）、H5 容器样式。验收：独立 demo 页三步接入跑通基础聊天室（**已达成**：apps/demo `#/chatroom` 页嵌套 IM Provider 验证两包同装，TECH-DEBT D97 进度记录）。
 - **P3 场景预设系统**（**已完成，2026-08-15**）：scene config 类型 + 三内置 preset（`LIVE_ROOM_SCENE`/`VOICE_ROOM_SCENE`/`CLASS_ROOM_SCENE` 模块加载即注册）+ `useChatroomScene`（`themeOverrides` 容器根元素应用 + `i18nOverrides` locale 并入）+ 插槽全接线（含 `gift-bar`/`mic-queue`）；礼物（custom 消息 `CHATROOM_GIFT_EVENT` 协议 + `ChatroomGiftBar` + 消息项礼物渲染，未识别 custom 仍兜底）；麦位（语聊房 `ChatroomMicQueue`，状态存 `voice:micQueue` 房间属性 JSON）；禁言/公告（编辑 Popup）/黑名单管理（成员面板 tab）；`useChatroomAttributes`；**多房间订阅（UI 房 + 信令房：`signal-rooms` 配置 + `signal-message`/`signal-status` 透传回调 + `useChatroomMessage` 按 roomId 发送 + 断线全量重进，见 5.9）**；**headless 契约（`subscribe` 增量有序 + flush 批量消费 + 可丢弃中间帧策略，容器只消费公开契约，见 5.10）**。验收已达成：三个变种仅靠 config+插槽实现（demo 场景切换按钮实证）；headless 契约在容器与纯 JS 消费两种形态下行为一致（demo headless 订阅面板实证）。**P3 review（2026-08-15）修复 5 处缺陷后验收口径成立**：subscribe 跟随活动房间（此前进房前订阅永久失效，demo headless 面板在标准流程收不到消息）；UI 房换房只清理旧 UI 房保留信令房（此前 reset 清空注册表）；UI 房 join 显式 `leaveOtherRooms: false`（此前默认 true 会踢掉并行信令房）；信令房 `pullHistory` 改为按序经 `signal-message` 透传（此前拉取被活动房守卫丢弃）；join 超时失效按房间令牌校验（store 增 `roomJoinToken`）。详见 TECH-DEBT D97 复核记录。
 - **P4 变种 Demo（H5-first）**（**已完成，2026-08-15**）：新 app `apps/demo-chatroom`（375px 移动视口居中壳、纯 chatroom 单包形态、登录复用 `uikit_demo_login_config`）——基础聊天室 + 语聊房 + 私域直播/带货 + 小班课 四个页面（均按「正常场景页面」标准：场景化导航/入口卡/完整交互闭环）+ **纯弹幕 headless 页**（无容器、自绘弹幕轨道 + 礼物飘屏 + 系统通知条，实证 headless 契约与 store 建模的 UI 解耦）。私域直播页同时实证 `signal-rooms` 双房链路（商品指令发信令房 → signal-message 回调 → 写 `live:product` 属性 → 商品卡全房间刷新）。验收：五个页面 dev server 冒烟通过、门禁全绿。
@@ -316,8 +316,8 @@ prop 全部可选——P2~P4 五变种 demo 页零回归；H5 页面在桌面浏
 ## 十、明确假设（实施时如与预期不符，以当时实际情况为准）
 
 1. **RTC/音频不在 v1 范围**：语聊房麦位 = IM 信令 + 房间状态（属性存储），音频推拉流由接入方选型（声网/TRTC）；聊天室包不依赖任何 RTC SDK。
-2. 聊天室包命名 `@easemob/uikit-chatroom`，核心包命名 `@easemob/uikit-core`，单群聊包改名 `@easemob/uikit-im`（P0.5 执行），容器组件名 `EmChatroomContainer`。
-3. 聊天室包独立版本号，与 `@easemob/uikit-im` 互不绑架（共享 core 用 range 约束）。
+2. 聊天室包命名 `@easemob-community/uikit-chatroom`，核心包命名 `@easemob-community/uikit-core`，单群聊包改名 `@easemob-community/uikit-im`（P0.5 执行），容器组件名 `EmChatroomContainer`。
+3. 聊天室包独立版本号，与 `@easemob-community/uikit-im` 互不绑架（共享 core 用 range 约束）。
 4. 变种首期交付三个内置 preset（语聊房 / 私域直播带货 / 小班课），更多场景靠插槽由用户自建。
 5. 实施时若 `easemob-websdk` 已升级，以当时的 `ChatRoomManager` 实际 API 为准做 adapter 映射（本文档 API 清单基于 5.0.0 核实）。
 6. **多房并行（见 5.9）**：SDK `joinChatRoom` 支持并行多房（`leaveOtherRooms: false`）；服务端多房并发上限、`leaveOtherRooms` 默认值、信令房历史消息可达性以实施时 SDK/服务端实际行为为准。

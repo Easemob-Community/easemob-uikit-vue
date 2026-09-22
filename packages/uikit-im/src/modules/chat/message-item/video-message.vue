@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
 import type { ComputedRef } from 'vue'
-import { useThemeStore } from '@easemob/uikit-core'
-import { INJECTION_KEY, MESSAGE_STATUS } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
-import { useToast } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { detectEnvironment, downloadFile } from '@easemob/uikit-core'
-import type { UiMessage, VideoMessageBody } from '@easemob/uikit-core'
+import { useThemeStore } from '@easemob-community/uikit-core'
+import { INJECTION_KEY, MESSAGE_STATUS } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
+import { useToast } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { detectEnvironment, downloadFile } from '@easemob-community/uikit-core'
+import type { UiMessage, VideoMessageBody } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
 
 export interface VideoMessageProps {

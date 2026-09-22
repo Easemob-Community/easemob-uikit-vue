@@ -1,4 +1,4 @@
-## @easemob/uikit-sdk-contract 1.2.0 (2026-09-03)
+## @easemob-community/uikit-sdk-contract 1.2.0 (2026-09-03)
 
 
 ### 新增
@@ -7,7 +7,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.1.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.1.0 (2026-09-02)
 
 
 ### 新增
@@ -16,7 +16,7 @@
 
 ---
 
-## @easemob/uikit-sdk-contract 1.0.0 (2026-09-02)
+## @easemob-community/uikit-sdk-contract 1.0.0 (2026-09-02)
 
 
 ### 新增

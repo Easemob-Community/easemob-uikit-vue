@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 
 export interface GroupAnnouncementBannerProps {

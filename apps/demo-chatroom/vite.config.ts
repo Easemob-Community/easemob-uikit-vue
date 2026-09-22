@@ -55,9 +55,9 @@ export default defineConfig({
   resolve: {
     // 源码直连模式：theme 子路径必须排在主 alias 之前
     alias: [
-      { find: '@easemob/uikit-core/theme', replacement: resolve(__dirname, '../../packages/uikit-core/src/theme/index.css') },
-      { find: '@easemob/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
-      { find: '@easemob/uikit-chatroom', replacement: resolve(__dirname, '../../packages/uikit-chatroom/src') },
+      { find: '@easemob-community/uikit-core/theme', replacement: resolve(__dirname, '../../packages/uikit-core/src/theme/index.css') },
+      { find: '@easemob-community/uikit-core', replacement: resolve(__dirname, '../../packages/uikit-core/src') },
+      { find: '@easemob-community/uikit-chatroom', replacement: resolve(__dirname, '../../packages/uikit-chatroom/src') },
     ],
   },
 })

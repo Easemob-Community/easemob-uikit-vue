@@ -1,6 +1,6 @@
 /**
  * 中立 SDK 契约常量。
- * 与 `@easemob/uikit-core` 的 constants 中 SDK-wire 相关枚举同源（core 从本包 re-export 保持向后兼容）。
+ * 与 `@easemob-community/uikit-core` 的 constants 中 SDK-wire 相关枚举同源（core 从本包 re-export 保持向后兼容）。
  * 仅保留「SDK 语义中立」的枚举字符串；UIKit 组件专属常量（MESSAGE_EXT_KEY / INJECTION_KEY / GROUP_INFO_LIMIT 等）
  * 仍留在 core，不进入本包。
  */

@@ -1,6 +1,6 @@
 import type { EasemobChat } from 'easemob-websdk-4'
-import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup } from '@easemob/uikit-sdk-contract'
-import { GROUP_MEMBER_ROLE, createLogger } from '@easemob/uikit-sdk-contract'
+import type { CreateGroupParams, GroupMemberPage, GroupPage, GroupRepository, UiGroup } from '@easemob-community/uikit-sdk-contract'
+import { GROUP_MEMBER_ROLE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
 import type { GroupStoreLike } from '../event/types'
 import {

@@ -18,9 +18,9 @@ import {
   useChatroomAttributes,
   useChatroomMember,
   useChatroomMessage,
-} from '@easemob/uikit-chatroom'
-import type { SignalMessagePayload, SignalStatusPayload } from '@easemob/uikit-chatroom'
-import { t, useToast } from '@easemob/uikit-core'
+} from '@easemob-community/uikit-chatroom'
+import type { SignalMessagePayload, SignalStatusPayload } from '@easemob-community/uikit-chatroom'
+import { t, useToast } from '@easemob-community/uikit-core'
 import DemoSceneHeader from '../components/demo-scene-header.vue'
 import { LIVE_ROLES, useDemoRole } from '../demo-role'
 import type { DemoPlayerRole } from '../demo-role'

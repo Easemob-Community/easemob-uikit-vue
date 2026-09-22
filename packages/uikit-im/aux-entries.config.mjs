@@ -5,7 +5,7 @@
  *          - exclude（内部实现细节） + include（composables 之外的合法登记）。
  */
 export default {
-  pkgName: '@easemob/uikit-im',
+  pkgName: '@easemob-community/uikit-im',
   resolverName: 'EasemobUIKitResolver',
   importsName: 'EasemobUIKitImports',
   prefix: 'Em',

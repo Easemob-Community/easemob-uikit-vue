@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // 依赖链经 adapter/conversation-adapter 引入 4.x SDK 入口（模块加载时访问 `self`），需在 jsdom 下运行
-import type { UiConversation, UiMessage } from '@easemob/uikit-sdk-contract'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob/uikit-sdk-contract'
+import type { UiConversation, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE } from '@easemob-community/uikit-sdk-contract'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { notifyContactEvent, notifyOnNewMessage } from '../notification-engine'
 import { setEventHandlerDeps } from '../event/deps'

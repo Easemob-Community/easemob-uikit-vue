@@ -8,7 +8,7 @@
 
 ---
 
-## 一、契约类型骨架（新建 `@easemob/uikit-sdk-contract`）
+## 一、契约类型骨架（新建 `@easemob-community/uikit-sdk-contract`）
 
 > 原则：**中立类型以 5.x 字段命名为基准**（保 UI 零改动）；`SdkMessage`/`MessageBody` 为「本地复刻」，字段名沿用 5.x；4.x adapter 负责把 4.x `body` 判别联合映射到这套命名。凡标注「迁移现有 core `sdk/types.ts`」的类型，可从现文件原样搬入。
 
@@ -273,7 +273,7 @@ export interface SdkAdapter {
 
 | 文件 | 动作 |
 | --- | --- |
-| `package.json`（依赖 `easemob-websdk@^5.0.0` + `@easemob/uikit-sdk-contract`）/ `tsconfig.json` / `vite.config.ts` | 【新建】 |
+| `package.json`（依赖 `easemob-websdk@^5.0.0` + `@easemob-community/uikit-sdk-contract`）/ `tsconfig.json` / `vite.config.ts` | 【新建】 |
 | `src/index.ts` | 【新建】导出 `Websdk5Adapter` |
 | `src/adapter.ts` | 【新建】`Websdk5Adapter implements SdkAdapter`：`init`(ChatClient.init) / `login` / `logout` / `subscribe`(addEventHandler → 翻译 → 回调) |
 | `src/client.ts` | 【迁移】core `sdk/client.ts` 的 `ChatClient` 初始化/生命周期逻辑 |
@@ -300,7 +300,7 @@ export interface SdkAdapter {
 | `composables/types.ts` | 【修改】`UserInfo` → contract；`UIKitDataSource` 迁移为 repository 接口（规划为最新形式，见计划 2.5） | |
 | `composables/use-user-info.ts` / `use-own-user-info.ts` | 【修改】`UserInfoAttribute` → contract | |
 | `index.ts` | 【修改】re-export 改经 contract；移除 SDK 专属符号 | |
-| `package.json` | 【修改】删 `easemob-websdk` 依赖；加 `@easemob/uikit-sdk-contract` | |
+| `package.json` | 【修改】删 `easemob-websdk` 依赖；加 `@easemob-community/uikit-sdk-contract` | |
 | `vite.config.ts` | 【修改】删 `getSdkVersion`/`external: easemob-websdk`/`globals: Easemob` | |
 
 ### D. im 剥干净（`packages/uikit-im/`，零 SDK 直接依赖）
@@ -315,13 +315,13 @@ export interface SdkAdapter {
 | `sdk/notification-engine.ts` | 【修改】`Message` → contract `SdkMessage` | |
 | `store/message.ts` / `store/group.ts` | 【修改】`Message`/`UserInfo` → contract | |
 | `composables/use-chat.ts` / `use-message-actions.ts` / `use-user-info.ts` / `use-blocklist.ts` | 【修改】`Message`/`UserInfoAttribute` → contract | |
-| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」）⚠️ 快捷方式**禁止在主入口顶层静态 import `Websdk5Adapter`**（会破坏 4.x 下游的摇树隔离），默认构造逻辑放子路径入口（如 `@easemob/uikit-im/websdk5`），见主计划决策 22 | 兼容存量业务方，非 breaking |
+| `containers/uikit-provider/uikit-provider.vue` | 【修改】`UserInfo` → contract；新增 `adapter` prop；**保留 `appKey`/`sdkConfig` 旧 props 作 websdk5 快捷方式**（未传 adapter 时内部 `new Websdk5Adapter()`，传了以 adapter 为准并告警，见主计划「2.9 Provider props 兼容策略」）⚠️ 快捷方式**禁止在主入口顶层静态 import `Websdk5Adapter`**（会破坏 4.x 下游的摇树隔离），默认构造逻辑放子路径入口（如 `@easemob-community/uikit-im/websdk5`），见主计划决策 22 | 兼容存量业务方，非 breaking |
 | `components/user-card/user-card-modal.vue` | 【修改】`UserInfoAttribute` → contract | |
 | `modules/chat/message-item/combine-message-modal.vue` | 【修改】`Message` → contract | |
 | `modules/chat/message-list/message-list.vue` | 【修改】`GroupMessageReadUsersResult` → contract（中立） | |
 | `modules/contact/contact-detail.vue` | 【修改】`UserInfo`/`UserInfoAttribute` → contract | |
 | `utils/stream-message.ts` | 【修改】`StreamMessageStatus` → contract 中立 | |
-| `package.json` | 【修改】删 `easemob-websdk`；加 `@easemob/uikit-sdk-contract`（dep）+ `@easemob/uikit-sdk-websdk5`（peer/optional） | |
+| `package.json` | 【修改】删 `easemob-websdk`；加 `@easemob-community/uikit-sdk-contract`（dep）+ `@easemob-community/uikit-sdk-websdk5`（peer/optional） | |
 | `vite.config.ts` | 【修改】删 external/globals `easemob-websdk` 与 `getSdkVersion` | |
 
 ### E. 构建/依赖联动
@@ -349,8 +349,8 @@ export interface SdkAdapter {
 
 ## 四、验证门禁（Phase 1 完成标准）
 
-- `pnpm -F @easemob/uikit-im exec vue-tsc --noEmit`（0 错误）
-- `pnpm -F @easemob/uikit-im build`
+- `pnpm -F @easemob-community/uikit-im exec vue-tsc --noEmit`（0 错误）
+- `pnpm -F @easemob-community/uikit-im build`
 - `cd apps/demo && pnpm exec vue-tsc --noEmit`
 - **5.x 全量回归「行为不变」**（对照 Phase 0 记录的基线，逐项手测：登录/会话/收发各类型消息/联系人/群/回执/撤回/编辑/翻译/置顶/搜索）
 - 公开 API 无 breaking（组件 props/emits/composable 签名、`sdk/index.ts` 的 re-export 面不变）

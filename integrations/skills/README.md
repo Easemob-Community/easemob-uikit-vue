@@ -9,10 +9,10 @@
 
 | 技能 | 覆盖包 | 入口 |
 | --- | --- | --- |
-| `easemob-uikit-integration` | `@easemob/uikit-im`（单群聊 IM） | `SKILL.md` |
-| `easemob-uikit-chatroom-integration` | `@easemob/uikit-chatroom`（聊天室 / 直播 / 语聊 / 小班课） | `chatroom/SKILL.md` |
+| `easemob-uikit-integration` | `@easemob-community/uikit-im`（单群聊 IM） | `SKILL.md` |
+| `easemob-uikit-chatroom-integration` | `@easemob-community/uikit-chatroom`（聊天室 / 直播 / 语聊 / 小班课） | `chatroom/SKILL.md` |
 
-两者共用同一套基座（`@easemob/uikit-core`）与工具链，按用户要接的场景选择加载。
+两者共用同一套基座（`@easemob-community/uikit-core`）与工具链，按用户要接的场景选择加载。
 
 ## 目录结构
 

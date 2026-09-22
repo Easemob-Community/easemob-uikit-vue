@@ -4,7 +4,7 @@
  * 白名单 = composables 桶文件派生的运行时导出 - exclude（内部实现细节） + include。
  */
 export default {
-  pkgName: '@easemob/uikit-chatroom',
+  pkgName: '@easemob-community/uikit-chatroom',
   resolverName: 'EasemobUIKitChatroomResolver',
   importsName: 'EasemobUIKitChatroomImports',
   prefix: 'Em',

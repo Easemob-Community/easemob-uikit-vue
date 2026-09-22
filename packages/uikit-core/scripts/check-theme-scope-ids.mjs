@@ -11,7 +11,7 @@
 // 用法：node check-theme-scope-ids.mjs <pkgRoot>
 //   <pkgRoot> 待校验包根目录（如 uikit-im 传 '.'，core 自身传 '.'）。
 //   CSS 取 <pkgRoot>/dist/theme/index.css；JS 取本包 package.json module 指向的
-//   dist JS，外加从 <pkgRoot> 解析到的 @easemob/uikit-core 的 dist JS（若可解析）。
+//   dist JS，外加从 <pkgRoot> 解析到的 @easemob-community/uikit-core 的 dist JS（若可解析）。
 
 import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -49,7 +49,7 @@ for (const match of css.matchAll(/\.([a-zA-Z][a-zA-Z0-9_-]*)\[data-v-([0-9a-f]{8
 const jsSources = [readDistJs(join(pkgRoot, 'package.json'))]
 try {
   // 注意：经 exports 解析包根（package.json 子路径未被 exports 暴露，不能直接 resolve）
-  let dir = dirname(require.resolve('@easemob/uikit-core'))
+  let dir = dirname(require.resolve('@easemob-community/uikit-core'))
   while (dir !== dirname(dir)) {
     if (existsSync(join(dir, 'package.json'))) {
       const coreJs = readDistJs(join(dir, 'package.json'))

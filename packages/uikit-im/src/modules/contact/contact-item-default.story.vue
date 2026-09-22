@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import UIKitProvider from '../../containers/uikit-provider/uikit-provider.vue'
-import type { UiContact } from '@easemob/uikit-core'
-import { useUserInfoStore } from '@easemob/uikit-core'
+import type { UiContact } from '@easemob-community/uikit-core'
+import { useUserInfoStore } from '@easemob-community/uikit-core'
 import ContactItemDefault from './contact-item-default.vue'
 
 const logs = ref<string[]>([])

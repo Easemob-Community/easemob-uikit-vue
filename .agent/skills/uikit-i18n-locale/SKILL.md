@@ -12,7 +12,7 @@
 
 ## 目标
 
-在 `easemob-uikit-vue`（核心包 `@easemob/uikit-im`）里加文案 / 改多语言时，
+在 `easemob-uikit-vue`（核心包 `@easemob-community/uikit-im`）里加文案 / 改多语言时，
 统一走 **`useLocale().t('dotted.key')`** 这一条路，避免三类翻车：
 
 1. 组件里硬编码中文/英文字面量，英文环境漏翻；

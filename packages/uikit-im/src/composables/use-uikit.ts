@@ -8,11 +8,11 @@ import type {
   SdkMessageDomain,
   SdkPresenceDomain,
   SdkUserInfoDomain,
-} from '@easemob/uikit-sdk-contract'
-import type { CoreConnectionCallbacks, CoreUIKitInitConfig, H5AdaptationConfig, NoticeConfig, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob/uikit-core'
+} from '@easemob-community/uikit-sdk-contract'
+import type { CoreConnectionCallbacks, CoreUIKitInitConfig, H5AdaptationConfig, NoticeConfig, UIKitDataSource, UIKitFeatures, useH5Adaptation, useThemeStore } from '@easemob-community/uikit-core'
 import {
   useCoreUIKitProvider,
-} from '@easemob/uikit-core'
+} from '@easemob-community/uikit-core'
 import { useMessageStore } from '../store/message'
 import { useConversationStore } from '../store/conversation'
 import { useContactStore } from '../store/contact'
@@ -22,12 +22,12 @@ import { clearAllDrafts } from './use-conversation'
 import { resetMultiSelectState } from './use-message-actions'
 import { useInvitePersistenceInternal } from './use-invite-persistence'
 
-// 构建期注入：@easemob/uikit-im 包版本（vite define，见 vite.config.ts）
+// 构建期注入：@easemob-community/uikit-im 包版本（vite define，见 vite.config.ts）
 declare const __EASEMOB_UIKIT_VERSION__: string
 
-export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob/uikit-core'
-export type { SdkCapabilities, SdkCapabilityFlags, SdkRepositoryOverrides, ContactPage, GroupPage } from '@easemob/uikit-core'
-export type { H5AdaptationConfig } from '@easemob/uikit-core'
+export type { UIKitDataSource, UIKitFeatures, ContactFetchMode } from '@easemob-community/uikit-core'
+export type { SdkCapabilities, SdkCapabilityFlags, SdkRepositoryOverrides, ContactPage, GroupPage } from '@easemob-community/uikit-core'
+export type { H5AdaptationConfig } from '@easemob-community/uikit-core'
 
 /** UIKit 登录参数：支持 accessToken 或密码登录 */
 export interface UIKitLoginParams {
@@ -103,7 +103,7 @@ function resolveSdkConfig(config: CoreUIKitInitConfig): CoreUIKitInitConfig {
  * 在 <UIKitProvider> 组件的 setup 中调用。
  *
  * 架构（D122）：客户端生命周期 / core stores / presence & userInfo 域由
- * `@easemob/uikit-core` 的 useCoreUIKitProvider 承接；SDK 访问统一走中立
+ * `@easemob-community/uikit-core` 的 useCoreUIKitProvider 承接；SDK 访问统一走中立
  * `SdkAdapter` 接口（init/login/logout/subscribe/domains），场景 stores
  * （message/conversation/contact/group）经 adapterConfig.stores 注入 adapter，
  * 事件层直写 Pinia store（行为与旧 registerEventHandlers 直连一致）。
@@ -117,7 +117,7 @@ export function useUIKitProvider(
   options: {
     /**
      * 注入的中立 SDK 适配器（注入模式：业务全权管理其生命周期，决策 18）。
-     * 未传时走 core 注册表默认适配器（由 `@easemob/uikit-im/websdk5` 子路径入口
+     * 未传时走 core 注册表默认适配器（由 `@easemob-community/uikit-im/websdk5` 子路径入口
      * import 时自注册，决策 22；未注册会在 Provider 装配时抛出明确错误）。
      */
     adapter?: SdkAdapter
@@ -151,7 +151,7 @@ export function useUIKitProvider(
 
   // core provider：承接 adapter 生命周期、core stores/domains、features/dataSource/noticeConfig/h5/theme。
   // autoInit 一律置 false，立即初始化改在下方显式触发。
-  // 默认适配器由 core 注册表解析（子路径入口 @easemob/uikit-im/websdk5 自注册，决策 22）。
+  // 默认适配器由 core 注册表解析（子路径入口 @easemob-community/uikit-im/websdk5 自注册，决策 22）。
   // clientName/clientVersion：场景包版本注入，客户端版本日志输出 SDK + UIKit-IM + Core 三版本。
   // resolveSdkConfig：IM 默认 enableSyncData 注入下沉到 core setupAdapter，
   // auto-init 与 useClient().init() 延迟初始化路径统一生效。

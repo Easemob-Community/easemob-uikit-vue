@@ -5,7 +5,7 @@
  * 在 IM Demo 登录过的用户进入本应用自动带出配置。
  */
 import { ref } from 'vue'
-import { useClient } from '@easemob/uikit-core'
+import { useClient } from '@easemob-community/uikit-core'
 
 const emit = defineEmits<{
   (e: 'login-success'): void
@@ -110,7 +110,7 @@ async function handleLogin() {
         聊天室变种 Demo 登录
       </h1>
       <p class="login-subtitle">
-        纯 @easemob/uikit-chatroom 单包接入（不依赖 IM 包）
+        纯 @easemob-community/uikit-chatroom 单包接入（不依赖 IM 包）
       </p>
 
       <div class="login-form">

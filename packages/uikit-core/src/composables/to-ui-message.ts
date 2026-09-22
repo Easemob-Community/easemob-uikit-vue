@@ -1,6 +1,6 @@
 import { markRaw } from 'vue'
-import { MESSAGE_STATUS, isCombineBody, normalizeUserId } from '@easemob/uikit-sdk-contract'
-import type { CombineMessageBody, SdkMessage, UiMessage } from '@easemob/uikit-sdk-contract'
+import { MESSAGE_STATUS, isCombineBody, normalizeUserId } from '@easemob-community/uikit-sdk-contract'
+import type { CombineMessageBody, SdkMessage, UiMessage } from '@easemob-community/uikit-sdk-contract'
 import { createLogger } from '../utils/logger'
 
 const logger = createLogger('UIKit:ToUiMessage')

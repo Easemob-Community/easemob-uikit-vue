@@ -41,7 +41,7 @@
 ## 权限原语
 
 ```ts
-import { useChatroomMember } from '@easemob/uikit-chatroom'
+import { useChatroomMember } from '@easemob-community/uikit-chatroom'
 
 const { canManageMember, canManage, currentRole } = useChatroomMember()
 // canManageMember(target): 当前用户能否管理目标成员

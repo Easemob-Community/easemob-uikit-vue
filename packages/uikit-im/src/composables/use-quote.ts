@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob/uikit-core'
-import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage, VoiceMessageBody } from '@easemob/uikit-core'
+import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob-community/uikit-core'
+import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage, VoiceMessageBody } from '@easemob-community/uikit-core'
 import { chineseMessagePreviewLabels } from '../utils/resolve-last-message-text'
 
 /** 语音时长格式化：12'28''（分'秒''），与设计师引用样式稿一致 */

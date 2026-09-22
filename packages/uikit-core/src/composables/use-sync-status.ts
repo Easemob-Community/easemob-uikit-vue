@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import type { SyncStatusPayload } from '@easemob/uikit-sdk-contract'
+import type { SyncStatusPayload } from '@easemob-community/uikit-sdk-contract'
 import { createLogger } from '../utils/logger'
 
 const syncLog = createLogger('UIKit:SyncStatus')

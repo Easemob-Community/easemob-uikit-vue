@@ -7,9 +7,9 @@
  *
  * 多包约定（P2 落地，对应 docs/CHATROOM-UIKIT-DESIGN.md「复审修正 6」）：
  * - 版本段标题两种格式并存：
- *   - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 `@easemob/uikit-im` 的历史段（不动）；
+ *   - 裸格式 `## x.y.z (yyyy-mm-dd)`：视为 `@easemob-community/uikit-im` 的历史段（不动）；
  *   - 带包名前缀 `## @easemob/<pkg> x.y.z (yyyy-mm-dd)`：各包新段统一用前缀格式
- *     （`@easemob/uikit-core` / `@easemob/uikit-chatroom`；后续 uikit-im 新段也建议带前缀）。
+ *     （`@easemob-community/uikit-core` / `@easemob-community/uikit-chatroom`；后续 uikit-im 新段也建议带前缀）。
  * - 各包版本独立推进，「最新段」= 该包在文件中首个匹配段。
  *
  * 校验点：
@@ -38,14 +38,14 @@ const fail = msg => failures.push(msg) || console.error(`  ✗ ${msg}`)
 
 // ---- 已发布包登记表：包名 → package.json 相对路径 ----
 // 裸格式版本段（## x.y.z）归入 BARE_SECTION_PKG（uikit-im 历史段）。
-const BARE_SECTION_PKG = '@easemob/uikit-im'
+const BARE_SECTION_PKG = '@easemob-community/uikit-im'
 const PACKAGES = {
-  '@easemob/uikit-im': 'packages/uikit-im/package.json',
-  '@easemob/uikit-core': 'packages/uikit-core/package.json',
-  '@easemob/uikit-chatroom': 'packages/uikit-chatroom/package.json',
-  '@easemob/uikit-sdk-contract': 'packages/uikit-sdk-contract/package.json',
-  '@easemob/uikit-sdk-websdk5': 'packages/uikit-sdk-websdk5/package.json',
-  '@easemob/uikit-sdk-webim4': 'packages/uikit-sdk-webim4/package.json',
+  '@easemob-community/uikit-im': 'packages/uikit-im/package.json',
+  '@easemob-community/uikit-core': 'packages/uikit-core/package.json',
+  '@easemob-community/uikit-chatroom': 'packages/uikit-chatroom/package.json',
+  '@easemob-community/uikit-sdk-contract': 'packages/uikit-sdk-contract/package.json',
+  '@easemob-community/uikit-sdk-websdk5': 'packages/uikit-sdk-websdk5/package.json',
+  '@easemob-community/uikit-sdk-webim4': 'packages/uikit-sdk-webim4/package.json',
 }
 
 // ---- 解析根 CHANGELOG 全部版本段并按包归类（保持文件出现顺序） ----

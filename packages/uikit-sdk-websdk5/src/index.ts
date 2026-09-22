@@ -1,4 +1,4 @@
-// @easemob/uikit-sdk-websdk5 —— easemob-websdk@5.x 适配器
+// @easemob-community/uikit-sdk-websdk5 —— easemob-websdk@5.x 适配器
 // 职责：SDK5 的 client / domain / event / adapter 实现（唯一 import easemob-websdk 的地方）。
 
 export * from './adapter'

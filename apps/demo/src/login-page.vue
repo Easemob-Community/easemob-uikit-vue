@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { EmIcon, useClient } from '@easemob/uikit-im'
+import { EmIcon, useClient } from '@easemob-community/uikit-im'
 import { demoPresetUsers, demoSdkVersion, sdkIsHttpDNS, setDemoSdkVersion, setSdkIsHttpDNS } from './composables/use-demo-settings'
 import type { DemoPresetUser, DemoSdkVersion } from './composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, isWebim4Mode } from './composables/use-demo-sdk-adapter'

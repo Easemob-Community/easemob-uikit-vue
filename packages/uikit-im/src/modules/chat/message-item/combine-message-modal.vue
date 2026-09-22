@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { SdkMessage } from '@easemob/uikit-sdk-contract'
-import { formatSdkError } from '@easemob/uikit-core'
-import { useLocale } from '@easemob/uikit-core'
+import type { SdkMessage } from '@easemob-community/uikit-sdk-contract'
+import { formatSdkError } from '@easemob-community/uikit-core'
+import { useLocale } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../../composables/use-uikit'
-import { toUiMessage } from '@easemob/uikit-core'
-import { EmIcon as Icon } from '@easemob/uikit-core'
-import { EmPopup as Popup } from '@easemob/uikit-core'
-import { EmEmpty as Empty } from '@easemob/uikit-core'
-import type { CombineMessageBody, UiMessage } from '@easemob/uikit-core'
+import { toUiMessage } from '@easemob-community/uikit-core'
+import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import { EmPopup as Popup } from '@easemob-community/uikit-core'
+import { EmEmpty as Empty } from '@easemob-community/uikit-core'
+import type { CombineMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import { useMessageStore } from '../../../store/message'
 import CombineMessageModalItem from './combine-message-modal-item.vue'
-import { createLogger } from '@easemob/uikit-core'
+import { createLogger } from '@easemob-community/uikit-core'
 
 const logger = createLogger('UIKit:CombineMessageModal')
 

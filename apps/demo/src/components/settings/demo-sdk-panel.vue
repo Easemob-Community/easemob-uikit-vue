@@ -9,7 +9,7 @@
  * （SDK 断开 + 场景 stores / 模块级单例重置）。登出成功后 emit('logout') 由
  * demo-page → app.vue 处理，清空本地登录缓存并回到登录页。
  */
-import { useClient, useUIKit } from '@easemob/uikit-im'
+import { useClient, useUIKit } from '@easemob-community/uikit-im'
 import { demoPresetUsers, demoSdkVersion, sdkIsHttpDNS, setDemoSdkVersion, setSdkIsHttpDNS, useDemoSettings } from '../../composables/use-demo-settings'
 import type { DemoSdkVersion } from '../../composables/use-demo-settings'
 import { buildDemoSdkInitConfig, demoLogin, demoLogout, isWebim4Mode } from '../../composables/use-demo-sdk-adapter'
