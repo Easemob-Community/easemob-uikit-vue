@@ -1244,6 +1244,9 @@ async function doRemoveAdmin(member: UiGroupMember) {
       <!-- 主区 + 抽屉位：push 抽屉模式下为横向 flex，抽屉占位挤压主区 -->
       <div class="chat__body" :class="{ 'chat__body--drawer-push': drawerMode === 'push' }">
         <div class="chat__main">
+          <!-- 聊天内容区（header → 消息列表）：相对定位容器，#watermark 水印覆盖层挂在此区域内，
+               覆盖除输入框 / 多选操作栏外的聊天主区 -->
+          <div class="chat__content">
           <!-- Header -->
           <div
             v-if="showHeader"
@@ -1363,6 +1366,13 @@ async function doRemoveAdmin(member: UiGroupMember) {
               <slot :name="name" v-bind="slotProps" />
             </template>
           </MessageList>
+
+          <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满聊天内容区——header/通知条/消息列表，
+               不含输入框与多选操作栏，不响应交互） -->
+          <div v-if="$slots.watermark" class="chat__watermark">
+            <slot name="watermark" :conversation="currentConversation" />
+          </div>
+          </div>
 
           <!-- 多选模式底部操作栏（#multi-select-bar：完全接管多选操作栏渲染） -->
           <slot
@@ -1591,11 +1601,6 @@ async function doRemoveAdmin(member: UiGroupMember) {
         />
       </slot>
     </template>
-
-    <!-- 水印覆盖层（#watermark：用户注入水印内容，铺满整个聊天区，不响应交互） -->
-    <div v-if="$slots.watermark" class="chat__watermark">
-      <slot name="watermark" :conversation="currentConversation" />
-    </div>
   </div>
 </template>
 
@@ -1640,7 +1645,17 @@ async function doRemoveAdmin(member: UiGroupMember) {
   overflow: hidden;
 }
 
-/* 水印覆盖层：铺满聊天区，穿透事件；层级低于抽屉(200)/弹窗 */
+/* 聊天内容区：header / 通知条 / 横幅 / 消息列表的包裹容器，相对定位供 #watermark 水印覆盖层挂靠，
+   使水印只覆盖内容区而不盖住输入框 / 多选操作栏 */
+.chat__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 水印覆盖层：铺满聊天内容区（不含输入框 / 多选操作栏），穿透事件；层级低于抽屉(200)/弹窗 */
 .chat__watermark {
   position: absolute;
   inset: 0;

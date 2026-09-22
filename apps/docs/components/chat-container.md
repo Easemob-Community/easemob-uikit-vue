@@ -65,7 +65,7 @@ import { EmUIKitProvider } from '@easemob/uikit-im'
 - `forward`：接管转发弹窗渲染，作用域提供 `{ show, messages, mode, open, close }`；`open(messages, mode?)` 需传入待转发的消息数组（单条默认逐条转发，多条默认合并转发）
 - `message-search`：接管消息搜索弹窗渲染，作用域提供 `{ show, config, locate, open, close }`
 - `multi-select-bar`：接管多选操作栏渲染，作用域提供 `{ visible, selectedMessages, totalMessages, selectAll, deselectAll, forwardOneByOne, forwardCombine, delete, close }`
-- `watermark`：水印覆盖层，铺满整个聊天区（含空状态），`pointer-events: none` 不响应交互，作用域提供 `{ conversation }`；内容由用户注入（文字平铺 / canvas / 图片均可）
+- `watermark`：水印覆盖层，铺满聊天内容区（header / 通知条 / 消息列表，不含输入框与多选操作栏；无会话空状态不渲染），`pointer-events: none` 不响应交互，作用域提供 `{ conversation }`；内容由用户注入（文字平铺 / canvas / 图片均可）
 
 水印注入示例（UIKit 只提供铺满、穿透的覆盖层壳，平铺与样式由业务实现）：
 

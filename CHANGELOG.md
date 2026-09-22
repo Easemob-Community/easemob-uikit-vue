@@ -1,5 +1,11 @@
 # Changelog
 
+## @easemob/uikit-im 3.7.10 (2026-09-22)
+
+### 修复
+
+- **`EmChatContainer` `#watermark` 水印覆盖层收窄到聊天内容区**：覆盖层由挂在 `.chat` 根级（`inset: 0` 铺满整个聊天区、连同输入框一起覆盖）改为挂在新划出的 `.chat__content` 内容区容器（header / 通知条 / 置顶与群公告横幅 / 消息列表），输入框与多选操作栏区域不再被水印覆盖；插槽名与 `:conversation` 作用域不变。行为变化：无会话空状态（`.chat__empty` 分支）下不再渲染水印。
+
 ## @easemob/uikit-sdk-websdk5 1.3.4 (2026-09-21)
 
 ### 修复
