@@ -60,7 +60,7 @@ theme?: {
 ### 1.4 功能开关 enable 类开关（withDefaults 默认值）
 
 - `enableContact: true` / `enableBlocklist: true` / `enablePresence: true` — 默认开启（3.x 起；presence 订阅
-  有额外查询/订阅请求，私有化或低频场景显式 `:enable-presence="false"`）
+  有额外查询/订阅请求，低频场景显式 `:enable-presence="false"`）
   - presence 全链路默认开启：`usePresence` composable 层的开关硬门仍保留（显式关闭时 subscribe/fetch/publish/watch
     全 no-op）；adapter 独立运行（websdk5/webim4 `getDefaultFeatures()`）的 `enablePresence` 默认同步为 `true`。
 - `enableGroup: true` / `enableUserInfo: true` / `enableUserInfoSubscription: true` — 默认开启

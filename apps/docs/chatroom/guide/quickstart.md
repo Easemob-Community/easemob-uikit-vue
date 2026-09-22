@@ -6,12 +6,22 @@
 ## 三步接入
 
 ```bash
-pnpm add @easemob-community/uikit-chatroom pinia vue
+pnpm add @easemob-community/uikit-chatroom @easemob-community/uikit-sdk-websdk5 pinia vue
 ```
+
+> 聊天室包不内置任何 SDK 适配器，需显式安装适配器包（5.x 公开版用 `@easemob-community/uikit-sdk-websdk5`）
+> 并在初始化前注册为默认适配器。**主题样式同样需要单独引入**（CSS 为独立产物，
+> 子路径 `@easemob-community/uikit-chatroom/theme`）。
 
 ```ts
 // App.vue / main.ts —— 初始化（自带 pinia 注入）
 import { useChatroomProvider } from '@easemob-community/uikit-chatroom'
+import { registerDefaultSdkAdapterFactory } from '@easemob-community/uikit-core'
+import { Websdk5Adapter } from '@easemob-community/uikit-sdk-websdk5'
+import '@easemob-community/uikit-chatroom/theme' // 引入主题样式（必需，JS 不自动注入样式）
+
+// 注册 websdk5 为默认 SDK 适配器（必需，否则 Provider 无可用适配器）
+registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())
 
 useChatroomProvider({ appKey: 'orgName#appName' })
 ```
@@ -110,7 +120,8 @@ PC / Electron 开播端、小班课双端等场景，用 `layout: 'split'` 三�
 
 ## headless 接入（无 UI）
 
-自绘弹幕轨道 / 礼物飘屏时，不渲染容器，直接用组合式函数：
+自绘弹幕轨道 / 礼物飘屏时，不渲染容器，直接用组合式函数（前置条件同上：
+已完成适配器注册与 `useChatroomProvider` 初始化）：
 
 ```ts
 import { useChatroom, useChatroomMessage } from '@easemob-community/uikit-chatroom'

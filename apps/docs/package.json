@@ -4,17 +4,15 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm split-changelog && pnpm sync:vendor && vitepress dev",
-    "build": "pnpm split-changelog && pnpm sync:vendor && vitepress build",
+    "dev": "pnpm split-changelog && vitepress dev",
+    "build": "pnpm split-changelog && vitepress build",
     "preview": "vitepress preview",
-    "sync:vendor": "node scripts/sync-vendor.mjs",
     "split-changelog": "node scripts/split-changelog.mjs",
     "gen:api": "node scripts/gen-api-docs.mjs"
   },
   "dependencies": {
     "@easemob-community/uikit-chatroom": "workspace:*",
     "@easemob-community/uikit-im": "workspace:*",
-    "@vue/repl": "^4.7.2",
     "easemob-websdk": "^5.0.0",
     "pinia": "^2.3.1",
     "pinyin-pro": "^3.29.0",

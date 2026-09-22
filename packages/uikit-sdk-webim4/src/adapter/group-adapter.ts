@@ -21,7 +21,7 @@ type SdkGroupSource =
 export function toUiGroup(source: SdkGroupSource): UiGroup {
   // GroupDetailInfo（getGroupInfo 返回，下划线风格字段）：
   // 以 `id`（另两种形状分别为 groupid/groupId，均无 `id`）或详情专属字段判别，
-  // 避免私有化服务裁剪字段时静默落到 BaseGroupInfo 分支产出空 groupName
+  // 避免 4.x 服务裁剪字段时静默落到 BaseGroupInfo 分支产出空 groupName
   if ('affiliations_count' in source || 'maxusers' in source || 'id' in source) {
     const detail = source as EasemobChat.GroupDetailInfo
     return {

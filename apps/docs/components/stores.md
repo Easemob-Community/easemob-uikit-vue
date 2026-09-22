@@ -146,4 +146,4 @@ presenceStore.updateBatch(mockPresence)
 ## 关联
 
 - 全局配置：见 [Provider 全局配置](./provider)
-- 在线演练场 mock 注入模式：见各组件页「在线代码演练场」的 `mock.ts` 模板
+- mock 免登录注入模式：`EmUIKitProvider(:auto-init="false")` + store 注入渲染（参考 [消息列表](./message-list) 的单条气泡能力演练场与 `packages/uikit-im/src/**/*.story.vue`）

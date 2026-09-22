@@ -6,7 +6,6 @@ import UIKit from '@easemob-community/uikit-im'
 import IconGallery from '../components/IconGallery.vue'
 import ChangelogTabs from '../components/ChangelogTabs.vue'
 import DocsConfigPanel from '../components/DocsConfigPanel.vue'
-import VuePlayground from '../components/VuePlayground.vue'
 import DemoBlock from './DemoBlock.vue'
 import Layout from './Layout.vue'
 import './style.css'
@@ -27,7 +26,5 @@ export default {
     // 声明式配置面板：demo 内以 items 声明 + model 对象驱动开关，
     // 复刻 demo 应用设置面板交互（按钮组 / 复选框 / 数字输入 + 问号说明）
     app.component('DocsConfigPanel', DocsConfigPanel)
-    // 可编辑代码实时预览演练场（@vue/repl 封装，本地 vendor 静态托管）
-    app.component('VuePlayground', VuePlayground)
   },
 } satisfies Theme

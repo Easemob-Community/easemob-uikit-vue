@@ -79,7 +79,7 @@
 - Chat 抽屉三种接管能力设计执行计划（整块 `#drawer` + 部分 `drawer-*` + 自绘壳 `EmChatDrawer`）：[CHAT-DRAWER-EXTENSION-PLAN.md](docs/CHAT-DRAWER-EXTENSION-PLAN.md)（对应 TECH-DEBT D119）
 - uikit-im 组件插槽/Props 可控性反向评估（会话列表弹窗、名片弹窗、消息操作菜单等缺口矩阵）：[UIIM-CAPABILITY-REVIEW.md](docs/UIIM-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D120）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：[CONSUMER-VALIDATION-CHECKLIST.md](docs/CONSUMER-VALIDATION-CHECKLIST.md)
-- SDK 适配层 + 数据入口层抽象设计执行计划（双 adapter `websdk5`/`webim4` + 中立契约 `@easemob-community/uikit-sdk-contract` + repository 数据入口 + 能力映射/语义归一化，一套 UI 产物切 SDK 不重来、数据来源可插拔，对应 4.x 私有化低成本切换 + Electron 持久化）：[SDK-ADAPTER-ABSTRACTION-PLAN.md](docs/SDK-ADAPTER-ABSTRACTION-PLAN.md)（对应 TECH-DEBT D122，联动 D85）
+- SDK 适配层 + 数据入口层抽象设计执行计划（双 adapter `websdk5`/`webim4` + 中立契约 `@easemob-community/uikit-sdk-contract` + repository 数据入口 + 能力映射/语义归一化，一套 UI 产物切 SDK 不重来、数据来源可插拔，对应 4.x SDK 低成本切换 + Electron 持久化）：[SDK-ADAPTER-ABSTRACTION-PLAN.md](docs/SDK-ADAPTER-ABSTRACTION-PLAN.md)（对应 TECH-DEBT D122，联动 D85）
 - **SDK 源码参考（D122 双 adapter 专用，只读）**：4.x `easemob-websdk@4.24.2` 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（入口 `src/entry.ts`）；5.x 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。仓库内软链锚点 `tmp/sdk-ref/websdk4|websdk5`（`tmp/` 已 gitignore，仅本机有效；rg/Grep 默认不跟随软链，搜索请直接用绝对路径）。核对两代 SDK 的 API/wire/事件行为时直接进对应源码核实，禁止凭记忆
 - 微前端 OA 基座宿主兼容性预研（集成形态选择 + 单例作用域/主题作用域/window 副作用/SDK 单例与卸载 4 点风险清单 + 与 D122 决策 17–20 衔接）：[MICRO-FRONTEND-COMPATIBILITY.md](docs/MICRO-FRONTEND-COMPATIBILITY.md)（对应 TECH-DEBT D125）
 - IM 职责边界与 OA↔UIKIT 接入契约（五包封顶 + 扩展点复用 + 不做清单 + 接入契约 + 按触发点落地）：[IM-RESPONSIBILITY-BOUNDARY.md](docs/IM-RESPONSIBILITY-BOUNDARY.md)（对应 TECH-DEBT D126）

@@ -22,7 +22,7 @@ describe('toUiGroup（4.x 群组字段映射）', () => {
     expect(group.approval).toBe(true)
   })
 
-  it('仅有 id/name 的详情响应（私有化服务裁剪字段）也能识别为 GroupDetailInfo', () => {
+  it('仅有 id/name 的详情响应（4.x 服务裁剪字段）也能识别为 GroupDetailInfo', () => {
     // 回归：旧判别只认 affiliations_count/maxusers，裁剪字段后会静默产出空 groupName
     const detail = { id: 'g2', name: '裁剪群' } as EasemobChat.GroupDetailInfo
     const group = toUiGroup(detail)

@@ -1,5 +1,8 @@
 # 样式定制
 
+> **前提**：聊天室组件样式为独立 CSS 产物，JS 不会自动注入，请在入口处引入
+> `import '@easemob-community/uikit-chatroom/theme'`（安装与初始化见 [快速开始](./quickstart)）。
+
 聊天室 UIKit 复用 `@easemob-community/uikit-core` 的**主题体系**（CSS 变量 + 暗色模式），
 并在弹幕流等组件上额外开放了**组件级 CSS 变量 token**。定制方式分四层，
 按优先级从低到高：

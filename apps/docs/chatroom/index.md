@@ -74,4 +74,4 @@ useChatroomProvider({ appKey: 'orgName#appName' })
   [直播组件](./components/live-top-bar)（顶部栏 / 输入条 / 礼物 / 卡片 / 动效）· [PC 模式](./components/chatroom-split-layout)（分栏 / 侧栏 / 菜单）
 - **样式**：[样式定制](./guide/styling)（CSS 变量 / `themeOverrides` / `--live-danmaku-*` token / 插槽接管）
 
-> `@easemob-community/uikit-chatroom` 当前版本 **1.0.0**（首个稳定版）。组件 API 表格由 `gen:api` 从源码自动生成，与实现保持同步。
+> `@easemob-community/uikit-chatroom` 当前版本 **2.0.0**。组件 API 表格由 `gen:api` 从源码自动生成，与实现保持同步。

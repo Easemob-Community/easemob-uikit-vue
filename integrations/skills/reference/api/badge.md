@@ -13,3 +13,4 @@
 | variant   | `BadgeVariant`   | `'filled'`                         | 风格：filled（实心，默认）/ stroked（描边）                                 |
 | placement | `BadgePlacement` | `'top-right'`                      | 徽标相对容器的位置：top-right（默认）/ bottom-right                         |
 | bordered  | `boolean`        | `false`                            | 是否给徽标加 2px 描边与底层内容（如头像）分界；颜色跟随 --uikit-bg-base，暗色自适应          |
+| inline    | `boolean`        | `false`                            | 内联模式：徽标不占位覆盖，按文档流渲染（如会话列表行尾未读数），默认 false；开启后 placement 不生效    |

@@ -40,9 +40,12 @@ const off = subscribe((messages) => {
 ## 完整示例：自绘弹幕轨道
 
 ```ts
-import { useChatroom, useChatroomMessage } from '@easemob-community/uikit-chatroom'
+import { useChatroom, useChatroomMessage, useChatroomProvider } from '@easemob-community/uikit-chatroom'
+import { registerDefaultSdkAdapterFactory } from '@easemob-community/uikit-core'
+import { Websdk5Adapter } from '@easemob-community/uikit-sdk-websdk5'
 
-// 1) 初始化（App 级一次）
+// 1) 初始化（App 级一次）：先注册默认 SDK 适配器（必需），再装配 Provider
+registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())
 useChatroomProvider({ appKey: 'orgName#appName' })
 
 // 2) 页面内：进房 + 订阅

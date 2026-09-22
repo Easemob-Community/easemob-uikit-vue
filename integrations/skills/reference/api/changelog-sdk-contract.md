@@ -1,3 +1,31 @@
+## @easemob-community/uikit-sdk-contract 1.3.1 (2026-09-21)
+
+
+### 新增
+
+- **`UIKitFeatures` 新增 `enableReadReceipt?: boolean`**：是否启用消息已读回执，默认 true；类型面供 core / adapter / uikit-im 共享。
+
+---
+
+## @easemob-community/uikit-sdk-contract 1.3.0 (2026-09-18)
+
+
+### 新增
+
+- **`SdkMessageDomain` 新增 `removeMessages`**：删除当前用户的服务端漫游历史（本账号各端同步生效），补齐消息删除的契约面（双 adapter 实现见 websdk5 1.3.1 / webim4 1.3.1）。
+- **`UiContactInvite` 新增 `outgoing` 字段**：标记「我发出的申请被对方拒绝」的通知方向，用于通知列表展示。
+
+---
+
+## @easemob-community/uikit-sdk-contract 1.2.1 (2026-09-17)
+
+
+### 新增
+
+- **`UIKitFeatures` 新增两个可选开关**：`showNicknameInSingleChat`（单聊消息列表是否展示对方昵称，默认 false）、`showNicknameInGroupChat`（群聊消息列表是否展示发送者昵称，默认 true）。
+
+---
+
 ## @easemob-community/uikit-sdk-contract 1.2.0 (2026-09-03)
 
 

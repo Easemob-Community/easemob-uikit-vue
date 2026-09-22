@@ -2,7 +2,7 @@
 
 > 状态：**核心 IM 链路已通（组合根装配完成，整包类型检查/构建/单测/eslint 全绿）**。
 > 本包负责把 `easemob-websdk@4.x`（`easemob-websdk@4.24.2`，`WebIM.connection`）翻译为
-> `@easemob-community/uikit-sdk-contract` 中立契约，使 UIKit 在 4.x / 私有化场景下零改动复用。
+> `@easemob-community/uikit-sdk-contract` 中立契约，使 UIKit 在 4.x SDK 场景下零改动复用。
 >
 > 依赖说明：运行时依赖以 npm alias 声明为 `easemob-websdk-4`（`npm:easemob-websdk@4.24.2`），
 > 内容与 `easemob-websdk@4.24.2` 完全一致。使用独立 specifier 是为了与 websdk5 的

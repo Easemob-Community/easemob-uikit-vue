@@ -128,7 +128,7 @@ export interface ProviderProps {
   enableBlocklist?: boolean
   /**
    * 是否启用在线状态（默认 true；presence 订阅会带来额外查询/订阅请求，
-   * 私有化或低频场景可显式关闭）
+   * 低频场景可显式关闭）
    */
   enablePresence?: boolean
   /**

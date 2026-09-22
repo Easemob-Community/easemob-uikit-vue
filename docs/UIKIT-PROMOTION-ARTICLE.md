@@ -139,7 +139,7 @@ demo 里就有现成的玩法示例：自定义名片消息、快捷回复面板
 ## 六、工程素质：给认真的人看的部分
 
 - **TypeScript strict 全量覆盖**，所有组件 props/emits 有完整类型与 API 文档（文档站由源码自动生成）。
-- **双 SDK 适配器架构**：`import '@easemob-community/uikit-im/websdk5'` 走 5.x；私有化部署换成 `import '@easemob-community/uikit-im/webim4'` 即可接 4.x——**UI 代码一行不改，产物物理隔离**（4.x 工程的 bundle 里搜不到任何 5.x 符号，已通过摇树验收）。
+- **双 SDK 适配器架构**：`import '@easemob-community/uikit-im/websdk5'` 走 5.x；换成 `import '@easemob-community/uikit-im/webim4'` 即可接 4.x——**UI 代码一行不改，产物物理隔离**（4.x 工程的 bundle 里搜不到任何 5.x 符号，已通过摇树验收）。
 - **按需引入**：`unplugin-vue-components` + 官方 `EasemobUIKitResolver`，用哪个组件打包哪个。
 - **功能开关化**：联系人、黑名单、在线状态、草稿、@我、正在输入、已读回执……每个能力都有 `features` 开关，运行时切换即时生效。
 - **数据可插拔**：`dataSource` 允许业务方接管好友/黑名单/用户搜索等数据源，UIKit 的 UI 照跑。

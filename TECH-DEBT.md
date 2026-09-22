@@ -1165,9 +1165,9 @@
 - **待办**：**单群聊侧（apps/docs/components、guide）同样存在**——含 `{{ }}` 的 vue 代码块（如 button/chat-container 等页的模板示例）需同样包裹 `::: v-pre`；正文 `{{ }}` 需实体转义。修完勾选归档。
 - **关联 skill**：`uikit-docs-authoring`
 
-### [ ] D122. SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）落地计划：4.x 私有化低成本切换
+### [ ] D122. SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）落地计划：4.x SDK 低成本切换
 
-- **背景**：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已开发接近尾声）；存量用户主力仍是 IM4.x；另有一个**私有化项目仅支持 4.x**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合），且**运行在 Electron 环境**，聊天消息/会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
+- **背景**：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已开发接近尾声）；存量用户主力仍是 IM4.x；另有一个**仅支持 4.x SDK 的项目**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合），且**运行在 Electron 环境**，聊天消息/会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
 - **结论/方案**：采用「端口-适配器 + 中立契约」，**不做"4.x 单独再开发"**（两套 UI 双份维护违背"不重来"诉求）。当前架构"先进但未收口"：im 有约 23 处 `import ... from 'easemob-websdk'` + `composables/use-uikit.ts` 6 个 manager 构造器 value import + `package.json` 硬依赖 + `vite.config.ts` external/globals；`UiMessage = SdkMessage & UiMessageExtension` 直接 extend SDK5 `Message`（core `sdk/types.ts`）、`ManagerHost` 直接暴露 7 个 SDK5 `*Manager` 类型、body 类型守卫按 5.x wire 写死（core `sdk/types/message.ts`）。分三阶段：**Phase 1 防腐层收口**（契约包 `@easemob-community/uikit-sdk-contract` + 中立化 + SDK5 adapter 化 + uikit-im 剥干净，UI 零重写）；**Phase 2 新写 `webim4` adapter** + 语义归一化（**4.x 能力全支持**，合并/置顶/流式/回执均在，差异在字段/API/事件形状，尤其回执是"消息类型"vs"专用 API"，详见计划文档第八节）；**Phase 3 数据入口层 repository + Electron 持久化**（`MessageRepository`/`ConversationRepository` 接口 + 本地优先历史加载 + 会话覆盖竞争 + 序列化清洗 + SQLite 主进程/IPC）。
 - **联动**：与 D85（`docs/ELECTRON-PERSISTENCE-RESEARCH.md`，Electron 持久化预研）同构合并——SDK 与本地库是两个数据来源，统一收敛到同一中立契约；`UIKitDataSource`（`composables/types.ts`）只覆盖联系人/群/presence，消息/会话的持久化抽象目前是空白，store 回流入口（`setConversationList`/`prependMessages`）与 `toUiMessage` adapter 已现成，属"中等规模、不动组件层"扩展。
 - **建议修法**：见 `docs/SDK-ADAPTER-ABSTRACTION-PLAN.md`（含四层架构、包拆分、中立契约以 5.x 字段命名为基准、`SdkCapabilities` 能力矩阵、repository 接口、事件推法 + Provider 注入、三阶段里程碑、验证门禁、14 项已确认决策、归一化映射表）。
@@ -1189,9 +1189,9 @@
   - `@easemob-community/uikit-sdk-webim4` 核心 IM 全量落地（镜像 websdk5 组合根结构）：`client.ts`（Webim4Client 包装 `new WebIM.connection({appKey})`）+ 六个 domain（message/conversation/contact/group/presence/userInfo，全部满足 contract `SdkDomainSet`）+ 四个字段映射 adapter + 事件层（4.x 单 `connection.addEventHandler` 模型，`registry.ts` 合并各域 Partial handler 一次注册；`onMessage` 批量数组逐条展开、read/delivery/channel 独立回调归一化、流式 `stream.text` 增量→`deltaText`/累计 `fullText`、群事件 `onGroupEvent` 按 operation 分发 30 项）+ 组合根 `adapter.ts`（内部 store 工厂 ×7 + `adapterConfig.stores` 注入覆盖 + subscribe Proxy 扇出 + 六 repository 代理 + login/logout 生命周期对齐 websdk5）。会话链路：`getServerConversations` 游标分页（refresh/loadMore + 置顶合并 + 排序稳定）、资料补全两级去重（`fetchConversationProfiles` 注入，单聊走 fetchUserInfos 批量、群聊走群信息）、清未读走 read/channel 回执消息（`mid` 由 `getLastMessageId`/`noteLastMessageId` 内部维护）。
   - **4.x 源码核对新事实（修正/补充计划文档）**：① 4.x **无用户资料订阅能力**（`subscribeUserInfos` 熔断降级 + `onSubscriptionPermissionError`）；② `updateGroupConfigs` 4.x 无 API（`modifyGroup` 仅 name/avatar/description/ext，告警跳过）；③ `getGroupMsgReadUser` **不分页**（源码 limit 固定 500，TODO 标注）；④ 群禁用事件（disable_group/able_group）4.24.2 源码为空实现、实际不可得；⑤ `removeAdmin` 事件载荷缺目标 userId；⑥ 共享文件 upload/delete 事件载荷无文件详情；⑦ 联系人拒绝事件叫 `onContactRefuse`、带备注联系人用 `getAllContacts()`（`getContacts()` 仅返回 ID）；⑧ `clearChatHistory` 参数名 `beforeTimeStamp`（大写 S）；⑨ `types/message.d.ts` 的 `CreateAudioMsgParameters.type` 误写 `'video'`（d.ts bug，以主入口 namespace 类型为准）；⑩ 会话免打扰经 `setSilentModeForConversation`/`getSilentModeForConversations`（20 条/批）维护，不在会话项里。
   - **验证**：webim4 整包 `vue-tsc --noEmit` 0 错误、`pnpm build` 通过（esm 113.6 kB / umd 78.6 kB）、message-adapter 映射单测 20/20（含风险 #8「中立 body 零 4.x 原始字段残留」断言）、eslint 0 错误、uikit-im `vue-tsc --noEmit` 0 错误 + `build` 通过（webim4 不在 im 依赖图，无回归面）。
-  - **残留（下一步）**：① 核心 IM 手测矩阵（登录/会话/收发/回执/撤回/联系人/群）——本次仅静态门禁，需真实 4.x 环境手测；② 4.x 私有化端到端验收（Phase 2.4）；③ 摇树验收（4.x 消费者工程产物搜不到 5.x 符号）；④ 二期能力：Reaction/Thread/翻译/语音转文字/chatroom 变体；⑤ websdk5 adapter.ts 有 13 个与 webim4 同源的 eslint 风格错误（复制方向相反带入），如需清零单独跟进；⑥ Phase 3 repository 数据入口层（SQLite/IPC）未启动。
+  - **残留（下一步）**：① 核心 IM 手测矩阵（登录/会话/收发/回执/撤回/联系人/群）——本次仅静态门禁，需真实 4.x 环境手测；② 4.x 端到端验收（Phase 2.4）；③ 摇树验收（4.x 消费者工程产物搜不到 5.x 符号）；④ 二期能力：Reaction/Thread/翻译/语音转文字/chatroom 变体；⑤ websdk5 adapter.ts 有 13 个与 webim4 同源的 eslint 风格错误（复制方向相反带入），如需清零单独跟进；⑥ Phase 3 repository 数据入口层（SQLite/IPC）未启动。
 - **进度备忘（2026-08-30，4.x 注入手测反馈两项修复，静态门禁全绿）**：
-  - **会话群名不显示（只显示群 id）**：链路本身完整（dist + 模拟 connection 运行时复现通过），根因是三个静默脆弱点——① `conversation-domain.ts` `patchConversationProfiles` 先标记 `profileRequestedIds` 后请求，首次 `getGroupInfo` 失败/空名即终身不补 → 改为**成功拿到名称才永久标记**，失败/空名计 `profileAttemptCounts` 允许后续 refresh 重试、达 `MAX_PROFILE_ATTEMPTS=3` 放弃；② `group-adapter.ts` `toUiGroup` 仅靠 `affiliations_count/maxusers` 判别 `GroupDetailInfo`，私有化服务裁剪字段时静默产出空 `groupName` → 判别补 `id` 字段（另两种形状无 `id`），兜底分支形状不匹配时显式 warn；③ `applyServerItems` 的 `'replace'` 模式用空 existing 重建列表，后续 refresh 把已补全群名冲回 id → 改为两种模式都从现有项继承 name/avatar（replace 仍控制成员去留，对齐 websdk5 `mergeWithExistingConversations`）。
+  - **会话群名不显示（只显示群 id）**：链路本身完整（dist + 模拟 connection 运行时复现通过），根因是三个静默脆弱点——① `conversation-domain.ts` `patchConversationProfiles` 先标记 `profileRequestedIds` 后请求，首次 `getGroupInfo` 失败/空名即终身不补 → 改为**成功拿到名称才永久标记**，失败/空名计 `profileAttemptCounts` 允许后续 refresh 重试、达 `MAX_PROFILE_ATTEMPTS=3` 放弃；② `group-adapter.ts` `toUiGroup` 仅靠 `affiliations_count/maxusers` 判别 `GroupDetailInfo`，4.x 服务裁剪字段时静默产出空 `groupName` → 判别补 `id` 字段（另两种形状无 `id`），兜底分支形状不匹配时显式 warn；③ `applyServerItems` 的 `'replace'` 模式用空 existing 重建列表，后续 refresh 把已补全群名冲回 id → 改为两种模式都从现有项继承 name/avatar（replace 仍控制成员去留，对齐 websdk5 `mergeWithExistingConversations`）。
   - **联系人/群组数需二次进入才显示**：5.x 靠 SDK 登录后 `enableSyncData` 自动同步 + `onSyncDataFinished` 回填 store（进页面前数据已备好）；4.x SDK 无此通道且 webim4 登录后零预取，首页计数 `getLocalCount()` 纯只读永远等不到数据 → `Webim4Adapter.login` 成功后按 `features.enableContact/enableGroup` 触发 `contactDomain.syncFromServer()`（改 public 并返回 boolean）+ `groupDomain.refreshJoinedGroups()`（改 public），并补发 `contact`/`group` 中立 `onSyncStatus` 事件（syncing→success/failed），对齐 5.x 体感；新增 `adapterConfig.prefetchOnLogin` 开关（默认 true，可关退回懒加载）。注入模式业务直连 `adapter.login` 同样生效。
   - **验证**：webim4 `vue-tsc --noEmit` 0 错误、`build` 通过（esm 117.9 kB）、vitest 28/28（新增 `group-adapter.test.ts` 5 例含裁剪字段判别回归）、改动文件 eslint 0 错误、demo `vue-tsc --noEmit` 0 错误。待用户真实 4.x 环境复测两个现象。
   - **群已读详情弹窗崩溃（`charCodeAt is not a function` + `metadata/user/get` 400）**：`getGroupMsgReadUser` 的 d.ts 标注 `userlist: string[]`（`UserId = string`），但实测服务端 wire 返回**对象数组** `{username, meta_id, timestamp, ack_content}`（d.ts 与 wire 不一致，该 API 源码是纯 GET 直通无转换）——adapter 原样透传导致对象被当 userId 流入 `fetchUserInfos`（targets 400）与 Avatar `name`（charCodeAt 崩溃）。修复：`message-domain.ts fetchGroupReadDetail` 兼容两种形状（对象取 `username` 为 userId、逐项 timestamp）、按 userId 去重（多端重复上报）、无法识别项告警丢弃、`count` 缺省回落去重后长度；UI 侧 `message-list.vue` readUsers filter 收紧为 `typeof id === 'string'` 防御。门禁：webim4 vue-tsc/build/vitest 28/28、uikit-im vue-tsc 全绿（message-list.vue 头部 import 区 18 个存量 import/order+no-duplicates 报错为 Phase 1 遗留，未 --fix）。
@@ -1220,7 +1220,7 @@
   - **摇树验收执行（决策 22 闭环）**：`tmp/tree-shaking-check/` 双消费者工程（vite vanilla-ts + pnpm pack 产物 + 5.0.0 tgz / npm `easemob-websdk@4.24.2`）：consumer4 产物 `ChatClient`/`Websdk5Adapter` 0 命中、consumer5 产物 `WebIM`/`Webim4Adapter` 0 命中（跨界命中仅 core 错误文案中的包名字符串）；反向确认各自 SDK/adapter 确实进包；结果已记入 `docs/CONSUMER-VALIDATION-CHECKLIST.md`。
   - **4.x `getGroupMsgReadUser` 分页核实**：SDK 4.24.2 源码 `apis/groupApi.ts:3394` 自带 `// TODO: 分页`，`limit` 固定 500、`key` 固定 undefined，无分页参数暴露——adapter 无法分页，webim4 `message-domain.ts` 既有注释已如实记录，不改代码。
   - **验证**：五包按依赖序 vue-tsc + build 全绿（contract → websdk5/webim4 → core → im）；websdk5 vitest 24/24、webim4 58/58；demo / demo-chatroom vue-tsc 0 错误；54 个改动文件 eslint 0 错误（--fix 清这批文件的存量风格错误；另修 demo app.vue `currentHash` 先用后定义）。
-  - **残留（仅人工/发版项）**：① 核心 IM 手测矩阵（真实 4.x 环境，清单已交付）；② 4.x 私有化端到端验收（Phase 2.4）；③ 发版 CHANGELOG + 版本号（`sdk/index.ts` 值级导出迁移 + `dataSource` 移除随主版本）；④ Phase 3.2~3.5 DB/Electron 专项未启动；⑤ 二期能力 Reaction/Thread/翻译/语音转文字。
+  - **残留（仅人工/发版项）**：① 核心 IM 手测矩阵（真实 4.x 环境，清单已交付）；② 4.x 端到端验收（Phase 2.4）；③ 发版 CHANGELOG + 版本号（`sdk/index.ts` 值级导出迁移 + `dataSource` 移除随主版本）；④ Phase 3.2~3.5 DB/Electron 专项未启动；⑤ 二期能力 Reaction/Thread/翻译/语音转文字。
 - **进度备忘（2026-08-30，Phase 3.1 repository 注入留口子落地，门禁全绿）**：
   - **契约**：`SdkConfig` 新增 `repositories?: SdkRepositoryOverrides`（`{ message?: Partial<MessageRepository>, conversation?: Partial<ConversationRepository> }`，contract `repository.ts` + `config.ts`）；core `normalizeInitConfig` 零改动——平铺字段自动下沉 `adapterConfig`，两 adapter init 按 `config.repositories ?? adapterCfg.repositories` 读取。
   - **两 adapter 同构落地**：`MessageDomain` 构造新增 options（webim4 为 `messageRepository` 字段）——注入 `loadMessages` 时 `fetchHistory` 整体委托（store 写入语义与 SDK 路径一致）；`ConversationDomain` options/deps 新增 `conversationRepository`——注入 `fetchConversations` 时 `refresh` 游标翻页至 `hasMore=false` 合并全量、去重并继承已补全名称/头像后 `setList`，不触 SDK；未注入路径零变化。adapter 的 repository getter 不做注入合并（Domain 委托已覆盖，getter 处注释说明）。
@@ -1275,20 +1275,20 @@
 
 ### [ ] D125. 微前端 OA 基座宿主兼容性：单例作用域 / 主题作用域 / window 副作用 / SDK 单例与卸载
 
-- **背景**：私有化 OA 项目提出「OA 基座 + 微前端」，IM 为核心协同能力，UIKIT 定位「未来包提供者 + IM 能力基座」。微前端与 SDK 适配（D122）是两个正交维度：D122 解决"切 4.x/5.x"，微前端解决"UIKIT 被宿主加载时的隔离/单例/生命周期"。当前 UIKIT 有几处"全局假设"在共享 document 的微前端宿主下会变成硬约束。
+- **背景**：4.x OA 项目提出「OA 基座 + 微前端」，IM 为核心协同能力，UIKIT 定位「未来包提供者 + IM 能力基座」。微前端与 SDK 适配（D122）是两个正交维度：D122 解决"切 4.x/5.x"，微前端解决"UIKIT 被宿主加载时的隔离/单例/生命周期"。当前 UIKIT 有几处"全局假设"在共享 document 的微前端宿主下会变成硬约束。
 - **证据（代码级）**：
   1. **模块级单例**：`use-toast` / `use-notification`（顶层 `state = ref(...)`，`packages/uikit-core/src/composables/use-notification.ts:63`）、`use-quote`（顶层 `quotedMessage`，`packages/uikit-im/src/composables/use-quote.ts:21`）、`useMessageActions` 多选态、`useLocale` `currentLocale`、`useTheme` —— 多子应用/多实例并存时状态串扰。
   2. **主题作用域全局**：`packages/uikit-core/src/theme/index.css:1` 变量挂 `:root`，`:412` 暗色用 `[data-uikit-theme="dark"]` 属性选择器（非容器 class），兄弟子应用可互相污染 `--uikit-*`。
   3. **全局 window 副作用**：通知点击 `window.focus()`、键盘 `window` listener、`download` 走 `window.open`。
   4. **SDK 单例**：`ChatClient` 全局单例，子应用反复挂载/卸载 + 宿主也可能集成时存在"已初始化/配置冲突"（仓库已有 IM+chatroom 同装配置对齐案例）。
-- **结论/方案**：不重写 UI，把"全局假设"变成"可作用域化/可清理"边界；推荐集成形态为**共享依赖包**（宿主与 IM 子应用共享同一份 Vue + UIKIT），非子应用内独立打包。落地时点：Phase 1 收口后、私有化 OA 基座集成前做专项评估。
+- **结论/方案**：不重写 UI，把"全局假设"变成"可作用域化/可清理"边界；推荐集成形态为**共享依赖包**（宿主与 IM 子应用共享同一份 Vue + UIKIT），非子应用内独立打包。落地时点：Phase 1 收口后、4.x OA 基座集成前做专项评估。
 - **建议修法**：见 `docs/MICRO-FRONTEND-COMPATIBILITY.md`（集成形态选择 + 4 点风险清单 + 与 D122 决策 17–20 衔接 + 待确认问题）。
 - **联动**：D122（SDK adapter 抽象，决策 17–20 即微前端催生的补充决策）/ D85（Electron 持久化，window.open/download 注入点同源）/ D123（生命周期对称：卸载清理事件监听）。
 - **关联 skill**：`uikit-package-boundary` / `uikit-provider-config` / `uikit-styling-theming`
 
 ### [ ] D126. IM 职责边界与 OA↔UIKIT 接入契约（不做清单）
 
-- **背景**：私有化 OA 项目把 UIKIT 定位为「IM 能力基座 + 包提供者」。为避免 UIKIT 越界耦合、做无谓设计/开发，把"守好 IM 职责"落成可执行的边界清单与接入契约。
+- **背景**：4.x OA 项目把 UIKIT 定位为「IM 能力基座 + 包提供者」。为避免 UIKIT 越界耦合、做无谓设计/开发，把"守好 IM 职责"落成可执行的边界清单与接入契约。
 - **结论/方案**：架构五包封顶（core / sdk-contract / uikit-im / websdk5 adapter / webim4 adapter），不再新增 portal/集成/消息总线层；扩展点复用现有（`useChatPlugin`/插槽/`dataSource`→repository/adapter/`features`），不新造；定开两级接入（最小接入 + 源码直连）。
 - **不做清单（守职责核心）**：① 不碰登录/认证（只接受 token）；② 不碰组织架构/用户主数据（走 `dataSource`/repository 注入）；③ 不建消息队列/缓存/权限中心；④ 不引入 Vuetify3/微前端框架/Electron 专属逻辑（只提供 D85 注入点）；⑤ 不改公开组件 API 迁就平台。
 - **接入契约**：OA 底座管 token/用户数据/路由/权限；UIKIT 管拿到 token + appKey 后的一切 IM 行为（会话/消息/联系人/群/回执/通知）。
@@ -1366,6 +1366,13 @@
   - **现象**：`conversation-item.vue` setup 中调用 `useUIKit()`（取 `features`/`theme`），而 `conversation-item.story.vue` 未用 `<UIKitProvider>` 包裹，sandbox 抛 `useUIKit() must be used within <UIKitProvider>`，10 个变体全部停在 Loading。同类依赖 `useUIKit`/`usePresence` 等注入的模块 story（如 `conversation-list.story.vue`）大概率同样崩溃（2026-09-21 排查会话列表行尾徽标对齐时发现）。
   - **建议修法**：story 侧统一包一层 `<UIKitProvider :auto-init="false">`（或在其 histoire-setup 提供 app 级 stub context），让模块级 story 不依赖真实 SDK 连接即可渲染。
   - **关联 skill**：`uikit-component-authoring` / `uikit-demo-development`
+
+- [ ] **D141. 文档站在线代码演练场（VuePlayground）暂时整体下线，待效果达标后恢复**
+  - **背景**：在线代码演练场（`@vue/repl`，页面内编辑 SFC 实时预览）上线后效果不佳（iframe 内偶发 `Failed to resolve module specifier` 报错白屏等），为保本次发布顺利，2026-09-22 起暂时全部去除，后续评估恢复。
+  - **已移除**：10 个页面（guide/theme + components 下 button/cell/badge/avatar/input/conversation-container/chat-container/group-container/message-list）的「在线代码演练场」小节与 script 引入；`VuePlayground.vue` 全局组件注册与组件本体；`.vitepress/components/playground-files/theme.ts`；各页 `demo/playground/template.ts` 与 chat-container/group-container 的 `mock.ts`；`public/playground.html`；`public/vendor/` 全部产物；`scripts/sync-vendor.mjs` 与 package.json 的 `sync:vendor` script；`@vue/repl` 依赖（lockfile 已同步）。
+  - **保留未动**：`<demo>` 块本地渲染的交互演示（message-list「单条气泡能力演练场」`demo/playground/bubble.vue` 及其依赖的同目录 `mock.ts`、theme「主题 token 演练场 / 动效可视化面板」）；`conversation-container/demo/mock-conversations.ts`（原 playground/mock.ts 改名，theme-playground.vue 复用）；changelog 历史记录中的演练场条目（历史事实不动）。
+  - **恢复路径**：git 历史恢复上述文件 + 重加 `@vue/repl` 依赖 + 恢复 `sync:vendor` 前置；恢复前需先解决模块解析失败问题（import map 覆盖完整性 / vendor 产物同步时机），并升级各演练场 localStorage key 版本号（`<id>:v1`→`v2`）防旧缓存污染。skill `uikit-docs-authoring` §2 已加状态注记。
+  - **关联 skill**：`uikit-docs-authoring`
 
 ---
 

@@ -9,7 +9,7 @@ const log = createLogger('UIKit:Webim4Client')
 /** 4.x Connection 类型别名 */
 export type Webim4Connection = EasemobChat.Connection
 
-/** 4.x 连接配置（`new WebIM.connection(params)` 的原生参数，私有化场景常用 apiUrl/url/isHttpDNS 等） */
+/** 4.x 连接配置（`new WebIM.connection(params)` 的原生参数，自建服务常用 apiUrl/url/isHttpDNS 等） */
 export type Webim4ConnectionParameters = EasemobChat.ConnectionParameters
 
 /**
@@ -21,7 +21,7 @@ export type Webim4ConnectionParameters = EasemobChat.ConnectionParameters
  *
  * 构造参数直接透传 4.x 原生 `ConnectionParameters`（`appKey`/`appId`/`apiUrl`/`url`/
  * `isHttpDNS`/`delivery`/`deviceId`/`autoReconnectNumMax`/`useOwnUploadFun` 等），
- * adapter 不裁剪 SDK 自身支持的配置——私有化部署的 `apiUrl`/`isHttpDNS:false` 即经此下发。
+ * adapter 不裁剪 SDK 自身支持的配置——自建服务的 `apiUrl`/`isHttpDNS:false` 即经此下发。
  */
 export class Webim4Client {
   private _conn: Webim4Connection | null = null
@@ -64,7 +64,7 @@ export class Webim4Client {
   }
 }
 
-/** 创建 4.x 客户端（params 为 4.x 原生 ConnectionParameters，含 appKey 及私有化部署等全部连接配置） */
+/** 创建 4.x 客户端（params 为 4.x 原生 ConnectionParameters，含 appKey 及 apiUrl/isHttpDNS 等全部连接配置） */
 export function createClient(params: Webim4ConnectionParameters): Webim4Client {
   return new Webim4Client(params)
 }

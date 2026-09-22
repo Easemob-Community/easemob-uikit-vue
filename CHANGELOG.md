@@ -246,7 +246,7 @@
 
 ### 变更
 
-- **Provider 能力开关默认对齐产品化形态（行为变更）**：`enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（双 Demo 共识配置下沉）。好友/黑名单/在线状态开箱即用；presence 订阅会带来额外查询/订阅请求，私有化或低频场景请显式 `:enable-presence="false"`。
+- **Provider 能力开关默认对齐产品化形态（行为变更）**：`enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（双 Demo 共识配置下沉）。好友/黑名单/在线状态开箱即用；presence 订阅会带来额外查询/订阅请求，低频场景请显式 `:enable-presence="false"`。
 - **输入框发送按钮条件默认（行为变更）**：`config.input.showSendButton` 未配置时由「一律显示」改为按端型取默认——PC 隐藏（回车发送，对齐桌面 IM 形态）、移动端显示（触屏无回车键）；显式 true/false 仍优先。此前 PC 上依赖默认发送按钮的接入方需显式 `showSendButton: true`。
 - **会话列表下拉刷新增回落链（能力补齐）**：`EmConversationContainer` 的 `pull-refresh` 未配置（undefined）时回落 Provider `h5.pullRefresh`（默认 `'auto'`：触屏设备自动开启），不再写死 `false`；显式 true/false 仍优先。
 - **ChatContainer 容器风格条件默认（行为变更）**：`variant` 未配置时由一律 `'compact'` 改为按端型取默认——PC `'card'`（圆角卡片壳由容器自绘）、移动端 `'compact'`（平铺全屏形态）；显式传入仍优先。此前 PC 上未传 variant 的接入方视觉会变为卡片壳，如需平铺请显式 `variant="compact"`。
@@ -255,13 +255,13 @@
 
 ### 变更
 
-- **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，私有化或低频场景显式关闭。
+- **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，低频场景显式关闭。
 
 ## @easemob-community/uikit-sdk-websdk5 1.3.0 (2026-09-16)
 
 ### 变更
 
-- **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
+- **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，低频场景应显式关闭。
 
 ## @easemob-community/uikit-sdk-webim4 1.3.0 (2026-09-16)
 
@@ -494,7 +494,7 @@
 
 ### 新增
 
-- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob-community/uikit-sdk-contract` 与两个适配器包 `@easemob-community/uikit-sdk-websdk5`（5.x）/ `@easemob-community/uikit-sdk-webim4`（4.x 私有化，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
+- **双 SDK 适配架构落地（D122）**：SDK 层收敛为「中立契约 + 双 adapter」——新增契约包 `@easemob-community/uikit-sdk-contract` 与两个适配器包 `@easemob-community/uikit-sdk-websdk5`（5.x）/ `@easemob-community/uikit-sdk-webim4`（4.x，经 npm alias `easemob-websdk-4` 引入 4.24.2）。一套 UI 产物可按 SDK 版本切换，UI 层零重写。
 - **子路径入口**：新增 `@easemob-community/uikit-im/websdk5` 与 `@easemob-community/uikit-im/webim4`（import 即自注册默认 adapter）；主入口保持零 adapter 值级静态引用，4.x 下游产物不含 5.x 符号，反之亦然（摇树隔离已双消费者工程验收）。
 - **Provider 新能力**：新增 `adapter` prop（注入模式：业务自带 adapter 实例，UIKit 不转发 login/logout）；`sdkConfig.repositories` 数据入口注入（message/conversation/contact/group/presence/userInfo 全域可接管）；`useUIKit()` 暴露 `capabilities`（adapter 上报的 SDK 客观能力矩阵，与 features 取交集决定能力入口）；core 新增模块级 `getUIKitAdapter()` 支持非 Vue 上下文访问。
 - **4.x 适配补齐**：登录后按 features 预取联系人/群组（对齐 5.x 同步体感）；漫游坏消息容错（单条解码失败跳过不拖垮整页）。
@@ -543,7 +543,7 @@
 
 ### 新增
 
-- **首次发布**：easemob-websdk 4.x（4.24.2，私有化）适配器——`Webim4Adapter`（内置 / 注入双模式）+ 六域 Domain + 单 `addEventHandler` 事件层归一化（批量 onMessage 逐条展开、read/delivery/channel 回执归一、流式增量、群事件 operation 分发）+ 字段/API 映射（合并/置顶/流式/已读回执全支持）+ 登录预取（对齐 5.x 同步体感）+ 漫游 pb 容错（坏消息跳过不拖垮整页）。4.x SDK 经 npm alias `easemob-websdk-4` 引入，与 5.x 同工程共存互不干扰。
+- **首次发布**：easemob-websdk 4.x（4.24.2）适配器——`Webim4Adapter`（内置 / 注入双模式）+ 六域 Domain + 单 `addEventHandler` 事件层归一化（批量 onMessage 逐条展开、read/delivery/channel 回执归一、流式增量、群事件 operation 分发）+ 字段/API 映射（合并/置顶/流式/已读回执全支持）+ 登录预取（对齐 5.x 同步体感）+ 漫游 pb 容错（坏消息跳过不拖垮整页）。4.x SDK 经 npm alias `easemob-websdk-4` 引入，与 5.x 同工程共存互不干扰。
 
 ## @easemob-community/uikit-im 2.8.6 (2026-08-28)
 

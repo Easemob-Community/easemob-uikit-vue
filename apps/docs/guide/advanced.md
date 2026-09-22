@@ -316,6 +316,8 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 
 3.0 起 SDK 层收敛为「中立契约 + 双 adapter」架构：UI 产物不直接依赖某一版 SDK，而是面向 `@easemob-community/uikit-sdk-contract` 的中立 `SdkAdapter` 接口，由 adapter 包完成与具体 SDK（5.x / 4.x）的对接。
 
+> **安装**：适配器包是 optional peer 依赖，不会被自动安装，请按所用 SDK 二选一显式安装——`pnpm add @easemob-community/uikit-sdk-websdk5`（5.x 公开版）或 `pnpm add @easemob-community/uikit-sdk-webim4`（4.x）。
+
 ### 两个子路径入口
 
 主入口 `@easemob-community/uikit-im` 保持零 adapter 静态引用（4.x / 5.x 产物互不含对方符号，摇树隔离）；「默认内置」通过子路径入口的 import 副作用完成注册：
@@ -323,7 +325,7 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 | 入口 | 适配 SDK | 适用场景 |
 | --- | --- | --- |
 | `import '@easemob-community/uikit-im/websdk5'` | `easemob-websdk` 5.x（公开版默认） | 绝大多数接入方 |
-| `import '@easemob-community/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`，4.x 私有化） | 私有化部署 |
+| `import '@easemob-community/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`） | 使用 4.x SDK 的存量项目 |
 
 两个入口都会把对应 adapter 注册为默认适配器（重复 import 以最后一次注册为准并告警），`<EmUIKitProvider>` 不传 `adapter` prop 时由 UIKit 全权管理其生命周期（init / login / logout）。入口同时 re-export adapter 包的全量 API，原先从主入口导入的 SDK 值级符号（3.0 已从主入口移除）改从对应子路径入口导入：
 

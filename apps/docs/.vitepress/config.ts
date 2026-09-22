@@ -13,7 +13,9 @@ export default defineConfig({
   lang: 'zh-CN',
   title: 'Easemob UIKit',
   description: '环信 Vue3 即时通讯 UI 组件库 - 官方文档',
-  cleanUrls: true,
+  // 发布托管在阿里云 OSS 纯静态 bucket（无 $uri.html 回退能力），URL 带 .html 后缀
+  // 直接按真实对象服务；若未来 nginx/CDN 侧支持回源 URI 改写，可改回 cleanUrls: true
+  cleanUrls: false,
   // icons.md 引用了 packages/uikit-im 下的仓内文件（docs/UI_CONVENTIONS.md 等），属于仓库内文档链接，跳过校验
   ignoreDeadLinks: [/packages\/uikit/],
 

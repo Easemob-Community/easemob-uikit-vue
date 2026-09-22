@@ -55,7 +55,7 @@ export interface DemoSdkInitInput {
 }
 
 /**
- * 组装 init 配置：apiUrl 非空才传；webim4 模式追加 isHttpDNS（私有化部署验证时关闭）；
+ * 组装 init 配置：apiUrl 非空才传；webim4 模式追加 isHttpDNS（自建服务验证时关闭）；
  * 开启自定义数据源开关时注入 repositories.contact（core 归一化会下沉 adapterConfig，
  * 并与 dataSource 翻译结果合并，显式 repositories 优先）。
  * core 会把 appKey/debug 之外的平铺字段下沉 adapterConfig，

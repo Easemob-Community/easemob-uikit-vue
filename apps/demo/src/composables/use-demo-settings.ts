@@ -80,7 +80,7 @@ export function setDemoSdkLogLevel(level: DemoSdkLogLevel) {
 /** SDK 版本切换的 localStorage 记忆 key */
 const SDK_VERSION_STORAGE_KEY = 'demo-sdk-version'
 
-/** 4.x isHttpDNS 开关的 localStorage 记忆 key：值 'off' 表示关闭（私有化部署验证） */
+/** 4.x isHttpDNS 开关的 localStorage 记忆 key：值 'off' 表示关闭（自建服务验证） */
 const SDK_IS_HTTP_DNS_STORAGE_KEY = 'demo-sdk-is-http-dns'
 
 /** demo 侧可选 SDK 版本：5.x（websdk5，默认工厂自注册）/ 4.x（webim4，注入模式） */
@@ -110,7 +110,7 @@ export function setDemoSdkVersion(version: DemoSdkVersion) {
 
 /**
  * 4.x isHttpDNS 开关（模块级单例，默认 true）。
- * 私有化部署验证时关闭，配合 sdkApiUrl 透传给 4.x `new WebIM.connection(params)`；
+ * 自建服务验证时关闭，配合 sdkApiUrl 透传给 4.x `new WebIM.connection(params)`；
  * 仅 webim4 模式下参与 init 配置组装。
  */
 export const sdkIsHttpDNS = ref(localStorage.getItem(SDK_IS_HTTP_DNS_STORAGE_KEY) !== 'off')

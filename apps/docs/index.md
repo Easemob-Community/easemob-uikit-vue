@@ -43,7 +43,7 @@ features:
 安装依赖：
 
 ```bash
-pnpm add @easemob-community/uikit-im pinia vue
+pnpm add @easemob-community/uikit-im @easemob-community/uikit-sdk-websdk5 pinia vue
 ```
 
 全局注册并挂载：
@@ -52,6 +52,8 @@ pnpm add @easemob-community/uikit-im pinia vue
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import UIKit from '@easemob-community/uikit-im'
+import '@easemob-community/uikit-im/websdk5' // 注册 websdk5 为默认 SDK 适配器（3.0 起必需）
+import '@easemob-community/uikit-im/theme' // 引入主题样式（CSS 为独立产物，需手动引入）
 import App from './App.vue'
 
 const app = createApp(App)

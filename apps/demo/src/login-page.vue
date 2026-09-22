@@ -139,7 +139,7 @@ async function handleLogin() {
             >
               {{ opt.label }}
             </button>
-            <label v-if="isWebim4Mode()" class="demo-check" title="私有化部署验证时关闭，配合 ApiUrl 透传给 4.x connection">
+            <label v-if="isWebim4Mode()" class="demo-check" title="自建服务验证时关闭，配合 ApiUrl 透传给 4.x connection">
               <input
                 :checked="sdkIsHttpDNS"
                 type="checkbox"

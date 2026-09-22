@@ -1,5 +1,49 @@
+## @easemob-community/uikit-sdk-webim4 1.3.3 (2026-09-21)
+
+
+### 修复
+
+- **`currentUser` 记账提前到 login 发起前**：同 websdk5 1.3.4，4.x 线对称修复。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.2 (2026-09-20)
+
+
+### 新增
+
+- **联系人关系变更全局通知**：与 websdk5 1.3.2 对齐，`onContactRefuse` / `onContactDeleted` 同步投递全局通知。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.1 (2026-09-18)
+
+
+### 新增
+
+- **实现契约 `removeMessages`**：4.x SDK 无单条删除服务端漫游历史的公开 API，降级为本地删除语义（仅落删除墓碑），UI 本地移除行为与旧版一致。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：与 websdk5 1.3.1 对齐。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.0 (2026-09-16)
+
+
+### 变更
+
+- **同 websdk5 1.3.0**：`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`。
+
+---
+
 ## @easemob-community/uikit-sdk-webim4 1.2.2 (2026-09-03)
 
+
+### 新增
+
+- **语音未播放打标（与 websdk5 同口径）**：`onMessage` 实时收到对方语音消息时调用 `stores.message.markVoiceUnplayed?.(msgId)`（`MessageStoreLike` 新增可选方法）。
 
 ### 修复
 
@@ -47,4 +91,4 @@
 
 ### 新增
 
-- **首次发布**：easemob-websdk 4.x（4.24.2，私有化）适配器——`Webim4Adapter`（内置 / 注入双模式）+ 六域 Domain + 单 `addEventHandler` 事件层归一化（批量 onMessage 逐条展开、read/delivery/channel 回执归一、流式增量、群事件 operation 分发）+ 字段/API 映射（合并/置顶/流式/已读回执全支持）+ 登录预取（对齐 5.x 同步体感）+ 漫游 pb 容错（坏消息跳过不拖垮整页）。4.x SDK 经 npm alias `easemob-websdk-4` 引入，与 5.x 同工程共存互不干扰。
+- **首次发布**：easemob-websdk 4.x（4.24.2）适配器——`Webim4Adapter`（内置 / 注入双模式）+ 六域 Domain + 单 `addEventHandler` 事件层归一化（批量 onMessage 逐条展开、read/delivery/channel 回执归一、流式增量、群事件 operation 分发）+ 字段/API 映射（合并/置顶/流式/已读回执全支持）+ 登录预取（对齐 5.x 同步体感）+ 漫游 pb 容错（坏消息跳过不拖垮整页）。4.x SDK 经 npm alias `easemob-websdk-4` 引入，与 5.x 同工程共存互不干扰。

@@ -47,7 +47,7 @@ const adapterLog = createLogger('UIKit:Webim4Adapter')
 /**
  * 默认 UIKit 能力开关：adapter 独立运行或未传 features 时使用。
  * presence 默认开启（对齐 UIKit Provider 3.x 默认）：在线状态为产品化默认形态；
- * 注意订阅/查询会带来额外请求，私有化或低频场景应显式关闭。
+ * 注意订阅/查询会带来额外请求，低频场景应显式关闭。
  */
 function getDefaultFeatures(): UIKitFeatures {
   return {
@@ -977,7 +977,7 @@ function createUserInfoStore(handlersRef: HandlersRef): EventStores['userInfo'] 
 }
 
 /**
- * easemob-websdk@4.x 适配器（私有化 / 存量 4.x）。
+ * easemob-websdk@4.x 适配器（存量 4.x）。
  *
  * 生命周期所有权（主计划决策 18，单一所有者，禁止半注入）：
  * - 内置模式：UIKit 全权（本实例内部构造 connection，login/logout/dispose 归 UIKit）；
@@ -1090,7 +1090,7 @@ export class Webim4Adapter implements SdkAdapter {
     // 剥离 features/dataSource/stores/eventDeps 等 adapter 装配字段后，
     // 剩余字段（clientCfg）原样透传给 `new WebIM.connection(...)`——
     // 4.x 原生 ConnectionParameters（apiUrl/url/isHttpDNS/delivery/deviceId/
-    // autoReconnectNumMax/useOwnUploadFun 等，私有化部署配置即经此下发），adapter 不裁剪。
+    // autoReconnectNumMax/useOwnUploadFun 等，自建服务的连接配置即经此下发），adapter 不裁剪。
     const {
       features,
       dataSource,

@@ -72,11 +72,10 @@
 
 ## 1. 文档站结构（apps/docs）
 
-- `package.json`：`dev` / `build` 前置 `pnpm sync:vendor`（node
-  scripts/sync-vendor.mjs，同步 Playground vendor 静态资源）+ `preview`（vitepress
-  原生）+ `gen:api`（node scripts/gen-api-docs.mjs）；依赖 vitepress ^1.6.4、  vite-plugin-vitepress-demo ^2.2.1、`@vue/repl` ^4.7.2（在线演练场）、
-  `@vue/compiler-sfc` + typescript（gen 脚本的解析引擎）；`@easemob-community/uikit-im` 为
-  `workspace:*`；
+- `package.json`：`dev` / `build` 前置 `pnpm split-changelog` + `preview`（vitepress
+  原生）+ `gen:api`（node scripts/gen-api-docs.mjs）；依赖 vitepress ^1.6.4、
+  vite-plugin-vitepress-demo ^2.2.1、`@vue/compiler-sfc` + typescript（gen 脚本的解析引擎）；
+  `@easemob-community/uikit-im` 为 `workspace:*`；
 - `index.md`：home 布局（hero + features），hero actions 指向快速开始与组件预览；
 - `guide/`：quickstart / theme / icons / h5-adaptation / advanced / demo-phase1-plan /
   changelog（更新日志，与根 CHANGELOG.md 不同，是站点展示版）；
@@ -152,6 +151,12 @@
   直引 demo 源文件，mock 注入前需 `typeof window` 守卫（避免触碰 SSR）。
 
 **在线代码演练场（VuePlayground）约定：**
+
+> **状态：已暂时整体下线（2026-09-22，为保发布顺利）**——组件页「在线代码演练场」
+> 小节、`VuePlayground.vue`、`public/playground.html`、`public/vendor/`、
+> `scripts/sync-vendor.mjs`、`@vue/repl` 依赖已全部移除（恢复入口：git 历史 +
+> TECH-DEBT 记录）。以下约定保留作恢复时的参考，**当前不要按本节新增演练场**；
+> 页面内的交互演示一律用 `<demo>` 块（mock 免登录注入）实现。
 
 - `VuePlayground`（`.vitepress/components/VuePlayground.vue`，已在 theme 注册为
   全局组件）基于 `@vue/repl` 4.x（vuejs.org Playground 同款）：页面内编辑 SFC
@@ -277,8 +282,7 @@
 - 本地预览：`cd apps/docs && pnpm dev`（改 md/demo 热更）；
 - 构建验证：`cd apps/docs && pnpm build`（会真实编译所有 demo，语法/引用错误在此暴露；
   死链校验由 ignoreDeadLinks 白名单豁免仓库内路径）；
-- 演练场验证：`pnpm dev` 后打开含 VuePlayground 的页面，编辑代码看 iframe 实时
-  更新、点「重置代码」恢复初始模板；改 uikit 源码后记得先 build 再 sync:vendor。
+- ~~演练场验证~~（在线代码演练场已暂时下线，见 §2 状态注记）。
 - API 表格校验：改组件后 `pnpm gen:api` 重跑，diff `.vitepress/gen/` 检查是否
   符合预期（表格对齐由脚本保证，手改必被覆盖）。
 

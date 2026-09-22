@@ -18,6 +18,7 @@
 | offset              | `number`                                             | `8`        | 与锚点的间距（px），默认 8                                                                         |
 | boundary            | `HTMLElement`                                        | —          | 边界约束元素，传入后 popup 将被限制在该元素范围内                                                            |
 | group               | `string`                                             | —          | 互斥分组：同一 group 内同时只能有一个 popup 打开，打开新的会自动关闭其他的                                            |
+| shell               | `boolean`                                            | `true`     | 内容外壳（背景/边框/圆角/阴影），默认 true。<br>设为 false 时弹层外壳透明，由内部组件自行承担视觉外壳（如名片卡片的圆角与阴影）。              |
 | to                  | `string \| HTMLElement`                              | —          | Teleport 目标（默认 'body'）。嵌套弹层容器（如 demo 手机壳）场景传入<br>壳内元素选择器/元素，弹层随壳定位（配合壳的 transform 包含块）。 |
 
 ### Events

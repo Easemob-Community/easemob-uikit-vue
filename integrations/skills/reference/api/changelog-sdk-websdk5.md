@@ -1,5 +1,58 @@
+## @easemob-community/uikit-sdk-websdk5 1.3.4 (2026-09-21)
+
+
+### 修复
+
+- **`currentUser` 记账提前到 login 发起前**：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的欢迎语在 login resolve 前经 `onMessage` 到达），此前 `setCurrentUser` 在 `await login()` resolve 后才执行，窗口期内 `toUiMessage` 打 `currentUserId is empty` 告警且 `isSelf` / 自动清未读 / @我 / 通知过滤不可靠；现同步提前记账、失败回滚清空。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.3.3 (2026-09-21)
+
+
+### 新增
+
+- **`enableReadReceipt` 能力开关落地**：`onMessage` 实时回执（`queueMessageReadReceipt`）与进入会话补发（`sendPendingReadReceipts` 钩子）在开关关闭时整体跳过，不再调用 `sendMessageReadReceipts`。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.3.2 (2026-09-20)
+
+
+### 新增
+
+- **联系人关系变更全局通知**：通知引擎新增 `notifyContactEvent`，`onContactRefuse`（我发出的好友申请被对方拒绝）与 `onContactDeleted`（被好友删除）除既有 store 写入 / 会话内通知外，同时投递全局通知（页内右上角弹窗 / 页面隐藏时浏览器系统通知优先、失败降级页内）。好友关系变更属低频高优事件，跳过免打扰 / 当前会话 / triggerMode 判定，仅尊重通知总开关；送达回调通道语义与消息通知一致。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.3.1 (2026-09-18)
+
+
+### 新增
+
+- **实现契约 `removeMessages`**：透传 SDK `chatManager.removeHistoryMessages` 删除服务端漫游历史，成功后触发 `persistence.message.deleteMessages` 删除墓碑（多端移除事件路径另有落库）。
+
+### 修复
+
+- **`onContactRefuse` 补「我发出的申请被对方拒绝」通知**：无本地 pending 申请时落一条 `outgoing: true` 的拒绝通知，UI 展示「拒绝了你的好友申请」。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.3.0 (2026-09-16)
+
+
+### 变更
+
+- **`getDefaultFeatures()` 的 `enablePresence` 默认由 `false` 改为 `true`**：adapter 独立运行或未传 features 时与 UIKit Provider 3.6.0 默认对齐（在线状态为产品化默认形态）；注意订阅/查询会带来额外请求，低频场景应显式关闭。
+
+---
+
 ## @easemob-community/uikit-sdk-websdk5 1.2.2 (2026-09-03)
 
+
+### 新增
+
+- **语音未播放打标**：`onMessage` 实时收到对方语音消息时调用 `stores.message.markVoiceUnplayed?.(msgId)`（`MessageStoreLike` 新增可选方法，chatroom 等场景 store 可缺省），支撑 UI 层语音未读红点；历史/漫游路径不打标。
 
 ### 修复
 

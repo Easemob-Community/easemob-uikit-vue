@@ -89,7 +89,7 @@ IM 作为 OA 的"常驻全局能力"，需要一个明确的「挂载 → 卸载
 ## 八、落地节奏：按触发点做，不提前
 
 - **现在**：维持 5.x 现状，不动。
-- **私有化项目立项**：Phase 1 收口（5.x 回归不变）→ Phase 2 写 `webim4` adapter。
+- **存量 4.x 项目立项**：Phase 1 收口（5.x 回归不变）→ Phase 2 写 `webim4` adapter。
 - **OA 基座集成前**：D125 微前端专项评估（主题作用域/单例/window 副作用/SDK 卸载）。
 - **要 Electron 本地库**：Phase 3 repository + 持久化。
 

@@ -420,12 +420,6 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 
 `bubbleColor` 也支持传字符串同时设置自己/对方：`bubbleColor: '#7c3aed'`。`chatBg` 支持颜色、渐变或 `url(...)` 图片背景。`hoverColor` / `activeColor` / `iconMutedColor` 均为单值（任意 CSS 颜色），自定义后浅色与深色模式共用该值；不配置时分别走内置浅/深默认（`--uikit-bg-hover` / `--uikit-bg-active` 跟随主色 / `--uikit-icon-muted`），也可以通过覆盖同名 CSS 变量微调。
 
-## 在线代码演练场
-
-编辑下面的代码即可实时预览主题效果（右侧预览随代码编译即时更新，点「重置代码」恢复初始模板），体验与在线 IDE 一致：
-
-<VuePlayground :files="themePlaygroundFiles" title="主题配置在线演练场" id="theme" />
-
 ## 业务层映射
 
 业务项目可以在自己的样式表中把设计稿 Token 映射到 UIKit 变量，保持多端视觉一致：
@@ -442,7 +436,3 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 ## 与文档站主题的关系
 
 本文档站（VitePress）的 `--vp-c-brand-*` 变量已映射到 UIKit 品牌蓝，因此暗色模式下文档站与组件视觉保持一致，具体样式见 `.vitepress/theme/style.css`。
-
-<script setup>
-import { themePlaygroundFiles } from '../.vitepress/components/playground-files/theme'
-</script>

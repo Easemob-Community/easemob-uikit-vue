@@ -1,10 +1,10 @@
 # SDK 适配层 + 数据入口层抽象（双 adapter + 中立契约 + repository）设计执行计划
 
-> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 代码项全部落地——含 webim4 子路径入口、新消息通知引擎、注入 client 模式单测、摇树验收（2026-08-31 执行通过，结果见 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）——剩真实 4.x 环境手测矩阵 + 私有化端到端验收（人工项）；契约层残留债务已闭环（repository/domains 双线收敛、capabilities 协商机制、四域 repository 注入、`UIKitDataSource` 薄别名收口、im 侧 capabilities 消费接线）；Phase 3.2 前置（persistence 旁路写库钩子）/3.3（会话覆盖竞争并集合并）/3.4（DTO 序列化清洗）已于 2026-09-02 落地（明细见 TECH-DEBT D122 进度备忘），剩 Phase 3.5（Electron SQLite 实现包 + 登录 DB 预填时序）与搜索接口未启动**（2026-09-02 更新，明细见 TECH-DEBT D122 进度备忘）
+> 状态：**Phase 1 收口完成（5.x 门禁全绿）；Phase 2 webim4 adapter 核心 IM 代码项全部落地——含 webim4 子路径入口、新消息通知引擎、注入 client 模式单测、摇树验收（2026-08-31 执行通过，结果见 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）——剩真实 4.x 环境手测矩阵 + 4.x 端到端验收（人工项）；契约层残留债务已闭环（repository/domains 双线收敛、capabilities 协商机制、四域 repository 注入、`UIKitDataSource` 薄别名收口、im 侧 capabilities 消费接线）；Phase 3.2 前置（persistence 旁路写库钩子）/3.3（会话覆盖竞争并集合并）/3.4（DTO 序列化清洗）已于 2026-09-02 落地（明细见 TECH-DEBT D122 进度备忘），剩 Phase 3.5（Electron SQLite 实现包 + 登录 DB 预填时序）与搜索接口未启动**（2026-09-02 更新，明细见 TECH-DEBT D122 进度备忘）
 > 对应 TECH-DEBT D122（SDK 抽象），联动 D85（Electron 持久化预研，见 `docs/ELECTRON-PERSISTENCE-RESEARCH.md`）。
 > 修订（基于 `easemob-websdk@4.24.2` 源码核对）：会话列表 API 修正为 `getServerConversations`（游标分页）；补 4.x 消息体字段映射表（`msg`/`thumb`/`length`/`addr`/`customEvent` 等差异）与事件模型差异（`onMessage` 批量数组、回执独立回调）；`SdkAdapter` 补操作面；Provider 兼容策略明确为非 breaking；UMD 全局名决策修正；chatroom 本期暂缓接入 adapter。
 > **SDK 源码参考（只读）**：4.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（`easemob-websdk@4.24.2`，入口 `src/entry.ts`）；5.x `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。软链锚点 `tmp/sdk-ref/websdk4|websdk5`（gitignored）。施工中核对 SDK 行为一律进源码，禁止凭记忆。
-> 背景：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已接近开发尾声）；存量用户主力仍是 IM4.x；另有一个**私有化项目仅支持 4.x SDK，且运行在 Electron 环境**，聊天消息 / 会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
+> 背景：公有云推荐 `easemob-websdk` 5.x（当前 UIKit 已接近开发尾声）；存量用户主力仍是 IM4.x；另有一个**仅支持 4.x SDK 的项目，且运行在 Electron 环境**，聊天消息 / 会话可能需外接本地库注入或新增数据入口层。目标：一套 UI 产物不重来，底层 SDK 可低成本切换、数据来源可插拔。
 
 ---
 
@@ -13,9 +13,9 @@
 ### 1.1 需求背景
 
 1. **5.x 是战略方向**：公有云推荐，当前 UIKit（`@easemob-community/uikit-im` + `@easemob-community/uikit-core`）已按 5.x 开发接近尾声，UI 逻辑产物（消息气泡 / 会话列表 / 联系人 / 群管理 / 输入框 / 主题 / 文案）不愿舍弃重来。
-2. **4.x 是真实存量 + 硬需求**：4.x 仍是主要存量用户在用的 SDK；且有一个**私有化项目仅支持 4.x**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合，非更老的全局 `WebIM`/`msg.bodies` 形态）。
+2. **4.x 是真实存量 + 硬需求**：4.x 仍是主要存量用户在用的 SDK；且有一个**仅支持 4.x 的项目**（目标为 `easemob-websdk@4.24.2`：`connection.open()` 登录 + `connection.send()` 发消息 + `body` 判别联合，非更老的全局 `WebIM`/`msg.bodies` 形态）。
 3. **两代长期并存**：4.x 与 5.x 会长期双轨，不是"短期迁到 5.x 就完"。
-4. **私有化项目还是 Electron 环境**：聊天消息 / 会话可能需外接本地库（如 SQLite）注入，或新增数据入口层——登录后从本地库回流渲染（冷启动不依赖网络）、新消息收发时同步写库、翻页优先读本地。这一诉求与"SDK 切换"是**同一个端口-适配器问题**：SDK 是一个数据来源，本地库是另一个数据来源，应统一收敛到同一中立契约。
+4. **该项目还是 Electron 环境**：聊天消息 / 会话可能需外接本地库（如 SQLite）注入，或新增数据入口层——登录后从本地库回流渲染（冷启动不依赖网络）、新消息收发时同步写库、翻页优先读本地。这一诉求与"SDK 切换"是**同一个端口-适配器问题**：SDK 是一个数据来源，本地库是另一个数据来源，应统一收敛到同一中立契约。
 
 ### 1.2 结论
 
@@ -316,7 +316,7 @@ interface MessageRepository {
 | 2.1 | 新写 `webim4` adapter：`new WebIM.connection({ appKey })` 初始化 + `conn.open({user, accessToken})` 登录 + `connection.send()` 发消息 + `body` 判别联合 → 中立 `UiMessage` 映射 | 4.x 数据链路打通 |
 | 2.2 | 语义归一化：清未读（发 read/channel 隐式清）/ 已读回执 / 消息排序 / 会话更新事件对齐 5.x 行为 | uikit-im 看到一致行为 |
 | 2.3 | 能力映射：按「九」归一化映射表逐项实现（核心 IM 范围）；回执"消息类型 vs 专用 API"重点回归 | 4.x 能力与 5.x 对齐 |
-| 2.4 | 私有化验收：私有化项目接入 4.x adapter，uikit-im dist 与 UI 零改动；先手测核心 IM 逐项可用 | 端到端可用 |
+| 2.4 | 4.x 验收：4.x 项目接入 4.x adapter，uikit-im dist 与 UI 零改动；先手测核心 IM 逐项可用 | 端到端可用 |
 
 ### Phase 3 —— 数据入口层（repository）+ Electron 持久化（与 Phase 2 可并行；UI 零改动）
 
@@ -410,7 +410,7 @@ interface MessageRepository {
 
 ### 已确认决策（SDK 暴露模型与生命周期，OA 微前端讨论补充）
 
-17. **「创建权」与「暴露」解耦**：SDK 实例「由谁创建」（内置 vs 注入）与「能否被业务直接调用」（暴露）是两个正交问题。满足"SDK 对外暴露、业务可独立调用"**不需要**业务自己 import SDK 建实例——UIKit 内置创建后经 `useClient()` 暴露实例同样满足。两个入口并存：**默认内置**（未传 `adapter` 时内部 `new Websdk5Adapter()`，私有化项目里 `new Webim4Adapter()`）+ **可选注入**（业务已自建 client 时传 `new Webim4Adapter(connection)`），避免双 client。这样"开箱即用"与"用户可独立调用"同时成立。
+17. **「创建权」与「暴露」解耦**：SDK 实例「由谁创建」（内置 vs 注入）与「能否被业务直接调用」（暴露）是两个正交问题。满足"SDK 对外暴露、业务可独立调用"**不需要**业务自己 import SDK 建实例——UIKit 内置创建后经 `useClient()` 暴露实例同样满足。两个入口并存：**默认内置**（未传 `adapter` 时内部 `new Websdk5Adapter()`，4.x 项目里 `new Webim4Adapter()`）+ **可选注入**（业务已自建 client 时传 `new Webim4Adapter(connection)`），避免双 client。这样"开箱即用"与"用户可独立调用"同时成立。
 18. **单一生命周期所有者（压复杂度的核心原则）**：内置模式 = UIKit 全权（login/logout/dispose 归 UIKit）；注入模式 = 业务全权（UIKit 只订阅事件 + 借实例操作，绝不替业务 login/logout/dispose）。**禁止"半注入"**（业务建 client 但 UIKit 管 login）。此条写进 `SdkAdapter` 契约注释并加断言/门禁，把复杂度封死在适配层边界，不扩散到 UI 层。这是"支持注入"唯一会引入复杂度的点，用这条原则压死它。**落地注记（2026-08-29）**：core `useCoreUIKitProvider` 按 `options.adapter` 是否传入判定 injected/builtin；注入模式下 core 仍负责 `adapter.init` **接线**（stores/features/eventDeps 注入是 UIKit 工作的前提），但 `login`/`logout` 不再转发 adapter（告警并引导业务直连自己的 adapter），UIKit 自身 store 清理照常。配套：`Websdk5Adapter.login` 成功后经注入 stores 记账 `setCurrentUser`（`ClientStoreLike.setCurrentUser?` 可选方法），保证业务直连 `adapter.login` 时 `isLoggedIn` 正常翻转。
 19. **`useClient()` 返回中立 `SdkAdapter`，不泄漏 SDK 类型**：当前 `useClient()` 返回的 `client`/`sdkClient` 是 `ManagerHost` 代理（`packages/uikit-core/src/composables/use-client.ts`，2026-08 复核修正：并非原生 `ChatClient` 本体），但 `ManagerHost` 的 7 个 manager 字段均为 SDK5 原生类型，同样会从公开 API 泄漏 SDK 类型、破坏"纯 UIKIT"。Phase 1 后改为返回中立 `SdkAdapter`；原生实例经 `adapter.client`（`unknown`/可选）拿；需要强类型原生 SDK 的深度调用放 adapter 包内 helper，不让 uikit-im 公开类型带 `ChatClient`/`connection`。
 20. **非 Vue 上下文的独立调用入口**：`useClient()` 是 `provide/inject` 绑定、只能在 Provider 子树内用；OA 基座里"SDK 对外独立调用"往往意味着非 Vue 上下文（别的子应用 / 主进程 IPC / 定时任务）。除 `useClient()` 外，需提供非 context 访问口（如 `login()` 返回实例，或 adapter 实例挂在确定位置 / 模块级 getter）。**已落地（2026-08-29）**：core 新增模块级 `getUIKitAdapter(): SdkAdapter | null`（`composables/default-adapter.ts`，主入口导出），Provider 装配时登记、scope dispose 时（仅当仍指向本实例）清空。
@@ -433,7 +433,7 @@ interface MessageRepository {
 - `cd apps/demo && pnpm exec vue-tsc --noEmit`
 - 5.x 全功能回归（Phase 1 后必须"行为不变"）
 - 4.x 手测可用（Phase 2 第一版：核心 IM 逐项手测，对照 5.x 行为）
-- 4.x 私有化端到端验收（Phase 2 收尾）
+- 4.x 端到端验收（Phase 2 收尾）
 - **摇树验收**（Phase 2，对应决策 22）：分别用 4.x / 5.x 各起一个独立消费者工程跑 bundle analyzer——4.x 工程产物中搜不到 5.x 符号（`ChatClient`/`Easemob` 全局名），5.x 工程产物中搜不到 4.x 符号（`WebIM`/`connection`）；结果并入 `docs/CONSUMER-VALIDATION-CHECKLIST.md`
 - 消费者验证（tgz 独立工程，参考 `docs/CONSUMER-VALIDATION-CHECKLIST.md`）
 

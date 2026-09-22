@@ -30,12 +30,6 @@ import { EmMessageList, EmUIKitProvider } from '@easemob-community/uikit-im'
 
 > 通常不需要单独使用 `EmMessageList` —— [聊天模块](./chat-container) 的 `EmChatContainer` 已经内置了消息列表、输入区与消息操作。单独使用 `EmMessageList` 适用于深度定制聊天页布局（如自定义输入区）的场景。
 
-### 在线代码演练场
-
-直接编辑下面的代码（`config.messageList` 配置对象与 mock 数据），右侧列表随代码编译即时更新，点「重置代码」恢复初始模板：
-
-<VuePlayground :files="messageListPlaygroundFiles" title="消息列表配置在线演练场" id="message-list" />
-
 ### 单条气泡能力演练场
 
 下面针对单条消息气泡 `EmMessageBubbleWrapper` 演示**多选态 / 引用卡片 / 状态组合 / 群已读圆圈**四类能力（演示数据为 mock，不依赖登录态）：
@@ -82,7 +76,3 @@ import { EmMessageList, EmUIKitProvider } from '@easemob-community/uikit-im'
 ## API
 
 <!-- @include: ../.vitepress/gen/message-list.md -->
-
-<script setup>
-import { messageListPlaygroundFiles } from './message-list/demo/playground/template'
-</script>

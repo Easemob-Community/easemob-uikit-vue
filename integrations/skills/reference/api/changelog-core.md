@@ -1,3 +1,127 @@
+## @easemob-community/uikit-core 2.8.7 (2026-09-21)
+
+
+### 修复
+
+- **core `login()` 同步提前记账 `currentUser`**：同 websdk5 1.3.4，消除「REST 消息先于 login resolve 到达」的空 `currentUserId` 竞态窗口，登录失败回滚清空。
+
+---
+
+## @easemob-community/uikit-core 2.8.6 (2026-09-21)
+
+
+### 新增
+
+- **`EmBadge` 新增 `inline` prop**：徽标不占位覆盖、按文档流渲染（如会话列表行尾未读数），默认 `false` 行为不变；开启后 `placement` 不生效。
+- **defaultFeatures 新增 `enableReadReceipt: true`**：全局已读回执开关默认值，经 features 响应式链路下发 adapter 与 UIKit（sdk-contract 1.3.1）。
+
+---
+
+## @easemob-community/uikit-core 2.8.5 (2026-09-18)
+
+
+### 变更
+
+- **输入占位文字字号统一为 13px**（`EmInput` 及聊天输入框），比正文（15px）小一档，对齐抽屉搜索框观感。
+- **群成员移除文案收敛**：`group.memberList.remove` 由「从群组移除」改为「移除」。
+
+### 新增
+
+- **icons-v2 新增 `dspntd`（失望）图标**：好友申请被对端拒绝的通知条目使用。
+- **locale 新增 `contact.inviteRequestReceived` / `contact.inviteDeclinedByPeer`**：好友申请副文案与「拒绝了你的好友申请」通知文案。
+
+---
+
+## @easemob-community/uikit-core 2.8.4 (2026-09-18)
+
+
+### 变更
+
+- **`--uikit-sidebar-width` 默认值由固定 `360px` 改为弹性 `clamp(240px, 25%, 480px)`**：新增边界 token `--uikit-sidebar-min-width`（默认 240px）/ `--uikit-sidebar-max-width`（默认 480px），侧栏列表容器随宿主容器宽度伸缩；宿主覆写为 `100%` 或固定 px 的用法不受影响。
+
+### 新增
+
+- **`EmResizable` 新增 `fluid` prop**：fluid 且未拖拽过、无受控值时不写内联尺寸（由 CSS 决定），首次拖拽时测量根元素当前实际尺寸作为拖拽起点，拖拽后经 `update:model-value` / 内联 px 接管。
+
+---
+
+## @easemob-community/uikit-core 2.8.3 (2026-09-17)
+
+
+### 新增
+
+- **defaultFeatures 补齐昵称展示开关默认值**：`showNicknameInSingleChat` 默认 false、`showNicknameInGroupChat` 默认 true（契约字段定义见 uikit-sdk-contract 1.2.1）。
+
+---
+
+## @easemob-community/uikit-core 2.8.2 (2026-09-17)
+
+
+### 修复
+
+- **修复生产构建中 core 组件（按钮等）样式随 SFC 源码改动漂移失配的问题（严重）**：`@vitejs/plugin-vue` 4.x 生产构建的 scoped `data-v` hash = `hash(文件路径 + SFC 源码)`，任何 SFC 内容修改都会生成新 scopeId；而 `@easemob-community/uikit-im` 的 theme 内联的是 core dist 构建期固化的 scoped 样式，core 单独重构建（如 2.8.0 → 2.8.1 修改 EmButton）会使已发布的 im theme 里的 `data-v` 选择器全部失配，表现为消费方生产构建中按钮等 core 组件**失去全部样式**。修复：升级 `@vitejs/plugin-vue` 至 ^5.2.4 并统一启用 `features.componentIdGenerator: 'filepath'`，scoped hash 仅由文件路径决定、与源码内容无关，重复构建保持稳定；新增构建守卫 `scripts/check-theme-scope-ids.mjs`（core / uikit-im / uikit-chatroom 构建链接入），theme CSS 中出现运行时无法匹配的 scoped hash 时立即构建失败，杜绝再次静默产坏包。
+
+---
+
+## @easemob-community/uikit-core 2.8.1 (2026-09-16)
+
+
+### 变更
+
+- **`componentsShape` 方正档改为真直角（视觉变更）**：`square` 档 `--uikit-components-radius` 由 4px 改为 **0px**（`--uikit-components-radius-hover` 同步 10px → 0px）。原 4px 与圆润档 8px 在卡片 / 弹窗 / 按钮上肉眼几乎无差别，实测用户感知为开关失效；方正档现在呈现明确的直角风格（business 预设同步受影响）。同时清理 EmButton 中无人设置 `data-uikit-components-radius` 属性的失效 legacy 选择器（pill 按钮保持胶囊不受开关影响）。
+
+---
+
+## @easemob-community/uikit-core 2.8.0 (2026-09-16)
+
+
+### 变更
+
+- **新增全局 header 底部分隔线开关 `headerBorder`**：`themeStore.headerBorder`（持久化，默认 `false`）驱动新 token `--uikit-header-border-width`（`0px`/`1px`）；`ProviderThemeConfig` 新增 `headerBorder?: boolean`，`useTheme()` 新增 `headerBorder` / `setHeaderBorder()`。
+- **EmModal `showHeaderDivider` 默认行为变化**：默认值由 `true` 改为「不传时跟随全局 `headerBorder` 开关（默认关闭）」，显式传 `true`/`false` 仍优先（沿用 Avatar `shape` 回落主题的惯例）。此前依赖默认显示 header 分割线的弹窗，需开启全局开关或显式 `:show-header-divider="true"`。
+
+---
+
+## @easemob-community/uikit-core 2.7.1 (2026-09-16)
+
+
+### 变更
+
+- **EmModal 度量对齐设计稿（视觉变更，无 API 变更）**：header 高 60px（`padding 13px 12px 13px 16px`，标题 18px/Medium）；body 默认 padding 24px → **56px 48px**、默认字号 14 → **18px**（`bodyFlush` 贴边形态不变，承接表单/穿梭/列表场景）；正文语义图标 56 → **72px**；footer 高 80px（`padding 16px 22px`，按钮间距 16 → 12）；外壳移除 1px 描边（设计稿仅阴影），圆角仍跟随 `--uikit-components-radius`、阴影走 `--uikit-shadow`。移动端 bottom-sheet 分支保持原有紧凑度量不受影响。
+
+---
+
+## @easemob-community/uikit-core 2.7.0 (2026-09-16)
+
+
+### 变更
+
+- **能力开关默认对齐产品化形态（行为变更）**：`defaultFeatures` 与 core `UIKitProvider` 的 `enableContact` / `enableBlocklist` / `enablePresence` 默认由 `false` 改为 `true`（此前 Provider 保守默认与 defaultFeatures 故意不一致，现对齐）；`usePresence` 关闭告警文案同步更新。presence 订阅有额外请求成本，低频场景显式关闭。
+
+---
+
+## @easemob-community/uikit-core 2.6.0 (2026-09-04)
+
+
+### 新增
+
+- **文件类型图标底色 token**：`--uikit-file-icon-{pdf,xls,doc,ppt,md,img,video,audio,file}` 品牌识别色（pdf `#E5252A` / xls `#1D7044` / doc `#2B5797` / ppt `#D24625` / md `#424242` / img `#00897B` / video `#E91E63` / audio `#7B1FA2` / 未识别普通文件 `#4CAF50`），明暗模式通用。
+
+---
+
+## @easemob-community/uikit-core 2.5.0 (2026-09-03)
+
+
+### 新增
+
+- **`EmText` 排版原子组件**（TECH-DEBT D127）：`level` 对齐设计师 Value.tokens.json 9 档（h0=34 / h1=28 / h2=22 / h3=18 / body-lg=16 / body=14 / caption=12 / small=10 / mini=8）并补 `body-sm`（13px）；每档内置「字号 + 行高」配对（行高按稿值换算为 `calc(Npx × --uikit-font-scale)`，跟随适老缩放）与默认字重；`weight`（regular / medium / semibold / bold）可覆盖默认字重，`color`（primary / secondary / tertiary / inverse）走语义 token，`ellipsis` 单行截断，`tag` 默认 `span`。新增后不全库回改，新代码用、老代码渐进迁移。
+- **字号 token 补两档大标题**：`--uikit-font-size-28` / `--uikit-font-size-34`（明暗两段，× `--uikit-font-scale`）。
+- **字体族栈首声明设计规范字体**：`--uikit-font-family` 栈首加 `'Inter'`（拉丁字形）/ `'Noto Sans SC'`（中文），本机未安装时自动回落 PingFang SC / 雅黑 / 思源黑体等系统字体栈；库不内置网络字体加载，需要精确字形时由接入方自行引入 webfont。
+- **气泡语义 token 扩展与默认值校准（设计规范）**：新增 `--uikit-bubble-radius`（round 档 16px，默认）/ `--uikit-bubble-radius-square`（square 档 8px）与气泡内分割线 `--uikit-bubble-divider-other` / `--uikit-bubble-divider-self`（明暗两段）；气泡默认色校准为对方 `#E4E6E7` / `#171A1C`、己方 `#009EFF` / `#FFFFFF`（暗色段：对方沿用表面色与文字色，己方保持品牌蓝 `#009EFF`）。
+- **`INJECTION_KEY.VOICE_UNREAD_DOT` 注入键**：语音未读红点开关的 provide/inject 通道（`ComputedRef<boolean | undefined>`，undefined 回落默认 true），支持消息项级深一层 provide 覆盖。
+
+---
+
 ## @easemob-community/uikit-core 2.4.0 (2026-09-03)
 
 

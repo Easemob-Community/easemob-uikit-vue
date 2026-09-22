@@ -11,7 +11,7 @@
 import { computed, reactive } from 'vue'
 import { EmConversationContainer, EmUIKitProvider } from '@easemob-community/uikit-im'
 import type { ConfigItem } from '../../.vitepress/components/DocsConfigPanel.vue'
-import { injectMockConversations } from '../../components/conversation-container/demo/playground/mock'
+import { injectMockConversations } from '../../components/conversation-container/demo/mock-conversations'
 
 // 注入 mock 会话（仅客户端执行，见 DemoBlock 的 ClientOnly）
 injectMockConversations()
