@@ -115,11 +115,30 @@ d.ts 对 core 的引用保持裸包名 `@easemob/uikit-core`（vite-plugin-dts `
 - **切换后必须重新 `pnpm install` 生效**（可加 `--install` 自动重装）；
 - 检查当前模式：`pnpm sdk:status`；tgz 模式仅影响本地安装/构建，发布不受影响。
 
-## 5. 根 workspace 与常用脚本（pnpm 9 / pnpm-workspace.yaml）
+## 5. npm 发布编排（`scripts/publish.mjs`）
+
+- **默认演练**：`pnpm release`（= `node scripts/publish.mjs`）跑门禁 + 构建 + `pnpm pack` +
+  `npm publish --dry-run`，不上传；**真实发布**：`pnpm release:publish`（`--publish`），
+  npm CLI 自动拉起浏览器完成 passkey 2FA（TOTP 已被 npm 弃用，浏览器 WebAuthn 是现行交互验证方式）。
+- **pnpm pack + npm publish 组合的原因**：子包间 `workspace:^` 互引只有 pnpm pack 会改写为真实
+  版本号（npm publish 原样发出会让消费者解析失败）；浏览器 2FA 挑战是 npm CLI 能力（pnpm 9 不支持）。
+  脚本打包后还会校验产物 manifest 不含 `workspace:`。
+- 拓扑序固化在脚本 `PACKAGES`：sdk-contract → core → sdk-websdk5 / sdk-webim4 → im → chatroom → mcp；
+  `npm view` 检查到版本已存在则自动跳过（幂等可重跑）；支持 `--only` / `--from` / `--skip-build`。
+- **门禁**：根 `pnpm.overrides` 不得残留任何 `file:` 本地 tgz（会污染 pnpm pack 的 workspace 版本改写，
+  曾实测改写出旧版 `core@^2.8.6`）；`changelog:check`；暂存区无 dist/node_modules/.tgz；
+  真实发布要求已 `npm login --registry https://registry.npmjs.org`。
+- **registry 固定为 `https://registry.npmjs.org`**：本机全局 `~/.npmrc` 指向 npmmirror 只读镜像，
+  脚本所有 npm 调用（whoami / view / publish）都显式带 `--registry`，登录也要对准官方源。
+- 首次发布 scoped 包必须 `--access public`（脚本已内置）；发布后建议在 npm 网页端把包级
+  Publishing access 设为「Require two-factor authentication and disallow tokens」。
+
+## 6. 根 workspace 与常用脚本（pnpm 9 / pnpm-workspace.yaml）
 
 - workspace：`packages/*`（@easemob/uikit-im）+ `apps/*`（demo / docs）；
 - 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob/uikit-im story:dev`（Histoire）；
   `test` = vitest；`lint` = `eslint .`；`format` = `prettier --write .`；
+  `release` = 发布演练（dry-run）、`release:publish` = 真实发布（见 §5）；
 - `packageManager: pnpm@9.12.3`；`engines.node >= 18`；
 - **提交前检查**：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'`
   应为空（`dist/` 已 gitignore，但 tgz 模式改动的根 package.json 是真实 diff）。
