@@ -12,6 +12,7 @@ import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import { usePresence, useViewport } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../composables/use-user-info'
 import { useUIKit } from '../../composables/use-uikit'
+import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 import type { PresenceDisplayStatus } from '@easemob-community/uikit-core'
 import type { ConversationAction } from './types'
@@ -66,7 +67,7 @@ const { isMobile } = useViewport()
 const isSingleChat = computed(() => props.conversation.type === CONVERSATION_TYPE.SINGLECHAT)
 // SDK 的 conversationName 在 enableUserInfoSync 开启后已预填充用户资料。
 // 仅在 SDK 名称为空或等于 userId 时才回退到 useUserInfo 单独获取，
-// 头像缺失不影响——Avatar 组件会自动显示文字占位。
+// 头像缺失不影响——单聊由 Avatar 显示文字占位，群聊回落默认群头像。
 const sdkNameSufficient = computed(() =>
   !!props.conversation.name && props.conversation.name !== props.conversation.id,
 )
@@ -98,7 +99,10 @@ const peerPresence = computed<PresenceDisplayStatus | undefined>(() => {
 const conversationName = computed(() =>
   contact.value?.remark || userInfo.value?.nickname || props.conversation.name || props.conversation.id,
 )
-const conversationAvatar = computed(() => avatarUrl.value || props.conversation.avatar)
+const conversationAvatar = computed(() =>
+  avatarUrl.value || props.conversation.avatar
+  || (props.conversation.type === CONVERSATION_TYPE.GROUPCHAT ? DEFAULT_GROUP_AVATAR : undefined),
+)
 
 /** 实际是否展示 @我 提示（受全局 enableAtMe 开关控制） */
 const effectiveHasAtMe = computed(() => props.hasAtMe && features.enableAtMe !== false)

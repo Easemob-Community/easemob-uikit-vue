@@ -4,6 +4,7 @@ import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
 import { EmCheckbox as Checkbox } from '@easemob-community/uikit-core'
 import { EmCell as Cell } from '@easemob-community/uikit-core'
 import type { UiGroup as Group } from '@easemob-community/uikit-core'
+import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import type { AvatarShape, GroupItemSize } from './types'
 
 interface GroupItemDefaultProps {
@@ -88,7 +89,7 @@ const memberCountMeta = computed(() => {
         <slot name="avatar" :group="props.group" :size="resolvedAvatarSize">
           <Avatar
             v-if="props.showAvatar"
-            :src="props.group.avatar"
+            :src="props.group.avatar || DEFAULT_GROUP_AVATAR"
             :name="displayName"
             :size="resolvedAvatarSize"
             :shape="resolvedAvatarShape"

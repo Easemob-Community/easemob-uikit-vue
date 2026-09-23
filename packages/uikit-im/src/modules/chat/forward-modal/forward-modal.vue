@@ -8,7 +8,9 @@ import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
 import { EmCell as Cell } from '@easemob-community/uikit-core'
 import { EmInput as Input } from '@easemob-community/uikit-core'
 import { EmEmpty as Empty } from '@easemob-community/uikit-core'
+import { CONVERSATION_TYPE } from '@easemob-community/uikit-core'
 import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
+import { DEFAULT_GROUP_AVATAR } from '../../../assets'
 
 export interface ForwardModalProps {
   show: boolean
@@ -49,6 +51,11 @@ function onSelect(conversation: Conversation) {
   emit('forward', conversation)
   onClose()
 }
+
+/** 会话头像：群会话无头像时回落默认群头像 */
+function resolveAvatar(item: Conversation) {
+  return item.avatar || (item.type === CONVERSATION_TYPE.GROUPCHAT ? DEFAULT_GROUP_AVATAR : undefined)
+}
 </script>
 
 <template>
@@ -83,7 +90,7 @@ function onSelect(conversation: Conversation) {
           @click="onSelect(item)"
         >
           <template #leading>
-            <Avatar :src="item.avatar" :name="item.name" :size="40" />
+            <Avatar :src="resolveAvatar(item)" :name="item.name" :size="40" />
           </template>
         </Cell>
         <Empty

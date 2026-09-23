@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { EmAvatar as Avatar, CONVERSATION_TYPE, GROUP_MEMBER_ROLE, EmIcon as Icon, EmIconButton as IconButton, EmInput as Input, EmModal as Modal, NOTICE_EVENT_TYPE, createLogger, formatSdkError, insertChatNotice, useLocale, useToast } from '@easemob-community/uikit-core'
 import type { UiGroup } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
+import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import { useGroup } from '../../composables/use-group'
 
 const props = withDefaults(defineProps<GroupDetailProps>(), {
@@ -201,7 +202,7 @@ async function onConfirmAction() {
         <!-- 插槽 #avatar：接管群头像区 / Slot #avatar: override the avatar block -->
         <slot name="avatar" :group-id="props.groupId" :avatar="displayAvatar" :display-name="displayName">
           <Avatar
-            :src="displayAvatar"
+            :src="displayAvatar || DEFAULT_GROUP_AVATAR"
             :name="displayName"
             :size="96"
           />

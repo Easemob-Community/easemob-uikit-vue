@@ -2,6 +2,7 @@
 import { EmAvatar as Avatar } from '@easemob-community/uikit-core'
 import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import { EmCopyableText as CopyableText } from '@easemob-community/uikit-core'
+import { DEFAULT_GROUP_AVATAR } from '../../assets'
 
 export interface GroupCardAction {
   /** 操作唯一标识，点击时作为 action-click 负载回传 */
@@ -71,7 +72,7 @@ function onActionClick(key: string) {
       <div class="group-card__profile">
         <Avatar
           class="group-card__avatar"
-          :src="props.avatar"
+          :src="props.avatar || DEFAULT_GROUP_AVATAR"
           :name="props.name"
           :size="90"
         />

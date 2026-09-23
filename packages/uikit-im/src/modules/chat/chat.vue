@@ -12,6 +12,7 @@ import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
 import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
+import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import CreateGroupModal from '../conversation/create-group-modal.vue'
 import UserCardModal from '../../components/user-card/user-card-modal.vue'
@@ -560,10 +561,10 @@ const showSignText = computed(() =>
   showSubtitleArea.value && (subtitleMode.value === 'auto' || subtitleMode.value === 'sign') && !!peerSign.value,
 )
 
-/** 顶部头像：单聊优先取用户资料头像 */
+/** 顶部头像：单聊优先取用户资料头像；群聊无头像时回落默认群头像 */
 const headerAvatar = computed(() => {
   if (currentConversation.value?.type === CONVERSATION_TYPE.GROUPCHAT)
-    return currentConversation.value.avatar
+    return currentConversation.value.avatar || DEFAULT_GROUP_AVATAR
   return avatarUrl.value || currentConversation.value?.avatar
 })
 
