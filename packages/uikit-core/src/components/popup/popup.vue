@@ -34,6 +34,12 @@ export interface PopupProps {
   /** 互斥分组：同一 group 内同时只能有一个 popup 打开，打开新的会自动关闭其他的 */
   group?: string
   /**
+   * 全高档位（opt-in，仅 position="bottom" 且非锚定模式生效）：
+   * 弹层拉满视口高度（100dvh + safe-top），突破 bottom 形态默认的 80dvh 上限；
+   * 用于移动端选人/重交互场景。默认 false，不影响其他 bottom 使用方。
+   */
+  fullscreen?: boolean
+  /**
    * 内容外壳（背景/边框/圆角/阴影），默认 true。
    * 设为 false 时弹层外壳透明，由内部组件自行承担视觉外壳（如名片卡片的圆角与阴影）。
    */
@@ -67,6 +73,7 @@ const props = withDefaults(defineProps<PopupProps>(), {
   align: 'center',
   offset: 8,
   shell: true,
+  fullscreen: false,
 })
 
 const emit = defineEmits<PopupEmits>()
@@ -313,7 +320,10 @@ onUnmounted(() => {
             class="uikit-popup__content"
             :class="[
               isAnchored ? 'uikit-popup__content--anchored' : `uikit-popup__content--${props.position}`,
-              { 'uikit-popup__content--no-shell': !props.shell },
+              {
+                'uikit-popup__content--no-shell': !props.shell,
+                'uikit-popup__content--full': props.fullscreen && !isAnchored && props.position === 'bottom',
+              },
             ]"
             :style="isAnchored ? contentStyle : undefined"
             role="dialog"
@@ -400,8 +410,21 @@ onUnmounted(() => {
   box-shadow: var(--uikit-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
   max-width: 100%;
   max-height: 80vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 80vh */
+  max-height: 80dvh;
   padding-bottom: var(--uikit-safe-bottom, 0px);
   overflow: auto;
+}
+
+/* 全高档位（opt-in fullscreen）：拉满视口高度并贴顶（含 safe-top），
+   覆盖 bottom 形态的 80dvh 上限与顶部圆角 */
+.uikit-popup__content--full {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  border-radius: 0;
+  padding-top: var(--uikit-safe-top, 0px);
 }
 
 .uikit-popup__content--top {

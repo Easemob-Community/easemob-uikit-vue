@@ -8,6 +8,7 @@ import IconButton from '../icon-button/icon-button.vue'
 import { t } from '../../locale'
 import { useViewport } from '../../composables/use-viewport'
 import { useThemeStore } from '../../store/theme'
+import { resolveModalLayout } from './modal-layout'
 
 export interface ModalProps {
   /** 是否显示弹窗（v-model:show 受控） */
@@ -33,7 +34,8 @@ export interface ModalProps {
   icon?: string
   /** 是否显示底部按钮区，默认 true；列表/搜索类弹窗可置 false 并用默认插槽自绘内容 */
   showFooter?: boolean
-  /** 底部按钮布局：right（默认，右对齐 pill 按钮）/ stretch（等宽铺满，兼容旧形态） */
+  /** 底部按钮布局：right（默认，右对齐 pill 按钮）/ stretch（等宽铺满，兼容旧形态）；
+   *  移动端忽略该 prop，强制 stretch 等宽铺满 */
   footerAlign?: 'right' | 'stretch'
   /** 是否显示「取消」按钮，默认 true */
   showCancel?: boolean
@@ -45,7 +47,8 @@ export interface ModalProps {
   closeOnClickOverlay?: boolean
   /** 弹窗类型：default（默认）/ danger（危险操作，确认按钮变红色）/ warning / info / success；
    *  非 default 时正文自动带对应语义图标（icon prop / #icon 插槽可覆盖）；
-   *  图标默认脱色（主文字色），语义着色需显式开启 semanticIconColor */
+   *  图标默认脱色（主文字色），语义着色需显式开启 semanticIconColor；
+   *  移动端回落差异：default 表单类回落 bottom sheet，语义类（短文案确认/通知）保持居中 */
   type?: 'default' | 'danger' | 'warning' | 'info' | 'success'
   /** 语义图标是否按类型着色（warning 橙 / danger 红 等），默认 false 脱色展示 */
   semanticIconColor?: boolean
@@ -57,6 +60,9 @@ export interface ModalProps {
   confirmAutoClose?: boolean
   /** 正文是否贴边（去除 body 内边距并撑满高度），列表/搜索类弹窗使用，默认 false */
   bodyFlush?: boolean
+  /** 移动端全高档位（opt-in）：bottom sheet 形态下弹窗拉满视口高度（100dvh + safe-top），
+   *  突破默认 80dvh 上限，用于选人等重交互场景；仅移动端 bottom sheet 生效，桌面端无影响 */
+  mobileFullscreen?: boolean
 }
 
 export interface ModalEmits {
@@ -87,12 +93,16 @@ const props = withDefaults(defineProps<ModalProps>(), {
   confirmAutoClose: true,
   bodyFlush: false,
   semanticIconColor: false,
+  mobileFullscreen: false,
 })
 
 const emit = defineEmits<ModalEmits>()
 
 const { isMobile } = useViewport()
-const popupPosition = computed(() => (isMobile.value ? 'bottom' : 'center'))
+/** 布局决策（位置 / 外壳 / footer 口径）统一走纯函数，行为矩阵见 modal-layout.ts 单测 */
+const layout = computed(() =>
+  resolveModalLayout({ isMobile: isMobile.value, type: props.type, footerAlign: props.footerAlign }),
+)
 
 const themeStore = useThemeStore()
 /** header 分割线显隐：prop 显式传入优先，未传时跟随全局 headerBorder 开关（默认关闭） */
@@ -132,16 +142,17 @@ function onCancel() {
 <template>
   <Popup
     :show="props.show"
-    :position="popupPosition"
-    :shell="isMobile"
+    :position="layout.position"
+    :shell="layout.shell"
+    :fullscreen="props.mobileFullscreen"
     :close-on-click-overlay="props.closeOnClickOverlay"
     @update:show="(v: boolean) => emit('update:show', v)"
     @close="onCancel"
   >
     <div
       class="uikit-modal"
-      :class="{ 'uikit-modal--mobile': isMobile }"
-      :style="isMobile ? undefined : { '--uikit-modal-design-width': `${props.width}px`, ...(props.height > 0 ? { height: `${props.height}px` } : {}) }"
+      :class="{ 'uikit-modal--mobile': isMobile, 'uikit-modal--sheet': layout.shell, 'uikit-modal--fullscreen': props.mobileFullscreen && layout.shell }"
+      :style="layout.shell ? undefined : { '--uikit-modal-design-width': `${props.width}px`, ...(props.height > 0 ? { height: `${props.height}px` } : {}) }"
     >
       <div
         v-if="props.title || $slots.title || props.showClose"
@@ -175,22 +186,41 @@ function onCancel() {
       <div
         v-if="props.showFooter || $slots.footer"
         class="uikit-modal__footer"
-        :class="`uikit-modal__footer--${props.footerAlign}`"
+        :class="`uikit-modal__footer--${layout.footerAlign}`"
       >
         <slot name="footer">
-          <Button
-            pill
-            size="large"
-            :type="props.type === 'danger' ? 'danger' : 'primary'"
-            :disabled="props.confirmDisabled"
-            :loading="props.confirmLoading"
-            @click="onConfirm"
-          >
-            {{ props.confirmText }}
-          </Button>
-          <Button v-if="props.showCancel" pill size="large" type="outline" @click="onCancel">
-            {{ props.cancelText }}
-          </Button>
+          <!-- 移动端：取消在左、确认在右（等宽铺满，对齐移动端操作习惯）；
+               桌面端保持设计稿：确认在左、取消在右 -->
+          <template v-if="layout.footerOrder === 'cancel-first'">
+            <Button v-if="props.showCancel" pill size="large" type="outline" @click="onCancel">
+              {{ props.cancelText }}
+            </Button>
+            <Button
+              pill
+              size="large"
+              :type="props.type === 'danger' ? 'danger' : 'primary'"
+              :disabled="props.confirmDisabled"
+              :loading="props.confirmLoading"
+              @click="onConfirm"
+            >
+              {{ props.confirmText }}
+            </Button>
+          </template>
+          <template v-else>
+            <Button
+              pill
+              size="large"
+              :type="props.type === 'danger' ? 'danger' : 'primary'"
+              :disabled="props.confirmDisabled"
+              :loading="props.confirmLoading"
+              @click="onConfirm"
+            >
+              {{ props.confirmText }}
+            </Button>
+            <Button v-if="props.showCancel" pill size="large" type="outline" @click="onCancel">
+              {{ props.cancelText }}
+            </Button>
+          </template>
         </slot>
       </div>
     </div>
@@ -198,7 +228,7 @@ function onCancel() {
 </template>
 
 <style scoped>
-/* 桌面端外壳由 Modal 自绘（Popup shell=false）：
+/* 居中形态外壳由 Modal 自绘（Popup shell=false，含桌面全部场景与移动端确认/通知类）：
    白卡 + 阴影，无描边（设计稿形态）；圆角跟随全局大容器约束 --uikit-components-radius。
    宽度自适应：min(设计稿宽度, 视口宽 × --uikit-modal-width-ratio)，ratio 默认 0.5 可在主题层覆写 */
 .uikit-modal {
@@ -216,15 +246,23 @@ function onCancel() {
   overflow: hidden;
 }
 
-/* 移动端回落 bottom sheet：外壳交还 Popup（shell=true），内部不再自绘 */
-.uikit-modal--mobile {
+/* 移动端回落 bottom sheet（仅 type=default 表单类）：外壳交还 Popup（shell=true），内部不再自绘 */
+.uikit-modal--sheet {
   width: 100%;
   max-width: 100%;
   max-height: 80vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 80vh */
+  max-height: 80dvh;
   background: none;
   border: none;
   border-radius: 0;
   box-shadow: none;
+}
+
+/* 移动端居中形态（确认/通知类，type 非 default）：外壳仍由 Modal 自绘，
+   宽度按视口留边收敛（桌面端的 50vw 比例口径不适用于窄屏） */
+.uikit-modal--mobile:not(.uikit-modal--sheet) {
+  width: min(var(--uikit-modal-design-width, 420px), calc(100vw - 48px));
 }
 
 /* 设计稿 header 规格：高 60（padding 13/16/13/12 + 30 关闭热区 + 1px 底分割线），标题 18px/500 */
@@ -307,7 +345,7 @@ function onCancel() {
   min-width: 104px;
 }
 
-/* 兼容旧形态：等宽铺满 */
+/* 等宽铺满：旧形态兼容 + 移动端强制口径（移动端 footer 一律等宽铺满） */
 .uikit-modal__footer--stretch > * {
   flex: 1;
 }
@@ -318,7 +356,28 @@ function onCancel() {
   font-size: var(--uikit-font-size-13);
 }
 
+/* 贴边模式在移动端同样生效（全屏选人等场景需要内容贴边），压掉上面的紧凑 padding */
+.uikit-modal--mobile .uikit-modal__body--flush {
+  padding: 0;
+}
+
 .uikit-modal--mobile .uikit-modal__footer {
-  padding: 0 24px calc(24px + var(--uikit-safe-bottom, 0px));
+  padding: 0 24px 24px;
+}
+
+/* bottom sheet 形态贴底，footer 底部叠加安全区；居中形态不需要 */
+.uikit-modal--sheet .uikit-modal__footer {
+  padding-bottom: calc(24px + var(--uikit-safe-bottom, 0px));
+}
+
+/* 移动端全高档位（opt-in mobileFullscreen）：弹窗拉满 Popup 全高外壳，body 撑满剩余空间 */
+.uikit-modal--sheet.uikit-modal--fullscreen {
+  height: 100%;
+  max-height: none;
+}
+
+.uikit-modal--fullscreen .uikit-modal__body {
+  flex: 1;
+  min-height: 0;
 }
 </style>
