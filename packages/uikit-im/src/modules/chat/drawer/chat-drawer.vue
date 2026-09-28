@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
-import { useThemeStore } from '@easemob-community/uikit-core'
+import { useThemeStore, useViewport } from '@easemob-community/uikit-core'
 import type { ChatDrawerProps } from '../types'
 
 const props = withDefaults(defineProps<ChatDrawerProps>(), {
@@ -20,12 +20,20 @@ const emit = defineEmits<{
 }>()
 
 const themeStore = useThemeStore()
+const { isMobile } = useViewport()
 const shapeClass = computed(() =>
   themeStore.componentsShape === 'square' ? 'chat-drawer__panel--square' : '',
 )
 
 /** 是否按覆盖模式渲染：全屏强制走覆盖结构（满铺），push 才走占位挤压结构 */
 const isOverlayMode = computed(() => props.fullscreen || props.mode === 'overlay')
+
+/**
+ * H5 整页接管（模式 A）：fullscreen 语义在移动端升级为视口级 fixed 全屏层，
+ * 脱离聊天容器坐标系、盖住宿主页面 header，消除双层 header；
+ * PC 端 fullscreen 仍保持容器内满铺（不影响桌面布局）
+ */
+const isFixedFullscreen = computed(() => props.fullscreen && isMobile.value)
 
 const panelRef = ref<HTMLElement>()
 
@@ -83,7 +91,7 @@ onClickOutside(panelRef, (event) => {
 <template>
   <!-- 覆盖 / 全屏模式：absolute 满铺壳 + 遮罩或点击层 + 右侧滑入面板 -->
   <Transition name="chat-drawer-fade">
-    <div v-if="show && isOverlayMode" class="chat-drawer">
+    <div v-if="show && isOverlayMode" class="chat-drawer" :class="{ 'chat-drawer--fixed': isFixedFullscreen }">
       <!-- 遮罩层（visible overlay） -->
       <div v-if="overlay" class="chat-drawer__overlay" @click="onOverlayClick" />
       <!-- 透明点击层（overlay=false 时覆盖外部区域，支持点击关闭） -->
@@ -143,6 +151,21 @@ onClickOutside(panelRef, (event) => {
   height: 100%;
   z-index: 200;
   pointer-events: none;
+}
+
+/* H5 整页接管（模式 A）：脱离聊天容器 fixed 满铺视口，盖住宿主页面 header，消除双层 header。
+   z-index 取 1000（与 multi-select-bar 同档）：高于宿主页面内容，低于 Popup 全局分配器
+   基线 2000，保证从抽屉内打开的 Modal/Popup（teleport 到 body）仍叠在抽屉之上 */
+.chat-drawer--fixed {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 100vh */
+  height: 100dvh;
+  z-index: 1000;
+  /* 面板滚动到边界时不把滚动链穿透给被盖住的宿主页面 */
+  overscroll-behavior: contain;
 }
 
 .chat-drawer__overlay {

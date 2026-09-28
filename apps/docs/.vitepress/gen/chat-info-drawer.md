@@ -19,7 +19,7 @@
 | showJoinRequests           | `boolean`                      | `false`    | 是否展示入群申请入口                                                                                                                 |
 | mode                       | `'overlay' \| 'push'`          | `'push'`   | 抽屉展示模式：push 占位挤压聊天区（默认）/ overlay 完全遮挡                                                                                      |
 | closeOnClickOutside        | `boolean`                      | `true`     | 点击抽屉外部（聊天区 / 空白处）是否关闭，默认 true；透传 ChatDrawer 的 closeOnClickOutside，仅 push 模式生效                                              |
-| fullscreen                 | `boolean`                      | `false`    | 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头                                                                                  |
+| fullscreen                 | `boolean`                      | `false`    | 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头；<br>移动端下经 ChatDrawer 升级为视口级 fixed 全屏层（盖住宿主页面 header）                             |
 | width                      | `number`                       | —          | 抽屉宽度（px），默认 320；全屏模式忽略                                                                                                     |
 | showMessageSearch          | `boolean`                      | —          | 是否展示「消息搜索」入口行（由宿主按 messageList.search 配置下发）                                                                                |
 | avatarClickViewProfile     | `boolean`                      | `true`     | 预览区点击头像是否打开用户名片（单聊对方头像 / 群聊成员宫格头像），默认 true；<br>由宿主按 ChatConfig.drawer.avatarClickViewProfile 下发；名片弹层由宿主经 view-profile 事件接管 |

@@ -8,7 +8,7 @@ import { EmCell as Cell } from '@easemob-community/uikit-core'
 import { EmSwitch as Switch } from '@easemob-community/uikit-core'
 
 import { useLocale } from '@easemob-community/uikit-core'
-import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE } from '@easemob-community/uikit-core'
+import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, useViewport } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { insertChatNotice } from '@easemob-community/uikit-core'
@@ -84,6 +84,8 @@ const emit = defineEmits<{
 const logger = createLogger('UIKit:GroupManagementSection')
 
 const { t } = useLocale()
+/** 移动端二级抽屉整页接管（fullscreen 在 H5 升级为视口级 fixed 全屏层，盖住宿主 header） */
+const { isMobile } = useViewport()
 const { stores } = useUIKit()
 const { muteAllGroupMembers, unmuteAllGroupMembers } = useGroup()
 
@@ -262,6 +264,7 @@ function closePanel() {
       v-model:show="showDrawer"
       :overlay="true"
       :close-on-click-overlay="true"
+      :fullscreen="isMobile"
       @close="closePanel"
     >
       <template #header>
@@ -531,7 +534,8 @@ function closePanel() {
 .group-management-section__drawer-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  /* 顶部内边距叠加 safe-top：移动端全屏接管（fixed 满铺）时 header 避开刘海 */
+  padding: calc(12px + var(--uikit-safe-top, 0px)) 16px 12px;
   gap: 12px;
 }
 

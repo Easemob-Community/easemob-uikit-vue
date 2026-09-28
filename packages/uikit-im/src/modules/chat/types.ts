@@ -462,9 +462,11 @@ export interface ChatDrawerProps {
    */
   mode?: 'overlay' | 'push'
   /**
-   * 全屏模式（移动端独立页面），默认 false：忽略 offsetTop 与宽度，满铺整个聊天容器且圆角归零。
+   * 全屏模式（移动端独立页面），默认 false：忽略 offsetTop 与宽度，满铺整个聊天容器且圆角归零；
+   * 移动端（<768px）下进一步升级为视口级 fixed 全屏层（100dvh），盖住宿主页面 header，避免双层 header。
    * Fullscreen mode (mobile standalone page). Default false. Ignores offsetTop/width and
-   * covers the whole chat container with no border radius.
+   * covers the whole chat container with no border radius. On mobile it further becomes a
+   * viewport-fixed fullscreen layer (100dvh) that covers the host page header.
    */
   fullscreen?: boolean
   /**

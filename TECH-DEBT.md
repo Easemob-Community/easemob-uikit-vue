@@ -1380,6 +1380,14 @@
 
 ## 已修复（归档）
 
+- [x] **D142. H5 下钻容器全屏接管口径（模式 A：组件全屏接管）**
+  - 已于 2026-09-28 修复并确立口径。
+  - **现象**：H5 下 UIKit 的下钻子页（典型：聊天页打开会话信息抽屉「好友信息/群信息」）只满铺聊天容器（`position: absolute`），宿主 App 自身页面 header 仍可见，出现双层 header（宿主返回键 + 组件返回键）。
+  - **口径**：移动端（`useViewport().isMobile`，768px）下钻子页一律整页接管——`position: fixed; inset: 0`、高度 `100vh`/`100dvh` 双声明、header 叠加 `safe-top`、z-index 1000（与 multi-select-bar 同档，高于宿主页面、低于 Popup 全局分配器基线 2000，保证层内打开的 Modal/Popup 仍在上层）；返回键语义归组件自身（点「<」只关闭该层）；PC 端零影响（fullscreen 在 PC 仍为容器内满铺）。
+  - **落地**：修复收敛在共享壳 `chat-drawer.vue`（`fullscreen && isMobile` → 壳升 `.chat-drawer--fixed`），覆盖 `chat-info-drawer`（chat.vue 已传 `:fullscreen="isMobileView"`，零改动获益）与 `group-management-section` 二级抽屉（补传 `:fullscreen="isMobile"` + header safe-top padding）；未发明第二套全屏方案（与 EmPopup `fullscreen` / EmModal `mobileFullscreen` 档位同语义、按组件形态各自实现）。
+  - **范围说明**：`message-search-modal` 等 EmPopup/EmModal 类弹层本就 teleport 到 body（fixed 全屏遮罩），不存在双层 header，不在本条范围；bottom sheet 类（操作菜单/选人弹窗）同理不在范围。
+  - **关联 skill**：`uikit-h5-adaptation`
+
 - [x] **D138. 好友列表搜索/字母分组不识别 userInfo 昵称（中文昵称搜不到、分组错位）**
   - 已于 2026-09-20 修复。
   - 根因：列表项展示名口径 `remark || userInfo昵称 || name || userId`，而搜索（`use-contact-filter`）与分组/排序（`use-contact-group` / `use-contact-sort`）只消费 `remark || name`；SDK5 好友列表只有 userId、昵称异步拉取在 userInfo store，按显示的中文昵称搜索永远落空。

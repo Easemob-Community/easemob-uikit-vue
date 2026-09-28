@@ -117,7 +117,8 @@ export interface ChatInfoDrawerProps {
   mode?: 'overlay' | 'push'
   /** 点击抽屉外部（聊天区 / 空白处）是否关闭，默认 true；透传 ChatDrawer 的 closeOnClickOutside，仅 push 模式生效 */
   closeOnClickOutside?: boolean
-  /** 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头 */
+  /** 全屏模式（移动端独立页面）：满铺聊天容器、圆角归零，header 主档显示返回箭头；
+   *  移动端下经 ChatDrawer 升级为视口级 fixed 全屏层（盖住宿主页面 header） */
   fullscreen?: boolean
   /** 抽屉宽度（px），默认 320；全屏模式忽略 */
   width?: number
