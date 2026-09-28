@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { EmPopup as Popup } from '@easemob-community/uikit-core'
-import { EmButton as Button } from '@easemob-community/uikit-core'
-import { EmInput as Input } from '@easemob-community/uikit-core'
-import { useLocale } from '@easemob-community/uikit-core'
+import { EmInput as Input, EmModal as Modal, useLocale } from '@easemob-community/uikit-core'
 
 export interface ChatInfoDrawerFieldEditModalProps {
   /** 是否显示（v-model:show 受控） */
@@ -69,77 +66,54 @@ function onSave() {
 </script>
 
 <template>
-  <Popup
+  <!-- 壳已收敛到 EmModal（D133）：自带移动端 bottom sheet 回落与 safe-bottom，
+       确认不自动关闭（confirmAutoClose=false），由父组件保存成功后关闭 -->
+  <Modal
     :show="props.show"
-    position="center"
+    :title="props.title"
+    :width="400"
+    body-flush
+    :confirm-text="t('chat.info.save', '保存')"
+    :confirm-loading="props.saving"
+    :confirm-disabled="props.saving"
+    :confirm-auto-close="false"
     @update:show="emit('update:show', $event)"
-    @close="onCancel"
+    @confirm="onSave"
+    @cancel="onCancel"
   >
-    <div class="chat-info-drawer-field-edit">
-      <div class="chat-info-drawer-field-edit__title">
-        {{ props.title }}
-      </div>
-      <div class="chat-info-drawer-field-edit__body">
-        <textarea
-          v-if="props.multiline"
-          ref="textareaRef"
-          v-model="input"
-          class="chat-info-drawer-field-edit__textarea"
-          rows="3"
-          :maxlength="props.maxLength"
-          @keydown.esc="onCancel"
-        />
-        <Input
-          v-else
-          ref="inputRef"
-          v-model="input"
-          :maxlength="props.maxLength"
-          @submit="onSave"
-          @keydown.esc="onCancel"
-        />
-        <div
-          class="chat-info-drawer-field-edit__char-count"
-          :class="{ 'is-near-limit': input.length > props.maxLength * 0.9 }"
-        >
-          {{ formatCharCount(input.length, props.maxLength) }}
-        </div>
-      </div>
-      <div class="chat-info-drawer-field-edit__footer">
-        <Button type="default" @click="onCancel">
-          {{ t('button.cancel', '取消') }}
-        </Button>
-        <Button type="primary" :loading="props.saving" :disabled="props.saving" @click="onSave">
-          {{ t('chat.info.save', '保存') }}
-        </Button>
+    <div class="chat-info-drawer-field-edit__body">
+      <textarea
+        v-if="props.multiline"
+        ref="textareaRef"
+        v-model="input"
+        class="chat-info-drawer-field-edit__textarea"
+        rows="3"
+        :maxlength="props.maxLength"
+      />
+      <Input
+        v-else
+        ref="inputRef"
+        v-model="input"
+        :maxlength="props.maxLength"
+        @submit="onSave"
+      />
+      <div
+        class="chat-info-drawer-field-edit__char-count"
+        :class="{ 'is-near-limit': input.length > props.maxLength * 0.9 }"
+      >
+        {{ formatCharCount(input.length, props.maxLength) }}
       </div>
     </div>
-  </Popup>
+  </Modal>
 </template>
 
 <style scoped>
-.chat-info-drawer-field-edit {
-  width: 400px;
-  max-width: 90vw;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
-  overflow: hidden;
-}
-
-.chat-info-drawer-field-edit__title {
-  padding: 16px 16px 8px;
-  font-size: var(--uikit-font-size-15);
-  font-weight: var(--uikit-font-weight-semibold);
-  text-align: center;
-  color: var(--uikit-text-primary);
-}
-
+/* body 贴边（bodyFlush）后由本区块自带内边距，对齐 add-contact-modal 表单项 20px 内收口径 */
 .chat-info-drawer-field-edit__body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 8px 16px;
+  padding: 8px 20px 16px;
 }
 
 .chat-info-drawer-field-edit__textarea {
@@ -171,12 +145,5 @@ function onSave() {
 
 .chat-info-drawer-field-edit__char-count.is-near-limit {
   color: var(--uikit-warning-color, var(--uikit-error-color));
-}
-
-.chat-info-drawer-field-edit__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 12px 16px 16px;
 }
 </style>

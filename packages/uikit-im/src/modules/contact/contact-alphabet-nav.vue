@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { type ContactGroupItem, DEFAULT_ALPHABET_KEYS } from './types'
+import { resolveAlphabetKeyByOffsetY } from './alphabet-nav.utils'
 
 interface ContactAlphabetNavProps {
   /** 当前已渲染的分组数据，用于禁用空字母（与 keys 二选一） */
@@ -20,7 +21,8 @@ const props = withDefaults(defineProps<ContactAlphabetNavProps>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'jump', key: string): void
+  /** 点击或滑动命中字母时触发；sliding=true 表示来自按住滑动（连续定位，跳转应瞬时完成） */
+  (e: 'jump', key: string, sliding?: boolean): void
 }>()
 
 const existKeys = computed(() => {
@@ -29,15 +31,55 @@ const existKeys = computed(() => {
   return new Set(props.groups.map(g => g.key))
 })
 
-function onTap(key: string) {
+function onTap(key: string, sliding = false) {
   if (props.dimEmpty && !existKeys.value.has(key))
     return
-  emit('jump', key)
+  emit('jump', key, sliding)
+}
+
+// ===== 移动端按住滑动连续定位：触点 y 在完整字母序列上按占比映射 =====
+const navRef = ref<HTMLElement>()
+/** 滑动中标记：touchmove 仅在从索引条起滑时响应，避免列表滚动误入 */
+let sliding = false
+
+function keyFromTouch(e: TouchEvent): string | null {
+  const el = navRef.value
+  const touch = e.touches[0]
+  if (!el || !touch)
+    return null
+  const rect = el.getBoundingClientRect()
+  return resolveAlphabetKeyByOffsetY(touch.clientY - rect.top, rect.height, DEFAULT_ALPHABET_KEYS)
+}
+
+function onTouchStart(e: TouchEvent) {
+  sliding = true
+  const key = keyFromTouch(e)
+  if (key)
+    onTap(key, true)
+}
+
+function onTouchMove(e: TouchEvent) {
+  if (!sliding)
+    return
+  const key = keyFromTouch(e)
+  if (key)
+    onTap(key, true)
+}
+
+function onTouchEnd() {
+  sliding = false
 }
 </script>
 
 <template>
-  <div class="contact-alphabet-nav">
+  <div
+    ref="navRef"
+    class="contact-alphabet-nav"
+    @touchstart="onTouchStart"
+    @touchmove.prevent="onTouchMove"
+    @touchend="onTouchEnd"
+    @touchcancel="onTouchEnd"
+  >
     <span
       v-for="key in DEFAULT_ALPHABET_KEYS"
       :key="key"
@@ -73,7 +115,12 @@ function onTap(key: string) {
   flex: 1 1 0;
   min-height: 0;
   max-height: 20px;
+  /* 视觉保持 16px 纤细、触摸热区经 content-box padding 加宽到 24px（≥24px 触控目标）；
+     background-clip: content-box 保证 is-active 高亮块仍只覆盖 16px 视觉区 */
+  box-sizing: content-box;
   width: 16px;
+  padding: 0 4px;
+  background-clip: content-box;
   position: relative;
   display: inline-flex;
   align-items: center;

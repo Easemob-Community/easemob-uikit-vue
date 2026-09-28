@@ -118,6 +118,8 @@ function resolveAvatar(item: Conversation) {
 .forward-modal--mobile {
   width: 100vw;
   max-height: 80vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 80vh */
+  max-height: 80dvh;
   border-radius: 12px 12px 0 0;
 }
 

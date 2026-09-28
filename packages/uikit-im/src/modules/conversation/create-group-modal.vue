@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { EmButton as Button, CONVERSATION_TYPE, EmCell as Cell, EmEmpty as Empty, GROUP_INFO_LIMIT, EmIcon as Icon, EmInput as Input, EmPopup as Popup, EmSwitch as Switch, useLocale, useViewport } from '@easemob-community/uikit-core'
+import { CONVERSATION_TYPE, EmCell as Cell, GROUP_INFO_LIMIT, EmInput as Input, EmSwitch as Switch, useLocale } from '@easemob-community/uikit-core'
 import type { CreateGroupParams, UiContact } from '@easemob-community/uikit-core'
 import { useUIKit } from '../../composables/use-uikit'
 import { useGroup } from '../../composables/use-group'
 import { useContact } from '../../composables/use-contact'
 import { useConversation } from '../../composables/use-conversation'
-import ContactList from '../contact/contact-list.vue'
-import ContactItemDefault from '../contact/contact-item-default.vue'
+import ContactTransferModal from '../contact/contact-transfer-modal.vue'
 
 export interface CreateGroupModalConfig {
   /** 群名称；不传时自动生成 */
@@ -67,10 +66,9 @@ function formatCharCount(current: number, max: number): string {
   return t('common.charCount', '{current}/{max}').replace('{current}', String(current)).replace('{max}', String(max))
 }
 
-const { isMobile } = useViewport()
 const { stores } = useUIKit()
 const { createGroup } = useGroup()
-const { contactList, selectedIds, setSelectedIds, toggleSelect, fetchContacts } = useContact()
+const { contactList } = useContact()
 const { selectConversation } = useConversation()
 
 const loading = ref(false)
@@ -93,28 +91,19 @@ const settings = reactive({
   maxMembers: '',
 })
 
+/** 当前选中成员 id：打开时取 config.initialSelectedIds，之后由穿梭框 update:selectedIds 同步 */
+const selectedIds = ref<string[]>([])
+
 const selectedContacts = computed(() => {
-  const ids = [...selectedIds.value]
   const map = new Map(contactList.value.map(c => [c.userId, c]))
   // 不在联系人列表中的预选 ID（如单聊抽屉「添加」入口的对方）以最小信息兜底展示，
   // 保证 initialSelectedIds 始终生效（与非好友也可发起群聊的语义一致）
-  return ids
+  return selectedIds.value
     .map(id => map.get(id) ?? ({ userId: id, name: id } as UiContact))
     .filter(c => c.userId !== currentUserId.value)
 })
 
 const selectedCount = computed(() => selectedContacts.value.length)
-
-/** 右栏已选列表搜索关键词（本地过滤，不写入 store） */
-const selectedSearchKeyword = ref('')
-const filteredSelectedContacts = computed(() => {
-  const kw = selectedSearchKeyword.value.trim().toLowerCase()
-  if (!kw)
-    return selectedContacts.value
-  return selectedContacts.value.filter(c =>
-    (c.remark || c.name || c.userId).toLowerCase().includes(kw),
-  )
-})
 
 const generatedName = computed(() => {
   if (props.config.name)
@@ -138,17 +127,16 @@ function reset() {
   errorMsg.value = ''
   groupNameInput.value = ''
   groupDescriptionInput.value = ''
-  selectedSearchKeyword.value = ''
   settings.public = props.config.public ?? false
   settings.joinApprovalRequired = props.config.joinApprovalRequired ?? false
   settings.allowInvites = props.config.allowInvites ?? false
   settings.inviteNeedConfirm = props.config.inviteNeedConfirm ?? false
   settings.maxMembers = props.config.maxMembers ? String(props.config.maxMembers) : ''
-  setSelectedIds(props.config.initialSelectedIds ?? [])
+  selectedIds.value = [...(props.config.initialSelectedIds ?? [])]
 }
 
-function removeSelected(userId: string) {
-  toggleSelect(userId)
+function onSelectedChange(ids: string[]) {
+  selectedIds.value = ids
 }
 
 async function onCreate() {
@@ -210,302 +198,131 @@ async function onCreate() {
 
 watch(
   () => props.show,
-  async (show) => {
-    if (show) {
+  (show) => {
+    if (show)
       reset()
-      await fetchContacts()
-    }
   },
 )
 </script>
 
 <template>
-  <Popup
+  <!-- 壳与选人结构收敛到共享穿梭框 EmContactTransferModal（D133）：
+       EmModal 底座自带移动端 bottom sheet 回落，mobileFullscreen 全高档位拉满视口 -->
+  <ContactTransferModal
     :show="props.show"
-    :position="isMobile ? 'bottom' : 'center'"
-    :show-close="true"
+    :title="t('conversation.createGroup', '创建群组')"
+    :selected-ids="props.config.initialSelectedIds ?? []"
+    :disabled-fn="(contact: UiContact) => contact.userId === currentUserId"
+    :confirm-text="t('group.createSubmit', '完成')"
+    :loading="loading"
     @update:show="emit('update:show', $event)"
-    @close="onClose"
+    @update:selected-ids="onSelectedChange"
+    @confirm="onCreate"
   >
-    <div class="create-group-modal" :class="{ 'create-group-modal--mobile': isMobile }">
-      <div class="create-group-modal__header">
-        <span class="create-group-modal__title">{{ t('conversation.createGroup', '创建群组') }}</span>
+    <!-- #body 插槽：完全接管弹窗主体（透传宿主的同名接管） -->
+    <template v-if="$slots.body" #body>
+      <slot name="body" />
+    </template>
+
+    <!-- 群信息表单 + 群设置注入穿梭框右栏顶部（移动端渲染在头像条与列表之间） -->
+    <template #panel-top>
+      <div v-if="showNameInput || showDescriptionInput" class="create-group-modal__form">
+        <div v-if="showNameInput" class="create-group-modal__field">
+          <label class="create-group-modal__label">{{ t('group.createName', '群名称') }}</label>
+          <Input
+            v-model="groupNameInput"
+            variant="default"
+            :placeholder="generatedName || (t('group.createNamePlaceholder', '输入群名称'))"
+            :maxlength="GROUP_INFO_LIMIT.NAME_MAX_LENGTH"
+          />
+          <div
+            class="create-group-modal__char-count"
+            :class="{ 'is-near-limit': groupNameInput.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH * 0.9 }"
+          >
+            {{ formatCharCount(groupNameInput.length, GROUP_INFO_LIMIT.NAME_MAX_LENGTH) }}
+          </div>
+        </div>
+        <div v-if="showDescriptionInput" class="create-group-modal__field">
+          <label class="create-group-modal__label">{{ t('group.createDescription', '群介绍') }}</label>
+          <Input
+            v-model="groupDescriptionInput"
+            variant="default"
+            :placeholder="t('group.createDescriptionPlaceholder', '输入群介绍（可选）')"
+            :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
+          />
+          <div
+            class="create-group-modal__char-count"
+            :class="{ 'is-near-limit': groupDescriptionInput.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH * 0.9 }"
+          >
+            {{ formatCharCount(groupDescriptionInput.length, GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) }}
+          </div>
+        </div>
       </div>
 
-      <div v-if="$slots.body" class="create-group-modal__body">
-        <slot name="body" />
-      </div>
-      <div v-else class="create-group-modal__body">
-        <!-- 左侧：联系人选择 -->
-        <div class="create-group-modal__left">
-          <ContactList
-            :show-header="false"
-            :show-scroll-to-top="false"
-            group-by="alphabet"
-            select-mode="multiple"
-            checkbox-position="right"
-            :disabled-fn="(contact) => contact.userId === currentUserId"
+      <!-- 群设置：公开/审批/邀请开关 + 最大成员数（config.showSettings 开启） -->
+      <div v-if="showSettings" class="create-group-modal__settings">
+        <div class="create-group-modal__settings-title">
+          {{ t('group.createSettings', '群设置') }}
+        </div>
+        <Cell size="compact" :border="false" @click="settings.public = !settings.public">
+          <template #default>
+            {{ t('group.createPublic', '公开群') }}
+          </template>
+          <template #trailing>
+            <Switch v-model="settings.public" @click.stop />
+          </template>
+        </Cell>
+        <Cell size="compact" :border="false" @click="settings.joinApprovalRequired = !settings.joinApprovalRequired">
+          <template #default>
+            {{ t('group.createApproval', '入群需审批') }}
+          </template>
+          <template #trailing>
+            <Switch v-model="settings.joinApprovalRequired" @click.stop />
+          </template>
+        </Cell>
+        <Cell size="compact" :border="false" @click="settings.allowInvites = !settings.allowInvites">
+          <template #default>
+            {{ t('group.createAllowInvites', '允许成员邀请') }}
+          </template>
+          <template #trailing>
+            <Switch v-model="settings.allowInvites" @click.stop />
+          </template>
+        </Cell>
+        <Cell size="compact" :border="false" @click="settings.inviteNeedConfirm = !settings.inviteNeedConfirm">
+          <template #default>
+            {{ t('group.createInviteNeedConfirm', '被邀请人需确认') }}
+          </template>
+          <template #trailing>
+            <Switch v-model="settings.inviteNeedConfirm" @click.stop />
+          </template>
+        </Cell>
+        <div class="create-group-modal__field create-group-modal__field--max-members">
+          <label class="create-group-modal__label">{{ t('group.createMaxMembers', '最大成员数') }}</label>
+          <Input
+            v-model="settings.maxMembers"
+            type="number"
+            variant="default"
+            :placeholder="t('group.createMaxMembersPlaceholder', '不填则使用默认上限')"
           />
         </div>
-
-        <!-- 右侧：已选 + 群信息 -->
-        <div class="create-group-modal__right">
-          <div class="create-group-modal__right-search">
-            <Input
-              v-model="selectedSearchKeyword"
-              variant="search"
-              clearable
-              clear-icon="search/xmark"
-              :placeholder="t('contact.searchPlaceholder')"
-              prefix-icon="search"
-            />
-          </div>
-
-          <div v-if="showNameInput || showDescriptionInput" class="create-group-modal__form">
-            <div v-if="showNameInput" class="create-group-modal__field">
-              <label class="create-group-modal__label">{{ t('group.createName', '群名称') }}</label>
-              <Input
-                v-model="groupNameInput"
-                variant="default"
-                :placeholder="generatedName || (t('group.createNamePlaceholder', '输入群名称'))"
-                :maxlength="GROUP_INFO_LIMIT.NAME_MAX_LENGTH"
-              />
-              <div
-                class="create-group-modal__char-count"
-                :class="{ 'is-near-limit': groupNameInput.length > GROUP_INFO_LIMIT.NAME_MAX_LENGTH * 0.9 }"
-              >
-                {{ formatCharCount(groupNameInput.length, GROUP_INFO_LIMIT.NAME_MAX_LENGTH) }}
-              </div>
-            </div>
-            <div v-if="showDescriptionInput" class="create-group-modal__field">
-              <label class="create-group-modal__label">{{ t('group.createDescription', '群介绍') }}</label>
-              <Input
-                v-model="groupDescriptionInput"
-                variant="default"
-                :placeholder="t('group.createDescriptionPlaceholder', '输入群介绍（可选）')"
-                :maxlength="GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH"
-              />
-              <div
-                class="create-group-modal__char-count"
-                :class="{ 'is-near-limit': groupDescriptionInput.length > GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH * 0.9 }"
-              >
-                {{ formatCharCount(groupDescriptionInput.length, GROUP_INFO_LIMIT.DESCRIPTION_MAX_LENGTH) }}
-              </div>
-            </div>
-          </div>
-
-          <!-- 群设置：公开/审批/邀请开关 + 最大成员数（config.showSettings 开启） -->
-          <div v-if="showSettings" class="create-group-modal__settings">
-            <div class="create-group-modal__settings-title">
-              {{ t('group.createSettings', '群设置') }}
-            </div>
-            <Cell size="compact" :border="false" @click="settings.public = !settings.public">
-              <template #default>
-                {{ t('group.createPublic', '公开群') }}
-              </template>
-              <template #trailing>
-                <Switch v-model="settings.public" @click.stop />
-              </template>
-            </Cell>
-            <Cell size="compact" :border="false" @click="settings.joinApprovalRequired = !settings.joinApprovalRequired">
-              <template #default>
-                {{ t('group.createApproval', '入群需审批') }}
-              </template>
-              <template #trailing>
-                <Switch v-model="settings.joinApprovalRequired" @click.stop />
-              </template>
-            </Cell>
-            <Cell size="compact" :border="false" @click="settings.allowInvites = !settings.allowInvites">
-              <template #default>
-                {{ t('group.createAllowInvites', '允许成员邀请') }}
-              </template>
-              <template #trailing>
-                <Switch v-model="settings.allowInvites" @click.stop />
-              </template>
-            </Cell>
-            <Cell size="compact" :border="false" @click="settings.inviteNeedConfirm = !settings.inviteNeedConfirm">
-              <template #default>
-                {{ t('group.createInviteNeedConfirm', '被邀请人需确认') }}
-              </template>
-              <template #trailing>
-                <Switch v-model="settings.inviteNeedConfirm" @click.stop />
-              </template>
-            </Cell>
-            <div class="create-group-modal__field create-group-modal__field--max-members">
-              <label class="create-group-modal__label">{{ t('group.createMaxMembers', '最大成员数') }}</label>
-              <Input
-                v-model="settings.maxMembers"
-                type="number"
-                variant="default"
-                :placeholder="t('group.createMaxMembersPlaceholder', '不填则使用默认上限')"
-              />
-            </div>
-          </div>
-
-          <div class="create-group-modal__selected-list">
-            <ContactItemDefault
-              v-for="contact in filteredSelectedContacts"
-              :key="contact.userId"
-              class="create-group-modal__selected-item"
-              :contact="contact"
-              size="normal"
-              :show-checkbox="false"
-              :clickable="false"
-            >
-              <template #extra>
-                <button
-                  class="create-group-modal__selected-remove"
-                  @click="removeSelected(contact.userId)"
-                >
-                  <Icon name="filled/circle/xmark" :size="20" />
-                </button>
-              </template>
-            </ContactItemDefault>
-            <Empty
-              v-if="selectedCount === 0"
-              icon="person/single"
-              :description="t('group.createSelectedEmpty', '请选择联系人')"
-              size="small"
-            />
-            <Empty
-              v-else-if="filteredSelectedContacts.length === 0"
-              icon="person/single"
-              :description="t('contact.noSearchResult')"
-              size="small"
-            />
-          </div>
-        </div>
       </div>
+    </template>
 
+    <!-- 创建校验/接口错误提示（穿梭框 #notice 区，footer 上方） -->
+    <template #notice>
       <div v-if="errorMsg" class="create-group-modal__error">
         {{ errorMsg }}
       </div>
+    </template>
 
-      <!-- #footer 插槽：接管操作区 -->
-      <div v-if="$slots.footer" class="create-group-modal__footer">
-        <slot name="footer" />
-      </div>
-      <div v-else class="create-group-modal__footer">
-        <Button
-          class="create-group-modal__footer-btn"
-          type="primary"
-          size="large"
-          pill
-          :disabled="selectedCount === 0"
-          :loading="loading"
-          @click="onCreate"
-        >
-          {{ t('group.createSubmit', '完成') }}
-        </Button>
-        <Button class="create-group-modal__footer-btn" type="outline" size="large" pill @click="onClose">
-          {{ t('button.cancel', '取消') }}
-        </Button>
-      </div>
-    </div>
-  </Popup>
+    <!-- #footer 插槽：接管操作区（透传宿主的同名接管） -->
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+  </ContactTransferModal>
 </template>
 
 <style scoped>
-.create-group-modal {
-  width: 720px;
-  max-width: 90vw;
-  height: 70vh;
-  max-height: 620px;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--uikit-bg-base);
-  border-radius: var(--uikit-components-radius, 12px);
-  overflow: hidden;
-}
-
-.create-group-modal--mobile {
-  width: 100vw;
-  max-width: 100vw;
-  height: 85vh;
-  max-height: 85vh;
-  border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
-}
-
-.create-group-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 16px;
-  flex-shrink: 0;
-  /* 底部分隔线宽度随全局 headerBorder 开关（默认 0 关闭） */
-  border-bottom: var(--uikit-header-border-width, 0px) solid var(--uikit-border-color, #e5e7eb);
-}
-
-.create-group-modal__title {
-  font-size: var(--uikit-font-size-15);
-  font-weight: var(--uikit-font-weight-semibold);
-  color: var(--uikit-text-primary);
-}
-
-.create-group-modal__body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  overflow: hidden;
-}
-
-.create-group-modal__left {
-  flex: 1;
-  min-width: 0;
-  border-right: 1px solid var(--uikit-border-color, #e5e7eb);
-  overflow: hidden;
-}
-
-/* 左栏列表对齐设计稿：分组头无底色、行间发丝线、行尾选择框避开字母导航 */
-.create-group-modal__left :deep(.contact-list__search) {
-  padding: 12px 16px 8px;
-}
-.create-group-modal__left :deep(.contact-list__group-header) {
-  background-color: transparent;
-}
-
-.create-group-modal__left :deep(.contact-item) {
-  margin-bottom: 0;
-}
-
-/* 行尾选择框右缘到分割线之间预留字母索引条通道（40px），
-   索引条居中于通道内（right: 11px ≈ (40-18)/2），与选择框、分割线两侧都留出间距。
-   选择器需带上 .uikit-cell：scoped CSS 属性选择器计特异性，单类 deep 覆盖与
-   EmCell 的 .uikit-cell.is-auto-height padding 简写同为 (0,3,0)，构建产物中
-   core 样式注入靠后会回写 padding-right 导致通道失效（索引条与选择框重叠） */
-.create-group-modal__left :deep(.uikit-cell.contact-item-default) {
-  padding-right: 40px;
-}
-
-.create-group-modal__left :deep(.contact-alphabet-nav) {
-  right: 11px;
-}
-
-/* 行间发丝线左内收：从名字起点开始（避开头像列），与设计稿一致 */
-.create-group-modal__left :deep(.contact-item-default)::after {
-  content: '';
-  position: absolute;
-  left: calc(var(--uikit-item-hover-padding-x, 16px) + 48px + var(--uikit-spacing-3, 12px));
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
-  pointer-events: none;
-}
-
-.create-group-modal__right {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--uikit-bg-base);
-}
-
-.create-group-modal__right-search {
-  padding: 12px 16px 8px;
-  flex-shrink: 0;
-}
-
 .create-group-modal__form {
   padding: 12px 16px;
   display: flex;
@@ -537,50 +354,6 @@ watch(
   color: var(--uikit-warning-color, var(--uikit-error-color, #f59e0b));
 }
 
-.create-group-modal__selected-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 8px;
-}
-
-.create-group-modal__selected-item {
-  --uikit-item-hover-padding-x: 8px;
-}
-
-/* 已选行发丝线同样左内收避开头像列 */
-.create-group-modal__selected-item::after {
-  content: '';
-  position: absolute;
-  left: calc(var(--uikit-item-hover-padding-x, 8px) + 48px + var(--uikit-spacing-3, 12px));
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background-color: var(--uikit-divider-color, rgba(0, 0, 0, 0.06));
-  pointer-events: none;
-}
-
-.create-group-modal__selected-remove {
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: none;
-  color: var(--uikit-text-tertiary);
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-@media (hover: hover) {
-  .create-group-modal__selected-remove:hover {
-    color: var(--uikit-danger-color);
-  }
-}
-
 .create-group-modal__error {
   padding: 8px 16px;
   font-size: var(--uikit-font-size-11);
@@ -607,36 +380,5 @@ watch(
 
 .create-group-modal__field--max-members {
   margin-top: 10px;
-}
-
-.create-group-modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  flex-shrink: 0;
-  background-color: var(--uikit-bg-base);
-}
-
-.create-group-modal__footer-btn {
-  min-width: 104px;
-}
-
-@media (max-width: 640px) {
-  .create-group-modal__body {
-    flex-direction: column;
-  }
-
-  .create-group-modal__left {
-    border-right: none;
-    border-bottom: 1px solid var(--uikit-border-color, #e5e7eb);
-    flex: 1.5;
-  }
-
-  .create-group-modal__right {
-    width: 100%;
-    flex: 1;
-  }
 }
 </style>

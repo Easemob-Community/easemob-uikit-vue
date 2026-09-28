@@ -168,7 +168,10 @@ async function onConfirm() {
   width: 100vw;
   max-width: 100vw;
   height: 80vh;
+  /* 移动端优先使用动态视口高度，不支持的浏览器回退到上面的 80vh */
+  height: 80dvh;
   max-height: 80vh;
+  max-height: 80dvh;
   border-radius: var(--uikit-components-radius, 12px) var(--uikit-components-radius, 12px) 0 0;
 }
 

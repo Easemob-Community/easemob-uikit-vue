@@ -285,15 +285,15 @@ onBeforeUnmount(() => {
     setSelectedIds([])
 })
 
-/** 跳转到指定分组 */
-async function scrollToGroup(key: string) {
+/** 跳转到指定分组；滑动定位（sliding）时用瞬时滚动，避免连续触发平滑滚动排队卡顿 */
+async function scrollToGroup(key: string, sliding = false) {
   await nextTick()
   const root = itemsRef.value
   if (!root)
     return
   const target = root.querySelector<HTMLElement>(`[data-group-key="${key}"]`)
   if (target) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    target.scrollIntoView({ behavior: sliding ? 'auto' : 'smooth', block: 'start' })
   }
   emit('group-jump', key)
 }
