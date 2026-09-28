@@ -1,3 +1,12 @@
+## @easemob-community/uikit-core 2.9.0 (2026-09-28)
+
+
+### 新增
+
+- **`EmModal` / `EmPopup` 移动端体验优化**：H5 下 footer 按钮等宽铺满且顺序翻转为取消左/确认右；语义类弹窗（success/warning/error 等）H5 保持居中；新增 `fullscreen` / `mobileFullscreen` 全屏档位；弹层高度补 `dvh` 兜底。
+
+---
+
 ## @easemob-community/uikit-core 2.8.7 (2026-09-21)
 
 

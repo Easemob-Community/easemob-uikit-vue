@@ -1,3 +1,16 @@
+## @easemob-community/uikit-im 3.9.0 (2026-09-28)
+
+
+### 新增
+
+- **选人弹窗 H5 全屏化重构与弹窗收敛（D133 部分）**：创建群弹窗迁移到共享 `EmContactTransferModal`；已选成员改为顶部头像横条；移动端确认键改为单通栏计数样式；字母索引条支持触摸滑动扫字；备注弹窗迁移至 `EmModal`。
+
+### 修复
+
+- **H5 下钻抽屉全屏接管**：`ChatDrawer` 的 `fullscreen` 在移动端升级为 fixed 视口级覆盖（100dvh + safe-top + z-index 1000），消除宿主双层 header；群管理二级抽屉同步补齐。
+
+---
+
 ## @easemob-community/uikit-im 3.8.0 (2026-09-23)
 
 
