@@ -1066,9 +1066,11 @@ watch(locateRequest, (req) => {
   position: relative;
 }
 
-/* 中性气泡 plain 模式：对方气泡去底色、仅保留文字（容器根作用域覆写变量，组件级变体范式） */
+/* 中性气泡 plain 模式：对方气泡去底色、仅保留文字（容器根作用域覆写变量，组件级变体范式）；
+   chip 同步去底，保持与去底色风格一致 */
 .message-list--bubble-plain {
   --uikit-bubble-bg-other: transparent;
+  --uikit-message-chip-bg: transparent;
 }
 
 .message-list__scroll {

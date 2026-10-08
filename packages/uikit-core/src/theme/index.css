@@ -222,9 +222,10 @@
   /* 气泡内分割线（译文 / 语音转文字与原文之间，与原文同一气泡展示） */
   --uikit-bubble-divider-other: rgba(23, 26, 28, 0.12);
   --uikit-bubble-divider-self: rgba(255, 255, 255, 0.35);
-  /* 消息辅助信息胶囊底（时间分割线 / 通知事件 / 没有更多历史消息），默认跟随对方气泡底；
-     themeStore.messageChipBg 关闭时运行时覆写为 transparent */
-  --uikit-message-chip-bg: var(--uikit-bubble-bg-other);
+  /* 消息辅助信息胶囊底（时间分割线 / 通知事件 / 没有更多历史消息）：独立中性底，
+     不跟随对方气泡自定义色；themeStore.messageChipBg 关闭时运行时覆写为 transparent；
+     业务需要联动时可自行覆写为 var(--uikit-bubble-bg-other) */
+  --uikit-message-chip-bg: #E4E6E7;
   /* 气泡圆角档位：round（默认）16px / square 8px，由 bubbleShape 消费 */
   --uikit-bubble-radius: 16px;
   --uikit-bubble-radius-square: 8px;
@@ -380,8 +381,8 @@
   /* 气泡内分割线 - 暗色（设计稿统一 #3C3F42） */
   --uikit-bubble-divider-other: #3C3F42;
   --uikit-bubble-divider-self: #3C3F42;
-  /* 消息辅助信息胶囊底 - 暗色（默认跟随对方气泡底） */
-  --uikit-message-chip-bg: var(--uikit-bubble-bg-other);
+  /* 消息辅助信息胶囊底 - 暗色（独立中性底，不跟随对方气泡自定义色） */
+  --uikit-message-chip-bg: var(--uikit-control-bg);
   /* 己方气泡内次级文字 - 暗色（己方气泡暗色为深字，次级同步弱化） */
   --uikit-bubble-text-self-secondary: rgba(30, 33, 35, 0.72);
   /* 消息状态徽章 - 暗色（亮蓝在暗底上可辨识，不覆写色值） */

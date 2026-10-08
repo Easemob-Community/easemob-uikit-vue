@@ -165,6 +165,7 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 ### 聊天语义 token
 
 - `--uikit-bubble-bg-other`：对方气泡背景（默认 `#E4E6E7`，暗色 `--uikit-control-bg` `#333537`）
+- `--uikit-message-chip-bg`：消息辅助信息胶囊底（时间分割线 / 通知事件 / 「没有更多历史消息」，默认 `#E4E6E7`，暗色 `--uikit-control-bg`；独立于对方气泡，不随 `setBubbleBg` 联动，需要联动可自行覆写为 `var(--uikit-bubble-bg-other)`）
 - `--uikit-bubble-bg-self`：自己气泡背景（默认 `#009EFF` 品牌蓝，暗色 `#33B1FF`；不跟随主色，可用 `setBubbleBg` / 主题预设覆盖）
 - `--uikit-bubble-text-other`：对方气泡文字（默认 `#171A1C`，暗色 `--uikit-text-primary`）
 - `--uikit-bubble-text-self`：自己气泡文字（默认 `#FFFFFF`，暗色按设计稿反转为 `#1E2123`）

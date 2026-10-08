@@ -446,7 +446,7 @@ export const useThemeStore = defineStore('theme', () => {
   })
 
   // 消息辅助信息胶囊背景开关：关闭时覆写 --uikit-message-chip-bg 为 transparent，
-  // 开启时移除 inline 覆写，让主题 CSS 默认（跟随对方气泡底、随明暗切换）生效
+  // 开启时移除 inline 覆写，让主题 CSS 默认（中性底、随明暗切换）生效
   watchEffect(() => {
     applySemanticToken(
       '--uikit-message-chip-bg',
