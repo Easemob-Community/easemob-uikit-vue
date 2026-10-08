@@ -1,3 +1,43 @@
+## @easemob-community/uikit-im 3.10.0 (2026-10-08)
+
+
+### 新增
+
+- **H5 长按消息操作面板改造（对齐飞书交互）**：高频操作（默认引用/复制/转发/下载）收拢到顶部图标网格区横排展示，其余操作保持整行列表；面板支持 drag handle 半屏（50dvh）↔ 展开（78dvh）拖拽/轻点切换，展开后列表区纵向滚动。新增 `messageAction.gridActionTypes` 配置自定义高频集合（传 `[]` 关闭网格分区）。
+- **H5 输入框发送按钮图标化**：有文本时的「发送」文字按钮替换为 plane 图标按钮，与工具条其余图标按钮视觉一致。
+
+### 修复
+
+- **H5 表情面板右侧大量空白**：core `EmEmojiPicker` 固定 320px 宽度与 h5-input 的 `width: 100%` 覆盖同为 class+attr 优先级、产物内顺序不定导致覆盖失效；改为高特异性选择器全宽（含 `max-width: none`），表情网格改 `grid + auto-fill` 均匀铺满。
+- **H5 语音/表情按钮选中态不互斥**：语音模式下打开表情/更多面板前未退出语音态，两个按钮同时高亮；现开面板前先退出语音模式。
+- **H5 点击消息区空白无法收起软键盘**：`h5-input` / `message-input` 暴露 `blur()`（失焦并收起表情/更多面板），`chat.vue` 聊天内容区点击时调用（仅移动端）。
+- **H5 长按气泡菜单只剩「取消」**：`message-bubble-wrapper` 的 `message-action-menu` / `message-action-extra` 插槽无条件转发，导致 `message-interactive` 判定插槽恒被接管、ActionSheet 默认动作列表恒为空；改为 `v-if="$slots[...]"` 条件转发。
+- **H5 输入框删除文本后高度不回落**：`autoGrow` 在浏览器默认 content-box 下把含 padding 的 `scrollHeight` 直接赋给 `height`，padding 双重计入（空内容也保持约 2 行高）；现按盒模型换算（border-box 直接用、content-box 减去 padding），且赋值前先取 `scrollHeight` 避免被 `clientHeight` 污染。
+
+---
+
+## @easemob-community/uikit-im 3.9.0 (2026-09-28)
+
+
+### 新增
+
+- **选人弹窗 H5 全屏化重构与弹窗收敛（D133 部分）**：创建群弹窗迁移到共享 `EmContactTransferModal`；已选成员改为顶部头像横条；移动端确认键改为单通栏计数样式；字母索引条支持触摸滑动扫字；备注弹窗迁移至 `EmModal`。
+
+### 修复
+
+- **H5 下钻抽屉全屏接管**：`ChatDrawer` 的 `fullscreen` 在移动端升级为 fixed 视口级覆盖（100dvh + safe-top + z-index 1000），消除宿主双层 header；群管理二级抽屉同步补齐。
+
+---
+
+## @easemob-community/uikit-im 3.8.0 (2026-09-23)
+
+
+### 新增
+
+- **群组默认头像**：群未设置头像时，默认头像由原来的「群名前 2 字 + 随机色块」文字占位统一替换为内置默认图（紫底白「群」，构建时内联为 data URI，无额外资源请求）。覆盖会话列表、群列表、群详情、群名片（含弹窗）、聊天页头部、转发会话列表全部群头像渲染点；已设置头像的群不受影响，用户头像维持原文字占位。
+
+---
+
 ## @easemob-community/uikit-im 3.7.11 (2026-09-22)
 
 

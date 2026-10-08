@@ -146,22 +146,23 @@
 
 > 消息操作配置
 
-| 属性                    | 类型        | 默认值 | 说明                                                                                |
+| 属性                    | 类型                    | 默认值 | 说明                                                                                                                    |
 | --- | --- | --- | --- |
-| enableQuote           | `boolean` | —   | 启用引用，默认 true                                                                      |
-| enableCopy            | `boolean` | —   | 启用复制，默认 true（仅文本消息生效）                                                             |
-| enableDownload        | `boolean` | —   | 启用下载，默认 true（仅文件消息生效）                                                             |
-| enableDelete          | `boolean` | —   | 启用删除，默认 true                                                                      |
-| enableRecall          | `boolean` | —   | 启用撤回，默认 true                                                                      |
-| enableRecallOther     | `boolean` | —   | 启用撤回他人消息，默认 true（仅群主/管理员在群聊中生效）                                                   |
-| enableEdit            | `boolean` | —   | 启用编辑，默认 true（仅 isSelf 且文本消息生效）                                                    |
-| enableForward         | `boolean` | —   | 启用转发，默认 true                                                                      |
-| enableMultiSelect     | `boolean` | —   | 启用多选，默认 true                                                                      |
-| enableTranslate       | `boolean` | —   | 启用翻译，默认 true（仅文本消息生效）                                                             |
-| enableVoiceToText     | `boolean` | —   | 启用语音转文字，默认 true（仅带 url 的语音消息生效）                                                   |
-| enablePin             | `boolean` | —   | 启用置顶/取消置顶，默认 true                                                                 |
-| recallDisableDuration | `number`  | —   | 撤回禁用时长（毫秒），超过该时长后无法撤回，默认 2 分钟（120000）                                             |
-| translateTargetLang   | `string`  | —   | 翻译目标语言，例如 'zh-Hans'、'en'。不设置时根据 UIKIT 当前 locale 自动选择（zh-CN→zh-Hans，en→en，其他默认 en） |
+| enableQuote           | `boolean`             | —   | 启用引用，默认 true                                                                                                          |
+| enableCopy            | `boolean`             | —   | 启用复制，默认 true（仅文本消息生效）                                                                                                 |
+| enableDownload        | `boolean`             | —   | 启用下载，默认 true（仅文件消息生效）                                                                                                 |
+| enableDelete          | `boolean`             | —   | 启用删除，默认 true                                                                                                          |
+| enableRecall          | `boolean`             | —   | 启用撤回，默认 true                                                                                                          |
+| enableRecallOther     | `boolean`             | —   | 启用撤回他人消息，默认 true（仅群主/管理员在群聊中生效）                                                                                       |
+| enableEdit            | `boolean`             | —   | 启用编辑，默认 true（仅 isSelf 且文本消息生效）                                                                                        |
+| enableForward         | `boolean`             | —   | 启用转发，默认 true                                                                                                          |
+| enableMultiSelect     | `boolean`             | —   | 启用多选，默认 true                                                                                                          |
+| enableTranslate       | `boolean`             | —   | 启用翻译，默认 true（仅文本消息生效）                                                                                                 |
+| enableVoiceToText     | `boolean`             | —   | 启用语音转文字，默认 true（仅带 url 的语音消息生效）                                                                                       |
+| enablePin             | `boolean`             | —   | 启用置顶/取消置顶，默认 true                                                                                                     |
+| recallDisableDuration | `number`              | —   | 撤回禁用时长（毫秒），超过该时长后无法撤回，默认 2 分钟（120000）                                                                                 |
+| translateTargetLang   | `string`              | —   | 翻译目标语言，例如 'zh-Hans'、'en'。不设置时根据 UIKIT 当前 locale 自动选择（zh-CN→zh-Hans，en→en，其他默认 en）                                     |
+| gridActionTypes       | `MessageActionType[]` | —   | H5 长按操作面板（ActionSheet）的高频操作集合：命中的操作类型收拢到顶部图标网格区，<br>其余保持整行列表；默认 ['quote', 'copy', 'forward', 'download']。传 [] 关闭网格分区。 |
 
 #### config.groupReadReceipt {#config-groupreadreceipt}
 

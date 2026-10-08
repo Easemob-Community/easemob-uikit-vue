@@ -14,8 +14,8 @@
 | Button API | [button.md](./button.md) |
 | Cell API | [cell.md](./cell.md) |
 | @easemob-community/uikit-chatroom 2.0.0 (2026-09-02) | [changelog-chatroom.md](./changelog-chatroom.md) |
-| @easemob-community/uikit-core 2.8.7 (2026-09-21) | [changelog-core.md](./changelog-core.md) |
-| @easemob-community/uikit-im 3.7.11 (2026-09-22) | [changelog-im.md](./changelog-im.md) |
+| @easemob-community/uikit-core 2.10.0 (2026-10-08) | [changelog-core.md](./changelog-core.md) |
+| @easemob-community/uikit-im 3.10.0 (2026-10-08) | [changelog-im.md](./changelog-im.md) |
 | @easemob-community/uikit-sdk-contract 1.3.1 (2026-09-21) | [changelog-sdk-contract.md](./changelog-sdk-contract.md) |
 | @easemob-community/uikit-sdk-webim4 1.3.3 (2026-09-21) | [changelog-sdk-webim4.md](./changelog-sdk-webim4.md) |
 | @easemob-community/uikit-sdk-websdk5 1.3.4 (2026-09-21) | [changelog-sdk-websdk5.md](./changelog-sdk-websdk5.md) |

@@ -1,3 +1,25 @@
+## @easemob-community/uikit-core 2.10.0 (2026-10-08)
+
+
+### 新增
+
+- **`EmActionSheet` 高频网格区与拖拽扩档**：`ActionSheetItem` 新增 `zone`（`'grid'` 顶部图标 tile 横排、超出横向滚动 / `'list'` 默认整行列表，select 事件 index 语义保持原数组下标）；新增 `expandable`（默认 false）：顶部 drag handle，半屏档 50dvh ↔ 展开档 78dvh（受 EmPopup bottom 80dvh 上限约束），拖拽跟随、松手按方向吸附、轻点切换档位，展开后列表区纵向滚动。未开启时行为完全不变。
+
+### 修复
+
+- **`EmPopup` 遮罩点击关闭回归**：core 2.8.0 引入的「点击落在其它弹层内不视为外部点击」豁免未区分弹层实例，本弹层自身遮罩也在 `.uikit-popup` 根内被一并豁免，导致 `closeOnClickOverlay` 全面失效（H5 底部弹窗场景最明显）；收窄为仅豁免其它弹层实例，自身遮罩点击恢复关闭。
+
+---
+
+## @easemob-community/uikit-core 2.9.0 (2026-09-28)
+
+
+### 新增
+
+- **`EmModal` / `EmPopup` 移动端体验优化**：H5 下 footer 按钮等宽铺满且顺序翻转为取消左/确认右；语义类弹窗（success/warning/error 等）H5 保持居中；新增 `fullscreen` / `mobileFullscreen` 全屏档位；弹层高度补 `dvh` 兜底。
+
+---
+
 ## @easemob-community/uikit-core 2.8.7 (2026-09-21)
 
 

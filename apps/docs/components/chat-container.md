@@ -106,6 +106,8 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 - `close()`：关闭菜单
 - 插槽提供时，PC Popup 与 H5 ActionSheet 双端均接管；H5 端默认 actions 列表自动隐藏
 
+> H5 长按弹出的 ActionSheet 面板默认把高频操作（引用/复制/转发/下载）收拢为顶部图标网格区，其余操作保持整行列表；面板带 drag handle，可在半屏（50dvh）与展开（78dvh）两档间拖拽或轻点切换，展开后列表区纵向滚动。高频集合可通过 `config.messageAction.gridActionTypes` 自定义（传 `[]` 关闭网格分区），PC 右键菜单不受网格分区影响。
+
 ## 弹窗接管
 
 聊天页内置的名片、邀请、转发、搜索、多选栏等子界面均支持接管（默认内容 = 内置实现，不传插槽行为不变）：
