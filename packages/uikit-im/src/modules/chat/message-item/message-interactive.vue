@@ -206,13 +206,17 @@ const actions = computed<MessageActionItem[]>(() => {
   return items
 })
 
-/** ActionSheet 格式化的 actions */
+/** H5 高频操作集合：命中类型收拢到 ActionSheet 顶部图标网格区，默认引用/复制/转发/下载 */
+const gridActionTypes = computed(() => props.config?.gridActionTypes ?? ['quote', 'copy', 'forward', 'download'])
+
+/** ActionSheet 格式化的 actions：高频操作标记 zone='grid' 收拢到顶部网格区，其余保持整行列表 */
 const actionSheetActions = computed(() =>
   actions.value.map(item => ({
     name: item.label,
     color: item.danger ? 'var(--uikit-danger-color)' : undefined,
     disabled: item.disabled,
     icon: item.icon,
+    zone: (gridActionTypes.value.includes(item.type) ? 'grid' : 'list') as 'grid' | 'list',
   })),
 )
 
@@ -346,6 +350,7 @@ function onActionSheetSelect(_item: { name: string }, index: number) {
   <ActionSheet
     :show="showActionSheet"
     :actions="effectiveActionSheetActions"
+    expandable
     @update:show="showActionSheet = $event"
     @select="onActionSheetSelect"
   >

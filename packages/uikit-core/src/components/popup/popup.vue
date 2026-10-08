@@ -245,9 +245,14 @@ onClickOutside(contentRef, (event) => {
   if (isAnchored.value && props.anchor && props.anchor.contains(event.target as Node))
     return
   // 点击落在其它弹层（如从本弹层内打开的 Modal，自身 teleport 到 body）内时不视为外部点击，
-  // 避免下层弹层被误关而上层弹窗状态残留（与 ChatDrawer 的 .uikit-popup 豁免同一口径）
-  if (event.target instanceof Element && event.target.closest('.uikit-popup'))
-    return
+  // 避免下层弹层被误关而上层弹窗状态残留（与 ChatDrawer 的 .uikit-popup 豁免同一口径）。
+  // 注意只豁免「其它」弹层实例：本弹层自身遮罩也在 .uikit-popup 根内，
+  // 不区分实例会让遮罩点击永远被豁免，closeOnClickOverlay 全面失效
+  if (event.target instanceof Element) {
+    const hitPopup = event.target.closest('.uikit-popup')
+    if (hitPopup && hitPopup !== contentRef.value?.closest('.uikit-popup'))
+      return
+  }
   if (props.closeOnClickOverlay && props.show) {
     emit('update:show', false)
     emit('close')

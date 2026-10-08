@@ -256,6 +256,11 @@ export interface ChatConfig {
     recallDisableDuration?: number
     /** 翻译目标语言，例如 'zh-Hans'、'en'。不设置时根据 UIKIT 当前 locale 自动选择（zh-CN→zh-Hans，en→en，其他默认 en） */
     translateTargetLang?: string
+    /**
+     * H5 长按操作面板（ActionSheet）的高频操作集合：命中的操作类型收拢到顶部图标网格区，
+     * 其余保持整行列表；默认 ['quote', 'copy', 'forward', 'download']。传 [] 关闭网格分区。
+     */
+    gridActionTypes?: MessageActionType[]
   }
   /** 群已读回执配置 */
   groupReadReceipt?: {

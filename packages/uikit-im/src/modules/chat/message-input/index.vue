@@ -819,6 +819,20 @@ function focus() {
   }
 }
 
+/** 失焦输入框（H5 点击消息区空白时收起软键盘/面板，由 chat.vue 调用） */
+function blur() {
+  if (isMobile.value) {
+    h5InputRef.value?.blur?.()
+  }
+  else if (inputMode.value === 'simple') {
+    simpleInputRef.value?.$el?.querySelector('textarea')?.blur()
+    simpleInputRef.value?.$el?.querySelector('input')?.blur()
+  }
+  else {
+    (richInputRef.value?.$el?.querySelector('[contenteditable]') as HTMLElement | null)?.blur()
+  }
+}
+
 /** 在光标/末尾插入 @提及 */
 function appendMention(contact: MentionContact) {
   if (isMobile.value) {
@@ -843,6 +857,7 @@ provideMessageInputPluginContext({
 defineExpose({
   setText,
   getText,
+  blur,
   appendMention,
 })
 </script>

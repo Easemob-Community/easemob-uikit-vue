@@ -2,7 +2,6 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useLocale } from '@easemob-community/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
-import { EmButton as Button } from '@easemob-community/uikit-core'
 import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import { EmEmojiPicker as EmojiPicker } from '@easemob-community/uikit-core'
 import type { EmojiStickerItem } from '@easemob-community/uikit-core'
@@ -108,12 +107,13 @@ const rootStyle = computed(() => {
 /** 输入框引用 */
 const textareaRef = ref<HTMLTextAreaElement>()
 
-/** 切换面板；与键盘互斥：开面板前先 blur textarea */
+/** 切换面板；与键盘互斥：开面板前先 blur textarea；与语音模式互斥：退出语音态，避免语音/表情按钮同时高亮 */
 function togglePanel(panel: PanelType) {
   if (activePanel.value === panel) {
     activePanel.value = 'none'
     return
   }
+  isVoiceMode.value = false
   textareaRef.value?.blur()
   activePanel.value = panel
   // 面板展开时也 emit 一次 focus：供上层把消息列表滚动到底部（语义同键盘弹起）
@@ -194,8 +194,15 @@ function autoGrow() {
   const verticalPadding
     = (Number.parseFloat(style.paddingTop) || 0) + (Number.parseFloat(style.paddingBottom) || 0)
   const maxHeight = lineHeight * 5 + verticalPadding
-  el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`
-  el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden'
+  // scrollHeight 含上下 padding，且须先取值再赋 height（赋值后 scrollHeight 会被 clientHeight 污染）。
+  // content-box（浏览器默认）下 height 只作用于内容区，需减去 padding，
+  // 否则 padding 双重计入：空内容也会保持约 2 行高、删除文本后高度无法回落。
+  const contentHeight = el.scrollHeight
+  const isBorderBox = style.boxSizing === 'border-box'
+  const target = isBorderBox ? contentHeight : contentHeight - verticalPadding
+  const maxTarget = isBorderBox ? maxHeight : maxHeight - verticalPadding
+  el.style.height = `${Math.min(target, maxTarget)}px`
+  el.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden'
 }
 
 watch(text, () => {
@@ -499,6 +506,12 @@ function getText(): string {
   return text.value
 }
 
+/** 失焦输入框并收起展开的面板（H5 点击消息区空白时收起软键盘/表情面板） */
+function blur() {
+  textareaRef.value?.blur()
+  activePanel.value = 'none'
+}
+
 /** 自动聚焦 */
 onMounted(() => {
   if (props.config?.autoFocus)
@@ -517,6 +530,7 @@ onBeforeUnmount(() => {
 defineExpose({
   setText,
   getText,
+  blur,
   insertEmoji,
   insertMention,
   appendMention,
@@ -576,16 +590,16 @@ defineExpose({
         <Icon name="circle/face" :size="24" />
       </button>
 
-      <!-- 有文本时「+」替换为发送按钮 -->
-      <Button
+      <!-- 有文本时「+」替换为发送按钮（plane 图标） -->
+      <button
         v-if="text.trim()"
-        type="primary"
-        size="small"
-        class="h5-input__send-btn"
+        type="button"
+        class="h5-input__icon-btn h5-input__icon-btn--send"
+        :aria-label="t('chat.send')"
         @click="handleSend"
       >
-        {{ t('chat.send') }}
-      </Button>
+        <Icon name="plane" :size="24" />
+      </button>
       <button
         v-else
         type="button"
@@ -778,8 +792,9 @@ defineExpose({
   background-color: var(--uikit-bg-hover);
 }
 
-.h5-input__send-btn {
-  flex-shrink: 0;
+/* 发送按钮：plane 图标，主题色 */
+.h5-input__icon-btn--send {
+  color: var(--uikit-primary-color);
 }
 
 /* 底部面板（表情 / 更多），高度由父级 :style 注入（与键盘高度对齐） */
@@ -789,8 +804,11 @@ defineExpose({
   padding-bottom: var(--uikit-safe-bottom, 0px);
 }
 
-.h5-input__emoji-picker {
+/* 面板内表情选择器全宽：双类选择器提高特异性，压过 core .emoji-picker 的固定 320px 宽度
+   （同为 class+attr 优先级时产物内顺序不定，曾导致 H5 面板右侧大量空白） */
+.h5-input__panel > .h5-input__emoji-picker.h5-input__emoji-picker {
   width: 100%;
+  max-width: none;
   height: 100%;
   border-radius: 0;
 }
@@ -801,6 +819,13 @@ defineExpose({
   height: auto;
   min-height: 0;
   max-height: none;
+}
+
+/* 全宽面板下表情网格均匀铺满（core 为 flex-wrap + 固定 32px 项，宽面板右侧留白） */
+.h5-input__emoji-picker :deep(.emoji-picker__emoji-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  justify-items: center;
 }
 
 /* 更多面板网格 */

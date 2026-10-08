@@ -376,6 +376,12 @@ const drawerAvatarClickViewProfile = computed(() => props.config?.drawer?.avatar
 /** 移动端窄屏（viewport < 768）：抽屉一律回落满铺全屏（独立页面观感） */
 const isMobileView = h5.isMobile
 
+/** H5：点击聊天内容区（消息列表/空白）时失焦输入框，收起软键盘与表情/更多面板 */
+function onChatContentClick() {
+  if (isMobileView.value)
+    messageInputRef.value?.blur?.()
+}
+
 /** 是否启用消息搜索入口 */
 const searchEnabled = computed(() => props.config?.messageList?.search?.enabled === true)
 
@@ -1247,7 +1253,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
         <div class="chat__main">
           <!-- 聊天内容区（header → 消息列表）：相对定位容器，#watermark 水印覆盖层挂在此区域内，
                覆盖除输入框 / 多选操作栏外的聊天主区 -->
-          <div class="chat__content">
+          <div class="chat__content" @click="onChatContentClick">
           <!-- Header -->
           <div
             v-if="showHeader"

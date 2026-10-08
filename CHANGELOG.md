@@ -1,5 +1,30 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.10.0 (2026-10-08)
+
+### 新增
+
+- **H5 长按消息操作面板改造（对齐飞书交互）**：高频操作（默认引用/复制/转发/下载）收拢到顶部图标网格区横排展示，其余操作保持整行列表；面板支持 drag handle 半屏（50dvh）↔ 展开（78dvh）拖拽/轻点切换，展开后列表区纵向滚动。新增 `messageAction.gridActionTypes` 配置自定义高频集合（传 `[]` 关闭网格分区）。
+- **H5 输入框发送按钮图标化**：有文本时的「发送」文字按钮替换为 plane 图标按钮，与工具条其余图标按钮视觉一致。
+
+### 修复
+
+- **H5 表情面板右侧大量空白**：core `EmEmojiPicker` 固定 320px 宽度与 h5-input 的 `width: 100%` 覆盖同为 class+attr 优先级、产物内顺序不定导致覆盖失效；改为高特异性选择器全宽（含 `max-width: none`），表情网格改 `grid + auto-fill` 均匀铺满。
+- **H5 语音/表情按钮选中态不互斥**：语音模式下打开表情/更多面板前未退出语音态，两个按钮同时高亮；现开面板前先退出语音模式。
+- **H5 点击消息区空白无法收起软键盘**：`h5-input` / `message-input` 暴露 `blur()`（失焦并收起表情/更多面板），`chat.vue` 聊天内容区点击时调用（仅移动端）。
+- **H5 长按气泡菜单只剩「取消」**：`message-bubble-wrapper` 的 `message-action-menu` / `message-action-extra` 插槽无条件转发，导致 `message-interactive` 判定插槽恒被接管、ActionSheet 默认动作列表恒为空；改为 `v-if="$slots[...]"` 条件转发。
+- **H5 输入框删除文本后高度不回落**：`autoGrow` 在浏览器默认 content-box 下把含 padding 的 `scrollHeight` 直接赋给 `height`，padding 双重计入（空内容也保持约 2 行高）；现按盒模型换算（border-box 直接用、content-box 减去 padding），且赋值前先取 `scrollHeight` 避免被 `clientHeight` 污染。
+
+## @easemob-community/uikit-core 2.10.0 (2026-10-08)
+
+### 新增
+
+- **`EmActionSheet` 高频网格区与拖拽扩档**：`ActionSheetItem` 新增 `zone`（`'grid'` 顶部图标 tile 横排、超出横向滚动 / `'list'` 默认整行列表，select 事件 index 语义保持原数组下标）；新增 `expandable`（默认 false）：顶部 drag handle，半屏档 50dvh ↔ 展开档 78dvh（受 EmPopup bottom 80dvh 上限约束），拖拽跟随、松手按方向吸附、轻点切换档位，展开后列表区纵向滚动。未开启时行为完全不变。
+
+### 修复
+
+- **`EmPopup` 遮罩点击关闭回归**：core 2.8.0 引入的「点击落在其它弹层内不视为外部点击」豁免未区分弹层实例，本弹层自身遮罩也在 `.uikit-popup` 根内被一并豁免，导致 `closeOnClickOverlay` 全面失效（H5 底部弹窗场景最明显）；收窄为仅豁免其它弹层实例，自身遮罩点击恢复关闭。
+
 ## @easemob-community/uikit-im 3.9.0 (2026-09-28)
 
 ### 新增
