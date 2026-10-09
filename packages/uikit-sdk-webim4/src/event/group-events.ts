@@ -83,11 +83,12 @@ function buildMemberNoticeParams(
 /**
  * 创建 4.x 群组事件处理器（`onGroupEvent` 单入口，按 `operation` 分发）。
  *
- * 与 5.x 事件模型的差异（已核对 4.24.2 EventHandlerType / handleMucMsg 源码）：
+ * 与 5.x 事件模型的差异（已核对 4.24.3 EventHandlerType / handleMucMsg 源码）：
  * - 5.x 是 GroupManager 上按语义拆分的回调（onMembersJoined/onAdminAdded/...），
  *   4.x 收敛为 connection 级 `onGroupEvent({ operation, id, from, userId?, name?, detail?, ... })`；
  * - 载荷普遍不含 UserInfo 对象（仅 userId 字符串），展示名走注入的 resolveNoticeUserName；
- * - `removeAdmin` / `uploadFile` / `deleteFile` 等事件载荷缺关键字段（见各分支注释）。
+ * - 4.24.3 起 removeAdmin / changeOwner / unblockMember / removeMember / inviteToJoin
+ *   载荷携带 `userId`（目标用户）；`uploadFile` / `deleteFile` 等事件载荷仍缺关键字段（见各分支注释）。
  */
 export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.EventHandlerType> {
   const { t, insertChatNotice, buildAnnouncementNoticeText, resolveNoticeUserName } = getEventHandlerDeps()
@@ -194,21 +195,29 @@ export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.Ev
         break
       }
       case 'removeMember': {
-        // 自己被移出群（或被加入黑名单，仅当事人收）：移除群 + 删会话 + 清消息
-        stores.group.removeGroup(groupId)
-        stores.conversation.deleteConversation(groupId)
-        stores.message.clearConversationMessages(groupId)
-        const name = t('chat.notice.you')
+        // 4.24.3 起 payload.userId 标识被移出者；无 userId（旧包）按仅当事人收的语义回落为「自己」
+        const removedUserId = payload.userId || currentUser
+        if (removedUserId === currentUser) {
+          // 自己被移出群（或被加入黑名单）：移除群 + 删会话 + 清消息
+          stores.group.removeGroup(groupId)
+          stores.conversation.deleteConversation(groupId)
+          stores.message.clearConversationMessages(groupId)
+        }
+        else {
+          // 其他成员被移出：只减成员数，不动群/会话
+          stores.group.decrementMemberCount(groupId, 1)
+        }
+        const name = removedUserId === currentUser ? t('chat.notice.you') : resolveNoticeUserName({ userId: removedUserId } as UserInfo)
         insertChatNotice(stores, groupId, CONVERSATION_TYPE.GROUPCHAT, {
           eventType: NOTICE_EVENT_TYPE.USER_REMOVED,
-          params: { name },
+          params: { name, userId: removedUserId },
           defaultText: t('chat.notice.userRemoved').replace('{name}', name),
         })
         break
       }
       case 'unblockMember': {
-        // 自己被移出群黑名单（仅当事人收）：无 store 语义（不会自动回群），仅记录
-        groupLog.info('onGroupEvent unblockMember（被移出黑名单），不自动回群', { groupId })
+        // 被移出群黑名单：无 store 语义（不会自动回群），仅记录；4.24.3 起 userId 标识被移出者
+        groupLog.info('onGroupEvent unblockMember（被移出黑名单），不自动回群', { groupId, userId: payload.userId })
         break
       }
 
@@ -269,13 +278,13 @@ export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.Ev
 
       // ===== 角色变更 =====
       case 'changeOwner': {
-        // 4.x changeOwner 事件 payload.from 是旧群主（操作者），不是新群主。
-        // 真正的 newOwner 优先从 UIKit 飞行中的 pending 标记读取；若 pending 已清除但当前用户
-        // 是旧群主且本地 group.owner 已发生变化，说明是当前设备刚完成转让，沿用本地 owner。
+        // 4.24.3 起 payload.userId 直接给出新群主；旧包无此字段时回落：
+        // payload.from 是旧群主（操作者），真正的新群主从 UIKit 飞行中的 pending 标记读取；
+        // 若 pending 已清除但当前用户是旧群主且本地 group.owner 已变化，说明是本设备刚完成转让。
         const prevOwnerId = payload.from || ''
         const pendingNewOwner = stores.group.getPendingOwnerTransfer?.(groupId)
         const localOwner = stores.group.getGroupById(groupId)?.owner
-        let newOwnerId = pendingNewOwner
+        let newOwnerId = payload.userId || pendingNewOwner
         if (!newOwnerId && currentUser && currentUser === prevOwnerId && localOwner && localOwner !== currentUser) {
           newOwnerId = localOwner
         }
@@ -318,8 +327,8 @@ export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.Ev
         break
       }
       case 'removeAdmin': {
-        // 被取消管理员。注意：4.x 源码（handleMucMsg op 22）未在事件载荷上设置 userId，
-        // from 为操作者而非被移除者，无法可靠定位目标管理员——跳过角色更新，仅发通知。
+        // 被取消管理员。4.24.3 起 payload.userId 标识被移除者，可可靠定位目标管理员并更新角色；
+        // 旧包无 userId（from 为操作者）时跳过角色更新，仅发通知。
         const userId = payload.userId || ''
         if (userId)
           stores.group.updateGroupMemberRole(groupId, userId, GROUP_MEMBER_ROLE.MEMBER)

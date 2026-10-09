@@ -1,3 +1,26 @@
+## @easemob-community/uikit-sdk-websdk5 1.5.0 (2026-10-09)
+
+
+### 新增
+
+- **支持 App ID 初始化（SDK 5.1+）**：`SdkConfig.appKey` 与 `appId` 二选一，两者都未提供且非注入模式时 init 明确报错；`adapterConfig` 透传槽中的身份字段剥离，以契约顶层为准。
+- **支持自定义登录超时（SDK 5.1.2+）**：`SdkConfig.loginTimeoutMs` 透传至 `login({ userId, token, timeoutMs })`，缺省走 SDK 默认 30s。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.4.0 (2026-10-09)
+
+
+### 新增
+
+- **SDK 日志捕获接入官方 `onLog` 通道（SDK 5.1+）**：`sdk-log-capture` 探测链新增最高优先级分支——检测到 SDK 根导出 `LogEventName` 且 client 单例已初始化时，经 `addEventHandler` 注册 `onLog` 回调，接收 SDK 已脱敏的结构化日志（timestamp/level/message/args），不再依赖 console 拦截；旧版 SDK（5.0.x）或未初始化场景自动回退原有 console patch 方案。探测链优先级：onLog > setLogger 注入 > console 拦截。
+
+### 适配 easemob-websdk 5.1.x
+
+- **`ClientConfig` 适配 `InitConfig` 联合类型**：SDK 5.1 起 `InitConfig` 变为 `appKey / appId` 二选一联合，`ClientConfig` 由 interface extends 改为交叉类型，单例一致性校验同时比对 `appKey` / `appId`；`adapterConfig` 透传槽剥离 `appId`（中立契约 `SdkConfig.appKey` 仍为必填，App ID 初始化的契约支持另行评估）。
+
+---
+
 ## @easemob-community/uikit-sdk-websdk5 1.3.4 (2026-09-21)
 
 

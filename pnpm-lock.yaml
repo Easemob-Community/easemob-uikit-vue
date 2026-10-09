@@ -52,7 +52,7 @@ importers:
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.1.2
       markdown-it:
         specifier: ^15.0.0
         version: 15.0.0
@@ -101,7 +101,7 @@ importers:
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.1.2
       pinia:
         specifier: ^2.3.1
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -138,7 +138,7 @@ importers:
         version: link:../../packages/uikit-im
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.1.2
       pinia:
         specifier: ^2.3.1
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -191,7 +191,7 @@ importers:
         version: link:../uikit-sdk-contract
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.1.2
       pinia:
         specifier: ^2.1.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -328,8 +328,8 @@ importers:
         specifier: workspace:*
         version: link:../uikit-sdk-contract
       easemob-websdk-4:
-        specifier: npm:easemob-websdk@4.24.2
-        version: easemob-websdk@4.24.2
+        specifier: npm:easemob-websdk@4.24.3
+        version: easemob-websdk@4.24.3
       pinia:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -357,7 +357,7 @@ importers:
         version: link:../uikit-sdk-contract
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.1.2
       pinia:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -2254,11 +2254,11 @@ packages:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
 
-  easemob-websdk@4.24.2:
-    resolution: {integrity: sha512-EsCPg6n2fD3HHzIGBId62OpImeWIezJPSBtQMbEQnRCfiHxR8jwRG/kL4enfv9vaosptbnQnSWpESIOECz9E+Q==}
+  easemob-websdk@4.24.3:
+    resolution: {integrity: sha512-/SPyAAJp8bC8cHeoMI4LFAyjdqeHXxx1I7B89iqtygqICTOum0iCtM94pXAZwutpyxAtBIDEL5VAqDR8Q0iUCg==}
 
-  easemob-websdk@5.0.0:
-    resolution: {integrity: sha512-9jp2wGzKyn6OD4YvcGr9CKo7ZdBKX7hlxsbLjgFZ4s+lsDytOjHjPnCd+lKojJEcvUIfq2bjynzBaMQFa4VtIQ==}
+  easemob-websdk@5.1.2:
+    resolution: {integrity: sha512-w2PHgi5z+hcbvHRWuUiws3W6HRlwTI7TTlQMgFViYtFp48+jjR79m9H2T2AVRwM7yE9EJyJdQcyPxKxfJog9Yg==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -6359,9 +6359,9 @@ snapshots:
       es-errors: 1.3.0
       gopd: 1.2.0
 
-  easemob-websdk@4.24.2: {}
+  easemob-websdk@4.24.3: {}
 
-  easemob-websdk@5.0.0:
+  easemob-websdk@5.1.2:
     dependencies:
       zod: 3.25.76
 

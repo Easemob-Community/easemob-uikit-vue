@@ -24,6 +24,7 @@ import '@easemob-community/uikit-chatroom/theme' // 引入主题样式（必需�
 registerDefaultSdkAdapterFactory(() => new Websdk5Adapter())
 
 useChatroomProvider({ appKey: 'orgName#appName' })
+// 或 App ID 初始化（SDK 5.1+）：useChatroomProvider({ appId: 'your-app-id' })
 ```
 
 ```vue

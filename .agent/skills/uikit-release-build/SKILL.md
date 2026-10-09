@@ -111,7 +111,9 @@ d.ts 对 core 的引用保持裸包名 `@easemob-community/uikit-core`（vite-pl
 - **tgz 模式（dev 联调）**：根 `package.json` 的 `pnpm.overrides` 指向
   `file:./easemob-websdk-5.0.0.tgz`，本地安装/构建全部使用 tgz 内容，**不改子包依赖声明**；
 - 命令：`pnpm sdk:use-tgz` / `pnpm sdk:use-npm` / `pnpm sdk:status` / `pnpm sdk:up`
-  （= `pnpm up easemob-websdk`，更新到 range 内最新版并更新 lockfile）；
+  （= `node scripts/switch-sdk.mjs up`：快照各包声明 → `pnpm up -r` 升级到 range 内最新 →
+  按原文恢复声明行 → `pnpm install`；**不要直接跑 `pnpm up [-r] easemob-websdk`**，
+  前者根级不生效，后者会把声明改写为最新版本号、违反「声明恒为 ^5.0.0」约定，D146）；
 - **切换后必须重新 `pnpm install` 生效**（可加 `--install` 自动重装）；
 - 检查当前模式：`pnpm sdk:status`；tgz 模式仅影响本地安装/构建，发布不受影响。
 

@@ -91,7 +91,7 @@ export class ChatroomAdapter {
       this.rooms.leaveChatRoom({ chatRoomId: roomId }))
   }
 
-  /** 获取房间详情（含公告 / 当前用户权限与状态快照） */
+  /** 获取房间详情（名称/权限/成员数/全员禁言；公告自 SDK 5.1 起走 getAnnouncement 独立查询） */
   async getChatroomInfo(roomId: string): Promise<Chatroom> {
     const detail = await this._call('getChatRoomInfo', () =>
       this.rooms.getChatRoomInfo({ chatRoomId: roomId }))

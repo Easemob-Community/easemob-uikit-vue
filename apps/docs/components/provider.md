@@ -2,7 +2,7 @@
 
 `EmUIKitProvider` 是 UIKit 的**顶级容器组件**：所有组件（会话列表、聊天、通讯录、群组、原子组件）都必须在它内部渲染。它负责：
 
-- **SDK 连接与登录**：用 `appKey` 创建环信 SDK Client 并初始化 Domain/事件管线
+- **SDK 连接与登录**：用 `appKey` / `appId`（二选一；appId 为 SDK 5.1+ 能力，仅 websdk5）创建环信 SDK Client 并初始化 Domain/事件管线
 - **功能开关（features）**：好友体系、在线状态、群组、用户资料、草稿、@我、正在输入等模块的启停（运行时切换即时生效）
 - **全局主题 / 国际化 / 动画 / H5 适配**：一套配置作用于全部组件
 - **数据源接管（dataSource）**：业务侧完全接管联系人/群组/在线状态/用户资料等数据获取
@@ -12,7 +12,7 @@
 
 | 能力域 | 相关配置 |
 | --- | --- |
-| 连接与登录 | `appKey`、`sdkConfig`、`autoInit`、`adapter`（注入模式）、`onTokenWillExpire`、`onTokenExpired` |
+| 连接与登录 | `appKey` / `appId`（二选一）、`sdkConfig`、`autoInit`、`adapter`（注入模式）、`onTokenWillExpire`、`onTokenExpired` |
 | 功能开关 | `enableContact`、`contactFetchMode`、`enableBlocklist`、`enablePresence`、`enableGroup`、`enableUserInfo`、`enableUserInfoSubscription`、`enableDraft`、`enableAtMe`、`enableTyping`、`filterBlockedContacts`、`showNicknameInSingleChat`、`showNicknameInGroupChat`、`enableToast` |
 | 主题 | `theme`（模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色） |
 | 国际化 | `locale`（zh-CN / en） |
@@ -42,7 +42,7 @@ import { createPinia } from 'pinia'
 
 ::: tip 依赖说明
 - `EmUIKitProvider` 不自带 pinia：项目需自行 `app.use(createPinia())`（文档站演示、在线演练场中由运行环境注入）。
-- 未配置 `appKey` 时 Provider 仍会创建上下文，但 client 无法完成登录。
+- 未配置 `appKey` / `appId` 时 Provider 仍会创建上下文，但 client 无法完成登录。
 :::
 
 ## 常见配置

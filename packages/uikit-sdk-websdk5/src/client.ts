@@ -49,11 +49,14 @@ export interface ManagerHost {
   removeEventHandler: (id: string) => void
 }
 
+/** 跨联合分支的 Omit（InitConfig 自 SDK 5.1 起为 appKey/appId 二选一联合，普通 Omit 会丢失分支独有键） */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+
 /**
  * UIKitClient 初始化配置。
- * 在 SDK InitConfig 基础上增加 UIKit 专属开关。
+ * 在 SDK InitConfig（appKey / appId 二选一联合，SDK 5.1+）基础上增加 UIKit 专属开关。
  */
-export interface ClientConfig extends InitConfig {
+export type ClientConfig = InitConfig & {
   /** 是否开启 SDK 调试日志 */
   debug?: boolean
   /**
@@ -86,16 +89,16 @@ export function isSdkDebugEnabled(): boolean {
 /**
  * 最近一次成功传给 SDK 的规范化配置（不含 clientName/clientVersion 日志字段）。
  */
-let activeClientConfig: Omit<ClientConfig, 'clientName' | 'clientVersion'> | null = null
+let activeClientConfig: DistributiveOmit<ClientConfig, 'clientName' | 'clientVersion'> | null = null
 
-function alignClientConfig(config: Omit<ClientConfig, 'clientName' | 'clientVersion'>): Omit<ClientConfig, 'clientName' | 'clientVersion'> {
+function alignClientConfig(config: DistributiveOmit<ClientConfig, 'clientName' | 'clientVersion'>): DistributiveOmit<ClientConfig, 'clientName' | 'clientVersion'> {
   const active = activeClientConfig
   if (!active)
     return config
-  if (config.appKey !== active.appKey) {
+  if (config.appKey !== active.appKey || config.appId !== active.appId) {
     throw new Error(
-      `[UIKit] ClientConfig.appKey（${config.appKey}）与已初始化的 SDK 单例（${active.appKey}）不一致：`
-      + '同一应用内多个 UIKit 场景包必须使用同一个 appKey（SDK 连接与事件总线是全局单例）。',
+      `[UIKit] ClientConfig 应用身份（appKey=${config.appKey ?? '-'} / appId=${config.appId ?? '-'}）与已初始化的 SDK 单例（appKey=${active.appKey ?? '-'} / appId=${active.appId ?? '-'}）不一致：`
+      + '同一应用内多个 UIKit 场景包必须使用同一个 appKey/appId（SDK 连接与事件总线是全局单例）。',
     )
   }
   const { managers: incomingManagers, ...rest } = config
@@ -229,8 +232,8 @@ export class UIKitClient {
     this._client.removeEventHandler(id)
   }
 
-  async login(userId: string, token: string) {
-    return this._client.login({ userId, token })
+  async login(userId: string, token: string, timeoutMs?: number) {
+    return this._client.login({ userId, token, ...(timeoutMs !== undefined ? { timeoutMs } : {}) })
   }
 
   async logout() {

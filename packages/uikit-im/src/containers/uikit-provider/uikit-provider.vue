@@ -38,16 +38,18 @@ const logger = createLogger('UIKit:UikitProvider')
 export type ThemeFontSize = FontSizePreset | number
 
 export interface ProviderProps {
-  /** 环信应用标识 AppKey（orgName#appName），由环信控制台创建应用获取 */
+  /** 环信应用标识 AppKey（orgName#appName），由环信控制台创建应用获取；与 appId 二选一 */
   appKey?: string
+  /** 环信应用 App ID（SDK 5.1+；与 appKey 二选一，appId 模式经 DNSConfig 解析，不可配固定 serverUrls；webim4 / SDK 4.x 不支持） */
+  appId?: string
   /**
    * 注入的中立 SDK 适配器（SdkAdapter）。传入后业务全权管理其生命周期（D122 注入模式）；
    * 不传时使用注册表默认适配器——由 `import '@easemob-community/uikit-im/websdk5'` 子路径入口
    * 自注册（UIKit 全权管理）；4.x 接入方改为 import webim4 adapter 并显式传本 prop。
    */
   adapter?: SdkAdapter
-  /** SDK 客户端配置（除 appKey 外的 SDK 初始化字段，如 debug / enableSyncData 等），与 appKey 合并后透传给 adapter */
-  sdkConfig?: Omit<CoreUIKitInitConfig, 'appKey'>
+  /** SDK 客户端配置（除 appKey/appId 外的 SDK 初始化字段，如 debug / enableSyncData / loginTimeoutMs 等），与 appKey/appId 合并后透传给 adapter */
+  sdkConfig?: Omit<CoreUIKitInitConfig, 'appKey' | 'appId'>
   /** 是否自动初始化 SDK 连接（默认 true）：false 时延迟初始化，待业务调用 useClient().init(config) 传入 appKey 后创建 */
   autoInit?: boolean
   /** 全局主题配置：预设 / 模式 / 品牌色 / 间距 / 圆角 / 字号 / 密度 / 气泡与背景色，挂载时应用 */
@@ -243,6 +245,7 @@ export interface ProviderProps {
 
 const config = computed<CoreUIKitInitConfig>(() => ({
   appKey: props.appKey ?? '',
+  appId: props.appId,
   ...props.sdkConfig,
 }))
 

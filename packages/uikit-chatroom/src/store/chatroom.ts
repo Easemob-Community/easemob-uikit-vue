@@ -173,6 +173,10 @@ export const useChatroomStore = defineStore('chatroom', () => {
     if (roomInfo) {
       room.info = roomInfo
       room.announcement = roomInfo.announcement ?? ''
+      // 全员禁言初态以详情 muteAllMembers 为准（SDK 5.1+），
+      // 消除进房到首个 onAllMemberMuteStateChanged 事件之间的状态盲区
+      if (roomInfo.muteAllMembers !== undefined)
+        room.isAllMuted = roomInfo.muteAllMembers
     }
   }
 

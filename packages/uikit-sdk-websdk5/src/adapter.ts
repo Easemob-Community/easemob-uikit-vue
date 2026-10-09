@@ -1054,6 +1054,8 @@ export class Websdk5Adapter implements SdkAdapter {
   private _registerImEvents = true
   /** 旁路持久化钩子（init 记账，事件处理器登出重建时仍需透传） */
   private _persistence?: SdkPersistenceHooks
+  /** 登录超时（毫秒，init 记账；SDK 5.1.2+ login 参数，缺省走 SDK 默认 30s） */
+  private _loginTimeoutMs?: number
 
   constructor(private injectedClient?: UIKitClient) {}
 
@@ -1143,12 +1145,26 @@ export class Websdk5Adapter implements SdkAdapter {
     // 旁路持久化：同 repositories 读取方式（SdkConfig 顶层优先，adapterConfig 下沉次之）
     const persistence = config.persistence ?? adapterPersistence
     this._persistence = persistence
+    this._loginTimeoutMs = config.loginTimeoutMs
+
+    // 应用身份：appKey / appId 二选一（SDK 5.1+ 支持 appId 初始化）；
+    // 透传槽中的身份字段剥离，以契约顶层字段为准
+    const { appKey: _cfgAppKey, appId: _cfgAppId, ...clientCfgRest } = clientCfg
+    let identity: { appKey: string } | { appId: string }
+    if (config.appKey)
+      identity = { appKey: config.appKey }
+    else if (config.appId)
+      identity = { appId: config.appId }
+    else if (this.injectedClient)
+      identity = { appKey: '' } // 注入模式不使用该参数，仅满足类型
+    else
+      throw new Error('[Websdk5Adapter] 缺少应用身份：SdkConfig.appKey 与 SdkConfig.appId 必须提供其一')
 
     this._client = this.injectedClient ?? createClient({
-      appKey: config.appKey,
       debug: config.debug,
       managers: clientCfg.managers ?? (managerPreset === 'chatroom' ? WEBSDK5_CHATROOM_MANAGERS : WEBSDK5_MANAGERS),
-      ...clientCfg,
+      ...clientCfgRest,
+      ...identity,
     })
 
     if (eventDeps)
@@ -1253,7 +1269,7 @@ export class Websdk5Adapter implements SdkAdapter {
     // 失败时在 catch 中回滚清空。内置 store 的 currentUser 派生自 adapter.currentUserId（可选方法）。
     this._stores?.client.setCurrentUser?.(user)
     try {
-      await this._client.login(user, token)
+      await this._client.login(user, token, this._loginTimeoutMs)
     }
     catch (err) {
       this._stores?.client.setCurrentUser?.('')

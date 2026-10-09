@@ -1,3 +1,12 @@
+## @easemob-community/uikit-core 2.11.0 (2026-10-09)
+
+
+### 新增
+
+- **初始化配置支持 `appId` 与 `loginTimeoutMs`（D143/D144）**：`normalizeInitConfig` 将二者纳入标准字段（不再下沉 adapterConfig）；auto-init 与延迟初始化判定、client store 应用身份记账（`setAppKey`）均兼容 appId 模式。
+
+---
+
 ## @easemob-community/uikit-core 2.10.0 (2026-10-08)
 
 

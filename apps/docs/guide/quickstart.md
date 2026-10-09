@@ -116,7 +116,7 @@ import { useClient } from '@easemob-community/uikit-im'
 
 const { init, login, logout, isLoggedIn, currentUser } = useClient()
 
-// 初始化 SDK（appKey 必填）
+// 初始化 SDK（appKey / appId 二选一；appId 为 SDK 5.1+ 能力，仅 websdk5）
 await init({ appKey: 'your-app-key' })
 
 // 登录：支持 accessToken 或密码

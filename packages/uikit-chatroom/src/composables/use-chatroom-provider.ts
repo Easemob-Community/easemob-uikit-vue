@@ -101,8 +101,8 @@ export function useChatroomProvider(
     },
   })
 
-  // 立即初始化：仅当 auto-init 未关闭且已提供 appKey（语义同 core 的 auto-init）
-  if (options.autoInit !== false && config.appKey) {
+  // 立即初始化：仅当 auto-init 未关闭且已提供应用身份（appKey 或 appId，语义同 core 的 auto-init）
+  if (options.autoInit !== false && (config.appKey || config.appId)) {
     void coreCtx.init(config)
   }
 

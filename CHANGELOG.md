@@ -1,5 +1,69 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.11.0 (2026-10-09)
+
+### 新增
+
+- **`UIKitProvider` 支持 App ID 初始化（SDK 5.1+）**：新增 `appId` prop（与 `appKey` 二选一）；`sdkConfig` 类型同步放开 `loginTimeoutMs` 等中立字段（`Omit<CoreUIKitInitConfig, 'appKey' | 'appId'>`）。auto-init 判定改为「已提供 appKey 或 appId」。
+
+## @easemob-community/uikit-core 2.11.0 (2026-10-09)
+
+### 新增
+
+- **初始化配置支持 `appId` 与 `loginTimeoutMs`（D143/D144）**：`normalizeInitConfig` 将二者纳入标准字段（不再下沉 adapterConfig）；auto-init 与延迟初始化判定、client store 应用身份记账（`setAppKey`）均兼容 appId 模式。
+
+## @easemob-community/uikit-chatroom 2.2.0 (2026-10-09)
+
+### 新增
+
+- **聊天室 Provider 支持 App ID 初始化（SDK 5.1+）**：auto-init 判定由「已提供 appKey」放宽为「已提供 appKey 或 appId」。
+
+## @easemob-community/uikit-sdk-websdk5 1.5.0 (2026-10-09)
+
+### 新增
+
+- **支持 App ID 初始化（SDK 5.1+）**：`SdkConfig.appKey` 与 `appId` 二选一，两者都未提供且非注入模式时 init 明确报错；`adapterConfig` 透传槽中的身份字段剥离，以契约顶层为准。
+- **支持自定义登录超时（SDK 5.1.2+）**：`SdkConfig.loginTimeoutMs` 透传至 `login({ userId, token, timeoutMs })`，缺省走 SDK 默认 30s。
+
+## @easemob-community/uikit-sdk-webim4 1.4.0 (2026-10-09)
+
+### 新增
+
+- **消费 4.24.3 群事件 `userId` 字段（D145）**：`changeOwner` 直接以 `payload.userId` 定位新群主（不再依赖 pending 转让标记/本地启发式，旧包无该字段时自动回落）；`removeMember` 可区分「自己被移出」（移除群+删会话）与「其他成员被移出」（仅减成员数+通知）；`removeAdmin` 角色更新在 4.24.3 下生效（此前载荷无 userId 只能跳过）；`unblockMember` 日志补 userId。
+
+### 变更
+
+- **appKey 缺失时明确报错**：4.x 仅支持 appKey 初始化，仅传 `appId`（SDK 5.1+ 能力）且非注入模式时 init 抛出清晰错误。
+
+## @easemob-community/uikit-sdk-contract 1.4.0 (2026-10-09)
+
+### 新增
+
+- **`SdkConfig` 新增 `appId` 与 `loginTimeoutMs`（D143/D144）**：`appKey` 由必填放宽为与 `appId` 二选一（类型层保持双可选、由 adapter 运行时校验，向后兼容既有 appKey 调用方）；`loginTimeoutMs` 仅 websdk5（SDK 5.1.2+）生效，webim4 忽略。
+
+## @easemob-community/uikit-chatroom 2.1.0 (2026-10-09)
+
+### 适配 easemob-websdk 5.1.2
+
+- **聊天室详情字段适配（SDK 兼容性变更）**：SDK 5.1.2 起聊天室详情接口不再返回 `announcement` 与 `currentUserStatus`（`ChatRoomCurrentUserStatus` 类型已移除）。进房公告改走独立公告查询接口落地（失败降级为空、不阻断进房），实时同步仍走 `onAnnouncementChanged` 事件。`Chatroom` 类型同步移除 `currentUserMuted` / `currentUserInAllowlist` 字段（SDK 已不返回；实际禁言判断走 muteList、白名单判断走 `checkIfInAllowList`，行为不变）。
+- **全员禁言初态修复**：`Chatroom` 新增 `muteAllMembers` 字段（SDK 5.1.2 详情新增），进房时据此初始化 `isAllMuted`，消除「进房到首个全员禁言事件之间输入框短暂可用」的状态盲区。
+
+## @easemob-community/uikit-sdk-websdk5 1.4.0 (2026-10-09)
+
+### 新增
+
+- **SDK 日志捕获接入官方 `onLog` 通道（SDK 5.1+）**：`sdk-log-capture` 探测链新增最高优先级分支——检测到 SDK 根导出 `LogEventName` 且 client 单例已初始化时，经 `addEventHandler` 注册 `onLog` 回调，接收 SDK 已脱敏的结构化日志（timestamp/level/message/args），不再依赖 console 拦截；旧版 SDK（5.0.x）或未初始化场景自动回退原有 console patch 方案。探测链优先级：onLog > setLogger 注入 > console 拦截。
+
+### 适配 easemob-websdk 5.1.x
+
+- **`ClientConfig` 适配 `InitConfig` 联合类型**：SDK 5.1 起 `InitConfig` 变为 `appKey / appId` 二选一联合，`ClientConfig` 由 interface extends 改为交叉类型，单例一致性校验同时比对 `appKey` / `appId`；`adapterConfig` 透传槽剥离 `appId`（中立契约 `SdkConfig.appKey` 仍为必填，App ID 初始化的契约支持另行评估）。
+
+## @easemob-community/uikit-sdk-webim4 1.3.4 (2026-10-09)
+
+### 变更
+
+- 4.x SDK 依赖由 `easemob-websdk@4.24.2` 升至 `4.24.3`（群事件 payload 新增 `userId` 字段，本包暂不消费）。
+
 ## @easemob-community/uikit-im 3.10.0 (2026-10-08)
 
 ### 新增

@@ -3,12 +3,30 @@ import type { SdkRepositoryOverrides } from './repository'
 
 /** 中立初始化配置，只含 SDK 无关字段 */
 export interface SdkConfig {
-  appKey: string
+  /**
+   * 应用 AppKey（`org#app` 格式）。与 `appId` 二选一，至少提供其一。
+   * Application AppKey (`org#app`). Mutually exclusive with `appId`; at least one is required.
+   */
+  appKey?: string
+  /**
+   * 应用 App ID（SDK 5.1+ 支持；与 `appKey` 二选一。appId 模式经 DNSConfig 解析 AppKey，
+   * 不可配置固定 serverUrls；webim4 / SDK 4.x 不支持，仅传 appId 时 webim4 会抛错）。
+   * Application App ID (SDK 5.1+; mutually exclusive with `appKey`). App ID mode resolves
+   * the AppKey via DNSConfig and cannot use fixed serverUrls; webim4 (SDK 4.x) does not
+   * support it and throws when only `appId` is provided.
+   */
+  appId?: string
   /** 用户 ID：延迟初始化场景可在 login 时再提供 */
   userId?: string
   /** Token：延迟初始化场景可在 login 时再提供 */
   token?: string
   debug?: boolean
+  /**
+   * 登录超时时间（毫秒），缺省用 SDK 默认（30s）。仅 websdk5（SDK 5.1.2+）生效，webim4 忽略。
+   * Login timeout in milliseconds; SDK default (30s) applies when omitted.
+   * Only honored by the websdk5 adapter (SDK 5.1.2+); ignored by webim4.
+   */
+  loginTimeoutMs?: number
   /**
    * 数据入口接管注入（Phase 3.1 留口子）。core 归一化（normalizeInitConfig）
    * 会把本字段随其它平铺字段下沉进 adapterConfig；websdk5 / webim4 两 adapter

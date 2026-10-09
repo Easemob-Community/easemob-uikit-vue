@@ -1,3 +1,12 @@
+## @easemob-community/uikit-im 3.11.0 (2026-10-09)
+
+
+### 新增
+
+- **`UIKitProvider` 支持 App ID 初始化（SDK 5.1+）**：新增 `appId` prop（与 `appKey` 二选一）；`sdkConfig` 类型同步放开 `loginTimeoutMs` 等中立字段（`Omit<CoreUIKitInitConfig, 'appKey' | 'appId'>`）。auto-init 判定改为「已提供 appKey 或 appId」。
+
+---
+
 ## @easemob-community/uikit-im 3.10.0 (2026-10-08)
 
 

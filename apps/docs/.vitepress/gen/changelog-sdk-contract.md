@@ -1,3 +1,12 @@
+## @easemob-community/uikit-sdk-contract 1.4.0 (2026-10-09)
+
+
+### 新增
+
+- **`SdkConfig` 新增 `appId` 与 `loginTimeoutMs`（D143/D144）**：`appKey` 由必填放宽为与 `appId` 二选一（类型层保持双可选、由 adapter 运行时校验，向后兼容既有 appKey 调用方）；`loginTimeoutMs` 仅 websdk5（SDK 5.1.2+）生效，webim4 忽略。
+
+---
+
 ## @easemob-community/uikit-sdk-contract 1.3.1 (2026-09-21)
 
 

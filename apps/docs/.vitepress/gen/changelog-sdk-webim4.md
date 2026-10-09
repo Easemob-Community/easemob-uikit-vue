@@ -1,3 +1,25 @@
+## @easemob-community/uikit-sdk-webim4 1.4.0 (2026-10-09)
+
+
+### 新增
+
+- **消费 4.24.3 群事件 `userId` 字段（D145）**：`changeOwner` 直接以 `payload.userId` 定位新群主（不再依赖 pending 转让标记/本地启发式，旧包无该字段时自动回落）；`removeMember` 可区分「自己被移出」（移除群+删会话）与「其他成员被移出」（仅减成员数+通知）；`removeAdmin` 角色更新在 4.24.3 下生效（此前载荷无 userId 只能跳过）；`unblockMember` 日志补 userId。
+
+### 变更
+
+- **appKey 缺失时明确报错**：4.x 仅支持 appKey 初始化，仅传 `appId`（SDK 5.1+ 能力）且非注入模式时 init 抛出清晰错误。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.3.4 (2026-10-09)
+
+
+### 变更
+
+- 4.x SDK 依赖由 `easemob-websdk@4.24.2` 升至 `4.24.3`（群事件 payload 新增 `userId` 字段，本包暂不消费）。
+
+---
+
 ## @easemob-community/uikit-sdk-webim4 1.3.3 (2026-09-21)
 
 

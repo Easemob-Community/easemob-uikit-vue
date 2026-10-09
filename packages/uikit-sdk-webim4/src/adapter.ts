@@ -1109,7 +1109,16 @@ export class Webim4Adapter implements SdkAdapter {
     // 旁路持久化：读取方式与 repositories 一致（顶层优先，adapterConfig 次之）
     this._persistence = config.persistence ?? adapterPersistence
 
-    this._client = this.injectedClient ?? createClient({ appKey: config.appKey, ...clientCfg })
+    // 4.x 仅支持 appKey 初始化；SDK 5.1+ 的 appId 模式在 webim4 下不可用
+    let appKey = config.appKey
+    if (!appKey) {
+      if (this.injectedClient)
+        appKey = '' // 注入模式不使用该参数，仅满足类型
+      else
+        throw new Error('[Webim4Adapter] 缺少 SdkConfig.appKey：SDK 4.x 仅支持 appKey 初始化（appId 初始化为 SDK 5.1+ 能力，webim4 不支持）')
+    }
+
+    this._client = this.injectedClient ?? createClient({ appKey, ...clientCfg })
 
     // 中立 debug 字段 → 4.x 日志级别（对齐 websdk5 的 setLogLevel('DEBUG') 语义）
     if (config.debug)

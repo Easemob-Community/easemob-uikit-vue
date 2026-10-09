@@ -27,7 +27,7 @@ export interface Chatroom {
   memberCount?: number
   /** 房主用户 ID */
   ownerId?: string
-  /** 房间公告（详情接口携带；实时变更经 onAnnouncementChanged 事件同步） */
+  /** 房间公告（SDK 5.1+ 起经独立公告查询接口落地；实时变更经 onAnnouncementChanged 事件同步） */
   announcement?: string
   /** 创建时间戳（单位以服务端返回为准） */
   createdAt?: number
@@ -37,10 +37,8 @@ export interface Chatroom {
   disabled?: boolean
   /** 当前用户在房间内的权限类型 */
   permissionType?: ChatroomPermissionValue
-  /** 当前用户是否处于禁言状态 */
-  currentUserMuted?: boolean
-  /** 当前用户是否在白名单中 */
-  currentUserInAllowlist?: boolean
+  /** 是否开启全员禁言（SDK 5.1+ 详情字段；setJoined 据此初始化 isAllMuted 初态） */
+  muteAllMembers?: boolean
 }
 
 /** 聊天室成员 */
@@ -119,10 +117,8 @@ export function toChatroom(detail: ChatRoomSummary | ChatRoomDetail): Chatroom {
     room.maxUsers = detail.maxMembers
     room.createdAt = detail.createdAt
     room.ext = detail.ext
-    room.announcement = detail.announcement
     room.permissionType = detail.permissionType
-    room.currentUserMuted = detail.currentUserStatus?.muted
-    room.currentUserInAllowlist = detail.currentUserStatus?.inAllowlist
+    room.muteAllMembers = detail.muteAllMembers
   }
   return room
 }

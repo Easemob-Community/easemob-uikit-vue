@@ -318,6 +318,29 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 
 > **安装**：适配器包是 optional peer 依赖，不会被自动安装，请按所用 SDK 二选一显式安装——`pnpm add @easemob-community/uikit-sdk-websdk5`（5.x 公开版）或 `pnpm add @easemob-community/uikit-sdk-webim4`（4.x）。
 
+### 应用身份与登录超时
+
+初始化身份支持两种形态（`@easemob-community/uikit-sdk-contract` 1.4.0 起）：
+
+- **`appKey`**：`org#app` 格式，由环信控制台创建应用获取；
+- **`appId`**（SDK 5.1+，仅 websdk5）：SDK 经 DNSConfig 解析对应 AppKey，**不可配置固定 `serverUrls`**；两者二选一，不可同时提供。
+
+```vue
+<EmUIKitProvider app-id="your-app-id">...</EmUIKitProvider>
+<!-- 或 -->
+<EmUIKitProvider app-key="orgName#appName">...</EmUIKitProvider>
+```
+
+webim4（SDK 4.x）不支持 appId，仅传 appId 时 init 会抛出明确错误。
+
+`sdkConfig.loginTimeoutMs`（SDK 5.1.2+，仅 websdk5）可自定义登录总超时时间，缺省为 SDK 默认 30 秒；webim4 忽略该字段。
+
+```vue
+<EmUIKitProvider app-key="orgName#appName" :sdk-config="{ loginTimeoutMs: 15000 }">...</EmUIKitProvider>
+```
+
+SDK 日志收集（`logConfig.collectSdkLog`）在 websdk5 + SDK 5.1.2 下自动切换到官方 `onLog` 结构化日志通道（SDK 侧已完成脱敏），旧版 SDK 回退 console 捕获，业务无感。
+
 ### 两个子路径入口
 
 主入口 `@easemob-community/uikit-im` 保持零 adapter 静态引用（4.x / 5.x 产物互不含对方符号，摇树隔离）；「默认内置」通过子路径入口的 import 副作用完成注册：
@@ -325,7 +348,7 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 | 入口 | 适配 SDK | 适用场景 |
 | --- | --- | --- |
 | `import '@easemob-community/uikit-im/websdk5'` | `easemob-websdk` 5.x（公开版默认） | 绝大多数接入方 |
-| `import '@easemob-community/uikit-im/webim4'` | `easemob-websdk` 4.24.2（经 npm alias `easemob-websdk-4`） | 使用 4.x SDK 的存量项目 |
+| `import '@easemob-community/uikit-im/webim4'` | `easemob-websdk` 4.24.3（经 npm alias `easemob-websdk-4`） | 使用 4.x SDK 的存量项目 |
 
 两个入口都会把对应 adapter 注册为默认适配器（重复 import 以最后一次注册为准并告警），`<EmUIKitProvider>` 不传 `adapter` prop 时由 UIKit 全权管理其生命周期（init / login / logout）。入口同时 re-export adapter 包的全量 API，原先从主入口导入的 SDK 值级符号（3.0 已从主入口移除）改从对应子路径入口导入：
 
@@ -464,7 +487,7 @@ if (capabilities.groupReadReceipt) {
 
 从历史版本迁移请查阅仓库 [CHANGELOG](https://github.com/Easemob-Community/easemob-uikit-vue/blob/main/CHANGELOG.md)，关注以下破坏性变更点：
 
-- `UIKitProvider` 取代旧的初始化写法，`appKey` 为必填
+- `UIKitProvider` 取代旧的初始化写法，`appKey` / `appId` 二选一（SDK 5.1+ 支持 appId 初始化，仅 websdk5）
 - 组件统一 `Em` 前缀，旧版非前缀组件名不再注册
 - 主题变量名统一为 `--uikit-*`，旧 `--em-*` 变量已废弃
 

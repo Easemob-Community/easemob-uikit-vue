@@ -176,15 +176,17 @@ function buildEventHandlerDeps(): Record<string, unknown> {
 
 /**
  * 把兼容旧 ClientConfig 的平铺初始化配置归一化为 SdkConfig：
- * 标准字段（appKey/debug/userId/token/adapterConfig）保留，其余平铺字段下沉 adapterConfig。
+ * 标准字段（appKey/appId/debug/userId/token/loginTimeoutMs/adapterConfig）保留，其余平铺字段下沉 adapterConfig。
  */
 function normalizeInitConfig(config: CoreUIKitInitConfig): CoreUIKitInitConfig {
-  const { appKey, debug, userId, token, adapterConfig, ...rest } = config
+  const { appKey, appId, debug, userId, token, loginTimeoutMs, adapterConfig, ...rest } = config
   return {
     appKey,
+    appId,
     debug,
     userId,
     token,
+    loginTimeoutMs,
     adapterConfig: { ...rest, ...adapterConfig },
   }
 }
@@ -198,8 +200,8 @@ function normalizeInitConfig(config: CoreUIKitInitConfig): CoreUIKitInitConfig {
  * 事件流：adapter 事件层直接写注入的 Pinia stores（adapterConfig.stores），
  * 中立事件（adapter.subscribe）仅承担 token 回调与同步状态桥接。
  *
- * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey）时，setup 阶段不初始化 SDK，
- * 待业务通过 `init(config)` 传入 appKey 后再初始化。Domain 访问在初始化前调用会抛错，
+ * 支持延迟初始化：当 `autoInit === false`（或未提供 appKey/appId）时，setup 阶段不初始化 SDK，
+ * 待业务通过 `init(config)` 传入应用身份后再初始化。Domain 访问在初始化前调用会抛错，
  * 初始化后正常工作（与旧 ManagerHost 代理语义一致）。
  */
 export function useCoreUIKitProvider(
@@ -293,7 +295,7 @@ export function useCoreUIKitProvider(
   // 使用 shallowRef 避免深层 UnwrapRef 丢失适配器/Domain 的私有字段导致类型不兼容
   const client: Ref<SdkAdapter> = shallowRef(adapter)
 
-  let currentAppKey = config.appKey || ''
+  let currentAppKey = config.appKey ?? config.appId ?? ''
   let initialized = false
   /** 进行中的初始化 Promise：允许业务 init() 后不 await 直接 login（login 内部会等待） */
   let initPromise: Promise<void> | null = null
@@ -348,6 +350,7 @@ export function useCoreUIKitProvider(
     logger.info('adapter 装配开始', {
       ownership: adapterOwnership,
       appKey: resolved.appKey,
+      appId: resolved.appId,
       reinit: initialized,
     })
     try {
@@ -379,8 +382,8 @@ export function useCoreUIKitProvider(
       throw err
     }
     initialized = true
-    currentAppKey = resolved.appKey
-    stores.client.setAppKey(resolved.appKey)
+    currentAppKey = resolved.appKey ?? resolved.appId ?? ''
+    stores.client.setAppKey(currentAppKey)
     // 连接配置快照：事件层（群解散删会话等）读取 deleteConversationOnGroupDestroyed
     const rawClient = adapter.client as { deleteConversationOnGroupDestroyed?: boolean } | null | undefined
     stores.client.setClient({
@@ -390,11 +393,11 @@ export function useCoreUIKitProvider(
     // 场景层挂钩（如 chatroom 注册场景事件），返回的 dispose 随生命周期清理
     disposeAdapterReady?.()
     disposeAdapterReady = options.onAdapterReady?.(adapter) || null
-    logger.info('adapter 装配完成', { ownership: adapterOwnership, appKey: resolved.appKey })
+    logger.info('adapter 装配完成', { ownership: adapterOwnership, appKey: resolved.appKey, appId: resolved.appId })
   }
 
-  // 立即初始化：仅当 auto-init 未关闭且已提供 appKey
-  if (options.autoInit !== false && config.appKey) {
+  // 立即初始化：仅当 auto-init 未关闭且已提供应用身份（appKey 或 appId）
+  if (options.autoInit !== false && (config.appKey || config.appId)) {
     initPromise = setupAdapter(config)
   }
 
@@ -416,7 +419,7 @@ export function useCoreUIKitProvider(
     }
     if (!initialized) {
       throw new Error(
-        '[UIKit] SDK 尚未初始化：请先调用 init(config)，或在 Provider 上提供 appKey 且保持 auto-init 开启',
+        '[UIKit] SDK 尚未初始化：请先调用 init(config)，或在 Provider 上提供 appKey/appId 且保持 auto-init 开启',
       )
     }
     // 提前记账 currentUser：SDK 连接建立瞬间即可推送消息（典型：服务端 REST 下发的

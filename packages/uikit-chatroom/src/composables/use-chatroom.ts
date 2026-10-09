@@ -188,11 +188,13 @@ export function useChatroom(options: UseChatroomOptions = {}) {
       // join 竞态：响应返回时已非目标房间（期间发起了新 join / 已 leave）则丢弃
       if (!chatroomStore.isCurrentJoin(token, id))
         return
-      // 进房后拉详情（名称/公告/权限/成员数）；详情失败不阻断进房
+      // 进房后拉详情（名称/权限/成员数/全员禁言）；详情失败不阻断进房
       const info = await adapter.getChatroomInfo(id).catch(() => null)
+      // 公告自 SDK 5.1 起不再随详情返回，走独立查询接口（失败降级为空，不阻断进房）
+      const announcement = await adapter.getAnnouncement(id).catch(() => null)
       if (!chatroomStore.isCurrentJoin(token, id))
         return
-      chatroomStore.setJoined(id, info ?? { id, name: id })
+      chatroomStore.setJoined(id, { ...(info ?? { id, name: id }), announcement: announcement?.content ?? '' })
       // 封顶条数按房间生效（P2 review P1-4：去掉模块级默认改写，避免跨实例污染）
       if (options.maxMessages !== undefined)
         messageStore.setMaxMessages(id, options.maxMessages)

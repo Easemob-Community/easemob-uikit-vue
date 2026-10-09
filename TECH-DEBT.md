@@ -876,7 +876,7 @@
 
 ### [x] D97. 聊天室 UIKit（`@easemob-community/uikit-chatroom`）：独立场景包 + 抽 `@easemob-community/uikit-core` 设计规划
 
-- **背景**：聊天室（直播/语聊房/小班课/私域直播，H5 居多）与单群聊场景几乎不重合（无离线/未读/回执/会话列表，消息为广播流），需独立场景包；但主题/i18n/sdk 抽象/原子组件必须单一维护，故抽共享基座。底层 `easemob-websdk@5.0.0` 已具备完整 `ChatRoomManager`（join/leave/成员/管理员/禁言/黑/白名单/公告/房间属性 KV），能力底座齐备。
+- **背景**：聊天室（直播/语聊房/小班课/私域直播，H5 居多）与单群聊场景几乎不重合（无离线/未读/回执/会话列表，消息为广播流），需独立场景包；但主题/i18n/sdk 抽象/原子组件必须单一维护，故抽共享基座。底层 `easemob-websdk@5.0.0` 已具备完整 `ChatRoomManager`（join/leave/成员/管理员/禁言/黑/白名单/公告/房间属性 KV），能力底座齐备。（2026-10-09 修订：底座已升 `easemob-websdk@5.1.2`——详情接口不再返回公告/`currentUserStatus`，公告改走独立查询接口、全员禁言初态改由详情新增 `muteAllMembers` 落地，见 uikit-chatroom 2.1.0 版本段。）
 - **结论**：三包架构 `@easemob-community/uikit-core`（共享内核）+ `@easemob-community/uikit-im`（1v1/群聊场景，对外 API 零变化）+ `@easemob-community/uikit-chatroom`（聊天室场景）；变种靠「场景预设 config + 容器插槽」，不 fork、不拆子场景包；H5-first。
 - **关键增量/修正（评审已核实）**：① 事件注册按场景分离（core 只留连接级 + notice，chatroom 自建 `registerChatroomEventHandlers`）；② `ManagerHost` 需新增 `chatRoomManager`（当前 `SdkChatClient.init` 未注册 ChatRoomManager）；③ 所有包 external `vue/pinia/easemob-websdk`，场景包再 external core（单 websdk 实例规则）；④ chatroom 合并 i18n keys 用既有 `mergeLocaleMessages`（P1 核实 core locale 已有合并 API，无需新增 extendLocale）；⑤ `useChatroomAttributes` 四层同步（本地缓存 + set + 变更事件 + 拉取兜底），属性 key 加场景前缀；⑥ `scripts/check-version-sync.mjs` 升级为双版本校验。
 - **执行计划**（P0 决策 → P0.5 改名 → P1 抽核 → P2 包骨架 → P3 场景预设 → P4 H5 变种 demo → P5 文档/集成，每阶段门禁全绿）：见 [CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)。
@@ -1490,3 +1490,23 @@
     - **指南/状态类**：`useSyncStatus()`（2.8.6）未进 stores.md / advanced.md 组合式清单；`MessageStoreOptions.maxCachedConversations`（3.1.0）stores.md 未写；被踢下线 `kicked`/`kickCode`（core 2.4）未进 stores.md，`conversation-container.md` 状态横幅节无被踢分支；`--uikit-file-icon-*` 9 个 token（core 2.6）与 `--uikit-badge-bg`（core 2.3）未进 design-tokens.md；`sdkConfig.persistence`（Electron 持久化钩子）无指南。
     - **文档与源码不符（反向漂移，需先对齐实现对错边）**：chat-container.md:223-232 手写抽屉插槽表列了 `drawer-profile` / `drawer-announcement` / `drawer-admin-actions` / `drawer-management` 4 个源码不存在的插槽（chat-info-drawer.vue 实际仅 6 个 outlet：drawer-header/members/settings/actions/member-detail/footer；CHANGELOG 2.2.0 还声称 drawer-remark，亦不存在）；gen 脚本 JSDoc 解析把「@我」误判为 tag 导致 enableAtMe / enableMentionHighlight / locateOnMentionClick / at-me-click 等说明被截断（gen/uikit-provider.md:24、gen/chat-container.md:258/260/267、gen/conversation-container.md:39）。
     - 修复路径建议：先修 theme.md 错误与 chat-container.md 幽灵插槽（低成本高收益）；接入指南（3.0 adapter）补 quickstart/advanced/provider；组件页按「容器页补节 vs 独立页 + gen 白名单」逐个评估；gen 脚本 JSDoc 截断问题在 gen-api-docs.mjs 侧修。
+
+- [x] **D143. SDK 5.1.2 自定义登录超时未透传（`login` 的 `timeoutMs`，默认 30s）**
+  - 已于 2026-10-09 修复（uikit-sdk-contract 1.4.0 / uikit-sdk-websdk5 1.5.0 / uikit-core 2.11.0 / uikit-im 3.11.0）。
+  - 背景：easemob-websdk 5.1.2 登录支持自定义超时（`login({ userId, token, timeoutMs })`，见 `types/chat-client.d.ts` LoginParams:148）。
+  - 修复：契约 `SdkConfig` 新增可选 `loginTimeoutMs`；core `normalizeInitConfig` 纳入标准字段；websdk5 adapter init 记账、login 透传 `timeoutMs`（`UIKitClient.login` 加第三参）；webim4（4.x 无等价参数）按契约文档忽略。
+
+- [x] **D144. SDK 5.1 App ID 初始化的契约层支持**
+  - 已于 2026-10-09 修复（uikit-sdk-contract 1.4.0 / uikit-sdk-websdk5 1.5.0 / uikit-sdk-webim4 1.4.0 / uikit-core 2.11.0 / uikit-im 3.11.0 / uikit-chatroom 2.2.0）。
+  - 背景：SDK 5.1 起 `InitConfig` 为 `appKey / appId` 二选一联合（App ID 模式经 DNSConfig 解析 AppKey，不能配固定 serverUrls）。
+  - 修复：`SdkConfig.appKey` 放宽为与 `appId` 二选一（类型双可选、adapter 运行时校验缺失即抛错）；core `normalizeInitConfig` / auto-init 判定 / `setAppKey` 记账兼容 appId；websdk5 init 按 `appKey → appId` 选择身份分支并剥离透传槽身份字段；webim4 仅传 appId 时明确报错；`UIKitProvider` 新增 `appId` prop，im/chatroom Provider auto-init 判定同步放宽。
+
+- [x] **D145. webim4 侧 4.24.3 群事件 `userId` 字段未消费**
+  - 已于 2026-10-09 修复（uikit-sdk-webim4 1.4.0）。
+  - 背景：easemob-websdk 4.24.3 群事件（removeAdmin/changeOwner/unblockMember/removeMember/inviteToJoin）payload 新增 `userId` 标识目标用户。
+  - 修复（`packages/uikit-sdk-webim4/src/event/group-events.ts`）：`changeOwner` 优先用 `payload.userId` 定位新群主（旧包回落 pending 标记/本地启发式）；`removeMember` 按 userId 区分自己被移出（移除群+删会话+清消息）与其他成员被移出（仅减成员数+通知）；`removeAdmin` 角色更新在 4.24.3 下生效；`unblockMember` 日志补 userId。事件写注入 stores，无需契约 events 变更。
+
+- [x] **D146. `pnpm sdk:up` 根脚本不递归 workspace，且 `pnpm up -r` 会改写子包声明**
+  - 已于 2026-10-09 修复。
+  - 现象（2026-10-09 实测）：根 `sdk:up` = `pnpm up easemob-websdk` 只作用于根 package.json（根无此依赖，输出 Already up to date，实际未升级）；改用 `pnpm up -r easemob-websdk` 能升级到 range 内最新，但会把各子包/应用的 `easemob-websdk: ^5.0.0` 声明改写成 `^5.1.2`（`--lockfile-only` 同样改写），违反「声明恒为 ^5.0.0」约定，需手工还原 5 处。
+  - 修复：`scripts/switch-sdk.mjs` 新增 `up` 子命令——快照所有 workspace manifest 的 SDK 声明 → `pnpm up -r easemob-websdk` → 按原文恢复被改写的声明行 → `pnpm install`；根 `sdk:up` 脚本改为 `node scripts/switch-sdk.mjs up`。已实测：声明保持 `^5.0.0`，lockfile 解析 5.1.2。

@@ -197,10 +197,10 @@ export function useUIKitProvider(
     },
   }
 
-  // 立即初始化：仅当 auto-init 未关闭且已提供 appKey（语义同 core 的 auto-init）。
+  // 立即初始化：仅当 auto-init 未关闭且已提供应用身份（appKey 或 appId，语义同 core 的 auto-init）。
   // IM 默认 enableSyncData 由 core setupAdapter 内的 resolveSdkConfig 钩子补齐，
   // 此处与延迟初始化（ctx.init）均传原始 config 即可。
-  if (options.autoInit !== false && config.appKey) {
+  if (options.autoInit !== false && (config.appKey || config.appId)) {
     void coreCtx.init(config)
   }
 
