@@ -130,6 +130,11 @@ d.ts 对 core 的引用保持裸包名 `@easemob-community/uikit-core`（vite-pl
 - **门禁**：根 `pnpm.overrides` 不得残留任何 `file:` 本地 tgz（会污染 pnpm pack 的 workspace 版本改写，
   曾实测改写出旧版 `core@^2.8.6`）；`changelog:check`；暂存区无 dist/node_modules/.tgz；
   真实发布要求已 `npm login --registry https://registry.npmjs.org`。
+- **真实 UIKit tag 自动推送**：涉及 im 的真实发布先要求工作区干净，固定 HEAD 并校验该提交的 im 版本、
+  CHANGELOG 与本地/远端 tag 无冲突；npm 实际发布 im 成功后立即创建 `v<im版本>` annotated tag 并推送
+  origin。dry-run、`--only core` 等不含 im 的发布不打签；registry 已存在而跳过 im 时也不把旧版本擅自
+  绑定到当前 HEAD。推签失败或补签时核对原提交后执行 `pnpm release:tag -- <version> <commit> --push`；
+  去掉 `--push` 可先 dry-run。脚本会拒绝覆盖同名不同 commit 的本地/远端标签。
 - **registry 固定为 `https://registry.npmjs.org`**：本机全局 `~/.npmrc` 指向 npmmirror 只读镜像，
   脚本所有 npm 调用（whoami / view / publish）都显式带 `--registry`，登录也要对准官方源。
 - 首次发布 scoped 包必须 `--access public`（脚本已内置）；发布后建议在 npm 网页端把包级
@@ -146,7 +151,7 @@ d.ts 对 core 的引用保持裸包名 `@easemob-community/uikit-core`（vite-pl
 - workspace：`packages/*`（@easemob-community/uikit-im）+ `apps/*`（demo / docs）；
 - 根脚本：`build` = `pnpm -r build`；`dev` = `pnpm -F @easemob-community/uikit-im story:dev`（Histoire）；
   `test` = vitest；`lint` = `eslint .`；`format` = `prettier --write .`；
-  `release` = 发布演练（dry-run）、`release:publish` = 真实发布（见 §5）；
+  `release` = 发布演练（dry-run）、`release:publish` = 真实发布（见 §5）、`release:tag` = UIKit 打签/恢复；
 - `packageManager: pnpm@9.12.3`；`engines.node >= 18`；
 - **提交前检查**：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'`
   应为空（`dist/` 已 gitignore，但 tgz 模式改动的根 package.json 是真实 diff）。

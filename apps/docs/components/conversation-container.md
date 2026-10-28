@@ -2,6 +2,8 @@
 
 会话列表容器，开箱即用的 IM 会话页：内置搜索、未读徽标、置顶 / 免打扰 / 删除（长按或右键）、草稿记忆与下拉刷新，数据由 SDK 自动同步驱动。
 
+![会话列表、未读徽标与空聊天区](../guide/images/overview/conversation-main.png)
+
 ## 使用方式
 
 组件以 `EmConversationContainer` 为名导出。容器依赖 `EmUIKitProvider` 提供 SDK 实例，需将两者组合使用：
@@ -33,6 +35,12 @@ function onSelect() {
 ```
 
 > 会话列表在 SDK 5.x 下由 WebSocket 自动同步：登录成功后会监听 `onConversationListSyncDidFinish` 并自动填充列表，无需手动拉取。
+
+## 会话操作
+
+PC 端右键会话项、H5 端长按会话项，即可打开内置操作菜单，执行标记已读、置顶、免打扰或删除会话：
+
+![会话置顶、免打扰与删除操作菜单](../guide/images/overview/conversation-actions.png)
 
 ## 会话列表项
 

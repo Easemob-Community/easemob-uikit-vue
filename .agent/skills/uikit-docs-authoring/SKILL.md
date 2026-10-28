@@ -1,4 +1,4 @@
-# 文档站写作契约（apps/docs VitePress 结构 / demo 块 / API 自动生成）
+# 文档站写作契约（apps/docs 内容源 / demo 块 / API 自动生成）
 
 > 命中本 skill 时，先说一句：**本次命中 skill: uikit-docs-authoring**。
 
@@ -14,20 +14,22 @@
 
 ## 目标
 
-文档站是 VitePress 工程，组件页由「手写 markdown + demo 块 + 自动生成 API 表格」三部分
-拼装。本 skill 记录**目录结构**、**组件页写作规范**、**API 自动生成机制**与**构建细节**
-的真实契约，避免以下翻车：
+公开文档内容仍留在本仓库 `apps/docs`，VitePress 站壳位于同级仓库
+`../easemob-community-docs`，通过 `apps/docs/docs.manifest.mjs` 聚合内容、版本、编辑链接与
+nav/sidebar。组件页由「手写 markdown + demo 块 + 自动生成 API 表格」三部分拼装。本 skill
+记录**目录结构**、**组件页写作规范**、**API 自动生成机制**与**构建细节**的真实契约，避免以下翻车：
 
 1. 新 demo 文件放错目录（`components/x.md` 的 demo 必须放 `components/x/demo/`）；
 2. 改完组件 props/emits 不跑 `pnpm gen:api`，API 表格过期；
 3. 手动编辑 `.vitepress/gen/*.md`（生成产物，下次 gen 覆盖）；
-4. 新增组件页后忘记在 `.vitepress/config.ts` 的 sidebar 登记；
+4. 新增组件页后忘记在 `docs.manifest.mjs` 的 sidebar 登记；
 5. 不了解 rewriteDemoSrc 插件，以为 demo 路径规则与标准 vitepress-demo 一致。
 
 ## 0. 主题定制与 UI 重构规范（antfu vitepress skill 落地）
 
-> 规范来源：antfu/skills 仓库的 vitepress skill（tessl.io registry），
-> 已按本项目现状精简落地。改文档站 UI 时先对照本节，避免破坏既有定制。
+> 规范来源：antfu/skills 仓库的 vitepress skill（tessl.io registry），已按项目现状精简落地。
+> 本节的 `.vitepress/`、`vite.config.ts` 路径均指独立站壳仓库 `../easemob-community-docs`；
+> Vue 的 nav/sidebar 与编辑链接在本仓库 `apps/docs/docs.manifest.mjs` 维护。
 
 **导航（.vitepress/config.ts `nav`）**：
 - 一级链接必须配 `activeMatch`（正则）保证子页高亮：组件 `^/components/`、
@@ -41,14 +43,12 @@
 - 字体：`theme/index.ts` 必须 import `vitepress/theme-without-fonts`（移除默认
   Inter），`--vp-font-family-base` 用中文字体栈（PingFang SC / Hiragino /
   Microsoft YaHei），`--vp-font-family-mono` 用系统等宽栈。
-- **标题 display 字体（设计感来源）**：本地托管得意黑 Smiley Sans
+- **标题 display 字体（品牌识别）**：本地托管得意黑 Smiley Sans
   （`public/fonts/smiley-sans.woff2`，OFL-1.1 开源可商用，来源
   atelier-anchor/smiley-sans v2.0.1，ttf 变体 1.15MB），经 `@font-face`
-  （font-display: swap）定义为 `--vp-font-family-display`，仅应用于标题体系：
-  `.VPHero .name/.text`、`.vp-doc h1/h2/h3`、`.VPNavBarTitle .title`、
-  `.VPSidebarItem.level-0 .text`；**正文保持系统中文栈**（得意黑为斜体 display
-  字体，不适合正文长文本）。新增标题字体时遵循：只影响标题、正文不动、字体文件
-  本地托管不走 CDN。
+  （font-display: swap）定义为 `--vp-font-family-display`，仅应用于首页
+  `.VPHero .name/.text` 与 `.VPNavBarTitle .title`；文档 H1/H2/H3、侧栏与正文
+  统一使用系统中文栈，避免斜体展示字体干扰长文阅读。字体文件本地托管不走 CDN。
 - hero 定制变量：`--vp-home-hero-name-background`（名称渐变，同色系）、
   `--vp-home-hero-image-background-image` + `--vp-home-hero-image-filter`（logo 光晕）。
 
@@ -68,14 +68,15 @@
 **其他 config 约定**：`editLink.pattern` 指向 GitHub
   `.../edit/main/apps/docs/:path`；`footer.copyright` 用
   `new Date().getFullYear()` 动态年份；local search 开启并配中文
-  translations；sidebar 分组用 `collapsed: false`（默认展开、可折叠）。
+  translations；站壳通过 `withCollapsibleGroups` 将各产品 sidebar 分组统一设为
+  `collapsed: true`（默认折叠、当前组自动展开），不修改各内容仓库 manifest。
 
-## 1. 文档站结构（apps/docs）
+## 1. 文档内容结构（apps/docs）
 
-- `package.json`：`dev` / `build` 前置 `pnpm split-changelog` + `preview`（vitepress
-  原生）+ `gen:api`（node scripts/gen-api-docs.mjs）；依赖 vitepress ^1.6.4、
-  vite-plugin-vitepress-demo ^2.2.1、`@vue/compiler-sfc` + typescript（gen 脚本的解析引擎）；
-  `@easemob-community/uikit-im` 为 `workspace:*`；
+- `package.json`：只保留 `gen:api`（node scripts/gen-api-docs.mjs）与
+  `split-changelog`；VitePress dev/build/preview 统一在独立站壳仓库执行；
+- `docs.manifest.mjs`：声明公开内容映射、各包版本文件，以及 root locale 的
+  nav/sidebar/editLink；新增组件页在这里按分类登记；
 - `index.md`：home 布局（hero + features），hero actions 指向快速开始与组件预览；
 - `guide/`：quickstart / theme / icons / h5-adaptation / advanced / demo-phase1-plan /
   changelog（更新日志，与根 CHANGELOG.md 不同，是站点展示版）；
@@ -85,32 +86,27 @@
   大多只有 md，无 demo 目录（容器依赖 SDK 登录态，不便于静态演示）；
   例外：`message-list.md` 有 demo 目录——消息列表演练场用 mock 注入免登录渲染
   （见 §2 交互式 demo 约定），新容器页若采用同模式可按需建 demo 目录；
-- `.vitepress/config.ts`：sidebar 结构（指南 + 组件四组分类：基础 10 / 反馈 8 /
-  数据展示 4 / 业务模块 8）、nav、`ignoreDeadLinks: [/packages\/uikit\//]`
-  （icons.md 引用仓库内源码文件，跳过死链校验）；
-- `.vitepress/components/`：站点级自定义组件（如 IconGallery.vue 图标画廊）；
-- `.vitepress/gen/`：gen:api 生成产物目录，提交但**禁止手改**。
+- `.vitepress/gen/`：gen:api 与 changelog 拆分生成产物目录，提交但**禁止手改**；
+- 独立站壳仓库持有 `.vitepress/config.ts`、`.vitepress/theme/`、
+  `.vitepress/components/`（如 IconGallery）与共享 `ignoreDeadLinks` 配置。
 
-**双 UIKit 文档架构（2026-08-15 起）**：站点复用 VitePress `locales` 机制承载**两套并列
-文档树**（非多语言，两树 lang 均为 zh-CN）：
+**多 UIKit 文档架构**：独立站壳复用 VitePress `locales` 机制承载并列文档树（非多语言，
+各树 lang 均为 zh-CN）。每个源码仓库通过自己的 manifest 提供 locale 配置：
 
 - `root`（label「单群聊 UIKit」）：既有 uikit-im 文档（URL 无前缀），nav/sidebar 在
-  `locales.root.themeConfig`；
-- `chatroom`（label「聊天室 UIKit」）：uikit-chatroom 文档骨架（`chatroom/` 目录：index /
-  guide / components，URL 前缀 `/chatroom/`），nav/sidebar 在 `locales.chatroom.themeConfig`；
+  `apps/docs/docs.manifest.mjs` 的 `locale.themeConfig`；
+- `chatroom`：内容仍在本仓库 `chatroom/`，一期继续通过站壳 `srcExclude` 下线；恢复时在
+  对应 manifest 提供 locale，并同步恢复切换器与 changelog 配置；
 - **locale key 必须不带斜杠**：`root` 是默认 locale 保留字，非 root key 会被拼成 `/<key>/`
-  正则做前缀匹配——写成 `'/'` / `'/chatroom/'` 会拼出 `'//'` / `'//chatroom//'` 永不匹配，
-  所有页面回退 `root` 而 `locales['root']` 不存在，**两套 nav/sidebar 全部丢失**（2026-08-15
-  事故）；sidebar 的路径前缀（`'/chatroom/guide/'` 等）与 nav link（`/chatroom/...`）不受影响；
+  正则做前缀匹配；写成带斜杠的 key 会导致所有页面回退 `root`；
 - per-locale `themeConfig` 对顶层浅合并覆盖，所以 **nav/sidebar 必须写在各自 locale 内**，
-  顶层 `themeConfig` 只留共享项（logo/outline/search/footer/editLink 等）；
-- 顶部标题旁切换器：`.vitepress/theme/components/UiKitDocsSwitcher.vue`（`#nav-bar-title-after`
-  插槽），按路由前缀判定上下文；桌面端默认「语言」下拉已被 style.css 隐藏（
-  `.VPNavBar .VPNavBarTranslations`），移动端菜单内切换入口保留；
-- 聊天室版本宏 `__EASEMOB_UIKIT_CHATROOM_VERSION__` 由 vite.config.ts 注入，包未落地时为空串，
-  hero 徽章降级为仅产品名；`@easemob-community/uikit-chatroom` alias 已预置（包落地后 demo 可直接引用）。
-- 新增聊天室文档页 = 在 `chatroom/` 下建页 + 在 `locales.chatroom.themeConfig.sidebar`
-  登记；gen:api 白名单待聊天室组件落地后接入。
+  站壳顶层 `themeConfig` 只留共享项；
+- 产品切换器位于站壳 `.vitepress/theme/components/UiKitDocsSwitcher.vue`，使用自定义
+  展开按钮 + 导航链接弹层展示当前产品与选项，按路由前缀判定上下文并跳转对应文档树；
+  支持点击外部关闭、Escape 关闭并归还焦点、明暗主题和 reduced-motion；桌面使用
+  `#nav-bar-content-before`（`#nav-bar-title-after` 位于首页 `<a>` 内，禁止嵌套交互控件），
+  移动菜单复用同一组件，默认 locale 下拉在两端均隐藏，不使用原生 `<select>` 或 ARIA menu 角色；
+- 各产品版本宏由站壳 `vite.config.ts` 从对应源码仓库读取并注入，不能跨产品复用。
 
 ## 2. 组件文档写作规范（components/<name>.md）
 
@@ -260,28 +256,29 @@
   - 首页徽章/页脚版本来源：徽章经 Layout.vue 的 import.meta.env 键；**页脚 copyright 的
     `v__EASEMOB_UIKIT_VERSION__` 是历史遗留问题**（config.ts 在 vite define 生效前加载，宏永不
     替换，渲染为字面量），已知未修；
-- sidebar / nav 维护：新增组件页必须在 `.vitepress/config.ts` 按分类登记
+- sidebar / nav 维护：新增组件页必须在 `apps/docs/docs.manifest.mjs` 按分类登记
   （基础/反馈/数据展示/业务模块），新增 guide 页面在 `/guide/` 分组登记；
-- 构建产物在 `.vitepress/dist`，仓库根 gitignore 覆盖。
+- **跨仓库运行时去重**：站壳 `vite.config.ts` 必须保留 `resolve.dedupe: ['vue', 'pinia']`，
+  否则站壳与 Vue 源码仓库可能解析出两份 Vue/Pinia，导致构建成功但 demo 客户端不渲染；
+- 站壳先同步到 `.content/`，构建产物在 `.content/.vitepress/dist`，已被站壳 gitignore 覆盖；
+  构建期间不要运行 preview，同步清空 `.content/` 会使正在服务的进程读到缺失文件。
 
 ## 5. 特殊页面与约定
 
 - `index.md`：`layout: home`，hero 的 text/tagline/actions + features 六宫格；
   首页 features 数字（如「18 个原子组件」）随组件数量漂移，改组件时顺手核对；
 - `guide/icons.md`：引用 `packages/uikit-im/src` 下源码文件作为仓库内链接，因此
-  config.ts 配了 `ignoreDeadLinks` 跳过校验——新增仓库内链接无需再改配置；
-- `.vitepress/components/IconGallery.vue`：图标画廊（图标名/分类/预览），
+  站壳 config.ts 配了 `ignoreDeadLinks` 跳过校验——新增仓库内链接无需再改配置；
+- 站壳 `.vitepress/components/IconGallery.vue`：图标画廊（图标名/分类/预览），
   新增图标集时同步它的数据源；
-- `guide/changelog.md`：**单一数据源**——整页只保留说明 + `<!-- @include: ../../../CHANGELOG.md -->`，内容自动引用根 `CHANGELOG.md`，禁止在站点页手写版本段（曾发生双写分叉：1.5.0/1.5.1 只进站点、根 CHANGELOG 停在 1.4.0、package.json 停在 1.3.1）；改根 CHANGELOG 后 `cd apps/docs && pnpm build` 验证渲染与死链；
+- `guide/changelog.md`：**单一数据源**——整页只保留说明 + 生成文件 `@include`，内容自动引用根 `CHANGELOG.md`，禁止在站点页手写版本段；改根 CHANGELOG 后在 `../easemob-community-docs` 运行 `pnpm build` 验证渲染与死链；
 - 文档站无多语言（lang 固定 zh-CN），文案只写中文（组件 API 注释保持中英双语，
-  那是组件侧的事）；**注意 `locales` 配置已用于「单群聊 / 聊天室」双文档树切换**
-  （见 §1 双 UIKit 文档架构），不要再往 `locales` 里加语言条目，也不要移除现有两树。
+  那是组件侧的事）；`locales` 只用于并列产品文档树，不要添加语言条目。
 
 ## 6. 常用验证
 
-- 本地预览：`cd apps/docs && pnpm dev`（改 md/demo 热更）；
-- 构建验证：`cd apps/docs && pnpm build`（会真实编译所有 demo，语法/引用错误在此暴露；
-  死链校验由 ignoreDeadLinks 白名单豁免仓库内路径）；
+- 本地预览：`cd ../easemob-community-docs && pnpm dev`（改 md/demo 后重跑同步或重启 dev）；
+- 构建验证：`cd ../easemob-community-docs && pnpm build`（真实编译所有 demo，并检查公开内容边界与死链）；
 - ~~演练场验证~~（在线代码演练场已暂时下线，见 §2 状态注记）。
 - API 表格校验：改组件后 `pnpm gen:api` 重跑，diff `.vitepress/gen/` 检查是否
   符合预期（表格对齐由脚本保证，手改必被覆盖）。
@@ -295,7 +292,7 @@
 - 改组件公开 API 后必须重跑 `pnpm gen:api`（JSDoc 即文档）。
 - 新组件进 API 文档必须加入 gen-api-docs.mjs 的白名单（原子组件 COMPONENTS，
   业务容器 MODULES）。
-- 新页面必须登记到 `.vitepress/config.ts` 的 sidebar（组件按分类、指南按分组）。
+- 新页面必须登记到 `apps/docs/docs.manifest.mjs` 的 sidebar（组件按分类、指南按分组）。
 - demo 源文件必须能独立编译运行（docs build 会真实渲染）。
 - 演练场模板只能 import import map 已覆盖的模块（@easemob-community/uikit-im / vue / pinia /
   easemob-websdk），否则 iframe 模块解析失败白屏。

@@ -10,6 +10,7 @@
   - 构建：`pnpm -F @easemob-community/uikit-im build`（= `vite build && vue-tsc --emitDeclarationOnly`，约 9s）
   - demo 类型检查：`cd apps/demo && pnpm exec vue-tsc --noEmit`
 - **版本号同步**：`packages/uikit-im/package.json` 的 `version` 必须与根 `CHANGELOG.md` 最新版本段一致；发版/改版本号后提交前跑 `pnpm changelog:check`（唯一版本数据源是根 CHANGELOG，文档站 changelog 页通过 tabs 引入按包自动拆分的生成文件，禁止手写版本段）。
+- **UIKit 发布必须留下真实 Git 标签**：涉及 im 的真实发布要求工作区干净，npm 发布成功后自动创建 `v<im版本>` annotated tag 并推送 origin；dry-run 或非 im 单包发布不打签。推签失败时核对原发布提交后跑 `pnpm release:tag -- <version> <commit> --push` 恢复，禁止把已发布版本擅自绑到新 HEAD。
 - 每次 `git commit` 的 message 用**中文**；**不主动 `git push`**，不做其它 git 变更（reset/rebase/force 等），除非用户明确要求，且每次都需再确认。
 - 暂存后确认没混入产物/依赖：`git diff --cached --name-only | grep -E 'dist/|node_modules/|\.tgz$'` 应为空（`dist/` 已 gitignore）。
 - 大改动先写计划、等确认再编码；涉及公开 API（组件名 / props / emits / 导出）改动先说明影响面。
@@ -85,6 +86,6 @@
 - IM 职责边界与 OA↔UIKIT 接入契约（五包封顶 + 扩展点复用 + 不做清单 + 接入契约 + 按触发点落地）：[IM-RESPONSIBILITY-BOUNDARY.md](docs/IM-RESPONSIBILITY-BOUNDARY.md)（对应 TECH-DEBT D126）
 - 核心包源码：`packages/uikit-im/src`（`components/` 原子、`modules/` 业务块、`containers/` 页面容器、`store/`、`composables/`、`sdk/`、`theme/`、`locale/`）
 - 共享基座包源码：`packages/uikit-core/src`（`@easemob-community/uikit-core`，P1 Step 1 已迁入：sdk 基座层 client/wire 类型/user-info & presence domain/连接级事件/notice 工具、store client/theme/user-info/presence、composables/types、constants、locale、通用 utils logger/log-store/sdk-log-capture/sdk-error；core 内禁止 import uikit-im，uikit-im 侧一律经 `@easemob-community/uikit-core` 裸 specifier 引用；**core 引擎层 sdk/constants/utils 保持纯 TS**：禁 vue/pinia/@vueuse 值依赖（门禁 `packages/uikit-core/scripts/check-engine-isolation.mjs`），locale 纯逻辑在 `locale/messages.ts`，响应式 `useLocale` 在 `locale/use-locale.ts`）
-- 示例工程：`apps/demo`（vite alias 直连源码）、`apps/docs`（vitepress）
+- 示例工程：`apps/demo`（vite alias 直连源码）；文档内容源：`apps/docs`（Markdown/demo/API 生成脚本/`docs.manifest.mjs`），VitePress 站壳已拆到同级仓库 `../easemob-community-docs`（聚合 Vue / uniApp 文档，构建时同步 `.content/`）
 - 组件 story：`packages/uikit-im/src/**/*.story.vue`（Histoire）
 - 集成侧产物（面向下游接入者，与内部 `.agent/skills/*` 相互独立）：Skills 包 `integrations/skills/`（入口 `SKILL.md`，同步脚本 `scripts/gen-skill.mjs`）+ MCP 服务 `packages/mcp/`（`@easemob-community/uikit-mcp`，stdio 传输，数据源 `apps/docs`，构建前跑 `scripts/sync-docs.mjs`）

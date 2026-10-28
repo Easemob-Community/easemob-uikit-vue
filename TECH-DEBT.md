@@ -1510,3 +1510,9 @@
   - 已于 2026-10-09 修复。
   - 现象（2026-10-09 实测）：根 `sdk:up` = `pnpm up easemob-websdk` 只作用于根 package.json（根无此依赖，输出 Already up to date，实际未升级）；改用 `pnpm up -r easemob-websdk` 能升级到 range 内最新，但会把各子包/应用的 `easemob-websdk: ^5.0.0` 声明改写成 `^5.1.2`（`--lockfile-only` 同样改写），违反「声明恒为 ^5.0.0」约定，需手工还原 5 处。
   - 修复：`scripts/switch-sdk.mjs` 新增 `up` 子命令——快照所有 workspace manifest 的 SDK 声明 → `pnpm up -r easemob-websdk` → 按原文恢复被改写的声明行 → `pnpm install`；根 `sdk:up` 脚本改为 `node scripts/switch-sdk.mjs up`。已实测：声明保持 `^5.0.0`，lockfile 解析 5.1.2。
+
+- [x] **D147. ImageViewer 缺少明确退出入口，触屏场景难以关闭大图**
+  - 已于 2026-10-27 修复。
+  - 根因：组件仅支持遮罩点击与 ESC 关闭，没有可见关闭按钮；图片自身阻止点击冒泡，触屏用户缺少明确出口。
+  - 修复：右上角新增带可访问名称的 44×44px 关闭按钮，复用既有 `close()` 与 `button.close` 文案，支持焦点态及顶部安全区；公开 props/emits 与遮罩配置语义不变。
+  - 验证：新增 `image-viewer.test.ts`，先因关闭按钮不存在失败，再验证点击后 `show=false`、`close` 触发且浮层移除。

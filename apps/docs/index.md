@@ -6,9 +6,9 @@ hero:
   text: Vue 3 即时通讯 UI 组件库
   tagline: 基于环信 Web IM SDK 构建的高质量 Vue 3 组件库，提供原子组件、业务模块与容器组件，支持主题定制、暗色模式与 H5 移动端适配，开箱即用。
   image:
-    light: /logo-light.png
-    dark: /logo-dark.png
-    alt: Easemob UIKit
+    light: /guide/images/overview/main.png
+    dark: /guide/images/overview/main.png
+    alt: Vue 3 UIKit 会话列表与群聊界面
   actions:
     - theme: brand
       text: 快速开始

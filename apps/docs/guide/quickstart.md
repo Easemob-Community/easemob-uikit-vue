@@ -21,6 +21,8 @@ pnpm add @easemob-community/uikit-im @easemob-community/uikit-sdk-websdk5 pinia 
 > 组件库将 `pinia` 与 `vue` 声明为 peerDependencies，需要在使用方项目中显式安装。
 > SDK 适配器包（`@easemob-community/uikit-sdk-websdk5` / `@easemob-community/uikit-sdk-webim4`）是 **optional peer 依赖，不会被包管理器自动安装**，请按所用 SDK 版本二选一显式安装。
 > `@easemob-community/uikit-core` / `@easemob-community/uikit-sdk-contract` 是 uikit-im 的普通 dependencies，会随安装自动带上，**无需也不建议直接依赖**——3.7.11 起 core 的常用 store / 工具函数 / 业务类型已从 uikit-im 主入口透出（如 `useUserInfoStore`、`UiContact`、`UiPresence` 等），业务代码 import 一律走 `@easemob-community/uikit-im`。
+
+> [!IMPORTANT]
 > **主题样式需要单独引入**：构建产物将 CSS 提取为独立文件（子路径 `@easemob-community/uikit-im/theme`），入口 JS 不会自动注入样式，请在入口处加一行 `import '@easemob-community/uikit-im/theme'`（见下方示例）。
 
 ## 全局注册

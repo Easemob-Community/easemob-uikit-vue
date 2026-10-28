@@ -56,8 +56,13 @@ app.mount('#app')
 
 ## 文档
 
+文档正文、demo 与 API 生成脚本保留在 `apps/docs`；VitePress 站壳位于同级仓库 `../easemob-community-docs`。先安装本仓库依赖，再启动独立门户：
+
 ```bash
-pnpm -F @easemob/docs dev
+pnpm install
+cd ../easemob-community-docs
+pnpm install
+pnpm dev
 ```
 
 ## SDK 引入模式

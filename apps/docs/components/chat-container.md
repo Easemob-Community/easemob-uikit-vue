@@ -2,6 +2,8 @@
 
 聊天容器，提供完整的会话聊天页：消息列表（虚拟滚动）、输入区（文本 / 表情 / 图片 / 文件 / 语音）、消息操作（引用、复制、撤回、翻译、多选转发）与群组相关能力，数据由 Provider 统一管理。
 
+![聊天页消息流与输入区](../guide/images/overview/chat-main.png)
+
 ## 使用方式
 
 组件以 `EmChatContainer` 为名导出。需与 `EmConversationContainer` 配合 `EmUIKitProvider` 使用：
@@ -83,6 +85,8 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 ```
 
 ## 消息操作菜单接管
+
+![消息引用、复制、转发与撤回操作菜单](../guide/images/overview/chat-actions.png)
 
 消息右键（PC）/ 长按（H5）菜单默认由内置动作集合（引用/复制/转发/多选/翻译/置顶/撤回/编辑/删除等）按消息类型裁剪生成。通过 `#message-action-menu` 插槽可完全接管菜单内容——例如插入自定义主菜单项（举报/收藏/业务菜单）或整体改分组/顺序：
 

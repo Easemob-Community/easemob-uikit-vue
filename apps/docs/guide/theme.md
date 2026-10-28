@@ -231,6 +231,8 @@ UIKit 全局 z-index 分配遵循「通知/Toast 最上层 > 弹层容器 > 浮�
 
 UIKit 暗色主题通过 `[data-uikit-theme="dark"]` 属性驱动，所有组件自动切换：
 
+![暗色主题与主题设置面板](./images/overview/theme-custom.png)
+
 ```html
 <html data-uikit-theme="dark">
   ...

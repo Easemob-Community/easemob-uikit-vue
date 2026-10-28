@@ -24,7 +24,7 @@ export interface ImageViewerProps {
 }
 
 export interface ImageViewerEmits {
-  /** 关闭预览时触发（点击遮罩/ESC），负载 false，供 v-model:show 双向同步 */
+  /** 关闭预览时触发（点击遮罩/右上角关闭按钮/ESC），负载 false，供 v-model:show 双向同步 */
   (e: 'update:show', value: boolean): void
   /** 当前图片索引变化时触发（打开/切换上下一张），负载为新索引，供 v-model:index 双向同步 */
   (e: 'update:index', value: number): void
@@ -367,6 +367,16 @@ async function handleDownload() {
     @click="onOverlayClick"
     @wheel.prevent="onWheel"
   >
+    <button
+      type="button"
+      class="image-viewer__close"
+      :aria-label="t('button.close', '关闭')"
+      :title="t('button.close', '关闭')"
+      @click.stop="close"
+    >
+      <Icon name="xmark/bold" :size="24" />
+    </button>
+
     <img
       :key="currentIndex"
       :src="currentSrc"
@@ -483,6 +493,35 @@ async function handleDownload() {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+.image-viewer__close {
+  position: absolute;
+  top: calc(16px + var(--uikit-safe-top, 0px));
+  right: 16px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--uikit-image-viewer-control-radius);
+  background-color: var(--uikit-image-viewer-control-bg);
+  color: var(--uikit-text-inverse);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--uikit-anim-duration) var(--uikit-anim-easing);
+}
+
+.image-viewer__close:focus-visible {
+  outline: 2px solid var(--uikit-text-inverse);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .image-viewer__close:hover {
+    background-color: var(--uikit-image-viewer-control-bg-hover);
+  }
 }
 
 .image-viewer__img {

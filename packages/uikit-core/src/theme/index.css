@@ -128,6 +128,9 @@
   --uikit-banner-padding-x: 12px;
   --uikit-components-radius: 8px;
   --uikit-components-radius-hover: 14px;
+  --uikit-image-viewer-control-radius: 50%;
+  --uikit-image-viewer-control-bg: rgba(0, 0, 0, 0.5);
+  --uikit-image-viewer-control-bg-hover: rgba(0, 0, 0, 0.7);
   /* 桌面端弹窗（EmModal）最大宽度占视口宽度比例（0~1）：实际宽度 = min(设计稿宽度, 视口宽 × ratio)，最小不小于 280px */
   --uikit-modal-width-ratio: 0.5;
 
@@ -332,6 +335,9 @@
   --uikit-bg-active: #0D2840;
   /* 控件底 - 暗色（按钮 default、对方气泡、系统消息 pill、引用块） */
   --uikit-control-bg: #333537;
+  --uikit-image-viewer-control-radius: 50%;
+  --uikit-image-viewer-control-bg: rgba(0, 0, 0, 0.5);
+  --uikit-image-viewer-control-bg-hover: rgba(0, 0, 0, 0.7);
   --uikit-text-primary: #E8EAED;
   --uikit-text-secondary: #9AA0A6;
   /* 暗色下三级文字（时间戳/占位符），设计稿 #737B82 */

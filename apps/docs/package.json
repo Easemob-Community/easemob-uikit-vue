@@ -4,26 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm split-changelog && vitepress dev",
-    "build": "pnpm split-changelog && vitepress build",
-    "preview": "vitepress preview",
     "split-changelog": "node scripts/split-changelog.mjs",
     "gen:api": "node scripts/gen-api-docs.mjs"
   },
-  "dependencies": {
-    "@easemob-community/uikit-chatroom": "workspace:*",
-    "@easemob-community/uikit-im": "workspace:*",
-    "easemob-websdk": "^5.0.0",
-    "pinia": "^2.3.1",
-    "pinyin-pro": "^3.29.0",
-    "vue": "^3.5.41"
-  },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.6.2",
     "@vue/compiler-sfc": "^3.5.41",
-    "typescript": "^5.9.3",
-    "vite": "^5.4.21",
-    "vite-plugin-vitepress-demo": "^2.2.1",
-    "vitepress": "^1.6.4"
+    "typescript": "^5.9.3"
   }
 }

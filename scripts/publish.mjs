@@ -3,8 +3,9 @@
  * 发布编排脚本（@easemob/* 全家桶）
  *
  * 默认演练模式（dry-run）：跑发布门禁 + 构建 + pnpm pack + npm publish --dry-run，
- * 不上传任何东西，用于发布前核对产物。
- * 显式加 --publish 才真实发布：npm publish 弹出浏览器完成 passkey 2FA 验证。
+ * 不上传、不打标签，用于发布前核对产物。
+ * 显式加 --publish 才真实发布：npm publish 弹出浏览器完成 passkey 2FA 验证；
+ * uikit-im 发布成功后自动把 v<im版本> annotated tag 推送到 origin。
  *
  * 为什么用 pnpm pack + npm publish 组合：
  * - 子包之间用 workspace:^ 互引，npm publish 不会改写该协议（消费者会解析失败），
@@ -13,7 +14,7 @@
  *
  * 用法：
  *   node scripts/publish.mjs                        # 演练（默认）
- *   node scripts/publish.mjs --publish              # 真实发布（浏览器 2FA）
+ *   node scripts/publish.mjs --publish              # 真实发布（浏览器 2FA + im 推签）
  *   node scripts/publish.mjs --only uikit-im        # 只处理指定包（短名，可逗号分隔多个）
  *   node scripts/publish.mjs --from uikit-core      # 从指定包开始按拓扑顺序处理
  *   node scripts/publish.mjs --skip-build           # 跳过构建（确认 dist 已是最新时用）
@@ -28,6 +29,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { assertCleanReleaseWorktree } from './tag-uikit-release.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const NPM_REGISTRY = 'https://registry.npmjs.org'
@@ -90,8 +92,10 @@ for (const p of selected) {
   p.name = pkgJson.name
   p.version = pkgJson.version
 }
+const imRelease = selected.find(p => p.short === 'im')
+let imReleaseCommit = ''
 
-console.log(`[publish] 模式：${isPublish ? '真实发布（将弹浏览器 2FA 验证）' : '演练（dry-run，不上传）'}`)
+console.log(`[publish] 模式：${isPublish ? '真实发布（将弹浏览器 2FA 验证）' : '演练（dry-run，不上传、不打标签）'}`)
 console.log(`[publish] 待处理包：${selected.map(p => `${p.name}@${p.version}`).join(' → ')}`)
 
 // ---------- 门禁 ----------
@@ -121,7 +125,20 @@ if (staged.status === 0) {
 }
 console.log('[publish] ✓ 暂存区无产物混入')
 
-// 4. 登录态：真实发布必须已登录；演练只提示
+// 4. im 真实发布：固定发布提交并提前校验标签，避免 npm 成功后才发现无法溯源
+if (isPublish && imRelease) {
+  try {
+    assertCleanReleaseWorktree(ROOT)
+  }
+  catch (error) {
+    fail(error.message)
+  }
+  imReleaseCommit = runCapture('git', ['rev-parse', 'HEAD']).stdout.trim()
+  run('node', ['scripts/tag-uikit-release.mjs', imRelease.version, imReleaseCommit])
+  console.log(`[publish] ✓ im 工作区干净，发布提交 ${imReleaseCommit} 与 v${imRelease.version} 标签预检通过`)
+}
+
+// 5. 登录态：真实发布必须已登录；演练只提示
 const whoami = runCapture('npm', ['whoami', '--registry', NPM_REGISTRY])
 if (whoami.status === 0) {
   console.log(`[publish] ✓ npm 已登录（${NPM_REGISTRY}）：${whoami.stdout.trim()}`)
@@ -147,6 +164,8 @@ try {
     const view = runCapture('npm', ['view', `${p.name}@${p.version}`, 'version', '--registry', NPM_REGISTRY])
     if (view.status === 0 && view.stdout.trim()) {
       console.log(`[publish] ↷ registry 已存在 ${p.name}@${p.version}，跳过`)
+      if (isPublish && p.short === 'im')
+        console.log(`[publish] ! 不把已发布版本擅自绑定到当前 HEAD；核对原发布提交后可执行：pnpm release:tag -- ${p.version} <已核对commit> --push`)
       skipped++
       continue
     }
@@ -168,10 +187,17 @@ try {
     if (manifest.stdout.includes('workspace:'))
       fail(`${p.name} 产物 manifest 仍含 workspace: 协议，禁止发布`)
 
-    if (isPublish)
+    if (isPublish) {
       run('npm', ['publish', tgzPath, '--access', 'public', '--registry', NPM_REGISTRY])
-    else
+      if (p.short === 'im') {
+        const tagResult = spawnSync('node', ['scripts/tag-uikit-release.mjs', p.version, imReleaseCommit, '--push'], { cwd: ROOT, stdio: 'inherit', shell: false })
+        if (tagResult.status !== 0)
+          fail(`npm 已发布 ${p.name}@${p.version}，但标签推送失败；核对原发布提交后执行：pnpm release:tag -- ${p.version} ${imReleaseCommit} --push`)
+      }
+    }
+    else {
       run('npm', ['publish', tgzPath, '--dry-run', '--access', 'public', '--registry', NPM_REGISTRY])
+    }
 
     rmSync(tgzPath, { force: true })
     done++

@@ -36,6 +36,8 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 </template>
 ```
 
+![聊天输入区与消息功能配置面板](./images/overview/extension-config.png)
+
 ## 键盘导航
 
 UIKit 为列表类交互提供了一套声明式键盘导航 hooks，默认已接入**会话列表、联系人列表、群组列表、@ 提及弹层**。焦点在列表区域内时：
@@ -331,7 +333,8 @@ UIKit 要求所有面向用户的文案必须走多语言 key，**禁止在组�
 <EmUIKitProvider app-key="orgName#appName">...</EmUIKitProvider>
 ```
 
-webim4（SDK 4.x）不支持 appId，仅传 appId 时 init 会抛出明确错误。
+> [!WARNING]
+> webim4（SDK 4.x）不支持 appId，仅传 appId 时 init 会抛出明确错误。
 
 `sdkConfig.loginTimeoutMs`（SDK 5.1.2+，仅 websdk5）可自定义登录总超时时间，缺省为 SDK 默认 30 秒；webim4 忽略该字段。
 

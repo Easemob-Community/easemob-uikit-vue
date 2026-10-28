@@ -39,6 +39,13 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 
 > 暗色模式对应值见 [主题定制](./theme) 页暗色段，所有颜色 token 均已在 `[data-uikit-theme="dark"]` 下重写。
 
+### 图片预览控制按钮
+
+| Token | 默认值 | 用途 |
+| --- | --- | --- |
+| `--uikit-image-viewer-control-bg` | `rgba(0, 0, 0, 0.5)` | 关闭等浮层控制按钮背景，明暗模式同值 |
+| `--uikit-image-viewer-control-bg-hover` | `rgba(0, 0, 0, 0.7)` | 浮层控制按钮 hover 背景，明暗模式同值 |
+
 ### 文件消息图标底色（core 2.6.0）
 
 文件消息气泡左侧固定展示彩色底色块（双方气泡一致），图标本体固定白色，底色按扩展名 / 类别取对应品牌识别色，明暗模式通用：
@@ -110,6 +117,7 @@ UIKit 所有视觉参数沉淀为 `--uikit-*` CSS 变量，按颜色、字号、
 | --- | --- | --- |
 | `--uikit-components-radius` | 8px | 组件默认圆角 |
 | `--uikit-components-radius-hover` | 14px | hover / 展开态圆角 |
+| `--uikit-image-viewer-control-radius` | 50% | 图片预览浮层控制按钮圆形半径 |
 | `--uikit-bubble-radius` | 16px | 消息气泡圆角（round 档，默认） |
 | `--uikit-bubble-radius-square` | 8px | 消息气泡圆角（square 档） |
 | `--uikit-input-radius` | 999px | 输入框圆角（默认纯椭圆/胶囊，消息输入区消费） |

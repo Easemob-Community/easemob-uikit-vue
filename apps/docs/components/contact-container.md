@@ -2,6 +2,8 @@
 
 通讯录容器，聚合「通知 / 群组列表 / 好友列表」三大入口：首页入口导航 + 好友列表子视图（字母分组、在线状态默认关闭可显式开启、多选）+ 群组列表子视图 + 通知子视图，内置视图切换过场动画。
 
+![好友列表与字母索引](../guide/images/overview/contact-main.png)
+
 ## 使用方式
 
 组件以 `EmContactContainer` 为名导出。需在 `EmUIKitProvider` 内使用：

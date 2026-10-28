@@ -22,7 +22,8 @@
     "format": "prettier --write .",
     "changelog:check": "node scripts/check-version-sync.mjs",
     "release": "node scripts/publish.mjs",
-    "release:publish": "node scripts/publish.mjs --publish"
+    "release:publish": "node scripts/publish.mjs --publish",
+    "release:tag": "node scripts/tag-uikit-release.mjs"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.27.3",

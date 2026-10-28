@@ -2,6 +2,10 @@
 
 环信 Vue3 UIKit 为移动端 H5 场景提供了一键式适配能力。只需要在 `<UIKitProvider>` 上配置 `h5` 属性，相关组件会自动处理安全区、软键盘、下拉刷新、长按交互等问题。
 
+| 移动端会话列表 | 移动端聊天页 |
+| --- | --- |
+| ![移动端会话列表](./images/h5/conversations.png) | ![移动端聊天页](./images/h5/chat.png) |
+
 ## 开启适配
 
 ```vue
@@ -59,7 +63,8 @@ import { UIKitProvider } from '@easemob-community/uikit-im'
 
 移动端（触屏设备）输入框**固定使用 H5 形态**（单行起步、随内容自动增高至最多 5 行 + 语音 + 表情 + 长按交互），不渲染 tiptap 富文本编辑器；此时配置 `mode: 'rich'` 会被忽略，控制台会输出一条 warn 提示（`[MessageInput] 移动端已强制使用 H5Input，mode=rich 配置被忽略`）。
 
-需要富文本 / 多行长文本编辑能力的场景请使用桌面端；若 H5 业务必须支持多行输入，可自行通过 `#message-input` 插槽接管输入区（见组件文档），或改用原生 `textarea` 方案。
+> [!WARNING]
+> 需要富文本 / 多行长文本编辑能力的场景请使用桌面端；若 H5 业务必须支持多行输入，可自行通过 `#message-input` 插槽接管输入区（见组件文档），或改用原生 `textarea` 方案。
 
 ## 输入区布局规范
 
