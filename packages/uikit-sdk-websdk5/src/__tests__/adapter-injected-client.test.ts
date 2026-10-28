@@ -87,13 +87,13 @@ describe('websdk5Adapter 注入 client 模式（决策 17/18）', () => {
     expect(injected.userInfoManager.addEventHandler).toHaveBeenCalledTimes(1)
   })
 
-  it('login 委托到注入实例的 login，透传 user 与 token', async () => {
+  it('login 委托到注入实例的 login，透传 user、token 与默认登录超时', async () => {
     const { adapter, injected } = await setupInjectedAdapter()
 
     await adapter.login('user-a', 'token-a')
 
     expect(injected.login).toHaveBeenCalledTimes(1)
-    expect(injected.login).toHaveBeenCalledWith('user-a', 'token-a')
+    expect(injected.login).toHaveBeenCalledWith('user-a', 'token-a', undefined)
   })
 
   it('logout 委托注入实例 logout 并反注册事件，但不销毁注入实例', async () => {
