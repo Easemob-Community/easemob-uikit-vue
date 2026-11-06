@@ -1,3 +1,13 @@
+## @easemob-community/uikit-core 2.12.0 (2026-11-06)
+
+
+### 新增
+
+- **复合消息共享基座**：透出 `MultiBody` / `MultiBodySegment` / `MultiBodySegmentInput`、附件下载结果与对应类型守卫；`toUiMessage` 保留复合分段顺序并以 `markRaw` 避免无用深响应式包装。
+- **能力缺省兼容**：新增 `multiBodyMessage` 能力位，旧自定义 adapter 未上报时默认关闭，避免暴露不存在的复合发送入口。
+
+---
+
 ## @easemob-community/uikit-core 2.11.0 (2026-10-09)
 
 

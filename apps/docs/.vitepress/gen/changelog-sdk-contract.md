@@ -1,3 +1,13 @@
+## @easemob-community/uikit-sdk-contract 1.5.0 (2026-11-06)
+
+
+### 新增
+
+- **复合消息中立契约**：新增 `multi_body` 类型、七类分段输入与 body、类型守卫、附件下载结果、发送/重试/下载 domain 接口及 `multiBodyMessage` 能力位；发送创建限制 2～20 段，接收侧不截断历史消息。
+- **共享摘要与记录工具**：`resolveMultiBodyPreview` 统一会话、引用、置顶和搜索摘要，记录工具支持复合消息数组安全读写。
+
+---
+
 ## @easemob-community/uikit-sdk-contract 1.4.0 (2026-10-09)
 
 

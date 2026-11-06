@@ -1,3 +1,13 @@
+## @easemob-community/uikit-sdk-websdk5 1.6.0 (2026-11-06)
+
+
+### 新增
+
+- **适配 easemob-websdk 5.2.0 复合消息**：支持七类有序分段创建发送、原消息对象重试与全附件按序下载；接收转换、事件旁路持久化保留数组及顺序，blob URL 与 File 不落库。
+- **复合摘要与本地会话重算**：按分段顺序生成文本/文件名/地址等摘要，支持 `refreshPreviews` 仅重算现有会话预览，不覆盖其他本地字段。
+
+---
+
 ## @easemob-community/uikit-sdk-websdk5 1.5.0 (2026-10-09)
 
 

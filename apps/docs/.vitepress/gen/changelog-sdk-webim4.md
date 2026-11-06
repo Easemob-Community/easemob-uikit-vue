@@ -1,3 +1,12 @@
+## @easemob-community/uikit-sdk-webim4 1.4.1 (2026-11-06)
+
+
+### 变更
+
+- **明确复合消息能力边界**：上报 `multiBodyMessage: false` 及原因，保留中立 domain 契约兼容占位；websdk 4.x 不提供复合发送、接收转换、转发、下载或兼容渲染。
+
+---
+
 ## @easemob-community/uikit-sdk-webim4 1.4.0 (2026-10-09)
 
 

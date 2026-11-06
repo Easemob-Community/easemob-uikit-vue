@@ -1,3 +1,19 @@
+## @easemob-community/uikit-im 3.12.0 (2026-11-06)
+
+
+### 新增
+
+- **SDK 5.2 `multi_body` 复合消息**：新增 `EmMultiBodyMessage` 与 `sendMultiBodyMessage`，支持 2～20 个有序 text/image/file/voice/video/location/custom 分段；复合摘要、逐段搜索、引用、置顶、复制、下载与数组持久化保持同一父消息语义，H5 保留接收渲染与逐段下载。
+- **PC simple/rich 复合编辑与草稿**：`input.features.multiBody` 开启后，rich 支持图片 inline 混排及视频/文件卡片，simple 支持按文本光标位置组织附件与前后文字；切换会话可保存并恢复文字、图片、视频、文件、@提及及顺序，单附件无文字仍发送普通消息。
+- **复合复制粘贴与发送安全**：结构化剪贴板可还原文本、图片、视频、文件及顺序，不支持的数据走纯文本兜底；发送绑定原会话、草稿版本与引用，避免跨会话误发、上传中新输入误清和预览 URL 提前回收。
+- **表情包业务扩展**：`input.stickerExt` 支持按 sticker 与 packId 追加业务自定义 ext，不改变 UIKit 既有消息编码约定。
+
+### 文档
+
+- 新增复合消息组件/发送指南、Nuxt 式 Vue API 参考与文档示例签名校验，修正进阶指南中的公开 API 示例。
+
+---
+
 ## @easemob-community/uikit-im 3.11.0 (2026-10-09)
 
 

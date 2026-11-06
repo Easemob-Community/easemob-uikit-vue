@@ -1,5 +1,45 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.12.0 (2026-11-06)
+
+### 新增
+
+- **SDK 5.2 `multi_body` 复合消息**：新增 `EmMultiBodyMessage` 与 `sendMultiBodyMessage`，支持 2～20 个有序 text/image/file/voice/video/location/custom 分段；复合摘要、逐段搜索、引用、置顶、复制、下载与数组持久化保持同一父消息语义，H5 保留接收渲染与逐段下载。
+- **PC simple/rich 复合编辑与草稿**：`input.features.multiBody` 开启后，rich 支持图片 inline 混排及视频/文件卡片，simple 支持按文本光标位置组织附件与前后文字；切换会话可保存并恢复文字、图片、视频、文件、@提及及顺序，单附件无文字仍发送普通消息。
+- **复合复制粘贴与发送安全**：结构化剪贴板可还原文本、图片、视频、文件及顺序，不支持的数据走纯文本兜底；发送绑定原会话、草稿版本与引用，避免跨会话误发、上传中新输入误清和预览 URL 提前回收。
+- **表情包业务扩展**：`input.stickerExt` 支持按 sticker 与 packId 追加业务自定义 ext，不改变 UIKit 既有消息编码约定。
+
+### 文档
+
+- 新增复合消息组件/发送指南、Nuxt 式 Vue API 参考与文档示例签名校验，修正进阶指南中的公开 API 示例。
+
+## @easemob-community/uikit-core 2.12.0 (2026-11-06)
+
+### 新增
+
+- **复合消息共享基座**：透出 `MultiBody` / `MultiBodySegment` / `MultiBodySegmentInput`、附件下载结果与对应类型守卫；`toUiMessage` 保留复合分段顺序并以 `markRaw` 避免无用深响应式包装。
+- **能力缺省兼容**：新增 `multiBodyMessage` 能力位，旧自定义 adapter 未上报时默认关闭，避免暴露不存在的复合发送入口。
+
+## @easemob-community/uikit-sdk-websdk5 1.6.0 (2026-11-06)
+
+### 新增
+
+- **适配 easemob-websdk 5.2.0 复合消息**：支持七类有序分段创建发送、原消息对象重试与全附件按序下载；接收转换、事件旁路持久化保留数组及顺序，blob URL 与 File 不落库。
+- **复合摘要与本地会话重算**：按分段顺序生成文本/文件名/地址等摘要，支持 `refreshPreviews` 仅重算现有会话预览，不覆盖其他本地字段。
+
+## @easemob-community/uikit-sdk-webim4 1.4.1 (2026-11-06)
+
+### 变更
+
+- **明确复合消息能力边界**：上报 `multiBodyMessage: false` 及原因，保留中立 domain 契约兼容占位；websdk 4.x 不提供复合发送、接收转换、转发、下载或兼容渲染。
+
+## @easemob-community/uikit-sdk-contract 1.5.0 (2026-11-06)
+
+### 新增
+
+- **复合消息中立契约**：新增 `multi_body` 类型、七类分段输入与 body、类型守卫、附件下载结果、发送/重试/下载 domain 接口及 `multiBodyMessage` 能力位；发送创建限制 2～20 段，接收侧不截断历史消息。
+- **共享摘要与记录工具**：`resolveMultiBodyPreview` 统一会话、引用、置顶和搜索摘要，记录工具支持复合消息数组安全读写。
+
 ## @easemob-community/uikit-im 3.11.0 (2026-10-09)
 
 ### 新增
