@@ -79,9 +79,11 @@
 ### [ ] D149. SDK 5.2 `multi_body` 复合消息接入与双端在线验收
 
 - **目标**：支持 2～20 个有序 text/image/file/voice/video/location/custom 分段的一条消息；与 combine 合并转发保持独立。
-- **实现（2026-11-06）**：SDK lockfile 升至 5.2.0；中立类型/guard/capability/domain 已落地，websdk5 支持七类发送、下载和原对象重试，websdk4 完全不支持。新增共享摘要、逐段搜索、数组持久化、`EmMultiBodyMessage`、PC rich inline 图文、PC simple/H5 有序分段草稿器，以及公开文档和 demo 七类发送入口。
-- **验证**：新增契约/adapter/摘要/持久化/渲染/发送/编辑器测试覆盖；UIKit 50/50 测试、类型检查、UIKit 与 demo 构建、Histoire 构建通过。
-- **待完成**：浏览器自动化在登录前后持续遇到 `BROWSER_USER_TAKEOVER`，PC/H5 双账号在线发送、漫游回归、上传失败重试与真实触屏键盘验收尚未完成，不能据此关闭本条。
+- **实现（2026-11-06）**：SDK lockfile 升至 5.2.0；中立类型/guard/capability/domain 已落地，websdk5 支持七类发送、下载和原对象重试，websdk4 完全不支持。新增共享摘要、逐段搜索、数组持久化、`EmMultiBodyMessage` 与公开文档。发送端收敛为 PC-only：`rich` 支持多图 inline 混排，图片最大 240×160px 等比展示，视频/文件以带名称、大小与删除按钮的 inline atom 卡片插入光标并按文档顺序发送；`simple` 在文字下方提供图片/视频/文件待发送区，并按附件粘贴/选择时的文本光标位置拆分前后文本，增删文字后同步修正顺序；单附件无文字仍发普通消息，多内容走统一 `multi_body` 漏斗。复合复制同时写 `text/plain` 与带 UIKit 标记的 `text/html`，rich 粘贴可还原文本/图片/视频/文件及顺序，远端资源直接复用 `originalUrl`，其他类型或异常数据走纯文本兜底。发送绑定原会话/草稿版本/引用，成功且版本未变才清草稿，预览 URL 在发送 settle 后按引用回收；视频先占位后补元数据并做代际校验。旧 PC/H5 分段弹窗已删除，H5 不提供复合编辑/发送入口但保留接收渲染与逐段下载；复合媒体按可用宽度等比收缩，内层媒体圆角为外层气泡的一半。
+- **复合草稿（2026-11-06）**：PC simple/rich 在页面内切换会话可保存并恢复文字、图片、视频、文件、@提及及顺序；会话列表按分段顺序展示 `[图片]文字` 等摘要，附件-only 草稿有效。完整快照使用独立内存缓存，`UiConversation.draft` 仍只保存字符串摘要；旧 `saveDraft/loadDraft` API 不变，`draftStorage=local/session` 刷新后仍只恢复文本。恢复与发送 settle 的 Blob URL 回收会检查缓存引用，模式不匹配时降级恢复文本。
+- **本轮验证**：uikit-im 13 个测试文件 96/96 通过（含快照、摘要、缓存替换/清理与 storage 降级），uikit-im 类型检查与构建、demo 类型检查、API 生成 69/69 与引用校验通过。demo 未发送消息，已实测 simple `[草稿][图片]哇达哇` 与 rich `[草稿]图前[图片]图后`，两种模式切回后均恢复图片和文字；其余页面级边界矩阵由用户自行验收。`packages/` 全量测试另有既有 `uikit-core/image-viewer.test.ts` 缺少 Vue 插件的解析失败，与本轮改动无关。
+- **验证**：uikit-im 包级测试及 websdk5 multi_body domain 测试合计 76/76 通过；新增 simple 分段保序、文字插入/删除后的锚点修正、rich 内联附件顺序与原始 File 缺失保护、结构化剪贴板 round-trip/异常降级与远端图片输入回归。UIKit 类型检查与构建、demo 类型检查、API 文档生成与校验通过。独立代码审查发现的跨会话误发/清草稿、上传中新输入误清、视频元数据晚到、附件态高度和 URL 提前回收问题已修复并回归。demo 已实测 simple 图片 + 文字只产生一条复合气泡、单文件无文字发普通文件消息；rich 编辑器内已确认图前文字、inline 图片、图后文字顺序。
+- **待完成**：rich 在线发送在浏览器自动化中持续 pending，未确认成功；视频缺少本机可用素材，未做真实上传。本轮 H5 出界、半半径圆角、simple 粘贴顺序、rich 图片缩放与内联附件卡片、复合复制粘贴只完成代码和自动检查，未做修复后的在线/触屏视觉及真实系统剪贴板验收。PC/H5 双账号在线发送、漫游回归、上传失败重试、simple 多附件/视频在线发送与真实触屏键盘验收尚未完成，不能据此关闭本条。
 - **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-message-rendering` / `uikit-tiptap-editor` / `uikit-h5-adaptation`
 
 ### [x] D148. 双 adapter 组合根超过 1600 行，职责混杂难以维护

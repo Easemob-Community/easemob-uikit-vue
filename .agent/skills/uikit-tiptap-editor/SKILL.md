@@ -18,13 +18,15 @@
 1. 在 rich-input 之外另起一个 tiptap 实例，或误以为「加个 tiptap 扩展」富文本就能发出去；
 2. 想当然用 tiptap 官方 Mention 扩展替换现有手搓 `@` 逻辑，忽略下游 `ext.em_at_list` 契约。
 
-> 核心结论：**虽然是富文本编辑器，实际上行只有「纯文本 + mention userId 列表」**。
-> 想让加粗/图片等富文本真正发出去，要改的是**下游发送链路**，不是只在 tiptap 加扩展。
+> 核心结论：默认上行只有「纯文本 + mention userId 列表」；`input.features.multiBody: true` 且 adapter 支持时，
+> inline 图片与附件会经 `rich-input-multi-body.ts` 按文档顺序投影为 `multi_body` 分段。
+> 想让其他富文本格式真正发出去，仍需先改**下游发送链路**，不是只在 tiptap 加扩展。
 
-## 落点唯一：只有 `rich-input.vue` 碰 tiptap
+## 落点唯一：只有 `rich-input.vue` 创建 tiptap 实例
 
-所有 `@tiptap/*` import 都集中在
-`packages/uikit-im/src/modules/chat/message-input/rich-input.vue`，别处 0 引用：
+编辑器实例与文本/粘贴/提及钩子集中在
+`packages/uikit-im/src/modules/chat/message-input/rich-input.vue`；复合附件的自定义 Node 在同目录
+`rich-input-attachment-node.ts`，Vue NodeView 在 `components/rich-input-attachment-node-view.vue`：
 
 ```ts
 import { useEditor, EditorContent } from '@tiptap/vue-3'
@@ -35,8 +37,12 @@ import Image from '@tiptap/extension-image'
 兄弟组件 `message-input/simple-input.vue` 是纯 `<textarea>`（`textareaRef = ref<HTMLTextAreaElement>()`），
 **不引 tiptap**。两者由上层 `modules/chat/message-input.vue` 按需二选一渲染。
 
-→ 规则：编辑器逻辑集中在 rich-input，不要在别的组件里再 `new` 一个 tiptap 实例；
-simple-input 保持纯 textarea，别把编辑器逻辑复制过去。
+→ 规则：不要在别的组件里再 `new` 一个 tiptap 实例；simple-input 保持纯 textarea。
+rich 的图片限制为最大 240×160px 等比展示；文件/视频以 inline atom 卡片插入光标，NodeView 只负责展示与删除，
+原始 File 仍在附件草稿 Map 中，发送时经节点 `attachmentId` 投影，不能只在 NodeView 里保存文件。
+复合消息复制通过 `createMultiBodyClipboardData` 同时写 `text/plain` 与带 UIKit 标记的 `text/html`；
+rich 的 `handlePaste` 用 `parseMultiBodyClipboardHtml` 校验并还原文本/图片/视频/文件顺序，远端资源以 `originalUrl` 注册到对应 Map，
+不伪造空 File；语音、位置、自定义段或异常数据只走纯文本兜底。
 
 ## 编辑器配置集中在一个 `useEditor` 调用
 
@@ -47,6 +53,7 @@ const editor = useEditor({
   extensions: [
     StarterKit.configure({ heading: false, blockquote: false, horizontalRule: false, codeBlock: false }),
     Image.configure({ inline: true }),
+    MultiBodyAttachmentNode.configure({ isSending: () => props.sending }),
   ],
   content: '',
   onCreate: ({ editor: e }) => { updateHasContent(e); if (props.config?.autoFocus) e.commands.focus() },
@@ -59,7 +66,7 @@ const editor = useEditor({
 })
 ```
 
-自定义行为**走 ProseMirror 钩子，而非加扩展**：
+文本输入、提及与粘贴行为走 ProseMirror 钩子；复合文件/视频卡片使用上述自定义 Node，不另建编辑器实例：
 
 - `handleKeyDown`：`maxLength` 到顶时拦普通字符输入；`@` 键（且 `enableMention`）触发 mention；
   `Enter` 发送、`Shift+Enter` 换行（`event.key === 'Enter' && !event.shiftKey` → `preventDefault()` + `handleSend()`）。

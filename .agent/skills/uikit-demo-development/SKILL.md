@@ -79,7 +79,7 @@ alias: [
 - **chatConfig** 由设置状态实时组装（`computed`），分组：`header`（showAvatar）/
   `groupReadReceipt`（enabled + maxGroupSize）/ `groupManagement`（muteAll/muteList/
   blocklist/allowlist/sharedFiles/joinRequests）/ `input`（mode/style/features/autoFocus/
-  showSendButton/stickerPacks/焦点色/光标色/选中色/maxLength）/ `messageList`（showTime/
+  showSendButton/stickerPacks/multiBody/焦点色/光标色/选中色/maxLength）/ `messageList`（showTime/
   search/messageStatus）；
 - **插槽接管**：`#toolbar-extra`（快捷回复面板 toggle）、`#message-custom`（自定义消息
   渲染，demo 用 event=userCard 判定名片，未识别回落 EmCustomMessage）；

@@ -103,7 +103,7 @@ const {
   sendLocationMessage,
 } = useChat()
 const { stores, domains, h5, client, capabilities } = useUIKit()
-const { sendChannelAck, saveDraft, loadDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
+const { sendChannelAck, saveInputDraft, loadInputDraft, clearDraft, clearChatHistory, deleteConversation, selectConversation } = useConversation()
 const { leaveGroup, destroyGroup, addGroupAdmin, removeGroupAdmin, removeGroupMembers, inviteUsersToGroup, fetchGroupMembers, fetchGroupInfo, fetchGroupAnnouncement } = useGroup()
 const { clearQuote, requestLocate } = useQuote()
 
@@ -296,12 +296,12 @@ const enableDraft = computed(() => props.config?.enableDraft !== false)
 function restoreDraft(cvsId: string) {
   if (!enableDraft.value)
     return
-  const draft = loadDraft(cvsId)
+  const draft = loadInputDraft(cvsId)
   nextTick(() => {
     // 防止异步竞态：仅当会话仍为目标会话时才操作输入框
     if (currentConversation.value?.id !== cvsId)
       return
-    messageInputRef.value?.setText?.(draft || '')
+    messageInputRef.value?.restoreDraftSnapshot?.(draft)
   })
 }
 
@@ -309,20 +309,18 @@ function restoreDraft(cvsId: string) {
 function saveCurrentDraft(cvsId: string) {
   if (!enableDraft.value)
     return
-  const text = messageInputRef.value?.getText?.() || ''
-  if (text.trim()) {
-    saveDraft(cvsId, text)
-  }
-  else {
+  const draft = messageInputRef.value?.getDraftSnapshot?.()
+  if (draft)
+    saveInputDraft(cvsId, draft)
+  else
     clearDraft(cvsId)
-  }
 }
 
-/** 发送成功后清除草稿 */
-function handleSendSuccess() {
+/** 发送成功后清除原会话草稿 */
+function handleSendSuccess(conversationId?: string) {
   if (!enableDraft.value)
     return
-  const cvsId = currentConversation.value?.id
+  const cvsId = conversationId || currentConversation.value?.id
   if (!cvsId)
     return
   clearDraft(cvsId)
@@ -719,6 +717,9 @@ watch(currentConversation, async (cvs, oldCvs) => {
   clearQuote()
   exitEditMode()
 
+  // 先恢复新会话草稿，避免历史请求期间短暂显示旧会话内容
+  restoreDraft(cvs.id)
+
   // 发送会话已读回执（内部已做未读数为 0 跳过；单聊/群聊均适用）
   sendChannelAck(cvs.id)
 
@@ -747,9 +748,6 @@ watch(currentConversation, async (cvs, oldCvs) => {
       locateAtMeMessage(cvs.id)
     }
   }
-
-  // 恢复新会话的草稿到输入框
-  restoreDraft(cvs.id)
 }, { immediate: true })
 
 /** 多选模式底部操作 */

@@ -102,6 +102,8 @@ const defaultFeatures: UIKitFeatures = {
 /** capabilities 缺省值：adapter 未上报时全 true（行为零变化） */
 const DEFAULT_SDK_CAPABILITIES: SdkCapabilityFlags = {
   combineMessage: true,
+  // 新增能力默认关闭：旧自定义 adapter 未上报时不得暴露不存在的发送入口
+  multiBodyMessage: false,
   pinnedMessage: true,
   streamingMessage: true,
   groupReadReceipt: true,

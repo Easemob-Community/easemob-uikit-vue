@@ -94,6 +94,7 @@ const PACKAGES = [
       // message-list：config 为完整 ChatConfig，本组件只消费 messageList 子树；
       // 但为保持与 chat-container 一致的配置全景展示，仍全量展开（父表每项均可锚点跳转）
       { name: 'message-list', file: 'chat/message-list/message-list.vue' },
+      { name: 'multi-body-message', file: 'chat/message-item/multi-body-message.vue' },
       // ---- 群管理模块（group-management.md / chat-container.md）----
       { name: 'group-management-section', file: 'group/group-management-section.vue' },
       { name: 'group-announcement', file: 'group/group-announcement.vue' },

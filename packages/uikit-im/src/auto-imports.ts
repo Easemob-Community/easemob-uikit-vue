@@ -12,6 +12,7 @@
  */
 export const EasemobUIKitImports = {
   '@easemob-community/uikit-im': [
+    'isDraftPreviewUrlRetained',
     'useArrowNavigation',
     'useBlocklist',
     'useBottomSheet',

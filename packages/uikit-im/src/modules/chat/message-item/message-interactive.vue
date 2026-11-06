@@ -103,13 +103,16 @@ const actions = computed<MessageActionItem[]>(() => {
 
   if (cfg?.enableQuote !== false)
     add('quote', t('message.action.quote') ?? '引用', 'arrow/turn_left')
-  // 复制：仅文本消息支持；图片/视频/文件等类型暂不提供复制
-  if (cfg?.enableCopy !== false && props.message.type === MESSAGE_TYPE.TEXT)
+  const hasCopyableText = props.message.type === MESSAGE_TYPE.TEXT
+    || (props.message.type === MESSAGE_TYPE.MULTI_BODY
+      && Array.isArray(props.message.body)
+      && props.message.body.some(segment => segment.type === MESSAGE_TYPE.TEXT && !!segment.content))
+  if (cfg?.enableCopy !== false && hasCopyableText)
     add('copy', t('message.action.copy') ?? '复制', 'rects')
-  // 下载：仅文件消息在右键/长按菜单中提供下载入口
+  // 下载：仅文件消息在右键/长按菜单中提供下载入口；复合文件段由各自文件卡下载
   if (cfg?.enableDownload !== false && props.message.type === MESSAGE_TYPE.FILE)
     add('download', t('message.action.download') ?? '下载', 'arrow/down_tray')
-  if (cfg?.enableForward !== false)
+  if (cfg?.enableForward !== false && (props.message.type !== MESSAGE_TYPE.MULTI_BODY || capabilities.multiBodyMessage !== false))
     add('forward', t('message.action.forward') ?? '转发', 'lines/arrow-right_3bars')
   if (cfg?.enableMultiSelect !== false)
     add('multiSelect', t('message.action.multiSelect') ?? '多选', 'items_check')

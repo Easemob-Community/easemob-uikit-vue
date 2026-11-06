@@ -116,6 +116,11 @@ function hydrateUiMessage(msg: SdkMessage, currentUserId: string): UiMessage {
  * 已读回执走 4.x 的 read 消息模型（回执即消息，无 5.x 的 sendMessageReadReceipts API）。
  */
 export class MessageDomain {
+  /** websdk4 不支持 multi_body；仅为中立 domain 契约保留未实现占位 */
+  readonly sendMultiBody = undefined as never
+  readonly resendMultiBody = undefined as never
+  readonly downloadMultiBodyAttachments = undefined as never
+
   constructor(
     private client: Webim4Client,
     private store: MessageStoreLike,

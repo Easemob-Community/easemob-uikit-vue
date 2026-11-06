@@ -1,132 +1,43 @@
-# Store 状态管理（Pinia Stores）
+# Store 状态管理指南
 
-UIKit 基于 **Pinia** 管理全局状态：所有组件（会话列表、聊天、通讯录、群组等）内部
-消费一组 setup-store，业务代码可通过 `useXxxStore()` 直接读取或注入数据。
+UIKit 基于 **Pinia** 管理全局状态：会话列表、聊天、通讯录、群组等组件内部消费一组 setup stores，业务代码可通过 `useXxxStore()` 读取状态或注入数据。
 
 ::: tip 依赖
-- UIKit 不自带 pinia：项目需先 `app.use(createPinia())`（Provider 或文档演练场由运行环境注入）。
-- Store 需在 `EmUIKitProvider` 上下文内使用（内部依赖 SDK Client / Domain 事件管线）。
+- UIKit 不自带 Pinia：项目需先 `app.use(createPinia())`。
+- Store 需在 `EmUIKitProvider` 上下文内使用，内部依赖 SDK Client 与 Domain 事件管线。
 :::
 
-## Store 总览
+## Store API 索引
 
-| Store | 职责 | 核心 state | 常用读取 |
-| --- | --- | --- | --- |
-| `useClientStore` | SDK 连接与登录态 | `client` / `connected` / `connecting` / `kicked` / `kickCode` / `currentUser` / `appKey` | `isLoggedIn`（computed） |
-| `useConversationStore` | 会话列表与当前会话 | `conversationList` / `currentConversationId` / `atMeMap` / `typingMap` | `currentConversation` / `sortedConversationList` |
-| `useMessageStore` | 消息列表与发送状态 | `messageMap`（会话 ID → `UiMessage[]`）/ `pinnedMessageMap` / `atMeMessageMap` | 按会话读消息数组 |
-| `useContactStore` | 联系人 / 黑名单 / 邀请 | `contactList` / `blackList` / `inviteList` / `selectedIds` | `contactCount` |
-| `useGroupStore` | 群资料 / 成员 / 管理 | `groupList` / `currentGroup` / `groupMembersMap` / `groupAnnouncementMap` / 禁言/黑白名单/共享文件 map | `joinedGroupCount` |
-| `usePresenceStore` | 在线状态 | `presenceMap` / `subscribedUserIds` | `onlineUserIds` |
-| `useThemeStore` | 主题 token 与形态 | `primaryColor` / `mode` / `avatarShape` / `bubbleShape` / `density` / `fontSizeScale` 等 | `effectiveMode` |
+| Store | 职责 | 参考 |
+| --- | --- | --- |
+| `useClientStore` | SDK 连接、登录态与账号失效 | [连接状态 API](/api/stores/use-client-store) |
+| `useConversationStore` | 会话列表、当前会话与同步状态 | [会话 Store API](/api/stores/use-conversation-store) |
+| `useMessageStore` | 消息列表、发送状态与缓存 | [消息 Store API](/api/stores/use-message-store) |
+| `useContactStore` | 联系人、黑名单与邀请 | [联系人 Store API](/api/stores/use-contact-store) |
+| `useGroupStore` | 群资料、成员与管理数据 | [群组 Store API](/api/stores/use-group-store) |
+| `usePresenceStore` | 在线状态与订阅集合 | [在线状态 Store API](/api/stores/use-presence-store) |
+| `useThemeStore` | 主题 token 与组件形态 | [主题 Store API](/api/stores/use-theme-store) |
 
 ::: info 用户资料 Store
-用户资料（昵称 / 头像 / 在线状态订阅）由 `useUserInfoStore` 管理，主要在 UIKit
-内部（`useUserInfo` composable）使用，业务侧一般通过组件展示即可，无需直接读写。
+用户资料由 `useUserInfoStore` 管理，主要在 UIKit 内部使用。业务侧优先通过 [`useUserInfo`](/api/composables/use-user-info) 或 [`useOwnUserInfo`](/api/composables/use-own-user-info) 读取和更新。
 :::
 
-## 各 Store 说明
+## 响应式读取
 
-### useClientStore（连接与登录）
-
-SDK Client 实例与连接状态：
-
-```ts
-import { useClientStore } from '@easemob-community/uikit-im'
-
-const { connected, currentUser, isLoggedIn, setCurrentUser } = useClientStore()
-```
-
-- `kicked`：账号被踢 / 失效终态标记（多端互踢 206 / 注销 207 / 设备超限 214 / 改密 216 / 被踢 217，见 `@easemob-community/uikit-sdk-contract` 的 `KICK_ERROR_CODE`）。此类断开 SDK 不再自动重连，UI 应展示被踢文案而非网络异常；重新连接成功（`onConnected`）或 `clearClient()` 时清除。
-- `kickCode`：被踢的 SDK 错误码，用于差异化文案（会话列表状态横幅按错误码区分展示）。
-- `setKicked(code?)`：标记账号被踢（连接事件层在 `onDisconnected` 按错误码调用，业务侧一般无需手动触发）。
-
-### useConversationStore（会话）
-
-```ts
-const store = useConversationStore()
-store.setConversationList(list)          // 注入会话列表（docs 演练场模式）
-store.setCurrentConversationId(cvsId)    // 切换当前会话
-store.updateUnreadCount(cvsId, 0)        // 更新未读数
-store.setAtMe(cvsId, true)               // 标记 @我
-const current = store.currentConversation // getter：当前会话对象
-const sorted = store.sortedConversationList // getter：置顶 + 时间排序后的列表
-```
-
-### useMessageStore（消息）
-
-`messageMap` 以会话 ID 为键存放消息数组：
-
-```ts
-const store = useMessageStore()
-const messages = store.messageMap[conversationId] ?? []
-store.addMessage(msg)                      // 追加一条消息
-store.updateMessageStatus(msgId, 'read')   // 更新消息状态
-store.markFailed(localId, reason)          // 发送失败标记
-```
-
-- `setOptions({ maxMessageCount, maxCachedConversations })`：配置缓存上限。
-  `maxMessageCount`（默认 300）限制单个会话保留的最大消息数；`maxCachedConversations`
-  是 opt-in 的会话缓存上限——超过后按 LRU 从最旧的会话开始整体淘汰内存消息
-  （会跳过当前正在查看的会话），低内存场景（如 Electron 嵌入）可用它兜底，
-  默认 `undefined` = 不淘汰。
-
-### useSyncStatus（数据同步状态）
-
-来自 `@easemob-community/uikit-core` 的 composable（经 `@easemob-community/uikit-im` 重导出），观察登录后
-conversation / contact / group 三类数据的自动同步进度（由 SDK 的 `onSyncDataStart` /
-`onSyncDataFinished` 事件驱动，登出时自动重置）：
-
-```ts
-import { useSyncStatus } from '@easemob-community/uikit-im'
-
-const { status, isSyncing, allFinished } = useSyncStatus()
-status.value.conversation.status // 'idle' | 'syncing' | 'success' | 'failed'
-isSyncing.value                  // 任一类数据仍在同步中
-allFinished.value                // 三类均已终结（success 或 failed）
-```
-
-- `status`：按数据类型的同步状态 `{ status, finishedAt?, error? }`，终结态会附带
-  `finishedAt` 时间戳，失败时附 `error`（含 `stage` / `retryable` / `message`）。
-- 消息（离线漫游）同步不在这里跟踪，走 `useMessageStore().isSyncingMessages`。
-
-### useContactStore / useGroupStore / usePresenceStore（通讯录 / 群 / 在线状态）
-
-```ts
-useContactStore().setContactList(contacts)
-useGroupStore().setGroupList(groups)
-useGroupStore().groupMembersMap[groupId] = members   // 直接注入成员（演练场模式）
-usePresenceStore().updateBatch([{ userId, status: 'online', ext: '', lastTime: Date.now() }])
-```
-
-### useThemeStore（主题）
-
-主题 token 写入 `documentElement` CSS 变量（`--uikit-*`），运行时修改即时生效：
-
-```ts
-const themeStore = useThemeStore()
-themeStore.setPrimaryColor(203)      // 品牌色相
-themeStore.setFontSize('large')      // 字号档位（适老）
-themeStore.setDensity('comfortable') // 密度档位
-themeStore.setAvatarShape('square')  // 头像形状
-```
-
-## 业务使用场景
-
-### 1. 响应式读取（自定义展示）
-
-组件外读取 store 的 getter 会保持响应式（Pinia setup-store 解包）：
+组件外读取 store 的 getter 会保持响应式。需要解构时配合 `storeToRefs`：
 
 ```ts
 import { storeToRefs } from 'pinia'
+import { useConversationStore } from '@easemob-community/uikit-im'
 
 const conversationStore = useConversationStore()
 const { currentConversation, sortedConversationList } = storeToRefs(conversationStore)
 ```
 
-### 2. Mock 数据注入（免登录渲染 / 文档演练场）
+## Mock 数据注入
 
-无 SDK 连接时向 store 直灌数据即可渲染（docs 在线演练场与 Histoire story 同款模式）：
+无 SDK 连接时，可以向 store 注入数据以渲染文档演练场或测试界面：
 
 ```ts
 conversationStore.setConversationList(mockConversations)
@@ -135,15 +46,17 @@ messageStore.messageMap[conversationId] = mockMessages
 presenceStore.updateBatch(mockPresence)
 ```
 
-### 3. 直接写 store 的注意点
+`EmUIKitProvider(:auto-init="false")` 配合 store 注入即可免登录渲染。消息缓存与淘汰配置见[消息 Store API](/api/stores/use-message-store)。
 
-- **真实业务优先走 `dataSource` / SDK 事件管线**：store 会被 SDK 事件（消息、
-  会话同步、群变更等）自动维护，直接写 store 会与事件同步相互覆盖。
-- `messageMap` 直接赋值是**替换整组消息**（不是追加）；追加请用 `addMessage`。
-- Store 的写入方法主要用于：初始化占位、mock/演示、业务自有数据源（此时建议
-  配合 Provider 的 `dataSource` 接管，而非绕过事件管线直写）。
+## 直接写 Store 的约束
+
+- **真实业务优先走 `dataSource` / SDK 事件管线**：store 会被 SDK 事件自动维护，直接写入可能与事件同步相互覆盖。
+- `messageMap` 直接赋值是**替换整组消息**，不是追加；追加使用 `addMessage`。
+- 写入方法主要用于初始化占位、mock/演示和业务自有数据源。自有数据源建议通过 Provider 的 `dataSource` 接管。
+- 数据同步进度使用 [`useSyncStatus`](/api/composables/use-sync-status)，不要根据单个 store 的加载字段自行拼接全局状态。
 
 ## 关联
 
-- 全局配置：见 [Provider 全局配置](./provider)
-- mock 免登录注入模式：`EmUIKitProvider(:auto-init="false")` + store 注入渲染（参考 [消息列表](./message-list) 的单条气泡能力演练场与 `packages/uikit-im/src/**/*.story.vue`）
+- [Store API 分类](/api/stores/)
+- [Provider 全局配置](./provider)
+- [消息列表演练场](./message-list)

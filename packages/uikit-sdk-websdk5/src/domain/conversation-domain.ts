@@ -1,4 +1,4 @@
-import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, UiConversation } from '@easemob-community/uikit-sdk-contract'
+import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, LastMessageTextResolver, UiConversation } from '@easemob-community/uikit-sdk-contract'
 import { MESSAGE_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import type { ManagerHost } from '../client'
@@ -83,6 +83,8 @@ export class ConversationDomain {
        * 优先于 SDK lastMessage.sender.nickname，用于资料已缓存时直接展示昵称。
        */
       resolveSenderName?: (userId: string) => string | undefined
+      /** 业务消息摘要解析器，本地会话与快照恢复共用 */
+      lastMessageTextResolver?: LastMessageTextResolver
       /**
        * 会话数据入口接管注入（Phase 3.1 留口子）：当前仅消费 `fetchConversations`
        * （refresh 委托），其余方法为后续 DB 阶段预留。
@@ -117,9 +119,30 @@ export class ConversationDomain {
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (syncLocal)', items)
     dumpRawSnippets(items, 'syncLocal')
-    const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })
+    const list = toUiConversations(items, {
+      resolveSenderName: this.hooks.resolveSenderName,
+      lastMessageTextResolver: this.hooks.lastMessageTextResolver,
+    })
     this.store.setList(list)
     return list
+  }
+
+  /** 仅按原始快照重算现有会话摘要，保留本地字段和本地独有会话 */
+  refreshPreviews(): void {
+    const existing = this.store.conversationList ?? []
+    if (existing.length === 0)
+      return
+    const items = this.client.chatManager.getConversationList()
+    const list = toUiConversations(items, {
+      resolveSenderName: this.hooks.resolveSenderName,
+      lastMessageTextResolver: this.hooks.lastMessageTextResolver,
+    })
+    const previewById = new Map(list.map(item => [item.id, item.lastMessageText]))
+    for (const conversation of existing) {
+      const lastMessageText = previewById.get(conversation.id)
+      if (lastMessageText !== undefined)
+        this.store.update(conversation.id, { lastMessageText })
+    }
   }
 
   /**
@@ -290,7 +313,10 @@ export class ConversationDomain {
   async loadMore(_pageSize?: number) {
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (loadMore)', items)
-    const list = toUiConversations(items, { resolveSenderName: this.hooks.resolveSenderName })
+    const list = toUiConversations(items, {
+      resolveSenderName: this.hooks.resolveSenderName,
+      lastMessageTextResolver: this.hooks.lastMessageTextResolver,
+    })
     this.store.setList(list)
   }
 }

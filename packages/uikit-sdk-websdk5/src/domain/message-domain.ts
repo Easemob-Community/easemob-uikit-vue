@@ -1,5 +1,5 @@
-import type { Message as SdkMessage, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
-import type { ConversationTypeValue, MessagePersistenceHooks, MessageRepository, MessageStatus, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import type { Message as SdkMessage, MultiBodySegment, VoiceMessageSource, VoiceParams } from 'easemob-websdk'
+import type { ConversationTypeValue, MessageAttachmentDownloadResult, MessagePersistenceHooks, MessageRepository, MessageStatus, MultiBodySegmentInput, SdkMessage as NeutralSdkMessage, UiMessage } from '@easemob-community/uikit-sdk-contract'
 import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, createLogger, isVoiceBody, normalizeUserId, toMessageRecord } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import { toUiMessage } from '../adapter/message-adapter'
@@ -135,10 +135,50 @@ function hydrateUiMessage(msg: NeutralSdkMessage, currentUserId: string): UiMess
   }
 }
 
+/** 将中立分段输入交给对应 SDK 工厂；返回对象必须原样用于组装，不能复制 */
+function toSdkMultiBodySegment(
+  chatManager: ManagerHost['chatManager'],
+  input: MultiBodySegmentInput,
+): MultiBodySegment {
+  switch (input.type) {
+    case MESSAGE_TYPE.TEXT: {
+      const { type: _, ...params } = input
+      return chatManager.createTextMessageBody(params)
+    }
+    case MESSAGE_TYPE.IMAGE: {
+      const { type: _, ...params } = input
+      return chatManager.createImageMessageBody(params)
+    }
+    case MESSAGE_TYPE.FILE: {
+      const { type: _, ...params } = input
+      return chatManager.createFileMessageBody(params)
+    }
+    case MESSAGE_TYPE.VOICE: {
+      const { type: _, ...params } = input
+      return chatManager.createVoiceMessageBody(params)
+    }
+    case MESSAGE_TYPE.VIDEO: {
+      const { type: _, ...params } = input
+      return chatManager.createVideoMessageBody(params)
+    }
+    case MESSAGE_TYPE.LOCATION: {
+      const { type: _, ...params } = input
+      return chatManager.createLocationMessageBody(params)
+    }
+    case MESSAGE_TYPE.CUSTOM: {
+      const { type: _, ...params } = input
+      return chatManager.createCustomMessageBody(params)
+    }
+  }
+}
+
 /**
  * 消息业务域：封装 SDK ChatManager 的消息相关能力。
  */
 export class MessageDomain {
+  /** 上传/发送失败的原始复合消息，重试时必须复用以保留 SDK 分段附件缓存 */
+  private readonly failedMultiBodyMessages = new Map<string, SdkMessage>()
+
   constructor(
     private client: ManagerHost,
     private store: MessageStoreLike,
@@ -329,6 +369,54 @@ export class MessageDomain {
       elapsedMs: Math.round(performance.now() - t0),
     })
     return this._send(sdkMsg)
+  }
+
+  async sendMultiBody(
+    conversationId: string,
+    conversationType: ConversationTypeValue,
+    bodies: readonly MultiBodySegmentInput[],
+    ext?: Record<string, unknown>,
+    needReadReceipt?: boolean,
+  ): Promise<SdkMessage> {
+    const sdkBodies = bodies.map(input => toSdkMultiBodySegment(this.client.chatManager, input))
+    const sdkMsg = this.client.chatManager.createMultiBodyMessage({
+      conversationId,
+      conversationType,
+      bodies: sdkBodies,
+      ext,
+      needReadReceipt,
+    })
+    try {
+      const sent = await this._send(sdkMsg)
+      this.failedMultiBodyMessages.delete(sdkMsg.msgLocalId)
+      return sent
+    }
+    catch (error) {
+      this.failedMultiBodyMessages.set(sdkMsg.msgLocalId, sdkMsg)
+      throw error
+    }
+  }
+
+  async resendMultiBody(message: SdkMessage): Promise<SdkMessage> {
+    const pending = this.failedMultiBodyMessages.get(message.msgLocalId)
+    if (!pending)
+      throw new Error('MULTI_BODY_RESEND_UNAVAILABLE')
+    const sent = await this._send(pending)
+    this.failedMultiBodyMessages.delete(pending.msgLocalId)
+    return sent
+  }
+
+  clearMultiBodyRetryCache(): void {
+    this.failedMultiBodyMessages.clear()
+  }
+
+  async downloadMultiBodyAttachments(message: SdkMessage): Promise<readonly MessageAttachmentDownloadResult[]> {
+    if (message.type !== MESSAGE_TYPE.MULTI_BODY)
+      throw new Error('MULTI_BODY_ATTACHMENT_UNSUPPORTED')
+    const result = await this.client.chatManager.downloadAttachment({ message })
+    if (Array.isArray(result))
+      return result
+    return [result as MessageAttachmentDownloadResult]
   }
 
   /** 通用发送流程 */

@@ -73,13 +73,17 @@ nav/sidebar。组件页由「手写 markdown + demo 块 + 自动生成 API 表�
 
 ## 1. 文档内容结构（apps/docs）
 
-- `package.json`：只保留 `gen:api`（node scripts/gen-api-docs.mjs）与
-  `split-changelog`；VitePress dev/build/preview 统一在独立站壳仓库执行；
+- `package.json`：保留 `gen:api`、`check:api-reference` 与 `split-changelog`；
+  VitePress dev/build/preview 统一在独立站壳仓库执行；
 - `docs.manifest.mjs`：声明公开内容映射、各包版本文件，以及 root locale 的
-  nav/sidebar/editLink；新增组件页在这里按分类登记；
+  nav/sidebar/editLink；新增组件页和 API 页在这里按分类登记；
 - `index.md`：home 布局（hero + features），hero actions 指向快速开始与组件预览；
 - `guide/`：quickstart / theme / icons / h5-adaptation / advanced / demo-phase1-plan /
   changelog（更新日志，与根 CHANGELOG.md 不同，是站点展示版）；
+- `api/`：Nuxt 式 API 总览、分类索引和独立参考页。composable/store 文件名与公开导出名
+  保持 kebab-case 对应；函数页包含用途、导入、签名、参数、返回值、最小示例与边界；
+  索引只放摘要和链接，不复制组件生成表格；新增公开导出后运行 `pnpm check:api-reference`，
+  同时校验名称覆盖、sidebar 链接、Markdown 示例参数数量与关键参数类型，并把页面登记到 `/api/` sidebar；
 - `components/`：每个组件一对——`<name>.md`（手写正文）+ `<name>/demo/*.vue`（示例）;
   业务容器（conversation-container / chat-container / contact-container /
   address-book-container / group-container / add-contact-modal / create-group-modal）
@@ -107,6 +111,30 @@ nav/sidebar。组件页由「手写 markdown + demo 块 + 自动生成 API 表�
   `#nav-bar-content-before`（`#nav-bar-title-after` 位于首页 `<a>` 内，禁止嵌套交互控件），
   移动菜单复用同一组件，默认 locale 下拉在两端均隐藏，不使用原生 `<select>` 或 ARIA menu 角色；
 - 各产品版本宏由站壳 `vite.config.ts` 从对应源码仓库读取并注入，不能跨产品复用。
+
+### 多主题说明的语义分段（硬规则）
+
+新增或改写说明文字时，先列出其中所有独立事实，再选择排版结构。只要同时包含两类及以上主题
+（依赖类型、安装方式、版本差异、导入路径、注意事项等），就必须按主题拆分；不得沿用周围的连续
+`>` 引用，也不得只用 `<br>` 做视觉换行。
+
+默认使用 VitePress 原生容器 + 无序列表：一个容器只讲一个主题，每个列表项只回答一个问题，并用
+加粗标签标明分类。安装约束与导入规则属于不同主题，必须分开。无需为此新增插件、组件或 CSS。
+
+拆分是事实到结构的映射，不是摘要：版本号、包名、适用条件、否定约束与例外必须全部保留。写完后
+只读分类标签应能重建内容大纲，并逐项对照事实清单确认无遗漏。
+
+普通 `>` 引用只用于单一、简短的补充说明；`::: details` 只收纳非必要的进阶内容；表格只用于确有
+多列对比关系的内容，不能为了形式把长说明塞进单元格。
+
+```md
+::: info 依赖说明
+- **基础依赖**：`pinia` 与 `vue` 是 peerDependencies，需要在使用方项目中显式安装。
+- **SDK 适配器**：`@easemob-community/uikit-sdk-websdk5` / `@easemob-community/uikit-sdk-webim4` 是 optional peer 依赖，**不会被包管理器自动安装**，请按所用 SDK 版本二选一显式安装。
+- **内部依赖**：`@easemob-community/uikit-core` / `@easemob-community/uikit-sdk-contract` 是 `uikit-im` 的普通 dependencies，会随安装自动带上，**无需也不建议直接依赖**。
+- **统一导入入口**：3.7.11 起，core 的常用 store、工具函数和业务类型已从 `uikit-im` 主入口透出，业务代码一律从 `@easemob-community/uikit-im` 导入。
+:::
+```
 
 ## 2. 组件文档写作规范（components/<name>.md）
 

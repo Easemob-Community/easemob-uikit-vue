@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useLocale } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE, useLocale, useToast } from '@easemob-community/uikit-core'
 import { useResizable, useViewport } from '@easemob-community/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
 import { EmInput as Input } from '@easemob-community/uikit-core'
 import { EmButton as Button } from '@easemob-community/uikit-core'
 import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import type { MultiBodySegmentInput } from '@easemob-community/uikit-core'
+import { isDraftPreviewUrlRetained } from '../../../composables/use-conversation'
 import type { ChatConfig, MentionContact } from '../types'
 import VoicePanel from './components/voice-panel.vue'
+import AttachmentDraftList from './components/attachment-draft-list.vue'
+import type { MultiBodyAttachmentDraftItem } from './multi-body-draft'
+import { buildMultiBodyInputs, createAttachmentDraft, rebaseAttachmentPositions, resolveSimpleInputHeightChange, revokeDraftPreviewUrls, shouldApplyAttachmentMetadata } from './multi-body-draft'
+import { getClipboardAttachmentFiles, readVideoMetadata } from './attachment-draft'
+import type { SimpleInputDraftSnapshot } from './input-draft'
+import { cloneMessageInputDraftSnapshot } from './input-draft'
 
 export interface SimpleInputProps {
   config?: ChatConfig['input']
@@ -15,12 +23,18 @@ export interface SimpleInputProps {
   enableMention?: boolean
   /** @提及选择弹层是否打开（打开时 Enter 优先用于选择联系人，不发送消息） */
   mentionOpen?: boolean
+  /** 是否启用整框复合消息模式 */
+  enableMultiBody?: boolean
+  sending?: boolean
 }
 
-const props = defineProps<SimpleInputProps>()
+const props = withDefaults(defineProps<SimpleInputProps>(), {
+  enableMultiBody: false,
+  sending: false,
+})
 
 const emit = defineEmits<{
-  (e: 'send', text: string, mentionList?: MentionContact[]): void
+  (e: 'send', text: string, mentionList?: MentionContact[], bodies?: readonly MultiBodySegmentInput[]): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
   /** 粘贴剪贴板图片（截图/复制的图片），交由上层弹窗预览后发送 */
   (e: 'image-paste', files: File[]): void
@@ -45,10 +59,22 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { show: showToast } = useToast()
 const { isMobile } = useViewport()
 
 /** 输入文本 */
 const text = ref('')
+const attachments = ref<MultiBodyAttachmentDraftItem[]>([])
+const draftVersion = ref(0)
+const attachmentGeneration = ref(0)
+const pendingVideoMetadata = ref(0)
+watch(text, (nextText, previousText) => {
+  rebaseAttachmentPositions(attachments.value, previousText, nextText)
+}, { flush: 'sync' })
+watch([text, attachments], () => {
+  draftVersion.value += 1
+}, { deep: true })
+const hasContent = computed(() => Boolean(text.value.trim()) || (props.enableMultiBody && attachments.value.length > 0))
 
 /** 输入框风格 */
 const style = computed(() => props.config?.style ?? 'toolbar-top')
@@ -87,15 +113,15 @@ const customHeight = ref<number | null>(null)
 
 /** 默认内容高度（卡片 126px 时的 root 高度初值 108 = 126 - 18 chrome：工具栏 28 + 间距 8 + 三行文本区 72，挂载后按实际测量值校准） */
 const defaultContentHeight = ref(108)
-
-/** 当前生效的 root 内容高度（统一高度语义：默认/拖拽/展开都是它） */
-const effectiveHeight = computed(() => customHeight.value ?? defaultContentHeight.value)
+const baseEffectiveHeight = computed(() => customHeight.value ?? defaultContentHeight.value)
+const attachmentExtraHeight = computed(() => props.enableMultiBody && attachments.value.length > 0 ? 88 : 0)
+const effectiveHeight = computed(() => baseEffectiveHeight.value + attachmentExtraHeight.value)
 
 /**
  * 展开视觉态（融合拖拽与展开）：当前高度达到展开高度即视为「已展开」，
  * 角标据此切换 topright/spread（可放大）与 topright/singularity（可恢复）。
  */
-const expandedVisual = computed(() => effectiveHeight.value + CARD_CHROME_PX >= EXPAND_CARD_HEIGHT)
+const expandedVisual = computed(() => baseEffectiveHeight.value + CARD_CHROME_PX >= EXPAND_CARD_HEIGHT)
 
 /** 拖拽手柄 ref */
 const resizeHandleRef = ref<HTMLElement>()
@@ -108,10 +134,14 @@ const { size: resizeSize, isResizing } = useResizable(resizeHandleRef, {
   invert: true,
   disabled: () => !showResizeHandle.value,
   onChange: (h) => {
-    customHeight.value = h
+    customHeight.value = Math.max(72, h - attachmentExtraHeight.value)
     emit('height-change', h)
     emit('expand-change', expandedVisual.value)
   },
+})
+
+watch(attachmentExtraHeight, (extraHeight) => {
+  emit('height-change', resolveSimpleInputHeightChange(customHeight.value, extraHeight, effectiveHeight.value))
 })
 
 /** 根元素样式：内联 height 作为 flex-basis（flex: 1 1 auto 保留收缩能力，引用条在场时输入区可被挤压；过渡动画作用于 height） */
@@ -130,7 +160,7 @@ function syncResizeSize() {
 /** 角标点击：未展开 → 升到 212px；已展开（含拖拽超过 212）→ 恢复默认 126px。内容与光标保留 */
 function toggleExpand() {
   customHeight.value = expandedVisual.value ? null : EXPAND_CARD_HEIGHT - CARD_CHROME_PX
-  emit('height-change', customHeight.value)
+  emit('height-change', resolveSimpleInputHeightChange(customHeight.value, attachmentExtraHeight.value, effectiveHeight.value))
   emit('expand-change', expandedVisual.value)
   syncResizeSize()
   getInputEl()?.focus()
@@ -163,20 +193,22 @@ watch(isVoiceMode, val => emit('voice-mode-change', val))
 /** 已插入的 @提及列表 */
 const mentionList = ref<MentionContact[]>([])
 
+function getMultiBodyInputs(): readonly MultiBodySegmentInput[] {
+  return buildMultiBodyInputs(text.value, attachments.value)
+}
+
 /** 发送消息 */
 function handleSend() {
-  // @提及弹层打开时，Enter 优先交给弹层选择联系人，不发送消息
-  if (props.mentionOpen)
+  if (props.mentionOpen || props.sending || !hasContent.value)
     return
-  const trimmed = text.value.trim()
-  if (!trimmed) {
+  if (pendingVideoMetadata.value > 0) {
+    showToast(t('message.multiBody.preparing', '正在读取视频信息，请稍后发送'), 'warning')
     return
   }
-  // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
+  const trimmed = text.value.trim()
   const activeMentions = filterActiveMentions(trimmed, mentionList.value)
-  emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined)
-  text.value = ''
-  mentionList.value = []
+  const bodies = props.enableMultiBody ? getMultiBodyInputs() : undefined
+  emit('send', trimmed, activeMentions.length > 0 ? activeMentions : undefined, bodies)
 }
 
 /** 输入状态提示节流 */
@@ -210,6 +242,8 @@ function onKeydown(e: KeyboardEvent) {
   }
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
+    if (e.isComposing || e.keyCode === 229)
+      return
     handleSend()
   }
 }
@@ -224,23 +258,85 @@ function triggerFileInput(type: 'image' | 'file' | 'video') {
   ref.value?.click()
 }
 
-function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
-  const files = (event.target as HTMLInputElement).files
-  if (files && files.length > 0) {
-    emit('send-file', type, files)
-    ;(event.target as HTMLInputElement).value = ''
+async function hydrateVideoMetadata(item: MultiBodyAttachmentDraftItem, generation: number) {
+  pendingVideoMetadata.value += 1
+  try {
+    const metadata = await readVideoMetadata(item.file)
+    if (shouldApplyAttachmentMetadata(item, attachments.value, generation, attachmentGeneration.value))
+      Object.assign(item, metadata)
+  }
+  finally {
+    pendingVideoMetadata.value -= 1
   }
 }
 
-/**
- * 粘贴事件（挂在根元素，textarea/EmInput 的 paste 均冒泡至此）：
- * 剪贴板含图片时拦截默认行为，提取 image/* 文件交给上层弹窗预览后发送；
- * 纯文本粘贴不受影响。
- */
+function addAttachments(files: readonly File[]) {
+  const generation = attachmentGeneration.value
+  const position = getInputEl()?.selectionStart ?? text.value.length
+  for (const file of files) {
+    if (props.sending)
+      return
+    const type = file.type.startsWith('image/')
+      ? MESSAGE_TYPE.IMAGE
+      : file.type.startsWith('video/')
+        ? MESSAGE_TYPE.VIDEO
+        : MESSAGE_TYPE.FILE
+    const item = createAttachmentDraft(file, type, {}, position)
+    attachments.value.push(item)
+    if (type === MESSAGE_TYPE.VIDEO)
+      void hydrateVideoMetadata(item, generation)
+  }
+}
+
+function removeAttachment(id: string) {
+  if (props.sending)
+    return
+  const item = attachments.value.find(item => item.id === id)
+  if (item && !isDraftPreviewUrlRetained(item.previewUrl))
+    revokeDraftPreviewUrls([item])
+  attachments.value = attachments.value.filter(item => item.id !== id)
+}
+
+function clearAttachments() {
+  attachmentGeneration.value += 1
+  if (!props.sending) {
+    for (const url of getDraftPreviewUrls()) {
+      if (!isDraftPreviewUrlRetained(url))
+        URL.revokeObjectURL(url)
+    }
+  }
+  attachments.value = []
+}
+
+async function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = input.files
+  if (!files || files.length === 0)
+    return
+  if (props.enableMultiBody)
+    await addAttachments(Array.from(files))
+  else
+    emit('send-file', type, files)
+  input.value = ''
+}
+
 function onPaste(e: ClipboardEvent) {
   const data = e.clipboardData
   if (!data)
     return
+  if (props.enableMultiBody) {
+    const files = getClipboardAttachmentFiles(data, {
+      image: features.value.image && props.config?.pasteImagePreview !== false,
+      video: features.value.video,
+      file: features.value.file,
+    })
+    if (files.length === 0)
+      return
+    if (!data.getData('text/plain'))
+      e.preventDefault()
+    void addAttachments(files)
+    return
+  }
   const files: File[] = []
   for (const item of Array.from(data.items)) {
     if (item.kind === 'file' && item.type.startsWith('image/')) {
@@ -251,7 +347,6 @@ function onPaste(e: ClipboardEvent) {
   }
   if (files.length === 0)
     return
-  // image 功能或粘贴预览特性关闭：剪贴板同时带文本时放行文本粘贴，纯图则拦截丢弃
   if (!features.value.image || props.config?.pasteImagePreview === false) {
     if (!data.getData('text/plain'))
       e.preventDefault()
@@ -476,9 +571,20 @@ onMounted(() => {
   }
 })
 
+watch(() => props.enableMultiBody, (enabled) => {
+  if (!enabled)
+    clearAttachments()
+})
+
 /** 组件卸载时退出录音模式 */
 onBeforeUnmount(() => {
   isVoiceMode.value = false
+  attachmentGeneration.value += 1
+  for (const url of getDraftPreviewUrls()) {
+    if (!isDraftPreviewUrlRetained(url))
+      URL.revokeObjectURL(url)
+  }
+  attachments.value = []
 })
 
 /** 设置输入文本 */
@@ -496,6 +602,53 @@ function getText(): string {
   return text.value
 }
 
+function getDraftSnapshot(): SimpleInputDraftSnapshot | null {
+  if (!hasContent.value)
+    return null
+  return cloneMessageInputDraftSnapshot({
+    mode: 'simple',
+    text: text.value,
+    attachments: attachments.value,
+    mentionList: mentionList.value,
+  })
+}
+
+function restoreDraftSnapshot(snapshot: SimpleInputDraftSnapshot | null): void {
+  attachmentGeneration.value += 1
+  text.value = snapshot?.text || ''
+  if (!snapshot) {
+    attachments.value = []
+    mentionList.value = []
+    return
+  }
+  const restored = cloneMessageInputDraftSnapshot(snapshot)
+  attachments.value = restored.attachments
+  mentionList.value = restored.mentionList
+  const generation = attachmentGeneration.value
+  for (const item of attachments.value) {
+    if (item.type === MESSAGE_TYPE.VIDEO && item.duration === undefined)
+      void hydrateVideoMetadata(item, generation)
+  }
+}
+
+function getDraftVersion() {
+  return draftVersion.value
+}
+
+function getDraftPreviewUrls() {
+  return attachments.value.map(item => item.previewUrl).filter(url => url.startsWith('blob:'))
+}
+
+function hasPreviewUrl(url: string) {
+  return attachments.value.some(item => item.previewUrl === url)
+}
+
+function clearDraft() {
+  text.value = ''
+  mentionList.value = []
+  clearAttachments()
+}
+
 /** 暴露方法（toggleExpand/expanded 供上层在卡片层渲染右上角展开角标） */
 defineExpose({
   insertMention,
@@ -503,6 +656,14 @@ defineExpose({
   insertEmoji,
   setText,
   getText,
+  getDraftSnapshot,
+  restoreDraftSnapshot,
+  getMultiBodyInputs,
+  clearDraft,
+  clearAttachments,
+  getDraftVersion,
+  getDraftPreviewUrls,
+  hasPreviewUrl,
   toggleExpand,
   expanded: expandedVisual,
 })
@@ -572,6 +733,12 @@ defineExpose({
           @input="onInput"
           @focus="emit('focus')"
         />
+        <AttachmentDraftList
+          v-if="enableMultiBody"
+          :items="attachments"
+          :disabled="sending"
+          @remove="removeAttachment"
+        />
       </template>
 
       <!-- 移动端语音录制按钮 -->
@@ -601,7 +768,8 @@ defineExpose({
       <Button
         type="primary"
         size="small"
-        :disabled="!text.trim()"
+        :loading="sending"
+        :disabled="sending || pendingVideoMetadata > 0 || !hasContent"
         @click="handleSend"
       >
         {{ t('chat.send') }}
@@ -620,6 +788,7 @@ defineExpose({
       ref="imageInputRef"
       type="file"
       accept="image/*"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('image', $event)"
     >
@@ -627,12 +796,14 @@ defineExpose({
       ref="videoInputRef"
       type="file"
       accept="video/*"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('video', $event)"
     >
     <input
       ref="fileInputRef"
       type="file"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('file', $event)"
     >
@@ -701,6 +872,7 @@ defineExpose({
   flex: 1;
   min-height: 0;
   display: flex;
+  flex-direction: column;
   align-items: stretch;
   gap: var(--uikit-container-gap, 8px);
   position: relative;

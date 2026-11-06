@@ -1,14 +1,25 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import { useLocale } from '@easemob-community/uikit-core'
+import { MESSAGE_TYPE, useLocale, useToast } from '@easemob-community/uikit-core'
 import { useResizable, useViewport } from '@easemob-community/uikit-core'
 import { filterActiveMentions } from '../../../utils/mention'
 import { EmButton as Button } from '@easemob-community/uikit-core'
 import { EmIcon as Icon } from '@easemob-community/uikit-core'
+import type { MultiBodySegmentInput } from '@easemob-community/uikit-core'
+import { parseMultiBodyClipboardHtml } from '../../../composables/multi-body.utils'
+import { isDraftPreviewUrlRetained } from '../../../composables/use-conversation'
 import type { ChatConfig, MentionContact } from '../types'
+import { projectRichDocumentToMultiBodyInputs } from './rich-input-multi-body'
+import type { RichDocumentNode } from './rich-input-multi-body'
+import { MULTI_BODY_ATTACHMENT_NODE, MultiBodyAttachmentNode } from './rich-input-attachment-node'
+import type { MultiBodyAttachmentDraftItem } from './multi-body-draft'
+import { createAttachmentDraft, shouldApplyAttachmentMetadata, toMultiBodyAttachmentInputs } from './multi-body-draft'
+import { getClipboardAttachmentFiles, hasHtmlImage, readVideoMetadata } from './attachment-draft'
+import type { RichInputDraftSnapshot } from './input-draft'
+import { cloneMessageInputDraftSnapshot } from './input-draft'
 
 export interface RichInputProps {
   config?: ChatConfig['input']
@@ -16,12 +27,17 @@ export interface RichInputProps {
   enableMention?: boolean
   /** @提及选择弹层是否打开（打开时 Enter 优先用于选择联系人，不发送消息） */
   mentionOpen?: boolean
+  enableMultiBody?: boolean
+  sending?: boolean
 }
 
-const props = defineProps<RichInputProps>()
+const props = withDefaults(defineProps<RichInputProps>(), {
+  enableMultiBody: false,
+  sending: false,
+})
 
 const emit = defineEmits<{
-  (e: 'send', html: string, text: string, mentionList?: MentionContact[]): void
+  (e: 'send', html: string, text: string, mentionList?: MentionContact[], bodies?: readonly MultiBodySegmentInput[]): void
   (e: 'send-file', type: 'image' | 'file' | 'video', files: FileList): void
   (e: 'emoji-click', anchor: HTMLElement): void
   (e: 'voice-start'): void
@@ -39,6 +55,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+const { show: showToast } = useToast()
 const { isMobile } = useViewport()
 
 /** 输入框风格 */
@@ -133,6 +150,8 @@ function triggerTyping() {
   }, 5000)
 }
 
+let restoringDraftSnapshot = false
+
 /** Tiptap 编辑器实例 */
 const editor = useEditor({
   extensions: [
@@ -145,6 +164,9 @@ const editor = useEditor({
     Image.configure({
       inline: true,
     }),
+    MultiBodyAttachmentNode.configure({
+      isSending: () => props.sending,
+    }),
   ],
   content: '',
   onCreate: ({ editor: e }) => {
@@ -154,7 +176,12 @@ const editor = useEditor({
     }
   },
   onUpdate: ({ editor: e }) => {
+    draftVersion.value += 1
     updateHasContent(e)
+    if (!restoringDraftSnapshot) {
+      syncInlineImageFiles(e.getHTML())
+      syncInlineAttachments(e.getJSON())
+    }
     triggerTyping()
   },
   onFocus: () => emit('focus'),
@@ -163,15 +190,42 @@ const editor = useEditor({
       class: 'rich-input__editor-content',
     },
     handlePaste: (_view, event) => {
+      const data = event.clipboardData
+      const pastedText = data?.getData('text/plain') || ''
       if (maxLength.value > 0) {
         const text = _view.state.doc.textContent
-        const pastedText = event.clipboardData?.getData('text/plain') || ''
         if (text.length + pastedText.length > maxLength.value) {
           event.preventDefault()
           return true
         }
       }
-      return false
+      if (!props.enableMultiBody || !data)
+        return false
+      const copiedSegments = parseMultiBodyClipboardHtml(data.getData('text/html'))
+      if (copiedSegments) {
+        event.preventDefault()
+        insertCopiedMultiBody(copiedSegments)
+        return true
+      }
+      const files = getClipboardAttachmentFiles(data, {
+        image: features.value.image,
+        video: features.value.video,
+        file: features.value.file,
+      })
+      if (files.length === 0) {
+        if (!hasHtmlImage(data.getData('text/html')))
+          return false
+        event.preventDefault()
+        if (pastedText)
+          editor.value?.chain().focus().insertContent({ type: 'text', text: pastedText }).run()
+        showToast(t('message.multiBody.unsupportedInlineImage', '仅支持粘贴本地图片文件'), 'warning')
+        return true
+      }
+      event.preventDefault()
+      if (pastedText)
+        editor.value?.chain().focus().insertContent({ type: 'text', text: pastedText }).run()
+      void addAttachmentFiles(files)
+      return true
     },
     handleKeyDown: (_view, event) => {
       // 最大长度限制：阻止普通字符输入
@@ -220,6 +274,8 @@ const editor = useEditor({
           return true
         }
         event.preventDefault()
+        if (event.isComposing || event.keyCode === 229)
+          return true
         handleSend()
         return true
       }
@@ -250,32 +306,215 @@ function toggleExpand() {
   editor.value?.commands.focus()
 }
 
-/** 是否有内容（包含文本或图片） */
-const hasContent = ref(false)
+const editorHasContent = ref(false)
+const attachments = ref<MultiBodyAttachmentDraftItem[]>([])
+const draftVersion = ref(0)
+const attachmentGeneration = ref(0)
+const pendingVideoMetadata = ref(0)
+watch(attachments, () => {
+  draftVersion.value += 1
+}, { deep: true })
+const hasContent = computed(() => editorHasContent.value || (props.enableMultiBody && attachments.value.length > 0))
 
 function updateHasContent(e: any) {
   const text = e.getText().trim()
   const html = e.getHTML()
-  hasContent.value = text.length > 0 || html.includes('<img')
+  editorHasContent.value = text.length > 0 || html.includes('<img') || html.includes('data-rich-input-attachment')
 }
 
 /** 待回收的内联图片 Blob URL 列表 */
 const inlineImageBlobUrls = new Set<string>()
+const inlineImageFiles = new Map<string, File | MultiBodySegmentInput>()
+const copiedAttachmentInputs = new Map<string, MultiBodySegmentInput>()
+let copiedAttachmentSequence = 0
+
+function syncInlineImageFiles(html: string) {
+  for (const [url] of inlineImageFiles) {
+    if (html.includes(url))
+      continue
+    inlineImageFiles.delete(url)
+    inlineImageBlobUrls.delete(url)
+    if (!props.sending && url.startsWith('blob:') && !isDraftPreviewUrlRetained(url))
+      URL.revokeObjectURL(url)
+  }
+}
+
+function revokeUnretainedAttachmentUrls(items: readonly MultiBodyAttachmentDraftItem[]): void {
+  for (const item of items) {
+    if (!item.previewUrl.startsWith('blob:') || isDraftPreviewUrlRetained(item.previewUrl))
+      continue
+    URL.revokeObjectURL(item.previewUrl)
+    item.previewUrl = ''
+  }
+}
+
+function insertInlineImages(files: readonly File[]) {
+  for (const file of files) {
+    const url = URL.createObjectURL(file)
+    inlineImageBlobUrls.add(url)
+    inlineImageFiles.set(url, file)
+    editor.value?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+async function hydrateVideoMetadata(item: MultiBodyAttachmentDraftItem, generation: number) {
+  pendingVideoMetadata.value += 1
+  try {
+    const metadata = await readVideoMetadata(item.file)
+    if (shouldApplyAttachmentMetadata(item, attachments.value, generation, attachmentGeneration.value))
+      Object.assign(item, metadata)
+  }
+  finally {
+    pendingVideoMetadata.value -= 1
+  }
+}
+
+function syncInlineAttachments(document: RichDocumentNode) {
+  const ids = new Set<string>()
+  function collect(node: RichDocumentNode) {
+    if (node.type === MULTI_BODY_ATTACHMENT_NODE && typeof node.attrs?.attachmentId === 'string')
+      ids.add(node.attrs.attachmentId)
+    node.content?.forEach(collect)
+  }
+  collect(document)
+
+  const removedItems = attachments.value.filter(item => !ids.has(item.id))
+  if (!props.sending)
+    revokeUnretainedAttachmentUrls(removedItems)
+  attachments.value = attachments.value.filter(item => ids.has(item.id))
+  for (const id of copiedAttachmentInputs.keys()) {
+    if (!ids.has(id))
+      copiedAttachmentInputs.delete(id)
+  }
+}
+
+function insertInlineAttachment(item: {
+  id: string
+  type: MultiBodyAttachmentDraftItem['type']
+  fileName: string
+  fileSize: number
+}) {
+  editor.value?.chain().focus().insertContent({
+    type: MULTI_BODY_ATTACHMENT_NODE,
+    attrs: {
+      attachmentId: item.id,
+      attachmentType: item.type,
+      fileName: item.fileName,
+      fileSize: item.fileSize,
+    },
+  }).run()
+}
+
+function addAttachmentFiles(files: readonly File[]) {
+  const generation = attachmentGeneration.value
+  for (const file of files) {
+    if (props.sending)
+      return
+    if (file.type.startsWith('image/')) {
+      insertInlineImages([file])
+      continue
+    }
+    const type = file.type.startsWith('video/') ? MESSAGE_TYPE.VIDEO : MESSAGE_TYPE.FILE
+    const item = createAttachmentDraft(file, type)
+    attachments.value.push(item)
+    insertInlineAttachment({ id: item.id, type: item.type, fileName: item.file.name, fileSize: item.file.size })
+    if (type === MESSAGE_TYPE.VIDEO)
+      void hydrateVideoMetadata(item, generation)
+  }
+}
+
+function insertCopiedMultiBody(segments: readonly MultiBodySegmentInput[]) {
+  for (const segment of segments) {
+    if (props.sending)
+      return
+    if (segment.type === MESSAGE_TYPE.TEXT) {
+      editor.value?.chain().focus().insertContent({ type: 'text', text: segment.content }).run()
+      continue
+    }
+    if (segment.type === MESSAGE_TYPE.IMAGE) {
+      const src = segment.thumbnailUrl || segment.originalUrl
+      if (!src)
+        continue
+      inlineImageFiles.set(src, segment)
+      editor.value?.chain().focus().setImage({ src }).run()
+      continue
+    }
+    if (segment.type !== MESSAGE_TYPE.FILE && segment.type !== MESSAGE_TYPE.VIDEO)
+      continue
+
+    copiedAttachmentSequence += 1
+    const id = `copied-${Date.now()}-${copiedAttachmentSequence}`
+    copiedAttachmentInputs.set(id, segment)
+    insertInlineAttachment({
+      id,
+      type: segment.type,
+      fileName: segment.filename || (segment.type === MESSAGE_TYPE.FILE ? t('message.file', 'file') : t('message.video', 'video')),
+      fileSize: segment.fileLength ?? (segment.type === MESSAGE_TYPE.FILE ? segment.fileSize : undefined) ?? 0,
+    })
+  }
+}
+
+function getInlineAttachmentInputs() {
+  const inputs = new Map(copiedAttachmentInputs)
+  for (const item of attachments.value)
+    inputs.set(item.id, toMultiBodyAttachmentInputs([item])[0]!)
+  return inputs
+}
+
+function clearAttachments() {
+  attachmentGeneration.value += 1
+  const currentEditor = editor.value
+  if (currentEditor && !currentEditor.isDestroyed) {
+    currentEditor.chain().command(({ state, tr }) => {
+      const ranges: { from: number, to: number }[] = []
+      state.doc.descendants((node, pos) => {
+        if (node.type.name === MULTI_BODY_ATTACHMENT_NODE)
+          ranges.push({ from: pos, to: pos + node.nodeSize })
+      })
+      for (const range of ranges.reverse())
+        tr.delete(range.from, range.to)
+      return true
+    }).run()
+  }
+  if (!props.sending)
+    revokeUnretainedAttachmentUrls(attachments.value)
+  attachments.value = []
+  copiedAttachmentInputs.clear()
+}
+
+function getMultiBodyInputs(): readonly MultiBodySegmentInput[] {
+  return projectRichDocumentToMultiBodyInputs(
+    editor.value?.getJSON() || {},
+    inlineImageFiles,
+    [],
+    getInlineAttachmentInputs(),
+  )
+}
 
 /** 发送消息 */
 function handleSend() {
-  if (!editor.value || !hasContent.value)
+  if (!editor.value || !hasContent.value || props.sending)
     return
+  if (pendingVideoMetadata.value > 0) {
+    showToast(t('message.multiBody.preparing', '正在读取视频信息，请稍后发送'), 'warning')
+    return
+  }
   const html = editor.value.getHTML()
   const text = editor.value.getText()
-  // 过滤出实际出现在文本中的 mention（精确匹配，防止删除后残留/前缀误判）
+  let bodies: readonly MultiBodySegmentInput[] | undefined
+  try {
+    bodies = props.enableMultiBody ? getMultiBodyInputs() : undefined
+  }
+  catch {
+    showToast(t('message.multiBody.unsupportedInlineImage', '仅支持粘贴本地图片文件'), 'warning')
+    return
+  }
+  if (bodies && bodies.length > 20) {
+    showToast(t('message.multiBody.tooMany', '最多支持 20 段内容'), 'warning')
+    return
+  }
   const activeMentions = filterActiveMentions(text, mentionList.value)
-  emit('send', html, text, activeMentions.length > 0 ? activeMentions : undefined)
-  editor.value.commands.clearContent()
-  // 发送后回收内联图片 blob URL
-  inlineImageBlobUrls.forEach(url => URL.revokeObjectURL(url))
-  inlineImageBlobUrls.clear()
-  mentionList.value = []
+  emit('send', html, text, activeMentions.length > 0 ? activeMentions : undefined, bodies)
 }
 
 /** 表情按钮 ref */
@@ -304,22 +543,18 @@ function triggerFileInput(type: 'image' | 'file' | 'video') {
   ref.value?.click()
 }
 
-function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
-  const files = (event.target as HTMLInputElement).files
+async function onFileSelected(type: 'image' | 'file' | 'video', event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = input.files
   if (!files || files.length === 0)
     return
-
-  if (type === 'image') {
-    const file = files[0]
-    const url = URL.createObjectURL(file)
-    inlineImageBlobUrls.add(url)
-    editor.value?.chain().focus().setImage({ src: url }).run()
-    ;(event.target as HTMLInputElement).value = ''
-  }
-  else {
+  if (props.enableMultiBody)
+    await addAttachmentFiles(Array.from(files))
+  else if (type === MESSAGE_TYPE.IMAGE)
+    insertInlineImages([files[0]!])
+  else
     emit('send-file', type, files)
-    ;(event.target as HTMLInputElement).value = ''
-  }
+  input.value = ''
 }
 
 /** 语音录制 */
@@ -388,6 +623,89 @@ function getText(): string {
   return editor.value?.getText() || ''
 }
 
+function getDraftSnapshot(): RichInputDraftSnapshot | null {
+  if (!editor.value || !hasContent.value)
+    return null
+  return cloneMessageInputDraftSnapshot({
+    mode: 'rich',
+    document: editor.value.getJSON(),
+    inlineImageFiles,
+    inlineImageBlobUrls,
+    attachments: attachments.value,
+    copiedAttachmentInputs,
+    mentionList: mentionList.value,
+  })
+}
+
+function restoreDraftSnapshot(snapshot: RichInputDraftSnapshot | null): void {
+  restoringDraftSnapshot = true
+  attachmentGeneration.value += 1
+  inlineImageBlobUrls.clear()
+  inlineImageFiles.clear()
+  copiedAttachmentInputs.clear()
+  attachments.value = []
+  mentionList.value = []
+  try {
+    if (snapshot) {
+      const restored = cloneMessageInputDraftSnapshot(snapshot)
+      for (const [url, source] of restored.inlineImageFiles)
+        inlineImageFiles.set(url, source)
+      for (const url of restored.inlineImageBlobUrls)
+        inlineImageBlobUrls.add(url)
+      for (const [id, input] of restored.copiedAttachmentInputs)
+        copiedAttachmentInputs.set(id, input)
+      attachments.value = restored.attachments
+      mentionList.value = restored.mentionList
+    }
+    editor.value?.commands.setContent(snapshot?.document || '')
+  }
+  finally {
+    restoringDraftSnapshot = false
+  }
+  if (editor.value)
+    updateHasContent(editor.value)
+  draftVersion.value += 1
+  const generation = attachmentGeneration.value
+  for (const item of attachments.value) {
+    if (item.type === MESSAGE_TYPE.VIDEO && item.duration === undefined)
+      void hydrateVideoMetadata(item, generation)
+  }
+}
+
+function getDraftVersion() {
+  return draftVersion.value
+}
+
+function getDraftPreviewUrls() {
+  return [
+    ...inlineImageBlobUrls,
+    ...attachments.value.map(item => item.previewUrl).filter(url => url.startsWith('blob:')),
+  ]
+}
+
+function hasPreviewUrl(url: string) {
+  return inlineImageBlobUrls.has(url) || attachments.value.some(item => item.previewUrl === url)
+}
+
+function clearDraft() {
+  editor.value?.commands.clearContent()
+  if (!props.sending) {
+    inlineImageBlobUrls.forEach((url) => {
+      if (url.startsWith('blob:') && !isDraftPreviewUrlRetained(url))
+        URL.revokeObjectURL(url)
+    })
+  }
+  inlineImageBlobUrls.clear()
+  inlineImageFiles.clear()
+  mentionList.value = []
+  clearAttachments()
+}
+
+watch(() => props.enableMultiBody, (enabled) => {
+  if (!enabled)
+    clearAttachments()
+})
+
 /** 暴露方法 */
 defineExpose({
   insertMention,
@@ -395,13 +713,28 @@ defineExpose({
   insertEmoji,
   setText,
   getText,
+  getDraftSnapshot,
+  restoreDraftSnapshot,
+  getMultiBodyInputs,
+  clearDraft,
+  clearAttachments,
+  getDraftVersion,
+  getDraftPreviewUrls,
+  hasPreviewUrl,
 })
 
 /** 组件卸载时销毁编辑器并回收 Blob URL */
 onBeforeUnmount(() => {
   editor.value?.destroy()
-  inlineImageBlobUrls.forEach(url => URL.revokeObjectURL(url))
+  if (!props.sending) {
+    inlineImageBlobUrls.forEach((url) => {
+      if (url.startsWith('blob:') && !isDraftPreviewUrlRetained(url))
+        URL.revokeObjectURL(url)
+    })
+  }
   inlineImageBlobUrls.clear()
+  inlineImageFiles.clear()
+  clearAttachments()
   if (typingThrottleTimer) {
     clearTimeout(typingThrottleTimer)
     typingThrottleTimer = null
@@ -417,6 +750,7 @@ onBeforeUnmount(() => {
       'rich-input--toolbar-bottom': style === 'toolbar-bottom',
       'rich-input--toolbar-top': style === 'toolbar-top',
       'rich-input--expanded': expanded,
+      'rich-input--sending': sending,
     }"
     :style="cssVars"
   >
@@ -486,7 +820,8 @@ onBeforeUnmount(() => {
       <Button
         type="primary"
         size="small"
-        :disabled="!hasContent"
+        :loading="sending"
+        :disabled="sending || pendingVideoMetadata > 0 || !hasContent"
         @click="handleSend"
       >
         {{ t('chat.send') }}
@@ -498,6 +833,7 @@ onBeforeUnmount(() => {
       ref="imageInputRef"
       type="file"
       accept="image/*"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('image', $event)"
     >
@@ -505,12 +841,14 @@ onBeforeUnmount(() => {
       ref="videoInputRef"
       type="file"
       accept="video/*"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('video', $event)"
     >
     <input
       ref="fileInputRef"
       type="file"
+      :multiple="enableMultiBody"
       style="display: none"
       @change="onFileSelected('file', $event)"
     >
@@ -546,7 +884,11 @@ onBeforeUnmount(() => {
 }
 
 .rich-input__editor-content img {
-  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-width: min(240px, 100%);
+  max-height: 160px;
+  object-fit: contain;
   border-radius: var(--uikit-components-radius, 4px);
   display: inline-block;
 }
@@ -610,7 +952,8 @@ onBeforeUnmount(() => {
 
 .rich-input__field-area {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--uikit-container-gap, 8px);
 }
 

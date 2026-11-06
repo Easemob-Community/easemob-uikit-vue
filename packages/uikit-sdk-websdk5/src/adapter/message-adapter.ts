@@ -2,6 +2,7 @@ import type { Message as SdkMessage, SessionMessageSnippet } from 'easemob-websd
 import { markRaw } from 'vue'
 import {
   CONVERSATION_TYPE,
+  MESSAGE_EXT_KEY,
   MESSAGE_STATUS,
   MESSAGE_TYPE,
   createLogger,
@@ -11,13 +12,14 @@ import {
   isFileBody as isFileMessageBody,
   isImageBody as isImageMessageBody,
   isLocationBody as isLocationMessageBody,
+  isMultiBody,
   isTextBody as isTextMessageBody,
   isVideoBody as isVideoMessageBody,
   isVoiceBody as isVoiceMessageBody,
   normalizeUserId,
 } from '@easemob-community/uikit-sdk-contract'
-import type { CombineMessageBody, ConversationTypeValue, MessagePreviewLabels, UiMessage } from '@easemob-community/uikit-sdk-contract'
-import { customEventPreviewMap, mergeMessagePreviewLabels } from '@easemob-community/uikit-sdk-contract'
+import type { ChatConversationType, CombineMessageBody, ConversationTypeValue, LastMessageTextResolver, MessagePreviewLabels, UiMessage } from '@easemob-community/uikit-sdk-contract'
+import { customEventPreviewMap, mergeMessagePreviewLabels, resolveMultiBodyPreview } from '@easemob-community/uikit-sdk-contract'
 
 const adapterLog = createLogger('UIKit:MessageAdapter')
 
@@ -33,6 +35,8 @@ export const defaultAdapterPreviewLabels: MessagePreviewLabels = {
   file: '[文件]',
   location: '[位置]',
   combine: '[聊天记录]',
+  multiBody: '[复合消息]',
+  multiBodyMore: '...',
   custom: customEventPreviewMap,
   customFallback: '[自定义]',
   unknown: '',
@@ -96,6 +100,9 @@ export function toUiMessage(sdkMsg: SdkMessage, currentUserId: string): UiMessag
       messageList: markRaw([...uiMsg.body.messageList]),
     } as CombineMessageBody
   }
+  else if (isMultiBody(uiMsg.body)) {
+    uiMsg.body = markRaw([...uiMsg.body])
+  }
   return uiMsg
 }
 
@@ -104,20 +111,68 @@ export function toUiMessages(sdkMsgs: readonly SdkMessage[], currentUserId: stri
   return sdkMsgs.map(msg => toUiMessage(msg, currentUserId))
 }
 
+/** 摘要场景不判断消息方向，仅补齐业务 resolver 需要的 UI 状态字段 */
+function toPreviewUiMessage(sdkMsg: SdkMessage): UiMessage {
+  return {
+    ...sdkMsg,
+    isSelf: false,
+    localId: sdkMsg.msgLocalId,
+    status: sdkMsg.sendStatus ?? MESSAGE_STATUS.SENT,
+  }
+}
+
+export interface SnippetPreviewContext {
+  conversationId: string
+  conversationType: ChatConversationType
+}
+
+/** 会话快照字段可能不完整，使用所属会话上下文补齐后再交给统一业务 resolver */
+function toPreviewUiMessageFromSnippet(
+  snippet: SessionMessageSnippet,
+  context?: SnippetPreviewContext,
+): UiMessage {
+  const from = snippet.from || ''
+  return {
+    ...snippet,
+    msgServerId: snippet.msgServerId || '',
+    msgLocalId: snippet.msgLocalId || snippet.msgServerId || '',
+    from,
+    to: snippet.to || '',
+    sender: snippet.sender || { userId: from },
+    conversationId: snippet.conversationId || context?.conversationId || '',
+    conversationType: snippet.conversationType || context?.conversationType || CONVERSATION_TYPE.SINGLECHAT,
+    type: (snippet.type || 'unknown') as SdkMessage['type'],
+    sendStatus: snippet.sendStatus ?? MESSAGE_STATUS.SENT,
+    ext: snippet.ext ?? {},
+    timestamp: snippet.timestamp ?? 0,
+    body: (snippet.body || {}) as SdkMessage['body'],
+    isSelf: false,
+    localId: snippet.msgLocalId || snippet.msgServerId,
+    status: snippet.sendStatus ?? MESSAGE_STATUS.SENT,
+  }
+}
+
 /** 从 SDK Message 提取消息摘要文本 */
 export function extractLastMessageText(
   sdkMsg: SdkMessage | null | undefined,
   labels?: Partial<MessagePreviewLabels>,
+  lastMessageTextResolver?: LastMessageTextResolver,
 ): string {
   if (!sdkMsg)
     return ''
 
+  const resolved = lastMessageTextResolver?.(toPreviewUiMessage(sdkMsg))
+  if (resolved !== undefined)
+    return resolved
+
   const l = mergeMessagePreviewLabels({ ...defaultAdapterPreviewLabels, ...labels })
   const { body } = sdkMsg
+  if (sdkMsg.type === MESSAGE_TYPE.MULTI_BODY)
+    return resolveMultiBodyPreview(toPreviewUiMessage(sdkMsg), l)
   if (isTextMessageBody(body))
     return body.content || ''
   if (isImageMessageBody(body))
-    return l.image
+    return sdkMsg.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true ? l.sticker : l.image
   if (isVoiceMessageBody(body))
     return l.voice
   if (isVideoMessageBody(body))
@@ -140,19 +195,27 @@ export function extractLastMessageText(
 export function extractSnippetText(
   snippet: SessionMessageSnippet | null | undefined,
   labels?: Partial<MessagePreviewLabels>,
+  lastMessageTextResolver?: LastMessageTextResolver,
+  context?: SnippetPreviewContext,
 ): string {
   if (!snippet)
     return ''
 
+  const resolved = lastMessageTextResolver?.(toPreviewUiMessageFromSnippet(snippet, context))
+  if (resolved !== undefined)
+    return resolved
+
   const l = mergeMessagePreviewLabels({ ...defaultAdapterPreviewLabels, ...labels })
-  const body = snippet.body || {}
+  const body = (Array.isArray(snippet.body) ? {} : snippet.body || {}) as Record<string, unknown>
   switch (snippet.type) {
+    case MESSAGE_TYPE.MULTI_BODY:
+      return resolveMultiBodyPreview(toPreviewUiMessageFromSnippet(snippet, context), l)
     case MESSAGE_TYPE.TEXT:
       // combine 经 WS 会话同步会被 payload-decoder 降级为 text（title/summary 丢失），
       // content 为空时尝试 summary，避免预览空白
       return (body.content as string) || (body.summary as string) || ''
     case MESSAGE_TYPE.IMAGE:
-      return l.image
+      return snippet.ext?.[MESSAGE_EXT_KEY.IS_STICKER] === true ? l.sticker : l.image
     case MESSAGE_TYPE.VOICE:
       return l.voice
     case MESSAGE_TYPE.VIDEO:

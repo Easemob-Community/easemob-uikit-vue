@@ -98,6 +98,30 @@ describe('toMessageRecord', () => {
     expect('extraFn' in record).toBe(false)
     expect(record.msgServerId).toBe('srv-1')
   })
+
+  it('multi_body 保持数组和分段顺序，并清除 File 与 blob 本地地址', () => {
+    const body = Array.from({ length: 21 }, (_, index) => (
+      index % 2 === 0
+        ? { type: 'text', content: `segment-${index}` }
+        : {
+            type: 'image',
+            localUrl: 'blob:draft',
+            originalImageUrl: `https://cdn/${index}.jpg`,
+            isGif: false,
+            isOriginalImage: false,
+            data: new File(['x'], `${index}.jpg`),
+          }
+    )) as unknown as MessageBody
+
+    const record = toMessageRecord(makeMsg({ type: 'multi_body', body }))
+    expect(Array.isArray(record.body)).toBe(true)
+    const segments = record.body as Array<Record<string, unknown>>
+    expect(segments).toHaveLength(21)
+    expect(segments[0]).toMatchObject({ type: 'text', content: 'segment-0' })
+    expect(segments[20]).toMatchObject({ type: 'text', content: 'segment-20' })
+    expect(segments[1]).toMatchObject({ type: 'image', localUrl: '' })
+    expect('data' in segments[1]!).toBe(false)
+  })
 })
 
 describe('toConversationRecord', () => {

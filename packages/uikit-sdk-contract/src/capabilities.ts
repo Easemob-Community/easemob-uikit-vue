@@ -10,6 +10,8 @@
 /** 能力位（boolean 映射）：true = 该 adapter 背后的 SDK 支持此能力 */
 export interface SdkCapabilityFlags {
   combineMessage: boolean
+  /** 复合消息能力；旧自定义 adapter 未上报时按 false 处理 */
+  multiBodyMessage?: boolean
   pinnedMessage: boolean
   streamingMessage: boolean
   groupReadReceipt: boolean

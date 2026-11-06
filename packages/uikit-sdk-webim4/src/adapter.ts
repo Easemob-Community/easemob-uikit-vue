@@ -50,9 +50,13 @@ const adapterLog = createLogger('UIKit:Webim4Adapter')
 export class Webim4Adapter implements SdkAdapter {
   readonly capabilities: SdkCapabilities = {
     combineMessage: true,
+    multiBodyMessage: false,
     pinnedMessage: true,
     streamingMessage: true,
     groupReadReceipt: true,
+    meta: {
+      multiBodyMessage: { reason: 'websdk 4.x 不提供 multi_body；本 adapter 不支持复合消息' },
+    },
     // 本 adapter 遵循的契约版本（协商机制见 contract capabilities.ts）
     contractVersion: SDK_CONTRACT_VERSION,
   }

@@ -66,6 +66,14 @@ function sanitizeValue(value: unknown, depth: number, maxDepth: number, seen: We
 function sanitizeBody(body: MessageBody): MessageBody {
   if (!body || typeof body !== 'object')
     return body
+  if (Array.isArray(body)) {
+    return body.map((segment) => {
+      const cleaned = sanitizeValue(segment, 0, EXT_MAX_DEPTH, new WeakSet<object>()) as Record<string, unknown>
+      if (typeof cleaned.localUrl === 'string' && cleaned.localUrl.startsWith('blob:'))
+        cleaned.localUrl = ''
+      return cleaned
+    }) as MessageBody
+  }
   const out: Record<string, unknown> = {}
   const seen = new WeakSet<object>()
   for (const [key, val] of Object.entries(body)) {

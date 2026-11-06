@@ -19,6 +19,7 @@ function createStubAdapter(): SdkAdapter {
     isConnected: false,
     capabilities: {
       combineMessage: false,
+      multiBodyMessage: false,
       pinnedMessage: false,
       streamingMessage: false,
       groupReadReceipt: false,

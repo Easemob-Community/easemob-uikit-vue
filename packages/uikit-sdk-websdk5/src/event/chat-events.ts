@@ -9,7 +9,7 @@ import {
   toConversationRecord,
   toMessageRecord,
 } from '@easemob-community/uikit-sdk-contract'
-import type { ConversationTypeValue, SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
+import type { ConversationTypeValue, LastMessageTextResolver, SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
 import { normalizeUserId, toUiMessage } from '../adapter/message-adapter'
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { toUiContacts } from '../adapter/contact-adapter'
@@ -290,6 +290,8 @@ export function createChatHandlers(
   features?: UIKitFeatures,
   /** 旁路持久化钩子（只写不读，fire-and-forget）；未注入时全部同步跳过 */
   persistence?: SdkPersistenceHooks,
+  /** 业务消息摘要解析器，会话快照回填时与本地消息共用 */
+  lastMessageTextResolver?: LastMessageTextResolver,
 ): ChatEventHandlerMap {
   // 群聊会话摘要发送者显示名解析：优先联系人备注，其次用户资料昵称
   const resolveSenderName = (userId: string) => resolveUserDisplayName(stores, userId)
@@ -357,7 +359,7 @@ export function createChatHandlers(
             const rawItems = client.chatManager.getConversationList()
               .filter(item => item.conversationType !== 'chatRoom')
             chatLog.info('getConversationList raw (onSyncDataFinished)', rawItems)
-            const incoming = toUiConversations(rawItems, { resolveSenderName })
+            const incoming = toUiConversations(rawItems, { resolveSenderName, lastMessageTextResolver })
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
             chatLog.info('conversation 同步回填', { count: merged.length })
@@ -419,7 +421,7 @@ export function createChatHandlers(
       }
       // SDK5 payload.items 是当前完整快照；patch.removed 包含本次移除的会话。
       // 当有删除或整体重置时，直接以快照替换列表，避免已删除会话仍留在 UI 上。
-      const incoming = toUiConversations(items, { resolveSenderName })
+      const incoming = toUiConversations(items, { resolveSenderName, lastMessageTextResolver })
       const merged = mergeWithExistingConversations(stores, incoming)
       // 显式删除通道不受并集保留影响：patch.removed 命中的会话必须从结果剔除
       const removedIds = new Set(payload.patch.removed.map(r => r.conversationId))

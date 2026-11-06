@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_EXT_KEY, MESSAGE_TYPE, EmIcon as Icon, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob-community/uikit-core'
-import type { EmojiStickerItem, UiMessage } from '@easemob-community/uikit-core'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { CONVERSATION_TYPE, EmEmojiPicker as EmojiPicker, MESSAGE_TYPE, EmIcon as Icon, EmModal as Modal, EmPopup as Popup, createLogger, formatSdkError, resolveSdkErrorMessage, useLocale, useToast, useViewport } from '@easemob-community/uikit-core'
+import type { EmojiStickerItem, MultiBodySegmentInput, UiMessage } from '@easemob-community/uikit-core'
 import { useChat } from '../../../composables/use-chat'
+import { toMultiBodyPreview } from '../../../composables/multi-body.utils'
 import { useQuote } from '../../../composables/use-quote'
 import { useUIKit } from '../../../composables/use-uikit'
 import { provideMessageInputPluginContext } from '../../../composables/use-chat-plugin'
+import { isDraftPreviewUrlRetained, useConversation } from '../../../composables/use-conversation'
 import MentionPicker from '../mention/mention-picker.vue'
 import QuoteBar from '../quote/quote-bar.vue'
 import type { ChatConfig, ChatSendHooks, MentionContact } from '../types'
@@ -13,6 +15,10 @@ import H5Input from '../h5-input/h5-input.vue'
 import SimpleInput from './simple-input.vue'
 import RichInput from './rich-input.vue'
 import EditingBar from './editing-bar.vue'
+import { canUseConversationForSend, resolveMultiBodySendPlan, settleInputDraftSend } from './multi-body-send-plan'
+import { buildStickerExt } from './sticker'
+import type { MessageInputDraft } from './input-draft'
+import { buildMessageInputDraft, canRestoreInputDraftSnapshot } from './input-draft'
 
 const props = defineProps<MessageInputProps>()
 
@@ -33,7 +39,7 @@ export interface MessageInputProps {
 }
 
 export interface MessageInputEmits {
-  (e: 'send-success'): void
+  (e: 'send-success', conversationId?: string): void
   /** 输入框聚焦时触发（H5 键盘弹起后需滚动消息列表） */
   (e: 'focus'): void
   /** 点击工具栏翻译按钮（业务链路交由宿主接入） */
@@ -42,7 +48,8 @@ export interface MessageInputEmits {
   (e: 'contact-card-click'): void
 }
 
-const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
+const { sendTextMessage, sendImageMessage, sendFileMessage, sendAudioMessage, sendVideoMessage, sendCmdMessage, sendMultiBodyMessage, currentConversation, editingMessage, exitEditMode, modifyTextMessage } = useChat()
+const { loadInputDraft: loadConversationInputDraft } = useConversation()
 const { features, capabilities } = useUIKit()
 const { quotedMessage, clearQuote, buildQuoteExt } = useQuote()
 const { isMobile } = useViewport()
@@ -164,11 +171,56 @@ const richInputRef = ref<InstanceType<typeof RichInput>>()
 const groupReadReceiptConfig = computed(() =>
   capabilities.groupReadReceipt === false ? undefined : props.config?.groupReadReceipt)
 
+/** 复合消息功能仅在 PC 由业务开关与 adapter 客观能力共同决定 */
+const multiBodyEnabled = computed(() =>
+  !isMobile.value && inputConfig.value?.features?.multiBody === true && capabilities.multiBodyMessage !== false)
+
+watch([inputMode, multiBodyEnabled], ([mode, enabled], [previousMode, previousEnabled]) => {
+  if (mode === previousMode && enabled === previousEnabled)
+    return
+  const conversationId = currentConversation.value?.id
+  if (!conversationId)
+    return
+  const draft = loadConversationInputDraft(conversationId)
+  nextTick(() => {
+    if (currentConversation.value?.id === conversationId)
+      restoreDraftSnapshot(draft)
+  })
+})
+
+interface SendContext {
+  conversationId: string
+  quote: typeof quotedMessage.value
+  notifySuccess: boolean
+}
+
+function createSendContext(notifySuccess: boolean): SendContext {
+  return {
+    conversationId: currentConversation.value?.id || '',
+    quote: quotedMessage.value,
+    notifySuccess,
+  }
+}
+
+function isCurrentConversation(conversationId: string): boolean {
+  return canUseConversationForSend(conversationId, currentConversation.value?.id)
+}
+
 /** 构造包含引用 ext 的合并对象；无引用时返回 undefined */
-function buildExtWithQuote(): Record<string, any> | undefined {
-  if (!quotedMessage.value)
+function buildExtWithQuote(message = quotedMessage.value): Record<string, any> | undefined {
+  if (!message)
     return undefined
-  return { ...buildQuoteExt(quotedMessage.value) }
+  return { ...buildQuoteExt(message) }
+}
+
+function clearQuoteForSend(context: SendContext) {
+  if (quotedMessage.value === context.quote)
+    clearQuote()
+}
+
+function notifySendSuccess(context: SendContext) {
+  if (context.notifySuccess)
+    emit('send-success', context.conversationId)
 }
 
 /** 取消编辑：退出编辑态并清空输入 */
@@ -178,121 +230,197 @@ function handleCancelEdit() {
 }
 
 /** 发送文本消息（或提交编辑） */
-async function handleSendText(text: string, mentionList?: MentionContact[]) {
-  // 编辑模式：改为调用 modifyMessage
+async function handleSendText(text: string, mentionList?: MentionContact[], context = createSendContext(true)): Promise<boolean> {
   if (editingMessage.value) {
     const target = editingMessage.value
-    modifyTextMessage(target, text)
-      .then(() => {
-        setText('')
-        emit('send-success')
-      })
-      .catch((e: any) => {
-        const code = e?.type ?? e?.code
-        const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
-          ? t('message.edit.limitReached')
-          : t('message.edit.failed')
-        showToast(msg, 'error')
-      })
-    return
+    try {
+      await modifyTextMessage(target, text)
+      setText('')
+      emit('send-success', currentConversation.value?.id)
+      return true
+    }
+    catch (e: any) {
+      const code = e?.type ?? e?.code
+      const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
+        ? t('message.edit.limitReached')
+        : t('message.edit.failed')
+      showToast(msg, 'error')
+      return false
+    }
   }
-  let ext = buildExtWithQuote()
-  // 如果有 mention，写入 ext.em_at_list
+  let ext = buildExtWithQuote(context.quote)
   if (mentionList && mentionList.length > 0) {
     ext = ext || {}
     ext.em_at_list = mentionList.map(m => m.userId)
   }
-  // beforeSend 拦截
   const canSend = await runBeforeSend({ type: MESSAGE_TYPE.TEXT, body: { content: text } })
-  if (!canSend)
-    return
-  sendTextMessage(text, ext)
-    .then((msg) => {
-      emit('send-success')
-      runAfterSend(msg)
-    })
-    .catch((e: any) => {
-      logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
-      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
-    })
-  clearQuote()
+  if (!canSend || !isCurrentConversation(context.conversationId))
+    return false
+  try {
+    const msg = await sendTextMessage(text, ext)
+    notifySendSuccess(context)
+    runAfterSend(msg)
+    clearQuoteForSend(context)
+    return true
+  }
+  catch (e: any) {
+    logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
+    showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
+    return false
+  }
 }
 
-/** 发送富文本消息（或提交编辑） */
-async function handleSendRich(_html: string, text: string, mentionList?: MentionContact[]) {
-  if (editingMessage.value) {
-    const target = editingMessage.value
-    modifyTextMessage(target, text)
-      .then(() => {
-        setText('')
-        emit('send-success')
-      })
-      .catch((e: any) => {
-        const code = e?.type ?? e?.code
-        const msg = code === 'modifiedCountExceedLimit' || /limit|count|5/i.test(String(e?.message || ''))
-          ? t('message.edit.limitReached')
-          : t('message.edit.failed')
-        showToast(msg, 'error')
-      })
-    return
-  }
-  let ext = buildExtWithQuote()
-  // 如果有 mention，写入 ext.em_at_list
+/** rich/simple/H5 共用的复合消息发送漏斗 */
+async function sendComposedMultiBody(
+  bodies: readonly MultiBodySegmentInput[],
+  mentionList?: MentionContact[],
+  context = createSendContext(true),
+): Promise<boolean> {
+  let ext = buildExtWithQuote(context.quote)
   if (mentionList && mentionList.length > 0) {
     ext = ext || {}
     ext.em_at_list = mentionList.map(m => m.userId)
   }
-  // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: MESSAGE_TYPE.TEXT, body: { content: text } })
-  if (!canSend)
-    return
-  sendTextMessage(text, ext)
-    .then((msg) => {
-      emit('send-success')
-      runAfterSend(msg)
-    })
-    .catch((e: any) => {
-      logger.error('[MessageInput] sendTextMessage failed:', formatSdkError(e))
-      showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
-    })
-  clearQuote()
+  const canSend = await runBeforeSend({ type: MESSAGE_TYPE.MULTI_BODY, body: toMultiBodyPreview(bodies) })
+  if (!canSend || !isCurrentConversation(context.conversationId))
+    return false
+  try {
+    const msg = await sendMultiBodyMessage(bodies, ext, groupReadReceiptConfig.value)
+    notifySendSuccess(context)
+    runAfterSend(msg)
+    clearQuoteForSend(context)
+    return true
+  }
+  catch (e: any) {
+    logger.error('[MessageInput] sendMultiBodyMessage failed:', formatSdkError(e))
+    showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
+    return false
+  }
+}
+
+const sendingInput = ref<'simple' | 'rich' | null>(null)
+
+function releaseSendPreviewUrls(source: 'simple' | 'rich', urls: readonly string[]) {
+  const input = source === 'simple' ? simpleInputRef.value : richInputRef.value
+  for (const url of urls) {
+    if (!input?.hasPreviewUrl(url) && !isDraftPreviewUrlRetained(url))
+      URL.revokeObjectURL(url)
+  }
+}
+
+async function handleSendContent(
+  source: 'simple' | 'rich',
+  text: string,
+  mentionList?: MentionContact[],
+  bodies?: readonly MultiBodySegmentInput[],
+): Promise<boolean> {
+  if (editingMessage.value)
+    return handleSendText(text, mentionList)
+  if (sendingInput.value)
+    return false
+  const conversationId = currentConversation.value?.id
+  if (!conversationId)
+    return false
+  const input = source === 'simple' ? simpleInputRef.value : richInputRef.value
+  const draftVersion = input?.getDraftVersion() ?? 0
+  const previewUrls = input?.getDraftPreviewUrls() ?? []
+  const context = createSendContext(false)
+  sendingInput.value = source
+  try {
+    return await settleInputDraftSend(async () => {
+      if (!multiBodyEnabled.value || !bodies)
+        return handleSendText(text, mentionList, context)
+      const plan = resolveMultiBodySendPlan(bodies)
+      switch (plan.kind) {
+        case 'empty':
+          return false
+        case 'tooMany':
+          showToast(t('message.multiBody.tooMany', '最多支持 20 段内容'), 'warning')
+          return false
+        case 'multiBody':
+          return sendComposedMultiBody(plan.bodies, mentionList, context)
+        case 'text':
+          return handleSendText(plan.body.content, mentionList, context)
+        case 'image': {
+          const data = plan.body.data || plan.body.originalUrl
+          return data ? handleSendFile(MESSAGE_TYPE.IMAGE, data, mentionList, undefined, context) : false
+        }
+        case 'video':
+          return plan.body.data
+            ? handleSendFile(MESSAGE_TYPE.VIDEO, plan.body.data, mentionList, plan.body.duration, context)
+            : false
+        case 'file':
+          return plan.body.data ? handleSendFile(MESSAGE_TYPE.FILE, plan.body.data, mentionList, undefined, context) : false
+      }
+    }, () => {
+      input?.clearDraft()
+      emit('send-success', conversationId)
+    }, () => isCurrentConversation(conversationId) && input?.getDraftVersion() === draftVersion)
+  }
+  finally {
+    releaseSendPreviewUrls(source, previewUrls)
+    sendingInput.value = null
+  }
+}
+
+function handleSendSimple(text: string, mentionList?: MentionContact[], bodies?: readonly MultiBodySegmentInput[]) {
+  return handleSendContent('simple', text, mentionList, bodies)
+}
+
+function handleSendRich(_html: string, text: string, mentionList?: MentionContact[], bodies?: readonly MultiBodySegmentInput[]) {
+  return handleSendContent('rich', text, mentionList, bodies)
 }
 
 /** 待回收的 Blob URL 列表 */
 const pendingBlobUrls = new Set<string>()
 
 /** 发送文件消息 */
-async function handleSendFile(type: 'image' | 'file' | 'video', files: FileList | File[]) {
-  const file = Array.from(files)[0]
-  if (!file)
-    return
+async function handleSendFile(
+  type: 'image' | 'file' | 'video',
+  files: FileList | File[] | File | string,
+  mentionList?: MentionContact[],
+  videoDuration?: number,
+  context = createSendContext(true),
+): Promise<boolean> {
+  const file = typeof files === 'string'
+    ? files
+    : files instanceof File
+      ? files
+      : Array.from(files)[0]
+  if (!file || (type !== MESSAGE_TYPE.IMAGE && typeof file === 'string'))
+    return false
 
-  const ext = buildExtWithQuote()
+  let ext = buildExtWithQuote(context.quote)
+  if (mentionList && mentionList.length > 0) {
+    ext = ext || {}
+    ext.em_at_list = mentionList.map(m => m.userId)
+  }
+  const canSend = await runBeforeSend({ type })
+  if (!canSend || !isCurrentConversation(context.conversationId))
+    return false
 
-  // beforeSend 拦截
-  const canSend = await runBeforeSend({ type: type === MESSAGE_TYPE.IMAGE ? MESSAGE_TYPE.IMAGE : type })
-  if (!canSend)
-    return
-
-  let promise: Promise<any> | undefined
-  if (type === MESSAGE_TYPE.IMAGE) {
-    promise = sendImageMessage(file, groupReadReceiptConfig.value, ext)
-  }
-  else if (type === MESSAGE_TYPE.VIDEO) {
-    const duration = await getVideoDuration(file)
-    promise = sendVideoMessage(file, duration, groupReadReceiptConfig.value, ext)
-  }
-  else {
-    promise = sendFileMessage(file, groupReadReceiptConfig.value, ext)
-  }
-  promise?.then((msg) => {
-    emit('send-success')
+  try {
+    let msg: any
+    if (type === MESSAGE_TYPE.IMAGE) {
+      msg = await sendImageMessage(file, groupReadReceiptConfig.value, ext)
+    }
+    else if (type === MESSAGE_TYPE.VIDEO) {
+      const duration = videoDuration ?? await getVideoDuration(file as File)
+      msg = await sendVideoMessage(file as File, duration, groupReadReceiptConfig.value, ext)
+    }
+    else {
+      msg = await sendFileMessage(file as File, groupReadReceiptConfig.value, ext)
+    }
+    notifySendSuccess(context)
     runAfterSend(msg)
-  }).catch((e: any) => {
+    clearQuoteForSend(context)
+    return true
+  }
+  catch (e: any) {
     logger.error('[MessageInput] sendFile failed:', formatSdkError(e))
     showToast(resolveSdkErrorMessage(e, 'message.send.failed', t), 'error')
-  })
-  clearQuote()
+    return false
+  }
 }
 
 // ===== 粘贴图片预览弹窗（simple 模式） =====
@@ -449,14 +577,14 @@ async function resolveStickerFile(sticker: EmojiStickerItem): Promise<File | str
   }
 }
 
-/** 选择表情包（sticker）：以图片消息发送（本地资源先转 File），ext 打 isSticker 标记供收发双端按表情渲染（不启用图片预览） */
-async function onStickerSelect(sticker: EmojiStickerItem) {
+/** 选择表情包（sticker）：以图片消息发送，通用表情标记之外的业务 ext 由接入方扩展 */
+async function onStickerSelect(sticker: EmojiStickerItem, packId: string) {
   showEmojiPicker.value = false
   const canSend = await runBeforeSend({ type: MESSAGE_TYPE.IMAGE })
   if (!canSend)
     return
   const file = await resolveStickerFile(sticker)
-  sendImageMessage(file, groupReadReceiptConfig.value, { [MESSAGE_EXT_KEY.IS_STICKER]: true })
+  sendImageMessage(file, groupReadReceiptConfig.value, buildStickerExt(sticker, packId, inputConfig.value?.stickerExt))
     .then((msg) => {
       emit('send-success')
       runAfterSend(msg)
@@ -805,6 +933,52 @@ function getText(): string {
   }
 }
 
+function getDraftSnapshot(): MessageInputDraft | null {
+  const text = getText()
+  if (isMobile.value || !multiBodyEnabled.value)
+    return text.trim() ? { text, preview: text } : null
+  const snapshot = inputMode.value === 'simple'
+    ? simpleInputRef.value?.getDraftSnapshot()
+    : richInputRef.value?.getDraftSnapshot()
+  if (!snapshot)
+    return null
+  let bodies: readonly MultiBodySegmentInput[]
+  try {
+    bodies = inputMode.value === 'simple'
+      ? simpleInputRef.value?.getMultiBodyInputs() || []
+      : richInputRef.value?.getMultiBodyInputs() || []
+  }
+  catch {
+    return { text, preview: text, snapshot }
+  }
+  return buildMessageInputDraft(text, snapshot, bodies, t) || { text, preview: text, snapshot }
+}
+
+function restoreDraftSnapshot(draft: MessageInputDraft | null): void {
+  if (isMobile.value) {
+    h5InputRef.value?.setText(draft?.text || '')
+    return
+  }
+  const snapshot = draft?.snapshot
+  if (inputMode.value === 'simple') {
+    if (multiBodyEnabled.value && canRestoreInputDraftSnapshot(snapshot, 'simple')) {
+      simpleInputRef.value?.restoreDraftSnapshot(snapshot)
+    }
+    else {
+      simpleInputRef.value?.restoreDraftSnapshot(null)
+      simpleInputRef.value?.setText(draft?.text || '')
+    }
+    return
+  }
+  if (multiBodyEnabled.value && canRestoreInputDraftSnapshot(snapshot, 'rich')) {
+    richInputRef.value?.restoreDraftSnapshot(snapshot)
+  }
+  else {
+    richInputRef.value?.restoreDraftSnapshot(null)
+    richInputRef.value?.setText(draft?.text || '')
+  }
+}
+
 /** 聚焦输入框 */
 function focus() {
   if (isMobile.value) {
@@ -857,6 +1031,8 @@ provideMessageInputPluginContext({
 defineExpose({
   setText,
   getText,
+  getDraftSnapshot,
+  restoreDraftSnapshot,
   blur,
   appendMention,
 })
@@ -929,7 +1105,9 @@ defineExpose({
       :config="inputConfig"
       :enable-mention="enableMention"
       :mention-open="showMentionPicker"
-      @send="handleSendText"
+      :enable-multi-body="multiBodyEnabled"
+      :sending="sendingInput === 'simple'"
+      @send="handleSendSimple"
       @send-file="handleSendFile"
       @image-paste="onImagePaste"
       @emoji-click="onEmojiClick"
@@ -961,6 +1139,8 @@ defineExpose({
       :config="inputConfig"
       :enable-mention="enableMention"
       :mention-open="showMentionPicker"
+      :enable-multi-body="multiBodyEnabled"
+      :sending="sendingInput === 'rich'"
       @send="handleSendRich"
       @send-file="handleSendFile"
       @emoji-click="onEmojiClick"

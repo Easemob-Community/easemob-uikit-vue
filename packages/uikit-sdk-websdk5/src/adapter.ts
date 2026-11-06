@@ -11,6 +11,7 @@ import type {
   ContactRepository,
   ConversationRepository,
   GroupRepository,
+  LastMessageTextResolver,
   MessageRepository,
   PresenceRepository,
   SdkAdapter,
@@ -88,6 +89,7 @@ export type Websdk5ManagerPreset = 'im' | 'chatroom'
 export class Websdk5Adapter implements SdkAdapter {
   readonly capabilities: SdkCapabilities = {
     combineMessage: true,
+    multiBodyMessage: true,
     pinnedMessage: true,
     streamingMessage: true,
     groupReadReceipt: true,
@@ -118,6 +120,8 @@ export class Websdk5Adapter implements SdkAdapter {
   private _registerImEvents = true
   /** 旁路持久化钩子（init 记账，事件处理器登出重建时仍需透传） */
   private _persistence?: SdkPersistenceHooks
+  /** 业务消息摘要解析器（init 记账，本地会话与事件重建共用） */
+  private _lastMessageTextResolver?: LastMessageTextResolver
   /** 登录超时（毫秒，init 记账；SDK 5.1.2+ login 参数，缺省走 SDK 默认 30s） */
   private _loginTimeoutMs?: number
 
@@ -190,6 +194,8 @@ export class Websdk5Adapter implements SdkAdapter {
        * 下沉到这里；直连 adapter 时也可走 SdkConfig 顶层字段，两处都读。
        */
       persistence?: SdkPersistenceHooks
+      /** 业务消息摘要解析器，完整消息与 SessionMessageSnippet 共用 */
+      lastMessageTextResolver?: LastMessageTextResolver
     }
     // clientCfg 仅保留 SDK 初始化字段，剥离 features/stores/eventDeps 等 adapter 装配字段
     const {
@@ -202,6 +208,7 @@ export class Websdk5Adapter implements SdkAdapter {
       managerPreset,
       repositories: adapterRepositories,
       persistence: adapterPersistence,
+      lastMessageTextResolver,
       ...clientCfg
     } = adapterCfg
     // 数据入口接管：SdkConfig 顶层字段优先（直连 adapter 场景），core 归一化下沉的 adapterConfig 次之
@@ -209,6 +216,7 @@ export class Websdk5Adapter implements SdkAdapter {
     // 旁路持久化：同 repositories 读取方式（SdkConfig 顶层优先，adapterConfig 下沉次之）
     const persistence = config.persistence ?? adapterPersistence
     this._persistence = persistence
+    this._lastMessageTextResolver = lastMessageTextResolver
     this._loginTimeoutMs = config.loginTimeoutMs
 
     // 应用身份：appKey / appId 二选一（SDK 5.1+ 支持 appId 初始化）；
@@ -279,6 +287,7 @@ export class Websdk5Adapter implements SdkAdapter {
             return contact.remark || contact.name
           return stores.userInfo.getUserInfo(userId)?.nickname
         },
+        lastMessageTextResolver: this._lastMessageTextResolver,
         conversationRepository: repositories?.conversation,
         persistence: persistence?.conversation,
       }),
@@ -407,6 +416,7 @@ export class Websdk5Adapter implements SdkAdapter {
       },
       this._features,
       this._persistence,
+      this._lastMessageTextResolver,
     )
     this._eventsRegistered = true
     adapterLog.debug('[Websdk5Adapter] SDK 事件处理器已注册')

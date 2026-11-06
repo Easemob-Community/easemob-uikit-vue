@@ -368,6 +368,44 @@ describe('chat-events 旁路持久化（persistence）', () => {
   })
 })
 
+describe('业务摘要 resolver 事件接线', () => {
+  const resolver = (message: UiMessage) =>
+    message.ext?.stickerCode === 'huanxin.biubiu' ? '[Ta-da!]' : undefined
+  const makeStickerCvs = () => makeRawCvs('u1', {
+    lastMessage: {
+      msgServerId: 'srv-sticker',
+      msgLocalId: 'local-sticker',
+      from: PEER,
+      to: SELF,
+      conversationId: 'u1',
+      conversationType: CONVERSATION_TYPE.SINGLECHAT,
+      type: MESSAGE_TYPE.IMAGE,
+      sendStatus: MESSAGE_STATUS.SENT,
+      ext: { isSticker: true, stickerCode: 'huanxin.biubiu' },
+      timestamp: 1700000000000,
+      body: { isGif: true },
+    },
+  })
+
+  it('onSyncDataFinished 使用业务 resolver 回填会话摘要', () => {
+    const { stores, conversationList } = makeStores()
+    const handlers = createChatHandlers(makeClient([makeStickerCvs()]), stores, undefined, undefined, resolver)
+
+    handlers.onSyncDataFinished?.({ dataType: 'conversation', status: 'success' } as unknown as HandlerArg<'onSyncDataFinished'>)
+
+    expect(conversationList[0]?.lastMessageText).toBe('[Ta-da!]')
+  })
+
+  it('onConversationListUpdate 使用同一业务 resolver 回填会话摘要', () => {
+    const { stores, conversationList } = makeStores()
+    const handlers = createChatHandlers(makeClient(), stores, undefined, undefined, resolver)
+
+    handlers.onConversationListUpdate?.(makeListUpdatePayload([makeStickerCvs()], { reset: true }))
+
+    expect(conversationList[0]?.lastMessageText).toBe('[Ta-da!]')
+  })
+})
+
 describe('会话并集合并（mergeWithExistingConversations）', () => {
   it('本地独有（DB 预填）会话保留，排在 SDK 快照会话之后（按 lastMessageTime 倒序）', async () => {
     const { stores, conversationList } = makeStores([

@@ -3,14 +3,9 @@ import { computed } from 'vue'
 import type { Component } from 'vue'
 import type { LocationMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
-import TextMessage from './text-message.vue'
-import ImageMessage from './image-message.vue'
-import VoiceMessage from './voice-message.vue'
-import VideoMessage from './video-message.vue'
-import FileMessage from './file-message.vue'
 import CombineMessage from './combine-message.vue'
-import CustomMessage from './custom-message.vue'
-import LocationMessage from './location-message.vue'
+import MultiBodyMessage from './multi-body-message.vue'
+import { segmentMessageComponentMap } from './segment-component-map'
 
 export interface MessageRendererProps {
   message: UiMessage
@@ -27,16 +22,11 @@ export interface MessageRendererEmits {
 const props = defineProps<MessageRendererProps>()
 const emit = defineEmits<MessageRendererEmits>()
 
-/** 消息类型到组件的映射 */
+/** 消息类型到组件的映射；七种普通内容与复合分段共用同一张基础 map */
 const messageComponentMap: Record<string, Component> = {
-  [MESSAGE_TYPE.TEXT]: TextMessage,
-  [MESSAGE_TYPE.IMAGE]: ImageMessage,
-  [MESSAGE_TYPE.VOICE]: VoiceMessage,
-  [MESSAGE_TYPE.VIDEO]: VideoMessage,
-  [MESSAGE_TYPE.FILE]: FileMessage,
+  ...segmentMessageComponentMap,
   [MESSAGE_TYPE.COMBINE]: CombineMessage,
-  [MESSAGE_TYPE.CUSTOM]: CustomMessage,
-  [MESSAGE_TYPE.LOCATION]: LocationMessage,
+  [MESSAGE_TYPE.MULTI_BODY]: MultiBodyMessage,
 }
 
 /** 当前消息对应的渲染组件 */
@@ -133,6 +123,7 @@ const noticeSegments = computed(() => {
       @view="emit('view-combine', $event)"
       @mention-click="emit('mention-click', $event)"
       @location-click="emit('location-click', $event, message)"
+      @custom-message-action="(action: string, payload: any) => emit('custom-message-action', action, payload, message)"
     />
 
     <!-- 未识别的消息类型 -->

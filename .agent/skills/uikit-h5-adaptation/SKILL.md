@@ -121,7 +121,13 @@ H5 上动画应更克制，且必须接入全局动画开关：
 - 从底部弹起的 sheet（如 emoji picker）优先用 `uikit-slide-up` Vue Transition，
   而不是自己写 `@keyframes` 或硬编码 transform/opacity。
 
-## 7. 预留接口（P2 不做，但已留口）
+## 7. H5 复合消息渲染
+
+H5 不提供复合消息编辑/发送入口；即使 `input.features.multiBody: true` 且 adapter 支持，也只有 PC 启用草稿器。
+接收到的 `multi_body` 保留完整分段渲染与逐段下载。复合容器内的图片/视频必须受可用宽度约束并按原始宽高比缩放，
+消息内容列与媒体之间的 flex 项需要 `min-width: 0`，不能用 `overflow: hidden` 掩盖出界；内部媒体圆角为外层气泡的一半。
+
+## 8. 预留接口（P2 不做，但已留口）
 
 以下能力在 `H5AdaptationConfig` / `theme/index.css` 里已留好字段/变量，
 当前仅作占位，方便后续直接实现：

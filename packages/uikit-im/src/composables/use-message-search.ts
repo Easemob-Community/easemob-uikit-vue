@@ -3,6 +3,7 @@ import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import type { UiMessage } from '@easemob-community/uikit-core'
 import { useUIKit } from './use-uikit'
 import { createLogger } from '@easemob-community/uikit-core'
+import { chineseMessagePreviewLabels, resolveMultiBodyPreview } from '../utils/resolve-last-message-text'
 
 const logger = createLogger('UIKit:UseMessageSearch')
 
@@ -58,6 +59,12 @@ const SEARCH_WIRE_TYPE_MAP: Record<Exclude<MessageSearchTypeFilter, ''>, 'txt' |
 /** 判断消息内容是否命中关键词 */
 function matchMessageContent(msg: UiMessage, keyword: string): boolean {
   const k = keyword.toLowerCase()
+  if (msg.type === MESSAGE_TYPE.MULTI_BODY && Array.isArray(msg.body)) {
+    return msg.body.some((segment) => {
+      const { type, ...body } = segment
+      return matchMessageContent({ ...msg, type, body } as UiMessage, keyword)
+    })
+  }
   if (msg.type === MESSAGE_TYPE.TEXT) {
     const content = (msg.body as { content?: string }).content || ''
     return content.toLowerCase().includes(k)
@@ -85,6 +92,8 @@ function matchMessageContent(msg: UiMessage, keyword: string): boolean {
 
 /** 从 UiMessage 提取摘要 */
 function getMessageSummary(msg: UiMessage): string {
+  if (msg.type === MESSAGE_TYPE.MULTI_BODY)
+    return resolveMultiBodyPreview(msg, chineseMessagePreviewLabels)
   if (msg.type === MESSAGE_TYPE.TEXT)
     return (msg.body as { content?: string }).content || ''
   if (msg.type === MESSAGE_TYPE.IMAGE)

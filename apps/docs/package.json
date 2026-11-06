@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "split-changelog": "node scripts/split-changelog.mjs",
-    "gen:api": "node scripts/gen-api-docs.mjs"
+    "gen:api": "node scripts/gen-api-docs.mjs",
+    "check:api-reference": "node scripts/check-api-reference.mjs && node scripts/check-api-examples.mjs"
   },
   "devDependencies": {
     "@vue/compiler-sfc": "^3.5.41",

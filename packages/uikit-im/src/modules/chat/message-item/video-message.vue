@@ -105,7 +105,7 @@ async function handleDownload(event: MouseEvent) {
   <div class="video-message" :class="{ 'video-message--self': props.message.isSelf }">
     <div
       class="video-message__container"
-      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }"
+      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px`, aspectRatio: `${displaySize.width} / ${displaySize.height}` }"
       @click="openPreview"
     >
       <video

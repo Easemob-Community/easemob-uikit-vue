@@ -15,7 +15,7 @@
 ## 目标
 
 在 `packages/uikit-im/src/modules/chat/message-item/` 里新增或修改消息渲染组件时，
-**保证与既有 13 个渲染组件的类型读取、插槽契约、状态展示逻辑一致**，避免三类翻车：
+**保证与既有 14 个渲染组件的类型读取、插槽契约、状态展示逻辑一致**，避免三类翻车：
 
 1. 渲染层直接 `(msg as any).xxx` 读 SDK 裸字段，绕过类型守卫，改 SDK 后编译不过；
 2. 新增消息类型只在 `message-renderer.vue` 加映射，漏掉插槽/事件转发链路；
@@ -27,14 +27,9 @@
 
 ```ts
 const messageComponentMap: Record<string, Component> = {
-  [MESSAGE_TYPE.TEXT]: TextMessage,
-  [MESSAGE_TYPE.IMAGE]: ImageMessage,
-  [MESSAGE_TYPE.VOICE]: VoiceMessage,
-  [MESSAGE_TYPE.VIDEO]: VideoMessage,
-  [MESSAGE_TYPE.FILE]: FileMessage,
+  ...segmentMessageComponentMap, // 七类普通内容与复合分段共用
   [MESSAGE_TYPE.COMBINE]: CombineMessage,
-  [MESSAGE_TYPE.CUSTOM]: CustomMessage,
-  [MESSAGE_TYPE.LOCATION]: LocationMessage,
+  [MESSAGE_TYPE.MULTI_BODY]: MultiBodyMessage,
 }
 ```
 
@@ -56,11 +51,12 @@ const messageComponentMap: Record<string, Component> = {
 
 ## 2. body 类型守卫：渲染前必须窄化，禁止 `as any` 裸读
 
-`src/sdk/types/message.ts` 提供 9 个 SDK body 类型守卫，**渲染组件一律先用守卫窄化再读字段**：
+`@easemob-community/uikit-sdk-contract` 提供 11 个 SDK body 类型守卫，**渲染组件一律先用守卫窄化再读字段**：
 
 ```ts
 isTextBody / isImageBody / isFileBody / isVoiceBody / isVideoBody / isLocationBody
-isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMessageBody
+isCustomBody / isCombineBody / isCmdBody
+isMultiBodySegment(segment: unknown) / isMultiBody(body: unknown) // 复合分段与数组 body
 ```
 
 守卫判据（修改 SDK 时注意这些"指纹"字段）：
@@ -74,12 +70,14 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
 - `isCustomBody` — `'event' in body`
 - `isCombineBody` — `'title' in body && 'summary' in body`
 - `isCmdBody` — `'action' in body`
+- `isMultiBodySegment` — 先按 `segment.type` 分派，再复用普通 body 守卫；图片段 `isGif/isOriginalImage` 必填
+- `isMultiBody` — 数组且至少 2 个合法分段；接收侧不施加 20 段上限
 
 **硬规则**：
 
 - 渲染组件内访问 `msg.body.xxx` 前必须经过对应守卫窄化（或组件按类型固定接收，如
   `text-message.vue` 用 `TextMessageType` 类型化 prop）。
-- `*MessageBody` 类型直接从 `easemob-websdk` 再导出（`sdk/types/message.ts`），**不本地复刻**，避免双源漂移。
+- `*MessageBody` 类型从 `@easemob-community/uikit-sdk-contract` 再导出，**不本地复刻**，避免双源漂移。
 - 消息状态类型：SDK `Message.status` 在 0.20.0 起改名 `sendStatus`（仅 sending/sent/failed）；
   UIKit 展示层 `status` 额外含 `delivered/read`（由回执事件驱动），类型即 `MessageStatusValue`。
 
@@ -147,6 +145,17 @@ isCustomBody / isCombineBody / isCmdBody // (body: MessageBody) => body is XxxMe
   `useUserInfo(() => props.message.from)`（列表场景规范，见 `uikit-user-attribute-extraction`）。
 - 合并消息 body 的 `messageList` 大数组在 adapter 层已 `markRaw`（见 `uikit-store-composable` 第 7 节），
   渲染层不要试图让其响应式。
+
+### 4.5 复合消息（multi-body-message.vue）
+
+- `multi_body` 的 body 是有序分段数组，支持 text/image/file/voice/video/location/custom；与 combine 不混用。
+- `segment-component-map.ts` 是七类内容组件的唯一 map；主 renderer 与复合容器复用，禁止另写分段 switch。
+- `toSegmentUiMessage` 只创建渲染视图模型，分段 ID 为 `${parentId}:${index}`，展示状态置 sent，避免重复 spinner；
+  不复制 SDK 发送对象。location/custom 等事件的 message 参数必须还原为父消息。
+- 复合容器只覆盖内嵌气泡样式；父消息头像/状态/引用/撤回/置顶仍归 `message-bubble-wrapper`。
+  文本链接/@、图片三级预览、语音互斥、视频/文件/位置交互复用原组件，不可编辑或翻译。
+- 会话摘要、引用、置顶和搜索统一使用 `resolveMultiBodyPreview`；本地搜索逐段复用普通类型规则。
+- `toUiMessage` 与 persistence 必须保留数组及顺序；blob URL/File 不落库，接收超过 20 段不截断。
 
 ## 5. 消息列表（message-list.vue）的配置契约
 

@@ -25,6 +25,7 @@ export const MESSAGE_TYPE = {
   CUSTOM: 'custom',
   LOCATION: 'location',
   COMBINE: 'combine',
+  MULTI_BODY: 'multi_body',
   NOTICE: 'notice', // UIKit 本地通知消息（不走 SDK 消息流）
 } as const
 

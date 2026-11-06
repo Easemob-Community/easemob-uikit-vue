@@ -1,4 +1,4 @@
-import type { CustomMessageBody, TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import type { CustomMessageBody, MultiBodySegmentInput, SdkMessage, TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
 import { CONVERSATION_TYPE, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import type { ConversationTypeValue } from '@easemob-community/uikit-core'
 import { createLogger } from '@easemob-community/uikit-core'
@@ -32,7 +32,7 @@ function shouldEnableGroupAck(
 }
 
 export function useMessageSend() {
-  const { domains, stores } = useUIKit()
+  const { domains, stores, capabilities } = useUIKit()
   const conversationStore = stores.conversation
   const messageStore = stores.message
 
@@ -159,19 +159,39 @@ export function useMessageSend() {
     await domains.message.sendCmd(cvs.id, cvs.type, action, ext)
   }
 
+  /** 发送一条有序复合消息 */
+  async function sendMultiBodyMessage(
+    bodies: readonly MultiBodySegmentInput[],
+    ext?: Record<string, unknown>,
+    options?: SendMessageOptions,
+  ): Promise<SdkMessage | undefined> {
+    const cvs = currentCvs()
+    if (!cvs)
+      return
+    if (capabilities.multiBodyMessage === false)
+      throw new Error('MULTI_BODY_UNSUPPORTED')
+    const enableGroupAck = shouldEnableGroupAck(
+      cvs.type,
+      cvs.id,
+      options?.groupReadReceiptEnabled,
+      options?.maxGroupSize,
+      stores,
+    )
+    return domains.message.sendMultiBody(cvs.id, cvs.type, bodies, ext, enableGroupAck)
+  }
+
   /** 重发失败的消息 */
   async function resendMessage(message: UiMessage) {
     const cvs = currentCvs()
     if (!cvs)
       return
 
-    // 媒体/未知类型不进入删旧逻辑（下方 switch 单独处理）
     const resendId = message.msgServerId || message.msgLocalId
-    const isTextLike = message.type === MESSAGE_TYPE.TEXT || message.type === MESSAGE_TYPE.CUSTOM
-    // 先发后删的补偿式实现：_send 被调用时同步插入新 sending 气泡，
-    // 若先删旧消息再发，发送前同步抛错会导致该条消息静默丢失；
-    // 故先删旧消息（避免双气泡），失败时回补旧消息并上抛。
-    if (isTextLike)
+    const shouldRestoreOnFailure = message.type === MESSAGE_TYPE.TEXT
+      || message.type === MESSAGE_TYPE.CUSTOM
+      || message.type === MESSAGE_TYPE.MULTI_BODY
+    // 先删旧消息避免双气泡；发送失败时回补，不让用户丢失原失败消息。
+    if (shouldRestoreOnFailure)
       messageStore.deleteMessage(resendId)
 
     try {
@@ -186,12 +206,13 @@ export function useMessageSend() {
             (message.body as CustomMessageBody).params,
             message.ext,
           )
+        case MESSAGE_TYPE.MULTI_BODY:
+          return await domains.message.resendMultiBody(message as SdkMessage)
         case MESSAGE_TYPE.IMAGE:
         case MESSAGE_TYPE.VOICE:
         case MESSAGE_TYPE.VIDEO:
         case MESSAGE_TYPE.FILE:
           // 媒体消息重发需要原始 File，当前无法重发：保留本地失败消息，不得删除
-          // 抛标识错误由调用方（message-list onResend）转为 toast，避免静默无反馈
           logger.warn('[useMessageSend] resendMessage: media resend requires original File')
           throw new Error('MEDIA_RESEND_UNSUPPORTED')
         default:
@@ -199,8 +220,7 @@ export function useMessageSend() {
       }
     }
     catch (error) {
-      // 发送未成功：回补旧失败消息，避免从列表静默消失
-      if (isTextLike)
+      if (shouldRestoreOnFailure)
         messageStore.addMessage(message)
       throw error
     }
@@ -215,6 +235,7 @@ export function useMessageSend() {
     sendLocationMessage,
     sendCustomMessage,
     sendCmdMessage,
+    sendMultiBodyMessage,
     resendMessage,
   }
 }

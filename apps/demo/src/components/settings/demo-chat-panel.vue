@@ -8,9 +8,34 @@
  * 说明：所有状态来自 useDemoSettings 单例，改动由 demo-page 的 chatConfig 汇总后
  * 实时作用于 EmChatContainer，无需在本面板内再维护副本。
  */
+import { ref } from 'vue'
+import { useChat } from '@easemob-community/uikit-im'
 import { useDemoSettings } from '../../composables/use-demo-settings'
 import DemoSettingLabel from './demo-setting-label.vue'
 import './demo-settings-common.css'
+
+const { sendMultiBodyMessage } = useChat()
+const sendingMultiBody = ref(false)
+
+async function sendAllSegmentTypes() {
+  if (sendingMultiBody.value)
+    return
+  sendingMultiBody.value = true
+  try {
+    await sendMultiBodyMessage([
+      { type: 'text', content: '七类分段演示' },
+      { type: 'image', originalUrl: 'https://picsum.photos/480/320', filename: 'demo.jpg', isGif: false, isOriginalImage: false },
+      { type: 'file', originalUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', filename: 'dummy.pdf' },
+      { type: 'voice', originalUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', filename: 'demo.mp3', duration: 6 },
+      { type: 'video', originalUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', filename: 'demo.mp4', duration: 10, width: 640, height: 360 },
+      { type: 'location', latitude: 31.2304, longitude: 121.4737, address: '上海' },
+      { type: 'custom', event: 'userCard', params: { userId: 'demo-user' } },
+    ])
+  }
+  finally {
+    sendingMultiBody.value = false
+  }
+}
 
 const {
   chatVariant,
@@ -164,6 +189,10 @@ const {
         <label class="demo-check">
           <input v-model="chatInputFeatures.video" type="checkbox" />
           <span>视频</span>
+        </label>
+        <label class="demo-check">
+          <input v-model="chatInputFeatures.multiBody" type="checkbox" />
+          <span>复合消息（图文混排）</span>
         </label>
         <label class="demo-check">
           <input v-model="chatInputFeatures.mention" type="checkbox" />
@@ -435,6 +464,16 @@ const {
       <div class="demo-info">
         点击聊天头部头像时不再打开内置名片弹窗，改为渲染业务自定义名片卡片。
       </div>
+    </div>
+
+    <div class="demo-settings__group">
+      <DemoSettingLabel
+        title="复合消息联调"
+        tip="通过 sendMultiBodyMessage 一次发送文本、图片、文件、语音、视频、位置和 custom 七类分段"
+      />
+      <button class="demo-option" :disabled="sendingMultiBody" @click="sendAllSegmentTypes">
+        {{ sendingMultiBody ? '发送中…' : '发送七类复合消息' }}
+      </button>
     </div>
 
     <div class="demo-settings__group">

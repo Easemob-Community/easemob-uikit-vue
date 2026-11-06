@@ -1,3 +1,4 @@
+import { MESSAGE_TYPE } from '../../constants'
 import type {
   MessageBody,
   CmdMessageBody,
@@ -6,6 +7,8 @@ import type {
   FileMessageBody,
   ImageMessageBody,
   LocationMessageBody,
+  MultiBody,
+  MultiBodySegment,
   TextMessageBody,
   VideoMessageBody,
   VoiceMessageBody,
@@ -80,4 +83,35 @@ export function isCmdBody(body: MessageBody): body is CmdMessageBody {
     && !('content' in body)
     && !('localUrl' in body)
     && !('event' in body)
+}
+
+/** 复合消息分段：以 segment.type 判别，再复用普通 body 的结构守卫 */
+export function isMultiBodySegment(segment: unknown): segment is MultiBodySegment {
+  if (!segment || typeof segment !== 'object' || Array.isArray(segment) || !('type' in segment))
+    return false
+
+  const body = segment as MessageBody
+  switch (segment.type) {
+    case MESSAGE_TYPE.TEXT:
+      return isTextBody(body)
+    case MESSAGE_TYPE.IMAGE:
+      return isImageBody(body)
+    case MESSAGE_TYPE.FILE:
+      return isFileBody(body)
+    case MESSAGE_TYPE.VOICE:
+      return isVoiceBody(body)
+    case MESSAGE_TYPE.VIDEO:
+      return isVideoBody(body)
+    case MESSAGE_TYPE.LOCATION:
+      return isLocationBody(body)
+    case MESSAGE_TYPE.CUSTOM:
+      return isCustomBody(body)
+    default:
+      return false
+  }
+}
+
+/** 复合消息正文：至少两个合法分段；接收侧不施加 20 段上限 */
+export function isMultiBody(body: unknown): body is MultiBody {
+  return Array.isArray(body) && body.length >= 2 && body.every(isMultiBodySegment)
 }

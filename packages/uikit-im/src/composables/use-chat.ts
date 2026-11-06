@@ -10,6 +10,7 @@ import { useMessageSend } from './use-message-send'
 import { useMessageHistory } from './use-message-history'
 import { useMessageActions } from './use-message-actions'
 import { useUIKit } from './use-uikit'
+import { toMultiBodyInputs } from './multi-body.utils'
 
 const combineLogger = createLogger('Combine')
 
@@ -188,6 +189,8 @@ export function useChat() {
           (message.body as CustomMessageBody).params ? JSON.parse(JSON.stringify(toRaw((message.body as CustomMessageBody).params))) : undefined,
           ext,
         )
+      case MESSAGE_TYPE.MULTI_BODY:
+        return domains.message.sendMultiBody(id, type, toMultiBodyInputs(message), ext)
       case MESSAGE_TYPE.COMBINE:
         // 合并消息逐条转发：作为单个合并消息重新发送
         return forwardCombineMessages([message], target)
@@ -281,6 +284,7 @@ export function useChat() {
     sendLocationMessage: send.sendLocationMessage,
     sendCustomMessage: send.sendCustomMessage,
     sendCmdMessage: send.sendCmdMessage,
+    sendMultiBodyMessage: send.sendMultiBodyMessage,
     resendMessage: send.resendMessage,
 
     // 编辑/转发

@@ -1,11 +1,50 @@
 import { computed, ref } from 'vue'
-import type { UiConversation } from '@easemob-community/uikit-core'
+import { type UIKitStorageType, type UiConversation, createUIKitStorageKey, getStorageBackend } from '@easemob-community/uikit-core'
+import type { MessageInputDraft, MessageInputDraftSnapshot } from '../modules/chat/message-input/input-draft'
+import { cloneMessageInputDraftSnapshot, getDraftSnapshotPreviewUrls } from '../modules/chat/message-input/input-draft'
 import { useUIKit } from './use-uikit'
-import { type UIKitStorageType, createUIKitStorageKey, getStorageBackend } from '@easemob-community/uikit-core'
+
+interface DraftCacheEntry extends MessageInputDraft {
+  time: number
+}
+
+interface PersistedDraft {
+  text: string
+  time: number
+}
 
 /** 草稿存储模式 */
 let draftStorageType: UIKitStorageType | 'none' = 'none'
-const draftCache = new Map<string, { text: string, time: number }>()
+const draftCache = new Map<string, DraftCacheEntry>()
+
+function cloneSnapshot(snapshot: MessageInputDraftSnapshot | undefined): MessageInputDraftSnapshot | undefined {
+  return snapshot ? cloneMessageInputDraftSnapshot(snapshot) : undefined
+}
+
+function revokeDraftPreviewUrls(draft: MessageInputDraft | undefined): void {
+  if (!draft?.snapshot)
+    return
+  for (const url of getDraftSnapshotPreviewUrls(draft.snapshot))
+    URL.revokeObjectURL(url)
+}
+
+function revokeReplacedDraftPreviewUrls(previous: DraftCacheEntry | undefined, next: MessageInputDraft): void {
+  if (!previous?.snapshot)
+    return
+  const retained = new Set(next.snapshot ? getDraftSnapshotPreviewUrls(next.snapshot) : [])
+  for (const url of getDraftSnapshotPreviewUrls(previous.snapshot)) {
+    if (!retained.has(url))
+      URL.revokeObjectURL(url)
+  }
+}
+
+export function isDraftPreviewUrlRetained(url: string): boolean {
+  for (const draft of draftCache.values()) {
+    if (draft.snapshot && getDraftSnapshotPreviewUrls(draft.snapshot).includes(url))
+      return true
+  }
+  return false
+}
 
 /** 初始化草稿存储模式 */
 export function initDraftStorage(type: UIKitStorageType | 'none') {
@@ -14,6 +53,8 @@ export function initDraftStorage(type: UIKitStorageType | 'none') {
 
 /** 清除所有草稿 */
 export function clearAllDrafts() {
+  for (const draft of draftCache.values())
+    revokeDraftPreviewUrls(draft)
   draftCache.clear()
 }
 
@@ -37,26 +78,28 @@ export function useConversation() {
     )
   }
 
-  /** 保存草稿 */
-  function saveDraft(conversationId: string, text: string) {
+  function writeDraft(conversationId: string, draft: MessageInputDraft): void {
     if (features.enableDraft === false) {
       clearDraft(conversationId)
       return
     }
-    if (!text) {
-      clearDraft(conversationId)
-      return
-    }
     const key = getDraftKey(conversationId)
-    const draftData = { text, time: Date.now() }
+    const previous = draftCache.get(key)
+    const draftData: DraftCacheEntry = {
+      ...draft,
+      snapshot: cloneSnapshot(draft.snapshot),
+      time: Date.now(),
+    }
+    revokeReplacedDraftPreviewUrls(previous, draftData)
     draftCache.set(key, draftData)
     conversationStore.updateConversation(conversationId, {
-      draft: text,
+      draft: draft.preview,
       draftTime: draftData.time,
     })
     if (draftStorageType !== 'none') {
       try {
-        getStorageBackend(draftStorageType).setItem(key, JSON.stringify(draftData))
+        const persisted: PersistedDraft = { text: draft.text, time: draftData.time }
+        getStorageBackend(draftStorageType).setItem(key, JSON.stringify(persisted))
       }
       catch {
         // ignore
@@ -64,39 +107,60 @@ export function useConversation() {
     }
   }
 
-  /** 加载草稿 */
-  function loadDraft(conversationId: string): string {
+  /** 保存文本草稿 */
+  function saveDraft(conversationId: string, text: string) {
+    if (!text) {
+      clearDraft(conversationId)
+      return
+    }
+    writeDraft(conversationId, { text, preview: text })
+  }
+
+  /** 保存包含编辑器状态的草稿 */
+  function saveInputDraft(conversationId: string, draft: MessageInputDraft): void {
+    writeDraft(conversationId, draft)
+  }
+
+  /** 加载完整草稿 */
+  function loadInputDraft(conversationId: string): MessageInputDraft | null {
     if (features.enableDraft === false) {
       clearDraft(conversationId)
-      return ''
+      return null
     }
     const key = getDraftKey(conversationId)
     const cached = draftCache.get(key)
     if (cached)
-      return cached.text
+      return cached
     if (draftStorageType !== 'none') {
       try {
         const raw = getStorageBackend(draftStorageType).getItem(key)
         if (raw) {
-          const data = JSON.parse(raw) as { text: string, time: number }
-          draftCache.set(key, data)
+          const data = JSON.parse(raw) as PersistedDraft
+          const hydrated: DraftCacheEntry = { text: data.text, preview: data.text, time: data.time }
+          draftCache.set(key, hydrated)
           conversationStore.updateConversation(conversationId, {
-            draft: data.text,
+            draft: hydrated.preview,
             draftTime: data.time,
           })
-          return data.text
+          return hydrated
         }
       }
       catch {
         // ignore
       }
     }
-    return ''
+    return null
+  }
+
+  /** 加载文本草稿 */
+  function loadDraft(conversationId: string): string {
+    return loadInputDraft(conversationId)?.text || ''
   }
 
   /** 清除草稿 */
   function clearDraft(conversationId: string) {
     const key = getDraftKey(conversationId)
+    revokeDraftPreviewUrls(draftCache.get(key))
     draftCache.delete(key)
     conversationStore.updateConversation(conversationId, {
       draft: '',
@@ -128,6 +192,11 @@ export function useConversation() {
   /** 首屏同步：读本地缓存 */
   function syncLocalConversations(): UiConversation[] {
     return domains.conversation.syncLocal()
+  }
+
+  /** 仅重算现有会话摘要，用于语言等展示上下文变化 */
+  function refreshConversationPreviews(): void {
+    domains.conversation.refreshPreviews?.()
   }
 
   /** 下拉刷新：触发服务端同步 */
@@ -246,6 +315,7 @@ export function useConversation() {
     selectConversation,
     leaveConversation,
     syncLocalConversations,
+    refreshConversationPreviews,
     refreshConversations,
     loadMoreConversations,
     pinConversation,
@@ -260,7 +330,9 @@ export function useConversation() {
       conversationStore.setConversationList(list)
     },
     saveDraft,
+    saveInputDraft,
     loadDraft,
+    loadInputDraft,
     clearDraft,
   }
 }

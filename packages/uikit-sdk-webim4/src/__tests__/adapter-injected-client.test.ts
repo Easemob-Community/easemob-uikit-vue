@@ -97,4 +97,10 @@ describe('webim4Adapter 登录用户 ID 归一化', () => {
     expect(setCurrentUser).toHaveBeenNthCalledWith(2, '')
   })
 
+  it('显式关闭 multi_body 能力并说明原因', async () => {
+    const { adapter } = await setupInjectedAdapter(makeLoginConfig(vi.fn()))
+
+    expect(adapter.capabilities.multiBodyMessage).toBe(false)
+    expect(adapter.capabilities.meta?.multiBodyMessage?.reason).toContain('4.x')
+  })
 })

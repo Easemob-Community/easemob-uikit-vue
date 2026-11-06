@@ -183,7 +183,7 @@ function onPreviewError(index: number) {
       v-if="displayUrl"
       class="image-message__container"
       :class="isSticker ? 'image-message__container--sticker' : radiusClass"
-      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }"
+      :style="{ width: `${displaySize.width}px`, height: `${displaySize.height}px`, aspectRatio: `${displaySize.width} / ${displaySize.height}` }"
       @click="openPreview"
     >
       <!-- 加载中占位 -->

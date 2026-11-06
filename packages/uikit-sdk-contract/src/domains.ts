@@ -7,6 +7,8 @@ import type {
   UiConversation,
   UiGroup,
   UiMessage,
+  MultiBodySegmentInput,
+  MessageAttachmentDownloadResult,
   UserInfo,
   UserInfoAttribute,
   UserInfoAttributeValue,
@@ -37,6 +39,12 @@ export interface SdkMessageDomain {
   sendCustom: (conversationId: string, conversationType: ConversationTypeValue, event: string, params?: Record<string, string>, ext?: Record<string, unknown>) => Promise<SdkMessage>
   sendCmd: (conversationId: string, conversationType: ConversationTypeValue, action: string, ext?: Record<string, unknown>) => Promise<SdkMessage>
   sendCombine: (conversationId: string, conversationType: ConversationTypeValue, title: string, summary: string, compatibleText: string, messageList: readonly SdkMessage[], ext?: Record<string, unknown>) => Promise<SdkMessage>
+  /** 创建并发送一条有序复合消息；发送创建支持 2～20 段 */
+  sendMultiBody: (conversationId: string, conversationType: ConversationTypeValue, bodies: readonly MultiBodySegmentInput[], ext?: Record<string, unknown>, needReadReceipt?: boolean) => Promise<SdkMessage>
+  /** 重试同一条复合消息，复用原消息对象以保留分段附件 */
+  resendMultiBody: (message: SdkMessage) => Promise<SdkMessage>
+  /** 按分段顺序下载复合消息中的全部附件 */
+  downloadMultiBodyAttachments: (message: SdkMessage) => Promise<readonly MessageAttachmentDownloadResult[]>
   fetchHistory: (conversationId: string, conversationType: ConversationTypeValue, cursor?: string, pageSize?: number) => Promise<{ list: UiMessage[], cursor?: string, hasMore: boolean }>
   recall: (conversationId: string, conversationType: ConversationTypeValue, messageId: string) => Promise<void>
   /**
@@ -71,6 +79,8 @@ export interface SdkConversationDomain {
   syncLocal: () => UiConversation[]
   /** 主动刷新服务端会话列表，由事件回填 store */
   refresh: (includeEmpty?: boolean) => Promise<void>
+  /** 仅按原始快照重算现有会话摘要，不增删会话或覆盖其他本地字段；adapter 支持时提供 */
+  refreshPreviews?: () => void
   /** 加载更多会话（无分页能力的 SDK 退化为本地全量） */
   loadMore: (pageSize?: number) => Promise<void>
   pin: (conversationId: string, conversationType: ConversationTypeValue, pinned: boolean) => Promise<void>

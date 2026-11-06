@@ -1,4 +1,5 @@
 import type { App, Component, Plugin } from 'vue'
+import './locale'
 // side-effect：注册 UIKit logger → 日志持久化内核的 sink（见 utils/logger-binding.ts）
 import './utils/logger-binding'
 

@@ -330,7 +330,7 @@ const displayDraft = computed(() => {
 /** 未读是否强制圆点：全局 dot 模式或会话免打扰 */
 const unreadDot = computed(() => props.unreadMode === 'dot' || props.conversation.isMuted)
 
-/** 显示消息内容：正在输入 > 草稿 > 最后消息，并用 messageFormatter 格式化 */
+/** 显示消息内容：正在输入 > 草稿摘要（含复合内容类型标签）> 最后消息，并用 messageFormatter 格式化 */
 const displayMessage = computed(() => {
   if (props.isTyping) {
     return t('chat.typing', '对方正在输入...')

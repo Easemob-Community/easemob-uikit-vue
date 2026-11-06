@@ -52,7 +52,7 @@ importers:
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.1.3
+        version: 5.2.0
       markdown-it:
         specifier: ^15.0.0
         version: 15.0.0
@@ -101,7 +101,7 @@ importers:
         version: link:../../packages/uikit-sdk-websdk5
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.1.3
+        version: 5.2.0
       pinia:
         specifier: ^2.3.1
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -160,7 +160,7 @@ importers:
         version: link:../uikit-sdk-contract
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.1.3
+        version: 5.2.0
       pinia:
         specifier: ^2.1.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -326,7 +326,7 @@ importers:
         version: link:../uikit-sdk-contract
       easemob-websdk:
         specifier: ^5.0.0
-        version: 5.1.3
+        version: 5.2.0
       pinia:
         specifier: ^2.1.0 || ^4.0.0
         version: 2.3.1(typescript@5.9.3)(vue@3.5.41(typescript@5.9.3))
@@ -1986,8 +1986,8 @@ packages:
   easemob-websdk@4.24.3:
     resolution: {integrity: sha512-/SPyAAJp8bC8cHeoMI4LFAyjdqeHXxx1I7B89iqtygqICTOum0iCtM94pXAZwutpyxAtBIDEL5VAqDR8Q0iUCg==}
 
-  easemob-websdk@5.1.3:
-    resolution: {integrity: sha512-j+PKlvMo6ppotTEVAKg9D+L65M9ZkUhVMK2sthp1IYU0l7IPpmB8ul4teoh1qfrQbvNXN05eLC8V3qmGaY7tcw==}
+  easemob-websdk@5.2.0:
+    resolution: {integrity: sha512-mBA9lnclfkMe1vTrsfmgvbkKWKRfVW5XOD4FwAp4kQJ2WR5dipQ2NLKgRSk1AdbmTxtojBrD9f3+BoyJK50hgg==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -5641,7 +5641,7 @@ snapshots:
 
   easemob-websdk@4.24.3: {}
 
-  easemob-websdk@5.1.3:
+  easemob-websdk@5.2.0:
     dependencies:
       zod: 3.25.76
 

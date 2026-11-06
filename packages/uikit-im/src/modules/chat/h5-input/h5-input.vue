@@ -29,7 +29,7 @@ const emit = defineEmits<{
   (e: 'voice-cancel'): void
   (e: 'mention-trigger', anchor: HTMLElement, keyword: string): void
   (e: 'mention-close'): void
-  (e: 'sticker-select', sticker: EmojiStickerItem): void
+  (e: 'sticker-select', sticker: EmojiStickerItem, packId: string): void
   (e: 'typing'): void
   (e: 'focus'): void
 }>()
@@ -486,10 +486,10 @@ function insertEmoji(emoji: string) {
   })
 }
 
-/** 选择表情包（sticker）：收起面板并上抛给外层发送 */
-function onSelectSticker(sticker: EmojiStickerItem) {
+/** 选择表情包（sticker）：收起面板并连同 packId 上抛给外层发送 */
+function onSelectSticker(sticker: EmojiStickerItem, packId: string) {
   activePanel.value = 'none'
-  emit('sticker-select', sticker)
+  emit('sticker-select', sticker, packId)
 }
 
 /** 设置输入文本 */

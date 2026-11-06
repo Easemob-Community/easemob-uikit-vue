@@ -21,6 +21,7 @@ import { detectEnvironment, downloadFile } from '@easemob-community/uikit-core'
 import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import { createLogger } from '@easemob-community/uikit-core'
 import MessageVirtualList from './message-virtual-list.vue'
+import { createMultiBodyClipboardData } from '../../../composables/multi-body.utils'
 
 const props = defineProps<MessageListProps>()
 
@@ -580,9 +581,14 @@ function resolveTranslateErrorMessage(e: unknown): string {
   return t('message.translate.failed', '翻译失败，请稍后重试')
 }
 
-/** 通过 VueUse useClipboard 复制消息文本 */
+/** 普通消息复制文本；复合消息额外写入供 rich 还原的有序 HTML 数据 */
 async function handleCopyMessage(message: UiMessage) {
-  const text = message.type === MESSAGE_TYPE.TEXT ? (message.body as TextMessageBody).content || '' : ''
+  const multiBodyData = message.type === MESSAGE_TYPE.MULTI_BODY
+    ? createMultiBodyClipboardData(message)
+    : null
+  const text = message.type === MESSAGE_TYPE.TEXT
+    ? (message.body as TextMessageBody).content || ''
+    : multiBodyData?.text || ''
   if (!text) {
     showToast(t('message.copyFailed') ?? '复制失败', 'error')
     return
@@ -592,7 +598,20 @@ async function handleCopyMessage(message: UiMessage) {
     return
   }
   try {
-    await copyToClipboard(text)
+    if (multiBodyData?.html && navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/plain': new Blob([text], { type: 'text/plain' }),
+          'text/html': new Blob([multiBodyData.html], { type: 'text/html' }),
+        })])
+      }
+      catch {
+        await copyToClipboard(text)
+      }
+    }
+    else {
+      await copyToClipboard(text)
+    }
     showToast(t('message.copySuccess') ?? '已复制', 'success')
   }
   catch {

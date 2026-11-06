@@ -174,7 +174,7 @@ app.component(finalName, value as Component)
 ```ts
 // src/constants/index.ts（定义处保留字面量）
 export const CONVERSATION_TYPE = { SINGLECHAT: 'singleChat', GROUPCHAT: 'groupChat' } as const
-export const MESSAGE_TYPE = { TEXT: 'text', IMAGE: 'image', VOICE: 'voice', VIDEO: 'video', FILE: 'file', CMD: 'cmd', CUSTOM: 'custom', LOCATION: 'location', COMBINE: 'combine', NOTICE: 'notice' } as const
+export const MESSAGE_TYPE = { TEXT: 'text', IMAGE: 'image', VOICE: 'voice', VIDEO: 'video', FILE: 'file', CMD: 'cmd', CUSTOM: 'custom', LOCATION: 'location', COMBINE: 'combine', MULTI_BODY: 'multi_body', NOTICE: 'notice' } as const
 export const MESSAGE_STATUS = { SENDING: 'sending', SENT: 'sent', DELIVERED: 'delivered', READ: 'read', FAILED: 'failed' } as const
 export const GROUP_MEMBER_ROLE = { OWNER: 'owner', ADMIN: 'admin', MEMBER: 'member' } as const
 export const FORWARD_MODE = { ONE_BY_ONE: 'oneByOne', COMBINE: 'combine' } as const

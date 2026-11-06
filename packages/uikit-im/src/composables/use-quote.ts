@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { MESSAGE_EXT_KEY, MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import type { CustomMessageBody, FileMessageBody, ImageMessageBody, TextMessageBody, UiMessage, VoiceMessageBody } from '@easemob-community/uikit-core'
-import { chineseMessagePreviewLabels } from '../utils/resolve-last-message-text'
+import { chineseMessagePreviewLabels, resolveMultiBodyPreview } from '../utils/resolve-last-message-text'
 
 /** 语音时长格式化：12'28''（分'秒''），与设计师引用样式稿一致 */
 function formatVoiceQuoteDuration(seconds: number | undefined): string {
@@ -22,7 +22,7 @@ export interface MsgQuotePayload {
   /** 发送人显示名 / ID */
   msgSender: string
   /** 原消息类型 */
-  msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd'
+  msgType: 'text' | 'image' | 'video' | 'file' | 'voice' | 'custom' | 'location' | 'cmd' | 'multi_body'
   /** 图片/视频类消息的缩略图 URL，用于在引用卡片中直接展示原图/缩略图 */
   msgThumbUrl?: string
 }
@@ -64,6 +64,8 @@ export function getQuotePreview(message: UiMessage): string {
     }
     case MESSAGE_TYPE.CMD:
       return '[指令]'
+    case MESSAGE_TYPE.MULTI_BODY:
+      return resolveMultiBodyPreview(message, chineseMessagePreviewLabels)
     default:
       return '[消息]'
   }

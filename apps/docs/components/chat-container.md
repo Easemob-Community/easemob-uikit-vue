@@ -32,6 +32,31 @@ import { EmUIKitProvider } from '@easemob-community/uikit-im'
 
 > 聊天容器会跟随 `useConversation()` 中的当前会话自动切换：点击左侧会话列表（`conversation-select`）后，聊天页即开始加载对应会话的消息。
 
+## 复合消息（图文混排）
+
+`multi_body` 把 2～20 个有序内容段作为一条消息发送。与 `combine` 的多条历史消息合并转发不同，复合消息只有一个消息 ID 和一套发送状态。
+
+```ts
+const chatConfig = {
+  input: {
+    mode: 'rich', // rich：inline 图文；simple：文字 + 底部附件区
+    features: {
+      multiBody: true,
+    },
+  },
+}
+```
+
+- **PC rich**：图片、视频和文件都在光标处内联，可继续编辑前后文字；图片等比缩小，视频/文件显示附件卡片，发送顺序与文档顺序一致。
+- **PC simple**：图片、视频和文件在文字下方的待发送区预览，可删除后继续编辑并一次发送。
+- **复合草稿**：开启草稿后，simple/rich 在页面内切换会话会保留文字、图片、视频、文件、@提及及内容顺序；会话列表按顺序显示 `[图片]文字` 等摘要，只有附件时也会保留草稿。
+- **发送判定**：单附件无文字仍发普通消息；文字 + 附件或两个及以上附件发一条 `multi_body`，最多 20 段。
+- **H5**：不提供复合编辑/发送入口，附件仍分开发送；可接收展示复合消息并逐段下载附件。
+- **其他分段**：语音、位置和 custom 可通过 `useChat().sendMultiBodyMessage` 发送，七类分段均可接收展示。
+- **能力限制**：默认关闭，还需 adapter 上报 `multiBodyMessage !== false`；websdk4 完全不支持。复合消息不可编辑或翻译。
+
+完整发送示例见 [`useMessageSend`](../api/composables/use-message-send)，单条渲染见 [MultiBodyMessage](./multi-body-message)。
+
 ## API
 
 <!-- @include: ../.vitepress/gen/chat-container.md -->

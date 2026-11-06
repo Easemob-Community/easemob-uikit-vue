@@ -16,6 +16,7 @@ export type MessageType =
   | 'custom'
   | 'cmd'
   | 'combine'
+  | 'multi_body'
 
 /** 消息发送状态（wire 层；`sent` 表示服务端已接受，不代表对端已读） */
 export type SdkSendStatus = 'sending' | 'sent' | 'failed'
@@ -256,7 +257,23 @@ export interface CombineMessageBody {
   combineLevel: number
 }
 
-/** 所有消息体的联合类型（结构型，无统一 `type` 判别字段） */
+/** 复合图片段；SDK 要求两个图片语义标记必填，普通图片 body 仍保持可选兼容 */
+export type MultiBodyImageSegment = { type: 'image' } & Omit<ImageMessageBody, 'isGif' | 'isOriginalImage'> & Required<Pick<ImageMessageBody, 'isGif' | 'isOriginalImage'>>
+
+/** 复合消息中的一个有序分段；`type` 仅存在于复合消息分段上 */
+export type MultiBodySegment =
+  | ({ type: 'text' } & TextMessageBody)
+  | MultiBodyImageSegment
+  | ({ type: 'file' } & FileMessageBody)
+  | ({ type: 'voice' } & VoiceMessageBody)
+  | ({ type: 'video' } & VideoMessageBody)
+  | ({ type: 'location' } & LocationMessageBody)
+  | ({ type: 'custom' } & CustomMessageBody)
+
+/** 复合消息正文；发送创建为 2～20 段，接收不截断 */
+export type MultiBody = ReadonlyArray<MultiBodySegment>
+
+/** 所有消息体的联合类型（普通 body 无统一判别字段，multi_body 为分段数组） */
 export type MessageBody =
   | TextMessageBody
   | ImageMessageBody
@@ -267,6 +284,7 @@ export type MessageBody =
   | CmdMessageBody
   | CustomMessageBody
   | CombineMessageBody
+  | MultiBody
 
 /**
  * 中立消息对象：两代 SDK 都映射到该形状；字段名以 5.x 为基准。

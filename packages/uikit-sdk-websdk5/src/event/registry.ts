@@ -1,7 +1,7 @@
 import { createConnectionHandlers } from './connection-events'
 import type { ConnectionEventCallbacks } from './connection-events'
 import type { ManagerHost } from '../client'
-import type { SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
+import type { LastMessageTextResolver, SdkPersistenceHooks, UIKitFeatures } from '@easemob-community/uikit-sdk-contract'
 import { resetSyncStatus } from '../use-sync-status'
 import type { EventStores } from './types'
 import { createChatHandlers, resetChatEventState } from './chat-events'
@@ -20,9 +20,11 @@ export function registerEventHandlers(
   features?: UIKitFeatures,
   /** 旁路持久化钩子（只写不读，fire-and-forget），透传给 chat 事件套件 */
   persistence?: SdkPersistenceHooks,
+  /** 业务消息摘要解析器，透传给 chat 事件套件 */
+  lastMessageTextResolver?: LastMessageTextResolver,
 ) {
   const connHandlers = createConnectionHandlers(stores, connectionCallbacks)
-  const chatHandlers = createChatHandlers(client, stores, features, persistence)
+  const chatHandlers = createChatHandlers(client, stores, features, persistence, lastMessageTextResolver)
   const contactHandlers = createContactHandlers(stores)
   const groupHandlers = createGroupHandlers(stores)
   const presenceHandlers = createPresenceHandlers(stores)

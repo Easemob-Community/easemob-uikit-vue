@@ -1,4 +1,5 @@
 import type {
+  EmojiStickerItem,
   EmojiStickerPack,
   EmojiTabsPosition,
   MessageStatusValue,
@@ -72,9 +73,15 @@ export interface ChatSendHooks {
   afterSend?: (message: UiMessage) => void
 }
 
+/** 业务扩展 sticker 图片消息 ext；编码及含义由接入方决定 / Resolve business-specific sticker message ext */
+export type StickerExtResolver = (
+  sticker: EmojiStickerItem,
+  packId: string,
+) => Record<string, unknown>
+
 /** 聊天页面全局配置 */
 export interface ChatConfig {
-  /** 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true */
+  /** 是否启用草稿功能（切换会话时自动保存/恢复输入内容），默认 true；PC 复合模式在页面内保留图文/视频/文件快照 / Whether drafts are saved and restored on conversation switch; PC multi-body drafts retain attachments for the page lifetime */
   enableDraft?: boolean
   /** 消息发送拦截钩子 */
   hooks?: ChatSendHooks
@@ -230,7 +237,7 @@ export interface ChatConfig {
   messageAction?: {
     /** 启用引用，默认 true */
     enableQuote?: boolean
-    /** 启用复制，默认 true（仅文本消息生效） */
+    /** 启用复制，默认 true（文本消息与含文本段的复合消息生效） */
     enableCopy?: boolean
     /** 启用下载，默认 true（仅文件消息生效） */
     enableDownload?: boolean
@@ -309,6 +316,8 @@ export interface ChatConfig {
       voice?: boolean
       /** 视频，默认 true */
       video?: boolean
+      /** PC simple/rich 整框复合消息（multi_body）模式，默认 false；还需 adapter 上报 multiBodyMessage 能力，H5 不提供复合编辑入口 / PC simple/rich integrated multi-body mode, default false; also requires adapter capability; H5 has no composite editor */
+      multiBody?: boolean
       /** 翻译入口，默认 false；仅渲染按钮，点击经 `translation-click` 事件交由宿主接入 / Translation entry, default false; only renders the button, click is surfaced via the `translation-click` event for the host to handle */
       translation?: boolean
       /** 名片发送入口，默认 false；仅渲染按钮，点击经 `contact-card-click` 事件交由宿主接入 / Contact card entry, default false; only renders the button, click is surfaced via the `contact-card-click` event for the host to handle */
@@ -344,10 +353,12 @@ export interface ChatConfig {
     resizable?: boolean
     /** 是否显示「展开输入框」角标（仅 PC，卡片右上角；点击后输入区升至 212px，再次点击或 Esc 恢复默认；拖拽超过 212px 时角标自动呈现恢复态），默认 true / Whether to show the expand-input corner toggle (PC only), default true */
     expandable?: boolean
-    /** 粘贴剪贴板图片时是否弹出预览确认弹窗（截图/复制的图片预览后发送；simple 模式 PC 生效），默认 true；关闭后粘贴图片不弹窗也不发送 / Whether pasting an image from the clipboard opens a preview-confirm modal before sending (simple mode on PC), default true; when false, pasted images are discarded */
+    /** PC simple 粘贴图片预览，默认 true；非复合模式弹确认窗，复合模式加入文字下方待发送区；false 禁止粘贴图片但不影响主动选图 / PC simple pasted-image preview, default true; uses a modal in normal mode or the attachment tray in multi-body mode; false disables pasted images but not image picking */
     pasteImagePreview?: boolean
     /** 表情包（sticker/GIF）配置，默认 [] 不展示表情包 tab；以图片消息发送并打 ext.isSticker 标记，按表情渲染、不启用图片预览 / Sticker packs shown as extra tabs in the emoji picker */
     stickerPacks?: EmojiStickerPack[]
+    /** 追加业务 sticker ext；UIKit 不约定业务编码或文案 / Append business-specific sticker ext without defining codes or labels */
+    stickerExt?: StickerExtResolver
     /** Emoji 面板配置 / Emoji picker config */
     emoji?: {
       /** 是否启用「常用」最近使用区（置于表情视图顶部），默认 true；关闭后不展示常用区也不再记录 / Whether to enable the recent-emoji section at the top of the emoji view, default true */

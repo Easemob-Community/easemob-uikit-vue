@@ -969,6 +969,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
 }
 
 /* 状态与气泡同一行 */
@@ -977,6 +978,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 4px;
   width: 100%;
+  min-width: 0;
 }
 
 /* inline 分支：body 宽度随气泡内容收缩。

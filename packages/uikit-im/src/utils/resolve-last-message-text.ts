@@ -10,6 +10,7 @@ export {
   formatConversationPreview,
   mergeMessagePreviewLabels,
   resolveLastMessageText,
+  resolveMultiBodyPreview,
 } from '@easemob-community/uikit-sdk-contract'
 export type {
   LastMessageTextResolver,
@@ -30,6 +31,8 @@ export const chineseMessagePreviewLabels: MessagePreviewLabels = {
   file: '[文件]',
   location: '[位置]',
   combine: '[聊天记录]',
+  multiBody: '[复合消息]',
+  multiBodyMore: '...',
   custom: {
     userCard: '[名片]',
     order: '[订单]',

@@ -5,6 +5,7 @@ import { useLocale } from '@easemob-community/uikit-core'
 import { useToast } from '@easemob-community/uikit-core'
 import { detectEnvironment, downloadFile } from '@easemob-community/uikit-core'
 import type { FileMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import { resolveFileType } from '../file-type'
 
 export interface FileMessageProps {
   message: UiMessage
@@ -31,30 +32,9 @@ const fileSize = computed(() => {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 })
 
-/** 文件类型 key：与 --uikit-file-icon-{key} token 一一对应；'file' 为未识别兜底 */
-type FileTypeKey = 'pdf' | 'xls' | 'doc' | 'ppt' | 'md' | 'img' | 'video' | 'audio' | 'file'
-
-/** 按扩展名归类：音频/图片/视频按类别，明确格式按明确图标，其余回落 file/empty */
-const FILE_TYPE_RULES: Array<{ key: Exclude<FileTypeKey, 'file'>, icon: string, pattern: RegExp }> = [
-  { key: 'pdf', icon: 'file/pdf', pattern: /\.pdf$/ },
-  { key: 'xls', icon: 'file/xls', pattern: /\.(?:xls|xlsx|csv|et)$/ },
-  { key: 'doc', icon: 'doc', pattern: /\.(?:doc|docx|txt|rtf|wps)$/ },
-  { key: 'ppt', icon: 'file/ppt', pattern: /\.(?:ppt|pptx|dps)$/ },
-  { key: 'md', icon: 'file/md', pattern: /\.(?:md|markdown)$/ },
-  { key: 'img', icon: 'file/img', pattern: /\.(?:jpe?g|png|gif|webp|svg|bmp|ico|heic)$/ },
-  { key: 'video', icon: 'file/video', pattern: /\.(?:mp4|mov|avi|mkv|webm|flv|wmv)$/ },
-  { key: 'audio', icon: 'file/audio', pattern: /\.(?:mp3|wav|aac|flac|ogg|m4a|wma)$/ },
-]
-
-const fileTypeRule = computed(
-  () => FILE_TYPE_RULES.find(rule => rule.pattern.test(fileName.value.toLowerCase())),
-)
-
-/** 类型 key（驱动图标底色 token） */
-const fileType = computed<FileTypeKey>(() => fileTypeRule.value?.key ?? 'file')
-
-/** 类型图标（未识别回落 file/empty） */
-const fileIcon = computed(() => fileTypeRule.value?.icon ?? 'file/empty')
+const resolvedFileType = computed(() => resolveFileType(fileName.value))
+const fileType = computed(() => resolvedFileType.value.key)
+const fileIcon = computed(() => resolvedFileType.value.icon)
 
 async function handleDownload() {
   const url = body.value.url

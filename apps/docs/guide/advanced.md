@@ -173,28 +173,17 @@ import { dataSource } from './data-source'
 
 ## 组合式函数
 
-UIKit 暴露一组与组件同构的组合式函数，业务可直接复用状态与逻辑：
+UIKit 暴露一组与组件同构的组合式函数，业务可直接复用状态与逻辑。完整的签名、参数和返回值见 [Composables API](/api/composables/)。
 
-- `useClient()`：SDK 客户端，`init / login / logout / isLoggedIn / currentUser`
-- `useChat()`：聊天状态与消息发送
-- `useConversation()`：会话列表与切换
-- `useContact()`：好友 / 陌生人 / 黑名单
-- `useGroup()`：群组列表与详情
-- `usePresence()`：在线状态订阅与发布
-- `useUserInfo()`：用户资料（昵称 / 头像）
-- `useTheme()`：主题运行时定制
-- `useToast()`：轻提示
-- `useH5Adaptation()`：移动端安全区 / 键盘 / 下拉刷新
-
-例如在业务代码中监听会话切换：
+例如在业务代码中切换并监听当前会话：
 
 ```ts
 import { useConversation } from '@easemob-community/uikit-im'
 
-const { currentConversation, switchConversation } = useConversation()
+const { currentConversation, selectConversation } = useConversation()
 
 function onConversationClick(id: string) {
-  switchConversation(id)
+  selectConversation(id)
 }
 ```
 
@@ -206,18 +195,15 @@ function onConversationClick(id: string) {
 - 收到新消息且发送者资料缺失时
 - 会话列表 / 联系人 / 群成员渲染时按需补齐
 
-业务可通过 `useUserInfo()` 手动获取或更新：
+使用 [`useUserInfo`](/api/composables/use-user-info) 读取指定用户资料，使用 [`useOwnUserInfo`](/api/composables/use-own-user-info) 更新当前用户资料：
 
 ```ts
-import { useUserInfo } from '@easemob-community/uikit-im'
+import { useOwnUserInfo, useUserInfo } from '@easemob-community/uikit-im'
 
-const { getUserInfo, updateOwnUserInfo } = useUserInfo()
+const { userInfo } = useUserInfo('user-a')
+const { updateOwnInfoByAttribute } = useOwnUserInfo()
 
-// 获取用户资料（含本地缓存）
-const info = await getUserInfo('user1')
-
-// 更新自己的昵称与头像
-await updateOwnUserInfo({ nickname: '新昵称', avatarUrl: 'https://...' })
+await updateOwnInfoByAttribute('nickname', '新昵称')
 ```
 
 ## 国际化定制

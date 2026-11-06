@@ -342,6 +342,7 @@ function createDemoSettings() {
     file: true,
     voice: true,
     video: true,
+    multiBody: true,
     mention: true,
   })
   const chatInputAutoFocus = ref(false)

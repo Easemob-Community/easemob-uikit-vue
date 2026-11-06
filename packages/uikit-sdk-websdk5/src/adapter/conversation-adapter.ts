@@ -1,19 +1,24 @@
 import type { ConversationItem } from 'easemob-websdk'
 import { CONVERSATION_TYPE } from '@easemob-community/uikit-sdk-contract'
 import { formatConversationPreview } from '@easemob-community/uikit-sdk-contract'
-import type { UiConversation } from '@easemob-community/uikit-sdk-contract'
+import type { LastMessageTextResolver, UiConversation } from '@easemob-community/uikit-sdk-contract'
 import { extractSnippetText, normalizeUserId } from './message-adapter'
 
 export interface ToUiConversationOptions {
   /** 群聊摘要发送者显示名解析器；返回 undefined 时回退到 SDK 提供的 sender 或 from */
   resolveSenderName?: (userId: string) => string | undefined
+  /** 业务消息摘要解析器；返回 undefined 时回落 adapter 默认摘要 */
+  lastMessageTextResolver?: LastMessageTextResolver
 }
 
 /**
  * 将 SDK 本地会话缓存项转换为 UIKit 会话展示类型。
  */
 export function toUiConversation(item: ConversationItem, options?: ToUiConversationOptions): UiConversation {
-  const snippetText = extractSnippetText(item.lastMessage)
+  const snippetText = extractSnippetText(item.lastMessage, undefined, options?.lastMessageTextResolver, {
+    conversationId: item.conversationId,
+    conversationType: item.conversationType,
+  })
   // 群聊会话利用 SDK lastMessage.sender 预填充的发送者信息，拼接 "发送者: 消息" 格式。
   // sender.nickname 在 enableUserInfoSync 开启后由 SDK 在消息链路中补齐；
   // 若 UIKit 用户资料/联系人资料已缓存，优先用 resolver 解析为备注/昵称。

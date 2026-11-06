@@ -48,3 +48,15 @@ packages/uikit-im/src/assets/icons-next/
 
 # VitePress vite-node 加载 vite.config.ts 的临时产物（dev server 被强杀时残留）
 *.timestamp-*.mjs
+
+# Local promotion drafts, captures and archives (not release sources)
+/easemob-uikit-promotion.zip
+/docs/assets/promotion-live/
+/docs/images/overview/
+/docs/官网产品概述页.md
+/docs/掘金封面-960x640.png
+/docs/掘金推广文-UIKit介绍.md
+/apps/docs/guide/images/overview/chat-group.png
+/apps/docs/guide/images/overview/chat-message-types.png
+/apps/docs/guide/images/overview/chat-status.png
+/apps/docs/guide/images/overview/modules.png

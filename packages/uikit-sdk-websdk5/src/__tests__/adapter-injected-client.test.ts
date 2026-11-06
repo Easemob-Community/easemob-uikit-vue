@@ -185,6 +185,7 @@ describe('websdk5Adapter 注入 client 模式（决策 17/18）', () => {
 
     expect(adapter.capabilities).toMatchObject({
       combineMessage: true,
+      multiBodyMessage: true,
       pinnedMessage: true,
       streamingMessage: true,
       groupReadReceipt: true,

@@ -4,6 +4,7 @@ import { useLocale } from '@easemob-community/uikit-core'
 import { MESSAGE_TYPE } from '@easemob-community/uikit-core'
 import { useUserInfo } from '../../../composables/use-user-info'
 import type { TextMessageBody, UiMessage } from '@easemob-community/uikit-core'
+import { chineseMessagePreviewLabels, resolveMultiBodyPreview } from '../../../utils/resolve-last-message-text'
 
 export interface PinnedBarItemProps {
   /** 置顶消息 */
@@ -38,6 +39,10 @@ const preview = computed(() => {
     return t('message.video', '[视频]')
   if (msg.type === MESSAGE_TYPE.FILE)
     return t('message.file', '[文件]')
+  if (msg.type === MESSAGE_TYPE.MULTI_BODY) {
+    const text = resolveMultiBodyPreview(msg, chineseMessagePreviewLabels)
+    return text.length > max ? `${text.slice(0, max)}…` : text
+  }
   if (msg.type === MESSAGE_TYPE.COMBINE)
     return t('message.combine', '[聊天记录]')
   return t('message.custom', '[消息]')
