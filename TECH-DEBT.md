@@ -68,6 +68,30 @@
 - **附带观察**：`create-group-modal.vue` 的 `createFn` 接管后，弹窗仍用 `finalName`（自动群名）写本地会话（`stores.conversation.addConversation`），与服务端实际群名不一致，需等会话同步纠正；若 `createFn` 成为公开推荐路径，弹窗应改用 `params.name` 或回调结果回填。
 - **关联**：D120（插槽/Props 可控性矩阵）/ D133（`create-group-modal` 壳收敛）；demo 侧实现见 `apps/demo/src/demo-page.vue` `demoCreateGroup`。
 
+### [ ] D150. 后端大小写混写 userId 的登录兼容（临时）
+
+- **现象**：后端整改期允许注册大小写混写的 userId；使用原始 ID 登录后，发送消息可能报 `serverCode: 7 / payload from must same as message from`。
+- **证据**：`uikit-sdk-websdk5/src/adapter.ts` 与 `uikit-sdk-webim4/src/adapter.ts` 的 `login()` 原先均把业务传入的 userId 原样交给 SDK 并写入当前用户 store，登录态与消息发送者可能出现大小写不一致。
+- **兼容落地（2026-11-05）**：契约包新增 `normalizeLoginUserId()`，双 adapter 在登录边界统一转为纯小写并输出包含原值/归一化值的 warn；SDK 登录参数与当前用户提前记账均使用归一化值，token 和其他场景用户 ID 不变。定向测试覆盖混写、全大写、纯小写及失败清理。
+- **后续**：这是后端账号规范整改期的临时兼容，不是后端根因修复；后端统一账号规范后评估保留或移除，若业务允许仅大小写不同的独立账号则不应使用该策略。
+- **关联 skill**：`uikit-sdk-adapter-architecture`
+
+### [ ] D149. SDK 5.2 `multi_body` 复合消息接入与双端在线验收
+
+- **目标**：支持 2～20 个有序 text/image/file/voice/video/location/custom 分段的一条消息；与 combine 合并转发保持独立。
+- **实现（2026-11-06）**：SDK lockfile 升至 5.2.0；中立类型/guard/capability/domain 已落地，websdk5 支持七类发送、下载和原对象重试，websdk4 完全不支持。新增共享摘要、逐段搜索、数组持久化、`EmMultiBodyMessage`、PC rich inline 图文、PC simple/H5 有序分段草稿器，以及公开文档和 demo 七类发送入口。
+- **验证**：新增契约/adapter/摘要/持久化/渲染/发送/编辑器测试覆盖；UIKit 50/50 测试、类型检查、UIKit 与 demo 构建、Histoire 构建通过。
+- **待完成**：浏览器自动化在登录前后持续遇到 `BROWSER_USER_TAKEOVER`，PC/H5 双账号在线发送、漫游回归、上传失败重试与真实触屏键盘验收尚未完成，不能据此关闭本条。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-message-rendering` / `uikit-tiptap-editor` / `uikit-h5-adaptation`
+
+### [x] D148. 双 adapter 组合根超过 1600 行，职责混杂难以维护
+
+- **现象**：`uikit-sdk-websdk5/src/adapter.ts` 与 `uikit-sdk-webim4/src/adapter.ts` 同时承载内部 store、repository 转发、配置兼容、Domain 装配和连接生命周期，分别约 1633 / 1669 行。
+- **修复（2026-11-06）**：按方案 B 纯结构拆分，双包同构新增 `adapter/internal-stores/`、`adapter/repositories/`、`adapter/config.ts`，事件依赖兜底归入 `event/deps.ts`；组合根保留初始化守卫和生命周期，分别降至 460 / 490 行。公开 API 与 SDK 差异不变，未做跨 SDK store 抽象。
+- **约束**：根 `eslint.config.js` 对组合根及上述新增模块启用 `max-lines=500`（空行/注释同计）；501 行 stdin 反例已验证会报错。架构 skill 同步登记目录职责与行数约定。
+- **验证**：三包 25 个测试文件 208/208 通过；contract / websdk5 构建与 adapter 隔离通过。webim4 当前构建受并行 multi_body 预览标签缺失阻塞，与本次拆分无关；未借重构修改该功能。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-lint-governance`
+
 ### [x] D20. `Avatar` shape 在卡片与列表项中被硬编码，未遵循主题 `avatarShape`
 
 - **现象**：`UserCard` 硬编码 `shape="circle"`、`GroupCard` 硬编码 `shape="square"`，`ContactItem*` / `GroupItem*` / `ContactList` / `GroupList` 的 `avatarShape` 默认值也硬编码为 `'circle'` / `'rounded'`。当用户通过主题设置把头像改成方形/圆角时，名片和列表项不会跟随变化。

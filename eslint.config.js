@@ -25,4 +25,20 @@ export default antfu(
       'no-alert': 'off',
     },
   },
+  {
+    // 双 adapter 组合根及拆分模块不得再演变为超长文件；空行与注释同样计数
+    files: [
+      'packages/uikit-sdk-websdk5/src/adapter.ts',
+      'packages/uikit-sdk-websdk5/src/adapter/config.ts',
+      'packages/uikit-sdk-websdk5/src/adapter/internal-stores/**/*.ts',
+      'packages/uikit-sdk-websdk5/src/adapter/repositories/**/*.ts',
+      'packages/uikit-sdk-webim4/src/adapter.ts',
+      'packages/uikit-sdk-webim4/src/adapter/config.ts',
+      'packages/uikit-sdk-webim4/src/adapter/internal-stores/**/*.ts',
+      'packages/uikit-sdk-webim4/src/adapter/repositories/**/*.ts',
+    ],
+    rules: {
+      'max-lines': ['error', { max: 500 }],
+    },
+  },
 )

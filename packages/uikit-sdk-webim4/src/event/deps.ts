@@ -1,3 +1,4 @@
+import { createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { ConversationTypeValue, NoticeEventTypeValue, UserInfo } from '@easemob-community/uikit-sdk-contract'
 import type { EventStores } from './types'
 
@@ -79,4 +80,39 @@ export function getEventHandlerDeps(): EventHandlerDeps {
     )
   }
   return _deps
+}
+
+const adapterLog = createLogger('UIKit:Webim4Adapter')
+
+/**
+ * 若业务层（core/uikit-im）未注入事件层依赖，则注入一组最小兜底实现，
+ * 保证 adapter 独立运行时不因 `getEventHandlerDeps()` 抛错而崩溃。
+ * 真正使用通知/系统通知/i18n 时，业务层应在 subscribe 前调用 setEventHandlerDeps。
+ */
+export function ensureEventHandlerDeps(): void {
+  try {
+    getEventHandlerDeps()
+  }
+  catch {
+    adapterLog.warn('[Webim4Adapter] 事件层依赖未注入，使用最小兜底实现')
+    setEventHandlerDeps({
+      t: (key: string) => key,
+      insertChatNotice: () => {},
+      buildAnnouncementNoticeText: (announcement: string) => announcement || '',
+      resolveNoticeUserName: user => user?.nickname || user?.userId || '',
+      useNotification: () => ({
+        state: {
+          value: {
+            enabled: false,
+            browserEnabled: false,
+            inAppEnabled: false,
+            triggerMode: 'background' as const,
+          },
+        },
+        notify: () => {},
+        notifyBrowser: async () => false,
+      }),
+      emitNotificationDelivered: () => {},
+    })
+  }
 }

@@ -1,6 +1,6 @@
 import type { SdkConfig } from '@easemob-community/uikit-sdk-contract'
-import { SDK_CONTRACT_VERSION } from '@easemob-community/uikit-sdk-contract'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SDK_CONTRACT_VERSION, setLogCollector } from '@easemob-community/uikit-sdk-contract'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { WEBSDK5_MANAGERS, Websdk5Adapter } from '../adapter'
 import type { UIKitClient } from '../client'
 import { createClient } from '../client'
@@ -24,6 +24,7 @@ vi.mock('../client', () => ({
 }))
 
 const mockedCreateClient = vi.mocked(createClient)
+const logEntries: Array<{ level: string, ns: string, message: string, args: unknown[] }> = []
 
 /** 构造 SDK manager mock：事件层注册只用到 add/removeEventHandler */
 function makeManager() {
@@ -56,16 +57,34 @@ function makeSdkClient() {
 const INIT_CONFIG: SdkConfig = { appKey: 'easemob#test' }
 
 /** 构造注入模式 adapter 并完成 init，返回 adapter 与注入实例 mock */
-async function setupInjectedAdapter() {
+async function setupInjectedAdapter(config: SdkConfig = INIT_CONFIG) {
   const injected = makeSdkClient()
   const adapter = new Websdk5Adapter(injected as unknown as UIKitClient)
-  await adapter.init(INIT_CONFIG)
+  await adapter.init(config)
   return { adapter, injected }
+}
+
+function makeLoginConfig(setCurrentUser: ReturnType<typeof vi.fn>, loginTimeoutMs?: number): SdkConfig {
+  return {
+    ...INIT_CONFIG,
+    loginTimeoutMs,
+    adapterConfig: { stores: { client: { setCurrentUser } } },
+  }
+}
+
+function getUserIdWarnings() {
+  return logEntries.filter(entry => entry.level === 'warn' && entry.message.includes('userId'))
 }
 
 describe('websdk5Adapter 注入 client 模式（决策 17/18）', () => {
   beforeEach(() => {
     mockedCreateClient.mockReset()
+    logEntries.length = 0
+    setLogCollector(entry => logEntries.push(entry))
+  })
+
+  afterEach(() => {
+    setLogCollector(null)
   })
 
   it('init 不再自行创建 ChatClient，直接使用注入实例', async () => {
@@ -87,13 +106,47 @@ describe('websdk5Adapter 注入 client 模式（决策 17/18）', () => {
     expect(injected.userInfoManager.addEventHandler).toHaveBeenCalledTimes(1)
   })
 
-  it('login 委托到注入实例的 login，透传 user、token 与默认登录超时', async () => {
-    const { adapter, injected } = await setupInjectedAdapter()
+  it('纯小写 login 原样透传 user、token 与默认登录超时，不输出转换警告', async () => {
+    const setCurrentUser = vi.fn()
+    const { adapter, injected } = await setupInjectedAdapter(makeLoginConfig(setCurrentUser))
 
     await adapter.login('user-a', 'token-a')
 
     expect(injected.login).toHaveBeenCalledTimes(1)
     expect(injected.login).toHaveBeenCalledWith('user-a', 'token-a', undefined)
+    expect(setCurrentUser).toHaveBeenCalledWith('user-a')
+    expect(getUserIdWarnings()).toHaveLength(0)
+  })
+
+  it.each([
+    ['User-A', 'user-a'],
+    ['USER-A', 'user-a'],
+  ])('混写或全大写 login 用户 %s 转为小写后登录并记账', async (input, expected) => {
+    const setCurrentUser = vi.fn()
+    const { adapter, injected } = await setupInjectedAdapter(makeLoginConfig(setCurrentUser, 4500))
+
+    await adapter.login(input, 'token-a')
+
+    expect(injected.login).toHaveBeenCalledWith(expected, 'token-a', 4500)
+    expect(setCurrentUser).toHaveBeenCalledWith(expected)
+    expect(getUserIdWarnings()).toHaveLength(1)
+    expect(getUserIdWarnings()[0]?.args[0]).toEqual({
+      originalUserId: input,
+      normalizedUserId: expected,
+    })
+  })
+
+  it('混写用户登录失败后清空已提前记账的当前用户', async () => {
+    const setCurrentUser = vi.fn()
+    const { adapter, injected } = await setupInjectedAdapter(makeLoginConfig(setCurrentUser))
+    injected.login.mockRejectedValueOnce(Object.assign(new Error('login failed'), {
+      toJSON: () => ({ message: 'login failed' }),
+    }))
+
+    await expect(adapter.login('User-A', 'token-a')).rejects.toThrow('login failed')
+
+    expect(setCurrentUser).toHaveBeenNthCalledWith(1, 'user-a')
+    expect(setCurrentUser).toHaveBeenNthCalledWith(2, '')
   })
 
   it('logout 委托注入实例 logout 并反注册事件，但不销毁注入实例', async () => {

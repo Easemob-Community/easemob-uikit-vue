@@ -286,6 +286,7 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 | 初始化 SDK | `ChatClient.init({ appKey, managers: [...] })` | `new WebIM.connection({ appKey })` | 4.x appKey 在构造时传入 |
 | 登录 | `client.login({ userId, token })` | `conn.open({ user, accessToken })` | 中立 `login(user, token)` 透传 |
 | 发送文本 | `chatManager.createTextMessage(...)` + `sendMessage` | `Message.create({ type: 'txt', ... })` + `connection.send` | body 字段映射见计划文档 |
+| 复合消息 `multi_body` | 七类 `create*MessageBody` → `createMultiBodyMessage`；`downloadAttachment` 全量下载 | **完全不支持**（capability=false，无发送/接收转换/转发/下载/兼容渲染） | 发送 2～20 段；分段工厂对象不得复制；失败重试复用原消息 |
 | 拉历史 | `chatManager.getHistoryMessages(...)` | `connection.getHistoryMessages(...)` | 参数名 `conversationId` vs `targetId` |
 | 清空会话未读 | `chatManager.clearConversationUnreadMessageCount(...)` | 发 `type:'read'` / `type:'channel'` 回执消息 | 4.x 无专用 API |
 | 发送已读回执 | `chatManager.sendMessageReadReceipts(...)` | 发 read/delivery/channel 消息 | 模型差异 |
@@ -305,14 +306,16 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 - 注入模式下 UIKit **不转发** `login` / `logout`；业务全权。
 - 新增能力若某 SDK 暂不支持，必须在 `SdkCapabilities` 显式声明为 `false`，uikit-im 按 capabilities 隐藏入口。
 - 会话快照/回填 merge 时「本地维护字段」必须显式以本地为准（清单与落点见 §7.1）；新增本地字段同步进两 adapter 保留清单 + 回归测试。
+- 双 adapter 的 `adapter.ts` 只承担组合根与连接生命周期；内部 store 放 `adapter/internal-stores/`，repository 转发放 `adapter/repositories/`，默认配置放 `adapter/config.ts`。这些文件由根 ESLint `max-lines=500` 硬门禁覆盖，新模块不得 import 具体 adapter 类或 UI 包。
 
 **软约定：**
 
+- 新增/修改模块接近或超过 500 行时先复盘职责，优先按既有领域边界拆分；不得为通过门禁压缩代码、删除有效注释或提高阈值。
 - 中立类型字段名沿用 5.x 语义（`msgServerId` / `msgLocalId` / `thumbnailUrl` / `originalImageUrl` 等），4.x adapter 负责字段映射。
 - body 类型守卫用字段存在性判断（`'duration' in body`），因此 adapter 映射时必须**精确产出中立字段集**，不要携带多余原始字段。
 - 4.x 未实现的方法用 `never = undefined as never` 占位并 TODO，不要空实现误导。
 - repository 与 domain port 并存时，优先用 domain port 满足当前 UI 消费；repository 留给 Phase 3 DB 接入。
-- capabilities 协商机制（2026-08-31 落地）：能力位保持 boolean 映射不动；契约包导出 `SDK_CONTRACT_VERSION` 常量（契约 breaking 变更时递增），adapter 经 `SdkCapabilities.contractVersion` 上报遵循的契约版本；某能力为 `false` 或语义有差异时，在 `SdkCapabilities.meta.<能力名>.reason` 写原因，语义演进需要新版本契约时填 `meta.<能力名>.minContractVersion`。当前两代能力全 true，元信息可空。
+- capabilities 协商机制（2026-08-31 落地）：能力位保持 boolean 映射不动；契约包导出 `SDK_CONTRACT_VERSION` 常量（契约 breaking 变更时递增），adapter 经 `SdkCapabilities.contractVersion` 上报遵循的契约版本；某能力为 `false` 或语义有差异时，在 `SdkCapabilities.meta.<能力名>.reason` 写原因，语义演进需要新版本契约时填 `meta.<能力名>.minContractVersion`。`multiBodyMessage` 为 websdk4=false（完全不支持），其余既有能力按 adapter 实际上报；新增能力若旧 adapter 未上报，默认按 false 防误显示。
 
 ## 已知漂移（改到相关文件时注意）
 
