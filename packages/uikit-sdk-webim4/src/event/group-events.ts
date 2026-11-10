@@ -248,6 +248,10 @@ export function createGroupHandlers(stores: EventStores): Partial<EasemobChat.Ev
           patch.allowInvites = detail.allowInvites
         if (detail.maxUsers !== undefined)
           patch.maxUsers = detail.maxUsers
+        if (detail.inviteNeedConfirm !== undefined)
+          patch.inviteNeedConfirm = detail.inviteNeedConfirm
+        if (detail.ext !== undefined)
+          patch.ext = detail.ext
         stores.group.updateGroup(groupId, patch)
         // 仅群名称实际变更时插入系统通知（描述/头像变更不提示，避免刷屏）
         if (detail.name && prevGroup?.groupName && detail.name !== prevGroup.groupName) {

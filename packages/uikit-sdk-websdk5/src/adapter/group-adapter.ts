@@ -1,5 +1,6 @@
 import type { GroupDetail, GroupMemberEntry, GroupMuteEntry, JoinedGroupSummary } from 'easemob-websdk'
 import type { UiGroup, UiGroupMember } from '@easemob-community/uikit-sdk-contract'
+
 type SdkGroupSource = JoinedGroupSummary | GroupDetail
 
 /**
@@ -45,6 +46,18 @@ export function toUiGroup(source: SdkGroupSource): UiGroup {
 
   if ('messageBlocked' in source) {
     base.shieldgroup = source.messageBlocked
+  }
+
+  if ('ext' in source) {
+    base.ext = source.ext
+  }
+
+  if ('inviteNeedConfirm' in source) {
+    base.inviteNeedConfirm = source.inviteNeedConfirm
+  }
+
+  if ('joinedAt' in source) {
+    base.joinedAt = source.joinedAt
   }
 
   return base

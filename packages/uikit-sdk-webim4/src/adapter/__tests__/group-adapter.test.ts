@@ -22,6 +22,16 @@ describe('toUiGroup（4.x 群组字段映射）', () => {
     expect(group.approval).toBe(true)
   })
 
+  it('将 GroupDetailInfo.custom 映射为群扩展字段 ext', () => {
+    const detail = {
+      id: 'g-ext',
+      name: '扩展群',
+      custom: '{"from":"oa"}',
+    } as EasemobChat.GroupDetailInfo
+
+    expect(toUiGroup(detail).ext).toBe('{"from":"oa"}')
+  })
+
   it('仅有 id/name 的详情响应（4.x 服务裁剪字段）也能识别为 GroupDetailInfo', () => {
     // 回归：旧判别只认 affiliations_count/maxusers，裁剪字段后会静默产出空 groupName
     const detail = { id: 'g2', name: '裁剪群' } as EasemobChat.GroupDetailInfo

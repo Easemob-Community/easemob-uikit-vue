@@ -10,6 +10,8 @@ export interface UiGroup {
   avatar?: string
   /** 群描述 */
   description?: string
+  /** 群扩展信息 / Group extension information */
+  ext?: string
   /** 群主 */
   owner?: string
   /** 当前用户在群内的角色 */
@@ -24,6 +26,8 @@ export interface UiGroup {
   allowInvites?: boolean
   /** 入群是否需要审批 */
   approval?: boolean
+  /** 被邀请人入群前是否需要确认 / Whether invitees must confirm before joining */
+  inviteNeedConfirm?: boolean
   /** 是否全员禁言 */
   mute?: boolean
   /** 群是否被禁用 */
@@ -34,6 +38,8 @@ export interface UiGroup {
   announcement?: string
   /** 创建时间 */
   created?: number
+  /** 当前用户入群时间 / Timestamp when the current user joined the group */
+  joinedAt?: number
 }
 
 /** 创建群组参数（对齐 SDK groupManager.createGroup 契约，供业务接管时复用） */

@@ -26,6 +26,7 @@ import type {
 } from 'easemob-websdk'
 import { CONVERSATION_TYPE, GROUP_MEMBER_ROLE, NOTICE_EVENT_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { UiContactInvite, UiGroup } from '@easemob-community/uikit-sdk-contract'
+import { toUiGroup } from '../adapter/group-adapter'
 import { getEventHandlerDeps } from './deps'
 import type { EventStores } from './types'
 
@@ -159,11 +160,17 @@ export function createGroupHandlers(stores: EventStores): GroupEventHandlerMap {
       const info: any = (payload as any).groupInfo ?? payload
       const newName: string | undefined = info.name ?? info.groupName
       const prevGroup = stores.group.getGroupById(payload.groupId)
-      stores.group.updateGroup(payload.groupId, {
-        groupName: newName,
-        description: info.description,
-        avatar: info.avatarUrl ?? info.avatar,
+      const groupPatch = toUiGroup({
+        ...info,
+        groupId: payload.groupId,
+        name: newName,
+        avatarUrl: info.avatarUrl ?? info.avatar,
       })
+      const isFullDetail = Boolean((payload as any).groupInfo)
+      const normalizedPatch = isFullDetail
+        ? groupPatch
+        : Object.fromEntries(Object.entries(groupPatch).filter(([, value]) => value !== undefined)) as Partial<UiGroup>
+      stores.group.updateGroup(payload.groupId, normalizedPatch)
       // 仅群名称实际变更时插入系统通知（描述/头像变更不提示，避免刷屏）
       if (newName && prevGroup?.groupName && newName !== prevGroup.groupName) {
         insertChatNotice(stores, payload.groupId, CONVERSATION_TYPE.GROUPCHAT, {

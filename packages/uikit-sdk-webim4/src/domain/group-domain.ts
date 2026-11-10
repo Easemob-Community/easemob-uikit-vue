@@ -189,6 +189,7 @@ export class GroupDomain {
       public: params.public ?? false,
       allowInvites: params.allowInvites ?? false,
       approval: params.joinApprovalRequired ?? false,
+      inviteNeedConfirm: params.inviteNeedConfirm ?? false,
     })
     // 拉取权威详情（群主、角色、成员数等），失败不阻塞创建流程
     try {
@@ -376,6 +377,8 @@ export class GroupDomain {
       patch.description = input.description
     if (input.avatar !== undefined)
       patch.avatar = input.avatar
+    if (input.ext !== undefined)
+      patch.ext = input.ext
     this.store.updateGroup(groupId, patch)
   }
 

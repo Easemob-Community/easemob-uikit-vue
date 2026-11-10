@@ -28,6 +28,7 @@ export function toUiGroup(source: SdkGroupSource): UiGroup {
       groupId: detail.id,
       groupName: detail.name,
       description: detail.description,
+      ext: detail.custom,
       owner: detail.owner,
       memberCount: detail.affiliations_count,
       maxUsers: detail.maxusers,
