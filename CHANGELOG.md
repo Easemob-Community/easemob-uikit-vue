@@ -1,5 +1,23 @@
 # Changelog
 
+## @easemob-community/uikit-sdk-contract 1.5.1 (2026-11-10)
+
+### 修复
+
+- **群资料中立字段补齐**：`UiGroup` 新增可选 `ext`、`inviteNeedConfirm` 与 `joinedAt`，统一群扩展信息、邀请确认配置及入群时间的跨 SDK 数据契约。
+
+## @easemob-community/uikit-sdk-websdk5 1.6.1 (2026-11-10)
+
+### 修复
+
+- **群资料字段完整同步**：群详情与摘要映射、创建快照、更新回写及群资料事件均保留 `ext`、`inviteNeedConfirm` 与 `joinedAt`；旧版顶层稀疏事件过滤 `undefined`，避免覆盖已有群资料缓存。
+
+## @easemob-community/uikit-sdk-webim4 1.4.2 (2026-11-10)
+
+### 修复
+
+- **群扩展信息同步**：将 4.x 群资料 `custom` 映射为中立字段 `ext`，并在创建快照、更新回写及群资料事件中保留 `ext` 与 `inviteNeedConfirm`。
+
 ## @easemob-community/uikit-im 3.12.0 (2026-11-06)
 
 ### 新增
