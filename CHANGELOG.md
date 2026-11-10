@@ -1,5 +1,23 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.12.1 (2026-11-10)
+
+### 修复
+
+- **群管理员角色重查同步**：升级双 SDK 适配器依赖，设置管理员后重新调用 `fetchGroupMembers` 可返回最新 `admin` 角色，避免缓存被 SDK 原始 `member` 覆盖。
+
+## @easemob-community/uikit-sdk-websdk5 1.6.2 (2026-11-10)
+
+### 修复
+
+- **群成员角色缓存一致性**：`fetchGroupMembers` 按当前页合并缓存成员角色，首页重查与游标追加均保留已同步的 `admin`，避免设置管理员后仍返回 `member`；分页顺序、`cursor` 与 `hasMore` 语义不变。
+
+## @easemob-community/uikit-sdk-webim4 1.4.3 (2026-11-10)
+
+### 修复
+
+- **群成员角色缓存一致性**：`fetchGroupMembers` 按当前页合并缓存成员角色，首页重查与游标追加均保留已同步的 `admin`，避免设置管理员后仍返回 `member`；分页顺序、`cursor` 与 `hasMore` 语义不变。
+
 ## @easemob-community/uikit-sdk-contract 1.5.1 (2026-11-10)
 
 ### 修复
