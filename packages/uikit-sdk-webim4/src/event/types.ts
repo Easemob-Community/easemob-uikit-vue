@@ -93,6 +93,7 @@ export interface GroupStoreLike {
   updateGroup: (groupId: string, patch: Partial<UiGroup>) => void
   setGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   appendGroupMembers: (groupId: string, members: UiGroupMember[]) => void
+  getGroupMembers: (groupId: string) => UiGroupMember[]
   removeGroupMembers: (groupId: string, userIds: string[]) => void
   updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void

@@ -46,6 +46,13 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [x] D151. 双 adapter `fetchGroupMembers` 返回管理员角色合并前数组
+
+- **现象**：`addGroupAdmin()` 成功后重新调用 `fetchGroupMembers()`，业务读取 `result.list` 仍看到目标成员为 `member`，但 store 中已合并为 `admin`。
+- **证据**：websdk5 / webim4 的 `GroupDomain.fetchGroupMembers()` 均在 `setGroupMembers` 与首屏 `syncGroupAdmins` 后返回 SDK 原始 `members` 局部数组，未读取合并后的缓存；adapter 内置 store 的首屏覆盖与分页追加还会先把已缓存 `admin` 冲回 `member`。
+- **修复**：已于 2026-11-10 修复。双 adapter 的内部 store 补齐 `getGroupMembers()` 并在写入时保留已缓存管理员角色，Domain 按 `userId` 将缓存角色合并到当前 SDK 页后返回；公开 `GroupMemberPage` 签名、当前页成员顺序和分页元数据不变，不新增 SDK 请求。新增双端 `domain/__tests__/group-members.test.ts`，使用真实内部 store 覆盖 `addGroupAdmin → 首页重查`、游标追加及不混入其他分页缓存，均已验证 RED → GREEN。
+- **关联 skill**：`uikit-sdk-adapter-architecture` / `uikit-contact-group-capabilities`
+
 ### [ ] D133. 存量业务弹窗（14 个）自绘壳未收敛到升级后的 `EmModal` / `EmContactTransferModal`
 
 - **现象**：2026-09-14 前基础 `EmModal`（core）能力太薄（居中标题、无 ×、无分割线、无 footer slot、等宽铺满按钮），导致 14 个业务弹窗全部基于 `EmPopup` 自绘壳，header/footer/关闭按钮/移动端 bottom 回落 CSS 在 6+ 文件逐字重复，4 处（`block-list-add-modal`、`mute-list`、`block-list`、`presence-selector`）甚至用原生 `<button>` 手写按钮样式绕开 `EmButton`。

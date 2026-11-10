@@ -26,6 +26,7 @@ export interface GroupStoreLike {
   getGroupById: (groupId: string) => UiGroup | undefined
   setGroupMembers: (groupId: string, members: UiGroupMember[]) => void
   appendGroupMembers: (groupId: string, members: UiGroupMember[]) => void
+  getGroupMembers: (groupId: string) => UiGroupMember[]
   removeGroupMembers: (groupId: string, userIds: string[]) => void
   updateGroupMemberRole: (groupId: string, userId: string, role: UiGroupMember['role']) => void
   setGroupAnnouncement: (groupId: string, announcement: string) => void
@@ -204,7 +205,9 @@ export class GroupDomain {
         // 管理员列表失败不应阻塞成员列表展示
       }
     }
-    return { list: members, cursor: result.cursor, hasMore: result.hasMore ?? false }
+    const cachedById = new Map(this.store.getGroupMembers(groupId).map(member => [member.userId, member]))
+    const list = members.map(member => cachedById.get(member.userId) ?? member)
+    return { list, cursor: result.cursor, hasMore: result.hasMore ?? false }
   }
 
   /** 拉取并合并群管理员到成员缓存 */

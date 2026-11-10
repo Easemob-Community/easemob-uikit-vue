@@ -248,7 +248,9 @@ export class GroupDomain {
         // 管理员列表失败不应阻塞成员列表展示
       }
     }
-    return { list: members, cursor: nextCursor, hasMore: !!nextCursor }
+    const cachedById = new Map(this.store.getGroupMembers(groupId).map(member => [member.userId, member]))
+    const list = members.map(member => cachedById.get(member.userId) ?? member)
+    return { list, cursor: nextCursor, hasMore: !!nextCursor }
   }
 
   /** 拉取并合并群管理员到成员缓存（4.x getGroupAdmin 仅返回 userId 列表） */

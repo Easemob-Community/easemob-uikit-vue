@@ -2,6 +2,7 @@ import type {
   UiGroup,
   UiGroupMember,
 } from '@easemob-community/uikit-sdk-contract'
+import { GROUP_MEMBER_ROLE } from '@easemob-community/uikit-sdk-contract'
 import type { EventStores } from '../../event/types'
 import type { HandlersRef } from './types'
 
@@ -20,6 +21,16 @@ export function createGroupStore(handlersRef: HandlersRef): EventStores['group']
 
   function emitChange() {
     handlersRef()?.onGroupChange?.(groupList)
+  }
+
+  function preserveCachedAdminRoles(existing: UiGroupMember[], incoming: UiGroupMember[]) {
+    const existingRoles = new Map(existing.map(member => [member.userId, member.role]))
+    return incoming.map((member) => {
+      const existingRole = existingRoles.get(member.userId)
+      return existingRole === GROUP_MEMBER_ROLE.ADMIN && member.role === GROUP_MEMBER_ROLE.MEMBER
+        ? { ...member, role: existingRole }
+        : member
+    })
   }
 
   return {
@@ -64,14 +75,19 @@ export function createGroupStore(handlersRef: HandlersRef): EventStores['group']
     },
 
     setGroupMembers(groupId, list) {
-      members.set(groupId, list)
-      handlersRef()?.onGroupMembersChanged?.({ groupId, members: list })
+      const merged = preserveCachedAdminRoles(members.get(groupId) ?? [], list)
+      members.set(groupId, merged)
+      handlersRef()?.onGroupMembersChanged?.({ groupId, members: merged })
+    },
+
+    getGroupMembers(groupId) {
+      return members.get(groupId) ?? []
     },
 
     appendGroupMembers(groupId, list) {
       const existing = members.get(groupId) ?? []
       const map = new Map(existing.map(m => [m.userId, m]))
-      for (const m of list)
+      for (const m of preserveCachedAdminRoles(existing, list))
         map.set(m.userId, m)
       const merged = Array.from(map.values())
       members.set(groupId, merged)
