@@ -331,6 +331,9 @@ const pinnedBarConfig = computed(() => props.config?.messageList?.pinnedBar)
 const showPinnedBar = computed(() => pinnedBarConfig.value?.visible !== false)
 const pinnedBarMaxLength = computed(() => pinnedBarConfig.value?.maxPreviewLength ?? 30)
 
+/** 群公告横幅配置 */
+const showGroupAnnouncementBar = computed(() => props.config?.messageList?.groupAnnouncementBar?.visible !== false)
+
 /** 在消息列表中定位置顶消息 */
 function onPinnedLocate(message: UiMessage) {
   const target = message.msgServerId || message.msgLocalId
@@ -1343,7 +1346,7 @@ async function doRemoveAdmin(member: UiGroupMember) {
 
           <!-- 群公告横幅 -->
           <GroupAnnouncementBanner
-            v-if="isGroupChat && currentConversation"
+            v-if="showGroupAnnouncementBar && isGroupChat && currentConversation"
             :group-id="currentConversation.id"
           />
 

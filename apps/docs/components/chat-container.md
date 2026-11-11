@@ -57,6 +57,58 @@ const chatConfig = {
 
 完整发送示例见 [`useMessageSend`](../api/composables/use-message-send)，单条渲染见 [MultiBodyMessage](./multi-body-message)。
 
+## 顶部横幅显示控制
+
+`messageList.pinnedBar.visible` 和 `messageList.groupAnnouncementBar.visible` 分别控制顶部置顶消息与群公告横幅，默认均为 `true`，可独立配置：
+
+```vue
+<EmChatContainer
+  :config="{
+    messageList: {
+      pinnedBar: { visible: false },
+      groupAnnouncementBar: { visible: false },
+    },
+  }"
+/>
+```
+
+传入响应式配置即可在运行时动态切换：
+
+```vue
+<script setup lang="ts">
+import { reactive } from 'vue'
+import { EmChatContainer } from '@easemob-community/uikit-im'
+import type { ChatConfig } from '@easemob-community/uikit-im'
+
+const chatConfig = reactive<ChatConfig>({
+  messageList: {
+    pinnedBar: { visible: true },
+    groupAnnouncementBar: { visible: true },
+  },
+})
+
+function togglePinnedBar() {
+  const config = chatConfig.messageList?.pinnedBar
+  if (config)
+    config.visible = !config.visible
+}
+
+function toggleGroupAnnouncementBar() {
+  const config = chatConfig.messageList?.groupAnnouncementBar
+  if (config)
+    config.visible = !config.visible
+}
+</script>
+
+<template>
+  <button type="button" @click="togglePinnedBar">切换置顶消息横幅</button>
+  <button type="button" @click="toggleGroupAnnouncementBar">切换群公告横幅</button>
+  <EmChatContainer :config="chatConfig" />
+</template>
+```
+
+这些开关仅控制顶部横幅：置顶/取消置顶操作仍由 `messageAction.enablePin` 控制；隐藏群公告横幅不会停止公告预拉，也不影响会话详情抽屉中的公告查看与编辑。
+
 ## API
 
 <!-- @include: ../.vitepress/gen/chat-container.md -->

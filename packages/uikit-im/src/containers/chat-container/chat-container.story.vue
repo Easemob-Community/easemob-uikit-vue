@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, usePresenceStore, useUserInfoStore } from '@easemob-community/uikit-core'
 import { useConversationStore } from '../../store/conversation'
+import { useGroupStore } from '../../store/group'
 import { useMessageStore } from '../../store/message'
 import type { ChatConfig } from '../../modules/chat/types'
-import { CONVERSATION_TYPE, MESSAGE_STATUS, MESSAGE_TYPE, usePresenceStore, useUserInfoStore } from '@easemob-community/uikit-core'
 import UIKitProvider from '../uikit-provider/uikit-provider.vue'
 import ChatContainer from './chat-container.vue'
 
@@ -58,6 +59,21 @@ function injectMockData() {
   msgStore.messageMap[mockConversation.id] = mockMessages as any
 }
 
+function injectBannerMockData() {
+  injectMockData()
+  const msgStore = useMessageStore()
+  const pinnedMessage = msgStore.messageMap.cvs_001?.[0]
+  if (pinnedMessage) {
+    msgStore.setPinnedMessages('cvs_001', [{
+      ...pinnedMessage,
+      pinned: true,
+      pinTime: Date.now(),
+      pinOperatorId: 'user_self',
+    }])
+  }
+  useGroupStore().setGroupAnnouncement('cvs_001', '本周五发布新版本，请提前完成相关功能验收。')
+}
+
 /** 单聊会话 mock（header 副标题区演示） */
 const singleChatConversation = {
   id: 'user_002',
@@ -100,6 +116,27 @@ const baseConfig: ChatConfig = {
   header: { visible: true, align: 'center' },
   messageList: { layout: 'conversation', showAvatar: true, showTime: true },
   input: { mode: 'simple', style: 'toolbar-top', features: { emoji: true, image: true, file: true, voice: true } },
+}
+
+const bannerConfig = ref<ChatConfig>({
+  ...baseConfig,
+  messageList: {
+    ...baseConfig.messageList,
+    pinnedBar: { visible: true },
+    groupAnnouncementBar: { visible: true },
+  },
+})
+
+function togglePinnedBar() {
+  const config = bannerConfig.value.messageList?.pinnedBar
+  if (config)
+    config.visible = !config.visible
+}
+
+function toggleGroupAnnouncementBar() {
+  const config = bannerConfig.value.messageList?.groupAnnouncementBar
+  if (config)
+    config.visible = !config.visible
 }
 
 /** 单聊 header 配置（设计师稿：左对齐、不展示头像） */
@@ -265,6 +302,34 @@ injectMockData()
         <UIKitProvider :auto-init="false">
           <ChatContainer :config="baseConfig" @vue:mounted="injectMockData" />
         </UIKitProvider>
+      </div>
+    </Variant>
+
+    <Variant title="Banner Visibility (Reactive)">
+      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <div style="display: flex; gap: 16px; padding: 12px 16px;">
+          <label style="display: flex; align-items: center; gap: 6px;">
+            <input
+              type="checkbox"
+              :checked="bannerConfig.messageList?.pinnedBar?.visible"
+              @change="togglePinnedBar"
+            >
+            显示置顶消息
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px;">
+            <input
+              type="checkbox"
+              :checked="bannerConfig.messageList?.groupAnnouncementBar?.visible"
+              @change="toggleGroupAnnouncementBar"
+            >
+            显示群公告
+          </label>
+        </div>
+        <div style="height: 600px;">
+          <UIKitProvider :auto-init="false">
+            <ChatContainer :config="bannerConfig" @vue:mounted="injectBannerMockData" />
+          </UIKitProvider>
+        </div>
       </div>
     </Variant>
 

@@ -211,6 +211,11 @@ export interface ChatConfig {
       /** 预览文本最大长度，默认 30 */
       maxPreviewLength?: number
     }
+    /** 群公告横幅配置 / Group announcement banner configuration */
+    groupAnnouncementBar?: {
+      /** 是否显示聊天页顶部群公告横幅，默认 true；不影响抽屉中的群公告 / Whether to show the announcement banner at the top of the chat page. Default true; does not affect the drawer announcement */
+      visible?: boolean
+    }
     /** 消息搜索配置（居中 Modal 形态，支持关键词高亮与消息类型筛选） */
     search?: {
       /** 是否启用消息搜索入口，默认 false */
