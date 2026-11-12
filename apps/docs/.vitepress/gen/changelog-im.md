@@ -1,3 +1,26 @@
+## @easemob-community/uikit-im 3.13.0 (2026-11-12)
+
+
+### 新增
+
+- **聊天页顶部横幅配置**：`chatConfig.messageList.groupAnnouncementBar.visible` 可控制聊天页群公告横幅，默认显示且不影响群信息抽屉中的公告；demo 同步补充置顶消息与群公告横幅开关。
+
+### 修复
+
+- **H5 全屏页面可视高度**：聊天宿主可消费 Provider 提供的可视视口高度，跟随浏览器底栏与软键盘变化，避免固定 `100vh` 造成底部遮挡。
+- **H5 输入区与草稿恢复**：输入区和表情/更多面板不再重复叠加键盘高度或底部安全区；切换会话恢复草稿时仅还原文本，不再自动聚焦弹起键盘。
+
+---
+
+## @easemob-community/uikit-im 3.12.1 (2026-11-10)
+
+
+### 修复
+
+- **群管理员角色重查同步**：升级双 SDK 适配器依赖，设置管理员后重新调用 `fetchGroupMembers` 可返回最新 `admin` 角色，避免缓存被 SDK 原始 `member` 覆盖。
+
+---
+
 ## @easemob-community/uikit-im 3.12.0 (2026-11-06)
 
 

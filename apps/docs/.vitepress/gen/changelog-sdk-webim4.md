@@ -1,3 +1,21 @@
+## @easemob-community/uikit-sdk-webim4 1.4.3 (2026-11-10)
+
+
+### 修复
+
+- **群成员角色缓存一致性**：`fetchGroupMembers` 按当前页合并缓存成员角色，首页重查与游标追加均保留已同步的 `admin`，避免设置管理员后仍返回 `member`；分页顺序、`cursor` 与 `hasMore` 语义不变。
+
+---
+
+## @easemob-community/uikit-sdk-webim4 1.4.2 (2026-11-10)
+
+
+### 修复
+
+- **群扩展信息同步**：将 4.x 群资料 `custom` 映射为中立字段 `ext`，并在创建快照、更新回写及群资料事件中保留 `ext` 与 `inviteNeedConfirm`。
+
+---
+
 ## @easemob-community/uikit-sdk-webim4 1.4.1 (2026-11-06)
 
 

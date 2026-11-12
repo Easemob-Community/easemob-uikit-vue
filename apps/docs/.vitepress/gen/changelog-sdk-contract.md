@@ -1,3 +1,12 @@
+## @easemob-community/uikit-sdk-contract 1.5.1 (2026-11-10)
+
+
+### 修复
+
+- **群资料中立字段补齐**：`UiGroup` 新增可选 `ext`、`inviteNeedConfirm` 与 `joinedAt`，统一群扩展信息、邀请确认配置及入群时间的跨 SDK 数据契约。
+
+---
+
 ## @easemob-community/uikit-sdk-contract 1.5.0 (2026-11-06)
 
 

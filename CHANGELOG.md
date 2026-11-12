@@ -1,5 +1,26 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.13.0 (2026-11-12)
+
+### 新增
+
+- **聊天页顶部横幅配置**：`chatConfig.messageList.groupAnnouncementBar.visible` 可控制聊天页群公告横幅，默认显示且不影响群信息抽屉中的公告；demo 同步补充置顶消息与群公告横幅开关。
+
+### 修复
+
+- **H5 全屏页面可视高度**：聊天宿主可消费 Provider 提供的可视视口高度，跟随浏览器底栏与软键盘变化，避免固定 `100vh` 造成底部遮挡。
+- **H5 输入区与草稿恢复**：输入区和表情/更多面板不再重复叠加键盘高度或底部安全区；切换会话恢复草稿时仅还原文本，不再自动聚焦弹起键盘。
+
+## @easemob-community/uikit-core 2.13.0 (2026-11-12)
+
+### 新增
+
+- **可视视口公开状态**：`useH5Adaptation` / `useViewport` 新增 `visibleHeight` 与 `viewportOffsetTop`，Provider 向子树提供 `--uikit-visible-height` 和 `--uikit-viewport-offset-top`，不支持 `visualViewport` 时回退到 `innerHeight` 与零偏移。
+
+### 修复
+
+- **H5 图片预览适配**：预览层挂载到 `body`，脱离宿主裁剪与层叠上下文，并跟随 Provider 的可视高度和顶部偏移；Provider 外使用保持兼容。
+
 ## @easemob-community/uikit-im 3.12.1 (2026-11-10)
 
 ### 修复

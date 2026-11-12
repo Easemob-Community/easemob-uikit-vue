@@ -1,3 +1,21 @@
+## @easemob-community/uikit-sdk-websdk5 1.6.2 (2026-11-10)
+
+
+### 修复
+
+- **群成员角色缓存一致性**：`fetchGroupMembers` 按当前页合并缓存成员角色，首页重查与游标追加均保留已同步的 `admin`，避免设置管理员后仍返回 `member`；分页顺序、`cursor` 与 `hasMore` 语义不变。
+
+---
+
+## @easemob-community/uikit-sdk-websdk5 1.6.1 (2026-11-10)
+
+
+### 修复
+
+- **群资料字段完整同步**：群详情与摘要映射、创建快照、更新回写及群资料事件均保留 `ext`、`inviteNeedConfirm` 与 `joinedAt`；旧版顶层稀疏事件过滤 `undefined`，避免覆盖已有群资料缓存。
+
+---
+
 ## @easemob-community/uikit-sdk-websdk5 1.6.0 (2026-11-06)
 
 
