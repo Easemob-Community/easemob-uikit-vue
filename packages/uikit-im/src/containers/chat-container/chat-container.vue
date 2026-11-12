@@ -233,7 +233,7 @@ defineExpose({
   overflow: hidden;
 }
 
-/* 键盘弹起时输入框已由 keyboardHeight padding 顶起，去掉容器这份 safe-bottom，避免双重叠加 */
+/* 键盘弹起时页面已跟随可视视口收缩，去掉容器 safe-bottom，避免额外底部空白 */
 .chat-container--keyboard-open {
   padding-bottom: 0;
 }

@@ -65,6 +65,8 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
 
   const width = ref(typeof window === 'undefined' ? 0 : window.innerWidth)
   const height = ref(typeof window === 'undefined' ? 0 : window.innerHeight)
+  const visibleHeight = ref(typeof window === 'undefined' ? 0 : window.visualViewport?.height ?? window.innerHeight)
+  const viewportOffsetTop = ref(typeof window === 'undefined' ? 0 : window.visualViewport?.offsetTop ?? 0)
   const isMobile = computed(() => width.value < 768)
 
   const safeAreaInsets = ref({
@@ -80,6 +82,8 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
       return
     width.value = window.innerWidth
     height.value = window.innerHeight
+    visibleHeight.value = window.visualViewport?.height ?? window.innerHeight
+    viewportOffsetTop.value = window.visualViewport?.offsetTop ?? 0
 
     if (!resolved.value.safeArea) {
       safeAreaInsets.value = { top: 0, right: 0, bottom: 0, left: 0 }
@@ -99,6 +103,7 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
     useEventListener(window, 'resize', updateViewportAndSafeArea)
     if (window.visualViewport) {
       useEventListener(window.visualViewport, 'resize', updateViewportAndSafeArea)
+      useEventListener(window.visualViewport, 'scroll', updateViewportAndSafeArea)
     }
   }
   // 初始化一次
@@ -123,6 +128,8 @@ export function useH5Adaptation(config: MaybeRef<H5AdaptationConfig> = {}) {
   return {
     config: resolved,
     viewport: { width, height },
+    visibleHeight,
+    viewportOffsetTop,
     isMobile,
     safeAreaInsets,
     keyboardHeight: computed(() =>

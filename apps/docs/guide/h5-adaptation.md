@@ -44,7 +44,6 @@ import { UIKitProvider } from '@easemob-community/uikit-im'
 - `address-book-container` header / footer
 - `popup` 底部弹出层
 - `scroll-to-top` 按钮
-- `message-input` 表情面板
 - `conversation-list` header / footer
 
 如果你的项目不需要安全区（例如纯 PC 网页），保持 `safeArea: false` 即可，组件会按 `0px` 处理。
@@ -53,11 +52,19 @@ import { UIKitProvider } from '@easemob-community/uikit-im'
 
 开启 `keyboardAdapt: true` 后：
 
-1. UIKit 监听 `window.visualViewport` 变化，实时得到软键盘高度。
-2. `chat.vue` 把键盘高度传给 `MessageInput`，输入框随键盘上移。
-3. 输入框获得焦点时，消息列表会自动滚动到最底部，避免键盘遮挡最新消息。
+1. UIKit 统一监听 `window.visualViewport` 的 `resize` / `scroll`，得到真实可视高度与软键盘状态。
+2. Provider 向子树提供 `--uikit-visible-height` 和 `--uikit-viewport-offset-top`；全屏宿主页面使用可视高度，原生底栏或键盘变化时不需要另行估算高度。
+3. 输入区不再把 `keyboardHeight` 转成底部 padding；该值只用于表情/更多面板高度对齐。
+4. 输入框获得焦点及键盘状态变化时，消息列表自动滚动到最底部，避免最新消息被遮挡。
 
-> 不需要在业务代码里手动监听 `resize` 或 `visualViewport`。
+```css
+.full-screen-h5-page {
+  height: 100vh;
+  height: var(--uikit-visible-height, 100dvh);
+}
+```
+
+> 不需要在业务组件里手动监听 `resize` 或 `visualViewport`。自定义全屏壳只需消费 Provider 提供的变量；UIKit 不会修改宿主的 `html`、`body` 或 `#app` 高度。
 
 ## 输入框模式
 
@@ -70,11 +77,11 @@ import { UIKitProvider } from '@easemob-community/uikit-im'
 
 H5 输入区布局遵循以下原则，避免键盘弹起时页面抖动或按钮被遮挡：
 
-- **固定底部**：输入区始终固定在视口底部，键盘弹起时随 `keyboardHeight` 同步上移。
+- **跟随可视底部**：全屏宿主容器跟随 `visualViewport.height`，输入区位于容器底部，不再通过键盘高度 padding 二次顶起。
 - **工具栏一行展示**：语音、表情、更多、发送等操作按钮在一行内完成，不拆成多行；语音/表情/更多互斥切换（选中态唯一），有文本时「+」自动切换为 plane 发送图标按钮。
 - **点击空白收起**：点击消息列表/聊天内容区空白处自动失焦输入框，收起软键盘与表情/更多面板。
 - **表情/更多面板高度对齐键盘**：面板展开高度与当前键盘高度保持一致，切换时无跳变；表情网格在全宽面板内均匀铺满。
-- **保留安全区底部**：`safeArea: true` 时输入区底部额外增加 `--uikit-safe-bottom`，避免被 home indicator 遮挡。
+- **安全区只计算一次**：`safeArea: true` 时由聊天容器统一添加 `--uikit-safe-bottom`，输入区和面板不重复添加；键盘打开时不再保留该底部安全区。
 - **避免输入框被键盘遮挡**：`chat.vue` 在键盘高度变化后二次调用 `scrollToBottom()`，确保最新消息可见。
 - **iOS 自动缩放规避**：H5 输入框字体固定 `16px`，防止 focus 时 Safari 自动放大页面。
 

@@ -90,20 +90,6 @@ const isKeyboardOpen = computed(() => (props.keyboardHeight ?? 0) > 0)
 /** 面板高度：与键盘高度对齐，键盘未弹起时兜底 280px */
 const panelHeightVar = computed(() => `${Math.max(props.keyboardHeight ?? 0, 280)}px`)
 
-/**
- * 根容器底部 padding：
- * - 键盘弹起：padding = 键盘高度（safe-bottom 由键盘区域覆盖，不再叠加）
- * - 面板展开：不加（面板自身 padding-bottom 含 safe-bottom）
- * - 默认：贴安全区
- */
-const rootStyle = computed(() => {
-  if (isKeyboardOpen.value)
-    return { paddingBottom: `${props.keyboardHeight}px` }
-  if (activePanel.value !== 'none')
-    return { paddingBottom: '0px' }
-  return { paddingBottom: 'var(--uikit-safe-bottom, 0px)' }
-})
-
 /** 输入框引用 */
 const textareaRef = ref<HTMLTextAreaElement>()
 
@@ -492,13 +478,15 @@ function onSelectSticker(sticker: EmojiStickerItem, packId: string) {
   emit('sticker-select', sticker, packId)
 }
 
-/** 设置输入文本 */
-function setText(value: string) {
+/** 设置输入文本；shouldFocus=false 时仅恢复内容，不主动聚焦 */
+function setText(value: string, shouldFocus = true) {
   text.value = value
   mentionList.value = []
-  nextTick(() => {
-    textareaRef.value?.focus()
-  })
+  if (shouldFocus) {
+    nextTick(() => {
+      textareaRef.value?.focus()
+    })
+  }
 }
 
 /** 获取当前输入文本 */
@@ -538,7 +526,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="h5-input" :style="rootStyle">
+  <div class="h5-input">
     <!-- 工具条：[语音切换] [输入区] [表情] [+ / 发送] -->
     <div class="h5-input__toolbar">
       <button
@@ -801,7 +789,6 @@ defineExpose({
 .h5-input__panel {
   overflow: hidden;
   border-top: 1px solid var(--uikit-border-color);
-  padding-bottom: var(--uikit-safe-bottom, 0px);
 }
 
 /* 面板内表情选择器全宽：双类选择器提高特异性，压过 core .emoji-picker 的固定 320px 宽度

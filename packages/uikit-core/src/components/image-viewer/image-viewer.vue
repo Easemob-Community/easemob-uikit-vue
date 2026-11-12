@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import Icon from '../icon/icon.vue'
 import { useLocale } from '../../locale'
 import { useKeyBindings } from '../../composables/use-key-bindings'
 import { useToast } from '../../composables/use-toast'
+import { CORE_UIKIT_CONTEXT_KEY } from '../../composables/use-uikit'
 import { nextZIndex } from '../../utils/z-index'
 import { detectEnvironment, downloadFile } from '../../utils/download'
 
@@ -38,6 +39,8 @@ export interface ImageViewerEmits {
   (e: 'download', url: string, index: number): void
 }
 
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<ImageViewerProps>(), {
   index: 0,
   show: false,
@@ -49,11 +52,21 @@ const props = withDefaults(defineProps<ImageViewerProps>(), {
 const emit = defineEmits<ImageViewerEmits>()
 const { t } = useLocale()
 const { show: showToast } = useToast()
+const h5 = inject(CORE_UIKIT_CONTEXT_KEY, undefined)?.h5
 
 /** 内部显示状态（受控于 props.show） */
 const visible = ref(props.show)
 /** 实际 z-index：打开时从全局分配器取递增 */
 const zIndex = ref(2000)
+const viewerStyle = computed(() => ({
+  zIndex: zIndex.value,
+  ...((h5?.visibleHeight.value ?? 0) > 0
+    ? {
+      '--uikit-visible-height': `${h5!.visibleHeight.value}px`,
+      '--uikit-viewport-offset-top': `${h5!.viewportOffsetTop.value}px`,
+    }
+    : {}),
+}))
 
 watch(() => props.show, (v) => {
   visible.value = v
@@ -360,134 +373,140 @@ async function handleDownload() {
 </script>
 
 <template>
-  <div
-    v-if="visible"
-    class="image-viewer"
-    :style="{ zIndex }"
-    @click="onOverlayClick"
-    @wheel.prevent="onWheel"
-  >
-    <button
-      type="button"
-      class="image-viewer__close"
-      :aria-label="t('button.close', '关闭')"
-      :title="t('button.close', '关闭')"
-      @click.stop="close"
+  <Teleport to="body">
+    <div
+      v-if="visible"
+      class="image-viewer"
+      v-bind="$attrs"
+      :style="viewerStyle"
+      @click="onOverlayClick"
+      @wheel.prevent="onWheel"
     >
-      <Icon name="xmark/bold" :size="24" />
-    </button>
+      <button
+        type="button"
+        class="image-viewer__close"
+        :aria-label="t('button.close', '关闭')"
+        :title="t('button.close', '关闭')"
+        @click.stop="close"
+      >
+        <Icon name="xmark/bold" :size="24" />
+      </button>
 
-    <img
-      :key="currentIndex"
-      :src="currentSrc"
-      class="image-viewer__img"
-      :style="{ transform: transformStyle }"
-      :class="{
-        'image-viewer__img--dragging': isDragging,
-        'image-viewer__img--no-transition': isDragging || isGesturing,
-      }"
-      alt="preview"
-      draggable="false"
-      @load="onImgLoad"
-      @error="onImgError"
-      @click.stop
-      @dblclick="onDblClick"
-      @touchstart.passive="onTouchStart"
-      @touchmove.prevent="onTouchMove"
-      @touchend="onTouchEnd"
-      @mousedown="onMouseDown"
-    >
+      <img
+        :key="currentIndex"
+        :src="currentSrc"
+        class="image-viewer__img"
+        :style="{ transform: transformStyle }"
+        :class="{
+          'image-viewer__img--dragging': isDragging,
+          'image-viewer__img--no-transition': isDragging || isGesturing,
+        }"
+        alt="preview"
+        draggable="false"
+        @load="onImgLoad"
+        @error="onImgError"
+        @click.stop
+        @dblclick="onDblClick"
+        @touchstart.passive="onTouchStart"
+        @touchmove.prevent="onTouchMove"
+        @touchend="onTouchEnd"
+        @mousedown="onMouseDown"
+      >
 
-    <!-- 加载中（首屏/切换原图） -->
-    <div v-if="isLoading" class="image-viewer__loading">
-      <Icon name="loading/arc/normal" :size="40" class="image-viewer__spinner" anim="spin" />
+      <!-- 加载中（首屏/切换原图） -->
+      <div v-if="isLoading" class="image-viewer__loading">
+        <Icon name="loading/arc/normal" :size="40" class="image-viewer__spinner" anim="spin" />
+      </div>
+      <!-- 加载失败占位 -->
+      <div v-else-if="isError" class="image-viewer__failed">
+        <Icon name="triangle/exclamation" :size="36" />
+        <span>{{ t('imageViewer.loadFailed', '图片加载失败') }}</span>
+      </div>
+
+      <!-- 多图切换箭头 -->
+      <button
+        v-if="showNavigator && srcs.length > 1"
+        class="image-viewer__nav image-viewer__nav--prev"
+        @click.stop="goPrev"
+      >
+        <Icon name="chevron/left" :size="28" />
+      </button>
+      <button
+        v-if="showNavigator && srcs.length > 1"
+        class="image-viewer__nav image-viewer__nav--next"
+        @click.stop="goNext"
+      >
+        <Icon name="chevron/right" :size="28" />
+      </button>
+
+      <!-- 底部插槽：业务侧放大图/原图切换按钮；默认显示索引指示器 -->
+      <div class="image-viewer__footer" @click.stop>
+        <slot name="footer" :index="currentIndex" :loading="isLoading" :error="isError">
+          <span v-if="showNavigator && srcs.length > 1" class="image-viewer__counter">
+            {{ currentIndex + 1 }} / {{ srcs.length }}
+          </span>
+        </slot>
+      </div>
+
+      <!-- 工具栏：缩放/旋转/适应屏/下载 -->
+      <div v-if="showToolbar" class="image-viewer__toolbar" @click.stop>
+        <button
+          class="image-viewer__tool-btn"
+          :title="t('imageViewer.zoomOut', '缩小')"
+          :disabled="scale <= 1"
+          @click="zoomOut"
+        >
+          <Icon name="search/minus" :size="18" />
+        </button>
+        <button
+          class="image-viewer__tool-btn"
+          :title="t('imageViewer.zoomIn', '放大')"
+          :disabled="scale >= 5"
+          @click="zoomIn"
+        >
+          <Icon name="search/plus" :size="18" />
+        </button>
+        <button
+          class="image-viewer__tool-btn"
+          :title="resetTooltip"
+          :disabled="isViewReset"
+          @click="resetView"
+        >
+          <Icon name="ringarrow/ccw" :size="18" />
+        </button>
+        <button
+          class="image-viewer__tool-btn"
+          :title="t('imageViewer.rotateLeft', '向左旋转')"
+          @click="rotateLeft"
+        >
+          <Icon name="ringarrow/ccw" :size="18" />
+        </button>
+        <button
+          class="image-viewer__tool-btn"
+          :title="t('imageViewer.rotateRight', '向右旋转')"
+          @click="rotateRight"
+        >
+          <Icon name="ringarrow/cw" :size="18" />
+        </button>
+        <button
+          class="image-viewer__tool-btn"
+          :title="t('imageViewer.download', '下载')"
+          @click="handleDownload"
+        >
+          <Icon name="arrow/down_tray" :size="18" />
+        </button>
+      </div>
     </div>
-    <!-- 加载失败占位 -->
-    <div v-else-if="isError" class="image-viewer__failed">
-      <Icon name="triangle/exclamation" :size="36" />
-      <span>{{ t('imageViewer.loadFailed', '图片加载失败') }}</span>
-    </div>
-
-    <!-- 多图切换箭头 -->
-    <button
-      v-if="showNavigator && srcs.length > 1"
-      class="image-viewer__nav image-viewer__nav--prev"
-      @click.stop="goPrev"
-    >
-      <Icon name="chevron/left" :size="28" />
-    </button>
-    <button
-      v-if="showNavigator && srcs.length > 1"
-      class="image-viewer__nav image-viewer__nav--next"
-      @click.stop="goNext"
-    >
-      <Icon name="chevron/right" :size="28" />
-    </button>
-
-    <!-- 底部插槽：业务侧放大图/原图切换按钮；默认显示索引指示器 -->
-    <div class="image-viewer__footer" @click.stop>
-      <slot name="footer" :index="currentIndex" :loading="isLoading" :error="isError">
-        <span v-if="showNavigator && srcs.length > 1" class="image-viewer__counter">
-          {{ currentIndex + 1 }} / {{ srcs.length }}
-        </span>
-      </slot>
-    </div>
-
-    <!-- 工具栏：缩放/旋转/适应屏/下载 -->
-    <div v-if="showToolbar" class="image-viewer__toolbar" @click.stop>
-      <button
-        class="image-viewer__tool-btn"
-        :title="t('imageViewer.zoomOut', '缩小')"
-        :disabled="scale <= 1"
-        @click="zoomOut"
-      >
-        <Icon name="search/minus" :size="18" />
-      </button>
-      <button
-        class="image-viewer__tool-btn"
-        :title="t('imageViewer.zoomIn', '放大')"
-        :disabled="scale >= 5"
-        @click="zoomIn"
-      >
-        <Icon name="search/plus" :size="18" />
-      </button>
-      <button
-        class="image-viewer__tool-btn"
-        :title="resetTooltip"
-        :disabled="isViewReset"
-        @click="resetView"
-      >
-        <Icon name="ringarrow/ccw" :size="18" />
-      </button>
-      <button
-        class="image-viewer__tool-btn"
-        :title="t('imageViewer.rotateLeft', '向左旋转')"
-        @click="rotateLeft"
-      >
-        <Icon name="ringarrow/ccw" :size="18" />
-      </button>
-      <button
-        class="image-viewer__tool-btn"
-        :title="t('imageViewer.rotateRight', '向右旋转')"
-        @click="rotateRight"
-      >
-        <Icon name="ringarrow/cw" :size="18" />
-      </button>
-      <button
-        class="image-viewer__tool-btn"
-        :title="t('imageViewer.download', '下载')"
-        @click="handleDownload"
-      >
-        <Icon name="arrow/down_tray" :size="18" />
-      </button>
-    </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
 .image-viewer {
   position: fixed;
-  inset: 0;
+  top: var(--uikit-viewport-offset-top, 0px);
+  right: 0;
+  left: 0;
+  height: var(--uikit-visible-height, 100dvh);
   background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
@@ -526,7 +545,7 @@ async function handleDownload() {
 
 .image-viewer__img {
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 90%;
   object-fit: contain;
   border-radius: 4px;
   user-select: none;

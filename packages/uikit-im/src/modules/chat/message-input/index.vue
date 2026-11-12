@@ -956,7 +956,7 @@ function getDraftSnapshot(): MessageInputDraft | null {
 
 function restoreDraftSnapshot(draft: MessageInputDraft | null): void {
   if (isMobile.value) {
-    h5InputRef.value?.setText(draft?.text || '')
+    h5InputRef.value?.setText(draft?.text || '', false)
     return
   }
   const snapshot = draft?.snapshot

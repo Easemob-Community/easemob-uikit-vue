@@ -153,7 +153,7 @@ const noticeConfig = computed(() => props.noticeConfig ?? {})
  * adapter prop 注入时业务全权管理其生命周期；未注入时走注册表默认适配器
  * （由场景包子路径入口自注册，如 @easemob-community/uikit-im/websdk5，决策 22）。
  */
-useCoreUIKitProvider(config.value, {
+const { h5 } = useCoreUIKitProvider(config.value, {
   adapter: props.adapter,
   autoInit: props.autoInit,
   features,
@@ -165,6 +165,15 @@ useCoreUIKitProvider(config.value, {
     onTokenWillExpire: props.onTokenWillExpire,
     onTokenExpired: props.onTokenExpired,
   },
+})
+
+const providerStyle = computed((): Record<string, string> => {
+  if (h5.visibleHeight.value <= 0)
+    return {}
+  return {
+    '--uikit-visible-height': `${h5.visibleHeight.value}px`,
+    '--uikit-viewport-offset-top': `${h5.viewportOffsetTop.value}px`,
+  }
 })
 
 /** 场景无关副作用（theme/locale/animation/h5 安全区/通知/日志 watch）走 core 共享实现 */
@@ -187,7 +196,7 @@ const {
 </script>
 
 <template>
-  <div class="uikit-provider">
+  <div class="uikit-provider" :style="providerStyle">
     <slot />
     <EmToast v-if="props.enableToast" v-bind="toastProps" />
     <EmNotificationContainer

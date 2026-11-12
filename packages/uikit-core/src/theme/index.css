@@ -59,6 +59,8 @@
   --uikit-safe-right: env(safe-area-inset-right);
   --uikit-safe-bottom: env(safe-area-inset-bottom);
   --uikit-safe-left: env(safe-area-inset-left);
+  --uikit-visible-height: 100vh;
+  --uikit-viewport-offset-top: 0px;
 
   /* 边框与分隔线 */
   --uikit-border-color: #e5e7eb;

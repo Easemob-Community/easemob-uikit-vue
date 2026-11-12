@@ -113,6 +113,8 @@ const {
   groupReadReceiptEnabled,
   groupReadReceiptMaxSize,
   chatShowTime,
+  chatPinnedBarVisible,
+  chatGroupAnnouncementBarVisible,
   chatMessageSearchEnabled,
   chatMessageServerSearchEnabled,
   chatMessageStatusShowText,
@@ -326,6 +328,8 @@ const chatConfig = computed(() => ({
     showTime: chatShowTime.value,
     bubbleStyle: chatBubbleStyle.value,
     voiceUnreadDot: chatVoiceUnreadDot.value,
+    pinnedBar: { visible: chatPinnedBarVisible.value },
+    groupAnnouncementBar: { visible: chatGroupAnnouncementBarVisible.value },
     search: {
       enabled: chatMessageSearchEnabled.value,
       enableServerSearch: chatMessageServerSearchEnabled.value,
@@ -526,7 +530,7 @@ watch(
 
 <template>
   <!-- 事件委托根：Dev Hints 引擎在此监听悬停（rootRef 绑定） -->
-  <div ref="rootRef" class="demo-layout">
+  <div ref="rootRef" class="demo-layout" :class="{ 'demo-layout--mobile': isMobile }">
     <!-- ==================== PC 三栏布局 ==================== -->
     <template v-if="!isMobile">
       <!-- 左侧导航栏（仿微信） -->
@@ -984,6 +988,11 @@ watch(
   box-sizing: border-box;
 }
 
+.demo-layout--mobile {
+  gap: 0;
+  padding: 0;
+}
+
 .demo-toolbar-btn {
   display: inline-flex;
   align-items: center;
@@ -1041,6 +1050,7 @@ watch(
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: var(--uikit-visible-height, 100dvh);
   width: 100vw;
   background-color: var(--uikit-bg-base, #ffffff);
   overflow: hidden;

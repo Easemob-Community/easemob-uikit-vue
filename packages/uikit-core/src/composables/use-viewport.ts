@@ -23,6 +23,8 @@ export function useViewport() {
     return {
       width: h5.viewport.width,
       height: h5.viewport.height,
+      visibleHeight: h5.visibleHeight,
+      viewportOffsetTop: h5.viewportOffsetTop,
       isMobile: h5.isMobile,
       // H5 适配相关扩展字段，方便组件直接读取
       keyboardHeight: h5.keyboardHeight,
@@ -34,16 +36,21 @@ export function useViewport() {
   // Provider 外部 fallback
   const width = ref(typeof window === 'undefined' ? 0 : window.innerWidth)
   const height = ref(typeof window === 'undefined' ? 0 : window.innerHeight)
+  const visibleHeight = ref(typeof window === 'undefined' ? 0 : window.innerHeight)
+  const viewportOffsetTop = ref(0)
   const isMobile = computed(() => width.value < 768)
 
   useEventListener(window, 'resize', () => {
     width.value = window.innerWidth
     height.value = window.innerHeight
+    visibleHeight.value = window.innerHeight
   })
 
   return {
     width,
     height,
+    visibleHeight,
+    viewportOffsetTop,
     isMobile,
     keyboardHeight: ref(0),
     isKeyboardOpen: ref(false),

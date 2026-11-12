@@ -52,6 +52,8 @@ const {
   groupReadReceiptEnabled,
   groupReadReceiptMaxSize,
   chatShowTime,
+  chatPinnedBarVisible,
+  chatGroupAnnouncementBarVisible,
   chatMessageSearchEnabled,
   chatMessageServerSearchEnabled,
   chatMessageStatusShowText,
@@ -292,9 +294,17 @@ const {
     <div class="demo-settings__group">
       <DemoSettingLabel
         title="消息列表"
-        tip="时间戳显示策略（关闭 / 始终 / 悬停）、消息搜索开关、中性气泡带底色/无底色、发送状态样式（经典小字 / 数字胶囊）与排列方向"
+        tip="顶部横幅、时间戳、消息搜索、中性气泡与发送状态等聊天页配置"
       />
       <div style="display: flex; flex-direction: column; gap: 12px;">
+        <label class="demo-check">
+          <input v-model="chatPinnedBarVisible" type="checkbox" />
+          <span>显示置顶消息横幅</span>
+        </label>
+        <label class="demo-check">
+          <input v-model="chatGroupAnnouncementBarVisible" type="checkbox" />
+          <span>显示群公告横幅</span>
+        </label>
         <label class="demo-check">
           <input v-model="chatMessageSearchEnabled" type="checkbox" />
           <span>启用消息搜索</span>

@@ -357,6 +357,8 @@ function createDemoSettings() {
 
   /* ===== 消息列表配置 ===== */
   const chatShowTime = ref<false | true | 'always' | 'hover'>(false)
+  const chatPinnedBarVisible = ref(true)
+  const chatGroupAnnouncementBarVisible = ref(true)
   const chatMessageSearchEnabled = ref(true)
   /** 服务端消息搜索（付费增值服务，需在环信控制台开通；关闭时纯本地搜索） */
   const chatMessageServerSearchEnabled = ref(false)
@@ -593,6 +595,8 @@ function createDemoSettings() {
     groupReadReceiptMaxSize,
     // 消息列表
     chatShowTime,
+    chatPinnedBarVisible,
+    chatGroupAnnouncementBarVisible,
     chatMessageSearchEnabled,
     chatMessageServerSearchEnabled,
     chatMessageStatusShowText,
