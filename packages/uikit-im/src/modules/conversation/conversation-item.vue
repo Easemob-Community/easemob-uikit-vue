@@ -16,6 +16,7 @@ import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 import type { PresenceDisplayStatus } from '@easemob-community/uikit-core'
 import type { ConversationAction } from './types'
+import { shouldFetchLastMessageSender } from './conversation-item.utils'
 
 export interface ConversationItemProps {
   conversation: Conversation
@@ -80,12 +81,12 @@ const peerUserId = computed(() => {
 })
 const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
 
-/** 群聊最后一条消息发送者 userId，用于资料异步就绪后重新解析昵称 */
-const lastMessageSenderUserId = computed(() => {
-  if (!isSingleChat.value)
-    return props.conversation.lastMessageFrom
-  return undefined
-})
+/** 仅在摘要仍展示原始 userId 时回退拉取；SDK 已预填充昵称时不重复请求 */
+const lastMessageSenderUserId = computed(() =>
+  shouldFetchLastMessageSender(props.conversation, props.showSenderName)
+    ? props.conversation.lastMessageFrom
+    : undefined,
+)
 const { displayName: lastMessageSenderDisplayName } = useUserInfo(lastMessageSenderUserId)
 
 const { get: getPresence } = usePresence()

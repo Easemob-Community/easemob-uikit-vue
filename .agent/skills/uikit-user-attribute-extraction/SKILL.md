@@ -49,8 +49,8 @@ export function useUserInfo(
 
 **关键特性**：
 
-- **自动拉取**：首次调用时若 store 无缓存，自动调 `domains.userInfo.fetchUserInfos([userId])`。
-- **自动订阅**：若 `enableUserInfoSubscription` 开启，自动订阅陌生人资料变更；服务端未开通时自动熔断。
+- **自动拉取**：首次调用时若 store 无缓存，自动调 `domains.userInfo.fetchUserInfos([userId])`；同一 tick 先合批，再按 100 人顺序分片，分片失败互不影响。会话列表群发送者仅在摘要仍展示原始 userId 时回退，SDK 已预填昵称时不重复拉取。
+- **自动订阅**：若 `enableUserInfoSubscription` 开启，自动订阅陌生人资料变更；订阅/退订同样按 100 人顺序分片，服务端未开通时自动熔断并停止剩余分片。
 - **优先级内置**：`displayName = contact.remark > userInfo.nickname > userId`，`avatarUrl = userInfo.avatarUrl > contact.avatar`。
 - **参数支持 ref / getter**：可传 `() => props.userId` 跟随响应式变化。
 

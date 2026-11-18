@@ -10,6 +10,8 @@ function makeClient(connected = true) {
     isConnected: connected,
     userInfoManager: {
       getUserInfoByAttribute: vi.fn().mockResolvedValue([]),
+      subscribeUsersInfo: vi.fn().mockResolvedValue(undefined),
+      unsubscribeUsersInfo: vi.fn().mockResolvedValue(undefined),
       addEventHandler: vi.fn(),
       removeEventHandler: vi.fn(),
     },
@@ -35,12 +37,23 @@ function makeStore(options: { fetchedIds?: string[], cached?: UserInfo[] } = {})
     markFetchFailed: vi.fn(),
     isFetchFailed: () => false,
     isLoading: () => false,
+    isSubscriptionDisabled: () => false,
+    isSubscribed: () => false,
+    isSubscribeFailed: () => false,
+    markSubscribed: vi.fn(),
+    markUnsubscribed: vi.fn(),
+    markSubscribeFailed: vi.fn(),
+    disableSubscription: vi.fn(),
   } as unknown as UserInfoStoreLike & {
     setUserInfos: ReturnType<typeof vi.fn>
     markFetchedAttributes: ReturnType<typeof vi.fn>
     markLoading: ReturnType<typeof vi.fn>
     markLoaded: ReturnType<typeof vi.fn>
     markFetchFailed: ReturnType<typeof vi.fn>
+    markSubscribed: ReturnType<typeof vi.fn>
+    markUnsubscribed: ReturnType<typeof vi.fn>
+    markSubscribeFailed: ReturnType<typeof vi.fn>
+    disableSubscription: ReturnType<typeof vi.fn>
   }
 }
 
@@ -171,5 +184,166 @@ describe('userInfoDomain fetchUserInfos 微任务合批', () => {
     expect(result).toEqual([])
     expect(client.userInfoManager.getUserInfoByAttribute).not.toHaveBeenCalled()
     expect(store.markLoading).not.toHaveBeenCalled()
+  })
+})
+
+describe('userInfoDomain fetchUserInfos 100 人分片', () => {
+  it('205 个 ID 按 100/100/5 顺序请求', async () => {
+    const client = makeClient()
+    const getUserInfoByAttribute = client.userInfoManager.getUserInfoByAttribute as ReturnType<typeof vi.fn>
+    let active = 0
+    let maxActive = 0
+    getUserInfoByAttribute.mockImplementation(async ({ userIds }: { userIds: string[] }) => {
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await Promise.resolve()
+      active -= 1
+      return userIds.map(userId => ({ userId }))
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.fetchUserInfos(userIds, ['nickname'])
+
+    expect(getUserInfoByAttribute.mock.calls.map(call => call[0].userIds)).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(maxActive).toBe(1)
+  })
+
+  it('repository 注入路径也按 100 人分片', async () => {
+    const client = makeClient()
+    const store = makeStore()
+    const fetchUserInfos = vi.fn(async (userIds: string[]) => userIds.map(userId => ({ userId })))
+    const domain = new UserInfoDomain(client, store, { fetchUserInfos })
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.fetchUserInfos(userIds)
+
+    expect(fetchUserInfos.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(client.userInfoManager.getUserInfoByAttribute).not.toHaveBeenCalled()
+  })
+
+  it('中间分片失败不影响其他分片入库和属性标记', async () => {
+    const client = makeClient()
+    const getUserInfoByAttribute = client.userInfoManager.getUserInfoByAttribute as ReturnType<typeof vi.fn>
+    let callIndex = 0
+    getUserInfoByAttribute.mockImplementation(async ({ userIds }: { userIds: string[] }) => {
+      callIndex += 1
+      if (callIndex === 2)
+        throw new Error('chunk failed')
+      return userIds.map(userId => ({ userId }))
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    const result = await domain.fetchUserInfos(userIds, ['nickname'])
+
+    expect(result).toHaveLength(105)
+    expect(store.markFetchFailed).toHaveBeenCalledTimes(1)
+    expect(store.markFetchFailed).toHaveBeenCalledWith(userIds.slice(100, 200))
+    expect(store.markFetchedAttributes.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(200),
+    ])
+  })
+})
+
+describe('userInfoDomain 资料订阅 100 人分片', () => {
+  it('订阅 205 个 ID 按 100/100/5 顺序请求', async () => {
+    const client = makeClient()
+    const subscribeUsersInfo = client.userInfoManager.subscribeUsersInfo as ReturnType<typeof vi.fn>
+    let active = 0
+    let maxActive = 0
+    subscribeUsersInfo.mockImplementation(async () => {
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await Promise.resolve()
+      active -= 1
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.subscribeUserInfos(userIds)
+
+    expect(subscribeUsersInfo.mock.calls.map(call => call[0].userIds)).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(maxActive).toBe(1)
+  })
+
+  it('普通错误只影响当前订阅分片并继续后续分片', async () => {
+    const client = makeClient()
+    const subscribeUsersInfo = client.userInfoManager.subscribeUsersInfo as ReturnType<typeof vi.fn>
+    let callIndex = 0
+    subscribeUsersInfo.mockImplementation(async () => {
+      callIndex += 1
+      if (callIndex === 2)
+        throw new Error('chunk failed')
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.subscribeUserInfos(userIds)
+
+    expect(subscribeUsersInfo).toHaveBeenCalledTimes(3)
+    expect(store.markSubscribeFailed).toHaveBeenCalledWith(userIds.slice(100, 200))
+    expect(store.markSubscribed.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(200),
+    ])
+  })
+
+  it('权限错误熔断并停止剩余订阅分片', async () => {
+    const client = makeClient()
+    const subscribeUsersInfo = client.userInfoManager.subscribeUsersInfo as ReturnType<typeof vi.fn>
+    subscribeUsersInfo.mockRejectedValue({ code: 210 })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.subscribeUserInfos(userIds)
+
+    expect(subscribeUsersInfo).toHaveBeenCalledTimes(1)
+    expect(store.markSubscribeFailed).toHaveBeenCalledWith(userIds.slice(0, 100))
+    expect(store.disableSubscription).toHaveBeenCalledTimes(1)
+  })
+
+  it('退订 205 个 ID 按 100/100/5 请求并只更新成功分片', async () => {
+    const client = makeClient()
+    const unsubscribeUsersInfo = client.userInfoManager.unsubscribeUsersInfo as ReturnType<typeof vi.fn>
+    let callIndex = 0
+    unsubscribeUsersInfo.mockImplementation(async () => {
+      callIndex += 1
+      if (callIndex === 2)
+        throw new Error('chunk failed')
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.unsubscribeUsersInfo(userIds)
+
+    expect(unsubscribeUsersInfo.mock.calls.map(call => call[0].userIds)).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(store.markUnsubscribed.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(200),
+    ])
   })
 })

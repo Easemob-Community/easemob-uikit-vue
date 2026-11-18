@@ -10,6 +10,7 @@ import type { Webim4Client } from '../client'
 import type { UserInfoStoreLike } from '../event/types'
 
 const logger = createLogger('UIKit:Webim4UserInfoDomain')
+const USER_INFO_REQUEST_BATCH_SIZE = 100
 
 /** 解包 4.x AsyncResult（data/entities 二选一承载） */
 function unwrap<T>(res: EasemobChat.AsyncResult<T>): T {
@@ -86,8 +87,8 @@ export class UserInfoDomain {
 
   /**
    * 批量获取用户资料；已缓存（且请求属性已覆盖）或正在加载中的 userId 会被跳过。
-   * 同一事件循环内的多次调用会合批为一次底层请求（微任务 flush，与 websdk5 同构对齐）：
-   * flush 时合并所有调用的 userIds（去重）与 attributes（并集），只发一次请求，
+   * 同一事件循环内的多次调用会先微任务合批，再按 100 人顺序分片（与 websdk5 同构对齐）：
+   * flush 时合并所有调用的 userIds（去重）与 attributes（并集），
    * 每个原始调用各自 resolve 回「自己请求的 userIds 对应的 UserInfo[]」（从 store 缓存读回）。
    * @param userIds 目标用户 ID 列表
    * @param attributes 需要查询的属性，默认全量 8 个属性
@@ -136,23 +137,28 @@ export class UserInfoDomain {
       if (missingIds.length > 0) {
         this.store.markLoading(missingIds)
         try {
-          const infos = this.userInfoRepository.fetchUserInfos
-            ? await this.fetchFromRepository(missingIds)
-            : await this.fetchFromSdk(missingIds, attributes)
+          for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+            const chunk = missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
+            try {
+              const infos = this.userInfoRepository.fetchUserInfos
+                ? await this.fetchFromRepository(chunk)
+                : await this.fetchFromSdk(chunk, attributes)
 
-          // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
-          const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
-          const failedIds = missingIds.filter(id => !fetchedIds.has(id))
-          if (failedIds.length > 0)
-            this.store.markFetchFailed(failedIds)
+              // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
+              const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+              const failedIds = chunk.filter(id => !fetchedIds.has(id))
+              if (failedIds.length > 0)
+                this.store.markFetchFailed(failedIds)
 
-          this.store.setUserInfos(infos)
-          // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
-          this.store.markFetchedAttributes(missingIds, attributes)
-        }
-        catch (err) {
-          logger.warn('[UserInfoDomain] fetchUserInfos failed:', err)
-          this.store.markFetchFailed(missingIds)
+              this.store.setUserInfos(infos)
+              // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
+              this.store.markFetchedAttributes(chunk, attributes)
+            }
+            catch (err) {
+              logger.warn('[UserInfoDomain] fetchUserInfos failed:', err)
+              this.store.markFetchFailed(chunk)
+            }
+          }
         }
         finally {
           this.store.markLoaded(missingIds)

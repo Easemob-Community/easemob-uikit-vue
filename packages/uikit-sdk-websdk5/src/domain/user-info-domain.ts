@@ -5,6 +5,7 @@ import type { UserInfoStoreLike } from '../event/types'
 import { formatSdkError } from '../utils/sdk-error'
 
 const logger = createLogger('UIKit:UserInfoDomain')
+const USER_INFO_REQUEST_BATCH_SIZE = 100
 
 /**
  * 用户资料全部可查属性（SDK UserInfoAttribute 全集）。
@@ -60,8 +61,8 @@ export class UserInfoDomain {
 
   /**
    * 批量获取用户资料；已缓存（且请求属性已覆盖）或正在加载中的 userId 会被跳过。
-   * 同一事件循环内的多次调用会合批为一次底层请求（微任务 flush，与 subscribe 合批同构）：
-   * flush 时合并所有调用的 userIds（去重）与 attributes（并集），只发一次请求，
+   * 同一事件循环内的多次调用会先微任务合批，再按 100 人顺序分片（与 subscribe 合批同构）：
+   * flush 时合并所有调用的 userIds（去重）与 attributes（并集），
    * 每个原始调用各自 resolve 回「自己请求的 userIds 对应的 UserInfo[]」（从 store 缓存读回）。
    * @param userIds 目标用户 ID 列表
    * @param attributes 需要查询的属性，默认全量 8 个属性
@@ -110,23 +111,28 @@ export class UserInfoDomain {
       if (missingIds.length > 0) {
         this.store.markLoading(missingIds)
         try {
-          const infos = this.userInfoRepository.fetchUserInfos
-            ? await this.fetchFromRepository(missingIds)
-            : await this.fetchFromSdk(missingIds, attributes)
+          for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+            const chunk = missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
+            try {
+              const infos = this.userInfoRepository.fetchUserInfos
+                ? await this.fetchFromRepository(chunk)
+                : await this.fetchFromSdk(chunk, attributes)
 
-          // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
-          const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
-          const failedIds = missingIds.filter(id => !fetchedIds.has(id))
-          if (failedIds.length > 0)
-            this.store.markFetchFailed(failedIds)
+              // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
+              const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+              const failedIds = chunk.filter(id => !fetchedIds.has(id))
+              if (failedIds.length > 0)
+                this.store.markFetchFailed(failedIds)
 
-          this.store.setUserInfos(infos)
-          // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
-          this.store.markFetchedAttributes(missingIds, attributes)
-        }
-        catch (err) {
-          logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
-          this.store.markFetchFailed(missingIds)
+              this.store.setUserInfos(infos)
+              // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
+              this.store.markFetchedAttributes(chunk, attributes)
+            }
+            catch (err) {
+              logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
+              this.store.markFetchFailed(chunk)
+            }
+          }
         }
         finally {
           this.store.markLoaded(missingIds)
@@ -181,7 +187,7 @@ export class UserInfoDomain {
 
   /**
    * 批量订阅陌生人资料变更通知。
-   * 同一事件循环内的多次调用会合并为一次 SDK 请求；
+   * 同一事件循环内的多次调用先合批，再按 100 人顺序分片；
    * 若服务端返回无权限，则自动熔断后续订阅并缓存失败用户，避免重复请求与控制台警告刷屏。
    */
   async subscribeUserInfos(userIds: string[]): Promise<void> {
@@ -211,11 +217,19 @@ export class UserInfoDomain {
     this.subscribeQueue = []
 
     try {
-      await this.client.userInfoManager.subscribeUsersInfo({ userIds })
-      this.store.markSubscribed(userIds)
-    }
-    catch (err) {
-      this.handleSubscribeError(err, userIds)
+      for (let index = 0; index < userIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+        const chunk = userIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
+        try {
+          await this.client.userInfoManager.subscribeUsersInfo({ userIds: chunk })
+          this.store.markSubscribed(chunk)
+        }
+        catch (err) {
+          const permissionError = this.isPermissionError(err)
+          this.handleSubscribeError(err, chunk)
+          if (permissionError)
+            break
+        }
+      }
     }
     finally {
       this.subscribeFlushPromise = null
@@ -315,12 +329,15 @@ export class UserInfoDomain {
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     if (uniqueIds.length === 0)
       return
-    try {
-      await this.client.userInfoManager.unsubscribeUsersInfo({ userIds: uniqueIds })
-      this.store.markUnsubscribed(uniqueIds)
-    }
-    catch (err) {
-      logger.warn('[UserInfoDomain] unsubscribeUsersInfo failed:', formatSdkError(err))
+    for (let index = 0; index < uniqueIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+      const chunk = uniqueIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
+      try {
+        await this.client.userInfoManager.unsubscribeUsersInfo({ userIds: chunk })
+        this.store.markUnsubscribed(chunk)
+      }
+      catch (err) {
+        logger.warn('[UserInfoDomain] unsubscribeUsersInfo failed:', formatSdkError(err))
+      }
     }
   }
 

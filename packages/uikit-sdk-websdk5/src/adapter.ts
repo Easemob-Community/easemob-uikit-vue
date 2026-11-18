@@ -232,10 +232,15 @@ export class Websdk5Adapter implements SdkAdapter {
     else
       throw new Error('[Websdk5Adapter] 缺少应用身份：SdkConfig.appKey 与 SdkConfig.appId 必须提供其一')
 
+    const enableUserInfoSync = features?.enableUserInfo === false
+      ? false
+      : clientCfgRest.enableUserInfoSync ?? true
+
     this._client = this.injectedClient ?? createClient({
       debug: config.debug,
       managers: clientCfg.managers ?? (managerPreset === 'chatroom' ? WEBSDK5_CHATROOM_MANAGERS : WEBSDK5_MANAGERS),
       ...clientCfgRest,
+      enableUserInfoSync,
       ...identity,
     })
 

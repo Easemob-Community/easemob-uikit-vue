@@ -177,3 +177,73 @@ describe('userInfoDomain fetchUserInfos 微任务合批（4.x）', () => {
     expect(store.markLoading).not.toHaveBeenCalled()
   })
 })
+
+describe('userInfoDomain fetchUserInfos 100 人分片（4.x）', () => {
+  it('205 个 ID 按 100/100/5 顺序请求', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    let active = 0
+    let maxActive = 0
+    fetchUserInfoById.mockImplementation(async (userIds: string[]) => {
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await Promise.resolve()
+      active -= 1
+      return wireData(Object.fromEntries(userIds.map(userId => [userId, {}])))
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.fetchUserInfos(userIds, ['nickname'])
+
+    expect(fetchUserInfoById.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(maxActive).toBe(1)
+  })
+
+  it('repository 注入路径也按 100 人分片', async () => {
+    const client = makeClient()
+    const store = makeStore()
+    const fetchUserInfos = vi.fn(async (userIds: string[]) => userIds.map(userId => ({ userId })))
+    const domain = new UserInfoDomain(client, store, { fetchUserInfos })
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    await domain.fetchUserInfos(userIds)
+
+    expect(fetchUserInfos.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+    expect(client.connection!.fetchUserInfoById).not.toHaveBeenCalled()
+  })
+
+  it('中间分片失败不影响其他分片入库和属性标记', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    let callIndex = 0
+    fetchUserInfoById.mockImplementation(async (userIds: string[]) => {
+      callIndex += 1
+      if (callIndex === 2)
+        throw new Error('chunk failed')
+      return wireData(Object.fromEntries(userIds.map(userId => [userId, {}])))
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    const result = await domain.fetchUserInfos(userIds, ['nickname'])
+
+    expect(result).toHaveLength(105)
+    expect(store.markFetchFailed).toHaveBeenCalledTimes(1)
+    expect(store.markFetchFailed).toHaveBeenCalledWith(userIds.slice(100, 200))
+    expect(store.markFetchedAttributes.mock.calls.map(call => call[0])).toEqual([
+      userIds.slice(0, 100),
+      userIds.slice(200),
+    ])
+  })
+})

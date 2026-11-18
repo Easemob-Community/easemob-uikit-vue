@@ -208,3 +208,52 @@ describe('websdk5Adapter 注入 client 模式（决策 17/18）', () => {
     expect(adapter.client).toBe(builtin)
   })
 })
+
+describe('websdk5Adapter 用户资料开关初始化语义', () => {
+  beforeEach(() => {
+    mockedCreateClient.mockReset()
+  })
+
+  it.each([
+    {
+      name: '总开关关闭时硬关闭自动同步',
+      features: { enableUserInfo: false },
+      configuredSync: true,
+      expected: false,
+    },
+    {
+      name: '总开关开启且子开关缺省时开启自动同步',
+      features: { enableUserInfo: true },
+      configuredSync: undefined,
+      expected: true,
+    },
+    {
+      name: '总开关开启时保留显式关闭的子开关',
+      features: { enableUserInfo: true },
+      configuredSync: false,
+      expected: false,
+    },
+    {
+      name: '直连 adapter 未传 features 时保持原默认',
+      features: undefined,
+      configuredSync: undefined,
+      expected: true,
+    },
+  ])('$name', async ({ features, configuredSync, expected }) => {
+    const builtin = makeSdkClient()
+    mockedCreateClient.mockReturnValue(builtin as unknown as UIKitClient)
+    const adapter = new Websdk5Adapter()
+
+    await adapter.init({
+      ...INIT_CONFIG,
+      adapterConfig: {
+        features,
+        enableUserInfoSync: configuredSync,
+      },
+    })
+
+    expect(mockedCreateClient).toHaveBeenCalledWith(
+      expect.objectContaining({ enableUserInfoSync: expected }),
+    )
+  })
+})

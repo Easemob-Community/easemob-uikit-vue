@@ -46,6 +46,14 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [x] D152. 用户资料回退触发过宽且合批缺少 100 人分片
+
+- **现象**：群会话摘要已由 SDK 填入发送者昵称时，会话项仍对 `lastMessageFrom` 主动拉取并订阅资料；全量会话项在同一 tick 合批后未按服务端 100 人上限拆分。线上样本中 `getUserInfoByAttribute` 截断前已有 204 个不重复 userId，随后 `/metadata/user/get` 返回 400（既有截图为 `exceed allowed batch size 100`）。
+- **证据**：`conversation-item.vue` 原先把所有群会话 `lastMessageFrom` 直接交给 `useUserInfo`，只有原始 `${lastMessageFrom}: ` 前缀才真正消费异步昵称；单聊已有 `sdkNameSufficient`，群聊缺少同等判断。websdk5/webim4 `UserInfoDomain.flushFetchQueue()` 只合批不分片，websdk5 订阅/退订存在同类上限风险。204 的主来源高概率为群会话发送者，但 SDK 日志没有调用方标签，仍需在同场景用 store 集合对账，不能当作已完全直证。
+- **修复（2026-11-18，工作区未提交）**：群会话仅在摘要仍展示原始 userId 且需要展示发送者时回退，草稿/已有昵称/单聊/`showSenderName=false` 不触发；双 adapter 拉取与 websdk5 订阅/退订按 100 顺序分片并隔离失败；`enableUserInfo=false` 在 websdk5 初始化时硬关闭自动同步，保留 `enableUserInfoSync` 子开关。新增触发源、205 人分片、失败隔离、订阅熔断和开关矩阵回归测试。
+- **边界**：首屏原始 ID 摘要仍立即 REST，不等待 SDK 自动同步；运行期 Provider 开关不会重建 SDK 单例或修改既有自动同步配置；`showSenderName` 的完整展示语义与联系人全量预取/列表虚拟化不在本轮扩大修改。
+- **关联 skill**：`uikit-user-attribute-extraction` / `uikit-provider-config` / `uikit-sdk-adapter-architecture`
+
 ### [x] D151. 双 adapter `fetchGroupMembers` 返回管理员角色合并前数组
 
 - **现象**：`addGroupAdmin()` 成功后重新调用 `fetchGroupMembers()`，业务读取 `result.list` 仍看到目标成员为 `member`，但 store 中已合并为 `admin`。

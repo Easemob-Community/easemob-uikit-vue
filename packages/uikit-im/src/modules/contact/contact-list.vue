@@ -197,7 +197,7 @@ const filteredContacts = useContactFilter(sortedContacts, searchKeyword, {
 })
 const groupedContacts = useContactGroup(filteredContacts, groupByRef)
 
-// 批量预取可见联系人的用户资料昵称：列表项展示、搜索过滤、字母分组都消费 userInfo 昵称，
+// 批量预取全部联系人的用户资料昵称：列表项展示、搜索过滤、字母分组都消费 userInfo 昵称，
 // 行级 useUserInfo 是单条拉取，进入页面立即搜索时数据可能未回，这里对整页批量补拉
 watchEffect(() => {
   if (features.enableUserInfo === false)

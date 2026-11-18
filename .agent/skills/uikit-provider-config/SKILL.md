@@ -64,6 +64,8 @@ theme?: {
   - presence 全链路默认开启：`usePresence` composable 层的开关硬门仍保留（显式关闭时 subscribe/fetch/publish/watch
     全 no-op）；adapter 独立运行（websdk5/webim4 `getDefaultFeatures()`）的 `enablePresence` 默认同步为 `true`。
 - `enableGroup: true` / `enableUserInfo: true` / `enableUserInfoSubscription: true` — 默认开启
+  - `enableUserInfo` 是用户资料总开关；websdk5 初始化时有效自动同步配置为 `enableUserInfo && (sdkConfig.enableUserInfoSync ?? true)`，总开关 false 硬关闭自动同步，子开关仍可显式关闭。
+  - SDK `enableUserInfoSync` 是单例初始化配置；运行期切换 Provider prop 会即时影响 UIKit 主动拉取/订阅，但不会重建设 SDK 连接或改变既有 SDK 自动同步配置。
 - `enableDraft: true` / `enableAtMe: true` / `enableTyping: true` — 默认开启
 - `contactFetchMode: 'page'`（'page' 实际按全量返回处理；'all' 一次性全量拉取）
 - `enableToast: true` — 关闭后仍可 `useToast()` 取状态自渲染
