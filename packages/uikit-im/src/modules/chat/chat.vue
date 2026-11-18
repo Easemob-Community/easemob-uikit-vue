@@ -164,12 +164,13 @@ const lastMessageSummary = computed(() => {
   if (!lastMsg || !cvs || lastMsg.conversationId !== cvs.id)
     return null
   const isGroup = cvs.type === CONVERSATION_TYPE.GROUPCHAT
-  const from = lastMsg.from || ''
+  // 与 conversation-adapter 对齐：先归一化发送者 ID（去多设备后缀），保证资料/联系人命中
+  const from = normalizeUserId(lastMsg.from || '')
   // 群聊摘要统一拼接 "发送者: 消息" 前缀（与同步数据 conversation-adapter 的
   // formatConversationPreview 规则一致），避免点击进入会话后摘要样式割裂。
   // 发送者名用共享解析链路（备注 > 资料昵称 > 消息 ext 快照 > userId）：
   // 历史消息场景资料可能未加载完成，ext 快照兜底避免前缀退化为 userId。
-  const senderName = isGroup ? resolveSenderDisplayName(stores, lastMsg) : undefined
+  const senderName = isGroup ? resolveSenderDisplayName(stores, { ...lastMsg, from }) : undefined
   // 发送者资料加载中且只能兜底 userId 时标记未就绪：推迟写入摘要
   // （保持进入会话前的昵称展示），待资料就绪后直接刷新为最终态，
   // 避免 "userId → 昵称" 的闪动过程。
@@ -179,6 +180,9 @@ const lastMessageSummary = computed(() => {
     text: resolveLastMessageText(lastMsg, lastMessageTextResolver.value, senderName, t('message.recalledPreview'), chineseMessagePreviewLabels),
     timestamp: lastMsg.timestamp,
     senderReady,
+    // 结构化发送者字段与摘要文本同一次写入，避免列表项按过期 sender 判断是否补拉
+    senderId: isGroup ? from || undefined : undefined,
+    senderName: isGroup ? senderName : undefined,
   }
 })
 
@@ -192,7 +196,7 @@ watchEffect(() => {
   const cvs = currentConversation.value
   if (!lastMsg || !cvs || cvs.type !== CONVERSATION_TYPE.GROUPCHAT)
     return
-  const from = lastMsg.from || ''
+  const from = normalizeUserId(lastMsg.from || '')
   if (!from)
     return
   if (
@@ -202,25 +206,31 @@ watchEffect(() => {
   ) {
     return
   }
-  void domains.userInfo.fetchUserInfos([from])
+  void domains.userInfo.fetchUserInfos([from], undefined, { source: 'chat' })
 })
 
 /** 上一次写入的摘要指纹（id|text|timestamp），内容未变时不重复写入 */
 const lastSummaryFingerprint = ref('')
 
-/** 摘要快照变化时，自动更新会话列表的 lastMessageText */
+/** 摘要快照变化时，自动更新会话列表的摘要文本与结构化发送者字段 */
 watch(lastMessageSummary, (summary) => {
   if (!summary?.id || !summary.senderReady)
     return
   const cvs = currentConversation.value
   if (!cvs)
     return
-  const fingerprint = `${summary.id}|${summary.text}|${summary.timestamp || ''}`
+  const fingerprint = `${summary.id}|${summary.text}|${summary.timestamp || ''}|${summary.senderId || ''}|${summary.senderName || ''}`
   if (fingerprint === lastSummaryFingerprint.value)
     return
   lastSummaryFingerprint.value = fingerprint
   const patch: Partial<Conversation> = {
     lastMessageText: summary.text,
+  }
+  // 摘要文本与结构化发送者字段同一次落库：P2-1 的“是否补拉”判断只读后者，
+  // 若只更新文本，列表项会按上一条消息的 sender 决策。
+  if (summary.senderId) {
+    patch.lastMessageFrom = summary.senderId
+    patch.lastMessageSenderName = summary.senderName
   }
   // lastMessageTime 仅单调递增更新：本地消息 timestamp 与服务端 lastMessageAt 存在
   // 时钟偏差时，无条件覆盖会让进入会话瞬间列表按本地时间重排（会话项跳动）。

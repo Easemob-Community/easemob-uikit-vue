@@ -234,6 +234,46 @@ describe('chat-events 旁路持久化（persistence）', () => {
     expect(persistence.message.markMessageRecalled).toHaveBeenCalledWith('srv-9', SELF)
   })
 
+  it('onMessageRecalled 群聊撤回同步摘要、senderId 与结构化名称', async () => {
+    const persistence = makePersistence()
+    const cvs = makeCvs('g1', {
+      type: CONVERSATION_TYPE.GROUPCHAT,
+      lastMessageText: 'Bob: old',
+      lastMessageFrom: 'bob',
+      lastMessageSenderName: 'Bob',
+      lastMessageTime: 1700000000000,
+    })
+    const { stores, messageStore } = makeStores([cvs])
+    ;(stores.userInfo.getUserInfo as ReturnType<typeof vi.fn>).mockReturnValue({ userId: 'alice', nickname: 'Alice' })
+    messageStore.getMessages.mockReturnValue([{
+      msgServerId: 'srv-9',
+      msgLocalId: 'loc-9',
+      from: 'alice',
+      to: 'g1',
+      conversationId: 'g1',
+      conversationType: CONVERSATION_TYPE.GROUPCHAT,
+      type: MESSAGE_TYPE.TEXT,
+      status: MESSAGE_STATUS.SENT,
+      timestamp: 1700000001000,
+      body: { content: 'hi' },
+      ext: {},
+    } as unknown as UiMessage])
+    const handlers = createChatHandlers(makeClient(), stores, undefined, persistence)
+
+    handlers.onMessageRecalled?.({
+      messageId: 'srv-9',
+      conversationId: 'g1',
+      conversationType: 'groupChat',
+    } as unknown as HandlerArg<'onMessageRecalled'>)
+    await flushPersist()
+
+    expect(stores.conversation.updateConversation).toHaveBeenCalledWith('g1', expect.objectContaining({
+      lastMessageFrom: 'alice',
+      lastMessageSenderName: 'Alice',
+      lastMessageText: 'Alice: message.recalledPreview',
+    }))
+  })
+
   it('onMessageUpdated → updateMessageContent（body / ext / modifiedInfo 透传）', async () => {
     const persistence = makePersistence()
     const { stores } = makeStores()

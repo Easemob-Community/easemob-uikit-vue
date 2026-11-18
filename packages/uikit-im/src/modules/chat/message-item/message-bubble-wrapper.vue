@@ -86,7 +86,11 @@ const clientStore = useClientStore()
 
 const { capabilities, features } = useUIKit()
 
-const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.message.from,
+  undefined,
+  { source: 'message-bubble', subscribe: false },
+)
 const { get: getPresence } = usePresence()
 
 /**

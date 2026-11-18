@@ -1,6 +1,6 @@
 import { computed, toValue, watchEffect } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
-import type { UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
+import type { UseUserInfoOptions, UserInfoAttribute } from '@easemob-community/uikit-sdk-contract'
 import { useCoreUIKit } from './use-uikit'
 
 /**
@@ -8,10 +8,16 @@ import { useCoreUIKit } from './use-uikit'
  * core 版展示优先级：用户资料昵称/头像 > 用户 ID；
  * 联系人备注/头像兜底属场景能力，由场景包组合叠加（如 uikit-im 的 useUserInfo）。
  * 首次使用时会触发批量拉取与订阅；缓存已覆盖请求属性集时直接返回，部分覆盖会自动补拉。
+ * @param userId 响应式用户 ID / Reactive user ID.
+ * @param attributes 需要读取的属性 / Attributes to read.
+ * @param options 行为选项 / Behavior options.
+ * @param options.source 日志来源标签 / Caller label for diagnostic logs.
+ * @param options.subscribe 是否订阅资料变更，默认 true / Subscribe to changes; defaults to true.
  */
 export function useUserInfo(
   userId: MaybeRefOrGetter<string | undefined>,
   attributes: UserInfoAttribute[] = ['nickname', 'avatarUrl'],
+  options: UseUserInfoOptions = {},
 ) {
   const { stores, domains, features } = useCoreUIKit()
   const enabled = features.enableUserInfo !== false
@@ -38,10 +44,10 @@ export function useUserInfo(
     }
 
     // 缓存已存在但未覆盖请求的属性集（如只拉过昵称/头像），按请求属性补拉
-    void domains.userInfo.fetchUserInfos([userIdValue], attributes)
+    void domains.userInfo.fetchUserInfos([userIdValue], attributes, { source: options.source })
 
-    if (subscriptionEnabled && !stores.userInfo.isSubscriptionDisabled()) {
-      void domains.userInfo.subscribeUserInfos([userIdValue])
+    if (options.subscribe !== false && subscriptionEnabled && !stores.userInfo.isSubscriptionDisabled()) {
+      void domains.userInfo.subscribeUserInfos([userIdValue], { source: options.source })
     }
   })
 

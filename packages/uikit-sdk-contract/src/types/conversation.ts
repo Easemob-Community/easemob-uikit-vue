@@ -23,6 +23,8 @@ export interface UiConversation {
   lastMessageText: string
   /** 最后一条消息发送者 userId（群聊场景用于异步资料就绪后重新解析昵称） */
   lastMessageFrom?: string
+  /** 已解析的发送者显示名 / Resolved display name of the last message sender. */
+  lastMessageSenderName?: string
   /** 最后一条消息时间戳 */
   lastMessageTime?: number
   /** 是否置顶 */

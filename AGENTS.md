@@ -79,6 +79,7 @@
 - 聊天室 UIKit 设计规划（独立场景包 `@easemob-community/uikit-chatroom` + 抽共享基座 `@easemob-community/uikit-core` + 场景预设变种，H5-first）：[CHATROOM-UIKIT-DESIGN.md](docs/CHATROOM-UIKIT-DESIGN.md)（对应 TECH-DEBT D97，按时序 `@easemob-community/uikit-im` 1.x 开发完后启动）
 - Chat 抽屉三种接管能力设计执行计划（整块 `#drawer` + 部分 `drawer-*` + 自绘壳 `EmChatDrawer`）：[CHAT-DRAWER-EXTENSION-PLAN.md](docs/CHAT-DRAWER-EXTENSION-PLAN.md)（对应 TECH-DEBT D119）
 - uikit-im 组件插槽/Props 可控性反向评估（会话列表弹窗、名片弹窗、消息操作菜单等缺口矩阵）：[UIIM-CAPABILITY-REVIEW.md](docs/UIIM-CAPABILITY-REVIEW.md)（对应 TECH-DEBT D120）
+- 用户资料拉取链路加固（100 分片 / websdk5 重试 / SDK 缓存预填 / 来源日志 / own 独立链路）：[USER-INFO-FETCH-RESILIENCE-PLAN.md](docs/USER-INFO-FETCH-RESILIENCE-PLAN.md)（对应 TECH-DEBT D152）
 - 消费者验证清单（独立 Vue3 工程验证「好不好用」，发版前产物自检 + 下周 Demo 逐项打勾）：[CONSUMER-VALIDATION-CHECKLIST.md](docs/CONSUMER-VALIDATION-CHECKLIST.md)
 - SDK 适配层 + 数据入口层抽象设计执行计划（双 adapter `websdk5`/`webim4` + 中立契约 `@easemob-community/uikit-sdk-contract` + repository 数据入口 + 能力映射/语义归一化，一套 UI 产物切 SDK 不重来、数据来源可插拔，对应 4.x SDK 低成本切换 + Electron 持久化）：[SDK-ADAPTER-ABSTRACTION-PLAN.md](docs/SDK-ADAPTER-ABSTRACTION-PLAN.md)（对应 TECH-DEBT D122，联动 D85）
 - **SDK 源码参考（D122 双 adapter 专用，只读）**：4.x `easemob-websdk@4.24.2` 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk/packages/IM/sdk`（入口 `src/entry.ts`）；5.x 源码 `/Users/neohuang/Desktop/WorkCommonUse/SDK/websdk2`（入口 `src/index.ts`，git HEAD 对应 5.0.0 线）。仓库内软链锚点 `tmp/sdk-ref/websdk4|websdk5`（`tmp/` 已 gitignore，仅本机有效；rg/Grep 默认不跟随软链，搜索请直接用绝对路径）。核对两代 SDK 的 API/wire/事件行为时直接进对应源码核实，禁止凭记忆

@@ -35,6 +35,7 @@ import { createGroupRepository } from './adapter/repositories/group'
 import { createMessageRepository } from './adapter/repositories/message'
 import { createPresenceRepository } from './adapter/repositories/presence'
 import { createUserInfoRepository } from './adapter/repositories/user-info'
+import { readSdkCachedUserInfos } from './adapter/user-info-cache'
 import { MessageDomain } from './domain/message-domain'
 import { ConversationDomain } from './domain/conversation-domain'
 import { ContactDomain } from './domain/contact-domain'
@@ -292,6 +293,7 @@ export class Websdk5Adapter implements SdkAdapter {
             return contact.remark || contact.name
           return stores.userInfo.getUserInfo(userId)?.nickname
         },
+        prefillUserInfo: userIds => this._userInfoDomain?.prefillUserInfos(userIds),
         lastMessageTextResolver: this._lastMessageTextResolver,
         conversationRepository: repositories?.conversation,
         persistence: persistence?.conversation,
@@ -309,10 +311,14 @@ export class Websdk5Adapter implements SdkAdapter {
 
     // 用户资料域：内部监听 SDK 用户资料变更事件，通过 userInfo store 触发 onUserInfoChanged
     // 数据入口注入优先取 repositories.userInfo；旧 adapterConfig.dataSource 直连仅兼容兜底
+    const injectedUserInfoRepository = repositories?.userInfo ?? legacyDataSourceToUserInfoRepository(dataSource) ?? {}
     this._userInfoDomain = new UserInfoDomain(
       this._client,
       stores.userInfo,
-      repositories?.userInfo ?? legacyDataSourceToUserInfoRepository(dataSource) ?? {},
+      {
+        readCachedUserInfos: userIds => readSdkCachedUserInfos(this._client!, userIds),
+        ...injectedUserInfoRepository,
+      },
       onUserInfoSubscriptionPermissionError
       ?? (() => adapterLog.warn('[Websdk5Adapter] 用户资料订阅无权限，已自动熔断')),
     )

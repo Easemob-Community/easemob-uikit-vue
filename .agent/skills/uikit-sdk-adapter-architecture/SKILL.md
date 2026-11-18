@@ -250,6 +250,7 @@ SDK 会话快照/回填**不携带**部分字段（协议限制：5.x 快照 `re
 
 - **domain port**：`adapter.domains.*` —— 现有 UI 操作面，当前优先使用。
 - **repository**：`adapter.message` / `adapter.conversation` / `adapter.contact` / `adapter.group` / `adapter.presence` / `adapter.userInfo` —— 数据入口层，读写一体、游标分页。
+  - `UserInfoRepository.readCachedUserInfos?`（可选）：读取 SDK 本地资料缓存（websdk5 实现 runtime 优先 + summary 兜底，internal API 缺失时降级为空）；`fetchOwnInfo?` 是 domain 的 own 独立拉取能力，未实现时 composable 回退单 ID `fetchUserInfos`。
 
 **签名风格约定（2026-08-31 契约层质量整改收敛，repository 与 domains 共用一套）：**
 

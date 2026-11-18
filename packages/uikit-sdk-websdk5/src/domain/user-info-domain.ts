@@ -1,11 +1,60 @@
 import { createLogger } from '@easemob-community/uikit-sdk-contract'
-import type { UserInfo, UserInfoAttribute, UserInfoRepository } from '@easemob-community/uikit-sdk-contract'
+import type { UserInfo, UserInfoAttribute, UserInfoRepository, UserInfoRequestOptions } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../client'
 import type { UserInfoStoreLike } from '../event/types'
 import { formatSdkError } from '../utils/sdk-error'
 
 const logger = createLogger('UIKit:UserInfoDomain')
 const USER_INFO_REQUEST_BATCH_SIZE = 100
+const USER_INFO_RETRY_DELAY_MS = 300
+
+function isRetryableFetchError(err: unknown): boolean {
+  const error = err as {
+    code?: number | string
+    details?: { httpStatus?: number }
+    httpStatus?: number
+  }
+  const httpStatus = error?.details?.httpStatus ?? error?.httpStatus
+  if (httpStatus === 429 || (httpStatus !== undefined && httpStatus >= 500))
+    return true
+  if (httpStatus !== undefined)
+    return false
+  const code = Number(error?.code)
+  if ([2, 301, 302, 303, 304].includes(code))
+    return true
+  if (error?.code !== undefined)
+    return false
+  const message = err instanceof Error ? err.message : String(err ?? '')
+  return /network|failed to fetch|timeout|timed out/i.test(message)
+}
+
+function getErrorDiagnostics(err: unknown) {
+  const error = err as {
+    code?: number | string
+    message?: string
+    details?: { httpStatus?: number, reason?: string, reasonKey?: string }
+    httpStatus?: number
+    reason?: string
+  }
+  return {
+    code: error?.code,
+    httpStatus: error?.details?.httpStatus ?? error?.httpStatus,
+    reason: error?.details?.reasonKey ?? error?.details?.reason ?? error?.reason,
+    message: error?.message,
+  }
+}
+
+async function requestWithRetry<T>(request: () => Promise<T>): Promise<T> {
+  try {
+    return await request()
+  }
+  catch (err) {
+    if (!isRetryableFetchError(err))
+      throw err
+    await new Promise(resolve => setTimeout(resolve, USER_INFO_RETRY_DELAY_MS))
+    return request()
+  }
+}
 
 /**
  * 用户资料全部可查属性（SDK UserInfoAttribute 全集）。
@@ -27,6 +76,7 @@ export const ALL_USER_INFO_ATTRIBUTES: UserInfoAttribute[] = [
 interface FetchQueueItem {
   userIds: string[]
   attributes: UserInfoAttribute[]
+  options?: UserInfoRequestOptions
   resolve: (infos: UserInfo[]) => void
 }
 
@@ -35,7 +85,7 @@ interface FetchQueueItem {
  */
 export class UserInfoDomain {
   private handlerId = 'uikit-user-info'
-  private subscribeQueue: string[] = []
+  private subscribeQueue: { userIds: string[], options?: UserInfoRequestOptions }[] = []
   private subscribeFlushPromise: Promise<void> | null = null
   private fetchQueue: FetchQueueItem[] = []
   private fetchFlushPromise: Promise<void> | null = null
@@ -51,6 +101,28 @@ export class UserInfoDomain {
     private userInfoRepository: Partial<UserInfoRepository> = {},
     private onSubscriptionPermissionError?: () => void,
   ) {}
+
+  readCachedUserInfos(userIds: string[]): UserInfo[] {
+    try {
+      return this.userInfoRepository.readCachedUserInfos?.(Array.from(new Set(userIds.filter(Boolean)))) ?? []
+    }
+    catch {
+      return []
+    }
+  }
+
+  prefillUserInfos(userIds: string[]): UserInfo[] {
+    const cached = this.readCachedUserInfos(userIds)
+    if (cached.length === 0)
+      return []
+    this.store.setUserInfos(cached)
+    for (const info of cached) {
+      const attributes = ALL_USER_INFO_ATTRIBUTES.filter(attribute => info[attribute] !== undefined)
+      if (attributes.length > 0)
+        this.store.markFetchedAttributes([info.userId], attributes)
+    }
+    return cached
+  }
 
   /**
    * 启动用户资料变更事件监听。应在 SDK 初始化完成后调用。
@@ -70,17 +142,21 @@ export class UserInfoDomain {
   async fetchUserInfos(
     userIds: string[],
     attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
+    options?: UserInfoRequestOptions,
   ): Promise<UserInfo[]> {
-    // 未连接时不发起请求，直接返回空结果（缓存数据由 store 层兜底展示）
-    if (!this.client.isConnected) {
-      return []
-    }
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     if (uniqueIds.length === 0)
       return []
+    // 未连接时不发起请求，直接返回空结果（缓存数据由 store 层兜底展示）。
+    // 同时把目标标记为失败：重连 onConnected 清空失败集合时，已挂载的响应式 composable
+    // 会因 isFetchFailed 变化重新求值并补拉；否则离线期间挂载/滚入的条目会永久停留在 userId。
+    if (!this.client.isConnected) {
+      this.store.markFetchFailed(uniqueIds)
+      return []
+    }
 
     return new Promise<UserInfo[]>((resolve) => {
-      this.fetchQueue.push({ userIds: uniqueIds, attributes, resolve })
+      this.fetchQueue.push({ userIds: uniqueIds, attributes, options, resolve })
       this.scheduleFetchFlush()
     })
   }
@@ -95,7 +171,13 @@ export class UserInfoDomain {
     const batch = this.fetchQueue
     this.fetchQueue = []
     try {
-      // 合并前先按各调用自身的 attributes 过滤：已覆盖/加载中/已失败的 id 不再请求
+      const cacheCandidates = Array.from(new Set(batch.flatMap(item => item.userIds.filter(
+        id => !this.store.areAttributesFetched(id, item.attributes)
+          && !this.store.isLoading(id)
+          && !this.store.isFetchFailed(id),
+      ))))
+      this.prefillUserInfos(cacheCandidates)
+      // 预填后按各调用自身的 attributes 重算缺失：已覆盖/加载中/已失败的 id 不再请求
       const pending = batch.map(item => ({
         ...item,
         missingIds: item.userIds.filter(
@@ -107,37 +189,27 @@ export class UserInfoDomain {
       const missingIds = Array.from(new Set(pending.flatMap(item => item.missingIds)))
       // 各调用 attributes 取并集，一次请求覆盖各方所需字段
       const attributes = Array.from(new Set(batch.flatMap(item => item.attributes)))
+      const sources = Array.from(new Set(batch.map(item => item.options?.source ?? 'unknown')))
+      const source = sources.join(',')
+      let failedChunks = 0
 
       if (missingIds.length > 0) {
-        this.store.markLoading(missingIds)
-        try {
-          for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
-            const chunk = missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
-            try {
-              const infos = this.userInfoRepository.fetchUserInfos
-                ? await this.fetchFromRepository(chunk)
-                : await this.fetchFromSdk(chunk, attributes)
-
-              // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
-              const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
-              const failedIds = chunk.filter(id => !fetchedIds.has(id))
-              if (failedIds.length > 0)
-                this.store.markFetchFailed(failedIds)
-
-              this.store.setUserInfos(infos)
-              // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
-              this.store.markFetchedAttributes(chunk, attributes)
-            }
-            catch (err) {
-              logger.warn('[UserInfoDomain] fetchUserInfos failed:', formatSdkError(err))
-              this.store.markFetchFailed(chunk)
-            }
-          }
-        }
-        finally {
-          this.store.markLoaded(missingIds)
+        for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+          await this.fetchChunk(
+            missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE),
+            attributes,
+            { source },
+            () => { failedChunks += 1 },
+          )
         }
       }
+      logger.info('[UserInfoDomain] fetch', {
+        sources,
+        requested: new Set(batch.flatMap(item => item.userIds)).size,
+        missing: missingIds.length,
+        chunks: Math.ceil(missingIds.length / USER_INFO_REQUEST_BATCH_SIZE),
+        failedChunks,
+      })
 
       // 每个原始调用各自 resolve：从 store 缓存读回自己请求的 userIds 子集
       for (const item of pending) {
@@ -153,6 +225,42 @@ export class UserInfoDomain {
       // flush 进行中新 push 进队列的调用不会再触发后续 flush，这里补排一轮避免滞留
       if (this.fetchQueue.length > 0)
         this.scheduleFetchFlush()
+    }
+  }
+
+  private async fetchChunk(
+    userIds: string[],
+    attributes: UserInfoAttribute[],
+    options?: UserInfoRequestOptions,
+    onFailure?: () => void,
+  ): Promise<UserInfo[]> {
+    this.store.markLoading(userIds)
+    try {
+      const infos = await requestWithRetry(() => this.userInfoRepository.fetchUserInfos
+        ? this.fetchFromRepository(userIds)
+        : this.fetchFromSdk(userIds, attributes))
+      const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+      const failedIds = userIds.filter(id => !fetchedIds.has(id))
+      if (failedIds.length > 0)
+        this.store.markFetchFailed(failedIds)
+      this.store.setUserInfos(infos)
+      const fetchedUserIds = userIds.filter(id => fetchedIds.has(id))
+      if (fetchedUserIds.length > 0)
+        this.store.markFetchedAttributes(fetchedUserIds, attributes)
+      return infos
+    }
+    catch (err) {
+      onFailure?.()
+      logger.warn('[UserInfoDomain] chunk failed', {
+        source: options?.source ?? 'unknown',
+        chunkSize: userIds.length,
+        ...getErrorDiagnostics(err),
+      })
+      this.store.markFetchFailed(userIds)
+      return []
+    }
+    finally {
+      this.store.markLoaded(userIds)
     }
   }
 
@@ -190,7 +298,7 @@ export class UserInfoDomain {
    * 同一事件循环内的多次调用先合批，再按 100 人顺序分片；
    * 若服务端返回无权限，则自动熔断后续订阅并缓存失败用户，避免重复请求与控制台警告刷屏。
    */
-  async subscribeUserInfos(userIds: string[]): Promise<void> {
+  async subscribeUserInfos(userIds: string[], options?: UserInfoRequestOptions): Promise<void> {
     if (!this.client.isConnected) {
       return
     }
@@ -203,7 +311,7 @@ export class UserInfoDomain {
     if (targetIds.length === 0)
       return
 
-    this.subscribeQueue.push(...targetIds)
+    this.subscribeQueue.push({ userIds: targetIds, options })
 
     if (this.subscribeFlushPromise)
       return this.subscribeFlushPromise
@@ -213,8 +321,15 @@ export class UserInfoDomain {
   }
 
   private async flushSubscribeQueue(): Promise<void> {
-    const userIds = Array.from(new Set(this.subscribeQueue))
+    const batch = this.subscribeQueue
     this.subscribeQueue = []
+    const userIds = Array.from(new Set(batch.flatMap(item => item.userIds)))
+    const sources = Array.from(new Set(batch.map(item => item.options?.source ?? 'unknown')))
+    logger.info('[UserInfoDomain] subscribe', {
+      sources,
+      requested: userIds.length,
+      chunks: Math.ceil(userIds.length / USER_INFO_REQUEST_BATCH_SIZE),
+    })
 
     try {
       for (let index = 0; index < userIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
@@ -268,6 +383,7 @@ export class UserInfoDomain {
       details?: { httpStatus?: number, reason?: string }
     }
     return e.code === 210
+      || e.code === 1600
       || e.details?.httpStatus === 403
       || e.details?.reason === 'service_forbidden'
   }
@@ -275,12 +391,29 @@ export class UserInfoDomain {
   /**
    * 获取当前登录用户自己的资料（默认全量属性，保证签名等登录后回显）。
    */
-  async fetchOwnInfo(attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES): Promise<UserInfo | undefined> {
+  async fetchOwnInfo(
+    attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
+    options?: UserInfoRequestOptions,
+  ): Promise<UserInfo | undefined> {
     const currentUserId = this.client.currentUserId
     if (!currentUserId)
       return undefined
-    const [info] = await this.fetchUserInfos([currentUserId], attributes)
-    return info
+    if (!this.client.isConnected) {
+      // 与批量拉取一致：离线标记失败，重连清理后由 useOwnUserInfo 的响应式 effect 重新触发
+      this.store.markFetchFailed([currentUserId])
+      return this.store.getUserInfo(currentUserId)
+    }
+    if (!this.store.isLoading(currentUserId) && !this.store.isFetchFailed(currentUserId))
+      this.prefillUserInfos([currentUserId])
+    if (
+      this.store.areAttributesFetched(currentUserId, attributes)
+      || this.store.isLoading(currentUserId)
+      || this.store.isFetchFailed(currentUserId)
+    ) {
+      return this.store.getUserInfo(currentUserId)
+    }
+    await this.fetchChunk([currentUserId], attributes, options)
+    return this.store.getUserInfo(currentUserId)
   }
 
   /**

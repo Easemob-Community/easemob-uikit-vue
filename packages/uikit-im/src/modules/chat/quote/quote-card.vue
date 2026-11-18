@@ -22,7 +22,11 @@ const props = withDefaults(defineProps<QuoteCardProps>(), {
 const emit = defineEmits<QuoteCardEmits>()
 
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
-const { displayName, avatarUrl } = useUserInfo(() => props.quote.msgSender)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.quote.msgSender,
+  undefined,
+  { source: 'quote', subscribe: false },
+)
 const senderName = computed(() => displayName.value || props.quote.msgSender)
 
 /** 非文本类型的前置图标（设计师稿：图片/视频/语音/文件带类型 icon，文本不带） */

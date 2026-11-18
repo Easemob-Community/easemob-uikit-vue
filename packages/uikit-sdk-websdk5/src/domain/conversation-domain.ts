@@ -1,6 +1,7 @@
 import type { ConversationPersistenceHooks, ConversationRepository, ConversationTypeValue, LastMessageTextResolver, UiConversation } from '@easemob-community/uikit-sdk-contract'
-import { MESSAGE_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
+import { CONVERSATION_TYPE, MESSAGE_TYPE, createLogger } from '@easemob-community/uikit-sdk-contract'
 import { toUiConversations } from '../adapter/conversation-adapter'
+import { normalizeUserId } from '../adapter/message-adapter'
 import type { ManagerHost } from '../client'
 
 const conversationLogger = createLogger('Conversation')
@@ -83,6 +84,8 @@ export class ConversationDomain {
        * 优先于 SDK lastMessage.sender.nickname，用于资料已缓存时直接展示昵称。
        */
       resolveSenderName?: (userId: string) => string | undefined
+      /** 本地会话映射前预填发送者资料 / Prefill sender profiles before local conversation mapping. */
+      prefillUserInfo?: (userIds: string[]) => void
       /** 业务消息摘要解析器，本地会话与快照恢复共用 */
       lastMessageTextResolver?: LastMessageTextResolver
       /**
@@ -119,6 +122,11 @@ export class ConversationDomain {
     const items = this.client.chatManager.getConversationList()
     conversationLogger.info('getConversationList raw (syncLocal)', items)
     dumpRawSnippets(items, 'syncLocal')
+    const senderIds = Array.from(new Set(items
+      .filter(item => item.conversationType === CONVERSATION_TYPE.GROUPCHAT)
+      .map(item => normalizeUserId(item.lastMessage?.sender?.userId || item.lastMessage?.from || ''))
+      .filter(Boolean)))
+    this.hooks.prefillUserInfo?.(senderIds)
     const list = toUiConversations(items, {
       resolveSenderName: this.hooks.resolveSenderName,
       lastMessageTextResolver: this.hooks.lastMessageTextResolver,

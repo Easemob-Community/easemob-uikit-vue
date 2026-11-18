@@ -154,6 +154,7 @@ export interface UserInfoStoreLike {
   markLoaded: (userIds: string[]) => void
   markFetchFailed: (userIds: string[]) => void
   isFetchFailed: (userId: string) => boolean
+  clearFetchFailed?: (userIds?: string[]) => void
   markSubscribed: (userIds: string[]) => void
   markUnsubscribed: (userIds: string[]) => void
   markSubscribeFailed: (userIds: string[]) => void

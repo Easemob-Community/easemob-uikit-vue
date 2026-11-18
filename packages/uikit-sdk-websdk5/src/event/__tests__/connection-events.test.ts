@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createConnectionHandlers } from '../connection-events'
+import { createUserInfoStore } from '../../adapter/internal-stores/user-info'
 
 function makeStores() {
   return {
@@ -27,6 +28,31 @@ function makePayload(errorCode?: number) {
     timestamp: Date.now(),
   } as never
 }
+
+describe('connection-events 用户资料失败恢复（5.x）', () => {
+  it('内置 store 支持按 ID 清理并保留其他失败状态', () => {
+    const userInfo = createUserInfoStore(() => undefined)
+    userInfo.markFetchFailed(['u1', 'u2'])
+
+    userInfo.clearFetchFailed?.(['u1'])
+
+    expect(userInfo.isFetchFailed('u1')).toBe(false)
+    expect(userInfo.isFetchFailed('u2')).toBe(true)
+  })
+
+  it('onConnected 清理全部拉取失败状态并保留连接状态更新', () => {
+    const userInfo = createUserInfoStore(() => undefined)
+    userInfo.markFetchFailed(['u1', 'u2'])
+    const stores = { ...makeStores(), userInfo }
+
+    createConnectionHandlers(stores).onConnected?.({ state: 'connected' } as never)
+
+    expect(userInfo.isFetchFailed('u1')).toBe(false)
+    expect(userInfo.isFetchFailed('u2')).toBe(false)
+    expect(stores.client.setConnected).toHaveBeenCalledWith(true)
+    expect(stores.client.setHasConnectedOnce).toHaveBeenCalledWith(true)
+  })
+})
 
 describe('connection-events 被踢识别（5.x）', () => {
   it('onDisconnected 携带被踢/账号失效错误码（206/207/214/216/217）时标记 kicked', () => {

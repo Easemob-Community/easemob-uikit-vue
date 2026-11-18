@@ -12,6 +12,7 @@ import type {
   UserInfo,
   UserInfoAttribute,
   UserInfoAttributeValue,
+  UserInfoRequestOptions,
 } from './types'
 
 /**
@@ -175,10 +176,17 @@ export interface SdkPresenceDomain {
 
 /** 用户资料业务域 */
 export interface SdkUserInfoDomain {
-  fetchUserInfos: (userIds: string[], attributes?: UserInfoAttribute[]) => Promise<UserInfo[]>
+  fetchUserInfos: (userIds: string[], attributes?: UserInfoAttribute[], options?: UserInfoRequestOptions) => Promise<UserInfo[]>
+  /**
+   * 获取当前用户资料，独立于普通批量队列。
+   * 可选能力：未实现时 `useOwnUserInfo` 回退到 `fetchUserInfos([currentUserId], ...)`。
+   * Fetch current user outside the batch queue. Optional; the composable falls back
+   * to `fetchUserInfos([currentUserId], ...)` when absent.
+   */
+  fetchOwnInfo?: (attributes?: UserInfoAttribute[], options?: UserInfoRequestOptions) => Promise<UserInfo | undefined>
   updateOwnInfo: (input: Partial<Pick<UserInfo, 'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'>>) => Promise<UserInfo | undefined>
   updateOwnInfoByAttribute: (attribute: UserInfoAttribute, value: UserInfoAttributeValue) => Promise<UserInfo | undefined>
-  subscribeUserInfos: (userIds: string[]) => Promise<void>
+  subscribeUserInfos: (userIds: string[], options?: UserInfoRequestOptions) => Promise<void>
   unsubscribeUsersInfo: (userIds: string[]) => Promise<void>
   getSubscribedUsers: () => Promise<readonly UserInfo[]>
 }

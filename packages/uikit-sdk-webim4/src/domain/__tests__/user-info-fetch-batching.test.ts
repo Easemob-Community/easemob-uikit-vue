@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 // 4.x SDK（easemob-websdk@4.x）入口在模块加载时访问 `self`，node 环境需在 jsdom 下运行
 import type { UserInfo } from '@easemob-community/uikit-sdk-contract'
+import { setLogCollector } from '@easemob-community/uikit-sdk-contract'
 import { describe, expect, it, vi } from 'vitest'
 import type { Webim4Client } from '../../client'
 import type { UserInfoStoreLike } from '../../event/types'
@@ -165,6 +166,19 @@ describe('userInfoDomain fetchUserInfos 微任务合批（4.x）', () => {
     expect(r2).toEqual([])
   })
 
+  it('部分返回时只标记已返回 ID 的属性，缺失 ID 可在失败清理后重试', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    fetchUserInfoById.mockResolvedValue(wireData({ u1: { nickname: '有' } }))
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+
+    await domain.fetchUserInfos(['u1', 'u2'], ['nickname'])
+
+    expect(store.markFetchFailed).toHaveBeenCalledWith(['u2'])
+    expect(store.markFetchedAttributes).toHaveBeenCalledWith(['u1'], ['nickname'])
+  })
+
   it('未连接时直接 resolve 空结果且不入队列', async () => {
     const client = makeClient(false)
     const store = makeStore()
@@ -175,6 +189,87 @@ describe('userInfoDomain fetchUserInfos 微任务合批（4.x）', () => {
     expect(result).toEqual([])
     expect(client.connection!.fetchUserInfoById).not.toHaveBeenCalled()
     expect(store.markLoading).not.toHaveBeenCalled()
+    // 离线丢弃必须留下可恢复状态，否则重连后无人重拉
+    expect(store.markFetchFailed).toHaveBeenCalledWith(['u1'])
+  })
+})
+
+describe('userInfoDomain 来源日志（4.x）', () => {
+  it('聚合同批 sources 并只输出数量统计', async () => {
+    const entries: { message: string, args: unknown[] }[] = []
+    setLogCollector(entry => entries.push(entry))
+    try {
+      const client = makeClient()
+      const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+      fetchUserInfoById.mockImplementation(async (userIds: string[]) =>
+        wireData(Object.fromEntries(userIds.map(userId => [userId, {}]))))
+      const domain = new UserInfoDomain(client, makeStore())
+
+      await Promise.all([
+        domain.fetchUserInfos(['u1'], ['nickname'], { source: 'conversation-item' }),
+        domain.fetchUserInfos(['u2'], ['nickname'], { source: 'contact-list' }),
+      ])
+
+      const summary = entries.find(entry => entry.message === '[UserInfoDomain] fetch')
+      expect(summary?.args[0]).toEqual({
+        sources: ['conversation-item', 'contact-list'],
+        requested: 2,
+        missing: 2,
+        chunks: 1,
+        failedChunks: 0,
+      })
+      expect(JSON.stringify(summary?.args)).not.toContain('u1')
+    }
+    finally {
+      setLogCollector(null)
+    }
+  })
+
+  it('分片失败日志带 source、code 与 httpStatus', async () => {
+    const entries: { message: string, args: unknown[] }[] = []
+    setLogCollector(entry => entries.push(entry))
+    try {
+      const client = makeClient()
+      const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+      // 4.x 真实错误形状：HTTP 状态在 extraInfo.httpCode，描述在 extraInfo.errDesc / message
+      fetchUserInfoById.mockRejectedValue({
+        type: 17,
+        message: 'exceed allowed batch size 100',
+        data: '{"desc":"exceed allowed batch size 100"}',
+        extraInfo: { httpCode: 400, errDesc: 'exceed allowed batch size 100' },
+      })
+      const domain = new UserInfoDomain(client, makeStore())
+
+      await domain.fetchUserInfos(['u1'], ['nickname'], { source: 'conversation-item' })
+
+      const failure = entries.find(entry => entry.message === '[UserInfoDomain] chunk failed')
+      expect(failure?.args[0]).toEqual({
+        source: 'conversation-item',
+        chunkSize: 1,
+        code: 17,
+        httpStatus: 400,
+        reason: 'exceed allowed batch size 100',
+        message: 'exceed allowed batch size 100',
+      })
+    }
+    finally {
+      setLogCollector(null)
+    }
+  })
+})
+
+describe('userInfoDomain 拉取失败（4.x 不重试）', () => {
+  it('5xx/限流类错误也只请求一次并标记失败（无自动同步可由重连恢复）', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    fetchUserInfoById.mockRejectedValue({ type: 500, message: 'Server is busy.', extraInfo: { httpCode: 503 } })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+
+    await domain.fetchUserInfos(['u1'], ['nickname'])
+
+    expect(fetchUserInfoById).toHaveBeenCalledTimes(1)
+    expect(store.markFetchFailed).toHaveBeenCalledWith(['u1'])
   })
 })
 
@@ -220,6 +315,52 @@ describe('userInfoDomain fetchUserInfos 100 人分片（4.x）', () => {
       userIds.slice(200),
     ])
     expect(client.connection!.fetchUserInfoById).not.toHaveBeenCalled()
+  })
+
+  it('own 与 205 个普通 ID 同 tick 时产生 1+3 次独立请求', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    fetchUserInfoById.mockImplementation(async (userIds: string[]) =>
+      wireData(Object.fromEntries(userIds.map(userId => [userId, {}]))))
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+    const userIds = Array.from({ length: 205 }, (_, index) => `u${index}`)
+
+    const [own] = await Promise.all([
+      domain.fetchOwnInfo(),
+      domain.fetchUserInfos(userIds, ['nickname']),
+    ])
+
+    expect(own?.userId).toBe('me')
+    expect(fetchUserInfoById).toHaveBeenCalledTimes(4)
+    expect(fetchUserInfoById.mock.calls.map(call => call[0])).toEqual([
+      ['me'],
+      userIds.slice(0, 100),
+      userIds.slice(100, 200),
+      userIds.slice(200),
+    ])
+  })
+
+  it('own 请求失败只标记自己，不影响同 tick 普通请求', async () => {
+    const client = makeClient()
+    const fetchUserInfoById = client.connection!.fetchUserInfoById as unknown as ReturnType<typeof vi.fn>
+    fetchUserInfoById.mockImplementation(async (userIds: string[]) => {
+      if (userIds.length === 1 && userIds[0] === 'me')
+        throw new Error('own failed')
+      return wireData(Object.fromEntries(userIds.map(userId => [userId, {}])))
+    })
+    const store = makeStore()
+    const domain = new UserInfoDomain(client, store)
+
+    const [own, ordinary] = await Promise.all([
+      domain.fetchOwnInfo(),
+      domain.fetchUserInfos(['u1'], ['nickname']),
+    ])
+
+    expect(own).toBeUndefined()
+    expect(ordinary.map(info => info.userId)).toEqual(['u1'])
+    expect(store.markFetchFailed).toHaveBeenCalledTimes(1)
+    expect(store.markFetchFailed).toHaveBeenCalledWith(['me'])
   })
 
   it('中间分片失败不影响其他分片入库和属性标记', async () => {

@@ -83,6 +83,15 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     return fetchFailedSet.value.has(userId)
   }
 
+  function clearFetchFailed(userIds?: string[]) {
+    if (!userIds) {
+      fetchFailedSet.value.clear()
+      return
+    }
+    for (const id of userIds)
+      fetchFailedSet.value.delete(id)
+  }
+
   function markSubscribed(userIds: string[]) {
     for (const id of userIds) {
       subscribedSet.value.add(id)
@@ -148,6 +157,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     markLoaded,
     markFetchFailed,
     isFetchFailed,
+    clearFetchFailed,
     markSubscribed,
     markUnsubscribed,
     markSubscribeFailed,

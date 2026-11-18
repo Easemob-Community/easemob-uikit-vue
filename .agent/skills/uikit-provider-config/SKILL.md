@@ -110,6 +110,9 @@ theme?: {
   由 adapter 的 Contact/Group/Presence/UserInfo Domain 判空委托（未配置回落 SDK 默认路径）；
 - 优先级：显式传入的 `repositories`（SdkConfig/sdkConfig）**按域整体优先**于 dataSource
   翻译结果（`mergeRepositoryOverrides`）；
+- 用户资料域特例：adapter 先装配 SDK 缓存读取 `readCachedUserInfos`（websdk5 读 runtime/summary），
+  再展开 `repositories.userInfo`。自定义 repository 未显式提供该方法时**不会关闭 SDK 缓存预填**；
+  若业务数据源必须优先，显式传 `readCachedUserInfos: () => []`。
 - `ctx.dataSource` 仍是 **Proxy**（`get/has/ownKeys` 委托 `resolveDataSource()`，支持传入
   computed），但保留的唯一直接消费点是 `searchUsers`（SDK 无搜索能力、repository 契约无
   对应项，add-contact-modal 单点消费）；其余项不再由 UI 层直接读取；

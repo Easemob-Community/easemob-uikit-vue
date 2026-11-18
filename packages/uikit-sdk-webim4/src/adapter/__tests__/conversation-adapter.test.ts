@@ -31,6 +31,7 @@ describe('deriveConversationUpsertFromMessage（onMessage 会话列表代偿）'
     expect(unreadIncrement).toBe(1)
     expect(patch.lastMessageText).toBe('小明: hi')
     expect(patch.lastMessageFrom).toBe(PEER)
+    expect(patch.lastMessageSenderName).toBe('小明')
     expect(patch.lastMessageTime).toBe(uiMsg.timestamp)
   })
 

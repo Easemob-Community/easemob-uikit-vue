@@ -14,7 +14,8 @@ import type { UiConversation } from '@easemob-community/uikit-im'
 | `type` | `ConversationTypeValue` | 会话类型 |
 | `unreadCount` | `number` | 未读数 |
 | `lastMessageText` | `string` | 最后消息摘要 |
-| `lastMessageFrom` | `string?` | 最后消息发送者 |
+| `lastMessageFrom` | `string?` | 最后消息发送者 ID（已归一化） |
+| `lastMessageSenderName` | `string?` | 最后消息发送者已解析显示名；缺省时回退解析摘要前缀 |
 | `lastMessageTime` | `number?` | 最后消息时间 |
 | `isPinned` / `pinnedTime` | `boolean` / `number?` | 置顶状态与时间 |
 | `isMuted` | `boolean` | 是否免打扰 |

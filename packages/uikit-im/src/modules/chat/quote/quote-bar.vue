@@ -22,7 +22,11 @@ const emit = defineEmits<QuoteBarEmits>()
 const { t } = useLocale()
 
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
-const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.message.from,
+  undefined,
+  { source: 'quote', subscribe: false },
+)
 const sender = computed(() => displayName.value || props.message.from || '')
 
 /** 是否为图片/视频（有缩略图时直接展示缩略图） */

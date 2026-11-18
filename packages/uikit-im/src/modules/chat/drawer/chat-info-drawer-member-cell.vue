@@ -10,7 +10,11 @@ export interface ChatInfoDrawerMemberCellProps {
 const props = defineProps<ChatInfoDrawerMemberCellProps>()
 
 // ✅ 使用 useUserInfo 解析显示名和头像（优先级：备注 > 昵称 > userId）
-const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.member.userId,
+  undefined,
+  { source: 'group-member-list', subscribe: false },
+)
 </script>
 
 <template>

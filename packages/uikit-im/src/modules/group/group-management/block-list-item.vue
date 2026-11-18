@@ -22,7 +22,10 @@ const userId = computed(() => {
   return user?.userId || ''
 })
 
-const { displayName, avatarUrl } = useUserInfo(userId)
+const { displayName, avatarUrl } = useUserInfo(userId, undefined, {
+  source: 'group-block-list',
+  subscribe: false,
+})
 </script>
 
 <template>

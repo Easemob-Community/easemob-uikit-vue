@@ -41,7 +41,10 @@ const muteText = computed(() => {
   return `${t('group.mutelist.expireAt', '禁言至')} ${new Date(expire).toLocaleString()}`
 })
 
-const { displayName, avatarUrl } = useUserInfo(userId)
+const { displayName, avatarUrl } = useUserInfo(userId, undefined, {
+  source: 'group-mute-list',
+  subscribe: false,
+})
 </script>
 
 <template>

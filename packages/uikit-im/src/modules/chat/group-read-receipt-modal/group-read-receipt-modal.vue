@@ -38,7 +38,7 @@ watchEffect(() => {
       && !stores.userInfo.isFetchFailed(id),
   )
   if (missing.length > 0) {
-    void domains.userInfo.fetchUserInfos(missing)
+    void domains.userInfo.fetchUserInfos(missing, undefined, { source: 'read-receipt' })
   }
 })
 

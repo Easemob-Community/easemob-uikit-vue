@@ -22,7 +22,10 @@ const emit = defineEmits<{
 
 const ownerUserId = computed(() => props.file.fileOwner?.userId || '')
 
-const { displayName: ownerDisplayName } = useUserInfo(ownerUserId)
+const { displayName: ownerDisplayName } = useUserInfo(ownerUserId, undefined, {
+  source: 'group-shared-file-list',
+  subscribe: false,
+})
 
 function formatSize(bytes?: number): string {
   if (!bytes || bytes <= 0)

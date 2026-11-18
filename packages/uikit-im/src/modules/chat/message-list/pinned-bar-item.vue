@@ -20,7 +20,11 @@ const props = withDefaults(defineProps<PinnedBarItemProps>(), {
 const { t } = useLocale()
 
 /** 发送人显示名：内置用户属性展示链（联系人备注 > 用户资料昵称 > userId） */
-const { displayName } = useUserInfo(() => props.message.from)
+const { displayName } = useUserInfo(
+  () => props.message.from,
+  undefined,
+  { source: 'pinned-message', subscribe: false },
+)
 const sender = computed(() => displayName.value || props.message.from || '')
 
 /** 单条预览文本（直接复用 locale 中已带方括号的预览文案，避免再拼接） */

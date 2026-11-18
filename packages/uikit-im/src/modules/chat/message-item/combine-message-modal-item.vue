@@ -18,7 +18,11 @@ const props = defineProps<CombineMessageModalItemProps>()
 const emit = defineEmits<CombineMessageModalItemEmits>()
 
 /** 通过 useUserInfo 解析发送者昵称与头像 */
-const { displayName, avatarUrl } = useUserInfo(() => props.message.from)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.message.from,
+  undefined,
+  { source: 'combine-message', subscribe: false },
+)
 
 /**
  * 发送者显示名称优先级：

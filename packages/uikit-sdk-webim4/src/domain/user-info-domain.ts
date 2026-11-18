@@ -4,6 +4,7 @@ import type {
   UserInfoAttribute,
   UserInfoAttributeValue,
   UserInfoRepository,
+  UserInfoRequestOptions,
 } from '@easemob-community/uikit-sdk-contract'
 import { ALL_USER_INFO_ATTRIBUTES, createLogger } from '@easemob-community/uikit-sdk-contract'
 import type { Webim4Client } from '../client'
@@ -11,6 +12,26 @@ import type { UserInfoStoreLike } from '../event/types'
 
 const logger = createLogger('UIKit:Webim4UserInfoDomain')
 const USER_INFO_REQUEST_BATCH_SIZE = 100
+function getErrorDiagnostics(err: unknown) {
+  // 4.x 错误为 { type, message, data: responseText, extraInfo: { httpCode, errDesc } }；
+  // 5.x 风格字段保留兜底，避免注入 repository 抛出中立错误时丢失诊断信息。
+  const error = err as {
+    code?: number | string
+    type?: number | string
+    message?: string
+    data?: { httpStatus?: number, reason?: string }
+    details?: { httpStatus?: number, reason?: string, reasonKey?: string }
+    extraInfo?: { httpCode?: number, errDesc?: string }
+    httpStatus?: number
+    reason?: string
+  }
+  return {
+    code: error?.code ?? error?.type,
+    httpStatus: error?.details?.httpStatus ?? error?.data?.httpStatus ?? error?.extraInfo?.httpCode ?? error?.httpStatus,
+    reason: error?.details?.reasonKey ?? error?.details?.reason ?? error?.data?.reason ?? error?.extraInfo?.errDesc ?? error?.reason,
+    message: error?.message,
+  }
+}
 
 /** 解包 4.x AsyncResult（data/entities 二选一承载） */
 function unwrap<T>(res: EasemobChat.AsyncResult<T>): T {
@@ -41,6 +62,7 @@ function fromWireUserInfo(userId: string, raw: EasemobChat.UpdateOwnUserInfoPara
 interface FetchQueueItem {
   userIds: string[]
   attributes: UserInfoAttribute[]
+  options?: UserInfoRequestOptions
   resolve: (infos: UserInfo[]) => void
 }
 
@@ -96,17 +118,21 @@ export class UserInfoDomain {
   async fetchUserInfos(
     userIds: string[],
     attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
+    options?: UserInfoRequestOptions,
   ): Promise<UserInfo[]> {
-    // 未连接时不发起请求，直接返回空结果（缓存数据由 store 层兜底展示）
-    if (!this.client.isConnected) {
-      return []
-    }
     const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
     if (uniqueIds.length === 0)
       return []
+    // 未连接时不发起请求，直接返回空结果（缓存数据由 store 层兜底展示）。
+    // 同时把目标标记为失败：重连 onConnected 清空失败集合时，已挂载的响应式 composable
+    // 会因 isFetchFailed 变化重新求值并补拉；4.x 没有自动同步补位，离线丢弃后无法自愈。
+    if (!this.client.isConnected) {
+      this.store.markFetchFailed(uniqueIds)
+      return []
+    }
 
     return new Promise<UserInfo[]>((resolve) => {
-      this.fetchQueue.push({ userIds: uniqueIds, attributes, resolve })
+      this.fetchQueue.push({ userIds: uniqueIds, attributes, options, resolve })
       this.scheduleFetchFlush()
     })
   }
@@ -133,37 +159,27 @@ export class UserInfoDomain {
       const missingIds = Array.from(new Set(pending.flatMap(item => item.missingIds)))
       // 各调用 attributes 取并集，一次请求覆盖各方所需字段
       const attributes = Array.from(new Set(batch.flatMap(item => item.attributes)))
+      const sources = Array.from(new Set(batch.map(item => item.options?.source ?? 'unknown')))
+      const source = sources.join(',')
+      let failedChunks = 0
 
       if (missingIds.length > 0) {
-        this.store.markLoading(missingIds)
-        try {
-          for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
-            const chunk = missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE)
-            try {
-              const infos = this.userInfoRepository.fetchUserInfos
-                ? await this.fetchFromRepository(chunk)
-                : await this.fetchFromSdk(chunk, attributes)
-
-              // 若请求未返回某些 userId 的数据，标记为失败，防止空结果触发无限重试
-              const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
-              const failedIds = chunk.filter(id => !fetchedIds.has(id))
-              if (failedIds.length > 0)
-                this.store.markFetchFailed(failedIds)
-
-              this.store.setUserInfos(infos)
-              // 记录已请求属性，避免「已拉过部分字段」的缓存阻止后续全量补拉
-              this.store.markFetchedAttributes(chunk, attributes)
-            }
-            catch (err) {
-              logger.warn('[UserInfoDomain] fetchUserInfos failed:', err)
-              this.store.markFetchFailed(chunk)
-            }
-          }
-        }
-        finally {
-          this.store.markLoaded(missingIds)
+        for (let index = 0; index < missingIds.length; index += USER_INFO_REQUEST_BATCH_SIZE) {
+          await this.fetchChunk(
+            missingIds.slice(index, index + USER_INFO_REQUEST_BATCH_SIZE),
+            attributes,
+            { source },
+            () => { failedChunks += 1 },
+          )
         }
       }
+      logger.info('[UserInfoDomain] fetch', {
+        sources,
+        requested: new Set(batch.flatMap(item => item.userIds)).size,
+        missing: missingIds.length,
+        chunks: Math.ceil(missingIds.length / USER_INFO_REQUEST_BATCH_SIZE),
+        failedChunks,
+      })
 
       // 每个原始调用各自 resolve：从 store 缓存读回自己请求的 userIds 子集
       for (const item of pending) {
@@ -179,6 +195,44 @@ export class UserInfoDomain {
       // flush 进行中新 push 进队列的调用不会再触发后续 flush，这里补排一轮避免滞留
       if (this.fetchQueue.length > 0)
         this.scheduleFetchFlush()
+    }
+  }
+
+  private async fetchChunk(
+    userIds: string[],
+    attributes: UserInfoAttribute[],
+    options?: UserInfoRequestOptions,
+    onFailure?: () => void,
+  ): Promise<UserInfo[]> {
+    this.store.markLoading(userIds)
+    try {
+      // 4.x 没有自动同步/缓存补位，重试也无法改变终态，且 4.x 错误码与 5.x 不同源，
+      // 这里只做单片失败标记 + 重连清理恢复，不做自动重试。
+      const infos = this.userInfoRepository.fetchUserInfos
+        ? await this.fetchFromRepository(userIds)
+        : await this.fetchFromSdk(userIds, attributes)
+      const fetchedIds = new Set(infos.map(info => info.userId).filter(Boolean))
+      const failedIds = userIds.filter(id => !fetchedIds.has(id))
+      if (failedIds.length > 0)
+        this.store.markFetchFailed(failedIds)
+      this.store.setUserInfos(infos)
+      const fetchedUserIds = userIds.filter(id => fetchedIds.has(id))
+      if (fetchedUserIds.length > 0)
+        this.store.markFetchedAttributes(fetchedUserIds, attributes)
+      return infos
+    }
+    catch (err) {
+      onFailure?.()
+      logger.warn('[UserInfoDomain] chunk failed', {
+        source: options?.source ?? 'unknown',
+        chunkSize: userIds.length,
+        ...getErrorDiagnostics(err),
+      })
+      this.store.markFetchFailed(userIds)
+      return []
+    }
+    finally {
+      this.store.markLoaded(userIds)
     }
   }
 
@@ -216,7 +270,7 @@ export class UserInfoDomain {
    * 4.x 无用户资料订阅能力（已核对 4.24.2 源码）：直接熔断——标记失败、关闭订阅，
    * 并触发注入的权限错误回调（与 websdk5 无权限分支语义一致），避免上层空转重试。
    */
-  async subscribeUserInfos(userIds: string[]): Promise<void> {
+  async subscribeUserInfos(userIds: string[], _options?: UserInfoRequestOptions): Promise<void> {
     if (this.store.isSubscriptionDisabled())
       return
 
@@ -241,12 +295,27 @@ export class UserInfoDomain {
   /**
    * 获取当前登录用户自己的资料（默认全量属性，保证签名等登录后回显）。
    */
-  async fetchOwnInfo(attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES): Promise<UserInfo | undefined> {
+  async fetchOwnInfo(
+    attributes: UserInfoAttribute[] = ALL_USER_INFO_ATTRIBUTES,
+    options?: UserInfoRequestOptions,
+  ): Promise<UserInfo | undefined> {
     const currentUserId = this.client.currentUserId
     if (!currentUserId)
       return undefined
-    const [info] = await this.fetchUserInfos([currentUserId], attributes)
-    return info
+    if (!this.client.isConnected) {
+      // 与批量拉取一致：离线标记失败，重连清理后由 useOwnUserInfo 的响应式 effect 重新触发
+      this.store.markFetchFailed([currentUserId])
+      return this.store.getUserInfo(currentUserId)
+    }
+    if (
+      this.store.areAttributesFetched(currentUserId, attributes)
+      || this.store.isLoading(currentUserId)
+      || this.store.isFetchFailed(currentUserId)
+    ) {
+      return this.store.getUserInfo(currentUserId)
+    }
+    await this.fetchChunk([currentUserId], attributes, options)
+    return this.store.getUserInfo(currentUserId)
   }
 
   /**

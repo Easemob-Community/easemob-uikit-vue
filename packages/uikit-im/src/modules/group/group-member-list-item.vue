@@ -60,7 +60,11 @@ const { stores } = useUIKit()
 const { addContact } = useContact()
 
 // ✅ 使用 useUserInfo 解析显示名和头像（优先级：备注 > 昵称 > userId）
-const { displayName, avatarUrl } = useUserInfo(() => props.member.userId)
+const { displayName, avatarUrl } = useUserInfo(
+  () => props.member.userId,
+  undefined,
+  { source: 'group-member-list', subscribe: false },
+)
 
 /** 显示名命中高亮分段：keyword 为空或未命中时仅一段原文 */
 const nameSegments = computed(() => {

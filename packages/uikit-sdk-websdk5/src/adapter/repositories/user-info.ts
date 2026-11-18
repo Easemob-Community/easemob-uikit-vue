@@ -3,6 +3,7 @@ import type { UserInfoDomain } from '../../domain/user-info-domain'
 
 export function createUserInfoRepository(domain: UserInfoDomain): UserInfoRepository {
   return {
+    readCachedUserInfos: userIds => domain.readCachedUserInfos(userIds),
     fetchUserInfos: async (userIds, attributes) => {
       return domain.fetchUserInfos(userIds, attributes)
     },

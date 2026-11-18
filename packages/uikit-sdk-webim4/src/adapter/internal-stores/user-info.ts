@@ -69,6 +69,15 @@ export function createUserInfoStore(handlersRef: HandlersRef): EventStores['user
       return failed.has(userId)
     },
 
+    clearFetchFailed(userIds) {
+      if (!userIds) {
+        failed.clear()
+        return
+      }
+      for (const id of userIds)
+        failed.delete(id)
+    },
+
     markSubscribed(userIds) {
       for (const id of userIds)
         subscribed.add(id)

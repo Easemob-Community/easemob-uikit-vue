@@ -97,6 +97,7 @@ export function toUiConversation(
     lastMessageText,
     // 保留群聊最后一条消息发送者 userId，供会话列表项在资料异步就绪后重新解析昵称
     lastMessageFrom: type === CONVERSATION_TYPE.GROUPCHAT && senderId ? senderId : undefined,
+    lastMessageSenderName: type === CONVERSATION_TYPE.GROUPCHAT ? senderName : undefined,
     lastMessageTime: uiMsg?.timestamp,
     isPinned: item.isPinned ?? false,
     pinnedTime: item.pinnedTime || undefined,
@@ -150,6 +151,7 @@ export function deriveConversationUpsertFromMessage(
       lastMessageText: formatConversationPreview(type, senderName, defaultLastMessageTextResolver(uiMsg, adapterPreviewLabels)),
       lastMessageTime: uiMsg.timestamp,
       lastMessageFrom: type === CONVERSATION_TYPE.GROUPCHAT && senderId ? senderId : undefined,
+      lastMessageSenderName: type === CONVERSATION_TYPE.GROUPCHAT ? senderName : undefined,
     },
     unreadIncrement: !uiMsg.isSelf && !options.readOnArrive ? 1 : 0,
   }

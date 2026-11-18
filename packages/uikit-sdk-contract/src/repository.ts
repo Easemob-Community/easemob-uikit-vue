@@ -289,6 +289,8 @@ export interface PresenceRepository {
 
 /** 用户资料数据入口 */
 export interface UserInfoRepository {
+  /** 读取本地缓存资料；缺省表示无缓存 / Read cached profiles; absence means no local cache. */
+  readCachedUserInfos?: (userIds: string[]) => UserInfo[]
   fetchUserInfos: (userIds: string[], attributes?: UserInfoAttribute[]) => Promise<UserInfo[]>
   updateOwnInfo: (input: Partial<Pick<UserInfo, 'nickname' | 'avatarUrl' | 'mail' | 'phone' | 'gender' | 'sign' | 'birth' | 'ext'>>) => Promise<void>
   updateOwnInfoByAttribute: (attribute: UserInfoAttribute, value: UserInfoAttributeValue) => Promise<void>

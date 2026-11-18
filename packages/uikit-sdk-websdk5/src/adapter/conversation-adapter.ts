@@ -40,6 +40,7 @@ export function toUiConversation(item: ConversationItem, options?: ToUiConversat
     lastMessageText,
     // 保留群聊最后一条消息发送者 userId，供会话列表项在资料异步就绪后重新解析昵称
     lastMessageFrom: senderId || undefined,
+    lastMessageSenderName: senderName || undefined,
     lastMessageTime: item.lastMessageAt,
     isPinned: item.isPinned ?? false,
     pinnedTime: item.pinnedTimestamp,

@@ -45,7 +45,11 @@ const props = withDefaults(defineProps<ContactItemDefaultProps>(), {
   clickable: true,
 })
 
-const { userInfo, avatarUrl, displayName: userInfoDisplayName } = useUserInfo(() => props.contact.userId)
+const { userInfo, avatarUrl, displayName: userInfoDisplayName } = useUserInfo(
+  () => props.contact.userId,
+  undefined,
+  { source: 'contact-list', subscribe: false },
+)
 
 const displayName = computed(() =>
   props.contact.remark || userInfoDisplayName.value || props.contact.name || props.contact.userId,

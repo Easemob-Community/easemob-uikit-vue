@@ -224,6 +224,12 @@ export class UIKitClient {
     return this._client.getCurrentUserId()
   }
 
+  /** SDK internal 缓存入口的安全委托，由 adapter 内结构类型消费。 */
+  getCacheManager(): unknown {
+    const client = this._client as unknown as { getCacheManager?: () => unknown }
+    return client.getCacheManager?.() ?? null
+  }
+
   addEventHandler(id: string, handlers: ConnectionEventHandlerMap) {
     this._client.addEventHandler(id, handlers as EventHandlerMap)
   }

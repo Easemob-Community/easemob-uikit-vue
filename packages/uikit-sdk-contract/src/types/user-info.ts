@@ -12,6 +12,18 @@ export type UserInfoAttribute =
 /** 单个用户资料属性允许的值类型 */
 export type UserInfoAttributeValue = string | number | boolean
 
+/** 用户资料请求诊断选项 / Diagnostic options for user info requests. */
+export interface UserInfoRequestOptions {
+  /** 调用来源标签，仅用于日志聚合 / Caller label used only for log aggregation. */
+  source?: string
+}
+
+/** useUserInfo 行为选项 / Behavior options for useUserInfo. */
+export interface UseUserInfoOptions extends UserInfoRequestOptions {
+  /** 是否订阅资料变更，默认 true / Subscribe to profile changes; defaults to true. */
+  subscribe?: boolean
+}
+
 /** 中立用户资料对象（替代 SDK `UserInfo`） */
 export interface UserInfo {
   /** 用户 ID */

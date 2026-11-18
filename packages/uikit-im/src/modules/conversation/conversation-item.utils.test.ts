@@ -25,6 +25,21 @@ describe('shouldFetchLastMessageSender', () => {
     expect(shouldFetchLastMessageSender(makeConversation({ lastMessageText: 'hello' }), true)).toBe(false)
   })
 
+  it('结构化发送者名称优先于摘要文本和自定义格式', () => {
+    expect(shouldFetchLastMessageSender(makeConversation({
+      lastMessageSenderName: '昵称',
+      lastMessageText: '自定义摘要',
+    }), true)).toBe(false)
+    expect(shouldFetchLastMessageSender(makeConversation({
+      lastMessageSenderName: 'u1',
+      lastMessageText: '自定义摘要',
+    }), true)).toBe(true)
+    expect(shouldFetchLastMessageSender(makeConversation({
+      lastMessageSenderName: '',
+      lastMessageText: '自定义摘要',
+    }), true)).toBe(true)
+  })
+
   it('单聊、无发送者、草稿覆盖和关闭发送者名称时不拉取', () => {
     expect(shouldFetchLastMessageSender(makeConversation({ type: CONVERSATION_TYPE.SINGLECHAT }), true)).toBe(false)
     expect(shouldFetchLastMessageSender(makeConversation({ lastMessageFrom: undefined }), true)).toBe(false)

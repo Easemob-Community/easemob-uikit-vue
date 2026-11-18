@@ -79,7 +79,10 @@ const peerUserId = computed(() => {
     return undefined
   return props.conversation.id
 })
-const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId)
+const { userInfo, avatarUrl, contact } = useUserInfo(peerUserId, undefined, {
+  source: 'conversation-item',
+  subscribe: false,
+})
 
 /** 仅在摘要仍展示原始 userId 时回退拉取；SDK 已预填充昵称时不重复请求 */
 const lastMessageSenderUserId = computed(() =>
@@ -87,7 +90,10 @@ const lastMessageSenderUserId = computed(() =>
     ? props.conversation.lastMessageFrom
     : undefined,
 )
-const { displayName: lastMessageSenderDisplayName } = useUserInfo(lastMessageSenderUserId)
+const { displayName: lastMessageSenderDisplayName } = useUserInfo(lastMessageSenderUserId, ['nickname'], {
+  source: 'conversation-item',
+  subscribe: false,
+})
 
 const { get: getPresence } = usePresence()
 

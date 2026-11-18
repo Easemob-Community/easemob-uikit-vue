@@ -46,12 +46,20 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [ ] D153. 根 vitest 配置缺 `@vitejs/plugin-vue`，3 个 `.vue` 测试套件无法收集
+
+- **现象**：从仓库根执行 `pnpm exec vitest run packages/...` 时，`uikit-provider.test.ts` / `image-viewer.test.ts` / `h5-input.test.ts` 三个套件收集失败：`Failed to parse source for import analysis ... Install @vitejs/plugin-vue to handle .vue files`。根目录没有 vite/vitest 配置加载 Vue 插件；按包/目录单独跑时由包内 vite 配置接管才正常。
+- **影响**：全量测试命令不能作为门禁，`.vue` 组件相关断言默认被跳过；本轮用户资料加固只能在「按目录 run」下证明 390 条可运行用例通过。
+- **建议修法**：根新增 `vitest.config.ts`（`@vitejs/plugin-vue` + workspace include，或改用 vitest projects 配置），使 `pnpm test` 能收集 `.vue`；在此之前门禁命令显式写「按包/目录 run」并在计划里注明。
+- **关联 skill**：`uikit-lint-governance` / `uikit-release-build`
+
 ### [x] D152. 用户资料回退触发过宽且合批缺少 100 人分片
 
 - **现象**：群会话摘要已由 SDK 填入发送者昵称时，会话项仍对 `lastMessageFrom` 主动拉取并订阅资料；全量会话项在同一 tick 合批后未按服务端 100 人上限拆分。线上样本中 `getUserInfoByAttribute` 截断前已有 204 个不重复 userId，随后 `/metadata/user/get` 返回 400（既有截图为 `exceed allowed batch size 100`）。
 - **证据**：`conversation-item.vue` 原先把所有群会话 `lastMessageFrom` 直接交给 `useUserInfo`，只有原始 `${lastMessageFrom}: ` 前缀才真正消费异步昵称；单聊已有 `sdkNameSufficient`，群聊缺少同等判断。websdk5/webim4 `UserInfoDomain.flushFetchQueue()` 只合批不分片，websdk5 订阅/退订存在同类上限风险。204 的主来源高概率为群会话发送者，但 SDK 日志没有调用方标签，仍需在同场景用 store 集合对账，不能当作已完全直证。
-- **修复（2026-11-18，工作区未提交）**：群会话仅在摘要仍展示原始 userId 且需要展示发送者时回退，草稿/已有昵称/单聊/`showSenderName=false` 不触发；双 adapter 拉取与 websdk5 订阅/退订按 100 顺序分片并隔离失败；`enableUserInfo=false` 在 websdk5 初始化时硬关闭自动同步，保留 `enableUserInfoSync` 子开关。新增触发源、205 人分片、失败隔离、订阅熔断和开关矩阵回归测试。
-- **边界**：首屏原始 ID 摘要仍立即 REST，不等待 SDK 自动同步；运行期 Provider 开关不会重建 SDK 单例或修改既有自动同步配置；`showSenderName` 的完整展示语义与联系人全量预取/列表虚拟化不在本轮扩大修改。
+- **修复（2026-11-18，基线 `79cc4c31`）**：群会话仅在摘要仍展示原始 userId 且需要展示发送者时回退，草稿/已有昵称/单聊/`showSenderName=false` 不触发；双 adapter 拉取与 websdk5 订阅/退订按 100 顺序分片并隔离失败；`enableUserInfo=false` 在 websdk5 初始化时硬关闭自动同步，保留 `enableUserInfoSync` 子开关。
+- **加固（2026-11-18）**：own 经真实 `fetchOwnInfo` 独立链路拉取（adapter 可选能力，缺省回退单 ID `fetchUserInfos`）；**仅 websdk5** 对网络/超时与 429/5xx 退避重试一次（4.x 无自动同步且错误码/缓存能力不同，不重试，只做单片失败标记；4.x 唯一资料 REST 入口已保证 100 分片）；离线发起的拉取标记失败、重连清理后由响应式 composable 补拉；1600 会话级熔断、1601 仅当前分片失败；日志增加 source、code/httpStatus/reason/message；会话/联系人/群成员（含抽屉宫格、群管理 5 类名单）与消息气泡/引用/置顶/合并消息不订阅陌生人资料；websdk5 优先复用 runtime/summary 缓存并按实际字段标记；`UiConversation` 新增可选 `lastMessageSenderName` 解耦摘要格式，摘要就地更新路径同步写 sender 字段。
+- **边界**：SDK 缓存命中属性视为本地展示权威，缺失属性仍 REST；运行期 Provider 开关不会重建 SDK 单例或修改既有自动同步配置；联系人全量预取与列表虚拟化不在本轮扩大修改。
 - **关联 skill**：`uikit-user-attribute-extraction` / `uikit-provider-config` / `uikit-sdk-adapter-architecture`
 
 ### [x] D151. 双 adapter `fetchGroupMembers` 返回管理员角色合并前数组

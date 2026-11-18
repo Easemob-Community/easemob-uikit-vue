@@ -22,6 +22,9 @@ export interface ConnectionEventStores {
   message: {
     setSyncingMessages: (value: boolean) => void
   }
+  userInfo?: {
+    clearFetchFailed?: (userIds?: string[]) => void
+  }
 }
 
 /** 连接级事件对外回调 */
@@ -51,6 +54,7 @@ export function createConnectionHandlers(
       stores.client.setConnecting(false)
       // 标记首次连接成功：此后再次 onConnecting 即为自动重连，横幅据此区分文案
       stores.client.setHasConnectedOnce(true)
+      stores.userInfo?.clearFetchFailed?.()
     },
     onDisconnected: (payload) => {
       connLog.info('onDisconnected', payload ? { reason: payload.reason, errorCode: payload.errorCode } : undefined)

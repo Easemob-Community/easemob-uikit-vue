@@ -67,6 +67,7 @@ export type {
   UiContactInvite,
   UiGroup,
   UiPresence,
+  UseUserInfoOptions,
   UserInfoStore,
 } from '@easemob-community/uikit-core'
 

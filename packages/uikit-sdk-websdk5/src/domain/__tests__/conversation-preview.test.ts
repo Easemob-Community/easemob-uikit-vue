@@ -5,6 +5,7 @@ import type { UiConversation } from '@easemob-community/uikit-sdk-contract'
 import type { ManagerHost } from '../../client'
 import type { ConversationStoreLike } from '../conversation-domain'
 import { ConversationDomain } from '../conversation-domain'
+import { toUiConversation } from '../../adapter/conversation-adapter'
 
 function makeSdkConversation(): ConversationItem {
   return {
@@ -30,6 +31,68 @@ function makeSdkConversation(): ConversationItem {
     remindType: 'DEFAULT',
   }
 }
+
+describe('会话发送者名称结构化', () => {
+  it('自定义摘要 resolver 不影响已解析发送者名称字段', () => {
+    const raw = {
+      ...makeSdkConversation(),
+      conversationType: CONVERSATION_TYPE.GROUPCHAT,
+      lastMessage: {
+        ...makeSdkConversation().lastMessage,
+        conversationType: CONVERSATION_TYPE.GROUPCHAT,
+      },
+    } as ConversationItem
+
+    const result = toUiConversation(raw, {
+      resolveSenderName: () => 'Alice',
+      lastMessageTextResolver: () => '自定义摘要',
+    })
+
+    expect(result.lastMessageFrom).toBe('alice')
+    expect(result.lastMessageSenderName).toBe('Alice')
+    expect(result.lastMessageText).toBe('Alice: 自定义摘要')
+  })
+})
+
+describe('conversationDomain 本地会话缓存预填', () => {
+  it('syncLocal 在映射前预填群发送者，使首帧摘要使用昵称', () => {
+    const raw = {
+      ...makeSdkConversation(),
+      conversationType: CONVERSATION_TYPE.GROUPCHAT,
+      lastMessage: {
+        ...makeSdkConversation().lastMessage,
+        conversationType: CONVERSATION_TYPE.GROUPCHAT,
+      },
+    }
+    const names = new Map<string, string>()
+    const store: ConversationStoreLike = {
+      setList: vi.fn(),
+      setCurrentConversationId: vi.fn(),
+      setSyncing: vi.fn(),
+      delete: vi.fn(),
+      update: vi.fn(),
+    }
+    const client = {
+      chatManager: { getConversationList: vi.fn(() => [raw]) },
+    } as unknown as ManagerHost
+    const prefillUserInfo = vi.fn((userIds: string[]) => {
+      for (const userId of userIds)
+        names.set(userId, 'Alice')
+    })
+    const domain = new ConversationDomain(client, store, {
+      prefillUserInfo,
+      resolveSenderName: userId => names.get(userId),
+      lastMessageTextResolver: () => 'hello',
+    })
+
+    domain.syncLocal()
+
+    expect(prefillUserInfo).toHaveBeenCalledWith(['alice'])
+    expect(store.setList).toHaveBeenCalledWith([
+      expect.objectContaining({ lastMessageText: 'Alice: hello' }),
+    ])
+  })
+})
 
 describe('ConversationDomain 摘要重算', () => {
   it('仅更新现有会话摘要，保留本地字段和本地独有会话', () => {

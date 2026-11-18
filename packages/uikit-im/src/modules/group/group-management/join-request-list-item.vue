@@ -19,7 +19,10 @@ const { t } = useLocale()
 
 const applicantId = computed(() => props.item.applicant?.userId || '')
 
-const { displayName, avatarUrl } = useUserInfo(applicantId)
+const { displayName, avatarUrl } = useUserInfo(applicantId, undefined, {
+  source: 'group-join-request-list',
+  subscribe: false,
+})
 </script>
 
 <template>

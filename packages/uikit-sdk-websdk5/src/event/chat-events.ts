@@ -222,7 +222,11 @@ function patchConversationLastMessageOnRecall(
     return
 
   const isGroup = conversationType === CONVERSATION_TYPE.GROUPCHAT
-  const senderName = isGroup ? resolveSenderDisplayName(stores, recalledMsg) : undefined
+  // 与 toUiConversation 对齐：发送者 ID 归一化后再解析名称，结构化字段与摘要文本一起写
+  const senderId = isGroup ? normalizeUserId(recalledMsg.from || '') : ''
+  const senderName = senderId
+    ? resolveSenderDisplayName(stores, { ...recalledMsg, from: senderId })
+    : undefined
   const { t } = getEventHandlerDeps()
   stores.conversation.updateConversation(conversationId, {
     lastMessageText: formatConversationPreview(
@@ -230,6 +234,9 @@ function patchConversationLastMessageOnRecall(
       senderName,
       t('message.recalledPreview'),
     ),
+    ...(senderId
+      ? { lastMessageFrom: senderId, lastMessageSenderName: senderName }
+      : {}),
   })
 }
 

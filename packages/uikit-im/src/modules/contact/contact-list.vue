@@ -211,7 +211,7 @@ watchEffect(() => {
       && !stores.userInfo.isFetchFailed(id),
     )
   if (missing.length > 0)
-    void domains.userInfo.fetchUserInfos(missing)
+    void domains.userInfo.fetchUserInfos(missing, undefined, { source: 'contact-list' })
 })
 
 const isAlphabet = computed(() => props.groupBy === 'alphabet')

@@ -49,8 +49,8 @@ export function useUserInfo(
 
 **关键特性**：
 
-- **自动拉取**：首次调用时若 store 无缓存，自动调 `domains.userInfo.fetchUserInfos([userId])`；同一 tick 先合批，再按 100 人顺序分片，分片失败互不影响。会话列表群发送者仅在摘要仍展示原始 userId 时回退，SDK 已预填昵称时不重复拉取。
-- **自动订阅**：若 `enableUserInfoSubscription` 开启，自动订阅陌生人资料变更；订阅/退订同样按 100 人顺序分片，服务端未开通时自动熔断并停止剩余分片。
+- **自动拉取**：首次调用时若 store 无缓存，自动调 `domains.userInfo.fetchUserInfos([userId])`；同一 tick 先合批，再按 100 人顺序分片。websdk5 优先复用 SDK runtime/summary 缓存，缺失属性再 REST；**仅 websdk5** 对网络/超时与 429/5xx 退避重试一次（4.x 错误码/缓存能力不同，不重试，只做单片失败标记）。双 adapter 均可在重连清理失败状态后由响应式 composable 重新拉取；离线期间发起的拉取会标记失败并在重连后补拉。own 走独立 `fetchOwnInfo`（adapter 可选能力，缺省回退单 ID `fetchUserInfos`），不与普通队列连坐。
+- **自动订阅**：若 `enableUserInfoSubscription` 开启，默认订阅陌生人资料变更；`useUserInfo` 第三参可传 `{ source, subscribe }`，会话/联系人/群成员（含聊天信息抽屉宫格、群管理禁言/黑名单/白名单/入群申请/群文件名单）、消息气泡/引用/置顶/合并消息项内置 `subscribe: false`。订阅/退订按 100 人分片，210/1600 会话级熔断，1601 只影响当前分片。
 - **优先级内置**：`displayName = contact.remark > userInfo.nickname > userId`，`avatarUrl = userInfo.avatarUrl > contact.avatar`。
 - **参数支持 ref / getter**：可传 `() => props.userId` 跟随响应式变化。
 

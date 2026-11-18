@@ -28,8 +28,13 @@ export function useOwnUserInfo() {
     if (stores.userInfo.isLoading(userId) || stores.userInfo.isFetchFailed(userId))
       return
 
-    // 全量拉取自身资料：即使此前消息列表已缓存过部分字段（昵称/头像），也会补拉剩余属性
-    void domains.userInfo.fetchUserInfos([userId], ALL_USER_INFO_ATTRIBUTES)
+    // 全量拉取自身资料：即使此前消息列表已缓存过部分字段（昵称/头像），也会补拉剩余属性。
+    // fetchOwnInfo 属 adapter 可选能力：旧 adapter 未实现时回退到普通批量分片（单 ID）。
+    const fetchOwnInfo = domains.userInfo.fetchOwnInfo
+    if (fetchOwnInfo)
+      void fetchOwnInfo.call(domains.userInfo, ALL_USER_INFO_ATTRIBUTES, { source: 'own' })
+    else
+      void domains.userInfo.fetchUserInfos([userId], ALL_USER_INFO_ATTRIBUTES, { source: 'own' })
   })
 
   const userInfo = computed(() => {
