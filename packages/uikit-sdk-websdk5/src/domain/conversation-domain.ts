@@ -3,6 +3,7 @@ import { CONVERSATION_TYPE, MESSAGE_TYPE, createLogger } from '@easemob-communit
 import { toUiConversations } from '../adapter/conversation-adapter'
 import { normalizeUserId } from '../adapter/message-adapter'
 import type { ManagerHost } from '../client'
+import { logConversationSnapshot } from '../utils/conversation-log'
 
 const conversationLogger = createLogger('Conversation')
 
@@ -120,7 +121,7 @@ export class ConversationDomain {
   /** 从本地缓存读取会话列表 */
   syncLocal(): UiConversation[] {
     const items = this.client.chatManager.getConversationList()
-    conversationLogger.info('getConversationList raw (syncLocal)', items)
+    logConversationSnapshot(conversationLogger, 'syncLocal', items)
     dumpRawSnippets(items, 'syncLocal')
     const senderIds = Array.from(new Set(items
       .filter(item => item.conversationType === CONVERSATION_TYPE.GROUPCHAT)
@@ -320,7 +321,7 @@ export class ConversationDomain {
   /** 加载更多会话：SDK5 当前无分页游标，直接返回本地列表 */
   async loadMore(_pageSize?: number) {
     const items = this.client.chatManager.getConversationList()
-    conversationLogger.info('getConversationList raw (loadMore)', items)
+    logConversationSnapshot(conversationLogger, 'loadMore', items)
     const list = toUiConversations(items, {
       resolveSenderName: this.hooks.resolveSenderName,
       lastMessageTextResolver: this.hooks.lastMessageTextResolver,

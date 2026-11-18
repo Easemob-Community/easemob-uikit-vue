@@ -354,6 +354,7 @@ describe('userInfoDomain 来源日志', () => {
       const summary = entries.find(entry => entry.message === '[UserInfoDomain] fetch')
       expect(summary?.args[0]).toEqual({
         sources: ['conversation-item', 'contact-list'],
+        prefilled: 0,
         requested: 2,
         missing: 2,
         chunks: 1,

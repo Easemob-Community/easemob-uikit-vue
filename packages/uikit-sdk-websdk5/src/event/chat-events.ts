@@ -22,6 +22,7 @@ import type { ManagerHost } from '../client'
 import { getEventHandlerDeps } from './deps'
 import { resolveSenderDisplayName, resolveUserDisplayName } from './resolve-display-name'
 import type { EventStores } from './types'
+import { logConversationSnapshot } from '../utils/conversation-log'
 
 const chatLog = createLogger('UIKit:ChatEvents')
 
@@ -365,7 +366,7 @@ export function createChatHandlers(
             // （两包同装隔离，TECH-DEBT D97；SDK 会话列表面会 upsert chatRoom 会话）
             const rawItems = client.chatManager.getConversationList()
               .filter(item => item.conversationType !== 'chatRoom')
-            chatLog.info('getConversationList raw (onSyncDataFinished)', rawItems)
+            logConversationSnapshot(chatLog, 'onSyncDataFinished', rawItems)
             const incoming = toUiConversations(rawItems, { resolveSenderName, lastMessageTextResolver })
             const merged = mergeWithExistingConversations(stores, incoming)
             stores.conversation.setConversationList(merged)
@@ -410,7 +411,7 @@ export function createChatHandlers(
       // 过滤聊天室会话（两包同装隔离，同 onSyncDataFinished conversation 分支）
       const items = payload.items.filter(item => item.conversationType !== 'chatRoom')
       chatLog.info('onConversationListUpdate', { count: items.length, reset: payload.patch.reset, removed: payload.patch.removed.length })
-      chatLog.info('getConversationList raw (onConversationListUpdate)', items)
+      logConversationSnapshot(chatLog, 'onConversationListUpdate', items)
       // 诊断：打印 combine/unknown snippet 的 SDK 原始形态（定位合并消息预览空白）
       {
         const typeCount: Record<string, number> = {}

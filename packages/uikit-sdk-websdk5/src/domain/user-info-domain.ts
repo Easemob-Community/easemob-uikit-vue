@@ -176,7 +176,7 @@ export class UserInfoDomain {
           && !this.store.isLoading(id)
           && !this.store.isFetchFailed(id),
       ))))
-      this.prefillUserInfos(cacheCandidates)
+      const prefilledCount = this.prefillUserInfos(cacheCandidates).length
       // 预填后按各调用自身的 attributes 重算缺失：已覆盖/加载中/已失败的 id 不再请求
       const pending = batch.map(item => ({
         ...item,
@@ -205,6 +205,7 @@ export class UserInfoDomain {
       }
       logger.info('[UserInfoDomain] fetch', {
         sources,
+        prefilled: prefilledCount,
         requested: new Set(batch.flatMap(item => item.userIds)).size,
         missing: missingIds.length,
         chunks: Math.ceil(missingIds.length / USER_INFO_REQUEST_BATCH_SIZE),
