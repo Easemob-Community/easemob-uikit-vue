@@ -62,6 +62,17 @@
 - **边界**：首轮仍需 `会话数/20` 次请求；若还要再降，可评估改用 `getConversationListByRemindType` 只拉非默认项（需先确认服务端语义与 DURATION/INTERVAL 规则覆盖）。
 - **关联 skill**：`uikit-log-analysis` / `uikit-sdk-adapter-architecture`
 
+### [ ] D156. 会话列表全量挂载，规划独立的虚拟滚动组件逐步替换
+
+- **现状**：`conversation-list.vue` 对 `filteredConversationList` 直接 `v-for` 全量挂载并实例化 `ConversationItem`（含长按/弹层等）。压测实测：1004 条从列表更新到首个分片请求约 **0.7s**，1360 条约 **1.5s**（`easemob-uikit-im-logs-2026-11-18T09-14-48.log` 17:13:55.313→56.016；`09-54-39.log` 17:52:22.587→24.115），首屏挂载已是资料拉取之后的下一瓶颈。
+- **为什么不能直接改**：`#item` 插槽允许业务接管任意高度内容，默认项又是 `Cell auto-height`；`useArrowNavigation` 按索引遍历 DOM、`useInfiniteScroll` 与 `usePullRefresh` 绑定滚动容器、`scrollIntoView`（置顶/搜索定位）依赖目标项在 DOM 中，sticky body/footer 槽也基于当前滚动结构。直接虚拟化是公共组件契约级改动，回归面大。
+- **临时口径（不是最终设计）**：`PRESENCE_SUBSCRIBE_LIMIT = 100`（只订首屏前 100 个单聊 presence）与 `syncConversationMuteStates` 首轮 `会话数/20` 次请求，都是“全量挂载”前提下的收敛手段；虚拟化落地后应改为“按可见范围订阅/查询”，届时同步下调/移除这两个上限。
+- **计划**：新开发并列组件（如 `EmConversationListVirtual`），**复用**现有 props/emits/slots 契约与 `useConversation`、`domains.userInfo|presence`、`syncConversationMuteStates` 等数据层能力，不复制分片/退避/去重逻辑；与旧组件并存、业务按需替换，旧组件保留到新组件验收完成。
+- **前置决策**：`#item` 高度契约三选一——① 固定高度；② 业务必须自报高度；③ ResizeObserver 动态测量。该决策直接影响工期、是否引入虚拟滚动依赖，以及是否属于公开 API 变更，需先出设计文档。
+- **备选（若新组件排期前仍需优化）**：首屏只挂前 50 条 + 底部 IntersectionObserver 增量（保留 DOM 顺序与插槽契约，约 1–2 天）；或先加 `content-visibility: auto` + `contain-intrinsic-size` 兜底（约 0.5 小时，只省布局/绘制，不省挂载与请求）。
+- **验收口径**：2000 条会话首屏挂载 < 100ms；滚动无明显白屏/掉帧；切 tab、搜索、置顶、键盘导航、下拉刷新、`scrollIntoView` 全回归通过；仅可见项触发 userInfo/presence/mute 请求；新旧组件对业务暴露的 API 契约一致；`PRESENCE_SUBSCRIBE_LIMIT` 的临时上限有明确去留结论。
+- **关联 skill**：`uikit-component-authoring` / `uikit-h5-adaptation` / `uikit-store-composable` / `uikit-sdk-adapter-architecture`
+
 ### [ ] D153. 根 vitest 配置缺 `@vitejs/plugin-vue`，3 个 `.vue` 测试套件无法收集
 
 - **现象**：从仓库根执行 `pnpm exec vitest run packages/...` 时，`uikit-provider.test.ts` / `image-viewer.test.ts` / `h5-input.test.ts` 三个套件收集失败：`Failed to parse source for import analysis ... Install @vitejs/plugin-vue to handle .vue files`。根目录没有 vite/vitest 配置加载 Vue 插件；按包/目录单独跑时由包内 vite 配置接管才正常。
