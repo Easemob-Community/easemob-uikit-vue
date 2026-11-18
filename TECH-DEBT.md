@@ -54,6 +54,14 @@
 - **边界**：首屏 100 个之后的会话暂不订阅 presence（列表未虚拟化，可见性感知待后续）；100 的口径见 SDK 文档 `docs/integration/presence.md`——`subscribePresence` 单次最多 100 人、总订阅上限 3000 人，`getPresenceStatus` 单次最多 100 人。
 - **关联 skill**：`uikit-user-attribute-extraction` / `uikit-log-analysis`
 
+### [x] D155. 会话免打扰状态每次同步都全量重查，千级会话形成 20 条/批的请求风暴
+
+- **现象**：`patchConversationMuteStates` 在每次会话同步完成后，对 `conversationList` **全量**会话按 20 条/次串行调用 `pushManager.getConversationSilentModes`，无已查询去重、无并发、无事件合并。1360 条会话 ≈ 68 次请求/轮，连续同步会重复整轮。
+- **证据**：`easemob-uikit-im-logs-2026-11-18T09-54-39.log` 2 分钟内 204 次 `Call getConversationSilentModes`（每次 count=20）；`easemob-uikit-im-logs-2026-11-18T09-14-48.log` 218 次。SDK 文档与实现均标注单次最多 20 条（`push-manager.ts`），无法靠加大批量解决。
+- **修复（2026-11-18）**：抽出 `event/conversation-mute.ts#syncConversationMuteStates`——按事件注册周期维护已查询 key 去重、20 条/批、并发 2、失败批次不记账（下次同步重试）、同步事件运行中只合并补跑一轮；日志输出 `{ conversations, queried, batches, failedBatches, durationMs }`。首轮之后仅查询新增会话。
+- **边界**：首轮仍需 `会话数/20` 次请求；若还要再降，可评估改用 `getConversationListByRemindType` 只拉非默认项（需先确认服务端语义与 DURATION/INTERVAL 规则覆盖）。
+- **关联 skill**：`uikit-log-analysis` / `uikit-sdk-adapter-architecture`
+
 ### [ ] D153. 根 vitest 配置缺 `@vitejs/plugin-vue`，3 个 `.vue` 测试套件无法收集
 
 - **现象**：从仓库根执行 `pnpm exec vitest run packages/...` 时，`uikit-provider.test.ts` / `image-viewer.test.ts` / `h5-input.test.ts` 三个套件收集失败：`Failed to parse source for import analysis ... Install @vitejs/plugin-vue to handle .vue files`。根目录没有 vite/vitest 配置加载 Vue 插件；按包/目录单独跑时由包内 vite 配置接管才正常。

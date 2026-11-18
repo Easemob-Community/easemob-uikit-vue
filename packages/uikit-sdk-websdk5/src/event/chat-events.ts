@@ -19,10 +19,11 @@ import { formatSdkError } from '../utils/sdk-error'
 import { notifyOnNewMessage } from '../notification-engine'
 import { setSyncStatus } from '../use-sync-status'
 import type { ManagerHost } from '../client'
+import { logConversationSnapshot } from '../utils/conversation-log'
 import { getEventHandlerDeps } from './deps'
 import { resolveSenderDisplayName, resolveUserDisplayName } from './resolve-display-name'
 import type { EventStores } from './types'
-import { logConversationSnapshot } from '../utils/conversation-log'
+import { syncConversationMuteStates } from './conversation-mute'
 
 const chatLog = createLogger('UIKit:ChatEvents')
 
@@ -32,6 +33,12 @@ const fetchingGroupNames = new Set<string>()
 /** 已主动拉取过群名称的 ID 集合（本次事件注册周期内），避免 SDK 定时同步会话列表时重复请求 */
 const fetchedGroupNameIds = new Set<string>()
 
+/** 已成功查询过免打扰规则的会话 key（按事件注册周期维护，避免每次会话同步全量重查） */
+const muteQueriedKeys = new Set<string>()
+/** 免打扰同步进行中 / 期间又触发同步，结束后补跑一轮 */
+let mutePatchRunning = false
+let mutePatchQueued = false
+
 /** 待发送已读回执的单聊消息 ID 队列（按会话分组，同一 microtask 内合并为一次请求） */
 const pendingReadReceipts = new Map<string, string[]>()
 let readReceiptFlushScheduled = false
@@ -40,6 +47,9 @@ let readReceiptFlushScheduled = false
 export function resetChatEventState() {
   fetchingGroupNames.clear()
   fetchedGroupNameIds.clear()
+  muteQueriedKeys.clear()
+  mutePatchRunning = false
+  mutePatchQueued = false
   pendingReadReceipts.clear()
   readReceiptFlushScheduled = false
 }
@@ -102,33 +112,57 @@ function queueMessageReadReceipt(
  * DURATION/INTERVAL 规则无 remindType，用 expireTimestamp 未过期判定免打扰中。
  */
 async function patchConversationMuteStates(stores: EventStores, client: ManagerHost) {
-  const targets = stores.conversation.conversationList.map(c => ({
-    conversationId: c.id,
-    conversationType: c.type,
-  }))
-  if (targets.length === 0)
+  // 同步事件可能连续触发（重登 / 刷新 / 定时同步）：运行中只记一次待跑，避免并发全量查询
+  if (mutePatchRunning) {
+    mutePatchQueued = true
     return
-
-  for (let i = 0; i < targets.length; i += 20) {
-    try {
-      const result = await client.pushManager.getConversationSilentModes({
-        conversationList: targets.slice(i, i + 20),
-      })
-      for (const item of result.conversations) {
-        const muted = item.rule.remindType === 'NONE'
-          || (item.rule.expireTimestamp !== undefined && item.rule.expireTimestamp > Date.now())
-        const existing = stores.conversation.conversationList.find(c => c.id === item.conversationId)
-        if (existing && existing.isMuted !== muted) {
-          stores.conversation.updateConversation(item.conversationId, {
-            isMuted: muted,
-            remindType: item.rule.remindType ?? (muted ? 'NONE' : 'DEFAULT'),
-          })
-        }
+  }
+  mutePatchRunning = true
+  try {
+    do {
+      mutePatchQueued = false
+      const startedAt = Date.now()
+      // PushManager 只接受单聊/群聊；IM 会话列表已过滤 chatRoom，这里再显式收敛类型
+      const targets: Array<{
+        conversationId: string
+        conversationType: typeof CONVERSATION_TYPE.SINGLECHAT | typeof CONVERSATION_TYPE.GROUPCHAT
+      }> = []
+      for (const conversation of stores.conversation.conversationList) {
+        if (conversation.type === CONVERSATION_TYPE.SINGLECHAT)
+          targets.push({ conversationId: conversation.id, conversationType: CONVERSATION_TYPE.SINGLECHAT })
+        else if (conversation.type === CONVERSATION_TYPE.GROUPCHAT)
+          targets.push({ conversationId: conversation.id, conversationType: CONVERSATION_TYPE.GROUPCHAT })
       }
-    }
-    catch (err) {
-      chatLog.warn('patch conversation mute states failed:', err)
-    }
+      const { queriedCount, batchCount, failedBatchCount } = await syncConversationMuteStates({
+        targets,
+        queried: muteQueriedKeys,
+        query: async batch => (await client.pushManager.getConversationSilentModes({ conversationList: batch })).conversations,
+        apply: (item) => {
+          const muted = item.rule.remindType === 'NONE'
+            || (item.rule.expireTimestamp !== undefined && item.rule.expireTimestamp > Date.now())
+          const existing = stores.conversation.conversationList.find(c => c.id === item.conversationId)
+          if (existing && existing.isMuted !== muted) {
+            stores.conversation.updateConversation(item.conversationId, {
+              isMuted: muted,
+              remindType: item.rule.remindType ?? (muted ? 'NONE' : 'DEFAULT'),
+            })
+          }
+        },
+        onError: err => chatLog.warn('patch conversation mute states failed:', err),
+      })
+      if (batchCount > 0) {
+        chatLog.info('patch conversation mute states', {
+          conversations: targets.length,
+          queried: queriedCount,
+          batches: batchCount,
+          failedBatches: failedBatchCount,
+          durationMs: Date.now() - startedAt,
+        })
+      }
+    } while (mutePatchQueued)
+  }
+  finally {
+    mutePatchRunning = false
   }
 }
 
