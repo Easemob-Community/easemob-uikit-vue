@@ -6,6 +6,17 @@ import type { PresenceStoreLike } from '../event/types'
 
 const presenceDomainLog = createLogger('UIKit:Webim4PresenceDomain')
 
+/** 服务端 presence 单次请求的 userIds 上限（与 websdk5 同构：千级会话订阅/查询必须分片） */
+export const PRESENCE_REQUEST_BATCH_SIZE = 100
+
+/** 按固定大小切分 userIds，保持原顺序 */
+function chunkUserIds(userIds: string[], size: number): string[][] {
+  const chunks: string[][] = []
+  for (let index = 0; index < userIds.length; index += size)
+    chunks.push(userIds.slice(index, index + size))
+  return chunks
+}
+
 /** 解包 4.x AsyncResult（data/entities 二选一承载） */
 function unwrap<T>(res: EasemobChat.AsyncResult<T>): T {
   return (res?.data ?? res?.entities) as T
@@ -100,14 +111,38 @@ export class PresenceDomain {
     if (!this.client.isConnected) {
       return []
     }
-    const res = await this.connection.subscribePresence({
-      usernames: userIds,
-      expiry,
-    })
-    this.store.setSubscribed(userIds)
-    const mapped = toUiPresenceList(unwrap(res))
-    this.store.updateBatch(mapped)
-    return mapped
+    const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
+    if (uniqueIds.length === 0)
+      return []
+
+    const collected: UiPresence[] = []
+    let firstError: unknown
+    const chunks = chunkUserIds(uniqueIds, PRESENCE_REQUEST_BATCH_SIZE)
+    for (const chunk of chunks) {
+      try {
+        const res = await this.connection.subscribePresence({
+          usernames: chunk,
+          expiry,
+        })
+        this.store.setSubscribed(chunk)
+        const mapped = toUiPresenceList(unwrap(res))
+        this.store.updateBatch(mapped)
+        collected.push(...mapped)
+      }
+      catch (err) {
+        if (firstError === undefined) {
+          firstError = err
+          presenceDomainLog.warn('[PresenceDomain] subscribePresence chunk failed:', {
+            chunkSize: chunk.length,
+            chunks: chunks.length,
+          })
+        }
+        // 继续后续分片：不让一个异常分片阻断其余用户的状态
+      }
+    }
+    if (firstError !== undefined)
+      throw firstError
+    return collected
   }
 
   /** 取消订阅 */
@@ -120,7 +155,18 @@ export class PresenceDomain {
     if (!this.client.isConnected) {
       return
     }
-    await this.connection.unsubscribePresence({ usernames: userIds })
+    const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
+    for (const chunk of chunkUserIds(uniqueIds, PRESENCE_REQUEST_BATCH_SIZE)) {
+      try {
+        await this.connection.unsubscribePresence({ usernames: chunk })
+      }
+      catch (err) {
+        presenceDomainLog.warn('[PresenceDomain] unsubscribePresence chunk failed:', {
+          chunkSize: chunk.length,
+          err,
+        })
+      }
+    }
   }
 
   /** 主动查询在线状态 */
@@ -135,10 +181,33 @@ export class PresenceDomain {
     if (!this.client.isConnected) {
       return []
     }
-    const res = await this.connection.getPresenceStatus({ usernames: userIds })
-    const mapped = toUiPresenceList(unwrap(res))
-    this.store.updateBatch(mapped)
-    return mapped
+    const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
+    if (uniqueIds.length === 0)
+      return []
+
+    const collected: UiPresence[] = []
+    let firstError: unknown
+    const chunks = chunkUserIds(uniqueIds, PRESENCE_REQUEST_BATCH_SIZE)
+    for (const chunk of chunks) {
+      try {
+        const res = await this.connection.getPresenceStatus({ usernames: chunk })
+        const mapped = toUiPresenceList(unwrap(res))
+        this.store.updateBatch(mapped)
+        collected.push(...mapped)
+      }
+      catch (err) {
+        if (firstError === undefined) {
+          firstError = err
+          presenceDomainLog.warn('[PresenceDomain] getPresenceStatus chunk failed:', {
+            chunkSize: chunk.length,
+            chunks: chunks.length,
+          })
+        }
+      }
+    }
+    if (firstError !== undefined)
+      throw firstError
+    return collected
   }
 
   /** 发布自定义在线状态（4.x publishPresence 参数为 description） */

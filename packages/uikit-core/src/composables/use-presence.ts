@@ -8,6 +8,10 @@ import { useCoreUIKit } from './use-uikit'
 
 const logger = createLogger('UIKit:UsePresence')
 
+/** 订阅失败后的首次重试延迟（指数退避，上限 60s；服务端未开通时避免每次列表变化都全量重试） */
+const PRESENCE_RETRY_BASE_DELAY_MS = 5_000
+const PRESENCE_RETRY_MAX_DELAY_MS = 60_000
+
 /** presence 关闭时各操作仅告警一次（warnOnce），避免刷屏 */
 let warnedPresenceDisabled = false
 function warnPresenceDisabledOnce(action: string): void {
@@ -115,6 +119,74 @@ export function usePresence() {
    */
   function watch(source: MaybeRefOrGetter<string[]>): void {
     let current: string[] = []
+    /** 正在订阅中的 id，避免重试与列表变化重复发起同一批订阅 */
+    const inflight = new Set<string>()
+    /** 订阅失败后的待重试集合（配合指数退避，替代“等下一次列表变化再全量重补”） */
+    const pendingRetry = new Set<string>()
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
+    let retryDelay = PRESENCE_RETRY_BASE_DELAY_MS
+
+    function clearRetryTimer(): void {
+      if (retryTimer) {
+        clearTimeout(retryTimer)
+        retryTimer = null
+      }
+    }
+
+    function scheduleRetry(ids: string[]): void {
+      for (const id of ids)
+        pendingRetry.add(id)
+      if (retryTimer)
+        return
+      retryTimer = setTimeout(() => {
+        retryTimer = null
+        const targets = Array.from(pendingRetry).filter(
+          id => current.includes(id) && !presenceStore.get(id) && !inflight.has(id),
+        )
+        pendingRetry.clear()
+        if (targets.length > 0)
+          attemptSubscribe(targets)
+      }, retryDelay)
+      retryDelay = Math.min(retryDelay * 2, PRESENCE_RETRY_MAX_DELAY_MS)
+    }
+
+    function attemptSubscribe(ids: string[]): void {
+      const targets = ids.filter(id => !inflight.has(id))
+      if (targets.length === 0)
+        return
+      for (const id of targets)
+        inflight.add(id)
+      void (async () => {
+        let subscribeFailed = false
+        try {
+          await subscribePresence(targets)
+          // 成功即重置退避，避免一次抖动后长期停留在长间隔
+          retryDelay = PRESENCE_RETRY_BASE_DELAY_MS
+        }
+        catch (err: unknown) {
+          subscribeFailed = true
+          logger.warn('[usePresence] subscribePresence failed:', formatSdkError(err), '；已按指数退避重试，并回退主动查询补齐首屏')
+          scheduleRetry(targets)
+        }
+        finally {
+          for (const id of targets)
+            inflight.delete(id)
+        }
+        // 首屏兜底：订阅 settle 后仍无状态的 id（订阅失败/服务端未返回条目），
+        // 主动查询补齐；订阅成功路径 store 已写入，missing 为空，零额外请求
+        const missing = targets.filter(id => !presenceStore.get(id))
+        if (missing.length) {
+          try {
+            await fetchPresence(missing)
+          }
+          catch (err: unknown) {
+            if (!subscribeFailed)
+              logger.warn('[usePresence] fetchPresence fallback failed:', formatSdkError(err))
+          }
+        }
+      })()
+    }
+
     const stop = vueWatch(
       () => ({ ids: toValue(source), self: currentUserId.value, connected: stores.client.connected }),
       ({ ids, connected }) => {
@@ -122,50 +194,35 @@ export function usePresence() {
         // 防止“关闭期标记已订阅、开启后漏订”的状态漂移
         if (!features.enablePresence) {
           current = []
+          pendingRetry.clear()
+          clearRetryTimer()
           return
         }
         // 未连接：不订阅不记账，等 connected 变 true 后重放（见上注释）
         if (!connected) {
           current = []
+          pendingRetry.clear()
+          clearRetryTimer()
           return
         }
         const next = (ids || []).filter(id => !isSelf(id))
         const toAdd = next.filter(id => !current.includes(id))
         const toRemove = current.filter(id => !next.includes(id))
         current = [...next]
-        if (toAdd.length) {
-          void (async () => {
-            let subscribeFailed = false
-            try {
-              await subscribePresence(toAdd)
-            }
-            catch (err: unknown) {
-              subscribeFailed = true
-              logger.warn('[usePresence] subscribePresence failed:', formatSdkError(err), '；回退主动查询补齐首屏，后续列表变化时重新补订')
-              // 订阅失败的 id 从“已订阅”集合移除，后续列表变化时可重新补订
-              current = current.filter(id => !toAdd.includes(id))
-            }
-            // 首屏兜底：订阅 settle 后仍无状态的 id（订阅失败/服务端未返回条目），
-            // 主动查询补齐；订阅成功路径 store 已写入，missing 为空，零额外请求
-            const missing = toAdd.filter(id => !presenceStore.get(id))
-            if (missing.length) {
-              try {
-                await fetchPresence(missing)
-              }
-              catch (err: unknown) {
-                if (!subscribeFailed)
-                  logger.warn('[usePresence] fetchPresence fallback failed:', formatSdkError(err))
-              }
-            }
-          })()
-        }
-        if (toRemove.length)
+        if (toAdd.length > 0)
+          attemptSubscribe(toAdd)
+        if (toRemove.length > 0) {
+          for (const id of toRemove)
+            pendingRetry.delete(id)
           void unsubscribePresence(toRemove)
+        }
       },
       { immediate: true },
     )
     onScopeDispose(() => {
       stop()
+      pendingRetry.clear()
+      clearRetryTimer()
       if (current.length)
         void unsubscribePresence(current)
     })

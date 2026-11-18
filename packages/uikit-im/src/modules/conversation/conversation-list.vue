@@ -18,6 +18,7 @@ import { EmStatusBanner as StatusBanner } from '@easemob-community/uikit-core'
 import { EmSkeleton as Skeleton } from '@easemob-community/uikit-core'
 import type { UiConversation as Conversation } from '@easemob-community/uikit-core'
 import { DEFAULT_CONVERSATION_TABS } from './types'
+import { selectPresencePeerIds } from './conversation-list.utils'
 import type { ConversationAction, ConversationHeaderMenuItem, ConversationTabKey } from './types'
 import ConversationItem from './conversation-item.vue'
 import ConversationTabs from './conversation-tabs.vue'
@@ -428,12 +429,10 @@ const emptyDescription = computed(() => {
   return props.emptyText || tabEmptyTexts[effectiveActiveTab.value] || t('conversation.empty')
 })
 
-/** 当前会话列表中可见的单聊对方用户 ID，用于 Presence 兜底拉取 */
+/** 需要订阅 Presence 的单聊对方 ID：只取前 N 个（千级会话全量订阅会 400 并放大请求） */
 const visibleUserIds = computed(() =>
   effectiveEnablePresence.value
-    ? filteredConversationList.value
-      .filter(item => item.type === CONVERSATION_TYPE.SINGLECHAT)
-      .map(item => item.id)
+    ? selectPresencePeerIds(filteredConversationList.value)
     : [],
 )
 

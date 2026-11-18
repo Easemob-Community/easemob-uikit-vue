@@ -46,6 +46,14 @@
 
 ## P1 · 一致性 / 契约漂移
 
+### [x] D154. 千级会话下 Presence 订阅/查询未分片，且失败后每次列表变化全量重试
+
+- **现象**：会话列表 `visibleUserIds` 实际取全部单聊会话（非“可见”），1000+ 条时一次性 `subscribePresence` / `getPresenceStatus` 直接 400 `illegal_argument`；订阅失败后失败 id 从已订阅集合移除，每次列表更新都把历史失败集合+新增会话一起重发，形成重试风暴；订阅失败后的 `fetchPresence` 兜底同样一次性超限。
+- **证据**：`easemob-uikit-im-logs-2026-11-18T09-54-39.log`（1360 条会话，3 分钟内 62 次订阅 400 + 62 次查询 400）；`easemob-uikit-im-logs-2026-11-18T09-14-48.log`（1004 条会话，重登后 8 次订阅 400）。`presence-domain.ts` 三个批量方法均单次透传；`use-presence.ts` 失败分支 `current = current.filter(...)` 后无退避。
+- **修复（2026-11-18）**：双 adapter `presence-domain` 的 `subscribe` / `unsubscribe` / `fetchStatus` 按 100 分片（`PRESENCE_REQUEST_BATCH_SIZE`），单片失败不阻断其余分片，逐片记账；core `usePresence.watch` 订阅失败改为 5s→10s→…→60s 指数退避合并重试，失败 id 保留在已订阅集合内，列表变化只订阅真正新增的 id，作用域销毁清理定时器；会话列表只订阅前 100 个单聊（`PRESENCE_SUBSCRIBE_LIMIT`）。
+- **边界**：首屏 100 个之后的会话暂不订阅 presence（列表未虚拟化，可见性感知待后续）；100 为服务端单次上限口径，若服务端更严格需再下调。
+- **关联 skill**：`uikit-user-attribute-extraction` / `uikit-log-analysis`
+
 ### [ ] D153. 根 vitest 配置缺 `@vitejs/plugin-vue`，3 个 `.vue` 测试套件无法收集
 
 - **现象**：从仓库根执行 `pnpm exec vitest run packages/...` 时，`uikit-provider.test.ts` / `image-viewer.test.ts` / `h5-input.test.ts` 三个套件收集失败：`Failed to parse source for import analysis ... Install @vitejs/plugin-vue to handle .vue files`。根目录没有 vite/vitest 配置加载 Vue 插件；按包/目录单独跑时由包内 vite 配置接管才正常。

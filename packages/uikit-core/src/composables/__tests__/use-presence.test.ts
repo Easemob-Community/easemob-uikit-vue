@@ -100,7 +100,7 @@ describe('usePresence().watch', () => {
     scope.stop()
   })
 
-  it('订阅失败时回退 fetchPresence 兜底首屏，且失败 id 不留在已订阅集合', async () => {
+  it('订阅失败时回退 fetchPresence 兜底首屏，失败 id 留在已订阅集合内避免每次列表变化全量重发', async () => {
     subscribeMock.mockRejectedValueOnce(new Error('subscribe denied'))
     const ids = ref(['a', 'b'])
     const scope = startWatch(ids)
@@ -112,13 +112,13 @@ describe('usePresence().watch', () => {
     expect(storeData.has('a')).toBe(true)
     expect(storeData.has('b')).toBe(true)
 
-    // 失败 id 未记账：列表新增 id 触发重放时，失败的 id 会随 toAdd 重新补订
+    // 失败 id 仍记账：列表新增只订阅新增的 c，不再把 a/b 全量重发
     subscribeMock.mockClear()
     ids.value = ['a', 'b', 'c']
     await flush()
     await flush()
     expect(subscribeMock).toHaveBeenCalledTimes(1)
-    expect(subscribeMock).toHaveBeenCalledWith(['a', 'b', 'c'], undefined)
+    expect(subscribeMock).toHaveBeenCalledWith(['c'], undefined)
     scope.stop()
   })
 
@@ -150,5 +150,89 @@ describe('usePresence().watch', () => {
     await flush()
     expect(subscribeMock).not.toHaveBeenCalled()
     scope.stop()
+  })
+})
+
+describe('usePresence().watch 订阅失败退避', () => {
+  let localSubscribe: Mock
+  let localFetchStatus: Mock
+  let clientState: { currentUser: string, connected: boolean }
+
+  beforeEach(() => {
+    clientState = reactive({ currentUser: 'me', connected: true })
+    localSubscribe = vi.fn(async () => {
+      throw new Error('400 illegal_argument')
+    })
+    localFetchStatus = vi.fn(async () => {
+      throw new Error('400 illegal_argument')
+    })
+    mockCtx.features = { enablePresence: true }
+    mockCtx.stores = {
+      client: clientState,
+      presence: {
+        presenceMap: new Map(),
+        onlineUserIds: [],
+        get: () => undefined,
+        update: () => {},
+      },
+    }
+    mockCtx.domains = {
+      presence: {
+        subscribe: localSubscribe,
+        unsubscribe: vi.fn(async () => {}),
+        fetchStatus: localFetchStatus,
+        publish: vi.fn(async () => {}),
+      },
+    }
+  })
+
+  function startWatch(ids: Ref<string[]>) {
+    const scope = effectScope()
+    scope.run(() => usePresence().watch(ids))
+    return scope
+  }
+
+  it('失败后按 5s 退避合并重试；列表变化只订阅新增 id，不再全量重发', async () => {
+    vi.useFakeTimers()
+    try {
+      const ids = ref(['a', 'b'])
+      const scope = startWatch(ids)
+      await vi.advanceTimersByTimeAsync(0)
+      await vi.advanceTimersByTimeAsync(0)
+      expect(localSubscribe).toHaveBeenCalledTimes(1)
+      expect(localSubscribe).toHaveBeenCalledWith(['a', 'b'], undefined)
+
+      // 列表变化：只新增 c，失败中的 a/b 不重发
+      localSubscribe.mockClear()
+      ids.value = ['a', 'b', 'c']
+      await vi.advanceTimersByTimeAsync(0)
+      await vi.advanceTimersByTimeAsync(0)
+      expect(localSubscribe.mock.calls.map(call => call[0])).toEqual([['c']])
+
+      // 到达退避窗口：a/b/c 合并为一次重试
+      await vi.advanceTimersByTimeAsync(5_000)
+      const retried = localSubscribe.mock.calls.slice(1).map(call => call[0])
+      expect(retried.flat().sort()).toEqual(['a', 'b', 'c'])
+      scope.stop()
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('作用域销毁时清理重试定时器，不再发起订阅', async () => {
+    vi.useFakeTimers()
+    try {
+      const scope = startWatch(ref(['a']))
+      await vi.advanceTimersByTimeAsync(0)
+      await vi.advanceTimersByTimeAsync(0)
+      localSubscribe.mockClear()
+      scope.stop()
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(localSubscribe).not.toHaveBeenCalled()
+    }
+    finally {
+      vi.useRealTimers()
+    }
   })
 })
