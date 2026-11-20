@@ -12,6 +12,7 @@ import { useUserInfo } from '../../composables/use-user-info'
 import { useGroup } from '../../composables/use-group'
 import { provideChatPluginContext } from '../../composables/use-chat-plugin'
 import { chineseMessagePreviewLabels, resolveLastMessageText, resolveSenderDisplayName } from '../../utils/resolve-last-message-text'
+import { pickLastSummaryMessage } from '../../utils/conversation-summary'
 import { DEFAULT_GROUP_AVATAR } from '../../assets'
 import InviteMemberModal from '../group/invite-member-modal.vue'
 import CreateGroupModal from '../conversation/create-group-modal.vue'
@@ -150,16 +151,17 @@ provideChatPluginContext({
 const lastMessageTextResolver = computed(() => props.config?.lastMessageTextResolver)
 
 /**
- * 当前会话最新一条消息的摘要快照（computed 驱动）。
+ * 当前会话最新一条真实消息的摘要快照（computed 驱动）。
  *
- * 依赖面 = 最新消息 + 发送者资料（联系人备注 / 用户资料昵称）+ 资料加载状态：
- * 发送者资料异步加载完成（如点击会话后 fetchUserInfos 返回）时，
- * computed 会自动重算，watch 随之重新写入会话 store；senderReady 为 false
- * 时跳过写入，保证摘要不会闪动到 userId 中间态。
+ * 本地系统通知（群成员进出等）由 pickLastSummaryMessage 排除，不参与
+ * 会话摘要与排序；其余依赖面 = 最新真实消息 + 发送者资料（联系人备注 /
+ * 用户资料昵称）+ 资料加载状态：发送者资料异步加载完成（如点击会话后
+ * fetchUserInfos 返回）时，computed 会自动重算，watch 随之重新写入会话
+ * store；senderReady 为 false 时跳过写入，保证摘要不会闪动到 userId 中间态。
  */
 const { t } = useLocale()
 const lastMessageSummary = computed(() => {
-  const lastMsg = messages.value[messages.value.length - 1]
+  const lastMsg = pickLastSummaryMessage(messages.value)
   const cvs = currentConversation.value
   if (!lastMsg || !cvs || lastMsg.conversationId !== cvs.id)
     return null
@@ -192,7 +194,7 @@ const lastMessageSummary = computed(() => {
  * 资料就绪后 lastMessageSummary 重算，摘要直接以昵称落盘，无中间态。
  */
 watchEffect(() => {
-  const lastMsg = messages.value[messages.value.length - 1]
+  const lastMsg = pickLastSummaryMessage(messages.value)
   const cvs = currentConversation.value
   if (!lastMsg || !cvs || cvs.type !== CONVERSATION_TYPE.GROUPCHAT)
     return
@@ -232,8 +234,9 @@ watch(lastMessageSummary, (summary) => {
     patch.lastMessageFrom = summary.senderId
     patch.lastMessageSenderName = summary.senderName
   }
-  // lastMessageTime 仅单调递增更新：本地消息 timestamp 与服务端 lastMessageAt 存在
-  // 时钟偏差时，无条件覆盖会让进入会话瞬间列表按本地时间重排（会话项跳动）。
+  // lastMessageTime 仅由真实消息推进（本地 NOTICE 已在 pickLastSummaryMessage 中排除）。
+  // 真实消息 timestamp 与服务端 lastMessageAt 存在时钟偏差时，无条件覆盖会让进入
+  // 会话瞬间列表按本地时间重排（会话项跳动），因此这里保持单调递增。
   if (summary.timestamp && (!cvs.lastMessageTime || summary.timestamp > cvs.lastMessageTime)) {
     patch.lastMessageTime = summary.timestamp
   }
