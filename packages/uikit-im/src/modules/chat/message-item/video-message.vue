@@ -9,6 +9,7 @@ import { EmIcon as Icon } from '@easemob-community/uikit-core'
 import { detectEnvironment, downloadFile } from '@easemob-community/uikit-core'
 import type { UiMessage, VideoMessageBody } from '@easemob-community/uikit-core'
 import type { BubbleShape } from '../types'
+import { resolveVideoPlaybackUrl } from './video-message.utils'
 
 export interface VideoMessageProps {
   message: UiMessage
@@ -28,6 +29,10 @@ const videoClass = computed(() =>
 )
 
 const body = computed(() => props.message.body as VideoMessageBody)
+const playbackUrl = computed(() => {
+  const url = body.value.url
+  return url ? resolveVideoPlaybackUrl(url) : ''
+})
 
 /** 发送中（status=sending）：播放按钮替换为居中 loading，蒙层保留压暗 */
 const isSending = computed(() => props.message.status === MESSAGE_STATUS.SENDING)
@@ -110,7 +115,7 @@ async function handleDownload(event: MouseEvent) {
     >
       <video
         v-if="body.url"
-        :src="body.url"
+        :src="playbackUrl"
         :poster="body.thumbnailUrl || undefined"
         class="video-message__video"
         :class="videoClass"
@@ -139,7 +144,7 @@ async function handleDownload(event: MouseEvent) {
       @click="closePreview"
     >
       <video
-        :src="body.url"
+        :src="playbackUrl"
         class="video-message__preview-video"
         controls
         autoplay
