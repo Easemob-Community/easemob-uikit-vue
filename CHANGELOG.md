@@ -1,5 +1,57 @@
 # Changelog
 
+## @easemob-community/uikit-im 3.14.0 (2026-11-26)
+
+### 新增
+
+- **用户资料读取行为配置**：`useUserInfo` 新增可选 `options`，支持 `source` 日志来源标签与 `subscribe: false` 禁止资料订阅，并导出 `UseUserInfoOptions`；默认行为保持不变。
+
+### 修复
+
+- **会话摘要与排序**：群会话仅在摘要仍展示原始用户 ID 时回退拉取发送者资料，减少重复请求；入群、管理员变更等 UIKit 本地系统通知不再参与会话摘要和时间排序，避免会话被误置顶到列表最前。
+- **大会话量状态同步**：Presence 首屏仅订阅前 100 个单聊，订阅失败按退避策略合并重试；免打扰状态按会话去重并分批查询，失败批次可在下轮同步恢复。
+- **视频消息播放**：播放地址保留已有查询参数并请求原始文件，改善带签名或重定向参数的视频 URL 播放兼容性。
+
+## @easemob-community/uikit-core 2.14.0 (2026-11-26)
+
+### 新增
+
+- **用户资料 composable 配置**：`useUserInfo` 支持可选 `source` / `subscribe`，并透出 `UseUserInfoOptions`；自身资料优先走独立 `fetchOwnInfo` 能力，旧 adapter 自动回退到单用户批量拉取。
+
+### 修复
+
+- **在线状态失败恢复**：订阅失败采用 5 秒至 60 秒指数退避合并重试，列表变化只订阅新增用户，作用域销毁时清理重试定时器。
+- **资料失败状态恢复**：用户资料 store 支持按用户或全量清理失败标记，供重连后的响应式补拉使用。
+
+## @easemob-community/uikit-sdk-websdk5 1.7.0 (2026-11-26)
+
+### 新增
+
+- **用户资料缓存与诊断**：批量拉取前优先复用 SDK 本地资料缓存，按实际命中属性补齐剩余资料；请求支持 `source` 标签，会话摘要新增结构化 `lastMessageSenderName` 同步。
+- **适配 easemob-websdk 5.2.1**：完成会话增量同步、取消置顶、本地状态保护及群组资料/名片场景回归，继承上游会话同步稳定性与群资料行为修复；业务侧无新增迁移要求。
+
+### 修复
+
+- **用户资料分片与恢复**：资料拉取和订阅/退订按 100 人分片并隔离单片失败；网络、超时、429/5xx 拉取失败退避重试一次，重连后清理失败标记；1600 配额错误执行会话级订阅熔断，1601 仅标记当前分片失败。
+- **Presence 与免打扰请求治理**：Presence 订阅、退订和查询按 100 人分片；免打扰状态按已查询会话去重，20 条/批、并发 2，失败批次不记账，重复同步事件合并执行。
+
+## @easemob-community/uikit-sdk-webim4 1.5.0 (2026-11-26)
+
+### 新增
+
+- **用户资料与摘要契约对齐**：支持自身资料独立拉取、请求来源标签及会话摘要 `lastMessageSenderName` 同步，与 websdk5 adapter 的中立契约保持一致。
+
+### 修复
+
+- **批量请求失败隔离**：用户资料拉取与 Presence 订阅、退订、查询按 100 人分片，单片失败不阻断其他分片；资料拉取失败可在重连后清理并由 composable 补拉。
+
+## @easemob-community/uikit-sdk-contract 1.6.0 (2026-11-26)
+
+### 新增
+
+- **用户资料可选能力**：新增 `UserInfoRequestOptions` / `UseUserInfoOptions`，`SdkUserInfoDomain` 支持可选 `fetchOwnInfo`，`UserInfoRepository` 支持可选本地缓存读取。
+- **结构化会话摘要**：`UiConversation` 新增可选 `lastMessageSenderName`，解耦发送者显示名与摘要文本格式；新增字段和方法均为可选，既有自定义 adapter 保持兼容。
+
 ## @easemob-community/uikit-im 3.13.0 (2026-11-12)
 
 ### 新增

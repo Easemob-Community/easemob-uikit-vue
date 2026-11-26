@@ -87,6 +87,7 @@
 - **修复（2026-11-18，基线 `79cc4c31`）**：群会话仅在摘要仍展示原始 userId 且需要展示发送者时回退，草稿/已有昵称/单聊/`showSenderName=false` 不触发；双 adapter 拉取与 websdk5 订阅/退订按 100 顺序分片并隔离失败；`enableUserInfo=false` 在 websdk5 初始化时硬关闭自动同步，保留 `enableUserInfoSync` 子开关。
 - **加固（2026-11-18）**：own 经真实 `fetchOwnInfo` 独立链路拉取（adapter 可选能力，缺省回退单 ID `fetchUserInfos`）；**仅 websdk5** 对网络/超时与 429/5xx 退避重试一次（4.x 无自动同步且错误码/缓存能力不同，不重试，只做单片失败标记；4.x 唯一资料 REST 入口已保证 100 分片）；离线发起的拉取标记失败、重连清理后由响应式 composable 补拉；1600 会话级熔断、1601 仅当前分片失败；日志增加 source、code/httpStatus/reason/message；会话/联系人/群成员（含抽屉宫格、群管理 5 类名单）与消息气泡/引用/置顶/合并消息不订阅陌生人资料；websdk5 优先复用 runtime/summary 缓存并按实际字段标记；`UiConversation` 新增可选 `lastMessageSenderName` 解耦摘要格式，摘要就地更新路径同步写 sender 字段。
 - **边界**：SDK 缓存命中属性视为本地展示权威，缺失属性仍 REST；运行期 Provider 开关不会重建 SDK 单例或修改既有自动同步配置；联系人全量预取与列表虚拟化不在本轮扩大修改。
+- **UIKit 侧收口版本**：`contract 1.6.0` / `core 2.14.0` / `websdk5 1.7.0` / `webim4 1.5.0` / `im 3.14.0`。
 - **关联 skill**：`uikit-user-attribute-extraction` / `uikit-provider-config` / `uikit-sdk-adapter-architecture`
 
 ### [x] D151. 双 adapter `fetchGroupMembers` 返回管理员角色合并前数组
