@@ -27,8 +27,9 @@
 - `CustomMessageBody`：`event` 与可选 `params`。
 - `CombineMessageBody`：`title`、`summary`、可选 `messageList`、下载信息和 `combineLevel`。
 - `CmdMessageBody` / `NoticeMessageBody`：CMD 与通知消息数据。
+- `MultiBody` / `MultiBodySegment`：复合消息（`multi_body`）正文，由 2～20 个有序的 `text` / `image` / `file` / `voice` / `video` / `location` / `custom` 分段组成；`type` 判别字段只存在于分段上。发送侧使用 `MultiBodySegmentInput`。
 - `SendingMessageMeta`：发送过程元信息。
 
 ## 结构型守卫
 
-`isTextBody`、`isImageBody`、`isVoiceBody`、`isVideoBody`、`isFileBody`、`isLocationBody`、`isCustomBody`、`isCombineBody`、`isCmdBody` 用于在运行时收窄消息体类型。
+`isTextBody`、`isImageBody`、`isVoiceBody`、`isVideoBody`、`isFileBody`、`isLocationBody`、`isCustomBody`、`isCombineBody`、`isCmdBody` 用于在运行时收窄消息体类型；`isMultiBody`、`isMultiBodySegment` 用于复合消息正文与分段。

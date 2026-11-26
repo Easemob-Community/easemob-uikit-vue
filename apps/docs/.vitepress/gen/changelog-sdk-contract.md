@@ -1,3 +1,13 @@
+## @easemob-community/uikit-sdk-contract 1.6.0 (2026-11-26)
+
+
+### 新增
+
+- **用户资料可选能力**：新增 `UserInfoRequestOptions` / `UseUserInfoOptions`，`SdkUserInfoDomain` 支持可选 `fetchOwnInfo`，`UserInfoRepository` 支持可选本地缓存读取。
+- **结构化会话摘要**：`UiConversation` 新增可选 `lastMessageSenderName`，解耦发送者显示名与摘要文本格式；新增字段和方法均为可选，既有自定义 adapter 保持兼容。
+
+---
+
 ## @easemob-community/uikit-sdk-contract 1.5.1 (2026-11-10)
 
 

@@ -53,7 +53,7 @@ const chatConfig = {
 - **发送判定**：单附件无文字仍发普通消息；文字 + 附件或两个及以上附件发一条 `multi_body`，最多 20 段。
 - **H5**：不提供复合编辑/发送入口，附件仍分开发送；可接收展示复合消息并逐段下载附件。
 - **其他分段**：语音、位置和 custom 可通过 `useChat().sendMultiBodyMessage` 发送，七类分段均可接收展示。
-- **能力限制**：默认关闭，还需 adapter 上报 `multiBodyMessage !== false`；websdk4 完全不支持。复合消息不可编辑或翻译。
+- **能力限制**：默认关闭，还需 adapter 上报 `multiBodyMessage !== false`；依赖 `easemob-websdk` 5.2.0 起的 SDK 能力，websdk4 完全不支持。复合消息不可编辑或翻译。
 
 完整发送示例见 [`useMessageSend`](../api/composables/use-message-send)，单条渲染见 [MultiBodyMessage](./multi-body-message)。
 

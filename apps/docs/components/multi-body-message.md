@@ -64,6 +64,7 @@ await sendMultiBodyMessage([
 :::
 
 ::: warning 能力边界
+- 复合消息依赖 `easemob-websdk` 5.2.0 起的 `multi_body` 能力（websdk5 适配器从 1.6.0 起适配 5.2.0，3.14.0 起适配 5.2.1）。
 - `input.features.multiBody` 默认 `false`，并且只有 adapter 上报 `multiBodyMessage !== false` 才启用。
 - websdk4 完全不支持 `multi_body`，不会提供发送、接收转换、转发、下载或兼容渲染。
 - SDK 旧端、推送与服务端搜索只保证看到首段；UIKit 本地搜索会扫描全部文本、文件名、地址和 custom 内容。

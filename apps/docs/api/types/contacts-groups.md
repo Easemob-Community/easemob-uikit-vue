@@ -15,7 +15,7 @@
 
 ## UiGroup
 
-群对象以 `groupId` 为必需字段，其他常用字段包括 `groupName`、`avatar`、`description`、`owner`、`role`、`memberCount`、`maxUsers`、`public`、`allowInvites`、`approval`、`mute`、`disabled`、`announcement` 和 `created`。
+群对象以 `groupId` 为必需字段，其他常用字段包括 `groupName`、`avatar`、`description`、`ext`、`owner`、`role`、`memberCount`、`maxUsers`、`public`、`allowInvites`、`approval`、`inviteNeedConfirm`（被邀请人入群前是否需要确认）、`mute`、`disabled`、`shieldgroup`、`announcement`、`created` 和 `joinedAt`（当前用户入群时间）。
 
 ## UiGroupMember
 

@@ -1,3 +1,16 @@
+## @easemob-community/uikit-sdk-webim4 1.5.0 (2026-11-26)
+
+
+### 新增
+
+- **用户资料与摘要契约对齐**：支持自身资料独立拉取、请求来源标签及会话摘要 `lastMessageSenderName` 同步，与 websdk5 adapter 的中立契约保持一致。
+
+### 修复
+
+- **批量请求失败隔离**：用户资料拉取与 Presence 订阅、退订、查询按 100 人分片，单片失败不阻断其他分片；资料拉取失败可在重连后清理并由 composable 补拉。
+
+---
+
 ## @easemob-community/uikit-sdk-webim4 1.4.3 (2026-11-10)
 
 

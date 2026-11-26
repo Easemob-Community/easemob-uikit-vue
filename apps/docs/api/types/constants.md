@@ -5,7 +5,7 @@
 | 常量 | 用途 | 对应值类型 |
 | --- | --- | --- |
 | `CONVERSATION_TYPE` | 单聊、群聊等会话类型 | `ConversationTypeValue` |
-| `MESSAGE_TYPE` | 文本、媒体、自定义、合并等消息类型 | `MessageTypeValue` |
+| `MESSAGE_TYPE` | 文本、媒体、自定义、合并、复合等消息类型 | `MessageTypeValue` |
 | `MESSAGE_STATUS` | 发送与阅读状态 | `MessageStatusValue` |
 | `GROUP_MEMBER_ROLE` | 群主、管理员、成员等角色 | `GroupMemberRoleValue` |
 | `PRESENCE_STATUS` | 在线状态 | `PresenceStatusValue` |

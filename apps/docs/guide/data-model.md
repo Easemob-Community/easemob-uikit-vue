@@ -72,5 +72,5 @@ UIKit 的列表项（会话 / 联系人 / 消息）数据来自环信 Web SDK �
 ## 与 Store / Composable 的关系
 
 - `useUserInfo()` / `useOwnUserInfo()` 负责拉取与更新 UserInfo，展示名解析遵循「群昵称 → 备注 → 昵称 → userId」优先级。
-- `usePresence()` 负责订阅在线状态；`getPresenceStatus` 无需订阅即可查询，`subscribePresence` 单次 ≤100、总数 ≤3000、最长 30 天。
+- `usePresence()` 负责订阅在线状态；`fetchPresence(userIds)` 无需订阅关系即可主动查询，`subscribePresence` 单次 ≤100、总数 ≤3000、最长 30 天。会话列表只自动订阅前 100 个单聊，退避重试与临时上限见 [`usePresence`](/api/composables/use-presence)。
 - 会话维度操作（免打扰 / 删除 / 置顶）在会话列表内完成，不在联系人列表内；详见 `EmConversationContainer` 内置操作与 `customActions` 扩展。

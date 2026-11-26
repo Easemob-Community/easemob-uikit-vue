@@ -1,3 +1,17 @@
+## @easemob-community/uikit-core 2.14.0 (2026-11-26)
+
+
+### 新增
+
+- **用户资料 composable 配置**：`useUserInfo` 支持可选 `source` / `subscribe`，并透出 `UseUserInfoOptions`；自身资料优先走独立 `fetchOwnInfo` 能力，旧 adapter 自动回退到单用户批量拉取。
+
+### 修复
+
+- **在线状态失败恢复**：订阅失败采用 5 秒至 60 秒指数退避合并重试，列表变化只订阅新增用户，作用域销毁时清理重试定时器。
+- **资料失败状态恢复**：用户资料 store 支持按用户或全量清理失败标记，供重连后的响应式补拉使用。
+
+---
+
 ## @easemob-community/uikit-core 2.13.0 (2026-11-12)
 
 
