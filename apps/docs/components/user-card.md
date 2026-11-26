@@ -38,6 +38,10 @@ const userId = 'user_001'
 function onSendMessage(id: string) {
   // 跳转到与该用户的会话
 }
+
+function onClose() {
+  // 执行关闭后的埋点、清理等操作
+}
 </script>
 
 <template>
@@ -45,11 +49,14 @@ function onSendMessage(id: string) {
     v-model:show="show"
     :user-id="userId"
     @send-message="onSendMessage"
+    @close="onClose"
   />
 </template>
 ```
 
 打开弹窗时自动拉取在线状态与黑名单；`enableAudioAction` / `enableVideoAction` 仅展示语音 / 视频通话入口（SDK 无 RTC 能力），点击后抛 `audio-call` / `video-call` 事件，通话能力由消费方实现。
+
+H5 下点击遮罩或按 ESC 关闭时，组件会同时抛出 `update:show(false)` 和 `close`。`v-model:show` 会自动将 `show` 同步为 `false`，无需手动调用关闭方法；需要执行埋点、清理等操作时监听 `close`。
 
 <!-- @include: ../.vitepress/gen/user-card-modal.md -->
 

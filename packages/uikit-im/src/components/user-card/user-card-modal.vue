@@ -44,6 +44,10 @@ const props = withDefaults(defineProps<UserCardModalProps>(), {
 })
 
 const emit = defineEmits<{
+  /**
+   * 弹层内部触发显隐变化时发出；点击遮罩、ESC 等关闭路径负载 false，供 v-model:show 双向同步。
+   * Emitted when the internal popup changes visibility; closing via overlay or ESC emits false for v-model:show.
+   */
   (e: 'update:show', value: boolean): void
   (e: 'send-message', userId: string): void
   /** 陌生人档点击「加好友」且申请发送成功后触发 */
@@ -58,6 +62,10 @@ const emit = defineEmits<{
   (e: 'audio-call', userId: string): void
   /** 点击视频通话入口时触发（需 enableVideoAction 开启，通话能力由消费方实现） */
   (e: 'video-call', userId: string): void
+  /**
+   * 内置弹层或名片操作触发关闭时发出（含点击遮罩、ESC），供业务侧感知关闭。
+   * Emitted when the internal popup or a card action closes the card, including overlay and ESC dismissal.
+   */
   (e: 'close'): void
 }>()
 

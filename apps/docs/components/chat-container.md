@@ -196,9 +196,16 @@ function toggleGroupAnnouncementBar() {
 ```vue
 <template>
   <em-chat-container>
-    <!-- 名片弹窗：点头像/右键头像时打开业务自己的资料卡 -->
-    <template #user-card="{ show, userId, open, close }">
-      <MyUserCard v-model:show="show" :user-id="userId" @send-message="onSend" />
+    <!-- 名片弹窗：点头像/右键头像时打开资料卡，关闭时通过 close 同步容器状态 -->
+    <template #user-card="{ show, userId, anchor, close }">
+      <em-user-card-modal
+        :show="show"
+        :user-id="userId"
+        :anchor="anchor"
+        @update:show="value => !value && close()"
+        @send-message="onSend"
+        @close="onUserCardClose"
+      />
     </template>
     <!-- 多选栏：自定义多选底部操作 -->
     <template #multi-select-bar="{ visible, selectedMessages, forwardOneByOne, delete, close }">
@@ -216,6 +223,8 @@ function toggleGroupAnnouncementBar() {
   </em-chat-container>
 </template>
 ```
+
+`#user-card` 接管后，自定义弹窗关闭时需要调用作用域中的 `close()` 同步容器内部状态。上面示例中，H5 点击遮罩或按 ESC 会触发 `EmUserCardModal` 的 `update:show(false)`，从而调用 `close()`；`close` 事件则用于业务侧感知关闭。
 
 ### 入群邀请弹窗独立使用 `EmInviteMemberModal`
 

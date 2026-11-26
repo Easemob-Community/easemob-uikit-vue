@@ -18,14 +18,14 @@
 
 ### Events
 
-| 事件名              | 参数                               | 说明                                             |
+| 事件名              | 参数                               | 说明                                                                                                                                                                        |
 | --- | --- | --- |
-| `update:show`    | value: boolean                   | —                                              |
-| `send-message`   | userId: string                   | —                                              |
-| `contact-added`  | userId: string                   | 陌生人档点击「加好友」且申请发送成功后触发                          |
-| `deleted`        | userId: string                   | 删除联系人成功后触发                                     |
-| `block-changed`  | userId: string, blocked: boolean | 拉黑/取消拉黑成功后触发                                   |
-| `remark-changed` | userId: string, remark: string   | 备注保存成功后触发                                      |
-| `audio-call`     | userId: string                   | 点击语音通话入口时触发（需 enableAudioAction 开启，通话能力由消费方实现） |
-| `video-call`     | userId: string                   | 点击视频通话入口时触发（需 enableVideoAction 开启，通话能力由消费方实现） |
-| `close`          | —                                | —                                              |
+| `update:show`    | value: boolean                   | 弹层内部触发显隐变化时发出；点击遮罩、ESC 等关闭路径负载 false，供 v-model:show 双向同步。<br>Emitted when the internal popup changes visibility; closing via overlay or ESC emits false for v-model:show. |
+| `send-message`   | userId: string                   | —                                                                                                                                                                         |
+| `contact-added`  | userId: string                   | 陌生人档点击「加好友」且申请发送成功后触发                                                                                                                                                     |
+| `deleted`        | userId: string                   | 删除联系人成功后触发                                                                                                                                                                |
+| `block-changed`  | userId: string, blocked: boolean | 拉黑/取消拉黑成功后触发                                                                                                                                                              |
+| `remark-changed` | userId: string, remark: string   | 备注保存成功后触发                                                                                                                                                                 |
+| `audio-call`     | userId: string                   | 点击语音通话入口时触发（需 enableAudioAction 开启，通话能力由消费方实现）                                                                                                                            |
+| `video-call`     | userId: string                   | 点击视频通话入口时触发（需 enableVideoAction 开启，通话能力由消费方实现）                                                                                                                            |
+| `close`          | —                                | 内置弹层或名片操作触发关闭时发出（含点击遮罩、ESC），供业务侧感知关闭。<br>Emitted when the internal popup or a card action closes the card, including overlay and ESC dismissal.                           |
